@@ -4,7 +4,8 @@
 *         Copyright (c) 2002-2003 Lektec Consulting         *
 *                                                           *
 ************************************************************/
-//allows users to edit there links
+//Controls the subject news forms.  Allows creation, deletion 
+//and modify of subject news posts. 
 
 require_once("../include/session.php");
 require_once("../include/include.php");
@@ -23,7 +24,7 @@ class AddSubNews
 		{
 			$this->t_body->set_var("MODIFY", "<input type=\"hidden\" name=\"id\" value=\"$modify\">");
 			$this->t_body->set_var("DELETE_NEWS", "<input type=\"submit\" name=\"delete\" value=\"Delete News\">");
-			$this->set_var("LEAVE_OPTION", "<option value=0 selected>Keep existing</option>");
+			$this->set_var("LEAVE_OPTION", "<option value=\"0\" selected>Keep existing</option>");
 		}
 		else
 		{

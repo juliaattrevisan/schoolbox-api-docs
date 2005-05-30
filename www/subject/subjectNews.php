@@ -1,11 +1,12 @@
 <?php
 
-/* Orginally developed by David Hammerton for MGS
- * Modified by James Leckie for inclusion in complete Intranet solution
- * 
- * News Object - controls all news behaviour, insert, get, modify, delete.
- * Controls news for subjects only.  Stripped down version of David Hammertons news objecct
- * Seperated from main news for tidyness and userfriendlyness */
+/************************************************************
+*                                                           *
+*         Copyright (c) 2002-2003 Lektec Consulting         *
+*                                                           *
+************************************************************/
+//Provides database interface for news posts.  Allows creation, 
+//deletion and modify of subject news posts. 
 
 require_once($_SERVER['DOCUMENT_ROOT']."/include/html-parse.php");
 

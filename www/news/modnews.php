@@ -85,7 +85,7 @@ function putExisting($newsItem, $groupArray, $campusArray) {
 
 	$this->set_var("ID", $newsItem['item_id']);
 	$this->set_var("HEADING", $newsItem['item_heading']);
-	$this->set_var("LEAVE_OPTION", "<option value=0 selected>Keep existing</option>");
+	$this->set_var("LEAVE_OPTION", "<option value=\"0\" selected>Keep existing</option>");
 	$this->set_var("DEFAULT_TIME_SELECTED", "");
 	$this->set_var("BODY", $newsItem['item_body']);
 	$this->set_var("DEL_FORM", " <input type=\"submit\" name=\"delete\" value=\"Delete News\">");
