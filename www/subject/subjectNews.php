@@ -30,13 +30,23 @@ function addNews($code, $owner, $heading, $expires, $body)
 
 function modNews($id, $code, $heading, $expires, $body)
 {
-	$now = time();
-	$expirestime = $now + (3600 * $expires);
+	if($expires)
+	{
+		$now = time();
+		$expirestime = $now + (3600 * $expires);
 
-	$SQL_QUERY = "UPDATE subject_news
-		SET code = '$code', heading = '$heading',
-		datetime_expires = FROM_UNIXTIME($expirestime), body = '$body'
-		WHERE id = '$id'";
+		$SQL_QUERY = "UPDATE subject_news
+			SET code = '$code', heading = '$heading',
+			datetime_expires = FROM_UNIXTIME($expirestime), body = '$body'
+			WHERE id = '$id'";
+	}
+	else
+	{
+		$SQL_QUERY = "UPDATE subject_news
+			SET code = '$code', heading = '$heading', body = '$body'
+			WHERE id = '$id'";
+	}
+	
 	$this->dbConnection->dbDoQuery($SQL_QUERY);
 }
 

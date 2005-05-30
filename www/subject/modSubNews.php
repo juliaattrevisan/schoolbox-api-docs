@@ -23,11 +23,13 @@ class AddSubNews
 		{
 			$this->t_body->set_var("MODIFY", "<input type=\"hidden\" name=\"id\" value=\"$modify\">");
 			$this->t_body->set_var("DELETE_NEWS", "<input type=\"submit\" name=\"delete\" value=\"Delete News\">");
+			$this->set_var("LEAVE_OPTION", "<option value=0 selected>Keep existing</option>");
 		}
 		else
 		{
 			$this->t_body->set_var("MODIFY", ""); 	
-			$this->t_body->set_var("DELETE_NEWS", ""); 	
+			$this->t_body->set_var("DELETE_NEWS", "");
+			$this->set_var("LEAVE_OPTION", ""); 	
 		}
 		$this->t_body->set_var("CODE", "<input type=\"hidden\" name=\"code\" value=\"$code\">");
 	}
