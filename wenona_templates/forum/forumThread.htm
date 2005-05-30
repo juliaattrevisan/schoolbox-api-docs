@@ -1,0 +1,254 @@
+<html><!-- #BeginTemplate "/Templates/wenona_main.dwt" --><!-- DW6 -->
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>{TITLE}</title>
+<script type="text/javascript" src="document.js">
+</script>
+<script type="text/javascript" src="tree.js">
+</script>
+<script type="text/javascript">
+    
+        var {ROOTOBJ} = new jsTree;
+        
+        //create the root
+        {ROOTOBJ}.createRoot("{ROOTNAME}");
+        <!-- BEGIN forum -->
+        var {OBJ} = {PARENTOBJ}.addChild("{ID}", "{CID}", "{HEADING}",  "{BODY}", "{OWNER}", "{DATE}", {MODIFY});
+        <!-- END forum -->
+		
+function doLoad() { {ROOTOBJ}.buildDOM(); {OPEN} }     
+window.onload = new Function('doLoad();');
+</script>
+
+<!-- #EndEditable --> 
+<link rel="stylesheet" href="/global.css" type="text/css">
+</head>
+
+<body>
+  <script language="JavaScript1.2" type="text/javascript" src="/coolmenus4.js"></script>
+  <script language="JavaScript1.2" type="text/javascript" src="/menusettings.js" ></script>
+  <script language="JavaScript1.2" type="text/javascript">{DROPDOWNMENU}</script>
+<form name="search" method="GET" class="nospace" action="/search.php">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td width="150" align="center" valign="bottom" class="blueBG"><img src="/images/header1.gif" width="133" height="60"></td>
+    <td valign="bottom" class="blueBG"><br>
+	  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td class="blueBG" valign="bottom">&nbsp;</td>
+          <td align="right" valign="bottom"><input class="tab_unselected" type="text" name="keyword" /></td>
+        </tr>
+        <tr> 
+          <td class="blueBG" valign="bottom"><!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" --><table border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td align="right" valign="bottom" height="5" width="7"><img src="/images/bluepixel.gif" width="2" height="2"></td>
+    <td valign="bottom" height="5" width="70"><img src="/images/bluepixel.gif" width="70" height="2"></td>
+    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2	"></td>
+    <td valign="bottom" height="5" width="70"><img src="/images/bluepixel.gif" width="70" height="2"></td>
+    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
+    <!-- BEGIN webmail_toptab -->
+    <td valign="bottom" height="5" width="83"><img src="/images/bluepixel.gif" width="83" height="2"></td>
+    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
+    <!-- END webmail_toptab -->
+    <td valign="bottom" height="5" width="85"><img src="/images/bluepixel.gif" width="85" height="2"></td>
+    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
+    <!-- BEGIN timetable_toptab -->
+    <td valign="bottom" height="5" width="90"><img src="/images/bluepixel.gif" width="90" height="2"></td>
+    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
+    <!-- END timetable_toptab -->
+    <td valign="bottom" height="5" width="90"><img src="/images/bluepixel.gif" width="90" height="2"></td>
+    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
+	    <td valign="bottom" height="5" width="75"><img src="/images/bluepixel.gif" width="75" height="2"></td>
+    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
+	    <td valign="bottom" height="5" width="75"><img src="/images/bluepixel.gif" width="75" height="2"></td>
+    <td valign="bottom" height="5" width="7"><img src="/images/bluepixel.gif" width="2" height="2"></td>
+  </tr>
+  <tr> 
+    <td width="7" height="20"><img src="/images/tab_bluelbigleftcorner.gif" width="7" height="20"></td>
+    <td width="70" height="20" background="/images/lightbluepixel.gif" bgcolor="#9EC6D9"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/home.php">Main</a></b></td>
+    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
+    <td height="20" background="/images/lightbluepixel.gif" bgcolor="#9EC6D9"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/news.php">News</a></b></td>
+    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
+    <!-- BEGIN webmail_tab -->
+    <td height="20" background="/images/lightbluepixel.gif" bgcolor="#9EC6D9"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="http://webmail.wenona.nsw.edu.au/servlet/webacc" target="_blank">Webmail</a></b></td>
+    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
+    <!-- END webmail_tab -->
+    <td height="20" background="/images/lightbluepixel.gif"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/calendar/viewCalendar.php">Calendar</a></b></td>
+    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
+    <!-- BEGIN timetable_tab -->
+    <td height="20" background="/images/lightbluepixel.gif" bgcolor="#9EC6D9"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/timetable.php">Timetable</a></b></td>
+    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
+    <!-- END timetable_tab -->
+    <td height="20" background="/images/redpixel.gif"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/browse.php" class="one">Resources</a></b></td>
+    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
+	<td height="20" background="/images/lightbluepixel.gif"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="http://intranet.wenona.nsw.edu.au/index.asp?strEncrypted={ENC_LOGIN}" target="_blank">Intranet</a></b></td>
+    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
+	<td height="20" background="/images/lightbluepixel.gif"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="http://intranet.wenona.nsw.edu.au/MyFilePortal/index.asp?strEncrypted={ENC_LOGIN}" target="_blank">My Files</a></b></td>
+ 	<td width="7" height="20"><img src="/images/tab_bluelbigrightcorner.gif" width="7" height="20"></td>
+  </tr>
+</table><!-- #EndLibraryItem --><!-- #EndEditable --></td>
+          <td align="right" valign="top"> 
+              <select  class="tab_unselected" name="where">
+                <option value="0" selected>portal</option>
+                <option value="1">google</option>
+                <option value="2">yahoo</option>
+              </select>
+              <input type="submit" name="Submit" value="Search">
+            </td>
+        </tr>
+    </table></td>
+    <td width="50" valign="bottom" class="blueBG">&nbsp;</td>
+  </tr>
+</table>
+</form>
+<table width="100%" height="93%" border="0" cellpadding="0" cellspacing="0">
+  <tr valign="top"> 
+    <td height="25" align="center" class="blueBG"><img src="/images/header2.gif" width="133" height="25"></td>
+    <td width="20" height="25" background="/images/redpixelcnrbg.gif">&nbsp;</td>
+    <td height="25" background="/images/redpixelbg2.gif">&nbsp;</td>
+    <td width="50" height="25" background="/images/redpixelbg2.gif">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="150" valign="top" class="blueBG">
+<table border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td><img src="/images/sidenav-goto.gif" width="150" height="15"></td>
+        </tr>
+        <tr> 
+          <td height="2" class="blueBG"> 
+		  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr> 
+                <td width="12"><img src="/images/pix.gif" width="15" height="5"></td>
+                <td width="121" height="{MJSHEIGHT}" class="blueBG">&nbsp;</td>
+              </tr>
+            </table></td>
+        </tr>
+        <tr> 
+          <td class="blueBG">&nbsp;</td>
+        </tr>
+        <!-- BEGIN msubject -->
+        <tr> 
+          <td> <p><img src="/images/sidenav-mysubjects.gif" width="150" height="15"></p></td>
+        </tr>
+        <tr> 
+          <td class="blueBG"> <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr> 
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <!-- BEGIN msubject_block -->
+              <tr> 
+                <td width="12"><img src="/images/pix.gif" width="15" height="5"></td>
+                <td><img src="/images/whitearrow.gif" width="6" height="9"></td>
+                <td width="121"><a href="/{MLINKSUB}" class="one">{MSUBJECT}</a></td>
+              </tr>
+              <!-- END msubject_block -->
+            </table></td>
+        </tr>
+        <tr> 
+          <td class="blueBG">&nbsp;</td>
+        </tr>
+        <!-- END msubject -->
+        <!-- BEGIN mgroup -->
+        <tr> 
+          <td> <p><img src="/images/sidenav-mygroups.gif" width="150" height="15"></p></td>
+        </tr>
+        <tr> 
+          <td class="blueBG"> <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr> 
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <!-- BEGIN mgroup_block -->
+              <tr> 
+                <td width="12"><img src="/images/pix.gif" width="15" height="5"></td>
+                <td><img src="/images/whitearrow.gif" width="6" height="9"></td>
+                <td width="121"><a href="/{MGLINK}" class="one">{MGNAME}</a></td>
+              </tr>
+              <!-- END mgroup_block -->
+            </table></td>
+        </tr>
+        <tr> 
+          <td>&nbsp;</td>
+        </tr>
+        <!-- END mgroup -->
+        <tr> 
+          <td><img src="/images/sidenav-mylinks.gif" width="150" height="15"></td>
+        </tr>
+        <tr> 
+          <td class="blueBG"> <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr> 
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <!-- BEGIN mlink_block -->
+              <tr> 
+                <td width="12"><img src="/images/pix.gif" width="15" height="5"></td>
+                <td><img src="/images/whitearrow.gif" width="6" height="9"></td>
+                <td width="121" class="blueBG">{MLINK}</td>
+              </tr>
+              <!-- END mlink_block -->
+              <tr> 
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr> 
+                <td><img src="/images/pix.gif" width="15" height="5"></td>
+                <td><img src="/images/whitearrow.gif" width="6" height="9"></td>
+                <td><a href="/editLinks.php" class="one">ADD LINK</a></td>
+              </tr>
+            </table></td>
+        </tr>
+        <tr> 
+          <td class="blueBG">&nbsp;</td>
+        </tr>
+      </table>
+      
+    </td>
+    <td width="20" background="/images/redpixelbg.gif">&nbsp;</td>
+    <td valign="top"><!-- #BeginEditable "main" --> 
+            <table width="98%" border="0" cellspacing="0" cellpadding="0">
+              <tr> 
+                <td class="itemHeader">{ROOTNAME}<br> <img src="/images/redpixel.gif" width="100%" height="2"> </td>
+              </tr>
+            </table>
+            <table width="98%" border="0">
+              <tr>
+                <td width="49%">Displaying topics {SELECTION} {PREV} {NEXT} in
+                  threaded view</td>
+                <td width="51%" align="right"><a href="/forum/modpost.php?cid={CID}&parent=0">Post
+                    Topic</a> // <a href="/forum/viewForum.php?cid={CID}&view=flat">Flat
+                    View </a></td>
+              </tr>
+            </table>
+            <br>
+            <table width="98%" border="0" cellpadding="0" cellspacing="0">
+              <tr valign="top">
+                <td width="30%" align="center"><table width="90%" border="0" cellpadding="2" cellspacing="0">
+                    <tr>
+                      <td  bgcolor="#EEEEEE" class="cfinetable"><div id=domRoot></div></td>
+                    </tr>
+                </table></td>
+                <td width="70%"><div id=domBody></div></td>
+              </tr>
+            </table>
+            <p align="right"><a href="/homepage.php?category={CID}">return
+                    to homepage</a></p>
+            <!-- #EndEditable --></td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="150" class="blueBG">&nbsp;</td>
+    <td width="20" background="/images/redpixelbg.gif">&nbsp;</td>
+    <td align="right"><b>Copyright 2005 Wenona</b><br>
+      Guidelines of Use and Privacy Policy</td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+
+</body>
+<!-- #EndTemplate --></html>

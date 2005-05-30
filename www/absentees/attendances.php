@@ -1,0 +1,418 @@
+<?php
+/************************************************************
+*                                                           *
+*         Copyright (c) 2002-2003 Lektec Consulting         *
+*                                                           *
+************************************************************/
+//absentee system, interfaces with synergetic database to
+
+require_once("../include/session.php");
+require_once("../include/include.php");
+require_once("../include/permission.php");
+require_once("../include/syn_timetable.php");
+
+
+//check if they are a staff member, students cannot access this
+if(isStudent($_SESSION['gid']))
+{
+      error(19);
+}
+
+class Attendance
+{
+
+	function Attendance()
+	{
+		$this->year = date("Y");
+		$this->date = date("Y-m-d");
+		$this->campus = 'S';
+
+		$this->msdb = @mssql_connect(MSSQL_host, MSSQL_user, MSSQL_passwd);
+	}
+
+        function displayStudentList($subCode, $daynum)
+        {
+                $this->t_body = new Template(TPL_directory);
+                $this->t_body->set_file("tplBODY", "absentees/studentList.htm");
+		$this->t_body->set_block("tplBODY", "student_list", "student_list_block");
+		$this->t_body->set_var("TITLE", HEADING." - Attendances Roll");
+		include_once("../include/page.php");
+		
+
+		if (!$daynum)
+			$daynum = getDayNumber();
+		$periodnum = $this->getSubjectPeriod($subCode, $daynum);
+		if (!$periodnum)
+			error(33); //period doesn't exist today
+
+		$this->t_body->set_var("DAYNUMBER", "Day&nbsp;".$daynum);
+		$this->t_body->set_var("PERNUMBER", $periodnum);
+		$this->t_body->set_var("SUBCODE", $subCode);
+		$this->t_body->set_var("DATE",  date("j/n/Y"));
+	 	$this->t_body->set_var("PERIOD", "");	
+
+                //setup database
+		//$mySQLdb = new dbManager();
+		//$mySQLdb->dbConnect();	
+
+		$query = "SELECT SubjectClasses.Description 
+                       	FROM SynergyOne.dbo.SubjectClasses SubjectClasses
+                       	WHERE SubjectClasses.ClassCode = '$subCode'";
+
+		$result = mssql_query($query, $this->msdb);
+		$name = mssql_fetch_array($result);
+		$this->t_body->set_var("SUBJECTNAME", $name[0]);	
+
+		$query = "
+			SELECT CommunityStudents.Surname,
+				CommunityStudents.Preferred,
+				Students.ID, 
+				Attendances.AttendedFlag, 
+				Attendances.PossibleAbsenceCode, 
+				Attendances.PossibleDescription
+			FROM	Students Students
+			INNER JOIN StudentSemester ON Students.ID = StudentSemester.ID
+			LEFT JOIN StudentClasses ON (
+				StudentSemester.FileYear = StudentClasses.FileYear AND
+				StudentSemester.FileSemester = StudentClasses.FileSemester AND
+				StudentSemester.ID = StudentClasses.ID)
+			LEFT JOIN SubjectClasses ON (
+				StudentClasses.FileType = SubjectClasses.FileType AND
+				StudentClasses.FileYear = SubjectClasses.FileYear AND
+				StudentClasses.FileSemester = SubjectClasses.FileSemester AND
+				StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
+				StudentClasses.ClassCode = SubjectClasses.ClassCode )
+			LEFT JOIN Community CommunityStudents ON 
+				Students.ID = CommunityStudents.ID
+			LEFT JOIN luStudentStatus lS ON (
+				StudentSemester.Status = lS.Code)
+			LEFT JOIN Attendances ON ( 
+				Students.ID = Attendances.ID AND
+				Attendances.ClassCode = StudentClasses.ClassCode
+				AND Attendances.AttendancePeriod = '" . $periodnum . "'
+				AND Attendances.AttendanceDate = '" . $this->date . "')	
+			WHERE	CommunityStudents.DeceasedFlag = 0
+				AND lS.SynergyMeaning <> 'LEFT'  
+				AND lS.SynergyMeaning <> 'LOA'  
+				AND StudentClasses.ClassCode = '" . $subCode . "'
+				AND (SubjectClasses.FileYear='" . $_SESSION['FileYear']  . "')
+				AND (SubjectClasses.FileSemester='" . $_SESSION['FileSemester'] .  "')
+		ORDER BY CommunityStudents.Surname, CommunityStudents.Preferred ";
+
+		$result = mssql_query($query, $this->msdb);
+		
+		$x=0;		
+
+		while($student = @mssql_fetch_array($result))
+ 		{
+			$this->t_body->set_var("SURNAME", $student[0]);
+			$this->t_body->set_var("FIRSTNAME", $student[1]);
+			
+
+			//now the absentee stuff
+			$abscode = $this->createAbsCodeHTML($student['PossibleAbsenceCode']);
+
+			$this->t_body->set_var("ABSCODENAME", "abscode".$x);
+			$this->t_body->set_var("ABSCODE", $abscode);
+			$this->t_body->set_var("ATTENDNAME", "attend".$x);
+			
+			if($student['AttendedFlag'] == 1 || is_null($student['AttendedFlag']))
+			{
+				$this->t_body->set_var("ATTENDED", "checked");
+			}
+			else
+			{
+				$this->t_body->set_var("ATTENDED", "");
+			}
+
+			$this->t_body->set_var("REASONNAME", "reason".$x);
+			$this->t_body->set_var("REASON", $student['PossibleDescription']);
+			$this->t_body->set_var("STUDNAME", "stud".$x);
+			$this->t_body->set_var("STUDCODE", $student['ID']);
+
+
+			$this->t_body->parse("student_list_block", "student_list", true);		
+			$x++;
+		}
+		
+                $this->t_body->pparse("finaloutput", "tplBODY");
+        }
+
+	function createAbsCodeHTML($code)
+	{
+		$abscodeHTML = "";
+	
+		$query = "SELECT * FROM SynergyOne.dbo.luAbsenceType";
+		$result = mssql_query($query, $this->msdb);		
+
+		while( $desc = mssql_fetch_array($result) )
+		{
+			if($desc[0] == $code)
+				$abscodeHTML .= "<option value=\"".$desc[0]."\" selected>".trim($desc[1])."</option>";
+			else
+				$abscodeHTML .= "<option value=\"".$desc[0]."\">".trim($desc[1])."</option>";
+		}
+
+		return $abscodeHTML;
+	}
+
+	function displayClassList($daynum)
+	{
+                $this->t_body = new Template(TPL_directory);
+                $this->t_body->set_file("tplBODY", "absentees/classList.htm");
+		$this->t_body->set_block("tplBODY", "class_list", "class_list_block");
+		$this->t_body->set_var("TITLE", HEADING." - Attendances Class List");
+		include_once("../include/page.php");
+
+                //setup database
+		$this->msdb = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
+
+		$synergy_id = $_SESSION['sid'];
+
+		//need method for detecting what day it is
+		if(!$daynum)
+			$daynum = getDayNumber();
+
+		$this->t_body->set_var("DAYNO", "Day&nbsp;".$daynum);
+		$this->t_body->set_var("DATE", date("j/n/Y"));
+	
+		//get teacher name 
+		$mydb = new dbManager;
+		$mydb->dbConnect();
+		$query = "SELECT firstname, lastname FROM user WHERE id = '".$_SESSION['id']."'";
+		$mydb->dbDoQuery($query);
+		$teacher = $mydb->dbGetNextArray();
+		
+		$this->t_body->set_var("TEACHERNAME", $teacher['firstname']." ".$teacher['lastname']);
+
+		//also get current peroid
+                $periodNum = getPeriodNumber();
+
+                $query = "SELECT Timetable.Room, SubjectClasses.Description,
+                       	  Timetable.PeriodNumber, Timetable.ClassCode, SubjectClasses.ClassCampus
+                          FROM SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable Timetable
+                          WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
+                          Timetable.ClassCode = SubjectClasses.ClassCode AND Timetable.FileSemester =
+                          SubjectClasses.FileSemester AND Timetable.FileType = SubjectClasses.FileType
+                          AND Timetable.FileYear = SubjectClasses.FileYear AND
+                          ((SubjectClasses.FileSemester=".$_SESSION['FileSemester'].") AND (SubjectClasses.FileYear='".$_SESSION['FileYear']."')
+                          AND (Timetable.StaffID='$synergy_id')) AND Timetable.DayNumber = '$daynum'
+			  ORDER BY Timetable.PeriodNumber
+		";
+
+                $result = mssql_query($query, $this->msdb);
+
+                while( $desc = mssql_fetch_array($result) )
+                {
+                        //output list of classes
+                        $this->t_body->set_var("ROOM", $desc[0]);
+                        $this->t_body->set_var("DESC", $desc[1]);
+                        $this->t_body->set_var("PERNO", $desc[2]);
+                        $this->t_body->set_var("CODE", $desc[3]);
+                        $this->t_body->set_var("CAMPUS", $desc[4]);
+                        $this->t_body->set_var("SUBJECTLINK", "attendances.php?code=".$desc[3]);
+
+                        //if($desc[2] == $periodNum) //perhaps bold current period
+      
+                        $this->t_body->parse("class_list_block", "class_list", true);
+
+                }
+                $this->t_body->pparse("finaloutput", "tplBODY");
+	}
+
+	function getSubjectPeriod($code, $day)
+	{	
+		//give a subject code and day this function returns the period that it occurs in
+		//or it returns 0 on failure
+
+                //setup database
+
+		$query = "SELECT Timetable.PeriodNumber
+			FROM SynergyOne.dbo.Timetable Timetable
+			WHERE Timetable.FileSemester='".$_SESSION['FileSemester']."' AND Timetable.FileYear='".$this->year."' 
+			AND Timetable.DayNumber = '$day' AND Timetable.ClassCode = '$code'
+		";
+
+		$result = mssql_query($query, $this->msdb);
+		if ($result != 1){
+			if(mssql_num_rows($result) > 0)
+			{
+				$array = mssql_fetch_array($result);
+				return $array[0];
+			}	
+			else	
+				return 0;
+		}
+		else 
+			return 0;
+
+	}
+
+	function involvedInSubjectSyn($code)
+	{	
+		//returns 1 when user is invovled in subject according to synergy
+                //setup database
+
+		$query = "SELECT Timetable.PeriodNumber
+			FROM SynergyOne.dbo.Timetable Timetable
+			WHERE Timetable.FileSemester='".$_SESSION['FileSemester']."' AND Timetable.FileYear='".$_SESSION['FileYear']."' 
+			AND Timetable.StaffID = '".$_SESSION['sid']."' AND Timetable.ClassCode = '$code'";
+
+		$result = mssql_query($query, $this->msdb);
+	
+		if ($result != 1){
+		if(mssql_num_rows($result) > 0)
+			return 1;
+		}
+		else 
+			return 0;
+	}
+
+
+	function startAttendanceInsert($code, $period)
+	{
+		//initalise some variables to make insert faster
+		$this->code = $code;
+		$this->period = $period;
+	}
+
+	function insertAttendance($stuid, $attend, $abstype, $reason)
+	{
+		$query = "INSERT INTO SynergyOne.dbo.Attendances
+			(FileType, FileYear, FileSemester, ClassCampus, ClassCode,
+			ID, AttendanceDate, AttendancePeriod, AttendedFlag,
+			StaffID, PossibleAbsenceCode, PossibleDescription)
+			VALUES
+			('A', 
+			'".$_SESSION['FileYear']."', 
+			'".$_SESSION['FileSemester']."',
+			'".$this->campus."', 
+			'".$this->code."', 
+			'".$stuid."', 
+			'".$this->date."', 
+			'".$this->period."', 
+			'".$attend."', 
+			'".$_SESSION['sid']."', 
+			'".$abstype."', 
+			'".$reason."')";
+
+		return $query;
+	}
+
+	function updateAttendance($stuid, $attend, $abstype, $reason)
+	{
+
+		$query = "UPDATE SynergyOne.dbo.Attendances 
+			  SET AttendedFlag = '$attend', 
+			      PossibleAbsenceCode = '$abstype', 
+			      PossibleDescription = '$reason'
+			  WHERE FileType = 'A' AND
+				FileYear = '".$_SESSION['FileYear']."' AND
+				FileSemester = '".$_SESSION['FileSemester']."' AND
+				ClassCampus = '".$this->campus."' AND
+				ClassCode = '".$this->code."' AND
+				ID = '$stuid' AND
+				AttendanceDate = '".$this->date."' AND
+				AttendancePeriod = '".$this->period."'";
+
+		return $query;
+	}
+
+	function runQuery($query)
+	{
+		mssql_query($query, $this->msdb);
+	}
+
+	function checkAttendance($stuid)
+	{
+		//checks if attendance has been recorded for student
+
+		$query = "SELECT ID FROM SynergyOne.dbo.Attendances
+			  WHERE FileType = 'A' AND
+				FileYear = '".$_SESSION['FileYear']."' AND
+				FileSemester = '".$_SESSION['FileSemester']."' AND
+				ClassCampus = '".$this->campus."' AND
+				ClassCode = '".$this->code."' AND
+				ID = '$stuid' AND
+				AttendanceDate = '".$this->date."' AND
+				AttendancePeriod = '".$this->period."'";
+		
+		$result = mssql_query($query, $this->msdb);
+		
+		if ($result != 1){	
+			if(mssql_num_rows($result) > 0)
+				return 1;
+			else
+				return 0;
+		}
+		else 
+			return 0;	
+	}
+
+}
+
+$page = new Attendance;
+
+//check if its a weekend.. cant mark roll on weekend
+if(date("w") == 0 ||date("w") == 6)
+	error(32);
+
+if(isset($_POST['submit']) && $_POST['submit'] && isset($_POST['daynum']) && $_POST['daynum'] && 
+isset($_POST['pernum']) && $_POST['pernum'] && isset($_POST['subcode']) && $_POST['subcode'] )
+{
+	$page->startAttendanceInsert($_POST['subcode'], $_POST['pernum']);
+	
+	$query = "";
+	$stuid = "stud0";
+	
+	//assume if first student attendance completed all will be completed =(
+	$attendState = $page->checkAttendance($_POST[$stuid]);
+
+	for($i=0; isset($_POST[$stuid]); $i++)
+	{
+		//setup variable names
+		$attend = "attend".$i;
+		$abscode = "abscode".$i;
+		$reason = "reason".$i;
+		$stuid = "stud".$i;
+
+		if($attendState )
+		{
+			//update existing record
+			if($_POST[$attend] == 1)
+				$query .= $page->updateAttendance($_POST[$stuid], 1, $_POST[$abscode], $_POST[$reason]);
+			else
+				$query .= $page->updateAttendance($_POST[$stuid], 0, $_POST[$abscode], $_POST[$reason]);
+		}
+		else	
+		{
+			//insert them into database
+			if($_POST[$attend] == 1)
+				$query .= $page->insertAttendance($_POST[$stuid], 1, $_POST[$abscode], $_POST[$reason]);
+			else
+				$query .= $page->insertAttendance($_POST[$stuid], 0, $_POST[$abscode], $_POST[$reason]);
+		}
+
+		$query .= "; ";
+	}
+
+	$page->runQuery($query."SELECT 1");
+
+	$back = -2;
+	include("../include/back.php");
+}
+else if(isset($_GET['code']) && $_GET['code'] && isStaff($_SESSION['gid']) && $page->involvedInSubjectSyn($_GET['code']) )
+{
+	//display absentee page
+	$page->displayStudentList(urldecode($_GET['code']), 0);
+}
+else if( $_SESSION['timetable'] )
+{
+	//they have a timetable so lets show them there subjects to pick for absentees
+	$page->displayClassList(0);
+}
+else
+{
+	error(19);
+}        
+?>

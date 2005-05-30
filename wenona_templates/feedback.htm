@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>{TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="global.css" type="text/css">
+</head>
+<body>
+<div id="container"> 
+  <div align="right" class="header">    
+  </div>
+</div>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr> 
+        <td class="blueBG">&nbsp;</td>
+        <td class="blueBG">&nbsp;</td>
+        <td class="blueBG">&nbsp;</td>
+        <td class="blueBG">&nbsp;</td>
+      </tr>
+      <tr> 
+        <td width="150" class="blueBG"> 
+          <p>&nbsp;</p>
+          
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p></td>
+        <td width="35">&nbsp;</td>
+        <td valign="top"><table width="85%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td class="itemHeader">FEEDBACK<br>
+            <img src="/images/redpixel.gif" width="100%" height="2"> </td>
+        </tr>
+      </table>
+      <p> {{ERROR}</p>
+      {FORM_BEFORE} 
+      <p>This form can be used to provide portal-related feedback to the IT department.</p>
+      <form method="post" action="feedback.php">
+        <table width="400" border="0" cellspacing="10" cellpadding="0">
+          <tr> 
+            <td> Sending feedback to <font size=-2>portal_support@wenonaxxxxxxx</font> 
+            </td>
+          </tr>
+          <tr> 
+            <td> <div align="left">Your login name<br>
+                <font size=-2>(or email address at which we can get back to you)</font></div>
+              <input type="text" name="username" class="field" size="60" onBlur="fixEmailAddress( this)"> 
+            </td>
+          </tr>
+          <tr> 
+            <td> <div align="left">Feedback </div>
+              <textarea wrap="virtual" name="body" rows="10" cols="60" class="field"></textarea> 
+            </td>
+          </tr>
+          <tr> 
+            <td align="left"> <input type="hidden" name="page" value="{HIDDEN}"> 
+              <input type="submit" name="submit" value="submit feedback"> </td>
+          </tr>
+        </table>
+      </form>
+      <p>{FORM_AFTER} </p>
+      <p>&nbsp;</p></td>
+        <td>&nbsp;</td>
+      </tr>
+    </table>
+	<br>
+<div align="right">
+  <p class="fineprint"><b>Copyright 2005 Wenona</b>&nbsp;&nbsp;&nbsp;<br>
+    <a href="/policy.htm">Guidelines of Use and Privacy Policy</a>&nbsp;&nbsp;&nbsp;</div> 
+  </p>
+</div>
+</body>
+</html>

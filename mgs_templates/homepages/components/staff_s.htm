@@ -1,0 +1,17 @@
+<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr>
+  <td class="small_head" height="7">Staff</td>
+  </tr>
+  <tr><td height="2" bgcolor="#666666"></td></tr>
+  <!-- BEGIN staff_members -->
+  <tr><td bgcolor="#CCCCCC" class="small_text">{MEMBER_NAME}</td></tr>
+  <!-- END staff_members -->
+  <tr>
+    <td align="right"><form action="/mail/send.php" method="post" name="form2">
+        <input type="hidden" name="replyto" value="{HEADING}">
+        <input type="hidden" name="bcc" value="{EMAILALL}">
+        <input class="emailall" type="submit" name="emailall" value="Email all">
+      </form>
+    </td>
+  </tr>
+</table>

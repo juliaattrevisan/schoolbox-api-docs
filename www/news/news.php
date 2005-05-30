@@ -1,0 +1,214 @@
+<?php
+
+/* Orginally developed by David Hammerton for MGS
+ * Modified by James Leckie for inclusion in complete Intranet solution
+ *
+ * News Object - controls all news behaviour, insert, get, modify, delete.*/
+
+class news
+{
+
+function news($topic = 0)
+{
+    $this->dbConnection = new dbManager;
+}
+
+function addNews($groupArray, $campusArray, $owner, $heading, $expires, $mainpage, $body, $file, $file_type, $file_name, $url1, $url2, $url3, $url4, $url5, $userInfo)
+{
+	$now = time();
+	$expirestime = $now + (3600 * $expires);
+	$query = "INSERT INTO news_items (item_heading, item_owner, item_datetime_posted, 
+	item_datetime_expires, item_mainpage, item_body, item_link1, item_link2, item_link3, item_link4, item_link5)
+	VALUES ('$heading', '$owner', FROM_UNIXTIME($now), 
+	FROM_UNIXTIME($expirestime), '$mainpage', '$body', '$url1', '$url2', '$url3', '$url4', '$url5')";
+	$this->dbConnection->dbDoQuery($query);
+		
+	$newsid = $this->dbConnection->dbInsertId();
+	$this->addPerms($newsid, $groupArray, $campusArray);
+
+}
+
+function modNews($id, $campusArray, $groupArray, $heading, $expires, $mainpage, $body, $url1, $url2, $url3, $url4, $url5, $userInfo)
+{
+	//allow expiry time to be left as is if set to 0
+	if($expires)
+	{
+		$now = time();
+		$expirestime = $now + (3600 * $expires);
+		$expirequery = "item_datetime_expires = FROM_UNIXTIME($expirestime),";
+	}
+	else
+		$expirequery = "";
+		
+	$query = "UPDATE news_items
+		SET item_heading = '$heading', $expirequery item_body = '$body',
+		item_mainpage = '$mainpage', item_link1 = '$url1', item_link2 = '$url2', item_link3 = '$url3',
+		item_link4 = '$url4', item_link5 = '$url5'
+		WHERE item_id = '$id'";
+	$this->dbConnection->dbDoQuery($query);
+	
+	$this->delPerms($id);
+	$this->addPerms($id, $groupArray, $campusArray);
+	
+}
+
+function delPerms($id)
+{
+	$query = "DELETE FROM newsGroup WHERE id = '$id'";
+	$this->dbConnection->dbDoQuery($query);
+	$query = "DELETE FROM newsCampus WHERE id = '$id'";
+	$this->dbConnection->dbDoQuery($query);
+}
+
+function addPerms($id, $groupArray, $campusArray)
+{
+	foreach($groupArray as $group) 
+	{
+		$query = "INSERT INTO newsGroup (id, gid) VALUES ('$id', '$group')";
+		$this->dbConnection->dbDoQuery($query);
+	}
+	foreach($campusArray as $campus)
+	{
+		$query = "INSERT INTO newsCampus (id, campus) VALUES ('$id', '$campus')";
+		$this->dbConnection->dbDoQuery($query);
+	}
+}
+
+function deleteNews($id, $userInfo)
+{
+	$SQL_QUERY = "UPDATE news_items
+		SET item_deleted = '1'
+		WHERE item_id = '$id'";
+	$this->dbConnection->dbDoQuery($SQL_QUERY);
+	$this->delPerms($id);
+}
+
+function getHeadlines()
+{
+    $SQL_QUERY = "
+	SELECT DISTINCT(news_items.item_id), news_items.item_heading
+    FROM news_items 
+    	JOIN newsCampus ON newsCampus.id = news_items.item_id 
+			AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).") 
+			OR news_items.item_campus='4'
+			OR news_items.item_owner = '".$_SESSION['id']."'
+		JOIN newsGroup ON newsGroup.id = news_items.item_id 
+			AND newsGroup.gid = '".$_SESSION['gid']."'
+			OR news_items.item_owner = '".$_SESSION['id']."'
+    WHERE news_items.item_datetime_expires > NOW() 
+		AND news_items.item_deleted = 0 
+	ORDER BY news_items.item_datetime_posted DESC
+	";
+    
+    $dbhandle = $this->dbConnection->dbDoQuery($SQL_QUERY);
+    
+    for($i=0;$newsDbResult = $this->dbConnection->dbGetNextArray($dbhandle);$i++) {
+		$this->headlines['Id'][$i] = $newsDbResult["item_id"]; // add
+		$this->headlines['Heading'][$i] = $newsDbResult["item_heading"];
+    }
+    if (isset($this->headlines))
+        return $this->headlines;
+    $this->dbConnection->dbClose();
+}
+
+function getNews($id = 0)
+{
+ 	$SQL_QUERY = "
+	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner,
+    	news_items.item_link1, news_items.item_link2, news_items.item_link3, news_items.item_link4, news_items.item_link5,
+    	DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime,
+    	DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
+    	news_items.item_body, news_items.item_mainpage, 
+    	user.lastname, user.firstname, user.username, user.local_email, user.alt_email
+    FROM news_items
+	JOIN user ON news_items.item_owner = user.id
+    	JOIN newsCampus ON newsCampus.id = news_items.item_id 
+			AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).") 
+			OR news_items.item_campus='4' 
+			OR news_items.item_owner = '".$_SESSION['id']."'
+		JOIN newsGroup ON newsGroup.id = news_items.item_id 
+			AND newsGroup.gid = '".$_SESSION['gid']."'
+			OR news_items.item_owner = '".$_SESSION['id']."'
+    WHERE news_items.item_datetime_expires > NOW() 
+		AND news_items.item_deleted = 0 
+	"; 
+ 
+    //get a single article by id if id submitted
+    if($id)
+            $SQL_QUERY .="AND news_items.item_id = '$id'";
+
+    $SQL_QUERY .= " ORDER BY news_items.item_datetime_posted DESC;";
+    $dbhandle = $this->dbConnection->dbDoQuery($SQL_QUERY);
+    $this->newscount = 0;
+    
+    while($newsDbResult = $this->dbConnection->dbGetNextArray($dbhandle)) {
+		$this->newscount++;
+		$i = $this->newscount;
+		$this->news['Id'][$i] = $newsDbResult["item_id"]; // add
+		$this->news['Heading'][$i] = $newsDbResult["item_heading"];
+		$this->news['Owner'][$i] = $newsDbResult["item_owner"];
+		$this->news['Poster'][$i] = $newsDbResult["firstname"]." ".$newsDbResult["lastname"];
+		if($newsDbResult['local_email'])
+			$this->news['Contact'][$i] = $newsDbResult["username"]."@".MAIL_address;
+		else if($newsDbResult['alt_email'])
+			$this->news['Contact'][$i] = $newsDbResult['alt_email'];
+		else
+			$this->news['Contact'][$i] = "";
+		$this->news['Datetime'][$i] = $newsDbResult["post_datetime"];
+		$this->news['Expires'][$i] = $newsDbResult["expire_datetime"];
+		$this->news['Body'][$i] = $newsDbResult["item_body"];
+		$this->news['Link1'][$i] = $newsDbResult["item_link1"];
+		$this->news['Link2'][$i] = $newsDbResult["item_link2"];
+		$this->news['Link3'][$i] = $newsDbResult["item_link3"];
+		$this->news['Link4'][$i] = $newsDbResult["item_link4"];
+		$this->news['Link5'][$i] = $newsDbResult["item_link5"];
+		$this->news['Mainpage'][$i] = $newsDbResult["item_mainpage"];
+		//if (isset($newsDbResult["newspics_filename"]))
+		//	$this->news['picname'][$i] = $newsDbResult["newspics_filename"];
+    }
+    if (isset($this->news))
+        return $this->news;
+    $this->dbConnection->dbClose();
+}
+
+function getOneNews($id)
+{
+	//this function mainly serves to populate the modify news form
+	$SQL_QUERY = "SELECT item_id, item_heading, item_owner,
+		item_datetime_posted, item_datetime_expires, item_mainpage, item_body,
+		item_link1, item_link2, item_link3, item_link4, item_link5, item_deleted
+		FROM news_items WHERE item_id = '$id'";
+	$this->dbConnection->dbDoQuery($SQL_QUERY);
+	if ($thisNews = $this->dbConnection->dbGetNextArray())
+	{
+		//get list of campus and groups that item is available for
+		$query = "SELECT campus FROM newsCampus WHERE id = '$id'";
+		$this->dbConnection->dbDoQuery($query);
+		while($thisCampus = $this->dbConnection->dbGetNextArray())
+		{
+			$thisNews['item_campus'][] = $thisCampus['campus'];
+		}
+		$query = "SELECT gid FROM newsGroup WHERE id = '$id'";
+		$this->dbConnection->dbDoQuery($query);
+		while($thisCampus = $this->dbConnection->dbGetNextArray())
+		{
+			$thisNews['item_group'][] = $thisCampus['gid'];
+		}
+		return $thisNews;
+	}
+	else
+		return false;
+}
+
+function getOwner($id)
+{
+	$SQL_QUERY = "SELECT item_owner FROM news_items WHERE item_id = '$id'";
+	$this->dbConnection->dbDoQuery($SQL_QUERY);
+	if ($owner = $this->dbConnection->dbGetNextArray())
+		return $owner['item_owner'];
+	else
+		return false;
+	 
+}
+}
+?>

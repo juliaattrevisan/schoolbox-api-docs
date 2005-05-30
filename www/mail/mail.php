@@ -1,0 +1,110 @@
+<?php
+/************************************************************
+*                                                           *
+*         Copyright (c) 2002-2003 Lektec Consulting         *
+*                                                           *
+************************************************************/
+//mail object.. controls all attributes of mail processing
+
+// message types
+$type = array("text", "multipart", "message", "application", "audio","image", "video", "other");
+// message encodings
+$encoding = array("7bit", "8bit", "binary", "base64", "quoted-printable","other");
+
+class Mail
+{
+
+	function Mail()
+	{}
+  
+	function checkMailDetails()
+        {
+                //check user has submitted their mail account details, if not request that they do
+
+                $db = new dbManager();
+
+                $query = "SELECT username, email_pass FROM user WHERE id = ".$_SESSION["id"];
+                $info = $db->dbGetSingleRow($query);
+
+                if($info["username"] == "" || $info["email_pass"] == "") 
+                {
+                        //failed to get information about user
+                        return false;
+
+                }
+                else
+                {       //get all the info out
+                        $this->user = $info["username"];
+                        $this->mail_host = MAIL_host;
+                        $this->password = $info["email_pass"];
+                        return true;
+                } 
+        }
+
+        function submitMailDetails()
+        {
+                //redirect the user to the submit mail details form
+		localRedir("/mail/mailInfo.php");
+        }
+
+        function openMailBox()
+        {
+		if(MAIL_retrieval == "pop3")
+                	$server="{".$this->mail_host.":110/pop3}INBOX";
+                else if(MAIL_retrieval == "imap")
+			$server="{".$this->mail_host.":143/imap/notls/norsh}INBOX";
+                else
+			error(0);
+
+		$inbox = @imap_open ($server, $this->user, $this->password) or error(4);
+                return $inbox;
+        }
+
+	function mailExists($msgid, $inbox)
+	{
+		if($msgid > 0 && $msgid <= imap_num_msg($inbox))
+			return 1;
+		else
+			return 0;
+	}
+
+        function deleteMailArray($deleteArray)
+        {
+                //open mailbox
+                $inbox = $this->openMailBox();
+
+                // delete specified message numbers
+                for($x=0; $x<sizeof($deleteArray); $x++)
+ 		{
+			if($this->mailExists($deleteArray[$x], $inbox))
+				imap_delete($inbox, $deleteArray[$x]);
+		}
+
+                //clean up
+                imap_close($inbox, CL_EXPUNGE);
+                //reload the page.. 
+                localRedir("/mail.php");
+        }
+	
+	function deleteMailSingle($delete)
+	{
+		//open
+		$inbox = $this->openMailBox();
+		if($this->mailExists($delete, $inbox))
+		{
+			imap_delete($inbox, $delete);
+			$total = imap_num_msg($inbox);
+			imap_close($inbox, CL_EXPUNGE);
+			//now return a sane email number to display or 0
+			if($delete == $total)
+				$delete--;
+			//leave it up to caller to redirect
+			return $delete;
+		}
+		else
+			error(46);
+	}
+
+}
+
+?>

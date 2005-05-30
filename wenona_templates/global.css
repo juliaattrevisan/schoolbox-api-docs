@@ -1,0 +1,152 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+ 
+body {
+  background: #fff;
+  color: #000; 
+}
+
+p, div, li, table, tr, td {
+  font-family: arial, helvetica, sans-serif;
+  font-size: 11px;
+  color: #000;
+  background-color: transparent;
+}
+
+.red {
+  font-family: arial, helvetica, sans-serif;
+  color: red;
+  background-color: transparent;
+}
+
+.blue {
+  font-family: arial, helvetica, sans-serif;
+  color: blue;
+  background-color: transparent;
+}
+
+.blueBG {
+	background: #002750;
+	color: #fff;
+}
+
+.welcomeHeader {
+  font-family: arial, helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: bold; 
+}
+
+.fineprint {
+  font-family: arial, helvetica, sans-serif;
+  font-size: 10px;
+}
+
+.itemHeader {
+  font-family: arial, helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: bold; 
+}
+
+textarea, input, select {
+	border: 1px solid #002750; 
+	background-color: #fff; color: #000; 
+	font: 11px Arial, Verdana, sans-serif;
+}
+
+form.nospace {
+	margin-bottom: 0px;
+	margin-top: 0px;
+}
+
+
+a:link, a:visited, a:active 			{ color: #006; text-decoration: none; }
+a:hover, a:visited:hover 				{ color: #B41E27; text-decoration: none; }
+a.one:link, a.one:visited, a.one:active { color: #fff; text-decoration: none; }
+a.one:hover, a.one:visited:hover 		{ color: #ccc; text-decoration: underline; }
+
+.button_modify 
+{
+	color: #FFFFFF;
+	height: 20px;
+	font-size:8pt;
+	border: 0px none;
+	background-repeat: no-repeat;
+	background-color: #003366;
+
+}.finetable {
+	border-top: 1px solid #000000;
+	border-right: 1px solid #000000;
+}
+
+.finetableleft {
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-bottom-color: #000000;
+	border-left-color: #000000;
+}
+
+.forumheading {
+	font-style: normal;
+	border: 1px solid #000000;
+	background-color: #EEEEEE;
+	font-weight: bold;
+}
+
+.forumbody {
+	background-color: #EEEEEE;
+	border-top: 1px none #000000;
+	border-right: 1px solid #000000;
+	border-bottom: 1px solid #000000;
+	border-left: 1px solid #000000;
+}
+
+.cfinetable {	border: 1px solid #000000; }
+.finetableright {
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-bottom-color: #000000;
+	border-right-width: 1px;
+	border-right-style: solid;
+	border-right-color: #000000;
+	border-left-width: 1px;
+	border-left-color: #000000;
+}
+
+.emailall {
+	color: #0033CC;
+	height: 18px;
+	font-size:8pt;
+	border: 0px none #FFFFFF;
+	background-color: #CCCCCC;
+	text-decoration: none;
+	top: 5px;
+}
+.emailall:hover,.emailall:active { text-decoration:underline}
+.calTable { background-color: #CCCCCC; border: 1px inset #FFFFFF; }
+.calTableCurrent { background-color: #CCCCCC; border: 1px inset #000000; }
+.calTableSelected { background-color: ##0066CC; border: 1px inset #FFFFFF; }
+
+
+/* CoolMenus 4 - default styles - do not edit */
+.clCMAbs				{ position:absolute; visibility:hidden; left:0; top:0 }
+/* CoolMenus 4 - default styles - end */
+
+/*Style for the background-bar*/
+.clBar					{ position:absolute; width:10; height:10; background-color:#FF9900; layer-background-color:#FF9900; visibility:hidden }
+
+/*Styles for level 0*/
+.clLevel0,.clLevel0over	{ position:absolute; padding:1px; font-family: arial, helvetica, sans-serif; font-size: 11px; }
+.clLevel0				{ background-color:; layer-background-color:; color:#fff; }
+.clLevel0over			{ background-color:; layer-background-color:; color:#fff; cursor:pointer; cursor:hand; }
+.clLevel0border			{ position:absolute; visibility:hidden; background-color:; layer-background-color:;}
+
+/*Styles for level 1*/
+.clLevel1, .clLevel1over{ position:absolute; padding:2px; font-family: arial, helvetica, sans-serif; font-size: 10px; }
+.clLevel1				{ background-color:#9EC6D9; layer-background-color:#9EC6D9; color:#00458A; }
+.clLevel1over			{ background-color:#00458A; layer-background-color:#00458A; color:white; cursor:pointer; cursor:hand; }
+.clLevel1border			{ position:absolute; visibility:hidden; background-color:#0055AA; layer-background-color:#0055AA }
