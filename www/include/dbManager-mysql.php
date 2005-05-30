@@ -17,7 +17,6 @@ class dbManager
 /* Constuctor sets up variables and connects to database */
 function dbManager($db = SQL_db, $debug = 0)
 {
-
 	$this->host = SQL_host;
 	$this->user = SQL_user;
 	$this->passwd = SQL_passwd;
@@ -33,10 +32,9 @@ function dbConnect()
 		$this->dbf = mysql_connect($this->host, $this->user, $this->passwd);
 	
 	if(!$this->dbf){
-		if($this->debug)
 			print "Unable to connect ".$this->user."@".$this->host." using ".$this->db; 
 		else
-			error(22);
+			print "Unable to connect";;
 	}	
 	$this->dbChangeDb($this->db);
 }
@@ -109,10 +107,12 @@ function dbGetAllRows($sql_q)
 /* Can be optionally passed a result resource otherwise it uses current result resource */
 function dbGetNextArray($result = 0)
 {
-	if ($result)
+	if($result)
 	        $return_array = mysql_fetch_assoc($result);
-	else
+	else if($this->result)
 		$return_array = mysql_fetch_assoc($this->result);
+	else
+		return false;
 
 	return $return_array;
 }
@@ -123,8 +123,10 @@ function dbCountRows($result = 0)
 {
 	if($result)
 		$return_count = mysql_num_rows($result);
-	else
+	else if($this->result)
 		$return_count = mysql_num_rows($this->result);
+	else
+		return false;
 	return $return_count;
 }
 
@@ -165,8 +167,10 @@ function dbEndQuery($result = 0)
 {
 	if ($result)
 		mysql_free_result($result);
-	else
+	else if($this->result)
 		mysql_free_result($this->result);
+	else
+		return false;
 }
 
 /* PRIVATE FUNCTIONS */
@@ -184,6 +188,5 @@ function dbSmartQuote($value)
    }
    return $value;
 }
-
 }
 ?>
