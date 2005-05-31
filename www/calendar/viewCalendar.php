@@ -20,7 +20,7 @@ class displayCalendar
                 if(!$currMonth) { $this->currMonth = date("n"); } else { $this->currMonth = $currMonth; }
                 if(!$currDay) { $this->currDay = date("j"); } else { $this->currDay = $currDay; }
 
-		$this->cal = new Calendar;
+				$this->cal = new Calendar;
 
         }
 
@@ -79,11 +79,11 @@ class displayCalendar
                 $this->t_body->set_var("YEAR", date("Y",  $currentMonth));
 
                 $this->t_body->set_var("BACK", "viewCalendar.php?Year=".date("Y",$previousMonth).
-                                "&Month=".date("m",$previousMonth)."&Day=".date("d", $previousMonth)."&view=1");
+                                "&Month=".date("m",$previousMonth)."&Day=".date("d", $previousMonth)."&view=month");
                 $this->t_body->set_var("FORWARD", "viewCalendar.php?Year=".date("Y",$nextMonth).
-                                "&Month=".date("m",$nextMonth)."&Day=".date("d", $nextMonth)."&view=1");
+                                "&Month=".date("m",$nextMonth)."&Day=".date("d", $nextMonth)."&view=month");
 		$this->t_body->set_var("VIEWLINK", "viewCalendar.php?Year=".date("Y",$currentMonth).
-                                "&Month=".date("m",$currentMonth)."&Day=".date("d", $currentMonth));
+                                "&Month=".date("m",$currentMonth)."&Day=".date("d", $currentMonth)."&view=week");
 
 		$monthDay = 1;
 
@@ -103,7 +103,7 @@ class displayCalendar
 					$this->t_body->set_var("MONTABLE_CSS".$day, "calTable"); 
 				
 				$url = "viewCalendar.php?Year=".date("Y",$currentMonth).   
-                                "&Month=".date("m",$currentMonth)."&Day=".$monthDay."&view=1";				
+                                "&Month=".date("m",$currentMonth)."&Day=".$monthDay."&view=month";				
 
 				$daylink = $monthDay;
 				$this->t_body->set_var("DAY".$day, $daylink);
@@ -169,11 +169,10 @@ class displayCalendar
                 $this->t_body->set_block("tplBODY", "note_block6", "note_listing6");
                 $this->t_body->set_block("tplBODY", "note_block7", "note_listing7");
 
-		include_once("../include/page.php");
+				include_once("../include/page.php");
 
                 //setup database
                 $db = new dbManager;
-                $db->dbConnect();
 
                 //figure out which day of the week is the current day
                 $dayOfWeek = date("w", mktime(0,0,0,$this->currMonth, $this->currDay, $this->currYear));
@@ -198,11 +197,11 @@ class displayCalendar
                 $currentWeek = mktime (0,0,0,$this->currMonth, $this->currDay, $this->currYear);
 
                 $this->t_body->set_var("BACK", "viewCalendar.php?Year=".date("Y",$previousWeek).
-                                "&Month=".date("m",$previousWeek)."&Day=".date("d", $previousWeek));
+                                "&Month=".date("m",$previousWeek)."&Day=".date("d", $previousWeek)."&view=week");
                 $this->t_body->set_var("FORWARD", "viewCalendar.php?Year=".date("Y",$nextWeek).
-                                "&Month=".date("m",$nextWeek)."&Day=".date("d", $nextWeek));
+                                "&Month=".date("m",$nextWeek)."&Day=".date("d", $nextWeek)."&view=week");
 		$this->t_body->set_var("VIEWLINK", "viewCalendar.php?Year=".date("Y",$currentWeek ).
-                                "&Month=".date("m",$currentWeek )."&Day=".date("d", $currentWeek )."&view=1" );
+                                "&Month=".date("m",$currentWeek )."&Day=".date("d", $currentWeek )."&view=month" );
 
 
 		//initialise the day values
