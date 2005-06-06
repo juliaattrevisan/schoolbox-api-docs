@@ -1,5 +1,8 @@
 <?php
 
+define('INTRANET_site', 'intranet.wenona.nsw.edu.au');
+define('INTRANET_encryption_key', 'ABCD1234');
+
 // This file contains functions specific to Wenona
 
 function xorEncrypt($key, $string)
