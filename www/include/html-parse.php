@@ -77,54 +77,6 @@ function html_link($message){
 	return $message;
 }
 
-function isLocalURL($url)
-{	
-	//returns true if the url is for a local page
-	if( strncasecmp($url, "http://".SITE_name, 7+strlen(SITE_name)) && 
-	strncasecmp($url, "https://".SITE_name, 8+strlen(SITE_name)) )
-		return false;
-	else
-		return true;
-}
-
-function scrubHTML($html)
-{
-	//cleans html of all nasty stuff
-	//and converts everything into html safe for php and browser output
-	//can be used on input to database or output
-
-	$search = array('\\\\',			// To protect from \\ backreferences
-			'$',			// Dollars are important else they can cause backreferences
-			'\\\\',			// To protect from \\ backreferences
-			'<script',		// Remove javascript markup
-			'</script>',			
-		);
-	
-	$replace = array('&#92;',
-			'&#36;',
-			'&#92;',
-			'',
-			'',
-		);
-
-	$html = str_replace($search, $replace, $html);
-
-	return $html;
-}
-
-function scrubTEXT($text)
-{
-	//cleans plain text of all nasty stuff
-	//can be used on input to database or output
-
-	//this in built function encode html chars
-	//the ENT_QUOTES converts all talking marks
-	$text = htmlentities($text, ENT_QUOTES);
-
-	//get rid of any possible bad chars
-	$text = scrubHTML($text);
-	return $text;
-}
 
 	
 
