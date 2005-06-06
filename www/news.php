@@ -10,7 +10,6 @@ require_once("include/session.php");
 require_once("include/include.php");
 require_once("include/permission.php");
 require_once("news/news.php");
-require_once("include/html-parse.php");
 
 class OutPut
 {
@@ -54,6 +53,7 @@ class OutPut
 			
 			$this->set_var("NEWS_TITLE", $items['Heading'][$i]);
 		
+			//TODO: Fix news handle to support no email address
 			if($items['Contact'][$i])
 				$email = "<a href=\"".$_SESSION['mailhandle'].$items['Contact'][$i]."\">".$items['Poster'][$i]."</a>";
 			else
@@ -64,28 +64,14 @@ class OutPut
 				$this->set_var("DATETIME", $items['Datetime'][$i]." expires on ".$items['Expires'][$i]);
 			else
 				$this->set_var("DATETIME", $items['Datetime'][$i]);
-			$totalBody = preg_replace("/(\015\012)|(\015)|(\012)/","<br />",$items['Body'][$i]);
-			$totalBody = num_encode($totalBody);
-			//$totalBody = $items['Body'][$i];		
-
-	                for ($urls = 1; $urls < 6; $urls++) 
-			{
-        	                $hash = 'Link' . $urls;
-                        	if ($items[$hash][$i] != '' && $items[$hash][$i] != '0') 
-				{
-					if(isLocalURL($items[$hash][$i]))
-                                		$totalBody .= "<br><b>Extra URLs: </b><i><a href=\"".$items[$hash][$i] . "\">" . $items[$hash][$i] . "</a></i>";
-                                	else
-						$totalBody .= "<br><b>Extra URLs: </b><i><a href=\"/redir.php?url=" . $items[$hash][$i] . "\" target=\"_blank\">" . $items[$hash][$i] . "</a></i>";
-                        	}
-                	}
+			$totalBody = preg_replace("/(\015\012)|(\015)|(\012)/","<br />",scrubHTML($items['Body'][$i]));
                 
 			$this->set_var("NEWS_BODY", $totalBody);
                 	$this->t_body->parse("story_block", "story_body");
 
-		$this->t_body->parse("stories_block", "main_stories", true);
+			$this->t_body->parse("stories_block", "main_stories", true);
 
-        	}
+        }
 		if ($num_items < 1)
         		$this->set_var("stories_block", "No news items found");
 	}

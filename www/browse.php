@@ -17,7 +17,6 @@ require_once('include/session.php');
 require_once('include/include.php');
 require_once('include/permission.php');
 require_once('include/fileTypes.php');
-require_once('include/html-parse.php');
 
 class OutPut
 {
@@ -139,18 +138,27 @@ class OutPut
 		//first we dont want to be able to click on current node so just display its name
 		if($this->category != 0) //unless of course its the root node (no parents here)
 		{
-			$query = "SELECT id, name, parent FROM category WHERE id = ".$this->category."";	
+			$query = "SELECT id, name, parent, code FROM category WHERE id = $this->category";	
 			$currentCat = $this->db->dbGetSingleRow($query);
 			$parentID = $currentCat['parent'];
-			$path = " > <b>".scrubTEXT($currentCat['name'])."</b>";
+			if($currentCat['code'])
+				$code = ' ('.scrubTEXT($currentCat['code']).')';
+			else
+				$code = '';
+				
+			$path = ' > <b>'.scrubTEXT($currentCat['name']).$code.'</b>';
 		}
 
 		while($parentID != 0)
 		{
-			$query = "SELECT id, name, parent FROM category WHERE id = ".$parentID."";
+			$query = "SELECT id, name, parent, code FROM category WHERE id = ".$parentID."";
 			$parentArray = $this->db->dbGetSingleRow($query);
 			$parentID = $parentArray['parent'];
-			$path = " > <a href=\"browse.php?category=".$parentArray['id']."&verbose=".$this->verbose."\">".scrubTEXT($parentArray['name'])."</a>".$path;
+			if($parentArray['code'])
+				$code = ' ('.scrubTEXT($parrentArray['code']).')';
+			else
+				$code = '';
+			$path = " > <a href=\"browse.php?category=".$parentArray['id']."&verbose=".$this->verbose."\">".scrubTEXT($parentArray['name']).$code."</a>".$path;
 
 		}
 		
@@ -286,7 +294,6 @@ class OutPut
 		if ($linkDetails['comment'] == "") { $linkDetails['comment'] = "No comment available"; }
 
 		// set link
-		include_once('include/html-parse.php');
 		if(isLocalURL($linkDetails['url']))
 			$this->t_body->set_var("LINK_HTML", "<a href=\"".$linkDetails['url']."\">".scrubTEXT($linkDetails['description'])."</a>");
 		else

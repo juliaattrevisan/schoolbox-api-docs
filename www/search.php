@@ -9,7 +9,6 @@
 require_once("include/session.php");
 require_once("include/include.php");
 require_once("include/fileTypes.php");
-require_once("include/html-parse.php");
 require_once("include/permission.php");
 
 class OutPut

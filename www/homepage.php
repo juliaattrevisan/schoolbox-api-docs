@@ -910,9 +910,7 @@ class OutPut
 
 	function outputLink($queryArray)
 	{
-		//set the url
-		include_once('include/html-parse.php');
-		
+		//set the url		
 		if(isLocalURL($queryArray['url']))
 		{
 			$this->t_body->set_var("LINK_NAME", "<a href=\"".$queryArray['url']."\">"
