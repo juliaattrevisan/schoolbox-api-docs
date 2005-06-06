@@ -23,9 +23,6 @@ class OutPut
 		$this->t_body->set_block("tplBODY", "main_stories", "stories_block");
     		$this->t_body->set_block("main_stories", "story_body", "story_block");
 
-
-		//$this->set_var("DATE", date("F j, Y, g:i a"));
-
 		include("include/page.php");
 	}
 
