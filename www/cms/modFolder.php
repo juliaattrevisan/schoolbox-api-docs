@@ -35,7 +35,13 @@ class ModFolderPage
 					$catHTML .= "<OPTION VALUE=\"" . $thisCat['id'] . "\" selected>";
 				else
 					$catHTML .= "<OPTION VALUE=\"" . $thisCat['id'] . "\">";
-				$catHTML .= $thisCat['name'];
+				
+				if($thisCat['code'])
+					$code = " ({$thisCat['code']})";
+				else
+					$code = '';
+					
+				$catHTML .= $thisCat['name'].$code;
 				$catHTML .= "</OPTION>";
 		}
 		$catHTML .= "</SELECT>";
@@ -73,9 +79,9 @@ class ModFolderPage
 		{
 				$groupHTML .= "<tr>";
 				$groupHTML .= "<td>".$thisGroup['name']."</td>";
-				$groupHTML .= "<td><input type=\"radio\" name=\"".$thisGroup['id']."\" value=\"0\" checked></td>";
-				$groupHTML .= "<td><input type=\"radio\" name=\"".$thisGroup['id']."\" value=\"1\"></td>";
-				$groupHTML .= "<td><input type=\"radio\" name=\"".$thisGroup['id']."\" value=\"2\"></td>";
+				$groupHTML .= "<td><input type=\"radio\" name=\"group[".$thisGroup['id']."]\" value=\"0\" checked></td>";
+				$groupHTML .= "<td><input type=\"radio\" name=\"group[".$thisGroup['id']."]\" value=\"1\"></td>";
+				$groupHTML .= "<td><input type=\"radio\" name=\"group[".$thisGroup['id']."]\" value=\"2\"></td>";
 				$groupHTML .= "</tr>";
 
 				$checkboxNames .= '"' . $thisGroup[ 'id'] . '_r","' . $thisGroup[ 'id'] . '_w",';
@@ -131,8 +137,8 @@ class ModFolderPage
 	function getCatTree($parent, $ident)
 	{
         	$this->catList[-1] = "";
-		
-		$query = "SELECT id, name FROM category WHERE parent = ".$parent." ORDER BY name";
+		//TODO: make this one query iterative rather than being recursive. also needs to check perms
+		$query = "SELECT id, name, code FROM category WHERE parent = ".$parent." ORDER BY name";
 
  		$result = $this->db->dbDoQuery($query);
 
@@ -141,7 +147,8 @@ class ModFolderPage
 			while($line = $this->db->dbGetNextArray($result) )
 			{
 				$thisRow['id'] = $line['id'];
-				$thisRow['name'] = $ident.htmlentities($line['name']);
+				$thisRow['name'] = $ident.scrubTEXT($line['name']);
+				$thisRow['code'] = scrubTEXT($line['code']);
 				array_push($this->catList, $thisRow);
 
 				$this->getCatTree($line['id'], $ident."&nbsp; &nbsp;|&nbsp;");
@@ -237,12 +244,18 @@ class ModFolderPage
         }
 }
 
-
-
-if(isset($_POST['name']) && isset($_POST['parent']) && $_POST['name'])
+//check data is being submitted
+if(is_numeric($_POST['parent']) && $_POST['name'])
 {
 	//stuff has been submitted
 	$folderDB = new folder;
+	
+	//check perms enable the user to modify what they have created
+	if(!($_SESSION['su'] || $_POST['groupcheck']))
+	{
+		if($_POST['group'][$_SESSION['gid']] < 2)
+			error(47);
+	}
 
 	//check if its a modify or add
 	if(isset($_POST['cid']) && $_POST['cid'])
