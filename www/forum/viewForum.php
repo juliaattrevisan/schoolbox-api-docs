@@ -9,7 +9,6 @@
 require_once("../include/session.php");
 require_once("../include/include.php");
 require_once("../include/permission.php");
-require_once("../include/html-parse.php");
 
 require_once("forum.php");
 
@@ -100,25 +99,34 @@ class OutPut
 				}
 				
 				$this->t_body->set_var("ID", $post['id']);
-				$this->t_body->set_var("HEADING", html_encode($post['heading']));
-				$this->t_body->set_var("BODY", preg_replace("/(\015\012)|(\015)|(\012)/","<br />", html_encode($post['message'])));
+				//TODO: make email enabled
 				$this->t_body->set_var("OWNER", $post['firstname']." ".$post['lastname']);
 				$this->t_body->set_var("DATE", $post['fulldate']);	
 				
-				if($perm > 1 || $_SESSION['id'] == $post['owner'])
+				if($this->view == 'flat')
 				{
-					if($this->view == 'flat')					
+					$this->t_body->set_var("HEADING", scubTEXT($post['heading']));
+					$this->t_body->set_var("BODY", preg_replace("/(\015\012)|(\015)|(\012)/","<br />", scrubTEXT($post['message'])));
+					
+					if($perm > 1 || $_SESSION['id'] == $post['owner'])
 						$this->t_body->set_var("MODIFY", "<a href=\"/forum/modpost.php?id={$post['id']}\">modify</a> // ");
 					else
-						$this->t_body->set_var("MODIFY", "true");
+						$this->t_body->set_var("MODIFY", "");
+						
+						
 				}
 				else
 				{
-					if($this->view == 'flat')		
-						$this->t_body->set_var("MODIFY", "");
+					//escape output as its going into a javascript function (ugh!)
+					$this->t_body->set_var("HEADING", addslashes(scubTEXT($post['heading'])));
+					$this->t_body->set_var("BODY", addslashes(preg_replace("/(\015\012)|(\015)|(\012)/","<br />", scrubTEXT($post['message']))));
+					
+					if($perm > 1 || $_SESSION['id'] == $post['owner'])
+						$this->t_body->set_var("MODIFY", "true");
 					else
 						$this->t_body->set_var("MODIFY", "false");
 				}
+
 				$this->t_body->parse("forum_block", "forum", true);
 			}
 		}

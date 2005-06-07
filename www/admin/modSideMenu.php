@@ -16,6 +16,7 @@ class modSideMenu
 	function modSideMenu()
 	{
 		$this->db = new dbManager;
+		$this->itemList = array();
 	}
 
 	function displaySideMenuItem($id)
@@ -76,10 +77,16 @@ class modSideMenu
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "admin/manageMenuItems.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Manage Menu Items");
+		
+		$this->t_body->set_block("tplBODY", "up_button", "up_button_block");
+		$this->t_body->set_block("tplBODY", "down_button", "down_button_block");
+		$this->t_body->set_block("tplBODY", "menu_item", "menu_item_block");
+		$this->t_body->set_block("tplBODY", "menu_item_list", "menu_item_list_block");
+		
 		include_once("../include/page.php");
 
 		$this->createMenuTree(0, "");
-		$this->t_body->set_var("MENU_ITEM", $this->createMenuItemList($this->itemList));
+		$this->createMenuItemList($this->itemList);
 
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
@@ -87,26 +94,34 @@ class modSideMenu
 
 	function createMenuTree($parent, $indent)
 	{
-                $this->itemList[-1] = "";
+		//query database for all categories that user has permission to see (redundant doesnt work properly)
+		$catQuery = "SELECT txt, id, sequence FROM sideMenu WHERE parent = '".$parent."' ORDER BY sequence, txt";
 
-                //query database for all categories that user has permission to see (redundant doesnt work properly)
-		$catQuery = "SELECT txt, id FROM sideMenu WHERE parent = '".$parent."' ORDER BY sequence, txt";
+		$result = $this->db->dbDoQuery($catQuery);
 
-                $result = $this->db->dbDoQuery($catQuery);
-
-                if( $this->db->dbCountRows() > 0 )
-                {
-                        while($line = $this->db->dbGetNextArray($result) )
-                        {
-                                $thisRow['id'] = $line['id'];
-                                $thisRow['indent'] = $indent;
-				$thisRow['txt'] = $line['txt'];
-                                array_push($this->itemList, $thisRow);
-
-                                $this->createMenuTree($line['id'], $indent."&nbsp; &nbsp;|&nbsp;");
-                        }
-                }
-                $this->db->dbEndQuery($result);
+		if( $this->db->dbCountRows() > 0 )
+		{
+				while($line = $this->db->dbGetNextArray($result) )
+				{
+						$thisRow['id'] = $line['id'];
+						$thisRow['indent'] = $indent;
+						$thisRow['txt'] = $line['txt'];
+						//mark the first item
+						if($line['sequence'] == 0)
+							$thisRow['first'] = 1;
+							
+						$this->itemList[] = $thisRow;
+						unset($thisRow);
+						$this->createMenuTree($line['id'], $indent."&nbsp; &nbsp;|&nbsp;");
+				}
+			
+			//mark the last item
+			$lastRow = array_pop($this->itemList);
+			$lastRow['last'] = 1;
+			array_push($this->itemList, $lastRow);
+				
+		}
+		$this->db->dbEndQuery($result);
 	}
 
 	function createMenuItemSelect($list, $selected=0)
@@ -131,20 +146,29 @@ class modSideMenu
 
 	function createMenuItemList($list)
 	{
-		$html = "<table width=\"100%\" border=\"0\">";
 		if( is_array($list) )
 		{
 			foreach($list as $item)
 			{
-				if($item['id'])
-					$html .= "<tr>
-					      <td width=\"70%\">".$item['indent']."<a href=\"modSideMenu.php?id=".$item['id']."\">".$item['txt']."</a></td>
-					      <td width=\"30%\"><a href=\"modSideMenu.php?delete=".$item['id']."\">delete</a></td>
-					</tr>";
+				$this->t_body->set_var("ITEM_IDENT", $item['indent']);
+				$this->t_body->set_var("ITEM_TXT", $item['txt']);
+				$this->t_body->set_var("ITEM_ID", $item['id']);
+				
+				if($item['first'])
+					$this->t_body->set_var("up_button_block", "");
+				else
+					$this->t_body->parse("up_button_block", "up_button");
+				
+				if($item['last'])
+					$this->t_body->set_var("down_button_block", "");
+				else
+					$this->t_body->parse("down_button_block", "down_button");
+				
+				$this->t_body->parse("menu_item_block", "menu_item", true);
 			}
 		}
-		$html .= "</table>";
-		return $html;
+		else
+			$this->t_body->set_var("menu_item_list", "");
 	}	
 
 	function createTargetList($selected = 0)
@@ -220,28 +244,38 @@ $sideMenu = new sideMenu;
 $myPage = new modSideMenu;
 
 
-if(isset($_GET['delete']) && $_GET['delete'])
+if(is_numeric($_GET['delete']))
 {
 	//delete menu item
 	$sideMenu->deleteMenuItem($_GET['delete']);
 	$myPage->displayMenuItemList();
 }
-else if($_POST['text'] && $_POST['url'] && isset($_POST['parent']) && $_POST['id'])
+else if(is_numeric($_GET['up']))
+{
+	$sideMenu->moveMenuItemUp($_GET['up']);
+	$myPage->displayMenuItemList();
+}
+else if(is_numeric($_GET['down']))
+{
+	$sideMenu->moveMenuItemDown($_GET['down']);
+	$myPage->displayMenuItemList();
+}
+else if($_POST['text'] && $_POST['url'] && is_numeric($_POST['parent']) && is_numeric($_POST['id']))
 {
 	$sideMenu->updateMenuItem($_POST['id'], $_POST['parent'], $_POST['text'], $_POST['url'], $_POST['target'], $_POST['campus'], $_POST['group']);
-	$myPage->displaySideMenuItem($_POST['id']);
+	$myPage->displayMenuItemList($_POST['id']);
 }
-else if($_POST['text'] && $_POST['url'] && isset($_POST['parent']))
+else if($_POST['text'] && $_POST['url'] && is_numeric($_POST['parent']))
 {
 	$sideMenu->addMenuItem($_POST['parent'], $_POST['text'], $_POST['url'], $_POST['target'], $_POST['campus'], $_POST['group']);
 	$myPage->displayMenuItemList();
 }
 
-else if(isset($_GET['id']) && $_GET['id'])		
+else if(is_numeric($_GET['id']))		
 {
 	$myPage->displaySideMenuItem($_GET['id']);
 }
-else if(isset($_GET['add']) && $_GET['add'])
+else if(isset($_GET['add']))
 {
 	$myPage->displayNewSideMenuItem();
 }

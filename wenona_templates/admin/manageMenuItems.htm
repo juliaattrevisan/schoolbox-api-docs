@@ -204,13 +204,20 @@
             <table width="98%" border="0" cellspacing="0" cellpadding="2">
               <!--BEGIN menu_item_list -->
               <tr> 
-                <td valign="top">{MENU_ITEM}</td>
-                <td align="right" valign="top">&nbsp;</td>
+                <td valign="top">					  
+				<table width="100%" border="0">
+					  <!-- BEGIN menu_item -->
+					  <tr>
+					  <td width="70%">{ITEM_IDENT}<a href="modSideMenu.php?id={ITEM_ID}">{ITEM_TXT}</a></td>
+					  <td><!-- BEGIN up_button --><a href="modSideMenu.php?up={ITEM_ID}">Up</a><!-- END up_button --></td>
+					  <td><!-- BEGIN down_button --><a href="modSideMenu.php?down={ITEM_ID}">Down</a><!-- END down_button --></td>
+					  <td><a href="modSideMenu.php?delete={ITEM_ID}">Delete</a></td>
+					  </tr>
+					  <!-- END menu_item -->
+					  </table></td>
               </tr>
               <tr> 
-                <td valign="top">&nbsp;</td>
-                <td align="right" valign="top"><a href="modSideMenu.php?add=1">add 
-                  item</a></td>
+                <td align="right" valign="top"><a href="modSideMenu.php?add=1">add item</a></td>
               </tr>
               <!-- END menu_item_list -->
       </table>
