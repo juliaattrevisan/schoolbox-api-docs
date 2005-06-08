@@ -11,10 +11,10 @@
 class file
 {
 	function file()
-        {
-                //always gonna need the db so lets create one..
-                $this->db = new dbManager();
-        }
+	{
+		//always gonna need the db so lets create one..
+		$this->db = new dbManager();
+	}
 
 	function checkWriteAccess($category)
 	{
@@ -29,44 +29,44 @@ class file
 	} 
 
 	function modifyFile($description, $comment, $category, $type, $modid)
-        {
-                //check allowed perms to add to specified category before proceeding
+	{
+		//check allowed perms to add to specified category before proceeding
 		$this->checkWriteAccess($category);		
-
-                $query = "UPDATE file 
+		
+		$query = "UPDATE file 
 			SET description='$description', comment='$comment', category='$category', type='$type' 
 			WHERE id = '$modid'";
-                $this->db->dbDoQuery($query);
-        }
+		$this->db->dbDoQuery($query);
+	}
 
-        function addFile($file_name, $file_type, $description, $comment, $category, $type)
-        {
-                //check allowed perms to add to specified category before proceeding
+	function addFile($file_name, $file_type, $description, $comment, $category, $type)
+	{
+		//check allowed perms to add to specified category before proceeding
 		$this->checkWriteAccess($category);		
-
-                //INSERT file details
-                $query = "INSERT INTO file 
-				(category, owner, realname, submitted, 
-				description, comment, type, mime_type)
-                	VALUES 
-				('".$category."','".$_SESSION['id']."','$file_name', NOW(), 
-				'$description', '$comment', '$type','$file_type')";
-
-                $this->db->dbDoQuery($query);
-
-                //get file ID from INSERT
-                $fileId = $this->db->dbInsertId();
-
-                if( $_FILES['file']['tmp_name'] )
-                {
-                        //save file using file ID as name
-                        $newFileName = $fileId . ".dat";
-                        copy($_FILES['file']['tmp_name'], FILE_directory ."/". $newFileName);
-                }
-
-                return $fileId;
-
-        }
+		$filesize = @filesize($_FILES['file']['tmp_name']);
+		//INSERT file details
+		$query = "INSERT INTO file 
+		(category, owner, realname, submitted, 
+		description, comment, type, mime_type, file_size)
+			VALUES 
+		('".$category."','".$_SESSION['id']."','$file_name', NOW(), 
+		'$description', '$comment', '$type','$file_type', '$filesize')";
+	
+		$this->db->dbDoQuery($query);
+	
+		//get file ID from INSERT
+		$fileId = $this->db->dbInsertId();
+	
+		if( $_FILES['file']['tmp_name'] )
+		{
+				//save file using file ID as name
+				$newFileName = $fileId . ".dat";
+				copy($_FILES['file']['tmp_name'], FILE_directory ."/". $newFileName);
+		}
+	
+		return $fileId;
+	
+	}
 
 	function deleteFile($id)
 	{
