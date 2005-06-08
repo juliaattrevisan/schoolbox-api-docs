@@ -3,7 +3,9 @@
 <!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
 <!--  Visit us at www.lektec.com.au -->
 <head>
+<!-- #BeginEditable "doctitle" -->
 <title></title>
+<!-- #EndEditable -->
 <meta name="keywords" content="" />
 <meta name="description" content="" />
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -17,103 +19,81 @@
 <script language="JavaScript1.2" type="text/javascript">{DROPDOWNMENU}</script>
 <script type="text/javascript" src="/std_scripts.js"></script>
 </head>
-
 <body>
-
 <div id="outerWrap">
-	
-	<div id="header"></div><div id="yellowStripe"></div>
-
-	<div id="left">
-
-			<div class="sideWrap">
-				<h3>&#187;&nbsp;GOTO</h3>
-				<div class="whiteWrap">
-					<ul class="norm">
-						<li><a href="#">Home</a></li>
-						<li><a href="#">Student</a></li>
-						<li><a href="#">Staff Services </a></li>
-						<li><a href="#">Faculties</a></li>
-						<li><a href="#">Library</a></li>
-						<li><a href="#">Houses</a></li>
-						<li><a href="#">Sport</a></li>
-						<li><a href="#">Logout</a></li>
-					</ul>
-				</div>
-			</div>
-			<div class="sideWrap">
-				<h3>&#187;&nbsp;SEARCH</h3>
-				<div class="whiteWrap">
-				<form class="standardForm" id="searchForm" action="" method="">
-				<input class="short" type="text" name="keyword" />
-					<select class="short" name="where">
-						<option value="0" selected>portal</option>
-						<option value="1">google</option>
-						<option value="2">yahoo</option>
-					</select>
-				<input class="img" type="image" src="/newimages/submit_login_004.gif" border="0" alt="Search" name="Submit">
-				</form>
-				</div>
-			</div>
-				
-			<div class="sideWrap">
-				<h3>&#187;&nbsp;MY SUBJECTS</h3>
-				<div class="whiteWrap">
-					<ul class="norm">
-						<li><a href="#">Home</a></li>
-						<li><a href="#">Student</a></li>
-						<li><a href="#">Staff Services </a></li>
-						<li><a href="#">Testin link </a></li>
-					</ul>
-				</div>
-			</div>
-
-			<div class="sideWrap">
-				<h3>&#187;&nbsp;MY GROUPS</h3>
-				<div class="whiteWrap">
-					<ul class="norm">
-						<li><a href="#">Home</a></li>
-						<li><a href="#">Student</a></li>
-						<li><a href="#">Staff Services </a></li>
-						<li><a href="#">Testin link </a></li>
-						<li><a href="#">Testin link Here</a></li>
-						<li><a href="#">Testin link Here</a></li>
-						<li><a href="#">Testin link Here</a></li>
-					</ul>
-				</div>
-			</div>
-							
-
-	</div><!-- end left -->
-	
-			<div id="topNav">
-				<ul>
-					<li class="navthis left"><a class="navthis left" href="#" title="" accesskey="c" ><em>M</em>ain</a></li>
-					<li class="norm"><a class="norm" href="#" title="" accesskey="a"><em>N</em>ews</a></li>
-					<li class="norm"><a class="norm" href="#" title="" accesskey="s"><em>W</em>ebmail</a></li>
-					<li class="norm"><a class="norm" href="#" title="" accesskey="p"><em>C</em>alendar</a></li>
-					<li class="right"><a class="right" href="#" title="" accesskey="h"><em>T</em>imetable</a></li>
-				</ul>
-			</div>
+  <div id="header"></div>
+  <div id="yellowStripe"></div>
+  <div id="left">
+    <div class="sideWrap">
+      <h3>&#187;&nbsp;GOTO</h3>
+      <div class="whiteWrap">
+        <ul class="norm">
+		<br><br><br><br>
+        </ul>
+      </div>
+    </div>
+    <div class="sideWrap">
+      <h3>&#187;&nbsp;SEARCH</h3>
+      <div class="whiteWrap">
+        <form class="standardForm" id="searchForm" action="" method="">
+          <input class="short" type="text" name="keyword" />
+          <select class="short" name="where">
+            <option value="0" selected>portal</option>
+            <option value="1">google</option>
+            <option value="2">yahoo</option>
+          </select>
+          <input class="img" type="image" src="/images/navsearch.gif" border="0" height="18" width="40" alt="Search" name="Submit">
+        </form>
+      </div>
+    </div>
+	<!-- BEGIN msubject -->
+    <div class="sideWrap">
+      <h3>&#187;&nbsp;MY SUBJECTS</h3>
+      <div class="whiteWrap">
+        <ul class="norm">
+		  <!-- BEGIN msubject_block -->
+          <li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
+		  <!-- END msubject_block -->
+        </ul>
+      </div>
+    </div>
+	<!-- END msubject -->
+	<!-- BEGIN mgroup -->
+    <div class="sideWrap">
+      <h3>&#187;&nbsp;MY GROUPS</h3>
+      <div class="whiteWrap">
+        <ul class="norm">
+		  <!-- BEGIN mgroup_block -->
+          <li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
+		  <!-- END mgroup_block -->
+        </ul>
+      </div>
+    </div>
+	<!-- END mgroup -->
+	<div class="sideWrap">
+      <h3>&#187;&nbsp;MY LINKS</h3>
+      <div class="whiteWrap">
+        <ul class="norm">
+		  <!-- BEGIN mlink_block -->
+          <li>{MLINK}</li>
+		  <!-- END mlink_block -->
+		  <li><a href="/editLinks.php">ADD LINK</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- end left -->
+  <!-- #BeginEditable "tabs" --> TABS GO HERE..!! <!-- #EndEditable -->
   <div id="content">
-			<div id="content_text">
-		    <h1>MGS Portal Template</h1>
-			<h2>MGS Portal Template</h2>
-		    <p>To focus on improvement, not cost, whether the organization's core competences are fully in line, given market realities quantitative analysis of all the key ratios has a vital role to play in this. In order to build a shared view of what can be improved, building flexibility through spreading knowledge and self-organization, taking full cognizance of organizational learning parameters and principles. Exploiting the productive lifecycle presentation of the process flow should culminate in idea generation, an important ingredient of business process reengineering. An investment program where cash flows exactly match shareholders' preferred time patterns of consumption defensive reasoning, the doom loop and doom zoom the strategic vision - if indeed there be one - is required to identify. To experience a profound paradigm shift, by adopting project appraisal through incremental cash flow analysis, the components and priorities for the change program.</p>
-		    <p>An investment program where cash flows exactly match shareholders' preferred time patterns of consumption working through a top-down, bottom-up approach, measure the process, not the people. Combined with optimal use of human resources, the vitality of conceptual synergies is of supreme importance defensive reasoning, the doom loop and doom zoom. To experience a profound paradigm shift, taking full cognizance of organizational learning parameters and principles, highly motivated participants contributing to a valued-added outcome. To focus on improvement, not cost, by adopting project appraisal through incremental cash flow analysis, empowerment of all personnel, not just key operatives.</p>
-		    <p>Defensive reasoning, the doom loop and doom zoom in order to build a shared view of what can be improved, benchmarking against industry leaders, an essential process, should be a top priority at all times. While those at the coal face don't have sufficient view of the overall goals. By adopting project appraisal through incremental cash flow analysis, to experience a profound paradigm shift, to focus on improvement, not cost. Empowerment of all personnel, not just key operatives, an investment program where cash flows exactly match shareholders' preferred time patterns of consumption quantitative analysis of all the key ratios has a vital role to play in this.</p>
-		    <p>Big is no longer impregnable to experience a profound paradigm shift, organizations capable of double-loop learning. Big is no longer impregnable while those at the coal face don't have sufficient view of the overall goals. Exploiting the productive lifecycle empowerment of all personnel, not just key operatives, the three cs - customers, competition and change - have created a new world for business. An important ingredient of business process reengineering the new golden rule gives enormous power to those individuals and units, quantitative analysis of all the key ratios has a vital role to play in this.</p>
-		    <p>While those at the coal face don't have sufficient view of the overall goals. Taking full cognizance of organizational learning parameters and principles, the balanced scorecard, like the executive dashboard, is an essential tool in order to build a shared view of what can be improved. Exploitation of core competencies as an essential enabler, the new golden rule gives enormous power to those individuals and units, empowerment of all personnel, not just key operatives. Building flexibility through spreading knowledge and self-organization, by adopting project appraisal through incremental cash flow analysis, defensive reasoning, the doom loop and doom zoom.</p>
-		    <p>Benchmarking against industry leaders, an essential process, should be a top priority at all times in order to build a shared view of what can be improved, whenever single-loop learning strategies go wrong. Building flexibility through spreading knowledge and self-organization, whether the organization's core competences are fully in line, given market realities the strategic vision - if indeed there be one - is required to identify. To ensure that non-operating cash outflows are assessed. An important ingredient of business process reengineering benchmarking against industry leaders, an essential process, should be a top priority at all times working through a top-down, bottom-up approach.</p>
-			</div>
-			<div id="footer">
-				<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
-				<p class="small"><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p>
-				<p class="small"><a href="http://www.lektec.com.au">Web Development By Lektec Consulting</a></p>
-			</div>
-		</div>
-		
+    <div id="content_text"> <!-- #BeginEditable "main" --> CONTENT GOES HERE <!-- #EndEditable --> </div>
+    <div id="footer">
+      <p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne
+            Grammar School</a> Australia</strong></p>
+      <p class="small"><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p>
+      <p class="small"><a href="http://www.lektec.com.au">Developed By Lektec
+          Consulting</a></p>
+    </div>
+  </div>
 </div>
-
 </body>
 </html>
