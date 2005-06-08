@@ -100,7 +100,8 @@ if($db->dbCountRows() > 0)
 	while($group = $db->dbGetNextArray())
 	{
 			$this->t_body->set_var("MGNAME", $group['name']);
-			$this->t_body->set_var("MGLINK", "homepage.php?category=".$group['sid']);	
+			//$this->t_body->set_var("MGLINK", "homepage.php?category=".$group['sid']);
+			$this->t_body->set_var("MGID", $group['sid']);	
 			$this->t_body->parse("my_groups", "mgroup_block", true);
 	}
 	$this->t_body->parse("mgroup_section", "mgroup");
@@ -121,7 +122,8 @@ if(is_array($_SESSION['subjects']))
 			$this->t_body->set_var("MSUBJECT", $_SESSION['subjects'][$x]." (".$_SESSION['sub_code'][$x].")");
 		else		
 			$this->t_body->set_var("MSUBJECT", $_SESSION['subjects'][$x]);
-		$this->t_body->set_var("MLINKSUB", "homepage.php?code=".urlencode($_SESSION['sub_code'][$x]));
+		//$this->t_body->set_var("MLINKSUB", "homepage.php?code=".urlencode($_SESSION['sub_code'][$x]));
+		$this->t_body->set_var("MSUBCODE", urlencode($_SESSION['sub_code'][$x]));
 		$this->t_body->parse("my_subjects","msubject_block",true); 
 	}
 	$this->t_body->parse("msubject_section","msubject");

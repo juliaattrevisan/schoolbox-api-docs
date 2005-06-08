@@ -14,38 +14,38 @@ require_once("calendar.php");
 class displayCalendar
 {
 
-        function displayCalendar($currYear=0, $currMonth=0, $currDay=0)
-        {
-                if(!$currYear) { $this->currYear = date("Y"); } else { $this->currYear = $currYear; }
-                if(!$currMonth) { $this->currMonth = date("n"); } else { $this->currMonth = $currMonth; }
-                if(!$currDay) { $this->currDay = date("j"); } else { $this->currDay = $currDay; }
+	function displayCalendar($currYear=0, $currMonth=0, $currDay=0)
+	{
+		if(!$currYear) { $this->currYear = date("Y"); } else { $this->currYear = $currYear; }
+		if(!$currMonth) { $this->currMonth = date("n"); } else { $this->currMonth = $currMonth; }
+		if(!$currDay) { $this->currDay = date("j"); } else { $this->currDay = $currDay; }
+		
+		$this->cal = new Calendar;
+	
+	}
 
-				$this->cal = new Calendar;
-
-        }
-
-        function outputEvent($block, $id, $startTime, $endTime, $priority, $note, $owner, $access, $sid, $type)
-        {
+	function outputEvent($id, $startTime, $endTime, $priority, $note, $owner, $access, $sid, $type)
+	{
 		$startTime = strtolower($startTime);
 		$endTime = strtolower($endTime);
 		if($startTime == "0:00" || $startTime == "12:00am" || $startTime == "12:00 am")   
 			$this->t_body->set_var("TIME", "");
 		else if($endTime == "0:00" || $endTime == "12:00am" || $endTime == "12:00 am")
-                	$this->t_body->set_var("TIME", $startTime);
-                else
+			$this->t_body->set_var("TIME", $startTime);
+		else
 			$this->t_body->set_var("TIME", $startTime." - ".$endTime);
- 
-                $this->t_body->set_var("NOTE", htmlentities($note));
-                $this->t_body->set_var("PRIORITY", $this->cal->displayColour($priority));
-
-
-                if($owner == $_SESSION['id'] || $this->cal->checkSecurity($access, $sid) > 1 || $_SESSION['su'])
-                        $this->t_body->set_var("MODIFY","<a href=\"addEvent.php?type=$type&id=$id\">Modify</a>");
-                else
-                        $this->t_body->set_var("MODIFY", ""); 
-
-                $this->t_body->parse("note_listing".$block,"note_block".$block, true);
-        }
+		
+		$this->t_body->set_var("NOTE", htmlentities($note));
+		$this->t_body->set_var("PRIORITY", $this->cal->displayColour($priority));
+		
+		
+		if($owner == $_SESSION['id'] || $this->cal->checkSecurity($access, $sid) > 1 || $_SESSION['su'])
+			$this->t_body->set_var("MODIFY","<a href=\"addEvent.php?type=$type&id=$id\">Modify</a>");
+		else
+			$this->t_body->set_var("MODIFY", ""); 
+		
+		$this->t_body->parse("note_listing","note_block", true);
+	}
 
 	function displayMonth()
 	{
@@ -76,14 +76,14 @@ class displayCalendar
 
 		$this->t_body->set_var("MONTH", date("F", $currentMonth));
 		$this->t_body->set_var("TITLE", HEADING." - Calendar for ".date("F",$currentMonth)." ".$this->currYear);
-                $this->t_body->set_var("YEAR", date("Y",  $currentMonth));
-
-                $this->t_body->set_var("BACK", "viewCalendar.php?Year=".date("Y",$previousMonth).
-                                "&Month=".date("m",$previousMonth)."&Day=".date("d", $previousMonth)."&view=month");
-                $this->t_body->set_var("FORWARD", "viewCalendar.php?Year=".date("Y",$nextMonth).
-                                "&Month=".date("m",$nextMonth)."&Day=".date("d", $nextMonth)."&view=month");
+		$this->t_body->set_var("YEAR", date("Y",  $currentMonth));
+		
+		$this->t_body->set_var("BACK", "viewCalendar.php?Year=".date("Y",$previousMonth).
+						"&Month=".date("m",$previousMonth)."&Day=".date("d", $previousMonth)."&view=month");
+		$this->t_body->set_var("FORWARD", "viewCalendar.php?Year=".date("Y",$nextMonth).
+						"&Month=".date("m",$nextMonth)."&Day=".date("d", $nextMonth)."&view=month");
 		$this->t_body->set_var("VIEWLINK", "viewCalendar.php?Year=".date("Y",$currentMonth).
-                                "&Month=".date("m",$currentMonth)."&Day=".date("d", $currentMonth)."&view=week");
+						"&Month=".date("m",$currentMonth)."&Day=".date("d", $currentMonth)."&view=week");
 
 		$monthDay = 1;
 
@@ -132,7 +132,7 @@ class displayCalendar
 		$sub = $this->cal->getSubmissionEvents($this->currDay, $this->currMonth, $this->currYear);
 		for($i=0; $sub['category'][$i]; $i++)
 		{
-			$this->outputEvent("", 0, 0, 0, 1, "*DUE WORK* ".$sub['category'][$i]." - ".$sub['name'][$i], 0,0,0,""); 
+			$this->outputEvent(0, 0, 0, 1, "*DUE WORK* ".$sub['category'][$i]." - ".$sub['name'][$i], 0,0,0,""); 
 			$subout = 1;
 		}
 
@@ -144,7 +144,7 @@ class displayCalendar
 			for($i=0; $event['note'][$i]; $i++)
 			{
 	
-				$this->outputEvent("", $event['id'][$i], $event['startTime'][$i], $event['endTime'][$i], 
+				$this->outputEvent($event['id'][$i], $event['startTime'][$i], $event['endTime'][$i], 
 				$event['priority'][$i], $event['note'][$i], $event['owner'][$i], 
 				$event['access'][$i], $event['sid'][$i], $event['type'][$i]);
 			}
@@ -154,100 +154,95 @@ class displayCalendar
 	}
   
 
-        function displayWeek()
-        {
-                //output week to template
-                $this->t_body = new Template(TPL_directory);
-                $this->t_body->set_file("tplBODY", "calendar/week.htm");
-
-                //setup blocks
-                $this->t_body->set_block("tplBODY", "note_block1", "note_listing1");
-                $this->t_body->set_block("tplBODY", "note_block2", "note_listing2");
-                $this->t_body->set_block("tplBODY", "note_block3", "note_listing3");
-                $this->t_body->set_block("tplBODY", "note_block4", "note_listing4");
-                $this->t_body->set_block("tplBODY", "note_block5", "note_listing5");
-                $this->t_body->set_block("tplBODY", "note_block6", "note_listing6");
-                $this->t_body->set_block("tplBODY", "note_block7", "note_listing7");
-
-				include_once("../include/page.php");
-
-                //setup database
-                $db = new dbManager;
-
-                //figure out which day of the week is the current day
-                $dayOfWeek = date("w", mktime(0,0,0,$this->currMonth, $this->currDay, $this->currYear));
-                //figure out which day from the current day is the start of the week
-                $startOfWeek = mktime (0,0,0,$this->currMonth, ($this->currDay-$dayOfWeek), $this->currYear);
-                $endOfWeek = $startOfWeek + 518400; 
+	function displayWeek()
+	{
+		//output week to template
+		$this->t_body = new Template(TPL_directory);
+		$this->t_body->set_file("tplBODY", "calendar/week.htm");
+	
+		//setup blocks
+		$this->t_body->set_block("tplBODY", "day_block", "day_listing");
+		$this->t_body->set_block("day_listing", "note_block", "note_listing");
+		include_once("../include/page.php");
+	
+		//setup database
+		$db = new dbManager;
+	
+		//figure out which day of the week is the current day
+		$dayOfWeek = date("w", mktime(0,0,0,$this->currMonth, $this->currDay, $this->currYear));
+		//figure out which day from the current day is the start of the week
+		$startOfWeek = mktime (0,0,0,$this->currMonth, ($this->currDay-$dayOfWeek), $this->currYear);
+		$endOfWeek = $startOfWeek + 518400; 
 
 		if(date("F", $startOfWeek) != date("F", $endOfWeek))
-                	$this->t_body->set_var("MONTH", date("F",$startOfWeek)." / ".date("F", $endOfWeek));
+			$this->t_body->set_var("MONTH", date("F",$startOfWeek)." / ".date("F", $endOfWeek));
 		else
-                	$this->t_body->set_var("MONTH", date("F",$startOfWeek));
+			$this->t_body->set_var("MONTH", date("F",$startOfWeek));
 
-                $this->t_body->set_var("TITLE", HEADING." - Calendar for ".date("F",$startOfWeek)." ".$this->currYear);
-                $this->t_body->set_var("YEAR", date("Y",$startOfWeek));
-
-
-                $currentDay = $startOfWeek;
-
-                //setup the movement buttons
-                $previousWeek = mktime (0,0,0,$this->currMonth, ($this->currDay-7), $this->currYear);
-                $nextWeek = mktime (0,0,0,$this->currMonth, ($this->currDay+7), $this->currYear);
-                $currentWeek = mktime (0,0,0,$this->currMonth, $this->currDay, $this->currYear);
-
-                $this->t_body->set_var("BACK", "viewCalendar.php?Year=".date("Y",$previousWeek).
-                                "&Month=".date("m",$previousWeek)."&Day=".date("d", $previousWeek)."&view=week");
-                $this->t_body->set_var("FORWARD", "viewCalendar.php?Year=".date("Y",$nextWeek).
-                                "&Month=".date("m",$nextWeek)."&Day=".date("d", $nextWeek)."&view=week");
+		$this->t_body->set_var("TITLE", HEADING." - Calendar for ".date("F",$startOfWeek)." ".$this->currYear);
+		$this->t_body->set_var("YEAR", date("Y",$startOfWeek));
+		
+		$currentDay = $startOfWeek;
+		
+		//setup the movement buttons
+		$previousWeek = mktime (0,0,0,$this->currMonth, ($this->currDay-7), $this->currYear);
+		$nextWeek = mktime (0,0,0,$this->currMonth, ($this->currDay+7), $this->currYear);
+		$currentWeek = mktime (0,0,0,$this->currMonth, $this->currDay, $this->currYear);
+		
+		$this->t_body->set_var("BACK", "viewCalendar.php?Year=".date("Y",$previousWeek).
+						"&Month=".date("m",$previousWeek)."&Day=".date("d", $previousWeek)."&view=week");
+		$this->t_body->set_var("FORWARD", "viewCalendar.php?Year=".date("Y",$nextWeek).
+						"&Month=".date("m",$nextWeek)."&Day=".date("d", $nextWeek)."&view=week");
 		$this->t_body->set_var("VIEWLINK", "viewCalendar.php?Year=".date("Y",$currentWeek ).
-                                "&Month=".date("m",$currentWeek )."&Day=".date("d", $currentWeek )."&view=month" );
-
+						"&Month=".date("m",$currentWeek )."&Day=".date("d", $currentWeek )."&view=month" );
 
 		//initialise the day values
-                $this->currYear = date("Y",$currentDay);
-                $this->currMonth = date("n",$currentDay);
-                $this->currDay = date("j",$currentDay);
-
-
-                //for each day of the week
-                for($x=1; $x <= 7; $x++)
-                {
-                        $this->t_body->set_var("DATE".$x, date("l jS",$currentDay));
-
-			$this->t_body->set_var("ADD".$x, "<a href=\"addEvent.php?date=".$this->currDay."&month=".$this->currMonth."\">add</a>");
-
+		$this->currYear = date("Y",$currentDay);
+		$this->currMonth = date("n",$currentDay);
+		$this->currDay = date("j",$currentDay);
+		
+		//for each day of the week
+		for($x=1; $x <= 7; $x++)
+		{
+			$this->t_body->set_var("DATE", date("l jS",$currentDay));
+			
+			$this->t_body->set_var("ADD", "<a href=\"addEvent.php?date=".$this->currDay."&month=".$this->currMonth."\">add</a>");
+			
 			//first lets output submission events
 			$sub = $this->cal->getSubmissionEvents($this->currDay, $this->currMonth, $this->currYear);
 			for($i=0; $sub['category'][$i]; $i++)
 			{
-				$this->outputEvent($x, 0, 0, 0, 1, "*DUE WORK* ".$sub['category'][$i]." - ".$sub['name'][$i], 0,0,0); 
+				$this->outputEvent(0, 0, 0, 1, "*DUE WORK* ".$sub['category'][$i]." - ".$sub['name'][$i], 0,0,0); 
 				$subout = 1;
 			}
 
 			$event = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear);
 			
-			if(count($event['id']) < 1 && !$subout) {$this->t_body->set_var("note_listing".$x, "");}
-                        else
-                        {	
-                                for($i=0; isset($event['id'][$i]); $i++)
-                                {
-					$this->outputEvent($x, $event['id'][$i], $event['startTime'][$i], $event['endTime'][$i], 
-					$event['priority'][$i], $event['note'][$i], $event['owner'][$i], 
-					$event['access'][$i], $event['sid'][$i], $event['type'][$i]);
-                                }
+			if(count($event['id']) < 1 && !$subout)
+			{
+				$this->t_body->set_var("note_listing", "");
+			}
+			else
+			{	
+				for($i=0; isset($event['id'][$i]); $i++)
+				{
+					$this->outputEvent($event['id'][$i], $event['startTime'][$i], $event['endTime'][$i], 
+						$event['priority'][$i], $event['note'][$i], $event['owner'][$i], 
+						$event['access'][$i], $event['sid'][$i], $event['type'][$i]);
+				}
 
-                        }
-                        //increment date
-                        $currentDay = mktime (0,0,0,date("m",$currentDay), date("d",$currentDay)+1, date("Y",$currentDay));
-                	$this->currYear = date("Y",$currentDay);
-                	$this->currMonth = date("n",$currentDay);
-                	$this->currDay = date("j",$currentDay);
+			}
+			$this->t_body->parse("day_listing","day_block", true);
+			
+			//increment date
+			$currentDay = mktime (0,0,0,date("m",$currentDay), date("d",$currentDay)+1, date("Y",$currentDay));
+			$this->currYear = date("Y",$currentDay);
+			$this->currMonth = date("n",$currentDay);
+			$this->currDay = date("j",$currentDay);
 		}
 
-
-                $this->t_body->pparse("finaloutput", "tplBODY");
-        }
+		$this->t_body->pparse("finaloutput", "tplBODY");
+	}
 
 }
 
