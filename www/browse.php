@@ -212,7 +212,11 @@ class OutPut
 		// set file size
 		if($fileDetails['realname'] != "")
 		{
-			$filesize = @filesize($filename);
+			if($fileDetails['file_size'])
+				$filesize = $fileDetails['file_size'];
+			else
+				$filesize = @filesize($filename);
+			
 			if($filesize == FALSE) //if we cannot find the file (something is wrong dont link to it)
 			{
 				$this->t_body->set_var("SIZE", "");
