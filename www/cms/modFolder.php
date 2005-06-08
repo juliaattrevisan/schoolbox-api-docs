@@ -160,31 +160,30 @@ class ModFolderPage
 
 	function setSynergyCodeField($code = 0)
 	{
+		$this->t_body->set_block("tplBODY", "synergy_input", "synergy_input_block");
 		//if user a superuser allow them to add subjects
 		if($_SESSION['su'])
 		{
-			$this->t_body->set_var("SYNERGYDESC", "<b>Synergy Subject Code</b><br><i>If you want this 
-						category to be a subject enter its code here</i>");
 			if($code)
-				$this->t_body->set_var("SYNERGYCODE", "<input type=\"text\" name=\"code\" maxlength=\"8\" size=\"8\" value=\"$code\">");
+				$this->t_body->set_var('SYNERGYCODE', $code);
 			else
-				$this->t_body->set_var("SYNERGYCODE", "<input type=\"text\" name=\"code\" maxlength=\"8\" size=\"8\">");
+				$this->t_body->set_var('SYNERGYCODE', '');
+		
+			$this->t_body->parse('synergy_input_block', 'synergy_input');
 		}
 		else
 		{
-			$this->t_body->set_var("SYNERGYDESC", "");
-			$this->t_body->set_var("SYNERGYCODE", "");
+			$this->t_body->set_var('synergy_input_block', '');
 		}
 	}
 
         function showPage($action, $cid = 0)
         {	
-	
 			$this->t_body = new Template(TPL_directory);
 			$folderDB = new folder;
 			
 			//ensure they have access to do this
-			$folderDB->checkWriteAccess($cid);
+			$access = $folderDB->checkWriteAccess($cid);
 			
 			if($action == "del")
 			{
@@ -194,32 +193,44 @@ class ModFolderPage
 			}
 			else if($action == "mod")
 			{
-	             $this->t_body->set_file("tplBODY", "cms/addCat.htm");
-        		$this->t_body->set_var("TITLE", "Modify Category page");
+				$this->t_body->set_file("tplBODY", "cms/modFolder.htm");
+				$this->t_body->set_var("TITLE", "Modify Category page");
 				$this->t_body->set_var("ACTION", "Modify");
 				$this->t_body->set_var("CID", "<input type=\"hidden\" name=\"cid\" value=\"$cid\">");
-			
-			//get category details
-			$cat = $folderDB->getFolder($cid);
-			
-			//set name
-			$this->t_body->set_var("CATNAME", $cat['name']);
-
-			//set template box
-			if($cat['template'])
+				
+				//get category details
+				$cat = $folderDB->getFolder($cid);
+				
+				//set name
+				$this->t_body->set_var("CATNAME", $cat['name']);
+				
+				//set template box
+				if($cat['template'])
 				$this->setTemplateList($cat['template']);
-			else
+				else
 				$this->setTemplateList();
-	
-			$this->setCatList("parent", $cat['parent']);
-			$this->setGroupListPerms($cid, $folderDB);
-			$this->setSynergyCodeField($cat['code']);
-			
-		}	
-		else
-		{
-	                $this->t_body->set_file("tplBODY", "cms/addCat.htm");
-        		$this->t_body->set_var("TITLE", HEADING." - Create Category page");
+				
+				$this->setCatList("parent", $cat['parent']);
+				$this->setGroupListPerms($cid, $folderDB);
+				
+				//control individual perms actions dependent on wether group owner or not
+				require_once('../group/group.php');
+				$group = new Group(HOMEPAGESERVICE, $cid);
+				$groupOwner = $group->getOwner();
+
+				if($groupOwner['uid'] == $_SESSION['id'] || ($groupOwner['uid'] && $_SESSION['su']) )
+					$this->t_body->set_var("INDIVIDUAL_PERMS", "<a href=\"/group/modUserGroup.php?service=1&sid=$cid\">Modify Group</a>");
+				else if($groupOwner['uid'])
+					$this->t_body->set_var("INDIVIDUAL_PERMS", "Cannot Modify");
+				else
+					$this->t_body->set_var("INDIVIDUAL_PERMS", "<input type=\"checkbox\" name=\"groupcheck\">");
+								
+				$this->setSynergyCodeField($cat['code']);
+			}	
+			else
+			{
+			$this->t_body->set_file("tplBODY", "cms/modFolder.htm");
+			$this->t_body->set_var("TITLE", HEADING." - Create Category page");
 			$this->t_body->set_var("ACTION", "Create");
 			$this->t_body->set_var("CATNAME", "");
 			$this->t_body->set_var("CID", "");
@@ -231,17 +242,20 @@ class ModFolderPage
 			}
 			else
 				$this->setCatList("parent");
-
+			
+			$this->t_body->set_var("INDIVIDUAL_PERMS", "<input type=\"checkbox\" name=\"groupcheck\">");
+			
 			$this->setTemplateList();
+			
 			$this->setSynergyCodeField();
-
+			
 			$this->setGroupList();
-		}
-
-		require_once("../include/page.php");
-
-                $this->t_body->pparse("finaloutput", "tplBODY");
-        }
+			}
+			
+			require_once("../include/page.php");
+			
+				$this->t_body->pparse("finaloutput", "tplBODY");
+			}
 }
 
 //check data is being submitted

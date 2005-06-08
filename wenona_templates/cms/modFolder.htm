@@ -293,20 +293,21 @@ function verify(){
                     </strong><em>Manage individual user access to this folder. 
                     You will automatically be assigned administration rights.</em></td>
                   <td align="right" valign="top">&nbsp;</td>
-                  <td><input type="checkbox" name="groupcheck" value="1"></td>
+                  <td>{INDIVIDUAL_PERMS}</td>
                 </tr>
                 <tr> 
                   <td width="5">&nbsp;</td>
                   <td>&nbsp;</td>
                   <td align="right" valign="top">&nbsp;</td>
                   <td>&nbsp;</td>
-                </tr>
+                </tr><!-- BEGIN synergy_input -->
                 <tr> 
                   <td width="5">&nbsp;</td>
-                  <td width="38%">{SYNERGYDESC}</td>
+                  <td width="38%"><b>Synergy Subject Code</b><br><i>If you want this 
+						category to be a subject enter its code here</i></td>
                   <td align="right" valign="top">&nbsp;</td>
-                  <td width="50%">{SYNERGYCODE}</td>
-                </tr>
+                  <td width="50%"><input type="text" name="code" maxlength="8" size="8" value="{SYNERGY_CODE}"></td>
+                </tr><!-- END synergy_input -->
                 <tr> 
                   <td width="5">&nbsp;</td>
                   <td width="38%">&nbsp;</td>

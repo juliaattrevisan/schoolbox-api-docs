@@ -11,32 +11,34 @@
 class folder
 {
 	function folder()
-        {
-                //always gonna need the db so lets create one..
-                $this->db = new dbManager();
-        }
-
-        function checkWriteAccess($category)
-        {
-                require_once("../include/permission.php");
-				
-				//just a simple cache to stop excessive calls to perm (which is quite heavy)
-				if(!isset($this->permCache[$category]))
-				{
-					$access = perm($category, HOMEPAGESERVICE);
-					$this->permCache[$category] = $access;
-				}
-				else
-				{
-					$access = $this->permCache[$category];
-				}
-				
-                if($access < 2)
-                        error(6);
-        		
-				$this->permCache[$category] = $access;
+	{
+		//always gonna need the db so lets create one..
+		$this->db = new dbManager();
+	}
+	
+	function checkWriteAccess($category)
+	{
+		require_once("../include/permission.php");
+		
+		//just a simple cache to stop excessive calls to perm (which is quite heavy)
+		if(!isset($this->permCache[$category]))
+		{
+			$access = perm($category, HOMEPAGESERVICE);
+			$this->permCache[$category] = $access;
 		}
-
+		else
+		{
+			$access = $this->permCache[$category];
+		}
+		
+		if($access < 2)
+				error(6);
+		
+		$this->permCache[$category] = $access;
+		
+		return $access;
+	}
+	
 
 	function insertCat($name, $parent, $template = 0, $code = 0)
 	{
@@ -167,18 +169,18 @@ class folder
 		if($this->db->dbCountRows() > 0)
 		{
 			//children exist exit with error
-                	error(12);
+			error(12);
 		}
-
-	        //check for files/links in category
+		
+		//check for files/links in category
 		$query = "SELECT id FROM link WHERE category = '".$id."'";
 		$this->db->dbDoQuery($query);
 		if($this->db->dbCountRows() > 0)
-        	{
+		{
 			//children exist exit with error
-                	error(12);
+			error(12);
 		}
-
+		
 		$query = "SELECT id FROM file WHERE category = '".$_GET['delete']."' AND deleted = '0'";
 		$this->db->dbDoQuery($query);
 		if($this->db->dbCountRows() > 0)
@@ -186,9 +188,9 @@ class folder
 			//children exist exit with error
 			error(12);
 		}
-
+		
 		//check for submission boxes
-		//???
+		//TODO: check for submission boxes
 
 	}
 }
