@@ -198,14 +198,13 @@ if(isset($_REQUEST['service']) && $_REQUEST['service'] && isset($_REQUEST['sid']
 	$group = new Group($_REQUEST['service'], $_REQUEST['sid']);
 
 	//check accessor is owner if not a superuser
-	if($_SESSION['su'] != 1)
+	if(!$_SESSION['su'])
 	{
 		$curOwner = $group->getOwner();
-		if($_SESSION['id'] != $curOwner['uid'] && $curOwner != 0)
+		if(!(isset($curOwner['uid']) && $_SESSION['id'] == $curOwner['uid']) )
 		{
 			error(19);
 		}
-
 	}
 
 	$page = new modUserGroup($_REQUEST['service'], $_REQUEST['sid']);
