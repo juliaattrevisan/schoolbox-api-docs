@@ -11,8 +11,8 @@ if (isset($_POST['delete']) && isset($_POST['id']) && $_POST['delete'] == "Delet
 	$myNews->deleteNews($_POST['id'], $_POST['myInfo']);
 } else {
 	$error = "";
-	if (!is_array($_POST['campus']) || count($_POST['campus']) < 1)
-		$error .= "Invalid Campus Selected<br>";
+	if (!is_array($_POST['campus']) && isset($_POST['campus']))
+		$error .= isset($_POST['campus']). "/" .!is_numeric($_POST['campus']). "/ ".!is_array($_POST['campus'])."/".$_POST['campus']."Invalid Campus Selected<br>";
 	if (!is_array($_POST['group']) || count($_POST['group']) < 1)
 		$error .= "Invalid Group Selected<br>";
 	if (!isset($_POST['heading']) || strlen($_POST['heading']) < 1 || strlen($_POST['heading']) > 50)

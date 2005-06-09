@@ -62,17 +62,53 @@ function delPerms($id)
 
 function addPerms($id, $groupArray, $campusArray)
 {
-	foreach($groupArray as $group) 
+	if(is_array($groupArray))
 	{
-		$query = "INSERT INTO newsGroup (id, gid) VALUES ('$id', '$group')";
-		$this->dbConnection->dbDoQuery($query);
+		foreach($groupArray as $group) 
+		{
+			$this->insertGroup($id, $group);
+		}
 	}
-	foreach($campusArray as $campus)
+	else if(is_numeric($groupArray))
 	{
-		$query = "INSERT INTO newsCampus (id, campus) VALUES ('$id', '$campus')";
+		$this->insertGroup($id, $groupArray);
+	}
+	
+	if(is_array($campusArray))
+	{
+		foreach($campusArray as $campus)
+		{
+			$this->insertCampus($id, $campus);
+		}
+	}
+	else if(is_numeric($campusArray))
+	{
+		$this->insertCampus($id, $campusArray);
+	}
+	else
+	{
+		$this->insertCampus($id, 1);
+	}
+}
+
+function insertGroup($id, $group)
+{
+	if(is_numeric($id) && is_numeric($group))
+	{
+		$query = "INSERT INTO newsGroup (id, gid) VALUES ($id, $group)";
 		$this->dbConnection->dbDoQuery($query);
 	}
 }
+
+function insertCampus($id, $campus)
+{
+	if(is_numeric($id) && is_numeric($campus))
+	{
+		$query = "INSERT INTO newsCampus (id, campus) VALUES ($id, $campus)";
+		$this->dbConnection->dbDoQuery($query);
+	}
+}
+
 
 function deleteNews($id, $userInfo)
 {
@@ -85,7 +121,7 @@ function deleteNews($id, $userInfo)
 
 function getHeadlines()
 {
-    $SQL_QUERY = "
+    $query = "
 	SELECT DISTINCT(news_items.item_id), news_items.item_heading
     FROM news_items 
     	JOIN newsCampus ON newsCampus.id = news_items.item_id 
@@ -100,15 +136,7 @@ function getHeadlines()
 	ORDER BY news_items.item_datetime_posted DESC
 	";
     
-    $dbhandle = $this->dbConnection->dbDoQuery($SQL_QUERY);
-    
-    for($i=0;$newsDbResult = $this->dbConnection->dbGetNextArray($dbhandle);$i++) {
-		$this->headlines['Id'][$i] = $newsDbResult["item_id"]; // add
-		$this->headlines['Heading'][$i] = $newsDbResult["item_heading"];
-    }
-    if (isset($this->headlines))
-        return $this->headlines;
-    $this->dbConnection->dbClose();
+    return $this->dbConnection->dbGetAllRows($query);
 }
 
 function getNews($id = 0)

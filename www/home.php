@@ -62,18 +62,21 @@ class OutPut
 		$this->set_var("GREETING", $this->greeting()." ".$user['firstname']);
 	}
 
-	function setStories($items)
+	function setStories($headlineList)
 	{
-		$num_items = count($items['Id']);
-		for ($i = 0; $i <= $num_items; $i++) 
-		{ 
-			$this->set_var("NEWS_TITLE", $items['Heading'][$i]);
-			$this->set_var("NEWS_URL", "/news.php?id=".$items['Id'][$i]); 
-			$this->t_body->parse("stories_block", "main_stories", true);
+		if(count($headlineList) > 0 )
+		{
+			foreach($headlineList as $item)
+			{
+				$this->set_var("NEWS_TITLE", $item['item_heading']);
+				$this->set_var("NEWS_URL", "/news.php#".$item['item_id']); 
+				$this->t_body->parse("stories_block", "main_stories", true);
 	    	}
-		
-		if ($num_items < 1)
-        		$this->set_var("stories_block", "<tr><td width=\"20\">&nbsp;</td><td>No News items found</td></tr>");
+		}
+		else
+		{
+        	$this->set_var("stories_block", "<li>No news articles available</li>");
+		}
 	}
 
 	function setDayEvents()

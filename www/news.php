@@ -16,7 +16,7 @@ class OutPut
 	function OutPut()
 	{
 		$this->t_body = new Template(TPL_directory);
-		$this->t_body->set_file("tplBODY", "news.htm");
+		$this->t_body->set_file("tplBODY", "news/news.htm");
 
 		$this->t_body->set_var("TITLE", HEADING." - News");
 		
@@ -42,6 +42,7 @@ class OutPut
 		$num_items = count($items['Id']);
 		for ($i = 1; $i <= $num_items; $i++) 
 		{ 
+			$this->set_var("NEWS_ID",$items['Id'][$i]); 
          
 			if($items['Owner'][$i] == $_SESSION['id'] || $_SESSION['su'] == 1)
 				$this->set_var("MODIFY", "<a href=\"/news/modnews.php?id=".$items['Id'][$i]."\">modify</a>");

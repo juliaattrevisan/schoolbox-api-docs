@@ -23,6 +23,7 @@ function pageTpl()
     $this->t_body->set_block("tplBODY", "group_selection", "group_selection_block");
     $this->t_body->set_block("tplBODY", "campus_selection", "campus_selection_block");
 	$this->t_body->set_block("tplBODY", "campus_row", "campus_row_block");
+	$this->t_body->set_block("tplBODY", "delete_button", "delete_button_block");
 }
 
 function setList($name, $array, $selected){
@@ -52,7 +53,7 @@ function setList($name, $array, $selected){
 }
 
 function putEmpty($groupArray, $userInfo, $campusArray) {
-	
+	$this->set_var("ACTION", "Submit");
 	$this->setList("GROUP", $groupArray, array());
 	
 	if(count($campusArray) < 2){  //dont show campus row when only 1
@@ -69,10 +70,12 @@ function putEmpty($groupArray, $userInfo, $campusArray) {
 	$this->set_var("DEFAULT_TIME_SELECTED", "selected");
 	$this->set_var("disp_main", "");
 	$this->set_var("BODY", "");
-	$this->set_var("DEL_FORM", "");
+	$this->set_var("delete_button_block", "");
 }
 
 function putExisting($newsItem, $groupArray, $campusArray) {
+
+	$this->set_var("ACTION", "Update");
 	$this->setList("GROUP", $groupArray, $newsItem['item_group']);
 	
 	if(count($campusArray) < 2){  //dont show campus row when only 1
@@ -88,7 +91,7 @@ function putExisting($newsItem, $groupArray, $campusArray) {
 	$this->set_var("LEAVE_OPTION", "<option value=\"0\" selected>Keep existing</option>");
 	$this->set_var("DEFAULT_TIME_SELECTED", "");
 	$this->set_var("BODY", $newsItem['item_body']);
-	$this->set_var("DEL_FORM", " <input type=\"submit\" name=\"delete\" value=\"Delete News\">");
+	$this->t_body->parse("delete_button_block", "delete_button");
 }
 
 
