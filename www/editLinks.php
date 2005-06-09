@@ -6,8 +6,8 @@
 ************************************************************/
 //allows users to edit there links
 
-require("session.php");
-include("include.php");
+require("include/session.php");
+include("include/include.php");
 
 class EditMyLinks
 {
@@ -76,7 +76,7 @@ class EditMyLinks
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "mylinks.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Edit My Links");
-		include("page.php");
+		include("include/page.php");
 
 		$this->setMyLinks();
 
