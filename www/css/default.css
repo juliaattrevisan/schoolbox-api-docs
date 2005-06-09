@@ -11,6 +11,7 @@ body {
 	font-size:100%;
 	text-align:left;
 	color:#666;
+	width:100%;
 	}
 /*--------------------------------------------------------------------------------------*/
 /* HEADINGS */
@@ -18,15 +19,15 @@ body {
 h1, h2 {
 	font-weight:normal;
 	letter-spacing:-1px;
-	margin:10px 10px 0 0;
+	margin:10px 0 0 0;
 	background:transparent;
-	padding:3px;
+	padding:1px 0 1px 3px;
 	font-weight:bold;	
 	}
 
 h1 {
 	color:#00458C;
-	font-size:100%;
+	font-size:120%;
 	border-left:20px solid #00458C;
 	border-bottom:4px solid #00458C;
 	}
@@ -34,7 +35,7 @@ h1 {
 h2 {
 	margin-left:20px;
 	color:#06c;
-	font-size:90%;
+	font-size:110%;
 	border-left:10px solid #06c;
 	border-bottom:4px solid #06c;
 	}
@@ -54,22 +55,41 @@ h2 {
 /* STANDARD ELEMENTS */
 /*--------------------------------------------------------------------------------------*/
 p {
-	font-size:80%;
-	line-height:2em;
+	line-height:1.4em;
 	color:#000;
-	margin:1em 0 0 0;
+	margin:0.8 0 0 0;
 	} 
 
-ul {
+acronym, dfn, abbr {
+	text-decoration:none;
+	padding-bottom:2px;
+	cursor:help;
+	}
 
-}
-
-ul.norm {
+#content ul {
 	margin:0;
 	list-style:none;
 	text-align:left;
 	}
-ul.norm li {
+#content ul li{
+	list-style:none;
+	padding-left:22px;
+	margin:3px 0 0 20px;
+	font-weight:normal;
+	line-height:1.5em;
+	color:#000;
+	}
+#content ul li {
+	background:transparent url(/images/bullet.gif) no-repeat 2px 0.2em;
+	}
+#content ul a {font-weight:normal;}
+
+.sideWrap ul {
+	margin:0;
+	list-style:none;
+	text-align:left;
+	}
+.sideWrap ul li {
 	list-style:none;
 	padding-left:12px;
 	margin:3px 0;
@@ -78,15 +98,10 @@ ul.norm li {
 	line-height:1.5em;
 	}
 
-ul.norm li {
+.sideWrap ul li {
 	background:transparent url(/newimages/navbar_input_small.gif) no-repeat 2px 0.2em;
 	}
-ul.norm a {font-weight:normal;}
-acronym, dfn, abbr {
-	text-decoration:none;
-	padding-bottom:2px;
-	cursor:help;
-	}
+.sideWrap ul a {font-weight:normal;}
 
 /*--------------------------------------------------------------------------------------*/
 /* LINKS */
@@ -128,7 +143,13 @@ a img {
 	height:54px;
 	margin-left:11%;
 	}
-	
+
+#yellowStripe {
+	background:#FFFFA4;
+	padding-top:8px;
+	margin-left:6%;
+	}
+
 #left{
 	position:absolute;
 	top:72px;
@@ -137,9 +158,7 @@ a img {
 	}
 
 #content{
-	position:absolute;
-	top:105px;
-	left:130px;
+	margin:35px 0 0 130px;
 	}
 
 #content_text{
@@ -147,16 +166,15 @@ a img {
 	background:#fff;
 	border:4px solid #00458C;
 	padding:10px;
+	font-size:80%;
+	line-height:1.4em;
+	color:#000;
 	}
-
+#content_text p {
+	margin: 0.8em 0 0 0;
+	}
 .padFix {
 	padding:10px;
-	}
-
-#yellowStripe {
-	background:#FFFFA4;
-	padding-top:8px;
-	margin-left:6%;
 	}
 
 .sideWrap {
@@ -164,8 +182,12 @@ a img {
 	background:#0065CE;
 	}
 .whiteWrap {
-	margin:0 -12px 0 10px;
+	margin:0 -10px 0 5px;
 	background:#fff;
+	}
+.indent {
+	margin:0;
+	padding-left:20px;
 	}
 /*--------------------------------------------------------------------------------------*/
 /* TOP NAVIGATION */
@@ -264,22 +286,21 @@ a img {
 	}
 #footer a {
 	color:#ccc;
-	text-decoration:underline;
+	text-decoration:non;
 	
 	}
 #footer a:hover {
-	color:#fff;
-	text-decoration:none;
+	color:#ccc;
+	text-decoration:underline;
 	}
 #footer p {	
 	margin:0;
-	font-size:60%;
+	font-size:70%;
 	color:#ccc;
 	line-height:1.4em;
 	}
 #content #footer p.small, #content #footer p.small a {
 	font-weight:normal;
-	font-size:70%;
 	}
 /*--------------------------------------------------------------------------------------*/
 /* MAIN FORMS */
@@ -355,8 +376,123 @@ a img {
 	border:0;
 	}
 /*--------------------------------------------------------------------------------------*/
+/* OTHER FORMS */
+/*--------------------------------------------------------------------------------------*/
+form.standard {
+	padding:4px;
+	background:#ccc;
+	}
+form.standard em {
+	font-size:70%;
+	font-style:normal;
+	}
+.standard input, .standard select {
+	border-collapse:collapse;
+	border:1px solid #333;
+	font-weight:normal;
+	font-size:80%;
+	margin:0 0 1em 0;
+	padding:2px;
+	vertical-align:middle;
+	}
+.standard table td {
+	vertical-align:top;
+	}
+.standard input.btn {
+	margin:1em 0;
+	cursor:pointer;
+	color:#000;
+	border:2px solid;
+	border-color:#efefef #333 #333 #efefef;
+	background:#eee;
+	padding:.3em 0.8em 0.3em 0.8em;
+	}
+.standard input.timeField {
+	width:2em;
+	}
+.standard .short {
+	width:5em;
+	}	
+.standard h2 {
+	font-weight:bold;
+	font-size:100%;
+	padding:0;
+	border:0;
+	margin:0;
+	color:#333;
+	}
+/*--------------------------------------------------------------------------------------*/
 /* SPECIFIC ELEMENT DECLARATIONS */
 /*--------------------------------------------------------------------------------------*/
+.element_footer {
+	color:#666;
+	font-size:90%;
+	}
+.cntr {
+	text-align:center;
+	}
+.header_option {
+	float:right;
+	margin:-24px 0 0 0;
+	padding:0;
+	}
+.calendarTime {
+	white-space:nowrap;
+	font-size:80%;
+	vertical-align:top;
+	padding-right:0.5em;
+	}
+#content_text table.calendarTable {
+	width:400px;
+	text-align:center;
+	}
+.calTable {
+	background:#D7ECFF;
+	font-weight:bold;
+}
+.calTableCurrent {
+	background: #335473;
+	color:#fff;
+	font-weight:bold;
+}
+.calTableSelected {
+	background: #fff;
+	font-weight:bold;
+}
+
 br.fix {
 	clear:both;
 	}
+#content table a {font-weight:normal;}
+#content table {
+	font-weight:normal;
+	width:100%;
+	}
+#content table tr{
+	vertical-align:middle;
+	}
+#content table th {
+	padding:3px;
+	background:#00458C;
+	color:#fff;
+	font:bold 90% /1em Verdana, arial, sans-serif, serif
+	}
+
+/*--------------------------------------------------------------------------------------*/
+/* CoolMenus 4 - default styles - do not edit */
+/*--------------------------------------------------------------------------------------*/
+.clCMAbs{position:absolute; visibility:hidden; left:0; top:0}
+/* CoolMenus 4 - default styles - end */
+/*Style for the background-bar*/
+.clBar{position:absolute; width:10; height:10; background-color:#FF9900; layer-background-color:#FF9900; visibility:hidden}
+/*Styles for level 0*/
+.clLevel0,.clLevel0over{position:absolute; padding:1px; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; }
+.clLevel0{background-color:; layer-background-color:; color:#0033CC;}
+.clLevel0over{background-color:; layer-background-color:; color:#0066CC; cursor:pointer; cursor:hand; }
+.clLevel0border{position:absolute; visibility:hidden; background-color:; layer-background-color:;}
+/*Styles for level 1*/
+.clLevel1, .clLevel1over{position:absolute; padding:2px; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px;}
+.clLevel1{background-color:#0066CC; layer-background-color:#0066CC; color:white;}
+.clLevel1over{background-color:#00458A; layer-background-color:#00458A; color:white; cursor:pointer; cursor:hand; }
+.clLevel1border{position:absolute; visibility:hidden; background-color:#0055AA; layer-background-color:#0055AA}
+
