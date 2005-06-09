@@ -19,6 +19,45 @@ class modUser
 		$this->db = new dbManager();
 	}
 
+	function displayAddUser()
+	{
+		$this->t_body = new Template(TPL_directory);
+		$this->t_body->set_file("tplBODY", "admin/modUser.htm");
+		$this->t_body->set_var("TITLE", HEADING." - Add User");
+		include_once("../include/page.php");	
+		$this->t_body->set_var('ACTION', 'Create');
+		
+		//blank all fields
+		$this->t_body->set_var("FIRSTNAME", '');
+		$this->t_body->set_var("LASTNAME", '');
+		$this->t_body->set_var("ESCAPE_FIRSTNAME", '');
+		$this->t_body->set_var("ESCAPE_LASTNAME", '');
+		$this->t_body->set_var("USERNAME", '');
+		$this->t_body->set_var("PASSWORD", '');
+		$this->t_body->set_var("SYNERGYID", '');
+		$this->t_body->set_var("LOCAL_EMAIL", '');
+		$this->t_body->set_var("ALT_EMAIL", '');		
+		$this->t_body->set_var("YEAR", '');
+		$this->t_body->set_var("ID", '');
+		$this->t_body->set_var("SUPERUSER", '');
+		$this->t_body->set_var("CAMPUSLIST", $this->campusList(0));
+		$this->t_body->set_var("GROUPLIST", $this->groupList(0));
+		
+		$this->t_body->set_block("tplBODY", "delete_button", "delete_button_block");
+		$this->t_body->set_var("delete_button_block", "");
+		
+		//do not display group and permission management
+		$this->t_body->set_block("tplBODY", "login", "login_section");
+		$this->t_body->set_block("tplBODY", "groups", "group_section");
+		$this->t_body->set_block("tplBODY", "perms", "perm_section");
+		$this->t_body->set_var("login_section","");
+		$this->t_body->set_var("group_section","");
+		$this->t_body->set_var("perm_section","");
+		
+		$this->t_body->pparse("finaloutput", "tplBODY");
+		
+	}
+
 	function displayUser($id)
 	{
 		//display user description page
@@ -26,11 +65,13 @@ class modUser
 		$this->t_body->set_file("tplBODY", "admin/modUser.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Modify User");
 		include_once("../include/page.php");	
-
+		$this->t_body->set_var('ACTION', 'Update');
 
 		//fill out all fields
 		global $userDb;
 		$user = $userDb->getUserInfo($id);
+		$userCampus = $userDb->getUserCampus($id);
+		
 		$this->t_body->set_var("FIRSTNAME", $user['firstname']);
 		$this->t_body->set_var("LASTNAME", $user['lastname']);
 		$this->t_body->set_var("ESCAPE_FIRSTNAME", addslashes($user['firstname']));
@@ -50,19 +91,20 @@ class modUser
 		else
 			$this->t_body->set_var("SUPERUSER", "");
 
-		$groupListHTML = "";
-		$query = "SELECT * FROM groups ORDER BY name";
-		$this->db->dbDoQuery($query);
-		while($line = $this->db->dbGetNextArray() )
-		{		
-			if($line['id'] == $user['group_id'])
-				$groupListHTML .= "<option value=\"".$line['id']."\" selected>".$line['name']."</option>";
-			else
-				$groupListHTML .= "<option value=\"".$line['id']."\">".$line['name']."</option>";
-		}
-		$this->t_body->set_var("GROUPLIST", $groupListHTML);
+		$this->t_body->set_var("GROUPLIST", $this->groupList($user['group_id']));
+		$this->t_body->set_var("CAMPUSLIST", $this->campusList($userCampus));
 
-		$userCampus = $userDb->getUserCampus($id);
+		$this->t_body->set_block("tplBODY", "login", "login_section");
+		$this->t_body->parse("login_section", "login");
+
+		$this->displayUserGroups($id);
+		$this->displayUserPerms($id);
+
+		$this->t_body->pparse("finaloutput", "tplBODY");
+	}
+
+	function campusList($userCampus)
+	{
 		$campusListHTML = "";
 		$query = "SELECT * FROM luCampus WHERE id != '".ALLCAMPUS."' ORDER BY name";
 		$this->db->dbDoQuery($query);
@@ -73,13 +115,22 @@ class modUser
 			else
 				$campusListHTML .= "<input type=\"checkbox\" name=\"campus[]\" value=\"".$line['id']."\"> ".$line['name']."<br>";	
 		}
-		
-		$this->t_body->set_var("CAMPUSLIST", $campusListHTML);
+		return $campusListHTML;
+	}
 
-		$this->displayUserGroups($id);
-		$this->displayUserPerms($id);
-
-		$this->t_body->pparse("finaloutput", "tplBODY");
+	function groupList($groupID)
+	{
+		$groupListHTML = "";
+		$query = "SELECT * FROM groups ORDER BY name";
+		$this->db->dbDoQuery($query);
+		while($line = $this->db->dbGetNextArray() )
+		{		
+			if($line['id'] == $groupID)
+				$groupListHTML .= "<option value=\"".$line['id']."\" selected>".$line['name']."</option>";
+			else
+				$groupListHTML .= "<option value=\"".$line['id']."\">".$line['name']."</option>";
+		}
+		return $groupListHTML;
 	}
 
 	function isInCampus($userCampus, $campus)
@@ -98,7 +149,8 @@ class modUser
 
 	function displayUserGroups($id)
 	{
-		$this->t_body->set_block("tplBODY", "group_block", "group");
+		$this->t_body->set_block("tplBODY", "groups", "group_section");
+		$this->t_body->set_block("groups", "group_block", "group");
 		
 		global $userDb;
                 $group = $userDb->getUserGroups($id);
@@ -140,12 +192,15 @@ class modUser
 
 		//ouput group list
 		$this->t_body->set_var("GROUP_DROP_DOWN", $this->getHTMLgroupList());
+		
+		$this->t_body->parse("group_section","groups");
 
 	}				
 
 	function displayUserPerms($id)
 	{
-		$this->t_body->set_block("tplBODY", "perm_block", "perm");
+		$this->t_body->set_block("tplBODY", "perms", "perm_section");
+		$this->t_body->set_block("perms", "perm_block", "perm");
 		
 		global $userDb;
                 $perm = $userDb->getUserPermissions($id);
@@ -178,7 +233,8 @@ class modUser
 		//if user in no groups just display nothing
 		if($i==0)
 			$this->t_body->set_var("perm", "");
-
+			
+		$this->t_body->parse("perm_section","perms");
 
 	}				
 
@@ -273,14 +329,33 @@ if(isset($_POST['delete']) && isset($_POST['id']) && $_POST['delete'] && $_POST[
 	$userDb->deleteUser($_POST['id'], 1);
 	localRedir("/admin/formValid.php?msg=User Deleted Sucessfully&loc=/admin/modUser.php");
 }
-else if(isset($_POST['username']) && isset($_POST['group']) && isset($_POST['firstname']) && 
-		isset($_POST['lastname']) && isset($_POST['campus']) && isset($_POST['id']) && $_POST['id'] && 
-		$_POST['username'] && $_POST['firstname'] && $_POST['lastname'] && $_POST['group'] && $_POST['campus'])
+else if($_POST['username'] && $_POST['firstname'] && $_POST['lastname'] && $_POST['group'] && $_POST['campus'])
 {
-	$userDb->updateUser($_POST['id'], $_POST['username'], $_POST['firstname'], $_POST['lastname'], $_POST['synergyid'], 
+	if($_POST['id'])
+	{
+		$userDb->updateUser($_POST['id'], $_POST['username'], $_POST['firstname'], $_POST['lastname'], $_POST['synergyid'], 
 			$_POST['local_email'], $_POST['alt_email'], $_POST['group'], $_POST['password'], $_POST['campus'], 
 			$_POST['su'], $_POST['year']);
-	$myPage->displayUser($_POST['id']);
+		$myPage->displayUser($_POST['id']);
+	}
+	else
+	{
+		if ($_POST['alt_email'])
+			$mail_handler = 1;
+		else
+			$mail_handler = 0;
+	
+		if($id = $userDb->addUser($_POST['username'], $_POST['firstname'], $_POST['lastname'],
+			 $_POST['synergyid'], $_POST['group'], $_POST['campus'], $_POST['year'], $_POST['password'], 
+			 $_POST['local_email'], $_POST['local_email'], $_POST['alt_email'], $mail_handler))	
+		{	
+			localRedir("/admin/modUser.php?id=$id");
+		}
+		else
+		{	
+			error(0);
+		}
+	}
 }
 else if(isset($_GET['search']) && $_GET['search'])
 {
@@ -298,6 +373,10 @@ else if(isset($_POST['addgroup']) && $_POST['addgroup'])
 else if(isset($_GET['id']) && $_GET['id'])		
 {
 	$myPage->displayUser($_GET['id']);
+}
+else if($_GET['adduser'])
+{
+	$myPage->displayAddUser();
 }
 else
 	$myPage->displayFindUser();

@@ -232,8 +232,8 @@ class user
 		
 		//insert information into database
 		$query = "INSERT INTO user (username, firstname, lastname, synergy_id, group_id, year, local_email, alt_email, mail_handler) VALUES
-                      ('$username', '$firstname', '$lastname', '$synergyid', '$group', '$year', '$local_email', '$alt_email', '$mail_handler')";
-
+					  ('$username', '$firstname', '$lastname', '$synergyid', '$group', '$year', '$local_email', '$alt_email', '$mail_handler')";
+		
 		$this->db->dbDoQuery($query);
 		$id = $this->db->dbInsertId();
 		
@@ -243,7 +243,7 @@ class user
 			$query = "UPDATE user SET password = PASSWORD('$password'), email_pass = '$password' WHERE id = '$id'";
 			$this->db->dbDoQuery($query);
 		}
-
+		
 		if(is_array($campusarray))
 		{
 			foreach($campusarray as $campus)
@@ -257,10 +257,9 @@ class user
 			$campusquery = "INSERT INTO userCampus (uid, campus) VALUES ('$id', '$campusarray')";
 			$this->db->dbDoQuery($campusquery);
 		}
-
-        		
-	        return 1;
-        }
+				
+		return $id;
+	}
 	
 	function getUserInfo($id)
 	{
