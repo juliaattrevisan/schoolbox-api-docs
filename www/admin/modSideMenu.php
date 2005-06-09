@@ -25,6 +25,8 @@ class modSideMenu
 		$this->t_body->set_file("tplBODY", "admin/modMenuItem.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Modify Menu Item");
 		include_once("../include/page.php");	
+	
+		$this->t_body->set_var("ACTION", "Update");
 
 		$menu = new sideMenu();
 		
@@ -55,7 +57,7 @@ class modSideMenu
 		$this->t_body->set_file("tplBODY", "admin/modMenuItem.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Add Menu Item");
 		include_once("../include/page.php");	
-
+		$this->t_body->set_var("ACTION", "Create");
 		$this->createMenuTree(0, "&nbsp; &nbsp;|&nbsp;");
 		$this->t_body->set_var("MENUITEMLIST", $this->createMenuItemSelect($this->itemList, $parent));
 
