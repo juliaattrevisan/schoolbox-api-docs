@@ -5,24 +5,27 @@
 <head>
 <!-- #BeginEditable "doctitle" -->
 <title>{TITLE}</title>
-<!-- #EndEditable -->
+
 <meta name="keywords" content="" />
 <meta name="description" content="" />
+<!-- #EndEditable -->
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="MGS"/>
 <meta name="ROBOTS" content="INDEX, FOLLOW" />
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<!-- TemplateBeginEditable name="scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
+<script type="text/javascript" src="/std_scripts.js"></script>
+<!-- TemplateEndEditable -->
+</head>
+<body>
 <script language="JavaScript1.2" type="text/javascript" src="/coolmenus4.js" ></script>
 <script language="JavaScript1.2" type="text/javascript" src="/menusettings.js" ></script>
 <script language="JavaScript1.2" type="text/javascript">{DROPDOWNMENU}</script>
-<script type="text/javascript" src="/std_scripts.js"></script>
-</head>
-<body>
-<div id="outerWrap">
-  <div id="header"></div>
-  <div id="yellowStripe"></div>
+<div id="outerWrap"> 
+	<div id="header"></div>
+	<div id="yellowStripe"></div>
   <div id="left">
     <div class="sideWrap">
       <h3>&#187;&nbsp;GOTO</h3>
@@ -47,7 +50,7 @@
     <div class="sideWrap">
       <h3>&#187;&nbsp;MY SUBJECTS</h3>
       <div class="whiteWrap">
-        <ul class="norm">
+        <ul>
 		  <!-- BEGIN msubject_block -->
           <li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
 		  <!-- END msubject_block -->
@@ -59,7 +62,7 @@
     <div class="sideWrap">
       <h3>&#187;&nbsp;MY GROUPS</h3>
       <div class="whiteWrap">
-        <ul class="norm">
+        <ul>
 		  <!-- BEGIN mgroup_block -->
           <li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
 		  <!-- END mgroup_block -->
@@ -70,7 +73,7 @@
 	<div class="sideWrap">
       <h3>&#187;&nbsp;MY LINKS</h3>
       <div class="whiteWrap">
-        <ul class="norm">
+        <ul>
 		  <!-- BEGIN mlink_block -->
           <li>{MLINK}</li>
 		  <!-- END mlink_block -->
@@ -84,8 +87,7 @@
   <div id="content">
     <div id="content_text"> <!-- #BeginEditable "main" --> CONTENT GOES HERE <!-- #EndEditable --> </div>
     <div id="footer">
-      <p><strong>2005&nbsp;&copy;&nbsp;Copyright 
-	  <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
+      <p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
       <p class="small"><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p>
       <p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
     </div>

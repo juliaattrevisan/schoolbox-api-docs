@@ -97,81 +97,31 @@
   <div id="content">
     <div id="content_text"> <!-- #BeginEditable "main" -->
 			<h1>Manage My Links</h1><br />
-            <table width="90%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td width="5%">&nbsp;</td>
-                <td width="95%"> 
-                  
-                    <table width="100%" border="0" cellspacing="0" cellpadding="1" bgcolor="#CCCCCC">
-                      <tr> 
-                        <td width="10" bgcolor="#0066CC">&nbsp;</td>
-                        <td width="38%" bgcolor="#0066CC"><b><font color="#FFFFFF">Hyperlink</font></b></td>
-                        <td bgcolor="#0066CC"><b><font color="#FFFFFF">Name</font></b></td>
-                        <td bgcolor="#0066CC"><b></b></td>
-                        <td width="10" bgcolor="#0066CC"><b></b></td>
-                      </tr>
-                      <tr> 
-                        <td width="10" valign="top">&nbsp;</td>
-                        <td width="38%" valign="top">&nbsp;</td>
-                        <td valign="top">&nbsp;</td>
-                        <td valign="top">&nbsp;</td>
-                        <td width="10" valign="top">&nbsp;</td>
-                      </tr>
-                      <tr> 
-                        <td width="10">&nbsp;</td>
-                        <td width="38%">e.g. http://www.yahoo.com</td>
-                        <td valign="top">e.g. Yahoo</td>
-                        <td valign="top">&nbsp;</td>
-                        <td width="10" valign="top">&nbsp;</td>
-                      </tr>
-                      <tr> 
-                        <td width="10">&nbsp;</td>
-                        <td width="38%">&nbsp;</td>
-                        <td valign="top">&nbsp;</td>
-                        <td valign="top">&nbsp;</td>
-                        <td width="10" valign="top">&nbsp;</td>
-                      </tr>
-					  <!-- BEGIN link_block -->
-                      <tr> 
-                        <td width="10">&nbsp;</td>
-                        <td width="38%">{URL}</td>
-                        <td>{DESC}</td>
-                        <td align="right"><a href="/editLinks.php?delete={ID}">delete</a></td>
-                        <td width="10">&nbsp; </td>
-                      </tr>
-					  <!-- END link_block -->
-                      <tr> 
-                        <td width="10">&nbsp;</td>
-                        <td width="38%">&nbsp; </td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td width="10">&nbsp; </td>
-                      </tr>
-                      <tr> 
-					  <form action="" method="post" name="form" id="form">
-                        <td width="10">&nbsp;</td>
-                        <td width="38%"><input name="url" type="text" id="url" /> </td>
-                        <td> 
-                          <input name="description" type="text" id="description" /></td>
-                        <td align="right"> <input type="submit" name="submit" value="Add" class="formfield" /> 
-                        </td>
-                        <td width="10">&nbsp; </td>
-						</form>
-                      </tr>
-                      <tr> 
-                        <td width="10">&nbsp;</td>
-                        <td width="38%">&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td width="10" align="right">&nbsp; </td>
-                      </tr>
-                    </table>
-                  
-                </td>
-              </tr>
-            </table>
-            <br />
-            <br />
+			<form action="" method="post" name="form" id="form">
+				<div class="browse">				
+				<table>
+				  <tr> 
+					<th title="e.g. http://www.yahoo.com.au">Hyperlink</th>
+					<th title="e.g. Yahoo Search Directory">Name</th>
+					<th class="cntr">Modify</th>
+				  </tr>
+				  <!-- BEGIN link_block -->
+				  <tr> 
+					<td>{URL}</td>
+					<td>{DESC}</td>
+					<td class="cntr"><a href="/editLinks.php?delete={ID}">delete</a></td>
+				  </tr>
+				  <!-- END link_block -->
+				  <tr> 
+					
+					<td width="38%"><input name="url" type="text" id="url" /></td>
+					<td><input name="description" type="text" id="description" /></td>
+					<td class="cntr"><input type="submit" name="submit" value="Add" class="formfield" /></td>
+					
+				  </tr>
+				</table>
+				</div>
+			</form>
     <!-- #EndEditable --> </div>
     <div id="footer">
       <p><strong>2005&nbsp;&copy;&nbsp;Copyright 

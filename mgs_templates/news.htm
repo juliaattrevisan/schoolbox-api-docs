@@ -6,23 +6,23 @@
 <!-- #BeginEditable "doctitle" --> 
 <title>{TITLE}</title>
 <!-- #EndEditable -->
-<meta name="keywords" content="" />
-<meta name="description" content="" />
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="MGS"/>
 <meta name="ROBOTS" content="INDEX, FOLLOW" />
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<!-- #BeginEditable "scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
+<script type="text/javascript" src="/std_scripts.js"></script>
+<!-- #EndEditable -->
+</head>
+<body>
 <script language="JavaScript1.2" type="text/javascript" src="/coolmenus4.js" ></script>
 <script language="JavaScript1.2" type="text/javascript" src="/menusettings.js" ></script>
 <script language="JavaScript1.2" type="text/javascript">{DROPDOWNMENU}</script>
-<script type="text/javascript" src="/std_scripts.js"></script>
-</head>
-<body>
-<div id="outerWrap">
-  <div id="header"></div>
-  <div id="yellowStripe"></div>
+<div id="outerWrap"> 
+	<div id="header"></div>
+	<div id="yellowStripe"></div>
   <div id="left">
     <div class="sideWrap">
       <h3>&#187;&nbsp;GOTO</h3>
@@ -47,7 +47,7 @@
     <div class="sideWrap">
       <h3>&#187;&nbsp;MY SUBJECTS</h3>
       <div class="whiteWrap">
-        <ul class="norm">
+        <ul>
 		  <!-- BEGIN msubject_block -->
           <li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
 		  <!-- END msubject_block -->
@@ -59,7 +59,7 @@
     <div class="sideWrap">
       <h3>&#187;&nbsp;MY GROUPS</h3>
       <div class="whiteWrap">
-        <ul class="norm">
+        <ul>
 		  <!-- BEGIN mgroup_block -->
           <li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
 		  <!-- END mgroup_block -->
@@ -70,7 +70,7 @@
 	<div class="sideWrap">
       <h3>&#187;&nbsp;MY LINKS</h3>
       <div class="whiteWrap">
-        <ul class="norm">
+        <ul>
 		  <!-- BEGIN mlink_block -->
           <li>{MLINK}</li>
 		  <!-- END mlink_block -->
@@ -80,35 +80,41 @@
     </div>
   </div>
   <!-- end left -->
-  <!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/News_Active.lbi" -->			<div id="topNav">
-				<ul>
-					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
-					<li class="navthis norm"><a class="navthis norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
-					<!-- BEGIN webmail_tab --> 
-					<li class="norm"><a class="norm" href="/mail.php" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
-					<!-- END webmail_tab -->
-					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
-					<!-- BEGIN timetable_tab -->
-					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
-					<!-- END timetable_tab -->
-					<li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
-				</ul>
-			</div><!-- #EndLibraryItem --><!-- #EndEditable -->
+  <!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/News_Active.lbi" -->
+  <div id="topNav">
+    <ul>
+      <li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+      <li class="navthis norm"><a class="navthis norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+      <!-- BEGIN webmail_tab -->
+      <li class="norm"><a class="norm" href="/mail.php" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+      <!-- END webmail_tab -->
+      <li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+      <!-- BEGIN timetable_tab -->
+      <li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+      <!-- END timetable_tab -->
+      <li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+    </ul>
+  </div>
+  <!-- #EndLibraryItem --><!-- #EndEditable -->
   <div id="content">
     <div id="content_text"> <!-- #BeginEditable "main" --> 
 				<h1>News</h1>
 				<!-- BEGIN main_stories -->
-				<h2>{NEWS_TITLE}<div align="right">{MODIFY}</div></h2>
+				<h2>{NEWS_TITLE}</h2>
+
+				
+				<div class="indent">
 				<!-- BEGIN story_body -->
-				{NEWS_BODY}
-				<hr>
-				<font color="#333333">Submitted by {POSTER} on {DATETIME}</font></td>
-                  <!-- END story_body -->
+					{NEWS_BODY}
+					<hr>
+					<p class="element_footer">Submitted by {POSTER} on {DATETIME}</p></td>
+					<!-- END story_body -->
+				</div>
+                  
                   <!-- END main_stories -->
             <!-- #EndEditable --> </div>
     <div id="footer">
-      <p><strong>2005&nbsp;&copy;&nbsp;Copyright 
-	  <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
+      <p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
       <p class="small"><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p>
       <p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
     </div>

@@ -6,23 +6,23 @@
 <!-- #BeginEditable "doctitle" --> 
 <title>{TITLE}</title>
 <!-- #EndEditable -->
-<meta name="keywords" content="" />
-<meta name="description" content="" />
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="MGS"/>
 <meta name="ROBOTS" content="INDEX, FOLLOW" />
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<!-- #BeginEditable "scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
+<script type="text/javascript" src="/std_scripts.js"></script>
+<!-- #EndEditable -->
+</head>
+<body>
 <script language="JavaScript1.2" type="text/javascript" src="/coolmenus4.js" ></script>
 <script language="JavaScript1.2" type="text/javascript" src="/menusettings.js" ></script>
 <script language="JavaScript1.2" type="text/javascript">{DROPDOWNMENU}</script>
-<script type="text/javascript" src="/std_scripts.js"></script>
-</head>
-<body>
-<div id="outerWrap">
-  <div id="header"></div>
-  <div id="yellowStripe"></div>
+<div id="outerWrap"> 
+	<div id="header"></div>
+	<div id="yellowStripe"></div>
   <div id="left">
     <div class="sideWrap">
       <h3>&#187;&nbsp;GOTO</h3>
@@ -47,7 +47,7 @@
     <div class="sideWrap">
       <h3>&#187;&nbsp;MY SUBJECTS</h3>
       <div class="whiteWrap">
-        <ul class="norm">
+        <ul>
 		  <!-- BEGIN msubject_block -->
           <li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
 		  <!-- END msubject_block -->
@@ -59,7 +59,7 @@
     <div class="sideWrap">
       <h3>&#187;&nbsp;MY GROUPS</h3>
       <div class="whiteWrap">
-        <ul class="norm">
+        <ul>
 		  <!-- BEGIN mgroup_block -->
           <li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
 		  <!-- END mgroup_block -->
@@ -70,7 +70,7 @@
 	<div class="sideWrap">
       <h3>&#187;&nbsp;MY LINKS</h3>
       <div class="whiteWrap">
-        <ul class="norm">
+        <ul>
 		  <!-- BEGIN mlink_block -->
           <li>{MLINK}</li>
 		  <!-- END mlink_block -->
@@ -98,88 +98,66 @@
   <div id="content">
     <div id="content_text"> <!-- #BeginEditable "main" --> 
             <h1>{CATEGORY_PATH}</h1>
-            <br />
-            <table width="80%" cellpadding="0" cellspacing="0" border="0">
-              <tr> 
-                <td width="20">&nbsp;</td>
-                <td valign="top" align="left"> {VIEW} {TEMPLATE} {IMAGE_GALLERY}
-                  {MODIFY_FOLDER} {ADDFILE} {ADDLINK}  {ADDCAT} 
-                  <hr /><!-- BEGIN category_listing -->
-                  <table cellpadding="0" cellspacing="0" width="100%">
-                    <tr> 
-                      <td width="20"><a href="{CATEGORY_LINK}">
-				<img src="/images/mime/folder_blue_full.png" width="30" height="30" border="0" /></a>
-		      </td><td valign="middle">
-				<a href="{CATEGORY_LINK}">{CATEGORY_NAME}</a> 
-                      </td>
-                      <td width="80">{HOMEPAGE}</td>
+			<p>{VIEW} {TEMPLATE} {IMAGE_GALLERY}{MODIFY_FOLDER} {ADDFILE} {ADDLINK}  {ADDCAT} </p>
+			<hr>
+                  <table>
+					<!-- BEGIN category_listing -->                    
+					<tr> 
+                      <td><a href="{CATEGORY_LINK}"><img  src="/images/mime/folder_blue_full.png" width="30" height="30" border="0" /></a>
+						  <a href="{CATEGORY_LINK}">{CATEGORY_NAME}</a></td>
+                      <td class="cntr">{HOMEPAGE}</td>
                       <!-- BEGIN mod_cat -->
-                      <td width="50"> <a href="/cms/modFolder.php?action=mod&amp;cid={CATID}">modify</a></td>
-                      <td width="50"> <a href="/cms/modFolder.php?delete={CATID}" onclick="return(confirm('Remove folder {CATEGORY_NAME_ESCAPED}?'));">delete</a></td>
+                      <td class="cntr"><a href="/cms/modFolder.php?action=mod&amp;cid={CATID}">modify</a></td>
+                      <td><a href="/cms/modFolder.php?delete={CATID}" onclick="return(confirm('Remove folder {CATEGORY_NAME_ESCAPED}?'));">delete</a></td>
                       <!-- END mod_cat -->
                     </tr>
-                  </table>
                   <!-- END category_listing -->
                   <!-- BEGIN file_listing -->
-                  <table cellpadding="2" cellspacing="0" width="100%">
                     <tr> 
-                      <td width="20" align="left"><img src="{FILE_IMAGE}" width="25" height="27" border="0" /></td>
-                      <td>{FILE_DESCRIPTION} </b><font color="black" align="right"><i>{SIZE}</i></font></td>
+                      <td colspan="2"><img src="{FILE_IMAGE}" width="25" height="27" border="0" />{FILE_DESCRIPTION} </b><font color="black" align="right"><i>{SIZE}</i></font></td>
                       <!-- BEGIN mod_file -->
-                      <td  width="50"><a href="/cms/modResource.php?type=modfile&amp;id={FILEID}">modify</a></td>
-                      <td  width="50"><a href="/cms/delResource.php?fileid={FILEID}" onclick=" return(confirm('Remove file {FILE_DESCRIPTION_ESCAPED}?'));">delete</a></td>
+                      <td class="cntr"><a href="/cms/modResource.php?type=modfile&amp;id={FILEID}">modify</a></td>
+                      <td><a href="/cms/delResource.php?fileid={FILEID}" onclick=" return(confirm('Remove file {FILE_DESCRIPTION_ESCAPED}?'));">delete</a></td>
                       <!-- END mod_file -->
                     </tr>
                     <!-- BEGIN file_desc -->
                     <tr>
-                      <td width="20">&nbsp;</td>
-                      <td>{COMMENT} </td>
+                      <td colspan="2">{COMMENT}</td>
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
                     </tr>
                     <tr>
-                      <td height="13" align="right" width="20">&nbsp;</td>
-                      <td height="13" align="right"><i><font color="#666666">Submitted by {OWNER} on {DATETIME}</font></i></td>
+                      <td colspan="2"><i><font color="#666666">Submitted by {OWNER} on {DATETIME}</font></i></td>
                       <td>&nbsp;</td>
-                      <td> <i></i> </td>
+                      <td>&nbsp;</td>
                     </tr>
                   <!-- END file_desc -->
-				  </table>
                   <!-- END file_listing -->
                   <!-- BEGIN link_listing -->
-                  <table cellpadding="2" cellspacing="0" width="100%">
                     <tr>
-                      <td width="15" align="left" valign="middle"><img src="/images/mime/http-url.png" width="25" height="27" border="0" /></td>
-                      <td>{LINK_HTML}</td>
+                      <td colspan="2"><img src="/images/mime/http-url.png" width="25" height="27" border="0" />{LINK_HTML}</td>
                       <!-- BEGIN mod_link -->
-                      <td  width="50"><a href="/cms/modResource.php?type=modurl&amp;id={LINKID}">modify</a> </td>
-                      <td  width="50"><a href="/cms/delResource.php?linkid={LINKID}" onclick="return(confirm('Remove link {LINK_DESCRIPTION_ESCAPED}?'));">delete</a> </td>
+                      <td class="cntr"><a href="/cms/modResource.php?type=modurl&amp;id={LINKID}">modify</a> </td>
+                      <td><a href="/cms/delResource.php?linkid={LINKID}" onclick="return(confirm('Remove link {LINK_DESCRIPTION_ESCAPED}?'));">delete</a> </td>
                       <!-- END mod_link -->
                     </tr>
                     <!-- BEGIN link_desc -->
                     <tr>
-                      <td width="15">&nbsp;</td>
-                      <td>{COMMENT}</td>
+                      <td colspan="2">{COMMENT}</td>
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
                     </tr>
                     <tr>
-                      <td width="15">&nbsp;</td>
-                      <td align="right"><i><font color="#666666">Submitted by
-                            {OWNER} on {DATETIME}</font></i></td>
+                      <td colspan="2"><i><font color="#666666">Submitted by {OWNER} on {DATETIME}</font></i></td>
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
                     </tr>
                     <!-- END link_desc -->
+					<!-- END link_listing -->
                   </table>
-                  <!-- END link_listing -->
-                </td>
-              </tr>
-            </table>
             <!-- #EndEditable --> </div>
     <div id="footer">
-      <p><strong>2005&nbsp;&copy;&nbsp;Copyright 
-	  <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
+      <p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
       <p class="small"><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p>
       <p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
     </div>
