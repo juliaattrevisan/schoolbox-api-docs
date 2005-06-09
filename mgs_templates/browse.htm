@@ -17,9 +17,9 @@
 <!-- #EndEditable -->
 </head>
 <body>
-<script language="JavaScript1.2" type="text/javascript" src="/coolmenus4.js" ></script>
-<script language="JavaScript1.2" type="text/javascript" src="/menusettings.js" ></script>
-<script language="JavaScript1.2" type="text/javascript">{DROPDOWNMENU}</script>
+<script type="text/javascript" src="/coolmenus4.js" ></script>
+<script type="text/javascript" src="/menusettings.js" ></script>
+<script type="text/javascript">{DROPDOWNMENU}</script>
 <div id="outerWrap"> 
 	<div id="header"></div>
 	<div id="yellowStripe"></div>
@@ -32,15 +32,15 @@
     <div class="sideWrap">
       <h3>&#187;&nbsp;SEARCH</h3>
       <div class="whiteWrap">
-        <form class="standardForm" id="searchForm" action="" method="">
-          <input class="short" type="text" name="keyword" />
+        <form class="standardForm" id="searchForm" action="/search.php" method="post">
+          <p style="margin:0;"><input class="short" type="text" name="keyword" />
           <select class="short" name="where">
-            <option value="0" selected>portal</option>
+            <option value="0" selected="selected">portal</option>
             <option value="1">google</option>
             <option value="2">yahoo</option>
           </select>
-          <input class="img" type="image" src="/images/navsearch.gif" border="0" height="18" width="40" alt="Search" name="Submit">
-        </form>
+          <input class="img" type="image" src="/images/navsearch.gif" alt="Search" name="Submit" />
+        </p></form>
       </div>
     </div>
 	<!-- BEGIN msubject -->

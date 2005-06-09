@@ -1,435 +1,198 @@
-<html><!-- #BeginTemplate "/Templates/mgs_main_001.dwt" --><!-- DW6 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/main.dwt" codeOutsideHTMLIsLocked="false" -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
 <head>
-<!-- #BeginEditable "doctitle" --> 
+<!-- #BeginEditable "doctitle" -->
 <title>{TITLE}</title>
 
+<meta name="Keywords" content="" />
+<meta name="Description" content="" />
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="MGS"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<!-- InstanceBeginEditable name="scripts" -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
+<script type="text/javascript" src="/std_scripts.js"></script>
 <script type="text/javascript">
 function showRow(){
-	var selecLevel = document.eventForm.level.options[document.eventForm.level.selectedIndex].value;
+	var selecLevel = document.getElementById('eventForm').level.options[document.getElementById('eventForm').level.selectedIndex].value;
 	if( selecLevel == 1 || selecLevel == 4){
 		document.getElementById('campusRow').style.display = "none";
 		document.getElementById('groupRow').style.display = "none";
+		document.getElementById('campusRow').style.visibility="hidden";
+		document.getElementById('groupRow').style.visibility="hidden";
 	}
 	else if( selecLevel == 2 ){
+		document.getElementById('campusRow').style.visibility="hidden";
 		document.getElementById('campusRow').style.display = "none";
 		document.getElementById('groupRow').style.display = "block";
+		document.getElementById('groupRow').style.visibility="visible";
 	}
 	else if( selecLevel == 3 ){
+		document.getElementById('campusRow').style.visibility="visible";
 		document.getElementById('campusRow').style.display = "block";
 		document.getElementById('groupRow').style.display = "none";
+		document.getElementById('groupRow').style.visibility="hidden";
 	}
 }
 
 window.onload = new Function('showRow();');
 
 </script>
-<!-- #EndEditable --> 
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link rel="stylesheet" href="/css/mgsportal_001.css" type="text/css">
+<!-- InstanceEndEditable -->
 </head>
-<body bgcolor="#FFFFFF" text="#000000" leftmargin="0" topmargin="0" background="/newimages/bg_main_001.gif">
-<script language="JavaScript1.2" type="text/javascript" src="/coolmenus4.js" ></script>
-<script language="JavaScript1.2" type="text/javascript" src="/menusettings.js" ></script>
-<script language="JavaScript1.2" type="text/javascript">{DROPDOWNMENU}</script>
-<table width="100%" border="0" cellspacing="0" cellpadding="0" height="54">
-  <tr> 
-    <td width="90%" height="6" valign="bottom"> <div align="right"> 
-        <table width="85%" border="0" cellspacing="0" cellpadding="0" background="/newimages/block_bg_mgsblue_001.gif">
-          <tr> 
-            <td height="54">&nbsp;</td>
-          </tr>
-        </table>
-      </div></td>
-    <td width="10%" valign="bottom" height="6"> <div align="right"><img src="/newimages/logo_mgs_right_001.gif" width="129" height="54"></div></td>
-  </tr>
-  <tr valign="top" align="left"> 
-    <td colspan="2" height="22"> <table width="90%" border="0" cellspacing="0" cellpadding="0" align="right" background="/newimages/block_subtleyellow_001.gif" height="8">
-        <tr> 
-          <td><img src="/newimages/gfx_transparentspacer_001.gif" width="7" height="8"></td>
-        </tr>
-      </table></td>
-  </tr>
-</table>
-<table width="100%" border="0" cellspacing="0" cellpadding="0" height="480">
-  <tr> 
-    <td width="11%" valign="top" rowspan="4"> <table width="74%" border="0" cellspacing="0" cellpadding="0">
-        <tr> 
-          <td height="15">&nbsp;</td>
-          <td height="7"><img src="/newimages/gfx_transparentspacer_001.gif" width="7" height="7"></td>
-        </tr>
-        <tr> 
-          <td>&nbsp;</td>
-          <td><img src="/newimages/navbar_goto.gif" width="105" height="20"></td>
-        </tr>
-        <tr> 
-          <td height="2">&nbsp;</td>
-          <td height="2"> <table width="111" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
-              <tr> 
-                <td width="12" height="{MJSHEIGHT}" background="/newimages/navbar_bg.gif"><img src="/newimages/gfx_transparentspacer_001.gif" width="12" height="7"></td>
-                <td width="121" height="{MJSHEIGHT}">&nbsp;</td>
-              </tr>
-            </table></td>
-        </tr>
-        <tr> 
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-        </tr>
-        <tr> 
-          <td>&nbsp;</td>
-          <td><img src="/newimages/navbar_search.gif" width="105" height="20"></td>
-        </tr>
-        <tr> 
-          <td>&nbsp;</td>
-          <td> <table width="111" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td width="12" background="/newimages/navbar_bg.gif"><img src="/newimages/gfx_transparentspacer_001.gif" width="12" height="7"></td>
-                <td bgcolor="#FFFFFF"> <form name="search" method="GET" action="/search.php"><table width="99" border="0" cellpadding="0" cellspacing="0">
-                    
+<body>
+<script type="text/javascript" src="/coolmenus4.js" ></script>
+<script type="text/javascript" src="/menusettings.js" ></script>
+<script type="text/javascript">{DROPDOWNMENU}</script>
+<div id="outerWrap"> 
+	<div id="header"></div>
+	<div id="yellowStripe"></div>
+  <div id="left">
+    <div class="sideWrap">
+      <h3>&#187;&nbsp;GOTO</h3>
+      <div class="whiteWrap" style="height:{MJSHEIGHT}px">
+      </div>
+    </div>
+    <div class="sideWrap">
+      <h3>&#187;&nbsp;SEARCH</h3>
+      <div class="whiteWrap">
+        <form class="standardForm" id="searchForm" action="/search.php" method="post">
+          <p style="margin:0;"><input class="short" type="text" name="keyword" />
+          <select class="short" name="where">
+            <option value="0" selected="selected">portal</option>
+            <option value="1">google</option>
+            <option value="2">yahoo</option>
+          </select>
+          <input class="img" type="image" src="/images/navsearch.gif" alt="Search" name="Submit" />
+        </p></form>
+      </div>
+    </div>
+	<!-- BEGIN msubject -->
+    <div class="sideWrap">
+      <h3>&#187;&nbsp;MY SUBJECTS</h3>
+      <div class="whiteWrap">
+        <ul>
+		  <!-- BEGIN msubject_block -->
+          <li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
+		  <!-- END msubject_block -->
+        </ul>
+      </div>
+    </div>
+	<!-- END msubject -->
+	<!-- BEGIN mgroup -->
+    <div class="sideWrap">
+      <h3>&#187;&nbsp;MY GROUPS</h3>
+      <div class="whiteWrap">
+        <ul>
+		  <!-- BEGIN mgroup_block -->
+          <li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
+		  <!-- END mgroup_block -->
+        </ul>
+      </div>
+    </div>
+	<!-- END mgroup -->
+	<div class="sideWrap">
+      <h3>&#187;&nbsp;MY LINKS</h3>
+      <div class="whiteWrap">
+        <ul>
+		  <!-- BEGIN mlink_block -->
+          <li>{MLINK}</li>
+		  <!-- END mlink_block -->
+		  <li><a href="/editLinks.php">ADD LINK</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- end left -->
+  <!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Calendar_Active.lbi" -->
+  <div id="topNav">
+    <ul>
+      <li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+      <li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+      <!-- BEGIN webmail_tab -->
+      <li class="norm"><a class="norm" href="/mail.php" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+      <!-- END webmail_tab -->
+      <li class="navthis norm"><a class="navthis norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+      <!-- BEGIN timetable_tab -->
+      <li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+      <!-- END timetable_tab -->
+      <li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+    </ul>
+  </div>
+  <!-- #EndLibraryItem --><!-- #EndEditable -->
+  <div id="content">
+    <div id="content_text"> <!-- #BeginEditable "main" -->
+		<h1>{FUNCTION} Event</h1>
+            <form class="standard" method="post" action="/calendar/addEvent.php" id="eventForm">
+                    <table>
                       <tr> 
-                        <td width="89" height="5"></td>
+                        <td valign="top"><h2>Date</h2><em>The date on which the event will occur</em></td>
+                        <td>{DATE}{MONTH}</td>
                       </tr>
                       <tr> 
-                        <td> <input class="tab_unselected" type="text" name="keyword" size="11"> 
-                        </td>
-                      </tr>
-                      <tr> 
-                        <td> <select  class="tab_unselected" name="where">
-                            <option value="0" selected>portal</option>
-                            <option value="1">google</option>
-                            <option value="2">yahoo</option>
-                          </select> </td>
-                      </tr>
-                      <tr> 
-                        <td valign="middle"> 
-                          <input type="image" src="/newimages/submit_login_004.gif" border="0" alt="Search" name="Submit">
-                        </td>
-                      </tr>
-                   
-                  </table> </form></td>
-              </tr>
-            </table></td>
-        </tr>
-        <tr> 
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-        </tr>
-        <!-- BEGIN msubject -->
-        <tr> 
-          <td>&nbsp;</td>
-          <td> <p><img src="/newimages/navbar_mysubjects.gif" width="105" height="20"></p></td>
-        </tr>
-        <tr> 
-          <td>&nbsp;</td>
-          <td> <table width="111" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td width="12" height="25" background="/newimages/navbar_bg.gif"><img src="/newimages/gfx_transparentspacer_001.gif" width="12" height="7"></td>
-                <td width="99" height="25" bgcolor="#FFFFFF" valign="top"> <table width="99" border="0" cellpadding="0" cellspacing="0">
-                    <tr> 
-                      <td width="10" height="5"></td>
-                      <td height="5"></td>
-                    </tr>
-                    <!-- BEGIN msubject_block -->
-                    <tr> 
-                      <td width="10"><img src="/newimages/navbar_input_small.gif" width="8" height="13"></td>
-                      <td class="navbar"><a href="/{MLINKSUB}">{MSUBJECT}</a></td>
-                    </tr>
-                    <!-- END msubject_block -->
-                  </table></td>
-              </tr>
-            </table></td>
-        </tr>
-        <tr> 
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-        </tr>
-        <!-- END msubject -->
-		<!-- BEGIN mgroup -->
-        <tr> 
-          <td>&nbsp;</td>
-          <td> <p><img src="/newimages/navbar_mygroups.gif" width="105" height="20"></p></td>
-        </tr>
-        <tr> 
-          <td>&nbsp;</td>
-          <td> <table width="111" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td width="12" height="25" background="/newimages/navbar_bg.gif"><img src="/newimages/gfx_transparentspacer_001.gif" width="12" height="7"></td>
-                <td width="99" height="25" bgcolor="#FFFFFF" valign="top"> <table width="99" border="0" cellpadding="0" cellspacing="0">
-                    <tr> 
-                      <td width="10" height="5"></td>
-                      <td height="5"></td>
-                    </tr>
-                    <!-- BEGIN mgroup_block -->
-                    <tr> 
-                      <td width="10"><img src="/newimages/navbar_input_small.gif" width="8" height="13"></td>
-                      <td class="navbar"><a href="/{MGLINK}">{MGNAME}</a></td>
-                    </tr>
-                    <!-- END mgroup_block -->
-                  </table></td>
-              </tr>
-            </table></td>
-        </tr>
-        <tr> 
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-        </tr>
-        <!-- END mgroup -->
-        <tr> 
-          <td>&nbsp;</td>
-          <td><img src="/newimages/navbar_mylinks.gif" width="105" height="20"></td>
-        </tr>
-        <tr> 
-          <td>&nbsp;</td>
-          <td> <table width="111" border="0" cellspacing="0" cellpadding="0" height="44">
-              <tr> 
-                <td width="12" height="25" background="/newimages/navbar_bg.gif"><img src="/newimages/gfx_transparentspacer_001.gif" width="12" height="7"></td>
-                <td width="99" height="25" valign="top" bgcolor="#FFFFFF"> <table width="99" border="0" cellpadding="0" cellspacing="0">
-                    <tr> 
-                      <td width="10" height="5"></td>
-                      <td width="89" height="5"></td>
-                    </tr>
-                    <!-- BEGIN mlink_block -->
-                    <tr> 
-                      <td width="10"><img src="/newimages/navbar_input_small.gif" width="8" height="13"></td>
-                      <td width="89" class="navbar">{MLINK}</td>
-                    </tr>
-                    <!-- END mlink_block -->
-                    <tr> 
-                      <td width="10">&nbsp;</td>
-                      <td width="89">&nbsp;</td>
-                    </tr>
-                    <tr> 
-                      <td width="10"><img src="/newimages/navbar_input_small.gif" width="8" height="13"></td>
-                      <td width="89" class="navbar"><a href="/editLinks.php">ADD 
-                        LINK</a></td>
-                    </tr>
-                    <tr> 
-                      <td width="10">&nbsp;</td>
-                      <td width="89">&nbsp;</td>
-                    </tr>
-                  </table></td>
-              </tr>
-            </table></td>
-        </tr>
-        <tr> 
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-        </tr>
-      </table></td>
-    <td width="1%" rowspan="4">&nbsp; </td>
-    <td width="88%" valign="top"></td>
-    <td width="0%" rowspan="4">&nbsp;</td>
-  </tr>
-  <tr> 
-    <td width="88%" valign="bottom" height="7"><!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Calendar_Active.lbi" -->			<div id="topNav">
-				<ul>
-					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
-					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
-					<!-- BEGIN webmail_tab --> 
-					<li class="norm"><a class="norm" href="/mail.php" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
-					<!-- END webmail_tab -->
-					<li class="navthis norm"><a class="navthis norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
-					<!-- BEGIN timetable_tab -->
-					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
-					<!-- END timetable_tab -->
-					<li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
-				</ul>
-			</div><!-- #EndLibraryItem --><!-- #EndEditable --></td>
-  </tr>
-  <tr> 
-    <td width="88%" valign="top" height="473"> <table width="100%" border="0" cellspacing="0" cellpadding="0" align="right">
-        <tr> 
-          <td width="0%" background="/newimages/block_bluebg.gif" height="4"><img src="/newimages/gfx_transparentspacer_001.gif" width="7" height="4"></td>
-          <td width="100%" bgcolor="#FFFFFF" background="/newimages/block_bluebg.gif" height="4"><img src="/newimages/gfx_transparentspacer_001.gif" width="5" height="4"></td>
-        </tr>
-        <tr> 
-          <td width="0%" background="/newimages/block_bluesidebg.gif" height="2">&nbsp;</td>
-          <td width="100%" bgcolor="#FFFFFF" valign="top" align="left" height="2">&nbsp; 
-          </td>
-        </tr>
-        <tr> 
-          <td width="0%" background="/newimages/block_bluesidebg.gif" height="40"> 
-            <p>&nbsp;&nbsp;</p>
-            <p>&nbsp;</p></td>
-          <td width="100%" bgcolor="#FFFFFF" valign="top" align="left" height="40"><!-- #BeginEditable "main" --> 
-            <table width="90%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td width="10"><img src="/newimages/block_bluebg.gif" width="15" height="20"></td>
-                <td width="713" height="20">&nbsp;<span class="header1">{FUNCTION} 
-                  Event </span></td>
-              </tr>
-              <tr> 
-                <td background="/newimages/block_bluebg.gif" height="2" width="10"><img src="/newimages/gfx_transparentspacer_001.gif" width="7" height="3"></td>
-                <td background="/newimages/block_bluebg.gif" height="2" width="100%"><img src="/newimages/gfx_transparentspacer_001.gif" width="7" height="3"></td>
-              </tr>
-            </table>
-            <br>
-            <form method="post" action="/calendar/addEvent.php" name="eventForm">
-              <table width="90%" border="0" cellspacing="0" cellpadding="0">
-                <tr> 
-                  <td width="10">&nbsp;</td>
-                  <td width="95%"> 
-                    <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#CCCCCC">
-                      <tr> 
-                        <td width="10">&nbsp;</td>
-                        <td width="45%">&nbsp;</td>
-                        <td width="10">&nbsp;</td>
-                        <td width="45%">&nbsp;</td>
-                        <td width="10">&nbsp;</td>
-                      </tr>
-                      <tr> 
-                        <td width="10"> </td>
-                        <td width="45%" valign="top"><strong>Date</strong><br> 
-                          <em>The date on which the event will occur</em> </td>
-                        <td width="10">&nbsp;</td>
-                        <td width="45%">{DATE}{MONTH} </td>
-                        <td width="10">&nbsp;</td>
-                      </tr>
-                      <tr> 
-                        <td width="10">&nbsp;</td>
-                        <td width="45%"> <p>&nbsp;</p></td>
-                        <td width="10">&nbsp;</td>
-                        <td width="45%">&nbsp; </td>
-                        <td width="10">&nbsp;</td>
-                      </tr>
-                      <tr> 
-                        <td width="10">&nbsp;</td>
-                        <td width="45%"><strong>Time</strong><br> <em>Both time 
-                          slots are optional.</em></td>
-                        <td width="10">&nbsp;</td>
-                        <td width="45%"> <input name="hour" type="text" size="2" maxlength="2" class="formfield" value="{HOUR}">
+                        <td><h2>Time</h2><em>Both time slots are optional.</em></td>
+                        <td> <input name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField">
                           : 
-                          <input name="minute" type="text" size="2" maxlength="2" class="formfield" value="{MIN}"> 
-                          <select name="period" class="formfield">
+                          <input name="minute" type="text" maxlength="2" value="{MIN}" class="timeField"> 
+                          <select name="period" class="short">
                             <option value="1" {AM} >AM</option>
                             <option value="2" {PM} >PM</option>
                           </select>
                           to 
-                          <input name="tohour" type="text" size="2" maxlength="2" class="formfield" value="{TOHOUR}">
+                          <input name="tohour" type="text" maxlength="2" value="{TOHOUR}" class="timeField">
                           : 
-                          <input name="tominute" type="text" size="2" maxlength="2" class="formfield" value="{TOMIN}"> 
-                          <select name="toperiod" class="formfield">
+                          <input name="tominute" type="text" maxlength="2" value="{TOMIN}" class="timeField"> 
+                          <select name="toperiod" class="short">
                             <option value="1" {AMTO}>AM</option>
                             <option value="2" {PMTO}>PM</option>
                           </select></td>
-                        <td width="10">&nbsp;</td>
                       </tr>
                       <tr> 
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                      </tr>
-                      <tr> 
-                        <td>&nbsp;</td>
-                        <td><strong>Priority</strong><br> <em>This will determine 
-                          the colour the note will appear on your calendar</em> 
+                        <td><h2>Priority</h2><em>This will determine the colour the note will appear on your calendar</em> 
                         </td>
-                        <td>&nbsp;</td>
-                        <td><select name="priority" class="formfield">
+                        <td><select name="priority">
                             <option value="4" {PRIORITY4}>Low (Black)</option>
                             <option value="3" {PRIORITY3}>Medium (Blue)</option>
                             <option value="2" {PRIORITY2}>High (Green)</option>
                             <option value="1" {PRIORITY1}>Very High (Red)</option>
                           </select></td>
-                        <td>&nbsp;</td>
                       </tr>
                       <tr> 
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td >&nbsp;</td>
-                        <td>&nbsp;</td>
-                      </tr>
-                      <tr> 
-                        <td>&nbsp;</td>
-                        <td><strong>Level</strong><br> <em>Select who you would 
-                          like to be able to see this event</em></td>
-                        <td>&nbsp;</td>
-                        <td ><select name="level" id="level" class="formfield" onChange="showRow()">{LEVEL}
+                        <td><h2>Level</h2><em>Select who you would like to be able to see this event</em></td>
+                        <td ><select name="level" id="level" onChange="showRow()">{LEVEL}
                           </select></td>
-                        <td>&nbsp;</td>
                       </tr>
-                      <tr> 
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td >&nbsp;</td>
-                        <td>&nbsp;</td>
-                      </tr>
-                      <tr id="groupRow"> 
-                        <td>&nbsp;</td>
-                        <td><strong>Group</strong><br> <em>Select the group which 
-                          will be able to view this event</em></td>
-                        <td>&nbsp;</td>
+                      <tr id="groupRow" style="display:none;visibility:hidden;"> 
+                        <td><h2>Group</h2><em>Select the group which will be able to view this event</em></td>
                         <td >{GROUP}</td>
-                        <td>&nbsp;</td>
                       </tr>
-                      <tr id="campusRow"> 
-                        <td>&nbsp;</td>
-                        <td><strong>Campus</strong><br> <em>Select the campus 
-                          which will be able to view this event </em></td>
-                        <td>&nbsp;</td>
+                      <tr id="campusRow" style="display:none;visibility:hidden;"> 
+                        <td><h2>Campus</h2><em>Select the campus which will be able to view this event</em></td>
                         <td >{CAMPUS}</td>
-                        <td>&nbsp;</td>
+                      </tr>
+                      <tr> 
+                        <td><h2>Description</h2></td>
+                        <td ><textarea name="note" cols="50" rows="3">{DESCRIPTION}</textarea></td>
                       </tr>
                       <tr> 
                         <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td >&nbsp;</td>
-                        <td>&nbsp;</td>
-                      </tr>
-                      <tr> 
-                        <td>&nbsp;</td>
-                        <td valign="top"><strong>Description</strong></td>
-                        <td>&nbsp;</td>
-                        <td ><textarea name="note" cols="50" rows="3" class="formfield">{DESCRIPTION}</textarea></td>
-                        <td>&nbsp;</td>
-                      </tr>
-                      <tr> 
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td >&nbsp;</td>
-                        <td>&nbsp;</td>
-                      </tr>
-                      <tr> 
-                        <td width="10">&nbsp;</td>
-                        <td width="45%">&nbsp;</td>
-                        <td width="10">&nbsp;</td>
-                        <td width="45%" align="right">{HIDDEN} 
-                          <input type="submit" name="Submit" value="{FUNCTION} Event" class="formbutton">
-                          {DELETE} </td>
-                        <td width="10">&nbsp;</td>
-                      </tr>
-                      <tr> 
-                        <td width="10">&nbsp;</td>
-                        <td width="45%">&nbsp;</td>
-                        <td width="10">&nbsp;</td>
-                        <td width="45%" >&nbsp; </td>
-                        <td width="10">&nbsp; </td>
+                        <td>{HIDDEN} 
+                          <input type="submit" name="Submit" value="{FUNCTION} Event" class="btn">{DELETE}</td>
                       </tr>
                     </table>
-                  </td>
-                </tr>
-              </table>
-              <p>&nbsp;</p>
-            </form>
-            <!-- #EndEditable --> 
-            <p>&nbsp;</p></td>
-        </tr>
-        <tr> 
-          <td colspan="2" bgcolor="#003399" background="/newimages/block_bluebg.gif"> 
-            <p><img src="/newimages/gfx_transparentspacer_001.gif" width="5" height="5"></p></td>
-        </tr>
-      </table>
-      <p>&nbsp;</p>
-      <p>&nbsp;</p></td>
-  </tr>
-</table>
-<div align="right"><span class="fineprint"><b>Copyright 2002 Melbourne Grammar 
-  School</b></span>&nbsp;&nbsp;&nbsp;<br>
-  <a href="/policy.htm"><span class="fineprint">Guidelines of Use and Privacy Policy</span></a>&nbsp;&nbsp;&nbsp;</div>
+            </form>	
+	<!-- #EndEditable --> </div>
+    <div id="footer">
+      <p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
+      <p class="small"><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p>
+      <p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
+    </div>
+  </div>
+</div>
 </body>
-<!-- #EndTemplate --></html>
+<!-- InstanceEnd --></html>

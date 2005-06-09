@@ -45,9 +45,9 @@ window.onload = new Function('initEditor();');
 <!-- InstanceEndEditable -->
 </head>
 <body>
-<script language="JavaScript1.2" type="text/javascript" src="/coolmenus4.js" ></script>
-<script language="JavaScript1.2" type="text/javascript" src="/menusettings.js" ></script>
-<script language="JavaScript1.2" type="text/javascript">{DROPDOWNMENU}</script>
+<script type="text/javascript" src="/coolmenus4.js" ></script>
+<script type="text/javascript" src="/menusettings.js" ></script>
+<script type="text/javascript">{DROPDOWNMENU}</script>
 <div id="outerWrap"> 
 	<div id="header"></div>
 	<div id="yellowStripe"></div>
@@ -60,15 +60,15 @@ window.onload = new Function('initEditor();');
     <div class="sideWrap">
       <h3>&#187;&nbsp;SEARCH</h3>
       <div class="whiteWrap">
-        <form class="standardForm" id="searchForm" action="" method="">
-          <input class="short" type="text" name="keyword" />
+        <form class="standardForm" id="searchForm" action="/search.php" method="post">
+          <p style="margin:0;"><input class="short" type="text" name="keyword" />
           <select class="short" name="where">
-            <option value="0" selected>portal</option>
+            <option value="0" selected="selected">portal</option>
             <option value="1">google</option>
             <option value="2">yahoo</option>
           </select>
-          <input class="img" type="image" src="/images/navsearch.gif" border="0" height="18" width="40" alt="Search" name="Submit">
-        </form>
+          <input class="img" type="image" src="/images/navsearch.gif" alt="Search" name="Submit" />
+        </p></form>
       </div>
     </div>
 	<!-- BEGIN msubject -->
@@ -131,7 +131,7 @@ window.onload = new Function('initEditor();');
 		<input type="hidden" name="id" value="{ID}" />
 		<table>
 		  <tr> 
-			<td><strong>Groups<br /></strong><em>Select which groups can view this news item. You can select multiple by holding down 'crtl' while selecting </em></td>
+			<td><h2>Groups</h2><em>Select which groups can view this news item. You can select multiple by holding down 'crtl' while selecting </em></td>
 			<td> <select name="group[]" size="{GROUP_TOTAL}" multiple>
 			<!-- BEGIN group_selection -->
 				<option value="{GROUP_ID}" {SELECTED_GROUP}>{GROUP_NAME}</option>
@@ -140,7 +140,7 @@ window.onload = new Function('initEditor();');
 		  </tr>
 		  <!-- BEGIN campus_row -->
 		  <tr>
-			<td><strong>Campus</strong><br /><em>You must also select which campuses can view this item.</em></td>
+			<td><h2>Campus</h2><em>You must also select which campuses can view this item.</em></td>
 			<td><select name="campus[]" size="{CAMPUS_TOTAL}" multiple>           
 				<!-- BEGIN campus_selection -->
 				<option value="{CAMPUS_ID}" {SELECTED_CAMPUS}>{CAMPUS_NAME}</option>
@@ -148,11 +148,11 @@ window.onload = new Function('initEditor();');
 			  </select></td>
 		  </tr><!-- END campus_row -->
 		  <tr> 
-			<td><strong>News heading</strong></td>
+			<td><h2>News heading</h2></td>
 			<td><input type="text" name="heading" size="35" maxlength="50" value="{HEADING}" /></td>
 		  </tr>
 		  <tr> 
-			<td><strong>Expires</strong></td>
+			<td><h2>Expires</h2></td>
 			<td><select name="expires">
 				{LEAVE_OPTION}
 				<option value="1">In 1 hour</option>
@@ -170,7 +170,7 @@ window.onload = new Function('initEditor();');
 			  </select></td>
 		  </tr>
 		  <tr> 
-			<td><strong>News Body</strong><br /><em>This is the main portion of your news.</em></td>
+			<td><h2>News Body</h2><em>This is the main portion of your news.</em></td>
 			<td><textarea id="body" name="body" style="width:430px;height:350px">{BODY}</textarea></td>
 		  </tr>
 		  <tr> 
