@@ -252,7 +252,7 @@ class addEvent
 
 		$this->t_body->set_var("DESCRIPTION", $event['note']);
 		$this->t_body->set_var("HIDDEN", "<input type=\"hidden\" name=\"id\" value=\"".$event['id']."\">");
-		$this->t_body->set_var("DELETE", "<input type=\"submit\" name=\"delete\" value=\"Delete Event\" class=\"formbutton\">");
+		$this->t_body->set_var("DELETE", "<input type=\"submit\" name=\"delete\" value=\"Delete Event\">");
 
 		$this->t_body->pparse("final", "tplBODY");
 
