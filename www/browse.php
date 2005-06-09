@@ -71,12 +71,6 @@ class OutPut
 		//output path to current category
 		$this->outputCatPath();
 
-		//output link to control detail
-		if($this->verbose)
-			$this->t_body->set_var("VIEW", "<a href=\"browse.php?category=".$this->category."\">collapse view</a>");
-		else
-			$this->t_body->set_var("VIEW", "<a href=\"browse.php?category=".$this->category."&verbose=1\">expand view</a>");
-
 		//output various page links
 		$this->outputPageLink();		
 
@@ -168,7 +162,25 @@ class OutPut
 	}	
 
 	function outputPageLink()
-	{
+	{	
+		$this->t_body->set_block("tplBODY", "view_expand", "view_expand_block");
+		$this->t_body->set_block("tplBODY", "view_collapse", "view_collapse_block");
+		$this->t_body->set_block("tplBODY", "view_homepage", "view_homepage_block");
+		$this->t_body->set_block("tplBODY", "view_image_gallery", "view_image_gallery_block");
+		$this->t_body->set_block("tplBODY", "modify_access", "modify_access_block");
+	
+		//output link to control detail
+		if($this->verbose)
+		{
+			$this->t_body->set_var("view_expand_block", "");
+			$this->t_body->parse("view_collapse_block", "view_collapse");
+		}
+		else
+		{
+			$this->t_body->set_var("view_collapse_block", "");
+			$this->t_body->parse("view_expand_block", "view_expand");
+		}
+		
 		$query  = "SELECT id, code, template FROM category WHERE id = ".$this->category."";
 		$result = $this->db->dbGetSingleRow($query);
 		
@@ -176,28 +188,16 @@ class OutPut
 			error(13);
 		
 		if($result['template'])
-			$this->t_body->set_var("TEMPLATE", "// <a href=\"/homepage.php?category=".$this->category."\">view homepage</a>");
+			$this->t_body->parse("view_homepage_block", "view_homepage");
 		else
-			$this->t_body->set_var("TEMPLATE", "");
+			$this->t_body->set_var("view_homepage_block", "");
 
-
-		$this->t_body->set_var("IMAGE_GALLERY", "// <a href=\"/cms/imageGallery.php?category=".$this->category."\">view images</a>");
-			
+		$this->t_body->parse("view_image_gallery_block", "view_image_gallery");			
 
 		if($this->perm >= 2)
-		{
-			$this->t_body->set_var("MODIFY_FOLDER", "// <a href=\"/cms/modFolder.php?action=mod&cid=".$this->category."\">modify folder</a>");
-			$this->t_body->set_var("ADDFILE", "// <a href=\"/cms/modResource.php?type=file&cid=".$this->category."\">add file</a>");
-			$this->t_body->set_var("ADDLINK", "// <a href=\"/cms/modResource.php?type=url&cid=".$this->category."\">add link</a>");
-			$this->t_body->set_var("ADDCAT", "// <a href=\"/cms/modFolder.php?action=add&cid=".$this->category."\">add folder</a>");
-		}
+			$this->t_body->parse("modify_access_block", "modify_access");
 		else
-		{
-			$this->t_body->set_var("MODIFY_FOLDER", "");
-			$this->t_body->set_var("ADDFILE", "");
-			$this->t_body->set_var("ADDLINK", "");
-			$this->t_body->set_var("ADDCAT", "");
-		}	
+			$this->t_body->set_var("modify_access_block", "");
 	}
 
 	function outputFile($fileDetails)
