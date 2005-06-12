@@ -132,7 +132,7 @@ window.onload = new Function('initEditor();');
 		<input type="hidden" name="id" value="{ID}" />
 		<table>
 		  <tr> 
-			<td><h2>Groups</h2><em>Select which groups can view this news item. You can select multiple by holding down 'crtl' while selecting </em></td>
+			<td><h2>Groups</h2><em>This news item will only be visible to the groups you select. You can select multiple by holding down 'crtl' while selecting.</em></td>
 			<td> <select name="group[]" size="{GROUP_TOTAL}" multiple>
 			<!-- BEGIN group_selection -->
 				<option value="{GROUP_ID}" {SELECTED_GROUP}>{GROUP_NAME}</option>
@@ -141,7 +141,7 @@ window.onload = new Function('initEditor();');
 		  </tr>
 		  <!-- BEGIN campus_row -->
 		  <tr>
-			<td><h2>Campus</h2><em>You must also select which campuses can view this item.</em></td>
+			<td><h2>Campus</h2><em>This news item will only be visible to users that are within this campus. You can select multple by holding down 'crtl'.</em></td>
 			<td><select name="campus[]" size="{CAMPUS_TOTAL}" multiple>           
 				<!-- BEGIN campus_selection -->
 				<option value="{CAMPUS_ID}" {SELECTED_CAMPUS}>{CAMPUS_NAME}</option>
@@ -153,7 +153,8 @@ window.onload = new Function('initEditor();');
 			<td><input type="text" name="heading" size="35" maxlength="50" value="{HEADING}" /></td>
 		  </tr>
 		  <tr> 
-			<td><h2>Expires</h2></td>
+			<td><h2>Expires</h2>
+			<em>Select a period for which the news item will remain available.</td>
 			<td><select name="expires">
 				{LEAVE_OPTION}
 				<option value="1">In 1 hour</option>
@@ -177,7 +178,7 @@ window.onload = new Function('initEditor();');
 		  <tr> 
 			<td>&nbsp;</td>
 			<td><input class="btn" type="submit" name="submit" value="{ACTION} News" /> 
-				<!-- BEGIN delete_button --><input type=\"submit\" name=\"delete\" value=\"Delete News\" class=\"btn\"> <!-- END delete_button --></td>
+				<!-- BEGIN delete_button --><input type="submit" name="delete" value="Delete News" class="btn"> <!-- END delete_button --></td>
 		  </tr>
 		</table>
 		</form>
