@@ -378,11 +378,11 @@ a img {
 /*--------------------------------------------------------------------------------------*/
 /* OTHER FORMS */
 /*--------------------------------------------------------------------------------------*/
-form.standard {
+.standard {
 	padding:4px;
 	background:#ccc;
 	}
-form.standard em {
+.standard em {
 	font-size:70%;
 	font-style:normal;
 	}
