@@ -38,10 +38,12 @@ else
           ORDER BY parent, sequence, txt";
 
 $db->dbDoQuery($query);
-$menucount = 0;
-
+//$menucount = 0;
+$list[0]['id'] = 0;
 while($menuitem = $db->dbGetNextArray() )
 {
+	$list = insertChild($list, $menuitem);
+	/*
         $this->t_body->set_var("JM_ID", "m".$menuitem['id']);
         if($menuitem['parent'] == 0){
                 $this->t_body->set_var("JM_PARENT", "");
@@ -55,10 +57,12 @@ while($menuitem = $db->dbGetNextArray() )
         $this->t_body->set_var("JM_TARGET", $menuitem['target']);
 
         $this->t_body->parse("menu_drop_down_block", "menu_drop_down", true);
+	*/
 }
 //first find out how big the menu is so we can size the space for it appropriately
-$this->t_body->set_var("MJSHEIGHT", $menucount * ITEMHEIGHT);
-$this->t_body->parse("DROPDOWNMENU", "dropmenu");
+//$this->t_body->set_var("MJSHEIGHT", $menucount * ITEMHEIGHT);
+//$this->t_body->parse("DROPDOWNMENU", "dropmenu");
+$this->t_body->set_var("MCSSMENU", outputMenu($list[0]['children']));
 
 //this section handles the mylinks section in the template 
 	
@@ -71,7 +75,7 @@ if($db->dbCountRows() > 0)
 	while($link = $db->dbGetNextArray())
 	{
 		$this->t_body->set_var("MDESC", $link['description']);
-		if(strncasecmp($link['url'], "http://".SITE_name, 7+strlen(SITE_name)) && strncasecmp($link['url'], "https://".SITE_name, 8+strlen(SITE_name)) )
+		if(isLocalURL($link['url']) )
 		{
 			$this->t_body->set_var("MLINK", "<a href=\"/redir.php?url=".$link['url']."\" target=\"_blank\" class=\"one\">".$link['description']."</a>");	
 		}else{
@@ -169,4 +173,47 @@ if(SITE_location == 'wenona')
 	//provide encoded login details for intranet
 	$this->t_body->set_var("ENC_LOGIN", base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'].' '.$_SESSION['password'])));
 }
+
+//function used to create data structure for drop down menu
+function insertChild($list, $element)
+{
+	for($i=0; $list[$i]; $i++)
+	{
+		//if item is parent insert item
+		if($list[$i]['id'] == $element['parent'])
+		{
+			$list[$i]['children'][] = $element;
+			return $list;
+		}
+		
+		if(is_array($list[$i]['children']))
+		{
+			$sublist = insertChild($list[$i]['children'], $element);
+			//if item was inserted then we can leave else we need to keep searching
+			//optimisation step (hopefully should stop linear search)
+			if($sublist)
+			{
+				$list[$i]['children'] = $sublist;
+				return $list;
+			}
+		}
+	}
+	return false;
+}
+
+function outputMenu($list)
+{
+	$text = "<ul>\n";
+	for($i=0; $list[$i]; $i++)
+	{
+		$text .= '<li><a href="'.$list[$i]['url'].'">'.$list[$i]['txt'].'</a>';
+		if(is_array($list[$i]['children']))
+			$text .= outputMenu($list[$i]['children']);
+		
+		$text .= "</li>\n";
+	}
+	$text .= "</ul>\n";
+	return $text;
+}
+		
 ?>
