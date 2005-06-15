@@ -34,6 +34,7 @@ tinyMCE.init({
 });
 </script>
 <!-- InstanceEndEditable -->
+<script type="text/javascript" src="/drop_down.js"></script>
 </head>
 <body>
 <div id="outerWrap">
@@ -120,7 +121,7 @@ tinyMCE.init({
 		<input type="hidden" name="id" value="{ID}" />
 		<table>
 		  <tr> 
-			<td><h2>Groups</h2><em>This news item will only be visible to the groups you select. You can select multiple by holding down 'crtl' while selecting.</em></td>
+			<td class="formLabelWidth"><h2>Groups</h2><em>This news item will only be visible to the groups you select. You can select multiple by holding down 'crtl' while selecting.</em></td>
 			<td> <select name="group[]" size="{GROUP_TOTAL}" multiple>
 			<!-- BEGIN group_selection -->
 				<option value="{GROUP_ID}" {SELECTED_GROUP}>{GROUP_NAME}</option>

@@ -17,6 +17,7 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
 <script type="text/javascript" src="/std_scripts.js"></script>
 <!-- InstanceEndEditable -->
+<script type="text/javascript" src="/drop_down.js"></script>
 </head>
 <body>
 <div id="outerWrap">
@@ -101,7 +102,6 @@
             <!-- BEGIN current -->
 			<h2>Currently</h2>
 			<ul>
-				<li>Temperature :{TEMP}&deg;</li>
 				<li><strong>Temperature :</strong> {TEMP}&deg;</li>
 				<li><strong>Wind Direction : </strong>{DIRECTION}</li>
 				<li><strong>Wind Speed : </strong>{SPEED} km/h</li>
@@ -132,10 +132,10 @@
                         {PRECIS4}</td>
                     </tr>
                     <tr> 
-                      <td><font color="#FF3333">{HIGH1}</font> - <font color="#0099FF">{LOW1}</font></td>
-                      <td><font color="#FF3333">{HIGH2}</font> - <font color="#0099FF">{LOW2}</font></td>
-                      <td><font color="#FF3333">{HIGH3}</font> - <font color="#0099FF">{LOW3}</font></td>
-                      <td><font color="#FF3333">{HIGH4}</font> - <font color="#0099FF">{LOW4}</font></td>
+                      <td><span style="color:#f33">{HIGH1}</span> - <span style="color:#09f">{LOW1}</span></td>
+                      <td><span style="color:#f33">{HIGH2}</span> - <span style="color:#09f">{LOW2}</span></td>
+                      <td><span style="color:#f33">{HIGH3}</span> - <span style="color:#09f">{LOW3}</span></td>
+                      <td><span style="color:#f33">{HIGH4}</span> - <span style="color:#09f">{LOW4}</span></td>
                     </tr>
             </table>
             <!-- END forecast -->

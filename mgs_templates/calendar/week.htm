@@ -15,6 +15,7 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
 <script type="text/javascript" src="/std_scripts.js"></script>
 <!-- #EndEditable -->
+<script type="text/javascript" src="/drop_down.js"></script>
 </head>
 <body>
 <div id="outerWrap">
@@ -100,9 +101,24 @@
 				<center>
 				<table class="calendarTable"> 
 					<tr> 
-						<td><a href="{BACK}">&lt;&lt;</a></td> 
-						<td colspan="5">&nbsp;</td> 
-						<td style="text-align:right;"><a href="{FORWARD}">&gt;&gt;</a></td> 
+						<td><a class="back" href="{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td> 
+						<td colspan="5">
+						<select name="selectMonth">
+							<option value="jan" onclick="location.href='viewCalendar.php?Year=2005&Month=01';">January</option>
+							<option value="feb" onclick="location.href='viewCalendar.php?Year=2005&Month=02';">February</option>
+							<option value="mar" onclick="location.href='viewCalendar.php?Year=2005&Month=03';">March</option>
+							<option value="apr" onclick="location.href='viewCalendar.php?Year=2005&Month=04';">April</option>
+							<option value="may" onclick="location.href='viewCalendar.php?Year=2005&Month=05';">May</option>
+							<option value="jun" onclick="location.href='viewCalendar.php?Year=2005&Month=06';">June</option>
+							<option value="jul" onclick="location.href='viewCalendar.php?Year=2005&Month=07';">July</option>
+							<option value="aug" onclick="location.href='viewCalendar.php?Year=2005&Month=08';">August</option>
+							<option value="sep" onclick="location.href='viewCalendar.php?Year=2005&Month=09';">September</option>
+							<option value="oct" onclick="location.href='viewCalendar.php?Year=2005&Month=10';">October</option>
+							<option value="nov" onclick="location.href='viewCalendar.php?Year=2005&Month=11';">November</option>
+							<option value="dec" onclick="location.href='viewCalendar.php?Year=2005&Month=12';">December</option>
+						</select>
+						</td> 
+						<td><a class="forward" href="{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
 					</tr> 
 					<tr> 
 						<th class="cntr">Sun</th> 

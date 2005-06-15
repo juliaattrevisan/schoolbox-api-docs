@@ -1,7 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<!-- #BeginTemplate "/Templates/main.dwt" -->
-<!-- DW6 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
 <!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
 <!--  Visit us at www.lektec.com.au -->
 <head>
@@ -21,69 +19,70 @@
 	window.onload=function(){tableruler();} 
 </script>
 <!-- #EndEditable -->
+<script type="text/javascript" src="/drop_down.js"></script>
 </head>
-<body> 
-<div id="outerWrap"> 
-	<div id="header"></div> 
-	<div id="yellowStripe"></div> 
-	<div id="left"> 
-		<div class="sideWrap"> 
-			<h3>&#187;&nbsp;GOTO</h3> 
-			<div class="whiteWrap">{MCSSMENU}</div> 
-		</div> 
-		<div class="sideWrap"> 
-			<h3>&#187;&nbsp;SEARCH</h3> 
-			<div class="whiteWrap"> 
-				<form class="standardForm" id="searchForm" action="/search.php" method="post"> 
-					<p style="margin:0;"> 
-						<input class="short" type="text" name="keyword" /> 
-						<select class="short" name="where"> 
-							<option value="0" selected="selected">portal</option> 
-							<option value="1">google</option> 
-							<option value="2">yahoo</option> 
-						</select> 
-						<input class="img" type="image" src="/images/navsearch.gif" alt="Search" name="Submit" /> 
-					</p> 
-				</form> 
-			</div> 
-		</div> 
-		<!-- BEGIN msubject --> 
-		<div class="sideWrap"> 
-			<h3>&#187;&nbsp;MY SUBJECTS</h3> 
-			<div class="whiteWrap"> 
-				<ul> 
-					<!-- BEGIN msubject_block --> 
-					<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li> 
-					<!-- END msubject_block --> 
-				</ul> 
-			</div> 
-		</div> 
-		<!-- END msubject --> 
-		<!-- BEGIN mgroup --> 
-		<div class="sideWrap"> 
-			<h3>&#187;&nbsp;MY GROUPS</h3> 
-			<div class="whiteWrap"> 
-				<ul> 
-					<!-- BEGIN mgroup_block --> 
-					<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li> 
-					<!-- END mgroup_block --> 
-				</ul> 
-			</div> 
-		</div> 
-		<!-- END mgroup --> 
-		<div class="sideWrap"> 
-			<h3>&#187;&nbsp;MY LINKS</h3> 
-			<div class="whiteWrap"> 
-				<ul> 
-					<!-- BEGIN mlink_block --> 
-					<li>{MLINK}</li> 
-					<!-- END mlink_block --> 
-					<li><a href="/editLinks.php">ADD LINK</a></li> 
-				</ul> 
-			</div> 
-		</div> 
-	</div> 
-	<!-- end left --> 
+<body>
+<div id="outerWrap">
+	<div id="header"></div>
+	<div id="yellowStripe"></div>
+	<div id="left">
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;GOTO</h3>
+			<div class="whiteWrap">{MCSSMENU}</div>
+		</div>
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;SEARCH</h3>
+			<div class="whiteWrap">
+				<form class="standardForm" id="searchForm" action="/search.php" method="post">
+					<p style="margin:0;">
+						<input class="short" type="text" name="keyword" />
+						<select class="short" name="where">
+							<option value="0" selected="selected">portal</option>
+							<option value="1">google</option>
+							<option value="2">yahoo</option>
+						</select>
+						<input class="img" type="image" src="/images/navsearch.gif" alt="Search" name="Submit" />
+					</p>
+				</form>
+			</div>
+		</div>
+		<!-- BEGIN msubject -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY SUBJECTS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN msubject_block -->
+					<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
+					<!-- END msubject_block -->
+				</ul>
+			</div>
+		</div>
+		<!-- END msubject -->
+		<!-- BEGIN mgroup -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY GROUPS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN mgroup_block -->
+					<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
+					<!-- END mgroup_block -->
+				</ul>
+			</div>
+		</div>
+		<!-- END mgroup -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY LINKS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN mlink_block -->
+					<li>{MLINK}</li>
+					<!-- END mlink_block -->
+					<li><a href="/editLinks.php">ADD LINK</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- end left -->
 	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" --> 
 	<div id="topNav"> 
 		<ul> 
@@ -99,8 +98,8 @@
 			<li class="navthis right"><a class="navthis right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li> 
 		</ul> 
 	</div> 
-	<!-- #EndLibraryItem --><!-- #EndEditable --> 
-	<div id="content"> 
+	<!-- #EndLibraryItem --><!-- #EndEditable -->
+	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
 			<h1>Returned Work</h1> 
 			<div class="indent"> 
@@ -133,14 +132,14 @@
 					<!-- END category_block --> 
 				</table> 
 			</div> 
-			<!-- #EndEditable --> </div> 
-		<div id="footer"> 
-			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p> 
-			<p class="small"><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p> 
-			<p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p> 
-		</div> 
-	</div> 
-</div> 
+			<!-- #EndEditable --> </div>
+		<div id="footer">
+			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne
+						Grammar School</a> Australia</strong></p>
+			<p class="small"><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p>
+			<p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
+		</div>
+	</div>
+</div>
 </body>
-<!-- #EndTemplate -->
-</html>
+<!-- #EndTemplate --></html>
