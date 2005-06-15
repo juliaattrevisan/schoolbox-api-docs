@@ -99,10 +99,10 @@
 	<div id="content"> 
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
 			<h1>Compose Email</h1> 
-			<form action="send.php" method="post" enctype="multipart/form-data" name="form1" id="form1"> 
+			<form class="standard" action="send.php" method="post" enctype="multipart/form-data" name="form1" id="form1"> 
 				<table> 
 					<tr> 
-						<td>To:</td> 
+						<td><h2>To:</h2></td> 
 						<td><input type="text" name="to" size="50" value="{REPLYTO}" class="formfield" /> 
 							<a href="/search/userLookup.php">address book</a></td> 
 					</tr> 
@@ -111,32 +111,24 @@
 						<td>&nbsp;</td> 
 					</tr> 
 					<tr> 
-						<td>CC:</td> 
+						<td><h2>CC:</h2></td> 
 						<td> <input type="text" name="cc" size="50" class="formfield" /> </td> 
 					</tr> 
 					<tr> 
-						<td>BCC:</td> 
+						<td><h2>BCC:</h2></td> 
 						<td> <input type="text" name="bcc" size="50" class="formfield" value="{BCC}" /> </td> 
 					</tr> 
 					<tr> 
-						<td>Subject:</td> 
+						<td><h2>Subject:</h2></td> 
 						<td><input type="text" name="subject" size="60" class="formfield" value="{SUBJECT}" /></td> 
-					</tr> 
-					<tr> 
-						<td>&nbsp;</td> 
-						<td>&nbsp;</td> 
 					</tr> 
 					<tr> 
 						<td>&nbsp;</td> 
 						<td><textarea name="message" cols="80" rows="12" class="formfield">{BODY}</textarea></td> 
 					</tr> 
 					<tr> 
-						<td>Attachment:</td> 
+						<td><h2>Attachment:</h2></td> 
 						<td><input type="file" name="attachment" class="formfield" /></td> 
-					</tr> 
-					<tr> 
-						<td>&nbsp;</td> 
-						<td>&nbsp;</td> 
 					</tr> 
 					<tr> 
 						<td>&nbsp;</td> 
