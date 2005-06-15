@@ -17,44 +17,32 @@
 <!-- InstanceBeginEditable name="scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
 <script type="text/javascript" src="/std_scripts.js"></script>
+<script language="javascript" type="text/javascript" src="/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
-  _editor_url = "/htmleditor/";
-  _editor_lang = "en";
-</script>
-<script type="text/javascript" src="/htmleditor/htmlarea.js"></script>
-<script type="text/javascript">
-function initEditor() {
-
-  var config = new HTMLArea.Config();
-  config.toolbar = [
-  [ "fontname", "space", "fontsize", "space", "formatblock", "space",
-    "forecolor", "hilitecolor", "separator",
-    "copy", "cut", "paste", "space", "undo", "redo" ],
-  [ "bold", "italic", "underline", "strikethrough", "separator" ,
-    "justifyleft", "justifycenter", "justifyright", "justifyfull", "separator",
-    "insertorderedlist", "insertunorderedlist", "outdent", "indent", "separator",
-    "inserthorizontalrule", "createlink", "insertimage", "inserttable", "htmlmode" ] ];
-
-
-  // comment the following two lines to see how customization works
-  HTMLArea.replace("body", config);  
-  return false;
-}
-window.onload = new Function('initEditor();');
+tinyMCE.init({
+	mode : "textareas",
+	theme : "advanced",
+	plugins : "table",
+	theme_advanced_layout_manager : "RowLayout",
+	theme_advanced_containers_default_align : "left",
+	theme_advanced_container_default_class : "mceToolbar",
+	theme_advanced_containers : "row1,row2,mceEditor,mceElementpath",
+	theme_advanced_container_row1_class : "mceToolbarTop",
+	theme_advanced_container_row2_class : "mceToolbarTop",
+	theme_advanced_container_row1 : "bold,italic,underline,separator,bullist,numlist,outdent,indent,separator,sub,sup,separator,link,unlink,image,charmap,hr,separator,undo,redo",
+	theme_advanced_container_row2 : "tablecontrols,separator,removeformat,cleanup,code"
+});
 </script>
 <!-- InstanceEndEditable -->
 </head>
 <body>
-<script type="text/javascript" src="/coolmenus4.js" ></script>
-<script type="text/javascript" src="/menusettings.js" ></script>
-<script type="text/javascript">{DROPDOWNMENU}</script>
 <div id="outerWrap">
 	<div id="header"></div>
 	<div id="yellowStripe"></div>
 	<div id="left">
 		<div class="sideWrap">
 			<h3>&#187;&nbsp;GOTO</h3>
-			<div class="whiteWrap" style="height:{MJSHEIGHT}px"> </div>
+			<div class="whiteWrap">{MCSSMENU}</div>
 		</div>
 		<div class="sideWrap">
 			<h3>&#187;&nbsp;SEARCH</h3>
@@ -173,7 +161,7 @@ window.onload = new Function('initEditor();');
 		  </tr>
 		  <tr> 
 			<td><h2>News Body</h2><em>This is the main portion of your news.</em></td>
-			<td><textarea id="body" name="body" style="width:430px;height:350px">{BODY}</textarea></td>
+			<td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
 		  </tr>
 		  <tr> 
 			<td>&nbsp;</td>
