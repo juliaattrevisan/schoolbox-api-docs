@@ -14,6 +14,10 @@
 <!-- #BeginEditable "scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
 <script type="text/javascript" src="/std_scripts.js"></script>
+<script type="text/javascript" src="/tableruler.js"></script>
+<script type="text/javascript">
+	window.onload=function(){tableruler();} 
+</script>
 <!-- #EndEditable -->
 </head>
 <body>
@@ -99,25 +103,27 @@
 			<h1>Manage Drop Down Menu </h1>
 			<span class="header_option"><a href="modSideMenu.php?add=1">add item</a></span>
 			<!--BEGIN menu_item_list -->
-				<table>
+				<table class="ruler">
 					<tr>
 						<th>Name</th>
-						<th>Move Up</th>
-						<th>Move Down</th>
-						<th>Delete</th>
+						<th class="cntr">Move Up</th>
+						<th class="cntr">Move Down</th>
+						<th class="cntr">Delete</th>
 					</tr>
+					<tbody>
 					<!-- BEGIN menu_item -->
 					<tr>
 						<td>{ITEM_IDENT}<a href="modSideMenu.php?id={ITEM_ID}">{ITEM_TXT}</a></td>
-						<td><!-- BEGIN up_button -->
+						<td class="cntr"><!-- BEGIN up_button -->
 							<a href="modSideMenu.php?up={ITEM_ID}">Up</a>
 							<!-- END up_button --></td>
-						<td><!-- BEGIN down_button -->
+						<td class="cntr"><!-- BEGIN down_button -->
 							<a href="modSideMenu.php?down={ITEM_ID}">Down</a>
 							<!-- END down_button --></td>
-						<td><a href="modSideMenu.php?delete={ITEM_ID}">Delete</a></td>
+						<td class="cntr"><a href="modSideMenu.php?delete={ITEM_ID}">Delete</a></td>
 					</tr>
 					<!-- END menu_item -->
+					</tbody>
 				</table>
 			<!-- END menu_item_list -->
 			<!-- #EndEditable --> </div>
