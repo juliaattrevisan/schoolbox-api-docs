@@ -1,48 +1,17 @@
-<table border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td align="right" valign="bottom" height="5" width="7"><img src="/images/bluepixel.gif" width="2" height="2"></td>
-    <td valign="bottom" height="5" width="70"><img src="/images/bluepixel.gif" width="70" height="2"></td>
-    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2	"></td>
-    <td valign="bottom" height="5" width="70"><img src="/images/bluepixel.gif" width="70" height="2"></td>
-    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
-    <!-- BEGIN webmail_toptab -->
-    <td valign="bottom" height="5" width="83"><img src="/images/bluepixel.gif" width="83" height="2"></td>
-    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
-    <!-- END webmail_toptab -->
-    <td valign="bottom" height="5" width="85"><img src="/images/bluepixel.gif" width="85" height="2"></td>
-    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
-    <!-- BEGIN timetable_toptab -->
-    <td valign="bottom" height="5" width="90"><img src="/images/bluepixel.gif" width="90" height="2"></td>
-    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
-    <!-- END timetable_toptab -->
-    <td valign="bottom" height="5" width="90"><img src="/images/bluepixel.gif" width="90" height="2"></td>
-    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
-    <td valign="bottom" height="5" width="75"><img src="/images/bluepixel.gif" width="75" height="2"></td>
-    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
-    <td valign="bottom" height="5" width="75"><img src="/images/bluepixel.gif" width="75" height="2"></td>
-    <td valign="bottom" height="5" width="7"><img src="/images/bluepixel.gif" width="2" height="2"></td>
-  </tr>
-  <tr>
-    <td width="7" height="20"><img src="/images/tab_bluelbigleftcorner.gif" width="7" height="20"></td>
-    <td width="70" height="20" background="/images/lightbluepixel.gif" bgcolor="#9EC6D9"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/home.php">Main</a></b></td>
-    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
-    <td height="20" background="/images/redpixel.gif" bgcolor="#9EC6D9"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/news.php" class="one">News</a></b></td>
-    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
-    <!-- BEGIN webmail_tab -->
-    <td height="20" background="/images/lightbluepixel.gif" bgcolor="#9EC6D9"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="http://webmail.wenona.nsw.edu.au/servlet/webacc" target="_blank">Webmail</a></b></td>
-    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
-    <!-- END webmail_tab -->
-    <td height="20" background="/images/lightbluepixel.gif"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/calendar/viewCalendar.php">Calendar</a></b></td>
-    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
-    <!-- BEGIN timetable_tab -->
-    <td height="20" background="/images/lightbluepixel.gif" bgcolor="#9EC6D9"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/timetable.php">Timetable</a></b></td>
-    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
-    <!-- END timetable_tab -->
-    <td height="20" background="/images/lightbluepixel.gif"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/browse.php">Resources</a></b></td>
-    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
-    <td height="20" background="/images/lightbluepixel.gif"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="http://intranet.wenona.nsw.edu.au/?strEncrypted={ENC_LOGIN}" target="_blank">Intranet</a></b></td>
-    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
-    <td height="20" background="/images/lightbluepixel.gif"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="http://intranet.wenona.nsw.edu.au/MyFilePortal/index.asp?strEncrypted={ENC_LOGIN}" target="_blank">My Files</a></b></td>
-    <td width="7" height="20"><img src="/images/tab_bluelbigrightcorner.gif" width="7" height="20"></td>
-  </tr>
-</table>
+			<div id="topNav">
+				<ul>
+					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+					<li class="navthis norm"><a class="navthis norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+					<!-- BEGIN webmail_tab --> 
+					<li class="norm"><a class="norm" href="http://webmail.wenona.nsw.edu.au/servlet/webacc" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+					<!-- END webmail_tab -->
+					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+					<!-- BEGIN timetable_tab -->
+					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+					<!-- END timetable_tab -->
+					<li class="norm"><a class="norm" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+					<li class="norm"><a class="norm" href="http://intranet.wenona.nsw.edu.au/index.asp?strEncrypted={ENC_LOGIN}" title="Access the school intranet" accesskey="i"><em>I</em>ntranet</a></li>
+					<li class="right"><a class="right" href="http://intranet.wenona.nsw.edu.au/MyFilePortal/index.asp?strEncrypted={ENC_LOGIN}" title="Access your H:\ files" accesskey="f">My <em>F</em>iles</a></li>
+					
+				</ul>
+			</div>
