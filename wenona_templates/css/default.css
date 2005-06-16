@@ -1,0 +1,611 @@
+* {
+	margin:0;
+	padding:0;
+	}
+
+body {
+	margin:0;
+	padding:0;
+	background:white url(/images/body_back.gif) repeat-y left;
+	font-family:Verdana, Arial, Helvetica, sans-serif, serif;
+	font-size:100%;
+	text-align:left;
+	color:#000;
+	width:100%;
+	}
+/*--------------------------------------------------------------------------------------*/
+/* HEADINGS */
+/*--------------------------------------------------------------------------------------*/
+h1, h2 {
+	font-weight:normal;
+	letter-spacing:-1px;
+	margin:10px 0 0 0;
+	background:transparent;
+	padding:1px 0 1px 3px;
+	font-weight:bold;	
+	}
+
+h1 {
+	font-size:120%;
+	border-bottom:2px solid #B51C21;
+	}
+	
+h2 {
+	font-size:110%;
+	padding:4px 0;
+	border-bottom:2px solid #002452;
+	}
+
+#left h3 {
+	margin:0;
+	padding:3px 0 0 10px;
+	background:#B51C21;
+	color:#fff;
+	font-size:80%; 
+	line-height:1.4em;
+	font-weight:bold;
+	}
+
+/*--------------------------------------------------------------------------------------*/
+/* STANDARD ELEMENTS */
+/*--------------------------------------------------------------------------------------*/
+p {
+	line-height:1.4em;
+	color:#000;
+	margin:0.8 0 0 0;
+	} 
+
+acronym, dfn, abbr {
+	text-decoration:none;
+	padding-bottom:2px;
+	cursor:help;
+	}
+
+#content ul {
+	margin:0;
+	list-style:none;
+	text-align:left;
+	}
+#content ul li{
+	list-style:none;
+	padding-left:22px;
+	margin:3px 0 0 20px;
+	font-weight:normal;
+	line-height:1.5em;
+	color:#000;
+	}
+#content ul li {
+	background:transparent url(/images/bullet.gif) no-repeat 2px 0.2em;
+	}
+#content ul a {font-weight:normal;}
+/*--------------------------------------------------------------------------------------*/
+/* OLD MENU STYLES */
+/*--------------------------------------------------------------------------------------
+
+.sideWrap ul {
+	margin:0;
+	list-style:none;
+	text-align:left;
+	}
+.sideWrap ul li {
+	list-style:none;
+	padding-left:12px;
+	margin:3px 0;
+	font-weight:normal;
+	font-size:70%;
+	line-height:1.5em;
+	}
+
+.sideWrap ul li {
+	background:transparent url(/newimages/navbar_input_small.gif) no-repeat 2px 0.2em;
+	}
+.sideWrap ul a {font-weight:normal;}
+*/
+
+/*--------------------------------------------------------------------------------------*/
+/* HORIZONTAL DROP DOWN MENU STYLES */
+/*--------------------------------------------------------------------------------------*/
+
+/* FIRST LEVEL MENU UNORDERED LIST */
+#left ul {
+	margin:0 0 10px 0;
+	padding:0;
+	list-style: none;
+	width:150px; /* Width of Menu Items */
+	z-index:2;
+	}
+/* FIRST LEVEL MENU UNORDERED LIST ELEMENT */
+#left ul li {
+	position: relative;
+	}
+
+/* FIRST LEVEL MENU LINK */
+#left ul li a {
+	color:#fff;
+	display:block;
+	text-decoration:none;
+	background:#002452; /* IE6 Bug */
+	padding:2px 5px;
+	border:0;
+	margin:0;
+	font-weight:normal;
+	font-size:70%;
+	}
+	
+/* SECOND LEVEL MENU UNORDERED LIST */
+#left li ul {
+	position:absolute;
+	left:149px; /* Set 1px less than menu width */
+	top:0;
+	display:none;
+	border:1px solid #0055AD;
+	border-bottom:0;
+	margin-left:1px;
+	}
+
+/* Fix IE. Hide from IE Mac \*/
+* html #left ul li {float:left; height:1%;}
+* html #left ul li a {height:1%;}
+/* End */
+
+#left ul li a:hover {background:#0055AD;color:#fff;} /* Hover Styles */
+#left li ul li a:hover {background:#0055AD;color:#fff;}
+/* SECOND LEVEL LIST */
+#left li ul li { 
+	border-bottom:1px solid #0055AD;
+	}	
+/* SECOND LEVEL LIST LINK */
+#left li ul li a {
+	padding:2px 5px;
+	background:#9CC7DE;
+	color:#002452;
+	} 
+
+#left li:hover ul ul, #left li.over ul ul {display:none;} 
+#left li:hover ul, #left li li:hover ul, #left li.over ul, #left li li.over ul {display: block;} /* The magic */
+/*--------------------------------------------------------------------------------------*/
+/* LINKS */
+/*--------------------------------------------------------------------------------------*/
+
+a {
+	font-weight:bold;
+	text-decoration:none;
+	}
+a:link, a:visited {
+	color:#03c;
+	text-decoration:none;
+	}
+a:hover {
+	color:#06c;
+	text-decoration:underline;
+	}
+a:active {
+	color:#03c;
+	}
+a img {
+	border:0;
+	}
+
+/*--------------------------------------------------------------------------------------*/
+/* LAYOUT ELEMENTS */
+/*--------------------------------------------------------------------------------------*/
+
+#outerWrap. #header, #innerWrap, #left, #content, .padFix {
+	margin:0;
+	padding:0;
+	border:0;
+	background:transparent;
+	}
+
+#header {
+	background:#002452 url(/images/header.gif) no-repeat 30px 5px;
+	height:85px;
+	}
+
+#left{
+	position:absolute;
+	top:86px;
+	left:0;
+	width:150px;
+	z-index:2; /* this is needed so that the horizontal pop-up menu appears above this */
+	}
+
+#content{
+	z-index:1; /* this is needed so that the horizontal pop-up menu appears above this */
+	margin:-22px 0 0 150px;
+	}
+
+#content_text{
+	background:#fff;
+	border-top:2px solid #B51C21;
+	border-left:2px solid #B51C21;
+	padding:10px;
+	font-size:80%;
+	line-height:1.4em;
+	color:#000;
+	z-index:1; /* this is needed so that the horizontal pop-up menu appears above this */
+	}
+#content_text p {
+	margin: 0.8em 0 0 0;
+	}
+
+#searchBox {
+	position:absolute;
+	top:0;
+	right:10px;
+	width:400px;
+	text-align:right;
+	}
+
+.padFix {
+	padding:10px;
+	}
+
+.indent {
+	margin:0;
+	padding-left:20px;
+	}
+.indent h2 {
+	margin-left:0;
+	}
+/*--------------------------------------------------------------------------------------*/
+/* TOP NAVIGATION */
+/*--------------------------------------------------------------------------------------*/    
+
+#topNav {
+	position:absolute;
+	top:40px;
+	left:150px;
+	padding:0;
+	background:transparent;
+	z-index:1; /* this is needed so that the horizontal pop-up menu appears above this */
+	}
+#topNav ul {
+	margin:0;
+	padding:0;
+	list-style:none;
+	}
+#topNav li.right, #topNav li.left, #topNav li.norm {
+	float:left;
+	background:transparent;
+	margin:0;
+	padding:0 0 0 9px;
+	border:0;
+	}
+#topNav li.right {	
+	background:url("/images/navright_left.gif") no-repeat left top;
+	}
+#topNav li.left {	
+	background:url("/images/navleft_left.gif") no-repeat left top;
+	}
+#topNav li.norm {	
+	background:url("/images/navnorm_left.gif") no-repeat left top;
+	}
+#topNav a {
+	float:left;
+	display:block;
+	width:.1em;
+	padding:5px 15px 4px 6px;
+	text-decoration:none;
+	font-weight:normal;
+	font-weight:bold;
+	font-size:70%; 
+	white-space:nowrap;
+	}
+#topNav a.right {
+	background:url("/images/navright_right.gif") no-repeat right top;color:#002452;
+	} 
+#topNav a.left {
+	background:url("/images/navleft_right.gif") no-repeat right top;color:#002452;
+	} 
+#topNav a.norm {
+	background:url("/images/navnorm_right.gif") no-repeat right top;color:#002452;
+	} 
+#topNav >  ul a {width:auto;}
+/* Commented Backslash Hack hides rule from IE5-Mac \*/
+#topNav a {float:none;}
+/* End IE5-Mac hack */
+#topNav a:hover {
+	color:#fff;
+}
+#topNav a.navthis:hover {
+	color:#fff;
+}
+#topNav li {
+	background-position:0 -150px;
+	border-width:0;
+}
+#topNav li a {
+	background-position:100% -150px;
+	padding-bottom:5px;
+	color:#333;
+}
+#topNav li.navthis {
+	background-position:0% -150px;
+	color:#fff;
+}
+#topNav li a.navthis, #topNav li a.navthis, #topNav li a.navthis {
+	background-position:100% -150px;
+	color:#fff;
+	}
+
+#topNav a em {
+	text-decoration:underline;
+	font-style:normal;
+	}  
+
+/*--------------------------------------------------------------------------------------*/
+/* FOOTER */
+/*--------------------------------------------------------------------------------------*/
+
+#footer {
+	margin:0;	
+	padding:0 10px;
+	border:0;
+	text-align:left;
+	vertical-align:middle;
+	background:transparent;
+	clear:both;
+	}
+#footer a {
+	color:#fff;
+	text-decoration:none;
+	}
+#footer a:hover {
+	color:#B51C21;
+	text-decoration:underline;
+	}
+#footer p {	
+	color:#fff;
+	margin:0;
+	font-size:50%;
+	line-height:2em;
+	}
+#content #footer p.small, #content #footer p.small a {
+	font-weight:normal;
+	}
+/*--------------------------------------------------------------------------------------*/
+/* MAIN FORMS */
+/*--------------------------------------------------------------------------------------*/
+.standardForm fieldset {
+	border:0;
+	text-align:left;
+	background:#fff;
+	margin:0;
+	padding:0;
+	}
+.standardForm label{
+	font-family:inherit;
+	font-weight:normal;
+	font-size:90%;
+	line-height:2.1em;
+	display:block;
+	color:#666;
+	padding:0;
+	border:0;
+	background:transparent;
+	}
+.standardForm label span {
+	font-size:70%;
+	color:#f00;
+	font-weight:bold;
+	font-family:Verdana, Arial, sans-serif;
+	}
+.standardForm input, .standardForm textarea, .standardForm select {
+	border-collapse:collapse;
+	border:1px solid #efefef;
+	font-weight:normal;
+	font-size:60%;
+	margin:0 0 1em 0;
+	padding:2px;
+	vertical-align:middle;
+	}
+.standardForm input:focus, .standardForm textarea:focus, .standardForm select:focus {
+	border-color:#39c;
+	}
+.standardForm input:hover, .standardForm textarea:hover, .standardForm select:hover {
+	border:1px solid #A5C7FF;
+	}
+.standardForm input.btn {
+	margin:10px 0;
+	cursor:pointer;
+	color:#000;
+	border:2px solid;
+	border-color:#efefef #333 #333 #efefef;
+	background:#eee;
+	padding:.3em 0.8em 0.3em 0.8em;
+	}
+.standardForm p {
+	font-family:inherit;
+	font-weight:normal;
+	font-size:90%;
+	line-height:2.1em;
+	color:#666;
+	background:transparent;
+	}
+/*--------------------------------------------------------------------------------------*/
+/* OTHER FORMS */
+/*--------------------------------------------------------------------------------------*/
+#searchForm {
+	margin:0;
+}
+#searchForm input.short, #searchForm select.short {
+	width:100px;margin:0;padding:0;
+	border:1px solid #B51C21;
+	font-size:100%;
+	}
+#searchForm input.img {
+	margin-bottom:4px;
+	margin-left:10px;
+	border:0;
+	}
+/*--------------------------------------------------------------------------------------*/
+/* OTHER FORMS */
+/*--------------------------------------------------------------------------------------*/
+form.standard {
+	padding:4px;
+	background:#ccc;
+	}
+form.standard em {
+	font-size:70%;
+	font-style:normal;
+	}
+.standard input, .standard select {
+	border-collapse:collapse;
+	border:1px solid #333;
+	font-weight:normal;
+	font-size:80%;
+	margin:0 0 1em 0;
+	padding:2px;
+	vertical-align:middle;
+	}
+.standard table td {
+	vertical-align:top;
+	}
+.standard input.btn {
+	margin:1em 0;
+	cursor:pointer;
+	color:#000;
+	border:2px solid;
+	border-color:#efefef #333 #333 #efefef;
+	background:#eee;
+	padding:.3em 0.8em 0.3em 0.8em;
+	}
+.standard input.timeField {
+	width:2em;
+	}
+.standard .short {
+	width:5em;
+	}	
+.standard h2 {
+	font-weight:bold;
+	font-size:100%;
+	padding:0;
+	border:0;
+	margin:0;
+	color:#333;
+	}
+.standard td.formLabelWidth {
+	width:260px;
+	}
+/*--------------------------------------------------------------------------------------*/
+/* SPECIFIC ELEMENT DECLARATIONS */
+/*--------------------------------------------------------------------------------------*/
+.element_footer {
+	color:#666;
+	font-size:90%;
+	}
+.cntr {
+	text-align:center;
+	}
+.header_option {
+	float:right;
+	margin:-24px 0 0 0;
+	padding:0;
+	}
+.calendarTime {
+	white-space:nowrap;
+	font-size:80%;
+	vertical-align:top;
+	padding-right:0.5em;
+	}
+#content_text table.calendarTable td a.back, #content_text table.calendarTable td a.forward {
+	display:block;
+	background:#00458C;
+	color:#fff;
+	text-align:center;
+	margin:0;
+	padding:0;
+	}	
+#content_text table.calendarTable {
+	width:400px;
+	text-align:center;
+	border:2px solid #00458C;
+	margin:10px 0 0 0;
+	}
+#content_text .calendarTable select {
+	font:bold 70% /1em Verdana, arial, sans-serif, serif;
+	color:#00458C;
+	width:10em;
+	}	
+.calTable {
+	background:#D7ECFF;
+	font-weight:bold;
+}
+.calTableCurrent {
+	background: #335473;
+	color:#fff;
+	font-weight:bold;
+}
+.calTableSelected {
+	background: #fff;
+	font-weight:bold;
+}
+
+br.fix {
+	clear:both;
+	}
+#content table a {font-weight:normal;}
+#content table {
+	font-weight:normal;
+	width:100%;
+	}
+#content table tr{
+	vertical-align:middle;
+	}
+#content table th {
+	padding:3px;
+	background:#00458C;
+	color:#fff;
+	font:bold 90% /1em Verdana, arial, sans-serif, serif
+	}
+
+/*--------------------------------------------------------------------------------------*/
+/* TABLE RULER */
+/*--------------------------------------------------------------------------------------*/
+
+tr.ruled{
+	background:#FFFFA5;
+	}    
+table.ruler td {
+	padding-bottom:2px;
+	}  
+table.ruler tbody td {
+	padding:0 10px 2px 4px;
+	}
+table.ruler h2 {
+	margin-left:0;
+	padding-right:0;
+	}
+
+table.timetable {
+	width:100%;
+	margin:0;
+	background:transparent;
+	}
+
+table.timetable th {
+	padding:3px;
+	background:#002750;
+	color:#fff;
+	font:bold 70% /1em Verdana, arial, sans-serif, serif
+	}
+
+table.timetable td {
+	background:transparent;
+	colour:#000;
+	font:normal 70% /1em Verdana, arial, sans-serif, serif
+	}
+
+.timetable td.current {
+	background:#06c;
+	}
+	
+table.home {
+	position:relative;
+	}
+table.home tr {
+	vertical-align:top;
+	}
+table.home td {
+	}

@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<!-- #BeginEditable "doctitle" -->
+<title>{TITLE}</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="MGS"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<!-- TemplateBeginEditable name="scripts" -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
+<script type="text/javascript" src="/std_scripts.js"></script>
+<!-- TemplateEndEditable -->
+<script type="text/javascript" src="/drop_down.js"></script>
+</head>
+<body> 
+<div id="outerWrap"> 
+	<div id="header"></div> 
+	<div id="searchBox"> 
+		<form class="standardForm" id="searchForm" action="/search.php" method="post"> 
+			<p style="margin:0;"> 
+				<input class="short" type="text" name="keyword" /> 
+				<select class="short" name="where"> 
+					<option value="0" selected="selected">portal</option> 
+					<option value="1">google</option> 
+					<option value="2">yahoo</option> 
+				</select> 
+				<input class="img" type="image" src="/images/searchbutton.gif" alt="Search" name="Submit" /> 
+			</p> 
+		</form> 
+	</div> 
+	<div id="left"> 
+		<h3>&#187;&nbsp;GOTO</h3> 
+		{MCSSMENU}
+		<!-- BEGIN msubject --> 
+		<h3>&#187;&nbsp;MY SUBJECTS</h3> 
+		<ul> 
+			<!-- BEGIN msubject_block --> 
+			<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li> 
+			<!-- END msubject_block --> 
+		</ul> 
+		<!-- END msubject --> 
+		<!-- BEGIN mgroup --> 
+		<h3>&#187;&nbsp;MY GROUPS</h3> 
+		<ul> 
+			<!-- BEGIN mgroup_block --> 
+			<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li> 
+			<!-- END mgroup_block --> 
+		</ul> 
+		<!-- END mgroup --> 
+		<h3>&#187;&nbsp;MY LINKS</h3> 
+		<ul> 
+			<!-- BEGIN mlink_block --> 
+			<li>{MLINK}</li> 
+			<!-- END mlink_block --> 
+			<li><a href="/editLinks.php">ADD LINK</a></li> 
+		</ul> 
+		<div id="footer"> 
+			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.wenona.nsw.edu.au" title="Wenona">Wenona</a></strong></p> 
+			<p class="small"><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p> 
+			<p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p> 
+		</div> 
+	</div> 
+	<!-- end left --> 
+	<!-- TemplateBeginEditable name="tabs" -->tabs<!-- TemplateEndEditable --> 
+	<div id="content"> 
+		<div id="content_text"> <!-- #BeginEditable "main" --> CONTENT GOES HERE <!-- #EndEditable --> </div> 
+	</div> 
+</div> 
+</body>
+</html>
