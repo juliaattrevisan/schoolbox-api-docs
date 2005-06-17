@@ -38,8 +38,6 @@ class mail_parser
         function getBody($prefferred)
         {
 		//gets preffered email body content
-	
-		include("../include/html-parse.php");
 		
 		$pidList = array();
 		
@@ -69,7 +67,7 @@ class mail_parser
 			$this->decodeMail($this->getEncoding($pidList[0]), &$body);
 			//get rid of html/head/body tags
 			$body = preg_replace(array('/<html[^>]*>.*<body[^>]*>/si','/<\/body>*<\/html>/si'), array('',''), $body);
-
+			$body = scrubHTML($body);
  			//if inline images are to be included
  			//if($inlineimage)
  			$body = preg_replace('/\"cid:([^\"]*)/i', "\"download.php?msgid=".trim($this->header->Msgno)."&cid=$1", $body);
@@ -77,11 +75,11 @@ class mail_parser
 		}
 		else if($prefferred == "TEXT_ONLY") //used to output text as text
 		{
-			return htmlspecialchars(stripslashes(trim($body)));
+			return scubTEXT(stripslashes(trim($body)));
 		}	
 		else //outputs a text based email formatted in html
 		{
-			return html_link(num_encode(nl2br(htmlspecialchars(stripslashes(trim($body))))));
+			return html_link(nl2br(scrubTEXT(stripslashes(trim($body)))));
 		}
 
         }
