@@ -1,21 +1,22 @@
-<<<<<<< .mine
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="../Templates/main.dwt" codeOutsideHTMLIsLocked="false" -->
 <!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
 <!--  Visit us at www.lektec.com.au -->
 <head>
 <!-- #BeginEditable "doctitle" -->
 <title>{TITLE}</title>
+<meta name="Keywords" content="" />
+<meta name="Description" content="" />
 <!-- #EndEditable -->
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="MGS"/>
 <meta name="ROBOTS" content="INDEX, FOLLOW" />
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
-<!-- #BeginEditable "scripts" -->
+<!-- InstanceBeginEditable name="scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
 <script type="text/javascript" src="/std_scripts.js"></script>
-<!-- #EndEditable -->
+<!-- InstanceEndEditable -->
 <script type="text/javascript" src="/drop_down.js"></script>
 </head>
 <body>
@@ -80,36 +81,35 @@
 		</div>
 	</div>
 	<!-- end left -->
-	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Calendar_Active.lbi" --> 
-	<div id="topNav"> 
-		<ul> 
-			<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li> 
-			<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li> 
-			<!-- BEGIN webmail_tab --> 
-			<li class="norm"><a class="norm" href="/mail.php" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li> 
-			<!-- END webmail_tab --> 
-			<li class="navthis norm"><a class="navthis norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li> 
-			<!-- BEGIN timetable_tab --> 
-			<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li> 
-			<!-- END timetable_tab --> 
-			<li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li> 
-		</ul> 
-	</div> 
+	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Calendar_Active.lbi" -->
+    <div id="topNav">
+    	<ul>
+    		<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+    		<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+    		<!-- BEGIN webmail_tab -->
+    		<li class="norm"><a class="norm" href="/mail.php" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+    		<!-- END webmail_tab -->
+    		<li class="navthis norm"><a class="navthis norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+    		<!-- BEGIN timetable_tab -->
+    		<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+    		<!-- END timetable_tab -->
+    		<li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+   		</ul>
+   	</div>
 	<!-- #EndLibraryItem --><!-- #EndEditable -->
 	<div id="content">
-		<div id="content_text"> <!-- #BeginEditable "main" --> 
-			<h1>{MONTH} - {YEAR}</h1>
+		<div id="content_text"> <!-- #BeginEditable "main" -->			<h1>{MONTH} - {YEAR}</h1>
 				<center>
 				<table class="calendarTable"> 
 					<tr> 
 						<td><a class="back" href="{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td> 
 						<td colspan="5">
-						<form method="get" action="">
+						<form method="get" action="viewCalendar.php" id="calendarDrop">
 						<input type="hidden" name="Year" value="{YEAR}">
 						<input type="hidden" name="Day" value="{DAY}">
-						<select name="Month">
+						<select name="Month" onchange="this.form.submit();">
 						<!-- BEGIN month_drop -->
-							<option value="{DROP_MONTH_NUMBER}" onchange="this.form.submit();" {DROP_MONTH_SELECTED}>{DROP_MONTH_NAME}</option>
+							<option value="{DROP_MONTH_NUMBER}" {DROP_MONTH_SELECTED}>{DROP_MONTH_NAME}</option>
 						<!-- END month_drop -->
 						</select>
 						</form>
@@ -138,6 +138,7 @@
 					<!-- END week_block --> 
 				</table>
 				</center>
+				
 			<table> 
 				<!-- BEGIN day_block --> 
 				<tr> 
@@ -151,178 +152,7 @@
 				</tr> 
 				<!-- END note_block --> 
 				<!-- END day_block --> 
-			</table> 
-			<!-- #EndEditable --> </div>
-		<div id="footer">
-			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne
-						Grammar School</a> Australia</strong></p>
-			<p class="small"><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p>
-			<p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
-		</div>
-	</div>
-</div>
-</body>
-<!-- #EndTemplate --></html>
-=======
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
-<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
-<!--  Visit us at www.lektec.com.au -->
-<head>
-<!-- #BeginEditable "doctitle" -->
-<title>{TITLE}</title>
-<!-- #EndEditable -->
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="MGS"/>
-<meta name="ROBOTS" content="INDEX, FOLLOW" />
-<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
-<!-- #BeginEditable "scripts" -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
-<script type="text/javascript" src="/std_scripts.js"></script>
-<!-- #EndEditable -->
-<script type="text/javascript" src="/drop_down.js"></script>
-</head>
-<body>
-<div id="outerWrap">
-	<div id="header"></div>
-	<div id="yellowStripe"></div>
-	<div id="left">
-		<div class="sideWrap">
-			<h3>&#187;&nbsp;GOTO</h3>
-			<div class="whiteWrap">{MCSSMENU}</div>
-		</div>
-		<div class="sideWrap">
-			<h3>&#187;&nbsp;SEARCH</h3>
-			<div class="whiteWrap">
-				<form class="standardForm" id="searchForm" action="/search.php" method="post">
-					<p style="margin:0;">
-						<input class="short" type="text" name="keyword" />
-						<select class="short" name="where">
-							<option value="0" selected="selected">portal</option>
-							<option value="1">google</option>
-							<option value="2">yahoo</option>
-						</select>
-						<input class="img" type="image" src="/images/navsearch.gif" alt="Search" name="Submit" />
-					</p>
-				</form>
-			</div>
-		</div>
-		<!-- BEGIN msubject -->
-		<div class="sideWrap">
-			<h3>&#187;&nbsp;MY SUBJECTS</h3>
-			<div class="whiteWrap">
-				<ul>
-					<!-- BEGIN msubject_block -->
-					<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
-					<!-- END msubject_block -->
-				</ul>
-			</div>
-		</div>
-		<!-- END msubject -->
-		<!-- BEGIN mgroup -->
-		<div class="sideWrap">
-			<h3>&#187;&nbsp;MY GROUPS</h3>
-			<div class="whiteWrap">
-				<ul>
-					<!-- BEGIN mgroup_block -->
-					<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
-					<!-- END mgroup_block -->
-				</ul>
-			</div>
-		</div>
-		<!-- END mgroup -->
-		<div class="sideWrap">
-			<h3>&#187;&nbsp;MY LINKS</h3>
-			<div class="whiteWrap">
-				<ul>
-					<!-- BEGIN mlink_block -->
-					<li>{MLINK}</li>
-					<!-- END mlink_block -->
-					<li><a href="/editLinks.php">ADD LINK</a></li>
-				</ul>
-			</div>
-		</div>
-	</div>
-	<!-- end left -->
-	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Calendar_Active.lbi" --> 
-	<div id="topNav"> 
-		<ul> 
-			<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li> 
-			<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li> 
-			<!-- BEGIN webmail_tab --> 
-			<li class="norm"><a class="norm" href="/mail.php" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li> 
-			<!-- END webmail_tab --> 
-			<li class="navthis norm"><a class="navthis norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li> 
-			<!-- BEGIN timetable_tab --> 
-			<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li> 
-			<!-- END timetable_tab --> 
-			<li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li> 
-		</ul> 
-	</div> 
-	<!-- #EndLibraryItem --><!-- #EndEditable -->
-	<div id="content">
-		<div id="content_text"> <!-- #BeginEditable "main" --> 
-			<h1>{MONTH} - {YEAR}</h1>
-				<center>
-				<table class="calendarTable"> 
-					<tr> 
-						<td><a class="back" href="{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td> 
-						<td colspan="5">
-						<select name="selectMonth">
-							<option value="jan" onclick="location.href='viewCalendar.php?Year=2005&Month=01';">January</option>
-							<option value="feb" onclick="location.href='viewCalendar.php?Year=2005&Month=02';">February</option>
-							<option value="mar" onclick="location.href='viewCalendar.php?Year=2005&Month=03';">March</option>
-							<option value="apr" onclick="location.href='viewCalendar.php?Year=2005&Month=04';">April</option>
-							<option value="may" onclick="location.href='viewCalendar.php?Year=2005&Month=05';">May</option>
-							<option value="jun" onclick="location.href='viewCalendar.php?Year=2005&Month=06';">June</option>
-							<option value="jul" onclick="location.href='viewCalendar.php?Year=2005&Month=07';">July</option>
-							<option value="aug" onclick="location.href='viewCalendar.php?Year=2005&Month=08';">August</option>
-							<option value="sep" onclick="location.href='viewCalendar.php?Year=2005&Month=09';">September</option>
-							<option value="oct" onclick="location.href='viewCalendar.php?Year=2005&Month=10';">October</option>
-							<option value="nov" onclick="location.href='viewCalendar.php?Year=2005&Month=11';">November</option>
-							<option value="dec" onclick="location.href='viewCalendar.php?Year=2005&Month=12';">December</option>
-						</select>
-						</td> 
-						<td><a class="forward" href="{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
-					</tr> 
-					<tr> 
-						<th class="cntr">Sun</th> 
-						<th class="cntr">Mon</th> 
-						<th class="cntr">Tue</th> 
-						<th class="cntr">Wed</th> 
-						<th class="cntr">Thu</th> 
-						<th class="cntr">Fri</th> 
-						<th class="cntr">Sat</th> 
-					</tr> 
-					<!-- BEGIN week_block --> 
-					<tr> 
-						<td class="{MONTABLE_CSS0} cntr" onclick="location.href='{DAYURL0}';">{DAY0}</td> 
-						<td class="{MONTABLE_CSS1} cntr" onclick="location.href='{DAYURL1}';">{DAY1}</td> 
-						<td class="{MONTABLE_CSS2} cntr" onclick="location.href='{DAYURL2}';">{DAY2}</td> 
-						<td class="{MONTABLE_CSS3} cntr" onclick="location.href='{DAYURL3}';">{DAY3}</td> 
-						<td class="{MONTABLE_CSS4} cntr" onclick="location.href='{DAYURL4}';">{DAY4}</td> 
-						<td class="{MONTABLE_CSS5} cntr" onclick="location.href='{DAYURL5}';">{DAY5}</td> 
-						<td class="{MONTABLE_CSS6} cntr" onclick="location.href='{DAYURL6}';">{DAY6}</td> 
-					</tr> 
-					<!-- END week_block --> 
-				</table>
-				</center>
-			<table> 
-				<!-- BEGIN day_block --> 
-				<tr> 
-					<td colspan="3"><h2>{DATE}</h2> <span class="header_option">{ADD}</span></td> 
-				</tr> 
-				<!-- BEGIN note_block --> 
-				<tr> 
-					<td class="indent calendarTime"><span style="color:{PRIORITY};">{TIME}</span></td> 
-					<td><span style="color:{PRIORITY};">{NOTE}</span></td> 
-					<td style="text-align:right;vertical-align:top;">{MODIFY}</td> 
-				</tr> 
-				<!-- END note_block --> 
-				<!-- END day_block --> 
-			</table> 
-			<!-- #EndEditable --> </div>
+			</table> <!-- #EndEditable --> </div>
 		<div id="footer">
 			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
 			<p><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p>
@@ -331,5 +161,4 @@
 	</div>
 </div>
 </body>
-<!-- #EndTemplate --></html>
->>>>>>> .r67
+<!-- InstanceEnd --></html>
