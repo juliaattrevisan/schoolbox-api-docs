@@ -26,12 +26,12 @@ h1, h2 {
 	}
 
 h1 {
-	font-size:120%;
+	font-size:130%;
 	border-bottom:2px solid #B51C21;
 	}
 	
 h2 {
-	font-size:110%;
+	font-size:120%;
 	padding:4px 0;
 	border-bottom:2px solid #002452;
 	}
@@ -105,7 +105,6 @@ acronym, dfn, abbr {
 /*--------------------------------------------------------------------------------------*/
 /* HORIZONTAL DROP DOWN MENU STYLES */
 /*--------------------------------------------------------------------------------------*/
-
 /* FIRST LEVEL MENU UNORDERED LIST */
 #left ul {
 	margin:0 0 10px 0;
@@ -148,8 +147,12 @@ acronym, dfn, abbr {
 * html #left ul li a {height:1%;}
 /* End */
 
-#left ul li a:hover {background:#0055AD;color:#fff;} /* Hover Styles */
-#left li ul li a:hover {background:#0055AD;color:#fff;}
+ /* Hover Styles */
+#left ul li a:hover, #left li ul li a:hover {
+	background:#0055AD;
+	color:#fff;
+	}
+
 /* SECOND LEVEL LIST */
 #left li ul li { 
 	border-bottom:1px solid #0055AD;
@@ -444,7 +447,7 @@ a img {
 /*--------------------------------------------------------------------------------------*/
 form.standard {
 	padding:4px;
-	background:#ccc;
+	background:transparent;
 	}
 form.standard em {
 	font-size:70%;
@@ -518,10 +521,13 @@ form.standard em {
 	padding:0;
 	}	
 #content_text table.calendarTable {
-	width:400px;
+	width:280px;
 	text-align:center;
 	border:2px solid #00458C;
 	margin:10px 0 0 0;
+	}
+#content_text table.calendarTable td {
+	width:40px;
 	}
 #content_text .calendarTable select {
 	font:bold 70% /1em Verdana, arial, sans-serif, serif;

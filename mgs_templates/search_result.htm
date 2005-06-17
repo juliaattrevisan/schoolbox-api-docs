@@ -3,7 +3,7 @@
 <!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
 <!--  Visit us at www.lektec.com.au -->
 <head>
-<!-- #BeginEditable "doctitle" --> 
+<!-- #BeginEditable "doctitle" -->
 <title>{TITLE}</title>
 <!-- #EndEditable -->
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -29,7 +29,7 @@
 		<div class="sideWrap">
 			<h3>&#187;&nbsp;SEARCH</h3>
 			<div class="whiteWrap">
-				<form class="standardForm" id="searchForm" action="/search.php" method="post">
+				<form class="standardForm" id="searchForm" action="/search.php" method="get">
 					<p style="margin:0;">
 						<input class="short" type="text" name="keyword" />
 						<select class="short" name="where">
@@ -79,95 +79,73 @@
 		</div>
 	</div>
 	<!-- end left -->
-	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" -->			<div id="topNav">
-				<ul>
-					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
-					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
-					<!-- BEGIN webmail_tab --> 
-					<li class="norm"><a class="norm" href="/mail.php" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
-					<!-- END webmail_tab -->
-					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
-					<!-- BEGIN timetable_tab -->
-					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
-					<!-- END timetable_tab -->
-					<li class="navthis right"><a class="navthis right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
-				</ul>
-			</div>
-<!-- #EndLibraryItem --><!-- #EndEditable -->
+	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" --> 
+	<div id="topNav"> 
+		<ul> 
+			<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li> 
+			<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li> 
+			<!-- BEGIN webmail_tab --> 
+			<li class="norm"><a class="norm" href="/mail.php" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li> 
+			<!-- END webmail_tab --> 
+			<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li> 
+			<!-- BEGIN timetable_tab --> 
+			<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li> 
+			<!-- END timetable_tab --> 
+			<li class="navthis right"><a class="navthis right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li> 
+		</ul> 
+	</div> 
+	<!-- #EndLibraryItem --><!-- #EndEditable -->
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
-            <h1>Search Results</h1>
+			<h1>Search Results</h1> 
 			<br />
-            <table width="90%" cellpadding="0" cellspacing="0">
-              <tr>
-                <td valign="top" align="left"><table cellpadding="0" cellspacing="0" width="100%">
-                    <!-- BEGIN cat_listing -->
-                    <tr>
-                      <td width="20"><img src="/images/mime/folder_blue_full.png" width="30" height="30" border="0" /></td>
-                      <td >{CAT_DESCRIPTION}</td>
-                    </tr>
-                    <!-- END cat_listing -->
-                  </table>
-                    <br />
-                </td>
-              </tr>
-            </table>
-            <table width="90%" cellpadding="0" cellspacing="0">
-              <tr>
-                <td valign="top" align="left"><!-- BEGIN file_listing -->
-                    <table cellpadding="2" cellspacing="0" width="100%">
-                      <tr>
-                        <td  width="25"><img src="{FILE_IMAGE}" width="25" height="27" border="0" /></td>
-                        <td valign="bottom">{FILE_DESCRIPTION}</td>
-                        <td align="right" ><i>{SIZE}</i></td>
-                      </tr>
-                      <!-- BEGIN file_desc -->
-                      <tr>
-                        <td width="25">&nbsp;</td>
-                        <td colspan="2">{COMMENT}</td>
-                      </tr>
-                      <tr>
-                        <td width="25">&nbsp;</td>
-                        <td colspan="2"><i><font color="#666666">Submitted by
-                              {OWNER} on {DATETIME} to <a href="/browse.php?category={CATEGORY_ID}">{CATEGORY_NAME}</a></font></i></td>
-                      </tr>
-                      <!-- END file_desc -->
-                    </table>
-                    <br />
-                    <!-- END file_listing -->
-                    <br />
-                </td>
-              </tr>
-            </table>
-            <table width="90%" border="0" cellspacing="0" cellpadding="0">
-              <tr>
-                <td><!-- BEGIN link_listing -->
-                    <table cellpadding="2" cellspacing="0" width="100%">
-                      <tr>
-                        <td width="25"><img src="/images/mime/http-url.png" width="25" height="27" border="0" /></td>
-                        <td valign="bottom">{LINK_HTML}</td>
-                      </tr>
-                      <!-- BEGIN link_desc -->
-                      <tr>
-                        <td width="25">&nbsp;</td>
-                        <td colspan="2">{COMMENT}</td>
-                      </tr>
-                      <tr>
-                        <td width="25">&nbsp;</td>
-                        <td colspan="2"><i><font color="#666666">Submitted by
-                              {OWNER} on {DATETIME} to <a href="/browse.php?category={CATEGORY_ID}">{CATEGORY_NAME}</a></font></i></td>
-                      </tr>
-                      <!-- END link_desc -->
-                    </table>
-                    <br />
-                    <!-- END link_listing -->
-                </td>
-              </tr>
-            </table>
-    <!-- #EndEditable --> </div>
+			<table> 
+				<!-- BEGIN cat_listing --> 
+				<tr> 
+					<td style="vertical-align:top;"><img style="float:left;" src="/images/mime/folder_blue_full.png" width="20" height="20" />&nbsp;{CAT_DESCRIPTION}</td> 
+				</tr> 
+				<!-- END cat_listing --> 
+			</table> 
+			<table> 
+				<!-- BEGIN file_listing --> 
+				<tr><td><p style="margin:5px 0 0 0;"></p></td></tr>
+				<tr> 
+					<td rowspan="2" style="width:25px;"><img src="{FILE_IMAGE}" alt="File Picture" /></td>
+					<td>&nbsp;<strong>{FILE_DESCRIPTION}</strong></td> 
+					<td style="text-align:right;"><em>{SIZE}</em></td> 
+				</tr> 
+				<!-- BEGIN file_desc --> 
+				<tr> 
+					<td>&nbsp;{COMMENT}</td> 
+				</tr> 
+				<tr> 
+					<td colspan="3" style="border-bottom:1px solid #ccc;"><span class="element_footer">Submitted by {OWNER} on {DATETIME} to <a href="/browse.php?category={CATEGORY_ID}">{CATEGORY_NAME}</a></span></td> 
+				</tr> 
+				<!-- END file_desc --> 
+				<!-- END file_listing --> 
+			</table> 
+			<table>
+			<!-- BEGIN link_listing --> 
+				<tr><td><p style="margin:5px 0 0 0;"></p></td></tr>
+				<tr> 
+					<td rowspan="2" style="width:25px;"><img src="/images/mime/http-url.png" width="25" height="27" border="0" /></td> 
+					<td>&nbsp;{LINK_HTML}</td>
+				</tr> 
+				<!-- BEGIN link_desc --> 
+				<tr> 
+					<td colspan="2">&nbsp;{COMMENT}</td> 
+				</tr> 
+				<tr> 
+					<td colspan="2" style="border-bottom:1px solid #ccc;"><span class="element_footer">Submitted by {OWNER} on {DATETIME} to <a href="/browse.php?category={CATEGORY_ID}">{CATEGORY_NAME}</a></span></td> 
+				</tr>
+				<!-- END link_desc -->
+				<!-- END link_listing --> 
+			</table> 
+			
+			<!-- #EndEditable --> </div>
 		<div id="footer">
 			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
-			<p><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p>
+			<p><a href="/policy.htm">Guidelines of Use and Privacy Policy</a></p>
 			<p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
 		</div>
 	</div>
