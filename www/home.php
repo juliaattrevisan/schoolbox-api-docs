@@ -16,8 +16,6 @@ require_once("calendar/calendar.php");
 
 class OutPut
 {
-
-
 	function OutPut()
 	{
 		$this->t_body = new Template(TPL_directory);
@@ -33,8 +31,32 @@ class OutPut
 		$this->db = new dbManager;
 		
 		$this->setGreeting();
+		
+		//if staff get all news.. 
+		if(isStaff($_SESSION['gid']))
+			$topic = 0;
+		else //student only sees news for everyone
+			$topic = 2;
+		
+		$myNews = new news($topic);
+		//output headlines
+		$this->setStories($myNews->getHeadlines());
+		
+		//if user has timetable show it on the homepage
+		if($_SESSION['timetable'])
+			$this->setTimetable();
+		else
+			$this->t_body->set_var("timetable_block", "");
 
-		//$this->set_var("DATE", date("F j, Y, g:i a"));
+		//if weather module enabled output it
+		if(WEATHER_enable)
+			$this->setWeather();
+		else
+			$this->t_body->set_var("weather_block", "");
+		
+		//output calendar
+		$this->setDayEvents();
+		
 		include("include/page.php");
 	}
 
@@ -81,49 +103,47 @@ class OutPut
 
 	function setDayEvents()
 	{
-		
 		$cal = new Calendar;
-
+		
 		$currDay = date("d");
 		$currMonth = date("m");
 		$currYear = date("Y");
-
-		$currentDay = mktime();
 		
-		$this->t_body->set_var("DATE", date("l jS",$currentDay));
-
-
-                //first lets output submission events
-                $sub = $cal->getSubmissionEvents($currDay, $currMonth, $currYear);
-                for($i=0; $sub['category'][$i]; $i++)
-                {
+		$currentDay = mktime();
+		$this->t_body->set_var("DATE", date("l jS F",$currentDay));
+		
+		//first lets output submission events
+		$sub = $cal->getSubmissionEvents($currDay, $currMonth, $currYear);
+		for($i=0; $sub['category'][$i]; $i++)
+		{
 			$this->t_body->set_var("TIME", "");
 			$this->t_body->set_var("NOTE", "*DUE WORK* ".$sub['category'][$i]." - ".$sub['name'][$i]); 
 			$this->t_body->parse("note_listing","note_block", true);
-                        $subout = 1;
-                }
-
+			$subout = 1;
+		}
+		
 		$event = $cal->getAllDayEvents($currDay, $currMonth, $currYear);
-
-                if(count($event['note']) < 1 && !$subout) {$this->t_body->set_var("note_listing", "");}
-                else
-                {
-                        for($i=0; isset($event['note'][$i]); $i++)
-                        {
+		
+		if(count($event['note']) < 1 && !$subout) 
+		{
+			$this->t_body->set_var("note_listing", "");
+		}
+		else
+		{
+			for($i=0; isset($event['note'][$i]); $i++)
+			{
 				if($event['startTime'][$i] == "0:00" || strtolower($event['startTime'][$i]) == "12:00am" || strtolower($event['startTime'][$i]) == "12:00 am")
-                                        $this->t_body->set_var("TIME", "");
-                                else if($event['endTime'][$i] == "0:00" || strtolower($event['endTime'][$i]) == "12:00am" || strtolower($event['endTime'][$i]) == "12:00 am")
-                                        $this->t_body->set_var("TIME", $event['startTime'][$i]);
-                                else
-                                        $this->t_body->set_var("TIME", $event['startTime'][$i]." - 
-							".$event['endTime'][$i]);
-                
-				$this->t_body->set_var("NOTE", 
-				"<font color=".$cal->displayColour($event['priority'][$i]).">".$event['note'][$i]."</font>");
+						$this->t_body->set_var("TIME", "");
+				else if($event['endTime'][$i] == "0:00" || strtolower($event['endTime'][$i]) == "12:00am" || strtolower($event['endTime'][$i]) == "12:00 am")
+						$this->t_body->set_var("TIME", $event['startTime'][$i]);
+				else
+						$this->t_body->set_var("TIME", $event['startTime'][$i]." - ".$event['endTime'][$i]);
+				
+				$this->t_body->set_var("NOTE", "<font color=".$cal->displayColour($event['priority'][$i]).">".$event['note'][$i]."</font>");
 				$this->t_body->parse("note_listing","note_block", true);
 
 			}
-                }
+		}
 	}
 
 	
@@ -163,40 +183,40 @@ class OutPut
 		$timetabledef = unserialize(TIMETABLE_definition);
 
 		if(isStudent($_SESSION['gid']))
-                {
-                        $query ="SELECT Timetable.Room, SubjectClasses.Description,
-                                Timetable.PeriodNumber, Timetable.ClassCode
-                                FROM SynergyOne.dbo.StudentClasses StudentClasses,
-                                SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable
-                                Timetable
-                                WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
-                                Timetable.ClassCode = SubjectClasses.ClassCode AND Timetable.FileSemester =
-                                SubjectClasses.FileSemester AND Timetable.FileType = SubjectClasses.FileType
-                                AND Timetable.FileYear = SubjectClasses.FileYear AND
-                                StudentClasses.FileSemester = SubjectClasses.FileSemester AND
-                                StudentClasses.FileSemester = Timetable.FileSemester AND
-                                StudentClasses.FileType = SubjectClasses.FileType AND
-                                StudentClasses.FileType = Timetable.FileType AND StudentClasses.FileYear =
-                                SubjectClasses.FileYear AND StudentClasses.FileYear = Timetable.FileYear AND
-                                StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
-                                StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-                                ((Timetable.FileSemester=".$_SESSION['FileSemester'].") AND (Timetable.FileYear='$year') AND
-                                (StudentClasses.ID='$synergy_id')) AND Timetable.DayNumber = '$daynumber'
-                                ORDER BY Timetable.PeriodNumber";
+		{
+			$query ="SELECT Timetable.Room, SubjectClasses.Description,
+				Timetable.PeriodNumber, Timetable.ClassCode
+				FROM SynergyOne.dbo.StudentClasses StudentClasses,
+				SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable
+				Timetable
+				WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
+				Timetable.ClassCode = SubjectClasses.ClassCode AND Timetable.FileSemester =
+				SubjectClasses.FileSemester AND Timetable.FileType = SubjectClasses.FileType
+				AND Timetable.FileYear = SubjectClasses.FileYear AND
+				StudentClasses.FileSemester = SubjectClasses.FileSemester AND
+				StudentClasses.FileSemester = Timetable.FileSemester AND
+				StudentClasses.FileType = SubjectClasses.FileType AND
+				StudentClasses.FileType = Timetable.FileType AND StudentClasses.FileYear =
+				SubjectClasses.FileYear AND StudentClasses.FileYear = Timetable.FileYear AND
+				StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
+				StudentClasses.ClassCode = SubjectClasses.ClassCode AND
+				((Timetable.FileSemester=".$_SESSION['FileSemester'].") AND (Timetable.FileYear='$year') AND
+				(StudentClasses.ID='$synergy_id')) AND Timetable.DayNumber = '$daynumber'
+				ORDER BY Timetable.PeriodNumber";
 		}
-                else
-                {
+		else
+		{
 			$query = "SELECT Timetable.Room, SubjectClasses.Description,
-                                Timetable.PeriodNumber, Timetable.ClassCode
-                                FROM SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable
-                                Timetable
-                                WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
-                                Timetable.ClassCode = SubjectClasses.ClassCode AND Timetable.FileSemester =
-                                SubjectClasses.FileSemester AND Timetable.FileType = SubjectClasses.FileType
-                                AND Timetable.FileYear = SubjectClasses.FileYear AND
-                                ((SubjectClasses.FileSemester=".$_SESSION['FileSemester'].") AND (SubjectClasses.FileYear='$year') AND
-                                (Timetable.StaffID='$synergy_id')) AND Timetable.DayNumber = '$daynumber'
-                                ORDER BY Timetable.PeriodNumber";
+				Timetable.PeriodNumber, Timetable.ClassCode
+				FROM SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable
+				Timetable
+				WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
+				Timetable.ClassCode = SubjectClasses.ClassCode AND Timetable.FileSemester =
+				SubjectClasses.FileSemester AND Timetable.FileType = SubjectClasses.FileType
+				AND Timetable.FileYear = SubjectClasses.FileYear AND
+				((SubjectClasses.FileSemester=".$_SESSION['FileSemester'].") AND (SubjectClasses.FileYear='$year') AND
+				(Timetable.StaffID='$synergy_id')) AND Timetable.DayNumber = '$daynumber'
+				ORDER BY Timetable.PeriodNumber";
 		}
 		
 		$result = mssql_query($query, $db);
@@ -209,7 +229,7 @@ class OutPut
 
 		//for each period set result
 		for($y=1; $y <= $periods; $y++)
-                {
+		{
 			if($desc[2] == ($y-1))
 			{
 				if ($result != 1)
@@ -238,8 +258,8 @@ class OutPut
 					if(isStaff($_SESSION['gid']) && SITE_location == 'mgs')
 						$period .= "<a href=\"/absentees/attendances.php?code=".$desc[3]."\">attendances</a><br>";
 					$code = "onClick=\"window.location='/homepage.php?code=".urlencode($desc[3])."'\"";
-             			}		
- 				$desc = mssql_fetch_array($result);
+						}		
+				$desc = mssql_fetch_array($result);
 			}
 			$this->set_var("CODE", $code);
 			$this->set_var("PERIOD", $period);
@@ -274,33 +294,5 @@ class OutPut
 }
 
 $myPage = new OutPut();
-
-//if staff get all news.. 
-if(isStaff($_SESSION['gid']))
-        $topic = 0;
-else //student only sees news for everyone
-        $topic = 2;
-
-$myNews = new news($topic);
-//output headlines
-$myPage->setStories($myNews->getHeadlines());
-
-//if user has timetable show it on the homepage
-if($_SESSION['timetable'])
-	$myPage->setTimetable();
-else
-	$myPage->t_body->set_var("timetable_block", "");
-
-
-
-//if weather module enabled output it
-if(WEATHER_enable)
-	$myPage->setWeather();
-else
-	$myPage->t_body->set_var("weather_block", "");
-
-//output calendar
-$myPage->setDayEvents();
-
 $myPage->showPage();
 ?>
