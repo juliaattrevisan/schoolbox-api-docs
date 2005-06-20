@@ -36,10 +36,10 @@
 		</form> 
 	</div> 
 	<div id="left"> 
-		<h3>&#187;&nbsp;GOTO</h3> 
+		<h3>&#187;&nbsp;Go To</h3> 
 		{MCSSMENU}
 		<!-- BEGIN msubject --> 
-		<h3>&#187;&nbsp;MY SUBJECTS</h3> 
+		<h3>&#187;&nbsp;My Subjects</h3> 
 		<ul> 
 			<!-- BEGIN msubject_block --> 
 			<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li> 
@@ -47,14 +47,14 @@
 		</ul> 
 		<!-- END msubject --> 
 		<!-- BEGIN mgroup --> 
-		<h3>&#187;&nbsp;MY GROUPS</h3> 
+		<h3>&#187;&nbsp;My Groups</h3> 
 		<ul> 
 			<!-- BEGIN mgroup_block --> 
 			<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li> 
 			<!-- END mgroup_block --> 
 		</ul> 
 		<!-- END mgroup --> 
-		<h3>&#187;&nbsp;MY LINKS</h3> 
+		<h3>&#187;&nbsp;My Links</h3> 
 		<ul> 
 			<!-- BEGIN mlink_block --> 
 			<li>{MLINK}</li> 

@@ -1,358 +1,161 @@
-<html><!-- #BeginTemplate "/Templates/wenona_main.dwt" --><!-- DW6 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
 <head>
 <!-- #BeginEditable "doctitle" --> 
 <title>{TITLE}</title>
-<!-- #EndEditable --> 
-<link rel="stylesheet" href="/global.css" type="text/css">
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="MGS"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<!-- #BeginEditable "scripts" -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
+<script type="text/javascript" src="/std_scripts.js"></script>
+<script type="text/javascript" src="/tableruler.js"></script>
+<script type="text/javascript">
+	window.onload=function(){tableruler();} 
+</script>
+<!-- #EndEditable -->
+<script type="text/javascript" src="/drop_down.js"></script>
 </head>
-
-<body>
-  <script language="JavaScript1.2" type="text/javascript" src="/coolmenus4.js"></script>
-  <script language="JavaScript1.2" type="text/javascript" src="/menusettings.js" ></script>
-  <script language="JavaScript1.2" type="text/javascript">{DROPDOWNMENU}</script>
-<form name="search" method="GET" class="nospace" action="/search.php">
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
-  <tr> 
-    <td width="150" align="center" valign="bottom" class="blueBG"><img src="/images/header1.gif" width="133" height="60"></td>
-    <td valign="bottom" class="blueBG"><br>
-	  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-        <tr>
-          <td class="blueBG" valign="bottom">&nbsp;</td>
-          <td align="right" valign="bottom"><input class="tab_unselected" type="text" name="keyword" /></td>
-        </tr>
-        <tr> 
-          <td class="blueBG" valign="bottom"><!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Calendar_Active.lbi" --><table border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td align="right" valign="bottom" height="5" width="7"><img src="/images/bluepixel.gif" width="2" height="2"></td>
-    <td valign="bottom" height="5" width="70"><img src="/images/bluepixel.gif" width="70" height="2"></td>
-    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2	"></td>
-    <td valign="bottom" height="5" width="70"><img src="/images/bluepixel.gif" width="70" height="2"></td>
-    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
-    <!-- BEGIN webmail_toptab -->
-    <td valign="bottom" height="5" width="83"><img src="/images/bluepixel.gif" width="83" height="2"></td>
-    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
-    <!-- END webmail_toptab -->
-    <td valign="bottom" height="5" width="85"><img src="/images/bluepixel.gif" width="85" height="2"></td>
-    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
-    <!-- BEGIN timetable_toptab -->
-    <td valign="bottom" height="5" width="90"><img src="/images/bluepixel.gif" width="90" height="2"></td>
-    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
-    <!-- END timetable_toptab -->
-    <td valign="bottom" height="5" width="90"><img src="/images/bluepixel.gif" width="90" height="2"></td>
-    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
-    <td valign="bottom" height="5" width="75"><img src="/images/bluepixel.gif" width="75" height="2"></td>
-    <td valign="bottom" height="5" width="1"><img src="/images/bluepixel.gif" width="1" height="2"></td>
-    <td valign="bottom" height="5" width="75"><img src="/images/bluepixel.gif" width="75" height="2"></td>
-    <td valign="bottom" height="5" width="7"><img src="/images/bluepixel.gif" width="2" height="2"></td>
-  </tr>
-  <tr>
-    <td width="7" height="20"><img src="/images/tab_bluelbigleftcorner.gif" width="7" height="20"></td>
-    <td width="70" height="20" background="/images/lightbluepixel.gif" bgcolor="#9EC6D9"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/home.php">Main</a></b></td>
-    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
-    <td height="20" background="/images/lightbluepixel.gif" bgcolor="#9EC6D9"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/news.php">News</a></b></td>
-    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
-    <!-- BEGIN webmail_tab -->
-    <td height="20" background="/images/lightbluepixel.gif" bgcolor="#9EC6D9"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="http://webmail.wenona.nsw.edu.au/servlet/webacc" target="_blank">Webmail</a></b></td>
-    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
-    <!-- END webmail_tab -->
-    <td height="20" background="/images/redpixel.gif"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/calendar/viewCalendar.php" class="one">Calendar</a></b></td>
-    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
-    <!-- BEGIN timetable_tab -->
-    <td height="20" background="/images/lightbluepixel.gif" bgcolor="#9EC6D9"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/timetable.php">Timetable</a></b></td>
-    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
-    <!-- END timetable_tab -->
-    <td height="20" background="/images/lightbluepixel.gif"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="/browse.php">Resources</a></b></td>
-    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
-    <td height="20" background="/images/lightbluepixel.gif"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="http://intranet.wenona.nsw.edu.au/index.asp?strEncrypted={ENC_LOGIN}">Intranet</a></b></td>
-    <td bgcolor="#002750" width="1" height="20"><img src="/images/bluepixel.gif" width="1" height="20"></td>
-    <td height="20" background="/images/lightbluepixel.gif"><img src="/images/navbar_tab.gif" width="16" height="15"><b><a href="http://intranet.wenona.nsw.edu.au/MyFilePortal/index.asp?strEncrypted={ENC_LOGIN}">My Files</a></b></td>
-    <td width="7" height="20"><img src="/images/tab_bluelbigrightcorner.gif" width="7" height="20"></td>
-  </tr>
-</table>
-<!-- #EndLibraryItem --><!-- #EndEditable --></td>
-          <td align="right" valign="top"> 
-              <select  class="tab_unselected" name="where">
-                <option value="0" selected>portal</option>
-                <option value="1">google</option>
-                <option value="2">yahoo</option>
-              </select>
-              <input type="submit" name="Submit" value="Search">
-            </td>
-        </tr>
-    </table></td>
-    <td width="50" valign="bottom" class="blueBG">&nbsp;</td>
-  </tr>
-</table>
-</form>
-<table width="100%" height="93%" border="0" cellpadding="0" cellspacing="0">
-  <tr valign="top"> 
-    <td height="25" align="center" class="blueBG"><img src="/images/header2.gif" width="133" height="25"></td>
-    <td width="20" height="25" background="/images/redpixelcnrbg.gif">&nbsp;</td>
-    <td height="25" background="/images/redpixelbg2.gif">&nbsp;</td>
-    <td width="50" height="25" background="/images/redpixelbg2.gif">&nbsp;</td>
-  </tr>
-  <tr> 
-    <td width="150" valign="top" class="blueBG">
-<table border="0" cellspacing="0" cellpadding="0">
-        <tr> 
-          <td><img src="/images/sidenav-goto.gif" width="150" height="15"></td>
-        </tr>
-        <tr> 
-          <td height="2" class="blueBG"> 
-		  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td width="12"><img src="/images/pix.gif" width="15" height="5"></td>
-                <td width="121" height="{MJSHEIGHT}" class="blueBG">&nbsp;</td>
-              </tr>
-            </table></td>
-        </tr>
-        <tr> 
-          <td class="blueBG">&nbsp;</td>
-        </tr>
-        <!-- BEGIN msubject -->
-        <tr> 
-          <td> <p><img src="/images/sidenav-mysubjects.gif" width="150" height="15"></p></td>
-        </tr>
-        <tr> 
-          <td class="blueBG"> <table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-              </tr>
-              <!-- BEGIN msubject_block -->
-              <tr> 
-                <td width="12"><img src="/images/pix.gif" width="15" height="5"></td>
-                <td><img src="/images/whitearrow.gif" width="6" height="9"></td>
-                <td width="121"><a href="/{MLINKSUB}" class="one">{MSUBJECT}</a></td>
-              </tr>
-              <!-- END msubject_block -->
-            </table></td>
-        </tr>
-        <tr> 
-          <td class="blueBG">&nbsp;</td>
-        </tr>
-        <!-- END msubject -->
-        <!-- BEGIN mgroup -->
-        <tr> 
-          <td> <p><img src="/images/sidenav-mygroups.gif" width="150" height="15"></p></td>
-        </tr>
-        <tr> 
-          <td class="blueBG"> <table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-              </tr>
-              <!-- BEGIN mgroup_block -->
-              <tr> 
-                <td width="12"><img src="/images/pix.gif" width="15" height="5"></td>
-                <td><img src="/images/whitearrow.gif" width="6" height="9"></td>
-                <td width="121"><a href="/{MGLINK}" class="one">{MGNAME}</a></td>
-              </tr>
-              <!-- END mgroup_block -->
-            </table></td>
-        </tr>
-        <tr> 
-          <td>&nbsp;</td>
-        </tr>
-        <!-- END mgroup -->
-        <tr> 
-          <td><img src="/images/sidenav-mylinks.gif" width="150" height="15"></td>
-        </tr>
-        <tr> 
-          <td class="blueBG"> <table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-              </tr>
-              <!-- BEGIN mlink_block -->
-              <tr> 
-                <td width="12"><img src="/images/pix.gif" width="15" height="5"></td>
-                <td><img src="/images/whitearrow.gif" width="6" height="9"></td>
-                <td width="121" class="blueBG">{MLINK}</td>
-              </tr>
-              <!-- END mlink_block -->
-              <tr> 
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-              </tr>
-              <tr> 
-                <td><img src="/images/pix.gif" width="15" height="5"></td>
-                <td><img src="/images/whitearrow.gif" width="6" height="9"></td>
-                <td><a href="/editLinks.php" class="one">ADD LINK</a></td>
-              </tr>
-            </table></td>
-        </tr>
-        <tr> 
-          <td class="blueBG">&nbsp;</td>
-        </tr>
-      </table>
-      
-    </td>
-    <td width="20" background="/images/redpixelbg.gif">&nbsp;</td>
-    <td valign="top"><!-- #BeginEditable "main" --> 
-            <table width="98%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td class="itemHeader">{MONTH} - {YEAR}<br><img src="/images/redpixel.gif" width="100%" height="2"></td>
-              	<td class="itemHeader" align="right"><a href="{VIEWLINK}">View by Month</a><br><img src="/images/redpixel.gif" width="100%" height="2"></td>
-			  </tr>
-      </table>
-            <br>
-            <table width="98%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td align="left"><a href="{BACK}">&lt;&lt;</a></td>
-                <td align="right"><a href="{FORWARD}">&gt;&gt;</a></td>
-              </tr>
-              <tr> 
-                <td>&nbsp;</td>
-                <td align="right">&nbsp;</td>
-              </tr>
-              <tr> 
-                <td><b>{DATE1}</b></td>
-                <td align="right">{ADD1}</td>
-              </tr>
-              <tr>
-                <td height="5" colspan="2"><img src="/images/bluepixel.gif" width="100%" height="2"></td>
-                </tr>
-            </table>
-                  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <!-- BEGIN note_block1 -->
-                    <tr> 
-                      <td width="15%">{TIME}</td>
-                      <td>{NOTE}</td>
-                      <td width="10%" align="right">{MODIFY}</td>
-                    </tr>
-                    <!-- END note_block1 -->
-                  </table>
-                  <br> <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <tr> 
-                      <td><b>{DATE2}</b></td>
-                      <td align="right">{ADD2}</td>
-                    </tr>
-					 <tr>
-                <td height="5" colspan="2"><img src="/images/bluepixel.gif" width="100%" height="2"></td>
-                </tr>
-                  </table>
-                  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <!-- BEGIN note_block2 -->
-                    <tr> 
-                      <td width="15%">{TIME}</td>
-                      <td>{NOTE}</td>
-                      <td width="10%" align="right">{MODIFY}</td>
-                    </tr>
-                    <!-- END note_block2 -->
-                  </table>
-                  <br> <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <tr> 
-                      <td><b>{DATE3}</b></td>
-                      <td align="right">{ADD3}</td>
-                    </tr>
-					              <tr>
-                <td height="5" colspan="2"><img src="/images/bluepixel.gif" width="100%" height="2"></td>
-                </tr>
-                  </table>
-                  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <!-- BEGIN note_block3 -->
-                    <tr> 
-                      <td width="15%">{TIME}</td>
-                      <td>{NOTE}</td>
-                      <td width="10%" align="right">{MODIFY}</td>
-                    </tr>
-                    <!-- END note_block3 -->
-                  </table>
-                  <br> <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <tr> 
-                      <td><b>{DATE4}</b></td>
-                      <td align="right">{ADD4}</td>
-                    </tr>             
-					<tr>
-                <td height="5" colspan="2"><img src="/images/bluepixel.gif" width="100%" height="2"></td>
-                </tr>
-                  </table>
-                  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <!-- BEGIN note_block4 -->
-                    <tr> 
-                      <td width="15%">{TIME}</td>
-                      <td>{NOTE}</td>
-                      <td width="10%" align="right">{MODIFY}</td>
-                    </tr>
-                    <!-- END note_block4 -->
-                  </table>
-                  <br> <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <tr> 
-                      <td><b>{DATE5}</b></td>
-                      <td align="right">{ADD5}</td>
-                    </tr>
-					              <tr>
-                <td height="5" colspan="2"><img src="/images/bluepixel.gif" width="100%" height="2"></td>
-                </tr>
-                  </table>
-                  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <!-- BEGIN note_block5 -->
-                    <tr> 
-                      <td width="15%">{TIME}</td>
-                      <td>{NOTE}</td>
-                      <td width="10%" align="right">{MODIFY}</td>
-                    </tr>
-                    <!-- END note_block5 -->
-                  </table>
-                  <br> <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <tr> 
-                      <td><b>{DATE6}</b></td>
-                      <td align="right">{ADD6}</td>
-                    </tr>
-					              <tr>
-                <td height="5" colspan="2"><img src="/images/bluepixel.gif" width="100%" height="2"></td>
-                </tr>
-                  </table>
-                  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <!-- BEGIN note_block6 -->
-                    <tr> 
-                      <td width="15%">{TIME}</td>
-                      <td>{NOTE}</td>
-                      <td width="10%" align="right">{MODIFY}</td>
-                    </tr>
-                    <!-- END note_block6 -->
-                  </table>
-                  <br> <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <tr> 
-                      <td><b>{DATE7}</b></td>
-                      <td align="right">{ADD7}</td>
-                    </tr>
-					              <tr>
-                <td height="5" colspan="2"><img src="/images/bluepixel.gif" width="100%" height="2"></td>
-                </tr>
-                  </table>
-                  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <!-- BEGIN note_block7 -->
-                    <tr> 
-                      <td width="15%">{TIME}</td>
-                      <td>{NOTE}</td>
-                      <td width="10%" align="right">{MODIFY}</td>
-                    </tr>
-                    <!-- END note_block7 -->
-                  </table></td>
-              </tr>
-      </table>
-            
-      <p></p>
-      <p>&nbsp;</p>
-      <!-- #EndEditable --></td>
-    <td>&nbsp;</td>
-  </tr>
-  <tr> 
-    <td width="150" class="blueBG">&nbsp;</td>
-    <td width="20" background="/images/redpixelbg.gif">&nbsp;</td>
-    <td align="right"><b>Copyright 2005 Wenona</b><br>
-      Guidelines of Use and Privacy Policy</td>
-    <td>&nbsp;</td>
-  </tr>
-</table>
-
+<body> 
+<div id="outerWrap"> 
+	<div id="header"></div> 
+	<div id="searchBox"> 
+		<form class="standardForm" id="searchForm" action="/search.php" method="post"> 
+			<p style="margin:0;"> 
+				<input class="short" type="text" name="keyword" /> 
+				<select class="short" name="where"> 
+					<option value="0" selected="selected">portal</option> 
+					<option value="1">google</option> 
+					<option value="2">yahoo</option> 
+				</select> 
+				<input class="img" type="image" src="/images/searchbutton.gif" alt="Search" name="Submit" /> 
+			</p> 
+		</form> 
+	</div> 
+	<div id="left"> 
+		<h3>&#187;&nbsp;Go To</h3> 
+		{MCSSMENU}
+		<!-- BEGIN msubject --> 
+		<h3>&#187;&nbsp;My Subjects</h3> 
+		<ul> 
+			<!-- BEGIN msubject_block --> 
+			<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li> 
+			<!-- END msubject_block --> 
+		</ul> 
+		<!-- END msubject --> 
+		<!-- BEGIN mgroup --> 
+		<h3>&#187;&nbsp;My Groups</h3> 
+		<ul> 
+			<!-- BEGIN mgroup_block --> 
+			<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li> 
+			<!-- END mgroup_block --> 
+		</ul> 
+		<!-- END mgroup --> 
+		<h3>&#187;&nbsp;My Links</h3> 
+		<ul> 
+			<!-- BEGIN mlink_block --> 
+			<li>{MLINK}</li> 
+			<!-- END mlink_block --> 
+			<li><a href="/editLinks.php">ADD LINK</a></li> 
+		</ul> 
+		<div id="footer"> 
+			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.wenona.nsw.edu.au" title="Wenona">Wenona</a></strong></p> 
+			<p class="small"><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p> 
+			<p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p> 
+		</div> 
+	</div> 
+	<!-- end left --> 
+	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Calendar_Active.lbi" -->			<div id="topNav">
+				<ul>
+					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+					<!-- BEGIN webmail_tab --> 
+					<li class="norm"><a class="norm" href="http://webmail.wenona.nsw.edu.au/servlet/webacc" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+					<!-- END webmail_tab -->
+					<li class="navthis norm"><a class="navthis norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+					<!-- BEGIN timetable_tab -->
+					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+					<!-- END timetable_tab -->
+					<li class="norm"><a class="norm" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+					<li class="norm"><a class="norm" href="http://intranet.wenona.nsw.edu.au/index.asp?strEncrypted={ENC_LOGIN}" title="Access the school intranet" accesskey="i"><em>I</em>ntranet</a></li>
+					<li class="right"><a class="right" href="http://intranet.wenona.nsw.edu.au/MyFilePortal/index.asp?strEncrypted={ENC_LOGIN}" title="Access your H:\ files" accesskey="f">My <em>F</em>iles</a></li>
+					
+				</ul>
+			</div><!-- #EndLibraryItem --><!-- #EndEditable --> 
+	<div id="content"> 
+		<div id="content_text"> <!-- #BeginEditable "main" --> 
+           <h1>{MONTH} - {YEAR}</h1>
+				<center>
+				<table class="calendarTable"> 
+					<tr> 
+						<td><a class="back" href="{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td> 
+						<td colspan="5">
+						<form method="get" action="viewCalendar.php">
+						<input type="hidden" name="Year" value="{YEAR}" />
+						<input type="hidden" name="Day" value="{DAY}" />
+						<select name="Month" onchange="this.form.submit();">
+						<!-- BEGIN month_drop -->
+							<option value="{DROP_MONTH_NUMBER}" {DROP_MONTH_SELECTED}>{DROP_MONTH_NAME}</option>
+						<!-- END month_drop -->
+						</select>
+						</form>
+						</td> 
+						<td><a class="forward" href="{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
+					</tr> 
+					<tr> 
+						<th class="cntr">Sun</th> 
+						<th class="cntr">Mon</th> 
+						<th class="cntr">Tue</th> 
+						<th class="cntr">Wed</th> 
+						<th class="cntr">Thu</th> 
+						<th class="cntr">Fri</th> 
+						<th class="cntr">Sat</th> 
+					</tr> 
+					<!-- BEGIN week_block --> 
+					<tr> 
+						<td class="{MONTABLE_CSS0} cntr" onclick="location.href='{DAYURL0}';">{DAY0}</td> 
+						<td class="{MONTABLE_CSS1} cntr" onclick="location.href='{DAYURL1}';">{DAY1}</td> 
+						<td class="{MONTABLE_CSS2} cntr" onclick="location.href='{DAYURL2}';">{DAY2}</td> 
+						<td class="{MONTABLE_CSS3} cntr" onclick="location.href='{DAYURL3}';">{DAY3}</td> 
+						<td class="{MONTABLE_CSS4} cntr" onclick="location.href='{DAYURL4}';">{DAY4}</td> 
+						<td class="{MONTABLE_CSS5} cntr" onclick="location.href='{DAYURL5}';">{DAY5}</td> 
+						<td class="{MONTABLE_CSS6} cntr" onclick="location.href='{DAYURL6}';">{DAY6}</td> 
+					</tr> 
+					<!-- END week_block --> 
+				</table>
+				</center>
+						<form method="get" action="viewCalendar.php">
+						<select name="campus" onchange="this.form.submit();">
+						<!-- BEGIN campus_drop -->
+							<option value="{DROP_CAMPUS_ID}" {DROP_CAMPUS_SELECTED}>{DROP_CAMPUS_NAME}</option>
+						<!-- END campus_drop -->
+						</select>
+						</form>
+			<table class="ruler"> 
+				<!-- BEGIN day_block -->
+				<thead>
+				<tr> 
+					<td colspan="3"><h2>{DATE}</h2> <span class="header_option">{ADD}</span></td> 
+				</tr>
+				</thead>
+				<tbody>
+				<!-- BEGIN note_block --> 
+				<tr> 
+					<td class="indent calendarTime"><span style="color:{PRIORITY};">{TIME}</span></td> 
+					<td><span style="color:{PRIORITY};">{NOTE}</span></td> 
+					<td style="text-align:right;vertical-align:top;">{MODIFY}</td> 
+				</tr> 
+				<!-- END note_block --> 
+				</tbody>
+				<!-- END day_block --> 
+			</table> 
+      <!-- #EndEditable --> </div> 
+	</div> 
+</div> 
 </body>
 <!-- #EndTemplate --></html>
