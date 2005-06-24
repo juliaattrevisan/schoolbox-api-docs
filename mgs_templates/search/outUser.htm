@@ -97,43 +97,98 @@
 	<!-- #EndLibraryItem --><!-- #EndEditable -->
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" -->
-			<h1>Address Book Details</h1>
-			<table>
-				<tr>
-					<td width="50%"><strong>Name: </strong>{NAME}</td>
-					<td width="50%">{EXT}</td>
-				</tr>
-				<tr>
-					<td>&nbsp;</td>
-					<td>&nbsp;</td>
-				</tr>
-				<tr>
-					<td><strong>Position: </strong>{POSTION}</td>
-					<td><strong>Email: </strong>{EMAIL}</td>
-				</tr>
-				<tr>
-					<td>&nbsp;</td>
-					<td>&nbsp;</td>
-				</tr>
-				<tr>
-					<td>{HOMEPAGE}</td>
-					<td>&nbsp;</td>
-				</tr>
-				<tr>
-					<td>&nbsp;</td>
-					<td>&nbsp;</td>
-				</tr>
-				<tr>
-					<td><strong>{GROUPTITLE}</strong></td>
-					<td>&nbsp;</td>
-				</tr>
-				<!-- BEGIN grouplist -->
-				<tr>
-					<td>&nbsp;</td>
-					<td>{GROUP}</td>
-				</tr>
-				<!-- END grouplist -->
-			</table>
+			<h1>Address Book</h1>
+			<!-- BEGIN portrait -->
+			<img style="float:right;" width="167" height="251" src="portrait.php?id={SYNERGY_ID}" />
+			<!-- END portrait -->
+            <table>
+              <tr>
+                <td><strong>Name</strong></td> 
+                <td>{NAME}</td>
+                <td>&nbsp;</td>
+                <td>{EXT}</td>
+              </tr>
+              <tr>
+                <td><strong>Group</strong></td> 
+                <td>{POSTION}</td>
+                <td><strong>Email</strong></td>
+                <td>{EMAIL}</td>
+              </tr>
+			<!-- BEGIN student_synergy -->
+              <tr>
+                <td><strong>Tutor</strong></td>
+                <td>{TUTOR}</td>
+                <td><strong>Year Level </strong></td>
+                <td>{YEAR_LEVEL}</td>
+              </tr>
+              <tr>
+                <td><strong>Birthdate</strong></td>
+                <td>{BIRTHDATE}</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td colspan="4"><strong>Emergency Contact</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Name</strong></td>
+                <td>{EMERGENCY_NAME}</td>
+                <td><strong>Phone </strong></td>
+                <td>{EMERGENCY_PHONE}</td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td><strong>Alt. Phone </strong></td>
+                <td>{EMERGENCY_ALT_PHONE}</td>
+              </tr>
+              <tr>
+                <td colspan="4"><strong>Primary Contact </strong></td>
+              </tr>
+              <tr>
+                <td><strong>Name</strong></td>
+                <td>{CONTACT_NAME}</td>
+                <td><strong>Home Phone </strong></td>
+                <td>{CONTACT_HOME_PHONE}</td>
+              </tr>
+              <tr>
+                <td><strong>Address</strong></td>
+                <td rowspan="2" valign="top">{CONTACT_ADDRESS}</td>
+                <td><strong>Mobile Phone </strong></td>
+                <td>{CONTACT_MOBILE_PHONE}</td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td><strong>Work  Phone </strong></td>
+                <td>{CONTACT_OCCUP_PHONE}</td>
+              </tr>
+              <tr>
+                <td><strong>Spouse</strong></td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td><strong>Name</strong></td>
+                <td>{SPOUSE_NAME}</td>
+                <td><strong>Mobile Phone </strong></td>
+                <td>{SPOUSE_MOBILE_PHONE}</td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td><strong>Work Phone </strong></td>
+                <td>{SPOUSE_OCCUP_PHONE}</td>
+              </tr><!-- END student_synergy -->
+              <tr>
+                <td>&nbsp;</td> 
+                <td colspan="3"><strong>{GROUPTITLE}</strong></td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td> 
+                <td colspan="3"><!-- BEGIN grouplist -->{GROUP}<!-- END grouplist --></td>
+              </tr>
+            </table>
 			<!-- #EndEditable --> </div>
 		<div id="footer">
 			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>

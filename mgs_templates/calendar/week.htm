@@ -16,6 +16,10 @@
 <!-- InstanceBeginEditable name="scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
 <script type="text/javascript" src="/std_scripts.js"></script>
+<script type="text/javascript" src="/tableruler.js"></script>
+<script type="text/javascript">
+	window.onload=function(){tableruler();} 
+</script>
 <!-- InstanceEndEditable -->
 <script type="text/javascript" src="/drop_down.js"></script>
 </head>
@@ -98,13 +102,14 @@
    	</div>
 	<!-- #EndLibraryItem --><!-- #EndEditable -->
 	<div id="content">
-		<div id="content_text"> <!-- #BeginEditable "main" -->			<h1>{MONTH} - {YEAR}</h1>
+		<div id="content_text"> <!-- #BeginEditable "main" -->
+			<h1>{MONTH} - {YEAR}</h1>
 				<center>
 				<table class="calendarTable"> 
 					<tr> 
 						<td><a class="back" href="{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td> 
 						<td colspan="5">
-						<form method="get" action="viewCalendar.php" id="calendarDrop">
+						<form method="get" action="viewCalendar.php">
 						<input type="hidden" name="Year" value="{YEAR}">
 						<input type="hidden" name="Day" value="{DAY}">
 						<select name="Month" onchange="this.form.submit();">
@@ -138,12 +143,21 @@
 					<!-- END week_block --> 
 				</table>
 				</center>
-				
-			<table> 
-				<!-- BEGIN day_block --> 
+						<form method="get" action="viewCalendar.php">
+						<select name="campus" onchange="this.form.submit();">
+						<!-- BEGIN campus_drop -->
+							<option value="{DROP_CAMPUS_ID}" {DROP_CAMPUS_SELECTED}>{DROP_CAMPUS_NAME}</option>
+						<!-- END campus_drop -->
+						</select>
+						</form>
+			<table class="ruler"> 
+				<!-- BEGIN day_block -->
+				<thead>
 				<tr> 
 					<td colspan="3"><h2>{DATE}</h2> <span class="header_option">{ADD}</span></td> 
-				</tr> 
+				</tr>
+				</thead>
+				<tbody>
 				<!-- BEGIN note_block --> 
 				<tr> 
 					<td class="indent calendarTime"><span style="color:{PRIORITY};">{TIME}</span></td> 
@@ -151,8 +165,10 @@
 					<td style="text-align:right;vertical-align:top;">{MODIFY}</td> 
 				</tr> 
 				<!-- END note_block --> 
+				</tbody>
 				<!-- END day_block --> 
-			</table> <!-- #EndEditable --> </div>
+			</table> 
+			<!-- #EndEditable --> </div>
 		<div id="footer">
 			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
 			<p><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p>

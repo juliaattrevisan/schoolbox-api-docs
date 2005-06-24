@@ -5,11 +5,21 @@
 <head>
 <!-- #BeginEditable "doctitle" -->
 <title>{TITLE}</title>
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="MGS"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<!-- #BeginEditable "scripts" -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
+<script type="text/javascript" src="/std_scripts.js"></script>
 <script language="JavaScript" type="text/javascript">
 function verify(){
 	var msg = ""
+	var myform = document.getElementById('returnWorkForm');
 	//user must enter at least one field
-	if(document.form.file.value == "" && document.form.comment.value == "" && document.form.mark.value == ""){
+	if(myform.file.value == "" && myform.comment.value == "" && myform.mark.value == ""){
 		msg += "You need to enter at least one field to return to student\n";
 	}
 	if(msg != ""){
@@ -20,15 +30,6 @@ function verify(){
 		return true;
 }
 </script>
-<!-- #EndEditable -->
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="MGS"/>
-<meta name="ROBOTS" content="INDEX, FOLLOW" />
-<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
-<!-- #BeginEditable "scripts" -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
-<script type="text/javascript" src="/std_scripts.js"></script>
 <!-- #EndEditable -->
 <script type="text/javascript" src="/drop_down.js"></script>
 </head>
@@ -113,7 +114,7 @@ function verify(){
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" -->
 			<h1>Return Work </h1>
-			<form action="" method="post" enctype="multipart/form-data" name="form" class="standard" id="form" onsubmit="return(verify());">
+			<form action="" method="post" enctype="multipart/form-data" name="returnWorkForm" id="returnWorkForm" class="standard" onsubmit="return(verify());">
 				<table>
 					<tr>
 						<td class="formLabelWidth"><h2>Returning Work To</h2>

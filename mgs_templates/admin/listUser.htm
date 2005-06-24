@@ -13,7 +13,10 @@
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
 <!-- #BeginEditable "scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
-<script type="text/javascript" src="/std_scripts.js"></script>
+<script type="text/javascript" src="/tableruler.js"></script>
+<script type="text/javascript">
+	window.onload=function(){tableruler();} 
+</script>
 <!-- #EndEditable -->
 <script type="text/javascript" src="/drop_down.js"></script>
 </head>
@@ -98,7 +101,7 @@
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" -->
 			<h1>Find User</h1>
-			<table>
+			<table class="ruler">
 				<tr>
 					<th>ID</th>
 					<th>Username</th>
@@ -107,17 +110,18 @@
 					<th>Synergy ID</th>
 					<th>Group</th>
 				</tr>
+			<tbody> 
 				<!-- BEGIN userlist -->
 				<tr>
 					<td><a href="/admin/modUser.php?id={ID}">{ID}</a></td>
 					<td><a href="/admin/modUser.php?id={ID}">{USERNAME}</a></td>
-					<br />
 					<td><a href="/admin/modUser.php?id={ID}">{FIRSTNAME}</a></td>
 					<td><a href="/admin/modUser.php?id={ID}">{LASTNAME}</a></td>
 					<td><a href="/admin/modUser.php?id={ID}">{SYNERGYID}</a></td>
 					<td><a href="/admin/modUser.php?id={ID}">{GROUP}</a></td>
 				</tr>
 				<!-- END userlist -->
+				</tbody>
 			</table>
 			<!-- #EndEditable --> </div>
 		<div id="footer">

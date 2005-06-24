@@ -15,8 +15,12 @@
 <meta name="ROBOTS" content="INDEX, FOLLOW" />
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
 <!-- InstanceBeginEditable name="scripts" -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />  
+<link rel="stylesheet" type="text/css" media="screen" href="/jscalendar/calendar-blue2.css" />
 <script type="text/javascript" src="/std_scripts.js"></script>
+<script type="text/javascript" src="/jscalendar/calendar.js"></script>
+<script type="text/javascript" src="/jscalendar/lang/calendar-en.js"></script>
+<script type="text/javascript" src="/jscalendar/calendar-setup.js"></script>
 <script type="text/javascript">
 function showRow(){
 	var selecLevel = document.getElementById('eventForm').level.options[document.getElementById('eventForm').level.selectedIndex].value;
@@ -43,6 +47,8 @@ function showRow(){
 window.onload = new Function('showRow();');
 
 </script>
+
+
 <!-- InstanceEndEditable -->
 <script type="text/javascript" src="/drop_down.js"></script>
 </head>
@@ -130,8 +136,20 @@ window.onload = new Function('showRow();');
             <form class="standard" method="post" action="/calendar/addEvent.php" id="eventForm">
                     <table>
                       <tr> 
-                        <td class="formLabelWidth" valign="top"><h2>Date</h2><em>The date on which the event will occur</em></td>
-                        <td>{DATE}{MONTH}</td>
+                        <td class="formLabelWidth" valign="top"><h2>Date</h2>
+                        	<em>The date on which the event will occur. This field takes the date in the format mm/dd/yyyy. You may use the calendar to help speed up the selection. </em></td>
+                        <td><input name="date" id="cal_date" type="text" size="15" maxlength="10" value="{DATE}"/>
+						<img src="../images/ico_calendar.gif" width="16" height="13" id="cal_trigger" style="cursor: pointer;" title="Date selector" onmouseover="this.style.background='red';" onmouseout="this.style.background=''"/>
+	 				 	<script type="text/javascript">
+						Calendar.setup({
+							inputField     :    "cal_date",     // id of the input field
+							ifFormat       :    "%d/%m/%Y",      // format of the input field
+							button         :    "cal_trigger",  // trigger for the calendar (button ID)
+							align          :    "br",           // alignment (defaults to "Bl")
+							singleClick    :    true
+						});
+						</script>
+					 </td>
                       </tr>
                       <tr> 
                         <td><h2>Time</h2><em>Both time slots are optional.</em></td>
@@ -152,7 +170,8 @@ window.onload = new Function('showRow();');
                           </select></td>
                       </tr>
                       <tr> 
-                        <td><h2>Priority</h2><em>This will determine the colour the note will appear on your calendar</em> 
+                        <td><h2>Priority</h2>
+                        	<em>This will determine the colour that the note shall appear on the calendar</em> 
                         </td>
                         <td><select name="priority">
                             <option value="4" {PRIORITY4}>Low (Black)</option>

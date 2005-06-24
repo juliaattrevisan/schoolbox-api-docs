@@ -127,7 +127,7 @@ function verify()
 		<div id="content_text"> <!-- #BeginEditable "main" -->
 			<h1>User Details</h1>
 			<form action="" method="post" id="userForm" class="standard" onsubmit="return(verify());">
-				<table border="0" cellspacing="0" cellpadding="0" bgcolor="#CCCCCC" >
+				<table>
 					<tr>
 						<td><h2>Preffered</h2></td>
 						<td><input type="text" name="firstname" value="{FIRSTNAME}" />
@@ -152,7 +152,7 @@ function verify()
 						<td><span onmouseover="this.innerHTML='{PASSWORD}';" onmouseout="this.innerHTML='Reveal Password';">Reveal Password</span></td>
 					</tr>
 					<tr>
-						<td><h2>MGS Email</h2></td>
+						<td><h2>Local Email</h2></td>
 						<td><input type="checkbox" name="local_email" value="1" {LOCAL_EMAIL} /></td>
 						<td><h2>Alternate Email</h2></td>
 						<td><input type="text" name="alt_email" value="{ALT_EMAIL}" /></td>
@@ -188,7 +188,7 @@ function verify()
 			</form>
 			<!-- BEGIN login -->
 			<form action="/login.php" method="post" id="loginForm" class="standard">
-				<table  border="0" cellpadding="0" cellspacing="0" bgcolor="#CCCCCC">
+				<table>
 					<tr>
 						<td><h2>Click here to transfer session to this user</h2></td>
 						<td><input type="hidden" name="username" value="{USERNAME}" />

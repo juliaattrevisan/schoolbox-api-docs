@@ -123,22 +123,22 @@ function verify()
 		<div id="content_text"> <!-- #BeginEditable "main" -->
 			<h1>{ACTION} URL</h1>
 			<form action="" method="post" id="urlForm" class="standard" onsubmit="return(verify());">
-				<table  border="0" cellspacing="0" cellpadding="4" bgcolor="#CCCCCC">
+				<table>
 					<tr>
-						<td><h2>URL</h2></td>
-						<td><input type="text" name="url" size="40" maxlength="250" class="formfield" value="{URL}" />
+						<td class="formLabelWidth"><h2>URL</h2></td>
+						<td><input type="text" name="url" size="40" maxlength="250" value="{URL}" />
 						</td>
 					</tr>
 					<tr>
 						<td><h2>Description</h2>
 							<em>One line description of the URL for the title </em> </td>
-						<td ><input type="text" name="description" maxlength="250" size="40" class="formfield" value="{DESCRIPTION}" />
+						<td ><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" />
 						</td>
 					</tr>
 					<tr>
 						<td><h2>Comments</h2>
 							<em>Any further details you wish to make about the URL, useful for enhancing search results</em> </td>
-						<td><textarea name="comment" cols="40" rows="4" class="formfield">{COMMENT}</textarea>
+						<td><textarea name="comment" cols="40" rows="4">{COMMENT}</textarea>
 						</td>
 					</tr>
 					<tr>
@@ -148,8 +148,8 @@ function verify()
 					</tr>
 					<tr>
 						<td >&nbsp;</td>
-						<td width="46%" align="right">{IDFIELD}
-							<input type="submit" name="Submit" value="Submit" class="btn" />
+						<td>{IDFIELD}
+							<input type="submit" name="Submit" value="{ACTION}" class="btn" />
 						</td>
 					</tr>
 				</table>

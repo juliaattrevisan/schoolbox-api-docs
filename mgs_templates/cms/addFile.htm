@@ -119,11 +119,11 @@ function verify()
 		<div id="content_text"> <!-- #BeginEditable "main" -->
 			<h1>{ACTION} File </h1>
 			<form method="post" enctype="multipart/form-data" id="fileForm" class="standard" onsubmit="return(verify());">
-				<table  border="0" cellspacing="0" cellpadding="0" bgcolor="#CCCCCC">
+				<table>
 					<!-- BEGIN browse_row -->
 					<tr>
-						<td><h2>File</h2></td>
-						<td><input type="file" name="file" class="formfield" />
+						<td class="formLabelWidth"><h2>File</h2></td>
+						<td><input type="file" name="file" />
 							<input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
 						</td>
 					</tr>
@@ -131,13 +131,13 @@ function verify()
 					<tr>
 						<td><h2>Description</h2>
 							<em>One line description of the file for use as the title</em> </td>
-						<td ><input type="text" name="description" maxlength="250" size="40" class="formfield" value="{DESCRIPTION}" />
+						<td ><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" />
 						</td>
 					</tr>
 					<tr>
 						<td><h2>Comments</h2>
 							<em>Any further details you wish to make about the file, useful for enhancing search results</em></td>
-						<td><textarea name="comment" cols="40" rows="4" class="formfield">{COMMENT}</textarea>
+						<td><textarea name="comment" cols="40" rows="4">{COMMENT}</textarea>
 						</td>
 					</tr>
 					<tr>
@@ -159,7 +159,7 @@ function verify()
 					<!-- END submission -->
 					<tr>
 						<td>&nbsp;</td>
-						<td><input type="submit" name="Submit" value="Submit" class="btn" />
+						<td><input type="submit" name="Submit" value="{ACTION}" class="btn" />
 						</td>
 					</tr>
 				</table>

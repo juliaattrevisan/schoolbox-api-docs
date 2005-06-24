@@ -14,6 +14,10 @@
 <!-- #BeginEditable "scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
 <script type="text/javascript" src="/std_scripts.js"></script>
+<script type="text/javascript" src="/tableruler.js"></script>
+<script type="text/javascript">
+	window.onload=function(){tableruler();} 
+</script>
 <!-- #EndEditable -->
 <script type="text/javascript" src="/drop_down.js"></script>
 </head>
@@ -97,21 +101,27 @@
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
             <h1>Results of User Search</h1>
-                  <table>
-                    <tr> 
-                      <th>Surname</th>
+                  <table class="ruler">
+                    <thead>
+					<tr> 
                       <th>Preferred Name</th>
-                      <th>Position</th>
+					  <th>Surname</th>
+                      <th>Group</th>
+					  <th>Year</th>
                       <th>Email</th>
                     </tr>
+					</thead>
+					<tbody>
                     <!-- BEGIN userlist -->
                     <tr> 
-                      <td><a href="/search/userLookup.php?id={ID}">{LASTNAME}</a></td>
                       <td><a href="/search/userLookup.php?id={ID}">{FIRSTNAME}</a></td>
-                      <td><a href="/search/userLookup.php?id={ID}">{POSTION}</a></td>
+					  <td><a href="/search/userLookup.php?id={ID}">{LASTNAME}</a></td>
+                      <td><a href="/search/userLookup.php?id={ID}">{GROUP}</a></td>
+					  <td><a href="/search/userLookup.php?id={ID}">{YEAR}</a>
                       <td>{EMAIL}</td>
                     </tr>
                     <!-- END userlist -->
+					</tbody>
                   </table>
             <!-- #EndEditable --> </div>
 		<div id="footer">

@@ -98,11 +98,11 @@
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
 			<h1>Compose Email</h1> 
-			<form class="standard" action="send.php" method="post" enctype="multipart/form-data" name="form1" id="form1"> 
+			<form class="standard" action="send.php" method="post" enctype="multipart/form-data" name="mailForm" id="mailForm"> 
 				<table> 
 					<tr> 
 						<td><h2>To:</h2></td> 
-						<td><input type="text" name="to" size="50" value="{REPLYTO}" class="formfield" /> 
+						<td><input type="text" name="to" size="50" value="{REPLYTO}" /> 
 							<a href="/search/userLookup.php">address book</a></td> 
 					</tr> 
 					<tr> 
@@ -111,27 +111,27 @@
 					</tr> 
 					<tr> 
 						<td><h2>CC:</h2></td> 
-						<td> <input type="text" name="cc" size="50" class="formfield" /> </td> 
+						<td> <input type="text" name="cc" size="50" /> </td> 
 					</tr> 
 					<tr> 
 						<td><h2>BCC:</h2></td> 
-						<td> <input type="text" name="bcc" size="50" class="formfield" value="{BCC}" /> </td> 
+						<td> <input type="text" name="bcc" size="50" value="{BCC}" /> </td> 
 					</tr> 
 					<tr> 
 						<td><h2>Subject:</h2></td> 
-						<td><input type="text" name="subject" size="60" class="formfield" value="{SUBJECT}" /></td> 
+						<td><input type="text" name="subject" size="60" value="{SUBJECT}" /></td> 
 					</tr> 
 					<tr> 
 						<td>&nbsp;</td> 
-						<td><textarea name="message" cols="80" rows="12" class="formfield">{BODY}</textarea></td> 
+						<td><textarea name="message" cols="80" rows="12">{BODY}</textarea></td> 
 					</tr> 
 					<tr> 
 						<td><h2>Attachment:</h2></td> 
-						<td><input type="file" name="attachment" class="formfield" /></td> 
+						<td><input type="file" name="attachment" /></td> 
 					</tr> 
 					<tr> 
 						<td>&nbsp;</td> 
-						<td><input type="submit" name="submit" value="Send" class="formfield" /></td> 
+						<td><input type="submit" name="submit" value="Send" /></td> 
 					</tr> 
 				</table> 
 			</form> 
