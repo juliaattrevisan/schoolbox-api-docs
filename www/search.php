@@ -16,11 +16,13 @@ class OutPut
 	function OutPut()
 	{
 		$this->t_body = new Template(TPL_directory);
-		$this->t_body->set_file("tplBODY", "search_result.htm");
-
-		$this->t_body->set_var("TITLE", HEADING." - Search Result");
-		
 		$this->db = new dbManager;
+	}
+
+	function searchResult()
+	{
+		$this->t_body->set_file("tplBODY", "search/search_result.htm");
+		$this->t_body->set_var("TITLE", HEADING." - Search Result");
 		
 		//category output
 		$this->t_body->set_block("tplBODY", "cat_listing", "cat_block");
@@ -34,8 +36,15 @@ class OutPut
 		$this->t_body->set_block("link_listing", "link_desc", "link_block");
 		
 		include("include/page.php");
-
 	}
+	
+	function advancedSearch()
+	{
+		$this->t_body->set_file("tplBODY", "search/adSearch.htm");
+		$this->t_body->set_var("TITLE", HEADING." - Advanced Search");
+		include("include/page.php");
+	}
+	
 
 	function showPage()
 	{
@@ -452,18 +461,25 @@ else if($_GET['where'] == 2 && isset($_GET['keyword']))
 else
 {
 	$myPage = new OutPut();
-	if( (isset($_GET['type'])) && (isset($_GET['sort'])) && (isset($_GET['keyword'])) && $_GET['type'] && 
-		$_GET['sort'] && $_GET['keyword'])
-	{    //advanced search
-		$myPage->listSearch($_GET['keyword'], $_GET['type'], $_GET['sort']);
-	}
-	else if( (isset($_GET['keyword'])) && $_GET['keyword'])
-	{  //simple keyword search
-		$myPage->listSearch($_GET['keyword']);
-	}
+	if($_GET['keyword'])
+	{ 	
+		//setup search result page
+		$myPage->searchResult();
+		
+		//advanced search
+		if( ($_GET['type'] && $_GET['sort'])
+		{   
+			$myPage->listSearch($_GET['keyword'], $_GET['type'], $_GET['sort']);
+		}
+		else //simple keyword search
+		{  
+			$myPage->listSearch($_GET['keyword']);
+		}
 	else
-		error(2);
-
+	{
+		$myPage->advancedSearch();
+	}
+	
 	$myPage->showPage();
 }
 ?>

@@ -22,13 +22,7 @@ else if(!isset($db))
 	$db->dbConnect();
 }
 
-//this section handles the drop down javascript menu
-//it sizes the table it sits in (well sorta more like floats in) and use the template engine to build the javascript
-define("ITEMHEIGHT", "20");
-
-$this->t_body->set_file("dropmenu", "dynamicmenu.js");
-$this->t_body->set_block("dropmenu", "menu_drop_down", "menu_drop_down_block");
-
+//this section handles the drop down menu
 if($_SESSION['su'])
 	$query = "SELECT sideMenu.id, parent, txt, url, target FROM sideMenu ORDER BY parent, sequence, txt";
 else
@@ -38,31 +32,17 @@ else
           ORDER BY parent, sequence, txt";
 
 $db->dbDoQuery($query);
-//$menucount = 0;
+
+//initialise root of tree
 $list[0]['id'] = 0;
+
+//fetch each record and insert into tree
 while($menuitem = $db->dbGetNextArray() )
 {
 	$list = insertChild($list, $menuitem);
-	/*
-        $this->t_body->set_var("JM_ID", "m".$menuitem['id']);
-        if($menuitem['parent'] == 0){
-                $this->t_body->set_var("JM_PARENT", "");
-        		$menucount++;
-		}
-		else{
-                $this->t_body->set_var("JM_PARENT", "m".$menuitem['parent']);
-        }
-		$this->t_body->set_var("JM_TEXT", $menuitem['txt']);
-        $this->t_body->set_var("JM_URL", $menuitem['url']);
-        $this->t_body->set_var("JM_TARGET", $menuitem['target']);
-
-        $this->t_body->parse("menu_drop_down_block", "menu_drop_down", true);
-	*/
 }
-//first find out how big the menu is so we can size the space for it appropriately
-//$this->t_body->set_var("MJSHEIGHT", $menucount * ITEMHEIGHT);
-//$this->t_body->parse("DROPDOWNMENU", "dropmenu");
-$this->t_body->set_var("MCSSMENU", outputMenu($list[0]['children']));
+//output tree with html
+$this->t_body->set_var("MCSSMENU", outputMenu($list[0]['children'], 1));
 
 //this section handles the mylinks section in the template 
 	
@@ -137,33 +117,27 @@ else
 
 
 //this section hanldes the display of the timetable tab
-$this->t_body->set_block("tplBODY", "timetable_toptab", "tt_toptab");
 $this->t_body->set_block("tplBODY", "timetable_tab", "tt_tab");
 
 if($_SESSION['timetable'])
 {
-	$this->t_body->parse("tt_toptab","timetable_toptab",true); 
 	$this->t_body->parse("tt_tab","timetable_tab",true); 	
 }
 else
 {
-	$this->t_body->set_var("tt_toptab", "");
 	$this->t_body->set_var("tt_tab", "");
 }
 
 //this section handles the display of the webmail tab
 // if configuration states mail is available and user has access to local mail account display it
-$this->t_body->set_block("tplBODY", "webmail_toptab", "wm_toptab");
 $this->t_body->set_block("tplBODY", "webmail_tab", "wm_tab");
 
 if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && isStaff($_SESSION['gid'])))
 {
-	$this->t_body->parse("wm_toptab","webmail_toptab",true);
 	$this->t_body->parse("wm_tab","webmail_tab",true);
 }
 else
 {
-	$this->t_body->set_var("wm_toptab", "");
 	$this->t_body->set_var("wm_tab", "");
 }
 	
@@ -201,14 +175,18 @@ function insertChild($list, $element)
 	return false;
 }
 
-function outputMenu($list)
+function outputMenu($list, $level)
 {
-	$text = "<ul>\n";
+	if($level == 1)
+		$text = "\n<ul class=\"dropDownMenu$level\" id=\"nav\">\n";
+	else
+		$text = "\n<ul class=\"dropDownMenu$level\">\n";
+	
 	for($i=0; $list[$i]; $i++)
 	{
 		$text .= '<li><a href="'.$list[$i]['url'].'">'.$list[$i]['txt'].'</a>';
 		if(is_array($list[$i]['children']))
-			$text .= outputMenu($list[$i]['children']);
+			$text .= outputMenu($list[$i]['children'], ($level + 1));
 		
 		$text .= "</li>\n";
 	}

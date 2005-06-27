@@ -36,13 +36,14 @@ class outUser
 		
 		$this->t_body->set_var("SYNERGY_ID", $user['synergy_id']);
 		
+		$this->t_body->set_block("tplBODY", "portrait", "portrait_block");
+		$this->t_body->set_block("tplBODY", "student_synergy", "student_synergy_block");
+		
 		//advanced synergetic information
 		if(SYNERGY_enabled)
 		{
 			require_once('../include/syn_userinfo.php');
-			$this->t_body->set_block("tplBODY", "portrait", "portrait_block");
-			$this->t_body->set_block("tplBODY", "student_synergy", "student_synergy_block");
-			
+
 			//only allow staff to see student information
 			if(isStaff($_SESSION['gid']))
 			{
@@ -155,15 +156,22 @@ class outUser
 		
 		foreach($users as $user)
 		{
-			$query = "SELECT firstname, lastname, username, groups.name AS gname FROM user, groups 
+			$query = "SELECT firstname, lastname, username, groups.name AS gname, year, local_email, alt_email FROM user, groups 
 				WHERE user.group_id = groups.id AND user.id = '$user'";  
 			$userdetails = $db->dbGetSingleRow($query);
 			$this->t_body->set_var("FIRSTNAME", $userdetails['firstname']);
 			$this->t_body->set_var("LASTNAME", $userdetails['lastname']);
-			$this->t_body->set_var("EMAIL", "<a href=\"/mail/send.php?replyto=
-						".$userdetails['username']."@".MAIL_address."\">
-                                                ".$userdetails['username']."@".MAIL_address."</a>");
-			$this->t_body->set_var("POSTION", $userdetails['gname']);
+			$this->t_body->set_var("YEAR", $userdetails['year']);
+			
+			if($userdetails['local_email'])
+				$email = "<a href=\"".$_SESSION['mailhandle'].$userdetails['username']."@".MAIL_address."\">".$userdetails['username']."@".MAIL_address."</a>";
+			else if($userdetails['alt_email'])
+				$email = "<a href=\"".$_SESSION['mailhandle'].$userdetails['alt_email']."\">".$userdetails['alt_email']."</a>";
+			else
+				$email = "";
+			
+			$this->t_body->set_var("EMAIL", $email);
+			$this->t_body->set_var("GROUP", $userdetails['gname']);
 			$this->t_body->set_var("ID", $user);
 			$this->t_body->parse("user_block", "userlist", true);
 		}
@@ -171,20 +179,46 @@ class outUser
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 		
-	function searchUser($firstname, $lastname, $group)
+	function searchUser($keyword, $group)
 	{
 		//search for a user based on at least one of the above fields
 		//assumes at least one contains something
 	
-		$query = "SELECT id FROM user WHERE";
+		$query = "SELECT id FROM user WHERE ";
 
-		if($firstname != "")
-			$query .= " firstname LIKE '%".$firstname."%' AND";
-		if($lastname != "")
-			$query .= " lastname LIKE '%".$lastname."%' AND";
-		if($group != "")
-			$query .= " group_id LIKE '%".$group."%' AND";
-		$query .= " '1' = '1'";
+		if($keyword != "")
+		{
+			if( is_numeric( $keyword)) 
+			{
+				$query .= "( synergy_id = $keyword OR year = $keyword ) ";
+			}
+			else 
+			{
+				if(preg_match('/([[:alpha:]\']+) ([[:alpha:]\']+)/', $keyword, $name)) 
+				{
+					$query .= "( firstname like '%{$name[1]}%' and lastname like '%{$name[2]}%' ) ";
+				}
+				else 
+				{
+					$query .= "( firstname like '%$keyword%' or lastname like '%$keyword%' or username like '%$keyword%' ) ";
+				}
+			}
+				
+			if($group)
+			{
+				$query .= "AND group_id = $group ";
+			}
+		}
+		else if($group)
+		{
+			$query .= "group_id = $group ";
+		}
+		else
+		{
+			error(0);
+		}
+		
+		$query .= "ORDER BY group_id, year, lastname, firstname"; 
 
 		$db = new dbManager();
 		$db->dbDoQuery($query);
@@ -206,10 +240,9 @@ class outUser
 
 $myPage = new outUser;
 
-if((isset($_GET['firstname']) && $_GET['firstname']) || (isset($_GET['lastname']) && $_GET['lastname']) 
-	|| (isset($_GET['group']) && $_GET['group']))
+if($_GET['keyword'] || $_GET['group'])
 {
-	$users = $myPage->searchUser($_GET['firstname'], $_GET['lastname'], $_GET['group']);
+	$users = $myPage->searchUser($_GET['keyword'], $_GET['group']);
 	//if no users found return to search page
 	if($users == 0)
 		error(31);
@@ -222,7 +255,7 @@ if((isset($_GET['firstname']) && $_GET['firstname']) || (isset($_GET['lastname']
 			$myPage->displayUserList($users);
 	}			
 }
-else if(isset($_GET['id']) && $_GET['id'])		
+else if($_GET['id'])		
 {
 	$myPage->displayUser($_GET['id']);
 }

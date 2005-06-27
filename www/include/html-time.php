@@ -11,7 +11,7 @@
 
 function createMonthList($currentMonth, $name)
 {
-	$month = "<select name=\"$name\" class=\"formfield\">";
+	$month = "<select name=\"$name\">";
 	for($i=1;$i<=12;$i++)
 	{
 		if($currentMonth == $i)
@@ -25,7 +25,7 @@ function createMonthList($currentMonth, $name)
 	
 function createYearList($theYear, $name)
 {
-	$year = "<select name=\"$name\" class=\"formfield\">";
+	$year = "<select name=\"$name\">";
 	$date = getDate();
 	$currentYear = $date['year'];
  	$initialYear = "2003";	
@@ -42,7 +42,7 @@ function createYearList($theYear, $name)
 
 function createDateList($currentDate, $name)
 {
-	$date = "<select name =\"$name\" class=\"formfield\">";
+	$date = "<select name =\"$name\" class=\"short\">";
 	for($i=1;$i<=31;$i++)
 	{
 		if($currentDate == $i)
@@ -57,7 +57,7 @@ function createDateList($currentDate, $name)
 
 function createTimeList($currentHour, $name)
 {
-	$time = "<select name=\"$name\" class=\"formfield\">";
+	$time = "<select name=\"$name\" class=\"short\">";
 	for($i=8; $i<=20; $i++)
 	{
 		if($i == $currentHour)

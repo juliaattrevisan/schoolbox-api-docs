@@ -58,38 +58,24 @@ class OutPut
 				WHERE cid = id AND userGroups.type = '$type'";
 		$this->db->dbDoQuery($query);
 	
-		if($this->db->dbCountRows() > 0 ){
-		
-		for($x = 0; $row = $this->db->dbGetNextArray(); $x++)
+		if($this->db->dbCountRows() > 0 )
 		{
-			//if in group or awaiting authorisation tick box
-			if(is_numeric($row['type'])) 
-				$output .= "<td> <a href=\"joinGroup.php?leave=".$row['id']."\">
-					<img src=\"/newimages/greentick.gif\" border=\"0\"></a>".$row['name']."</td>";
-			else	
-				$output .= "<td><a href=\"joinGroup.php?join=".$row['id']."\">
-					<img src=\"/newimages/emptybox.gif\" border=\"0\"></a>".$row['name']."</td>";
-
-			if($x % 2)
+			for($x = 0; $row = $this->db->dbGetNextArray(); $x++)
 			{
+				//if in group or awaiting authorisation tick box
+				if(is_numeric($row['type'])) 
+					$output = "<a href=\"joinGroup.php?leave=".$row['id']."\">
+						<img src=\"/newimages/greentick.gif\" border=\"0\"></a>".$row['name'];
+				else	
+					$output = "<a href=\"joinGroup.php?join=".$row['id']."\">
+						<img src=\"/newimages/emptybox.gif\" border=\"0\"></a>".$row['name'];
+				
 				$this->t_body->set_var(strtoupper($var), $output);
 				$this->t_body->parse($var, $var."_block", true);
-				$output = "";
-			} 
-			
-		}
-		
-		//if anything left over output it on its own
-		if($output)
-		{
-			$this->t_body->set_var(strtoupper($var), $output);
-			$this->t_body->parse($var, $var."_block", true);
-		}
-		
+			}
 		}
 		else
-			$this->t_body->set_var($var, "<td>No groups to display</td>");
-
+			$this->t_body->set_var($var, "<tr><td>No groups to display</td></tr>");
 	}
 
 }

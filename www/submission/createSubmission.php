@@ -18,40 +18,63 @@ class CreateSubmissionPage {
 	{
 		global $subbox;
 
-		//this sets the date fields and allows people to only select months in the future
-		//it also selects todays date by default
+		//it selects todays date by default
 		//added feature to allow it to set current date those pulled from database in modify situation
 		if($modify)
 		{
 			$details = $subbox->getSubBoxDetails($modify);
 
 			//convert times into timestamps
-			$date = strtotime($details['date']);
-			$late_date = strtotime($details['late_date']);			
-
-			$this->t_body->set_var("DATE", createDateList(date("j", $date), "date"));
-			$this->t_body->set_var("MONTH", createMonthList(date("n", $date), "month"));
-			$this->t_body->set_var("TIME", createTimeList(date("G", $date), "time"));
-			$this->t_body->set_var("LDATE", createDateList(date("j", $late_date), "ldate"));
-			$this->t_body->set_var("LMONTH", createMonthList(date("n", $late_date), "lmonth"));
-			$this->t_body->set_var("LTIME", createTimeList(date("G", $late_date), "ltime"));
-
+			$due_date = strtotime($details['date']);
+			$late_date = strtotime($details['late_date']);	
+					
+			$due_hour = date('g',$due_date);
+			$due_min = date('i',$due_date);
+			
+			//output due dates
+			$this->t_body->set_var("DUE_DATE", date('d/m/Y', $due_date));
+			$this->t_body->set_var("DUE_HOUR", $due_hour);
+			$this->t_body->set_var("DUE_MIN", $due_min);
+			if(date('a', $due_date) == 'pm')
+				$this->t_body->set_var("DUE_PM", "selected");
+			else
+				$this->t_body->set_var("DUE_PM", "");
+			
+			//output late dates
+			$late_hour = date('g',$late_date);
+			$late_min = date('i',$late_date);
+			$this->t_body->set_var("LATE_DATE", date('d/m/Y', $late_date));
+			$this->t_body->set_var("LATE_HOUR", $late_hour);
+			$this->t_body->set_var("LATE_MIN", $late_min);
+			if(date('a', $late_date) == 'pm')
+				$this->t_body->set_var("LATE_PM", "selected");
+			else
+				$this->t_body->set_var("LATE_PM", "");
+				
 			$this->t_body->set_var("DESC", $details['description']);
 			
 		}
 		else
 		{
-			
-			//just set them to today
+			//just set them to today + 1 hour
 			//set variables in template
+			$defaultduetime = strtotime('+1 hours');
 			
-			$this->t_body->set_var("DATE", createDateList(date("j"), "date"));
-			$this->t_body->set_var("MONTH", createMonthList(date("n"), "month"));
-			$this->t_body->set_var("TIME",createTimeList(date("G"), "time"));
-
-			$this->t_body->set_var("LDATE", createDateList(date("j"), "ldate"));
-			$this->t_body->set_var("LMONTH",createMonthList(date("n"), "lmonth"));
-			$this->t_body->set_var("LTIME",createTimeList(date("G"), "ltime"));
+			$this->t_body->set_var("DUE_DATE", date('d/m/Y'));
+			$this->t_body->set_var("DUE_HOUR", date('g', $defaultduetime));
+			$this->t_body->set_var("DUE_MIN", '00');
+			if(date('a', $defaultduetime) == 'pm')
+				$this->t_body->set_var("DUE_PM", "selected");
+			else
+				$this->t_body->set_var("DUE_PM", "");
+			
+			$this->t_body->set_var("LATE_DATE", date('d/m/Y'));
+			$this->t_body->set_var("LATE_HOUR", date('g', $defaultduetime));
+			$this->t_body->set_var("LATE_MIN", '00');
+			if(date('a', $defaultduetime) == 'pm')
+				$this->t_body->set_var("LATE_PM", "selected");
+			else
+				$this->t_body->set_var("LATE_PM", "");
 
 		}
 
@@ -101,20 +124,18 @@ class CreateSubmissionPage {
 $myPage = new CreateSubmissionPage();
 $subbox = new subBox;
 
-if(isset($_POST['sid']) && isset($_POST['date']) && isset($_POST['time']) && isset($_POST['ldate']) && isset($_POST['ltime']) && 
-	$_POST['date'] && $_POST['time'] && $_POST['ldate'] && $_POST['ltime'] && $_POST['sid'])
+if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour'] && $_POST['sid'])
 {
 	//submission box id and times sent so update the submission box times
-	$subbox->updateSubmissionDate($_POST['sid'], $_POST['date'], $_POST['month'], $_POST['time'], $_POST['ldate'], 
-		$_POST['lmonth'], $_POST['ltime'], $_POST['description']);
+	$subbox->updateSubmissionDate($_POST['sid'], $_POST['due_date'], $_POST['due_hour'], $_POST['due_min'], $_POST['due_period'], $_POST['late_date'], 
+		$_POST['late_hour'], $_POST['late_min'], $_POST['late_period'], $_POST['description']);
 	localRedir("/submission/listSubmission.php");
 }
-else if(isset($_POST['date']) && isset($_POST['time']) && isset($_POST['ldate']) && isset($_POST['ltime']) && $_POST['date'] && 
-	$_POST['time'] && $_POST['ldate'] && $_POST['ltime'])
+else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour'])
 {
 	//form has been submitted 
-	$subbox->createSubmission($_POST['cid'], $_POST['date'], $_POST['month'], $_POST['time'], $_POST['ldate'], $_POST['lmonth'], 
-			$_POST['ltime'], $_POST['fileid'], $_POST['description']);
+	$subbox->createSubmission($_POST['cid'], $_POST['due_date'], $_POST['due_hour'], $_POST['due_minute'], $_POST['due_period'], $_POST['late_date'], $_POST['late_hour'], 
+			$_POST['late_min'], $_POST['late_period'], $_POST['fileid'], $_POST['description']);
 	localRedir("/submission/listSubmission.php");
 	
 }

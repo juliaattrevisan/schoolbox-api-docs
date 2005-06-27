@@ -189,37 +189,31 @@ class addEvent
 
 	function displayAddSingleEvent($date=0, $month=0, $level=0, $sid=0)
 	{
-                $this->t_body = new Template(TPL_directory);
-                $this->t_body->set_file("tplBODY", "calendar/addSingleEvent.htm");
+		$this->t_body = new Template(TPL_directory);
+		$this->t_body->set_file("tplBODY", "calendar/addSingleEvent.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Add Single Calender Event");
-
+		
 		$this->t_body->set_var("FUNCTION", "Add");
-
+		
 		include_once("../include/page.php");
-
-		//some logic to decide if we should use the dates supplied
-		if($date && $month && checkdate($month,$date, date("Y")) )
-		{		
-			$this->t_body->set_var("DATE", createDateList($date, "date"));
-			$this->t_body->set_var("MONTH", createMonthList($month, "month"));
-		}
+		
+		if($date && $month && checkdate($month,$date, date('Y')))
+			$this->t_body->set_var("DATE", "$date/$month/".date('Y'));
 		else
-		{
-			$this->t_body->set_var("DATE", createDateList(date("j"), "date"));
-			$this->t_body->set_var("MONTH", createMonthList(date("n"), "month"));
-		}
-
+			$this->t_body->set_var("DATE", date('d/m/Y'));
+		
 		$this->setTimeVars("", "");
-
+		
 		$this->setDropDowns($level,$sid,$sid);
-
+		
 		$this->setSelectedHTML("PRIORITY", 0, 1, 4);
 		$this->setSelectedHTML("LEVEL", 0, 1, 4);
-
+		
 		$this->t_body->set_var("DESCRIPTION", "");
 		$this->t_body->set_var("HIDDEN", "");
-		$this->t_body->set_var("DELETE", "");
-
+		$this->t_body->set_block("tplBODY", "delete_button", "delete_button_block");
+		$this->t_body->set_var("delete_button_block", "");
+		
 		$this->t_body->pparse("final", "tplBODY");
 	}
 
@@ -242,8 +236,9 @@ class addEvent
 
 		$this->t_body->set_var("FUNCTION", "Update");
 		
-		$this->t_body->set_var("DATE", createDateList(substr($event['date'],8,2), "date"));
-		$this->t_body->set_var("MONTH", createMonthList(substr($event['date'],5, 2), "month"));
+		//$this->t_body->set_var("DATE", createDateList(substr($event['date'],8,2), "date"));
+		//$this->t_body->set_var("MONTH", createMonthList(substr($event['date'],5, 2), "month"));
+		$this->t_body->set_var("DATE", date('d/m/Y', strtotime($event['date'])));
 
 		$this->setTimeVars($event['startTime'], $event['endTime']);
 
@@ -252,7 +247,8 @@ class addEvent
 
 		$this->t_body->set_var("DESCRIPTION", $event['note']);
 		$this->t_body->set_var("HIDDEN", "<input type=\"hidden\" name=\"id\" value=\"".$event['id']."\">");
-		$this->t_body->set_var("DELETE", "<input type=\"submit\" name=\"delete\" value=\"Delete Event\">");
+		$this->t_body->set_block("tplBODY", "delete_button", "delete_button_block");
+		$this->t_body->parse("delete_button_block", "delete_buton");
 
 		$this->t_body->pparse("final", "tplBODY");
 
@@ -286,7 +282,8 @@ class addEvent
 
 		$this->t_body->set_var("DESCRIPTION", "");
 		$this->t_body->set_var("HIDDEN", "");
-		$this->t_body->set_var("DELETE", "");
+		$this->t_body->set_block("tplBODY", "delete_button", "delete_button_block");
+		$this->t_body->set_var("delete_button_block", "");
 
 		$this->t_body->pparse("final", "tplBODY");
 
@@ -331,7 +328,8 @@ class addEvent
 
 		$this->t_body->set_var("DESCRIPTION", $event['note']);
 		$this->t_body->set_var("HIDDEN", "<input type=\"hidden\" name=\"id\" value=\"".$event['id']."\">");
-		$this->t_body->set_var("DELETE", "<input type=\"submit\" name=\"delete\" value=\"Delete Event\" class=\"formbutton\">");
+		$this->t_body->set_block("tplBODY", "delete_button", "delete_button_block");
+		$this->t_body->parse("delete_button_block", "delete_buton");
 
 		$this->t_body->pparse("final", "tplBODY");
 
@@ -359,7 +357,8 @@ class addEvent
 
 		$this->t_body->set_var("DESCRIPTION", "");
 		$this->t_body->set_var("HIDDEN", "");
-		$this->t_body->set_var("DELETE", "");
+		$this->t_body->set_block("tplBODY", "delete_button", "delete_button_block");
+		$this->t_body->set_var("delete_button_block", "");
 
 		$this->t_body->pparse("final", "tplBODY");
 
@@ -399,7 +398,8 @@ class addEvent
 
 		$this->t_body->set_var("DESCRIPTION", $event['note']);
 		$this->t_body->set_var("HIDDEN", "<input type=\"hidden\" name=\"id\" value=\"".$event['id']."\">");
-		$this->t_body->set_var("DELETE", "<input type=\"submit\" name=\"delete\" value=\"Delete Event\" class=\"formbutton\">");
+		$this->t_body->set_block("tplBODY", "delete_button", "delete_button_block");
+		$this->t_body->parse("delete_button_block", "delete_buton");
 
 		$this->t_body->pparse("final", "tplBODY");
 
@@ -427,10 +427,16 @@ class addEvent
 
 	function createTime($hour, $minute, $period)
 	{
-		if($period == 1) //am time period
-			$time = $hour.":".$minute.":00";
-		else if($period == 2) //pm period
-			$time = ($hour+12).":".$minute.":00";
+		//in this strange world we live in 12:00 am is actually 00:00 not 12:00 and 12:00 pm is actually 12:00 no 24:00 or 0:00  
+		if($period == 'am') //am time period
+		{
+			$time = ($hour%12).":".$minute.":00";
+		}
+		else if($period == 'pm') //pm period
+		{
+
+			$time = (($hour%12)+12).":".$minute.":00";
+		}
 		else
 			error(9, "Invalid time selected");
 		
@@ -479,9 +485,10 @@ if(isset($_POST['priority']) && $_POST['priority'] && isset($_POST['note']) && $
 		$sid = $_POST['campus'];
 
 	//add/modify single event
-	if( isset($_POST['date']) && $_POST['date'] && isset($_POST['month']) && $_POST['month'] )
+	if($_POST['date'])
 	{
-		if( !checkdate($_POST['month'], $_POST['date'], date("Y")) )		
+		list($date,$month,$year) = explode('/',$_POST['date'],3); 
+		if( !checkdate($month, $date, $year) )		
 			error(9);
 
 		if($_POST['delete']){
@@ -489,12 +496,12 @@ if(isset($_POST['priority']) && $_POST['priority'] && isset($_POST['note']) && $
 		}
 		else if($_POST['id']){
 			//modify event
-			$cal->modSingleEvent($_POST['id'], mktime(0,0,0, $_POST['month'], $_POST['date'], date("Y")),
+			$cal->modSingleEvent($_POST['id'], mktime(0,0,0, $month, $date, $year),
                         $startTime, $endTime, $_POST['priority'], $_POST['note'],
                                 $_POST['level'], $sid);	
 		}else{
 		//insert event 
-			$cal->addSingleEvent(mktime(0,0,0, $_POST['month'], $_POST['date'], date("Y")), 
+			$cal->addSingleEvent(mktime(0,0,0, $month, $date, $year), 
 			$startTime, $endTime, $_POST['priority'], $_POST['note'], 
 				$_POST['level'], $sid); 
 		}

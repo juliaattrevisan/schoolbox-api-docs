@@ -35,7 +35,7 @@ class displayCalendar
 		else
 			$this->t_body->set_var("TIME", $startTime." - ".$endTime);
 		
-		$this->t_body->set_var("NOTE", htmlentities($note));
+		$this->t_body->set_var("NOTE", scrubTEXT($note));
 		$this->t_body->set_var("PRIORITY", $this->cal->displayColour($priority));
 		
 		
@@ -46,8 +46,48 @@ class displayCalendar
 		
 		$this->t_body->parse("note_listing","note_block", true);
 	}
+  	
+	function monthDropDown($selected)
+	{
+		$this->t_body->set_block("tplBODY", "month_drop", "month_drop_block");
+		for($i=1; $i <= 12; $i++)
+		{
+			$this->t_body->set_var("DROP_MONTH_NUMBER", $i);
+			$this->t_body->set_var("DROP_MONTH_NAME", date('F', mktime(0,0,0,$i)));
+			if($i == $selected)
+				$this->t_body->set_var("DROP_MONTH_SELECTED", "selected=\"selected\"");
+			else
+				$this->t_body->set_var("DROP_MONTH_SELECTED", "");
+	
+			$this->t_body->parse("month_drop_block", "month_drop",true);
+		}
+		
+	}
+	
+	function campusDropDown($selected)
+	{
+		$this->t_body->set_block("tplBODY", "campus_drop", "campus_drop_block");
+		$query = "SELECT id, name FROM luCampus";
+		$this->db->dbDoQuery($query);
+		
+		$this->t_body->set_var("DROP_CAMPUS_ID", 0);
+		$this->t_body->set_var("DROP_CAMPUS_NAME", 'Show All');
+		$this->t_body->parse("campus_drop_block", "campus_drop",true);
+		
+		while($campus = $this->db->dbGetNextArray() )
+		{
+			$this->t_body->set_var("DROP_CAMPUS_ID", $campus['id']);
+			$this->t_body->set_var("DROP_CAMPUS_NAME", $campus['name']);
+			if($campus['id'] == $selected)
+				$this->t_body->set_var("DROP_CAMPUS_SELECTED", "selected=\"selected\"");
+			else
+				$this->t_body->set_var("DROP_CAMPUS_SELECTED", "");
+	
+			$this->t_body->parse("campus_drop_block", "campus_drop",true);
+		}
+	}
+	
   
-
 	function outputCalendar()
 	{
 		//output week to template
@@ -61,7 +101,7 @@ class displayCalendar
 		include_once("../include/page.php");
 	
 		//setup database
-		$db = new dbManager;
+		$this->db = new dbManager;
 		
 		//intitalise real date for indication on table
 		$realMonth = date("n");
@@ -77,6 +117,9 @@ class displayCalendar
 						"&Month=".date("m",$previousMonth)."&Day=".date("d", $previousMonth));
 		$this->t_body->set_var("FORWARD", "viewCalendar.php?Year=".date("Y",$nextMonth).
 						"&Month=".date("m",$nextMonth)."&Day=".date("d", $nextMonth));
+						
+		$this->monthDropDown($this->currMonth);
+		$this->campusDropDown($this->campus);
 						
 		//get amount of days in month
 		$numDaysinMonth = date("t", $currentMonth);
@@ -100,9 +143,13 @@ class displayCalendar
 
 		$this->t_body->set_var("TITLE", HEADING." - Calendar");
 		$this->t_body->set_var("YEAR", date("Y",$startOfWeek));
+		$this->t_body->set_var("DAY", $this->currDay);
 		
 		//output the month calendar
 		$monthDay = 1;
+		$monthYear = date("Y",$currentMonth);
+		$monthMonth = date("m",$currentMonth);
+		
 		for($i=0; $i < $totalDays; $i++)
 		{
 			$day = $i % 7;
@@ -113,13 +160,12 @@ class displayCalendar
 				//use css to indicate current day
 				if($this->currDay == $monthDay)
 					$this->t_body->set_var("MONTABLE_CSS".$day, "calTableSelected");
-				else if($realDay == $monthDay && $this->currMonth == $realMonth && $this->currYear == $realYear)
+				else if($realDay == $monthDay && $monthMonth == $realMonth && $monthYear == $realYear)
 					$this->t_body->set_var("MONTABLE_CSS".$day, "calTableCurrent");
 				else
 					$this->t_body->set_var("MONTABLE_CSS".$day, "calTable"); 
 				
-				$url = "viewCalendar.php?Year=".date("Y",$currentMonth).   
-                                "&Month=".date("m",$currentMonth)."&Day=".$monthDay;				
+				$url = "viewCalendar.php?Year=$monthYear&Month=$monthMonth&Day=$monthDay";				
 
 				$daylink = $monthDay;
 				$this->t_body->set_var("DAY".$day, $daylink);
