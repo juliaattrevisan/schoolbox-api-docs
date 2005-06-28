@@ -11,16 +11,16 @@
 <!-- #EndEditable -->
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="MGS"/>
+<meta name="author" content="James Leckie, Lektec Consulting"/>
 <meta name="ROBOTS" content="INDEX, FOLLOW" />
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<script type="text/javascript" src="/javascript/drop_down.js"></script>
 <!-- InstanceBeginEditable name="scripts" -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />  
-<link rel="stylesheet" type="text/css" media="screen" href="/jscalendar/calendar-blue2.css" />
-<script type="text/javascript" src="/std_scripts.js"></script>
-<script type="text/javascript" src="/jscalendar/calendar.js"></script>
-<script type="text/javascript" src="/jscalendar/lang/calendar-en.js"></script>
-<script type="text/javascript" src="/jscalendar/calendar-setup.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />  
+<link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
+<script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
 <script type="text/javascript">
 function showRow(){
 	var selecLevel = document.getElementById('eventForm').level.options[document.getElementById('eventForm').level.selectedIndex].value;
@@ -50,7 +50,6 @@ window.onload = new Function('showRow();');
 
 
 <!-- InstanceEndEditable -->
-<script type="text/javascript" src="/drop_down.js"></script>
 </head>
 <body>
 <div id="outerWrap">
@@ -137,7 +136,7 @@ window.onload = new Function('showRow();');
                     <table>
                       <tr> 
                         <td class="formLabelWidth" valign="top"><h2>Date</h2>
-                        	<em>The date on which the event will occur. This field takes the date in the format mm/dd/yyyy. You may use the calendar to help speed up the selection. </em></td>
+                        	<em>The date on which the event will occur. The date should be formatted like this mm/dd/yyyy. </em></td>
                         <td><input name="date" id="cal_date" type="text" size="15" maxlength="10" value="{DATE}"/>
 						<img src="../images/ico_calendar.gif" width="16" height="13" id="cal_trigger" style="cursor: pointer;" title="Date selector" onmouseover="this.style.background='red';" onmouseout="this.style.background=''"/>
 	 				 	<script type="text/javascript">
@@ -157,16 +156,16 @@ window.onload = new Function('showRow();');
                           : 
                           <input name="minute" type="text" maxlength="2" value="{MIN}" class="timeField"> 
                           <select name="period" class="short">
-                            <option value="1" {AM} >AM</option>
-                            <option value="2" {PM} >PM</option>
+                            <option value="am" {AM} >AM</option>
+                            <option value="pm" {PM} >PM</option>
                           </select>
                           to 
                           <input name="tohour" type="text" maxlength="2" value="{TOHOUR}" class="timeField">
                           : 
                           <input name="tominute" type="text" maxlength="2" value="{TOMIN}" class="timeField"> 
                           <select name="toperiod" class="short">
-                            <option value="1" {AMTO}>AM</option>
-                            <option value="2" {PMTO}>PM</option>
+                            <option value="am" {AMTO}>AM</option>
+                            <option value="pm" {PMTO}>PM</option>
                           </select></td>
                       </tr>
                       <tr> 
@@ -200,7 +199,8 @@ window.onload = new Function('showRow();');
                       <tr> 
                         <td>&nbsp;</td>
                         <td>{HIDDEN} 
-                          <input type="submit" name="Submit" value="{FUNCTION} Event" class="btn">{DELETE}</td>
+                          <input type="submit" name="Submit" value="{FUNCTION} Event" class="btn">
+						  <!-- BEGIN delete_button --><input type="submit" name="delete" value="Delete Event" class="btn"><!-- END delete_button --></td>
                       </tr>
                     </table>
             </form>	

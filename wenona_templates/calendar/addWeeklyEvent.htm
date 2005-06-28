@@ -35,14 +35,14 @@ window.onload = new Function('showRow();');
 <!-- #EndEditable -->
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="MGS"/>
+<meta name="author" content="James Leckie, Lektec Consulting"/>
 <meta name="ROBOTS" content="INDEX, FOLLOW" />
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<script type="text/javascript" src="/javascript/drop_down.js"></script>
 <!-- #BeginEditable "scripts" -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
-<script type="text/javascript" src="/std_scripts.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-default.css" />
+
 <!-- #EndEditable -->
-<script type="text/javascript" src="/drop_down.js"></script>
 </head>
 <body> 
 <div id="outerWrap"> 
@@ -175,7 +175,8 @@ window.onload = new Function('showRow();');
 		  <tr> 
 			<td>&nbsp;</td>
 			<td>{HIDDEN} 
-			  <input type="submit" name="Submit" value="{FUNCTION} Event" class="btn">{DELETE}</td>
+			  <input type="submit" name="Submit" value="{FUNCTION} Event" class="btn">
+			  <!-- BEGIN delete_button --><input type="submit" name="delete" value="Delete Event" class="btn"><!-- END delete_button --></td>
 		  </tr>
 		</table>
 	</form>	

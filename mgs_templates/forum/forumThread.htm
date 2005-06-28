@@ -8,31 +8,13 @@
 <!-- #EndEditable -->
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="MGS"/>
+<meta name="author" content="James Leckie, Lektec Consulting"/>
 <meta name="ROBOTS" content="INDEX, FOLLOW" />
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<script type="text/javascript" src="/javascript/drop_down.js"></script>
 <!-- #BeginEditable "scripts" -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
-<script type="text/javascript" src="/std_scripts.js"></script>
-<script type="text/javascript" src="document.js">
-</script>
-<script type="text/javascript" src="tree.js">
-</script>
-<script type="text/javascript">
-    
-        var {ROOTOBJ} = new jsTree;
-        
-        //create the root
-        {ROOTOBJ}.createRoot("{ROOTNAME}");
-        <!-- BEGIN forum -->
-        var {OBJ} = {PARENTOBJ}.addChild("{ID}", "{CID}", "{HEADING}",  "{BODY}", "{OWNER}", "{DATE}", {MODIFY});
-        <!-- END forum -->
-		
-function doLoad() { {ROOTOBJ}.buildDOM(); {OPEN} }     
-window.onload = new Function('doLoad();');
-</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
 <!-- #EndEditable -->
-<script type="text/javascript" src="/drop_down.js"></script>
 </head>
 <body>
 <div id="outerWrap">
@@ -113,7 +95,7 @@ window.onload = new Function('doLoad();');
 <!-- #EndLibraryItem --><!-- #EndEditable -->
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
-         <h1>{ROOTNAME}</h1>
+         <h1>{FORUM_HEADING}</h1>
 		 <span class="header_option"><a href="/homepage.php?category={CID}">return to homepage</a></span>
          <table>
               <tr>
@@ -124,8 +106,8 @@ window.onload = new Function('doLoad();');
 
             <table>
               <tr> 
-                <td><div id="domRoot"></div></td>
-                <td><div id="domBody"></div></td>
+                <td>{TOPIC_TREE}</td>
+                <td></td>
               </tr>
             </table>
             <!-- #EndEditable --> </div>

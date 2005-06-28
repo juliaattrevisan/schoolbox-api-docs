@@ -1,28 +1,73 @@
-<html><!-- #BeginTemplate "/Templates/wenona_main.dwt" --><!-- DW6 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
 <head>
 <!-- #BeginEditable "doctitle" --> 
 <title>{TITLE}</title>
-<style type="text/css">{CSS}</style>
-<!-- #EndEditable --> 
-<link rel="stylesheet" href="/global.css" type="text/css">
-</head>
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<script type="text/javascript" src="/javascript/drop_down.js"></script>
+<!-- #BeginEditable "scripts" -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-default.css" />
 
-<body>
-  <script language="JavaScript1.2" type="text/javascript" src="/coolmenus4.js"></script>
-  <script language="JavaScript1.2" type="text/javascript" src="/menusettings.js" ></script>
-  <script language="JavaScript1.2" type="text/javascript">{DROPDOWNMENU}</script>
-<form name="search" method="GET" class="nospace" action="/search.php">
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
-  <tr> 
-    <td width="150" align="center" valign="bottom" class="blueBG"><img src="/images/header1.gif" width="133" height="60"></td>
-    <td valign="bottom" class="blueBG"><br>
-	  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-        <tr>
-          <td class="blueBG" valign="bottom">&nbsp;</td>
-          <td align="right" valign="bottom"><input class="tab_unselected" type="text" name="keyword" /></td>
-        </tr>
-        <tr> 
-          <td class="blueBG" valign="bottom"><!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" -->			<div id="topNav">
+<style type="text/css">{CSS}</style>
+<!-- #EndEditable -->
+</head>
+<body> 
+<div id="outerWrap"> 
+	<div id="header"></div> 
+	<div id="searchBox"> 
+		<form class="standardForm" id="searchForm" action="/search.php" method="post"> 
+			<p style="margin:0;"> 
+				<input class="short" type="text" name="keyword" /> 
+				<select class="short" name="where"> 
+					<option value="0" selected="selected">portal</option> 
+					<option value="1">google</option> 
+					<option value="2">yahoo</option> 
+				</select> 
+				<input class="img" type="image" src="/images/searchbutton.gif" alt="Search" name="Submit" /> 
+			</p> 
+		</form> 
+	</div> 
+	<div id="left"> 
+		<h3>&#187;&nbsp;Go To</h3> 
+		{MCSSMENU}
+		<!-- BEGIN msubject --> 
+		<h3>&#187;&nbsp;My Subjects</h3> 
+		<ul> 
+			<!-- BEGIN msubject_block --> 
+			<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li> 
+			<!-- END msubject_block --> 
+		</ul> 
+		<!-- END msubject --> 
+		<!-- BEGIN mgroup --> 
+		<h3>&#187;&nbsp;My Groups</h3> 
+		<ul> 
+			<!-- BEGIN mgroup_block --> 
+			<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li> 
+			<!-- END mgroup_block --> 
+		</ul> 
+		<!-- END mgroup --> 
+		<h3>&#187;&nbsp;My Links</h3> 
+		<ul> 
+			<!-- BEGIN mlink_block --> 
+			<li>{MLINK}</li> 
+			<!-- END mlink_block --> 
+			<li><a href="/editLinks.php">ADD LINK</a></li> 
+		</ul> 
+		<div id="footer"> 
+			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.wenona.nsw.edu.au" title="Wenona">Wenona</a></strong></p> 
+			<p class="small"><a href="privacy.html">Guidelines of Use and Privacy Policy</a></p> 
+			<p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p> 
+		</div> 
+	</div> 
+	<!-- end left --> 
+	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" -->			<div id="topNav">
 				<ul>
 					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
 					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
@@ -38,164 +83,27 @@
 					<li class="right"><a class="right" href="http://intranet.wenona.nsw.edu.au/MyFilePortal/index.asp?strEncrypted={ENC_LOGIN}" title="Access your H:\ files" accesskey="f">My <em>F</em>iles</a></li>
 					
 				</ul>
-			</div><!-- #EndLibraryItem --><!-- #EndEditable --></td>
-          <td align="right" valign="top"> 
-              <select  class="tab_unselected" name="where">
-                <option value="0" selected>portal</option>
-                <option value="1">google</option>
-                <option value="2">yahoo</option>
-              </select>
-              <input type="submit" name="Submit" value="Search">
-            </td>
-        </tr>
-    </table></td>
-    <td width="50" valign="bottom" class="blueBG">&nbsp;</td>
-  </tr>
-</table>
-</form>
-<table width="100%" height="93%" border="0" cellpadding="0" cellspacing="0">
-  <tr valign="top"> 
-    <td height="25" align="center" class="blueBG"><img src="/images/header2.gif" width="133" height="25"></td>
-    <td width="20" height="25" background="/images/redpixelcnrbg.gif">&nbsp;</td>
-    <td height="25" background="/images/redpixelbg2.gif">&nbsp;</td>
-    <td width="50" height="25" background="/images/redpixelbg2.gif">&nbsp;</td>
-  </tr>
-  <tr> 
-    <td width="150" valign="top" class="blueBG">
-<table border="0" cellspacing="0" cellpadding="0">
-        <tr> 
-          <td><img src="/images/sidenav-goto.gif" width="150" height="15"></td>
-        </tr>
-        <tr> 
-          <td height="2" class="blueBG"> 
-		  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td width="12"><img src="/images/pix.gif" width="15" height="5"></td>
-                <td width="121" height="{MJSHEIGHT}" class="blueBG">&nbsp;</td>
-              </tr>
-            </table></td>
-        </tr>
-        <tr> 
-          <td class="blueBG">&nbsp;</td>
-        </tr>
-        <!-- BEGIN msubject -->
-        <tr> 
-          <td> <p><img src="/images/sidenav-mysubjects.gif" width="150" height="15"></p></td>
-        </tr>
-        <tr> 
-          <td class="blueBG"> <table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-              </tr>
-              <!-- BEGIN msubject_block -->
-              <tr> 
-                <td width="12"><img src="/images/pix.gif" width="15" height="5"></td>
-                <td><img src="/images/whitearrow.gif" width="6" height="9"></td>
-                <td width="121"><a href="/{MLINKSUB}" class="one">{MSUBJECT}</a></td>
-              </tr>
-              <!-- END msubject_block -->
-            </table></td>
-        </tr>
-        <tr> 
-          <td class="blueBG">&nbsp;</td>
-        </tr>
-        <!-- END msubject -->
-        <!-- BEGIN mgroup -->
-        <tr> 
-          <td> <p><img src="/images/sidenav-mygroups.gif" width="150" height="15"></p></td>
-        </tr>
-        <tr> 
-          <td class="blueBG"> <table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-              </tr>
-              <!-- BEGIN mgroup_block -->
-              <tr> 
-                <td width="12"><img src="/images/pix.gif" width="15" height="5"></td>
-                <td><img src="/images/whitearrow.gif" width="6" height="9"></td>
-                <td width="121"><a href="/{MGLINK}" class="one">{MGNAME}</a></td>
-              </tr>
-              <!-- END mgroup_block -->
-            </table></td>
-        </tr>
-        <tr> 
-          <td>&nbsp;</td>
-        </tr>
-        <!-- END mgroup -->
-        <tr> 
-          <td><img src="/images/sidenav-mylinks.gif" width="150" height="15"></td>
-        </tr>
-        <tr> 
-          <td class="blueBG"> <table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-              </tr>
-              <!-- BEGIN mlink_block -->
-              <tr> 
-                <td width="12"><img src="/images/pix.gif" width="15" height="5"></td>
-                <td><img src="/images/whitearrow.gif" width="6" height="9"></td>
-                <td width="121" class="blueBG">{MLINK}</td>
-              </tr>
-              <!-- END mlink_block -->
-              <tr> 
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-              </tr>
-              <tr> 
-                <td><img src="/images/pix.gif" width="15" height="5"></td>
-                <td><img src="/images/whitearrow.gif" width="6" height="9"></td>
-                <td><a href="/editLinks.php" class="one">ADD LINK</a></td>
-              </tr>
-            </table></td>
-        </tr>
-        <tr> 
-          <td class="blueBG">&nbsp;</td>
-        </tr>
-      </table>
-      
-    </td>
-    <td width="20" background="/images/redpixelbg.gif">&nbsp;</td>
-    <td valign="top"><!-- #BeginEditable "main" --> 
-            <table width="98%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                
-          <td class="large_head"><span class="itemHeader">{HEADING}</span><br><img src="/images/redpixel.gif" width="100%" height="2"></td>
-              </tr>
-      </table>
-            <br>
-            <table width="98%" border="0" cellspacing="0" cellpadding="0">
-              <tr align="left"> 
-                <td width="75%" valign="top" class="large_text"> {POS1}<br>
-                  {POS2}<br>
-                  {POS3}<br>
-                  {POS4}<br>
-                {POS5} </td>
-                <td width="35%" valign="top" class="large_text"> {POS6}<br>
-                  {POS7}<br>
-                  {POS8}<br>
-                  {POS9}<br>
-                {POS10} </td>
-              </tr>
-      </table>
-            <p>&nbsp;</p>
-            <!-- #EndEditable --></td>
-    <td>&nbsp;</td>
-  </tr>
-  <tr> 
-    <td width="150" class="blueBG">&nbsp;</td>
-    <td width="20" background="/images/redpixelbg.gif">&nbsp;</td>
-    <td align="right"><b>Copyright 2005 Wenona</b><br>
-      Guidelines of Use and Privacy Policy</td>
-    <td>&nbsp;</td>
-  </tr>
-</table>
-
+			</div><!-- #EndLibraryItem --><!-- #EndEditable --> 
+	<div id="content"> 
+		<div id="content_text"> <!-- #BeginEditable "main" --> 
+			<h1>{HEADING}</h1>
+			<br />
+			<table>
+				<tr>
+					<td style="width:70%; vertical-align:top"> {POS1}<br />
+						{POS2}<br />
+						{POS3}<br />
+						{POS4}<br />
+						{POS5} </td>
+					<td style="width:30%; vertical-align:top"> {POS6}<br />
+						{POS7}<br />
+						{POS8}<br />
+						{POS9}<br />
+						{POS10} </td>
+				</tr>
+			</table>
+            <!-- #EndEditable --> </div> 
+	</div> 
+</div> 
 </body>
 <!-- #EndTemplate --></html>

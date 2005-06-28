@@ -8,14 +8,17 @@
 <!-- #EndEditable -->
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="MGS"/>
+<meta name="author" content="James Leckie, Lektec Consulting"/>
 <meta name="ROBOTS" content="INDEX, FOLLOW" />
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<script type="text/javascript" src="/javascript/drop_down.js"></script>
 <!-- #BeginEditable "scripts" -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/default.css" />
-<script type="text/javascript" src="/std_scripts.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
+<script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
 <!-- #EndEditable -->
-<script type="text/javascript" src="/drop_down.js"></script>
 </head>
 <body>
 <div id="outerWrap">
@@ -107,12 +110,42 @@
 					<tr>
 						<td><h2>Due Date</h2>
 							<em>Actual date the work is due. This is the date that will be published.</em> </td>
-						<td>Date {DATE} Month {MONTH} Time {TIME}</td>
+						<td><input name="due_date" id="due_date" type="text" value="{DUE_DATE}" size="20" /> <img src="../images/ico_calendar.gif" width="16" height="13" id="due_trigger" style="cursor: pointer;" title="Date selector"/>
+	 				 	<script type="text/javascript">
+						Calendar.setup({
+							inputField     :    "due_date",     // id of the input field
+							ifFormat       :    "%d/%m/%Y",      // format of the input field
+							button         :    "due_trigger",  // trigger for the calendar (button ID)
+							align          :    "br",           // alignment (defaults to "Bl")
+							singleClick    :    true
+						});
+						</script>
+						<br />
+						<input name="due_hour" type="text" maxlength="2" value="{DUE_HOUR}" class="timeField">:<input name="due_minute" type="text" maxlength="2" value="{DUE_MIN}" class="timeField"> 
+                          <select name="due_period" class="short">
+                            <option value="am">AM</option>
+                            <option value="pm" {DUE_PM}>PM</option>
+                          </select> </td>
 					</tr>
 					<tr>
 						<td><h2>Late Date</h2>
 							<em>Students will not be able to submit after this date</em></td>
-						<td> Date {LDATE} Month {LMONTH} Time {LTIME}</td>
+						<td><input name="late_date" id="late_date" type="text" value="{LATE_DATE}" size="20" /> <img src="../images/ico_calendar.gif" width="16" height="13" id="late_trigger" style="cursor: pointer;" title="Date selector"/>
+	 				 	<script type="text/javascript">
+						Calendar.setup({
+							inputField     :    "late_date",     // id of the input field
+							ifFormat       :    "%d/%m/%Y",      // format of the input field
+							button         :    "late_trigger",  // trigger for the calendar (button ID)
+							align          :    "br",           // alignment (defaults to "Bl")
+							singleClick    :    true
+						});
+						</script>
+						<br />
+						<input name="late_hour" type="text" maxlength="2" value="{LATE_HOUR}" class="timeField">:<input name="late_minute" type="text" maxlength="2" value="{LATE_MIN}" class="timeField"> 
+                          <select name="late_period" class="short">
+                            <option value="am">AM</option>
+                            <option value="pm" {LATE_PM}>PM</option>
+                          </select></td>
 					</tr>
 					<tr>
 						<td><input type="hidden" name="cid" value="{CID}" />
