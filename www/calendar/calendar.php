@@ -57,10 +57,10 @@ function checkSecurity($level, $id)
 		return 0;
 }
 
-function getAllDayEvents($currDay, $currMonth, $currYear)
+function getAllDayEvents($currDay, $currMonth, $currYear, $campus = 0)
 {
 	//gets normal events and group shared events and merges them into an one array
-	$normalevents = $this->getDayEvents($currDay, $currMonth, $currYear);
+	$normalevents = $this->getDayEvents($currDay, $currMonth, $currYear, $campus);
 	$groupevents =  $this->getAllGroupDayEvents($currDay, $currMonth, $currYear);
 
 	$event = array_merge_recursive($normalevents,$groupevents);
@@ -285,7 +285,7 @@ function getSingleEvent($id, $type)
 	return $event;
 }
 
-function getDayEvents($day, $month, $year)
+function getDayEvents($day, $month, $year, $campus = 0)
 {
 	//this function will return all events occuring on the date specified
 		
@@ -294,7 +294,12 @@ function getDayEvents($day, $month, $year)
 	$dayno = date("w", $datestamp)+1;
 	$dayocc = ceil($date/7);  
 	$eventCount = 0;
-	$campuslist = implode(',',$_SESSION['campus']);
+	
+	//ouput only selected campus
+	if($campus)
+		$campuslist = $campus;
+	else
+		$campuslist = implode(',',$_SESSION['campus']);
 
 	//get single events for the day
 	$querysingle = "SELECT id, owner,TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, 
@@ -405,25 +410,25 @@ function getSubmissionEvents($day, $month, $year)
 
 	if(is_array($catList['id']))
 	{
-		$date = mktime(0,0,0,$month,$day,$year);
-		$i=0;	
+		$start_date = mktime(0,0,0,$month,$day,$year);
+		$end_date = mktime(23,59,59,$month,$day,$year); 
 
 		foreach($catList['id'] as $catID)
 		{
-			$query = "SELECT category.name, file.description FROM category, file, submission_box WHERE category.id = 
-				submission_box.category AND file.id = submission_box.fid AND submission_box.category = '$catID' AND 
-				submission_box.date = FROM_UNIXTIME('$date')";
-	
+			$query = "SELECT category.name AS category, category.code AS synergyCode, submission_box.description, submission_box.owner,
+				DATE_FORMAT(submission_box.date, '%w') as dayIndex, DATE_FORMAT(submission_box.date, '".CALENDAR_time_format."') as dueTime
+				FROM category, file, submission_box WHERE category.id = submission_box.category 
+				AND file.id = submission_box.fid AND submission_box.category = '$catID' AND submission_box.deleted = 0 AND
+				submission_box.date >= FROM_UNIXTIME('$start_date') AND submission_box.date <= FROM_UNIXTIME('$end_date')
+				ORDER BY submission_box.date ";
 			$this->db->dbDoQuery($query);
-
-			if($this->db->dbCountRows() > 0)
-			{
-				$subEvent = $this->db->dbGetNextArray(); 	
-	
-				$subEvents['category'][$i] = $subEvent['name'];
-				$subEvents['description'][$i] = $subEvent['description'];
-	
-				$i++;
+			while($subEvent = $this->db->dbGetNextArray())
+			{ 		
+				$subEvents['category'][] = $subEvent['category'];
+				$subEvents['owner'][] = $subEvent['owner'];
+				$subEvents['description'][] = $subEvent['description'];
+				$subEvents['synergyCode'][] = $subEvent['synergyCode'];
+				$subEvents['dueTime'][] = $subEvent['dueTime'];
 			}
 		}
 	}
@@ -431,6 +436,40 @@ function getSubmissionEvents($day, $month, $year)
 	return $subEvents;
 }
 
+function getWeekSubmissionEvents($day, $month, $year)
+{
+
+	//get a list of all the possible submission box categories
+	require_once($_SERVER['DOCUMENT_ROOT']."/include/involved.php");
+	$catList = involvedCategoryList(1);
+
+	if(is_array($catList['id']))
+	{
+		$start_date = mktime(0,0,0,$month,$day,$year);
+		$end_date = mktime(23,59,59,$month,$day+7,$year); 
+
+		foreach($catList['id'] as $catID)
+		{
+			$query = "SELECT category.name AS category, category.code AS synergyCode, submission_box.description, submission_box.owner,
+				DATE_FORMAT(submission_box.date, '%w') as dayIndex, DATE_FORMAT(submission_box.date, '".CALENDAR_time_format."') as dueTime
+				FROM category, file, submission_box WHERE category.id = submission_box.category 
+				AND file.id = submission_box.fid AND submission_box.category = '$catID' AND submission_box.deleted = 0 AND
+				submission_box.date >= FROM_UNIXTIME('$start_date') AND submission_box.date <= FROM_UNIXTIME('$end_date')
+				ORDER BY submission_box.date ";
+			$this->db->dbDoQuery($query);
+			while($subEvent = $this->db->dbGetNextArray())
+			{ 		
+				$subEvents[$subEvent['dayIndex']]['category'][] = $subEvent['category'];
+				$subEvents[$subEvent['dayIndex']]['owner'][] = $subEvent['owner'];
+				$subEvents[$subEvent['dayIndex']]['description'][] = $subEvent['description'];
+				$subEvents[$subEvent['dayIndex']]['synergyCode'][] = $subEvent['synergyCode'];
+				$subEvents[$subEvent['dayIndex']]['dueTime'][] = $subEvent['dueTime'];
+			}
+		}
+	}
+
+	return $subEvents;
+}
 
 function getCalendarArray($query1, $query2, $query3)
 {

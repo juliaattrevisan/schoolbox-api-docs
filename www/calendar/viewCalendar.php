@@ -28,9 +28,9 @@ class displayCalendar
 	{
 		$startTime = strtolower($startTime);
 		$endTime = strtolower($endTime);
-		if($startTime == "0:00" || $startTime == "12:00am" || $startTime == "12:00 am")   
+		if($startTime == "0:00" || $startTime == "12:00am" || $startTime == "12:00 am" || $startTime == '')   
 			$this->t_body->set_var("TIME", "");
-		else if($endTime == "0:00" || $endTime == "12:00am" || $endTime == "12:00 am")
+		else if($endTime == "0:00" || $endTime == "12:00am" || $endTime == "12:00 am" || $endTime == '')
 			$this->t_body->set_var("TIME", $startTime);
 		else
 			$this->t_body->set_var("TIME", $startTime." - ".$endTime);
@@ -39,7 +39,7 @@ class displayCalendar
 		$this->t_body->set_var("PRIORITY", $this->cal->displayColour($priority));
 		
 		
-		if($owner == $_SESSION['id'] || $this->cal->checkSecurity($access, $sid) > 1 || $_SESSION['su'])
+		if($id && ($_SESSION['su'] || $owner == $_SESSION['id'] || $this->cal->checkSecurity($access, $sid) > 1))
 			$this->t_body->set_var("MODIFY","<a href=\"addEvent.php?type=$type&id=$id\">Modify</a>");
 		else
 			$this->t_body->set_var("MODIFY", ""); 
@@ -189,18 +189,25 @@ class displayCalendar
 		$this->currMonth = date("n",$currentDay);
 		$this->currDay = date("j",$currentDay);
 		
+		$sub = $this->cal->getWeekSubmissionEvents($this->currDay, $this->currMonth, $this->currYear);
+		
 		//output week listing
-		for($x=1; $x <= 7; $x++)
+		for($x=0; $x < 7; $x++)
 		{
 			$this->t_body->set_var("DATE", date("l jS",$currentDay));
 			
 			$this->t_body->set_var("ADD", "<a href=\"addEvent.php?date=".$this->currDay."&month=".$this->currMonth."\">add</a>");
 			
 			//first lets output submission events
-			$sub = $this->cal->getSubmissionEvents($this->currDay, $this->currMonth, $this->currYear);
-			for($i=0; $sub['category'][$i]; $i++)
+			
+			for($i=0; $sub[$x]['category'][$i]; $i++)
 			{
-				$this->outputEvent(0, 0, 0, 1, "*DUE WORK* ".$sub['category'][$i]." - ".$sub['name'][$i], 0,0,0); 
+				if($sub[$x]['synergyCode'][$i])
+					$descr = $sub[$x]['category'][$i]." (".$sub[$x]['synergyCode'][$i].") - ".$sub[$x]['description'][$i];
+				else
+					$descr = $sub[$x]['category'][$i]." - ".$sub[$x]['description'][$i];
+					
+				$this->outputEvent(0, $sub[$x]['dueTime'][$i], '', 1, "WORK DUE ".$descr, 0,0,0,0); 
 				$subout = 1;
 			}
 

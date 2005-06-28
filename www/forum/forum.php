@@ -90,7 +90,8 @@ class forum
 		$res = $this->db->dbDoQuery($threadQuery);
 		if($this->db->dbCountRows($res) > 0)
 		{
-			$list = array();	
+			//initialise root of tree
+			$tree[0]['id'] = 0;	
 
 			while($thread = $this->db->dbGetNextArray($res))
 			{
@@ -101,11 +102,42 @@ class forum
 				WHERE owner = user.id AND thread = '".$thread['id']."' 
 				AND deleted = 0 ORDER BY parent, date";
 
-				$list = array_merge($this->db->dbGetAllRows($query),$list);
+				$this->db->dbDoQuery($query);
+				while($post = $this->db->dbGetNextArray())
+				{
+					$tree = $this->insertChildToTree($tree, $post);
+				}
 			}
 		}
 
+		return $tree;
+	}
+
+	function insertChildToTree($list, $element)
+	{
+		for($i=0; $list[$i]; $i++)
+		{
+			//if item is parent insert item
+			if($list[$i]['id'] == $element['parent'])
+			{
+				$list[$i]['children'][] = $element;
+				return $list;
+			}
+			
+			if(is_array($list[$i]['children']))
+			{
+				$sublist = insertChild($list[$i]['children'], $element);
+				//if item was inserted then we can leave else we need to keep searching
+				//optimisation step (hopefully should stop linear search)
+				if($sublist)
+				{
+					$list[$i]['children'] = $sublist;
+					return $list;
+				}
+			}
+		}
 		return $list;
+	
 	}
 
 	function countTopics($cid)
