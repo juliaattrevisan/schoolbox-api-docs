@@ -116,8 +116,15 @@ class OutPut
 		$sub = $cal->getSubmissionEvents($currDay, $currMonth, $currYear);
 		for($i=0; $sub['category'][$i]; $i++)
 		{
-			$this->t_body->set_var("TIME", "");
-			$this->t_body->set_var("NOTE", "*DUE WORK* ".$sub['category'][$i]." - ".$sub['name'][$i]); 
+			$this->t_body->set_var("TIME", $sub['dueTime'][$i]);
+			if($sub['synergyCode'][$i])
+				$descr = $sub['category'][$i]." (".$sub['synergyCode'][$i].") - ".$sub['description'][$i];
+			else
+				$descr = $sub['category'][$i]." - ".$sub['description'][$i];
+				
+			$this->t_body->set_var("NOTE", "WORK DUE ".$descr); 
+			$this->t_body->set_var("NOTE_COLOUR", $cal->displayColour(1));
+			
 			$this->t_body->parse("note_listing","note_block", true);
 			$subout = 1;
 		}
@@ -139,7 +146,8 @@ class OutPut
 				else
 						$this->t_body->set_var("TIME", $event['startTime'][$i]." - ".$event['endTime'][$i]);
 				
-				$this->t_body->set_var("NOTE", "<font color=".$cal->displayColour($event['priority'][$i]).">".$event['note'][$i]."</font>");
+				$this->t_body->set_var("NOTE_COLOUR", $cal->displayColour($event['priority'][$i]));
+				$this->t_body->set_var("NOTE", $event['note'][$i]);
 				$this->t_body->parse("note_listing","note_block", true);
 
 			}
