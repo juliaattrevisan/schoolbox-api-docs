@@ -1,4 +1,4 @@
- <h2>News</h2>
+<h2 class="large_head">News</h2>
 <table> 
 	<!-- BEGIN news --> 
 	<tr> 
@@ -8,16 +8,14 @@
 	<tr> 
 		<td class="large_text" colspan="2">{NEWS_BODY}</td> 
 	</tr> 
-	<tr> 
+	<tr style="border-bottom:1px solid #666"> 
 		<td class="large_text" style="text-align:right;" colspan="2"><span class="element_footer">Posted by {EMAIL_CONTACT} on {POSTED_DATE}</span></td> 
-	</tr> 
-	<tr> 
-		<td colspan="2"><div style="margin:0; padding:0; border-bottom:2px solid #666;"></div></td> 
 	</tr> 
 	<!-- END news --> 
 	<!-- BEGIN submit_news --> 
-	<tr> 
+	<tr style="border-top:2px solid #666"> 
 		<td style="text-align:right;" colspan="2" class="navbar"><img src="/newimages/navbar_input_small.gif" alt="small arrow" /><a href="/subject/modSubNews.php?category={ID}">POST NEWS</a></td> 
 	</tr> 
 	<!-- END submit_news --> 
 </table>
+<br />

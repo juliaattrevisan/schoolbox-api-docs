@@ -1,52 +1,21 @@
-<table width="90%" border="0" cellspacing="0" cellpadding="0" height="1" align="center">
-  <tr>
-    <td class="large_head" colspan="2">Discussion Board</td>
-  </tr>
-  <tr>
-    <td height="2" bgcolor="#666666" width="70%"></td>
-    <td height="2" bgcolor="#666666" width="30%"></td>
-  </tr>
-  <!-- BEGIN large_forum -->
-  <tr>
-    <td class="large_text" width="70%"><b>{FORUM_HEADING}</b></td>
-    <td class="large_text" align="right" width="30%">{REPLY}{MOD_FORUM} </td>
-  </tr>
-  <tr>
-    <td class="large_text" colspan="2">{FORUM_BODY}</td>
-  </tr>
-  <tr align="right">
-    <td class="large_text" colspan="3" height="1"><font color="#666666">Posted
-        by <a href="/mail/send.php?replyto={CONTACT}">{POSTER}</a> on {POSTED_DATE}</font></td>
-  </tr>
-  <tr>
-    <td width="70%" bgcolor="#666666" height="1"></td>  
-    <td width="30%" bgcolor="#666666" height="1"></td>
-  </tr>
-  <!-- END large_forum -->
-  <tr>
-    <td width="70%" bgcolor="#666666" height="2"></td>
-    <td width="30%" bgcolor="#666666" height="2"></td>
-  </tr>
-  <!-- BEGIN submit_forum -->
-  <tr>
-    <td height="4" width="70%">&nbsp;</td>
-    <td height="4" width="30%">
-      <table  border="0" cellpadding="0" cellspacing="0" align="right">
-        <tr>
-          <td height="5"></td>
-          <td height="5"> </td>
-        </tr>
-        <tr>
-          <td><img src="/newimages/navbar_input_small.gif" width="8" height="13"></td>
-          <td class="navbar"><a href="/forum/modpost.php?cid={CID}&parent=0">POST
-              </a></td>
-        </tr>
-        <tr>
-          <td height="5"></td>
-          <td height="5"></td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-  <!-- END submit_forum -->
+<h2 class="large_head">Discussion Board</h2>
+<table>
+	<!-- BEGIN large_forum -->
+	<tr>
+		<td class="large_text"><h3>{FORUM_HEADING}</h3></td>
+		<td style="text-align:right" class="large_text">{REPLY}{MOD_FORUM}</td>
+	</tr>
+	<tr>
+		<td class="large_text" colspan="2">{FORUM_BODY}</td>
+	</tr>
+	<tr style="border-bottom:1px solid #666">
+		<td class="large_text" colspan="2"><span class="element_footer">Posted by <a href="/mail/send.php?replyto={CONTACT}">{POSTER}</a> on {POSTED_DATE}</span></td>
+	</tr>
+	<!-- END large_forum -->
+	<!-- BEGIN submit_forum -->
+	<tr style="border-top: 2px solid #666">
+		<td style="text-align:right;" colspan="2" class="navbar"><img src="/newimages/navbar_input_small.gif" alt="small arrow" /><a href="/forum/modpost.php?cid={CID}&parent=0">POST TOPIC</a></td>
+	</tr>
+	<!-- END submit_forum -->
 </table>
+<br />
