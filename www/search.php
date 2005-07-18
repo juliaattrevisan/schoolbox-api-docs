@@ -467,7 +467,7 @@ else
 		$myPage->searchResult();
 		
 		//advanced search
-		if( ($_GET['type'] && $_GET['sort'])
+		if($_GET['type'] && $_GET['sort'])
 		{   
 			$myPage->listSearch($_GET['keyword'], $_GET['type'], $_GET['sort']);
 		}
@@ -475,6 +475,7 @@ else
 		{  
 			$myPage->listSearch($_GET['keyword']);
 		}
+	}
 	else
 	{
 		$myPage->advancedSearch();

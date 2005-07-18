@@ -126,23 +126,23 @@ class OutPut
 
 		//now create css string
 		$css = ".large_head{ ";
-		$css .= "background-color: ".$ctable[$page['large_head_bgcolour']]."; ";
-		$css .= "color: ".$ctable[$page['large_head_fontcolour']]."; ";
+		$css .= "background-color: #".$ctable[$page['large_head_bgcolour']]."; ";
+		$css .= "color: #".$ctable[$page['large_head_fontcolour']]."; ";
 		$css .= "font-weight: bold; font-family: Verdana; }";
 		
 		$css .= ".large_text{ ";
-		$css .= "background-color: ".$ctable[$page['large_text_bgcolour']]."; ";
-		$css .= "color: ".$ctable[$page['large_text_fontcolour']]."; ";
+		$css .= "background-color: #".$ctable[$page['large_text_bgcolour']]."; ";
+		$css .= "color: #".$ctable[$page['large_text_fontcolour']]."; ";
 		$css .= "font-family: Verdana; }";
 
 		$css .= ".small_head{ ";
-		$css .= "background-color: ".$ctable[$page['small_head_bgcolour']]."; ";
-		$css .= "color: ".$ctable[$page['small_head_fontcolour']]."; ";
+		$css .= "background-color: #".$ctable[$page['small_head_bgcolour']]."; ";
+		$css .= "color: #".$ctable[$page['small_head_fontcolour']]."; ";
 		$css .= "font-weight: bold; font-family: Verdana; font-size: 11px}";
 		
 		$css .= ".small_text{ ";
-		$css .= "background-color: ".$ctable[$page['small_text_bgcolour']]."; ";
-		$css .= "color: ".$ctable[$page['small_text_fontcolour']]."; ";
+		$css .= "background-color: #".$ctable[$page['small_text_bgcolour']]."; ";
+		$css .= "color: #".$ctable[$page['small_text_fontcolour']]."; ";
 		$css .= "font-family: Verdana; font-size: 11px}";
 
 		$this->t_body->set_var("CSS", $css);

@@ -29,6 +29,7 @@ class OutPut
 		$this->t_body->set_file('tplBODY', 'browse.htm');
 
 		$this->t_body->set_var("TITLE", HEADING." - Browse");
+		$this->t_body->set_var("CID", $category);
 		
 		//category output
 		$this->t_body->set_block("tplBODY", "category_listing", "cats_block");
