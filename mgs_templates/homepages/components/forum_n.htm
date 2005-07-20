@@ -1,5 +1,7 @@
-<h2 class="large_head">Discussion Board</h2>
 <table>
+	<tr>
+		<td class="homeComponentHeader"><h2 class="large_head">Discussion Board</h2></td>
+	</tr>
 	<!-- BEGIN large_forum -->
 	<tr>
 		<td class="large_text"><h3>{FORUM_HEADING}</h3></td>
@@ -8,12 +10,15 @@
 	<tr>
 		<td class="large_text" colspan="2">{FORUM_BODY}</td>
 	</tr>
-	<tr style="border-bottom:1px solid #666">
-		<td class="large_text" colspan="2"><span class="element_footer">Posted by <a href="/mail/send.php?replyto={CONTACT}">{POSTER}</a> on {POSTED_DATE}</span></td>
+	<tr>
+		<td style="border-bottom:1px solid #666" class="large_text" colspan="2"><span class="element_footer">Posted by <a href="/mail/send.php?replyto={CONTACT}">{POSTER}</a> on {POSTED_DATE}</span></td>
 	</tr>
 	<!-- END large_forum -->
+	<tr style="height:2px;">
+		<td colspan="2" style="background:#666;"></td>
+	</tr>					
 	<!-- BEGIN submit_forum -->
-	<tr style="border-top: 2px solid #666">
+	<tr>
 		<td style="text-align:right;" colspan="2" class="navbar"><img src="/newimages/navbar_input_small.gif" alt="small arrow" /><a href="/forum/modpost.php?cid={CID}&parent=0">POST TOPIC</a></td>
 	</tr>
 	<!-- END submit_forum -->
