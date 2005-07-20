@@ -26,7 +26,7 @@ h1, h2 {
 	}
 
 h1 {
-	color:#00458C;
+	/*color:#00458C;*/
 	font-size:120%;
 	border-left:20px solid #00458C;
 	border-bottom:4px solid #00458C;
@@ -34,21 +34,21 @@ h1 {
 	
 h2 {
 	margin-left:20px;
-	color:#06c;
+	/*color:#06c;*/
 	font-size:110%;
 	border-left:10px solid #06c;
 	border-bottom:4px solid #06c;
 	}
 
 .sideWrap h3 {
-	margin:0;
-	padding:4px 0 0 10px;
+	margin:0 0 3px 0;
+	padding:4px 0 0 6px;
 	background:#0065CE;
 	color:#fff;
 	font-size:60%; 
 	line-height:1.4em;
-	font-weight:bold;
-	font-style:italic;
+	/*font-weight:bold;*/
+	/*font-style:italic;*/
 	}
 
 /*--------------------------------------------------------------------------------------*/
@@ -57,7 +57,7 @@ h2 {
 p {
 	line-height:1.4em;
 	color:#000;
-	margin:0.8 0 0 0;
+	margin:0.8em 0 0 0;
 	} 
 
 acronym, dfn, abbr {
@@ -84,25 +84,80 @@ acronym, dfn, abbr {
 	}
 #content ul a {font-weight:normal;}
 
+/*--------------------------------------------------------------------------------------*/
+/* HORIZONTAL DROP DOWN MENU STYLES */
+/*--------------------------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------------------------*/
+/* HORIZONTAL DROP DOWN MENU STYLES */
+/*--------------------------------------------------------------------------------------*/
+.sideWrap a:link, .sideWrap a:active, .sideWrap a:visited {color:#03c;}
+/* FIRST LEVEL MENU UNORDERED LIST */
 .sideWrap ul {
-	margin:0;
-	list-style:none;
-	text-align:left;
+	margin:0 0 10px 0;
+	padding:0;
+	list-style: none;
+	width:135px; /* Width of Menu Items */
+	z-index:2;
 	}
+/* FIRST LEVEL MENU UNORDERED LIST ELEMENT */
 .sideWrap ul li {
-	list-style:none;
-	padding-left:12px;
-	margin:3px 0;
+	position: relative;
+	background:#fff url(/newimages/navbar_input_small.gif) no-repeat 2px 3px;	
+	}
+
+/* FIRST LEVEL MENU LINK */
+.sideWrap ul li a {
+	color:blue;
+	display:block;
+	text-decoration:none;
+	background:transparent; /* IE6 Bug */
+	padding:2px 0 2px 14px;
+	border:0;
+	margin:0;
 	font-weight:normal;
 	font-size:70%;
-	line-height:1.5em;
 	}
-
-.sideWrap ul li {
-	background:transparent url(/newimages/navbar_input_small.gif) no-repeat 2px 0.2em;
+	
+/* SECOND LEVEL MENU UNORDERED LIST */
+.sideWrap li ul {
+	position:absolute;
+	left:134px; /* Set 1px less than menu width */
+	top:0;
+	display:none;
+	border:1px solid #00458C;
+	border-bottom:0;
+	margin-left:1px;
 	}
-.sideWrap ul a {font-weight:normal;}
+/* SECOND LEVEL LIST */
+.sideWrap li ul li { 
+	border-bottom:1px solid #00458C;
+	background-image:none;
+	background:#0065CE;
+	}	
+/* SECOND LEVEL LIST LINK */
+.sideWrap li ul li a {
+	padding:2px 5px;
+	background:#0065CE;
+	color:#fff;
+	} 
 
+/* Hover Styles */
+.sideWrap ul li a:hover {background:#CEF3FF url(/newimages/navbar_input_small.gif) no-repeat 2px 3px;color:#00f;text-decoration:none;} 
+.sideWrap li ul li a:hover {
+	color:#fff;
+	background-image:none;
+	background:#00458C;
+	}
+.sideWrap li ul li a:link, .sideWrap li ul li a:active, .sideWrap li ul li a:visited {color:#fff;}
+
+/* Fix IE. Hide from IE Mac \*/
+* html .sideWrap ul li {float:left; height:1%;}
+* html .sideWrap ul li a {height:1%;}
+/* End */
+
+.sideWrap li:hover ul ul, .sideWrap li.over ul ul {display:none;} 
+.sideWrap li:hover ul, .sideWrap li li:hover ul, .sideWrap li.over ul, .sideWrap li li.over ul {display: block;} /* The magic */
 /*--------------------------------------------------------------------------------------*/
 /* LINKS */
 /*--------------------------------------------------------------------------------------*/
@@ -119,9 +174,6 @@ a:hover {
 	color:#06c;
 	text-decoration:underline;
 	}
-a:active {
-	color:#03c;
-	}
 a img {
 	border:0;
 	}
@@ -130,7 +182,7 @@ a img {
 /* LAYOUT ELEMENTS */
 /*--------------------------------------------------------------------------------------*/
 
-#outerWrap. #header, #innerWrap, #left, #content, .padFix {
+#outerWrap, #header, #innerWrap, #left, #content {
 	margin:0;
 	padding:0;
 	border:0;
@@ -154,11 +206,13 @@ a img {
 	position:absolute;
 	top:72px;
 	left:0;
-	width:120px;
+	width:150px;
+	z-index:2; /* this is needed so that the horizontal pop-up menu appears above this */
 	}
 
 #content{
-	margin:35px 0 0 130px;
+	z-index:1; /* this is needed so that the horizontal pop-up menu appears above this */
+	margin:35px 0 0 160px;
 	}
 
 #content_text{
@@ -169,14 +223,11 @@ a img {
 	font-size:80%;
 	line-height:1.4em;
 	color:#000;
+	z-index:1; /* this is needed so that the horizontal pop-up menu appears above this */
 	}
 #content_text p {
 	margin: 0.8em 0 0 0;
 	}
-.padFix {
-	padding:10px;
-	}
-
 .sideWrap {
 	margin:10px 10px 20px 10px;
 	background:#0065CE;
@@ -189,6 +240,9 @@ a img {
 	margin:0;
 	padding-left:20px;
 	}
+.indent h2 {
+	margin-left:0;
+	}
 /*--------------------------------------------------------------------------------------*/
 /* TOP NAVIGATION */
 /*--------------------------------------------------------------------------------------*/    
@@ -196,9 +250,10 @@ a img {
 #topNav {
 	position:absolute;
 	top:82px;
-	left:130px;
+	left:160px;
 	padding:0;
 	background:transparent;
+	z-index:1; /* this is needed so that the horizontal pop-up menu appears above this */
 	}
 #topNav ul {
 	margin:0;
@@ -246,7 +301,10 @@ a img {
 #topNav a {float:none;}
 /* End IE5-Mac hack */
 #topNav a:hover {
-	color:#333;
+	color:#00458C;
+}
+#topNav a.navthis:hover {
+	color:#fff;
 }
 #topNav li {
 	background-position:0 -150px;
@@ -286,18 +344,17 @@ a img {
 	}
 #footer a {
 	color:#ccc;
-	text-decoration:non;
-	
+	text-decoration:none;
 	}
 #footer a:hover {
 	color:#ccc;
 	text-decoration:underline;
 	}
-#footer p {	
-	margin:0;
-	font-size:70%;
+#footer p {
+	padding:0;
+	margin:0 0 0.4em 0;
+	font-size:60%;
 	color:#ccc;
-	line-height:1.4em;
 	}
 #content #footer p.small, #content #footer p.small a {
 	font-weight:normal;
@@ -365,10 +422,14 @@ a img {
 /* OTHER FORMS */
 /*--------------------------------------------------------------------------------------*/
 #searchForm {
-	margin-top:3px;
+	padding-top:3px;
 }
+#searchForm input, #searchForm select {
+	margin:0 0 10px 10px;
+	}
 #searchForm input.short, #searchForm select.short {
-	width:80px;margin:0 0 0 10px;padding:0;
+	width:110px;padding:0;
+	border:1px solid #0065CE;
 	}
 #searchForm input.img {
 	margin-bottom:4px;
@@ -378,11 +439,11 @@ a img {
 /*--------------------------------------------------------------------------------------*/
 /* OTHER FORMS */
 /*--------------------------------------------------------------------------------------*/
-.standard {
+form.standard {
 	padding:4px;
 	background:#ccc;
 	}
-.standard em {
+form.standard em {
 	font-size:70%;
 	font-style:normal;
 	}
@@ -421,6 +482,9 @@ a img {
 	margin:0;
 	color:#333;
 	}
+.standard td.formLabelWidth {
+	width:260px;
+	}
 /*--------------------------------------------------------------------------------------*/
 /* SPECIFIC ELEMENT DECLARATIONS */
 /*--------------------------------------------------------------------------------------*/
@@ -442,10 +506,28 @@ a img {
 	vertical-align:top;
 	padding-right:0.5em;
 	}
-#content_text table.calendarTable {
-	width:400px;
+#content_text table.calendarTable td a.back, #content_text table.calendarTable td a.forward {
+	display:block;
+	background:#00458C;
+	color:#fff;
 	text-align:center;
+	margin:0;
+	padding:0;
+	}	
+#content_text table.calendarTable {
+	width:280px;
+	text-align:center;
+	border:2px solid #00458C;
+	margin:10px 0 0 0;
 	}
+#content_text table.calendarTable td {
+	width:40px;
+	}	
+#content_text .calendarTable select {
+	font:bold 70% /1em Verdana, arial, sans-serif, serif;
+	color:#00458C;
+	width:10em;
+	}	
 .calTable {
 	background:#D7ECFF;
 	font-weight:bold;
@@ -479,20 +561,19 @@ br.fix {
 	}
 
 /*--------------------------------------------------------------------------------------*/
-/* CoolMenus 4 - default styles - do not edit */
+/* TABLE RULER */
 /*--------------------------------------------------------------------------------------*/
-.clCMAbs{position:absolute; visibility:hidden; left:0; top:0}
-/* CoolMenus 4 - default styles - end */
-/*Style for the background-bar*/
-.clBar{position:absolute; width:10; height:10; background-color:#FF9900; layer-background-color:#FF9900; visibility:hidden}
-/*Styles for level 0*/
-.clLevel0,.clLevel0over{position:absolute; padding:1px; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; }
-.clLevel0{background-color:; layer-background-color:; color:#0033CC;}
-.clLevel0over{background-color:; layer-background-color:; color:#0066CC; cursor:pointer; cursor:hand; }
-.clLevel0border{position:absolute; visibility:hidden; background-color:; layer-background-color:;}
-/*Styles for level 1*/
-.clLevel1, .clLevel1over{position:absolute; padding:2px; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px;}
-.clLevel1{background-color:#0066CC; layer-background-color:#0066CC; color:white;}
-.clLevel1over{background-color:#00458A; layer-background-color:#00458A; color:white; cursor:pointer; cursor:hand; }
-.clLevel1border{position:absolute; visibility:hidden; background-color:#0055AA; layer-background-color:#0055AA}
 
+tr.ruled{
+	background:#FFFFA5;
+	}    
+table.ruler td {
+	padding-bottom:2px;
+	}  
+table.ruler tbody td {
+	padding:0 10px 2px 4px;
+	}
+table.ruler h2 {
+	margin-left:0;
+	padding-right:0;
+	}
