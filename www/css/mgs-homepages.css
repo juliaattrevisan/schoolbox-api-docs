@@ -4,18 +4,18 @@ h2, h3 {
 	/*background:transparent;*/
 	padding:0;
 	font-weight:bold;	
+	line-height:1em;
 	}
 
 h2 {
-	padding:1px 2px;
+	padding:3px 0 3px 2px;
 	/*color:#000;*/
 	font-size:100%;
 	border:0;
 	border-bottom:2px solid #666;
-	width:95%
 	}
 h3 {
-	padding:1px 2px;
+	padding:1px 0 2px 0;
 	color:#000;
 	font-size:100%;
 	border:0;
@@ -23,14 +23,28 @@ h3 {
 
 #left-homepage-col table {
 	border-collapse:collapse;
+	border:0;
 	width:95%
 }
 
 #right-homepage-col table {
 	border-collapse:collapse;
-	width:95%
+	border:0;
+	width:100%
+}
+
+#left-homepage-col table td, #right-homepage-col table td {
+	padding-left:4px;
+}
+#left-homepage-col table td.homeComponentHeader, #right-homepage-col table td.homeComponentHeader {
+	padding-left:0;
 }
 
 #right-homepage-col ul li {
 	background:transparent url(/newimages/navbar_input_small.gif) no-repeat 2px 0.2em;
+}
+#left-homepage-col table td.titleColumn, #right-homepage-col table td.titleColumn {
+	width:35%;
+	background-color:#ccc;
+	border-bottom:1px solid #666;
 }
