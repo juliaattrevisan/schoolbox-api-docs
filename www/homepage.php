@@ -36,17 +36,14 @@ class OutPut
 						
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file('tplBODY', 'homepages/homepage'.$skel_template['template'].'.htm');
-		//$this->t_body->debug = 5;
+
 		//setup css
 		$this->outputCSS($skel_template);
-		//$this->t_body->set_var("CSS", $skel_template['css']);
 
 		//output header information
 		$this->outputHeader($skel_template['name']);
 
 		$this->logPageView();
-
-
 
 		//get list of homepage components, locations and size
 		$query = "SELECT position, component, homepage_comp_location.size, name, method, filename 
@@ -88,7 +85,7 @@ class OutPut
 
 	function outputHeader($name)
 	{
-		$name = htmlentities($name);
+		$name = scrubTEXT($name);
 		$this->t_body->set_var("HEADING", $name);
 		
 		$this->t_body->set_var("ID", $this->category);
@@ -175,10 +172,10 @@ class OutPut
 		$result = $this->db->dbGetNextArray();
 	
                 if($result['code'] == "")
-                        $this->t_body->set_var("HEADING", htmlentities($result['name']));
+                        $this->t_body->set_var("HEADING", scrubTEXT($result['name']));
                 else
                 {
-		        $this->t_body->set_var("HEADING", htmlentities($result['name'])." (".$result["code"].")");	
+		        $this->t_body->set_var("HEADING", scrubTEXT($result['name'])." (".$result["code"].")");	
 			$this->t_body->set_var("CODE", urlencode($result['code']));
 		}
 
@@ -197,25 +194,25 @@ class OutPut
 		//output members of group
 		$this->t_body->set_block($name, "members", "members_block");
 		
-                $query = "SELECT firstname, lastname, type, username, local_email, alt_email FROM user, userAccess
-                WHERE id = uid AND service = '$this->service' AND sid = '$this->category' AND type > 0 ORDER BY lastname, firstname";
-                $this->db->dbDoQuery($query);
-                
+		$query = "SELECT firstname, lastname, type, username, local_email, alt_email FROM user, userAccess
+		WHERE id = uid AND service = '$this->service' AND sid = '$this->category' AND type > 0 ORDER BY lastname, firstname";
+		$this->db->dbDoQuery($query);
+		
 		if($this->db->dbCountRows() > 0)
 		{
-                	while($member = $this->db->dbGetNextArray())
-                	{			
+			while($member = $this->db->dbGetNextArray())
+			{			
 				$name = $member['firstname']." ".$member['lastname'];	
 				if($member['type'] == 3)
 					$name .= " (Group Admin.)";
-
-		                if($member['local_email'])
-                		        $email = $member['username']."@".MAIL_address;
-                		else if($member['alt_email'])
-                        		$email = $member['alt_email'];
-                		else
-                        		$email = "";
-								
+				
+				if($member['local_email'])
+						$email = $member['username']."@".MAIL_address;
+				else if($member['alt_email'])
+						$email = $member['alt_email'];
+				else
+						$email = "";
+						
 				if($email)
 				{
 					$this->t_body->set_var("MEMBER_NAME", "<a href=\"{$_SESSION['mailhandle']}{$email}\">{$name}</a>");
@@ -224,7 +221,7 @@ class OutPut
 				else
 					$this->t_body->set_var("MEMBER_NAME", $name);
 				
-               			$this->t_body->parse("members_block", "members", true);	
+				$this->t_body->parse("members_block", "members", true);	
 			}
 			$this->t_body->set_var("EMAILALL", $emailall);
 		}
@@ -311,7 +308,7 @@ class OutPut
 		}
 		else
 		{
-			$this->t_body->set_var("news_block", "<tr><td>No news available.</td></tr>");
+			$this->t_body->set_var("news_block", "");
 		}
 
 		//setup block for submission button
@@ -374,7 +371,7 @@ class OutPut
 				$imageSize=$size*100;
 						
 			$imageurl = "cms/image.php?id={$image['id']}&height={$imageSize}&width={$imageSize}";
-
+			
 			$this->t_body->set_var("PREVIEW_IMAGE_URL", $imageurl);
 			$this->t_body->set_var("PREVIEW_IMAGE_DESC", $image['comment']);
 			$this->t_body->set_var("CONTENT_URL", $link['url']);
@@ -436,7 +433,7 @@ class OutPut
 
 		$this->db->dbDoQuery($query);
 
-		if($this->db->dbCountRows() < 1 ){ $this->t_body->set_var("homework_block", "<tr><td></td><td>No Homework</td></tr>");}
+		if($this->db->dbCountRows() < 1 ){$this->t_body->set_var("homework_block", "");}
 		else
 		{
 			while($queryArray = $this->db->dbGetNextArray() )
@@ -485,7 +482,7 @@ class OutPut
 
 		$this->db->dbDoQuery($query);
 
-		if($this->db->dbCountRows() < 1 ){$this->t_body->set_var("assign_block", "<tr><td></td><td>No Assignments</td></tr>");}
+		if($this->db->dbCountRows() < 1 ){$this->t_body->set_var("assign_block", "");}
 		else
 		{
 			while($queryArray = $this->db->dbGetNextArray() )
@@ -518,7 +515,7 @@ class OutPut
 	
 		$this->db->dbDoQuery($query);
 
-		if($this->db->dbCountRows() < 1){ $array['comment'] = "No Notes Found"; $this->outputNote($array);}
+		if($this->db->dbCountRows() < 1){ $this->t_body->set_var("notes_block", "");}
 		else
 		{
 			while($queryArray = $this->db->dbGetNextArray() )
@@ -550,7 +547,7 @@ class OutPut
 
 		$this->db->dbDoQuery($query);
 
-		if($this->db->dbCountRows() < 1){$array['comment']="No Links Found"; $this->outputLink($array);}
+		if($this->db->dbCountRows() < 1){$this->t_body->set_var("link_block", "");}
 		else
 		{
 			while($queryArray = $this->db->dbGetNextArray() )
@@ -582,7 +579,7 @@ class OutPut
 
 		$this->db->dbDoQuery($query);
 
-		if($this->db->dbCountRows() < 1){ $array['comment'] = "No Files Found"; $this->outputFile($array);}
+		if($this->db->dbCountRows() < 1){ $this->t_body->set_var("files_block", "");}
 		else
 		{
 			while($queryArray = $this->db->dbGetNextArray() )
@@ -613,7 +610,7 @@ class OutPut
 
 		$this->db->dbDoQuery($query);
 
-		if($this->db->dbCountRows() < 1){ $array['comment'] = "No Folders Available"; $this->outputFolder($array);}
+		if($this->db->dbCountRows() < 1){ $this->t_body->set_var("folders_block", "");}
 		else
 		{
 			while($queryArray = $this->db->dbGetNextArray() )
@@ -692,8 +689,7 @@ class OutPut
 		}//end if
 		else
 		{
-			$this->t_body->set_VAR("row_block", "There are no images in this page, <a 
-			href='/cms/modResource.php?type=file&cid={$this->category}'>POST FILE</a> to upload some.");
+			$this->t_body->set_VAR("row_block", "");
 		}
 	}
 
@@ -710,7 +706,7 @@ class OutPut
 
 		$res = $this->db->dbDoQuery($query);
 
-		if($this->db->dbCountRows() < 1){ $array['heading'] = "No Forum Posts"; $this->outputForum($array);}
+		if($this->db->dbCountRows() < 1){$this->t_body->set_var("forum_block", "");}
 		else
 		{
 			while($curr = $this->db->dbGetNextArray($res))
@@ -739,13 +735,13 @@ class OutPut
 		
 		$this->db->dbDoQuery($query);	
 
-		if($this->db->dbCountRows() < 1){$array['note'] = "No Events Scheduled"; $this->outputEvent($array);}
+		if($this->db->dbCountRows() < 1){$this->t_body->set_var("group_events_block", "");}
 		else
 		{
 			require_once("calendar/calendar.php");
 			$cal = new calendar;			
 
-			while($queryArray = $this->db->dbGetNextARray() )
+			while($queryArray = $this->db->dbGetNextArray() )
 			{
 				$queryArray['colour'] = $cal->displayColour($queryArray['priority']);
 				$this->outputEvent($queryArray);
@@ -869,16 +865,16 @@ class OutPut
 		if($queryArray['realname'] != "")
 		{
 			if($allowedFileTypes[$queryArray['mime_type']][1] == 1)
-				$url = "<a href=\"sendframe.php?id=".$queryArray['id']."\" target=\"_blank\">".htmlentities($queryArray['description'])."</a>";
+				$url = "<a href=\"sendframe.php?id=".$queryArray['id']."\" target=\"_blank\">".scrubTEXT($queryArray['description'])."</a>";
 			else
-				$url = "<a href=\"send.php?id=".$queryArray['id']."\">".htmlentities($queryArray['description'])."</a>";
+				$url = "<a href=\"send.php?id=".$queryArray['id']."\">".scrubTEXT($queryArray['description'])."</a>";
 
 			$this->t_body->set_var("FILE_NAME", $url);
 		}
 		else
-			$this->t_body->set_var("FILE_NAME", htmlentities($queryArray['description']));
+			$this->t_body->set_var("FILE_NAME", scrubTEXT($queryArray['description']));
 
-		$this->t_body->set_var("FILE_COMMENT", nl2br(htmlentities($queryArray['comment'])));
+		$this->t_body->set_var("FILE_COMMENT", nl2br(scrubTEXT($queryArray['comment'])));
 
 		$this->t_body->parse("files_block", "files", true);
 
@@ -887,7 +883,7 @@ class OutPut
 	function outputFolder($queryArray)
 	{
 		//set name
-		$this->t_body->set_var("FOLDER_NAME", "<a href=\"/browse.php?category=".$queryArray['id']."\">".htmlentities($queryArray['name'])."</a>");
+		$this->t_body->set_var("FOLDER_NAME", "<a href=\"/browse.php?category=".$queryArray['id']."\">".scrubTEXT($queryArray['name'])."</a>");
 
 		$this->t_body->parse("folders_block", "folders", true);
 
@@ -899,9 +895,9 @@ class OutPut
 		
 		//set name
 		if($queryArray['id'] == "")
-			$this->t_body->set_var("FORUM_HEAD", htmlentities($queryArray['heading']));
+			$this->t_body->set_var("FORUM_HEAD", scrubTEXT($queryArray['heading']));
 		else
-			$this->t_body->set_var("FORUM_HEAD", "<a href=\"$url\">".htmlentities($queryArray['heading'])."</a>");
+			$this->t_body->set_var("FORUM_HEAD", "<a href=\"$url\">".scrubTEXT($queryArray['heading'])."</a>");
 
 		$this->t_body->parse("forum_block", "forum", true);
 	}
@@ -912,18 +908,12 @@ class OutPut
 	{
 		//set the url		
 		if(isLocalURL($queryArray['url']))
-		{
-			$this->t_body->set_var("LINK_NAME", "<a href=\"".$queryArray['url']."\">"
-				.htmlentities($queryArray['description'])."</a>");
-		}
+			$this->t_body->set_var("LINK_NAME", "<a href=\"".$queryArray['url']."\">".scrubTEXT($queryArray['description'])."</a>");
 		else
-		{
-			$this->t_body->set_var("LINK_NAME", "<a href=\"/redir.php?url=".$queryArray['url']."\" target=\"_blank\">"
-				.htmlentities($queryArray['description'])."</a>");
-		}
+			$this->t_body->set_var("LINK_NAME", "<a href=\"/redir.php?url=".$queryArray['url']."\" target=\"_blank\">".scrubTEXT($queryArray['description'])."</a>");
 		
 		//set the description
-		$this->t_body->set_var("LINK_COMMENT", nl2br($queryArray['comment']));
+		$this->t_body->set_var("LINK_COMMENT", nl2br(scrubTEXT($queryArray['comment'])));
 
 		$this->t_body->parse("link_block", "link", true);
 	}
@@ -935,19 +925,16 @@ class OutPut
 		$this->t_body->set_var("CAL_MONTH", $queryArray['month']);
 		$this->t_body->set_var("CAL_DAY", $queryArray['day']);
 	
-                if($queryArray['startTime'] == "0:00" || $queryArray['startTime'] == "")
-                        $this->t_body->set_var("CAL_TIME", "");
-                else if($queryArray['endTime'] == "0:00")
-                        $this->t_body->set_var("CAL_TIME", $queryArray['startTime']);
-                else
-                        $this->t_body->set_var("CAL_TIME", $queryArray['startTime']." - ".$queryArray['endTime']);
+		if($queryArray['startTime'] == "0:00" || $queryArray['startTime'] == "")
+				$this->t_body->set_var("CAL_TIME", "");
+		else if($queryArray['endTime'] == "0:00")
+				$this->t_body->set_var("CAL_TIME", $queryArray['startTime']);
+		else
+				$this->t_body->set_var("CAL_TIME", $queryArray['startTime']." - ".$queryArray['endTime']);
 
 		$this->t_body->set_var("CAL_COLOUR",$queryArray['colour']);
 		
-		if($queryArray['outputDate'])
-			$this->t_body->set_var("CAL_NOTE",": ".htmlentities($queryArray['note']));
-		else
-			$this->t_body->set_var("CAL_NOTE", htmlentities($queryArray['note']));
+		$this->t_body->set_var("CAL_NOTE", nl2br(scrubTEXT($queryArray['note'])));
 
 		$this->t_body->parse("group_events_block", "group_events", true);
 
