@@ -416,13 +416,13 @@ class addEvent
 	function checkDateNum($date)
 	{
 		if($date < 1 || $date > 31)
-			error(9, "Invalid date selected");
+			error(9, "Invalid date selected: $date");
 	}
 
 	function checkTime($hour, $minute)
 	{
 		if ($hour < 0 || $hour > 12 || $minute < 0 || $minute >= 60 )
-			error(9, "Invalid time selected");
+			error(9, "Invalid time selected: $hour:$minute");
 	}		
 
 	function createTime($hour, $minute, $period)
