@@ -76,9 +76,6 @@ class OutPut
 			$this->t_body->set_var("NEXT", "<a href=\"viewForum.php?cid={$this->cid}&pos=".($start+$increments)."&view={$_GET['view']}\">Next >></a>");
 		}
 		
-
-
-		
 		if($this->view == 'flat')
 		{
 			$postList = $forum->getFlatPosts($this->cid, $start, $increments);	
@@ -89,23 +86,54 @@ class OutPut
 		}
 		else
 		{
+			//retrieve threaded post tree
 			$postTree = $forum->getThreadedPosts($this->cid, $start, $increments);
-			$this->t_body->set_var("TOPIC_TREE", $this->outputPostTree($postTree[0]['children'], 1));
+			
+			//get initial list of posts to display
+			$initList = '';
+			if(is_array($postTree[0]['children']))
+			{
+				foreach($postTree[0]['children'] as $post)
+					$initList .= "'{$post['id']}',";
+				$initList = substr($initList, 0, -1);
+			}
+			$this->t_body->set_var("INIT_POST_LIST", $initList);
+			
+			//output navigation tree
+			$this->t_body->set_var("TOPIC_TREE", $this->outputNavTree($postTree, 1));
+			//output posts
+			$this->outputPostTree($postTree[0]['children']);
 		}
 	}
 
-	function outputPostTree($postTree, $level)
+	function outputNavTree($postTree, $level)
 	{
 		if($level == 1)
 			$text = "\n<ul id=\"forumNav\">\n";
 		else
 			$text = "\n<ul>\n";
 	
-		for($i=0; $postTree[$i]; $i++)
+		foreach($postTree as $post)
 		{
-			$text .= '<li>'.$postTree[$i]['heading'];
-			if(is_array($postTree[$i]['children']))
-				$text .= $this->outputPostTree($postTree[$i]['children'], ($level+1));
+			//this code tells the javascript the ids of children of this post (this avoids javascript traversal)
+			$childString = '';
+			if(is_array($post['children']))
+			{
+				foreach($post['children'] as $child)
+						$childString .= ",'{$child['id']}'";
+			}
+			
+			if($post['id'])
+				$text .= "<li><a href=\"#\" onclick=\"showPosts('{$post['id']}'{$childString})\">{$post['heading']}</a>";
+			else
+			{
+				//this if for when we are producing the top level link (ie id 0)
+				$childString = substr($childString, 1);
+				$text .= "<li><a href=\"#\" onclick=\"showPosts($childString)\">{$post['heading']}</a>";
+			}
+			
+			if(is_array($post['children']))
+				$text .= $this->outputNavTree($post['children'], ($level+1));
 			
 			$text .= "</li>\n";
 		}
@@ -113,11 +141,32 @@ class OutPut
 		return $text;
 	}
 
+	function outputPostTree($postTree)
+	{
+		foreach($postTree as $post)
+		{
+			$this->outputPost($post);
+			if(is_array($post['children']))
+				$this->outputPostTree($post['children']);
+		}
+	}
+
 	function outputPost($post)
 	{
 		$this->t_body->set_var("ID", $post['id']);
-		//TODO: make email enabled
-		$this->t_body->set_var("OWNER", $post['firstname']." ".$post['lastname']);
+		
+		// set owner
+		$fullname = $post['firstname']." ".$post['lastname'];
+		
+		//create owner email address
+		if($post['local_email'])
+			$owner = "<a href=\"".$_SESSION['mailhandle'].$post['username']."@".MAIL_address."\">$fullname</a>";
+		else if($post['alt_email'])
+			$owner = "<a href=\"".$_SESSION['mailhandle'].$post['alt_email']."\">$fullname</a>";
+		else
+			$owner = $fullname;
+			
+		$this->t_body->set_var("OWNER", $owner);
 		$this->t_body->set_var("DATE", $post['fulldate']);	
 		
 		$this->t_body->set_var("HEADING", scrubTEXT($post['heading']));

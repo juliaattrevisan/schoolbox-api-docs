@@ -21,46 +21,68 @@ function pageTpl()
     include_once("../include/page.php");
     
     $this->set_var("FORMSUB_URL", "/forum/modpost.php");
+	
+	$this->t_body->set_block("tplBODY", "reply_to", "reply_to_block");
+	$this->t_body->set_block("tplBODY", "delete_button", "delete_button_block");
+	 
 }
 
 function putEmpty($cid, $parent) {
 
 	if($parent){
-	$forum = new forum;
-	$replyto = $forum->getCompleteSingle($parent);
-	$this->set_var("REPLYTO", "<span class=\"header2\">You are replying to...</span><br><br>
-		<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">
-		<tr><td><b>".$replyto['heading']."</b></td></tr>
-        	<tr><td bgcolor=\"#EEEEEE\">".$replyto['message']."</td></tr>
-		<tr><td class=\"navbar\" align=\"right\"> 
-		Submitted by ".$replyto['firstname']." ".$replyto['lastname']." on ".$replyto['date']."</td></tr></table>");	
-	}
-	else 
-		$this->set_var("REPLYTO", "");
+		$forum = new forum;
+		$replyto = $forum->getCompleteSingle($parent);
+		
+		$this->set_var("REPLY_HEADING", $replyto['heading']);
+		$this->set_var("REPLY_MESSAGE", $replyto['message']);
+		
+		// set owner
+		$fullname = $replyto['firstname']." ".$replyto['lastname'];
+		
+		//create owner email address
+		if($replyto['local_email'])
+			$owner = "<a href=\"".$_SESSION['mailhandle'].$replyto['username']."@".MAIL_address."\">$fullname</a>";
+		else if($replyto['alt_email'])
+			$owner = "<a href=\"".$_SESSION['mailhandle'].$replyto['alt_email']."\">$fullname</a>";
+		else
+			$owner = $fullname;
+		
+		$this->set_var("REPLY_SUBMITTED_BY", $owner);
+		$this->set_var("REPLY_DATE", $replyto['date']);
+		
+		$this->t_body->parse("reply_to_block", "reply_to");
+		
+		//dont keep putting Re: at front if it already there
+		if(strncasecmp($replyto['heading'], 'Re:', 3))
+			$this->set_var("HEADING", "Re: ".$replyto['heading']);
+		else
+			$this->set_var("HEADING", $replyto['heading']);
 
+	}
+	else
+	{
+		$this->set_var("reply_to_block", "");
+		$this->set_var("HEADING", "");
+	}
+	
 	$this->set_var("ID", 0);
 	$this->set_var("CID", $cid);
 	$this->set_var("PARENT", $parent);
-	if($parent)
-		$this->set_var("HEADING", "Re: ".$replyto['heading']);
-	else
-		$this->set_var("HEADING", "");
+		
 	$this->set_var("BODY", "");
 
-	$this->set_var("DEL_FORM", "");
+	$this->set_var("delete_button_block", "");
 }
 
 function putExisting($item) {
 
-	$this->set_var("REPLYTO", "");
+	$this->set_var("reply_to_block", "");
 	$this->set_var("ID", $item['id']);
 	$this->set_var("CID", $item['cid']);
 	$this->set_var("PARENT", $item['parent']);
 	$this->set_var("HEADING", $item['heading']);
 	$this->set_var("BODY", $item['message']);
-
-	$this->set_var("DEL_FORM", " <input type=\"submit\" name=\"delete\" value=\"Delete Post\" onClick='return 
-confirm(\"Are you sure you want to delete this post?  All replies to this post will also be deleted\");'>");
+	$this->t_body->parse("delete_button_block", "delete_button");
 }
 
 function set_var($varName, $varContents)
@@ -108,11 +130,9 @@ else if(isset($_POST['heading']) && $_POST['heading'] && isset($_POST['body']) &
 	else
 		error(29);
 }
-else if(isset($_POST['heading']) && $_POST['heading'] && isset($_POST['body']) && $_POST['body'] && 
-		$_POST['cid'] && isset($_POST['parent']))
+else if($_POST['heading'] && $_POST['body'] && $_POST['cid'] && isset($_POST['parent']))
 {
 	//add post
-
 	if(perm($_POST['cid'], 1) > 0)
 	{
 		$forum->addPost($_POST['cid'], $_SESSION['id'], $_POST['parent'], $_POST['heading'], $_POST['body']);

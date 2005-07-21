@@ -29,7 +29,7 @@ class forum
 		//check to ensure parent exists
 		if($parent != 0)
 		{
-			if($this->getOwner($parent))
+			if(!$this->getOwner($parent))
 				error(9, "Parent thread has been deleted");
 		}
 		
@@ -74,7 +74,9 @@ class forum
 	function getFlatPosts($cid, $start=0, $amount=10)
 	{
 		$query = "SELECT forum.id, owner, DATE_FORMAT(date, '%W %M %e @ %l:%i%p') AS fulldate, 
-		heading, message, parent, firstname, lastname FROM forum, user 
+		heading, message, parent, 
+		user.username, user.firstname, user.lastname, user.local_email, user.alt_email 
+		FROM forum, user 
 		WHERE owner = user.id AND cid = '$cid' AND deleted = 0 
 		ORDER BY date LIMIT $start, $amount";
 		
@@ -92,13 +94,16 @@ class forum
 		{
 			//initialise root of tree
 			$tree[0]['id'] = 0;	
+			$tree[0]['heading'] = 'Show Topics';
 
 			while($thread = $this->db->dbGetNextArray($res))
 			{
 				//now foreach thread output all the messages in that thread
 
 				$query = "SELECT forum.id, owner, DATE_FORMAT(date, '%W %M %e @ %l:%i%p') AS fulldate, 
-				heading, message, parent, firstname, lastname FROM forum, user 
+				heading, message, parent, 
+				user.username, user.firstname, user.lastname, user.local_email, user.alt_email 
+				FROM forum, user 
 				WHERE owner = user.id AND thread = '".$thread['id']."' 
 				AND deleted = 0 ORDER BY parent, date";
 
@@ -157,7 +162,7 @@ class forum
 	function getCompleteSingle($id)
 	{
 		$query = "SELECT forum.id, owner, DATE_FORMAT(date, '%W %M %e @ %l:%i%p') AS date, heading, message, parent, 
-		cid, firstname, lastname FROM forum, user WHERE owner=user.id AND forum.id = '$id' AND deleted = 0";
+		cid, user.username, user.firstname, user.lastname, user.local_email, user.alt_email FROM forum, user WHERE owner=user.id AND forum.id = '$id' AND deleted = 0";
 		return $this->db->dbGetSingleRow($query);
 	}
 
