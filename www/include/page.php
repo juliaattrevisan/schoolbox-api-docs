@@ -178,9 +178,9 @@ function insertChild($list, $element)
 function outputMenu($list, $level)
 {
 	if($level == 1)
-		$text = "\n<ul class=\"dropDownMenu$level\" id=\"nav\">\n";
+		$text = "\n<ul class=\"dropDownMenu$level\" id=\"nav\">";
 	else
-		$text = "\n<ul class=\"dropDownMenu$level\">\n";
+		$text = "<ul class=\"dropDownMenu$level\">";
 	
 	for($i=0; $list[$i]; $i++)
 	{
@@ -188,7 +188,7 @@ function outputMenu($list, $level)
 		if(is_array($list[$i]['children']))
 			$text .= outputMenu($list[$i]['children'], ($level + 1));
 		
-		$text .= "</li>\n";
+		$text .= "</li>";
 	}
 	$text .= "</ul>\n";
 	return $text;
