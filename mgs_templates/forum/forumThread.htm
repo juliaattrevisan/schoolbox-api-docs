@@ -14,6 +14,75 @@
 <script type="text/javascript" src="/javascript/drop_down.js"></script>
 <!-- #BeginEditable "scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/xc.jss" />
+<script type="text/javascript">
+
+function initialise()
+{
+	showPosts({INIT_POST_LIST});
+}
+
+function rollupPosts()
+{
+    // Check we're working with a DOM compliant browser
+    if (document.getElementById && document.createElement)
+    {
+        var objMenu = document.getElementById('post_data');
+        var objNested = objMenu.getElementsByTagName('div');
+
+        // Hide each of the nested unordered list
+        for (var i=0; i<objNested.length; i++){
+            objNested[i].style.display = 'none';
+			objNested[i].className = 'childPost';
+		}
+	}
+}
+
+function showPosts()
+{
+	rollupPosts();
+	
+	for (var i=0; i<arguments.length; i++) {
+		var post = 'post_' + arguments[i];
+	
+		if(i==0){
+			document.getElementById(post).className = 'parentPost';
+		}
+		document.getElementById(post).style.display = 'block';
+	}
+}
+
+window.onload=initialise;
+
+</script>
+
+
+<style type="text/css">
+<!--
+	#forumNav {
+		font-size:90%;
+	}
+
+	#forumNav ul li{
+		margin-left: -8px;
+	}
+	#content #forumNav {
+		margin-left: -20px;
+	}
+	
+	.parentPost td.postBody{
+	}
+	
+	.parentPost h2{
+		margin-top: 0pt;
+		border-color:#FFFFA5;
+	}
+	
+	.childPost {
+	
+	}
+-->
+</style>
 <!-- #EndEditable -->
 </head>
 <body>
@@ -106,8 +175,28 @@
 
             <table>
               <tr> 
-                <td>{TOPIC_TREE}</td>
-                <td></td>
+                <td style="vertical-align:top;width:25%;">{TOPIC_TREE}</td>
+                <td style="vertical-align:top">
+				    <div id="post_data">
+					<!-- BEGIN forum --> 
+					<div id="post_{ID}" class="childPost" style="display:none">
+					<table> <tr> 
+						<td><h2 style="margin-left:0">{HEADING}</h2> 
+							<span class="header_option">{MODIFY}<a href="/forum/modpost.php?cid={CID}&amp;parent={ID}">reply</a></span></td> 
+					</tr> 
+					<tr> 
+						<td class="postBody">{BODY}</td>
+					</tr> 
+					<tr> 
+						<td class="element_footer">Submitted by {OWNER} on {DATE}</td> 
+					</tr> 
+					<tr> 
+						<td>&nbsp;</td> 
+					</tr> </table>
+					</div>
+					<!-- END forum -->
+					 </div>
+				 </td>
               </tr>
             </table>
             <!-- #EndEditable --> </div>
