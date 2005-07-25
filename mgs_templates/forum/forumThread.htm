@@ -14,75 +14,12 @@
 <script type="text/javascript" src="/javascript/drop_down.js"></script>
 <!-- #BeginEditable "scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/xc.jss" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-forum.css" />
+<script type="text/javascript" src="/javascript/forum.js" ></script>
 <script type="text/javascript">
-
-function initialise()
-{
-	showPosts({INIT_POST_LIST});
-}
-
-function rollupPosts()
-{
-    // Check we're working with a DOM compliant browser
-    if (document.getElementById && document.createElement)
-    {
-        var objMenu = document.getElementById('post_data');
-        var objNested = objMenu.getElementsByTagName('div');
-
-        // Hide each of the nested unordered list
-        for (var i=0; i<objNested.length; i++){
-            objNested[i].style.display = 'none';
-			objNested[i].className = 'childPost';
-		}
-	}
-}
-
-function showPosts()
-{
-	rollupPosts();
-	
-	for (var i=0; i<arguments.length; i++) {
-		var post = 'post_' + arguments[i];
-	
-		if(i==0){
-			document.getElementById(post).className = 'parentPost';
-		}
-		document.getElementById(post).style.display = 'block';
-	}
-}
-
+function initialise(){ showPosts({INIT_POST_LIST}); }
 window.onload=initialise;
-
 </script>
-
-
-<style type="text/css">
-<!--
-	#forumNav {
-		font-size:90%;
-	}
-
-	#forumNav ul li{
-		margin-left: -8px;
-	}
-	#content #forumNav {
-		margin-left: -20px;
-	}
-	
-	.parentPost td.postBody{
-	}
-	
-	.parentPost h2{
-		margin-top: 0pt;
-		border-color:#FFFFA5;
-	}
-	
-	.childPost {
-	
-	}
--->
-</style>
 <!-- #EndEditable -->
 </head>
 <body>
