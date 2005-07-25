@@ -166,15 +166,14 @@ class ClassList
 					$name = "<a href='viewSubmission.php?box_id=".$box['id']."'>
 					" . str_replace( ' ', '&nbsp;', $box['description']) . "</a>";
 
-
 				$worknameHTML .= "
-					<td class='finetable'>
+					<th>
 					<div style='bottom: 0px; writing-mode: tb-rl; filter: flipH() flipV();'>
-					<form method='POST'><b>$name</b><input type='hidden' name='box_id' value='" . $box[ 
-'id'] . "'><input type='hidden' name='do' value='columnDelete'><input type='image' src='/images/button_cross.jpg' width='10' align='right' onClick='return confirm( \"Delete this column?\")'>
+					<form method='POST'>$name<input type='hidden' name='box_id' value='" . $box[ 'id'] . "'>
+					<input type='hidden' name='do' value='columnDelete'><input type='image' src='/images/button_cross.jpg' width='10' align='right' onClick='return confirm( \"Delete this column?\")'>
 					</form>
 					</div>
-					</td>
+					</th>
 				";
 			
 				array_push($workList, $box);
@@ -206,30 +205,26 @@ class ClassList
 									# No mark given yet
 					if($user['work'][$box['id']] == "") {
 						$workmarkHTML .= '
-						<form method="POST">
-						 <td width="20" class="finetable">
-							<input name="mark" value="" defaultvalue="" class="inputMark" 
-						type="text" size="5" maxlength="10" onBlur="submitOnFieldChange(this.form);">
+						
+						 <td><form method="POST">
+							<input name="mark" value="" class="inputMark" type="text" size="5" maxlength="10" onBlur="submitOnFieldChange(this.form);">
 							<div style="display: none;">
 							<input type="hidden" name="userID" value="' . $user[ 'userID'] . '">
 							<input type="hidden" name="box_id" value="' . $box[ 'id'] . '">
 							<input type="hidden" name="do" value="markAdd">
-							</div>
-						</td></form>';
+							</div></form>
+						</td>';
 					}
 					else {				# Mark has been given
 						$workmarkHTML .= '
-						<form method="POST" onSubmit="return markValidate( this.mark);">
-						  <td width="20" class="finetable">
-							<input name="mark" class="inputMark" type="text" size="5" maxlength="10" 
-							value="' . htmlentities( $user[ 'work'][ $box[ 'id']]) . '" 
-							defaultvalue="' . htmlentities( $user[ 'work'][ $box[ 'id']]) . 
-'"onBlur="submitOnFieldChange(this.form);">
+						
+						  <td><form method="POST" onSubmit="return markValidate( this.mark);">
+							<input name="mark" class="inputMark" type="text" size="5" maxlength="10" value="' . htmlentities( $user[ 'work'][ $box[ 'id']]) . '" onBlur="submitOnFieldChange(this.form);">
 							<input type="hidden" name="userID" value="' . $user[ 'userID'] . '">
 							<input type="hidden" name="box_id" value="' . $box[ 'id'] . '">
 							<input type="hidden" name="do" value="markUpdate">
-						  </td>
-						</form>';
+						  </form></td>
+						';
 					}
 				}
 				$this->t_body->set_var("WORKMARKS", $workmarkHTML);
@@ -287,9 +282,7 @@ function markDelete( $userID, $box_id) {
 			owner = '" . mysql_escape_string( $userID) . "'
 	";
 	$mySQLdb = new dbManager();
-	$mySQLdb->dbConnect();
 	$mySQLdb->dbDoQuery( $sql);
-	$mySQLdb->dbClose();
 }
 
 
