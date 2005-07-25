@@ -5,6 +5,16 @@
 <head>
 <!-- #BeginEditable "doctitle" -->
 <title>{TITLE}</title>
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<script type="text/javascript" src="/javascript/drop_down.js"></script>
+<!-- #BeginEditable "scripts" -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
+
 <script src='../common.js'></script>
 <script>
 
@@ -38,15 +48,18 @@ function submitOnFieldChange( form )
 }
 
 </script>
-<!-- #EndEditable -->
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="James Leckie, Lektec Consulting"/>
-<meta name="ROBOTS" content="INDEX, FOLLOW" />
-<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
-<script type="text/javascript" src="/javascript/drop_down.js"></script>
-<!-- #BeginEditable "scripts" -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
+<style type="text/css">
+
+.markTable {
+	border-top: 1px solid #000000;
+	border-right: 1px solid #000000;
+}
+
+.inputMark {
+	border: 0px none;
+}
+
+</style>
 
 <!-- #EndEditable -->
 </head>
@@ -131,24 +144,27 @@ function submitOnFieldChange( form )
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
 			<h1>{SUBJECTNAME} - {CODE}</h1> 
-			<table border="0" cellpadding="2" cellspacing="0" class="finetableleft"> 
-				<tr> 
-					<td valign="bottom" class="finetable"><b>Surname</b></td> 
-					<td valign="bottom" class="finetable"><b>Preferred Name </b></td> 
-					{WORKNAMES}
-					<td valign='top'> <form method='POST' onSubmit='return columnAdd();'> 
+			<span class="header_option">
+			<form method='POST' onSubmit='return columnAdd();'> 
 							<input name='do' type='hidden' value='columnAdd' /> 
 							<input name='studentID' type='hidden' value='{EXAMPLE_STUDENTID}' /> 
 							<input name='cid' type='hidden' value='{CID}' /> 
 							<input name='hiddenColName' type='hidden' value='' /> 
 							<input type='image' src='/images/button_add.jpg' alt='add column' /> 
-						</form></td> 
+						</form>
+			</span>
+			<table class="markTable"> 
+				<tr> 
+					<th>Surname</th> 
+					<th>Preferred Name</th> 
+					{WORKNAMES}
 				</tr> 
 				<!-- BEGIN student_list --> 
-				<tr height="10" class="finetable"> 
-					<td width="150" class="finetable">{SURNAME}</td> 
-					<td width="150" class="finetable">{FIRSTNAME}</td> 
-					{WORKMARKS} </tr> 
+				<tr> 
+					<td>{SURNAME}</td> 
+					<td>{FIRSTNAME}</td> 
+					{WORKMARKS} 
+					</tr> 
 				<!-- END student_list --> 
 			</table> 
 			<!-- #EndEditable --> </div>
