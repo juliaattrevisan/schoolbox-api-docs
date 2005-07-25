@@ -10,13 +10,14 @@ table.timetable th {
 	padding:3px;
 	background:#00458C;
 	color:#fff;
-	font:bold 70% /1em Verdana, arial, sans-serif, serif
+	font:bold 70% /1em Verdana, arial, sans-serif, serif;
 	}
 
 table.timetable td {
 	background:#efefef;
 	colour:#000;
-	font:normal 70% /1em Verdana, arial, sans-serif, serif
+	font:normal 70% /1em Verdana, arial, sans-serif, serif;
+	cursor:hand;
 	}
 
 .timetable td.current {
