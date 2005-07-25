@@ -190,42 +190,7 @@ class OutPut
 		//retrieve timetable defintion
 		$timetabledef = unserialize(TIMETABLE_definition);
 
-		if(isStudent($_SESSION['gid']))
-		{
-			$query ="SELECT Timetable.Room, SubjectClasses.Description,
-				Timetable.PeriodNumber, Timetable.ClassCode
-				FROM SynergyOne.dbo.StudentClasses StudentClasses,
-				SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable
-				Timetable
-				WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
-				Timetable.ClassCode = SubjectClasses.ClassCode AND Timetable.FileSemester =
-				SubjectClasses.FileSemester AND Timetable.FileType = SubjectClasses.FileType
-				AND Timetable.FileYear = SubjectClasses.FileYear AND
-				StudentClasses.FileSemester = SubjectClasses.FileSemester AND
-				StudentClasses.FileSemester = Timetable.FileSemester AND
-				StudentClasses.FileType = SubjectClasses.FileType AND
-				StudentClasses.FileType = Timetable.FileType AND StudentClasses.FileYear =
-				SubjectClasses.FileYear AND StudentClasses.FileYear = Timetable.FileYear AND
-				StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
-				StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-				((Timetable.FileSemester=".$_SESSION['FileSemester'].") AND (Timetable.FileYear='$year') AND
-				(StudentClasses.ID='$synergy_id')) AND Timetable.DayNumber = '$daynumber'
-				ORDER BY Timetable.PeriodNumber";
-		}
-		else
-		{
-			$query = "SELECT Timetable.Room, SubjectClasses.Description,
-				Timetable.PeriodNumber, Timetable.ClassCode
-				FROM SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable
-				Timetable
-				WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
-				Timetable.ClassCode = SubjectClasses.ClassCode AND Timetable.FileSemester =
-				SubjectClasses.FileSemester AND Timetable.FileType = SubjectClasses.FileType
-				AND Timetable.FileYear = SubjectClasses.FileYear AND
-				((SubjectClasses.FileSemester=".$_SESSION['FileSemester'].") AND (SubjectClasses.FileYear='$year') AND
-				(Timetable.StaffID='$synergy_id')) AND Timetable.DayNumber = '$daynumber'
-				ORDER BY Timetable.PeriodNumber";
-		}
+		$query = getDayTimetableQuery($synergy_id, $year, $daynumber)
 		
 		$result = mssql_query($query, $db);
 		if ($result != 1)
@@ -238,7 +203,7 @@ class OutPut
 		//for each period set result
 		for($y=1; $y <= $periods; $y++)
 		{
-			if($desc[2] == ($y-1))
+			if($desc['PeriodNumber'] == ($y-1))
 			{
 				if ($result != 1)
 					$desc = mssql_fetch_array($result);
@@ -246,40 +211,48 @@ class OutPut
 					$desc = "";
 			}
 			
-			if($desc[2] != $y)
+			if($desc['PeriodNumber'] != $y)
 			{
 				$code = "";
 				$period = "-";
 			}
 			else
 			{
-				if ($_SESSION['campus'][0] == 3){
-					$post = strpos($desc[3], "EN");
+				//custom stuff for grimwade
+				if ($_SESSION['campus'][0] == 3 && SITE_location == 'mgs')
+				{
+					$post = strpos($desc['ClassCode'], "EN");
+					
 					if ($post == 2)
 						$period = "Homeroom";
 					else
-						$period = $desc[1]."<br>".$desc[0]."<br>";
+						$period = $desc['Description']."<br />".$desc['Room']."<br />";
+			
 					$code = "";
 				}
-				else {
-					$period = $desc[1]."<br>".$desc[0]."<br>";
+				else 
+				{
+					$period = $desc['Description']."<br />(".$desc['ClassCode'].")<br />".$desc['Room']."<br />";
+					
+					//only show attendances to staff at mgs
 					if(isStaff($_SESSION['gid']) && SITE_location == 'mgs')
-						$period .= "<a href=\"/absentees/attendances.php?code=".$desc[3]."\">attendances</a><br>";
-					$code = "onClick=\"window.location='/homepage.php?code=".urlencode($desc[3])."'\"";
-						}		
+						$period .= "<a href=\"/absentees/attendances.php?code=".$desc['ClassCode']."\">attendances</a><br>";
+					
+					$code = "onClick=\"window.location='/homepage.php?code=".urlencode($desc['ClassCode'])."'\"";
+				}		
+				
 				$desc = mssql_fetch_array($result);
 			}
+			
 			$this->set_var("CODE", $code);
 			$this->set_var("PERIOD", $period);
 			if($y == $periodNum)
 			{
-				$this->set_var("TIMECOLOUR", "#0066CC");
-				$this->set_var("TIMEOVERCOLOUR", "#0066CC");
+				$this->set_var("TIMETABLE_CLASS", "current");
 			}
 			else 
 			{
-				$this->set_var("TIMECOLOUR", "#EEEEEE");
-				$this->set_var("TIMEOVERCOLOUR", "#CCCCCC");
+				$this->set_var("TIMETABLE_CLASS", "normal");
 			}
 			
 			//output period block
