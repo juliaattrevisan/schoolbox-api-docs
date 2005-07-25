@@ -1,0 +1,22 @@
+#forumNav {
+	font-size:90%;
+}
+
+#forumNav ul li{
+	margin-left: -8px;
+}
+#content #forumNav {
+	margin-left: -20px;
+}
+
+.parentPost td.postBody{
+}
+
+.parentPost h2{
+	margin-top: 0pt;
+	border-color:#FFFFA5;
+}
+
+.childPost {
+
+}
