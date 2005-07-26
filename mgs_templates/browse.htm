@@ -129,7 +129,7 @@
                   <!-- END category_listing -->
                   <!-- BEGIN file_listing -->
                     <tr> 
-                      <td colspan="2"><img src="{FILE_IMAGE}" width="25" height="27" border="0" />{FILE_DESCRIPTION} </b><font color="black" align="right"><i>{SIZE}</i></font></td>
+                      <td colspan="2">{FILE_URL}<img src="{FILE_IMAGE}" width="25" height="27" border="0" /> {FILE_DESCRIPTION} <em>{SIZE}</em></td>
                       <!-- BEGIN mod_file -->
                       <td class="cntr"><a href="/cms/modResource.php?type=modfile&amp;id={FILEID}">modify</a></td>
                       <td><a href="/cms/delResource.php?fileid={FILEID}" onclick=" return(confirm('Remove file {FILE_DESCRIPTION_ESCAPED}?'));">delete</a></td>
@@ -150,7 +150,7 @@
                   <!-- END file_listing -->
                   <!-- BEGIN link_listing -->
                     <tr>
-                      <td colspan="2"><img src="/images/mime/http-url.png" width="25" height="27" border="0" />{LINK_HTML}</td>
+                      <td colspan="2">{LINK_URL}<img src="/images/mime/http-url.png" width="25" height="27" border="0" /> {LINK_DESCRIPTION}</td>
                       <!-- BEGIN mod_link -->
                       <td class="cntr"><a href="/cms/modResource.php?type=modurl&amp;id={LINKID}">modify</a> </td>
                       <td><a href="/cms/delResource.php?linkid={LINKID}" onclick="return(confirm('Remove link {LINK_DESCRIPTION_ESCAPED}?'));">delete</a> </td>
