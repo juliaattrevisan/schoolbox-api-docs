@@ -190,7 +190,7 @@ class OutPut
 		//retrieve timetable defintion
 		$timetabledef = unserialize(TIMETABLE_definition);
 
-		$query = getDayTimetableQuery($synergy_id, $year, $daynumber)
+		$query = getDayTimetableQuery($synergy_id, $year, $daynumber);
 		
 		$result = mssql_query($query, $db);
 		if ($result != 1)

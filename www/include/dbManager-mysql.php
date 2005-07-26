@@ -32,9 +32,7 @@ function dbConnect()
 		$this->dbf = mysql_connect($this->host, $this->user, $this->passwd);
 	
 	if(!$this->dbf){
-			print "Unable to connect ".$this->user."@".$this->host." using ".$this->db; 
-		else
-			print "Unable to connect";;
+		print "Unable to connect ".$this->user."@".$this->host." using ".$this->db; 
 	}	
 	$this->dbChangeDb($this->db);
 }

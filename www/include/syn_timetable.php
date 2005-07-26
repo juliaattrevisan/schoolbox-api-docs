@@ -106,7 +106,7 @@ function getPeriodNumber()
 	return $period[2];
 }
 
-getDayTimetableQuery($synergy_id, $year, $daynumber)
+function getDayTimetableQuery($synergy_id, $year, $daynumber)
 {
 
 	if(isStudent($_SESSION['gid']))

@@ -241,14 +241,18 @@ class OutPut
 		{
 			//if inline open in new window, if not give user a save dialog box
 			if($allowedFileTypes[$fileDetails['mime_type']][1] == 1)
-				$fileurl = "<a href=\"/sendframe.php?id=".$fileDetails['id']."\" target=\"_blank\">".scrubTEXT($fileDetails['description'])."</a>";
+				$fileurl = "<a href=\"/sendframe.php?id=".$fileDetails['id']."\" target=\"_blank\">";
 			else
-				$fileurl = "<a href=\"/send.php?id=".$fileDetails['id']."&save=1\">".scrubTEXT($fileDetails['description'])."</a>";
+				$fileurl = "<a href=\"/send.php?id=".$fileDetails['id']."&save=1\">";
 
-			$this->t_body->set_var("FILE_DESCRIPTION", $fileurl);
+			$this->t_body->set_var("FILE_DESCRIPTION", scrubTEXT($fileDetails['description']).'</a>');
+			$this->t_body->set_var("FILE_URL", $fileurl);
 		}
 		else
+		{
+			$this->t_body->set_var("FILE_URL", '');
 			$this->t_body->set_var("FILE_DESCRIPTION", scrubTEXT($fileDetails['description']));
+		}
 		
 		$this->t_body->set_var("FILE_DESCRIPTION_ESCAPED", addslashes(htmlentities($fileDetails['description'])));
 		
@@ -300,11 +304,12 @@ class OutPut
 
 		// set link
 		if(isLocalURL($linkDetails['url']))
-			$this->t_body->set_var("LINK_HTML", "<a href=\"".$linkDetails['url']."\">".scrubTEXT($linkDetails['description'])."</a>");
+			$this->t_body->set_var("LINK_URL", "<a href=\"".$linkDetails['url']."\">");
 		else
-			$this->t_body->set_var("LINK_HTML", "<a href=\"/redir.php?url=".$linkDetails['url']."\" target=\"_blank\">".scrubTEXT($linkDetails['description'])."</a>");
+			$this->t_body->set_var("LINK_URL", "<a href=\"/redir.php?url=".$linkDetails['url']."\" target=\"_blank\">");
 
-		$this->t_body->set_var("LINK_DESCRIPTION", scrubTEXT($linkDetails['description']));
+		$this->t_body->set_var("LINK_DESCRIPTION", scrubTEXT($linkDetails['description']).'</a>');
+		
 		$this->t_body->set_var("LINK_DESCRIPTION_ESCAPED", addslashes(htmlentities($linkDetails['description'])));
 
 		//give the users modify buttons if they have rights

@@ -183,7 +183,7 @@ class OutPut
 
 		//output mangement/userlist link to owner of subject
 		$this->t_body->set_block($name, "class_list", "class_list_block");
-		if(SYNERGY_enable == 0 || $this->perm < 2 || $result['code'] == "" )
+		if(SYNERGY_enable == false || $this->perm < 2 || $result['code'] == "" )
 			$this->t_body->set_var("class_list_block", "");
 		else
 			$this->t_body->parse("class_list_block", "class_list");	
