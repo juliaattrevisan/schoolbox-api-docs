@@ -18,47 +18,46 @@ class Mail
 	{}
   
 	function checkMailDetails()
-        {
-                //check user has submitted their mail account details, if not request that they do
+	{
+		//check user has submitted their mail account details, if not request that they do
+	
+		$db = new dbManager();
+	
+		$query = "SELECT username, email_pass FROM user WHERE id = ".$_SESSION["id"];
+		$info = $db->dbGetSingleRow($query);
+	
+		if($info["username"] == "" || $info["email_pass"] == "") 
+		{
+				//failed to get information about user
+				return false;
+	
+		}
+		else
+		{       //get all the info out
+				$this->user = $info["username"];
+				$this->mail_host = MAIL_host;
+				$this->password = $info["email_pass"];
+				return true;
+		} 
+	}
 
-                $db = new dbManager();
-
-                $query = "SELECT username, email_pass FROM user WHERE id = ".$_SESSION["id"];
-                $info = $db->dbGetSingleRow($query);
-
-                if($info["username"] == "" || $info["email_pass"] == "") 
-                {
-                        //failed to get information about user
-                        return false;
-
-                }
-                else
-                {       //get all the info out
-                        $this->user = $info["username"];
-                        $this->mail_host = MAIL_host;
-                        $this->password = $info["email_pass"];
-                        return true;
-                } 
-        }
-
-        function submitMailDetails()
-        {
-                //redirect the user to the submit mail details form
+	function submitMailDetails()
+	{
+		//redirect the user to the submit mail details form
 		localRedir("/mail/mailInfo.php");
-        }
+	}
 
-        function openMailBox()
-        {
-		if(MAIL_retrieval == "pop3")
-                	$server="{".$this->mail_host.":110/pop3}INBOX";
-                else if(MAIL_retrieval == "imap")
+	function openMailBox()
+	{
+
+		if(MAIL_retrieval == "imap")
 			$server="{".$this->mail_host.":143/imap/notls/norsh}INBOX";
-                else
-			error(0);
-
+		else
+			$server="{".$this->mail_host.":110/pop3}INBOX";
+		
 		$inbox = @imap_open ($server, $this->user, $this->password) or error(4);
-                return $inbox;
-        }
+		return $inbox;
+	}
 
 	function mailExists($msgid, $inbox)
 	{
@@ -68,23 +67,46 @@ class Mail
 			return 0;
 	}
 
-        function deleteMailArray($deleteArray)
-        {
-                //open mailbox
-                $inbox = $this->openMailBox();
-
-                // delete specified message numbers
-                for($x=0; $x<sizeof($deleteArray); $x++)
- 		{
-			if($this->mailExists($deleteArray[$x], $inbox))
-				imap_delete($inbox, $deleteArray[$x]);
+	function purgeMailBox()
+	{
+		//delete all email in mailbox
+		
+		//open mailbox
+		$inbox = $this->openMailBox();
+	
+		$total = imap_num_msg($inbox);
+	
+		// delete all messages
+		for($x=1; $x<$total; $x++)
+		{
+			if($this->mailExists($x, $inbox))
+				imap_delete($inbox, $x);
 		}
+	
+		//clean up
+		imap_close($inbox, CL_EXPUNGE);
+		//reload the page.. 
+		localRedir("/mail.php");
+	}
 
-                //clean up
-                imap_close($inbox, CL_EXPUNGE);
-                //reload the page.. 
-                localRedir("/mail.php");
-        }
+
+	function deleteMailArray($deleteArray)
+	{
+		//open mailbox
+		$inbox = $this->openMailBox();
+	
+		// delete specified message numbers
+		for($x=0; $x<sizeof($deleteArray); $x++)
+		{
+			if($this->mailExists($deleteArray[$x], $inbox))
+			imap_delete($inbox, $deleteArray[$x]);
+		}
+	
+		//clean up
+		imap_close($inbox, CL_EXPUNGE);
+		//reload the page.. 
+		localRedir("/mail.php");
+	}
 	
 	function deleteMailSingle($delete)
 	{

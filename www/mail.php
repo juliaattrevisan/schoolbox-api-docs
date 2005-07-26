@@ -142,6 +142,8 @@ if(MAIL_enable)
 	$mail = new Mail;
 
 	if($mail->checkMailDetails())
+		if($_POST['purgebtn'])
+			$mail->purgeMailBox();
 		if($_POST['dmsg'])
 			$mail->deleteMailArray($_POST['dmsg']);
 		else
