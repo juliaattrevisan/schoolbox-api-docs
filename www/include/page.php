@@ -54,12 +54,11 @@ if($db->dbCountRows() > 0)
 {
 	while($link = $db->dbGetNextArray())
 	{
-		$this->t_body->set_var("MDESC", $link['description']);
 		if(isLocalURL($link['url']) )
 		{
-			$this->t_body->set_var("MLINK", "<a href=\"/redir.php?url=".$link['url']."\" target=\"_blank\" class=\"one\">".$link['description']."</a>");	
+			$this->t_body->set_var("MLINK", "<a href=\"/redir.php?url=".$link['url']."\" target=\"_blank\" class=\"one\">".scrubTEXT($link['description'])."</a>");	
 		}else{
-			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\" class=\"one\">".$link['description']."</a>");	
+			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\" class=\"one\">".scrubTEXT($link['description'])."</a>");	
 		}
 		$this->t_body->parse("my_links", "mlink_block", true);
 	}
@@ -83,8 +82,7 @@ if($db->dbCountRows() > 0)
 {
 	while($group = $db->dbGetNextArray())
 	{
-			$this->t_body->set_var("MGNAME", $group['name']);
-			//$this->t_body->set_var("MGLINK", "homepage.php?category=".$group['sid']);
+			$this->t_body->set_var("MGNAME", scrubTEXT($group['name']));
 			$this->t_body->set_var("MGID", $group['sid']);	
 			$this->t_body->parse("my_groups", "mgroup_block", true);
 	}
@@ -184,7 +182,7 @@ function outputMenu($list, $level)
 	
 	for($i=0; $list[$i]; $i++)
 	{
-		$text .= '<li><a href="'.$list[$i]['url'].'">'.$list[$i]['txt'].'</a>';
+		$text .= '<li><a href="'.$list[$i]['url'].'">'.scrubTEXT($list[$i]['txt']).'</a>';
 		if(is_array($list[$i]['children']))
 			$text .= outputMenu($list[$i]['children'], ($level + 1));
 		
