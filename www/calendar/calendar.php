@@ -103,7 +103,7 @@ function checkOwnership($id, $type)
 function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 1, $sid = 0)
 {
 	$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access, sid) 
-	VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), '$startTime', '$endTime', '$priority', 
+	VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), $startTime, $endTime, '$priority', 
 	'$note', '$level', '$sid')";
 	
 	if($this->checkSecurity($level, $sid) > 1) //check has permission to write

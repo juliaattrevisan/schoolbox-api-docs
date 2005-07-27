@@ -88,7 +88,7 @@ class displayCalendar
 	}
 	
   
-	function outputCalendar()
+	function outputCalendar($campus = 0)
 	{
 		//output week to template
 		$this->t_body = new Template(TPL_directory);
@@ -211,7 +211,7 @@ class displayCalendar
 				$subout = 1;
 			}
 
-			$event = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear);
+			$event = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear, $campus);
 			
 			if(count($event['id']) < 1 && !$subout)
 			{
@@ -244,6 +244,6 @@ class displayCalendar
 
 $cal = new displayCalendar($_GET['Year'], $_GET['Month'], $_GET['Day']);
 
-$cal->outputCalendar();
+$cal->outputCalendar($_GET['campus']);
 
 ?>

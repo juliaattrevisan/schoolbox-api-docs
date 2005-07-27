@@ -248,7 +248,7 @@ class addEvent
 		$this->t_body->set_var("DESCRIPTION", $event['note']);
 		$this->t_body->set_var("HIDDEN", "<input type=\"hidden\" name=\"id\" value=\"".$event['id']."\">");
 		$this->t_body->set_block("tplBODY", "delete_button", "delete_button_block");
-		$this->t_body->parse("delete_button_block", "delete_buton");
+		$this->t_body->parse("delete_button_block", "delete_button");
 
 		$this->t_body->pparse("final", "tplBODY");
 
@@ -329,7 +329,7 @@ class addEvent
 		$this->t_body->set_var("DESCRIPTION", $event['note']);
 		$this->t_body->set_var("HIDDEN", "<input type=\"hidden\" name=\"id\" value=\"".$event['id']."\">");
 		$this->t_body->set_block("tplBODY", "delete_button", "delete_button_block");
-		$this->t_body->parse("delete_button_block", "delete_buton");
+		$this->t_body->parse("delete_button_block", "delete_button");
 
 		$this->t_body->pparse("final", "tplBODY");
 
@@ -399,7 +399,7 @@ class addEvent
 		$this->t_body->set_var("DESCRIPTION", $event['note']);
 		$this->t_body->set_var("HIDDEN", "<input type=\"hidden\" name=\"id\" value=\"".$event['id']."\">");
 		$this->t_body->set_block("tplBODY", "delete_button", "delete_button_block");
-		$this->t_body->parse("delete_button_block", "delete_buton");
+		$this->t_body->parse("delete_button_block", "delete_button");
 
 		$this->t_body->pparse("final", "tplBODY");
 
@@ -440,7 +440,7 @@ class addEvent
 		else
 			error(9, "Invalid time selected");
 		
-		return $time;
+		return "'".$time."'";
 	}
 }
 
@@ -457,7 +457,7 @@ if(isset($_POST['priority']) && $_POST['priority'] && isset($_POST['note']) && $
 		$startTime = $page->createTime($_POST['hour'], $_POST['minute'], $_POST['period']);
 	}
 	else
-		$startTime = "00:00:00";
+		$startTime = "NULL";
 
 	if(isset($_POST['tohour']) && $_POST['tohour'] )
 	{
@@ -465,7 +465,7 @@ if(isset($_POST['priority']) && $_POST['priority'] && isset($_POST['note']) && $
 		$endTime = $page->createTime($_POST['tohour'], $_POST['tominute'], $_POST['toperiod']);
 	}
 	else
-		$endTime = "00:00:00";
+		$endTime = "NULL";
 
 	//make sure level is correct if just default to personal
 	if( $level < 1 || $level > 3 )
