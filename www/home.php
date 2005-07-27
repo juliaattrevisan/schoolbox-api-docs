@@ -86,7 +86,7 @@ class OutPut
 
 	function setStories($headlineList)
 	{
-		if(count($headlineList) > 0 )
+		if(is_array($headlineList) )
 		{
 			foreach($headlineList as $item)
 			{

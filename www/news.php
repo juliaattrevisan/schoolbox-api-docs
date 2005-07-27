@@ -38,40 +38,46 @@ class OutPut
 			$this->set_var("ADD", "<b><a href=\"/news/modnews.php\">add news</a></b>");
 		else
 			$this->set_var("ADD", "");
-	
-		$num_items = count($items['Id']);
-		for ($i = 1; $i <= $num_items; $i++) 
-		{ 
-			$this->set_var("NEWS_ID",$items['Id'][$i]); 
-         
-			if($items['Owner'][$i] == $_SESSION['id'] || $_SESSION['su'] == 1)
-				$this->set_var("MODIFY", "<a href=\"/news/modnews.php?id=".$items['Id'][$i]."\">modify</a>");
-			else
-				$this->set_var("MODIFY", "");
 			
-			$this->set_var("NEWS_TITLE", $items['Heading'][$i]);
-		
-			//TODO: Fix news handle to support no email address
-			if($items['Contact'][$i])
-				$email = "<a href=\"".$_SESSION['mailhandle'].$items['Contact'][$i]."\">".$items['Poster'][$i]."</a>";
-			else
-				$email = $items['Poster'][$i];
-
-			$this->set_var("POSTER", $email);
-			if($_SESSION['su'] == 1)
-				$this->set_var("DATETIME", $items['Datetime'][$i]." expires on ".$items['Expires'][$i]);
-			else
-				$this->set_var("DATETIME", $items['Datetime'][$i]);
-			$totalBody = preg_replace("/(\015\012)|(\015)|(\012)/","<br />",scrubHTML($items['Body'][$i]));
-                
-			$this->set_var("NEWS_BODY", $totalBody);
-                	$this->t_body->parse("story_block", "story_body");
-
-			$this->t_body->parse("stories_block", "main_stories", true);
-
-        }
-		if ($num_items < 1)
+		if(is_array($items))
+		{
+			foreach($items as $article)
+			{
+				$this->set_var("NEWS_ID",$article['item_id']); 
+        	 
+				if($article['item_owner'] == $_SESSION['id'] || $_SESSION['su'] == 1)
+					$this->set_var("MODIFY", "<a href=\"/news/modnews.php?id=".$article['item_id']."\">modify</a>");
+				else
+					$this->set_var("MODIFY", "");
+				
+				$this->set_var("NEWS_TITLE", $article['item_heading']);
+			
+				$fullname = $article['firstname']." ".$article['lastname'];
+				if($article['local_email'])
+					$owner = "<a href=\"".$_SESSION['mailhandle'].$article['username']."@".MAIL_address."\">$fullname</a>";
+				else if($article['alt_email'])
+					$owner = "<a href=\"".$_SESSION['mailhandle'].$article['alt_email']."\">$fullname</a>";
+				else
+					$owner = $fullname;
+	
+				$this->set_var("POSTER", $owner);
+				
+				if($_SESSION['su'] == 1)
+					$this->set_var("DATETIME", $article['post_datetime']." expires on ".$article['expire_datetime']);
+				else
+					$this->set_var("DATETIME", $article['post_datetime']);
+					
+				$this->set_var("NEWS_BODY", nl2br(scrubHTML($article['item_body'])));
+				
+				$this->t_body->parse("story_block", "story_body");
+				$this->t_body->parse("stories_block", "main_stories", true);
+	
+			}
+		}
+		else
+		{
         		$this->set_var("stories_block", "No news items found");
+		}
 	}
 
 	function showPage()

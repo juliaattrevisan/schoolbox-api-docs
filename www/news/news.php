@@ -122,29 +122,54 @@ function deleteNews($id, $userInfo)
 function getHeadlines()
 {
     $query = "
-	SELECT DISTINCT(news_items.item_id), news_items.item_heading
+	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_datetime_posted
     FROM news_items 
     	JOIN newsCampus ON newsCampus.id = news_items.item_id 
 			AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).") 
-			OR news_items.item_campus='4'
-			OR news_items.item_owner = '".$_SESSION['id']."'
 		JOIN newsGroup ON newsGroup.id = news_items.item_id 
 			AND newsGroup.gid = '".$_SESSION['gid']."'
-			OR news_items.item_owner = '".$_SESSION['id']."'
-    WHERE news_items.item_datetime_expires > NOW() 
+    WHERE news_items.item_owner != '".$_SESSION['id']."' 
+		AND news_items.item_datetime_expires > NOW() 
 		AND news_items.item_deleted = 0 
 	ORDER BY news_items.item_datetime_posted DESC
 	";
-    
-    return $this->dbConnection->dbGetAllRows($query);
+	
+	$shareResults = $this->dbConnection->dbGetAllRows($query);
+	
+    $query = "
+	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_datetime_posted
+    FROM news_items 
+    WHERE news_items.item_owner = '".$_SESSION['id']."' 
+		AND news_items.item_datetime_expires > NOW() 
+		AND news_items.item_deleted = 0 
+	ORDER BY news_items.item_datetime_posted DESC
+	";
+	
+	$userResults = $this->dbConnection->dbGetAllRows($query);
+	
+	//merge and sort the headlines based on time
+	$headlines = array_merge($shareResults, $userResults);
+	usort($headlines,array($this,"timecmp"));
+	
+    return $headlines;
+}
+
+
+function timecmp($a, $b)
+{
+	//just a quick function to enable sorting of news based on time
+   if ($a['item_datetime_posted'] == $b['item_datetime_posted']) {
+       return 0;
+   }
+   return ($a['item_datetime_posted'] > $b['item_datetime_posted']) ? -1 : 1;
 }
 
 function getNews($id = 0)
 {
- 	$SQL_QUERY = "
+ 	$query = "
 	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner,
     	news_items.item_link1, news_items.item_link2, news_items.item_link3, news_items.item_link4, news_items.item_link5,
-    	DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime,
+    	DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted,
     	DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
     	news_items.item_body, news_items.item_mainpage, 
     	user.lastname, user.firstname, user.username, user.local_email, user.alt_email
@@ -153,50 +178,45 @@ function getNews($id = 0)
     	JOIN newsCampus ON newsCampus.id = news_items.item_id 
 			AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).") 
 			OR news_items.item_campus='4' 
-			OR news_items.item_owner = '".$_SESSION['id']."'
 		JOIN newsGroup ON newsGroup.id = news_items.item_id 
 			AND newsGroup.gid = '".$_SESSION['gid']."'
-			OR news_items.item_owner = '".$_SESSION['id']."'
     WHERE news_items.item_datetime_expires > NOW() 
 		AND news_items.item_deleted = 0 
 	"; 
- 
     //get a single article by id if id submitted
     if($id)
-            $SQL_QUERY .="AND news_items.item_id = '$id'";
+            $query .="AND news_items.item_id = '$id'";
 
-    $SQL_QUERY .= " ORDER BY news_items.item_datetime_posted DESC;";
-    $dbhandle = $this->dbConnection->dbDoQuery($SQL_QUERY);
-    $this->newscount = 0;
-    
-    while($newsDbResult = $this->dbConnection->dbGetNextArray($dbhandle)) {
-		$this->newscount++;
-		$i = $this->newscount;
-		$this->news['Id'][$i] = $newsDbResult["item_id"]; // add
-		$this->news['Heading'][$i] = $newsDbResult["item_heading"];
-		$this->news['Owner'][$i] = $newsDbResult["item_owner"];
-		$this->news['Poster'][$i] = $newsDbResult["firstname"]." ".$newsDbResult["lastname"];
-		if($newsDbResult['local_email'])
-			$this->news['Contact'][$i] = $newsDbResult["username"]."@".MAIL_address;
-		else if($newsDbResult['alt_email'])
-			$this->news['Contact'][$i] = $newsDbResult['alt_email'];
-		else
-			$this->news['Contact'][$i] = "";
-		$this->news['Datetime'][$i] = $newsDbResult["post_datetime"];
-		$this->news['Expires'][$i] = $newsDbResult["expire_datetime"];
-		$this->news['Body'][$i] = $newsDbResult["item_body"];
-		$this->news['Link1'][$i] = $newsDbResult["item_link1"];
-		$this->news['Link2'][$i] = $newsDbResult["item_link2"];
-		$this->news['Link3'][$i] = $newsDbResult["item_link3"];
-		$this->news['Link4'][$i] = $newsDbResult["item_link4"];
-		$this->news['Link5'][$i] = $newsDbResult["item_link5"];
-		$this->news['Mainpage'][$i] = $newsDbResult["item_mainpage"];
-		//if (isset($newsDbResult["newspics_filename"]))
-		//	$this->news['picname'][$i] = $newsDbResult["newspics_filename"];
-    }
-    if (isset($this->news))
-        return $this->news;
-    $this->dbConnection->dbClose();
+    $query .= " ORDER BY news_items.item_datetime_posted DESC;";
+
+	$sharedResults = $this->dbConnection->dbGetAllRows($query);
+	
+	 	$query = "
+	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner,
+    	news_items.item_link1, news_items.item_link2, news_items.item_link3, news_items.item_link4, news_items.item_link5,
+    	DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted,
+    	DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
+    	news_items.item_body, news_items.item_mainpage, 
+    	user.lastname, user.firstname, user.username, user.local_email, user.alt_email
+    FROM news_items
+	JOIN user ON news_items.item_owner = user.id
+    WHERE news_items.item_owner = '".$_SESSION['id']."'
+		AND news_items.item_datetime_expires > NOW() 
+		AND news_items.item_deleted = 0 
+	"; 
+    //get a single article by id if id submitted
+    if($id)
+            $query .="AND news_items.item_id = '$id'";
+
+    $query .= " ORDER BY news_items.item_datetime_posted DESC;";
+	
+	$userResults = $this->dbConnection->dbGetAllRows($query);
+	
+	//merge and sort the headlines based on time
+	$allNews = array_merge($shareResults, $userResults);
+	usort($allNews,array($this,"timecmp"));
+	
+	return $allNews;
 }
 
 function getOneNews($id)
