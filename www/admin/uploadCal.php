@@ -62,18 +62,21 @@ function processCal()
 			
 			$comment = trim($comment);
             
-			# Skip empty comments
-        	if($comment)
+			# Skip empty comments and no dates
+        	if($comment && $date)
 			{
         		ereg('\"([^\"]*)\"|([^\"]*)'  , $comment, $regs);
         		if($regs[1])
                 	$comment = $regs[1];
+			
+				$stime = ($stime) ? "'".$stime."'" : 'NULL';
+				$ftime = ($ftime) ? "'".$ftime."'" : 'NULL';
 
         		$sql = "
                 	INSERT
                 	INTO    event
                         	(owner, access, sid, priority, note, date, startTime, endTime )
-                	VALUES ('{$uid}','3','{$_POST['campus']}', '4', '".mysql_escape_string( trim($comment))."', '$date', '$stime', '$ftime')
+                	VALUES ('{$uid}','3','{$_POST['campus']}', '4', '".mysql_escape_string( trim($comment))."', '$date', $stime, $ftime)
                 	";
 			
         		if($db->dbDoQuery($sql))
