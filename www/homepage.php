@@ -175,7 +175,7 @@ class OutPut
                         $this->t_body->set_var("HEADING", scrubTEXT($result['name']));
                 else
                 {
-		        $this->t_body->set_var("HEADING", scrubTEXT($result['name'])." (".$result["code"].")");	
+		        $this->t_body->set_var("HEADING", scrubTEXT($result['name'])." (".$result['code'].")");	
 			$this->t_body->set_var("CODE", urlencode($result['code']));
 		}
 
@@ -183,12 +183,43 @@ class OutPut
 
 		//output mangement/userlist link to owner of subject
 		$this->t_body->set_block($name, "class_list", "class_list_block");
-		if(SYNERGY_enable == false || $this->perm < 2 || $result['code'] == "" )
+	
+		if(SYNERGY_enable == false || $this->perm < 2 || $result['code'] == '' )
 			$this->t_body->set_var("class_list_block", "");
 		else
 			$this->t_body->parse("class_list_block", "class_list");	
 	}
 	
+	function outputDuties($name, $size)
+        {
+                $this->t_body->set_block($name, "duties", "d_block");
+                $db = new dbManager();
+                $sql = "SELECT l.*, d.user, d.date, d.cid FROM luDuties l LEFT JOIN duty d ON l.dutyTypeID = d.dutyTypeID 
+			and d.date = now() where l.cid = ".$this->category ;
+                $db->dbDoQuery($sql);
+                $block = false;
+                $this->t_body->set_var("DATE", 'Duties for '.date('l, jS of F'));
+                while($row = $db->dbGetNextArray())
+                {
+                        $this->t_body->set_var("DUTY", $row['name']);
+                        $this->t_body->set_var("ASSIGNEDUSER", $row['user']);
+                        $this->t_body->parse("d_block", "duties", true);
+                        $block = true;
+                }
+                if($block == false)
+                {
+                        $this->t_body->set_var("DUTY", "No Duties set for today");
+                        $this->t_body->set_var("ASSIGNEDUSER", '');
+                        $this->t_body->parse("d_block", "duties", true);
+                }
+                $this->t_body->set_block($name, "edit_duties", "edit_duties_block");
+                if($this->perm < 2)
+                        $this->t_body->set_var("edit_duties_block", "");
+                else
+                        $this->t_body->parse("edit_duties_block", "edit_duties");
+
+        }
+
 	function outputMembers($name, $size)
 	{
 		//output members of group
@@ -335,7 +366,7 @@ class OutPut
 			//get link
 			if($size==0){$size=6;}
 				$imageSize=$size*100;
-						
+
 			$imageurl = "cms/image.php?id={$image['id']}&height={$imageSize}&width={$imageSize}";
 			
 			$this->t_body->set_var("PREVIEW_IMAGE_URL", $imageurl);
@@ -765,19 +796,26 @@ class OutPut
 
 		$url = "sendframe.php?id=".$queryArray['id'];
 
+		if($queryArray['date'])
+			$date = $queryArray['date'];
+		else
+			$date = "No date";
+
 		//if staff or student is enrolled and there is work due provide a link
 		if($this->enroled)
 		{
 			if(isStudent($_SESSION['gid']) && $queryArray['owner']=="" && $queryArray['late'] > date("U")) //student
-				$this->t_body->set_var("HW_DATE", "<a href=\"/submission/submitWork.php?box_id=".$queryArray['box_id']."\">".$queryArray['date']."</a>");
+				$dueDate = "<a href=\"/submission/submitWork.php?box_id=".$queryArray['box_id']."\">".$date."</a>";
 			else if(isStaff($_SESSION['gid']) && $queryArray['owner'] == $_SESSION['id']) //if staff owns box provide link
-				$this->t_body->set_var("HW_DATE", "<a href=\"/submission/viewSubmission.php?box_id=".$queryArray['box_id']."\">".$queryArray['date']."</a>");
+				$dueDate = "<a href=\"/submission/viewSubmission.php?box_id=".$queryArray['box_id']."\">".$date."</a>";
 			else
-				$this->t_body->set_var("HW_DATE", $queryArray['date']);
+				$dueDate = $date;
 		}
 		else
-			$this->t_body->set_var("HW_DATE", $queryArray['date']);
-
+			$dueDate = $date;
+			
+		$this->t_body->set_var("HW_DATE", $dueDate);
+	
 		//set name
 		if($queryArray['realname'] != "")
 		{
@@ -802,18 +840,25 @@ class OutPut
 
 		global $allowedFileTypes;
 
+		if($queryArray['date'])
+			$date = $queryArray['date'];
+		else
+			$date = "No date";
+
 		//if staff or student is enrolled and there is work due provide a link
 		if($this->enroled)
 		{
 			if(isStudent($_SESSION['gid']) && $queryArray['owner']=="" && $queryArray['late'] > date("U")) //student
-				$this->t_body->set_var("ASS_DATE", "<a href=\"/submission/submitWork.php?box_id=".$queryArray['box_id']."\">".$queryArray['date']."</a>");
+				$dueDate = "<a href=\"/submission/submitWork.php?box_id=".$queryArray['box_id']."\">".$date."</a>";
 			else if(isStaff($_SESSION['gid']) && $queryArray['owner'] == $_SESSION['id']) //if staff owns box provide link
-				$this->t_body->set_var("ASS_DATE", "<a href=\"/submission/viewSubmission.php?box_id=".$queryArray['box_id']."\">".$queryArray['date']."</a>");
+				$dueDate = "<a href=\"/submission/viewSubmission.php?box_id=".$queryArray['box_id']."\">".$date."</a>";
 			else
-				$this->t_body->set_var("ASS_DATE", $queryArray['date']);
+				$dueDate = $date;
 		}
 		else
-			$this->t_body->set_var("ASS_DATE", $queryArray['date']);
+			$dueDate = $date;
+			
+			$this->t_body->set_var("ASS_DATE", $dueDate);
 
 		//set name
 		if($queryArray['realname'] != "")
