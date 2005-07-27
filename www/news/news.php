@@ -148,7 +148,11 @@ function getHeadlines()
 	$userResults = $this->dbConnection->dbGetAllRows($query);
 	
 	//merge and sort the headlines based on time
-	$headlines = array_merge($shareResults, $userResults);
+	if(is_array($shareResults) || is_array($userResults))
+		$headlines = array_merge($shareResults, $userResults);
+	else
+		return false;
+			
 	usort($headlines,array($this,"timecmp"));
 	
     return $headlines;
@@ -189,7 +193,7 @@ function getNews($id = 0)
 
     $query .= " ORDER BY news_items.item_datetime_posted DESC;";
 
-	$sharedResults = $this->dbConnection->dbGetAllRows($query);
+	$shareResults = $this->dbConnection->dbGetAllRows($query);
 	
 	 	$query = "
 	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner,
@@ -213,7 +217,11 @@ function getNews($id = 0)
 	$userResults = $this->dbConnection->dbGetAllRows($query);
 	
 	//merge and sort the headlines based on time
-	$allNews = array_merge($shareResults, $userResults);
+	if(is_array($shareResults) || is_array($userResults))
+		$allNews = array_merge($shareResults, $userResults);
+	else
+		return false;
+
 	usort($allNews,array($this,"timecmp"));
 	
 	return $allNews;
