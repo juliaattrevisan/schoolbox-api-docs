@@ -184,6 +184,7 @@ class OutPut
 		$daynumber = getDayNumber();
 		
 		$this->t_body->set_var("DAYNUMBER", $daynumber);
+		
 		//also get current peroid
 		$periodNum = getPeriodNumber();
 
@@ -199,6 +200,9 @@ class OutPut
 			$desc = "";
 
 		$periods =  $timetabledef[$_SESSION['campus'][0]]['period'];
+
+		//timetable field width
+		$this->t_body->set_var("TIMETABLE_FIELD_WIDTH", round((100 / $periods),1));
 
 		//for each period set result
 		for($y=1; $y <= $periods; $y++)
@@ -246,17 +250,13 @@ class OutPut
 			
 			$this->set_var("CODE", $code);
 			$this->set_var("PERIOD", $period);
+			
 			if($y == $periodNum)
-			{
 				$this->set_var("TIMETABLE_CLASS", "current");
-			}
 			else 
-			{
 				$this->set_var("TIMETABLE_CLASS", "normal");
-			}
 			
 			//output period block
-			$this->set_var("PERIOD_NUMBER", $y);
 			$this->set_var("PERIOD_NAME", $timetabledef[$_SESSION['campus'][0]]['periodnames'][$y]);
 			$this->t_body->parse("timetable_header_block", "timetable_header", true);
 			$this->t_body->parse("timetable_period_block", "timetable_period", true);

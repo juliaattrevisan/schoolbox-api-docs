@@ -98,6 +98,9 @@ class Timetable
 	
 
 		$flag = 1;
+		
+		//timetable field width
+		$this->t_body->set_var("TIMETABLE_FIELD_WIDTH", round((100 / ($d+1)),1));
 
 		//for each period
 		for ($x = 1; $x <= $p; $x++) 
@@ -130,33 +133,34 @@ class Timetable
 				}
 				else
 				{
-                                        if ($_SESSION['campus'][0] == 3){
-                                                $post = strpos($desc[4], "EN");
-                                                if (($post) == 2)
-                                                        $period = "Homeroom";
-                                                else
-                                                        $period = $desc[1]." (".$desc[4].")<br>";
-                                        }
-                                        else   
-						$period = $desc[1]." (".$desc[4].")<br>".$desc[0]."<br>";
+					if ($_SESSION['campus'][0] == 3){
+						$post = strpos($desc[4], "EN");
+						if (($post) == 2)
+							$period = "Homeroom";
+						else
+							$period = $desc[1]."<br />(".$desc[4].")<br />";
+					}
+					else   
+						$period = $desc[1]."<br />(".$desc[4].")<br />".$desc[0]."<br />";
 					
 					$desctest = mssql_fetch_array($result);
+					
 					if ($desctest[2] == $y && $desctest[3] == $x)
 					{
-						$desc = mssql_fetch_array($result);
+					$desc = mssql_fetch_array($result);
 					}
 					else
 					{
-						$desc = $desctest;
+					$desc = $desctest;
 					}
 				}
 
 				$this->t_body->set_var($dayvar, $period);
 				
 				if($y == $dayNum && $x == $periodNum)
-					$this->t_body->set_var($col, "#0099CC");
+					$this->t_body->set_var("TIMETABLE_CLASS", "current");
 				else	
-					$this->t_body->set_var($col, "#E4E4E4");
+					$this->t_body->set_var("TIMETABLE_CLASS", "normal");
 
 				if($y==1)
 					$this->t_body->parse("day_listing", "day", false);
@@ -165,7 +169,7 @@ class Timetable
 					$this->t_body->parse("day_listing", "day", true);
 
 			}
-        		$this->t_body->parse("period_listing", "period", true);
+        	$this->t_body->parse("period_listing", "period", true);
 			
                 }
                 $this->t_body->pparse("finaloutput", "tplBODY");

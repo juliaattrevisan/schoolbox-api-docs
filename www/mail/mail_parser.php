@@ -5,6 +5,7 @@
 //parts of an email. given the recursive nature of email this is often
 //a complicated process.  hopefully this file will help
 include($_SERVER['DOCUMENT_ROOT']."/mail/email.php");
+require_once($_SERVER['DOCUMENT_ROOT']."/include/html-parse.php");
 
 class mail_parser
 {

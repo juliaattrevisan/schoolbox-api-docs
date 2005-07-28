@@ -96,14 +96,14 @@ function getPeriodNumber()
 			t.FileYear = '".$_SESSION['FileYear']."'
 			and
 			TimetableGroup = '" . $campus . "'";
-
+			
 	$result = mssql_query($query, $db);
 	if ($result != 1)
 		$period = @mssql_fetch_array($result);
 	else
-		$period[2] = 0;
+		return false;
 
-	return $period[2];
+	return $period['PeriodNumber'];
 }
 
 function getDayTimetableQuery($synergy_id, $year, $daynumber)
