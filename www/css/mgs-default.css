@@ -66,13 +66,12 @@ acronym, dfn, abbr {
 	cursor:help;
 	}
 
-#content ul {
+#content ul, #content ol {
 	margin:0;
-	list-style:none;
 	text-align:left;
 	}
-#content ul li{
-	list-style:none;
+#content ul li,#content ol li{
+	
 	padding-left:22px;
 	margin:3px 0 0 20px;
 	font-weight:normal;
@@ -80,6 +79,7 @@ acronym, dfn, abbr {
 	color:#000;
 	}
 #content ul li {
+	list-style:none;
 	background:transparent url(/images/mgs/bullet.gif) no-repeat 2px 0.2em;
 	}
 #content ul a {font-weight:normal;}
