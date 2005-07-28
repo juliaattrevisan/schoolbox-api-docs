@@ -167,15 +167,15 @@ acronym, dfn, abbr {
 
 a {
 	font-weight:bold;
-	text-decoration:underline;
+	text-decoration:none;
 	}
 a:link, a:visited {
 	color:#03c;
-	text-decoration:underline;
+	text-decoration:none;
 	}
 a:hover {
 	color:#06c;
-	text-decoration:none;
+	text-decoration:underline;
 	}
 a img {
 	border:0;
@@ -305,6 +305,7 @@ a img {
 /* End IE5-Mac hack */
 #topNav a:hover {
 	color:#00458C;
+	text-decoration:none;
 }
 #topNav a.navthis:hover {
 	color:#fff;
