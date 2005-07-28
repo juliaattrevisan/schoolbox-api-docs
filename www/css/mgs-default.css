@@ -563,7 +563,7 @@ br.fix {
 	font:bold 90% /1em Verdana, arial, sans-serif, serif
 	}
 
-table.mail {border-collapse:collapse;}
+table.mail {margin-top:10px;border-collapse:collapse;}
 table.mail th a:link, table.mail th a:active, table.mail th a:visited {
 	color:#fff;
 	font-weight:bold;
