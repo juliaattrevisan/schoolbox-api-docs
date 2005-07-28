@@ -18,10 +18,13 @@ table.timetable td {
 	colour:#000;
 	font:normal 70% /1em Verdana, arial, sans-serif, serif;
 	cursor:hand;
+	padding:4px;
+	text-align:center;
 	}
 
 .timetable td.current {
 	background:#06c;
+	color:#fff;
 	}
 	
 table.home {

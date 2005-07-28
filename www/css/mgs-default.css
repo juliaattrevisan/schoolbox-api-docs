@@ -563,6 +563,16 @@ br.fix {
 	font:bold 90% /1em Verdana, arial, sans-serif, serif
 	}
 
+table.mail th td a:link, table.mail th td a:active, table.mail th td a:visited {
+	color:#fff;
+	font-weight:bold;
+	}
+table.mail th td a:hover {
+	color:#ccc;
+	}
+table.mail td.mailHeader {
+	background:#ccc;
+	}
 /*--------------------------------------------------------------------------------------*/
 /* TABLE RULER */
 /*--------------------------------------------------------------------------------------*/
