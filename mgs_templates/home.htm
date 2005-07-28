@@ -103,7 +103,7 @@
 <h1>{GREETING}</h1>
             <!-- BEGIN timetable -->
 			<h2>Timetable - Day {DAYNUMBER}</h2>
-                  <table class="timetable">                    
+                  <table class="timetable indent">                    
 						<tr>
 						<!-- BEGIN timetable_header -->
 							<th>PERIOD {PERIOD_NUMBER}</th>
@@ -123,11 +123,13 @@
 						<div class="dbx-box">
 							<h2 class="dbx-handle">News Headlines</h2>
 							<div class="dbx-content">
-								<ul class="norm">
-									<!-- BEGIN main_stories -->
-									<li><a href="{NEWS_URL}">{NEWS_TITLE}</a></li>
-									<!-- END main_stories -->
-								</ul>
+								<div class="indent">
+									<ul class="norm">
+										<!-- BEGIN main_stories -->
+										<li><a href="{NEWS_URL}">{NEWS_TITLE}</a></li>
+										<!-- END main_stories -->
+									</ul>
+								</div>
 							</div>
 						</div>
 					</td>
@@ -136,11 +138,13 @@
 					<div class="dbx-box">
 						<h2 class="dbx-handle">Current Weather</h2>
 						<div class="dbx-content">
-							<p><strong>Temperature:</strong> {TEMP}&deg;&nbsp;<br />
-							<strong>Wind:</strong> {DIRECTION} {SPEED}km/h<br />
-							<strong>Humidity:</strong>{HUMIDITY}<br />
-							Issued at {ISSUED}</p>
-							<p><a href="/weather.php">MORE WEATHER...</a></p>
+							<div class="indent">
+								<p><strong>Temperature:</strong> {TEMP}&deg;&nbsp;<br />
+								<strong>Wind:</strong> {DIRECTION} {SPEED}km/h<br />
+								<strong>Humidity:</strong>{HUMIDITY}<br />
+								Issued at {ISSUED}</p>
+								<p><a href="/weather.php">MORE WEATHER...</a></p>
+							</div>
 						</div>
 					</div>
 					</td>
@@ -151,11 +155,13 @@
 					<div class="dbx-box">
 						<h2 class="dbx-handle">Todays Events - {DATE}</h2>
 						<div class="dbx-content">
-							<ul class="norm">
-							<!-- BEGIN note_block -->
-								<li style="color:{NOTE_COLOUR};">{TIME} {NOTE}</li>
-							<!-- END note_block -->
-							</ul>  
+							<div class="indent">
+								<ul class="norm">
+								<!-- BEGIN note_block -->
+									<li style="color:{NOTE_COLOUR};">{TIME} {NOTE}</li>
+								<!-- END note_block -->
+								</ul> 
+							</div> 
 						</div>
 					</div>
 				</td>
