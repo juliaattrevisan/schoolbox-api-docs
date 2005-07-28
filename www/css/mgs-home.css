@@ -11,6 +11,7 @@ table.timetable th {
 	background:#00458C;
 	color:#fff;
 	font:bold 70% /1em Verdana, arial, sans-serif, serif;
+	text-align:center;
 	}
 
 table.timetable td {
