@@ -6,7 +6,7 @@
 body {
 	margin:0;
 	padding:0;
-	background:#182484 url(/newimages/bg_main_001.gif) repeat;
+	background:#182484 url(/images/mgs/background.gif) repeat;
 	font-family:Verdana, Arial, Helvetica, sans-serif, serif;
 	font-size:100%;
 	text-align:left;
@@ -80,7 +80,7 @@ acronym, dfn, abbr {
 	color:#000;
 	}
 #content ul li {
-	background:transparent url(/images/bullet.gif) no-repeat 2px 0.2em;
+	background:transparent url(/images/mgs/bullet.gif) no-repeat 2px 0.2em;
 	}
 #content ul a {font-weight:normal;}
 
@@ -103,7 +103,7 @@ acronym, dfn, abbr {
 /* FIRST LEVEL MENU UNORDERED LIST ELEMENT */
 .sideWrap ul li {
 	position: relative;
-	background:#fff url(/newimages/navbar_input_small.gif) no-repeat 2px 3px;	
+	background:#fff url(/images/mgs/leftnav_arrow.gif) no-repeat 2px 3px;	
 	}
 
 /* FIRST LEVEL MENU LINK */
@@ -143,7 +143,7 @@ acronym, dfn, abbr {
 	} 
 
 /* Hover Styles */
-.sideWrap ul li a:hover {background:#CEF3FF url(/newimages/navbar_input_small.gif) no-repeat 2px 3px;color:#00f;text-decoration:none;} 
+.sideWrap ul li a:hover {background:#CEF3FF url(/images/mgs/leftnav_arrow.gif) no-repeat 2px 3px;color:#00f;text-decoration:none;} 
 .sideWrap li ul li a:hover {
 	color:#fff;
 	background-image:none;
@@ -194,7 +194,7 @@ a img {
 
 #header {
 	padding:4px 0;
-	background:#182484 url(/newimages/logo_mgs_right_001.gif) no-repeat right;
+	background:#182484 url(/images/mgs/logo.gif) no-repeat right;
 	height:54px;
 	margin-left:11%;
 	}
@@ -271,13 +271,13 @@ a img {
 	border:0;
 	}
 #topNav li.right {	
-	background:url("/images/navright_left.gif") no-repeat left top;
+	background:url("/images/mgs/navright_left.gif") no-repeat left top;
 	}
 #topNav li.left {	
-	background:url("/images/navleft_left.gif") no-repeat left top;
+	background:url("/images/mgs/navleft_left.gif") no-repeat left top;
 	}
 #topNav li.norm {	
-	background:url("/images/navnorm_left.gif") no-repeat left top;
+	background:url("/images/mgs/navnorm_left.gif") no-repeat left top;
 	}
 #topNav a {
 	float:left;
@@ -291,13 +291,13 @@ a img {
 	font-size:70%; 
 	}
 #topNav a.right {
-	background:url("/images/navright_right.gif") no-repeat right top;
+	background:url("/images/mgs/navright_right.gif") no-repeat right top;
 	} 
 #topNav a.left {
-	background:url("/images/navleft_right.gif") no-repeat right top;
+	background:url("/images/mgs/navleft_right.gif") no-repeat right top;
 	} 
 #topNav a.norm {
-	background:url("/images/navnorm_right.gif") no-repeat right top;
+	background:url("/images/mgs/navnorm_right.gif") no-repeat right top;
 	} 
 #topNav >  ul a {width:auto;}
 /* Commented Backslash Hack hides rule from IE5-Mac \*/
@@ -563,11 +563,12 @@ br.fix {
 	font:bold 90% /1em Verdana, arial, sans-serif, serif
 	}
 
-table.mail th td a:link, table.mail th td a:active, table.mail th td a:visited {
+table.mail {border-collapse:collapse;}
+table.mail th a:link, table.mail th a:active, table.mail th a:visited {
 	color:#fff;
 	font-weight:bold;
 	}
-table.mail th td a:hover {
+table.mail th a:hover {
 	color:#ccc;
 	}
 table.mail td.mailHeader {
