@@ -33,12 +33,12 @@ function showRow(){
 	else if( selecLevel == 2 ){
 		document.getElementById('campusRow').style.visibility="hidden";
 		document.getElementById('campusRow').style.display = "none";
-		document.getElementById('groupRow').style.display = "block";
+		document.getElementById('groupRow').style.display = "table-row";
 		document.getElementById('groupRow').style.visibility="visible";
 	}
 	else if( selecLevel == 3 ){
 		document.getElementById('campusRow').style.visibility="visible";
-		document.getElementById('campusRow').style.display = "block";
+		document.getElementById('campusRow').style.display = "table-row";
 		document.getElementById('groupRow').style.display = "none";
 		document.getElementById('groupRow').style.visibility="hidden";
 	}
@@ -152,17 +152,17 @@ window.onload = new Function('showRow();');
                       </tr>
                       <tr> 
                         <td><h2>Time</h2><em>Both time slots are optional.</em></td>
-                        <td> <input name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField">
+                        <td> <input name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />
                           : 
-                          <input name="minute" type="text" maxlength="2" value="{MIN}" class="timeField"> 
+                          <input name="minute" type="text" maxlength="2" value="{MIN}" class="timeField" /> 
                           <select name="period" class="short">
                             <option value="am" {AM} >AM</option>
                             <option value="pm" {PM} >PM</option>
                           </select>
                           to 
-                          <input name="tohour" type="text" maxlength="2" value="{TOHOUR}" class="timeField">
+                          <input name="tohour" type="text" maxlength="2" value="{TOHOUR}" class="timeField" />
                           : 
-                          <input name="tominute" type="text" maxlength="2" value="{TOMIN}" class="timeField"> 
+                          <input name="tominute" type="text" maxlength="2" value="{TOMIN}" class="timeField" /> 
                           <select name="toperiod" class="short">
                             <option value="am" {AMTO}>AM</option>
                             <option value="pm" {PMTO}>PM</option>
@@ -181,16 +181,16 @@ window.onload = new Function('showRow();');
                       </tr>
                       <tr> 
                         <td><h2>Level</h2><em>Select who you would like to be able to see this event</em></td>
-                        <td ><select name="level" id="level" onChange="showRow()">{LEVEL}
+                        <td><select name="level" id="level" onChange="showRow()">{LEVEL}
                           </select></td>
                       </tr>
                       <tr id="groupRow" style="display:none;visibility:hidden;"> 
                         <td><h2>Group</h2><em>Select the group which will be able to view this event</em></td>
-                        <td >{GROUP}</td>
+                        <td>{GROUP}</td>
                       </tr>
                       <tr id="campusRow" style="display:none;visibility:hidden;"> 
                         <td><h2>Campus</h2><em>Select the campus which will be able to view this event</em></td>
-                        <td >{CAMPUS}</td>
+                        <td>{CAMPUS}</td>
                       </tr>
                       <tr> 
                         <td><h2>Description</h2></td>
