@@ -99,7 +99,7 @@
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
 			<h1>View Mail</h1> 
 			<span class="header_option"><a href="/mail.php?pos={MSGPOS}">return to index</a></span> 
-			<table> 
+			<table class="mail"> 
 				<tr> 
 					<th>{PREVIOUS}</th> 
 					<th class="cntr"><a href="{DELETE}">delete</a></th> 
@@ -109,8 +109,8 @@
 					<th style="text-align:right;">{NEXT}</th> 
 				</tr> 
 				<tr> 
-					<td colspan="3"><b>From : </b>{FROM}</td> 
-					<td colspan="3" style="white-space:nowrap;"><strong>Sent : </strong>{DATE}</td> 
+					<td class="mailHeader" colspan="3"><b>From : </b>{FROM}</td> 
+					<td class="mailHeader" colspan="3" style="white-space:nowrap;"><strong>Sent : </strong>{DATE}</td> 
 				</tr> 
 				<tr> 
 					<td colspan="6"><strong>To : </strong>{TO}</td> 
