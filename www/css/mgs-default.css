@@ -156,8 +156,11 @@ acronym, dfn, abbr {
 * html .sideWrap ul li a {height:1%;}
 /* End */
 
-.sideWrap li:hover ul ul, .sideWrap li.over ul ul {display:none;} 
-.sideWrap li:hover ul, .sideWrap li li:hover ul, .sideWrap li.over ul, .sideWrap li li.over ul {display: block;} /* The magic */
+
+/*The following two lines define up to 4 levels including the actual first level menu. Modify to accommodate further levels */
+.sideWrap li:hover ul ul, .sideWrap li:hover ul ul ul, .sideWrap li:hover ul ul ul ul, .sideWrap li.over ul ul, .sideWrap li.over ul ul ul, .sideWrap li.over ul ul ul ul {display:none;} 
+.sideWrap li:hover ul, .sideWrap li li:hover ul, .sideWrap li li li:hover ul, .sideWrap li li li li:hover ul, .sideWrap li.over ul, .sideWrap li li.over ul, .sideWrap li li li.over ul, .sideWrap li li li li.over ul {display: block;} /* The magic */
+
 /*--------------------------------------------------------------------------------------*/
 /* LINKS */
 /*--------------------------------------------------------------------------------------*/
@@ -439,11 +442,11 @@ a img {
 /*--------------------------------------------------------------------------------------*/
 /* OTHER FORMS */
 /*--------------------------------------------------------------------------------------*/
-form.standard {
+.standard {
 	padding:4px;
 	background:#ccc;
 	}
-form.standard em {
+.standard em {
 	font-size:70%;
 	font-style:normal;
 	}
