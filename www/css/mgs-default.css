@@ -167,15 +167,15 @@ acronym, dfn, abbr {
 
 a {
 	font-weight:bold;
-	text-decoration:none;
+	text-decoration:underline;
 	}
 a:link, a:visited {
 	color:#03c;
-	text-decoration:none;
+	text-decoration:underline;
 	}
 a:hover {
 	color:#06c;
-	text-decoration:underline;
+	text-decoration:none;
 	}
 a img {
 	border:0;
