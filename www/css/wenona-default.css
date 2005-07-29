@@ -52,7 +52,7 @@ h2 {
 p {
 	line-height:1.4em;
 	color:#000;
-	margin:0.8 0 0 0;
+	margin:0.8em 0 0 0;
 	} 
 
 acronym, dfn, abbr {
@@ -61,13 +61,11 @@ acronym, dfn, abbr {
 	cursor:help;
 	}
 
-#content ul {
+#content ul, #content ol {
 	margin:0;
-	list-style:none;
 	text-align:left;
 	}
-#content ul li{
-	list-style:none;
+#content ul li, #content ol li{
 	padding-left:22px;
 	margin:3px 0 0 20px;
 	font-weight:normal;
@@ -75,32 +73,10 @@ acronym, dfn, abbr {
 	color:#000;
 	}
 #content ul li {
-	background:transparent url(/images/bullet.gif) no-repeat 2px 0.2em;
+	list-style:none;
+	background:transparent url(/images/wenona/bullet.gif) no-repeat 2px 0.2em;
 	}
 #content ul a {font-weight:normal;}
-/*--------------------------------------------------------------------------------------*/
-/* OLD MENU STYLES */
-/*--------------------------------------------------------------------------------------
-
-.sideWrap ul {
-	margin:0;
-	list-style:none;
-	text-align:left;
-	}
-.sideWrap ul li {
-	list-style:none;
-	padding-left:12px;
-	margin:3px 0;
-	font-weight:normal;
-	font-size:70%;
-	line-height:1.5em;
-	}
-
-.sideWrap ul li {
-	background:transparent url(/newimages/navbar_input_small.gif) no-repeat 2px 0.2em;
-	}
-.sideWrap ul a {font-weight:normal;}
-*/
 
 /*--------------------------------------------------------------------------------------*/
 /* HORIZONTAL DROP DOWN MENU STYLES */
@@ -164,8 +140,10 @@ acronym, dfn, abbr {
 	color:#002452;
 	} 
 
-#left li:hover ul ul, #left li.over ul ul {display:none;} 
-#left li:hover ul, #left li li:hover ul, #left li.over ul, #left li li.over ul {display: block;} /* The magic */
+/*The following two lines define up to 4 levels including the actual first level menu. Modify to accommodate further levels */
+#left li:hover ul ul, #left li:hover ul ul ul, #left li:hover ul ul ul ul, #left li.over ul ul, #left li.over ul ul ul, #left li.over ul ul ul ul {display:none;} 
+#left li:hover ul, #left li li:hover ul, #left li li li:hover ul, #left li li li li:hover ul, #left li.over ul, #left li li.over ul, #left li li li.over ul, #left li li li li.over ul {display: block;} /* The magic */
+
 /*--------------------------------------------------------------------------------------*/
 /* LINKS */
 /*--------------------------------------------------------------------------------------*/
@@ -175,11 +153,11 @@ a {
 	text-decoration:none;
 	}
 a:link, a:visited {
-	color:#03c;
+	color:#006;
 	text-decoration:none;
 	}
 a:hover {
-	color:#06c;
+	color:#c00;
 	text-decoration:underline;
 	}
 a:active {
@@ -276,13 +254,13 @@ a img {
 	border:0;
 	}
 #topNav li.right {	
-	background:url("/images/navright_left.gif") no-repeat left top;
+	background:url("/images/wenona/navright_left.gif") no-repeat left top;
 	}
 #topNav li.left {	
-	background:url("/images/navleft_left.gif") no-repeat left top;
+	background:url("/images/wenona/navleft_left.gif") no-repeat left top;
 	}
 #topNav li.norm {	
-	background:url("/images/navnorm_left.gif") no-repeat left top;
+	background:url("/images/wenona/navnorm_left.gif") no-repeat left top;
 	}
 #topNav a {
 	float:left;
@@ -296,13 +274,13 @@ a img {
 	white-space:nowrap;
 	}
 #topNav a.right {
-	background:url("/images/navright_right.gif") no-repeat right top;color:#002452;
+	background:url("/images/wenona/navright_right.gif") no-repeat right top;color:#002452;
 	} 
 #topNav a.left {
-	background:url("/images/navleft_right.gif") no-repeat right top;color:#002452;
+	background:url("/images/wenona/navleft_right.gif") no-repeat right top;color:#002452;
 	} 
 #topNav a.norm {
-	background:url("/images/navnorm_right.gif") no-repeat right top;color:#002452;
+	background:url("/images/wenona/navnorm_right.gif") no-repeat right top;color:#002452;
 	} 
 #topNav >  ul a {width:auto;}
 /* Commented Backslash Hack hides rule from IE5-Mac \*/
@@ -445,11 +423,11 @@ a img {
 /*--------------------------------------------------------------------------------------*/
 /* OTHER FORMS */
 /*--------------------------------------------------------------------------------------*/
-form.standard {
+.standard {
 	padding:4px;
 	background:transparent;
 	}
-form.standard em {
+.standard em {
 	font-size:70%;
 	font-style:normal;
 	}
@@ -610,8 +588,6 @@ table.timetable td {
 table.home {
 	position:relative;
 	}
-table.home tr {
-	vertical-align:top;
-	}
 table.home td {
+	vertical-align:top;
 	}
