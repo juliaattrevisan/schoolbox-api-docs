@@ -88,6 +88,8 @@ define("WEATHER_CACHE", "7200");  			//cache weather info for 2 hours
 define("WEATHER_CURRENT_CACHE_LOCATION", "/home/staff/jleckie/www/portaldev/files/currentweather.xml");	//File to save weather cache in
 define("WEATHER_FORECAST_CACHE_LOCATION", "/home/staff/jleckie/www/portaldev/files/forecastweather.xml");	//File to save weather cache in
 define("WEATHER_SERVER", "ftp.theweather.com.au");
+define("WEATHER_CURRENT_FILE", "obs_current_aws_vic.xml");
+define("WEATHER_FORECAST_FILE", "d_fcast_city_4day.xml");
 define("WEATHER_USERNAME", "");
 define("WEATHER_PASSWORD", "");
 define("WEATHER_LOCATION", "");

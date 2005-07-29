@@ -115,8 +115,8 @@ class Weather
 				ftp_pasv( $conn_id, false);
 
 				// download current weather file
-				$download = ftp_get($conn_id, $currentWeather, "obs_current_aws_vic.xml", FTP_ASCII); 
-				$download = ftp_get($conn_id, $forecastWeather, "d_fcast_city_4day.xml", FTP_ASCII); 
+				$download = ftp_get($conn_id, $currentWeather, WEATHER_CURRENT_FILE, FTP_ASCII); 
+				$download = ftp_get($conn_id, $forecastWeather, WEATHER_FORECAST_FILE, FTP_ASCII); 
 
 				ftp_close($conn_id);
 			}
