@@ -1,20 +1,19 @@
-<table width="98%" border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td class="small_head">Notes</td>
-  </tr>
-  <tr>
-    <td width="75%" height="2" background="/images/greypixel.gif"></td>
-  </tr>
-  <!-- BEGIN notes -->
-  <tr>
-    <td><b>{NOTE_NAME}</b></td>
-  </tr>
-  <!-- END notes -->
-  <tr>
-    <td align="right"> 
-      <!-- BEGIN submit_note -->
-      <a href="/cms/modResource.php?type=file&cid={ID}&file=1">POST NOTE</a> 
-      <!-- END submit_note -->
-    </td>
-  </tr>
+<table>
+	<tr>
+		<td class="homeComponentHeader"><h2 class="small_head">Notes</h2></td>
+	</tr>
+	<!-- BEGIN notes -->
+	<tr>
+		<td style="border-bottom:1px solid #666" class="small_text">{NOTE_NAME}</td>
+	</tr>
+	<!-- END notes -->
+	<tr style="height:2px;">
+		<td colspan="2" style="background:#666;"></td>
+	</tr>						
+	<!-- BEGIN submit_note -->
+	<tr>
+		<td style="text-align:right;"><a href="/cms/modResource.php?type=file&cid={ID}&file=1">POST NOTE</a></td>
+	</tr>
+	<!-- END submit_note -->
 </table>
+<br />

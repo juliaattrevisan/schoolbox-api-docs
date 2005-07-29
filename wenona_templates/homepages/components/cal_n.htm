@@ -1,31 +1,20 @@
-<table width="98%" border="0" cellspacing="0" cellpadding="0" height="1">
-  <tr>
-    <td colspan="2" class="large_head">Upcoming Events</td>
-  </tr>
-  <tr> 
-    <td width="33%" height="2" background="/images/greypixel.gif"></td>
-    <td width="67%" height="2" background="/images/greypixel.gif"></td>
-  </tr>
-  <!-- BEGIN group_events -->
-  <tr valign="top">
-    <td width="33%"><a href="/calendar/viewCalendar.php?Year={CAL_YEAR}&Month={CAL_MONTH}&Day={CAL_DAY}&view=1">{CAL_DATE}</a> 
-      : {CAL_TIME}</td>
-    <td width="67%" class="large_text">{CAL_NOTE}</td>
-  </tr>
-  <tr> 
-    <td width="33%" height="1" background="/images/greypixel.gif"></td>
-    <td width="67%" height="1" background="/images/greypixel.gif"></td>
-  </tr>
-  <!-- END group_events -->
-  <tr> 
-    <td width="33%" height="2" background="/images/greypixel.gif"></td>
-    <td width="67%" height="2" background="/images/greypixel.gif"></td>
-  </tr>
-  <!-- BEGIN submit_event -->
-  <tr>
-    <td height="4" width="33%">&nbsp;</td>
-    <td height="4" width="67%" align="right"><a href="/calendar/addEvent.php?level=2&sid={ID}">ADD 
-      EVENT </a></td>
-  </tr>
-  <!-- END submit_event -->
+<table>
+	<tr>
+		<td colspan="2" class="homeComponentHeader"><h2 class="large_head">Upcoming Events</h2></td>
+	</tr>
+	<!-- BEGIN group_events -->
+	<tr>
+		<td class="large_text titleColumn"><a href="/calendar/viewCalendar.php?Year={CAL_YEAR}&Month={CAL_MONTH}&Day={CAL_DAY}&view=1">{CAL_DATE}</a> {CAL_TIME}</td>
+		<td style="border-bottom:1px solid #666" class="large_text"><div style="color:{CAL_COLOUR}">{CAL_NOTE}</div></td>
+	</tr>
+	<!-- END group_events -->
+	<tr style="height:1px;">
+		<td colspan="2" style="border-bottom:1px solid #666;"></td>
+	</tr>	
+	<!-- BEGIN submit_event -->
+	<tr>
+		<td style="text-align:right;" colspan="2"><a href="/calendar/addEvent.php?level=2&sid={ID}">ADD EVENT </a></td>
+	</tr>
+	<!-- END submit_event -->
 </table>
+<br />

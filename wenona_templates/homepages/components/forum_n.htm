@@ -1,36 +1,26 @@
-<table width="98%" border="0" cellspacing="0" cellpadding="0" height="1">
-  <tr>
-    <td colspan="2" class="large_head">Discussion Board</td>
-  </tr>
-  <tr background="/images/greypixel.gif">
-    <td height="2" width="70%"></td>
-    <td height="2" width="30%"></td>
-  </tr>
-  <!-- BEGIN large_forum -->
-  <tr>
-    <td width="70%" class="large_text"><b>{FORUM_HEADING}</b></td>
-    <td align="right" width="30%" class="large_text">{REPLY}{MOD_FORUM} </td>
-  </tr>
-  <tr>
-    <td colspan="2" class="large_text">{FORUM_BODY}</td>
-  </tr>
-  <tr align="right">
-    <td colspan="3" height="1"><em>Posted by <a href="/mail/send.php?replyto={CONTACT}">{POSTER}</a> on {POSTED_DATE}</em></td>
-  </tr>
-  <tr background="/images/greypixel.gif">
-    <td width="70%" height="1"></td>  
-    <td width="30%" height="1"></td>
-  </tr>
-  <!-- END large_forum -->
-  <tr background="/images/greypixel.gif">
-    <td width="70%" height="2"></td>
-    <td width="30%" height="2"></td>
-  </tr>
-  <!-- BEGIN submit_forum -->
-  <tr>
-    <td height="4" width="70%">&nbsp;</td>
-    <td height="4" width="30%" align="right"><a href="/forum/modpost.php?cid={CID}&parent=0">POST 
-      </a></td>
-  </tr>
-  <!-- END submit_forum -->
+<table>
+	<tr>
+		<td class="homeComponentHeader"><h2 class="large_head">Discussion Board</h2></td>
+	</tr>
+	<!-- BEGIN large_forum -->
+	<tr>
+		<td class="large_text"><h3>{FORUM_HEADING}</h3></td>
+		<td style="text-align:right" class="large_text">{REPLY}{MOD_FORUM}</td>
+	</tr>
+	<tr>
+		<td class="large_text" colspan="2">{FORUM_BODY}</td>
+	</tr>
+	<tr>
+		<td style="border-bottom:1px solid #666" class="large_text" colspan="2"><span class="element_footer">Posted by <a href="/mail/send.php?replyto={CONTACT}">{POSTER}</a> on {POSTED_DATE}</span></td>
+	</tr>
+	<!-- END large_forum -->
+	<tr style="height:2px;">
+		<td colspan="2" style="background:#666;"></td>
+	</tr>					
+	<!-- BEGIN submit_forum -->
+	<tr>
+		<td style="text-align:right;" colspan="2" class="navbar"><a href="/forum/modpost.php?cid={CID}&parent=0">POST TOPIC</a></td>
+	</tr>
+	<!-- END submit_forum -->
 </table>
+<br />
