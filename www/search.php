@@ -85,8 +85,8 @@ class OutPut
 				$val = preg_quote($match[1]);
 				$str = preg_replace("/^$val/", "", $str);
 			}
-			//cut out string from search smaller than 3 chars
-			if(strlen($match[1]) > 3)
+			//cut out string from search smaller than 2 chars
+			if(strlen($match[1]) > 1)
 			{
 				$token[$x] = $match[1];
 			}
@@ -101,11 +101,11 @@ class OutPut
 		//op is the operator AND/OR/+		
 		
 		//first item has no op to begin with
-		$query = "$column LIKE '%".array_shift($tokenArray)."%'";
+		$query = "$column LIKE '%".mysql_escape_string(array_shift($tokenArray))."%'";
 
 		foreach($tokenArray as $token)
 		{
-			$query .= " $op $column LIKE '%$token%'";
+			$query .= " $op $column LIKE '%".mysql_escape_string($token)."%'";
 		} 
 		
 		return $query;
@@ -115,8 +115,8 @@ class OutPut
 	function catSearch($token)
 	{
 		//this query will get all categories that the user can see
-		$query = "SELECT name, id FROM category WHERE ".$this->tokenToQuery($token, "category.name", "OR"). 
-		"ORDER BY name";
+		$query = "SELECT name, id FROM category WHERE ".$this->tokenToQuery($token, 'name', 'OR'). 
+		" OR ".$this->tokenToQuery($token, 'code', 'OR')." ORDER BY name";
 
 		$result = $this->db->dbDoQuery($query);
 
@@ -142,7 +142,7 @@ class OutPut
 		//this query will get all files that the user can see
 		$query = "SELECT file.id, file.realname, file.mime_type, DATE_FORMAT(file.submitted, '%W %M %e @ %l:%i%p') AS submitted, 
 		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, file.description,
-		file.comment, category.name, category.id as cid 
+		file.comment, category.name, category.id as cid, category.code
 		FROM file, user, category WHERE file.owner=user.id AND file.category = category.id AND file.deleted = '0'";
 		//do the query based on search type
 		switch ($type)
@@ -222,7 +222,7 @@ class OutPut
 	{
 		//this query will get all files that the user can see
 		$query = "SELECT link.id, link.url, DATE_FORMAT(link.submitted, '%W %M %e @ %l:%i%p') AS submitted, 
-		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, link.description, link.comment, category.name, category.id as cid 
+		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, link.description, link.comment, category.name, category.id as cid, category.code 
 		FROM link, user, category WHERE link.owner = user.id AND link.category = category.id";
 		//do the query based on search type
 		switch ($type)
@@ -364,7 +364,11 @@ class OutPut
 		$this->t_body->set_var("DATETIME", $queryArray['submitted']);
 
 		//set category
-		$this->t_body->set_var("CATEGORY_NAME", scrubTEXT($queryArray['name']));
+		if($queryArray['code'])
+			$this->t_body->set_var("CATEGORY_NAME", scrubTEXT($queryArray['name']).' ('.$queryArray['code'].')');
+		else
+			$this->t_body->set_var("CATEGORY_NAME", scrubTEXT($queryArray['name']));
+
 		$this->t_body->set_var("CATEGORY_ID", $queryArray['cid']);
 
 		//parse the output
@@ -420,14 +424,19 @@ class OutPut
 
 		while($parent != 0)
 		{
-			$query = "SELECT id, name, parent FROM category WHERE id = '".$parent."'";
+			$query = "SELECT id, name, parent, code FROM category WHERE id = '".$parent."'";
 			$queryArray = $this->db->dbGetSingleRow($query);
-
+			
+			if($queryArray['code'])
+				$code = " ({$queryArray['code']})";
+			else
+				$code = '';
+		
 			$parent = $queryArray['parent'];
 			if($parent == 0)
-                       		$path = "<a href=\"browse.php?category=".$queryArray['id']."\">".scrubTEXT($queryArray['name'])."</a>".$path;
+                       		$path = "<a href=\"browse.php?category=".$queryArray['id']."\">".scrubTEXT($queryArray['name']).$code."</a>".$path;
 			else			 
-				$path = " > <a href=\"browse.php?category=".$queryArray['id']."\">".scrubTEXT($queryArray['name'])."</a>".$path;
+				$path = " > <a href=\"browse.php?category=".$queryArray['id']."\">".scrubTEXT($queryArray['name']).$code."</a>".$path;
 		}
 
 		return $path;
@@ -461,7 +470,7 @@ else if($_GET['where'] == 2 && isset($_GET['keyword']))
 else
 {
 	$myPage = new OutPut();
-	if($_GET['keyword'])
+	if($_REQUEST['keyword'])
 	{ 	
 		//setup search result page
 		$myPage->searchResult();
@@ -469,11 +478,11 @@ else
 		//advanced search
 		if($_GET['type'] && $_GET['sort'])
 		{   
-			$myPage->listSearch($_GET['keyword'], $_GET['type'], $_GET['sort']);
+			$myPage->listSearch($_REQUEST['keyword'], $_GET['type'], $_GET['sort']);
 		}
 		else //simple keyword search
 		{  
-			$myPage->listSearch($_GET['keyword']);
+			$myPage->listSearch($_REQUEST['keyword']);
 		}
 	}
 	else
