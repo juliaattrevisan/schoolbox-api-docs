@@ -16,7 +16,7 @@
 					</font>
 					</td>
 				<td align="right">
-			<a href='javascript:top.close()'><img src="/newimages/cross.gif" width="25" height="25" border="0" align="absmiddle"></a>
+			<a href='javascript:top.close()'><img src="/images/cross.gif" width="25" height="25" border="0" align="absmiddle"></a>
 				</td>
 			</tr>
 		</table>

@@ -163,11 +163,11 @@ class modUser
 			if($group[$i]['type'] == 1)
 				$this->t_body->set_var("BOX", 
 				"<a href=\"/group/modUserGroup.php?write=$id&service=1&sid=".$group[$i]['id']."&user=$id\" border='0'>
-				<img src=\"/newimages/emptybox.gif\" border=\"0\"></a>");
+				<img src=\"/images/emptybox.gif\" border=\"0\"></a>");
 			else if($group[$i]['type'] == 2)
 				$this->t_body->set_var("BOX", 
 				"<a href=\"/group/modUserGroup.php?unwrite=$id&service=1&sid=".$group[$i]['id']."&user=$id\" border='0'>
-				<img src=\"/newimages/greentick.gif\" border=\"0\"></a>");
+				<img src=\"/images/greentick.gif\" border=\"0\"></a>");
 			else
 				$this->t_body->set_var("BOX", "");
 

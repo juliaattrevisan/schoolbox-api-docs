@@ -66,7 +66,7 @@ function image_resize($src, $maxWidth,$maxHeight,$resample=1, $quality=75)
 		//test image size (cannot handle large 30mb+ uncompressed images)
 		if(($srcSize[0] * $srcSize[1]) > MAX_IMAGE_SIZE) 
 		{
-			outputImageFile($_SERVER['DOCUMENT_ROOT']."/newimages/cross.gif");
+			outputImageFile($_SERVER['DOCUMENT_ROOT']."/images/cross.gif");
 			exit;
 		}
 

@@ -65,10 +65,10 @@ class OutPut
 				//if in group or awaiting authorisation tick box
 				if(is_numeric($row['type'])) 
 					$output = "<a href=\"joinGroup.php?leave=".$row['id']."\">
-						<img src=\"/newimages/greentick.gif\" border=\"0\"></a>".$row['name'];
+						<img src=\"/images/greentick.gif\" border=\"0\"></a>".$row['name'];
 				else	
 					$output = "<a href=\"joinGroup.php?join=".$row['id']."\">
-						<img src=\"/newimages/emptybox.gif\" border=\"0\"></a>".$row['name'];
+						<img src=\"/images/emptybox.gif\" border=\"0\"></a>".$row['name'];
 				
 				$this->t_body->set_var(strtoupper($var), $output);
 				$this->t_body->parse($var, $var."_block", true);

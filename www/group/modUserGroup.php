@@ -97,14 +97,14 @@ class modUserGroup
 					$this->t_body->set_var("WRITE", 
 					"<a href=\"modUserGroup.php?
 					write=".$member['uid']."&service=".$this->service."&sid=".$this->sid."\">
-					<img src=\"/newimages/emptybox.gif\" width=\"13\" height=\"12\" border=\"0\"></a>");
+					<img src=\"/images/emptybox.gif\" width=\"13\" height=\"12\" border=\"0\"></a>");
 				}
 				else
 				{
 					$this->t_body->set_var("WRITE", 
 					"<a href=\"modUserGroup.php?
 					unwrite=".$member['uid']."&service=".$this->service."&sid=".$this->sid."\">
-					<img src=\"/newimages/greentick.gif\" width=\"13\" height=\"12\" border=\"0\"></a>");
+					<img src=\"/images/greentick.gif\" width=\"13\" height=\"12\" border=\"0\"></a>");
 				}
 				
 				$this->t_body->parse("member_block", "member", true);

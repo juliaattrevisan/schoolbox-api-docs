@@ -6,7 +6,7 @@
 body {
 	margin:0;
 	padding:0;
-	background:white url(/images/body_back.gif) repeat-y left;
+	background:white url(/images/wenona/body_back.gif) repeat-y left;
 	font-family:Verdana, Arial, Helvetica, sans-serif, serif;
 	font-size:100%;
 	text-align:left;
@@ -38,11 +38,11 @@ h2 {
 
 #left h3 {
 	margin:0;
-	padding:3px 0 0 10px;
+	padding:0 0 4px 5px;
 	background:#B51C21;
 	color:#fff;
 	font-size:80%; 
-	line-height:1.4em;
+	line-height:1.2em;
 	font-weight:bold;
 	}
 
@@ -85,7 +85,7 @@ acronym, dfn, abbr {
 #left ul {
 	margin:0 0 10px 0;
 	padding:0;
-	list-style: none;
+	list-style: none;;
 	width:150px; /* Width of Menu Items */
 	z-index:2;
 	}
@@ -99,10 +99,8 @@ acronym, dfn, abbr {
 	color:#fff;
 	display:block;
 	text-decoration:none;
-	background:#002452; /* IE6 Bug */
-	padding:2px 5px;
-	border:0;
-	margin:0;
+	background:#002452 url(/images/wenona/white_arrow.gif) no-repeat 2px 3px; /* IE6 Bug */
+	padding:2px 0 2px 14px;
 	font-weight:normal;
 	font-size:70%;
 	}
@@ -124,7 +122,13 @@ acronym, dfn, abbr {
 /* End */
 
  /* Hover Styles */
-#left ul li a:hover, #left li ul li a:hover {
+#left ul li a:hover
+{
+	background:#9CC7DE url(/images/wenona/white_arrow.gif) no-repeat 2px 3px;
+	color:#fff;
+}
+
+#left li ul li a:hover {
 	background:#0055AD;
 	color:#fff;
 	}
@@ -179,7 +183,7 @@ a img {
 	}
 
 #header {
-	background:#002452 url(/images/header.gif) no-repeat 30px 5px;
+	background:#002452 url(/images/wenona/header.gif) no-repeat 30px 5px;
 	height:85px;
 	}
 
@@ -549,7 +553,7 @@ br.fix {
 /*--------------------------------------------------------------------------------------*/
 
 tr.ruled{
-	background:#FFFFA5;
+	background:#FFCCCC;
 	}    
 table.ruler td {
 	padding-bottom:2px;

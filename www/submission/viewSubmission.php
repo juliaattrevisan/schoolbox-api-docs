@@ -52,12 +52,12 @@ class ViewSubmissionPage {
 					$this->t_body->set_var("COLOUR", "#000000");
 				if($line['marked'])
 				{
-					$this->t_body->set_var("MARKED","<img src=\"/newimages/greentick.gif\" width=\"13\" height=\"12\">");
+					$this->t_body->set_var("MARKED","<img src=\"/images/greentick.gif\" width=\"13\" height=\"12\">");
 					$this->t_body->set_var("RETURN", "");
 				}
 				else
 				{
-					$this->t_body->set_var("MARKED","<img src=\"/newimages/emptybox.gif\" border=\"0\" width=\"13\" height=\"12\">");
+					$this->t_body->set_var("MARKED","<img src=\"/images/emptybox.gif\" border=\"0\" width=\"13\" height=\"12\">");
 					$this->t_body->set_var("RETURN", "/ <a href=\"returnWork.php?box_id=$box_id&sid=".$line['uid']."\">Return</a>");
 				}
 				$this->t_body->parse("submission_listing","submitted_block",true);
