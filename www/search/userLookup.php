@@ -53,9 +53,12 @@ class outUser
 				{
 					$synInfo = getStudentInfo($user['synergy_id']);
 					
+					list($date, $month, $year) = explode(' ', $synInfo['StudentBirthDate']);
+					$birthdate = strtotime($date.' '.$month.' '.$year);
+					
 					$this->t_body->set_var("TUTOR", $synInfo['StudentTutor']);
 					$this->t_body->set_var("YEAR_LEVEL", $synInfo['StudentYearLevel']);
-					$this->t_body->set_var("BIRTHDATE", $synInfo['StudentBirthDate']);
+					$this->t_body->set_var("BIRTHDATE", date('jS of F, Y', $birthdate));
 					$this->t_body->set_var("EMERGENCY_NAME", $synInfo['StudentEmergencyName']);
 					$this->t_body->set_var("EMERGENCY_PHONE", $synInfo['StudentEmergencyPhone']);
 					$this->t_body->set_var("EMERGENCY_ALT_PHONE", $synInfo['StudentEmergencyPhoneAlt']);
