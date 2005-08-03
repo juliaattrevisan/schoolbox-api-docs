@@ -14,13 +14,14 @@
 <script type="text/javascript" src="/javascript/drop_down.js"></script>
 <!-- #BeginEditable "scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-default.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-home.css" />
 <!-- #EndEditable -->
 </head>
 <body> 
 <div id="outerWrap"> 
 	<div id="header"></div> 
 	<div id="searchBox"> 
-		<form class="standardForm" id="searchForm" action="/search.php" method="post"> 
+		<form class="standardForm" id="searchForm" action="/search.php" method="get"> 
 			<p style="margin:0;"> 
 				<input class="short" type="text" name="keyword" /> 
 				<select class="short" name="where"> 
@@ -28,7 +29,7 @@
 					<option value="1">google</option> 
 					<option value="2">yahoo</option> 
 				</select> 
-				<input class="img" type="image" src="/images/searchbutton.gif" alt="Search" name="Submit" /> 
+				<input class="img" type="image" src="/images/wenona/searchbutton.gif" alt="Search" name="Submit" /> 
 			</p> 
 		</form> 
 	</div> 
@@ -87,18 +88,20 @@
 <h1>{GREETING}</h1>
             <!-- BEGIN timetable -->
 			<h2>Timetable - Day {DAYNUMBER}</h2>
+			<div class="indent">
                   <table class="timetable">                    
 						<tr>
 						<!-- BEGIN timetable_header -->
-							<th>PERIOD {PERIOD_NUMBER}</th>
+							<th>{PERIOD_NAME}</th>
 						<!-- END timetable_header -->
 						</tr>
 						<tr>
 							<!-- BEGIN timetable_period -->
-							  <td bgcolor="{TIMECOLOUR}" {CODE} onmouseover="bgColor='{TIMEOVERCOLOUR}'"  style="cursor:hand" onmouseout="bgColor='{TIMECOLOUR}'">{PERIOD}</td>
+							  <td style="width:{TIMETABLE_FIELD_WIDTH}%" class="{TIMETABLE_CLASS}" {CODE}>{PERIOD}</td>
 							<!-- END timetable_period -->
 						</tr>
                   </table>
+				  </div>
             <!-- END timetable -->
 			<div class="dbx-group" id="news-column">
 			<table class="home">
@@ -120,24 +123,28 @@
 					<div class="dbx-box">
 						<h2 class="dbx-handle">Current Weather</h2>
 						<div class="dbx-content">
-							<p><strong>Temperature:</strong> {TEMP}&deg;&nbsp;<br />
-							<strong>Wind:</strong> {DIRECTION} {SPEED}km/h<br />
-							<strong>Humidity:</strong>{HUMIDITY}<br />
-							Issued at {ISSUED}</p>
-							<p><a href="/weather.php">MORE WEATHER...</a></p>
+							<div class="indent">
+								<p><strong>Temperature:</strong> {TEMP}&deg;&nbsp;<br />
+								<strong>Wind:</strong> {DIRECTION} {SPEED}km/h<br />
+								<strong>Humidity:</strong>{HUMIDITY}<br />
+								Issued at {ISSUED}</p>
+								<p><a href="/weather.php">MORE WEATHER...</a></p>
+							</div>
 						</div>
 					</div>
 					</td>
-				</tr>
 				<!-- END weather -->
+				</tr>
 				<tr>
 				<td>
 					<div class="dbx-box">
 						<h2 class="dbx-handle">Todays Events - {DATE}</h2>
 						<div class="dbx-content">
+							<table>
 							<!-- BEGIN note_block -->
-								<p>{TIME} - {NOTE}</p>
-							<!-- END note_block -->     
+								<tr><td class="calendarTime" style="color:{NOTE_COLOUR}">{TIME}</td><td style="color:{NOTE_COLOUR}">{NOTE}</td></tr>
+							<!-- END note_block -->
+							</table>
 						</div>
 					</div>
 				</td>

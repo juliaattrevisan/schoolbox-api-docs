@@ -20,7 +20,7 @@
 <div id="outerWrap"> 
 	<div id="header"></div> 
 	<div id="searchBox"> 
-		<form class="standardForm" id="searchForm" action="/search.php" method="post"> 
+		<form class="standardForm" id="searchForm" action="/search.php" method="get"> 
 			<p style="margin:0;"> 
 				<input class="short" type="text" name="keyword" /> 
 				<select class="short" name="where"> 
@@ -28,7 +28,7 @@
 					<option value="1">google</option> 
 					<option value="2">yahoo</option> 
 				</select> 
-				<input class="img" type="image" src="/images/searchbutton.gif" alt="Search" name="Submit" /> 
+				<input class="img" type="image" src="/images/wenona/searchbutton.gif" alt="Search" name="Submit" /> 
 			</p> 
 		</form> 
 	</div> 
@@ -84,7 +84,7 @@
 			</div><!-- #EndLibraryItem --><!-- #EndEditable --> 
 	<div id="content"> 
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
-                        <h1>{CATEGORY_PATH}</h1>
+                         <h1>{CATEGORY_PATH}</h1>
 			<p>
 			<!-- BEGIN view_expand --><a href="browse.php?category={CID}&verbose=1">expand view</a>
 			<!-- END view_expand -->
@@ -103,7 +103,7 @@
 			// <a href="/cms/modFolder.php?action=add&cid={CID}">add folder</a>
 			<!-- END modify_access -->
 			 </p>
-			<hr>
+			<hr />
                   <table>
 					<!-- BEGIN category_listing -->                    
 					<tr> 
@@ -118,7 +118,7 @@
                   <!-- END category_listing -->
                   <!-- BEGIN file_listing -->
                     <tr> 
-                      <td colspan="2"><img src="{FILE_IMAGE}" width="25" height="27" border="0" />{FILE_DESCRIPTION} </b><font color="black" align="right"><i>{SIZE}</i></font></td>
+                      <td colspan="2"><a href="{FILE_URL}" target="{FILE_TARGET}"><img src="{FILE_IMAGE}" width="25" height="27" border="0" /></a> <a href="{FILE_URL}" target="{FILE_TARGET}">{FILE_DESCRIPTION}</a> <em>{SIZE}</em></td>
                       <!-- BEGIN mod_file -->
                       <td class="cntr"><a href="/cms/modResource.php?type=modfile&amp;id={FILEID}">modify</a></td>
                       <td><a href="/cms/delResource.php?fileid={FILEID}" onclick=" return(confirm('Remove file {FILE_DESCRIPTION_ESCAPED}?'));">delete</a></td>
@@ -131,7 +131,7 @@
                       <td>&nbsp;</td>
                     </tr>
                     <tr>
-                      <td colspan="2"><span style="color:#666;font-style:italic;">Submitted by {OWNER} on {DATETIME}</span></td>
+                      <td colspan="2"><p class="element_footer">Submitted by {OWNER} on {DATETIME}</p></td>
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
                     </tr>
@@ -139,7 +139,7 @@
                   <!-- END file_listing -->
                   <!-- BEGIN link_listing -->
                     <tr>
-                      <td colspan="2"><img src="/images/mime/http-url.png" width="25" height="27" border="0" />{LINK_HTML}</td>
+                      <td colspan="2"><a href="{LINK_URL}" target="{LINK_TARGET}"><img src="/images/mime/http-url.png" width="25" height="27" border="0" /></a> <a href="{LINK_URL}" target="{LINK_TARGET}">{LINK_DESCRIPTION}</a></td>
                       <!-- BEGIN mod_link -->
                       <td class="cntr"><a href="/cms/modResource.php?type=modurl&amp;id={LINKID}">modify</a> </td>
                       <td><a href="/cms/delResource.php?linkid={LINKID}" onclick="return(confirm('Remove link {LINK_DESCRIPTION_ESCAPED}?'));">delete</a> </td>
@@ -152,7 +152,7 @@
                       <td>&nbsp;</td>
                     </tr>
                     <tr>
-                      <td colspan="2"><i><font color="#666666">Submitted by {OWNER} on {DATETIME}</font></i></td>
+                      <td colspan="2"><p class="element_footer">Submitted by {OWNER} on {DATETIME}</p></td>
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
                     </tr>

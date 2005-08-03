@@ -21,7 +21,7 @@
 <div id="outerWrap"> 
 	<div id="header"></div> 
 	<div id="searchBox"> 
-		<form class="standardForm" id="searchForm" action="/search.php" method="post"> 
+		<form class="standardForm" id="searchForm" action="/search.php" method="get"> 
 			<p style="margin:0;"> 
 				<input class="short" type="text" name="keyword" /> 
 				<select class="short" name="where"> 
@@ -29,7 +29,7 @@
 					<option value="1">google</option> 
 					<option value="2">yahoo</option> 
 				</select> 
-				<input class="img" type="image" src="/images/searchbutton.gif" alt="Search" name="Submit" /> 
+				<input class="img" type="image" src="/images/wenona/searchbutton.gif" alt="Search" name="Submit" /> 
 			</p> 
 		</form> 
 	</div> 
@@ -101,7 +101,7 @@
             <!-- BEGIN forecast -->
             <br />
             <h2>Forecast</h2>
-			<table>
+			<table style="text-align:center">
                     <tr> 
                       <th>{DAY1}</th>
                       <th>{DAY2}</th>
@@ -109,13 +109,13 @@
                       <th>{DAY4}</th>
                     </tr>
                     <tr> 
-                      <td><img src="/newimages/weather/{IMAGE1}" alt="{PRECIS1}" width="50" height="50" /><br />
+                      <td><img src="/images/weather/{IMAGE1}" alt="{PRECIS1}" width="50" height="50" /><br />
                         {PRECIS1}</td>
-                      <td><img src="/newimages/weather/{IMAGE2}" alt="{PRECIS2}" width="50" height="50" /><br />
+                      <td><img src="/images/weather/{IMAGE2}" alt="{PRECIS2}" width="50" height="50" /><br />
                         {PRECIS2}</td>
-                      <td><img src="/newimages/weather/{IMAGE3}" alt="{PRECIS4}" width="50" height="50" /><br />
+                      <td><img src="/images/weather/{IMAGE3}" alt="{PRECIS4}" width="50" height="50" /><br />
                         {PRECIS3}</td>
-                      <td><img src="/newimages/weather/{IMAGE4}" alt="{PRECIS4}" width="50" height="50" /><br />
+                      <td><img src="/images/weather/{IMAGE4}" alt="{PRECIS4}" width="50" height="50" /><br />
                         {PRECIS4}</td>
                     </tr>
                     <tr> 
@@ -126,7 +126,7 @@
                     </tr>
             </table>
             <!-- END forecast -->
-            <form action="" method="post" name="locForm" id="locForm">
+            <form action="" method="get" name="locForm" id="locForm">
 			<table>
               <tr>
                 <td> Get more weather from around Australia {LOCDROP} </td>

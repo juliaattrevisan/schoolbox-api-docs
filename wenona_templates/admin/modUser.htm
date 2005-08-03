@@ -5,7 +5,15 @@
 <head>
 <!-- #BeginEditable "doctitle" --> 
 <title>{TITLE}</title>
-
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<script type="text/javascript" src="/javascript/drop_down.js"></script>
+<!-- #BeginEditable "scripts" -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-default.css" />
 <script language="JavaScript" type="text/javascript">
 function verify()
 {
@@ -35,22 +43,12 @@ function verify()
 	
 </script>
 <!-- #EndEditable -->
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="James Leckie, Lektec Consulting"/>
-<meta name="ROBOTS" content="INDEX, FOLLOW" />
-<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
-<script type="text/javascript" src="/javascript/drop_down.js"></script>
-<!-- #BeginEditable "scripts" -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-default.css" />
-
-<!-- #EndEditable -->
 </head>
 <body> 
 <div id="outerWrap"> 
 	<div id="header"></div> 
 	<div id="searchBox"> 
-		<form class="standardForm" id="searchForm" action="/search.php" method="post"> 
+		<form class="standardForm" id="searchForm" action="/search.php" method="get"> 
 			<p style="margin:0;"> 
 				<input class="short" type="text" name="keyword" /> 
 				<select class="short" name="where"> 
@@ -58,7 +56,7 @@ function verify()
 					<option value="1">google</option> 
 					<option value="2">yahoo</option> 
 				</select> 
-				<input class="img" type="image" src="/images/searchbutton.gif" alt="Search" name="Submit" /> 
+				<input class="img" type="image" src="/images/wenona/searchbutton.gif" alt="Search" name="Submit" /> 
 			</p> 
 		</form> 
 	</div> 
@@ -247,6 +245,8 @@ function verify()
 					</tr>
 				</table>
 			</form>
+			<!-- END perms -->
+			
             <!-- #EndEditable --> </div> 
 	</div> 
 </div> 

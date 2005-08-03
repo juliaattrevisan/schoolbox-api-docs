@@ -14,14 +14,17 @@
 <script type="text/javascript" src="/javascript/drop_down.js"></script>
 <!-- #BeginEditable "scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-default.css" />
-
+<script type="text/javascript" src="/javascript/tableruler.js"></script>
+<script type="text/javascript">
+	window.onload=function(){tableruler();} 
+</script>
 <!-- #EndEditable -->
 </head>
 <body> 
 <div id="outerWrap"> 
 	<div id="header"></div> 
 	<div id="searchBox"> 
-		<form class="standardForm" id="searchForm" action="/search.php" method="post"> 
+		<form class="standardForm" id="searchForm" action="/search.php" method="get"> 
 			<p style="margin:0;"> 
 				<input class="short" type="text" name="keyword" /> 
 				<select class="short" name="where"> 
@@ -29,7 +32,7 @@
 					<option value="1">google</option> 
 					<option value="2">yahoo</option> 
 				</select> 
-				<input class="img" type="image" src="/images/searchbutton.gif" alt="Search" name="Submit" /> 
+				<input class="img" type="image" src="/images/wenona/searchbutton.gif" alt="Search" name="Submit" /> 
 			</p> 
 		</form> 
 	</div> 
@@ -85,30 +88,27 @@
 			</div><!-- #EndLibraryItem --><!-- #EndEditable --> 
 	<div id="content"> 
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
-            <table width="85%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td class="itemHeader">Find User <br /> <img src="/images/redpixel.gif" width="100%" height="2" /> 
-                </td>
-              </tr>
-            </table>
-            <br />
-            <table width="85%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td width="25%" class="blueBG">Surname</td>
-                <td width="25%" class="blueBG">Preferred Name</td>
-                <td width="25%" class="blueBG">Position</td>
-                <td width="25%" class="blueBG">Email</td>
-              </tr>
-              <!-- BEGIN userlist -->
-              <tr> 
-                <td><a href="/search/userLookup.php?id={ID}">{LASTNAME}</a></td>
-                <td><a href="/search/userLookup.php?id={ID}">{FIRSTNAME}</a></td>
-                <td><a href="/search/userLookup.php?id={ID}">{POSTION}</a></td>
-                <td>{EMAIL}</td>
-              </tr>
-              <!-- END userlist -->
-            </table>
-            <p>&nbsp;</p>
+            <h1>Results of User Search</h1>
+                  <table class="ruler">
+                    <thead>
+					<tr> 
+                      <th>Preferred Name</th>
+					  <th>Surname</th>
+                      <th>Group</th>
+					  <th>Year</th>
+                    </tr>
+					</thead>
+					<tbody>
+                    <!-- BEGIN userlist -->
+                    <tr> 
+                      <td><a href="/search/userLookup.php?id={ID}">{FIRSTNAME}</a></td>
+					  <td><a href="/search/userLookup.php?id={ID}">{LASTNAME}</a></td>
+                      <td><a href="/search/userLookup.php?id={ID}">{GROUP}</a></td>
+					  <td><a href="/search/userLookup.php?id={ID}">{YEAR}</a>
+                    </tr>
+                    <!-- END userlist -->
+					</tbody>
+                  </table>
             <!-- #EndEditable --> </div> 
 	</div> 
 </div> 

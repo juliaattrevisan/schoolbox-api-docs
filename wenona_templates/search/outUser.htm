@@ -14,14 +14,13 @@
 <script type="text/javascript" src="/javascript/drop_down.js"></script>
 <!-- #BeginEditable "scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-default.css" />
-
 <!-- #EndEditable -->
 </head>
 <body> 
 <div id="outerWrap"> 
 	<div id="header"></div> 
 	<div id="searchBox"> 
-		<form class="standardForm" id="searchForm" action="/search.php" method="post"> 
+		<form class="standardForm" id="searchForm" action="/search.php" method="get"> 
 			<p style="margin:0;"> 
 				<input class="short" type="text" name="keyword" /> 
 				<select class="short" name="where"> 
@@ -29,7 +28,7 @@
 					<option value="1">google</option> 
 					<option value="2">yahoo</option> 
 				</select> 
-				<input class="img" type="image" src="/images/searchbutton.gif" alt="Search" name="Submit" /> 
+				<input class="img" type="image" src="/images/wenona/searchbutton.gif" alt="Search" name="Submit" /> 
 			</p> 
 		</form> 
 	</div> 
@@ -87,9 +86,12 @@
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
             <h1>Address Book</h1>
 			<!-- BEGIN portrait -->
-			<img style="float:right;" width="167" height="251" src="portrait.php?id={SYNERGY_ID}" />
+			<div style="float:right; margin-top:10px"><img width="167" height="251" src="portrait.php?id={SYNERGY_ID}" /></div>
 			<!-- END portrait -->
-            <table>
+            <table style="width:70%">
+			  <tr>
+                <td colspan="4"><h2>User Info</h2></td>
+              </tr>
               <tr>
                 <td><strong>Name</strong></td> 
                 <td>{NAME}</td>
@@ -116,7 +118,7 @@
                 <td>&nbsp;</td>
               </tr>
               <tr>
-                <td colspan="4"><strong>Emergency Contact</strong></td>
+                <td colspan="4"><h2>Emergency Contact</h2></td>
               </tr>
               <tr>
                 <td><strong>Name</strong></td>
@@ -131,7 +133,7 @@
                 <td>{EMERGENCY_ALT_PHONE}</td>
               </tr>
               <tr>
-                <td colspan="4"><strong>Primary Contact </strong></td>
+                <td colspan="4"><h2>Primary Contact </h2></td>
               </tr>
               <tr>
                 <td><strong>Name</strong></td>

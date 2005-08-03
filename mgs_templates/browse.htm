@@ -114,7 +114,7 @@
 			// <a href="/cms/modFolder.php?action=add&cid={CID}">add folder</a>
 			<!-- END modify_access -->
 			 </p>
-			<hr>
+			<hr />
                   <table>
 					<!-- BEGIN category_listing -->                    
 					<tr> 
@@ -129,7 +129,7 @@
                   <!-- END category_listing -->
                   <!-- BEGIN file_listing -->
                     <tr> 
-                      <td colspan="2">{FILE_URL}<img src="{FILE_IMAGE}" width="25" height="27" border="0" /> {FILE_DESCRIPTION} <em>{SIZE}</em></td>
+                      <td colspan="2"><a href="{FILE_URL}" target="{FILE_TARGET}"><img src="{FILE_IMAGE}" width="25" height="27" border="0" /></a> <a href="{FILE_URL}" target="{FILE_TARGET}">{FILE_DESCRIPTION}</a> <em>{SIZE}</em></td>
                       <!-- BEGIN mod_file -->
                       <td class="cntr"><a href="/cms/modResource.php?type=modfile&amp;id={FILEID}">modify</a></td>
                       <td><a href="/cms/delResource.php?fileid={FILEID}" onclick=" return(confirm('Remove file {FILE_DESCRIPTION_ESCAPED}?'));">delete</a></td>
@@ -142,7 +142,7 @@
                       <td>&nbsp;</td>
                     </tr>
                     <tr>
-                      <td colspan="2"><span style="color:#666;font-style:italic;">Submitted by {OWNER} on {DATETIME}</span></td>
+                      <td colspan="2"><p class="element_footer">Submitted by {OWNER} on {DATETIME}</p></td>
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
                     </tr>
@@ -163,7 +163,7 @@
                       <td>&nbsp;</td>
                     </tr>
                     <tr>
-                      <td colspan="2"><i><font color="#666666">Submitted by {OWNER} on {DATETIME}</font></i></td>
+                      <td colspan="2"><p class="element_footer">Submitted by {OWNER} on {DATETIME}</p></td>
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
                     </tr>

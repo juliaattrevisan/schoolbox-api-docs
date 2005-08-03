@@ -157,13 +157,11 @@
 					<div class="dbx-box">
 						<h2 class="dbx-handle">Todays Events - {DATE}</h2>
 						<div class="dbx-content">
-							<div class="indent">
-								<ul class="norm">
-								<!-- BEGIN note_block -->
-									<li style="color:{NOTE_COLOUR};">{TIME} {NOTE}</li>
-								<!-- END note_block -->
-								</ul> 
-							</div> 
+							<table>
+							<!-- BEGIN note_block -->
+								<tr><td class="calendarTime" style="color:{NOTE_COLOUR}">{TIME}</td><td style="color:{NOTE_COLOUR}">{NOTE}</td></tr>
+							<!-- END note_block -->
+							</table>
 						</div>
 					</div>
 				</td>
