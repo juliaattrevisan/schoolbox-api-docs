@@ -184,7 +184,8 @@ function getNews($id = 0)
 			OR news_items.item_campus='4' 
 		JOIN newsGroup ON newsGroup.id = news_items.item_id 
 			AND newsGroup.gid = '".$_SESSION['gid']."'
-    WHERE news_items.item_datetime_expires > NOW() 
+    WHERE news_items.item_owner != '".$_SESSION['id']."' AND
+		news_items.item_datetime_expires > NOW() 
 		AND news_items.item_deleted = 0 
 	"; 
     //get a single article by id if id submitted
