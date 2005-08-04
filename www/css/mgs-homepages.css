@@ -8,14 +8,14 @@ h2, h3 {
 	}
 
 h2 {
-	padding:3px 0 3px 2px;
+	padding:0 0 0 2px;
 	/*color:#000;*/
 	font-size:100%;
 	border:0;
 	border-bottom:2px solid #666;
 	}
 h3 {
-	padding:1px 0 2px 0;
+	padding:1px 0 1px 0;
 	color:#000;
 	font-size:100%;
 	border:0;
