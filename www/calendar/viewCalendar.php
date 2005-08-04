@@ -211,19 +211,19 @@ class displayCalendar
 				$subout = 1;
 			}
 
-			$event = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear, $campus);
+			$eventList = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear, $campus);
 			
-			if(count($event['id']) < 1 && !$subout)
+			if(!is_array($eventList))
 			{
 				$this->t_body->set_var("note_listing", "");
 			}
 			else
 			{	
-				for($i=0; isset($event['id'][$i]); $i++)
+				foreach($eventList as $event)
 				{
-					$this->outputEvent($event['id'][$i], $event['startTime'][$i], $event['endTime'][$i], 
-						$event['priority'][$i], $event['note'][$i], $event['owner'][$i], 
-						$event['access'][$i], $event['sid'][$i], $event['type'][$i]);
+					$this->outputEvent($event['id'], $event['startTime'], $event['endTime'], 
+						$event['priority'], $event['note'], $event['owner'], 
+						$event['access'], $event['sid'], $event['type']);
 				}
 
 			}

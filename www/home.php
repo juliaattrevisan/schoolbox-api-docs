@@ -11,8 +11,12 @@ require_once("include/session.php");
 require_once("include/include.php");
 require_once("include/permission.php");
 require_once("news/news.php");
-require_once("weather/weather.php");
 require_once("calendar/calendar.php");
+
+if(SITE_location == 'wenona')
+	require_once("weather/wenona-weather.php");
+else
+	require_once("weather/weather.php");
 
 class OutPut
 {
@@ -129,25 +133,25 @@ class OutPut
 			$subout = 1;
 		}
 		
-		$event = $cal->getAllDayEvents($currDay, $currMonth, $currYear);
+		$eventList = $cal->getAllDayEvents($currDay, $currMonth, $currYear);
 		
-		if(count($event['note']) < 1 && !$subout) 
+		if(!is_array($eventList))
 		{
 			$this->t_body->set_var("note_listing", "");
 		}
 		else
 		{
-			for($i=0; isset($event['note'][$i]); $i++)
+			foreach($eventList as $event)
 			{
-				if($event['startTime'][$i] == "0:00" || strtolower($event['startTime'][$i]) == "12:00am" || strtolower($event['startTime'][$i]) == "12:00 am")
+				if($event['startTime'] == "0:00" || strtolower($event['startTime']) == "12:00am" || strtolower($event['startTime']) == "12:00 am")
 						$this->t_body->set_var("TIME", "");
-				else if($event['endTime'][$i] == "0:00" || strtolower($event['endTime'][$i]) == "12:00am" || strtolower($event['endTime'][$i]) == "12:00 am")
-						$this->t_body->set_var("TIME", $event['startTime'][$i]);
+				else if($event['endTime'] == "0:00" || strtolower($event['endTime']) == "12:00am" || strtolower($event['endTime']) == "12:00 am")
+						$this->t_body->set_var("TIME", $event['startTime']);
 				else
-						$this->t_body->set_var("TIME", $event['startTime'][$i]." - ".$event['endTime'][$i]);
+						$this->t_body->set_var("TIME", $event['startTime']." - ".$event['endTime']);
 				
-				$this->t_body->set_var("NOTE_COLOUR", $cal->displayColour($event['priority'][$i]));
-				$this->t_body->set_var("NOTE", $event['note'][$i]);
+				$this->t_body->set_var("NOTE_COLOUR", $cal->displayColour($event['priority']));
+				$this->t_body->set_var("NOTE", $event['note']);
 				$this->t_body->parse("note_listing","note_block", true);
 
 			}
@@ -159,11 +163,17 @@ class OutPut
 	{
 		$weather = new Weather("Current");
 		
+		if(SITE_location == "wenona")
+		{
+			$this->t_body->set_var("WEATHER_ICON", $weather->forecast[0]["Icon"]);
+			$this->t_body->set_var("PRECIS", $weather->forecast[0]["Precis"]);
+		}
+		
 		$this->t_body->set_var("TEMP", $weather->Temp);
-		$this->t_body->set_var("DIRECTION", $weather->WindC);
-		$this->t_body->set_var("SPEED", $weather->WindS);
+		$this->t_body->set_var("DIRECTION", $weather->WindCompass);
+		$this->t_body->set_var("SPEED", $weather->WindSpeed);
 		$this->t_body->set_var("HUMIDITY", $weather->Humid);
-		$this->t_body->set_var("ISSUED", date("g:i a", strtotime($weather->Date)));
+		$this->t_body->set_var("ISSUED", date("g:i a", strtotime(str_replace('T', ' ',$weather->Date))));
 
 		$this->t_body->parse("weather_block", "weather");
 	}

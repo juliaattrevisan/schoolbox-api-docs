@@ -57,9 +57,9 @@ class Weather
 			$this->Temp = $this->data[0]["T_CURR"];
 			$this->T_DP = $this->data[0]["T_DP"];
 			$this->Humid = $this->data[0]["REL_H"];
-			$this->WindS = $this->data[0]["SPEED_KPH"];
-			$this->WindD = $this->data[0]["DIR_DEGREES"];
-			$this->WindC = $this->data[0]["DIR_COMPASS"];
+			$this->WindSpeed = $this->data[0]["SPEED_KPH"];
+			$this->WindDirection = $this->data[0]["DIR_DEGREES"];
+			$this->WindCompass = $this->data[0]["DIR_COMPASS"];
 			$this->Period = $this->data[0]["PERIOD"];
 			$this->Rain = $this->data[0]["AMOUNT_MM"];
 		}

@@ -8,7 +8,11 @@
 
 require_once("include/session.php");
 require_once("include/include.php");
-require_once("weather/weather.php");
+
+if(SITE_location == 'wenona')
+	require_once("weather/wenona-weather.php");
+else
+	require_once("weather/weather.php");
 
 class WeatherFore 
 {
@@ -36,13 +40,12 @@ class WeatherFore
 
 		//set current weather
 		$this->t_body->set_var("TEMP", $weather->Temp);
-		$this->t_body->set_var("DIRECTION", $weather->WindC." (".$weather->WindD."&deg)");
-		$this->t_body->set_var("SPEED", $weather->WindS);
+		$this->t_body->set_var("DIRECTION", $weather->WindCompass." (".$weather->WindDirection."&deg)");
+		$this->t_body->set_var("SPEED", $weather->WindSpeed);
 		$this->t_body->set_var("HUMIDITY", $weather->Humid);
 		$this->t_body->set_var("RAIN", $weather->Rain);
 		$this->t_body->set_var("PERIOD", date("F j, Y, g:i a", strtotime($weather->Date)));
 			
-
 		for($i = 0; $i < 4; $i++)
 		{
 			//set days
@@ -87,6 +90,6 @@ class WeatherFore
 }
 
 $myPage = new WeatherFore;
-$myPage->displayForecast($_POST['code']);
+$myPage->displayForecast($_REQUEST['code']);
 
 ?>

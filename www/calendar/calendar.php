@@ -63,18 +63,33 @@ function getAllDayEvents($currDay, $currMonth, $currYear, $campus = 0)
 	$normalevents = $this->getDayEvents($currDay, $currMonth, $currYear, $campus);
 	$groupevents =  $this->getAllGroupDayEvents($currDay, $currMonth, $currYear);
 
-	$event = array_merge_recursive($normalevents,$groupevents);
+	if(is_array($normalevents) || is_array($groupevents))
+		$event = array_merge($normalevents,$groupevents);
+	else
+		return false;
 	
-	if(is_array($event['note']))
-	{
-		//sort array on start time
-		array_multisort($event['startTime'], SORT_ASC, SORT_NUMERIC, $event['id'],$event['owner'], 
-			$event['endTime'], $event['priority'], $event['note'], $event['type']);
-	}
-
+	//sort array on start time
+	usort($event,array($this,"timecmp"));
+	
 	return $event;
 }
 
+function timecmp($a, $b)
+{
+	if($a['startTimestamp'] == 0)
+		return 1;
+	if($b['startTimestamp'] == 0)
+		return -1;
+		
+	//just a quick function to enable sorting of calenar based on time
+	if ($a['startTimestamp'] == $b['startTimestamp']) {
+		return 0;
+	}
+	if($a['startTimestamp'] < $b['startTimestamp'])
+   		return -1;
+	else
+		return 1;
+}
 
 function checkOwnership($id, $type)
 {
@@ -302,7 +317,7 @@ function getDayEvents($day, $month, $year, $campus = 0)
 		$campuslist = implode(',',$_SESSION['campus']);
 
 	//get single events for the day
-	$querysingle = "SELECT id, owner,TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, 
+	$querysingle = "SELECT id, owner,TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp,
 	TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, 
 	priority, note FROM event WHERE date = FROM_UNIXTIME('$datestamp')
 	AND ( (access = '4') OR (access = '1' AND owner= '".$_SESSION['id']."') 
@@ -310,7 +325,7 @@ function getDayEvents($day, $month, $year, $campus = 0)
 	ORDER BY event.startTime, event.endTime";
 
 	//get weekly events that occur today
-	$queryweekly = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, 
+	$queryweekly = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp,
 	TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note FROM eventWeekly WHERE day = '$dayno' 
 	AND startDuration < FROM_UNIXTIME('$datestamp') AND endDuration > FROM_UNIXTIME('$datestamp')
 	AND ( (access = '4') OR (access = '1' AND owner= '".$_SESSION['id']."') 
@@ -318,7 +333,7 @@ function getDayEvents($day, $month, $year, $campus = 0)
 	ORDER BY eventWeekly.startTime, eventWeekly.endTime";
 
 	//get monthly events that occur today
-	$querymonthly = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime,
+	$querymonthly = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp,
 	TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note FROM eventMonthly WHERE
 	((day = '$dayno' AND dayocc='$dayocc') OR (date='$day'))  
 	AND startDuration < FROM_UNIXTIME('$datestamp') AND endDuration > FROM_UNIXTIME('$datestamp')
@@ -339,21 +354,21 @@ function getGroupDayEvents($sid, $day, $month, $year)
 	$dayocc = ceil($date/7);  
 
 	//get single events for the day
-	$querysingle = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note 
+	$querysingle = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note 
 	FROM event, userAccess WHERE 
 	date = FROM_UNIXTIME('$datestamp') AND access = '2' AND uid = ".$_SESSION['id']." 
 	AND service = '1' AND sid = '$sid' AND userAccess.sid = event.sid
 	ORDER BY event.startTime, event.endTime";
 
 	//get weekly events that occur today
-	$queryweekly = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note 
+	$queryweekly = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note 
 	FROM eventWeekly, userAccess WHERE day = '$dayno' 
 	AND startDuration < FROM_UNIXTIME('$datestamp') AND endDuration > FROM_UNIXTIME('$datestamp')
 	AND uid = ".$_SESSION['id']." AND access = '2' AND service = '1' AND sid = '$sid' AND userAccess.sid = event.sid
 	ORDER BY eventWeekly.startTime, eventWeekly.endTime";
 
 	//get monthly events that occur today
-	$querymonthly = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note 
+	$querymonthly = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note 
 	FROM eventMonthly WHERE
 	((day = '$dayno' AND dayocc='$dayocc') OR (date='$day'))  
 	AND startDuration < FROM_UNIXTIME('$datestamp') AND endDuration > FROM_UNIXTIME('$datestamp')
@@ -375,21 +390,21 @@ function getAllGroupDayEvents($day, $month, $year)
 	$dayocc = ceil($date/7);  
 
 	//get single events for the day
-	$querysingle = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note 
+	$querysingle = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note 
 	FROM event, userAccess WHERE 
 	date = FROM_UNIXTIME('$datestamp') AND uid = ".$_SESSION['id']." AND access = '2' 
 	AND service = '1' AND userAccess.sid = event.sid
 	ORDER BY event.startTime, event.endTime";
 
 	//get weekly events that occur today
-	$queryweekly = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note 
+	$queryweekly = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note 
 	FROM eventWeekly, userAccess WHERE day = '$dayno' 
 	AND startDuration < FROM_UNIXTIME('$datestamp') AND endDuration > FROM_UNIXTIME('$datestamp')
 	AND uid = ".$_SESSION['id']." AND access = '2' AND service = '1' AND userAccess.sid = eventWeekly.sid
 	ORDER BY eventWeekly.startTime, eventWeekly.endTime";
 
 	//get monthly events that occur today
-	$querymonthly = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note 
+	$querymonthly = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note 
 	FROM eventMonthly, userAccess WHERE
 	((day = '$dayno' AND dayocc='$dayocc') OR (date='$day'))  
 	AND startDuration < FROM_UNIXTIME('$datestamp') AND endDuration > FROM_UNIXTIME('$datestamp')
@@ -471,47 +486,29 @@ function getWeekSubmissionEvents($day, $month, $year)
 	return $subEvents;
 }
 
-function getCalendarArray($query1, $query2, $query3)
+function getCalendarArray($dayQuery, $weekQuery, $monthQuery)
 {
 
 	$eventCount = 0;
-	$this->db->dbDoQuery($query1);
+	$this->db->dbDoQuery($dayQuery);
 	while( $line = $this->db->dbGetNextArray() )
 	{
-		$dayEvents['id'][$eventCount] = $line['id'];		
-		$dayEvents['owner'][$eventCount] = $line['owner'];		
-		$dayEvents['startTime'][$eventCount] = $line['startTime'];		
-		$dayEvents['endTime'][$eventCount] = $line['endTime'];		
-		$dayEvents['priority'][$eventCount] = $line['priority'];		
-		$dayEvents['note'][$eventCount] = $line['note'];		
-		$dayEvents['type'][$eventCount] = "day";
-		$eventCount++;
+		$line['type'] = 'day';
+		$dayEvents[] = $line;
 	}
 
-	$this->db->dbDoQuery($query2);
+	$this->db->dbDoQuery($weekQuery);
 	while( $line = $this->db->dbGetNextArray() )
 	{
-		$dayEvents['id'][$eventCount] = $line['id'];		
-		$dayEvents['owner'][$eventCount] = $line['owner'];		
-		$dayEvents['startTime'][$eventCount] = $line['startTime'];		
-		$dayEvents['endTime'][$eventCount] = $line['endTime'];		
-		$dayEvents['priority'][$eventCount] = $line['priority'];		
-		$dayEvents['note'][$eventCount] = $line['note'];		
-		$dayEvents['type'][$eventCount] = "week";
-		$eventCount++;
+		$line['type'] = 'week';
+		$dayEvents[] = $line;
 	}
 
-	$this->db->dbDoQuery($query3);
+	$this->db->dbDoQuery($monthQuery);
 	while( $line = $this->db->dbGetNextArray() )
 	{
-		$dayEvents['id'][$eventCount] = $line['id'];		
-		$dayEvents['owner'][$eventCount] = $line['owner'];		
-		$dayEvents['startTime'][$eventCount] = $line['startTime'];		
-		$dayEvents['endTime'][$eventCount] = $line['endTime'];		
-		$dayEvents['priority'][$eventCount] = $line['priority'];		
-		$dayEvents['note'][$eventCount] = $line['note'];		
-		$dayEvents['type'][$eventCount] = "month";
-		$eventCount++;
+		$line['type'] = 'month';
+		$dayEvents[] = $line;
 	}
 
 	return $dayEvents;

@@ -756,9 +756,9 @@ class OutPut
 	
         	$query = "SELECT id, DATE_FORMAT(date, '%D %b') as outputDate, 
 				DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
-				TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, 
+				TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTimeString, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTimeString, 
 				priority, note 
-        		  FROM event WHERE access = '2' AND sid = '".$this->category."' AND date >= NOW() ORDER BY date";
+        		  FROM event WHERE access = '2' AND sid = '".$this->category."' AND date >= NOW() ORDER BY date, startTime";
 
 		//if no size make unlimited query else make it limited by size
 		if($size != 0 && $size != '') 
@@ -970,12 +970,12 @@ class OutPut
 		$this->t_body->set_var("CAL_MONTH", $queryArray['month']);
 		$this->t_body->set_var("CAL_DAY", $queryArray['day']);
 	
-		if($queryArray['startTime'] == "0:00" || $queryArray['startTime'] == "")
+		if($queryArray['startTimeString'] == "0:00" || $queryArray['startTimeString'] == "")
 				$this->t_body->set_var("CAL_TIME", "");
-		else if($queryArray['endTime'] == "0:00")
-				$this->t_body->set_var("CAL_TIME", $queryArray['startTime']);
+		else if($queryArray['endTimeString'] == "0:00")
+				$this->t_body->set_var("CAL_TIME", $queryArray['startTimeString']);
 		else
-				$this->t_body->set_var("CAL_TIME", $queryArray['startTime']." - ".$queryArray['endTime']);
+				$this->t_body->set_var("CAL_TIME", $queryArray['startTimeString']." - ".$queryArray['endTimeString']);
 
 		$this->t_body->set_var("CAL_COLOUR",$queryArray['colour']);
 		
