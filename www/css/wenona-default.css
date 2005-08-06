@@ -565,32 +565,3 @@ table.ruler h2 {
 	padding-right:0;
 	}
 
-table.timetable {
-	width:100%;
-	margin:0;
-	background:transparent;
-	}
-
-table.timetable th {
-	padding:3px;
-	background:#002750;
-	color:#fff;
-	font:bold 70% /1em Verdana, arial, sans-serif, serif
-	}
-
-table.timetable td {
-	background:transparent;
-	colour:#000;
-	font:normal 70% /1em Verdana, arial, sans-serif, serif
-	}
-
-.timetable td.current {
-	background:#06c;
-	}
-	
-table.home {
-	position:relative;
-	}
-table.home td {
-	vertical-align:top;
-	}
