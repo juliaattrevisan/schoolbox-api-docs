@@ -11,9 +11,11 @@
 <meta name="author" content="James Leckie, Lektec Consulting"/>
 <meta name="ROBOTS" content="INDEX, FOLLOW" />
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
 <script type="text/javascript" src="/javascript/drop_down.js"></script>
 <!-- #BeginEditable "scripts" -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
+
 <link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-home.css" />
 <!-- #EndEditable -->
 </head>
@@ -100,14 +102,14 @@
 			<h1>Timetable</h1> 
 			<table class="timetable"> 
 				<tr> 
-					<th style="width:{TIMETABLE_FIELD_WIDTH}%;">&nbsp;</th> 
+					<th>&nbsp;</th> 
 					<!-- BEGIN day_header --> 
-					<th>Day {DAY_NUMBER}</th> 
+					<th style="width:{TIMETABLE_FIELD_WIDTH}%;">Day {DAY_NUMBER}</th> 
 					<!-- END day_header --> 
 				</tr> 
 				<!-- BEGIN period --> 
 				<tr> 
-					<th style="white-space:nowrap;width:{TIMETABLE_FIELD_WIDTH}%;">{PERIOD}</th> 
+					<th style="white-space:nowrap;width:5%">{PERIOD}</th> 
 					<!-- BEGIN day --> 
 					<td class="{TIMETABLE_CLASS}">{DAY}</td> 
 					<!-- END day --> 

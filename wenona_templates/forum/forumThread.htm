@@ -1,7 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<!-- #BeginTemplate "/Templates/main.dwt" -->
-<!-- DW6 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
 <!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
 <!--  Visit us at www.lektec.com.au -->
 <head>
@@ -14,8 +12,10 @@
 <meta name="ROBOTS" content="INDEX, FOLLOW" />
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
 <script type="text/javascript" src="/javascript/drop_down.js"></script>
-<!-- #BeginEditable "scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-default.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/wenona-print.css" />
+<!-- #BeginEditable "scripts" -->
+
 <link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-forum.css" />
 <script type="text/javascript" src="/javascript/forum.js" ></script>
 <script type="text/javascript">
@@ -24,55 +24,55 @@ window.onload=initialise;
 </script>
 <!-- #EndEditable -->
 </head>
-<body>
-<div id="outerWrap">
-	<div id="header"></div>
-	<div id="searchBox">
-		<form class="standardForm" id="searchForm" action="/search.php" method="get">
-			<p style="margin:0;">
-				<input class="short" type="text" name="keyword" />
-				<select class="short" name="where">
-					<option value="0" selected="selected">portal</option>
-					<option value="1">google</option>
-					<option value="2">yahoo</option>
-				</select>
-				<input class="img" type="image" src="/images/wenona/searchbutton.gif" alt="Search" name="Submit" />
-			</p>
-		</form>
-	</div>
-	<div id="left">
-		<h3>&#187;&nbsp;Go To</h3>
+<body> 
+<div id="outerWrap"> 
+	<div id="header"></div> 
+	<div id="searchBox"> 
+		<form class="standardForm" id="searchForm" action="/search.php" method="get"> 
+			<p style="margin:0;"> 
+				<input class="short" type="text" name="keyword" /> 
+				<select class="short" name="where"> 
+					<option value="0" selected="selected">portal</option> 
+					<option value="1">google</option> 
+					<option value="2">yahoo</option> 
+				</select> 
+				<input class="img" type="image" src="/images/wenona/searchbutton.gif" alt="Search" name="Submit" /> 
+			</p> 
+		</form> 
+	</div> 
+	<div id="left"> 
+		<h3>&#187;&nbsp;Go To</h3> 
 		{MCSSMENU}
-		<!-- BEGIN msubject -->
-		<h3>&#187;&nbsp;My Subjects</h3>
-		<ul>
-			<!-- BEGIN msubject_block -->
-			<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
-			<!-- END msubject_block -->
-		</ul>
-		<!-- END msubject -->
-		<!-- BEGIN mgroup -->
-		<h3>&#187;&nbsp;My Groups</h3>
-		<ul>
-			<!-- BEGIN mgroup_block -->
-			<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
-			<!-- END mgroup_block -->
-		</ul>
-		<!-- END mgroup -->
-		<h3>&#187;&nbsp;My Links</h3>
-		<ul>
-			<!-- BEGIN mlink_block -->
-			<li>{MLINK}</li>
-			<!-- END mlink_block -->
-			<li><a href="/editLinks.php">ADD LINK</a></li>
-		</ul>
-		<div id="footer">
-			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.wenona.nsw.edu.au" title="Wenona">Wenona</a></strong></p>
-			<p class="small"><a href="policy/wenona.htm">Guidelines of Use and Privacy Policy</a></p>
-			<p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
-		</div>
-	</div>
-	<!-- end left -->
+		<!-- BEGIN msubject --> 
+		<h3>&#187;&nbsp;My Subjects</h3> 
+		<ul> 
+			<!-- BEGIN msubject_block --> 
+			<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li> 
+			<!-- END msubject_block --> 
+		</ul> 
+		<!-- END msubject --> 
+		<!-- BEGIN mgroup --> 
+		<h3>&#187;&nbsp;My Groups</h3> 
+		<ul> 
+			<!-- BEGIN mgroup_block --> 
+			<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li> 
+			<!-- END mgroup_block --> 
+		</ul> 
+		<!-- END mgroup --> 
+		<h3>&#187;&nbsp;My Links</h3> 
+		<ul> 
+			<!-- BEGIN mlink_block --> 
+			<li>{MLINK}</li> 
+			<!-- END mlink_block --> 
+			<li><a href="/editLinks.php">ADD LINK</a></li> 
+		</ul> 
+		<div id="footer"> 
+			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.wenona.nsw.edu.au" title="Wenona">Wenona</a></strong></p> 
+			<p class="small"><a href="policy/wenona.htm">Guidelines of Use and Privacy Policy</a></p> 
+			<p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p> 
+		</div> 
+	</div> 
+	<!-- end left --> 
 	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" -->
 	<div id="topNav">
 		<ul>
@@ -90,8 +90,8 @@ window.onload=initialise;
 			<li class="right"><a class="right" href="http://intranet.wenona.nsw.edu.au/MyFilePortal/index.asp?strEncrypted={ENC_LOGIN}" title="Access your H:\ files" accesskey="f">My <em>F</em>iles</a></li>
 		</ul>
 	</div>
-	<!-- #EndLibraryItem --><!-- #EndEditable -->
-	<div id="content">
+	<!-- #EndLibraryItem --><!-- #EndEditable --> 
+	<div id="content"> 
 		<div id="content_text"> <!-- #BeginEditable "main" -->
 			<h1>{FORUM_HEADING}</h1>
 			<span class="header_option"><a href="/homepage.php?category={CID}">return to homepage</a></span>
@@ -127,9 +127,8 @@ window.onload=initialise;
 						</div></td>
 				</tr>
 			</table>
-			<!-- #EndEditable --> </div>
-	</div>
-</div>
+			<!-- #EndEditable --> </div> 
+	</div> 
+</div> 
 </body>
-<!-- #EndTemplate -->
-</html>
+<!-- #EndTemplate --></html>
