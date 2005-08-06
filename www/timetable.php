@@ -13,19 +13,19 @@ require_once("include/permission.php");
 class Timetable
 {
 
-        function Timetable()
-        {
-                //output week to template
-                $this->t_body = new Template(TPL_directory);
+	function Timetable()
+	{
+		//output week to template
+		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "timetable.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Timetable");
-                //setup blocks
-                $this->t_body->set_block("tplBODY", "period", "period_listing");
-                $this->t_body->set_block("period", "day", "day_listing");
-                $this->t_body->set_block("tplBODY", "day_header", "day_header_listing");
-
+		//setup blocks
+		$this->t_body->set_block("tplBODY", "period", "period_listing");
+		$this->t_body->set_block("period", "day", "day_listing");
+		$this->t_body->set_block("tplBODY", "day_header", "day_header_listing");
+		
 		include_once("include/page.php");
-        }
+	}
 
 	function getQuery()
 	{	
@@ -71,8 +71,8 @@ class Timetable
 		return $query;
 	}
 
-        function displayWeek()
-        {
+	function displayWeek()
+	{
 
                 //setup database
 		$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);				
@@ -100,7 +100,7 @@ class Timetable
 		$flag = 1;
 		
 		//timetable field width
-		$this->t_body->set_var("TIMETABLE_FIELD_WIDTH", round((100 / ($d+1)),1));
+		$this->t_body->set_var("TIMETABLE_FIELD_WIDTH", round((95 / ($d)),1));
 
 		//for each period
 		for ($x = 1; $x <= $p; $x++) 
