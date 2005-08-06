@@ -182,7 +182,7 @@ function outputMenu($list, $level)
 	
 	for($i=0; $list[$i]; $i++)
 	{
-		$text .= '<li><a href="'.$list[$i]['url'].'">'.scrubTEXT($list[$i]['txt']).'</a>';
+		$text .= '<li><a href="'.$list[$i]['url'].'">'.$list[$i]['txt'].'</a>';
 		if(is_array($list[$i]['children']))
 			$text .= outputMenu($list[$i]['children'], ($level + 1));
 		

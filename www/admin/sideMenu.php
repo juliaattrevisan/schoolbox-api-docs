@@ -24,6 +24,7 @@ class sideMenu
 		$query = "SELECT sequence FROM sideMenu WHERE parent = $parent ORDER BY sequence DESC";
 		$lastItem = $this->db->dbGetSingleRow($query);
 		$sequence = $lastItem['sequence'] + 1;
+		$text = scrubTEXT($text);
 	
 		$query = "INSERT INTO sideMenu (parent, txt, url, target, sequence) VALUES ($parent, '$text', '$url', '$target', $sequence)";
 		$this->db->dbDoQuery($query);
@@ -35,6 +36,7 @@ class sideMenu
 
 	function updateMenuItem($id, $parent, $text, $url, $target, $campus, $group)
 	{
+		$text = scrubTEXT($text);
 		$query = "UPDATE sideMenu SET parent = '$parent', txt='$text', url='$url', target='$target' WHERE id = '$id'";
 		$this->db->dbDoQuery($query);
 

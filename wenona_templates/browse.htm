@@ -118,7 +118,7 @@
                   <!-- END category_listing -->
                   <!-- BEGIN file_listing -->
                     <tr> 
-                      <td colspan="2"><a href="{FILE_URL}" target="{FILE_TARGET}"><img src="{FILE_IMAGE}" width="25" height="27" border="0" /></a> <a href="{FILE_URL}" target="{FILE_TARGET}">{FILE_DESCRIPTION}</a> <em>{SIZE}</em></td>
+                      <td colspan="2">{FILE_URL}<img src="{FILE_IMAGE}" width="25" height="27" border="0" />{FILE_URL_END} {FILE_URL}{FILE_DESCRIPTION}{FILE_URL_END} <em>{SIZE}</em></td>
                       <!-- BEGIN mod_file -->
                       <td class="cntr"><a href="/cms/modResource.php?type=modfile&amp;id={FILEID}">modify</a></td>
                       <td><a href="/cms/delResource.php?fileid={FILEID}" onclick=" return(confirm('Remove file {FILE_DESCRIPTION_ESCAPED}?'));">delete</a></td>

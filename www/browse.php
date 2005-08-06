@@ -241,22 +241,18 @@ class OutPut
 		{
 			//if inline open in new window, if not give user a save dialog box
 			if($allowedFileTypes[$fileDetails['mime_type']][1] == 1)
-			{
-				$this->t_body->set_var("FILE_URL", "/sendframe.php?id=".$fileDetails['id']);
-				$this->t_body->set_var("FILE_TARGET", "_blank");
-			}
+				$this->t_body->set_var("FILE_URL", "<a href=\"/sendframe.php?id=".$fileDetails['id']."\" target=\"_blank\">");
 			else
-			{
-				$this->t_body->set_var("FILE_URL", "/send.php?id=".$fileDetails['id']."&save=1");
-				$this->t_body->set_var("FILE_TARGET", "_self");
-			}
-			
-			$this->t_body->set_var("FILE_DESCRIPTION", scrubTEXT($fileDetails['description']));
+				$this->t_body->set_var("FILE_URL", "<a href=\"/send.php?id=".$fileDetails['id']."&save=1\">");
+				
+			$this->t_body->set_var('FILE_URL_END', '</a>');
+			$this->t_body->set_var('FILE_DESCRIPTION', scrubTEXT($fileDetails['description']));
 		}
 		else
 		{
-			$this->t_body->set_var("FILE_URL", '');
-			$this->t_body->set_var("FILE_DESCRIPTION", scrubTEXT($fileDetails['description']));
+			$this->t_body->set_var('FILE_URL', '');
+			$this->t_body->set_var('FILE_URL_END', '');
+			$this->t_body->set_var('FILE_DESCRIPTION', scrubTEXT($fileDetails['description']));
 		}
 		
 		$this->t_body->set_var("FILE_DESCRIPTION_ESCAPED", addslashes(htmlentities($fileDetails['description'])));
