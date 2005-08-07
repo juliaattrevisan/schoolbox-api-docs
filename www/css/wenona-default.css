@@ -98,7 +98,7 @@ acronym, dfn, abbr {
 	color:#fff;
 	display:block;
 	text-decoration:none;
-	background:#002452 url(/images/wenona/white_arrow2.png) no-repeat 2px 3px; /* IE6 Bug */
+	background:#002452 url(/images/wenona/white_arrow.png) no-repeat 2px 3px; /* IE6 Bug */
 	padding:2px 0 2px 14px;
 	font-weight:normal;
 	font-size:70%;
@@ -123,7 +123,7 @@ acronym, dfn, abbr {
  /* Hover Styles */
 #left ul li a:hover
 {
-	background:#9CC7DE url(/images/wenona/white_arrow2.png) no-repeat 2px 3px;
+	background:#9CC7DE url(/images/wenona/white_arrow.png) no-repeat 2px 3px;
 	color:#fff;
 }
 
