@@ -79,10 +79,15 @@ class OutPut
 		if($this->view == 'flat')
 		{
 			$postList = $forum->getFlatPosts($this->cid, $start, $increments);	
-			foreach($postList as $post)
+			if(is_array($postList))
 			{
-				$this->outputPost($post);
+				foreach($postList as $post)
+				{
+					$this->outputPost($post);
+				}
 			}
+			else
+				$this->t_body->set_var('forum_block', '');
 		}
 		else
 		{
@@ -96,13 +101,21 @@ class OutPut
 				foreach($postTree[0]['children'] as $post)
 					$initList .= "'{$post['id']}',";
 				$initList = substr($initList, 0, -1);
+
+				$this->t_body->set_var("INIT_POST_LIST", $initList);
+				
+				//output navigation tree
+				$this->t_body->set_var("TOPIC_TREE", $this->outputNavTree($postTree, 1));
+				//output posts
+				$this->outputPostTree($postTree[0]['children']);
+						
 			}
-			$this->t_body->set_var("INIT_POST_LIST", $initList);
-			
-			//output navigation tree
-			$this->t_body->set_var("TOPIC_TREE", $this->outputNavTree($postTree, 1));
-			//output posts
-			$this->outputPostTree($postTree[0]['children']);
+			else
+			{
+				$this->t_body->set_var('INIT_POST_LIST', '');
+				$this->t_body->set_var('TOPIC_TREE', '');
+				$this->t_body->set_var('forum_block', '');
+			}
 		}
 	}
 

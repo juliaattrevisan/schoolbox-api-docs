@@ -28,6 +28,7 @@ class AddSubNews
 			$this->t_body->set_var("MODIFY", "<input type=\"hidden\" name=\"id\" value=\"$modify\">");
 			$this->t_body->parse("delete_button_block", "delete_button");
 			$this->t_body->set_var("LEAVE_OPTION", "<option value=\"0\" selected>Keep existing</option>");
+			$this->t_body->set_var("DEFAULT_TIME_SELECTED", '');
 		}
 		else
 		{
@@ -35,6 +36,7 @@ class AddSubNews
 			$this->t_body->set_var("MODIFY", ""); 	
 			$this->t_body->set_var("delete_button_block", "");
 			$this->t_body->set_var("LEAVE_OPTION", ""); 	
+			$this->t_body->set_var("DEFAULT_TIME_SELECTED", 'selected="selected"');
 		}
 		$this->t_body->set_var("CODE", "<input type=\"hidden\" name=\"code\" value=\"$code\">");
 	}

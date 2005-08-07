@@ -26,8 +26,6 @@ table.timetable td {
 table.home {
 	position:relative;
 	}
-table.home tr {
-	vertical-align:top;
-	}
 table.home td {
+	vertical-align:top;
 	}

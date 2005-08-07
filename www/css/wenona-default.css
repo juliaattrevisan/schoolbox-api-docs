@@ -98,7 +98,7 @@ acronym, dfn, abbr {
 	color:#fff;
 	display:block;
 	text-decoration:none;
-	background:#002452 url(/images/wenona/white_arrow.gif) no-repeat 2px 3px; /* IE6 Bug */
+	background:#002452 url(/images/wenona/white_arrow2.png) no-repeat 2px 3px; /* IE6 Bug */
 	padding:2px 0 2px 14px;
 	font-weight:normal;
 	font-size:70%;
@@ -123,7 +123,7 @@ acronym, dfn, abbr {
  /* Hover Styles */
 #left ul li a:hover
 {
-	background:#9CC7DE url(/images/wenona/white_arrow.gif) no-repeat 2px 3px;
+	background:#9CC7DE url(/images/wenona/white_arrow2.png) no-repeat 2px 3px;
 	color:#fff;
 }
 
@@ -396,8 +396,10 @@ a img {
 	color:#000;
 	border:2px solid;
 	border-color:#efefef #333 #333 #efefef;
-	background:#eee;
+	background:#B51C21;
 	padding:.3em 0.8em 0.3em 0.8em;
+	font-style:italic;
+	font-weight:bold;
 	}
 .standardForm p {
 	font-family:inherit;
@@ -447,13 +449,15 @@ a img {
 	vertical-align:top;
 	}
 .standard input.btn {
-	margin:1em 0;
+	margin:0.8em 0;
 	cursor:pointer;
-	color:#000;
+	color:#fff;
 	border:2px solid;
-	border-color:#efefef #333 #333 #efefef;
-	background:#eee;
+	border-color:#CC6666 #660000  #660000 #CC6666;
+	background:#B51C21;
 	padding:.3em 0.8em 0.3em 0.8em;
+	/*font-style:italic;*/
+	font-weight:bold;
 	}
 .standard input.timeField {
 	width:2em;
