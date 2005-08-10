@@ -71,7 +71,7 @@ define("TIMETABLE_definition", serialize(array(
 		//Wad
 		array("period"=>6, "day"=>7, "periodnames"=>array(1=>"Period 1", "Period 2", "Period 3", "Period 4", "Period 5", "Period 6")),
 		//Grim
-		array("period"=>9, "day"=>7, "periodnames"=>array(1=>"Period 1", "Period 2", "Period 3", "Period 4", "Period 5", "Period 6", "Period 7", "Period 8", "Period 9"))
+		array("period"=>9, "day"=>5, "periodnames"=>array(1=>"Period 1", "Period 2", "Period 3", "Period 4", "Period 5", "Period 6", "Period 7", "Period 8", "Period 9"))
 )));
 
 

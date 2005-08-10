@@ -84,14 +84,18 @@ define("MAIL_address", "wenona.nsw.edu.au");
 
 
 //Weather options
-define("WEATHER_enable", false);				//This will disable the weather module
+define("WEATHER_enable", true);				//This will disable the weather module
 define("WEATHER_CACHE", "7200");  			//cache weather info for 2 hours
-define("WEATHER_CURRENT_CACHE_LOCATION", "/usr/local/www/files/currentweather.xml");	//File to save weather cache in
+define("WEATHER_CURRENT_LOCAL_CACHE_LOCATION", "/usr/local/www/files/currentlocalweather.xml");	//File to save weather cache in
+define("WEATHER_CURRENT_AUS_CACHE_LOCATION", "/usr/local/www/files/currentausweather.xml");	//File to save weather cache in
 define("WEATHER_FORECAST_CACHE_LOCATION", "/usr/local/www/files/forecastweather.xml");	//File to save weather cache in
+define("WEATHER_CURRENT_AUS_FILE", "twc_obs_current_aws_aus.xml");
+define("WEATHER_CURRENT_LOCAL_FILE", "twc_obs_current_aws_sydney_9770.xml");
+define("WEATHER_FORECAST_FILE", "twc_fcast_local_4day_capcity.xml");
 define("WEATHER_SERVER", "ftp.theweather.com.au");
-define("WEATHER_USERNAME", "");
-define("WEATHER_PASSWORD", "");
-define("WEATHER_LOCATION", "");
+define("WEATHER_USERNAME", "wenona");
+define("WEATHER_PASSWORD", "8MAP2m34");
+define("WEATHER_LOCATION", "9770");
 
 define("ALLCAMPUS", 0);					//Value that represents all campuses in the luCampus table
 define("HOMEPAGESERVICE", 1);				//Value that represents the homepage module in the service table

@@ -31,6 +31,7 @@ $allowedFileTypes = array(
         "application/postscript" => array("application-postscript.png",1, array("ps", "ai", "eps") ),
         "application/x-photoshop" => array("image-psd.png",0, array("psd") ),
 		"application/ogg" => array("audio-x-wav.png", 1, array("ogg")),
+		"application/x-gsp" => array("application-x-none.png", 0, array("gsp")),
         "application/octet-stream" => array("application-x-none.png", 0, array("ins", "ogg") ),
         "audio/wav" => array("audio-x-wav.png",0, array("wav") ),
         "audio/mpeg" => array("audio-mpeg.png",0, array("mp3", "mp2") ),
@@ -38,6 +39,7 @@ $allowedFileTypes = array(
         "audio/x-realaudio" => array("audio-x-pn-realaudio.png",0, array("ra") ),
         "video/mpeg" => array("video-mpeg.png",0, array("mpg", "mpeg") ),
         "video/quicktime" => array("video-quicktime.png",0, array("qt", "mov") ),
+		"video/x-ms-wmv" => array("video-x-msvideo.png", 1, array("wmv")),
         "video/x-msvideo" => array("video-x-msvideo.png",0, array("avi") ),
 );
 ?>
