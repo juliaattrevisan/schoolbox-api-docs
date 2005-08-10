@@ -4,7 +4,7 @@
 class Weather
 {	
 	//location for weather cache file
-	var $cache_file = WEATHER_CURRENT_CACHE_LOCATION;
+	var $cache_file = WEATHER_CURRENT_LOCAL_CACHE_LOCATION;
 	//time cache file lives for
 	var $cache_time = WEATHER_CACHE;
 	
@@ -12,16 +12,11 @@ class Weather
 	{
 		//Can be told to only parse current or to parse both	
 		//check to see where we should get our weather from (cache/source)
-		if( (file_exists($this->cache_file)) && ((filectime($this->cache_file)+$this->cache_time) - date("U") > 0) && 
-		(filesize($this->cache_file)))		
-		{
-			//$this->getWeatherFromCache();
-		}
-		else
+		if( !((file_exists($this->cache_file)) && ((filectime($this->cache_file)+$this->cache_time) - date("U") > 0) && 
+		(filesize($this->cache_file))))		
 		{
 			$this->getWeatherFromSource();
-			//$this->cacheWeather();
-		}	
+		}
 		
 		//if location not specified default 
 		if($location == 0)
@@ -31,7 +26,8 @@ class Weather
 
 		if(!strcmp("Current", $type))
 		{
-			$this->setCurrentFromXML();
+			$this->setLocalCurrentFromXML();
+			$this->setForecastFromXML();
 		}
 		else
 		{
@@ -43,49 +39,74 @@ class Weather
 
 	function setCurrentFromXML()
 	{
-		$file = WEATHER_CURRENT_CACHE_LOCATION;
+		$file = WEATHER_CURRENT_AUS_CACHE_LOCATION;
 		$this->parseXML($file);
 		
 		//check we found at least what we were looking for
-		if($this->location > 0)
+		if($this->data[$this->areacode]["NAME"])
 		{
 			//only 1 current forecast for location so accessed like this
 			$this->Current = 1;
-			$this->City = $this->data[0]["SCREEN_NAME"];
-			$this->Date = $this->data[0]["DATE"];
-			$this->Day = $this->data[0]["DAY_NAME"];
-			$this->Temp = $this->data[0]["T_CURR"];
-			$this->T_DP = $this->data[0]["T_DP"];
-			$this->Humid = $this->data[0]["REL_H"];
-			$this->WindSpeed = $this->data[0]["SPEED_KPH"];
-			$this->WindDirection = $this->data[0]["DIR_DEGREES"];
-			$this->WindCompass = $this->data[0]["DIR_COMPASS"];
-			$this->Period = $this->data[0]["PERIOD"];
-			$this->Rain = $this->data[0]["AMOUNT_MM"];
+			$this->City = $this->data[$this->areacode]["NAME"];
+			$this->Date = $this->data[$this->areacode]["OBS_TIME_LOCAL"];
+			$this->Temp = $this->data[$this->areacode]["TEMP_C"];
+			$this->T_DP = $this->data[$this->areacode]["DP_C"];
+			$this->Humid = $this->data[$this->areacode]["RH"];
+			$this->WindSpeed = $this->data[$this->areacode]["WIND_SPEED_KPH"];
+			$this->WindDirection = $this->data[$this->areacode]["WIND_DIR_DEGREES"];
+			$this->WindCompass = $this->data[$this->areacode]["WIND_DIR_COMPASS"];
+			$this->WindChill = $this->data[$this->areacode]["WIND_CHILL_C"];
+			$this->Rain = $this->data[$this->areacode]["RAINFALL_MM"];
 		}
 		else
 			$this->Current = 0;
 	}		
+	
+	function setLocalCurrentFromXML()
+	{
+	
+		$file = WEATHER_CURRENT_LOCAL_CACHE_LOCATION;
+		$this->parseXML($file);
+		
+		//check we found at least what we were looking for
+		if($this->data[$this->areacode]["NAME"])
+		{
+			//only 1 current forecast for location so accessed like this
+			$this->Current = 1;
+			$this->City = $this->data[$this->areacode]["NAME"];
+			$this->Date = $this->data[$this->areacode]["OBS_TIME_LOCAL"];
+			$this->Temp = $this->data[$this->areacode]["TEMP_C"];
+			$this->T_DP = $this->data[$this->areacode]["DP_C"];
+			$this->Humid = $this->data[$this->areacode]["RH"];
+			$this->WindSpeed = $this->data[$this->areacode]["WIND_SPEED_KPH"];
+			$this->WindDirection = $this->data[$this->areacode]["WIND_DIR_DEGREES"];
+			$this->WindCompass = $this->data[$this->areacode]["WIND_DIR_COMPASS"];
+			$this->WindChill = $this->data[$this->areacode]["WIND_CHILL_C"];
+			$this->Rain = $this->data[$this->areacode]["RAINFALL_MM"];
+		}
+		else
+			$this->Current = 0;
+	}	
+
 		
 	function setForecastFromXML()
 	{
 		$file = WEATHER_FORECAST_CACHE_LOCATION;
 		$this->parseXML($file);
 	
-		if($this->location > 0)
+		if($this->data[$this->areacode]["NAME"])
 		{	
 			$this->Forecast = 1;
 			//forecast has 4 entries so we will step through each and put them in an array
 			for($i=0; $i<4; $i++)
 			{
-				$this->forecast[$i]["City"] = $this->data[$i]["SCREEN_NAME"];
-				$this->forecast[$i]["Date"] = $this->data[$i]["DATE"];
-				$this->forecast[$i]["DayNum"] = $this->data[$i]["DAY_NUM"];
-				$this->forecast[$i]["Day"] = $this->data[$i]["DAY_NAME"];
-				$this->forecast[$i]["Precis"] = $this->data[$i]["PRECIS"];
-				$this->forecast[$i]["Icon"] = str_replace(" ", "_", strtolower($this->data[$i]["ICON"])).".gif";
-				$this->forecast[$i]["Min"] = $this->data[$i]["T_MIN"];
-				$this->forecast[$i]["Max"] = $this->data[$i]["T_MAX"];
+				$this->forecast[$i]["City"] = $this->data[$this->areacode]["NAME"];
+				$this->forecast[$i]["Date"] = $this->data[$this->areacode]['forecast']["DATE"][$i];
+				$this->forecast[$i]["Day"] = $this->data[$this->areacode]['forecast']["DAY_NAME"][$i];
+				$this->forecast[$i]["Precis"] = $this->data[$this->areacode]['forecast']["ICON"][$i];
+				$this->forecast[$i]["Icon"] = str_replace(" ", "_", strtolower($this->data[$this->areacode]['forecast']["ICON"][$i])).".gif";
+				$this->forecast[$i]["Min"] = $this->data[$this->areacode]['forecast']["TEMP_MIN_C"][$i];
+				$this->forecast[$i]["Max"] = $this->data[$this->areacode]['forecast']["TEMP_MAX_C"][$i];
 			}
 		}
 		else
@@ -108,14 +129,16 @@ class Weather
 			// check connection
 			if ($login_result) 
 			{
-				$currentWeather = WEATHER_CURRENT_CACHE_LOCATION;
+				$currentLocalWeather = WEATHER_CURRENT_LOCAL_CACHE_LOCATION;
+				$currentAusWeather = WEATHER_CURRENT_AUS_CACHE_LOCATION;
 				$forecastWeather = WEATHER_FORECAST_CACHE_LOCATION;
 
 				// enter active mode
 				ftp_pasv( $conn_id, false);
 
 				// download current weather file
-				$download = ftp_get($conn_id, $currentWeather, WEATHER_CURRENT_FILE, FTP_ASCII); 
+				$download = ftp_get($conn_id, $currentLocalWeather, WEATHER_CURRENT_LOCAL_FILE, FTP_ASCII); 
+				$download = ftp_get($conn_id, $currentAusWeather, WEATHER_CURRENT_AUS_FILE, FTP_ASCII); 
 				$download = ftp_get($conn_id, $forecastWeather, WEATHER_FORECAST_FILE, FTP_ASCII); 
 
 				ftp_close($conn_id);
@@ -125,33 +148,37 @@ class Weather
 
 	function startElement($parser, $name, $attrs) 
 	{
+		if($name == "LOCATION")
+		{
+			$this->location = $attrs['CODE'];
+			$this->data[$this->location]['NAME'] = $attrs['NAME'];
+			$this->data[$this->location]['STATE'] = $attrs['STATE'];
+			
+			$this->locationArray[$attrs['NAME']] = $attrs['CODE'];
+		}
+		
+		if($name == "FORECAST")
+			$this->forecasttag = 1;
+			
 		$this->currentTag = $name;
 	}
 
 	function endElement($parser, $name) 
 	{
-		//if end of block
-		if($name == "OBS" || $name == "FORECAST")
-		{
-			//create location array
-			$this->locationArray[$this->data[$this->location]["SCREEN_NAME"]] = $this->data[$this->location]["SITE_NUM"];
-
-			//check if this block contains relevant info
-			if($this->data[$this->location]["SITE_NUM"] == $this->areacode)
-			{
-				//if it does increment block counter otherwise just overwrite it
-				$this->location++;
-			}
-		}						
-
+		if($name == "FORECAST")
+			$this->forecasttag = 0;
 	}
 
 	function characterData($parser, $data)
 	{
-		if(preg_match('/[A-Za-z0-9]+/', $data))
-		{
-			$this->data[$this->location][$this->currentTag] = $data;	
+		if(preg_match('/[A-Za-z0-9\.\-]+/', $data))
+		{	
+			if($this->forecasttag)
+				$this->data[$this->location]['forecast'][$this->currentTag][] = $data;
+			else
+				$this->data[$this->location][$this->currentTag] = $data;	
 		}
+				
 	}
 
 	function parseXML($file)
@@ -171,12 +198,12 @@ class Weather
 
 		while ($data = fread($fp, 4096)) 
 		{
-    			if (!xml_parse($xml_parser, $data, feof($fp))) 
+			if (!xml_parse($xml_parser, $data, feof($fp))) 
 			{
 				die(sprintf("XML error: %s at line %d",
 				xml_error_string(xml_get_error_code($xml_parser)),
 				xml_get_current_line_number($xml_parser)));
-    			}
+			}
 		}
 
 		xml_parser_free($xml_parser);

@@ -12,11 +12,7 @@ require_once("include/include.php");
 require_once("include/permission.php");
 require_once("news/news.php");
 require_once("calendar/calendar.php");
-
-if(SITE_location == 'wenona')
-	require_once("weather/wenona-weather.php");
-else
-	require_once("weather/weather.php");
+require_once("weather/weather.php");
 
 class OutPut
 {
@@ -163,12 +159,8 @@ class OutPut
 	{
 		$weather = new Weather("Current");
 		
-		if(SITE_location == "wenona")
-		{
-			$this->t_body->set_var("WEATHER_ICON", $weather->forecast[0]["Icon"]);
-			$this->t_body->set_var("PRECIS", $weather->forecast[0]["Precis"]);
-		}
-		
+		$this->t_body->set_var("WEATHER_ICON", $weather->forecast[0]["Icon"]);
+		$this->t_body->set_var("PRECIS", $weather->forecast[0]["Precis"]);
 		$this->t_body->set_var("TEMP", $weather->Temp);
 		$this->t_body->set_var("DIRECTION", $weather->WindCompass);
 		$this->t_body->set_var("SPEED", $weather->WindSpeed);

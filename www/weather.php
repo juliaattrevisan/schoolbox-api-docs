@@ -8,11 +8,7 @@
 
 require_once("include/session.php");
 require_once("include/include.php");
-
-if(SITE_location == 'wenona')
-	require_once("weather/wenona-weather.php");
-else
-	require_once("weather/weather.php");
+require_once("weather/weather.php");
 
 class WeatherFore 
 {
