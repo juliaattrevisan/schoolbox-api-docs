@@ -457,7 +457,7 @@ if(isset($_POST['priority']) && $_POST['priority'] && isset($_POST['note']) && $
 		$startTime = $page->createTime($_POST['hour'], $_POST['minute'], $_POST['period']);
 	}
 	else
-		$startTime = "NULL";
+		$startTime = 'NULL';
 
 	if(isset($_POST['tohour']) && $_POST['tohour'] )
 	{
@@ -465,7 +465,7 @@ if(isset($_POST['priority']) && $_POST['priority'] && isset($_POST['note']) && $
 		$endTime = $page->createTime($_POST['tohour'], $_POST['tominute'], $_POST['toperiod']);
 	}
 	else
-		$endTime = "NULL";
+		$endTime = 'NULL';
 
 	//make sure level is correct if just default to personal
 	if( $level < 1 || $level > 3 )

@@ -131,8 +131,8 @@ function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 
 
 function modSingleEvent($id, $date, $startTime,  $endTime, $priority, $note, $level = 1, $sid = 0)
 {
-	$query = "UPDATE event SET date=FROM_UNIXTIME('$date'), startTime='$startTime', 
-		endTime='$endTime', priority='$priority', note='$note', access='$level', sid='$sid' 
+	$query = "UPDATE event SET date=FROM_UNIXTIME('$date'), startTime=$startTime, 
+		endTime=$endTime, priority='$priority', note='$note', access='$level', sid='$sid' 
 		WHERE id='$id'";
 	
 	if(($this->checkSecurity($level, $sid) > 2) || ($this->checkOwnership($id, 1) == $_SESSION['id']))
@@ -163,7 +163,7 @@ function addWeeklyEvent($day, $startTime, $endTime, $startDuration, $endDuration
 	$query = "INSERT INTO eventWeekly 
 			(owner, day, startTime, endTime, startDuration, endDuration, priority, note, access, sid) 
 		VALUES 
-			('".$_SESSION['id']."', '$day', '$startTime', '$endTime', FROM_UNIXTIME('$startDuration'), 
+			('".$_SESSION['id']."', '$day', $startTime, $endTime, FROM_UNIXTIME('$startDuration'), 
 			FROM_UNIXTIME('$endDuration'), '$priority', '$note', '$level', '$sid')";
 
 	if($this->checkSecurity($level, $sid) > 1) //check has permission to write
@@ -177,8 +177,8 @@ function addWeeklyEvent($day, $startTime, $endTime, $startDuration, $endDuration
 
 function modWeeklyEvent($id, $day, $startTime,  $endTime, $startDuration, $endDuration, $priority, $note, $level = 1, $sid = 0)
 {
-	$query = "UPDATE eventWeekly SET day='$day', startTime='$startTime', 
-		endTime='$endTime', startDuration=FROM_UNIXTIME('$startDuration'), endDuration=FROM_UNIXTIME('$endDuration'),
+	$query = "UPDATE eventWeekly SET day='$day', startTime=$startTime, 
+		endTime=$endTime, startDuration=FROM_UNIXTIME('$startDuration'), endDuration=FROM_UNIXTIME('$endDuration'),
  		priority='$priority', note='$note', access='$level', sid='$sid' 
 		WHERE id='$id'";
 	
@@ -210,7 +210,7 @@ function addMonthlyDayEvent($day, $dayOcc, $startTime, $endTime, $startDuration,
 	$query = "INSERT INTO eventMonthly 
 			(owner, day, dayOcc, startTime, endTime, startDuration, endDuration, priority, note, access, sid) 
 		VALUES 
-			('".$_SESSION['id']."', '$day', '$dayOcc', '$startTime', '$endTime', FROM_UNIXTIME('$startDuration'), 
+			('".$_SESSION['id']."', '$day', '$dayOcc', $startTime, $endTime, FROM_UNIXTIME('$startDuration'), 
 			FROM_UNIXTIME('$endDuration'), '$priority', '$note', '$level', '$sid')";
 
 	if($this->checkSecurity($level, $sid) > 1) //check has permission to write
@@ -224,8 +224,8 @@ function addMonthlyDayEvent($day, $dayOcc, $startTime, $endTime, $startDuration,
 
 function modMonthlyDayEvent($id, $day, $dayOcc, $startTime,  $endTime, $startDuration, $endDuration, $priority, $note, $level = 1, $sid = 0)
 {
-	$query = "UPDATE eventMonthly SET day='$day', dayOcc='$dayOcc', startTime='$startTime', 
-		endTime='$endTime', startDuration=FROM_UNIXTIME('$startDuration'), endDuration=FROM_UNIXTIME('$endDuration'),
+	$query = "UPDATE eventMonthly SET day='$day', dayOcc='$dayOcc', startTime=$startTime, 
+		endTime=$endTime, startDuration=FROM_UNIXTIME('$startDuration'), endDuration=FROM_UNIXTIME('$endDuration'),
  		priority='$priority', note='$note', access='$level', sid='$sid' 
 		WHERE id='$id'";
 
@@ -243,7 +243,7 @@ function addMonthlyDateEvent($date, $startTime, $endTime, $startDuration, $endDu
 	$query = "INSERT INTO eventMonthly 
 			(owner, date, startTime, endTime, startDuration, endDuration, priority, note, access, sid) 
 		VALUES 
-			('".$_SESSION['id']."', '$date', '$startTime', '$endTime', FROM_UNIXTIME('$startDuration'), 
+			('".$_SESSION['id']."', '$date', $startTime, $endTime, FROM_UNIXTIME('$startDuration'), 
 			FROM_UNIXTIME('$endDuration'), '$priority', '$note', '$level', '$sid')";
 
 	if($this->checkSecurity($level, $sid) > 1) //check has permission to write
@@ -256,8 +256,8 @@ function addMonthlyDateEvent($date, $startTime, $endTime, $startDuration, $endDu
 
 function modMonthlyDateEvent($id, $date, $startTime,  $endTime, $startDuration, $endDuration, $priority, $note, $level = 1, $sid = 0)
 {
-	$query = "UPDATE eventMonthly SET date='$date', startTime='$startTime', 
-		endTime='$endTime', startDuration=FROM_UNIXTIME('$startDuration'), endDuration=FROM_UNIXTIME('$endDuration'),
+	$query = "UPDATE eventMonthly SET date='$date', startTime=$startTime, 
+		endTime=$endTime, startDuration=FROM_UNIXTIME('$startDuration'), endDuration=FROM_UNIXTIME('$endDuration'),
  		priority='$priority', note='$note', access='$level', sid='$sid' 
 		WHERE id='$id'";
 
