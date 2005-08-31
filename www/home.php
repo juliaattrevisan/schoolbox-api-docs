@@ -139,9 +139,9 @@ class OutPut
 		{
 			foreach($eventList as $event)
 			{
-				if($event['startTime'] == "0:00" || strtolower($event['startTime']) == "12:00am" || strtolower($event['startTime']) == "12:00 am")
+				if($event['startTime'] == "0:00" || strtolower($event['startTime']) == "12:00am" || strtolower($event['startTime']) == "12:00 am" || $event['startTime'] == '')
 						$this->t_body->set_var("TIME", "");
-				else if($event['endTime'] == "0:00" || strtolower($event['endTime']) == "12:00am" || strtolower($event['endTime']) == "12:00 am")
+				else if($event['endTime'] == "0:00" || strtolower($event['endTime']) == "12:00am" || strtolower($event['endTime']) == "12:00 am" || $event['endTime'] == '')
 						$this->t_body->set_var("TIME", $event['startTime']);
 				else
 						$this->t_body->set_var("TIME", $event['startTime']." - ".$event['endTime']);
