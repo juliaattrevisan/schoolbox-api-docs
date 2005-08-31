@@ -264,7 +264,7 @@ class modUser
 		//display search for user page
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "admin/findUser.htm");
-		$this->t_body->set_var("TITLE", "MGS Portal - Find User");
+		$this->t_body->set_var("TITLE", HEADING." - Find User");
 		include_once("../include/page.php");
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
@@ -273,7 +273,7 @@ class modUser
 	{
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "admin/listUser.htm");
-		$this->t_body->set_var("TITLE", "MGS Portal - Find User");
+		$this->t_body->set_var("TITLE", HEADING." - Find User");
 		include_once("../include/page.php");	
 		$this->t_body->set_block("tplBODY", "userlist", "user_block");
 		//we assume that the connection is setup and ready to go.. yeah messy but optimized.
