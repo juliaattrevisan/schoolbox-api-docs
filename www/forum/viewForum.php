@@ -47,9 +47,10 @@ class OutPut
 	
 	function setPosts($perm, $postion=1)
 	{
+		$this->perm = $perm;
 		
 		$increments = 10;
-
+		
 		//get post list
 		$forum = new forum;
 
@@ -185,7 +186,7 @@ class OutPut
 		$this->t_body->set_var("HEADING", scrubTEXT($post['heading']));
 		$this->t_body->set_var("BODY", nl2br(scrubTEXT($post['message'])));
 		
-		if($perm > 1 || $_SESSION['id'] == $post['owner'])
+		if($this->perm > 1 || $_SESSION['id'] == $post['owner'])
 			$this->t_body->set_var("MODIFY", "<a href=\"/forum/modpost.php?id={$post['id']}\">modify</a> // ");
 		else
 			$this->t_body->set_var("MODIFY", "");

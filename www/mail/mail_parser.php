@@ -76,7 +76,7 @@ class mail_parser
 		}
 		else if($prefferred == "TEXT_ONLY") //used to output text as text
 		{
-			return scubTEXT(stripslashes(trim($body)));
+			return scrubTEXT(stripslashes(trim($body)));
 		}	
 		else //outputs a text based email formatted in html
 		{

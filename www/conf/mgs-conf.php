@@ -51,7 +51,7 @@ define("SQL_db", "intranet");
 
 
 //Synergy options
-define("SYNERGY_enable", false);				//Use this to disable synergy modules
+define("SYNERGY_enable", true);				//Use this to disable synergy modules
 define("MSSQL_host","synergy");
 define("MSSQL_user","intranet");
 define("MSSQL_passwd","Qu4LitY");
@@ -87,7 +87,7 @@ define("WEATHER_CACHE", "7200");                        //cache weather info for
 define("WEATHER_CURRENT_LOCAL_CACHE_LOCATION", "/usr/local/www/files/currentlocalweather.xml");	//File to save weather cache in
 define("WEATHER_CURRENT_AUS_CACHE_LOCATION", "/usr/local/www/files/currentausweather.xml");	//File to save weather cache in
 define("WEATHER_FORECAST_CACHE_LOCATION", "/usr/local/www/files/forecastweather.xml");	//File to save weather cache in
-define("WEATHER_CURRENT_AUS_FILE", "twc_obs_current_aws_aus.xml");
+define("WEATHER_CURRENT_AUS_FILE", "twc_obs_current_aws_vic.xml");
 define("WEATHER_CURRENT_LOCAL_FILE", "twc_obs_current_aws_melbourne_9477.xml");
 define("WEATHER_FORECAST_FILE", "twc_fcast_local_4day_capcity.xml");
 define("WEATHER_SERVER", "ftp.theweather.com.au");

@@ -51,7 +51,6 @@ function getStudents($subCode, $db = 0)
 			AND (SubjectClasses.FileSemester='" . $_SESSION['FileSemester'] .  "')
 		ORDER BY CommunityStudents.Surname, CommunityStudents.Preferred ";
                 
-	print "<!-- $query -->";
 	$result = mssql_query($query, $db);
 
 	return $result;

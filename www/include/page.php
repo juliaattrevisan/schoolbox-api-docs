@@ -41,6 +41,7 @@ while($menuitem = $db->dbGetNextArray() )
 {
 	$list = insertChild($list, $menuitem);
 }
+
 //output tree with html
 $this->t_body->set_var("MCSSMENU", outputMenu($list[0]['children'], 1));
 
@@ -50,15 +51,12 @@ $this->t_body->set_var("MCSSMENU", outputMenu($list[0]['children'], 1));
 $this->t_body->set_block("tplBODY", "mlink_block", "my_links");
 $query = "SELECT url, description FROM bookmarks WHERE owner = '".$_SESSION['id']."'";
 $db->dbDoQuery($query);
-if($db->dbCountRows() > 0)
-{
-	while($link = $db->dbGetNextArray())
-	{
-		if(isLocalURL($link['url']) )
-		{
-			$this->t_body->set_var("MLINK", "<a href=\"/redir.php?url=".$link['url']."\" target=\"_blank\" class=\"one\">".scrubTEXT($link['description'])."</a>");	
+if($db->dbCountRows() > 0){
+	while($link = $db->dbGetNextArray()){
+		if(isLocalURL($link['url'])){
+			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\">".scrubTEXT($link['description'])."</a>");	
 		}else{
-			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\" class=\"one\">".scrubTEXT($link['description'])."</a>");	
+			$this->t_body->set_var("MLINK", "<a href=\"/redir.php?url=".$link['url']."\" target=\"_blank\">".scrubTEXT($link['description'])."</a>");
 		}
 		$this->t_body->parse("my_links", "mlink_block", true);
 	}
@@ -133,6 +131,14 @@ $this->t_body->set_block("tplBODY", "webmail_tab", "wm_tab");
 if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && isStaff($_SESSION['gid'])))
 {
 	$this->t_body->parse("wm_tab","webmail_tab",true);
+	
+	if(SITE_location == 'mgs')
+	{
+		if(isStaff($_SESSION['gid']))
+			$this->t_body->set_var("WEBMAIL_LOCATION", "href=\"https://webmail.mgs.vic.edu.au/exchange/\" target=\"_blank\"");
+		else
+			$this->t_body->set_var("WEBMAIL_LOCATION", "href=\"/mail.php\"");
+	}
 }
 else
 {
@@ -145,6 +151,8 @@ if(SITE_location == 'wenona')
 	//provide encoded login details for intranet
 	$this->t_body->set_var("ENC_LOGIN", base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'].' '.$_SESSION['password'])));
 }
+
+
 
 //function used to create data structure for drop down menu
 function insertChild($list, $element)
@@ -161,16 +169,10 @@ function insertChild($list, $element)
 		if(is_array($list[$i]['children']))
 		{
 			$sublist = insertChild($list[$i]['children'], $element);
-			//if item was inserted then we can leave else we need to keep searching
-			//optimisation step (hopefully should stop linear search)
-			if($sublist)
-			{
-				$list[$i]['children'] = $sublist;
-				return $list;
-			}
+			$list[$i]['children'] = $sublist;
 		}
 	}
-	return false;
+	return $list;
 }
 
 function outputMenu($list, $level)

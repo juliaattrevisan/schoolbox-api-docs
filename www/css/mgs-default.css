@@ -418,20 +418,15 @@ a img {
 /*--------------------------------------------------------------------------------------*/
 /* OTHER FORMS */
 /*--------------------------------------------------------------------------------------*/
-#searchForm {
-	padding-top:3px;
-}
 #searchForm input, #searchForm select {
-	margin:0 0 10px 10px;
+	margin-left:10px;
 	}
-#searchForm input.short, #searchForm select.short {
+#searchForm input.short, #searchForm select {
 	width:110px;padding:0;
 	border:1px solid #0065CE;
 	}
 #searchForm input.img {
 	margin-bottom:4px;
-	margin-left:10px;
-	border:0;
 	}
 /*--------------------------------------------------------------------------------------*/
 /* OTHER FORMS */

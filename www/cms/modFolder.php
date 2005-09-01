@@ -268,7 +268,7 @@ if(is_numeric($_POST['parent']) && $_POST['name'])
 	if(!($_SESSION['su'] || $_POST['groupcheck']))
 	{
 		if($_POST['group'][$_SESSION['gid']] < 2)
-			error(47);
+			error(9, 'You have not granted permission for yourself to access this folder');
 	}
 
 	//check if its a modify or add
