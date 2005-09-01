@@ -18,28 +18,23 @@
 <link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
 <script type="text/javascript" src="/javascript/drop_down.js"></script>
 <!-- InstanceBeginEditable name="scripts" -->
-
-
 <script type="text/javascript">
 function showRow(){
 	var selecLevel = document.getElementById('eventForm').level.options[document.getElementById('eventForm').level.selectedIndex].value;
+	var campusRow = document.getElementById('campusRow');
+	var groupRow = document.getElementById('groupRow');
+
 	if( selecLevel == 1 || selecLevel == 4){
-		document.getElementById('campusRow').style.display = "none";
-		document.getElementById('groupRow').style.display = "none";
-		document.getElementById('campusRow').style.visibility="hidden";
-		document.getElementById('groupRow').style.visibility="hidden";
+		campusRow.style.display = "none";
+		groupRow.style.display = "none";
 	}
 	else if( selecLevel == 2 ){
-		document.getElementById('campusRow').style.visibility="hidden";
-		document.getElementById('campusRow').style.display = "none";
-		document.getElementById('groupRow').style.display = "block";
-		document.getElementById('groupRow').style.visibility="visible";
+		campusRow.style.display = "none";
+		groupRow.style.display = "";
 	}
 	else if( selecLevel == 3 ){
-		document.getElementById('campusRow').style.visibility="visible";
-		document.getElementById('campusRow').style.display = "block";
-		document.getElementById('groupRow').style.display = "none";
-		document.getElementById('groupRow').style.visibility="hidden";
+		campusRow.style.display = "";
+		groupRow.style.display = "none";
 	}
 }
 
@@ -110,22 +105,20 @@ window.onload = new Function('showRow();');
 		</div>
 	</div>
 	<!-- end left -->
-	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Calendar_Active.lbi" -->
-  <div id="topNav">
-    <ul>
-      <li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
-      <li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
-      <!-- BEGIN webmail_tab -->
-      <li class="norm"><a class="norm" href="/mail.php" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
-      <!-- END webmail_tab -->
-      <li class="navthis norm"><a class="navthis norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
-      <!-- BEGIN timetable_tab -->
-      <li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
-      <!-- END timetable_tab -->
-      <li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
-    </ul>
-  </div>
-  <!-- #EndLibraryItem --><!-- #EndEditable -->
+	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Calendar_Active.lbi" -->			<div id="topNav">
+				<ul>
+					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+					<!-- BEGIN webmail_tab --> 
+					<li class="norm"><a class="norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+					<!-- END webmail_tab -->
+					<li class="navthis norm"><a class="navthis norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+					<!-- BEGIN timetable_tab -->
+					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+					<!-- END timetable_tab -->
+					<li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+				</ul>
+			</div><!-- #EndLibraryItem --><!-- #EndEditable -->
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" -->
 	<h1>{FUNCTION} Reoccurring Monthly Event</h1>
@@ -193,11 +186,11 @@ window.onload = new Function('showRow();');
                         <td ><select name="level" id="select" onchange="showRow()">{LEVEL}
                           </select></td>
                       </tr>
-                      <tr id="groupRow" style="display:none;visibility:none;"> 
+                      <tr id="groupRow" style="display:none"> 
                         <td><h2>Group</h2><em>Select the group which will be able to view this event</em></td>
                         <td>{GROUP}</td>
                       </tr>
-                      <tr id="campusRow" style="display:none;visibility:none;"> 
+                      <tr id="campusRow" style="display:none"> 
                         <td><h2>Campus</h2><em>Select the campus which will be able to view this event </em></td>
                         <td>{CAMPUS}</td>
                       </tr>

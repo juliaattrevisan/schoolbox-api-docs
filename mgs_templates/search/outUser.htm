@@ -80,29 +80,31 @@
 		</div>
 	</div>
 	<!-- end left -->
-	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" -->
-	<div id="topNav">
-		<ul>
-			<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
-			<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
-			<!-- BEGIN webmail_tab -->
-			<li class="norm"><a class="norm" href="/mail.php" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
-			<!-- END webmail_tab -->
-			<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
-			<!-- BEGIN timetable_tab -->
-			<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
-			<!-- END timetable_tab -->
-			<li class="navthis right"><a class="navthis right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
-		</ul>
-	</div>
-	<!-- #EndLibraryItem --><!-- #EndEditable -->
+	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" -->			<div id="topNav">
+				<ul>
+					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+					<!-- BEGIN webmail_tab --> 
+					<li class="norm"><a class="norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+					<!-- END webmail_tab -->
+					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+					<!-- BEGIN timetable_tab -->
+					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+					<!-- END timetable_tab -->
+					<li class="navthis right"><a class="navthis right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+				</ul>
+			</div>
+<!-- #EndLibraryItem --><!-- #EndEditable -->
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" -->
 			<h1>Address Book</h1>
 			<!-- BEGIN portrait -->
-			<img style="float:right;" width="167" height="251" src="portrait.php?id={SYNERGY_ID}" />
+			<div style="float:right; margin-top:10px"><img width="180" height="250" src="portrait.php?id={SYNERGY_ID}" /></div>
 			<!-- END portrait -->
-            <table>
+            <table style="width:70%" class="indent">
+			  <tr>
+                <td colspan="4"><h2>User Info</h2></td>
+              </tr>
               <tr>
                 <td><strong>Name</strong></td> 
                 <td>{NAME}</td>
@@ -112,8 +114,8 @@
               <tr>
                 <td><strong>Group</strong></td> 
                 <td>{POSTION}</td>
-                <td><strong>Email</strong></td>
-                <td>{EMAIL}</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
               </tr>
 			<!-- BEGIN student_synergy -->
               <tr>
@@ -129,7 +131,7 @@
                 <td>&nbsp;</td>
               </tr>
               <tr>
-                <td colspan="4"><strong>Emergency Contact</strong></td>
+                <td colspan="4"><h2>Emergency Contact</h2></td>
               </tr>
               <tr>
                 <td><strong>Name</strong></td>
@@ -144,7 +146,7 @@
                 <td>{EMERGENCY_ALT_PHONE}</td>
               </tr>
               <tr>
-                <td colspan="4"><strong>Primary Contact </strong></td>
+                <td colspan="4"><h2>Primary Contact </h2></td>
               </tr>
               <tr>
                 <td><strong>Name</strong></td>
@@ -187,7 +189,7 @@
               </tr>
               <tr>
                 <td>&nbsp;</td> 
-                <td colspan="3"><!-- BEGIN grouplist -->{GROUP}<!-- END grouplist --></td>
+                <td colspan="3"><ul><!-- BEGIN grouplist --><li>{GROUP}</li><!-- END grouplist --></ul></td>
               </tr>
             </table>
 			<!-- #EndEditable --> </div>
