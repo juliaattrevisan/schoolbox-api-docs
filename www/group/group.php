@@ -25,6 +25,16 @@ class Group
 		$this->db->dbDoQuery($query);
 	}
 
+	function groupExists()
+	{
+		$query = "SELECT cid FROM userGroups WHERE cid = '$this->sid'";
+		$result = $this->db->dbGetSingleRow($query);
+		if($result['cid'])
+			return true;
+		else
+			return false;
+	}
+
 	function deleteMember($uid, $type = 0)
 	{
 		//deletes a uid also can optionally delete a user based on its permission

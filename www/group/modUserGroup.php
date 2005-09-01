@@ -201,7 +201,7 @@ if(isset($_REQUEST['service']) && $_REQUEST['service'] && isset($_REQUEST['sid']
 	if(!$_SESSION['su'])
 	{
 		$curOwner = $group->getOwner();
-		if(!(isset($curOwner['uid']) && $_SESSION['id'] == $curOwner['uid']) )
+		if($curOwner['uid'] && $_SESSION['id'] != $curOwner['uid'] )
 		{
 			error(19);
 		}
@@ -209,9 +209,9 @@ if(isset($_REQUEST['service']) && $_REQUEST['service'] && isset($_REQUEST['sid']
 
 	$page = new modUserGroup($_REQUEST['service'], $_REQUEST['sid']);
 
-        //if update group type
-        if(isset($_POST['type']) && $_POST['type'])
-                $group->updateGroupType($_POST['type']);
+	//if update group type
+	if(isset($_POST['type']) && $_POST['type'])
+		$group->updateGroupType($_POST['type']);
 	
 	//if delete member
 	if(isset($_GET['delete']) && $_GET['delete'])
@@ -237,15 +237,17 @@ if(isset($_REQUEST['service']) && $_REQUEST['service'] && isset($_REQUEST['sid']
 		//check if member is allowed to become a owner
 		if($group->allowOwner($_GET['owner']))
 		{
+			//if we are accessing group for first time create group
+			if(!$group->groupExists())
+				$group->createGroup();
+			
 			$curOwner = $group->getOwner();
 			if($curOwner != 0)
 			{
 				$group->deleteMember($curOwner['uid']);
 				$group->addMember($curOwner['uid']);
 			}
-			else 
-				$group->createGroup();
-
+			
 			//make new person an owner
 			$group->deleteMember($_GET['owner']);
 			$group->addOwner($_GET['owner']);
