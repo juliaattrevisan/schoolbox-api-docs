@@ -10,6 +10,9 @@
 require_once("../include/session.php");
 require_once("../include/include.php");
 require_once("../include/staffonly.php");
+
+//no image
+define(NO_IMAGE, '../images/no_available.jpg');
 	
 if(isset($_GET['id']) && $_GET['id'])
 {
@@ -25,12 +28,19 @@ if(isset($_GET['id']) && $_GET['id'])
 	{
 		$image = mssql_fetch_array($result);
 		header("Content-Type: image/jpg");
-		header ("Content-Disposition: filename={$_GET['id']}.jpg"); 
+		header("Content-Disposition: filename={$_GET['id']}.jpg"); 
 		//header ("Content-Length: $filesize");	
 		echo $image['Photo'];
 	}
 	else
-		error(0);
+	{
+		if(file_exists(NO_IMAGE))
+		{
+			header("Content-Type: image/jpg");
+			header("Content-Disposition: filename=nopic.jpg"); 
+			readfile(NO_IMAGE);
+		}		
+	}
 } 
 
 ?>
