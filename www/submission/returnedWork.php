@@ -128,8 +128,8 @@ class returnedWorkPage
 
                 //send headers
                 header ("Content-Type: application/octet-stream"); 
-                header ("Content-Disposition: $attach filename=".$result['filename'].""); 
-                header ("Content-Length: ".filesize("$filename"));
+                header ("Content-Disposition: $attach filename=\"".$result['filename']."\""); 
+                header ("Content-Length: ".filesize($filename));
                 readfile($filename);
 
 	}

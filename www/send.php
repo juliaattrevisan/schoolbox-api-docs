@@ -50,7 +50,7 @@ if(isset($_GET['id']) && $_GET['id'])
 			else
 				header ("Content-Type: application/octet-stream"); 
 		
-			header ("Content-Disposition: $attach filename=".$resultArray['realname'].""); 
+			header ("Content-Disposition: $attach filename=\"".$resultArray['realname']."\""); 
 			header ("Content-Length: $filesize");	
 			readfile($filename);
 		}

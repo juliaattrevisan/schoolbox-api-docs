@@ -105,8 +105,8 @@ class ViewSubmissionPage {
 
 		//send headers
 		header ("Content-Type: application/octet-stream"); 
-		header ("Content-Disposition: $attach filename=".$result['lastname']."-".$result['realname'].""); 
-		header ("Content-Length: ".filesize("$filename"));
+		header ("Content-Disposition: $attach filename=\"".$result['lastname']."-".$result['realname']."\""); 
+		header ("Content-Length: ".filesize($filename));
 		readfile($filename);
 	
 	}
