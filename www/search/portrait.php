@@ -12,7 +12,7 @@ require_once("../include/include.php");
 require_once("../include/staffonly.php");
 
 //no image
-define(NO_IMAGE, '../images/no_available.jpg');
+define(NO_IMAGE, '../images/no_portrait.jpg');
 	
 if(isset($_GET['id']) && $_GET['id'])
 {
