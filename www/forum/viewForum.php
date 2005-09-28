@@ -49,7 +49,7 @@ class OutPut
 	{
 		$this->perm = $perm;
 		
-		$increments = 10;
+		$increments = FORUM_increment;
 		
 		//get post list
 		$forum = new forum;
