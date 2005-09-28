@@ -54,9 +54,9 @@ if(isset($_GET['msgid']) && $_GET['msgid'] && (isset($_GET['pid']) && $_GET['pid
 	else
 		header ("Content-Type: application/octet-stream"); 
 
-	header ("Content-Disposition: $attach filename=".$filename.""); 
+	header ("Content-Disposition: $attach filename=\"".$filename."\""); 
 
-	$email->decodeMail($file['encoding'], &$body);
+	$body = $email->decodeMail($file['encoding'], $body);
 
 	echo $body;	
 

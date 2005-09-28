@@ -65,7 +65,7 @@ class mail_parser
 		//if we retrieved a html body format appropriately
 		if($type == "HTML")
 		{
-			$this->decodeMail($this->getEncoding($pidList[0]), &$body);
+			$body = $this->decodeMail($this->getEncoding($pidList[0]), $body);
 			//get rid of html/head/body tags
 			$body = preg_replace(array('/<html[^>]*>.*<body[^>]*>/si','/<\/body>*<\/html>/si'), array('',''), $body);
 			$body = scrubHTML($body);
@@ -148,28 +148,16 @@ class mail_parser
 	
 	}
 
-	function decodeMail($encoding, &$body)
+	function decodeMail($code, $data)
 	{
-		switch($encoding){
-			case 0: //7BIT
-                        break;
-
-                                case 1: //8BIT
-                                        $body = imap_8bit($body);
-                                break;
-
-                                case 2: //BINARY
-
-                                case 3: //BASE64
-                                        $body = imap_base64($body);
-                                break;
-
-                                case 4: //QOUTED_PRINTABLE
-                                        $body = quoted_printable_decode($body);
-                                break;
-
-                                case 5: //OTHER
-                        }
+		if($code===0){return imap_utf7_decode($data);}
+		if($code==1){return imap_utf8($data);}
+		if($code==2){return ($data);}
+		if($code==3){return imap_base64($data);}
+		if($code==4){return imap_qprint($data);}
+		if($code==5){return ($data);}
+		
+		return $data;
 	}
 	
 	function decodeHeader($text)

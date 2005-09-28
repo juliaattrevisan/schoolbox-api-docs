@@ -49,31 +49,33 @@ class OutPut
 	
 		// get number of messages
 		$total = imap_num_msg($inbox);
-		//$this->set_var("TOTAL", $total);
 		$this->set_var("USER", $mail->user);
 
+		//messages per page
+		$increments = MAIL_increment;
+
 		//only output 15 messages make links to all others
-		$sections = ceil($total / 15);
+		$sections = ceil($total / $increments);
 		$link = "";
 		if($pos < 1)
 			$pos = 1;
 
 		for($x=0; $x < $sections; $x++)
 		{
-			$temp_start = ($x*15)+1;
-			$temp_finish = ($x+1)*15;
+			$temp_start = ($x*$increments)+1;
+			$temp_finish = ($x+1)*$increments;
 			if($temp_finish > $total)
 				$temp_finish = $total;
 
 			//check where we currently are 
 			if($pos < $temp_start || $pos > $temp_finish)
-				$link .= "<a href=\"mail.php?pos=".$temp_start."\">[".$temp_start."-".$temp_finish."]</a>";
+				$link .= "<a href=\"mail.php?pos=".$temp_start."\">".($x+1)."</a> ";
 			else
 			{
 				//swap round so we get newest first..
 				$start = $total-$temp_finish+1;
 				$finish = $total-$temp_start+1;
-				$link .= "<b>[".$temp_start."-".$temp_finish."]</b>";
+				$link .= "<b>".($x+1)."</b> ";
 			}
 		}
 
