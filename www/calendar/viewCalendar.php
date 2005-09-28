@@ -38,7 +38,6 @@ class displayCalendar
 		$this->t_body->set_var("NOTE", scrubTEXT($note));
 		$this->t_body->set_var("PRIORITY", $this->cal->displayColour($priority));
 		
-		
 		if($id && ($_SESSION['su'] || $owner == $_SESSION['id'] || $this->cal->checkSecurity($access, $sid) > 1))
 			$this->t_body->set_var("MODIFY","<a href=\"addEvent.php?type=$type&id=$id\">Modify</a>");
 		else
