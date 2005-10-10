@@ -149,4 +149,46 @@ function getDayTimetableQuery($synergy_id, $year, $daynumber)
 	return $query;
 
 }
+
+function getFullTimetableQuery($synergy_id)
+{	
+	if( isStudent($_SESSION['gid']))
+	{
+		$query ="SELECT Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, 
+			Timetable.PeriodNumber, Timetable.ClassCode 
+			FROM SynergyOne.dbo.StudentClasses StudentClasses, 
+			SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable 
+			Timetable 
+			WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND 
+			Timetable.ClassCode = SubjectClasses.ClassCode AND Timetable.FileSemester = 
+			SubjectClasses.FileSemester AND Timetable.FileType = SubjectClasses.FileType 
+			AND Timetable.FileYear = SubjectClasses.FileYear AND 
+			StudentClasses.FileSemester = SubjectClasses.FileSemester AND 
+			StudentClasses.FileSemester = Timetable.FileSemester AND 
+			StudentClasses.FileType = SubjectClasses.FileType AND 
+			StudentClasses.FileType = Timetable.FileType AND StudentClasses.FileYear = 
+			SubjectClasses.FileYear AND StudentClasses.FileYear = Timetable.FileYear AND 
+			StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND 
+			StudentClasses.ClassCode = SubjectClasses.ClassCode AND 
+			((Timetable.FileSemester=".$_SESSION['FileSemester'].") AND (Timetable.FileYear=".$_SESSION['FileYear'].") AND 
+			(StudentClasses.ID='$synergy_id')) AND Timetable.PeriodNumber > '0'
+			ORDER BY Timetable.PeriodNumber, Timetable.DayNumber"; 
+	}
+	else
+	{
+		$query = "SELECT Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, 
+			Timetable.PeriodNumber, Timetable.ClassCode
+			FROM SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable 
+			Timetable 
+			WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND 
+			Timetable.ClassCode = SubjectClasses.ClassCode AND Timetable.FileSemester = 
+			SubjectClasses.FileSemester AND Timetable.FileType = SubjectClasses.FileType 
+			AND Timetable.FileYear = SubjectClasses.FileYear AND 
+			((SubjectClasses.FileSemester=".$_SESSION['FileSemester'].") AND 
+			(SubjectClasses.FileYear=".$_SESSION['FileYear'].") AND 
+			(Timetable.StaffID='$synergy_id')) AND Timetable.PeriodNumber > '0' 
+			ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
+	}
+	return $query;
+}
 ?>

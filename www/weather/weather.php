@@ -10,6 +10,10 @@ class Weather
 	
 	function Weather($type = 0, $location = 0)
 	{
+		//setup the error flag, we only want to retry the file fetch once if we get an error
+		$this->errorOnce = 0;
+		
+	
 		//Can be told to only parse current or to parse both	
 		//check to see where we should get our weather from (cache/source)
 		if( !((file_exists($this->cache_file)) && ((filectime($this->cache_file)+$this->cache_time) - date("U") > 0) && 
@@ -24,7 +28,16 @@ class Weather
 		else
 			$this->areacode = $location;
 
-		if(!strcmp("Current", $type))
+		$this->type = $type;
+		
+		//parse xml and set variables
+		$this->setWeatherData();
+
+	}
+
+	function setWeatherData()
+	{
+		if(!strcmp("Current", $this->type))
 		{
 			$this->setLocalCurrentFromXML();
 			$this->setForecastFromXML();
@@ -33,9 +46,9 @@ class Weather
 		{
 			$this->setForecastFromXML();
 			$this->setCurrentFromXML();
-
 		}
 	}
+	
 
 	function setCurrentFromXML()
 	{
@@ -193,16 +206,29 @@ class Weather
 		
 		if (!($fp = fopen($file, "r"))) 
 		{
-			die("could not open XML input");
+			//try refetching the files 
+			$this->getWeatherFromSource();
+			
+			if (!($fp = fopen($file, "r"))) 
+			{
+				error(0);
+			}
 		}
 
 		while ($data = fread($fp, 4096)) 
 		{
 			if (!xml_parse($xml_parser, $data, feof($fp))) 
 			{
-				die(sprintf("XML error: %s at line %d",
-				xml_error_string(xml_get_error_code($xml_parser)),
-				xml_get_current_line_number($xml_parser)));
+				if(!$this->errorOnce)
+				{
+					//only refetch once
+					$this->errorOnce = 1;
+					$this->getWeatherFromSource();
+					$this->parseXML($file);
+					return;
+				}
+				else
+					error(0);
 			}
 		}
 
