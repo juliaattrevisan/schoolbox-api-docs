@@ -37,6 +37,10 @@ class file
 			SET description='$description', comment='$comment', category='$category', type='$type' 
 			WHERE id = '$modid'";
 		$this->db->dbDoQuery($query);
+		
+		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('file', $modid, 'modify', {$_SESSION['id']})";
+		$this->db->dbDoQuery($query);
+		
 	}
 
 	function addFile($file_name, $file_type, $description, $comment, $category, $type)
@@ -64,6 +68,9 @@ class file
 				copy($_FILES['file']['tmp_name'], FILE_directory ."/". $newFileName);
 		}
 	
+		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('file', $fileId, 'add', {$_SESSION['id']})";
+		$this->db->dbDoQuery($query);
+	
 		return $fileId;
 	
 	}
@@ -83,6 +90,9 @@ class file
 		//now delete file by updating it as deleted
 		$query = "UPDATE file SET deleted = '1' WHERE id = '".$id."'";
         	$this->db->dbDoQuery($query);
+
+		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('file', $id, 'delete', {$_SESSION['id']})";
+		$this->db->dbDoQuery($query);
 
 		//we leave file incase we need it but we should clean up any cached files right now
 		

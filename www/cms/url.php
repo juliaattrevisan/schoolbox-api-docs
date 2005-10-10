@@ -29,7 +29,7 @@ class url
         }
 
 	function modifyUrl($url, $description, $comment, $category, $modid)
-        {
+	{
 		//check allowed perms to add to specified category before proceeding
 		$this->checkWriteAccess($category);
 		
@@ -38,31 +38,38 @@ class url
 		//append http if not already there
 		if( strncasecmp($url,"http://", 7) && strncasecmp($url, "https://", 8) )
 			$url = "http://".$url;
-
+		
 		$query = "UPDATE link 
 			SET url='$url', description='$description', comment='$comment', category='$category' 
 			WHERE id = '$modid'";
-                $this->db->dbDoQuery($query);
-        }
+		$this->db->dbDoQuery($query);
+		
+		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('link', $modid, 'modify', {$_SESSION['id']})";
+		$this->db->dbDoQuery($query);
+	}
 
-        function addUrl($url, $description, $comment, $category)
-        {
-                //check allowed perms to add to specified category before proceeding
+	function addUrl($url, $description, $comment, $category)
+	{
+		//check allowed perms to add to specified category before proceeding
 		$this->checkWriteAccess($category);
-
+		
 		//clean up and append http if not already exists
-                $url = trim($url);
-                if( strncasecmp($url,"http://", 7) && strncasecmp($url, "https://", 8) )
-                        $url = "http://".$url;
-
-                //INSERT url into table
-                $query = "INSERT INTO link 
-				(category, owner, url, submitted, description, comment) 
-			  VALUES 
-				('$category','".$_SESSION['id']."','$url',NOW(),'$description','$comment')";
-
-                $this->db->dbDoQuery($query);
-        }
+		$url = trim($url);
+		if( strncasecmp($url,"http://", 7) && strncasecmp($url, "https://", 8) )
+			$url = "http://".$url;
+		
+		//INSERT url into table
+		$query = "INSERT INTO link 
+		(category, owner, url, submitted, description, comment) 
+		VALUES 
+		('$category','".$_SESSION['id']."','$url',NOW(),'$description','$comment')";
+		
+		$this->db->dbDoQuery($query);
+		$linkId = $this->db->dbInsertId();
+		
+		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('link', $linkId, 'add', {$_SESSION['id']})";
+		$this->db->dbDoQuery($query);
+	}
 
 	function deleteUrl($id)
 	{
@@ -77,6 +84,9 @@ class url
 		//now delete url from the database
 
 		$query = "DELETE FROM link WHERE id = '".$id."'";
+		$this->db->dbDoQuery($query);
+		
+		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('link', $id, 'delete', {$_SESSION['id']})";
 		$this->db->dbDoQuery($query);
 
 	}

@@ -51,6 +51,10 @@ class folder
                 
 		$this->db->dbDoQuery($query);
 		$cid = $this->db->dbInsertId();
+		
+		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('folder', $cid, 'create', {$_SESSION['id']})";
+		$this->db->dbDoQuery($query);
+		
 		$this->createTemplate($cid, $template);
 
 		return $cid;
@@ -84,7 +88,11 @@ class folder
 			$query = "UPDATE category SET name = '$name', parent = '$parent', template = '$template' WHERE id = '$cid'";
                 
 		$this->db->dbDoQuery($query);
-                $this->createTemplate($cid, $template);
+		
+		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('folder', $cid, 'modify', {$_SESSION['id']})";
+		$this->db->dbDoQuery($query);
+		
+		$this->createTemplate($cid, $template);
 		
 		return $cid;
 	}
@@ -112,6 +120,9 @@ class folder
 		$this->db->dbDoQuery($query);
 
 		$query = "DELETE FROM subject_news WHERE code = '".$id."'";
+		$this->db->dbDoQuery($query);
+		
+		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('folder', $id, 'delete', {$_SESSION['id']})";
 		$this->db->dbDoQuery($query);
 
 	}
