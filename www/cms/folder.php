@@ -92,7 +92,8 @@ class folder
 		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('folder', $cid, 'modify', {$_SESSION['id']})";
 		$this->db->dbDoQuery($query);
 		
-		$this->createTemplate($cid, $template);
+		if($template)
+			$this->createTemplate($cid, $template);
 		
 		return $cid;
 	}

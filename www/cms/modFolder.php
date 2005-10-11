@@ -49,15 +49,19 @@ class ModFolderPage
 
 	}
 
-	function setTemplateList($tid = 0)
+	function setTemplateList($modify = 0)
 	{		
 		$templateList = $this->getTemplateList();
 
-		$templateHTML = "<SELECT name=\"template\"><OPTION VALUE=\"0\">No Homepage</OPTION>";
+		if($modify)
+			$templateHTML = "<SELECT name=\"template\"><OPTION VALUE=\"0\">Keep Existing</OPTION>";
+		else
+			$templateHTML = "<SELECT name=\"template\"><OPTION VALUE=\"0\">No Homepage</OPTION>";
+		
 		while ($thisTemplate = array_shift($templateList))
 		{
 				if($tid == $thisTemplate['id'])
-					$templateHTML .= "<OPTION VALUE=\"" . $thisTemplate['id'] . "\" selected>";
+					$templateHTML .= "<OPTION VALUE=\"" . $thisTemplate['id'] . "\">";
 				else
 					$templateHTML .= "<OPTION VALUE=\"" . $thisTemplate['id'] . "\">";
 				$templateHTML .= $thisTemplate['name'];
@@ -203,12 +207,8 @@ class ModFolderPage
 				
 				//set name
 				$this->t_body->set_var("CATNAME", $cat['name']);
-				
-				//set template box
-				if($cat['template'])
-				$this->setTemplateList($cat['template']);
-				else
-				$this->setTemplateList();
+
+				$this->setTemplateList(1);
 				
 				$this->setCatList("parent", $cat['parent']);
 				$this->setGroupListPerms($cid, $folderDB);
