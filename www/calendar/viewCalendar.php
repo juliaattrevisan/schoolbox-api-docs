@@ -214,7 +214,7 @@ class displayCalendar
 			
 			if(!is_array($eventList))
 			{
-				$this->t_body->set_var("note_listing", "");
+				if(!$subout) $this->t_body->set_var("note_listing", "");
 			}
 			else
 			{	

@@ -106,12 +106,12 @@
                   <table class="timetable">                    
 						<tr>
 						<!-- BEGIN timetable_header -->
-							<th>{PERIOD_NAME}</th>
+							<th>{PERIOD_NAME}<div style="font-size:0.7em">{PERIOD_START}-{PERIOD_END}</div></th>
 						<!-- END timetable_header -->
 						</tr>
 						<tr>
 							<!-- BEGIN timetable_period -->
-							  <td style="width:{TIMETABLE_FIELD_WIDTH}%" class="{TIMETABLE_CLASS}" {CODE}>{PERIOD}</td>
+							  <td style="width:{TIMETABLE_FIELD_WIDTH}%;cursor:pointer;" class="{TIMETABLE_CLASS}" {PERIOD_ONCLICK}>{PERIOD_DESC}<br />{PERIOD_CODE}<br />{PERIOD_ROOM} {PERIOD_ABSENTEES}</td>
 							<!-- END timetable_period -->
 						</tr>
                   </table>
@@ -120,52 +120,10 @@
 			<div class="dbx-group" id="news-column">
 			<table class="home">
 				<tr>
-					<td>
-						<div class="dbx-box">
-							<h2 class="dbx-handle">News Headlines</h2>
-							<div class="dbx-content">
-								<div class="indent">
-									<ul class="norm">
-										<!-- BEGIN main_stories -->
-										<li><a href="{NEWS_URL}">{NEWS_TITLE}</a></li>
-										<!-- END main_stories -->
-									</ul>
-								</div>
-							</div>
-						</div>
-					</td>
-				<!-- BEGIN weather -->
-					<td>
-					<div class="dbx-box">
-						<h2 class="dbx-handle">Current Weather</h2>
-						<div class="dbx-content">
-							<div class="indent">
-								<img style="float:left;" src="/images/weather/{WEATHER_ICON}" alt="{PRECIS}" width="50" height="50" />
-								<p><strong>Temperature:</strong> {TEMP}&deg;&nbsp;<br />
-								<strong>Wind:</strong> {DIRECTION} {SPEED}km/h<br />
-								<strong>Humidity:</strong>{HUMIDITY}<br />
-								Issued at {ISSUED}</p>
-								<p><a href="/weather.php">MORE WEATHER...</a></p>
-							</div>
-						</div>
-					</div>
-					</td>
-				<!-- END weather -->
-				</tr>
-				<tr>
-				<td>
-					<div class="dbx-box">
-						<h2 class="dbx-handle">Todays Events - {DATE}</h2>
-						<div class="dbx-content">
-							<table>
-							<!-- BEGIN note_block -->
-								<tr><td class="calendarTime" style="color:{NOTE_COLOUR}">{TIME}</td><td style="color:{NOTE_COLOUR}">{NOTE}</td></tr>
-							<!-- END note_block -->
-							</table>
-						</div>
-					</div>
-				</td>
-				<td>&nbsp;</td>
+					<td style="vertical-align:top">{POS1}
+						{POS2}</td>
+					<td style="vertical-align:top">{POS3}
+						{POS4}</td>
 				</tr>
 			</table>
 	</div><!-- end docking box group -->

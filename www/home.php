@@ -13,6 +13,7 @@ require_once("include/permission.php");
 require_once("news/news.php");
 require_once("calendar/calendar.php");
 require_once("weather/weather.php");
+require_once("news/whatsnew.php");
 
 class OutPut
 {
@@ -24,40 +25,46 @@ class OutPut
 		$this->t_body->set_var("TITLE", HEADING." - Home");
 		
 		$this->t_body->set_block("tplBODY", "timetable", "timetable_block");	
-		$this->t_body->set_block("tplBODY", "main_stories", "stories_block");
-		$this->t_body->set_block("tplBODY", "weather", "weather_block");
-		$this->t_body->set_block("tplBODY", "note_block", "note_listing");	
-
+		
 		$this->db = new dbManager;
 		
 		$this->setGreeting();
 		
-		//if staff get all news.. 
-		if(isStaff($_SESSION['gid']))
-			$topic = 0;
-		else //student only sees news for everyone
-			$topic = 2;
-		
-		$myNews = new news($topic);
-		//output headlines
-		$this->setStories($myNews->getHeadlines());
 		
 		//if user has timetable show it on the homepage
 		if($_SESSION['timetable'])
-			$this->setTimetable();
+			$this->outputTimetable();
 		else
 			$this->t_body->set_var("timetable_block", "");
 
-		//if weather module enabled output it
-		if(WEATHER_enable)
-			$this->setWeather();
-		else
-			$this->t_body->set_var("weather_block", "");
+
+		$this->t_body->set_file("news", "home/news.htm");
+		$this->t_body->set_file("weather", "home/weather.htm");
+		$this->t_body->set_file("calendar", "home/calendar.htm");
+		$this->t_body->set_file("whatnew", "home/changedfolder.htm");
 		
-		//output calendar
-		$this->setDayEvents();
 		
-		include("include/page.php");
+		if($this->outputWeather("weather"))
+			$this->t_body->parse("POS3", "weather");
+		else 
+			$this->t_body->set_var("POS3", "");
+		
+		if($this->outputCalendar("calendar"))
+			$this->t_body->parse("POS2", "calendar");
+		else 
+			$this->t_body->set_var("POS2", "");
+		
+		if($this->outputNews("news"))
+			$this->t_body->parse("POS1", "news");
+		else 
+			$this->t_body->set_var("POS1", "");
+		
+		if($this->outputWhatNew("whatnew"))
+			$this->t_body->parse("POS4", "whatnew");
+		else 
+			$this->t_body->set_var("POS4", "");
+		
+		$this->showPage();
 	}
 
 
@@ -84,8 +91,15 @@ class OutPut
 		$this->set_var("GREETING", $this->greeting()." ".$user['firstname']);
 	}
 
-	function setStories($headlineList)
-	{
+	function outputNews($location)
+	{	
+		$this->t_body->set_block($location, "main_stories", "stories_block");
+		
+		$myNews = new news($topic);
+		
+		//output headlines
+		$headlineList = $myNews->getHeadlines();
+		
 		if(is_array($headlineList) )
 		{
 			foreach($headlineList as $item)
@@ -99,18 +113,21 @@ class OutPut
 		{
         	$this->set_var("stories_block", "<li>No news articles available</li>");
 		}
+		
+		return true;
 	}
 
-	function setDayEvents()
+	function outputCalendar($location)
 	{
+		$this->t_body->set_block($location, "note_block", "note_listing");
+		
 		$cal = new Calendar;
 		
 		$currDay = date("d");
 		$currMonth = date("m");
 		$currYear = date("Y");
 		
-		$currentDay = mktime();
-		$this->t_body->set_var("DATE", date("l jS F",$currentDay));
+		$this->t_body->set_var("DATE", date("l jS F"));
 		
 		//first lets output submission events
 		$sub = $cal->getSubmissionEvents($currDay, $currMonth, $currYear);
@@ -133,7 +150,7 @@ class OutPut
 		
 		if(!is_array($eventList))
 		{
-			$this->t_body->set_var("note_listing", "");
+			if(!$subout) $this->t_body->set_var("note_listing", "");
 		}
 		else
 		{
@@ -152,11 +169,18 @@ class OutPut
 
 			}
 		}
+		
+		return true;
 	}
 
 	
-	function setWeather()
+	function outputWeather($location)
 	{
+		//dont output weather if not enabled
+		if(!WEATHER_enable)
+			return false;
+			
+		$this->t_body->set_block($location, "weather", "weather_block");
 		$weather = new Weather("Current");
 		
 		$this->t_body->set_var("WEATHER_ICON", $weather->forecast[0]["Icon"]);
@@ -166,100 +190,95 @@ class OutPut
 		$this->t_body->set_var("SPEED", $weather->WindSpeed);
 		$this->t_body->set_var("HUMIDITY", $weather->Humid);
 		$this->t_body->set_var("ISSUED", date("g:i a", strtotime(str_replace('T', ' ',$weather->Date))));
-
+	
 		$this->t_body->parse("weather_block", "weather");
+		
+		return true;
 	}
 
-	function setTimetable()
+	function outputTimetable()
 	{
 		$this->t_body->set_block("timetable", "timetable_period", "timetable_period_block");
 		$this->t_body->set_block("timetable", "timetable_header", "timetable_header_block");
 
-		//setup database
-		$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
-
-		$year = date("Y");
-		$synergy_id = $_SESSION['sid'];
-
-		//need method for detecting what day it is
 		include("syn_timetable.php");
+		
+		//get current day and period
 		$daynumber = getDayNumber();
+		$periodNum = getPeriodNumber();
 		
 		$this->t_body->set_var("DAYNUMBER", $daynumber);
+	
+
+		$timetable = getDayTimetable($_SESSION['sid'], $_SESSION['gid'], $_SESSION['campus'][0], $daynumber);
 		
-		//also get current peroid
-		$periodNum = getPeriodNumber();
-
-		//retrieve timetable defintion
-		$timetabledef = unserialize(TIMETABLE_definition);
-
-		$query = getDayTimetableQuery($synergy_id, $year, $daynumber);
-		
-		$result = mssql_query($query, $db);
-		if ($result != 1)
-			$desc = mssql_fetch_array($result);
-		else
-			$desc = "";
-
-		$periods =  $timetabledef[$_SESSION['campus'][0]]['period'];
+		$periods = count($timetable);
 
 		//timetable field width
 		$this->t_body->set_var("TIMETABLE_FIELD_WIDTH", round((100 / $periods),1));
 
 		//for each period set result
-		for($y=1; $y <= $periods; $y++)
+		foreach($timetable as $period)
 		{
-			if($desc['PeriodNumber'] == ($y-1))
-			{
-				if ($result != 1)
-					$desc = mssql_fetch_array($result);
-				else
-					$desc = "";
-			}
 			
-			if($desc['PeriodNumber'] != $y)
-			{
-				$code = "";
-				$period = "-";
-			}
-			else
+			$this->t_body->set_var("PERIOD_NAME", $period['periodName']);
+			$this->t_body->set_var("PERIOD_START", $period['periodStart']);
+			$this->t_body->set_var("PERIOD_END", $period['periodEnd']);
+			
+			if($period['description'])
 			{
 				//custom stuff for grimwade
 				if ($_SESSION['campus'][0] == 3 && SITE_location == 'mgs')
 				{
-					$post = strpos($desc['ClassCode'], "EN");
-					
+					$post = strpos($period['code'], "EN");
+						
 					if ($post == 2)
-						$period = "Homeroom";
+					{
+						$this->set_var('PERIOD_DESC', 'Homeroom');
+						$this->set_var('PERIOD_CODE','');
+						$this->set_var('PERIOD_ROOM','');
+					}
 					else
-						$period = $desc['Description']."<br />".$desc['Room']."<br />";
-			
-					$code = "";
+					{
+						$this->set_var('PERIOD_DESC', $period['description']);
+						$this->set_var('PERIOD_CODE','');
+						$this->set_var('PERIOD_ROOM',$period['room']);
+					}
+					
+					$this->set_var('PERIOD_ONCLICK','');
+					$this->set_var('PERIOD_ABSENTEES','');
 				}
 				else 
 				{
-					$period = $desc['Description']."<br />(".$desc['ClassCode'].")<br />".$desc['Room']."<br />";
+					$this->set_var('PERIOD_DESC', $period['description']);
+					$this->set_var('PERIOD_CODE','('.$period['code'].')');
+					$this->set_var('PERIOD_ROOM',$period['room']);
 					
 					//only show attendances to staff at mgs
 					if(isStaff($_SESSION['gid']) && SITE_location == 'mgs')
-						$period .= "<a href=\"/absentees/attendances.php?code=".$desc['ClassCode']."\">attendances</a><br>";
-					
-					$code = "onClick=\"window.location='/homepage.php?code=".urlencode($desc['ClassCode'])."'\"";
+						$this->set_var('PERIOD_ABSENTEES',"<br /><a href=\"/absentees/attendances.php?code=".$period['code']."\">attendances</a>");
+					else
+						$this->set_var('PERIOD_ABSENTEES','');
+						
+					$this->set_var('PERIOD_ONCLICK',"onClick=\"window.location='/homepage.php?code=".urlencode($period['code'])."'\"");
 				}		
-				
-				$desc = mssql_fetch_array($result);
+			
+			}
+			else
+			{
+				$this->set_var('PERIOD_DESC','');
+				$this->set_var('PERIOD_CODE','');
+				$this->set_var('PERIOD_ROOM','');
+				$this->set_var('PERIOD_ABSENTEES','');
+				$this->set_var('PERIOD_ONCLICK','');
 			}
 			
-			$this->set_var("CODE", $code);
-			$this->set_var("PERIOD", $period);
-			
-			if($y == $periodNum)
+			if($period['periodNumber'] == $periodNum)
 				$this->set_var("TIMETABLE_CLASS", "current");
 			else 
 				$this->set_var("TIMETABLE_CLASS", "normal");
 			
 			//output period block
-			$this->set_var("PERIOD_NAME", $timetabledef[$_SESSION['campus'][0]]['periodnames'][$y]);
 			$this->t_body->parse("timetable_header_block", "timetable_header", true);
 			$this->t_body->parse("timetable_period_block", "timetable_period", true);
 
@@ -267,15 +286,74 @@ class OutPut
 
 		$this->t_body->parse("timetable_block", "timetable");
 	}
+	
+	function outputWhatNew($location)
+	{
+		$catList = involvedCategoryList();
+		$whatnew = new WhatsNew();
+	
+		$this->t_body->set_block($location, "category_block", "new_category");
+		$this->t_body->set_block("category_block", "new_news", "new_news_item"); 
+		$this->t_body->set_block("category_block", "new_file", "new_file_item"); 
+		$this->t_body->set_block("category_block", "new_url", "new_url_item"); 
+		$flag = 0;
+
+		//for each subject
+		for($x = 0; $catList['id'][$x] ; $x++)
+		{
+			$cat = $whatnew->newCategory($catList['id'][$x]);
+			if($cat['news'])
+			{
+				$this->t_body->set_var("NEW_NEWS", $cat['news']);
+				$this->t_body->parse("new_news_item", "new_news");
+			}
+			else
+				$this->t_body->set_var("new_news_item", "");
+				
+			if($cat['files'])
+			{
+				$this->t_body->set_var("NEW_FILES", $cat['files']);
+				$this->t_body->parse("new_file_item", "new_file");
+			}
+			else
+				$this->t_body->set_var("new_file_item", "");
+			
+			if($cat['links'])
+			{
+				$this->t_body->set_var("NEW_URLS", $cat['links']);
+				$this->t_body->parse("new_url_item", "new_url");
+			}
+			else
+				$this->t_body->set_var("new_url_item", "");
+			
+			if($cat['news'] || $cat['files'] || $cat['links'])
+			{
+				if($catList['code'][$x])
+					$this->t_body->set_var("NEW_CATEGORY_NAME", $catList['name'][$x].' ('.$catList['code'][$x].')');
+				else
+					$this->t_body->set_var("NEW_CATEGORY_NAME", $catList['name'][$x]);
+				$this->t_body->set_var("NEW_CATEGORY_ID", $catList['id'][$x]);
+				$this->t_body->parse("new_category", "category_block");
+				$flag = 1;
+			}
+			
+		}
+		
+		if(!$flag)
+			$this->t_body->set_var('new_category','');
+		
+		return true;
+	}
 
 
 	function showPage()
 	{
+		include("include/page.php");
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 
 }
 
 $myPage = new OutPut();
-$myPage->showPage();
+
 ?>

@@ -38,6 +38,7 @@ define("GROUP_staff_only_owner", true);			//Determines if students can be group 
 
 //FORUM options
 define("FORUM_default_view", 'thread'); 		//Default forum style (flat or thread)
+define("FORUM_increment", 10);					//Amount of thread or posts per page
 
 //CALENDAR options
 define("CALENDAR_default_view", 'week');		//Default view style for calendar (week or month)
@@ -64,6 +65,9 @@ define('SYN_CAMPUS_Codes', serialize(array(
 		3=>'GRIM',
 )));
 
+//Timetable days as this is not found in synergetic and it can be a bit hard to calculate pre-timetable
+define('TIMETABLE_day_count',serialize(array(7,7,5)));
+
 //Temporary timetable definition until synergy interface is written
 define("TIMETABLE_definition", serialize(array(
 		//SS
@@ -80,6 +84,7 @@ define("MAIL_enable", false);				//This will disable webmail module
 define("MAIL_retrieval", "imap");			//Options are pop or imap (imap has extra state information)
 define("MAIL_host", "mail.mgs.vic.edu.au");
 define("MAIL_address", "mgs.vic.edu.au");
+define("MAIL_increment", 20);					//Amount of emails per page
 
 
 //Weather options

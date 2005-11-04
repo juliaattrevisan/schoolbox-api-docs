@@ -5,31 +5,6 @@
 <head>
 <!-- #BeginEditable "doctitle" --> 
 <title>{TITLE}</title>
-
-<script language="JavaScript" type="text/javascript">
-function verify(){
-	var msg = ""
-	//check that description, url, location have been entered
-	if(document.form.name.value == ""){
-		msg += "You need to enter a name\n";
-	}
-	if(document.form.parent.value == "" || isNaN(document.form.parent.value)){
-		msg += "You need to select a proper location";
-	}
-	//if its not a group check it has enough permission to be accessed by someone
-	if(document.form.groupcheck.value != 1)
-	{
-	}
-	
-	if(msg != ""){
-		alert(msg);
-		return false;
-	}
-	else
-		return true;
-}
-	
-</script>
 <!-- #EndEditable -->
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta http-equiv="Content-Language" content="en-au" />
@@ -40,8 +15,29 @@ function verify(){
 <link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-default.css" />
 <link rel="stylesheet" type="text/css" media="print" href="/css/wenona-print.css" />
 <!-- #BeginEditable "scripts" -->
-
-
+<script language="JavaScript" type="text/javascript">
+function verify(){
+	var msg = ""
+	//check that description, url, location have been entered
+	if(document.getElementById('folderForm').name.value == ""){
+		msg += "You need to enter a name\n";
+	}
+	if(document.getElementById('folderForm').parent.value == "" || isNaN(document.getElementById('folderForm').parent.value)){
+		msg += "You need to select a proper location";
+	}
+	//if its not a group check it has enough permission to be accessed by someone
+	if(document.getElementById('folderForm').groupcheck.value != 1)
+	{
+	}
+	
+	if(msg != ""){
+		alert(msg);
+		return false;
+	}
+	else
+		return true;
+}
+</script>
 <!-- #EndEditable -->
 </head>
 <body> 

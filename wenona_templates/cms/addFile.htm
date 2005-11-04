@@ -5,15 +5,25 @@
 <head>
 <!-- #BeginEditable "doctitle" --> 
 <title>{TITLE}</title>
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<script type="text/javascript" src="/javascript/drop_down.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-default.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/wenona-print.css" />
+<!-- #BeginEditable "scripts" -->
 <script language="JavaScript" type="text/javascript">
 function verify()
 {
 	var msg = ""
 	//check that description and category have been entered
-	if(document.form.description.value == ""){
+	if(document.getElementById('fileForm').description.value == ""){
 		msg += "You need to enter a description\n";
 	}
-	if(document.form.category.value == "" || isNaN(document.form.category.value)){
+	if(document.getElementById('fileForm').category.value == "" || isNaN(document.getElementById('fileForm').category.value)){
 		msg += "You need to select a proper location";
 	}
 	if(msg != ""){
@@ -25,18 +35,6 @@ function verify()
 }
 	
 </script>
-<!-- #EndEditable -->
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="James Leckie, Lektec Consulting"/>
-<meta name="ROBOTS" content="INDEX, FOLLOW" />
-<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
-<script type="text/javascript" src="/javascript/drop_down.js"></script>
-<link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-default.css" />
-<link rel="stylesheet" type="text/css" media="print" href="/css/wenona-print.css" />
-<!-- #BeginEditable "scripts" -->
-
-
 <!-- #EndEditable -->
 </head>
 <body> 

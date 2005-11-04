@@ -17,7 +17,7 @@ define("SITE_location", "wenona");				//This defines the location, allows specif
 define("LOGINGRACE", "60");				//Time measured between logins (secs)
 define("LOGINALLOWED", "3");				//Logins allowed in grace time
 define("TRACKIP", "0");					//Ensure user session does not change ip (can cause issues)
-define("SESSIONLENGTH", "1800");			//Automatically logout users who have been idle for this amount of time (secs)
+define("SESSIONLENGTH", "3600");			//Automatically logout users who have been idle for this amount of time (secs)
 define("REMEMBERSESSION", "0");				//Allows server to store session indefinetly. Overrides above setting. 
 							//Users will only need to login once (has security implications)
 define("REGISTER_FIRSTIME", false);                     //Detects no password and checks password against mail server if correct registers account
@@ -72,7 +72,7 @@ define("TIMETABLE_definition", serialize(array(
 		//Junior
 		array("period"=>9, 
 			"day"=>5, 
-			"periodnames"=>array(1=>"Period 0", "Period 1", "Period 2", "Roll Call", "Period 3", "Period 4", "Lunch", "Period 5", "Period 6")),
+			"periodnames"=>array(1=>"Period 0", "Period 1", "Period 2", "Period 3", "Period 4", "Lunch", "Period 5", "Period 6", "Period 7")),
 )));
 
 

@@ -30,104 +30,89 @@ class Timetable
 
 	function displayWeek()
 	{
-
-        //setup database
-		$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);				
-		$query = getFullTimetableQuery($_SESSION['sid']);
-		$result = mssql_query($query, $db);
 	     
 		$periodNum = getPeriodNumber();
 		$dayNum = getDayNumber();	
-
-		$timetabledef = unserialize(TIMETABLE_definition);
 		
-		$p = $timetabledef[$_SESSION['campus'][0]]['period'];
-		$d = $timetabledef[$_SESSION['campus'][0]]['day'];
-
-		if ($result != 1)
-			$desc = mssql_fetch_array($result);
-	 	else
-			$desc = "";	
-	
-
-		$flag = 1;
+		$timetable = getFullTimetable($_SESSION['sid'], $_SESSION['gid'], $_SESSION['campus'][0]);
+		
+		$days = count($timetable[0]['day']);
 		
 		//timetable field width
-		$this->t_body->set_var("TIMETABLE_FIELD_WIDTH", round((95 / ($d)),1));
-
+		$this->t_body->set_var("TIMETABLE_FIELD_WIDTH", round((95 / $days),1));
+		
+		$periodCount = 1;
 		//for each period
-		for ($x = 1; $x <= $p; $x++) 
+		foreach($timetable as $row)
 		{
-			$this->t_body->set_var("PERIOD", $timetabledef[$_SESSION['campus'][0]]['periodnames'][$x]);
+			$this->t_body->set_var("PERIOD_NAME", $row['periodName']);
+			$this->t_body->set_var("PERIOD_START", $row['periodStart']);
+			$this->t_body->set_var("PERIOD_END", $row['periodEnd']);
 			
-			
+			$dayCount = 1;
 			//for each day
-			for ($y = 1; $y <= $d; $y++)
+			foreach($row['day'] as $period)
 			{	
-			
-				if($x == 1) // only output header on first run through
+				if($periodCount == 1) // only output header on first run through
 				{
 					//output day header
-					$this->t_body->set_var("DAY_NUMBER", $y);
-	        			$this->t_body->parse("day_header_listing", "day_header", true);
+					$this->t_body->set_var("DAY_NUMBER", $dayCount);
+	        		$this->t_body->parse("day_header_listing", "day_header", true);	
 				}
 
-				if ($desc[3] != $x || $desc[2] != $y)
-					$flag = 0;
-				else 
-					$flag = 1;
-
-				$dayvar = "DAY";
-				$col = "COL";
-
-				if ($flag == 0)
-				{	
-					$period = "-"; 
-				}
+				if($period['description'])
+				{
+					if ($_SESSION['campus'][0] == 3 && SITE_location == 'mgs')
+					{
+						$post = strpos($period['code'], "EN");
+					
+						if ($post == 2)
+						{
+							$this->t_body->set_var('PERIOD_DESC', 'Homeroom');
+							$this->t_body->set_var('PERIOD_CODE','');
+							$this->t_body->set_var('PERIOD_ROOM','');
+						}
+						else
+						{
+							$this->t_body->set_var('PERIOD_DESC', $period['description']);
+							$this->t_body->set_var('PERIOD_CODE','');
+							$this->t_body->set_var('PERIOD_ROOM',$period['room']);
+						}
+					
+						$this->t_body->set_var('PERIOD_ONCLICK','');
+					}
+					else 
+					{
+						$this->t_body->set_var('PERIOD_DESC', $period['description']);
+						$this->t_body->set_var('PERIOD_CODE','('.$period['code'].')');
+						$this->t_body->set_var('PERIOD_ROOM',$period['room']);
+						$this->t_body->set_var('PERIOD_ONCLICK',"onClick=\"window.location='/homepage.php?code=".urlencode($period['code'])."'\"");	
+					}
+				}	
 				else
 				{
-					if ($_SESSION['campus'][0] == 3){
-						$post = strpos($desc[4], "EN");
-						if (($post) == 2)
-							$period = "Homeroom";
-						else
-							$period = $desc[1]."<br />(".$desc[4].")<br />";
-					}
-					else   
-						$period = $desc[1]."<br />(".$desc[4].")<br />".$desc[0]."<br />";
-					
-					$desctest = mssql_fetch_array($result);
-					
-					if ($desctest[2] == $y && $desctest[3] == $x)
-					{
-					$desc = mssql_fetch_array($result);
-					}
-					else
-					{
-					$desc = $desctest;
-					}
+					$this->t_body->set_var('PERIOD_DESC','');
+					$this->t_body->set_var('PERIOD_CODE','');
+					$this->t_body->set_var('PERIOD_ROOM','');
+					$this->t_body->set_var('PERIOD_ONCLICK','');
 				}
-
-				$this->t_body->set_var($dayvar, $period);
-				
-				if($y == $dayNum && $x == $periodNum)
+					
+				if($day == $dayNum && $row['periodNumber'] == $periodNum)
 					$this->t_body->set_var("TIMETABLE_CLASS", "current");
 				else	
 					$this->t_body->set_var("TIMETABLE_CLASS", "normal");
 
-				if($y==1)
-					$this->t_body->parse("day_listing", "day", false);
-				
-				else
-					$this->t_body->parse("day_listing", "day", true);
-
+				$this->t_body->parse("day_listing", "day", true);
+				$dayCount++;
 			}
-        	$this->t_body->parse("period_listing", "period", true);
 			
-                }
-                $this->t_body->pparse("finaloutput", "tplBODY");
-        }
-
+        	$this->t_body->parse("period_listing", "period", true);
+			$this->t_body->set_var("day_listing", '');
+			$periodCount++;
+		}
+		
+		$this->t_body->pparse("finaloutput", "tplBODY");
+	}
 }
 
 $timetable = new Timetable();

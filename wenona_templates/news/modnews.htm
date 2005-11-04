@@ -34,6 +34,24 @@ tinyMCE.init({
 	extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
 });
 </script>
+<script language="JavaScript" type="text/javascript">
+function verify()
+{
+        var msg = ""
+        if(document.getElementById('newsForm').heading.value == ""){
+                msg += "You need to enter a heading\n";
+        }
+        if(msg != ""){
+                alert(msg);
+                return false;
+        }
+        else
+	{
+                return true;
+	}
+}
+</script>
+
 <!-- #EndEditable -->
 </head>
 <body> 
@@ -105,7 +123,7 @@ tinyMCE.init({
 	<div id="content"> 
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
 		<h1>{ACTION} News</h1>
-		<form class="standard" method="post" enctype="multipart/form-data" action="{FORMSUB_URL}">
+		<form id="newsForm" class="standard" method="post" enctype="multipart/form-data" action="{FORMSUB_URL}" onsubmit="return(verify());">
 		<input type="hidden" name="id" value="{ID}" />
 		<table>
 		  <tr> 
