@@ -93,21 +93,21 @@ class WhatsNew
 
 		//check if any new news has been submitted
 		$query = "SELECT COUNT(*) AS newscount FROM subject_news WHERE deleted = 0 AND code = '$id' AND
-			datetime_posted > '$lastcatvisit'";
+			datetime_posted >= '$lastcatvisit' AND datetime_expires >= NOW()";
 		$result = $this->db->dbGetSingleRow($query);
 			
 		$count['news'] = $result['newscount'];
 
 		//check if any new files have been submitted
 		$query = "SELECT COUNT(*) AS filecount FROM file WHERE 
-			deleted = '0' AND category = '$id' AND submitted > '$lastcatvisit'";
+			deleted = '0' AND category = '$id' AND submitted >= '$lastcatvisit'";
 		$result = $this->db->dbGetSingleRow($query);
 			
 		$count['files'] = $result['filecount'];
 			
 		//check if any new links have been submitted
 		$query = "SELECT COUNT(*) AS linkcount FROM link WHERE category = '$id' 
-			AND submitted > '$lastcatvisit'";
+			AND submitted >= '$lastcatvisit'";
 		$result = $this->db->dbGetSingleRow($query);
 
 		$count['links'] = $result['linkcount'];
