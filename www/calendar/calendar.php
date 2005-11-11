@@ -421,19 +421,19 @@ function getSubmissionEvents($day, $month, $year)
 
 	//get a list of all the possible submission box categories
 	require_once($_SERVER['DOCUMENT_ROOT']."/include/involved.php");
-	$catList = involvedCategoryList(1);
+	$catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
 
-	if(is_array($catList['id']))
+	if(is_array($catList))
 	{
 		$start_date = mktime(0,0,0,$month,$day,$year);
 		$end_date = mktime(23,59,59,$month,$day,$year); 
 
-		foreach($catList['id'] as $catID)
+		foreach($catList as $cat)
 		{
 			$query = "SELECT category.name AS category, category.code AS synergyCode, submission_box.description, submission_box.owner,
 				DATE_FORMAT(submission_box.date, '%w') as dayIndex, DATE_FORMAT(submission_box.date, '".CALENDAR_time_format."') as dueTime
 				FROM category, file, submission_box WHERE category.id = submission_box.category 
-				AND file.id = submission_box.fid AND submission_box.category = '$catID' AND submission_box.deleted = 0 AND
+				AND file.id = submission_box.fid AND submission_box.category = {$cat['id']} AND submission_box.deleted = 0 AND
 				submission_box.date >= FROM_UNIXTIME('$start_date') AND submission_box.date <= FROM_UNIXTIME('$end_date')
 				ORDER BY submission_box.date ";
 			$this->db->dbDoQuery($query);
@@ -456,19 +456,19 @@ function getWeekSubmissionEvents($day, $month, $year)
 
 	//get a list of all the possible submission box categories
 	require_once($_SERVER['DOCUMENT_ROOT']."/include/involved.php");
-	$catList = involvedCategoryList(1);
+	$catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
 
-	if(is_array($catList['id']))
+	if(is_array($catList))
 	{
 		$start_date = mktime(0,0,0,$month,$day,$year);
 		$end_date = mktime(23,59,59,$month,$day+7,$year); 
 
-		foreach($catList['id'] as $catID)
+		foreach($catList as $cat)
 		{
 			$query = "SELECT category.name AS category, category.code AS synergyCode, submission_box.description, submission_box.owner,
 				DATE_FORMAT(submission_box.date, '%w') as dayIndex, DATE_FORMAT(submission_box.date, '".CALENDAR_time_format."') as dueTime
 				FROM category, file, submission_box WHERE category.id = submission_box.category 
-				AND file.id = submission_box.fid AND submission_box.category = '$catID' AND submission_box.deleted = 0 AND
+				AND file.id = submission_box.fid AND submission_box.category = {$cat['id']} AND submission_box.deleted = 0 AND
 				submission_box.date >= FROM_UNIXTIME('$start_date') AND submission_box.date <= FROM_UNIXTIME('$end_date')
 				ORDER BY submission_box.date ";
 			$this->db->dbDoQuery($query);

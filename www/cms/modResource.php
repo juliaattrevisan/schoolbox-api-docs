@@ -130,19 +130,16 @@ class ModResourcePage {
 
 		//get list of categories involved in with write access
 		require("../include/involved.php");
-		$catList = involvedCategoryList(2);
+		$catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 2);
 	
 		$catOutput = "";
 		//turn list into html 
-		for($i=0; $catList['name'][$i] != ""; $i++)
+		foreach($catList as $cat)
 		{
-			$catOutput .= "<input type=\"checkbox\" name=\"mulc[]\" value=\"".$catList['id'][$i]."\">
-					".$catList['name'][$i];
+			$catOutput .= "<input type=\"checkbox\" name=\"mulc[]\" value=\"".$cat['id']."\">".$catList['name'];
 			
-			if($catList['code'][$i] != "")
-			{
-				$catOutput .= " (".$catList['code'][$i].")";
-			}
+			if($cat['code'] != "")
+				$catOutput .= " (".$cat['code'].")";
 
 			$catOutput .= "<br />";
 		}
