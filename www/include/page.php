@@ -96,14 +96,14 @@ $this->t_body->set_block("msubject", "msubject_block", "my_subjects");
 
 if(is_array($_SESSION['subjects']))
 {
-	for($x=0;$_SESSION['subjects'][$x]; $x++)
+	foreach($_SESSION['subjects'] as $subject)
 	{
 		if(isStaff($_SESSION['gid']))
-			$this->t_body->set_var("MSUBJECT", $_SESSION['subjects'][$x]." (".$_SESSION['sub_code'][$x].")");
+			$this->t_body->set_var("MSUBJECT", $subject['name']." (".$subject['code'].")");
 		else		
-			$this->t_body->set_var("MSUBJECT", $_SESSION['subjects'][$x]);
-		//$this->t_body->set_var("MLINKSUB", "homepage.php?code=".urlencode($_SESSION['sub_code'][$x]));
-		$this->t_body->set_var("MSUBCODE", urlencode($_SESSION['sub_code'][$x]));
+			$this->t_body->set_var("MSUBJECT", $subject['name']);
+
+		$this->t_body->set_var("MSUBCODE", urlencode($subject['code']));
 		$this->t_body->parse("my_subjects","msubject_block",true); 
 	}
 	$this->t_body->parse("msubject_section","msubject");
@@ -114,8 +114,8 @@ else
 
 //this section hanldes the display of the timetable tab
 $this->t_body->set_block("tplBODY", "timetable_tab", "tt_tab");
-
-if($_SESSION['timetable'])
+//if the have a timetable or their children have a timetable
+if($_SESSION['timetable'] || is_array($_SESSION['children'][0]['subjects']))
 {
 	$this->t_body->parse("tt_tab","timetable_tab",true); 	
 }

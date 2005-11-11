@@ -103,8 +103,6 @@ function authenticate(&$db, $username, $password, $remember = 0)
 				$_SESSION['campus'][] = $campus['campus'];
 		}
 
-		//$SESSION['time'] = time();
-		
 		if(SYNERGY_enable && $_SESSION['sid'])
 			setSynergyInfo(&$db);
 
@@ -151,85 +149,126 @@ function setSynergyInfo(&$mydb)
 	$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
 	mssql_select_db( MSSQL_db);
 
-	$year = date("Y");
 	$synergy_id = $_SESSION['sid'];
 
-	#Get current FileSemester and FileYear
-        $sql_fs = "SELECT FileSemester, FileYear
-                   FROM FileSemesters
-                   WHERE (SystemCurrentFlag=1)
-                   ";
-        $query_fs = mssql_query( $sql_fs)
-            or die( "Couldn't get FileSemester and FileYear- " . mssql_get_last_message());
-        $row_fs = mssql_fetch_array( $query_fs);
-
-        //get synergy info
-        $_SESSION[ 'FileSemester'] = $row_fs[ 'FileSemester'];
-        $_SESSION[ 'FileYear'] = $row_fs[ 'FileYear'];
+	$semester = getCurrentSemester();
+	$_SESSION[ 'FileSemester'] = $semester[ 'FileSemester'];
+	$_SESSION[ 'FileYear'] = $semester[ 'FileYear'];
 
 
-	if( isStudent($_SESSION['gid']) )
+	$subjectList = getSubjectList($synergy_id, $_SESSION['gid']);
+
+	if( is_array($subjectList))
 	{
-		$sql ="SELECT DISTINCT(SubjectClasses.ClassCode), SubjectClasses.Description
-			FROM SynergyOne.dbo.SubjectClasses SubjectClasses,
-			SynergyOne.dbo.vStudentTimetableFull vStudentTimetableFull
-			WHERE SubjectClasses.ClassCode = vStudentTimetableFull.ClassCode AND
-			SubjectClasses.FileSemester = vStudentTimetableFull.FileSemester AND
-			SubjectClasses.FileType = vStudentTimetableFull.FileType AND
-			SubjectClasses.FileYear = vStudentTimetableFull.FileYear AND
-			((vStudentTimetableFull.FileSemester=".$_SESSION['FileSemester'].") AND
-			(vStudentTimetableFull.FileYear='$year') AND
-			(vStudentTimetableFull.StudentID='$synergy_id'))";
-	}
-	else
-	{      
-
-		$sql = '
-			select	distinct(c1.ClassCode),
-				c2.description
-			from	SubjectClassStaff c1,
-				SubjectClasses c2
-			where	c1.ClassCode = c2.ClassCode 
-				AND
-				c1.FileSemester = ' . $_SESSION['FileSemester'] . '
-				AND
-				c1.FileYear = ' . $year . '
-				AND
-				c1.StaffID = ' . $synergy_id . '
-				AND
-				c2.Description <= all ( select description from subjectclasses c3 where c3.classcode=c1.classcode)';
-	}
-	
-	$result = mssql_query( $sql, $db)
-		or die( "Couldn't query subjects - " . mssql_get_last_message());
-	if($result != 1)
-	{
-	if( mssql_num_rows( $result ) > 0 )
-	{
-		$x=0;
 		$_SESSION['timetable']=1;
-		while($subject = @mssql_fetch_array($result))
+		foreach($subjectList as $subject)
 		{
-			//check subject exists..
-			$myquery = "SELECT id FROM category WHERE code = '".$subject[0]."'";
+			//check subject exists.. we cant link to subjects that dont exist its ugly
+			$myquery = "SELECT id FROM category WHERE code = '".$subject['code']."'";
 			$mydb->dbDoQuery($myquery);
 			if($mydb->dbCountRows() > 0)
-			{
-				//remove study periods and rostered offs
-        			if(!preg_match("/ST|RO/",$subject[0]))
-        			{
-					preg_match("/([a-zA-Z \.0-9]+)/",$subject[1],$matches);
-					$_SESSION['subjects'][$x] = $matches[1];
-					$_SESSION['sub_code'][$x] = $subject[0];
-					$x++;
-				}
-			}
+				$_SESSION['subjects'][] = $subject;
 		}
-	}
 	}
 	else {
 		$_SESSION['timetable']=0;
 	}
 	
+	//if user is parent get information regarding enrolled students
+	if( isParent($_SESSION['gid']))
+	{
+		$studentGroup = unserialize(STUDENTGROUPIDS);
+		$children = getEnrolledStudents($synergy_id);
+		foreach($children as $child)
+		{
+			$myquery = "SELECT id FROM user WHERE synergy_id = $child";
+			$portal = $mydb->dbGetSingleRow($myquery);
+			$subjects = getSubjectList($child, $studentGroup[0]);
+			
+			$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child, 'subjects'=>$subjects);
+		}
+	}
+	
+}
+
+function getCurrentSemester()
+{
+	#Get current FileSemester and FileYear
+	$query = "SELECT FileSemester, FileYear
+				FROM FileSemesters
+				WHERE (SystemCurrentFlag=1)
+	";
+    
+	$result = @mssql_query( $query);
+	return @mssql_fetch_array( $result); 
+}
+
+function getSubjectList($synergyID, $group)
+{
+	if( isStudent($group) )
+	{
+		$sql ="SELECT DISTINCT(SubjectClasses.ClassCode), SubjectClasses.Description
+				FROM SubjectClasses SubjectClasses, vStudentTimetableFull vStudentTimetableFull
+				WHERE SubjectClasses.ClassCode = vStudentTimetableFull.ClassCode AND
+				SubjectClasses.FileSemester = vStudentTimetableFull.FileSemester AND
+				SubjectClasses.FileType = vStudentTimetableFull.FileType AND
+				SubjectClasses.FileYear = vStudentTimetableFull.FileYear AND
+				((vStudentTimetableFull.FileSemester=".$_SESSION['FileSemester'].") AND
+				(vStudentTimetableFull.FileYear=".$_SESSION[ 'FileYear'].") AND
+				(vStudentTimetableFull.StudentID=$synergyID))";
+	}
+	else
+	{      
+
+		$sql = "SELECT DISTINCT(c1.ClassCode), c2.description
+				FROM SubjectClassStaff c1, SubjectClasses c2
+				WHERE c1.ClassCode = c2.ClassCode AND
+				c1.FileSemester = ".$_SESSION['FileSemester']." AND
+				c1.FileYear = ".$_SESSION[ 'FileYear']." AND
+				c1.StaffID = $synergyID AND
+				c2.Description <= all ( select description from subjectclasses c3 where c3.classcode=c1.classcode)";
+	}
+	
+	$result = @mssql_query( $sql);
+	if($result != 1)
+	{
+		if( mssql_num_rows( $result ) > 0 )
+		{
+			while($subject = @mssql_fetch_array($result))
+			{
+					//remove study periods and rostered offs
+        			if(!preg_match("/ST|RO/",$subject['ClassCode']))
+        			{
+						$subjectList[] = array('code'=>$subject['ClassCode'], 'name'=>$subject['Description']);
+					}
+			}
+			return $subjectList;
+		}
+	}
+	return false;
+	
+}
+
+function getEnrolledStudents($synergyID)
+{
+	$query = "SELECT Relationships.RelatedID
+			FROM SynergyOne.dbo.Constituencies Constituencies, SynergyOne.dbo.Relationships Relationships
+			WHERE Relationships.RelatedID = Constituencies.ID AND 
+			Relationships.ID = $synergyID AND 
+			Constituencies.ConstitCode='@SC'";
+			
+	$result = @mssql_query( $query);
+	if($result != 1)
+	{
+		if( mssql_num_rows( $result ) > 0 )
+		{
+			while($student = @mssql_fetch_array($result))
+			{
+					$studentList[] = $student['RelatedID'];
+			}
+			return $studentList;
+		}
+	}
+	return false;
 }
 ?>

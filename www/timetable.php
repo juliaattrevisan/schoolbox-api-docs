@@ -21,20 +21,37 @@ class Timetable
 		$this->t_body->set_file("tplBODY", "timetable.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Timetable");
 		//setup blocks
-		$this->t_body->set_block("tplBODY", "period", "period_listing");
+		$this->t_body->set_block("tplBODY", "timetable", "timetable_listing");
+		$this->t_body->set_block("timetable", "period", "period_listing");
 		$this->t_body->set_block("period", "day", "day_listing");
-		$this->t_body->set_block("tplBODY", "day_header", "day_header_listing");
+		$this->t_body->set_block("timetable", "day_header", "day_header_listing");
 		
 		include_once("include/page.php");
 	}
 
-	function displayWeek()
+	function getUserInfo($sid)
+	{
+		$db = new dbManager;
+		$query = "SELECT firstname, lastname, year, group_id, userCampus.campus 
+			FROM user JOIN userCampus ON id = uid WHERE synergy_id = {$sid}";
+		return $db->dbGetSingleRow($query);
+		
+	}
+
+	function displayWeek($sid)
 	{
 	     
+		$user = $this->getUserInfo($sid);
+		$this->t_body->set_var("PERSON", $user['firstname'].' '.$user['lastname']);
+		if($user['year'])
+			$this->t_body->set_var("YEAR", ', Year '.$user['year']);
+		else
+			$this->t_body->set_var("YEAR", "");
+		 
 		$periodNum = getPeriodNumber();
 		$dayNum = getDayNumber();	
 		
-		$timetable = getFullTimetable($_SESSION['sid'], $_SESSION['gid'], $_SESSION['campus'][0]);
+		$timetable = getFullTimetable($sid, $user['group_id'], $user['campus']);
 		
 		$days = count($timetable[0]['day']);
 		
@@ -110,14 +127,42 @@ class Timetable
 			$this->t_body->set_var("day_listing", '');
 			$periodCount++;
 		}
+		$this->t_body->parse("timetable_listing", "timetable", true);
 		
+		//reset blocks in case we coming back...
+		$this->t_body->set_var('period_listing', '');
+		$this->t_body->set_var("day_header_listing", '');
+	}
+	
+	function showPage()
+	{
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 }
 
 $timetable = new Timetable();
 
-$timetable->displayWeek();
-
+if(isParent($_SESSION['gid']))
+{
+	foreach($_SESSION['children'] as $child)
+	{
+		$timetable->displayWeek($child['sid']);
+	}
+	$timetable->showPage();
+}
+else
+{
+	if($_GET['sid'])
+	{
+		if(isStaff($_SESSION['gid']))
+			$timetable->displayWeek($_GET['sid']);
+		else
+			error(0);
+	}
+	else
+		$timetable->displayWeek($_SESSION['sid']);
+	
+	$timetable->showPage();
+}
 
 ?>

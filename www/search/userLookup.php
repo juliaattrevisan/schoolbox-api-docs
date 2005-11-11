@@ -17,16 +17,26 @@ class outUser
 
 		$db = new dbManager;
 		
-		$query = "SELECT user.id, firstname, lastname, username, groups.name AS gname, group_id, extension, synergy_id 
-			FROM user, groups LEFT JOIN ph_ext ON user.id = ph_ext.owner
-			WHERE user.group_id = groups.id AND user.id = '$id'";
+		$query = "SELECT user.id, firstname, lastname, username, groups.name AS gname, group_id, extension, 
+					synergy_id, local_email, alt_email
+				FROM user, groups LEFT JOIN ph_ext ON user.id = ph_ext.owner
+				WHERE user.group_id = groups.id AND user.id = '$id'";
 		$user = $db->dbGetSingleRow($query);
 		
 		//fill out all fields
 		
 		$this->t_body->set_var("NAME", $user['firstname']." ".$user['lastname']);
-		$this->t_body->set_var("EMAIL", "<a href=\"/mail/send.php?replyto=".$user['username']."@".MAIL_address."\">
-						".$user['username']."@".MAIL_address."</a>");
+		
+			//create owner email address
+			if($user['local_email'])
+				$email = "<a href=\"".$_SESSION['mailhandle'].$user['username']."@".MAIL_address."\">".$user['username']."@".MAIL_address."</a>";
+			else if($user['alt_email'])
+				$email = "<a href=\"".$_SESSION['mailhandle'].$user['alt_email']."\">".$user['alt_email']."</a>";
+			else
+				$email = "No address available";
+			
+		$this->t_body->set_var("EMAIL", $email);
+		
 		if($user['extension'] != "")
 			$this->t_body->set_var("EXT", "<b>Extension</b>: ".$user['extension']);
 		else

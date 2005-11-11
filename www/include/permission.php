@@ -74,4 +74,14 @@ function isStaff($gid)
 		return 0;
 }
 
+function isParent($gid)
+{
+	//Function check if parent
+	if(in_array($gid, unserialize(PARENTGROUPIDS)))
+		return 1;
+	else
+		return 0;
+	
+}
+
 ?>

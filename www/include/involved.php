@@ -40,7 +40,7 @@ function involvedInGroup($cid)
 		return 0;
 }
 
-function involvedCategoryList($accessType=1)
+function involvedCategoryList($id, $subjects, $accessType=1)
 {
 	//returns a list of categories that the user is involved in
 	//optional accessType specifies read=1 , write=2, ownership=3 access levels
@@ -49,32 +49,29 @@ function involvedCategoryList($accessType=1)
 
 	//for each subject involved in
 	$x=0;
-	while($_SESSION['subjects'][$x])
+	foreach($subjects as $subject)
 	{
 		//convert code to id and get name
-		$query = "SELECT name, id FROM category WHERE code = '".$_SESSION['sub_code'][$x]."'";
+		$query = "SELECT name, id FROM category WHERE code = '".$subject['code']."'";
 		$result = $db->dbGetSingleRow($query);
 
-		$catList['name'][$x] = $result['name'];
-		$catList['id'][$x] = $result['id'];
-		//give code for subjects only so it can be displayed aswell
-		$catList['code'][$x] = $_SESSION['sub_code'][$x];
-		
-		$x++;
+		$catList[] = array (	'name' 	=>	$result['name'],
+								'id' 	=>	$result['id'],
+								'code' 	=>	$subject['code'],
+							);
 	}
 
 	//get list of groups involved in
 	$query = "SELECT category.name, category.id FROM userAccess, category 
-	WHERE userAccess.uid = '".$_SESSION['id']."' AND userAccess.sid = category.id
+	WHERE userAccess.uid = $id AND userAccess.sid = category.id
 	AND userAccess.type >= '$accessType'";
 
 	$db->dbDoQuery($query);
 	while($result = $db->dbGetNextArray())
 	{
-  		$catList['name'][$x] = $result['name'];
-		$catList['id'][$x] = $result['id'];
-
-		$x++;
+		$catList[] = array (	'name' 	=>	$result['name'],
+								'id' 	=>	$result['id'],
+							);
 	}
 	
 	return $catList;

@@ -37,33 +37,26 @@ class OutPut
 		else
 			$this->t_body->set_var("timetable_block", "");
 
-
-		$this->t_body->set_file("news", "home/news.htm");
-		$this->t_body->set_file("weather", "home/weather.htm");
-		$this->t_body->set_file("calendar", "home/calendar.htm");
-		$this->t_body->set_file("whatnew", "home/changedfolder.htm");
-		
-		
-		if($this->outputWeather("weather"))
-			$this->t_body->parse("POS3", "weather");
-		else 
-			$this->t_body->set_var("POS3", "");
-		
-		if($this->outputCalendar("calendar"))
-			$this->t_body->parse("POS2", "calendar");
-		else 
-			$this->t_body->set_var("POS2", "");
-		
-		if($this->outputNews("news"))
-			$this->t_body->parse("POS1", "news");
-		else 
-			$this->t_body->set_var("POS1", "");
-		
-		if($this->outputWhatNew("whatnew"))
-			$this->t_body->parse("POS4", "whatnew");
-		else 
-			$this->t_body->set_var("POS4", "");
-		
+		//fetch layout for user
+		$query = "SELECT position, name, filename, function 
+					FROM welcomeLayout LEFT JOIN welcomeComponent ON componentID = welcomeComponent.id
+					WHERE gid = {$_SESSION['gid']}";
+		$result = $this->db->dbDoQuery($query);
+		while($component = $this->db->dbGetNextArray($result))
+		{
+			if($component['name'])
+			{
+				$this->t_body->set_file($component['name'], 'home/'.$component['filename']);
+				
+				$funcname = $component['function'];
+				if($funcname && $this->$funcname($component['name']))
+					$this->t_body->parse('POS'.$component['position'], $component['name']);
+				else 
+					$this->t_body->set_var('POS'.$component['position'], '');
+			}
+			else 
+				$this->t_body->set_var('POS'.$component['position'], '');
+		}		
 		$this->showPage();
 	}
 
@@ -179,8 +172,7 @@ class OutPut
 		//dont output weather if not enabled
 		if(!WEATHER_enable)
 			return false;
-			
-		$this->t_body->set_block($location, "weather", "weather_block");
+
 		$weather = new Weather("Current");
 		
 		$this->t_body->set_var("WEATHER_ICON", $weather->forecast[0]["Icon"]);
@@ -190,8 +182,6 @@ class OutPut
 		$this->t_body->set_var("SPEED", $weather->WindSpeed);
 		$this->t_body->set_var("HUMIDITY", $weather->Humid);
 		$this->t_body->set_var("ISSUED", date("g:i a", strtotime(str_replace('T', ' ',$weather->Date))));
-	
-		$this->t_body->parse("weather_block", "weather");
 		
 		return true;
 	}
@@ -220,76 +210,77 @@ class OutPut
 		//for each period set result
 		foreach($timetable as $period)
 		{
-			
-			$this->t_body->set_var("PERIOD_NAME", $period['periodName']);
-			$this->t_body->set_var("PERIOD_START", $period['periodStart']);
-			$this->t_body->set_var("PERIOD_END", $period['periodEnd']);
-			
-			if($period['description'])
+			if($period['periodSequence'] == 1)
 			{
-				//custom stuff for grimwade
-				if ($_SESSION['campus'][0] == 3 && SITE_location == 'mgs')
+				$this->t_body->set_var("PERIOD_NAME", $period['periodName']);
+				$this->t_body->set_var("PERIOD_START", $period['periodStart']);
+				$this->t_body->set_var("PERIOD_END", $period['periodEnd']);
+				
+				if($period['description'])
 				{
-					$post = strpos($period['code'], "EN");
-						
-					if ($post == 2)
+					//custom stuff for grimwade
+					if ($_SESSION['campus'][0] == 3 && SITE_location == 'mgs')
 					{
-						$this->set_var('PERIOD_DESC', 'Homeroom');
-						$this->set_var('PERIOD_CODE','');
-						$this->set_var('PERIOD_ROOM','');
+						$post = strpos($period['code'], "EN");
+							
+						if ($post == 2)
+						{
+							$this->set_var('PERIOD_DESC', 'Homeroom');
+							$this->set_var('PERIOD_CODE','');
+							$this->set_var('PERIOD_ROOM','');
+						}
+						else
+						{
+							$this->set_var('PERIOD_DESC', $period['description']);
+							$this->set_var('PERIOD_CODE','');
+							$this->set_var('PERIOD_ROOM',$period['room']);
+						}
+						
+						$this->set_var('PERIOD_ONCLICK','');
+						$this->set_var('PERIOD_ABSENTEES','');
 					}
-					else
+					else 
 					{
 						$this->set_var('PERIOD_DESC', $period['description']);
-						$this->set_var('PERIOD_CODE','');
+						$this->set_var('PERIOD_CODE','('.$period['code'].')');
 						$this->set_var('PERIOD_ROOM',$period['room']);
-					}
-					
-					$this->set_var('PERIOD_ONCLICK','');
-					$this->set_var('PERIOD_ABSENTEES','');
-				}
-				else 
-				{
-					$this->set_var('PERIOD_DESC', $period['description']);
-					$this->set_var('PERIOD_CODE','('.$period['code'].')');
-					$this->set_var('PERIOD_ROOM',$period['room']);
-					
-					//only show attendances to staff at mgs
-					if(isStaff($_SESSION['gid']) && SITE_location == 'mgs')
-						$this->set_var('PERIOD_ABSENTEES',"<br /><a href=\"/absentees/attendances.php?code=".$period['code']."\">attendances</a>");
-					else
-						$this->set_var('PERIOD_ABSENTEES','');
 						
-					$this->set_var('PERIOD_ONCLICK',"onClick=\"window.location='/homepage.php?code=".urlencode($period['code'])."'\"");
-				}		
+						//only show attendances to staff at mgs
+						if(isStaff($_SESSION['gid']) && SITE_location == 'mgs')
+							$this->set_var('PERIOD_ABSENTEES',"<br /><a href=\"/absentees/attendances.php?code=".$period['code']."\">attendances</a>");
+						else
+							$this->set_var('PERIOD_ABSENTEES','');
+							
+						$this->set_var('PERIOD_ONCLICK',"onClick=\"window.location='/homepage.php?code=".urlencode($period['code'])."'\"");
+					}		
+				
+				}
+				else
+				{
+					$this->set_var('PERIOD_DESC','');
+					$this->set_var('PERIOD_CODE','');
+					$this->set_var('PERIOD_ROOM','');
+					$this->set_var('PERIOD_ABSENTEES','');
+					$this->set_var('PERIOD_ONCLICK','');
+				}
 			
+				if($period['periodNumber'] == $periodNum)
+					$this->set_var("TIMETABLE_CLASS", "current");
+				else 
+					$this->set_var("TIMETABLE_CLASS", "normal");
+			
+			
+				//output period block
+				$this->t_body->parse("timetable_header_block", "timetable_header", true);
+				$this->t_body->parse("timetable_period_block", "timetable_period", true);
 			}
-			else
-			{
-				$this->set_var('PERIOD_DESC','');
-				$this->set_var('PERIOD_CODE','');
-				$this->set_var('PERIOD_ROOM','');
-				$this->set_var('PERIOD_ABSENTEES','');
-				$this->set_var('PERIOD_ONCLICK','');
-			}
-			
-			if($period['periodNumber'] == $periodNum)
-				$this->set_var("TIMETABLE_CLASS", "current");
-			else 
-				$this->set_var("TIMETABLE_CLASS", "normal");
-			
-			//output period block
-			$this->t_body->parse("timetable_header_block", "timetable_header", true);
-			$this->t_body->parse("timetable_period_block", "timetable_period", true);
-
 		}
-
 		$this->t_body->parse("timetable_block", "timetable");
 	}
 	
 	function outputWhatNew($location)
 	{
-		$catList = involvedCategoryList();
+		$catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
 		$whatnew = new WhatsNew();
 	
 		$this->t_body->set_block($location, "category_block", "new_category");
@@ -299,52 +290,95 @@ class OutPut
 		$flag = 0;
 
 		//for each subject
-		for($x = 0; $catList['id'][$x] ; $x++)
+		if(is_array($catList))
 		{
-			$cat = $whatnew->newCategory($catList['id'][$x]);
-			if($cat['news'])
+			foreach($catList as $catInfo)
 			{
-				$this->t_body->set_var("NEW_NEWS", $cat['news']);
-				$this->t_body->parse("new_news_item", "new_news");
-			}
-			else
-				$this->t_body->set_var("new_news_item", "");
-				
-			if($cat['files'])
-			{
-				$this->t_body->set_var("NEW_FILES", $cat['files']);
-				$this->t_body->parse("new_file_item", "new_file");
-			}
-			else
-				$this->t_body->set_var("new_file_item", "");
-			
-			if($cat['links'])
-			{
-				$this->t_body->set_var("NEW_URLS", $cat['links']);
-				$this->t_body->parse("new_url_item", "new_url");
-			}
-			else
-				$this->t_body->set_var("new_url_item", "");
-			
-			if($cat['news'] || $cat['files'] || $cat['links'])
-			{
-				if($catList['code'][$x])
-					$this->t_body->set_var("NEW_CATEGORY_NAME", $catList['name'][$x].' ('.$catList['code'][$x].')');
+				$cat = $whatnew->newCategory($catInfo['id']);
+				if($cat['news'])
+				{
+					if($cat['news'] > 1)
+						$this->t_body->set_var('NEW_PLURAL_NEWS', 's');
+					else
+						$this->t_body->set_var('NEW_PLURAL_NEWS', '');
+					$this->t_body->set_var("NEW_NEWS", $cat['news']);
+					$this->t_body->parse("new_news_item", "new_news");
+				}
 				else
-					$this->t_body->set_var("NEW_CATEGORY_NAME", $catList['name'][$x]);
-				$this->t_body->set_var("NEW_CATEGORY_ID", $catList['id'][$x]);
-				$this->t_body->parse("new_category", "category_block");
-				$flag = 1;
+					$this->t_body->set_var("new_news_item", "");
+					
+				if($cat['files'])
+				{
+					if($cat['files'] > 1)
+						$this->t_body->set_var('NEW_PLURAL_FILE', 's');
+					else
+						$this->t_body->set_var('NEW_PLURAL_FILE', '');
+					$this->t_body->set_var("NEW_FILES", $cat['files']);
+					$this->t_body->parse("new_file_item", "new_file");
+				}
+				else
+					$this->t_body->set_var("new_file_item", "");
+				
+				if($cat['links'])
+				{
+					if($cat['links'] > 1)
+						$this->t_body->set_var('NEW_PLURAL_LINK', 's');
+					else
+						$this->t_body->set_var('NEW_PLURAL_LINK', '');
+					$this->t_body->set_var("NEW_URLS", $cat['links']);
+					$this->t_body->parse("new_url_item", "new_url");
+				}
+				else
+					$this->t_body->set_var("new_url_item", "");
+				
+				if($cat['news'] || $cat['files'] || $cat['links'])
+				{
+					if($catInfo['code'])
+						$this->t_body->set_var("NEW_CATEGORY_NAME", $catInfo['name'].' ('.$catInfo['code'].')');
+					else
+						$this->t_body->set_var("NEW_CATEGORY_NAME", $catInfo['name']);
+					$this->t_body->set_var("NEW_CATEGORY_ID", $catInfo['id']);
+					$this->t_body->parse("new_category", "category_block", true);
+					$flag = 1;
+				}
+				
 			}
-			
 		}
 		
 		if(!$flag)
+		{
 			$this->t_body->set_var('new_category','');
+			return false;
+		}
 		
 		return true;
 	}
 
+	function outputChildSubjects($location)
+	{
+		$this->t_body->set_block($location, "student_block", "student_subjects");
+		$this->t_body->set_block("student_block", "subject_block", "subject_item");
+
+		foreach($_SESSION['children'] as $child)
+		{
+			$query = "SELECT firstname, lastname, year FROM user WHERE id = {$child['id']}";
+			$user = $this->db->dbGetSingleRow($query);
+			$this->t_body->set_var("STUDENT_NAME", $user['firstname'].' '.$user['lastname']);
+			$this->t_body->set_var("STUDENT_YEAR", $user['year']);
+			
+			foreach($child['subjects'] as $subject)
+			{
+				$this->t_body->set_var("STUDENT_SUBJECT_NAME", $subject['name']);
+				$this->t_body->set_var("STUDENT_SUBJECT_CODE", $subject['code']);
+				$this->t_body->parse("subject_item", "subject_block", true);
+			}
+			$this->t_body->parse("student_subjects", "student_block", true);
+			$this->t_body->set_var("subject_item", '');
+		
+		}
+		return true;
+	}
+	
 
 	function showPage()
 	{

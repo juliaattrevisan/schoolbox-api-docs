@@ -211,6 +211,7 @@ function getDayTimetable($synergy_id, $group, $campus, $daynumber)
 		$timetable[$x]['periodStart'] = $timetabledef['start'][$x];
 		$timetable[$x]['periodEnd'] = $timetabledef['end'][$x];
 		$timetable[$x]['periodNumber'] = $timetabledef['number'][$x];
+		$timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
 
 		if($timetabledef['sequence'][$x] != 2 && $desc['PeriodNumber'] == $timetable[$x]['periodNumber'])
 		{
@@ -245,7 +246,7 @@ function getFullTimetable($synergy_id, $group, $campus)
 			StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND 
 			StudentClasses.ClassCode = SubjectClasses.ClassCode AND 
 			((Timetable.FileSemester=".$_SESSION['FileSemester'].") AND (Timetable.FileYear=".$_SESSION['FileYear'].") AND 
-			(StudentClasses.ID='$synergy_id')) AND Timetable.PeriodNumber > '0'
+			(StudentClasses.ID='$synergy_id'))
 			ORDER BY Timetable.PeriodNumber, Timetable.DayNumber"; 
 	}
 	else
@@ -260,7 +261,7 @@ function getFullTimetable($synergy_id, $group, $campus)
 			AND Timetable.FileYear = SubjectClasses.FileYear AND 
 			((SubjectClasses.FileSemester=".$_SESSION['FileSemester'].") AND 
 			(SubjectClasses.FileYear=".$_SESSION['FileYear'].") AND 
-			(Timetable.StaffID='$synergy_id')) AND Timetable.PeriodNumber > '0' 
+			(Timetable.StaffID='$synergy_id'))
 			ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
 	}
 	
@@ -290,8 +291,7 @@ function getFullTimetable($synergy_id, $group, $campus)
 			
 		//for each day
 		for ($y = 1; $y <= $dayCount; $y++)
-		{	
-
+		{	 
 			if($timetabledef['sequence'][$x] != 2 && $desc['PeriodNumber'] == $timetable[$x]['periodNumber'] && $desc['DayNumber'] == $y)
 			{
 				$timetable[$x]['day'][$y]['periodOn'] = 1;
@@ -299,6 +299,10 @@ function getFullTimetable($synergy_id, $group, $campus)
 				$timetable[$x]['day'][$y]['code'] = $desc['ClassCode'];
 				$timetable[$x]['day'][$y]['room'] = $desc['Room'];
 				$desc = mssql_fetch_array($result);
+				
+				//bad data in synergetic.. why..?? 
+				while($desc['DayNumber'] == $y)
+					$desc = mssql_fetch_array($result);
 			
 			}
 			else
