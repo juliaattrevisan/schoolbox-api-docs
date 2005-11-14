@@ -1,0 +1,139 @@
+<?php
+/************************************************************
+*                                                           *
+*         Copyright (c) 2002-2003 Lektec Consulting         *
+*                                                           *
+************************************************************/
+//outputs form to get users mail details and processes the information
+
+require_once("../include/session.php");
+require_once("../include/include.php");
+require_once("mail.php");
+
+class OutPut
+{
+	function OutPut()
+	{
+		$this->t_body = new Template(TPL_directory);
+		$this->t_body->set_file("tplBODY", "mail/send.htm");
+
+		$this->t_body->set_var("TITLE", HEADING." - Send Mail");
+		
+		include_once("../include/page.php");
+	}
+
+	function forwardMail($msgid)
+	{
+		//reply to the email with the the $msgid
+		//first include the mail class
+		//this opens the mailbox
+		$mail = new Mail;		
+		$mail->checkMailDetails();
+		$inbox = $mail->openMailBox();
+
+		//get email		
+		include("mail_parser.php");
+		$email = new mail_parser($inbox, $msgid);
+
+		$subject = "Fw: " . $email->decodeHeader($email->header->Subject);
+		
+		// display message body with forward symbol >
+		$body = "\n\n";
+		$body .= ">From: ".$email->header->fromaddress."\n";
+		$body .= ">To: ".$email->header->toaddress."\n";
+
+		if($email->header->ccaddress)
+		{
+			$body .= ">Cc: ".$email->header->ccaddress."\n";
+		}
+
+		$body .= ">Date: ".$email->header->Date."\n";
+		$body .= ">Subject: " . $email->decodeHeader($email->header->Subject)."\n\n>";
+
+		$text = $email->getBody("TEXT_ONLY");
+		$body .= str_replace("\n", "\n>", $text);
+
+		$body = str_replace("\'", "'", $body);
+	
+		$this->showPage("", "", $subject, $body);
+	}
+
+	function replyMail($msgid, $qoute = 0)
+	{
+		//reply to the email with the the $msgid
+		//first include the mail class
+		$mail = new Mail;		
+		//print "opening mailbox";
+		$mail->checkMailDetails();
+		$inbox = $mail->openMailBox();
+
+		//get email		
+		include("mail_parser.php");
+		$email = new mail_parser($inbox, $msgid);
+
+		// check for Reply-To: header and use if available
+		if($email->header->reply_toaddress)
+			$to = trim($email->header->reply_toaddress);
+		else
+			$to = trim($email->header->fromaddress);
+
+		//if subject already has Re: dont add another one
+		if(strtolower(substr(trim($headers->Subject), 0, 3)) == "re:")
+			$subject = $email->header->Subject;
+		else
+			$subject = "Re: " . $email->header->Subject;
+		
+		$body = "";
+
+		//if qoute enabled put message in body
+		if($qoute)
+		{	
+			
+			$body = "\n\n\nOn " . $email->header->Date . ", you wrote: \n>";
+			$text = $email->getBody("TEXT_ONLY");
+			$body .= str_replace("\n", "\n>", $text);
+
+		}
+
+		$body = str_replace("\'", "'", $body);
+
+		$this->showPage($to, "", $subject, $body);	
+
+	}
+
+
+	function showPage($replyto = "", $bcc = "", $subject = "", $body = "")
+	{
+		$this->t_body->set_var("SUBJECT", $subject);
+		$this->t_body->set_var("BODY", $body);
+		$this->t_body->set_var("REPLYTO", $replyto);
+		$this->t_body->set_var("BCC", $bcc);
+		$this->t_body->pparse("finaloutput", "tplBODY");
+	}
+
+}
+
+$myPage = new OutPut();
+
+//if replyto has been specified
+if(isset($_GET['reply']) && $_GET['reply'])
+{
+	$myPage->replyMail($_GET['reply'], $_GET['qoute']);
+}
+else if(isset($_GET['forward']) && $_GET['forward'])
+{
+	$myPage->forwardMail($_GET['forward']);
+}
+else if( isset($_POST['replyto']) && isset($_POST['bcc']) && $_POST['bcc'])
+	$myPage->showPage($_POST['replyto'], $_POST['bcc']);
+else if( (isset($_GET['replyto'])) && $_GET['replyto'])
+	$myPage->showPage($_GET['replyto']);
+else if( (isset($_POST['replyto'])) && $_POST['replyto'])
+	$myPage->showPage($_POST['replyto']);
+//if form has been submitted
+else if(isset($_POST['to']) && $_POST['to'])
+{
+	$myPage->sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message']);
+}	
+else
+	$myPage->showPage();

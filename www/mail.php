@@ -107,14 +107,14 @@ class OutPut
 					$from = $email->header->from[0]->personal;
 				else
 					$from = $email->header->from[0]->mailbox . "@" . $email->header->from[0]->host;
-				$this->set_var("FROM", $from);
+				$this->set_var("FROM", scrubTEXT($from));
 
 				//$this->set_var("FROM", htmlspecialchars($email->header->fromaddress));
 				//correction if no subject
 				if ($email->header->Subject == "")
 					$this->set_var("SUBJECT", "<a href=\"/mail/view_mail.php?msgid=$x\">No Subject</a>");
 				else
-					$this->set_var("SUBJECT", "<a href=\"/mail/view_mail.php?msgid=$x\">".$email->decodeHeader($email->header->Subject)."</a>");
+					$this->set_var("SUBJECT", "<a href=\"/mail/view_mail.php?msgid=$x\">".scrubTEXT($email->decodeHeader($email->header->Subject))."</a>");
 					
 				// parse structure to see if attachments exist
 				// display icon if so

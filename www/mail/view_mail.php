@@ -50,11 +50,11 @@ class OutPut
 		$this->t_body->set_var("DELETE", "/mail/view_mail.php?delete=$current");		
 		
 		//reply button	
-		$this->t_body->set_var("REPLY", "/mail/send.php?reply=$current");
+		$this->t_body->set_var("REPLY", "/mail/createMail.php?reply=$current");
 		//reply with quote button
-		$this->t_body->set_var("REPLYQ", "/mail/send.php?reply=$current&qoute=1");
+		$this->t_body->set_var("REPLYQ", "/mail/createMail.php?reply=$current&qoute=1");
 		//forward
-		$this->t_body->set_var("FORWARD", "/mail/send.php?forward=$current");
+		$this->t_body->set_var("FORWARD", "/mail/createMail.php?forward=$current");
 	}
 
 	function viewMail($msgid)

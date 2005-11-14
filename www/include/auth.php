@@ -75,7 +75,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 		if(MAIL_enable == 0 || $user['mail_handler'])
 			$_SESSION['mailhandle'] = "mailto:";
 		else
-			$_SESSION['mailhandle'] = "/mail/send.php?replyto=";
+			$_SESSION['mailhandle'] = "/mail/createMail.php?replyto=";
 
 		//if wenona store password in session for single signon
 		if(SITE_location == 'wenona')
