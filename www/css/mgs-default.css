@@ -16,7 +16,7 @@ body {
 /*--------------------------------------------------------------------------------------*/
 /* HEADINGS */
 /*--------------------------------------------------------------------------------------*/
-h1, h2 {
+h1, h2, h3{
 	font-weight:normal;
 	letter-spacing:-1px;
 	margin:10px 0 0 0;
@@ -26,7 +26,6 @@ h1, h2 {
 	}
 
 h1 {
-	/*color:#00458C;*/
 	font-size:120%;
 	border-left:20px solid #00458C;
 	border-bottom:4px solid #00458C;
@@ -34,11 +33,14 @@ h1 {
 	
 h2 {
 	margin-left:20px;
-	/*color:#06c;*/
 	font-size:110%;
 	border-left:10px solid #06c;
 	border-bottom:4px solid #06c;
 	}
+
+h3 {
+	font-size:100%;
+}
 
 .sideWrap h3 {
 	margin:0 0 3px 0;
@@ -50,6 +52,8 @@ h2 {
 	/*font-weight:bold;*/
 	/*font-style:italic;*/
 	}
+
+
 
 /*--------------------------------------------------------------------------------------*/
 /* STANDARD ELEMENTS */
@@ -74,7 +78,7 @@ acronym, dfn, abbr {
 	padding-left:22px;
 	margin:3px 0 0 20px;
 	font-weight:normal;
-	line-height:1.5em;
+	line-height:1.2em;
 	color:#000;
 	}
 #content ul li {
