@@ -16,7 +16,7 @@
 <script type="text/javascript" src="/javascript/drop_down.js"></script>
 <!-- #BeginEditable "scripts" -->
 
-<script language="JavaScript">
+<script type="text/javascript">
 function checkAll(theForm, state) {
 	for (i=0,n=theForm.elements.length;i<n;i++){
 		if (theForm.elements[i].type == 'checkbox'){
@@ -107,18 +107,18 @@ function checkAll(theForm, state) {
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
 			<h1>Listing messages for {USER}</h1> 
-			<span class="header_option"><a href="mail/send.php"><strong>send mail</strong></a></span> 
+			<span class="header_option"><a href="mail/createMail.php"><strong>send mail</strong></a></span> 
 			<div class="indent"> 
 				Message Index <br />
 				{TOTAL}
 				<form action="mail.php" method="post" name="mailList" id="mailList"> 
 					<table> 
 						<tr> 
-							<th>Delete</td> 
-							<th>&nbsp;</td> 
-							<th>From</td> 
-							<th>Subject</td> 
-							<th>Date</td> 
+							<th>Delete</th> 
+							<th>&nbsp;</th> 
+							<th>From</th> 
+							<th>Subject</th> 
+							<th>Date</th> 
 						</tr> 
 						<!-- BEGIN mail_listing --> 
 						<tr> 

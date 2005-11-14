@@ -15,8 +15,41 @@
 <link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
 <script type="text/javascript" src="/javascript/drop_down.js"></script>
 <!-- #BeginEditable "scripts" -->
-
-
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript">
+tinyMCE.init({
+	mode : "textareas",
+	theme : "advanced",
+	plugins : "table",
+	theme_advanced_layout_manager : "RowLayout",
+	theme_advanced_containers_default_align : "left",
+	theme_advanced_container_default_class : "mceToolbar",
+	theme_advanced_containers : "row1,row2,mceEditor,mceElementpath",
+	theme_advanced_container_row1_class : "mceToolbarTop",
+	theme_advanced_container_row2_class : "mceToolbarTop",
+	theme_advanced_container_row1 : "bold,italic,underline,separator,bullist,numlist,outdent,indent,separator,sub,sup,separator,link,unlink,charmap,hr,separator,undo,redo",
+	theme_advanced_container_row2 : "forecolor,tablecontrols,separator,removeformat,cleanup,code",
+	extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
+});
+</script>
+<script language="JavaScript" type="text/javascript">
+function verify()
+{
+        var msg = ""
+        if(document.getElementById('mailForm').to.value == ""){
+                msg += "You need to have a recipient\n";
+        }
+        if(msg != ""){
+                alert(msg);
+                return false;
+        }
+        else
+	{
+                return true;
+	}
+}
+</script>
+<script type="text/javascript" src="/javascript/multifile.js"></script>
 <!-- #EndEditable -->
 </head>
 <body>
@@ -106,10 +139,6 @@
 							<a href="/search/userLookup.php">address book</a></td> 
 					</tr> 
 					<tr> 
-						<td><img src="../newimages/gfx_transparentspacer_001.gif" width="55" height="7" /></td> 
-						<td>&nbsp;</td> 
-					</tr> 
-					<tr> 
 						<td><h2>CC:</h2></td> 
 						<td> <input type="text" name="cc" size="50" /> </td> 
 					</tr> 
@@ -123,11 +152,18 @@
 					</tr> 
 					<tr> 
 						<td>&nbsp;</td> 
-						<td><textarea name="message" cols="80" rows="12">{BODY}</textarea></td> 
+						<td><textarea name="message" style="width:100%;height:350px">{BODY}</textarea></td> 
 					</tr> 
 					<tr> 
-						<td><h2>Attachment:</h2></td> 
-						<td><input type="file" name="attachment" /></td> 
+						<td><h2>Attachments:</h2></td> 
+						<td><input id="attachment" type="file" name="file[]" />
+						<div id="files_list"></div>
+						<script type="text/javascript">
+						<!-- Create an instance of the multiSelector class, pass it the output target and the max number of files -->
+						var multi_selector = new MultiSelector( document.getElementById( 'files_list' ), 5 );
+						<!-- Pass in the file element -->
+						multi_selector.addElement( document.getElementById( 'attachment' ) );
+						</script></td> 
 					</tr> 
 					<tr> 
 						<td>&nbsp;</td> 
