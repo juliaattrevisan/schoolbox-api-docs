@@ -9,18 +9,21 @@
 require_once("../include/session.php");
 require_once("../include/include.php");
 require_once("mail.php");
+require_once("mail_parser.php");
 
 class OutPut
 {
 	function OutPut()
 	{
 		$this->t_body = new Template(TPL_directory);
+
 		$this->t_body->set_file("tplBODY", "mail/view_mail.htm");
 
 		$this->t_body->set_var("TITLE", HEADING." - View Mail");
 		
 		$this->t_body->set_block("tplBODY", "attachment_block", "attachment_listing");
 		$this->t_body->set_block("tplBODY", "cc_block", "cc_block_var");
+		$this->t_body->set_block("tplBODY", "iframe_block", "iframe_block_var");
 
 		include_once("../include/page.php");
 	}
@@ -67,7 +70,6 @@ class OutPut
 		$total = imap_num_msg($inbox);
 		$this->setControlPanel($total, $msgid);
 
-		include("mail_parser.php");
 		$email = new mail_parser($inbox, $msgid);
 
 		//correction if no subject
@@ -75,6 +77,8 @@ class OutPut
 			$this->set_var("SUBJECT", "No Subject");
 		else	
 			$this->set_var("SUBJECT", $email->decodeHeader($email->header->Subject));
+		
+		$this->set_var("MSGID", $msgid);
 		
 		$date = strtotime($email->header->Date);
 		$this->set_var("DATE", date('l j/m/y g:i A', $date));
@@ -114,9 +118,19 @@ class OutPut
 			$this->set_var("cc_block_var", "");
 
 	
-		$body = $email->getBody("HTML");
+		if($email->isHTML())
+		{
+			$this->t_body->set_var('BODY', '');
+			$this->t_body->parse("iframe_block_var", "iframe_block");
+		}
+		else
+		{
+			$this->set_var('iframe_block_var', '');
+			$body = $email->getBody('TEXT');
+			$this->t_body->set_var('BODY', $body);	
+		}
+		
 
-		$this->t_body->set_var("BODY", $body);
 
 		$attachments = $email->getAttachmentList();
 
@@ -125,9 +139,7 @@ class OutPut
 		{
 			for($x=0; $x<sizeof($attachments); $x++)
 			{
-				$fileurl = "<li>";
-				$fileurl .= "<a href=\"/mail/download.php?msgid=".$msgid."&pid=".$attachments[$x]['pid']."&save=1\">";
-				$fileurl .= $attachments[$x]['name']."</a> (".ceil($attachments[$x]['size']/1024)." KB)";
+				$fileurl = "<a href=\"/mail/download.php?msgid=$msgid&pid={$attachments[$x]['pid']}&save=1\">{$attachments[$x]['name']}</a> (".bytesToString($attachments[$x]['size']).")";
 				$this->set_var("ATTACHMENT", $fileurl);
 				$this->t_body->parse("attachment_listing", "attachment_block", true);
 			}

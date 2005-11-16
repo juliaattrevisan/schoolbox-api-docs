@@ -44,6 +44,15 @@ class mail_parser
 			$this->email = new email(1, &$this->structure);
 	}
 
+	function isHTML()
+	{
+		$this->searchParts(0, "HTML", &$this->email, &$pidList);
+		if(sizeof($pidList) < 1)
+			return false;
+		else
+			return true;
+	}
+
 	function getBody($prefferred)
 	{
 		//gets preffered email body content
@@ -52,9 +61,9 @@ class mail_parser
 		
 		if($prefferred == "HTML")
 		{
-			$pid = $this->searchParts(0, "HTML", &$this->email, &$pidList);
+			$this->searchParts(0, "HTML", &$this->email, &$pidList);
 			if(sizeof($pidList) < 1)
-				$pid = $this->searchParts(0, "PLAIN", &$this->email, &$pidList);
+				$this->searchParts(0, "PLAIN", &$this->email, &$pidList);
 			else
 				$type = "HTML";
 		}
@@ -63,19 +72,20 @@ class mail_parser
 			$pid = $this->searchParts(0, "PLAIN", &$this->email, &$pidList);
 			if(sizeof($pidList) < 1)
 			{
-				$pid = $this->searchParts(0, "HTML", &$this->email, &$pidList);
+				$this->searchParts(0, "HTML", &$this->email, &$pidList);
 				$type = "HTML";
 			}	
 		}		
 		
 		$body = imap_fetchbody($this->inbox, $this->msgid, $pidList[0]);
+		$body = $this->decodeMail($this->getEncoding($pidList[0]), $body);
 		
 		//if we retrieved a html body format appropriately
 		if($type == "HTML")
 		{
-			$body = $this->decodeMail($this->getEncoding($pidList[0]), $body);
+			//$body = $this->decodeMail($this->getEncoding($pidList[0]), $body);
 			//get rid of html/head/body tags
-			$body = preg_replace(array('/<!DOCTYPE[^>]*>/si','/<html[^>]*>.*<body[^>]*>/si','/<\/body>.*<\/html>/si'), array('','',''), $body);
+			//$body = preg_replace(array('/<!DOCTYPE[^>]*>/si','/<html[^>]*>.*<body[^>]*>/si','/<\/body>.*<\/html>/si'), array('','',''), $body);
 			$body = scrubHTML($body);
 			//if inline images are to be included
 			//if($inlineimage)
