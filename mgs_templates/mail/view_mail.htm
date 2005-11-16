@@ -124,12 +124,13 @@
 					<td class="mailHeader" colspan="6"><strong>Subject : </strong>{SUBJECT}</td> 
 				</tr> 
 				<tr> 
-					<td colspan="6"><p>{BODY}</p></td> 
+					<td colspan="6">
+					<!-- BEGIN iframe_block --><iframe frameborder="0" src="mailBody.php?msgid={MSGID}" style="width:100%; height:400px"></iframe><!-- END iframe_block -->{BODY}</td> 
 				</tr> 
 				<tr> 
 					<td colspan="6"><ul> 
 							<!-- BEGIN attachment_block --> 
-							{ATTACHMENT}
+							<li>{ATTACHMENT}</li>
 							<!-- END attachment_block --> 
 						</ul></td> 
 				</tr> 
