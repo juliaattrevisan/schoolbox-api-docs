@@ -4,14 +4,22 @@
 //it provides extra features in terms of locating and identifying particular
 //parts of an email. given the recursive nature of email this is often
 //a complicated process.  hopefully this file will help
-include($_SERVER['DOCUMENT_ROOT']."/mail/email.php");
+require_once($_SERVER['DOCUMENT_ROOT']."/mail/email.php");
 require_once($_SERVER['DOCUMENT_ROOT']."/include/html-parse.php");
+
+
 
 class mail_parser
 {
 
-        function mail_parser($inbox, $msgid)
-        {
+	// message types
+	var $type = array("text", "multipart", "message", "application", "audio","image", "video", "other");
+
+	// message encodings
+	var $encoding = array("7bit", "8bit", "binary", "base64", "quoted-printable","other");
+
+	function mail_parser($inbox, $msgid)
+	{
 		//check email exists in mailbox
 		if($msgid > 0 && $msgid <= imap_num_msg($inbox))
 		{
@@ -20,9 +28,9 @@ class mail_parser
 		
 			$this->inbox = $inbox;
 			$this->msgid = $msgid;
-
+	
 			$this->parseStructure();
-        	}
+			}
 		else
 			error(46);	
 
@@ -36,8 +44,8 @@ class mail_parser
 			$this->email = new email(1, &$this->structure);
 	}
 
-        function getBody($prefferred)
-        {
+	function getBody($prefferred)
+	{
 		//gets preffered email body content
 		
 		$pidList = array();
@@ -59,19 +67,19 @@ class mail_parser
 				$type = "HTML";
 			}	
 		}		
-	
+		
 		$body = imap_fetchbody($this->inbox, $this->msgid, $pidList[0]);
-
+		
 		//if we retrieved a html body format appropriately
 		if($type == "HTML")
 		{
 			$body = $this->decodeMail($this->getEncoding($pidList[0]), $body);
 			//get rid of html/head/body tags
-			$body = preg_replace(array('/<html[^>]*>.*<body[^>]*>/si','/<\/body>*<\/html>/si'), array('',''), $body);
+			$body = preg_replace(array('/<!DOCTYPE[^>]*>/si','/<html[^>]*>.*<body[^>]*>/si','/<\/body>.*<\/html>/si'), array('','',''), $body);
 			$body = scrubHTML($body);
- 			//if inline images are to be included
- 			//if($inlineimage)
- 			$body = preg_replace('/\"cid:([^\"]*)/i', "\"download.php?msgid=".trim($this->header->Msgno)."&cid=$1", $body);
+			//if inline images are to be included
+			//if($inlineimage)
+			$body = preg_replace('/\"cid:([^\"]*)/i', "\"download.php?msgid=".trim($this->header->Msgno)."&cid=$1", $body);
 			return $body;
 		}
 		else if($prefferred == "TEXT_ONLY") //used to output text as text
@@ -82,27 +90,26 @@ class mail_parser
 		{
 			return html_link(nl2br(scrubTEXT(stripslashes(trim($body)))));
 		}
+	}
 
-        }
-
-        function searchParts($type, $subtype, &$part, &$resultList)
-        {
-			if($part->type == $type && strtolower($part->subtype) == strtolower($subtype))
-				$resultList[] = $part->pid;
-			else
+	function searchParts($type, $subtype, &$part, &$resultList)
+	{
+		if($part->type == $type && strtolower($part->subtype) == strtolower($subtype))
+			$resultList[] = $part->pid;
+		else
+		{
+			if(is_array($part->subparts))
 			{
-				if(is_array($part->subparts))
+				foreach($part->subparts as $subpart)
 				{
-					foreach($part->subparts as $subpart)
+					//first check that we not going into another message
+					if($subpart->type != TYPEMESSAGE)
 					{
-						//first check that we not going into another message
-						if($subpart->type != TYPEMESSAGE)
-						{
-							$this->searchParts($type, $subtype, &$subpart, &$resultList);
-						}	
-					}
+						$this->searchParts($type, $subtype, &$subpart, &$resultList);
+					}	
 				}
 			}
+		}
 	}
 
 	function getEncoding($pid)
@@ -148,16 +155,13 @@ class mail_parser
 	
 	}
 
-	function decodeMail($code, $data)
+	function decodeMail($code, $body)
 	{
-		if($code===0){return imap_utf7_decode($data);}
-		if($code==1){return imap_utf8($data);}
-		if($code==2){return ($data);}
-		if($code==3){return imap_base64($data);}
-		if($code==4){return imap_qprint($data);}
-		if($code==5){return ($data);}
-		
-		return $data;
+        switch ($this->encoding[$code]) {
+            case 'quoted-printable':  return imap_qprint($body);
+            case 'base64':            return imap_base64($body);
+            default:                  return $body;
+        }
 	}
 	
 	function decodeHeader($text)

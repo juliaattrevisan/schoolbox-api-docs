@@ -6,11 +6,6 @@
 ************************************************************/
 //mail object.. controls all attributes of mail processing
 
-// message types
-$type = array("text", "multipart", "message", "application", "audio","image", "video", "other");
-// message encodings
-$encoding = array("7bit", "8bit", "binary", "base64", "quoted-printable","other");
-
 class Mail
 {
 
