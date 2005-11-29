@@ -32,6 +32,7 @@ $allowedFileTypes = array(
         "application/x-photoshop" => array("image-psd.png",0, array("psd") ),
 		"application/ogg" => array("audio-x-wav.png", 1, array("ogg")),
 		"application/x-gsp" => array("application-x-none.png", 0, array("gsp")),
+		"application/x-shockwave-flash" => array("application-x-none.png",1,array("swf", "cab") ),
         "application/octet-stream" => array("application-x-none.png", 0, array("ins", "ogg") ),
         "audio/wav" => array("audio-x-wav.png",0, array("wav") ),
         "audio/mpeg" => array("audio-mpeg.png",0, array("mp3", "mp2") ),
