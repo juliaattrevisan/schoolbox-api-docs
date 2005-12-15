@@ -66,17 +66,7 @@ define('SYN_CAMPUS_Codes', serialize(array(
 )));
 
 //Timetable days as this is not found in synergetic and it can be a bit hard to calculate pre-timetable
-define('TIMETABLE_day_count',serialize(array(7,7,5)));
-
-//Temporary timetable definition until synergy interface is written
-define("TIMETABLE_definition", serialize(array(
-		//SS
-		array("period"=>6, "day"=>7, "periodnames"=>array(1=>"Period 1", "Period 2", "Period 3", "Period 4", "Period 5", "Period 6")),
-		//Wad
-		array("period"=>6, "day"=>7, "periodnames"=>array(1=>"Period 1", "Period 2", "Period 3", "Period 4", "Period 5", "Period 6")),
-		//Grim
-		array("period"=>9, "day"=>5, "periodnames"=>array(1=>"Period 1", "Period 2", "Period 3", "Period 4", "Period 5", "Period 6", "Period 7", "Period 8", "Period 9"))
-)));
+define('TIMETABLE_day_count',serialize(array(1=>7,7,5)));
 
 
 //Webmail
@@ -104,6 +94,7 @@ define("HOMEPAGESERVICE", 1);				//Value that represents the homepage module in 
 
 define("STUDENTGROUPIDS", serialize(array(3)));	//List of id numbers representing student groups
 define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
+define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 
 
 ?>
