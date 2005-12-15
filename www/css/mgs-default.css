@@ -70,10 +70,12 @@ acronym, dfn, abbr {
 	cursor:help;
 	}
 
+/*
 #content ul, #content ol {
 	margin:0;
 	text-align:left;
 	}
+*/
 #content ul li, #content ol li{
 	padding-left:22px;
 	margin:3px 0 0 20px;
@@ -183,8 +185,6 @@ a img {
 /*--------------------------------------------------------------------------------------*/
 
 #outerWrap, #header, #innerWrap, #left, #content {
-	margin:0;
-	padding:0;
 	border:0;
 	background:transparent;
 	}
@@ -229,7 +229,7 @@ a img {
 	margin: 0.8em 0 0 0;
 	}
 .sideWrap {
-	margin:10px 10px 20px 10px;
+	margin:10px 10px 10px 10px;
 	background:#0065CE;
 	}
 .whiteWrap {
@@ -363,114 +363,60 @@ a img {
 /*--------------------------------------------------------------------------------------*/
 /* MAIN FORMS */
 /*--------------------------------------------------------------------------------------*/
-.standardForm fieldset {
-	border:0;
-	text-align:left;
-	background:#fff;
-	margin:0;
-	padding:0;
-	}
-.standardForm label{
-	font-family:inherit;
-	font-weight:normal;
-	font-size:90%;
-	line-height:2.1em;
-	display:block;
-	color:#666;
-	padding:0;
-	border:0;
-	background:transparent;
-	}
-.standardForm label span {
-	font-size:70%;
-	color:#f00;
-	font-weight:bold;
-	font-family:Verdana, Arial, sans-serif;
-	}
-.standardForm input, .standardForm textarea, .standardForm select {
-	border-collapse:collapse;
-	border:1px solid #efefef;
-	font-weight:normal;
-	font-size:60%;
-	margin:0 0 1em 0;
-	padding:2px;
-	vertical-align:middle;
-	}
-.standardForm input:focus, .standardForm textarea:focus, .standardForm select:focus {
-	border-color:#39c;
-	}
-.standardForm input:hover, .standardForm textarea:hover, .standardForm select:hover {
-	border:1px solid #A5C7FF;
-	}
-.standardForm input.btn {
-	margin:10px 0;
-	cursor:pointer;
-	color:#000;
-	border:2px solid;
-	border-color:#efefef #333 #333 #efefef;
-	background:#eee;
-	padding:.3em 0.8em 0.3em 0.8em;
-	}
-.standardForm p {
-	font-family:inherit;
-	font-weight:normal;
-	font-size:90%;
-	line-height:2.1em;
-	color:#666;
-	background:transparent;
-	}
-/*--------------------------------------------------------------------------------------*/
-/* OTHER FORMS */
-/*--------------------------------------------------------------------------------------*/
-#searchForm input, #searchForm select {
-	margin-left:10px;
-	}
-#searchForm input.short, #searchForm select {
-	width:110px;padding:0;
-	border:1px solid #0065CE;
-	}
-#searchForm input.img {
-	margin-bottom:4px;
-	}
-/*--------------------------------------------------------------------------------------*/
-/* OTHER FORMS */
-/*--------------------------------------------------------------------------------------*/
-.standard {
+.standardForm {
 	padding:4px;
 	background:#ccc;
-	}
-.standard em {
-	font-size:70%;
-	font-style:normal;
-	}
-.standard input, .standard select {
-	border-collapse:collapse;
-	border:1px solid #333;
+	border:0;
+}
+
+/* Form Elements */
+.standardForm input, .standardForm textarea, .standardForm select {
 	font-weight:normal;
-	font-size:80%;
 	margin:0 0 1em 0;
 	padding:2px;
 	vertical-align:middle;
+	font-size:90%
 	}
-.standard table td {
-	vertical-align:top;
+	
+.standardForm option {
+	margin: 0 0.8em 0 0;
+	padding: 2px 0 0 2px;
+
+}
+
+.standardForm input:focus, .standardForm textarea:focus, .standardForm select:focus 
+.standardForm input:hover, .standardForm textarea:hover, .standardForm select:hover {
+	border-color:#00458C;
 	}
-.standard input.btn {
-	margin:1em 0;
+
+
+/* From Button */
+.standardForm input.btn {
 	cursor:pointer;
-	color:#000;
-	border:2px solid;
-	border-color:#efefef #333 #333 #efefef;
-	background:#eee;
-	padding:.3em 0.8em 0.3em 0.8em;
+	border: 3px double #999;
+	border-top-color: #eee;
+	border-left-color: #eee;
+	padding: 0.25em;
+	background-color:#ccc;
+	background-image: url("/images/background_form_element.gif");
+	background-repeat:repeat-x;
+	color: #333;
+	font-size: 80%;
+	font-weight: bold;
 	}
-.standard input.timeField {
+	
+.standardForm input.btn:active{
+	border: 3px double #eee;
+	border-top-color: #999;
+	border-left-color: #999;
+	}
+	
+.standardForm .timeField {
 	width:2em;
 	}
-.standard .short {
-	width:5em;
-	}	
-.standard h2 {
+	
+/* Field Labels */
+.standardForm h2 {
 	font-weight:bold;
 	font-size:100%;
 	padding:0;
@@ -478,9 +424,40 @@ a img {
 	margin:0;
 	color:#333;
 	}
-.standard td.formLabelWidth {
+	
+.standardForm em {
+	font-size:70%;
+	font-style:normal;
+	}
+		
+/* Form Table Layouts */
+.standardForm table td {
+	vertical-align:top;
+	}
+.standardForm td.formLabelWidth {
 	width:260px;
 	}
+	
+
+
+/*--------------------------------------------------------------------------------------*/
+/* OTHER FORMS */
+/*--------------------------------------------------------------------------------------*/
+#searchForm {
+	background-color:#FFF;
+}
+#searchForm input, #searchForm select {
+	margin:2px 2px 2px 6px;
+	}
+#searchForm input.short, #searchForm select {
+	width:110px;padding:0;
+	border:1px solid #0065CE;
+	}
+/*--------------------------------------------------------------------------------------*/
+/* OTHER FORMS */
+/*--------------------------------------------------------------------------------------*/
+
+
 /*--------------------------------------------------------------------------------------*/
 /* SPECIFIC ELEMENT DECLARATIONS */
 /*--------------------------------------------------------------------------------------*/
