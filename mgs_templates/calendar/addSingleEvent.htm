@@ -124,7 +124,7 @@ window.onload = new Function('showRow();');
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" -->
 		<h1>{FUNCTION} Event</h1>
-            <form class="standard" method="post" action="/calendar/addEvent.php" id="eventForm">
+            <form class="standardForm" method="post" action="/calendar/addEvent.php" id="eventForm">
                     <table>
                       <tr> 
                         <td class="formLabelWidth" valign="top"><h2>Date</h2>
@@ -147,7 +147,7 @@ window.onload = new Function('showRow();');
                         <td> <input name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />
                           : 
                           <input name="minute" type="text" maxlength="2" value="{MIN}" class="timeField" /> 
-                          <select name="period" class="short">
+                          <select name="period">
                             <option value="am" {AM} >AM</option>
                             <option value="pm" {PM} >PM</option>
                           </select>
@@ -155,7 +155,7 @@ window.onload = new Function('showRow();');
                           <input name="tohour" type="text" maxlength="2" value="{TOHOUR}" class="timeField" />
                           : 
                           <input name="tominute" type="text" maxlength="2" value="{TOMIN}" class="timeField" /> 
-                          <select name="toperiod" class="short">
+                          <select name="toperiod">
                             <option value="am" {AMTO}>AM</option>
                             <option value="pm" {PMTO}>PM</option>
                           </select></td>

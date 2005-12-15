@@ -122,7 +122,7 @@ window.onload = new Function('showRow();');
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" -->
 	<h1>{FUNCTION} Reoccurring Monthly Event</h1>
-    <form id="eventForm" class="standard" method="post" action="/calendar/addEvent.php">
+    <form id="eventForm" class="standardForm" method="post" action="/calendar/addEvent.php">
                     <table>
                       <tr> 
                         <td class="formLabelWidth"><h2>Day</h2><em>Select the day of the month on which the event will reoccur.</em></td>
@@ -155,7 +155,7 @@ window.onload = new Function('showRow();');
                         <td><input name="hour" type="text" class="timeField" value="{HOUR}">
                           : 
                           <input name="minute" type="text" value="{MIN}" class="timeField"> 
-                          <select name="period" class="short">
+                          <select name="period">
                             <option value="1" {AM} >AM</option>
                             <option value="2" {PM} >PM</option>
                           </select>
@@ -163,7 +163,7 @@ window.onload = new Function('showRow();');
                           <input name="tohour" type="text" value="{TOHOUR}" class="timeField">
                           : 
                           <input name="tominute" type="text" value="{TOMIN}" class="timeField"> 
-                          <select name="toperiod" class="short">
+                          <select name="toperiod">
                             <option value="1" {AMTO}>AM</option>
                             <option value="2" {PMTO}>PM</option>
                           </select></td>
