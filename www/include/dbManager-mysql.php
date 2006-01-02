@@ -131,7 +131,7 @@ function dbCountRows($result = 0)
 /* Inserts an array into table (does all proper security checks to ensure safe) */
 function dbInsertArray($table, $array)
 {
-	if(!($table || is_array($array)))
+	if(!($table && is_array($array)))
 		return FALSE;
 
 	$names = '';
@@ -142,9 +142,36 @@ function dbInsertArray($table, $array)
 		$names .= '`'.$key.'`' . ',';
 		$values .= $this->dbSmartQuote($value) . ',';
 	}
+	$names = substr($names, 0, -1);
+	$values = substr($values, 0, -1);
+	
 	$query = "INSERT INTO `$table` ($names) VALUES ($values)";
 	return $this->dbDoQuery($query);
 }
+
+/* Updates a row */
+function dbUpdateRow($table, $identifier, $array)
+{
+	if(!($table && $array[$identifier] ) )
+			return FALSE;
+
+	foreach($array as $key => $value)
+	{
+		if($key != $identifier)
+			$set .= '`'.$key.'`='.$this->dbSmartQuote($value).',';
+	
+	}
+	$set = substr($set, 0, -1);
+	$query = "UPDATE `$table` SET $set WHERE `$identifier`= ".$this->dbSmartQuote($array[$identifier]); 
+	return $this->dbDoQuery($query);
+}
+
+function deleteRow($table, $identifier, $value)
+{
+	$query = "DELETE FROM `$table` WHERE `$identifier` =  ".$this->dbSmartQuote($array[$identifier]);
+	return $this->dbDoQuery($query);
+}
+
 
 /* Returns the id of the last record inserted */
 function dbInsertId()

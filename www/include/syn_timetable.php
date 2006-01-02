@@ -51,27 +51,35 @@ function getTimetableDefinition($campus)
 }
 
 //gets current day number
-function getDayNumber()
+function getDayNumber($campus, $date = 0)
 {
-	//get rotation style
-	$rotation = unserialize(TIMETABLE_definition);
+	//get day count
+	$days = unserialize(TIMETABLE_day_count);
 
-	if($rotation[$_SESSION['campus'][0]]['day'] == 5)
+	if($days[$campus] == 5)
 	{
 		return date("w");
 	}
-	else if($rotation[$_SESSION['campus'][0]]['day'] == 7)
+	else if($days[$campus] == 7)
 	{
 		//date format yyyy-dd-mm 00:00:00
-		$year = date("Y");
-		$date = $year."-01-01 00:00:00";
+		if(!$date)
+		{
+			$date = mktime();
+			$year = date("Y");
+			$mssqldate = $year."-01-01 00:00:00";
+		}
+		else
+		{
+			$mssqldate = date('Y-d-m',$date).' 00:00:00';
+		}
 	
 		$db = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
 		mssql_select_db(MSSQL_db, $db);
 	
 		$query = "SELECT CONVERT(CHAR(19),CalendarEvents.CalendarDate), CalendarEvents.CalendarType
 		FROM SynergyOne.dbo.CalendarEvents CalendarEvents
-		WHERE (CalendarEvents.CalendarType LIKE 'd%') AND CalendarEvents.CalendarDate >= '$date' ORDER BY 
+		WHERE (CalendarEvents.CalendarType LIKE 'd%') AND CalendarEvents.CalendarDate >= '$mssqldate' ORDER BY 
 		CalendarEvents.CalendarDate DESC";
 
 		$result = mssql_query($query, $db);
@@ -86,7 +94,7 @@ function getDayNumber()
 		$startDate = strtotime($day[0]);
 	
 		//find number of days between both dates
-		$difference = intval((date("U") - $startDate) / 86400);
+		$difference = intval(($date - $startDate) / 86400);
 
 		//find number of weekends between 2 dates
 		$weekends = intval(($difference+date("w", $startDate)) / 7);
@@ -94,7 +102,7 @@ function getDayNumber()
 		$currentDay = ($startDay + $difference - 2 * $weekends - 1) % 7 + 1;
 
 		//make correction for sunday (otherwise we travel back in time)
-		if(date("w") == 0)
+		if(date("w", $date) == 0)
 			$currentDay = $currentDay % 7 + 1;
 
 		return $currentDay;
@@ -105,10 +113,10 @@ function getDayNumber()
 
 
 //returns the period number for the current time
-function getPeriodNumber()
+function getPeriodNumber($campus)
 {
-	$campusCodes = unserialize(SYN_CAMPUS_codes);
-	$campus = $campusCodes[$_SESSION['campus'][0]];
+	$campusCodes = unserialize(SYN_CAMPUS_Codes);
+	$campusString = $campusCodes[$campus];
 
 	$db = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
 	mssql_select_db(MSSQL_db, $db);
@@ -137,7 +145,7 @@ function getPeriodNumber()
 			and
 			t.FileYear = '".$_SESSION['FileYear']."'
 			and
-			TimetableGroup = '" . $campus . "'";
+			TimetableGroup = '" . $campusString . "'";
 			
 	$result = mssql_query($query, $db);
 	if ($result != 1)
@@ -145,7 +153,7 @@ function getPeriodNumber()
 	else
 		return false;
 
-	return $period['PeriodNumber'];
+	return $period;
 }
 
 function getDayTimetable($synergy_id, $group, $campus, $daynumber)
@@ -288,6 +296,7 @@ function getFullTimetable($synergy_id, $group, $campus)
 		$timetable[$x]['periodStart'] = $timetabledef['start'][$x];
 		$timetable[$x]['periodEnd'] = $timetabledef['end'][$x];
 		$timetable[$x]['periodNumber'] = $timetabledef['number'][$x];
+		$timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
 			
 		//for each day
 		for ($y = 1; $y <= $dayCount; $y++)
