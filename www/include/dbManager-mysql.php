@@ -46,7 +46,7 @@ function dbClose()
 /* Changes the current selected database */
 function dbChangeDb($db)
 {
-	if(mysql_select_db($this->db, $this->dbf))
+	if(mysql_select_db($db, $this->dbf))
 	{
 		$this->db = $db;
 		return true;
@@ -168,7 +168,7 @@ function dbUpdateRow($table, $identifier, $array)
 
 function deleteRow($table, $identifier, $value)
 {
-	$query = "DELETE FROM `$table` WHERE `$identifier` =  ".$this->dbSmartQuote($array[$identifier]);
+	$query = "DELETE FROM `$table` WHERE `$identifier` =  ".$this->dbSmartQuote($value);
 	return $this->dbDoQuery($query);
 }
 
@@ -207,8 +207,8 @@ function dbSmartQuote($value)
    if (get_magic_quotes_gpc()) {
        $value = stripslashes($value);
    }
-   // Quote if not integer
-   if (!is_numeric($value)) {
+   // Quote if not integer or special
+   if (!(is_numeric($value) || $value == 'NULL' ||  $value == 'NOW()')) {
        $value = "'" . mysql_real_escape_string($value) . "'";
    }
    return $value;

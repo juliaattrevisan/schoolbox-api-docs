@@ -48,9 +48,9 @@ class Timetable
 		else
 			$this->t_body->set_var("YEAR", "");
 		 
-		$periodNum = getPeriodNumber();
-		$dayNum = getDayNumber();	
-		
+		$periodCurrent = getPeriodNumber($user['campus']);
+		$dayCurrent = getDayNumber($user['campus']);	
+				
 		$timetable = getFullTimetable($sid, $user['group_id'], $user['campus']);
 		
 		$days = count($timetable[0]['day']);
@@ -114,7 +114,7 @@ class Timetable
 					$this->t_body->set_var('PERIOD_ONCLICK','');
 				}
 					
-				if($day == $dayNum && $row['periodNumber'] == $periodNum)
+				if($dayCount == $dayCurrent && $row['periodNumber'] == $periodCurrent['PeriodNumber'] && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq'] )
 					$this->t_body->set_var("TIMETABLE_CLASS", "current");
 				else	
 					$this->t_body->set_var("TIMETABLE_CLASS", "normal");
@@ -157,7 +157,7 @@ else
 		if(isStaff($_SESSION['gid']))
 			$timetable->displayWeek($_GET['sid']);
 		else
-			error(0);
+			error(19);
 	}
 	else
 		$timetable->displayWeek($_SESSION['sid']);

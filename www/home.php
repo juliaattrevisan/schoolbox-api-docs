@@ -194,12 +194,12 @@ class OutPut
 		include("syn_timetable.php");
 		
 		//get current day and period
-		$daynumber = getDayNumber();
-		$periodNum = getPeriodNumber();
+		$daynumber = getDayNumber($_SESSION['campus'][0]);
+		$period = getPeriodNumber($_SESSION['campus'][0]);
+		$periodNum = $period['PeriodNumber'];
 		
 		$this->t_body->set_var("DAYNUMBER", $daynumber);
 	
-
 		$timetable = getDayTimetable($_SESSION['sid'], $_SESSION['gid'], $_SESSION['campus'][0], $daynumber);
 		
 		$periods = count($timetable);
