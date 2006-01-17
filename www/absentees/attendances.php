@@ -40,7 +40,7 @@ class Attendance
 		
 
 		if (!$daynum)
-			$daynum = getDayNumber();
+			$daynum = getDayNumber($_SESSION['campus'][0]);
 		$periodnum = $this->getSubjectPeriod($subCode, $daynum);
 		if (!$periodnum)
 			error(33); //period doesn't exist today
@@ -171,7 +171,7 @@ class Attendance
 
 		//need method for detecting what day it is
 		if(!$daynum)
-			$daynum = getDayNumber();
+			$daynum = getDayNumber($_SESSION['campus'][0]);
 
 		$this->t_body->set_var("DAYNO", "Day&nbsp;".$daynum);
 		$this->t_body->set_var("DATE", date("j/n/Y"));
@@ -185,9 +185,7 @@ class Attendance
 		
 		$this->t_body->set_var("TEACHERNAME", $teacher['firstname']." ".$teacher['lastname']);
 
-		//also get current peroid
-                $periodNum = getPeriodNumber();
-
+            
                 $query = "SELECT Timetable.Room, SubjectClasses.Description,
                        	  Timetable.PeriodNumber, Timetable.ClassCode, SubjectClasses.ClassCampus
                           FROM SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable Timetable
@@ -211,8 +209,6 @@ class Attendance
                         $this->t_body->set_var("CODE", $desc[3]);
                         $this->t_body->set_var("CAMPUS", $desc[4]);
                         $this->t_body->set_var("SUBJECTLINK", "attendances.php?code=".$desc[3]);
-
-                        //if($desc[2] == $periodNum) //perhaps bold current period
       
                         $this->t_body->parse("class_list_block", "class_list", true);
 
