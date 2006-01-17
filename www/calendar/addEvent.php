@@ -9,6 +9,7 @@
 require_once("../include/session.php");
 require_once("../include/include.php");
 require_once("../include/html-time.php");
+require_once("../include/time.php");
 require_once("../include/permission.php");
 require_once("calendar.php");
 
@@ -17,7 +18,6 @@ class addEvent
 	function addEvent()
 	{
 		$this->db = new dbManager;
-		$this->db->dbConnect();
 	}
 
 	function campusHTMLList($name, $selected) 
@@ -418,30 +418,6 @@ class addEvent
 		if($date < 1 || $date > 31)
 			error(9, "Invalid date selected: $date");
 	}
-
-	function checkTime($hour, $minute)
-	{
-		if ($hour < 0 || $hour > 12 || $minute < 0 || $minute >= 60 )
-			error(9, "Invalid time selected: $hour:$minute");
-	}		
-
-	function createTime($hour, $minute, $period)
-	{
-		//in this strange world we live in 12:00 am is actually 00:00 not 12:00 and 12:00 pm is actually 12:00 no 24:00 or 0:00  
-		if($period == 'am') //am time period
-		{
-			$time = ($hour%12).":".$minute.":00";
-		}
-		else if($period == 'pm') //pm period
-		{
-
-			$time = (($hour%12)+12).":".$minute.":00";
-		}
-		else
-			error(9, "Invalid time selected");
-		
-		return "'".$time."'";
-	}
 }
 
 
@@ -453,16 +429,16 @@ if(isset($_POST['priority']) && $_POST['priority'] && isset($_POST['note']) && $
 
 	if(isset($_POST['hour']) && $_POST['hour'] )
 	{
-		$page->checkTime($_POST['hour'], $_POST['minute']);
-		$startTime = $page->createTime($_POST['hour'], $_POST['minute'], $_POST['period']);
+		checkTime($_POST['hour'], $_POST['minute']);
+		$startTime = "'".createTime($_POST['hour'], $_POST['minute'], $_POST['period'])."'";
 	}
 	else
 		$startTime = 'NULL';
 
 	if(isset($_POST['tohour']) && $_POST['tohour'] )
 	{
-		$page->checkTime($_POST['tohour'], $_POST['tominute']);	
-		$endTime = $page->createTime($_POST['tohour'], $_POST['tominute'], $_POST['toperiod']);
+		checkTime($_POST['tohour'], $_POST['tominute']);	
+		$endTime = "'".createTime($_POST['tohour'], $_POST['tominute'], $_POST['toperiod'])."'";
 	}
 	else
 		$endTime = 'NULL';
