@@ -26,10 +26,11 @@ class dueWorkPage
 		$this->logPageView();
 	}
 
-	function displayDueWork()
+	function displayDueWork($id = 0)
 	{
 		if(isParent($_SESSION['gid']))
 		{
+			//if parent output childs work
 			foreach($_SESSION['children'] as $child)
 			{
 				$flag=false;
@@ -43,34 +44,42 @@ class dueWorkPage
 				
 				$this->t_body->parse("user_heading_area","user_heading");
 				
-				//output students list of subjects
-				$catList = involvedCategoryList($child['id'], $child['subjects'], 1);
-				foreach($catList as $cat)
-				{
-					$flag = $this->outputCategoryWork($child['id'], $cat['id']);
-				}
-				if(!$flag)
-					$this->t_body->set_var("category_listing", "<b>You have completed all work at this time</b>");
-					
-				$this->t_body->parse("user_list","user_block",true);
+				$this->outputCategories($child['id'], $child['subjects']);
+				
 			}
+		}
+		else if($id)
+		{
+			//if requested user check they are staff
+			if(isStaff($_SESSION['gid']))
+			{
+				//TODO:  GET ID SUBJECTS
+				$this->outputCategories($id, $subjects);		
+			}
+			else
+				error(19); //perm denied
 		}
 		else
 		{
-			$this->t_body->set_var("user_heading_area","");
-			$catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
-			foreach($catList as $cat)
-			{
-				$flag = $this->outputCategoryWork($_SESSION['id'], $cat['id']);
-			}
-			
-			if(!$flag)
-				$this->t_body->set_var("category_listing", "<b>You have completed all work at this time</b>");
-			
-			$this->t_body->parse("user_list","user_block");
+			//just output own due work
+			$this->outputCategories($_SESSION['id'], $_SESSION['subjects']);
 		}
 	}
 
+	
+	function outputCategories($id, $subjects)
+	{
+			$catList = involvedCategoryList($id, $subjects, 1);
+			foreach($catList as $cat)
+			{
+				$flag = $this->outputCategoryWork($id, $cat['id']);
+			}
+			if(!$flag)
+				$this->t_body->set_var("category_listing", "<b>You have completed all work at this time</b>");
+					
+			$this->t_body->parse("user_list","user_block",true);
+	}
+	
 	
 	function outputCategoryWork($id, $catId)
 	{
