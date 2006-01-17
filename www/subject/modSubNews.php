@@ -77,7 +77,9 @@ else if(isset($_POST['delete']) && $_POST['delete'] && isset($_POST['id']) && $_
 	{
 
 		$news->deleteNews($_POST['id']);
-		localRedir("/homepage.php?category=".$_POST['code']);
+		$back = -2;
+		include("../include/back.php");
+		exit;
 	}
 	else
 		error(19);
@@ -106,8 +108,10 @@ else if(isset($_POST['code']) && $_POST['code'] && isset($_POST['heading']) && $
 		else
 			$news->addNews($_POST['code'], $_SESSION['id'], $_POST['heading'], $_POST['expires'], $_POST['body']);		
 	
-		//redirect to subject page
-		localRedir("/homepage.php?category=".$_POST['code']);
+		//redirect to back to where they came from
+		$back = -2;
+		include("../include/back.php");
+		exit;
 	}
 	else
 		error(19);
