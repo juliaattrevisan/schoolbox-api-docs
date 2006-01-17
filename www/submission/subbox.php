@@ -2,6 +2,8 @@
 
 //Submission object
 //Contains functions for creating and manipulating submission boxes
+require_once('../include/time.php');
+
 
 class subBox
 {
@@ -27,10 +29,10 @@ class subBox
 			error(15);//late date is greater than due date
 
 		//validate time
-		$this->checkTime($due_hour,$due_min);
-		$this->checkTime($late_hour,$late_min);
-		$time = $this->createTime($due_hour,$due_min,$due_period);
-		$ltime = $this->createTime($late_hour,$late_min,$late_period);
+		checkTime($due_hour,$due_min);
+		checkTime($late_hour,$late_min);
+		$time = createTime($due_hour,$due_min,$due_period);
+		$ltime = createTime($late_hour,$late_min,$late_period);
 		
 
 		$insertDate = $year."-".$month."-".$date." ".$time;
@@ -61,10 +63,10 @@ class subBox
 			error(15);	//late date is greater than due date
 			
 		//validate time
-		$this->checkTime($due_hour,$due_min);
-		$this->checkTime($late_hour,$late_min);
-		$time = $this->createTime($due_hour,$due_min,$due_period);
-		$ltime = $this->createTime($late_hour,$late_min,$late_period);
+		checkTime($due_hour,$due_min);
+		checkTime($late_hour,$late_min);
+		$time = createTime($due_hour,$due_min,$due_period);
+		$ltime = createTime($late_hour,$late_min,$late_period);
 
 		$insertDate = $year."-".$month."-".$date." ".$time;
 		$insertLDate = $year."-".$lmonth."-".$ldate." ".$ltime;
@@ -107,30 +109,6 @@ class subBox
 		$dates = $this->db->dbGetNextArray();
 		
 		return $dates;
-	}
-	
-	function checkTime($hour, $minute)
-	{
-		if ($hour < 0 || $hour > 12 || $minute < 0 || $minute >= 60 )
-			error(9, "Invalid time selected");
-	}		
-
-	function createTime($hour, $minute, $period)
-	{
-		//in this strange world we live in 12:00 am is actually 00:00 not 12:00 and 12:00 pm is actually 12:00 no 24:00 or 0:00  
-		if($period == 'am') //am time period
-		{
-			$time = ($hour%12).":".$minute.":00";
-		}
-		else if($period == 'pm') //pm period
-		{
-
-			$time = (($hour%12)+12).":".$minute.":00";
-		}
-		else
-			error(9, "Invalid time selected");
-		
-		return $time;
 	}
 
 }
