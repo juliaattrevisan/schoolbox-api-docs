@@ -351,63 +351,80 @@ a img {
 /*--------------------------------------------------------------------------------------*/
 /* MAIN FORMS */
 /*--------------------------------------------------------------------------------------*/
-.standardForm fieldset {
+.standardForm {
+	padding:4px;
 	border:0;
-	text-align:left;
-	background:#fff;
-	margin:0;
-	padding:0;
-	}
-.standardForm label{
-	font-family:inherit;
-	font-weight:normal;
-	font-size:90%;
-	line-height:2.1em;
-	display:block;
-	color:#666;
-	padding:0;
-	border:0;
-	background:transparent;
-	}
-.standardForm label span {
-	font-size:70%;
-	color:#f00;
-	font-weight:bold;
-	font-family:Verdana, Arial, sans-serif;
-	}
+}
+
+/* Form Elements */
 .standardForm input, .standardForm textarea, .standardForm select {
-	border-collapse:collapse;
-	border:1px solid #efefef;
 	font-weight:normal;
-	font-size:60%;
+	font-family:Verdana, Arial, Helvetica, sans-serif, serif;
 	margin:0 0 1em 0;
 	padding:2px;
 	vertical-align:middle;
-	}
-.standardForm input:focus, .standardForm textarea:focus, .standardForm select:focus {
-	border-color:#39c;
-	}
-.standardForm input:hover, .standardForm textarea:hover, .standardForm select:hover {
-	border:1px solid #A5C7FF;
-	}
-.standardForm input.btn {
-	margin:10px 0;
-	cursor:pointer;
-	color:#000;
-	border:2px solid;
-	border-color:#efefef #333 #333 #efefef;
-	background:#B51C21;
-	padding:.3em 0.8em 0.3em 0.8em;
-	font-style:italic;
-	font-weight:bold;
-	}
-.standardForm p {
-	font-family:inherit;
-	font-weight:normal;
 	font-size:90%;
-	line-height:2.1em;
-	color:#666;
-	background:transparent;
+	border:1px solid #333;
+	}
+	
+.standardForm option {
+	margin: 0 0.8em 0 0;
+	padding: 2px 0 0 2px;
+
+}
+
+.standardForm input:focus, .standardForm textarea:focus, .standardForm select:focus 
+.standardForm input:hover, .standardForm textarea:hover, .standardForm select:hover {
+	border-color:#00458C;
+	}
+
+
+/* From Button */
+.standardForm input.btn {
+	cursor:pointer;
+	border: 3px double #999;
+	border-top-color: #eee;
+	border-left-color: #eee;
+	padding: 0.25em;
+	background-color:#eee;
+	background-image: url("/images/background_form_element.gif");
+	background-repeat:repeat-x;
+	color: #333;
+	font-size: 80%;
+	font-weight: bold;
+	}
+	
+.standardForm input.btn:active{
+	border: 3px double #eee;
+	border-top-color: #999;
+	border-left-color: #999;
+	}
+	
+.standardForm .timeField {
+	width:2em;
+	}
+	
+/* Field Labels */
+.standardForm h2 {
+	font-weight:bold;
+	font-size:100%;
+	padding:0;
+	border:0;
+	margin:0;
+	color:#333;
+	}
+	
+.standardForm em {
+	font-size:70%;
+	font-style:normal;
+	}
+		
+/* Form Table Layouts */
+.standardForm table td {
+	vertical-align:top;
+	}
+.standardForm td.formLabelWidth {
+	width:260px;
 	}
 /*--------------------------------------------------------------------------------------*/
 /* OTHER FORMS */
@@ -418,63 +435,12 @@ a img {
 #searchForm input.short, #searchForm select.short {
 	width:100px;margin:0;padding:0;
 	border:1px solid #B51C21;
-	font-size:100%;
+	font-size:70%;
 	}
 #searchForm input.img {
 	margin-bottom:4px;
 	margin-left:10px;
 	border:0;
-	}
-/*--------------------------------------------------------------------------------------*/
-/* OTHER FORMS */
-/*--------------------------------------------------------------------------------------*/
-.standard {
-	padding:4px;
-	background:transparent;
-	}
-.standard em {
-	font-size:70%;
-	font-style:normal;
-	}
-.standard input, .standard select {
-	border-collapse:collapse;
-	border:1px solid #333;
-	font-weight:normal;
-	font-size:80%;
-	margin:0 0 1em 0;
-	padding:2px;
-	vertical-align:middle;
-	}
-.standard table td {
-	vertical-align:top;
-	}
-.standard input.btn {
-	margin:0.8em 0;
-	cursor:pointer;
-	color:#fff;
-	border:2px solid;
-	border-color:#CC6666 #660000  #660000 #CC6666;
-	background:#B51C21;
-	padding:.3em 0.8em 0.3em 0.8em;
-	/*font-style:italic;*/
-	font-weight:bold;
-	}
-.standard input.timeField {
-	width:2em;
-	}
-.standard .short {
-	width:5em;
-	}	
-.standard h2 {
-	font-weight:bold;
-	font-size:100%;
-	padding:0;
-	border:0;
-	margin:0;
-	color:#333;
-	}
-.standard td.formLabelWidth {
-	width:260px;
 	}
 /*--------------------------------------------------------------------------------------*/
 /* SPECIFIC ELEMENT DECLARATIONS */
