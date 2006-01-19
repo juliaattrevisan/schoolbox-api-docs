@@ -227,6 +227,13 @@ if(is_numeric($_GET['cid']))
 	$perm = perm($_GET['cid'], 1);
 	if($perm > 0)
 	{
+		if(isParent($_SESSION['gid']))
+		{
+			//check parent is member of group
+			if(!isMember($_GET['cid'], $_SESSION['id']))
+				error(14);
+		}
+		
 		$myPage = new OutPut($_GET['cid'], $_GET['view']);
 		//only display forum if it exists as a module for this homepage
 		if ($myPage->checkTemplate())

@@ -25,7 +25,7 @@ function perm($sid, $service)
 
 	//individual access
 	$userQuery = "SELECT type FROM userAccess 
-	WHERE service = '".$service."' AND sid = '".$sid."' AND uid = '".$_SESSION['id']."'";
+	WHERE service = ".$service." AND sid = ".$sid." AND uid = ".$_SESSION['id']."";
      
 	$result = $db->dbGetSingleRow($userQuery);            
 	$perm = $result['type'];
@@ -51,6 +51,25 @@ function perm($sid, $service)
 	}
 	return $perm;
 }
+
+function isMember($id, $uid)
+{
+	// Checks if user is member of the supplied group id (for category groups only, use perm for others) 
+	$db = new dbManager;
+	$service = HOMEPAGESERVICE;
+	
+	//individual access
+	$userQuery = "SELECT type FROM userAccess 
+	WHERE service = $service AND sid = $id AND uid = $uid";
+     
+	$result = $db->dbGetSingleRow($userQuery);   
+
+	if($result['type'])
+		return true;
+	else
+		return false; 
+}
+
 
 function isStudent($gid)
 {

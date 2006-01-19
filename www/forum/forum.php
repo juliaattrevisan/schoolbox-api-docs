@@ -178,6 +178,16 @@ class forum
 		$result = $this->db->dbGetSingleRow($query);
 		return $result['owner'];
 	}
+	
+	function checkForumExists($cid)
+	{
+		$query = "SELECT position FROM homepage_comp_location WHERE cid = $cid AND component IN (5)";
+		if($this->db->dbGetSingleRow($query))
+			return 1;
+		else
+			return 0;
+	}
+	
 }		
 		
 ?>

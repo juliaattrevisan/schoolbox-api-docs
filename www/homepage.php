@@ -60,9 +60,10 @@ class OutPut
 				$this->t_body->set_file($component['name'].$componentCount, "homepages/components/".$component['filename']);
 
 				$func = $component['method'];
-				$this->$func($component['name'].$componentCount, $component['size']);
-			
-				$this->t_body->parse("POS".$component['position'], $component['name'].$componentCount);
+				if($this->$func($component['name'].$componentCount, $component['size']))
+					$this->t_body->parse("POS".$component['position'], $component['name'].$componentCount);
+				else
+					$this->t_body->set_var("POS".$component['position'], '');
 			}
 			else   //nothing to be put in this postion so make it blank
 				$this->t_body->set_var("POS".$component['position'], "");
@@ -108,6 +109,8 @@ class OutPut
 			$this->t_body->parse("edit_page_block", "edit_page");	
 		else
 			$this->t_body->set_var("edit_page_block", "");
+			
+		return true;
 	}				
 
 	function outputCSS($page)
@@ -217,6 +220,8 @@ class OutPut
                         $this->t_body->set_var("edit_duties_block", "");
                 else
                         $this->t_body->parse("edit_duties_block", "edit_duties");
+					
+				return true;
 
         }
 
@@ -260,7 +265,7 @@ class OutPut
 		{
 			$this->t_body->set_var("members_block", "");
 		}		       
-                    
+		return true;
 	}
 
 	function outputManagers($name, $size)
@@ -305,7 +310,7 @@ class OutPut
 		{
 			$this->t_body->set_var("staff_member_block", "");
 		}
-				
+		return true;
 	}
 
 
@@ -349,6 +354,7 @@ class OutPut
 		else
 			$this->t_body->parse("submit_news_block", "submit_news");	
 
+		return true;
 	} 
 		
 	function outputRandImage($name, $size)
@@ -379,6 +385,7 @@ class OutPut
 		{
 			$this->t_body->set_var("preview_block", "");
 		}
+		return true;
 	}
 
 	function outputImage($name, $size)
@@ -407,11 +414,12 @@ class OutPut
 			$this->t_body->set_var("PREVIEW_IMAGE_DESC", $image['comment']);
 			$this->t_body->set_var("CONTENT_URL", $link['url']);
 
-                        $this->t_body->parse("preview_block", "previewimage");
-
+            $this->t_body->parse("preview_block", "previewimage");
+						
+			return true;
 		}
 		else
-			$this->t_body->set_var("preview_block", "");
+			return false;
 
 	}
 
@@ -479,6 +487,8 @@ class OutPut
 			$this->t_body->set_var("submit_hw_block", "");
 		else
 			$this->t_body->parse("submit_hw_block", "submit_hw");	
+			
+		return true;
 
 	}
 	
@@ -529,7 +539,7 @@ class OutPut
 		else
 			$this->t_body->parse("submit_ass_block", "submit_ass");	
 
-
+		return true;
 	}
 	
 	function outputNoteList($name, $size)
@@ -562,6 +572,7 @@ class OutPut
 		else
 			$this->t_body->parse("submit_note_block", "submit_note");	
 
+		return true;
 	}
 	
 	function outputLinkList($name, $size)
@@ -594,6 +605,7 @@ class OutPut
 		else
 			$this->t_body->parse("submit_link_block", "submit_link");	
 
+		return true;
 	}	
 	
 	function outputFileList($name, $size)
@@ -625,6 +637,8 @@ class OutPut
 			$this->t_body->set_var("submit_file_block", "");
 		else
 			$this->t_body->parse("submit_file_block", "submit_file");	
+
+		return true;
 	}
 		
 	function outputFolderList($name, $size)
@@ -656,7 +670,8 @@ class OutPut
 			$this->t_body->set_var("submit_folder_block", "");
 		else
 			$this->t_body->parse("submit_folder_block", "submit_folder");	
-
+	
+		return true;
 	}
 		
 	function outputImageGallery($name, $size)
@@ -722,10 +737,21 @@ class OutPut
 		{
 			$this->t_body->set_VAR("row_block", "");
 		}
+		return true;
 	}
 
 	function outputForumList($name, $size)
 	{	
+		//dont show forums to parents if they not a direct member of group
+		if(isParent($_SESSION['gid']))
+		{
+			if(!isMember($this->category, $_SESSION['id']))
+			{
+				$this->t_body->set_var($name, "");
+				return false;
+			}
+		}
+	
 		//forum recent posts
 		$this->t_body->set_block($name, "forum", "forum_block");
 	
@@ -747,6 +773,7 @@ class OutPut
 				$this->outputForum($this->db->dbGetNextArray());
 			}
 		}
+		return true;
 	}		
 
 	function outputEventList($name, $size)
@@ -787,7 +814,7 @@ class OutPut
 		else
 			$this->t_body->parse("submit_event_block", "submit_event");	
 		
-	
+		return true;
 	}
 
 	function outputHomework($queryArray)
