@@ -121,7 +121,7 @@ function verify()
 	<div id="content"> 
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
 			<h1>{ACTION} Homepage News</h1>
-			<form action="/subject/modSubNews.php" method="post" enctype="multipart/form-data" id="newsForm" class="standard" onsubmit="return(verify());">
+			<form action="/subject/modSubNews.php" method="post" enctype="multipart/form-data" id="newsForm" class="standardForm" onsubmit="return(verify());">
 				{MODIFY}{CODE}
 				<table>
 					<tr>
@@ -147,6 +147,7 @@ function verify()
 								<option value="336">In 2 weeks</option>
 								<option value="672">In 1 month</option>
 								<option value="8760">In 1 year</option>
+								<option value="99999">Never</option>
 							</select>
 						</td>
 					</tr>
