@@ -255,8 +255,9 @@ function getEnrolledStudents($synergyID)
 			FROM SynergyOne.dbo.Constituencies Constituencies, SynergyOne.dbo.Relationships Relationships
 			WHERE Relationships.RelatedID = Constituencies.ID AND 
 			Relationships.ID = $synergyID AND 
-			Constituencies.ConstitCode='@SC'";
-			
+			Constituencies.ConstitCode='@SC'
+			AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD')";
+				
 	$result = @mssql_query( $query);
 	if($result != 1)
 	{
