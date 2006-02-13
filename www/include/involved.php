@@ -12,11 +12,11 @@ function involvedInSubject($code)
 {
 	//returns true on user being involved in subject
 
-	if(is_array($_SESSION['sub_code']))
+	if(is_array($_SESSION['subjects']))
 	{
-		foreach($_SESSION['sub_code'] as $sub_code)
+		foreach($_SESSION['subjects'] as $subject)
 		{
-			if($code == $sub_code)
+			if($code == $subject['code'])
 				return 1;
 		}
 	}

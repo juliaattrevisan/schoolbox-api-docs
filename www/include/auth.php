@@ -207,7 +207,7 @@ function getSubjectList($synergyID, $group)
 {
 	if( isStudent($group) )
 	{
-		$sql ="SELECT DISTINCT(SubjectClasses.ClassCode), SubjectClasses.Description
+		$sql ="SELECT DISTINCT(SubjectClasses.ClassCode), SubjectClasses.Description as name
 				FROM SubjectClasses SubjectClasses, vStudentTimetableFull vStudentTimetableFull
 				WHERE SubjectClasses.ClassCode = vStudentTimetableFull.ClassCode AND
 				SubjectClasses.FileSemester = vStudentTimetableFull.FileSemester AND
@@ -220,7 +220,7 @@ function getSubjectList($synergyID, $group)
 	else
 	{      
 
-		$sql = "SELECT DISTINCT(c1.ClassCode), c2.description
+		$sql = "SELECT DISTINCT(c1.ClassCode), c2.description as name
 				FROM SubjectClassStaff c1, SubjectClasses c2
 				WHERE c1.ClassCode = c2.ClassCode AND
 				c1.FileSemester = ".$_SESSION['FileSemester']." AND
@@ -239,7 +239,7 @@ function getSubjectList($synergyID, $group)
 					//remove study periods and rostered offs
         			if(!preg_match("/ST|RO/",$subject['ClassCode']))
         			{
-						$subjectList[] = array('code'=>$subject['ClassCode'], 'name'=>$subject['Description']);
+						$subjectList[] = array('code'=>$subject['ClassCode'], 'name'=>$subject['name']);
 					}
 			}
 			return $subjectList;
