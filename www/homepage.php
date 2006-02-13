@@ -191,6 +191,8 @@ class OutPut
 			$this->t_body->set_var("class_list_block", "");
 		else
 			$this->t_body->parse("class_list_block", "class_list");	
+			
+		return true;
 	}
 	
 	function outputDuties($name, $size)

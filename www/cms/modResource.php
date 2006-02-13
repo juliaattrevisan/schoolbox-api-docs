@@ -136,7 +136,7 @@ class ModResourcePage {
 		//turn list into html 
 		foreach($catList as $cat)
 		{
-			$catOutput .= "<input type=\"checkbox\" name=\"mulc[]\" value=\"".$cat['id']."\">".$catList['name'];
+			$catOutput .= "<input type=\"checkbox\" name=\"mulc[]\" value=\"".$cat['id']."\">".$cat['name'];
 			
 			if($cat['code'] != "")
 				$catOutput .= " (".$cat['code'].")";
