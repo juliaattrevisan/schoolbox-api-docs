@@ -147,6 +147,10 @@ function setSynergyInfo(&$mydb)
 	//setup a users enrolement for the session
 
 	$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
+	
+	if(!$db)
+		error(65); 
+	
 	mssql_select_db( MSSQL_db);
 
 	$synergy_id = $_SESSION['sid'];
@@ -155,25 +159,6 @@ function setSynergyInfo(&$mydb)
 	$_SESSION[ 'FileSemester'] = $semester[ 'FileSemester'];
 	$_SESSION[ 'FileYear'] = $semester[ 'FileYear'];
 
-
-	$subjectList = getSubjectList($synergy_id, $_SESSION['gid']);
-
-	if( is_array($subjectList))
-	{
-		$_SESSION['timetable']=1;
-		foreach($subjectList as $subject)
-		{
-			//check subject exists.. we cant link to subjects that dont exist its ugly
-			$myquery = "SELECT id FROM category WHERE code = '".$subject['code']."'";
-			$mydb->dbDoQuery($myquery);
-			if($mydb->dbCountRows() > 0)
-				$_SESSION['subjects'][] = $subject;
-		}
-	}
-	else {
-		$_SESSION['timetable']=0;
-	}
-	
 	//if user is parent get information regarding enrolled students
 	if( isParent($_SESSION['gid']))
 	{
@@ -187,6 +172,27 @@ function setSynergyInfo(&$mydb)
 			
 			$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child, 'subjects'=>$subjects);
 		}
+	}
+	else  //user is not parent so get timetable information
+	{
+		$subjectList = getSubjectList($synergy_id, $_SESSION['gid']);
+	
+		if( is_array($subjectList))
+		{
+			$_SESSION['timetable']=1;
+			foreach($subjectList as $subject)
+			{
+				//check subject exists.. we cant link to subjects that dont exist its ugly
+				$myquery = "SELECT id FROM category WHERE code = '".$subject['code']."'";
+				$mydb->dbDoQuery($myquery);
+				if($mydb->dbCountRows() > 0)
+					$_SESSION['subjects'][] = $subject;
+			}
+		}
+		else {
+			$_SESSION['timetable']=0;
+		}
+	
 	}
 	
 }
