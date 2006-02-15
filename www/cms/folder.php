@@ -82,16 +82,20 @@ class folder
 	{
 		$this->checkWriteAccess($parent);
 
+		//update folder details
+		$cat = array('id'=>$cid, 'name'=>$name, 'parent'=>$parent);
 		if($code)
-			$query = "UPDATE category SET name = '$name', parent = '$parent', template = '$template', code = '$code' WHERE id = '$cid'";
-		else
-			$query = "UPDATE category SET name = '$name', parent = '$parent', template = '$template' WHERE id = '$cid'";
-                
-		$this->db->dbDoQuery($query);
+			$cat['code'] = $code;
+		if($template)
+			$cat['template'] = $template;
+			
+		$this->db->dbUpdateRow('category', 'id', $cat);
 		
-		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('folder', $cid, 'modify', {$_SESSION['id']})";
-		$this->db->dbDoQuery($query);
+		//log modification
+		$log = array('object'=>'folder', 'objectId'=>$cid, 'action'=>'modify', 'user'=>$_SESSION['id']);
+		$this->db->dbInsertArray('cmsLog', $log);
 		
+		//if template set apply new template
 		if($template)
 			$this->createTemplate($cid, $template);
 		

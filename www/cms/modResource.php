@@ -131,8 +131,9 @@ class ModResourcePage {
 		//get list of categories involved in with write access
 		require("../include/involved.php");
 		$catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 2);
-	
+		
 		$catOutput = "";
+		$i =0;
 		//turn list into html 
 		foreach($catList as $cat)
 		{
@@ -142,6 +143,7 @@ class ModResourcePage {
 				$catOutput .= " (".$cat['code'].")";
 
 			$catOutput .= "<br />";
+			$i++;
 		}
 
 		
