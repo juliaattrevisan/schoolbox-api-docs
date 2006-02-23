@@ -61,6 +61,8 @@ class dueWorkPage
 		}
 		else
 		{
+		
+			$this->t_body->set_var('user_heading_area', '');
 			//just output own due work
 			$this->outputCategories($_SESSION['id'], $_SESSION['subjects']);
 		}
@@ -72,10 +74,11 @@ class dueWorkPage
 			$catList = involvedCategoryList($id, $subjects, 1);
 			foreach($catList as $cat)
 			{
-				$flag = $this->outputCategoryWork($id, $cat['id']);
+				if($this->outputCategoryWork($id, $cat['id']))
+					$flag=1;
 			}
 			if(!$flag)
-				$this->t_body->set_var("category_listing", "<b>You have completed all work at this time</b>");
+				$this->t_body->set_var("category_listing", "<b>You have completed all work set via the portal</b>");
 					
 			$this->t_body->parse("user_list","user_block",true);
 	}
