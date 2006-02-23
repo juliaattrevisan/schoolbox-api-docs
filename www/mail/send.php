@@ -70,17 +70,15 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 			$bcc = str_replace(";",",",$bcc);
 			$recipients['Bcc'] = $bcc;
 	}
-	
-	
+		
 	$mime = new Mail_mime("\r\n");
 
-	$mime->setTXTBody("This message is in HTML please view with a compatible client");
 	$mime->setHTMLBody($message);
 	
 	foreach ($_FILES["file"]["error"] as $key => $error) {
    		if ($error == UPLOAD_ERR_OK) {
-			$mime->addAttachment($_FILES['file']['tmp_name'][$key], $_FILES['attachment']['type'][$key], $_FILES['file']['name'][$key]);
-   		}
+			$mime->addAttachment($_FILES['file']['tmp_name'][$key], $_FILES['file']['type'][$key], $_FILES['file']['name'][$key]);
+		}
 	}
 
 	$body = $mime->get();
