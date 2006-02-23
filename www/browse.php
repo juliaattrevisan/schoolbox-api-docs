@@ -80,11 +80,11 @@ class OutPut
 
 		$fileQuery = "SELECT file.id, file.realname, DATE_FORMAT(file.submitted, '%W %M %e @ %l:%i%p') AS submitted, 
 		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, file.description, file.comment, file.mime_type 
-		FROM file, user WHERE user.id = file.owner AND file.category = ".$this->category." AND deleted = '0'";
+		FROM file LEFT JOIN user ON user.id = file.owner WHERE file.category = ".$this->category." AND deleted = '0'";
 
 		$linkQuery = "SELECT link.id, link.url, DATE_FORMAT(link.submitted, '%W %M %e @ %l:%i%p') AS submitted, 
 		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, link.description, link.comment 
-		FROM link, user WHERE user.id = link.owner AND link.category = ".$this->category."";
+		FROM link LEFT JOIN user ON user.id = link.owner WHERE link.category = ".$this->category."";
 
 		$result = $this->db->dbDoQuery($catQuery);
 
@@ -204,6 +204,7 @@ class OutPut
 	function outputFile($fileDetails)
 	{
 		global $allowedFileTypes;
+
 		// correction for empty description
 		if ($fileDetails['comment'] == "") { $fileDetails['comment'] = "No comment available"; }
 
@@ -236,7 +237,7 @@ class OutPut
 		else				
 			$this->t_body->set_var("FILE_IMAGE", "/images/mime/application-x-none.png");
 
-		// set description
+		// set url depending on wether it should have one and how it should be opened
 		if($fileDetails['realname'] != "")
 		{
 			//if inline open in new window, if not give user a save dialog box
@@ -246,16 +247,15 @@ class OutPut
 				$this->t_body->set_var("FILE_URL", "<a href=\"/send.php?id=".$fileDetails['id']."&save=1\">");
 				
 			$this->t_body->set_var('FILE_URL_END', '</a>');
-			$this->t_body->set_var('FILE_DESCRIPTION', scrubTEXT($fileDetails['description']));
 		}
 		else
 		{
 			$this->t_body->set_var('FILE_URL', '');
 			$this->t_body->set_var('FILE_URL_END', '');
-			$this->t_body->set_var('FILE_DESCRIPTION', scrubTEXT($fileDetails['description']));
 		}
 		
-		$this->t_body->set_var("FILE_DESCRIPTION_ESCAPED", addslashes(htmlentities($fileDetails['description'])));
+		$this->t_body->set_var('FILE_DESCRIPTION', scrubTEXT($fileDetails['description']));
+		$this->t_body->set_var('FILE_DESCRIPTION_ESCAPED', addslashes(htmlentities($fileDetails['description'])));
 		
 		//if user has write access give modify/delete buttons
 		if($this->perm >= 2)
