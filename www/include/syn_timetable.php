@@ -227,8 +227,13 @@ function getDayTimetable($synergy_id, $group, $campus, $daynumber)
 			$timetable[$x]['code'] = $desc['ClassCode'];
 			$timetable[$x]['room'] = $desc['Room'];
 			$desc = mssql_fetch_array($result);
+			
+			//bad data in synergetic.. why..?? 
+			while($desc['PeriodNumber'] == $timetable[$x]['periodNumber'] && $desc != 0) 
+					$desc = mssql_fetch_array($result); 
 		}
 	}
+
 	return $timetable;
 
 }

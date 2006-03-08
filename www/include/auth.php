@@ -168,18 +168,18 @@ function setSynergyInfo(&$mydb)
 		{
 			$myquery = "SELECT id FROM user WHERE synergy_id = $child";
 			$portal = $mydb->dbGetSingleRow($myquery);
-			$subjects = getSubjectList($child, $studentGroup[0]);
-			
-			$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child, 'subjects'=>$subjects);
+			if($portal['id'])
+			{
+				$subjects = getSubjectList($child, $studentGroup[0]);
+				$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child, 'subjects'=>$subjects);
+			}
 		}
 	}
 	else  //user is not parent so get timetable information
 	{
 		$subjectList = getSubjectList($synergy_id, $_SESSION['gid']);
-	
 		if( is_array($subjectList))
 		{
-			$_SESSION['timetable']=1;
 			foreach($subjectList as $subject)
 			{
 				//check subject exists.. we cant link to subjects that dont exist its ugly
@@ -189,10 +189,11 @@ function setSynergyInfo(&$mydb)
 					$_SESSION['subjects'][] = $subject;
 			}
 		}
-		else {
+
+		if(is_array($_SESSION['subjects']))
+			$_SESSION['timetable'] = 1;
+		else	
 			$_SESSION['timetable']=0;
-		}
-	
 	}
 	
 }

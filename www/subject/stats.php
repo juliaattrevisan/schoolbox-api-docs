@@ -255,40 +255,10 @@ class stats
 		//get member hits
 		$this->t_body->set_var("LISTREC", "All Member Visits");
 
-		if ($this->template > 1)
-		{
-			$query = "
-				SELECT 	lastname, firstname, username, hitcount, local_email, alt_email, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date 
-				FROM 	user, homepage_log, category, userAccess
-				WHERE   category.id = '" . $this->category . "'	
-				AND	category.id = homepage_log.cid
-		 		AND	category.id = userAccess.sid	
-				AND 	user.id = homepage_log.user
-				AND	user.id = userAccess.uid
-				AND	hitcount > 0
-				ORDER BY lastname asc, firstname asc	
-		 	";
-
-			$this->mySQLdb->dbDoQuery($query);		
-		
-			if($this->mySQLdb->dbCountRows() > 0 )
-			{
-				while ($member = $this->mySQLdb->dbGetNextArray())
-				{
-					$this->t_body->set_var("DATE", $member['date']);	
-					$this->t_body->set_var("COUNT", $member['hitcount']);	
-					$this->outputName($member['firstname'], $member['lastname'],  $member['username'], $member['local_email'], $member['alt_email']);
-
-					$this->t_body->parse("all_block", "all_listing", true);
-				}
-			}
-			else
-				$this->t_body->set_var("all_block", "<tr><td colspan=\"2\">No data available</td></tr>");
-		}	
-		else //must be a class so query synergy db
+		if ($this->code) //get synergetic member list
 		{
 			$result = getStudents($this->code);
-			if ($result)
+			if (mssql_num_rows($result) > 0)
 			{
 			  while($student = @mssql_fetch_array($result))
 			  {
@@ -326,6 +296,36 @@ class stats
 
 				$this->t_body->parse("all_block", "all_listing", true);
 			  }		
+			}
+			else
+				$this->t_body->set_var("all_block", "<tr><td colspan=\"2\">No data available</td></tr>");
+		}	
+		else 
+		{
+			$query = "
+				SELECT 	lastname, firstname, username, hitcount, local_email, alt_email, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date 
+				FROM 	user,userAccess
+				LEFT JOIN homepage_log ON user.id = homepage_log.user
+				WHERE  userAccess.sid =  " . $this->category . "
+				AND userAccess.service = ".HOMEPAGESERVICE."
+				AND 	user.id = userAccess.uid
+				AND homepage_log.cid = ".$this->category."
+				AND hitcount > 0
+				ORDER BY lastname asc, firstname asc	
+		 	";
+
+			$this->mySQLdb->dbDoQuery($query);		
+		
+			if($this->mySQLdb->dbCountRows() > 0 )
+			{
+				while ($member = $this->mySQLdb->dbGetNextArray())
+				{
+					$this->t_body->set_var("DATE", $member['date']);	
+					$this->t_body->set_var("COUNT", $member['hitcount']);	
+					$this->outputName($member['firstname'], $member['lastname'],  $member['username'], $member['local_email'], $member['alt_email']);
+
+					$this->t_body->parse("all_block", "all_listing", true);
+				}
 			}
 			else
 				$this->t_body->set_var("all_block", "<tr><td colspan=\"2\">No data available</td></tr>");

@@ -92,7 +92,7 @@ class WhatsNew
 		$lastcatvisit = $this->lastCatVisit($id);
 
 		//check if any new news has been submitted
-		$query = "SELECT COUNT(*) AS newscount FROM subject_news WHERE deleted = 0 AND code = '$id' AND
+		$query = "SELECT COUNT(*) AS newscount FROM subject_news WHERE deleted = 0 AND code = $id AND
 			datetime_posted >= '$lastcatvisit' AND datetime_expires >= NOW()";
 		$result = $this->db->dbGetSingleRow($query);
 			
@@ -100,17 +100,24 @@ class WhatsNew
 
 		//check if any new files have been submitted
 		$query = "SELECT COUNT(*) AS filecount FROM file WHERE 
-			deleted = '0' AND category = '$id' AND submitted >= '$lastcatvisit'";
+			deleted = 0 AND category = $id AND submitted >= '$lastcatvisit'";
 		$result = $this->db->dbGetSingleRow($query);
 			
 		$count['files'] = $result['filecount'];
 			
 		//check if any new links have been submitted
-		$query = "SELECT COUNT(*) AS linkcount FROM link WHERE category = '$id' 
+		$query = "SELECT COUNT(*) AS linkcount FROM link WHERE category = $id 
 			AND submitted >= '$lastcatvisit'";
 		$result = $this->db->dbGetSingleRow($query);
 
 		$count['links'] = $result['linkcount'];
+		
+		//check if any new forum posts have been made
+		$query = "SELECT COUNT(*) AS forumcount FROM forum WHERE cid = $id AND 
+						deleted = 0 AND `date` >= '$lastcatvisit'";
+		$result = $this->db->dbGetSingleRow($query);
+		
+		$count['forum'] = $result['forumcount'];				 
 	
 		return $count;
 	}

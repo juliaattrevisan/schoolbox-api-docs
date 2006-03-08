@@ -287,6 +287,7 @@ class OutPut
 		$this->t_body->set_block("category_block", "new_news", "new_news_item"); 
 		$this->t_body->set_block("category_block", "new_file", "new_file_item"); 
 		$this->t_body->set_block("category_block", "new_url", "new_url_item"); 
+		$this->t_body->set_block("category_block", "new_forum", "new_forum_item"); 
 		$flag = 0;
 
 		//for each subject
@@ -331,7 +332,20 @@ class OutPut
 				else
 					$this->t_body->set_var("new_url_item", "");
 				
-				if($cat['news'] || $cat['files'] || $cat['links'])
+				if($cat['forum'])
+				{
+					if($cat['forum'] > 1)
+						$this->t_body->set_var('NEW_PLURAL_FORUM', 's');
+					else
+						$this->t_body->set_var('NEW_PLURAL_FORUM', '');
+					$this->t_body->set_var("NEW_FORUM", $cat['forum']);
+					$this->t_body->parse("new_forum_item", "new_forum");
+				}
+				else
+					$this->t_body->set_var("new_forum_item", "");
+				
+				
+				if($cat['news'] || $cat['files'] || $cat['links'] || $cat['forum'])
 				{
 					if($catInfo['code'])
 						$this->t_body->set_var("NEW_CATEGORY_NAME", $catInfo['name'].' ('.$catInfo['code'].')');
