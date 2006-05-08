@@ -98,6 +98,13 @@ class Timetable
 					
 						$this->t_body->set_var('PERIOD_ONCLICK','');
 					}
+					else if($_SESSION['campus'][0] == 2 && SITE_location == 'wenona')
+					{
+							$this->t_body->set_var('PERIOD_DESC', $period['description']);
+							$this->t_body->set_var('PERIOD_CODE','');
+							$this->t_body->set_var('PERIOD_ROOM',$period['room']);
+							$this->t_body->set_var('PERIOD_ONCLICK','');
+					}
 					else 
 					{
 						$this->t_body->set_var('PERIOD_DESC', $period['description']);
