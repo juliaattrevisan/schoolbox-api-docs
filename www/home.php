@@ -239,6 +239,14 @@ class OutPut
 						$this->set_var('PERIOD_ONCLICK','');
 						$this->set_var('PERIOD_ABSENTEES','');
 					}
+					else if($_SESSION['campus'][0] == 2 && SITE_location == 'wenona')
+					{
+							$this->set_var('PERIOD_DESC', $period['description']);
+							$this->set_var('PERIOD_CODE','');
+							$this->set_var('PERIOD_ROOM',$period['room']);
+							$this->set_var('PERIOD_ONCLICK','');
+							$this->set_var('PERIOD_ABSENTEES','');
+					}
 					else 
 					{
 						$this->set_var('PERIOD_DESC', $period['description']);
