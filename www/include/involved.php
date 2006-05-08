@@ -49,16 +49,19 @@ function involvedCategoryList($id, $subjects, $accessType=1)
 
 	//for each subject involved in
 	$x=0;
-	foreach($subjects as $subject)
+	if(is_array($subjects))
 	{
-		//convert code to id and get name
-		$query = "SELECT name, id FROM category WHERE code = '".$subject['code']."'";
-		$result = $db->dbGetSingleRow($query);
+		foreach($subjects as $subject)
+		{
+			//convert code to id and get name
+			$query = "SELECT name, id FROM category WHERE code = '".$subject['code']."'";
+			$result = $db->dbGetSingleRow($query);
 
-		$catList[] = array (	'name' 	=>	$result['name'],
-								'id' 	=>	$result['id'],
-								'code' 	=>	$subject['code'],
-							);
+			$catList[] = array (	'name' 	=>	$result['name'],
+									'id' 	=>	$result['id'],
+									'code' 	=>	$subject['code'],
+								);
+		}
 	}
 
 	//get list of groups involved in

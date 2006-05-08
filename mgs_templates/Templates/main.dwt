@@ -27,7 +27,7 @@
 			<h3>&#187;&nbsp;GOTO</h3>
 			<div class="whiteWrap">{MCSSMENU}</div>
 		</div>
-		<div class="sideWrap">
+		<div class="sideWrap" id="searchBox">
 			<h3>&#187;&nbsp;SEARCH</h3>
 			<div class="whiteWrap">
 				<form class="standardForm" id="searchForm" action="/search.php" method="get">

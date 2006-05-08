@@ -91,9 +91,13 @@
 			</div><!-- #EndLibraryItem --><!-- #EndEditable --> 
 	<div id="content"> 
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
-		<h1>Due Work</h1> 
-			<div class="indent"> 
-				<p>This list shows all work that is to be completed. Work in red has passed its due by date. </p> 
+		<h1>Due Work</h1>  
+				<p class="indent">This list shows all work that is to be completed. Work in red has passed its due by date. </p>
+				<!-- BEGIN user_block -->
+				<!-- BEGIN user_heading -->			
+				<h1>{USER_NAME} {USER_YEAR}</h1>
+				<!-- END user_heading -->
+				<div class="indent">
 				<table class="ruler"> 
 					<!-- BEGIN category_block --> 
 					<thead> 
@@ -103,8 +107,8 @@
 						<tr> 
 							<th>Assignment Title</th> 
 							<th>View File</th> 
-							<th>Due Date</th> 
-							<th class="cntr">Submit</th> 
+							<th>Due Date</th>
+							<th>Submit</th> 
 						</tr> 
 					</thead> 
 					<tbody> 
@@ -112,14 +116,15 @@
 						<tr> 
 							<td style="color:{COLOUR};">{ASSDESC}</td> 
 							<td>{VIEW}</td> 
-							<td style="color:{COLOUR};">{DUEDATE}</td> 
-							<td class="cntr">{SUBMIT}</td> 
+							<td style="color:{COLOUR};">{DUEDATE}</td>
+							<td class="cntr">{SUBMIT}</td>
 						</tr> 
 						<!-- END due_block --> 
 					</tbody> 
 				<!-- END category_block --> 
 				</table> 
-			</div> 
+				</div> 
+				<!-- END user_block -->
             <!-- #EndEditable --> </div> 
 	</div> 
 </div> 
