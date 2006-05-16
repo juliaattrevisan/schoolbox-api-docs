@@ -174,12 +174,15 @@ class OutPut
 		$this->db->dbDoQuery($query);
 		$result = $this->db->dbGetNextArray();
 	
-                if($result['code'] == "")
-                        $this->t_body->set_var("HEADING", scrubTEXT($result['name']));
-                else
-                {
-		        $this->t_body->set_var("HEADING", scrubTEXT($result['name'])." (".$result['code'].")");	
-			$this->t_body->set_var("CODE", urlencode($result['code']));
+		if($result['code'] == "")
+		{
+			$this->t_body->set_var("HEADING", scrubTEXT($result['name']));
+		}
+		else
+		{
+			$this->code = $result['code'];
+			$this->t_body->set_var("HEADING", scrubTEXT($result['name'])." (".$result['code'].")");	
+			$this->t_body->set_var("CODE", urlencode($this->code));
 		}
 
 		//$this->t_body->set_var("TEACHER", $result['teacher']); 
@@ -315,6 +318,44 @@ class OutPut
 		return true;
 	}
 
+	function outputTeachers($name, $size)
+	{
+		// gets teachers involved in subject, outputs links to their addressbook page
+		
+		// sql to add module :
+		// INSERT INTO homepage_comp VALUES(2, 'outputTeachers', 'Class Teachers', 'teacher_s.htm')
+		
+		if($this->code != "")
+		{
+			$this->t_body->set_block($name, "staff_teachers", "staff_teacher_block");
+	
+	
+			$db = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
+			mssql_select_db(MSSQL_db, $db);
+		
+			$msQuery = "SELECT SubjectClassStaff.StaffID
+				FROM SynergyOne.dbo.SubjectClassStaff SubjectClassStaff
+				WHERE SubjectClassStaff.ClassCode = '{$this->code}'";
+			
+			$msResult = mssql_select_db($msQuery, $db);
+			
+			while($synrow = mssql_fetch_array($msResult);
+			{
+				$query = "SELECT id, firstname, lastname FROM user WHERE synergy_id = '{$synrow['StaffID']}'";
+				$result = $this->db->dbDoQuery($query);
+				$row = $this->db->dbGetNextArray();
+				$name = $manager['firstname']." ".$manager['lastname'];	
+				
+				$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$row['id']}\">{$name}</a>");
+				$this->t_body->parse("staff_teacher_block", "staff_teachers", true);		
+			}
+		}
+		else
+		{
+			$this->t_body->set_var("staff_teacher_block", "");
+		}
+		return true;
+	}
 
 	function outputNews($name, $size)
 	{

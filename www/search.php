@@ -140,7 +140,7 @@ class OutPut
 	function fileSearch($token, $type, $sort)
 	{
 		//this query will get all files that the user can see
-		$query = "SELECT file.id, file.realname, file.mime_type, DATE_FORMAT(file.submitted, '%W %M %e @ %l:%i%p') AS submitted, 
+		$query = "SELECT file.id, file.realname, file.mime_type, DATE_FORMAT(file.submitted, 'FILE_date_format') AS submitted, 
 		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, file.description,
 		file.comment, category.name, category.id as cid, category.code
 		FROM file, user, category WHERE file.owner=user.id AND file.category = category.id AND file.deleted = '0'";
@@ -221,7 +221,7 @@ class OutPut
 	function linkSearch($token, $type, $sort)
 	{
 		//this query will get all files that the user can see
-		$query = "SELECT link.id, link.url, DATE_FORMAT(link.submitted, '%W %M %e @ %l:%i%p') AS submitted, 
+		$query = "SELECT link.id, link.url, DATE_FORMAT(link.submitted, 'FILE_date_format') AS submitted, 
 		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, link.description, link.comment, category.name, category.id as cid, category.code 
 		FROM link, user, category WHERE link.owner = user.id AND link.category = category.id";
 		//do the query based on search type
