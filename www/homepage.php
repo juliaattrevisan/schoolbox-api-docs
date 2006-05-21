@@ -339,7 +339,7 @@ class OutPut
 			
 			$msResult = mssql_select_db($msQuery, $db);
 			
-			while($synrow = mssql_fetch_array($msResult);
+			while($synrow = mssql_fetch_array($msResult))
 			{
 				$query = "SELECT id, firstname, lastname FROM user WHERE synergy_id = '{$synrow['StaffID']}'";
 				$result = $this->db->dbDoQuery($query);
