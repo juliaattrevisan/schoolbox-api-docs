@@ -156,7 +156,7 @@ class Group
 		// 3 = free
 	
 		if($this->service != 1)
-				error(); //this only works on folder groups!!??
+				error(9, "this only works on folder groups!!??"); //this only works on folder groups!!??
 	
 		$query = "UPDATE userGroups SET type = '$type' WHERE cid = '$this->sid'";
 		$this->db->dbDoQuery($query);

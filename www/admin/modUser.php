@@ -11,6 +11,7 @@ require_once("../include/include.php");
 require_once("../include/session.php");
 require_once("../include/adminonly.php");
 require_once("user.php");
+require_once("../group/group.php");
 
 class modUser
 {
@@ -324,6 +325,12 @@ $userDb = new user;
 $myPage = new modUser;
 
 
+if(isset($_POST['permSubmit']) && $_POST['permSubmit'] == 'Add')
+{
+	$groupPerm = new Group($_POST['service'], $_POST['sid']);
+	$groupPerm->addMember($_POST['uid'], $_POST['type']);
+}
+
 if(isset($_POST['delete']) && isset($_POST['id']) && $_POST['delete'] && $_POST['id'])
 {
 	$userDb->deleteUser($_POST['id'], 1);
@@ -380,6 +387,7 @@ else if($_GET['adduser'])
 }
 else
 	$myPage->displayFindUser();
+
 
 
 

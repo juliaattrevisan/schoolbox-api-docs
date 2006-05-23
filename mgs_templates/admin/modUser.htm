@@ -241,19 +241,14 @@ function verify()
 						<td>{SERVICE_NAME}</td>
 						<td>{SERVICE_ID}</td>
 						<td>{SERVICE_TYPE}</td>
-						<td>{REMOVE}</td>
+						<td>{SERVICE_REMOVE}</td>
 					</tr>
 					<!-- END perm_block -->
 					<tr>
 						<td>{SERVICE_DROP_DOWN}</td>
-						<td><input name="textfield" type="text" size="4" maxlength="6" /></td>
-						<td><select name="select">
-								<option value="1" selected="selected">1</option>
-								<option value="2">2</option>
-								<option value="3">3</option>
-							</select>
-						</td>
-						<td><input type="hidden" name="id2" value="{ID}" />
+						<td><input name="sid" type="text" size="4" maxlength="6" /></td>
+						<td><input name="type" type="text" size="4" maxlength="6"  /></td>
+						<td><input type="hidden" name="uid" value="{ID}" />
 							<input type="submit" name="permSubmit" value="Add" class="btn"/></td>
 					</tr>
 				</table>
