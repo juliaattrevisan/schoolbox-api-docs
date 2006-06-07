@@ -29,7 +29,7 @@ function getStudentInfo($synID)
 			AND vStudents.FileSemester = contactDetails.FileSemester 
 			AND vStudents.FileYear = contactDetails.FileYear 
 			AND vStudents.StudentID = contactDetails.ID
-			AND contactDetails.StudentContactDescription='Contact 1'
+			AND (contactDetails.StudentContactDescription='Contact 1' OR contactDetails.StudentContactDescription='Primary Contacts')
 			AND vStudents.StudentID = $synID
 		ORDER BY
 			contactDetails.FileYear DESC,contactDetails.FileSemester DESC
