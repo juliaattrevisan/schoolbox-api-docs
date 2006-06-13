@@ -65,7 +65,13 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 		$recipients['Cc'] = $cc;
 	}
 	
-	if(strrchr($to, '@'))
+	if(strrchr($to, '@')) // cant think of a situation for this
+	{
+			$bcc = str_replace(";",",",$bcc);
+			$recipients['Bcc'] = $bcc;
+	}
+
+	if(!strrchr($to, '@')) // this makes sense
 	{
 			$bcc = str_replace(";",",",$bcc);
 			$recipients['Bcc'] = $bcc;
