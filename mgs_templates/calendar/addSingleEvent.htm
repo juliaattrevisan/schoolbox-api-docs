@@ -25,19 +25,23 @@
 <script type="text/javascript">
 function showRow(){
 	var selecLevel = document.getElementById('eventForm').level.options[document.getElementById('eventForm').level.selectedIndex].value;
-	var campusRow = document.getElementById('campusRow');
+	var campusRow1 = document.getElementById('campusRow1');
+	var campusRow2 = document.getElementById('campusRow2');
 	var groupRow = document.getElementById('groupRow');
 
 	if( selecLevel == 1 || selecLevel == 4){
-		campusRow.style.display = "none";
+		campusRow1.style.display = "none";
+		campusRow2.style.display = "none";
 		groupRow.style.display = "none";
 	}
 	else if( selecLevel == 2 ){
-		campusRow.style.display = "none";
+		campusRow1.style.display = "none";
+		campusRow2.style.display = "none";
 		groupRow.style.display = "";
 	}
 	else if( selecLevel == 3 ){
-		campusRow.style.display = "";
+		campusRow1.style.display = "";
+		campusRow2.style.display = "";
 		groupRow.style.display = "none";
 	}
 }
@@ -139,8 +143,7 @@ window.onload = new Function('showRow();');
 							align          :    "br",           // alignment (defaults to "Bl")
 							singleClick    :    true
 						});
-						</script>
-					 </td>
+						</script>					 </td>
                       </tr>
                       <tr> 
                         <td><h2>Time</h2><em>Both time slots are optional.</em></td>
@@ -162,8 +165,7 @@ window.onload = new Function('showRow();');
                       </tr>
                       <tr> 
                         <td><h2>Priority</h2>
-                        	<em>This will determine the colour that the note shall appear on the calendar</em> 
-                        </td>
+                        	<em>This will determine the colour that the note shall appear on the calendar</em>                        </td>
                         <td><select name="priority">
                             <option value="4" {PRIORITY4}>Low (Black)</option>
                             <option value="3" {PRIORITY3}>Medium (Blue)</option>
@@ -180,9 +182,21 @@ window.onload = new Function('showRow();');
                         <td><h2>Group</h2><em>Select the group which will be able to view this event</em></td>
                         <td>{GROUP}</td>
                       </tr>
-                      <tr id="campusRow" style="display:none;"> 
-                        <td><h2>Campus</h2><em>Select the campus which will be able to view this event</em></td>
-                        <td>{CAMPUS}</td>
+                      <tr id="campusRow1" style="display:none;"> 
+                        <td><h2>Campus</h2><em>Select the campus' which will be able to view this event</em></td>
+                        <td>
+						<!-- BEGIN campus_check_list -->
+							<label><input type="checkbox" name="campus[]" value="{CAMPUSID}" {CAMPUSCHECKED} />{CAMPUSNAME}</label><br />
+						<!-- END campus_check_list -->
+						</td>
+                      </tr>
+                      <tr id="campusRow2" style="display:none;"> 
+                        <td><h2>Group</h2><em>Select the Groups which will be able to view this event</em></td>
+                        <td>
+						<!-- BEGIN user_group_check_list -->
+							<label><input type="checkbox" name="userGroup[]" value="{USERGROUPID}" {USERGROUPCHECKED} />{USERGROUPNAME}</label><br />
+						<!-- END user_group_check_list -->
+						</td>
                       </tr>
                       <tr> 
                         <td><h2>Description</h2></td>

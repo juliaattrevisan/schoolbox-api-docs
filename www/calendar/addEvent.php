@@ -22,26 +22,66 @@ class addEvent
 
 	function campusHTMLList($name, $selected) 
 	{
+		$this->t_body->set_block("tplBODY", "campus_check_list", "campus_chck_lst");
 		if($_SESSION['su'])
 			$SQL_QUERY = "SELECT id, name FROM luCampus";
 		else
-	        	$SQL_QUERY = "SELECT id, name FROM luCampus, userAccess WHERE luCampus.id = userAccess.sid AND 
-			userAccess.service = '2' AND uid = ".$_SESSION['id']." AND type > '1'";   
+	        $SQL_QUERY = "SELECT id, name FROM luCampus, userAccess WHERE luCampus.id = userAccess.sid AND 
+				userAccess.service = '2' AND uid = ".$_SESSION['id']." AND type > '1'";   
 
 		$this->db->dbDoQuery($SQL_QUERY);
-	        $i = 1;
-	        $allCampus = "<select name=\"".$name."\" class=\"formfield\">";  	
-        	while ($thisCampus = $this->db->dbGetNextArray()) 
+		$i = 0;	
+		while ($thisCampus = $this->db->dbGetNextArray()) 
 		{
-			if($selected == $thisCampus['id'])
-	        	        $allCampus .= "<option value=\"".$thisCampus['id']."\" selected>".$thisCampus['name']."</option>";
-        		else	
-		        	$allCampus .= "<option value=\"".$thisCampus['id']."\">".$thisCampus['name']."</option>";
-        	}
-		$allCampus .= "</select>";        
-
-		return $allCampus;
+			$this->t_body->set_var("CAMPUSNAME", $thisCampus['name']);
+			$this->t_body->set_var("CAMPUSID", $thisCampus['id']);
+			if(is_array($selected))
+			{			
+				if(in_array($thisCampus['id'], $selected, true))
+					$this->t_body->set_var("CAMPUSCHECKED", "checked=\"checked\"");
+				else	
+					$this->t_body->set_var("CAMPUSCHECKED", "");
+			}
+			else
+			{
+				if($thisCampus['id'] == $selected)
+					$this->t_body->set_var("CAMPUSCHECKED", "checked=\"checked\"");
+				else	
+					$this->t_body->set_var("CAMPUSCHECKED", "");				
+			}	
+			$this->t_body->parse("campus_chck_lst", "campus_check_list", true);
+			$i++;
+		}       
+		return $i;
 	}  
+
+	function userGroupHTMLList($name, $selected) 
+	{
+		$this->t_body->set_block("tplBODY", "user_group_check_list", "user_group_chck_lst");
+		$SQL_QUERY = "SELECT id, name FROM groups";
+		$this->db->dbDoQuery($SQL_QUERY);
+		for($i=0;$thisGroup=$this->db->dbGetNextArray();$i++) 
+		{
+			$this->t_body->set_var("USERGROUPNAME", $thisGroup['name']);
+			$this->t_body->set_var("USERGROUPID", $thisGroup['id']);
+			if(is_array($selected))
+			{
+				if(in_array($thisGroup['id'], $selected, true))
+					$this->t_body->set_var("USERGROUPCHECKED", "checked=\"checked\"");
+				else	
+					$this->t_body->set_var("USERGROUPCHECKED", "");
+			}
+			else
+			{
+				if($thisGroup['id'] == $selected)
+					$this->t_body->set_var("USERGROUPCHECKED", "checked=\"checked\"");
+				else	
+					$this->t_body->set_var("USERGROUPCHECKED", "");
+			}
+			$this->t_body->parse("user_group_chck_lst", "user_group_check_list", true);
+		}      
+		return $i;
+	}
 
 	function groupHTMLList($name, $selected) 
 	{
@@ -138,7 +178,7 @@ class addEvent
 
 	}
 
-	function setDropdowns($levSelected, $campSelected, $groupSelected)
+	function setDropdowns($levSelected, $campSelected, $groupSelected,$userGroupSelected)
 	{
 		//function sets the level drop down
 		//only gives access to appropriate drop downs
@@ -151,6 +191,7 @@ class addEvent
                             $leveldrop = "<option value=\"1\">Personal</option>";
 
 		$campusHTML = $this->campusHTMLList("campus", $campSelected);
+		$userGroup = $this->userGroupHTMLList("", $userGroupSelected);
 		$groupHTML = $this->groupHTMLList("group", $groupSelected);
 
 		//if the campus drop down contains campuses then output it and the option to select it in level
@@ -169,9 +210,8 @@ class addEvent
 
 
 		//if the campus drop down contains campuses then output it and the option to select it in level
-		if(strlen($campusHTML) > 50)
+		if($campusHTML > 0)
 		{
-			$this->t_body->set_var("CAMPUS", $campusHTML);
 			if($levSelected == 3)
 				$leveldrop .= "<option value=\"3\" selected>Campus</option>";
 			else
@@ -179,9 +219,6 @@ class addEvent
 		}
 		else if(($campSelected && $levSelected == 3) && !$_SESSION['su'])
 			error(0);   //no longer has access to modify even though owner?
-		else
-			$this->t_body->set_var("CAMPUS", "");
-			
 
 		$this->t_body->set_var("LEVEL", $leveldrop);
 
@@ -204,7 +241,7 @@ class addEvent
 		
 		$this->setTimeVars("", "");
 		
-		$this->setDropDowns($level,$sid,$sid);
+		$this->setDropDowns($level,$sid,$sid, 0);
 		
 		$this->setSelectedHTML("PRIORITY", 0, 1, 4);
 		$this->setSelectedHTML("LEVEL", 0, 1, 4);
@@ -243,7 +280,7 @@ class addEvent
 		$this->setTimeVars($event['startTime'], $event['endTime']);
 
 		$this->setSelectedHTML("PRIORITY", $event['priority'], 1, 4);
-		$this->setDropDowns($event['access'],$event['sid'],$event['sid']);
+		$this->setDropDowns($event['access'],$event['sid'],$event['sid'],$event['userGroup']);
 
 		$this->t_body->set_var("DESCRIPTION", $event['note']);
 		$this->t_body->set_var("HIDDEN", "<input type=\"hidden\" name=\"id\" value=\"".$event['id']."\">");
@@ -474,12 +511,12 @@ if(isset($_POST['priority']) && $_POST['priority'] && isset($_POST['note']) && $
 			//modify event
 			$cal->modSingleEvent($_POST['id'], mktime(0,0,0, $month, $date, $year),
                         $startTime, $endTime, $_POST['priority'], $_POST['note'],
-                                $_POST['level'], $sid);	
+                                $_POST['level'], $sid, $_POST['userGroup']);	
 		}else{
 		//insert event 
 			$cal->addSingleEvent(mktime(0,0,0, $month, $date, $year), 
 			$startTime, $endTime, $_POST['priority'], $_POST['note'], 
-				$_POST['level'], $sid); 
+				$_POST['level'], $sid, $_POST['userGroup']); 
 		}
 
 		//redirect back to where they came from

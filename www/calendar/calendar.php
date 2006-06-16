@@ -115,13 +115,70 @@ function checkOwnership($id, $type)
 	return $result['owner'];
 }
 
-function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 1, $sid = 0)
+function addPerms($id, $groupArray, $campusArray)
+{
+	$hasAuth = false;
+	foreach($campusArray as $campus)
+	{
+		if($this->checkSecurity(3, $campus) > 1)
+		{
+			$this->insertCampus($id, $campus);
+			$hasAuth = true;
+		}
+	}
+	if($hasAuth)
+	{
+		foreach($groupArray as $group) 
+		{
+			$this->insertGroup($id, $group);
+		}
+	}
+}
+
+function delPerms($id)
+{
+	$query = "DELETE FROM eventGroup WHERE eventID = '$id'";
+	$this->db->dbDoQuery($query);
+	$query = "DELETE FROM eventCampus WHERE eventID = '$id'";
+	$this->db->dbDoQuery($query);
+}
+
+function insertGroup($id, $group)
+{
+	$query = "INSERT INTO eventGroup VALUES ($id, $group)";
+	$this->db->dbDoQuery($query);
+}
+
+function insertCampus($id, $campus)
+{
+	$query = "INSERT INTO eventCampus VALUES ($id, $campus)";
+	$this->db->dbDoQuery($query);
+}
+
+function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 1, $sid = 0, $userGroup = 0)
 {
 	$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access, sid) 
 	VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), $startTime, $endTime, '$priority', 
 	'$note', '$level', '$sid')";
 	
-	if($this->checkSecurity($level, $sid) > 1) //check has permission to write
+	if(is_array($sid))
+	{
+		$hasAuth = false;
+		foreach($sid as $campusID)
+		{
+			if($this->checkSecurity($level, $campusID) > 1) //check has permission to write
+				$hasAuth = true;		
+		}
+		if($hasAuth)
+		{
+			$this->db->dbDoQuery($query);
+			$newEventID =  $this->db->dbInsertId();
+			$this->addPerms($newEventID, $userGroup, $sid);
+		}
+		else
+			error(35); //do not have permission to add event
+	}
+	else if($this->checkSecurity($level, $sid) > 1) //check has permission to write
 	{
 		$this->db->dbDoQuery($query);
 	}
@@ -129,15 +186,34 @@ function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 
 		error(35); //do not have permission to add event
 }
 
-function modSingleEvent($id, $date, $startTime,  $endTime, $priority, $note, $level = 1, $sid = 0)
+function modSingleEvent($id, $date, $startTime,  $endTime, $priority, $note, $level = 1, $sid = 0, $userGroup = 0)
 {
 	$query = "UPDATE event SET date=FROM_UNIXTIME('$date'), startTime=$startTime, 
 		endTime=$endTime, priority='$priority', note='$note', access='$level', sid='$sid' 
 		WHERE id='$id'";
 	
+	if(is_array($sid))
+	{
+		$hasAuth = false;
+		foreach($sid as $campusID)
+		{
+			if($this->checkSecurity($level, $campusID) > 2 || ($this->checkOwnership($id, 1) == $_SESSION['id'])) 
+				$hasAuth = true;		
+		}
+		if($hasAuth)
+		{
+			$this->db->dbDoQuery($query);
+			$this->delPerms($id);
+			$this->addPerms($id, $userGroup, $sid);
+		}
+		else
+			error(34); //do not have permission to add event
+	}
+	else
 	if(($this->checkSecurity($level, $sid) > 2) || ($this->checkOwnership($id, 1) == $_SESSION['id']))
 	{
 		$this->db->dbDoQuery($query);
+		$this->delPerms($id);
 	}
 	else
 		error(34); //do not have permission to modify event
@@ -150,6 +226,7 @@ function deleteSingleEvent($id, $level = 1, $sid = 0)
 	if(($this->checkSecurity($level, $sid) > 2) || ($this->checkOwnership($id, 1) == $_SESSION['id']))
 	{
 		$this->db->dbDoQuery($query);
+		$this->delPerms($id);
 	}
 	else
 		error(34); //do not have permission to modify event
@@ -290,17 +367,40 @@ function getSingleEvent($id, $type)
 	//get single event to populate modify form
 
 	if($type == "week")
+	{
 		$query = "SELECT * FROM eventWeekly WHERE id = '$id'";
+		$event = $this->db->dbGetSingleRow($query);
+	}
 	else if($type == "month")
+	{
 		$query = "SELECT * FROM eventMonthly WHERE id = '$id'";
+		$event = $this->db->dbGetSingleRow($query);
+	}
 	else
+	{
 		$query = "SELECT * FROM event WHERE id = '$id'";
-
-	$event = $this->db->dbGetSingleRow($query);
+		$event = $this->db->dbGetSingleRow($query);
+		if($event['access'] == 3)
+		{
+			unset($event['sid']);
+			$query = "SELECT campusID FROM eventCampus WHERE eventID = '$id'";
+			$this->db->dbDoQuery($query);
+			while($thisCampus = $this->db->dbGetNextArray())
+			{
+				$event['sid'][] = $thisCampus['campusID'];
+			}
+			$query = "SELECT groupID FROM eventGroup WHERE eventID = '$id'";
+			$this->db->dbDoQuery($query);
+			while($thisGroup = $this->db->dbGetNextArray())
+			{
+				$event['userGroup'][] = $thisGroup['groupID'];
+			}
+		}
+	}
 	return $event;
 }
 
-function getDayEvents($day, $month, $year, $campus = 0)
+function getDayEvents($day, $month, $year, $campus = 0, $group = 0)
 {
 	//this function will return all events occuring on the date specified
 		
@@ -310,18 +410,31 @@ function getDayEvents($day, $month, $year, $campus = 0)
 	$dayocc = ceil($date/7);  
 	$eventCount = 0;
 	
+	if($group)
+		$groupID = group;
+	else
+		$groupID = $_SESSION['gid'];
 	//ouput only selected campus
 	if($campus)
 		$campuslist = $campus;
 	else
 		$campuslist = implode(',',$_SESSION['campus']);
-
+		
+	//give people with userAccess to moderate Calendar Access to view all Camups Posts
+	//
+	if($this->checkSecurity(3, $_SESSION['campus'][0]) > 2 || $_SESSION['su'])
+		$groupChunk = "";
+	else
+		$groupChunk = "AND eventGroup.groupID = '$groupID'";
+		
 	//get single events for the day
-	$querysingle = "SELECT id, owner,TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp,
-	TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, 
-	priority, note FROM event WHERE date = FROM_UNIXTIME('$datestamp')
+	$querysingle = "SELECT DISTINCT id, owner,TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note, access, eventCampus.campusID as sid
+	FROM event 
+	JOIN eventCampus ON event.id = eventCampus.eventID
+	JOIN eventGroup ON event.id = eventGroup.eventID
+	WHERE date = FROM_UNIXTIME('$datestamp')
 	AND ( (access = '4') OR (access = '1' AND owner= '".$_SESSION['id']."') 
-		OR (access = '3' AND sid IN($campuslist) ))
+		OR (access = '3' AND eventCampus.campusID IN($campuslist) $groupChunk ))
 	ORDER BY event.startTime, event.endTime";
 
 	//get weekly events that occur today

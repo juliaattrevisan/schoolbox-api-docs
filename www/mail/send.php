@@ -111,6 +111,6 @@ if(isset($_POST['to']) && $_POST['to'])
 }	
 else
 {
-	localRedir('mail/createMail.php');
+	localRedir('/mail/createMail.php');
 }
 ?>
