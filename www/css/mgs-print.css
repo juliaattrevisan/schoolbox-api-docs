@@ -394,3 +394,17 @@ table.ruler h2 {
 	margin-left:0;
 	padding-right:0;
 	}
+
+table.timetable {
+	border: 1px solid #000;
+	border-collapse:collapse;
+}
+
+table.timetable td {
+	border: 1px solid;
+	padding: 4px;
+}
+
+table.timetable th {
+	border: 1px solid #000;
+}
