@@ -165,7 +165,7 @@ class Absentee
                           SubjectClasses.FileSemester AND Timetable.FileType = SubjectClasses.FileType
                           AND Timetable.FileYear = SubjectClasses.FileYear AND
                           ((SubjectClasses.FileSemester='".$_SESSION['FileSemester']."') AND (SubjectClasses.FileYear='".$_SESSION['FileYear']."')
-                          AND (Timetable.StaffID='$synergy_id')) AND (SubjectClasses.ClassCode like '%EN%')
+                          AND (Timetable.StaffID='$synergy_id')) AND (SubjectClasses.ClassCode like '%HOME%')
 			";
 
                 $result = mssql_query($query, $this->msdb);
