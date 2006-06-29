@@ -133,9 +133,11 @@ class Attendance
 
 			$this->t_body->parse("student_list_block", "student_list", true);		
 			$x++;
-		}
-		
-                $this->t_body->pparse("finaloutput", "tplBODY");
+		}		
+               	if($x==0)
+			$this->t_body->set_var("student_list_block", "");
+
+		$this->t_body->pparse("finaloutput", "tplBODY");
         }
 
 	function createAbsCodeHTML($code)
@@ -199,7 +201,7 @@ class Attendance
 		";
 
                 $result = mssql_query($query, $this->msdb);
-
+		$x = 0;
                 while( $desc = mssql_fetch_array($result) )
                 {
                         //output list of classes
@@ -211,8 +213,11 @@ class Attendance
                         $this->t_body->set_var("SUBJECTLINK", "attendances.php?code=".$desc[3]);
       
                         $this->t_body->parse("class_list_block", "class_list", true);
-
+			$x++;
                 }
+		if($x==0)
+			$this->t_body->set_var("class_list_block", "");
+
                 $this->t_body->pparse("finaloutput", "tplBODY");
 	}
 
