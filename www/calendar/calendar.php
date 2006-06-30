@@ -146,20 +146,29 @@ function delPerms($id)
 function insertGroup($id, $group)
 {
 	$query = "INSERT INTO eventGroup VALUES ($id, $group)";
-	$this->db->dbDoQuery($query);
+	return $this->db->dbDoQuery($query);
 }
 
 function insertCampus($id, $campus)
 {
 	$query = "INSERT INTO eventCampus VALUES ($id, $campus)";
-	$this->db->dbDoQuery($query);
+	return $this->db->dbDoQuery($query);
 }
 
 function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 1, $sid = 0, $userGroup = 0)
 {
-	$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access, sid) 
-	VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), $startTime, $endTime, '$priority', 
-	'$note', '$level', '$sid')";
+	if($level == 3)
+	{
+		$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access, sid) 
+			VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), $startTime, $endTime, '$priority', 
+			'$note', '$level', '$sid')";
+	}
+	else
+	{
+		$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access) 
+			VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), $startTime, $endTime, '$priority', 
+			'$note', '$level')";	
+	}
 	
 	if(is_array($sid))
 	{
