@@ -689,7 +689,7 @@ class OutPut
 		//file output
 		$this->t_body->set_block($name, "folders", "folders_block");
 	
-		$query = "SELECT id, name FROM category 
+		$query = "SELECT id, name, template FROM category 
 		WHERE parent = '".$this->category."' ORDER BY name DESC";
 
 		//if no size make unlimited query else make it limited by size
@@ -999,6 +999,11 @@ class OutPut
 	{
 		//set name
 		$this->t_body->set_var("FOLDER_NAME", "<a href=\"/browse.php?category=".$queryArray['id']."\">".scrubTEXT($queryArray['name'])."</a>");
+
+		if($queryArray['template'])
+			$this->t_body->set_var("HOMEPAGE_LINK", "<a href=\"/homepage.php?category=".$queryArray['id']."\">homepage</a>");
+		else
+			$this->t_body->set_var("HOMEPAGE_LINK", "");
 
 		$this->t_body->parse("folders_block", "folders", true);
 
