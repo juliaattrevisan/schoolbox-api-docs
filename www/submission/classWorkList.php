@@ -36,8 +36,15 @@ if(isset($_GET['subject']) && $_GET['subject'])
 			columnDelete( $_POST[ 'box_id']);
 		}
 
-		$page = new ClassList;
-		$page->displayClass($subject);
+		if($_POST['ajaxPost'] == true)
+		{
+			echo"Query Executed OK";
+		}
+		else
+		{
+			$page = new ClassList;
+			$page->displayClass($subject);
+		}
 	}
 	else
 	{
@@ -60,7 +67,7 @@ class ClassList
                 //output week to template
 
                 $this->t_body = new Template(TPL_directory);
-                $this->t_body->set_file("tplBODY", "submission/classMarkList.htm");
+                $this->t_body->set_file("tplBODY", "submission/testClassMarkList.htm");
 		$this->t_body->set_block("tplBODY", "student_list", "student_list_block");
 		$this->t_body->set_var("TITLE", HEADING." - Mark Lists");
 		include_once("../include/page.php");
@@ -206,23 +213,23 @@ class ClassList
 					if($user['work'][$box['id']] == "") {
 						$workmarkHTML .= '
 						
-						 <td><form method="POST">
+						 <td><form method="POST" onSubmit="return false;">
 							<input name="mark" value="" class="inputMark" type="text" size="5" maxlength="10" onBlur="submitOnFieldChange(this.form);">
 							<div style="display: none;">
 							<input type="hidden" name="userID" value="' . $user[ 'userID'] . '">
 							<input type="hidden" name="box_id" value="' . $box[ 'id'] . '">
-							<input type="hidden" name="do" value="markAdd">
+							<input type="hidden" name="do_" value="markAdd">
 							</div></form>
 						</td>';
 					}
 					else {				# Mark has been given
 						$workmarkHTML .= '
 						
-						  <td><form method="POST" onSubmit="return markValidate( this.mark);">
+						  <td><form method="POST" onSubmit="return false;">
 							<input name="mark" class="inputMark" type="text" size="5" maxlength="10" value="' . htmlentities( $user[ 'work'][ $box[ 'id']]) . '" onBlur="submitOnFieldChange(this.form);">
 							<input type="hidden" name="userID" value="' . $user[ 'userID'] . '">
 							<input type="hidden" name="box_id" value="' . $box[ 'id'] . '">
-							<input type="hidden" name="do" value="markUpdate">
+							<input type="hidden" name="do_" value="markUpdate">
 						  </form></td>
 						';
 					}

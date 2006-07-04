@@ -15,10 +15,64 @@
 <link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
 <script type="text/javascript" src="/javascript/drop_down.js"></script>
 <!-- #BeginEditable "scripts" -->
+<style type="text/css">
 
+.markTable {
+	border-top: 1px solid #000000;
+	border-right: 1px solid #000000;
+}
+
+.inputMark {
+	border: 0px none;
+}
+
+.markWaiting {
+background-color:#FFFFCC
+}
+.markFail {
+background-color:#CC3300
+}
+.markOK {
+background-color:#66CC33
+}
+</style>
 
 <script src='/javascript/common.js'></script>
+<script src='/javascript/yui/yahoo/yahoo-min.js'></script>
+<script src='/javascript/yui/connection/connection-min.js'></script>
 <script>
+
+var handleSuccess = function(o)
+{
+	if(o.responseText !== undefined)
+	{
+		if(o.responseText == "Query Executed OK")
+		{
+			o.argument.mark.style.backgroundColor = '#66CC33';
+			o.argument.mark.title = "Result Saved";	
+		}
+		else
+		{
+			o.argument.mark.style.backgroundColor = '#CC3300';
+			o.argument.mark.title = "Database Error";	
+		}
+	}
+}
+
+var handleFailure = function(o)
+{
+	if(o.responseText !== undefined)
+	{
+		o.argument.mark.style.backgroundColor = '#CC3300';
+		o.argument.mark.title = "Connection Failure";	
+	}
+}
+
+var callback =
+{
+  success:handleSuccess,
+  failure:handleFailure
+};
 
 function columnAdd() {
 	var strColName =  prompt( 'Name of column', '');
@@ -45,23 +99,22 @@ function submitOnFieldChange( form )
 {
 	if( form.mark.defaultvalue != form.mark.value )
 	{
-			form.submit();
+		form.mark.style.backgroundColor = '#FFFFCC';
+		form.mark.title = "Connecting";	
+		
+		var sUrl = '/submission/testClassWorkList.php?subject={CODE}';
+		var postData = "userID="+form.userID.value+
+			"&box_id="+form.box_id.value+
+			"&mark="+form.mark.value+
+			"&ajaxPost=true"+
+			"&do="+form.do_.value;
+		callback.argument = form;
+		var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);
 	}
 }
 
 </script>
-<style type="text/css">
 
-.markTable {
-	border-top: 1px solid #000000;
-	border-right: 1px solid #000000;
-}
-
-.inputMark {
-	border: 0px none;
-}
-
-</style>
 
 <!-- #EndEditable -->
 </head>
