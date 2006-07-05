@@ -325,30 +325,34 @@ class OutPut
 		// sql to add module :
 		// INSERT INTO homepage_comp VALUES(2, 'outputTeachers', 'Class Teachers', 'teacher_s.htm')
 		
-		if($this->code != "")
+		if($this->code != "" && SYNERGY_enable)
 		{
 			$this->t_body->set_block($name, "staff_teachers", "staff_teacher_block");
 	
-	
-			$db = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
+			
+			$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
 			mssql_select_db(MSSQL_db, $db);
 		
-			$msQuery = "SELECT SubjectClassStaff.StaffID
-				FROM SynergyOne.dbo.SubjectClassStaff SubjectClassStaff
-				WHERE SubjectClassStaff.ClassCode = '{$this->code}'";
+			$msQuery = "SELECT DISTINCT StaffID FROM SubjectClassStaff
+				WHERE ClassCode = '{$this->code}'";
 			
-			$msResult = mssql_select_db($msQuery, $db);
+			$msResult = mssql_query($msQuery, $db);
 			
-			while($synrow = mssql_fetch_array($msResult))
-			{
-				$query = "SELECT id, firstname, lastname FROM user WHERE synergy_id = '{$synrow['StaffID']}'";
-				$result = $this->db->dbDoQuery($query);
-				$row = $this->db->dbGetNextArray();
-				$name = $manager['firstname']." ".$manager['lastname'];	
-				
-				$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$row['id']}\">{$name}</a>");
-				$this->t_body->parse("staff_teacher_block", "staff_teachers", true);		
+			if(mssql_num_rows($msResult) > 0)
+			{ 
+				while($synrow = mssql_fetch_array($msResult))
+				{
+					$query = "SELECT id, firstname, lastname FROM user WHERE synergy_id = '{$synrow['StaffID']}'";
+					$manager=$this->db->dbGetSingleRow($query);
+					$name = $manager['firstname']." ".$manager['lastname'];	
+					
+					$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$manager['id']}\">{$name}</a>");
+					$this->t_body->parse("staff_teacher_block", "staff_teachers", true);		
+				}
 			}
+			else
+				$this->t_body->set_var("staff_teacher_block", "");
+
 		}
 		else
 		{

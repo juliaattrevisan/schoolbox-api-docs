@@ -67,7 +67,7 @@ class ClassList
                 //output week to template
 
                 $this->t_body = new Template(TPL_directory);
-                $this->t_body->set_file("tplBODY", "submission/testClassMarkList.htm");
+                $this->t_body->set_file("tplBODY", "submission/classMarkList.htm");
 		$this->t_body->set_block("tplBODY", "student_list", "student_list_block");
 		$this->t_body->set_var("TITLE", HEADING." - Mark Lists");
 		include_once("../include/page.php");

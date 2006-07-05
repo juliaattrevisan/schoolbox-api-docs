@@ -13,16 +13,15 @@ class fixEvents
 		$this->t_body->set_file("tplBODY", "admin/fixEvents.htm");
 		$this->message = "";
 		$this->cal = new calendar();
-		$this->db = new dbManager();
-		$this->dbUpdate = new dbManager();
+		$this->db = new dbManager(SQL_db, 1);
 		$groupArray = $this->getAllGroups();
 		$allCampusArray = $this->getAllCampus();		
 		$sql = "SELECT id, sid FROM event WHERE access = 3 AND sid IS NOT NULL";
-		$this->db->dbDoQuery($sql);
+		$result = $this->db->dbDoQuery($sql);
 		
-		while($row = $this->db->dbGetNextArray())
+		while($row = $this->db->dbGetNextArray($result))
 		{
-
+			$campusArray = array();
 			if($row['sid'] == 0)
 			{
 				$campusArray = $allCampusArray;
@@ -33,13 +32,13 @@ class fixEvents
 			}
 			
 			$this->addPerms($row['id'], $groupArray, $campusArray);
-			$sql = "UPDATE event SET sid = null WHERE id = '{$row['id']}'";
-			$this->dbUpdate->dbDoQuery($sql);
+			$sql = "UPDATE event SET sid = null WHERE id = {$row['id']}";
+			$this->db->dbDoQuery($sql);
 			$this->message .= "Updated event $id<br />";
 		
 		}
 		
-		$this->t_body->set_var("RESULT",$message);
+		$this->t_body->set_var("RESULT",$this->message);
 		include_once("../include/page.php");
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}

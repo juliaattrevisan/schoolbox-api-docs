@@ -17,9 +17,14 @@
 <!-- #BeginEditable "scripts" -->
 <style type="text/css">
 
-.markTable {
-	border-top: 1px solid #000000;
+
+.markTable tr td { 
+	border-bottom: 1px solid #000000;
 	border-right: 1px solid #000000;
+}
+
+.markTable th {
+	vertical-align:bottom;
 }
 
 .inputMark {
@@ -48,7 +53,7 @@ var handleSuccess = function(o)
 	{
 		if(o.responseText == "Query Executed OK")
 		{
-			o.argument.mark.style.backgroundColor = '#66CC33';
+			o.argument.mark.style.backgroundColor = '#ffffff';
 			o.argument.mark.title = "Result Saved";	
 		}
 		else
@@ -102,7 +107,7 @@ function submitOnFieldChange( form )
 		form.mark.style.backgroundColor = '#FFFFCC';
 		form.mark.title = "Connecting";	
 		
-		var sUrl = '/submission/testClassWorkList.php?subject={CODE}';
+		var sUrl = '/submission/classWorkList.php?subject={CODE}';
 		var postData = "userID="+form.userID.value+
 			"&box_id="+form.box_id.value+
 			"&mark="+form.mark.value+
@@ -207,7 +212,8 @@ function submitOnFieldChange( form )
 							<input type='image' src='/images/button_add.jpg' alt='add column' /> 
 						</form>
 			</span>
-			<table class="markTable"> 
+			<br />
+			<table class="markTable" cellspacing="0" cellpadding="0"> 
 				<tr> 
 					<th>Surname</th> 
 					<th>Preferred Name</th> 
