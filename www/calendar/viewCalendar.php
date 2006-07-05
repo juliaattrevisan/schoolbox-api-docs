@@ -210,6 +210,20 @@ class displayCalendar
 				$subout = 1;
 			}
 
+			if(SITE_location == "mgs")
+			{
+				$birthdayList = $this->cal->getStudentBirthdays($this->currDay, $this->currMonth, $this->currYear);
+				if(in_array(3 ,$_SESSION['campus']))
+				{
+					foreach($birthdayList as $bDay)
+					{
+						$this->outputEvent(0, '', '', 3, 'Student Birthday - '.$bDay['name'].' in '.$bDay['form'].' turns '.$bDay['age']
+							,0,0,0,0);
+						$subout = 1;
+					}
+				}
+			}
+
 			$eventList = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear, $campus);
 			
 			if(!is_array($eventList))
