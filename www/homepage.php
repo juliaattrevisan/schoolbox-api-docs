@@ -824,15 +824,18 @@ class OutPut
 		//event output
 		$this->t_body->set_block($name, "group_events", "group_events_block");
 	
-        	$query = "SELECT id, DATE_FORMAT(date, '%D %b') as outputDate, 
-				DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
-				TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTimeString, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTimeString, 
-				priority, note 
-        		  FROM event WHERE access = '2' AND sid = '".$this->category."' AND date >= NOW() ORDER BY date, startTime";
-
-		//if no size make unlimited query else make it limited by size
-		if($size != 0 && $size != '') 
-			$query .= " LIMIT 0, $size"; 
+		//event limit changed from posts to days
+		if($size != 0 && $size != '')
+				$where = " AND date < ADDDATE(CURDATE(), INTERVAL $size DAY) ";
+		else
+				$where = "";
+		
+		
+		$query = "SELECT id, DATE_FORMAT(date, '%a %D %b') as outputDate,
+						DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
+						TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTimeString, TIME_FORMAT(endTime, 
+		'".CALENDAR_time_format."') as endTimeString,priority, note
+				  FROM event WHERE access = '2' AND sid = '".$this->category."' AND( date >= NOW() $where) ORDER BY date, startTime";
 		
 		$this->db->dbDoQuery($query);	
 
