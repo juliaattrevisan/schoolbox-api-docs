@@ -573,6 +573,38 @@ function getSubmissionEvents($day, $month, $year)
 	return $subEvents;
 }
 
+function getStudentBirthdays($day, $month, $year)
+{
+        $db = mssql_connect(MSSQL_host,MSSQL_user, MSSQL_passwd); //todo: get portal synergy account permissions
+
+        $query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
+                        vStudents.StudentBirthDate, vStudents.StudentCampus, datediff(year,studentbirthdate,getdate()) as 'Student Age',
+                        vStudents.StudentFormDescription, convert(varchar,studentbirthdate,106)  as 'la'
+                        FROM SynergyOne.dbo.vStudents vStudents
+                        WHERE (vStudents.CurrentSemesterOnlyFlag=1)
+                        AND day(studentbirthdate) = ". $day ."
+                        AND month(studentbirthdate) =". $month ."
+                        AND StudentCampus = 'G'
+                        ORDER BY day(studentbirthdate) ";
+
+        $result = mssql_query($query, $db);
+        $i=0;
+        if($result != 1)
+        {
+                while($line = mssql_fetch_assoc($result))
+                {
+
+                        $birthdays[$i]['name'] = $line['StudentGiven1']." ".$line['StudentSurname'];
+                        $birthdays[$i]['form'] = $line['StudentFormDescription'];
+                        $birthdays[$i]['age'] = $line['Student Age'];
+                        $birthdays[$i]['birthdate'] = $line['la'];
+                        $i++;
+                }
+		return $birthdays;
+        }
+}
+
+
 function getWeekSubmissionEvents($day, $month, $year)
 {
 
