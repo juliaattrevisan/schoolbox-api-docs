@@ -28,7 +28,7 @@ class date
 		}
 	  	$where = substr($where, 0, strlen($where)-2);		
 		$query = "SELECT 	id, firstname, lastname
-			  FROM 		intranet.user
+			  FROM 		".SQL_db.".user
 			  WHERE		group_id IN (1, 2) 
 			  AND		(".$where.")
 			";
@@ -42,7 +42,7 @@ class date
 	
 	function addStaff($id)
 	{
-		$query = "INSERT INTO	intranet.userAccess
+		$query = "INSERT INTO	".SQL_db.".userAccess
 			  		(uid, service, sid, type)
 			  VALUES	($id, 5, 0, 2)
 			";
@@ -52,8 +52,8 @@ class date
 	function getStaff()
 	{
 		$query = "SELECT 	u.id, u.firstname, u.lastname
-			  FROM 		intranet.userAccess ua
-			  LEFT JOIN 	intranet.user u
+			  FROM 		".SQL_db.".userAccess ua
+			  LEFT JOIN 	".SQL_db.".user u
 			  ON		u.id = ua.uid
 			  WHERE		ua.service = 5 
 			  AND		ua.type >= 2
@@ -238,7 +238,7 @@ class date
                                 		//get date into array for notify function to deal with
                                 		$query = "SELECT date_format(d.detdatetime, '%a %D %b') as detdate, date_format(d.detdatetime, '%l:%i%p') as time, u.firstname, u.lastname, l.location
                                           		  FROM detdate d, location l
-                                          		  LEFT JOIN intranet.user u ON u.id = d.staff
+                                          		  LEFT JOIN ".SQL_db.".user u ON u.id = d.staff
                                           		  WHERE d.id = '$date'
                                           		  AND d.location = l.id
                                 		";

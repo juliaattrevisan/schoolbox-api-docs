@@ -15,7 +15,7 @@ function permType()
 		return 4;
 	}
 
-	$db = new dbManager("intranet");
+	$db = new dbManager();
 	$db->dbConnect();
 
 	//individual access
