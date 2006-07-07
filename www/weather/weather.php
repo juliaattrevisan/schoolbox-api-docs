@@ -147,7 +147,7 @@ class Weather
 				$forecastWeather = WEATHER_FORECAST_CACHE_LOCATION;
 
 				// enter active mode
-				ftp_pasv( $conn_id, false);
+				ftp_pasv( $conn_id, true);
 
 				// download current weather file
 				$download = ftp_get($conn_id, $currentLocalWeather, WEATHER_CURRENT_LOCAL_FILE, FTP_ASCII); 
