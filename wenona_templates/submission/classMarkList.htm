@@ -17,7 +17,40 @@
 <!-- #BeginEditable "scripts" -->
 
 <script src='/javascript/common.js'></script>
+<script src='/javascript/yui/yahoo/yahoo-min.js'></script>
+<script src='/javascript/yui/connection/connection-min.js'></script>
 <script>
+var handleSuccess = function(o)
+{
+	if(o.responseText !== undefined)
+	{
+		if(o.responseText == "Query Executed OK")
+		{
+			o.argument.mark.style.backgroundColor = '#ffffff';
+			o.argument.mark.title = "Result Saved";	
+		}
+		else
+		{
+			o.argument.mark.style.backgroundColor = '#CC3300';
+			o.argument.mark.title = "Database Error";	
+		}
+	}
+}
+
+var handleFailure = function(o)
+{
+	if(o.responseText !== undefined)
+	{
+		o.argument.mark.style.backgroundColor = '#CC3300';
+		o.argument.mark.title = "Connection Failure";	
+	}
+}
+
+var callback =
+{
+  success:handleSuccess,
+  failure:handleFailure
+};
 
 function columnAdd() {
 	var strColName =  prompt( 'Name of column', '');
@@ -44,7 +77,17 @@ function submitOnFieldChange( form )
 {
 	if( form.mark.defaultvalue != form.mark.value )
 	{
-			form.submit();
+		form.mark.style.backgroundColor = '#FFFFCC';
+		form.mark.title = "Connecting";	
+		
+		var sUrl = '/submission/classWorkList.php?subject={CODE}';
+		var postData = "userID="+form.userID.value+
+			"&box_id="+form.box_id.value+
+			"&mark="+form.mark.value+
+			"&ajaxPost=true"+
+			"&do="+form.do_.value;
+		callback.argument = form;
+		var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);
 	}
 }
 
