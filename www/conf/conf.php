@@ -26,11 +26,11 @@ define("REGISTER_FIRSTIME", false);			//Detects no password and checks password 
 // be writable by the apache process
 
 //CMS options
-define("FILE_directory", "/home/jleckie/portal/files");	//Files uploaded using CMS system will be stored here
-define("SUBMISSION_directory", "/home/jleckie/portal/submissions");	//All files submitted to submission box stored here
-define("RETURNS_directory", "/home/jleckie/portal/returns");		//Returned work will be stored in this directory
-define("TPL_directory", "/home/jleckie/portal/templates");		//Where site templates are located
-define("THUMBNAIL_IMAGE_CACHE", "/home/jleckie/portal/files/thumbnails");		//Thumbnail cache for 
+define("FILE_directory", "/usr/local/www/portal/files");	//Files uploaded using CMS system will be stored here
+define("SUBMISSION_directory", "/usr/local/www/portal/submissions");	//All files submitted to submission box stored here
+define("RETURNS_directory", "/usr/local/www/portal/returns");		//Returned work will be stored in this directory
+define("TPL_directory", "/usr/local/www/portal/mgs_templates");		//Where site templates are located
+define("THUMBNAIL_IMAGE_CACHE", "/usr/local/www/portal/files/thumbnails");		//Thumbnail cache for 
 define("URLS_use_frame", true);						//Open links in frame
 
 //GROUP options
@@ -50,9 +50,9 @@ define("FILE_date_format", '%W %M %e %Y @ %l:%i%p');		//Time output style 24 hou
 
 //MySQL config options
 define("SQL_host", "localhost");
-define("SQL_user", "jleckie_portal");
-define("SQL_passwd", "tRiD3nT");
-define("SQL_db", "jleckie_portal");
+define("SQL_user", "portal");
+define("SQL_passwd", "tnp879");
+define("SQL_db", "portal");
 
 
 //Synergy options
@@ -84,8 +84,8 @@ define("MAIL_increment", 20);					//Amount of emails per page
 //Weather options
 define("WEATHER_enable", false);				//This will disable the weather module
 define("WEATHER_CACHE", "7200");  			//cache weather info for 2 hours
-define("WEATHER_CURRENT_CACHE_LOCATION", "/home/staff/jleckie/www/portaldev/files/currentweather.xml");	//File to save weather cache in
-define("WEATHER_FORECAST_CACHE_LOCATION", "/home/staff/jleckie/www/portaldev/files/forecastweather.xml");	//File to save weather cache in
+define("WEATHER_CURRENT_CACHE_LOCATION", "/usr/local/www/portal/files/currentweather.xml");	//File to save weather cache in
+define("WEATHER_FORECAST_CACHE_LOCATION", "/usr/local/www/portal/files/forecastweather.xml");	//File to save weather cache in
 define("WEATHER_SERVER", "ftp.theweather.com.au");
 define("WEATHER_CURRENT_FILE", "obs_current_aws_vic.xml");
 define("WEATHER_FORECAST_FILE", "d_fcast_city_4day.xml");
