@@ -17,7 +17,7 @@ class bulletin
 	function getCampusBulletinNews($catID)
 	{
 		$sql = "SELECT * FROM subject_news n
-				WHERE n.code = '{$catID}'
+				WHERE n.code = '{$catID}' AND deleted = 0
 				ORDER BY datetime_posted DESC
 				LIMIT 1";
 		$row = 	$this->db->dbGetSingleRow($sql);
@@ -105,13 +105,10 @@ class bulletin
 }
 
 if(isset($_GET['campusID']))
-{
 	$page = new bulletin($_GET['campusID']);
-	$page->doOutput();
-}
 else
-{
-	error(2); //not enough info was supplied
-}
+	$page = new bulletin($_SESSION['campus'][0]);
+
+$page->doOutput();
 
 ?>
