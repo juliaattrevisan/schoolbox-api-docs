@@ -15,12 +15,7 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
 <link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
 <script type="text/javascript" src="/javascript/drop_down.js"></script>
-<!-- InstanceBeginEditable name="scripts" -->
-<link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
-<script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
-<script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
-<script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
-<!-- InstanceEndEditable -->
+<!-- InstanceBeginEditable name="scripts" --><!-- InstanceEndEditable -->
 </head>
 <body> 
 <div id="outerWrap"> 
@@ -108,11 +103,10 @@
 <tr> 
   <td style="vertical-align:top"> 
   <h2>Upcoming Events</h2> 
-  <div class="indent">
   <table> 
   <!-- BEGIN event -->
     <tr> 
-      <td><a href="viewEvent.php?id={EVENT_ID}"><strong>{EVENT_NAME}</strong></a></td> 
+      <td><strong>{EVENT_NAME}</strong></td> 
       <td style="text-align:right;">{EVENT_COST}</td> 
     </tr> 
     <tr> 
@@ -124,13 +118,11 @@
 	<!-- END event -->
 	      <!-- BEGIN submit_event --> 
       <tr> 
-        <td style="text-align:right;" colspan="2" class="navbar"><img src="/images/mgs/arrow_bullet.gif" alt="small arrow" /><a href="modEvent.php">POST EVENT</a></td> 
+        <td style="text-align:right;" colspan="2" class="navbar"><img src="/images/mgs/arrow_bullet.gif" alt="small arrow" /><a href="#">POST EVENT</a></td> 
       </tr> 
       <!-- END submit_event -->
   </table> 
-  </div>
-    <h2>News</h2>
-	<div class="indent">
+    <h2>News</h2> 
     <table> 
       <!-- BEGIN news --> 
       <tr> 
@@ -149,80 +141,45 @@
       </tr> 
       <!-- BEGIN submit_news --> 
       <tr> 
-        <td style="text-align:right;" colspan="2" class="navbar"><img src="/images/mgs/arrow_bullet.gif" alt="small arrow" /><a href="/subject/modSubNews.php?category={FOLDER_ID}">POST NEWS</a></td> 
+        <td style="text-align:right;" colspan="2" class="navbar"><img src="/images/mgs/arrow_bullet.gif" alt="small arrow" /><a href="/subject/modSubNews.php?category={ID}">POST NEWS</a></td> 
       </tr> 
       <!-- END submit_news --> 
     </table> 
-	</div>
     </td> 
-     <td style="vertical-align:top" width="30%"><h2>Event Search</h2> 
-          <div class="indent">
-		  <form class="standardForm" action="search.php" method="get"> 
+     <td style="vertical-align:top"><h2>Event Search</h2> 
+          <form class="standardForm"> 
              <table> 
               <tr> 
                  <td><h2>Keyword</h2></td> 
-                 <td><input type="text" name="keyword" /></td> 
+                 <td><input type="text" name="textfield" /></td> 
                </tr> 
               <tr>
-              	<td><h2>Year</h2></td>
-              	<td><select name="year">
-					<!-- BEGIN year_select -->
-					<option value="{YEAR_ID}">{YEAR_NAME}</option>
-					<!-- END year_select -->
+              	<td><h2>Category</h2></td>
+              	<td><select name="category">
+					<!-- BEGIN category_select -->
+					<option value="{CAT_ID}">{CAT_NAME}</option>
+					<!-- END category_select -->
 				</select></td>
               	</tr>
               <tr>
-              	<td><h2>Format</h2></td>
-              	<td><select name="format">
-					<!-- BEGIN format_select -->
-					<option value="{FORMAT_ID}">{FORMAT_NAME}</option>
-					<!-- END format_select -->
+              	<td><h2>Type</h2></td>
+              	<td><select name="type">
+					<!-- BEGIN type_select -->
+					<option value="{TYPE_ID}">{TYPE_NAME}</option>
+					<!-- END type_select -->
 				</select></td>
               	</tr>
               <tr>
-              	<td><h2>From</h2></td>
-              	<td><input name="fromDate" id="fromDate" type="text" value="" size="15" /> <img src="/images/ico_calendar.gif" width="16" height="13" id="from_date_trigger" style="cursor: pointer;" title="Date selector"/>
-	 				 	<script type="text/javascript">
-						Calendar.setup({
-							inputField     :    "fromDate",
-							ifFormat       :    "%d/%m/%Y",
-							button         :    "from_date_trigger",
-							align          :    "br",
-							singleClick    :    true
-						});
-						</script> </td>
-              	</tr>
-              <tr>
-              	<td><h2>Before </h2></td>
-              	<td>
-						<input name="toDate" id="toDate" type="text" value="" size="15" /> <img src="/images/ico_calendar.gif" width="16" height="13" id="to_date_trigger" style="cursor: pointer;" title="Date selector"/>
-	 				 	<script type="text/javascript">
-						Calendar.setup({
-							inputField     :    "toDate",
-							ifFormat       :    "%d/%m/%Y",
-							button         :    "to_date_trigger",
-							align          :    "br",
-							singleClick    :    true
-						});
-						</script></td>
-              	</tr>
-              <tr>
-              	<td><h2>Min Cost </h2></td>
-              	<td><input type="text" name="minCost" size="10" /></td>
-              	</tr>
-              <tr>
-              	<td><h2>Max Cost </h2></td>
-              	<td><input type="text" name="maxCost" size="10" /></td>
+              	<td><h2>Date Range </h2></td>
+              	<td>&nbsp;</td>
               	</tr>
               <tr> 
                  <td>&nbsp;</td> 
-                 <td><input type="submit" name="Search" value="Search"  class="btn"/></td> 
+                 <td><input type="submit" name="Submit" value="Submit" /></td> 
                </tr> 
             </table> 
            </form> 
-		   </div>
          <h2>Whitepapers</h2>
-		 <div class="indent">
 		 <table>
 	<!-- BEGIN files -->
 	<tr>
@@ -234,11 +191,10 @@
 	</tr>				
 	<!-- BEGIN submit_file -->
 	<tr>
-		<td style="text-align:right;"><img src="/images/mgs/arrow_bullet.gif" alt="small arrow" /><a href="/cms/modResource.php?type=file&cid={FOLDER_ID}">POST FILE</a></td>
+		<td style="text-align:right;"><img src="/images/mgs/arrow_bullet.gif" alt="small arrow" /><a href="/cms/modResource.php?type=file&cid={ID}">POST FILE</a></td>
 	</tr>
 	<!-- END submit_file -->
 </table> 
-</div>
     </tr> </table> 
 <!-- #EndEditable --> 
 </div> 

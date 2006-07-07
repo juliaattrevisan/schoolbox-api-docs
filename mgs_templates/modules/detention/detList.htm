@@ -1,0 +1,260 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>{TITLE}</title>
+<script type="text/javascript">
+<!--
+function showFields(){
+	var selecType = document.getElementById('timeframe').options[document.getElementById('timeframe').selectedIndex].value;
+	if (selecType == '1'){
+		document.getElementById('sday').disabled = false;
+		document.getElementById('smth').disabled = false;
+		document.getElementById('eday').disabled = false;
+ 		document.getElementById('emth').disabled = false;
+	}
+	else {
+		document.getElementById('sday').disabled = true;
+		document.getElementById('smth').disabled = true;
+		document.getElementById('eday').disabled = true;
+ 		document.getElementById('emth').disabled = true;
+	}
+}
+	// Mark Parncutt 24 Jan 2005
+	// Added here Jan.2006, Tyson Day
+    function hidetoggle (idtogg) {
+        document.getElementById(idtogg).style.display = (document.getElementById(idtogg).style.display == 'none') ? '' : 'none';
+	}
+	
+	// Tyson Day Jan 2006
+	function ImageRotate(buttonid) {
+		if (document.getElementById(buttonid).src == "http://portal.mgs.vic.edu.au/images/button_add.jpg") {
+			document.getElementById(buttonid).src = "http://portal.mgs.vic.edu.au/images/button_cross.jpg";	
+		}
+		else {
+			document.getElementById(buttonid).src = "http://portal.mgs.vic.edu.au/images/button_add.jpg";
+		}
+	}
+window.onload = new Function('showFields();');
+//-->
+</script>
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
+<script type="text/javascript" src="/javascript/drop_down.js"></script>
+<!-- #BeginEditable "scripts" -->
+
+<!-- #EndEditable -->
+</head>
+<body>
+<div id="outerWrap">
+	<div id="header"></div>
+	<div id="yellowStripe"></div>
+	<div id="left">
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;GOTO</h3>
+			<div class="whiteWrap">{MCSSMENU}</div>
+		</div>
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;SEARCH</h3>
+			<div class="whiteWrap">
+				<form class="standardForm" id="searchForm" action="/search.php" method="get">
+					<p style="margin:0;">
+						<input class="short" type="text" name="keyword" />
+						<select class="short" name="where">
+							<option value="0" selected="selected">portal</option>
+							<option value="1">google</option>
+							<option value="2">yahoo</option>
+						</select>
+						<input class="img" type="image" src="/images/mgs/navsearch.gif" alt="Search" name="Submit" />
+					</p>
+				</form>
+			</div>
+		</div>
+		<!-- BEGIN msubject -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY SUBJECTS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN msubject_block -->
+					<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
+					<!-- END msubject_block -->
+				</ul>
+			</div>
+		</div>
+		<!-- END msubject -->
+		<!-- BEGIN mgroup -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY GROUPS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN mgroup_block -->
+					<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
+					<!-- END mgroup_block -->
+				</ul>
+			</div>
+		</div>
+		<!-- END mgroup -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY LINKS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN mlink_block -->
+					<li>{MLINK}</li>
+					<!-- END mlink_block -->
+					<li><a href="/editLinks.php">ADD LINK</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- end left -->
+	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Main_Active.lbi" -->
+    <div id="topNav">
+      <ul>
+        <li class="navthis left"><a class="navthis left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+        <li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+        <!-- BEGIN webmail_tab -->
+        <li class="norm"><a class="norm" href="/mail.php" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+        <!-- END webmail_tab -->
+        <li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+        <!-- BEGIN timetable_tab -->
+        <li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+        <!-- END timetable_tab -->
+        <li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+      </ul>
+    </div>
+	<!-- #EndLibraryItem --><!-- #EndEditable -->
+	<div id="content">
+		<div id="content_text"> <!-- #BeginEditable "main" --> 
+            <h1>Detention System</h1>
+			{DETNAV}<br />
+			<br />
+                <form action="/modules/detention/detList.php" method="post" id="detListForm" class="standardForm">
+                    <table>
+                      <tr> 
+                        <td class="formLabelWidth"><h2>Student:</h2></td><td><input name="filter_student" value="{STUDENT}" /></td>
+                        </tr><tr><td><h2>Year:</h2></td><td>
+                          <select name="filter_year">
+                            <option value="0" {Y0}>All</option>
+                            <option value="3" {Y3}>9</option>
+                            <option value="4" {Y4}>10</option>
+                            <option value="5" {Y5}>11</option>
+                            <option value="6" {Y6}>12</option>
+                          </select></td></tr><tr>
+                        <td><h2>House:</h2></td><td>{HOUSE_SEL}</td></tr><tr>
+                        <td><h2>Offence:</h2></td><td>{OFF_SEL}</td>
+                      </tr>
+                      <tr> 
+                        <td><h2>Staff:</h2></td><td>
+                          <input name="filter_staff" value="{STAFF}" /></td></tr><tr>
+                        <td><h2>Type:</h2></td><td>
+                          <select name="filter_type">
+                            <option value="0" {T0}>All</option>
+                            <option value="1" {T1}>Green</option>
+                            <option value="2" {T2}>Yellow</option>
+                            <option value="3" {T3}>Red</option>
+                          </select> </td></tr><tr>
+                        <td><h2>Status:</h2></td><td>
+                          <select name="filter_status">
+                            <option value="0" {S0}>All</option>
+                            <option value="1" {S1}>Attended</option>
+                            <option value="2" {S2}>Cancelled</option>
+                            <option value="3" {S3}>Confirmed </option>
+                            <option value="4" {S4}>No-show</option>
+                            <option value="5" {S5}>Unconfirmed</option>
+			    <option value="6" {S6}>Upgraded</option>
+                          </select></td></tr><tr>
+                        <td><h2>Order:</h2></td><td>
+                          <select name="filter_order">
+                            <option value="0" {OB0}>Date</option>
+                            <option value="1" {OB1}>House</option>
+                            <option value="2" {OB2}>Staff Name</option>
+                            <option value="3" {OB3}>Status</option>
+                            <option value="4" {OB4}>Type</option>
+                            <option value="5" {OB5}>Year</option>
+                            <option value="6" {OB6}>Student Name</option>
+                          </select></td>
+                      </tr>
+                            <tr>
+                              <td><h2>Timeframe:</h2></td><td><select id="timeframe" name="timeframe" onchange="showFields();">
+                                  <option value="0" {TF0}>All</option>
+                                  <option value="1" {TF1}>Specify Date</option>
+                                  <option value="2" {TF2}>To Date</option>
+                                  <option value="3" {TF3}>Weekly</option>
+                                  <option value="4" {TF4}>Year</option>
+                                </select></td></tr><tr>
+                              <td><h2>Start Date:</h2></td><td>{SDAY}&nbsp;{SMTH}</td></tr><tr>
+							  <td><h2>End Date:</h2></td><td>{EDAY}&nbsp;{EMTH}</td></tr><tr>
+                              <td></td><td><a href="javascript:document.all.detListForm.submit()">Filter Results</a></td>
+                            </tr>
+                          </table>
+                  </form>
+            <!-- BEGIN det_list -->
+			<br />
+			<table>
+			  <tr> 
+                <td colspan="9"><h2>{RECORDS_SHOWN} - ({PAGELIST})</h2></td>
+              </tr>
+		      <tr>
+				<td width="5%"></td>
+                <td><b>Name</b></td>
+                <td><b>Year</b></td>
+                <td><b>House</b></td>
+                <td><b>Type</b></td>
+		      	<td><b>Offence</b></td>
+                <td><b>Details</b></td>
+                <td colspan="2"><b>Date</b></td>
+              </tr>
+			  <tr>
+			    <td width="5%"></td>
+			    <td colspan="8"><hr /></td>
+		      </tr>
+			  <!-- BEGIN list -->
+              <tr>
+				<td width="5%"></td>
+                <td width="15%">{NAME}</td>
+                <td width="10%">{YEAR}</td>
+                <td width="10%">{HOUSE}</td>
+                <td width="10%">{TYPE}</td>
+		        <td width="15%">{OFFENCE}</td>
+                <td width="10%">{DETAILS}</td>
+                <td width="10%">{DATE}</td>
+                <td width="15%">{ACTION}</td>
+              </tr>
+			  <tr id="show{UNIQID}" style="display:none;">
+				<td width="5%"></td>
+				<td colspan="8">
+				<form class="standardForm">
+				<table>
+				<tr><td width="30%"><b>Staff:</b></td><td width="35%"><b>Work Set:</b></td><td width="35%"><b>Details:</b></td></tr>
+				<tr><td><i>{STAFF}</i></td><!-- BEGIN workset_row --><td><i>{WORKSET}</i></td><!-- END workset_row --><!-- BEGIN history_row --><td><i>{HISTORY}</i></td><!-- END history_row --></tr>
+				<tr><td colspan="3"><b>Status: </b>{STATUS}</td></tr>
+				</table>
+				</form>
+				</td>
+			  </tr>
+			  <!-- END list -->
+			  <!-- END det_list -->
+			  <tr>
+			    <td width="5%"></td>
+			    <td colspan="8"><hr /></td>
+		      </tr>
+			</table>
+            <br />
+            <!-- #EndEditable --> </div>
+		<div id="footer">
+			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
+			<p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
+			<p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
+		</div>
+	</div>
+</div>
+</body>
+<!-- #EndTemplate --></html>

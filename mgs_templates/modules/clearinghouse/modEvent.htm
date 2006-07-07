@@ -106,7 +106,7 @@
 		<table width="100%%"  border="0" cellspacing="0" cellpadding="0">
   <tr>
     <td class="formLabelWidth"><h2>Name</h2></td>
-    <td><input type="text" name="name" maxlength="250"  size="50" value="{NAME}"/></td>
+    <td><input type="text" name="name" maxlength="250" style="width:98%" value="{NAME}"/></td>
   </tr>
   <tr>
     <td><h2>Date</h2></td>
@@ -122,7 +122,7 @@
 						</script>
 						<br />
 						<input name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />:<input name="minute" type="text" maxlength="2" value="{MIN}" class="timeField" /> 
-                          <select name="period">
+                          <select name="due_period" class="short">
                             <option value="am">AM</option>
                             <option value="pm" {PM}>PM</option>
                           </select></td>
@@ -142,55 +142,47 @@
   </tr>
   <tr>
     <td><h2>Description</h2></td>
-    <td><textarea name="description" style="width:90%">{DESCRIPTION}</textarea></td>
+    <td><textarea name="description" style="width:98%">{DESCRIPTION}</textarea></td>
   </tr>
   <tr>
     <td><h2>Meta Description </h2></td>
-    <td><textarea name="keywords" style="width:90%">{KEYWORDS}</textarea></td>
+    <td><textarea name="meta" style="width:98%">{META}</textarea></td>
   </tr>
   <tr>
     <td><h2>Category</h2></td>
     <td><select name="category">
 	<!-- BEGIN category_select -->
-	<option value="{CATEGORY_ID}" {CATEGORY_SELECT}>{CATEGORY_NAME}</option>
+	<option value="{CAT_ID}">{CAT_NAME}</option>
 	<!-- END category_select -->
     </select></td>
   </tr>
   <tr>
-  	<td><h2>Year Range</h2></td>
-  	<td><select name="year">
-		<!-- BEGIN year_select -->
-		<option value="{YEAR_ID}" {YEAR_SELECT}>{YEAR_NAME}</option>
-		<!-- END year_select -->
-	</select></td>
-  	</tr>
-  <tr>
     <td><h2>Format</h2></td>
     <td><select name="format">
-		<!-- BEGIN format_select -->
-	<option value="{FORMAT_ID}" {FORMAT_SELECT}>{FORMAT_NAME}</option>
-	<!-- END format_select -->
+		<!-- BEGIN type_select -->
+	<option value="{FORMAT_ID}">{FORMAT_NAME}</option>
+	<!-- END type_select -->
     </select></td>
   </tr>
   <tr>
     <td><h2>Organiser</h2></td>
-    <td><input type="text" name="organiser" maxlength="250" size="50" value="{ORGANISER}" /></td>
+    <td><input type="text" name="organiser" maxlength="250" style="width:98%" value="{ORGANISER}" /></td>
   </tr>
   <tr>
   	<td><h2>Presenter</h2></td>
-  	<td><input type="text" name="presenter" maxlength="250" size="50" value="{PRESENTER}" /></td>
+  	<td><input type="text" name="presenter" maxlength="250" style="width:98%" value="{PRESENTER}" /></td>
   	</tr>
   <tr>
     <td><h2>Venue</h2></td>
-    <td><input type="text" name="venue" maxlength="250"  size="50" value="{VENUE}" /></td>
+    <td><input type="text" name="venue" maxlength="250" style="width:98%" value="{VENUE}" /></td>
   </tr>
   <tr>
     <td><h2>Address</h2></td>
-    <td><textarea name="address" style="width:90%">{ADDRESS}</textarea></td>
+    <td><textarea name="address" style="width:98%">{ADDRESS}</textarea></td>
   </tr>
   <tr>
   	<td><h2>URL</h2></td>
-  	<td><input type="text" name="url" maxlength="250"  size="50" value="{URL}" /></td>
+  	<td><input type="text" name="url" maxlength="250" style="width:98%" value="{URL}" /></td>
   	</tr>
   <tr>
     <td><h2>Brochure</h2></td>
@@ -200,13 +192,6 @@
     <td><h2>Signup Form </h2></td>
     <td><input type="file" name="file" /></td>
   </tr>
-  <tr>
-  	<td>&nbsp;</td>
-  	<td><input type="submit" name="Submit2" value="{ACTION} Event" class="btn" /><input type="hidden" name="id" value="{ID}" />
-								<!-- BEGIN delete_button -->
-							<input type="submit" name="delete" value="Delete Event" class="btn">
-							<!-- END delete_button --></td>
-  	</tr>
 </table>
 		</form>
 		 <!-- #EndEditable --> </div>
