@@ -8,8 +8,7 @@ class offence
 	{
 		
 		//setup database
-		$SQL_db = "detention";
-		$this->mySQLdb = new dbManager($SQL_db);
+		$this->mySQLdb = new dbManager("detention");
 		$this->mySQLdb->dbConnect();
 
 		$this->id = $id;
