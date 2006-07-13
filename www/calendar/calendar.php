@@ -15,7 +15,7 @@ class calendar
 
 function calendar()
 {
-	$this->db = new dbManager;
+	$this->db = new dbManager();
 }
 
 function displayColour($id)
@@ -159,15 +159,16 @@ function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 
 {
 	if($level == 3)
 	{
-		$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access, sid) 
+		$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access) 
 			VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), $startTime, $endTime, '$priority', 
-			'$note', '$level', '$sid')";
+			'$note', '$level')";
 	}
 	else
 	{
-		$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access) 
+		//what if sid is an array as below??!!!!  please fixme
+		$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access, sid) 
 			VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), $startTime, $endTime, '$priority', 
-			'$note', '$level')";	
+			'$note', '$level',$sid)";	
 	}
 	
 	if(is_array($sid))
@@ -575,7 +576,7 @@ function getSubmissionEvents($day, $month, $year)
 
 function getStudentBirthdays($day, $month, $year)
 {
-        $db = mssql_connect(MSSQL_host,MSSQL_user, MSSQL_passwd); //todo: get portal synergy account permissions
+        $db = mssql_connect(MSSQL_host,MSSQL_user, MSSQL_passwd);
 
         $query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
                         vStudents.StudentBirthDate, vStudents.StudentCampus, datediff(year,studentbirthdate,getdate()) as 'Student Age',

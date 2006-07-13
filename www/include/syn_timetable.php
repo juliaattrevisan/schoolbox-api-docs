@@ -183,6 +183,20 @@ function getDayTimetable($synergy_id, $group, $campus, $daynumber)
 	}
 	else
 	{
+		if(SITE_location == 'mgs') {
+		$query = "SELECT Timetable.Room, SubjectClasses.Description,
+			Timetable.PeriodNumber, Timetable.ClassCode
+			FROM SynergyOne.dbo.SubjectClasses SubjectClasses, 
+			SynergyOne.dbo.Timetable Timetable
+			WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
+			Timetable.ClassCode = SubjectClasses.ClassCode AND 
+			Timetable.FileSemester = SubjectClasses.FileSemester AND 
+			Timetable.FileType = SubjectClasses.FileType AND 
+			Timetable.FileYear = SubjectClasses.FileYear AND
+			((SubjectClasses.FileSemester=".$_SESSION['FileSemester'].") AND (SubjectClasses.FileYear=".$_SESSION['FileYear'].") AND
+			(Timetable.StaffID='$synergy_id')) AND Timetable.DayNumber = $daynumber
+			ORDER BY Timetable.PeriodNumber";
+		} else {
 		$query = "SELECT Timetable.Room, SubjectClasses.Description,
 			Timetable.PeriodNumber, Timetable.ClassCode
 			FROM SynergyOne.dbo.SubjectClasses SubjectClasses, 
@@ -200,6 +214,7 @@ function getDayTimetable($synergy_id, $group, $campus, $daynumber)
 			((SubjectClasses.FileSemester=".$_SESSION['FileSemester'].") AND (SubjectClasses.FileYear=".$_SESSION['FileYear'].") AND
 			(SubjectClassStaff.StaffID='$synergy_id')) AND Timetable.DayNumber = $daynumber
 			ORDER BY Timetable.PeriodNumber";
+		}
 	}
 	
 	
@@ -270,6 +285,22 @@ function getFullTimetable($synergy_id, $group, $campus)
 	}
 	else
 	{
+		if(SITE_location == 'mgs') {
+		$query = "SELECT Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, 
+			Timetable.PeriodNumber, Timetable.ClassCode
+			FROM SynergyOne.dbo.SubjectClasses SubjectClasses, 
+			SynergyOne.dbo.Timetable Timetable
+			WHERE 
+			Timetable.ClassCampus = SubjectClasses.ClassCampus AND 
+			Timetable.ClassCode = SubjectClasses.ClassCode AND 
+			Timetable.FileSemester = SubjectClasses.FileSemester AND 
+			Timetable.FileType = SubjectClasses.FileType AND 
+			Timetable.FileYear = SubjectClasses.FileYear AND
+			((SubjectClasses.FileSemester=".$_SESSION['FileSemester'].") AND 
+			(SubjectClasses.FileYear=".$_SESSION['FileYear'].") AND 
+			(Timetable.StaffID='$synergy_id'))
+			ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
+		} else {
 		$query = "SELECT Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, 
 			Timetable.PeriodNumber, Timetable.ClassCode
 			FROM SynergyOne.dbo.SubjectClasses SubjectClasses, 
@@ -289,6 +320,7 @@ function getFullTimetable($synergy_id, $group, $campus)
 			(SubjectClasses.FileYear=".$_SESSION['FileYear'].") AND 
 			(SubjectClassStaff.StaffID='$synergy_id'))
 			ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
+		}	
 	}
 
 	//setup database
