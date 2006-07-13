@@ -16,7 +16,7 @@ function Mailer($template, $subject = "", $to="") {
 	$this->setSubject($subject);
 
 	//setup HTML template
-	$this->template = new Template(MAIL_templates);
+	$this->template = new Template(TPL_directory);
 	$this->t_label = "tplBODY";
 	$this->loadTemplate($template);
 
