@@ -168,7 +168,7 @@ function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 
 		//what if sid is an array as below??!!!!  please fixme
 		$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access, sid) 
 			VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), $startTime, $endTime, '$priority', 
-			'$note', '$level',$sid)";	
+			'$note', '$level','$sid')";	
 	}
 	
 	if(is_array($sid))
@@ -440,8 +440,8 @@ function getDayEvents($day, $month, $year, $campus = 0, $group = 0)
 	//get single events for the day
 	$querysingle = "SELECT DISTINCT id, owner,TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note, access, eventCampus.campusID as sid
 	FROM event 
-	JOIN eventCampus ON event.id = eventCampus.eventID
-	JOIN eventGroup ON event.id = eventGroup.eventID
+	LEFT JOIN eventCampus ON event.id = eventCampus.eventID
+	LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 	WHERE date = FROM_UNIXTIME('$datestamp')
 	AND ( (access = '4') OR (access = '1' AND owner= '".$_SESSION['id']."') 
 		OR (access = '3' AND eventCampus.campusID IN($campuslist) $groupChunk ))
