@@ -115,7 +115,7 @@ class OutPut
 	function catSearch($token)
 	{
 		//this query will get all categories that the user can see
-		$query = "SELECT name, id FROM category WHERE ".$this->tokenToQuery($token, 'name', 'OR'). 
+		$query = "SELECT name, id, template FROM category WHERE ".$this->tokenToQuery($token, 'name', 'OR'). 
 		" OR ".$this->tokenToQuery($token, 'code', 'OR')." ORDER BY name";
 
 		$result = $this->db->dbDoQuery($query);
@@ -142,7 +142,7 @@ class OutPut
 		//this query will get all files that the user can see
 		$query = "SELECT file.id, file.realname, file.mime_type, DATE_FORMAT(file.submitted, '".FILE_date_format."') AS submitted, 
 		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, file.description,
-		file.comment, category.name, category.id as cid, category.code
+		file.comment, category.name, category.id as cid, category.code, file_size
 		FROM file, user, category WHERE file.owner=user.id AND file.category = category.id AND file.deleted = '0'";
 		//do the query based on search type
 		switch ($type)
@@ -301,116 +301,131 @@ class OutPut
 		$this->db->dbEndQuery;
 	}
 
-	function outputFile($queryArray)
+	function outputFile($fileDetails)
 	{
 		global $allowedFileTypes;
+
 		// correction for empty description
-		if ($queryArray['comment'] == "") { $queryArray['comment'] = "No comment available"; }
+		if ($fileDetails['comment'] == "") { $fileDetails['comment'] = "No comment available"; }
 
 		// set filename for filesize() call below
-		$filename = FILE_directory . "/". $queryArray['id'] . ".dat";
+		$filename = FILE_directory . "/" . $fileDetails['id'] . ".dat";
 
-                // set file size
-                if($queryArray['realname'] != "")
-                {
-                        $filesize = @filesize($filename);
-                        if($filesize == FALSE) //if we cannot find the file (something is wrong dont link to it)
-                        {
-                                $this->t_body->set_var("SIZE", "");
-                                $queryArray['realname'] = "";
-                        }
-                        else
-                                $this->t_body->set_var("SIZE", bytesToString($filesize));
-                }
-                else
-                        $this->t_body->set_var("SIZE", "");
+		// set file size
+		if($fileDetails['realname'] != "")
+		{
+			if($fileDetails['file_size'])
+				$filesize = $fileDetails['file_size'];
+			else
+				$filesize = @filesize($filename);
+			
+			if($filesize == FALSE) //if we cannot find the file (something is wrong dont link to it)
+			{
+				$this->t_body->set_var("SIZE", "");
+				$fileDetails['realname'] = "";	
+			}
+			else
+				$this->t_body->set_var("SIZE", '('.bytesToString($filesize).')');
+		}
+		else
+			$this->t_body->set_var("SIZE", "");
+		
 
-                //set image
-                if(isset($allowedFileTypes[$queryArray['mime_type']][0]))
-                        $this->t_body->set_var("FILE_IMAGE", "/images/mime/".$allowedFileTypes[$queryArray['mime_type']][0]);
-                else
-                        $this->t_body->set_var("FILE_IMAGE", "/images/mime/application-x-none.png");
+		//set image
+		if(isset($allowedFileTypes[$fileDetails['mime_type']][0]))
+			$this->t_body->set_var("FILE_IMAGE", "/images/mime/".$allowedFileTypes[$fileDetails['mime_type']][0]);
+		else				
+			$this->t_body->set_var("FILE_IMAGE", "/images/mime/application-x-none.png");
 
-		// set description
-                if($queryArray['realname'] != "")
-                {
-                        //if inline open in new window, if not give user a save dialog box
-			if($allowedFileTypes[$queryArray['mime_type']][1] == 1)
-				$fileurl = "<a href=\"/sendframe.php?id=".$queryArray['id']."\" target=\"_blank\">".scrubTEXT($queryArray['description'])."</a>";
-                        else
-				$fileurl = "<a href=\"/send.php?id=".$queryArray['id']."&save=1\">".scrubTEXT($queryArray['description'])."</a>";
-
-                        $this->t_body->set_var("FILE_DESCRIPTION", $fileurl);
-                }
-                else
-                        $this->t_body->set_var("FILE_DESCRIPTION", scrubTEXT($queryArray['description']));
+		// set url depending on wether it should have one and how it should be opened
+		if($fileDetails['realname'] != "")
+		{
+			//if inline open in new window, if not give user a save dialog box
+			if($allowedFileTypes[$fileDetails['mime_type']][1] == 1)
+				$this->t_body->set_var("FILE_URL", "<a href=\"/sendframe.php?id=".$fileDetails['id']."\" target=\"_blank\">");
+			else
+				$this->t_body->set_var("FILE_URL", "<a href=\"/send.php?id=".$fileDetails['id']."&save=1\">");
+				
+			$this->t_body->set_var('FILE_URL_END', '</a>');
+		}
+		else
+		{
+			$this->t_body->set_var('FILE_URL', '');
+			$this->t_body->set_var('FILE_URL_END', '');
+		}
+		
+		$this->t_body->set_var('FILE_DESCRIPTION', scrubTEXT($fileDetails['description']));
 
 		// set comment
-		$this->t_body->set_var("COMMENT", scrubTEXT($queryArray['comment']));
-
+		$this->t_body->set_var("COMMENT", scrubTEXT($fileDetails['comment']));
+	
 		// set owner
-               $fullname = $queryArray['firstname']." ".$queryArray['lastname'];
-
-                if($queryArray['local_email'])
-                        $email = "<a href=\"".$_SESSION['mailhandle'].$queryArray['username']."@".MAIL_address."\">$fullname</a>";
-                else if($queryArray['alt_email'])
-                        $email = "<a href=\"".$_SESSION['mailhandle'].$queryArray['alt_email']."\">$fullname</a>";
-                else
-                        $email = $fullname;
-
-		$this->t_body->set_var("OWNER", $email); 
-
+		$fullname = $fileDetails['firstname']." ".$fileDetails['lastname'];
+	
+		//create owner email address
+		if($fileDetails['local_email'])
+			$owner = "<a href=\"".$_SESSION['mailhandle'].$fileDetails['username']."@".MAIL_address."\">$fullname</a>";
+		else if($fileDetails['alt_email'])
+			$owner = "<a href=\"".$_SESSION['mailhandle'].$fileDetails['alt_email']."\">$fullname</a>";
+		else
+			$owner = $fullname;
+		
+		//output owner
+		$this->t_body->set_var("OWNER", $owner);
+	
 		// set date uploaded
-		$this->t_body->set_var("DATETIME", $queryArray['submitted']);
+		$this->t_body->set_var("DATETIME", $fileDetails['submitted']);
 
 		//set category
 		if($queryArray['code'])
-			$this->t_body->set_var("CATEGORY_NAME", scrubTEXT($queryArray['name']).' ('.$queryArray['code'].')');
+			$this->t_body->set_var("CATEGORY_NAME", scrubTEXT($fileDetails['name']).' ('.$fileDetails['code'].')');
 		else
-			$this->t_body->set_var("CATEGORY_NAME", scrubTEXT($queryArray['name']));
+			$this->t_body->set_var("CATEGORY_NAME", scrubTEXT($fileDetails['name']));
 
-		$this->t_body->set_var("CATEGORY_ID", $queryArray['cid']);
+		$this->t_body->set_var("CATEGORY_ID", $fileDetails['cid']);
 
 		//parse the output
 		$this->t_body->parse("file_block", "file_desc");
 		$this->t_body->parse("files_block", "file_listing", true);
 	}
 
-	function outputLink($queryArray)
+	function outputLink($linkDetails)
 	{
-		// correction for empty description
-		if ($queryArray['comment'] == "") { $queryArray['comment'] = "No comment available"; }
+		if ($linkDetails['comment'] == "") { $linkDetails['comment'] = "No comment available"; }
 
-                if(isLocalURL($queryArray['url']))
-                {
-                        $this->t_body->set_var("LINK_HTML", "<a href=\"".$queryArray['url']."\">
-                                ".scrubTEXT($queryArray['description'])."</a>");
-                }
-                else
-                {
-                        $this->t_body->set_var("LINK_HTML", "<a href=\"redir.php?url=".$queryArray['url']."\" 
-                                target=\"_blank\">".scrubTEXT($queryArray['description'])."</a>");
-                }
-
-
-		$this->t_body->set_var("COMMENT", scrubTEXT($queryArray['comment']));
-
+		// set link
+		if(isLocalURL($linkDetails['url']))
+		{
+			$this->t_body->set_var("LINK_URL", $linkDetails['url']);
+			$this->t_body->set_var("LINK_TARGET", "_self");
+		}
+		else
+		{
+			$this->t_body->set_var("LINK_URL", "/redir.php?url=".$linkDetails['url']);
+			$this->t_body->set_var("LINK_TARGET", "_blank");
+		}
+		
+		$this->t_body->set_var("LINK_DESCRIPTION", scrubTEXT($linkDetails['description']).'</a>');
+		$this->t_body->set_var("COMMENT", scrubTEXT($linkDetails['comment']));
+		
 		// set owner
-                $fullname = $queryArray['firstname']." ".$queryArray['lastname'];
+		$fullname = $linkDetails['firstname']." ".$linkDetails['lastname'];
+			
+		if($linkDetails['local_email'])
+			$owner = "<a href=\"".$_SESSION['mailhandle'].$linkDetails['username']."@".MAIL_address."\">$fullname</a>";
+		else if($linkDetails['alt_email'])
+			$owner = "<a href=\"".$_SESSION['mailhandle'].$linkDetails['alt_email']."\">$fullname</a>";
+		else
+			$owner = $fullname;
 
-                if($queryArray['local_email'])
-                        $email = "<a href=\"".$_SESSION['mailhandle'].$queryArray['username']."@".MAIL_address."\">$fullname</a>";
-                else if($queryArray['alt_email'])
-                        $email = "<a href=\"".$_SESSION['mailhandle'].$queryArray['alt_email']."\">$fullname</a>";
-                else
-                        $email = $fullname;
-
-		$this->t_body->set_var("OWNER", $email); 
+		$this->t_body->set_var("OWNER", $owner);		
+	
 		// set date uploaded
-		$this->t_body->set_var("DATETIME", $queryArray['submitted']);
+		$this->t_body->set_var("DATETIME", $linkDetails['submitted']);
+		
 		//set category category
-		$this->t_body->set_var("CATEGORY_NAME", scrubTEXT($queryArray['name']));
-		$this->t_body->set_var("CATEGORY_ID", $queryArray['cid']);
+		$this->t_body->set_var("CATEGORY_NAME", scrubTEXT($linkDetails['name']));
+		$this->t_body->set_var("CATEGORY_ID", $linkDetails['cid']);
 		
 		//parse the output
 		$this->t_body->parse("link_block", "link_desc");
@@ -443,10 +458,16 @@ class OutPut
         }
 
 	
-	function outputCat($queryArray)
+	function outputCat($catDetails)
 	{
 		//set description
-		$this->t_body->set_var("CAT_DESCRIPTION", $this->getCatPath($queryArray['id']));
+		$this->t_body->set_var("CAT_DESCRIPTION", $this->getCatPath($catDetails['id']));
+		
+		//output homepage link
+		if($catDetails['template'])
+			$this->t_body->set_var("HOMEPAGE", "<a href=\"/homepage.php?category=".$catDetails['id']."\">homepage</a>");
+		else
+			$this->t_body->set_var("HOMEPAGE", "&nbsp;");
 		
 		//parse
 		$this->t_body->parse("cat_block", "cat_listing", true);

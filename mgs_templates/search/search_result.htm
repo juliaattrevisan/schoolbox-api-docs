@@ -99,11 +99,11 @@
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
 			<h1>Search Results</h1> 
-			<br />
 			<table> 
 				<!-- BEGIN cat_listing --> 
 				<tr> 
-					<td style="vertical-align:top;"><img style="float:left;" src="/images/mime/folder_blue_full.png" width="20" height="20" />&nbsp;{CAT_DESCRIPTION}</td> 
+					<td style="vertical-align:top;"><img style="float:left;" src="/images/mime/folder_blue_full.png" width="20" height="20" />&nbsp;{CAT_DESCRIPTION}</td>
+					<td style="text-align:right;">{HOMEPAGE}</td>
 				</tr> 
 				<!-- END cat_listing --> 
 			</table> 
@@ -111,16 +111,14 @@
 				<!-- BEGIN file_listing --> 
 				<tr><td><p style="margin:5px 0 0 0;"></p></td></tr>
 				<tr> 
-					<td rowspan="2" style="width:25px; vertical-align:top;"><img src="{FILE_IMAGE}" alt="File Picture" /></td>
-					<td>&nbsp;<strong>{FILE_DESCRIPTION}</strong></td> 
-					<td style="text-align:right; white-space:nowrap;"><em>{SIZE}</em></td> 
+					<td>{FILE_URL}<img src="{FILE_IMAGE}" width="25" height="27" border="0" />{FILE_URL_END} {FILE_URL}{FILE_DESCRIPTION}{FILE_URL_END} <em>{SIZE}</em></td>
 				</tr> 
 				<!-- BEGIN file_desc --> 
 				<tr> 
 					<td>&nbsp;{COMMENT}</td> 
 				</tr> 
 				<tr> 
-					<td colspan="3" style="border-bottom:1px solid #ccc;"><span class="element_footer">Submitted by {OWNER} on {DATETIME} to <a href="/browse.php?category={CATEGORY_ID}">{CATEGORY_NAME}</a></span></td> 
+					<td style="border-bottom:1px solid #ccc;"><span class="element_footer">Submitted by {OWNER} on {DATETIME} to <a href="/browse.php?category={CATEGORY_ID}">{CATEGORY_NAME}</a></span></td> 
 				</tr> 
 				<!-- END file_desc --> 
 				<!-- END file_listing --> 
@@ -129,15 +127,14 @@
 			<!-- BEGIN link_listing --> 
 				<tr><td><p style="margin:5px 0 0 0;"></p></td></tr>
 				<tr> 
-					<td rowspan="2" style="width:25px;"><img src="/images/mime/http-url.png" width="25" height="27" border="0" /></td> 
-					<td>&nbsp;{LINK_HTML}</td>
+					<td><a href="{LINK_URL}" target="{LINK_TARGET}"><img src="/images/mime/http-url.png" width="25" height="27" border="0" /></a> <a href="{LINK_URL}" target="{LINK_TARGET}">{LINK_DESCRIPTION}</a></td> 
 				</tr> 
 				<!-- BEGIN link_desc --> 
 				<tr> 
-					<td colspan="2">&nbsp;{COMMENT}</td> 
+					<td>&nbsp;{COMMENT}</td> 
 				</tr> 
 				<tr> 
-					<td colspan="2" style="border-bottom:1px solid #ccc;"><span class="element_footer">Submitted by {OWNER} on {DATETIME} to <a href="/browse.php?category={CATEGORY_ID}">{CATEGORY_NAME}</a></span></td> 
+					<td style="border-bottom:1px solid #ccc;"><span class="element_footer">Submitted by {OWNER} on {DATETIME} to <a href="/browse.php?category={CATEGORY_ID}">{CATEGORY_NAME}</a></span></td> 
 				</tr>
 				<!-- END link_desc -->
 				<!-- END link_listing --> 
