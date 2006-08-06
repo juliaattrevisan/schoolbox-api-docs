@@ -182,13 +182,13 @@ a img {
 	}
 
 #header {
-	background:#002452 url(/images/wenona/headerv2.gif) no-repeat 5px 2px;
-	height:85px;
+	background:#002452 url(/images/wenona/headerv2.gif) no-repeat 20px 2px;
+	height:162px;
 	}
 
 #left{
 	position:absolute;
-	top:86px;
+	top:162px;
 	left:0;
 	width:150px;
 	z-index:2; /* this is needed so that the horizontal pop-up menu appears above this */
@@ -196,7 +196,7 @@ a img {
 
 #content{
 	z-index:1; /* this is needed so that the horizontal pop-up menu appears above this */
-	margin:-22px 0 0 150px;
+	margin:-99px 0 0 150px;
 	}
 
 #content_text{
