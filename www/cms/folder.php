@@ -43,22 +43,30 @@ class folder
 	function insertCat($name, $parent, $template = 0, $code = 0)
 	{
 		$this->checkWriteAccess($parent);
-
+  
+  		$folder = array(	'name'			=> $name,
+									'parent'	 	=> $parent,
+									'template'		=> $template,
+								);
+		
 		if($code)
-			$query = "INSERT INTO category (name, parent, template, code) VALUES ('$name', '$parent', '$template', '$code')";
-		else
-			$query = "INSERT INTO category (name, parent, template) VALUES ('$name', '$parent', '$template')";
-                
-		$this->db->dbDoQuery($query);
+			$folder['code']	= $code;
+		
+		$this->db->dbInsertRow('category', $folder);
+  
 		$cid = $this->db->dbInsertId();
 		
-		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('folder', $cid, 'create', {$_SESSION['id']})";
-		$this->db->dbDoQuery($query);
+		$logEntry = array(	'object'			=> 'folder',
+										'objectId'		=> $cid,
+										'action'			=> 'create',
+										'user'			=> $_SESSION['id'],
+							);
+		
+		$this->db->dbInsertRow('cmsLog', $logEntry);
 		
 		$this->createTemplate($cid, $template);
 
 		return $cid;
-
 	}
 	
 	function insertPermArray($cid, $parent, $permArray)
@@ -92,8 +100,12 @@ class folder
 		$this->db->dbUpdateRow('category', 'id', $cat);
 		
 		//log modification
-		$log = array('object'=>'folder', 'objectId'=>$cid, 'action'=>'modify', 'user'=>$_SESSION['id']);
-		$this->db->dbInsertArray('cmsLog', $log);
+		$log = array(	'object'		=>'folder', 
+								'objectId'	=>$cid, 
+								'action'		=>'modify', 
+								'user'		=>$_SESSION['id']
+							);
+		$this->db->dbInsertRow('cmsLog', $log);
 		
 		//if template set apply new template
 		if($template)
@@ -109,39 +121,39 @@ class folder
 		$this->checkWriteAccess($folderInfo['parent']);
 		$this->checkForChildren($id);
 
-		$query = "DELETE FROM category WHERE id = '".$id."'";
-		$this->db->dbDoQuery($query);
-
-		$query = "DELETE FROM homepage_comp_location WHERE cid = '".$id."'";
-		$this->db->dbDoQuery($query);
-
-		$query = "DELETE FROM homepage_config WHERE cid = '".$id."'";
-		$this->db->dbDoQuery($query);
-
+		
+		$this->db->dbDeleteRow('category', 'id', $id);
+		$this->db->dbDeleteRow('homepage_comp_location', 'cid', $id);
+		$this->db->dbDeleteRow('homepage_config', 'cid', $id);
+		$this->db->dbDeleteRow('forum', 'cid', $id);
+		$this->db->dbDeleteRow('subject_news', 'code', $id);
+		
+		$this->deletePerms($cid)
 		$query = "DELETE FROM userAccess WHERE service = '1' AND sid = '".$id."'";
 		$this->db->dbDoQuery($query);
-
-		$query = "DELETE FROM forum WHERE cid = '".$id."'";
-		$this->db->dbDoQuery($query);
-
-		$query = "DELETE FROM subject_news WHERE code = '".$id."'";
-		$this->db->dbDoQuery($query);
 		
-		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('folder', $id, 'delete', {$_SESSION['id']})";
-		$this->db->dbDoQuery($query);
+		$logEntry = array(	'object'			=> 'folder',
+										'objectId'		=> $id,
+										'action'			=> 'delete',
+										'user'			=> $_SESSION['id'],
+							);
+		
+		$this->db->dbInsertRow('cmsLog', $logEntry);
 
 	}
 
 	function deletePerms($cid)
 	{
-		$query = "DELETE FROM perms WHERE cid = '".$cid."'";
-		$this->db->dbDoQuery($query);
+		$this->db->dbDeleteRow('perms', 'cid', $cid);
 	}
 
 	function insertPerm($cid, $group, $access)
 	{
-		$query = "INSERT INTO perms (cid, gid, type) VALUES ('$cid','$group','$access')";
-		$this->db->dbDoQuery($query);
+		$perm = array(	'cid'		=> $cid,
+								'gid'		=> $group,
+								'type' 	=> $access,
+								);
+		$this->db->dbInsertRow('perms', $perm); 
 	}
 
 	function getFolder($cid)
@@ -183,30 +195,24 @@ class folder
 		$query = "SELECT id FROM category WHERE parent = '".$id."'";
 		$this->db->dbDoQuery($query);
 		if($this->db->dbCountRows() > 0)
-		{
-			//children exist exit with error
-			error(12);
-		}
+			error(12); //children exist exit with error
 		
 		//check for files/links in category
 		$query = "SELECT id FROM link WHERE category = '".$id."'";
 		$this->db->dbDoQuery($query);
 		if($this->db->dbCountRows() > 0)
-		{
-			//children exist exit with error
-			error(12);
-		}
+			error(12); //children exist exit with error
 		
-		$query = "SELECT id FROM file WHERE category = '".$_GET['delete']."' AND deleted = '0'";
+		$query = "SELECT id FROM file WHERE category = '".$id."' AND deleted = '0'";
 		$this->db->dbDoQuery($query);
 		if($this->db->dbCountRows() > 0)
-		{
-			//children exist exit with error
-			error(12);
-		}
+			error(12); //children exist exit with error
 		
 		//check for submission boxes
-		//TODO: check for submission boxes
+		$query = "SELECT id FROM submission_box WHERE category = $id AND deleted = 0";
+		$this->db->dbDoQuery($query);
+		if($this->db->dbCountRows() > 0)
+			error(12); //children exist exit with error
 
 	}
 }

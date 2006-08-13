@@ -33,13 +33,22 @@ class file
 		//check allowed perms to add to specified category before proceeding
 		$this->checkWriteAccess($category);		
 		
-		$query = "UPDATE file 
-			SET description='$description', comment='$comment', category='$category', type='$type' 
-			WHERE id = '$modid'";
-		$this->db->dbDoQuery($query);
+		$file = array(	'id'				=> $modid,
+								'description'	=> $description,
+								'comment'	 	=> $comment,
+								'category'		=> $category,
+								'type'			=> $type,
+							);
 		
-		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('file', $modid, 'modify', {$_SESSION['id']})";
-		$this->db->dbDoQuery($query);
+		$this->db->dbUpdateRow('file', 'id', $file);
+		
+		$logEntry = array(	'object'			=> 'file',
+										'objectId'		=> $modid,
+										'action'			=> 'modify',
+										'user'			=> $_SESSION['id'],
+							);
+		
+		$this->db->dbInsertRow('cmsLog', $logEntry);
 		
 	}
 
@@ -48,15 +57,19 @@ class file
 		//check allowed perms to add to specified category before proceeding
 		$this->checkWriteAccess($category);		
 		$filesize = @filesize($_FILES['file']['tmp_name']);
-		//INSERT file details
-		$query = "INSERT INTO file 
-		(category, owner, realname, submitted, 
-		description, comment, type, mime_type, file_size)
-			VALUES 
-		('".$category."','".$_SESSION['id']."','$file_name', NOW(), 
-		'$description', '$comment', '$type','$file_type', '$filesize')";
 	
-		$this->db->dbDoQuery($query);
+		$file = array(	'description'	=> $description,
+								'comment'	 	=> $comment,
+								'category'		=> $category,
+								'owner'			=> $_SESSION['id'],
+								'type'			=> $type,
+								'realname'	=> $file_name,
+								'submitted'	=> 'NOW()',
+								'mime_type'	=> $file_type,
+								'file_size'		=> $filesize,
+							);
+		
+		$this->db->dbInsertRow('file', $file);
 	
 		//get file ID from INSERT
 		$fileId = $this->db->dbInsertId();
@@ -68,8 +81,13 @@ class file
 				copy($_FILES['file']['tmp_name'], FILE_directory ."/". $newFileName);
 		}
 	
-		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('file', $fileId, 'add', {$_SESSION['id']})";
-		$this->db->dbDoQuery($query);
+		$logEntry = array(	'object'			=> 'file',
+										'objectId'		=> $fileId,
+										'action'			=> 'create',
+										'user'			=> $_SESSION['id'],
+							);
+		
+		$this->db->dbInsertRow('cmsLog', $logEntry);
 	
 		return $fileId;
 	
@@ -88,11 +106,15 @@ class file
 		//ok all checks completed
 
 		//now delete file by updating it as deleted
-		$query = "UPDATE file SET deleted = '1' WHERE id = '".$id."'";
-        	$this->db->dbDoQuery($query);
+		$this->db->dbUpdateRow('file', 'id', array('id'=>$id, 'deleted'=>1));
 
-		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('file', $id, 'delete', {$_SESSION['id']})";
-		$this->db->dbDoQuery($query);
+		$logEntry = array(	'object'			=> 'file',
+										'objectId'		=> $id,
+										'action'			=> 'delete',
+										'user'			=> $_SESSION['id'],
+							);
+		
+		$this->db->dbInsertRow('cmsLog', $logEntry);
 
 		//we leave file incase we need it but we should clean up any cached files right now
 		

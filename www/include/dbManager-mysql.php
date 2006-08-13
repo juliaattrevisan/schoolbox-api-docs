@@ -22,19 +22,20 @@ function dbManager($db = SQL_db, $debug = 0)
 	$this->passwd = SQL_passwd;
 	$this->debug = $debug;
 	$this->db = $db;
-	$this->dbConnect();
+	
 }
 
 /* Estabilishes a connection to the database */
 function dbConnect()
 {
-	if(!$this->dbf)
+	if(!isset($this->dbf)) {
 		$this->dbf = mysql_connect($this->host, $this->user, $this->passwd);
-	
+		$this->dbChangeDb($this->db);
+	}
 	if(!$this->dbf){
 		print "Unable to connect ".$this->user."@".$this->host." using ".$this->db; 
+		exit;
 	}	
-	$this->dbChangeDb($this->db);
 }
 
 /* Closes the connection to the database */
@@ -59,15 +60,16 @@ function dbChangeDb($db)
 /* Returns the result resource for the query, also saves the result resource as a object var */
 function dbDoQuery($sql_q)
 {
+	$this->dbConnect();
 	$this->result = mysql_query($sql_q, $this->dbf) or $mysql_eval_error = mysql_error();
-	if ($mysql_eval_error) {
+	if (isset($mysql_eval_error)) {
 		if($this->debug)
 		{
 			print "<b>Query:</b> $sql_q<br />";
 			print "<b>Error:</b> $mysql_eval_error";
 		}
 		else
-			error(21, $mysql_eval_error);
+			error(6, $mysql_eval_error);
 	}
 	
 	return $this->result;
@@ -93,6 +95,7 @@ function dbGetSingleRow($sql_q)
 function dbGetAllRows($sql_q)
 {
 	$result = $this->dbDoQuery($sql_q);
+	$table = array();
 	//loop through all records and insert into array table
 	while($line = $this->dbGetNextArray($result))
 	{
@@ -129,7 +132,7 @@ function dbCountRows($result = 0)
 }
 
 /* Inserts an array into table (does all proper security checks to ensure safe) */
-function dbInsertArray($table, $array)
+function dbInsertRow($table, $array)
 {
 	if(!($table && is_array($array)))
 		return FALSE;
@@ -140,7 +143,11 @@ function dbInsertArray($table, $array)
 	foreach($array as $key => $value)
 	{
 		$names .= '`'.$key.'`' . ',';
-		$values .= $this->dbSmartQuote($value) . ',';
+		if (!is_array($value)) {
+			$values .= $this->dbSmartQuote($value) . ',';
+		} else if (isset($value['function'])) {
+			$values .= $value['function']. '('. $this->dbSmartQuote($value['value']). '),';
+		}
 	}
 	$names = substr($names, 0, -1);
 	$values = substr($values, 0, -1);
@@ -149,26 +156,72 @@ function dbInsertArray($table, $array)
 	return $this->dbDoQuery($query);
 }
 
+/* Inserts a multidimension array into table (does all proper security checks to ensure safe) */
+function dbInsertMultiRow($table, $array, $names=false)
+{
+	if(!($table && is_array($array)))
+		return FALSE;
+	
+	//	try to get the names from the first row if they are not sent seperatly
+	if (!$names) {
+		$names = array_keys($array[0]);
+	}
+	$cols = '`'. implode('`,`', $names). '`';
+	$rows = array();
+	foreach ($array as $row) {
+		
+		$values = '(';
+		
+		foreach($row as $key => $value)
+		{
+			if (!is_array($value)) {
+				$values .= $this->dbSmartQuote($value) . ',';
+			} else if (isset($value['function'])) {
+				$values .= $value['function']. '('. $this->dbSmartQuote($value['value']). '),';
+			}
+		}
+		$values = substr($values, 0, -1). ')';
+		$rows[] = $values;
+	}
+	
+	$query = "INSERT INTO `$table` ($cols) VALUES ";
+	$query .= implode(',', $rows);
+	
+	return $this->dbDoQuery($query);
+}
+
 /* Updates a row */
 function dbUpdateRow($table, $identifier, $array)
 {
 	if(!($table && $array[$identifier] ) )
 			return FALSE;
-
+	
+	$set = '';
 	foreach($array as $key => $value)
 	{
-		if($key != $identifier)
-			$set .= '`'.$key.'`='.$this->dbSmartQuote($value).',';
-	
+		if($key != $identifier) {
+			if (!is_array($value)) {
+				$set .= '`'.$key.'`='.$this->dbSmartQuote($value).',';
+			} else if (isset($value['function'])) {
+				$set .= '`'.$key.'`='. $value['function']. '('.$this->dbSmartQuote($value['value']).'),';
+			}
+		}
 	}
 	$set = substr($set, 0, -1);
 	$query = "UPDATE `$table` SET $set WHERE `$identifier`= ".$this->dbSmartQuote($array[$identifier]); 
 	return $this->dbDoQuery($query);
 }
 
-function deleteRow($table, $identifier, $value)
+function dbDeleteRow($table, $identifier, $value)
 {
-	$query = "DELETE FROM `$table` WHERE `$identifier` =  ".$this->dbSmartQuote($value);
+	$query = "DELETE FROM `$table` WHERE 1 != 1 ";
+	if (is_array($value)) {
+		foreach ($value as $item) {
+			$query .= " OR `$identifier` =  ".$this->dbSmartQuote($value);
+		}
+	} else {
+		$query .= "OR `$identifier` =  ".$this->dbSmartQuote($value);
+	}
 	return $this->dbDoQuery($query);
 }
 
