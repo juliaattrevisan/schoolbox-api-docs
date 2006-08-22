@@ -576,6 +576,7 @@ function getSubmissionEvents($day, $month, $year)
 
 function getStudentBirthdays($day, $month, $year)
 {
+	if(SYNERGY_enable) {
         $db = mssql_connect(MSSQL_host,MSSQL_user, MSSQL_passwd);
 
         $query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
@@ -603,6 +604,7 @@ function getStudentBirthdays($day, $month, $year)
                 }
 		return $birthdays;
         }
+	}
 }
 
 
