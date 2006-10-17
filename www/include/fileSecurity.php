@@ -45,7 +45,7 @@ $mime = strtolower($_FILES['file']['type']);
 list($name, $ext) = explode(".",$_FILES['file']['name']);
 
 $db = new dbManager;
-$query = "SELECT t.fileTypeID FROM allowedFileTypes t LEFT JOIN allowedFileExtension e on t.fileTypeID = e.fileTypeID WHERE mime = '$mime' AND extension = '$ext'";
+$query = "SELECT t.fileTypeID FROM allowedFileTypes t LEFT JOIN allowedFileExtension e on t.fileTypeID = e.fileTypeID WHERE mime = '$mime' AND extension = '$ext' AND enable = 'true'";
 if(!$db->dbGetSingleRow($query))
 	error(11, "Your file, ".$_FILES['file']['name']." with the extension '$ext' and type of '$mime'");
 
