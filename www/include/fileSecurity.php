@@ -11,7 +11,6 @@
 *                                                           *
 ************************************************************/
 
-require_once("fileTypes.php");
 
 //check error codes in FILE array
 switch($_FILES['file']['error'])
@@ -42,23 +41,12 @@ if(!is_uploaded_file($_FILES['file']['tmp_name']))
 if( $_FILES['file']['size'] <= 0)
 	error(10);
 
-//check file type is in allowed file type array
-if(!isset($allowedFileTypes[strtolower($_FILES['file']['type'])]))
-	error(11, "Your file, ".$_FILES['file']['name']." with the extension .$ext and type of ".$_FILES['file']['type']);
+$mime = strtolower($_FILES['file']['type']);
+list($name, $ext) = explode(".",$_FILES['file']['name']);
 
-//check file has correct and allowed extension for its identified mime type
-$flag = 0;
-foreach($allowedFileTypes[strtolower($_FILES['file']['type'])][2] as $allowedExt)
-{
-	if(strpos(strtolower($_FILES['file']['name']), ".".$allowedExt) !== FALSE)
-	{
-		$flag = 1;
-		break;
- 	}
-}
-if(!$flag)
-{
-	list($name, $ext) = explode(".",$_FILES['file']['name']);
-	error(11, "Your file, ".$_FILES['file']['name']." with the extension .$ext and type of ".$_FILES['file']['type']);
-}
+$db = new dbManager;
+$query = "SELECT t.fileTypeID FROM allowedFileTypes t LEFT JOIN allowedFileExtension e on t.fileTypeID = e.fileTypeID WHERE mime = '$mime' AND extension = '$ext'";
+if(!$db->dbGetSingleRow($query))
+	error(11, "Your file, ".$_FILES['file']['name']." with the extension '$ext' and type of '$mime'");
+
 ?>

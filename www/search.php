@@ -8,7 +8,6 @@
 
 require_once("include/session.php");
 require_once("include/include.php");
-require_once("include/fileTypes.php");
 require_once("include/permission.php");
 
 class OutPut
@@ -140,10 +139,10 @@ class OutPut
 	function fileSearch($token, $type, $sort)
 	{
 		//this query will get all files that the user can see
-		$query = "SELECT file.id, file.realname, file.mime_type, DATE_FORMAT(file.submitted, '".FILE_date_format."') AS submitted, 
+		$query = "SELECT file.id, file.realname, inline, iconFile, DATE_FORMAT(file.submitted, '".FILE_date_format."') AS submitted, 
 		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, file.description,
 		file.comment, category.name, category.id as cid, category.code, file_size
-		FROM file, user, category WHERE file.owner=user.id AND file.category = category.id AND file.deleted = '0'";
+		FROM file, user, category LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime WHERE file.owner=user.id AND file.category = category.id AND file.deleted = '0'";
 		//do the query based on search type
 		switch ($type)
 		{
@@ -303,7 +302,6 @@ class OutPut
 
 	function outputFile($fileDetails)
 	{
-		global $allowedFileTypes;
 
 		// correction for empty description
 		if ($fileDetails['comment'] == "") { $fileDetails['comment'] = "No comment available"; }
@@ -332,8 +330,8 @@ class OutPut
 		
 
 		//set image
-		if(isset($allowedFileTypes[$fileDetails['mime_type']][0]))
-			$this->t_body->set_var("FILE_IMAGE", "/images/mime/".$allowedFileTypes[$fileDetails['mime_type']][0]);
+		if($fileDetails['iconFile'])
+			$this->t_body->set_var("FILE_IMAGE", "/images/mime/".$fileDetails['iconFile']);
 		else				
 			$this->t_body->set_var("FILE_IMAGE", "/images/mime/application-x-none.png");
 
@@ -341,7 +339,7 @@ class OutPut
 		if($fileDetails['realname'] != "")
 		{
 			//if inline open in new window, if not give user a save dialog box
-			if($allowedFileTypes[$fileDetails['mime_type']][1] == 1)
+			if($fileDetails['inline']== 'true')
 				$this->t_body->set_var("FILE_URL", "<a href=\"/sendframe.php?id=".$fileDetails['id']."\" target=\"_blank\">");
 			else
 				$this->t_body->set_var("FILE_URL", "<a href=\"/send.php?id=".$fileDetails['id']."&save=1\">");

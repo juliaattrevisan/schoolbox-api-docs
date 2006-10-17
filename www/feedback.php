@@ -5,11 +5,6 @@ require_once( 'dbManager-mysql.php');
 require_once( 'mail/mail.php');
 
 define( '_MAX_STRLEN', '2048');
-define( '_EMAIL_SUBJECT', 'Portal feedback');
-define( '_EMAIL_FROM_DEFAULT', 'portal_feedback@mgs.vic.edu.au');
-define( '_EMAIL_TO', 'portal_support@mgs.vic.edu.au');
-define( '_EMAIL_TO_DEAKIN', 'mmarantz@mgs.vic.edu.au');		# dodgy hack to support Feedback page for Deakin
-
 
 class FeedbackPage
 {

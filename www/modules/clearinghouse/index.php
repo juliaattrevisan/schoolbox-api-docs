@@ -4,7 +4,6 @@ define("FOLDER_ID", 2587);
 
 require_once('../../include/session.php');
 require_once('../../include/include.php');
-require_once('../../include/fileTypes.php');
 require_once('event.php');
 
 class displayHome
@@ -105,7 +104,7 @@ class displayHome
 		//file output
 		$this->t_body->set_block('tplBODY', 'files', 'files_block');
 	
-		$query = "SELECT id, description, realname, mime_type FROM intranet.file 
+		$query = "SELECT id, description, realname, inline FROM intranet.file LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
 		WHERE category = '".$this->folderID."' AND file.deleted = '0' ORDER BY submitted DESC 
 		LIMIT 0, 15";
 
@@ -117,7 +116,7 @@ class displayHome
 			{
 				if($file['realname'] != "")
 				{
-					if($allowedFileTypes[$file['mime_type']][1] == 1)
+					if($file['inline']== 'true')
 						$url = "<a href=\"/sendframe.php?id=".$file['id']."\" target=\"_blank\">".scrubTEXT($file['description'])."</a>";
 					else
 						$url = "<a href=\"/send.php?id=".$file['id']."\">".scrubTEXT($file['description'])."</a>";

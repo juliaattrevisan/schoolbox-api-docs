@@ -100,4 +100,9 @@ define("HOMEPAGESERVICE", 1);                           //Value that represents 
 
 define("STUDENTGROUPIDS", serialize(array(3,4,5)));     //List of id numbers representing student groups
 define("STAFFGROUPIDS", serialize(array(1,2)));         //Staff group ids
+
+define( '_EMAIL_SUBJECT', 'Portal feedback');
+define( '_EMAIL_FROM_DEFAULT', 'portal_feedback@mgs.vic.edu.au');
+define( '_EMAIL_TO', 'portal_support@mgs.vic.edu.au');
+define( '_EMAIL_TO_DEAKIN', 'mmarantz@mgs.vic.edu.au');		# dodgy hack to support Feedback page for Deakin
 ?>

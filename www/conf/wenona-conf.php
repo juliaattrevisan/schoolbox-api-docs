@@ -103,4 +103,8 @@ define("HOMEPAGESERVICE", 1);				//Value that represents the homepage module in 
 define("STUDENTGROUPIDS", serialize(array(3)));	//List of id numbers representing student groups
 define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
 
+define( '_EMAIL_SUBJECT', 'Portal feedback');
+define( '_EMAIL_FROM_DEFAULT', 'portal_feedback@wenona.nsw.edu.au');
+define( '_EMAIL_TO', 'portal_support@wenona.nsw.edu.au');
+
 ?>

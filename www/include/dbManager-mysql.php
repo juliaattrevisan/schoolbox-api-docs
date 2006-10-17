@@ -214,13 +214,23 @@ function dbUpdateRow($table, $identifier, $array)
 
 function dbDeleteRow($table, $identifier, $value)
 {
-	$query = "DELETE FROM `$table` WHERE 1 != 1 ";
-	if (is_array($value)) {
-		foreach ($value as $item) {
-			$query .= " OR `$identifier` =  ".$this->dbSmartQuote($value);
+	$query = "DELETE FROM `$table` WHERE ";
+	
+	if(is_array($identifier) {
+		for($i = 0; $$identifier[$i]; $i++) {
+			$query .= "`{$identifier[$i]}` = ".$this->dbSmartQuote($value[$i]).' AND ';
 		}
-	} else {
-		$query .= "OR `$identifier` =  ".$this->dbSmartQuote($value);
+		substr($query, 0, -5);
+	}
+	else {
+		if (is_array($value)) {
+			foreach ($value as $item) {
+				$query .= "`$identifier` =  ".$this->dbSmartQuote($value).' OR ';
+			}
+			substr($query, 0, -4);
+		} else {
+			$query .= "`$identifier` =  ".$this->dbSmartQuote($value);
+		}
 	}
 	return $this->dbDoQuery($query);
 }

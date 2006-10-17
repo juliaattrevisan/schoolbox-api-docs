@@ -12,7 +12,6 @@ require_once('include/session.php');
 require_once('include/include.php');
 require_once('include/permission.php');
 require_once('include/involved.php');
-require_once('include/fileTypes.php');
 
 class OutPut
 {
@@ -378,8 +377,8 @@ class OutPut
 					$this->t_body->set_var("MOD_NEWS", "<a href=\"/subject/modSubNews.php?modify=".$article['Id']."\">Modify</a>");
 				else
 					$this->t_body->set_var("MOD_NEWS", "");
-				$this->t_body->set_var("NEWS_HEADING", htmlentities($article['Heading']));
-				$this->t_body->set_var("NEWS_BODY", $article['Body']);
+				$this->t_body->set_var("NEWS_HEADING", scrubTEXT($article['Heading']));
+				$this->t_body->set_var("NEWS_BODY", scrubHTML($article['Body']));
 				if($article['Contact'])
 					$this->t_body->set_var("EMAIL_CONTACT", "<a href=\"{$_SESSION['mailhandle']}{$article['Contact']}\">{$article['Poster']}</a>");
 				else
@@ -423,7 +422,7 @@ class OutPut
 			$imageurl = "cms/image.php?id={$image['id']}&height={$imageSize}&width={$imageSize}";
 			
 			$this->t_body->set_var("PREVIEW_IMAGE_URL", $imageurl);
-			$this->t_body->set_var("PREVIEW_IMAGE_DESC", $image['comment']);
+			$this->t_body->set_var("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));
 	        $this->t_body->set_var("CONTENT_URL", $link['url']);
 
 			$this->t_body->parse("preview_block", "previewimage");
@@ -458,7 +457,7 @@ class OutPut
 			$imageurl = "cms/image.php?id={$image['id']}&height={$imageSize}&width={$imageSize}";
 			
 			$this->t_body->set_var("PREVIEW_IMAGE_URL", $imageurl);
-			$this->t_body->set_var("PREVIEW_IMAGE_DESC", $image['comment']);
+			$this->t_body->set_var("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));
 			$this->t_body->set_var("CONTENT_URL", $link['url']);
 
             $this->t_body->parse("preview_block", "previewimage");
@@ -485,21 +484,15 @@ class OutPut
 					DATE_FORMAT(submission_box.date, '%D %b') AS date, 
 					UNIX_TIMESTAMP(submission_box.late_date) AS late,
 					submission_box.id AS box_id,
-					student_submission.owner, file.mime_type
-				FROM	file
-					LEFT JOIN
-					submission_box	ON	file.id = submission_box.fid
-								AND
-								submission_box.deleted = '0'
-					LEFT JOIN
-					student_submission ON	student_submission.box_id = submission_box.id 
-								AND
-								student_submission.owner = '".$_SESSION['id']."' 
-				WHERE	file.category = '".$this->category."'
-					AND
-					file.type = '3'
-					AND
-					file.deleted = '0' 
+					student_submission.owner, inline
+				FROM file
+				LEFT JOIN allowedFileTypes ON mime_type = mime
+				LEFT JOIN submission_box ON	file.id = submission_box.fid
+					AND submission_box.deleted = '0'
+				LEFT JOIN student_submission ON	student_submission.box_id = submission_box.id 
+					AND student_submission.owner = '".$_SESSION['id']."' 
+				WHERE file.category = '".$this->category."' AND file.type = '3'
+					AND file.deleted = '0' 
 				ORDER BY submission_box.date DESC
 			";
 		
@@ -507,7 +500,8 @@ class OutPut
 		else
 		{
 			$query = "SELECT file.id, file.description, file.comment, DATE_FORMAT(submission_box.date, '%D %b') AS date, 
-			submission_box.id AS box_id, submission_box.owner, file.realname, mime_type FROM file 
+			submission_box.id AS box_id, submission_box.owner, file.realname, inline
+			FROM file  LEFT JOIN allowedFileTypes ON mime_type = mime
 			LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0' 
 			WHERE file.category = '".$this->category."' AND file.type = '3' AND file.deleted = '0'
 			ORDER BY submission_box.date DESC";
@@ -547,8 +541,9 @@ class OutPut
 		if(isStudent($_SESSION['gid']))
 		{
 			$query = "SELECT file.id, file.description, file.realname, file.comment, DATE_FORMAT(submission_box.date, '%D %b') AS date, 
-			UNIX_TIMESTAMP(submission_box.late_date) AS late, submission_box.id AS box_id, student_submission.owner, file.mime_type
-			FROM file LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0'
+			UNIX_TIMESTAMP(submission_box.late_date) AS late, submission_box.id AS box_id, student_submission.owner, inline
+			FROM file LEFT JOIN allowedFileTypes ON mime_type = mime 
+			LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0'
 			LEFT JOIN student_submission ON  student_submission.box_id = submission_box.id 
 			AND student_submission.owner = '".$_SESSION['id']."'
 			WHERE file.category = '".$this->category."' AND file.type = '2' AND file.deleted = '0'
@@ -557,7 +552,8 @@ class OutPut
 		else
 		{
 			$query = "SELECT file.id, file.description, file.comment, DATE_FORMAT(submission_box.date, '%D %b') AS date, 
-			submission_box.id AS box_id, submission_box.owner, file.realname, mime_type FROM file 
+			submission_box.id AS box_id, submission_box.owner, file.realname, inline 
+			FROM file LEFT JOIN allowedFileTypes ON mime_type = mime
 			LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0' 
 			WHERE file.category = '".$this->category."' AND file.type = '2' AND file.deleted = '0'
 			ORDER BY submission_box.date DESC";
@@ -594,7 +590,7 @@ class OutPut
 		//note output
 		$this->t_body->set_block($name, "notes", "notes_block");
 		
-		$query = "SELECT id, description, comment, realname, mime_type FROM file 
+		$query = "SELECT id, file.description, comment, realname, inline FROM file LEFT JOIN allowedFileTypes ON mime_type = mime
 		WHERE category = '".$this->category."' AND type = '1' AND file.deleted = '0' ORDER BY submitted DESC";
 
 		//if no size make unlimited query else make it limited by size
@@ -660,7 +656,7 @@ class OutPut
 		//file output
 		$this->t_body->set_block($name, "files", "files_block");
 	
-		$query = "SELECT id, description, comment, realname, mime_type FROM file 
+		$query = "SELECT id, file.description, comment, realname, inline FROM file LEFT JOIN allowedFileTypes ON mime_type = mime
 		WHERE category = '".$this->category."' AND file.deleted = '0' ORDER BY submitted DESC";
 
 		//if no size make unlimited query else make it limited by size
@@ -734,7 +730,8 @@ class OutPut
 		else
 			$lim = " LIMIT 1, ".IMAGESPERROW * $size;
 			
-        $query = "SELECT id, description FROM file WHERE category = '{$this->category}' AND deleted = '0' AND INSTR(mime_type, 'image/')
+        $query = "SELECT id, file.description FROM file LEFT JOIN allowedFileTypes ON mime_type = mime WHERE category = '{$this->category}' 
+					AND deleted = '0' AND INSTR(mime_type, 'image/') AND inline = 'true'
                 	ORDER BY submitted".$lim;
 		$this->db->dbDoQuery($query);
 
@@ -869,7 +866,6 @@ class OutPut
 
 	function outputHomework($queryArray)
 	{
-		global $allowedFileTypes;
 
 		$url = "sendframe.php?id=".$queryArray['id'];
 
@@ -896,17 +892,17 @@ class OutPut
 		//set name
 		if($queryArray['realname'] != "")
 		{
-			if($allowedFileTypes[$queryArray['mime_type']][1] == 1)
-				$url = "<a href=\"sendframe.php?id=".$queryArray['id']."\" target=\"_blank\">".htmlentities($queryArray['description'])."</a>";
+			if($queryArray['inline'] == 'true')
+				$url = "<a href=\"sendframe.php?id=".$queryArray['id']."\" target=\"_blank\">".scrubTEXT($queryArray['description'])."</a>";
 			else
-				$url = "<a href=\"send.php?id=".$queryArray['id']."\">".htmlentities($queryArray['description'])."</a>";
+				$url = "<a href=\"send.php?id=".$queryArray['id']."\">".scrubTEXT($queryArray['description'])."</a>";
 
 			$this->t_body->set_var("HW_NAME", $url);
 		}
 		else
-			$this->t_body->set_var("HW_NAME", htmlentities($queryArray['description']));
+			$this->t_body->set_var("HW_NAME", scrubTEXT($queryArray['description']));
 		
-		$this->t_body->set_var("HW_COMMENT", nl2br(htmlentities($queryArray['comment'])));
+		$this->t_body->set_var("HW_COMMENT", nl2br(scrubTEXT($queryArray['comment'])));
 
 		$this->t_body->parse("homework_block", "homework", true);
 
@@ -914,8 +910,6 @@ class OutPut
 
 	function outputAssignment($queryArray)
 	{
-
-		global $allowedFileTypes;
 
 		if($queryArray['date'])
 			$date = $queryArray['date'];
@@ -940,17 +934,17 @@ class OutPut
 		//set name
 		if($queryArray['realname'] != "")
 		{
-			if($allowedFileTypes[$queryArray['mime_type']][1] == 1)
-				$url = "<a href=\"sendframe.php?id=".$queryArray['id']."\" target=\"_blank\">".htmlentities($queryArray['description'])."</a>";
+			if($queryArray['inline'] == 'true')
+				$url = "<a href=\"sendframe.php?id=".$queryArray['id']."\" target=\"_blank\">".scrubTEXT($queryArray['description'])."</a>";
 			else
-				$url = "<a href=\"send.php?id=".$queryArray['id']."\">".htmlentities($queryArray['description'])."</a>";
+				$url = "<a href=\"send.php?id=".$queryArray['id']."\">".scrubTEXT($queryArray['description'])."</a>";
 
 			$this->t_body->set_var("ASS_NAME", $url);
 		}
 		else
-			$this->t_body->set_var("ASS_NAME", htmlentities($queryArray['description']));
+			$this->t_body->set_var("ASS_NAME", scrubTEXT($queryArray['description']));
 		
-		$this->t_body->set_var("ASS_COMMENT", nl2br(htmlentities($queryArray['comment'])));
+		$this->t_body->set_var("ASS_COMMENT", nl2br(scrubTEXT($queryArray['comment'])));
 
 		$this->t_body->parse("assign_block", "assign", true);
 
@@ -958,35 +952,32 @@ class OutPut
 
 	function outputNote($queryArray)
 	{
-		global $allowedFileTypes;
 
 		//set name
 		if($queryArray['realname'] != "")
 		{
-			if($allowedFileTypes[$queryArray['mime_type']][1] == 1)
-				$url = "<a href=\"sendframe.php?id=".$queryArray['id']."\" target=\"_blank\">".htmlentities($queryArray['description'])."</a>";
+			if($queryArray['inline'] == 'true')
+				$url = "<a href=\"sendframe.php?id=".$queryArray['id']."\" target=\"_blank\">".scrubTEXT($queryArray['description'])."</a>";
 			else
-				$url = "<a href=\"send.php?id=".$queryArray['id']."\">".htmlentities($queryArray['description'])."</a>";
+				$url = "<a href=\"send.php?id=".$queryArray['id']."\">".scrubTEXT($queryArray['description'])."</a>";
 
 			$this->t_body->set_var("NOTE_NAME", $url);
 		}
 		else
-			$this->t_body->set_var("NOTE_NAME", htmlentities($queryArray['description']));
+			$this->t_body->set_var("NOTE_NAME", scrubTEXT($queryArray['description']));
 	
-		$this->t_body->set_var("NOTE_COMMENT", nl2br(htmlentities($queryArray['comment'])));
+		$this->t_body->set_var("NOTE_COMMENT", nl2br(scrubTEXT($queryArray['comment'])));
 
 		$this->t_body->parse("notes_block", "notes", true);
 
 	}
 
 	function outputFile($queryArray)
-	{
-		global $allowedFileTypes;
-		
+	{		
 		//set name
 		if($queryArray['realname'] != "")
 		{
-			if($allowedFileTypes[$queryArray['mime_type']][1] == 1)
+			if($queryArray['inline'] == 'true')
 				$url = "<a href=\"sendframe.php?id=".$queryArray['id']."\" target=\"_blank\">".scrubTEXT($queryArray['description'])."</a>";
 			else
 				$url = "<a href=\"send.php?id=".$queryArray['id']."\">".scrubTEXT($queryArray['description'])."</a>";

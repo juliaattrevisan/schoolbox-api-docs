@@ -16,7 +16,6 @@
 require_once('include/session.php');
 require_once('include/include.php');
 require_once('include/permission.php');
-require_once('include/fileTypes.php');
 
 class OutPut
 {
@@ -79,8 +78,10 @@ class OutPut
 		$catQuery = "SELECT id, name, template, code FROM category WHERE parent = ".$this->category." ORDER BY name";
 
 		$fileQuery = "SELECT file.id, file.realname, DATE_FORMAT(file.submitted, '".FILE_date_format."') AS submitted, 
-		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, file.description, file.comment, file.mime_type 
-		FROM file LEFT JOIN user ON user.id = file.owner WHERE file.category = ".$this->category." AND deleted = '0'";
+		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, file.description, file.comment, file.mime_type,
+		iconFile, allowedFileTypes.description as mime_description, inline
+		FROM file LEFT JOIN user ON user.id = file.owner LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
+		WHERE file.category = ".$this->category." AND deleted = '0'";
 
 		$linkQuery = "SELECT link.id, link.url, DATE_FORMAT(link.submitted, '".FILE_date_format."') AS submitted, 
 		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, link.description, link.comment 
@@ -203,8 +204,6 @@ class OutPut
 
 	function outputFile($fileDetails)
 	{
-		global $allowedFileTypes;
-
 		// correction for empty description
 		if ($fileDetails['comment'] == "") { $fileDetails['comment'] = "No comment available"; }
 
@@ -232,16 +231,21 @@ class OutPut
 		
 
 		//set image
-		if(isset($allowedFileTypes[$fileDetails['mime_type']][0]))
-			$this->t_body->set_var("FILE_IMAGE", "/images/mime/".$allowedFileTypes[$fileDetails['mime_type']][0]);
+		if($fileDetails['iconFile'])
+			$this->t_body->set_var("FILE_IMAGE", "/images/mime/".$fileDetails['iconFile']);
 		else				
 			$this->t_body->set_var("FILE_IMAGE", "/images/mime/application-x-none.png");
-
+	
+		if($fileDetails['mime_description'])
+			$this->t_body->set_var("FILE_MIME", $fileDetails['mime_description']);
+		else
+			$this->t_body->set_var("FILE_MIME", "Unknown");
+			
 		// set url depending on wether it should have one and how it should be opened
 		if($fileDetails['realname'] != "")
 		{
 			//if inline open in new window, if not give user a save dialog box
-			if($allowedFileTypes[$fileDetails['mime_type']][1] == 1)
+			if($fileDetails['inline'] == 'true')
 				$this->t_body->set_var("FILE_URL", "<a href=\"/sendframe.php?id=".$fileDetails['id']."\" target=\"_blank\">");
 			else
 				$this->t_body->set_var("FILE_URL", "<a href=\"/send.php?id=".$fileDetails['id']."&save=1\">");

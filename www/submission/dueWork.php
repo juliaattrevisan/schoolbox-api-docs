@@ -2,7 +2,6 @@
 
 require_once("../include/session.php");
 require_once("../include/include.php");
-require_once("../include/fileTypes.php");
 require_once("../include/involved.php");
 
 class dueWorkPage 
@@ -88,9 +87,10 @@ class dueWorkPage
 	{
 		$query = "SELECT file.description, file.realname, file.id AS fid, 
 			DATE_FORMAT(submission_box.date, '%a, %D of %b %l:%i%p') AS date, submission_box.id, category.name, 
-			UNIX_TIMESTAMP(submission_box.date) AS overdue_date, student_submission.owner, file.mime_type 
+			UNIX_TIMESTAMP(submission_box.date) AS overdue_date, student_submission.owner, inline 
 			FROM file, submission_box, category LEFT JOIN student_submission
 			ON student_submission.box_id = submission_box.id AND student_submission.owner = $id
+			LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
 			WHERE submission_box.fid = file.id AND submission_box.category = category.id 
 			AND submission_box.deleted = '0' AND category.id = '$catId' 
 			AND submission_box.late_date > NOW()
@@ -115,12 +115,12 @@ class dueWorkPage
 					else
 						$this->t_body->set_var("COLOUR", "#000000");
 	
-					$this->t_body->set_var("ASSDESC", $result['description']);
+					$this->t_body->set_var("ASSDESC", scrubTEXT($result['description']));
 					if($result['realname'] == "")
 						$this->t_body->set_var("VIEW", "");		
 					else
 					{
-						if($allowedFileTypes[$result['mime_type']][1] == 1)
+						if($result['inline'] == 'true')
 							$url = "<a href=\"/sendframe.php?id=".$result['fid']."\" target=\"_blank\">View</a>";
 						else
 							$url = "<a href=\"/send.php?id=".$result['fid']."&save=1\">View</a>";

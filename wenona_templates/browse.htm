@@ -108,7 +108,7 @@
                   <table>
 					<!-- BEGIN category_listing -->                    
 					<tr> 
-                      <td><a href="{CATEGORY_LINK}"><img  src="/images/mime/folder_blue_full.png" width="30" height="30" border="0" /></a>
+                      <td><a href="{CATEGORY_LINK}"><img  src="/images/mime/folder_blue_full.png" width="30" height="30" border="0" alt="Folder" /></a>
 						  <a href="{CATEGORY_LINK}">{CATEGORY_NAME}</a></td>
                       <td class="cntr">{HOMEPAGE}</td>
                       <!-- BEGIN mod_cat -->
@@ -119,7 +119,7 @@
                   <!-- END category_listing -->
                   <!-- BEGIN file_listing -->
                     <tr> 
-                      <td colspan="2">{FILE_URL}<img src="{FILE_IMAGE}" width="25" height="27" border="0" />{FILE_URL_END} {FILE_URL}{FILE_DESCRIPTION}{FILE_URL_END} <em>{SIZE}</em></td>
+                      <td colspan="2">{FILE_URL}<img src="{FILE_IMAGE}" width="25" height="27" border="0" alt="{FILE_MIME}" />{FILE_URL_END} {FILE_URL}{FILE_DESCRIPTION}{FILE_URL_END} <em>{SIZE}</em></td>
                       <!-- BEGIN mod_file -->
                       <td class="cntr"><a href="/cms/modResource.php?type=modfile&amp;id={FILEID}">modify</a></td>
                       <td><a href="/cms/delResource.php?fileid={FILEID}" onclick=" return(confirm('Remove file {FILE_DESCRIPTION_ESCAPED}?'));">delete</a></td>
@@ -140,7 +140,7 @@
                   <!-- END file_listing -->
                   <!-- BEGIN link_listing -->
                     <tr>
-                      <td colspan="2"><a href="{LINK_URL}" target="{LINK_TARGET}"><img src="/images/mime/http-url.png" width="25" height="27" border="0" /></a> <a href="{LINK_URL}" target="{LINK_TARGET}">{LINK_DESCRIPTION}</a></td>
+                      <td colspan="2"><a href="{LINK_URL}" target="{LINK_TARGET}"><img src="/images/mime/http-url.png" width="25" height="27" border="0" alt="URL" /></a> <a href="{LINK_URL}" target="{LINK_TARGET}">{LINK_DESCRIPTION}</a></td>
                       <!-- BEGIN mod_link -->
                       <td class="cntr"><a href="/cms/modResource.php?type=modurl&amp;id={LINKID}">modify</a> </td>
                       <td><a href="/cms/delResource.php?linkid={LINKID}" onclick="return(confirm('Remove link {LINK_DESCRIPTION_ESCAPED}?'));">delete</a> </td>
