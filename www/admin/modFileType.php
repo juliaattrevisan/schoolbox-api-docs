@@ -34,7 +34,7 @@ class modFileType
 
 		$this->t_body->set_var("DESCRIPTION", scrubTEXT($item['description']));
 		$this->t_body->set_var("MIME", scrubTEXT($item['mime']));		
-		$this->t_body->set_var("ICONLIST", $this->createIconList($fileType->getIconList(), $item['icon']));
+		$this->t_body->set_var("ICONLIST", $this->createIconList($fileType->getIconList(), $item['iconFile']));
 
 		if($item['inline'] == 'true') {
 			$this->t_body->set_var('INLINE_TRUE', 'checked="checked"');

@@ -32,6 +32,7 @@ define("RETURNS_directory", "/usr/local/www/portal/returns");		//Returned work w
 define("TPL_directory", "/usr/local/www/portal/mgs_templates");		//Where site templates are located
 define("THUMBNAIL_IMAGE_CACHE", "/usr/local/www/portal/files/thumbnails");		//Thumbnail cache for 
 define("URLS_use_frame", true);						//Open links in frame
+define('ZIP_directory', '/usr/local/www/portal/zip');
 
 //GROUP options
 define("GROUP_staff_only_owner", true);			//Determines if students can be group owner or not
