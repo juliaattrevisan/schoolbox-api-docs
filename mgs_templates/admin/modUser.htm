@@ -26,7 +26,7 @@ function verify()
 		msg += "You need to enter a username\n";
 	}
 	if(document.getElementById('userForm').firstname.value == ""){
-		msg += "You need to enter a preffered name\n";
+		msg += "You need to enter a preferred name\n";
 	}
 	if(document.getElementById('userForm').lastname.value == ""){
 		msg += "You need to enter a surname\n";
@@ -129,7 +129,7 @@ function verify()
 			<form action="" method="post" id="userForm" class="standardForm" onsubmit="return(verify());">
 				<table>
 					<tr>
-						<td><h2>Preffered</h2></td>
+						<td><h2>Preferred</h2></td>
 						<td><input type="text" name="firstname" value="{FIRSTNAME}" />
 						</td>
 						<td><h2>Surname</h2></td>
