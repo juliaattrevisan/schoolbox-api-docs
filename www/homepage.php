@@ -91,23 +91,24 @@ class OutPut
 		$this->t_body->set_var("ID", $this->category);
 		
 		$this->t_body->set_var("TITLE", HEADING." - ".$name);
+		
+		$this->t_body->set_block("tplBODY", "edit_page", "edit_page_block");
+		
+		if($this->perm >= 2) //has elevated priviliges, can write to page
+			$this->t_body->parse("edit_page_block", "edit_page");	
+		else
+			$this->t_body->set_var("edit_page_block", "");
 
 	}
 
 	function folderManage($name, $size)
 	{
 		$this->t_body->set_block($name, "manage_page", "manage_page_block");
-		$this->t_body->set_block($name, "edit_page", "edit_page_block");
 
 		if($this->perm == 3) //is owner of area
 			$this->t_body->parse("manage_page_block", "manage_page");	
 		else
 			$this->t_body->set_var("manage_page_block", "");
-
-		if($this->perm >= 2) //has elevated priviliges, can write to page
-			$this->t_body->parse("edit_page_block", "edit_page");	
-		else
-			$this->t_body->set_var("edit_page_block", "");
 			
 		return true;
 	}				
