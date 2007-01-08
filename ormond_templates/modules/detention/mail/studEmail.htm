@@ -1,0 +1,68 @@
+<html>
+<style>
+<!--
+body {font-family:Verdana, Arial, Helvetica, sans-serif;}
+-->
+</style>
+  <body>
+  <h1>Detention</h1>
+    <p>
+		<strong>Attention:</strong>{STUDNAME}
+	</p>
+    <p>
+		<strong>{SUBJECT}</strong>
+	</p>
+    <table>
+      <tr>
+        <td colspan=2>STUDENT DETAILS:</td>
+      </tr>
+      <tr>
+        <td><strong>Name:</strong></td>
+        <td>{STUDNAME}</td>
+      </tr>
+      <tr>
+        <td><strong>Year:</strong></td>
+        <td>{STUDYEAR}</td>
+      </tr>
+      <tr>
+        <td><strong>House:</strong></td>
+        <td>{STUDHOUSE}</td>
+      </tr>
+    </table>
+    <p style="color:{TYPE};"><strong>{BLURB}</strong></p>
+    <table>
+      <tr>
+        <td colspan=2>DETENTION DETAILS:</td>
+      </tr>
+      <tr>
+        <td><strong>Issued by:</strong></td>
+        <td>{ASSSTAFFNAME}</td>
+      </tr>
+      <tr>
+        <td><strong>Offence:</strong></td>
+        <td>{OFFENCE}</td>
+      </tr>
+      <tr>
+        <td><strong>Work set: </strong></td>
+        <td>{WORKSET}</td>
+      </tr>
+      <tr>
+        <td colspan=2>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><strong>When:</strong></td>
+        <td>{DETDATE}</td>
+      </tr>
+      <tr>
+        <td><strong>Where:</strong></td>
+        <td>{DETLOC}</td>
+      </tr>
+      <tr>
+        <td><strong>Staff:</strong></td>
+        <td>{DETSTAFFNAME}</td>
+      <tr>
+    </table>
+	<p>{BLURB2}</p>
+    <p>This is an automatically generated email.</p>
+  </body>
+</html>

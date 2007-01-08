@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- #BeginTemplate "/Templates/main.dwt" -->
+<!-- DW6 -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<!-- #BeginEditable "doctitle" -->
+<title>{TITLE}</title>
+<script type="text/javascript">
+
+function verify()
+{
+	var msg = ""
+	
+	if(document.form.name.value == ""){
+		msg += "You need to enter a name\n";
+	}
+	
+	if(document.form.category.value == "" || isNaN(document.form.category.value)){
+		msg += "You need to select a proper category";
+	}
+	
+	if(msg != ""){
+		alert(msg);
+		return false;
+	}
+	else
+		return true;
+}
+	
+</script>
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
+<script type="text/javascript" src="/javascript/drop_down.js"></script>
+<!-- #BeginEditable "scripts" --><!-- #EndEditable -->
+</head>
+<body>
+<div id="outerWrap">
+	<div id="header"></div>
+	<div id="yellowStripe"></div>
+	<div id="left">
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;GOTO</h3>
+			<div class="whiteWrap">{MCSSMENU}</div>
+		</div>
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;SEARCH</h3>
+			<div class="whiteWrap">
+				<form class="standardForm" id="searchForm" action="/search.php" method="get">
+					<p style="margin:0;">
+						<input class="short" type="text" name="keyword" />
+						<select class="short" name="where">
+							<option value="0" selected="selected">portal</option>
+							<option value="1">google</option>
+							<option value="2">yahoo</option>
+						</select>
+						<input class="img" type="image" src="/images/mgs/navsearch.gif" alt="Search" name="Submit" />
+					</p>
+				</form>
+			</div>
+		</div>
+		<!-- BEGIN msubject -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY SUBJECTS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN msubject_block -->
+					<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
+					<!-- END msubject_block -->
+				</ul>
+			</div>
+		</div>
+		<!-- END msubject -->
+		<!-- BEGIN mgroup -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY GROUPS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN mgroup_block -->
+					<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
+					<!-- END mgroup_block -->
+				</ul>
+			</div>
+		</div>
+		<!-- END mgroup -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY LINKS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN mlink_block -->
+					<li>{MLINK}</li>
+					<!-- END mlink_block -->
+					<li><a href="/editLinks.php">ADD LINK</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- end left -->
+	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" -->
+	<div id="topNav">
+		<ul>
+			<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+			<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+			<!-- BEGIN webmail_tab -->
+			<li class="norm"><a class="norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+			<!-- END webmail_tab -->
+			<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+			<!-- BEGIN timetable_tab -->
+			<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+			<!-- END timetable_tab -->
+			<li class="navthis right"><a class="navthis right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+		</ul>
+	</div>
+	<!-- #EndLibraryItem --><!-- #EndEditable -->
+	<div id="content">
+		<div id="content_text"> <!-- #BeginEditable "main" -->
+			<h1>{ACTION} Resource</h1>
+			<form action="" method="post" enctype="multipart/form-data" id="form" onsubmit="return(verify());" class="standardForm">
+				<table>
+					<tr>
+						<td class="formLabelWidth"><h2>Name</h2></td>
+						<td><input name="name" type="text" id="name" value="{NAME}" size="50" maxlength="250" />
+						</td>
+					</tr>
+					<!-- BEGIN image -->
+					<tr>
+						<td><h2>Image</h2>
+							<em>Picture 
+							of resource for display</em></td>
+						<td><input type="file" name="file" /></td>
+					</tr>
+					<!-- END image -->
+					<tr>
+						<td><h2>Type</h2>
+							<em>This is 
+							used to group items together. It will also help people 
+							find what they are looking for quicker.</em> </td>
+						<td>{TYPEHTML}</td>
+					</tr>
+					<tr>
+						<td><h2>Description</h2>
+							<em>A description of the resource in detail. This 
+							can include purpose, operational guidelines or information 
+							unique to this resource.</em> </td>
+						<td><textarea name="description" cols="40" rows="4" class="formfield" id="description">{DESCRIPTION}</textarea>
+						</td>
+					</tr>
+					<tr>
+						<td><h2>Booking Method </h2>
+							<em>How the booking of this item is regulated.</em></td>
+						<td>{PERMHTML}</td>
+					</tr>
+					<tr>
+						<td><h2>Location</h2>
+							<em>This is the location at which the resource can 
+							be located for pickup or use.</em></td>
+						<td> {LOCHTML}</td>
+					</tr>
+					<!-- BEGIN equipment -->
+					<tr>
+						<td><h2>Equipment List </h2>
+							<em>This is a list of equipment that has been
+							associated with this room. You can remove equipment or
+							modify it as required. </em> </td>
+						<td>{EQUIPLIST}</td>
+					</tr>
+					<!-- END equipment -->
+					<!-- BEGIN assignment -->
+					<tr>
+						<td><h2>Assignment</h2>
+							<em>If the equipment 
+							is statically located in a room please select which 
+							room. The room will then be listed with all static equipment 
+							available. The equipment will not be bookable only the 
+							room.</em></td>
+						<td>{ASSIGNHTML}</td>
+					</tr>
+					<!-- END assignment -->
+					<tr>
+						<td>&nbsp;</td>
+						<td>{IDFIELD}
+							<input type="submit" name="Submit" value="Submit" class="btn" />
+						</td>
+					</tr>
+				</table>
+			</form>
+			<!-- #EndEditable --> </div>
+		<div id="footer">
+			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
+			<p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
+			<p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
+		</div>
+	</div>
+</div>
+</body>
+<!-- #EndTemplate -->
+</html>

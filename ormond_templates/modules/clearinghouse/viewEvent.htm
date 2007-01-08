@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/main.dwt" codeOutsideHTMLIsLocked="false" -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<!-- #BeginEditable "doctitle" -->
+<title>{TITLE}</title>
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
+<script type="text/javascript" src="/javascript/drop_down.js"></script>
+<!-- InstanceBeginEditable name="scripts" -->
+
+
+<style type="text/css">
+<!--
+.outputGrid {border-collapse:collapse; border:0; }
+.outputGrid  tr td{ border-top:solid 1px #999; vertical-align:top;padding: 0 8px 0 8px;}
+.outputGrid tr td {}  
+.outputGrid h3{margin: 0; text-align:right; width:100%;}
+-->
+</style>
+<!-- InstanceEndEditable -->
+</head>
+<body>
+<div id="outerWrap">
+	<div id="header"></div>
+	<div id="yellowStripe"></div>
+	<div id="left">
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;GOTO</h3>
+			<div class="whiteWrap">{MCSSMENU}</div>
+		</div>
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;SEARCH</h3>
+			<div class="whiteWrap">
+				<form class="standardForm" id="searchForm" action="/search.php" method="get">
+					<p style="margin:0;">
+						<input class="short" type="text" name="keyword" />
+						<select class="short" name="where">
+							<option value="0" selected="selected">portal</option>
+							<option value="1">google</option>
+							<option value="2">yahoo</option>
+						</select>
+						<input class="img" type="image" src="/images/mgs/navsearch.gif" alt="Search" name="Submit" />
+					</p>
+				</form>
+			</div>
+		</div>
+		<!-- BEGIN msubject -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY SUBJECTS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN msubject_block -->
+					<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
+					<!-- END msubject_block -->
+				</ul>
+			</div>
+		</div>
+		<!-- END msubject -->
+		<!-- BEGIN mgroup -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY GROUPS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN mgroup_block -->
+					<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
+					<!-- END mgroup_block -->
+				</ul>
+			</div>
+		</div>
+		<!-- END mgroup -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY LINKS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN mlink_block -->
+					<li>{MLINK}</li>
+					<!-- END mlink_block -->
+					<li><a href="/editLinks.php">ADD LINK</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- end left -->
+	<!-- #BeginEditable "tabs" --> <!-- #BeginLibraryItem "/Library/Main_Active.lbi" -->
+	<div id="topNav">
+		<ul>
+			<li class="navthis left"><a class="navthis left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+			<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+			<!-- BEGIN webmail_tab -->
+			<li class="norm"><a class="norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+			<!-- END webmail_tab -->
+			<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+			<!-- BEGIN timetable_tab -->
+			<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+			<!-- END timetable_tab -->
+			<li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+		</ul>
+	</div>
+	<!-- #EndLibraryItem --><!-- #EndEditable -->
+	<div id="content">
+		<div id="content_text"> <!-- #BeginEditable "main" --><h1>{NAME}</h1>
+		<span class="header_option"><a href="index.php">return to homepage</a></span>
+		<br />
+	<table class="outputGrid">
+		<tr><td><h3>Organiser</h3></td>
+			<td>{ORGANISER}</td>
+			<td><h3>Format</h3></td>
+			<td>{FORMAT}</td>
+		</tr>
+	<tr>
+		<td><h3>Presenters</h3></td>
+		<td>{PRESENTER}</td>
+		<td><h3>Category</h3></td>
+		<td>{CATEGORY}</td>
+	</tr>
+	<tr>
+		<td><h3>Age Group </h3></td>
+		<td>{YEAR}</td>
+		<td><h3>Cost</h3></td>
+		<td>{COST}</td>
+		</tr>
+	<tr>
+		<td><h3>Date</h3></td>
+		<td>{DATE}</td>
+		<td><h3>Duration</h3></td>
+		<td>{DURATION}</td>
+	</tr>
+	<tr>
+		<td height="28"><h3>Description</h3></td>
+		<td colspan="4">{DESCRIPTION}</td>
+	</tr>
+	<tr>
+		<td><h3>Venue</h3></td>
+		<td colspan="2"><strong>{VENUE}</strong><br />
+				{ADDRESS}</td>
+		<td><a href="sendfile.php?id={ID}&type=brochure">View Brochure</a><br />
+			<a href="sendfile.php?id={ID}&type=form">View form</a><br />
+			<a href="/redir.php?url={URL}" target="_blank">Visit Homepage</a><br />
+			<a href="modEvent.php?id={ID}">Modify Event</a></td>
+	</tr>
+				</table>
+		<!-- #EndEditable --> </div>
+		<div id="footer">
+			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
+			<p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
+			<p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
+		</div>
+	</div>
+</div>
+</body>
+<!-- InstanceEnd --></html>

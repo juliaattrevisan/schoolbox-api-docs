@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<!-- #BeginEditable "doctitle" -->
+<title>{TITLE}</title>
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
+<script type="text/javascript" src="/javascript/drop_down.js"></script>
+<!-- #BeginEditable "scripts" -->
+
+<script type="text/javascript">
+function verify()
+{
+	var msg = ""
+	
+	//check all details have been entered
+	if(document.getElementById('userForm').username.value == ""){
+		msg += "You need to enter a username\n";
+	}
+	if(document.getElementById('userForm').firstname.value == ""){
+		msg += "You need to enter a preferred name\n";
+	}
+	if(document.getElementById('userForm').lastname.value == ""){
+		msg += "You need to enter a surname\n";
+	}
+	if(document.getElementById('userForm').group.value == "" || isNaN(document.getElementById('userForm').group.value)){
+		msg += "You need to select a group\n";
+	}
+
+	if(msg != ""){
+		alert(msg);
+		return false;
+	}
+	else
+		return true;
+}
+	
+</script>
+<!-- #EndEditable -->
+</head>
+<body>
+<div id="outerWrap">
+	<div id="header"></div>
+	<div id="yellowStripe"></div>
+	<div id="left">
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;GOTO</h3>
+			<div class="whiteWrap">{MCSSMENU}</div>
+		</div>
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;SEARCH</h3>
+			<div class="whiteWrap">
+				<form class="standardForm" id="searchForm" action="/search.php" method="get">
+					<p style="margin:0;">
+						<input class="short" type="text" name="keyword" />
+						<select class="short" name="where">
+							<option value="0" selected="selected">portal</option>
+							<option value="1">google</option>
+							<option value="2">yahoo</option>
+						</select>
+						<input class="img" type="image" src="/images/mgs/navsearch.gif" alt="Search" name="Submit" />
+					</p>
+				</form>
+			</div>
+		</div>
+		<!-- BEGIN msubject -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY SUBJECTS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN msubject_block -->
+					<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
+					<!-- END msubject_block -->
+				</ul>
+			</div>
+		</div>
+		<!-- END msubject -->
+		<!-- BEGIN mgroup -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY GROUPS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN mgroup_block -->
+					<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
+					<!-- END mgroup_block -->
+				</ul>
+			</div>
+		</div>
+		<!-- END mgroup -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY LINKS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN mlink_block -->
+					<li>{MLINK}</li>
+					<!-- END mlink_block -->
+					<li><a href="/editLinks.php">ADD LINK</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- end left -->
+	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" -->			<div id="topNav">
+				<ul>
+					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+					<!-- BEGIN webmail_tab --> 
+					<li class="norm"><a class="norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+					<!-- END webmail_tab -->
+					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+					<!-- BEGIN timetable_tab -->
+					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+					<!-- END timetable_tab -->
+					<li class="navthis right"><a class="navthis right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+				</ul>
+			</div>
+<!-- #EndLibraryItem --><!-- #EndEditable -->
+	<div id="content">
+		<div id="content_text"> <!-- #BeginEditable "main" -->
+			<h1>User Details</h1>
+			<form action="" method="post" id="userForm" class="standardForm" onsubmit="return(verify());">
+				<table>
+					<tr>
+						<td><h2>Preferred</h2></td>
+						<td><input type="text" name="firstname" value="{FIRSTNAME}" />
+						</td>
+						<td><h2>Surname</h2></td>
+						<td><input type="text" name="lastname" value="{LASTNAME}" />
+						</td>
+					</tr>
+					<tr>
+						<td><h2>Username</h2></td>
+						<td><input type="text" name="username" value="{USERNAME}" />
+						</td>
+						<td><h2>Password</h2></td>
+						<td><input type="password" name="password" value="{PASSWORD}" />
+						</td>
+					</tr>
+					<tr>
+						<td><h2>Synergy ID</h2></td>
+						<td><input type="text" name="synergyid" value="{SYNERGYID}" />
+						</td>
+						<td>&nbsp;</td>
+						<td><span onmouseover="this.innerHTML='{PASSWORD}';" onmouseout="this.innerHTML='Reveal Password';">Reveal Password</span></td>
+					</tr>
+					<tr>
+						<td><h2>Local Email</h2></td>
+						<td><input type="checkbox" name="local_email" value="1" {LOCAL_EMAIL} /></td>
+						<td><h2>Alternate Email</h2></td>
+						<td><input type="text" name="alt_email" value="{ALT_EMAIL}" /></td>
+					</tr>
+					<tr>
+						<td><h2>Superuser</h2></td>
+						<td><input type="checkbox" name="su" value="1" {SUPERUSER} onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME} superuser status?'));" />
+						</td>
+						<td><h2>Group</h2></td>
+						<td><select name="group">
+								{GROUPLIST}
+                          
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td><h2>Campus</h2></td>
+						<td>{CAMPUSLIST}</td>
+						<td><h2>Year</h2></td>
+						<td><input name="year" type="text" size="2" maxlength="2" value="{YEAR}" /></td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td><input type="hidden" name="id" value="{ID}" />
+							<input type="submit" name="submit" value="{ACTION}" class="btn" />
+							<!-- BEGIN delete_button -->
+							<input type="submit" name="delete" value="Delete" class="btn" onclick="return(confirm('Are you sure you want to delete {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME}'));" />
+							<!-- END delete_button -->
+						</td>
+					</tr>
+				</table>
+			</form>
+			<!-- BEGIN login -->
+			<form action="/login.php" method="post" id="loginForm" class="standardForm">
+				<table>
+					<tr>
+						<td><h2>Click here to transfer session to this user</h2></td>
+						<td><input type="hidden" name="username" value="{USERNAME}" />
+							<input type="hidden" name="password" value="{PASSWORD}" />
+							<input type="submit" class="btn" name="loginSubmit" value="Login" /></td>
+					</tr>
+				</table>
+			</form>
+			<!-- END login -->
+			<!-- BEGIN groups -->
+			<h1>Groups</h1>
+			<form action="/group/modUserGroup.php" method="post" id="groupForm" class="standardForm">
+				<table>
+					<tr>
+						<th>Group Name</th>
+						<th>Access</th>
+						<th>Make Owner</th>
+						<th>Remove</th>
+					</tr>
+					<!-- BEGIN group_block -->
+					<tr>
+						<td>{GROUP_NAME}</td>
+						<td>{BOX}</td>
+						<td>{OWNER}</td>
+						<td>{REMOVE}</td>
+					</tr>
+					<!-- END group_block -->
+					<tr>
+						<td>{GROUP_DROP_DOWN}</td>
+						<td><input type="hidden" name="uid" value="{ID}" />
+							<input type="hidden" name="service" value="1" /></td>
+						<td><input type="submit" name="groupSubmit" value="Add" class="btn"/></td>
+						<td>&nbsp;</td>
+					</tr>
+				</table>
+			</form>
+			<!-- END groups -->
+			<!-- BEGIN perms -->
+			<h1>Permissions</h1>
+			<form action="" method="post" id="permForms" class="standardForm">
+				<table>
+					<tr>
+						<th>Name</th>
+						<th>ID</th>
+						<th>Type</th>
+						<th>Remove</th>
+					</tr>
+					<!-- BEGIN perm_block -->
+					<tr>
+						<td>{SERVICE_NAME}</td>
+						<td>{SERVICE_ID}</td>
+						<td>{SERVICE_TYPE}</td>
+						<td>{SERVICE_REMOVE}</td>
+					</tr>
+					<!-- END perm_block -->
+					<tr>
+						<td>{SERVICE_DROP_DOWN}</td>
+						<td><input name="sid" type="text" size="4" maxlength="6" /></td>
+						<td><input name="type" type="text" size="4" maxlength="6"  /></td>
+						<td><input type="hidden" name="uid" value="{ID}" />
+							<input type="submit" name="permSubmit" value="Add" class="btn"/></td>
+					</tr>
+				</table>
+			</form>
+			<!-- END perms -->
+			<!-- #EndEditable --> </div>
+		<div id="footer">
+			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
+			<p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
+			<p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
+		</div>
+	</div>
+</div>
+</body>
+<!-- #EndTemplate --></html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>{TITLE}</title>
+<script type="text/javascript">
+<!--
+    function refresh() {
+        window.location.reload(false);
+    }
+	
+	// Mark Parncutt 24 Jan 2005
+    function hidetoggle (idtogg) {
+        document.getElementById(idtogg).style.display = (document.getElementById(idtogg).style.display == 'none') ? '' : 'none';
+	}
+	
+	// Tyson Day Jan 2006
+	function ImageRotate(buttonid) {
+		if (document.getElementById(buttonid).src == "/images/button_add.jpg") {
+			document.getElementById(buttonid).src = "/images/button_cross.jpg";	
+		}
+		else {
+			document.getElementById(buttonid).src = "/images/button_add.jpg";
+		}
+	}
+//-->
+</script>
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
+<script type="text/javascript" src="/javascript/drop_down.js"></script>
+<!-- #BeginEditable "scripts" -->
+
+<!-- #EndEditable -->
+</head>
+<body>
+<div id="outerWrap">
+	<div id="header"></div>
+	<div id="yellowStripe"></div>
+	<div id="left">
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;GOTO</h3>
+			<div class="whiteWrap">{MCSSMENU}</div>
+		</div>
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;SEARCH</h3>
+			<div class="whiteWrap">
+				<form class="standardForm" id="searchForm" action="/search.php" method="get">
+					<p style="margin:0;">
+						<input class="short" type="text" name="keyword" />
+						<select class="short" name="where">
+							<option value="0" selected="selected">portal</option>
+							<option value="1">google</option>
+							<option value="2">yahoo</option>
+						</select>
+						<input class="img" type="image" src="/images/mgs/navsearch.gif" alt="Search" name="Submit" />
+					</p>
+				</form>
+			</div>
+		</div>
+		<!-- BEGIN msubject -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY SUBJECTS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN msubject_block -->
+					<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
+					<!-- END msubject_block -->
+				</ul>
+			</div>
+		</div>
+		<!-- END msubject -->
+		<!-- BEGIN mgroup -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY GROUPS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN mgroup_block -->
+					<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
+					<!-- END mgroup_block -->
+				</ul>
+			</div>
+		</div>
+		<!-- END mgroup -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY LINKS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN mlink_block -->
+					<li>{MLINK}</li>
+					<!-- END mlink_block -->
+					<li><a href="/editLinks.php">ADD LINK</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- end left -->
+	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Main_Active.lbi" -->
+    <div id="topNav">
+      <ul>
+        <li class="navthis left"><a class="navthis left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+        <li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+        <!-- BEGIN webmail_tab -->
+        <li class="norm"><a class="norm" href="/mail.php" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+        <!-- END webmail_tab -->
+        <li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+        <!-- BEGIN timetable_tab -->
+        <li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+        <!-- END timetable_tab -->
+        <li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+      </ul>
+    </div>
+	<!-- #EndLibraryItem --><!-- #EndEditable -->
+	<div id="content">
+		<div id="content_text"> <!-- #BeginEditable "main" -->
+<h1>Detention System</h1>
+{DETNAV}<br /><br />
+                  <table>
+                    <tr>
+                      <td colspan="9"><h2>Awaiting Authorisation: Head Of House</h2></td>
+                    </tr>
+		    <!-- BEGIN hoh_header -->
+                    <tr>
+					  <td width="5%"></td>
+                      <td><b>Name</b></td>
+                      <td><b>Year</b></td>
+                      <td><b>House</b></td>
+                      <td><b>Type</b></td>
+		      		  <td><b>Offence</b></td>
+                      <td><b>Details</b></td>
+                      <td colspan="2"><b>Date</b></td>
+                    </tr>
+		    <!-- END hoh_header -->
+		    <tr>
+			<td width="5%"></td>
+			<td colspan="8"><hr /></td>
+		    </tr>
+                    <!-- BEGIN hoh_auth -->
+                    <tr>
+					  <td width="5%"></td>
+                      <td width="15%">{NAME}</td>
+                      <td width="10%">{YEAR}</td>
+                      <td width="10%">{HOUSE}</td>
+                      <td width="10%">{TYPE}</td>
+		              <td width="15%">{OFFENCE}</td>
+                      <td width="10%">{DETAILS}</td>
+                      <td width="10%">{DATE}</td>
+                      <td width="15%"><a href="/modules/detention/viewDet.php?id={ID}&amp;confirm=1&amp;type={TYPE}">Confirm</a> / <a href="/modules/detention/modifyDet.php?id={ID}">Modify</a></td>
+                    </tr>
+					<tr id="show{UNIQID}" style="display:none;">
+					<td width="5%"></td>
+					<td colspan="8">
+					  <form class="standardForm">
+					  <table>
+						<tr><td width="30%"><b>Staff:</b></td><td width="35%"><b>Work Set:</b></td><td width="35%"><b>Details:</b></td></tr>
+						<tr><td><i>{STAFF}</i></td><td><i>{WORKSET}</i></td><td><i>{HISTORY}</i></td></tr>
+					  </table>
+					  </form>
+					</td></tr>
+                    <!-- END hoh_auth -->
+					<tr>
+					  <td width="5%"></td>
+					  <td colspan="8"><hr /></td>
+		    		</tr>
+                  </table>
+				  <br />
+                  <table>
+                    <tr>
+                      <td colspan="9"><h2>Awaiting Authorisation: School Steward</h2></td>
+                    </tr>
+		    <!-- BEGIN ss_header -->
+                    <tr>
+					  <td width="5%"></td>
+                      <td><b>Name</b></td>
+                      <td><b>Year</b></td>
+                      <td><b>House</b></td>
+                      <td><b>Type</b></td>
+		      		  <td><b>Offence</b></td>
+                      <td><b>Details</b></td>
+                      <td colspan="2"><b>Date</b></td>
+                    </tr>
+		    <!-- END ss_header -->
+		    <tr>
+			<td width="5%"></td>
+			<td colspan="8"><hr /></td>
+		    </tr>
+                    <!-- BEGIN ss_auth -->
+                    <tr>
+					  <td width="5%"></td>
+                      <td width="15%">{NAME}</td>
+                      <td width="10%">{YEAR}</td>
+                      <td width="10%">{HOUSE}</td>
+                      <td width="10%">{TYPE}</td>
+		              <td width="15%">{OFFENCE}</td>
+                      <td width="10%">{DETAILS}</td>
+                      <td width="10%">{DATE}</td>
+			  <!-- BEGIN ss_action -->
+                      <td width="15%"><a href="/modules/detention/viewDet.php?id={ID}&amp;confirm=1&amp;type={TYPE}">Confirm</a> / <a href="/modules/detention/modifyDet.php?id={ID}">Modify</a></td>
+  			  <!-- END ss_action -->
+				    </tr> 
+					<tr id="show{UNIQID}" style="display:none;">
+					<td width="5%"></td>
+					<td colspan="8">
+					  <form class="standardForm">
+					  <table>
+						<tr><td width="30%"><b>Staff:</b></td><td width="35%"><b>Work Set:</b></td><td width="35%"><b>Details:</b></td></tr>
+						<tr><td><i>{STAFF}</i></td><td><i>{WORKSET}</i></td><td><i>{HISTORY}</i></td></tr>
+					  </table>
+					  </form>
+					</td></tr>
+                      <!-- END ss_auth -->
+					<tr>
+					  <td width="5%"></td>
+					  <td colspan="8"><hr /></td>
+					</tr>
+                  </table>
+            <br />
+                  <table>
+                    <tr>
+                      <td colspan="9"><h2>Confirmed</h2></td>
+                    </tr>
+		    <!-- BEGIN conf_header -->
+                    <tr>
+				  	  <td width="5%"></td>
+                      <td><b>Name</b></td>
+                      <td><b>Year</b></td>
+                      <td><b>House</b></td>
+                      <td><b>Type</b></td>
+		      		  <td><b>Offence</b></td>
+                      <td><b>Details</b></td>
+                      <td colspan="2"><b>Date</b></td>
+                    </tr>
+		    <!-- END conf_header -->
+		    <tr>
+			<td width="5%"></td>
+			<td colspan="8"><hr /></td>
+		    </tr>
+                    <!-- BEGIN confirmed -->
+                    <tr>
+					  <td width="5%"></td>
+                      <td width="15%">{NAME}</td>
+                      <td width="10%">{YEAR}</td>
+                      <td width="10%">{HOUSE}</td>
+                      <td width="10%">{TYPE}</td>
+		              <td width="15%">{OFFENCE}</td>
+                      <td width="10%">{DETAILS}</td>
+                      <td width="10%">{DATE}</td>
+                      <td width="15%"><a href="/modules/detention/modifyDet.php?id={ID}">Modify</a> / <a href="/modules/detention/viewDet.php?id={ID}&amp;delete=1">Delete</a></td>
+                    </tr>
+					<tr id="show{UNIQID}" style="display:none;">
+					<td width="5%"></td>
+					<td colspan="8">
+					    <form class="standardForm">
+					    <table>
+						  <tr><td width="30%"><b>Staff:</b></td><td width="35%"><b>Work Set:</b></td><td width="35%"><b>Details:</b></td></tr>
+						  <tr><td><i>{STAFF}</i></td><td><i>{WORKSET}</i></td><td><i>{HISTORY}</i></td></tr>
+						</table>
+						</form>
+					</td></tr>
+                    <!-- END confirmed -->
+		    <tr>
+			<td width="5%"></td>
+			<td colspan="8"><hr /></td>
+		    </tr>
+                  </table>
+				  <br />
+		  <!-- #EndEditable --> </div>
+		<div id="footer">
+			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
+			<p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
+			<p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
+		</div>
+	</div>
+</div>
+</body>
+<!-- #EndTemplate --></html>

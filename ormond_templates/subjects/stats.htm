@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<!-- #BeginEditable "doctitle" -->
+<title>{TITLE}</title>
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
+<script type="text/javascript" src="/javascript/drop_down.js"></script>
+<!-- #BeginEditable "scripts" -->
+
+
+<!-- #EndEditable -->
+</head>
+<body>
+<div id="outerWrap">
+	<div id="header"></div>
+	<div id="yellowStripe"></div>
+	<div id="left">
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;GOTO</h3>
+			<div class="whiteWrap">{MCSSMENU}</div>
+		</div>
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;SEARCH</h3>
+			<div class="whiteWrap">
+				<form class="standardForm" id="searchForm" action="/search.php" method="get">
+					<p style="margin:0;">
+						<input class="short" type="text" name="keyword" />
+						<select class="short" name="where">
+							<option value="0" selected="selected">portal</option>
+							<option value="1">google</option>
+							<option value="2">yahoo</option>
+						</select>
+						<input class="img" type="image" src="/images/mgs/navsearch.gif" alt="Search" name="Submit" />
+					</p>
+				</form>
+			</div>
+		</div>
+		<!-- BEGIN msubject -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY SUBJECTS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN msubject_block -->
+					<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
+					<!-- END msubject_block -->
+				</ul>
+			</div>
+		</div>
+		<!-- END msubject -->
+		<!-- BEGIN mgroup -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY GROUPS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN mgroup_block -->
+					<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
+					<!-- END mgroup_block -->
+				</ul>
+			</div>
+		</div>
+		<!-- END mgroup -->
+		<div class="sideWrap">
+			<h3>&#187;&nbsp;MY LINKS</h3>
+			<div class="whiteWrap">
+				<ul>
+					<!-- BEGIN mlink_block -->
+					<li>{MLINK}</li>
+					<!-- END mlink_block -->
+					<li><a href="/editLinks.php">ADD LINK</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- end left -->
+	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" -->			<div id="topNav">
+				<ul>
+					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+					<!-- BEGIN webmail_tab --> 
+					<li class="norm"><a class="norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+					<!-- END webmail_tab -->
+					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+					<!-- BEGIN timetable_tab -->
+					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+					<!-- END timetable_tab -->
+					<li class="navthis right"><a class="navthis right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+				</ul>
+			</div>
+<!-- #EndLibraryItem --><!-- #EndEditable -->
+	<div id="content">
+		<div id="content_text"> <!-- #BeginEditable "main" -->
+			<h1>Homepage Statistics - {CATEGORY}</h1>
+			<!-- BEGIN menu -->
+			<ul>
+				<li><a href="stats.php?cid={ID}&code={CODE}">General Statistics</a></li>
+				<li><a href="stats.php?cid={ID}&code={CODE}&flag=1">Top Ten Recent Visits</a></li>
+				<li><a href="stats.php?cid={ID}&code={CODE}&flag=2">Top Ten Frequent Visits</a></li>
+				<li><a href="stats.php?cid={ID}&code={CODE}&flag=3">All Members</a></li>
+			</ul>
+			<!-- END menu -->
+			<!-- BEGIN stats_main -->
+			<!-- BEGIN tt_recent -->
+			<h2>{LISTREC}</h2>
+			<span class="header_option"><a href="stats.php?cid={ID}&amp;code={CODE}&amp;flag=4">{DISPLAY}</a></span>
+			<p>** These statistics have been taken from the {FIRSTDATE} **</p>
+			<table>
+				<tr>
+					<th>Lastname</th>
+					<th>Firstname</th>
+					<th>Hit Count</th>
+					<th>Last Accessed</th>
+				</tr>
+				<!-- BEGIN tt_recent_listing -->
+				<tr>
+					<td>{LNAME}</td>
+					<td>{FNAME}</td>
+					<td>{COUNT}</td>
+					<td>{DATE}</td>
+				</tr>
+				<!-- END tt_recent_listing -->
+			</table>
+			<!-- END tt_recent -->
+			<!-- BEGIN tt_freq -->
+			<h2>{LISTREC}</h2>
+			<span class="header_option"><a href="stats.php?cid={ID}&amp;code={CODE}&amp;flag=5">{DISPLAY}</a></span>
+			<p>** These statistics have been taken from the {FIRSTDATE} **</p>
+			<table>
+				<tr>
+					<th>Lastname</th>
+					<th>Firstname</th>
+					<th>Hit Count</th>
+					<th>Last Accessed</th>
+				</tr>
+				<!-- BEGIN tt_freq_listing -->
+				<tr>
+					<td>{LNAME}</td>
+					<td>{FNAME}</td>
+					<td>{COUNT}</td>
+					<td>{DATE}</td>
+				</tr>
+				<!-- END tt_freq_listing -->
+			</table>
+			<!-- END tt_freq -->
+			<!-- BEGIN all -->
+			<h2>{LISTREC}</h2>
+			<p>** These statistics have been taken from the {FIRSTDATE} **</p>
+			<table>
+				<tr>
+					<th>Lastname</th>
+					<th>Firstname</th>
+					<th>Hit Count</th>
+					<th>Last Accessed</th>
+				</tr>
+				<!-- BEGIN all_listing -->
+				<tr>
+					<td>{LNAME}</td>
+					<td>{FNAME}</td>
+					<td>{COUNT}</td>
+					<td>{DATE}</td>
+				</tr>
+				<!-- END all_listing -->
+			</table>
+			<!-- END all -->
+			<!-- BEGIN general -->
+			<h2>Hit Summary</h2>
+			<table>
+				<tr>
+					<th>&nbsp;</th>
+					<th>This Page</th>
+					<th>Entire Portal</th>
+				</tr>
+				<tr>
+					<td>All Hits</td>
+					<td>{ALL}</td>
+					<td>{PORTALALL}</td>
+				</tr>
+				<tr>
+					<td>Member Hits</td>
+					<td>{MEMBER}</td>
+					<td>{PORTALMEM}</td>
+				</tr>
+			</table>
+			<h2>Most Popular Pages</h2>
+			<table>
+				<tr>
+					<th>Type</th>
+					<th>Name</th>
+					<th>Hits</th>
+				</tr>
+				<!-- BEGIN spotstats -->
+				<tr>
+					<td>{TEMPLATE}</td>
+					<td><a href="/homepage.php?category={CID}">{HOMEPAGE}</a></td>
+					<td>{HITS}</td>
+				</tr>
+				<!-- END spotstats -->
+			</table>
+			<!-- END general -->
+			<!-- END stats_main -->
+			<!-- #EndEditable --> </div>
+		<div id="footer">
+			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
+			<p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
+			<p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
+		</div>
+	</div>
+</div>
+</body>
+<!-- #EndTemplate --></html>
