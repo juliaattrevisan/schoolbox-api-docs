@@ -78,7 +78,7 @@ class ModResourcePage {
 	{
 		$this->catList[-1] = "";
 
-		//query database for all categories that user has permission to see (redundant doesnt work properly)
+		//query database for all categories that user has permission to see
 
 		if($_SESSION['su'])
 			$catQuery = "SELECT name, id, code FROM category WHERE parent = '".$parent."' ORDER BY name";
@@ -228,7 +228,7 @@ class ModResourcePage {
 		
 		$this->t_body->set_var("DESCRIPTION", $file['description']);
 		$this->t_body->set_var("COMMENT", $file['comment']);
-                $this->setCategory($file['category']);
+		$this->setCategoryList($file['category']);
 		$this->setFileTypeList($file['type']);
 
 		//check box for submission box associated with file
