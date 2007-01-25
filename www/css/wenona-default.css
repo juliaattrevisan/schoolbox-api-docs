@@ -108,48 +108,6 @@ acronym, dfn, abbr {
 	font-size:70%;
 	}
 	
-/* SECOND LEVEL MENU UNORDERED LIST */
-#left li ul {
-	position:absolute;
-	left:149px; /* Set 1px less than menu width */
-	top:0;
-	display:none;
-	border:1px solid #0055AD;
-	border-bottom:0;
-	margin-left:1px;
-	}
-
-/* Fix IE. Hide from IE Mac \*/
-* html #left ul li {float:left; height:1%;}
-* html #left ul li a {height:1%;}
-/* End */
-
- /* Hover Styles */
-#left ul li a:hover
-{
-	background:#9CC7DE url(/images/wenona/white_arrow.png) no-repeat 2px 3px;
-	color:#fff;
-}
-
-#left li ul li a:hover {
-	background:#0055AD;
-	color:#fff;
-	}
-
-/* SECOND LEVEL LIST */
-#left li ul li { 
-	border-bottom:1px solid #0055AD;
-	}	
-/* SECOND LEVEL LIST LINK */
-#left li ul li a {
-	padding:2px 5px;
-	background:#9CC7DE;
-	color:#002452;
-	} 
-
-/*The following two lines define up to 4 levels including the actual first level menu. Modify to accommodate further levels */
-#left li:hover ul ul, #left li:hover ul ul ul, #left li:hover ul ul ul ul, #left li.over ul ul, #left li.over ul ul ul, #left li.over ul ul ul ul {display:none;} 
-#left li:hover ul, #left li li:hover ul, #left li li li:hover ul, #left li li li li:hover ul, #left li.over ul, #left li li.over ul, #left li li li.over ul, #left li li li li.over ul {display: block;} /* The magic */
 
 /*--------------------------------------------------------------------------------------*/
 /* LINKS */

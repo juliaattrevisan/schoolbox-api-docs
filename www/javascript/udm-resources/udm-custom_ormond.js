@@ -108,8 +108,8 @@ um.navbar = [
 
 //styles which apply to each navbar item
 um.items = [
-	"1",		// margin between items ["n" pixels]
-	"1",		// border size ["n" pixels] (single value only)
+	"0",		// margin between items ["n" pixels]
+	"0",		// border size ["n" pixels] (single value only)
 	"collapse",	// border collapse ["collapse"|"separate"] (only applies when margin = "0")
 	"#EEEEE7 #EEEEE7 #ffffff #EEEEE7",// border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
 	"solid",	// border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
@@ -118,13 +118,13 @@ um.items = [
 	"#EEEEE7 #EEEEE7 #ffffff #EEEEE7",// visited border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
 	"solid",// visited border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
 	"9",		// left/right padding ["n" pixels] (single value only)
-	"5",		// top/bottom padding ["n" pixels] (single value only)
+	"3",		// top/bottom padding ["n" pixels] (single value only)
 	"#EEEEE7",		// background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"#DEDEDB",		// hover/focus background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"#EEEEE7",		// visited background ["color"|"#hex"|"rgb()"|"image.gif"]
-	"75%",		// font size ["em"|"ex"|"%"|"px"|"pt"|"absolute-size"|"relative-size"]
+	"70%",		// font size ["em"|"ex"|"%"|"px"|"pt"|"absolute-size"|"relative-size"]
 	"verdana, arial,sans-serif, serif",// font family ["font1,font2,font3"] (always end with a generic family name)
-	"bold",		// font weight ["normal"|"bold"|"bolder"|"lighter|"100" to "900"]
+	"normal",		// font weight ["normal"|"bold"|"bolder"|"lighter|"100" to "900"]
 	"none",		// text decoration ["none"|"underline"|"overline"|"line-through"]
 	"left",		// text-align ["left"|"right"|"center"]
 	"#222223",	// color ["color"|"#hex"|"rgb()"]
