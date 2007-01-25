@@ -117,48 +117,6 @@ acronym, dfn, abbr {
 	font-weight:normal;
 	font-size:70%;
 	}
-	
-/* SECOND LEVEL MENU UNORDERED LIST */
-.sideWrap li ul {
-	position:absolute;
-	left:134px; /* Set 1px less than menu width */
-	top:0;
-	display:none;
-	border:1px solid #00458C;
-	border-bottom:0;
-	margin-left:1px;
-	}
-/* SECOND LEVEL LIST */
-.sideWrap li ul li { 
-	border-bottom:1px solid #00458C;
-	background-image:none;
-	background:#0065CE;
-	}	
-/* SECOND LEVEL LIST LINK */
-.sideWrap li ul li a {
-	padding:2px 5px;
-	background:#0065CE;
-	color:#fff;
-	} 
-
-/* Hover Styles */
-.sideWrap ul li a:hover {background:#CEF3FF url(/images/mgs/arrow_bullet.gif) no-repeat 2px 3px;color:#00f;text-decoration:none;} 
-.sideWrap li ul li a:hover {
-	color:#fff;
-	background-image:none;
-	background:#00458C;
-	}
-.sideWrap li ul li a:link, .sideWrap li ul li a:active, .sideWrap li ul li a:visited {color:#fff;}
-
-/* Fix IE. Hide from IE Mac \*/
-* html .sideWrap ul li {float:left; height:1%;}
-* html .sideWrap ul li a {height:1%;}
-/* End */
-
-
-/*The following two lines define up to 4 levels including the actual first level menu. Modify to accommodate further levels */
-.sideWrap li:hover ul ul, .sideWrap li:hover ul ul ul, .sideWrap li:hover ul ul ul ul, .sideWrap li.over ul ul, .sideWrap li.over ul ul ul, .sideWrap li.over ul ul ul ul {display:none;} 
-.sideWrap li:hover ul, .sideWrap li li:hover ul, .sideWrap li li li:hover ul, .sideWrap li li li li:hover ul, .sideWrap li.over ul, .sideWrap li li.over ul, .sideWrap li li li.over ul, .sideWrap li li li li.over ul {display: block;} /* The magic */
 
 /*--------------------------------------------------------------------------------------*/
 /* LINKS */

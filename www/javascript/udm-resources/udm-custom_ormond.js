@@ -54,6 +54,7 @@ um.behaviors = [
 	"default",	// manage windowed controls for win/ie ["default","hide","iframe","none"]
 	];
 
+
 //reset behaviors
 um.reset = [
 	"yes",		// reset from document mouse click ["yes"|"no"]
@@ -62,6 +63,7 @@ um.reset = [
 	"no",		// reset after following link ["yes"|"no"]
 	];
 
+
 //horizontal continuation strip
 um.hstrip = [
 	"none",		// background ["color"|"#hex"|"rgb()"|"image.gif"|"none"]
@@ -69,9 +71,12 @@ um.hstrip = [
 	];
 
 
+
+
 ///////////////////////////////////////////////////////////////////
 // MODULE SETTINGS                                               //
 ///////////////////////////////////////////////////////////////////
+
 
 //keyboard navigation [comment out or remove if not using]
 um.keys = [
@@ -84,6 +89,9 @@ um.keys = [
 	"27",		// escape ["n"|"none"] ("27" = escape key)
 	"document.getElementsByTagName('a')[0]", // exit focus ["js-expression"]
 	];
+
+
+
 
 ///////////////////////////////////////////////////////////////////
 // NAVBAR DEFAULT STYLES                                         //
@@ -101,7 +109,7 @@ um.navbar = [
 //styles which apply to each navbar item
 um.items = [
 	"1",		// margin between items ["n" pixels]
-	"0",		// border size ["n" pixels] (single value only)
+	"1",		// border size ["n" pixels] (single value only)
 	"collapse",	// border collapse ["collapse"|"separate"] (only applies when margin = "0")
 	"#EEEEE7 #EEEEE7 #ffffff #EEEEE7",// border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
 	"solid",	// border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
@@ -161,14 +169,14 @@ um.menus = [
 
 //styles which apply to each menu item
 um.menuItems = [
-	"1",		// margin around items ["n" pixels] (single value only; margins are like table cellspacing)
-	"0",		// border size ["n" pixels] (single value only)
+	"0",		// margin around items ["n" pixels] (single value only; margins are like table cellspacing)
+	"1",		// border size ["n" pixels] (single value only)
 	"separate",	// border collapse ["collapse"|"separate"] (only applies when margin = "0")
-	"#f8fbd0",	// border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
+	"#f0f0f0",	// border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
 	"solid",	// border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
-	"#aca",		// hover/focus border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
+	"#f0f0f0",		// hover/focus border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
 	"solid",	// hover/focus border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
-	"#f8fbd0",	// visited border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
+	"#f0f0f0",	// visited border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
 	"solid",	// visited border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
 	"5",		// left/right padding ["n" pixels] (single value only)
 	"2",		// top/bottom padding ["n" pixels] (single value only)
@@ -176,7 +184,7 @@ um.menuItems = [
 	"#DEDEDB",	// hover/focus background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"transparent",	// visited background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"70%",		// font size ["em"|"ex"|"%"|"px"|"pt"|"absolute-size"|"relative-size"]
-	"verdana,arial,sans-serif,serif",// font family ["font1,font2,font3"] (always end with a generic family name)
+	"tahoma,sans-serif",// font family ["font1,font2,font3"] (always end with a generic family name)
 	"normal",	// font weight ["normal"|"bold"|"bolder"|"lighter|"100" to "900"]
 	"none",		// text decoration ["none"|"underline"|"overline"|"line-through"]
 	"left",		// text-align ["left"|"right"|"center"]
@@ -204,56 +212,46 @@ um.menuItems = [
 
 
 //classes which apply to menus [optional]
-um.menuClasses["ormondMenu"] = [
-	"-7",		// menu -> menu x-offset (+-)["n" pixels]
-	"-12",		// menu -> menu y-offset (+-)["n" pixels]
-	"1",		// border size ["n" pixels] (single value only)
-	"#ddbdc5 #cf0034 #cf0034 #ddbdc5",// border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
+um.menuClasses["orangeMenu"] = [
+	"#ddbdc5 #cf0034 #cf0034 #ddbdc5",// border colors ["color"|"#hex"|"rgb()"]
 	"solid",	// border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
-	"150px",	// width ["em"|"ex"|"px"]
-	"2",		// padding ["n" pixels] (single value only)
-	"#EEEEE7",	// background ["color"|"#hex"|"rgb()"|"image.gif"]
+	"150px",		// width ["em"|"ex"|"px"]
+	"#EEEEE7",		// background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"",		// additional menu CSS (careful!) (you can use a transition here but *not* a static filter)
 	"redshadow.png",// shadow background ["color"|"#hex"|"rgb()"|"image.gif"|"none"]
 	"2px",		// shadow offset (+-) ["em"|"px"|"pt"|"%"|"0"]
-	"filter:alpha(opacity=50);",// additional shadow layer CSS (if you use a Microsoft.Shadow filter here then Win/IE5.5+ will do that *instead* of default shadow)
+	"filter:alpha(opacity=50);", // additional shadow layer CSS (if you use a Microsoft.Shadow filter here then Win/IE5.5+ will do that *instead* of default shadow)
 	];
 
 
 //classes which apply to menu items [optional]
-um.itemClasses["ormondMenuItem"] = [
-	"1",		// margin around items ["n" pixels] (single value only; margins are like table cellspacing)
-	"0",		// border size ["n" pixels] (single value only)
-	"separate",	// border collapse ["collapse"|"separate"] (only applies when margin = "0")
-	"#f8fbd0",	// border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
+um.itemClasses["orangeMenuItem"] = [
+	"#f0f0f0",		// border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
 	"solid",	// border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
-	"#aca",		// hover/focus border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
+	"#f0f0f0",	// hover/focus border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
 	"solid",	// hover/focus border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
-	"#f8fbd0",	// visited border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
+	"#f0f0f0",		// visited border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
 	"solid",	// visited border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
-	"5",		// left/right padding ["n" pixels] (single value only)
-	"2",		// top/bottom padding ["n" pixels] (single value only)
-	"transparent",	// background ["color"|"#hex"|"rgb()"|"image.gif"]
+	"transparent",		// background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"#DEDEDB",	// hover/focus background ["color"|"#hex"|"rgb()"|"image.gif"]
-	"transparent",	// visited background ["color"|"#hex"|"rgb()"|"image.gif"]
+	"transparent",		// visited background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"70%",		// font size ["em"|"ex"|"%"|"px"|"pt"|"absolute-size"|"relative-size"]
-	"verdana,arial,sans-serif,serif",// font family ["font1,font2,font3"] (always end with a generic family name)
+	"tahoma,sans-serif",// font family ["font1,font2,font3"] (always end with a generic family name)
 	"normal",	// font weight ["normal"|"bold"|"bolder"|"lighter|"100" to "900"]
 	"none",		// text decoration ["none"|"underline"|"overline"|"line-through"]
 	"left",		// text-align ["left"|"right"|"center"]
-	"#222223",		// color ["color"|"#hex"|"rgb()"]
-	"#Cf0034",		// hover/focus color ["color"|"#hex"|"rgb()"]
-	"#222223",		// visited color ["color"|"#hex"|"rgb()"]
+	"#222223",	// color ["color"|"#hex"|"rgb()"]
+	"#Cf0034",	// hover/focus color ["color"|"#hex"|"rgb()"]
+	"#222223",	// visited color ["color"|"#hex"|"rgb()"]
 	"normal",	// font-style ["normal"|"italic"|"oblique"]
 	"normal",	// hover/focus font-style ["normal"|"italic"|"oblique"]
 	"normal",	// visited font-style ["normal"|"italic"|"oblique"]
 	"",		// additional link CSS (careful!)
 	"",		// additional hover/focus CSS (careful!)
 	"",		// additional visited CSS (careful!)
-	"right-green.gif",// submenu indicator character/image ["text"|"image.gif"|"none"]
-	"right-black.gif",// submenu indicator rollover character/image ["text"|"image.gif"|"none"] (must be the same type)
-	"3",		// clipping width of indicator image ["n" pixels] (only when using image arrows)
-	"..",		// alt text of indicator image ["text"] (only when using image arrows)
+	"right-purple.gif",// submenu indicator character/image ["text"|"image.gif"|"none"] (must be the same type as default submenu indicator)
+	"right-blue.gif",// submenu indicator rollover character/image ["text"|"image.gif"|"none"] (must be the same type)
+	"..",		// alt text of indicator image  ["text"] (only when using image arrow)
 	];
 
 
