@@ -19,7 +19,7 @@ class outUser
 		
 		$query = "SELECT user.id, firstname, lastname, username, groups.name AS gname, group_id, extension, 
 					synergy_id, local_email, alt_email
-				FROM user, groups LEFT JOIN ph_ext ON user.id = ph_ext.owner
+				FROM user, groups LEFT JOIN ph_ext ON id = ph_ext.owner
 				WHERE user.group_id = groups.id AND user.id = '$id'";
 		$user = $db->dbGetSingleRow($query);
 		
@@ -68,7 +68,7 @@ class outUser
 					
 					$this->t_body->set_var("TUTOR", $synInfo['StudentTutor']);
 					$this->t_body->set_var("YEAR_LEVEL", $synInfo['StudentYearLevel']);
-					$this->t_body->set_var("BIRTHDATE", date('jS of F, Y', $birthdate));
+					$this->t_body->set_var("BIRTHDATE", date('jS \o\f F, Y', $birthdate));
 					$this->t_body->set_var("EMERGENCY_NAME", $synInfo['StudentEmergencyName']);
 					$this->t_body->set_var("EMERGENCY_PHONE", $synInfo['StudentEmergencyPhone']);
 					$this->t_body->set_var("EMERGENCY_ALT_PHONE", $synInfo['StudentEmergencyPhoneAlt']);
