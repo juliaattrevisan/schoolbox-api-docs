@@ -1,14 +1,14 @@
 			<div id="topNav">
 				<ul>
-					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
-					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><span><em>M</em>ain</span></a></li>
+					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><span><em>N</em>ews</span></a></li>
 					<!-- BEGIN webmail_tab --> 
-					<li class="navthis norm"><a class="navthis norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+					<li class="navthis norm"><a class="navthis norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><span><em>W</em>ebmail</span></a></li>
 					<!-- END webmail_tab -->
-					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><span><em>C</em>alendar</span></a></li>
 					<!-- BEGIN timetable_tab -->
-					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><span><em>T</em>imetable</span></a></li>
 					<!-- END timetable_tab -->
-					<li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+					<li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><span><em>R</em>esources</span></a></li>
 				</ul>
 			</div>

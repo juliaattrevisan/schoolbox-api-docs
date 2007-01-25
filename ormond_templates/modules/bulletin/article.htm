@@ -14,41 +14,44 @@
 <meta name="author" content="James Leckie, Lektec Consulting"/>
 <meta name="ROBOTS" content="INDEX, FOLLOW" />
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
-<link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
-<script type="text/javascript" src="/javascript/drop_down.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/ormond-default.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/ormond-print.css" />
+<!--<script type="text/javascript" src="/javascript/drop_down.js"></script> -->
+<!-- ULTIMATE DROP DOWN MENU Version 4.5 by Brothercake -->
+<!-- http://www.udm4.com/ -->
+<script type="text/javascript" src="/javascript/udm-resources/udm-custom.js"></script>
+<script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
+<script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
 <!-- InstanceBeginEditable name="scripts" -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-home.css" />
 <!-- InstanceEndEditable -->
 </head>
 <body>
+<script type="text/javascript" src="/javascript/udm-resources/udm-dom.js"></script>
+<script type="text/javascript" src="/javascript/udm-resources/udm-mod-keyboard.js"></script>
 <div id="outerWrap">
-	<div id="header"></div>
-	<div id="yellowStripe"></div>
+	<div id="header">
+		<div id="ormond-logo"></div>
+		<form class="standardForm" id="searchForm" action="/search.php" method="get">
+			<p style="margin:0;">
+				<input class="short" type="text" name="keyword" />
+				<select class="short" name="where">
+					<option value="0" selected="selected">portal</option>
+					<option value="1">google</option>
+					<option value="2">yahoo</option>
+				</select>
+				<input class="img" type="image" src="/images/mgs/navsearch.gif" alt="Search" name="Submit" />
+			</p>
+		</form>		
+	</div>
 	<div id="left">
-		<div class="sideWrap">
-			<h3>&#187;&nbsp;GOTO</h3>
-			<div class="whiteWrap">{MCSSMENU}</div>
-		</div>
-		<div class="sideWrap">
-			<h3>&#187;&nbsp;SEARCH</h3>
-			<div class="whiteWrap">
-				<form class="standardForm" id="searchForm" action="/search.php" method="get">
-					<p style="margin:0;">
-						<input class="short" type="text" name="keyword" />
-						<select class="short" name="where">
-							<option value="0" selected="selected">portal</option>
-							<option value="1">google</option>
-							<option value="2">yahoo</option>
-						</select>
-						<input class="img" type="image" src="/images/mgs/navsearch.gif" alt="Search" name="Submit" />
-					</p>
-				</form>
-			</div>
+		<div id="udmMenuWrap">
+			<h3>GOTO</h3>
+			{MCSSMENU}
 		</div>
 		<!-- BEGIN msubject -->
 		<div class="sideWrap">
-			<h3>&#187;&nbsp;MY SUBJECTS</h3>
+			<h3>MY SUBJECTS</h3>
 			<div class="whiteWrap">
 				<ul>
 					<!-- BEGIN msubject_block -->
@@ -60,7 +63,7 @@
 		<!-- END msubject -->
 		<!-- BEGIN mgroup -->
 		<div class="sideWrap">
-			<h3>&#187;&nbsp;MY GROUPS</h3>
+			<h3>MY GROUPS</h3>
 			<div class="whiteWrap">
 				<ul>
 					<!-- BEGIN mgroup_block -->
@@ -71,7 +74,7 @@
 		</div>
 		<!-- END mgroup -->
 		<div class="sideWrap">
-			<h3>&#187;&nbsp;MY LINKS</h3>
+			<h3>MY LINKS</h3>
 			<div class="whiteWrap">
 				<ul>
 					<!-- BEGIN mlink_block -->
@@ -85,16 +88,16 @@
 	<!-- end left -->
 	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Main_Active.lbi" -->			<div id="topNav">
 				<ul>
-					<li class="navthis left"><a class="navthis left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
-					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+					<li class="navthis left"><a class="navthis left" href="/home.php" title="Greeting page" accesskey="m" ><span><em>M</em>ain</span></a></li>
+					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><span><em>N</em>ews</span></a></li>
 					<!-- BEGIN webmail_tab --> 
-					<li class="norm"><a class="norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+					<li class="norm"><a class="norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><span><em>W</em>ebmail</span></a></li>
 					<!-- END webmail_tab -->
-					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><span><em>C</em>alendar</span></a></li>
 					<!-- BEGIN timetable_tab -->
-					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><span><em>T</em>imetable</span></a></li>
 					<!-- END timetable_tab -->
-					<li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+					<li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><span><em>R</em>esources</span></a></li>
 				</ul>
 			</div><!-- #EndLibraryItem --><!-- #EndEditable -->
 	<div id="content">
@@ -106,11 +109,6 @@
 				
 	<br style="clear:both" />	
 	 <!-- #EndEditable --> </div>
-		<div id="footer">
-			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
-			<p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
-			<p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
-		</div>
 	</div>
 </div>
 </body>

@@ -16,7 +16,12 @@
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
 <link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
-<script type="text/javascript" src="/javascript/drop_down.js"></script>
+<!--<script type="text/javascript" src="/javascript/drop_down.js"></script> -->
+<!-- ULTIMATE DROP DOWN MENU Version 4.5 by Brothercake -->
+<!-- http://www.udm4.com/ -->
+<script type="text/javascript" src="/javascript/udm-resources/udm-custom_mgs.js"></script>
+<script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
+<script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
 <!-- InstanceBeginEditable name="scripts" -->
 
 
@@ -57,15 +62,18 @@ function verify()
 <!-- InstanceEndEditable -->
 </head>
 <body>
+<!-- THESE ARE MEANT TO GO HERE -->
+<script type="text/javascript" src="/javascript/udm-resources/udm-dom.js"></script>
+<script type="text/javascript" src="/javascript/udm-resources/udm-mod-keyboard.js"></script>
 <div id="outerWrap">
 	<div id="header"></div>
 	<div id="yellowStripe"></div>
 	<div id="left">
-		<div class="sideWrap">
+		<div class="sideMenuWrap">
 			<h3>&#187;&nbsp;GOTO</h3>
-			<div class="whiteWrap">{MCSSMENU}</div>
+			<div class="whiteMenuWrap">{MCSSMENU}</div>
 		</div>
-		<div class="sideWrap">
+		<div class="sideWrap" id="searchBox">
 			<h3>&#187;&nbsp;SEARCH</h3>
 			<div class="whiteWrap">
 				<form class="standardForm" id="searchForm" action="/search.php" method="get">
@@ -78,8 +86,10 @@ function verify()
 						</select>
 						<input class="img" type="image" src="/images/mgs/navsearch.gif" alt="Search" name="Submit" />
 					</p>
+					<div class="float-fix"></div>
 				</form>
 			</div>
+			<div class="float-fix"></div>
 		</div>
 		<!-- BEGIN msubject -->
 		<div class="sideWrap">

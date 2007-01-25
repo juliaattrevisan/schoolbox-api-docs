@@ -1,0 +1,127 @@
+/* UDMv4.5 */
+/***************************************************************\
+
+  ULTIMATE DROP DOWN MENU Version 4.5 by Brothercake
+  http://www.udm4.com/
+  
+  This script may not be used or distributed without license
+
+\***************************************************************/
+
+/***************************************************************/
+/* Generated CSS - DO NOT EDIT THIS DIRECTLY                   */
+/***************************************************************/
+
+.udm,.udm li,.udm ul {
+	margin:0;
+	padding:0;
+	list-style-type:none;
+	}
+.udm {
+	position:absolute;
+	left:0;
+	top:0;
+	z-index:20000;
+	width:7.5em;
+	cursor:default !important;
+	border:none;
+	text-align:left;
+	}
+.udm {
+	margin-left:0.6em;
+	margin-top:0.7em;
+	}
+.udm li {
+	display:block;
+	width:7.5em;
+	position:static;
+	}
+@media Screen,Projection {
+	:root .udm/**/[class="udm"] li {
+	position:relative;
+	}}
+.udm li a {
+	position:relative;
+	display:block;
+	}
+.udm li {
+	margin-bottom:1px;
+	}
+.udm a,.udm a:link,.udm a.nohref {
+	background-image:url(/udm-resources/orange-yellow-gradient.jpg);
+	cursor:pointer !important;
+	z-index:1000;
+	text-align:left;
+	border-style:solid;
+	border-color:#ead4a4 #edbb85 #edbb85 #ead4a4;
+	padding-left:9px;
+	padding-right:9px;
+	padding-top:5px !important;
+	padding-bottom:5px !important;
+	text-decoration:none;
+	color:#008000;
+	border-width:1px;
+	font-style:normal;
+	font-family:tahoma,sans-serif;
+	font-weight:bold !important;
+	}
+.udm a,.udm a.nohref {
+	font-size:75%;
+	}
+.udm li a,.udm li a:link,.udm li a.nohref,.udm li a:visited {
+	background-color:#ffc;
+	letter-spacing:1px !important;
+	}
+.udm li a:visited {
+	background-image:url(/udm-resources/orange-yellow-gradient.jpg);
+	border-width:1px;
+	color:#008000;
+	font-style:normal;
+	border-style:solid dashed solid solid;
+	border-color:#ead4a4 #edbb85 #edbb85 #ead4a4;
+	}
+.udm li a.udmR,.udm li a.udmY,.udm li a.udmR:visited,.udm li a.udmY:visited,.udm li a:hover,.udm li a:focus,.udm li a.nohref:hover,.udm li a.nohref:focus {
+	font-style:normal;
+	background-image:url(/udm-resources/orange-cream-gradient.jpg);
+	text-decoration:none;
+	color:#b05010;
+	border-color:#ead4a4 #ffe #fae4b4 #fae4b4;
+	border-style:solid;
+	border-width:1px;
+	background-color:#ffe;
+	padding-left:10px;
+	}
+* html .udm li a:active {
+	font-style:normal;
+	background-image:url(/udm-resources/orange-cream-gradient.jpg);
+	text-decoration:none;
+	color:#b05010;
+	border-color:#ead4a4 #ffe #fae4b4 #fae4b4;
+	border-style:solid;
+	border-width:1px;
+	background-color:#ffe;
+	padding-left:10px;
+	}
+.udm a.nohref,.udm ul a.nohref {
+	cursor:default !important;
+	}
+@media screen,projection {
+	* html .udm li {
+	display:inline;
+	}}
+@media screen,projection {
+	* html .udm li,* html .udm ul li {
+	display/**/:block;
+	float/**/:left;
+	}}
+ul[class$="udm"].udm li,ul[class$="udm"].udm ul li {
+	display:block;
+	float:left;
+	}
+ul[class$="udm"].udm:not([class="xxx"]) li {
+	float:none;
+	}
+@media all and (min-width:0px) {
+	ul[class$="udm"].udm li {
+	float:none;
+	}}

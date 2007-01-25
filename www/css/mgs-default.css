@@ -42,7 +42,7 @@ h3 {
 	font-size:100%;
 }
 
-.sideWrap h3 {
+.sideWrap h3, .sideMenuWrap h3 {
 	margin:0 0 3px 0;
 	padding:4px 0 0 6px;
 	background:#0065CE;
@@ -231,6 +231,15 @@ a img {
 .sideWrap {
 	margin:10px 10px 10px 10px;
 	background:#0065CE;
+	}
+.sideMenuWrap {
+	margin:10px 15px 0 10px;
+	background:#fff;
+	background:#0065CE;
+	}
+.whiteMenuWrap {
+	margin:0 -10px 0 5px;
+	background:#fff;
 	}
 .whiteWrap {
 	margin:0 -10px 0 5px;
@@ -560,4 +569,38 @@ table.ruler tbody td {
 table.ruler h2 {
 	margin-left:0;
 	padding-right:0;
+	}
+/*--------------------------------------------------------------
+ Miscellaneous styles 
+--------------------------------------------------------------*/
+.text-align-right {
+	text-align:right;
+	}
+.text-align-left{
+	text-align:left;
+	}
+.center {
+	text-align:center;
+	}
+.float-right {
+	float:right;
+	padding:0 0 14px 14px;
+	}
+.float-left {
+	float:left;
+	padding:0 14px 14px 0;
+	}
+div.float-fix {
+	overflow:hidden;
+	clear:both;
+	height:0;
+	}
+br.float-fix {
+	clear:both;
+	}
+.bold {
+	font-weight:bold;
+	}
+.udm li a {
+	_height:1px;
 	}

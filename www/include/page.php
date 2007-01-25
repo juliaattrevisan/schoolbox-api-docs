@@ -178,13 +178,13 @@ function insertChild($list, $element)
 function outputMenu($list, $level)
 {
 	if($level == 1)
-		$text = "\n<ul class=\"dropDownMenu$level\" id=\"nav\">";
+		$text = "\n<ul  id=\"udm\" class=\"udm\">";
 	else
-		$text = "<ul class=\"dropDownMenu$level\">";
+		$text = "<ul class=\"ormondMenu\">";
 	
 	for($i=0; $list[$i]; $i++)
 	{
-		$text .= '<li><a href="'.$list[$i]['url'].'">'.$list[$i]['txt'].'</a>';
+		$text .= '<li class="ormondMenuItem"><a href="'.$list[$i]['url'].'">'.$list[$i]['txt'].'</a>';
 		if(is_array($list[$i]['children']))
 			$text .= outputMenu($list[$i]['children'], ($level + 1));
 		
