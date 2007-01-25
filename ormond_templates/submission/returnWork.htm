@@ -46,16 +46,15 @@ function verify(){
 <div id="outerWrap">
 	<div id="header">
 		<div id="ormond-logo"></div>
-		<form class="standardForm" id="searchForm" action="/search.php" method="get">
-			<p style="margin:0;">
-				<input class="short" type="text" name="keyword" />
-				<select class="short" name="where">
-					<option value="0" selected="selected">portal</option>
-					<option value="1">google</option>
-					<option value="2">yahoo</option>
-				</select>
-				<input class="img" type="image" src="/images/mgs/navsearch.gif" alt="Search" name="Submit" />
-			</p>
+		<form id="searchForm" action="/search.php" method="get">
+			<table cellpadding="0" cellspacing="0">
+				<tr>
+					<td><label for="keyword">Search</label>
+						<input type="text" name="keyword" id="keyword" /></td>
+					<td class="go"><input type="image" src="/images/ormond/go.gif" alt="Search" name="Submit" /></td>
+				</tr>
+			</table>
+			
 		</form>		
 	</div>
 	<div id="left">

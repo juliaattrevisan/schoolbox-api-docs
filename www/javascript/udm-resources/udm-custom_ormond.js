@@ -108,7 +108,7 @@ um.navbar = [
 
 //styles which apply to each navbar item
 um.items = [
-	"0",		// margin between items ["n" pixels]
+	"1",		// margin between items ["n" pixels]
 	"0",		// border size ["n" pixels] (single value only)
 	"collapse",	// border collapse ["collapse"|"separate"] (only applies when margin = "0")
 	"#EEEEE7 #EEEEE7 #ffffff #EEEEE7",// border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
@@ -118,11 +118,11 @@ um.items = [
 	"#EEEEE7 #EEEEE7 #ffffff #EEEEE7",// visited border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
 	"solid",// visited border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
 	"9",		// left/right padding ["n" pixels] (single value only)
-	"3",		// top/bottom padding ["n" pixels] (single value only)
+	"4",		// top/bottom padding ["n" pixels] (single value only)
 	"#EEEEE7",		// background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"#DEDEDB",		// hover/focus background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"#EEEEE7",		// visited background ["color"|"#hex"|"rgb()"|"image.gif"]
-	"70%",		// font size ["em"|"ex"|"%"|"px"|"pt"|"absolute-size"|"relative-size"]
+	"80%",		// font size ["em"|"ex"|"%"|"px"|"pt"|"absolute-size"|"relative-size"]
 	"verdana, arial,sans-serif, serif",// font family ["font1,font2,font3"] (always end with a generic family name)
 	"normal",		// font weight ["normal"|"bold"|"bolder"|"lighter|"100" to "900"]
 	"none",		// text decoration ["none"|"underline"|"overline"|"line-through"]
@@ -136,7 +136,7 @@ um.items = [
 	"letter-spacing:1px !important;",// additional link CSS (careful!)
 	"",		// additional hover/focus CSS (careful!)
 	"",		// additional visited CSS (careful!)
-	"right-green.gif",// menu indicator character/image ["text"|"image.gif"|"none"]
+	"right-red.gif",// menu indicator character/image ["text"|"image.gif"|"none"]
 	"right-red.gif",// menu indicator rollover character/image ["text"|"image.gif"|"none"] (must be same type)
 	"7",		// clipping width of indicator image ["n" pixels] (only when using image arrows)
 	"..",		// alt text of indicator image ["text"] (only when using image arrows)
@@ -197,7 +197,7 @@ um.menuItems = [
 	"",		// additional link CSS (careful!)
 	"",		// additional hover/focus CSS (careful!)
 	"",		// additional visited CSS (careful!)
-	"right-green.gif",// submenu indicator character/image ["text"|"image.gif"|"none"]
+	"right-black.gif",// submenu indicator character/image ["text"|"image.gif"|"none"]
 	"right-black.gif",// submenu indicator rollover character/image ["text"|"image.gif"|"none"] (must be the same type)
 	"3",		// clipping width of indicator image ["n" pixels] (only when using image arrows)
 	"..",		// alt text of indicator image ["text"] (only when using image arrows)

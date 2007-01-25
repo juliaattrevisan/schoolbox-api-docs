@@ -114,10 +114,20 @@ acronym, dfn, abbr {
 	text-decoration:none;
 	background:transparent; /* IE6 Bug */
 	padding:2px 0 2px 14px;
+	border:0;
+	margin:0;
 	font-weight:normal;
 	font-size:70%;
 	}
+	
 
+/* Hover Styles */
+.sideWrap ul li a:hover {background:#CEF3FF url(/images/mgs/arrow_bullet.gif) no-repeat 2px 3px;color:#00f;text-decoration:none;} 
+
+/* Fix IE. Hide from IE Mac \*/
+* html .sideWrap ul li {float:left; height:1%;}
+* html .sideWrap ul li a {height:1%;}
+/* End */
 /*--------------------------------------------------------------------------------------*/
 /* LINKS */
 /*--------------------------------------------------------------------------------------*/
@@ -559,6 +569,7 @@ br.float-fix {
 .bold {
 	font-weight:bold;
 	}
+
 .udm li a {
 	_height:1px;
 	}
