@@ -17,8 +17,9 @@ require_once("../include/permission.php");
 
 define("IMAGESPERROW", 5);
 
-if(isset($_GET['category']) && perm($_GET['category'], HOMEPAGESERVICE))
-{
+class ImageGallery {
+
+function ImageGallery($cid) {
 
 	//display page
 	$this->t_body = new Template(TPL_directory);
@@ -28,7 +29,7 @@ if(isset($_GET['category']) && perm($_GET['category'], HOMEPAGESERVICE))
 
 	$db = new dbManager;
 
-	$query = "SELECT id, name FROM category WHERE id = {$_GET['category']}";
+	$query = "SELECT id, name FROM category WHERE id = $cid";
 	$catInfo = $db->dbGetSingleRow($query);
 
 	$this->t_body->set_var("FOLDER_NAME", $catInfo['name']);
@@ -41,7 +42,7 @@ if(isset($_GET['category']) && perm($_GET['category'], HOMEPAGESERVICE))
 			<img src=\"image.php?id={$_GET['image']}&height=300&width=400\" border=\"0\"></a>");
 	else	//no image pick a random one from the db
 	{
-		$query = "SELECT id, description FROM file WHERE category = {$_GET['category']} AND deleted = '0' AND INSTR(mime_type, 'image/') 
+		$query = "SELECT id, description FROM file WHERE category = $cid AND deleted = '0' AND INSTR(mime_type, 'image/') 
 				ORDER BY RAND() LIMIT 1";
 		$image = $db->dbGetSingleRow($query);	
 			
@@ -54,7 +55,7 @@ if(isset($_GET['category']) && perm($_GET['category'], HOMEPAGESERVICE))
 	$this->t_body->set_block("tplBODY", "thumb_row", "row_block");
 	$this->t_body->set_block("thumb_row", "thumb_cell", "cell_block");
 	
-	$query = "SELECT id, description FROM file WHERE category = {$_GET['category']} AND deleted = '0' AND INSTR(mime_type, 'image/') 
+	$query = "SELECT id, description FROM file WHERE category = {$cid} AND deleted = '0' AND INSTR(mime_type, 'image/') 
 		ORDER BY submitted";
 	$db->dbDoQuery($query);
 
@@ -63,7 +64,7 @@ if(isset($_GET['category']) && perm($_GET['category'], HOMEPAGESERVICE))
 
 	while( $thumbnail = $db->dbGetNextArray() )
 	{
-		$this->t_body->set_VAR("THUMBNAIL", "<a href=\"$_PHPSELF?category={$_GET['category']}&image={$thumbnail['id']}\">
+		$this->t_body->set_VAR("THUMBNAIL", "<a href=\"$_PHPSELF?category={$cid}&image={$thumbnail['id']}\">
 				<img src=\"image.php?id={$thumbnail['id']}&height=80&width=80&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
 
 
@@ -95,9 +96,13 @@ if(isset($_GET['category']) && perm($_GET['category'], HOMEPAGESERVICE))
 	$this->t_body->parse("row_block", "thumb_row", true);
 
 	$this->t_body->pparse("finaloutput", "tplBODY");
-
 	
 }
+}
+
+if(isset($_GET['category']) && perm($_GET['category'], HOMEPAGESERVICE))
+	$page = new ImageGallery($_GET['category']);
 else 
 	error(2);  
+
 ?>

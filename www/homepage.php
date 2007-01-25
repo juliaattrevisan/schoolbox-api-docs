@@ -865,6 +865,52 @@ class OutPut
 		return true;
 	}
 
+	function outputCalendarList($name, $size)
+	{
+		//event output
+		$this->t_body->set_block($name, "group_events", "group_events_block");
+	
+		//event limit changed from posts to days
+		if($size != 0 && $size != '')
+				$where = " AND date < ADDDATE(CURDATE(), INTERVAL $size DAY) ";
+		else
+				$where = "";
+		
+		
+		
+		$query = "SELECT id, DATE_FORMAT(date, '%a %D %b') as outputDate,
+						DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
+						TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTimeString, TIME_FORMAT(endTime, 
+				'".CALENDAR_time_format."') as endTimeString,priority, note
+				FROM event
+        				JOIN eventCampus ON event.id = eventCampus.eventID
+				WHERE access = 3 AND eventCampus.campusID = 3 AND( date >= NOW() $where) ORDER BY date, startTime";
+		$this->db->dbDoQuery($query);	
+
+		if($this->db->dbCountRows() < 1){$this->t_body->set_var("group_events_block", "");}
+		else
+		{
+			require_once("calendar/calendar.php");
+			$cal = new calendar;			
+
+			while($queryArray = $this->db->dbGetNextArray() )
+			{
+				$queryArray['colour'] = $cal->displayColour($queryArray['priority']);
+				$this->outputEvent($queryArray);
+			}
+		}
+
+
+		//setup block for submission button
+		$this->t_body->set_block($name, "submit_event", "submit_event_block");
+		if($this->perm < 2)		
+			$this->t_body->set_var("submit_event_block", "");
+		else
+			$this->t_body->parse("submit_event_block", "submit_event");	
+		
+		return true;
+	}
+
 	function outputHomework($queryArray)
 	{
 

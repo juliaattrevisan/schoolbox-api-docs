@@ -191,7 +191,7 @@ class OutPut
 		$this->t_body->set_block("timetable", "timetable_period", "timetable_period_block");
 		$this->t_body->set_block("timetable", "timetable_header", "timetable_header_block");
 
-		include("syn_timetable.php");
+		include("include/syn_timetable.php");
 		
 		//get current day and period
 		$daynumber = getDayNumber($_SESSION['campus'][0]);
@@ -388,12 +388,15 @@ class OutPut
 			$this->t_body->set_var("STUDENT_NAME", $user['firstname'].' '.$user['lastname']);
 			$this->t_body->set_var("STUDENT_YEAR", $user['year']);
 			
-			foreach($child['subjects'] as $subject)
-			{
-				$this->t_body->set_var("STUDENT_SUBJECT_NAME", $subject['name']);
-				$this->t_body->set_var("STUDENT_SUBJECT_CODE", $subject['code']);
-				$this->t_body->parse("subject_item", "subject_block", true);
+			if(is_array($child['subjects']) ) {
+				foreach($child['subjects'] as $subject)
+				{
+					$this->t_body->set_var("STUDENT_SUBJECT_NAME", $subject['name']);
+					$this->t_body->set_var("STUDENT_SUBJECT_CODE", $subject['code']);
+					$this->t_body->parse("subject_item", "subject_block", true);
+				}
 			}
+
 			$this->t_body->parse("student_subjects", "student_block", true);
 			$this->t_body->set_var("subject_item", '');
 		

@@ -9,6 +9,7 @@ require_once("../include/include.php");
 require_once("../include/session.php");
 require_once("../include/adminonly.php");
 
+class displayPage {
 function displayPage()
 {
 	$this->t_body = new Template(TPL_directory);
@@ -19,7 +20,7 @@ function displayPage()
 
 	$this->t_body->pparse("finaloutput", "tplBODY");
 }
+}
 
-
-displayPage();
+$page = new displayPage;
 
