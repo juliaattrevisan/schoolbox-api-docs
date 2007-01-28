@@ -22,6 +22,7 @@ function dbManager($db = SQL_db, $debug = 0)
 	$this->passwd = SQL_passwd;
 	$this->debug = $debug;
 	$this->db = $db;
+	$this->dbConnect();
 	
 }
 
@@ -60,7 +61,6 @@ function dbChangeDb($db)
 /* Returns the result resource for the query, also saves the result resource as a object var */
 function dbDoQuery($sql_q)
 {
-	$this->dbConnect();
 	$this->result = mysql_query($sql_q, $this->dbf) or $mysql_eval_error = mysql_error();
 	if (isset($mysql_eval_error)) {
 		if($this->debug)
@@ -148,7 +148,7 @@ function dbInsertRow($table, $array)
 	foreach($array as $key => $value)
 	{
 		$names .= '`'.$key.'`' . ',';
-		if (!is_array($value)) {
+		if (!is_array($value) ) {
 			$values .= $this->dbSmartQuote($value) . ',';
 		} else if (isset($value['function'])) {
 			$values .= $value['function']. '('. $this->dbSmartQuote($value['value']). '),';

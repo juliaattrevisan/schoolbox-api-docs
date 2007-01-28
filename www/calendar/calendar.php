@@ -63,8 +63,12 @@ function getAllDayEvents($currDay, $currMonth, $currYear, $campus = 0)
 	$normalevents = $this->getDayEvents($currDay, $currMonth, $currYear, $campus);
 	$groupevents =  $this->getAllGroupDayEvents($currDay, $currMonth, $currYear);
 
-	if(is_array($normalevents) || is_array($groupevents))
+	if(is_array($normalevents) && is_array($groupevents))
 		$event = array_merge($normalevents,$groupevents);
+	else if(is_array($normalevents))
+		$event = $normalevents;
+	else if(is_array($groupevents))
+		$event = $groupevents;
 	else
 		return false;
 	
@@ -165,10 +169,9 @@ function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 
 	}
 	else
 	{
-		//what if sid is an array as below??!!!!  please fixme
 		$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access, sid) 
 			VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), $startTime, $endTime, '$priority', 
-			'$note', '$level','$sid')";	
+			'$note', '$level',$sid)";	
 	}
 	
 	if(is_array($sid))
@@ -440,8 +443,8 @@ function getDayEvents($day, $month, $year, $campus = 0, $group = 0)
 	//get single events for the day
 	$querysingle = "SELECT DISTINCT id, owner,TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note, access, eventCampus.campusID as sid
 	FROM event 
-	LEFT JOIN eventCampus ON event.id = eventCampus.eventID
-	LEFT JOIN eventGroup ON event.id = eventGroup.eventID
+	JOIN eventCampus ON event.id = eventCampus.eventID
+	JOIN eventGroup ON event.id = eventGroup.eventID
 	WHERE date = FROM_UNIXTIME('$datestamp')
 	AND ( (access = '4') OR (access = '1' AND owner= '".$_SESSION['id']."') 
 		OR (access = '3' AND eventCampus.campusID IN($campuslist) $groupChunk ))
@@ -576,8 +579,7 @@ function getSubmissionEvents($day, $month, $year)
 
 function getStudentBirthdays($day, $month, $year)
 {
-	if(SYNERGY_enable) {
-        $db = mssql_connect(MSSQL_host,MSSQL_user, MSSQL_passwd);
+        $db = mssql_connect(MSSQL_host,MSSQL_user, MSSQL_passwd); //todo: get portal synergy account permissions
 
         $query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
                         vStudents.StudentBirthDate, vStudents.StudentCampus, datediff(year,studentbirthdate,getdate()) as 'Student Age',
@@ -604,7 +606,6 @@ function getStudentBirthdays($day, $month, $year)
                 }
 		return $birthdays;
         }
-	}
 }
 
 

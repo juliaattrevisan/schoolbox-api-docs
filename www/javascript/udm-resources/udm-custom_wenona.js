@@ -100,7 +100,7 @@ um.keys = [
 
 //styles which apply to the navbar
 um.navbar = [
-	"0",		// nav -> menu x-offset (+-)["n" pixels]
+	"-2",		// nav -> menu x-offset (+-)["n" pixels]
 	"-11",		// nav -> menu y-offset (+-)["n" pixels]
 	"135px",	// width ["em"|"ex"|"px"] (vertical navbar only - horizontal navbar items have "auto" width) ("%" doesn't work right)
 	];
@@ -162,8 +162,8 @@ um.menus = [
 	"#FFFFFF",	// background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"",		// additional menu CSS (careful!) (you can use a transition here but *not* a static filter)
 	"none",// shadow background ["color"|"#hex"|"rgb()"|"image.gif"|"none"]
-	"2px",		// shadow offset (+-) ["em"|"px"|"pt"|"%"|"0"]
-	"filter:alpha(opacity=50);",// additional shadow layer CSS (if you use a Microsoft.Shadow filter here then Win/IE5.5+ will do that *instead* of default shadow)
+	"0",		// shadow offset (+-) ["em"|"px"|"pt"|"%"|"0"]
+	"",// additional shadow layer CSS (if you use a Microsoft.Shadow filter here then Win/IE5.5+ will do that *instead* of default shadow)
 	];
 
 
