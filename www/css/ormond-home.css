@@ -1,0 +1,36 @@
+/* CSS Document */
+
+table.timetable {
+	width:100%;
+	margin:0;
+	background:transparent;
+	}
+
+table.timetable th {
+	padding:3px;
+	background:#00458C;
+	color:#fff;
+	font:bold 80% /1em Verdana, arial, sans-serif, serif;
+	text-align:center;
+	}
+
+table.timetable td {
+	background:#efefef;
+	colour:#000;
+	font:normal 80% /1em Verdana, arial, sans-serif, serif;
+	cursor:hand;
+	padding:4px;
+	text-align:center;
+	}
+
+.timetable td.current {
+	background:#06c;
+	color:#fff;
+	}
+	
+table.home {
+	position:relative;
+	}
+table.home td {
+	vertical-align:top;
+	}

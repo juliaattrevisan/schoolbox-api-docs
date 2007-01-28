@@ -1,0 +1,51 @@
+h2, h3 {
+	/*letter-spacing:-1px;*/
+	margin:0;
+	/*background:transparent;*/
+	padding:0;
+	font-weight:bold;	
+	line-height:1em;
+	}
+
+h2 {
+	padding:0 0 0 2px;
+	/*color:#000;*/
+	font-size:100%;
+	border:0;
+	border-bottom:2px solid #666;
+	}
+h3 {
+	padding:1px 0 1px 0;
+	color:#000;
+	font-size:100%;
+	border:0;
+	}
+
+#left-homepage-col table {
+	border-collapse:collapse;
+	border:0;
+	width:95%
+}
+
+#right-homepage-col table {
+	border-collapse:collapse;
+	border:0;
+	width:100%
+}
+
+#left-homepage-col table td, #right-homepage-col table td {
+	padding-left:4px;
+}
+#left-homepage-col table td.homeComponentHeader, #right-homepage-col table td.homeComponentHeader {
+	padding-left:0;
+}
+
+#right-homepage-col ul li {
+	background:transparent url(/images/mgs/arrow_bullet.gif) no-repeat 2px 0.2em;
+}
+#left-homepage-col table td.titleColumn, #right-homepage-col table td.titleColumn {
+	width:35%;
+	background-color:#ccc;
+	border-bottom:1px solid #666;
+	vertical-align:top;
+}
