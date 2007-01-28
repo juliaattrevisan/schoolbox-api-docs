@@ -108,6 +108,38 @@ acronym, dfn, abbr {
 	font-size:70%;
 	}
 	
+#left li ul li a:hover {
+	background:#0055AD;
+	color:#fff;
+	}
+	
+	/* SECOND LEVEL LIST */
+#left li ul li { 
+	border-bottom:1px solid #0055AD;
+	}	
+/* SECOND LEVEL LIST LINK */
+#left li ul li a {
+	padding:2px 5px;
+	background:#9CC7DE;
+	color:#002452;
+	} 
+	
+	
+ /* Hover Styles */
+#left ul li a:hover
+{
+	background:#9CC7DE url(/images/wenona/white_arrow.png) no-repeat 2px 3px;
+	color:#fff;
+}
+
+/* Fix IE. Hide from IE Mac \*/
+//* html #left ul li {float:left; height:1%;}
+//* html #left ul li a {height:1%;}
+/* End */
+
+.udm li a {
+	_height:1px;
+}
 
 /*--------------------------------------------------------------------------------------*/
 /* LINKS */
