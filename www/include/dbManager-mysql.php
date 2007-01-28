@@ -96,12 +96,17 @@ function dbGetAllRows($sql_q)
 {
 	$result = $this->dbDoQuery($sql_q);
 	$table = array();
+	$results = false;
 	//loop through all records and insert into array table
 	while($line = $this->dbGetNextArray($result))
 	{
 		$table[] = $line;
+		$results = true;
 	}
-	return $table;
+	if($results)
+		return $table;
+	else
+		return false;
 }
 
 /* Returns the next result from a query result resource */
@@ -193,13 +198,27 @@ function dbInsertMultiRow($table, $array, $names=false)
 /* Updates a row */
 function dbUpdateRow($table, $identifier, $array)
 {
-	if(!($table && $array[$identifier] ) )
+	if(!$table) 
+		return FALSE;
+		
+	if(is_array($identifier)) {
+		foreach($identifier as $ident){
+			if(!$array[$ident] )
+				return FALSE;
+		}
+	}
+	else {
+	 	if(!$array[$identifier] )
 			return FALSE;
+
+		$identifier = array($identifier);
+	}
 	
 	$set = '';
 	foreach($array as $key => $value)
 	{
-		if($key != $identifier) {
+	
+		if(!in_array($key, $identifier)) {
 			if (!is_array($value)) {
 				$set .= '`'.$key.'`='.$this->dbSmartQuote($value).',';
 			} else if (isset($value['function'])) {
@@ -208,29 +227,23 @@ function dbUpdateRow($table, $identifier, $array)
 		}
 	}
 	$set = substr($set, 0, -1);
-	$query = "UPDATE `$table` SET $set WHERE `$identifier`= ".$this->dbSmartQuote($array[$identifier]); 
+	$query = "UPDATE `$table` SET $set WHERE 1=1";
+	
+	foreach($identifier as $ident) {
+		$query .= " AND `$ident`= ".$this->dbSmartQuote($array[$ident]); 
+	}
 	return $this->dbDoQuery($query);
 }
 
 function dbDeleteRow($table, $identifier, $value)
 {
-	$query = "DELETE FROM `$table` WHERE ";
-	
-	if(is_array($identifier) {
-		for($i = 0; $$identifier[$i]; $i++) {
-			$query .= "`{$identifier[$i]}` = ".$this->dbSmartQuote($value[$i]).' AND ';
+	$query = "DELETE FROM `$table` WHERE 1 != 1 ";
+	if (is_array($value)) {
+		foreach ($value as $item) {
+			$query .= " OR `$identifier` =  ".$this->dbSmartQuote($value);
 		}
-		substr($query, 0, -5);
-	}
-	else {
-		if (is_array($value)) {
-			foreach ($value as $item) {
-				$query .= "`$identifier` =  ".$this->dbSmartQuote($value).' OR ';
-			}
-			substr($query, 0, -4);
-		} else {
-			$query .= "`$identifier` =  ".$this->dbSmartQuote($value);
-		}
+	} else {
+		$query .= "OR `$identifier` =  ".$this->dbSmartQuote($value);
 	}
 	return $this->dbDoQuery($query);
 }
