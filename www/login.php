@@ -107,7 +107,7 @@ else
 		$myPage->setOutput("You are currently not logged in.  Your session has either expired or you are beginning 
 			a new session.  Please log in below to continue browsing the portal. ");
 	else
-		$myPage->setOutput("Please enter your username and password");
+		$myPage->setOutput("To begin a new session please login with your username and password.");
 	$myPage->showPage();
 	
 }

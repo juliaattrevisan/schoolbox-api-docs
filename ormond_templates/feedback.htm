@@ -19,7 +19,7 @@
 <script type="text/javascript">
 function fixEmailAddress( input) {
 	if( input.value.indexOf( '@') == -1) {
-		input.value += '@mgs.vic.edu.au';
+		input.value += '@ormond.unimelb.edu.au';
 	}
 }
 </script>
@@ -27,15 +27,14 @@ function fixEmailAddress( input) {
 </head>
 <body>
 <div id="outerWrap">
-	<div id="header">
-		<div id="ormond-logo"></div>
-	</div>
-	<div id="yellowStripe"></div>
-	<div id="left">
-	</div>
-	<!-- end left -->
-	<div id="content" style="margin-right:190px;">
-		<div id="content_text"> <!-- #BeginEditable "main" -->
+  <div id="header">
+    <div id="ormond-logo"></div>
+  </div>
+  <div id="yellowStripe"></div>
+  <div id="left"> </div>
+  <!-- end left -->
+  <div id="content" style="margin-right:190px;">
+    <div id="content_text"> <!-- #BeginEditable "main" -->
 		<h1>Feedback</h1>
       <p>{ERROR}</p>
       {FORM_BEFORE} 
@@ -43,7 +42,7 @@ function fixEmailAddress( input) {
       <form method="post" action="feedback.php">
         <table>
           <tr> 
-            <td> Sending feedback to <font size=-2>portal_support@mgs.vic.edu.au</font> 
+            <td> Sending feedback to <font size=-2>portal_support@ormond.unimelb.edu.au</font> 
             </td>
           </tr>
           <tr> 
@@ -65,12 +64,13 @@ function fixEmailAddress( input) {
       </form>
       <p>{FORM_AFTER} </p>
 		 <!-- #EndEditable --> </div>
-		<div id="footer">
-			<p>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</p>
-			<p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
-			<p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
-		</div>
-	</div>
+    <div id="footer">
+      <p>If you view offensive or inappropriate content please report it immediately via the <a href="/feedback.php">feedback form</a></p>
+      <p>2005&nbsp;&copy;&nbsp;Copyright <a href="http://ormond.unimelb.edu.au" title="Ormond College">Ormond College</a>, <a href="http://www.unimelb.edu.au" title="University of Melbourne">The University of Melbourne</a>, Australia</p>
+      <p><a href="/policy/ormond.htm">Guidelines of Use and Privacy Policy</a></p>
+      <p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
+    </div>
+  </div>
 </div>
 </body>
 <!-- InstanceEnd --></html>

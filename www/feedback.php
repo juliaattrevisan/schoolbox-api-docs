@@ -1,7 +1,7 @@
 <?php
 
-require_once( 'include.php');
-require_once( 'dbManager-mysql.php');
+require_once( 'include/include.php');
+require_once( 'include/dbManager-mysql.php');
 require_once( 'mail/mail.php');
 
 define( '_MAX_STRLEN', '2048');
@@ -13,7 +13,6 @@ class FeedbackPage
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplFeedback", "feedback.htm");			
 		$this->t_body->set_var("TITLE", HEADING." - Feedback");
-		$this->t_body->set_var("HIDDEN",$page);
 
 		if( $showForm == true) {
 			$this->t_body->set_var( 'FORM_BEFORE', '');

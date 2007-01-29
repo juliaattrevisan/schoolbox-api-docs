@@ -52,7 +52,7 @@ class displayCalendar
 		for($i=1; $i <= 12; $i++)
 		{
 			$this->t_body->set_var("DROP_MONTH_NUMBER", $i);
-			$this->t_body->set_var("DROP_MONTH_NAME", date('F', mktime(0,0,0,$i)));
+			$this->t_body->set_var("DROP_MONTH_NAME", date('F', mktime(0,0,0,$i,1)));
 			if($i == $selected)
 				$this->t_body->set_var("DROP_MONTH_SELECTED", "selected=\"selected\"");
 			else
