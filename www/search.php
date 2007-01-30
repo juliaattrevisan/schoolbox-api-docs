@@ -139,26 +139,27 @@ class OutPut
 	function fileSearch($token, $type, $sort)
 	{
 		//this query will get all files that the user can see
-		$query = "SELECT file.id, file.realname, inline, iconFile, DATE_FORMAT(file.submitted, '".FILE_date_format."') AS submitted, 
-		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, file.description,
-		file.comment, category.name, category.id as cid, category.code, file_size
-		FROM file, user, category LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime WHERE file.owner=user.id AND file.category = category.id AND file.deleted = '0'";
+		$query = "SELECT f.id, f.realname, inline, iconFile, DATE_FORMAT(f.submitted, '".FILE_date_format."') AS submitted, 
+		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, f.description,
+		f.comment, category.name, category.id as cid, category.code, file_size, f.mime_type
+		FROM (file as f, user, category) LEFT JOIN allowedFileTypes ON mime = f.mime_type WHERE f.owner=user.id AND f.category = 
+category.id AND f.deleted = '0'";
 		//do the query based on search type
 		switch ($type)
 		{
 		//description search
 			case 1:
-			$query .= " AND (".$this->tokenToQuery($token, "file.description", "OR").")";
+			$query .= " AND (".$this->tokenToQuery($token, "f.description", "OR").")";
 			break;
 
 			//filename search
 			case 2:
-			$query .= " AND (".$this->tokenToQuery($token, "file.realname", "OR").")";
+			$query .= " AND (".$this->tokenToQuery($token, "f.realname", "OR").")";
 			break;
 
 			//comment search
 			case 3:
-			$query .= " AND (".$this->tokenToQuery($token, "file.comment", "OR").")";
+			$query .= " AND (".$this->tokenToQuery($token, "f.comment", "OR").")";
 			break;
 
 			//category search
@@ -173,9 +174,9 @@ class OutPut
 			break;
 			//search all
 			default:
-			$query .= " AND (".$this->tokenToQuery($token, "file.description", "OR").
-				" OR ".$this->tokenToQuery($token, "file.realname", "OR").
-				" OR ".$this->tokenToQuery($token, "file.comment", "OR").
+			$query .= " AND (".$this->tokenToQuery($token, "f.description", "OR").
+				" OR ".$this->tokenToQuery($token, "f.realname", "OR").
+				" OR ".$this->tokenToQuery($token, "f.comment", "OR").
 				" OR ".$this->tokenToQuery($token, "user.username", "OR").
 				" OR ".$this->tokenToQuery($token, "CONCAT(user.firstname, ' ', user.lastname)", "OR").")";
 			break;
@@ -186,17 +187,17 @@ class OutPut
 		{
 		        //description
 			case 1:
-			$query .= " ORDER BY file.description ";
+			$query .= " ORDER BY f.description ";
 			break;
 
 			//submission date
 			case 2:
-			$query .= " ORDER BY file.submitted DESC";
+			$query .= " ORDER BY f.submitted DESC";
 			break;
 
 			//author name
 			case 3:
-			$query .= " ORDER BY file.owner ";
+			$query .= " ORDER BY f.owner ";
 			break;
 		}
 		$this->db->dbDoQuery($query);

@@ -270,7 +270,7 @@ class modUser
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 
-	function displayUserList()
+	function displayUserList($queryString)
 	{
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "admin/listUser.htm");
@@ -278,6 +278,8 @@ class modUser
 		include_once("../include/page.php");	
 		$this->t_body->set_block("tplBODY", "userlist", "user_block");
 		//we assume that the connection is setup and ready to go.. yeah messy but optimized.
+
+		$this->db->dbDoQuery($queryString);
 		while($userdetails = $this->db->dbGetNextArray())
 		{
 			$this->t_body->set_var("FIRSTNAME", $userdetails['firstname']);
@@ -311,7 +313,7 @@ class modUser
 		}
 		else if($matchedUsers > 1)
 		{
-			$this->displayUserList();
+			$this->displayUserList($query);
 		}
 		else
 			error(31);  //no users match search

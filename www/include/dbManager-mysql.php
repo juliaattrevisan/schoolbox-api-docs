@@ -69,7 +69,7 @@ function dbDoQuery($sql_q)
 			print "<b>Error:</b> $mysql_eval_error";
 		}
 		else
-			error(6, $mysql_eval_error);
+			error(21, $mysql_eval_error);
 	}
 	
 	return $this->result;

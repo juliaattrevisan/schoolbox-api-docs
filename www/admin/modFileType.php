@@ -70,6 +70,7 @@ class modFileType
 		include_once("../include/page.php");	
 		$this->t_body->set_var("ACTION", "Create");
 		
+		$fileType = new allowedFileType();
 
 		$this->t_body->set_var('DESCRIPTION', '');
 		$this->t_body->set_var('MIME', '');		
