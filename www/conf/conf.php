@@ -22,6 +22,13 @@ define("REMEMBERSESSION", false);				//Allows server to store session indefinetl
 											//Users will only need to login once (has security implications)
 define("REGISTER_FIRSTIME", false);			//Detects no password and checks password against mail server if correct registers account
 
+//LDAP Authentcation
+define('LDAP_enable', false);
+define('LDAP_host', '');
+define('LDAP_user', '');
+define('LDAP_pass', '');
+define('LDAP_base', '');
+
 // Note that the following directories should exist outside the webroot and 
 // be writable by the apache process
 

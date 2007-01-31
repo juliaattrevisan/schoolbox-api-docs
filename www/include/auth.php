@@ -26,19 +26,27 @@ function checkBruteForce(&$db)
 		return 1;
 } 
 
-function authenticateLdap(&$db, $username, $password) {
+function authenticateLDAP($username, $password) {
+
+	$ds=@ldap_connect(LDAP_host);
+	@ldap_bind($ds, LDAP_user, LDAP_pass);
+	$result = @ldap_search($ds, LDAP_base,'uid='.$username,array('dn'));
+	$entries = @ldap_get_entries($ds, $result);
+	$dn = $entries[0]['dn'];
+	if($dn)
+		return @ldap_bind($ds, $dn, $password);
+	else
+		return false;
 
 }
 
 function authenticateSQL(&$db, $username, $password) {
 	// Function to check username exists and password is correct
 
-	$query = "SELECT user.id, username, group_id, synergy_id, superusers.id AS su, password, email_pass, local_email, mail_handler 
-	FROM user LEFT JOIN superusers ON user.id = superusers.id WHERE username = '". trim( $username)."' 
-	AND ((password = PASSWORD('".$password."')) 
-	OR (password IS NULL) OR (password = ''))";
+	$query = "SELECT user.id FROM user WHERE username = '". trim( $username)."' 
+	AND password = PASSWORD('".$password."')";
 	$db->dbDoQuery($query);
-
+	
 	$result = $db->dbCountRows();
 	//$user = $db->dbGetNextArray();
 
@@ -50,27 +58,35 @@ function authenticateSQL(&$db, $username, $password) {
 
 function authenticate(&$db, $username, $password, $remember = 0)
 {
+
+	$result = false;
+	
 	// Function to check username exists and password is correct
+	if(LDAP_enable) {
+		$result = authenticateLDAP($username, $password);
+	}
+	
+	if(!$result) {
+		//fall back on SQL if ldap is not enable or fails
+		$result = authenticateSQL(&$db, $username, $password);
+	}
 
-	$query = "SELECT user.id, username, group_id, synergy_id, superusers.id AS su, password, email_pass, local_email, mail_handler 
-	FROM user LEFT JOIN superusers ON user.id = superusers.id WHERE username = '". trim( $username)."' 
-	AND ((password = PASSWORD('".$password."')) 
-	OR (password IS NULL) OR (password = ''))";
-	$db->dbDoQuery($query);
+	if($result == true) {
 
-	$result = $db->dbCountRows();
-	$user = $db->dbGetNextArray();
-
+		$query = "SELECT user.id, username, group_id, synergy_id, superusers.id AS su, password, email_pass, local_email, mail_handler 
+		FROM user LEFT JOIN superusers ON user.id = superusers.id WHERE username = '". trim( $username)."'";
+		$user = $db->dbGetSingleRow($query);
+	}
+	
 	//log the authentication attempt
-	$now = time();
-	$ip = getenv('REMOTE_ADDR');
+	$ip = getIP(); 
 	$loginlogquery = "INSERT INTO login_log (username, date, ip, login) 
-			VALUES ('$username', FROM_UNIXTIME($now), '$ip'";
+			VALUES ('$username', NOW(), '$ip'";
 
 	//check password
-	if( $result == 1)
+	if( $result == true && is_array($user))
 	{
-		if(REGISTER_FIRSTIME)
+		/*if(REGISTER_FIRSTIME)
 		{
 			if(!isset($user['password']) || $user['password'] == "")
 			{
@@ -78,7 +94,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 				if(!firsttime(&$db, $username, $password))
 					return false;		
 			}
-		}
+		}*/
 
 		//register users id
 		$_SESSION['id'] = $user['id'];
