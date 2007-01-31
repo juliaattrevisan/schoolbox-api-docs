@@ -26,6 +26,28 @@ function checkBruteForce(&$db)
 		return 1;
 } 
 
+function authenticateLdap(&$db, $username, $password) {
+
+}
+
+function authenticateSQL(&$db, $username, $password) {
+	// Function to check username exists and password is correct
+
+	$query = "SELECT user.id, username, group_id, synergy_id, superusers.id AS su, password, email_pass, local_email, mail_handler 
+	FROM user LEFT JOIN superusers ON user.id = superusers.id WHERE username = '". trim( $username)."' 
+	AND ((password = PASSWORD('".$password."')) 
+	OR (password IS NULL) OR (password = ''))";
+	$db->dbDoQuery($query);
+
+	$result = $db->dbCountRows();
+	//$user = $db->dbGetNextArray();
+
+	if($result == 1)
+		return true;
+	else
+		return false;
+}
+
 function authenticate(&$db, $username, $password, $remember = 0)
 {
 	// Function to check username exists and password is correct

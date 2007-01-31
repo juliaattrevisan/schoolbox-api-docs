@@ -19,7 +19,7 @@ class outUser
 		
 		$query = "SELECT user.id, firstname, lastname, username, groups.name AS gname, group_id, extension, 
 					synergy_id, local_email, alt_email
-				FROM user, groups LEFT JOIN ph_ext ON id = ph_ext.owner
+				FROM (user, groups) LEFT JOIN ph_ext ON user.id = ph_ext.owner
 				WHERE user.group_id = groups.id AND user.id = '$id'";
 		$user = $db->dbGetSingleRow($query);
 		

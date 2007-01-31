@@ -487,7 +487,7 @@ class OutPut
 					submission_box.id AS box_id,
 					student_submission.owner, inline
 				FROM file
-				LEFT JOIN allowedFileTypes ON mime_type = mime
+				LEFT JOIN allowedFileTypes ON file.mime_type = mime
 				LEFT JOIN submission_box ON	file.id = submission_box.fid
 					AND submission_box.deleted = '0'
 				LEFT JOIN student_submission ON	student_submission.box_id = submission_box.id 
@@ -543,7 +543,7 @@ class OutPut
 		{
 			$query = "SELECT file.id, file.description, file.realname, file.comment, DATE_FORMAT(submission_box.date, '%D %b') AS date, 
 			UNIX_TIMESTAMP(submission_box.late_date) AS late, submission_box.id AS box_id, student_submission.owner, inline
-			FROM file LEFT JOIN allowedFileTypes ON mime_type = mime 
+			FROM file LEFT JOIN allowedFileTypes ON file.mime_type = mime 
 			LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0'
 			LEFT JOIN student_submission ON  student_submission.box_id = submission_box.id 
 			AND student_submission.owner = '".$_SESSION['id']."'
