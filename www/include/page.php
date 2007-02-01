@@ -128,7 +128,7 @@ else
 // if configuration states mail is available and user has access to local mail account display it
 $this->t_body->set_block("tplBODY", "webmail_tab", "wm_tab");
 
-if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && isStaff($_SESSION['gid'])))
+if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && isStaff($_SESSION['gid'])) || SITE_location == 'ormond')
 {
 	$this->t_body->parse("wm_tab","webmail_tab",true);
 	
@@ -138,6 +138,10 @@ if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && is
 			$this->t_body->set_var("WEBMAIL_LOCATION", "href=\"https://webmail.mgs.vic.edu.au/exchange/\" target=\"_blank\"");
 		else
 			$this->t_body->set_var("WEBMAIL_LOCATION", "href=\"/mail.php\"");
+	}
+	else if(SITE_location == 'ormond') 
+	{
+		$this->t_body->set_var('WEBMAIL_LOCATION', 'href="http://webmail.ormond.unimelb.edu.au/" target="_blank"');
 	}
 	else if(SITE_location == 'wenona') {
 		if(isStaff($_SESSION['gid'])) {
