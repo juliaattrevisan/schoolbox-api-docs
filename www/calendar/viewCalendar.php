@@ -210,7 +210,7 @@ class displayCalendar
 				$subout = 1;
 			}
 
-			if(SITE_location == "mgs")
+			if(SITE_location == "mgs" && SYNERGY_enable)
 			{
 				$birthdayList = $this->cal->getStudentBirthdays($this->currDay, $this->currMonth, $this->currYear);
 				if(in_array(3 ,$_SESSION['campus']))

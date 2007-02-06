@@ -161,17 +161,17 @@ function insertCampus($id, $campus)
 
 function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 1, $sid = 0, $userGroup = 0)
 {
-	if($level == 1)
+	if($level == 2)
+	{
+		$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access, sid) 
+			VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), $startTime, $endTime, '$priority', 
+			'$note', '$level',$sid)";
+	}
+	else
 	{
 		$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access) 
 			VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), $startTime, $endTime, '$priority', 
 			'$note', '$level')";
-	}
-	else
-	{
-		$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access, sid) 
-			VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), $startTime, $endTime, '$priority', 
-			'$note', '$level',$sid)";	
 	}
 	if(is_array($sid))
 	{
