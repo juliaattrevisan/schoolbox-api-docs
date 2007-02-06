@@ -136,8 +136,8 @@ um.items = [
 	"letter-spacing:0px !important;",// additional link CSS (careful!)
 	"",		// additional hover/focus CSS (careful!)
 	"",		// additional visited CSS (careful!)
-	"blue_arrow.gif",// menu indicator character/image ["text"|"image.gif"|"none"]
-	"blue_arrow.gif",// menu indicator rollover character/image ["text"|"image.gif"|"none"] (must be same type)
+	"none",// menu indicator character/image ["text"|"image.gif"|"none"]
+	"none",// menu indicator rollover character/image ["text"|"image.gif"|"none"] (must be same type)
 	"7",		// clipping width of indicator image ["n" pixels] (only when using image arrows)
 	"..",		// alt text of indicator image ["text"] (only when using image arrows)
 	];
