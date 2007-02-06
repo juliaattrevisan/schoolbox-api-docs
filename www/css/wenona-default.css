@@ -90,13 +90,11 @@ acronym, dfn, abbr {
 	padding:0;
 	list-style: none;;
 	width:150px; /* Width of Menu Items */
-	z-index:2;
 	}
 /* FIRST LEVEL MENU UNORDERED LIST ELEMENT */
 #left ul li {
 	position: relative;
 	}
-
 /* FIRST LEVEL MENU LINK */
 #left ul li a {
 	color:#fff;
@@ -107,39 +105,34 @@ acronym, dfn, abbr {
 	font-weight:normal;
 	font-size:70%;
 	}
-	
-#left li ul li a:hover {
-	background:#0055AD;
-	color:#fff;
-	}
-	
-	/* SECOND LEVEL LIST */
-#left li ul li { 
-	border-bottom:1px solid #0055AD;
-	}	
-/* SECOND LEVEL LIST LINK */
-#left li ul li a {
-	padding:2px 5px;
-	background:#9CC7DE;
-	color:#002452;
-	} 
-	
-	
  /* Hover Styles */
-#left ul li a:hover
-{
+#left ul li a:hover {
 	background:#9CC7DE url(/images/wenona/white_arrow.png) no-repeat 2px 3px;
 	color:#fff;
-}
-
+	}
+#left li li a, #left li li a:hover {
+	background-image:none;
+	}
 /* Fix IE. Hide from IE Mac \*/
-//* html #left ul li {float:left; height:1%;}
-//* html #left ul li a {height:1%;}
+* html #left ul li {float:left; height:1%;}
+* html #left ul li a {height:1%;}
 /* End */
 
+#left li li a {
+	background:#9BC7DE;
+	color:#000;
+	}
+#left li li a:hover {
+	color:#fff;
+	background:#0054AC;
+	}
+
+#left li ul {
+	border-bottom:1px solid #00458c;
+	}
 .udm li a {
 	_height:1px;
-}
+	}
 
 /*--------------------------------------------------------------------------------------*/
 /* LINKS */

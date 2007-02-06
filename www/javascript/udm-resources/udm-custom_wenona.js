@@ -100,9 +100,9 @@ um.keys = [
 
 //styles which apply to the navbar
 um.navbar = [
-	"-2",		// nav -> menu x-offset (+-)["n" pixels]
+	"0",		// nav -> menu x-offset (+-)["n" pixels]
 	"-11",		// nav -> menu y-offset (+-)["n" pixels]
-	"135px",	// width ["em"|"ex"|"px"] (vertical navbar only - horizontal navbar items have "auto" width) ("%" doesn't work right)
+	"150px",	// width ["em"|"ex"|"px"] (vertical navbar only - horizontal navbar items have "auto" width) ("%" doesn't work right)
 	];
 
 
@@ -123,7 +123,7 @@ um.items = [
 	"#cef3ff",		// hover/focus background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"#FFFFFF",		// visited background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"70%",		// font size ["em"|"ex"|"%"|"px"|"pt"|"absolute-size"|"relative-size"]
-	"Verdana, Arial, Helvetica, sans-serif, serif",// font family ["font1,font2,font3"] (always end with a generic family name)
+	"verdana, arial,sans-serif, serif",// font family ["font1,font2,font3"] (always end with a generic family name)
 	"normal",		// font weight ["normal"|"bold"|"bolder"|"lighter|"100" to "900"]
 	"none",		// text decoration ["none"|"underline"|"overline"|"line-through"]
 	"left",		// text-align ["left"|"right"|"center"]
@@ -136,8 +136,8 @@ um.items = [
 	"letter-spacing:0px !important;",// additional link CSS (careful!)
 	"",		// additional hover/focus CSS (careful!)
 	"",		// additional visited CSS (careful!)
-	"none",// menu indicator character/image ["text"|"image.gif"|"none"]
-	"none",// menu indicator rollover character/image ["text"|"image.gif"|"none"] (must be same type)
+	"blue_arrow.gif",// menu indicator character/image ["text"|"image.gif"|"none"]
+	"blue_arrow.gif",// menu indicator rollover character/image ["text"|"image.gif"|"none"] (must be same type)
 	"7",		// clipping width of indicator image ["n" pixels] (only when using image arrows)
 	"..",		// alt text of indicator image ["text"] (only when using image arrows)
 	];
@@ -152,18 +152,18 @@ um.items = [
 
 //styles which apply to each menu
 um.menus = [
-	"-2",		// menu -> menu x-offset (+-)["n" pixels]
-	"-12",		// menu -> menu y-offset (+-)["n" pixels]
+	"0",		// menu -> menu x-offset (+-)["n" pixels]
+	"-11",		// menu -> menu y-offset (+-)["n" pixels]
 	"0",		// border size ["n" pixels] (single value only)
-	"#0055AD #0055AD #9CC7DE #0055AD",// border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
-	"solid solid none solid",	// border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
+	"#00458c #00458c #00458c #00458c",// border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
+	"solid solid solid solid",	// border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
 	"135px",	// width ["em"|"ex"|"px"]
 	"0",		// padding ["n" pixels] (single value only)
 	"#FFFFFF",	// background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"",		// additional menu CSS (careful!) (you can use a transition here but *not* a static filter)
-	"none",// shadow background ["color"|"#hex"|"rgb()"|"image.gif"|"none"]
-	"0",		// shadow offset (+-) ["em"|"px"|"pt"|"%"|"0"]
-	"",// additional shadow layer CSS (if you use a Microsoft.Shadow filter here then Win/IE5.5+ will do that *instead* of default shadow)
+	"greyshadow.png",// shadow background ["color"|"#hex"|"rgb()"|"image.gif"|"none"]
+	"2px",		// shadow offset (+-) ["em"|"px"|"pt"|"%"|"0"]
+	"filter:alpha(opacity=50);",// additional shadow layer CSS (if you use a Microsoft.Shadow filter here then Win/IE5.5+ will do that *instead* of default shadow)
 	];
 
 
@@ -172,20 +172,20 @@ um.menuItems = [
 	"0",		// margin around items ["n" pixels] (single value only; margins are like table cellspacing)
 	"1",		// border size ["n" pixels] (single value only)
 	"separate",	// border collapse ["collapse"|"separate"] (only applies when margin = "0")
-	"#0055AD #0055AD #9CC7DE #0055AD",	// border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
+	"#00458c #00458c #0065ce #00458c",	// border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
 	"solid solid none solid",	// border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
 
-	"#0055AD #0055AD #9CC7DE #0055AD",		// hover/focus border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
+	"#00458c #00458c #0065ce #00458c",		// hover/focus border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
 	"solid solid none solid",	// hover/focus border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
-	"#0055AD #0055AD #9CC7DE #0055AD",	// visited border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
+	"#00458c #00458c #0065ce #00458c",	// visited border colors ["color"|"#hex"|"rgb()"] (single, double or four values)
 	"solid solid none solid",	// visited border styles ["solid"|"double"|"dotted"|"dashed"|"groove"|"ridge"|"inset"|"outset"] (single, double or four values; be careful with using "none")
 	"5",		// left/right padding ["n" pixels] (single value only)
 	"2",		// top/bottom padding ["n" pixels] (single value only)
-	"#9CC7DE",	// background ["color"|"#hex"|"rgb()"|"image.gif"]
-	"#0055AD",	// hover/focus background ["color"|"#hex"|"rgb()"|"image.gif"]
-	"#9CC7DE",	// visited background ["color"|"#hex"|"rgb()"|"image.gif"]
+	"red",	// background ["color"|"#hex"|"rgb()"|"image.gif"]
+	"#00458C",	// hover/focus background ["color"|"#hex"|"rgb()"|"image.gif"]
+	"red",	// visited background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"70%",		// font size ["em"|"ex"|"%"|"px"|"pt"|"absolute-size"|"relative-size"]
-	"Verdana, Arial, Helvetica, sans-serif, serif",// font family ["font1,font2,font3"] (always end with a generic family name)
+	"tahoma,sans-serif",// font family ["font1,font2,font3"] (always end with a generic family name)
 	"normal",	// font weight ["normal"|"bold"|"bolder"|"lighter|"100" to "900"]
 	"none",		// text decoration ["none"|"underline"|"overline"|"line-through"]
 	"left",		// text-align ["left"|"right"|"center"]
