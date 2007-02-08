@@ -76,8 +76,8 @@ class forum
 		$query = "SELECT forum.id, owner, DATE_FORMAT(date, '%W %M %e @ %l:%i%p') AS fulldate, 
 		heading, message, parent, 
 		user.username, user.firstname, user.lastname, user.local_email, user.alt_email 
-		FROM forum, user 
-		WHERE owner = user.id AND cid = '$cid' AND deleted = 0 
+		FROM forum LEFT JOIN user ON user.id = owner 
+		WHERE cid = '$cid' AND deleted = 0 
 		ORDER BY date LIMIT $start, $amount";
 		
 		return $this->db->dbGetAllRows($query);		
@@ -103,8 +103,8 @@ class forum
 				$query = "SELECT forum.id, owner, DATE_FORMAT(date, '%W %M %e @ %l:%i%p') AS fulldate, 
 				heading, message, parent, 
 				user.username, user.firstname, user.lastname, user.local_email, user.alt_email 
-				FROM forum, user 
-				WHERE owner = user.id AND thread = '".$thread['id']."' 
+				FROM forum LEFT JOIN user ON user.id = owner 
+				WHERE thread = '".$thread['id']."' 
 				AND deleted = 0 ORDER BY parent, date";
 
 				$this->db->dbDoQuery($query);

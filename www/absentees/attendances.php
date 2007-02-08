@@ -42,7 +42,7 @@ class Attendance
 		if (!$daynum)
 			$daynum = getDayNumber($_SESSION['campus'][0]);
 		$periodnum = $this->getSubjectPeriod($subCode, $daynum);
-		if (!$periodnum)
+		if ($periodnum === false)
 			error(33); //period doesn't exist today
 
 		$this->t_body->set_var("DAYNUMBER", "Day&nbsp;".$daynum);
@@ -242,10 +242,10 @@ class Attendance
 				return $array[0];
 			}	
 			else	
-				return 0;
+				return false;
 		}
 		else 
-			return 0;
+			return false;
 
 	}
 
@@ -263,10 +263,10 @@ class Attendance
 	
 		if ($result != 1){
 		if(mssql_num_rows($result) > 0)
-			return 1;
+			return true;
 		}
 		else 
-			return 0;
+			return false;
 	}
 
 

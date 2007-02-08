@@ -10,6 +10,8 @@ require_once("../include/adminonly.php");
 require_once("../include/permission.php");
 require_once("../calendar/calendar.php");
 
+class uploadCal {
+
 function displayPage($response = "")
 {
 	//nothing has been submitted
@@ -70,25 +72,26 @@ function processCal()
 	$output	= "";		
 	while(!feof($cal))
 	{
-		list($date,$stime,$ftime,$comment,$priority) = explode(',', fgets($cal,4096), 5);
-		
-		$comment = trim($comment);
-		
-		# Skip empty comments and no dates
-		if($comment && $date)
-		{
-			ereg('\"([^\"]*)\"|([^\"]*)'  , $comment, $regs);
-			if($regs[1])
-				$comment = $regs[1];
-			
-			if($priority < 1 && $priority > 4)
-				$priority = 4;
-		
-			$stime = ($stime) ? "'".$stime."'" : 'NULL';
-			$ftime = ($ftime) ? "'".$ftime."'" : 'NULL';
 
-			$sql = "INSERT INTO event (owner, access, priority, note, date, startTime, endTime)
-				VALUES ('{$uid}',3, '$priority', '".mysql_escape_string(trim($comment))."', '$date', $stime, $ftime)";
+		list($date,$stime,$ftime,$comment,$priority) = explode(',', fgets($cal,4096), 5);
+        
+        	$comment = trim($comment);
+        
+        	# Skip empty comments and no dates
+        	if($comment && $date)
+        	{
+        	    ereg('\"([^\"]*)\"|([^\"]*)'  , $comment, $regs);
+        	    if($regs[1])
+        	        $comment = $regs[1];
+            
+        	    if($priority < 1 && $priority > 4)
+        	        $priority = 4;
+        
+        	    $stime = ($stime) ? "'".$stime."'" : 'NULL';
+        	    $ftime = ($ftime) ? "'".$ftime."'" : 'NULL';
+	
+        	    $sql = "INSERT INTO event (owner, access, priority, note, date, startTime, endTime)
+               		 VALUES ('{$uid}',3, '$priority', '".mysql_escape_string(trim($comment))."', '$date', $stime, $ftime)"; 
 				
 				
 			if($db->dbDoQuery($sql))
@@ -103,14 +106,17 @@ function processCal()
 					
 		}
 	}
-	displayPage($output);
+	$this->displayPage($output);
 }
+}
+
+$page = new uploadCal;
 
 if ($_FILES['file']['tmp_name'])
 {
-	processCal();
+	$page->processCal();
 }else
 {
-	displayPage();
+	$page->displayPage();
 }
 ?>

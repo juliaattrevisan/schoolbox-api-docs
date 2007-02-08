@@ -236,7 +236,6 @@ class OutPut
 							$this->set_var('PERIOD_ROOM',$period['room']);
 						}
 						
-						$this->set_var('PERIOD_ONCLICK','');
 						$this->set_var('PERIOD_ABSENTEES','');
 					}
 					else if($_SESSION['campus'][0] == 2 && SITE_location == 'wenona')
@@ -244,12 +243,12 @@ class OutPut
 							$this->set_var('PERIOD_DESC', $period['description']);
 							$this->set_var('PERIOD_CODE','');
 							$this->set_var('PERIOD_ROOM',$period['room']);
-							$this->set_var('PERIOD_ONCLICK','');
 							$this->set_var('PERIOD_ABSENTEES','');
 					}
 					else 
 					{
-						$this->set_var('PERIOD_DESC', $period['description']);
+						$this->set_var('PERIOD_DESC', "<a 
+href=\"/homepage.php?code=".urlencode($period['code'])."\">{$period['description']}</a>");
 						$this->set_var('PERIOD_CODE','('.$period['code'].')');
 						$this->set_var('PERIOD_ROOM',$period['room']);
 						
@@ -259,7 +258,6 @@ class OutPut
 						else
 							$this->set_var('PERIOD_ABSENTEES','');
 							
-						$this->set_var('PERIOD_ONCLICK',"onClick=\"window.location='/homepage.php?code=".urlencode($period['code'])."'\"");
 					}		
 				
 				}

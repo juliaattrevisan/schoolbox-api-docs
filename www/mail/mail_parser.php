@@ -140,10 +140,9 @@ class mail_parser
 				foreach($variable as $varname)
 				{
 					//this is a dirty little hack to make arrays work aswell.
-					//$varstring = '$var = $part->'.$varname.';';
-					//eval($varstring);
-					
-					$temp[$varname] = $part->$varname;
+					$varstring = '$var = $part->'.$varname.';';
+					eval($varstring);
+					$temp[$varname] = $var;
 				}
 				return $temp;
 			} 
