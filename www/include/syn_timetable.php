@@ -22,7 +22,8 @@ function getTimetableDefinition($campus)
 				FROM SynergyOne.dbo.TimetableDefinition TimetableDefinition
 				WHERE TimetableDefinition.FileYear={$_SESSION['FileYear']} AND 
 					TimetableDefinition.FileSemester={$_SESSION['FileSemester']} AND
-					TimetableDefinition.TimetableGroup='{$campusCode[$campus]}'
+					TimetableDefinition.TimetableGroup='{$campusCode[$campus]}' AND
+					TimetableDefinition.DayNumber = 0
 				ORDER BY TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
 				";
 	$result = mssql_query($query, $db);

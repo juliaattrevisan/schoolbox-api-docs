@@ -45,7 +45,7 @@ class Attendance
 		if ($periodnum === false)
 			error(33); //period doesn't exist today
 
-		$this->t_body->set_var("DAYNUMBER", "Day&nbsp;".$daynum);
+		$this->t_body->set_var("DAYNUMBER", $daynum);
 		$this->t_body->set_var("PERNUMBER", $periodnum);
 		$this->t_body->set_var("SUBCODE", $subCode);
 		$this->t_body->set_var("DATE",  date("j/n/Y"));
@@ -358,8 +358,7 @@ $page = new Attendance;
 if(date("w") == 0 ||date("w") == 6)
 	error(32);
 
-if(isset($_POST['submit']) && $_POST['submit'] && isset($_POST['daynum']) && $_POST['daynum'] && 
-isset($_POST['pernum']) && $_POST['pernum'] && isset($_POST['subcode']) && $_POST['subcode'] )
+if( is_numeric($_POST['daynum']) && is_numeric($_POST['pernum']) && $_POST['subcode'] )
 {
 	$page->startAttendanceInsert($_POST['subcode'], $_POST['pernum']);
 	

@@ -88,7 +88,7 @@ class dueWorkPage
 		$query = "SELECT file.description, file.realname, file.id AS fid, 
 			DATE_FORMAT(submission_box.date, '%a, %D of %b %l:%i%p') AS date, submission_box.id, category.name, 
 			UNIX_TIMESTAMP(submission_box.date) AS overdue_date, student_submission.owner, inline 
-			FROM file, submission_box, category LEFT JOIN student_submission
+			FROM (file, submission_box, category) LEFT JOIN student_submission
 			ON student_submission.box_id = submission_box.id AND student_submission.owner = $id
 			LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
 			WHERE submission_box.fid = file.id AND submission_box.category = category.id 
