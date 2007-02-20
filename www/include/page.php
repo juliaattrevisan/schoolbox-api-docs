@@ -200,6 +200,7 @@ function outputMenu($list, $level)
 	{
 		if($list[$i]['target'])
 			$target = " target={$list[$i]['target']}";
+		else $target = '';
 			
 		$text .= '<li class="ormondMenuItem"><a href="'.$list[$i]['url'].'"'.$target.'>'.$list[$i]['txt'].'</a>';
 		if(is_array($list[$i]['children']))

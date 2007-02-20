@@ -28,13 +28,18 @@ class outUser
 		$this->t_body->set_var("NAME", $user['firstname']." ".$user['lastname']);
 		
 			//create owner email address
-			if($user['local_email'])
-				$email = "<a href=\"".$_SESSION['mailhandle'].$user['username']."@".MAIL_address."\">".$user['username']."@".MAIL_address."</a>";
-			else if($user['alt_email'])
-				$email = "<a href=\"".$_SESSION['mailhandle'].$user['alt_email']."\">".$user['alt_email']."</a>";
+			if($user['local_email']) {
+				$emailAddress = $user['username']."@".MAIL_address;
+				$email = "<a href=\"".$_SESSION['mailhandle']."$emailAddress\">$emailAddress</a>";
+			}
+			else if($user['alt_email']) {
+				$emailAddress = $user['alt_email'];
+				$email = "<a href=\"".$_SESSION['mailhandle']."$emailAddress\">$emailAddress</a>";
+			}
 			else
 				$email = "No address available";
-			
+		
+		$this->t_body->set_var("EMAIL_ADDRESS", $emailAddress);
 		$this->t_body->set_var("EMAIL", $email);
 		
 		if($user['extension'] != "")

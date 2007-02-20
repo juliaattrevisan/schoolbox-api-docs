@@ -74,7 +74,8 @@ class ClassList
 						}
 						else
 							$this->t_body->set_var("EMAIL", "");
-		
+			
+						$this->t_body->set_var("EMAIL_ADDRESS", $emailaddr);
 						//get the time since the last visit to this homepage
 						$visitquery = "SELECT DATE_FORMAT(`datetime`, '%a %D %b %H:%i') as visit FROM homepage_log, category
 								  WHERE category.code = '" . $subCode . "'
