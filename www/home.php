@@ -78,10 +78,7 @@ class OutPut
 
 	function setGreeting()
 	{
-		$query = "SELECT firstname FROM user WHERE 
-				id = '".$_SESSION['id']."'";
-		$user = $this->db->dbGetSingleRow($query);
-		$this->set_var("GREETING", $this->greeting()." ".$user['firstname']);
+		$this->set_var("GREETING", $this->greeting()." ".$_SESSION['firstname'].' '.$_SESSION['surname']);
 	}
 
 	function outputNews($location)

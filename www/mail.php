@@ -23,9 +23,11 @@ class OutPut
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "mail.htm");
 
-		$this->t_body->set_var("TITLE", HEADING." - My Mail");
+		$this->t_body->set_var("TITLE", HEADING." - My Messages");
 		
 		$this->t_body->set_block("tplBODY", "mail_listing", "mail_block");
+		
+		$this->t_body->set_var('NAME', $_SESSION['firstname'].' '.$_SESSION['surname']);
 		
 		include("include/page.php");
 	}
@@ -50,6 +52,7 @@ class OutPut
 		// get number of messages
 		$total = imap_num_msg($inbox);
 		$this->set_var("USER", $mail->user);
+		
 
 		//messages per page
 		$increments = MAIL_increment;
@@ -80,14 +83,12 @@ class OutPut
 		}
 
 		$this->set_var("TOTAL", $link);	
-
-		if($total > 0)
+		if($total && $total > 0)
 		{
 			//iterate over messages
 			for($x=$finish; $x>($start-1); $x--)
 			{
 				$email = new mail_parser($inbox, $x);
-
 				//set all the variables
 				$this->set_var("CHECKBOX_NAME", "dmsg[]");
 				$this->set_var("CHECKBOX_VALUE", $x);				
@@ -125,10 +126,11 @@ class OutPut
 				$this->t_body->parse("mail_block", "mail_listing", true);
 			}
 			//clean up
-			imap_close($inbox);
 		}
 		else
 			$this->set_var("mail_block", "</table>You have no mail at this time<table>");
+		
+		imap_close($inbox);
 	}
 
 	function showPage()

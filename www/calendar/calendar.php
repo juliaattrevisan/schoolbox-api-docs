@@ -43,11 +43,29 @@ function checkSecurity($level, $id)
 	}
 	else if($level == 2) //group
 	{
-		return perm($id, 1);
+		if(is_array($id)) {
+			foreach($id as $serv) {
+				$value = perm($serv, 1);
+				if($value >= $perm)
+					$perm = $value;
+			}		
+		}
+		else
+			$perm = perm($id, 1);
+		return $perm;
 	}
 	else if($level == 3) //campus
 	{
-		return perm($id, 2);
+		if(is_array($id)) {
+			foreach($id as $serv) {
+				$value = perm($serv, 2);
+				if($value >= $perm)
+					$perm = $value;
+			}		
+		}
+		else
+			$perm = perm($id, 2);
+		return $perm;
 	}
 	else if($level == 4) //all
 	{
