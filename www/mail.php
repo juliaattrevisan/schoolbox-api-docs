@@ -50,10 +50,12 @@ class OutPut
 		$inbox = $mail->openMailBox();
 	
 		// get number of messages
-		$total = imap_num_msg($inbox);
+		//$total = imap_num_msg($inbox);
+		
+		$status = $mail->mailboxStatus($inbox);
 		$this->set_var("USER", $mail->user);
 		
-
+		$total = $status->messages;
 		//messages per page
 		$increments = MAIL_increment;
 
@@ -89,41 +91,44 @@ class OutPut
 			for($x=$finish; $x>($start-1); $x--)
 			{
 				$email = new mail_parser($inbox, $x);
-				//set all the variables
-				$this->set_var("CHECKBOX_NAME", "dmsg[]");
-				$this->set_var("CHECKBOX_VALUE", $x);				
-				
-				//check if message has been read
-				if($email->header->Unseen == 'U' || $email->header->Recent == 'N')
-					$this->set_var("STYLE", "font-weight: bold;");
-				else
-					$this->set_var("STYLE", "");
-
-				//format date apppropiately
-				$date = strtotime($email->header->Date);
-				$this->set_var("DATE", date('D j/m/y g:i A', $date));
-
-				//if user has a personal name output that otherwise just output there email address
-				if($email->header->from[0]->personal)
-					$from = $email->header->from[0]->personal;
-				else
-					$from = $email->header->from[0]->mailbox . "@" . $email->header->from[0]->host;
-				$this->set_var("FROM", scrubTEXT($from));
-
-				//$this->set_var("FROM", htmlspecialchars($email->header->fromaddress));
-				//correction if no subject
-				if ($email->header->Subject == "")
-					$this->set_var("SUBJECT", "<a href=\"/mail/view_mail.php?msgid=$x\">No Subject</a>");
-				else
-					$this->set_var("SUBJECT", "<a href=\"/mail/view_mail.php?msgid=$x\">".scrubTEXT($email->decodeHeader($email->header->Subject))."</a>");
+				if(is_object($email->header)) {
+					$count++;
+					//set all the variables
+					$this->set_var("CHECKBOX_NAME", "dmsg[]");
+					$this->set_var("CHECKBOX_VALUE", $x);				
 					
-				// parse structure to see if attachments exist
-				// display icon if so
-				if(sizeof($email->getAttachmentList()) > 0)
-					$this->set_var("ATTACHMENT", "<img src=\"/images/paperclip.gif\" width=\"26\" height=\"24\">");
-				else
-					$this->set_var("ATTACHMENT", "&nbsp;");
-				$this->t_body->parse("mail_block", "mail_listing", true);
+					//check if message has been read
+					if($email->header->Unseen == 'U' || $email->header->Recent == 'N')
+						$this->set_var("STYLE", "font-weight: bold;");
+					else
+						$this->set_var("STYLE", "");
+	
+					//format date apppropiately
+					$date = strtotime($email->header->Date);
+					$this->set_var("DATE", date('D j/m/y g:i A', $date));
+	
+					//if user has a personal name output that otherwise just output there email address
+					if($email->header->from[0]->personal)
+						$from = $email->header->from[0]->personal;
+					else
+						$from = $email->header->from[0]->mailbox . "@" . $email->header->from[0]->host;
+					$this->set_var("FROM", scrubTEXT($from));
+	
+					//$this->set_var("FROM", htmlspecialchars($email->header->fromaddress));
+					//correction if no subject
+					if ($email->header->Subject == "")
+						$this->set_var("SUBJECT", "<a href=\"/mail/view_mail.php?msgid=$x\">No Subject</a>");
+					else
+						$this->set_var("SUBJECT", "<a href=\"/mail/view_mail.php?msgid=$x\">".scrubTEXT($email->decodeHeader($email->header->Subject))."</a>");
+						
+					// parse structure to see if attachments exist
+					// display icon if so
+					if(sizeof($email->getAttachmentList()) > 0)
+						$this->set_var("ATTACHMENT", "<img src=\"/images/paperclip.gif\" width=\"26\" height=\"24\">");
+					else
+						$this->set_var("ATTACHMENT", "&nbsp;");
+					$this->t_body->parse("mail_block", "mail_listing", true);
+				}
 			}
 			//clean up
 		}

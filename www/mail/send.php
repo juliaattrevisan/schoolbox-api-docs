@@ -25,9 +25,9 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 	if($user['alt_email'])
 		$from_email = $user['alt_email'];
-	else if($user['local_email'])
+	else if($user['local_email'] || SITE_location == 'wenona')
 		$from_email = $user['username']."@".MAIL_address;
-	else
+	else 
 		error(42);
 
 	//if emails have ; seperator account for it
@@ -65,18 +65,13 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 		$recipients['Cc'] = $cc;
 	}
 	
-	if(strrchr($to, '@')) // cant think of a situation for this
+	if(strrchr($bcc, '@'))
 	{
 			$bcc = str_replace(";",",",$bcc);
+			$headers['Bcc'] = $bcc;
 			$recipients['Bcc'] = $bcc;
 	}
 
-	if(!strrchr($to, '@')) // this makes sense
-	{
-			$bcc = str_replace(";",",",$bcc);
-			$recipients['Bcc'] = $bcc;
-	}
-		
 	$mime = new Mail_mime("\r\n");
 
 	$mime->setHTMLBody($message);
@@ -91,8 +86,10 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	$hdrs = $mime->headers($headers);
 
 	//$params = "-f".$user['username']."@".MAIL_address;
+	if(MAIL_smtp_server)
+		$params['host'] = MAIL_smtp_server;
 
-	$mail =& Mail::factory('smtp');
+	$mail =& Mail::factory('smtp', $params);
 	$return = $mail->send($recipients, $hdrs, $body);
 	if($return != true)
 		error(9, $return->getMessage()); 

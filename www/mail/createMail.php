@@ -124,16 +124,14 @@ else if(isset($_GET['forward']) && $_GET['forward'])
 {
 	$myPage->forwardMail($_GET['forward']);
 }
-else if( isset($_POST['replyto']) && isset($_POST['bcc']) && $_POST['bcc'])
-	$myPage->showPage($_POST['replyto'], $_POST['bcc']);
-else if( (isset($_GET['replyto'])) && $_GET['replyto'])
-	$myPage->showPage($_GET['replyto']);
-else if( (isset($_POST['replyto'])) && $_POST['replyto'])
-	$myPage->showPage($_POST['replyto']);
+else if( $_REQUEST['replyto'] || $_REQUEST['bcc'])
+	$myPage->showPage($_REQUEST['replyto'], $_REQUEST['bcc']);
 //if form has been submitted
 else if(isset($_POST['to']) && $_POST['to'])
 {
 	$myPage->sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message']);
 }	
-else
+else if(SITE_location != 'wenona')
 	$myPage->showPage();
+else
+	error(2);

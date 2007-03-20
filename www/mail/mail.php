@@ -46,12 +46,17 @@ class Mail
 	{
 
 		if(MAIL_retrieval == "imap")
-			$server="{".$this->mail_host.":143/imap/notls/norsh}INBOX";
+			$this->server="{".$this->mail_host.":143/imap/notls/norsh}INBOX";
 		else
-			$server="{".$this->mail_host.":110/pop3}INBOX";
+			$this->server="{".$this->mail_host.":110/pop3}INBOX";
 		
-		$inbox = @imap_open ($server, $this->user, $this->password) or error(4);
+		$inbox = @imap_open ($this->server, $this->user, $this->password) or error(4);
+		$this->inbox = $inbox;
 		return $inbox;
+	}
+	
+	function mailboxStatus($inbox){
+		return imap_status($inbox, $this->server, SA_ALL);
 	}
 
 	function mailExists($msgid, $inbox)
@@ -89,15 +94,16 @@ class Mail
 	{
 		//open mailbox
 		$inbox = $this->openMailBox();
-	
 		// delete specified message numbers
 		for($x=0; $x<sizeof($deleteArray); $x++)
 		{
-			if($this->mailExists($deleteArray[$x], $inbox))
-			imap_delete($inbox, $deleteArray[$x]);
+			if($this->mailExists($deleteArray[$x], $inbox)) {
+				imap_delete($inbox, $deleteArray[$x]);
+			}
 		}
 	
 		//clean up
+		imap_expunge($inbox);
 		imap_close($inbox, CL_EXPUNGE);
 		//reload the page.. 
 		localRedir("/mail.php");

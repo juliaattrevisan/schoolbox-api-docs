@@ -41,6 +41,9 @@ h2 {
 .standardForm h2 {
 	background:transparent;
 	}
+.large_head, .small_head {
+	padding:4px 0 5px 4px;
+	}
 h3 {
 	font-size:100%;
 	}

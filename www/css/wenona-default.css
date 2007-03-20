@@ -497,7 +497,7 @@ br.fix {
 #content table tr{
 	vertical-align:middle;
 	}
-#content table th {
+#content table th, #content table th a {
 	padding:3px;
 	background:#002452;
 	color:#fff;

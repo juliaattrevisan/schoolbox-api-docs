@@ -85,6 +85,7 @@ define('TIMETABLE_day_count',serialize(array(1=>7,7,5)));
 define("MAIL_enable", false);				//This will disable webmail module
 define("MAIL_retrieval", "imap");			//Options are pop or imap (imap has extra state information)
 define("MAIL_host", "mail.mgs.vic.edu.au");
+define("MAIL_smtp_server", "mail.mgs.vic.edu.au");
 define("MAIL_address", "mgs.vic.edu.au");
 define("MAIL_increment", 20);					//Amount of emails per page
 
