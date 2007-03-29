@@ -11,87 +11,91 @@ require("../../include/include.php");
 require("../../include/permission.php");
 require("common.php");
 
-$currentYear = date("Y");
 
-if($_GET['week'] == 0)
-	$week = getCurrentWeek( mktime()-604800 );
-else
-	$week = $_GET['week'];
+class ProxyUsage {
 
-$proxydb = new dbManager("proxy");
-$proxydb->dbConnect();
+function ProxyUsage() {
+	$currentYear = date("Y");
 
-$this->t_body = new Template(TPL_directory);
-
-//check perms
-$perms = perm(0, 4);
-
-if($_GET['usage'])
-{
-	//only people with rights can access this page
-	if($perms != 3 && $perms != 2)
-		error(19);
-
-	//display full usage report for week
-	
-	$this->t_body->set_file("tplBODY", "modules/proxy/full_list.htm");
-	include("../../include/page.php");
-	$proxydb->dbDoQuery("use proxy");
-
-	$this->t_body->set_var("TITLE", HEADING." - Full Listing of Proxy Usage");
-	$this->t_body->set_block("tplBODY", "user", "user_block");
-	
-	$this->t_body->set_var("TOPIC", "Usage");
-
-	//if campus submitted use that otherwise default to user campus
-	if($_GET['campus'])
-		$campusid = $_GET['campus'];
+	if($_GET['week'] == 0)
+		$week = getCurrentWeek( mktime()-604800 );
 	else
-		$campusid = $_SESSION['campus'][0];
+		$week = $_GET['week'];
 
-	if($campusid == ALLCAMPUS)
-		$campusquery = "";
-	else
-		$campusquery = "AND userCampus.campus = '$campusid'";
+	$proxydb = new dbManager("proxy");
+	$proxydb->dbConnect();
 
-	if($perms == 3)
+	$this->t_body = new Template(TPL_directory);
+
+	//check perms
+	$perms = perm(0, 4);
+
+	if($_GET['usage'])
 	{
-		$this->t_body->set_var("WHO", "Everyone");
-		$studquery = "";
-	}
-	else 
-	{
-		$this->t_body->set_var("WHO", "All Students");
-		$studquery = "AND user.group_id NOT IN(1,2)";
-	}
+		//only people with rights can access this page
+		if($perms != 3 && $perms != 2)
+			error(19);
+	
+		//display full usage report for week
+	
+		$this->t_body->set_file("tplBODY", "modules/proxy/full_list.htm");
+		include("../../include/page.php");
+		$proxydb->dbDoQuery("use proxy");
+
+		$this->t_body->set_var("TITLE", HEADING." - Full Listing of Proxy Usage");
+		$this->t_body->set_block("tplBODY", "user", "user_block");
+	
+		$this->t_body->set_var("TOPIC", "Usage");
+
+		//if campus submitted use that otherwise default to user campus
+		if($_GET['campus'])
+			$campusid = $_GET['campus'];
+		else
+			$campusid = $_SESSION['campus'][0];
+
+		if($campusid == ALLCAMPUS)
+			$campusquery = "";
+		else
+			$campusquery = "AND userCampus.campus = '$campusid'";
+
+		if($perms == 3)
+		{
+			$this->t_body->set_var("WHO", "Everyone");
+			$studquery = "";
+		}
+		else 
+		{
+			$this->t_body->set_var("WHO", "All Students");
+			$studquery = "AND user.group_id NOT IN(1,2)";
+		}
 
 
-	$query = "SELECT DISTINCT user.firstname, user.lastname, user.id, proxy.usage_report_week.user, usage_report_week.datausage
+		$query = "SELECT DISTINCT user.firstname, user.lastname, user.id, proxy.usage_report_week.user, usage_report_week.datausage
 		FROM proxy.usage_report_week
 		RIGHT JOIN intranet.user ON usage_report_week.user = user.id
                 LEFT JOIN intranet.userCampus ON user.id = userCampus.uid
 		WHERE usage_report_week.year = '$currentYear' AND usage_report_week.week = '$week' $studquery $campusquery
 		ORDER BY usage_report_week.datausage DESC";
 
-	$proxydb->dbDoQuery($query);
+		$proxydb->dbDoQuery($query);
+	
+		for($x = 1; $row = $proxydb->dbGetNextArray(); $x++ )
+		{
+			$this->t_body->set_var("POS", $x.".");
+			$this->t_body->set_var("NAME", $row['firstname']." ".$row['lastname']);
+	                $this->t_body->set_var("UID", $row['id']);
+			$this->t_body->set_var("HITS", bytesToString($row['datausage']));
+			$this->t_body->set_var("VIEW", "<a href=\"proxy_log.php?uid=".$row['id']."&week=$week\">view urls</a>");
 
-	for($x = 1; $row = $proxydb->dbGetNextArray(); $x++ )
-	{
-		$this->t_body->set_var("POS", $x.".");
-		$this->t_body->set_var("NAME", $row['firstname']." ".$row['lastname']);
-                $this->t_body->set_var("UID", $row['id']);
-		$this->t_body->set_var("HITS", bytesToString($row['datausage']));
-		$this->t_body->set_var("VIEW", "<a href=\"proxy_log.php?uid=".$row['id']."&week=$week\">view urls</a>");
-
-		$this->t_body->parse("user_block", "user", true);
-	}
+			$this->t_body->parse("user_block", "user", true);
+		}
 		
 
-}
-else if($_GET['cid'])
-{
-	if($perms != 3 && $perms != 2)
-		error(19);
+	}
+	else if($_GET['cid'])
+	{
+		if($perms != 3 && $perms != 2)
+			error(19);
 
 	//display full category word matches
 
@@ -396,5 +400,7 @@ else
 $this->t_body->set_var("WEEK", $week);
 
 $this->t_body->pparse("finaloutput", "tplBODY");
-
+}
+}
+$page = new ProxyUsage;
 ?>

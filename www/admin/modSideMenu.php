@@ -181,7 +181,7 @@ class modSideMenu
 		$html .= "<option value=\"\">No Target</option>";
 		if($selected == "_blank")
 			$html .= "<option value=\"_blank\" selected>New Window</option>";
-        	else
+        else
 			$html .= "<option value=\"_blank\">New Window</option>";
 		$html .= "</select>";
 		return $html;

@@ -18,11 +18,11 @@
 	
 	// Tyson Day Jan 2006
 	function ImageRotate(buttonid) {
-		if (document.getElementById(buttonid).src == "/images/button_add.jpg") {
-			document.getElementById(buttonid).src = "/images/button_cross.jpg";	
+		if (document.getElementById(buttonid).src == "http://portal.mgs.vic.edu.au/images/button_add.jpg") {
+			document.getElementById(buttonid).src = "http://portal.mgs.vic.edu.au/images/button_cross.jpg";	
 		}
 		else {
-			document.getElementById(buttonid).src = "/images/button_add.jpg";
+			document.getElementById(buttonid).src = "http://portal.mgs.vic.edu.au/images/button_add.jpg";
 		}
 	}
 //-->
@@ -41,9 +41,7 @@
 <script type="text/javascript" src="/javascript/udm-resources/udm-custom_mgs.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
-<!-- #BeginEditable "scripts" -->
-
-<!-- #EndEditable -->
+<!-- #BeginEditable "scripts" --><!-- #EndEditable -->
 </head>
 <body>
 <!-- THESE ARE MEANT TO GO HERE -->
@@ -161,7 +159,7 @@
                       <td width="10%">{TYPE}</td>
 		              <td width="15%">{OFFENCE}</td>
                       <td width="10%">{DETAILS}</td>
-                      <td width="10%">{DATE}</td>
+                      <td width="10%" nowrap>{DATE}</td>
                       <td width="15%"><a href="/modules/detention/viewDet.php?id={ID}&amp;confirm=1&amp;type={TYPE}">Confirm</a> / <a href="/modules/detention/modifyDet.php?id={ID}">Modify</a></td>
                     </tr>
 					<tr id="show{UNIQID}" style="display:none;">
@@ -234,7 +232,7 @@
             <br />
                   <table>
                     <tr>
-                      <td colspan="9"><h2>Confirmed</h2></td>
+                      <td colspan="10"><h2>Confirmed</h2></td>
                     </tr>
 		    <!-- BEGIN conf_header -->
                     <tr>
@@ -245,39 +243,41 @@
                       <td><b>Type</b></td>
 		      		  <td><b>Offence</b></td>
                       <td><b>Details</b></td>
-                      <td colspan="2"><b>Date</b></td>
+                      <td><strong>Created</strong></td>
+                      <td><b>Allocated</b></td>
+                      <td>&nbsp;</td>
                     </tr>
 		    <!-- END conf_header -->
 		    <tr>
 			<td width="5%"></td>
-			<td colspan="8"><hr /></td>
+			<td colspan="9"><hr /></td>
 		    </tr>
                     <!-- BEGIN confirmed -->
                     <tr>
 					  <td width="5%"></td>
-                      <td width="15%">{NAME}</td>
-                      <td width="10%">{YEAR}</td>
-                      <td width="10%">{HOUSE}</td>
-                      <td width="10%">{TYPE}</td>
-		              <td width="15%">{OFFENCE}</td>
-                      <td width="10%">{DETAILS}</td>
-                      <td width="10%">{DATE}</td>
-                      <td width="15%"><a href="/modules/detention/modifyDet.php?id={ID}">Modify</a> / <a href="/modules/detention/viewDet.php?id={ID}&amp;delete=1">Delete</a></td>
+                      <td>{NAME}</td>
+                      <td>{YEAR}</td>
+                      <td>{HOUSE}</td>
+                      <td>{TYPE}</td>
+		              <td>{OFFENCE}</td>
+                      <td>{DETAILS}</td>
+                      <td nowrap>{CREATED}</td>
+                      <td >{DATE}</td>
+                      <td nowrap><a href="/modules/detention/modifyDet.php?id={ID}">Modify</a> / <a href="/modules/detention/viewDet.php?id={ID}&amp;delete=1">Delete</a></td>
                     </tr>
 					<tr id="show{UNIQID}" style="display:none;">
 					<td width="5%"></td>
-					<td colspan="8">
+					<td colspan="9">
 					    <form class="standardForm">
 					    <table>
 						  <tr><td width="30%"><b>Staff:</b></td><td width="35%"><b>Work Set:</b></td><td width="35%"><b>Details:</b></td></tr>
 						  <tr><td><i>{STAFF}</i></td><td><i>{WORKSET}</i></td><td><i>{HISTORY}</i></td></tr>
 						</table>
-						</form>
-					</td></tr>
+					</form>					</td></tr>
                     <!-- END confirmed -->
 		    <tr>
 			<td width="5%"></td>
-			<td colspan="8"><hr /></td>
+			<td colspan="9"><hr /></td>
 		    </tr>
                   </table>
 				  <br />

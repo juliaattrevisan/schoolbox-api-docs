@@ -30,11 +30,11 @@ function showFields(){
 	
 	// Tyson Day Jan 2006
 	function ImageRotate(buttonid) {
-		if (document.getElementById(buttonid).src == "/images/button_add.jpg") {
-			document.getElementById(buttonid).src = "/images/button_cross.jpg";	
+		if (document.getElementById(buttonid).src == "http://portal.mgs.vic.edu.au/images/button_add.jpg") {
+			document.getElementById(buttonid).src = "http://portal.mgs.vic.edu.au/images/button_cross.jpg";	
 		}
 		else {
-			document.getElementById(buttonid).src = "/images/button_add.jpg";
+			document.getElementById(buttonid).src = "http://portal.mgs.vic.edu.au/images/button_add.jpg";
 		}
 	}
 window.onload = new Function('showFields();');
@@ -202,7 +202,7 @@ window.onload = new Function('showFields();');
                                 </select></td></tr><tr>
                               <td><h2>Start Date:</h2></td><td>{SDAY}&nbsp;{SMTH}</td></tr><tr>
 							  <td><h2>End Date:</h2></td><td>{EDAY}&nbsp;{EMTH}</td></tr><tr>
-                              <td></td><td><a href="javascript:document.all.detListForm.submit()">Filter Results</a></td>
+                              <td></td><td><input type="submit" name="submit" value="Filter Results" /></td>
                             </tr>
                           </table>
                   </form>
@@ -235,7 +235,7 @@ window.onload = new Function('showFields();');
                 <td width="10%">{TYPE}</td>
 		        <td width="15%">{OFFENCE}</td>
                 <td width="10%">{DETAILS}</td>
-                <td width="10%">{DATE}</td>
+                <td width="10%" nowrap>{DATE}</td>
                 <td width="15%">{ACTION}</td>
               </tr>
 			  <tr id="show{UNIQID}" style="display:none;">

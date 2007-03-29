@@ -20,11 +20,21 @@ if(($perms != 2 && $perms !=3) && ($_SESSION['id'] != $_REQUEST['uid']))
 
 $currentYear = date("Y");
 
-$db = new dbManager();
-$db->dbConnect();
 
 if($_REQUEST['uid'] && ($_REQUEST['bdate'] && $_REQUEST['bmonth'] && $_REQUEST['edate'] && $_REQUEST['emonth']) || $_REQUEST['week'])
 {
+	$proxyLog = new ProxyLog();
+}
+else
+	error(0);
+
+class ProxyLog {
+
+function ProxyLog() {
+	$db = new dbManager();
+	$db->dbConnect();
+
+	global $months;
 
 	$this->t_body = new Template(TPL_directory);
 	$this->t_body->set_file("tplBODY", "modules/proxy/history_list.htm");
@@ -67,7 +77,7 @@ if($_REQUEST['uid'] && ($_REQUEST['bdate'] && $_REQUEST['bmonth'] && $_REQUEST['
 		$keyword = " url like '%".$_REQUEST['keyword']."%'";
 
 	$totalrows = 0;
-	$resultsperpage = 45;
+	$resultsperpage = 100;
 
 	if($_REQUEST['page'])
 		$page = $_REQUEST['page'];
@@ -98,7 +108,6 @@ if($_REQUEST['uid'] && ($_REQUEST['bdate'] && $_REQUEST['bmonth'] && $_REQUEST['
 	{
 		$query = "SELECT DATE_FORMAT(time, '%e/%c %l:%i %p') as outtime, ip, url, UNIX_TIMESTAMP(time) as utime FROM ".$months[$i]." 
 			WHERE user like '".$user['username']."' AND time > FROM_UNIXTIME('$begintime') AND time < FROM_UNIXTIME('$endtime')";	
-
 		if($keyword)
 			$query .= "AND ( $keyword )";
 		
@@ -199,6 +208,6 @@ if($_REQUEST['uid'] && ($_REQUEST['bdate'] && $_REQUEST['bmonth'] && $_REQUEST['
 
 	$this->t_body->pparse("finaloutput", "tplBODY");
 }
-else
-	error(0);
+}
+
 ?>

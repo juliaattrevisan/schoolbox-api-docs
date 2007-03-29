@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/main.dwt" codeOutsideHTMLIsLocked="false" -->
 <!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
 <!--  Visit us at www.lektec.com.au -->
 <head>
@@ -19,9 +19,9 @@
 <script type="text/javascript" src="/javascript/udm-resources/udm-custom_mgs.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
-<!-- #BeginEditable "scripts" -->
+<!-- InstanceBeginEditable name="scripts" -->
 
-<!-- #EndEditable -->
+<!-- InstanceEndEditable -->
 </head>
 <body>
 <!-- THESE ARE MEANT TO GO HERE -->
@@ -90,7 +90,7 @@
 		</div>
 	</div>
 	<!-- end left -->
-	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/News_Active.lbi" -->
+	<!-- #BeginEditable "tabs" --> <!-- #BeginLibraryItem "/Library/News_Active.lbi" -->
 	<div id="topNav">
 		<ul>
 			<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
@@ -108,11 +108,12 @@
 	<!-- #EndLibraryItem --><!-- #EndEditable -->
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" -->
-			<h1>Internet Usage for {FULLNAME}</h1>
+					<h1>Internet Usage for {FULLNAME}</h1>
 			<table>
 			<tr><td style="width:75%; vertical-align:top;">
 			<h2>User Details</h2>
 			<div class="indent">
+			<form class="standardForm">
 				<table class="standard">
 					<tr>
 						<td><h2>Name</h2></td>
@@ -133,9 +134,11 @@
 						<td>{YEAR}</td>
 					</tr>
 				</table>
+				</form>
 			</div>
 			<h2>Usage</h2>
 			<div class="indent">
+			<form class="standardForm">
 				<table class="standard">
 					<tr>
 						<td><h2>Last Week</h2></td>
@@ -146,10 +149,12 @@
 						<td>{TOTAL_USAGE}</td>
 					</tr>
 				</table>
+				</form>
 			</div>
 			<!-- BEGIN filter_matches -->
 			<h2>Filter Matches</h2>
 			<div class="indent">
+			<form class="standardForm">
 			<table class="standard">
 				<!-- BEGIN category -->
 				<tr>
@@ -169,6 +174,7 @@
 				</tr>
 				<!-- END category -->
 			</table>
+			</form>
 			</div>
 			<!-- END filter_matches -->
 			</td><td>
@@ -178,8 +184,8 @@
 <p class="indent">As a network user, you are responsible for using the MGS Network for educational purposes and in an appropriate manner.</p>
 					<br />
 					<!-- BEGIN search_row -->
-					<div class="indent"
-<form action="proxy_log.php" method="post" class="standard">
+					<div class="indent">
+<form action="proxy_log.php" method="post" class="standardForm">
 								<table>
 									<tr>
 										<th colspan="2">Search User History</th>
@@ -190,11 +196,11 @@
 									</tr>
 									<tr>
 										<td><h2>From </h2></td>
-										<td>{BEGIN_DATE}{BEGIN_MONTH}</td>
+										<td nowrap="nowrap">{BEGIN_DATE}{BEGIN_MONTH}</td>
 									</tr>
 									<tr>
 										<td><h2>To</h2></td>
-										<td>{END_DATE}{END_MONTH}</td>
+										<td nowrap="nowrap">{END_DATE}{END_MONTH}</td>
 									</tr>
 									<tr>
 										<td>&nbsp;</td>
@@ -202,12 +208,12 @@
 											<input name="Submit" type="submit" class="formbutton" id="Submit" value="Submit" />
 										</td>
 									</tr>
-								</table>
-							</form>
+				</table>
+					  </form>
 							</div>
 					<!-- END search_row -->
 				</td></tr></table>
-			<!-- #EndEditable --> </div>
+		 <!-- #EndEditable --> </div>
 		<div id="footer">
 			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
 			<p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
@@ -216,4 +222,4 @@
 	</div>
 </div>
 </body>
-<!-- #EndTemplate --></html>
+<!-- InstanceEnd --></html>

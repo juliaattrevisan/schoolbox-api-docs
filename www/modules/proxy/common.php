@@ -78,9 +78,9 @@ function createWeekList($selectedWeek, $name, $extras)
 		$date = beginDateOfWeek(date("Y"), $i);	
 
 		if($i == $selectedWeek)
-                        $week .= "<option value=\"$i\" selected>".date("jS of F", $date)."</option>";
+                        $week .= "<option value=\"$i\" selected>".date("jS \of F", $date)."</option>";
                 else
-                        $week .= "<option value=\"$i\">".date("jS of F", $date)."</option>";
+                        $week .= "<option value=\"$i\">".date("jS \of F", $date)."</option>";
 	}
 
 	$week .= "</select>";
