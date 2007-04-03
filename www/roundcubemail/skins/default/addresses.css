@@ -1,0 +1,116 @@
+/***** RoundCube|Mail address book task styles *****/
+
+
+#abooktoolbar
+{
+  position: absolute;
+  top: 45px;
+  left: 200px;
+  height: 35px;
+}
+
+#abooktoolbar a
+{
+  padding-right: 10px;
+}
+
+#abookcountbar
+{
+  position: absolute;
+  top: 60px;
+  left: 490px;
+  width: 240px;
+  height: 20px;
+  text-align: left;
+}
+
+#abookcountbar span
+{
+  font-size: 11px;
+  color: #333333;
+}
+
+
+#addresslist
+{
+  position: absolute;
+  top: 85px;
+  left: 20px;
+  width: 450px;
+  bottom: 40px;
+  border: 1px solid #999999;
+  background-color: #F9F9F9;
+  overflow: auto;
+  /* css hack for IE */
+  height: expression((parseInt(document.documentElement.clientHeight)-135)+'px');
+}
+
+#contacts-table
+{
+  width: 100%;
+  table-layout: fixed;
+  /* css hack for IE */
+  width: expression(document.getElementById('addresslist').clientWidth);
+}
+
+
+#contacts-table tbody td
+{
+  cursor: pointer;
+}
+
+
+#contacts-box
+{
+  position: absolute;
+  top: 85px;
+  left: 490px;
+  right: 40px;
+  bottom: 40px;
+  border: 1px solid #999999;
+  overflow: hidden;
+  /* css hack for IE */
+  width: expression((parseInt(document.documentElement.clientWidth)-80-document.getElementById('addresslist').offsetWidth)+'px');
+  height: expression((parseInt(document.documentElement.clientHeight)-135)+'px');
+}
+
+
+#addressviewsplitter
+{
+  background-position: 6px center;
+}
+
+#addressviewsplitter .splitterLine
+{
+  margin-left: 3px;
+  width: 9px;
+}
+
+
+body.iframe,
+#contact-frame
+{
+  background-color: #F9F9F9;
+}
+
+#contact-frame
+{
+  border: none;
+/* visibility: hidden; */
+}
+
+
+#contact-details
+{
+  padding: 15px 20px 10px 20px;
+}
+
+#contact-details table td.title
+{
+  color: #666666;
+  font-weight: bold;
+  text-align: right;
+  padding-right: 10px;
+}
+
+
