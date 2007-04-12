@@ -345,6 +345,7 @@ if(isset($_POST['description']) && $_POST['description'])
 	{
 		//call file security checks
 		include("../include/fileSecurity.php");
+		fileSecurityCheck(true, true, true, true);
 
 		include("file.php");
 		$fileDB = new file; 
