@@ -119,10 +119,10 @@ function authenticate(&$db, $username, $password, $remember = 0)
 			$_SESSION['mailhandle'] = "/mail/createMail.php?replyto=";
 
 		//if wenona store password in session for single signon
-		if(SITE_location == 'wenona')
-		{
+		//if(SITE_location == 'wenona')
+		//{
 			$_SESSION['password'] = $user['email_pass'];
-		}
+		//}
 		//superuser value, used to bypass most security checks
 		if($user['su'] != "")
 			$_SESSION['su'] = 1;

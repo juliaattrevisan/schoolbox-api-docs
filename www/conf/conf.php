@@ -34,6 +34,7 @@ define('LDAP_base', '');
 
 //CMS options
 define("FILE_directory", "/usr/local/www/portal/files");	//Files uploaded using CMS system will be stored here
+define("MYFILE_directory", "/usr/local/www/portal/myFiles");	//Files uploaded using CMS system will be stored here
 define("SUBMISSION_directory", "/usr/local/www/portal/submissions");	//All files submitted to submission box stored here
 define("RETURNS_directory", "/usr/local/www/portal/returns");		//Returned work will be stored in this directory
 define("TPL_directory", "/usr/local/www/portal/mgs_templates");		//Where site templates are located
@@ -85,9 +86,12 @@ define('TIMETABLE_day_count',serialize(array(1=>7,7,5)));
 define("MAIL_enable", false);				//This will disable webmail module
 define("MAIL_retrieval", "imap");			//Options are pop or imap (imap has extra state information)
 define("MAIL_host", "mail.mgs.vic.edu.au");
-define("MAIL_smtp_server", "mail.mgs.vic.edu.au");
-define("MAIL_address", "mgs.vic.edu.au");
+define("MAIL_port", 143);
+define("MAIL_smtp_server", "localhost");
+define("MAIL_smtp_port", 25);
+define("MAIL_domain", "mgs.vic.edu.au");
 define("MAIL_increment", 20);					//Amount of emails per page
+define("MAIL_db", "roundcubemail");
 
 
 //Weather options

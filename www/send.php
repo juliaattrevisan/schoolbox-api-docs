@@ -19,8 +19,12 @@ if(isset($_GET['id']) && $_GET['id'])
 	$db = new dbManager;
 	$db->dbConnect();
 
-	//needs to check file permissions otherwise we have security problem
-	$query = "SELECT realname, mime_type, category FROM file WHERE id = '".$_GET['id']."'";
+	if(!isset($_GET['myFile'])){
+		//needs to check file permissions otherwise we have security problem
+		$query = "SELECT realname, mime_type, category FROM file WHERE id = '".$_GET['id']."'";
+	}else{
+		$query = "SELECT * FROM myFile WHERE id = '".$_GET['id']."'";
+	}
 	$db->dbDoQuery($query);
 	
 	if($db->dbCountRows() < 1)
@@ -33,9 +37,29 @@ if(isset($_GET['id']) && $_GET['id'])
 			$attach = "";
 		
 		$resultArray = $db->dbGetNextArray();
-		
+
 		//check perms to double check security
-		if(perm($resultArray['category'], 1) > 0)
+		if(isset($_GET['myFile'])){
+			if($resultArray['owner'] == $_SESSION['id']){
+				//all checks completed.. continue with file send
+				$filename = MYFILE_directory ."/". $_GET['id'] . ".dat";
+	
+				$filesize = @filesize($filename);
+				if($filesize == FALSE) //if we cannot find the file (something is wrong dont link to it)
+					error(41);
+	
+				//send headers
+				if($resultArray['mime_type'])		
+					header ("Content-Type: {$resultArray['mime_type']}"); 
+				else
+					header ("Content-Type: application/octet-stream"); 
+			
+				header ("Content-Disposition: $attach filename=\"".$resultArray['realname']."\""); 
+				header ("Content-Length: $filesize");	
+				readfile($filename);
+			}
+		}
+		elseif(perm($resultArray['category'], 1) > 0)
 		{
 			//all checks completed.. continue with file send
 			$filename = FILE_directory ."/". $_GET['id'] . ".dat";

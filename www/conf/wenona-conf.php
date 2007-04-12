@@ -77,10 +77,15 @@ define("TIMETABLE_definition", serialize(array(
 
 
 //Webmail
-define("MAIL_enable", true);				//This will disable webmail module
+define("MAIL_enable", false);				//This will disable webmail module
 define("MAIL_retrieval", "imap");			//Options are pop or imap (imap has extra state information)
-define("MAIL_host", "172.16.0.7");
-define("MAIL_address", "wenona.nsw.edu.au");
+define("MAIL_host", "mail.mgs.vic.edu.au");
+define("MAIL_port", 143);
+define("MAIL_smtp_server", "localhost");
+define("MAIL_smtp_port", 25);
+define("MAIL_domain", "mgs.vic.edu.au");
+define("MAIL_increment", 20);					//Amount of emails per page
+define("MAIL_db", "roundcubemail");
 
 
 //Weather options

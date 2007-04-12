@@ -6,8 +6,8 @@
 	</head>
 
 	<frameset rows="*,26" border="0" framespacing="0" frameborder="no">
-		<frame src="/send.php?id=<?=$_GET['id']?>" name="TopFrame" noresize>
-		<frame src="/sendbanner.php?id=<?=$_GET['id']?>" name="BottomFrame" noresize scrolling="no">
+		<frame src="/send.php?<?=http_build_query($_GET);?>" name="TopFrame" noresize>
+		<frame src="/sendbanner.php?<?=http_build_query($_GET);?>" name="BottomFrame" noresize scrolling="no">
 	</frameset>
 	<noframes>
 
