@@ -30,7 +30,7 @@ class ViewSubmissionPage {
 		//log page
 		$this->logPageView($box_id);
 
-		$query = "SELECT student_submission.id, user.firstname, user.lastname, user.id AS uid,
+		$query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid,
 			DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked 
 			FROM student_submission, user WHERE owner = user.id AND box_id = '$box_id' ORDER BY lastname";  
 	
@@ -40,8 +40,8 @@ class ViewSubmissionPage {
 		{
 			while($line = $this->db->dbGetNextArray() )
 			{
-				$this->t_body->set_var("OWNER", $line['lastname'].", ".$line['firstname']);
-				$this->t_body->set_var("OWNER_ESCAPED", addslashes($line['lastname'].", ".$line['firstname']));
+				$this->t_body->set_var("OWNER", formatName('{lastname}, {firstname}', $line));
+				$this->t_body->set_var("OWNER_ESCAPED", addslashes(formatName('{lastname}, {firstname}', $line)));
 				$this->t_body->set_var("DATE", $line['date']);
 				$this->t_body->set_var("VIEW", "sendframe.php?view=".$line['id']);
 				$this->t_body->set_var("SAVE", "viewSubmission.php?view=".$line['id']."&save=1");
@@ -132,7 +132,7 @@ class ViewSubmissionPage {
 		//check user has access to student submission
 
 		//check if user has rights to view file and get file details and username for appending to save
-		$query = "SELECT student_submission.realname, user.lastname, user.firstname 
+		$query = "SELECT student_submission.realname, user.lastname, user.title, user.firstname 
 			FROM submission_box, student_submission, user 
 			WHERE student_submission.id = '$id' AND student_submission.box_id = submission_box.id 
 			AND submission_box.owner = '".$_SESSION['id']."' AND student_submission.owner = user.id";    	

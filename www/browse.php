@@ -78,13 +78,13 @@ class OutPut
 		$catQuery = "SELECT id, name, template, code FROM category WHERE parent = ".$this->category." ORDER BY name";
 
 		$fileQuery = "SELECT file.id, file.realname, DATE_FORMAT(file.submitted, '".FILE_date_format."') AS submitted, 
-		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, file.description, file.comment, file.mime_type,
+		user.username, user.title, user.firstname, user.lastname, user.local_email, user.alt_email, file.description, file.comment, file.mime_type,
 		iconFile, allowedFileTypes.description as mime_description, inline
 		FROM file LEFT JOIN user ON user.id = file.owner LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
 		WHERE file.category = ".$this->category." AND deleted = '0'";
 
 		$linkQuery = "SELECT link.id, link.url, DATE_FORMAT(link.submitted, '".FILE_date_format."') AS submitted, 
-		user.username, user.firstname, user.lastname, user.local_email, user.alt_email, link.description, link.comment 
+		user.username, user.title, user.firstname, user.lastname, user.local_email, user.alt_email, link.description, link.comment 
 		FROM link LEFT JOIN user ON user.id = link.owner WHERE link.category = ".$this->category."";
 
 		$result = $this->db->dbDoQuery($catQuery);
@@ -277,7 +277,7 @@ class OutPut
 			$this->t_body->set_var("COMMENT", scrubTEXT($fileDetails['comment']));
 		
 			// set owner
-			$fullname = $fileDetails['firstname']." ".$fileDetails['lastname'];
+			$fullname = formatName(NULL, $fileDetails);
 		
 			//create owner email address
 			if($fileDetails['local_email'])
@@ -339,7 +339,7 @@ class OutPut
 			$this->t_body->set_var("COMMENT", scrubTEXT($linkDetails['comment']));
 			
 			// set owner
-			$fullname = $linkDetails['firstname']." ".$linkDetails['lastname'];
+			$fullname = formatName(NULL, $linkDetails);
                 
 			if($linkDetails['local_email'])
 				$owner = "<a href=\"".$_SESSION['mailhandle'].$linkDetails['username']."@".MAIL_address."\">$fullname</a>";
@@ -378,7 +378,7 @@ class OutPut
 	
 		//output link to homepage
 		if($catDetails['template'])
-			$this->t_body->set_var("HOMEPAGE", "<a href=\"/homepage.php?category=".$catDetails['id']."\">homepage</a>");
+			$this->t_body->set_var("HOMEPAGE", "<a id=\"home\" href=\"/homepage.php?category=".$catDetails['id']."\" title=\"homepage\"></a>");
 		else
 			$this->t_body->set_var("HOMEPAGE", "");
 			

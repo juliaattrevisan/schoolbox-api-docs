@@ -181,11 +181,11 @@ class Attendance
 		//get teacher name 
 		$mydb = new dbManager;
 		$mydb->dbConnect();
-		$query = "SELECT firstname, lastname FROM user WHERE id = '".$_SESSION['id']."'";
+		$query = "SELECT title, firstname, lastname FROM user WHERE id = '".$_SESSION['id']."'";
 		$mydb->dbDoQuery($query);
 		$teacher = $mydb->dbGetNextArray();
 		
-		$this->t_body->set_var("TEACHERNAME", $teacher['firstname']." ".$teacher['lastname']);
+		$this->t_body->set_var("TEACHERNAME", formatName(NULL, $teacher));
 
             
                 $query = "SELECT Timetable.Room, SubjectClasses.Description,

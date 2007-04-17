@@ -113,5 +113,8 @@ define("STUDENTGROUPIDS", serialize(array(3)));	//List of id numbers representin
 define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
 define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 
+// Name format display options.
+define("NAME_FORMAT", "{title} {firstname} {lastname}");
+
 
 ?>

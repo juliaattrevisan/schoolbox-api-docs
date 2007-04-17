@@ -91,7 +91,7 @@ class stats
 
 	  	//get top ten recent hits
 		$query = "
-			SELECT 	lastname, firstname, username, local_email, alt_email, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date, hitcount 
+			SELECT 	lastname, title, firstname, username, local_email, alt_email, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date, hitcount 
 			FROM 	user, homepage_log, category
 			WHERE   category.id = '" . $this->category . "'	
 			AND	category.id = homepage_log.cid  	
@@ -134,7 +134,7 @@ class stats
 		$this->t_body->set_var("DISPLAY", "");
 
 		$query = "
-			SELECT 	lastname, firstname, hitcount, username, local_email, alt_email, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date
+			SELECT 	lastname, title, firstname, hitcount, username, local_email, alt_email, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date
 			FROM 	user, homepage_log, category
 			WHERE   category.id = '" . $this->category . "'	
 			AND	category.id = homepage_log.cid  	
@@ -174,7 +174,7 @@ class stats
 		$this->t_body->set_var("DISPLAY", "Show All");
 
 		$query = "
-			SELECT 	lastname, firstname, username, local_email, alt_email, hitcount,  DATE_FORMAT(datetime, '%a %D %b %H:%i') as date 
+			SELECT 	lastname, title, firstname, username, local_email, alt_email, hitcount,  DATE_FORMAT(datetime, '%a %D %b %H:%i') as date 
 			FROM 	user, homepage_log, category
 			WHERE   category.id = '" . $this->category . "'	
 			AND	category.id = homepage_log.cid
@@ -216,7 +216,7 @@ class stats
 	 	$this->t_body->set_var("DISPLAY", "");	
 
 		$query = "
-			SELECT 	lastname, firstname, username, hitcount, local_email, alt_email, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date
+			SELECT 	title, lastname, firstname, username, hitcount, local_email, alt_email, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date
 			FROM 	user, homepage_log, category
 			WHERE   category.id = '" . $this->category . "'	
 			AND	category.id = homepage_log.cid
@@ -263,7 +263,7 @@ class stats
 			  while($student = @mssql_fetch_array($result))
 			  {
 				$query = "
-					SELECT	username, firstname, lastname, local_email, alt_email, homepage_log.hitcount, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date 
+					SELECT	username, title, firstname, lastname, local_email, alt_email, homepage_log.hitcount, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date 
 					FROM	user
 					LEFT JOIN homepage_log  ON user.id = homepage_log.user
 					AND	homepage_log.cid = '".$this->category."'
@@ -303,7 +303,7 @@ class stats
 		else 
 		{
 			$query = "
-				SELECT 	lastname, firstname, username, hitcount, local_email, alt_email, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date 
+				SELECT 	lastname, title, firstname, username, hitcount, local_email, alt_email, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date 
 				FROM 	user,userAccess
 				LEFT JOIN homepage_log ON user.id = homepage_log.user
 				WHERE  userAccess.sid =  " . $this->category . "

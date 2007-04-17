@@ -37,7 +37,7 @@ function putEmpty($cid, $parent) {
 		$this->set_var("REPLY_MESSAGE", $replyto['message']);
 		
 		// set owner
-		$fullname = $replyto['firstname']." ".$replyto['lastname'];
+		$fullname = formatName(NULL, $replyto);
 		
 		//create owner email address
 		if($replyto['local_email'])

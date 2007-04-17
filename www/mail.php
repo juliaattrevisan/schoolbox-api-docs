@@ -27,7 +27,7 @@ class OutPut
 		
 		$this->t_body->set_block("tplBODY", "mail_listing", "mail_block");
 		
-		$this->t_body->set_var('NAME', $_SESSION['firstname'].' '.$_SESSION['surname']);
+		$this->t_body->set_var('NAME', formatName();
 		
 		include("include/page.php");
 	}

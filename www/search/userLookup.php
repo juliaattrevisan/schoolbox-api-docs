@@ -17,7 +17,7 @@ class outUser
 
 		$db = new dbManager;
 		
-		$query = "SELECT user.id, firstname, lastname, username, groups.name AS gname, group_id, extension, 
+		$query = "SELECT user.id, title, firstname, lastname, username, groups.name AS gname, group_id, extension, 
 					synergy_id, local_email, alt_email
 				FROM (user, groups) LEFT JOIN ph_ext ON user.id = ph_ext.owner
 				WHERE user.group_id = groups.id AND user.id = '$id'";
@@ -25,7 +25,7 @@ class outUser
 		
 		//fill out all fields
 		
-		$this->t_body->set_var("NAME", $user['firstname']." ".$user['lastname']);
+		$this->t_body->set_var("NAME", formatName(NULL, $user));
 		
 			//create owner email address
 			if($user['local_email']) {
@@ -174,7 +174,7 @@ class outUser
 		
 		foreach($users as $user)
 		{
-			$query = "SELECT firstname, lastname, username, groups.name AS gname, year, local_email, alt_email FROM user, groups 
+			$query = "SELECT title, firstname, lastname, username, groups.name AS gname, year, local_email, alt_email FROM user, groups 
 				WHERE user.group_id = groups.id AND user.id = '$user'";  
 			$userdetails = $db->dbGetSingleRow($query);
 			$this->t_body->set_var("FIRSTNAME", $userdetails['firstname']);

@@ -32,7 +32,7 @@ class Timetable
 	function getUserInfo($sid)
 	{
 		$db = new dbManager;
-		$query = "SELECT firstname, lastname, year, group_id, userCampus.campus 
+		$query = "SELECT title, firstname, lastname, year, group_id, userCampus.campus 
 			FROM user JOIN userCampus ON id = uid WHERE synergy_id = {$sid}";
 		return $db->dbGetSingleRow($query);
 		
@@ -42,7 +42,7 @@ class Timetable
 	{
 	     
 		$user = $this->getUserInfo($sid);
-		$this->t_body->set_var("PERSON", $user['firstname'].' '.$user['lastname']);
+		$this->t_body->set_var("PERSON", formatName(NULL, $user));
 		if($user['year'])
 			$this->t_body->set_var("YEAR", ', Year '.$user['year']);
 		else

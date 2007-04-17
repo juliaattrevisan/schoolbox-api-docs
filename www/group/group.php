@@ -49,7 +49,7 @@ class Group
 	{
 	
 		//get the owner(s) of the group
-		$query = "SELECT firstname, lastname, uid FROM userAccess, user WHERE uid = id AND service = '$this->service' 
+		$query = "SELECT title, firstname, lastname, uid FROM userAccess, user WHERE uid = id AND service = '$this->service' 
 				AND sid = '$this->sid' AND type = '3'";
 		return $this->db->dbGetSingleRow($query); //only one owner at the moment
 	}

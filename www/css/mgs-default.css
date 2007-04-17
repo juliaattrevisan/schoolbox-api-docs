@@ -573,3 +573,85 @@ br.float-fix {
 .udm li a {
 	_height:1px;
 	}
+/*--------------------------------------------------------------
+ Button styles 
+--------------------------------------------------------------*/
+a#addevent, a#addfile, a#addfolder, a#back, a#collapse, a#expand, a#home, a#image, a#modevent, a#modfolder, a#modify, a#modpost, a#next, a#posttopic, a#reply {
+	display: block;
+	width: 25px;
+	height: 25px;
+	background-repeat: no-repeat;
+}
+	
+.floatLeft {
+	float: left;
+	padding-right:6px;
+}	
+
+a#addevent:hover, a#addfile:hover, a#addfolder:hover, a#back:hover, a#collapse:hover, a#expand:hover, a#home:hover, a#image:hover, a#modevent:hover, a#modfolder:hover, a#modify:hover, a#modpost:hover, a#next:hover, a#posttopic:hover, a#reply:hover {
+	background-position: 0px -25px;
+}
+
+#addevent span {
+	visibility:hidden;
+}
+
+a#addevent {
+	background-image: url('/images/icons/addevent.gif');
+}
+
+a#addfile {
+	background-image: url('/images/icons/addfile.gif');
+}
+
+a#addfolder {
+	background-image: url('/images/icons/addfolder.gif');
+}
+
+a#back {
+	background-image: url('/images/icons/back.gif');
+}
+
+a#collapse {
+	background-image: url('/images/icons/collapse.gif');
+}
+
+a#expand {
+	background-image: url('/images/icons/expand.gif');
+}
+
+a#home {
+	background-image: url('/images/icons/home.gif');
+}
+
+a#image {
+	background-image: url('/images/icons/image.gif');
+}
+
+a#modevent {
+	background-image: url('/images/icons/modevent.gif');
+}
+
+a#modfolder {
+	background-image: url('/images/icons/modfolder.gif');
+}
+
+a#modify {
+	background-image: url('/images/icons/modify.gif');
+}
+
+a#modpost {
+	background-image: url('/images/icons/modpost.gif');
+}
+
+a#next {
+	background-image: url('/images/icons/next.gif');
+}
+
+a#posttopic {
+	background-image: url('/images/icons/posttopic.gif');
+}
+
+a#reply {
+	background-image: url('/images/icons/reply.gif');
+}

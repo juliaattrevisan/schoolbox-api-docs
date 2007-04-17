@@ -170,7 +170,7 @@ class OutPut
 		$this->t_body->set_var("ID", $post['id']);
 		
 		// set owner
-		$fullname = $post['firstname']." ".$post['lastname'];
+		$fullname = formatName(NULL, $post);
 		
 		//create owner email address
 		if($post['local_email'])

@@ -78,7 +78,7 @@ class OutPut
 
 	function setGreeting()
 	{
-		$this->set_var("GREETING", $this->greeting()." ".$_SESSION['firstname'].' '.$_SESSION['surname']);
+		$this->set_var("GREETING", $this->greeting() . formatName(' {firstname}'));
 	}
 
 	function outputNews($location)
@@ -378,9 +378,9 @@ href=\"/homepage.php?code=".urlencode($period['code'])."\">{$period['description
 
 		foreach($_SESSION['children'] as $child)
 		{
-			$query = "SELECT firstname, lastname, year FROM user WHERE id = {$child['id']}";
+			$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
 			$user = $this->db->dbGetSingleRow($query);
-			$this->t_body->set_var("STUDENT_NAME", $user['firstname'].' '.$user['lastname']);
+			$this->t_body->set_var("STUDENT_NAME", formatName(NULL, $user));
 			$this->t_body->set_var("STUDENT_YEAR", $user['year']);
 			
 			if(is_array($child['subjects']) ) {

@@ -178,7 +178,7 @@ class user
 		
 	}
 
-	function updateUser($id, $username, $firstname, $lastname, $synergyid, $local_email, $alt_email, 
+	function updateUser($id, $username, $title, $firstname, $lastname, $synergyid, $local_email, $alt_email, 
 				$group, $password, $campusarray, $su, $year)
 	{
 		//update user info  
@@ -186,7 +186,7 @@ class user
 			$year = "NULL";
 		else
 			$year = "'$year'";
-		$query = "UPDATE user SET username='$username', firstname='$firstname', lastname='$lastname',
+		$query = "UPDATE user SET username='$username', title='$title', firstname='$firstname', lastname='$lastname',
 			synergy_id='$synergyid', local_email='$local_email', alt_email='$alt_email', group_id='$group', 
 			password=PASSWORD('$password'), email_pass='$password', year=$year WHERE id ='$id'";
 
@@ -221,7 +221,7 @@ class user
 
 	}
 
-	function addUser($username, $firstname, $lastname, $synergyid, $group, $campusarray, $year = '', $password = '', $local_email = '', $alt_email = '', $mail_handler = '')
+	function addUser($username, $title, $firstname, $lastname, $synergyid, $group, $campusarray, $year = '', $password = '', $local_email = '', $alt_email = '', $mail_handler = '')
 	{       
 		//sanity checks
 		//check username doesnt already exist
@@ -231,8 +231,8 @@ class user
 			return 0;
 		
 		//insert information into database
-		$query = "INSERT INTO user (username, firstname, lastname, synergy_id, group_id, year, local_email, alt_email, mail_handler) VALUES
-					  ('$username', '$firstname', '$lastname', '$synergyid', '$group', '$year', '$local_email', '$alt_email', '$mail_handler')";
+		$query = "INSERT INTO user (username, title, firstname, lastname, synergy_id, group_id, year, local_email, alt_email, mail_handler) VALUES
+					  ('$username', '$title', '$firstname', '$lastname', '$synergyid', '$group', '$year', '$local_email', '$alt_email', '$mail_handler')";
 		
 		$this->db->dbDoQuery($query);
 		$id = $this->db->dbInsertId();
@@ -264,7 +264,7 @@ class user
 	function getUserInfo($id)
 	{
 		//return an array of user info
-		$query = "SELECT username, firstname, lastname, email_pass, group_id, synergy_id, 
+		$query = "SELECT username, title, firstname, lastname, email_pass, group_id, synergy_id, 
 			superusers.id AS su, year, local_email, alt_email
 			FROM user LEFT JOIN superusers ON user.id = superusers.id WHERE user.id = '$id'";
 		

@@ -139,6 +139,13 @@ function verify()
 			<form action="" method="post" id="userForm" class="standardForm" autocomplete="off" onsubmit="return(verify());">
 				<table>
 					<tr>
+						<td><h2>Title</h2></td>
+						<td><select name="title">
+								{TITLELIST}
+							</select>
+						</td>
+					</tr>
+					<tr>
 						<td><h2>Preferred</h2></td>
 						<td><input type="text" name="firstname" value="{FIRSTNAME}" />
 						</td>

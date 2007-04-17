@@ -104,6 +104,7 @@ $myPage = new submitWorkPage();
 if( isset($_FILES['file']['name']) && $_FILES['file']['name'] && $_REQUEST['box_id'])
 {
 	require("../include/fileSecurity.php");
+	fileSecurityCheck(true, true, true, true);
         	
 	//all checks passed add it
        	$myPage->addFile($_FILES['file']['name'], $_REQUEST['box_id']);

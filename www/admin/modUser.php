@@ -29,6 +29,7 @@ class modUser
 		$this->t_body->set_var('ACTION', 'Create');
 		
 		//blank all fields
+		$this->t_body->set_var("TITLELIST", $this->titleList(0));
 		$this->t_body->set_var("FIRSTNAME", '');
 		$this->t_body->set_var("LASTNAME", '');
 		$this->t_body->set_var("ESCAPE_FIRSTNAME", '');
@@ -73,6 +74,7 @@ class modUser
 		$user = $userDb->getUserInfo($id);
 		$userCampus = $userDb->getUserCampus($id);
 		
+		$this->t_body->set_var("TITLELIST", $this->titleList($user['title']));
 		$this->t_body->set_var("FIRSTNAME", $user['firstname']);
 		$this->t_body->set_var("LASTNAME", $user['lastname']);
 		$this->t_body->set_var("ESCAPE_FIRSTNAME", addslashes($user['firstname']));
@@ -104,6 +106,21 @@ class modUser
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 
+	function titleList($titleName)
+	{
+		$titleListHTML = "";
+		$query = "SELECT * FROM luTitle ORDER BY titleName";
+		$this->db->dbDoQuery($query);
+		while($line = $this->db->dbGetNextArray() )
+		{		
+			if($line['titleName'] == $titleName)
+				$titleListHTML .= "<option value=\"".$line['titleName']."\" selected>".$line['titleName']."</option>";
+			else
+				$titleListHTML .= "<option value=\"".$line['titleName']."\">".$line['titleName']."</option>";
+		}
+		return $titleListHTML;
+	}
+	
 	function campusList($userCampus)
 	{
 		$campusListHTML = "";
@@ -342,7 +359,7 @@ else if($_POST['username'] && $_POST['firstname'] && $_POST['lastname'] && $_POS
 {
 	if($_POST['id'])
 	{
-		$userDb->updateUser($_POST['id'], $_POST['username'], $_POST['firstname'], $_POST['lastname'], $_POST['synergyid'], 
+		$userDb->updateUser($_POST['id'], $_POST['username'], $_POST['title'], $_POST['firstname'], $_POST['lastname'], $_POST['synergyid'], 
 			$_POST['local_email'], $_POST['alt_email'], $_POST['group'], $_POST['password'], $_POST['campus'], 
 			$_POST['su'], $_POST['year']);
 		$myPage->displayUser($_POST['id']);
@@ -354,7 +371,7 @@ else if($_POST['username'] && $_POST['firstname'] && $_POST['lastname'] && $_POS
 		else
 			$mail_handler = 0;
 	
-		if($id = $userDb->addUser($_POST['username'], $_POST['firstname'], $_POST['lastname'],
+		if($id = $userDb->addUser($_POST['username'], $_POST['title'], $_POST['firstname'], $_POST['lastname'],
 			 $_POST['synergyid'], $_POST['group'], $_POST['campus'], $_POST['year'], $_POST['password'], 
 			 $_POST['local_email'], $_POST['local_email'], $_POST['alt_email'], $mail_handler))	
 		{	

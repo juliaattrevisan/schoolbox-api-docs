@@ -68,7 +68,7 @@ class modUserGroup
 		$owner = $group->getOwner();
 		if($owner != 0)
 		{
-			$this->t_body->set_var("OWNER", $owner['firstname']." ".$owner['lastname']);
+			$this->t_body->set_var("OWNER", formatName(NULL, $owner));
 			$this->t_body->set_var("OWNERID", $owner['uid']);
 		}
 		else
@@ -78,7 +78,7 @@ class modUserGroup
 		$this->t_body->set_var("SID", $this->sid);
 
 		//get members of group
-		$query = "SELECT firstname, lastname, uid, type FROM userAccess, user WHERE uid = id AND service = '$this->service'
+		$query = "SELECT title, firstname, lastname, uid, type FROM userAccess, user WHERE uid = id AND service = '$this->service'
 			AND sid = '$this->sid' AND type < '3' AND type > '0'";
 		$this->db->dbDoQuery($query);
 
@@ -88,8 +88,8 @@ class modUserGroup
 		{
 			while($member = $this->db->dbGetNextArray())
 			{
-				$this->t_body->set_var("MEMBER", $member['firstname']." ".$member['lastname']);
-				$this->t_body->set_var("MEMBER_JAVA", addslashes($member['firstname']." ".$member['lastname']));
+				$this->t_body->set_var("MEMBER", formatName(NULL, $member));
+				$this->t_body->set_var("MEMBER_JAVA", addslashes(formatName(NULL, $member)));
 				$this->t_body->set_var("MEMBERID", $member['uid']);
 
 				if($member['type'] == 1)
@@ -125,7 +125,7 @@ class modUserGroup
 	function displayAwaitingUsers()
 	{
 		//get the list of users awaiting authorisation into group
-		$query = "SELECT firstname, lastname, id FROM userAccess, user WHERE service = '$this->service' 
+		$query = "SELECT title, firstname, lastname, id FROM userAccess, user WHERE service = '$this->service' 
 				AND sid = '$this->sid' AND type = '0' AND user.id = uid"; 
 		$this->db->dbDoQuery($query);
 	
@@ -137,7 +137,7 @@ class modUserGroup
 		{
 			while($row = $this->db->dbGetNextArray() )
 			{
-				$this->t_body->set_var("WAITING_MEMBER", $row['firstname']." ".$row['lastname']);
+				$this->t_body->set_var("WAITING_MEMBER", formatName(NULL, $row));
 				$this->t_body->set_var("WAITINGID", $row['id']);
 				
 				$this->t_body->parse("waiting_block", "waiting", true);

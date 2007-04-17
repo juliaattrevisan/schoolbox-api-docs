@@ -90,11 +90,11 @@ class returnWorkPage {
 		$this->t_body->set_var("BOX_ID", $box_id);
 		
 		//get details of user work being returned to for user verification
-		$query = "SELECT lastname, firstname FROM user WHERE id = '$sid'";
+		$query = "SELECT lastname, title, firstname FROM user WHERE id = '$sid'";
 		$this->db->dbDoQuery($query);
 		$result = $this->db->dbGetNextArray();
 		
-		$this->t_body->set_var("NAME", $result['firstname']." ".$result['lastname']);
+		$this->t_body->set_var("NAME", formatName(NULL, $result));
 		$this->t_body->set_var("SID", $sid);
                 $this->t_body->pparse("finaloutput", "tplBODY");
         }
@@ -112,6 +112,7 @@ if( ((isset($_POST['comment']) && $_POST['comment']) || (isset($_POST['mark']) &
 	if( isset($_FILES['file']['name']) && $_FILES['file']['name'] )
 	{
 		require("../include/fileSecurity.php");
+		fileSecurityCheck(true, true, true, true);
 
 		//all checks passed add it
 		$myPage->returnWorkWithFile($_FILES['file']['tmp_name'], $_FILES['file']['name'], $_POST['sid'], $_POST['box_id'], 

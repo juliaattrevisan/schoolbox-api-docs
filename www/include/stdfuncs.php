@@ -135,4 +135,21 @@ function isLocalURL($url)
 		return true;
 }
 
+function formatName($format, $userInfo = array('title' => '', 'username' => '', 'firstname' => '', 'lastname' => '')){
+	// Check for custom format
+	if(empty($format)){
+		$format = NAME_FORMAT;
+	}
+	
+	// Replace tags
+	foreach($userInfo as $tagName => $tagValue){
+		// Fill empty var with session data if any
+		if(empty($tagValue) and !empty($_SESSION[$tagName])){
+			$tagValue = $_SESSION[$tagName];
+		}
+		$format = str_replace('{' . $tagName . '}', $tagValue, $format);
+	}
+	
+	return $format;
+}
 ?>

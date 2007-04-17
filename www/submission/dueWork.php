@@ -33,9 +33,9 @@ class dueWorkPage
 			foreach($_SESSION['children'] as $child)
 			{
 				$flag=false;
-				$query = "SELECT firstname, lastname, year FROM user WHERE id = {$child['id']}";
+				$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
 				$user = $this->db->dbGetSingleRow($query);
-				$this->t_body->set_var("USER_NAME", $user['firstname'].' '.$user['lastname']);
+				$this->t_body->set_var("USER_NAME", formatName(NULL, $user));
 				if($user['year'])
 					$this->t_body->set_var("USER_YEAR", ', '.$user['year']);
 				else

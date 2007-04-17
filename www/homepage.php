@@ -235,7 +235,7 @@ class OutPut
 		//output members of group
 		$this->t_body->set_block($name, "members", "members_block");
 		
-		$query = "SELECT firstname, lastname, type, username, local_email, alt_email FROM user, userAccess
+		$query = "SELECT title, firstname, lastname, type, username, local_email, alt_email FROM user, userAccess
 		WHERE id = uid AND service = '$this->service' AND sid = '$this->category' AND type > 0 ORDER BY lastname, firstname";
 		$this->db->dbDoQuery($query);
 		
@@ -243,7 +243,7 @@ class OutPut
 		{
 			while($member = $this->db->dbGetNextArray())
 			{			
-				$name = $member['firstname']." ".$member['lastname'];	
+				$name = formatName(NULL, $member);	
 				if($member['type'] == 3)
 					$name .= " (Group Admin.)";
 				
@@ -279,7 +279,7 @@ class OutPut
 		//output managers
 		$this->t_body->set_block($name, "staff_members", "staff_member_block");
 
-		$query = "SELECT firstname, lastname, type, username, local_email, alt_email FROM user, userAccess
+		$query = "SELECT title, firstname, lastname, type, username, local_email, alt_email FROM user, userAccess
 		WHERE id = uid AND service = '$this->service' AND sid = '$this->category' and type in(3,2) ORDER BY lastname, firstname";
 		$this->db->dbDoQuery($query);
 	
@@ -287,7 +287,7 @@ class OutPut
 		{
 			while($manager = $this->db->dbGetNextArray())
 			{
-				$name = $manager['firstname']." ".$manager['lastname'];	
+				$name = formatName(NULL, $manager);	
 				if($manager['type'] == 3)
 					$name .= " (Group Admin.)";
 
@@ -342,9 +342,9 @@ class OutPut
 			{ 
 				while($synrow = mssql_fetch_array($msResult))
 				{
-					$query = "SELECT id, firstname, lastname FROM user WHERE synergy_id = '{$synrow['StaffID']}'";
+					$query = "SELECT id, title, firstname, lastname FROM user WHERE synergy_id = '{$synrow['StaffID']}'";
 					$manager=$this->db->dbGetSingleRow($query);
-					$name = $manager['firstname']." ".$manager['lastname'];	
+					$name = formatName(NULL, $manager);
 					
 					$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$manager['id']}\">{$name}</a>");
 					$this->t_body->parse("staff_teacher_block", "staff_teachers", true);		

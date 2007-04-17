@@ -52,7 +52,7 @@ class OutPut
 				
 				$this->set_var("NEWS_TITLE", $article['item_heading']);
 			
-				$fullname = $article['firstname']." ".$article['lastname'];
+				$fullname = formatName(NULL, $article);
 				if($article['local_email'])
 					$owner = "<a href=\"".$_SESSION['mailhandle'].$article['username']."@".MAIL_address."\">$fullname</a>";
 				else if($article['alt_email'])
