@@ -180,7 +180,7 @@ function getNews($id = 0)
     	DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted,
     	DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
     	news_items.item_body, news_items.item_mainpage, 
-    	user.lastname, user.title, user.firstname, user.username, user.local_email, user.alt_email
+    	user.lastname, user.title, user.id as uid, user.firstname, user.username, user.local_email, user.alt_email
     FROM news_items
 	JOIN user ON news_items.item_owner = user.id
     	JOIN newsCampus ON newsCampus.id = news_items.item_id 

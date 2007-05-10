@@ -11,6 +11,7 @@ require_once("../include/include.php");
 require_once('Mail.php');
 require_once('Mail/mime.php');
 
+define('MAX_RECIPIENTS', 10);
 
 function sendMail($to, $cc, $bcc, $subject, $message)
 {
@@ -20,7 +21,6 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	$db->dbConnect();
 
 	$query = "SELECT firstname, lastname, username, local_email, alt_email FROM user WHERE id = '".$_SESSION["id"]."'";
-
 	$user = $db->dbGetSingleRow($query);
 
 	if($user['alt_email'])
@@ -30,15 +30,28 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	else 
 		error(42);
 
+	//if id is submitted to form convert to email
+	if(is_numeric($to) || SITE_location == 'wenona') {
+		$query = "SELECT username, local_email, alt_email FROM user WHERE id = $to";
+		$toemail = $db->dbGetSingleRow($query);
+
+		if($toemail['alt_email'])
+			$to = $toemail['alt_email'];
+		else if($user['local_email'] || SITE_location == 'wenona')
+			$to = $toemail['username']."@".MAIL_address;
+		else 
+			error(43);
+	}
+
 	//if emails have ; seperator account for it
 	$to = str_replace(";",",",$to);
 
 
 	//check if its got no to address but has either cc or bcc
 	//put the users email in the to field
-	if( !strrchr($to, '@') && ( $bcc || $cc) )
+	if( !isEmail($to) && ( $bcc || $cc) )
 	{
-		$to = $to." <".$user['username']."@".MAIL_address.">";
+		$to = '"'.$to.'" <'.$user['username'].'@'.MAIL_address.'>';
 	}
 
 	//fix qoute escapes
@@ -54,22 +67,19 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 						'Subject'   => $subject,
 						'Reply-To'	=> $from_email,
 						);
-			
 						
 	$recipients['To'] = $to;
-						
+											
 	if(strrchr($cc, '@'))
 	{
 		$cc = str_replace(";",",",$cc);
 		$headers['Cc'] = $cc;
-		$recipients['Cc'] = $cc;
 	}
 	
 	if(strrchr($bcc, '@'))
 	{
-			$bcc = str_replace(";",",",$bcc);
-			$headers['Bcc'] = $bcc;
-			$recipients['Bcc'] = $bcc;
+		$bcc = str_replace(";",",",$bcc);
+		$headers['Bcc'] = $bcc;
 	}
 
 	$mime = new Mail_mime("\r\n");
@@ -83,13 +93,13 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	}
 
 	$body = $mime->get();
-	$hdrs = $mime->headers($headers);
-
-	//$params = "-f".$user['username']."@".MAIL_address;
+	
 	if(MAIL_smtp_server)
 		$params['host'] = MAIL_smtp_server;
-
+	
 	$mail =& Mail::factory('smtp', $params);
+	
+	$hdrs = $mime->headers($headers);
 	$return = $mail->send($recipients, $hdrs, $body);
 	if($return != true)
 		error(9, $return->getMessage()); 
@@ -97,7 +107,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 
 //if form has been submitted
-if(isset($_POST['to']) && $_POST['to'])
+if(isset($_POST['to']) && $_POST['to'] && MAIL_enable)
 {
 	sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message']);
 	

@@ -140,7 +140,7 @@ class OutPut
 	{
 		//this query will get all files that the user can see
 		$query = "SELECT f.id, f.realname, inline, iconFile, DATE_FORMAT(f.submitted, '".FILE_date_format."') AS submitted, 
-		user.username, user.title, user.firstname, user.lastname, user.local_email, user.alt_email, f.description,
+		user.username, user.title, user.id as uid, user.firstname, user.lastname, user.local_email, user.alt_email, f.description,
 		f.comment, category.name, category.id as cid, category.code, file_size, f.mime_type
 		FROM (file as f, user, category) LEFT JOIN allowedFileTypes ON mime = f.mime_type WHERE f.owner=user.id AND f.category = 
 category.id AND f.deleted = '0'";
@@ -222,7 +222,7 @@ category.id AND f.deleted = '0'";
 	{
 		//this query will get all files that the user can see
 		$query = "SELECT link.id, link.url, DATE_FORMAT(link.submitted, '".FILE_date_format."') AS submitted, 
-		user.username, user.firstname, user.firstname, user.lastname, user.local_email, user.alt_email, link.description, link.comment, category.name, category.id as cid, category.code 
+		user.title, user.id as uid, user.username, user.firstname, user.firstname, user.lastname, user.local_email, user.alt_email, link.description, link.comment, category.name, category.id as cid, category.code 
 		FROM link, user, category WHERE link.owner = user.id AND link.category = category.id";
 		//do the query based on search type
 		switch ($type)
@@ -360,12 +360,10 @@ category.id AND f.deleted = '0'";
 	
 		// set owner
 		$fullname = formatName(NULL, $fileDetails);
-	
-		//create owner email address
-		if($fileDetails['local_email'])
-			$owner = "<a href=\"".$_SESSION['mailhandle'].$fileDetails['username']."@".MAIL_address."\">$fullname</a>";
-		else if($fileDetails['alt_email'])
-			$owner = "<a href=\"".$_SESSION['mailhandle'].$fileDetails['alt_email']."\">$fullname</a>";
+		$email = formatEmail($fileDetails);
+		
+		if($email)
+			$owner = "<a href=\"".$_SESSION['mailhandle'].$email."\">$fullname</a>";
 		else
 			$owner = $fullname;
 		
@@ -409,11 +407,11 @@ category.id AND f.deleted = '0'";
 		
 		// set owner
 		$fullname = formatName(NULL, $linkDetails);
-			
-		if($linkDetails['local_email'])
-			$owner = "<a href=\"".$_SESSION['mailhandle'].$linkDetails['username']."@".MAIL_address."\">$fullname</a>";
-		else if($linkDetails['alt_email'])
-			$owner = "<a href=\"".$_SESSION['mailhandle'].$linkDetails['alt_email']."\">$fullname</a>";
+		$email = formatEmail($linkDetails);
+		
+		//create owner email address
+		if($email)
+			$owner = "<a href=\"".$_SESSION['mailhandle'].$email."\">$fullname</a>";
 		else
 			$owner = $fullname;
 

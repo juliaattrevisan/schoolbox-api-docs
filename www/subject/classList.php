@@ -53,20 +53,14 @@ class ClassList
 					$this->t_body->set_var("HOUSE", $student['house']);
 					
 					//get each students email address
-					$mysqlquery = "SELECT id, username, local_email, alt_email FROM user WHERE synergy_id = '".$student['synergy_id']."'";
+					$mysqlquery = "SELECT id as uid, username, local_email, alt_email FROM user WHERE synergy_id = '".$student['synergy_id']."'";
 					$mySQLdb->dbDoQuery($mysqlquery);
 					if($mySQLdb->dbCountRows() > 0)
 					{	
 						$email = $mySQLdb->dbGetNextArray();
 		
-						if($email['local_email'])
-							$emailaddr = $email['username']."@".MAIL_address;
-						else if($email['alt_email'])
-							$emailaddr = $email['alt_email'];
-						else
-							$emailaddr = "";
-						
-		
+						$emailaddr = formatEmail($email);
+	
 						if($emailaddr){				
 							$emaillink = "<a href=\"".$_SESSION['mailhandle'].$emailaddr."\">Email</a>";
 							$this->t_body->set_var("EMAIL", $emaillink);

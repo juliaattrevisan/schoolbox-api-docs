@@ -235,7 +235,7 @@ class OutPut
 		//output members of group
 		$this->t_body->set_block($name, "members", "members_block");
 		
-		$query = "SELECT title, firstname, lastname, type, username, local_email, alt_email FROM user, userAccess
+		$query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email FROM user, userAccess
 		WHERE id = uid AND service = '$this->service' AND sid = '$this->category' AND type > 0 ORDER BY lastname, firstname";
 		$this->db->dbDoQuery($query);
 		
@@ -243,16 +243,11 @@ class OutPut
 		{
 			while($member = $this->db->dbGetNextArray())
 			{			
-				$name = formatName(NULL, $member);	
+				$name = formatName(NULL, $member);
+				$email = formatEmail($member);
+					
 				if($member['type'] == 3)
 					$name .= " (Group Admin.)";
-				
-				if($member['local_email'])
-						$email = $member['username']."@".MAIL_address;
-				else if($member['alt_email'])
-						$email = $member['alt_email'];
-				else
-						$email = "";
 						
 				if($email)
 				{
@@ -279,7 +274,7 @@ class OutPut
 		//output managers
 		$this->t_body->set_block($name, "staff_members", "staff_member_block");
 
-		$query = "SELECT title, firstname, lastname, type, username, local_email, alt_email FROM user, userAccess
+		$query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email FROM user, userAccess
 		WHERE id = uid AND service = '$this->service' AND sid = '$this->category' and type in(3,2) ORDER BY lastname, firstname";
 		$this->db->dbDoQuery($query);
 	
@@ -287,16 +282,11 @@ class OutPut
 		{
 			while($manager = $this->db->dbGetNextArray())
 			{
-				$name = formatName(NULL, $manager);	
+				$name = formatName(NULL, $manager);
+				$email = formatEmail($manager);
+				
 				if($manager['type'] == 3)
 					$name .= " (Group Admin.)";
-
-		                if($manager['local_email'])
-                		        $email = $manager['username']."@".MAIL_address;
-                		else if($manager['alt_email'])
-                        		$email = $manager['alt_email'];
-                		else
-                        		$email = "";
 								
 				if($email)
 				{

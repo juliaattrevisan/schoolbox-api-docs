@@ -284,7 +284,7 @@ function dbSmartQuote($value)
        $value = stripslashes($value);
    }
    // Quote if not integer or special
-   if (!(is_numeric($value) || $value == 'NULL' ||  $value == 'NOW()')) {
+   if (!((is_numeric($value) && $value[0] != 0) || $value == 'NULL' ||  $value == 'NOW()')) {
        $value = "'" . mysql_real_escape_string($value) . "'";
    }
    return $value;

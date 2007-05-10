@@ -13,7 +13,7 @@ require_once("../include/include.php");
 require_once("../include/session.php");
 require_once("../include/permission.php");
 
-define("MAX_IMAGE_SIZE", 6000000);
+define("MAX_IMAGE_SIZE", 9000000);
 
 if($_GET['id'] && $_GET['width'] && $_GET['height'])
 {

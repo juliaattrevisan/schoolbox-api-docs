@@ -152,4 +152,17 @@ function formatName($format, $userInfo = array('title' => '', 'username' => '', 
 	
 	return $format;
 }
+
+function formatEmail($email) {
+	
+	if($email['local_email'])
+		return $email['username']."@".MAIL_address;
+	else if($email['alt_email'])
+		return $email['alt_email'];
+	else 
+		return false;
+}
+function isEmail($email) {
+	return eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$",$email);
+}
 ?>

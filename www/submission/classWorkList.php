@@ -175,8 +175,8 @@ class ClassList
 
 				$worknameHTML .= "
 					<th>
-					<div style='bottom: 0px; writing-mode: tb-rl; filter: flipH() flipV();'>
-					<form method='POST'>$name<input type='hidden' name='box_id' value='" . $box[ 'id'] . "'>
+					<div style=\"bottom: 0px; writing-mode: tb-rl; filter: flipH() flipV();\">
+					<form method=\"post\" action=\"\">$name<input type='hidden' name='box_id' value='".$box[ 'id']."'>
 					<input type='hidden' name='do' value='columnDelete'><input type='image' src='/images/button_cross.jpg' width='10' align='right' onClick='return confirm( \"Delete this column?\")'>
 					</form>
 					</div>
@@ -213,7 +213,7 @@ class ClassList
 					if($user['work'][$box['id']] == "") {
 						$workmarkHTML .= '
 						
-						 <td><form method="POST" onSubmit="return false;">
+						 <td><form method="post" onSubmit="return false;" action="">
 							<input name="mark" value="" class="inputMark" type="text" size="5" maxlength="10" onBlur="submitOnFieldChange(this.form);">
 							<div style="display: none;">
 							<input type="hidden" name="userID" value="' . $user[ 'userID'] . '">
@@ -225,7 +225,7 @@ class ClassList
 					else {				# Mark has been given
 						$workmarkHTML .= '
 						
-						  <td><form method="POST" onSubmit="return false;">
+						  <td><form method="post" onSubmit="return false;" action="">
 							<input name="mark" class="inputMark" type="text" size="5" maxlength="10" value="' . htmlentities( $user[ 'work'][ $box[ 'id']]) . '" onBlur="submitOnFieldChange(this.form);">
 							<input type="hidden" name="userID" value="' . $user[ 'userID'] . '">
 							<input type="hidden" name="box_id" value="' . $box[ 'id'] . '">

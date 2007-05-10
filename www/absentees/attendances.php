@@ -27,7 +27,7 @@ class Attendance
 		$this->date = date("Y-m-d");
 		$this->campus = 'S';
 
-		$this->msdb = @mssql_connect(MSSQL_host, MSSQL_user, MSSQL_passwd);
+		$this->msdb = mssql_connect(MSSQL_host, MSSQL_user, MSSQL_passwd);
 	}
 
         function displayStudentList($subCode, $daynum)
@@ -103,7 +103,7 @@ class Attendance
 		
 		$x=0;		
 
-		while($student = @mssql_fetch_array($result))
+		while($student = mssql_fetch_array($result))
  		{
 			$this->t_body->set_var("SURNAME", $student[0]);
 			$this->t_body->set_var("FIRSTNAME", $student[1]);
@@ -167,7 +167,7 @@ class Attendance
 		include_once("../include/page.php");
 
                 //setup database
-		$this->msdb = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
+		$this->msdb = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
 
 		$synergy_id = $_SESSION['sid'];
 
@@ -181,11 +181,11 @@ class Attendance
 		//get teacher name 
 		$mydb = new dbManager;
 		$mydb->dbConnect();
-		$query = "SELECT title, firstname, lastname FROM user WHERE id = '".$_SESSION['id']."'";
+		$query = "SELECT firstname, lastname FROM user WHERE id = '".$_SESSION['id']."'";
 		$mydb->dbDoQuery($query);
 		$teacher = $mydb->dbGetNextArray();
 		
-		$this->t_body->set_var("TEACHERNAME", formatName(NULL, $teacher));
+		$this->t_body->set_var("TEACHERNAME", $teacher['firstname']." ".$teacher['lastname']);
 
             
                 $query = "SELECT Timetable.Room, SubjectClasses.Description,
@@ -270,52 +270,38 @@ class Attendance
 	}
 
 
-	function startAttendanceInsert($code, $period)
+	function startAttendanceInsert($code, $period,$day)
 	{
 		//initalise some variables to make insert faster
 		$this->code = $code;
 		$this->period = $period;
+		$this->day = $day;
 	}
 
-	function insertAttendance($stuid, $attend, $abstype, $reason)
+	function insertAttendance($attendSeq, $stuid, $attend, $abstype, $reason)
 	{
-		$query = "INSERT INTO SynergyOne.dbo.Attendances
-			(FileType, FileYear, FileSemester, ClassCampus, ClassCode,
-			ID, AttendanceDate, AttendancePeriod, AttendedFlag,
-			StaffID, PossibleAbsenceCode, PossibleDescription)
+		$query = "INSERT INTO SynergyOne.dbo.tAttendances
+			( ID, AttendanceMasterSeq,AttendedFlag,
+			PossibleAbsenceCode,PossibleDescription)
 			VALUES
-			('A', 
-			'".$_SESSION['FileYear']."', 
-			'".$_SESSION['FileSemester']."',
-			'".$this->campus."', 
-			'".$this->code."', 
-			'".$stuid."', 
-			'".$this->date."', 
-			'".$this->period."', 
+			('".$stuid."', 
+			'".$attendSeq."',
 			'".$attend."', 
-			'".$_SESSION['sid']."', 
 			'".$abstype."', 
 			'".$reason."')";
 
 		return $query;
 	}
 
-	function updateAttendance($stuid, $attend, $abstype, $reason)
+	function updateAttendance($attendSeq, $stuid, $attend, $abstype, $reason)
 	{
 
-		$query = "UPDATE SynergyOne.dbo.Attendances 
+		$query = "UPDATE SynergyOne.dbo.tAttendances 
 			  SET AttendedFlag = '$attend', 
 			      PossibleAbsenceCode = '$abstype', 
 			      PossibleDescription = '$reason'
-			  WHERE FileType = 'A' AND
-				FileYear = '".$_SESSION['FileYear']."' AND
-				FileSemester = '".$_SESSION['FileSemester']."' AND
-				ClassCampus = '".$this->campus."' AND
-				ClassCode = '".$this->code."' AND
-				ID = '$stuid' AND
-				AttendanceDate = '".$this->date."' AND
-				AttendancePeriod = '".$this->period."'";
-
+			  WHERE AttendanceMasterSeq = '$attendSeq' AND
+				ID = '$stuid'";
 		return $query;
 	}
 
@@ -324,30 +310,51 @@ class Attendance
 		mssql_query($query, $this->msdb);
 	}
 
-	function checkAttendance($stuid)
+	function checkAttendance()
 	{
-		//checks if attendance has been recorded for student
+		//checks if attendance has been recorded
 
-		$query = "SELECT ID FROM SynergyOne.dbo.Attendances
+		$query = "SELECT AttendanceMasterSeq FROM SynergyOne.dbo.AttendanceMaster
 			  WHERE FileType = 'A' AND
 				FileYear = '".$_SESSION['FileYear']."' AND
 				FileSemester = '".$_SESSION['FileSemester']."' AND
 				ClassCampus = '".$this->campus."' AND
 				ClassCode = '".$this->code."' AND
-				ID = '$stuid' AND
 				AttendanceDate = '".$this->date."' AND
 				AttendancePeriod = '".$this->period."'";
 		
 		$result = mssql_query($query, $this->msdb);
-		
-		if ($result != 1){	
-			if(mssql_num_rows($result) > 0)
-				return 1;
+
+
+		if ($result != 1) {	
+			if(mssql_num_rows($result) > 0) {
+				$array = mssql_fetch_array($result);		
+				return $array[0];
+			}
 			else
 				return 0;
 		}
 		else 
 			return 0;	
+	}
+
+	function initAttendance() {
+		//inserts attendance record into master table
+		$query = "INSERT INTO SynergyOne.dbo.AttendanceMaster
+			(FileType, FileYear, FileSemester, ClassCampus, ClassCode,
+                        AttendanceDate, AttendanceDayNumber, AttendancePeriod, StaffID)
+                        VALUES
+                        ('A',
+                        '".$_SESSION['FileYear']."',
+                        '".$_SESSION['FileSemester']."',
+                        '".$this->campus."',
+                        '".$this->code."',
+                        '".$this->date."',
+			'".$this->day."',
+                        '".$this->period."',
+                        '".$_SESSION['sid']."')";
+		
+		return mssql_query($query, $this->msdb);
 	}
 
 }
@@ -360,13 +367,21 @@ if(date("w") == 0 ||date("w") == 6)
 
 if( is_numeric($_POST['daynum']) && is_numeric($_POST['pernum']) && $_POST['subcode'] )
 {
-	$page->startAttendanceInsert($_POST['subcode'], $_POST['pernum']);
+	$page->startAttendanceInsert($_POST['subcode'], $_POST['pernum'], $_POST['daynum']);
 	
 	$query = "";
 	$stuid = "stud0";
 	
-	//assume if first student attendance completed all will be completed =(
-	$attendState = $page->checkAttendance($_POST[$stuid]);
+	//ok so we check the attendance record if it exists good, if it dont we 
+	if(!$attendSeq = $page->checkAttendance()){
+		$attendCheck = 0;
+		$page->initAttendance();
+		$attendSeq = $page->checkAttendance();
+		if(!$attendSeq)
+			error(0);
+	}
+	else
+		$attendCheck = 1;
 
 	for($i=0; isset($_POST[$stuid]); $i++)
 	{
@@ -376,28 +391,27 @@ if( is_numeric($_POST['daynum']) && is_numeric($_POST['pernum']) && $_POST['subc
 		$reason = "reason".$i;
 		$stuid = "stud".$i;
 
-		if($attendState )
+		if($attendCheck)
 		{
 			//update existing record
 			if($_POST[$attend] == 1)
-				$query .= $page->updateAttendance($_POST[$stuid], 1, $_POST[$abscode], $_POST[$reason]);
+				$query .= $page->updateAttendance($attendSeq, $_POST[$stuid], 1, $_POST[$abscode], $_POST[$reason]);
 			else
-				$query .= $page->updateAttendance($_POST[$stuid], 0, $_POST[$abscode], $_POST[$reason]);
+				$query .= $page->updateAttendance($attendSeq, $_POST[$stuid], 0, $_POST[$abscode], $_POST[$reason]);
 		}
 		else	
 		{
 			//insert them into database
 			if($_POST[$attend] == 1)
-				$query .= $page->insertAttendance($_POST[$stuid], 1, $_POST[$abscode], $_POST[$reason]);
+				$query .= $page->insertAttendance($attendSeq, $_POST[$stuid], 1, $_POST[$abscode], $_POST[$reason]);
 			else
-				$query .= $page->insertAttendance($_POST[$stuid], 0, $_POST[$abscode], $_POST[$reason]);
+				$query .= $page->insertAttendance($attendSeq, $_POST[$stuid], 0, $_POST[$abscode], $_POST[$reason]);
 		}
 
 		$query .= "; ";
 	}
-
 	$page->runQuery($query."SELECT 1");
-
+	
 	$back = -2;
 	include("../include/back.php");
 }

@@ -65,7 +65,7 @@ class editDuties
 		$sql = "SELECT l.*, d.user, d.date, d.cid FROM luDuties l LEFT JOIN duty d ON l.dutyTypeID = d.dutyTypeID and d.date = '".$queryDate."' where l.cid = ".$this->category ;
 		$this->db->dbDoQuery($sql);
 		$i = 0;
-		$this->t_body->set_var("DATE", date('l, jS of F', $currentDate));
+		$this->t_body->set_var("DATE", date('l, jS \of F', $currentDate));
 		$this->t_body->set_var("QDATE", $queryDate);
 		$this->t_body->set_var("GET", "?category=".$this->category."&Year=".date("Y",$currentDate).
                                 "&Month=".date("m",$currentDate)."&Day=".date("d", $currentDate) );

@@ -171,12 +171,11 @@ class OutPut
 		
 		// set owner
 		$fullname = formatName(NULL, $post);
-		
+		$email = formatEmail($post);
+			
 		//create owner email address
-		if($post['local_email'])
-			$owner = "<a href=\"".$_SESSION['mailhandle'].$post['username']."@".MAIL_address."\">$fullname</a>";
-		else if($post['alt_email'])
-			$owner = "<a href=\"".$_SESSION['mailhandle'].$post['alt_email']."\">$fullname</a>";
+		if($email)
+			$owner = "<a href=\"".$_SESSION['mailhandle'].$email."\">$fullname</a>";
 		else
 			$owner = $fullname;
 			

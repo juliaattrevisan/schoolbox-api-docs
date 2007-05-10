@@ -117,20 +117,11 @@ $myPage = new OutPut();
 
 //if replyto has been specified
 if(isset($_GET['reply']) && $_GET['reply'])
-{
 	$myPage->replyMail($_GET['reply'], $_GET['qoute']);
-}
 else if(isset($_GET['forward']) && $_GET['forward'])
-{
 	$myPage->forwardMail($_GET['forward']);
-}
 else if( $_REQUEST['replyto'] || $_REQUEST['bcc'])
-	$myPage->showPage($_REQUEST['replyto'], $_REQUEST['bcc']);
-//if form has been submitted
-else if(isset($_POST['to']) && $_POST['to'])
-{
-	$myPage->sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message']);
-}	
+	$myPage->showPage($_REQUEST['replyto'], $_REQUEST['bcc']); 
 else if(SITE_location != 'wenona')
 	$myPage->showPage();
 else

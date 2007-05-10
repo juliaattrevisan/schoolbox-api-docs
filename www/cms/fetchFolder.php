@@ -37,18 +37,21 @@ function getResources() {
 }
 
 function sendZip() {
-	$this->createZip();
+	if($this->createZip()) {
 	
-	$dodgychars = "[^0-9a-zA-Z()_-]";
-	$filename = preg_replace("/$dodgychars/","_",$this->folderDetails['name']);
-	
-	$filesize = filesize($this->tmpZip);
-	header ("Content-Type: application/x-zip-compressed"); 
-	header ("Content-Disposition: attachment; filename=\"".$filename.".zip\"");
-	header ("Content-Length: $filesize"); 
-	readfile($this->tmpZip);
-	
-	$this->cleanUp();
+		$dodgychars = "[^0-9a-zA-Z()_-]";
+		$filename = preg_replace("/$dodgychars/","_",$this->folderDetails['name']);
+		
+		$filesize = filesize($this->tmpZip);
+		header ("Content-Type: application/x-zip-compressed"); 
+		header ("Content-Disposition: attachment; filename=\"".$filename.".zip\"");
+		header ("Content-Length: $filesize"); 
+		readfile($this->tmpZip);
+		
+		$this->cleanUp();
+	}
+	else
+		error(49);
 }
 
 function createZip() {
@@ -57,16 +60,19 @@ function createZip() {
 	$fileList = $this->getResources();
 
 	mkdir($this->tmpFolder);
-
-	foreach($fileList as $file) {
-		if(is_file(FILE_directory .'/'.$file['id'].'.dat')) {
-			//if two files in folder have same name it will overwrite.. not cool
-			copy(FILE_directory .'/'.$file['id'].'.dat', $this->tmpFolder.'/'.$file['realname']);
-			$zipFiles[] = $this->tmpFolder.'/'.$file['realname'];
+	if(is_array($fileList) {
+		foreach($fileList as $file) {
+			if(is_file(FILE_directory .'/'.$file['id'].'.dat')) {
+				//if two files in folder have same name it will overwrite.. not cool
+				copy(FILE_directory .'/'.$file['id'].'.dat', $this->tmpFolder.'/'.$file['realname']);
+				$zipFiles[] = $this->tmpFolder.'/'.$file['realname'];
+			}
 		}
-	}
 	
-	$archive->create($zipFiles,PCLZIP_OPT_REMOVE_ALL_PATH);
+	
+		$archive->create($zipFiles,PCLZIP_OPT_REMOVE_ALL_PATH);
+		return true;
+	}
 
 
 }

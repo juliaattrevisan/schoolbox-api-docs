@@ -228,7 +228,7 @@ class ModResourcePage {
 		
 		$this->t_body->set_var("DESCRIPTION", $file['description']);
 		$this->t_body->set_var("COMMENT", $file['comment']);
-		$this->setCategoryList($file['category']);
+		$this->setCategory($file['category']);
 		$this->setFileTypeList($file['type']);
 
 		//check box for submission box associated with file

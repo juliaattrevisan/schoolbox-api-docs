@@ -73,17 +73,13 @@ function processCal()
 	while(!feof($cal))
 	{
 
-		list($date,$stime,$ftime,$comment,$priority) = explode(',', fgets($cal,4096), 5);
+		list($date,$stime,$ftime,$comment,$priority) = fgetcsv($cal,4096);
         
         	$comment = trim($comment);
         
         	# Skip empty comments and no dates
         	if($comment && $date)
         	{
-        	    ereg('\"([^\"]*)\"|([^\"]*)'  , $comment, $regs);
-        	    if($regs[1])
-        	        $comment = $regs[1];
-            
         	    if($priority < 1 && $priority > 4)
         	        $priority = 4;
         

@@ -60,7 +60,7 @@ function deleteNews($id)
 function getNews()
 {
     $SQL_QUERY = "SELECT subject_news.id, heading, owner, DATE_FORMAT(datetime_posted, '%W %M %e @ %l:%i%p') AS datetime,
-    body, username, lastname, title, firstname, local_email, alt_email 
+    body, username, user.id as uid, lastname, title, firstname, local_email, alt_email 
     FROM subject_news, user WHERE user.id = subject_news.owner AND code = '$this->code' AND datetime_expires > NOW() AND deleted = 0 
     ORDER BY datetime_posted DESC";
 
@@ -71,12 +71,7 @@ function getNews()
 		$this->news[$i]['Id'] = $newsDbResult["id"];
 		$this->news[$i]['Heading'] = num_encode($newsDbResult["heading"]);
 		$this->news[$i]['Poster'] = formatName(NULL, $newsDbResult);
-		if($newsDbResult['local_email'])
-			$this->news[$i]['Contact'] = $newsDbResult["username"]."@".MAIL_address;
-		else if($newsDbResult['alt_email'])
-			$this->news[$i]['Contact'] = $newsDbResult['alt_email'];
-		else
-			$this->news[$i]['Contact'] = "";
+		$this->news[$i]['Contact'] = formatEmail($newsDbResult);
 		$this->news[$i]['Owner'] = $newsDbResult["owner"];
 		$this->news[$i]['Datetime'] = $newsDbResult["datetime"];
 		$this->news[$i]['Body'] = num_encode($newsDbResult["body"]);

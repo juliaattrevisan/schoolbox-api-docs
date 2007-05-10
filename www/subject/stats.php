@@ -68,14 +68,11 @@ class stats
 	
 	function outputName($firstname, $lastname, $username, $localmail, $altmail)
 	{
-		if($localmail){
-			$email = $username."@".MAIL_address;
+		$email = formatEmail(array('username'=>$username, 'local_email'=>$localmail, 'alt_email'=>$altmail));
+		
+		if($email){
 			$this->t_body->set_var("FNAME", "<a href=\"".$_SESSION['mailhandle'].$email."\">".$firstname."</a>");
 			$this->t_body->set_var("LNAME", "<a href=\"".$_SESSION['mailhandle'].$email."\">".$lastname."</a>");
-		}
-		else if($altmail){
-			$this->t_body->set_var("FNAME", "<a href=\"".$_SESSION['mailhandle'].$altmail."\">".$firstname."</a>");
-			$this->t_body->set_var("LNAME", "<a href=\"".$_SESSION['mailhandle'].$altmail."\">".$lastname."</a>");
 		}
 		else{
 			$this->t_body->set_var("FNAME", $firstname);

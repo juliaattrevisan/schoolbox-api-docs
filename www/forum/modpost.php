@@ -38,12 +38,11 @@ function putEmpty($cid, $parent) {
 		
 		// set owner
 		$fullname = formatName(NULL, $replyto);
-		
+		$email = formatEmail($replyto);
+			
 		//create owner email address
-		if($replyto['local_email'])
-			$owner = "<a href=\"".$_SESSION['mailhandle'].$replyto['username']."@".MAIL_address."\">$fullname</a>";
-		else if($replyto['alt_email'])
-			$owner = "<a href=\"".$_SESSION['mailhandle'].$replyto['alt_email']."\">$fullname</a>";
+		if($email)
+			$owner = "<a href=\"".$_SESSION['mailhandle'].$email."\">$fullname</a>";
 		else
 			$owner = $fullname;
 		
