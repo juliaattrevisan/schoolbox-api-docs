@@ -153,9 +153,9 @@ else if($_POST['description'] && $_POST['mime'] && $_POST['icon'] && is_numeric(
 	$fileType->updateFileType($_POST['id'], $_POST['description'], $_POST['mime'], $_POST['icon'], $_POST['inline'], $_POST['enable'], $_POST['extensions']);
 	$myPage->displayFileTypeList();
 }
-else if($_POST['text'] && $_POST['url'] && is_numeric($_POST['parent']))
+else if($_POST['description'] && $_POST['mime'])
 {
-	$sideMenu->addFileType($_POST['description'], $_POST['mime'], $_POST['icon'], $_POST['inline'], $_POST['enable'], $_POST['extensions']);
+	$fileType->addFileType($_POST['description'], $_POST['mime'], $_POST['icon'], $_POST['inline'], $_POST['enable'], $_POST['extensions']);
 	$myPage->displayFileTypeList();
 }
 
