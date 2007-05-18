@@ -1046,8 +1046,8 @@ function SetName ( $mysql )
         return;
 
     $query = 'SET NAMES ' . $charset;
-    if ($charset!="[default]") {
-        yog_mysql_query ( $query, $mysql );
+    if ($charset!="[default]") {        
+        yog_mysql_query ( $query, $mysql );        
     }    
 
     WriteLog ( "Exit SetName" );
@@ -1446,12 +1446,12 @@ function ProcessQuery ()
         return;
     }
 
-    WriteLog ( "Connected" );
-
-    yog_mysql_select_db ( str_replace ( '`', '', $db ), $mysql );
+    WriteLog ( "Connected" );    
 
     /* Function will execute setnames in the server as it does in SQLyog client */
     SetName ( $mysql );
+
+    yog_mysql_select_db ( str_replace ( '`', '', $db ), $mysql );
 
     /* set sql_mode to zero */
     SetNonStrictMode ( $mysql );
@@ -1495,7 +1495,7 @@ define ( "XML_CHARSET", 7 );
 /* version constant */
 /* You will need to change the version in processquery method too, where it shows: $versionheader = 'TunnelVersion:5.13.1' */
 
-define ( "tunnelversion", '5.25' );
+define ( "tunnelversion", '6.0');
 define ( "tunnelversionstring", 'TunnelVersion:' );
 define ( "phpversionerror", 'PHP_VERSION_ERROR' );
 define ( "phpmoduleerror", 'PHP_MODULE_NOT_INSTALLED' );

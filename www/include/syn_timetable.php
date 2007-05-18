@@ -329,7 +329,7 @@ function getFullTimetable($synergy_id, $group, $campus)
 	$result = mssql_query($query, $db);
 
 	$timetabledef = getTimetableDefinition($campus);
-	
+
 	$periodCount = $timetabledef['periodCount'];
 	$dayCount = $timetabledef['dayCount'];
 	

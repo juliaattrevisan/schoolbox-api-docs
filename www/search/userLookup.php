@@ -169,7 +169,7 @@ class outUser
 		
 		foreach($users as $user)
 		{
-			$query = "SELECT id as uid, title, firstname, lastname, username, groups.name AS gname, year, local_email, alt_email FROM user, groups 
+			$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, year, local_email, alt_email FROM user, groups 
 				WHERE user.group_id = groups.id AND user.id = '$user'";  
 			$userdetails = $db->dbGetSingleRow($query);
 			$this->t_body->set_var("FIRSTNAME", $userdetails['firstname']);

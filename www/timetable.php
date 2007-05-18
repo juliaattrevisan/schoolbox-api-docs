@@ -50,9 +50,9 @@ class Timetable
 		 
 		$periodCurrent = getPeriodNumber($user['campus']);
 		$dayCurrent = getDayNumber($user['campus']);	
-				
+					
 		$timetable = getFullTimetable($sid, $user['group_id'], $user['campus']);
-		
+
 		$days = count($timetable[0]['day']);
 		
 		//timetable field width
@@ -171,5 +171,6 @@ else
 	
 	$timetable->showPage();
 }
+
 
 ?>

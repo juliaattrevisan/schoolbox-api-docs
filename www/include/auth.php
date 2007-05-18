@@ -46,10 +46,8 @@ function authenticateSQL(&$db, $username, $password) {
 	$query = "SELECT user.id FROM user WHERE username = '". trim( $username)."' 
 	AND password = PASSWORD('".$password."')";
 	$db->dbDoQuery($query);
-	
 	$result = $db->dbCountRows();
 	//$user = $db->dbGetNextArray();
-
 	if($result == 1)
 		return true;
 	else
@@ -70,7 +68,6 @@ function authenticate(&$db, $username, $password, $remember = 0)
 		//fall back on SQL if ldap is not enable or fails
 		$result = authenticateSQL(&$db, $username, $password);
 	}
-
 	if($result == true) {
 
 		$query = "SELECT user.id, firstname, lastname, username, group_id, synergy_id, superusers.id AS su, password, email_pass, local_email, mail_handler 
@@ -143,7 +140,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 				$_SESSION['campus'][] = $campus['campus'];
 		}
 
-		if(SYNERGY_enable && $_SESSION['sid'])
+		if(SYNERGY_enable)
 			setSynergyInfo(&$db);
 
 		$loginlogquery .= ", '1')";
@@ -157,6 +154,8 @@ function authenticate(&$db, $username, $password, $remember = 0)
 		$db->dbDoQuery($loginlogquery);
 		return false;		
 	}
+	
+	return false;
 }	
 
 function firsttime(&$db, $username, $password)
@@ -193,47 +192,49 @@ function setSynergyInfo(&$mydb)
 	
 	mssql_select_db( MSSQL_db);
 
-	$synergy_id = $_SESSION['sid'];
-
 	$semester = getCurrentSemester();
 	$_SESSION[ 'FileSemester'] = $semester[ 'FileSemester'];
 	$_SESSION[ 'FileYear'] = $semester[ 'FileYear'];
+	$synergy_id = $_SESSION['sid'];
+	
+	if(is_numeric($synergy_id)) {
 
-	//if user is parent get information regarding enrolled students
-	if( isParent($_SESSION['gid']))
-	{
-		$studentGroup = unserialize(STUDENTGROUPIDS);
-		$children = getEnrolledStudents($synergy_id);
-		foreach($children as $child)
+		//if user is parent get information regarding enrolled students
+		if( isParent($_SESSION['gid']))
 		{
-			$myquery = "SELECT id FROM user WHERE synergy_id = $child";
-			$portal = $mydb->dbGetSingleRow($myquery);
-			if($portal['id'])
+			$studentGroup = unserialize(STUDENTGROUPIDS);
+			$children = getEnrolledStudents($synergy_id);
+			foreach($children as $child)
 			{
-				$subjects = getSubjectList($child, $studentGroup[0]);
-				$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child, 'subjects'=>$subjects);
+				$myquery = "SELECT id FROM user WHERE synergy_id = $child";
+				$portal = $mydb->dbGetSingleRow($myquery);
+				if($portal['id'])
+				{
+					$subjects = getSubjectList($child, $studentGroup[0]);
+					$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child, 'subjects'=>$subjects);
+				}
 			}
 		}
-	}
-	else  //user is not parent so get timetable information
-	{
-		$subjectList = getSubjectList($synergy_id, $_SESSION['gid']);
-		if( is_array($subjectList))
+		else  //user is not parent so get timetable information
 		{
-			foreach($subjectList as $subject)
+			$subjectList = getSubjectList($synergy_id, $_SESSION['gid']);
+			if( is_array($subjectList))
 			{
-				//check subject exists.. we cant link to subjects that dont exist its ugly
-				$myquery = "SELECT id FROM category WHERE code = '".$subject['code']."'";
-				$mydb->dbDoQuery($myquery);
-				if($mydb->dbCountRows() > 0)
-					$_SESSION['subjects'][] = $subject;
+				foreach($subjectList as $subject)
+				{
+					//check subject exists.. we cant link to subjects that dont exist its ugly
+					$myquery = "SELECT id FROM category WHERE code = '".$subject['code']."'";
+					$mydb->dbDoQuery($myquery);
+					if($mydb->dbCountRows() > 0)
+						$_SESSION['subjects'][] = $subject;
+				}
 			}
+	
+			if(is_array($_SESSION['subjects']))
+				$_SESSION['timetable'] = 1;
+			else	
+				$_SESSION['timetable']=0;
 		}
-
-		if(is_array($_SESSION['subjects']))
-			$_SESSION['timetable'] = 1;
-		else	
-			$_SESSION['timetable']=0;
 	}
 	
 }

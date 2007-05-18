@@ -125,7 +125,10 @@ function verify()
 				<table>
 					<tr>
 						<td><h2>Preferred</h2></td>
-						<td><input type="text" name="firstname" value="{FIRSTNAME}" />
+						<td><select name="title">
+								{TITLELIST}
+							</select>
+							<input type="text" name="firstname" value="{FIRSTNAME}" />
 						</td>
 						<td><h2>Surname</h2></td>
 						<td><input type="text" name="lastname" value="{LASTNAME}" />

@@ -154,9 +154,13 @@ function formatName($format, $userInfo = array('title' => '', 'username' => '', 
 }
 
 function formatEmail($email) {
-	
-	if($email['local_email'])
-		return $email['username']."@".MAIL_address;
+
+	if($email['local_email']) {
+		if(SITE_location == 'wenona'&& $email['uid'] && stristr($_SESSION['mailhandle'],'createMail.php') ) 
+			return $email['uid'];
+		else
+			return $email['username']."@".MAIL_address;
+	}
 	else if($email['alt_email'])
 		return $email['alt_email'];
 	else 
