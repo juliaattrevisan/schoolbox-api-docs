@@ -116,5 +116,15 @@ define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 // Name format display options.
 define("NAME_FORMAT", "{title} {firstname} {lastname}");
 
+//homepage config
+define('HOMEPAGE_large_head_font', 5);
+define('HOMEPAGE_large_head_bg', 1);
+define('HOMEPAGE_large_text_font', 4);
+define('HOMEPAGE_large_text_bg', 5);
+define('HOMEPAGE_small_head_font', 5);
+define('HOMEPAGE_small_head_bg', 2);
+define('HOMEPAGE_small_text_font', 4);
+define('HOMEPAGE_small_text_bg', 6);
+
 
 ?>

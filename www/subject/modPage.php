@@ -93,7 +93,15 @@ class modPage
                 $this->saveComponentPosition(1, 10, 0);
 
                 //setup css attributes
-                $this->saveDisplayProperties(5,1,4,5,5,2,4,6);
+                $this->saveDisplayProperties(
+				HOMEPAGE_large_head_font,
+				HOMEPAGE_large_head_bg,
+				HOMEPAGE_large_text_font,
+				HOMEPAGE_large_text_bg,
+				HOMEPAGE_small_head_font,
+				HOMEPAGE_small_head_bg,
+				HOMEPAGE_small_text_font,
+				HOMEPAGE_small_text_bg);
 
         }
 
@@ -120,7 +128,15 @@ class modPage
                 $this->saveComponentPosition(10, 10, 0);
 
                 //setup css attributes
-                $this->saveDisplayProperties(5,1,4,5,5,2,4,6);
+                $this->saveDisplayProperties(
+				HOMEPAGE_large_head_font,
+				HOMEPAGE_large_head_bg,
+				HOMEPAGE_large_text_font,
+				HOMEPAGE_large_text_bg,
+				HOMEPAGE_small_head_font,
+				HOMEPAGE_small_head_bg,
+				HOMEPAGE_small_text_font,
+				HOMEPAGE_small_text_bg);
 
         }
 
@@ -138,16 +154,24 @@ class modPage
                 $this->saveComponentPosition(8, 1, 0);
                 $this->saveComponentPosition(3, 2, 5);
                 $this->saveComponentPosition(2, 3, 5);
-		$this->saveComponentPosition(1, 4, 0);
+				$this->saveComponentPosition(1, 4, 0);
                 $this->saveComponentPosition(1, 5, 0);
-		$this->saveComponentPosition(4, 6, 7);
+				$this->saveComponentPosition(4, 6, 7);
                 $this->saveComponentPosition(10, 7, 7);
                 $this->saveComponentPosition(1, 8, 0);
                 $this->saveComponentPosition(1, 9, 0);
                 $this->saveComponentPosition(1, 10, 0);
 
                 //setup css attributes
-                $this->saveDisplayProperties(5,1,4,5,5,2,4,3);
+                $this->saveDisplayProperties(
+				HOMEPAGE_large_head_font,
+				HOMEPAGE_large_head_bg,
+				HOMEPAGE_large_text_font,
+				HOMEPAGE_large_text_bg,
+				HOMEPAGE_small_head_font,
+				HOMEPAGE_small_head_bg,
+				HOMEPAGE_small_text_font,
+				HOMEPAGE_small_text_bg);
         }
 
         function createGroupForumPage()
@@ -173,7 +197,15 @@ class modPage
                 $this->saveComponentPosition(1, 10, 0);
 
                 //setup css attributes
-                $this->saveDisplayProperties(5,1,4,5,5,2,4,3);
+                $this->saveDisplayProperties(
+				HOMEPAGE_large_head_font,
+				HOMEPAGE_large_head_bg,
+				HOMEPAGE_large_text_font,
+				HOMEPAGE_large_text_bg,
+				HOMEPAGE_small_head_font,
+				HOMEPAGE_small_head_bg,
+				HOMEPAGE_small_text_font,
+				HOMEPAGE_small_text_bg);
         }
 
         function createFacultyPage()
@@ -199,7 +231,15 @@ class modPage
                 $this->saveComponentPosition(1, 10, 0);
 
                 //setup css attributes
-                $this->saveDisplayProperties(5,1,4,5,5,2,4,3);
+                $this->saveDisplayProperties(
+				HOMEPAGE_large_head_font,
+				HOMEPAGE_large_head_bg,
+				HOMEPAGE_large_text_font,
+				HOMEPAGE_large_text_bg,
+				HOMEPAGE_small_head_font,
+				HOMEPAGE_small_head_bg,
+				HOMEPAGE_small_text_font,
+				HOMEPAGE_small_text_bg);
         }
 
 
