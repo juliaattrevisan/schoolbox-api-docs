@@ -63,6 +63,22 @@ class displayCalendar
 		
 	}
 	
+	function yearDropDown($selected)
+	{
+		$this->t_body->set_block("tplBODY", "year_drop", "year_drop_block");
+		for($i=date('Y')-2; $i <= date('Y')+1; $i++)
+		{
+			$this->t_body->set_var("DROP_YEAR_NUMBER", $i);
+			if($i == $selected)
+				$this->t_body->set_var("DROP_YEAR_SELECTED", "selected=\"selected\"");
+			else
+				$this->t_body->set_var("DROP_YEAR_SELECTED", "");
+	
+			$this->t_body->parse("year_drop_block", "year_drop",true);
+		}
+		
+	}
+	
 	function campusDropDown($selected)
 	{
 		$this->t_body->set_block("tplBODY", "campus_drop", "campus_drop_block");
@@ -116,7 +132,8 @@ class displayCalendar
 						"&Month=".date("m",$previousMonth)."&Day=".date("d", $previousMonth));
 		$this->t_body->set_var("FORWARD", "viewCalendar.php?Year=".date("Y",$nextMonth).
 						"&Month=".date("m",$nextMonth)."&Day=".date("d", $nextMonth));
-						
+		
+		$this->yearDropDown($this->currYear);			
 		$this->monthDropDown($this->currMonth);
 		$this->campusDropDown($this->campus);
 						

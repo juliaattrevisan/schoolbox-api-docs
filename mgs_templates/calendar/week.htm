@@ -119,35 +119,39 @@
 						<td><a class="back" href="{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td> 
 						<td colspan="5">
 						<form method="get" action="viewCalendar.php">
-						<input type="hidden" name="Year" value="{YEAR}">
 						<input type="hidden" name="Day" value="{DAY}">
 						<select name="Month" onchange="this.form.submit();">
 						<!-- BEGIN month_drop -->
 							<option value="{DROP_MONTH_NUMBER}" {DROP_MONTH_SELECTED}>{DROP_MONTH_NAME}</option>
 						<!-- END month_drop -->
 						</select>
+                        <select name="Year" onchange="this.form.submit();">
+                        <!-- BEGIN year_drop -->
+                        	<option value="{DROP_YEAR_NUMBER}" {DROP_YEAR_SELECTED}>{DROP_YEAR_NUMBER}</option>
+                        <!-- END year_drop -->
+                        </select>
 						</form>
 						</td> 
 						<td><a class="forward" href="{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
 					</tr> 
-					<tr> 
-						<th class="cntr">Sun</th> 
-						<th class="cntr">Mon</th> 
-						<th class="cntr">Tue</th> 
-						<th class="cntr">Wed</th> 
-						<th class="cntr">Thu</th> 
-						<th class="cntr">Fri</th> 
-						<th class="cntr">Sat</th> 
+										<tr> 
+						<th>Sun</th> 
+						<th>Mon</th> 
+						<th>Tue</th> 
+						<th>Wed</th> 
+						<th>Thu</th> 
+						<th>Fri</th> 
+						<th>Sat</th> 
 					</tr> 
 					<!-- BEGIN week_block --> 
 					<tr> 
-						<td class="{MONTABLE_CSS0} cntr" onclick="location.href='{DAYURL0}';">{DAY0}</td> 
-						<td class="{MONTABLE_CSS1} cntr" onclick="location.href='{DAYURL1}';">{DAY1}</td> 
-						<td class="{MONTABLE_CSS2} cntr" onclick="location.href='{DAYURL2}';">{DAY2}</td> 
-						<td class="{MONTABLE_CSS3} cntr" onclick="location.href='{DAYURL3}';">{DAY3}</td> 
-						<td class="{MONTABLE_CSS4} cntr" onclick="location.href='{DAYURL4}';">{DAY4}</td> 
-						<td class="{MONTABLE_CSS5} cntr" onclick="location.href='{DAYURL5}';">{DAY5}</td> 
-						<td class="{MONTABLE_CSS6} cntr" onclick="location.href='{DAYURL6}';">{DAY6}</td> 
+						<td class="{MONTABLE_CSS0}" onclick="location.href='{DAYURL0}';">{DAY0}</td> 
+						<td class="{MONTABLE_CSS1}" onclick="location.href='{DAYURL1}';">{DAY1}</td> 
+						<td class="{MONTABLE_CSS2}" onclick="location.href='{DAYURL2}';">{DAY2}</td> 
+						<td class="{MONTABLE_CSS3}" onclick="location.href='{DAYURL3}';">{DAY3}</td> 
+						<td class="{MONTABLE_CSS4}" onclick="location.href='{DAYURL4}';">{DAY4}</td> 
+						<td class="{MONTABLE_CSS5}" onclick="location.href='{DAYURL5}';">{DAY5}</td> 
+						<td class="{MONTABLE_CSS6}" onclick="location.href='{DAYURL6}';">{DAY6}</td> 
 					</tr> 
 					<!-- END week_block --> 
 				</table>
