@@ -154,11 +154,18 @@ function formatName($format, $userInfo = array('title' => '', 'username' => '', 
 }
 
 function formatEmail($email) {
-
 	if($email['local_email']) {
-		if(SITE_location == 'wenona'&& $email['uid'] && stristr($_SESSION['mailhandle'],'createMail.php') ) 
-			return $email['uid'];
-		else
+		if(SITE_location == 'wenona' ) {
+			if(isStaff($_SESSION['gid'])) {		//if wenona only return address if they are staff then only return a uid
+				if($email['uid'] && stristr($_SESSION['mailhandle'],'createMail.php')) 
+					return $email['uid'];
+				else 
+					return $email['username']."@".MAIL_address;
+			}
+			else 
+				return false;
+		}
+		else 
 			return $email['username']."@".MAIL_address;
 	}
 	else if($email['alt_email'])

@@ -30,15 +30,11 @@ class ClassList
 					//setup database
 			$db = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
 			$mySQLdb = new dbManager();
-			$mySQLdb->dbConnect();	
 	
-			$query = "SELECT SubjectClasses.Description 
-				FROM SynergyOne.dbo.SubjectClasses SubjectClasses
-				WHERE SubjectClasses.ClassCode = '$subCode'";
-			
-			$result = mssql_query($query, $db);
-			$name = @mssql_fetch_array($result);
-			$this->t_body->set_var("SUBJECTNAME", $name[0]);	
+			$query = "SELECT name FROM category WHERE code = '$subCode'";
+			$category = $mySQLdb->dbGetSingleRow($query);
+	
+			$this->t_body->set_var("SUBJECTNAME", $category['name'] ." ($subCode)");	
 	
 			$result = getStudents($subCode, $db);
 	
@@ -54,13 +50,11 @@ class ClassList
 					
 					//get each students email address
 					$mysqlquery = "SELECT id as uid, username, local_email, alt_email FROM user WHERE synergy_id = '".$student['synergy_id']."'";
-					$mySQLdb->dbDoQuery($mysqlquery);
-					if($mySQLdb->dbCountRows() > 0)
-					{	
-						$email = $mySQLdb->dbGetNextArray();
+					$email = $mySQLdb->dbGetSingleRow($mysqlquery);
 		
+					if(is_array($email)){
 						$emailaddr = formatEmail($email);
-	
+		
 						if($emailaddr){				
 							$emaillink = "<a href=\"".$_SESSION['mailhandle'].$emailaddr."\">Email</a>";
 							$this->t_body->set_var("EMAIL", $emaillink);
@@ -70,15 +64,15 @@ class ClassList
 							$this->t_body->set_var("EMAIL", "");
 			
 						$this->t_body->set_var("EMAIL_ADDRESS", $emailaddr);
+						
 						//get the time since the last visit to this homepage
 						$visitquery = "SELECT DATE_FORMAT(`datetime`, '%a %D %b %H:%i') as visit FROM homepage_log, category
 								  WHERE category.code = '" . $subCode . "'
 								  AND	category.id = homepage_log.cid
 								  AND   homepage_log.user = '{$email['id']}'
 						"; 
-						$mySQLdb->dbDoQuery($visitquery);
-						if($mySQLdb->dbCountRows() > 0)
-						{
+						$lastVisit = $mySQLdb->dbGetSingleRow($visitquery);
+						if(is_array($lastVisit)) {
 							$lastVisit = $mySQLdb->dbGetNextArray();
 							$this->t_body->set_var("LASTVISIT", $lastVisit['visit']);
 						}

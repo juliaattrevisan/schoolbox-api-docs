@@ -22,12 +22,9 @@ class OutPut
 	{
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "mail.htm");
-
 		$this->t_body->set_var("TITLE", HEADING." - My Messages");
-		
 		$this->t_body->set_block("tplBODY", "mail_listing", "mail_block");
-		
-		$this->t_body->set_var('NAME', formatName();
+		$this->t_body->set_var('NAME', formatName(NULL));
 		
 		include("include/page.php");
 	}
@@ -133,7 +130,7 @@ class OutPut
 			//clean up
 		}
 		else
-			$this->set_var("mail_block", "</table>You have no mail at this time<table>");
+			$this->set_var("mail_block", "</table>You have no messages at this time<table>");
 		
 		imap_close($inbox);
 	}

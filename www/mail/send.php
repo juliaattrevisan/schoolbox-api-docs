@@ -24,9 +24,9 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	$user = $db->dbGetSingleRow($query);
 
 	if($user['alt_email'])
-		$from_email = $user['alt_email'];
+		$from_email = $user['firstname'].' '.$user['lastname'].'<'.$user['alt_email'].'>';
 	else if($user['local_email'] || SITE_location == 'wenona')
-		$from_email = $user['username']."@".MAIL_address;
+		$from_email = $user['firstname'].' '.$user['lastname'].'<'.$user['username']."@".MAIL_address.'>';
 	else 
 		error(42);
 
@@ -74,12 +74,14 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	{
 		$cc = str_replace(";",",",$cc);
 		$headers['Cc'] = $cc;
+		$recipients['Cc'] = $cc;
 	}
 	
 	if(strrchr($bcc, '@'))
 	{
 		$bcc = str_replace(";",",",$bcc);
 		$headers['Bcc'] = $bcc;
+		$recipients['Bcc'] = $bcc;
 	}
 
 	$mime = new Mail_mime("\r\n");
