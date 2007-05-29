@@ -69,11 +69,10 @@ class ClassList
 						$visitquery = "SELECT DATE_FORMAT(`datetime`, '%a %D %b %H:%i') as visit FROM homepage_log, category
 								  WHERE category.code = '" . $subCode . "'
 								  AND	category.id = homepage_log.cid
-								  AND   homepage_log.user = '{$email['id']}'
+								  AND   homepage_log.user = '{$email['uid']}'
 						"; 
 						$lastVisit = $mySQLdb->dbGetSingleRow($visitquery);
 						if(is_array($lastVisit)) {
-							$lastVisit = $mySQLdb->dbGetNextArray();
 							$this->t_body->set_var("LASTVISIT", $lastVisit['visit']);
 						}
 						else
