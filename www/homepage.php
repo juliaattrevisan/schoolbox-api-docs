@@ -104,12 +104,18 @@ class OutPut
 	function folderManage($name, $size)
 	{
 		$this->t_body->set_block($name, "manage_page", "manage_page_block");
+		$this->t_body->set_block($name, "stats_data", "stats_data_block");
 
 		if($this->perm == 3) //is owner of area
 			$this->t_body->parse("manage_page_block", "manage_page");	
 		else
 			$this->t_body->set_var("manage_page_block", "");
-			
+	
+		if($this->perm >= 2) //has write access
+			$this->t_body->parse("stats_data_block", "stats_data");	
+		else
+			$this->t_body->set_var("stats_data_block", "");
+		
 		return true;
 	}				
 
