@@ -29,13 +29,14 @@ class OutPut
 		$this->checkPerms();		
 
 		//get skeleton template
-		$query = "SELECT name, homepage_config.* FROM category, homepage_config WHERE cid = id AND id = '$category'"; 		
-		$this->db->dbDoQuery($query);
-		$skel_template = $this->db->dbGetNextArray();
+		$query = "SELECT name, code, homepage_config.* FROM category, homepage_config WHERE cid = id AND id = '$category'"; 		
+		$skel_template = $this->db->dbGetSingleRow($query);
 						
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file('tplBODY', 'homepages/homepage'.$skel_template['template'].'.htm');
 
+		$this->code = $skel_template['code'];
+		
 		//setup css
 		$this->outputCSS($skel_template);
 
@@ -86,7 +87,16 @@ class OutPut
 	function outputHeader($name)
 	{
 		$name = scrubTEXT($name);
-		$this->t_body->set_var("HEADING", $name);
+	
+		if($this->code)
+		{
+			$this->t_body->set_var("HEADING", $name." (".$this->code.")");	
+			$this->t_body->set_var("CODE", urlencode($this->code));
+		}
+		else {
+			$this->t_body->set_var("HEADING", $name);
+			$this->t_body->set_var("CODE",'');
+		}
 		
 		$this->t_body->set_var("ID", $this->category);
 		
@@ -176,27 +186,10 @@ class OutPut
 
 	function initSubject($name, $size)
 	{
-		$query = "SELECT name, code FROM category WHERE id = '".$this->category."'";
-		$this->db->dbDoQuery($query);
-		$result = $this->db->dbGetNextArray();
-	
-		if($result['code'] == "")
-		{
-			$this->t_body->set_var("HEADING", scrubTEXT($result['name']));
-		}
-		else
-		{
-			$this->code = $result['code'];
-			$this->t_body->set_var("HEADING", scrubTEXT($result['name'])." (".$result['code'].")");	
-			$this->t_body->set_var("CODE", urlencode($this->code));
-		}
-
-		//$this->t_body->set_var("TEACHER", $result['teacher']); 
-
 		//output mangement/userlist link to owner of subject
 		$this->t_body->set_block($name, "class_list", "class_list_block");
 	
-		if(SYNERGY_enable == false || $this->perm < 2 || $result['code'] == '' )
+		if(SYNERGY_enable == false || $this->perm < 2 || $this->code == '' )
 			$this->t_body->set_var("class_list_block", "");
 		else
 			$this->t_body->parse("class_list_block", "class_list");	
@@ -320,12 +313,10 @@ class OutPut
 		
 		// sql to add module :
 		// INSERT INTO homepage_comp VALUES(2, 'outputTeachers', 'Class Teachers', 'teacher_s.htm')
+		$this->t_body->set_block($name, "staff_teachers", "staff_teacher_block");
 		
 		if($this->code != "" && SYNERGY_enable)
-		{
-			$this->t_body->set_block($name, "staff_teachers", "staff_teacher_block");
-	
-			
+		{	
 			$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
 			mssql_select_db(MSSQL_db, $db);
 		
@@ -348,12 +339,10 @@ class OutPut
 			}
 			else
 				$this->t_body->set_var("staff_teacher_block", "");
-
 		}
 		else
-		{
 			$this->t_body->set_var("staff_teacher_block", "");
-		}
+	
 		return true;
 	}
 
