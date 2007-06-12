@@ -11,54 +11,52 @@
 *                                                           *
 ************************************************************/
 
-function fileSecurityCheck($errorCheck, $uploadCheck, $sizeCheck, $typeCheck)
+function fileSecurityCheck($error, $file_name, $tmp_name, $size, $type="")
 {
-	// PHP internal error check
-	if($errorCheck)
+
+	//check error codes in FILE array
+	switch($error)
 	{
-		//check error codes in FILE array
-		switch($_FILES['file']['error'])
-		{
-			case 0: //no error
-				break;
-			case 1: //uploaded file exceeds the upload_max_filesize directive in php.ini
-				error(10);
-					break;
-			case 2: //uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form
-				error(10);
-				break;
-			case 3: //uploaded file was only partially uploaded
-				error(43);
-				break;
-			case 4: //no file was uploaded
-				error(43);
-				break;
-			default: //a default error, just in case!  :)
-				break;
-		}
-	}
-	
-	// Upload error check
-	if($uploadCheck)
-	{
-		//check file is in upload dir
-		if(!is_uploaded_file($_FILES['file']['tmp_name']))
-			error(9, "Security infringement, possible file upload attack.");
-	}
-	
-	// Size check
-	if($sizeCheck)
-	{
-		//file size test
-		if( $_FILES['file']['size'] <= 0)
+		case 0: //no error
+			break;
+		case 1: //uploaded file exceeds the upload_max_filesize directive in php.ini
 			error(10);
+				break;
+		case 2: //uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form
+			error(10);
+			break;
+		case 3: //uploaded file was only partially uploaded
+			error(43);
+			break;
+		case 4: //no file was uploaded
+			error(43);
+			break;
+		default: //a default error, just in case!  :)
+			break;
 	}
+	
+	//check file is in upload dir
+	if(!is_uploaded_file($tmp_name))
+		error(9, "Security infringement, possible file upload attack.");
+	
+	//file size test
+	if( $size <= 0)
+		error(10);
 	
 	// MIME type check
-	if($typeCheck)
+	if($type)
 	{
-		$mime = strtolower($_FILES['file']['type']);
-		list($name, $ext) = explode(".",$_FILES['file']['name']);
+		//$mime = strtolower($type);
+		//improved so that it only gets the last . in the string
+		$ext = substr(strrchr($file_name, "."), 1);
+		
+		if(MIME_magic) {
+			//update to check against magic mime file on server rather than trust browser interpretation
+			$handle = finfo_open(FILEINFO_MIME, MIME_magic);
+			$mime = finfo_file($handle,$tmp_name);
+		}
+		else //just trust browser not as good but it works
+			$mime = strtolower($type);
 		
 		$db = new dbManager;
 		$query = "SELECT t.fileTypeID FROM allowedFileTypes t LEFT JOIN allowedFileExtension e on t.fileTypeID = e.fileTypeID WHERE mime = '$mime' AND extension = '$ext' AND enable = 'true'";

@@ -52,11 +52,11 @@ class file
 		
 	}
 
-	function addFile($file_name, $file_type, $description, $comment, $category, $type)
+	function addFile($file_name, $file_type, $file_loc, $description, $comment, $category, $type)
 	{
 		//check allowed perms to add to specified category before proceeding
 		$this->checkWriteAccess($category);		
-		$filesize = @filesize($_FILES['file']['tmp_name']);
+		$filesize = @filesize($file_loc);
 	
 		$file = array(	'description'	=> $description,
 								'comment'	 	=> $comment,
@@ -74,11 +74,11 @@ class file
 		//get file ID from INSERT
 		$fileId = $this->db->dbInsertId();
 	
-		if( $_FILES['file']['tmp_name'] )
+		if( $file_loc )
 		{
 				//save file using file ID as name
 				$newFileName = $fileId . ".dat";
-				copy($_FILES['file']['tmp_name'], FILE_directory ."/". $newFileName);
+				copy($file_loc, FILE_directory ."/". $newFileName);
 		}
 	
 		$logEntry = array(	'object'			=> 'file',

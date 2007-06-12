@@ -8,6 +8,9 @@
 
 require_once("../include/include.php");
 require_once("../include/session.php");
+require_once("../include/fileSecurity.php");
+require_once("file.php");
+require_once("url.php");
 
 class ModResourcePage {
 	
@@ -259,7 +262,7 @@ class ModResourcePage {
 	function displayModifyURL($id)
         {
                 //first find details about file to fill form with
-		include("url.php");
+	
 		$urlObj = new url;
 		$url = $urlObj->getUrl($id); 
 
@@ -312,14 +315,13 @@ class ModResourcePage {
 
 $myPage = new ModResourcePage();
 
-if(isset($_POST['description']) && $_POST['description'])
+if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['description'][0]) && $_POST['description'][0]) )
 {
 	//description entered
 
 	if(isset($_POST['url']) && $_POST['url'] )
 	{
 		//a url has been submitted 
-		include("url.php");
 		$urlDB = new url; 
 
 		if(isset($_POST['modid']) && $_POST['modid'])
@@ -344,28 +346,27 @@ if(isset($_POST['description']) && $_POST['description'])
 	else if( isset($_FILES['file']['name']) && $_FILES['file']['name'] )
 	{
 		//call file security checks
-		include("../include/fileSecurity.php");
-		fileSecurityCheck(true, true, true, true);
+		
+		fileSecurityCheck($_FILES['file']['error'], $_FILES['file']['name'], $_FILES['file']['tmp_name'], $_FILES['file']['size'], $_FILES['file']['type']);
 
-		include("file.php");
 		$fileDB = new file; 
 		
 		//all checks passed add it
 		if($_POST['catCount'])
-		{
+		{	//submit file to multiple locations
 			for($x=0; $_POST['catCount'] > $x; $x++)
-			{
+			{	
 				if($_POST['mulc'][$x])
-	 			       	$fileId = $fileDB->addFile($_FILES['file']['name'], $_FILES['file']['type'], 
-					$_POST['description'], $_POST['comment'], $_POST['mulc'][$x], $_POST['ftype']);
+	 			       	$fileId = $fileDB->addFile($_FILES['file']['name'], $_FILES['file']['type'], $_FILES['file']['tmp_name'], 
+													$_POST['description'], $_POST['comment'], $_POST['mulc'][$x], $_POST['ftype']);
 			}
 		}
-		else			
-        		$fileId = $fileDB->addFile($_FILES['file']['name'], $_FILES['file']['type'], $_POST['description'], 
-			$_POST['comment'], $_POST['category'], $_POST['ftype']);
-
+		else {	//just submit file
+        		$fileId = $fileDB->addFile($_FILES['file']['name'], $_FILES['file']['type'], $_FILES['file']['tmp_name'], $_POST['description'], 
+											$_POST['comment'], $_POST['category'], $_POST['ftype']);
+		}
 	 	//ok finished redirect create submission page if requested or just go to where file was added
-        	if($_POST['submission'])
+        if($_POST['submission'])
 			localRedir("/submission/createSubmission.php?cid=".$_POST['category']."&fileid=".$fileId);
 		else
 		{
@@ -373,12 +374,24 @@ if(isset($_POST['description']) && $_POST['description'])
 			include("../include/back.php");
 		}
 		exit;
-		
-
 	}
+	else if(is_array($_FILES['file']['name'])) { 
+		//submit multiple files to single location
+		foreach ($_FILES['file']['error'] as $key => $error) {
+   			if ($error == UPLOAD_ERR_OK) {
+				fileSecurityCheck($_FILES['file']['error'][$key], $_FILES['file']['name'][$key], $_FILES['file']['tmp_name'][$key], $_FILES['file']['size'][$key], $_FILES['file']['type'][$key]);
+				$fileDB->addFile($_FILES['file']['name'][$key], $_FILES['file']['type'][$key], $_FILES['file']['tmp_name'][$key],
+								$_POST['description'][$key], '', $_POST['category'], $_POST['ftype']);
+			}
+		}
+			
+		$back = -2;
+		include("../include/back.php");
+		
+	}
+	
 	else if(isset($_POST['modid']) && $_POST['modid'])
 	{
-		include("file.php");
 		$fileDB = new file; 
 
 		$fileDB->modifyFile($_POST['description'], $_POST['comment'], $_POST['category'], $_POST['ftype'], $_POST['modid']);
@@ -389,7 +402,6 @@ if(isset($_POST['description']) && $_POST['description'])
 	}
 	else if(isset($_POST['ftype']))
 	{	
-		include("file.php");
 		$fileDB = new file; 
 
 		//submitting a file without a file 

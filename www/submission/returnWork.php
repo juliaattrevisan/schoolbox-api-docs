@@ -112,7 +112,7 @@ if( ((isset($_POST['comment']) && $_POST['comment']) || (isset($_POST['mark']) &
 	if( isset($_FILES['file']['name']) && $_FILES['file']['name'] )
 	{
 		require("../include/fileSecurity.php");
-		fileSecurityCheck(true, true, true, true);
+		fileSecurityCheck($_FILES['file']['error'], $_FILES['file']['name'], $_FILES['file']['tmp_name'], $_FILES['file']['size'], $_FILES['file']['type']);
 
 		//all checks passed add it
 		$myPage->returnWorkWithFile($_FILES['file']['tmp_name'], $_FILES['file']['name'], $_POST['sid'], $_POST['box_id'], 
