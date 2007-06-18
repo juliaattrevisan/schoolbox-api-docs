@@ -94,7 +94,7 @@ class returnWorkPage {
 		$this->db->dbDoQuery($query);
 		$result = $this->db->dbGetNextArray();
 		
-		$this->t_body->set_var("NAME", formatName(NULL, $result));
+		$this->t_body->set_var("NAME", formatName($result));
 		$this->t_body->set_var("SID", $sid);
                 $this->t_body->pparse("finaloutput", "tplBODY");
         }

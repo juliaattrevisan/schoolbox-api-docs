@@ -68,7 +68,7 @@ class modUserGroup
 		$owner = $group->getOwner();
 		if($owner != 0)
 		{
-			$this->t_body->set_var("OWNER", formatName(NULL, $owner));
+			$this->t_body->set_var("OWNER", formatName($owner));
 			$this->t_body->set_var("OWNERID", $owner['uid']);
 		}
 		else
@@ -88,8 +88,8 @@ class modUserGroup
 		{
 			while($member = $this->db->dbGetNextArray())
 			{
-				$this->t_body->set_var("MEMBER", formatName(NULL, $member));
-				$this->t_body->set_var("MEMBER_JAVA", addslashes(formatName(NULL, $member)));
+				$this->t_body->set_var("MEMBER", formatName($member));
+				$this->t_body->set_var("MEMBER_JAVA", addslashes(formatName($member)));
 				$this->t_body->set_var("MEMBERID", $member['uid']);
 
 				if($member['type'] == 1)
@@ -137,7 +137,7 @@ class modUserGroup
 		{
 			while($row = $this->db->dbGetNextArray() )
 			{
-				$this->t_body->set_var("WAITING_MEMBER", formatName(NULL, $row));
+				$this->t_body->set_var("WAITING_MEMBER", formatName($row));
 				$this->t_body->set_var("WAITINGID", $row['id']);
 				
 				$this->t_body->parse("waiting_block", "waiting", true);

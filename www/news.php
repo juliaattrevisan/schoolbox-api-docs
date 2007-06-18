@@ -52,7 +52,7 @@ class OutPut
 				
 				$this->set_var("NEWS_TITLE", $article['item_heading']);
 			
-				$fullname = formatName(NULL, $article);
+				$fullname = formatName($article);
 				$email = formatEmail($article);
 				
 				if($email)

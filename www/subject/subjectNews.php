@@ -70,7 +70,7 @@ function getNews()
     {
 		$this->news[$i]['Id'] = $newsDbResult["id"];
 		$this->news[$i]['Heading'] = num_encode($newsDbResult["heading"]);
-		$this->news[$i]['Poster'] = formatName(NULL, $newsDbResult);
+		$this->news[$i]['Poster'] = formatName($newsDbResult);
 		$this->news[$i]['Contact'] = formatEmail($newsDbResult);
 		$this->news[$i]['Owner'] = $newsDbResult["owner"];
 		$this->news[$i]['Datetime'] = $newsDbResult["datetime"];

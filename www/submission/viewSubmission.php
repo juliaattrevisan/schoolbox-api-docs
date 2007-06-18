@@ -40,8 +40,8 @@ class ViewSubmissionPage {
 		{
 			while($line = $this->db->dbGetNextArray() )
 			{
-				$this->t_body->set_var("OWNER", formatName('{lastname}, {firstname}', $line));
-				$this->t_body->set_var("OWNER_ESCAPED", addslashes(formatName('{lastname}, {firstname}', $line)));
+				$this->t_body->set_var("OWNER", formatName($line,'{lastname}, {firstname}'));
+				$this->t_body->set_var("OWNER_ESCAPED", addslashes(formatName($line,'{lastname}, {firstname}')));
 				$this->t_body->set_var("DATE", $line['date']);
 				$this->t_body->set_var("VIEW", "sendframe.php?view=".$line['id']);
 				$this->t_body->set_var("SAVE", "viewSubmission.php?view=".$line['id']."&save=1");

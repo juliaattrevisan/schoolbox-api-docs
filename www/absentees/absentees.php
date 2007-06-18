@@ -156,7 +156,7 @@ class Absentee
                 $mydb->dbDoQuery($query);
                 $teacher = $mydb->dbGetNextArray();
 
-                $this->t_body->set_var("TEACHERNAME", formatName(NULL, $teacher));
+                $this->t_body->set_var("TEACHERNAME", formatName($teacher));
 
 		$query = "SELECT Timetable.ClassCode
                           FROM SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable Timetable

@@ -292,6 +292,10 @@ class ModResourcePage {
                	$this->t_body->set_file("tplBODY", "cms/addURL.htm");
 				$this->t_body->set_var("TITLE", HEADING." - Link Submission page");
 			}
+			else if($type=='files') {
+			  	$this->t_body->set_file("tplBODY", "cms/addMultiFile.htm");
+				$this->t_body->set_var("TITLE", HEADING." - File Submission page");
+			}
 			else
 			{
                	$this->t_body->set_file("tplBODY", "cms/addFile.htm");
@@ -443,7 +447,7 @@ else if((isset($_FILES['file']['name']) && $_FILES['file']['name']) || (isset($_
 else
 {
 	if ($_GET['type'] != "url" && $_GET['type'] != "multurl" && $_GET['type'] != "multfile" && $_GET['type'] != "modurl" 
-		&& $_GET['type'] != "modfile")
+		&& $_GET['type'] != "modfile" && $_GET['type'] != 'files')
 		$myPage->showPage("file", $_GET['cid'], $_GET['file'], $_GET['id']);
 	else
 		//just display the page

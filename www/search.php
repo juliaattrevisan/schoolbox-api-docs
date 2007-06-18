@@ -359,7 +359,7 @@ category.id AND f.deleted = '0'";
 		$this->t_body->set_var("COMMENT", scrubTEXT($fileDetails['comment']));
 	
 		// set owner
-		$fullname = formatName(NULL, $fileDetails);
+		$fullname = formatName($fileDetails);
 		$email = formatEmail($fileDetails);
 		
 		if($email)
@@ -406,7 +406,7 @@ category.id AND f.deleted = '0'";
 		$this->t_body->set_var("COMMENT", scrubTEXT($linkDetails['comment']));
 		
 		// set owner
-		$fullname = formatName(NULL, $linkDetails);
+		$fullname = formatName($linkDetails);
 		$email = formatEmail($linkDetails);
 		
 		//create owner email address

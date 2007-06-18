@@ -42,7 +42,7 @@ class Timetable
 	{
 	     
 		$user = $this->getUserInfo($sid);
-		$this->t_body->set_var("PERSON", formatName(NULL, $user));
+		$this->t_body->set_var("PERSON", formatName($user));
 		if($user['year'])
 			$this->t_body->set_var("YEAR", ', Year '.$user['year']);
 		else

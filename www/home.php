@@ -28,8 +28,8 @@ class OutPut
 		
 		$this->db = new dbManager;
 		
-		$this->setGreeting();
-		
+		//set greeting
+		$this->set_var("GREETING", $this->greeting() .' '. formatName($_SESSION));
 		
 		//if user has timetable show it on the homepage
 		if($_SESSION['timetable'])
@@ -74,11 +74,6 @@ class OutPut
 			return "Good Afternoon";
 		else
 			return "Good Evening";
-	}
-
-	function setGreeting()
-	{
-		$this->set_var("GREETING", $this->greeting() . formatName(' {firstname}'));
 	}
 
 	function outputNews($location)
@@ -380,7 +375,7 @@ href=\"/homepage.php?code=".urlencode($period['code'])."\">{$period['description
 		{
 			$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
 			$user = $this->db->dbGetSingleRow($query);
-			$this->t_body->set_var("STUDENT_NAME", formatName('{firstname} {lastname}', $user));
+			$this->t_body->set_var("STUDENT_NAME", formatName($user,'{firstname} {lastname}'));
 			$this->t_body->set_var("STUDENT_YEAR", $user['year']);
 			
 			if(is_array($child['subjects']) ) {

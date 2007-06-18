@@ -242,7 +242,7 @@ class OutPut
 		{
 			while($member = $this->db->dbGetNextArray())
 			{			
-				$name = formatName(NULL, $member);
+				$name = formatName($member);
 				$email = formatEmail($member);
 					
 				if($member['type'] == 3)
@@ -281,7 +281,7 @@ class OutPut
 		{
 			while($manager = $this->db->dbGetNextArray())
 			{
-				$name = formatName(NULL, $manager);
+				$name = formatName($manager);
 				$email = formatEmail($manager);
 				
 				if($manager['type'] == 3)
@@ -331,7 +331,7 @@ class OutPut
 				{
 					$query = "SELECT id, title, firstname, lastname FROM user WHERE synergy_id = '{$synrow['StaffID']}'";
 					$manager=$this->db->dbGetSingleRow($query);
-					$name = formatName(NULL, $manager);
+					$name = formatName($manager);
 					
 					$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$manager['id']}\">{$name}</a>");
 					$this->t_body->parse("staff_teacher_block", "staff_teachers", true);		

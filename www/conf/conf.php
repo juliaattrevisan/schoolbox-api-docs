@@ -55,8 +55,8 @@ define("CALENDAR_default_view", 'week');		//Default view style for calendar (wee
 define("CALENDAR_time_format", '%l:%i%p');		//Time output style 24 hour = '%k:%i', 12 hour = '%l:%i %p'
 
 //SEARCH & BROWSE Display options
-define("FILE_date_format", '%W %M %e %Y @ %l:%i%p');		//Time output style 24 hour = '%k:%i', 12 hour = '%l:%i %p'
-
+define('FILE_date_format', '%W %M %e %Y @ %l:%i%p');		//Time output style 24 hour = '%k:%i', 12 hour = '%l:%i %p'
+define('NAME_format', '{title} {firstname} {lastname}'); 	// Format for output of name
 
 //MySQL config options
 define("SQL_host", "localhost");
@@ -113,9 +113,6 @@ define("HOMEPAGESERVICE", 1);				//Value that represents the homepage module in 
 define("STUDENTGROUPIDS", serialize(array(3)));	//List of id numbers representing student groups
 define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
 define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
-
-// Name format display options.
-define("NAME_FORMAT", "{title} {firstname} {lastname}");
 
 //homepage config
 define('HOMEPAGE_large_head_font', 5);
