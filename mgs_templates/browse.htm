@@ -109,23 +109,23 @@
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
             <h1>{CATEGORY_PATH}</h1>
-			<p style="padding-bottom:30px;">
-			<!-- BEGIN view_expand --><a id="expand" class="floatLeft" href="browse.php?category={CID}&verbose=1" title="expand"></a>
+			<p>
+			<!-- BEGIN view_expand --><a href="browse.php?category={CID}&verbose=1">expand view</a>
 			<!-- END view_expand -->
-			<!-- BEGIN view_collapse --><a id="collapse" class="floatLeft" href="browse.php?category={CID}" title="collapse"></a>
+			<!-- BEGIN view_collapse --><a href="browse.php?category={CID}">collapse view</a>
 			<!-- END view_collapse -->
 			<!-- BEGIN view_homepage -->
-			<a id="home" class="floatLeft" href="/homepage.php?category={CID}" title="homepage"></a> 
+			// <a href="/homepage.php?category={CID}">view homepage</a>  
 			<!-- END view_homepage -->
 			<!-- BEGIN view_image_gallery -->
-			<a id="image" class="floatLeft" href="/cms/imageGallery.php?category={CID}" title="image"></a>
+			// <a href="/cms/imageGallery.php?category={CID}">view images</a>
 			<!-- END view_image_gallery -->
 			<!-- BEGIN modify_access -->
-			<a id="modfolder" class="floatLeft" href="/cms/modFolder.php?action=mod&cid={CID}" title="modify folder"></a>
-			<a id="addfile" class="floatLeft" href="/cms/modResource.php?type=file&cid={CID}" title="add file"></a>
-			<!-- <a href="/cms/modResource.php?type=url&cid={CID}">add link</a> -->
-			<a id="addfolder" class="floatLeft" href="/cms/modFolder.php?action=add&cid={CID}" title="add folder"></a>
-			<!-- <a href="/cms/fetchFolder.php?folder={CID}">download</a> -->
+			// <a href="/cms/modFolder.php?action=mod&cid={CID}">modify folder</a>
+			// <a href="/cms/modResource.php?type=file&cid={CID}">add file</a>
+			// <a href="/cms/modResource.php?type=url&cid={CID}">add link</a>
+			// <a href="/cms/modFolder.php?action=add&cid={CID}">add folder</a>
+			// <a href="/cms/fetchFolder.php?folder={CID}">download</a>
 			<!-- END modify_access -->
 			<div style="overflow:hidden;clear:both;height:0;"></div>
 			 </p>
@@ -137,7 +137,7 @@
 						  <a href="{CATEGORY_LINK}">{CATEGORY_NAME}</a></td>
                       <td class="cntr">{HOMEPAGE}</td>
                       <!-- BEGIN mod_cat -->
-                      <td class="cntr"><a id="modify" href="/cms/modFolder.php?action=mod&amp;cid={CATID}" title="modify folder"></a></td>
+                      <td class="cntr"><a href="/cms/modFolder.php?action=mod&amp;cid={CATID}">modify</a></td>
                       <td><a href="/cms/modFolder.php?delete={CATID}" onclick="return(confirm('Remove folder {CATEGORY_NAME_ESCAPED}?'));">delete</a></td>
                       <!-- END mod_cat -->
                     </tr>
@@ -146,8 +146,8 @@
                     <tr> 
                        <td colspan="2">{FILE_URL}<img src="{FILE_IMAGE}" width="25" height="27" border="0" alt="{FILE_MIME}" />{FILE_URL_END} {FILE_URL}{FILE_DESCRIPTION}{FILE_URL_END} <em>{SIZE}</em></td>
                       <!-- BEGIN mod_file -->
-                      <td class="cntr"><a id="modify" href="/cms/modResource.php?type=modfile&amp;id={FILEID}" title="modify file"></a></td>
-                      <td><a href="/cms/delResource.php?fileid={FILEID}" onclick=" return(confirm('Remove file {FILE_DESCRIPTION_ESCAPED}?'));" title="delete"></a></td>
+                      <td class="cntr"><a href="/cms/modResource.php?type=modfile&amp;id={FILEID}">modify</a></td>
+                      <td><a href="/cms/delResource.php?fileid={FILEID}" onclick=" return(confirm('Remove file {FILE_DESCRIPTION_ESCAPED}?'));">delete</a></td>
                       <!-- END mod_file -->
                     </tr>
                     <!-- BEGIN file_desc -->
