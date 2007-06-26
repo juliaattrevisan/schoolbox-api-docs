@@ -102,9 +102,10 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	$mail =& Mail::factory('smtp', $params);
 	
 	$hdrs = $mime->headers($headers);
+	
 	$return = $mail->send($recipients, $hdrs, $body);
-	if($return != true)
-		error(9, $return->getMessage()); 
+	if (PEAR::isError($return))
+		error(9, $return->getMessage());
 }
 
 
