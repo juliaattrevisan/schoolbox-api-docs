@@ -13,8 +13,11 @@
 function getTimetableDefinition($campus)
 {
 	$db = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
+	if(!$db)
+		error(65); 
 	mssql_select_db(MSSQL_db, $db);
-	
+
+		
 	$campusCode = unserialize(SYN_CAMPUS_Codes);
 	
 	$query = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
@@ -76,8 +79,11 @@ function getDayNumber($campus, $date = 0)
 		}
 	
 		$db = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
+		if(!$db)
+			error(65);
 		mssql_select_db(MSSQL_db, $db);
-	
+
+		
 		$query = "SELECT CONVERT(CHAR(19),CalendarEvents.CalendarDate), CalendarEvents.CalendarType
 		FROM SynergyOne.dbo.CalendarEvents CalendarEvents
 		WHERE (CalendarEvents.CalendarType LIKE 'd%') AND CalendarEvents.CalendarDate >= '$mssqldate' ORDER BY 
@@ -120,7 +126,10 @@ function getPeriodNumber($campus)
 	$campusString = $campusCodes[$campus];
 
 	$db = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
+	if(!$db)
+		error(65);
 	mssql_select_db(MSSQL_db, $db);
+
 
 		# Since the year information in the TimeFrom and TimeTo fields is not reliable, this rips out just the time
 		# and sets all dates to be the same, then compares.
@@ -221,8 +230,14 @@ function getDayTimetable($synergy_id, $group, $campus, $daynumber)
 	
 	//setup database
 	$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
+	if(!$db)
+		error(65);
+	mssql_select_db(MSSQL_db, $db);
+
+		
 	$result = mssql_query($query, $db);
 
+		
 	$timetabledef = getTimetableDefinition($campus);
 	
 	$periodCount = $timetabledef['periodCount'];
@@ -326,6 +341,11 @@ function getFullTimetable($synergy_id, $group, $campus)
 
 	//setup database
 	$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
+	if(!$db)
+		error(65);
+	mssql_select_db(MSSQL_db, $db);
+
+	
 	$result = mssql_query($query, $db);
 
 	$timetabledef = getTimetableDefinition($campus);

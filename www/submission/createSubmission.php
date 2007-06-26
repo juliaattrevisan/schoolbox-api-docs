@@ -25,9 +25,23 @@ class CreateSubmissionPage {
 			$details = $subbox->getSubBoxDetails($modify);
 
 			//convert times into timestamps
+			$open_date = strtotime($details['open_date']);
 			$due_date = strtotime($details['date']);
 			$late_date = strtotime($details['late_date']);	
-					
+	
+			$open_hour = date('g',$open_date);
+			$open_min = date('i',$open_date);
+			
+			//output open dates
+			$this->t_body->set_var("OPEN_DATE", date('d/m/Y', $open_date));
+			$this->t_body->set_var("OPEN_HOUR", $open_hour);
+			$this->t_body->set_var("OPEN_MIN", $open_min);
+			if(date('a', $open_date) == 'pm')
+				$this->t_body->set_var("OPEN_PM", "selected");
+			else
+				$this->t_body->set_var("OPEN_PM", "");
+								
+	
 			$due_hour = date('g',$due_date);
 			$due_min = date('i',$due_date);
 			
@@ -60,6 +74,14 @@ class CreateSubmissionPage {
 			//set variables in template
 			$defaultduetime = strtotime('+1 hours');
 			
+			$this->t_body->set_var("OPEN_DATE", date('d/m/Y'));
+			$this->t_body->set_var("OPEN_HOUR", date('g', $defaultduetime));
+			$this->t_body->set_var("OPEN_MIN", '00');
+			if(date('a', $defaultduetime) == 'pm')
+				$this->t_body->set_var("OPEN_PM", "selected");
+			else
+				$this->t_body->set_var("OPEN_PM", "");
+				
 			$this->t_body->set_var("DUE_DATE", date('d/m/Y'));
 			$this->t_body->set_var("DUE_HOUR", date('g', $defaultduetime));
 			$this->t_body->set_var("DUE_MIN", '00');
@@ -127,15 +149,21 @@ $subbox = new subBox;
 if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour'] && $_POST['sid'])
 {
 	//submission box id and times sent so update the submission box times
-	$subbox->updateSubmissionDate($_POST['sid'], $_POST['due_date'], $_POST['due_hour'], $_POST['due_min'], $_POST['due_period'], $_POST['late_date'], 
-		$_POST['late_hour'], $_POST['late_min'], $_POST['late_period'], $_POST['description']);
+	$subbox->updateSubmissionDate($_POST['sid'], 
+		$_POST['open_date'], $_POST['open_hour', $_POST['open_minute'], $_POST['open_period'],
+		$_POST['due_date'], $_POST['due_hour'], $_POST['due_min'], $_POST['due_period'], 
+		$_POST['late_date'], $_POST['late_hour'], $_POST['late_min'], $_POST['late_period'], 
+		$_POST['description']);
 	localRedir("/submission/listSubmission.php");
 }
 else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour'])
 {
 	//form has been submitted 
-	$subbox->createSubmission($_POST['cid'], $_POST['due_date'], $_POST['due_hour'], $_POST['due_minute'], $_POST['due_period'], $_POST['late_date'], $_POST['late_hour'], 
-			$_POST['late_min'], $_POST['late_period'], $_POST['fileid'], $_POST['description']);
+	$subbox->createSubmission($_POST['cid'], 
+			$_POST['open_date'], $_POST['open_hour', $_POST['open_minute'], $_POST['open_period'],
+			$_POST['due_date'], $_POST['due_hour'], $_POST['due_minute'], $_POST['due_period'], 
+			$_POST['late_date'], $_POST['late_hour'], $_POST['late_min'], $_POST['late_period'], 
+			$_POST['fileid'], $_POST['description']);
 	localRedir("/submission/listSubmission.php");
 	
 }

@@ -11,9 +11,9 @@
 function getStudents($subCode, $db = 0)
 {
         //setup database
+        $db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
 		if(!$db)
-        	$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
-
+			error(65);
 		mssql_select_db(MSSQL_db, $db);
 
         $query = "

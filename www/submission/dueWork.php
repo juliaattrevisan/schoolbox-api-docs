@@ -1,8 +1,9 @@
 <?php
 
-require_once("../include/session.php");
-require_once("../include/include.php");
-require_once("../include/involved.php");
+require_once('../include/session.php');
+require_once('../include/include.php');
+require_once('../include/involved.php');
+require_once('../include/syn_userinfo.php');
 
 class dueWorkPage 
 {
@@ -35,7 +36,7 @@ class dueWorkPage
 				$flag=false;
 				$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
 				$user = $this->db->dbGetSingleRow($query);
-				$this->t_body->set_var("USER_NAME", formatName(NULL, $user));
+				$this->t_body->set_var("USER_NAME", formatName($user));
 				if($user['year'])
 					$this->t_body->set_var("USER_YEAR", ', '.$user['year']);
 				else
@@ -47,12 +48,21 @@ class dueWorkPage
 				
 			}
 		}
-		else if($id)
+		else if(is_numeric($id) && $id)
 		{
 			//if requested user check they are staff
 			if(isStaff($_SESSION['gid']))
 			{
-				//TODO:  GET ID SUBJECTS
+				$query = "SELECT title, firstname, lastname, year, synergy_id, group_id FROM user WHERE id = $id";
+				$user = $this->db->dbGetSingleRow($query);
+				$this->t_body->set_var("USER_NAME", formatName($user));
+				if($user['year'])
+					$this->t_body->set_var("USER_YEAR", ', '.$user['year']);
+				else
+					$this->t_body->set_var("USER_YEAR", '');
+				
+				$this->t_body->parse("user_heading_area","user_heading");
+				$subjects = getSubjectList($user['synergy_id'], $user['group_id']);
 				$this->outputCategories($id, $subjects);		
 			}
 			else
@@ -85,15 +95,18 @@ class dueWorkPage
 	
 	function outputCategoryWork($id, $catId)
 	{
-		$query = "SELECT file.description, file.realname, file.id AS fid, 
-			DATE_FORMAT(submission_box.date, '%a, %D of %b %l:%i%p') AS date, submission_box.id, category.name, 
-			UNIX_TIMESTAMP(submission_box.date) AS overdue_date, student_submission.owner, inline 
-			FROM (file, submission_box, category) LEFT JOIN student_submission
-			ON student_submission.box_id = submission_box.id AND student_submission.owner = $id
-			LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
+		$query = "
+			SELECT file.description, file.realname, file.id AS fid, 
+				DATE_FORMAT(submission_box.date, '%a, %D of %b %l:%i%p') AS date, 
+				UNIX_TIMESTAMP(submission_box.date) AS overdue_date,
+				UNIX_TIMESTAMP(submission_box.open_date) AS open_date, 
+				submission_box.id, category.name, student_submission.owner, inline 
+			FROM (file, submission_box, category) 
+				LEFT JOIN student_submission ON student_submission.box_id = submission_box.id AND student_submission.owner = $id
+				LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
 			WHERE submission_box.fid = file.id AND submission_box.category = category.id 
-			AND submission_box.deleted = '0' AND category.id = '$catId' 
-			AND submission_box.late_date > NOW()
+				AND submission_box.deleted = '0' AND category.id = '$catId' 
+				AND submission_box.late_date > NOW()
 			ORDER BY submission_box.date";
 
 		$res = $this->db->dbDoQuery($query);
@@ -127,7 +140,11 @@ class dueWorkPage
 						$this->t_body->set_var("VIEW", $url);
 					}
 					$this->t_body->set_var("DUEDATE", $result['date']);
-					$this->t_body->set_var("SUBMIT", "<a href=\"submitWork.php?box_id=".$result['id']."\">Submit</a>");
+					
+					if($_SESSION['id'] == $id && $result['open_date'] < date('U') )
+						$this->t_body->set_var("SUBMIT", "<a href=\"submitWork.php?box_id=".$result['id']."\">Submit</a>");
+					else
+						$this->t_body->set_var("SUBMIT", "");
 				
 					$this->t_body->parse("due_list","due_block",true);
 
@@ -185,5 +202,5 @@ class dueWorkPage
 
 
 $page = new dueWorkPage();
-$page->displayDueWork();
+$page->displayDueWork($_GET['id']);
 $page->showPage();

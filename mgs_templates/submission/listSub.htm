@@ -122,7 +122,8 @@
 						<td colspan="5"><h2>{CATEGORY}</h2></td> 
 					<tr>  
 					<tr> 
-						<th>Assignment Title</th> 
+						<th>Assignment Title</th>
+                        <th>Open Date</th> 
 						<th>Due Date</th> 
 						<th class="cntr">Marked</th> 
 						<th class="cntr">Total</th> 
@@ -132,7 +133,8 @@
 					<tbody>
 					<!-- BEGIN submission_block --> 
 					<tr> 
-						<td><a href="/submission/viewSubmission.php?box_id={ID}">{ASSDESC}</a></td> 
+						<td><a href="/submission/viewSubmission.php?box_id={ID}">{ASSDESC}</a></td>
+                        <td><a href="/submission/createSubmission.php?sid={ID}">{OPENDATE}</a></td>
 						<td><a href="/submission/createSubmission.php?sid={ID}">{DUEDATE}</a></td> 
 						<td class="cntr">{MARKED}</td> 
 						<td class="cntr">{TOTAL}</td> 

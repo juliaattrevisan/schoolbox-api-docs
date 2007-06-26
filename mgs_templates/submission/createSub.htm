@@ -24,8 +24,7 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
 <script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
 <script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
-<script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
-<!-- #EndEditable -->
+<script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script><!-- #EndEditable -->
 </head>
 <body>
 <!-- THESE ARE MEANT TO GO HERE -->
@@ -120,6 +119,29 @@
 						<td><input name="description" type="text" value="{DESC}" size="30" /></td>
 					</tr>
 					<tr>
+                      <td><h2>Open Date</h2>
+                          <em>The date from when the submission box will be available for submission.  To make the box never available but have the date published, set this date to after the due date.</em></td>
+					  <td><input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20" />
+                          <img src="../images/ico_calendar.gif" width="16" height="13" id="open_trigger" style="cursor: pointer;" title="Date selector"/>
+                          <script type="text/javascript">
+						Calendar.setup({
+							inputField     :    "open_date",
+							ifFormat       :    "%d/%m/%Y",
+							button         :    "open_trigger",
+							align          :    "br",
+							singleClick    :    true
+						});
+						</script>
+                          <br />
+                          <input name="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" class="timeField" />
+					    :
+					    <input name="open_minute" type="text" maxlength="2" value="{OPEN_MIN}" class="timeField" />
+                          <select name="open_period" class="short">
+                            <option value="am">AM</option>
+                            <option value="pm" {DUE_PM}>PM</option>
+                          </select>                      </td>
+				  </tr>
+					<tr>
 						<td><h2>Due Date</h2>
 							<em>Actual date the work is due. This is the date that will be published.</em> </td>
 						<td><input name="due_date" id="due_date" type="text" value="{DUE_DATE}" size="20" /> <img src="../images/ico_calendar.gif" width="16" height="13" id="due_trigger" style="cursor: pointer;" title="Date selector"/>
@@ -161,14 +183,12 @@
 					</tr>
 					<tr>
 						<td><input type="hidden" name="cid" value="{CID}" />
-							<input type="hidden" name="fileid" value="{FILEID}" />
-						</td>
+							<input type="hidden" name="fileid" value="{FILEID}" />						</td>
 						<td> {SID}
-							<input type="submit" name="Submit" value="{HEADING}" class="btn" />
-						</td>
+							<input type="submit" name="Submit" value="{HEADING}" class="btn" />						</td>
 					</tr>
 				</table>
-			</form>
+		</form>
 			<!-- #EndEditable --> </div>
 		<div id="footer">
 			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>

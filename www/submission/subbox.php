@@ -12,66 +12,85 @@ class subBox
 		$this->db = new dbManager;
 	}
 
-	function createSubmission($cid, $due_date, $due_hour, $due_min, $due_period, $late_date, $late_hour, $late_min, $late_period, $fileid, $desc)
+	function createSubmission($cid, 			
+			$open_date, $open_hour, $open_min, $open_period, 
+			$due_date, $due_hour, $due_min, $due_period, 
+			$late_date, $late_hour, $late_min, $late_period,$fileid, $desc)
 	{
 		//extract parts of date, expects in format dd/mm/yyyy
+		list($odate,$omonth,$oyear) = explode('/',$open_date,3);
 		list($date,$month,$year) = explode('/',$due_date,3);
-		list($ldate,$lmonth,$year) = explode('/',$late_date,3);
+		list($ldate,$lmonth,$lyear) = explode('/',$late_date,3);
 		
 		//validate date
+		if(!checkdate($omonth,$odate,$oyear) )
+			error(15);//open date is wrong
+			
 		if(!checkdate($month,$date,$year) )
 			error(15);//due date is wrong
 
-		if(!checkdate($lmonth,$ldate,$year) )
+		if(!checkdate($lmonth,$ldate,$lyear) )
 			error(15);//late date is wrong
 
-		if(mktime(0,0,0,$month,$date,$year) > mktime(0,0,0,$lmonth,$ldate,$year))
+		if(mktime(0,0,0,$month,$date,$year) > mktime(0,0,0,$lmonth,$ldate,$lyear))
 			error(15);//late date is greater than due date
 
 		//validate time
+		checkTime($open_hour,$open_min);
 		checkTime($due_hour,$due_min);
 		checkTime($late_hour,$late_min);
+		$otime = createTime($open_hour,$open_min,$open_period);
 		$time = createTime($due_hour,$due_min,$due_period);
 		$ltime = createTime($late_hour,$late_min,$late_period);
 		
-
+		$insertODate = $oyear."-".$omonth."-".$odate." ".$otime;
 		$insertDate = $year."-".$month."-".$date." ".$time;
-		$insertLDate = $year."-".$lmonth."-".$ldate." ".$ltime;
+		$insertLDate = $lyear."-".$lmonth."-".$ldate." ".$ltime;
 
-		$query = "INSERT INTO submission_box (category, owner, date, late_date, fid, created, description) 
-			VALUES ('$cid', '".$_SESSION['id']."','$insertDate','$insertLDate','$fileid', NOW(), '$desc' )";
+		$query = "INSERT INTO submission_box (category, owner, open_date, date, late_date, fid, created, description) 
+			VALUES ('$cid', '".$_SESSION['id']."','$insertODate','$insertDate','$insertLDate','$fileid', NOW(), '$desc' )";
 
 		$this->db->dbDoQuery($query);
 	}
 
-	function updateSubmissionDate($sid, $due_date, $due_hour, $due_min, $due_period, $late_date, $late_hour, $late_min, $late_period, $desc)
+	function updateSubmissionDate($sid, 
+			$open_date, $open_hour, $open_min, $open_period, 
+			$due_date, $due_hour, $due_min, $due_period, 
+			$late_date, $late_hour, $late_min, $late_period, $desc)
 	{
 		//given a submission box it updates the date fields
 		
 		//extract parts of date, expects in format dd/mm/yyyy
+		list($odate,$omonth,$oyear) = explode('/',$open_date,3);
 		list($date,$month,$year) = explode('/',$due_date,3);
-		list($ldate,$lmonth,$year) = explode('/',$late_date,3);
-
+		list($ldate,$lmonth,$lyear) = explode('/',$late_date,3);
+		
 		//validate date
-		if(!checkdate($month,$date,$year) )
-			error(15);	//due date is wrong
-
-		if(!checkdate($lmonth,$ldate,$year) )
-			error(15);	//due date is wrong
-
-		if(mktime(0,0,0,$month,$date,$year) > mktime(0,0,0,$lmonth,$ldate,$year))
-			error(15);	//late date is greater than due date
+		if(!checkdate($omonth,$odate,$oyear) )
+			error(15);//open date is wrong
 			
+		if(!checkdate($month,$date,$year) )
+			error(15);//due date is wrong
+
+		if(!checkdate($lmonth,$ldate,$lyear) )
+			error(15);//late date is wrong
+
+		if(mktime(0,0,0,$month,$date,$year) > mktime(0,0,0,$lmonth,$ldate,$lyear))
+			error(15);//late date is greater than due date
+
 		//validate time
+		checkTime($open_hour,$open_min);
 		checkTime($due_hour,$due_min);
 		checkTime($late_hour,$late_min);
+		$otime = createTime($open_hour,$open_min,$open_period);
 		$time = createTime($due_hour,$due_min,$due_period);
 		$ltime = createTime($late_hour,$late_min,$late_period);
-
+		
+		$insertODate = $oyear."-".$omonth."-".$odate." ".$otime;
 		$insertDate = $year."-".$month."-".$date." ".$time;
-		$insertLDate = $year."-".$lmonth."-".$ldate." ".$ltime;
+		$insertLDate = $lyear."-".$lmonth."-".$ldate." ".$ltime;
 
-		$query = "UPDATE submission_box SET date = '$insertDate', late_date = '$insertLDate', description = '$desc' WHERE id = '$sid'"; 
+		$query = "UPDATE submission_box SET open_date = '$insertODate', date = '$insertDate', late_date = '$insertLDate', description = '$desc' WHERE id = '$sid'"; 
 		$this->db->dbDoQuery($query);
         }
 

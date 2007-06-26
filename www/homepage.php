@@ -463,14 +463,11 @@ class OutPut
 		if( isStudent($_SESSION['gid']) )
 		{
 			$query = "
-				SELECT	file.id,
-					file.description,
-					file.realname,
-					file.comment,
-					DATE_FORMAT(submission_box.date, '%D %b') AS date, 
+				SELECT	file.id, file.description, file.realname, file.comment,
+					DATE_FORMAT(submission_box.date, '%D %b') AS date,
+					UNIX_TIMESTAMP(submission_box.open_date) AS open, 
 					UNIX_TIMESTAMP(submission_box.late_date) AS late,
-					submission_box.id AS box_id,
-					student_submission.owner, inline
+					submission_box.id AS box_id, student_submission.owner, inline
 				FROM file
 				LEFT JOIN allowedFileTypes ON file.mime_type = mime
 				LEFT JOIN submission_box ON	file.id = submission_box.fid
@@ -485,11 +482,15 @@ class OutPut
 		}
 		else
 		{
-			$query = "SELECT file.id, file.description, file.comment, DATE_FORMAT(submission_box.date, '%D %b') AS date, 
-			submission_box.id AS box_id, submission_box.owner, file.realname, inline
-			FROM file  LEFT JOIN allowedFileTypes ON mime_type = mime
-			LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0' 
-			WHERE file.category = '".$this->category."' AND file.type = '3' AND file.deleted = '0'
+			$query = "
+			SELECT file.id, file.description, file.comment, 
+				DATE_FORMAT(submission_box.date, '%D %b') AS date, 
+				submission_box.id AS box_id, submission_box.owner, file.realname, inline
+			FROM file  
+				LEFT JOIN allowedFileTypes ON mime_type = mime
+				LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0' 
+			WHERE file.category = '".$this->category."' AND file.type = '3' 
+				AND file.deleted = '0'
 			ORDER BY submission_box.date DESC";
 		}
 
@@ -526,21 +527,29 @@ class OutPut
 
 		if(isStudent($_SESSION['gid']))
 		{
-			$query = "SELECT file.id, file.description, file.realname, file.comment, DATE_FORMAT(submission_box.date, '%D %b') AS date, 
-			UNIX_TIMESTAMP(submission_box.late_date) AS late, submission_box.id AS box_id, student_submission.owner, inline
-			FROM file LEFT JOIN allowedFileTypes ON file.mime_type = mime 
-			LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0'
-			LEFT JOIN student_submission ON  student_submission.box_id = submission_box.id 
-			AND student_submission.owner = '".$_SESSION['id']."'
+			$query = "
+			SELECT file.id, file.description, file.realname, file.comment, 
+				DATE_FORMAT(submission_box.date, '%D %b') AS date, 
+				UNIX_TIMESTAMP(submission_box.late_date) AS late, 
+				UNIX_TIMESTAMP(submission_box.open_date) AS open,
+				submission_box.id AS box_id, student_submission.owner, inline
+			FROM file 
+				LEFT JOIN allowedFileTypes ON file.mime_type = mime 
+				LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0'
+				LEFT JOIN student_submission ON  student_submission.box_id = submission_box.id 
+					AND student_submission.owner = '".$_SESSION['id']."'
 			WHERE file.category = '".$this->category."' AND file.type = '2' AND file.deleted = '0'
 			ORDER BY submission_box.date DESC";
 		}
 		else
 		{
-			$query = "SELECT file.id, file.description, file.comment, DATE_FORMAT(submission_box.date, '%D %b') AS date, 
-			submission_box.id AS box_id, submission_box.owner, file.realname, inline 
-			FROM file LEFT JOIN allowedFileTypes ON mime_type = mime
-			LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0' 
+			$query = "
+			SELECT file.id, file.description, file.comment, 
+				DATE_FORMAT(submission_box.date, '%D %b') AS date, 
+				submission_box.id AS box_id, submission_box.owner, file.realname, inline 
+			FROM file 
+				LEFT JOIN allowedFileTypes ON mime_type = mime
+				LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0' 
 			WHERE file.category = '".$this->category."' AND file.type = '2' AND file.deleted = '0'
 			ORDER BY submission_box.date DESC";
 		}
@@ -909,7 +918,7 @@ class OutPut
 		//if staff or student is enrolled and there is work due provide a link
 		if($this->enroled)
 		{
-			if(isStudent($_SESSION['gid']) && $queryArray['owner']=="" && $queryArray['late'] > date("U")) //student
+			if(isStudent($_SESSION['gid']) && $queryArray['owner']=='' && $queryArray['late'] > date('U') && $queryArray['open'] < date('U') ) //student
 				$dueDate = "<a href=\"/submission/submitWork.php?box_id=".$queryArray['box_id']."\">".$date."</a>";
 			else if(isStaff($_SESSION['gid']) && $queryArray['owner'] == $_SESSION['id']) //if staff owns box provide link
 				$dueDate = "<a href=\"/submission/viewSubmission.php?box_id=".$queryArray['box_id']."\">".$date."</a>";
@@ -951,10 +960,10 @@ class OutPut
 		//if staff or student is enrolled and there is work due provide a link
 		if($this->enroled)
 		{
-			if(isStudent($_SESSION['gid']) && $queryArray['owner']=="" && $queryArray['late'] > date("U")) //student
-				$dueDate = "<a href=\"/submission/submitWork.php?box_id=".$queryArray['box_id']."\">".$date."</a>";
+			if(isStudent($_SESSION['gid']) && $queryArray['owner']=='' && $queryArray['late'] > date('U') && $queryArray['open'] < date('U')) //student
+				$dueDate = '<a href="/submission/submitWork.php?box_id='.$queryArray['box_id'].'">'.$date.'</a>';
 			else if(isStaff($_SESSION['gid']) && $queryArray['owner'] == $_SESSION['id']) //if staff owns box provide link
-				$dueDate = "<a href=\"/submission/viewSubmission.php?box_id=".$queryArray['box_id']."\">".$date."</a>";
+				$dueDate = '<a href="/submission/viewSubmission.php?box_id='.$queryArray['box_id'].'">'.$date.'</a>';
 			else
 				$dueDate = $date;
 		}
