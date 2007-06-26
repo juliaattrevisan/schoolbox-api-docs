@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>{TITLE}</title>
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<meta name="ROBOTS" content="INDEX, FOLLOW" />
+<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-default.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/wenona-print.css" />
+<!-- ULTIMATE DROP DOWN MENU Version 4.5 by Brothercake -->
+<!-- http://www.udm4.com/ -->
+<script type="text/javascript" src="/javascript/udm-resources/udm-custom_wenona.js"></script>
+<script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
+<script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
+<!-- #BeginEditable "scripts" -->
+<script language="JavaScript" type="text/javascript">
+function verify()
+{
+	var msg = ""
+	//check that description and category have been entered
+	if(document.getElementById('fileForm').description.value == ""){
+		msg += "You need to enter a description\n";
+	}
+	if(document.getElementById('fileForm').category.value == "" || isNaN(document.getElementById('fileForm').category.value)){
+		msg += "You need to select a proper location";
+	}
+	if(msg != ""){
+		alert(msg);
+		return false;
+	}
+	else
+		return true;
+}
+	
+</script>
+<!-- #EndEditable -->
+</head>
+<body>
+<script type="text/javascript" src="/javascript/udm-resources/udm-dom.js"></script>
+<script type="text/javascript" src="/javascript/udm-resources/udm-mod-keyboard.js"></script>
+<div id="outerWrap"> 
+	<div id="header"></div> 
+	<div id="searchBox"> 
+		<form class="standardForm" id="searchForm" action="/search.php" method="get"> 
+			<p style="margin:0;"> 
+				<input class="short" type="text" name="keyword" /> 
+				<select class="short" name="where"> 
+					<option value="0" selected="selected">portal</option> 
+					<option value="1">google</option> 
+					<option value="2">yahoo</option> 
+				</select> 
+				<input class="img" type="image" src="/images/wenona/searchbutton.gif" alt="Search" name="Submit" /> 
+			</p> 
+		</form> 
+	</div> 
+	<div id="left"> 
+		<h3>&#187;&nbsp;Go To</h3> 
+		{MCSSMENU}
+		<!-- BEGIN msubject --> 
+		<h3>&#187;&nbsp;My Subjects</h3> 
+		<ul> 
+			<!-- BEGIN msubject_block --> 
+			<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li> 
+			<!-- END msubject_block --> 
+		</ul> 
+		<!-- END msubject --> 
+		<!-- BEGIN mgroup --> 
+		<h3>&#187;&nbsp;My Groups</h3> 
+		<ul> 
+			<!-- BEGIN mgroup_block --> 
+			<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li> 
+			<!-- END mgroup_block --> 
+		</ul> 
+		<!-- END mgroup --> 
+		<h3>&#187;&nbsp;My Links</h3> 
+		<ul> 
+			<!-- BEGIN mlink_block --> 
+			<li>{MLINK}</li> 
+			<!-- END mlink_block --> 
+			<li><a href="/editLinks.php">ADD LINK</a></li> 
+		</ul> 
+		<div id="footer"> 
+			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.wenona.nsw.edu.au" title="Wenona">Wenona</a></strong></p> 
+			<p class="small"><a href="../Templates/policy/wenona.htm">Guidelines of Use and Privacy Policy</a></p> 
+			<p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p> 
+		</div> 
+	</div> 
+	<!-- end left --> 
+	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" -->			<div id="topNav">
+				<ul>
+					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+					<!-- BEGIN webmail_tab --> 
+					<li class="norm"><a class="norm" {WEBMAIL_LOCATION} title="Access your messages here" accesskey="w">{WEBMAIL_TITLE}</a></li>
+					<!-- END webmail_tab -->
+					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+					<!-- BEGIN timetable_tab -->
+					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+					<!-- END timetable_tab -->
+					<li class="navthis norm"><a class="navthis norm" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+					<li class="norm"><a class="norm" href="http://intranet.wenona.nsw.edu.au/index.asp?strEncrypted={ENC_LOGIN}" title="Access the school intranet" accesskey="i"><em>I</em>ntranet</a></li>
+					<li class="right"><a class="right" href="http://webmail.wenona.nsw.edu.au/NetStorage" title="Access your H:\ files" accesskey="f">My <em>F</em>iles</a></li>
+					
+				</ul>
+			</div><!-- #EndLibraryItem --><!-- #EndEditable --> 
+	<div id="content"> 
+		<div id="content_text"> <!-- #BeginEditable "main" --> 
+			<h1>{ACTION} Folder</h1>
+			<form action="" method="post" class="standardForm" id="folderForm" onsubmit="return(verify());">
+				<table>
+					<tr>
+						<td class="formLabelWidth"><h2>Folder Name</h2></td>
+						<td><input type="text" name="name" maxlength="250" size="40" value="{CATNAME}" />
+						</td>
+					</tr>
+					<tr>
+						<td><h2>Folder Parent</h2>
+							<em>Location at which this folder should be placed</em></td>
+						<td> {CATLIST} </td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td> {CATID}
+							<input type="submit" label="Submit" name="submit" value="{ACTION} Folder" class="btn"/>
+						</td>
+					</tr>
+				</table>
+			</form>
+            <!-- #EndEditable --> </div> 
+	</div> 
+</div> 
+</body>
+<!-- #EndTemplate --></html>

@@ -576,7 +576,7 @@ br.float-fix {
 /*--------------------------------------------------------------
  Button styles 
 --------------------------------------------------------------*/
-a#addevent, a#addfile, a#addfolder, a#back, a#collapse, a#expand, a#home, a#image, a#modevent, a#modfolder, a#modify, a#modpost, a#next, a#posttopic, a#reply {
+/*a#addevent, a#addfile, a#addfolder, a#back, a#collapse, a#expand, a#home, a#image, a#modevent, a#modfolder, a#modify, a#modpost, a#next, a#posttopic, a#reply {
 	display: block;
 	width: 25px;
 	height: 25px;
@@ -654,4 +654,4 @@ a#posttopic {
 
 a#reply {
 	background-image: url('/images/icons/reply.gif');
-}
+}*/

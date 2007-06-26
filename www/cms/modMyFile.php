@@ -125,11 +125,11 @@ if(isset($_POST['description']) && $_POST['description'])
 	//description entered
 	if( isset($_FILES['file']['name']) && $_FILES['file']['name'] )
 	{
+		$fileDB = new myFile; 
 		//call file security checks
 		include("../include/fileSecurity.php");
 		fileSecurityCheck($_FILES['file']['error'], $_FILES['file']['name'], $_FILES['file']['tmp_name'], $_FILES['file']['size']);
-
-		$fileDB = new myFile; 
+		
 		
 		$fileId = $fileDB->addFile($_POST['parent'], $_FILES['file']['name'], $_FILES['file']['type'], $_POST['description']);
 
