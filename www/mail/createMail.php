@@ -15,8 +15,14 @@ class OutPut
 	function OutPut()
 	{
 		$this->t_body = new Template(TPL_directory);
-		$this->t_body->set_file("tplBODY", "mail/send.htm");
-
+		if(MAIL_interface == "simple")
+		{
+			$this->t_body->set_file("tplBODY", "mail/send.htm");
+		}
+		else
+		{
+			$this->t_body->set_file("tplBODY", "mail2.htm");
+		}
 		$this->t_body->set_var("TITLE", HEADING." - Send Mail");
 		
 		include_once("../include/page.php");
@@ -104,25 +110,44 @@ class OutPut
 
 	function showPage($replyto = "", $bcc = "", $subject = "", $body = "")
 	{
-		$this->t_body->set_var("SUBJECT", $subject);
-		$this->t_body->set_var("BODY", $body);
-		$this->t_body->set_var("REPLYTO", $replyto);
-		$this->t_body->set_var("BCC", $bcc);
-		$this->t_body->pparse("finaloutput", "tplBODY");
+		if(MAIL_interface == "simple")
+		{
+			$this->t_body->set_var("SUBJECT", $subject);
+			$this->t_body->set_var("BODY", $body);
+			$this->t_body->set_var("REPLYTO", $replyto);
+			$this->t_body->set_var("BCC", $bcc);
+			$this->t_body->pparse("finaloutput", "tplBODY");
+		}
+		else
+		{
+			$this->t_body->set_var("ROUNDCUBE_PARAMS", "?_task=mail&_action=compose&_to=$replyto&_bcc=$bcc&_subject=$subject&_body=$body");
+			$this->t_body->pparse("finaloutput", "tplBODY");
+		}
 	}
 
 }
 
 $myPage = new OutPut();
 
-//if replyto has been specified
-if(isset($_GET['reply']) && $_GET['reply'])
-	$myPage->replyMail($_GET['reply'], $_GET['qoute']);
-else if(isset($_GET['forward']) && $_GET['forward'])
-	$myPage->forwardMail($_GET['forward']);
-else if( $_REQUEST['replyto'] || $_REQUEST['bcc'])
-	$myPage->showPage($_REQUEST['replyto'], $_REQUEST['bcc']); 
-else if(SITE_location != 'wenona')
-	$myPage->showPage();
+if(MAIL_interface == "simple")
+{	
+	//if replyto has been specified
+	if(isset($_GET['reply']) && $_GET['reply'])
+		$myPage->replyMail($_GET['reply'], $_GET['qoute']);
+	else if(isset($_GET['forward']) && $_GET['forward'])
+		$myPage->forwardMail($_GET['forward']);
+	else if($_REQUEST['replyto'] || $_REQUEST['bcc'])
+		$myPage->showPage($_REQUEST['replyto'], $_REQUEST['bcc']); 
+	else if(SITE_location != 'wenona')
+		$myPage->showPage();
+	else
+		error(2);
+}
 else
-	error(2);
+{
+	if($_REQUEST['replyto'] || $_REQUEST['bcc'])
+		$myPage->showPage($_REQUEST['replyto'], $_REQUEST['bcc']);
+	else
+		if( $_REQUEST['replyto'] || $_REQUEST['bcc'])
+		$myPage->showPage(); 
+}

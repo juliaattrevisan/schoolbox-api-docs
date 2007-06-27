@@ -9,7 +9,7 @@
 *							    *
 *  $Id: mail.php,v 1.5 2004/01/24 05:35:48 jleckie Exp $							 			
 *							    *
-************************************************************/
+**********************************************************/
 
 require_once("include/session.php");
 require_once("include/include.php");
@@ -21,10 +21,18 @@ class OutPut
 	function OutPut()
 	{
 		$this->t_body = new Template(TPL_directory);
-		$this->t_body->set_file("tplBODY", "mail.htm");
+		if(MAIL_interface == 'roundcube')
+		{
+			$this->t_body->set_file("tplBODY", "mail2.htm");
+			$this->t_body->set_var('ROUNDCUBE_PARAMS', "");
+		}
+		else
+		{
+			$this->t_body->set_file("tplBODY", "mail.htm");
+			$this->t_body->set_block("tplBODY", "mail_listing", "mail_block");
+			$this->t_body->set_var('NAME', $_SESSION['firstname'] .' '.$_SESSION['surname']);
+		}
 		$this->t_body->set_var("TITLE", HEADING." - My Messages");
-		$this->t_body->set_block("tplBODY", "mail_listing", "mail_block");
-		$this->t_body->set_var('NAME', $_SESSION['firstname'] .' '.$_SESSION['surname']);
 		
 		include("include/page.php");
 	}
@@ -145,23 +153,26 @@ class OutPut
 if(MAIL_enable)
 {
 	$myPage = new OutPut();
-	$mail = new Mail;
-
-	if($mail->checkMailDetails())
+	
+	if(MAIL_interface == 'simple')
 	{
-		if($_POST['purgebtn'])
-			$mail->purgeMailBox();
-		if($_POST['dmsg'])
-			$mail->deleteMailArray($_POST['dmsg']);
+		$mail = new Mail;
+	
+		if($mail->checkMailDetails())
+		{
+			if($_POST['purgebtn'])
+				$mail->purgeMailBox();
+			if($_POST['dmsg'])
+				$mail->deleteMailArray($_POST['dmsg']);
+			else
+				$myPage->setMail($_GET['pos']);  //display mail at section pos
+		}
 		else
-			$myPage->setMail($_GET['pos']);  //display mail at section pos
+		{
+			$mail->submitMailDetails();
+			exit;
+		}
 	}
-	else
-	{
-		$mail->submitMailDetails();
-		exit;
-	}
-
 	$myPage->showPage();
 }
 else
