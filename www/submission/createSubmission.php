@@ -150,7 +150,7 @@ if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['la
 {
 	//submission box id and times sent so update the submission box times
 	$subbox->updateSubmissionDate($_POST['sid'], 
-		$_POST['open_date'], $_POST['open_hour', $_POST['open_minute'], $_POST['open_period'],
+		$_POST['open_date'], $_POST['open_hour'], $_POST['open_minute'], $_POST['open_period'],
 		$_POST['due_date'], $_POST['due_hour'], $_POST['due_min'], $_POST['due_period'], 
 		$_POST['late_date'], $_POST['late_hour'], $_POST['late_min'], $_POST['late_period'], 
 		$_POST['description']);
@@ -160,7 +160,7 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
 {
 	//form has been submitted 
 	$subbox->createSubmission($_POST['cid'], 
-			$_POST['open_date'], $_POST['open_hour', $_POST['open_minute'], $_POST['open_period'],
+			$_POST['open_date'], $_POST['open_hour'], $_POST['open_minute'], $_POST['open_period'],
 			$_POST['due_date'], $_POST['due_hour'], $_POST['due_minute'], $_POST['due_period'], 
 			$_POST['late_date'], $_POST['late_hour'], $_POST['late_min'], $_POST['late_period'], 
 			$_POST['fileid'], $_POST['description']);

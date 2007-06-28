@@ -39,8 +39,8 @@ class ListSubmissionPage {
 	
 		$currentCat = "";
 
-		$listquery = "SELECT submission_box.id, submission_box.description, category.id as catid, category.code, category.name
-				DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date, DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date, 
+		$listquery = "SELECT submission_box.id, submission_box.description, category.id as catid, category.code, category.name,
+				DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date, DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date 
 				FROM category, submission_box WHERE 
 				category.id = submission_box.category AND submission_box.owner = '".$_SESSION['id']."' 
 				AND submission_box.deleted = '0' ORDER BY category.id, submission_box.date"; 

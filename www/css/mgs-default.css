@@ -352,7 +352,8 @@ a img {
 	margin:0 0 1em 0;
 	padding:2px;
 	vertical-align:middle;
-	font-size:90%
+	font-size:90%;
+	font-family:Verdana, Arial, Helvetica, sans-serif, serif;
 	}
 	
 .standardForm option {

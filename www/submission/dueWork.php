@@ -140,7 +140,7 @@ class dueWorkPage
 						$this->t_body->set_var("VIEW", $url);
 					}
 					$this->t_body->set_var("DUEDATE", $result['date']);
-					
+
 					if($_SESSION['id'] == $id && $result['open_date'] < date('U') )
 						$this->t_body->set_var("SUBMIT", "<a href=\"submitWork.php?box_id=".$result['id']."\">Submit</a>");
 					else

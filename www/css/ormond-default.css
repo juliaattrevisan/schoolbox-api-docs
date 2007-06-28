@@ -334,7 +334,8 @@ a img {
 	margin:0 0 1em 0;
 	padding:2px;
 	vertical-align:middle;
-	font-size:90%
+	font-family:Verdana, Arial, sans-serif, serif;
+	font-size:90%;
 	}
 .standardForm option {
 	margin: 0 0.8em 0 0;
@@ -376,7 +377,7 @@ a img {
 	color:#333;
 	}
 .standardForm em {
-	font-size:70%;
+	font-size:80%;
 	font-style:normal;
 	}
 /* Form Table Layouts */
