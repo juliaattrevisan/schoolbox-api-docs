@@ -11,12 +11,11 @@
 <meta name="author" content="James Leckie, Lektec Consulting"/>
 <meta name="ROBOTS" content="INDEX, FOLLOW" />
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
-<link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
-<!--<script type="text/javascript" src="/javascript/drop_down.js"></script> -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/wenona-default.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/wenona-print.css" />
 <!-- ULTIMATE DROP DOWN MENU Version 4.5 by Brothercake -->
 <!-- http://www.udm4.com/ -->
-<script type="text/javascript" src="/javascript/udm-resources/udm-custom_mgs.js"></script>
+<script type="text/javascript" src="/javascript/udm-resources/udm-custom_wenona.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
 <!-- #BeginEditable "scripts" -->
@@ -27,72 +26,56 @@
 <!-- #EndEditable -->
 </head>
 <body>
-<!-- THESE ARE MEANT TO GO HERE -->
 <script type="text/javascript" src="/javascript/udm-resources/udm-dom.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-mod-keyboard.js"></script>
-<div id="outerWrap">
-	<div id="header"></div>
-	<div id="yellowStripe"></div>
-	<div id="left">
-		<div class="sideMenuWrap">
-			<h3>&#187;&nbsp;GOTO</h3>
-			<div class="whiteMenuWrap">{MCSSMENU}</div>
-		</div>
-		<div class="sideWrap" id="searchBox">
-			<h3>&#187;&nbsp;SEARCH</h3>
-			<div class="whiteWrap">
-				<form class="standardForm" id="searchForm" action="/search.php" method="get">
-					<p style="margin:0;">
-						<input class="short" type="text" name="keyword" />
-						<select class="short" name="where">
-							<option value="0" selected="selected">portal</option>
-							<option value="1">google</option>
-							<option value="2">yahoo</option>
-						</select>
-						<input class="img" type="image" src="/images/mgs/navsearch.gif" alt="Search" name="Submit" />
-					</p>
-					<div class="float-fix"></div>
-				</form>
-			</div>
-			<div class="float-fix"></div>
-		</div>
-		<!-- BEGIN msubject -->
-		<div class="sideWrap">
-			<h3>&#187;&nbsp;MY SUBJECTS</h3>
-			<div class="whiteWrap">
-				<ul>
-					<!-- BEGIN msubject_block -->
-					<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
-					<!-- END msubject_block -->
-				</ul>
-			</div>
-		</div>
-		<!-- END msubject -->
-		<!-- BEGIN mgroup -->
-		<div class="sideWrap">
-			<h3>&#187;&nbsp;MY GROUPS</h3>
-			<div class="whiteWrap">
-				<ul>
-					<!-- BEGIN mgroup_block -->
-					<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
-					<!-- END mgroup_block -->
-				</ul>
-			</div>
-		</div>
-		<!-- END mgroup -->
-		<div class="sideWrap">
-			<h3>&#187;&nbsp;MY LINKS</h3>
-			<div class="whiteWrap">
-				<ul>
-					<!-- BEGIN mlink_block -->
-					<li>{MLINK}</li>
-					<!-- END mlink_block -->
-					<li><a href="/editLinks.php">ADD LINK</a></li>
-				</ul>
-			</div>
-		</div>
-	</div>
-	<!-- end left -->
+<div id="outerWrap"> 
+	<div id="header"></div> 
+	<div id="searchBox"> 
+		<form class="standardForm" id="searchForm" action="/search.php" method="get"> 
+			<p style="margin:0;"> 
+				<input class="short" type="text" name="keyword" /> 
+				<select class="short" name="where"> 
+					<option value="0" selected="selected">portal</option> 
+					<option value="1">google</option> 
+					<option value="2">yahoo</option> 
+				</select> 
+				<input class="img" type="image" src="/images/wenona/searchbutton.gif" alt="Search" name="Submit" /> 
+			</p> 
+		</form> 
+	</div> 
+	<div id="left"> 
+		<h3>&#187;&nbsp;Go To</h3> 
+		{MCSSMENU}
+		<!-- BEGIN msubject --> 
+		<h3>&#187;&nbsp;My Subjects</h3> 
+		<ul> 
+			<!-- BEGIN msubject_block --> 
+			<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li> 
+			<!-- END msubject_block --> 
+		</ul> 
+		<!-- END msubject --> 
+		<!-- BEGIN mgroup --> 
+		<h3>&#187;&nbsp;My Groups</h3> 
+		<ul> 
+			<!-- BEGIN mgroup_block --> 
+			<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li> 
+			<!-- END mgroup_block --> 
+		</ul> 
+		<!-- END mgroup --> 
+		<h3>&#187;&nbsp;My Links</h3> 
+		<ul> 
+			<!-- BEGIN mlink_block --> 
+			<li>{MLINK}</li> 
+			<!-- END mlink_block --> 
+			<li><a href="/editLinks.php">ADD LINK</a></li> 
+		</ul> 
+		<div id="footer"> 
+			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.wenona.nsw.edu.au" title="Wenona">Wenona</a></strong></p> 
+			<p class="small"><a href="policy/wenona.htm">Guidelines of Use and Privacy Policy</a></p> 
+			<p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p> 
+		</div> 
+	</div> 
+	<!-- end left --> 
 	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" -->			<div id="topNav">
 				<ul>
 					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
@@ -108,8 +91,8 @@
                     <li class="right"><a class="right" href="/cms/browseMyFiles.php" title="Upload files to your own private area" accesskey="f">My <em>F</em>iles</a></li>
 				</ul>
 			</div>
-<!-- #EndLibraryItem --><!-- #EndEditable -->
-	<div id="content">
+<!-- #EndLibraryItem --><!-- #EndEditable --> 
+	<div id="content"> 
 		<div id="content_text"> <!-- #BeginEditable "main" -->
 			<h1>{ACTION} File </h1>
 			<form method="post" enctype="multipart/form-data" id="fileForm" class="standardForm" onsubmit="return multi_selector.check();">
@@ -145,13 +128,8 @@
 					</tr>
 				</table>
 			</form>
-			<!-- #EndEditable --> </div>
-		<div id="footer">
-			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
-			<p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
-			<p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
-		</div>
-	</div>
-</div>
+			<!-- #EndEditable --> </div> 
+	</div> 
+</div> 
 </body>
 <!-- #EndTemplate --></html>
