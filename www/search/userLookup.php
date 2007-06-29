@@ -40,26 +40,33 @@ class outUser
 			$this->t_body->set_var("EXT", "<b>Extension</b>: ".$user['extension']);
 		else
 			$this->t_body->set_var("EXT", "");
-		$this->t_body->set_var("POSTION", $user['gname']);
+		$this->t_body->set_var("POSITION", $user['gname']);
 		$this->t_body->set_var("HOMEPAGE", "");
 		
 		$this->t_body->set_var("SYNERGY_ID", $user['synergy_id']);
 		
 		$this->t_body->set_block("tplBODY", "portrait", "portrait_block");
+		$this->t_body->set_block("tplBODY", "timetable_link", "timetable_link_block");
+		$this->t_body->set_block("tplBODY", "due_work", "due_work_block");
+		$this->t_body->set_block("tplBODY", "helpdesk", "helpdesk_block");
 		$this->t_body->set_block("tplBODY", "student_synergy", "student_synergy_block");
-		
+		$this->t_body->set_block("tplBODY", "contact_synergy", "contact_synergy_block");
+	
 		//advanced synergetic information
-		if(SYNERGY_enabled)
-		{
+		if(SYNERGY_enable)
+		{	
 			require_once('../include/syn_userinfo.php');
 
 			//only allow staff to see student information
 			if(isStaff($_SESSION['gid']))
 			{
-				$this->t_body->parse("portrait_block", "portrait");
+				$this->t_body->parse("portrait_block", "portrait");		
+				$this->t_body->parse("timetable_link_block", "timetable_link");
 				
 				if(isStudent($user['group_id']))
 				{
+					$this->t_body->parse("due_work_block", "due_work");	
+					$this->t_body->parse("helpdesk_block", "helpdesk");	
 					$synInfo = getStudentInfo($user['synergy_id']);
 					
 					list($date, $month, $year) = explode(' ', $synInfo['StudentBirthDate']);
@@ -80,23 +87,33 @@ class outUser
 					$this->t_body->set_var("SPOUSE_MOBILE_PHONE", $synInfo['StudentContactSpouseMobilePhone']);
 					$this->t_body->set_var("SPOUSE_OCCUP_PHONE", $synInfo['StudentContactSpouseOccupPhone']);
 					
+					$this->t_body->parse("contact_synergy_block", "contact_synergy");
 					$this->t_body->parse("student_synergy_block", "student_synergy");
 				}
 				else
 				{
 					$this->t_body->set_var("student_synergy_block", "");
+					$this->t_body->set_var("contact_synergy_block", "");
+					$this->t_body->set_var("due_work_block", "");	
+					$this->t_body->set_var("helpdesk_block", "");	
 				}
 			}
 			else
 			{
+				$this->t_body->set_var("contact_synergy_block", "");
 				$this->t_body->set_var("student_synergy_block", "");
 				$this->t_body->set_var("portrait_block", "");	
+				$this->t_body->set_var("timetable_link_block", "");	
 			}
 		}
 		else
 		{
+			$this->t_body->set_var("contact_synergy_block", "");
 			$this->t_body->set_var("student_synergy_block", "");
-			$this->t_body->set_var("portrait_block", "");	
+			$this->t_body->set_var("portrait_block", "");
+			$this->t_body->set_var("timetable_link_block", "");	
+			$this->t_body->set_var("due_work_block", "");	
+			$this->t_body->set_var("helpdesk_block", "");		
 		}
 		//display list of groups owner is in charge of so they can add the user
 		$this->t_body->set_block("tplBODY", "grouplist", "group_block");
@@ -108,7 +125,7 @@ class outUser
 			$db->dbDoQuery($query);
 			if($db->dbCountRows() > 0)
 			{
-				$this->t_body->set_var("GROUPTITLE", "Groups that you maintain that this user can be added to;");
+				$this->t_body->set_var("GROUPTITLE", "Add to your group");
 				while($group = $db->dbGetNextArray())
 				{
 					$this->t_body->set_var("GROUP", 

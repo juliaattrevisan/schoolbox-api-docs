@@ -12,9 +12,9 @@ require_once("../include/include.php");
 require_once("../include/staffonly.php");
 
 //no image
-define(NO_IMAGE, '../images/no_portrait.jpg');
+define(NO_IMAGE, $_SERVER['DOCUMENT_ROOT'].'/images/no_portrait.jpg');
 	
-if(isset($_GET['id']) && $_GET['id'])
+if(isset($_GET['id']) && $_GET['id'] && SYNERGY_enable)
 {
 	//get file details
 	$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);	
@@ -31,16 +31,19 @@ if(isset($_GET['id']) && $_GET['id'])
 		header("Content-Disposition: filename={$_GET['id']}.jpg"); 
 		//header ("Content-Length: $filesize");	
 		echo $image['Photo'];
+		exit;
 	}
-	else
-	{
-		if(file_exists(NO_IMAGE))
-		{
-			header("Content-Type: image/jpg");
-			header("Content-Disposition: filename=nopic.jpg"); 
-			readfile(NO_IMAGE);
-		}		
-	}
-} 
+	
+}
+
+//if we get to here just output the no image
+if(file_exists(NO_IMAGE))
+{
+	header("Content-Type: image/jpg");
+	header("Content-Disposition: filename=nopic.jpg"); 
+	readfile(NO_IMAGE);
+}		
+
+
 
 ?>

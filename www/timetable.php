@@ -147,6 +147,10 @@ class Timetable
 	}
 }
 
+//synergy not enabled do not display page
+if(!SYNERGY_enable)
+	error(19);
+
 $timetable = new Timetable();
 
 if(isParent($_SESSION['gid']))
