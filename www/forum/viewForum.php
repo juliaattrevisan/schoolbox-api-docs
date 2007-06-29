@@ -170,14 +170,8 @@ class OutPut
 		$this->t_body->set_var("ID", $post['id']);
 		
 		// set owner
-		$fullname = formatName(NULL, $post);
-		$email = formatEmail($post);
-			
-		//create owner email address
-		if($email)
-			$owner = "<a href=\"".$_SESSION['mailhandle'].$email."\">$fullname</a>";
-		else
-			$owner = $fullname;
+		$fullname = formatName($post);
+		$owner = "<a href=\"/search/userLookup.php?id={$post['uid']}\">$fullname</a>";
 			
 		$this->t_body->set_var("OWNER", $owner);
 		$this->t_body->set_var("DATE", $post['fulldate']);	

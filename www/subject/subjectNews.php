@@ -59,27 +59,12 @@ function deleteNews($id)
 
 function getNews()
 {
-    $SQL_QUERY = "SELECT subject_news.id, heading, owner, DATE_FORMAT(datetime_posted, '%W %M %e @ %l:%i%p') AS datetime,
-    body, username, user.id as uid, lastname, title, firstname, local_email, alt_email 
+    $query = "SELECT subject_news.id, heading, owner, DATE_FORMAT(datetime_posted, '%W %M %e @ %l:%i%p') AS datetime,
+    body, username, user.id as uid, lastname, title, firstname 
     FROM subject_news, user WHERE user.id = subject_news.owner AND code = '$this->code' AND datetime_expires > NOW() AND deleted = 0 
     ORDER BY datetime_posted DESC";
 
-    $res = $this->dbConnection->dbDoQuery($SQL_QUERY);
-
-    for($i=0; $newsDbResult = $this->dbConnection->dbGetNextArray($res); $i++) 
-    {
-		$this->news[$i]['Id'] = $newsDbResult["id"];
-		$this->news[$i]['Heading'] = num_encode($newsDbResult["heading"]);
-		$this->news[$i]['Poster'] = formatName($newsDbResult);
-		$this->news[$i]['Contact'] = formatEmail($newsDbResult);
-		$this->news[$i]['Owner'] = $newsDbResult["owner"];
-		$this->news[$i]['Datetime'] = $newsDbResult["datetime"];
-		$this->news[$i]['Body'] = num_encode($newsDbResult["body"]);
-    }
-
-    if (isset($this->news))
-        return $this->news;
-    //$this->dbConnection->dbClose();
+	return $this->dbConnection->dbGetAllRows($query);
 }
 
 function getSingleNews($id)

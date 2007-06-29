@@ -24,8 +24,7 @@ class outUser
 		$user = $db->dbGetSingleRow($query);
 		
 		//fill out all fields
-		
-		$this->t_body->set_var("NAME", formatName(NULL, $user));
+		$this->t_body->set_var("NAME", formatName($user));
 		
 		$emailAddress = formatEmail($user);
 		

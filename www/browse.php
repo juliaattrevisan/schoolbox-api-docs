@@ -78,13 +78,13 @@ class OutPut
 		$catQuery = "SELECT id, name, template, code FROM category WHERE parent = ".$this->category." ORDER BY name";
 
 		$fileQuery = "SELECT file.id, file.realname, DATE_FORMAT(file.submitted, '".FILE_date_format."') AS submitted, 
-		user.username, user.title, user.id as uid, user.firstname, user.lastname, user.local_email, user.alt_email, file.description, file.comment, file.mime_type,
+		user.title, user.id as uid, user.firstname, user.lastname, user.local_email, user.alt_email, file.description, file.comment, file.mime_type,
 		iconFile, allowedFileTypes.description as mime_description, inline
 		FROM file LEFT JOIN user ON user.id = file.owner LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
 		WHERE file.category = ".$this->category." AND deleted = '0'";
 
 		$linkQuery = "SELECT link.id, link.url, DATE_FORMAT(link.submitted, '".FILE_date_format."') AS submitted, 
-		user.id as uid, user.username, user.title, user.firstname, user.lastname, user.local_email, user.alt_email, link.description, link.comment 
+		user.id as uid, user.title, user.firstname, user.lastname, user.local_email, user.alt_email, link.description, link.comment 
 		FROM link LEFT JOIN user ON user.id = link.owner WHERE link.category = ".$this->category."";
 
 		$result = $this->db->dbDoQuery($catQuery);
@@ -278,13 +278,7 @@ class OutPut
 		
 			// set owner
 			$fullname = formatName($fileDetails);
-			$email = formatEmail($fileDetails);
-			
-			//create owner email address
-			if($email)
-				$owner = "<a href=\"".$_SESSION['mailhandle'].$email."\">$fullname</a>";
-			else
-				$owner = $fullname;
+			$owner = "<a href=\"/search/userLookup.php?id={$fileDetails['uid']}\">$fullname</a>";
 			
 			//output owner
 			$this->t_body->set_var("OWNER", $owner);
@@ -339,13 +333,7 @@ class OutPut
 			
 			// set owner
 			$fullname = formatName($linkDetails);
-			$email = formatEmail($linkDetails);
-			
-			//create owner email address
-			if($email)
-				$owner = "<a href=\"".$_SESSION['mailhandle'].$email."\">$fullname</a>";
-			else
-				$owner = $fullname;
+			$owner = "<a href=\"/search/userLookup.php?id={$linkDetails['uid']}\">$fullname</a>";
 
 			$this->t_body->set_var("OWNER", $owner);		
 		

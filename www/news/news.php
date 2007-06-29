@@ -206,7 +206,7 @@ function getNews($id = 0)
     	DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted,
     	DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
     	news_items.item_body, news_items.item_mainpage, 
-    	user.lastname, user.title, user.firstname
+    	user.lastname, user.title, user.firstname, user.id as uid
     FROM news_items
 	JOIN user ON news_items.item_owner = user.id
     WHERE news_items.item_owner = '".$_SESSION['id']."'

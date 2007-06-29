@@ -19,7 +19,6 @@ class OutPut
  
 	function showPage(&$db, $category, $enroled)
 	{
-
 		$this->db = $db;	
 		$this->enroled = $enroled;
 
@@ -244,17 +243,14 @@ class OutPut
 			{			
 				$name = formatName($member);
 				$email = formatEmail($member);
+				
+				$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$member['uid']}\">$name</a>");
 					
 				if($member['type'] == 3)
 					$name .= " (Group Admin.)";
 						
 				if($email)
-				{
-					$this->t_body->set_var("MEMBER_NAME", "<a href=\"{$_SESSION['mailhandle']}{$email}\">{$name}</a>");
 					$emailall .= $email.",";
-				}
-				else
-					$this->t_body->set_var("MEMBER_NAME", $name);
 				
 				$this->t_body->parse("members_block", "members", true);	
 			}
@@ -284,16 +280,13 @@ class OutPut
 				$name = formatName($manager);
 				$email = formatEmail($manager);
 				
+				$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$manager['uid']}\">$name</a>");
+					
 				if($manager['type'] == 3)
 					$name .= " (Group Admin.)";
-								
+						
 				if($email)
-				{
-					$this->t_body->set_var("MEMBER_NAME", "<a href=\"{$_SESSION['mailhandle']}{$email}\">{$name}</a>");
 					$emailall .= $email.",";
-				}
-				else
-					$this->t_body->set_var("MEMBER_NAME", $name);
 				
 				$this->t_body->parse("staff_member_block", "staff_members", true);
 
@@ -330,10 +323,10 @@ class OutPut
 				while($synrow = mssql_fetch_array($msResult))
 				{
 					$query = "SELECT id, title, firstname, lastname FROM user WHERE synergy_id = '{$synrow['StaffID']}'";
-					$manager=$this->db->dbGetSingleRow($query);
-					$name = formatName($manager);
+					$teacher=$this->db->dbGetSingleRow($query);
+					$name = formatName($teacher);
 					
-					$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$manager['id']}\">{$name}</a>");
+					$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$teacher['id']}\">{$name}</a>");
 					$this->t_body->parse("staff_teacher_block", "staff_teachers", true);		
 				}
 			}
@@ -359,18 +352,17 @@ class OutPut
 		{
 			foreach($subnews as $article)
 			{
-				if($article['Owner'] == $_SESSION['id'] || $_SESSION['su'] == 1 || $this->perm == 3)
+				if($article['owner'] == $_SESSION['id'] || $_SESSION['su'] == 1 || $this->perm == 2)
 					$this->t_body->set_var("MOD_NEWS", "<a href=\"/subject/modSubNews.php?modify=".$article['Id']."\">Modify</a>");
 				else
 					$this->t_body->set_var("MOD_NEWS", "");
-				$this->t_body->set_var("NEWS_HEADING", scrubTEXT($article['Heading']));
-				$this->t_body->set_var("NEWS_BODY", scrubHTML($article['Body']));
-				if($article['Contact'])
-					$this->t_body->set_var("EMAIL_CONTACT", "<a href=\"{$_SESSION['mailhandle']}{$article['Contact']}\">{$article['Poster']}</a>");
-				else
-					$this->t_body->set_var("EMAIL_CONTACT", $article['Poster']);
-		
-				$this->t_body->set_var("POSTED_DATE", $article['Datetime']);
+				
+				$poster = formatName($article);
+				
+				$this->t_body->set_var("NEWS_HEADING", scrubTEXT($article['heading']));
+				$this->t_body->set_var("NEWS_BODY", scrubHTML($article['body']));
+				$this->t_body->set_var("EMAIL_CONTACT", "<a href=\"/search/userLookup.php?id={$article['uid']}\">$poster</a>");
+				$this->t_body->set_var("POSTED_DATE", $article['datetime']);
 				$this->t_body->parse("news_block", "news", true);
 			}
 		}

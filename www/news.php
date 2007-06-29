@@ -51,14 +51,9 @@ class OutPut
 					$this->set_var("MODIFY", "");
 				
 				$this->set_var("NEWS_TITLE", $article['item_heading']);
-			
-				$fullname = formatName($article);
-				$email = formatEmail($article);
 				
-				if($email)
-					$owner = "<a href=\"".$_SESSION['mailhandle'].$email."\">$fullname</a>";
-				else
-					$owner = $fullname;
+				$fullname = formatName($article);
+				$owner = "<a href=\"/search/userLookup.php?id={$article['uid']}\">$fullname</a>";
 	
 				$this->set_var("POSTER", $owner);
 				
