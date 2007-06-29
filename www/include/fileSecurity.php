@@ -34,7 +34,7 @@ function fileSecurityCheck($error, $file_name, $tmp_name, $size, $type="")
 		default: //a default error, just in case!  :)
 			break;
 	}
-	
+
 	//check file is in upload dir
 	if(!is_uploaded_file($tmp_name))
 		error(9, "Security infringement, possible file upload attack.");

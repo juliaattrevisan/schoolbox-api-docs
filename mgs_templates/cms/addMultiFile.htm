@@ -20,27 +20,10 @@
 <script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
 <!-- #BeginEditable "scripts" -->
-<script language="JavaScript" type="text/javascript">
-function verify()
-{
-	var msg = ""
-	//check that description and category have been entered
-	if(document.getElementById('fileForm').description.value == ""){
-		msg += "You need to enter a description\n";
-	}
-	if(document.getElementById('fileForm').category.value == "" || isNaN(document.getElementById('fileForm').category.value)){
-		msg += "You need to select a proper location";
-	}
-	if(msg != ""){
-		alert(msg);
-		return false;
-	}
-	else
-		return true;
-}
-	
+<script type="text/javascript" src="/javascript/multifilecms.js"></script>
+<script type="text/javascript">
+	multi_selector = new MultiSelector();
 </script>
-<script type="text/javascript" src="/javascript/multifile.js"></script>
 <!-- #EndEditable -->
 </head>
 <body>
@@ -129,7 +112,7 @@ function verify()
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" -->
 			<h1>{ACTION} File </h1>
-			<form method="post" enctype="multipart/form-data" id="fileForm" class="standardForm" onsubmit="return(verify());">
+			<form method="post" enctype="multipart/form-data" id="fileForm" class="standardForm" onsubmit="return multi_selector.check();">
 				<table>
 					<tr>
 						<td><h2>Location</h2>
@@ -140,23 +123,20 @@ function verify()
                     <td>&nbsp;</td>
                     <td>
               			<table>
+              			<thead>
                         <tr>
 							<td><h2>Description</h2></td>
 							<td><h2>File</h2></td>
+							<td></td>
                         </tr>
-                        <tr>
-                        	<td><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" /></td>
-                        	<td> <input id="file" type="file" name="file[]" /></td>
-                         </tr>
-                    	<div id="files_list"></div>
-                        <script type="text/javascript">
-						<!-- Create an instance of the multiSelector class, pass it the output target and the max number of files -->
-						var multi_selector = new MultiSelector( document.getElementById( 'files_list' ), 5 );
-						<!-- Pass in the file element -->
-						multi_selector.addElement( document.getElementById( 'attachment' ) );
-						</script>
+                        </thead>
+                        <tbody id="files_list">
+                        </tbody>
                         </table>
-                        </td>
+                        <script type="text/javascript">
+                        	multi_selector.init(document.getElementById('files_list'), {FILE_max_upload});
+                        </script>
+                    </td>
 					</tr>
                     <tr>
 						<td>&nbsp;</td>

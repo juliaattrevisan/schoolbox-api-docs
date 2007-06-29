@@ -295,6 +295,7 @@ class ModResourcePage {
 			else if($type=='files') {
 			  	$this->t_body->set_file("tplBODY", "cms/addMultiFile.htm");
 				$this->t_body->set_var("TITLE", HEADING." - File Submission page");
+				$this->t_body->set_var("FILE_max_upload", FILE_max_upload);
 			}
 			else
 			{
@@ -347,6 +348,21 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 		include("../include/back.php");
 		exit;
 	}
+	else if(is_array($_FILES['file']['name'])) { 
+		//submit multiple files to single location
+		$fileDB = new file; 
+		foreach ($_FILES['file']['error'] as $key => $error) {
+   			if ($error == UPLOAD_ERR_OK) {
+				fileSecurityCheck($_FILES['file']['error'][$key], $_FILES['file']['name'][$key], $_FILES['file']['tmp_name'][$key], $_FILES['file']['size'][$key], $_FILES['file']['type'][$key]);
+				$fileDB->addFile($_FILES['file']['name'][$key], $_FILES['file']['type'][$key], $_FILES['file']['tmp_name'][$key],
+								$_POST['description'][$key], '', $_POST['category'], $_POST['ftype']);
+			}
+		}
+			
+		$back = -2;
+		include("../include/back.php");
+		
+	}
 	else if( isset($_FILES['file']['name']) && $_FILES['file']['name'] )
 	{
 		//call file security checks
@@ -379,21 +395,6 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 		}
 		exit;
 	}
-	else if(is_array($_FILES['file']['name'])) { 
-		//submit multiple files to single location
-		foreach ($_FILES['file']['error'] as $key => $error) {
-   			if ($error == UPLOAD_ERR_OK) {
-				fileSecurityCheck($_FILES['file']['error'][$key], $_FILES['file']['name'][$key], $_FILES['file']['tmp_name'][$key], $_FILES['file']['size'][$key], $_FILES['file']['type'][$key]);
-				$fileDB->addFile($_FILES['file']['name'][$key], $_FILES['file']['type'][$key], $_FILES['file']['tmp_name'][$key],
-								$_POST['description'][$key], '', $_POST['category'], $_POST['ftype']);
-			}
-		}
-			
-		$back = -2;
-		include("../include/back.php");
-		
-	}
-	
 	else if(isset($_POST['modid']) && $_POST['modid'])
 	{
 		$fileDB = new file; 
