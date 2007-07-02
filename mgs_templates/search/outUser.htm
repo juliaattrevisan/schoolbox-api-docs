@@ -1,5 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- #BeginTemplate "/Templates/main.dwt" -->
+<!-- DW6 -->
 <!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
 <!--  Visit us at www.lektec.com.au -->
 <head>
@@ -19,117 +21,118 @@
 <script type="text/javascript" src="/javascript/udm-resources/udm-custom_mgs.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
-<!-- #BeginEditable "scripts" -->
-
-<!-- #EndEditable -->
+<!-- #BeginEditable "scripts" --><!-- #EndEditable -->
 </head>
 <body>
 <!-- THESE ARE MEANT TO GO HERE -->
 <script type="text/javascript" src="/javascript/udm-resources/udm-dom.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-mod-keyboard.js"></script>
 <div id="outerWrap">
-	<div id="header"></div>
-	<div id="yellowStripe"></div>
-	<div id="left">
-		<div class="sideMenuWrap">
-			<h3>&#187;&nbsp;GOTO</h3>
-			<div class="whiteMenuWrap">{MCSSMENU}</div>
-		</div>
-		<div class="sideWrap" id="searchBox">
-			<h3>&#187;&nbsp;SEARCH</h3>
-			<div class="whiteWrap">
-				<form class="standardForm" id="searchForm" action="/search.php" method="get">
-					<p style="margin:0;">
-						<input class="short" type="text" name="keyword" />
-						<select class="short" name="where">
-							<option value="0" selected="selected">portal</option>
-							<option value="1">google</option>
-							<option value="2">yahoo</option>
-						</select>
-						<input class="img" type="image" src="/images/mgs/navsearch.gif" alt="Search" name="Submit" />
-					</p>
-					<div class="float-fix"></div>
-				</form>
-			</div>
-			<div class="float-fix"></div>
-		</div>
-		<!-- BEGIN msubject -->
-		<div class="sideWrap">
-			<h3>&#187;&nbsp;MY SUBJECTS</h3>
-			<div class="whiteWrap">
-				<ul>
-					<!-- BEGIN msubject_block -->
-					<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
-					<!-- END msubject_block -->
-				</ul>
-			</div>
-		</div>
-		<!-- END msubject -->
-		<!-- BEGIN mgroup -->
-		<div class="sideWrap">
-			<h3>&#187;&nbsp;MY GROUPS</h3>
-			<div class="whiteWrap">
-				<ul>
-					<!-- BEGIN mgroup_block -->
-					<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
-					<!-- END mgroup_block -->
-				</ul>
-			</div>
-		</div>
-		<!-- END mgroup -->
-		<div class="sideWrap">
-			<h3>&#187;&nbsp;MY LINKS</h3>
-			<div class="whiteWrap">
-				<ul>
-					<!-- BEGIN mlink_block -->
-					<li>{MLINK}</li>
-					<!-- END mlink_block -->
-					<li><a href="/editLinks.php">ADD LINK</a></li>
-				</ul>
-			</div>
-		</div>
-	</div>
-	<!-- end left -->
-	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" -->			<div id="topNav">
-				<ul>
-					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
-					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
-					<!-- BEGIN webmail_tab --> 
-					<li class="norm"><a class="norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
-					<!-- END webmail_tab -->
-					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
-					<!-- BEGIN timetable_tab -->
-					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
-					<!-- END timetable_tab -->
-					<li class="navthis norm"><a class="navthis norm" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
-                    <li class="right"><a class="right" href="/cms/browseMyFiles.php" title="Upload files to your own private area" accesskey="f">My <em>F</em>iles</a></li>
-				</ul>
-			</div>
-<!-- #EndLibraryItem --><!-- #EndEditable -->
-	<div id="content">
-		<div id="content_text"> <!-- #BeginEditable "main" -->
-  <h1>School Directory</h1>
+  <div id="header"></div>
+  <div id="yellowStripe"></div>
+  <div id="left">
+    <div class="sideMenuWrap">
+      <h3>&#187;&nbsp;GOTO</h3>
+      <div class="whiteMenuWrap">{MCSSMENU}</div>
+    </div>
+    <div class="sideWrap" id="searchBox">
+      <h3>&#187;&nbsp;SEARCH</h3>
+      <div class="whiteWrap">
+        <form class="standardForm" id="searchForm" action="/search.php" method="get">
+          <p style="margin:0;">
+            <input class="short" type="text" name="keyword" />
+            <select class="short" name="where">
+              <option value="0" selected="selected">portal</option>
+              <option value="1">google</option>
+              <option value="2">yahoo</option>
+            </select>
+            <input class="img" type="image" src="/images/mgs/navsearch.gif" alt="Search" name="Submit" />
+          </p>
+          <div class="float-fix"></div>
+        </form>
+      </div>
+      <div class="float-fix"></div>
+    </div>
+    <!-- BEGIN msubject -->
+    <div class="sideWrap">
+      <h3>&#187;&nbsp;MY SUBJECTS</h3>
+      <div class="whiteWrap">
+        <ul>
+          <!-- BEGIN msubject_block -->
+          <li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
+          <!-- END msubject_block -->
+        </ul>
+      </div>
+    </div>
+    <!-- END msubject -->
+    <!-- BEGIN mgroup -->
+    <div class="sideWrap">
+      <h3>&#187;&nbsp;MY GROUPS</h3>
+      <div class="whiteWrap">
+        <ul>
+          <!-- BEGIN mgroup_block -->
+          <li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
+          <!-- END mgroup_block -->
+        </ul>
+      </div>
+    </div>
+    <!-- END mgroup -->
+    <div class="sideWrap">
+      <h3>&#187;&nbsp;MY LINKS</h3>
+      <div class="whiteWrap">
+        <ul>
+          <!-- BEGIN mlink_block -->
+          <li>{MLINK}</li>
+          <!-- END mlink_block -->
+          <li><a href="/editLinks.php">ADD LINK</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- end left -->
+  <!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" -->
+  <div id="topNav">
+    <ul>
+      <li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+      <li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+      <!-- BEGIN webmail_tab -->
+      <li class="norm"><a class="norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+      <!-- END webmail_tab -->
+      <li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+      <!-- BEGIN timetable_tab -->
+      <li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+      <!-- END timetable_tab -->
+      <li class="navthis norm"><a class="navthis norm" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+      <li class="right"><a class="right" href="/cms/browseMyFiles.php" title="Upload files to your own private area" accesskey="f">My <em>F</em>iles</a></li>
+    </ul>
+  </div>
+  <!-- #EndLibraryItem --><!-- #EndEditable -->
+  <div id="content">
+    <div id="content_text"> <!-- #BeginEditable "main" -->
+      <h1>School Directory</h1>
       <table class="indent">
         <tr>
-          <td colspan="4"><h2>Personal Information</h2></td><td>&nbsp;</td>
-              </tr>
-              <tr>
-                <td><strong>Name</strong></td> 
-                <td>{NAME}</td>
-                <td>&nbsp;</td>
-                <td>{EXT}</td>
-                <td rowspan="16" style="vertical-align:top; text-align:center;"><!-- BEGIN portrait --><img src="portrait.php?id={SYNERGY_ID}" /><!-- END portrait -->
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Group</strong></td> 
-                <td>{POSITION}</td>
-                <td><strong>Email</strong></td>
-                <td>{EMAIL}</td>
-       
-         </tr>
-       <!-- BEGIN student_synergy -->
-         <tr>
+          <td colspan="4"><h2>Personal Information</h2></td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td><strong>Name</strong></td>
+          <td>{NAME}</td>
+          <td>&nbsp;</td>
+          <td>{EXT}</td>
+          <td rowspan="16" style="vertical-align:top; text-align:center;"><!-- BEGIN portrait -->
+            <img src="portrait.php?id={SYNERGY_ID}" />
+            <!-- END portrait -->
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Group</strong></td>
+          <td>{POSITION}</td>
+          <td><strong>Email</strong></td>
+          <td>{EMAIL}</td>
+        </tr>
+        <!-- BEGIN student_synergy -->
+        <tr>
           <td><strong>Tutor</strong></td>
           <td>{TUTOR}</td>
           <td><strong>Year Level </strong></td>
@@ -146,15 +149,9 @@
           <td colspan="4"><h2>Portal Functions</h2></td>
         </tr>
         <tr>
-          <td style="vertical-align:top;"><strong>{GROUPTITLE}</strong></td>
-          <td style="vertical-align:top;"><ul>
-              <!-- BEGIN grouplist -->
-              <li>{GROUP}</li>
-              <!-- END grouplist -->
-            </ul></td>
           <td style="vertical-align:top;"><strong>View Users Records</strong></td>
           <td style="vertical-align:top;"><ul>
-          	  <!-- BEGIN timetable_link -->
+              <!-- BEGIN timetable_link -->
               <li><a href="/timetable.php?sid={SYNERGY_ID}">Timetable</a></li>
               <!-- END timetable_link -->
               <!-- BEGIN due_work -->
@@ -164,69 +161,77 @@
               <li><a href="/modules/helpdesk/index.php?id={ID}">Helpdesk Jobs</a></li>
               <!-- END helpdesk -->
             </ul></td>
+          <td style="vertical-align:top;"><strong>{GROUPTITLE}</strong></td>
+          <td style="vertical-align:top;"><ul>
+              <!-- BEGIN grouplist -->
+              <li>{GROUP}</li>
+              <!-- END grouplist -->
+            </ul></td>
         </tr>
-			<!-- BEGIN contact_synergy -->
-              <tr>
-                <td colspan="4"><h2>Emergency Contact</h2></td>
-              </tr>
-              <tr>
-                <td><strong>Name</strong></td>
-                <td>{EMERGENCY_NAME}</td>
-                <td><strong>Phone </strong></td>
-                <td>{EMERGENCY_PHONE}</td>
-              </tr>
-              <tr>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td><strong>Alt. Phone </strong></td>
-                <td>{EMERGENCY_ALT_PHONE}</td>
-              </tr>
-              <tr>
-                <td colspan="4"><h2>Primary Contact </h2></td>
-              </tr>
-              <tr>
-                <td><strong>Name</strong></td>
-                <td>{CONTACT_NAME}</td>
-                <td><strong>Home Phone </strong></td>
-                <td>{CONTACT_HOME_PHONE}</td>
-              </tr>
-              <tr>
-                <td><strong>Address</strong></td>
-                <td rowspan="2" valign="top">{CONTACT_ADDRESS}</td>
-                <td><strong>Mobile Phone </strong></td>
-                <td>{CONTACT_MOBILE_PHONE}</td>
-              </tr>
-              <tr>
-                <td>&nbsp;</td>
-                <td><strong>Work  Phone </strong></td>
-                <td>{CONTACT_OCCUP_PHONE}</td>
-              </tr>
-              <tr>
-                <td><strong>Spouse</strong></td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-              </tr>
-              <tr>
-                <td><strong>Name</strong></td>
-                <td>{SPOUSE_NAME}</td>
-                <td><strong>Mobile Phone </strong></td>
-                <td>{SPOUSE_MOBILE_PHONE}</td>
-              </tr>
-              <tr>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td><strong>Work Phone </strong></td>
-                <td>{SPOUSE_OCCUP_PHONE}</td>
-              </tr><!-- END contact_synergy -->
-            </table>
-			<!-- #EndEditable --> </div>
-		<div id="footer">
-			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
-			<p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
-			<p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
-		</div>
-	</div>
+        <!-- BEGIN contact_synergy -->
+        <tr>
+          <td colspan="4"><h2>Emergency Contact</h2></td>
+        </tr>
+        <tr>
+          <td><strong>Name</strong></td>
+          <td>{EMERGENCY_NAME}</td>
+          <td><strong>Phone </strong></td>
+          <td>{EMERGENCY_PHONE}</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td><strong>Alt. Phone </strong></td>
+          <td>{EMERGENCY_ALT_PHONE}</td>
+        </tr>
+        <tr>
+          <td colspan="4"><h2>Primary Contact </h2></td>
+        </tr>
+        <tr>
+          <td><strong>Name</strong></td>
+          <td>{CONTACT_NAME}</td>
+          <td><strong>Home Phone </strong></td>
+          <td>{CONTACT_HOME_PHONE}</td>
+        </tr>
+        <tr>
+          <td><strong>Address</strong></td>
+          <td rowspan="2" valign="top">{CONTACT_ADDRESS}</td>
+          <td><strong>Mobile Phone </strong></td>
+          <td>{CONTACT_MOBILE_PHONE}</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td><strong>Work  Phone </strong></td>
+          <td>{CONTACT_OCCUP_PHONE}</td>
+        </tr>
+        <tr>
+          <td><strong>Spouse</strong></td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td><strong>Name</strong></td>
+          <td>{SPOUSE_NAME}</td>
+          <td><strong>Mobile Phone </strong></td>
+          <td>{SPOUSE_MOBILE_PHONE}</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td><strong>Work Phone </strong></td>
+          <td>{SPOUSE_OCCUP_PHONE}</td>
+        </tr>
+        <!-- END contact_synergy -->
+      </table>
+      <!-- #EndEditable --> </div>
+    <div id="footer">
+      <p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
+      <p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
+      <p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
+    </div>
+  </div>
 </div>
 </body>
-<!-- #EndTemplate --></html>
+<!-- #EndTemplate -->
+</html>

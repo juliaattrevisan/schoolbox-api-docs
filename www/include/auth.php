@@ -144,6 +144,11 @@ function authenticate(&$db, $username, $password, $remember = 0)
 
 		if(SYNERGY_enable)
 			setSynergyInfo(&$db);
+		else {
+			//testing parent system
+			if($_SESSION['id'] == 6277)
+				$_SESSION['children'][] = array('id'=>2673,'sid'=>48826);
+		}
 
 		$loginlogquery .= ", '1')";
 		$db->dbDoQuery($loginlogquery);

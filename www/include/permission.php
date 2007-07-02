@@ -77,9 +77,9 @@ function isStudent($gid)
 	//Returns 1 if student else 0
 
 	if(in_array($gid, unserialize(STUDENTGROUPIDS)))
-		return 1;
+		return true;
 	else
-		return 0;
+		return false;
 }
 
 function isStaff($gid)
@@ -88,19 +88,29 @@ function isStaff($gid)
 	//Returns 1 if student else 0
 
 	if(in_array($gid, unserialize(STAFFGROUPIDS)))
-		return 1;
+		return true;
 	else
-		return 0;
+		return false;
 }
 
 function isParent($gid)
 {
 	//Function check if parent
 	if(in_array($gid, unserialize(PARENTGROUPIDS)))
-		return 1;
+		return true;
 	else
-		return 0;
+		return false;
 	
+}
+
+function isParentOfChild($id) {
+	if(is_array($_SESSION['children'])) {
+		foreach($_SESSION['children'] as $child) {
+			if($child['id'] == $id)
+				return true;
+		}
+	}
+	return false;
 }
 
 ?>

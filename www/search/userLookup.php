@@ -24,12 +24,13 @@ class outUser
 		$user = $db->dbGetSingleRow($query);
 		
 		//fill out all fields
-		$this->t_body->set_var("NAME", formatName($user));
+		$this->t_body->set_var('NAME', formatName($user));
+		$this->t_body->set_var('ID', $id);
 		
 		$emailAddress = formatEmail($user);
 		
 		if($email)
-			$email = "<a href=\"".$_SESSION['mailhandle']."$emailAddress\">$emailAddress</a>";
+			$email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$emailAddress</a>";
 		else
 			$email = "No address available";
 		
@@ -56,12 +57,13 @@ class outUser
 		if(SYNERGY_enable)
 		{	
 			require_once('../include/syn_userinfo.php');
-
-			//only allow staff to see student information
-			if(isStaff($_SESSION['gid']))
+			
+			//only allow staff to see student information or parent
+			if(isStaff($_SESSION['gid']) || isParentOfChild($user['uid']))
 			{
 				$this->t_body->parse("portrait_block", "portrait");		
 				$this->t_body->parse("timetable_link_block", "timetable_link");
+				
 				
 				if(isStudent($user['group_id']))
 				{
@@ -89,6 +91,7 @@ class outUser
 					
 					$this->t_body->parse("contact_synergy_block", "contact_synergy");
 					$this->t_body->parse("student_synergy_block", "student_synergy");
+					
 				}
 				else
 				{
@@ -103,7 +106,9 @@ class outUser
 				$this->t_body->set_var("contact_synergy_block", "");
 				$this->t_body->set_var("student_synergy_block", "");
 				$this->t_body->set_var("portrait_block", "");	
-				$this->t_body->set_var("timetable_link_block", "");	
+				$this->t_body->set_var("timetable_link_block", "");
+				$this->t_body->set_var("due_work_block", "");	
+				$this->t_body->set_var("helpdesk_block", "");	
 			}
 		}
 		else

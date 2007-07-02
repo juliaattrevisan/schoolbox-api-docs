@@ -128,4 +128,7 @@ define('HOMEPAGE_small_text_font', 4);
 define('HOMEPAGE_small_text_bg', 6);
 
 
+//module config options
+define('HELPDESK_location', '/usr/local/www/helpdesk');
+define('HELPDESK_db', 'helpdesk');
 ?>

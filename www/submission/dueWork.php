@@ -81,10 +81,12 @@ class dueWorkPage
 	function outputCategories($id, $subjects)
 	{
 			$catList = involvedCategoryList($id, $subjects, 1);
-			foreach($catList as $cat)
-			{
-				if($this->outputCategoryWork($id, $cat['id']))
-					$flag=1;
+			if(is_array($catList)) {
+				foreach($catList as $cat)
+				{
+					if($this->outputCategoryWork($id, $cat['id']))
+						$flag=1;
+				}
 			}
 			if(!$flag)
 				$this->t_body->set_var("category_listing", "<b>You have completed all work set via the portal</b>");

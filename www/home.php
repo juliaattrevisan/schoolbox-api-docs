@@ -375,6 +375,7 @@ href=\"/homepage.php?code=".urlencode($period['code'])."\">{$period['description
 		{
 			$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
 			$user = $this->db->dbGetSingleRow($query);
+			$this->t_body->set_var("STUDENT_ID", $child['id']);
 			$this->t_body->set_var("STUDENT_NAME", formatName($user,'{firstname} {lastname}'));
 			$this->t_body->set_var("STUDENT_YEAR", $user['year']);
 			

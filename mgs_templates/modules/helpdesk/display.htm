@@ -7,26 +7,6 @@
 <head>
 <!-- #BeginEditable "doctitle" -->
 <title>MGS Portal - Helpdesk</title>
-<script type="text/javascript">
-<!--
-    function refresh() {
-        window.location.reload(false);
-    }
-
-    function hidetoggle (idtogg) {
-        document.getElementById(idtogg).style.display = (document.getElementById(idtogg).style.display == 'none') ? '' : 'none';
-	}
-
-	function ImageRotate(buttonid) {
-		if (document.getElementById(buttonid).src == "http://portal.mgs.vic.edu.au/images/button_add.jpg") {
-			document.getElementById(buttonid).src = "http://portal.mgs.vic.edu.au/images/button_cross.jpg";	
-		}
-		else {
-			document.getElementById(buttonid).src = "http://portal.mgs.vic.edu.au/images/button_add.jpg";
-		}
-	}
-//-->
-</script>
 <!-- #EndEditable -->
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta http-equiv="Content-Language" content="en-au" />
@@ -128,7 +108,8 @@
   <!-- #EndLibraryItem --><!-- #EndEditable -->
   <div id="content">
     <div id="content_text"> <!-- #BeginEditable "main" -->
-      <h1>Helpdesk Status for {USER_CURR}</h1>
+      <!-- BEGIN user -->
+      <h1>Helpdesk Information for {USER_CURR}</h1>
       <h2>Job List</h2>
       <table class="indent ruler">
         <thead>
@@ -172,6 +153,7 @@
           <!-- END equip -->
         </tbody>
       </table>
+      <!-- END user -->
       <!-- #EndEditable --> </div>
     <div id="footer">
       <p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
