@@ -17,3 +17,7 @@ while ($row = $db->dbGetNextArray()) {
 
 }
 ?>
+bGetNextArray()) {
+
+}
+?>

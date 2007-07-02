@@ -287,3 +287,5 @@ else if (isStaff($_SESSION['gid']) || $permType == 1)
 else
 	error(14); 
 ?>
+r(14); 
+?>

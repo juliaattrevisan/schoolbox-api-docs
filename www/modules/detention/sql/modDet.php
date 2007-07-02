@@ -9,8 +9,8 @@ class det
 	{
 		
 		//setup database
-
-		$this->mySQLdb = new dbManager("detention");
+		$SQL_db = "detention";
+		$this->mySQLdb = new dbManager($SQL_db);
 		$this->mySQLdb->dbConnect();
 
 		$this->detDate = "";
@@ -73,6 +73,13 @@ class det
 	{
 		$this->_arrParms = $filter;
 		$this->_arrParms['where'] = "AND det.status in (2, 3, 4)";
+		return ($this->getDet());
+	}
+
+	function getDetNoCancelled($filter)
+	{
+		$this->_arrParms = $filter;
+		$this->_arrParms['where'] = "AND det.status != 8";
 		return ($this->getDet());
 	}
 
@@ -139,6 +146,7 @@ class det
 				userstud.year,
 				det.id, 
 				date_format(detdate.detdatetime, '%e/%m/%y') as detDate, 
+				date_format(det.allocatedDate, '%e/%m/%y %l:%i:%p') as detCreated,
 				det.detDate as dateID,
 				det.studID, 
 				userstud.firstname as studfname, 
@@ -153,9 +161,9 @@ class det
 				det.status as statid, 
 				detstat.type as status,
 				det.history
-			  FROM det, ".SQL_db.".user as userstud, ".SQL_db.".user as userstaff, detdate, offence
+			  FROM (det, intranet.user as userstud, intranet.user as userstaff, detdate, offence)
 			";
-		$query.= " LEFT JOIN ".SQL_db.".house h ON userstud.house = h.id
+		$query.= " LEFT JOIN intranet.house h ON userstud.house = h.id
 			   LEFT JOIN status as detstat ON det.status = detstat.id
 			"; 
 		$query.= " WHERE userstud.id = det.studID
@@ -495,8 +503,8 @@ class det
 					staffu.lastname as stafflname,
 					staffu.firstname as stafffname
 			  FROM		detention.detdate dd
-			  LEFT JOIN	".SQL_db.".userAccess ua ON ua.uid = dd.staff		
-			  LEFT JOIN	".SQL_db.".user staffu ON staffu.id = ua.uid 
+			  LEFT JOIN	intranet.userAccess ua ON ua.uid = dd.staff		
+			  LEFT JOIN	intranet.user staffu ON staffu.id = ua.uid 
 			  LEFT JOIN 	detention.location l ON dd.location = l.id
 			  WHERE		ua.service = 5
 			  AND		ua.type >= 2
@@ -540,11 +548,11 @@ class det
 					h.house
 			  FROM		detdate dd 
 			  LEFT JOIN	det d ON dd.id = d.detDate
-			  LEFT JOIN	".SQL_db.".user stud ON stud.id = d.studID
-			  LEFT JOIN	".SQL_db.".user staff ON staff.id = dd.staff
+			  LEFT JOIN	intranet.user stud ON stud.id = d.studID
+			  LEFT JOIN	intranet.user staff ON staff.id = dd.staff
 			  LEFT JOIN	location l ON l.id = dd.location
 			  LEFT JOIN	offence o ON o.id = d.offence
-			  LEFT JOIN	".SQL_db.".house h ON h.id = stud.house
+			  LEFT JOIN	intranet.house h ON h.id = stud.house
 			  WHERE		dd.id = '".$classid."'
 			  AND		d.status NOT IN (8, 5) 
 			";
@@ -618,12 +626,12 @@ class det
 	{
 		if ($house) {
 			$query = "SELECT * ".			// <-- Mark Parncutt 27 Jan 2005
-				"FROM ".SQL_db.".house ".		//      This is used for when a HoH is viewing the
+				"FROM intranet.house ".		//      This is used for when a HoH is viewing the
 				"WHERE `id` = $house";      //      history page and they should only be able to
 											//      see their own house.
 		} else {
 			$query = "SELECT * ".
-				"FROM ".SQL_db.".house ".
+				"FROM intranet.house ".
 				"WHERE `id` in (1,2,3,4,5,6,7,8,9,10,11,15) ".  // <-- Mark Parncutt 21 Jan 2005
 				"ORDER BY `house` ASC";                         //      we only want Senior School houses,
 		}													    //      not the Wadhurst ones too.
@@ -656,8 +664,8 @@ class det
 	{
 
 		$query = "SELECT date_format(d.detdatetime, '%a %D %b') as detdate, date_format(d.detdatetime, '%l:%i%p') as time, u.firstname, u.lastname, l.location 
-			  FROM detdate d, location l 
-			  LEFT JOIN ".SQL_db.".user u ON u.id = d.staff
+			  FROM (detdate d, location l) 
+			  LEFT JOIN intranet.user u ON u.id = d.staff
 			  WHERE d.id = '".$detDate."'
 			  AND d.location = l.id
 		";
@@ -668,8 +676,8 @@ class det
 		// Mark Parncutt 19 Jan 2005
 		// Counts the number of dets that match the filter options
 		$query = "SELECT COUNT(det.id) AS count
-		 FROM det, ".SQL_db.".user as userstud, ".SQL_db.".user as userstaff, detdate, offence
-		 LEFT JOIN ".SQL_db.".house h ON userstud.house = h.id
+		 FROM (det, intranet.user as userstud, intranet.user as userstaff, detdate, offence)
+		 LEFT JOIN intranet.house h ON userstud.house = h.id
 		 LEFT JOIN status as detstat ON det.status = detstat.id
 		 WHERE userstud.id = det.studID
 		 AND userstaff.id = det.staffID 

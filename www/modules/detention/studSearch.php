@@ -61,28 +61,21 @@ class detSearch
 		//search for a user based on at least one of the above fields
 		//assumes at least one contains something
 	
-		$query = "SELECT id, username, firstname, lastname, year FROM user WHERE group_id in (3,4) ";
-		if ($yrlvl != 0)
-			$query .= " AND year = '".$yrlvl."' ";
-		else
-			$query .= " AND year in (9,10,11,12) ";
-			
+		$query = "SELECT id, username, firstname, lastname, year FROM user WHERE group_id in (3,4) AND year in (9,10,11,12)";
+		if ($yrlvl != 0){
+			$query .= "  AND year = '".$yrlvl."'";
+		}
 		$brace = "";
-		if ($name != "")
-		{
+		if ($name){
 			$namarr = explode(" ", $name);
 			$first = 1;
-			foreach ($namarr as $nam)
-			{
-				if($nam != "")
-				{
+			foreach ($namarr as $nam){
+				if($nam != ""){
 					if ($first)
 						$query .= " AND (firstname LIKE '%".$nam."%' OR lastname LIKE '%".$nam."%'";
 					else
-					{
 						$query .= " OR firstname LIKE '%".$nam."%' OR lastname LIKE '%".$nam."%'";
-						$first = 0;
-					}
+				$first = 0;
 				}
 				$brace = ")";
 			}

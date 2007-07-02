@@ -11,14 +11,13 @@
 //  !!! NOTE !!! Initially, the code in createHeaders() to be used will be commented out and test email addresses used instead 
 //		 These test addresses need to be deleted and the correct ones uncommented.
 //		 As soon as these are amended, the system will notify students and staff accordingly 
-include('../../../include/mailer.php');
 
 class notify
 {
 	function notify($state, $detDate, $studID, $staffID, $offence, $workset, $type, $history)
 	{
 		//setup db
-		$this->db = new dbManager();
+		$this->db = new dbManager("intranet");
 		$this->db->dbConnect();
 		//setup db for synergy queries
 		//$this->msdb = mssql_connect(MSSQL_host, MSSQL_user, MSSQL_passwd);

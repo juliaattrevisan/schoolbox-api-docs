@@ -79,3 +79,8 @@ function permHouse()
 	return $result['sid'];
 }
 ?>
+db->dbDoQuery($query);
+	$result = $db->dbGetNextArray();
+	return $result['sid'];
+}
+?>

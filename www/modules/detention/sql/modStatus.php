@@ -80,3 +80,8 @@ class status
 }
 
 ?>
+turn 0;
+	}
+}
+
+?>

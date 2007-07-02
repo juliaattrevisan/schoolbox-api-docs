@@ -10,7 +10,8 @@ class date
 	{
 		
 		//setup database
-		$this->mySQLdb = new dbManager("detention");
+		$SQL_db = "detention";
+		$this->mySQLdb = new dbManager($SQL_db);
 		$this->mySQLdb->dbConnect();
 
 		$this->id = $id;
@@ -27,9 +28,10 @@ class date
 		}
 	  	$where = substr($where, 0, strlen($where)-2);		
 		$query = "SELECT 	id, firstname, lastname
-			  FROM 		".SQL_db.".user
+			  FROM 		intranet.user
 			  WHERE		group_id IN (1, 2) 
 			  AND		(".$where.")
+			  ORDER BY lastname, firstname
 			";
 		$this->mySQLdb->dbDoQuery($query);
 	 	while ($stafflist = $this->mySQLdb->dbGetNextArray()){
@@ -41,7 +43,7 @@ class date
 	
 	function addStaff($id)
 	{
-		$query = "INSERT INTO	".SQL_db.".userAccess
+		$query = "INSERT INTO	intranet.userAccess
 			  		(uid, service, sid, type)
 			  VALUES	($id, 5, 0, 2)
 			";
@@ -51,11 +53,12 @@ class date
 	function getStaff()
 	{
 		$query = "SELECT 	u.id, u.firstname, u.lastname
-			  FROM 		".SQL_db.".userAccess ua
-			  LEFT JOIN 	".SQL_db.".user u
+			  FROM 		intranet.userAccess ua
+			  LEFT JOIN 	intranet.user u
 			  ON		u.id = ua.uid
 			  WHERE		ua.service = 5 
 			  AND		ua.type >= 2
+			  ORDER BY	u.lastname, u.firstname
 			";
 		$this->mySQLdb->dbDoQuery($query);
 		while ($stafflist = $this->mySQLdb->dbGetNextArray()){
@@ -236,8 +239,8 @@ class date
 
                                 		//get date into array for notify function to deal with
                                 		$query = "SELECT date_format(d.detdatetime, '%a %D %b') as detdate, date_format(d.detdatetime, '%l:%i%p') as time, u.firstname, u.lastname, l.location
-                                          		  FROM detdate d, location l
-                                          		  LEFT JOIN ".SQL_db.".user u ON u.id = d.staff
+                                          		  FROM (detdate d, location l)
+                                          		  LEFT JOIN intranet.user u ON u.id = d.staff
                                           		  WHERE d.id = '$date'
                                           		  AND d.location = l.id
                                 		";

@@ -137,6 +137,7 @@ class display
 		$uniqid = md5(uniqid(rand(),true));
 		$this->t_body->set_var("TYPE", $Conf['type']);
 		$this->t_body->set_var("DATE", $Conf['detDate']);
+		$this->t_body->set_var("CREATED", $Conf['detCreated']);
 		$this->t_body->set_var("OFFENCE", $Conf['offence']);
 		$this->t_body->set_var("ID", $Conf['id']);
 		$this->t_body->set_var("DETAILS", "<a border=\"0\" href=\"#\" onclick=\"hidetoggle('show".$uniqid."'); return false;\" onmouseover=\"window.status=''; return true;\" onmouseout=\"window.status=''; return true;\"><img id=\"".$Conf['id']."\" onclick=\"ImageRotate('".$Conf['id']."')\" border=\"0\" alt=\"Click for details\" src=\"/images/button_add.jpg\"></a>"); // Edited Jan.2006 Tyson Day
