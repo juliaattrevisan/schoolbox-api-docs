@@ -33,19 +33,19 @@ class file
 		//check allowed perms to add to specified category before proceeding
 		$this->checkWriteAccess($category);		
 		
-		$file = array(	'id'				=> $modid,
-								'description'	=> $description,
-								'comment'	 	=> $comment,
-								'category'		=> $category,
-								'type'			=> $type,
+		$file = array(	'id'			=> $modid,
+						'description'	=> $description,
+						'comment'	 	=> $comment,
+						'category'		=> $category,
+						'type'			=> $type,
 							);
 		
 		$this->db->dbUpdateRow('file', 'id', $file);
 		
-		$logEntry = array(	'object'			=> 'file',
-										'objectId'		=> $modid,
-										'action'			=> 'modify',
-										'user'			=> $_SESSION['id'],
+		$logEntry = array(	'object'		=> 'file',
+							'objectId'		=> $modid,
+							'action'		=> 'modify',
+							'user'			=> $_SESSION['id'],
 							);
 		
 		$this->db->dbInsertRow('cmsLog', $logEntry);
@@ -59,14 +59,14 @@ class file
 		$filesize = @filesize($file_loc);
 	
 		$file = array(	'description'	=> $description,
-								'comment'	 	=> $comment,
-								'category'		=> $category,
-								'owner'			=> $_SESSION['id'],
-								'type'			=> $type,
-								'realname'	=> $file_name,
-								'submitted'	=> 'NOW()',
-								'mime_type'	=> $file_type,
-								'file_size'		=> $filesize,
+						'comment'	 	=> $comment,
+						'category'		=> $category,
+						'owner'			=> $_SESSION['id'],
+						'type'			=> $type,
+						'realname'		=> $file_name,
+						'submitted'		=> 'NOW()',
+						'mime_type'		=> $file_type,
+						'file_size'		=> $filesize,
 							);
 		
 		$this->db->dbInsertRow('file', $file);
@@ -81,10 +81,10 @@ class file
 				copy($file_loc, FILE_directory ."/". $newFileName);
 		}
 	
-		$logEntry = array(	'object'			=> 'file',
-										'objectId'		=> $fileId,
-										'action'			=> 'create',
-										'user'			=> $_SESSION['id'],
+		$logEntry = array(	'object'	=> 'file',
+							'objectId'	=> $fileId,
+							'action'	=> 'create',
+							'user'		=> $_SESSION['id'],
 							);
 		
 		$this->db->dbInsertRow('cmsLog', $logEntry);
@@ -108,17 +108,15 @@ class file
 		//now delete file by updating it as deleted
 		$this->db->dbUpdateRow('file', 'id', array('id'=>$id, 'deleted'=>1));
 
-		$logEntry = array(	'object'			=> 'file',
-										'objectId'		=> $id,
-										'action'			=> 'delete',
-										'user'			=> $_SESSION['id'],
+		$logEntry = array(	'object'	=> 'file',
+							'objectId'	=> $id,
+							'action'	=> 'delete',
+							'user'		=> $_SESSION['id'],
 							);
 		
 		$this->db->dbInsertRow('cmsLog', $logEntry);
 
 		//we leave file incase we need it but we should clean up any cached files right now
-		
-
 	}
 
 	function getFile($id)

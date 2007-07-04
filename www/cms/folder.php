@@ -45,9 +45,9 @@ class folder
 		$this->checkWriteAccess($parent);
   
   		$folder = array(	'name'			=> $name,
-									'parent'	 	=> $parent,
-									'template'		=> $template,
-								);
+							'parent'	 	=> $parent,
+							'template'		=> $template,
+						);
 		
 		if($code)
 			$folder['code']	= $code;
@@ -56,11 +56,11 @@ class folder
   
 		$cid = $this->db->dbInsertId();
 		
-		$logEntry = array(	'object'			=> 'folder',
-										'objectId'		=> $cid,
-										'action'			=> 'create',
-										'user'			=> $_SESSION['id'],
-							);
+		$logEntry = array(	'object'		=> 'folder',
+							'objectId'		=> $cid,
+							'action'		=> 'create',
+							'user'			=> $_SESSION['id'],
+						);
 		
 		$this->db->dbInsertRow('cmsLog', $logEntry);
 		
@@ -100,11 +100,11 @@ class folder
 		$this->db->dbUpdateRow('category', 'id', $cat);
 		
 		//log modification
-		$log = array(	'object'		=>'folder', 
-								'objectId'	=>$cid, 
-								'action'		=>'modify', 
-								'user'		=>$_SESSION['id']
-							);
+		$log = array(	'object'		=> 'folder', 
+						'objectId'		=> $cid, 
+						'action'		=> 'modify', 
+						'user'			=> $_SESSION['id']
+					);
 		$this->db->dbInsertRow('cmsLog', $log);
 		
 		//if template set apply new template
@@ -132,11 +132,11 @@ class folder
 		$query = "DELETE FROM userAccess WHERE service = '1' AND sid = '".$id."'";
 		$this->db->dbDoQuery($query);
 		
-		$logEntry = array(	'object'			=> 'folder',
-										'objectId'		=> $id,
-										'action'			=> 'delete',
-										'user'			=> $_SESSION['id'],
-							);
+		$logEntry = array(	'object'		=> 'folder',
+							'objectId'		=> $id,
+							'action'		=> 'delete',
+							'user'			=> $_SESSION['id'],
+						);
 		
 		$this->db->dbInsertRow('cmsLog', $logEntry);
 
@@ -150,9 +150,9 @@ class folder
 	function insertPerm($cid, $group, $access)
 	{
 		$perm = array(	'cid'		=> $cid,
-								'gid'		=> $group,
-								'type' 	=> $access,
-								);
+						'gid'		=> $group,
+						'type' 	=> $access,
+					);
 		$this->db->dbInsertRow('perms', $perm); 
 	}
 

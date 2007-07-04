@@ -1,21 +1,22 @@
-<table> 
-	<tr> 
-		<td class="homeComponentHeader"><h2 class="small_head">Group Managers</h2></td> 
-	</tr> 
-	<!-- BEGIN staff_members --> 
-	<tr> 
-		<td class="small_text">{MEMBER_NAME}</td> 
-	</tr> 
-	<!-- END staff_members --> 
-	<tr style="height:2px;">
-		<td colspan="2" style="background:#666;"></td>
-	</tr>						
-	<tr> 
-		<td style="text-align:right;"><form action="/mail/createMail.php" method="post" name="form2"> 
-				<input type="hidden" name="replyto" value="{HEADING}" /> 
-				<input type="hidden" name="bcc" value="{EMAILALL}" /> 
-				<input class="emailall" type="submit" name="emailall" value="Email all" /> 
-			</form></td> 
-	</tr> 
-</table>
-<br />
+<div class="component" id="component{COMPONENT_ID}">
+  <div class="componentHeader">
+    <h2 class="small_head">Group Managers</h2>
+  </div>
+  <table>
+    <!-- BEGIN staff_members -->
+    <tr>
+      <td class="small_text">{MEMBER_NAME}</td>
+    </tr>
+    <!-- END staff_members -->
+    <tr style="height:2px;">
+      <td colspan="2" style="background:#666;"></td>
+    </tr>
+    <tr>
+      <td style="text-align:right;"><form action="/mail/createMail.php" method="post" name="form2">
+          <input type="hidden" name="replyto" value="{HEADING}" />
+          <input type="hidden" name="bcc" value="{EMAILALL}" />
+          <input class="emailall" type="submit" name="emailall" value="Email all" />
+        </form></td>
+    </tr>
+  </table>
+</div>

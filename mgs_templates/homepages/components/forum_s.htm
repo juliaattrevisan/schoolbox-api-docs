@@ -1,17 +1,18 @@
-<table>
-	<tr>
-		<td class="homeComponentHeader"><h2 class="small_head">Hot Topics</h2></td>
-	</tr>
-  <!-- BEGIN forum -->
-  <tr>
-    <td class="small_text">{FORUM_HEAD}</td>
-  </tr>
-  <!-- END forum -->
- 	<tr style="height:2px;">
-		<td colspan="2" style="background:#666;"></td>
-	</tr>					 
-  	<tr>
-		<td style="text-align:right;"><img src="/images/mgs/arrow_bullet.gif" alt="small arrow" /><a href="/forum/viewForum.php?cid={ID}">GOTO FORUM</a></td>
-	</tr>
-</table>
-<br />
+<div class="component" id="component{COMPONENT_ID}">
+  <div class="componentHeader">
+    <h2 class="small_head">Hot Topics</h2>
+  </div>
+  <table>
+    <!-- BEGIN forum -->
+    <tr>
+      <td class="small_text">{FORUM_HEAD}</td>
+    </tr>
+    <!-- END forum -->
+    <tr style="height:2px;">
+      <td colspan="2" style="background:#666;"></td>
+    </tr>
+    <tr>
+      <td style="text-align:right;"><img src="/images/mgs/arrow_bullet.gif" alt="small arrow" /><a href="/forum/viewForum.php?cid={ID}">GOTO FORUM</a></td>
+    </tr>
+  </table>
+</div>

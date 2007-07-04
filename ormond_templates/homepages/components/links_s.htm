@@ -1,19 +1,20 @@
-<table>
-	<tr>
-		<td class="homeComponentHeader"><h2 class="small_head">Links</h2></td>
-	</tr>
-  <!-- BEGIN link -->
-  <tr>
-    <td style="border-bottom:1px solid #666" class="small_text">{LINK_NAME}</td>
-  </tr>
-  <!-- END link -->
-	<tr style="height:2px;">
-		<td colspan="2" style="background:#666;"></td>
-	</tr>					  
+<div class="component" id="component{COMPONENT_ID}">
+  <div class="componentHeader">
+    <h2 class="small_head">Links</h2>
+  </div>
+  <table>
+    <!-- BEGIN link -->
+    <tr>
+      <td style="border-bottom:1px solid #666" class="small_text">{LINK_NAME}</td>
+    </tr>
+    <!-- END link -->
+    <tr style="height:2px;">
+      <td colspan="2" style="background:#666;"></td>
+    </tr>
     <!-- BEGIN submit_link -->
-	<tr>
-		<td style="text-align:right;"><a href="/cms/modResource.php?type=url&cid={ID}">POST LINK</a></td>
-	</tr>
-  <!-- END submit_link -->
-</table>
-<br />
+    <tr>
+      <td style="text-align:right;"><img src="/images/mgs/arrow_bullet.gif" alt="small arrow" /><a href="/cms/modResource.php?type=url&cid={ID}">POST LINK</a></td>
+    </tr>
+    <!-- END submit_link -->
+  </table>
+</div>

@@ -102,6 +102,7 @@ class modUser
 
 		$this->displayUserGroups($id);
 		$this->displayUserPerms($id);
+		$this->displayActivities($id);
 
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
@@ -214,6 +215,32 @@ class modUser
 		$this->t_body->parse("group_section","groups");
 
 	}				
+
+	function displayActivities($id) {
+		$this->t_body->set_block("tplBODY", "action_log", "action_section");
+		
+		$query = "SELECT object, action, time, c.name as folder, f.description as file, l.description as link 
+				FROM cmsLog 
+				LEFT JOIN category c ON c.id = objectId 
+				LEFT JOIN file f ON f.id = objectId
+				LEFT JOIN link l ON l.id = objectId 
+				WHERE user = $id
+				ORDER BY time DESC
+				LIMIT 0,20";
+				
+		$this->db->dbDoQuery($query);
+		
+		while($result = $this->db->dbGetNextArray()) {
+			$output = array (	'ACTION_DATE' 	=> date('d/m/Y G:i',strtotime( $result['time'] )),
+								'ACTION_ACTION' => $result['action'],
+								'ACTION_OBJECT' => $result['object'],
+								'ACTION_NAME'	=> $result[$result['object']],
+							);
+			$this->t_body->set_var($output);
+			$this->t_body->parse('action_section', 'action_log', true);
+		}		
+		
+	}
 
 	function displayUserPerms($id)
 	{

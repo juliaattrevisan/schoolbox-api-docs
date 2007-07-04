@@ -47,7 +47,6 @@ class ModResourcePage {
 
 	function setCategoryList($category=0)
 	{
-
 		//convert category list into html code
 		$this->listTree(0, "");
 		array_shift($this->catList);
@@ -218,7 +217,6 @@ class ModResourcePage {
 		$this->t_body->set_var("ACTION", "Modify");
 
                 //first find details about file to fill form with
-		include("file.php");
 		$fileObj = new file;
 		$file = $fileObj->getFile($id); 
 

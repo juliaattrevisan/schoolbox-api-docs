@@ -45,7 +45,7 @@ class OutPut
 		$this->logPageView();
 
 		//get list of homepage components, locations and size
-		$query = "SELECT position, component, homepage_comp_location.size, name, method, filename 
+		$query = "SELECT position, `column`, component, homepage_comp_location.size, name, method, filename 
 				FROM homepage_comp_location, homepage_comp 
 				WHERE component = id AND cid = '$category'";
 
@@ -57,15 +57,12 @@ class OutPut
 			if($component['method'] != "")
 			{
 				$this->t_body->set_file($component['name'].$componentCount, "homepages/components/".$component['filename']);
-
+				$this->t_body->set_var('COMPONENT_ID', $component['component']);
+				
 				$func = $component['method'];
 				if($this->$func($component['name'].$componentCount, $component['size']))
-					$this->t_body->parse("POS".$component['position'], $component['name'].$componentCount);
-				else
-					$this->t_body->set_var("POS".$component['position'], '');
+					$this->t_body->parse("COLUMN".$component['column'], $component['name'].$componentCount, true);
 			}
-			else   //nothing to be put in this postion so make it blank
-				$this->t_body->set_var("POS".$component['position'], "");
 		}
 
 		//output page

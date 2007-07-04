@@ -67,7 +67,7 @@ class url
 		$this->db->dbDoQuery($query);
 		$linkId = $this->db->dbInsertId();
 		
-		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('link', $linkId, 'add', {$_SESSION['id']})";
+		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('link', $linkId, 'create', {$_SESSION['id']})";
 		$this->db->dbDoQuery($query);
 	}
 
