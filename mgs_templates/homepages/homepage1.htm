@@ -20,8 +20,9 @@
 <script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
 <!-- InstanceBeginEditable name="scripts" -->
-
 <link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-homepages.css" />
+<script type="text/javascript" src="/javascript/mootools.js"></script>
+<script type="text/javascript" src="/javascript/dragDrop.js"></script>
 <style type="text/css">
 <!--
 {CSS}
@@ -108,7 +109,7 @@
 					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
 					<!-- END timetable_tab -->
 					<li class="navthis norm"><a class="navthis norm" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
-                    <li class="right"><a class="right" href="/cms/browseMyFiles.php" title="Upload files to your own private area" accesskey="f">My <em>F</em>iles</a></li>
+					<li class="right"><a class="right" href="/cms/browseMyFiles.php" title="Upload files to your own private area" accesskey="f">My <em>F</em>iles</a></li>
 				</ul>
 			</div>
 <!-- #EndLibraryItem --><!-- #EndEditable -->
@@ -119,21 +120,13 @@
 			<span class="header_option"><a href="/subject/customisePage.php?cid={ID}">customise page</a></span>
 			<!-- END edit_page -->
 			<br />
-			<table>
+			<table id="container">
 				<tr>
 					<td id="left-homepage-col" style="width:70%;vertical-align:top">
-					    {POS1}
-						{POS2}
-						{POS3}
-						{POS4}
-						{POS5}
+						{COLUMN1}
 					</td>
 					<td id="right-homepage-col" style="width:30%;vertical-align:top">
-					    {POS6}
-						{POS7}
-						{POS8}
-						{POS9}
-						{POS10} 
+						{COLUMN2}
 					</td>
 				</tr>
 			</table>		

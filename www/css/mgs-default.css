@@ -410,7 +410,7 @@ a img {
 		
 /* Form Table Layouts */
 .standardForm table td {
-	vertical-align:top;
+	vertical-align:center;
 	}
 .standardForm td.formLabelWidth {
 	width:260px;

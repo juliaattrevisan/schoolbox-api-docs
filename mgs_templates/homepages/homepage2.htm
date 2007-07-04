@@ -108,7 +108,7 @@
 					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
 					<!-- END timetable_tab -->
 					<li class="navthis norm"><a class="navthis norm" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
-                    <li class="right"><a class="right" href="/cms/browseMyFiles.php" title="Upload files to your own private area" accesskey="f">My <em>F</em>iles</a></li>
+					<li class="right"><a class="right" href="/cms/browseMyFiles.php" title="Upload files to your own private area" accesskey="f">My <em>F</em>iles</a></li>
 				</ul>
 			</div>
 <!-- #EndLibraryItem --><!-- #EndEditable -->
@@ -118,25 +118,17 @@
 		<!-- BEGIN edit_page -->
 			<span class="header_option"><a href="/subject/customisePage.php?cid={ID}">customise page</a></span>
 		<!-- END edit_page -->
-            <br />
-            <table>
-              	<tr> 
-                	<td id="left-homepage-col" style="width:50%; vertical-align:top"> 
-                  	{POS1}
-                  	{POS2}
-                  	{POS3}
-                	{POS4}
-                	{POS5}
+			<br />
+			<table id = "comonents">
+			  	<tr> 
+					<td id="left-homepage-col" style="width:50%; vertical-align:top"> 
+				  	{LEFT}
 					</td>
-                	<td id="right-homepage-col" style="width:50%; vertical-align:top">
-                  	{POS6}
-                  	{POS7}
-			  	{POS8}
-			  	{POS9}
-			  	{POS10}
-			  	</td>
-              	</tr>
-           	</table><!-- #EndEditable --> </div>
+					<td id="right-homepage-col" style="width:50%; vertical-align:top">
+				  	{RIGHT}
+					</td>
+				</tr>
+		   	</table><!-- #EndEditable --> </div>
 		<div id="footer">
 			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
 			<p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
