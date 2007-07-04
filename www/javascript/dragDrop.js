@@ -1,24 +1,28 @@
+function getURLParam(strParamName){
+	var strReturn = "";
+	var strHref = window.location.href;
+	if ( strHref.indexOf("?") > -1 ){
+	var strQueryString = strHref.substr(strHref.indexOf("?")).toLowerCase();
+	var aQueryString = strQueryString.split("&");
+	for ( var iParam = 0; iParam < aQueryString.length; iParam++ ){
+		if (aQueryString[iParam].indexOf(strParamName + "=") > -1 ){
+			var aParam = aQueryString[iParam].split("=");
+			strReturn = aParam[1];
+			break;
+		}
+	}
+	}
+	return strReturn;
+} 
+
 window.onload = function(){
 	// WebBoxes shared vars
 	var components = $$('.component');
 	var marker = new Element('div').addClass('marker').setStyles({'display': 'none'}).injectInside($('content_text'));
 	var container = $('container').getChildren()[0].getChildren().getChildren()[0];
 	
-	// Count and order for each side
-	var order = [[],[]];
-	var count = [1, 1];
-	
 	// WebBoxes drag behavior for each
 	components.each(function(element, i){
-		// Asses initial order
-		if(element.getParent().id == 'left-homepage-col'){
-			order[0][count[0]] = element.id.substr(9);
-			count[0]++;
-		}else{
-			order[1][count[1]] = element.id.substr(9);
-			count[1]++;
-		}
-		
 		// Make each component draggable using the handle
 		element.makeDraggable({
 			handle: element.getElementsBySelector('.componentHeader')[0],
@@ -41,7 +45,9 @@ window.onload = function(){
 				marker.injectInside($('content_text')).setStyles({'display': 'none'});
 				
 				// Reassess order
-				var count = [1, 1];
+				var count = [0, 0];
+				var order = [[],[]];
+				var components = $$('.component');
 				components.each(function(element, i){
 					if(element.getParent().id == 'left-homepage-col'){
 						order[0][count[0]] = element.id.substr(9);
@@ -53,7 +59,7 @@ window.onload = function(){
 				});
 
 				// Update the database
-				var myAjax = new Ajax('/subject/customisePage.php?column1='+order[0]+'&column2='+order[1]+'&update=components').request();
+				var myAjax = new Ajax('/subject/customisePage.php?cid='+getURLParam('category')+'&column1='+order[0]+'&column2='+order[1]+'&type=components').request();
 			},
 			'onDrag': function() {
 				var mouseX = this.mouse.now.x; var mouseY = this.mouse.now.y;

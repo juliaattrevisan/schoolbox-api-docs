@@ -36,18 +36,34 @@ class modPage
                 $query = "DELETE FROM homepage_config WHERE cid = '".$this->cid."'";
                 $this->db->dbDoQuery($query);
         }
+        
+        function updateComponentPosition($component, $column, $position)
+		{
+			$query = array(
+				"component" => $component,
+				"cid" => $this->cid,
+				"column" => $column,
+				"position" => $position
+			);
+			print('<pre>');print_r($query);print('<pre>');
+			$this->db->dbUpdateRow('homepage_comp_location', array('component', 'cid'), $query);
+		}
 
         function deleteComponentPositions()
         {
-                $query = "DELETE FROM homepage_comp_location WHERE cid = '".$this->cid."'";
-                $this->db->dbDoQuery($query);
+                $this->db->dbDeleteRow('homepage_comp_location', 'cid', $this->cid);
         }
 
-        function saveComponentPosition($component, $position, $size)
+        function saveComponentPosition($component, $column, $position)
         {
-                $query = "INSERT INTO homepage_comp_location (position, component, size, cid) VALUES ( '$position', '$component', '$size', '".$this->cid."')";
-                $this->db->dbDoQuery($query);
-
+                $query = array(
+                	"cid" => $this->cid,
+                	"component" => $component,
+                	"column" => $column,
+					"position" => $position,
+					"size" => $size
+                );
+                $this->db->dbDoInsertRow($query);
         }
 
         function saveDisplayProperties($large_head_font, $large_head_bg, $large_text_font, $large_text_bg, 
