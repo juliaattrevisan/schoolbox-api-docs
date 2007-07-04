@@ -47,7 +47,8 @@ class OutPut
 		//get list of homepage components, locations and size
 		$query = "SELECT position, `column`, component, homepage_comp_location.size, name, method, filename 
 				FROM homepage_comp_location, homepage_comp 
-				WHERE component = id AND cid = '$category'";
+				WHERE component = id AND cid = '$category'
+				ORDER BY position";
 
 		$result = $this->db->dbDoQuery($query);
 		$componentCount = 0;

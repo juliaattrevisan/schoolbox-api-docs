@@ -102,6 +102,7 @@ class modUser
 
 		$this->displayUserGroups($id);
 		$this->displayUserPerms($id);
+		$this->displayLogin($user['username']);
 		$this->displayActivities($id);
 
 		$this->t_body->pparse("finaloutput", "tplBODY");
@@ -226,7 +227,7 @@ class modUser
 				LEFT JOIN link l ON l.id = objectId 
 				WHERE user = $id
 				ORDER BY time DESC
-				LIMIT 0,20";
+				LIMIT 0,10";
 				
 		$this->db->dbDoQuery($query);
 		
@@ -238,6 +239,24 @@ class modUser
 							);
 			$this->t_body->set_var($output);
 			$this->t_body->parse('action_section', 'action_log', true);
+		}		
+		
+	}
+
+	function displayLogin($username) {
+		$this->t_body->set_block("tplBODY", "login_log", "login_block");
+		
+		$query = "SELECT date, ip, login FROM login_log WHERE username like '$username' ORDER BY date DESC LIMIT 0,10";
+				
+		$this->db->dbDoQuery($query);
+		
+		while($result = $this->db->dbGetNextArray()) {
+			$output = array (	'LOGIN_DATE' 	=> date('d/m/Y G:i',strtotime( $result['date'] )),
+								'LOGIN_IP' => $result['ip'],
+								'LOGIN_RESULT' => $result['login']?'Success':'Failed',
+							);
+			$this->t_body->set_var($output);
+			$this->t_body->parse('login_block', 'login_log', true);
 		}		
 		
 	}
