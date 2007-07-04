@@ -1,20 +1,21 @@
-<table>
-	<tr>
-		<td colspan="2" class="homeComponentHeader"><h2 class="large_head">Notes</h2></td>
-	</tr>
-	<!-- BEGIN notes -->
-	<tr>
-		<td class="large_text titleColumn"><h3>{NOTE_NAME}</h3></td>
-		<td style="border-bottom:1px solid #666;" class="large_text">{NOTE_COMMENT}</td>
-	</tr>
-	<!-- END notes -->
-	<tr style="height:1px;">
-		<td colspan="2" style="border-bottom:1px solid #666;"></td>
-	</tr>						
-	<!-- BEGIN submit_note -->
-	<tr>
-		<td style="text-align:right;" colspan="2" class="navbar"><a href="/cms/modResource.php?type=file&cid={ID}&file=1">POST NOTE</a></td>
-	</tr>
-	<!-- END submit_note -->
-</table>
-<br />
+<div class="component" id="component{COMPONENT_ID}">
+  <div class="componentHeader">
+    <h2 class="large_head">Notes</h2>
+  </div>
+  <table>
+    <!-- BEGIN notes -->
+    <tr>
+      <td class="large_text titleColumn"><h3>{NOTE_NAME}</h3></td>
+      <td style="border-bottom:1px solid #666;" class="large_text">{NOTE_COMMENT}</td>
+    </tr>
+    <!-- END notes -->
+    <tr style="height:1px;">
+      <td colspan="2" style="border-bottom:1px solid #666;"></td>
+    </tr>
+    <!-- BEGIN submit_note -->
+    <tr>
+      <td style="text-align:right;" colspan="2" class="navbar"><a href="/cms/modResource.php?type=file&cid={ID}&file=1">POST NOTE</a></td>
+    </tr>
+    <!-- END submit_note -->
+  </table>
+</div>

@@ -1,23 +1,24 @@
-<table>
-	<tr>
-		<td colspan="2" class="homeComponentHeader"><h2 class="large_head">Assignments</h2></td>
-	</tr>
-	<!-- BEGIN assign -->
-	<tr>
-		<td class="large_text"><h3>{ASS_NAME}</h3></td>
-		<td class="large_text" style="text-align:right"><strong>Due Date: </strong>{ASS_DATE}</td>
-	</tr>
-	<tr>
-		<td colspan="2" class="large_text" style="border-bottom:1px solid #666">{ASS_COMMENT}</td>
-	</tr>
-	<!-- END assign -->
-	<tr style="height:1px;">
-		<td colspan="2" style="border-bottom:1px solid #666;"></td>
-	</tr>
-	<!-- BEGIN submit_ass -->
-	<tr>
-		<td style="text-align:right;" colspan="2"><a href="/cms/modResource.php?type=file&cid={ID}&file=2">POST ASSIGNMENT</a></td>
-	</tr>
-	<!-- END submit_ass -->
-</table>
-<br />
+<div class="component" id="component{COMPONENT_ID}">
+  <div class="componentHeader">
+    <h2 class="large_head">Assignments</h2>
+  </div>
+  <table>
+    <!-- BEGIN assign -->
+    <tr>
+      <td class="large_text"><h3>{ASS_NAME}</h3></td>
+      <td class="large_text" style="text-align:right"><strong>Due Date: </strong>{ASS_DATE}</td>
+    </tr>
+    <tr>
+      <td colspan="2" class="large_text" style="border-bottom:1px solid #666">{ASS_COMMENT}</td>
+    </tr>
+    <!-- END assign -->
+    <tr style="height:1px;">
+      <td colspan="2" style="border-bottom:1px solid #666;"></td>
+    </tr>
+    <!-- BEGIN submit_ass -->
+    <tr>
+      <td style="text-align:right;" colspan="2"><a href="/cms/modResource.php?type=file&cid={ID}&file=2">POST ASSIGNMENT</a></td>
+    </tr>
+    <!-- END submit_ass -->
+  </table>
+</div>
