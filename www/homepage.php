@@ -99,13 +99,18 @@ class OutPut
 		
 		$this->t_body->set_var("TITLE", HEADING." - ".$name);
 		
+		$this->t_body->set_block('tplBODY', 'modify_layout', 'modify_layout_block');
 		$this->t_body->set_block("tplBODY", "edit_page", "edit_page_block");
+	
 		
-		if($this->perm >= 2) //has elevated priviliges, can write to page
-			$this->t_body->parse("edit_page_block", "edit_page");	
-		else
+		if($this->perm >= 2) {//has elevated priviliges, can write to page
+			$this->t_body->parse("edit_page_block", "edit_page");
+			$this->t_body->parse('modify_layout_block', 'modify_layout');
+		}	
+		else {
 			$this->t_body->set_var("edit_page_block", "");
-
+			$this->t_body->set_var('modify_layout_block', '');
+		}
 	}
 
 	function folderManage($name, $size)

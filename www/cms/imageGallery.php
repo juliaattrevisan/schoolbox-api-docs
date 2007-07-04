@@ -37,6 +37,7 @@ function ImageGallery($cid) {
 	
 	//output image
 
+/*
 	if(isset($_GET['image']))
 		$this->t_body->set_VAR("MAIN_IMAGE", "<a href=\"/sendframe.php?id={$_GET['image']}\" target=\"_blank\">
 			<img src=\"image.php?id={$_GET['image']}&height=300&width=400\" border=\"0\"></a>");
@@ -49,7 +50,7 @@ function ImageGallery($cid) {
 		$this->t_body->set_VAR("MAIN_IMAGE", "<a href=\"/sendframe.php?id={$image['id']}\" target=\"_blank\">
 			<img src=\"image.php?id={$image['id']}&height=300&width=400\" alt=\"{$image['description']}\" border=\"0\"></a>");
 	}
-
+*/
 
 	//output thumbnails
 	$this->t_body->set_block("tplBODY", "thumb_row", "row_block");
@@ -64,7 +65,7 @@ function ImageGallery($cid) {
 
 	while( $thumbnail = $db->dbGetNextArray() )
 	{
-		$this->t_body->set_VAR("THUMBNAIL", "<a href=\"$_PHPSELF?category={$cid}&image={$thumbnail['id']}\">
+		$this->t_body->set_VAR("THUMBNAIL", "<a href=\"image.php?id={$thumbnail['id']}&height=550&width=600\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
 				<img src=\"image.php?id={$thumbnail['id']}&height=80&width=80&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
 
 
