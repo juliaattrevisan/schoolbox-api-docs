@@ -64,7 +64,7 @@ function getSubjectList($synergyID, $group)
 {
 	$db = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
 	if(!$db)
-		error(65); 
+		return false; 
 	mssql_select_db(MSSQL_db, $db);
 
 	

@@ -25,23 +25,23 @@ class page
 				error(101);
 				
 		
-			$this->this->t_body = new Template(TPL_directory);
-			$this->this->t_body->set_file("tplBODY", "modules/resource/resource.htm");
+			$this->t_body = new Template(TPL_directory);
+			$this->t_body->set_file("tplBODY", "modules/resource/resource.htm");
 			include("../../include/page.php");
-			$this->this->t_body->set_var("TITLE", HEADING." - Resource Booking System");
+			$this->t_body->set_var("TITLE", HEADING." - Resource Booking System");
 		
-			$this->this->t_body->set_block("tplBODY", "equipment", "equipment_block");
-			$this->this->t_body->set_block("tplBODY", "assignment", "assignment_block");
-			$this->this->t_body->set_block("tplBODY", "edit_link", "edit_link_block");
+			$this->t_body->set_block("tplBODY", "equipment", "equipment_block");
+			$this->t_body->set_block("tplBODY", "assignment", "assignment_block");
+			$this->t_body->set_block("tplBODY", "edit_link", "edit_link_block");
 		
 			
-			$this->this->t_body->set_var("ID", $resource['id']);
-			$this->this->t_body->set_var("NAME", $resource['name']);
-			$this->this->t_body->set_var("IMAGE","<img src=\"resource_images/{$resource['id']}.dat\" width=\"200\" height=\"200\">");
-			$this->this->t_body->set_var("TYPE", $resource['type_name']);
-			$this->this->t_body->set_var("DESCRIPTION", $resource['description']);
-			$this->this->t_body->set_var("LOCATION", $resource['location_name']);
-			$this->this->t_body->set_var("OWNER", $resource['firstname']." ".$resource['lastname']);
+			$this->t_body->set_var("ID", $resource['id']);
+			$this->t_body->set_var("NAME", $resource['name']);
+			$this->t_body->set_var("IMAGE","<img src=\"resource_images/{$resource['id']}.dat\" width=\"200\" height=\"200\">");
+			$this->t_body->set_var("TYPE", $resource['type_name']);
+			$this->t_body->set_var("DESCRIPTION", $resource['description']);
+			$this->t_body->set_var("LOCATION", $resource['location_name']);
+			$this->t_body->set_var("OWNER", $resource['firstname']." ".$resource['lastname']);
 		
 			if($resource['type'] == ROOM)
 			{
@@ -53,14 +53,14 @@ class page
 					{
 						$equipmentList .=  "<a href=\"viewResource.php?id={$equipment['id']}\">{$equipment['name']}</a><br>";
 					}
-					$this->this->t_body->set_var("EQUIPMENTLIST", $equipmentList);
-					$this->this->t_body->parse("equipment_block", "equipment");
+					$this->t_body->set_var("EQUIPMENTLIST", $equipmentList);
+					$this->t_body->parse("equipment_block", "equipment");
 				}
 				else  //if no equipment assigned to room do not display equipment block
-					$this->this->t_body->set_var("equipment_block", "");
+					$this->t_body->set_var("equipment_block", "");
 				
 				//rooms cant be assigned so dont show assignment block
-				$this->this->t_body->set_var("assignment_block", ""); 
+				$this->t_body->set_var("assignment_block", ""); 
 			}
 			else
 			{		
@@ -68,34 +68,34 @@ class page
 				if($resource['room'])
 				{
 					$room = $resdb->getResource($resource['room']);
-					$this->this->t_body->set_var("ROOM", "<a href=\"viewResource.php?id={$room['id']}\">{$room['name']}</a>");
-					$this->this->t_body->parse("assignment_block", "assignment");
+					$this->t_body->set_var("ROOM", "<a href=\"viewResource.php?id={$room['id']}\">{$room['name']}</a>");
+					$this->t_body->parse("assignment_block", "assignment");
 				}
 				else //else dont output assignment block
-					$this->this->t_body->set_var("assignment_block", ""); 
+					$this->t_body->set_var("assignment_block", ""); 
 				//never output equipment block when resource is not a room
-				$this->this->t_body->set_var("equipment_block", "");
+				$this->t_body->set_var("equipment_block", "");
 			}
 			
 			
-			$this->this->t_body->set_var("WEEK_SELECT", createWeekList(getCurrentWeek(mktime()), "week", ''));
+			$this->t_body->set_var("WEEK_SELECT", createWeekList(getCurrentWeek(mktime()), "week", ''));
 			
 			if($resource['perm'] == 1)
-				$this->this->t_body->set_var("BOOK_RES", "<a href=\"modBooking.php?id={$resource['id']}\">make booking</a>");
+				$this->t_body->set_var("BOOK_RES", "<a href=\"modBooking.php?id={$resource['id']}\">make booking</a>");
 			else if($resource['perm'] == 2)
-				$this->this->t_body->set_var("BOOK_RES", "<a href=\"modBooking.php?id={$resource['id']}\">request booking</a>");
+				$this->t_body->set_var("BOOK_RES", "<a href=\"modBooking.php?id={$resource['id']}\">request booking</a>");
 			else
-				$this->this->t_body->set_var("BOOK_RES", "contact maintainer for bookings");
+				$this->t_body->set_var("BOOK_RES", "contact maintainer for bookings");
 			
 			
 			if($_SESSION['su'] || $resource['owner'] == $_SESSION['id'])
-				$this->this->t_body->parse("edit_link_block", "edit_link");
+				$this->t_body->parse("edit_link_block", "edit_link");
 			else
-				$this->this->t_body->set_var("edit_link_block", "");
+				$this->t_body->set_var("edit_link_block", "");
 				
 			
 			
-			$this->this->t_body->pparse("finaloutput", "tplBODY");
+			$this->t_body->pparse("finaloutput", "tplBODY");
 		}
 	}
 }

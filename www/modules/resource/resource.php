@@ -13,11 +13,11 @@ require_once("conf.php");
 class resource
 {
 	function resource()
-        {
-                //always gonna need the db so lets create one..
-                $this->db = new dbManager();
-                $this->db->dbConnect();
-        }
+	{
+			//always gonna need the db so lets create one..
+			$this->db = new dbManager();
+			$this->db->dbConnect();
+	}
 
 	function addResource($name, $owner, $image, $perm, $type, $description, $location)
 	{
@@ -84,7 +84,7 @@ class resource
 		resource.name, description, resource.type, 
 		luResourceType.name as type_name, 
 		luResourceLocation.name as location_name 
-		FROM resource, luResourceType, luResourceLocation, user
+		FROM ( resource, luResourceType, luResourceLocation, user )
 		LEFT JOIN roomResource ON resource.id = roomResource.resource
 		WHERE resource.id = '{$id}' AND resource.type = luResourceType.id
 		AND location = luResourceLocation.id AND owner = user.id"; 

@@ -1,13 +1,12 @@
 <?php
-// written by Robert Skillington
 
 require_once("../../include/session.php");
 require_once('../../conf/conf.php');
 require_once('../../include/dbManager-mysql.php');
 require_once('../../include/template.php');
-require_once('../../include/permission.php');
-//require_once("/usr/local/vhosts/helpdesk/include/common.php");	
-require_once(HELPDESK_location.'/include/sql.php');	
+require_once('../../include/permission.php');	
+require_once(HELPDESK_location.'/include/sql.php');
+	
 define( 'DB_NAME_PORTAL', SQL_db);
 
 class helpdesk_display{ 

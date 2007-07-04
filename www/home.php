@@ -371,28 +371,117 @@ href=\"/homepage.php?code=".urlencode($period['code'])."\">{$period['description
 		$this->t_body->set_block($location, "student_block", "student_subjects");
 		$this->t_body->set_block("student_block", "subject_block", "subject_item");
 
-		foreach($_SESSION['children'] as $child)
-		{
-			$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
-			$user = $this->db->dbGetSingleRow($query);
-			$this->t_body->set_var("STUDENT_ID", $child['id']);
-			$this->t_body->set_var("STUDENT_NAME", formatName($user,'{firstname} {lastname}'));
-			$this->t_body->set_var("STUDENT_YEAR", $user['year']);
-			
-			if(is_array($child['subjects']) ) {
-				foreach($child['subjects'] as $subject)
-				{
-					$this->t_body->set_var("STUDENT_SUBJECT_NAME", $subject['name']);
-					$this->t_body->set_var("STUDENT_SUBJECT_CODE", $subject['code']);
-					$this->t_body->parse("subject_item", "subject_block", true);
+		if(is_array($_SESSION['children'])) {
+			foreach($_SESSION['children'] as $child)
+			{
+				$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
+				$user = $this->db->dbGetSingleRow($query);
+				$this->t_body->set_var("STUDENT_ID", $child['id']);
+				$this->t_body->set_var("STUDENT_NAME", formatName($user,'{firstname} {lastname}'));
+				$this->t_body->set_var("STUDENT_YEAR", $user['year']);
+				
+				if(is_array($child['subjects']) ) {
+					foreach($child['subjects'] as $subject)
+					{
+						$this->t_body->set_var("STUDENT_SUBJECT_NAME", $subject['name']);
+						$this->t_body->set_var("STUDENT_SUBJECT_CODE", $subject['code']);
+						$this->t_body->parse("subject_item", "subject_block", true);
+					}
 				}
+	
+				$this->t_body->parse("student_subjects", "student_block", true);
+				$this->t_body->set_var("subject_item", '');
+			
 			}
-
-			$this->t_body->parse("student_subjects", "student_block", true);
-			$this->t_body->set_var("subject_item", '');
-		
+			return true;
 		}
+		
+		return false;
+	}
+	
+	function outputWenonaIntranet($location) {
 		return true;
+	}
+	
+	function outputHelpdesk($location) {
+			
+		$this->t_body->set_block($location, "helpdesk_block", "helpdesk_jobs");
+		
+		$jobs = $this->openHelpdeskJobs($_SESSION['id']);
+		
+		if(is_array($jobs)){
+			foreach ($jobs as $job) {
+				$this->t_body->set_var("PROBLEM", ucfirst($job['problem']));
+				$this->t_body->set_var("CREATED", $job['createdDate']);
+				$this->t_body->set_var("STATUS", $job['status']);
+				$this->t_body->parse("helpdesk_jobs", "helpdesk_block", true);
+			}
+		
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	function outputParentHelpdesk($location) {
+		
+		$this->t_body->set_block($location, "student_helpdesk_block", "student_helpdesk");
+		$this->t_body->set_block("student_helpdesk_block", "student_job_block", "student_job");
+		if(is_array($_SESSION['children'])) {
+			foreach($_SESSION['children'] as $child)
+			{
+				$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
+				$user = $this->db->dbGetSingleRow($query);
+				$this->t_body->set_var("STUDENT_ID", $child['id']);
+				$this->t_body->set_var("STUDENT_NAME", formatName($user,'{firstname} {lastname}'));
+				$this->t_body->set_var("STUDENT_YEAR", $user['year']);
+				
+				$jobs = $this->openHelpdeskJobs($child['id']);
+			
+				if(is_array($jobs)){
+					foreach ($jobs as $job) {
+						$this->t_body->set_var("PROBLEM", ucfirst($job['problem']));
+						$this->t_body->set_var("CREATED", $job['createdDate']);
+						$this->t_body->set_var("STATUS", $job['status']);
+						$this->t_body->parse("student_job", "student_job_block", true);
+					}
+				}
+			
+				$this->t_body->parse("student_helpdesk", "student_helpdesk_block", true);
+				$this->t_body->set_var("student_job", '');
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	function openHelpdeskJobs($userid) {
+			$query = "
+		SELECT  j.jobID, 
+				j.portalAssignedUserID,
+				concat(assignedUser.firstname, ' ', assignedUser.lastname) as assignedUserName,
+				p.description as problem,
+				j.description,
+				DATE_FORMAT(j.createdDate, '%e/%c/%Y') as createdDate,
+				s.description as status
+		FROM    tblJob j
+		INNER JOIN
+				tblProblem p on j.problemID = p.problemID
+		INNER JOIN
+				tblStatus s on j.statusID = s.statusID
+		LEFT JOIN
+				tblEquipment e on j.equipmentID = e.equipmentID
+		LEFT JOIN
+				".SQL_db.".user assignedUser on assignedUser.id = j.portalAssignedUserID
+		WHERE s.description != 'Closed' AND (j.portalAssociatedUserID = {$userid} OR e.portalUserID ={$userid} ) 
+		ORDER BY j.createdDate DESC";
+		
+		$this->db->dbChangedb(HELPDESK_db);
+		
+		$jobs = $this->db->dbGetAllRows($query);
+		$this->db->dbChangedb(SQL_db);
+		
+		return $jobs;
 	}
 	
 
