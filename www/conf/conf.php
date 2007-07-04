@@ -97,6 +97,11 @@ define("MAIL_address", MAIL_domain);
 define("MAIL_increment", 20);					//Amount of emails per page
 define("MAIL_db", "roundcubemail");
 
+//RSS Feed 
+define('RSS_url', 'http://www.abc.net.au/news/indexes/justin/rss.xml');
+define('RSS_cache_dir', '/usr/local/www/portal/files/');
+define('RSS_cache_time', 3000);
+define('RSS_limit', 6);
 
 //Weather options
 define("WEATHER_enable", false);				//This will disable the weather module

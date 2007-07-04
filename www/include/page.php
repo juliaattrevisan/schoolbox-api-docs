@@ -163,7 +163,7 @@ else
 if(SITE_location == 'wenona')
 {
 	//provide encoded login details for intranet
-	$this->t_body->set_var("ENC_LOGIN", base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'].' '.$_SESSION['password'])));
+	$this->t_body->set_var("ENC_LOGIN", base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'].' '.$_SESSION['password'].' '.date('Y m d H i'))));
 }
 
 

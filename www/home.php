@@ -484,6 +484,35 @@ href=\"/homepage.php?code=".urlencode($period['code'])."\">{$period['description
 		return $jobs;
 	}
 	
+	function outputRSS($location) {
+		$this->t_body->set_block($location, "rss_stories", "rss_block");
+		
+		require_once('include/lastRSS.php');
+		$rss = new lastRSS; 
+		
+		$rss->cache_dir = RSS_cache_dir; 
+  		$rss->cache_time = RSS_cache_time; // one hour
+		$rss->items_limit = RSS_limit;
+		$headlineList = $rss->get(RSS_url);
+			
+		$this->set_var('RSS_NAME', $headlineList['title']);
+		
+		//output headlines
+		if(is_array($headlineList['items']) ) {
+			foreach($headlineList['items'] as $item) {
+				$this->set_var("RSS_TITLE", $item['title']);
+				$this->set_var("RSS_URL", $item['link']); 
+				$this->set_var("RSS_BRIEF", $item['description']);
+				$this->t_body->parse("rss_block", "rss_stories", true);
+	    	}
+		}
+		else
+		{
+			return false;
+		}
+		
+		return true;
+	}
 
 	function showPage()
 	{
