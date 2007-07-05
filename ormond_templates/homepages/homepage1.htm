@@ -20,8 +20,11 @@
 <script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
 <!-- InstanceBeginEditable name="scripts" -->
-
 <link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-homepages.css" />
+<!-- BEGIN modify_layout -->
+<script type="text/javascript" src="/javascript/mootools.js"></script>
+<script type="text/javascript" src="/javascript/dragDrop.js"></script>
+<!-- END modify_layout -->
 <style type="text/css">
 <!--
 {CSS}
@@ -111,24 +114,16 @@
 			<span class="header_option"><a href="/subject/customisePage.php?cid={ID}">customise page</a></span>
 			<!-- END edit_page -->
 			<br />
-			<table>
+			<table id="container">
 				<tr>
 					<td id="left-homepage-col" style="width:70%;vertical-align:top">
-					    {POS1}
-						{POS2}
-						{POS3}
-						{POS4}
-						{POS5}
+						{COLUMN1}
 					</td>
 					<td id="right-homepage-col" style="width:30%;vertical-align:top">
-					    {POS6}
-						{POS7}
-						{POS8}
-						{POS9}
-						{POS10} 
+						{COLUMN2}
 					</td>
 				</tr>
-			</table>		
+			</table>			
 		<!-- #EndEditable --> </div>
 	</div>
 </div>
