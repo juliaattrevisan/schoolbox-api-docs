@@ -414,13 +414,11 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 			for($x=0; $_POST['catCount'] > $x; $x++)
 			{
 				if($_POST['mulc'][$x])
-	 			       	$fileId = $fileDB->addFile("", "", $_POST['description'], $_POST['comment'], 
-					$_POST['mulc'][$x], $_POST['ftype']);
+	 			       	$fileId = $fileDB->addFile("", "", "", $_POST['description'], $_POST['comment'], $_POST['mulc'][$x], $_POST['ftype']);
 			}
 		}
 		else			
-			$fileId = $fileDB->addFile("", "", $_POST['description'], $_POST['comment'], $_POST['category'], 
-			$_POST['ftype']);
+			$fileId = $fileDB->addFile("", "", "", $_POST['description'], $_POST['comment'], $_POST['category'], $_POST['ftype']);
 
 	 	//ok finished redirect create submission page if requested or just go to where file was added
         	if($_POST['submission'])

@@ -230,17 +230,19 @@ class modUser
 				LIMIT 0,10";
 				
 		$this->db->dbDoQuery($query);
-		
-		while($result = $this->db->dbGetNextArray()) {
-			$output = array (	'ACTION_DATE' 	=> date('d/m/Y G:i',strtotime( $result['time'] )),
-								'ACTION_ACTION' => $result['action'],
-								'ACTION_OBJECT' => $result['object'],
-								'ACTION_NAME'	=> $result[$result['object']],
-							);
-			$this->t_body->set_var($output);
-			$this->t_body->parse('action_section', 'action_log', true);
-		}		
-		
+		if($this->db->dbCountRows() > 0) {
+			while($result = $this->db->dbGetNextArray()) {
+				$output = array (	'ACTION_DATE' 	=> date('d/m/Y G:i',strtotime( $result['time'] )),
+									'ACTION_ACTION' => $result['action'],
+									'ACTION_OBJECT' => $result['object'],
+									'ACTION_NAME'	=> $result[$result['object']],
+								);
+				$this->t_body->set_var($output);
+				$this->t_body->parse('action_section', 'action_log', true);
+			}		
+		}
+		else
+			$this->t_body->set_var('action_section', '');
 	}
 
 	function displayLogin($username) {
@@ -249,16 +251,18 @@ class modUser
 		$query = "SELECT date, ip, login FROM login_log WHERE username like '$username' ORDER BY date DESC LIMIT 0,10";
 				
 		$this->db->dbDoQuery($query);
-		
-		while($result = $this->db->dbGetNextArray()) {
-			$output = array (	'LOGIN_DATE' 	=> date('d/m/Y G:i',strtotime( $result['date'] )),
-								'LOGIN_IP' => $result['ip'],
-								'LOGIN_RESULT' => $result['login']?'Success':'Failed',
-							);
-			$this->t_body->set_var($output);
-			$this->t_body->parse('login_block', 'login_log', true);
+		if($this->db->dbCountRows() > 0) {
+			while($result = $this->db->dbGetNextArray()) {
+				$output = array (	'LOGIN_DATE' 	=> date('d/m/Y G:i',strtotime( $result['date'] )),
+									'LOGIN_IP' => $result['ip'],
+									'LOGIN_RESULT' => $result['login']?'Success':'Failed',
+								);
+				$this->t_body->set_var($output);
+				$this->t_body->parse('login_block', 'login_log', true);
+			}
 		}		
-		
+		else
+			$this->t_body->set_var('login_block', '');
 	}
 
 	function displayUserPerms($id)

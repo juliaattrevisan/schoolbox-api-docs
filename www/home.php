@@ -281,18 +281,41 @@ href=\"/homepage.php?code=".urlencode($period['code'])."\">{$period['description
 		$catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
 		$whatnew = new WhatsNew();
 	
-		$this->t_body->set_block($location, "category_block", "new_category");
-		$this->t_body->set_block("category_block", "new_news", "new_news_item"); 
+
+		$this->t_body->set_block($location, 'category_block', 'new_category');
+		$this->t_body->set_block('category_block', 'due_work', 'due_block');
+		$this->t_body->set_block('category_block', 'ret_work', 'ret_block');
+		$this->t_body->set_block('category_block', 'sub_work', 'sub_block');
+		$this->t_body->set_block('category_block', "new_news", "new_news_item"); 
 		$this->t_body->set_block("category_block", "new_file", "new_file_item"); 
 		$this->t_body->set_block("category_block", "new_url", "new_url_item"); 
 		$this->t_body->set_block("category_block", "new_forum", "new_forum_item"); 
 		$flag = 0;
+
+		
 
 		//for each subject
 		if(is_array($catList))
 		{
 			foreach($catList as $catInfo)
 			{
+				$sub = $whatnew->submissionDetails($catInfo['id']);
+				if($sub['duework'])
+					$this->t_body->parse('due_block', 'due_work');
+				else
+					$this->t_body->set_var('due_block', '');
+				
+				if($sub['retwork']) 
+					$this->t_body->parse('ret_block', 'ret_work');
+				else
+					$this->t_body->set_var('ret_block', '');
+					
+				if($sub['subboxes'])
+					$this->t_body->parse('sub_block', 'sub_work');
+				else
+					$this->t_body->set_var('sub_block', '');
+	
+			
 				$cat = $whatnew->newCategory($catInfo['id']);
 				if($cat['news'])
 				{

@@ -55,8 +55,10 @@ class file
 	function addFile($file_name, $file_type, $file_loc, $description, $comment, $category, $type)
 	{
 		//check allowed perms to add to specified category before proceeding
-		$this->checkWriteAccess($category);		
-		$filesize = @filesize($file_loc);
+		$this->checkWriteAccess($category);
+		
+		if(is_readable($file_loc))		
+			$filesize = @filesize($file_loc);
 	
 		$file = array(	'description'	=> $description,
 						'comment'	 	=> $comment,

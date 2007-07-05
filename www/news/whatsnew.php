@@ -27,8 +27,10 @@ class WhatsNew
 		$count['retwork'] = $this->newReturnedWork($id);
 
 		//check for new submissions in category submission boxes
-		$count['subboxes'] = $this->newSubmission($id);
-	
+		$subboxes = $this->newSubmission($id);
+
+		$count['subboxes'] = count($subboxes);
+		return $count;
 	}	
 
 	function set_var($varName, $varContents)
@@ -148,7 +150,7 @@ class WhatsNew
 
 	function newReturnedWork($id)
 	{
-		$lastvisit = lastReturnedWorkVisit();
+		$lastvisit = $this->lastReturnedWorkVisit();
 		
 		//check for returned work
 		$query = "SELECT COUNT(submission_return.id) AS retwork FROM submission_return, submission_box WHERE 

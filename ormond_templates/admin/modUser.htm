@@ -22,6 +22,10 @@
 <script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
 <!-- #BeginEditable "scripts" -->
+<script type="text/javascript" src="/javascript/tableruler.js"></script>
+<script type="text/javascript">
+	window.onload=function(){tableruler();} 
+</script>
 <script type="text/javascript">
 function verify()
 {
@@ -260,7 +264,7 @@ function verify()
       </form>
       <!-- END perms -->
  <h1>Recent Login Log</h1>
-      <table>
+      <table class="ruler">
         <tr>
           <th>Date</th>
           <th>IP</th>
@@ -275,7 +279,7 @@ function verify()
         <!-- END login_log -->
       </table>
       <h1>Recent Action Log</h1>
-      <table>
+      <table class="ruler">
         <tr>
           <th>Date</th>
           <th>Action</th>
