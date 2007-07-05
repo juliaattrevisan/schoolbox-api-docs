@@ -202,13 +202,12 @@ class OutPut
 	function outputDuties($name, $size)
         {
                 $this->t_body->set_block($name, "duties", "d_block");
-                $db = new dbManager();
                 $sql = "SELECT l.*, d.user, d.date, d.cid FROM luDuties l LEFT JOIN duty d ON l.dutyTypeID = d.dutyTypeID 
 			and d.date = now() where l.cid = ".$this->category ;
-                $db->dbDoQuery($sql);
+                $this->db->dbDoQuery($sql);
                 $block = false;
                 $this->t_body->set_var("DATE", 'Duties for '.date('l, jS of F'));
-                while($row = $db->dbGetNextArray())
+                while($row = $this->db->dbGetNextArray())
                 {
                         $this->t_body->set_var("DUTY", $row['name']);
                         $this->t_body->set_var("ASSIGNEDUSER", $row['user']);
@@ -1094,6 +1093,41 @@ class OutPut
 
 	}
 
+	function outputDropBox($name, $size) {
+	
+		//output drop box
+		$this->t_body->set_block($name, "drop_student", "drop_student_block");
+		$this->t_body->set_block($name, "drop_staff", "drop_staff_block");
+		$this->t_body->set_block("drop_staff", "drop_file", "drop_file_block");
+	
+		if($this->perm < 2) {
+			$this->t_body->parse("drop_student_block", "drop_student");
+			$this->t_body->set_var("drop_staff_block", "");
+		}
+		else {
+			$this->t_body->set_var("drop_student_block", "");
+			require_once("subject/dropbox.php");
+			$dropbox = new dropbox;
+			$fileList = $dropbox->getFileList($this->category);
+			if(is_array($fileList)) {
+				foreach($fileList as $file) {
+					$output = array('DROPBOX_DESCRIPTION' => $file['description'],
+									'DROPBOX_ID'		=> $file['id'],
+									'DROP_SUBMITTED_BY' => formatName($file),
+									'DROP_SUBMITTED_TIME'=>$file['subdate'],
+									);
+					$this->t_body->set_var($output);
+					$this->t_body->parse("drop_file_block", "drop_file", true);
+				}
+			} 
+			else 
+				$this->t_body->set_var("drop_file_block", "");
+			
+			$this->t_body->parse("drop_staff_block", "drop_staff");
+			
+		}
+		return true;
+	}
 }
 
 $myPage = new OutPut();

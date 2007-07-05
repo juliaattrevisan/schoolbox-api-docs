@@ -43,6 +43,7 @@ define("THUMBNAIL_IMAGE_CACHE", "/usr/local/www/portal/files/thumbnails");		//Th
 define("URLS_use_frame", false);						//Open links in frame
 define('ZIP_directory', '/usr/local/www/portal/zip');
 define('MIME_magic', '/usr/share/file/magic');
+define('DROPBOX_directory', '/usr/local/www/portal/drop');
 
 //GROUP options
 define("GROUP_staff_only_owner", true);			//Determines if students can be group owner or not
