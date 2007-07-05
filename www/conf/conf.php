@@ -124,14 +124,14 @@ define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
 define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 
 //homepage config
-define('HOMEPAGE_large_head_font', 5);
-define('HOMEPAGE_large_head_bg', 1);
-define('HOMEPAGE_large_text_font', 4);
-define('HOMEPAGE_large_text_bg', 5);
-define('HOMEPAGE_small_head_font', 5);
-define('HOMEPAGE_small_head_bg', 2);
-define('HOMEPAGE_small_text_font', 4);
-define('HOMEPAGE_small_text_bg', 6);
+define('HOMEPAGE_large_head_font', '#FFFFFF');
+define('HOMEPAGE_large_head_bg', '#003399');
+define('HOMEPAGE_large_text_font', '#000000');
+define('HOMEPAGE_large_text_bg', '#FFFFFF');
+define('HOMEPAGE_small_head_font', '#FFFFFF');
+define('HOMEPAGE_small_head_bg', '#0066CC');
+define('HOMEPAGE_small_text_font', '#000000');
+define('HOMEPAGE_small_text_bg', '#FFFFDF');
 
 
 //module config options

@@ -21,8 +21,9 @@ var MooRainbow = new Class({
 		onChange: Class.empty
 	},
 	
-	initialize: function(el, options) {
+	initialize: function(el, input, options) {
 		this.element = $(el); if (!this.element) return;
+		this.input = $(input);
 		this.setOptions(options);
 		
 		this.sliderPos = 0;
@@ -76,9 +77,9 @@ var MooRainbow = new Class({
 		if (!type || (type != 'hsb' && type != 'hex')) type = 'rgb';
 		var rgb, hsb, hex;
 
-		if (type == 'rgb') { rgb = color; hsb = color.rgbToHsb(); hex = color.rgbToHex(); } 
+		if (type == 'rgb') { rgb = color; hsb = rgb.rgbToHsb(); hex = rgb.rgbToHex(); } 
 		else if (type == 'hsb') { hsb = color; rgb = color.hsbToRgb(); hex = rgb.rgbToHex(); }
-		else { hex = color; rgb = color.hexToRgb(); hsb = rgb.rgbToHsb(); }
+		else { hex = color; rgb = hex.hexToRgb(true); hsb = rgb.rgbToHsb(); }
 		
 		this.setMooRainbow(rgb);
 		this.autoSet(hsb);

@@ -24,29 +24,34 @@
 <script type="text/javascript" src="/javascript/mooRainbow.js"></script>
 <script type="text/javascript">
 	var pickers = [
-		['largeHeadingBackground', [255, 255, 255]],
-		['largeHeadingText', [255, 255, 255]],
-		['largeTextBackground', [255, 255, 255]],
-		['largeTextText', [255, 255, 255]],
-		['smallHeadingBackground', [255, 255, 255]],
-		['smallHeadingText', [255, 255, 255]],
-		['smallTextBackground', [255, 255, 255]],
-		['smallTextText', [255, 255, 255]],	
+		['largeHeadingBackground', '{large_head_bgcolour}'],
+		['largeHeadingText', '{large_head_fontcolour}'],
+		['largeTextBackground', '{large_text_bgcolour}'],
+		['largeTextText', '{large_text_fontcolour}'],
+		['smallHeadingBackground', '{small_head_bgcolour}'],
+		['smallHeadingText', '{small_head_fontcolour}'],
+		['smallTextBackground', '{small_text_bgcolour}'],
+		['smallTextText', '{small_text_fontcolour}'],	
 	];
 	window.onload = function(){
 		for(i = 0; i < pickers.length; i++){
-			pickers[i][2] = new MooRainbow(pickers[i][0] + 'Div', {
+			pickers[i][2] = new MooRainbow(pickers[i][0] + 'Div', pickers[i][0] + 'Input', {
 				'id': pickers[i][0] + 'Picker',
-				'startColor': pickers[i][1],
-				'imgPath': '/images/mooRainbow/', 
+				'imgPath': '/images/mooRainbow/',
 				'onComplete': function(color, object){
 					object.element.setStyle('background-color', color.hex);
+					object.input.value = color.hex;
+				},
+				'onChange': function(color, object){
+					object.element.setStyle('background-color', color.hex);
+					object.input.value = color.hex;
 				}
 			});
+			pickers[i][2].manualSet(pickers[i][1], 'hex');
 			$(pickers[i][0] + 'Div').setStyle('background-color', pickers[i][2].sets.hex);
+			$(pickers[i][0] + 'Input').value = pickers[i][2].sets.hex;
 		};
-	}
-</script>
+	}</script>
 <link rel="stylesheet" type="text/css" href="/css/mooRainbow.css" />
 <!-- #EndEditable -->
 </head>
@@ -140,11 +145,11 @@
 			<h2>Layout</h2>
 			<table class="standardForm">
 				<tr>
-					<td><input type="radio" name="template" value="1" {check1} /></td>
+					<td><input type="radio" name="template" value="1" {templateChecked1} /></td>
 					<td><strong>70%/30%</strong></td>
-					<td><input type="radio" name="template" value="2" {check2} /></td>
+					<td><input type="radio" name="template" value="2" {templateChecked2} /></td>
 					<td><strong>50%/50%</strong></td>
-					<td><input type="radio" name="template" value="3" {check3} /></td>
+					<td><input type="radio" name="template" value="3" {templateChecked3} /></td>
 					<td><strong>100%</strong></td>
 				</tr>
 				<tr>
@@ -159,32 +164,20 @@
 			<h2>Components</h2>
 			<table>
 				<tr>
-					<td class="indent">
-						<h2>Large Components</h2>
+				<!-- BEGIN componentGroup -->
+					<td class="indent" style="vertical-align:top;">
+						<h2>{componentGroupName}</h2>
 						<table class="standardForm">
+						<!-- BEGIN componentRow -->
 							<tr>
-								<td><input type="checkbox" name="components[]" value="" /> Members</td>
-								<td><input type="checkbox" name="components[]" value="" /> News</td>
+							<!-- BEGIN componentCol -->
+								<td><input type="checkbox" name="components[]" value="{componentID}" {componentChecked} /> {componentName}</td>
+							<!-- END componentCol -->
 							</tr>
-							<tr>
-								<td><input type="checkbox" name="components[]" value="" /> Files</td>
-								<td></td>
-							</tr>
+						<!-- END componentRow -->
 						</table>
 					</td>
-					<td class="indent">
-						<h2>Small Components</h2>
-						<table class="standardForm">
-							<tr>
-								<td><input type="checkbox" name="components[]" value="" /> News</td>
-								<td><input type="checkbox" name="components[]" value="" /> Homework</td>
-							</tr>
-							<tr>
-								<td><input type="checkbox" name="components[]" value="" /> Notes</td>
-								<td></td>
-							</tr>
-						</table>
-					</td>
+				<!-- END componentGroup -->
 				</tr>
 			</table>
 			<h2>Colours</h2>
