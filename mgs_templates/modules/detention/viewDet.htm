@@ -41,7 +41,9 @@
 <script type="text/javascript" src="/javascript/udm-resources/udm-custom_mgs.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
-<!-- #BeginEditable "scripts" --><!-- #EndEditable -->
+<!-- #BeginEditable "scripts" -->
+
+<!-- #EndEditable -->
 </head>
 <body>
 <!-- THESE ARE MEANT TO GO HERE -->
@@ -61,11 +63,6 @@
 				<form class="standardForm" id="searchForm" action="/search.php" method="get">
 					<p style="margin:0;">
 						<input class="short" type="text" name="keyword" />
-						<select class="short" name="where">
-							<option value="0" selected="selected">portal</option>
-							<option value="1">google</option>
-							<option value="2">yahoo</option>
-						</select>
 						<input class="img" type="image" src="/images/mgs/navsearch.gif" alt="Search" name="Submit" />
 					</p>
 					<div class="float-fix"></div>
@@ -110,22 +107,21 @@
 		</div>
 	</div>
 	<!-- end left -->
-	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Main_Active.lbi" -->
-    <div id="topNav">
-      <ul>
-        <li class="navthis left"><a class="navthis left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
-        <li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
-        <!-- BEGIN webmail_tab -->
-        <li class="norm"><a class="norm" href="/mail.php" title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
-        <!-- END webmail_tab -->
-        <li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
-        <!-- BEGIN timetable_tab -->
-        <li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
-        <!-- END timetable_tab -->
-        <li class="right"><a class="right" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
-      </ul>
-    </div>
-	<!-- #EndLibraryItem --><!-- #EndEditable -->
+	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Main_Active.lbi" -->			<div id="topNav">
+				<ul>
+					<li class="navthis left"><a class="navthis left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+					<!-- BEGIN webmail_tab --> 
+					<li class="norm"><a class="norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
+					<!-- END webmail_tab -->
+					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+					<!-- BEGIN timetable_tab -->
+					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+					<!-- END timetable_tab -->
+					<li class="norm"><a class="norm" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+                    <li class="right"><a class="right" href="/cms/browseMyFiles.php" title="Upload files to your own private area" accesskey="f">My <em>F</em>iles</a></li>
+				</ul>
+			</div><!-- #EndLibraryItem --><!-- #EndEditable -->
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" -->
 <h1>Detention System</h1>
