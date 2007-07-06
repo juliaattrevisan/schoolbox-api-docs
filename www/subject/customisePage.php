@@ -41,29 +41,6 @@ class customise
 		$this->t_body->set_block("tplBODY", 'componentGroup', 'componentGroupBlock');
 		$this->t_body->set_block('componentGroup', 'componentRow', 'componentRowBlock');
 		$this->t_body->set_block('componentRow', 'componentCol', 'componentColBlock');
-		$this->t_body->set_var('componentGroupName', 'Small Components');
-		
-		$listSmallComp = $this->getComponentList(2);
-		foreach($listSmallComp as $key => $smallComp){
-			$this->t_body->set_var('componentID', $smallComp['id']);
-			$this->t_body->set_var('componentName', $smallComp['name']);
-			if(!empty($smallComp['component']))
-				$this->t_body->set_var('componentChecked', 'checked');
-			else
-				$this->t_body->set_var('componentChecked', '');
-			
-			$this->t_body->parse('componentColBlock', 'componentCol', true);
-			
-			if((++$key % 2) == 0 or $smallComp == end($listSmallComp)) {
-				$this->t_body->parse('componentRowBlock', 'componentRow', true);
-				$this->t_body->set_var('componentColBlock','');
-			}
-		}
-		
-		$this->t_body->parse('componentGroupBlock', 'componentGroup',true);
-		
-		$this->t_body->set_var('componentColBlock','');
-		$this->t_body->set_var('componentRowBlock','');
 		$this->t_body->set_var('componentGroupName', 'Large Components');
 		
 		$listLargeComp = $this->getComponentList(1);
@@ -79,6 +56,29 @@ class customise
 			$this->t_body->parse('componentColBlock', 'componentCol', true);
 			
 			if((++$key % 2) == 0 or $largeComp == end($listLargeComp)) {
+				$this->t_body->parse('componentRowBlock', 'componentRow', true);
+				$this->t_body->set_var('componentColBlock','');
+			}
+		}
+		
+		$this->t_body->parse('componentGroupBlock', 'componentGroup',true);
+		
+		$this->t_body->set_var('componentColBlock','');
+		$this->t_body->set_var('componentRowBlock','');
+		$this->t_body->set_var('componentGroupName', 'Small Components');
+		
+		$listSmallComp = $this->getComponentList(2);
+		foreach($listSmallComp as $key => $smallComp){
+			$this->t_body->set_var('componentID', $smallComp['id']);
+			$this->t_body->set_var('componentName', $smallComp['name']);
+			if(!empty($smallComp['component']))
+				$this->t_body->set_var('componentChecked', 'checked');
+			else
+				$this->t_body->set_var('componentChecked', '');
+			
+			$this->t_body->parse('componentColBlock', 'componentCol', true);
+			
+			if($key % 2 or $smallComp == end($listSmallComp)) {
 				$this->t_body->parse('componentRowBlock', 'componentRow', true);
 				$this->t_body->set_var('componentColBlock','');
 			}

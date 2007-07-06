@@ -66,31 +66,31 @@
 }
 /* Following are just <label> */
 .moor-rLabel {
-	/*display: none;*/
+	display: none;
 	visibility: hidden;
 	margin-top: 100px;
 	margin-left: 315px;
 }
 .moor-gLabel {
-	/*display: none;*/
+	display: none;
 	visibility: hidden;
 	margin-top: 125px;
 	margin-left: 315px;
 }
 .moor-bLabel {
-	/*display: none;*/
+	display: none;
 	visibility: hidden;
 	margin-top: 150px;
 	margin-left: 315px;
 }
 .moor-HueLabel {
-	/*display: none;*/
+	display: none;
 	visibility: hidden;
 	margin-top: 190px;
 	margin-left: 315px;
 }
 span.moor-ballino { /* Style hue ° (degree) !! */
-	/*display: none;*/
+	display: none;
 	visibility: hidden;
 	margin-top: 190px;
 	margin-left: 370px;

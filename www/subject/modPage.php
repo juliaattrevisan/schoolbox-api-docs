@@ -120,12 +120,11 @@ class modPage
 			$query = "UPDATE homepage_config SET ";
 			foreach($listColor as $key => $color)
 			{		
-				$query .= "$key = '".substr($color, 1)."'";
-				$query .= $key != end($listColor) ? ', ' : '';
+				$query .= "$key = '".substr($color, 1)."', ";
 			}
+			$query = substr($query, 0, -2);
 			$query .= " WHERE cid = '".$this->cid."'";
-			print($query);
-			//$this->db->dbDoQuery($query);
+			$this->db->dbDoQuery($query);
 		}
 
 		
