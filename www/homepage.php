@@ -13,6 +13,8 @@ require_once('include/include.php');
 require_once('include/permission.php');
 require_once('include/involved.php');
 
+define('MAX_COLUMN_COUNT',2);
+
 class OutPut
 {
 	var $enroled = 0;
@@ -57,13 +59,21 @@ class OutPut
 		{
 			if($component['method'] != "")
 			{
-				$this->t_body->set_file($component['name'].$componentCount, "homepages/components/".$component['filename']);
+				$this->t_body->set_file($component['name'].$componentCount, 'homepages/components/'.$component['filename']);
 				$this->t_body->set_var('COMPONENT_ID', $component['component']);
 				
 				$func = $component['method'];
-				if($this->$func($component['name'].$componentCount, $component['size']))
-					$this->t_body->parse("COLUMN".$component['column'], $component['name'].$componentCount, true);
+				if($this->$func($component['name'].$componentCount, $component['size'])) {
+					$this->t_body->parse('COLUMN'.$component['column'], $component['name'].$componentCount, true);
+					$columnFlag[$component['column']] = true;
+				}
 			}
+		}
+		
+		//set any columns with nothing in them to null
+		for($i=1; $i <= MAX_COLUMN_COUNT; $i++){
+			if(!$columnFlag[$i])
+				$this->t_body->set_var('COLUMN'.$i,'');
 		}
 
 		//output page
