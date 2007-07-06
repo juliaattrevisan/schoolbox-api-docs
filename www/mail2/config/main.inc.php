@@ -60,10 +60,10 @@ $rcmail_config['virtuser_query'] = '';
 // use this host for sending mails.
 // to use SSL connection, set ssl://smtp.host.com
 // if left blank, the PHP mail() function is used
-$rcmail_config['smtp_server'] = MAIL_smtp_server;
+//$rcmail_config['smtp_server'] = MAIL_smtp_server;
 
 // SMTP port (default is 25; 465 for SSL)
-$rcmail_config['smtp_port'] = MAIL_smtp_port;
+//$rcmail_config['smtp_port'] = MAIL_smtp_port;
 
 // SMTP username (if required) if you use %u as the username RoundCube
 // will use the current username for login

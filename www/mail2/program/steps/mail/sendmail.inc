@@ -33,7 +33,6 @@ if (!isset($_SESSION['compose']['id']))
   return;
   }
 
-
 /****** message sending functions ********/
 
 
@@ -44,11 +43,10 @@ function rcmail_get_identity($id)
   // get identity record
   $sql_result = $DB->query("SELECT *, email AS mailto
                             FROM ".get_table_name('identities')."
-                            WHERE  identity_id=?
-                            AND    id=?
+                            WHERE    id=?
                             AND    del<>1",
-                            $id,$_SESSION['id']);
-                                   
+                            $id);
+
   if ($DB->num_rows($sql_result))
     {
     $sql_arr = $DB->fetch_assoc($sql_result);
@@ -158,7 +156,7 @@ $mailto = preg_replace($mailto_regexp, $mailto_replace, get_input_value('_to', R
 
 // decode address strings
 $to_address_arr = $IMAP->decode_address_list($mailto);
-$identity_arr = rcmail_get_identity(get_input_value('_from', RCUBE_INPUT_POST));
+$identity_arr = rcmail_get_identity($_SESSION['id']);
 
 $from = $identity_arr['mailto'];
 $first_to = is_array($to_address_arr[0]) ? $to_address_arr[0]['mailto'] : $mailto;
