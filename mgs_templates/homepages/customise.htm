@@ -24,14 +24,14 @@
 <script type="text/javascript" src="/javascript/mooRainbow.js"></script>
 <script type="text/javascript">
 	var pickers = [
-		['largeHeadingBackground', '{large_head_bgcolour}'],
-		['largeHeadingText', '{large_head_fontcolour}'],
-		['largeTextBackground', '{large_text_bgcolour}'],
-		['largeTextText', '{large_text_fontcolour}'],
-		['smallHeadingBackground', '{small_head_bgcolour}'],
-		['smallHeadingText', '{small_head_fontcolour}'],
+		['largeHeadingBackground', '#{large_head_bgcolour}'],
+		['largeHeadingText', '#{large_head_fontcolour}'],
+		['largeTextBackground', '#{large_text_bgcolour}'],
+		['largeTextText', '#{large_text_fontcolour}'],
+		['smallHeadingBackground', '#{small_head_bgcolour}'],
+		['smallHeadingText', '#{small_head_fontcolour}'],
 		['smallTextBackground', '{small_text_bgcolour}'],
-		['smallTextText', '{small_text_fontcolour}'],	
+		['smallTextText', '#{small_text_fontcolour}'],	
 	];
 	window.onload = function(){
 		for(i = 0; i < pickers.length; i++){
@@ -187,18 +187,18 @@
 						<h2>Headings for Large Components</h2>
 						<ul class="standardForm">
 							<li>Background Color<div id="largeHeadingBackgroundDiv" class="colorBox"></div></li>
-							<input id="largeHeadingBackgroundInput" name="largeHeadingBackgroundColor" type="hidden" />
+							<input id="largeHeadingBackgroundInput" name="colors[large_head_bgcolour]" type="hidden" />
 							<li>Text Color<div id="largeHeadingTextDiv" class="colorBox"></div></li>
-							<input id="largeHeadingTextInput" name="largeHeadingTextColor" type="hidden" />
+							<input id="largeHeadingTextInput" name="colors[large_head_fontcolour]" type="hidden" />
 						</ul>
 					</td>
 					<td class="indent">
 						<h2>Text for Large Components</h2>
 						<ul class="standardForm">
 							<li>Background Color<div id="largeTextBackgroundDiv" class="colorBox"></div></li>
-							<input id="largeTextBackgroundInput" name="largeTextBackgroundColor" type="hidden" />
+							<input id="largeTextBackgroundInput" name="colors[large_text_bgcolour]" type="hidden" />
 							<li>Text Color<div id="largeTextTextDiv" class="colorBox"></div></li>
-							<input id="largeTextTextInput" name="largeTextTextColor" type="hidden" />
+							<input id="largeTextTextInput" name="colors[large_text_fontcolour]" type="hidden" />
 						</ul>
 					</td>
 				</tr>
@@ -207,18 +207,18 @@
 						<h2>Headings for Small Components</h2>
 						<ul class="standardForm">
 							<li>Background Color<div id="smallHeadingBackgroundDiv" class="colorBox"></div></li>
-							<input id="smallHeadingBackgroundInput" name="smallHeadingBackgroundColor" type="hidden" />
+							<input id="smallHeadingBackgroundInput" name="colors[small_head_bgcolour]" type="hidden" />
 							<li>Text Color<div id="smallHeadingTextDiv" class="colorBox"></div></li>
-							<input id="smallHeadingTextInput" name="smallHeadingTextColor" type="hidden" />
+							<input id="smallHeadingTextInput" name="colors[small_head_fontcolour]" type="hidden" />
 						</ul>
 					</td>
 					<td class="indent">
 						<h2>Text for Small Components</h2>
 						<ul class="standardForm">
 							<li>Background Color<div id="smallTextBackgroundDiv" class="colorBox"></div></li>
-							<input id="smallTextBackgroundInput" name="smallTextBackgroundColor" type="hidden" />
+							<input id="smallTextBackgroundInput" name="colors[small_text_bgcolour]" type="hidden" />
 							<li>Text Color<div id="smallTextTextDiv" class="colorBox"></div></li>
-							<input id="smallTextTextInput" name="smallTextTextColor" type="hidden" />
+							<input id="smallTextTextInput" name="colors[small_text_fontcolour]" type="hidden" />
 						</ul>
 					</td>
 				</tr>

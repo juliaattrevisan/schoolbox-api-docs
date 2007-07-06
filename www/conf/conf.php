@@ -124,15 +124,7 @@ define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
 define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 
 //homepage config
-define('HOMEPAGE_large_head_font', '#FFFFFF');
-define('HOMEPAGE_large_head_bg', '#003399');
-define('HOMEPAGE_large_text_font', '#000000');
-define('HOMEPAGE_large_text_bg', '#FFFFFF');
-define('HOMEPAGE_small_head_font', '#FFFFFF');
-define('HOMEPAGE_small_head_bg', '#0066CC');
-define('HOMEPAGE_small_text_font', '#000000');
-define('HOMEPAGE_small_text_bg', '#FFFFDF');
-
+define('HOMEPAGE_colors', serialize(array('large_head_font' => 'FFFFFF', 'large_head_bg' => '003399', 'large_text_font' => '000000', 'large_text_bg' => 'FFFFFF', 'small_head_font' => 'FFFFFF', 'small_head_bg' => '0066CC', 'small_text_font' => '000000', 'small_text_bg', 'FFFFDF')));
 
 //module config options
 define('HELPDESK_location', '/usr/local/www/helpdesk');

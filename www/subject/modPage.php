@@ -115,19 +115,17 @@ class modPage
 			$this->db->dbInsertRow('homepage_comp_location', $query);
 		}
 
-		function saveDisplayProperties($large_head_font, $large_head_bg, $large_text_font, $large_text_bg, $small_head_font, $small_head_bg, $small_text_font, $small_text_bg)
+		function saveDisplayProperties($listColor)
 		{
-			$query = "UPDATE homepage_config SET
-					large_head_fontcolour = '$large_head_font' , 
-					large_head_bgcolour = '$large_head_bg', 
-					large_text_fontcolour = '$large_text_font', 
-					large_text_bgcolour = '$large_text_bg',
-					small_head_fontcolour = '$small_head_font' , 
-					small_head_bgcolour = '$small_head_bg', 
-					small_text_fontcolour = '$small_text_font', 
-					small_text_bgcolour = '$small_text_bg' 
-					WHERE cid = '".$this->cid."'";
-			$this->db->dbDoQuery($query);
+			$query = "UPDATE homepage_config SET ";
+			foreach($listColor as $key => $color)
+			{		
+				$query .= "$key = '".substr($color, 1)."'";
+				$query .= $key != end($listColor) ? ', ' : '';
+			}
+			$query .= " WHERE cid = '".$this->cid."'";
+			print($query);
+			//$this->db->dbDoQuery($query);
 		}
 
 		
@@ -147,15 +145,7 @@ class modPage
 			$this->saveComponentPosition(10, 2, 4, 0);
 
 			// Default colors
-			$this->saveDisplayProperties(
-			HOMEPAGE_large_head_font,
-			HOMEPAGE_large_head_bg,
-			HOMEPAGE_large_text_font,
-			HOMEPAGE_large_text_bg,
-			HOMEPAGE_small_head_font,
-			HOMEPAGE_small_head_bg,
-			HOMEPAGE_small_text_font,
-			HOMEPAGE_small_text_bg);
+			$this->saveDisplayProperties(unserialize(HOMEPAGE_colors));
 		}
 
 		function createSubjectForumPage()
@@ -174,15 +164,7 @@ class modPage
 			$this->saveComponentPosition(10, 2, 5, 0);
 
 			// Default colors
-			$this->saveDisplayProperties(
-			HOMEPAGE_large_head_font,
-			HOMEPAGE_large_head_bg,
-			HOMEPAGE_large_text_font,
-			HOMEPAGE_large_text_bg,
-			HOMEPAGE_small_head_font,
-			HOMEPAGE_small_head_bg,
-			HOMEPAGE_small_text_font,
-			HOMEPAGE_small_text_bg);
+			$this->saveDisplayProperties(unserialize(HOMEPAGE_colors));
 		}
 
 		function createGroupPage()
@@ -198,15 +180,7 @@ class modPage
 			$this->saveComponentPosition(10, 2, 2, 7);
 
 			// Default colors
-			$this->saveDisplayProperties(
-			HOMEPAGE_large_head_font,
-			HOMEPAGE_large_head_bg,
-			HOMEPAGE_large_text_font,
-			HOMEPAGE_large_text_bg,
-			HOMEPAGE_small_head_font,
-			HOMEPAGE_small_head_bg,
-			HOMEPAGE_small_text_font,
-			HOMEPAGE_small_text_bg);
+			$this->saveDisplayProperties(unserialize(HOMEPAGE_colors));
 		}
 
 		function createGroupForumPage()
@@ -223,15 +197,7 @@ class modPage
 			$this->saveComponentPosition(10, 2, 3, 7);
 			
 			// Default colors
-			$this->saveDisplayProperties(
-			HOMEPAGE_large_head_font,
-			HOMEPAGE_large_head_bg,
-			HOMEPAGE_large_text_font,
-			HOMEPAGE_large_text_bg,
-			HOMEPAGE_small_head_font,
-			HOMEPAGE_small_head_bg,
-			HOMEPAGE_small_text_font,
-			HOMEPAGE_small_text_bg);
+			$this->saveDisplayProperties(unserialize(HOMEPAGE_colors));
 		}
 
 		function createFacultyPage()
@@ -248,15 +214,7 @@ class modPage
 			$this->saveComponentPosition(10, 2, 4, 7);
 
 			// Default colors
-			$this->saveDisplayProperties(
-			HOMEPAGE_large_head_font,
-			HOMEPAGE_large_head_bg,
-			HOMEPAGE_large_text_font,
-			HOMEPAGE_large_text_bg,
-			HOMEPAGE_small_head_font,
-			HOMEPAGE_small_head_bg,
-			HOMEPAGE_small_text_font,
-			HOMEPAGE_small_text_bg);
+			$this->saveDisplayProperties(unserialize(HOMEPAGE_colors));
 		}
 }
 

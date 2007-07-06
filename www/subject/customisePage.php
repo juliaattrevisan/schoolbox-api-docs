@@ -10,7 +10,7 @@
 require_once("../include/session.php");
 require_once("../include/include.php");
 require_once("../include/permission.php");
-
+print_r($_POST['test']);
 class customise
 {
 	function customise($cid)
@@ -155,7 +155,7 @@ elseif($_POST['cid'])
 	$mod->updateComponents($_POST['components']);
 
 	// Update Colors
-	$mod->saveDisplayProperties($_POST['largeHeadingTextColor'], $_POST['largeHeadingBackgroundColor'], $_POST['largeTextTextColor'], $_POST['largeTextBackgroundColor'], $_POST['smallHeadingTextColor'], $_POST['smallHeadingBackgroundColor'], $_POST['smallTextTextColor'], $_POST['smallTextBackgroundColor']);
+	$mod->saveDisplayProperties($_POST['colors']);
 
 	// Send user back to homepage
 	localRedir("/homepage.php?category=".$_POST['cid']);
