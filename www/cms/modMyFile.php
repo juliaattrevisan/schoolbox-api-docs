@@ -96,7 +96,7 @@ class ModMyFilePage {
 	{
         	$this->catList[-1] = "";
 		//TODO: make this one query iterative rather than being recursive. also needs to check perms
-		$query = "SELECT * FROM myFolder WHERE parent = ".$parent." ORDER BY name";
+		$query = "SELECT * FROM myFolder WHERE parent = $parent AND owner = {$_SESSION['id']} ORDER BY name";
 
  		$result = $this->db->dbDoQuery($query);
 
