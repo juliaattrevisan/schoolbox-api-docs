@@ -29,7 +29,7 @@ class outUser
 		
 		$emailAddress = formatEmail($user);
 		
-		if($email)
+		if($emailAddress)
 			$email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$emailAddress</a>";
 		else
 			$email = "No address available";

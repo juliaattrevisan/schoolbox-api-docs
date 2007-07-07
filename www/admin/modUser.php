@@ -52,9 +52,14 @@ class modUser
 		$this->t_body->set_block("tplBODY", "login", "login_section");
 		$this->t_body->set_block("tplBODY", "groups", "group_section");
 		$this->t_body->set_block("tplBODY", "perms", "perm_section");
+		$this->t_body->set_block("tplBODY", "action_log", "action_section");
+		$this->t_body->set_block("tplBODY", "login_log", "login_block");
 		$this->t_body->set_var("login_section","");
 		$this->t_body->set_var("group_section","");
 		$this->t_body->set_var("perm_section","");
+		$this->t_body->set_var("action_log","");
+		$this->t_body->set_var("login_log","");
+		
 		
 		$this->t_body->pparse("finaloutput", "tplBODY");
 		

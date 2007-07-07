@@ -8,14 +8,16 @@
 
 require_once("../include/session.php");
 require_once("../include/include.php");
+require_once("../include/permission.php");
 require_once("mail.php");
 
 class OutPut
 {
-	function OutPut()
+	function OutPut($type)
 	{
 		$this->t_body = new Template(TPL_directory);
-		if(MAIL_interface == "simple")
+		$this->type = $type;
+		if($this->type == "simple")
 		{
 			$this->t_body->set_file("tplBODY", "mail/send.htm");
 		}
@@ -110,7 +112,7 @@ class OutPut
 
 	function showPage($replyto = "", $bcc = "", $subject = "", $body = "")
 	{
-		if(MAIL_interface == "simple")
+		if($this->type == "simple")
 		{
 			$this->t_body->set_var("SUBJECT", $subject);
 			$this->t_body->set_var("BODY", $body);
@@ -130,10 +132,12 @@ class OutPut
 
 }
 
-$myPage = new OutPut();
 
-if(MAIL_interface == "simple")
-{	
+	
+if(MAIL_interface == "simple" || (SITE_location == 'mgs' && !isStudent($_SESSION['gid'])) )
+{	 
+	$myPage = new OutPut('simple');
+	
 	//if replyto has been specified
 	if(isset($_GET['reply']) && $_GET['reply'])
 		$myPage->replyMail($_GET['reply'], $_GET['qoute']);
@@ -148,9 +152,10 @@ if(MAIL_interface == "simple")
 }
 else
 {
+	$myPage = new OutPut(MAIL_interface);
+	
 	if($_REQUEST['replyto'] || $_REQUEST['bcc'])
 		$myPage->showPage($_REQUEST['replyto'], $_REQUEST['bcc']);
 	else
-		if( $_REQUEST['replyto'] || $_REQUEST['bcc'])
 		$myPage->showPage(); 
 }
