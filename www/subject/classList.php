@@ -31,7 +31,7 @@ class ClassList
 			$db = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
 			$mySQLdb = new dbManager();
 	
-			$query = "SELECT name FROM category WHERE code = '$subCode'";
+			$query = "SELECT name, owner FROM category WHERE code = '$subCode'";
 			$category = $mySQLdb->dbGetSingleRow($query);
 	
 			$this->t_body->set_var("SUBJECTNAME", $category['name'] ." ($subCode)");	
@@ -88,7 +88,7 @@ class ClassList
 			}
 			else
 				$this->t_body->set_var('student_list_block', '');
-			
+			$this->t_body->set_var("REPLYTO", formatEmail($_SESSION));
 			$this->t_body->set_var("CLASSEMAIL", $classEmail);
 					$this->t_body->pparse("finaloutput", "tplBODY");
 			}

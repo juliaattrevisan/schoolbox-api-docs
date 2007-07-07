@@ -120,6 +120,9 @@ class OutPut
 		}
 		else
 		{
+			// Special passing requirment for roundcube
+			$replyto = urlencode(htmlspecialchars($replyto));
+			$bcc = urlencode(htmlspecialchars($bcc));
 			$this->t_body->set_var("ROUNDCUBE_PARAMS", "?_task=mail&_action=compose&_to=$replyto&_bcc=$bcc&_subject=$subject&_body=$body");
 			$this->t_body->pparse("finaloutput", "tplBODY");
 		}

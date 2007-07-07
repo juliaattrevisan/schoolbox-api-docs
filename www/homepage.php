@@ -257,6 +257,7 @@ class OutPut
 				
 				$this->t_body->parse("members_block", "members", true);	
 			}
+			$this->t_body->set_var("REPLYTO", formatEmail($_SESSION));
 			$this->t_body->set_var("EMAILALL", $emailall);
 		}
 		else
