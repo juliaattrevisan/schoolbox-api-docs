@@ -518,8 +518,8 @@ var MooRainbow = new Class({
 	rePosition: function() {
 		var coords = this.element.getCoordinates();
 		this.layout.setStyles({
-			'left': coords.left,
-			'top': coords.top + coords.height + 1
+			'left': coords.left + coords.width + 1,
+			'top': coords.top
 		});
 	},
 	
