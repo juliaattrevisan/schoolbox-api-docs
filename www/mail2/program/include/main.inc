@@ -580,7 +580,7 @@ function rcmail_create_user($user, $host)
   $name = $_SESSION['firstname'] . ' ' . $_SESSION['lastname'];
   $mail_domain = rcmail_mail_domain($host);
   $user_name = $_SESSION['username'];
-  $user_email = $_SESSION['username'] . '@' . MAIL_domain;
+  $user_email = $_SESSION['username'] . '@' . MAIL_address;
 
       // also create new identity records
       $DB->query("INSERT INTO ".get_table_name('identities')."

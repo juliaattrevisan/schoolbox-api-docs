@@ -427,53 +427,55 @@ href=\"/homepage.php?code=".urlencode($period['code'])."\">{$period['description
 	}
 	
 	function outputHelpdesk($location) {
+		if(HELPDESK_enable) {
+			$this->t_body->set_block($location, "helpdesk_block", "helpdesk_jobs");
 			
-		$this->t_body->set_block($location, "helpdesk_block", "helpdesk_jobs");
-		
-		$jobs = $this->openHelpdeskJobs($_SESSION['id']);
-		
-		if(is_array($jobs)){
-			foreach ($jobs as $job) {
-				$this->t_body->set_var("PROBLEM", ucfirst($job['problem']));
-				$this->t_body->set_var("CREATED", $job['createdDate']);
-				$this->t_body->set_var("STATUS", $job['status']);
-				$this->t_body->parse("helpdesk_jobs", "helpdesk_block", true);
+			$jobs = $this->openHelpdeskJobs($_SESSION['id']);
+			
+			if(is_array($jobs)){
+				foreach ($jobs as $job) {
+					$this->t_body->set_var("PROBLEM", ucfirst($job['problem']));
+					$this->t_body->set_var("CREATED", $job['createdDate']);
+					$this->t_body->set_var("STATUS", $job['status']);
+					$this->t_body->parse("helpdesk_jobs", "helpdesk_block", true);
+				}
+			
+				return true;
 			}
-		
-			return true;
 		}
-		else
-			return false;
+		
+		return false;
 	}
 	
 	function outputParentHelpdesk($location) {
-		
-		$this->t_body->set_block($location, "student_helpdesk_block", "student_helpdesk");
-		$this->t_body->set_block("student_helpdesk_block", "student_job_block", "student_job");
-		if(is_array($_SESSION['children'])) {
-			foreach($_SESSION['children'] as $child)
-			{
-				$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
-				$user = $this->db->dbGetSingleRow($query);
-				$this->t_body->set_var("STUDENT_ID", $child['id']);
-				$this->t_body->set_var("STUDENT_NAME", formatName($user,'{firstname} {lastname}'));
-				$this->t_body->set_var("STUDENT_YEAR", $user['year']);
+		if(HELPDESK_enable) {
+			$this->t_body->set_block($location, "student_helpdesk_block", "student_helpdesk");
+			$this->t_body->set_block("student_helpdesk_block", "student_job_block", "student_job");
+			if(is_array($_SESSION['children'])) {
+				foreach($_SESSION['children'] as $child)
+				{
+					$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
+					$user = $this->db->dbGetSingleRow($query);
+					$this->t_body->set_var("STUDENT_ID", $child['id']);
+					$this->t_body->set_var("STUDENT_NAME", formatName($user,'{firstname} {lastname}'));
+					$this->t_body->set_var("STUDENT_YEAR", $user['year']);
+					
+					$jobs = $this->openHelpdeskJobs($child['id']);
 				
-				$jobs = $this->openHelpdeskJobs($child['id']);
-			
-				if(is_array($jobs)){
-					foreach ($jobs as $job) {
-						$this->t_body->set_var("PROBLEM", ucfirst($job['problem']));
-						$this->t_body->set_var("CREATED", $job['createdDate']);
-						$this->t_body->set_var("STATUS", $job['status']);
-						$this->t_body->parse("student_job", "student_job_block", true);
+					if(is_array($jobs)){
+						foreach ($jobs as $job) {
+							$this->t_body->set_var("PROBLEM", ucfirst($job['problem']));
+							$this->t_body->set_var("CREATED", $job['createdDate']);
+							$this->t_body->set_var("STATUS", $job['status']);
+							$this->t_body->parse("student_job", "student_job_block", true);
+						}
 					}
+				
+					$this->t_body->parse("student_helpdesk", "student_helpdesk_block", true);
+					$this->t_body->set_var("student_job", '');
 				}
-			
-				$this->t_body->parse("student_helpdesk", "student_helpdesk_block", true);
-				$this->t_body->set_var("student_job", '');
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}

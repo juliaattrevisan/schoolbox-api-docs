@@ -93,8 +93,7 @@ define("MAIL_host", "alderaan.mgs.vic.edu.au");
 define("MAIL_port", 143);
 define("MAIL_smtp_server", "localhost");
 define("MAIL_smtp_port", 25);
-define("MAIL_domain", "mgs.vic.edu.au");
-define("MAIL_address", MAIL_domain);
+define("MAIL_address", "mgs.vic.edu.au");
 define("MAIL_increment", 20);					//Amount of emails per page
 define("MAIL_db", "roundcubemail");
 
@@ -124,9 +123,19 @@ define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
 define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 
 //homepage config
-define('HOMEPAGE_colors', serialize(array('large_head_fontcolour' => 'FFFFFF', 'large_head_bgcolour' => '003399', 'large_text_fontcolour' => '000000', 'large_text_bgcolour' => 'FFFFFF', 'small_head_fontcolour' => 'FFFFFF', 'small_head_bgcolour' => '0066CC', 'small_text_fontcolour' => '000000', 'small_text_bgcolour' => 'FFFFDF')));
+define('HOMEPAGE_colors', serialize(array(
+			'large_head_fontcolour' => 'FFFFFF', 
+			'large_head_bgcolour' => '003399', 
+			'large_text_fontcolour' => '000000', 
+			'large_text_bgcolour' => 'FFFFFF', 
+			'small_head_fontcolour' => 'FFFFFF', 
+			'small_head_bgcolour' => '0066CC', 
+			'small_text_fontcolour' => '000000', 
+			'small_text_bgcolour' => 'FFFFDF'
+		)));
 
 //module config options
+define('HELPDESK_enable', true);
 define('HELPDESK_location', '/usr/local/www/helpdesk');
 define('HELPDESK_db', 'helpdesk');
 ?>

@@ -47,7 +47,7 @@ $rcmail_config['username_domain'] = '';
 
 // This domain will be used to form e-mail addresses of new users
 // Specify an array with 'host' => 'domain' values to support multiple hosts
-$rcmail_config['mail_domain'] = MAIL_domain;
+$rcmail_config['mail_domain'] = MAIL_address;
 
 // Path to a virtuser table file to resolve user names and e-mail addresses
 $rcmail_config['virtuser_file'] = '';

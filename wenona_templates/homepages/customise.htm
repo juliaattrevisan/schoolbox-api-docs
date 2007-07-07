@@ -125,7 +125,7 @@
 	<!-- #EndLibraryItem --><!-- #EndEditable --> 
   <div id="content"> 
 	<div id="content_text"> <!-- #BeginEditable "main" --> 
-			<h1>Customise</h1>
+						<h1>Customise</h1>
 			<form method="post" name="customiseForm" id="customiseForm" class="indent">
 			<h2>Layout</h2>
 			<table class="standardForm">
@@ -170,47 +170,87 @@
 				<tr>
 					<td class="indent">
 						<h2>Headings for Large Components</h2>
-						<ul class="standardForm">
-							<li>Background Color<div id="largeHeadingBackgroundDiv" class="colorBox"></div></li>
-							<input id="largeHeadingBackgroundInput" name="colors[large_head_bgcolour]" type="hidden" />
-							<li>Text Color<div id="largeHeadingTextDiv" class="colorBox"></div></li>
-							<input id="largeHeadingTextInput" name="colors[large_head_fontcolour]" type="hidden" />
-						</ul>
+						<table class="standardForm">
+							<tr>
+								<td>Background Color</td>
+								<td>
+									<div id="largeHeadingBackgroundDiv" class="colorBox">
+									<input id="largeHeadingBackgroundInput" name="colors[large_head_bgcolour]" type="hidden" />
+								</td>
+							</tr>
+							<tr>
+								<td>Text Color</td>
+								<td>
+									<div id="largeHeadingTextDiv" class="colorBox"></div>
+									<input id="largeHeadingTextInput" name="colors[large_head_fontcolour]" type="hidden" />
+								</td>
+							</tr>
+						</table>
 					</td>
 					<td class="indent">
 						<h2>Headings for Small Components</h2>
-						<ul class="standardForm">
-							<li>Background Color<div id="smallHeadingBackgroundDiv" class="colorBox"></div></li>
-							<input id="smallHeadingBackgroundInput" name="colors[small_head_bgcolour]" type="hidden" />
-							<li>Text Color<div id="smallHeadingTextDiv" class="colorBox"></div></li>
-							<input id="smallHeadingTextInput" name="colors[small_head_fontcolour]" type="hidden" />
-						</ul>
+						<table class="standardForm">
+							<tr>
+								<td>Background Color</td>
+								<td>
+									<div id="smallHeadingBackgroundDiv" class="colorBox">
+									<input id="smallHeadingBackgroundInput" name="colors[small_head_bgcolour]" type="hidden" />
+								</td>
+							</tr>
+							<tr>
+								<td>Text Color</td>
+								<td>
+									<div id="smallHeadingTextDiv" class="colorBox"></div>
+									<input id="smallHeadingTextInput" name="colors[small_head_fontcolour]" type="hidden" />
+								</td>
+							</tr>
+						</table>
 					</td>
 				</tr>
 				<tr>
 					<td class="indent">
 						<h2>Text for Large Components</h2>
-						<ul class="standardForm">
-							<li>Background Color<div id="largeTextBackgroundDiv" class="colorBox"></div></li>
-							<input id="largeTextBackgroundInput" name="colors[large_text_bgcolour]" type="hidden" />
-							<li>Text Color<div id="largeTextTextDiv" class="colorBox"></div></li>
-							<input id="largeTextTextInput" name="colors[large_text_fontcolour]" type="hidden" />
-						</ul>
+						<table class="standardForm">
+							<tr>
+								<td>Background Color</td>
+								<td>
+									<div id="largeTextBackgroundDiv" class="colorBox">
+									<input id="largeTextBackgroundInput" name="colors[large_text_bgcolour]" type="hidden" />
+								</td>
+							</tr>
+							<tr>
+								<td>Text Color</td>
+								<td>
+									<div id="largeTextTextDiv" class="colorBox"></div>
+									<input id="largeTextTextInput" name="colors[large_text_fontcolour]" type="hidden" />
+								</td>
+							</tr>
+						</table>
 					</td>
 					<td class="indent">
 						<h2>Text for Small Components</h2>
-						<ul class="standardForm">
-							<li>Background Color<div id="smallTextBackgroundDiv" class="colorBox"></div></li>
-							<input id="smallTextBackgroundInput" name="colors[small_text_bgcolour]" type="hidden" />
-							<li>Text Color<div id="smallTextTextDiv" class="colorBox"></div></li>
-							<input id="smallTextTextInput" name="colors[small_text_fontcolour]" type="hidden" />
-						</ul>
+						<table class="standardForm">
+							<tr>
+								<td>Background Color</td>
+								<td>
+									<div id="smallTextBackgroundDiv" class="colorBox">
+									<input id="smallTextBackgroundInput" name="colors[small_text_bgcolour]" type="hidden" />
+								</td>
+							</tr>
+							<tr>
+								<td>Text Color</td>
+								<td>
+									<div id="smallTextTextDiv" class="colorBox"></div>
+									<input id="smallTextTextInput" name="colors[small_text_fontcolour]" type="hidden" />
+								</td>
+							</tr>
+						</table>
 					</td>
 				</tr>
 			</table>
 			<input type="hidden" name="cid" value="{CID}" />
 			<div align="right">
-				<input type="submit" name="Submit" value="Next" />
+				<input type="submit" name="Submit" value="Update Page" />
 			</div>
 			</form>
     <!-- #EndEditable --> </div> 

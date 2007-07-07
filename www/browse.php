@@ -365,7 +365,7 @@ class OutPut
 	
 		//output link to homepage
 		if($catDetails['template'])
-			$this->t_body->set_var("HOMEPAGE", "<a id=\"home\" href=\"/homepage.php?category=".$catDetails['id']."\" title=\"homepage\"></a>");
+			$this->t_body->set_var("HOMEPAGE", "<a id=\"home\" href=\"/homepage.php?category=".$catDetails['id']."\" title=\"homepage\">homepage</a>");
 		else
 			$this->t_body->set_var("HOMEPAGE", "");
 			

@@ -155,7 +155,12 @@ elseif($_POST['cid'])
 	$mod->updateComponents($_POST['components']);
 
 	// Update Colors
-	$mod->saveDisplayProperties($_POST['colors']);
+	//strip hash
+	foreach($_POST['colors'] as $key => $value) {
+		$color[$key] = substr($value,1);
+	}
+	
+	$mod->saveDisplayProperties($color);
 
 	// Send user back to homepage
 	localRedir("/homepage.php?category=".$_POST['cid']);
