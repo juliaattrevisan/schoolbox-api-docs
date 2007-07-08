@@ -37,7 +37,7 @@ $rcmail_config['db_persistent'] = TRUE;
 
 
 // you can define specific table names used to store webmail data
-$rcmail_config['db_table_users'] = 'portal.user';
+$rcmail_config['db_table_users'] = SQL_db.'.user';
 
 $rcmail_config['db_table_identities'] = 'identities';
 
