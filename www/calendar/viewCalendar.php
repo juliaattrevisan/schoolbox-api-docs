@@ -230,7 +230,7 @@ class displayCalendar
 			if(SITE_location == "mgs" && SYNERGY_enable)
 			{
 				$birthdayList = $this->cal->getStudentBirthdays($this->currDay, $this->currMonth, $this->currYear);
-				if(in_array(3 ,$_SESSION['campus']))
+				if(in_array(3 ,$_SESSION['campus']) && is_array($birthdayList))
 				{
 					foreach($birthdayList as $bDay)
 					{

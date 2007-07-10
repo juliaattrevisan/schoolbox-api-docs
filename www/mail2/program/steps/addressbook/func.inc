@@ -47,7 +47,7 @@ function rcmail_contacts_list($attrib)
   
 	// Get a list of contacts from the portal.user table
 	$sql_result2 = $DB->query("SELECT COUNT(id) AS rows
-						  FROM portal.user");
+						  FROM ".SQL_db.".user");
 						  
 	$sql_arr2 = $DB->fetch_assoc($sql_result2);;
   
@@ -73,7 +73,7 @@ function rcmail_contacts_list($attrib)
                                    $start_row,
                                    $CONFIG['pagesize'],
                                    $_SESSION['id']);
-    $sql_result2 = $DB->limitquery("SELECT * FROM portal.user
+    $sql_result2 = $DB->limitquery("SELECT * FROM ".SQL_db.".user
                                    ORDER BY firstname, lastname DESC",
                                    $start_row,
                                    $CONFIG['pagesize']);

@@ -50,7 +50,8 @@ function fileSecurityCheck($error, $file_name, $tmp_name, $size, $type="")
 		//improved so that it only gets the last . in the string
 		$ext = substr(strrchr($file_name, "."), 1);
 		
-		if(MIME_magic) {
+		//make sure we can read the magic file and fileinfo functions are defined
+		if(is_readable(MIME_magic) && function_exists('finfo_open') ) {
 			//update to check against magic mime file on server rather than trust browser interpretation
 			$handle = finfo_open(FILEINFO_MIME, MIME_magic);
 			$mime = finfo_file($handle,$tmp_name);

@@ -518,7 +518,7 @@ function rcmail_login($user, $pass, $host=NULL)
     {
     $id = $sql_arr['id'];
     $user = $sql_arr['username'];
-	$pass = $sql_arr['email_pass'];
+	$pass = $_SESSION['password'];
     }
 
   // try to resolve email address from virtuser table    

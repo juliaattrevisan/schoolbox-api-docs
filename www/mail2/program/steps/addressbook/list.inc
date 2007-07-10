@@ -23,12 +23,11 @@ $REMOTE_REQUEST = TRUE;
 
 // Get a list of contacts from the portal.user table
 $sql_result2 = $DB->query("SELECT COUNT(id) AS rows
-                          FROM portal.user
+                          FROM ".SQL_db.".user
                           WHERE id=?",
                           $_SESSION['id']);
 						  
 $sql_arr2 = $DB->fetch_assoc($sql_result2);
-print($sql_arr2['rows'];
 
 // count contacts for this user
 $sql_result = $DB->query("SELECT COUNT(contact_id) AS rows

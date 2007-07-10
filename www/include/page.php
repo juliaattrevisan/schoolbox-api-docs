@@ -141,7 +141,7 @@ if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && is
 	}
 	else if(SITE_location == 'ormond') 
 	{
-		$this->t_body->set_var('WEBMAIL_LOCATION', 'href="http://webmail.ormond.unimelb.edu.au/" target="_blank"');
+		$this->t_body->set_var('WEBMAIL_LOCATION', 'href="/mail.php"');
 	}
 	else if(SITE_location == 'wenona') {
 		if(isStaff($_SESSION['gid'])) {
