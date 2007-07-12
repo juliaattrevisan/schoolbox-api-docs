@@ -21,7 +21,7 @@ while($homepage = $db->dbGetNextArray($result) ) {
 	$update = array(	'cid'	=> $homepage['cid'],
 						'large_head_fontcolour' => $colourTable[$homepage['large_head_fontcolour']],
 						'large_head_bgcolour'	=> $colourTable[$homepage['large_head_bgcolour']], 
-						'large_text_fontcolour'	=> $colourTable[$homepage['large_text_bgcolour']], 
+						'large_text_fontcolour'	=> $colourTable[$homepage['large_text_fontcolour']], 
 						'large_text_bgcolour'	=> $colourTable[$homepage['large_text_bgcolour']], 
 						'small_head_fontcolour'	=> $colourTable[$homepage['small_head_fontcolour']], 
 						'small_head_bgcolour'	=> $colourTable[$homepage['small_head_bgcolour']], 

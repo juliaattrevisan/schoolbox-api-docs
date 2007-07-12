@@ -97,7 +97,7 @@ else if(isset($_POST['code']) && $_POST['code'] && isset($_POST['heading']) && $
 		{
 			$orginal = $news->getSingleNews($_POST['id']);
 			//allow owner, su or group owner to modify
-			if($_SESSION['id'] == $orginal['owner'] || $_SESSION['su'] || $permlevel == 3)
+			if($_SESSION['id'] == $orginal['owner'] || $_SESSION['su'] || $permlevel == 2)
 			{
 				//modify news
 				$news->modNews($_POST['id'], $_POST['code'], $_POST['heading'], $_POST['expires'], $_POST['body']);
@@ -124,7 +124,7 @@ else if(isset($_GET['modify']) && $_GET['modify'])
 	$article = $news->getSingleNews($_GET['modify']);
 
 	//security check if owner or is superuser or is group owner
-	if($_SESSION['id'] == $article['owner'] || $_SESSION['su'] || perm($article['code'], 1) == 3)
+	if($_SESSION['id'] == $article['owner'] || $_SESSION['su'] || perm($article['code'], 1) == 2)
 	{
 		$page->setFields($article['body'], $article['heading'], $_GET['modify'], $article['code']);
 		$page->showPage();

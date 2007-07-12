@@ -68,7 +68,12 @@ class outUser
 				if(isStudent($user['group_id']))
 				{
 					$this->t_body->parse("due_work_block", "due_work");	
-					$this->t_body->parse("helpdesk_block", "helpdesk");	
+					
+					if(is_dir(HELPDESK_location))
+						$this->t_body->parse("helpdesk_block", "helpdesk");	
+					else
+						$this->t_body->set_var("helpdesk_block", "");
+							
 					$synInfo = getStudentInfo($user['synergy_id']);
 					
 					list($date, $month, $year) = explode(' ', $synInfo['StudentBirthDate']);

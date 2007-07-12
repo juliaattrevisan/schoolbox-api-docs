@@ -357,7 +357,7 @@ class OutPut
 			foreach($subnews as $article)
 			{
 				if($article['owner'] == $_SESSION['id'] || $_SESSION['su'] == 1 || $this->perm == 2)
-					$this->t_body->set_var("MOD_NEWS", "<a href=\"/subject/modSubNews.php?modify=".$article['Id']."\">Modify</a>");
+					$this->t_body->set_var("MOD_NEWS", "<a href=\"/subject/modSubNews.php?modify=".$article['id']."\">Modify</a>");
 				else
 					$this->t_body->set_var("MOD_NEWS", "");
 				

@@ -10,6 +10,8 @@
 require_once("../include/session.php");
 require_once("../include/include.php");
 require_once("../include/staffonly.php");
+require_once("../include/image.php");
+
 
 //no image
 define(NO_IMAGE, $_SERVER['DOCUMENT_ROOT'].'/images/no_portrait.jpg');
@@ -26,11 +28,22 @@ if(isset($_GET['id']) && $_GET['id'] && SYNERGY_enable)
 	$result = mssql_query($query, $db);
 	if(mssql_num_rows($result) == 1)
 	{
+		$imageHandler = new Image;
 		$image = mssql_fetch_array($result);
+		
+		$tempFile = tempnam(ZIP_directory, 'synport');
+		$handle = fopen($tempFile, "w");
+		fwrite($handle, $image['Photo']);
+		fclose($handle);
+		
+		$outImage = $imageHandler->imageResize($tempFile, 300, 200, false);
+		unlink($tempFile);
+		
 		header("Content-Type: image/jpg");
 		header("Content-Disposition: filename={$_GET['id']}.jpg"); 
 		//header ("Content-Length: $filesize");	
-		echo $image['Photo'];
+		imagejpeg($outImage);
+
 		exit;
 	}
 	
@@ -43,7 +56,5 @@ if(file_exists(NO_IMAGE))
 	header("Content-Disposition: filename=nopic.jpg"); 
 	readfile(NO_IMAGE);
 }		
-
-
 
 ?>

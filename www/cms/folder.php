@@ -127,6 +127,7 @@ class folder
 		$this->db->dbDeleteRow('homepage_config', 'cid', $id);
 		$this->db->dbDeleteRow('forum', 'cid', $id);
 		$this->db->dbDeleteRow('subject_news', 'code', $id);
+		$this->db->dbDeleteRow('userGroups', 'cid', $id);
 		
 		$this->deletePerms($cid);
 		$query = "DELETE FROM userAccess WHERE service = '1' AND sid = '".$id."'";
