@@ -29,10 +29,14 @@ class outUser
 		
 		$emailAddress = formatEmail($user);
 		
-		if($emailAddress)
-			$email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$emailAddress</a>";
+		if($emailAddress) {
+			if(SITE_location == 'wenona' )
+				$email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">Send Message</a>";
+			else
+				$email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$emailAddress</a>";
+		}
 		else
-			$email = "No address available";
+			$email = "";
 		
 		$this->t_body->set_var("EMAIL_ADDRESS", $emailAddress);
 		$this->t_body->set_var("EMAIL", $email);

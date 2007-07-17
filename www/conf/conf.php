@@ -117,6 +117,8 @@ define("WEATHER_LOCATION", "");
 
 define("ALLCAMPUS", 4);					//Value that represents all campuses in the luCampus table
 define("HOMEPAGESERVICE", 1);				//Value that represents the homepage module in the service table
+define("DROPBOX_COMPONENT", 25);
+define("FORUM_COMPONENT", 5);
 
 define("STUDENTGROUPIDS", serialize(array(3)));	//List of id numbers representing student groups
 define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids

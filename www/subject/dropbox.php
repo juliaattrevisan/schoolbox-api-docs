@@ -34,7 +34,7 @@ class dropbox
 
 	function checkDropBoxExists($cid)
 	{
-		$query = "SELECT position FROM homepage_comp_location WHERE cid = $cid AND component IN (25)";
+		$query = "SELECT position FROM homepage_comp_location WHERE cid = $cid AND component IN (".DROPBOX_COMPONENT.")";
 		if($this->db->dbGetSingleRow($query))
 			return true;
 		else

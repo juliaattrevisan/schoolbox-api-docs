@@ -328,19 +328,19 @@ class OutPut
 				{
 					$query = "SELECT id, title, firstname, lastname FROM user WHERE synergy_id = '{$synrow['StaffID']}'";
 					$teacher=$this->db->dbGetSingleRow($query);
-					$name = formatName($teacher);
-					
-					$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$teacher['id']}\">{$name}</a>");
-					$this->t_body->parse("staff_teacher_block", "staff_teachers", true);		
+					if(is_array($teacher)) {
+						$name = formatName($teacher);
+						$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$teacher['id']}\">{$name}</a>");
+						$this->t_body->parse("staff_teacher_block", "staff_teachers", true);		
+					}
 				}
+				
+				if($name)
+					return true;
 			}
-			else
-				$this->t_body->set_var("staff_teacher_block", "");
 		}
-		else
-			$this->t_body->set_var("staff_teacher_block", "");
-	
-		return true;
+		
+		return false;
 	}
 
 	function outputNews($name, $size)

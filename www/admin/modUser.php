@@ -410,7 +410,7 @@ if(isset($_POST['delete']) && isset($_POST['id']) && $_POST['delete'] && $_POST[
 	$userDb->deleteUser($_POST['id'], 1);
 	localRedir("/admin/formValid.php?msg=User Deleted Sucessfully&loc=/admin/modUser.php");
 }
-else if($_POST['username'] && $_POST['firstname'] && $_POST['lastname'] && $_POST['group'] && $_POST['campus'])
+else if($_POST['username'] && $_POST['lastname'] && $_POST['group'] && $_POST['campus'])
 {
 	if($_POST['id'])
 	{

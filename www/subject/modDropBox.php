@@ -16,6 +16,7 @@ else if(is_numeric($_GET['id'])) {
 else if(is_numeric($_POST['category']) && $_POST['description'] && $_FILES['file']['tmp_name']) {
 	fileSecurityCheck($_FILES['file']['error'], $_FILES['file']['name'], $_FILES['file']['tmp_name'], $_FILES['file']['size'], $_FILES['file']['type']);
 	$fileId = $dropbox->addFile($_FILES['file']['name'], $_FILES['file']['type'], $_FILES['file']['tmp_name'], $_POST['description'], $_POST['category']);
+	localRedir("/homepage.php?category=".$_POST['category']);
 }
 else
 	error(2);

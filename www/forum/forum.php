@@ -182,7 +182,7 @@ class forum
 	
 	function checkForumExists($cid)
 	{
-		$query = "SELECT position FROM homepage_comp_location WHERE cid = $cid AND component IN (5)";
+		$query = "SELECT position FROM homepage_comp_location WHERE cid = $cid AND component IN (".FORUM_COMPONENT.")";
 		if($this->db->dbGetSingleRow($query))
 			return 1;
 		else
