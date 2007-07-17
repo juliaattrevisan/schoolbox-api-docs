@@ -318,7 +318,7 @@ class OutPut
 			mssql_select_db(MSSQL_db, $db);
 		
 			$msQuery = "SELECT DISTINCT StaffID FROM SubjectClassStaff
-				WHERE ClassCode = '{$this->code}'";
+				WHERE ClassCode = '{$this->code}' AND FileYear={$_SESSION['FileYear']} AND FileSemester={$_SESSION['FileSemester']}";
 			
 			$msResult = mssql_query($msQuery, $db);
 			
