@@ -20,7 +20,7 @@ $rcmail_config['debug_level'] = 4;
 
 // enable caching of messages and mailbox data in the local database.
 // this is recommended if the IMAP server does not run on the same machine
-$rcmail_config['enable_caching'] = FALSE;
+$rcmail_config['enable_caching'] = TRUE;
 
 // lifetime of message cache
 // possible units: s, m, h, d, w
@@ -60,10 +60,10 @@ $rcmail_config['virtuser_query'] = '';
 // use this host for sending mails.
 // to use SSL connection, set ssl://smtp.host.com
 // if left blank, the PHP mail() function is used
-//$rcmail_config['smtp_server'] = MAIL_smtp_server;
+$rcmail_config['smtp_server'] = MAIL_smtp_server;
 
 // SMTP port (default is 25; 465 for SSL)
-//$rcmail_config['smtp_port'] = MAIL_smtp_port;
+$rcmail_config['smtp_port'] = MAIL_smtp_port;
 
 // SMTP username (if required) if you use %u as the username RoundCube
 // will use the current username for login
@@ -218,10 +218,10 @@ $rcmail_config['include_host_config'] = FALSE;
 $rcmail_config['pagesize'] = 40;
 
 // use this timezone to display date/time
-$rcmail_config['timezone'] = 1;
+$rcmail_config['timezone'] = 10;
 
 // daylight savings are On
-$rcmail_config['dst_active'] = TRUE;
+$rcmail_config['dst_active'] = FALSE;
 
 // prefer displaying HTML messages
 $rcmail_config['prefer_html'] = TRUE;

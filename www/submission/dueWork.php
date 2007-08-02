@@ -206,7 +206,7 @@ class dueWorkPage
 				if($prevCat['cid'] != $return['cid'])
 				{
 					$this->t_body->set_var("CATEGORY", $prevCat['name']);
- 					$this->t_body->parse("category_listing", "category_block", true);
+ 					$this->t_body->parse("ret_category_listing", "ret_category_block", true);
 					$this->t_body->set_var("return_list", "");
 				}
 
@@ -219,7 +219,7 @@ class dueWorkPage
 				if($return['filename'] == "")
 					$this->t_body->set_var("VIEW", "");
 				else
-					$this->t_body->set_var("VIEW", "<a href=\"dueWork.php?view={$return['id']}\">View</a> /");
+					$this->t_body->set_var("VIEW", "<a href=\"dueWork.php?view={$return['id']}\">View</a>");
 						
 				$this->t_body->parse("return_list","return_block",true);
 				
