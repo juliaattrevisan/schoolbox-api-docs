@@ -20,13 +20,15 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	$db = new dbManager();
 	$db->dbConnect();
 
-	$query = "SELECT firstname, lastname, username, local_email, alt_email FROM user WHERE id = '".$_SESSION["id"]."'";
+	$query = "SELECT firstname, lastname, username, local_email, title, alt_email FROM user WHERE id = '".$_SESSION["id"]."'";
 	$user = $db->dbGetSingleRow($query);
 
+	$name = formatName($user);
+
 	if($user['alt_email'])
-		$from_email = $user['firstname'].' '.$user['lastname'].'<'.$user['alt_email'].'>';
+		$from_email = $name.'<'.$user['alt_email'].'>';
 	else if($user['local_email'] || SITE_location == 'wenona')
-		$from_email = $user['firstname'].' '.$user['lastname'].'<'.$user['username']."@".MAIL_address.'>';
+		$from_email = $name.'<'.$user['username']."@".MAIL_address.'>';
 	else 
 		error(42);
 

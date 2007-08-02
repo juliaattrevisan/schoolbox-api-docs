@@ -366,7 +366,7 @@ href=\"/homepage.php?code=".urlencode($period['code'])."\">{$period['description
 					$this->t_body->set_var("new_forum_item", "");
 				
 				
-				if($cat['news'] || $cat['files'] || $cat['links'] || $cat['forum'])
+				if($sub['duework'] || $sub['retwork'] || $sub['subboxes'] || $cat['news'] || $cat['files'] || $cat['links'] || $cat['forum'])
 				{
 					if($catInfo['code'])
 						$this->t_body->set_var("NEW_CATEGORY_NAME", $catInfo['name'].' ('.$catInfo['code'].')');

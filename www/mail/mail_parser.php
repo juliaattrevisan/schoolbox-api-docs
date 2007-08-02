@@ -18,19 +18,21 @@ class mail_parser
 	// message encodings
 	var $encoding = array("7bit", "8bit", "binary", "base64", "quoted-printable","other");
 
-	function mail_parser($inbox, $msgid)
+	function mail_parser($inbox, $msgid, $complete=true)
 	{
 		//check email exists in mailbox
 		if($msgid > 0 && $msgid <= imap_num_msg($inbox))
 		{
 			$this->header = imap_header($inbox, $msgid);
-			$this->structure = imap_fetchstructure($inbox, $msgid);
 		
 			$this->inbox = $inbox;
 			$this->msgid = $msgid;
-	
-			$this->parseStructure();
+			
+			if($complete) {
+				$this->structure = imap_fetchstructure($inbox, $msgid);	
+				$this->parseStructure();
 			}
+		}
 		else
 			error(46);	
 

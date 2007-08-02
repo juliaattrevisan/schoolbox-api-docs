@@ -31,7 +31,7 @@ class outUser
 		
 		if($emailAddress) {
 			if(SITE_location == 'wenona' )
-				$email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">Send Message</a>";
+				$email = '<a href="'.$_SESSION['mailhandle'].$id."\">Send Message</a>";
 			else
 				$email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$emailAddress</a>";
 		}

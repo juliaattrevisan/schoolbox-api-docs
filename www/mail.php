@@ -30,7 +30,7 @@ class OutPut
 		{
 			$this->t_body->set_file("tplBODY", "mail.htm");
 			$this->t_body->set_block("tplBODY", "mail_listing", "mail_block");
-			$this->t_body->set_var('NAME', $_SESSION['firstname'] .' '.$_SESSION['surname']);
+			$this->t_body->set_var('NAME', formatName($_SESSION));
 		}
 		$this->t_body->set_var("TITLE", HEADING." - My Messages");
 		
@@ -95,7 +95,7 @@ class OutPut
 			//iterate over messages
 			for($x=$finish; $x>($start-1); $x--)
 			{
-				$email = new mail_parser($inbox, $x);
+				$email = new mail_parser($inbox, $x, false);
 				if(is_object($email->header)) {
 					$count++;
 					//set all the variables
@@ -109,9 +109,16 @@ class OutPut
 						$this->set_var("STYLE", "");
 	
 					//format date apppropiately
-					$date = strtotime($email->header->Date);
-					$this->set_var("DATE", date('D j/m/y g:i A', $date));
-	
+					if($email->header->Date)
+						$date = strtotime($email->header->Date);
+					else if($email->header->MailDate)
+						$date = strtotime($email->header->MailDate);
+  
+					if($date)
+						$this->set_var("DATE", date('D j/m/y g:i A', $date));
+					else
+						$this->set_var("DATE", '');
+			
 					//if user has a personal name output that otherwise just output there email address
 					if($email->header->from[0]->personal)
 						$from = $email->header->from[0]->personal;
