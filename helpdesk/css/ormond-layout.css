@@ -1,0 +1,67 @@
+/* Layout Stylesheet */ 
+
+body{
+ margin: 0;
+ padding:0;
+ background: #3A3F92;
+ color: #333333;
+ }
+	 
+#hdr{
+ background: #3A3F92 url(images/headLogo.gif) no-repeat right;
+ color:#000000;
+ border-bottom: 2px solid #ffffff;
+ margin:0;
+ padding:0;
+ }
+
+#lh-col{
+ position: absolute;
+ top: 110px;
+ left: 14px;
+ width: 180px;
+ border: 2px solid #ffffff;
+ background: #686CC1;
+ color: #333333;
+ margin: 0px;
+ padding: 0px;
+ height: 300px;
+ }
+
+#rh-col{
+ margin: 20px 20px 20px 220px;
+ border: 2px solid #ffffff;
+ background: #ffffff;
+ color: #333333;
+ padding: 20px;
+ position :relative;
+ }
+ 
+ 
+ /*----------------------------------------------------------------------------*/
+ 
+ #globalWrap	{
+	background:#3A3F92;
+	margin-top: 0;
+	margin-left: auto; 
+	margin-right: auto; 
+	text-align: left; 
+	padding-top: 0;
+	border: 0;
+	height:100%;
+	width: 250px;	
+	}
+
+/* THIS DIV IS THE KEY TO FIXING THE BACKGROUND ISSUES WITH CONTAINER DIVS IN MAC IE */
+#globalWrapB {
+	margin: 0;
+	padding: 0;
+	height: 100%; /*IE Fix for background height*/
+	}
+
+
+	
+
+	
+
+	
