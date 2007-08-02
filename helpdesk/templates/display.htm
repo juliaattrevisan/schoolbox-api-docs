@@ -1,0 +1,111 @@
+<html>
+<head>
+<title>Helpdesk Display Page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="css/helpdisp.css" type="text/css">
+
+<script language='Javascript' type='text/javascript'>
+
+function changePage(campid){
+	if (campid == 3)
+		document.location.href="http://helpdesk.mgs.vic.edu.au/display.php?campus=1"; 
+	else {
+		campid++;
+		document.location.href="http://helpdesk.mgs.vic.edu.au/display.php?campus=" + campid; 
+	}
+}
+</script>
+</head>
+<body> 
+<table align="center" cellspacing="0" width="95%" border="0">
+  <tr>
+    <td width="100%">
+      <table align='right' width="100%" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td width="100%" background="images/helpdisp_title_stripe.gif">
+		<div class="section_heading">
+			<a onClick="changePage({CAMPID});">{CAMPUS}</a>
+		</div>
+	  </td>
+          <td align="right"><img src="images/helpdisp_title.gif" width="119" height="38"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td width="100%" colspan="2"> 
+	 <span class="content_box">
+     <table class="table_job" width="100%">
+       <tr>
+         <th class="th_data" colspan="2">News Headlines</th>
+       </tr>
+       <!-- BEGIN headlines -->
+       <tr>
+         <td width="30%" class="td_data">{HEADING}</td>
+         <td width="70%" class="td_data">{BODY}</td>
+       </tr>
+       <!-- END headlines -->
+     </table>
+     </span>
+    </td>
+  </tr>
+  <tr>
+    <td> 
+	<span class="content_box">
+    <table width="100%" class="table_job">
+      <tr>
+        <th class="th_data" colspan="4">Notebooks oustanding</th>
+      </tr>
+      <!-- BEGIN nb_outs -->
+      <tr>
+        <td class="td_data" width="30%">{USER}</td>
+        <td class="td_data" width="50%">{DESCRIPTION}</td>
+        <td class="td_data" width="10%">{DATE}</td>
+        <td class="td_data" width="10%">{ASSIGNED}</td>
+      </tr>
+      <!-- END nb_outs -->
+    </table>
+    </span> 
+	</td>
+  </tr>
+  <tr>
+    <td> 
+	<span class="content_box">
+    <table class="table_job" width="100%">
+      <tr>
+        <th class="th_data" colspan="4">Notebooks Ready</th>
+      </tr>
+      <!-- BEGIN nb_ready -->
+      <tr>
+        <td class="td_data" width="30%">{USER}</td>
+        <td class="td_data" width="50%">{DESCRIPTION}</td>
+        <td class="td_data" width="10%">{DATE}</td>
+        <td class="td_data" width="10%">{ASSIGNED}</td>
+      </tr>
+      <!-- END nb_ready -->
+    </table>
+    </span> 
+	</td>
+  </tr>
+  <tr>
+    <td> 
+	<span class='content_box'>
+    <table width="100%" class="table_job">
+      <tr>
+      	<th class="th_data" colspan="4">Other equip. oustanding</th>
+      </tr>
+      <!-- BEGIN other_outs -->
+      <tr>
+        <td class="td_data" width="30%">{USER}</td>
+        <td class="td_data" width="50%">{DESCRIPTION}</td>
+        <td class="td_data" width="10%">{DATE}</td>
+        <td class="td_data" width="10%">{ASSIGNED}</td>
+      </tr>
+      <!-- END other_outs -->
+    </table>
+    </span> 
+	</td>
+  </tr>
+</table>
+</body>
+</html>

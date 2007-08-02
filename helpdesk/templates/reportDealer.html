@@ -1,0 +1,81 @@
+<table class='table_itemcontainer' cellpadding=0 cellspacing=0>		
+<tr><tr>
+
+<div></div>
+
+    <form method='GET'>
+		<table>
+		 <tr>
+		  <td class="padded_left">
+		      <select name='campusID' onChange='this.form.submit()'>
+			<!-- BEGIN OPTIONS_Campus -->
+			<option value='{VALUE}'{SELECTED}>{NAME}</option>
+			<!-- END OPTIONS_Campus -->
+		      </select>
+		  </td>
+		  <td>
+		      <select name='dealerID' onChange='this.form.submit()'>
+			<!-- BEGIN OPTIONS_Dealer -->
+			<option value='{VALUE}'{SELECTED}>{NAME}</option>
+			<!-- END OPTIONS_Dealer -->
+		      </select>
+		  </td>
+		 </tr>
+		</table>
+    </form>
+
+
+<!-- BEGIN EQUIPMENT_SECTION -->
+
+<form method="POST" onSubmit="return confirm( 'Mark checked jobs as \'Returned from dealer\'?');">
+<input type="hidden" name="do" value="markAsReturned">
+<input type="hidden" name="campusID" value="{CAMPUS_ID}">
+
+<table class='ruler' cellpadding=0 cellspacing=0>		
+	<thead>
+	<tr>
+		<td class='tableHeadLeft'>ID</td>
+		<td class='tableHeadLeft'>OWNER</td>
+		<td class='tableHeadLeft'>SERIAL</td>
+		<td class='tableHeadLeft'>MODEL</td>
+		<td class='tableHeadLeft'>DESCRIPTION</td>
+		<td class='tableHeadLeft'>&nbsp;</td>
+		<td class='tableHeadLeft'>DETAILS</td>
+	</tr>
+	</thead>
+<!-- BEGIN item -->
+	<tr>
+		<td class='td_data'><a href="jobDetails.php?jobID={JOB_ID}" class="a_report">{JOB_ID}</a></td>
+		<td class='td_data'><a href="userDetails.php?portalID={PORTAL_ID}" class="a_report">{OWNER}</a></td>
+		<td class='td_data'><a href="equipmentDetails.php?equipmentID={EQUIPMENT_ID}" class="a_report">{SERIAL}</a></td>
+		<td class='td_data'>{MODEL}</td>
+                <td class='td_data'>{DESCRIPTION}</td>
+		<td class='td_data'><input type='checkbox' name='jobID_{I}' value='{JOB_ID}' checked></td>
+		<td class='td_data'><input type='text' name='details_{I}' value=''></td>
+	</tr>
+<!-- END item -->
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td class='td_data'><b>Total {TOTAL}</b></td>
+		<td class='td_data'>&nbsp;</td>
+		<td class='td_data'>&nbsp;</td>
+		<td class='td_data' colspan='6' align='right'>
+			<input type='hidden' name='maxCheckboxes' value='{MAX_CHECKBOXES}'>
+			<!-- BEGIN BUTTON_MARK -->
+				<input type="submit" name="submit" value="returned from dealer*" class="button_submit">
+			<!-- END BUTTON_MARK -->
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+</table>
+<br>
+<br>
+</form>
+<p class="small_comment">* adds a 'returned from dealer' event and sets the equipment's location to 'helpdesk (appropriate campus)'</p>
+<!-- END EQUIPMENT_SECTION -->
+</td></tr>
+</table>

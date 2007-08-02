@@ -1,0 +1,72 @@
+<h2 style="margin-top:0;">Equipment Details</h2>
+<form action="equipmentEdit.php" name="signup" id="signup" method="POST">
+  <table class='table_equipment' cellpadding=0 cellspacing=0>
+    <tr>
+      <td class="labelcell">Type</td>
+      <td class="fieldcell">{TYPE}</td>
+      <td class="labelcell">Provider</td>
+      <td class="fieldcell">{DEALER}</td>
+    </tr>
+    <tr>
+      <td class="labelcell">Brand</td>
+      <td class="fieldcell">{BRAND}</td>
+      <td class="labelcell">Serial</td>
+      <td class="fieldcell">{SERIAL}</td>
+    </tr>
+    <tr>
+      <td class="labelcell">Model</td>
+      <td class="fieldcell">{MODEL}</td>
+      <td class="labelcell">Location</td>
+      <td class="fieldcell">{LOCATION}</td>
+    </tr>
+    <tr>
+      <td class="labelcell">Assigned to</td>
+      <td class="fieldcell"><!--this is here to remove the link for 'nonSynergyUsers' (only have to remove opening tag =)-->
+        <!-- BEGIN userLink1 -->
+        <a href="userDetails.php?portalID={ASSIGNED_USER_ID}"> {USER} </a>
+        <!-- END userLink1 -->
+      </td>
+      <td class="labelcell">Owned by</td>
+      <td class="fieldcell">{OWNER} </td>
+    </tr>
+    <tr>
+      <td class="labelcell">Date of purchase</td>
+      <td class="fieldcell">{DATEOFPURCHASE}</td>
+      <td class="labelcell">Warranty period</td>
+      <td class="fieldcell">{WARRANTYYEARS}</td>
+    </tr>
+    <tr>
+      <td class="labelcell">&nbsp;</td>
+      <td class="fieldcell">&nbsp;</td>
+      <td class="labelcell">Active?</td>
+      <td class="fieldcell">{ACTIVE}</td>
+    </tr>
+	<!-- BEGIN CUSTOM_FIELD_HEADER -->
+    <tr>
+      <td class="labelcell">Custom Fields</td>
+      <td class="fieldcell">&nbsp;</td>
+      <td class="labelcell">&nbsp;</td>
+      <td class="fieldcell">&nbsp;</td>
+    </tr>
+	<!-- BEGIN CUSTOM_FIELD_BLOCK -->
+    <tr>
+      <td class="labelcell">{CUSTOMFIELDNAMEL}</td>
+      <td class="fieldcell">{CUSTOMFIELDL}</td>
+      <td class="labelcell">{CUSTOMFIELDNAMER}</td>
+      <td class="fieldcell">{CUSTOMFIELDR}</td>
+    </tr>
+	<!-- END CUSTOM_FIELD_BLOCK -->
+	<!-- END CUSTOM_FIELD_HEADER -->
+    <tr>
+      <td class="labelcell">&nbsp;
+        </td>
+      <td class="fieldcell"><input type='button' name='submit' value='new task' onClick="document.hiddenForm.submit()"></td>
+      <td class="labelcell">&nbsp;</td>
+      <td class="fieldcell">
+	  <input type='hidden' name='equipmentID' value='{EQUIPMENT_ID}'>
+        <input name="submit" type='submit' class='button_submit' value='edit'>  </td>
+    </tr>
+  </table></form>
+
+<form method='POST' action='jobEdit.php' id="hiddenForm" name="hiddenForm">	       <input type='hidden' name='equipmentID' value='{EQUIPMENT_ID}'>
+        <input type='hidden' name='action' value='newJob'></form>

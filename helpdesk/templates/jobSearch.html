@@ -1,0 +1,61 @@
+<script type='text/javascript' language='javascript'>
+	function setAssignedUser( username, assignedUser) {
+		assignedUser.value = username;
+	}
+</script>
+
+<form action='jobList.php' method='GET'>
+			<input type='hidden' name='assignedUser' id='assignedUser' value='everyone'>
+<table class='table_job' cellpadding=0 cellspacing=0>
+	<tr>
+		<td class='td_label'>Assigned to</td>
+		<td class='padded'>
+			<select name='assignedUserID'>
+ <!-- onChange='setAssignedUser( this.options[ this.selectedIndex].text, this.form.assignedUser);this.form.submit();'>-->
+
+				<!-- BEGIN OPTIONS_AssignedUser -->      
+				<option value='{VALUE}'>{NAME}</option>
+				<!-- END OPTIONS_AssignedUser -->
+			</select>
+		</td>
+
+	<tr>
+		<td class='td_label'>Task ID</td>
+		<td class='padded'><input type='text' name='jobID'></td>
+	</tr>
+	<tr>
+		<td class='td_label'>Equipment serial</td>
+		<td class='padded'><input type='text' name='serial'></td>
+	</tr>
+	<tr>
+		<td class='td_label'>Description</td>
+		<td class='padded'><input type='text' name='description'></td>
+	</tr>
+	</tr>
+	<tr>
+		<td class='td_label'>Problem</td>
+		<td class='padded'>
+			<select name='problemID'>
+				<!-- BEGIN OPTIONS_Problem -->      
+				<option value='{VALUE}' {SELECTED}>{NAME}</option>
+				<!-- END OPTIONS_Problem -->
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td class='td_label'>Status</td>
+		<td class='padded'>
+			<select name='statusID'>
+				<!-- BEGIN OPTIONS_Status -->      
+				<option value='{VALUE}' {SELECTED}>{NAME}</option>
+				<!-- END OPTIONS_Status -->
+				<option value='open'>Open (all unclosed)</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td class='padded'><input type='submit' name='search' class='button_submit' value='search'></td>
+	</tr>
+</table>
+</form>

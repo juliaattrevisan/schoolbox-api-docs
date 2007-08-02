@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>{TITLE}</title><meta name="keywords" content="" />
+<meta name="description" content="" />
+<meta name="author" content=""/>
+<meta http-equiv="DC.Creator.Jurisdiction" content="Australia" />
+<meta http-equiv="DC.Creator.CorporateName" content="LekTec" />
+<meta http-equiv="DC.Identifier" content="http://www.lektec.com.au/" />
+<meta http-equiv="DC.Language" scheme="RFC1766" content="en" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="Copyright" content="Copyright (c) 2004 LekTec Consulting" />
+<link rel="stylesheet" type="text/css"
+href="templates/2c-hd-lc-static-layout.css" />
+<link rel="stylesheet" type="text/css"
+href="templates/2c-hd-lc-static-presentation.css" />
+
+<style type="text/css">
+tr.ruled{
+	background:#efefef;
+	}    
+table.ruler td {
+	padding-right:10px;
+	padding-bottom:2px;
+	}  
+</style>
+
+<script language='JavaScript' type='text/javascript'>
+
+function initialise() {
+	tableruler();
+	if( {JAVASCRIPT_INITIALISE}) {
+		init();
+	}
+}
+
+function checkSearch( form) {
+	if( form.search.value == '') {
+		alert( 'You must enter a search term.');
+		return false;
+	}
+	return true;
+}
+</script>
+<script type="text/javascript" src="templates/tableruler.js"></script>
+
+</head>
+ 
+<!--
+<script src='javascript/coolmenus4.js' language='javascript' type='text/javascript'></script>
+<script src='javascript/menu.js' language='javascript' type='text/javascript'></script>
+--> 
+
+<script src='javascript/common.js' language='javascript' type='text/javascript'></script>
+
+<script language='javascript' type='text/javascript'>{JAVASCRIPT}</script>
+
+<body onLoad='initialise();'>
+<!-- Header -->
+<div id="hdr">
+
+<h1>{TITLE}<br />
+</h1>
+</div>
+
+<!-- left column -->
+<div id="lh-col"><br />
+<div style="padding-left: 18px; " id="searchBox">
+	<form action='search.php' method='GET' onSubmit='return checkSearch( this);'>
+		<input type="search" name="search" id="username" /><br />
+		<input class="button" type="submit" name="searchbutton" value="Search" onSubmit='return checkSearch( this);' />&nbsp;
+		<input class="button" type="button" name="logout" value="Logout" onclick="javascript:window.location.href='logout.php';" />
+	</form>
+</div>
+<div id="button">
+  <ul>
+  <li style="border-top: 1px solid #fff "><a href="jobList.php">TASK LIST</a></li>
+  <li><a href="jobEdit.php">CREATE TASK</a></li>
+  <li><a href="equipmentEdit.php">CREATE EQUIPMENT</a></li>
+  <li><a href="dealerEdit.php">CREATE PROVIDER</a></li>
+  <li><a href="tableEdit.php">ADMINISTRATION</a></li>
+  <li><a href="reportIndex.php">REPORTS</a></li>  
+  </ul>
+</div>
+</div>
+<!-- end of left column -->
+
+
+<!-- right column -->
+<div id="rh-col">
+
+	{CONTENT}
+</div>
+<!-- end of right column -->
+
+</body>
+</html>

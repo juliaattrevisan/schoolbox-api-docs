@@ -1,0 +1,22 @@
+<script language='javascript' type='text/javascript'>
+	function init() {
+		document.forms[0].username.focus();
+	}
+</script>
+
+<form method='post' action='login.php'>
+<table>
+<tr>
+	<td>Username</td>
+	<td><input type='text' name='username' onLoad='this.focus();'></td>
+</tr>
+<tr>
+	<td>Password</td>
+	<td><input type='password' name='passwd'></td>
+</tr>
+<tr>
+	<td></td>
+	<td><input type='submit' name='login' value='login' class='button_submit'></td>
+</tr>
+</table>
+</form>

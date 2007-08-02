@@ -1,0 +1,74 @@
+
+<table class='table_itemcontainer' cellpadding=0 cellspacing=0>		
+	<tr><td>
+
+	    <form method='GET'>
+		<table>
+		  <tr><td class='padded'>
+			Find tasks for which the most recent event was 
+
+		      <select name='eventType'>
+			<!-- BEGIN OPTIONS_EventType -->
+			<option value='{VALUE}'{SELECTED}>{NAME}</option>
+			<!-- END OPTIONS_EventType -->
+		      </selecT>
+			
+			on
+
+		      <select name='campusID'>
+			<!-- BEGIN OPTIONS_Campus -->
+			<option value='{VALUE}'{SELECTED}>{NAME}</option>
+			<!-- END OPTIONS_Campus -->
+		      </select>
+		  </td></tr>
+		</table>
+	    </form>
+
+
+<!-- BEGIN RESULTS -->
+
+<table class='ruler' cellpadding=0 cellspacing=0>		
+	<thead>
+	<tr>
+		<th class='tableHeadLeft'>job id</td>
+		<th class='tableHeadLeft'>owner</td>
+		<th class='tableHeadLeft'>serial</td>
+		<th class='tableHeadLeft'>brand, model</td>
+		<th class='tableHeadLeft'>&nbsp;</td>
+	</tr>
+	</thead>
+<!-- BEGIN item -->
+	<tr>
+		<td class='td_data'><a href="jobDetails.php?jobID={JOB_ID}" class="a_report">{JOB_ID}</a></td>
+		<td class='td_data'><a href="userDetails.php?synergyID={SYNERGY_ID}" class="a_report">{OWNER}</a></td>
+		<td class='td_data'><a href="equipmentDetails.php?equipmentID={EQUIPMENT_ID}" class="a_report">{SERIAL}</a></td>
+		<td class='td_data'>{MODEL}</td>
+	</tr>
+<!-- END item -->
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td class='td_data'><b>Total {TOTAL}</b></td>
+		<td class='td_data'>&nbsp;</td>
+		<td class='td_data'>&nbsp;</td>
+		<td class='td_data' colspan='2' align='right'>&nbsp;</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+</table>
+<br>
+<br>
+
+<table>
+	<tr>
+		<td class="small_comment">Date</td>
+		<td class="small_comment">{DATE}</td>
+	</tr>
+</table>
+
+<!-- END RESULTS -->
+
+</td></tr>
+</table>

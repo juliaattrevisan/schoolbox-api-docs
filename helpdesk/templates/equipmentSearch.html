@@ -1,0 +1,53 @@
+<form action='equipmentList.php' method='GET'>
+<table class='table_equipment' cellpadding=0 cellspacing=0>
+	<tr>
+		<td class='td_label'>Serial</td>
+		<td class='padded'><input type='text' name='serial'></td>
+	</tr>
+	<tr>
+		<td class='td_label'>Type</td>
+		<td class='padded'>
+			<select name='equipmentTypeID'>
+				<option value='' SELECTED>(any)</option>
+				<!-- BEGIN OPTIONS_EquipmentType -->
+				<option value='{VALUE}'>{NAME}</option>
+				<!-- END OPTIONS_EquipmentType -->
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td class='td_label'>Brand</td>
+		<td class='padded'>
+			<select name='brandID' onChange='filterSelect( this, this.form.modelID, arrModel)'>
+				<option value='' SELECTED>(any)</option>
+				<!-- BEGIN OPTIONS_Brand -->
+				<option value='{VALUE}'>{NAME}</option>
+				<!-- END OPTIONS_Brand -->
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td class='td_label'>Model</td>
+		<td class='padded'>
+			<select name='modelID'>
+				<option value='' SELECTED>(any)</option>
+				<!-- BEGIN OPTIONS_Model -->
+				<option value='{VALUE}'>{NAME}</option>
+				<!-- END OPTIONS_Model -->
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td class='padded'><input type='checkbox' name='active' value='1' checked> active</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td class='padded'><input type='checkbox' name='showUsers' value='1' checked> show users in results? <font size=1>(takes longer)</font></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td class='padded'><input class='button_submit' type='submit' name='search' value='search'></td>
+	</tr>
+</table>
+</form>

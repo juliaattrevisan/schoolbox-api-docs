@@ -1,0 +1,85 @@
+<h2 style="margin-top:0;">Equipment List</h2>
+<form method="get">
+	<table>
+		<tr>
+			<td colspan="4"><strong>Filters</strong></td><td><strong>Group By</strong></td>
+		</tr>
+		<tr>
+			<td>Campus</td>
+			<td><select name='campusID'>
+					<!-- BEGIN OPTIONS_Campus -->
+					<option value='{VALUE}'{SELECTED}>{NAME}</option>
+					<!-- END OPTIONS_Campus -->
+				</select></td>
+			<td>Type</td>
+			<td><select name='equipmentTypeID'>
+				<!-- BEGIN OPTIONS_EquipmentType -->
+				<option value='{VALUE}'{SELECTED}>{NAME}</option>
+				<!-- END OPTIONS_EquipmentType -->
+			</select></td>
+			<td><select name='groupBy'>
+				<!-- BEGIN OPTIONS_GroupBy -->
+				<option value='{VALUE}'{SELECTED}>{NAME}</option>
+				<!-- END OPTIONS_GroupBy -->
+			</select></td>
+		</tr>
+		<tr>
+			<td>Brand</td>
+			<td><select name='brandID'>
+					<!-- BEGIN OPTIONS_Brand -->
+					<option value='{VALUE}'{SELECTED}>{NAME}</option>
+					<!-- END OPTIONS_Brand -->
+				</select>			</td>
+			<td>Model</td>
+			<td><select name='modelID'>
+					<!-- BEGIN OPTIONS_Model -->
+					<option value='{VALUE}'{SELECTED}>{NAME}</option>
+					<!-- END OPTIONS_Model -->
+				</select></td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr><td colspan="5"><input name="Submit" type="submit" />
+	</table>
+</form>
+<!-- BEGIN group -->
+<h3>{GROUP}</h3>
+<table class='ruler' cellpadding=0 cellspacing=0>
+	<thead>
+		<tr>
+			<td class="tableHeadLeft">OWNER</td>
+			<!-- BEGIN type_head -->
+			<td class="tableHeadLeft">TYPE</td>
+			<!-- END type_head -->
+			<!-- BEGIN brand_head -->
+			<td class="tableHeadLeft">BRAND</td>
+			<!-- END brand_head -->
+			<td class="tableHeadLeft">MODEL</td>
+			<td class="tableHeadLeft">SERIAL</td>
+			<!-- BEGIN campus_head -->
+			<td class="tableHeadLeft">CAMPUS</td>
+			<!-- END campus_head -->
+			<td class="tableHeadLeft">LOCATION</td>
+		</tr>
+	</thead>
+	<tbody>
+		<!-- BEGIN item -->
+		<tr>
+			<td>{OWNER}</td>
+			<!-- BEGIN type_col -->
+			<td>{TYPE}</td>
+			<!-- END type_col -->
+			<!-- BEGIN brand_col -->
+			<td>{BRAND}</td>
+			<!-- END brand_col -->
+			<td>{MODEL}</td>
+			<td>{SERIAL}</td>
+			<!-- BEGIN campus_col -->
+			<td>{CAMPUS}</td>
+			<!-- END campus_col -->
+			<td>{LOCATION}</td>
+		</tr>
+		<!-- END item -->
+	</tbody>
+</table>
+<!-- END group -->
+<br />

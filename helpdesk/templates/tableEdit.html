@@ -1,0 +1,94 @@
+<script language='javascript'>
+        function clickAdd( button) {
+                if( button.value == 'new') {
+                        button.src = 'images/button_tick.jpg';
+                        trNew.style.visibility = 'visible';
+                        button.value = 'create';
+                        return false;
+                }
+                return true;
+}
+
+</scripT>
+
+<h2 style="margin-top:0;">Edit Database - {TABLE_NAME} </h2>
+
+<table class='table_itemcontainer' cellpadding=0 cellspacing=0>
+	<tr><td>
+		<form method="GET">
+			<select name="tableName" onChange="this.form.submit()">
+				<option value="">--select table to edit --</option>
+				<option value="tblBrand">tblBrand</option>
+				<option value="tblCampus">tblCampus</option>
+				<option value="tblEquipmentType">tblEquipmentType</option>
+				<option value="tblEventType">tblEventType</option>
+				<option value="tblLocation">tblLocation</option>
+				<option value="tblModel">tblModel</option>
+				<option value="tblOwner">tblOwner</option>
+				<option value="tblPriority">tblPriority</option>
+				<option value="tblProblem">tblProblem</option>
+				<option value="tblStaff">tblStaff</option>				
+				<!--
+				<option value="tblSpec">tblSpec</option>
+				<option value="tblSpecOption">tblSpecOption</option>
+				-->
+			</select>
+		</form>
+	</td></tr>
+	
+	<tr><td>
+	 <!-- BEGIN blockTable -->
+	 
+	<table class="ruler" cellpadding="0" cellspacing="0"><br>
+	<thead>
+			<tr>
+				<!-- BEGIN headerData -->
+				<td class='tableHeadLeft' width='20%'>{HEADER_DATA}</th>
+				<!-- END headerData -->
+				<td class='tableHeadLeft' width='20%'>&nbsp;</th>
+			</tr>
+	</thead>
+
+
+			<!-- BEGIN row -->
+			<tr>
+				<!-- BEGIN rowData -->
+				<td class='tableHeadLeft'>
+				{ROW_DATA}
+				</td>
+				<!-- END rowData -->
+				<td>
+					<form method='POST' onSubmit='return confirm( "Sure you want to delete this row?");'>
+					<input type='hidden' name='id' value='{ROW_DATA_ID}'>
+					<input type='hidden' name='doAction' value='delete'>
+					<input type='image' name='buttonDelete' src='images/button_cross.jpg' width='10px'>
+					</form>
+				</td>
+			</tr>
+			<!-- END row -->
+	</td></tr>
+
+        <form method='GET' onSubmit='return confirm( "Sure you want to add this row to the database?")'>
+                <tr id='trNew' class='tr_hidden'>
+			<!-- BEGIN newData -->
+                        <td class='td_data'>
+				{NEW_BEFORE}<input type='text' name='{NEW_DATA_NAME}'>{NEW_AFTER}
+			</td>
+			<!-- END newData -->
+                </tr>
+                <tr>
+                        <td class='padded'>
+                                <input type='hidden' name='tableName' value='{TABLE_NAME}'>
+                                <input type='hidden' name='doAction' value='add'>
+                                <input type='image' name='button' value='new' src='images/button_add_user.jpg'
+                                        alt='add new event' onClick='return clickAdd( this);'>
+                        </td>
+                </tr>
+        </form>
+		<!-- END blockTable -->
+		</table>
+		
+			
+</td></tr>
+
+</table>

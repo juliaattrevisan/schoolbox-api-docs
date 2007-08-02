@@ -1,0 +1,59 @@
+
+
+	<h2 style="margin-top:0;">Provider Details</h2>
+    <form action="dealerEdit.php" name="signup" id="signup" method="GET">
+  <table>
+    <tr>
+      <td class="labelcell"><label for="dealerDes"> Provider Name:</label></td>
+      <td class="fieldcell" colspan="4">{DEALERDESC}</td>
+    </tr>
+    <tr>
+      <td colspan="5" class="labelcell">&nbsp;</td>
+    </tr>
+    <tr>
+      <td class="labelcell"><label for="dealerType">Provider Type:</label></td>
+      <td colspan="4" class="fieldcell">{DEALERTYPE}</td>
+    </tr>
+    <tr>
+      <td class="labelcell"><label for="dealerFax">Fax:</label></td>
+      <td colspan="4" class="fieldcell">{DEALERFAX}</td>
+    </tr>
+    <tr>
+      <td class="labelcell"><label for="contactAddr">Address:</label></td>
+      <td colspan="4" class="fieldcell">{DEALERADDR} </td>
+    </tr>
+    <tr>
+      <td colspan="5" class="fieldcell"><input type='hidden' name='dealerID' value='{DEALERID}'>
+        <input name="submit" type='submit' class='button_submit' value='edit'>
+      </span> </td></table>
+</form>
+<form>
+	
+	<!-- BEGIN dealerContactBlock -->
+    <h2 style="margin-top:0;">Contact Details</h2>
+	<table class="ruler" cellpadding="0" cellspacing="0">
+      <thead><tr>
+        <td class="tableHeadLeft"><label for="dealerDescription">Name:</label></td>
+        <td class="tableHeadLeft"><label for="dealer_name">Position:</label></td>
+        <td class="tableHeadLeft"><label for="dealerPhone">Phone No:</label></td>
+        <td class="tableHeadLeft"><label for="dealerEmail">E-mail:</label></td>
+        <td class="tableHeadLeft"><span class="labelcell">
+          <input name="totalcontacts" type="hidden" id="totalcontacts" value="{TOTALCONTACTS}">
+        </span></td>
+      </tr></thead>
+      <!-- BEGIN contactList -->
+      <tbody><tr>
+        <td>{CONTACTNAME}</td>
+        <td>{CONTACTPOS}</td>
+        <td>{CONTACTPHONE}</td>
+        <td><a href="mailto:{CONTACTEMAIL}">{CONTACTEMAIL}</a></td>
+        <td><div align="center"><span class="labelcell">
+            <input name="contactID{LOOP}" type="hidden" id="contactID{LOOP}2" value="{CONTACTID}">
+        </span></div></td>
+      </tr></body>
+      <!-- END contactList -->
+      <!-- END dealerContactBlock -->
+    </table>
+  <div style="margin-top: 20px; text-align: center;"></div>
+</form>
+

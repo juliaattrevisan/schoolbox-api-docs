@@ -1,0 +1,33 @@
+<h2 style="margin-top:0;">Task Statistics</h2>
+<form method='GET'>
+		<strong>Show task statistics between these periods</strong> 
+		<table>
+		  <tr><td>Begin</td><td>
+		      <input type="text" name='beginDate' value="{BEGIN_DATE}">
+			</td><td>End</td><td>
+			 <input type="text" name='endDate' value="{END_DATE}">
+		  </td></tr>
+		  <tr><td><input type="submit" /></td><td colspan="3">*Note Tasks Remaining indicates currently open jobs regardless of time period</td></tr>
+		</table>
+	    </form>
+
+<table class="ruler" cellpadding="0" cellspacing="0">
+  <thead>
+    <tr>
+	<td class="tableHeadLeft" >NAME</td>
+      <td class="tableHead" >STARTED</td>
+      <td class="tableHead">COMPLETED</td>
+	  <td class="tableHead">REMAINING</td>
+	  <td class="tableHead">AVERAGE TIME</td>
+    </tr>
+  </thead>
+<!-- BEGIN person -->
+<tr>
+<td>{NAME}</td>
+<td style="text-align:center">{TASK_STARTED}</td>
+<td style="text-align:center">{TASK_COMPLETED}</td>
+<td style="text-align:center">{TASK_REMAINING}</td>
+<td style="text-align:center">{TASK_TIME}</td>
+</tr>
+<!-- END person -->
+</table>

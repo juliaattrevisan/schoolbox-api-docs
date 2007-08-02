@@ -1,0 +1,197 @@
+<script language='JavaScript' type='text/javascript'>
+
+                // Toggle visibility of campus/room select boxes based on selected primary location (User, Dealer, School)
+        function toggleLocation( locationPrimary) {
+                var selectedValue = locationPrimary.options[ locationPrimary.selectedIndex].text;
+                var form = locationPrimary.form;
+                var objLocationSchool = findObject( 'divLocationSchool');
+                if( selectedValue == 'School') {
+                        objLocationSchool.style.visibility = 'visible';
+                }
+                else {
+                        objLocationSchool.style.visibility = 'hidden';
+                        form.locationID.value = locationPrimary.value;
+                }
+        }
+
+
+        function init() {
+                //var form = findObject( 'frmEdit');
+                //var divDate = findObject( 'divDate');
+                filterSelect( this.signup.brandID, this.signup.modelID, arrModel);
+                toggleDate();
+        }
+
+
+        function validateForm( form) {
+                var sure;
+
+                if( form.userID && (form.userID.value == '')) {
+                        form.user.focus();
+                        sure = confirm( "Assign no user to this equipment?");
+                        return sure;
+                }
+        }
+
+</script>
+
+<h2 style="margin-top:0;">Associated User</h2>
+<form action="equipmentEdit.php" name="signup" id="signup" method="post">
+  <table width="75%" border="1">
+    <tr>
+      <td width="200" class="labelcell">Synergy ID or name<br>
+        Does not need to be exact </td>
+      <td width="200" class="fieldcell"><input type='text' name='user' value='{USER}'>
+      </td>
+      <td class="labelcell"> user is not in synergy</td>
+      <td width="200" class="fieldcell"><input type='checkbox' name='userNonSynergy' value='1'
+
+			onClick='return confirm( "This option should only be used if you are certain the user is NOT in synergy.\n You will not be able to search for this user, and will instead have to find the equipment.\n Is this ok?");'
+					{user_non_synergy_checked}>
+      </td>
+    </tr>
+  </table>
+  {USER_LIST} <br>
+  <h2>Equipment Details</h2>
+  <table>
+  <tr>
+    <td width="200" class="labelcell">Brand </td>
+    <td width='200' class="fieldcell"><select name='brandID' onChange='filterSelect(this, this.form.modelID, arrModel);' onLoad='filterSelect( this, this.form.modelID, arrModel);'>
+        <!-- BEGIN OPTIONS_Brand -->
+        <option value='{VALUE}'{SELECTED}>{NAME}</option>
+        <!-- END OPTIONS_Brand -->
+      </select>
+    </td>
+    <td width="200" class="labelcell"> Model</td>
+    <td width="250" class="fieldcell"><select name='modelID' onChange="document.signup.modelchange.value = true; document.signup.submit();">
+        <!-- BEGIN OPTIONS_Model -->
+        <option value='{VALUE}'{SELECTED}>{NAME}</option>
+        <!-- END OPTIONS_Model -->
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td width="200" class="labelcell"> Serial</td>
+    <td class="fieldcell"><input type="text" name="serial" value="{SERIAL}" onClick="init( this.form);">
+    </td>
+    <td width="200" class="labelcell">Type </td>
+    <td width="250" class="fieldcell"><select name='equipmentTypeID' onChange="document.signup.typechange.value = true; document.signup.submit();">
+        <!-- BEGIN OPTIONS_EquipmentType -->
+        <option value='{VALUE}'{SELECTED}>{NAME}</option>
+        <!-- END OPTIONS_EquipmentType -->
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td width="200" class="labelcell"> Dealer</td>
+    <td class="fieldcell"><select name='dealerID'>
+        <!-- BEGIN OPTIONS_Dealer -->
+        <option value='{VALUE}'{SELECTED}>{NAME}</option>
+        <!-- END OPTIONS_Dealer -->
+      </select>
+    </td>
+    <td width="200" class="labelcell"> Owner</td>
+    <td width="250" class="fieldcell"><select name='ownerID'>
+        <!-- BEGIN OPTIONS_Owner -->
+        <option value='{VALUE}'{SELECTED}>{NAME}</option>
+        <!-- END OPTIONS_Owner -->
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td width="200" class="labelcell">Location</td>
+    <td class="fieldcell">
+        
+	
+          <select name='locationIDPrimary' onChange='toggleLocation( this); filterSelect( this.form.campusID, this.form.locationID, arrLocation)'>
+              <!-- BEGIN OPTIONS_LocationPrimary -->
+              <option value='{VALUE}'{SELECTED}>{NAME}</option>
+              <!-- END OPTIONS_LocationPrimary -->
+        </select>
+         
+          <span name="divLocationSchool" style="visibility:{LOCATION_SCHOOL_VISIBILITY}" id="divLocationSchool">
+              <select name='campusID' onChange='filterSelect( this, this.form.locationID, arrLocation)'>
+                <!-- BEGIN OPTIONS_Campus -->
+                <option value='{VALUE}'{SELECTED}>{NAME}</option>
+                <!-- END OPTIONS_Campus -->
+              </select>
+              <select name='locationID'>
+                <!-- BEGIN OPTIONS_Location -->
+                <option value='{VALUE}'{SELECTED}>{NAME}</option>
+                <!-- END OPTIONS_Location -->
+              </select>
+        </span>
+        
+      </td>
+    <td width="200" class="labelcell">Warranty period (years)</td>
+    <td width="250" class="fieldcell"><select name='warrantyYears'>
+        <!-- BEGIN OPTIONS_warrantyYears -->
+        <option value='{VALUE}'{SELECTED}>{NAME}
+        <!-- END OPTIONS_warrantyYears -->
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td width="200" class="labelcell">Date of purchase</td>
+    <td class="fieldcell"><input type='checkbox' name='dateNone' value='1' onClick='toggleDate()'{NO_DATE_CHECK}>
+      <font size=-3>no date of purchase</font><br>
+      <div id='divDate' name='divDate' style='visibility:{VISIBILITY_DATE}'>
+        <select name='dateDay'>
+          <!-- BEGIN OPTIONS_dateDay -->
+          <option value='{VALUE}'{SELECTED}>{NAME}
+          <!-- END OPTIONS_dateDay -->
+        </select>
+        /
+        <select name='dateMonth'>
+          <!-- BEGIN OPTIONS_dateMonth -->
+          <option value='{VALUE}'{SELECTED}>{NAME}
+          <!-- END OPTIONS_dateMonth -->
+        </select>
+        /
+        <select name='dateYear'>
+          <!-- BEGIN OPTIONS_dateYear -->
+          <option value='{VALUE}'{SELECTED}>{NAME}
+          <!-- END OPTIONS_dateYear -->
+        </select>
+      </div></td>
+    <td width="200" class="labelcell">Active</td>
+    <td width="250" class="fieldcell"><input type="checkbox" name="active" value="1" {ACTIVE_CHECKED}>
+    </td>
+  </tr>
+  <!-- BEGIN CUSTOM_FIELD_HEADER -->
+  <tr>
+    <td colspan="4" class="labelcell">Custom Fields</td>
+  </tr>
+  <!-- BEGIN CUSTOM_FIELD_BLOCK -->
+  <tr>
+    <td width="200" class="labelcell">{CUSTOMFIELDNAMEL}</td>
+    <td class="fieldcell">{CUSTOMFIELDL}</td>
+    <td width="200" class="labelcell">{CUSTOMFIELDNAMER}</td>
+    <td class="fieldcell">{CUSTOMFIELDR}</td>
+  </tr>
+    <!-- END CUSTOM_FIELD_BLOCK -->
+  <!-- END CUSTOM_FIELD_HEADER -->
+  <tr>
+    <td width="200" class="labelcell">&nbsp;</td>
+    <td class="fieldcell">&nbsp;</td>
+    <td width="200" class="labelcell">&nbsp;</td>
+    <td class="fieldcell">&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td width="200">&nbsp;</td>
+    <td  class="fieldcell"><input name="action" type="hidden" id="action" value = "{ACTION}"></td>
+    <td width="200"  class="fieldcell"><input name="typechange" type="hidden" id="typechange">
+      <input type="submit" name="{ACTION}" value="{ACTION}" onClick="return validateForm( this.form)" class="button_submit">
+      <input name="modelchange" type="hidden" id="modelchange">
+    </td>
+    <td class="fieldcell"><input type='hidden' name='equipmentID' value='{EQUIPMENT_ID}'>
+      <!-- BEGIN button_delete -->
+      <input type="submit" name="delete" value="delete" class="button_submit">
+      <!-- END button_delete -->
+      <input type='hidden' name='EQUIPMENT_ID' value='{EQUIPMENT_ID}'></td>
+  </tr>
+  </table>
+  <div style="margin-top: 20px; text-align: center;"> </div>
+</form>
+</div>

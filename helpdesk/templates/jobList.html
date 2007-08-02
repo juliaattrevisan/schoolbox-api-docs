@@ -1,0 +1,46 @@
+<h2 style="margin-top:0;">Task List</h2>
+<!-- BEGIN userJobBlock -->
+<h3>Tasks Assigned To {OWNER}</h3>
+<table class="ruler" cellpadding="0" cellspacing="0">
+  <thead>
+    <tr>
+      <td class="tableHeadLeft">CONTACT</td>
+      <td class="tableHeadLeft">DESCRIPTION</td>
+      <td class="tableHead">CREATED</td>
+      <td class="tableHead">STATUS</td>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- BEGIN jobBlock -->
+    <tr>
+      <td width="150"><div align="left">{NAME}</div>
+      </td>
+      <td ><div align="left">{DESCRIPTION}</div>
+      </td>
+      <td class="value" width="80"><div align="left">{CREATEDDATE}</div>
+      </td>
+      <td class="value" width="80"><div align="right">{STATUS}</div>
+      </td>
+    </tr>
+    <!-- END jobBlock -->
+  </tbody>
+</table>
+<br/>
+<!-- END userJobBlock -->
+<!-- BEGIN button_add -->
+<h2>Create New Task </h2>
+<form method='POST' action='jobEdit.php' id="signup" name="signup">
+  <table class="ruler" cellpadding="0" cellspacing="0">
+    <tr>
+      <td class="fieldcell">
+        <input type='hidden' name='assignedUserID' value='{ASSIGNED_USER_ID}'>
+        <input type='hidden' name='userID' value='{ASSOCIATED_USER_ID}'>
+        <input type='hidden' name='equipmentID' value='{EQUIPMENT_ID}'>
+        <input type='hidden' name='action' value='newJob'>
+        <input type='submit' name='submit' value='new task'>
+      </td>
+    </tr>
+  </table>
+</form>
+<br/>
+<!-- END button_add -->

@@ -1,0 +1,122 @@
+<script language='JavaScript'>
+	function changeThing( thing) {
+		thing.form.campus.value = thing.form.campusID.options[ thing.form.campusID.selectedIndex].text;
+		thing.form.dealer.value = thing.form.dealerID.options[ thing.form.dealerID.selectedIndex].text;
+		return true;
+	}
+</script>
+
+<div>{HEADING}</div>
+
+<table class='table_itemcontainer' cellpadding=0 cellspacing=0>		
+	<tr>
+	<td>
+
+
+<!-- BEGIN SELECT_FILTERS -->
+    <form method='GET' name='frmTop'>
+	<input type='hidden' name='doAction' value=''>
+	<input type='hidden' name='campus' value='{CAMPUS}'>
+	<input type='hidden' name='dealer' value='{DEALER}'>
+
+		<table width="100%">
+		  <tr>
+			<td class='padded_left' width="10%">
+			      <select name='campusID' onChange='changeThing( this);this.form.submit();'>
+				<!-- BEGIN OPTIONS_Campus -->
+				<option value='{VALUE}'{SELECTED}>{NAME}</option>
+				<!-- END OPTIONS_Campus -->
+			      </select>
+			</td>
+			<td width="5%">
+			</td>
+			<td>
+			      <select name='dealerID' onChange='changeThing( this);this.form.submit();'>
+				<!-- BEGIN OPTIONS_Dealer -->
+				<option value='{VALUE}'{SELECTED}>{NAME}</option>
+				<!-- END OPTIONS_Dealer -->
+			      </select>
+			</td>
+			<td>
+				<input value="print courier invoice" type="submit" onClick="this.form.doAction.value='print'" class="button_submit">
+			</td>
+			<td width="100%">&nbsp;
+				
+			</td>
+		</tr>
+		</table>
+
+    </form>
+<!-- END SELECT_FILTERS -->
+
+
+
+<!-- BEGIN EQUIPMENT_SECTION -->
+
+<form method="POST" onSubmit="return confirm( 'Mark checked jobs as \'picked up by courier\'?');">
+<input type="hidden" name="doAction" value="markAsLeft">
+<input type="hidden" name="campusID" value="{CAMPUS_ID}">
+
+<table class='ruler' cellpadding=0 cellspacing=0>
+	<thead>		
+	<tr>
+		<td class='tableHeadLeft'>ID</td>
+		<td class='tableHeadLeft'>OWNER</td>
+		<td class='tableHeadLeft'>SERIAL</td>
+		<td class='tableHeadLeft'>MODEL</td>
+		<td class='tableHeadLeft'>DESCRIPTION</td>
+		<td class='tableHeadLeft'>&nbsp;</td>
+	</tr>
+	    </thead>
+	    <tbody>
+<!-- BEGIN item -->
+	<tr>
+		<td class='td_data'><a href="jobDetails.php?jobID={JOB_ID}">{JOB_ID}</a></td>
+		<td class='td_data' nowrap ><a href="userDetails.php?portalID={PORTAL_ID}">{OWNER}</a></td>
+		<td class='td_data'><a href="equipmentDetails.php?equipmentID={EQUIPMENT_ID}">{SERIAL}</a></td>
+		<td class='td_data' nowrap>{MODEL}</td>
+		<td class='td_data'>{DESCRIPTION}</td>
+		{CHECKBOX_BEFORE}
+		<td class='td_data'><input type='checkbox' name='jobID_{I}' value='{JOB_ID}' checked></td>
+		{CHECKBOX_AFTER}
+	</tr>
+<!-- END item -->
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td class='td_data'><b>Total {TOTAL}</b></td>
+		<td class='td_data'>&nbsp;</td>
+		<td class='td_data'>&nbsp;</td>
+		<td class='td_data' colspan='2' align='right'>
+			<input type='hidden' name='maxCheckboxes' value='{MAX_CHECKBOXES}'>
+			<!-- BEGIN BUTTON_MARK -->
+				<input type="submit" name="submit" value="picked up by courier*" class="button_submit">
+			<!-- END BUTTON_MARK -->
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+</table>
+<br>
+<br>
+<!-- BEGIN SIGNATURE -->
+<table>
+	<tr>
+		<td class="small_comment">Courier&nbsp;Signature</td>
+		<td class="small_comment">____________________________________</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+		<td class="small_comment">Date</td>
+		<td class="small_comment">{DATE}</td>
+	</tr>
+</table>
+<!-- END SIGNATURE -->
+</form>
+<p class="small_comment">* adds a 'picked up by courier' event and sets the equipment's location to 'provider'</p>
+<!-- END EQUIPMENT_SECTION -->
+</td></tr>
+</table>

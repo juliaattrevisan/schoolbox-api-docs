@@ -1,0 +1,70 @@
+<script>
+		function doit(message)
+		{
+		document.getElementById('selmess').innerHTML = message;
+		}
+		
+		</script>
+
+<form action='' method='post' enctype='multipart/form-data' name='signup' id="signup">
+
+  <table width='100%' border='0'> 
+    <tr>
+      <td colspan="2" class="fieldcell">Select *.CSV File to Upload<br>
+        <input type='file' name='file'></td>
+    </tr>
+    <tr>
+      <td colspan="2" class="fieldcell">Put your mouse over a fieldname to see what it should look
+      like</td>
+    </tr>
+    <tr> 
+      <td width='13%' class="fieldcell"><select name='select[]' size='12' multiple> 
+          <option value="serial" onMouseOut="doit('')" onMouseOver="doit('eg. <b>AX23423423</b> or <b>65464644</b> ');">Serial 
+          </option> 
+          <option value="dateOfPurchase" onMouseOut="doit('')" onMouseOver="doit('eg. <b>2004-12-23</b>');">Date Of Purchase 
+          </option> 
+          <option value="dealerID" onMouseOut="doit('')" onMouseOver="doit('eg. <b>Trident</b> or <b>Commander</b>');">Dealer 
+          </option> 
+          <option value="locationID" onMouseOut="doit('')" onMouseOver="doit('eg. <b>(not specified)</b> or <b>User</b> or <b>Helpdesk (Senior)</b>');">Location 
+          </option> 
+          <option value="ownerID" onMouseOut="doit('')" onMouseOver="doit('eg. <b>MGS</b> or <b>User</b>');">Owner 
+          </option> 
+          <option value="userNonSynergy" onMouseOut="doit('')" onMouseOver="doit('eg. <b>'Henry Jones' Use only if the user is not in Synergetic!</b>');">User Non-Synergy 
+          </option> 
+          <option value="modelID" onMouseOut="doit('')" onMouseOver="doit('eg. <b>LaserJet 8150N</b> or <b>Travelmate 354</b>');">Model 
+          </option> 
+          <option value="equipmentTypeID" onMouseOut="doit('')" onMouseOver="doit('eg. <b>Notebook</b> or <b>Printer</b>');">Equipment Type 
+          </option> 
+          <option value="warrantyYears" onMouseOut="doit('')" onMouseOver="doit('eg. <b>3</b>');">Warranty Years 
+          </option> 
+          <option value="active" onMouseOut="doit('')" onMouseOver="doit('eg. <b>true</b> or <b>false</b>');">Active 
+          </option> 
+          <option value="userID" onMouseOut="doit('')" onMouseOver="doit('eg. The owner's/user's Synergy ID');"> 
+          User 
+          </option> 
+        </select></td> 
+      <td width='87%' class="fieldcell"><div id='selmess'></div></td> 
+    </tr>
+    <tr>
+      <td colspan="2" class="fieldcell"><input type='checkbox' name='extrafields' value='1'>
+There are extra fields after the last field specified above</td>
+    </tr>
+    <tr>
+      <td colspan="2" class="fieldcell"><input type='checkbox' name='takeAction' value='1'><b>Take Action - Make changes to the data</b></td>
+    </tr>
+
+    <tr>
+      <td colspan="2" class="fieldcell"><input type='submit' name='Submit' value='Submit'></td>
+    </tr> 
+  </table> 
+  </form> 
+  
+  <table width="100%"  border="0" cellspacing="0" cellpadding="0">
+	<!-- BEGIN messageList -->
+    <tr>
+      <td>{MESSAGE}</td>
+    </tr>
+	<!-- END messageList -->
+  </table>
+ 
+

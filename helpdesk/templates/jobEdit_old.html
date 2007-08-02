@@ -1,0 +1,234 @@
+<script language='JavaScript' type='text/javascript'>
+
+		// Indicates whether the user or equipment section has been removed.
+		// There's a script block within both of these sections that sets the variable to false
+		// HOWEVER I think I might remove the ability to remove sections - it means that if a new job is assigned to
+		// a piece of equipment it can't be re-assigned to a user and v.v.
+	var sectionRemoved = true;
+
+	function init() {
+		var form = findObject( 'frmEdit');
+		var divDate = findObject( 'divDate');
+		toggleDate( form.dateNone, divDate);
+	}
+
+	function setInactive( objActive, objInactive) {
+		if( !sectionRemoved) { 
+			objInactive.value = '';
+			objInactive.style.background = '#bbbbbb';
+			objActive.style.background = 'white';
+
+				// If preset equipmentID, clear
+			if( objInactive.name == 'serial') {
+				objInactive.form.equipmentID.value = '';
+			}
+		}
+	}
+
+
+	function validateForm( form) {
+		var sure;
+
+		if( form.serial && form.associatedUser) {
+			if( (form.serial.value == '') && (form.associatedUser.value == '')) {
+				form.serial.focus();
+				sure = confirm( "Job not for specific person or equipment?");
+				return sure;
+			}
+			if( form.serial.value && form.associatedUser.value) {
+				form.serial.focus();
+				alert( "Can't associate both person and equipment to a job.\nBear in mind that people who own equipment will automatically be linked to this job if you assign that equipment to it.");
+				return false;
+			}
+		}
+	}
+
+	function pressDelete( btnDelete) {
+		var sure;
+		sure = confirm( 'Delete this job?');
+		if( sure) {
+			btnDelete.form.doAction.value = 'delete';
+		}
+		return sure;
+	}
+</script>
+
+<form action='jobEdit.php' onSubmit='return validateForm( this);' method='POST' name='frmEdit'>
+
+<table class='table_itemcontainer'>
+ <tr><td> 
+	<table class='table_job'>
+		<tr>
+			<td colspan='2'><h3>Job</h3></td>
+		</tr>
+		<!-- BEGIN JOB_ID_BLOCK -->
+		<tr> 
+			<td><h4>Job ID</h4></td>
+			<td>{JOB_ID}</td>
+		</tr>
+		<!-- END JOB_ID_BLOCK -->
+		<tr> 
+			<td><h4>Problem</h4></td>
+			<td> 
+				<select name='problemID'>
+					<!-- BEGIN OPTIONS_Problem -->
+					<option value='{VALUE}'{SELECTED}>{NAME}</option>
+					<!-- END OPTIONS_Problem -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td><h4>Assigned to</h4></td>
+			<td>
+				<select name='assignedUserID'>
+					<!-- BEGIN OPTIONS_AssignedUser -->
+					<option value='{VALUE}'{SELECTED}>{NAME}</option>
+					<!-- END OPTIONS_AssignedUser -->
+				</select>
+			</td>
+		<tr>
+			<td><h4>Campus</h4></td>
+			<td>
+				<select name='campusID'>
+				<!-- BEGIN OPTIONS_Campus -->
+					<option value='{VALUE}'{SELECTED}>{NAME}</option>
+				<!-- END OPTIONS_Campus -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td><h4>Extra info</h4></td>
+			<!--td><input type='text' name='description' value='{DESCRIPTION}'></td-->
+			<td><input type='text' name='description' value='{DESCRIPTION}'></td>
+		</tr>
+		<tr>
+			<td><h4>Status</h4></td>
+			<td>
+				<select name='statusID'>
+					<!-- BEGIN OPTIONS_Status -->
+					<option value='{VALUE}' {SELECTED}>{NAME}</option>
+					<!-- END OPTIONS_Status -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td><h4>Date due</h4></td>
+			<td>
+				<input type='checkbox' name='dateNone' value='1' onClick='toggleDate( this, this.form.dateDay, this
+				.form.dateMonth, this.form.dateYear)'{NO_DATE_CHECK}> <font size=-3>no due date</font><br>
+				<div id='divDate' name='divDate' style='visibility:{VISIBILITY_DATE}'>
+					<select name='dateDay'>
+					<!-- BEGIN OPTIONS_dateDay -->
+					<option value='{VALUE}'{SELECTED}>{NAME}</value>
+					<!-- END OPTIONS_dateDay -->
+					</select>
+					/
+					<select name='dateMonth'>
+					<!-- BEGIN OPTIONS_dateMonth -->
+					<option value='{VALUE}'{SELECTED}>{NAME}</value>
+					<!-- END OPTIONS_dateMonth -->
+					</select>
+					/
+					<select name='dateYear'>
+					<!-- BEGIN OPTIONS_dateYear -->
+					<option value='{VALUE}'{SELECTED}>{NAME}</value>
+					<!-- END OPTIONS_dateYear --> 
+					</select><br>
+				</div>
+			</td>
+		</tr>
+		<!-- BEGIN CREATED -->
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<td><h4>Created</h4></td>
+			<td>{CREATED_DATE} by <a href='userDetails.php?userID={CREATED_USER_ID}'>{CREATED_USER}</a></td>
+		</tr>
+		<!-- END CREATED -->
+
+		<tr><td>&nbsp;</td></tr>
+	</table>
+ </td>
+</tr>
+
+<!-- BEGIN EQUIPMENT_SECTION -->
+
+<tr>
+ <td colspan=3>
+	<table class='table_equipment'>
+		<tr><td><h3>For Equipment</h3></td></tr>
+		<tr>
+			<!-- BEGIN equipmentSearch -->
+				<td width='34%'>Serial number<br><div class='small_comment'>Does not need to be complete</div></td>
+				<td width='66%'>
+					<input type='hidden' name='equipmentID' value='{EQUIPMENT_ID}'>
+					<input type='text' name='serial' value='{EQUIPMENT_SERIAL}'
+						onFocus='setInactive( this, this.form.user)';
+						onChange='this.form.equipmentID.value=""'>
+				</td>
+			<!-- END equipmentSearch -->
+		</tr>
+		<tr>
+			<td>{EQUIPMENT_LIST}</td>
+		</tr>
+	</table>
+ </td>
+</tr>
+
+<!-- BEGIN ASSOCIATED_USER_SECTION -->
+
+<script language='JavaScript' type='text/javascript'>
+	var sectionRemoved = false;
+</script>
+
+<tr>
+ <td colspan='3' align='center'>
+	or
+ </td>
+</tr>
+
+<!-- END EQUIPMENT_SECTION -->
+
+<tr>
+ <td colspan=3>
+	<table class='table_user'>
+		<tr><td><h3>For Person</h3></td></tr>
+		<tr>
+			<!-- BEGIN associatedUserSearch -->
+				<td width='34%'>Person's name or synergy ID<br><div class='small_comment'>Does not need to be complete</div></td>
+				<td width='66%'>
+					<input type='text' name='user' value='{ASSOCIATED_USER_ID}'
+						onFocus='setInactive( this, this.form.serial);'>
+				</td>
+			<!-- END associatedUserSearch -->
+		</tr>
+		<tr>
+			<td>{ASSOCIATED_USER_LIST}</td>
+		</tr>
+	</table>
+ </td>
+</tr>
+<!-- END ASSOCIATED_USER_SECTION -->
+
+
+<tr><td>{EVENT_LIST}</td></tr>
+<tr>
+ <td colspan='3' align='center'>
+	<table><tr>
+		<td>
+			<input type='submit' value='{DO_ACTION}' class='button_submit'>	
+		</td>
+		<td>&nbsp;&nbsp;&nbsp;</td>
+		<!-- BEGIN button_delete -->
+		<td>
+			<input type="submit" name="delete" value="delete" class="button_submit" onClick='return pressDelete( this);'>
+		</td>
+		<!-- END button_delete -->
+	</tr></table>
+ </td>
+</tr>
+</table>
+
+<input type='hidden' name='jobID' value='{JOB_ID}'>
+<input type='hidden' name='doAction' value='{DO_ACTION}'>
+
+</form>

@@ -1,0 +1,54 @@
+	/* The font sizes are specified in the first few blocks */
+
+body {	font-family	: Verdana, Arial, Helvetica, sans-serif;
+	color		: black;
+	background-color: white;
+	background-image: url(../images/helpdesk_background.gif);
+}
+
+td {	font-family	: Verdana, Arial, Helvetica, sans-serif;
+	color		: #000000;
+	background-position: top;
+	vertical-align	: top;
+}
+
+		/*  The inner tables */
+.table_job { 		border: 2px #FF9933 solid;
+			height: auto;
+}
+
+.th_data {
+	font-weight	: bold;
+	font-size 	: 10pt;
+	color		: #006600;
+	text-align	: left;
+	border		: none;
+	border-bottom	: 1px #cccccc solid;
+	padding		: 5px;
+}
+.td_data {
+	font-weight 	: bold;
+	font-size 	: 8pt;
+	color  		: #000066; 
+	padding		: 1px;
+}
+
+.title_scroll {
+	position	: middle;
+	color		: white;
+	font-size	: 18pt;
+	font-weight	: bold;
+}
+.section_heading {
+	top			: 3px;
+	left		: 3px;
+	text-align	: left;
+	color		: white;
+	font-size	: 16pt;
+	font-weight	: bold;
+	font-style	: italic;
+}
+.content_box {
+	background-color: white;
+}
+

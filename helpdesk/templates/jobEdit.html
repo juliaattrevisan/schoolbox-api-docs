@@ -1,0 +1,160 @@
+<script language='JavaScript' type='text/javascript'>
+
+		// Indicates whether the user or equipment section has been removed.
+		// There's a script block within both of these sections that sets the variable to false
+		// HOWEVER I think I might remove the ability to remove sections - it means that if a new  is assigned to
+		// a piece of equipment it can't be re-assigned to a user and v.v.
+	var sectionRemoved = true;
+
+	function init() {
+	}
+
+	function setInactive( objActive, objInactive) {
+		if( !sectionRemoved) { 
+			objInactive.value = '';
+			objInactive.style.background = '#bbbbbb';
+			objActive.style.background = 'white';
+
+				// If preset equipmentID, clear
+			if( objInactive.name == 'serial') {
+				objInactive.form.equipmentID.value = '';
+			}
+		}
+	}
+
+
+	function validateForm( form) {
+		var sure;
+
+		if( form.serial && form.associatedUser) {
+			if( (form.serial.value == '') && (form.associatedUser.value == '')) {
+				form.serial.focus();
+				sure = confirm( "Task not for specific person or equipment?");
+				return sure;
+			}
+			if( form.serial.value && form.associatedUser.value) {
+				form.serial.focus();
+				alert( "Can't associate both person and equipment to a task.\nBear in mind that people who own equipment will automatically be linked to this task if you assign that equipment to it.");
+				return false;
+			}
+		}
+	}
+
+	function pressDelete( btnDelete) {
+		var sure;
+		sure = confirm( 'Delete this task?');
+		if( sure) {
+			btnDelete.form.doAction.value = 'delete';
+		}
+		return sure;
+	}
+</script>
+<h2 style="margin-top:0;">Associate Task With</h2>
+<form action="jobEdit.php" method="POST" onSubmit='return validateForm( this);' id="signup" name="signup">  <table>
+	<table>
+    <tr>
+      <!-- BEGIN EQUIPMENT_SECTION -->
+      <!-- BEGIN equipmentSearch -->
+      <td valign="top" class="labelcell">Equipment Serial :</td>
+      <td class="fieldcell"><input type='hidden' name='equipmentID' value='{EQUIPMENT_ID}'>
+        <input type='text' name='serial' value='{EQUIPMENT_SERIAL}'
+						onFocus='setInactive( this, this.form.user)';
+						onChange='this.form.equipmentID.value=""'>
+      </td>
+      <!-- END equipmentSearch -->
+      <!-- END EQUIPMENT_SECTION -->
+      <!-- BEGIN ASSOCIATED_USER_SECTION -->
+      <!-- BEGIN associatedUserSearch -->
+      <td class="labelcell">Name or Synergy ID :</td>
+      <td class="fieldcell"><input type="hidden" name="userID" value="{ASSOCIATED_PORTAL_USER_ID}">
+			<input type='text' name='user' value='{ASSOCIATED_USER_ID}'
+						onFocus='setInactive( this, this.form.serial);'>
+      </td>
+      <!-- END associatedUserSearch -->
+      <!-- END ASSOCIATED_USER_SECTION -->
+    </tr>
+  </table>
+  {EQUIPMENT_LIST} {ASSOCIATED_USER_LIST}
+  <h2>Task Details</h2>
+  <table>
+    <tr>
+      <td class="labelcell"><label for="problem">Problem :</label>
+      </td>
+      <td valign="top" class="fieldcell">
+        <select name="problemID" id="problem">
+          <!-- BEGIN OPTIONS_Problem -->
+          <option value='{VALUE}'{SELECTED}>{NAME}</option>
+          <!-- END OPTIONS_Problem -->
+        </select>
+      </td>
+      <td rowspan="4" valign="top" class="labelcell">Assign To :
+      </td>
+      <td rowspan="4" class="fieldcell">
+        <select name="assignedUserID" id="assignedUserID" size="8" tabindex="2" multiple="multiple">
+          <!-- BEGIN OPTIONS_AssignedUser -->
+          <option value='{VALUE}'{SELECTED}>{NAME}</option>
+          <!-- END OPTIONS_AssignedUser -->
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td class="labelcell">Campus :</td>
+      <td valign="top" class="fieldcell"><select name='campusID'>
+          <!-- BEGIN OPTIONS_Campus -->
+          <option value='{VALUE}'{SELECTED}>{NAME}</option>
+          <!-- END OPTIONS_Campus -->
+        </select>
+      </td>
+    </tr>
+      <td class="labelcell">Priority :</td>
+      <td valign="top" class="fieldcell"><select name='priorityID'>
+          <!-- BEGIN OPTIONS_Priority -->
+          <option value='{VALUE}'{SELECTED}>{NAME}</option>
+          <!-- END OPTIONS_Priority -->
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="labelcell">Due Date :
+      </td>
+      <td class="fieldcell"><input type='checkbox' name='dateNone' value='1' onClick='toggleDate( this, this.form.dateDay, this
+				.form.dateMonth, this.form.dateYear)'{NO_DATE_CHECK}>
+        <font size=-3>no due date</font><br>
+        <select name='dateDay'>
+          <!-- BEGIN OPTIONS_dateDay -->
+          <option value='{VALUE}'{SELECTED}>{NAME}
+          <!-- END OPTIONS_dateDay -->
+        </select>
+        /
+        <select name='dateMonth'>
+          <!-- BEGIN OPTIONS_dateMonth -->
+          <option value='{VALUE}'{SELECTED}>{NAME}
+          <!-- END OPTIONS_dateMonth -->
+        </select>
+        /
+        <select name='dateYear'>
+          <!-- BEGIN OPTIONS_dateYear -->
+          <option value='{VALUE}'{SELECTED}>{NAME}
+          <!-- END OPTIONS_dateYear -->
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="labelcell">Description :
+      </td>
+      <td class="fieldcell" colspan="3"><textarea name="description" id="description" cols="60" rows="4" tabindex="7">{DESCRIPTION}</textarea>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="labelcell">&nbsp;</td>
+      <td colspan="3" class="fieldcell">
+	    <input type='hidden' name='jobID' value='{JOB_ID}'>
+		<input type='hidden' name='doAction' value='{DO_ACTION}'>
+        <input class="button" type="submit" name="Submit" value="{DO_ACTION}" tabindex="10" />
+        <!-- BEGIN button_delete -->
+        <input type="submit" name="delete" value="delete" class="button" onClick='return pressDelete( this);'>
+        <!-- END button_delete -->
+      </td>
+    </tr>
+  </table>
+</form>
