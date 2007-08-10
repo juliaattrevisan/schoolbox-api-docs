@@ -66,18 +66,10 @@ class stats
 		$this->t_body->set_var("CODE", $code);
 	}
 	
-	function outputName($firstname, $lastname, $username, $localmail, $altmail)
+	function outputName($id, $firstname, $lastname)
 	{
-		$email = formatEmail(array('username'=>$username, 'local_email'=>$localmail, 'alt_email'=>$altmail));
-		
-		if($email){
-			$this->t_body->set_var("FNAME", "<a href=\"".$_SESSION['mailhandle'].$email."\">".$firstname."</a>");
-			$this->t_body->set_var("LNAME", "<a href=\"".$_SESSION['mailhandle'].$email."\">".$lastname."</a>");
-		}
-		else{
-			$this->t_body->set_var("FNAME", $firstname);
-			$this->t_body->set_var("LNAME", $lastname);
-		}			
+		$this->t_body->set_var("FNAME", "<a href=\"/search/userLookup.php?id=$id\">".$firstname."</a>");
+		$this->t_body->set_var("LNAME", "<a href=\"/search/userLookup.php?id=$id\">".$lastname."</a>");		
 	}
 
 
@@ -88,7 +80,7 @@ class stats
 
 	  	//get top ten recent hits
 		$query = "
-			SELECT 	lastname, title, firstname, username, local_email, alt_email, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date, hitcount 
+			SELECT 	user.id, lastname, title, firstname, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date, hitcount 
 			FROM 	user, homepage_log, category
 			WHERE   category.id = '" . $this->category . "'	
 			AND	category.id = homepage_log.cid  	
@@ -106,7 +98,7 @@ class stats
 			{
 				$this->t_body->set_var("COUNT", $student['hitcount']);	
 				
-				$this->outputName($student['firstname'], $student['lastname'], $student['username'], $student['local_email'], $student['alt_email']);
+				$this->outputName($student['id'], $student['firstname'], $student['lastname']);
 	
 				$this->t_body->set_var("DATE", $student['date']);	
 
@@ -131,7 +123,7 @@ class stats
 		$this->t_body->set_var("DISPLAY", "");
 
 		$query = "
-			SELECT 	lastname, title, firstname, hitcount, username, local_email, alt_email, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date
+			SELECT 	user.id, lastname, title, firstname, hitcount, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date
 			FROM 	user, homepage_log, category
 			WHERE   category.id = '" . $this->category . "'	
 			AND	category.id = homepage_log.cid  	
@@ -148,7 +140,7 @@ class stats
 			{
 				$this->t_body->set_var("DATE", $student['date']);	
 				$this->t_body->set_var("COUNT", $student['hitcount']);	
-				$this->outputName($student['firstname'], $student['lastname'], $student['username'], $student['local_email'], $student['alt_email']);
+				$this->outputName($student['id'], $student['firstname'], $student['lastname']);
 				$this->t_body->parse("tt_recent_block", "tt_recent_listing", true);
 			}
 		}
@@ -171,7 +163,7 @@ class stats
 		$this->t_body->set_var("DISPLAY", "Show All");
 
 		$query = "
-			SELECT 	lastname, title, firstname, username, local_email, alt_email, hitcount,  DATE_FORMAT(datetime, '%a %D %b %H:%i') as date 
+			SELECT 	user.id, lastname, title, firstname,  DATE_FORMAT(datetime, '%a %D %b %H:%i') as date 
 			FROM 	user, homepage_log, category
 			WHERE   category.id = '" . $this->category . "'	
 			AND	category.id = homepage_log.cid
@@ -189,7 +181,7 @@ class stats
 			{
 				$this->t_body->set_var("DATE", $student['date']);	
 				$this->t_body->set_var("COUNT", $student['hitcount']);	
-				$this->outputName($student['firstname'], $student['lastname'], $student['username'], $student['local_email'], $student['alt_email']);
+				$this->outputName($student['id'], $student['firstname'], $student['lastname']);
 				$this->t_body->parse("tt_freq_block", "tt_freq_listing", true);
 
 			}
@@ -213,7 +205,7 @@ class stats
 	 	$this->t_body->set_var("DISPLAY", "");	
 
 		$query = "
-			SELECT 	title, lastname, firstname, username, hitcount, local_email, alt_email, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date
+			SELECT 	user.id, title, lastname, firstname, hitcount, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date
 			FROM 	user, homepage_log, category
 			WHERE   category.id = '" . $this->category . "'	
 			AND	category.id = homepage_log.cid
@@ -231,7 +223,7 @@ class stats
 			{
 				$this->t_body->set_var("DATE", $student['date']);	
 				$this->t_body->set_var("COUNT", $student['hitcount']);	
-				$this->outputName($student['firstname'], $student['lastname'], $student['username'], $student['local_email'], $student['alt_email']);
+				$this->outputName($student['id'], $student['firstname'], $student['lastname']);
 				$this->t_body->parse("tt_freq_block", "tt_freq_listing", true);
 			}
 		}
@@ -260,8 +252,8 @@ class stats
 			  while($student = @mssql_fetch_array($result))
 			  {
 				$query = "
-					SELECT	username, title, firstname, lastname, local_email, alt_email, homepage_log.hitcount, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date 
-					FROM	user
+					SELECT	user.id, title, firstname, lastname, homepage_log.hitcount, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date 
+					FROM	 user
 					LEFT JOIN homepage_log  ON user.id = homepage_log.user
 					AND	homepage_log.cid = '".$this->category."'
 					WHERE	user.synergy_id = '". $student['synergy_id'] ."'
@@ -281,7 +273,7 @@ class stats
 						$this->t_body->set_var("COUNT", $info['hitcount']);		  
 						$this->t_body->set_var("DATE", $info['date']);
 					}
-					$this->outputName($info['firstname'], $info['lastname'],  $info['username'], $info['local_email'], $info['alt_email']);
+					$this->outputName($info['id'], $info['firstname'], $info['lastname']);
 
 				}
 				else
@@ -300,8 +292,8 @@ class stats
 		else 
 		{
 			$query = "
-				SELECT 	lastname, title, firstname, username, hitcount, local_email, alt_email, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date 
-				FROM 	user,userAccess
+				SELECT 	user.id, lastname, title, firstname, hitcount, DATE_FORMAT(datetime, '%a %D %b %H:%i') as date 
+				FROM 	(user,userAccess )
 				LEFT JOIN homepage_log ON user.id = homepage_log.user
 				WHERE  userAccess.sid =  " . $this->category . "
 				AND userAccess.service = ".HOMEPAGESERVICE."
@@ -319,7 +311,7 @@ class stats
 				{
 					$this->t_body->set_var("DATE", $member['date']);	
 					$this->t_body->set_var("COUNT", $member['hitcount']);	
-					$this->outputName($member['firstname'], $member['lastname'],  $member['username'], $member['local_email'], $member['alt_email']);
+					$this->outputName($member['id'], $member['firstname'], $member['lastname']);
 
 					$this->t_body->parse("all_block", "all_listing", true);
 				}

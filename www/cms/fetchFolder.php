@@ -60,7 +60,7 @@ function createZip() {
 	$fileList = $this->getResources();
 
 	mkdir($this->tmpFolder);
-	if(is_array($fileList) {
+	if(is_array($fileList)) {
 		foreach($fileList as $file) {
 			if(is_file(FILE_directory .'/'.$file['id'].'.dat')) {
 				//if two files in folder have same name it will overwrite.. not cool

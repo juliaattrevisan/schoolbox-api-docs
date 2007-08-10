@@ -207,7 +207,7 @@ class OutPut
 			and d.date = now() where l.cid = ".$this->category ;
                 $this->db->dbDoQuery($sql);
                 $block = false;
-                $this->t_body->set_var("DATE", 'Duties for '.date('l, jS of F'));
+                $this->t_body->set_var("DATE", 'Duties for '.date('l, jS \of F Y'));
                 while($row = $this->db->dbGetNextArray())
                 {
                         $this->t_body->set_var("DUTY", $row['name']);
