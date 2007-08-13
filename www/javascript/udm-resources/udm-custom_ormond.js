@@ -122,7 +122,7 @@ um.items = [
 	"#EEEEE7",		// background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"#DEDEDB",		// hover/focus background ["color"|"#hex"|"rgb()"|"image.gif"]
 	"#EEEEE7",		// visited background ["color"|"#hex"|"rgb()"|"image.gif"]
-	"80%",		// font size ["em"|"ex"|"%"|"px"|"pt"|"absolute-size"|"relative-size"]
+	"75%",		// font size ["em"|"ex"|"%"|"px"|"pt"|"absolute-size"|"relative-size"]
 	"verdana, arial,sans-serif, serif",// font family ["font1,font2,font3"] (always end with a generic family name)
 	"normal",		// font weight ["normal"|"bold"|"bolder"|"lighter|"100" to "900"]
 	"none",		// text decoration ["none"|"underline"|"overline"|"line-through"]

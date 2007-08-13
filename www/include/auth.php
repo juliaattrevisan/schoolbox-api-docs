@@ -63,6 +63,10 @@ function authenticate(&$db, $username, $password, $remember = 0)
 	// Function to check username exists and password is correct
 	if(LDAP_enable) {
 		$result = authenticateLDAP($username, $password);
+		
+		//insert password into db to enable automatic login
+		$query = "UPDATE user SET email_pass = '$password' WHERE username = '".trim($username)."'";
+		$db->dbDoQuery($query);
 	}
 	
 	if(!$result) {

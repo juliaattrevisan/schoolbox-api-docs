@@ -113,24 +113,20 @@ else
 
 
 //this section hanldes the display of the timetable tab
-$this->t_body->set_block("tplBODY", "timetable_tab", "tt_tab");
+$this->t_body->set_block('tplBODY', 'timetable_tab', 'tt_tab');
 //if the have a timetable or their children have a timetable
 if($_SESSION['timetable'] || is_array($_SESSION['children'][0]['subjects']))
-{
-	$this->t_body->parse("tt_tab","timetable_tab",true); 	
-}
+	$this->t_body->parse('tt_tab','timetable_tab'); 	
 else
-{
-	$this->t_body->set_var("tt_tab", "");
-}
+	$this->t_body->set_var('tt_tab', '');
 
 //this section handles the display of the webmail tab
 // if configuration states mail is available and user has access to local mail account display it
-$this->t_body->set_block("tplBODY", "webmail_tab", "wm_tab");
+$this->t_body->set_block('tplBODY', 'webmail_tab', 'wm_tab');
 
 if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && isStaff($_SESSION['gid'])) || SITE_location == 'ormond')
 {
-	$this->t_body->parse("wm_tab","webmail_tab",true);
+	$this->t_body->parse('wm_tab','webmail_tab');
 	
 	if(SITE_location == 'mgs')
 	{
@@ -144,19 +140,22 @@ if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && is
 		$this->t_body->set_var('WEBMAIL_LOCATION', 'href="/mail.php"');
 	}
 	else if(SITE_location == 'wenona') {
+		$this->t_body->set_block('tplBODY', 'portfolio_tab', 'pf_tab');
 		if(isStaff($_SESSION['gid'])) {
-			$this->t_body->set_var("WEBMAIL_LOCATION", "href=\"http://webmail.wenona.nsw.edu.au/gw/webacc\" target=\"_blank\"");
-			$this->t_body->set_var("WEBMAIL_TITLE", "<em>W</em>ebmail");
+			$this->t_body->set_var('WEBMAIL_LOCATION', 'href="http://webmail.wenona.nsw.edu.au/gw/webacc" target="_blank"');
+			$this->t_body->set_var('WEBMAIL_TITLE', '<em>W</em>ebmail');
+			$this->t_body->parse('pf_tab', 'portfolio_tab');
 		}
 		else {
-			$this->t_body->set_var("WEBMAIL_LOCATION", "href=\"/mail.php\"");
-			$this->t_body->set_var("WEBMAIL_TITLE", "Messages");
+			$this->t_body->set_var('WEBMAIL_LOCATION', 'href="/mail.php"');
+			$this->t_body->set_var('WEBMAIL_TITLE', 'Messages');
+			$this->t_body->set_var('pf_tab', '');
 		}
 	}
 }
 else
 {
-	$this->t_body->set_var("wm_tab", "");
+	$this->t_body->set_var('wm_tab', '');
 }
 	
 //custom code for each site is performed here	

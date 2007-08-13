@@ -3,12 +3,12 @@
 body{
  margin: 0;
  padding:0;
- background: #3A3F92;
+ background: #b4002f;
  color: #333333;
  }
 	 
 #hdr{
- background: #3A3F92 url(images/headLogo.gif) no-repeat right;
+ background: #b4002f url(/images/ormondLogo.jpg) no-repeat right;
  color:#000000;
  border-bottom: 2px solid #ffffff;
  margin:0;
@@ -21,7 +21,7 @@ body{
  left: 14px;
  width: 180px;
  border: 2px solid #ffffff;
- background: #686CC1;
+ background: #db4d59;
  color: #333333;
  margin: 0px;
  padding: 0px;
@@ -41,7 +41,7 @@ body{
  /*----------------------------------------------------------------------------*/
  
  #globalWrap	{
-	background:#3A3F92;
+	background:#b4002f;
 	margin-top: 0;
 	margin-left: auto; 
 	margin-right: auto; 

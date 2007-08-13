@@ -14,17 +14,27 @@ h1, h2{
 	letter-spacing: 1px;
 	line-height:1.1em;
 	}
-	
+
 h1 {
-	padding:14px 0px 10px 20px;
-	margin:0;
-	font-weight: bold; 
 	font-size: 50px;
-	color:#E8ECF0;
+	background:#fff url(/images/ormond/heading-back.gif) repeat-x;
+	padding:14px 0px 10px 20px;
+	border-bottom:1px dotted #1c1713;
+	margin-bottom:5px;
+	font-weight: bold; 
+	}
+	
+h2 {
+	font-size: 18px;
+	background:#fff url(/images/ormond/heading-back.gif) repeat-x;
+	margin:35px 0 10px 0;
+	padding: 3px 10px;
+	border-bottom:1px dotted #1c1713;
+	font-weight: bold; 
 	}
 
 h3 {
-	background-color: #F9FBFD; 
+	background-color: #fff; 
 	border: 1px solid #D7E5F2; 
 	font-family: "Trebuchet MS", "Bitstream Vera Sans", verdana, lucida, arial, helvetica, sans-serif;
 	color:#369;
@@ -32,21 +42,6 @@ h3 {
 	font-size: 15px;
 	padding:3px 0px 3px 10px;
 	letter-spacing: 1px;
-	}
-
-
-h2 {
-	font-family: "Trebuchet MS", "Bitstream Vera Sans", verdana, lucida, arial, helvetica, sans-serif;
-	font-weight: normal;
-	letter-spacing: 1px;
-	background: #E8ECF0;
-	border: 1px solid #7088B0;
-	color: #036;	 
-	font-weight: bold; 
-	text-align:left;
-    font-size: 18px;
-	margin:35px 0 10px 0;
-	padding: 3px 10px;
 	}
 
 h4 {
