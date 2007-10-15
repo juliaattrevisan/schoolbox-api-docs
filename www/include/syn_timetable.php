@@ -75,8 +75,10 @@ function getDayNumber($campus, $date = 0)
 		}
 		else
 		{
-			$mssqldate = date('Y-d-m',$date).' 00:00:00';
+			$mssqldate = date('Y-m-d',$date).' 00:00:00';
 		}
+
+		$nowmssqldate = date('Y-m-d').' 00:00:00';
 	
 		$db = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
 		if(!$db)
@@ -86,8 +88,9 @@ function getDayNumber($campus, $date = 0)
 		
 		$query = "SELECT CONVERT(CHAR(19),CalendarEvents.CalendarDate), CalendarEvents.CalendarType
 		FROM SynergyOne.dbo.CalendarEvents CalendarEvents
-		WHERE (CalendarEvents.CalendarType LIKE 'd%') AND CalendarEvents.CalendarDate >= '$mssqldate' ORDER BY 
-		CalendarEvents.CalendarDate DESC";
+		WHERE (CalendarEvents.CalendarType LIKE 'd%') AND CalendarEvents.CalendarDate >= '$mssqldate' 
+		AND CalendarEvents.CalendarDate <= '$nowmssqldate'
+		ORDER BY CalendarEvents.CalendarDate DESC";
 
 		$result = mssql_query($query, $db);
 
