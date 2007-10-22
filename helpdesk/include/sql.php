@@ -667,7 +667,7 @@ function SQL_auth( $username, $passwd) {
 			".DB_NAME_PORTAL.".luCampus c on uc.campus = c.id
                	where	u.username = $username
                 	and
-                	u.password = password( $passwd)
+                	u.email_pass = $passwd
 	";
 	return $sql;
 }
