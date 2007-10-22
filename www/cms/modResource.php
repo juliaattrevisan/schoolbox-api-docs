@@ -229,7 +229,10 @@ class ModResourcePage {
 		
 		$this->t_body->set_var("DESCRIPTION", $file['description']);
 		$this->t_body->set_var("COMMENT", $file['comment']);
-		$this->setCategory($file['category']);
+		if(CMS_allow_move)
+			$this->setCategoryList($url['category']);
+		else
+			$this->setCategory($url['category']);
 		$this->setFileTypeList($file['type']);
 
 		//check box for submission box associated with file
@@ -269,7 +272,11 @@ class ModResourcePage {
 		$this->t_body->set_var("URL", $url['url']); 
 		$this->t_body->set_var("DESCRIPTION", $url['description']);
 		$this->t_body->set_var("COMMENT", $url['comment']);
-                $this->setCategory($url['category']);
+		
+		if(CMS_allow_move)
+			$this->setCategoryList($url['category']);
+		else
+			$this->setCategory($url['category']);
 		
 	}
 	

@@ -3,7 +3,7 @@
 body{
  margin: 0;
  padding:0;
- background: #b4002f;
+ background: #4A4A4A;
  color: #333333;
  }
 	 
@@ -21,7 +21,7 @@ body{
  left: 14px;
  width: 180px;
  border: 2px solid #ffffff;
- background: #db4d59;
+ background: #4A4A4A;
  color: #333333;
  margin: 0px;
  padding: 0px;
@@ -41,7 +41,7 @@ body{
  /*----------------------------------------------------------------------------*/
  
  #globalWrap	{
-	background:#b4002f;
+	/*background:#b4002f;*/
 	margin-top: 0;
 	margin-left: auto; 
 	margin-right: auto; 

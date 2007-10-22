@@ -525,9 +525,9 @@ href=\"/homepage.php?code=".urlencode($period['code'])."\">{$period['description
 		//output headlines
 		if(is_array($headlineList['items']) ) {
 			foreach($headlineList['items'] as $item) {
-				$this->set_var("RSS_TITLE", $item['title']);
-				$this->set_var("RSS_URL", $item['link']); 
-				$this->set_var("RSS_BRIEF", $item['description']);
+				$this->set_var("RSS_TITLE", scrubTEXT($item['title']));
+				$this->set_var("RSS_URL", scrubHTML($item['link'])); 
+				$this->set_var("RSS_BRIEF", scrubTEXT($item['description']));
 				$this->t_body->parse("rss_block", "rss_stories", true);
 	    	}
 		}

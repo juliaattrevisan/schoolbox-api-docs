@@ -17,27 +17,31 @@ h1, h2{
 
 h1 {
 	font-size: 50px;
-	background:#fff url(/images/ormond/heading-back.gif) repeat-x;
+	color:#fff;
+	/*background:#b4002f;*/
+	/*background:#fff url(/images/heading-back.gif) repeat-x;*/
 	padding:14px 0px 10px 20px;
-	border-bottom:1px dotted #1c1713;
+	margin-top:0px;
 	margin-bottom:5px;
 	font-weight: bold; 
 	}
 	
 h2 {
 	font-size: 18px;
-	background:#fff url(/images/ormond/heading-back.gif) repeat-x;
+	color:#B4002F;
+	/*background:#fff url(/images/heading-back.gif) repeat-x;*/
+	background:#fdf3f3;
 	margin:35px 0 10px 0;
 	padding: 3px 10px;
-	border-bottom:1px dotted #1c1713;
+	border:1px solid #ffcccc;
 	font-weight: bold; 
 	}
 
 h3 {
 	background-color: #fff; 
-	border: 1px solid #D7E5F2; 
+	border: 1px solid #fae7e7; 
 	font-family: "Trebuchet MS", "Bitstream Vera Sans", verdana, lucida, arial, helvetica, sans-serif;
-	color:#369;
+	color:#B4002F;
 	font-weight: bold;
 	font-size: 15px;
 	padding:3px 0px 3px 10px;
@@ -64,7 +68,7 @@ h4 {
 	border-left: 0;
 	border-right: 0;
 	font: bold 12px /12px Tahoma, "Trebuchet MS", "Bitstream Vera Sans", verdana, lucida, arial, helvetica, sans-serif;
-	background-color: #7088B0; 
+	background-color: #4A4A4A; 
 	color: #fff;
 	text-decoration: none;
 	width:auto;
@@ -87,11 +91,11 @@ a {
 }
 
 a:link, a:visited {
-	color: #3670A7;
+	color: #B4002F;
 }
 
 a:active {
-	color: #3670A7;
+	color: #B4002F;
 }
 
 a:hover {
@@ -113,7 +117,7 @@ td {
 
 table thead td.tableHead, table thead td.tableHeadLeft{
 	font: bold 12px /16px Verdana, Arial, Sans-serif;
-	color:#369;
+	color:#B4002F;
 	text-align:center;
 	padding: 6px 10px;
 	border-bottom: 1px solid #ccc;
@@ -163,28 +167,28 @@ tr.disabled a{
 /*__________________________________________________________________________________________________________*/
 
 #signup table { 
-	background-color: #F9FBFD; 
+	background-color: #fdf3f3; 
 	color: #000000; 
 	width: 100%; 
-	border: 1px solid #D7E5F2; 
+	border: 1px solid #ffcccc; 
 	border-collapse: collapse; 
 	} 
 
 #signup td { 
-	border: 1px solid #D7E5F2; 
+	border: 1px solid #ffcccc; 
 	padding-left: 4px; 
 	}
 
 .labelcell { 
 	font: bold 11px Verdana, Geneva, Arial, Helvetica, sans-serif; 
-	color: #3670A7; 
+	color: #B4002F; 
 	background-color: transparent; 
 	vertical-align:top; 
 	} 
 
 .fieldcell { 
 	font-weight:normal;
-	background-color: #F2F7FB; 
+	background-color: #fff; 
 	color: #000000; 
 	text-align: left; 
 	margin-right: 0px; 
@@ -193,7 +197,7 @@ tr.disabled a{
 
 .fieldcell input, .fieldcell select, .fieldcell textarea { 
 	font: 11px Verdana, Geneva, Arial, Helvetica, sans-serif; 
-	background-color: #D7E5F2; 
+	background-color: #fff; 
 	color: #102132; 
 	border: 1px solid #284279; 
 	margin-right: 0px; 
@@ -211,7 +215,7 @@ tr.disabled a{
 
 #searchBox input{
 	border: 1px solid #fff;
-	background: #686CC1;
+	background: #B5B5B5;
 	color: #fff;
 	padding-left: 3px;
 	padding-right: 2px;
@@ -221,7 +225,7 @@ tr.disabled a{
 	font: bold 12px Verdana, Geneva, Arial, Helvetica, sans-serif; 
 		border: 1px solid #fff;
 
- 	background: #686CC1; 
+ 	background: #A4A4A4; 
 	color: #fff; 
  	margin-top: 3px; 
 	margin-bottom: 2px; 
@@ -229,7 +233,7 @@ tr.disabled a{
 
 #searchBox input.button {
 	font: bold 12px Verdana, Geneva, Arial, Helvetica, sans-serif; 
- 	background: #686CC1; 
+ 	background: #A4A4A4; 
 	color: #fff; 
  	margin-top: 3px; 
 	margin-bottom: 2px; 
