@@ -77,7 +77,7 @@ class ModuleEventAdd extends HelpDeskPage {
 						Job ID : {$row['jobID']}<br />
 						Problem : {$row['problem']}<br />
 						Description : {$row['description']}<br /><br />
-						You can monitor the progress of your job through the <a href=\"http://portal.mgs.vic.edu.au/modules/helpdesk/\">portal</a>. ");
+						You can monitor the progress of your job through the <a href=\"http://portal.".SITE_DOMAIN."/modules/helpdesk/\">portal</a>. ");
 				}
 			break;
 			case DB_ID_EVENT_JOB_REASSIGNED :

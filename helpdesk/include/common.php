@@ -2,7 +2,8 @@
 
 #Site constants
 define('MAIL_DOMAIN', '@mgs.vic.edu.au');
-
+define('SITE_NAME',		'MGS Helpdesk');
+define('SITE_DOMAIN', 'mgs.vic.edu.au');
 
 # Email messages
 define('EMAIL_EVENT_NOTIFICATION_SYSTEM', true);

@@ -67,6 +67,16 @@ function getNews()
 	return $this->dbConnection->dbGetAllRows($query);
 }
 
+function getNewsArchive()
+{
+    $query = "SELECT subject_news.id, heading, owner, DATE_FORMAT(datetime_posted, '%W %M %e %Y @ %l:%i%p') AS datetime,
+    body, username, user.id as uid, lastname, title, firstname 
+    FROM subject_news, user WHERE user.id = subject_news.owner AND code = '$this->code' AND deleted = 0 
+    ORDER BY datetime_posted DESC";
+
+	return $this->dbConnection->dbGetAllRows($query);
+}
+
 function getSingleNews($id)
 {
   $SQL_QUERY = "SELECT owner, heading, body, code FROM subject_news WHERE id = '$id' AND deleted = 0";

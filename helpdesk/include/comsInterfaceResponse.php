@@ -14,7 +14,7 @@
 		$tpl->set_file('tplContent', 'email.html');
 		
 		$tpl->set_var( 'CONTENT', $message);
-		$tpl->set_var( 'TITLE', 'MGS Helpdesk - Automated Response' );
+		$tpl->set_var( 'TITLE', SITE_NAME.' - Automated Response' );
 		$message = $tpl->parse('output', 'tplContent');
 		
 		/*$to = $person."@mgs.vic.edu.au";	#set the person to send email to
@@ -32,7 +32,7 @@
 		$headers .= "Content-type: text/html; charset=iso-8859-1\r\n";
 
 		/* additional headers */		
-		$headers .= "From: MGS Helpdesk <helpdesk@mgs.vic.edu.au>\r\n";
+		$headers .= "From: ".SITE_NAME." <helpdesk".MAIL_DOMAIN.">\r\n";
 
 		/* and now mail it */
 		mail($to, $subject, $message, $headers);

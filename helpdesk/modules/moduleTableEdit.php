@@ -133,17 +133,18 @@ class ModuleTableEdit extends HelpDeskPage {
 
 			if( $sqlCurr != '') {		# Couldn't get array_filter to work properly so slight kludge
 				$row = mysql_fetch_assoc( mysql_query( $sqlCurr));
-
+				if(is_array($row)) {
 					# If this table has a column named $idName
-				if( array_key_exists( $idName, $row)) {
-					$sql = SQL_checkForeignKey( $id, $tableNameCurr, $idName);
-					$query = mysql_query( $sql);
-					if( mysql_num_rows( $query) > 0) {
-						return( "Error deleting row id '" . $id . "' from table '" . $this->_tableName . "'.<br>
-							Foreign key is still in use according to SQL:<blockquote>" . $sql . "</blockquote>
-							If you're aware of this and wish to continue please get a developer to do it manually.
-							<br>The deletion has been cancelled.<br><br>
-							<a href='javascript:history.go(-1)'>back</a>");
+					if( array_key_exists( $idName, $row)) {
+						$sql = SQL_checkForeignKey( $id, $tableNameCurr, $idName);
+						$query = mysql_query( $sql);
+						if( mysql_num_rows( $query) > 0) {
+							return( "Error deleting row id '" . $id . "' from table '" . $this->_tableName . "'.<br>
+								Foreign key is still in use according to SQL:<blockquote>" . $sql . "</blockquote>
+								If you're aware of this and wish to continue please get a developer to do it manually.
+								<br>The deletion has been cancelled.<br><br>
+								<a href='javascript:history.go(-1)'>back</a>");
+						}
 					}
 				}
 			}
