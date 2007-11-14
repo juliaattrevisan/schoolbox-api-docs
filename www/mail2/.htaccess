@@ -1,10 +1,23 @@
 # AddDefaultCharset	UTF-8
-php_flag	display_errors	Off
-php_flag	log_errors	On
-php_value	error_log	logs/errors
-php_value	upload_max_filesize	2M
+AddType text/x-component .htc
 
-<FilesMatch "(\.inc|\~)$|^_">
+<IfModule mod_php4.c>
+  php_flag	display_errors	Off
+  php_flag	log_errors	On
+  php_value	error_log	logs/errors
+  php_value	upload_max_filesize	5M
+  php_value	post_max_size	6M
+</IfModule>
+
+<IfModule mod_php5.c>
+  php_flag	display_errors	Off
+  php_flag	log_errors	On
+  php_value	error_log	logs/errors
+  php_value	upload_max_filesize	5M
+  php_value	post_max_size	6M
+</IfModule>
+
+<FilesMatch "(\.inc|\~)$">
   Order allow,deny
   Deny from all
 </FilesMatch>

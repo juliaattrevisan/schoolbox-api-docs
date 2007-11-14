@@ -10,6 +10,7 @@ REQUIREMENTS
    - error_reporting E_ALL & ~E_NOTICE (or lower)
    - file_uploads on (for attachment upload features)
    - memory_limit (increase as suitable to support large attachments)
+* PHP compiled with Open SSL to connect to IMAPS and to use the spell checker
 * A MySQL or PostgreSQL database engine or the SQLite extension for PHP
 * A database with permission to create tables
 
@@ -42,7 +43,7 @@ roundcube user. Here is an example of that procedure:
 # mysql
 > CREATE DATABASE roundcubemail;
 > GRANT ALL PRIVILEGES ON roundcubemail.* TO roundcube@localhost
-        IDENTIFIED BY 'password';
+    IDENTIFIED BY 'password';
 > quit
 # mysql roundcubemail < SQL/mysql.initial.sql
 
@@ -55,7 +56,7 @@ RoundCube with utf-8 charset. Here's an example of the init procedure:
 # mysql
 > CREATE DATABASE roundcubemail DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 > GRANT ALL PRIVILEGES ON roundcubemail.* TO roundcube@localhost
-        IDENTIFIED BY 'password';
+    IDENTIFIED BY 'password';
 > quit
 
 # mysql roundcubemail < SQL/mysql5.initial.sql
@@ -103,9 +104,17 @@ CONFIGURATION
 Change the files in config/* according your to environment and your needs.
 Details about the config paramaters can be found in the config files.
 
+You can also modify the default .htaccess file. This is necessary to
+increase the allowed size of file attachments, for example:
+  php_value       upload_max_filesize     2M
+
+To enable the experimental HTML editor you need to set the config
+parameter 'enable_htmleditor' to true.
+
 
 UPGRADING
 =========
+
 If you already have a previous version of RoundCube installed,
 please refer to the instructions in UPGRADING guide.
 
