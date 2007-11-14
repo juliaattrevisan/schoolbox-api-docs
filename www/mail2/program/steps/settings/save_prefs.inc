@@ -5,7 +5,7 @@
  | program/steps/settings/save_prefs.inc                                 |
  |                                                                       |
  | This file is part of the RoundCube Webmail client                     |
- | Copyright (C) 2005, RoundCube Dev. - Switzerland                      |
+ | Copyright (C) 2005-2007, RoundCube Dev. - Switzerland                 |
  | Licensed under the GNU GPL                                            |
  |                                                                       |
  | PURPOSE:                                                              |
@@ -15,7 +15,7 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: save_prefs.inc 388 2006-12-01 18:06:16Z thomasb $
+ $Id: save_prefs.inc 768 2007-09-01 14:55:10Z till $
 
 */
 
@@ -42,14 +42,21 @@ if (isset($_POST['_language']))
   rcmail_set_locale($sess_user_lang);
   }
 
+// force min size
+if ($a_user_prefs['pagesize'] < 1)
+  {
+  $a_user_prefs['pagesize'] = 10;
+  }
+if (isset($CONFIG['max_pagesize']) && ($a_user_prefs['pagesize'] > $CONFIG['max_pagesize']))
+  {
+  $a_user_prefs['pagesize'] = (int) $CONFIG['max_pagesize'];
+  }
+
 if (rcmail_save_user_prefs($a_user_prefs))
-  show_message('successfullysaved', 'confirmation');
+  $OUTPUT->show_message('successfullysaved', 'confirmation');
 
 
 // go to next step
-$_action = 'preferences';
-
-// overwrite action variable  
-$OUTPUT->add_script(sprintf("\n%s.set_env('action', '%s');", $JS_OBJECT_NAME, $_action));  
+rcmail_overwrite_action('preferences');
 
 ?>

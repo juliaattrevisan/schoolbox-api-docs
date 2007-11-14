@@ -5,7 +5,7 @@
  | program/steps/settings/func.inc                                       |
  |                                                                       |
  | This file is part of the RoundCube Webmail client                     |
- | Copyright (C) 2005, RoundCube Dev. - Switzerland                      |
+ | Copyright (C) 2005-2007, RoundCube Dev. - Switzerland                 |
  | Licensed under the GNU GPL                                            |
  |                                                                       |
  | PURPOSE:                                                              |
@@ -15,18 +15,21 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: func.inc 419 2006-12-20 14:06:33Z thomasb $
+ $Id: func.inc 892 2007-10-20 21:47:11Z thomasb $
 
 */
 
 
 // get user record
 $sql_result = $DB->query("SELECT username, mail_host FROM ".get_table_name('users')."
-                          WHERE  id=?",
-                          $_SESSION['id']);
+                          WHERE  user_id=?",
+                          $_SESSION['user_id']);
                                  
 if ($USER_DATA = $DB->fetch_assoc($sql_result))
-  $PAGE_TITLE = sprintf('%s %s@%s', rcube_label('settingsfor'), $USER_DATA['username'], $USER_DATA['mail_host']);
+{
+  $username = $USER_DATA['username'] . (!strpos($USER_DATA['username'], '@') ? '@'.$USER_DATA['mail_host'] : '');
+  $OUTPUT->set_pagetitle(sprintf('%s %s', rcube_label('settingsfor'), $username));
+}
 
 
 
@@ -34,7 +37,7 @@ function rcmail_user_prefs_form($attrib)
   {
   global $DB, $CONFIG, $sess_user_lang;
 
-  $no_override = is_array($CONFIG['dont_override']) ? array_flip($CONFIG['dont_override']) : array();
+  $no_override = !empty($CONFIG['dont_override']) ? array_flip((array)$CONFIG['dont_override']) : array('preview_pane'=>true);
 
   // add some labels to client
   rcube_add_label('nopagesizewarning');
@@ -97,7 +100,7 @@ function rcmail_user_prefs_form($attrib)
     $select_timezone->add('(GMT +8:00) Beijing, Perth, Singapore, Taipei', '8');
     $select_timezone->add('(GMT +9:00) Tokyo, Seoul, Yakutsk', '9');
     $select_timezone->add('(GMT +9:30) Adelaide, Darwin', '9.5');
-    $select_timezone->add('(GMT +10:00) EAST/AEST: Guam, Vladivostok', '10');
+    $select_timezone->add('(GMT +10:00) EAST/AEST: Sydney, Guam, Vladivostok', '10');
     $select_timezone->add('(GMT +11:00) Magadan, Solomon Islands', '11');
     $select_timezone->add('(GMT +12:00) Auckland, Wellington, Kamchatka', '12');
     $select_timezone->add('(GMT +13:00) Tonga, Pheonix Islands', '13');
@@ -158,7 +161,7 @@ function rcmail_user_prefs_form($attrib)
     }
 
   // Show checkbox for HTML Editor
-  if (!isset($no_override['htmleditor']))
+  if (!isset($no_override['htmleditor']) && $CONFIG['enable_htmleditor'])
     {
     $field_id = 'rcmfd_htmleditor';
     $input_htmleditor = new checkbox(array('name' => '_htmleditor', 'id' => $field_id, 'value' => 1));
@@ -202,15 +205,15 @@ function rcmail_user_prefs_form($attrib)
 
 function rcmail_identities_list($attrib)
   {
-  global $DB, $CONFIG, $OUTPUT, $JS_OBJECT_NAME;
+  global $DB, $CONFIG, $OUTPUT;
 
 
   // get contacts from DB
   $sql_result = $DB->query("SELECT * FROM ".get_table_name('identities')."
                             WHERE  del<>1
-                            AND    id=?
+                            AND    user_id=?
                             ORDER BY standard DESC, name ASC",
-                            $_SESSION['id']);
+                            $_SESSION['user_id']);
 
 
   // add id to message list table if not specified
@@ -224,8 +227,7 @@ function rcmail_identities_list($attrib)
   $out = rcube_table_output($attrib, $sql_result, $a_show_cols, 'identity_id');
   
   // set client env
-  $javascript = sprintf("%s.gui_object('identitieslist', '%s');\n", $JS_OBJECT_NAME, $attrib['id']);
-  $OUTPUT->add_script($javascript);    
+  $OUTPUT->add_gui_object('identitieslist', $attrib['id']);
 
   return $out;
   }
@@ -235,7 +237,7 @@ function rcmail_identities_list($attrib)
 // similar function as in /steps/addressbook/edit.inc
 function get_form_tags($attrib, $action, $add_hidden=array())
   {
-  global $OUTPUT, $JS_OBJECT_NAME, $EDIT_FORM, $SESS_HIDDEN_FIELD;  
+  global $OUTPUT, $EDIT_FORM, $SESS_HIDDEN_FIELD;  
 
   $form_start = '';
   if (!strlen($EDIT_FORM))
@@ -258,12 +260,19 @@ function get_form_tags($attrib, $action, $add_hidden=array())
   $form_name = strlen($attrib['form']) ? $attrib['form'] : 'form';
 
   if (!strlen($EDIT_FORM))
-    $OUTPUT->add_script("$JS_OBJECT_NAME.gui_object('editform', '$form_name');");
+    $OUTPUT->add_gui_object('editform', $form_name);
   
   $EDIT_FORM = $form_name;
 
   return array($form_start, $form_end);  
   }
+
+
+// register UI objects
+$OUTPUT->add_handlers(array(
+  'userprefs' => 'rcmail_user_prefs_form',
+  'itentitieslist' => 'rcmail_identities_list'
+));
 
 
 ?>

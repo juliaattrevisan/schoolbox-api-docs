@@ -15,7 +15,7 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: save_identity.inc 462 2007-01-31 22:11:08Z thomasb $
+ $Id: save_identity.inc 543 2007-04-28 18:07:12Z thomasb $
 
 */
 
@@ -27,7 +27,7 @@ $updated = $default_id = false;
 // check input
 if (empty($_POST['_name']) || empty($_POST['_email']))
   {
-  show_message('formincomplete', 'warning');
+  $OUTPUT->show_message('formincomplete', 'warning');
   rcmail_overwrite_action('edit-identitiy');
   return;
   }
@@ -62,17 +62,17 @@ if ($_POST['_iid'])
       "UPDATE ".get_table_name('identities')."
        SET ".join(', ', $a_write_sql)."
        WHERE  identity_id=?
-       AND    id=?
+       AND    user_id=?
        AND    del<>1",
       get_input_value('_iid', RCUBE_INPUT_POST),
-      $_SESSION['id']);
+      $_SESSION['user_id']);
                        
     $updated = $DB->affected_rows();
     }
        
   if ($updated)
     {
-    show_message('successfullysaved', 'confirmation');
+    $OUTPUT->show_message('successfullysaved', 'confirmation');
     
     if (!empty($_POST['_standard']))
       $default_id = get_input_value('_iid', RCUBE_INPUT_POST);
@@ -86,7 +86,7 @@ if ($_POST['_iid'])
   else if ($DB->is_error())
     {
     // show error message
-    show_message('errorsaving', 'error');
+    $OUTPUT->show_message('errorsaving', 'error');
     rcmail_overwrite_action('edit-identitiy');
     return;
     }
@@ -110,9 +110,9 @@ else
   if (sizeof($a_insert_cols))
     {
     $DB->query("INSERT INTO ".get_table_name('identities')."
-                (id, ".join(', ', $a_insert_cols).")
+                (user_id, ".join(', ', $a_insert_cols).")
                 VALUES (?, ".join(', ', $a_insert_values).")",
-                $_SESSION['id']);
+                $_SESSION['user_id']);
 
     $insert_id = $DB->insert_id(get_sequence_name('identities'));
     }
@@ -133,7 +133,7 @@ else
   else
     {
     // show error message
-    show_message('errorsaving', 'error');
+    $OUTPUT->show_message('errorsaving', 'error');
     rcmail_overwrite_action('edit-identity');
     return;
     }
@@ -145,13 +145,13 @@ if ($default_id)
   $DB->query(
     "UPDATE ".get_table_name('identities')."
      SET ".$DB->quoteIdentifier('standard')."='0'
-     WHERE  id=?
+     WHERE  user_id=?
      AND    identity_id<>?
      AND    del<>1",
-    $_SESSION['id'],
+    $_SESSION['user_id'],
     $default_id);
 
 // go to next step
-rcmail_overwrite_action($_POST['_framed'] ? 'edit-identity' : 'identities');
+rcmail_overwrite_action($_framed ? 'edit-identity' : 'identities');
 
 ?>
