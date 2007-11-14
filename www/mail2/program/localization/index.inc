@@ -5,7 +5,7 @@
  | program/localization/index.inc                                        |
  |                                                                       |
  | This file is part of the RoundCube Webmail client                     |
- | Copyright (C) 2005, RoundCube Dev, - Switzerland                      |
+ | Copyright (C) 2005-2007, RoundCube Dev. - Switzerland                 |
  | Licensed under the GNU GPL                                            |
  |                                                                       |
  | PURPOSE:                                                              |
@@ -16,7 +16,7 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: index.inc 480 2007-02-16 08:46:46Z tomekp $
+ $Id: index.inc 886 2007-10-19 07:24:53Z yllar $
  
  */
  
@@ -27,27 +27,33 @@
 	'am'    => 'Armenian',
 	'bg'    => 'Bulgarian',
 	'bs_BA' => 'Bosnian (Bosanski)',
-	'tw'    => 'Chinese (BIG5)',
-	'zh_CN' => 'Chinese (GB2312)',
+	'zh_TW' => 'Chinese (Traditional)',
+	'zh_CN' => 'Chinese (Simplified)',
  	'ca'    => 'Català',
 	'cz'    => 'Czech',
 	'da'    => 'Dansk',
  	'de_DE' => 'Deutsch (Deutsch)',
  	'de_CH' => 'Deutsch (Schweiz)',
+	'eo'	=> 'Esperanto',
  	'es'    => 'Español',
  	'et_EE' => 'Estonian',
 	'eu'    => 'Euskara',
 	'fr'    => 'Français', 
-	'ga'    => 'Galician',
+	'gl'    => 'Galego',
+	'ga_IE' => 'Irish',
 	'el'    => 'Greek',
-	'hr'		=> 'Hrvatski',
+	'hi'    => 'Hindi',
+	'hr'    => 'Hrvatski',
 	'hu'    => 'Hungarian',
-	'id_ID'	=> 'Indonesian',
+	'id_ID' => 'Indonesian',
 	'it'    => 'Italiano',
 	'ja'    => 'Japanese (日本語)',
 	'kr'    => 'Korean',
+	'kur_KU' => 'Kurdish (Kurmancî)',
 	'lv'    => 'Latvian',
 	'lt'    => 'Lithuanian',
+	'mk'    => 'Macedonian (Slavic FYROM)',
+	'ms_MY'	=> 'Malay',
 	'nl_NL' => 'Nederlands',
 	'nl_BE' => 'Flemish',
 	'nb_NO' => 'Norsk (bokmål)',
@@ -60,24 +66,29 @@
 	'ru'    => 'Russian',
 	'fi'    => 'Suomi',
 	'se'    => 'Svenska',
-	'si'    => 'Slovenian',
+	'si'    => 'Sinhala',
+	'sl'    => 'Slovenian',
 	'sk'    => 'Slovak',
-	'sr_latin'    => 'Serbian Latin',
-    'sr_cyrillic'    => 'Serbian Cyrillic',
+	'sr_latin' => 'Serbian Latin',
+	'sr_cyrillic' => 'Serbian Cyrillic',
 	'tr'    => 'Turkish',
-	'th'    => 'Thai',
+	'th_TH' => 'Thai',
+	'uk'    => 'Ukrainian',
 	'vn'    => 'Vietnamese'
 );
 
 $rcube_language_aliases = array(
 	'ee' => 'et_EE',
 	'bs' => 'bs_BA',
-  'cn' => 'zh_CN',
+	'cn' => 'zh_CN',
 	'de' => 'de_DE',
 	'en' => 'en_US',
+	'ga' => 'ga_IE',
 	'nl' => 'nl_NL',
 	'no' => 'nn_NO',
-	'pt' => 'pt_PT'
+	'pt' => 'pt_PT',
+	'th' => 'th_TH',
+	'tw' => 'zh_TW'
 );
 
 $rcube_charsets = array();
