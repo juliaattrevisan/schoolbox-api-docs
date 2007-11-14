@@ -37,10 +37,12 @@ function rcube_list_widget(list, p)
   this.multiselect = false;
   this.draggable = false;
   this.keyboard = false;
+  this.toggleselect = false;
   
   this.dont_select = false;
   this.drag_active = false;
   this.last_selected = 0;
+  this.shift_start = 0;
   this.in_selection_before = false;
   this.focused = false;
   this.drag_mouse_start = null;
@@ -95,7 +97,7 @@ init: function()
 init_row: function(row)
 {
   // make references in internal array and set event handlers
-  if (row && String(row.id).match(/rcmrow([0-9]+)/))
+  if (row && String(row.id).match(/rcmrow([a-z0-9\-_=]+)/i))
   {
     var p = this;
     var uid = RegExp.$1;
@@ -117,22 +119,27 @@ init_row: function(row)
 /**
  *
  */
-clear: function()
+clear: function(sel)
 {
   var tbody = document.createElement('TBODY');
   this.list.insertBefore(tbody, this.list.tBodies[0]);
   this.list.removeChild(this.list.tBodies[1]);
-  this.rows = new Array();  
+  this.rows = new Array();
+  
+  if (sel) this.clear_selection();
 },
 
 
 /**
  * 'remove' message row from list (just hide it)
  */
-remove_row: function(uid)
+remove_row: function(uid, sel_next)
 {
   if (this.rows[uid].obj)
     this.rows[uid].obj.style.display = 'none';
+
+  if (sel_next)
+    this.select_next();
 
   this.rows[uid] = null;
 },
@@ -216,7 +223,7 @@ drag_row: function(e, id)
   if (this.draggable && this.selection.length)
   {
     this.drag_start = true;
-	this.drag_mouse_start = rcube_event.get_mouse_pos(e);
+    this.drag_mouse_start = rcube_event.get_mouse_pos(e);
     rcube_event.add_listener({element:document, event:'mousemove', object:this, method:'drag_mouse_move'});
     rcube_event.add_listener({element:document, event:'mouseup', object:this, method:'drag_mouse_up'});
   }
@@ -299,6 +306,9 @@ select_row: function(id, mod_key, with_mouse)
   var select_before = this.selection.join(',');
   if (!this.multiselect)
     mod_key = 0;
+    
+  if (!this.shift_start)
+    this.shift_start = id
 
   if (!mod_key)
   {
@@ -310,13 +320,12 @@ select_row: function(id, mod_key, with_mouse)
     switch (mod_key)
     {
       case SHIFT_KEY:
-        this.shift_select(id, false); 
+        this.shift_select(id, false);
         break;
 
       case CONTROL_KEY:
-        this.shift_start = id;
         if (!with_mouse)
-          this.highlight_row(id, true); 
+          this.highlight_row(id, true);
         break; 
 
       case CONTROL_SHIFT_KEY:
@@ -324,7 +333,7 @@ select_row: function(id, mod_key, with_mouse)
         break;
 
       default:
-        this.highlight_row(id, false); 
+        this.highlight_row(id, false);
         break;
     }
   }
@@ -336,8 +345,19 @@ select_row: function(id, mod_key, with_mouse)
   if (this.last_selected != 0 && this.rows[this.last_selected])
     this.set_classname(this.rows[this.last_selected].obj, 'focused', false);
 
+  // unselect if toggleselect is active and the same row was clicked again
+  if (this.toggleselect && this.last_selected == id)
+  {
+    this.clear_selection();
+    id = null;
+  }
+  else
+    this.set_classname(this.rows[id].obj, 'focused', true);
+
+  if (!this.selection.length)
+    this.shift_start = null;
+
   this.last_selected = id;
-  this.set_classname(this.rows[id].obj, 'focused', true);        
 },
 
 
@@ -414,7 +434,8 @@ select_all: function(filter)
   if (!this.rows || !this.rows.length)
     return false;
 
-  // reset selection first
+  // reset but remember selection first
+  var select_before = this.selection.join(',');
   this.clear_selection();
 
   for (var n in this.rows)
@@ -426,7 +447,11 @@ select_all: function(filter)
     }
   }
 
-  return true;  
+  // trigger event if selection changed
+  if (this.selection.join(',') != select_before)
+    this.trigger_event('select');
+
+  return true;
 },
 
 
@@ -435,14 +460,18 @@ select_all: function(filter)
  */
 clear_selection: function()
 {
-  for(var n=0; n<this.selection.length; n++)
+  var num_select = this.selection.length;
+  for (var n=0; n<this.selection.length; n++)
     if (this.rows[this.selection[n]])
     {
       this.set_classname(this.rows[this.selection[n]].obj, 'selected', false);
       this.set_classname(this.rows[this.selection[n]].obj, 'unfocused', false);
     }
 
-  this.selection = new Array();    
+  this.selection = new Array();
+  
+  if (num_select)
+    this.trigger_event('select');
 },
 
 
@@ -582,7 +611,7 @@ drag_mouse_move: function(e)
   
     // get subjects of selectedd messages
     var names = '';
-    var c, subject, obj;
+    var c, node, subject, obj;
     for(var n=0; n<this.selection.length; n++)
     {
       if (n>12)  // only show 12 lines
@@ -597,10 +626,11 @@ drag_mouse_move: function(e)
         subject = '';
 
         for(c=0; c<obj.childNodes.length; c++)
-          if (!subject && obj.childNodes[c].nodeName=='TD' && obj.childNodes[c].firstChild && obj.childNodes[c].firstChild.nodeType==3)
+          if (obj.childNodes[c].nodeName=='TD' && (node = obj.childNodes[c].firstChild) && (node.nodeType==3 || node.nodeName=='A'))
           {
-            subject = obj.childNodes[c].firstChild.data;
+            subject = node.nodeType==3 ? node.data : node.innerHTML;
             names += (subject.length > 50 ? subject.substring(0, 50)+'...' : subject) + '<br />';
+            break;
           }
       }
     }

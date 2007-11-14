@@ -32,7 +32,7 @@
 // | Author: Richard Heyes <richard@php.net>                               | 
 // +-----------------------------------------------------------------------+ 
 // 
-// $Id: SASL.php 17 2005-10-03 20:25:31Z roundcube $
+// $Id: SASL.php 584 2007-05-24 03:49:19Z estadtherr $
 
 /**
 * Client implementation of various SASL mechanisms 

@@ -10,7 +10,7 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
  
- $Id: common.js 527 2007-03-28 10:39:38Z thomasb $
+ $Id: common.js 811 2007-09-25 07:33:37Z robin $
 */
 
 // Constants
@@ -602,4 +602,33 @@ function getCookie(name)
 roundcube_browser.prototype.get_cookie = getCookie;
 
 
+// tiny replacement for Firebox functionality
+function rcube_console()
+{
+  this.box = rcube_find_object('console');
+  
+  this.log = function(msg)
+  {
+    if (this.box)
+      this.box.value += str+'\n--------------------------------------\n';
+  };
+  
+  this.reset = function()
+  {
+    if (this.box)
+      this.box.value = '';
+  };
+}
+
 var bw = new roundcube_browser();
+
+if (!window.console)
+  console = new rcube_console();
+
+
+// Add escape() method to RegExp object
+// http://dev.rubyonrails.org/changeset/7271
+RegExp.escape = function(str)
+  {
+  return String(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
+  }
