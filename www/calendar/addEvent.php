@@ -224,7 +224,7 @@ class addEvent
 
 	}
 
-	function displayAddSingleEvent($date=0, $month=0, $level=0, $sid=0)
+	function displayAddSingleEvent($date=0, $month=0, $year=0, $level=0, $sid=0)
 	{
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "calendar/addSingleEvent.htm");
@@ -234,8 +234,8 @@ class addEvent
 		
 		include_once("../include/page.php");
 		
-		if($date && $month && checkdate($month,$date, date('Y')))
-			$this->t_body->set_var("DATE", "$date/$month/".date('Y'));
+		if($date && $month && $year && checkdate($month,$date,$year))
+			$this->t_body->set_var("DATE", "$date/$month/$year");
 		else
 			$this->t_body->set_var("DATE", date('d/m/Y'));
 		
@@ -617,7 +617,7 @@ else
 	if(isset($_GET['id']))
 		$page->displayModSingleEvent($_GET['id']);
 	else
-		$page->displayAddSingleEvent($_GET['date'], $_GET['month'], $_GET['level'], $_GET['sid']);
+		$page->displayAddSingleEvent($_GET['date'], $_GET['month'], $_GET['year'], $_GET['level'], $_GET['sid']);
 }
 
 ?>

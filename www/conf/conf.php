@@ -41,6 +41,7 @@ define("SUBMISSION_directory", "/usr/local/www/portal/submissions");	//All files
 define("RETURNS_directory", "/usr/local/www/portal/returns");		//Returned work will be stored in this directory
 define("TPL_directory", "/usr/local/www/portal/mgs_templates");		//Where site templates are located
 define("THUMBNAIL_IMAGE_CACHE", "/usr/local/www/portal/files/thumbnails");		//Thumbnail cache for 
+define("THUMBNAIL_size", 100); 
 define("URLS_use_frame", false);						//Open links in frame
 define('ZIP_directory', '/usr/local/www/portal/zip');
 define('MIME_magic', '/usr/share/file/magic');

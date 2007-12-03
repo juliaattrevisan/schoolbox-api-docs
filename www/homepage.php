@@ -737,7 +737,7 @@ class OutPut
 	       	while( $thumbnail = $this->db->dbGetNextArray() )
         	{
 				$this->t_body->set_VAR("THUMBNAIL", "<a href=\"/sendframe.php?id={$thumbnail['id']}\" target=\"_blank\">
-                 <img src=\"/cms/image.php?id={$thumbnail['id']}&height=80&width=80&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
+                 <img src=\"/cms/image.php?id={$thumbnail['id']}&height=".THUMBNAIL_size."&width=".THUMBNAIL_size."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
 
 				if(($count % IMAGESPERROW) == 0)
 				{

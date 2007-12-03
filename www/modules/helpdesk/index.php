@@ -13,13 +13,15 @@ class helpdesk_display{
 	
 	function helpdesk_display($userid) {
 
-		$this->db = new dbManager();
+		$this->db = new dbManager(SQL_db, 1);
 
 		$this->t_body = new Template(TPL_directory);
 		
 		//setup file
 		$this->t_body->set_file("tplBODY", "modules/helpdesk/display.htm");
-
+		
+		$this->t_body->set_var("TITLE", HEADING." - Helpdesk");
+		
 		//setup blocks
 		$this->t_body->set_block("tplBODY", "user", "userlist");
 		$this->t_body->set_block("user", "job", "joblist");
@@ -69,6 +71,7 @@ class helpdesk_display{
 						'equipmentPortalUserID' => $userid,
 					);
 		$query = SQL_jobList( $parms, 'or');
+
 		$this->db->dbChangedb(HELPDESK_db);
 		$jobs = $this->db->dbGetAllRows($query);
 

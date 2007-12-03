@@ -212,7 +212,7 @@ class displayCalendar
 		{
 			$this->t_body->set_var("DATE", date("l jS",$currentDay));
 			
-			$this->t_body->set_var("ADD", "<a href=\"addEvent.php?date=".$this->currDay."&month=".$this->currMonth."\">add</a>");
+			$this->t_body->set_var("ADD", "<a href=\"addEvent.php?date=".$this->currDay."&month=".$this->currMonth."&year=".$this->currYear."\">add</a>");
 			
 			//first lets output submission events
 			
