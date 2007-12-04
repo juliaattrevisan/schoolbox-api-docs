@@ -60,27 +60,23 @@
         <!-- BEGIN OPTIONS_Brand -->
         <option value='{VALUE}'{SELECTED}>{NAME}</option>
         <!-- END OPTIONS_Brand -->
-      </select>
-    </td>
+      </select>    </td>
     <td width="200" class="labelcell"> Model</td>
     <td width="250" class="fieldcell"><select name='modelID' onChange="document.signup.modelchange.value = true; document.signup.submit();">
         <!-- BEGIN OPTIONS_Model -->
         <option value='{VALUE}'{SELECTED}>{NAME}</option>
         <!-- END OPTIONS_Model -->
-      </select>
-    </td>
+      </select>    </td>
   </tr>
   <tr>
     <td width="200" class="labelcell"> Serial</td>
-    <td class="fieldcell"><input type="text" name="serial" value="{SERIAL}" onClick="init( this.form);">
-    </td>
+    <td class="fieldcell"><input type="text" name="serial" value="{SERIAL}" onClick="init( this.form);">    </td>
     <td width="200" class="labelcell">Type </td>
     <td width="250" class="fieldcell"><select name='equipmentTypeID' onChange="document.signup.typechange.value = true; document.signup.submit();">
         <!-- BEGIN OPTIONS_EquipmentType -->
         <option value='{VALUE}'{SELECTED}>{NAME}</option>
         <!-- END OPTIONS_EquipmentType -->
-      </select>
-    </td>
+      </select>    </td>
   </tr>
   <tr>
     <td width="200" class="labelcell"> Dealer</td>
@@ -88,15 +84,13 @@
         <!-- BEGIN OPTIONS_Dealer -->
         <option value='{VALUE}'{SELECTED}>{NAME}</option>
         <!-- END OPTIONS_Dealer -->
-      </select>
-    </td>
+      </select>    </td>
     <td width="200" class="labelcell"> Owner</td>
     <td width="250" class="fieldcell"><select name='ownerID'>
         <!-- BEGIN OPTIONS_Owner -->
         <option value='{VALUE}'{SELECTED}>{NAME}</option>
         <!-- END OPTIONS_Owner -->
-      </select>
-    </td>
+      </select>    </td>
   </tr>
   <tr>
     <td width="200" class="labelcell">Location</td>
@@ -120,43 +114,43 @@
                 <option value='{VALUE}'{SELECTED}>{NAME}</option>
                 <!-- END OPTIONS_Location -->
               </select>
-        </span>
-        
-      </td>
+        </span>      </td>
     <td width="200" class="labelcell">Warranty period (years)</td>
     <td width="250" class="fieldcell"><select name='warrantyYears'>
         <!-- BEGIN OPTIONS_warrantyYears -->
         <option value='{VALUE}'{SELECTED}>{NAME}
         <!-- END OPTIONS_warrantyYears -->
-      </select>
-    </td>
+      </select>    </td>
   </tr>
   <tr>
-    <td width="200" class="labelcell">Date of purchase</td>
-    <td class="fieldcell"><input type='checkbox' name='dateNone' value='1' onClick='toggleDate()'{NO_DATE_CHECK}>
+    <td width="200" rowspan="2" class="labelcell">Date of purchase</td>
+    <td rowspan="2" class="fieldcell"><input type='checkbox' name='dateNone' value='1' onClick='toggleDate()'{NO_DATE_CHECK}>
       <font size=-3>no date of purchase</font><br>
       <div id='divDate' name='divDate' style='visibility:{VISIBILITY_DATE}'>
         <select name='dateDay'>
           <!-- BEGIN OPTIONS_dateDay -->
           <option value='{VALUE}'{SELECTED}>{NAME}
-          <!-- END OPTIONS_dateDay -->
-        </select>
+            <!-- END OPTIONS_dateDay -->
+          </select>
         /
         <select name='dateMonth'>
           <!-- BEGIN OPTIONS_dateMonth -->
           <option value='{VALUE}'{SELECTED}>{NAME}
-          <!-- END OPTIONS_dateMonth -->
-        </select>
+            <!-- END OPTIONS_dateMonth -->
+          </select>
         /
         <select name='dateYear'>
           <!-- BEGIN OPTIONS_dateYear -->
           <option value='{VALUE}'{SELECTED}>{NAME}
-          <!-- END OPTIONS_dateYear -->
-        </select>
+            <!-- END OPTIONS_dateYear -->
+          </select>
       </div></td>
+    <td class="labelcell">Insurance</td>
+    <td class="fieldcell"><input type="checkbox" name="insurance" value="1" {INSURANCE_CHECKED} /></td>
+  </tr>
+  <tr>
     <td width="200" class="labelcell">Active</td>
-    <td width="250" class="fieldcell"><input type="checkbox" name="active" value="1" {ACTIVE_CHECKED}>
-    </td>
+    <td width="250" class="fieldcell"><input type="checkbox" name="active" value="1" {ACTIVE_CHECKED}>    </td>
   </tr>
   <!-- BEGIN CUSTOM_FIELD_HEADER -->
   <tr>
@@ -183,8 +177,7 @@
     <td  class="fieldcell"><input name="action" type="hidden" id="action" value = "{ACTION}"></td>
     <td width="200"  class="fieldcell"><input name="typechange" type="hidden" id="typechange">
       <input type="submit" name="{ACTION}" value="{ACTION}" onClick="return validateForm( this.form)" class="button_submit">
-      <input name="modelchange" type="hidden" id="modelchange">
-    </td>
+      <input name="modelchange" type="hidden" id="modelchange">    </td>
     <td class="fieldcell"><input type='hidden' name='equipmentID' value='{EQUIPMENT_ID}'>
       <!-- BEGIN button_delete -->
       <input type="submit" name="delete" value="delete" class="button_submit">

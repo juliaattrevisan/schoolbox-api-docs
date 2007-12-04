@@ -34,8 +34,8 @@ class reportImage
 		"
 		SELECT u.firstname, u.lastname, u.year, h.house, e.serial, b.description as brand, 
 			m.description as model, active, image_date.contents as imaged_date, image_by.contents as imaged_by
-		FROM intranet.user u 
-		LEFT JOIN intranet.house h ON u.house = h.id
+		FROM ".DB_NAME_PORTAL.".user u 
+		LEFT JOIN ".DB_NAME_PORTAL.".house h ON u.house = h.id
 		LEFT JOIN tblEquipment e ON u.id = e.portalUserID
 		LEFT JOIN tblModel m ON e.modelID = m.modelID
 		LEFT JOIN tblBrand b ON m.brandID = b.brandID

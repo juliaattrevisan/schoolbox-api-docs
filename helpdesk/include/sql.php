@@ -579,6 +579,7 @@ function SQL_equipmentDetails( $equipmentID) {
 			e.active,
 			e.equipmentTypeID,
 			e.warrantyYears,
+			e.insurance,
 			equipOwner.synergy_id as userID,
 			e.portalUserID,
 			concat( equipOwner.firstname, ' ', equipOwner.lastname) as equipmentOwnerName,

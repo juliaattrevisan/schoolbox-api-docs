@@ -99,6 +99,7 @@ if( isset( $_REQUEST[ 'create']) or isset( $_REQUEST[ 'update'])) {
 			'dealerID'	=> $_REQUEST[ 'dealerID'],
 			'ownerID'	=> $_REQUEST[ 'ownerID'],
 			'active'	=> $_REQUEST[ 'active'],
+			'insurance' => $_REQUEST['insurance'],
 			'dateOfPurchase'=> $dateOfPurchase
 		);
 		

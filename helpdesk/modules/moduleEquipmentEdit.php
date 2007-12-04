@@ -89,7 +89,8 @@ class ModuleEquipmentEdit extends HelpDeskPage {
 				'ownerID'	=> '',
 				'userID'	=> '',				
 				'userNonSynergy'=> '',
-				'active'	=> ''
+				'active'	=> '',
+				'insurance'	=> '',
 			);
 		
 		
@@ -170,6 +171,13 @@ class ModuleEquipmentEdit extends HelpDeskPage {
 			$this->_tpl->set_var( 'ACTIVE_CHECKED', '');
 		}
 
+		if( $row[ 'insurance']) {
+			$this->_tpl->set_var( 'INSURANCE_CHECKED', 'checked');
+		}
+		else {
+			$this->_tpl->set_var( 'INSURANCE_CHECKED', '');
+		}
+
 		if( $row[ 'dateOfPurchase'] == '' && $_REQUEST['dateNone'] == 1) {
 			$this->_tpl->set_var( 'NO_DATE_CHECK', ' checked');
 			$selectedDay = date( 'j');
@@ -177,7 +185,7 @@ class ModuleEquipmentEdit extends HelpDeskPage {
 			$selectedYear = date( 'Y');
 			$this->hideDate();
 		}
-		else if(isset($row['dateOfPurchase'])){
+		else if($row['dateOfPurchase']){
 			$this->_tpl->set_var( 'NO_DATE_CHECK', '');
 			$dateOfPurchase = $row[ 'dateOfPurchase'];
 			preg_match( '/(\d\d\d\d)-(\d+)-(\d+)/', $dateOfPurchase, $matches);
@@ -185,13 +193,19 @@ class ModuleEquipmentEdit extends HelpDeskPage {
 			$selectedMonth = $matches[2]; 
 			$selectedDay = $matches[3];
 		}
-		else if(!($_REQUEST['dateNone'])) {
+		else if(!$_REQUEST['dateNone'] && $_REQUEST['dateDay']) {
 			$this->_tpl->set_var( 'NO_DATE_CHECK', '');
 			$selectedYear = $_REQUEST['dateYear'];
 			$selectedMonth = $_REQUEST['dateMonth'];
 			$selectedDay = $_REQUEST['dateDay'];
 		}
-
+		else {
+			$this->_tpl->set_var( 'NO_DATE_CHECK', ' checked');
+			$selectedDay = date( 'j');
+			$selectedMonth = date( 'n');
+			$selectedYear = date( 'Y');
+		}
+		print "blah=$selectedDay";
 			# usage is : $this->populateSelect( table/block name (must be same), initiallySelected);
 		$this->populateSelect( 'EquipmentType', $row[ 'equipmentTypeID']);
 		$this->populateSelect( 'Model', $row[ 'modelID']);
@@ -208,6 +222,7 @@ class ModuleEquipmentEdit extends HelpDeskPage {
 		if( $row[ 'location'] == 'School') {
 			$this->showLocationSchool();
 		}
+		
 
 			# populate these selects with a number range (e.g. 1,2,3...31)
 		$this->populateSelectNumberRange( 'dateDay', 1, 31, $selectedDay);

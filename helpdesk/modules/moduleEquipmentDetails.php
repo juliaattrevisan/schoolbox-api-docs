@@ -48,6 +48,8 @@ class ModuleEquipmentDetails extends HelpdeskPage{
 		$this->_tpl->set_var( 'DEALER', $row[ 'dealer']);
 		$this->_tpl->set_var( 'OWNER', $row[ 'owner']);
 		$this->_tpl->set_var( 'CAMPUS', $row[ 'campus']);
+		$this->_tpl->set_var( 'INSURANCE', $row[ 'insurance']?'Yes':'No');
+		$this->_tpl->set_var( 'ACTIVE', $row[ 'active']?'Yes':'No');
 		$this->_tpl->set_var( 'LOCATION', "<a href='/equipmentList.php?locationID=".$row['locationID'] ."'>".$row['location']."</a>");
 		$this->_tpl->set_var( 'DATEOFPURCHASE', $row[ 'dateOfPurchase']);
 		$this->_tpl->set_var( 'WARRANTYYEARS', $row[ 'warrantyYears'] . ' years');
@@ -60,13 +62,7 @@ class ModuleEquipmentDetails extends HelpdeskPage{
 			$this->_tpl->set_var( 'MESSAGE', '');
 		}
 
-		if( $row[ 'active'] == 1) {
-			$active = 'yes';
-		}
-		else {
-			$active = 'no';
-		}
-		$this->_tpl->set_var( 'ACTIVE', $active);
+		
 
 		if($row['portalUserID']){
 			if($row['equipmentOwnerName']){
