@@ -15,7 +15,6 @@ require_once("include/session.php");
 require_once("include/include.php");
 require_once("mail/mail.php");
 
-
 class OutPut
 {
 	function OutPut()

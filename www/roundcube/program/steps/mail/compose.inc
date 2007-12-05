@@ -237,95 +237,18 @@ function rcmail_compose_header_from($attrib)
   {
   global $IMAP, $MESSAGE, $DB, $OUTPUT, $compose_mode;
     
+  // From address
+  $from = $_SESSION['username'] . '@' . MAIL_address; 
+  
   // pass the following attributes to the form class
-  $field_attrib = array('name' => '_from');
+  $field_attrib = array('name' => '_from', 'value' => $from);
   foreach ($attrib as $attr => $value)
     if (in_array($attr, array('id', 'class', 'style', 'size', 'tabindex')))
       $field_attrib[$attr] = $value;
 
-  // extract all recipients of the reply-message
-  $a_recipients = array();
-  if ($compose_mode == RCUBE_COMPOSE_REPLY && is_object($MESSAGE['headers']))
-    {
-    $MESSAGE['FROM'] = array();
-
-    $a_to = $IMAP->decode_address_list($MESSAGE['headers']->to);
-    foreach ($a_to as $addr)
-      {
-      if (!empty($addr['mailto']))
-        $a_recipients[] = $addr['mailto'];
-      }
-
-    if (!empty($MESSAGE['headers']->cc))
-      {
-      $a_cc = $IMAP->decode_address_list($MESSAGE['headers']->cc);
-      foreach ($a_cc as $addr)
-        {
-        if (!empty($addr['mailto']))
-          $a_recipients[] = $addr['mailto'];
-        }
-      }
-    }
-
-  // get this user's identities
-  $sql_result = $DB->query("SELECT identity_id, name, email, signature, html_signature
-                            FROM   ".get_table_name('identities')."
-                            WHERE user_id=?
-                            AND    del<>1
-                            ORDER BY ".$DB->quoteIdentifier('standard')." DESC, name ASC",
-                           $_SESSION['user_id']);
-
-  if ($DB->num_rows($sql_result))
-    {
-    $from_id = 0;
-    $a_signatures = array();
-
-    $field_attrib['onchange'] = JS_OBJECT_NAME.".change_identity(this)";
-    $select_from = new select($field_attrib);
-
-    while ($sql_arr = $DB->fetch_assoc($sql_result))
-      {
-      $identity_id = $sql_arr['identity_id'];
-      $select_from->add(format_email_recipient($sql_arr['email'], $sql_arr['name']), $identity_id);
-
-      // add signature to array
-      if (!empty($sql_arr['signature']))
-        {
-        $a_signatures[$identity_id]['text'] = $sql_arr['signature'];
-        $a_signatures[$identity_id]['is_html'] = ($sql_arr['html_signature'] == 1) ? true : false;
-        if ($a_signatures[$identity_id]['is_html'])
-          {
-            $h2t = new html2text($a_signatures[$identity_id]['text'], false, false);
-            $plainTextPart = $h2t->get_text();
-            $a_signatures[$identity_id]['plain_text'] = trim($plainTextPart);
-          }
-        }
-
-      // set identity if it's one of the reply-message recipients
-      if (in_array($sql_arr['email'], $a_recipients))
-        $from_id = $sql_arr['identity_id'];
-
-      if ($compose_mode == RCUBE_COMPOSE_REPLY && is_array($MESSAGE['FROM']))
-        $MESSAGE['FROM'][] = $sql_arr['email'];
-
-      if ($compose_mode == RCUBE_COMPOSE_DRAFT && strstr($MESSAGE['headers']->from, $sql_arr['email']))
-        $from_id = $sql_arr['identity_id'];
-      }
-
-    // overwrite identity selection with post parameter
-    if (isset($_POST['_from']))
-      $from_id = get_input_value('_from', RCUBE_INPUT_POST);
-
-    $out = $select_from->show($from_id);
-
-    // add signatures to client
-    $OUTPUT->set_env('signatures', $a_signatures);
-    }
-  else
-    {
-    $input_from = new textfield($field_attrib);
-    $out = $input_from->show($_POST['_from']);
-    }
+  // Set from
+  $input_from = new hiddenfield($field_attrib);
+  $out = $input_from->show();
   
   if ($form_start)
     $out = $form_start.$out;
@@ -874,25 +797,6 @@ $OUTPUT->add_handlers(array(
   'editorselector' => 'rcmail_editor_selector',
   'receiptcheckbox' => 'rcmail_receipt_checkbox',
 ));
-
-
-/****** get contacts for this user and add them to client scripts ********/
-
-require_once('include/rcube_contacts.inc');
-
-$CONTACTS = new rcube_contacts($DB, $_SESSION['user_id']);
-$CONTACTS->set_pagesize(1000);
-                                   
-if ($result = $CONTACTS->list_records())
-  {        
-  $a_contacts = array();
-  while ($sql_arr = $result->iterate())
-    if ($sql_arr['email'])
-      $a_contacts[] = format_email_recipient($sql_arr['email'], JQ($sql_arr['name']));
-  
-  $OUTPUT->set_env('contacts', $a_contacts);
-  }
-
 
 parse_template('compose');
 ?>

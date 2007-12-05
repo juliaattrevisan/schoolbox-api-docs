@@ -66,11 +66,6 @@ if (!defined('PATH_SEPARATOR'))
 // instead the ones provided by RC
 ini_set('include_path', $INSTALL_PATH.PATH_SEPARATOR.$INSTALL_PATH.'program'.PATH_SEPARATOR.$INSTALL_PATH.'program/lib'.PATH_SEPARATOR.ini_get('include_path'));
 
-ini_set('session.name', 'roundcube_sessid');
-ini_set('session.use_cookies', 1);
-ini_set('session.gc_maxlifetime', 21600);
-ini_set('session.gc_divisor', 500);
-ini_set('error_reporting', E_ALL&~E_NOTICE); 
 set_magic_quotes_runtime(0);
 
 // increase maximum execution time for php scripts
@@ -83,7 +78,6 @@ require_once('include/rcube_imap.inc');
 require_once('include/bugs.inc');
 require_once('include/main.inc');
 require_once('PEAR.php');
-
 
 // set PEAR error handling
 // PEAR::setErrorHandling(PEAR_ERROR_TRIGGER, E_USER_NOTICE);
@@ -109,9 +103,9 @@ if ($_action != 'get' && $_action != 'viewsource')
     ob_start();
 }
 
-
 // start session with requested task
 rcmail_startup($_task);
+print_r($_SESSION);
 
 // set session related variables
 $COMM_PATH = sprintf('./?_task=%s', $_task);
@@ -144,78 +138,17 @@ if ($err_str = $DB->is_error())
 if ($_action=='error' && !empty($_GET['_code']))
   raise_error(array('code' => hexdec($_GET['_code'])), FALSE, TRUE);
 
-
-// try to log in
-if ($_action=='login' && $_task=='mail')
-{
-  $host = rcmail_autoselect_host();
-  
-  // check if client supports cookies
-  if (empty($_COOKIE))
-  {
-    $OUTPUT->show_message("cookiesdisabled", 'warning');
-  }
-  else if ($_SESSION['temp'] && !empty($_POST['_user']) && isset($_POST['_pass']) &&
-           rcmail_login(get_input_value('_user', RCUBE_INPUT_POST),
-              get_input_value('_pass', RCUBE_INPUT_POST, true, 'ISO-8859-1'), $host))
-  {
-    // create new session ID
-    unset($_SESSION['temp']);
-    sess_regenerate_id();
-
-    // send auth cookie if necessary
-    rcmail_authenticate_session();
-
-    // send redirect
-    header("Location: $COMM_PATH");
-    exit;
-  }
-  else
-  {
-    $OUTPUT->show_message($IMAP->error_code == -1 ? 'imaperror' : 'loginfailed', 'warning');
-    rcmail_kill_session();
-  }
-}
-
-// end session
-else if (($_task=='logout' || $_action=='logout') && isset($_SESSION['user_id']))
-{
-  $OUTPUT->show_message('loggedout');
-  rcmail_kill_session();
-}
-
-// check session and auth cookie
-else if ($_action != 'login' && $_SESSION['user_id'] && $_action != 'send')
-{
-  if (!rcmail_authenticate_session())
-  {
-    $OUTPUT->show_message('sessionerror', 'error');
-    rcmail_kill_session();
-  }
-}
-
-
 // log in to imap server
-if (!empty($_SESSION['user_id']) && $_task=='mail')
+if ($_task=='mail')
 {
-  $conn = $IMAP->connect($_SESSION['imap_host'], $_SESSION['username'], decrypt_passwd($_SESSION['password']), $_SESSION['imap_port'], $_SESSION['imap_ssl']);
+  $conn = $IMAP->connect(MAIL_host, $_SESSION['username'], $_SESSION['password'], MAIL_port, $_SESSION['imap_ssl']);
   if (!$conn)
   {
     $OUTPUT->show_message($IMAP->error_code == -1 ? 'imaperror' : 'sessionerror', 'error');
-    rcmail_kill_session();
+
   }
   else
     rcmail_set_imap_prop();
-}
-
-
-// not logged in -> set task to 'login
-if (empty($_SESSION['user_id']))
-{
-  if ($OUTPUT->ajax_call)
-    $OUTPUT->remote_response("setTimeout(\"location.href='\"+this.env.comm_path+\"'\", 2000);");
-  
-  $_task = 'login';
 }
 
 
@@ -234,16 +167,6 @@ if ($OUTPUT->ajax_call)
 $OUTPUT->set_env('task', $_task);
 if (!empty($_action))
   $OUTPUT->set_env('action', $_action);
-
-
-
-// not logged in -> show login page
-if (!$_SESSION['user_id'])
-{
-  $OUTPUT->task = 'login';
-  $OUTPUT->send('login');
-  exit;
-}
 
 
 // handle keep-alive signal

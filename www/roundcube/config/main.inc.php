@@ -14,6 +14,8 @@
 
 $rcmail_config = array();
 
+// Include global configs *Modified*
+require_once("../conf/conf.php");
 
 // system error reporting: 1 = log; 2 = report (not implemented yet), 4 = show, 8 = trace
 $rcmail_config['debug_level'] = 1;
@@ -35,19 +37,19 @@ $rcmail_config['auto_create_user'] = TRUE;
 // leave blank to show a textbox at login, give a list of hosts
 // to display a pulldown menu or set one host as string.
 // To use SSL connection, enter ssl://hostname:993
-$rcmail_config['default_host'] = '';
+$rcmail_config['default_host'] = MAIL_host;
 
 // TCP port used for IMAP connections
-$rcmail_config['default_port'] = 143;
+$rcmail_config['default_port'] = MAIL_port;
 
 // Automatically add this domain to user names for login
 // Only for IMAP servers that require full e-mail addresses for login
 // Specify an array with 'host' => 'domain' values to support multiple hosts
-$rcmail_config['username_domain'] = '';
+$rcmail_config['username_domain'] = MAIL_address;
 
 // This domain will be used to form e-mail addresses of new users
 // Specify an array with 'host' => 'domain' values to support multiple hosts
-$rcmail_config['mail_domain'] = '';
+$rcmail_config['mail_domain'] = MAIL_address;
 
 // Path to a virtuser table file to resolve user names and e-mail addresses
 $rcmail_config['virtuser_file'] = '';
@@ -60,10 +62,10 @@ $rcmail_config['virtuser_query'] = '';
 // use this host for sending mails.
 // to use SSL connection, set ssl://smtp.host.com
 // if left blank, the PHP mail() function is used
-$rcmail_config['smtp_server'] = '';
+$rcmail_config['smtp_server'] = MAIL_smtp_server;
 
 // SMTP port (default is 25; 465 for SSL)
-$rcmail_config['smtp_port'] = 25;
+$rcmail_config['smtp_port'] = MAIL_smtp_port;
 
 // SMTP username (if required) if you use %u as the username RoundCube
 // will use the current username for login

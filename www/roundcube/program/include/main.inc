@@ -69,12 +69,9 @@ function rcmail_startup($task='mail')
   $DB->sqlite_initials = $INSTALL_PATH.'SQL/sqlite.initial.sql';
   $DB->db_connect('w');
 
-  // use database for storing session data
-  include_once('include/session.inc');
+  // Initialize session *Modified*
+  require_once("../include/session.php");
 
-  // init session
-  session_start();
-  $sess_id = session_id();
 
   // create session and set session vars
   if (!isset($_SESSION['auth_time']))
@@ -257,7 +254,7 @@ function rcmail_imap_init($connect=FALSE)
   // connect with stored session data
   if ($connect)
     {
-    if (!($conn = $IMAP->connect($_SESSION['imap_host'], $_SESSION['username'], decrypt_passwd($_SESSION['password']), $_SESSION['imap_port'], $_SESSION['imap_ssl'])))
+    if (!($conn = $IMAP->connect(MAIL_host, $_SESSION['username'], $_SESSION['password'], MAIL_port, $_SESSION['imap_ssl'])))
       $OUTPUT->show_message('imaperror', 'error');
       
     rcmail_set_imap_prop();
