@@ -1,0 +1,49 @@
+UPDATE instructions
+===================
+
+Follow these instructions if upgrading from a previous version
+of RoundCube Webmail.
+
+from version 0.1-rc1
+----------------------------------------
+* replace index.php
+* replace all files in folder /program/
+* replace all files in folder /skins/default/
+* If you have LDAP servers configured you should re-configure
+  the config entries using the template given in /config/main.inc.php.dist
+
+
+from version 0.1-beta2
+----------------------------------------
+* replace index.php
+* replace all files in folder /program/
+* replace all files in folder /skins/default/
+* run all commands in SQL/[yourdbtype].update.sql or
+  re-initalize the database with [yourdbtype].initial.sql
+* add these lines to /config/main.inc.php
+   $rcmail_config['draft_autosave'] = 300;
+   $rcmail_config['date_today'] = 'H:i';
+* If you have LDAP servers configured you should re-configure
+  the config entries using the template given in /config/main.inc.php.dist
+
+
+form version 0.1-beta
+----------------------------------------
+* replace index.php
+* replace all files in folder /program/
+* replace all files in folder /skins/default/
+* run all commands in SQL/[yourdbtype].update.sql or
+  re-initalize the database with [yourdbtype].initial.sql
+* add this line to /config/db.inc.php
+   $rcmail_config['db_persistent'] = false;
+* add these lines to /config/main.inc.php
+   $rcmail_config['drafts_mbox'] = 'Drafts';
+   $rcmail_config['junk_mbox'] = 'Junk';
+   $rcmail_config['product_name'] = 'RoundCube Webmail';
+   $rcmail_config['read_when_deleted'] = false;
+   $rcmail_config['enable_spellcheck'] = false;
+   $rcmail_config['protect_default_folders'] = false;
+* replace the following line from /config/main.inc.php
+   @include($_SERVER['HTTP_HOST'].'.inc.php');
+  with 
+   $rcmail_config['include_host_config'] = false;
