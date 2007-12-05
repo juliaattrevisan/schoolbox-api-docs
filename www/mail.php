@@ -23,7 +23,7 @@ class OutPut
 		$this->t_body = new Template(TPL_directory);
 		if(MAIL_interface == 'roundcube')
 		{
-			$this->t_body->set_file("tplBODY", "mail2.htm");
+			$this->t_body->set_file("tplBODY", "roundcube.htm");
 			$this->t_body->set_var('ROUNDCUBE_PARAMS', "");
 		}
 		else
