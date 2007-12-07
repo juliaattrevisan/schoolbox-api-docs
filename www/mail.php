@@ -22,8 +22,13 @@ class OutPut
 		$this->t_body = new Template(TPL_directory);
 		if(MAIL_interface == 'roundcube')
 		{
+			// Find any params
+			$params = explode('?', $_SESSION['REQUEST_URI']);
+			$params = !empty($params[1]) ? "?$params" : '';
+			
+			// Set template
 			$this->t_body->set_file("tplBODY", "roundcube.htm");
-			$this->t_body->set_var('ROUNDCUBE_PARAMS', "");
+			$this->t_body->set_var('ROUNDCUBE_PARAMS', $params);
 		}
 		else
 		{

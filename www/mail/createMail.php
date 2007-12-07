@@ -23,7 +23,7 @@ class OutPut
 		}
 		else
 		{
-			$this->t_body->set_file("tplBODY", "mail2.htm");
+			$this->t_body->set_file("tplBODY", "roundcube.htm");
 		}
 		$this->t_body->set_var("TITLE", HEADING." - Send Mail");
 		

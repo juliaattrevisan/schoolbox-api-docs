@@ -93,7 +93,7 @@ define("MAIL_interface", "roundcube");		// Options are roundcube or simple
 define("MAIL_retrieval", "imap");			//Options are pop or imap (imap has extra state information)
 define("MAIL_host", "alderaan.mgs.vic.edu.au");
 define("MAIL_port", 143);
-define("MAIL_smtp_server", "localhost");
+define("MAIL_smtp_server", "mail.mgs.vic.edu.au");
 define("MAIL_smtp_port", 25);
 define("MAIL_address", "mgs.vic.edu.au");
 define("MAIL_increment", 20);					//Amount of emails per page

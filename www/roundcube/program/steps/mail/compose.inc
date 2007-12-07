@@ -798,5 +798,27 @@ $OUTPUT->add_handlers(array(
   'receiptcheckbox' => 'rcmail_receipt_checkbox',
 ));
 
+<<<<<<< .mine
+
+/****** get contacts for this user and add them to client scripts ********/
+
+/*require_once('include/rcube_contacts.inc');
+
+$CONTACTS = new rcube_contacts($DB, $_SESSION['user_id']);
+$CONTACTS->set_pagesize(1000);
+                                   
+if ($result = $CONTACTS->list_records())
+  {        
+  $a_contacts = array();
+  while ($sql_arr = $result->iterate())
+    if ($sql_arr['email'])
+      $a_contacts[] = format_email_recipient($sql_arr['email'], JQ($sql_arr['name']));
+  
+  $OUTPUT->set_env('contacts', $a_contacts);
+  }
+*/
+
+=======
+>>>>>>> .r458
 parse_template('compose');
 ?>
