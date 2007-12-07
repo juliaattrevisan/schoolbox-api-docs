@@ -112,11 +112,28 @@ img
 #header
 {
   position: absolute;
-  top: 10px;
-  left: 20px;
+  top: 55px;
+  left: -25px;
   width: 170px;
-  height: 40px;
-  z-index: 100;
+  text-align: right;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+#header a,
+#header a:active,
+#header a:visited
+{
+  font-size: 11px;
+  color: #666666;
+  text-decoration: none;
+  padding: 6px 16px 6px 30px;
+  background-repeat: no-repeat;
+}
+
+#header a:hover
+{
+  color: #333333;
 }
 
 #taskbar
