@@ -72,7 +72,6 @@ function rcmail_startup($task='mail')
   // Initialize session *Modified*
   require_once("../include/session.php");
 
-
   // create session and set session vars
   if (!isset($_SESSION['auth_time']))
     {

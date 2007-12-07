@@ -798,8 +798,6 @@ $OUTPUT->add_handlers(array(
   'receiptcheckbox' => 'rcmail_receipt_checkbox',
 ));
 
-<<<<<<< .mine
-
 /****** get contacts for this user and add them to client scripts ********/
 
 /*require_once('include/rcube_contacts.inc');
@@ -818,7 +816,5 @@ if ($result = $CONTACTS->list_records())
   }
 */
 
-=======
->>>>>>> .r458
 parse_template('compose');
 ?>

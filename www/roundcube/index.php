@@ -48,7 +48,7 @@ define('JS_OBJECT_NAME', 'rcmail');
 // define global vars
 $OUTPUT_TYPE = 'html';
 $INSTALL_PATH = dirname(__FILE__);
-$MAIN_TASKS = array('mail','settings','addressbook','logout');
+$MAIN_TASKS = array('mail', 'addressbook');
 
 if (empty($INSTALL_PATH))
   $INSTALL_PATH = './';
@@ -105,7 +105,6 @@ if ($_action != 'get' && $_action != 'viewsource')
 
 // start session with requested task
 rcmail_startup($_task);
-print_r($_SESSION);
 
 // set session related variables
 $COMM_PATH = sprintf('./?_task=%s', $_task);
@@ -151,16 +150,16 @@ if ($_task=='mail')
     rcmail_set_imap_prop();
 }
 
-
+// Removed due to firefox incompatibility *Modified*
 // check client X-header to verify request origin
-if ($OUTPUT->ajax_call)
+/* if ($OUTPUT->ajax_call)
 {
   if (empty($CONFIG['devel_mode']) && !rc_request_header('X-RoundCube-Referer'))
   {
     header('HTTP/1.1 404 Not Found');
     die("Invalid Request");
   }
-}
+}*/
 
 
 // set task and action to client
@@ -267,33 +266,6 @@ if ($_task=='addressbook')
 
   if ($_action=='mailto')
     include('program/steps/addressbook/mailto.inc');
-}
-
-
-// include task specific files
-if ($_task=='settings')
-{
-  include_once('program/steps/settings/func.inc');
-
-  if ($_action=='save-identity')
-    include('program/steps/settings/save_identity.inc');
-
-  if ($_action=='add-identity' || $_action=='edit-identity')
-    include('program/steps/settings/edit_identity.inc');
-
-  if ($_action=='delete-identity')
-    include('program/steps/settings/delete_identity.inc');
-  
-  if ($_action=='identities')
-    include('program/steps/settings/identities.inc');  
-
-  if ($_action=='save-prefs')
-    include('program/steps/settings/save_prefs.inc');  
-
-  if ($_action=='folders' || $_action=='subscribe' || $_action=='unsubscribe' ||
-      $_action=='create-folder' || $_action=='rename-folder' || $_action=='delete-folder')
-    include('program/steps/settings/manage_folders.inc');
-
 }
 
 
