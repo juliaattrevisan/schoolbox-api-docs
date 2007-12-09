@@ -1892,7 +1892,7 @@ class rcube_imap
          FROM ".get_table_name('cache')."
          WHERE  user_id=?
          AND    cache_key=?",
-        $_SESSION['user_id'],
+        $_SESSION['id'],
         $key);
 
       if ($sql_arr = $this->db->fetch_assoc($sql_result))
@@ -1921,7 +1921,7 @@ class rcube_imap
          FROM ".get_table_name('cache')."
          WHERE  user_id=?
          AND    cache_key=?",
-        $_SESSION['user_id'],
+        $_SESSION['id'],
         $key);
                                      
       if ($sql_arr = $this->db->fetch_assoc($sql_result))
@@ -1940,7 +1940,7 @@ class rcube_imap
          WHERE  user_id=?
          AND    cache_key=?",
         $data,
-        $_SESSION['user_id'],
+        $_SESSION['id'],
         $key);
       }
     // add new cache record
@@ -1950,7 +1950,7 @@ class rcube_imap
         "INSERT INTO ".get_table_name('cache')."
          (created, user_id, cache_key, data)
          VALUES (".$this->db->now().", ?, ?, ?)",
-        $_SESSION['user_id'],
+        $_SESSION['id'],
         $key,
         $data);
       }
@@ -1965,7 +1965,7 @@ class rcube_imap
       "DELETE FROM ".get_table_name('cache')."
        WHERE  user_id=?
        AND    cache_key=?",
-      $_SESSION['user_id'],
+      $_SESSION['id'],
       $key);
     }
 
@@ -2037,7 +2037,7 @@ class rcube_imap
          strtoupper($sort_order),
         $from,
         $to-$from,
-        $_SESSION['user_id'],
+        $_SESSION['id'],
         $key);
 
       while ($sql_arr = $this->db->fetch_assoc($sql_result))
@@ -2073,7 +2073,7 @@ class rcube_imap
          WHERE  user_id=?
          AND    cache_key=?
          AND    uid=?",
-        $_SESSION['user_id'],
+        $_SESSION['id'],
         $key,
         $uid);
 
@@ -2109,7 +2109,7 @@ class rcube_imap
        WHERE  user_id=?
        AND    cache_key=?
        ORDER BY ".$this->db->quote_identifier($sort_col)." ".$sort_order,
-      $_SESSION['user_id'],
+      $_SESSION['id'],
       $key);
 
     while ($sql_arr = $this->db->fetch_assoc($sql_result))
@@ -2134,7 +2134,7 @@ class rcube_imap
          AND    cache_key=?
          AND    uid=?
          AND    del<>1",
-        $_SESSION['user_id'],
+        $_SESSION['id'],
         $key,
         $headers->uid);
 
@@ -2157,7 +2157,7 @@ class rcube_imap
         "INSERT INTO ".get_table_name('messages')."
          (user_id, del, cache_key, created, idx, uid, subject, ".$this->db->quoteIdentifier('from').", ".$this->db->quoteIdentifier('to').", cc, date, size, headers, structure)
          VALUES (?, 0, ?, ".$this->db->now().", ?, ?, ?, ?, ?, ?, ".$this->db->fromunixtime($headers->timestamp).", ?, ?, ?)",
-        $_SESSION['user_id'],
+        $_SESSION['id'],
         $key,
         $index,
         $headers->uid,
@@ -2182,7 +2182,7 @@ class rcube_imap
        WHERE  user_id=?
        AND    cache_key=?
        AND    idx=?",
-      $_SESSION['user_id'],
+      $_SESSION['id'],
       $key,
       $index);
     }
@@ -2197,7 +2197,7 @@ class rcube_imap
        WHERE  user_id=?
        AND    cache_key=?
        AND    idx>=?",
-      $_SESSION['user_id'],
+      $_SESSION['id'],
       $key,
       $start_index);
     }

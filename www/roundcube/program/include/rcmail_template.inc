@@ -425,7 +425,7 @@ class rcmail_template extends rcube_html_page
    */
   function parse_xml($input)
   {
-    return preg_replace('/<roundcube:([-_a-z]+)\s+([^>]+)>/Uie', "\$this->xml_command('\\1', '\\2')", $input);
+    return preg_replace('/<roundcube:([-_a-z]+)\s+([^>]+)>/Uie', "\$this->xml_command('\\1', '\\2')", $input);print('a');
   }
 
 

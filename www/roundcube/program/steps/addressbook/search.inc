@@ -26,7 +26,7 @@ $search = trim(get_input_value('_q', RCUBE_INPUT_GET));
 $search_request = md5('addr'.$search);
 
 // get contacts for this user
-$result = $CONTACTS->search(array('name','email'), $search);
+$result = $CONTACTS->search(array('username', 'title', 'firstname','lastname'), $search);
 
 if ($result->count > 0)
 {

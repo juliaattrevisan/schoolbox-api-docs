@@ -18,7 +18,7 @@ $rcmail_config = array();
 // format is db_provider://user:password@host/databse
 // currently supported db_providers: mysql, sqlite
 
-$rcmail_config['db_dsnw'] = 'mysql://portal:tnp879@localhost/roundcubemail';
+$rcmail_config['db_dsnw'] = 'mysql://portal:tnp879@localhost/portal';
 // postgres example: 'pgsql://roundcube:pass@localhost/roundcubemail';
 // sqlite example: 'sqlite://./sqlite.db?mode=0646';
 
@@ -39,7 +39,7 @@ $rcmail_config['db_persistent'] = FALSE;
 
 
 // you can define specific table names used to store webmail data
-$rcmail_config['db_table_contacts'] = 'portal.user';
+$rcmail_config['db_table_contacts'] = 'user';
 
 $rcmail_config['db_table_cache'] = 'cache';
 

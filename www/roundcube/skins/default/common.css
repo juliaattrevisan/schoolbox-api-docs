@@ -3,7 +3,7 @@
 body
 {
   margin: 8px;
-  background-color: #F6F6F6; /* #EBEBEB; */
+  background-color: #FFFFFF
   color: #000000;
 }
 
@@ -112,7 +112,7 @@ img
 #header
 {
   position: absolute;
-  top: 55px;
+  top: 20px;
   left: -25px;
   width: 170px;
   text-align: right;
@@ -191,7 +191,7 @@ a.button-logout
 {
   position: absolute;
   display: none;
-  top: -1px;
+  top: 3px;
   left: 200px;
   right: 200px;
   z-index: 5000;
@@ -326,7 +326,7 @@ table.records-table tr.unfocused td
 #quicksearchbar
 {
   position: absolute;
-  top: 60px;
+  top: 25px;
   right: 30px;
   width: 182px;
   height: 20px;

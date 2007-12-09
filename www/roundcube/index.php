@@ -65,7 +65,7 @@ if (!defined('PATH_SEPARATOR'))
 // possible not compatible libraries (i.e PEAR) to be included
 // instead the ones provided by RC
 ini_set('include_path', $INSTALL_PATH.PATH_SEPARATOR.$INSTALL_PATH.'program'.PATH_SEPARATOR.$INSTALL_PATH.'program/lib'.PATH_SEPARATOR.ini_get('include_path'));
-
+ini_set('error_reporting', E_ALL&~E_NOTICE);
 set_magic_quotes_runtime(0);
 
 // increase maximum execution time for php scripts
@@ -73,6 +73,7 @@ set_magic_quotes_runtime(0);
 if (!ini_get('safe_mode')) @set_time_limit(120);
 
 // include base files
+require_once('../include/include.php');
 require_once('include/rcube_shared.inc');
 require_once('include/rcube_imap.inc');
 require_once('include/bugs.inc');
@@ -81,7 +82,7 @@ require_once('PEAR.php');
 
 // set PEAR error handling
 // PEAR::setErrorHandling(PEAR_ERROR_TRIGGER, E_USER_NOTICE);
-
+print_r($_SESSION);
 
 // catch some url/post parameters
 $_task = strip_quotes(get_input_value('_task', RCUBE_INPUT_GPC));

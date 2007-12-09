@@ -800,10 +800,10 @@ $OUTPUT->add_handlers(array(
 
 /****** get contacts for this user and add them to client scripts ********/
 
-/*require_once('include/rcube_contacts.inc');
+require_once('include/rcube_contacts.inc');
 
-$CONTACTS = new rcube_contacts($DB, $_SESSION['user_id']);
-$CONTACTS->set_pagesize(1000);
+$CONTACTS = new rcube_contacts($DB);
+$CONTACTS->set_pagesize(5000);
                                    
 if ($result = $CONTACTS->list_records())
   {        
@@ -814,7 +814,7 @@ if ($result = $CONTACTS->list_records())
   
   $OUTPUT->set_env('contacts', $a_contacts);
   }
-*/
+
 
 parse_template('compose');
 ?>
