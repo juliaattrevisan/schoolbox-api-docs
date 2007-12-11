@@ -10,7 +10,7 @@
 require_once("../include/session.php");
 require_once("../include/include.php");
 require_once("../include/permission.php");
-print_r($_POST['test']);
+
 class customise
 {
 	function customise($cid)
@@ -109,7 +109,7 @@ class customise
 	{
 		// 1 = large, 2 = small, 0 = all
 		if($size > 0 )
-			$query = "SELECT id, name, component, l.size FROM homepage_comp c LEFT JOIN homepage_comp_location l ON l.component = c.id AND cid = {$this->cid} WHERE c.size IN($size, 0) ORDER BY name";
+			$query = "SELECT id, name, component FROM homepage_comp c LEFT JOIN homepage_comp_location l ON l.component = c.id AND cid = {$this->cid} WHERE c.size IN($size, 0) ORDER BY name";
 		else
 			$query = "SELECT id, name FROM homepage_comp ORDER BY name";
 
@@ -145,6 +145,17 @@ if($_GET['cid'] && $_GET['type'] == 'components')
 			$mod->updateComponentPosition($component, $key, $ckey);
 		}
 	}
+}
+elseif($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component'])
+{	
+	$config = $_GET;
+	unset($config['cid'], $config['type'], $config['component']);
+	$config = serialize($config);
+	
+	$mod->updateComponentConfig($_GET['component'], $config);
+	
+	// Send user back to homepage
+	localRedir("/homepage.php?category=".$_GET['cid']);
 }
 elseif($_POST['cid'])
 {

@@ -1,7 +1,20 @@
 <div class="component" id="component{COMPONENT_ID}">
-  <div class="componentHeader"></div>
+  <a class="config" onclick="toggleConfig('component{COMPONENT_ID}');"></a>
+  <div class="componentConfig">
+	<form action="subject/customisePage.php" method="get">
+	  <input type="hidden" name="cid" value="{ID}" />
+	  <input type="hidden" name="type" value="config" />
+	  <input type="hidden" name="component" value="{COMPONENT_ID}" />
+	  <label for="image">Image: </label>
+	  <input type="text" name="image" value="{COMPONENT_CONFIG_IMAGE}" />
+	  <input type="submit" value="Update" />
+	</form>
+  </div>
+  <div class="componentHeader">
 	  <!-- BEGIN previewimage -->
-	  <div style="text-align:center;"> <a href="/redir.php?url={CONTENT_URL}" target="_blank"><img src="{PREVIEW_IMAGE_URL}" border="0" alt="{PREVIEW_IMAGE_DESC}" title="{PREVIEW_IMAGE_DESC}" /></a> </div>
+	  <div style="text-align:center;">
+	    <a href="/redir.php?url={CONTENT_URL}" target="_blank"><img src="{PREVIEW_IMAGE_URL}" border="0" alt="{PREVIEW_IMAGE_DESC}" title="{PREVIEW_IMAGE_DESC}" /></a>
+	  </div>
 	  <br style="clear:both;" />
-	  <!-- END previewimage -->
+	  <!-- END previewimage -->  </div>
 </div>

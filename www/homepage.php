@@ -46,8 +46,8 @@ class OutPut
 
 		$this->logPageView();
 
-		//get list of homepage components, locations and size
-		$query = "SELECT position, `column`, component, homepage_comp_location.size, name, method, filename 
+		//get list of homepage components, locations and config
+		$query = "SELECT position, `column`, component, homepage_comp_location.config, name, method, filename 
 				FROM homepage_comp_location, homepage_comp 
 				WHERE component = id AND cid = '$category'
 				ORDER BY position";
@@ -59,11 +59,31 @@ class OutPut
 		{
 			if($component['method'] != "")
 			{
+				$component['config'] = unserialize($component['config']);
+				
 				$this->t_body->set_file($component['name'].$componentCount, 'homepages/components/'.$component['filename']);
 				$this->t_body->set_var('COMPONENT_ID', $component['component']);
 				
+				if(!empty($component['config']))
+					foreach($component['config'] as $name => $value)
+					{
+						if($name == 'size')
+						{
+							$this->t_body->set_block($component['name'].$componentCount, "size", "size_block".$componentCount);
+							for($i=0; $i<=10; $i++)
+							{
+								$this->t_body->set_var('COMPONENT_CONFIG_SIZE_NAME', $i == 0 ? 'All' : $i);
+								$this->t_body->set_var('COMPONENT_CONFIG_SIZE_VALUE', $i);
+								$this->t_body->set_var('COMPONENT_CONFIG_SIZE_SELECTED', $i == $value ? ' selected' : '');
+								$this->t_body->parse("size_block".$componentCount, "size", true);
+							}
+						}
+						else
+							$this->t_body->set_var('COMPONENT_CONFIG_' . strtoupper($name), $value);
+					}
+				
 				$func = $component['method'];
-				if($this->$func($component['name'].$componentCount, $component['size'])) {
+				if($this->$func($component['name'].$componentCount, $component['config'])) {
 					$this->t_body->parse('COLUMN'.$component['column'], $component['name'].$componentCount, true);
 					$columnFlag[$component['column']] = true;
 				}
@@ -123,7 +143,7 @@ class OutPut
 		}
 	}
 
-	function folderManage($name, $size)
+	function folderManage($name, $config)
 	{
 		$this->t_body->set_block($name, "manage_page", "manage_page_block");
 		$this->t_body->set_block($name, "stats_data", "stats_data_block");
@@ -187,7 +207,7 @@ class OutPut
 		$this->db->dbDoQuery($query);
 	}
 
-	function initSubject($name, $size)
+	function initSubject($name, $config)
 	{
 		//output mangement/userlist link to owner of subject
 		$this->t_body->set_block($name, "class_list", "class_list_block");
@@ -200,7 +220,7 @@ class OutPut
 		return true;
 	}
 	
-	function outputDuties($name, $size)
+	function outputDuties($name, $config)
         {
                 $this->t_body->set_block($name, "duties", "d_block");
                 $sql = "SELECT l.*, d.user, d.date, d.cid FROM luDuties l LEFT JOIN duty d ON l.dutyTypeID = d.dutyTypeID 
@@ -231,7 +251,7 @@ class OutPut
 
         }
 
-	function outputMembers($name, $size)
+	function outputMembers($name, $config)
 	{
 		//output members of group
 		$this->t_body->set_block($name, "members", "members_block");
@@ -267,7 +287,7 @@ class OutPut
 		return true;
 	}
 
-	function outputManagers($name, $size)
+	function outputManagers($name, $config)
 	{
 
 		//output managers
@@ -304,7 +324,7 @@ class OutPut
 		return true;
 	}
 
-	function outputTeachers($name, $size)
+	function outputTeachers($name, $config)
 	{
 		// gets teachers involved in subject, outputs links to their addressbook page
 		
@@ -346,7 +366,7 @@ class OutPut
 		return false;
 	}
 
-	function outputNews($name, $size)
+	function outputNews($name, $config)
 	{
 		//news output
 		$this->t_body->set_block($name, "news", "news_block");
@@ -388,7 +408,7 @@ class OutPut
 		return true;
 	} 
 		
-	function outputRandImage($name, $size)
+	function outputRandImage($name, $config)
     {
 		//outputs an custom image and link to the homepage
 		$this->t_body->set_block($name, "previewimage", "preview_block");
@@ -401,8 +421,8 @@ class OutPut
 		if($image = $this->db->dbGetNextArray())
 		{
 			//get link
-			if($size==0){$size=6;}
-				$imageSize=$size*100;
+			if($config['size']==0){$config['size']=6;}
+				$imageSize=$config['size']*100;
 
 			$imageurl = "cms/image.php?id={$image['id']}&height={$imageSize}&width={$imageSize}";
 			
@@ -419,13 +439,17 @@ class OutPut
 		return true;
 	}
 
-	function outputImage($name, $size)
+	function outputImage($name, $config)
 	{
 		//outputs an custom image and link to the homepage
 		$this->t_body->set_block($name, "previewimage", "preview_block");
+		
+		// Make sure there a config option
+		if(empty($config['image']))
+			$config['image'] = 'Preview Image';
 
 		//get image id
-		$query = "SELECT id, comment FROM file WHERE category = '".$this->category."' AND deleted = '0' AND description LIKE 'Preview Image'";
+		$query = "SELECT id, comment FROM file WHERE category = '".$this->category."' AND deleted = '0' AND description LIKE '{$config['image']}'";
 		$this->db->dbDoQuery($query);
 		if($this->db->dbCountRows() > 0)
 		{
@@ -436,25 +460,28 @@ class OutPut
 			$this->db->dbDoQuery($query);
 			$link = $this->db->dbGetNextArray(); 
 			
-			if($size==0){$size=6;}
-				$imageSize=$size*100;
+			if($config['size']==0){$config['size']=6;}
+				$imageSize=$config['size']*100;
 						
 			$imageurl = "cms/image.php?id={$image['id']}&height={$imageSize}&width={$imageSize}";
 			
 			$this->t_body->set_var("PREVIEW_IMAGE_URL", $imageurl);
 			$this->t_body->set_var("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));
 			$this->t_body->set_var("CONTENT_URL", $link['url']);
-
-            $this->t_body->parse("preview_block", "previewimage");
-						
-			return true;
 		}
 		else
-			return false;
-
+		{
+			$this->t_body->set_var("PREVIEW_IMAGE_URL", 'images/notfound.gif');
+			$this->t_body->set_var("PREVIEW_IMAGE_DESC", 'Image Not Found');
+			$this->t_body->set_var("CONTENT_URL", '');
+		}
+		
+		$this->t_body->parse("preview_block", "previewimage");
+		
+		return true;
 	}
 
-	function outputHomeworkList($name, $size)
+	function outputHomeworkList($name, $config)
 	{
 		//homework output
 		$this->t_body->set_block($name, "homework", "homework_block");
@@ -494,8 +521,8 @@ class OutPut
 		}
 
 		//if no size make unlimited query else make it limited by size
-		if($size != 0 && $size != '') 
-			$query .= " LIMIT 0, $size"; 
+		if($config['size'] != 0 && $config['size'] != '') 
+			$query .= " LIMIT 0, {$config['size']}"; 
 
 		$this->db->dbDoQuery($query);
 
@@ -519,7 +546,7 @@ class OutPut
 
 	}
 	
-	function outputAssignList($name, $size)
+	function outputAssignList($name, $config)
 	{
 		//assignment
 		$this->t_body->set_block($name, "assign", "assign_block");
@@ -554,8 +581,8 @@ class OutPut
 		}
 
 		//if no size make unlimited query else make it limited by size
-		if($size != 0 && $size != '') 
-			$query .= " LIMIT 0, $size"; 
+		if($config['size'] != 0 && $config['size'] != '') 
+			$query .= " LIMIT 0, {$config['size']}"; 
 
 
 		$this->db->dbDoQuery($query);
@@ -579,7 +606,7 @@ class OutPut
 		return true;
 	}
 	
-	function outputNoteList($name, $size)
+	function outputNoteList($name, $config)
 	{
 		//note output
 		$this->t_body->set_block($name, "notes", "notes_block");
@@ -588,8 +615,8 @@ class OutPut
 		WHERE category = '".$this->category."' AND type = '1' AND file.deleted = '0' ORDER BY submitted DESC";
 
 		//if no size make unlimited query else make it limited by size
-		if($size != 0 && $size != '') 
-			$query .= " LIMIT 0, $size"; 
+		if($config['size'] != 0 && $config['size'] != '') 
+			$query .= " LIMIT 0, {$config['size']}"; 
 	
 		$this->db->dbDoQuery($query);
 
@@ -612,7 +639,7 @@ class OutPut
 		return true;
 	}
 	
-	function outputLinkList($name, $size)
+	function outputLinkList($name, $config)
 	{
 		//link output
 		$this->t_body->set_block($name, "link", "link_block");
@@ -621,8 +648,8 @@ class OutPut
 		ORDER BY submitted DESC";
 
 		//if no size make unlimited query else make it limited by size
-		if($size != 0 && $size != '') 
-			$query .= " LIMIT 0, $size"; 
+		if($config['size'] != 0 && $config['size'] != '') 
+			$query .= " LIMIT 0, {$config['size']}"; 
 
 		$this->db->dbDoQuery($query);
 
@@ -645,7 +672,7 @@ class OutPut
 		return true;
 	}	
 	
-	function outputFileList($name, $size)
+	function outputFileList($name, $config)
 	{
 		//file output
 		$this->t_body->set_block($name, "files", "files_block");
@@ -654,8 +681,8 @@ class OutPut
 		WHERE category = '".$this->category."' AND file.deleted = '0' ORDER BY submitted DESC";
 
 		//if no size make unlimited query else make it limited by size
-		if($size != 0 && $size != '') 
-			$query .= " LIMIT 0, $size"; 
+		if($config['size'] != 0 && $config['size'] != '') 
+			$query .= " LIMIT 0, {$config['size']}";  
 
 		$this->db->dbDoQuery($query);
 
@@ -678,7 +705,7 @@ class OutPut
 		return true;
 	}
 		
-	function outputFolderList($name, $size)
+	function outputFolderList($name, $config)
 	{
 		//file output
 		$this->t_body->set_block($name, "folders", "folders_block");
@@ -687,8 +714,8 @@ class OutPut
 		WHERE parent = '".$this->category."' ORDER BY name DESC";
 
 		//if no size make unlimited query else make it limited by size
-		if($size != 0 && $size != '') 
-			$query .= " LIMIT 0, $size"; 
+		if($config['size'] != 0 && $config['size'] != '') 
+			$query .= " LIMIT 0, {$config['size']}"; 
 
 		$this->db->dbDoQuery($query);
 
@@ -711,7 +738,7 @@ class OutPut
 		return true;
 	}
 		
-	function outputImageGallery($name, $size)
+	function outputImageGallery($name, $config)
 	{
 		define("IMAGESPERROW", 4);
         
@@ -719,10 +746,10 @@ class OutPut
         $this->t_body->set_block($name, "thumb_row", "row_block");
         $this->t_body->set_block("thumb_row", "thumb_cell", "cell_block");
 		
-		if ($size == 0)
+		if ($config['size'] == 0)
 			$lim = "";
 		else
-			$lim = " LIMIT 1, ".IMAGESPERROW * $size;
+			$lim = " LIMIT 1, ".IMAGESPERROW * $config['size'];
 			
         $query = "SELECT id, file.description FROM file LEFT JOIN allowedFileTypes ON mime_type = mime WHERE category = '{$this->category}' 
 					AND deleted = '0' AND INSTR(mime_type, 'image/') AND inline = 'true'
@@ -778,7 +805,7 @@ class OutPut
 		return true;
 	}
 
-	function outputForumList($name, $size)
+	function outputForumList($name, $config)
 	{	
 		//dont show forums to parents if they not a direct member of group
 		if(isParent($_SESSION['gid']))
@@ -796,8 +823,8 @@ class OutPut
 		$query = "SELECT DISTINCT(thread) FROM forum WHERE cid='".$this->category."' AND deleted = '0' ORDER BY date DESC";
 		
 		//if no size make unlimited query else make it limited by size
-		if($size != 0 && $size != '') 
-			$query .= " LIMIT 0, $size"; 
+		if($config['size'] != 0 && $config['size'] != '') 
+			$query .= " LIMIT 0, {$config['size']}";  
 
 		$res = $this->db->dbDoQuery($query);
 
@@ -814,14 +841,14 @@ class OutPut
 		return true;
 	}		
 
-	function outputEventList($name, $size)
+	function outputEventList($name, $config)
 	{
 		//event output
 		$this->t_body->set_block($name, "group_events", "group_events_block");
 	
 		//event limit changed from posts to days
-		if($size != 0 && $size != '')
-				$where = " AND date < ADDDATE(CURDATE(), INTERVAL $size DAY) ";
+		if($config['size'] != 0 && $config['size'] != '')
+				$where = " AND date < ADDDATE(CURDATE(), INTERVAL {$config['size']} DAY) ";
 		else
 				$where = "";
 		
@@ -858,14 +885,14 @@ class OutPut
 		return true;
 	}
 
-	function outputCalendarList($name, $size)
+	function outputCalendarList($name, $config)
 	{
 		//event output
 		$this->t_body->set_block($name, "group_events", "group_events_block");
 	
 		//event limit changed from posts to days
-		if($size != 0 && $size != '')
-				$where = " AND date < ADDDATE(CURDATE(), INTERVAL $size DAY) ";
+		if($config['size'] != 0 && $config['size'] != '')
+				$where = " AND date < ADDDATE(CURDATE(), INTERVAL {$config['size']} DAY) ";
 		else
 				$where = "";
 		
@@ -1098,7 +1125,7 @@ class OutPut
 
 	}
 
-	function outputDropBox($name, $size) {
+	function outputDropBox($name, $config) {
 	
 		//output drop box
 		$this->t_body->set_block($name, "drop_student", "drop_student_block");

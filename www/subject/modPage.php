@@ -47,10 +47,20 @@ class modPage
 			$this->db->dbUpdateRow('homepage_comp_location', array('component', 'cid'), $query);
 		}
 		
+		function updateComponentConfig($component, $config)
+		{
+			$query = array(
+				"component" => $component,
+				"cid" => $this->cid,
+				"config" => $config
+			);
+			$this->db->dbUpdateRow('homepage_comp_location', array('component', 'cid'), $query);
+		}
+		
 		// For updating available components
 		function updateComponents($submitListComp){
 			// Get components
-			$query = "SELECT `cid`, `position`, `column`, `component`
+			$query = "SELECT `cid`, `position`, `column`, `component`, `config`
 				FROM homepage_comp_location
 				WHERE cid = '{$this->cid}'
 				ORDER BY `position`";
@@ -71,14 +81,14 @@ class modPage
 			$newListComp = $currentListComp;
 			foreach($submitListComp as $key => $comp)
 			{
-				$query = "SELECT size FROM homepage_comp WHERE id = $comp";
-				$size = $this->db->dbGetSingleRow($query);
+				$query = "SELECT size, config FROM homepage_comp WHERE id = $comp";
+				$result = $this->db->dbGetSingleRow($query);
 				$newComp = array(
 					"cid" => $this->cid,
 					"position" => "",
-					"column" => $size['size'],
+					"column" => $result['size'],
 					"component" => $comp,
-					"size" => 0
+					"config" => $result['config']
 				);
 				$newListComp[] = $newComp;
 			}
@@ -95,7 +105,7 @@ class modPage
 			// Update
 			$this->deleteComponentPositions();
 			foreach($newListComp as $newComp)
-				$this->saveComponentPosition($newComp['component'], $newComp['column'], $newComp['position'], $newComp['size']);
+				$this->saveComponentPosition($newComp['component'], $newComp['column'], $newComp['position'], $newComp['config']);
 		}
 
 		function deleteComponentPositions()
@@ -103,14 +113,14 @@ class modPage
 			$this->db->dbDeleteRow('homepage_comp_location', 'cid', $this->cid);
 		}
 
-		function saveComponentPosition($component, $column, $position, $size)
+		function saveComponentPosition($component, $column, $position, $config)
 		{
 			$query = array(
 				"cid" => $this->cid,
 				"component" => $component,
 				"column" => $column,
 				"position" => $position,
-				"size" => $size
+				"config" => $config
 			);
 			$this->db->dbInsertRow('homepage_comp_location', $query);
 		}
@@ -135,13 +145,13 @@ class modPage
 			$this->deleteComponentPositions();
 
 			// Default components
-			$this->saveComponentPosition(8, 1, 1, 0);
-			$this->saveComponentPosition(19, 1, 2, 5);
-			$this->saveComponentPosition(2, 1, 3, 5);
-			$this->saveComponentPosition(12, 2, 1, 7);
-			$this->saveComponentPosition(11, 2, 2, 7);
-			$this->saveComponentPosition(9, 2, 3, 0);
-			$this->saveComponentPosition(10, 2, 4, 0);
+			$this->saveComponentPosition(8, 1, 1, '');
+			$this->saveComponentPosition(19, 1, 2, serialize(array('size' => 5)));
+			$this->saveComponentPosition(2, 1, 3, serialize(array('size' => 5)));
+			$this->saveComponentPosition(12, 2, 1, serialize(array('size' => 7)));
+			$this->saveComponentPosition(11, 2, 2, serialize(array('size' => 7)));
+			$this->saveComponentPosition(9, 2, 3, '');
+			$this->saveComponentPosition(10, 2, 4, '');
 
 			// Default colors
 			$this->saveDisplayProperties(unserialize(HOMEPAGE_colors));
@@ -153,14 +163,14 @@ class modPage
 			$this->deleteComponentPositions();
 
 			// Default components
-			$this->saveComponentPosition(8, 1, 1, 0);
-			$this->saveComponentPosition(19, 1, 2, 5);
-			$this->saveComponentPosition(2, 1, 3, 5);
-			$this->saveComponentPosition(12, 2, 1, 7);
-			$this->saveComponentPosition(11, 2, 2, 7);
-			$this->saveComponentPosition(5, 2, 3, 5);
-			$this->saveComponentPosition(9, 2, 4, 0);
-			$this->saveComponentPosition(10, 2, 5, 0);
+			$this->saveComponentPosition(8, 1, 1, '');
+			$this->saveComponentPosition(19, 1, 2, serialize(array('size' => 5)));
+			$this->saveComponentPosition(2, 1, 3, serialize(array('size' => 5)));
+			$this->saveComponentPosition(12, 2, 1, serialize(array('size' => 7)));
+			$this->saveComponentPosition(11, 2, 2, serialize(array('size' => 7)));
+			$this->saveComponentPosition(5, 2, 3, serialize(array('size' => 5)));
+			$this->saveComponentPosition(9, 2, 3, '');
+			$this->saveComponentPosition(10, 2, 4, '');
 
 			// Default colors
 			$this->saveDisplayProperties(unserialize(HOMEPAGE_colors));
@@ -172,11 +182,11 @@ class modPage
 			$this->deleteComponentPositions();
 
 			// Default components
-			$this->saveComponentPosition(8, 1, 1, 0);
-			$this->saveComponentPosition(3, 1, 2, 5);
-			$this->saveComponentPosition(2, 1, 3, 5);
-			$this->saveComponentPosition(4, 2, 1, 7);
-			$this->saveComponentPosition(10, 2, 2, 7);
+			$this->saveComponentPosition(8, 1, 1, '');
+			$this->saveComponentPosition(3, 1, 2, serialize(array('size' => 5)));
+			$this->saveComponentPosition(2, 1, 3, serialize(array('size' => 5)));
+			$this->saveComponentPosition(4, 2, 1, '');
+			$this->saveComponentPosition(10, 2, 2, '');
 
 			// Default colors
 			$this->saveDisplayProperties(unserialize(HOMEPAGE_colors));
@@ -188,12 +198,12 @@ class modPage
 			$this->deleteComponentPositions();
 
 			// Default components
-			$this->saveComponentPosition(8, 1, 1, 0);
-			$this->saveComponentPosition(3, 1, 2, 5);
-			$this->saveComponentPosition(2, 1, 3, 5);
-			$this->saveComponentPosition(5, 2, 1, 7);
-			$this->saveComponentPosition(4, 2, 2, 7);
-			$this->saveComponentPosition(10, 2, 3, 7);
+			$this->saveComponentPosition(8, 1, 1, '');
+			$this->saveComponentPosition(3, 1, 2, serialize(array('size' => 5)));
+			$this->saveComponentPosition(2, 1, 3, serialize(array('size' => 5)));
+			$this->saveComponentPosition(5, 2, 1, serialize(array('size' => 7)));
+			$this->saveComponentPosition(4, 2, 2, '');
+			$this->saveComponentPosition(10, 2, 3, '');
 			
 			// Default colors
 			$this->saveDisplayProperties(unserialize(HOMEPAGE_colors));
@@ -205,12 +215,12 @@ class modPage
 			$this->deleteComponentPositions();
 
 			// Default components
-			$this->saveComponentPosition(15, 1, 1, 0);
-			$this->saveComponentPosition(8, 1, 2, 10);
-			$this->saveComponentPosition(4, 2, 1, 7);
-			$this->saveComponentPosition(7, 2, 2, 7);
-			$this->saveComponentPosition(6, 2, 3, 7);
-			$this->saveComponentPosition(10, 2, 4, 7);
+			$this->saveComponentPosition(15, 1, 1, serialize(array('image' => 'Preview Image')));
+			$this->saveComponentPosition(8, 1, 2, '');
+			$this->saveComponentPosition(4, 2, 1, '');
+			$this->saveComponentPosition(7, 2, 2, serialize(array('size' => 7)));
+			$this->saveComponentPosition(6, 2, 3, serialize(array('size' => 7)));
+			$this->saveComponentPosition(10, 2, 4, '');
 
 			// Default colors
 			$this->saveDisplayProperties(unserialize(HOMEPAGE_colors));
