@@ -72,15 +72,20 @@ class reportModelStat
 				";
 		$result = $this->db->dbDoQuery($query);
 	
-		while($brand = $this->db->dbGetNextArray($result))
-		{
-			$this->tpl->set_var("BRAND_NAME", $brand['brand']);
-			$this->tpl->set_var("BRAND_TASKS", $brand['tasks']);
-			
-			$this->outputModels($brand['brandID']);
-			
-			$this->tpl->parse('brandList', 'brand', true);
-			$this->tpl->set_var('modelList', '');
+		if (mysql_num_rows($result) > 0) {
+			while($brand = $this->db->dbGetNextArray($result))
+			{
+				$this->tpl->set_var("BRAND_NAME", $brand['brand']);
+				$this->tpl->set_var("BRAND_TASKS", $brand['tasks']);
+				
+				$this->outputModels($brand['brandID']);
+				
+				$this->tpl->parse('brandList', 'brand', true);
+				$this->tpl->set_var('modelList', '');
+			}
+		
+		} else {
+				$this->tpl->set_var('brandList', '');
 		}
 	
 	}
