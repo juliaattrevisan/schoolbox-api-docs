@@ -23,6 +23,9 @@ window.onload = function(){
 	
 	// WebBoxes drag behavior for each
 	components.each(function(element, i){
+		// Giver the handle a cursor
+		(element.getElementsBySelector('.componentHeader')[0]).setStyle('cursor', 'move');
+		
 		// Make each component draggable using the handle
 		element.makeDraggable({
 			handle: element.getElementsBySelector('.componentHeader')[0],

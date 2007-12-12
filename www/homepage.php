@@ -63,13 +63,15 @@ class OutPut
 				
 				$this->t_body->set_file($component['name'].$componentCount, 'homepages/components/'.$component['filename']);
 				$this->t_body->set_var('COMPONENT_ID', $component['component']);
-				
-				if(!empty($component['config']))
+				$this->t_body->set_block($component['name'].$componentCount, "config", "config_block");
+		
+				if(!empty($component['config']) && $this->perm >= 2)
+				{			
 					foreach($component['config'] as $name => $value)
 					{
 						if($name == 'size')
 						{
-							$this->t_body->set_block($component['name'].$componentCount, "size", "size_block".$componentCount);
+							$this->t_body->set_block("config", "size", "size_block".$componentCount);
 							for($i=0; $i<=10; $i++)
 							{
 								$this->t_body->set_var('COMPONENT_CONFIG_SIZE_NAME', $i == 0 ? 'All' : $i);
@@ -80,7 +82,7 @@ class OutPut
 						}
 						elseif($name == 'image')
 						{
-							$this->t_body->set_block($component['name'].$componentCount, "image", "image_block".$componentCount);
+							$this->t_body->set_block("config", "image", "image_block".$componentCount);
 							
 							$query = "SELECT id, file.description FROM file LEFT JOIN allowedFileTypes ON mime_type = mime WHERE category = '{$this->category}' 
 									  AND deleted = '0' AND INSTR(mime_type, 'image/') AND inline = 'true'
@@ -100,6 +102,11 @@ class OutPut
 						else
 							$this->t_body->set_var('COMPONENT_CONFIG_' . strtoupper($name), $value);
 					}
+					
+					$this->t_body->parse("config_block", "config");	
+				}
+				else
+					$this->t_body->set_var("config_block", "");	
 				
 				$func = $component['method'];
 				if($this->$func($component['name'].$componentCount, $component['config'])) {
@@ -238,6 +245,36 @@ class OutPut
 			
 		return true;
 	}
+	
+	function outputRSS($name, $config) {
+		$this->t_body->set_block($name, "rss_stories", "rss_block");
+		
+		require_once('include/lastRSS.php');
+		$rss = new lastRSS; 
+		
+		$rss->cache_dir = RSS_cache_dir; 
+  		$rss->cache_time = RSS_cache_time; // one hour
+  		$rss->stripHTML = true;
+		$rss->items_limit = $config['size'];
+		$headlineList = $rss->get($config['url']);
+			
+		$this->t_body->set_var('RSS_NAME', !empty($headlineList['title']) ? $headlineList['title'] : 'RSS Feed');
+		
+		//output headlines
+		if(is_array($headlineList['items']) ) {
+			foreach($headlineList['items'] as $item) {
+				$this->t_body->set_var("RSS_TITLE", $item['title']);
+				$this->t_body->set_var("RSS_URL", $item['link']); 
+				$this->t_body->set_var("RSS_BRIEF", $item['description']);
+				$this->t_body->parse("rss_block", "rss_stories", true);
+	    	}
+		}
+		else
+			$this->t_body->set_var("rss_block", '');
+		
+		return true;
+	}
+
 	
 	function outputDuties($name, $config)
         {
@@ -490,6 +527,8 @@ class OutPut
 			
 			$this->t_body->parse("preview_block", "previewimage");
 		}
+		else
+			$this->t_body->set_var("preview_block", '');
 		
 		return true;
 	}
