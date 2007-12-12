@@ -1,14 +1,18 @@
 <div class="component" id="component{COMPONENT_ID}">
   <a class="config" onclick="toggleConfig('component{COMPONENT_ID}');"></a>
   <div class="componentConfig">
-	<form action="subject/customisePage.php" method="get">
-	  <input type="hidden" name="cid" value="{ID}" />
-	  <input type="hidden" name="type" value="config" />
-	  <input type="hidden" name="component" value="{COMPONENT_ID}" />
-	  <label for="image">Image: </label>
-	  <input type="text" name="image" value="{COMPONENT_CONFIG_IMAGE}" />
-	  <input type="submit" value="Update" />
-	</form>
+    <form action="subject/customisePage.php" method="get">
+      <input type="hidden" name="cid" value="{ID}" />
+      <input type="hidden" name="type" value="config" />
+      <input type="hidden" name="component" value="{COMPONENT_ID}" />
+      <label for="image">Image: </label>
+      <select name="image">
+      	<!-- BEGIN image -->
+      	<option value="{COMPONENT_CONFIG_IMAGE}"{COMPONENT_CONFIG_IMAGE_SELECTED}>{COMPONENT_CONFIG_IMAGE}</option>
+      	<!-- END image -->
+      </select>
+      <input type="submit" value="Update" />
+    </form>
   </div>
   <div class="componentHeader">
 	  <!-- BEGIN previewimage -->
@@ -16,5 +20,6 @@
 	    <a href="/redir.php?url={CONTENT_URL}" target="_blank"><img src="{PREVIEW_IMAGE_URL}" border="0" alt="{PREVIEW_IMAGE_DESC}" title="{PREVIEW_IMAGE_DESC}" /></a>
 	  </div>
 	  <br style="clear:both;" />
-	  <!-- END previewimage -->  </div>
+	  <!-- END previewimage -->
+  </div>
 </div>

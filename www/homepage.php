@@ -78,6 +78,25 @@ class OutPut
 								$this->t_body->parse("size_block".$componentCount, "size", true);
 							}
 						}
+						elseif($name == 'image')
+						{
+							$this->t_body->set_block($component['name'].$componentCount, "image", "image_block".$componentCount);
+							
+							$query = "SELECT id, file.description FROM file LEFT JOIN allowedFileTypes ON mime_type = mime WHERE category = '{$this->category}' 
+									  AND deleted = '0' AND INSTR(mime_type, 'image/') AND inline = 'true'
+                					  ORDER BY submitted".$lim;
+							$this->db->dbDoQuery($query);
+							
+							if($this->db->dbCountRows() > 0)
+							{
+								while($image = $this->db->dbGetNextArray())
+								{print($config['image']);
+									$this->t_body->set_var('COMPONENT_CONFIG_IMAGE', $image['description']);
+									$this->t_body->set_var('COMPONENT_CONFIG_IMAGE_SELECTED', $image['description'] == $value ? ' selected' : '');
+									$this->t_body->parse("image_block".$componentCount, "image", true);
+								}
+							}
+						}
 						else
 							$this->t_body->set_var('COMPONENT_CONFIG_' . strtoupper($name), $value);
 					}
@@ -468,15 +487,9 @@ class OutPut
 			$this->t_body->set_var("PREVIEW_IMAGE_URL", $imageurl);
 			$this->t_body->set_var("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));
 			$this->t_body->set_var("CONTENT_URL", $link['url']);
+			
+			$this->t_body->parse("preview_block", "previewimage");
 		}
-		else
-		{
-			$this->t_body->set_var("PREVIEW_IMAGE_URL", 'images/notfound.gif');
-			$this->t_body->set_var("PREVIEW_IMAGE_DESC", 'Image Not Found');
-			$this->t_body->set_var("CONTENT_URL", '');
-		}
-		
-		$this->t_body->parse("preview_block", "previewimage");
 		
 		return true;
 	}

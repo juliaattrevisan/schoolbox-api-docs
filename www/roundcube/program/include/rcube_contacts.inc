@@ -152,8 +152,9 @@ class rcube_contacts
       $length = $subset != 0 ? abs($subset) : $this->page_size;
       
       $sql_result = $this->db->limitquery(
-        "SELECT * FROM ".$this->db_name.($this->filter ? "
-         WHERE (".$this->filter.")" : "") .
+        "SELECT * FROM ".$this->db_name.
+        " WHERE (group_id = 2 or group_id = 3)" . ($this->filter ? 
+        " AND (".$this->filter.")" : "") .
         " ORDER BY lastname",
         $start_row,
         $length);
@@ -225,8 +226,10 @@ class rcube_contacts
     // count contacts for this user
     $sql_result = $this->db->query(
       "SELECT COUNT(id) AS rows
-       FROM  ".$this->db_name.($this->filter ? "
-       WHERE (".$this->filter.")" : ""));
+       FROM  " . $this->db_name . 
+       " WHERE (group_id = 2 or group_id = 3)" . ($this->filter ? 
+       " AND (".$this->filter.")" : "") .
+       " ORDER BY lastname");
 
     $sql_arr = $this->db->fetch_assoc($sql_result);
     return new rcube_result_set($sql_arr['rows'], ($this->list_page-1) * $this->page_size);;
