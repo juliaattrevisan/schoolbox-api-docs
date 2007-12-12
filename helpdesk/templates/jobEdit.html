@@ -48,9 +48,19 @@
 		}
 		return sure;
 	}
+		
+	function pressFileDelete( btnFileDelete) {
+		var sure;
+		sure = confirm( 'Delete this file?');
+		if (sure) {
+			btnFileDelete.form.doAction.value = 'deleteFile';
+			btnFileDelete.form.submit();
+		}
+		return sure;
+	}
 </script>
 <h2 style="margin-top:0;">Associate Task With</h2>
-<form action="jobEdit.php" method="POST" onSubmit='return validateForm( this);' id="signup" name="signup">  <table>
+<form action="jobEdit.php" method="POST" onSubmit='return validateForm( this);' id="signup" name="signup" enctype="multipart/form-data">  <table>
 	<table>
     <tr>
       <!-- BEGIN EQUIPMENT_SECTION -->
@@ -139,12 +149,35 @@
         </select>
       </td>
     </tr>
+
     <tr>
       <td valign="top" class="labelcell">Description :
       </td>
       <td class="fieldcell" colspan="3"><textarea name="description" id="description" cols="60" rows="4" tabindex="7">{DESCRIPTION}</textarea>
       </td>
     </tr>
+    </tr>
+        <tr>
+    	 <td valign="top" class="labelcell">Attach File :
+      </td>
+      <td class='fieldcell'>
+      		
+      <!-- BEGIN fileList --> 
+      <ul style="list-style-type: none; margin: 0 0 5px 0; padding: 0;">
+        <!-- BEGIN fileItem -->
+        <li><a href="/files/{FILE_ITEM_LINK}">{FILE_ITEM_NAME}</a></li>
+       
+       <!-- END fileItem -->
+       </ul>
+       
+       <!-- END fileList -->
+
+            
+      		<input type='file' name='attachment' />
+      </td>
+      <td colspan='2' class='fieldcell'>&nbsp;</td>
+      
+    </tr>    
     <tr>
       <td valign="top" class="labelcell">&nbsp;</td>
       <td colspan="3" class="fieldcell">
@@ -155,6 +188,6 @@
         <input type="submit" name="delete" value="delete" class="button" onClick='return pressDelete( this);'>
         <!-- END button_delete -->
       </td>
-    </tr>
+
   </table>
 </form>

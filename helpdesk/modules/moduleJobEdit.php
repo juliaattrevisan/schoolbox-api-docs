@@ -178,6 +178,46 @@ class ModuleJobEdit extends HelpDeskPage {
 		$this->populateSelectNumberRange( 'dateMonth', 1, 12, $selectedMonth);
 		$this->populateSelectNumberRange( 'dateYear', date( 'Y')-5, date( 'Y')+1, $selectedYear);
 
+
+		# File list
+		$this->_tpl->set_block( 'tplContent', 'fileList', 'blkFileList');
+		$this->_tpl->set_block( 'fileList', 'fileItem', 'blkFileItem');
+		
+				
+		
+		$link = mysql_connect( DB_HOST, DB_USER, DB_PASSWD);
+		mysql_select_db( DB_NAME, $link);
+		
+		$query = SQL_fileList($row[ 'jobID']);
+		
+		$res = mysql_query($query);
+		
+		$jobID = $row['jobID'];
+	
+		if (($numRows = mysql_num_rows($res)) > 0) {
+			
+			while (list($fileID, $jobID, $name) = mysql_fetch_array($res)) {
+				
+				$this->_tpl->set_var('FILE_ITEM_LINK', $jobID . "." . $fileID . "." . $name);
+				$this->_tpl->set_var('FILE_ITEM_NAME', $name);
+				
+				$this->_tpl->parse( 'blkFileItem', 'fileItem', true);
+						
+			}
+			
+			$this->_tpl->parse('blkFileList', 'fileList');
+			
+			$this->_tpl->set_var( 'FILE_ID', $fileID);
+	
+		
+			
+		
+		
+		} else {
+		
+			$this->_tpl->set_var('blkFileList','');
+		}
+
 		//mysql_close();
 
 		$this->showHideDate();
@@ -301,6 +341,31 @@ class ModuleJobEdit extends HelpDeskPage {
 				$moduleEventAdd->add( $arrDetails);
 			}
 		}
+	}
+	
+	
+	function saveAttachment( $jobID, $attachment) {
+
+	
+		mysql_connect( DB_HOST, DB_USER, DB_PASSWD);
+		mysql_select_db( DB_NAME);
+		
+		
+		$sql = SQL_fileAdd( array('jobID' => $jobID, 'name' => scrubTEXT($attachment['name'])));
+		
+		mysql_query( $sql);
+		$fileID = mysql_insert_id();
+
+		if( mysql_error() <> '') {
+			die( 'Error accessing database to update file : ' . '<br><br' . mysql_error());
+		}
+		
+		
+		$saveAs = $jobID . "." . $fileID . "." . scrubTEXT($attachment['name']);
+		
+		move_uploaded_file($attachment['tmp_name'], UPL_DIR . $saveAs);
+		
+	
 	}
 
 	function setContent( $content) {

@@ -8,6 +8,7 @@ require_once( 'modules/moduleJobDetails.php');
 require_once( 'modules/moduleEventList.php');
 require_once( 'modules/moduleEventAdd.php');
 require_once( 'modules/moduleEventDelete.php');
+require_once( 'modules/moduleFileDelete.php');
 
 $_TITLE = 'Task Details';
 $page = new HelpDeskPage;
@@ -36,6 +37,13 @@ switch( $_REQUEST[ 'action']) {
 		$jobID = $_REQUEST['jobID'];
 		$moduleEventDelete = new ModuleEventDelete;
 		$moduleEventDelete->delete( $jobID, $jobEventID);
+		break;
+	case( 'deleteFile') :
+		
+		$fileID = $_REQUEST[ 'fileID'];
+		$jobID = $_REQUEST['jobID'];
+		$moduleFileDelete = new ModuleFileDelete;
+		$moduleFileDelete->delete( $jobID, $fileID);
 		break;
 	default :
 		break;

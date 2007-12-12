@@ -11,6 +11,7 @@ require_once( 'modules/moduleUserList.php');
 require_once( 'modules/moduleEquipmentAdd.php');
 require_once( 'modules/moduleEquipmentDelete.php');
 
+
 $equipmentID = $_REQUEST[ 'equipmentID'];
 
 if ($_REQUEST['delete'] && isset($_REQUEST['delete']) && $_REQUEST['equipmentID'] && isset($_REQUEST['equipmentID'])){
@@ -130,6 +131,7 @@ if( isset( $_REQUEST[ 'create']) or isset( $_REQUEST[ 'update'])) {
 			$moduleEquipmentAdd = new ModuleEquipmentAdd();
 			$equipmentID = $moduleEquipmentAdd->add( $arrDetails);
 			$moduleEquipmentAdd->addExtraFields($equipmentID); //code abstracted to module for conformity
+	
 		}
 		elseif( $action == 'update') {
 			//$moduleEquipmentEdit = new ModuleEquipmentEdit();

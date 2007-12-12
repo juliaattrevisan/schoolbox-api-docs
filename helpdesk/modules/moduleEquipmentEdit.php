@@ -375,9 +375,29 @@ class ModuleEquipmentEdit extends HelpDeskPage {
 		mysql_select_db( DB_NAME ,$this->link);
 		mysql_query( $sql, $this->link);
 
+
 		if( mysql_error() <> '') {
 			die( 'Error accessing database to update equipment : ' . print_r( $details) . '<br><br' . mysql_error());
 		}
+		
+		if ($details['equipmentTypeID'] === '1' && $details['active'] == 1) {
+			$sql = "UPDATE tblEquipment SET 
+						active = NULL 
+					WHERE 
+						portalUserID = " . (int)$details['portalUserID'] . " AND 
+						equipmentID != '" . $details['equipmentID'] . "' AND 
+						equipmentTypeID = 1";
+					
+			mysql_query( $sql);
+		
+			
+			if( mysql_error() <> '') {
+				die( 'Error accessing database : ' . mysql_error());
+			}
+		} 
+		
+		
+		
 	}
 
 		# Check whethere or not to show the delete button, take appropriate action

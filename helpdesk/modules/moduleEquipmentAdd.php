@@ -16,6 +16,8 @@ class ModuleEquipmentAdd extends HelpDeskPage {
 		# Add an equipment item
 	function add( &$details) {
 		$sql = SQL_equipmentAdd( $details);
+		
+		
 		$link = mysql_connect( DB_HOST, DB_USER, DB_PASSWD);
 		mysql_select_db( DB_NAME);
 		mysql_query( $sql, $link);
@@ -24,6 +26,27 @@ class ModuleEquipmentAdd extends HelpDeskPage {
 			die( 'Error accessing database : ' . mysql_error());
 		}
 		$id = mysql_insert_id();
+
+		
+		if ($details['equipmentTypeID'] === '1' && $details['active'] == 1) {
+			$sql = "UPDATE tblEquipment SET 
+						active = NULL 
+					WHERE 
+						portalUserID = " . (int)$details['portalUserID'] . " AND 
+						equipmentID != '" . $id . "' AND 
+						equipmentTypeID = 1";
+					
+	
+			mysql_query( $sql);
+		
+			
+			if( mysql_error() <> '') {
+				die( 'Error accessing database : ' . mysql_error());
+			}
+		} 
+		
+
+
 		mysql_close( $link);
 		return $id;
 	}

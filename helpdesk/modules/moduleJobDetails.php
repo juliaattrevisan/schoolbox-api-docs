@@ -24,6 +24,14 @@ class ModuleJobDetails extends HelpdeskPage{
 		$this->_tpl->set_file( 'tplContent', $this->_TPL_NAME);
 		$this->_jobID = $jobID;
 		$this->_sql = SQL_jobDetails( $this->_jobID);
+		
+		//if user has permission allow them to delete attachments
+		if($_SESSION['authlevel'] == 3) {
+			$this->_showDelete = true;
+		}
+		else {
+			$this->_showDelete = false;
+		}
 	}
 
 	function getContent() {
@@ -123,6 +131,44 @@ class ModuleJobDetails extends HelpdeskPage{
 
 			# Specs - not yet implemented
 		#$query = mysql_query( SQL_jobSpecs( $jobID));
+		
+		# File list
+	
+		$this->_tpl->set_block( 'tplContent', 'fileDelete', 'fDelete');
+		$this->_tpl->set_block( 'tplContent', 'fileList', 'blkFileList');
+		$this->_tpl->set_block( 'fileList', 'fileItem', 'blkFileItem');	
+	
+		
+		$sql = SQL_fileList($row[ 'jobID']);
+		$res = mysql_query($sql);
+	
+		if(($numRows = mysql_num_rows($res)) > 0) 
+		{
+			
+			while (list($fileID, $jobID, $fileName) = mysql_fetch_array($res)) {
+		
+				$this->_tpl->set_var('FILE_ITEM_LINK', $jobID . "." . $fileID . "." . $fileName);
+				$this->_tpl->set_var('FILE_ITEM_NAME', $fileName);
+				
+				
+				
+					
+				if($this->_showDelete){
+					
+					$this->_tpl->set_var( 'JOB_FILE_ID', $fileID);	
+					$this->_tpl->parse('fDelete', 'fileDelete', false);
+				}
+				else{
+					$this->_tpl->set_var('fDelete', '');
+				}
+						
+				$this->_tpl->parse( 'blkFileItem', 'fileItem', true);		
+			}
+			
+			$this->_tpl->parse('blkFileList', 'fileList');
+		}
+		else
+			$this->_tpl->set_var('blkFileList','');
 
 		mysql_close( $link);
 

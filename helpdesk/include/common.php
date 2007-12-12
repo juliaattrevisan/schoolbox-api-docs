@@ -74,6 +74,9 @@ define( 'AUTH_NO_ACCESS', 0);
 define( 'AUTH_READ_ONLY', 1);
 define( 'AUTH_ADMIN', 2);
 
+	# File Constants
+define( 'UPL_DIR', '/usr/local/www/helpdesk/files/');
+
 function stripslashes_array($arr){
         $rs = $arr;
 

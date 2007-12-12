@@ -79,5 +79,32 @@
     </tr>
   </table>
   <div style="margin-top: 20px; text-align: center;"> </div>
-</form>
+  </form>
+  <!-- BEGIN fileList --> 
+  <h2 style="margin-top:0;">Files</h2>
+
+	<table class="ruler" cellpadding="0" cellspacing="0">
+  	
+  	<!-- BEGIN fileItem -->
+
+  	<tr>
+    	<td ><a href="/files/{FILE_ITEM_LINK}">{FILE_ITEM_NAME}</a></td>
+        <td class="value" width="50">
+        <!-- BEGIN fileDelete -->
+        <form method='POST' onSubmit='return confirm( "Sure you want to delete this file?");'  id="signup2" name="signup2">
+          <input type='hidden' name='fileID' value='{JOB_FILE_ID}'>
+          <input type='hidden' name='action' value='deleteFile'>
+          <input type='hidden' name='jobID' value='{JOB_ID}'>
+          <input type='image' name='buttonDelete' src='images/button_cross.jpg' width='10px'>
+        </form>
+        <!-- END fileDelete -->
+        </td>
+
+    </tr>
+    <!-- END fileItem -->
+  </table>
+
+  <!-- END fileList -->
+  
+
 <p>{EVENT_LIST}</p>

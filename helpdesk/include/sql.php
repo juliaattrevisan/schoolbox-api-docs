@@ -105,6 +105,14 @@ function SQL_eventDelete( $jobEventID) {
 	return $sql;
 }
 
+function SQL_fileDelete( $fileID) {
+	$jobEventID = sql_escape( $fileID);
+	$sql= " delete
+		from	tblFile
+		where	fileID = '" . $fileID . "' LIMIT 1";
+	return $sql;
+}
+
 function SQL_eventDetails( $parms) {
 	$sql= "	select	jobEventID,
 			jobID,
@@ -170,6 +178,12 @@ function SQL_eventList( &$parms) {
 	return $sql;
 }
 
+
+function SQL_fileList( $jobID) {
+	$sql = "SELECT fileID, jobID, name FROM tblFile WHERE jobID = '" . (int)$jobID . "'";
+	return $sql;
+	
+}
 
 	# $showUsers is a flag to speed queries - if true, will join on the intranet.user table. Otherwise will not (faster).
 	#
@@ -845,6 +859,27 @@ function SQL_jobUpdate( &$parms) {
 	}
 	$sql = substr( $sql, 0, strlen( $sql) - 2);
 	$sql .= " where jobID = " . sql_escape( $parms[ 'jobID']);
+
+	return $sql;
+}
+
+function SQL_fileAdd( $parms) {
+
+	$fields = '';
+	$values = '';
+
+	$sql = "INSERT INTO	tblFile ";
+
+	foreach( array_keys( $parms) as $key) {
+		$fields .= $key . ', ';
+		$value = sql_escape( $parms[ $key]);
+
+		$values .= $value . ", ";
+	}
+	$fields = substr( $fields, 0, strlen( $fields) - 2);
+	$values = substr( $values, 0, strlen( $values) - 2);
+
+	$sql .= '(' . $fields . ') values (' . $values . ')';
 
 	return $sql;
 }

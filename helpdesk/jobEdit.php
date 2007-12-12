@@ -39,6 +39,23 @@ if( $doAction == 'delete') {
 	$moduleJobDelete->delete( $jobID);
 	$moduleJobEdit->setContent( 'Job deleted.');
 }
+elseif ($doAction == 'deleteFile' && isset($_REQUEST['FileID'])) {
+	
+	mysql_connect( DB_HOST, DB_USER, DB_PASSWD);
+	mysql_select_db( DB_NAME);
+	
+	$sql = "SELECT * FROM tblFile WHERE fileID = '" . (int)$_REQUEST['FileID'] . "' LIMIT 1";
+	$res = mysql_query($sql) or die('Error: ' .  mysql_error());
+	list($fileID, $jobID, $fileName) = mysql_fetch_assoc($res);
+	$filePath = UPL_DIR . $jobID . "." . $fileID . "." . $fileName;
+	@unlink($filePath);
+	
+	$sql = "DELETE FROM tblFile WHERE fileID = '" . (int)$_REQUEST['FileID'] . "' LIMIT 1";
+	$res = mysql_query($sql) or die('Error: ' .  mysql_error());
+	
+	redirectTo( 'jobDetails.php?prevaction=' . $action . 'd&jobID=' . (int)$_REQUEST['jobID']);
+	
+}
 elseif(( $doAction == 'create') or ($doAction == 'update')) {
 
 	$serial = $_REQUEST[ 'serial'];
@@ -133,6 +150,13 @@ elseif(( $doAction == 'create') or ($doAction == 'update')) {
 		}
 		else {
 			die( "jobEdit.php - didn't specify a create or update =/");
+		}
+		
+		if (is_file($_FILES['attachment']['tmp_name'])) {
+	
+			$moduleJobEdit = isset($moduleJobEdit) ? $moduleJobEdit : new ModuleJobEdit();
+			$moduleJobEdit->saveAttachment( $jobID, $_FILES['attachment']);
+			
 		}
 
 		redirectTo( 'jobDetails.php?prevaction=' . $action . 'd&jobID=' . $jobID);
