@@ -50,6 +50,33 @@ h3 {
 	z-index: 1;
 }
 
+.componentConfig {
+	background-color: #CCCCCC;
+	text-align: right;
+	padding: 5px;
+	margin-bottom: 2px;
+	display: none;
+}
+
+a.config {
+	cursor: pointer;
+	position: absolute;
+	top: 1px;
+	right: 3px;
+	display: block;
+	width: 13px;
+	height: 13px;
+	background-repeat: no-repeat;
+}
+
+a.config:hover {
+	background-position: 0px -13px;
+}
+
+a.config {
+	background-image: url('/images/icons/modify_small.gif');
+}
+
 .componentHeader {
 	cursor: move;
 	padding-left: 0;

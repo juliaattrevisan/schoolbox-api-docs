@@ -62,7 +62,7 @@ class page
 					$week = $_GET['week'];
 				else 
 					$week = $curWeek = date('W', strtotime("+1 day"));
-				
+
 				$this->t_body->set_var("LASTWEEK", ($week - 1));
 				$this->t_body->set_var("NEXTWEEK", ($week + 1));
 				
@@ -70,17 +70,16 @@ class page
 				$startDay = strtotime("-1 day", $firstMonday); 
 				$currentDay = $startDay;
 				$col = 98;
-				
+
 				//7 days, from 8am till 7pm
 				//output headings
 				for($i = FIRST_DAY; $i < DAYS_IN_WEEK; $i++)
-				{
-					$this->t_body->set_var("COL_HEADING", dayNames($i)."<br />".date('j/n', $currentDay));
-					
+				{	
+					$this->t_body->set_var("COL_HEADING", $this->dayNames($i)."<br />".date('j/n', $currentDay));
 					$this->t_body->parse("col_header_block", "col_header", true);
-				
+
 					$bookings = $bookdb->getBookings($_GET['id'], ($currentDay + (START_TIME * 60 * 60)), ($currentDay + (END_TIME * 60 * 60)));
-				
+					
 					if(is_array($bookings))
 					{
 						foreach($bookings as $book)
@@ -132,7 +131,7 @@ class page
 				
 				for($x = START_TIME; $x < END_TIME; $x++)
 				{
-					$this->t_body->set_var("ROW_HEADING", timeNames($x));
+					$this->t_body->set_var("ROW_HEADING", $this->timeNames($x));
 		
 					if(($x % 2) == 0)
 						$this->t_body->set_var("ROW_TYPE", "ODD");
@@ -147,7 +146,8 @@ class page
 					}
 				
 					$this->t_body->parse("table_row_block", "table_row", true);
-				}	
+				}
+					
 			}
 			else
 			{

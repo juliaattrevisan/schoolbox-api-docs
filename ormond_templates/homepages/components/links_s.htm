@@ -2,6 +2,23 @@
   <div class="componentHeader">
     <h2 class="small_head">Links</h2>
   </div>
+  <!-- BEGIN config -->
+  <a class="config" onclick="toggleConfig('component{COMPONENT_ID}');"></a>
+  <div class="componentConfig">
+    <form action="subject/customisePage.php" method="get">
+      <input type="hidden" name="cid" value="{ID}" />
+      <input type="hidden" name="type" value="config" />
+      <input type="hidden" name="component" value="{COMPONENT_ID}" />
+      <label for="size">Item Limit: </label>
+      <select name="size">
+      	<!-- BEGIN size -->
+      	<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
+      	<!-- END size -->
+      </select>
+      <input type="submit" value="Update" />
+    </form>
+  </div>
+<!-- END config -->
   <table>
     <!-- BEGIN link -->
     <tr>
