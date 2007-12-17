@@ -136,6 +136,17 @@ define('HOMEPAGE_small_head_bg', 3);
 define('HOMEPAGE_small_text_font', 4);
 define('HOMEPAGE_small_text_bg', 2);
 
+define('HOMEPAGE_colors', serialize(array(
+			'large_head_fontcolour' => '000000', 
+			'large_head_bgcolour' => '003399', 
+			'large_text_fontcolour' => '000000', 
+			'large_text_bgcolour' => 'FFFFFF', 
+			'small_head_fontcolour' => '000000', 
+			'small_head_bgcolour' => '0066CC', 
+			'small_text_fontcolour' => '000000', 
+			'small_text_bgcolour' => 'FFFFDF'
+		)));
+
 //module config options
 define('HELPDESK_enable', false);
 define('HELPDESK_location', '/var/www/helpdesk');
