@@ -117,10 +117,11 @@
           <!-- BEGIN due_category_block -->
           <thead>
             <tr>
-              <td colspan="4"><h2>{CATEGORY}</h2></td>
+              <td colspan="5"><h2>{CATEGORY} {TEACHER}</h2></td>
             <tr>
             <tr>
               <th>Assignment Title</th>
+              <th>Type</th>
               <th>View File</th>
               <th>Due Date</th>
               <th>Submit</th>
@@ -130,6 +131,7 @@
             <!-- BEGIN due_block -->
             <tr>
               <td style="color:{COLOUR};">{ASSDESC}</td>
+              <td>{TYPE}</td>
               <td>{VIEW}</td>
               <td style="color:{COLOUR};">{DUEDATE}</td>
               <td class="cntr">{SUBMIT}</td>
@@ -148,10 +150,11 @@
           <!-- BEGIN ret_category_block -->
           <thead>
             <tr>
-              <td colspan="5"><h2>{CATEGORY}</h2></td>
+              <td colspan="6"><h2>{CATEGORY}</h2></td>
             </tr>
             <tr>
               <th>Assignment Title</th>
+              <th>Type</th>
               <th>Returned File</th>
               <th class="cntr">Delete</th>
               <th class="cntr">Mark</th>
@@ -162,6 +165,7 @@
             <!-- BEGIN return_block -->
             <tr>
               <td>{ASSDESC}</td>
+              <td>{TYPE}</td>
               <td>{VIEW}</td>
               <td class="cntr"><a href="{DELETE}" onclick="return(confirm('Remove {ASSDESC}?'));">Delete</a></td>
               <td class="cntr">{MARK}</td>

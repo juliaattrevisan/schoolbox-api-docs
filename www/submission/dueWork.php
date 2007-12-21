@@ -103,14 +103,17 @@ class dueWorkPage
 	function outputCategoryWork($id, $catId)
 	{
 		$query = "
-			SELECT file.description, file.realname, file.id AS fid, 
+			SELECT file.description, file.realname, file.id AS fid, file_type.name as type,
 				DATE_FORMAT(submission_box.date, '%a, %D of %b %l:%i%p') AS date, 
 				UNIX_TIMESTAMP(submission_box.date) AS overdue_date,
 				UNIX_TIMESTAMP(submission_box.open_date) AS open_date, 
-				submission_box.id, category.name, student_submission.owner, inline 
+				submission_box.id, category.name, student_submission.owner, inline,
+				user.title, user.firstname, user.lastname
 			FROM (file, submission_box, category) 
+				LEFT JOIN user ON category.teacherid = user.id
 				LEFT JOIN student_submission ON student_submission.box_id = submission_box.id AND student_submission.owner = $id
 				LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
+			 	LEFT JOIN file_type ON submission_box.type = file_type.id
 			WHERE submission_box.fid = file.id AND submission_box.category = category.id 
 				AND submission_box.deleted = '0' AND category.id = '$catId' 
 				AND submission_box.late_date > NOW()
@@ -136,6 +139,7 @@ class dueWorkPage
 						$this->t_body->set_var("COLOUR", "#000000");
 	
 					$this->t_body->set_var("ASSDESC", scrubTEXT($result['description']));
+					$this->t_body->set_var("TYPE", scrubTEXT($result['type']));
 					if($result['realname'] == "")
 						$this->t_body->set_var("VIEW", "");		
 					else
@@ -161,6 +165,10 @@ class dueWorkPage
 					$completed++;
 					
 				$catName = $result['name'];
+				$teacherName = trim($result['title']." ".$result['firstname']." ".$result['lastname']);
+				if (!empty($teacherName)) {
+					$teacherName = " - ".$teacherName;
+				}
 			}
 
 
@@ -169,6 +177,7 @@ class dueWorkPage
 			{
 				$havework = 1;
 				$this->t_body->set_var("CATEGORY", $catName);
+				$this->t_body->set_var("TEACHER", $teacherName);
 				$this->t_body->parse("due_category_listing", "due_category_block", true);
 				$this->t_body->set_var("due_list", "");
 				return true;
@@ -188,8 +197,9 @@ class dueWorkPage
 			 
 		$query = "SELECT category.id as cid, category.name, file.description, submission_return.mark, 
 				submission_return.comment, 
-				submission_return.id, submission_return.filename 
+				submission_return.id, submission_return.filename, file_type.name as type 
 				FROM submission_return, category, file, submission_box
+				LEFT JOIN file_type ON submission_box.type = file_type.id
 				WHERE submission_return.box_id = submission_box.id AND submission_box.category = category.id 
 				AND submission_box.fid = file.id AND submission_return.deleted = '0' 
 				AND submission_return.owner = '".$_SESSION['id']."'";
@@ -212,6 +222,7 @@ class dueWorkPage
 
 
 				$this->t_body->set_var("ASSDESC", $return['description']);
+				$this->t_body->set_var("TYPE", $return['type']);
 				$this->t_body->set_var("MARK", $return['mark']);
 				$this->t_body->set_var("COMMENT", $return['comment']);
 				

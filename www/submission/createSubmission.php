@@ -10,9 +10,36 @@ require_once("subbox.php");
 class CreateSubmissionPage {
 	function CreateSubmissionPage()
 	{
+				$this->db = new dbManager;
                 $this->t_body = new Template(TPL_directory);
                	$this->t_body->set_file("tplBODY", "submission/createSub.htm");		
 	}
+
+	function setFileTypeList($type=0)
+	{
+		//get types of files that can be added
+		$query = "SELECT * FROM file_type";
+		$this->db->dbDoQuery($query);
+		$typeHTML = "<OPTION VALUE=\"0\"></OPTION>";
+		while($line = $this->db->dbGetNextArray())
+		{
+			if($line['id'] == $type)
+			{
+				$typeHTML .= "<OPTION VALUE=\"".$line['id']."\" selected>";
+				$typeHTML .= $line['name'];
+				$typeHTML .= "</OPTION>";
+			}
+			else
+			{
+				$typeHTML .= "<OPTION VALUE=\"".$line['id']."\">";
+				$typeHTML .= $line['name'];
+				$typeHTML .= "</OPTION>";
+			}
+		}
+		$typeHTML = "<select name=\"type\" class=\"formfield\">".$typeHTML."</select>";
+		$this->t_body->set_var("TYPELIST", $typeHTML);
+	}	
+	
 
 	function setDateFields($modify=0)
 	{
@@ -119,7 +146,9 @@ class CreateSubmissionPage {
 		$query = "SELECT description FROM file WHERE id = '$fileid'";
 		$db->dbDoQuery($query);
 		$file = $db->dbGetNextArray();
-		$this->t_body->set_var("DESC", $file['description']);		
+		$this->t_body->set_var("DESC", $file['description']);
+		
+		$this->setFileTypeList();		
 
 		$this->showPage();
 	}
@@ -130,6 +159,10 @@ class CreateSubmissionPage {
 		$this->t_body->set_var("HEADING", "Modify");
 		$this->setDateFields($sid);
 		$this->t_body->set_var("SID", "<input type=\"hidden\" name=\"sid\" value=\"$sid\">");
+		
+		global $subbox;
+		$details = $subbox->getSubBoxDetails($sid);
+		$this->setFileTypeList($details['type']);
 				
 		$this->showPage();	
 	}
@@ -153,7 +186,7 @@ if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['la
 		$_POST['open_date'], $_POST['open_hour'], $_POST['open_minute'], $_POST['open_period'],
 		$_POST['due_date'], $_POST['due_hour'], $_POST['due_min'], $_POST['due_period'], 
 		$_POST['late_date'], $_POST['late_hour'], $_POST['late_min'], $_POST['late_period'], 
-		$_POST['description']);
+		$_POST['description'], $_POST['type']);
 	localRedir("/submission/listSubmission.php");
 }
 else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour'])
@@ -163,7 +196,7 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
 			$_POST['open_date'], $_POST['open_hour'], $_POST['open_minute'], $_POST['open_period'],
 			$_POST['due_date'], $_POST['due_hour'], $_POST['due_minute'], $_POST['due_period'], 
 			$_POST['late_date'], $_POST['late_hour'], $_POST['late_min'], $_POST['late_period'], 
-			$_POST['fileid'], $_POST['description']);
+			$_POST['fileid'], $_POST['description'], $_POST['type']);
 	localRedir("/submission/listSubmission.php");
 	
 }

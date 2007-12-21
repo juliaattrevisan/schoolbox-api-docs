@@ -52,7 +52,7 @@ class file
 		
 	}
 
-	function addFile($file_name, $file_type, $file_loc, $description, $comment, $category, $type)
+	function addFile($file_name, $file_type, $file_loc, $description, $comment, $category)
 	{
 		//check allowed perms to add to specified category before proceeding
 		$this->checkWriteAccess($category);
@@ -64,7 +64,7 @@ class file
 						'comment'	 	=> $comment,
 						'category'		=> $category,
 						'owner'			=> $_SESSION['id'],
-						'type'			=> $type,
+						
 						'realname'		=> $file_name,
 						'submitted'		=> 'NOW()',
 						'mime_type'		=> $file_type,

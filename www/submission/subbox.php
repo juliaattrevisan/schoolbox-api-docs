@@ -15,7 +15,7 @@ class subBox
 	function createSubmission($cid, 			
 			$open_date, $open_hour, $open_min, $open_period, 
 			$due_date, $due_hour, $due_min, $due_period, 
-			$late_date, $late_hour, $late_min, $late_period,$fileid, $desc)
+			$late_date, $late_hour, $late_min, $late_period,$fileid, $desc, $type)
 	{
 		//extract parts of date, expects in format dd/mm/yyyy
 		list($odate,$omonth,$oyear) = explode('/',$open_date,3);
@@ -47,8 +47,8 @@ class subBox
 		$insertDate = $year."-".$month."-".$date." ".$time;
 		$insertLDate = $lyear."-".$lmonth."-".$ldate." ".$ltime;
 
-		$query = "INSERT INTO submission_box (category, owner, open_date, date, late_date, fid, created, description) 
-			VALUES ('$cid', '".$_SESSION['id']."','$insertODate','$insertDate','$insertLDate','$fileid', NOW(), '$desc' )";
+		$query = "INSERT INTO submission_box (category, owner, open_date, date, late_date, fid, created, description, type) 
+			VALUES ('$cid', '".$_SESSION['id']."','$insertODate','$insertDate','$insertLDate','$fileid', NOW(), '$desc','$type')";
 
 		$this->db->dbDoQuery($query);
 	}
@@ -56,7 +56,7 @@ class subBox
 	function updateSubmissionDate($sid, 
 			$open_date, $open_hour, $open_min, $open_period, 
 			$due_date, $due_hour, $due_min, $due_period, 
-			$late_date, $late_hour, $late_min, $late_period, $desc)
+			$late_date, $late_hour, $late_min, $late_period, $desc, $type)
 	{
 		//given a submission box it updates the date fields
 		
@@ -90,7 +90,7 @@ class subBox
 		$insertDate = $year."-".$month."-".$date." ".$time;
 		$insertLDate = $lyear."-".$lmonth."-".$ldate." ".$ltime;
 
-		$query = "UPDATE submission_box SET open_date = '$insertODate', date = '$insertDate', late_date = '$insertLDate', description = '$desc' WHERE id = '$sid'"; 
+		$query = "UPDATE submission_box SET open_date = '$insertODate', date = '$insertDate', late_date = '$insertLDate', description = '$desc', type = '$type' WHERE id = '$sid'"; 
 		$this->db->dbDoQuery($query);
         }
 
@@ -123,7 +123,7 @@ class subBox
 
 	function getSubBoxDetails($sid)
 	{
-		$query = "SELECT open_date, date, late_date, description FROM submission_box WHERE id = '$sid'";
+		$query = "SELECT open_date, date, late_date, description, `type` FROM submission_box WHERE id = '$sid'";
 		$this->db->dbDoQuery($query);
 		$dates = $this->db->dbGetNextArray();
 		

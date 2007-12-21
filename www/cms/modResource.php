@@ -360,7 +360,7 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
    			if ($error == UPLOAD_ERR_OK) {
 				fileSecurityCheck($_FILES['file']['error'][$key], $_FILES['file']['name'][$key], $_FILES['file']['tmp_name'][$key], $_FILES['file']['size'][$key], $_FILES['file']['type'][$key]);
 				$fileDB->addFile($_FILES['file']['name'][$key], $_FILES['file']['type'][$key], $_FILES['file']['tmp_name'][$key],
-								$_POST['description'][$key], '', $_POST['category'], $_POST['ftype']);
+								$_POST['description'][$key], '', $_POST['category']);
 			}
 		}
 			
@@ -383,12 +383,12 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 			{	
 				if($_POST['mulc'][$x])
 	 			       	$fileId = $fileDB->addFile($_FILES['file']['name'], $_FILES['file']['type'], $_FILES['file']['tmp_name'], 
-													$_POST['description'], $_POST['comment'], $_POST['mulc'][$x], $_POST['ftype']);
+													$_POST['description'], $_POST['comment'], $_POST['mulc'][$x]);
 			}
 		}
 		else {	//just submit file
         		$fileId = $fileDB->addFile($_FILES['file']['name'], $_FILES['file']['type'], $_FILES['file']['tmp_name'], $_POST['description'], 
-											$_POST['comment'], $_POST['category'], $_POST['ftype']);
+											$_POST['comment'], $_POST['category']);
 		}
 	 	//ok finished redirect create submission page if requested or just go to where file was added
         if($_POST['submission'])
@@ -421,11 +421,11 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 			for($x=0; $_POST['catCount'] > $x; $x++)
 			{
 				if($_POST['mulc'][$x])
-	 			       	$fileId = $fileDB->addFile("", "", "", $_POST['description'], $_POST['comment'], $_POST['mulc'][$x], $_POST['ftype']);
+	 			       	$fileId = $fileDB->addFile("", "", "", $_POST['description'], $_POST['comment'], $_POST['mulc'][$x]);
 			}
 		}
 		else			
-			$fileId = $fileDB->addFile("", "", "", $_POST['description'], $_POST['comment'], $_POST['category'], $_POST['ftype']);
+			$fileId = $fileDB->addFile("", "", "", $_POST['description'], $_POST['comment'], $_POST['category']);
 
 	 	//ok finished redirect create submission page if requested or just go to where file was added
         	if($_POST['submission'])

@@ -16,12 +16,13 @@ class ListSubmissionPage {
 		include_once("../include/page.php");
 	}
 	
-	function outputSubmission($id, $description, $open_date, $date, $marked=0, $total=0)
+	function outputSubmission($id, $description, $open_date, $date, $marked=0, $total=0, $type = '')
 	{
 		if($marked=="")
 			$marked = 0;
 		$this->t_body->set_var("ID", $id);
 		$this->t_body->set_var("ASSDESC", $description);
+		$this->t_body->set_var("TYPE", $type);
 		$this->t_body->set_var("JAVAASSDESC", addslashes($description));
 		$this->t_body->set_var("OPENDATE", $open_date);
 		$this->t_body->set_var("DUEDATE", $date);
@@ -40,8 +41,8 @@ class ListSubmissionPage {
 		$currentCat = "";
 
 		$listquery = "SELECT submission_box.id, submission_box.description, category.id as catid, category.code, category.name,
-				DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date, DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date 
-				FROM category, submission_box WHERE 
+				DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date, DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date, 
+				submission_box.type, file_type.name as type FROM category, submission_box LEFT JOIN file_type ON submission_box.type = file_type.id WHERE 
 				category.id = submission_box.category AND submission_box.owner = '".$_SESSION['id']."' 
 				AND submission_box.deleted = '0' ORDER BY category.id, submission_box.date"; 
 	
@@ -73,7 +74,7 @@ class ListSubmissionPage {
 				$totals = $db->dbGetNextArray();
 
 				$this->outputSubmission($line['id'],$line['description'], $line['open_date'], $line['date'], 
-					$totals['marked'], $totals['total']);
+					$totals['marked'], $totals['total'], $line['type']);
 
 				$prevCat = $line;
 

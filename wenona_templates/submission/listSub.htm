@@ -105,10 +105,11 @@
 					<!-- BEGIN category_block -->
 					<thead>  
 					<tr> 
-						<td colspan="5"><h2>{CATEGORY}</h2></td> 
+						<td colspan="7"><h2>{CATEGORY}</h2></td> 
 					<tr>  
 					<tr> 
 						<th>Assignment Title</th>
+                        <th>Type</th>
                         <th>Open Date</th> 
 						<th>Due Date</th> 
 						<th class="cntr">Marked</th> 
@@ -120,6 +121,7 @@
 					<!-- BEGIN submission_block --> 
 					<tr> 
 						<td><a href="/submission/viewSubmission.php?box_id={ID}">{ASSDESC}</a></td>
+                        <td>{TYPE}</td>
                         <td><a href="/submission/createSubmission.php?sid={ID}">{OPENDATE}</a></td>
 						<td><a href="/submission/createSubmission.php?sid={ID}">{DUEDATE}</a></td> 
 						<td class="cntr">{MARKED}</td> 
