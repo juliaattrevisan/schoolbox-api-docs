@@ -13,6 +13,7 @@ require_once('include/include.php');
 require_once('include/permission.php');
 require_once('include/involved.php');
 
+
 define('MAX_COLUMN_COUNT',2);
 
 class OutPut
@@ -533,7 +534,7 @@ class OutPut
 					AND submission_box.deleted = '0'
 				LEFT JOIN student_submission ON	student_submission.box_id = submission_box.id 
 					AND student_submission.owner = '".$_SESSION['id']."' 
-				WHERE file.category = '".$this->category."' AND file.type = '3'
+				WHERE file.category = '".$this->category."' AND submission_box.type = '3'
 					AND file.deleted = '0' 
 				ORDER BY submission_box.date DESC
 			";
@@ -548,7 +549,7 @@ class OutPut
 			FROM file  
 				LEFT JOIN allowedFileTypes ON mime_type = mime
 				LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0' 
-			WHERE file.category = '".$this->category."' AND file.type = '3' 
+			WHERE file.category = '".$this->category."' AND submission_box.type = '3' 
 				AND file.deleted = '0'
 			ORDER BY submission_box.date DESC";
 		}
@@ -597,7 +598,7 @@ class OutPut
 				LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0'
 				LEFT JOIN student_submission ON  student_submission.box_id = submission_box.id 
 					AND student_submission.owner = '".$_SESSION['id']."'
-			WHERE file.category = '".$this->category."' AND file.type = '2' AND file.deleted = '0'
+			WHERE file.category = '".$this->category."' AND submission_box.type = '2' AND file.deleted = '0'
 			ORDER BY submission_box.date DESC";
 		}
 		else
@@ -609,7 +610,7 @@ class OutPut
 			FROM file 
 				LEFT JOIN allowedFileTypes ON mime_type = mime
 				LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0' 
-			WHERE file.category = '".$this->category."' AND file.type = '2' AND file.deleted = '0'
+			WHERE file.category = '".$this->category."' AND submission_box.type = '2' AND file.deleted = '0'
 			ORDER BY submission_box.date DESC";
 		}
 
@@ -710,8 +711,10 @@ class OutPut
 		//file output
 		$this->t_body->set_block($name, "files", "files_block");
 	
-		$query = "SELECT id, file.description, comment, realname, inline FROM file LEFT JOIN allowedFileTypes ON mime_type = mime
-		WHERE category = '".$this->category."' AND file.deleted = '0' ORDER BY submitted DESC";
+		$query = "SELECT file.id as id, file.description, comment, realname, inline 
+				  FROM file
+				  LEFT JOIN allowedFileTypes ON mime_type = mime 
+				  WHERE file.category = '".$this->category."' AND file.deleted = '0' ORDER BY submitted DESC";
 
 		//if no size make unlimited query else make it limited by size
 		if($config['size'] != 0 && $config['size'] != '') 
@@ -1084,9 +1087,10 @@ class OutPut
 
 			$this->t_body->set_var("FILE_NAME", $url);
 		}
-		else
+		else {
 			$this->t_body->set_var("FILE_NAME", scrubTEXT($queryArray['description']));
-
+		}
+		
 		$this->t_body->set_var("FILE_COMMENT", nl2br(scrubTEXT($queryArray['comment'])));
 
 		$this->t_body->parse("files_block", "files", true);
