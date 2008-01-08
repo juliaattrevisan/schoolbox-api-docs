@@ -56,7 +56,7 @@ class outUser
 		$this->t_body->set_block("tplBODY", "helpdesk", "helpdesk_block");
 		$this->t_body->set_block("tplBODY", "student_synergy", "student_synergy_block");
 		$this->t_body->set_block("tplBODY", "contact_synergy", "contact_synergy_block");
-	
+		
 		//advanced synergetic information
 		if(SYNERGY_enable)
 		{	

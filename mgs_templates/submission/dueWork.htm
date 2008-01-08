@@ -107,38 +107,92 @@
 	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" -->
       <h1>Due Work</h1>
-      <p class="indent">This list shows all work that is to be completed. Work in red has passed its due by date. </p>
+
+ 		<center>
+        <form method="get" action="dueWork.php">
+          <table class="calendarTable">
+            <tr>
+              <td><a class="back" href="{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td>
+              <td colspan="3"><input type="hidden" name="Day" value="{DAY}">
+                <div style="float:left;width:100px;">
+                <select name="Month" onchange="this.form.submit();">
+                  <!-- BEGIN month_drop -->
+                  <option value="{DROP_MONTH_NUMBER}" {DROP_MONTH_SELECTED}>{DROP_MONTH_NAME}</option>
+                  <!-- END month_drop -->
+                </select>
+              </td>
+              <td colspan="2"><select name="Year" onchange="this.form.submit();">
+                  <!-- BEGIN year_drop -->
+                  <option value="{DROP_YEAR_NUMBER}" {DROP_YEAR_SELECTED}>{DROP_YEAR_NUMBER}</option>
+                  <!-- END year_drop -->
+                </select>
+              </td>
+              <td><a class="forward" href="{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
+            </tr>
+            <tr>
+              <th>Sun</th>
+              <th>Mon</th>
+              <th>Tue</th>
+              <th>Wed</th>
+              <th>Thu</th>
+              <th>Fri</th>
+              <th>Sat</th>
+            </tr>
+            <!-- BEGIN week_block -->
+            <tr>
+              <td class="{MONTABLE_CSS0}" onclick="location.href='{DAYURL0}';">{DAY0}</td>
+              <td class="{MONTABLE_CSS1}" onclick="location.href='{DAYURL1}';">{DAY1}</td>
+              <td class="{MONTABLE_CSS2}" onclick="location.href='{DAYURL2}';">{DAY2}</td>
+              <td class="{MONTABLE_CSS3}" onclick="location.href='{DAYURL3}';">{DAY3}</td>
+              <td class="{MONTABLE_CSS4}" onclick="location.href='{DAYURL4}';">{DAY4}</td>
+              <td class="{MONTABLE_CSS5}" onclick="location.href='{DAYURL5}';">{DAY5}</td>
+              <td class="{MONTABLE_CSS6}" onclick="location.href='{DAYURL6}';">{DAY6}</td>
+            </tr>
+            <!-- END week_block -->
+          </table>
+        </form>
+      </center>       
+      
+      <p class="indent">{LISTBY} This list shows all work that is to be completed. Work in red has passed its due by date. </p>
       <!-- BEGIN user_block -->
       <!-- BEGIN user_heading -->
       <h1>{USER_NAME} {USER_YEAR}</h1>
       <!-- END user_heading -->
       <div class="indent">
         <table class="ruler">
-          <!-- BEGIN due_category_block -->
-          <thead>
+          <!-- BEGIN day_block -->
+          	<thead>
             <tr>
-              <td colspan="5"><h2>{CATEGORY} {TEACHER}</h2></td>
+              <td colspan="6"><h2>{DATE} <span class="header_option">{ADD}</span></h2></td>
+              
             <tr>
+            <!-- BEGIN due_heading_block -->
             <tr>
               <th>Assignment Title</th>
               <th>Type</th>
-              <th>View File</th>
-              <th>Due Date</th>
+              <th>Subject</th>
+              <th>Teacher</th>
+              
+              <th>Due</th>
               <th>Submit</th>
             </tr>
+            <!-- END due_heading_block -->
           </thead>
           <tbody>
             <!-- BEGIN due_block -->
             <tr>
               <td style="color:{COLOUR};">{ASSDESC}</td>
               <td>{TYPE}</td>
-              <td>{VIEW}</td>
+              <td>{CATEGORY}</td>
+              <td><a href="mailto:{TEACHER_EMAIL}">{TEACHER}</a></td>
+              
               <td style="color:{COLOUR};">{DUEDATE}</td>
-              <td class="cntr">{SUBMIT}</td>
+              <td class="cntr">{VIEW}{SUBMIT}</td>
             </tr>
             <!-- END due_block -->
           </tbody>
-          <!-- END due_category_block -->
+          
+          <!-- END day_block -->
         </table>
       </div>
       <!-- END user_block -->
@@ -150,7 +204,7 @@
           <!-- BEGIN ret_category_block -->
           <thead>
             <tr>
-              <td colspan="6"><h2>{CATEGORY}</h2></td>
+              <td colspan="6"><h2>{CATEGORY} <a href="mailto:{TEACHER_EMAIL}">{TEACHER}</a></h2></td>
             </tr>
             <tr>
               <th>Assignment Title</th>

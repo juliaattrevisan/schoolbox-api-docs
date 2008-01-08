@@ -390,36 +390,17 @@ class OutPut
 		
 		if($this->code != "" && SYNERGY_enable)
 		{	
-			$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
-			mssql_select_db(MSSQL_db, $db);
 		
-			$msQuery = "SELECT DISTINCT StaffID FROM SubjectClassStaff
-				WHERE ClassCode = '{$this->code}' AND FileYear={$_SESSION['FileYear']} AND FileSemester={$_SESSION['FileSemester']}";
+			$name = getTeacherName($this->code);
 			
-			$msResult = mssql_query($msQuery, $db);
-			
-			if(mssql_num_rows($msResult) > 0)
-			{ 
-				while($synrow = mssql_fetch_array($msResult))
-				{
-					$query = "SELECT id, title, firstname, lastname FROM user WHERE synergy_id = '{$synrow['StaffID']}'";
-					$teacher=$this->db->dbGetSingleRow($query);
-					if(is_array($teacher)) {
-						$name = formatName($teacher);
-						if(SITE_location == 'wenona')
-							$this->t_body->set_var("MEMBER_NAME", $name);
-						else
-							$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$teacher['id']}\">{$name}</a>");
-						$this->t_body->parse("staff_teacher_block", "staff_teachers", true);		
-					}
-				}
-				
-				if($name)
-					return true;
+		
+			if(SITE_location == 'wenona') {
+				$this->t_body->set_var("MEMBER_NAME", $name);
+			} else {
+				$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$teacher['id']}\">{$name}</a>");
+				$this->t_body->parse("staff_teacher_block", "staff_teachers", true);		
 			}
-		}
-		
-		return false;
+		}	
 	}
 
 	function outputNews($name, $config)
