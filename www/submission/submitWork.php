@@ -72,9 +72,10 @@ class submitWorkPage {
 		
 		include_once("../include/page.php");
 		
-		$query = "SELECT category.name, file.description, category.code, category.id FROM category, file, submission_box WHERE 
-		submission_box.category = category.id AND submission_box.fid = file.id 
-		AND submission_box.id = $box_id";
+		$query = "SELECT category.name, submission_box.description, category.code, category.id 
+				  FROM (category, submission_box)
+				  WHERE submission_box.category = category.id 
+					AND submission_box.id = $box_id";
 		
 		$result = $this->db->dbGetSingleRow($query);
 		if(!is_array($result))

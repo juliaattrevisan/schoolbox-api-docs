@@ -156,23 +156,22 @@ class dueWorkPage
 	function outputCategoryWork($id, $catId, $day)
 	{
 		$query = "
-			SELECT file.description, file.realname, file.id AS fid, file_type.name as type,
+			SELECT submission_box.description, file.realname, file.id AS fid, file_type.name as type,
 				DATE_FORMAT(submission_box.date, '%l:%i%p') AS date, 
 				UNIX_TIMESTAMP(submission_box.date) AS overdue_date,
 				UNIX_TIMESTAMP(submission_box.open_date) AS open_date, 
-				submission_box.id, category.name, student_submission.owner, inline,
-				user.title, user.firstname, user.lastname
-			FROM (file, submission_box, category) 
-				LEFT JOIN user ON category.teacherid = user.id
+				submission_box.id, category.name, student_submission.owner, inline
+			FROM (submission_box, category) 
+				LEFT JOIN file ON submission_box.fid = file.id
 				LEFT JOIN student_submission ON student_submission.box_id = submission_box.id AND student_submission.owner = $id
 				LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
 			 	LEFT JOIN file_type ON submission_box.type = file_type.id
-			WHERE submission_box.fid = file.id AND submission_box.category = category.id 
+			WHERE submission_box.category = category.id 
 				AND submission_box.deleted = '0' AND category.id = '$catId' 
 				AND submission_box.late_date > NOW()
 				AND DATE_FORMAT(submission_box.date, '%d%m%Y') = '" . date('dmY', $day) . "'
 			ORDER BY submission_box.date";
-
+	
 		$res = $this->db->dbDoQuery($query);
 
 		$now = date("U");
@@ -201,9 +200,11 @@ class dueWorkPage
 	
 					$this->t_body->set_var("ASSDESC", scrubTEXT($result['description']));
 					$this->t_body->set_var("TYPE", scrubTEXT($result['type']));
-					if($result['realname'] == "")
+					$divider = " / ";
+					if($result['realname'] == "") {
 						$this->t_body->set_var("VIEW", "");		
-					else
+						$divider = "";
+					} else
 					{
 						if($result['inline'] == 'true')
 							$url = "<a href=\"/sendframe.php?id=".$result['fid']."\" target=\"_blank\">View</a>";
@@ -214,7 +215,7 @@ class dueWorkPage
 					$this->t_body->set_var("DUEDATE", $result['date']);
 
 					if($_SESSION['id'] == $id && $result['open_date'] < date('U') )
-						$this->t_body->set_var("SUBMIT", " / <a href=\"submitWork.php?box_id=".$result['id']."\">Submit</a>");
+						$this->t_body->set_var("SUBMIT", $divider . "<a href=\"submitWork.php?box_id=".$result['id']."\">Submit</a>");
 					else
 						$this->t_body->set_var("SUBMIT", "");
 				
@@ -331,10 +332,10 @@ class dueWorkPage
 				//use css to indicate current day
 				if($this->currDay == $monthDay)
 					$this->t_body->set_var("MONTABLE_CSS".$day, "calTableSelected");
-				else if($realDay == $monthDay && $monthMonth == $realMonth && $monthYear == $realYear)
-					$this->t_body->set_var("MONTABLE_CSS".$day, "calTableCurrent");
 				else if (in_array($monthDay, $dueDates))
 					$this->t_body->set_var("MONTABLE_CSS".$day, "calTableEntry");
+				else if($realDay == $monthDay && $monthMonth == $realMonth && $monthYear == $realYear)
+					$this->t_body->set_var("MONTABLE_CSS".$day, "calTableCurrent");
 				else
 					$this->t_body->set_var("MONTABLE_CSS".$day, "calTable"); 
 				
@@ -382,8 +383,10 @@ class dueWorkPage
 			{
 				$this->t_body->set_var("DATE", date("l jS",$currentDay));
 				
-				
-				$this->t_body->set_var("ADD", "<a href=\"/cms/modResource.php?date=".$this->currDay."&month=".$this->currMonth."&year=".$this->currYear."&sb=1\">add</a>");
+				if (isStaff($_SESSION['gid'])) {
+				$this->t_body->set_var("ADD", "<a href=\"/submission/createSubmission.php?user=$id&Day=".$this->currDay.
+											  "&Month=".$this->currMonth."&Year=".$this->currYear."\">add</a>");
+				}
 				
 				$r = $this->outputCategories($id, $subjects, $currentDay);
 				
@@ -411,8 +414,10 @@ class dueWorkPage
 				$this->t_body->set_var("DATE", date("l jS",$currentDay));
 				
 				
-				$this->t_body->set_var("ADD", "<a href=\"/cms/modResource.php?date=".$this->currDay."&month=".$this->currMonth."&year=".$this->currYear."&sb=1\">add</a>");
-				
+				if (isStaff($_SESSION['gid'])) {
+				$this->t_body->set_var("ADD", "<a href=\"/submission/createSubmission.php?user=$id&Day=".$this->currDay.
+											  "&Month=".$this->currMonth."&Year=".$this->currYear."\">add</a>");
+				}				
 				$r = $this->outputCategories($id, $subjects, $currentDay);
 				
 				//increment date
@@ -456,19 +461,24 @@ class dueWorkPage
 			while($data = $this->db->dbGetNextArray($res)) {
 		
 				$currentDay = $data['day'];
+
+				$this->currYear = date("Y",$currentDay);
+				$this->currMonth = date("n",$currentDay);
+				$this->currDay = date("j",$currentDay);
 				
 				
 				$this->t_body->set_var("DATE", date("l jS F, Y", $currentDay));
 				
 			
 			
-				$this->t_body->set_var("ADD", "<a href=\"/cms/modResource.php?date=".$this->currDay."&month=".$this->currMonth."&year=".$this->currYear."&sb=1\">add</a>");
-				
+				if (isStaff($_SESSION['gid'])) {
+				$this->t_body->set_var("ADD", "<a href=\"/submission/createSubmission.php?user=$id&Day=".$this->currDay.
+											  "&Month=".$this->currMonth."&Year=".$this->currYear."\">add</a>");
+				}
+								
 				$r = $this->outputCategories($id, $subjects, $currentDay);
 				
-				$this->currYear = date("Y",$currentDay);
-				$this->currMonth = date("n",$currentDay);
-				$this->currDay = date("j",$currentDay);
+
 		
 				if ($r)
 					$this->t_body->parse("day_list","day_block", true);

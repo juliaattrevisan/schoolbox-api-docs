@@ -150,7 +150,10 @@ function verify()
 					</tr>
 					<!-- END submission -->
 					<tr>
-						<td>&nbsp;</td>
+						<td><input type='hidden' name='Day' value='{DUE_DAY}' />
+                        	<input type='hidden' name='Month' value='{DUE_MONTH}' />
+                        	<input type='hidden' name='Year' value='{DUE_YEAR}' />
+                        	<input type='hidden' name='type' value='{FILE_TYPE}' /></td>
 						<td><input type="submit" name="Submit" value="{ACTION}" class="btn" />
 						</td>
 					</tr>

@@ -101,12 +101,25 @@
 	<div id="content"> 
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
            <h1>{HEADING} Submission Box</h1>
-			<form action="" method="post" name="form" id="form" class="standardForm">
+			<form action="" method="post" name="form" id="form" class="standardForm" enctype="multipart/form-data">
 				<table>
+					<!-- BEGIN browse_row -->
+					<tr>
+						<td class="formLabelWidth"><h2>File</h2></td>
+						<td><input type="file" name="file" />
+							<input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
+						</td>
+					</tr>
+					<!-- END browse_row -->                 
 					<tr>
 						<td class="formLabelWidth"><h2>Title</h2></td>
 						<td><input name="description" type="text" value="{DESC}" size="30" /></td>
 					</tr>
+					<tr>
+						<td><h2>Subject</h2>
+							<em>Select to which subject this work applies.</em></td>
+						<td>{CATLIST}</td>
+					</tr>                      
 					<tr>
 						<td><h2>Type</h2>
 							<em>What is the purpose of this submission box?</em></td>
@@ -176,8 +189,7 @@
                           </select></td>
 					</tr>
 					<tr>
-						<td><input type="hidden" name="cid" value="{CID}" />
-							<input type="hidden" name="fileid" value="{FILEID}" />
+						<td><input type="hidden" name='fileId' value="{FILEID}" />
 						</td>
 						<td> {SID}
 							<input type="submit" name="Submit" value="{HEADING}" class="btn" />

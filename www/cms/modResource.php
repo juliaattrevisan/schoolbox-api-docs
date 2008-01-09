@@ -11,12 +11,16 @@ require_once("../include/session.php");
 require_once("../include/fileSecurity.php");
 require_once("file.php");
 require_once("url.php");
+require_once('../include/involved.php');
+require_once('../include/syn_userinfo.php');
 
 class ModResourcePage {
 	
 	function ModResourcePage()
 	{
 		$this->db = new dbManager;
+		
+		$this->submissionDefault = isset($_GET['sb']) ? 1 : 0;
 	}
 		
 	function setFileTypeList($type=0)
@@ -81,7 +85,6 @@ class ModResourcePage {
 		$this->catList[-1] = "";
 
 		//query database for all categories that user has permission to see
-
 		if($_SESSION['su'])
 			$catQuery = "SELECT name, id, code FROM category WHERE parent = '".$parent."' ORDER BY name";
 		else
@@ -179,7 +182,7 @@ class ModResourcePage {
 			//dont allow submission box to be created for multiple files
 			if($type=="file")
 			{
-				$this->t_body->set_var("SUBBOX", "<input type=\"checkbox\" name=\"submission\" value=\"1\">");
+				$this->t_body->set_var("SUBBOX", "<input type=\"checkbox\" name=\"submission\" value=\"1\" ".($this->submissionDefault?"checked=\"checked\"":"").">");
 				$this->t_body->parse("submission_block","submission", true); 
 			}
 			else
@@ -188,17 +191,35 @@ class ModResourcePage {
 			//set the browse block up
 			if($fileType)
 			{
-				$query = "SELECT name FROM file_type WHERE id = '$fileType'";
-				$result = $this->db->dbGetSingleRow($query);
+				//$query = "SELECT name FROM file_type WHERE id = '$fileType'";
+				//$result = $this->db->dbGetSingleRow($query);
 			
-				$typeOutput = "<b>".$result['name']."</b><input type=\"hidden\" name=\"ftype\" value=\"$fileType\">";
-				$this->t_body->set_var("TYPELIST", $typeOutput);
+				//$typeOutput = "<b>".$result['name']."</b><input type=\"hidden\" name=\"ftype\" value=\"$fileType\">";
+				$this->t_body->set_var("FILE_TYPE", $fileType);
 				
 			}
 			else
 			{
-				$this->setFileTypeList();
+				//$this->setFileTypeList();
+				$this->t_body->set_var("FILE_TYPE", '');
 			}
+			
+			if (is_numeric($_GET['Day']))
+				$this->t_body->set_var("DUE_DAY", $_GET['Day']);
+			else
+				$this->t_body->set_var("DUE_DAY", '');
+			
+			if (is_numeric($_GET['Month']))
+				$this->t_body->set_var("DUE_MONTH", $_GET['Month']);
+			else
+				$this->t_body->set_var("DUE_MONTH", '');
+
+			if (is_numeric($_GET['Year']))
+				$this->t_body->set_var("DUE_YEAR", $_GET['Year']);
+			else
+				$this->t_body->set_var("DUE_YEAR", '');				
+			
+			
 		}
 		else
 		{
@@ -391,9 +412,9 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 											$_POST['comment'], $_POST['category']);
 		}
 	 	//ok finished redirect create submission page if requested or just go to where file was added
-        if($_POST['submission'])
-			localRedir("/submission/createSubmission.php?cid=".$_POST['category']."&fileid=".$fileId);
-		else
+        if($_POST['submission']) {
+			localRedir("/submission/createSubmission.php?category=".$_POST['category']."&fileid=".$fileId);
+		} else
 		{
 			$back = -2;
 			include("../include/back.php");
@@ -410,7 +431,7 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 		include("../include/back.php");
 		exit;
 	}
-	else if(isset($_POST['ftype']))
+	else if(isset($_POST['description']))
 	{	
 		$fileDB = new file; 
 
@@ -429,7 +450,7 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 
 	 	//ok finished redirect create submission page if requested or just go to where file was added
         	if($_POST['submission'])
-			localRedir("/submission/createSubmission.php?cid=".$_POST['category']."&fileid=".$fileId);
+			localRedir("/submission/createSubmission.php?category=".$_POST['category']."&fileid=".$fileId);
 		else
 		{
 			$back = -2;
