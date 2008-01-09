@@ -39,7 +39,7 @@ class ModuleTableEdit extends HelpDeskPage {
 			$arrHeadings = array();
 
 
-
+			
 			while( $row = mysql_fetch_assoc( $query)) {
 				$row = stripslashes_array($row);
                        	$this->_tpl->set_var( 'blkRowData', '');
@@ -75,7 +75,9 @@ class ModuleTableEdit extends HelpDeskPage {
 			$this->_tpl->set_block( 'tplContent', 'headerData', 'blkHeaderData');
 			$this->_tpl->set_block( 'tplContent', 'newData', 'blkNewData');
 			$blnPKDone = false;
+			
 			foreach( $arrHeadings as $heading) {
+			
                        	$this->_tpl->set_var( 'HEADER_DATA', $heading);
                        	$this->_tpl->parse( 'blkHeaderData', 'headerData', true);
 
@@ -90,7 +92,7 @@ class ModuleTableEdit extends HelpDeskPage {
                        		$this->_tpl->set_var( 'NEW_AFTER', '');
                        		$this->_tpl->set_var( 'NEW_DATA_NAME', TABLE_COLUMN_NAME_PREFIX . $heading);
 				}
-                       	$this->_tpl->parse( 'blkNewData', 'newData', true);
+                     	$this->_tpl->parse( 'blkNewData', 'newData', true);
 			}
 
 			mysql_close( $link);
