@@ -2,6 +2,7 @@
 require_once("../include/session.php");
 require_once("../include/include.php");
 require_once("../include/staffonly.php");
+require_once("../include/syn_classlist.php");
 
 class ViewSubmissionPage {
 
@@ -15,7 +16,7 @@ class ViewSubmissionPage {
 	{
 
 		//security check.. check that user owns this box and that its not deleted
-		$query = "SELECT category.name, submission_box.description FROM submission_box, category WHERE 
+		$query = "SELECT category.name, submission_box.description, category.code FROM submission_box, category WHERE 
 		submission_box.category = category.id AND submission_box.owner = '".$_SESSION['id']."' 
 		AND submission_box.id = '$box_id' 
 		AND submission_box.deleted = '0'";
@@ -29,9 +30,13 @@ class ViewSubmissionPage {
 
 		//log page
 		$this->logPageView($box_id);
-
+		
+		// get all students
+		$classList = getStudents($desc['code']);
+		$returned = array();
+		
 		$query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid,
-			DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked 
+			DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id 
 			FROM student_submission, user WHERE owner = user.id AND box_id = '$box_id' ORDER BY lastname";  
 	
 		$this->db->dbDoQuery($query);
@@ -40,6 +45,9 @@ class ViewSubmissionPage {
 		{
 			while($line = $this->db->dbGetNextArray() )
 			{
+				
+				$returned[] = $line['synergy_id'];
+			
 				$this->t_body->set_var("OWNER", formatName($line,'{lastname}, {firstname}'));
 				$this->t_body->set_var("OWNER_ESCAPED", addslashes(formatName($line,'{lastname}, {firstname}')));
 				$this->t_body->set_var("DATE", $line['date']);
@@ -63,8 +71,31 @@ class ViewSubmissionPage {
 				$this->t_body->parse("submission_listing","submitted_block",true);
 			}
 		}
-		else
+		else {
 			$this->t_body->set_var("submission_listing", "No student has submitted work");
+		}
+		
+		if (is_array($classList)) {
+			foreach ($classList as $student) {
+				if (in_array($student['synergy_id'], $returned)) {
+					continue;
+				}
+				$this->t_body->set_var("OWNER", formatName($line,'{lastname}, {firstname}'));
+				$this->t_body->set_var("OWNER_ESCAPED", addslashes(formatName($line,'{lastname}, {firstname}')));
+				$this->t_body->set_var("DATE", 'NA');
+				$this->t_body->set_var("VIEW", '');
+				$this->t_body->set_var("SAVE", "");
+				$this->t_body->set_var("DELETE", "");
+				if($line['late'])
+					$this->t_body->set_var("COLOUR", "#ff0000");
+				else
+					$this->t_body->set_var("COLOUR", "#000000");
+				$this->t_body->set_var("MARKED","<img src=\"/images/emptybox.gif\" border=\"0\" width=\"13\" height=\"12\">");
+				$this->t_body->set_var("RETURN", "");
+				
+				$this->t_body->parse("submission_listing","submitted_block",true);
+			}
+		}		
 
 	}			
 
