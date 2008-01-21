@@ -26,7 +26,7 @@ class OutPut
 		$this->enroled = $enroled;
 
 		$this->category = $category;
-		$this->service = 1;
+		$this->service = HOMEPAGESERVICE;
 		//check perms first
 		$this->checkPerms();		
 

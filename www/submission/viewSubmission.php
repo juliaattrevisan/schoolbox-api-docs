@@ -12,11 +12,28 @@ class ViewSubmissionPage {
 		$this->db->dbConnect();
 	}
 
+	function getStudentList($desc) {
+		// get all students
+		if($desc['code'] && SYNERGY_enable) {
+			//if synergy code get synergy students
+			$studentList = getStudents($desc['code']);
+			
+			if(is_array($studentList))
+				return $studentList;			
+		}
+		
+		$query = "SELECT id as uid, synergy_id, firstname, lastname FROM user, userAccess
+		WHERE id = uid AND service = ".HOMEPAGESERVICE." AND sid = ".$desc['id']." AND type > 0 ORDER BY lastname, firstname";
+		$studentList = $this->db->dbGetAllRows($query); 
+			
+		return $studentList;
+	}
+
 	function setSubmissions($box_id)
 	{
 
 		//security check.. check that user owns this box and that its not deleted
-		$query = "SELECT category.name, submission_box.description, category.code FROM submission_box, category WHERE 
+		$query = "SELECT category.id, category.name, submission_box.description, category.code FROM submission_box, category WHERE 
 		submission_box.category = category.id AND submission_box.owner = '".$_SESSION['id']."' 
 		AND submission_box.id = '$box_id' 
 		AND submission_box.deleted = '0'";
@@ -31,71 +48,55 @@ class ViewSubmissionPage {
 		//log page
 		$this->logPageView($box_id);
 		
-		// get all students
-		$classList = getStudents($desc['code']);
+		$studentList = $this->getStudentList($desc);
+		
 		$returned = array();
 		
-		$query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid,
-			DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id 
-			FROM student_submission, user WHERE owner = user.id AND box_id = '$box_id' ORDER BY lastname";  
-	
-		$this->db->dbDoQuery($query);
-
-		if($this->db->dbCountRows() > 0)
-		{
-			while($line = $this->db->dbGetNextArray() )
-			{
-				
-				$returned[] = $line['synergy_id'];
+		foreach($studentList as $student) {
 			
-				$this->t_body->set_var("OWNER", formatName($line,'{lastname}, {firstname}'));
-				$this->t_body->set_var("OWNER_ESCAPED", addslashes(formatName($line,'{lastname}, {firstname}')));
-				$this->t_body->set_var("DATE", $line['date']);
-				$this->t_body->set_var("VIEW", "sendframe.php?view=".$line['id']);
-				$this->t_body->set_var("SAVE", "viewSubmission.php?view=".$line['id']."&save=1");
-				$this->t_body->set_var("DELETE", "viewSubmission.php?delete=".$line['id']."&box_id=$box_id");
-				if($line['late'])
-					$this->t_body->set_var("COLOUR", "#ff0000");
-				else
-					$this->t_body->set_var("COLOUR", "#000000");
-				if($line['marked'])
-				{
-					$this->t_body->set_var("MARKED","<img src=\"/images/greentick.gif\" width=\"13\" height=\"12\">");
-					$this->t_body->set_var("RETURN", "");
-				}
-				else
-				{
-					$this->t_body->set_var("MARKED","<img src=\"/images/emptybox.gif\" border=\"0\" width=\"13\" height=\"12\">");
-					$this->t_body->set_var("RETURN", "/ <a href=\"returnWork.php?box_id=$box_id&sid=".$line['uid']."\">Return</a>");
-				}
-				$this->t_body->parse("submission_listing","submitted_block",true);
-			}
-		}
-		else {
-			$this->t_body->set_var("submission_listing", "No student has submitted work");
-		}
-		
-		if (is_array($classList)) {
-			foreach ($classList as $student) {
-				if (in_array($student['synergy_id'], $returned)) {
-					continue;
-				}
-				$this->t_body->set_var("OWNER", formatName($line,'{lastname}, {firstname}'));
-				$this->t_body->set_var("OWNER_ESCAPED", addslashes(formatName($line,'{lastname}, {firstname}')));
-				$this->t_body->set_var("DATE", 'NA');
-				$this->t_body->set_var("VIEW", '');
-				$this->t_body->set_var("SAVE", "");
-				$this->t_body->set_var("DELETE", "");
-				if($line['late'])
-					$this->t_body->set_var("COLOUR", "#ff0000");
-				else
-					$this->t_body->set_var("COLOUR", "#000000");
-				$this->t_body->set_var("MARKED","<img src=\"/images/emptybox.gif\" border=\"0\" width=\"13\" height=\"12\">");
-				$this->t_body->set_var("RETURN", "");
+			if($student['uid'])
+				$where = "owner = {$student['uid']}";
+			else if($student['synergy_id'])
+				$where = "synergy_id = {$student['synergy_id']}";
+			
+			$query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username, local_email, alt_email, 
+				DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id 
+				FROM student_submission, user 
+				WHERE $where AND owner = user.id AND box_id = '$box_id'"; 
+			
+			if($line = $this->db->dbGetSingleRow($query)) {
 				
-				$this->t_body->parse("submission_listing","submitted_block",true);
+				$output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
+									'OWNER_ID' 	=> $line['uid'],
+									'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
+									'DATE'		=> $line['date'],
+									'VIEW'		=> 'sendframe.php?view='.$line['id'],
+									'SAVE'		=> 'viewSubmission.php?view='.$line['id'].'&save=1',
+									'DELETE'	=> 'viewSubmission.php?delete='.$line['id']."&box_id=$box_id",
+									'COLOUR'	=> $line['late']?'#ff0000':'#000000',
+									'MARKED'	=> $line['marked']?'<img src="/images/greentick.gif" width="13" height="12">':'<img src="/images/emptybox.gif" width="13" height="12">',
+									'RETURN'	=> $line['marked']?'':"/ <a href=\"returnWork.php?box_id=$box_id&sid=".$line['uid']."\">Return</a>",
+								);
 			}
-		}		
+			else {
+			
+				$output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
+									'OWNER_ID' 	=> $line['uid'],
+									'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
+									'DATE'		=> 'N/A',
+									'VIEW'		=> '',
+									'SAVE'		=> '',
+									'DELETE'	=> '',
+									'COLOUR'	=> '#000000',
+									'MARKED'	=> '',
+									'RETURN'	=> '',
+								);
+				
+				
+			}
+			$this->t_body->set_var($output);
+			$this->t_body->parse("submission_listing","submitted_block",true);
+		}
 
 	}			
 
