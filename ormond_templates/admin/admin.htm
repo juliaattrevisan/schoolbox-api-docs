@@ -164,7 +164,11 @@
 			<table>
 				<tr>
 					<td><img src="/newimages/navbar_input.gif" width="15" height="16" /> <strong>Remove Deleted/Expired Content</strong></td>
-					<td><a href="cleanup.php?news=1&amp;subnews=1" onclick="return(confirm('This will clean the database of all content no longer visible to users'));">Click Here</a></td>
+					<td><a href="cleanup.php?news=1&amp;subnews=1&amp;file=1" onclick="return(confirm('This will clean the database of all content no longer visible to users'));">Click Here</a></td>
+				</tr>
+                <tr>
+					<td><img src="/newimages/navbar_input.gif" width="15" height="16" /> <strong>Clean filesystem of stale files</strong></td>
+					<td><a href="cleanup.php?fileclean=1" onclick="return(confirm('This will delete all files that are no longer in the database'));">Click Here</a></td>
 				</tr>
 				<tr>
 					<td><img src="/newimages/navbar_input.gif" width="15" height="16" /> <strong>Clean Log Files</strong></td>
@@ -172,7 +176,7 @@
 				</tr>
 				<tr>
 					<td><strong><img src="/newimages/navbar_input.gif" width="15" height="16" /> Rollover users</strong></td>
-					<td>Click Here</td>
+					<td><a href="cleanup.php?rolluser=1" onclick="return(confirm('This will increment all students year by one'));">Click Here</a></td>
 				</tr>
 				<tr>
 					<td><img src="/newimages/navbar_input.gif" width="15" height="16" /> <strong>Clean Submission System</strong></td>

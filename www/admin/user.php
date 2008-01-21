@@ -294,6 +294,6 @@ class user
 				service != '".HOMEPAGESERVICE."' AND uid = '$id'";
 		return $this->db->dbGetAllRows($query);
 	}	
- 
+	
 }
 ?>

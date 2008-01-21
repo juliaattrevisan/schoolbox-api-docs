@@ -90,6 +90,75 @@ class clean {
 		print "Deleted ".$this->db->dbCountRowsAffected()." subject news items<br>";
 	}
 	
+	function cleanDeletedFiles() {
+		//deletes all files that are deleted
+		$query = "SELECT id FROM file WHERE deleted = '1'";
+		$this->db->dbDoQuery($query);
+		
+		while($file = $this->db->dbGetNextArray()) {
+			if(!@unlink(FILE_directory."/".$file['id'].".dat"))
+			print "Failed to delete ".FILE_directory."/".$file['id'].".dat<br>";		
+		}
+		
+		$query = "DELETE FROM file WHERE deleted = '1'";
+		$this->db->dbDoQuery($query);
+		print "Deleted ".$this->db->dbCountRowsAffected()." files<br>";
+	}
+	
+	function cleanFileSystem() {
+		//delete all files from the filesystem that do no have a corresponding record in the database
+		
+		//normal files
+		foreach(glob(FILE_directory.'/*.dat') as $file) {
+			preg_match('/.*\/([0-9]+).dat/', $file, $matches);
+			if($matches[1]) {
+				$query = "SELECT id FROM file WHERE id = '{$matches[1]}'";
+				if(!$this->db->dbGetSingleRow($query)) {
+					print "Deleting $file<br>";
+					if(!@unlink($file))
+						print "Failed to delete $file<br>";
+				
+				}
+			}
+		}
+		
+		//student submissions
+		foreach(glob(SUBMISSION_directory.'/*.dat') as $file) {
+			preg_match('/.*\/([0-9]+).dat/', $file, $matches);
+			if($matches[1]) {
+				$query = "SELECT id FROM student_submission WHERE id = '{$matches[1]}'";
+				if(!$this->db->dbGetSingleRow($query)) {
+					print "Deleting $file<br>";
+					if(!@unlink($file))
+						print "Failed to delete $file<br>";
+					
+				}
+			}
+		}
+		
+		//returns
+		foreach(glob(RETURNS_directory.'/*.dat') as $file) {
+			preg_match('/.*\/([0-9]+).dat/', $file, $matches);
+			if($matches[1]) {
+				$query = "SELECT id FROM submission_return WHERE id = '{$matches[1]}'";
+				if(!$this->db->dbGetSingleRow($query)) {
+					print "Deleting $file<br>";
+					if(!@unlink($file))
+						print "Failed to delete $file<br>";
+					
+				}
+			}
+		}
+		
+		
+		
+	}
+	
+	function rollStudents() {
+		$query = "UPDATE user SET year = year + 1 WHERE group_id IN(".implode(',',unserialize(STUDENTGROUPIDS)).") AND year IS NOT NULL";
+		$this->db->dbDoQuery($query);
+		print "Updated ".$this->db->dbCountRowsAffected()." student year levels<br>";
+	}
  
 }
 
@@ -99,6 +168,8 @@ if($_GET['news'] == 1)
 	$clean->cleanNews();
 if($_GET['subnews'] == 1)
 	$clean->cleanSubNews();
+if($_GET['file'] == 1)
+	$clean->cleanDeletedFiles();
 if($_GET['loginlog'] == 1)
 	$clean->cleanLoginLog();
 if($_GET['log'] == 1)
@@ -107,5 +178,9 @@ if($_GET['submission'] == 1)
 	$clean->cleanSubmissionBoxes();
 if($_GET['return'] == 1)
 	$clean->cleanReturnedWork();
+if($_GET['rolluser'] == 1)
+	$clean->rollStudents();
+if($_GET['fileclean'] == 1)
+	$clean->cleanFileSystem();
 
 ?>
