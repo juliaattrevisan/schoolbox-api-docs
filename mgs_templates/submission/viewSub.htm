@@ -125,14 +125,16 @@
 					<tbody>
 					<!-- BEGIN submitted_block --> 
 					<tr> 
-						<td style="color:{COLOUR}; white-space: nowrap;"><a href=\"/search/userLookup.php?id={OWNER_ID}\">{OWNER}</a></td> 
-						<td style="color:{COLOUR};">{DATE}</td> 
+						<td style="color:{COLOUR}; white-space: nowrap;"><a href="/search/userLookup.php?id={OWNER_ID}">{OWNER}</a></td> 
+						<!-- BEGIN mark -->
+                        <td style="color:{COLOUR};">{DATE}</td> 
 						<td>{MARKED}</td> 
 						<td class="cntr"><a href="{VIEW}" target="_blank">View</a></td> 
 						<td class="cntr"><a href="{SAVE}">Save</a></td> 
 						<td class="cntr">{RETURN}</td> 
 						<td class="cntr"><a href="{DELETE}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));">Delete</a></td> 
-					</tr> 
+						<!-- END mark -->
+                    </tr> 
 					<!-- END submitted_block -->
 					</tbody> 
 				</table> 

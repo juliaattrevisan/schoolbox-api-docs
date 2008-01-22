@@ -63,9 +63,9 @@ class ViewSubmissionPage {
 				DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id 
 				FROM student_submission, user 
 				WHERE $where AND owner = user.id AND box_id = '$box_id'"; 
-			
+
 			if($line = $this->db->dbGetSingleRow($query)) {
-				
+			
 				$output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
 									'OWNER_ID' 	=> $line['uid'],
 									'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
@@ -75,21 +75,16 @@ class ViewSubmissionPage {
 									'DELETE'	=> 'viewSubmission.php?delete='.$line['id']."&box_id=$box_id",
 									'COLOUR'	=> $line['late']?'#ff0000':'#000000',
 									'MARKED'	=> $line['marked']?'<img src="/images/greentick.gif" width="13" height="12">':'<img src="/images/emptybox.gif" width="13" height="12">',
-									'RETURN'	=> $line['marked']?'':"/ <a href=\"returnWork.php?box_id=$box_id&sid=".$line['uid']."\">Return</a>",
+									'RETURN'	=> $line['marked']?'':"<a href=\"returnWork.php?box_id=$box_id&sid=".$line['uid']."\">Return</a>",
 								);
+				$this->t_body->parse('mark_block', 'mark', false);
 			}
 			else {
 			
-				$output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
-									'OWNER_ID' 	=> $line['uid'],
-									'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
-									'DATE'		=> 'N/A',
-									'VIEW'		=> '',
-									'SAVE'		=> '',
-									'DELETE'	=> '',
-									'COLOUR'	=> '#000000',
-									'MARKED'	=> '',
-									'RETURN'	=> '',
+				$output = array(	'OWNER' 	=> formatName($student,'{lastname}, {firstname}'),
+									'OWNER_ID' 	=> $student['uid'],
+									'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
+									'mark_block' => '<td colspan="6">&nbsp;</td>',
 								);
 				
 				
@@ -182,17 +177,16 @@ class ViewSubmissionPage {
   
         function showPage($box_id)
         {
-
-		$this->t_body = new Template(TPL_directory);
-               	$this->t_body->set_file("tplBODY", "submission/viewSub.htm");
-		$this->t_body->set_var("TITLE", HEADING." - Student Submissions");
-		$this->t_body->set_block("tplBODY", "submitted_block", "submission_listing");		
-		$this->setSubmissions($box_id);
-
-		include_once("../include/page.php");
-
-                $this->t_body->pparse("finaloutput", "tplBODY");
-        	
+			$this->t_body = new Template(TPL_directory);
+			$this->t_body->set_file("tplBODY", "submission/viewSub.htm");
+			$this->t_body->set_var("TITLE", HEADING." - Student Submissions");
+			$this->t_body->set_block("tplBODY", "submitted_block", "submission_listing");		
+			$this->t_body->set_block("submitted_block", "mark", "mark_block");
+			$this->setSubmissions($box_id);
+			
+			include_once("../include/page.php");
+			
+			$this->t_body->pparse("finaloutput", "tplBODY");	
 	}
 }
 
