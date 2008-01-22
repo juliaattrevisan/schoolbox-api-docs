@@ -205,7 +205,7 @@ class ModuleEquipmentEdit extends HelpDeskPage {
 			$selectedMonth = date( 'n');
 			$selectedYear = date( 'Y');
 		}
-		print "blah=$selectedDay";
+		
 			# usage is : $this->populateSelect( table/block name (must be same), initiallySelected);
 		$this->populateSelect( 'EquipmentType', $row[ 'equipmentTypeID']);
 		$this->populateSelect( 'Model', $row[ 'modelID']);

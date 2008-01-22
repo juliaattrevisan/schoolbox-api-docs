@@ -29,11 +29,8 @@ class BulkRemove{
 	
 		if (is_file($file))
 		{
-			$lines = file($file);
-			foreach ($lines AS $line)
-			{
-				$line = trim($line);
-				$user = explode(',', $line);
+			$handle = fopen($file, "r");
+			while (($user = fgetcsv($handle, 1000, ",")) !== FALSE) {
 				
 				if($user[0] != "")
 				{
