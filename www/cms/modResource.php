@@ -19,35 +19,8 @@ class ModResourcePage {
 	function ModResourcePage()
 	{
 		$this->db = new dbManager;
-		
 		$this->submissionDefault = isset($_GET['sb']) ? 1 : 0;
 	}
-		
-	function setFileTypeList($type=0)
-	{
-		//get types of files that can be added
-		$query = "SELECT * FROM file_type";
-		$this->db->dbDoQuery($query);
-		$typeHTML = "<OPTION VALUE=\"0\"></OPTION>";
-		while($line = $this->db->dbGetNextArray())
-		{
-			if($line['id'] == $type)
-			{
-				$typeHTML .= "<OPTION VALUE=\"".$line['id']."\" selected>";
-				$typeHTML .= $line['name'];
-				$typeHTML .= "</OPTION>";
-			}
-			else
-			{
-				$typeHTML .= "<OPTION VALUE=\"".$line['id']."\">";
-				$typeHTML .= $line['name'];
-				$typeHTML .= "</OPTION>";
-			}
-		}
-		$typeHTML = "<select name=\"ftype\" class=\"formfield\">".$typeHTML."</select>";
-		$this->t_body->set_var("TYPELIST", $typeHTML);
-	}	
-
 
 	function setCategoryList($category=0)
 	{
@@ -188,21 +161,11 @@ class ModResourcePage {
 			else
 				$this->t_body->set_var("submission_block", "");
 				
-			//set the browse block up
+			//set hidden fields for submission box
 			if($fileType)
-			{
-				//$query = "SELECT name FROM file_type WHERE id = '$fileType'";
-				//$result = $this->db->dbGetSingleRow($query);
-			
-				//$typeOutput = "<b>".$result['name']."</b><input type=\"hidden\" name=\"ftype\" value=\"$fileType\">";
 				$this->t_body->set_var("FILE_TYPE", $fileType);
-				
-			}
 			else
-			{
-				//$this->setFileTypeList();
 				$this->t_body->set_var("FILE_TYPE", '');
-			}
 			
 			if (is_numeric($_GET['Day']))
 				$this->t_body->set_var("DUE_DAY", $_GET['Day']);
@@ -254,7 +217,7 @@ class ModResourcePage {
 			$this->setCategoryList($url['category']);
 		else
 			$this->setCategory($url['category']);
-		$this->setFileTypeList($file['type']);
+	
 
 		//check box for submission box associated with file
 		$query = "SELECT id, deleted FROM submission_box WHERE fid = '$id'";

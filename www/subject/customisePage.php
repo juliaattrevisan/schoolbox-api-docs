@@ -47,6 +47,7 @@ class customise
 		foreach($listLargeComp as $key => $largeComp){
 			$this->t_body->set_var('componentID', $largeComp['id']);
 			$this->t_body->set_var('componentName', $largeComp['name']);
+			$this->t_body->set_var('componentDescription', $largeComp['description']);
 			if(!empty($largeComp['component']))
 				$this->t_body->set_var('componentChecked', 'checked');
 			else
@@ -71,6 +72,7 @@ class customise
 		foreach($listSmallComp as $key => $smallComp){
 			$this->t_body->set_var('componentID', $smallComp['id']);
 			$this->t_body->set_var('componentName', $smallComp['name']);
+			$this->t_body->set_var('componentDescription', $smallComp['description']);
 			if(!empty($smallComp['component']))
 				$this->t_body->set_var('componentChecked', 'checked');
 			else
@@ -109,9 +111,9 @@ class customise
 	{
 		// 1 = large, 2 = small, 0 = all
 		if($size > 0 )
-			$query = "SELECT id, name, component FROM homepage_comp c LEFT JOIN homepage_comp_location l ON l.component = c.id AND cid = {$this->cid} WHERE c.size IN($size, 0) ORDER BY name";
+			$query = "SELECT id, name, component, description FROM homepage_comp c LEFT JOIN homepage_comp_location l ON l.component = c.id AND cid = {$this->cid} WHERE c.size = $size ORDER BY name";
 		else
-			$query = "SELECT id, name FROM homepage_comp ORDER BY name";
+			$query = "SELECT id, name, description FROM homepage_comp ORDER BY name";
 
 		return $this->db->dbGetAllRows($query); 
 	}

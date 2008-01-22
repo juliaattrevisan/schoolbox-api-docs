@@ -60,12 +60,12 @@ class OutPut
 		{
 			if($component['method'] != "")
 			{
+
 				$component['config'] = unserialize($component['config']);
-				
 				$this->t_body->set_file($component['name'].$componentCount, 'homepages/components/'.$component['filename']);
 				$this->t_body->set_var('COMPONENT_ID', $component['component']);
 				$this->t_body->set_block($component['name'].$componentCount, "config", "config_block");
-		
+				
 				if(!empty($component['config']) && $this->perm >= 2)
 				{			
 					foreach($component['config'] as $name => $value)
@@ -89,11 +89,10 @@ class OutPut
 									  AND deleted = '0' AND INSTR(mime_type, 'image/') AND inline = 'true'
                 					  ORDER BY submitted".$lim;
 							$this->db->dbDoQuery($query);
-							
 							if($this->db->dbCountRows() > 0)
 							{
 								while($image = $this->db->dbGetNextArray())
-								{print($config['image']);
+								{
 									$this->t_body->set_var('COMPONENT_CONFIG_IMAGE', $image['description']);
 									$this->t_body->set_var('COMPONENT_CONFIG_IMAGE_SELECTED', $image['description'] == $value ? ' selected' : '');
 									$this->t_body->parse("image_block".$componentCount, "image", true);
@@ -466,7 +465,6 @@ class OutPut
 			
 			$this->t_body->set_var("PREVIEW_IMAGE_URL", $imageurl);
 			$this->t_body->set_var("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));
-	        $this->t_body->set_var("CONTENT_URL", $link['url']);
 
 			$this->t_body->parse("preview_block", "previewimage");
 		}
@@ -488,31 +486,99 @@ class OutPut
 
 		//get image id
 		$query = "SELECT id, comment FROM file WHERE category = '".$this->category."' AND deleted = '0' AND description LIKE '{$config['image']}'";
-		$this->db->dbDoQuery($query);
-		if($this->db->dbCountRows() > 0)
-		{
-			$image = $this->db->dbGetNextArray();
+		$image = $this->db->dbGetSingleRow($query);
+		if(!is_array($image)) {
+			//try to find another image if we cant find the configured one	
+			$query = "SELECT id, comment FROM file WHERE category = {$this->category} AND deleted = '0' AND INSTR(mime_type, 'image/')";
+			$image = $this->db->dbGetSingleRow($query);
 			
-			//get link
-			$query = "SELECT url FROM link WHERE category = '".$this->category."' AND description LIKE 'Intranet Site'";
-			$this->db->dbDoQuery($query);
-			$link = $this->db->dbGetNextArray(); 
-			
-			if($config['size']==0){$config['size']=6;}
-				$imageSize=$config['size']*100;
-						
-			$imageurl = "cms/image.php?id={$image['id']}&height={$imageSize}&width={$imageSize}";
-			
-			$this->t_body->set_var("PREVIEW_IMAGE_URL", $imageurl);
-			$this->t_body->set_var("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));
-			$this->t_body->set_var("CONTENT_URL", $link['url']);
-			
-			$this->t_body->parse("preview_block", "previewimage");
+			if(!is_array($image)) {
+				$this->t_body->set_var('preview_block', '');
+				return true;
+			}
 		}
-		else
-			$this->t_body->set_var("preview_block", '');
+			
+		if($config['pixel']>400){$config['pixel']=400;}
+		if($config['pixel']<20){$config['pixel']=20;}
+		
+					
+		$imageurl = "cms/image.php?id={$image['id']}&height={$config['pixel']}&width={$config['pixel']}";
+		
+		$this->t_body->set_var("PREVIEW_IMAGE_URL", $imageurl);
+		$this->t_body->set_var("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));
+		$this->t_body->set_var("CONTENT_URL", $config['url']);
+		
+		$this->t_body->parse("preview_block", "previewimage");
+
 		
 		return true;
+	}
+
+	function outputDueWorkList($name, $config)
+	{
+		//due output
+		$this->t_body->set_block($name, "duework", "duework_block");
+
+		if( isStudent($_SESSION['gid']) )
+		{
+			$query = "
+				SELECT	file.id, file.description, file.realname, file.comment,
+					DATE_FORMAT(submission_box.date, '%D %b') AS date,
+					UNIX_TIMESTAMP(submission_box.open_date) AS open, 
+					UNIX_TIMESTAMP(submission_box.late_date) AS late,
+					submission_box.id AS box_id, student_submission.owner, inline,
+					file_type.name as type
+				FROM file
+				LEFT JOIN allowedFileTypes ON file.mime_type = mime
+				LEFT JOIN submission_box ON	file.id = _box.fid
+					AND submission_box.deleted = '0'
+				LEFT JOIN student_submission ON	student_submission.box_id = submission_box.id 
+					AND student_submission.owner = '".$_SESSION['id']."' 
+				LEFT JOIN file_type ON submission_box.type = file_type.id
+				WHERE file.category = '".$this->category."' AND file.deleted = '0' 
+				ORDER BY submission_box.date DESC
+			";
+		
+		}
+		else
+		{
+			$query = "
+			SELECT file.id, file.description, file.comment, 
+				DATE_FORMAT(submission_box.date, '%D %b') AS date, 
+				submission_box.id AS box_id, submission_box.owner, file.realname, inline,
+				file_type.name as type
+			FROM file  
+				LEFT JOIN allowedFileTypes ON mime_type = mime
+				LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0'
+				LEFT JOIN file_type ON submission_box.type = file_type.id
+			WHERE file.category = '".$this->category."' AND file.deleted = '0'
+			ORDER BY submission_box.date DESC";
+		}
+
+		//if no size make unlimited query else make it limited by size
+		if($config['size'] != 0 && $config['size'] != '') 
+			$query .= " LIMIT 0, {$config['size']}"; 
+
+		$this->db->dbDoQuery($query);
+
+		if($this->db->dbCountRows() < 1 ){$this->t_body->set_var("duework_block", "");}
+		else
+		{
+			while($queryArray = $this->db->dbGetNextArray() )
+			{
+				$this->outputDuework($queryArray);
+			}
+		}
+
+		//setup block for submission button
+		$this->t_body->set_block($name, "submit_dw", "submit_dw_block");
+		if($this->perm < 2)		
+			$this->t_body->set_var("submit_dw_block", "");
+		else
+			$this->t_body->parse("submit_dw_block", "submit_dw");	
+			
+		return true;
+
 	}
 
 	function outputHomeworkList($name, $config)
@@ -530,7 +596,7 @@ class OutPut
 					submission_box.id AS box_id, student_submission.owner, inline
 				FROM file
 				LEFT JOIN allowedFileTypes ON file.mime_type = mime
-				LEFT JOIN submission_box ON	file.id = submission_box.fid
+				LEFT JOIN submission_box ON	file.id = _box.fid
 					AND submission_box.deleted = '0'
 				LEFT JOIN student_submission ON	student_submission.box_id = submission_box.id 
 					AND student_submission.owner = '".$_SESSION['id']."' 
@@ -965,6 +1031,51 @@ class OutPut
 			$this->t_body->parse("submit_event_block", "submit_event");	
 		
 		return true;
+	}
+	
+	function outputDuework($queryArray)
+	{
+
+		$url = "sendframe.php?id=".$queryArray['id'];
+
+		if($queryArray['date'])
+			$date = $queryArray['date'];
+		else
+			$date = "No date";
+
+		//if staff or student is enrolled and there is work due provide a link
+		if($this->enroled)
+		{
+			if(isStudent($_SESSION['gid']) && $queryArray['owner']=='' && $queryArray['late'] > date('U') && $queryArray['open'] < date('U') ) //student
+				$dueDate = "<a href=\"/submission/submitWork.php?box_id=".$queryArray['box_id']."\">".$date."</a>";
+			else if(isStaff($_SESSION['gid']) && $queryArray['owner'] == $_SESSION['id']) //if staff owns box provide link
+				$dueDate = "<a href=\"/submission/viewSubmission.php?box_id=".$queryArray['box_id']."\">".$date."</a>";
+			else
+				$dueDate = $date;
+		}
+		else
+			$dueDate = $date;
+			
+		$this->t_body->set_var("DUE_DATE", $dueDate);
+	
+		//set name
+		if($queryArray['realname'] != "")
+		{
+			if($queryArray['inline'] == 'true')
+				$url = "<a href=\"sendframe.php?id=".$queryArray['id']."\" target=\"_blank\">".scrubTEXT($queryArray['description'])."</a>";
+			else
+				$url = "<a href=\"send.php?id=".$queryArray['id']."\">".scrubTEXT($queryArray['description'])."</a>";
+
+			$this->t_body->set_var("DUE_NAME", $url);
+		}
+		else
+			$this->t_body->set_var("DUE_NAME", scrubTEXT($queryArray['description']));
+		
+		$this->t_body->set_var("DUE_COMMENT", nl2br(scrubTEXT($queryArray['comment'])));
+		$this->t_body->set_var("DUE_TYPE", scrubTEXT($queryArray['type']));
+
+		$this->t_body->parse("duework_block", "duework", true);
+
 	}
 
 	function outputHomework($queryArray)
