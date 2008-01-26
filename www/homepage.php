@@ -383,7 +383,7 @@ class OutPut
 	function outputTeachers($name, $config)
 	{
 		// gets teachers involved in subject, outputs links to their addressbook page
-		
+		include('include/syn_classlist.php');
 		// sql to add module :
 		// INSERT INTO homepage_comp VALUES(2, 'outputTeachers', 'Class Teachers', 'teacher_s.htm')
 		$this->t_body->set_block($name, "staff_teachers", "staff_teacher_block");
@@ -391,14 +391,23 @@ class OutPut
 		if($this->code != "" && SYNERGY_enable)
 		{	
 		
-			$name = getTeacherName($this->code);
+			$listSyns = getTeacherName($this->code);
 			
-		
-			if(SITE_location == 'wenona') {
-				$this->t_body->set_var("MEMBER_NAME", $name);
-			} else {
-				$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$teacher['id']}\">{$name}</a>");
-				$this->t_body->parse("staff_teacher_block", "staff_teachers", true);		
+			if(is_array($listSyns)) {
+				foreach($listSyns as $synid) {
+					$query = "SELECT id, title, firstname, lastname, alt_email, local_email FROM user WHERE synergy_id = '$synid'";
+					$teacher=$this->db->dbGetSingleRow($query);
+					if(is_array($teacher)) {
+						$name = formatName($teacher);
+			
+						if(SITE_location == 'wenona') {
+							$this->t_body->set_var("MEMBER_NAME", $name);
+						} else {
+							$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$teacher['id']}\">{$name}</a>");
+							$this->t_body->parse("staff_teacher_block", "staff_teachers", true);		
+						}
+					}
+				}
 			}
 		}	
 	}
@@ -706,38 +715,6 @@ class OutPut
 		return true;
 	}
 	
-	function outputNoteList($name, $config)
-	{
-		//note output
-		$this->t_body->set_block($name, "notes", "notes_block");
-		
-		$query = "SELECT id, file.description, comment, realname, inline FROM file LEFT JOIN allowedFileTypes ON mime_type = mime
-		WHERE category = '".$this->category."' AND type = '1' AND file.deleted = '0' ORDER BY submitted DESC";
-
-		//if no size make unlimited query else make it limited by size
-		if($config['size'] != 0 && $config['size'] != '') 
-			$query .= " LIMIT 0, {$config['size']}"; 
-	
-		$this->db->dbDoQuery($query);
-
-		if($this->db->dbCountRows() < 1){ $this->t_body->set_var("notes_block", "");}
-		else
-		{
-			while($queryArray = $this->db->dbGetNextArray() )
-			{
-				$this->outputNote($queryArray);
-			}
-		}
-
-		//setup block for submission button
-		$this->t_body->set_block($name, "submit_note", "submit_note_block");
-		if($this->perm < 2)		
-			$this->t_body->set_var("submit_note_block", "");
-		else
-			$this->t_body->parse("submit_note_block", "submit_note");	
-
-		return true;
-	}
 	
 	function outputLinkList($name, $config)
 	{
@@ -1161,28 +1138,6 @@ class OutPut
 		$this->t_body->set_var("ASS_COMMENT", nl2br(scrubTEXT($queryArray['comment'])));
 
 		$this->t_body->parse("assign_block", "assign", true);
-
-	}
-
-	function outputNote($queryArray)
-	{
-
-		//set name
-		if($queryArray['realname'] != "")
-		{
-			if($queryArray['inline'] == 'true')
-				$url = "<a href=\"sendframe.php?id=".$queryArray['id']."\" target=\"_blank\">".scrubTEXT($queryArray['description'])."</a>";
-			else
-				$url = "<a href=\"send.php?id=".$queryArray['id']."\">".scrubTEXT($queryArray['description'])."</a>";
-
-			$this->t_body->set_var("NOTE_NAME", $url);
-		}
-		else
-			$this->t_body->set_var("NOTE_NAME", scrubTEXT($queryArray['description']));
-	
-		$this->t_body->set_var("NOTE_COMMENT", nl2br(scrubTEXT($queryArray['comment'])));
-
-		$this->t_body->parse("notes_block", "notes", true);
 
 	}
 

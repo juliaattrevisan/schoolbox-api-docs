@@ -522,9 +522,12 @@ class dueWorkPage
 
 				if($prevCat['cid'] != $return['cid'])
 				{
+					$teacherID = getTeacherName($prevCat['code']);
+					$query = "SELECT id, title, firstname, lastname, alt_email, local_email FROM user WHERE synergy_id = '{$teacherID[0]}'";
+					$teacher=$this->db->dbGetSingleRow($query);
 					$this->t_body->set_var("CATEGORY", $prevCat['name']);
-					$this->t_body->set_var("TEACHER", getTeacherName($prevCat['code']));
-					$this->t_body->set_var("TEACHER_EMAIL", getTeacherEmail($prevCat['code']));
+					$this->t_body->set_var("TEACHER", formatName($teacher));
+					$this->t_body->set_var("TEACHER_EMAIL", formatEmail($teacher));
  					$this->t_body->parse("ret_category_listing", "ret_category_block", true);
 					$this->t_body->set_var("return_list", "");
 				}

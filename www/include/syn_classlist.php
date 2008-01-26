@@ -52,11 +52,11 @@ function getStudents($subCode, $db = 0)
 		ORDER BY CommunityStudents.Surname, CommunityStudents.Preferred ";
                 
 	$result = mssql_query($query, $db);
-
+	print $query;
 	return $result;
 }
 
-function getTeacherName ($code) {
+function getTeacherName($code) {
 		
 		$db = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
 		@mssql_select_db(MSSQL_db, $db);
@@ -70,39 +70,9 @@ function getTeacherName ($code) {
 
 			while($synrow = @mssql_fetch_array($msResult))
 			{
-				$query = "SELECT id, title, firstname, lastname FROM user WHERE synergy_id = '{$synrow['StaffID']}'";
-				$teacher=$this->db->dbGetSingleRow($query);
-				if(is_array($teacher)) {
-					$name = formatName($teacher);
-					return $name;		
-				}
+				$teachers[] = $synrow['StaffID'];	
 			}
-		
-		}
-}
-
-function getTeacherEmail ($code) {
-		
-		$db = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
-		@mssql_select_db(MSSQL_db, $db);
-	
-		$msQuery = "SELECT DISTINCT StaffID FROM SubjectClassStaff
-			WHERE ClassCode = '$code' AND FileYear={$_SESSION['FileYear']} AND FileSemester={$_SESSION['FileSemester']}";
-		
-		$msResult = @mssql_query($msQuery, $db);
-		
-		if(@mssql_num_rows($msResult) > 0) {
-
-			while($synrow = @mssql_fetch_array($msResult))
-			{
-				$query = "SELECT * FROM user WHERE synergy_id = '{$synrow['StaffID']}'";
-				$teacher=$this->db->dbGetSingleRow($query);
-				if(is_array($teacher)) {
-					$email = formatEmail($teacher);
-					return $email;		
-				}
-			}
-		
+			return $teachers;
 		}
 }
 

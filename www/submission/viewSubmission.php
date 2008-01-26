@@ -17,7 +17,6 @@ class ViewSubmissionPage {
 		if($desc['code'] && SYNERGY_enable) {
 			//if synergy code get synergy students
 			$studentList = getStudents($desc['code']);
-			
 			if(is_array($studentList))
 				return $studentList;			
 		}
@@ -50,22 +49,56 @@ class ViewSubmissionPage {
 		
 		$studentList = $this->getStudentList($desc);
 		
-		$returned = array();
-		
-		foreach($studentList as $student) {
-			
-			if($student['uid'])
-				$where = "owner = {$student['uid']}";
-			else if($student['synergy_id'])
-				$where = "synergy_id = {$student['synergy_id']}";
-			
+		if(is_array($studentList)) {
+			foreach($studentList as $student) {
+				
+				if($student['uid'])
+					$where = "owner = {$student['uid']}";
+				else if($student['synergy_id'])
+					$where = "synergy_id = {$student['synergy_id']}";
+				
+				$query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username, local_email, alt_email, 
+					DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id 
+					FROM student_submission, user 
+					WHERE $where AND owner = user.id AND box_id = '$box_id'"; 
+	
+				if($line = $this->db->dbGetSingleRow($query)) {
+				
+					$output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
+										'OWNER_ID' 	=> $line['uid'],
+										'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
+										'DATE'		=> $line['date'],
+										'VIEW'		=> 'sendframe.php?view='.$line['id'],
+										'SAVE'		=> 'viewSubmission.php?view='.$line['id'].'&save=1',
+										'DELETE'	=> 'viewSubmission.php?delete='.$line['id']."&box_id=$box_id",
+										'COLOUR'	=> $line['late']?'#ff0000':'#000000',
+										'MARKED'	=> $line['marked']?'<img src="/images/greentick.gif" width="13" height="12">':'<img src="/images/emptybox.gif" width="13" height="12">',
+										'RETURN'	=> $line['marked']?'':"<a href=\"returnWork.php?box_id=$box_id&sid=".$line['uid']."\">Return</a>",
+									);
+					$this->t_body->parse('mark_block', 'mark', false);
+				}
+				else {
+				
+					$output = array(	'OWNER' 	=> formatName($student,'{lastname}, {firstname}'),
+										'OWNER_ID' 	=> $student['uid'],
+										'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
+										'mark_block' => '<td colspan="6">&nbsp;</td>',
+									);
+					
+					
+				}
+				$this->t_body->set_var($output);
+				$this->t_body->parse("submission_listing","submitted_block",true);
+			}
+		}
+		else {
 			$query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username, local_email, alt_email, 
-				DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id 
-				FROM student_submission, user 
-				WHERE $where AND owner = user.id AND box_id = '$box_id'"; 
-
-			if($line = $this->db->dbGetSingleRow($query)) {
-			
+					DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id 
+					FROM student_submission, user 
+					WHERE owner = user.id AND box_id = '$box_id'"; 
+				
+			$this->db->dbDoQuery($query);
+			while($line = $this->db->dbGetNextArray()) {				
 				$output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
 									'OWNER_ID' 	=> $line['uid'],
 									'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
@@ -76,21 +109,11 @@ class ViewSubmissionPage {
 									'COLOUR'	=> $line['late']?'#ff0000':'#000000',
 									'MARKED'	=> $line['marked']?'<img src="/images/greentick.gif" width="13" height="12">':'<img src="/images/emptybox.gif" width="13" height="12">',
 									'RETURN'	=> $line['marked']?'':"<a href=\"returnWork.php?box_id=$box_id&sid=".$line['uid']."\">Return</a>",
-								);
+									);
 				$this->t_body->parse('mark_block', 'mark', false);
+				$this->t_body->set_var($output);
+				$this->t_body->parse("submission_listing","submitted_block",true);
 			}
-			else {
-			
-				$output = array(	'OWNER' 	=> formatName($student,'{lastname}, {firstname}'),
-									'OWNER_ID' 	=> $student['uid'],
-									'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
-									'mark_block' => '<td colspan="6">&nbsp;</td>',
-								);
-				
-				
-			}
-			$this->t_body->set_var($output);
-			$this->t_body->parse("submission_listing","submitted_block",true);
 		}
 
 	}			
