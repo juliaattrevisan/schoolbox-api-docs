@@ -10,7 +10,7 @@
 					<li class="navthis norm"><a class="navthis norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
 					<!-- END timetable_tab -->
 					<li class="norm"><a class="norm" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
-					<li class="norm"><a class="norm" href="http://intranet.wenona.nsw.edu.au/index.asp?strEncrypted={ENC_LOGIN}" title="Access the school intranet" accesskey="i"><em>I</em>ntranet</a></li>
+					<li class="norm"><a class="norm" href="http://intranet.wenona.nsw.edu.au/index.asp?strEncrypted={ENC_LOGIN}" title="Access the school intranet" accesskey="d"><em>D</em>irectory</a></li>
                      <!-- BEGIN portfolio_tab -->
                     <li class="norm"><a class="norm" href="/cms/browseMyFiles.php" title="Access your portfolio area" accesskey="p">My <em>P</em>ortfolio</a></li>
 					<!-- END portfolio_tab -->

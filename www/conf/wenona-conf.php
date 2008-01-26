@@ -35,11 +35,13 @@ define('LDAP_base', '');
 //CMS options
 define("FILE_directory", "/usr/local/www/files");		//Files uploaded using CMS system will be stored here
 define("FILE_max_upload", "10");
+define("CMS_allow_move", true);
 define("SUBMISSION_directory", "/usr/local/www/submissions");	//All files submitted to submission box stored here
 define("RETURNS_directory", "/usr/local/www/returns");		//Returned work will be stored in this directory
 define("MYFILE_directory", "/usr/local/www/myfiles");
 define("TPL_directory", "/usr/local/www/templates");		//Where site templates are located
 define("THUMBNAIL_IMAGE_CACHE", "/usr/local/www/files/thumbnails");		//Thumbnail cache for 
+define("THUMBNAIL_size", 100);
 define("URLS_use_frame", false);						//Open links in frame
 define('ZIP_directory', '/usr/local/www/zip');
 //define('MIME_magic', '/usr/share/file/magic');
@@ -120,6 +122,8 @@ define('RSS_limit', 6);
 
 define("ALLCAMPUS", 0);					//Value that represents all campuses in the luCampus table
 define("HOMEPAGESERVICE", 1);				//Value that represents the homepage module in the service table
+define("DROPBOX_COMPONENT", 25);
+define("FORUM_COMPONENT", 5);
 
 define("STUDENTGROUPIDS", serialize(array(3)));	//List of id numbers representing student groups
 define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
