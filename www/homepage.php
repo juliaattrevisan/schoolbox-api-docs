@@ -539,7 +539,7 @@ class OutPut
 					file_type.name as type
 				FROM file
 				LEFT JOIN allowedFileTypes ON file.mime_type = mime
-				LEFT JOIN submission_box ON	file.id = _box.fid
+				LEFT JOIN submission_box ON	file.id = submission_box.fid
 					AND submission_box.deleted = '0'
 				LEFT JOIN student_submission ON	student_submission.box_id = submission_box.id 
 					AND student_submission.owner = '".$_SESSION['id']."' 
@@ -605,7 +605,7 @@ class OutPut
 					submission_box.id AS box_id, student_submission.owner, inline
 				FROM file
 				LEFT JOIN allowedFileTypes ON file.mime_type = mime
-				LEFT JOIN submission_box ON	file.id = _box.fid
+				LEFT JOIN submission_box ON	file.id = submission_box.fid
 					AND submission_box.deleted = '0'
 				LEFT JOIN student_submission ON	student_submission.box_id = submission_box.id 
 					AND student_submission.owner = '".$_SESSION['id']."' 
