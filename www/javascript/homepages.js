@@ -1,6 +1,10 @@
 function toggleConfig(div){		
-	if($$('div#' + div + ' div.componentConfig').getStyle('display') == 'none')
-		$$('div#' + div + ' div.componentConfig').setStyle('display', 'inherit')
-	else
-		$$('div#' + div + ' div.componentConfig').setStyle('display', 'none')
+	var obj = document.getElementById(div);
+	var div = obj.getElementsByClassName('componentConfig');
+	if (div[0]) {
+		div[0].className = 'componentConfigShow';
+	} else {
+		div = obj.getElementsByClassName('componentConfigShow');
+		div[0].className = 'componentConfig';
+	}
 } 

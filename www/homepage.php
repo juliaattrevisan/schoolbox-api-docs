@@ -486,6 +486,7 @@ class OutPut
 
 	function outputImage($name, $config)
 	{
+		
 		//outputs an custom image and link to the homepage
 		$this->t_body->set_block($name, "previewimage", "preview_block");
 		

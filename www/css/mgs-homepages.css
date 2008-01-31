@@ -47,6 +47,14 @@ table#container {
 	display: none;
 }
 
+.componentConfigShow {
+	background-color: #CCCCCC;
+	text-align: right;
+	padding: 5px;
+	margin-bottom: 2px;
+	display: inherit;
+}
+
 a.config {
 	cursor: pointer;
 	position: absolute;
