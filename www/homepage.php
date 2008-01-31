@@ -280,7 +280,7 @@ class OutPut
         {
                 $this->t_body->set_block($name, "duties", "d_block");
                 $sql = "SELECT l.*, d.user, d.date, d.cid FROM luDuties l LEFT JOIN duty d ON l.dutyTypeID = d.dutyTypeID 
-			and d.date = now() where l.cid = ".$this->category ;
+			and d.date = '".date('Y-m-d')."' where l.cid = ".$this->category ;
                 $this->db->dbDoQuery($sql);
                 $block = false;
                 $this->t_body->set_var("DATE", 'Duties for '.date('l, jS \of F Y'));

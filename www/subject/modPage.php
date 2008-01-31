@@ -146,7 +146,7 @@ class modPage
 
 			// Default components
 			$this->saveComponentPosition(8, 1, 1, '');
-			$this->saveComponentPosition(19, 1, 2, serialize(array('size' => 5)));
+			$this->saveComponentPosition(3, 1, 2, serialize(array('size' => 5)));
 			$this->saveComponentPosition(2, 1, 3, serialize(array('size' => 5)));
 			$this->saveComponentPosition(12, 2, 1, serialize(array('size' => 7)));
 			$this->saveComponentPosition(11, 2, 2, serialize(array('size' => 7)));
@@ -164,7 +164,7 @@ class modPage
 
 			// Default components
 			$this->saveComponentPosition(8, 1, 1, '');
-			$this->saveComponentPosition(19, 1, 2, serialize(array('size' => 5)));
+			$this->saveComponentPosition(3, 1, 2, serialize(array('size' => 5)));
 			$this->saveComponentPosition(2, 1, 3, serialize(array('size' => 5)));
 			$this->saveComponentPosition(12, 2, 1, serialize(array('size' => 7)));
 			$this->saveComponentPosition(11, 2, 2, serialize(array('size' => 7)));

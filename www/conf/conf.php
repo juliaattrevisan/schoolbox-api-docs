@@ -98,6 +98,8 @@ define("MAIL_smtp_port", 25);
 define("MAIL_address", "mgs.vic.edu.au");
 define("MAIL_increment", 20);					//Amount of emails per page
 define("MAIL_db", "roundcubemail");
+define('ROUNDCUBE_db','mysql://portal:tnp879@localhost/portal');
+
 
 //RSS Feed 
 define('RSS_url', 'http://www.abc.net.au/news/indexes/justin/rss.xml');

@@ -18,7 +18,7 @@ $rcmail_config = array();
 // format is db_provider://user:password@host/databse
 // currently supported db_providers: mysql, sqlite
 
-$rcmail_config['db_dsnw'] = 'mysql://portal:tnp879@localhost/portal';
+$rcmail_config['db_dsnw'] = ROUNDCUBE_db;
 // postgres example: 'pgsql://roundcube:pass@localhost/roundcubemail';
 // sqlite example: 'sqlite://./sqlite.db?mode=0646';
 
