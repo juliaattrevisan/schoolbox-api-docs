@@ -161,7 +161,7 @@ function getPeriodNumber($campus)
 			TimetableGroup = '" . $campusString . "'";
 			
 	$result = mssql_query($query, $db);
-	if ($result != 1)
+	if ($result !== FALSE && $result !== TRUE)
 		$period = @mssql_fetch_array($result);
 	else
 		return false;
@@ -247,7 +247,7 @@ function getDayTimetable($synergy_id, $group, $campus, $daynumber)
 	$dayCount = $timetabledef['dayCount'];
 	
 	//get first period
-	if ($result != 1)
+	if ($result !== FALSE && $result !== TRUE)
 		$desc = mssql_fetch_array($result);
 	 else
 		$desc = "";	

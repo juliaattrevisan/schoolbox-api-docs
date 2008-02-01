@@ -93,7 +93,7 @@ function getSubjectList($synergyID, $group)
 	}
 	
 	$result = @mssql_query( $sql);
-	if($result != 1)
+	if($result !== FALSE && $result !== TRUE)
 	{
 		if( mssql_num_rows( $result ) > 0 )
 		{
@@ -128,7 +128,7 @@ function getEnrolledStudents($synergyID)
 			AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD')";
 				
 	$result = @mssql_query( $query);
-	if($result != 1)
+	if($result !== FALSE && $result !== TRUE)
 	{
 		if( mssql_num_rows( $result ) > 0 )
 		{
