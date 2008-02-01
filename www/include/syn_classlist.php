@@ -52,7 +52,6 @@ function getStudents($subCode, $db = 0)
 		ORDER BY CommunityStudents.Surname, CommunityStudents.Preferred ";
                 
 	$result = mssql_query($query, $db);
-	print $query;
 	return $result;
 }
 
