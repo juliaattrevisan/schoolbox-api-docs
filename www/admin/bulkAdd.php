@@ -1,18 +1,14 @@
 <?php
+
 /************************************************************
 *                                                           *
 *         Copyright (c) 2002-2003 Lektec Consulting         *
 *                                                           *
 ************************************************************/
 
-require_once("../include/include.php");
-require_once("../include/session.php");
-require_once("../include/adminonly.php");
-require_once("user.php");
 
-class BulkAdd {
-
-/* CSV fields
+/* 
+CSV fields
 
 	0. username
 	1. title
@@ -27,21 +23,25 @@ class BulkAdd {
 	10 alt. email
 */
 
+require_once("../include/include.php");
+require_once("../include/session.php");
+require_once("../include/adminonly.php");
+require_once("user.php");
 
-	function parseCSV($file)
-	{
-		$userDb = new user;
-	
-		if (is_file($file))
-		{
+class BulkAdd {
+
+	function parseCSV($file) {
+		$userDB = new user;
+
+		if (is_file($file)){
 			$handle = fopen($file, "r");
 			while (($user = fgetcsv($handle, 1000, ",")) !== FALSE) {
-			{	
 				if($user[0] != "" && $user[2] != "" && $user[3] != "")
 				{	
 					$result = $userDB->addUser($user[0], $user[1], $user[2], $user[3], $user[4], $user[5], $user[6], $user[7], $user[8], $user[9], $user[10]);
 					
-					if(!$result) { //adding failed
+					if(!$result) { 
+						//adding failed
 						//check username and synergy already exists
 						$query = "SELECT id FROM user WHERE username = '{$user[0]}' AND synergy_id = '{$user[4]}'";
 						$updateUser = $userDB->db->dbGetSingleRow($query);
@@ -53,16 +53,14 @@ class BulkAdd {
 					}
 					else {
 						print "User {$user[0]} has been added<br>";
-					}
-					
-					
+					}					
 				}
 			}
 		}
 	}
 }
 
-$page = new BulkAdd();
+$page = new BulkAdd;
 
 
         
@@ -80,3 +78,4 @@ else
         //not enough info submitted fail
         $page->displayPage();
 }
+?>
