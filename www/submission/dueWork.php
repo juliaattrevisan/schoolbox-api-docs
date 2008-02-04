@@ -195,8 +195,11 @@ class dueWorkPage
 						$this->t_body->set_var("COLOUR", "#000000");
 						
 					$this->t_body->set_var("CATEGORY", $result['name']);
-					$this->t_body->set_var("TEACHER", getTeacherName($result['code']));
-					$this->t_body->set_var("TEACHER_EMAIL", getTeacherEmail($result['code']));
+					$teacherID = getTeacherName($result['code']);
+					$query = "SELECT id, title, firstname, lastname, alt_email, local_email FROM user WHERE synergy_id = '{$teacherID[0]}'";
+					$teacher=$this->db->dbGetSingleRow($query);
+					$this->t_body->set_var("TEACHER", formatName($teacher));
+					$this->t_body->set_var("TEACHER_EMAIL", formatEmail($teacher));
 	
 					$this->t_body->set_var("ASSDESC", scrubTEXT($result['description']));
 					$this->t_body->set_var("TYPE", scrubTEXT($result['type']));
