@@ -28,7 +28,7 @@ class url
                         error(6);
         }
 
-	function modifyUrl($url, $description, $comment, $category, $modid)
+	function modifyUrl($url, $description, $comment, $category, $modid, $hidden)
 	{
 		//check allowed perms to add to specified category before proceeding
 		$this->checkWriteAccess($category);
@@ -40,7 +40,7 @@ class url
 			$url = "http://".$url;
 		
 		$query = "UPDATE link 
-			SET url='$url', description='$description', comment='$comment', category='$category' 
+			SET url='$url', description='$description', comment='$comment', category='$category' ".(isStaff($_SESSION['gid'])?", hidden = '$hidden' ":"")."
 			WHERE id = '$modid'";
 		$this->db->dbDoQuery($query);
 		
@@ -48,7 +48,7 @@ class url
 		$this->db->dbDoQuery($query);
 	}
 
-	function addUrl($url, $description, $comment, $category)
+	function addUrl($url, $description, $comment, $category, $hidden)
 	{
 		//check allowed perms to add to specified category before proceeding
 		$this->checkWriteAccess($category);
@@ -59,10 +59,14 @@ class url
 			$url = "http://".$url;
 		
 		//INSERT url into table
-		$query = "INSERT INTO link 
-		(category, owner, url, submitted, description, comment) 
-		VALUES 
-		('$category','".$_SESSION['id']."','$url',NOW(),'$description','$comment')";
+		$query = "INSERT INTO link SET
+			category = '$category', 
+			owner = '".$_SESSION['id']."', 
+			url = '$url', 
+			submitted = NOW(), 
+			description = '$description', 
+			comment = '$comment' 
+			".(isStaff($_SESSION['gid'])?", hidden = '$hidden' ":"")."";
 		
 		$this->db->dbDoQuery($query);
 		$linkId = $this->db->dbInsertId();

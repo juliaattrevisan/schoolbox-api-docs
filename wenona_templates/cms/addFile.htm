@@ -37,6 +37,11 @@ function verify()
 	else
 		return true;
 }
+function clearBrowse(obj, id) {
+	if (obj.value != '') {
+		document.getElementById(id).value = '';
+	}
+}
 	
 </script>
 <!-- #EndEditable -->
@@ -119,11 +124,25 @@ function verify()
 				<table>
 					<!-- BEGIN browse_row -->
 					<tr>
-						<td class="formLabelWidth"><h2>File</h2></td>
-						<td><input type="file" name="file" />
+						<td class="formLabelWidth"><h2>File</h2>
+                        		<em>Browse your local disk for a file or upload from your portfolio.</em></td>
+						<td><input type="file" name="file"  id="browse" onchange="clearBrowse(this, 'myfile');" />
 							<input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
 						</td>
 					</tr>
+                    <tr>
+                     <td><span style='font-weight: bold; float: right; margin-right: 2px; position: relative; top: -20px;'>or</span></td>
+                     <td><select name='myfile' id="myfile" onchange="clearBrowse(this, 'browse');">
+                     	<option value=''></option>
+                     	<!-- BEGIN optgroup_start -->
+                        	<optgroup label="{MYFOLDER_NAME}"  style="margin-left: {MARGIN_LEFT}px;"><!-- END optgroup_start -->
+                        <!-- BEGIN my_files -->
+                        	<option value="{MYFILE_ID}" style="margin-left: {MARGIN_LEFT}px;">{MYFILE_NAME}</option><!-- END my_files -->
+                        <!-- BEGIN optgroup_end -->
+                        	</optgroup><!-- END optgroup_end -->
+                        
+                     </select></td>
+                    </tr>
 					<!-- END browse_row -->
 					<tr>
 						<td><h2>Description</h2>

@@ -133,6 +133,65 @@ class ModResourcePage {
 
 	}
 
+	function listMyFiles ($myFolder = 'TOP') {
+		
+		$this->i++;
+		if ($this->i > 10) {
+			return false;
+		}
+		
+		if ($myFolder == 'TOP') {
+			$myFolders[0] = array('id' => '0', 'name' => 'TOP');	
+		} else {
+			$query = "SELECT * FROM myFolder WHERE owner = " . $_SESSION['id'] . " AND parent = ". (int)$myFolder . " ORDER BY name";
+			
+			$myFolders = $this->db->dbGetAllRows($query);
+		}
+		
+		if (is_array($myFolders)) {
+			if (!isset($this->depth))
+				$this->depth = -1;
+			else
+				$this->depth++;			
+			foreach ($myFolders as $folder) {
+				
+				if ($folder['name'] != 'TOP') {
+					
+					$this->t_body->set_var('MYFOLDER_NAME', $folder['name']);
+					$this->t_body->set_var('MARGIN_LEFT', $this->depth * 10);
+					if ($this->i > 1)
+						$this->t_body->parse('my_files_block', 'optgroup_end', true);
+					$this->t_body->parse('my_files_block', 'optgroup_start', true);					
+					
+				}
+				
+				$this->listMyFiles($folder['id']);
+				
+				$query = "SELECT id, description FROM myFile WHERE owner = " . $_SESSION['id'] . " AND parent = " . $folder['id'] . " AND deleted = 0 ORDER BY description";
+				
+				$myFiles = $this->db->dbGetAllRows($query);
+				if (is_array($myFiles)) {
+					$this->depth++;
+					foreach ($myFiles as $file) {
+						
+						$output = array('MYFILE_ID' => $file['id'],
+										'MYFILE_NAME' => $file['description'],
+										'MARGIN_LEFT' => $this->depth * 10);
+										
+						$this->t_body->set_var($output);
+						$this->t_body->parse('my_files_block', 'my_files', true);
+					}
+					$this->depth--;
+				}
+				
+				
+			}
+			$this->depth--;
+			$this->t_body->parse('my_files_block', 'optgroup_end', true);
+		}
+		return false;
+	}
+
 
 	function setLists($category, $fileType, $type)
 	{
@@ -149,6 +208,16 @@ class ModResourcePage {
 		if($type=="file" || $type=="multfile")
 		{
 
+			
+			$this->t_body->set_block('tplBODY', 'optgroup_start', 'optgroup_start_block');
+			$this->t_body->set_block('tplBODY', 'optgroup_end', 'optgroup_end_block');
+			$this->t_body->set_block('tplBODY', 'my_files', 'my_files_block');
+			
+			$this->listMyFiles();
+			
+			
+			$this->t_body->set_var(array('optgroup_start_block' => '', 'optgroup_end_block' => ''));
+			
 			//set max file size to advice browser
 			$this->t_body->set_var("MAX_FILE_SIZE", MAX_FILE_SIZE); 
 
@@ -200,7 +269,7 @@ class ModResourcePage {
         {
 		$this->t_body->set_var("ACTION", "Modify");
 
-                //first find details about file to fill form with
+        //first find details about file to fill form with
 		$fileObj = new file;
 		$file = $fileObj->getFile($id); 
 
@@ -280,6 +349,11 @@ class ModResourcePage {
 			{
                	$this->t_body->set_file("tplBODY", "cms/addURL.htm");
 				$this->t_body->set_var("TITLE", HEADING." - Link Submission page");
+				$this->t_body->set_block('tplBODY', 'hidden', 'hidden_block');
+				if (isStaff($_SESSION['gid']))
+					$this->t_body->parse('hidden_block', 'hidden');
+				else
+					$this->t_body->set_var('hidden_block', '');
 			}
 			else if($type=='files') {
 			  	$this->t_body->set_file("tplBODY", "cms/addMultiFile.htm");
@@ -291,6 +365,11 @@ class ModResourcePage {
                	$this->t_body->set_file("tplBODY", "cms/addFile.htm");
 				$this->t_body->set_var("TITLE", HEADING." - File Submission page");
 				$this->t_body->set_block("tplBODY", "submission", "submission_block");
+				$this->t_body->set_block('tplBODY', 'hidden', 'hidden_block');
+				if (isStaff($_SESSION['gid']))
+					$this->t_body->parse('hidden_block', 'hidden');
+				else
+					$this->t_body->set_var('hidden_block', '');				
 			}			
 			if($type=="modfile")
 				$this->displayModifyFile($id);
@@ -319,7 +398,7 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 		$urlDB = new url; 
 
 		if(isset($_POST['modid']) && $_POST['modid'])
-			$urlDB->modifyURL($_POST['url'], $_POST['description'], $_POST['comment'], $_POST['category'], $_POST['modid']);
+			$urlDB->modifyURL($_POST['url'], $_POST['description'], $_POST['comment'], $_POST['category'], $_POST['modid'], $_POST['hidden']);
 		else
 		{
 			if(!isset($_POST['category']))
@@ -327,11 +406,11 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 				for($x=0; $_POST['catCount'] > $x; $x++)
 				{
 					if($_POST['mulc'][$x])
-						$urlDB->addURL($_POST['url'], $_POST['description'], $_POST['comment'], $_POST['mulc'][$x]);
+						$urlDB->addURL($_POST['url'], $_POST['description'], $_POST['comment'], $_POST['mulc'][$x], $_POST['hidden']);
 				}
 			}
 			else				
-				$urlDB->addURL($_POST['url'], $_POST['description'], $_POST['comment'], $_POST['category']);
+				$urlDB->addURL($_POST['url'], $_POST['description'], $_POST['comment'], $_POST['category'], $_POST['hidden']);
 		}
 		$back = -2;
 		include("../include/back.php");
@@ -344,7 +423,7 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
    			if ($error == UPLOAD_ERR_OK) {
 				fileSecurityCheck($_FILES['file']['error'][$key], $_FILES['file']['name'][$key], $_FILES['file']['tmp_name'][$key], $_FILES['file']['size'][$key], $_FILES['file']['type'][$key]);
 				$fileDB->addFile($_FILES['file']['name'][$key], $_FILES['file']['type'][$key], $_FILES['file']['tmp_name'][$key],
-								$_POST['description'][$key], '', $_POST['category']);
+								$_POST['description'][$key], '', $_POST['category'], $_POST['hidden']);
 			}
 		}
 			
@@ -352,7 +431,7 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 		include("../include/back.php");
 		
 	}
-	else if( isset($_FILES['file']['name']) && $_FILES['file']['name'] )
+	else if( isset($_FILES['file']['name']) && $_FILES['file']['name'] && empty($_POST['myfile']))
 	{
 		//call file security checks
 		
@@ -367,12 +446,12 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 			{	
 				if($_POST['mulc'][$x])
 	 			       	$fileId = $fileDB->addFile($_FILES['file']['name'], $_FILES['file']['type'], $_FILES['file']['tmp_name'], 
-													$_POST['description'], $_POST['comment'], $_POST['mulc'][$x]);
+													$_POST['description'], $_POST['comment'], $_POST['mulc'][$x], $_POST['hidden']);
 			}
 		}
 		else {	//just submit file
         		$fileId = $fileDB->addFile($_FILES['file']['name'], $_FILES['file']['type'], $_FILES['file']['tmp_name'], $_POST['description'], 
-											$_POST['comment'], $_POST['category']);
+											$_POST['comment'], $_POST['category'], $_POST['hidden']);
 		}
 	 	//ok finished redirect create submission page if requested or just go to where file was added
         if($_POST['submission']) {
@@ -384,11 +463,31 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 		}
 		exit;
 	}
+	else if (!empty($_POST['myfile'])) {
+
+		$fileDB = new file; 
+		$query  = "SELECT realname, mime_type FROM myFile WHERE id = ".$_POST['myfile'];
+		$privFile = $fileDB->db->dbGetSingleRow($query);
+		
+	
+		$fileId = $fileDB->addFile($privFile['realname'], $privFile['mime_type'], MYFILE_directory . '/' . $_POST['myfile'] . '.dat', $_POST['description'], 
+											$_POST['comment'], $_POST['category'], $_POST['hidden']);
+
+	 	//ok finished redirect create submission page if requested or just go to where file was added
+        if($_POST['submission']) {
+			localRedir("/submission/createSubmission.php?category=".$_POST['category']."&fileid=".$fileId);
+		} else
+		{
+			$back = -2;
+			include("../include/back.php");
+		}
+		exit;		
+	}
 	else if(isset($_POST['modid']) && $_POST['modid'])
 	{
 		$fileDB = new file; 
 
-		$fileDB->modifyFile($_POST['description'], $_POST['comment'], $_POST['category'], $_POST['ftype'], $_POST['modid']);
+		$fileDB->modifyFile($_POST['description'], $_POST['comment'], $_POST['category'], $_POST['ftype'], $_POST['modid'], $_POST['hidden']);
 		
 		$back = -2;
 		include("../include/back.php");
@@ -405,11 +504,11 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 			for($x=0; $_POST['catCount'] > $x; $x++)
 			{
 				if($_POST['mulc'][$x])
-	 			       	$fileId = $fileDB->addFile("", "", "", $_POST['description'], $_POST['comment'], $_POST['mulc'][$x]);
+	 			       	$fileId = $fileDB->addFile("", "", "", $_POST['description'], $_POST['comment'], $_POST['mulc'][$x], $_POST['hidden']);
 			}
 		}
 		else			
-			$fileId = $fileDB->addFile("", "", "", $_POST['description'], $_POST['comment'], $_POST['category']);
+			$fileId = $fileDB->addFile("", "", "", $_POST['description'], $_POST['comment'], $_POST['category'], $_POST['hidden']);
 
 	 	//ok finished redirect create submission page if requested or just go to where file was added
         	if($_POST['submission'])

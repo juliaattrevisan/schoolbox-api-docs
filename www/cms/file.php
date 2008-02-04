@@ -28,7 +28,7 @@ class file
 			error(6);
 	} 
 
-	function modifyFile($description, $comment, $category, $type, $modid)
+	function modifyFile($description, $comment, $category, $type, $modid, $hidden)
 	{
 		//check allowed perms to add to specified category before proceeding
 		$this->checkWriteAccess($category);		
@@ -39,6 +39,8 @@ class file
 						'category'		=> $category,
 						'type'			=> $type,
 							);
+		if (isStaff($_SESSION['gid']))
+			$file['hidden'] = $hidden;							
 		
 		$this->db->dbUpdateRow('file', 'id', $file);
 		
@@ -52,14 +54,14 @@ class file
 		
 	}
 
-	function addFile($file_name, $file_type, $file_loc, $description, $comment, $category)
+	function addFile($file_name, $file_type, $file_loc, $description, $comment, $category, $hidden)
 	{
 		//check allowed perms to add to specified category before proceeding
 		$this->checkWriteAccess($category);
 		
 		if(is_readable($file_loc))		
-			$filesize = @filesize($file_loc);
-	
+			$filesize = filesize($file_loc);
+		
 		$file = array(	'description'	=> $description,
 						'comment'	 	=> $comment,
 						'category'		=> $category,
@@ -70,6 +72,8 @@ class file
 						'mime_type'		=> $file_type,
 						'file_size'		=> $filesize,
 							);
+		if (isStaff($_SESSION['gid']))
+			$file['hidden'] = $hidden;
 		
 		$this->db->dbInsertRow('file', $file);
 	
@@ -123,7 +127,7 @@ class file
 
 	function getFile($id)
 	{
-                $query = "SELECT category, description, comment, type FROM file WHERE id = '$id'";
+                $query = "SELECT category, description, comment, type, realname, mime_type FROM file WHERE id = '$id'";
                 return $this->db->dbGetSingleRow($query);
 	} 
 
