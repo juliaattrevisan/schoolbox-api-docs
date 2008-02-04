@@ -13,14 +13,18 @@ class ViewSubmissionPage {
 	}
 
 	function getStudentList($desc) {
-		// get all students
+		// get all students from synergetic class list
 		if($desc['code'] && SYNERGY_enable) {
 			//if synergy code get synergy students
-			$studentList = getStudents($desc['code']);
-			if(is_array($studentList))
+			$result = getStudents($desc['code']);
+			if(mssql_num_rows($result) > 0) {
+				while($studentList[] = mssql_fetch_array($result)) {
+				}
 				return $studentList;			
+			}
 		}
 		
+		//get them from group list
 		$query = "SELECT id as uid, synergy_id, firstname, lastname FROM user, userAccess
 		WHERE id = uid AND service = ".HOMEPAGESERVICE." AND sid = ".$desc['id']." AND type > 0 ORDER BY lastname, firstname";
 		$studentList = $this->db->dbGetAllRows($query); 
@@ -56,6 +60,8 @@ class ViewSubmissionPage {
 					$where = "owner = {$student['uid']}";
 				else if($student['synergy_id'])
 					$where = "synergy_id = {$student['synergy_id']}";
+				else 
+					continue;
 				
 				$query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username, local_email, alt_email, 
 					DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id 
@@ -75,7 +81,9 @@ class ViewSubmissionPage {
 										'MARKED'	=> $line['marked']?'<img src="/images/greentick.gif" width="13" height="12">':'<img src="/images/emptybox.gif" width="13" height="12">',
 										'RETURN'	=> $line['marked']?'':"<a href=\"returnWork.php?box_id=$box_id&sid=".$line['uid']."\">Return</a>",
 									);
-					$this->t_body->parse('mark_block', 'mark', false);
+									$this->t_body->set_var($output);
+									$this->t_body->parse('mark_block', 'mark', false);
+									
 				}
 				else {
 				
@@ -84,10 +92,10 @@ class ViewSubmissionPage {
 										'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
 										'mark_block' => '<td colspan="6">&nbsp;</td>',
 									);
-					
+					$this->t_body->set_var($output);
 					
 				}
-				$this->t_body->set_var($output);
+				
 				$this->t_body->parse("submission_listing","submitted_block",true);
 			}
 		}
@@ -95,7 +103,7 @@ class ViewSubmissionPage {
 			$query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username, local_email, alt_email, 
 					DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id 
 					FROM student_submission, user 
-					WHERE owner = user.id AND box_id = '$box_id'"; 
+					WHERE owner = user.id AND box_id = '$box_id' ORDER BY lastname, firstname"; 
 				
 			$this->db->dbDoQuery($query);
 			while($line = $this->db->dbGetNextArray()) {				
