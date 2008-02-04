@@ -83,7 +83,7 @@ $rcmail_config['smtp_auth_type'] = '';
 // Hostname to give to the remote server for SMTP 'HELO' or 'EHLO' messages 
 // Leave this blank and you will get the server variable 'server_name' or 
 // localhost if that isn't defined. 
-$rcmail_config['smtp_helo_host'] = '';
+$rcmail_config['smtp_helo_host'] = 'portal.'.MAIL_address;
 
 // Log sent messages
 $rcmail_config['smtp_log'] = TRUE;

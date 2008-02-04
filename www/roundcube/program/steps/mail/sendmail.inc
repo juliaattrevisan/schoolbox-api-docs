@@ -157,9 +157,10 @@ $mailto = preg_replace($mailto_regexp, $mailto_replace, get_input_value('_to', R
 
 // decode address strings
 $to_address_arr = $IMAP->decode_address_list($mailto);
-$identity_arr = rcmail_get_identity(get_input_value('_from', RCUBE_INPUT_POST));
+//$identity_arr = rcmail_get_identity(get_input_value('_from', RCUBE_INPUT_POST));
 
-$from = $identity_arr['mailto'];
+//$from = $identity_arr['mailto'];
+$from = get_input_value('_from', RCUBE_INPUT_POST);
 $first_to = is_array($to_address_arr[0]) ? $to_address_arr[0]['mailto'] : $mailto;
 
 if (empty($identity_arr['string']))
@@ -324,7 +325,7 @@ if (!$savedraft) {
   
     if (!empty($mb_subject))
       $send_headers['Subject'] = $mb_subject;
-  
+
     // send message
     $smtp_response = array();
     $sent = smtp_mail($from, $a_recipients, ($foo = $MAIL_MIME->txtHeaders($send_headers)), $msg_body, $smtp_response);
