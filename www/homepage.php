@@ -758,7 +758,8 @@ class OutPut
 		$query = "SELECT file.id as id, file.description, comment, realname, inline 
 				  FROM file
 				  LEFT JOIN allowedFileTypes ON mime_type = mime 
-				  WHERE file.category = '".$this->category."' AND file.deleted = '0' ORDER BY submitted DESC";
+				  LEFT JOIN submission_box on submission_box.fid = file.id
+				  WHERE file.category = '".$this->category."' AND file.deleted = '0' AND submission_box.id IS NULL ORDER BY submitted DESC";
 
 		//if no size make unlimited query else make it limited by size
 		if($config['size'] != 0 && $config['size'] != '') 
