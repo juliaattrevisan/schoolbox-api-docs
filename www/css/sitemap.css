@@ -1,0 +1,36 @@
+@charset "utf-8";
+/* CSS Document */
+
+.sitemap-category {
+	margin: 0;
+	padding: 0;
+	clear: both;
+}
+
+.sitemap-category p {
+	margin: 0;
+	padding: 0;
+	font: bold 12px Arial, Helvetica, sans-serif;
+	cursor: pointer;
+	float: left;
+}
+
+.sitemap-icon {
+	width: 12px;
+	height: 12px;
+	margin: 0;
+	padding: 0;
+	float: left;
+	position: relative;
+	top: 2px;
+	left: -4px;
+}
+.sitemap-catid {
+	display: none;
+}
+.sitemap-file {
+	margin: 0;
+	padding: 0;
+	font: 10px Georgia, "Times New Roman", Times, serif;
+	clear: both;
+}
