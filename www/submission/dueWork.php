@@ -160,7 +160,7 @@ class dueWorkPage
 				DATE_FORMAT(submission_box.date, '%l:%i%p') AS date, 
 				UNIX_TIMESTAMP(submission_box.date) AS overdue_date,
 				UNIX_TIMESTAMP(submission_box.open_date) AS open_date, 
-				submission_box.id, category.name, student_submission.owner, inline
+				submission_box.id, category.name, student_submission.owner, inline, category.code
 			FROM (submission_box, category) 
 				LEFT JOIN file ON submission_box.fid = file.id
 				LEFT JOIN student_submission ON student_submission.box_id = submission_box.id AND student_submission.owner = $id
@@ -196,11 +196,17 @@ class dueWorkPage
 						
 					$this->t_body->set_var("CATEGORY", $result['name']);
 					$teacherID = getTeacherName($result['code']);
-					$query = "SELECT id, title, firstname, lastname, alt_email, local_email FROM user WHERE synergy_id = '{$teacherID[0]}'";
-					$teacher=$this->db->dbGetSingleRow($query);
-					$this->t_body->set_var("TEACHER", formatName($teacher));
-					$this->t_body->set_var("TEACHER_EMAIL", formatEmail($teacher));
-	
+					if($teacherID[0]) {
+						$query = "SELECT id, title, firstname, lastname, alt_email, local_email FROM user WHERE synergy_id = '{$teacherID[0]}'";
+						$teacher=$this->db->dbGetSingleRow($query);
+						$this->t_body->set_var("TEACHER", formatName($teacher));
+						$this->t_body->set_var("TEACHER_EMAIL", formatEmail($teacher));
+					}
+					else {
+						$this->t_body->set_var("TEACHER", '');
+						$this->t_body->set_var("TEACHER_EMAIL", '');
+					}
+				
 					$this->t_body->set_var("ASSDESC", scrubTEXT($result['description']));
 					$this->t_body->set_var("TYPE", scrubTEXT($result['type']));
 					$divider = " / ";
@@ -387,9 +393,11 @@ class dueWorkPage
 				$this->t_body->set_var("DATE", date("l jS",$currentDay));
 				
 				if (isStaff($_SESSION['gid'])) {
-				$this->t_body->set_var("ADD", "<a href=\"/submission/createSubmission.php?user=$id&Day=".$this->currDay.
+					$this->t_body->set_var('ADD', "<a href=\"/submission/createSubmission.php?user=$id&Day=".$this->currDay.
 											  "&Month=".$this->currMonth."&Year=".$this->currYear."\">add</a>");
 				}
+				else
+					$this->t_body->set_var('ADD', '');
 				
 				$r = $this->outputCategories($id, $subjects, $currentDay);
 				
@@ -420,7 +428,10 @@ class dueWorkPage
 				if (isStaff($_SESSION['gid'])) {
 				$this->t_body->set_var("ADD", "<a href=\"/submission/createSubmission.php?user=$id&Day=".$this->currDay.
 											  "&Month=".$this->currMonth."&Year=".$this->currYear."\">add</a>");
-				}				
+				}
+				else
+					$this->t_body->set_var('ADD', '');
+						
 				$r = $this->outputCategories($id, $subjects, $currentDay);
 				
 				//increment date
@@ -478,6 +489,8 @@ class dueWorkPage
 				$this->t_body->set_var("ADD", "<a href=\"/submission/createSubmission.php?user=$id&Day=".$this->currDay.
 											  "&Month=".$this->currMonth."&Year=".$this->currYear."\">add</a>");
 				}
+				else
+					$this->t_body->set_var('ADD', '');
 								
 				$r = $this->outputCategories($id, $subjects, $currentDay);
 				
@@ -505,7 +518,7 @@ class dueWorkPage
 			return;
 		}
 			 
-		$query = "SELECT category.id as cid, category.name, file.description, submission_return.mark, 
+		$query = "SELECT category.id as cid, category.name, category.code, file.description, submission_return.mark, 
 				submission_return.comment, category.code,
 				submission_return.id, submission_return.filename, file_type.name as type 
 				FROM submission_return, category, file, submission_box
@@ -526,11 +539,18 @@ class dueWorkPage
 				if($prevCat['cid'] != $return['cid'])
 				{
 					$teacherID = getTeacherName($prevCat['code']);
-					$query = "SELECT id, title, firstname, lastname, alt_email, local_email FROM user WHERE synergy_id = '{$teacherID[0]}'";
-					$teacher=$this->db->dbGetSingleRow($query);
+					if($teacherID[0]) {
+						$query = "SELECT id, title, firstname, lastname, alt_email, local_email FROM user WHERE synergy_id = '{$teacherID[0]}'";
+						$teacher=$this->db->dbGetSingleRow($query);
+						$this->t_body->set_var("TEACHER", formatName($teacher));
+						$this->t_body->set_var("TEACHER_EMAIL", formatEmail($teacher));
+					}
+					else {
+						$this->t_body->set_var("TEACHER", '');
+						$this->t_body->set_var("TEACHER_EMAIL", '');
+					}
+
 					$this->t_body->set_var("CATEGORY", $prevCat['name']);
-					$this->t_body->set_var("TEACHER", formatName($teacher));
-					$this->t_body->set_var("TEACHER_EMAIL", formatEmail($teacher));
  					$this->t_body->parse("ret_category_listing", "ret_category_block", true);
 					$this->t_body->set_var("return_list", "");
 				}

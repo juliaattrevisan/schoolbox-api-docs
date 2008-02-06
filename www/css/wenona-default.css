@@ -476,6 +476,11 @@ a img {
 	background:#D7ECFF;
 	font-weight:bold;
 }
+.calTableEntry {
+	background:#B51C21;
+	font-weight:bold;
+	color:white;
+}
 .calTableCurrent {
 	background: #335473;
 	color:#fff;

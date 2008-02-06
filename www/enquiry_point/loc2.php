@@ -21,44 +21,44 @@ class page {
 		$this->t_body = new Template(TPL_directory);
 		
 		if($enqum =="ns" && $no_user =="yes") {
-			$this->t_body->set_file("tplBODY", "modules/detention/enquiry_point/indexn.htm");
+			$this->t_body->set_file("tplBODY", "modules/enquiry_point/indexn.htm");
 			$rid1 ="mn";
 			include("include.php");
 		}
 
 		if($enqum =="ns" && $no_user ==null) {
-			$this->t_body->set_file("tplBODY", "modules/detention/enquiry_point/index.htm");
+			$this->t_body->set_file("tplBODY", "modules/enquiry_point/index.htm");
 			$rid1 ="mn";
 			include("include.php");
 		}
 		
 		if($fname ==NULL && $no_user =="yes") {
-			$this->t_body->set_file("tplBODY", "modules/detention/enquiry_point/indexn.htm");
+			$this->t_body->set_file("tplBODY", "modules/enquiry_point/indexn.htm");
 			$rid2 ="fnn";
 			include("include.php");
 		}
 
 		if($femail ==NULL && $no_user =="yes") {	
-			$this->t_body->set_file("tplBODY", "modules/detention/enquiry_point/indexn.htm");
+			$this->t_body->set_file("tplBODY", "modules/enquiry_point/indexn.htm");
 			$rid3 ="fen";
 			include("include.php");
 		}
 
 		if($enqu =="" && $no_user =="yes") {
-			$this->t_body->set_file("tplBODY", "modules/detention/enquiry_point/indexn.htm");
+			$this->t_body->set_file("tplBODY", "modules/enquiry_point/indexn.htm");
 			$rid4 ="tn";
 			include("include.php");
 		}
 
 		if($enqu =="" && $no_user ==NULL) {
-			$this->t_body->set_file("tplBODY", "modules/detention/enquiry_point/index.htm");
+			$this->t_body->set_file("tplBODY", "modules/enquiry_point/index.htm");
 			$rid4 ="tn";
 			include("include.php");
 		}
 
 
 		if($enqum !="ns" && $enqu !=NULL && $no_user ==NULL || $fname !=NULL && $femail !=NULL && $enqum !="ns" && $enqu !=NULL) {
-				$this->t_body->set_file("tplBODY", "modules/detention/enquiry_point/enqu2.htm");
+				$this->t_body->set_file("tplBODY", "modules/enquiry_point/enqu2.htm");
 				$allvalues ="yes";
 		}
 		

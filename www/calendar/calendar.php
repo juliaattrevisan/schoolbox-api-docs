@@ -596,33 +596,31 @@ function getSubmissionEvents($day, $month, $year)
 
 function getStudentBirthdays($day, $month, $year)
 {
-        $db = mssql_connect(MSSQL_host,MSSQL_user, MSSQL_passwd); //todo: get portal synergy account permissions
+	$db = mssql_connect(MSSQL_host,MSSQL_user, MSSQL_passwd); 
+	
+	$query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
+					vStudents.StudentBirthDate, vStudents.StudentCampus, datediff(year,studentbirthdate,getdate()) as age,
+					vStudents.StudentFormDescription, convert(varchar,studentbirthdate,106)  as 'la'
+					FROM SynergyOne.dbo.vStudents vStudents
+					WHERE 
+					vStudents.FileSemester=".$_SESSION['FileSemester']." 
+					AND vStudents.FileYear=".$_SESSION[ 'FileYear']." 
+					AND day(studentbirthdate) = ". $day ."
+					AND month(studentbirthdate) =". $month ."
+					AND StudentCampus = 'G'";
 
-        $query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
-                        vStudents.StudentBirthDate, vStudents.StudentCampus, datediff(year,studentbirthdate,getdate()) as 'Student Age',
-                        vStudents.StudentFormDescription, convert(varchar,studentbirthdate,106)  as 'la'
-                        FROM SynergyOne.dbo.vStudents vStudents
-                        WHERE (vStudents.CurrentSemesterOnlyFlag=1)
-                        AND day(studentbirthdate) = ". $day ."
-                        AND month(studentbirthdate) =". $month ."
-                        AND StudentCampus = 'G'
-                        ORDER BY day(studentbirthdate) ";
-
-        $result = mssql_query($query, $db);
-        $i=0;
-        if($result != 1)
-        {
-                while($line = mssql_fetch_assoc($result))
-                {
-
-                        $birthdays[$i]['name'] = $line['StudentGiven1']." ".$line['StudentSurname'];
-                        $birthdays[$i]['form'] = $line['StudentFormDescription'];
-                        $birthdays[$i]['age'] = $line['Student Age'];
-                        $birthdays[$i]['birthdate'] = $line['la'];
-                        $i++;
-                }
-		return $birthdays;
-        }
+	$result = mssql_query($query, $db);
+	$i=0;
+	if($result !== FALSE && $result !== TRUE) {
+		while($line = mssql_fetch_assoc($result)) {
+			$birthdays[$i]['name'] = $line['StudentGiven1']." ".$line['StudentSurname'];
+			$birthdays[$i]['form'] = $line['StudentFormDescription'];
+			$birthdays[$i]['age'] = $line['age'];
+			$birthdays[$i]['birthdate'] = $line['la'];
+			$i++;
+		}
+	return $birthdays;
+	}
 }
 
 

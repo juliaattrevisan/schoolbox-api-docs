@@ -16,11 +16,11 @@ class page {
 		$this->t_body = new Template(TPL_directory);
 
 		if($userid ==null) {
-			$this->t_body->set_file("tplBODY", "modules/detention/enquiry_point/indexn.htm");
+			$this->t_body->set_file("tplBODY", "modules/enquiry_point/indexn.htm");
 		}
 		else
 		{
-			$this->t_body->set_file("tplBODY", "modules/detention/enquiry_point/index.htm");
+			$this->t_body->set_file("tplBODY", "modules/enquiry_point/index.htm");
 		}
 		
 		if($no_user ==null) {

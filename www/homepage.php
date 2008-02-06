@@ -392,7 +392,6 @@ class OutPut
 		{	
 		
 			$listSyns = getTeacherName($this->code);
-			
 			if(is_array($listSyns)) {
 				foreach($listSyns as $synid) {
 					$query = "SELECT id, title, firstname, lastname, alt_email, local_email FROM user WHERE synergy_id = '$synid'";
@@ -400,12 +399,13 @@ class OutPut
 					if(is_array($teacher)) {
 						$name = formatName($teacher);
 			
-						if(SITE_location == 'wenona') {
+						if(SITE_location == 'wenona')
 							$this->t_body->set_var("MEMBER_NAME", $name);
-						} else {
+						else 
 							$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$teacher['id']}\">{$name}</a>");
-							$this->t_body->parse("staff_teacher_block", "staff_teachers", true);		
-						}
+							
+						$this->t_body->parse("staff_teacher_block", "staff_teachers", true);	
+						return true;
 					}
 				}
 			}
