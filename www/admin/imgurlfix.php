@@ -5,7 +5,7 @@ require_once('../include/include.php');
 $db = new dbManager;
 $query = "SELECT h.cid, h.config, l.url
 		  FROM homepage_comp_location h
-		  LEFT JOIN link l on l.category = h.cid
+		  LEFT JOIN link l on l.category = h.cid AND l.description = 'Intranet Site'
 		  WHERE component = 15";
 
 $catList = $db->dbGetAllRows($query);
@@ -19,6 +19,6 @@ foreach ($catList as $cat) {
 	$db->dbDoQuery($query);
 	print $query . "<br />\n";
 }
-
+print '<br />done';
 
 ?>
