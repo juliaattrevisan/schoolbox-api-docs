@@ -14,11 +14,12 @@ html, body, #outerWrap, #content, #content_text {
 
 #sitemap-nav {
 	width: 35%;
-	height: inherit;
+	height: 100%;
 	float: left;
 	padding: 0;
 	margin: 0;
 	padding: 0;
+	overflow: auto;
 	
 }
 
@@ -46,7 +47,6 @@ html, body, #outerWrap, #content, #content_text {
 .sitemap-category p {
 	margin: 0;
 	font: bold 12px Arial, Helvetica, sans-serif;
-	cursor: pointer;
 	float: left;
 	height: 30px;
 	line-height: 30px;
@@ -60,13 +60,16 @@ html, body, #outerWrap, #content, #content_text {
 	margin: 0;
 	padding: 0;
 	float: left;
+	cursor: default;
 
 }
 .sitemap-catname {
+	cursor: pointer;
 	margin: inherit 5px;
 }
 
-.sitemap-icon {
+.sitemap-caticon, .sitemap-icon {
+	cursor: pointer;
 	width: 40px;
 	height: 30px;
 	float: left;
@@ -85,8 +88,13 @@ html, body, #outerWrap, #content, #content_text {
 	font: 12px Arial, Helvetica, sans-serif;
 	height: 30px;
 	line-height: 30px;
-	position: relative;
+
 	vertical-align: middle;
 	float: left;
-	
+}
+.sitemap-filename, .sitemap-filesize {
+	width: 30%;
+}
+.sitemap-file {
+	position: relative;
 }

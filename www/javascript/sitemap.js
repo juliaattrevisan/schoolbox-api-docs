@@ -1,79 +1,97 @@
 var myrules = {
-	'.sitemap-category' : function (el) {
-		el.onclick = function() {
-			
-			var catDiv = el;
-			var catID = catDiv.getElementsByClassName("sitemap-catid");
-			catID = catID[0].innerHTML;
-			
-			var catName = catDiv.getElementsByClassName("sitemap-catname");
-			if ($('sitemap-selected'))
-				$('sitemap-selected').removeAttribute('id');
-			catName[0].setAttribute("id", "sitemap-selected");
-
-			var insert = catDiv.getElementsByTagName('div');
-
-			if ($('window_'+openCatID))
-				$('window_'+openCatID).setStyle('display', 'none');
-			openCatID = catID;	
-			
-			var icon = catDiv.getElementsByClassName("sitemap-openclose");
-			icon = icon[0].firstChild;
-			
-			var isOpen = $('category_'+catID);
-			if (!isOpen) {
-				getDir(insert[0], catID);
-				icon.src = '/images/icons/sitemap-collapse.gif';
-			} else if (isOpen.style.display == 'none') {
-				isOpen.style.display = 'block';
-				icon.src = '/images/icons/sitemap-collapse.gif';
-			} else {
-				isOpen.style.display = 'none';
-				icon.src = '/images/icons/sitemap-expand.gif';
-			}
-		
-			
-			var winOpen = $('window_'+catID);
-			if (!winOpen) {
-				getFiles(catID);
-			} else if (winOpen.style.display == 'none') {
-				winOpen.style.display = 'block';
-			} else {
-				winOpen.style.display = 'none';
-			}
-
-		}		
-		
-	},
 	'.sitemap-openclose' : function(el){
 		el.onclick = function() {
 			
-			var catDiv = el.parentNode;
+			var catParts = getCatParts(el.parentNode);
 			
-			var catID = catDiv.getElementsByClassName("sitemap-catid");
-			catID = catID[0].innerHTML;
-			
-			var catName = catDiv.getElementsByClassName("sitemap-catname");
-			if ($('sitemap-selected'))
-				$('sitemap-selected').removeAttribute('id');
-			catName[0].setAttribute("id", "sitemap-selected");
-			
-			var icon = el.firstChild;
-			//alert(icon);
+			setSelected(catParts.catName);		
 
-			var isOpen = $('category_'+catID);
-			if (!isOpen) {
-				icon.src = '/images/icons/sitemap-collapse.gif';
-			} else if (isOpen.style.display == 'none') {
-				icon.src = '/images/icons/sitemap-collapse.gif';
+			var catContents = $('category_' + catParts.catID);
+			if (!catContents || catContents.style.display == 'none') {
+				openCat(catParts.insertDiv, catParts.catID);
+				openWindow(catParts.catID);
+				if (catParts.openClose) catParts.openClose.src = '/images/icons/sitemap-collapse.gif';
 			} else {
-				icon.src = '/images/icons/sitemap-expand.gif';
+				closeCat(catParts.catID);
+				if (catParts.openClose) catParts.openClose.src = '/images/icons/sitemap-expand.gif';
 			}
 
 		}
+	},
+	'.sitemap-catname' : function (el) {
+		el.onclick = function() {
+			if (el.parentNode.className != 'sitemap-category') {
+				// normal
+				var catDiv = el.parentNode.parentNode;
+			} else {
+				
+				if (el.nextSibling.nextSibling) {
+					var catID = el.nextSibling.nextSibling.innerHTML;
+				} else if (el.nextSibling) {
+					var catID = el.nextSibling.innerHTML;
+				} 
+				
+				var catIDList = $('sitemap-nav').getElementsByTagName('p');
+				
+				for (var i=0; i< catIDList.length; i++) {
+					if (catIDList[i].innerHTML == catID) {
+						var catDiv = catIDList[i].parentNode.parentNode;
+					}
+				}
+			}
+		
+			var catParts = getCatParts(catDiv);
+			
+			setSelected(catParts.catName);	
+			
+			var catContents = $('category_' + catParts.catID);
+			if (!catContents || catContents.style.display == 'none') {
+				openCat(catParts.insertDiv, catParts.catID);
+				openWindow(catParts.catID);
+				if (catParts.openClose) catParts.openClose.src = '/images/icons/sitemap-collapse.gif';
+			} else {
+				openWindow(catParts.catID);
+			}
+		},
+		el.onmouseover = function () {
+			if (el.setStyle) el.setStyle('text-decoration', 'underline');	
+		},
+		el.onmouseout = function () {
+			if (el.setStyle) el.setStyle('text-decoration', 'none');	
+			
+		}
+	},
+	'.sitemap-caticon' : function (el) {
+		
+		el.onclick = function() {
+			
+			var catParts = getCatParts(el.parentNode);
+
+			setSelected(catParts.catName);	
+
+			var catContents = $('category_' + catParts.catID);
+			if (!catContents || catContents.style.display == 'none') {
+				openCat(catParts.insertDiv, catParts.catID);
+				openWindow(catParts.catID);
+				if (catParts.openClose) catParts.openClose.src = '/images/icons/sitemap-collapse.gif';
+			} 	
+			el.setStyle('position', 'relative');
+		},
+		el.onmouseover = function () {
+			var catParts = getCatParts(el.parentNode);
+			if (catParts.catName.setStyle) catParts.catName.setStyle('text-decoration', 'underline');	
+		},
+		el.onmouseout = function () {
+			
+			var catParts = getCatParts(el.parentNode);
+			if (catParts.catName.setStyle) catParts.catName.setStyle('text-decoration', 'none');	
+			
+		}		
 	}
+
+
 };	
-var openCatID = 0;
+
 
 Behaviour.addLoadEvent(init);
 Behaviour.register(myrules);	
@@ -81,10 +99,8 @@ Behaviour.register(myrules);
 function init() {
 	
 	getDir($('sitemap-nav'), 0);
-	//getFiles($('sitemap-window'), 0);
 
-	makeMoveable();
-	
+	//makeMoveable();
 }
 
 function getFiles(catID) {
@@ -137,6 +153,76 @@ function listDir(catDiv, data, catID) {
 	//makeMoveable();
 }
 
+function openCat (insertDiv, catID) {
+	var catContents = $('category_'+catID);
+	if (!catContents) {
+		// create
+		getDir(insertDiv, catID);
+	} else {
+		catContents.setStyle('display', 'block');	
+	}	
+	
+}
+
+function closeCat (catID) {
+	var catContents = $('category_'+catID);
+	if (catContents) {
+		catContents.setStyle('display', 'none');
+	} 	
+}
+
+function openWindow (catID) {
+
+	var winContainer =  $('sitemap-window');
+	
+	for (var i=0; i < winContainer.childNodes.length; i++) {
+		if ((winContainer.childNodes)[i].setStyle) {
+			(winContainer.childNodes)[i].setStyle('display', 'none');
+		} else if ((winContainer.childNodes[i]).style) {
+			(winContainer.childNodes[i]).style.display	= 'none';
+		}
+	}
+	
+	var winContents = $('window_'+catID);
+	if (!winContents) {
+		// create
+		getFiles(catID);
+	} else {
+		winContents.setStyle('display', 'block');	
+	}		
+}
+
+function closeWindow (catID) {
+	var winContents = $('window_'+catID);
+	if (winContents) {
+		winContents.setStyle('display', 'none');
+	} 	
+}
+
+function setSelected(catName) {
+		if ($('sitemap-selected'))
+			$('sitemap-selected').removeAttribute('id');
+		catName.setAttribute("id", "sitemap-selected");
+}
+
+function getCatParts(catDiv) {
+	if (catDiv.getElementsByClassName) {
+		var openClose = (catDiv.getElementsByClassName("sitemap-openclose"))[0].firstChild;
+		var catIcon = (catDiv.getElementsByClassName("sitemap-caticon"))[0].firstChild;
+		var catID = (catDiv.getElementsByClassName("sitemap-catid"))[0].innerHTML;
+		var catName = (catDiv.getElementsByClassName("sitemap-catname"))[0];
+		var insertDiv = (catDiv.getElementsByTagName('div'))[0];
+	} else {
+		var openClose = catDiv.firstChild.firstChild;
+		var catIcon = catDiv.firstChild.nextSibling.firstChild;
+		var catID = catDiv.firstChild.nextSibling.nextSibling.firstChild.nextSibling.innerHTML;
+		var catName = catDiv.firstChild.nextSibling.nextSibling.firstChild;
+		var insertDiv = catDiv.firstChild.nextSibling.nextSibling;
+	}
+	
+	return {'openClose': openClose, 'catIcon': catIcon, 'catID': catID, 'catName': catName, 'insertDiv': insertDiv};
+}
+
 function makeMoveable () {
 
 		// WebBoxes shared vars
@@ -147,11 +233,12 @@ function makeMoveable () {
 		// WebBoxes drag behavior for each
 		files.each(function(element, i){
 		// Giver the handle a cursor
-		(element.getElementsBySelector('.sitemap-icon')[0]).setStyle('cursor', 'move');
+		//(element.getElementsBySelector('.sitemap-icon')[0]).setStyle('cursor', 'move');
 		
 		// Make each component draggable using the handle
 		element.makeDraggable({
-			handle: element.getElementsBySelector('.sitemap-icon')[0],
+			limit: $('sitemap'),
+			droppables: $('sitemap'),
 			'onBeforeStart': function() {
 				// Introduce the marking box, change the draging box to absolute
 				// The order the next 4 lines seems to be important for it to work right in Firefox
@@ -197,7 +284,9 @@ function makeMoveable () {
 				webBoxTargetDiv = null;
 
 				// X - Which column?
-				container.each(function(element, i){
+				var catDivs = container.getElementsBySelector('sitemap-category');
+				
+				catDivs.each(function(element, i){
 					if (mouseX > element.getCoordinates().left) webBoxTargetCol = element;
 				});
 
