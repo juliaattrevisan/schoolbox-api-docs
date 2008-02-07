@@ -167,6 +167,13 @@ function clearBrowse(obj, id) {
 							<em>Select an appropriate location within the system that reflects the use of the file</em></td>
 						<td>{CATLIST}</td>
 					</tr>
+                    <!-- BEGIN hidden -->
+                    <tr>
+                    	<td><h2>Hidden</h2>
+                        	<em>Hide this file from students.</em></td>
+                    	<td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
+                    </tr>
+					<!-- END hidden -->                    
 					<!-- BEGIN submission -->
 					<tr>
 						<td><h2>Submission box</h2>
