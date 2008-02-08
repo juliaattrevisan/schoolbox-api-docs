@@ -29,6 +29,9 @@ window.onload = function(){
 		// Make each component draggable using the handle
 		element.makeDraggable({
 			handle: element.getElementsBySelector('.componentHeader')[0],
+			'onClick' : function () {
+				alert('d');
+			},
 			'onBeforeStart': function() {
 				// Introduce the marking box, change the draging box to absolute
 				// The order the next 4 lines seems to be important for it to work right in Firefox

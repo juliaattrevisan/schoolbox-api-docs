@@ -87,6 +87,7 @@ define('SYN_CAMPUS_Codes', serialize(array(
 //Timetable days as this is not found in synergetic and it can be a bit hard to calculate pre-timetable
 define('TIMETABLE_day_count',serialize(array(1=>7,7,5)));
 
+define("DROPBOX_COMPONENT", 25);
 
 //Webmail
 define("MAIL_enable", true);				//This will disable webmail module

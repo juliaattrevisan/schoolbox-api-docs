@@ -129,6 +129,8 @@ define("STUDENTGROUPIDS", serialize(array(3)));	//List of id numbers representin
 define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
 define("PARENTGROUPIDS", serialize(array(4)));
 
+define("DROPBOX_COMPONENT", 27);
+
 //homepage config
 define('HOMEPAGE_colors', serialize(array(
 			'large_head_fontcolour' => 'FFFFFF', 

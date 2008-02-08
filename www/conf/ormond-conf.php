@@ -126,6 +126,8 @@ define("PARENTGROUPIDS", serialize(array(6)));		//Parent group ids
 // Name format display options.
 define("NAME_FORMAT", "{title} {firstname} {lastname}");
 
+define("DROPBOX_COMPONENT", 25);
+
 //homepage config
 define('HOMEPAGE_large_head_font', 4);
 define('HOMEPAGE_large_head_bg', 3);
