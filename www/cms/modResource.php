@@ -283,9 +283,9 @@ class ModResourcePage {
 		$this->t_body->set_var("DESCRIPTION", $file['description']);
 		$this->t_body->set_var("COMMENT", $file['comment']);
 		if(CMS_allow_move)
-			$this->setCategoryList($url['category']);
+			$this->setCategoryList($file['category']);
 		else
-			$this->setCategory($url['category']);
+			$this->setCategory($file['category']);
 	
 
 		//check box for submission box associated with file
@@ -349,11 +349,6 @@ class ModResourcePage {
 			{
                	$this->t_body->set_file("tplBODY", "cms/addURL.htm");
 				$this->t_body->set_var("TITLE", HEADING." - Link Submission page");
-				$this->t_body->set_block('tplBODY', 'hidden', 'hidden_block');
-				if (isStaff($_SESSION['gid']))
-					$this->t_body->parse('hidden_block', 'hidden');
-				else
-					$this->t_body->set_var('hidden_block', '');
 			}
 			else if($type=='files') {
 			  	$this->t_body->set_file("tplBODY", "cms/addMultiFile.htm");
@@ -364,12 +359,7 @@ class ModResourcePage {
 			{
                	$this->t_body->set_file("tplBODY", "cms/addFile.htm");
 				$this->t_body->set_var("TITLE", HEADING." - File Submission page");
-				$this->t_body->set_block("tplBODY", "submission", "submission_block");
-				$this->t_body->set_block('tplBODY', 'hidden', 'hidden_block');
-				if (isStaff($_SESSION['gid']))
-					$this->t_body->parse('hidden_block', 'hidden');
-				else
-					$this->t_body->set_var('hidden_block', '');				
+				$this->t_body->set_block("tplBODY", "submission", "submission_block");		
 			}			
 			if($type=="modfile")
 				$this->displayModifyFile($id);
