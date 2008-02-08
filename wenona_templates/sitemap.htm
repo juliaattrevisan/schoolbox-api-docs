@@ -21,6 +21,7 @@
 <!-- #BeginEditable "scripts" -->
 <script type="text/javascript" src="/javascript/mootools.js"></script>
 <script type="text/javascript" src="/javascript/behaviour.js"></script>
+<script type="text/javascript" src="/javascript/contextmenu.js"></script>
 <script type="text/javascript" src="/javascript/sitemap.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/sitemap.css" />
 <!-- #EndEditable -->
@@ -104,12 +105,31 @@
 
 			<div id='sitemap'>
                 <div id='sitemap-nav'>
+                {NAV_CONTENT}
                 </div>
                 <div id='sitemap-window'>
-              
+              	{WINDOW_CONTENT}
                 </div>
             </div>
-			
+	
+    		<div id='sitemap-cm'>
+            	<ul>
+                    <li><a href="#" onclick="return Sitemap.newFile(event);">New File</a></li>
+                    <li><a href="#" onclick="return Sitemap.newURL(event);">New Link</a></li>
+                    <li class='sitemap-break'><a href="#" onclick="return Sitemap.newCategory(event);">New Folder</a></li>
+                	
+                    <li><a href="#" onclick="return Sitemap.modifyFile(event);">Modify</a></li>
+                    <li><a href="" onclick="return false;">Rename</a></li>
+                    <li class='sitemap-break'><a href="#" onclick="if (confirm('Delete this file?')) { Sitemap.deleteFile(event); }  return false;">Delete</a></li>
+
+                    <li><a href="" onclick="return false;">Cut</a></li>
+                    <li><a href="" onclick="return false;">Copy</a></li>
+                    <li><a href="" onclick="return false;">Paste</a></li>
+                    
+                </ul>
+              
+            </div>
+    		
 
             <!-- #EndEditable --> </div> 
 	</div> 

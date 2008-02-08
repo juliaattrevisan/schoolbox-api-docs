@@ -29,8 +29,27 @@ class OutPut
 
 	}
 
-	function showPage()
+	function showPage($catID)
 	{
+		
+		if ($catID > 0) {
+		
+			$this->t_body->set_file('blockBODY', 'sitemap_block.htm');
+	
+			$this->t_body->set_block('blockBODY', 'file', 'file_block');		
+			$this->t_body->set_block('blockBODY', 'category', 'category_block');
+			$this->t_body->set_block('blockBODY', 'category_window', 'category_window_block');
+	
+			$this->outputCategories(0, 'nav');
+			$this->outputCategories($catID, 'window');
+			$this->outputFiles($catID);		
+	
+			$this->t_body->set_var('NAV_CONTENT', $this->t_body->varvals['category_block']);
+			$this->t_body->set_var('WINDOW_CONTENT', $this->t_body->varvals['category_window_block'] . $this->t_body->varvals['file_block']);		
+		} else {
+			$this->t_body->set_var('NAV_CONTENT', '');
+			$this->t_body->set_var('WINDOW_CONTENT', '');		
+		}
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 	
@@ -92,6 +111,7 @@ class OutPut
 								 'FILE_NAME' => scrubText($file['description']),
 								 'FILE_ICON' => !is_null($file['iconFile']) ? "/images/mime/".$file['iconFile'] : "/images/mime/application-x-none.png",
 								 'FILE_ALT'  => !is_null($file['mime_description']) ? $file['mime_description'] : "File",
+								 'CAT_ID'	 => $parent,
 	
 								);
 
@@ -194,18 +214,15 @@ $myPage = new OutPut((int)$_GET['category'], (int)$_GET['verbose']);
 
 
 if (isset($_GET['catList'])) {
-	
 	$parent = (int)$_GET['catList'];
-
 	$myPage->outputNav($parent);
 	exit;
 } else if (isset($_GET['fileList'])) {
 	$parent = (int)$_GET['fileList'];
-
 	$myPage->outputWindow($parent);
 	exit;
 }
 
-$myPage->showPage();
+$myPage->showPage((int)$_REQUEST['category']);
 
 ?>
