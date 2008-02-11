@@ -45,7 +45,7 @@ define("THUMBNAIL_size", 100);
 define("URLS_use_frame", false);						//Open links in frame
 define('ZIP_directory', '/usr/local/www/zip');
 //define('MIME_magic', '/usr/share/file/magic');
-define('DROPBOX_directory', '/usr/local/www/portal/drop');
+define('DROPBOX_directory', '/usr/local/www/dropbox');
 
 //SEARCH & BROWSE Display options
 define("FILE_date_format", '%W %M %e %Y @ %l:%i%p');          //Time output style 24 hour = '%k:%i', 12 hour = '%l:%i %p'
@@ -122,14 +122,14 @@ define('RSS_limit', 6);
 
 define("ALLCAMPUS", 0);					//Value that represents all campuses in the luCampus table
 define("HOMEPAGESERVICE", 1);				//Value that represents the homepage module in the service table
-define("DROPBOX_COMPONENT", 25);
+define("DROPBOX_COMPONENT", 27);
 define("FORUM_COMPONENT", 5);
 
 define("STUDENTGROUPIDS", serialize(array(3)));	//List of id numbers representing student groups
 define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
 define("PARENTGROUPIDS", serialize(array(4)));
 
-define("DROPBOX_COMPONENT", 27);
+
 
 //homepage config
 define('HOMEPAGE_colors', serialize(array(
