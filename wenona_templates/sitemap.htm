@@ -112,14 +112,32 @@
                 </div>
             </div>
 	
-    		<div id='sitemap-cm'>
+    		<div id='sitemap-cm' class='sitemap-cm'>
             	<ul>
+                	<li class='sitemap-break'><a href="#" onclick="return Sitemap.openFile(event);" style='font-weight: bold;'>Open</a></li>
                     <li><a href="#" onclick="return Sitemap.newFile(event);">New File</a></li>
                     <li><a href="#" onclick="return Sitemap.newURL(event);">New Link</a></li>
                     <li class='sitemap-break'><a href="#" onclick="return Sitemap.newCategory(event);">New Folder</a></li>
                 	
                     <li><a href="#" onclick="return Sitemap.modifyFile(event);">Modify</a></li>
-                    <li><a href="" onclick="return false;">Rename</a></li>
+                    <li class='sitemap-break'><a href="#" onclick="if (confirm('Delete this file?')) { Sitemap.deleteFile(event); }  return false;">Delete</a></li>
+
+                    <li><a href="" onclick="return false;">Cut</a></li>
+                    <li><a href="" onclick="return false;">Copy</a></li>
+                    <li><a href="" onclick="return false;">Paste</a></li>
+                    
+                </ul>
+              
+            </div>
+
+    		<div id='sitemap-cm2' class='sitemap-cm'>
+            	<ul>
+                	<li class='sitemap-break'><a href="#" onclick="return Sitemap.viewHomepage(event);" style='font-weight: bold;'>View Homepage</a></li>
+                    <li><a href="#" onclick="return Sitemap.newFile(event);">New File</a></li>
+                    <li><a href="#" onclick="return Sitemap.newURL(event);">New Link</a></li>
+                    <li class='sitemap-break'><a href="#" onclick="return Sitemap.newCategory(event);">New Folder</a></li>
+                	
+                    <li><a href="#" onclick="return Sitemap.modifyFile(event);">Modify</a></li>
                     <li class='sitemap-break'><a href="#" onclick="if (confirm('Delete this file?')) { Sitemap.deleteFile(event); }  return false;">Delete</a></li>
 
                     <li><a href="" onclick="return false;">Cut</a></li>

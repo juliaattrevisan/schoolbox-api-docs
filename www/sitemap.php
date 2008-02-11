@@ -32,62 +32,95 @@ class OutPut
 	function showPage($catID)
 	{
 		
-		if ($catID > 0) {
+		$this->t_body->set_var('NAV_CONTENT', '');
+		$this->t_body->set_var('WINDOW_CONTENT', '');	
+	
+		$this->t_body->set_file('blockBODY', 'sitemap_block.htm');
+
+		$this->t_body->set_block('blockBODY', 'file', 'file_block');		
+		$this->t_body->set_block('blockBODY', 'category', 'category_block');
+		$this->t_body->set_block('blockBODY', 'category_window', 'category_window_block');
+
+		$catTree = array ($catID);
+		$parent = $catID;
+		while ($parent > 0) {
+			$query = "SELECT parent FROM category WHERE id = $parent";
+			$category = $this->db->dbGetSingleRow($query);
+			$parent = $category['parent'];
+			array_push($catTree, $parent);
+		} 
 		
-			$this->t_body->set_file('blockBODY', 'sitemap_block.htm');
-	
-			$this->t_body->set_block('blockBODY', 'file', 'file_block');		
-			$this->t_body->set_block('blockBODY', 'category', 'category_block');
-			$this->t_body->set_block('blockBODY', 'category_window', 'category_window_block');
-	
-			$this->outputCategories(0, 'nav');
+		$this->outputCategories($catTree, 'nav');
+		$this->t_body->set_var('NAV_CONTENT', $this->t_body->varvals['category_block']);
+		if ($catID > 0) {
 			$this->outputCategories($catID, 'window');
-			$this->outputFiles($catID);		
-	
-			$this->t_body->set_var('NAV_CONTENT', $this->t_body->varvals['category_block']);
-			$this->t_body->set_var('WINDOW_CONTENT', $this->t_body->varvals['category_window_block'] . $this->t_body->varvals['file_block']);		
-		} else {
-			$this->t_body->set_var('NAV_CONTENT', '');
-			$this->t_body->set_var('WINDOW_CONTENT', '');		
 		}
+		$this->outputFiles($catID);		
+		$this->t_body->set_var('WINDOW_CONTENT', '<div id="window_'.$catID.'">' . $this->t_body->varvals['category_window_block'] . $this->t_body->varvals['file_block'] . '</div>');		
+
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 	
-	function outputCategories($parent, $block)
+	function outputCategories($catTree, $block)
 	{
 
-		$query = "SELECT 
-					id, 
-					name,
-					code,
-				  (SELECT count(*) FROM category WHERE parent = c.id) + (SELECT count(*) FROM file WHERE category = c.id) as children
-				  FROM category c
-				  WHERE parent = $parent ORDER BY name";	
-		$catList = $this->db->dbGetAllRows($query);
-
-		if (is_array($catList)) {
-			foreach($catList as $category) {		
-				$output = array ('CAT_ID' 		 => $category['id'],
-								 'CAT_NAME'      => $category['name'] . (!empty($category['code']) ? " (" . $category['code'] . ")":""),
-								 'CAT_OPENCLOSE' => $category['children']>0?"<img src=\"/images/icons/sitemap-expand.gif\" alt=\"Expand\" />":"",
-								 
-								);
-								
-				$this->t_body->set_var($output);
-				if ($block == 'nav')
-					$this->t_body->parse('category_block', 'category', true);
-				else
-					$this->t_body->parse('category_window_block', 'category_window', true);
-			}
-		} else {
-		
-				if ($block == 'nav')
-					$this->t_body->set_var('category_block', '');
-				else
-					$this->t_body->set_var('category_window_block', '');
+		if (!is_array($catTree)) {
+			$catTree = array($catTree);
 		}
 		
+		for ($i=0;$i<count($catTree); $i++) {
+			
+			$this->t_body->set_var('category_block', '');
+			
+			$query = "SELECT 
+						id, 
+						name,
+						code,
+					  (SELECT count(*) FROM category WHERE parent = c.id) + (SELECT count(*) FROM file WHERE category = c.id) as children
+					  FROM category c
+					  WHERE parent = ".$catTree[$i]." ORDER BY name";	
+			$catList = $this->db->dbGetAllRows($query);
 	
+			if (is_array($catList)) {
+				foreach($catList as $category) {		
+					$output = array ('CAT_ID' 		 => $category['id'],
+									 'CAT_NAME'      => $category['name'] . (!empty($category['code']) ? " (" . $category['code'] . ")":""),
+									 'CAT_OPENCLOSE' => $category['children']>0?"<img src=\"/images/icons/sitemap-" . 
+									 					( $category['id'] == $previousCat? "collapse" : "expand") . ".gif\" alt=\"Expand\" />":"",
+									 'SUB_CATEGORY'  => ($i > 0 && $category['id'] == $previousCat)? '<div id="category_'.$category['id'].'">' . $previousCatHTML .'</div>' : '',
+									 'CAT_MARGIN'    => $i+1<count($catTree)? "style='margin-left: 30px;'" : "",
+									 'CAT_SELECTED'  => $category['id']==$_REQUEST['category'] ? "id='sitemap-selected'" : "",
+	
+									);
+									
+					$this->t_body->set_var($output);
+					
+					
+					if ($block == 'nav') {
+						
+						$this->t_body->parse('category_block', 'category', true);
+						
+					} else {
+						$this->t_body->parse('category_window_block', 'category_window', true);
+					}
+					
+
+				}
+				$previousCat = $catTree[$i];
+				$previousCatHTML = $this->t_body->get_var('category_block');
+				
+				
+//				var_dump($previousCatHTML);
+				
+			} else {
+			
+					if ($block == 'nav')
+						$this->t_body->set_var('category_block', '');
+					else
+						$this->t_body->set_var('category_window_block', '');
+			}
+			
+		}
 	}
 	
 	function outputFiles($parent)

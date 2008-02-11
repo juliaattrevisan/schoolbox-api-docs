@@ -9,14 +9,14 @@ html, body, #outerWrap, #content, #content_text {
 	height: 80%;
 	padding: 0;
 	margin: 0;
-	border: 1px solid #cccccc;
+	
 }
 
 #sitemap-nav {
 	width: 35%;
 	height: 100%;
 	float: left;
-	padding: 0;
+	padding: 10px !important;
 	margin: 0;
 	padding: 0;
 	overflow: auto;
@@ -28,7 +28,7 @@ html, body, #outerWrap, #content, #content_text {
 	height: 100%;
 	float: left;
 	margin: 0;
-	padding: 0;
+	padding: 10px !important;
 	border-left: 1px solid #cccccc;
 	overflow: auto;
 }
@@ -36,6 +36,7 @@ html, body, #outerWrap, #content, #content_text {
 #sitemap-selected, #sitemap-selected a {
 	background-color: #000066;
 	color: #ffffff;
+	border: 1px dotted white;
 }
 
 .sitemap-category {
@@ -102,7 +103,7 @@ html, body, #outerWrap, #content, #content_text {
 	color: #000000;
 }
 
-#sitemap-cm {
+.sitemap-cm {
 	display: none;
     position: absolute;
 	border: 1px solid #000000;
@@ -115,29 +116,31 @@ html, body, #outerWrap, #content, #content_text {
 	padding: 1px;
 	margin: 0;
 	z-index: 10;
+
+}
+
+.sitemap-cm ul {
+	padding: 0 !important;
+	margin: 0 !important;
 	list-style-type: none !important;
 }
 
-#sitemap-cm ul {
-	padding: 0;
-	margin: 0;
-}
-
-#sitemap-cm ul li {
+.sitemap-cm ul li {
 	list-style-type: none !important;
-	padding-left: 0;
+	padding: 0 !important;
 	background: #eeeeee !important;
-	margin: 0;
+	margin: 0 !important;
 }
 
-#sitemap-cm li a {
+.sitemap-cm li a {
 	color: #000000;
 	display: block;
 	width: 116px;
 	padding: 1px 2px;
+	margin: 0;
 }
 
-#sitemap-cm li a:hover {
+.sitemap-cm li a:hover {
 	text-decoration: none;
 	color: #ffffff;
 	background: #000000;
