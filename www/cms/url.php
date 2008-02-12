@@ -40,7 +40,7 @@ class url
 			$url = "http://".$url;
 		
 		$query = "UPDATE link 
-			SET url='$url', description='$description', comment='$comment', category='$category' ".(isStaff($_SESSION['gid'])?", hidden = '$hidden' ":"")."
+			SET url='$url', description='$description', comment='$comment', category='$category', hidden = '$hidden'
 			WHERE id = '$modid'";
 		$this->db->dbDoQuery($query);
 		
@@ -65,8 +65,8 @@ class url
 			url = '$url', 
 			submitted = NOW(), 
 			description = '$description', 
-			comment = '$comment' 
-			".(isStaff($_SESSION['gid'])?", hidden = '$hidden' ":"")."";
+			comment = '$comment', 
+			hidden = '$hidden' ";
 		
 		$this->db->dbDoQuery($query);
 		$linkId = $this->db->dbInsertId();

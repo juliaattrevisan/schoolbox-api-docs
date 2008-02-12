@@ -38,9 +38,9 @@ class file
 						'comment'	 	=> $comment,
 						'category'		=> $category,
 						'type'			=> $type,
+						'hidden'		=> $hidden,
 							);
-		if (isStaff($_SESSION['gid']))
-			$file['hidden'] = $hidden;							
+			
 		
 		$this->db->dbUpdateRow('file', 'id', $file);
 		
@@ -71,9 +71,8 @@ class file
 						'submitted'		=> 'NOW()',
 						'mime_type'		=> $file_type,
 						'file_size'		=> $filesize,
+						'hidden'		=> $hidden,
 							);
-		if (isStaff($_SESSION['gid']))
-			$file['hidden'] = $hidden;
 		
 		$this->db->dbInsertRow('file', $file);
 	

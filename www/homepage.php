@@ -460,7 +460,7 @@ class OutPut
 		$this->t_body->set_block($name, "previewimage", "preview_block");
 
 		//get image id
-		$query = "SELECT id, comment FROM file WHERE category = {$this->category} AND deleted = '0' AND INSTR(mime_type, 'image/')
+		$query = "SELECT id, comment FROM file WHERE category = {$this->category} AND deleted = '0' AND hidden = '0' AND INSTR(mime_type, 'image/')
                   ORDER BY RAND() LIMIT 1";
 		
 		$this->db->dbDoQuery($query);                
@@ -722,7 +722,7 @@ class OutPut
 		//link output
 		$this->t_body->set_block($name, "link", "link_block");
 
-		$query = "SELECT description, url, comment FROM link WHERE category = '".$this->category."' 
+		$query = "SELECT description, url, comment, hidden FROM link WHERE category = '".$this->category."' 
 		ORDER BY submitted DESC";
 
 		//if no size make unlimited query else make it limited by size
@@ -736,6 +736,7 @@ class OutPut
 		{
 			while($queryArray = $this->db->dbGetNextArray() )
 			{
+				if ($queryArray['hidden'] > 0 && $this->perm < 2) continue;
 				$this->outputLink($queryArray);
 			}
 		}
@@ -755,7 +756,7 @@ class OutPut
 		//file output
 		$this->t_body->set_block($name, "files", "files_block");
 	
-		$query = "SELECT file.id as id, file.description, comment, realname, inline 
+		$query = "SELECT file.id as id, file.description, comment, realname, inline, hidden, file.category
 				  FROM file
 				  LEFT JOIN allowedFileTypes ON mime_type = mime 
 				  LEFT JOIN submission_box on submission_box.fid = file.id
@@ -772,6 +773,7 @@ class OutPut
 		{
 			while($queryArray = $this->db->dbGetNextArray() )
 			{
+				if ($queryArray['hidden'] > 0 && $this->perm < 2) continue;
 				$this->outputFile($queryArray);
 			}
 		}

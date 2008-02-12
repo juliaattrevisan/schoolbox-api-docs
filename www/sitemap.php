@@ -12,6 +12,7 @@ class OutPut
 {
 	function OutPut($category, $verbose)
 	{
+	
 		$this->category = $category;
 		$this->verbose = $verbose;
 		
@@ -76,13 +77,21 @@ class OutPut
 						id, 
 						name,
 						code,
-					  (SELECT count(*) FROM category WHERE parent = c.id) + (SELECT count(*) FROM file WHERE category = c.id) as children
+					  (SELECT count(*) FROM category WHERE parent = c.id) + (SELECT count(*) FROM file WHERE category = c.id) as children,
+					  p.type as perm
 					  FROM category c
+					  LEFT JOIN perms p on c.id = p.cid AND gid = " . $_SESSION['gid'] . "
 					  WHERE parent = ".$catTree[$i]." ORDER BY name";	
 			$catList = $this->db->dbGetAllRows($query);
 	
+			$this->t_body->set_var('category_block', '');
+			$this->t_body->set_var('category_window_block', '');
+	
 			if (is_array($catList)) {
-				foreach($catList as $category) {		
+				foreach($catList as $category) {	
+					
+					if ($category['perm'] < 1) continue;
+					
 					$output = array ('CAT_ID' 		 => $category['id'],
 									 'CAT_NAME'      => $category['name'] . (!empty($category['code']) ? " (" . $category['code'] . ")":""),
 									 'CAT_OPENCLOSE' => $category['children']>0?"<img src=\"/images/icons/sitemap-" . 
@@ -112,13 +121,7 @@ class OutPut
 				
 //				var_dump($previousCatHTML);
 				
-			} else {
-			
-					if ($block == 'nav')
-						$this->t_body->set_var('category_block', '');
-					else
-						$this->t_body->set_var('category_window_block', '');
-			}
+			} 
 			
 		}
 	}
@@ -126,12 +129,12 @@ class OutPut
 	function outputFiles($parent)
 	{
 		
-		$query = "SELECT file.id, realname, '' as url, file_size, file.description, iconFile, allowedFileTypes.description as mime_description, inline
+		$query = "SELECT file.id, realname, '' as url, file_size, file.description, iconFile, allowedFileTypes.description as mime_description, inline, hidden
 				  FROM file 
 				  LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
 				  WHERE file.category = $parent AND deleted = '0'
 				  
-				  UNION SELECT link.id, '', link.url, '', link.description, 'http-url.png', link.comment, ''
+				  UNION SELECT link.id, '', link.url, '', link.description, 'http-url.png', link.comment, '', hidden
 				  FROM link
 				  WHERE link.category = $parent
 				  
@@ -140,11 +143,15 @@ class OutPut
 		
 		if (is_array($fileList)) {
 			foreach ($fileList as $file) {
+				
+				if ($file['hidden'] > 0 && $this->perm < 2) continue;
+			
 				$output = array ('FILE_ID' 	 => $file['id'],
 								 'FILE_NAME' => scrubText($file['description']),
 								 'FILE_ICON' => !is_null($file['iconFile']) ? "/images/mime/".$file['iconFile'] : "/images/mime/application-x-none.png",
 								 'FILE_ALT'  => !is_null($file['mime_description']) ? $file['mime_description'] : "File",
 								 'CAT_ID'	 => $parent,
+								 'HIDDEN'	 => $file['hidden'] > 0 ? "style='opacity: 0.55;'" : "",
 	
 								);
 
@@ -209,6 +216,10 @@ class OutPut
 
 	function outputNav($parent) {
 
+		if($parent > 0) {
+			$this->perm = perm($parent, 1);
+		}	
+
 		$this->t_body->set_file('blockBODY', 'sitemap_block.htm');
 		$this->t_body->set_block('blockBODY', 'category', 'category_block');
 		$this->t_body->set_block('blockBODY', 'file', 'file_block');
@@ -225,6 +236,10 @@ class OutPut
 	}
 	
 	function outputWindow($parent) {
+
+		if($parent > 0) {
+			$this->perm = perm($parent, 1);
+		}		
 	
 		$this->t_body->set_file('blockBODY', 'sitemap_block.htm');
 		$this->t_body->set_block('blockBODY', 'category', 'category_block');
