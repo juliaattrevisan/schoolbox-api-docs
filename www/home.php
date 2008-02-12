@@ -271,11 +271,11 @@ href=\"/homepage.php?code=".urlencode($period['code'])."\">{$period['description
 				//output period block
 				$this->t_body->parse("timetable_header_block", "timetable_header", true);
 				$this->t_body->parse("timetable_period_block", "timetable_period", true);
+			} else {
+				$this->t_body->set_var("timetable_header_block", "");
+				$this->t_body->set_vat("timetable_period_block", "");
 			}
-		} else {
-			$this->t_body->set_var("timetable_header_block", "");
-			$this->t_body->set_vat("timetable_period_block", "");
-		}
+		} 
 		$this->t_body->parse("timetable_block", "timetable");
 	}
 	

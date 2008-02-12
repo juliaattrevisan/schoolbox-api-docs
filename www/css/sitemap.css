@@ -33,12 +33,11 @@ html, body, #outerWrap, #content, #content_text {
 	overflow: auto;
 }
 
-#sitemap-selected, #sitemap-selected a {
-	background-color: #000066;
-	color: #ffffff;
-	border: 1px dotted white;
+#sitemap-selected {
+	background-color: #FFFFFF;
+	color: #000000;
+	border: 1px dotted #cccccc;
 }
-
 .sitemap-category {
 	margin: 0;
 	padding: 0;
@@ -52,6 +51,7 @@ html, body, #outerWrap, #content, #content_text {
 	height: 30px;
 	line-height: 30px;
 	vertical-align: middle;
+	border: 1px solid #ffffff;
 	
 }
 
@@ -89,7 +89,7 @@ html, body, #outerWrap, #content, #content_text {
 	font: 12px Arial, Helvetica, sans-serif;
 	height: 30px;
 	line-height: 30px;
-
+	border: 1px solid #ffffff;
 	vertical-align: middle;
 	float: left;
 }

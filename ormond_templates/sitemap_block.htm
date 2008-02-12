@@ -1,0 +1,24 @@
+<!-- BEGIN category -->
+<div class='sitemap-category' {CAT_MARGIN}>
+    <p class='sitemap-openclose'>{CAT_OPENCLOSE}</p>
+    <p class='sitemap-caticon'><img src="/images/mime/folder_blue_full.png" alt="{CAT_NAME}" /></p>
+    <div>
+        <p class='sitemap-catname' {CAT_SELECTED}>{CAT_NAME}</p>
+        <p class='sitemap-catid'>{CAT_ID}</p>
+        {SUB_CATEGORY}
+	</div>
+</div><!-- END category -->
+<!-- BEGIN category_window -->
+<div class='sitemap-category'>
+    <p class='sitemap-icon'><img src="/images/mime/folder_blue_full.png" alt="{CAT_NAME}" /></p>
+	<p class='sitemap-catname'>{CAT_NAME}</p>
+    <p class='sitemap-catid'>{CAT_ID}</p>
+</div><!-- END category_window -->
+<!-- BEGIN file -->
+<div class='sitemap-file'>
+    <p class='sitemap-icon'><img src="{FILE_ICON}" alt="{FILE_ALT}" /></p>
+    <p class='sitemap-filename'>{FILE_URL}{FILE_NAME}{FILE_URL_END}</p>
+    <p class='sitemap-filesize'>{FILE_SIZE}</p>
+	<p class='sitemap-fileid'>{FILE_ID}</p>
+    <p class='sitemap-catid'>{CAT_ID}</p>
+</div><!-- END file -->

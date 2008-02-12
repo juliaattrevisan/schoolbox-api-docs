@@ -120,11 +120,7 @@
                     <li class='sitemap-break'><a href="#" onclick="return Sitemap.newCategory(event);">New Folder</a></li>
                 	
                     <li><a href="#" onclick="return Sitemap.modifyFile(event);">Modify</a></li>
-                    <li class='sitemap-break'><a href="#" onclick="if (confirm('Delete this file?')) { Sitemap.deleteFile(event); }  return false;">Delete</a></li>
-
-                    <li><a href="" onclick="return false;">Cut</a></li>
-                    <li><a href="" onclick="return false;">Copy</a></li>
-                    <li><a href="" onclick="return false;">Paste</a></li>
+                    <li><a href="#" onclick="if (confirm('Delete this file?')) { Sitemap.deleteFile(event); }  return false;">Delete</a></li>
                     
                 </ul>
               
@@ -137,12 +133,8 @@
                     <li><a href="#" onclick="return Sitemap.newURL(event);">New Link</a></li>
                     <li class='sitemap-break'><a href="#" onclick="return Sitemap.newCategory(event);">New Folder</a></li>
                 	
-                    <li><a href="#" onclick="return Sitemap.modifyFile(event);">Modify</a></li>
-                    <li class='sitemap-break'><a href="#" onclick="if (confirm('Delete this file?')) { Sitemap.deleteFile(event); }  return false;">Delete</a></li>
-
-                    <li><a href="" onclick="return false;">Cut</a></li>
-                    <li><a href="" onclick="return false;">Copy</a></li>
-                    <li><a href="" onclick="return false;">Paste</a></li>
+                    <li><a href="#" onclick="return Sitemap.modifyFolder(event);">Modify</a></li>
+                    <li><a href="#" onclick="if (confirm('Delete this folder?')) { Sitemap.deleteFolder(event); }  return false;">Delete</a></li>
                     
                 </ul>
               
