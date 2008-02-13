@@ -65,8 +65,6 @@ class OutPut
 			if($this->perm < 1)
 				error(14);
 		}
-		else if($_SESSION['su']) //allows superusers access to root
-			$this->perm = 3;
 
 		//output path to current category
 		$this->outputCatPath();

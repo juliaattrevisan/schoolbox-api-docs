@@ -8,10 +8,9 @@ $db = new dbManager;
 $t_body = new Template(TPL_directory);
 
 
-class OutPut
-{
-	function OutPut($category, $verbose)
-	{
+class OutPut {
+
+	function OutPut($category, $verbose) {
 	
 		$this->category = $category;
 		$this->verbose = $verbose;
@@ -30,8 +29,7 @@ class OutPut
 
 	}
 
-	function showPage($catID)
-	{
+	function showPage($catID) {
 		
 		$this->t_body->set_var('NAV_CONTENT', '');
 		$this->t_body->set_var('WINDOW_CONTENT', '');	
@@ -62,8 +60,7 @@ class OutPut
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 	
-	function outputCategories($catTree, $block)
-	{
+	function outputCategories($catTree, $block) {
 
 		if (!is_array($catTree)) {
 			$catTree = array($catTree);
@@ -99,35 +96,23 @@ class OutPut
 									 'SUB_CATEGORY'  => ($i > 0 && $category['id'] == $previousCat)? '<div id="category_'.$category['id'].'">' . $previousCatHTML .'</div>' : '',
 									 'CAT_MARGIN'    => $i+1<count($catTree)? "style='margin-left: 30px;'" : "",
 									 'CAT_SELECTED'  => $category['id']==$_REQUEST['category'] ? "id='sitemap-selected'" : "",
-	
 									);
 									
 					$this->t_body->set_var($output);
 					
-					
 					if ($block == 'nav') {
-						
 						$this->t_body->parse('category_block', 'category', true);
-						
 					} else {
 						$this->t_body->parse('category_window_block', 'category_window', true);
 					}
-					
-
 				}
 				$previousCat = $catTree[$i];
 				$previousCatHTML = $this->t_body->get_var('category_block');
-				
-				
-//				var_dump($previousCatHTML);
-				
 			} 
-			
 		}
 	}
 	
-	function outputFiles($parent)
-	{
+	function outputFiles($parent) {
 		
 		$query = "SELECT file.id, realname, '' as url, file_size, file.description, iconFile, allowedFileTypes.description as mime_description, inline, hidden
 				  FROM file 
@@ -212,7 +197,6 @@ class OutPut
 			$this->t_body->set_var('file_block', '');	
 	
 	}
-
 
 	function outputNav($parent) {
 
