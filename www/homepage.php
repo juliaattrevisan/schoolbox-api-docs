@@ -727,20 +727,15 @@ class OutPut
 		//link output
 		$this->t_body->set_block($name, "link", "link_block");
 		
+		if($this->perm > 1)
+			$showHidden = "";
+		else
+			$showHidden = "AND hidden = 0";
+		
 		$query =   "SELECT description, url, comment 
-					FROM link l 
-					LEFT JOIN userAccess u ON u.sid = l.category AND 
-											  u.service = " . HOMEPAGESERVICE . " AND 
-											  u.uid = " . $_SESSION['id']. "
-					LEFT JOIN perms p ON p.cid = l.category AND p.gid = " . $_SESSION['gid'] . "
-					
+					FROM link l 					
 					WHERE l.category = " . $this->category . " 
-					AND (
-						 ( l.hidden > 0 
-						 	AND (u.type >= 2 OR p.type >= 2 OR " . (int)$_SESSION['su']. " = 1) 
-						 )
-						 OR l.hidden = 0 
-						 )
+					$showHidden
 					ORDER BY submitted DESC";
 		
 		//if no size make unlimited query else make it limited by size
@@ -772,22 +767,18 @@ class OutPut
 	{
 		//file output
 		$this->t_body->set_block($name, "files", "files_block");
+		
+		if($this->perm > 1)
+			$showHidden = "";
+		else
+			$showHidden = "AND hidden = 0";
 	
 		$query = "SELECT f.id as id, f.description, comment, realname, inline, f.category
 				  FROM file f
 				  LEFT JOIN allowedFileTypes a ON f.mime_type = a.mime 
 				  LEFT JOIN submission_box s on s.fid = f.id
-				  LEFT JOIN userAccess u ON u.sid = f.category AND 
-											  u.service = " . HOMEPAGESERVICE . " AND 
-											  u.uid = " . $_SESSION['id']. "
-				  LEFT JOIN perms p ON p.cid = f.category AND p.gid = " . $_SESSION['gid'] . "
-				  WHERE f.category = ".$this->category." 
-				  AND (
-						 ( f.hidden > 0 
-						 	AND (u.type >= 2 OR p.type >= 2 OR " . (int)$_SESSION['su']. " = 1) 
-						 )
-						 OR f.hidden = 0 
-						 )
+				  WHERE f.category = ".$this->category."
+				  $showHidden
 				  AND f.deleted = 0 
 				  AND s.id IS NULL 
 				  ORDER BY submitted DESC";
