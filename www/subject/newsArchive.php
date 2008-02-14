@@ -25,6 +25,7 @@ class NewsArchive {
 		$this->t_body->set_block("tplBODY", "submit_news", "submit_news_block");
 		$this->t_body->set_block("tplBODY", "news", "news_block");
 	
+		$this->service = HOMEPAGESERVICE;
 		$this->category = $category;
 		$this->checkPerms();
 		
