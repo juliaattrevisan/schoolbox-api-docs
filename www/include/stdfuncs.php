@@ -169,9 +169,11 @@ function formatEmail($email) {
 	else 
 		return false;
 }
+
 function isEmail($email) {
 	return eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$",$email);
 }
+
 function isUrl($url) {
 	$cmp = @parse_url($url);
 	if (is_array($cmp) && isset($cmp['host'])){
@@ -179,4 +181,11 @@ function isUrl($url) {
 	}
 	return false;
 }
+
+function delfile($str)
+{
+    foreach(glob($str) as $fn) {
+        unlink($fn);
+    }
+} 
 ?>

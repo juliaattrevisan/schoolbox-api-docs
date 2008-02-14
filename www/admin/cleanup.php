@@ -121,9 +121,29 @@ class clean {
 				}
 			}
 		}
+
+		//thumbnails
+		foreach(glob(THUMBNAIL_IMAGE_CACHE.'/*.jpg') as $file) {
+			preg_match('/.*\/([0-9]+)-.*\.jpg/', $file, $matches);
+			
+			if($matches[1]) {
+				$query = "SELECT id FROM file WHERE id = '{$matches[1]}'";
+				
+				if(!$this->db->dbGetSingleRow($query)) {
+					print "Deleting $file<br>";
+					if(!@unlink($file))
+						print "Failed to delete $file<br>";
+				
+				}
+			}
+		}
+		
+
 		
 		//student submissions
 		foreach(glob(SUBMISSION_directory.'/*.dat') as $file) {
+		print $file;
+		continue;
 			preg_match('/.*\/([0-9]+).dat/', $file, $matches);
 			if($matches[1]) {
 				$query = "SELECT id FROM student_submission WHERE id = '{$matches[1]}'";
@@ -159,6 +179,15 @@ class clean {
 		$this->db->dbDoQuery($query);
 		print "Updated ".$this->db->dbCountRowsAffected()." student year levels<br>";
 	}
+	
+	function cleanThumbnails() {
+		
+		foreach(glob(THUMBNAIL_IMAGE_CACHE.'/*.jpg') as $file) {
+					print "Deleting $file<br>";
+					if(!@unlink($file))
+						print "Failed to delete $file<br>";
+		}
+	}
  
 }
 
@@ -182,5 +211,7 @@ if($_GET['rolluser'] == 1)
 	$clean->rollStudents();
 if($_GET['fileclean'] == 1)
 	$clean->cleanFileSystem();
+if($_GET['thumbnail'] == 1)
+	$clean->cleanThumbnails();
 
 ?>
