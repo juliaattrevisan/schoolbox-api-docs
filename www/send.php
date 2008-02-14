@@ -21,7 +21,7 @@ if(isset($_GET['id']) && $_GET['id'])
 
 	if(!isset($_GET['myFile'])){
 		//needs to check file permissions otherwise we have security problem
-		$query = "SELECT realname, mime_type, category, hidden FROM file WHERE id = '".$_GET['id']."'";
+		$query = "SELECT realname, mime_type, category FROM file WHERE id = '".$_GET['id']."'";
 	}else{
 		$query = "SELECT * FROM myFile WHERE id = '".$_GET['id']."'";
 	}
@@ -59,8 +59,7 @@ if(isset($_GET['id']) && $_GET['id'])
 				readfile($filename);
 			}
 		}
-		elseif((perm($resultArray['category'], 1) > 0 && $resultArray['hidden'] == 0) ||
-			   (perm($resultArray['category'], 1) > 1 && $resultArray['hidden']  > 0))
+		elseif(perm($resultArray['category'], 1) > 0)
 		{
 			//all checks completed.. continue with file send
 			$filename = FILE_directory ."/". $_GET['id'] . ".dat";

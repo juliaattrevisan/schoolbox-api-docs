@@ -516,8 +516,13 @@ class OutPut
 		
 		$this->t_body->set_var("PREVIEW_IMAGE_URL", $imageurl);
 		$this->t_body->set_var("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));
-		$this->t_body->set_var("CONTENT_URL", $config['url']);
-		
+		if (isUrl($config['url'])) {
+			$this->t_body->set_var("CONTENT_URL_START", "<a href=\"/redir.php?url=".$config['url']."\" target=\"_blank\">");
+			$this->t_body->set_var("CONTENT_URL_END", "</a>");
+		} else {
+			$this->t_body->set_var("CONTENT_URL_START", "");
+			$this->t_body->set_var("CONTENT_URL_END", "");
+		}
 		$this->t_body->parse("preview_block", "previewimage");
 
 		
@@ -721,10 +726,23 @@ class OutPut
 	{
 		//link output
 		$this->t_body->set_block($name, "link", "link_block");
-
-		$query = "SELECT description, url, comment, hidden FROM link WHERE category = '".$this->category."' 
-		ORDER BY submitted DESC";
-
+		
+		$query =   "SELECT description, url, comment 
+					FROM link l 
+					LEFT JOIN userAccess u ON u.sid = l.category AND 
+											  u.service = " . HOMEPAGESERVICE . " AND 
+											  u.uid = " . $_SESSION['id']. "
+					LEFT JOIN perms p ON p.cid = l.category AND p.gid = " . $_SESSION['gid'] . "
+					
+					WHERE l.category = " . $this->category . " 
+					AND (
+						 ( l.hidden > 0 
+						 	AND (u.type >= 2 OR p.type >= 2 OR " . (int)$_SESSION['su']. " = 1) 
+						 )
+						 OR l.hidden = 0 
+						 )
+					ORDER BY submitted DESC";
+		
 		//if no size make unlimited query else make it limited by size
 		if($config['size'] != 0 && $config['size'] != '') 
 			$query .= " LIMIT 0, {$config['size']}"; 
@@ -736,7 +754,6 @@ class OutPut
 		{
 			while($queryArray = $this->db->dbGetNextArray() )
 			{
-				if ($queryArray['hidden'] > 0 && $this->perm < 2) continue;
 				$this->outputLink($queryArray);
 			}
 		}
@@ -756,11 +773,24 @@ class OutPut
 		//file output
 		$this->t_body->set_block($name, "files", "files_block");
 	
-		$query = "SELECT file.id as id, file.description, comment, realname, inline, hidden, file.category
-				  FROM file
-				  LEFT JOIN allowedFileTypes ON mime_type = mime 
-				  LEFT JOIN submission_box on submission_box.fid = file.id
-				  WHERE file.category = '".$this->category."' AND file.deleted = '0' AND submission_box.id IS NULL ORDER BY submitted DESC";
+		$query = "SELECT f.id as id, f.description, comment, realname, inline, f.category
+				  FROM file f
+				  LEFT JOIN allowedFileTypes a ON f.mime_type = a.mime 
+				  LEFT JOIN submission_box s on s.fid = f.id
+				  LEFT JOIN userAccess u ON u.sid = f.category AND 
+											  u.service = " . HOMEPAGESERVICE . " AND 
+											  u.uid = " . $_SESSION['id']. "
+				  LEFT JOIN perms p ON p.cid = f.category AND p.gid = " . $_SESSION['gid'] . "
+				  WHERE f.category = ".$this->category." 
+				  AND (
+						 ( f.hidden > 0 
+						 	AND (u.type >= 2 OR p.type >= 2 OR " . (int)$_SESSION['su']. " = 1) 
+						 )
+						 OR f.hidden = 0 
+						 )
+				  AND f.deleted = 0 
+				  AND s.id IS NULL 
+				  ORDER BY submitted DESC";
 
 		//if no size make unlimited query else make it limited by size
 		if($config['size'] != 0 && $config['size'] != '') 
@@ -773,7 +803,6 @@ class OutPut
 		{
 			while($queryArray = $this->db->dbGetNextArray() )
 			{
-				if ($queryArray['hidden'] > 0 && $this->perm < 2) continue;
 				$this->outputFile($queryArray);
 			}
 		}

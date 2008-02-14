@@ -172,4 +172,11 @@ function formatEmail($email) {
 function isEmail($email) {
 	return eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$",$email);
 }
+function isUrl($url) {
+	$cmp = @parse_url($url);
+	if (is_array($cmp) && isset($cmp['host'])){
+		return true;
+	}
+	return false;
+}
 ?>

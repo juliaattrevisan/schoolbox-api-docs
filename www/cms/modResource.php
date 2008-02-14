@@ -282,6 +282,7 @@ class ModResourcePage {
 		
 		$this->t_body->set_var("DESCRIPTION", $file['description']);
 		$this->t_body->set_var("COMMENT", $file['comment']);
+		$this->t_body->set_var("HIDDEN_SELECTED", $file['hidden'] > 0 ? "checked='checked'" : "");
 		if(CMS_allow_move)
 			$this->setCategoryList($file['category']);
 		else
@@ -426,7 +427,7 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 		//call file security checks
 		
 		fileSecurityCheck($_FILES['file']['error'], $_FILES['file']['name'], $_FILES['file']['tmp_name'], $_FILES['file']['size'], $_FILES['file']['type']);
-
+		
 		$fileDB = new file; 
 		
 		//all checks passed add it

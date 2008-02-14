@@ -40,7 +40,7 @@ class url
 			$url = "http://".$url;
 		
 		$query = "UPDATE link 
-			SET url='$url', description='$description', comment='$comment', category='$category', hidden = '$hidden'
+			SET url='$url', description=".$this->db->dbSmartQuote($description).", comment=".$this->db->dbSmartQuote($comment).", category='$category', hidden = '$hidden'
 			WHERE id = '$modid'";
 		$this->db->dbDoQuery($query);
 		
@@ -64,8 +64,8 @@ class url
 			owner = '".$_SESSION['id']."', 
 			url = '$url', 
 			submitted = NOW(), 
-			description = '$description', 
-			comment = '$comment', 
+			description = ".$this->db->dbSmartQuote($description).", 
+			comment = ".$this->db->dbSmartQuote($comment).", 
 			hidden = '$hidden' ";
 		
 		$this->db->dbDoQuery($query);
