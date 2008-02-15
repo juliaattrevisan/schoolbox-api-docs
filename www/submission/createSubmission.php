@@ -296,8 +296,9 @@ class CreateSubmissionPage {
 		
 		global $subbox;
 		$details = $subbox->getSubBoxDetails($sid);
+		
 		$this->setFileTypeList($details['type']);
-		$this->setCategory($details['cid']);
+		$this->setCategory($details['category']);
 		
 		$this->t_body->set_var('browse_block', '');	
 				
@@ -365,9 +366,21 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
 }
 else if(isset($_GET['category']) && isset($_GET['fileid']) && $_GET['category'] && $_GET['fileid'])
 {
+
 	//display create submission box page
 	//have recieved values from file submission page 
 	$myPage->showCreate($_GET['fileid'], $_GET['category']);
+}
+else if(isset($_GET['sid']) && $_GET['sid'])
+{
+	//display modfiy submission date page
+	$myPage->showModify($_GET['sid']);
+}
+else if(isset($_GET['cid']) && isset($_GET['fileid']) && $_GET['cid'] && $_GET['fileid'])
+{
+	//display create submission box page
+	//have recieved values from file submission page 
+	$myPage->showCreate($_GET['fileid'], $_GET['cid']);
 }
 else
 {

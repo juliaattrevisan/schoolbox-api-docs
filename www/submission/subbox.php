@@ -123,7 +123,7 @@ class subBox
 
 	function getSubBoxDetails($sid)
 	{
-		$query = "SELECT open_date, date, late_date, description, `type` FROM submission_box WHERE id = '$sid'";
+		$query = "SELECT open_date, date, late_date, description, `type`, category FROM submission_box WHERE id = '$sid'";
 		$this->db->dbDoQuery($query);
 		$dates = $this->db->dbGetNextArray();
 		
