@@ -52,6 +52,7 @@ class ViewSubmissionPage {
 		$this->logPageView($box_id);
 		
 		$studentList = $this->getStudentList($desc);
+		$this->t_body->set_var("submission_listing","");
 		
 		if(is_array($studentList)) {
 			foreach($studentList as $student) {
@@ -67,7 +68,9 @@ class ViewSubmissionPage {
 					DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id 
 					FROM student_submission, user 
 					WHERE $where AND owner = user.id AND box_id = '$box_id'"; 
-	
+				
+				
+				
 				if($line = $this->db->dbGetSingleRow($query)) {
 				
 					$output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
@@ -91,6 +94,9 @@ class ViewSubmissionPage {
 										'OWNER_ID' 	=> $student['uid'],
 										'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
 										'mark_block' => '<td colspan="6">&nbsp;</td>',
+										'DATE'		=> '',
+										'MARKED'	=> '',
+										'RETURN'	=> '',
 									);
 					$this->t_body->set_var($output);
 					
