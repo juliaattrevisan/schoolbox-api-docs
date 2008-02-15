@@ -14,6 +14,8 @@ require_once('include/permission.php');
 require_once('include/involved.php');
 
 
+
+
 define('MAX_COLUMN_COUNT',2);
 
 class OutPut
@@ -98,6 +100,29 @@ class OutPut
 									$this->t_body->parse("image_block".$componentCount, "image", true);
 								}
 							}
+						} elseif($name == 'sort')
+						{
+							$this->t_body->set_block("config", "sort", "sort_block".$componentCount);
+							$sortOptions = array('Name', 'Date');
+							foreach ($sortOptions as $sort)
+							{
+								$this->t_body->set_var('COMPONENT_CONFIG_SORT_NAME', $sort);
+								$this->t_body->set_var('COMPONENT_CONFIG_SORT_VALUE', $sort);
+								$this->t_body->set_var('COMPONENT_CONFIG_SORT_SELECTED', $sort == $value ? ' selected' : '');
+								$this->t_body->parse("sort_block".$componentCount, "sort", true);
+							}
+							
+							$this->t_body->set_block("config", "sortdir", "sortdir_block".$componentCount);
+							$sortOptions = array('Asc', 'Desc');
+							foreach ($sortOptions as $sort)
+							{
+								$this->t_body->set_var('COMPONENT_CONFIG_SORTDIR_NAME', $sort);
+								$this->t_body->set_var('COMPONENT_CONFIG_SORTDIR_VALUE', $sort);
+								$this->t_body->set_var('COMPONENT_CONFIG_SORTDIR_SELECTED', $sort == $value ? ' selected' : '');
+								$this->t_body->parse("sortdir_block".$componentCount, "sortdir", true);
+							}
+						
+						
 						}
 						else
 							$this->t_body->set_var('COMPONENT_CONFIG_' . strtoupper($name), $value);
@@ -736,7 +761,15 @@ class OutPut
 					FROM link l 					
 					WHERE l.category = " . $this->category . " 
 					$showHidden
-					ORDER BY submitted DESC";
+					";
+		
+		$config['sort'] = strtolower($config['sort']);
+		$sortFields = array('name' => 'l.description', 'date' => 'submitted');
+		if($config['sort'] == 'name' || $config['sort'] == 'date') {
+			$sortdir = isset($config['sortdir']) && ($config['sortdir'] == 'Asc' || $config['sortdir'] == 'Desc') ? $config['sortdir'] : 'ASC';
+			$query .= " ORDER BY " .$sortFields[$config['sort']]. " " . strtoupper($config['sortdir']);  
+		}
+
 		
 		//if no size make unlimited query else make it limited by size
 		if($config['size'] != 0 && $config['size'] != '') 
@@ -780,13 +813,19 @@ class OutPut
 				  WHERE f.category = ".$this->category."
 				  $showHidden
 				  AND f.deleted = 0 
-				  AND s.id IS NULL 
-				  ORDER BY submitted DESC";
+				  AND s.id IS NULL ";
 
+		$config['sort'] = strtolower($config['sort']);
+		$sortFields = array('name' => 'f.description', 'date' => 'submitted');
+		if($config['sort'] == 'name' || $config['sort'] == 'date') {
+			$sortdir = isset($config['sortdir']) && ($config['sortdir'] == 'Asc' || $config['sortdir'] == 'Desc') ? $config['sortdir'] : 'ASC';
+			$query .= " ORDER BY " .$sortFields[$config['sort']]. " " . strtoupper($config['sortdir']);  
+		}
+			
 		//if no size make unlimited query else make it limited by size
 		if($config['size'] != 0 && $config['size'] != '') 
 			$query .= " LIMIT 0, {$config['size']}";  
-
+	
 		$this->db->dbDoQuery($query);
 
 		if($this->db->dbCountRows() < 1){ $this->t_body->set_var("files_block", "");}
