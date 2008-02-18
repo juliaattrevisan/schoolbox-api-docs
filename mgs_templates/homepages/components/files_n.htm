@@ -9,6 +9,17 @@
       <input type="hidden" name="cid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
       <input type="hidden" name="component" value="{COMPONENT_ID}" />
+      <label for="sort">Sort: </label>
+      <select name="sort">
+      	<!-- BEGIN sort -->
+      	<option value="{COMPONENT_CONFIG_SORT_VALUE}"{COMPONENT_CONFIG_SORT_SELECTED}>{COMPONENT_CONFIG_SORT_NAME}</option>
+      	<!-- END sort -->
+      </select>
+      <select name="sortdir">
+      	<!-- BEGIN sortdir -->
+      	<option value="{COMPONENT_CONFIG_SORTDIR_VALUE}"{COMPONENT_CONFIG_SORTDIR_SELECTED}>{COMPONENT_CONFIG_SORTDIR_NAME}</option>
+      	<!-- END sortdir -->
+      </select>        
       <label for="size">Item Limit: </label>
       <select name="size">
       	<!-- BEGIN size -->

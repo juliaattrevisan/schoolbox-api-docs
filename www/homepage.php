@@ -111,7 +111,8 @@ class OutPut
 								$this->t_body->set_var('COMPONENT_CONFIG_SORT_SELECTED', $sort == $value ? ' selected' : '');
 								$this->t_body->parse("sort_block".$componentCount, "sort", true);
 							}
-							
+						} elseif($name == 'sortdir')
+						{	
 							$this->t_body->set_block("config", "sortdir", "sortdir_block".$componentCount);
 							$sortOptions = array('Asc', 'Desc');
 							foreach ($sortOptions as $sort)
