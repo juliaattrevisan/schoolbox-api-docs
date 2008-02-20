@@ -1047,7 +1047,7 @@ class OutPut
 				'".CALENDAR_time_format."') as endTimeString,priority, note
 				FROM event
         				JOIN eventCampus ON event.id = eventCampus.eventID
-				WHERE access = 3 AND eventCampus.campusID = 3 AND( date >= NOW() $where) ORDER BY date, startTime";
+				WHERE access = 3 AND eventCampus.campusID = 3 AND( date >= DATE(NOW()) $where) ORDER BY date, startTime";
 		$this->db->dbDoQuery($query);	
 
 		if($this->db->dbCountRows() < 1){$this->t_body->set_var("group_events_block", "");}
