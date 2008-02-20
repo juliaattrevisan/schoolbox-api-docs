@@ -769,7 +769,8 @@ class OutPut
 		if($config['sort'] == 'name' || $config['sort'] == 'date') {
 			$sortdir = isset($config['sortdir']) && ($config['sortdir'] == 'Asc' || $config['sortdir'] == 'Desc') ? $config['sortdir'] : 'ASC';
 			$query .= " ORDER BY " .$sortFields[$config['sort']]. " " . strtoupper($config['sortdir']);  
-		}
+		} else
+			$query .= " ORDER BY date DESC";
 
 		
 		//if no size make unlimited query else make it limited by size
@@ -821,7 +822,8 @@ class OutPut
 		if($config['sort'] == 'name' || $config['sort'] == 'date') {
 			$sortdir = isset($config['sortdir']) && ($config['sortdir'] == 'Asc' || $config['sortdir'] == 'Desc') ? $config['sortdir'] : 'ASC';
 			$query .= " ORDER BY " .$sortFields[$config['sort']]. " " . strtoupper($config['sortdir']);  
-		}
+		} else
+			$query .= " ORDER BY date DESC";
 			
 		//if no size make unlimited query else make it limited by size
 		if($config['size'] != 0 && $config['size'] != '') 
