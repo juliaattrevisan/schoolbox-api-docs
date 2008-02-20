@@ -210,9 +210,17 @@ class folder
 			error(12); //children exist exit with error
 		
 		//check for submission boxes TODO: REMOVE THIS AND PUT A CLEANUP SUBMISSION BOX FUNCTION IN (but maybe only for superusers), also add recursive delete functions)
-		//$query = "SELECT id FROM submission_box WHERE category = $id AND deleted = 0";
-		$query = "UPDATE submission_box SET deleted = 1 WHERE category = $id";
-		$this->db->dbDoQuery($query);
+		$query = "SELECT id FROM submission_box WHERE category = $id AND deleted = 0";
+		$subList = $this->db->dbGetAllRows($query);
+		if (is_array($subList)) {
+			if (!isset($_SESSION['su']))
+				error(12);
+			require_once '../submission/subbox.php';
+			$subBox = new subBox;
+			foreach ($subList as $sub) {
+				$subBox->deleteSubmissionBox($sub['id']);
+			} 
+		}
 
 	}
 
