@@ -410,13 +410,10 @@ class OutPut
 	{
 		// gets teachers involved in subject, outputs links to their addressbook page
 		include('include/syn_classlist.php');
-		// sql to add module :
-		// INSERT INTO homepage_comp VALUES(2, 'outputTeachers', 'Class Teachers', 'teacher_s.htm')
 		$this->t_body->set_block($name, "staff_teachers", "staff_teacher_block");
 		
 		if($this->code != "" && SYNERGY_enable)
 		{	
-		
 			$listSyns = getTeacherName($this->code);
 			if(is_array($listSyns)) {
 				foreach($listSyns as $synid) {
@@ -431,9 +428,10 @@ class OutPut
 							$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$teacher['id']}\">{$name}</a>");
 							
 						$this->t_body->parse("staff_teacher_block", "staff_teachers", true);	
-						return true;
 					}
 				}
+				if(is_array($teacher))
+					return true;
 			}
 		}	
 	}

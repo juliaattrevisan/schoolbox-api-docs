@@ -60,8 +60,9 @@ function getTeacherName($code) {
 		$db = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
 		@mssql_select_db(MSSQL_db, $db);
 	
-		$msQuery = "SELECT DISTINCT StaffID FROM SubjectClassStaff
-			WHERE ClassCode = '$code' AND FileYear={$_SESSION['FileYear']} AND FileSemester={$_SESSION['FileSemester']}";
+		$msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM SubjectClassStaff
+			WHERE ClassCode = '$code' AND FileYear={$_SESSION['FileYear']} AND FileSemester={$_SESSION['FileSemester']}
+			ORDER BY StaffSeq";
 		
 		$msResult = @mssql_query($msQuery, $db);
 		
