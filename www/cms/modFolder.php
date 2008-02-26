@@ -276,7 +276,10 @@ if(is_numeric($_POST['parent']) && $_POST['name'])
 	{
 		$cid = $_POST['cid'];
 		//modify
-		$folderDB->modifyCat($cid, $_POST['name'], $_POST['parent'], $_POST['template'], $_POST['code']);
+		if(isset($_POST['code'])
+			$folderDB->modifyCat($cid, $_POST['name'], $_POST['parent'], $_POST['template'], $_POST['code']);
+		else
+			$folderDB->modifyCat($cid, $_POST['name'], $_POST['parent'], $_POST['template']);
 		//delete perms and so we can readd new ones later
 		$folderDB->deletePerms($cid);
 	}

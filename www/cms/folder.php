@@ -92,7 +92,7 @@ class folder
 
 		//update folder details
 		$cat = array('id'=>$cid, 'name'=>$name, 'parent'=>$parent);
-		if($code)
+		if($code === 0)
 			$cat['code'] = $code;
 		if($template)
 			$cat['template'] = $template;
