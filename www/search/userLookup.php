@@ -83,20 +83,28 @@ class outUser
 					list($date, $month, $year) = explode(' ', $synInfo['StudentBirthDate']);
 					$birthdate = strtotime($date.' '.$month.' '.$year);
 					
-					$this->t_body->set_var("TUTOR", $synInfo['StudentTutor']);
-					$this->t_body->set_var("YEAR_LEVEL", $synInfo['StudentYearLevel']);
-					$this->t_body->set_var("BIRTHDATE", date('jS \o\f F, Y', $birthdate));
-					$this->t_body->set_var("EMERGENCY_NAME", $synInfo['StudentEmergencyName']);
-					$this->t_body->set_var("EMERGENCY_PHONE", $synInfo['StudentEmergencyPhone']);
-					$this->t_body->set_var("EMERGENCY_ALT_PHONE", $synInfo['StudentEmergencyPhoneAlt']);
-					$this->t_body->set_var("CONTACT_NAME", $synInfo['StudentContactTitle'].' '.$synInfo['StudentContactPreferred'].' '.$synInfo['StudentContactSurname']);
-					$this->t_body->set_var("CONTACT_ADDRESS", $synInfo['StudentContactAddress1'].'<br>'.$synInfo['StudentContactSuburb'].', '.$synInfo['StudentContactState'].' '.$synInfo['StudentContactPostCode']);
-					$this->t_body->set_var("CONTACT_HOME_PHONE", $synInfo['StudentContactPhoneActual']);
-					$this->t_body->set_var("CONTACT_MOBILE_PHONE", $synInfo['StudentContactMobilePhone']);
-					$this->t_body->set_var("CONTACT_OCCUP_PHONE", $synInfo['StudentContactOccupPhone']);
-					$this->t_body->set_var("SPOUSE_NAME", $synInfo['StudentContactSpouseTitle'].' '.$synInfo['StudentContactSpousePreferred'].' '.$synInfo['StudentContactSpouseSurname']);
-					$this->t_body->set_var("SPOUSE_MOBILE_PHONE", $synInfo['StudentContactSpouseMobilePhone']);
-					$this->t_body->set_var("SPOUSE_OCCUP_PHONE", $synInfo['StudentContactSpouseOccupPhone']);
+					$output = array(	'TUTOR' 				=> scrubTEXT($synInfo['StudentTutor']),
+										'YEAR_LEVEL'			=> scrubTEXT($synInfo['StudentYearLevel']),
+										'HOUSE'					=> scrubTEXT($synInfo['StudentHouse']),
+										'FORM'					=> scrubTEXT($synInfo['StudentForm']),
+										'LOCKER'				=> scrubTEXT($synInfo['StudentLockerBook']),
+										'BIRTHDATE'				=> date('jS \o\f F, Y', $birthdate),
+										'EMERGENCY_NAME'		=> scrubTEXT($synInfo['StudentEmergencyName']),
+										'EMERGENCY_PHONE'		=> scrubTEXT($synInfo['StudentEmergencyPhone']),
+										'EMERGENCY_ALT_PHONE'	=>scrubTEXT($synInfo['StudentEmergencyPhoneAlt']),
+										'CONTACT_NAME'			=> scrubTEXT($synInfo['StudentContactTitle'].' '.
+																$synInfo['StudentContactPreferred'].' '.$synInfo['StudentContactSurname']),
+										'CONTACT_ADDRESS'		=> scrubTEXT($synInfo['StudentContactAddress1'].'<br>'.$synInfo['StudentContactSuburb'].', '.
+																$synInfo['StudentContactState'].' '.$synInfo['StudentContactPostCode']),
+										'CONTACT_HOME_PHONE' 	=> scrubTEXT($synInfo['StudentContactPhoneActual']),
+										'CONTACT_MOBILE_PHONE' 	=> scrubTEXT($synInfo['StudentContactMobilePhone']),
+										'CONTACT_OCCUP_PHONE'	=> scrubTEXT($synInfo['StudentContactOccupPhone']),
+										'SPOUSE_NAME'			=> scrubTEXT($synInfo['StudentContactSpouseTitle'].' '.$synInfo['StudentContactSpousePreferred'].' '.
+																$synInfo['StudentContactSpouseSurname']),
+										'SPOUSE_MOBILE_PHONE'	=> scrubTEXT($synInfo['StudentContactSpouseMobilePhone']),
+										'SPOUSE_OCCUP_PHONE'	=> scrubTEXT($synInfo['StudentContactSpouseOccupPhone']),
+									);
+					$this->t_body->set_var($output);
 					
 					$this->t_body->parse("contact_synergy_block", "contact_synergy");
 					$this->t_body->parse("student_synergy_block", "student_synergy");

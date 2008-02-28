@@ -124,16 +124,20 @@
         </tr>
         <!-- BEGIN student_synergy -->
         <tr>
-          <td><strong>Tutor</strong></td>
-          <td>{TUTOR}</td>
-          <td><strong>Year Level </strong></td>
+        <td><strong>Room</strong></td>
+        <td>{FORM}</td>
+        <td><strong>Telephone Ext.</strong></td>
+        <td>{LOCKER}</td>
+        </tr>
+        <tr>
+          <td><strong>Ormond Year</strong></td>
+          <td>{HOUSE}</td>
+          <td><strong>Uni Year</strong></td>
           <td>{YEAR_LEVEL}</td>
         </tr>
         <tr>
           <td><strong>Birthdate</strong></td>
-          <td>{BIRTHDATE}</td>
-          <td>&nbsp;</td>
-          <td></td>
+          <td colspan="2">{BIRTHDATE}</td>
         </tr>
         <!-- END student_synergy -->
         <tr>
@@ -143,10 +147,8 @@
           <td style="vertical-align:top;"><strong>View Users Records</strong></td>
           <td style="vertical-align:top;"><ul>
               <!-- BEGIN timetable_link -->
-              <li><a href="/timetable.php?sid={SYNERGY_ID}">Timetable</a></li>
               <!-- END timetable_link -->
               <!-- BEGIN due_work -->
-              <li><a href="/submission/dueWork.php?id={ID}">Due Work</a></li>
               <!-- END due_work -->
               <!-- BEGIN helpdesk -->
               <li><a href="/modules/helpdesk/index.php?id={ID}">Helpdesk Jobs</a></li>
@@ -160,59 +162,6 @@
             </ul></td>
         </tr>
         <!-- BEGIN contact_synergy -->
-        <tr>
-          <td colspan="4"><h2>Emergency Contact</h2></td>
-        </tr>
-        <tr>
-          <td><strong>Name</strong></td>
-          <td>{EMERGENCY_NAME}</td>
-          <td><strong>Phone </strong></td>
-          <td>{EMERGENCY_PHONE}</td>
-        </tr>
-        <tr>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td><strong>Alt. Phone </strong></td>
-          <td>{EMERGENCY_ALT_PHONE}</td>
-        </tr>
-        <tr>
-          <td colspan="4"><h2>Primary Contact </h2></td>
-        </tr>
-        <tr>
-          <td><strong>Name</strong></td>
-          <td>{CONTACT_NAME}</td>
-          <td><strong>Home Phone </strong></td>
-          <td>{CONTACT_HOME_PHONE}</td>
-        </tr>
-        <tr>
-          <td><strong>Address</strong></td>
-          <td rowspan="2" valign="top">{CONTACT_ADDRESS}</td>
-          <td><strong>Mobile Phone </strong></td>
-          <td>{CONTACT_MOBILE_PHONE}</td>
-        </tr>
-        <tr>
-          <td>&nbsp;</td>
-          <td><strong>Work  Phone </strong></td>
-          <td>{CONTACT_OCCUP_PHONE}</td>
-        </tr>
-        <tr>
-          <td><strong>Spouse</strong></td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td><strong>Name</strong></td>
-          <td>{SPOUSE_NAME}</td>
-          <td><strong>Mobile Phone </strong></td>
-          <td>{SPOUSE_MOBILE_PHONE}</td>
-        </tr>
-        <tr>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td><strong>Work Phone </strong></td>
-          <td>{SPOUSE_OCCUP_PHONE}</td>
-        </tr>
         <!-- END contact_synergy -->
       </table>
       <!-- #EndEditable --> </div>

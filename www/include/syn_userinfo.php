@@ -18,8 +18,8 @@ function getStudentInfo($synID)
  
 		
         $query = "
-		SELECT 	vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname, 
-				vStudents.StudentTutor, vStudents.StudentYearLevel, vStudents.StudentBirthDate, 
+		SELECT 	vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname, vStudents.StudentBirthDate, 
+				vStudents.StudentHouse, vStudents.StudentForm, vStudents.StudentTutor, vStudents.StudentYearLevel, vStudents.StudentLockerBook,
 				vStudents.StudentEmergencyName, vStudents.StudentEmergencyPhone, vStudents.StudentEmergencyPhoneAlt,
 				contactDetails.StudentContactTitle, contactDetails.StudentContactPreferred, contactDetails.StudentContactSurname,
 				contactDetails.StudentContactAddress1, contactDetails.StudentContactSuburb, contactDetails.StudentContactPostCode, contactDetails.StudentContactState,
@@ -37,9 +37,11 @@ function getStudentInfo($synID)
 			AND vStudents.StudentID = $synID
 		ORDER BY
 			contactDetails.FileYear DESC,contactDetails.FileSemester DESC
-			";
+			"; 
+			
 	$result = mssql_query($query, $db);
-	return mssql_fetch_array($result);
+	$userInfo =  mssql_fetch_array($result);
+	return $userInfo;
 }
 
 function getCurrentSemester()

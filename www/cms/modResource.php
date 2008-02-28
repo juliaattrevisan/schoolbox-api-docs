@@ -165,7 +165,7 @@ class ModResourcePage {
 					
 				}
 				
-				$this->listMyFiles($folder['id']);
+				//$this->listMyFiles($folder['id']);
 				
 				$query = "SELECT id, description FROM myFile WHERE owner = " . $_SESSION['id'] . " AND parent = " . $folder['id'] . " AND deleted = 0 ORDER BY description";
 				
@@ -213,7 +213,7 @@ class ModResourcePage {
 			$this->t_body->set_block('tplBODY', 'optgroup_end', 'optgroup_end_block');
 			$this->t_body->set_block('tplBODY', 'my_files', 'my_files_block');
 			
-			$this->listMyFiles();
+			//$this->listMyFiles();
 			
 			
 			$this->t_body->set_var(array('optgroup_start_block' => '', 'optgroup_end_block' => ''));
