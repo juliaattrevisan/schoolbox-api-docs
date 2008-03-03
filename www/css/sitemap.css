@@ -83,6 +83,10 @@ html, body, #outerWrap, #content, #content_text {
 	clear: both;
 }
 
+.sitemap-hover {
+	background-color: #eeeeee;
+}
+
 .sitemap-file p {
 	margin: 0;
 	padding: 0;

@@ -19,7 +19,7 @@ var myrules = {
 		}
 	},
 	'.sitemap-catname' : function (el) {
-		el.onclick = function() {
+		el.onmouseup = function() {
 			if (el.parentNode.className != 'sitemap-category') {
 				// normal
 				var catDiv = el.parentNode.parentNode;
@@ -58,16 +58,14 @@ var myrules = {
 		},
 		el.onmouseout = function () {
 			if (el.setStyle) el.setStyle('text-decoration', 'none');	
-			
 		},
 		el.onmousedown = function () {
 			Sitemap.setSelected(el);	
-			
 		}
 	},
 	'.sitemap-caticon' : function (el) {
 		
-		el.onclick = function() {
+		el.onmousedown = function() {
 			
 			var catParts = Sitemap.getCatParts(el.parentNode);
 
@@ -92,16 +90,13 @@ var myrules = {
 			
 		}		
 	},
-	'.sitemap-filename' : function (el) {
+	'.sitemap-file' : function (el) {
 		
 		el.onmousedown = function () {
 			
-			Sitemap.setSelected(el);	
+			Sitemap.setSelected((el.childNodes)[3]);	
 		}
-		
 	}
-
-
 };	
 
 Behaviour.addLoadEvent(function () { Sitemap.init(); });
@@ -261,8 +256,8 @@ var Sitemap = {
 	
 	addContextMenu: function () {
 		SimpleContextMenu.setup({'preventDefault':false, 'preventForms':false});
-        SimpleContextMenu.attach('sitemap-filename', 'sitemap-cm');
-		SimpleContextMenu.attach('sitemap-catname', 'sitemap-cm2');
+        SimpleContextMenu.attach('sitemap-file', 'sitemap-cm');
+		SimpleContextMenu.attach('sitemap-category', 'sitemap-cm2');
 
 	},
 	newFile: function (e) {
