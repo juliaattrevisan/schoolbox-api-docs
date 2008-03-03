@@ -71,6 +71,10 @@ class OutPut
 
 		//output various page links
 		$this->outputPageLink();		
+		
+		if($this->perm < 2) {
+			$hiddenQuery = ' AND hidden = 0';
+		}
 
 		//get a list of all the categories.  later we will check if we have permission to access each
 		$catQuery = "SELECT id, name, template, code FROM category WHERE parent = ".$this->category." ORDER BY name";
@@ -79,11 +83,11 @@ class OutPut
 		user.title, user.id as uid, user.firstname, user.lastname, user.local_email, user.alt_email, file.description, file.comment, file.mime_type,
 		iconFile, allowedFileTypes.description as mime_description, inline
 		FROM file LEFT JOIN user ON user.id = file.owner LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
-		WHERE file.category = ".$this->category." AND deleted = '0'";
+		WHERE file.category = ".$this->category." AND deleted = '0'" . $hiddenQuery;
 
 		$linkQuery = "SELECT link.id, link.url, DATE_FORMAT(link.submitted, '".FILE_date_format."') AS submitted, 
 		user.id as uid, user.title, user.firstname, user.lastname, user.local_email, user.alt_email, link.description, link.comment 
-		FROM link LEFT JOIN user ON user.id = link.owner WHERE link.category = ".$this->category."";
+		FROM link LEFT JOIN user ON user.id = link.owner WHERE link.category = ".$this->category."" . $hiddenQuery;
 
 		$result = $this->db->dbDoQuery($catQuery);
 

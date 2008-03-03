@@ -420,7 +420,7 @@ class dueWorkPage
 			
 		} else if ($listby == 'month' ) {
 			//output work listing
-			for($j=1; $j <= $totalDays; $j++)
+			for($j=0; $j <= $numDaysinMonth; $j++)
 			{
 				$this->t_body->set_var("DATE", date("l jS",$currentDay));
 				

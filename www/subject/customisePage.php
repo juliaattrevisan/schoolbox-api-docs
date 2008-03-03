@@ -111,9 +111,9 @@ class customise
 	{
 		// 1 = large, 2 = small, 0 = all
 		if($size > 0 )
-			$query = "SELECT id, name, component, description FROM homepage_comp c LEFT JOIN homepage_comp_location l ON l.component = c.id AND cid = {$this->cid} WHERE c.size = $size ORDER BY name";
+			$query = "SELECT id, name, component, description FROM homepage_comp c LEFT JOIN homepage_comp_location l ON l.component = c.id AND cid = {$this->cid} WHERE c.size = $size AND invisible = 'false' ORDER BY name";
 		else
-			$query = "SELECT id, name, description FROM homepage_comp ORDER BY name";
+			$query = "SELECT id, name, description FROM homepage_comp WHERE invisible = 'false' ORDER BY name";
 
 		return $this->db->dbGetAllRows($query); 
 	}

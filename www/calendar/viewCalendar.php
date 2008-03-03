@@ -123,10 +123,17 @@ class displayCalendar
 		$realDay = date("j");
 		$realYear = date("Y");
 		
+		$listby = isset($_GET['listby']) ? $_GET['listby'] : 'week';
+		if ($listby != 'week' && $listby != 'month') {
+			$listby = 'week';
+		}
+
+		
 		//setup the movement buttons
 		$nextMonth = mktime (0,0,0,$this->currMonth+1, $this->currDay, $this->currYear);
 		$previousMonth = mktime (0,0,0,$this->currMonth-1, $this->currDay, $this->currYear); 
 		$currentMonth = mktime (0,0,0,$this->currMonth, $this->currDay, $this->currYear);
+		
 
 		$this->t_body->set_var("BACK", "viewCalendar.php?Year=".date("Y",$previousMonth).
 						"&Month=".date("m",$previousMonth)."&Day=".date("d", $previousMonth));
@@ -198,7 +205,9 @@ class displayCalendar
 				$this->t_body->parse("week_listing","week_block", true);
 		}
 		
+		
 		$currentDay = $startOfWeek;
+		
 		
 		//initialise the day values
 		$this->currYear = date("Y",$currentDay);
@@ -207,65 +216,143 @@ class displayCalendar
 		
 		$sub = $this->cal->getWeekSubmissionEvents($this->currDay, $this->currMonth, $this->currYear);
 		
-		//output week listing
-		for($x=0; $x < 7; $x++)
-		{
-			$this->t_body->set_var("DATE", date("l jS",$currentDay));
-			
-			$this->t_body->set_var("ADD", "<a href=\"addEvent.php?date=".$this->currDay."&month=".$this->currMonth."&year=".$this->currYear."\">add</a>");
-			
-			//first lets output submission events
-			
-			for($i=0; $sub[$x]['category'][$i]; $i++)
-			{
-				if($sub[$x]['synergyCode'][$i])
-					$descr = $sub[$x]['category'][$i]." (".$sub[$x]['synergyCode'][$i].") - ".$sub[$x]['description'][$i];
-				else
-					$descr = $sub[$x]['category'][$i]." - ".$sub[$x]['description'][$i];
-					
-				$this->outputEvent(0, $sub[$x]['dueTime'][$i], '', 1, "WORK DUE ".$descr, 0,0,0,0); 
-				$subout = 1;
-			}
+		$currentURL = "viewCalendar.php?Year={$this->currYear}&Month={$this->currMonth}&Day={$this->currDay}";
+		
+		$listByLink = 
+					  "<a href='{$currentURL}&listby=month'>Month</a> | " .
+				  	  "<a href='{$currentURL}&listby=week'>Week</a>";
+		$this->t_body->set_var('LISTBY', $listByLink);
 
-			if(SITE_location == "mgs" && SYNERGY_enable)
+		
+		if ($listby == 'month') {
+
+			
+			for($x=1; $x <= $numDaysinMonth; $x++)
 			{
-				$birthdayList = $this->cal->getStudentBirthdays($this->currDay, $this->currMonth, $this->currYear);
-				if(in_array(3 ,$_SESSION['campus']) && is_array($birthdayList))
+				
+				$currentDay = mktime (0,0,0,$this->currMonth, $x, $this->currYear);
+				$this->t_body->set_var("DATE", date("l jS",$currentDay));
+				
+				$this->t_body->set_var("ADD", "<a href=\"addEvent.php?date=".$this->currDay."&month=".$this->currMonth."&year=".$this->currYear."\">add</a>");
+				
+				//first lets output submission events
+				
+				for($i=0; $sub[$x]['category'][$i]; $i++)
 				{
-					foreach($birthdayList as $bDay)
+					if($sub[$x]['synergyCode'][$i])
+						$descr = $sub[$x]['category'][$i]." (".$sub[$x]['synergyCode'][$i].") - ".$sub[$x]['description'][$i];
+					else
+						$descr = $sub[$x]['category'][$i]." - ".$sub[$x]['description'][$i];
+						
+					$this->outputEvent(0, $sub[$x]['dueTime'][$i], '', 1, "WORK DUE ".$descr, 0,0,0,0); 
+					$subout = 1;
+				}
+	
+				if(SITE_location == "mgs" && SYNERGY_enable)
+				{
+					$birthdayList = $this->cal->getStudentBirthdays($this->currDay, $this->currMonth, $this->currYear);
+					if(in_array(3 ,$_SESSION['campus']) && is_array($birthdayList))
 					{
-						$this->outputEvent(0, '', '', 3, 'Student Birthday - '.$bDay['name'].' in '.$bDay['form'].' turns '.$bDay['age']
-							,0,0,0,0);
-						$subout = 1;
+						foreach($birthdayList as $bDay)
+						{
+							$this->outputEvent(0, '', '', 3, 'Student Birthday - '.$bDay['name'].' in '.$bDay['form'].' turns '.$bDay['age']
+								,0,0,0,0);
+							$subout = 1;
+						}
 					}
 				}
-			}
-
-			$eventList = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear, $campus);
-			
-			if(!is_array($eventList))
-			{
-				if(!$subout) $this->t_body->set_var("note_listing", "");
-			}
-			else
-			{	
-				foreach($eventList as $event)
+	
+				$eventList = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear, $campus);
+				
+				if(!is_array($eventList))
 				{
-					$this->outputEvent($event['id'], $event['startTime'], $event['endTime'], 
-						$event['priority'], $event['note'], $event['owner'], 
-						$event['access'], $event['sid'], $event['type']);
+					if(!$subout) $this->t_body->set_var("note_listing", "");
 				}
-
+				else
+				{	
+					foreach($eventList as $event)
+					{
+						$this->outputEvent($event['id'], $event['startTime'], $event['endTime'], 
+							$event['priority'], $event['note'], $event['owner'], 
+							$event['access'], $event['sid'], $event['type']);
+					}
+	
+				}
+				$this->t_body->parse("day_listing","day_block", true);
+				$this->t_body->set_var("note_listing", "");
+				
+				//increment date
+				
+				$this->currYear = date("Y",$currentDay);
+				$this->currMonth = date("n",$currentDay);
+				$this->currDay = date("j",$currentDay);
 			}
-			$this->t_body->parse("day_listing","day_block", true);
-			$this->t_body->set_var("note_listing", "");
-			
-			//increment date
-			$currentDay = mktime (0,0,0,date("m",$currentDay), date("d",$currentDay)+1, date("Y",$currentDay));
-			$this->currYear = date("Y",$currentDay);
-			$this->currMonth = date("n",$currentDay);
-			$this->currDay = date("j",$currentDay);
+		
+		
+		} else {
+
+			//output week listing
+			for($x=0; $x < 7; $x++)
+			{
+				$this->t_body->set_var("DATE", date("l jS",$currentDay));
+				
+				$this->t_body->set_var("ADD", "<a href=\"addEvent.php?date=".$this->currDay."&month=".$this->currMonth."&year=".$this->currYear."\">add</a>");
+				
+				//first lets output submission events
+				
+				for($i=0; $sub[$x]['category'][$i]; $i++)
+				{
+					if($sub[$x]['synergyCode'][$i])
+						$descr = $sub[$x]['category'][$i]." (".$sub[$x]['synergyCode'][$i].") - ".$sub[$x]['description'][$i];
+					else
+						$descr = $sub[$x]['category'][$i]." - ".$sub[$x]['description'][$i];
+						
+					$this->outputEvent(0, $sub[$x]['dueTime'][$i], '', 1, "WORK DUE ".$descr, 0,0,0,0); 
+					$subout = 1;
+				}
+	
+				if(SITE_location == "mgs" && SYNERGY_enable)
+				{
+					$birthdayList = $this->cal->getStudentBirthdays($this->currDay, $this->currMonth, $this->currYear);
+					if(in_array(3 ,$_SESSION['campus']) && is_array($birthdayList))
+					{
+						foreach($birthdayList as $bDay)
+						{
+							$this->outputEvent(0, '', '', 3, 'Student Birthday - '.$bDay['name'].' in '.$bDay['form'].' turns '.$bDay['age']
+								,0,0,0,0);
+							$subout = 1;
+						}
+					}
+				}
+	
+				$eventList = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear, $campus);
+				
+				if(!is_array($eventList))
+				{
+					if(!$subout) $this->t_body->set_var("note_listing", "");
+				}
+				else
+				{	
+					foreach($eventList as $event)
+					{
+						$this->outputEvent($event['id'], $event['startTime'], $event['endTime'], 
+							$event['priority'], $event['note'], $event['owner'], 
+							$event['access'], $event['sid'], $event['type']);
+					}
+	
+				}
+				$this->t_body->parse("day_listing","day_block", true);
+				$this->t_body->set_var("note_listing", "");
+				
+				//increment date
+				$currentDay = mktime (0,0,0,date("m",$currentDay), date("d",$currentDay)+1, date("Y",$currentDay));
+				$this->currYear = date("Y",$currentDay);
+				$this->currMonth = date("n",$currentDay);
+				$this->currDay = date("j",$currentDay);
+			}
+		
 		}
+		
 
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
