@@ -139,9 +139,23 @@
                	      	<input name="Submit" type="submit" class="button_modify" id="Submit" value="Save">
                	    	</td>
                     </tr>
+				 </table>
+                 </form>
+                 <p>&nbsp;</p>
+                 <form action='/subject/editDuties.php{GET}' method='post' enctype="multipart/form-data" class="standardForm">
+                 <input name="cid" type="hidden" id="cid" value="{CID}">
+                 <input name="maxi" type="hidden" id="cid" value="{MAXI}">
+               	 <input name="qdate" type="hidden" id="cid" value="{QDATE}">
+				 <table>
+                    <tr>
+                    	<td>Upload CSV</td>
+                        <td><input type='file' name='file' />
+                       <input type='submit' value='Upload' /></td>
+                    </tr>                    
                   </table>
+          		  </form>
          	</div>
-	</form></div>
+	</div>
 <!-- #EndEditable --> </div>
 		<div id="footer">
 			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>

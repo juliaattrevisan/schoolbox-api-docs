@@ -117,11 +117,65 @@ class editDuties
 			}
 		}
 	}
+	
+	function parseCSV() {
+		if (!is_file($_FILES['file']['tmp_name']))
+			return false;
+			
+		$handle = fopen($_FILES['file']['tmp_name'], "r");
+		$column = array();
+		$i = 0;
+
+		while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+			if ($i == 0) {
+				foreach ($data as $date) {
+					list($day, $month, $year) = explode("/", $date);
+					if ($day)
+						$column[] = $year . '-' . $month . '-' . $day;
+					else
+						$column[] = '';
+				}
+				
+				$length = count($data);
+				
+			} else {
+				
+				for ($j=0; $j < $length; $j++) {
+					if (!empty($column[$j]) && !empty($data[$j])) {
+						$sql = "SELECT dutyID FROM duty WHERE date = '" . $column[$j] . "' AND dutyTypeID = $i";
+						$duty = $this->db->dbGetSingleRow($sql);
+						if (isset($duty['dutyID'])) {
+							$sql = "UPDATE duty SET ";
+							$where = " WHERE dutyID = " . $duty['dutyID'];
+						} else
+							$sql = "INSERT INTO duty SET ";
+							
+						$sql .= "cid = '".$this->category."', date = '" . $column[$j] . "', dutyTypeID = '" . $i . "', user = '" . $data[$j] . "'" . $where;
+						
+						$this->db->dbDoQuery($sql);
+					}
+				}
+							
+			}
+			
+			$i++;
+		}
+		
+		
+		fclose($handle);
+		localRedir('/subject/editDuties.php?category=' . $this->category .'&Year=' . $year . '&Month=' . $month . '&Day=' . $day);
+		exit;
+	
+	}
 }
 
 $page = new editDuties($_GET['category'], $_GET['Year'], $_GET['Month'], $_GET['Day']);
 if($_POST['Submit'] == 'Save')
 	$page->doUpdate();
+if($_FILES['file']['name'])
+	$page->parseCSV();	
+
+
 $page->doOutput($message);
 
 ?>
