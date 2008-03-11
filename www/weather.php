@@ -26,7 +26,7 @@ class WeatherFore
 		include_once("include/page.php");
 		
 		//create weather
-		$weather = new Weather("All", $code);
+		$weather = new Weather("All", WEATHER_LOCATION);
 
 		$this->t_body->set_var("TITLE", HEADING." - Weather Forecast");
 		$this->t_body->set_var("LOCATION", $weather->City);

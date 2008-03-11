@@ -122,7 +122,7 @@ function deleteNews($id, $userInfo)
 function getHeadlines()
 {
     $query = "
-	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_datetime_posted
+	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_datetime_posted, news_items.item_body
     FROM news_items 
     	JOIN newsCampus ON newsCampus.id = news_items.item_id 
 			AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).") 
@@ -137,7 +137,7 @@ function getHeadlines()
 	$shareResults = $this->dbConnection->dbGetAllRows($query);
 	
     $query = "
-	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_datetime_posted
+	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_datetime_posted, news_items.item_body
     FROM news_items 
     WHERE news_items.item_owner = '".$_SESSION['id']."' 
 		AND news_items.item_datetime_expires > NOW() 
@@ -275,5 +275,11 @@ function getOwner($id)
 		return false;
 	 
 }
+function getDailyNotice() {
+	$query = "SELECT item_body FROM news_items WHERE item_heading LIKE '%Daily Notices%' ORDER BY item_datetime_posted DESC LIMIT 1";
+	$news_item = $this->dbConnection->dbGetSingleRow($query);
+	return $news_item['item_body'];
+}
+
 }
 ?>

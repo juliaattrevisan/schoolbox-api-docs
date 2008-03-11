@@ -170,6 +170,34 @@ function formatEmail($email) {
 		return false;
 }
 
+function cutSentence($content, $chars) {
+	/* Cut off a summary at the fullstop within the character limit, alternatively just at the word */
+	$summary=substr($content, 0, $chars);
+	$position=strrpos($summary, ".")+1;
+	$positionQ = strrpos($summary, "?")+1;
+	$positionB = strrpos($summary, "!")+1;
+	if($position > 1 && $position > $positionQ && $position > $positionB) {
+		$output=substr($summary, 0, $position);
+		return $output;
+	}
+	else if($positionQ > 1 && $positionQ > $positionB) {
+		$output=substr($summary, 0, $positionQ);
+		return $output;
+	}
+	else if($positionB > 1) {
+		$output=substr($summary, 0, $positionB);
+		return $output;
+	}
+	else {
+		$position = strrpos($summary, " ");
+		$output=substr($summary, 0, $position);
+		if($output)
+			return $output."...";
+		else
+			return "";
+	}
+}
+
 function isEmail($email) {
 	return eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$",$email);
 }

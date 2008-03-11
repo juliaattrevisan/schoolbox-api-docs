@@ -108,16 +108,32 @@ define('RSS_cache_time', 3000);
 define('RSS_limit', 6);
 
 //Weather options
+
 define("WEATHER_enable", false);				//This will disable the weather module
 define("WEATHER_CACHE", "7200");  			//cache weather info for 2 hours
+
+
 define("WEATHER_CURRENT_CACHE_LOCATION", "/usr/local/www/portal/files/currentweather.xml");	//File to save weather cache in
 define("WEATHER_FORECAST_CACHE_LOCATION", "/usr/local/www/portal/files/forecastweather.xml");	//File to save weather cache in
+/*
 define("WEATHER_SERVER", "ftp.theweather.com.au");
 define("WEATHER_CURRENT_FILE", "obs_current_aws_vic.xml");
 define("WEATHER_FORECAST_FILE", "d_fcast_city_4day.xml");
 define("WEATHER_USERNAME", "");
 define("WEATHER_PASSWORD", "");
 define("WEATHER_LOCATION", "");
+*/
+
+define("WEATHER_CURRENT_LOCAL_CACHE_LOCATION", "/usr/local/www/portal/files/currentlocalweather.xml");       //File to save weather cache in
+define("WEATHER_CURRENT_AUS_CACHE_LOCATION", "/usr/local/www/portal/files/currentausweather.xml");   //File to save weather cache in
+define("WEATHER_FORECAST_CACHE_LOCATION", "/usr/local/www/portal/files/forecastweather.xml");        //File to save weather cache in
+define("WEATHER_CURRENT_AUS_FILE", "twc_obs_current_aws_vic.xml");
+define("WEATHER_CURRENT_LOCAL_FILE", "twc_obs_current_aws_melbourne_9477.xml");
+define("WEATHER_FORECAST_FILE", "twc_fcast_local_4day_capcity.xml");
+define("WEATHER_SERVER", "ftp.theweather.com.au");
+define("WEATHER_USERNAME", "mgs");
+define("WEATHER_PASSWORD", "wm2xsg");
+define("WEATHER_LOCATION", "9477");
 
 define("ALLCAMPUS", 4);					//Value that represents all campuses in the luCampus table
 define("HOMEPAGESERVICE", 1);				//Value that represents the homepage module in the service table
