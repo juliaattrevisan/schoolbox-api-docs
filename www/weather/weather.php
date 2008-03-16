@@ -154,7 +154,7 @@ class Weather
 				$download = ftp_get($conn_id, $currentAusWeather, WEATHER_CURRENT_AUS_FILE, FTP_ASCII); 
 				$download = ftp_get($conn_id, $forecastWeather, WEATHER_FORECAST_FILE, FTP_ASCII); 
 				
-				var_dump($download);
+				
 				
 				ftp_close($conn_id);
 			}
