@@ -45,7 +45,9 @@ class Summary
 	
 	function outputDailyNotices() {
 		$myNews = new news($topic);
-		$this->t_body->set_var('DAILY_BODY',  $myNews->getDailyNotice());
+		$dNotice = $myNews->getDailyNotice();
+		$this->t_body->set_var('DAILY_TITLE', scrubText($dNotice['item_heading']));
+		$this->t_body->set_var('DAILY_BODY',  $dNotice['item_body']);
 		
 	}
 	
@@ -61,7 +63,7 @@ class Summary
 		if(is_array($headlineList) )
 		{
 			$length = count($headlineList);
-			if ($length > 10) $length = 10;
+			if ($length > 8) $length = 8;
 			
 			for($i = 0; $i < $length; $i++)
 			{

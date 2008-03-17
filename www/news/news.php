@@ -276,9 +276,9 @@ function getOwner($id)
 	 
 }
 function getDailyNotice() {
-	$query = "SELECT item_body FROM news_items WHERE item_heading LIKE '%Daily Notices%' ORDER BY item_datetime_posted DESC LIMIT 1";
+	$query = "SELECT item_heading, item_body FROM news_items WHERE item_heading LIKE '%Daily Notices%' ORDER BY item_datetime_posted DESC LIMIT 1";
 	$news_item = $this->dbConnection->dbGetSingleRow($query);
-	return $news_item['item_body'];
+	return $news_item;
 }
 
 }

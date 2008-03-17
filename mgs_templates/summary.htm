@@ -35,9 +35,11 @@
 }
 #news-headlines div, #calendar-weather div {
 	height: 40%;
+	padding-bottom: 10px;
+	
 }
 div#content_text {
-	font-size: 65% !important;
+	font-size: 85% !important;
 }
 #daily-notices {
 	height: 480px;
@@ -92,7 +94,7 @@ function cycleNews () {
   
   <div id="content_text">
     <div id="daily-notices">
-      <h1>Daily Notices</h1>
+      <h1>{DAILY_TITLE}</h1>
       <marquee scrollamount="1" direction="up" loop="true">
       {DAILY_BODY} 
 	  </marquee>
