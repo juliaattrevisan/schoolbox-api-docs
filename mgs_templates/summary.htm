@@ -13,6 +13,14 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
 <link rel="stylesheet" type="text/css" media="print" href="/css/mgs-print.css" />
 <style type='text/css' rel='stylesheet'>
+#content {
+	height: 460px;
+	margin: 4px 0 0 4px !important;
+}
+#content_text {
+	height: 442px;
+}
+
 #header, #yellowStripe {
 	margin-left: auto;
 }
@@ -23,6 +31,10 @@
 	width: 31%;
 	float: left;
 	margin-right: 5px;
+	height: 410px;
+}
+#news-headlines div, #calendar-weather div {
+	height: 40%;
 }
 div#content_text {
 	font-size: 65% !important;
@@ -34,6 +46,9 @@ div#content_text {
 .news_body {
 	height: 460px;
 	overflow: hidden;
+}
+marquee {
+	height: 80%;
 }
 </style>
 <!-- ULTIMATE DROP DOWN MENU Version 4.5 by Brothercake -->
@@ -61,8 +76,6 @@ function cycleNews () {
 </script>
 </head>
 <body>
-<!-- THESE ARE MEANT TO GO HERE -->
-<div id="outerWrap">
 <!-- BEGIN msubject -->
 <!-- BEGIN msubject_block -->
 <!-- END msubject_block -->
@@ -76,23 +89,24 @@ function cycleNews () {
 <!-- BEGIN webmail_tab -->
 <!-- END webmail_tab -->
 <div id="content">
+  
   <div id="content_text">
     <div id="daily-notices">
       <h1>Daily Notices</h1>
       <marquee scrollamount="1" direction="up" loop="true">
       {DAILY_BODY} 
 	  </marquee>
-</div>
+	</div>
 
     <div id="news-headlines">
       <h1>News Headlines</h1>
-      
+      <div>
    	   <!-- BEGIN main_stories -->
         <ul style='margin: 10px 0;'>
          <li style='margin: 0;'>{NEWS_TITLE}</li>
         </ul>
         <!-- END main_stories -->
-        
+        </div>
         <h2 style='margin-left: 0;'>{RSS_NAME}</h2>
    	   <!-- BEGIN rss_stories -->
         <div class="news-item hide">
@@ -136,12 +150,7 @@ function cycleNews () {
         </tr>
       </table>
     </div>
-    <div id="footer">
-      <p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
-      <p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
-      <p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
-    </div>
+
   </div>
-</div>
 </body>
 </html>

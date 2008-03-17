@@ -6,11 +6,24 @@
 ************************************************************/
 //timetable object that displays the users timetable
 
-require_once("include/session.php");
+set_time_limit(5);
+
+//require_once("include/session.php");
+session_start();
+
+if (is_numeric($_GET['id']))
+	$_SESSION['id'] = $_GET['id'];
+else
+	$_SESSION['id'] = 4579;
+	
+$_SESSION['campus'][] = 1;
+$_SESSION['gid'] = 3;
+
 require_once("include/include.php");
 require_once("weather/weather.php");
 require_once("news/news.php");
 require_once("calendar/calendar.php");
+
 
 
 class Summary
@@ -47,10 +60,15 @@ class Summary
 		
 		if(is_array($headlineList) )
 		{
-			foreach($headlineList as $item)
+			$length = count($headlineList);
+			if ($length > 10) $length = 10;
+			
+			for($i = 0; $i < $length; $i++)
 			{
-				$this->t_body->set_var("NEWS_TITLE", $item['item_heading']);
-				$this->t_body->set_var("NEWS_BRIEF", $item['item_body']); 
+				if (stristr($headlineList[$i]['item_heading'], 'Daily Notices')) { $length++; continue; }
+				
+				$this->t_body->set_var("NEWS_TITLE", $headlineList[$i]['item_heading']);
+				$this->t_body->set_var("NEWS_BRIEF", $headlineList[$i]['item_body']); 
 				$this->t_body->parse("stories_block", "main_stories", true);
 	    	}
 		}
