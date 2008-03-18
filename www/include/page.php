@@ -112,6 +112,29 @@ else
 	$this->t_body->set_var("msubject_section", "");
 
 
+//my students section
+$this->t_body->set_block("tplBODY", "mstudent", "mstudent_section");
+$this->t_body->set_block("mstudent", "mstudent_block", "my_students");
+
+if(is_array($_SESSION['children']))
+{
+	foreach($_SESSION['children'] as $child)
+	{
+		$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
+		$user = $db->dbGetSingleRow($query);
+		$this->t_body->set_var("MSTUDENT_ID", $child['id']);
+		$this->t_body->set_var("MSTUDENT_NAME", formatName($user,'{firstname}'));
+		$this->t_body->set_var("MSTUDENT_YEAR", $user['year']);
+
+		$this->t_body->parse("my_students", "mstudent_block", true);
+	
+	}
+	$this->t_body->parse("mstudent_section", "mstudent");
+}
+else
+	$this->t_body->set_var("mstudent_section", "");
+
+
 //this section hanldes the display of the timetable tab
 $this->t_body->set_block('tplBODY', 'timetable_tab', 'tt_tab');
 //if the have a timetable or their children have a timetable
@@ -140,16 +163,14 @@ if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && is
 		$this->t_body->set_var('WEBMAIL_LOCATION', 'href="/mail.php"');
 	}
 	else if(SITE_location == 'wenona') {
-		$this->t_body->set_block('tplBODY', 'portfolio_tab', 'pf_tab');
 		if(isStaff($_SESSION['gid'])) {
 			$this->t_body->set_var('WEBMAIL_LOCATION', 'href="http://webmail.wenona.nsw.edu.au/gw/webacc" target="_blank"');
 			$this->t_body->set_var('WEBMAIL_TITLE', '<em>W</em>ebmail');
-			$this->t_body->parse('pf_tab', 'portfolio_tab');
 		}
 		else {
 			$this->t_body->set_var('WEBMAIL_LOCATION', 'href="/mail.php"');
 			$this->t_body->set_var('WEBMAIL_TITLE', 'Messages');
-			$this->t_body->set_var('pf_tab', '');
+
 		}
 	}
 }
@@ -157,12 +178,26 @@ else
 {
 	$this->t_body->set_var('wm_tab', '');
 }
-	
+
 //custom code for each site is performed here	
 if(SITE_location == 'wenona')
 {
 	//provide encoded login details for intranet
 	$this->t_body->set_var("ENC_LOGIN", base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'].' '.$_SESSION['password'].' '.date('Y m d H i'))));
+
+	$this->t_body->set_block('tplBODY', 'portfolio_tab', 'pf_tab');
+	$this->t_body->set_block('tplBODY', 'myfiles_tab', 'mf_tab');
+	if(isStaff($_SESSION['gid'])) {
+		$this->t_body->parse('pf_tab', 'portfolio_tab');
+		$this->t_body->parse('mf_tab', 'myfiles_tab');
+	}
+	else if(isStudent($_SESSION['gid'])) {
+		$this->t_body->parse('mf_tab', 'myfiles_tab');
+	}
+	else {
+		$this->t_body->set_var('pf_tab', '');
+		$this->t_body->set_var('mf_tab', '');
+	}
 }
 
 

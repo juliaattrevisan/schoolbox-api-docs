@@ -50,7 +50,15 @@
 			<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li> 
 			<!-- END msubject_block --> 
 		</ul> 
-		<!-- END msubject --> 
+		<!-- END msubject -->
+        <!-- BEGIN mstudent --> 
+		<h3>&#187;&nbsp;My Daughters</h3> 
+		<ul> 
+			<!-- BEGIN mstudent_block --> 
+			<li><a href="/search/userLookup.php?id={MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
+			<!-- END mstudent_block --> 
+		</ul> 
+		<!-- END mstudent --> 
 		<!-- BEGIN mgroup --> 
 		<h3>&#187;&nbsp;My Groups</h3> 
 		<ul> 
@@ -67,7 +75,7 @@
 			<li><a href="/editLinks.php">ADD LINK</a></li> 
 		</ul> 
 		<div id="footer"> 
-			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.wenona.nsw.edu.au" title="Wenona">Wenona</a></strong></p> 
+			<p><strong>2008&nbsp;&copy;&nbsp;Copyright <a href="http://www.wenona.nsw.edu.au" title="Wenona">Wenona</a></strong></p> 
 			<p class="small"><a href="policy/wenona.htm">Guidelines of Use and Privacy Policy</a></p> 
 			<p class="small"><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p> 
 		</div> 

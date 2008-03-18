@@ -83,9 +83,11 @@ class outUser
 					list($date, $month, $year) = explode(' ', $synInfo['StudentBirthDate']);
 					$birthdate = strtotime($date.' '.$month.' '.$year);
 					
-					$output = array(	'TUTOR' 				=> scrubTEXT($synInfo['StudentTutor']),
+					$output = array(	'TUTOR_GROUP' 			=> scrubTEXT($synInfo['StudentTutorDescription']),
+										'TUTOR'					=> scrubTEXT($synInfo['StudentTutorName']),
 										'YEAR_LEVEL'			=> scrubTEXT($synInfo['StudentYearLevel']),
-										'HOUSE'					=> scrubTEXT($synInfo['StudentHouse']),
+										'HOUSE'					=> scrubTEXT($synInfo['StudentHouseDescription']),
+										'HOH'					=> scrubTEXT($synInfo['StudentHeadOfHouse']),
 										'FORM'					=> scrubTEXT($synInfo['StudentForm']),
 										'LOCKER'				=> scrubTEXT($synInfo['StudentLockerBook']),
 										'BIRTHDATE'				=> date('jS \o\f F, Y', $birthdate),
@@ -94,7 +96,7 @@ class outUser
 										'EMERGENCY_ALT_PHONE'	=>scrubTEXT($synInfo['StudentEmergencyPhoneAlt']),
 										'CONTACT_NAME'			=> scrubTEXT($synInfo['StudentContactTitle'].' '.
 																$synInfo['StudentContactPreferred'].' '.$synInfo['StudentContactSurname']),
-										'CONTACT_ADDRESS'		=> scrubTEXT($synInfo['StudentContactAddress1'].'<br>'.$synInfo['StudentContactSuburb'].', '.
+										'CONTACT_ADDRESS'		=> scrubTEXT($synInfo['StudentContactAddress1']).'<br>'.scrubTEXT($synInfo['StudentContactSuburb'].', '.
 																$synInfo['StudentContactState'].' '.$synInfo['StudentContactPostCode']),
 										'CONTACT_HOME_PHONE' 	=> scrubTEXT($synInfo['StudentContactPhoneActual']),
 										'CONTACT_MOBILE_PHONE' 	=> scrubTEXT($synInfo['StudentContactMobilePhone']),
