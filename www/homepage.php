@@ -865,10 +865,16 @@ class OutPut
 		if($this->db->dbCountRows() < 1){ $this->t_body->set_var("folders_block", "");}
 		else
 		{
+			$flag = 0;
 			while($queryArray = $this->db->dbGetNextArray() )
 			{
-				$this->outputFolder($queryArray);
+				if(perm($queryArray['id'], 1) > 0)
+				{
+					$this->outputFolder($queryArray);
+					$flag = 1;
+				}
 			}
+			if(!$flag) { $this->t_body->set_var("folders_block", "");}
 		}
 
 		//setup block for submission button
