@@ -503,18 +503,20 @@ if(isset($_POST['priority']) && $_POST['priority'] && isset($_POST['note']) && $
 		list($date,$month,$year) = explode('/',$_POST['date'],3); 
 		if( !checkdate($month, $date, $year) )		
 			error(9);
+			
+		$dateArray = array('month'=>$month, 'date'=>$date, 'year'=>$year);
 
 		if($_POST['delete']){
 			$cal->deleteSingleEvent($_POST['id'], $_POST['level'], $sid);
 		}
 		else if($_POST['id']){
 			//modify event
-			$cal->modSingleEvent($_POST['id'], mktime(0,0,0, $month, $date, $year),
+			$cal->modSingleEvent($_POST['id'], $dateArray,
                         $startTime, $endTime, $_POST['priority'], $_POST['note'],
                                 $_POST['level'], $sid, $_POST['userGroup']);	
 		}else{
 		//insert event 
-			$cal->addSingleEvent(mktime(0,0,0, $month, $date, $year), 
+			$cal->addSingleEvent($dateArray, 
 			$startTime, $endTime, $_POST['priority'], $_POST['note'], 
 				$_POST['level'], $sid, $_POST['userGroup']); 
 		}

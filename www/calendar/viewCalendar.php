@@ -263,7 +263,6 @@ class displayCalendar
 				}
 	
 				$eventList = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear, $campus);
-				
 				if(!is_array($eventList))
 				{
 					if(!$subout) $this->t_body->set_var("note_listing", "");
@@ -326,7 +325,7 @@ class displayCalendar
 				}
 	
 				$eventList = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear, $campus);
-				
+
 				if(!is_array($eventList))
 				{
 					if(!$subout) $this->t_body->set_var("note_listing", "");

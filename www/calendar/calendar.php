@@ -182,13 +182,13 @@ function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 
 	if($level == 2)
 	{
 		$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access, sid) 
-			VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), $startTime, $endTime, '$priority', 
+			VALUES ('".$_SESSION['id']."', '{$date['year']}-{$date['month']}-{$date['date']}', $startTime, $endTime, '$priority', 
 			'$note', '$level',$sid)";
 	}
 	else
 	{
 		$query = "INSERT INTO event (owner, date, startTime, endTime, priority, note, access) 
-			VALUES ('".$_SESSION['id']."', FROM_UNIXTIME('$date'), $startTime, $endTime, '$priority', 
+			VALUES ('".$_SESSION['id']."', '{$date['year']}-{$date['month']}-{$date['date']}', $startTime, $endTime, '$priority', 
 			'$note', '$level')";
 	}
 	if(is_array($sid))
@@ -218,7 +218,7 @@ function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 
 
 function modSingleEvent($id, $date, $startTime,  $endTime, $priority, $note, $level = 1, $sid = 0, $userGroup = 0)
 {
-	$query = "UPDATE event SET date=FROM_UNIXTIME('$date'), startTime=$startTime, 
+	$query = "UPDATE event SET date='{$date['year']}-{$date['month']}-{$date['date']}', startTime=$startTime, 
 		endTime=$endTime, priority='$priority', note='$note', access='$level', sid='$sid' 
 		WHERE id='$id'";
 	
@@ -450,19 +450,29 @@ function getDayEvents($day, $month, $year, $campus = 0, $group = 0)
 	else
 		$campuslist = implode(',',$_SESSION['campus']);
 		
+	if($_SESSION['id'])
+		$owner = $_SESSION['id'];
+	else
+		$owner = 0;
+	
 	//give people with userAccess to moderate Calendar Access to view all Camups Posts
 	//
-	if($this->checkSecurity(3, $_SESSION['campus'][0]) > 2 || $_SESSION['su'])
-		$groupChunk = "";
-	else
-		$groupChunk = "AND eventGroup.groupID = '$groupID'";
+	if(is_array($_SESSION['campus'])) {
+		if($this->checkSecurity(3, $_SESSION['campus'][0]) > 2 || $_SESSION['su'])
+			$groupChunk = "";
+		else
+			$groupChunk = "AND eventGroup.groupID = '$groupID'";
+	}
 		
 	//get single events for the day
-	$querysingle = "SELECT DISTINCT id, owner,TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note, access, eventCampus.campusID as sid
+	$querysingle = "SELECT DISTINCT id, owner,TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, 
+	TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime,
+	TIME_TO_SEC(endTime) as endTimestamp, TIME_TO_SEC(endTime)-TIME_TO_SEC(startTime) as duration, 
+	priority, note, access, eventCampus.campusID as sid
 	FROM event 
 	LEFT JOIN eventCampus ON event.id = eventCampus.eventID
 	LEFT JOIN eventGroup ON event.id = eventGroup.eventID
-	WHERE date = FROM_UNIXTIME('$datestamp')
+	WHERE date = '$year-$month-$day'
 	AND ( (access = '4') OR (access = '1' AND owner= '".$_SESSION['id']."') 
 		OR (access = '3' AND eventCampus.campusID IN($campuslist) $groupChunk ))
 	ORDER BY event.startTime, event.endTime";
@@ -497,9 +507,12 @@ function getGroupDayEvents($sid, $day, $month, $year)
 	$dayocc = ceil($date/7);  
 
 	//get single events for the day
-	$querysingle = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note, access, userAccesss.sid 
+	$querysingle = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, 
+	TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime,
+	TIME_TO_SEC(endTime) as endTimestamp, TIME_TO_SEC(endTime)-TIME_TO_SEC(startTime) as duration, 
+	priority, note, access, userAccesss.sid 
 	FROM event, userAccess WHERE 
-	date = FROM_UNIXTIME('$datestamp') AND access = '2' AND uid = ".$_SESSION['id']." 
+	date = FROM_UNIXTIME('$datestamp') AND access = '2' AND uid = '".$_SESSION['id']."' 
 	AND service = '1' AND sid = '$sid' AND userAccess.sid = event.sid
 	ORDER BY event.startTime, event.endTime";
 
@@ -507,7 +520,7 @@ function getGroupDayEvents($sid, $day, $month, $year)
 	$queryweekly = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note, access, userAccess.sid 
 	FROM eventWeekly, userAccess WHERE day = '$dayno' 
 	AND startDuration < FROM_UNIXTIME('$datestamp') AND endDuration > FROM_UNIXTIME('$datestamp')
-	AND uid = ".$_SESSION['id']." AND access = '2' AND service = '1' AND sid = '$sid' AND userAccess.sid = event.sid
+	AND uid = '".$_SESSION['id']."' AND access = '2' AND service = '1' AND sid = '$sid' AND userAccess.sid = event.sid
 	ORDER BY eventWeekly.startTime, eventWeekly.endTime";
 
 	//get monthly events that occur today
@@ -515,7 +528,7 @@ function getGroupDayEvents($sid, $day, $month, $year)
 	FROM eventMonthly, userAccess WHERE
 	((day = '$dayno' AND dayocc='$dayocc') OR (date='$day'))  
 	AND startDuration < FROM_UNIXTIME('$datestamp') AND endDuration > FROM_UNIXTIME('$datestamp')
-	AND uid = ".$_SESSION['id']." AND access = '2' AND service = '1' AND sid = '$sid' AND userAccess.sid = event.sid
+	AND uid = '".$_SESSION['id']."' AND access = '2' AND service = '1' AND sid = '$sid' AND userAccess.sid = event.sid
 	ORDER BY eventMonthly.startTime, eventMonthly.endTime";
 
 
@@ -533,9 +546,12 @@ function getAllGroupDayEvents($day, $month, $year)
 	$dayocc = ceil($date/7);  
 
 	//get single events for the day
-	$querysingle = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note, access, userAccess.sid
+	$querysingle = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, 
+	TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime,
+	TIME_TO_SEC(endTime) as endTimestamp, TIME_TO_SEC(endTime)-TIME_TO_SEC(startTime) as duration,
+	priority, note, access, userAccess.sid
 	FROM event, userAccess WHERE 
-	date = FROM_UNIXTIME('$datestamp') AND uid = ".$_SESSION['id']." AND access = '2' 
+	date = FROM_UNIXTIME('$datestamp') AND uid = '".$_SESSION['id']."' AND access = '2' 
 	AND service = '1' AND userAccess.sid = event.sid
 	ORDER BY event.startTime, event.endTime";
 
@@ -543,7 +559,7 @@ function getAllGroupDayEvents($day, $month, $year)
 	$queryweekly = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime, priority, note, access, userAccess.sid 
 	FROM eventWeekly, userAccess WHERE day = '$dayno' 
 	AND startDuration < FROM_UNIXTIME('$datestamp') AND endDuration > FROM_UNIXTIME('$datestamp')
-	AND uid = ".$_SESSION['id']." AND access = '2' AND service = '1' AND userAccess.sid = eventWeekly.sid
+	AND uid = '".$_SESSION['id']."' AND access = '2' AND service = '1' AND userAccess.sid = eventWeekly.sid
 	ORDER BY eventWeekly.startTime, eventWeekly.endTime";
 
 	//get monthly events that occur today
@@ -551,7 +567,7 @@ function getAllGroupDayEvents($day, $month, $year)
 	FROM eventMonthly, userAccess WHERE
 	((day = '$dayno' AND dayocc='$dayocc') OR (date='$day'))  
 	AND startDuration < FROM_UNIXTIME('$datestamp') AND endDuration > FROM_UNIXTIME('$datestamp')
-	AND uid = ".$_SESSION['id']." AND access = '2' AND service = '1' AND userAccess.sid = eventMonthly.sid
+	AND uid = '".$_SESSION['id']."' AND access = '2' AND service = '1' AND userAccess.sid = eventMonthly.sid
 	ORDER BY eventMonthly.startTime, eventMonthly.endTime";
 
 
