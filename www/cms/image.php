@@ -66,14 +66,14 @@ function image_resize($src, $maxWidth,$maxHeight,$resample=1, $quality=75)
 		//test image size (cannot handle large 30mb+ uncompressed images)
 		if(($srcSize[0] * $srcSize[1]) > MAX_IMAGE_SIZE) 
 		{
-			outputImageFile($_SERVER['DOCUMENT_ROOT']."/images/cross.gif");
+			outputImageFile($_SERVER['DOCUMENT_ROOT']."/images/cross.gif", 1);
 			exit;
 		}
 
 		// dont enlarge images beyond existing size (doesnt look good)
 		if($srcSize[0] < $maxHeight && $srcSize[1] < $maxWidth)
 		{
-			outputImageFile($src);
+			outputImageFile($src, $srcSize[2]);
 			exit;
 			//$destSize[1] = $srcSize[1];
 			//$destSize[0] = $srcSize[0];
@@ -103,7 +103,28 @@ function image_resize($src, $maxWidth,$maxHeight,$resample=1, $quality=75)
 		switch ($srcSize[2]) 
 		{ 
 			case 1: //GIF 
-				$srcImage = imageCreateFromGif($src); 
+				if(is_animated($src)) { //leave animateds alone we cant handle them so dont mess them up  {
+					outputImageFile($src, $srcSize[2]);
+					exit;	
+				}
+				else {
+					//resize gifs and handle that transparent background
+					$srcImage = imageCreateFromGif($src);
+					$originaltransparentcolor = imagecolortransparent( $srcImage );
+					
+					if( $originaltransparentcolor >= 0 && $originaltransparentcolor < imagecolorstotal( $srcImage ) ) {
+						$transparentcolor = imagecolorsforindex( $srcImage, $originaltransparentcolor );
+						$newtransparentcolor = imagecolorallocate( 	$destImage,
+																	$transparentcolor['red'],
+																	$transparentcolor['green'],
+																	$transparentcolor['blue']
+						);
+						// for true color image, we must fill the background manually
+						imagefill( $destImage, 0, 0, $newtransparentcolor );
+						imagecolortransparent( $destImage, $newtransparentcolor );
+					}
+				}
+				
 			break;
 
 			case 2: //JPEG 
@@ -126,8 +147,8 @@ function image_resize($src, $maxWidth,$maxHeight,$resample=1, $quality=75)
 			imageCopyResized($destImage, $srcImage, 0, 0, 0, 0,$destSize[0]+1,$destSize[1]+1,$srcSize[0],$srcSize[1]); 
 
 
-		cacheImage($destImage, $filename, $quality);
-		outputImage($destImage, $quality); 
+		cacheImage($destImage, $filename, $srcSize[2], $quality);
+		outputImage($destImage, $srcSize[2], $quality); 
 	} 
 	else 
 	{ 
@@ -135,22 +156,72 @@ function image_resize($src, $maxWidth,$maxHeight,$resample=1, $quality=75)
 	} 
 }
 
-function cacheImage($image, $filename, $quality)
+function cacheImage($image, $filename, $type=2, $quality=75)
 {
-	@imageJpeg($image, $filename, $quality); 
+	if($type == 1) 
+		@imagegif($image, $filename);
+	else if($type == 3)
+		@imagepng($image, $filename);
+	else
+		@imagejpeg($image, $filename, $quality); 
 }
 
 
-function outputImage($image, $quality)
+function outputImage($image, $type=2, $quality=75)
 {
-	header("Content-Type: image/jpg");
-	imageJpeg($image, '',$quality); 
+	if($type == 1) {
+		header("Content-Type: image/gif");
+		imagegif($image);
+	}
+	else if($type == 3) {
+		header("Content-Type: image/png");
+		imagepng($image);
+	}
+	else {
+		header("Content-Type: image/jpg");
+		imagejpeg($image, '',$quality); 
+	}
 }
 
 function outputImageFile($filename)
 {
 	header("Content-Type: image/jpg");
 	readfile($filename);
-}	
+}
+
+function is_animated($filename) {
+	//function works out if file is animated gif
+	
+	$filecontents=file_get_contents($filename);
+	$str_loc=0;
+	$count=0;
+	
+	while ($count < 2) { # There is no point in continuing after we find a 2nd frame
+		$where1=strpos($filecontents,"\x00\x21\xF9\x04",$str_loc);
+		if ($where1 === FALSE) {
+			break;
+		}
+		else {
+			$str_loc=$where1+1;
+			$where2=strpos($filecontents,"\x00\x2C",$str_loc);
+			if ($where2 === FALSE) {
+				break;
+			}
+			else {
+				if ($where1+8 == $where2) {
+						$count++;
+				}
+				$str_loc=$where2+1;
+			}
+		}
+	}
+	
+	if ($count > 1)
+			return true;
+	else
+			return false;
+}
+
+
 
 ?>
