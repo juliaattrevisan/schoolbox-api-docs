@@ -10,10 +10,9 @@ $t_body = new Template(TPL_directory);
 
 class OutPut {
 
-	function OutPut($category, $verbose) {
+	function OutPut($category) {
 	
 		$this->category = $category;
-		$this->verbose = $verbose;
 		
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file('tplBODY', 'sitemap.htm');
@@ -29,7 +28,7 @@ class OutPut {
 
 	}
 
-	function showPage($catID) {
+	function showPage() {
 		
 		$this->t_body->set_var('NAV_CONTENT', '');
 		$this->t_body->set_var('WINDOW_CONTENT', '');	
@@ -40,9 +39,11 @@ class OutPut {
 		$this->t_body->set_block('blockBODY', 'category', 'category_block');
 		$this->t_body->set_block('blockBODY', 'category_window', 'category_window_block');
 
-		$catTree = array ($catID);
-		$parent = $catID;
+		$catTree = array ($this->category);
+		$parent = $this->category;
 		while ($parent > 0) {
+			$this->perm = perm($parent, 1);
+
 			$query = "SELECT parent FROM category WHERE id = $parent";
 			$category = $this->db->dbGetSingleRow($query);
 			$parent = $category['parent'];
@@ -51,11 +52,12 @@ class OutPut {
 		
 		$this->outputCategories($catTree, 'nav');
 		$this->t_body->set_var('NAV_CONTENT', $this->t_body->varvals['category_block']);
-		if ($catID > 0) {
-			$this->outputCategories($catID, 'window');
+		if ($this->category > 0) {
+			$this->perm = perm($this->category, 1);
+			$this->outputCategories($this->category, 'window');
 		}
-		$this->outputFiles($catID);		
-		$this->t_body->set_var('WINDOW_CONTENT', '<div id="window_'.$catID.'">' . $this->t_body->varvals['category_window_block'] . $this->t_body->varvals['file_block'] . '</div>');		
+		$this->outputFiles($this->category);		
+		$this->t_body->set_var('WINDOW_CONTENT', '<div id="window_'.$this->category.'">' . $this->t_body->varvals['category_window_block'] . $this->t_body->varvals['file_block'] . '</div>');		
 
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
@@ -74,6 +76,7 @@ class OutPut {
 						id, 
 						name,
 						code,
+						template,
 					  (SELECT count(*) FROM category WHERE parent = c.id) + (SELECT count(*) FROM file WHERE category = c.id) as children,
 					  p.type as perm
 					  FROM category c
@@ -94,8 +97,9 @@ class OutPut {
 									 'CAT_OPENCLOSE' => $category['children']>0?"<img src=\"/images/icons/sitemap-" . 
 									 					( $category['id'] == $previousCat? "collapse" : "expand") . ".gif\" alt=\"Expand\" />":"",
 									 'SUB_CATEGORY'  => ($i > 0 && $category['id'] == $previousCat)? '<div id="category_'.$category['id'].'">' . $previousCatHTML .'</div>' : '',
-									 'CAT_MARGIN'    => $i+1<count($catTree)? "style='margin-left: 30px;'" : "",
-									 'CAT_SELECTED'  => $category['id']==$_REQUEST['category'] ? "id='sitemap-selected'" : "",
+									 'CAT_MARGIN'    => ($i+1<count($catTree)? "style='margin-left: 30px;'" : "") ,
+									 'CAT_SELECTED'  => $category['id']==$_SESSION['smCategory'] ? "id='sitemap-selected'" : "",
+									 'HOMEPAGE'		 => $category['template']>0?"Y":"N",
 									);
 									
 					$this->t_body->set_var($output);
@@ -114,12 +118,12 @@ class OutPut {
 	
 	function outputFiles($parent) {
 		
-		$query = "SELECT file.id, realname, '' as url, file_size, file.description, iconFile, allowedFileTypes.description as mime_description, inline, hidden
+		$query = "SELECT file.id, realname, '' as url, file_size, file.description, iconFile, allowedFileTypes.description as mime_description, inline, hidden, 'N' is_url
 				  FROM file 
 				  LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
 				  WHERE file.category = $parent AND deleted = '0'
 				  
-				  UNION SELECT link.id, '', link.url, '', link.description, 'http-url.png', link.comment, '', hidden
+				  UNION SELECT link.id, '', link.url, '', link.description, 'http-url.png', link.comment, '', hidden, 'Y' is_url
 				  FROM link
 				  WHERE link.category = $parent
 				  
@@ -136,7 +140,10 @@ class OutPut {
 								 'FILE_ICON' => !is_null($file['iconFile']) ? "/images/mime/".$file['iconFile'] : "/images/mime/application-x-none.png",
 								 'FILE_ALT'  => !is_null($file['mime_description']) ? $file['mime_description'] : "File",
 								 'CAT_ID'	 => $parent,
+								 'FILE_INLINE' => $file['inline']=='true'?"Y":"N",
+								 'URL_YN'	 => $file['is_url'],
 								 'HIDDEN'	 => $file['hidden'] > 0 ? "style='opacity: 0.55;'" : "",
+								 'FILE_LINK' => urlencode($file['url']),
 	
 								);
 
@@ -241,6 +248,8 @@ class OutPut {
 	}
 }
 
+if (!isset($_GET['category']))
+	$_GET['category'] = $_SESSION['smCategory'];
 
 $myPage = new OutPut((int)$_GET['category'], (int)$_GET['verbose']);
 
@@ -253,8 +262,11 @@ if (isset($_GET['catList'])) {
 	$parent = (int)$_GET['fileList'];
 	$myPage->outputWindow($parent);
 	exit;
+} else if (is_numeric($_GET['saveHistory'])) {
+	$_SESSION['smCategory'] = $_GET['saveHistory'];
+	exit;
 }
 
-$myPage->showPage((int)$_REQUEST['category']);
+$myPage->showPage();
 
 ?>

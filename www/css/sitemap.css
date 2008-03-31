@@ -4,19 +4,23 @@
 html, body, #outerWrap, #content, #content_text {
 	height: 100%;
 }
+#content_text p {
+	margin: 0;
+	padding: 0;
+}
 
 #sitemap {
 	height: 80%;
-	padding: 0;
 	margin: 0;
+	padding: 0;
 	
 }
 
 #sitemap-nav {
-	width: 35%;
+	width: 38%;
 	height: 100%;
 	float: left;
-	padding: 10px !important;
+	padding: 20px 10px !important;
 	margin: 0;
 	padding: 0;
 	overflow: auto;
@@ -24,11 +28,11 @@ html, body, #outerWrap, #content, #content_text {
 }
 
 #sitemap-window {
-	width: 60%;
+	width: 56%;
 	height: 100%;
 	float: left;
 	margin: 0;
-	padding: 10px !important;
+	padding: 20px 10px !important;
 	border-left: 1px solid #cccccc;
 	overflow: auto;
 }
@@ -46,18 +50,14 @@ html, body, #outerWrap, #content, #content_text {
 
 .sitemap-category p {
 	margin: 0;
+	padding: 0;
 	font: bold 12px Arial, Helvetica, sans-serif;
 	float: left;
-	height: 30px;
-	line-height: 30px;
-	vertical-align: middle;
 	border: 1px solid #ffffff;
-	
 }
 
 .sitemap-openclose {
-	width: 30px;
-	height: 30px;
+	width: 25px;
 	margin: 0;
 	padding: 0;
 	float: left;
@@ -70,13 +70,15 @@ html, body, #outerWrap, #content, #content_text {
 }
 
 .sitemap-caticon, .sitemap-icon {
+	width: 35px;
 	cursor: pointer;
-	width: 40px;
-	height: 30px;
 	float: left;
+	position: relative;
+	top: -12px;
+
 }
 
-.sitemap-catid, .sitemap-fileid {
+.sitemap-catid, .sitemap-fileid, .sitemap-inline {
 	display: none;
 }
 .sitemap-file {
@@ -91,8 +93,6 @@ html, body, #outerWrap, #content, #content_text {
 	margin: 0;
 	padding: 0;
 	font: 12px Arial, Helvetica, sans-serif;
-	height: 30px;
-	line-height: 30px;
 	border: 1px solid #ffffff;
 	vertical-align: middle;
 	float: left;
@@ -107,48 +107,3 @@ html, body, #outerWrap, #content, #content_text {
 	color: #000000;
 }
 
-.sitemap-cm {
-	display: none;
-    position: absolute;
-	border: 1px solid #000000;
-	border-top-color: #CCCCCC;
-	border-left-color: #CCCCCC;
-	background-color: #eeeeee;
-	font: 12px Arial, Helvetica, sans-serif;
-	color: #000000;
-	width: 120px;
-	padding: 1px;
-	margin: 0;
-	z-index: 10;
-
-}
-
-.sitemap-cm ul {
-	padding: 0 !important;
-	margin: 0 !important;
-	list-style-type: none !important;
-}
-
-.sitemap-cm ul li {
-	list-style-type: none !important;
-	padding: 0 !important;
-	background: #eeeeee !important;
-	margin: 0 !important;
-}
-
-.sitemap-cm li a {
-	color: #000000;
-	display: block;
-	width: 116px;
-	padding: 1px 2px;
-	margin: 0;
-}
-
-.sitemap-cm li a:hover {
-	text-decoration: none;
-	color: #ffffff;
-	background: #000000;
-}
-.sitemap-break {
-	border-bottom: 1px solid #cccccc;
-}

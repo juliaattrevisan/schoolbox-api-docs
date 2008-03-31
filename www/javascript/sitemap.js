@@ -19,7 +19,7 @@ var myrules = {
 		}
 	},
 	'.sitemap-catname' : function (el) {
-		el.onmouseup = function() {
+		el.onclick = function() {
 			if (el.parentNode.className != 'sitemap-category') {
 				// normal
 				var catDiv = el.parentNode.parentNode;
@@ -62,6 +62,7 @@ var myrules = {
 		el.onmousedown = function () {
 			Sitemap.setSelected(el);	
 		}
+
 	},
 	'.sitemap-caticon' : function (el) {
 		
@@ -113,8 +114,10 @@ var Sitemap = {
 		//makeMoveable();
 		Sitemap.addContextMenu();
 	},
-
 	getFiles: function(catID) {
+		
+		document.body.style.cursor = 'wait';
+		
 		var url = '/sitemap.php?fileList=' + catID;
 	
 		var myAjax = new Ajax(url, {
@@ -136,11 +139,20 @@ var Sitemap = {
 		parent.appendChild(div);
 	
 		Behaviour.apply();
-		//makeMoveable();
-		Sitemap.addContextMenu();
-	},
+		RightContext.initialize();
+		document.body.style.cursor = '';
+		
 
+	},
+	saveHistory: function (catID) {
+		var url = '/sitemap.php?saveHistory=' + catID;
+		var myAjax = new Ajax(url, {method: 'get'}).request();	
+		
+	},
 	getDir: function (catDiv, catID) {
+		
+		document.body.style.cursor = 'wait';
+		
 		var url = '/sitemap.php?catList=' + catID;
 	
 		var myAjax = new Ajax(url, {
@@ -151,7 +163,7 @@ var Sitemap = {
 								}).request();
 		},
 	
-		listDir: function (catDiv, data, catID) {
+	listDir: function (catDiv, data, catID) {
 		
 		var div = document.createElement('div');
 		div.innerHTML = data;
@@ -162,8 +174,9 @@ var Sitemap = {
 		catDiv.appendChild(div);
 	
 		Behaviour.apply();
-		//makeMoveable();
-		Sitemap.addContextMenu();
+		RightContext.initialize();
+		document.body.style.cursor = '';
+
 	},
 
 	openCat: function (insertDiv, catID) {
@@ -173,15 +186,17 @@ var Sitemap = {
 			Sitemap.getDir(insertDiv, catID);
 		} else {
 			catContents.setStyle('display', 'block');	
-		}	
+		}
 		
-		},
+		
+	},
 	
 		closeCat: function (catID) {
 		var catContents = $('category_'+catID);
 		if (catContents) {
 			catContents.setStyle('display', 'none');
 		} 	
+		
 	},
 
 	openWindow: function (catID) {
@@ -202,7 +217,8 @@ var Sitemap = {
 			Sitemap.getFiles(catID);
 		} else {
 			winContents.setStyle('display', 'block');	
-		}		
+		}	
+		Sitemap.saveHistory(catID);
 	},
 
 	closeWindow: function (catID) {
@@ -242,22 +258,23 @@ var Sitemap = {
 			var fileID 		= (fileDiv.getElementsByClassName("sitemap-fileid"))[0].innerHTML;
 			var catID 		= (fileDiv.getElementsByClassName("sitemap-catid"))[0].innerHTML;
 			var fileName 	= (fileDiv.getElementsByClassName("sitemap-filename"))[0];
+			var inline 		= (fileDiv.getElementsByClassName("sitemap-inline"))[0].innerHTML;
 		} else {
 			
 			var fileIcon 	= fileDiv.childNodes[0].firstChild;
 			var fileID 		= fileDiv.childNodes[3].innerHTML;
 			var catID 		= fileDiv.childNodes[4].innerHTML;
 			var fileName 	= fileDiv.childNodes[1];
+			var inline 		= fileDiv.childNodes[5].innerHTML;
 		}
-		
 		
 		return {'fileIcon': fileIcon, 'fileID': fileID, 'catID': catID, 'fileName': fileName};
 	},
 	
 	addContextMenu: function () {
-		SimpleContextMenu.setup({'preventDefault':false, 'preventForms':false});
-        SimpleContextMenu.attach('sitemap-file', 'sitemap-cm');
-		SimpleContextMenu.attach('sitemap-category', 'sitemap-cm2');
+		//SimpleContextMenu.setup({'preventDefault':false, 'preventForms':false});
+        //SimpleContextMenu.attach('sitemap-file', 'sitemap-cm');
+		//SimpleContextMenu.attach('sitemap-category', 'sitemap-cm2');
 
 	},
 	newFile: function (e) {
@@ -294,7 +311,10 @@ var Sitemap = {
 	},
 	modifyFile: function (e) {
 		var fileParts = Sitemap.getFileParts($('sitemap-selected').parentNode);
-		window.open('/cms/modResource.php?type=modfile&id=' + fileParts.fileID, '_self','');	
+		if (fileParts.fileIcon.src.indexOf('http-url')==-1)
+			window.open('/cms/modResource.php?type=modfile&id=' + fileParts.fileID, '_self','');	
+		else 
+			window.open('/cms/modResource.php?type=modurl&id=' + fileParts.fileID, '_self','');	
 		return false;
 	},
 	deleteFile: function (e) {
@@ -353,9 +373,15 @@ var Sitemap = {
 	openFile: function (e) {
 		
 		var fileParts = Sitemap.getFileParts($('sitemap-selected').parentNode);
-		window.open(fileParts.fileName.firstChild.href, '_blank','');	
+		window.open('/sendframe.php?id='+fileParts.fileID, '_blank','');	
 		return false;
 	},
+	saveAs: function (e) {
+		
+		var fileParts = Sitemap.getFileParts($('sitemap-selected').parentNode);
+		window.open('/send.php?id='+fileParts.fileID+'&save=1', '_blank','');	
+		return false;
+	},	
 	viewHomepage: function (e) {
 	
 		if ($('sitemap-selected').parentNode.parentNode.className == 'sitemap-category') {

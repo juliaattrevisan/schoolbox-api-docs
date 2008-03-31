@@ -44,8 +44,8 @@ function authenticateLDAP($username, $password) {
 function authenticateSQL(&$db, $username, $password) {
 	// Function to check username exists and password is correct
 
-	$query = "SELECT user.id FROM user WHERE username = '". trim( $username)."' 
-	AND password = PASSWORD('".$password."')";
+	$query = "SELECT user.id FROM user WHERE username = '". addslashes(trim( $username))."' 
+	AND password = PASSWORD('".addslashes($password)."')";
 	$db->dbDoQuery($query);
 	$result = $db->dbCountRows();
 	//$user = $db->dbGetNextArray();
@@ -83,7 +83,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 	//log the authentication attempt
 	$ip = getIP(); 
 	$loginlogquery = "INSERT INTO login_log (username, date, ip, login) 
-			VALUES ('$username', NOW(), '$ip'";
+			VALUES ('".addslashes($username)."', NOW(), '$ip'";
 
 	//check password
 	if( $result == true && is_array($user))

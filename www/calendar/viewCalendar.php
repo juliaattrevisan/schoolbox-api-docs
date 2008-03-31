@@ -316,7 +316,7 @@ class displayCalendar
 				
 				$j++;
 				$this->currDay = $j;
-				$this->t_body->set_var('DATE', date("jS", mktime(0,0,0,$this->currMonth, $j, $this->currYear)) . "<br />");
+				$this->t_body->set_var('DATE', date("jS", mktime(0,0,0,$this->currMonth, $j, $this->currYear)));
 				$this->t_body->set_var('FILLER', '');
 				$this->t_body->set_var("ADD", "<a href=\"addEvent.php?date=".$this->currDay."&month=".$this->currMonth."&year=".$this->currYear."\">add</a>");
 				
