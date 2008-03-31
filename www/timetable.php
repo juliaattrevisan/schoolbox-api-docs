@@ -52,93 +52,96 @@ class Timetable
 		$dayCurrent = getDayNumber($user['campus']);	
 					
 		$timetable = getFullTimetable($sid, $user['group_id'], $user['campus']);
-
-		$days = count($timetable[0]['day']);
+		if(is_array($timetable)) {
 		
-		//timetable field width
-		$this->t_body->set_var("TIMETABLE_FIELD_WIDTH", round((95 / $days),1));
-		
-		$periodCount = 1;
-		//for each period
-		foreach($timetable as $row)
-		{
-			$this->t_body->set_var("PERIOD_NAME", $row['periodName']);
-			$this->t_body->set_var("PERIOD_START", $row['periodStart']);
-			$this->t_body->set_var("PERIOD_END", $row['periodEnd']);
+			$days = count($timetable[0]['day']);
 			
-			$dayCount = 1;
-			//for each day
-			foreach($row['day'] as $period)
-			{	
-				if($periodCount == 1) // only output header on first run through
-				{
-					//output day header
-					$this->t_body->set_var("DAY_NUMBER", $dayCount);
-	        		$this->t_body->parse("day_header_listing", "day_header", true);	
-				}
-
-				if($period['description'])
-				{
-					if ($_SESSION['campus'][0] == 3 && SITE_location == 'mgs')
+			//timetable field width
+			$this->t_body->set_var("TIMETABLE_FIELD_WIDTH", round((95 / $days),1));
+			
+			$periodCount = 1;
+			//for each period
+			foreach($timetable as $row)
+			{
+				$this->t_body->set_var("PERIOD_NAME", $row['periodName']);
+				$this->t_body->set_var("PERIOD_START", $row['periodStart']);
+				$this->t_body->set_var("PERIOD_END", $row['periodEnd']);
+				
+				$dayCount = 1;
+				//for each day
+				foreach($row['day'] as $period)
+				{	
+					if($periodCount == 1) // only output header on first run through
 					{
-						$post = strpos($period['code'], "EN");
-					
-						if ($post == 2)
+						//output day header
+						$this->t_body->set_var("DAY_NUMBER", $dayCount);
+						$this->t_body->parse("day_header_listing", "day_header", true);	
+					}
+	
+					if($period['description'])
+					{
+						if ($_SESSION['campus'][0] == 3 && SITE_location == 'mgs')
 						{
-							$this->t_body->set_var('PERIOD_DESC', 'Homeroom');
-							$this->t_body->set_var('PERIOD_CODE','');
-							$this->t_body->set_var('PERIOD_ROOM','');
+							$post = strpos($period['code'], "EN");
+						
+							if ($post == 2)
+							{
+								$this->t_body->set_var('PERIOD_DESC', 'Homeroom');
+								$this->t_body->set_var('PERIOD_CODE','');
+								$this->t_body->set_var('PERIOD_ROOM','');
+							}
+							else
+							{
+								$this->t_body->set_var('PERIOD_DESC', $period['description']);
+								$this->t_body->set_var('PERIOD_CODE','');
+								$this->t_body->set_var('PERIOD_ROOM',$period['room']);
+							}
+						
+							$this->t_body->set_var('PERIOD_ONCLICK','');
 						}
-						else
+						else if($_SESSION['campus'][0] == 2 && SITE_location == 'wenona')
+						{
+								$this->t_body->set_var('PERIOD_DESC', $period['description']);
+								$this->t_body->set_var('PERIOD_CODE','');
+								$this->t_body->set_var('PERIOD_ROOM',$period['room']);
+								$this->t_body->set_var('PERIOD_ONCLICK','');
+						}
+						else 
 						{
 							$this->t_body->set_var('PERIOD_DESC', $period['description']);
-							$this->t_body->set_var('PERIOD_CODE','');
+							$this->t_body->set_var('PERIOD_CODE','('.$period['code'].')');
 							$this->t_body->set_var('PERIOD_ROOM',$period['room']);
+							$this->t_body->set_var('PERIOD_ONCLICK',"onClick=\"window.location='/homepage.php?code=".urlencode($period['code'])."'\"");	
 						}
-					
+					}	
+					else
+					{
+						$this->t_body->set_var('PERIOD_DESC','');
+						$this->t_body->set_var('PERIOD_CODE','');
+						$this->t_body->set_var('PERIOD_ROOM','');
 						$this->t_body->set_var('PERIOD_ONCLICK','');
 					}
-					else if($_SESSION['campus'][0] == 2 && SITE_location == 'wenona')
-					{
-							$this->t_body->set_var('PERIOD_DESC', $period['description']);
-							$this->t_body->set_var('PERIOD_CODE','');
-							$this->t_body->set_var('PERIOD_ROOM',$period['room']);
-							$this->t_body->set_var('PERIOD_ONCLICK','');
-					}
-					else 
-					{
-						$this->t_body->set_var('PERIOD_DESC', $period['description']);
-						$this->t_body->set_var('PERIOD_CODE','('.$period['code'].')');
-						$this->t_body->set_var('PERIOD_ROOM',$period['room']);
-						$this->t_body->set_var('PERIOD_ONCLICK',"onClick=\"window.location='/homepage.php?code=".urlencode($period['code'])."'\"");	
-					}
-				}	
-				else
-				{
-					$this->t_body->set_var('PERIOD_DESC','');
-					$this->t_body->set_var('PERIOD_CODE','');
-					$this->t_body->set_var('PERIOD_ROOM','');
-					$this->t_body->set_var('PERIOD_ONCLICK','');
+						
+					if($dayCount == $dayCurrent && $row['periodNumber'] == $periodCurrent['PeriodNumber'] && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq'] )
+						$this->t_body->set_var("TIMETABLE_CLASS", "current");
+					else	
+						$this->t_body->set_var("TIMETABLE_CLASS", "normal");
+	
+					$this->t_body->parse("day_listing", "day", true);
+					$dayCount++;
 				}
-					
-				if($dayCount == $dayCurrent && $row['periodNumber'] == $periodCurrent['PeriodNumber'] && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq'] )
-					$this->t_body->set_var("TIMETABLE_CLASS", "current");
-				else	
-					$this->t_body->set_var("TIMETABLE_CLASS", "normal");
-
-				$this->t_body->parse("day_listing", "day", true);
-				$dayCount++;
+				
+				$this->t_body->parse("period_listing", "period", true);
+				$this->t_body->set_var("day_listing", '');
+				$periodCount++;
 			}
+			$this->t_body->parse("timetable_listing", "timetable", true);
 			
-        	$this->t_body->parse("period_listing", "period", true);
-			$this->t_body->set_var("day_listing", '');
-			$periodCount++;
+			//reset blocks in case we coming back...
+			$this->t_body->set_var('period_listing', '');
+			$this->t_body->set_var("day_header_listing", '');
 		}
-		$this->t_body->parse("timetable_listing", "timetable", true);
-		
-		//reset blocks in case we coming back...
-		$this->t_body->set_var('period_listing', '');
-		$this->t_body->set_var("day_header_listing", '');
+			
 	}
 	
 	function showPage()

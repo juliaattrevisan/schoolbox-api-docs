@@ -61,6 +61,7 @@ class outUser
 		if(SYNERGY_enable)
 		{	
 			require_once('../include/syn_userinfo.php');
+			require_once('../include/syn_classlist.php');
 			
 			//only allow staff to see student information or parent
 			if(isStaff($_SESSION['gid']) || isParentOfChild($user['uid']))

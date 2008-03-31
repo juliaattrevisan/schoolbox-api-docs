@@ -311,12 +311,14 @@ class dueWorkPage
 		if(is_array($catList)) {
 			$query .= " AND (1=2 ";
 			foreach($catList as $cat) {
-				$query .= "OR category.id = {$cat['id']} ";
+				if(is_numeric($cat['id'])) {
+					$query .= "OR category.id = {$cat['id']} ";
+				}
 			}
 				
 			$query .= ")";
 		}					
-					
+		print $query;			
 		$r = $this->db->dbDoQuery($query);
 		$dueDates = array();
 		while($data = $this->db->dbGetNextArray($r)) {
