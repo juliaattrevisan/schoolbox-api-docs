@@ -205,20 +205,26 @@ class displayCalendar
 				$this->t_body->parse("week_listing","week_block", true);
 		}
 		
-		$this->currentDay = $startOfWeek;
-		
-		//initialise the day values
-		$this->currYear = date("Y",$this->currentDay);
-		$this->currMonth = date("n",$this->currentDay);
-		$this->currDay = date("j",$this->currentDay);
-		
+
 
 		
-		if ($_GET['listby'] == 'month')
-			$this->outputMonthView($campus);
-		else
-			$this->outputWeekView($campus);
+		if ($_GET['listby'] == 'month') {
+			
 		
+			$this->outputMonthView($campus, $currentMonth);
+			
+		} else {
+			
+			$this->currentDay = $startOfWeek;
+		
+			//initialise the day values
+			$this->currYear = date("Y",$this->currentDay);
+			$this->currMonth = date("n",$this->currentDay);
+			$this->currDay = date("j",$this->currentDay);
+			
+		
+			$this->outputWeekView($campus);
+		}
 		
 
 		$this->t_body->pparse("finaloutput", "tplBODY");
@@ -293,14 +299,15 @@ class displayCalendar
 	
 	}
 
-	function outputMonthView ($campus) {
+	function outputMonthView ($campus, $currentMonth) {
 
 		$this->t_body->set_block("tplBODY", "month_week", "month_week_listing");
 		$this->t_body->set_block("month_week", "day_block", "day_listing");
 		$this->t_body->set_block("day_block", "note_block", "note_listing");	
 
 		//get amount of days in month
-		$numDaysinMonth = date("t", $this->currentDay);
+		
+		$numDaysinMonth = date("t", $currentMonth);
 		
 		//get first day of month
 		$firstDay = date("w", mktime(0,0,0,$this->currMonth, 1, $this->currYear));
