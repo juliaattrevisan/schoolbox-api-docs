@@ -39,6 +39,13 @@ table#container {
 	padding-left: 0;
 }
 
+.textCmp {
+	background-color: #FF0000;
+	padding: 2px;
+	font-weight: bold;
+	color: #FFFFFF;
+	display: none;
+}
 .componentConfig {
 	background-color: #CCCCCC;
 	text-align: right;

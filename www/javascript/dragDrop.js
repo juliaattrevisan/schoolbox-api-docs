@@ -15,7 +15,24 @@ function getURLParam(strParamName){
 	return strReturn;
 } 
 
-window.onload = function(){
+document.addEvents({
+	'keydown': function (e) {
+		if (e.shiftKey) {
+			$$('.textCmp').each(function (o) { 
+				o.setStyle('display', 'block');
+			});
+		}
+	},
+	'keyup': function (e) {
+		$$('.textCmp').each(function (o) { 
+			o.setStyle('display', 'none');
+		});
+	}
+});
+
+Behaviour.addLoadEvent(function () { initDrag(); });
+
+var initDrag = function(){
 	// WebBoxes shared vars
 	var components = $$('.component');
 	var marker = new Element('div').addClass('marker').setStyles({'display': 'none'}).injectInside($('content_text'));
@@ -29,10 +46,12 @@ window.onload = function(){
 		// Make each component draggable using the handle
 		element.makeDraggable({
 			handle: element.getElementsBySelector('.componentHeader')[0],
-			'onClick' : function () {
-				alert('d');
+			'onStart' :  function () {
+				//if (!allowMove) element.removeEvent();
+				
 			},
 			'onBeforeStart': function() {
+
 				// Introduce the marking box, change the draging box to absolute
 				// The order the next 4 lines seems to be important for it to work right in Firefox
 				marker.injectAfter(element).setStyles({'display': 'block', 'height': element.getStyle('height')});
@@ -97,6 +116,7 @@ window.onload = function(){
 				}
 			}
 		});
+		
 	});
 
 }
