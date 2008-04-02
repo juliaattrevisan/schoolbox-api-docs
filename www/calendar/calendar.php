@@ -475,6 +475,7 @@ function getDayEvents($day, $month, $year, $campus = 0, $group = 0)
 	WHERE date = '$year-$month-$day'
 	AND ( (access = '4') OR (access = '1' AND owner= '".$_SESSION['id']."') 
 		OR (access = '3' AND eventCampus.campusID IN($campuslist) $groupChunk ))
+	GROUP BY id
 	ORDER BY event.startTime, event.endTime";
 
 	//get weekly events that occur today
