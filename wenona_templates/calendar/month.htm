@@ -19,55 +19,11 @@
 <script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
 <!-- #BeginEditable "scripts" -->
-
-
+<link rel="stylesheet" type="text/css" href="/css/wenona-calendar.css" />
 <script type="text/javascript" src="/javascript/tableruler.js"></script>
 <script type="text/javascript">
 	window.onload=function(){tableruler();} 
 </script>
-<style type="text/css">
-	#month-view {
-		
-	}
-	#month-view tbody {
-		background-color: #efefef;
-	}
-	#month-view thead {
-		font: bold 16px Verdana, Arial, Helvetica, sans-serif;
-		background-color: #FFFFFF;
-		
-	}
-	#month-view thead td {
-		padding: 5px;
-		border-bottom: 1px dotted #cccccc;
-		
-	}
-	.month-week {
-		height: 130px; 
-		vertical-align: top;	
-	}
-	.day-block {
-		width: 14%; 
-		padding: 5px; 
-		border-top: 1px solid #ffffff;
-		border-left: 1px solid #ffffff;
-		vertical-align: top;
-		font: 11px Verdana, Arial, Helvetica, sans-serif;
-	}
-	.day-num {
-		position: relative;
-		top: -5px;
-		left: 0;
-		padding: 0;
-		margin: 0;
-		font: bold 12px Verdana, Arial, Helvetica, sans-serif;
-	}
-	.filler {
-		background-color: #FFFFFF;
-	}
-
-</style>
-
 <!-- #EndEditable -->
 </head>
 <body>
@@ -155,10 +111,11 @@
            <h1>{MONTH} - {YEAR}</h1>
 			 <center>
         <form method="get" action="viewCalendar.php">
-          <table class="calendarTable">
+          <table id="month-nav">
             <tr>
-              <td><a class="back" href="{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td>
-              <td colspan="3"><input type="hidden" name="Day" value="{DAY}">
+              <td style="width: 20%;"><a class="back" href="{BACK}&listby=month" title="Back one month"><strong>&lt;&lt;</strong></a></td>
+              <td style="width: 30%;"><input type="hidden" name="Day" value="{DAY}">
+              				  <input type="hidden" name="listby" value="month" />
                 <div style="float:left;width:100px;">
                 <select name="Month" onchange="this.form.submit();">
                   <!-- BEGIN month_drop -->
@@ -166,33 +123,15 @@
                   <!-- END month_drop -->
                 </select>
               </td>
-              <td colspan="2"><select name="Year" onchange="this.form.submit();">
+              <td style="width: 30%;"><select name="Year" onchange="this.form.submit();">
                   <!-- BEGIN year_drop -->
                   <option value="{DROP_YEAR_NUMBER}" {DROP_YEAR_SELECTED}>{DROP_YEAR_NUMBER}</option>
                   <!-- END year_drop -->
                 </select>
               </td>
-              <td><a class="forward" href="{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
-            </tr>
-            <tr>
-              <th>Sun</th>
-              <th>Mon</th>
-              <th>Tue</th>
-              <th>Wed</th>
-              <th>Thu</th>
-              <th>Fri</th>
-              <th>Sat</th>
+              <td style="width: 20%;"><a class="forward" href="{FORWARD}&listby=month" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
             </tr>
             <!-- BEGIN week_block -->
-            <tr>
-              <td class="{MONTABLE_CSS0}" onclick="location.href='{DAYURL0}';">{DAY0}</td>
-              <td class="{MONTABLE_CSS1}" onclick="location.href='{DAYURL1}';">{DAY1}</td>
-              <td class="{MONTABLE_CSS2}" onclick="location.href='{DAYURL2}';">{DAY2}</td>
-              <td class="{MONTABLE_CSS3}" onclick="location.href='{DAYURL3}';">{DAY3}</td>
-              <td class="{MONTABLE_CSS4}" onclick="location.href='{DAYURL4}';">{DAY4}</td>
-              <td class="{MONTABLE_CSS5}" onclick="location.href='{DAYURL5}';">{DAY5}</td>
-              <td class="{MONTABLE_CSS6}" onclick="location.href='{DAYURL6}';">{DAY6}</td>
-            </tr>
             <!-- END week_block -->
           </table>
         </form>
@@ -207,6 +146,7 @@
 						</form> -->
 				
       <p>List by: {LISTBY}</p>
+
       <table id="month-view">
       	<thead>
       	<tr>
@@ -223,7 +163,7 @@
         <!-- BEGIN month_week -->
         <tr class="month-week">
         	<!-- BEGIN day_block -->
-        	<td class="day-block{FILLER}">
+        	<td class="day-block{OTHER_MONTH}">
             <p class="day-num">{DATE}</p>
               <span class="header_option">{ADD}</span>
               <!-- BEGIN note_block -->
@@ -237,6 +177,7 @@
         <!-- END month_week -->
         </tbody>
       </table>
+
       <!-- #EndEditable --> </div> 
 	</div> 
 </div> 
