@@ -152,7 +152,8 @@ function formatName($userInfo, $format = NULL){
 function formatEmail($email) {
 	if($email['local_email']) {
 		if(SITE_location == 'wenona' ) {
-			if(isStaff($_SESSION['gid'])) {		//if wenona only return address if they are staff then only return a uid
+		//if wenona only return address if they are staff then only return a uid
+			if(isStaff($_SESSION['gid']) || isParent($_SESSION['gid'])) {		
 				if($email['uid'] && stristr($_SESSION['mailhandle'],'createMail.php')) 
 					return $email['uid'];
 				else 

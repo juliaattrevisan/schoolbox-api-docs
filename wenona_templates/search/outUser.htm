@@ -113,38 +113,59 @@
         <tr>
           <td><strong>Name</strong></td>
           <td colspan="2">{NAME}</td>
-          <td><strong>House</strong></td>
-          <td colspan="2">{HOUSE}</td>
+          <td colspan="3">&nbsp;</td>
           <td rowspan="12" style="vertical-align:top; text-align:center;"><!-- BEGIN portrait -->
             <img src="portrait.php?id={SYNERGY_ID}" />
             <!-- END portrait -->          </td>
         </tr>
-        <!-- BEGIN student_synergy -->
-        <tr>
-          <td><strong>Year Level</strong></td>
-          <td colspan="2">{YEAR_LEVEL}</td>
-          <td><strong>Head of House</strong></td>
-          <td colspan="2">{HOH}</td>
-        </tr>
+        <!-- BEGIN student_synergy_form -->
         <tr>
           <td><strong>Date of Birth</strong></td>
           <td colspan="2">{BIRTHDATE}</td>
+          <td><strong>Year Level</strong></td>
+          <td colspan="2">{YEAR_LEVEL}</td>
+
+        </tr>
+        <tr>
+          <td><strong>House</strong></td>
+          <td colspan="2">{HOUSE}</td>
+          <td><strong>Class</strong></td>
+          <td colspan="2">{FORM}</td>
+        </tr>
+        <tr>
+		  <td><strong>Head of House</strong></td>
+          <td colspan="2">{HOH}</td>
+          <td><strong>Class Teacher</strong></td>
+          <td colspan="2">{FORM_STAFF}</td>
+        </tr>
+        <!-- END student_synergy_form -->
+        <!-- BEGIN student_synergy_tutor -->
+        <tr>
+          <td><strong>Date of Birth</strong></td>
+          <td colspan="2">{BIRTHDATE}</td>
+          <td><strong>Year Level</strong></td>
+          <td colspan="2">{YEAR_LEVEL}</td>
+
+        </tr>
+        <tr>
+          <td><strong>House</strong></td>
+          <td colspan="2">{HOUSE}</td>
           <td><strong>Tutor Group</strong></td>
           <td colspan="2">{TUTOR_GROUP}</td>
         </tr>
         <tr>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
+          <td><strong>Head of House</strong></td>
+          <td colspan="2">{HOH}</td>
           <td><strong>Tutor</strong></td>
           <td colspan="2">{TUTOR}</td>
         </tr>
-        <!-- END student_synergy -->
+        <!-- END student_synergy_tutor -->
         <tr>
           <td colspan="6"><h2>School Information</h2></td>
         </tr>
         <tr>
 		<td colspan="4"><table><tr><td valign="top">
+        <!-- BEGIN school_links -->
 		<ul>
 		<li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=1">Academic Care</a></li>
 		<li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=2">Excursions</a></li>
@@ -160,6 +181,7 @@
 		<td valign="top"><ul>
 		<li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=7">Curriculum Information</a></li>
 		<li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=8">Homework Policy</a></li>
+        <!-- END school_links -->
 		<!-- BEGIN timetable_link -->
           <li><a href="/timetable.php?sid={SYNERGY_ID}">Timetable</a></li>
         <!-- END timetable_link -->

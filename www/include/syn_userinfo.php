@@ -18,8 +18,10 @@ function getStudentInfo($synID)
  
 		
         $query = "
-		SELECT 	vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname, vStudents.StudentBirthDate, 
-				vStudents.StudentHouse, vStudents.StudentForm, vStudents.StudentTutor, vStudents.StudentYearLevel, vStudents.StudentLockerBook,
+		SELECT	vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname, vStudents.StudentBirthDate, 
+				vStudents.StudentTutorName, vStudents.StudentHeadOfHouse, vStudents.StudentFormStaffName, vStudents.StudentTutorDescription,
+				luForm.ID as TeacherFormID, vStudents.StudentForm, luTutor.ID as TeacherTutorID, vStudents.StudentTutor, 
+				vStudents.StudentHouseDescription, vStudents.StudentHouse, vStudents.StudentYearLevel, vStudents.StudentLockerBook,
 				vStudents.StudentEmergencyName, vStudents.StudentEmergencyPhone, vStudents.StudentEmergencyPhoneAlt,
 				contactDetails.StudentContactTitle, contactDetails.StudentContactPreferred, contactDetails.StudentContactSurname,
 				contactDetails.StudentContactAddress1, contactDetails.StudentContactSuburb, contactDetails.StudentContactPostCode, contactDetails.StudentContactState,
@@ -28,11 +30,15 @@ function getStudentInfo($synID)
 				contactDetails.StudentContactSpouseMobilePhone, contactDetails.StudentContactSpouseOccupPhone
 		FROM 
 				SynergyOne.dbo.vStudentContactAllAddress contactDetails, 
-				SynergyOne.dbo.vStudents vStudents 
+				SynergyOne.dbo.vStudents vStudents,
+				SynergyOne.dbo.luForm,
+				SynergyOne.dbo.luTutor
 		WHERE 	vStudents.CurrentSemesterOnlyFlag = contactDetails.CurrentSemesterOnlyFlag 
 			AND vStudents.FileSemester = contactDetails.FileSemester 
 			AND vStudents.FileYear = contactDetails.FileYear 
 			AND vStudents.StudentID = contactDetails.ID
+			AND vStudents.StudentForm=luForm.Code
+			AND vStudents.StudentTutor=luTutor.Code
 			AND (contactDetails.StudentContactDescription='Contact 1' OR contactDetails.StudentContactDescription='Primary Contacts')
 			AND vStudents.StudentID = $synID
 		ORDER BY

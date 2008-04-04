@@ -54,7 +54,8 @@ class outUser
 		$this->t_body->set_block("tplBODY", "timetable_link", "timetable_link_block");
 		$this->t_body->set_block("tplBODY", "due_work", "due_work_block");
 		$this->t_body->set_block("tplBODY", "helpdesk", "helpdesk_block");
-		$this->t_body->set_block("tplBODY", "student_synergy", "student_synergy_block");
+		$this->t_body->set_block("tplBODY", "student_synergy_form", "student_synergy_form_block");
+		$this->t_body->set_block("tplBODY", "student_synergy_tutor", "student_synergy_tutor_block");
 		$this->t_body->set_block("tplBODY", "contact_synergy", "contact_synergy_block");
 		
 		//advanced synergetic information
@@ -84,12 +85,33 @@ class outUser
 					list($date, $month, $year) = explode(' ', $synInfo['StudentBirthDate']);
 					$birthdate = strtotime($date.' '.$month.' '.$year);
 					
+					if($synInfo['StudentFormStaffName'] && $synInfo['TeacherFormID']) {
+						$query = "SELECT title, firstname, lastname, username, local_email, alt_email FROM user WHERE synergy_id = {$synInfo['TeacherFormID']}";
+						$form = $db->dbGetSingleRow($query);
+						if($formEmail = formatEmail($form))
+							$formTeacher = '<a href="'.$_SESSION['mailhandle'].$formEmail.'">'.scrubTEXT($synInfo['StudentFormStaffName']).'</a>';
+						else
+							$formTeacher = scrubTEXT($synInfo['StudentFormStaffName']);
+					}
+				
+					if($synInfo['StudentTutorName'] && $synInfo['TeacherTutorID']) {
+						$query = "SELECT title, firstname, lastname, username, local_email, alt_email FROM user WHERE synergy_id = {$synInfo['TeacherTutorID']}";
+						$tutor = $db->dbGetSingleRow($query);
+						if($tutorEmail = formatEmail($tutor))
+							$tutorTeacher = '<a href="'.$_SESSION['mailhandle'].$tutorEmail.'">'.scrubTEXT($synInfo['StudentTutorName']).'</a>';
+						else
+							$tutorTeacher = scrubTEXT($synInfo['StudentTutorName']);
+					}
+					
+				
+				
 					$output = array(	'TUTOR_GROUP' 			=> scrubTEXT($synInfo['StudentTutorDescription']),
-										'TUTOR'					=> scrubTEXT($synInfo['StudentTutorName']),
+										'TUTOR'					=> $tutorTeacher,
 										'YEAR_LEVEL'			=> scrubTEXT($synInfo['StudentYearLevel']),
 										'HOUSE'					=> scrubTEXT($synInfo['StudentHouseDescription']),
 										'HOH'					=> scrubTEXT($synInfo['StudentHeadOfHouse']),
 										'FORM'					=> scrubTEXT($synInfo['StudentForm']),
+										'FORM_STAFF'			=> $formTeacher,
 										'LOCKER'				=> scrubTEXT($synInfo['StudentLockerBook']),
 										'BIRTHDATE'				=> date('jS \o\f F, Y', $birthdate),
 										'EMERGENCY_NAME'		=> scrubTEXT($synInfo['StudentEmergencyName']),
@@ -110,12 +132,20 @@ class outUser
 					$this->t_body->set_var($output);
 					
 					$this->t_body->parse("contact_synergy_block", "contact_synergy");
-					$this->t_body->parse("student_synergy_block", "student_synergy");
 					
+					if($formTeacher) {
+						$this->t_body->parse('student_synergy_form_block', 'student_synergy_form');
+						$this->t_body->set_var('student_synergy_tutor_block','');
+					}
+					else {
+						$this->t_body->parse('student_synergy_tutor_block','student_synergy_tutor');
+						$this->t_body->set_var('student_synergy_form_block','');
+					}
 				}
 				else
 				{
-					$this->t_body->set_var("student_synergy_block", "");
+					$this->t_body->set_var("student_synergy_tutor_block", "");
+					$this->t_body->set_var("student_synergy_form_block", "");
 					$this->t_body->set_var("contact_synergy_block", "");
 					$this->t_body->set_var("due_work_block", "");	
 					$this->t_body->set_var("helpdesk_block", "");	
@@ -124,7 +154,8 @@ class outUser
 			else
 			{
 				$this->t_body->set_var("contact_synergy_block", "");
-				$this->t_body->set_var("student_synergy_block", "");
+				$this->t_body->set_var("student_synergy_tutor_block", "");
+				$this->t_body->set_var("student_synergy_form_block", "");
 				$this->t_body->set_var("portrait_block", "");	
 				$this->t_body->set_var("timetable_link_block", "");
 				$this->t_body->set_var("due_work_block", "");	
