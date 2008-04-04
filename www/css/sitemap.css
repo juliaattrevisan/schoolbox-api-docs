@@ -9,11 +9,23 @@ html, body, #outerWrap, #content, #content_text {
 	padding: 0;
 }
 
+.sitemap-details {
+	width: 100px;
+	height: 150px;
+	background-color: #efebe7;
+	border: 1px solid #000000;
+	position: absolute;
+	z-index: 100;
+	top: 200px;
+	left: 250px;
+	font: 12px Arial, Helvetica, sans-serif;
+	padding: 10px;
+}
+
 #sitemap {
 	height: 80%;
 	margin: 0;
 	padding: 0;
-	
 }
 
 #sitemap-nav {
@@ -23,7 +35,7 @@ html, body, #outerWrap, #content, #content_text {
 	padding: 20px 10px !important;
 	margin: 0;
 	padding: 0;
-	overflow: auto;
+	overflow:auto;
 	
 }
 
@@ -38,14 +50,16 @@ html, body, #outerWrap, #content, #content_text {
 }
 
 #sitemap-selected {
-	background-color: #FFFFFF;
-	color: #000000;
+	background-color: #003366;
+	color: #FFFFFF;
 	border: 1px dotted #cccccc;
 }
 .sitemap-category {
 	margin: 0;
 	padding: 0;
 	clear: both;
+	white-space: nowrap;
+	position: relative;
 }
 
 .sitemap-category p {
@@ -83,6 +97,7 @@ html, body, #outerWrap, #content, #content_text {
 }
 .sitemap-file {
 	clear: both;
+	position: relative;
 }
 
 .sitemap-hover {

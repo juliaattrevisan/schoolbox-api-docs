@@ -1,5 +1,5 @@
 <!-- BEGIN category -->
-<div class='sitemap-category' {CAT_MARGIN}>
+<div class='sitemap-category' {CAT_MARGIN} context="menuCategory" acatid="{CAT_ID}" ahomepage="{HOMEPAGE}" acatname="{CAT_NAME}">
     <p class='sitemap-openclose'>{CAT_OPENCLOSE}</p>
     <p class='sitemap-caticon'><img src="/images/mime/folder_blue_full.png" alt="{CAT_NAME}" /></p>
     <div>
@@ -9,16 +9,21 @@
 	</div>
 </div><!-- END category -->
 <!-- BEGIN category_window -->
-<div class='sitemap-category'>
+<div class='sitemap-category' context="menuCategory" acatid="{CAT_ID}" ahomepage="{HOMEPAGE}" acatname="{CAT_NAME}">
     <p class='sitemap-icon'><img src="/images/mime/folder_blue_full.png" alt="{CAT_NAME}" /></p>
 	<p class='sitemap-catname'>{CAT_NAME}</p>
     <p class='sitemap-catid'>{CAT_ID}</p>
 </div><!-- END category_window -->
 <!-- BEGIN file -->
-<div class='sitemap-file' {HIDDEN}>
+<div class='sitemap-file' {HIDDEN} context="menuFile" afileid="{FILE_ID}" acatid="{CAT_ID}" ainline="{FILE_INLINE}" aurl="{URL_YN}" alink="{FILE_LINK}">
     <p class='sitemap-icon'><img src="{FILE_ICON}" alt="{FILE_ALT}" /></p>
     <p class='sitemap-filename'>{FILE_URL}{FILE_NAME}{FILE_URL_END}</p>
     <p class='sitemap-filesize'>{FILE_SIZE}</p>
 	<p class='sitemap-fileid'>{FILE_ID}</p>
     <p class='sitemap-catid'>{CAT_ID}</p>
+    <p class='sitemap-inline'>{FILE_INLINE}</p>
 </div><!-- END file -->
+<!-- BEGIN file_details -->
+<div><p style="margin: 0 0 2px 0;">{COMMENT}</p>
+	 <p style="margin: 0; font-size: 9px;">Submitted by: {OWNER} <br />on {CREATED}</p></div>
+<!-- END file_details -->

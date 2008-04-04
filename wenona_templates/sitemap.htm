@@ -21,9 +21,12 @@
 <!-- #BeginEditable "scripts" -->
 <script type="text/javascript" src="/javascript/mootools.js"></script>
 <script type="text/javascript" src="/javascript/behaviour.js"></script>
-<script type="text/javascript" src="/javascript/contextmenu.js"></script>
+<script type="text/javascript" src="/javascript/rightcontext.js"></script>
 <script type="text/javascript" src="/javascript/sitemap.js"></script>
+
+
 <link rel="stylesheet" type="text/css" media="screen" href="/css/sitemap.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/rightcontext.css" />
 <!-- #EndEditable -->
 </head>
 <body>
@@ -111,44 +114,113 @@
 
 
 			<h1>{TITLE}</h1>
-
 			<div id='sitemap'>
                 <div id='sitemap-nav'>
-                {NAV_CONTENT}
-                </div>
+                {NAV_CONTENT}                </div>
                 <div id='sitemap-window'>
-              	{WINDOW_CONTENT}
-                </div>
+              	{WINDOW_CONTENT}                </div>
             </div>
-	
-    		<div id='sitemap-cm' class='sitemap-cm'>
-            	<ul>
-                	<li class='sitemap-break'><a href="#" onclick="return Sitemap.openFile(event);" style='font-weight: bold;'>Open</a></li>
-                    <li><a href="#" onclick="return Sitemap.newFile(event);">New File</a></li>
-                    <li><a href="#" onclick="return Sitemap.newURL(event);">New Link</a></li>
-                    <li class='sitemap-break'><a href="#" onclick="return Sitemap.newCategory(event);">New Folder</a></li>
-                	
-                    <li><a href="#" onclick="return Sitemap.modifyFile(event);">Modify</a></li>
-                    <li><a href="#" onclick="if (confirm('Delete this file?')) { Sitemap.deleteFile(event); }  return false;">Delete</a></li>
-                    
-                </ul>
-              
-            </div>
+  
+ <script type='text/javascript'>
 
-    		<div id='sitemap-cm2' class='sitemap-cm'>
-            	<ul>
-                	<li class='sitemap-break'><a href="#" onclick="return Sitemap.viewHomepage(event);" style='font-weight: bold;'>View Homepage</a></li>
-                    <li><a href="#" onclick="return Sitemap.newFile(event);">New File</a></li>
-                    <li><a href="#" onclick="return Sitemap.newURL(event);">New Link</a></li>
-                    <li class='sitemap-break'><a href="#" onclick="return Sitemap.newCategory(event);">New Folder</a></li>
-                	
-                    <li><a href="#" onclick="return Sitemap.modifyFolder(event);">Modify</a></li>
-                    <li><a href="#" onclick="if (confirm('Delete this folder?')) { Sitemap.deleteFolder(event); }  return false;">Delete</a></li>
+      menu1 = { attributes: "afileid,acatid,ainline,aurl,alink,acomments,aowner,asubmitted" ,
+
+                items: [ 
+                       {type:RightContext.TYPE_MENU,
+                        text:"Preview",
+						requires: ["ainline", "Y"],
+                        url:"/sendframe.php?id=[afileid]"},
+
+                       {type:RightContext.TYPE_MENU,
+                        text:"Save As",
+						requires: ["aurl", "N"],
+                        url:"/send.php?id=[afileid]"},
+						
+					   {type:RightContext.TYPE_MENU,
+                        text:"Open",
+						requires: ["aurl", "Y"],
+                        url:"/redir.php?url=[alink]"},
+					  
+					   {type: RightContext.TYPE_SEPERATOR },
+					   
+					   {type:RightContext.TYPE_MENU,
+                        text:"Modify",
+						requires: ["aurl", "N"],
+                        url:"/cms/modResource.php?type=modfile&id=[afileid]"},
+						
+					   {type:RightContext.TYPE_MENU,
+                        text:"Modify",
+						requires: ["aurl", "Y"],
+                        url:"/cms/modResource.php?type=modurl&id=[afileid]"},
+                      
+					   {type: RightContext.TYPE_SEPERATOR },
+					   
+					   {type:RightContext.TYPE_MENU,
+                        text:"New File",
+                        url:"/cms/modResource.php?type=file&cid=[acatid]"},
+						
+					   {type:RightContext.TYPE_MENU,
+                        text:"New Link",
+                        url:"/cms/modResource.php?type=url&cid=[acatid]"},
+						
+					   {type:RightContext.TYPE_MENU,
+                        text:"New Folder",
+                        url:"/cms/modFolder.php?action=add&cid=[acatid]"},
+					   
+					   {type: RightContext.TYPE_SEPERATOR },
+						
+							{type:RightContext.TYPE_TEXT_EXT,
+                        url:"http://portal.lektec.com.au/sitemap.php?details=[afileid]"
+                        }
+						 ]
                     
-                </ul>
-              
-            </div>
-    		
+               };			   
+
+      menu2 = { attributes: "acatid,ahomepage,acatname" ,
+
+                items: [ 
+					   {type:RightContext.TYPE_MENU,
+                        text:"View Homepage",
+						requires: ["ahomepage", "Y"],
+                        url:"/homepage.php?category=[acatid]"},
+
+					  {type:RightContext.TYPE_MENU,
+                        text:"Image Gallery",
+                        url:"/cms/imageGallery.php?category=[acatid]"},						
+                      
+					   {type: RightContext.TYPE_SEPERATOR,
+					   	requires: ["ahomepage", "Y"]},
+					   
+						
+					   {type:RightContext.TYPE_MENU,
+                        text:"Modify",
+                        url:"/cms/modFolder.php?action=mod&cid=[acatid]"},
+						
+					   {type:RightContext.TYPE_MENU,
+                        text:"Delete",
+                        onclick:function() { if (confirm('Are you sure you want to delete [acatname]?')) { window.open("/cms/modFolder.php?delete=[acatid]",'_blank',''); }} },
+                      
+					   {type: RightContext.TYPE_SEPERATOR },
+					   
+					   {type:RightContext.TYPE_MENU,
+                        text:"New File",
+                        url:"/cms/modResource.php?type=file&cid=[acatid]"},
+						
+					   {type:RightContext.TYPE_MENU,
+                        text:"New Link",
+                        url:"/cms/modResource.php?type=url&cid=[acatid]"},
+						
+					   {type:RightContext.TYPE_MENU,
+                        text:"New Folder",
+                        url:"/cms/modFolder.php?action=add&cid=[acatid]"} ]
+                    
+               };	
+
+		RightContext.addMenu("menuFile", menu1);
+		RightContext.addMenu("menuCategory", menu2);
+		RightContext.initialize();
+
+</script>          
 
             <!-- #EndEditable --> </div> 
 	</div> 

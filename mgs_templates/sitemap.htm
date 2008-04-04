@@ -122,29 +122,7 @@
   
  <script type='text/javascript'>
 
-      menu1 = { attributes: "attr1,attr2,attr3" ,
-
-                items: [ 
-                       {type:RightContext.TYPE_MENU,
-                        text:"Search for [attr2] on Google",
-                        url:"http://www.google.com/search?q=[attr1]",
-                        image: "icon.gif", align:"right" },
-
-                       {type:RightContext.TYPE_MENU,
-                        text:"The second item in the menu. it will show if attr3=Y (and its: [attr3])",
-                        requires: ["attr3", "Y"],
-                        onclick:function() { alert('This is a custom javascript')} },
-                      
-                       {type: RightContext.TYPE_SEPERATOR },
-                    
-                       {type: RightContext.TYPE_TEXT,
-                        text: "This is hardcoded, yet dynamic text: attr1=[attr1], attr2=[attr2], attr3=[attr3]"} ,
-                    
-                       {type: RightContext.TYPE_TEXT_EXT,
-                        url: "external.html"}   ]
-               };
-
-      menu2 = { attributes: "afileid,acatid,ainline,aurl,alink" ,
+      menu1 = { attributes: "afileid,acatid,ainline,aurl,alink,acomments,aowner,asubmitted" ,
 
                 items: [ 
                        {type:RightContext.TYPE_MENU,
@@ -162,10 +140,6 @@
 						requires: ["aurl", "Y"],
                         url:"/redir.php?url=[alink]"},
 					  
-					   {type:RightContext.TYPE_MENU,
-                        text:"Image Gallery",
-                        url:"/cms/imageGallery.php?category=[acatid]"},
-                      
 					   {type: RightContext.TYPE_SEPERATOR },
 					   
 					   {type:RightContext.TYPE_MENU,
@@ -190,11 +164,18 @@
 						
 					   {type:RightContext.TYPE_MENU,
                         text:"New Folder",
-                        url:"/cms/modFolder.php?action=add&cid=[acatid]"} ]
+                        url:"/cms/modFolder.php?action=add&cid=[acatid]"},
+					   
+					   {type: RightContext.TYPE_SEPERATOR },
+						
+							{type:RightContext.TYPE_TEXT_EXT,
+                        url:"http://portal.lektec.com.au/sitemap.php?details=[afileid]"
+                        }
+						 ]
                     
                };			   
 
-      menu3 = { attributes: "acatid,ahomepage,acatname" ,
+      menu2 = { attributes: "acatid,ahomepage,acatname" ,
 
                 items: [ 
 					   {type:RightContext.TYPE_MENU,
@@ -234,8 +215,8 @@
                     
                };	
 
-		RightContext.addMenu("menuFile", menu2);
-		RightContext.addMenu("menuCategory", menu3);
+		RightContext.addMenu("menuFile", menu1);
+		RightContext.addMenu("menuCategory", menu2);
 		RightContext.initialize();
 
 </script>          

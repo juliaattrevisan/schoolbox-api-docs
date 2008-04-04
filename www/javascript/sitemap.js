@@ -107,12 +107,10 @@ Behaviour.register(myrules);
 var Sitemap = {
 
 	init: function () {
+
+		//Sitemap.addDrag();
 		
 		
-		//Sitemap.getDir($('sitemap-nav'), 0);
-	
-		//makeMoveable();
-		Sitemap.addContextMenu();
 	},
 	getFiles: function(catID) {
 		
@@ -143,6 +141,69 @@ var Sitemap = {
 		document.body.style.cursor = '';
 		
 
+	},
+	openDetails: function (fileID) {
+		
+		var url = '/sitemap.php?details=' + fileID;
+	
+		var myAjax = new Ajax(url, {
+								method: 'get', 
+								onSuccess: function () {
+									Sitemap.showDetails(this.response.text, fileID);
+								}
+								}).request();		
+	},
+	showDetails: function (data, fileID) {
+		
+		var div = document.createElement('div');
+		div.innerHTML = data;
+		div.id = 'details_' + fileID;
+		div.setAttribute('class', 'sitemap-details');
+				
+		document.body.appendChild(div);
+
+	},
+	addDrag: function () {
+
+		$$('.sitemap-category').each(function(o, i){
+			
+			o.addEvent('mousedown', function(e) {
+													  
+				e = new Event(e).stop();							  
+				
+				var clone = this.clone()
+					.setStyles(this.getCoordinates())
+					.setStyles({'opacity': 0.7, 'position': 'absolute'})
+					.addEvent('emptydrop', function(){
+						this.remove();
+						//drop.removeEvents();			 
+					}).inject(document.body);
+				
+				var drag = clone.makeDraggable({
+						droppables: $$('.sitemap-category')
+				});
+				
+				drag.start(e);
+			});
+			
+		    o.addEvents({
+				'over': function(el, obj){
+					var catParts = Sitemap.getCatParts(this);
+					Sitemap.setSelected(this)
+					$('debug').value = el;
+					
+				},
+				'leave': function(el, obj){
+					//this.setStyle('background-color', '#1d1d20');
+				},
+				'drop': function(el, obj){
+					
+				}
+			});
+		
+		});
+		
+		
 	},
 	saveHistory: function (catID) {
 		var url = '/sitemap.php?saveHistory=' + catID;
@@ -235,6 +296,7 @@ var Sitemap = {
 	},
 
 	getCatParts: function (catDiv) {
+		
 		if (catDiv.getElementsByClassName) {
 			var openClose = (catDiv.getElementsByClassName("sitemap-openclose"))[0].firstChild;
 			var catIcon = (catDiv.getElementsByClassName("sitemap-caticon"))[0].firstChild;
@@ -271,12 +333,6 @@ var Sitemap = {
 		return {'fileIcon': fileIcon, 'fileID': fileID, 'catID': catID, 'fileName': fileName};
 	},
 	
-	addContextMenu: function () {
-		//SimpleContextMenu.setup({'preventDefault':false, 'preventForms':false});
-        //SimpleContextMenu.attach('sitemap-file', 'sitemap-cm');
-		//SimpleContextMenu.attach('sitemap-category', 'sitemap-cm2');
-
-	},
 	newFile: function (e) {
 		
 		if ($('sitemap-selected').parentNode.className == 'sitemap-file') {

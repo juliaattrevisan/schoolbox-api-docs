@@ -38,6 +38,7 @@ class OutPut {
 		$this->t_body->set_block('blockBODY', 'file', 'file_block');		
 		$this->t_body->set_block('blockBODY', 'category', 'category_block');
 		$this->t_body->set_block('blockBODY', 'category_window', 'category_window_block');
+		$this->t_body->set_block('blockBODY', 'file_details', 'file_details_block');
 
 		$catTree = array ($this->category);
 		$parent = $this->category;
@@ -77,10 +78,8 @@ class OutPut {
 						name,
 						code,
 						template,
-					  (SELECT count(*) FROM category WHERE parent = c.id) + (SELECT count(*) FROM file WHERE category = c.id) as children,
-					  p.type as perm
+					  (SELECT count(*) FROM category WHERE parent = c.id) as children
 					  FROM category c
-					  LEFT JOIN perms p on c.id = p.cid AND gid = " . $_SESSION['gid'] . "
 					  WHERE parent = ".$catTree[$i]." ORDER BY name";	
 			$catList = $this->db->dbGetAllRows($query);
 	
@@ -90,7 +89,7 @@ class OutPut {
 			if (is_array($catList)) {
 				foreach($catList as $category) {	
 					
-					if ($category['perm'] < 1) continue;
+					if (perm($category['id'], 1) < 1) continue;
 					
 					$output = array ('CAT_ID' 		 => $category['id'],
 									 'CAT_NAME'      => $category['name'] . (!empty($category['code']) ? " (" . $category['code'] . ")":""),
@@ -214,11 +213,13 @@ class OutPut {
 		$this->t_body->set_file('blockBODY', 'sitemap_block.htm');
 		$this->t_body->set_block('blockBODY', 'category', 'category_block');
 		$this->t_body->set_block('blockBODY', 'file', 'file_block');
+		$this->t_body->set_block('blockBODY', 'file_details', 'file_details_block');
 		
 		$this->t_body->set_block('blockBODY', 'category_window', 'category_window_block');
 		
 		$this->t_body->set_var('category_window_block', '');
 		$this->t_body->set_var('file_block', '');
+		$this->t_body->set_var('file_details_block', '');
 		
 		$this->outputCategories($parent, 'nav');
 		
@@ -235,16 +236,47 @@ class OutPut {
 		$this->t_body->set_file('blockBODY', 'sitemap_block.htm');
 		$this->t_body->set_block('blockBODY', 'category', 'category_block');
 		$this->t_body->set_block('blockBODY', 'file', 'file_block');
+		$this->t_body->set_block('blockBODY', 'file_details', 'file_details_block');
 		
 		$this->t_body->set_block('blockBODY', 'category_window', 'category_window_block');
 
 		$this->t_body->set_var('category_block', '');
 		$this->t_body->set_var('file_block', '');
+		$this->t_body->set_var('file_details_block', '');
 		
 		$this->outputCategories($parent, 'window');
 		$this->outputFiles($parent);
 		
 		$this->t_body->pparse("finaloutput", "blockBODY");	
+	}
+	
+	function outputDetails ($fileID) {
+
+		$this->t_body->set_file('blockBODY', 'sitemap_block.htm');
+		$this->t_body->set_block('blockBODY', 'category', 'category_block');
+		$this->t_body->set_block('blockBODY', 'file', 'file_block');
+		$this->t_body->set_block('blockBODY', 'file_details', 'file_details_block');
+		$this->t_body->set_block('blockBODY', 'category_window', 'category_window_block');
+
+		$this->t_body->set_var('category_block', '');
+		$this->t_body->set_var('file_block', '');
+		$this->t_body->set_var('category_window_block', '');
+
+		$query = "SELECT f.comment, UNIX_TIMESTAMP(f.submitted) submitted, concat(substring(u.firstname,1,1),' ',u.lastname) owner
+				  FROM file f
+				  LEFT JOIN user u ON u.id = f.id 
+				  WHERE f.id = $fileID";
+		$file = $this->db->dbGetSingleRow($query);
+		
+		$output = array ('COMMENT'	=> $file['comment'],
+						 'CREATED'	=> date("M j y @ g:iA", $file['submitted']),
+						 'OWNER'		=> $file['owner'],
+						 );
+		$this->t_body->set_var($output);
+
+		$this->t_body->parse('file_details_block', 'file_details');
+		$this->t_body->pparse("finaloutput", "blockBODY");	
+		
 	}
 }
 
@@ -264,6 +296,9 @@ if (isset($_GET['catList'])) {
 	exit;
 } else if (is_numeric($_GET['saveHistory'])) {
 	$_SESSION['smCategory'] = $_GET['saveHistory'];
+	exit;
+} else if (is_numeric($_GET['details'])) {
+	$myPage->outputDetails($_GET['details']);
 	exit;
 }
 

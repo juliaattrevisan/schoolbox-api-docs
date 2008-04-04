@@ -14,13 +14,18 @@ require_once("calendar.php");
 class displayCalendar
 {
 
-	function displayCalendar($currYear=0, $currMonth=0, $currDay=0)
+	function displayCalendar($currYear=0, $currMonth=0, $currDay=0, $campus, $listBy = 'week')
 	{
-		if(!$currYear) { $this->currYear = date("Y"); } else { $this->currYear = $currYear; }
-		if(!$currMonth) { $this->currMonth = date("n"); } else { $this->currMonth = $currMonth; }
-		if(!$currDay) { $this->currDay = date("j"); } else { $this->currDay = $currDay; }
+	
+		$this->currYear = !$currYear ? date("Y") : $currYear;
+		$this->currMonth = !$currMonth ? date("n") : $currMonth;
+		$this->currDay = !$currDay ? date("j") : $currDay;
+		
+		$this->campus = $campus > 0 ? (int)$campus : 0;
+		$this->listBy = $listBy == "month" ? $listBy : "week";
 		
 		$this->cal = new Calendar;
+		$this->db = new dbManager;
 	
 	}
 
@@ -102,25 +107,49 @@ class displayCalendar
 		}
 	}
 	
-  
-	function outputCalendar($campus = 0)
-	{
-		//output week to template
-		$this->t_body = new Template(TPL_directory);
-		if ($_REQUEST['listby'] == 'month')
-			$this->t_body->set_file("tplBODY", "calendar/month.htm");
-		else
-			$this->t_body->set_file("tplBODY", "calendar/week.htm");
-	
-		//setup blocks
-		$this->t_body->set_block("tplBODY", "week_block", "week_listing");
+	function outputPage() {
 
-		include_once("../include/page.php");
+		$this->t_body = new Template(TPL_directory);
 	
-		//setup database
-		$this->db = new dbManager;
+		switch ($this->listBy) {
 		
-				$currentURL = "/calendar/viewCalendar.php?Year=" . $this->currYear . "&Month=" . $this->currMonth . "&Day=" . $this->currDay;
+			case "month":
+			
+				$this->t_body->set_file("tplBODY", "calendar/month.htm");
+				$this->t_body->set_block("tplBODY", "week_block", "week_listing");
+				$this->t_body->set_block("tplBODY", "month_week", "month_week_listing");
+				$this->t_body->set_block("month_week", "day_block", "day_listing");
+				$this->t_body->set_block("day_block", "note_block", "note_listing");					
+								
+				include_once("../include/page.php");
+				
+				$this->outputCalendar();
+				$this->outputMonthView();
+				
+				break;
+			
+			default:
+			
+				$this->t_body->set_file("tplBODY", "calendar/week.htm");
+				$this->t_body->set_block("tplBODY", "week_block", "week_listing");
+				$this->t_body->set_block("tplBODY", "day_block", "day_listing");
+				$this->t_body->set_block("day_block", "note_block", "note_listing");	
+				
+				include_once("../include/page.php");
+				
+				$this->outputCalendar();
+				$this->outputWeekView();
+		}
+		
+		$this->t_body->pparse("finaloutput", "tplBODY");
+	
+	}
+	
+  
+	function outputCalendar()
+	{
+
+		$currentURL = "/calendar/viewCalendar.php?Year=" . $this->currYear . "&Month=" . $this->currMonth . "&Day=" . $this->currDay;
 		
 		$this->t_body->set_var('LISTBY', '<a href="'. $currentURL.'&listby=week">Week</a> | 
 										  <a href="'. $currentURL.'&listby=month">Month</a>');
@@ -160,7 +189,7 @@ class displayCalendar
 		$endOfWeek = $startOfWeek + 518400; 
 
 		if(date("F", $startOfWeek) != date("F", $endOfWeek)) {
-			if ($_REQUEST['listby']=='month')
+			if ($this->listBy=='month')
 				$this->t_body->set_var("MONTH", date("F",$endOfWeek));
 			else
 				$this->t_body->set_var("MONTH", date("F",$startOfWeek)." / ".date("F", $endOfWeek));
@@ -209,35 +238,23 @@ class displayCalendar
 				$this->t_body->parse("week_listing","week_block", true);
 		}
 		
-
-
-		
-		if ($_REQUEST['listby'] == 'month') {
-			
-		
-			$this->outputMonthView($campus, $currentMonth);
-			
-		} else {
-			
-			$this->currentDay = $startOfWeek;
-		
-			//initialise the day values
-			$this->currYear = date("Y",$this->currentDay);
-			$this->currMonth = date("n",$this->currentDay);
-			$this->currDay = date("j",$this->currentDay);
-			
-		
-			$this->outputWeekView($campus);
-		}
-		
-
-		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 	
-	function outputWeekView ($campus) {
+	function outputWeekView () {
 
-		$this->t_body->set_block("tplBODY", "day_block", "day_listing");
-		$this->t_body->set_block("day_block", "note_block", "note_listing");	
+
+		//figure out which day of the week is the current day
+		$dayOfWeek = date("w", mktime(0,0,0,$this->currMonth, $this->currDay, $this->currYear));
+		//figure out which day from the current day is the start of the week
+		$startOfWeek = mktime (0,0,0,$this->currMonth, ($this->currDay-$dayOfWeek), $this->currYear);
+
+		$this->currentDay = $startOfWeek;
+	
+		//initialise the day values
+		$this->currYear = date("Y",$this->currentDay);
+		$this->currMonth = date("n",$this->currentDay);
+		$this->currDay = date("j",$this->currentDay);
+
 
 		$sub = $this->cal->getWeekSubmissionEvents($this->currDay, $this->currMonth, $this->currYear);
 		
@@ -275,7 +292,7 @@ class displayCalendar
 				}
 			}
 
-			$eventList = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear, $campus);
+			$eventList = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear, $this->campus);
 			
 			if(!is_array($eventList))
 			{
@@ -303,14 +320,10 @@ class displayCalendar
 	
 	}
 
-	function outputMonthView ($campus, $currentMonth) {
-
-		$this->t_body->set_block("tplBODY", "month_week", "month_week_listing");
-		$this->t_body->set_block("month_week", "day_block", "day_listing");
-		$this->t_body->set_block("day_block", "note_block", "note_listing");	
+	function outputMonthView () {
 
 		//get amount of days in month
-		$numDaysinMonth = date("t", $currentMonth);
+		$numDaysinMonth = date("t", mktime (0,0,0,$this->currMonth, $this->currDay, $this->currYear));
 		
 		//get first day of month
 		$firstDay = date("w", mktime(0,0,0,$this->currMonth, 1, $this->currYear));
@@ -367,7 +380,7 @@ class displayCalendar
 				}
 			}
 
-			$eventList = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear, $campus);
+			$eventList = $this->cal->getAllDayEvents($this->currDay, $this->currMonth, $this->currYear, $this->campus);
 			
 			if(!is_array($eventList))
 			{
@@ -395,8 +408,8 @@ class displayCalendar
 	}
 }
 
-$cal = new displayCalendar($_GET['Year'], $_GET['Month'], $_GET['Day']);
+$cal = new displayCalendar($_GET['Year'], $_GET['Month'], $_GET['Day'], $_GET['campus'], $_GET['listby']);
 
-$cal->outputCalendar($_GET['campus']);
+$cal->outputPage();
 
 ?>
