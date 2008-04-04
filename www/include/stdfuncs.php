@@ -198,6 +198,26 @@ function cutSentence($content, $chars) {
 	}
 }
 
+function outputDate($format, $date) {
+	//this function attempts to remove output issues associated with mysql dates
+	//removes null dates and times
+	
+	if($date == '0000-00-00' || $date == '0000-00-00 00:00:00' || $date < 1)
+		return '';
+	
+	//if format contains a time check if it is null if so remove the time from the format
+	if(strpos($format, ':')) {
+		$time = date('g:ia',$date);
+		if($time == '12:00am') {
+			$format = preg_replace('/[a-z]:[a-z]+/i','',$format);
+			return date($format, $date);
+		}
+	}
+	
+	return date($format, $date);
+}
+
+
 function isEmail($email) {
 	return eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$",$email);
 }
