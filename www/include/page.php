@@ -78,6 +78,7 @@ $query = "SELECT category.name, userAccess.sid, userAccess.type
 $db->dbDoQuery($query);
 if($db->dbCountRows() > 0)
 {
+
 	while($group = $db->dbGetNextArray())
 	{
 			$this->t_body->set_var("MGNAME", scrubTEXT($group['name']));
@@ -193,6 +194,7 @@ if(SITE_location == 'wenona')
 	}
 	else if(isStudent($_SESSION['gid'])) {
 		$this->t_body->parse('mf_tab', 'myfiles_tab');
+		$this->t_body->set_var('pf_tab', '');
 	}
 	else {
 		$this->t_body->set_var('pf_tab', '');

@@ -447,9 +447,13 @@ function getDayEvents($day, $month, $year, $campus = 0, $group = 0)
 	//ouput only selected campus
 	if($campus)
 		$campuslist = $campus;
-	else
-		$campuslist = implode(',',$_SESSION['campus']);
-		
+	else {
+		if(is_array($_SESSION['campus']))
+			$campuslist = implode(',',$_SESSION['campus']);
+		else
+			$campuslist = 1;
+	}
+	
 	if($_SESSION['id'])
 		$owner = $_SESSION['id'];
 	else
