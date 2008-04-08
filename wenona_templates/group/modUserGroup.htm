@@ -19,6 +19,30 @@
 <script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
 <script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
 <!-- #BeginEditable "scripts" -->
+<script type="text/javascript" src="/javascript/mootools.js"></script>
+<script type="text/javascript" src="/javascript/behaviour.js"></script>
+<script type="text/javascript">
+Behaviour.addLoadEvent(function () { 
+	$('delAll').addEvent('mouseup', function (e) {
+		e = new Event(e);
+		m = $('delAll').checked;
+		$$('.delCheck').each(function (o) {
+			o.checked = !m;
+		});
+		e.stop();
+	});
+	$('deleteButton').addEvent('mousedown', function (e) {
+		if (confirm('Press OK to delete each selected user.')) 
+			$('deleteForm').submit();
+	});
+});
+</script>
+<style type="text/css">
+#delAll, .delCheck {
+	position: relative;
+	top: 3px;
+}
+</style>
 
 <!-- #EndEditable -->
 </head>
@@ -134,8 +158,11 @@
                     <tr> 
                       <td><h2>Members</h2>
                       	<em>You can give write access to any member of the group, this will enable them to post resources and moderate the forum.  Only one user may be the group admin and it cannot be a student.  Making another user the group admin will relinquish your control over the group.</em></td>
-                      <td><table>
+                      <td>
+                      <form action="modUserGroup.php" method="post" id="deleteForm">
+                      <table>
                       	<tr>
+                        	<th style="width: 20px; text-align: center;"><input type="checkbox" id="delAll" /></th>
                       		<th>Name</th>
                       		<th>Write</th>
                       		<th>Delete</th>
@@ -143,13 +170,21 @@
                       		</tr>
                       	<!-- BEGIN member -->
                       	<tr>
+                        	<td style="text-align: center;"><input class="delCheck" type="checkbox" name="deleteUser[]" value="{MEMBERID}"  /></td>
                       		<td style="white-space: nowrap;">{MEMBER}</td>
                       		<td>{WRITE}</td>
                       		<td><a href="/group/modUserGroup.php?delete={MEMBERID}&amp;service={SERVICE}&amp;sid={SID}" onclick="return(confirm('Remove {MEMBER_JAVA}?'));">delete</a></td>
                       		<td style="white-space: nowrap;"><a href="/group/modUserGroup.php?owner={MEMBERID}&amp;service={SERVICE}&amp;sid={SID}">make admin</a></td>
                       		</tr>
                       	<!-- END member -->
-                      	</table></td>
+                      	</table>                        
+                        <p>
+                        <input type="hidden" class="hide" name="service" value="{SERVICE}" />
+                        <input type="hidden" class="hide" name="sid" value="{SID}" />
+                        <input type="button" id="deleteButton" value="Delete Selected" />
+                        </p>
+                        </form>
+						</td>
                       </tr>
                     <!-- BEGIN authorisation -->
                     <tr> 

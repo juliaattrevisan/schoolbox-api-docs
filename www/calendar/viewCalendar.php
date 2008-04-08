@@ -186,14 +186,13 @@ class displayCalendar
 		$dayOfWeek = date("w", mktime(0,0,0,$this->currMonth, $this->currDay, $this->currYear));
 		//figure out which day from the current day is the start of the week
 		$startOfWeek = mktime (0,0,0,$this->currMonth, ($this->currDay-$dayOfWeek), $this->currYear);
-		$endOfWeek = $startOfWeek + 518400; 
+		$endOfWeek = strtotime("+6 days", $startOfWeek);
 
 		if(date("F", $startOfWeek) != date("F", $endOfWeek)) {
 			if ($this->listBy=='month')
 				$this->t_body->set_var("MONTH", date("F",$endOfWeek));
 			else
 				$this->t_body->set_var("MONTH", date("F",$startOfWeek)." / ".date("F", $endOfWeek));
-			
 		} else
 			$this->t_body->set_var("MONTH", date("F",$startOfWeek));
 

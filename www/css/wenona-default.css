@@ -81,6 +81,7 @@ acronym, dfn, abbr {
 	}
 #content ul a {font-weight:normal;}
 
+
 /*--------------------------------------------------------------------------------------*/
 /* HORIZONTAL DROP DOWN MENU STYLES */
 /*--------------------------------------------------------------------------------------*/
@@ -525,5 +526,14 @@ table.ruler tbody td {
 table.ruler h2 {
 	margin-left:0;
 	padding-right:0;
+	}
+/*--------------------------------------------------------------
+ Miscellaneous styles 
+--------------------------------------------------------------*/
+	
+div.float-fix {
+	overflow:hidden;
+	clear:both;
+	height:0;
 	}
 

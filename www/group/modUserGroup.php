@@ -216,6 +216,13 @@ if(isset($_REQUEST['service']) && $_REQUEST['service'] && isset($_REQUEST['sid']
 	//if delete member
 	if(isset($_GET['delete']) && $_GET['delete'])
 		$group->deleteMember($_GET['delete']);
+	
+	// delete multiple members	
+	if (isset($_POST['deleteUser']) && is_array($_POST['deleteUser'])) {
+		$c = count($_POST['deleteUser']);
+		for ($i = 0; $i < $c; $i++)
+			$group->deleteMember($_POST['deleteUser'][$i]);
+	}
 
 	//or change write permissions
 	else if(isset($_GET['write']) && $_GET['write'])
