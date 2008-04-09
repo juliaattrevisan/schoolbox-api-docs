@@ -117,6 +117,19 @@
 				<!-- END story_body -->
 			</div>
 			<!-- END main_stories -->
+            
+          <div class="pagination indent" style="margin: 10px 0;">
+            <!-- BEGIN previous_button -->
+            <a class="prev" href="/news.php?pageNum={PREVIOUS_PAGE}{ARCHIVED}">&lt;&lt; Prev</a><!-- END previous_button -->
+            <!-- BEGIN page_number -->
+            <a class="number{CURRENT}" href="/news.php?pageNum={PAGE_INDEX}{ARCHIVED}">{PAGE_INDEX}</a><!-- END page_number -->
+            <!-- BEGIN next_button -->
+            <a class="next" href="/news.php?pageNum={NEXT_PAGE}{ARCHIVED}">Next &gt;&gt;</a><!-- END next_button -->
+          </div>
+          
+          <!-- BEGIN archive_button -->
+          <p class="indent"><a href="/news.php?archived=1">View Archived News</a></p><!-- END archive_button -->
+            
 			<!-- #EndEditable --> </div>
 		<div id="footer">
 			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>

@@ -195,6 +195,9 @@ window.onload = new Function('showRow();');
 						<!-- BEGIN campus_check_list -->
 							<label><input type="checkbox" name="campus[]" value="{CAMPUSID}" {CAMPUSCHECKED} />{CAMPUSNAME}</label><br />
 						<!-- END campus_check_list -->
+                        <!-- BEGIN single_campus -->
+							<label><input type="hidden" name="campus[]" value="{CAMPUSID}" checked="checked" />{CAMPUSNAME}</label><br />
+						<!-- END single_campus -->                        
 						</td>
                       </tr>
                       <tr id="campusRow2" style="display:none;"> 

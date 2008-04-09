@@ -8,8 +8,9 @@
 class news
 {
 
-function news($topic = 0)
+function news($topic = 0, $show = "current")
 {
+	$this->show = $show;
     $this->dbConnection = new dbManager;
 }
 
@@ -172,7 +173,7 @@ function timecmp($a, $b)
    return ($a['item_datetime_posted'] > $b['item_datetime_posted']) ? -1 : 1;
 }
 
-function getNews($id = 0)
+function getNews($id = 0, $index = 0, $limit = 0)
 {
  	$query = "
 	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner,
@@ -188,15 +189,20 @@ function getNews($id = 0)
 			OR news_items.item_campus='4' 
 		JOIN newsGroup ON newsGroup.id = news_items.item_id 
 			AND newsGroup.gid = '".$_SESSION['gid']."'
-    WHERE news_items.item_owner != '".$_SESSION['id']."' AND
-		news_items.item_datetime_expires > NOW() 
-		AND news_items.item_deleted = 0 
-	"; 
+    WHERE news_items.item_owner != '".$_SESSION['id']."' ";
+	
+	if ($this->show == "current")
+		$query .=" AND news_items.item_datetime_expires > NOW() ";
+	else
+		$query .=" AND news_items.item_datetime_expires <= NOW() ";
+	
+	$query .=" AND news_items.item_deleted = 0"; 
+	
     //get a single article by id if id submitted
     if($id)
             $query .="AND news_items.item_id = '$id'";
 
-    $query .= " ORDER BY news_items.item_datetime_posted DESC;";
+    $query .= " ORDER BY news_items.item_datetime_posted DESC";
 
 	$shareResults = $this->dbConnection->dbGetAllRows($query);
 	
@@ -210,12 +216,16 @@ function getNews($id = 0)
     FROM news_items
 	JOIN user ON news_items.item_owner = user.id
     WHERE news_items.item_owner = '".$_SESSION['id']."'
-		AND news_items.item_datetime_expires > NOW() 
 		AND news_items.item_deleted = 0 
 	"; 
     //get a single article by id if id submitted
     if($id)
             $query .="AND news_items.item_id = '$id'";
+
+	if ($this->show == "current")
+		$query .=" AND news_items.item_datetime_expires > NOW() ";
+	else
+		$query .=" AND news_items.item_datetime_expires <= NOW() ";
 
     $query .= " ORDER BY news_items.item_datetime_posted DESC;";
 	
@@ -232,6 +242,9 @@ function getNews($id = 0)
 		return false;
 
 	usort($allNews,array($this,"timecmp"));
+	
+	if ($limit > 0)
+		$allNews = array_slice($allNews, $index, $limit);
 	
 	return $allNews;
 }

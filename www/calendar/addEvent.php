@@ -23,6 +23,7 @@ class addEvent
 	function campusHTMLList($name, $selected) 
 	{
 		$this->t_body->set_block("tplBODY", "campus_check_list", "campus_chck_lst");
+		$this->t_body->set_block("tplBODY", "single_campus", "single_campus_block");
 		if($_SESSION['su'])
 			$SQL_QUERY = "SELECT id, name FROM luCampus";
 		else
@@ -33,6 +34,9 @@ class addEvent
 		$i = 0;	
 		while ($thisCampus = $this->db->dbGetNextArray()) 
 		{
+			if ($i > 0)
+				$this->t_body->parse("campus_chck_lst", "campus_check_list", true);
+			
 			$this->t_body->set_var("CAMPUSNAME", $thisCampus['name']);
 			$this->t_body->set_var("CAMPUSID", $thisCampus['id']);
 			if(is_array($selected))
@@ -49,9 +53,18 @@ class addEvent
 				else	
 					$this->t_body->set_var("CAMPUSCHECKED", "");				
 			}	
-			$this->t_body->parse("campus_chck_lst", "campus_check_list", true);
+			
 			$i++;
-		}       
+		}  
+		if ($i === 1) {
+			$this->t_body->set_var('campus_chck_lst', '');
+			$this->t_body->parse("single_campus_block", "single_campus");
+		}
+		elseif ($i > 1) {
+			$this->t_body->set_var('single_campus_block', '');
+			$this->t_body->parse("campus_chck_lst", "campus_check_list", true);
+		}
+		
 		return $i;
 	}  
 

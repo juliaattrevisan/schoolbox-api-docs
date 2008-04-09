@@ -21,8 +21,13 @@ class OutPut
 		$this->t_body->set_var("TITLE", HEADING." - News");
 		
 		$this->t_body->set_block("tplBODY", "main_stories", "stories_block");
-    		$this->t_body->set_block("main_stories", "story_body", "story_block");
-
+    	$this->t_body->set_block("main_stories", "story_body", "story_block");
+		
+		$this->t_body->set_block('tplBODY', 'previous_button', 'previous_button_block');
+		$this->t_body->set_block('tplBODY', 'page_number', 'page_number_block');
+		$this->t_body->set_block('tplBODY', 'next_button', 'next_button_block');	
+		$this->t_body->set_block('tplBODY', 'archive_button', 'archive_button_block');	
+		
 		include("include/page.php");
 	}
 
@@ -90,20 +95,76 @@ if(isStaff($_SESSION['gid']) )
 else //student only sees news for everyone
 	$topic = 2;
 
+if (isset($_GET['archived'])) {
+	$show = "archived";
+	$myPage->t_body->set_var('archive_button_block', '');
+} else {
+	$show = "current";
+	$myPage->t_body->parse('archive_button_block', 'archive_button');
+}
 
-$myNews = new news($topic);
+$myNews = new news($topic, $show);
 
 if(isset($_GET['id']) && $_GET['id'])
 {
 	//show just a single story
 	$myPage->setStories($myNews->getNews($_GET['id']));	
 }
-else
+elseif (isset($_GET['archived']))
 {
-	//show all stories
+	$pageNum = $_GET['pageNum'];
+
+	// output pagination
+	$newsList = $myNews->getNews();
+
+	if(!$pageNum)
+		$pageNum = 1;
+		
+	$newsPerPage = 15;
+	$totalPages = ceil(count($newsList)/$newsPerPage);
+	$newsIndex = $newsPerPage * ($pageNum-1);		
+	
+	if($pageNum<2)	
+		$myPage->t_body->set_var('previous_button_block', '');
+	else
+		$myPage->t_body->parse('previous_button_block', 'previous_button');
+	
+	if($pageNum >= $totalPages)
+		$myPage->t_body->set_var('next_button_block', '');
+	else
+		$myPage->t_body->parse('next_button_block', 'next_button');
+	
+	if($totalPages > 1) {
+		for($j=1; $j <= $totalPages; $j++) {
+			if($pageNum == $j)
+				 $myPage->t_body->set_var('CURRENT', ' current');
+			else
+				 $myPage->t_body->set_var('CURRENT', '');
+				 
+			$myPage->t_body->set_var('PAGE_INDEX', $j);
+			$myPage->t_body->parse('page_number_block','page_number', true); 
+		}
+	}
+	else
+		$myPage->t_body->set_var('page_number_block','');
+
+	$outputPagination = array('PREVIOUS_PAGE' 	=> $pageNum - 1,
+							  'NEXT_PAGE'		=> $pageNum + 1,
+							  'LAST_PAGE'		=> $totalPages,
+							  'ARCHIVED'		=> $show=="archived" ? "&archived=1" : "",
+							  );
+							  
+	$myPage->t_body->set_var($outputPagination);	
+	
+		
+	$myPage->setStories($myNews->getNews(0, $newsIndex, $newsPerPage));
+} else {
+	// don't paginate current news
+	$myPage->t_body->set_var('next_button_block', '');
+	$myPage->t_body->set_var('previous_button_block', '');
+	$myPage->t_body->set_var('page_number_block', '');
 	$myPage->setStories($myNews->getNews());
 }
-
 
 $myPage->showPage();
 ?>
