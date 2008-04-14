@@ -5,12 +5,13 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/db.php';
 
 class SitePage extends Page {
 
-	function SitePage () {
+	function SitePage($login=TRUE) {
 		parent::Page();
-	
 		$this->site = SITE_location;
-		$this->initSession();
 		$this->db = new dbManager;
+		
+		if($login)
+			$this->initSession();
 	}
 	
 	
@@ -32,7 +33,7 @@ class SitePage extends Page {
 		
 		if(is_file($_SERVER['DOCUMENT_ROOT'].'/'.$page . '.php') && $execute)
 			include($_SERVER['DOCUMENT_ROOT'].'/'.$page . '.php');
-		else if(is_file($this->getTemplate($page.'.html')) 
+		else if(is_file($this->getTemplate($page.'.html')))
 			$this->setFile(TEMPLATE_content, $this->getTemplate($page.'.html'));
 		else
 			$this->pageNotFound();
@@ -40,8 +41,10 @@ class SitePage extends Page {
 	}
 	
 	
-	function outputPage() {
-		$this->buildPage();
+	function outputPage($lite=FALSE) {
+		if(!$lite)
+			$this->buildPage();
+			
 		$this->template->pparse('finaloutput', TEMPLATE_body);
 	}
 	
@@ -286,13 +289,22 @@ class SitePage extends Page {
 			exit;
 	}
 	
-	//This function is used when the session is not correct simply redirects
-	//user to login page with the requested url
 	function goLoginPage(){
-			$page = rawurlencode($_SERVER['REQUEST_URI']);
-			$this->localRedir("/login.php?page={$page}");
+		$this->setFile(TEMPLATE_body, $this->getTemplate('common/login.html'));
+		$this->setVar("TITLE", HEADING." - Login");
+		$this->setVar("HIDDEN",$_SERVER['REQUEST_URI']);
+		$this->outputPage(TRUE);
+		exit;
 	}
 
+	function pageNotFound() {
+		header("HTTP/1.0 404 Not Found");
+		$this->setFile(TEMPLATE_body, $this->getTemplate('common/404.html'));
+		$this->outputPage(TRUE);
+		exit;
+	}
+	
+	
 	
 	//Private Functions
 	

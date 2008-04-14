@@ -9,7 +9,6 @@ else
 
 $page = new sitePage();
 
-
 $page->loadContent($pageName);
 
 $page->outputPage();

@@ -7,6 +7,8 @@
 include('include/include.php');
 include('include/auth.php');
 
+
+
 class LoginPage
 {
 	function LoginPage($page = "")

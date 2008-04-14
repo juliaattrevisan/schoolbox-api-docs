@@ -21,7 +21,7 @@ function perm($sid, $service)
 	if($_SESSION['su'] == 1)
 		return 3;
 
-		$db = new dbManager;
+	$db = new dbManager;
 
 	//individual access
 	$userQuery = "SELECT type FROM userAccess 
