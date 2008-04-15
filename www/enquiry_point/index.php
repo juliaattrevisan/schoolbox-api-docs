@@ -40,7 +40,7 @@ class page {
 	function userdata($userid) {
 		$sql ="SELECT * FROM intranet.user WHERE id = '$userid'";
 		
-		$row = $this->db->dbGetSingleRow($sql);
+		$row = $this->db->getRow($sql);
 
 		$this->t_body->set_var($row);
 		

@@ -129,13 +129,13 @@ class ModFolderPage
 	function getGroupList()
 	{
 		$query = "SELECT * FROM groups ORDER BY name";
-		return $this->db->dbGetAllRows($query);
+		return $this->db->getAll($query);
 	}		
 		
 	function getTemplateList()
 	{
 		$query = "SELECT id, name FROM homepages";
-		return $this->db->dbGetAllRows($query);
+		return $this->db->getAll($query);
 	}
 		
 	function getCatTree($parent, $ident)
@@ -144,11 +144,11 @@ class ModFolderPage
 		//TODO: make this one query iterative rather than being recursive. also needs to check perms
 		$query = "SELECT id, name, code FROM category WHERE parent = ".$parent." ORDER BY name";
 
- 		$result = $this->db->dbDoQuery($query);
+ 		$result = $this->db->query($query);
 
-		if( $this->db->dbCountRows() > 0 )
+		if( $this->db->countRows() > 0 )
 		{
-			while($line = $this->db->dbGetNextArray($result) )
+			while($line = $this->db->getNextArray($result) )
 			{
 				$thisRow['id'] = $line['id'];
 				$thisRow['name'] = $ident.scrubTEXT($line['name']);

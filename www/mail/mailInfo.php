@@ -30,7 +30,7 @@ class OutPut
 
 		$query = "UPDATE user SET password = PASSWORD('".$password."'), email_pass = '".$password."' WHERE id = '".$_SESSION["id"]."'";
 
-		$db->dbDoQuery($query);
+		$db->query($query);
 	}
 
 	function showPage()

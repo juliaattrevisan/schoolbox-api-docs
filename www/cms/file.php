@@ -127,7 +127,7 @@ class file
 	function getFile($id)
 	{
                 $query = "SELECT category, description, comment, type, realname, mime_type, hidden FROM file WHERE id = '$id'";
-                return $this->db->dbGetSingleRow($query);
+                return $this->db->getRow($query);
 	} 
 
 }

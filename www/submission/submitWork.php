@@ -15,13 +15,13 @@ class submitWorkPage {
 	{		
 		//check if already submitted
 		$query = "SELECT id FROM student_submission WHERE box_id = '$box_id' AND owner = '".$_SESSION['id']."'";
-		if(is_array($this->db->dbGetSingleRow($query)))	
+		if(is_array($this->db->getRow($query)))	
 			error(27);
 			
 		//check if submitted assignment is late
 		$query = "SELECT UNIX_TIMESTAMP(date) AS overdue, UNIX_TIMESTAMP(open_date) AS open, code, category.id FROM submission_box, category 
 		WHERE submission_box.id = '$box_id' AND submission_box.category = category.id";
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 		if(!is_array($result))
 			error(17);
 		
@@ -51,7 +51,7 @@ class submitWorkPage {
 		$query = "INSERT INTO student_submission (owner, realname, submitted, box_id, late) VALUES 
 					('".$_SESSION['id']."','$file_name', NOW(), $box_id, '$late')";
 		
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
 		//get file ID from INSERT
 		$fileId = $this->db->dbInsertId();
@@ -77,7 +77,7 @@ class submitWorkPage {
 				  WHERE submission_box.category = category.id 
 					AND submission_box.id = $box_id";
 		
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 		if(!is_array($result))
 			error(2);
 		

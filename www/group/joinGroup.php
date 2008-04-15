@@ -56,11 +56,11 @@ class OutPut
 		$query = "SELECT name, id, userAccess.type FROM category, userGroups 
 				LEFT JOIN userAccess ON cid = sid AND service = '1' AND uid = '".$_SESSION['id']."' 
 				WHERE cid = id AND userGroups.type = '$type'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	
-		if($this->db->dbCountRows() > 0 )
+		if($this->db->countRows() > 0 )
 		{
-			for($x = 0; $row = $this->db->dbGetNextArray(); $x++)
+			for($x = 0; $row = $this->db->getNextArray(); $x++)
 			{
 				//if in group or awaiting authorisation tick box
 				if(is_numeric($row['type'])) 

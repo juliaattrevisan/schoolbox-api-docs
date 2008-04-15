@@ -33,11 +33,11 @@ function usernameToUserid($name, &$portaldb)
 
         //get users portalid
         $userquery = "SELECT id FROM user WHERE username LIKE '$name'";
-        $portaldb->dbDoQuery($userquery); 
-        if($portaldb->dbCountRows() != 1)
+        $portaldb->query($userquery); 
+        if($portaldb->countRows() != 1)
                 return 0;
 
-        $result = $portaldb->dbGetNextArray();
+        $result = $portaldb->getNextArray();
         return $result['id'];
 }
 
@@ -55,9 +55,9 @@ function wordListQuery($cid, &$db)
 {
         //get word list for category
         $wordlistquery = "SELECT word FROM filter_word_list WHERE category = '$cid'"; 
-        $db->dbDoQuery($wordlistquery);
+        $db->query($wordlistquery);
         $list = "";
-        while( $words = $db->dbGetNextArray() ) 
+        while( $words = $db->getNextArray() ) 
         {               
                 //create word list for query
                 $list .= " url LIKE '%".$words['word']."%' OR";
@@ -91,9 +91,9 @@ function createWeekList($selectedWeek, $name, $extras)
 function getCampusList(&$db)
 {
 	$query = "SELECT * FROM luCampus";
-	$db->dbDoQuery($query);
+	$db->query($query);
 
-	while( $campus[] = $db->dbGetNextArray() ) ;
+	while( $campus[] = $db->getNextArray() ) ;
 
 	return $campus;	
 }

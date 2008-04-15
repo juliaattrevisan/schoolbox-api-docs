@@ -24,8 +24,8 @@ function permType()
 			WHERE service = 5 
 			AND uid = '".$_SESSION['id']."'
 	";
-	$db->dbDoQuery($userQuery);      
-	$result = $db->dbGetNextArray();      
+	$db->query($userQuery);      
+	$result = $db->getNextArray();      
 	return $result['type'];
 }
 
@@ -41,8 +41,8 @@ function permSS()
 		  AND `sid` = 1
 		  AND `type` = 4
 	";
-	$db->dbDoQuery($query);
-	$result = $db->dbGetNextArray();
+	$db->query($query);
+	$result = $db->getNextArray();
 	return $result['uid'];
 }
 
@@ -58,8 +58,8 @@ function permHoH($house)
 		  AND sid = '".$house."' 
 		  AND type = 3
 	";
-	$db->dbDoQuery($query);
- 	$result = $db->dbGetNextArray();
+	$db->query($query);
+ 	$result = $db->getNextArray();
 	return $result['uid'];		  
 }
 
@@ -74,13 +74,13 @@ function permHouse()
 		  WHERE service = 5
 		  AND uid = '".$_SESSION['id']."'
 	"; 
-	$db->dbDoQuery($query);
-	$result = $db->dbGetNextArray();
+	$db->query($query);
+	$result = $db->getNextArray();
 	return $result['sid'];
 }
 ?>
-db->dbDoQuery($query);
-	$result = $db->dbGetNextArray();
+db->query($query);
+	$result = $db->getNextArray();
 	return $result['sid'];
 }
 ?>

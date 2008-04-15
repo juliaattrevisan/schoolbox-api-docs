@@ -74,8 +74,8 @@ class folder
 		$this->checkWriteAccess($parent);
 	
 		$query = "SELECT id FROM groups";
-		$reshandle=$this->db->dbDoQuery($query);
-		while($group = $this->db->dbGetNextArray($reshandle) )
+		$reshandle=$this->db->query($query);
+		while($group = $this->db->getNextArray($reshandle) )
 		{
 			//setup variable names
 			$vname = $group['id'];	
@@ -131,7 +131,7 @@ class folder
 		
 		$this->deletePerms($cid);
 		$query = "DELETE FROM userAccess WHERE service = '1' AND sid = '".$id."'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
 		$logEntry = array(	'object'		=> 'folder',
 							'objectId'		=> $id,
@@ -160,13 +160,13 @@ class folder
 	function getFolder($cid)
 	{
 		$query = "SELECT name, parent, code, template FROM category WHERE id = '$cid'";
-		return $this->db->dbGetSingleRow($query);
+		return $this->db->getRow($query);
 	}
 
 	function getPerms($cid, $gid)
 	{
 		$query = "SELECT type FROM perms WHERE cid='$cid' AND gid='$gid'";
-		$perm = $this->db->dbGetSingleRow($query);
+		$perm = $this->db->getRow($query);
 		return $perm['type'];
 	}
 
@@ -194,24 +194,24 @@ class folder
 	{
 		//check for child folders
 		$query = "SELECT id FROM category WHERE parent = '".$id."'";
-		$this->db->dbDoQuery($query);
-		if($this->db->dbCountRows() > 0)
+		$this->db->query($query);
+		if($this->db->countRows() > 0)
 			error(12); //children exist exit with error
 		
 		//check for files/links in category
 		$query = "SELECT id FROM link WHERE category = '".$id."'";
-		$this->db->dbDoQuery($query);
-		if($this->db->dbCountRows() > 0)
+		$this->db->query($query);
+		if($this->db->countRows() > 0)
 			error(12); //children exist exit with error
 		
 		$query = "SELECT id FROM file WHERE category = '".$id."' AND deleted = '0'";
-		$this->db->dbDoQuery($query);
-		if($this->db->dbCountRows() > 0)
+		$this->db->query($query);
+		if($this->db->countRows() > 0)
 			error(12); //children exist exit with error
 		
 		//check for submission boxes TODO: REMOVE THIS AND PUT A CLEANUP SUBMISSION BOX FUNCTION IN (but maybe only for superusers), also add recursive delete functions)
 		$query = "SELECT id FROM submission_box WHERE category = $id AND deleted = 0";
-		$subList = $this->db->dbGetAllRows($query);
+		$subList = $this->db->getAll($query);
 		if (is_array($subList)) {
 			if (!isset($_SESSION['su']))
 				error(12);

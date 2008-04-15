@@ -42,10 +42,10 @@ class url
 		$query = "UPDATE link 
 			SET url='$url', description=".$this->db->dbSmartQuote($description).", comment=".$this->db->dbSmartQuote($comment).", category='$category', hidden = '$hidden'
 			WHERE id = '$modid'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
 		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('link', $modid, 'modify', {$_SESSION['id']})";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 
 	function addUrl($url, $description, $comment, $category, $hidden)
@@ -68,11 +68,11 @@ class url
 			comment = ".$this->db->dbSmartQuote($comment).", 
 			hidden = '$hidden' ";
 		
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		$linkId = $this->db->dbInsertId();
 		
 		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('link', $linkId, 'create', {$_SESSION['id']})";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 
 	function deleteUrl($id)
@@ -88,17 +88,17 @@ class url
 		//now delete url from the database
 
 		$query = "DELETE FROM link WHERE id = '".$id."'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
 		$query = "INSERT INTO cmsLog (object, objectId, action, user) VALUES ('link', $id, 'delete', {$_SESSION['id']})";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
 	}
 
 	function getUrl($id)
 	{
 		$query = "SELECT url, category, description, comment FROM link WHERE id = '$id'";
-		return $this->db->dbGetSingleRow($query);
+		return $this->db->getRow($query);
 	}
 
 }

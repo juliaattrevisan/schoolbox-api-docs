@@ -43,12 +43,12 @@ function ZipFolder($folder) {
 
 function getResources($folder) {
 	$query = "SELECT id, realname, file_size FROM file WHERE category = {$folder} AND deleted = 0";
-	return $this->db->dbGetAllRows($query);
+	return $this->db->getAll($query);
 }
 
 function getFolders($folder) {
 	$query = "SELECT id, name FROM category WHERE parent = {$folder}";
-	return $this->db->dbGetAllRows($query);
+	return $this->db->getAll($query);
 }
 
 function cleanName($name) {

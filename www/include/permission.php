@@ -27,7 +27,7 @@ function perm($sid, $service)
 	$userQuery = "SELECT type FROM userAccess 
 	WHERE service = ".$service." AND sid = ".$sid." AND uid = ".$_SESSION['id']."";
      
-	$result = $db->dbGetSingleRow($userQuery);            
+	$result = $db->getRow($userQuery);            
 	$perm = $result['type'];
 	if($perm == "")
 		$perm = 0;
@@ -37,7 +37,7 @@ function perm($sid, $service)
 	{                       
 		$permQuery = "SELECT type FROM perms 
 		WHERE cid='".$sid."' AND gid='".$_SESSION['gid']."' ORDER BY type DESC";
-		$result = $db->dbGetSingleRow($permQuery);
+		$result = $db->getRow($permQuery);
 		if($result['type']) 
 		{
 			$perm = $result['type'];
@@ -62,7 +62,7 @@ function isMember($id, $uid)
 	$userQuery = "SELECT type FROM userAccess 
 	WHERE service = $service AND sid = $id AND uid = $uid";
      
-	$result = $db->dbGetSingleRow($userQuery);   
+	$result = $db->getRow($userQuery);   
 
 	if($result['type'])
 		return true;

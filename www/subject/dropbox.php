@@ -35,7 +35,7 @@ class dropbox
 	function checkDropBoxExists($cid)
 	{
 		$query = "SELECT position FROM homepage_comp_location WHERE cid = $cid AND component IN (".DROPBOX_COMPONENT.")";
-		if($this->db->dbGetSingleRow($query))
+		if($this->db->getRow($query))
 			return true;
 		else
 			return false;
@@ -98,24 +98,24 @@ class dropbox
 	function getFile($id)
 	{
 		$query = "SELECT category, description FROM dropbox WHERE id = '$id'";
-		return $this->db->dbGetSingleRow($query);
+		return $this->db->getRow($query);
 	} 
 
 	function getFileList($cid) {
 		$query = "SELECT d.id, description, u.id as uid, title, firstname, lastname,  DATE_FORMAT(submitted, '".FILE_date_format."') as subdate 
 				FROM dropbox d LEFT JOIN user u ON owner = u.id WHERE category = '$cid'";
-		return $this->db->dbGetAllRows($query);
+		return $this->db->getAll($query);
 	}
 
 	function outputFile($id, $save) {
 		//sends file
 		$query = "SELECT realname,category, mime_type FROM dropbox WHERE id = '$id'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
-		if($this->db->dbCountRows() < 1) 
+		if($this->db->countRows() < 1) 
 			error(5);
         
-		$result = $this->db->dbGetNextArray();
+		$result = $this->db->getNextArray();
 
 		if($this->checkWriteAccess($result['category']) < 2)
 			error(5);	

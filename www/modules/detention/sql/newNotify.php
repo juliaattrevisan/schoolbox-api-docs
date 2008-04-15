@@ -28,10 +28,10 @@ class Notify
 			LEFT JOIN offence ON d.offence = offence.id
 			LEFT JOIN status ON d.status = status.id
 			WHERE d.id = ".$detID;
-		$this->db->dbDoQuery($sql);
-		if($this->db->dbCountRows())
+		$this->db->query($sql);
+		if($this->db->countRows())
 		{
-			$this->det = $this->db->dbGetNextArray();
+			$this->det = $this->db->getNextArray();
 		}			
 	}
 	

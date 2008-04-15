@@ -46,13 +46,13 @@ function ProxyLog() {
 
 	//first get user information including fullname and username
 	$query = "SELECT firstname, lastname, username FROM user WHERE id = '".$_REQUEST['uid']."'";
-	$db->dbDoQuery($query);
-	$user = $db->dbGetNextArray();
+	$db->query($query);
+	$user = $db->getNextArray();
 
 
 	$this->t_body->set_var("NAME", $user['firstname']." ".$user['lastname']);
 
-	$db->dbDoQuery("use proxy");
+	$db->query("use proxy");
 
 	//make begin/end time in unix format
 	if($_REQUEST['week'])
@@ -112,9 +112,9 @@ function ProxyLog() {
 			$query .= "AND ( $keyword )";
 		
 		$query .= " ORDER BY time ASC";
-		$db->dbDoQuery($query);
+		$db->query($query);
 
-		while( $url = $db->dbGetNextArray() )
+		while( $url = $db->getNextArray() )
 		{
 			if($cur_results >= $begin && $cur_results <= $end)
 			{

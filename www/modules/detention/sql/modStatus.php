@@ -23,8 +23,8 @@ class status
 			  FROM status
 			  ORDER BY type
 		";
-	 	$this->mySQLdb->dbDoQuery($query);	   	
-		while ($status = $this->mySQLdb->dbGetNextArray())
+	 	$this->mySQLdb->query($query);	   	
+		while ($status = $this->mySQLdb->getNextArray())
 		{
 			$status['type'] = stripslashes($status['type']);
 			$listOfStatuss[] = $status;
@@ -40,7 +40,7 @@ class status
 			$query = "INSERT INTO status (type) 
 				  VALUES ('".$type."')
 			";
-			if($this->mySQLdb->dbDoQuery($query))
+			if($this->mySQLdb->query($query))
 				return 1;
 			else
 				error(21);
@@ -55,7 +55,7 @@ class status
 		if($this->exists)
 		{
 			$query = "DELETE FROM status WHERE id = '".$this->id."'";
-			$this->mySQLdb->dbDoQuery($query);
+			$this->mySQLdb->query($query);
 		}
 		else 
 			"whoops, not existing...";
@@ -71,8 +71,8 @@ class status
 		$query = "SELECT * FROM status 
 			  WHERE  id = '".$this->id."'
 		";
-		$this->mySQLdb->dbDoQuery($query);
-		if ($this->mySQLdb->dbCountRows() > 0)
+		$this->mySQLdb->query($query);
+		if ($this->mySQLdb->countRows() > 0)
 			return 1;
 		else
 			return 0;

@@ -41,7 +41,7 @@ class Event
 						LEFT JOIN luFormat f ON e.formatID = f.formatID
 						LEFT JOIN luYear y ON e.yearID = y.yearID
 						WHERE id = $id";
-		return $this->db->dbGetSingleRow($query);
+		return $this->db->getRow($query);
 	
 	}
 	
@@ -57,7 +57,7 @@ class Event
 						LEFT JOIN luYear y ON e.yearID = y.yearID
 						WHERE start > NOW()
 						ORDER BY start ASC LIMIT 0, $count";
-			return $this->db->dbGetAllRows($query);
+			return $this->db->getAll($query);
 	
 	}
 	
@@ -103,7 +103,7 @@ class Event
 		if($orderBy)
 			$query .= ' ORDER BY $orderBy';
 
-		return $this->db->dbGetAllRows($query);
+		return $this->db->getAll($query);
 	}
 	
 	

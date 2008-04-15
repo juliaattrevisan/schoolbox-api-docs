@@ -77,21 +77,21 @@ class myFolder
 	function getFolder($catid)
 	{
 		$query = "SELECT * FROM myFolder WHERE id = '$catid'";
-		return $this->db->dbGetSingleRow($query);
+		return $this->db->getRow($query);
 	}
 
 	function checkForChildren($id)
 	{
 		//check for child folders
 		$query = "SELECT id FROM myFolder WHERE parent = '".$id."'";
-		$this->db->dbDoQuery($query);
-		if($this->db->dbCountRows() > 0)
+		$this->db->query($query);
+		if($this->db->countRows() > 0)
 			error(12); //children exist exit with error
 		
 		//check for files in category
 		$query = "SELECT id FROM myFile WHERE parent = '".$id."' AND deleted = '0'";
-		$this->db->dbDoQuery($query);
-		if($this->db->dbCountRows() > 0)
+		$this->db->query($query);
+		if($this->db->countRows() > 0)
 			error(12); //children exist exit with error
 
 	}

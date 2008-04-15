@@ -76,9 +76,9 @@ class notify
 			  WHERE id IN ( '".$this->studID."', '".$this->assStaffID."' )
 		";
 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		$permType = permType();
-		while ($ppl = $this->db->dbGetNextArray()){
+		while ($ppl = $this->db->getNextArray()){
 			if ($ppl['group_id'] == 1 || $ppl['group_id'] == 2 || 
 				($ppl['id'] == $_SESSION['id'] && $permType == 1)){
 				$this->assStaffName = $ppl['lastname'].", ".substr($ppl['firstname'], 0, 1);
@@ -95,8 +95,8 @@ class notify
 		}
 		if (!empty($this->studHouse)) {
 			$query = "SELECT house FROM `house` WHERE `id` = ".$this->studHouse;
-			$this->db->dbDoQuery($query);
-			$house = $this->db->dbGetNextArray();
+			$this->db->query($query);
+			$house = $this->db->getNextArray();
 			$this->studHouseName = $house['house'];
 		}
 	}
@@ -109,8 +109,8 @@ class notify
 		$query = "SELECT * FROM user
 			  WHERE id = '".$this->HoHID."'
 			";
-		$this->db->dbDoQuery($query);
-		$hoh = $this->db->dbGetNextArray();
+		$this->db->query($query);
+		$hoh = $this->db->getNextArray();
 		$this->HoHname = $hoh['firstname']." ".$hoh['lastname'];
 		$this->HoHUN = $hoh['username'];
 	}
@@ -123,8 +123,8 @@ class notify
 		$query = "SELECT * FROM user
 			  WHERE id = '".$this->SSID."'
 			";
-		$this->db->dbDoQuery($query);
-		$ss = $this->db->dbGetNextArray();
+		$this->db->query($query);
+		$ss = $this->db->getNextArray();
 		$this->SSname = $ss['firstname']." ".$ss['lastname'];
 		$this->SSUN = $ss['username'];
 	}

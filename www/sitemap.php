@@ -46,7 +46,7 @@ class OutPut {
 			$this->perm = perm($parent, 1);
 
 			$query = "SELECT parent FROM category WHERE id = $parent";
-			$category = $this->db->dbGetSingleRow($query);
+			$category = $this->db->getRow($query);
 			$parent = $category['parent'];
 			array_push($catTree, $parent);
 		} 
@@ -81,7 +81,7 @@ class OutPut {
 					  (SELECT count(*) FROM category WHERE parent = c.id) as children
 					  FROM category c
 					  WHERE parent = ".$catTree[$i]." ORDER BY name";	
-			$catList = $this->db->dbGetAllRows($query);
+			$catList = $this->db->getAll($query);
 	
 			$this->t_body->set_var('category_block', '');
 			$this->t_body->set_var('category_window_block', '');
@@ -127,7 +127,7 @@ class OutPut {
 				  WHERE link.category = $parent
 				  
 				  ORDER BY description";
-		$fileList = $this->db->dbGetAllRows($query);
+		$fileList = $this->db->getAll($query);
 		
 		if (is_array($fileList)) {
 			foreach ($fileList as $file) {
@@ -266,7 +266,7 @@ class OutPut {
 				  FROM file f
 				  LEFT JOIN user u ON u.id = f.id 
 				  WHERE f.id = $fileID";
-		$file = $this->db->dbGetSingleRow($query);
+		$file = $this->db->getRow($query);
 		
 		$output = array ('COMMENT'	=> $file['comment'],
 						 'CREATED'	=> date("M j y @ g:iA", $file['submitted']),

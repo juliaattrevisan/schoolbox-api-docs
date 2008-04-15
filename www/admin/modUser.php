@@ -117,8 +117,8 @@ class modUser
 	{
 		$titleListHTML = "";
 		$query = "SELECT * FROM luTitle ORDER BY titleName";
-		$this->db->dbDoQuery($query);
-		while($line = $this->db->dbGetNextArray() )
+		$this->db->query($query);
+		while($line = $this->db->getNextArray() )
 		{		
 			if($line['titleName'] == $titleName)
 				$titleListHTML .= "<option value=\"".$line['titleName']."\" selected>".$line['titleName']."</option>";
@@ -132,8 +132,8 @@ class modUser
 	{
 		$campusListHTML = "";
 		$query = "SELECT * FROM luCampus WHERE id != '".ALLCAMPUS."' ORDER BY name";
-		$this->db->dbDoQuery($query);
-		while($line = $this->db->dbGetNextArray() )
+		$this->db->query($query);
+		while($line = $this->db->getNextArray() )
 		{
 			if($this->isInCampus($userCampus, $line['id']))
 				$campusListHTML .= "<input type=\"checkbox\" name=\"campus[]\" value=\"".$line['id']."\" checked> ".$line['name']."<br>";	
@@ -147,8 +147,8 @@ class modUser
 	{
 		$groupListHTML = "";
 		$query = "SELECT * FROM groups ORDER BY name";
-		$this->db->dbDoQuery($query);
-		while($line = $this->db->dbGetNextArray() )
+		$this->db->query($query);
+		while($line = $this->db->getNextArray() )
 		{		
 			if($line['id'] == $groupID)
 				$groupListHTML .= "<option value=\"".$line['id']."\" selected>".$line['name']."</option>";
@@ -234,9 +234,9 @@ class modUser
 				ORDER BY time DESC
 				LIMIT 0,10";
 				
-		$this->db->dbDoQuery($query);
-		if($this->db->dbCountRows() > 0) {
-			while($result = $this->db->dbGetNextArray()) {
+		$this->db->query($query);
+		if($this->db->countRows() > 0) {
+			while($result = $this->db->getNextArray()) {
 				$output = array (	'ACTION_DATE' 	=> date('d/m/Y G:i',strtotime( $result['time'] )),
 									'ACTION_ACTION' => $result['action'],
 									'ACTION_OBJECT' => $result['object'],
@@ -255,9 +255,9 @@ class modUser
 		
 		$query = "SELECT date, ip, login FROM login_log WHERE username like '$username' ORDER BY date DESC LIMIT 0,10";
 				
-		$this->db->dbDoQuery($query);
-		if($this->db->dbCountRows() > 0) {
-			while($result = $this->db->dbGetNextArray()) {
+		$this->db->query($query);
+		if($this->db->countRows() > 0) {
+			while($result = $this->db->getNextArray()) {
 				$output = array (	'LOGIN_DATE' 	=> date('d/m/Y G:i',strtotime( $result['date'] )),
 									'LOGIN_IP' => $result['ip'],
 									'LOGIN_RESULT' => $result['login']?'Success':'Failed',
@@ -291,11 +291,11 @@ class modUser
 		}
 		
 		$query = "SELECT * FROM luServices";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		$serviceHTML = "<select name=\"service\" class=\"formfield\">";
 		$serviceHTML .= "<option value=\"0\"><- Please Select a Service -></option>"; 
 
-		while($line = $this->db->dbGetNextArray() )
+		while($line = $this->db->getNextArray() )
 		{
 			$serviceHTML .= "<option value=\"".$line['id']."\">".$line['name']."</option>";
 		}
@@ -316,12 +316,12 @@ class modUser
 		//make a drop down of all available folder groups
 		$query = "SELECT name, id FROM category, userGroups WHERE cid = id ORDER BY name";
 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
 		$groupHTML = "<select name=\"sid\" class=\"formfield\">";
 		$groupHTML .= "<option value=\"0\"><- Please Select a Group -></option>"; 
 
-		while($line = $this->db->dbGetNextArray() )
+		while($line = $this->db->getNextArray() )
 		{
 			$groupHTML .= "<option value=\"".$line['id']."\">".$line['name']."</option>";
 		}
@@ -351,8 +351,8 @@ class modUser
 		$this->t_body->set_block("tplBODY", "userlist", "user_block");
 		//we assume that the connection is setup and ready to go.. yeah messy but optimized.
 
-		$this->db->dbDoQuery($queryString);
-		while($userdetails = $this->db->dbGetNextArray())
+		$this->db->query($queryString);
+		while($userdetails = $this->db->getNextArray())
 		{
 			$this->t_body->set_var("FIRSTNAME", $userdetails['firstname']);
 			$this->t_body->set_var("LASTNAME", $userdetails['lastname']);
@@ -376,11 +376,11 @@ class modUser
 			$query = "SELECT user.id, firstname, lastname, username, groups.name as `group`, synergy_id FROM user LEFT JOIN groups ON user.group_id = groups.id WHERE lastname LIKE '%".$keyword."%' || 
 				username LIKE '%".$keyword."%' || firstname LIKE '%".$keyword."%'";
 
-		$this->db->dbDoQuery($query);
-		$matchedUsers = $this->db->dbCountRows();
+		$this->db->query($query);
+		$matchedUsers = $this->db->countRows();
 		if($matchedUsers == 1)
 		{
-			$user = $this->db->dbGetNextArray();
+			$user = $this->db->getNextArray();
 			$this->displayUser($user['id']);
 		}
 		else if($matchedUsers > 1)

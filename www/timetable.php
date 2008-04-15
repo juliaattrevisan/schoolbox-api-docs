@@ -34,7 +34,7 @@ class Timetable
 		$db = new dbManager;
 		$query = "SELECT title, firstname, lastname, year, group_id, userCampus.campus 
 			FROM user JOIN userCampus ON id = uid WHERE synergy_id = {$sid}";
-		return $db->dbGetSingleRow($query);
+		return $db->getRow($query);
 		
 	}
 

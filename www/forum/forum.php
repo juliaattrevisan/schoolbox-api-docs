@@ -17,7 +17,7 @@ class forum
 		else
 		{
 			$query = "SELECT thread FROM forum WHERE id = '$id'";
-			$result = $this->db->dbGetSingleRow($query);
+			$result = $this->db->getRow($query);
 			return $result['thread'];
 		}
 	}
@@ -38,13 +38,13 @@ class forum
 		$query = "INSERT INTO forum (owner, date, heading, message, parent, cid, thread) 
 			VALUES ('$owner',  NOW(), '$heading', '$body', '$parent', '$cid', '$threadID')";
 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
 		if($threadID == 0)
 		{
 			$threadID = $this->db->dbInsertId();
 			$query = "UPDATE forum SET thread='$threadID' WHERE id = '$threadID'";
-			$this->db->dbDoQuery($query);
+			$this->db->query($query);
 		}	
 
 	}
@@ -53,19 +53,19 @@ class forum
 	{
 		$query = "UPDATE forum SET heading='$heading', message='$body' WHERE id = '$id'"; 
 		
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 
 	function delPost($id)
 	{
 		$query = "UPDATE forum SET deleted='1' WHERE id = '$id'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
 		//foreach child delete them to
 		$query = "SELECT id FROM forum WHERE parent = '$id'";
-		$result = $this->db->dbDoQuery($query);
+		$result = $this->db->query($query);
 		
-		while($child = $this->db->dbGetNextArray($result))
+		while($child = $this->db->getNextArray($result))
 		{
 			$this->delPost($child['id']);
 		}	
@@ -80,7 +80,7 @@ class forum
 		WHERE cid = '$cid' AND deleted = 0 
 		ORDER BY date LIMIT $start, $amount";
 		
-		return $this->db->dbGetAllRows($query);		
+		return $this->db->getAll($query);		
 	}
 
 	function getThreadedPosts($cid, $start=0, $amount=10)
@@ -89,14 +89,14 @@ class forum
 		$threadQuery = "SELECT id FROM forum WHERE cid = '$cid' AND deleted = 0 AND parent = 0
 				ORDER BY date DESC LIMIT $start, $amount";
 
-		$res = $this->db->dbDoQuery($threadQuery);
-		if($this->db->dbCountRows($res) > 0)
+		$res = $this->db->query($threadQuery);
+		if($this->db->countRows($res) > 0)
 		{
 			//initialise root of tree
 			$tree[0]['id'] = 0;	
 			$tree[0]['heading'] = 'Show Topics';
 
-			while($thread = $this->db->dbGetNextArray($res))
+			while($thread = $this->db->getNextArray($res))
 			{
 				//now foreach thread output all the messages in that thread
 
@@ -107,8 +107,8 @@ class forum
 				WHERE thread = '".$thread['id']."' 
 				AND deleted = 0 ORDER BY parent, date";
 
-				$this->db->dbDoQuery($query);
-				while($post = $this->db->dbGetNextArray())
+				$this->db->query($query);
+				while($post = $this->db->getNextArray())
 				{
 					$tree = $this->insertChildToTree($tree, $post);
 				}
@@ -148,14 +148,14 @@ class forum
 	function countTopics($cid)
 	{
 		$query = "SELECT COUNT(id) AS count FROM forum WHERE cid = '$cid' AND deleted = 0 AND parent = 0";
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 		return $result['count'];
 	}	
 
 	function countPosts($cid)
 	{
 		$query = "SELECT COUNT(id) AS count FROM forum WHERE cid = '$cid' AND deleted = 0";
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 		return $result['count'];
 	}
 	
@@ -164,26 +164,26 @@ class forum
 		$query = "SELECT forum.id, owner, DATE_FORMAT(date, '%W %M %e @ %l:%i%p') AS date, heading, message, parent, 
 		cid, user.id as uid, user.username, user.title, user.firstname, user.lastname, user.local_email, user.alt_email 
 		FROM forum, user WHERE owner=user.id AND forum.id = '$id' AND deleted = 0";
-		return $this->db->dbGetSingleRow($query);
+		return $this->db->getRow($query);
 	}
 
 	function getSinglePost($id)
 	{
 		$query = "SELECT id, owner, heading, message, parent, cid FROM forum WHERE id = '$id' AND deleted = 0";
-		return $this->db->dbGetSingleRow($query);     
+		return $this->db->getRow($query);     
 	}
 
 	function getOwner($id)
 	{
 		$query = "SELECT owner FROM forum WHERE id = '$id' AND deleted = 0";
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 		return $result['owner'];
 	}
 	
 	function checkForumExists($cid)
 	{
 		$query = "SELECT position FROM homepage_comp_location WHERE cid = $cid AND component IN (".FORUM_COMPONENT.")";
-		if($this->db->dbGetSingleRow($query))
+		if($this->db->getRow($query))
 			return 1;
 		else
 			return 0;

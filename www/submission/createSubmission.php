@@ -24,9 +24,9 @@ class CreateSubmissionPage {
 	{
 		//get types of files that can be added
 		$query = "SELECT * FROM file_type";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		$typeHTML = "<OPTION VALUE=\"0\"></OPTION>";
-		while($line = $this->db->dbGetNextArray())
+		while($line = $this->db->getNextArray())
 		{
 			if($line['id'] == $type)
 			{
@@ -145,7 +145,7 @@ class CreateSubmissionPage {
 		if($category)
 		{
 			$query = "SELECT name, code FROM category WHERE id = '$category'";
-			$result = $this->db->dbGetSingleRow($query);
+			$result = $this->db->getRow($query);
 
 			//if category has code output it
 			if($result['code'])			
@@ -204,7 +204,7 @@ class CreateSubmissionPage {
 			
 			// get student subjects
 			$query = "SELECT synergy_id, group_id FROM user WHERE id = " . $_GET['user'];
-			$user = $this->db->dbGetSingleRow($query);
+			$user = $this->db->getRow($query);
 			$sSubjects = getSubjectList($user['synergy_id'], $user['group_id']);
 			$sCatList = involvedCategoryList($_GET['user'], $sSubjects, 1);
 			
@@ -238,11 +238,11 @@ class CreateSubmissionPage {
 			$catQuery = "SELECT name, id, code FROM category, perms WHERE parent = '".$parent."' AND
                                 cid=id AND gid ='".$_SESSION['gid']."' AND type >= '1' ORDER BY name";
 
- 		$result = $this->db->dbDoQuery($catQuery);
+ 		$result = $this->db->query($catQuery);
 
-		if( $this->db->dbCountRows() > 0 )
+		if( $this->db->countRows() > 0 )
 		{
-			while($line = $this->db->dbGetNextArray($result) )
+			while($line = $this->db->getNextArray($result) )
 			{
 				$thisRow['id'] = $line['id'];
 				$thisRow['name'] = $ident.$line['name'];
@@ -269,8 +269,8 @@ class CreateSubmissionPage {
 		$db = new dbManager;
 		$db->dbConnect();
 		$query = "SELECT description FROM file WHERE id = '$fileid'";
-		$db->dbDoQuery($query);
-		$file = $db->dbGetNextArray();
+		$db->query($query);
+		$file = $db->getNextArray();
 		$this->t_body->set_var("DESC", $file['description']);
 		
 		$this->setFileTypeList($_GET['type']);	

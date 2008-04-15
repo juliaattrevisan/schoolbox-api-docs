@@ -64,11 +64,11 @@ class ModResourcePage {
 			$catQuery = "SELECT name, id, code FROM category, perms WHERE parent = '".$parent."' AND
                                 cid=id AND gid ='".$_SESSION['gid']."' AND type >= '1' ORDER BY name";
 
- 		$result = $this->db->dbDoQuery($catQuery);
+ 		$result = $this->db->query($catQuery);
 
-		if( $this->db->dbCountRows() > 0 )
+		if( $this->db->countRows() > 0 )
 		{
-			while($line = $this->db->dbGetNextArray($result) )
+			while($line = $this->db->getNextArray($result) )
 			{
 				$thisRow['id'] = $line['id'];
 				$thisRow['name'] = $ident.$line['name'];
@@ -86,7 +86,7 @@ class ModResourcePage {
 		if($category)
 		{
 			$query = "SELECT name, code FROM category WHERE id = '$category'";
-			$result = $this->db->dbGetSingleRow($query);
+			$result = $this->db->getRow($query);
 
 			//if category has code output it
 			if($result['code'])			
@@ -145,7 +145,7 @@ class ModResourcePage {
 		} else {
 			$query = "SELECT * FROM myFolder WHERE owner = " . $_SESSION['id'] . " AND parent = ". (int)$myFolder . " ORDER BY name";
 			
-			$myFolders = $this->db->dbGetAllRows($query);
+			$myFolders = $this->db->getAll($query);
 		}
 		
 		if (is_array($myFolders)) {
@@ -169,7 +169,7 @@ class ModResourcePage {
 				
 				$query = "SELECT id, description FROM myFile WHERE owner = " . $_SESSION['id'] . " AND parent = " . $folder['id'] . " AND deleted = 0 ORDER BY description";
 				
-				$myFiles = $this->db->dbGetAllRows($query);
+				$myFiles = $this->db->getAll($query);
 				if (is_array($myFiles)) {
 					$this->depth++;
 					foreach ($myFiles as $file) {
@@ -291,7 +291,7 @@ class ModResourcePage {
 
 		//check box for submission box associated with file
 		$query = "SELECT id, deleted FROM submission_box WHERE fid = '$id'";
-		$sub = $this->db->dbGetSingleRow($query);
+		$sub = $this->db->getRow($query);
 
 		//if submission box exists
 		if($sub['id'])
@@ -458,7 +458,7 @@ if((isset($_POST['description']) && $_POST['description']) || (isset($_POST['des
 
 		$fileDB = new file; 
 		$query  = "SELECT realname, mime_type FROM myFile WHERE id = ".$_POST['myfile'];
-		$privFile = $fileDB->db->dbGetSingleRow($query);
+		$privFile = $fileDB->db->getRow($query);
 		
 	
 		$fileId = $fileDB->addFile($privFile['realname'], $privFile['mime_type'], MYFILE_directory . '/' . $_POST['myfile'] . '.dat', $_POST['description'], 

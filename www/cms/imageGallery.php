@@ -30,7 +30,7 @@ function ImageGallery($cid) {
 	$db = new dbManager;
 
 	$query = "SELECT id, name FROM category WHERE id = $cid";
-	$catInfo = $db->dbGetSingleRow($query);
+	$catInfo = $db->getRow($query);
 
 	$this->t_body->set_var("FOLDER_NAME", $catInfo['name']);
 	$this->t_body->set_var("ID", $catInfo['id']);
@@ -41,12 +41,12 @@ function ImageGallery($cid) {
 	
 	$query = "SELECT id, description FROM file WHERE category = {$cid} AND deleted = '0' AND INSTR(mime_type, 'image/') 
 		ORDER BY submitted";
-	$db->dbDoQuery($query);
+	$db->query($query);
 
 	$count = 1; 
 	$flag = 0;
 
-	while( $thumbnail = $db->dbGetNextArray() )
+	while( $thumbnail = $db->getNextArray() )
 	{
 		$this->t_body->set_VAR("THUMBNAIL", "<a href=\"image.php?id={$thumbnail['id']}&height=550&width=600\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
 				<img src=\"image.php?id={$thumbnail['id']}&height=".THUMBNAIL_size."&width=".THUMBNAIL_size."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");

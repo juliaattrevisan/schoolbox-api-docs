@@ -29,7 +29,7 @@ class modUserGroup
 		
 		//get title of group
 		$query = "SELECT name FROM category WHERE id = '$this->sid'";
-		$heading = $this->db->dbGetSingleRow($query);
+		$heading = $this->db->getRow($query);
 
 		$this->t_body->set_var("HEADING", $heading['name']);	
 
@@ -51,7 +51,7 @@ class modUserGroup
 	
 		//get title of group and type
 		$query = "SELECT name, type FROM category, userGroups WHERE id = '$this->sid' AND cid = id";
-		$heading = $this->db->dbGetSingleRow($query);
+		$heading = $this->db->getRow($query);
 
 		$this->t_body->set_var("HEADING", $heading['name']);	
 
@@ -80,13 +80,13 @@ class modUserGroup
 		//get members of group
 		$query = "SELECT title, firstname, lastname, uid, type FROM userAccess, user WHERE uid = id AND service = '$this->service'
 			AND sid = '$this->sid' AND type < '3' AND type > '0'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
 		//setup member block
 		$this->t_body->set_block("tplBODY", "member", "member_block");		
-		if($this->db->dbCountRows() > 0)
+		if($this->db->countRows() > 0)
 		{
-			while($member = $this->db->dbGetNextArray())
+			while($member = $this->db->getNextArray())
 			{
 				$this->t_body->set_var("MEMBER", formatName($member));
 				$this->t_body->set_var("MEMBER_JAVA", addslashes(formatName($member)));
@@ -127,15 +127,15 @@ class modUserGroup
 		//get the list of users awaiting authorisation into group
 		$query = "SELECT title, firstname, lastname, id FROM userAccess, user WHERE service = '$this->service' 
 				AND sid = '$this->sid' AND type = '0' AND user.id = uid"; 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	
 		//output users
 		$this->t_body->set_block("tplBODY", "authorisation", "authorisation_block");		
 		$this->t_body->set_block("authorisation", "waiting", "waiting_block");
 
-		if($this->db->dbCountRows() > 0 )
+		if($this->db->countRows() > 0 )
 		{
-			while($row = $this->db->dbGetNextArray() )
+			while($row = $this->db->getNextArray() )
 			{
 				$this->t_body->set_var("WAITING_MEMBER", formatName($row));
 				$this->t_body->set_var("WAITINGID", $row['id']);
@@ -170,7 +170,7 @@ class modUserGroup
 			{
 				//numeric assume its a synergy id
 				$query = "SELECT id FROM user WHERE synergy_id = $key";
-				$userid = $this->db->dbGetSingleRow($query);
+				$userid = $this->db->getRow($query);
 				if($userid['id'])
 				{
 					$group->addMember($userid['id']);
@@ -180,7 +180,7 @@ class modUserGroup
 			{
 				//word, assume its a username
 				$query = "SELECT id FROM user WHERE username like '$key'";
-				$userid = $this->db->dbGetSingleRow($query);
+				$userid = $this->db->getRow($query);
 				if($userid['id'])
 				{
 					$group->addMember($userid['id']);

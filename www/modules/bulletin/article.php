@@ -19,7 +19,7 @@ class article
 		$sql = "SELECT body, heading, c.name FROM subject_news n
 				JOIN category c ON c.id = n.code
 				WHERE n.id = {$this->id}";	
-		$row = $this->db->dbGetSingleRow($sql);		
+		$row = $this->db->getRow($sql);		
 		
 		$this->t_body->set_var('HEADING2', $row['heading']);
 		$this->t_body->set_var('HEADING1', $row['name']);

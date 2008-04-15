@@ -33,8 +33,8 @@ class date
 			  AND		(".$where.")
 			  ORDER BY lastname, firstname
 			";
-		$this->mySQLdb->dbDoQuery($query);
-	 	while ($stafflist = $this->mySQLdb->dbGetNextArray()){
+		$this->mySQLdb->query($query);
+	 	while ($stafflist = $this->mySQLdb->getNextArray()){
 			$id = $stafflist['id']; 
 			$listOfStaff[$id] = stripslashes($stafflist['lastname']).", ".stripslashes($stafflist['firstname']);
 		}			
@@ -47,7 +47,7 @@ class date
 			  		(uid, service, sid, type)
 			  VALUES	($id, 5, 0, 2)
 			";
-		$this->mySQLdb->dbDoQuery($query);
+		$this->mySQLdb->query($query);
 	}
 
 	function getStaff()
@@ -60,8 +60,8 @@ class date
 			  AND		ua.type >= 2
 			  ORDER BY	u.lastname, u.firstname
 			";
-		$this->mySQLdb->dbDoQuery($query);
-		while ($stafflist = $this->mySQLdb->dbGetNextArray()){
+		$this->mySQLdb->query($query);
+		while ($stafflist = $this->mySQLdb->getNextArray()){
 			$stafflist['firstname'] = stripslashes($stafflist['firstname']);
 			$stafflist['lastname'] = stripslashes($stafflist['lastname']);
 			$id = $stafflist['id'];
@@ -77,15 +77,15 @@ class date
 		$query = "SELECT * FROM location
 				  WHERE `location` = '$loc'
 				  AND `deleted` = 0";
-			$result = $this->mySQLdb->dbDoQuery($query);
-			if ($this->mySQLdb->dbCountRows($result))
+			$result = $this->mySQLdb->query($query);
+			if ($this->mySQLdb->countRows($result))
 				error(60);
 
 		$query = "INSERT INTO	location
 			  		(location)
 			  VALUES	('$loc')
 			";
-		$this->mySQLdb->dbDoQuery($query);
+		$this->mySQLdb->query($query);
 	}
 
 	function getLocations()
@@ -93,8 +93,8 @@ class date
 		$query = "SELECT	id, location
 			  FROM 		location
 			  WHERE `deleted` = 0";
-		$this->mySQLdb->dbDoQuery($query);
-		while ($locs = $this->mySQLdb->dbGetNextArray()){
+		$this->mySQLdb->query($query);
+		while ($locs = $this->mySQLdb->getNextArray()){
 			$id = $locs['id'];
 			$listOfLocs[$id] = stripslashes($locs['location']);
 		}
@@ -114,8 +114,8 @@ class date
 				location
 			  FROM 	detdate
 		";
-	 	$this->mySQLdb->dbDoQuery($query);	   	
-		while ($schedule = $this->mySQLdb->dbGetNextArray())
+	 	$this->mySQLdb->query($query);	   	
+		while ($schedule = $this->mySQLdb->getNextArray())
 		{
 			$listOfDates[] = $schedule;
 		}
@@ -144,8 +144,8 @@ class date
 		}
 	 	else
 			$query.= " ORDER BY detdatetime asc, type asc";
-		$this->mySQLdb->dbDoQuery($query);
-		while ($datelist = $this->mySQLdb->dbGetNextArray())
+		$this->mySQLdb->query($query);
+		while ($datelist = $this->mySQLdb->getNextArray())
 		{
 			$listofDates[] = $datelist;
 		}	
@@ -161,8 +161,8 @@ class date
 		$query = "SELECT 	*
 			  FROM		det
 			  WHERE		detDate = '$id' AND status!=8";
-		$this->mySQLdb->dbDoQuery($query);
-		if ($this->mySQLdb->dbCountRows() > 0)
+		$this->mySQLdb->query($query);
+		if ($this->mySQLdb->countRows() > 0)
 			return 1;
 		else
 			return 0;
@@ -173,12 +173,12 @@ class date
 		$staff = addslashes($staff);
 		$location = addslashes($location);
 		$query = "SELECT * FROM detdate WHERE detdatetime = '$datetime' AND type = '$type' AND staff = '$staff' AND location = '$location'"; 
-		$this->mySQLdb->dbDoQuery($query);
-		if ($this->mySQLdb->dbCountRows() == 0){
+		$this->mySQLdb->query($query);
+		if ($this->mySQLdb->countRows() == 0){
 			$query = "INSERT INTO detdate (detdatetime, type, staff, location) 
 				  VALUES ('".$datetime."', '".$type."', '".$staff."', '".$location."')
 			";
-			if($this->mySQLdb->dbDoQuery($query))
+			if($this->mySQLdb->query($query))
 				return 1;
 			else
 				error(21);
@@ -201,8 +201,8 @@ class date
 				  AND		staff = '$staff'
 				  AND		location = '$location'
 			";
-		 	$this->mySQLdb->dbDoQuery($query);
-			if ($this->mySQLdb->dbCountRows() > 0){
+		 	$this->mySQLdb->query($query);
+			if ($this->mySQLdb->countRows() > 0){
 				$diff = 0;
 			}
 			else {
@@ -213,16 +213,16 @@ class date
 			$query = "UPDATE detdate set detdatetime = '$datetime', type = '$type', staff = '$staff', location = '$location'
 				  WHERE detdate.id = '".$this->id."' 
 			";
-			if($this->mySQLdb->dbDoQuery($query)){
+			if($this->mySQLdb->query($query)){
 				//if any details of detention have changed ie. diff = 1 then send notification
 				if ($diff){
 					//only get dets with status confirmed, notification for unconfirmed will occur upon confirmation
 					$query = "SELECT det.id from det WHERE detDate = '".$this->id."' AND status IN (2, 3, 4)";
-					$this->mySQLdb->dbDoQuery($query);
+					$this->mySQLdb->query($query);
 					
 					//if no detentions using this date, don't try and send notification
-					if ($this->mySQLdb->dbCountRows() > 0){
-					  while ($detlist = $this->mySQLdb->dbGetNextArray()){
+					if ($this->mySQLdb->countRows() > 0){
+					  while ($detlist = $this->mySQLdb->getNextArray()){
 						$ids[] = $detlist['id'];
 					  }
 					  foreach ($ids as $id){
@@ -244,8 +244,8 @@ class date
                                           		  WHERE d.id = '$date'
                                           		  AND d.location = l.id
                                 		";
-                                		$this->mySQLdb->dbDoQuery($query);
-                                		$date = $this->mySQLdb->dbGetNextArray();
+                                		$this->mySQLdb->query($query);
+                                		$date = $this->mySQLdb->getNextArray();
 
                                 		$notify = new notify("MOD", $date, $studID, $staffID, $off, $workset, $type, $history);
                                 		$notify->mail();
@@ -269,7 +269,7 @@ class date
 		if($this->exists)
 		{
 			$query = "DELETE FROM detdate WHERE id = '".$this->id."'";
-			if ($this->mySQLdb->dbDoQuery($query))
+			if ($this->mySQLdb->query($query))
 				return 1;
 			else
 				error(21);
@@ -287,8 +287,8 @@ class date
 		$query = "SELECT * FROM detdate 
 			  WHERE  id = '".$this->id."'
 		";
-		$this->mySQLdb->dbDoQuery($query);
-		if ($this->mySQLdb->dbCountRows() > 0)
+		$this->mySQLdb->query($query);
+		if ($this->mySQLdb->countRows() > 0)
 			return 1;
 		else
 			return 0;

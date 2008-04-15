@@ -29,13 +29,13 @@ function error($ec, $message="")
 	
 	header("HTTP/1.0 400 Bad Request");
 
-	$db = new dbManager;
+	$db = new dbManager(SQL_db, 1);
 
 	$query = "SELECT title, message FROM error WHERE id = '$ec'";
 	$error = $db->getRow($query);
-	
+
 	$output = str_replace("%MESSAGE%", $message, $error['message']);
-	$page = new SitePage(true);
+	$page = new SitePage(false);
 	$page->loadContent('error');
 	
 	$page->setVar("TITLE", $error['title']);

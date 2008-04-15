@@ -48,12 +48,12 @@ class displayHome
 	function searchBox()
 	{
 		$query = "SELECT * FROM luYear";
-		$year = $this->db->dbGetAllRows($query);
+		$year = $this->db->getAll($query);
 		array_unshift($year, array('name'=>'All'));
 		$this->doDropDown('year', $year);
 		
 		$query = "SELECT * FROM luFormat";
-		$format = $this->db->dbGetAllRows($query);
+		$format = $this->db->getAll($query);
 		array_unshift($format, array('name'=>'All'));
 		$this->doDropDown('format', $format);
 	}
@@ -108,7 +108,7 @@ class displayHome
 		WHERE category = '".$this->folderID."' AND file.deleted = '0' ORDER BY submitted DESC 
 		LIMIT 0, 15";
 
-		$files = $this->db->dbGetAllRows($query);
+		$files = $this->db->getAll($query);
 
 		if(is_array($files))
 		{

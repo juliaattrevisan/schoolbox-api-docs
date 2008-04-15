@@ -21,7 +21,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	$db->dbConnect();
 
 	$query = "SELECT firstname, lastname, username, local_email, title, alt_email FROM user WHERE id = '".$_SESSION["id"]."'";
-	$user = $db->dbGetSingleRow($query);
+	$user = $db->getRow($query);
 
 	$name = formatName($user);
 
@@ -35,7 +35,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	//if id is submitted to form convert to email
 	if(is_numeric($to) || SITE_location == 'wenona') {
 		$query = "SELECT username, local_email, alt_email FROM user WHERE id = $to";
-		$toemail = $db->dbGetSingleRow($query);
+		$toemail = $db->getRow($query);
 
 		if($toemail['alt_email'])
 			$to = $toemail['alt_email'];

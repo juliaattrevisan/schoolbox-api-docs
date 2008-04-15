@@ -32,7 +32,7 @@ class ClassList
 		$mySQLdb = new dbManager();
 
 		$query = "SELECT name FROM category WHERE code = '$subCode'";
-		$category = $mySQLdb->dbGetSingleRow($query);
+		$category = $mySQLdb->getRow($query);
 
 		$this->t_body->set_var("SUBJECTNAME", $category['name'] ." ($subCode)");	
 
@@ -50,7 +50,7 @@ class ClassList
 				
 				//get each students email address
 				$mysqlquery = "SELECT id as uid, username, local_email, alt_email FROM user WHERE synergy_id = '".$student['synergy_id']."'";
-				$email = $mySQLdb->dbGetSingleRow($mysqlquery);
+				$email = $mySQLdb->getRow($mysqlquery);
 	
 				if(is_array($email)){
 					$emailaddr = formatEmail($email);
@@ -73,7 +73,7 @@ class ClassList
 							  AND	category.id = homepage_log.cid
 							  AND   homepage_log.user = '{$email['uid']}'
 					"; 
-					$lastVisit = $mySQLdb->dbGetSingleRow($visitquery);
+					$lastVisit = $mySQLdb->getRow($visitquery);
 					if(is_array($lastVisit)) {
 						$this->t_body->set_var("LASTVISIT", $lastVisit['visit']);
 					}

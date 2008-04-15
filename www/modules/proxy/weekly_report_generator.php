@@ -77,15 +77,15 @@ $proxydb = new dbManager("proxy", 1);
 $proxydb->dbConnect();
 
 //execute the query
-$handle = $proxydb->dbDoQuery($query);
+$handle = $proxydb->query($query);
 	
-while( $userusage = $proxydb->dbGetNextArray($handle) )
+while( $userusage = $proxydb->getNextArray($handle) )
 {
 	//get users portalid
 
-	$proxydb->dbDoQuery("USE intranet");
+	$proxydb->query("USE intranet");
 	$userid = usernameToUserid($userusage['user'], &$proxydb);
-	$proxydb->dbDoQuery("USE proxy");
+	$proxydb->query("USE proxy");
 
 	if($userid == 0)
 	{
@@ -97,7 +97,7 @@ while( $userusage = $proxydb->dbGetNextArray($handle) )
 		$report = "INSERT INTO usage_report_week (year, week, user, datausage) VALUES
 		('$startOfWeekYear', '$currentWeek', '$userid', '".$userusage['totalsize']."')";
 
-		$proxydb->dbDoQuery($report); 
+		$proxydb->query($report); 
 	}
 }
 
@@ -105,9 +105,9 @@ while( $userusage = $proxydb->dbGetNextArray($handle) )
 
 //get category list
 $categoryquery = "SELECT id FROM filter_category";
-$cathandle = $proxydb->dbDoQuery($categoryquery);
+$cathandle = $proxydb->query($categoryquery);
 
-while( $cat =  $proxydb->dbGetNextArray($cathandle) )
+while( $cat =  $proxydb->getNextArray($cathandle) )
 {
 	$list = wordListQuery($cat['id'], &$proxydb);
 
@@ -116,14 +116,14 @@ while( $cat =  $proxydb->dbGetNextArray($cathandle) )
 			AND time < FROM_UNIXTIME('".$timestampEndOfWeek."') 
 			AND ( $list ) GROUP BY user";
 
-	$matchhandle = $proxydb->dbDoQuery($hitquery);
+	$matchhandle = $proxydb->query($hitquery);
 
-	while($hits  = $proxydb->dbGetNextArray($matchhandle) )
+	while($hits  = $proxydb->getNextArray($matchhandle) )
 	{
 	
-		$proxydb->dbDoQuery("USE intranetdev");
+		$proxydb->query("USE intranetdev");
 		$userid = usernameToUserid($hits['user'], &$proxydb);
-		$proxydb->dbDoQuery("USE proxy");
+		$proxydb->query("USE proxy");
 		
 		if($userid == 0)
 			print "error finding user: ".$userusage['user']."<br>";
@@ -133,7 +133,7 @@ while( $cat =  $proxydb->dbGetNextArray($cathandle) )
 			$report = "INSERT INTO filter_report_week (year, week, user, category, count, datausage) VALUES
 			('$startOfWeekYear', '$currentWeek', '$userid', '".$cat['id']."', '".$hits['matches']."', '".$hits['datasize']."')";
 
-			$proxydb->dbDoQuery($report);
+			$proxydb->query($report);
 		}
 	}
 }

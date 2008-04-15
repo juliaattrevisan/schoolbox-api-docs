@@ -38,7 +38,7 @@ class OutPut
 		$this->t_body->set_var("CID", $cid);
 		
 		$query = "SELECT name FROM category WHERE id = $cid";
-		$cat = $this->db->dbGetSingleRow($query);
+		$cat = $this->db->getRow($query);
 		$this->t_body->set_var("FORUM_HEADING", $cat['name']);
 
 
@@ -206,7 +206,7 @@ class OutPut
 	function checkTemplate()
 	{
 		$query = "SELECT position FROM homepage_comp_location WHERE cid = {$this->cid} AND component IN (5)";
-		if($this->db->dbGetSingleRow($query))
+		if($this->db->getRow($query))
 			return 1;
 		else
 			return 0;

@@ -46,11 +46,11 @@ class ListSubmissionPage {
 				category.id = submission_box.category AND submission_box.owner = '".$_SESSION['id']."' 
 				AND submission_box.deleted = '0' ORDER BY category.id, submission_box.date"; 
 	
-		$result=$db->dbDoQuery($listquery);
+		$result=$db->query($listquery);
 
-		if($db->dbCountRows() > 0)
+		if($db->countRows() > 0)
 		{
-			$line = $db->dbGetNextArray($result);
+			$line = $db->getNextArray($result);
 			$prevCat = $line;
 
 			do
@@ -70,15 +70,15 @@ class ListSubmissionPage {
 
 				//for each box we want to make some running totals of whats in them
 				$totalquery = "SELECT COUNT(*) AS total, SUM(marked) AS marked FROM student_submission WHERE box_id = '".$line['id']."'"; 
-				$db->dbDoQuery($totalquery);
-				$totals = $db->dbGetNextArray();
+				$db->query($totalquery);
+				$totals = $db->getNextArray();
 
 				$this->outputSubmission($line['id'],$line['description'], $line['open_date'], $line['date'], 
 					$totals['marked'], $totals['total'], $line['type']);
 
 				$prevCat = $line;
 
-			}while($line = $db->dbGetNextArray($result) );
+			}while($line = $db->getNextArray($result) );
 
 
 			if($prevCat['code'] != "")

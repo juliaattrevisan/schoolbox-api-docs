@@ -98,11 +98,11 @@ class ModMyFilePage {
 		//TODO: make this one query iterative rather than being recursive. also needs to check perms
 		$query = "SELECT * FROM myFolder WHERE parent = $parent AND owner = {$_SESSION['id']} ORDER BY name";
 
- 		$result = $this->db->dbDoQuery($query);
+ 		$result = $this->db->query($query);
 
-		if( $this->db->dbCountRows() > 0 )
+		if( $this->db->countRows() > 0 )
 		{
-			while($line = $this->db->dbGetNextArray($result) )
+			while($line = $this->db->getNextArray($result) )
 			{
 				$thisRow['id'] = $line['id'];
 				$thisRow['name'] = $ident.scrubTEXT($line['name']);

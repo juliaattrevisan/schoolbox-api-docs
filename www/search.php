@@ -117,9 +117,9 @@ class OutPut
 		$query = "SELECT name, id, template FROM category WHERE ".$this->tokenToQuery($token, 'name', 'OR'). 
 		" OR ".$this->tokenToQuery($token, 'code', 'OR')." ORDER BY name";
 
-		$result = $this->db->dbDoQuery($query);
+		$result = $this->db->query($query);
 
-		while($queryArray = $this->db->dbGetNextArray($result) )
+		while($queryArray = $this->db->getNextArray($result) )
 		{
 			//only output if they have access
 			if(perm($queryArray['id'], 1) >= 1)
@@ -200,11 +200,11 @@ category.id AND f.deleted = '0'";
 			$query .= " ORDER BY f.owner ";
 			break;
 		}
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
 		$count = 0;
 
-		while($queryArray = $this->db->dbGetNextArray() )
+		while($queryArray = $this->db->getNextArray() )
 		{
 			//only output if they have access
 			if(perm($queryArray['cid'], 1) >= 1)
@@ -284,10 +284,10 @@ category.id AND f.deleted = '0'";
 			break;
 		}
 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
 		$count = 0;
-		while($queryArray = $this->db->dbGetNextArray() )
+		while($queryArray = $this->db->getNextArray() )
 		{
 			//only output if they have access
 			if(perm($queryArray['cid'], 1) >= 1)
@@ -426,7 +426,7 @@ category.id AND f.deleted = '0'";
 		while($parent != 0)
 		{
 			$query = "SELECT id, name, parent, code FROM category WHERE id = '".$parent."'";
-			$queryArray = $this->db->dbGetSingleRow($query);
+			$queryArray = $this->db->getRow($query);
 			
 			if($queryArray['code'])
 				$code = " ({$queryArray['code']})";

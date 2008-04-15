@@ -56,12 +56,12 @@ class OutPut
 		
 		//get a list of all the categories.  later we will check if we have permission to access each
 		$catQuery = "SELECT * FROM myFolder WHERE parent = ".$this->category." AND owner = ".$_SESSION['id']." ORDER BY name";
-		$result = $this->db->dbDoQuery($catQuery);
-		$count = $this->db->dbCountRows($result);
+		$result = $this->db->query($catQuery);
+		$count = $this->db->countRows($result);
 		
 		if($count > 0)
 		{
-			while($queryArray = $this->db->dbGetNextArray($result))
+			while($queryArray = $this->db->getNextArray($result))
 			{
 				$this->outputCategory($queryArray);
 			}
@@ -75,13 +75,13 @@ class OutPut
 		FROM myFile LEFT JOIN user ON user.id = myFile.owner LEFT JOIN allowedFileTypes ON myFile.mime_type = allowedFileTypes.mime
 		WHERE myFile.owner = ".$_SESSION['id']." AND myFile.deleted = 0 AND myFile.parent = ".$this->category;
 
-		$this->db->dbDoQuery($fileQuery);
+		$this->db->query($fileQuery);
 
 		//if nothing there just display this
-		if($this->db->dbCountRows()<1){ $this->t_body->set_var("files_block", "");}
+		if($this->db->countRows()<1){ $this->t_body->set_var("files_block", "");}
 		else
 		{
-			while($queryArray = $this->db->dbGetNextArray() )
+			while($queryArray = $this->db->getNextArray() )
 			{
 				$this->outputFile($queryArray);
 			}
@@ -97,7 +97,7 @@ class OutPut
 		if($this->category != 0) //unless of course its the root node (no parents here)
 		{
 			$query = "SELECT * FROM myFolder WHERE id = $this->category";	
-			$currentCat = $this->db->dbGetSingleRow($query);
+			$currentCat = $this->db->getRow($query);
 			$parentID = $currentCat['parent'];
 			$path = ' > <b>'.scrubTEXT($currentCat['name']).'</b>';
 		}
@@ -105,7 +105,7 @@ class OutPut
 		while($parentID != 0)
 		{
 			$query = "SELECT * FROM myFolder WHERE id = ".$parentID."";
-			$parentArray = $this->db->dbGetSingleRow($query);
+			$parentArray = $this->db->getRow($query);
 			$parentID = $parentArray['parent'];
 			$path = " > <a href=\"/cms/browseMyFiles.php?catid=".$parentArray['id']."\">".scrubTEXT($parentArray['name'])."</a>".$path;
 

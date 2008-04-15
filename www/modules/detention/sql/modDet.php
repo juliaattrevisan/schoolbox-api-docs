@@ -242,8 +242,8 @@ class det
 		$query .= $limit;
 		$this->whereclause = $where;
 
-	 	$this->mySQLdb->dbDoQuery($query);	   	
-		while ($det = $this->mySQLdb->dbGetNextArray())
+	 	$this->mySQLdb->query($query);	   	
+		while ($det = $this->mySQLdb->getNextArray())
 		{
 			$det['offence'] = stripslashes($det['offence']);
 			$det['workset'] = stripslashes($det['workset']);
@@ -263,11 +263,11 @@ class det
 			  AND detDate = '".$this->detDate."'
 			  AND status <> 8
 		";
-		$this->mySQLdb->dbDoQuery($query);
-		//if ($this->mySQLdb->dbCountRows() == 0)
+		$this->mySQLdb->query($query);
+		//if ($this->mySQLdb->countRows() == 0)
 		//	return 0;
 		//else {
-		// 	return $this->mySQLdb->dbGetNextArray();
+		// 	return $this->mySQLdb->getNextArray();
 		//}
 	}
 
@@ -293,8 +293,8 @@ class det
 			//find dups and send email notification to school steward
 			$dup = 0;
 			$dupquery = "SELECT * FROM det WHERE det.studID = ".$studID." AND det.status in (2, 3, 4, 1)"; 
-			$this->mySQLdb->dbDoQuery($dupquery);
-			//if ($this->mySQLdb->dbCountRows($dupquery) > 0){
+			$this->mySQLdb->query($dupquery);
+			//if ($this->mySQLdb->countRows($dupquery) > 0){
 			//	$dup = 1;
 			//}
 
@@ -310,15 +310,15 @@ class det
 			else {
 				$query.=", workset) VALUES ('$detDate', '$studID', '$staffID', '$offence', '$type', '$status', '$history', '$workset')";
 			}
-			if($this->mySQLdb->dbDoQuery($query)){
+			if($this->mySQLdb->query($query)){
 				$query = "SELECT description FROM offence 
 				  	  WHERE id = '".$offence."'
 				";
-				$this->mySQLdb->dbDoQuery($query);
+				$this->mySQLdb->query($query);
 				$off = $this->mySQLdb->dbgetNextArray();
 				$query = $this->getNotifyDate($detDate);
-				$this->mySQLdb->dbDoQuery($query);
-				$date = $this->mySQLdb->dbGetNextArray();
+				$this->mySQLdb->query($query);
+				$date = $this->mySQLdb->getNextArray();
 
 				// Robert Skillington Jan 2006
 				// If anything but a red card, set the detention as confirmed
@@ -341,8 +341,8 @@ class det
 	{
  
 		$query = "SELECT status, detDate FROM det WHERE id = '$detID'";
-		$this->mySQLdb->dbDoQuery($query);
-		$detarr = $this->mySQLdb->dbGetNextArray();
+		$this->mySQLdb->query($query);
+		$detarr = $this->mySQLdb->getNextArray();
 
 		$status = $detarr['status'];
 
@@ -375,16 +375,16 @@ class det
 			$query.=", status = $status";
 			$query.= " WHERE id = '$detID'";
 			//notify student of modification
-			if ($this->mySQLdb->dbDoQuery($query)) {
+			if ($this->mySQLdb->query($query)) {
 				//queries to get parameters for notify function
 				$query = "SELECT description FROM offence 
 					  WHERE id = '".$offence."'
 				";
-				$this->mySQLdb->dbDoQuery($query);
+				$this->mySQLdb->query($query);
 				$off = $this->mySQLdb->dbgetNextArray();
 				$query = $this->getNotifyDate($detDate);
-				$this->mySQLdb->dbDoQuery($query);
-				$date = $this->mySQLdb->dbGetNextArray();
+				$this->mySQLdb->query($query);
+				$date = $this->mySQLdb->getNextArray();
 
 			 	//only notify student if the detention has already been confirmed and has been modified since confirmation	
 				$status = $this->getStatus($detID);
@@ -424,7 +424,7 @@ class det
 			// the School Steward.  Fixed now.
 			if ($permType == 3) {
 				$query = "UPDATE det SET status = '9' WHERE id = '".$this->id."'";
-				$this->mySQLdb->dbDoQuery($query);
+				$this->mySQLdb->query($query);
 				return 1;   // <-- Don't send the student an email yet, cos we need to wait for the
 						    //      School Steward's approval too.
 
@@ -436,14 +436,14 @@ class det
 			} else {
 				error(19);
 			}
-			$this->mySQLdb->dbDoQuery($query);
+			$this->mySQLdb->query($query);
 
 			//send email to student
 			$this->date = $studDetails[0]['dateID'];
 			//get date into array for notify function to deal with 
 			$query = $this->getNotifyDate($this->date);
-			$this->mySQLdb->dbDoQuery($query);
-			$date = $this->mySQLdb->dbGetNextArray();
+			$this->mySQLdb->query($query);
+			$date = $this->mySQLdb->getNextArray();
 			$this->studID = $studDetails[0]['studID'];
 			$this->staffID = $studDetails[0]['staffID'];
 			$this->offence = $studDetails[0]['offence'];
@@ -463,7 +463,7 @@ class det
 		if($this->exists)
 		{
 			$query = "UPDATE det SET status = '8' WHERE id = '".$this->id."'";
-			if ( $this->mySQLdb->dbDoQuery($query)) 
+			if ( $this->mySQLdb->query($query)) 
 			{
 				//notify student of cancellation
 				$detDetails = $this->getDet();
@@ -477,8 +477,8 @@ class det
 
  				//get date into array for notify function to deal with
 				$query = $this->getNotifyDate($date);
-                        	$this->mySQLdb->dbDoQuery($query);
-                        	$date = $this->mySQLdb->dbGetNextArray();
+                        	$this->mySQLdb->query($query);
+                        	$date = $this->mySQLdb->getNextArray();
 
 				$notify = new notify("DEL", $date, $studID, $staffID, $off, $workset, $type, $history);
 				if ($notify->mail())
@@ -518,8 +518,8 @@ class det
 
 		$query .= $idcompare;
 		$query .= " ORDER BY dd.detdatetime ASC";
-		$this->mySQLdb->dbDoQuery($query);
-		while ($class = $this->mySQLdb->dbGetNextArray()){
+		$this->mySQLdb->query($query);
+		while ($class = $this->mySQLdb->getNextArray()){
 			$class['location'] = stripslashes($class['location']);
 			$class['stafflname'] = stripslashes($class['stafflname']);
 			$class['stafffname'] = stripslashes($class['stafffname']);
@@ -556,8 +556,8 @@ class det
 			  WHERE		dd.id = '".$classid."'
 			  AND		d.status NOT IN (8, 5) 
 			";
-		$this->mySQLdb->dbDoQuery($query);
-		while ($studs = $this->mySQLdb->dbGetNextArray()){
+		$this->mySQLdb->query($query);
+		while ($studs = $this->mySQLdb->getNextArray()){
 			$studs['location'] = stripslashes($studs['location']);
 			$studs['studlname'] = stripslashes($studs['studlname']);
 			$studs['studfname'] = stripslashes($studs['studfname']);
@@ -580,8 +580,8 @@ class det
 		 		  FROM det
 				  WHERE id = '".$detID."'
 			";
-			$this->mySQLdb->dbDoQuery($sel);
-			$history = $this->mySQLdb->dbGetNextArray();
+			$this->mySQLdb->query($sel);
+			$history = $this->mySQLdb->getNextArray();
 			if ($history['history'] != "")
 				$hist = $history['history']."; no show due to ".$reason;
 			else
@@ -599,15 +599,15 @@ class det
 		  	  	  WHERE id = '".$detID."'
 			";
 		}
-	 	$this->mySQLdb->dbDoQuery($query);
+	 	$this->mySQLdb->query($query);
 		return 1;
 	}
 	
 	function getStatus($detID)
 	{
 		$query = "SELECT status FROM det where id = $detID";
-		$this->mySQLdb->dbDoQuery($query);
-		if ($result = $this->mySQLdb->dbGetNextArray())
+		$this->mySQLdb->query($query);
+		if ($result = $this->mySQLdb->getNextArray())
 			return $result['status'];
 		else
 			return 0;
@@ -619,7 +619,7 @@ class det
 			  SET attend = 1
 			  WHERE id = '".$detDate."'
 		";
-		$this->mySQLdb->dbDoQuery($query);
+		$this->mySQLdb->query($query);
 	}
 
 	function getHouseNames($house = false)
@@ -636,8 +636,8 @@ class det
 				"ORDER BY `house` ASC";                         //      we only want Senior School houses,
 		}													    //      not the Wadhurst ones too.
 
-		$this->mySQLdb->dbDoQuery($query);
-		while ($houses = $this->mySQLdb->dbGetNextArray()){
+		$this->mySQLdb->query($query);
+		while ($houses = $this->mySQLdb->getNextArray()){
 			$houselist[$houses['id']] = $houses['house'];
 		}
 		return $houselist; 
@@ -653,8 +653,8 @@ class det
 		$query = "SELECT status FROM det 
 			  WHERE  id = '".$this->id."'
 		";
-		$this->mySQLdb->dbDoQuery($query);
-		if ($this->mySQLdb->dbCountRows() > 0)
+		$this->mySQLdb->query($query);
+		if ($this->mySQLdb->countRows() > 0)
 			return 1;
 		else
 			return 0;
@@ -686,8 +686,8 @@ class det
 		".$this->_arrParms['where']."
 		".$this->whereclause."";
 
-		$this->mySQLdb->dbDoQuery($query);
-		$count = $this->mySQLdb->dbGetNextArray();
+		$this->mySQLdb->query($query);
+		$count = $this->mySQLdb->getNextArray();
 		return intval($count['count']);
 	}
 }

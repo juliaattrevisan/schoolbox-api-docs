@@ -25,8 +25,8 @@ function displayPage($response = "")
 	
 	$db = new dbManager();
 	$query = "SELECT * FROM luCampus ORDER BY name";
-	$db->dbDoQuery($query);
-	while($thisCampus = $db->dbGetNextArray())
+	$db->query($query);
+	while($thisCampus = $db->getNextArray())
 	{
 		$this->t_body->set_var("CAMPUSNAME", $thisCampus['name']);
 		$this->t_body->set_var("CAMPUSID", $thisCampus['id']);
@@ -35,8 +35,8 @@ function displayPage($response = "")
 
 	$db = new dbManager();
 	$query = "SELECT * FROM groups ORDER BY name";
-	$db->dbDoQuery($query);
-	while($thisCampus = $db->dbGetNextArray())
+	$db->query($query);
+	while($thisCampus = $db->getNextArray())
 	{
 		$this->t_body->set_var("USERGROUPNAME", $thisCampus['name']);
 		$this->t_body->set_var("USERGROUPID", $thisCampus['id']);
@@ -90,7 +90,7 @@ function processCal()
                		 VALUES ('{$uid}',3, '$priority', '".mysql_escape_string(trim($comment))."', '$date', $stime, $ftime)"; 
 				
 				
-			if($db->dbDoQuery($sql))
+			if($db->query($sql))
 			{
 				$newEventID = $db->dbInsertId();
 				$calObj->addPerms($newEventID, $_POST['userGroup'], $_POST['campus']);

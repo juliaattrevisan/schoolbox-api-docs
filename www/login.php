@@ -43,7 +43,6 @@ session_start();
 if( (isset($_POST['username'])) && (isset($_POST['password']) && $_POST['password'] && $_POST['username']) )
 {
 	$db = new dbManager;
-	$db->dbConnect();
 
 	//first check for brute force attempt
 	if( checkBruteForce(&$db) )

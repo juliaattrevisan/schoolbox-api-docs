@@ -12,8 +12,8 @@ $sql = 	"SELECT * ".
 		"FROM `userAccess` ".
 		"WHERE `service` = 5 ".
 		"AND `type` = 4";
-$db->dbDoQuery($sql);
-while ($row = $db->dbGetNextArray()) {
+$db->query($sql);
+while ($row = $db->getNextArray()) {
 
 }
 ?>

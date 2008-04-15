@@ -31,13 +31,13 @@ else
             AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '".$_SESSION['gid']."')
           ORDER BY parent, sequence, txt";
 
-$db->dbDoQuery($query);
+$db->query($query);
 
 //initialise root of tree
 $list[0]['id'] = 0;
 
 //fetch each record and insert into tree
-while($menuitem = $db->dbGetNextArray() )
+while($menuitem = $db->getNextArray() )
 {
 	$list = insertChild($list, $menuitem);
 }
@@ -50,9 +50,9 @@ $this->t_body->set_var("MCSSMENU", outputMenu($list[0]['children'], 1));
 //setup block
 $this->t_body->set_block("tplBODY", "mlink_block", "my_links");
 $query = "SELECT url, description FROM bookmarks WHERE owner = '".$_SESSION['id']."'";
-$db->dbDoQuery($query);
-if($db->dbCountRows() > 0){
-	while($link = $db->dbGetNextArray()){
+$db->query($query);
+if($db->countRows() > 0){
+	while($link = $db->getNextArray()){
 		if(isLocalURL($link['url'])){
 			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\">".scrubTEXT($link['description'])."</a>");	
 		}else{
@@ -75,11 +75,11 @@ $query = "SELECT category.name, userAccess.sid, userAccess.type
 		  AND userAccess.type > 0	
 		  AND category.template <> 0
 	";
-$db->dbDoQuery($query);
-if($db->dbCountRows() > 0)
+$db->query($query);
+if($db->countRows() > 0)
 {
 
-	while($group = $db->dbGetNextArray())
+	while($group = $db->getNextArray())
 	{
 			$this->t_body->set_var("MGNAME", scrubTEXT($group['name']));
 			$this->t_body->set_var("MGID", $group['sid']);	
@@ -122,7 +122,7 @@ if(is_array($_SESSION['children']))
 	foreach($_SESSION['children'] as $child)
 	{
 		$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
-		$user = $db->dbGetSingleRow($query);
+		$user = $db->getRow($query);
 		$this->t_body->set_var("MSTUDENT_ID", $child['id']);
 		$this->t_body->set_var("MSTUDENT_NAME", formatName($user,'{firstname}'));
 		$this->t_body->set_var("MSTUDENT_YEAR", $user['year']);

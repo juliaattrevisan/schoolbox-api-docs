@@ -10,7 +10,7 @@ require_once '../include/include.php';
 $db = new dbManager;
 
 $query = "SELECT * FROM homepage_comp_location WHERE component = ". FILE_COMPONENT_ID ." OR component = " . LINK_COMPONENT_ID;
-$componentList = $db->dbGetAllRows($query);
+$componentList = $db->getAll($query);
 
 if (is_array($componentList)) {
 	foreach ($componentList as $component) {
@@ -24,7 +24,7 @@ if (is_array($componentList)) {
 				  AND component = " . $component['component'];
 		
 		print $query . "\n";
-		$db->dbDoQuery($query);
+		$db->query($query);
 	}
 }
 

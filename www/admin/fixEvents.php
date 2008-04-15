@@ -17,9 +17,9 @@ class fixEvents
 		$groupArray = $this->getAllGroups();
 		$allCampusArray = $this->getAllCampus();		
 		$sql = "SELECT id, sid FROM event WHERE access = 3 AND sid IS NOT NULL";
-		$result = $this->db->dbDoQuery($sql);
+		$result = $this->db->query($sql);
 		
-		while($row = $this->db->dbGetNextArray($result))
+		while($row = $this->db->getNextArray($result))
 		{
 			$campusArray = array();
 			if($row['sid'] == 0)
@@ -33,7 +33,7 @@ class fixEvents
 			
 			$this->addPerms($row['id'], $groupArray, $campusArray);
 			$sql = "UPDATE event SET sid = null WHERE id = {$row['id']}";
-			$this->db->dbDoQuery($sql);
+			$this->db->query($sql);
 			$this->message .= "Updated event $id<br />";
 		
 		}
@@ -46,8 +46,8 @@ class fixEvents
 	function getAllGroups()
 	{
 		$sql = "SELECT id FROM groups";
-		$this->db->dbDoQuery($sql);
-		while($row = $this->db->dbGetNextArray())
+		$this->db->query($sql);
+		while($row = $this->db->getNextArray())
 		{
 			$groups[] = $row['id'];	
 		}
@@ -57,8 +57,8 @@ class fixEvents
 	function getAllCampus()
 	{
 		$sql = "SELECT id FROM luCampus";
-		$this->db->dbDoQuery($sql);
-		while($row = $this->db->dbGetNextArray())
+		$this->db->query($sql);
+		while($row = $this->db->getNextArray())
 		{
 			$campus[] = $row['id'];	
 		}

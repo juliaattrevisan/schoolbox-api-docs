@@ -35,8 +35,8 @@ function involvedInGroup($cid)
 		WHERE userAccess.uid = '".$_SESSION['id']."' AND userAccess.sid = category.id 
 		AND category.id = '$cid'";
 
-	$db->dbDoQuery($query);
-	if($db->dbCountRows() > 0) 
+	$db->query($query);
+	if($db->countRows() > 0) 
 		return 1;
 	else
 		return 0;
@@ -57,7 +57,7 @@ function involvedCategoryList($id, $subjects, $accessType=1)
 		{
 			//convert code to id and get name
 			$query = "SELECT name, id FROM category WHERE code = '".$subject['code']."'";
-			$result = $db->dbGetSingleRow($query);
+			$result = $db->getRow($query);
 
 			$catList[] = array (	'name' 	=>	$result['name'],
 									'id' 	=>	$result['id'],
@@ -71,8 +71,8 @@ function involvedCategoryList($id, $subjects, $accessType=1)
 	WHERE userAccess.uid = $id AND userAccess.sid = category.id
 	AND userAccess.type >= '$accessType'";
 
-	$db->dbDoQuery($query);
-	while($result = $db->dbGetNextArray())
+	$db->query($query);
+	while($result = $db->getNextArray())
 	{
 		$catList[] = array (	'name' 	=>	$result['name'],
 								'id' 	=>	$result['id'],

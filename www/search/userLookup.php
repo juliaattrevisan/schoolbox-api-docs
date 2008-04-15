@@ -21,7 +21,7 @@ class outUser
 					synergy_id, local_email, alt_email
 				FROM (user, groups) LEFT JOIN ph_ext ON user.id = ph_ext.owner
 				WHERE user.group_id = groups.id AND user.id = '$id'";
-		$user = $db->dbGetSingleRow($query);
+		$user = $db->getRow($query);
 		
 		//fill out all fields
 		$this->t_body->set_var('NAME', formatName($user));
@@ -87,7 +87,7 @@ class outUser
 					
 					if($synInfo['StudentFormStaffName'] && $synInfo['TeacherFormID']) {
 						$query = "SELECT title, firstname, lastname, username, local_email, alt_email FROM user WHERE synergy_id = {$synInfo['TeacherFormID']}";
-						$form = $db->dbGetSingleRow($query);
+						$form = $db->getRow($query);
 						if($formEmail = formatEmail($form))
 							$formTeacher = '<a href="'.$_SESSION['mailhandle'].$formEmail.'">'.scrubTEXT($synInfo['StudentFormStaffName']).'</a>';
 						else
@@ -96,7 +96,7 @@ class outUser
 				
 					if($synInfo['StudentTutorName'] && $synInfo['TeacherTutorID']) {
 						$query = "SELECT title, firstname, lastname, username, local_email, alt_email FROM user WHERE synergy_id = {$synInfo['TeacherTutorID']}";
-						$tutor = $db->dbGetSingleRow($query);
+						$tutor = $db->getRow($query);
 						if($tutorEmail = formatEmail($tutor))
 							$tutorTeacher = '<a href="'.$_SESSION['mailhandle'].$tutorEmail.'">'.scrubTEXT($synInfo['StudentTutorName']).'</a>';
 						else
@@ -178,11 +178,11 @@ class outUser
 			$query = "SELECT service, sid, category.name FROM userAccess, category 
 			WHERE sid = category.id AND uid = '".$_SESSION['id']."' AND type = '3'"; 
 			
-			$db->dbDoQuery($query);
-			if($db->dbCountRows() > 0)
+			$db->query($query);
+			if($db->countRows() > 0)
 			{
 				$this->t_body->set_var("GROUPTITLE", "Add to your group");
-				while($group = $db->dbGetNextArray())
+				while($group = $db->getNextArray())
 				{
 					$this->t_body->set_var("GROUP", 
 					"<a href=\"/group/modUserGroup.php?uid=$id&service=".$group['service']."
@@ -219,8 +219,8 @@ class outUser
 
 		$groupListHTML = "<option value=\"\"></option>";
 		$query = "SELECT * FROM groups ORDER BY name";
-		$db->dbDoQuery($query);
-		while($line = $db->dbGetNextArray() )
+		$db->query($query);
+		while($line = $db->getNextArray() )
 		{
 			$groupListHTML .= "<option value=\"".$line['id']."\">".$line['name']."</option>";
  		}
@@ -243,7 +243,7 @@ class outUser
 		{
 			$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, year, local_email, alt_email FROM user, groups 
 				WHERE user.group_id = groups.id AND user.id = '$user'";  
-			$userdetails = $db->dbGetSingleRow($query);
+			$userdetails = $db->getRow($query);
 			$this->t_body->set_var("FIRSTNAME", $userdetails['firstname']);
 			$this->t_body->set_var("LASTNAME", $userdetails['lastname']);
 			$this->t_body->set_var("YEAR", $userdetails['year']);
@@ -307,11 +307,11 @@ class outUser
 		$query .= "ORDER BY group_id, year, lastname, firstname"; 
 
 		$db = new dbManager();
-		$db->dbDoQuery($query);
+		$db->query($query);
 		//for each user put id in an array and return it.
-		if($db->dbCountRows() > 0)
+		if($db->countRows() > 0)
 		{
-			while($user = $db->dbGetNextArray())
+			while($user = $db->getNextArray())
 			{
 				$returnArray[] = $user['id'];
 			}

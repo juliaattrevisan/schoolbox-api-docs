@@ -99,11 +99,11 @@ class modSideMenu
 		//query database for all categories that user has permission to see (redundant doesnt work properly)
 		$catQuery = "SELECT txt, id, sequence FROM sideMenu WHERE parent = '".$parent."' ORDER BY sequence, txt";
 
-		$result = $this->db->dbDoQuery($catQuery);
+		$result = $this->db->query($catQuery);
 
-		if( $this->db->dbCountRows() > 0 )
+		if( $this->db->countRows() > 0 )
 		{
-				while($line = $this->db->dbGetNextArray($result) )
+				while($line = $this->db->getNextArray($result) )
 				{
 						$thisRow['id'] = $line['id'];
 						$thisRow['indent'] = $indent;
@@ -192,8 +192,8 @@ class modSideMenu
 	{	
 		$campusListHTML = "";
 		$query = "SELECT * FROM luCampus WHERE id != '".ALLCAMPUS."' ORDER BY name";
-		$this->db->dbDoQuery($query);
-		while($line = $this->db->dbGetNextArray() )
+		$this->db->query($query);
+		while($line = $this->db->getNextArray() )
 		{
 			if($this->isInHashArray($selected, $line['id'], "campus") )
 				$campusListHTML .= "<input type=\"checkbox\" name=\"campus[]\" value=\"".$line['id']."\" checked> ".$line['name']."<br>";	
@@ -210,8 +210,8 @@ class modSideMenu
 	{
 		$groupListHTML = "";
 		$query = "SELECT * FROM groups ORDER BY name";
-		$this->db->dbDoQuery($query);
-		while( $line = $this->db->dbGetNextArray() )
+		$this->db->query($query);
+		while( $line = $this->db->getNextArray() )
 		{
 			if($this->isInHashArray($selected, $line['id'], "gid") )	
 				$groupListHTML .= "<input type=\"checkbox\" name=\"group[]\" value=\"".$line['id']."\" checked> ".$line['name']."<br>";	

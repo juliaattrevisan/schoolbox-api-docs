@@ -92,15 +92,15 @@ class modEvent
 		$this->db->dbChangeDb('clearinghouse');
 	
 		$query = "SELECT * FROM luCategory";
-		$categories = $this->db->dbGetAllRows($query);
+		$categories = $this->db->getAll($query);
 		$this->doDropDown('category', $categories, $categorySelected);
 		
 		$query = "SELECT * FROM luYear";
-		$year = $this->db->dbGetAllRows($query);
+		$year = $this->db->getAll($query);
 		$this->doDropDown('year', $year, $yearSelected);
 		
 		$query = "SELECT * FROM luFormat";
-		$format = $this->db->dbGetAllRows($query);
+		$format = $this->db->getAll($query);
 		$this->doDropDown('format', $format, $formatSelected);
 		
 	}

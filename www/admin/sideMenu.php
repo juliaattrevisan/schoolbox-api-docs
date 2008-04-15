@@ -22,12 +22,12 @@ class sideMenu
 	{
 		//fetch last item in list so we can insert this item after it
 		$query = "SELECT sequence FROM sideMenu WHERE parent = $parent ORDER BY sequence DESC";
-		$lastItem = $this->db->dbGetSingleRow($query);
+		$lastItem = $this->db->getRow($query);
 		$sequence = $lastItem['sequence'] + 1;
 		$text = scrubTEXT($text);
 	
 		$query = "INSERT INTO sideMenu (parent, txt, url, target, sequence) VALUES ($parent, '$text', '$url', '$target', $sequence)";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
 		$id = $this->db->dbInsertId();
 
@@ -38,7 +38,7 @@ class sideMenu
 	{
 		$text = scrubTEXT($text);
 		$query = "UPDATE sideMenu SET parent = '$parent', txt='$text', url='$url', target='$target' WHERE id = '$id'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
 		$this->deletePermissions($id);
 		$this->addPermissions($id, $campus, $group);
@@ -51,10 +51,10 @@ class sideMenu
 		//fetch sequence of item below
 		$item = $this->getMenuItem($id);
 		$query = "UPDATE sideMenu SET sequence = (sequence + 1) WHERE parent = {$item['parent']} AND sequence = ({$item['sequence']} - 1)";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
 		$query = "UPDATE sideMenu SET sequence = (sequence - 1) WHERE id = $id";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 	
 	function moveMenuItemDown($id)
@@ -62,10 +62,10 @@ class sideMenu
 		//fetch sequence of item below
 		$item = $this->getMenuItem($id);
 		$query = "UPDATE sideMenu SET sequence = (sequence - 1) WHERE parent = {$item['parent']} AND sequence = ({$item['sequence']} + 1)";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
 		$query = "UPDATE sideMenu SET sequence = (sequence + 1) WHERE id = $id";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 	
 	//This function resequences a portion of the menu to ensure that it stays in a sequential order
@@ -73,12 +73,12 @@ class sideMenu
 	function resequenceMenu($parent)
 	{
 		$query = "SELECT id FROM sideMenu WHERE parent = $parent ORDER BY sequence, txt";
-		$result = $this->db->dbDoQuery($query);
+		$result = $this->db->query($query);
 		
-		for($i=0;$item = $this->db->dbGetNextArray($result);$i++)
+		for($i=0;$item = $this->db->getNextArray($result);$i++)
 		{
 			$seqquery = "UPDATE sideMenu SET sequence = $i WHERE id = {$item['id']}";
-			$this->db->dbDoQuery($seqquery);
+			$this->db->query($seqquery);
 		}
 	}
 
@@ -87,7 +87,7 @@ class sideMenu
 		$item = $this->getMenuItem($id);
 		
 		$query = "DELETE FROM sideMenu WHERE id = '$id'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		$this->deletePermissions($id);
 		
 		$this->resequenceMenu($item['parent']);
@@ -96,19 +96,19 @@ class sideMenu
 	function getMenuItem($id)
 	{
 		$query = "SELECT * FROM sideMenu WHERE id = '$id'";
-		return $this->db->dbGetSingleRow($query);
+		return $this->db->getRow($query);
 	}
 
 	function getMenuItemCampusList($id)
 	{
 		$query = "SELECT * FROM sideMenuCampus WHERE id = '$id'";
-		return $this->db->dbGetAllRows($query);
+		return $this->db->getAll($query);
 	}
 
 	function getMenuItemGroupList($id)
 	{
 		$query = "SELECT * FROM sideMenuGroup WHERE id = '$id'";
-		return $this->db->dbGetAllRows($query);
+		return $this->db->getAll($query);
 	}
 
 	function addPermissions($id, $campus, $group)
@@ -133,21 +133,21 @@ class sideMenu
 	function deletePermissions($id)
 	{
 		$query = "DELETE FROM sideMenuCampus WHERE sideMenuCampus.id = '$id'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		$query = "DELETE FROM sideMenuGroup WHERE sideMenuGroup.id = '$id'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 
 	function insertCampus($id, $campus)
 	{
 		$query = "INSERT INTO sideMenuCampus (id, campus) VALUES ('$id', '$campus')";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 
 	function insertGroup($id, $group)
 	{
 		$query = "INSERT INTO sideMenuGroup (id, gid) VALUES ('$id', '$group')";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
 	}
 

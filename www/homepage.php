@@ -34,7 +34,7 @@ class OutPut
 
 		//get skeleton template
 		$query = "SELECT name, code, homepage_config.* FROM category, homepage_config WHERE cid = id AND id = '$category'"; 		
-		$skel_template = $this->db->dbGetSingleRow($query);
+		$skel_template = $this->db->getRow($query);
 						
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file('tplBODY', 'homepages/homepage'.$skel_template['template'].'.htm');
@@ -55,10 +55,10 @@ class OutPut
 				WHERE component = id AND cid = '$category'
 				ORDER BY position";
 
-		$result = $this->db->dbDoQuery($query);
+		$result = $this->db->query($query);
 		$componentCount = 0;
 		//for each component we must place it in postion then call the appropriate function to parse it
-		for($componentCount = 0;$component = $this->db->dbGetNextArray($result);$componentCount++)
+		for($componentCount = 0;$component = $this->db->getNextArray($result);$componentCount++)
 		{
 			if($component['method'] != "")
 			{
@@ -90,10 +90,10 @@ class OutPut
 							$query = "SELECT id, file.description FROM file LEFT JOIN allowedFileTypes ON mime_type = mime WHERE category = '{$this->category}' 
 									  AND deleted = '0' AND INSTR(mime_type, 'image/') AND inline = 'true'
                 					  ORDER BY submitted".$lim;
-							$this->db->dbDoQuery($query);
-							if($this->db->dbCountRows() > 0)
+							$this->db->query($query);
+							if($this->db->countRows() > 0)
 							{
-								while($image = $this->db->dbGetNextArray())
+								while($image = $this->db->getNextArray())
 								{
 									$this->t_body->set_var('COMPONENT_CONFIG_IMAGE', $image['description']);
 									$this->t_body->set_var('COMPONENT_CONFIG_IMAGE_SELECTED', $image['description'] == $value ? ' selected' : '');
@@ -243,9 +243,9 @@ class OutPut
 	function logPageView()
 	{
 		$testquery = "SELECT datetime FROM homepage_log WHERE cid = '$this->category' AND user = '".$_SESSION['id']."'";
-		$this->db->dbDoQuery($testquery);
+		$this->db->query($testquery);
 
-		if($row = $this->db->dbGetNextArray() )
+		if($row = $this->db->getNextArray() )
 		{
 			$query = "UPDATE homepage_log SET datetime = NOW(), hitcount = hitcount + 1 WHERE cid = '$this->category'
 			AND user = '".$_SESSION['id']."'";
@@ -256,7 +256,7 @@ class OutPut
 			'".$_SESSION['id']."', '$this->category', '0')";
 		}
 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 
 	function initSubject($name, $config)
@@ -307,10 +307,10 @@ class OutPut
                 $this->t_body->set_block($name, "duties", "d_block");
                 $sql = "SELECT l.*, d.user, d.date, d.cid FROM luDuties l LEFT JOIN duty d ON l.dutyTypeID = d.dutyTypeID 
 			and d.date = '".date('Y-m-d')."' where l.cid = ".$this->category ;
-                $this->db->dbDoQuery($sql);
+                $this->db->query($sql);
                 $block = false;
                 $this->t_body->set_var("DATE", 'Duties for '.date('l, jS \of F Y'));
-                while($row = $this->db->dbGetNextArray())
+                while($row = $this->db->getNextArray())
                 {
                         $this->t_body->set_var("DUTY", $row['name']);
                         $this->t_body->set_var("ASSIGNEDUSER", $row['user']);
@@ -340,11 +340,11 @@ class OutPut
 		
 		$query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email FROM user, userAccess
 		WHERE id = uid AND service = '$this->service' AND sid = '$this->category' AND type > 0 ORDER BY lastname, firstname";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
-		if($this->db->dbCountRows() > 0)
+		if($this->db->countRows() > 0)
 		{
-			while($member = $this->db->dbGetNextArray())
+			while($member = $this->db->getNextArray())
 			{			
 				$name = formatName($member);
 				$email = formatEmail($member);
@@ -377,11 +377,11 @@ class OutPut
 
 		$query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email FROM user, userAccess
 		WHERE id = uid AND service = '$this->service' AND sid = '$this->category' and type in(3,2) ORDER BY lastname, firstname";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	
-		if($this->db->dbCountRows() > 0)
+		if($this->db->countRows() > 0)
 		{
-			while($manager = $this->db->dbGetNextArray())
+			while($manager = $this->db->getNextArray())
 			{
 				$name = formatName($manager);
 				$email = formatEmail($manager);
@@ -418,7 +418,7 @@ class OutPut
 			if(is_array($listSyns)) {
 				foreach($listSyns as $synid) {
 					$query = "SELECT id, title, firstname, lastname, alt_email, local_email FROM user WHERE synergy_id = '$synid'";
-					$teacher=$this->db->dbGetSingleRow($query);
+					$teacher=$this->db->getRow($query);
 					if(is_array($teacher)) {
 						$name = formatName($teacher);
 			
@@ -487,8 +487,8 @@ class OutPut
 		$query = "SELECT id, comment FROM file WHERE category = {$this->category} AND deleted = '0' AND hidden = '0' AND INSTR(mime_type, 'image/')
                   ORDER BY RAND() LIMIT 1";
 		
-		$this->db->dbDoQuery($query);                
-		if($image = $this->db->dbGetNextArray())
+		$this->db->query($query);                
+		if($image = $this->db->getNextArray())
 		{
 			//get link
 			if($config['size']==0){$config['size']=6;}
@@ -520,11 +520,11 @@ class OutPut
 
 		//get image id
 		$query = "SELECT id, comment FROM file WHERE category = '".$this->category."' AND deleted = '0' AND description LIKE '{$config['image']}'";
-		$image = $this->db->dbGetSingleRow($query);
+		$image = $this->db->getRow($query);
 		if(!is_array($image)) {
 			//try to find another image if we cant find the configured one	
 			$query = "SELECT id, comment FROM file WHERE category = {$this->category} AND deleted = '0' AND INSTR(mime_type, 'image/')";
-			$image = $this->db->dbGetSingleRow($query);
+			$image = $this->db->getRow($query);
 			
 			if(!is_array($image)) {
 				$this->t_body->set_var('preview_block', '');
@@ -598,12 +598,12 @@ class OutPut
 		if($config['size'] != 0 && $config['size'] != '') 
 			$query .= " LIMIT 0, {$config['size']}"; 
 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
-		if($this->db->dbCountRows() < 1 ){$this->t_body->set_var("duework_block", "");}
+		if($this->db->countRows() < 1 ){$this->t_body->set_var("duework_block", "");}
 		else
 		{
-			while($queryArray = $this->db->dbGetNextArray() )
+			while($queryArray = $this->db->getNextArray() )
 			{
 				$this->outputDuework($queryArray);
 			}
@@ -663,12 +663,12 @@ class OutPut
 		if($config['size'] != 0 && $config['size'] != '') 
 			$query .= " LIMIT 0, {$config['size']}"; 
 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
-		if($this->db->dbCountRows() < 1 ){$this->t_body->set_var("homework_block", "");}
+		if($this->db->countRows() < 1 ){$this->t_body->set_var("homework_block", "");}
 		else
 		{
-			while($queryArray = $this->db->dbGetNextArray() )
+			while($queryArray = $this->db->getNextArray() )
 			{
 				$this->outputHomework($queryArray);
 			}
@@ -724,12 +724,12 @@ class OutPut
 			$query .= " LIMIT 0, {$config['size']}"; 
 
 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
-		if($this->db->dbCountRows() < 1 ){$this->t_body->set_var("assign_block", "");}
+		if($this->db->countRows() < 1 ){$this->t_body->set_var("assign_block", "");}
 		else
 		{
-			while($queryArray = $this->db->dbGetNextArray() )
+			while($queryArray = $this->db->getNextArray() )
 			{
 				$this->outputAssignment($queryArray);
 			}
@@ -775,12 +775,12 @@ class OutPut
 		if($config['size'] != 0 && $config['size'] != '') 
 			$query .= " LIMIT 0, {$config['size']}"; 
 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
-		if($this->db->dbCountRows() < 1){$this->t_body->set_var("link_block", "");}
+		if($this->db->countRows() < 1){$this->t_body->set_var("link_block", "");}
 		else
 		{
-			while($queryArray = $this->db->dbGetNextArray() )
+			while($queryArray = $this->db->getNextArray() )
 			{
 				$this->outputLink($queryArray);
 			}
@@ -827,12 +827,12 @@ class OutPut
 		if($config['size'] != 0 && $config['size'] != '') 
 			$query .= " LIMIT 0, {$config['size']}";  
 	
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
-		if($this->db->dbCountRows() < 1){ $this->t_body->set_var("files_block", "");}
+		if($this->db->countRows() < 1){ $this->t_body->set_var("files_block", "");}
 		else
 		{
-			while($queryArray = $this->db->dbGetNextArray() )
+			while($queryArray = $this->db->getNextArray() )
 			{
 				$this->outputFile($queryArray);
 			}
@@ -860,13 +860,13 @@ class OutPut
 		if($config['size'] != 0 && $config['size'] != '') 
 			$query .= " LIMIT 0, {$config['size']}"; 
 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
-		if($this->db->dbCountRows() < 1){ $this->t_body->set_var("folders_block", "");}
+		if($this->db->countRows() < 1){ $this->t_body->set_var("folders_block", "");}
 		else
 		{
 			$flag = 0;
-			while($queryArray = $this->db->dbGetNextArray() )
+			while($queryArray = $this->db->getNextArray() )
 			{
 				if(perm($queryArray['id'], 1) > 0)
 				{
@@ -903,14 +903,14 @@ class OutPut
         $query = "SELECT id, file.description FROM file LEFT JOIN allowedFileTypes ON mime_type = mime WHERE category = '{$this->category}' 
 					AND deleted = '0' AND INSTR(mime_type, 'image/') AND inline = 'true'
                 	ORDER BY submitted".$lim;
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
         $count = 1;
         $flag = 0;
 		$this->t_body->set_var("CATID", $this->category);
-		if($this->db->dbCountRows() > 0 )
+		if($this->db->countRows() > 0 )
 		{ 
-	       	while( $thumbnail = $this->db->dbGetNextArray() )
+	       	while( $thumbnail = $this->db->getNextArray() )
         	{
 				$this->t_body->set_VAR("THUMBNAIL", "<a href=\"/cms/image.php?id={$thumbnail['id']}&height=550&width=600\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
                  <img src=\"/cms/image.php?id={$thumbnail['id']}&height=".THUMBNAIL_size."&width=".THUMBNAIL_size."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
@@ -975,16 +975,16 @@ class OutPut
 		if($config['size'] != 0 && $config['size'] != '') 
 			$query .= " LIMIT 0, {$config['size']}";  
 
-		$res = $this->db->dbDoQuery($query);
+		$res = $this->db->query($query);
 
-		if($this->db->dbCountRows() < 1){$this->t_body->set_var("forum_block", "");}
+		if($this->db->countRows() < 1){$this->t_body->set_var("forum_block", "");}
 		else
 		{
-			while($curr = $this->db->dbGetNextArray($res))
+			while($curr = $this->db->getNextArray($res))
 			{
 				$query = "SELECT id, heading FROM forum WHERE parent = '0' AND deleted ='0' AND thread = '".$curr['thread']."'";
-				$this->db->dbDoQuery($query);
-				$this->outputForum($this->db->dbGetNextArray());
+				$this->db->query($query);
+				$this->outputForum($this->db->getNextArray());
 			}
 		}
 		return true;
@@ -1008,15 +1008,15 @@ class OutPut
 		'".CALENDAR_time_format."') as endTimeString,priority, note
 				  FROM event WHERE access = '2' AND sid = '".$this->category."' AND( date >= NOW() $where) ORDER BY date, startTime";
 		
-		$this->db->dbDoQuery($query);	
+		$this->db->query($query);	
 
-		if($this->db->dbCountRows() < 1){$this->t_body->set_var("group_events_block", "");}
+		if($this->db->countRows() < 1){$this->t_body->set_var("group_events_block", "");}
 		else
 		{
 			require_once("calendar/calendar.php");
 			$cal = new calendar;			
 
-			while($queryArray = $this->db->dbGetNextArray() )
+			while($queryArray = $this->db->getNextArray() )
 			{
 				$queryArray['colour'] = $cal->displayColour($queryArray['priority']);
 				$this->outputEvent($queryArray);
@@ -1054,15 +1054,15 @@ class OutPut
 				FROM event
         				JOIN eventCampus ON event.id = eventCampus.eventID
 				WHERE access = 3 AND eventCampus.campusID = 3 AND( date >= DATE(NOW()) $where) ORDER BY date, startTime";
-		$this->db->dbDoQuery($query);	
+		$this->db->query($query);	
 
-		if($this->db->dbCountRows() < 1){$this->t_body->set_var("group_events_block", "");}
+		if($this->db->countRows() < 1){$this->t_body->set_var("group_events_block", "");}
 		else
 		{
 			require_once("calendar/calendar.php");
 			$cal = new calendar;			
 
-			while($queryArray = $this->db->dbGetNextArray() )
+			while($queryArray = $this->db->getNextArray() )
 			{
 				$queryArray['colour'] = $cal->displayColour($queryArray['priority']);
 				$this->outputEvent($queryArray);
@@ -1342,11 +1342,11 @@ if(isset($_GET['code']) && $_GET['code'])
 {
 	$code = urldecode($_GET['code']);
 	$query = "SELECT id FROM category WHERE code LIKE '$code'";
-	$db->dbDoQuery($query);
-	if($db->dbCountRows() > 0)
+	$db->query($query);
+	if($db->countRows() > 0)
 	{
 		$enroled = involvedInSubject($code);
-		$resultArray = $db->dbGetNextArray();
+		$resultArray = $db->getNextArray();
 		$myPage->showPage(&$db, $resultArray['id'], $enroled);
 	}
 	else
@@ -1356,11 +1356,11 @@ else if(isset($_GET['category']) && $_GET['category'])
 {
 	//check category has a template or code associated with it
 	$query = "SELECT template, code FROM category WHERE id = '".$_GET['category']."'";
-	$db->dbDoQuery($query);
-	if($db->dbCountRows() > 0)
+	$db->query($query);
+	if($db->countRows() > 0)
 	{
 
-		$resultArray = $db->dbGetNextArray();
+		$resultArray = $db->getNextArray();
 		if($resultArray['code'])
 		{
 			$enroled = involvedInSubject($resultArray['code']);

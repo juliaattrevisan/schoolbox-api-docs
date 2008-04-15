@@ -21,7 +21,7 @@ if($_GET['id'] && $_GET['width'] && $_GET['height'])
 	
 	//get file information	
 	$query = "SELECT id, mime_type, category, deleted FROM file WHERE id = {$_GET['id']}";
-	$imageInfo = $db->dbGetSingleRow($query);
+	$imageInfo = $db->getRow($query);
 
 	perm($imageInfo['category'], HOMEPAGESERVICE);
 	//is image exists, the user has permission and its not deleted then output the image

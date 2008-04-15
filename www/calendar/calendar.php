@@ -9,6 +9,7 @@
 /* This class provides the database abstraction for the calender system */
 /* It provides security, creation, and viewing of events		*/
 
+require_once($_SERVER['DOCUMENT_ROOT'].'/include/permission.php');
 
 class calendar
 {
@@ -132,7 +133,7 @@ function checkOwnership($id, $type)
 		$query = "SELECT owner FROM eventMonthly WHERE id = '$id'";
 	}
 
-	$result = $this->db->dbGetSingleRow($query);
+	$result = $this->db->getRow($query);
 
 	return $result['owner'];
 }
@@ -160,21 +161,21 @@ function addPerms($id, $groupArray, $campusArray)
 function delPerms($id)
 {
 	$query = "DELETE FROM eventGroup WHERE eventID = '$id'";
-	$this->db->dbDoQuery($query);
+	$this->db->query($query);
 	$query = "DELETE FROM eventCampus WHERE eventID = '$id'";
-	$this->db->dbDoQuery($query);
+	$this->db->query($query);
 }
 
 function insertGroup($id, $group)
 {
 	$query = "INSERT INTO eventGroup VALUES ($id, $group)";
-	return $this->db->dbDoQuery($query);
+	return $this->db->query($query);
 }
 
 function insertCampus($id, $campus)
 {
 	$query = "INSERT INTO eventCampus VALUES ($id, $campus)";
-	return $this->db->dbDoQuery($query);
+	return $this->db->query($query);
 }
 
 function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 1, $sid = 0, $userGroup = 0)
@@ -201,7 +202,7 @@ function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 
 		}
 		if($hasAuth)
 		{
-			$this->db->dbDoQuery($query);
+			$this->db->query($query);
 			$newEventID =  $this->db->dbInsertId();
 			$this->addPerms($newEventID, $userGroup, $sid);
 		}
@@ -210,7 +211,7 @@ function addSingleEvent($date, $startTime, $endTime, $priority, $note, $level = 
 	}
 	else if($this->checkSecurity($level, $sid) > 1) //check has permission to write
 	{
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 	else
 		error(35); //do not have permission to add event
@@ -232,7 +233,7 @@ function modSingleEvent($id, $date, $startTime,  $endTime, $priority, $note, $le
 		}
 		if($hasAuth)
 		{
-			$this->db->dbDoQuery($query);
+			$this->db->query($query);
 			$this->delPerms($id);
 			$this->addPerms($id, $userGroup, $sid);
 		}
@@ -242,7 +243,7 @@ function modSingleEvent($id, $date, $startTime,  $endTime, $priority, $note, $le
 	else
 	if(($this->checkSecurity($level, $sid) > 2) || ($this->checkOwnership($id, 1) == $_SESSION['id']))
 	{
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		$this->delPerms($id);
 	}
 	else
@@ -255,7 +256,7 @@ function deleteSingleEvent($id, $level = 1, $sid = 0)
 
 	if(($this->checkSecurity($level, $sid) > 2) || ($this->checkOwnership($id, 1) == $_SESSION['id']))
 	{
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		$this->delPerms($id);
 	}
 	else
@@ -275,7 +276,7 @@ function addWeeklyEvent($day, $startTime, $endTime, $startDuration, $endDuration
 
 	if($this->checkSecurity($level, $sid) > 1) //check has permission to write
 	{
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 	else
 		error(35); //do not have permission to add event
@@ -292,7 +293,7 @@ function modWeeklyEvent($id, $day, $startTime,  $endTime, $startDuration, $endDu
 	//has moderator access or is owner
 	if(($this->checkSecurity($level, $sid) > 2) || ($this->checkOwnership($id, 2) == $_SESSION['id']))
 	{
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 	else
 		error(34); //do not have permission to modify event
@@ -304,7 +305,7 @@ function deleteWeeklyEvent($id, $level = 1, $sid = 0)
 
 	if(($this->checkSecurity($level, $sid) > 2) || ($this->checkOwnership($id, 2) == $_SESSION['id']))
 	{
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 	else
 		error(34); //do not have permission to modify event
@@ -322,7 +323,7 @@ function addMonthlyDayEvent($day, $dayOcc, $startTime, $endTime, $startDuration,
 
 	if($this->checkSecurity($level, $sid) > 1) //check has permission to write
 	{
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 	else
 		error(35); //do not have permission to add event
@@ -339,7 +340,7 @@ function modMonthlyDayEvent($id, $day, $dayOcc, $startTime,  $endTime, $startDur
 	//has moderator access or is owner
 	if(($this->checkSecurity($level, $sid) > 2) || ($this->checkOwnership($id, 3) == $_SESSION['id']))
 	{
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 	else
 		error(34); //do not have permission to modify event
@@ -355,7 +356,7 @@ function addMonthlyDateEvent($date, $startTime, $endTime, $startDuration, $endDu
 
 	if($this->checkSecurity($level, $sid) > 1) //check has permission to write
 	{
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 	else
 		error(35); //do not have permission to add event
@@ -371,7 +372,7 @@ function modMonthlyDateEvent($id, $date, $startTime,  $endTime, $startDuration, 
 	//has moderator access or is owner
 	if(($this->checkSecurity($level, $sid) > 2) || ($this->checkOwnership($id, 3) == $_SESSION['id']))
 	{
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 	else
 		error(34); //do not have permission to modify event
@@ -383,7 +384,7 @@ function deleteMonthlyEvent($id, $level = 1, $sid = 0)
 
 	if(($this->checkSecurity($level, $sid) > 2) || ($this->checkOwnership($id, 2) == $_SESSION['id']))
 	{
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 	else
 		error(34); //do not have permission to modify event
@@ -399,29 +400,29 @@ function getSingleEvent($id, $type)
 	if($type == "week")
 	{
 		$query = "SELECT * FROM eventWeekly WHERE id = '$id'";
-		$event = $this->db->dbGetSingleRow($query);
+		$event = $this->db->getRow($query);
 	}
 	else if($type == "month")
 	{
 		$query = "SELECT * FROM eventMonthly WHERE id = '$id'";
-		$event = $this->db->dbGetSingleRow($query);
+		$event = $this->db->getRow($query);
 	}
 	else
 	{
 		$query = "SELECT * FROM event WHERE id = '$id'";
-		$event = $this->db->dbGetSingleRow($query);
+		$event = $this->db->getRow($query);
 		if($event['access'] == 3)
 		{
 			unset($event['sid']);
 			$query = "SELECT campusID FROM eventCampus WHERE eventID = '$id'";
-			$this->db->dbDoQuery($query);
-			while($thisCampus = $this->db->dbGetNextArray())
+			$this->db->query($query);
+			while($thisCampus = $this->db->getNextArray())
 			{
 				$event['sid'][] = $thisCampus['campusID'];
 			}
 			$query = "SELECT groupID FROM eventGroup WHERE eventID = '$id'";
-			$this->db->dbDoQuery($query);
-			while($thisGroup = $this->db->dbGetNextArray())
+			$this->db->query($query);
+			while($thisGroup = $this->db->getNextArray())
 			{
 				$event['userGroup'][] = $thisGroup['groupID'];
 			}
@@ -600,8 +601,8 @@ function getSubmissionEvents($day, $month, $year)
 				AND file.id = submission_box.fid AND submission_box.category = {$cat['id']} AND submission_box.deleted = 0 AND
 				submission_box.date >= FROM_UNIXTIME('$start_date') AND submission_box.date <= FROM_UNIXTIME('$end_date')
 				ORDER BY submission_box.date ";
-			$this->db->dbDoQuery($query);
-			while($subEvent = $this->db->dbGetNextArray())
+			$this->db->query($query);
+			while($subEvent = $this->db->getNextArray())
 			{ 		
 				$subEvents['category'][] = $subEvent['category'];
 				$subEvents['owner'][] = $subEvent['owner'];
@@ -665,8 +666,8 @@ function getWeekSubmissionEvents($day, $month, $year)
 				AND file.id = submission_box.fid AND submission_box.category = {$cat['id']} AND submission_box.deleted = 0 AND
 				submission_box.date >= FROM_UNIXTIME('$start_date') AND submission_box.date <= FROM_UNIXTIME('$end_date')
 				ORDER BY submission_box.date ";
-			$this->db->dbDoQuery($query);
-			while($subEvent = $this->db->dbGetNextArray())
+			$this->db->query($query);
+			while($subEvent = $this->db->getNextArray())
 			{ 		
 				$subEvents[$subEvent['dayIndex']]['category'][] = $subEvent['category'];
 				$subEvents[$subEvent['dayIndex']]['owner'][] = $subEvent['owner'];
@@ -684,22 +685,22 @@ function getCalendarArray($dayQuery, $weekQuery, $monthQuery)
 {
 
 	$eventCount = 0;
-	$this->db->dbDoQuery($dayQuery);
-	while( $line = $this->db->dbGetNextArray() )
+	$this->db->query($dayQuery);
+	while( $line = $this->db->getNextArray() )
 	{
 		$line['type'] = 'day';
 		$dayEvents[] = $line;
 	}
 
-	$this->db->dbDoQuery($weekQuery);
-	while( $line = $this->db->dbGetNextArray() )
+	$this->db->query($weekQuery);
+	while( $line = $this->db->getNextArray() )
 	{
 		$line['type'] = 'week';
 		$dayEvents[] = $line;
 	}
 
-	$this->db->dbDoQuery($monthQuery);
-	while( $line = $this->db->dbGetNextArray() )
+	$this->db->query($monthQuery);
+	while( $line = $this->db->getNextArray() )
 	{
 		$line['type'] = 'month';
 		$dayEvents[] = $line;

@@ -50,7 +50,7 @@ class subBox
 		$query = "INSERT INTO submission_box (category, owner, open_date, date, late_date, fid, created, description, type) 
 			VALUES ('$cid', '".$_SESSION['id']."','$insertODate','$insertDate','$insertLDate','$fileid', NOW(), '$desc','$type')";
 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 
 	function updateSubmissionDate($sid, 
@@ -91,7 +91,7 @@ class subBox
 		$insertLDate = $lyear."-".$lmonth."-".$ldate." ".$ltime;
 
 		$query = "UPDATE submission_box SET open_date = '$insertODate', date = '$insertDate', late_date = '$insertLDate', description = '$desc', type = '$type' WHERE id = '$sid'"; 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
         }
 
 	function deleteSubmissionBox($id)
@@ -99,8 +99,8 @@ class subBox
                         
 		//delete all files
 		$query = "SELECT id FROM student_submission WHERE box_id = '$id'";
-		$this->db->dbDoQuery($query);
-		while($file = $this->db->dbGetNextArray())
+		$this->db->query($query);
+		while($file = $this->db->getNextArray())
 		{
 			//delete from directory
 			$filename = $file['id'] . ".dat";
@@ -108,24 +108,24 @@ class subBox
 		}
 		//delete student submissions from database
 		$query = "DELETE FROM student_submission WHERE box_id = '$id'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
                 
 		//mark box deleted box but still exists for reference purposes
 		$query = "UPDATE submission_box SET deleted = '1' WHERE id = '$id'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
     } 
 
 	function undeleteSubmissionBox($id)
 	{
 		$query = "UPDATE submission_box SET deleted = '0' WHERE id = '$id'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}		
 
 	function getSubBoxDetails($sid)
 	{
 		$query = "SELECT open_date, date, late_date, description, `type`, category FROM submission_box WHERE id = '$sid'";
-		$this->db->dbDoQuery($query);
-		$dates = $this->db->dbGetNextArray();
+		$this->db->query($query);
+		$dates = $this->db->getNextArray();
 		
 		return $dates;
 	}

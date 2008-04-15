@@ -50,7 +50,7 @@ class dueWorkPage
 			{
 				$flag=false;
 				$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
-				$user = $this->db->dbGetSingleRow($query);
+				$user = $this->db->getRow($query);
 				$this->t_body->set_var("USER_NAME", formatName($user));
 				if($user['year'])
 					$this->t_body->set_var("USER_YEAR", ', '.$user['year']);
@@ -69,7 +69,7 @@ class dueWorkPage
 			if(isStaff($_SESSION['gid']))
 			{
 				$query = "SELECT title, firstname, lastname, year, synergy_id, group_id FROM user WHERE id = $id";
-				$user = $this->db->dbGetSingleRow($query);
+				$user = $this->db->getRow($query);
 				$this->t_body->set_var("USER_NAME", formatName($user));
 				if($user['year'])
 					$this->t_body->set_var("USER_YEAR", ', '.$user['year']);
@@ -172,16 +172,16 @@ class dueWorkPage
 				AND DATE_FORMAT(submission_box.date, '%d%m%Y') = '" . date('dmY', $day) . "'
 			ORDER BY submission_box.date";
 	
-		$res = $this->db->dbDoQuery($query);
+		$res = $this->db->query($query);
 
 		$now = date("U");
 		
-		if($this->db->dbCountRows() > 0)
+		if($this->db->countRows() > 0)
 		{
 			$completed = 0;
-			$due = $this->db->dbCountRows($res);
+			$due = $this->db->countRows($res);
 			
-			while($result = $this->db->dbGetNextArray($res) )
+			while($result = $this->db->getNextArray($res) )
 			{
 			
 				//if has not submitted response then output it
@@ -198,7 +198,7 @@ class dueWorkPage
 					$teacherID = getTeacherName($result['code']);
 					if($teacherID[0]) {
 						$query = "SELECT id, title, firstname, lastname, alt_email, local_email FROM user WHERE synergy_id = '{$teacherID[0]}'";
-						$teacher=$this->db->dbGetSingleRow($query);
+						$teacher=$this->db->getRow($query);
 						$this->t_body->set_var("TEACHER", formatName($teacher));
 						$this->t_body->set_var("TEACHER_EMAIL", formatEmail($teacher));
 					}
@@ -319,9 +319,9 @@ class dueWorkPage
 			$query .= ")";
 		}					
 		print $query;			
-		$r = $this->db->dbDoQuery($query);
+		$r = $this->db->query($query);
 		$dueDates = array();
-		while($data = $this->db->dbGetNextArray($r)) {
+		while($data = $this->db->getNextArray($r)) {
 			$dueDates[] = $data['day'];
 		}
 		
@@ -471,10 +471,10 @@ class dueWorkPage
 			}					
 			
 			$query .= "GROUP BY DATE_FORMAT(submission_box.date,'%d %b %Y') ORDER BY submission_box.date";	
-			$res = $this->db->dbDoQuery($query);
+			$res = $this->db->query($query);
 			$dueDates = array();
 			
-			while($data = $this->db->dbGetNextArray($res)) {
+			while($data = $this->db->getNextArray($res)) {
 		
 				$currentDay = $data['day'];
 
@@ -529,11 +529,11 @@ class dueWorkPage
 				AND submission_box.fid = file.id AND submission_return.deleted = '0' 
 				AND submission_return.owner = '".$_SESSION['id']."'";
 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
-		if($this->db->dbCountRows() > 0)
+		if($this->db->countRows() > 0)
 		{
-			$return = $this->db->dbGetNextArray();
+			$return = $this->db->getNextArray();
 			$prevCat = $return;			
 			do
 			{
@@ -543,7 +543,7 @@ class dueWorkPage
 					$teacherID = getTeacherName($prevCat['code']);
 					if($teacherID[0]) {
 						$query = "SELECT id, title, firstname, lastname, alt_email, local_email FROM user WHERE synergy_id = '{$teacherID[0]}'";
-						$teacher=$this->db->dbGetSingleRow($query);
+						$teacher=$this->db->getRow($query);
 						$this->t_body->set_var("TEACHER", formatName($teacher));
 						$this->t_body->set_var("TEACHER_EMAIL", formatEmail($teacher));
 					}
@@ -572,7 +572,7 @@ class dueWorkPage
 				$this->t_body->parse("return_list","return_block",true);
 				
 				$prevCat = $return;
-			}while($return = $this->db->dbGetNextArray());
+			}while($return = $this->db->getNextArray());
 
 
 		$this->t_body->set_var("CATEGORY", $prevCat['name']);
@@ -589,19 +589,19 @@ class dueWorkPage
 	{
 		//mark work deleted but only when the work is owned by user
 		$query = "UPDATE submission_return SET deleted = '1' WHERE id = '$id' AND owner = '".$_SESSION['id']."'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 
 	function viewReturnedWork($id, $save)
 	{
 		//sends students work to student only
 		$query = "SELECT filename FROM submission_return WHERE owner = '".$_SESSION['id']."' AND id = '$id'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
-		if($this->db->dbCountRows() < 1) 
+		if($this->db->countRows() < 1) 
 			error(5);
         
-		$result = $this->db->dbGetNextArray();		
+		$result = $this->db->getNextArray();		
 		if($save)
 			$attach = "attachment;";
 		else
@@ -623,9 +623,9 @@ class dueWorkPage
 		$testquery = "SELECT datetime FROM submission_log WHERE page = '1' 
 		AND user = '".$_SESSION['id']."'";
 		
-		$this->db->dbDoQuery($testquery);
+		$this->db->query($testquery);
 
-		if($row = $this->db->dbGetNextArray() )
+		if($row = $this->db->getNextArray() )
 		{
 			$query = "UPDATE submission_log SET datetime = NOW() WHERE page = 
 			'1' AND user = '".$_SESSION['id']."'";
@@ -636,7 +636,7 @@ class dueWorkPage
 				'".$_SESSION['id']."', '1')";
 		}
                 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 
 	function showPage()

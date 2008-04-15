@@ -24,7 +24,7 @@ class resource
 		$query = "INSERT INTO resource (owner, perm, location, name, description, type)
 			VALUES ('$owner', '$perm', '$location', '$name', '$description', '$type')";
  
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		$resourceid = $this->db->dbInsertId();
 		
 		if($image['tmp_name'])
@@ -46,7 +46,7 @@ class resource
 				type = '$type', description = '$description', location = '$location'
 				WHERE id = '$id'";
 
-			$this->db->dbDoQuery($query);
+			$this->db->query($query);
 			
 			if($image['tmp_name'])
 			{
@@ -69,7 +69,7 @@ class resource
 		
 			//remove from db
 			$query = "DELETE FROM resource WHERE id = '$id'";
-			return $this->db->dbDoQuery($query);
+			return $this->db->query($query);
 		}
 		else
 			error(101);
@@ -89,8 +89,8 @@ class resource
 		WHERE resource.id = '{$id}' AND resource.type = luResourceType.id
 		AND location = luResourceLocation.id AND owner = user.id"; 
 
-		$this->db->dbDoQuery($query);
-		return $this->db->dbGetNextArray();
+		$this->db->query($query);
+		return $this->db->getNextArray();
 	}
 
 	function getAssignedResources($id)
@@ -99,10 +99,10 @@ class resource
 				  FROM resource JOIN roomResource ON roomResource.resource = resource.id
 				  WHERE roomResource.room = '{$id}'";
 		
-		$this->db->dbDoQuery($query);
-		if($this->db->dbCountRows() > 0)
+		$this->db->query($query);
+		if($this->db->countRows() > 0)
 		{
-			while($resources[] = $this->db->dbGetNextArray());
+			while($resources[] = $this->db->getNextArray());
 			array_pop($resources);
 		}
 		return $resources;
@@ -121,9 +121,9 @@ class resource
 				AND resourceBooking.end = '$end'
 				ORDER BY luResourceType.name, resource.name"; 
 
-		$this->db->dbDoQuery($query);
-		if($this->db->dbCountRows() > 0)
-		while($available[] = $this->db->dbGetNextArray());
+		$this->db->query($query);
+		if($this->db->countRows() > 0)
+		while($available[] = $this->db->getNextArray());
 		return $available;
 
 	}	
@@ -137,10 +137,10 @@ class resource
 			  	FROM resource, luResourceType, luResourceLocation
 				WHERE resource.type = luResourceType.id AND location = luResourceLocation.id
 				ORDER BY luResourceType.name, resource.name";
-		$this->db->dbDoQuery($query);
-		if($this->db->dbCountRows() > 0)
+		$this->db->query($query);
+		if($this->db->countRows() > 0)
 		{
-			while($resources[] = $this->db->dbGetNextArray());
+			while($resources[] = $this->db->getNextArray());
 			array_pop($resources);
 		}
 		return $resources;
@@ -149,9 +149,9 @@ class resource
 	function isOwner($user, $resource)
 	{
 		$query = "SELECT id FROM resource WHERE owner = '$user' AND id = '$resource'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
-		if($this->db->dbGetNextArray())
+		if($this->db->getNextArray())
 			return true;
 		
 		return false;

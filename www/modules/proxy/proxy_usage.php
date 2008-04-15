@@ -40,7 +40,7 @@ function ProxyUsage() {
 	
 		$this->t_body->set_file("tplBODY", "modules/proxy/full_list.htm");
 		include("../../include/page.php");
-		$proxydb->dbDoQuery("use proxy");
+		$proxydb->query("use proxy");
 
 		$this->t_body->set_var("TITLE", HEADING." - Full Listing of Proxy Usage");
 		$this->t_body->set_block("tplBODY", "user", "user_block");
@@ -77,9 +77,9 @@ function ProxyUsage() {
 		WHERE usage_report_week.year = '$currentYear' AND usage_report_week.week = '$week' $studquery $campusquery
 		ORDER BY usage_report_week.datausage DESC";
 
-		$proxydb->dbDoQuery($query);
+		$proxydb->query($query);
 	
-		for($x = 1; $row = $proxydb->dbGetNextArray(); $x++ )
+		for($x = 1; $row = $proxydb->getNextArray(); $x++ )
 		{
 			$this->t_body->set_var("POS", $x.".");
 			$this->t_body->set_var("NAME", $row['firstname']." ".$row['lastname']);
@@ -101,13 +101,13 @@ function ProxyUsage() {
 
 	$this->t_body->set_file("tplBODY", "modules/proxy/full_list.htm");
 	include("../../include/page.php");
-	$proxydb->dbDoQuery("use proxy");
+	$proxydb->query("use proxy");
 	$this->t_body->set_var("TITLE", HEADING." - Full Listing of Filter Matches");
 	$this->t_body->set_block("tplBODY", "user", "user_block");
 
 	$query = "SELECT name FROM filter_category WHERE id = '".$_GET['cid']."'";
-	$proxydb->dbDoQuery($query);
-	$category = $proxydb->dbGetNextArray();
+	$proxydb->query($query);
+	$category = $proxydb->getNextArray();
 
 	$this->t_body->set_var("TOPIC", $category['name']." Filter");
 
@@ -141,9 +141,9 @@ function ProxyUsage() {
 		AND filter_report_week.category = '".$_GET['cid']."' $studquery $campusquery
 		ORDER BY filter_report_week.count DESC";
 
-	$proxydb->dbDoQuery($query);
+	$proxydb->query($query);
 
-	for($x = 1; $row = $proxydb->dbGetNextArray(); $x++ )
+	for($x = 1; $row = $proxydb->getNextArray(); $x++ )
 	{
 		$this->t_body->set_var("POS", $x.".");
 		$this->t_body->set_var("NAME", $row['firstname']." ".$row['lastname']);
@@ -195,7 +195,7 @@ else if($_GET['report'])
 		$studquery = "AND user.group_id NOT IN(1,2)";
 	}
 
-	$proxydb->dbDoQuery("use proxy");
+	$proxydb->query("use proxy");
 
 	$query = "SELECT DISTINCT user.firstname, user.lastname, user.id, usage_report_week.user, usage_report_week.datausage
 		FROM proxy.usage_report_week
@@ -206,9 +206,9 @@ else if($_GET['report'])
 		ORDER BY usage_report_week.datausage DESC LIMIT 0, 10";
 
 	
-	$proxydb->dbDoQuery($query);
+	$proxydb->query($query);
 
-        for($x = 1; $row = $proxydb->dbGetNextArray(); $x++ )
+        for($x = 1; $row = $proxydb->getNextArray(); $x++ )
         {
                 $this->t_body->set_var("POS", $x.".");
                 $this->t_body->set_var("NAME", $row['firstname']." ".$row['lastname']);
@@ -224,8 +224,8 @@ else if($_GET['report'])
 		$this->t_body->set_var("usage_block", "<tr><td>No report available</td></tr>");
 
 	$query = "SELECT * FROM filter_category";
-	$handle = $proxydb->dbDoQuery($query);
-	while( $cat = $proxydb->dbGetNextArray($handle) )
+	$handle = $proxydb->query($query);
+	while( $cat = $proxydb->getNextArray($handle) )
 	{
 		$this->t_body->set_var("CATEGORY", $cat['name']);
 		$this->t_body->set_var("CID", $cat['id']);
@@ -238,9 +238,9 @@ else if($_GET['report'])
                         AND filter_report_week.category = '".$cat['id']."' $studquery $campusquery
                         ORDER BY filter_report_week.count DESC LIMIT 0,10";
 
-		$proxydb->dbDoQuery($query);
+		$proxydb->query($query);
 
-		for($x = 1; $row = $proxydb->dbGetNextArray(); $x++ )
+		for($x = 1; $row = $proxydb->getNextArray(); $x++ )
 		{
 			$this->t_body->set_var("POS", $x.".");
 			$this->t_body->set_var("NAME", $row['firstname']." ".$row['lastname']);
@@ -288,8 +288,8 @@ else
 			LEFT JOIN luCampus ON userCampus.campus = luCampus.id
 			WHERE user.id = '".$uid."'";
 
-	$proxydb->dbDoQuery($query); 
-	$user = $proxydb->dbGetNextArray();
+	$proxydb->query($query); 
+	$user = $proxydb->getNextArray();
 
 	$this->t_body->set_var("FULLNAME", $user['firstname']." ".$user['lastname']);
 	$this->t_body->set_var("SYNID", $user['synergy_id']);
@@ -304,7 +304,7 @@ else
 	$this->t_body->set_var("YEAR", $user['year']);
 	
 
-	$proxydb->dbDoQuery("use proxy");
+	$proxydb->query("use proxy");
 
 	//get usage history?
 	
@@ -313,15 +313,15 @@ else
 	$query = "SELECT datausage FROM usage_report_week WHERE year = '$currentYear' 
 			AND week = '$week' AND user = '".$uid."'";
 	
-	$proxydb->dbDoQuery($query);
-	$usage = $proxydb->dbGetNextArray();
+	$proxydb->query($query);
+	$usage = $proxydb->getNextArray();
 
 	$this->t_body->set_var("WEEK_USAGE", bytesToString($usage['datausage']));
 
 	//get total history
 	$query = "SELECT SUM(datausage) as totalusage FROM usage_report_week WHERE year = '$currentYear' AND user = '".$uid."'";
-	$proxydb->dbDoQuery($query);
-	$usagetotal = $proxydb->dbGetNextArray();
+	$proxydb->query($query);
+	$usagetotal = $proxydb->getNextArray();
 
 	$this->t_body->set_var("TOTAL_USAGE", bytesToString($usagetotal['totalusage']));
 	
@@ -335,15 +335,15 @@ else
 	else
 	{
 		$query = "SELECT * FROM filter_category";
-		$handle = $proxydb->dbDoQuery($query);
-		while( $cat = $proxydb->dbGetNextArray($handle) )
+		$handle = $proxydb->query($query);
+		while( $cat = $proxydb->getNextArray($handle) )
 		{
 			$this->t_body->set_var("CATEGORY", $cat['name']);
 			$this->t_body->set_var("CID", $cat['id']);
 			//start with last week
 			$query = "SELECT count, datausage FROM filter_report_week WHERE category = '".$cat['id']."' AND user = '".$uid."' AND week = '$week'"; 	
-			$proxydb->dbDoQuery($query);
-			$filter = $proxydb->dbGetNextArray();
+			$proxydb->query($query);
+			$filter = $proxydb->getNextArray();
 			if($filter['count'] == "")
 			{
 				$this->t_body->set_var("WEEK_HITS", "0"); 
@@ -359,8 +359,8 @@ else
 			//now get for the entire year
 			$query = "SELECT SUM(count) as totalcount, SUM(datausage) as totalusage FROM filter_report_week 
 					WHERE category = '".$cat['id']."' AND user = '".$uid."'"; 	
-			$proxydb->dbDoQuery($query);
-			$filter = $proxydb->dbGetNextArray();
+			$proxydb->query($query);
+			$filter = $proxydb->getNextArray();
 			if($filter['totalcount'] == "")
 			{
 				$this->t_body->set_var("TOTAL_HITS", "0"); 

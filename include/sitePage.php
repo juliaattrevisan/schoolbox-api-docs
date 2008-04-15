@@ -293,6 +293,8 @@ class SitePage extends Page {
 		$this->setFile(TEMPLATE_body, $this->getTemplate('common/login.html'));
 		$this->setVar("TITLE", HEADING." - Login");
 		$this->setVar("HIDDEN",$_SERVER['REQUEST_URI']);
+		$this->setVar('ERROR', "You are currently not logged in.  Your session has either expired or you are beginning 
+			a new session.  Please log in below to continue browsing the portal. ");
 		$this->outputPage(TRUE);
 		exit;
 	}

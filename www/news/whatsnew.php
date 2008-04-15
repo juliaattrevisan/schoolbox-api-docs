@@ -7,8 +7,6 @@
 
 //display what has change since the last login for the user
 
-require_once("include/session.php");
-require_once("include/include.php");
 require_once("include/permission.php");
 require_once("include/involved.php");
 
@@ -58,7 +56,7 @@ class WhatsNew
 	{
 		//get last visit to category
 		$query = "SELECT datetime FROM homepage_log WHERE cid = '$id' AND user = '".$_SESSION['id']."'";
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 		if($result['datetime'])
 			return $result['datetime'];
 		else
@@ -70,7 +68,7 @@ class WhatsNew
 	{
 		//get the last visit by a student to due work
 		$query = "SELECT datetime FROM submission_log WHERE page = '1' AND user = '".$_SESSION['id']."'";
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 		if($result['datetime'])
 			return $result['datetime'];
 		else
@@ -81,7 +79,7 @@ class WhatsNew
 	{
 		//get last visit to returned work
 		$query = "SELECT datetime FROM submission_log WHERE page = '2' AND user = '".$_SESSION['id']."'";
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 		if($result['datetime'])
 			return $result['datetime'];
 		else
@@ -96,28 +94,28 @@ class WhatsNew
 		//check if any new news has been submitted
 		$query = "SELECT COUNT(*) AS newscount FROM subject_news WHERE deleted = 0 AND code = $id AND
 			datetime_posted >= '$lastcatvisit' AND datetime_expires >= NOW()";
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 			
 		$count['news'] = $result['newscount'];
 
 		//check if any new files have been submitted
 		$query = "SELECT COUNT(*) AS filecount FROM file WHERE 
 			deleted = 0 AND category = $id AND submitted >= '$lastcatvisit'";
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 			
 		$count['files'] = $result['filecount'];
 			
 		//check if any new links have been submitted
 		$query = "SELECT COUNT(*) AS linkcount FROM link WHERE category = $id 
 			AND submitted >= '$lastcatvisit'";
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 
 		$count['links'] = $result['linkcount'];
 		
 		//check if any new forum posts have been made
 		$query = "SELECT COUNT(*) AS forumcount FROM forum WHERE cid = $id AND 
 						deleted = 0 AND `date` >= '$lastcatvisit'";
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 		
 		$count['forum'] = $result['forumcount'];				 
 	
@@ -130,7 +128,7 @@ class WhatsNew
 		
 		//check for due work (* currently does not check if work has been returned *)
 		$query = "SELECT COUNT(id) AS duework FROM submission_box WHERE category = '$id' AND created > '$lastvisit'"; 
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 		
 		return $result['duework'];
 	}
@@ -143,7 +141,7 @@ class WhatsNew
 			LEFT JOIN student_submission AS sub ON sub.box_id = box.id AND sub.owner = '".$_SESSION['id']."' 
 			WHERE box.category = '$id' AND box.deleted = '0' AND box.owner != '".$_SESSION['id']."'";
 
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 
 		return $result['total'] - $result['submitted'];
 	} 
@@ -156,7 +154,7 @@ class WhatsNew
 		$query = "SELECT COUNT(submission_return.id) AS retwork FROM submission_return, submission_box WHERE 
 			submission_return.box_id = submission_box.id AND category = '$id' 
 			AND submission_return.owner = '".$_SESSION['id']."' AND returned > '$lastvisit'"; 
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 		
 		return $result['retwork'];
 	}
@@ -167,7 +165,7 @@ class WhatsNew
 		$query = "SELECT COUNT(submission_return.id) AS retwork FROM submission_return WHERE 
 				owner = '".$_SESSION['id']."' AND deleted = '0'";
 
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 		
 		return $result['retwork'];
 	}
@@ -183,15 +181,15 @@ class WhatsNew
 			AND submission_box.id = submission_log.sid 
 			WHERE owner = '".$_SESSION['id']."' AND deleted = '0' AND category = '$category'";
 
-		$rh = $this->db->dbDoQuery($query);
-		while( $subbox = $this->db->dbGetNextArray($rh) )
+		$rh = $this->db->query($query);
+		while( $subbox = $this->db->getNextArray($rh) )
 		{
 
 			//for each submission box check if there are any new submissions
 			$query = "SELECT COUNT(id) as newsubs FROM student_submission 
 				WHERE box_id = '".$subbox['id']."' AND submitted > '".$subbox['datetime']."'";
 
-			$result = $this->db->dbGetSingleRow($query);
+			$result = $this->db->getRow($query);
 	
 			//if there are any new submissions put them in a array for return
 			if($result['newsubs'] > 0 )

@@ -26,7 +26,7 @@ function addNews($code, $owner, $heading, $expires, $body)
 
 	$SQL_QUERY = "INSERT INTO subject_news (code, heading, owner, datetime_posted, datetime_expires, body)
 	VALUES ('$code', '$heading', '$owner', FROM_UNIXTIME($now), FROM_UNIXTIME($expirestime), '$body')";
-	$this->dbConnection->dbDoQuery($SQL_QUERY);
+	$this->dbConnection->query($SQL_QUERY);
 }
 
 function modNews($id, $code, $heading, $expires, $body)
@@ -48,13 +48,13 @@ function modNews($id, $code, $heading, $expires, $body)
 			WHERE id = '$id'";
 	}
 	
-	$this->dbConnection->dbDoQuery($SQL_QUERY);
+	$this->dbConnection->query($SQL_QUERY);
 }
 
 function deleteNews($id)
 {
 	$SQL_QUERY = "UPDATE subject_news SET deleted = '1' WHERE id = '$id'";
-	$this->dbConnection->dbDoQuery($SQL_QUERY);
+	$this->dbConnection->query($SQL_QUERY);
 }
 
 function getNews()
@@ -64,7 +64,7 @@ function getNews()
     FROM subject_news, user WHERE user.id = subject_news.owner AND code = '$this->code' AND datetime_expires > NOW() AND deleted = 0 
     ORDER BY datetime_posted DESC";
 
-	return $this->dbConnection->dbGetAllRows($query);
+	return $this->dbConnection->getAll($query);
 }
 
 function getNewsArchive()
@@ -74,15 +74,15 @@ function getNewsArchive()
     FROM subject_news, user WHERE user.id = subject_news.owner AND code = '$this->code' AND deleted = 0 
     ORDER BY datetime_posted DESC";
 
-	return $this->dbConnection->dbGetAllRows($query);
+	return $this->dbConnection->getAll($query);
 }
 
 function getSingleNews($id)
 {
   $SQL_QUERY = "SELECT owner, heading, body, code FROM subject_news WHERE id = '$id' AND deleted = 0";
-  $this->dbConnection->dbDoQuery($SQL_QUERY);
-  if($this->dbConnection->dbCountRows() == 1)
-        return $this->dbConnection->dbGetNextArray();
+  $this->dbConnection->query($SQL_QUERY);
+  if($this->dbConnection->countRows() == 1)
+        return $this->dbConnection->getNextArray();
   else
 	return 0;
 } 

@@ -19,9 +19,9 @@ function checkBruteForce(&$db)
 	$graceperiod = time() - LOGINGRACE;
         
 	$query = "SELECT id FROM login_log WHERE ip = '$ip' AND login = '0' AND date > FROM_UNIXTIME($graceperiod)";
-	$db->dbDoQuery($query);
+	$db->query($query);
 	
-	if($db->dbCountRows() < LOGINALLOWED)
+	if($db->countRows() < LOGINALLOWED)
 		return 0;
 	else
 		return 1;
@@ -46,9 +46,9 @@ function authenticateSQL(&$db, $username, $password) {
 
 	$query = "SELECT user.id FROM user WHERE username = '". addslashes(trim( $username))."' 
 	AND password = PASSWORD('".addslashes($password)."')";
-	$db->dbDoQuery($query);
-	$result = $db->dbCountRows();
-	//$user = $db->dbGetNextArray();
+	$db->query($query);
+	$result = $db->countRows();
+	//$user = $db->getNextArray();
 	if($result == 1)
 		return true;
 	else
@@ -66,7 +66,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 		
 		//insert password into db to enable automatic login
 		$query = "UPDATE user SET email_pass = '$password' WHERE username = '".trim($username)."'";
-		$db->dbDoQuery($query);
+		$db->query($query);
 	}
 	
 	if(!$result) {
@@ -77,7 +77,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 
 		$query = "SELECT user.id, title, firstname, lastname, username, group_id, synergy_id, superusers.id AS su, password, email_pass, local_email, mail_handler 
 		FROM user LEFT JOIN superusers ON user.id = superusers.id WHERE username = '". trim( $username)."'";
-		$user = $db->dbGetSingleRow($query);
+		$user = $db->getRow($query);
 	}
 	
 	//log the authentication attempt
@@ -139,8 +139,8 @@ function authenticate(&$db, $username, $password, $remember = 0)
 				WHERE uid = '".$user['id']."'
 				ORDER BY defaultCampus DESC
 				";
-		$db->dbDoQuery($campusquery);
-		while($campus = $db->dbGetNextArray() )
+		$db->query($campusquery);
+		while($campus = $db->getNextArray() )
 		{
 			if($campus['campus'])
 				$_SESSION['campus'][] = $campus['campus'];
@@ -155,14 +155,14 @@ function authenticate(&$db, $username, $password, $remember = 0)
 		}
 
 		$loginlogquery .= ", '1')";
-		$db->dbDoQuery($loginlogquery);
+		$db->query($loginlogquery);
 
 		return true;
 	}
 	else
 	{
 		$loginlogquery .= ", '0')";
-		$db->dbDoQuery($loginlogquery);
+		$db->query($loginlogquery);
 		return false;		
 	}
 	
@@ -187,7 +187,7 @@ function firsttime(&$db, $username, $password)
         //submit email password to database
         $query = "UPDATE user SET password = PASSWORD('".$password."'), email_pass = '".$password."' 
 		WHERE username = '".$username."'";
-        $db->dbDoQuery($query);
+        $db->query($query);
 
 	return 1;
 }
@@ -210,7 +210,7 @@ function setSynergyInfo(&$mydb)
 			foreach($children as $child)
 			{
 				$myquery = "SELECT id FROM user WHERE synergy_id = $child";
-				$portal = $mydb->dbGetSingleRow($myquery);
+				$portal = $mydb->getRow($myquery);
 				if($portal['id'])
 				{
 					$subjects = getSubjectList($child, $studentGroup[0]);
@@ -227,8 +227,8 @@ function setSynergyInfo(&$mydb)
 				{
 					//check subject exists.. we cant link to subjects that dont exist its ugly
 					$myquery = "SELECT id FROM category WHERE code = '".$subject['code']."'";
-					$mydb->dbDoQuery($myquery);
-					if($mydb->dbCountRows() > 0)
+					$mydb->query($myquery);
+					if($mydb->countRows() > 0)
 						$_SESSION['subjects'][] = $subject;
 				}
 			}

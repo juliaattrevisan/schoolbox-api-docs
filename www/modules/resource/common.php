@@ -13,8 +13,8 @@ function checkModPerms(&$db, $rid, $uid)
 		return true;
 	
 	$query = "SELECT owner FROM resource WHERE id = '$rid'";
-	$db->dbDoQuery($query); 
-	$resource = $db->dbGetNextArray();
+	$db->query($query); 
+	$resource = $db->getNextArray();
 	
 	if($resource['owner'] == $_SESSION['id'])
 		return true;
@@ -25,10 +25,10 @@ function checkModPerms(&$db, $rid, $uid)
 function typeDropDown(&$db, $name, $selected = 0)
 {
 	$query = "SELECT id, name FROM luResourceType";
-	$db->dbDoQuery($query);
+	$db->query($query);
 	
 	$typeDropDown = "<select name=\"$name\">";
-	while($type = $db->dbGetNextArray())
+	while($type = $db->getNextArray())
 	{
 		if($selected == $type['id'])
 			$typeDropDown .= "<option value=\"{$type['id']}\" selected>{$type['name']}</option>";
@@ -42,10 +42,10 @@ function typeDropDown(&$db, $name, $selected = 0)
 function locDropDown(&$db, $name, $selected = 0)
 {
 	$query = "SELECT id, name FROM luResourceLocation";
-	$db->dbDoQuery($query);
+	$db->query($query);
 	
 	$locDropDown = "<select name=\"$name\">";
-	while($loc = $db->dbGetNextArray())
+	while($loc = $db->getNextArray())
 	{
 		if($selected == $loc['id'])
 			$locDropDown .= "<option value=\"{$loc['id']}\" selected>{$loc['name']}</option>";
@@ -75,10 +75,10 @@ function permDropDown($name, $selected = 0)
 function roomDropDown(&$db, $name, $selected = 0)
 {
 	$query = "SELECT id, name FROM resource WHERE type = '". ROOM ."'";
-	$db->dbDoQuery($query);
+	$db->query($query);
 	
 	$roomDropDown = "<select name=\"$name\">";
-	while($room = $db->dbGetNextArray())
+	while($room = $db->getNextArray())
 	{
 		if($selected == $room['id'])
 			$roomDropDown .= "<option value=\"{$room['id']}\" selected>{$room['name']}</option>";

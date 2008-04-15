@@ -78,8 +78,8 @@ class ClassList
 		$mySQLdb->dbConnect();	
 
 		$query = "SELECT id, name FROM category WHERE code = '$subCode'";
-		$mySQLdb->dbDoQuery($query);
-		$category = $mySQLdb->dbGetNextArray();
+		$mySQLdb->query($query);
+		$category = $mySQLdb->getNextArray();
 		$this->_cid = $category[ 'id'];
 	
 		$this->t_body->set_var("SUBJECTNAME", $category['name']);
@@ -115,13 +115,13 @@ class ClassList
 					u.synergy_id = '".$student['synergy_id']."'
 				ORDER BY b.date";
 			
-			$mySQLdb->dbDoQuery($mysqlquery);
-			if($mySQLdb->dbCountRows() > 0)
+			$mySQLdb->query($mysqlquery);
+			if($mySQLdb->countRows() > 0)
 			{	
 				$count = 0;
 
 				//for each assignment record there mark
-				while( $work = $mySQLdb->dbGetNextArray())
+				while( $work = $mySQLdb->getNextArray())
 				{
 					$users[$userCount]['work'][$work['id']] = $work['mark'];	
 					$users[$userCount]['userID'] = $work['userID'];	
@@ -137,8 +137,8 @@ class ClassList
 					WHERE 	synergy_id = '".$student['synergy_id']."'
 				";
 		
-				$mySQLdb->dbDoQuery($mysqlquery);
-				$work = $mySQLdb->dbGetNextArray();
+				$mySQLdb->query($mysqlquery);
+				$work = $mySQLdb->getNextArray();
 				$users[$userCount]['userID'] = $work['userID']; 
 
 
@@ -156,16 +156,16 @@ class ClassList
 		//ok now we need to get the list of work
 		
 		$query = "SELECT description, id, deleted FROM submission_box WHERE category = '".$category['id']."'";
-		$mySQLdb->dbDoQuery($query);
+		$mySQLdb->query($query);
 	
-		$total = $mySQLdb->dbCountRows();
+		$total = $mySQLdb->countRows();
 		if($total > 0 )
 		{
 			//output header
 			$workList = array();
 
 			$worknameHTML = "";
-			while( $box = $mySQLdb->dbGetNextArray() )
+			while( $box = $mySQLdb->getNextArray() )
 			{	
 				if($box['deleted'])
 					$name = str_replace( ' ', '&nbsp;', $box['description']);
@@ -261,7 +261,7 @@ function markUpdate( $userID, $box_id, $mark){
 	";
 	$mySQLdb = new dbManager();
 	$mySQLdb->dbConnect();
-	$mySQLdb->dbDoQuery( $sql);
+	$mySQLdb->query( $sql);
 	$mySQLdb->dbClose();
 }
 
@@ -274,7 +274,7 @@ function markAdd( $userID, $box_id, $mark) {
 	
 	$mySQLdb = new dbManager();
 	$mySQLdb->dbConnect();
-	$mySQLdb->dbDoQuery( $sql);
+	$mySQLdb->query( $sql);
 	$mySQLdb->dbClose();
 }
 
@@ -289,7 +289,7 @@ function markDelete( $userID, $box_id) {
 			owner = '" . mysql_escape_string( $userID) . "'
 	";
 	$mySQLdb = new dbManager();
-	$mySQLdb->dbDoQuery( $sql);
+	$mySQLdb->query( $sql);
 }
 
 

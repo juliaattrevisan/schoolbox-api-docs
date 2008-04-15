@@ -61,7 +61,7 @@ function fileSecurityCheck($error, $file_name, $tmp_name, $size, $type="")
 		
 		$db = new dbManager;
 		$query = "SELECT t.fileTypeID FROM allowedFileTypes t LEFT JOIN allowedFileExtension e on t.fileTypeID = e.fileTypeID WHERE mime = '$mime' AND extension = '$ext' AND enable = 'true'";
-		if(!$db->dbGetSingleRow($query))
+		if(!$db->getRow($query))
 			error(11, "Your file, ".$_FILES['file']['name']." with the extension '$ext' and type of '$mime'");
 	}
 }

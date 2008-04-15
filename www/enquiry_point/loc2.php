@@ -76,7 +76,7 @@ uid = id
 WHERE id = 
 '$userid' ORDER BY defaultCampus DESC";
 		
-		$row = $this->db->dbGetSingleRow($sql);
+		$row = $this->db->getRow($sql);
 
 		$this->t_body->set_var($row);
 		
@@ -122,7 +122,7 @@ WHERE id =
 	function group($houseid, $campusid, $yearlevel, $firstname, $lastname, $username, $groupid, $allvalues) {
 		$sql ="SELECT * FROM intranet.groups WHERE id = '$groupid'";
 		
-		$row = $this->db->dbGetSingleRow($sql);
+		$row = $this->db->getRow($sql);
 
 		$this->t_body->set_var($row);
 		$group =$row[name];
@@ -132,7 +132,7 @@ WHERE id =
 	function house($houseid, $campusid, $yearlevel, $firstname, $lastname, $username, $group, $allvalues) {
 		$sql ="SELECT * FROM intranet.house WHERE id = '$houseid'";
 		
-		$row = $this->db->dbGetSingleRow($sql);
+		$row = $this->db->getRow($sql);
 
 		$this->t_body->set_var($row);
 		$house =$row[house];
@@ -141,7 +141,7 @@ WHERE id =
 
 	function campus($house, $campusid, $yearlevel, $firstname, $lastname, $username, $group, $allvalues) {
 		$sql ="SELECT * FROM intranet.luCampus WHERE id = '$campusid'";
-		$row = $this->db->dbGetSingleRow($sql);
+		$row = $this->db->getRow($sql);
 
 		$this->t_body->set_var($row);
 		$campus =$row[name];

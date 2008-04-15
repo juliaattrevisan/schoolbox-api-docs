@@ -27,7 +27,7 @@ class ViewSubmissionPage {
 		//get them from group list
 		$query = "SELECT id as uid, synergy_id, firstname, lastname FROM user, userAccess
 		WHERE id = uid AND service = ".HOMEPAGESERVICE." AND sid = ".$desc['id']." AND type > 0 ORDER BY lastname, firstname";
-		$studentList = $this->db->dbGetAllRows($query); 
+		$studentList = $this->db->getAll($query); 
 			
 		return $studentList;
 	}
@@ -40,12 +40,12 @@ class ViewSubmissionPage {
 		submission_box.category = category.id AND submission_box.owner = '".$_SESSION['id']."' 
 		AND submission_box.id = '$box_id' 
 		AND submission_box.deleted = '0'";
-		$this->db->dbDoQuery($query);
-		if($this->db->dbCountRows() < 1)
+		$this->db->query($query);
+		if($this->db->countRows() < 1)
 		{
 			error(17);
 		}
-		$desc = $this->db->dbGetNextArray();
+		$desc = $this->db->getNextArray();
 		$this->t_body->set_var("ASSDESC", $desc['name']." - ".$desc['description']);
 
 		//log page
@@ -71,7 +71,7 @@ class ViewSubmissionPage {
 				
 				
 				
-				if($line = $this->db->dbGetSingleRow($query)) {
+				if($line = $this->db->getRow($query)) {
 				
 					$output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
 										'OWNER_ID' 	=> $line['uid'],
@@ -111,8 +111,8 @@ class ViewSubmissionPage {
 					FROM student_submission, user 
 					WHERE owner = user.id AND box_id = '$box_id' ORDER BY lastname, firstname"; 
 				
-			$this->db->dbDoQuery($query);
-			while($line = $this->db->dbGetNextArray()) {				
+			$this->db->query($query);
+			while($line = $this->db->getNextArray()) {				
 				$output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
 									'OWNER_ID' 	=> $line['uid'],
 									'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
@@ -137,9 +137,9 @@ class ViewSubmissionPage {
                 $testquery = "SELECT datetime FROM submission_log WHERE page = '3'  
                 AND user = '".$_SESSION['id']."' AND sid = '$box_id'";
                 
-                $this->db->dbDoQuery($testquery);
+                $this->db->query($testquery);
                 
-                if($row = $this->db->dbGetNextArray() )
+                if($row = $this->db->getNextArray() )
                 {
                         $query = "UPDATE submission_log SET datetime = NOW() WHERE page =
                         '3' AND user = '".$_SESSION['id']."' AND sid = '$box_id'";
@@ -150,7 +150,7 @@ class ViewSubmissionPage {
 				(NOW(), '".$_SESSION['id']."', '3', '$box_id')";
                 }
                                         
-                $this->db->dbDoQuery($query);
+                $this->db->query($query);
         }
 
 	function sendWork($view, $save)
@@ -183,7 +183,7 @@ class ViewSubmissionPage {
 
 		//delete from database
 		$query = "DELETE FROM student_submission WHERE student_submission.id = '$id'"; 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
 		//all checks completed.. continue with file delete
                 $filename = SUBMISSION_directory . "/" . $id . ".dat";
@@ -201,9 +201,9 @@ class ViewSubmissionPage {
 			WHERE student_submission.id = '$id' AND student_submission.box_id = submission_box.id 
 			AND submission_box.owner = '".$_SESSION['id']."' AND student_submission.owner = user.id";    	
 
-		$this->db->dbDoQuery($query);
-		if($this->db->dbCountRows() > 0)
-			$result = $this->db->dbGetNextArray();		
+		$this->db->query($query);
+		if($this->db->countRows() > 0)
+			$result = $this->db->getNextArray();		
 		else
 		{
 			error(44);

@@ -89,10 +89,10 @@ class OutPut
 		user.id as uid, user.title, user.firstname, user.lastname, user.local_email, user.alt_email, link.description, link.comment 
 		FROM link LEFT JOIN user ON user.id = link.owner WHERE link.category = ".$this->category."" . $hiddenQuery;
 
-		$result = $this->db->dbDoQuery($catQuery);
+		$result = $this->db->query($catQuery);
 
 		$flag = 0;
-		while($queryArray = $this->db->dbGetNextArray($result) )
+		while($queryArray = $this->db->getNextArray($result) )
 		{
 			//only ouput if user has right to see
 			if(perm($queryArray['id'], 1) > 0)
@@ -103,24 +103,24 @@ class OutPut
 		}
 		if(!$flag){ $this->t_body->set_var("cats_block", "");}
 
-		$this->db->dbDoQuery($fileQuery);
+		$this->db->query($fileQuery);
 
 		//if nothing there just display this
-		if($this->db->dbCountRows()<1){ $this->t_body->set_var("files_block", "");}
+		if($this->db->countRows()<1){ $this->t_body->set_var("files_block", "");}
 		else
 		{
-			while($queryArray = $this->db->dbGetNextArray() )
+			while($queryArray = $this->db->getNextArray() )
 			{
 				$this->outputFile($queryArray);
 			}
 		}
 		
 		//output the links
-		$this->db->dbDoQuery($linkQuery);
-		if($this->db->dbCountRows()<1){ $this->t_body->set_var("links_block", "");}
+		$this->db->query($linkQuery);
+		if($this->db->countRows()<1){ $this->t_body->set_var("links_block", "");}
 		else
 		{
-			while($queryArray = $this->db->dbGetNextArray() )
+			while($queryArray = $this->db->getNextArray() )
 			{
 				$this->outputLink($queryArray);
 			}
@@ -137,7 +137,7 @@ class OutPut
 		if($this->category != 0) //unless of course its the root node (no parents here)
 		{
 			$query = "SELECT id, name, parent, code FROM category WHERE id = $this->category";	
-			$currentCat = $this->db->dbGetSingleRow($query);
+			$currentCat = $this->db->getRow($query);
 			$parentID = $currentCat['parent'];
 			if($currentCat['code'])
 				$code = ' ('.scrubTEXT($currentCat['code']).')';
@@ -150,7 +150,7 @@ class OutPut
 		while($parentID != 0)
 		{
 			$query = "SELECT id, name, parent, code FROM category WHERE id = ".$parentID."";
-			$parentArray = $this->db->dbGetSingleRow($query);
+			$parentArray = $this->db->getRow($query);
 			$parentID = $parentArray['parent'];
 			if($parentArray['code'])
 				$code = ' ('.scrubTEXT($parrentArray['code']).')';
@@ -186,7 +186,7 @@ class OutPut
 		}
 		
 		$query  = "SELECT id, code, template FROM category WHERE id = ".$this->category."";
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 		
 		if($result['id'] != $this->category)  //this will ensure that the category exists
 			error(13);

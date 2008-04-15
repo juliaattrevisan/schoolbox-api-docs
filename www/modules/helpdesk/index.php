@@ -60,7 +60,7 @@ class helpdesk_display{
 
 	function getUser($userid) {
 		$query = "SELECT firstname, lastname FROM user WHERE id=".$userid;
-		$user = $this->db->dbGetSingleRow($query);
+		$user = $this->db->getRow($query);
 		$this->t_body->set_var("USER_CURR", $user['firstname']." ".$user['lastname']);
 	}
 
@@ -73,7 +73,7 @@ class helpdesk_display{
 		$query = SQL_jobList( $parms, 'or');
 
 		$this->db->dbChangedb(HELPDESK_db);
-		$jobs = $this->db->dbGetAllRows($query);
+		$jobs = $this->db->getAll($query);
 
 		if(is_array($jobs)){
 			foreach ($jobs as $job) {
@@ -96,7 +96,7 @@ class helpdesk_display{
 						);
 		$this->db->dbChangedb(HELPDESK_db);
 		$query = SQL_equipmentList($params, false);
-		$equipment = $this->db->dbGetAllRows($query);
+		$equipment = $this->db->getAll($query);
 		
 		if(is_array($equipment)){
 			foreach($equipment as $equip)

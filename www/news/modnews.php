@@ -109,10 +109,10 @@ function showPage()
 function grabGroups() {
 	$dbConnection = new dbManager;
 	$SQL_QUERY = "SELECT id, name FROM groups";
-	$dbConnection->dbDoQuery($SQL_QUERY);
+	$dbConnection->query($SQL_QUERY);
 	//$currentCategory = 0;
 	$i = 0;
-	while ($thisGroup = $dbConnection->dbGetNextArray()) {
+	while ($thisGroup = $dbConnection->getNextArray()) {
 		$allGroups[$i]['name'] = $thisGroup['name'];
 		$allGroups[$i++]['id'] = $thisGroup['id'];
 	}
@@ -121,9 +121,9 @@ function grabGroups() {
 function grabCampus() {
 	$dbConnection = new dbManager;
 	$SQL_QUERY = "SELECT id, name FROM luCampus WHERE id != ".ALLCAMPUS;
-	$dbConnection->dbDoQuery($SQL_QUERY);
+	$dbConnection->query($SQL_QUERY);
 	$i = 0;
-	while ($thisCampus = $dbConnection->dbGetNextArray()) {
+	while ($thisCampus = $dbConnection->getNextArray()) {
 		$allCampus[$i]['name'] = $thisCampus['name'];
 		$allCampus[$i++]['id'] = $thisCampus['id'];
 	}

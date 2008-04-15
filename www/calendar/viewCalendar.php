@@ -88,13 +88,13 @@ class displayCalendar
 	{
 		$this->t_body->set_block("tplBODY", "campus_drop", "campus_drop_block");
 		$query = "SELECT id, name FROM luCampus";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
 		$this->t_body->set_var("DROP_CAMPUS_ID", 0);
 		$this->t_body->set_var("DROP_CAMPUS_NAME", 'Show All');
 		$this->t_body->parse("campus_drop_block", "campus_drop",true);
 		
-		while($campus = $this->db->dbGetNextArray() )
+		while($campus = $this->db->getNextArray() )
 		{
 			$this->t_body->set_var("DROP_CAMPUS_ID", $campus['id']);
 			$this->t_body->set_var("DROP_CAMPUS_NAME", $campus['name']);

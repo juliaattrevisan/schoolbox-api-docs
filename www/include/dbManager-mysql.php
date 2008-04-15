@@ -22,31 +22,31 @@ function dbManager($db = SQL_db, $debug = 0)
 	$this->passwd = SQL_passwd;
 	$this->debug = $debug;
 	$this->db = $db;
-	$this->dbConnect();
-	
+	$this->connect();
 }
 
 /* Estabilishes a connection to the database */
-function dbConnect()
+function connect()
 {
-	if(!isset($this->dbf)) {
+	if(!isset($this->dbf))
 		$this->dbf = mysql_connect($this->host, $this->user, $this->passwd);
-		$this->dbChangeDb($this->db);
-	}
-	if(!$this->dbf){
+	
+	if(!isset($this->dbf)){
 		print "Unable to connect ".$this->user."@".$this->host." using ".$this->db; 
 		exit;
 	}	
+	if(!$this->changeDb($this->db))
+		print "Unable to access ".$this->db.", check the permissions";
 }
 
 /* Closes the connection to the database */
-function dbClose()
+function close()
 {
 	return mysql_close ($this->dbf);
 }
 
 /* Changes the current selected database */
-function dbChangeDb($db)
+function changeDb($db)
 {
 	if(mysql_select_db($db, $this->dbf))
 	{
@@ -59,9 +59,10 @@ function dbChangeDb($db)
 
 /* Executes query on the database and handles any errors */
 /* Returns the result resource for the query, also saves the result resource as a object var */
-function dbDoQuery($sql_q)
+function query($sql_q)
 {
 	$this->result = mysql_query($sql_q, $this->dbf) or $mysql_eval_error = mysql_error();
+	
 	if (isset($mysql_eval_error)) {
 		if($this->debug)
 		{
@@ -69,36 +70,45 @@ function dbDoQuery($sql_q)
 			print "<b>Error:</b> $mysql_eval_error";
 		}
 		else
-			error(21, $mysql_eval_error);
+			error(4, $mysql_eval_error);
 	}
 	
 	return $this->result;
 }
 
 /* Returns the current result resource */
-function dbGetResult()
+function getResult()
 {
 	return $this->result;
 }
 
 /* Gets the first result returned by the query */
 /* Returns an associative array of row, false if none exists */
-function dbGetSingleRow($sql_q)
+function getRow($sql_q)
 {
-	$result = $this->dbDoQuery($sql_q);
-	$row = $this->dbGetNextArray($result);
+	$result = $this->query($sql_q);
+	$row = $this->getNextArray($result);
 	return $row;
+}
+
+/* Gets the first value of the first result returned by the query */
+/* Returns an associative array of row, false if none exists */
+function getOne($sql_q)
+{
+	$result = $this->query($sql_q);
+	$row = mysql_fetch_row($result);
+	return $row[0];
 }
 
 /* Gets an 3 dimensional associative array of all rows returned by query, */
 /*	returns false if no rows */
-function dbGetAllRows($sql_q)
+function getAll($sql_q)
 {
-	$result = $this->dbDoQuery($sql_q);
+	$result = $this->query($sql_q);
 	$table = array();
 	$results = false;
 	//loop through all records and insert into array table
-	while($line = $this->dbGetNextArray($result))
+	while($line = $this->getNextArray($result))
 	{
 		$table[] = $line;
 		$results = true;
@@ -111,7 +121,7 @@ function dbGetAllRows($sql_q)
 
 /* Returns the next result from a query result resource */
 /* Can be optionally passed a result resource otherwise it uses current result resource */
-function dbGetNextArray($result = 0)
+function getNextArray($result = 0)
 {
 	if($result)
 	        $return_array = mysql_fetch_assoc($result);
@@ -125,7 +135,7 @@ function dbGetNextArray($result = 0)
 
 
 /* Returns the number of rows returned by the query */
-function dbCountRows($result = 0)
+function countRows($result = 0)
 {
 	if($result)
 		$return_count = mysql_num_rows($result);
@@ -137,7 +147,7 @@ function dbCountRows($result = 0)
 }
 
 /* Inserts an array into table (does all proper security checks to ensure safe) */
-function dbInsertRow($table, $array)
+function insert($table, $array)
 {
 	if(!($table && is_array($array)))
 		return FALSE;
@@ -149,20 +159,20 @@ function dbInsertRow($table, $array)
 	{
 		$names .= '`'.$key.'`' . ',';
 		if (!is_array($value) ) {
-			$values .= $this->dbSmartQuote($value) . ',';
+			$values .= $this->smartQuote($value) . ',';
 		} else if (isset($value['function'])) {
-			$values .= $value['function']. '('. $this->dbSmartQuote($value['value']). '),';
+			$values .= $value['function']. '('. $this->smartQuote($value['value']). '),';
 		}
 	}
 	$names = substr($names, 0, -1);
 	$values = substr($values, 0, -1);
 	
 	$query = "INSERT INTO `$table` ($names) VALUES ($values)";
-	return $this->dbDoQuery($query);
+	return $this->query($query);
 }
 
 /* Inserts a multidimension array into table (does all proper security checks to ensure safe) */
-function dbInsertMultiRow($table, $array, $names=false)
+function insertMultiRow($table, $array, $names=false)
 {
 	if(!($table && is_array($array)))
 		return FALSE;
@@ -180,9 +190,9 @@ function dbInsertMultiRow($table, $array, $names=false)
 		foreach($row as $key => $value)
 		{
 			if (!is_array($value)) {
-				$values .= $this->dbSmartQuote($value) . ',';
+				$values .= $this->smartQuote($value) . ',';
 			} else if (isset($value['function'])) {
-				$values .= $value['function']. '('. $this->dbSmartQuote($value['value']). '),';
+				$values .= $value['function']. '('. $this->smartQuote($value['value']). '),';
 			}
 		}
 		$values = substr($values, 0, -1). ')';
@@ -192,11 +202,11 @@ function dbInsertMultiRow($table, $array, $names=false)
 	$query = "INSERT INTO `$table` ($cols) VALUES ";
 	$query .= implode(',', $rows);
 	
-	return $this->dbDoQuery($query);
+	return $this->query($query);
 }
 
 /* Updates a row */
-function dbUpdateRow($table, $identifier, $array)
+function update($table, $identifier, $array)
 {
 	if(!$table) 
 		return FALSE;
@@ -220,9 +230,9 @@ function dbUpdateRow($table, $identifier, $array)
 	
 		if(!in_array($key, $identifier)) {
 			if (!is_array($value)) {
-				$set .= '`'.$key.'`='.$this->dbSmartQuote($value).',';
+				$set .= '`'.$key.'`='.$this->smartQuote($value).',';
 			} else if (isset($value['function'])) {
-				$set .= '`'.$key.'`='. $value['function']. '('.$this->dbSmartQuote($value['value']).'),';
+				$set .= '`'.$key.'`='. $value['function']. '('.$this->smartQuote($value['value']).'),';
 			}
 		}
 	}
@@ -230,41 +240,42 @@ function dbUpdateRow($table, $identifier, $array)
 	$query = "UPDATE `$table` SET $set WHERE 1=1";
 	
 	foreach($identifier as $ident) {
-		$query .= " AND `$ident`= ".$this->dbSmartQuote($array[$ident]); 
+		$query .= " AND `$ident`= ".$this->smartQuote($array[$ident]); 
 	}
-	return $this->dbDoQuery($query);
+
+	return $this->query($query);
 }
 
-function dbDeleteRow($table, $identifier, $value)
+function delete($table, $identifier, $value)
 {
 	$query = "DELETE FROM `$table` WHERE 1 != 1 ";
 	if (is_array($value)) {
 		foreach ($value as $item) {
-			$query .= " OR `$identifier` =  ".$this->dbSmartQuote($value);
+			$query .= " OR `$identifier` =  ".$this->smartQuote($value);
 		}
 	} else {
-		$query .= "OR `$identifier` =  ".$this->dbSmartQuote($value);
+		$query .= "OR `$identifier` =  ".$this->smartQuote($value);
 	}
-	return $this->dbDoQuery($query);
+	return $this->query($query);
 }
 
 
 /* Returns the id of the last record inserted */
-function dbInsertId()
+function insertID()
 {
 	$return_id = mysql_insert_id($this->dbf);
 	return $return_id;
 }	
 
 /* Returns the number of rows affected by the last update */
-function dbCountRowsAffected()
+function affectedRows()
 {
 	$return_count = mysql_affected_rows($this->dbf);
 	return $return_count;
 }
 
 /* Free the result resource */
-function dbEndQuery($result = 0)
+function endQuery($result = 0)
 {
 	if ($result)
 		mysql_free_result($result);
@@ -277,14 +288,20 @@ function dbEndQuery($result = 0)
 /* PRIVATE FUNCTIONS */
 
 // Quote variable to make safe for sql use
-function dbSmartQuote($value)
+function smartQuote($value)
 {
    // Stripslashes
    if (get_magic_quotes_gpc()) {
        $value = stripslashes($value);
    }
+   
+   $mysqlFuncs = array('NULL', 
+   					   'NOW()',
+					   );
+   
+   
    // Quote if not integer or special
-   if (!((is_numeric($value) && $value[0] != 0) || $value == 'NULL' ||  $value == 'NOW()')) {
+   if (!((is_numeric($value) && $value[0] != 0) || in_array($value, $mysqlFuncs))) {
        $value = "'" . mysql_real_escape_string($value) . "'";
    }
    return $value;

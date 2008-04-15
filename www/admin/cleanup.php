@@ -16,7 +16,7 @@ class clean {
 	function cleanLoginLog()
 	{
 		$query = "DELETE FROM login_log";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		print "Login records cleaned<br>";
 	}
 
@@ -26,11 +26,11 @@ class clean {
 		$this->cleanLoginLog();
 		
 		$query = "DELETE FROM homepage_log";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		print "Homepage last visit records cleaned<br>";
 
 		$query = "DELETE FROM submission_log";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		print "Submission system last visit records cleaned<br>";
 	}
 
@@ -38,20 +38,20 @@ class clean {
 	{
 		//unlink all student submissions
 		$query = "SELECT id FROM student_submission";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	
-		while( $sub = $this->db->dbGetNextArray() )
+		while( $sub = $this->db->getNextArray() )
 		{
 			if(!@unlink(SUBMISSION_directory."/".$sub['id'].".dat"))					
 				print "Failed to delete ".SUBMISSION_directory."/".$sub['id'].".dat<br>";					
 		}
 
 		$query = "DELETE FROM student_submission";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		print "Deleted all student submissions<br>";
 
 		$query = "DELETE FROM submission_box";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		print "Deleted all submission boxes<br>";
 
 	}
@@ -59,16 +59,16 @@ class clean {
 	function cleanReturnedWork()	
 	{
 		$query = "SELECT id FROM submission_return";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	
-		while( $ret = $this->db->dbGetNextArray() )
+		while( $ret = $this->db->getNextArray() )
 		{
 			if(!@unlink(RETURNS_directory."/".$ret['id'].".dat"))
 				print "Failed to delete ".RETURNS_directory."/".$ret['id'].".dat<br>";					
 		}
 
 		$query = "DELETE FROM submission_return";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		print "Deleted all returned items<br>";
 
 	}
@@ -77,8 +77,8 @@ class clean {
 	{
 		//deletes all news that is either deleted or has expired
 		$query = "DELETE FROM news_items WHERE item_datetime_expires < NOW() || item_deleted = '1'";
-		$this->db->dbDoQuery($query);
-		print "Deleted ".$this->db->dbCountRowsAffected()." news items<br>";
+		$this->db->query($query);
+		print "Deleted ".$this->db->countRowsAffected()." news items<br>";
 	}
 
 
@@ -86,23 +86,23 @@ class clean {
 	{
 		//deletes all news that is either deleted or has expired
 		$query = "DELETE FROM subject_news WHERE datetime_expires < NOW() || deleted = '1'";
-		$this->db->dbDoQuery($query);
-		print "Deleted ".$this->db->dbCountRowsAffected()." subject news items<br>";
+		$this->db->query($query);
+		print "Deleted ".$this->db->countRowsAffected()." subject news items<br>";
 	}
 	
 	function cleanDeletedFiles() {
 		//deletes all files that are deleted
 		$query = "SELECT id FROM file WHERE deleted = '1'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
-		while($file = $this->db->dbGetNextArray()) {
+		while($file = $this->db->getNextArray()) {
 			if(!@unlink(FILE_directory."/".$file['id'].".dat"))
 			print "Failed to delete ".FILE_directory."/".$file['id'].".dat<br>";		
 		}
 		
 		$query = "DELETE FROM file WHERE deleted = '1'";
-		$this->db->dbDoQuery($query);
-		print "Deleted ".$this->db->dbCountRowsAffected()." files<br>";
+		$this->db->query($query);
+		print "Deleted ".$this->db->countRowsAffected()." files<br>";
 	}
 	
 	function cleanFileSystem() {
@@ -113,7 +113,7 @@ class clean {
 			preg_match('/.*\/([0-9]+).dat/', $file, $matches);
 			if($matches[1]) {
 				$query = "SELECT id FROM file WHERE id = '{$matches[1]}'";
-				if(!$this->db->dbGetSingleRow($query)) {
+				if(!$this->db->getRow($query)) {
 					print "Deleting $file<br>";
 					if(!@unlink($file))
 						print "Failed to delete $file<br>";
@@ -129,7 +129,7 @@ class clean {
 			if($matches[1]) {
 				$query = "SELECT id FROM file WHERE id = '{$matches[1]}'";
 				
-				if(!$this->db->dbGetSingleRow($query)) {
+				if(!$this->db->getRow($query)) {
 					print "Deleting $file<br>";
 					if(!@unlink($file))
 						print "Failed to delete $file<br>";
@@ -147,7 +147,7 @@ class clean {
 			preg_match('/.*\/([0-9]+).dat/', $file, $matches);
 			if($matches[1]) {
 				$query = "SELECT id FROM student_submission WHERE id = '{$matches[1]}'";
-				if(!$this->db->dbGetSingleRow($query)) {
+				if(!$this->db->getRow($query)) {
 					print "Deleting $file<br>";
 					if(!@unlink($file))
 						print "Failed to delete $file<br>";
@@ -161,7 +161,7 @@ class clean {
 			preg_match('/.*\/([0-9]+).dat/', $file, $matches);
 			if($matches[1]) {
 				$query = "SELECT id FROM submission_return WHERE id = '{$matches[1]}'";
-				if(!$this->db->dbGetSingleRow($query)) {
+				if(!$this->db->getRow($query)) {
 					print "Deleting $file<br>";
 					if(!@unlink($file))
 						print "Failed to delete $file<br>";
@@ -176,8 +176,8 @@ class clean {
 	
 	function rollStudents() {
 		$query = "UPDATE user SET year = year + 1 WHERE group_id IN(".implode(',',unserialize(STUDENTGROUPIDS)).") AND year IS NOT NULL";
-		$this->db->dbDoQuery($query);
-		print "Updated ".$this->db->dbCountRowsAffected()." student year levels<br>";
+		$this->db->query($query);
+		print "Updated ".$this->db->countRowsAffected()." student year levels<br>";
 	}
 	
 	function cleanThumbnails() {

@@ -81,11 +81,11 @@ class detSearch
 			}
 		}
 		$query .= " $brace ORDER BY lastname, firstname";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		//for each user put id in an array and return it.
-		if($this->db->dbCountRows() > 0)
+		if($this->db->countRows() > 0)
 		{
-			while($student = $this->db->dbGetNextArray())
+			while($student = $this->db->getNextArray())
 			{
 				$returnArray[] = $student;
 			}

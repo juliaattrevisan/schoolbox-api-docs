@@ -38,7 +38,7 @@ class NewsArchive {
 		//output category name
 		$query = "SELECT name FROM category WHERE id = $category";
 		$this->dbConnection = new dbManager(SQL_db, 1);
-		$category = $this->dbConnection->dbGetSingleRow($query);
+		$category = $this->dbConnection->getRow($query);
 		
 		$this->t_body->set_var("CATEGORY_NAME", $category['name']);
 	}

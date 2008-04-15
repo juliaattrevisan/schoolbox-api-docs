@@ -21,7 +21,7 @@ class allowedFileType
 	function addFileType($description, $mime, $icon, $inline, $enable, $extensions)
 	{
 		$query = "INSERT INTO allowedFileTypes (description, mime, iconFile, inline, enable) VALUES ('$description', '$mime', '$icon', '$inline', '$enable')";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
 		$id = $this->db->dbInsertId();
 
@@ -31,7 +31,7 @@ class allowedFileType
 	function updateFileType($id, $description, $mime, $icon, $inline, $enable, $extensions)
 	{
 		$query = "UPDATE allowedFileTypes SET description = '$description', mime='$mime', iconFile='$icon', inline='$inline', enable='$enable' WHERE fileTypeID = '$id'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
 		$this->deleteExtensions($id);
 		$this->addExtensions($id, $extensions);	
@@ -42,17 +42,17 @@ class allowedFileType
 	{		
 		$this->deleteExtensions($id);
 		$query = "DELETE FROM allowedFileTypes WHERE fileTypeID = $id";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 
 	function getFileType($id)
 	{
 		$query = "SELECT * FROM allowedFileTypes WHERE fileTypeID = $id";
-		$fileType = $this->db->dbGetSingleRow($query);
+		$fileType = $this->db->getRow($query);
 		
 		$query = "SELECT extension FROM allowedFileExtension WHERE fileTypeID = $id"; 
-		$this->db->dbDoQuery($query);
-		while($ext = $this->db->dbGetNextArray() ) {
+		$this->db->query($query);
+		while($ext = $this->db->getNextArray() ) {
 			$fileType['extensions'][] = $ext['extension'];
 		}
 		return $fileType;
@@ -60,7 +60,7 @@ class allowedFileType
 
 	function getFileTypeList() {
 		$query = "SELECT fileTypeID, description, iconFile, enable, mime FROM allowedFileTypes";
-		return $this->db->dbGetAllRows($query);
+		return $this->db->getAll($query);
 	}
 
 
@@ -91,14 +91,14 @@ class allowedFileType
 		foreach($extensionList as $ext) {
 			
 			$query = "INSERT INTO allowedFileExtension (fileTypeID, extension) VALUES ($fileTypeID, '$ext')";
-			$this->db->dbDoQuery($query);
+			$this->db->query($query);
 		}
 	}
 
 	function deleteExtensions($id)
 	{
 		$query = "DELETE FROM allowedFileExtension WHERE fileTypeID = $id";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 
 }

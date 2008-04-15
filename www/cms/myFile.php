@@ -97,7 +97,7 @@ class myFile
 	function getFile($id)
 	{
                 $query = "SELECT * FROM myFile WHERE id = '$id'";
-                return $this->db->dbGetSingleRow($query);
+                return $this->db->getRow($query);
 	} 
 
 }

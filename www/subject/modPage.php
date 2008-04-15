@@ -18,8 +18,8 @@ class modPage
 		function savePageTemplate($template)
 		{
 			$query = "SELECT cid FROM homepage_config WHERE cid = '".$this->cid."'";
-			$this->db->dbDoQuery($query);
-			if($row = $this->db->dbGetNextArray())
+			$this->db->query($query);
+			if($row = $this->db->getNextArray())
 			{
 				$query = "UPDATE homepage_config SET template = '$template' WHERE cid = '".$this->cid."'";
 			}
@@ -27,13 +27,13 @@ class modPage
 			{
 				$query = "INSERT INTO homepage_config (cid, template) VALUES ('$this->cid', '$template')";
 			}
-			$this->db->dbDoQuery($query);
+			$this->db->query($query);
 		}
 
 		function deletePageTemplate()
 		{
 			$query = "DELETE FROM homepage_config WHERE cid = '".$this->cid."'";
-			$this->db->dbDoQuery($query);
+			$this->db->query($query);
 		}
 		
 		function updateComponentPosition($component, $column, $position)
@@ -64,7 +64,7 @@ class modPage
 				FROM homepage_comp_location
 				WHERE cid = '{$this->cid}'
 				ORDER BY `position`";
-			$currentListComp = $this->db->dbGetAllRows($query);
+			$currentListComp = $this->db->getAll($query);
 
 			// Remove deleted ones
 			foreach($currentListComp as $key => $comp)
@@ -82,7 +82,7 @@ class modPage
 			foreach($submitListComp as $key => $comp)
 			{
 				$query = "SELECT size, config FROM homepage_comp WHERE id = $comp";
-				$result = $this->db->dbGetSingleRow($query);
+				$result = $this->db->getRow($query);
 				$newComp = array(
 					"cid" => $this->cid,
 					"position" => "",
@@ -134,7 +134,7 @@ class modPage
 			}
 			$query = substr($query, 0, -2);
 			$query .= " WHERE cid = '".$this->cid."'";
-			$this->db->dbDoQuery($query);
+			$this->db->query($query);
 		}
 
 		

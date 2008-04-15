@@ -20,11 +20,11 @@ class EditMyLinks
 		$this->t_body->set_block("tplBODY", "link_block", "editlinks");
 
 		$query = "SELECT id, url, description FROM bookmarks WHERE owner = '".$_SESSION['id']."'";
-		$db->dbDoQuery($query);
+		$db->query($query);
 		
-		if($db->dbCountRows() > 0)
+		if($db->countRows() > 0)
 		{
-			while($link = $db->dbGetNextArray())
+			while($link = $db->getNextArray())
 			{
 				$this->t_body->set_var("URL", $link["url"]);
 				$this->t_body->set_var("DESC", $link["description"]);
@@ -55,7 +55,7 @@ class EditMyLinks
 		$query = "INSERT INTO bookmarks (owner, url, description) 
 			VALUES ('".$_SESSION['id']."','$url', '$description')";
 
-		$db->dbDoQuery($query);
+		$db->query($query);
 		
 	}
 	
@@ -67,7 +67,7 @@ class EditMyLinks
 	
 		$query = "DELETE FROM bookmarks WHERE id = '$id' AND owner = '".$_SESSION['id']."'";
 		
-		$db->dbDoQuery($query);
+		$db->query($query);
 	}
 	
 

@@ -182,8 +182,8 @@ class Attendance
 		$mydb = new dbManager;
 		$mydb->dbConnect();
 		$query = "SELECT firstname, lastname FROM user WHERE id = '".$_SESSION['id']."'";
-		$mydb->dbDoQuery($query);
-		$teacher = $mydb->dbGetNextArray();
+		$mydb->query($query);
+		$teacher = $mydb->getNextArray();
 		
 		$this->t_body->set_var("TEACHERNAME", $teacher['firstname']." ".$teacher['lastname']);
 

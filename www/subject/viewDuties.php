@@ -60,9 +60,9 @@ class editDuties
 			$queryDate = date("Y-m-d", $startOfWeek + ($j*86400) );
                         $sql = "SELECT l.*, d.user, d.date, d.cid FROM luDuties l LEFT JOIN duty d ON l.dutyTypeID = d.dutyTypeID and d.date = '".
                                 $queryDate."' where l.cid = ".$this->category ;
-                        $this->db->dbDoQuery($sql);
+                        $this->db->query($sql);
 			
-			while($row = $this->db->dbGetNextArray())
+			while($row = $this->db->getNextArray())
 			{
 				$dutiesList[$row['dutyTypeID']] = $row['name'];
 				$userArray[$row['dutyTypeID']][$j] = $row['user'];

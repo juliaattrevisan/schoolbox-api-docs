@@ -25,9 +25,9 @@ if(isset($_GET['id']) && $_GET['id'])
 	}else{
 		$query = "SELECT * FROM myFile WHERE id = '".$_GET['id']."'";
 	}
-	$db->dbDoQuery($query);
+	$db->query($query);
 	
-	if($db->dbCountRows() < 1)
+	if($db->countRows() < 1)
 		error(2);
 	else
 	{
@@ -36,7 +36,7 @@ if(isset($_GET['id']) && $_GET['id'])
 		else
 			$attach = "";
 		
-		$resultArray = $db->dbGetNextArray();
+		$resultArray = $db->getNextArray();
 
 		//check perms to double check security
 		if(isset($_GET['myFile'])){

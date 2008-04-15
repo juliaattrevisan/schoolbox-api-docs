@@ -1,0 +1,27 @@
+<h1>News</h1>
+<span class="header_option">{ADD}</span>
+<!-- BEGIN main_stories -->
+<a name="{NEWS_ID}"></a>
+<h2>{NEWS_TITLE}</h2>
+<span class="header_option">{MODIFY}</span>
+<div class="indent">
+    <!-- BEGIN story_body -->
+    {NEWS_BODY}
+    <hr>
+    <span class="element_footer">Submitted by {POSTER} on {DATETIME}</span>
+    </td>
+    <!-- END story_body -->
+</div>
+<!-- END main_stories -->
+
+<div class="pagination indent" style="margin: 10px 0;">
+<!-- BEGIN previous_button -->
+<a class="prev" href="/news.php?pageNum={PREVIOUS_PAGE}{ARCHIVED}">&lt;&lt; Prev</a><!-- END previous_button -->
+<!-- BEGIN page_number -->
+<a class="number{CURRENT}" href="/news.php?pageNum={PAGE_INDEX}{ARCHIVED}">{PAGE_INDEX}</a><!-- END page_number -->
+<!-- BEGIN next_button -->
+<a class="next" href="/news.php?pageNum={NEXT_PAGE}{ARCHIVED}">Next &gt;&gt;</a><!-- END next_button -->
+</div>
+
+<!-- BEGIN archive_button -->
+<p class="indent"><a href="/news-archive/">View Archived News</a></p><!-- END archive_button -->

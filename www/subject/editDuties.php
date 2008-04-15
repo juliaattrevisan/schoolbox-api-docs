@@ -63,7 +63,7 @@ class editDuties
 		include_once("../include/page.php");
 		//$sql = "SELECT * FROM duty where date = now() AND cid = ".$this->category ;
 		$sql = "SELECT l.*, d.user, d.date, d.cid FROM luDuties l LEFT JOIN duty d ON l.dutyTypeID = d.dutyTypeID and d.date = '".$queryDate."' where l.cid = ".$this->category ;
-		$this->db->dbDoQuery($sql);
+		$this->db->query($sql);
 		$i = 0;
 		$this->t_body->set_var("DATE", date('l, jS \of F', $currentDate));
 		$this->t_body->set_var("QDATE", $queryDate);
@@ -71,7 +71,7 @@ class editDuties
                                 "&Month=".date("m",$currentDate)."&Day=".date("d", $currentDate) );
 		$this->t_body->set_var("TITLE", HEADING." - Duty Editor");
 		$this->t_body->set_var("CID", $this->category );
-		while($row = $this->db->dbGetNextArray())
+		while($row = $this->db->getNextArray())
 		{
 			if($row['user'] == ""){$update = 'false';}else{$update = 'true';}
 			
@@ -107,12 +107,12 @@ class editDuties
 				{	
 					$sql = "UPDATE duty SET user = '$user' 
 						where cid = '".$this->category."' and date = '".$queryDate."' and dutyTypeID = '$dutyTypeID'";
-					$this->db->dbDoQuery($sql);			
+					$this->db->query($sql);			
 				}
 				else
 				{	
 					$sql = "INSERT INTO duty(cid, date, dutyTypeID, user) VALUES('$this->category','$queryDate','$dutyTypeID','$user')";
-					$this->db->dbDoQuery($sql);
+					$this->db->query($sql);
 				}				
 			}
 		}
@@ -143,7 +143,7 @@ class editDuties
 				for ($j=0; $j < $length; $j++) {
 					if (!empty($column[$j]) && !empty($data[$j])) {
 						$sql = "SELECT dutyID FROM duty WHERE date = '" . $column[$j] . "' AND dutyTypeID = $i";
-						$duty = $this->db->dbGetSingleRow($sql);
+						$duty = $this->db->getRow($sql);
 						if (isset($duty['dutyID'])) {
 							$sql = "UPDATE duty SET ";
 							$where = " WHERE dutyID = " . $duty['dutyID'];
@@ -152,7 +152,7 @@ class editDuties
 							
 						$sql .= "cid = '".$this->category."', date = '" . $column[$j] . "', dutyTypeID = '" . $i . "', user = '" . $data[$j] . "'" . $where;
 						
-						$this->db->dbDoQuery($sql);
+						$this->db->query($sql);
 					}
 				}
 							

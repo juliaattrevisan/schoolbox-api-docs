@@ -8,7 +8,7 @@
 class news
 {
 
-function news($topic = 0, $show = "current")
+function news($show = "current")
 {
 	$this->show = $show;
     $this->dbConnection = new dbManager;
@@ -22,9 +22,9 @@ function addNews($groupArray, $campusArray, $owner, $heading, $expires, $mainpag
 	item_datetime_expires, item_mainpage, item_body, item_link1, item_link2, item_link3, item_link4, item_link5)
 	VALUES ('$heading', '$owner', FROM_UNIXTIME($now), 
 	FROM_UNIXTIME($expirestime), '$mainpage', '$body', '$url1', '$url2', '$url3', '$url4', '$url5')";
-	$this->dbConnection->dbDoQuery($query);
+	$this->dbConnection->query($query);
 		
-	$newsid = $this->dbConnection->dbInsertId();
+	$newsid = $this->dbConnection->insertId();
 	$this->addPerms($newsid, $groupArray, $campusArray);
 
 }
@@ -46,7 +46,7 @@ function modNews($id, $campusArray, $groupArray, $heading, $expires, $mainpage, 
 		item_mainpage = '$mainpage', item_link1 = '$url1', item_link2 = '$url2', item_link3 = '$url3',
 		item_link4 = '$url4', item_link5 = '$url5'
 		WHERE item_id = '$id'";
-	$this->dbConnection->dbDoQuery($query);
+	$this->dbConnection->query($query);
 	
 	$this->delPerms($id);
 	$this->addPerms($id, $groupArray, $campusArray);
@@ -56,9 +56,9 @@ function modNews($id, $campusArray, $groupArray, $heading, $expires, $mainpage, 
 function delPerms($id)
 {
 	$query = "DELETE FROM newsGroup WHERE id = '$id'";
-	$this->dbConnection->dbDoQuery($query);
+	$this->dbConnection->query($query);
 	$query = "DELETE FROM newsCampus WHERE id = '$id'";
-	$this->dbConnection->dbDoQuery($query);
+	$this->dbConnection->query($query);
 }
 
 function addPerms($id, $groupArray, $campusArray)
@@ -97,7 +97,7 @@ function insertGroup($id, $group)
 	if(is_numeric($id) && is_numeric($group))
 	{
 		$query = "INSERT INTO newsGroup (id, gid) VALUES ($id, $group)";
-		$this->dbConnection->dbDoQuery($query);
+		$this->dbConnection->query($query);
 	}
 }
 
@@ -106,7 +106,7 @@ function insertCampus($id, $campus)
 	if(is_numeric($id) && is_numeric($campus))
 	{
 		$query = "INSERT INTO newsCampus (id, campus) VALUES ($id, $campus)";
-		$this->dbConnection->dbDoQuery($query);
+		$this->dbConnection->query($query);
 	}
 }
 
@@ -116,7 +116,7 @@ function deleteNews($id, $userInfo)
 	$SQL_QUERY = "UPDATE news_items
 		SET item_deleted = '1'
 		WHERE item_id = '$id'";
-	$this->dbConnection->dbDoQuery($SQL_QUERY);
+	$this->dbConnection->query($SQL_QUERY);
 	$this->delPerms($id);
 }
 
@@ -135,7 +135,7 @@ function getHeadlines()
 	ORDER BY news_items.item_datetime_posted DESC
 	";
 	
-	$shareResults = $this->dbConnection->dbGetAllRows($query);
+	$shareResults = $this->dbConnection->getAll($query);
 	
     $query = "
 	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_datetime_posted, news_items.item_body
@@ -146,7 +146,7 @@ function getHeadlines()
 	ORDER BY news_items.item_datetime_posted DESC
 	";
 	
-	$userResults = $this->dbConnection->dbGetAllRows($query);
+	$userResults = $this->dbConnection->getAll($query);
 	
 	//merge and sort the headlines based on time
 	if(is_array($shareResults) && is_array($userResults))
@@ -204,7 +204,7 @@ function getNews($id = 0, $index = 0, $limit = 0)
 
     $query .= " ORDER BY news_items.item_datetime_posted DESC";
 
-	$shareResults = $this->dbConnection->dbGetAllRows($query);
+	$shareResults = $this->dbConnection->getAll($query);
 	
 	 	$query = "
 	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner,
@@ -229,7 +229,7 @@ function getNews($id = 0, $index = 0, $limit = 0)
 
     $query .= " ORDER BY news_items.item_datetime_posted DESC;";
 	
-	$userResults = $this->dbConnection->dbGetAllRows($query);
+	$userResults = $this->dbConnection->getAll($query);
 
 	//merge and sort the headlines based on time
 	if(is_array($shareResults) && is_array($userResults))
@@ -256,19 +256,19 @@ function getOneNews($id)
 		item_datetime_posted, item_datetime_expires, item_mainpage, item_body,
 		item_link1, item_link2, item_link3, item_link4, item_link5, item_deleted
 		FROM news_items WHERE item_id = '$id'";
-	$this->dbConnection->dbDoQuery($SQL_QUERY);
-	if ($thisNews = $this->dbConnection->dbGetNextArray())
+	$this->dbConnection->query($SQL_QUERY);
+	if ($thisNews = $this->dbConnection->getNextArray())
 	{
 		//get list of campus and groups that item is available for
 		$query = "SELECT campus FROM newsCampus WHERE id = '$id'";
-		$this->dbConnection->dbDoQuery($query);
-		while($thisCampus = $this->dbConnection->dbGetNextArray())
+		$this->dbConnection->query($query);
+		while($thisCampus = $this->dbConnection->getNextArray())
 		{
 			$thisNews['item_campus'][] = $thisCampus['campus'];
 		}
 		$query = "SELECT gid FROM newsGroup WHERE id = '$id'";
-		$this->dbConnection->dbDoQuery($query);
-		while($thisCampus = $this->dbConnection->dbGetNextArray())
+		$this->dbConnection->query($query);
+		while($thisCampus = $this->dbConnection->getNextArray())
 		{
 			$thisNews['item_group'][] = $thisCampus['gid'];
 		}
@@ -281,8 +281,8 @@ function getOneNews($id)
 function getOwner($id)
 {
 	$SQL_QUERY = "SELECT item_owner FROM news_items WHERE item_id = '$id'";
-	$this->dbConnection->dbDoQuery($SQL_QUERY);
-	if ($owner = $this->dbConnection->dbGetNextArray())
+	$this->dbConnection->query($SQL_QUERY);
+	if ($owner = $this->dbConnection->getNextArray())
 		return $owner['item_owner'];
 	else
 		return false;
@@ -290,7 +290,7 @@ function getOwner($id)
 }
 function getDailyNotice() {
 	$query = "SELECT item_heading, item_body FROM news_items WHERE item_heading LIKE '%Daily Notices%' ORDER BY item_datetime_posted DESC LIMIT 1";
-	$news_item = $this->dbConnection->dbGetSingleRow($query);
+	$news_item = $this->dbConnection->getRow($query);
 	return $news_item;
 }
 

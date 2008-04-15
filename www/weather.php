@@ -10,7 +10,7 @@ require_once("weather/weather.php");
 //create weather
 $weather = new Weather("All", WEATHER_LOCATION);
 
-$this->template->set_file(TEMPLATE_content, $this->getTemplate('weather/weather.html'));
+$this->setFile(TEMPLATE_content, $this->getTemplate('weather/weather.html'));
 $this->setVar("TITLE", HEADING." - Weather Forecast");
 $this->setVar("LOCATION", $weather->City);
 

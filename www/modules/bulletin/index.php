@@ -20,7 +20,7 @@ class bulletin
 				WHERE n.code = '{$catID}' AND deleted = 0
 				ORDER BY datetime_posted DESC
 				LIMIT 1";
-		$row = 	$this->db->dbGetSingleRow($sql);
+		$row = 	$this->db->getRow($sql);
 		
 		
 		if (strlen($row['body']) > 100)
@@ -47,12 +47,12 @@ class bulletin
 			WHERE category = '{$cat1}' OR category = '{$cat2}' OR category = '{$cat3}'
 		ORDER BY submitted DESC";
 
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
-		if($this->db->dbCountRows() < 1){$this->t_body->set_var("lnk_blck", "");}
+		if($this->db->countRows() < 1){$this->t_body->set_var("lnk_blck", "");}
 		else
 		{
-			while($queryArray = $this->db->dbGetNextArray())
+			while($queryArray = $this->db->getNextArray())
 			{
 				$this->outputLink($queryArray);
 			}
@@ -78,14 +78,14 @@ class bulletin
 	function getCatIDFromName($catName)
 	{
 		$sql ="SELECT id FROM category WHERE name = '{$catName}'";
-		$row = 	$this->db->dbGetSingleRow($sql);
+		$row = 	$this->db->getRow($sql);
 		return $row['id'];
 	}
 	
 	function doOutput()
 	{
 		$sql="SELECT * FROM luCampus WHERE id = '{$this->campusID}'";
-		$row = $this->db->dbGetSingleRow($sql);
+		$row = $this->db->getRow($sql);
 		$campusName = $row['name'];
 		
 		$headID = $this->getCatIDFromName("From the Headmaster - ({$campusName})");

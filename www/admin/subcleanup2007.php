@@ -15,20 +15,20 @@ class clean {
 	{
 		//unlink all student submissions
 		$query = "SELECT id FROM student_submission WHERE submitted < '2007-12-1' ";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	
-		while( $sub = $this->db->dbGetNextArray() )
+		while( $sub = $this->db->getNextArray() )
 		{
 			if(!@unlink(SUBMISSION_directory."/".$sub['id'].".dat"))					
 				print "Failed to delete ".SUBMISSION_directory."/".$sub['id'].".dat<br>";					
 		}
 
 		$query = "DELETE FROM student_submission WHERE submitted < '2007-12-1'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		print "Deleted all student submissions pre 2008<br>";
 
 		$query = "DELETE FROM submission_box WHERE submitted < '2007-12-1'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		print "Deleted all submission boxes pre 2008<br>";
 
 	}
@@ -36,16 +36,16 @@ class clean {
 	function cleanReturnedWork()	
 	{
 		$query = "SELECT id FROM submission_return WHERE submitted < '2007-12-1'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	
-		while( $ret = $this->db->dbGetNextArray() )
+		while( $ret = $this->db->getNextArray() )
 		{
 			if(!@unlink(RETURNS_directory."/".$ret['id'].".dat"))
 				print "Failed to delete ".RETURNS_directory."/".$ret['id'].".dat<br>";					
 		}
 
 		$query = "DELETE FROM submission_return WHERE submitted < '2007-12-1'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		print "Deleted all returned items pre 2008<br>";
 
 	}

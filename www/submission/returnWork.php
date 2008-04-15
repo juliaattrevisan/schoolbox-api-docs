@@ -19,18 +19,18 @@ class returnWorkPage {
 		//check if person returning work is actual owner of the submission box
 		
 		$query = "SELECT owner FROM submission_box WHERE id = '$box_id' AND owner = '".$_SESSION['id']."'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
-		if($this->db->dbCountRows() < 1)
+		if($this->db->countRows() < 1)
 		{
 			error(25);
 		}
 	
 		//check work exist and it isnt already marked
 		$query = "SELECT marked FROM student_submission WHERE box_id = '$box_id' AND owner = '$sid' AND marked = '0'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 
-		if($this->db->dbCountRows() < 1)
+		if($this->db->countRows() < 1)
 		{
 			error(26);
 		}
@@ -41,7 +41,7 @@ class returnWorkPage {
 	{
 	
 		$query = "UPDATE student_submission SET marked = '1' WHERE box_id = '$box_id' AND owner = '$sid'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	} 
 
 	function returnWork($sid, $box_id, $comment, $mark)
@@ -49,7 +49,7 @@ class returnWorkPage {
 		//insert comment and mark
 		$query = "INSERT INTO submission_return (box_id, comment, mark, owner, returned, deleted) 
 				VALUES ('$box_id', '$comment', '$mark', '$sid', NOW(), '0' )";
-		$this->db->dbDoQuery($query);	
+		$this->db->query($query);	
 	}
 
 	function returnWorkWithFile($file, $file_name, $sid, $box_id, $comment, $mark)
@@ -58,7 +58,7 @@ class returnWorkPage {
         	$query = "INSERT INTO submission_return (box_id, comment, mark, owner, filename) 
 		VALUES ('$box_id','$comment','$mark', '$sid', '$file_name')";
 
-        	$this->db->dbDoQuery($query);
+        	$this->db->query($query);
 
         	//get file ID from INSERT
         	$fileId = $this->db->dbInsertId();
@@ -82,8 +82,8 @@ class returnWorkPage {
 		submission_box.category = category.id AND submission_box.fid = file.id 
 		AND submission_box.id = $box_id";
 
-		$this->db->dbDoQuery($query);
-		$result = $this->db->dbGetNextArray();
+		$this->db->query($query);
+		$result = $this->db->getNextArray();
 		
 		$this->t_body->set_var("CATEGORY",$result['name']);
 		$this->t_body->set_var("ASSNAME", $result['description']);
@@ -91,8 +91,8 @@ class returnWorkPage {
 		
 		//get details of user work being returned to for user verification
 		$query = "SELECT lastname, title, firstname FROM user WHERE id = '$sid'";
-		$this->db->dbDoQuery($query);
-		$result = $this->db->dbGetNextArray();
+		$this->db->query($query);
+		$result = $this->db->getNextArray();
 		
 		$this->t_body->set_var("NAME", formatName($result));
 		$this->t_body->set_var("SID", $sid);

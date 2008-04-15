@@ -30,9 +30,9 @@ class addEvent
 	        $SQL_QUERY = "SELECT id, name FROM luCampus, userAccess WHERE luCampus.id = userAccess.sid AND 
 				userAccess.service = '2' AND uid = ".$_SESSION['id']." AND type > '1'";   
 
-		$this->db->dbDoQuery($SQL_QUERY);
+		$this->db->query($SQL_QUERY);
 		$i = 0;	
-		while ($thisCampus = $this->db->dbGetNextArray()) 
+		while ($thisCampus = $this->db->getNextArray()) 
 		{
 			if ($i > 0)
 				$this->t_body->parse("campus_chck_lst", "campus_check_list", true);
@@ -72,8 +72,8 @@ class addEvent
 	{
 		$this->t_body->set_block("tplBODY", "user_group_check_list", "user_group_chck_lst");
 		$SQL_QUERY = "SELECT id, name FROM groups";
-		$this->db->dbDoQuery($SQL_QUERY);
-		for($i=0;$thisGroup=$this->db->dbGetNextArray();$i++) 
+		$this->db->query($SQL_QUERY);
+		for($i=0;$thisGroup=$this->db->getNextArray();$i++) 
 		{
 			$this->t_body->set_var("USERGROUPNAME", $thisGroup['name']);
 			$this->t_body->set_var("USERGROUPID", $thisGroup['id']);
@@ -102,10 +102,10 @@ class addEvent
 
 	        $SQL_QUERY = "SELECT id, name FROM userAccess, category WHERE uid = '".$_SESSION['id']."' AND service = '1'
 				AND type > 1 AND sid = id";   
-	        $this->db->dbDoQuery($SQL_QUERY);
+	        $this->db->query($SQL_QUERY);
 	        $i = 1;
 	        $allGroup = "<select name=\"".$name."\" class=\"formfield\">";  	
-        	while ($thisGroup = $this->db->dbGetNextArray()) 
+        	while ($thisGroup = $this->db->getNextArray()) 
 		{
 			if($selected == $thisGroup['id'])
 	        	        $allGroup .= "<option value=\"".$thisGroup['id']."\" selected>".$thisGroup['name']."</option>";

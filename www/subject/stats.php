@@ -42,12 +42,12 @@ class stats
 		$this->t_body->set_block("general", "spotstats", "spotstats_sect");
 
 		$query = "SELECT name, template FROM category WHERE id = '". $cid ."'";
-		$this->mySQLdb->dbDoQuery($query);
-		$cat = $this->mySQLdb->dbGetNextArray();
+		$this->mySQLdb->query($query);
+		$cat = $this->mySQLdb->getNextArray();
 		
 		$query = "SELECT date_format(datetime, '%D %M') as firstdate from homepage_log order by datetime asc limit 0,1";
-		$this->mySQLdb->dbDoQuery($query);
-		$firstdate = $this->mySQLdb->dbGetNextArray();
+		$this->mySQLdb->query($query);
+		$firstdate = $this->mySQLdb->getNextArray();
 		$this->t_body->set_var("FIRSTDATE", $firstdate['firstdate']);
 		$this->template = $cat['template'];
 		$this->subname = $cat['name'];
@@ -90,11 +90,11 @@ class stats
 			LIMIT 0,10
 			";
 		
-		$this->mySQLdb->dbDoQuery($query);		
+		$this->mySQLdb->query($query);		
 
-		if($this->mySQLdb->dbCountRows() > 0 )
+		if($this->mySQLdb->countRows() > 0 )
 		{
-			while( $student = $this->mySQLdb->dbGetNextArray())
+			while( $student = $this->mySQLdb->getNextArray())
 			{
 				$this->t_body->set_var("COUNT", $student['hitcount']);	
 				
@@ -132,11 +132,11 @@ class stats
 			ORDER BY datetime desc, hitcount desc
 			";
 		
-		$this->mySQLdb->dbDoQuery($query);		
+		$this->mySQLdb->query($query);		
 		
-		if($this->mySQLdb->dbCountRows() > 0 )
+		if($this->mySQLdb->countRows() > 0 )
 		{
-			while( $student = $this->mySQLdb->dbGetNextArray())
+			while( $student = $this->mySQLdb->getNextArray())
 			{
 				$this->t_body->set_var("DATE", $student['date']);	
 				$this->t_body->set_var("COUNT", $student['hitcount']);	
@@ -173,11 +173,11 @@ class stats
 			LIMIT 0,10
 			";
 		
-		$this->mySQLdb->dbDoQuery($query);		
+		$this->mySQLdb->query($query);		
 
-		if($this->mySQLdb->dbCountRows() > 0 )
+		if($this->mySQLdb->countRows() > 0 )
 		{
-			while ( $student = $this->mySQLdb->dbGetNextArray())
+			while ( $student = $this->mySQLdb->getNextArray())
 			{
 				$this->t_body->set_var("DATE", $student['date']);	
 				$this->t_body->set_var("COUNT", $student['hitcount']);	
@@ -215,11 +215,11 @@ class stats
 			ORDER BY hitcount desc, datetime desc
 			";
 		
-		$this->mySQLdb->dbDoQuery($query);		
+		$this->mySQLdb->query($query);		
 
-		if($this->mySQLdb->dbCountRows() > 0 )
+		if($this->mySQLdb->countRows() > 0 )
 		{
-			while ( $student = $this->mySQLdb->dbGetNextArray())
+			while ( $student = $this->mySQLdb->getNextArray())
 			{
 				$this->t_body->set_var("DATE", $student['date']);	
 				$this->t_body->set_var("COUNT", $student['hitcount']);	
@@ -259,10 +259,10 @@ class stats
 					WHERE	user.synergy_id = '". $student['synergy_id'] ."'
 					";
 
-				$this->mySQLdb->dbDoQuery($query) or die ("problem with finding all members query");		
-				if ($this->mySQLdb->dbCountRows() > 0)
+				$this->mySQLdb->query($query) or die ("problem with finding all members query");		
+				if ($this->mySQLdb->countRows() > 0)
 				{
-					$info = $this->mySQLdb->dbGetNextArray();
+					$info = $this->mySQLdb->getNextArray();
 					if (!$info['hitcount'])
 					{
 						$this->t_body->set_var("COUNT", "0");
@@ -303,11 +303,11 @@ class stats
 				ORDER BY lastname asc, firstname asc	
 		 	";
 
-			$this->mySQLdb->dbDoQuery($query);		
+			$this->mySQLdb->query($query);		
 		
-			if($this->mySQLdb->dbCountRows() > 0 )
+			if($this->mySQLdb->countRows() > 0 )
 			{
-				while ($member = $this->mySQLdb->dbGetNextArray())
+				while ($member = $this->mySQLdb->getNextArray())
 				{
 					$this->t_body->set_var("DATE", $member['date']);	
 					$this->t_body->set_var("COUNT", $member['hitcount']);	
@@ -338,14 +338,14 @@ class stats
 			FROM homepage_log 
 		";
 		$queryend = " GROUP BY cid";
-		$this->mySQLdb->dbDoQuery($query);
-		$result = $this->mySQLdb->dbGetNextArray();
+		$this->mySQLdb->query($query);
+		$result = $this->mySQLdb->getNextArray();
 		$this->t_body->set_var("PORTALALL", $result['total']); 
 
 		//get hitcount for this page
 		$nextquery = $query."WHERE cid = '".$this->category."'".$queryend;
-		$this->mySQLdb->dbDoQuery($nextquery);
-		$result = $this->mySQLdb->dbGetNextArray();
+		$this->mySQLdb->query($nextquery);
+		$result = $this->mySQLdb->getNextArray();
 	 	$this->t_body->set_var("ALL", $result['total']);	
 
 		//get member count for the portal		
@@ -359,14 +359,14 @@ class stats
 				AND sid = '".$this->category."'
 			";
 			$queryend = " GROUP BY cid";
-			$this->mySQLdb->dbDoQuery($query);
-			$result = $this->mySQLdb->dbGetNextArray();
+			$this->mySQLdb->query($query);
+			$result = $this->mySQLdb->getNextArray();
 	 		$this->t_body->set_var("PORTALMEM", $result['total']);	
 
 			//get member count for this category
 			$nextquery = $query."AND cid = '".$this->category."'".$queryend;
-			$this->mySQLdb->dbDoQuery($nextquery);
-			$result = $this->mySQLdb->dbGetNextArray();
+			$this->mySQLdb->query($nextquery);
+			$result = $this->mySQLdb->getNextArray();
 	 		$this->t_body->set_var("MEMBER", $result['total']);	
 		}	
 		else #if class page
@@ -391,13 +391,13 @@ class stats
 			$queryend = " user.synergy_id IN ". $ids;
 
 			$nextquery = $query.$queryend;
-        		$this->mySQLdb->dbDoQuery($nextquery) or die ("problem with finding all members query");
-			$result = $this->mySQLdb->dbGetNextArray();
+        		$this->mySQLdb->query($nextquery) or die ("problem with finding all members query");
+			$result = $this->mySQLdb->getNextArray();
 	 		$this->t_body->set_var("PORTALMEM", $result['total']);	
 			
       			$nextquery = $query.$querymid.$queryend;
-        		$this->mySQLdb->dbDoQuery($nextquery) or die ("problem with finding all members query");
-			$result = $this->mySQLdb->dbGetNextArray();
+        		$this->mySQLdb->query($nextquery) or die ("problem with finding all members query");
+			$result = $this->mySQLdb->getNextArray();
 	 		$this->t_body->set_var("MEMBER", $result['total']);	
 		}
 		//base query to find most popular page
@@ -410,8 +410,8 @@ class stats
 
 		//for classes
 		$queryc = $query." AND template in (1, 5)".$queryend;
-        	$this->mySQLdb->dbDoQuery($queryc) or die ("problem with finding all members query");
-		$resultc = $this->mySQLdb->dbGetNextArray();
+        	$this->mySQLdb->query($queryc) or die ("problem with finding all members query");
+		$resultc = $this->mySQLdb->getNextArray();
 	 	$this->t_body->set_var("CID", $resultc['cid']);	
 	 	$this->t_body->set_var("HOMEPAGE", $resultc['name']." (".$result['code'].")" );	
 	 	$this->t_body->set_var("HITS", $resultc['totalhits']);	
@@ -420,8 +420,8 @@ class stats
 	
 		//for groups	
 		$queryg = $query." AND template in (2, 3)".$queryend;
-        	$this->mySQLdb->dbDoQuery($queryg) or die ("problem with finding all members query");
-		$resultg = $this->mySQLdb->dbGetNextArray();
+        	$this->mySQLdb->query($queryg) or die ("problem with finding all members query");
+		$resultg = $this->mySQLdb->getNextArray();
 	 	$this->t_body->set_var("CID", $resultg['cid']);	
 	 	$this->t_body->set_var("HOMEPAGE", $resultg['name']);	
 	 	$this->t_body->set_var("HITS", $resultg['totalhits']);	
@@ -430,8 +430,8 @@ class stats
 
 		//for faculties	
 		$queryf = $query." AND template = 4".$queryend;
-        	$this->mySQLdb->dbDoQuery($queryf) or die ("problem with finding all members query");
-		$resultf = $this->mySQLdb->dbGetNextArray();
+        	$this->mySQLdb->query($queryf) or die ("problem with finding all members query");
+		$resultf = $this->mySQLdb->getNextArray();
 	 	$this->t_body->set_var("CID", $resultf['cid']);	
 	 	$this->t_body->set_var("HITS", $resultf['totalhits']);	
 	 	$this->t_body->set_var("HOMEPAGE", $resultf['name']);	
@@ -440,8 +440,8 @@ class stats
 	
 		//for houses	
 		$queryh = $query." AND template = 6".$queryend;
-        	$this->mySQLdb->dbDoQuery($queryh) or die ("problem with finding all members query");
-		$resulth = $this->mySQLdb->dbGetNextArray();
+        	$this->mySQLdb->query($queryh) or die ("problem with finding all members query");
+		$resulth = $this->mySQLdb->getNextArray();
 	 	$this->t_body->set_var("CID", $resulth['cid']);	
 	 	$this->t_body->set_var("HITS", $resulth['totalhits']);	
 	 	$this->t_body->set_var("HOMEPAGE", $resulth['name']);	

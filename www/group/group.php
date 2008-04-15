@@ -22,13 +22,13 @@ class Group
 	function createGroup($type = 1)
 	{
 		$query = "INSERT INTO userGroups (cid, type) VALUES ('$this->sid', '$type')";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 
 	function groupExists()
 	{
 		$query = "SELECT cid FROM userGroups WHERE cid = '$this->sid'";
-		$result = $this->db->dbGetSingleRow($query);
+		$result = $this->db->getRow($query);
 		if($result['cid'])
 			return true;
 		else
@@ -41,7 +41,7 @@ class Group
 		$query = "DELETE FROM userAccess WHERE service = '$this->service' AND sid = '$this->sid' AND uid = '$uid'";
 		if($type)
 				$query .= " AND type = '$type'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	
 	}
 	
@@ -51,16 +51,16 @@ class Group
 		//get the owner(s) of the group
 		$query = "SELECT title, firstname, lastname, uid FROM userAccess, user WHERE uid = id AND service = '$this->service' 
 				AND sid = '$this->sid' AND type = '3'";
-		return $this->db->dbGetSingleRow($query); //only one owner at the moment
+		return $this->db->getRow($query); //only one owner at the moment
 	}
 	
 	function memberExist($uid)
 	{
 		//function to check if a user already exists, returns true if exists
 		$query = "SELECT uid FROM userAccess WHERE service = '$this->service' AND sid = '$this->sid' AND uid = '$uid'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	
-		if($this->db->dbCountRows() > 0)
+		if($this->db->countRows() > 0)
 				return true;
 		else
 				return false;
@@ -70,7 +70,7 @@ class Group
 	{
 		$query = "INSERT INTO userAccess (service, sid, uid, type) 
 		VALUES ('$this->service', '$this->sid', '$uid', '3')";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 	
 	function addMember($uid, $write = 1)
@@ -79,7 +79,7 @@ class Group
 		{
 				$query = "INSERT INTO userAccess (service, sid, uid, type) 
 		VALUES ('$this->service', '$this->sid', '$uid', '$write')";
-				$this->db->dbDoQuery($query);
+				$this->db->query($query);
 		}
 	}
 	
@@ -90,7 +90,7 @@ class Group
 		{
 			//only staff may be owners
 			$query = "SELECT group_id FROM user WHERE id = '$id'";
-			$group = $this->db->dbGetSingleRow($query);
+			$group = $this->db->getRow($query);
 			return isStaff($group['group_id']);
 			
 		}
@@ -123,10 +123,10 @@ class Group
 	{
 		//delete an entire group including owner
 		$query = "DELETE FROM userAccess WHERE service = '$this->service' AND sid = '$this->sid'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		
 		$query = "DELETE FROM userGroups WHERE cid = '$this->sid'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	
 	}
 	
@@ -136,7 +136,7 @@ class Group
 			error(0); //this only works on folder groups!!??
 		
 		$query = "SELECT type FROM userGroups WHERE cid = '$this->sid'";
-		$line = $this->db->dbGetSingleRow($query);
+		$line = $this->db->getRow($query);
 	
 		return $line['type'];
 	}	
@@ -145,7 +145,7 @@ class Group
 	{
 		$query = "UPDATE userAccess SET type = '1' WHERE uid = '$uid' AND sid = '$this->sid' 
 				AND service = '$this->service' AND type = '0'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 	
 	function updateGroupType($type)
@@ -159,7 +159,7 @@ class Group
 				error(9, "this only works on folder groups!!??"); //this only works on folder groups!!??
 	
 		$query = "UPDATE userGroups SET type = '$type' WHERE cid = '$this->sid'";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 	}
 }
 ?>

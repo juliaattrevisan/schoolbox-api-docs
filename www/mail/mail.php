@@ -19,7 +19,7 @@ class Mail
 		$db = new dbManager();
 	
 		$query = "SELECT username, email_pass FROM user WHERE id = ".$_SESSION["id"];
-		$info = $db->dbGetSingleRow($query);
+		$info = $db->getRow($query);
 	
 		if($info["username"] == "" || $info["email_pass"] == "") 
 		{

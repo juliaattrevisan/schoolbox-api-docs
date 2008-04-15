@@ -24,8 +24,8 @@ class offence
 			  WHERE `deleted` = 0
 			  ORDER BY description
 		";
-	 	$this->mySQLdb->dbDoQuery($query);	   	
-		while ($offence = $this->mySQLdb->dbGetNextArray())
+	 	$this->mySQLdb->query($query);	   	
+		while ($offence = $this->mySQLdb->getNextArray())
 		{
 			$offence['description'] = stripslashes($offence['description']);
 			$listOfOffences[] = $offence;
@@ -41,7 +41,7 @@ class offence
 				  SET description = '$desc'
 				  WHERE id = '".$this->id."'
 				"; 
-			if($this->mySQLdb->dbDoQuery($query))
+			if($this->mySQLdb->query($query))
 				return 1;
 			else
 				error(21);
@@ -61,15 +61,15 @@ class offence
 			$query = "SELECT * FROM offence
 					  WHERE `description` = '$description'
 					  AND `deleted` = 0";
-			$result = $this->mySQLdb->dbDoQuery($query);
+			$result = $this->mySQLdb->query($query);
 
-			if ($this->mySQLdb->dbCountRows($result))
+			if ($this->mySQLdb->countRows($result))
 				error(56);
 
 			$query = "INSERT INTO offence (description) 
 				  VALUES ('".$description."')
 			";
-			if($this->mySQLdb->dbDoQuery($query))
+			if($this->mySQLdb->query($query))
 				return 1;
 			else
 				error(21);
@@ -85,8 +85,8 @@ class offence
 			  FROM 	 det
 			  WHERE	 offence = '$id'
 		";
-	 	$this->mySQLdb->dbDoQuery($query);
-		if ($this->mySQLdb->dbCountRows() > 0)
+	 	$this->mySQLdb->query($query);
+		if ($this->mySQLdb->countRows() > 0)
 			return 1;
 		else
 			return 0;
@@ -100,7 +100,7 @@ class offence
 			// Mark the offence as deleted rather than deleting it from the database
 			// this will prevent problems with detentions already using this offence
 			$query = "UPDATE `offence` SET `deleted` = 1 WHERE `id` = '".$this->id."'";
-			if($this->mySQLdb->dbDoQuery($query))
+			if($this->mySQLdb->query($query))
 				return 1;
 			else
 				error(21);
@@ -119,8 +119,8 @@ class offence
 		$query = "SELECT * FROM offence 
 			  WHERE  id = '".$this->id."'
 		";
-		$this->mySQLdb->dbDoQuery($query);
-		if ($this->mySQLdb->dbCountRows() > 0)
+		$this->mySQLdb->query($query);
+		if ($this->mySQLdb->countRows() > 0)
 			return 1;
 		else
 			return 0;

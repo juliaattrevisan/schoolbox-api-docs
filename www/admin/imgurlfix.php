@@ -8,7 +8,7 @@ $query = "SELECT h.cid, h.config, l.url
 		  LEFT JOIN link l on l.category = h.cid AND l.description = 'Intranet Site'
 		  WHERE component = 15";
 
-$catList = $db->dbGetAllRows($query);
+$catList = $db->getAll($query);
 foreach ($catList as $cat) {
 	if (empty($cat['url'])) continue;
 	$config  = unserialize($cat['config']);
@@ -16,7 +16,7 @@ foreach ($catList as $cat) {
 	$config = serialize($config);
 	$query = "UPDATE homepage_comp_location SET config = ".$db->dbSmartQuote($config)." WHERE cid = ".$cat['cid']." AND component = 15";
 	
-	$db->dbDoQuery($query);
+	$db->query($query);
 	print $query . "<br />\n";
 }
 print '<br />done';

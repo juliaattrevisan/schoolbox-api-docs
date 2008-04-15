@@ -10,7 +10,7 @@ if ($_SESSION['su'] != 1)
 	die("Superuser access only");
 
 if (!empty($_POST['synergy_id'])) {
-	$user = $db->dbGetSingleRow("SELECT id, firstname, lastname FROM user WHERE synergy_id={$_POST['synergy_id']}");
+	$user = $db->getRow("SELECT id, firstname, lastname FROM user WHERE synergy_id={$_POST['synergy_id']}");
 	if (!empty($user)) {
 		$db->dbInsertArray("userAccess", array("uid"=>$user['id'], "service"=>5, "type"=>3));
 		echo "<b>Head of House Added:</b> {$user['firstname']} {$user['lastname']}<br><br>";

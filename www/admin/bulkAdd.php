@@ -44,7 +44,7 @@ class BulkAdd {
 						//adding failed
 						//check username and synergy already exists
 						$query = "SELECT id FROM user WHERE username = '{$user[0]}' AND synergy_id = '{$user[4]}'";
-						$updateUser = $userDB->db->dbGetSingleRow($query);
+						$updateUser = $userDB->db->getRow($query);
 						if(is_array($updateUser)) {
 						
 							$userDB->updateUser($updateUser['id'], $user[0], $user[1], $user[2], $user[3], $user[4], $user[9], $user[10], $user[5], $user[8], $user[6], 0, $user[7]);
