@@ -9,7 +9,7 @@
 require_once("include/permission.php");
 require_once("news/news.php");
 
-$this->setFile(TEMPLATE_content, $this->getTemplate('news.html'));
+$this->setFile(TEMPLATE_content, 'news.html');
 
 $this->setVar("TITLE", HEADING." - News");
 

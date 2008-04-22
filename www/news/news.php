@@ -173,7 +173,7 @@ function timecmp($a, $b)
    return ($a['item_datetime_posted'] > $b['item_datetime_posted']) ? -1 : 1;
 }
 
-function getNews($id = 0, $index = 0, $limit = 0)
+function getNews($id = 0, $archive = false, $index = 0, $limit = 0)
 {
  	$query = "
 	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner,
@@ -191,10 +191,10 @@ function getNews($id = 0, $index = 0, $limit = 0)
 			AND newsGroup.gid = '".$_SESSION['gid']."'
     WHERE news_items.item_owner != '".$_SESSION['id']."' ";
 	
-	if ($this->show == "current")
-		$query .=" AND news_items.item_datetime_expires > NOW() ";
-	else
+	if ($archive)
 		$query .=" AND news_items.item_datetime_expires <= NOW() ";
+	else
+		$query .=" AND news_items.item_datetime_expires > NOW() ";
 	
 	$query .=" AND news_items.item_deleted = 0"; 
 	

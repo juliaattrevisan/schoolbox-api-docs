@@ -1,0 +1,124 @@
+        <link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
+        <script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
+        <script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
+        <script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
+        <script type="text/javascript">
+        function showRow(){
+            var selecLevel = document.getElementById('eventForm').level.options[document.getElementById('eventForm').level.selectedIndex].value;
+            
+			var groupDrop = document.getElementById('groupDrop');
+			var campusList = document.getElementById('campusList');
+            var groupList = document.getElementById('groupList');
+        
+            if( selecLevel == 1 || selecLevel == 4){
+				groupDrop.style.display 	= "none";
+                campusList.style.display 	= "none";
+                groupList.style.display 	= "none";
+            }
+            else if( selecLevel == 2 ){
+				groupDrop.style.display 	= "";
+                campusList.style.display 	= "none";
+                groupList.style.display 	= "none";
+            }
+            else if( selecLevel == 3 ){
+				groupDrop.style.display 	= "none";
+                campusList.style.display 	= "";
+                groupList.style.display 	= "";
+            }
+        }
+        window.onload = new Function('showRow();');
+        </script>
+
+		<h1>{FUNCTION} Event</h1>
+            <form class="standardForm" method="post" action="/calendar/modify/" id="eventForm">
+                    <table>
+                      <tr> 
+                        <td class="formLabelWidth" valign="top"><h2>Date</h2>
+                        	<em>The date on which the event will occur. The date should be formatted like this dd/mm/yyyy. </em></td>
+                        <td><input name="date" id="cal_date" type="text" size="15" maxlength="10" value="{DATE}"/>
+						<img src="/images/ico_calendar.gif" width="16" height="13" id="cal_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+	 				 	<script type="text/javascript">
+						Calendar.setup({
+							inputField     :    "cal_date",     // id of the input field
+							ifFormat       :    "%d/%m/%Y",      // format of the input field
+							button         :    "cal_trigger",  // trigger for the calendar (button ID)
+							align          :    "br",           // alignment (defaults to "Bl")
+							singleClick    :    true
+						});
+						</script>					 </td>
+                      </tr>
+                      <tr> 
+                        <td><h2>Time</h2><em>Both time slots are optional.</em></td>
+                        <td> <input name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />
+                          : 
+                          <input name="minute" type="text" maxlength="2" value="{MIN}" class="timeField" /> 
+                          <select name="period">
+                            <option value="am" {AM} >AM</option>
+                            <option value="pm" {PM} >PM</option>
+                          </select>
+                          to 
+                          <input name="tohour" type="text" maxlength="2" value="{TOHOUR}" class="timeField" />
+                          : 
+                          <input name="tominute" type="text" maxlength="2" value="{TOMIN}" class="timeField" /> 
+                          <select name="toperiod">
+                            <option value="am" {AMTO}>AM</option>
+                            <option value="pm" {PMTO}>PM</option>
+                          </select></td>
+                      </tr>
+                      <tr> 
+                        <td><h2>Priority</h2>
+                        	<em>This will determine the colour that the note shall appear on the calendar</em>                        </td>
+                        <td><select name="priority">
+                             <!-- BEGIN priority_drop -->
+                              <option value="{PRIORITY_NUMBER}" {PRIORITY_NUMBER_SELECTED}>{PRIORITY_NAME}</option>
+                             <!-- END priority_drop -->
+                          </select></td>
+                      </tr>
+                      <tr> 
+                        <td><h2>Level</h2><em>Select who you would like to be able to see this event</em></td>
+                        <td><select name="level" id="level" onChange="showRow()">
+                       		 <!-- BEGIN level_drop -->
+                              <option value="{LEVEL_ID}" {LEVEL_ID_SELECTED}>{LEVEL_NAME}</option>
+                             <!-- END level_drop -->
+                        </select></td>
+                      </tr>
+                      <tr id="groupDrop" style="display:none;"> 
+                        <td><h2>Group</h2><em>Select the group which will be able to view this event</em></td>
+                        <td>
+                        <select name="group">
+                            <!-- BEGIN group_drop -->
+                            <option value="{GROUP_ID}" {GROUP_ID_SELECTED} />{GROUP_NAME}</option>
+                            <!-- END group_drop -->                        
+                        </select>
+                        </td>
+                      </tr>                      
+                      <tr id="campusList" style="display:none;"> 
+                        <td><h2>Campus</h2><em>Select the campus' which will be able to view this event</em></td>
+                        <td>
+						<!-- BEGIN campus_list -->
+							<label><input type="checkbox" {CAMPUS_ID_READONLY} name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}</label><br />
+						<!-- END campus_list -->
+                                            
+						</td>
+                      </tr>
+                      <tr id="groupList" style="display:none;"> 
+                        <td><h2>Group</h2><em>Select the group which will be able to view this event</em></td>
+                        <td>
+						<!-- BEGIN group_list -->
+							<label><input type="checkbox" name="groupCheck[]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />{GROUP_NAME}</label><br />
+						<!-- END group_list -->                        
+                        </td>
+                      </tr>
+                      <tr> 
+                        <td><h2>Description</h2></td>
+                        <td ><textarea name="note" cols="50" rows="3">{DESCRIPTION}</textarea></td>
+                      </tr>
+                      <tr> 
+                        <td>&nbsp;</td>
+                        <td><input type="hidden" name="id" value="{EVENT_ID}" />
+                        	<input type="hidden" name="return" value="{RETURN_TO}" />
+                          <input type="submit" name="Submit" value="{FUNCTION} Event" class="btn">
+						  <!-- BEGIN delete_button --><input type="submit" name="delete" value="Delete Event" class="btn"><!-- END delete_button --></td>
+                      </tr>
+                    </table>
+            </form>	

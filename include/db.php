@@ -15,7 +15,7 @@ class dbManager
 {
 
 /* Constuctor sets up variables and connects to database */
-function dbManager($db = SQL_db, $debug = 0)
+function dbManager($db = SQL_db, $debug = 1)
 {
 	$this->host = SQL_host;
 	$this->user = SQL_user;
@@ -70,7 +70,7 @@ function query($sql_q)
 			print "<b>Error:</b> $mysql_eval_error";
 		}
 		else
-			error(4, $mysql_eval_error);
+			error(21, $mysql_eval_error);
 	}
 	
 	return $this->result;

@@ -7,7 +7,7 @@
 
 //displays list of files either by search or during browsing.
 
-$this->setFile(TEMPLATE_content, $this->getTemplate('home.html'));
+$this->setFile(TEMPLATE_content, 'home.html');
 
 $this->setVar("TITLE", HEADING." - Home");
 
@@ -38,7 +38,7 @@ while($component = $this->db->getNextArray($result))
 {
 	if($component['name'])
 	{
-		$this->setFile($component['name'], $this->getTemplate('home/'.$component['filename']));
+		$this->setFile($component['name'], 'home/'.$component['filename']);
 		
 		$funcname = $component['function'];
 		if(is_file($_SERVER['DOCUMENT_ROOT'].'/home/'.$funcname.'.php')) {

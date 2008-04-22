@@ -8,9 +8,9 @@
 require_once("weather/weather.php");
 
 //create weather
-$weather = new Weather("All", WEATHER_LOCATION);
+$weather = new Weather("All", $this->arg[0]);
 
-$this->setFile(TEMPLATE_content, $this->getTemplate('weather/weather.html'));
+$this->setFile(TEMPLATE_content, 'weather/weather.html');
 $this->setVar("TITLE", HEADING." - Weather Forecast");
 $this->setVar("LOCATION", $weather->City);
 
@@ -58,6 +58,6 @@ else
 
 //ouput drop down box of available locations
 include("html-parse.php");
-$this->setVar("LOCDROP", html_select("code' onChange='this.form.submit();", $weather->locationArray, $weather->areacode));
+$this->setVar("LOCDROP", html_select("code' onchange='window.open(\"/weather/\"+this.value,\"_self\", \"\");", $weather->locationArray, $weather->areacode));
 
 ?>

@@ -9,7 +9,7 @@
 require_once("include/permission.php");
 require_once("news/news.php");
 
-$this->setFile(TEMPLATE_content, $this->getTemplate('news.html'));
+$this->setFile(TEMPLATE_content, 'news.html');
 
 $this->setVar("TITLE", HEADING." - News");
 
@@ -31,10 +31,11 @@ $this->setVar('archive_button_block', '');
 	
 $myNews = new news('archived');
 
-$pageNum = $arg[1];
+$pageNum = $this->arg[0];
+
 
 // output pagination
-$newsList = $myNews->getNews();
+$newsList = $myNews->getNews(0, true);
 
 if(!$pageNum)
 	$pageNum = 1;
@@ -76,7 +77,7 @@ $outputPagination = array('PREVIOUS_PAGE' 	=> $pageNum - 1,
 $this->setVar($outputPagination);	
 
 	
-$items = $myNews->getNews(0, $newsIndex, $newsPerPage);
+$items = $myNews->getNews(0, true, $newsIndex, $newsPerPage);
 
 if(is_array($items))
 {

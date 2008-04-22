@@ -17,9 +17,10 @@ class SitePage extends Page {
 	
 	function loadContent($pageFile, $execute=TRUE) {
 		$this->pageName = $pageFile;
-	
+		
 		//max dir depth is 2 so anything after that must be arguments being passed to the script
 		if( !preg_match("/^[a-zA-Z0-9\/\-\_]+/", $pageFile) ) {
+			
 			$this->pageNotFound();
 		}
 
@@ -31,11 +32,16 @@ class SitePage extends Page {
 		}
 		$page = rtrim($page, '/');
 		
+		
 		if(is_file($_SERVER['DOCUMENT_ROOT'].'/'.$page . '.php') && $execute)
 			include($_SERVER['DOCUMENT_ROOT'].'/'.$page . '.php');
-		else if(is_file($this->getTemplate($page.'.html')))
-			$this->setFile(TEMPLATE_content, $this->getTemplate($page.'.html'));
-		else
+		else if (is_file($_SERVER['DOCUMENT_ROOT'].'/'.$page.'/'. $this->arg[0] . '.php') && $execute) {
+			$page2 = array_shift($this->arg);
+			include($_SERVER['DOCUMENT_ROOT'].'/'.$page.'/'. $page2 . '.php');
+		}
+		else if(is_file($_SERVER['DOCUMENT_ROOT'] . '/../templates/' . $this->getTemplate($page.'.html'))) {
+			$this->setFile(TEMPLATE_content, $page.'.html');
+		} else
 			$this->pageNotFound();
 
 	}
@@ -50,11 +56,11 @@ class SitePage extends Page {
 	
 	function buildPage() {
 	
-		$this->setFile(TEMPLATE_body, $this->getTemplate('include/body.html') );
-		$this->setFile('headerTpl', $this->getTemplate('include/header.html') );
-		$this->setFile('footerTpl', $this->getTemplate('include/footer.html') );
-		$this->setFile('tabTpl', $this->getTemplate('include/tab.html') );
-		$this->setFile('navTpl', $this->getTemplate('include/nav.html') );
+		$this->setFile(TEMPLATE_body, 'include/body.html' );
+		$this->setFile('headerTpl', 'include/header.html' );
+		$this->setFile('footerTpl', 'include/footer.html' );
+		$this->setFile('tabTpl', 'include/tab.html' );
+		$this->setFile('navTpl', 'include/nav.html' );
 		
 		
 		$this->renderSideNav();
@@ -276,6 +282,10 @@ class SitePage extends Page {
 			$this->setVar("mstudent_section", "");
 	}
 	
+	function setFile($handle, $file) {
+		$this->template->set_file($handle, $this->getTemplate($file));
+	}
+	
 	function getTemplate($template) {
 		if(is_file($this->templateRoot.'/'.$this->site.'/'.$template))
 			return $this->site.'/'.$template;
@@ -290,7 +300,7 @@ class SitePage extends Page {
 	}
 	
 	function goLoginPage(){
-		$this->setFile(TEMPLATE_body, $this->getTemplate('common/login.html'));
+		$this->setFile(TEMPLATE_body, 'common/login.html');
 		$this->setVar("TITLE", HEADING." - Login");
 		$this->setVar("HIDDEN",$_SERVER['REQUEST_URI']);
 		$this->setVar('ERROR', "You are currently not logged in.  Your session has either expired or you are beginning 
@@ -301,9 +311,24 @@ class SitePage extends Page {
 
 	function pageNotFound() {
 		header("HTTP/1.0 404 Not Found");
-		$this->setFile(TEMPLATE_body, $this->getTemplate('common/404.html'));
+		$this->setFile(TEMPLATE_body, 'common/404.html');
 		$this->outputPage(TRUE);
 		exit;
+	}
+
+	function checkList($handle, $data, $selected = array()) {
+		$this->setBlock(TEMPLATE_content, $handle, $handle.'_block');
+		$selected = is_array($selected) ? $selected : array();
+		foreach($data as $row) {
+			foreach($row as $key => $value) {
+				$this->setVar($key, $value);
+				if(in_array($value, $selected))
+					$this->setVar($key.'_SELECTED', 'checked="checked"');
+				else
+					$this->setVar($key.'_SELECTED', '');
+			}
+			$this->parse($handle.'_block', $handle, true); 
+		}
 	}
 	
 	

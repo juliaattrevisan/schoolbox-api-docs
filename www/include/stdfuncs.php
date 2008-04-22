@@ -31,7 +31,7 @@ function error($ec, $message="")
 
 	$db = new dbManager(SQL_db, 1);
 
-	$query = "SELECT title, message FROM error WHERE id = '$ec'";
+	$query = "SELECT message FROM error WHERE id = '$ec'";
 	$error = $db->getRow($query);
 
 	$output = str_replace("%MESSAGE%", $message, $error['message']);
