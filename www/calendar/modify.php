@@ -12,13 +12,13 @@ if (isset($_POST['date'])) {
 	$event = array('owner' 		=> $_SESSION['id'],
 				   'access'		=> $_POST['level'],
 				   'sid'		=> $_POST['group'],
-				   'campus'		=> $_POST['campus'],
+				   'campus'		=> !empty($_POST['campus']) ? $_POST['campus'] : array($_SESSION['campus'][0]),
 				   'group'		=> $_POST['groupCheck'],
 				   'priority'	=> $_POST['priority'],
 				   'note'		=> $_POST['note'],
 				   'date'		=> implode($date),
-				   'startTime'	=> (($_POST['period'] == 'PM' ? 12 : 0) + $_POST['hour']) . ":" . $_POST['minute'] . ":00",
-				   'endTime'	=> (($_POST['toperiod'] == 'PM' ? 12 : 0) + $_POST['tohour']) . ":" . $_POST['tominute'] . ":00",
+				   'startTime'	=> (($_POST['period'] == 'pm' && $_POST['hour'] != 12 ? 12 : 0) + $_POST['hour']) . ":" . $_POST['minute'] . ":00",
+				   'endTime'	=> (($_POST['toperiod'] == 'pm' && $_POST['tohour'] != 12 ? 12 : 0) + $_POST['tohour']) . ":" . $_POST['tominute'] . ":00",
 				  );
 	if(is_numeric($_POST['id'])) {
 	
@@ -53,24 +53,28 @@ if (isset($_POST['date'])) {
 			error(34);
 	}
 	
-	list($hour, $minute) = explode(":", $event['startTime']);
-	list($tohour, $tominute) = explode(":", $event['endTime']);
+	if ($event['startTime'] != "12:00AM")
+		preg_match("/([\d]{1,2}):([\d]{2})(AM|PM)/", $event['startTime'], $startTime);
+	else
+		$startTime = array('','','','');
 	
-	$am = $hour < 12 ? true : false;
-	$amto = $tohour < 12 ? true : false;
+	if ($event['endTime'] != "12:00AM")
+		preg_match("/([\d]{1,2}):([\d]{2})(AM|PM)/", $event['endTime'], $endTime);
+	else
+		$endTime = array('','','','');
 	
 	$output = array('TITLE'			=> HEADING." - Update Calender Event",
 					'FUNCTION'		=> 'Update',
 					'EVENT_ID'		=> $event['id'],
 					'DATE'			=> date('d/m/Y', strtotime($event['date'])),
-					'HOUR'			=> $hour,
-					'MIN'			=> $minute,
-					'AM'			=> $hour <  12 ? 'checked="checked"' : '',
-					'PM'			=> $hour >= 12 ? 'checked="checked"' : '',
-					'TOHOUR'		=> $tohour,
-					'TOMIN'			=> $tominute,
-					'AMTO'			=> $tohour <  12 ? 'checked="checked"' : '',
-					'PMTO'			=> $tohour >= 12 ? 'checked="checked"' : '',
+					'HOUR'			=> $startTime[1],
+					'MIN'			=> $startTime[2],
+					'AM'			=> $startTime[3] == 'AM' ? 'selected="selected"' : '',
+					'PM'			=> $startTime[3] == 'PM' ? 'selected="selected"' : '',
+					'TOHOUR'		=> $endTime[1],
+					'TOMIN'			=> $endTime[2],
+					'AMTO'			=> $endTime[3] == 'AM' ? 'selected="selected"' : '',
+					'PMTO'			=> $endTime[3] == 'PM' ? 'selected="selected"' : '',
 					'LEVEL'			=> '',
 					'GROUP'			=> '',
 					'DESCRIPTION' 	=> $event['note'],
@@ -82,15 +86,15 @@ if (isset($_POST['date'])) {
 	$this->dropDown('priority_drop', $calendarHandler->getPriorityList(), $event['priority']);
 	
 	$campusList = $calendarHandler->getCampusList();
-	$this->checkList('campus_list', $campusList, $calendarHandler->getEventCampus($event['id']));
-
-	if (count($campusList) == 1)
-		$this->setVar('CAMPUS_ID_READONLY', 'onclick="return false;"');
-	else
-		$this->setVar('CAMPUS_ID_READONLY', '');
+	if (count($campusList) > 1) {
+		$this->checkList('campus_list', $campusList, $calendarHandler->getEventCampus($event['id']));
+	} else {
+		$this->setBlock(TEMPLATE_content, 'campus_list', 'campus_list_block');
+		$this->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
+	}
 
 	$groupList = $calendarHandler->getGroupList();
-	$this->checkList('group_drop', $groupList, $event['sid']);
+	$this->dropDown('group_drop', $groupList, $event['sid']);
 	$this->checkList('group_list', $groupList, $calendarHandler->getEventGroup($event['id']));
 	
 
@@ -143,15 +147,16 @@ if (isset($_POST['date'])) {
 	$this->dropDown('priority_drop', $calendarHandler->getPriorityList(), '');
 	
 	$campusList = $calendarHandler->getCampusList();
-	$this->checkList('campus_drop', $campusList, 1);
-
-	if (count($campusList) == 1)
-		$this->setVar('CAMPUS_ID_READONLY', 'onclick="return false;"');
-	else
-		$this->setVar('CAMPUS_ID_READONLY', '');
-		
+	if (count($campusList) > 1) {
+		$this->checkList('campus_list', $campusList, array($_SESSION['campus'][0]));
+	} else {
+		$this->setBlock(TEMPLATE_content, 'campus_list', 'campus_list_block');
+		$this->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
+	}
+	
 	$groupList = $calendarHandler->getGroupList();
-	$this->checkList('group_drop', $groupList, '');
+	$this->checkList('group_list', $groupList, '');
+	$this->dropDown('group_drop', $groupList, '');
 	
 
 	$levelList[] = array('LEVEL_ID'	=> 1, 'LEVEL_NAME'	=> 'Personal');

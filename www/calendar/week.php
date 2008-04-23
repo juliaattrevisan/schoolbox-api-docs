@@ -139,8 +139,8 @@ for($i=0; $i < 7; $i++) {
 	if(is_array($eventList)) {
 		foreach($eventList as $event) {
 			$output = array('TIME'		=> rtrim(
-											($event['startTime'] != "0:00" ? $event['startTime'] : "") . " - " .
-										   	($event['endTime'] != "0:00" ? $event['endTime'] : ""),
+											($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
+										   	($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
 										   "- "),
 							'NOTE'		=> $event['note'],
 							'PRIORITY'	=> $calendarHandler->displayColour($event['priority']),

@@ -2,6 +2,8 @@
         <script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
         <script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
         <script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
+        <script type="text/javascript" src="/javascript/mootools.js"></script>
+        <script type="text/javascript" src="/javascript/behaviour.js"></script>
         <script type="text/javascript">
         function showRow(){
             var selecLevel = document.getElementById('eventForm').level.options[document.getElementById('eventForm').level.selectedIndex].value;
@@ -27,6 +29,34 @@
             }
         }
         window.onload = new Function('showRow();');
+		
+		Behaviour.addLoadEvent(function () { 
+			$$('.campusCheck').each(function (o) {
+					o.addEvents({
+						'mouseup' : function (e) {
+								if (!countSelected(o)) checkNext(o);
+						
+						}
+					});
+			});
+		});
+		
+		function countSelected (ol) {
+			var s = 0;
+			$$('.campusCheck').each(function (o) { 
+										if (o != ol && o.checked == true) 
+											s++;
+									});
+			return s;
+		}
+		
+		function checkNext(ol) {
+			$$('.campusCheck').each(function (o) { 
+										if (o != ol) 
+											o.checked = true;
+											return;
+									});
+		}
         </script>
 
 		<h1>{FUNCTION} Event</h1>
@@ -96,7 +126,7 @@
                         <td><h2>Campus</h2><em>Select the campus' which will be able to view this event</em></td>
                         <td>
 						<!-- BEGIN campus_list -->
-							<label><input type="checkbox" {CAMPUS_ID_READONLY} name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}</label><br />
+							<label><input type="checkbox" class="campusCheck" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}</label><br />
 						<!-- END campus_list -->
                                             
 						</td>

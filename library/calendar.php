@@ -110,6 +110,80 @@ class Calendar extends Model {
 		return $output;
 	}  
 
+	function getByID($eventID) {
+		$query = "SELECT id, owner, access, sid, priority, note, date, 
+						DATE_FORMAT(startTime, '" . CALENDAR_time_format . "') startTime, 
+						DATE_FORMAT(endTime, '" . CALENDAR_time_format . "') endTime
+				  FROM " . $this->_table . "
+				  WHERE " . $this->_index . " = $eventID";
+		return $this->db->getRow($query);
+	}
+
+
+	function getWeekSubmissionEvents($currentDay) {
+	
+		//get a list of all the possible submission box categories
+		require_once($_SERVER['DOCUMENT_ROOT']."/include/involved.php");
+		$catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
+	
+		if(is_array($catList))
+		{
+			$start_date = $currentDay;
+			$end_date = strtotime("+7 days", $currentDay); 
+	
+			foreach($catList as $cat)
+			{
+				$query = "SELECT category.name AS category, category.code AS synergyCode, submission_box.description, submission_box.owner,
+							DATE_FORMAT(submission_box.date, '%w') as dayIndex, 
+							DATE_FORMAT(submission_box.date, '" . CALENDAR_time_format . "') as dueTime
+						  FROM category, file, submission_box 
+						  WHERE category.id = submission_box.category 
+							AND file.id = submission_box.fid 
+							AND submission_box.category = {$cat['id']} 
+							AND submission_box.deleted = 0 
+							AND	submission_box.date >= FROM_UNIXTIME('$start_date') 
+							AND submission_box.date <= FROM_UNIXTIME('$end_date')
+						  ORDER BY submission_box.date ";
+				$this->db->query($query);
+				while($subEvent = $this->db->getNextArray())
+				{ 		
+					$subEvents[$subEvent['dayIndex']]['category'][] = $subEvent['category'];
+					$subEvents[$subEvent['dayIndex']]['owner'][] = $subEvent['owner'];
+					$subEvents[$subEvent['dayIndex']]['description'][] = $subEvent['description'];
+					$subEvents[$subEvent['dayIndex']]['synergyCode'][] = $subEvent['synergyCode'];
+					$subEvents[$subEvent['dayIndex']]['dueTime'][] = $subEvent['dueTime'];
+				}
+			}
+		}
+	
+		return $subEvents;
+	}
+
+	function getSubmissionEvents($currentDay) {
+	
+		//get a list of all the possible submission box categories
+		require_once($_SERVER['DOCUMENT_ROOT']."/include/involved.php");
+		$catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
+	
+		if(is_array($catList)) {
+	
+			foreach($catList as $cat) {
+				$query = "SELECT category.name AS category, category.code AS synergyCode, submission_box.description, submission_box.owner,
+							DATE_FORMAT(submission_box.date, '%w') as dayIndex, 
+							DATE_FORMAT(submission_box.date, '" . CALENDAR_time_format . "') as dueTime
+						  FROM category, file, submission_box 
+						  WHERE category.id = submission_box.category 
+							AND file.id = submission_box.fid 
+							AND submission_box.category = {$cat['id']} 
+							AND submission_box.deleted = 0 
+							AND	submission_box.date >= FROM_UNIXTIME('$currentDay') 
+							AND submission_box.date <= FROM_UNIXTIME('$currentDay')
+						  ORDER BY submission_box.date ";
+				$subEvents[] = $this->db->getAll($query);
+			}
+		}
+		return $subEvents;
+	}
 
 	function getAllDayEvents($currentDay) {
 	
@@ -149,94 +223,17 @@ class Calendar extends Model {
 			return 1;
 	}
 
-	function getWeekSubmissionEvents($currentDay) {
-	
-		//get a list of all the possible submission box categories
-		require_once($_SERVER['DOCUMENT_ROOT']."/include/involved.php");
-		$catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
-	
-		if(is_array($catList))
-		{
-			$start_date = $currentDay;
-			$end_date = strtotime("+7 days", $currentDay); 
-	
-			foreach($catList as $cat)
-			{
-				$query = "SELECT category.name AS category, category.code AS synergyCode, submission_box.description, submission_box.owner,
-							DATE_FORMAT(submission_box.date, '%w') as dayIndex, 
-							DATE_FORMAT(submission_box.date, '".CALENDAR_time_format."') as dueTime
-						  FROM category, file, submission_box 
-						  WHERE category.id = submission_box.category 
-							AND file.id = submission_box.fid 
-							AND submission_box.category = {$cat['id']} 
-							AND submission_box.deleted = 0 
-							AND	submission_box.date >= FROM_UNIXTIME('$start_date') 
-							AND submission_box.date <= FROM_UNIXTIME('$end_date')
-						  ORDER BY submission_box.date ";
-				$this->db->query($query);
-				while($subEvent = $this->db->getNextArray())
-				{ 		
-					$subEvents[$subEvent['dayIndex']]['category'][] = $subEvent['category'];
-					$subEvents[$subEvent['dayIndex']]['owner'][] = $subEvent['owner'];
-					$subEvents[$subEvent['dayIndex']]['description'][] = $subEvent['description'];
-					$subEvents[$subEvent['dayIndex']]['synergyCode'][] = $subEvent['synergyCode'];
-					$subEvents[$subEvent['dayIndex']]['dueTime'][] = $subEvent['dueTime'];
-				}
-			}
-		}
-	
-		return $subEvents;
-	}
-
-	function getSubmissionEvents($currentDay) {
-	
-		//get a list of all the possible submission box categories
-		require_once($_SERVER['DOCUMENT_ROOT']."/include/involved.php");
-		$catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
-	
-		if(is_array($catList)) {
-	
-			foreach($catList as $cat) {
-				$query = "SELECT category.name AS category, category.code AS synergyCode, submission_box.description, submission_box.owner,
-							DATE_FORMAT(submission_box.date, '%w') as dayIndex, 
-							DATE_FORMAT(submission_box.date, '".CALENDAR_time_format."') as dueTime
-						  FROM category, file, submission_box 
-						  WHERE category.id = submission_box.category 
-							AND file.id = submission_box.fid 
-							AND submission_box.category = {$cat['id']} 
-							AND submission_box.deleted = 0 
-							AND	submission_box.date >= FROM_UNIXTIME('$currentDay') 
-							AND submission_box.date <= FROM_UNIXTIME('$currentDay')
-						  ORDER BY submission_box.date ";
-				$subEvents[] = $this->db->getAll($query);
-			}
-		}
-		return $subEvents;
-	}
-
-
 	function getDayEvents($currentDay) {
-		//this function will return all events occuring on the date specified
-			
-		//todays date stamp
-		$dayno = date("w", $currentDay)+1;
-		$dayocc = ceil($date/7);  
-		$eventCount = 0;
-		
-		if($group)
-			$groupID = group;
-		else
-			$groupID = $_SESSION['gid'];
-		//ouput only selected campus
+		// return all events occuring on the date specified
+
 		if(is_array($_SESSION['campus']))
 			$campuslist = implode(',',$_SESSION['campus']);
 		else
 			$campuslist = 1;
 		
-		if($_SESSION['id'])
-			$owner = $_SESSION['id'];
-		else
-			$owner = 0;
+		
+		// get accessible groups
+		
 		
 		//give people with userAccess to moderate Calendar Access to view all Camups Posts
 		if(is_array($_SESSION['campus'])) {
@@ -248,11 +245,8 @@ class Calendar extends Model {
 			
 		//get single events for the day
 		$query = "SELECT DISTINCT id, owner,
-							TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, 
-							TIME_TO_SEC(startTime) as startTimestamp, 
-							TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime,
-							TIME_TO_SEC(endTime) as endTimestamp, 
-							TIME_TO_SEC(endTime)-TIME_TO_SEC(startTime) as duration, 
+							TIME_FORMAT(startTime, '" . CALENDAR_time_format . "') as startTime, 
+							TIME_FORMAT(endTime, '" . CALENDAR_time_format . "') as endTime,
 							priority, note, access, eventCampus.campusID as sid
 						FROM event 
 						LEFT JOIN eventCampus ON event.id = eventCampus.eventID
@@ -262,11 +256,29 @@ class Calendar extends Model {
 								OR (access = '3' AND eventCampus.campusID IN($campuslist) $groupChunk ))
 						GROUP BY id
 						ORDER BY event.startTime, event.endTime";
-
+	
 		return $this->db->getAll($query);	
 
 	}		
 
+	function getAllGroupDayEvents($currentDay) {
+		// return all events occuring in the users groups on the date specified
+
+		$query = "SELECT id, owner, TIME_FORMAT(startTime, '" . CALENDAR_time_format . "') as startTime, 
+							TIME_FORMAT(endTime, '" . CALENDAR_time_format . "') as endTime,
+							priority, note, access, userAccess.sid
+						FROM event, userAccess 
+						WHERE date = '" . date("Y-m-d", $currentDay) . "'
+							AND uid = '".$_SESSION['id']."' 
+							AND access = '2' 
+							AND service = '1' 
+							AND userAccess.sid = event.sid
+						ORDER BY event.startTime, event.endTime";
+	
+		
+		return $this->db->getAll($query);
+	
+	}	
 
 	function getCalendarArray($dayQuery, $weekQuery, $monthQuery) {
 	
@@ -293,28 +305,6 @@ class Calendar extends Model {
 		}
 	
 		return $dayEvents;
-	}
-
-
-	function getAllGroupDayEvents($currentDay) {
-		//this function will return all events occuring in the users groups on the date specified
-
-		//get single events for the day
-		$query = "SELECT id, owner, TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTime, 
-							TIME_TO_SEC(startTime) as startTimestamp, TIME_FORMAT(endTime, '".CALENDAR_time_format."') as endTime,
-							TIME_TO_SEC(endTime) as endTimestamp, TIME_TO_SEC(endTime)-TIME_TO_SEC(startTime) as duration,
-							priority, note, access, userAccess.sid
-						FROM event, userAccess 
-						WHERE date = '" . date("Y-m-d", $currentDay) . "'
-							AND uid = '".$_SESSION['id']."' 
-							AND access = '2' 
-							AND service = '1' 
-							AND userAccess.sid = event.sid
-						ORDER BY event.startTime, event.endTime";
-	
-		
-		return $this->db->getAll($query);
-	
 	}		
 
 	function getStudentBirthdays($currentDay) {
@@ -428,7 +418,7 @@ class Calendar extends Model {
 		}
 
 		// campus permissions
-		if (is_array($event['campus'])) {
+		if ($hasAuth && is_array($event['campus'])) {
 			$campusList = $event['campus'];
 			foreach ($campusList as $campusID) {
 				if(!$this->checkSecurity($event['access'], $campusID))
