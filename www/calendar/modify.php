@@ -40,6 +40,7 @@ if (isset($_POST['date'])) {
 } elseif (is_numeric($this->arg[0])) {
 
 	$this->setFile(TEMPLATE_content, 'calendar/modify.html');
+	$this->setTab("calendar");
 	
 	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
@@ -112,6 +113,7 @@ if (isset($_POST['date'])) {
 } else {
 
 	$this->setFile(TEMPLATE_content, 'calendar/modify.html');
+	$this->setTab("calendar");
 	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
 	list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->arg[0]);

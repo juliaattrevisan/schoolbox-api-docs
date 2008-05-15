@@ -10,6 +10,7 @@ require_once("include/permission.php");
 require_once("news/news.php");
 
 $this->setFile(TEMPLATE_content, 'news.html');
+$this->setTab("news");
 
 $this->setVar("TITLE", HEADING." - News");
 

@@ -1,63 +1,66 @@
-        <link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
-        <script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
-        <script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
-        <script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
-        <script type="text/javascript" src="/javascript/mootools.js"></script>
-        <script type="text/javascript" src="/javascript/behaviour.js"></script>
-        <script type="text/javascript">
-        function showRow(){
+   
+    <!-- BEGIN custom_head -->
+    <link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
+    <script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
+    <script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
+    <script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
+    <script type="text/javascript" src="/javascript/mootools.js"></script>
+    <script type="text/javascript" src="/javascript/behaviour.js"></script>
+    <script type="text/javascript">
+        function showRow () {
             var selecLevel = document.getElementById('eventForm').level.options[document.getElementById('eventForm').level.selectedIndex].value;
             
-			var groupDrop = document.getElementById('groupDrop');
-			var campusList = document.getElementById('campusList');
+            var groupDrop = document.getElementById('groupDrop');
+            var campusList = document.getElementById('campusList');
             var groupList = document.getElementById('groupList');
         
             if( selecLevel == 1 || selecLevel == 4){
-				groupDrop.style.display 	= "none";
+                groupDrop.style.display 	= "none";
                 campusList.style.display 	= "none";
                 groupList.style.display 	= "none";
             }
             else if( selecLevel == 2 ){
-				groupDrop.style.display 	= "";
+                groupDrop.style.display 	= "";
                 campusList.style.display 	= "none";
                 groupList.style.display 	= "none";
             }
             else if( selecLevel == 3 ){
-				groupDrop.style.display 	= "none";
+                groupDrop.style.display 	= "none";
                 campusList.style.display 	= "";
                 groupList.style.display 	= "";
             }
         }
         window.onload = new Function('showRow();');
-		
-		Behaviour.addLoadEvent(function () { 
-			$$('.campusCheck').each(function (o) {
-					o.addEvents({
-						'mouseup' : function (e) {
-								if (!countSelected(o)) checkNext(o);
-						
-						}
-					});
-			});
-		});
-		
-		function countSelected (ol) {
-			var s = 0;
-			$$('.campusCheck').each(function (o) { 
-										if (o != ol && o.checked == true) 
-											s++;
-									});
-			return s;
-		}
-		
-		function checkNext(ol) {
-			$$('.campusCheck').each(function (o) { 
-										if (o != ol) 
-											o.checked = true;
-											return;
-									});
-		}
-        </script>
+        
+        Behaviour.addLoadEvent(function () { 
+            $$('.campusCheck').each(function (o) {
+                    o.addEvents({
+                        'mouseup' : function (e) {
+                                if (!countSelected(o)) checkNext(o);
+                        
+                        }
+                    });
+            });
+        });
+        
+        function countSelected (ol) {
+            var s = 0;
+            $$('.campusCheck').each(function (o) { 
+                                        if (o != ol && o.checked == true) 
+                                            s++;
+                                    });
+            return s;
+        }
+        
+        function checkNext(ol) {
+            $$('.campusCheck').each(function (o) { 
+                                        if (o != ol) 
+                                            o.checked = true;
+                                            return;
+                                    });
+        }
+    </script>
+    <!-- END custom_head -->
 
 		<h1>{FUNCTION} Event</h1>
             <form class="standardForm" method="post" action="/calendar/modify/" id="eventForm">

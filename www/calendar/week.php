@@ -11,6 +11,7 @@ require_once "../library/calendar.php";
 $calendarHandler = new Calendar;
 
 $this->setFile(TEMPLATE_content, 'calendar/week.html');
+$this->setTab("calendar");
 
 $this->setBlock(TEMPLATE_content, "week_block", "week_listing");
 $this->setBlock(TEMPLATE_content, "day_block", "day_listing");

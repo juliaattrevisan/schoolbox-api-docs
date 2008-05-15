@@ -9,6 +9,7 @@ class SitePage extends Page {
 		parent::Page();
 		$this->site = SITE_location;
 		$this->db = new dbManager;
+		$this->currentTab = "main";
 		
 		if($login)
 			$this->initSession();
@@ -76,7 +77,13 @@ class SitePage extends Page {
 		$this->parse('MAIN_TAB_REGION', 'tabTpl');
 		$this->parse('MAIN_NAV_REGION', 'navTpl');
 		$this->parse('MAIN_CONTENT_REGION', TEMPLATE_content);
+		
+		$this->setVar('CUSTOM_HEADER_REGION', $this->template->varvals['custom_head']);
+			
+	}
 	
+	function setTab($tab) {
+		$this->currentTab = $tab;
 	}
 	
 	function initSession() {
@@ -187,6 +194,19 @@ class SitePage extends Page {
 				$this->setVar('mf_tab', '');
 			}
 		}
+		
+		// choose tab to highlight
+		$output = array('TAB_MAIN_ON'		=> '',
+						'TAB_NEWS_ON'		=> '',
+						'TAB_WEBMAIL_ON'	=> '',
+						'TAB_CALENDAR_ON'	=> '',
+						'TAB_TIMETABLE_ON'	=> '',
+						'TAB_RESOURCES_ON'	=> '',
+						'TAB_MYFILES_ON'	=> '',
+						'TAB_' . strtoupper($this->currentTab) . '_ON'	=> ' navthis',
+						);
+						
+		$this->setVar($output);
 	}
 	
 	function renderGroupList() {
@@ -284,6 +304,12 @@ class SitePage extends Page {
 	
 	function setFile($handle, $file) {
 		$this->template->set_file($handle, $this->getTemplate($file));
+		
+		$contents = @file_get_contents($this->templateRoot . '/' . $this->getTemplate($file));
+		if (strpos($contents, "<!-- BEGIN custom_head -->") !== false) {
+			$this->setBlock($handle, "custom_head", "custom_head_block");
+			$this->setVar('custom_head_block', '');
+		}
 	}
 	
 	function getTemplate($template) {
