@@ -116,7 +116,7 @@ var Sitemap = {
 		
 		document.body.style.cursor = 'wait';
 		
-		var url = '/sitemap.php?fileList=' + catID;
+		var url = '/sitemap/file-list/' + catID;
 	
 		var myAjax = new Ajax(url, {
 						  	method: 'get', 
@@ -144,7 +144,7 @@ var Sitemap = {
 	},
 	openDetails: function (fileID) {
 		
-		var url = '/sitemap.php?details=' + fileID;
+		var url = '/sitemap/details/' + fileID;
 	
 		var myAjax = new Ajax(url, {
 								method: 'get', 
@@ -206,7 +206,7 @@ var Sitemap = {
 		
 	},
 	saveHistory: function (catID) {
-		var url = '/sitemap.php?saveHistory=' + catID;
+		var url = '/sitemap.php/save-history/' + catID;
 		var myAjax = new Ajax(url, {method: 'get'}).request();	
 		
 	},
@@ -214,7 +214,7 @@ var Sitemap = {
 		
 		document.body.style.cursor = 'wait';
 		
-		var url = '/sitemap.php?catList=' + catID;
+		var url = '/sitemap/cat-list/' + catID;
 	
 		var myAjax = new Ajax(url, {
 								method: 'get', 

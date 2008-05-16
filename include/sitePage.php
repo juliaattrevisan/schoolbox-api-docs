@@ -78,7 +78,7 @@ class SitePage extends Page {
 		$this->parse('MAIN_NAV_REGION', 'navTpl');
 		$this->parse('MAIN_CONTENT_REGION', TEMPLATE_content);
 		
-		$this->setVar('CUSTOM_HEADER_REGION', $this->template->varvals['custom_head']);
+		$this->setVar('CUSTOM_HEADER_REGION', $this->getVar('custom_head'));
 			
 	}
 	
@@ -317,6 +317,10 @@ class SitePage extends Page {
 			return $this->site.'/'.$template;
 		else
 			return 'core/'.$template;
+	}
+	
+	function getVar($varname) {
+		return $this->template->get_var($varname);
 	}
 	
 	function localRedir($file) {
