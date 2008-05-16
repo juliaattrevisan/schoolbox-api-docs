@@ -33,8 +33,6 @@ $this->setFile(TEMPLATE_content, 'sitemap/sitemap.html');
 $this->setTab("resources");
 $this->setVar("TITLE", HEADING." - Sitemap");
 
-$categoryHandler = new Category;
-
 $categoryID = isset($this->arg[0]) ? $this->arg[0] : $_SESSION['smCategory'];
 $categoryID = $_SESSION['smCategory'] = is_numeric($categoryID) ? $categoryID : 0;
 

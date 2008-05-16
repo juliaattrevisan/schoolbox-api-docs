@@ -8,10 +8,10 @@
 //this version is upgraded to allow custom configuration of a homepage
 
 //check to see user is logged in
-require_once('include/session.php');
-require_once('include/include.php');
-require_once('include/permission.php');
-require_once('include/involved.php');
+require_once 'include/session.php';
+require_once 'include/include.php';
+require_once 'include/permission.php';
+require_once 'include/involved.php';
 
 
 

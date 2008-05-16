@@ -307,4 +307,6 @@ function smartQuote($value)
    return $value;
 }
 }
+
+
 ?>
