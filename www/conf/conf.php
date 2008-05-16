@@ -11,7 +11,7 @@
 define("HEADING", "MGS Portal");			//This will appear on the window title of each page
 define("SITE_name", "portal");
 define("MAX_FILE_SIZE", 10485760); 			//Maximum filesize in bytes allowed to be uploaded (default 10MB) (also set in php.ini)
-define("SITE_location", "mgs");				//This defines the location, allows specific code for each location
+define("SITE_location", "ormond");				//This defines the location, allows specific code for each location
 
 //Security options
 define("LOGINGRACE", "60");				//Time measured between logins (secs)
@@ -39,7 +39,7 @@ define("CMS_allow_move", true);
 define("MYFILE_directory", "/usr/local/www/portal/myFiles");	//Files uploaded using CMS system will be stored here
 define("SUBMISSION_directory", "/usr/local/www/portal/submissions");	//All files submitted to submission box stored here
 define("RETURNS_directory", "/usr/local/www/portal/returns");		//Returned work will be stored in this directory
-define("TPL_directory", "/usr/local/www/portal/wenona_templates");		//Where site templates are located
+define("TPL_directory", "/usr/local/www/portal/" . SITE_location . "_templates");		//Where site templates are located
 define("THUMBNAIL_IMAGE_CACHE", "/usr/local/www/portal/files/thumbnails");		//Thumbnail cache for 
 define("THUMBNAIL_size", 100); 
 define("URLS_use_frame", false);						//Open links in frame
