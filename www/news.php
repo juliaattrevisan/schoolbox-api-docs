@@ -6,6 +6,10 @@
 ************************************************************/
 //displays news
 
+require_once 'include/stdfuncs.php';
+if (strpos($_SERVER['REQUEST_URI'], 'news.php'))
+	localRedir('/news');
+	
 require_once("include/permission.php");
 require_once("news/news.php");
 

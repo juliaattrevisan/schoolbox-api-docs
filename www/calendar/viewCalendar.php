@@ -6,6 +6,9 @@
 ************************************************************/
 //calendar object.. controls calendar events and display
 
+require_once '../include/stdfuncs.php';
+localRedir('/calendar/week');
+
 require_once("../include/include.php");
 require_once("../include/session.php");
 require_once("../include/permission.php");

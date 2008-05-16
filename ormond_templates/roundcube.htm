@@ -57,6 +57,14 @@
 			</div>
 		</div>
 		<!-- END msubject -->
+         <!-- BEGIN mstudent --> 
+		<h3>MY STUDENTS</h3> 
+		<ul> 
+			<!-- BEGIN mstudent_block --> 
+			<li><a href="/search/userLookup.php?id={MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
+			<!-- END mstudent_block --> 
+		</ul> 
+		<!-- END mstudent --> 
 		<!-- BEGIN mgroup -->
 		<div class="sideWrap">
 			<h3>MY GROUPS</h3>
@@ -99,7 +107,7 @@
       </ul>
     </div>
 	<!-- #EndLibraryItem --><!-- #EndEditable -->
-<div id="content">
+	<div id="content">
 		<div id="content_text"> <!-- #BeginEditable "main" --><iframe id="mailFrame" src="/roundcube/index.php{ROUNDCUBE_PARAMS}" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" vspace="0" hspace="0" style="width:100%; height:550px"></iframe><!-- #EndEditable --> </div>
 	</div>
 </div>

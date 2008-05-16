@@ -5,8 +5,11 @@
 *                                                           *
 ************************************************************/
 
-//displays list of files either by search or during browsing.
+require_once 'include/stdfuncs.php';
+if (strpos($_SERVER['REQUEST_URI'], 'home.php'))
+	localRedir('/home');
 
+//displays list of files either by search or during browsing.
 $this->setFile(TEMPLATE_content, 'home.html');
 
 $this->setVar("TITLE", HEADING." - Home");
