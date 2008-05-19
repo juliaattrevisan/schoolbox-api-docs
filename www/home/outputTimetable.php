@@ -16,85 +16,89 @@ $timetable = getDayTimetable($_SESSION['sid'], $_SESSION['gid'], $_SESSION['camp
 
 $periods = count($timetable);
 
-//timetable field width
-$this->setVar("TIMETABLE_FIELD_WIDTH", round((100 / $periods),1));
-
-//for each period set result
-foreach($timetable as $period)
-{
-	if($period['periodSequence'] == 1)
+if($periods) {
+	//timetable field width
+	$this->setVar("TIMETABLE_FIELD_WIDTH", round((100 / $periods),1));
+	
+	//for each period set result
+	foreach($timetable as $period)
 	{
-		$this->setVar("PERIOD_NAME", $period['periodName']);
-		$this->setVar("PERIOD_START", $period['periodStart']);
-		$this->setVar("PERIOD_END", $period['periodEnd']);
-		
-		if($period['description'])
+		if($period['periodSequence'] == 1)
 		{
-			//custom stuff for grimwade
-			if ($_SESSION['campus'][0] == 3 && SITE_location == 'mgs')
+			$this->setVar("PERIOD_NAME", $period['periodName']);
+			$this->setVar("PERIOD_START", $period['periodStart']);
+			$this->setVar("PERIOD_END", $period['periodEnd']);
+			
+			if($period['description'])
 			{
-				$post = strpos($period['code'], "EN");
+				//custom stuff for grimwade
+				if ($_SESSION['campus'][0] == 3 && SITE_location == 'mgs')
+				{
+					$post = strpos($period['code'], "EN");
+						
+					if ($post == 2)
+					{
+						$this->setVar('PERIOD_DESC', 'Homeroom');
+						$this->setVar('PERIOD_CODE','');
+						$this->setVar('PERIOD_ROOM','');
+					}
+					else
+					{
+						$this->setVar('PERIOD_DESC', $period['description']);
+						$this->setVar('PERIOD_CODE','');
+						$this->setVar('PERIOD_ROOM',$period['room']);
+					}
 					
-				if ($post == 2)
-				{
-					$this->setVar('PERIOD_DESC', 'Homeroom');
-					$this->setVar('PERIOD_CODE','');
-					$this->setVar('PERIOD_ROOM','');
+					$this->setVar('PERIOD_ABSENTEES','');
 				}
-				else
+				else if($_SESSION['campus'][0] == 2 && SITE_location == 'wenona')
 				{
-					$this->setVar('PERIOD_DESC', $period['description']);
-					$this->setVar('PERIOD_CODE','');
+						$this->setVar('PERIOD_DESC', $period['description']);
+						$this->setVar('PERIOD_CODE','');
+						$this->setVar('PERIOD_ROOM',$period['room']);
+						$this->setVar('PERIOD_ABSENTEES','');
+				}
+				else 
+				{
+					$this->setVar('PERIOD_DESC', "<a 
+	href=\"/homepage.php?code=".urlencode($period['code'])."\">{$period['description']}</a>");
+					$this->setVar('PERIOD_CODE','('.$period['code'].')');
 					$this->setVar('PERIOD_ROOM',$period['room']);
-				}
-				
+					
+					//only show attendances to staff at mgs
+					if(isStaff($_SESSION['gid']) && SITE_location == 'mgs')
+						$this->setVar('PERIOD_ABSENTEES',"<br /><a href=\"/absentees/attendances.php?code=".$period['code']."\">attendances</a>");
+					else
+						$this->setVar('PERIOD_ABSENTEES','');
+						
+				}		
+			
+			}
+			else
+			{
+				$this->setVar('PERIOD_DESC','');
+				$this->setVar('PERIOD_CODE','');
+				$this->setVar('PERIOD_ROOM','');
 				$this->setVar('PERIOD_ABSENTEES','');
+				$this->setVar('PERIOD_ONCLICK','');
 			}
-			else if($_SESSION['campus'][0] == 2 && SITE_location == 'wenona')
-			{
-					$this->setVar('PERIOD_DESC', $period['description']);
-					$this->setVar('PERIOD_CODE','');
-					$this->setVar('PERIOD_ROOM',$period['room']);
-					$this->setVar('PERIOD_ABSENTEES','');
-			}
-			else 
-			{
-				$this->setVar('PERIOD_DESC', "<a 
-href=\"/homepage.php?code=".urlencode($period['code'])."\">{$period['description']}</a>");
-				$this->setVar('PERIOD_CODE','('.$period['code'].')');
-				$this->setVar('PERIOD_ROOM',$period['room']);
-				
-				//only show attendances to staff at mgs
-				if(isStaff($_SESSION['gid']) && SITE_location == 'mgs')
-					$this->setVar('PERIOD_ABSENTEES',"<br /><a href=\"/absentees/attendances.php?code=".$period['code']."\">attendances</a>");
-				else
-					$this->setVar('PERIOD_ABSENTEES','');
-					
-			}		
 		
+			if($period['periodNumber'] == $periodNum)
+				$this->setVar("TIMETABLE_CLASS", "current");
+			else 
+				$this->setVar("TIMETABLE_CLASS", "normal");
+		
+		
+			//output period block
+			$this->parse("timetable_header_block", "timetable_header", true);
+			$this->parse("timetable_period_block", "timetable_period", true);
+		} else {
+			$this->setVar("timetable_header_block", "");
+			$this->setVar("timetable_period_block", "");
 		}
-		else
-		{
-			$this->setVar('PERIOD_DESC','');
-			$this->setVar('PERIOD_CODE','');
-			$this->setVar('PERIOD_ROOM','');
-			$this->setVar('PERIOD_ABSENTEES','');
-			$this->setVar('PERIOD_ONCLICK','');
-		}
-	
-		if($period['periodNumber'] == $periodNum)
-			$this->setVar("TIMETABLE_CLASS", "current");
-		else 
-			$this->setVar("TIMETABLE_CLASS", "normal");
-	
-	
-		//output period block
-		$this->parse("timetable_header_block", "timetable_header", true);
-		$this->parse("timetable_period_block", "timetable_period", true);
-	} else {
-		$this->setVar("timetable_header_block", "");
-		$this->setVar("timetable_period_block", "");
-	}
-} 
-$this->parse("timetable_block", "timetable");
+	} 
+	$this->parse("timetable_block", "timetable");
+}
+else
+	$this->setVar("timetable_block", "");
 ?>

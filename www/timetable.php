@@ -141,6 +141,8 @@ class Timetable
 			$this->t_body->set_var('period_listing', '');
 			$this->t_body->set_var("day_header_listing", '');
 		}
+		else 
+			$this->t_body->set_var("timetable_listing", "");
 			
 	}
 	
