@@ -301,7 +301,7 @@ class Template {
 
     if (!isset($this->file[$handle])) {
       $this->halt("loadfile: $handle is not a valid handle.");
-      return false;
+	  return false;
     }
     $filename = $this->file[$handle];
 

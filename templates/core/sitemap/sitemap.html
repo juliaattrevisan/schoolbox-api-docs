@@ -1,12 +1,14 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/mootools.js"></script>
 <script type="text/javascript" src="/javascript/behaviour.js"></script>
 <script type="text/javascript" src="/javascript/rightcontext.js"></script>
 <script type="text/javascript" src="/javascript/sitemap.js"></script>
+<script type="text/javascript" src="/javascript/windoo/windoo.svn.js"></script>
 
 <link rel="stylesheet" type="text/css" media="screen" href="/css/sitemap.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/rightcontext.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/windoo/windoo.alphacube.css" />
+
 <!-- END custom_head -->
 
 
@@ -68,8 +70,9 @@
 			   
 			   {type: RightContext.TYPE_SEPERATOR },
 				
-					{type:RightContext.TYPE_TEXT_EXT,
-				url:"http://portal.lektec.com.au/sitemap/details/[afileid]"
+			   {type:RightContext.TYPE_MENU,
+			   	text:"Properties",
+				onclick:function(e) { Sitemap.openDetails([afileid], e); }
 				}]
 	};			   
 	

@@ -38,14 +38,15 @@ $categoryID = $_SESSION['smCategory'] = is_numeric($categoryID) ? $categoryID : 
 
 $this->setVar("CID", $categoryID);
 
+require_once '../library/category.php';
+$categoryHandler = new Category;
+
 // build categoryID array
 $categoryIDList = array ($categoryID);
 $parent = $categoryID;
 while ($parent > 0) {
 	
-	$query = "SELECT parent FROM category WHERE id = $parent";
-	$category = $this->db->getRow($query);
-	$parent = $category['parent'];
+	$parent = $categoryHandler->getParent($parent);
 	array_push($categoryIDList, (int)$parent);
 } 
 
@@ -80,13 +81,13 @@ function getCategoryHTML($categoryIDList) {
 		$categoryIDList = array($categoryIDList);
 	}
 	
+	require_once '../library/category.php';
+	$categoryHandler = new Category;	
+	
 	for ($i = 0; $i < count($categoryIDList); $i++) {
-		
-		$query = "SELECT id, name, code, template,
-				  (SELECT count(*) FROM category WHERE parent = c.id) as children
-				  FROM category c
-				  WHERE parent = ".$categoryIDList[$i]." ORDER BY name";	
-		$catList = $page->db->getAll($query);
+
+
+		$catList = $categoryHandler->getCategoryList($categoryIDList[$i]);
 
 		$page->setVar('category_block', '');
 		$page->setVar('category_window_block', '');
@@ -129,19 +130,11 @@ function getFileHTML($categoryID) {
 	$page->setBlock('blockBODY', 'file', 'file_block');
 	
 	global $openPerm;
+
+	require_once '../library/file.php';
+	$fileHandler = new File;		
 	
-	$query = "SELECT file.id, realname, '' as url, file_size, file.description, iconFile, 
-					allowedFileTypes.description as mime_description, inline, hidden, 'N' is_url
-			  FROM file 
-			  LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
-			  WHERE file.category = " . $categoryID . " AND deleted = '0'
-			  
-			  UNION SELECT link.id, '', link.url, '', link.description, 'http-url.png', link.comment, '', hidden, 'Y' is_url
-			  FROM link
-			  WHERE link.category = " . $categoryID . "
-			  
-			  ORDER BY description";
-	$fileList = $page->db->getAll($query);
+	$fileList = $fileHandler->getAllInCategory($categoryID);
 	
 	if (is_array($fileList)) {
 		foreach ($fileList as $file) {
@@ -221,19 +214,28 @@ function getFileHTML($categoryID) {
 
 function outputDetails ($fileID) {
 
+	require_once '../library/file.php';
+	$fileHandler = new File;
+
 	$page = new SitePage();
 	$page->setFile('blockBODY', 'sitemap/sitemap_block.html');
 	$page->setBlock('blockBODY', 'file_details', 'file_details_block');
 
-	$query = "SELECT f.comment, UNIX_TIMESTAMP(f.submitted) submitted, concat(substring(u.firstname,1,1),' ',u.lastname) owner
-			  FROM file f
-			  LEFT JOIN user u ON u.id = f.id 
-			  WHERE f.id = $fileID";
-	$file = $page->db->getRow($query);
+	$file = $fileHandler->getByID($fileID);
 	
-	$output = array ('COMMENT'	=> $file['comment'],
+	$output = array ('FILE_ID'	=> $file['id'],
+					 'CATEGORY'	=> $file['categoryName'],
+					 'OWNER'	=> $file['ownerName'],
+					 'REALNAME'	=> $file['realname'],
+					 'OWNER'	=> $file['ownerName'],
 					 'CREATED'	=> date("M j y @ g:iA", $file['submitted']),
-					 'OWNER'		=> $file['owner'],
+					 'DESCRIPTION'	=> scrubText($file['description']),
+					 'COMMENT'	=> scrubText($file['comment']),
+					 'TYPE'		=> $file['typName'],
+					 'SIZE'		=> $file['file_size'],
+					 'MIME_TYPE'	=> $file['miem_type'],
+					 'HIDDEN'	=> $file['hidden'] > 0 ? 'Yes' : 'No',
+					 'OWNER'	=> $file['ownerName'],
 					 );
 	$page->setVar($output);
 	

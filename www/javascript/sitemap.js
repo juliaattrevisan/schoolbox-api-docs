@@ -110,7 +110,6 @@ var Sitemap = {
 
 		//Sitemap.addDrag();
 		
-		
 	},
 	getFiles: function(catID) {
 		
@@ -142,25 +141,39 @@ var Sitemap = {
 		
 
 	},
-	openDetails: function (fileID) {
-		
+	openDetails: function (fileID, e) {
 		var url = '/sitemap/details/' + fileID;
 	
+		var win = new Windoo({
+			resizable: false,
+			destroyOnClose: false,
+			title: 'Properties',
+			width: 300,
+			height: 350,
+			theme: Windoo.Themes.alphacube
+		});
+
+		// clear window content, display loading icon and ensure window is shown
+		win.setHTML('<div><img src="/images/sitemap/loading.gif" class="loading" alt="loading..."/></div>').show();
+
+		// send ajax request
+		new Windoo.Ajax(url, {
+			evalScripts: true,
+			window: win
+		}).request();
+
+/*
 		var myAjax = new Ajax(url, {
 								method: 'get', 
 								onSuccess: function () {
-									Sitemap.showDetails(this.response.text, fileID);
+									Sitemap.showDetails(this.response.text, fileID, e);
 								}
 								}).request();		
+	*/
 	},
-	showDetails: function (data, fileID) {
-		
-		var div = document.createElement('div');
-		div.innerHTML = data;
-		div.id = 'details_' + fileID;
-		div.setAttribute('class', 'sitemap-details');
-				
-		document.body.appendChild(div);
+	showDetails: function (data, fileID, e) {
+
+
 
 	},
 	addDrag: function () {

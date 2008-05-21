@@ -78,8 +78,10 @@ class SitePage extends Page {
 		$this->parse('MAIN_NAV_REGION', 'navTpl');
 		$this->parse('MAIN_CONTENT_REGION', TEMPLATE_content);
 		
-		$this->setVar('CUSTOM_HEADER_REGION', $this->getVar('custom_head'));
-			
+		if ($this->getVar('custom_head'))
+			$this->parse('CUSTOM_HEADER_REGION', 'custom_head');
+		else
+			$this->setVar('CUSTOM_HEADER_REGION', '');	
 	}
 	
 	function setTab($tab) {
