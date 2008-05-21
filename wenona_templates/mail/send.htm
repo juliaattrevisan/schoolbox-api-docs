@@ -139,9 +139,22 @@ function verify()
 			</div><!-- #EndLibraryItem --><!-- #EndEditable --> 
 	<div id="content"> 
 		<div id="content_text"> <!-- #BeginEditable "main" --> 
-           <h1>Compose Message</h1> 
+          	<h1>Compose Email</h1> 
 			<form class="standardForm" action="send.php" method="post" enctype="multipart/form-data" name="mailForm" id="mailForm"> 
 				<table> 
+					<tr> 
+						<td><h2>To:</h2></td> 
+						<td><input type="text" name="to" size="50" value="{REPLYTO}" /> 
+							<a href="/search/userLookup.php">address book</a></td> 
+					</tr> 
+					<tr> 
+						<td><h2>CC:</h2></td> 
+						<td> <input type="text" name="cc" size="50" /> </td> 
+					</tr> 
+					<tr> 
+						<td><h2>BCC:</h2></td> 
+						<td> <input type="text" name="bcc" size="50" value="{BCC}" /> </td> 
+					</tr> 
 					<tr> 
 						<td><h2>Subject:</h2></td> 
 						<td><input type="text" name="subject" size="60" value="{SUBJECT}" /></td> 
@@ -163,10 +176,7 @@ function verify()
 					</tr> 
 					<tr> 
 						<td>&nbsp;</td> 
-						<td>
-						<input type="hidden" name="to" value="{REPLYTO}" />
-						<input type="submit" name="submit" value="Send" />
-						</td> 
+						<td><input type="submit" name="submit" value="Send" /></td> 
 					</tr> 
 				</table> 
 			</form> 

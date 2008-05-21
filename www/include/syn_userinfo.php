@@ -22,12 +22,12 @@ function getStudentInfo($synID)
 				vStudents.StudentTutorName, vStudents.StudentHeadOfHouse, vStudents.StudentFormStaffName, vStudents.StudentTutorDescription,
 				luForm.ID as TeacherFormID, vStudents.StudentForm, luTutor.ID as TeacherTutorID, vStudents.StudentTutor, 
 				vStudents.StudentHouseDescription, vStudents.StudentHouse, vStudents.StudentYearLevel, vStudents.StudentLockerBook,
-				vStudents.StudentEmergencyName, vStudents.StudentEmergencyPhone, vStudents.StudentEmergencyPhoneAlt,
-				contactDetails.StudentContactTitle, contactDetails.StudentContactPreferred, contactDetails.StudentContactSurname,
+				vStudents.StudentEmergencyName, vStudents.StudentEmergencyPhone, vStudents.StudentEmergencyPhoneAlt, vStudents.StudentMedicalAlert,
+				contactDetails.StudentContactTitle, contactDetails.StudentContactPreferred, contactDetails.StudentContactSurname, contactDetails.StudentContactDefaultEmail,
 				contactDetails.StudentContactAddress1, contactDetails.StudentContactSuburb, contactDetails.StudentContactPostCode, contactDetails.StudentContactState,
 				contactDetails.StudentContactPhoneActual, contactDetails.StudentContactMobilePhone, contactDetails.StudentContactOccupPhone,
 				contactDetails.StudentContactSpouseTitle, contactDetails.StudentContactSpousePreferred, contactDetails.StudentContactSpouseSurname,
-				contactDetails.StudentContactSpouseMobilePhone, contactDetails.StudentContactSpouseOccupPhone
+				contactDetails.StudentContactSpouseMobilePhone, contactDetails.StudentContactSpouseOccupPhone,contactDetails.StudentContactSpouseDefaultEmail
 		FROM 
 				SynergyOne.dbo.vStudentContactAllAddress contactDetails, 
 				SynergyOne.dbo.vStudents vStudents,
@@ -134,7 +134,7 @@ function getEnrolledStudents($synergyID)
 			Relationships.ID = $synergyID AND 
 			Constituencies.ConstitCode='@SC'
 			AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD')";
-				
+
 	$result = @mssql_query( $query);
 	if($result !== FALSE && $result !== TRUE)
 	{

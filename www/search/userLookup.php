@@ -18,20 +18,24 @@ class outUser
 		$db = new dbManager;
 		
 		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, extension, 
-					synergy_id, local_email, alt_email
-				FROM (user, groups) LEFT JOIN ph_ext ON user.id = ph_ext.owner
+					synergy_id, local_email, alt_email, userCampus.campus
+				FROM user 
+					LEFT JOIN groups ON user.group_id = groups.id
+					LEFT JOIN userCampus ON user.id = userCampus.uid
+					LEFT JOIN ph_ext ON user.id = ph_ext.owner
 				WHERE user.group_id = groups.id AND user.id = '$id'";
-		$user = $db->getRow($query);
+		$user = $db->dbGetSingleRow($query);
 		
 		//fill out all fields
 		$this->t_body->set_var('NAME', formatName($user));
 		$this->t_body->set_var('ID', $id);
+		$this->t_body->set_var('CAMPUS_ID', $user['campus']);
 		
 		$emailAddress = formatEmail($user);
 		
 		if($emailAddress) {
-			if(SITE_location == 'wenona' )
-				$email = '<a href="'.$_SESSION['mailhandle'].$id."\">Send Message</a>";
+			if(SITE_location == 'wenona')
+				$email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">Send Email</a>";
 			else
 				$email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$emailAddress</a>";
 		}
@@ -51,12 +55,14 @@ class outUser
 		$this->t_body->set_var("SYNERGY_ID", $user['synergy_id']);
 		
 		$this->t_body->set_block("tplBODY", "portrait", "portrait_block");
+		$this->t_body->set_block("tplBODY", "school_links", "school_links_block");
 		$this->t_body->set_block("tplBODY", "timetable_link", "timetable_link_block");
 		$this->t_body->set_block("tplBODY", "due_work", "due_work_block");
 		$this->t_body->set_block("tplBODY", "helpdesk", "helpdesk_block");
 		$this->t_body->set_block("tplBODY", "student_synergy_form", "student_synergy_form_block");
 		$this->t_body->set_block("tplBODY", "student_synergy_tutor", "student_synergy_tutor_block");
 		$this->t_body->set_block("tplBODY", "contact_synergy", "contact_synergy_block");
+		$this->t_body->set_block("tplBODY", "medical", "medical_block");
 		
 		//advanced synergetic information
 		if(SYNERGY_enable)
@@ -81,13 +87,13 @@ class outUser
 						$this->t_body->set_var("helpdesk_block", "");
 							
 					$synInfo = getStudentInfo($user['synergy_id']);
-					
-					list($date, $month, $year) = explode(' ', $synInfo['StudentBirthDate']);
-					$birthdate = strtotime($date.' '.$month.' '.$year);
-					
+				
+					preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $synInfo['StudentBirthDate'], $matches);
+					$birthdate = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
+
 					if($synInfo['StudentFormStaffName'] && $synInfo['TeacherFormID']) {
 						$query = "SELECT title, firstname, lastname, username, local_email, alt_email FROM user WHERE synergy_id = {$synInfo['TeacherFormID']}";
-						$form = $db->getRow($query);
+						$form = $db->dbGetSingleRow($query);
 						if($formEmail = formatEmail($form))
 							$formTeacher = '<a href="'.$_SESSION['mailhandle'].$formEmail.'">'.scrubTEXT($synInfo['StudentFormStaffName']).'</a>';
 						else
@@ -96,15 +102,26 @@ class outUser
 				
 					if($synInfo['StudentTutorName'] && $synInfo['TeacherTutorID']) {
 						$query = "SELECT title, firstname, lastname, username, local_email, alt_email FROM user WHERE synergy_id = {$synInfo['TeacherTutorID']}";
-						$tutor = $db->getRow($query);
+						$tutor = $db->dbGetSingleRow($query);
 						if($tutorEmail = formatEmail($tutor))
 							$tutorTeacher = '<a href="'.$_SESSION['mailhandle'].$tutorEmail.'">'.scrubTEXT($synInfo['StudentTutorName']).'</a>';
 						else
 							$tutorTeacher = scrubTEXT($synInfo['StudentTutorName']);
 					}
 					
-				
-				
+					if($synInfo['StudentContactDefaultEmail'])
+						$contactName = '<a href="'.$_SESSION['mailhandle'].$synInfo['StudentContactDefaultEmail'].'">'. 
+							scrubTEXT($synInfo['StudentContactTitle'].' '.$synInfo['StudentContactPreferred'].' '.$synInfo['StudentContactSurname']).'</a>';
+					else
+						$contactName = scrubTEXT($synInfo['StudentContactTitle'].' '.$synInfo['StudentContactPreferred'].' '.$synInfo['StudentContactSurname']);
+						
+					
+					if($synInfo['StudentContactSpouseDefaultEmail'])
+						$spouseName = '<a href="'.$_SESSION['mailhandle'].$synInfo['StudentContactSpouseDefaultEmail'].'">'. 
+							scrubTEXT($synInfo['StudentContactSpouseTitle'].' '.$synInfo['StudentContactSpousePreferred'].' '.$synInfo['StudentContactSpouseSurname']).'</a>';
+					else
+						$spouseName = scrubTEXT($synInfo['StudentContactSpouseTitle'].' '.$synInfo['StudentContactSpousePreferred'].' '.$synInfo['StudentContactSpouseSurname']);
+					
 					$output = array(	'TUTOR_GROUP' 			=> scrubTEXT($synInfo['StudentTutorDescription']),
 										'TUTOR'					=> $tutorTeacher,
 										'YEAR_LEVEL'			=> scrubTEXT($synInfo['StudentYearLevel']),
@@ -124,16 +141,26 @@ class outUser
 										'CONTACT_HOME_PHONE' 	=> scrubTEXT($synInfo['StudentContactPhoneActual']),
 										'CONTACT_MOBILE_PHONE' 	=> scrubTEXT($synInfo['StudentContactMobilePhone']),
 										'CONTACT_OCCUP_PHONE'	=> scrubTEXT($synInfo['StudentContactOccupPhone']),
+										'CONTACT_EMAIL'			=> $synInfo['StudentContactDefaultEmail'],
+										'CONTACT_NAME_EMAIL'	=> $contactName,
 										'SPOUSE_NAME'			=> scrubTEXT($synInfo['StudentContactSpouseTitle'].' '.$synInfo['StudentContactSpousePreferred'].' '.
 																$synInfo['StudentContactSpouseSurname']),
 										'SPOUSE_MOBILE_PHONE'	=> scrubTEXT($synInfo['StudentContactSpouseMobilePhone']),
 										'SPOUSE_OCCUP_PHONE'	=> scrubTEXT($synInfo['StudentContactSpouseOccupPhone']),
+										'SPOUSE_EMAIL'			=> $synInfo['StudentContactSpouseDefaultEmail'],
+										'SPOUSE_NAME_EMAIL'		=> $spouseName,
+										'MEDICAL_NOTE'			=> scrubTEXT($synInfo['StudentMedicalAlert']),
 									);
 					$this->t_body->set_var($output);
 					
 					$this->t_body->parse("contact_synergy_block", "contact_synergy");
 					
-					if($formTeacher) {
+					if(SITE_location == 'wenona')
+						$this->t_body->parse("school_links_block","school_links");
+					else
+						$this->t_body->set_var("school_links_block","");
+					
+					if($synInfo['StudentYearLevel'] < 7) {
 						$this->t_body->parse('student_synergy_form_block', 'student_synergy_form');
 						$this->t_body->set_var('student_synergy_tutor_block','');
 					}
@@ -141,14 +168,22 @@ class outUser
 						$this->t_body->parse('student_synergy_tutor_block','student_synergy_tutor');
 						$this->t_body->set_var('student_synergy_form_block','');
 					}
+					
+					if($synInfo['StudentMedicalAlert'])
+						$this->t_body->parse('medical_block', 'medical');
+					else 
+						$this->t_body->set_var('medical_block', '');
+		
 				}
 				else
 				{
 					$this->t_body->set_var("student_synergy_tutor_block", "");
 					$this->t_body->set_var("student_synergy_form_block", "");
+					$this->t_body->set_var("medical_block", "");
 					$this->t_body->set_var("contact_synergy_block", "");
 					$this->t_body->set_var("due_work_block", "");	
-					$this->t_body->set_var("helpdesk_block", "");	
+					$this->t_body->set_var("helpdesk_block", "");
+					$this->t_body->set_var("school_links_block","");
 				}
 			}
 			else
@@ -156,20 +191,24 @@ class outUser
 				$this->t_body->set_var("contact_synergy_block", "");
 				$this->t_body->set_var("student_synergy_tutor_block", "");
 				$this->t_body->set_var("student_synergy_form_block", "");
+				$this->t_body->set_var("medical_block", "");
 				$this->t_body->set_var("portrait_block", "");	
 				$this->t_body->set_var("timetable_link_block", "");
 				$this->t_body->set_var("due_work_block", "");	
 				$this->t_body->set_var("helpdesk_block", "");	
+				$this->t_body->set_var("school_links_block","");
 			}
 		}
 		else
 		{
 			$this->t_body->set_var("contact_synergy_block", "");
 			$this->t_body->set_var("student_synergy_block", "");
+			$this->t_body->set_var("medical_block", "");
 			$this->t_body->set_var("portrait_block", "");
 			$this->t_body->set_var("timetable_link_block", "");	
 			$this->t_body->set_var("due_work_block", "");	
-			$this->t_body->set_var("helpdesk_block", "");		
+			$this->t_body->set_var("helpdesk_block", "");
+			$this->t_body->set_var("school_links_block","");		
 		}
 		//display list of groups owner is in charge of so they can add the user
 		$this->t_body->set_block("tplBODY", "grouplist", "group_block");
@@ -178,11 +217,11 @@ class outUser
 			$query = "SELECT service, sid, category.name FROM userAccess, category 
 			WHERE sid = category.id AND uid = '".$_SESSION['id']."' AND type = '3'"; 
 			
-			$db->query($query);
-			if($db->countRows() > 0)
+			$db->dbDoQuery($query);
+			if($db->dbCountRows() > 0)
 			{
 				$this->t_body->set_var("GROUPTITLE", "Add to your group");
-				while($group = $db->getNextArray())
+				while($group = $db->dbGetNextArray())
 				{
 					$this->t_body->set_var("GROUP", 
 					"<a href=\"/group/modUserGroup.php?uid=$id&service=".$group['service']."
@@ -219,8 +258,8 @@ class outUser
 
 		$groupListHTML = "<option value=\"\"></option>";
 		$query = "SELECT * FROM groups ORDER BY name";
-		$db->query($query);
-		while($line = $db->getNextArray() )
+		$db->dbDoQuery($query);
+		while($line = $db->dbGetNextArray() )
 		{
 			$groupListHTML .= "<option value=\"".$line['id']."\">".$line['name']."</option>";
  		}
@@ -243,7 +282,7 @@ class outUser
 		{
 			$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, year, local_email, alt_email FROM user, groups 
 				WHERE user.group_id = groups.id AND user.id = '$user'";  
-			$userdetails = $db->getRow($query);
+			$userdetails = $db->dbGetSingleRow($query);
 			$this->t_body->set_var("FIRSTNAME", $userdetails['firstname']);
 			$this->t_body->set_var("LASTNAME", $userdetails['lastname']);
 			$this->t_body->set_var("YEAR", $userdetails['year']);
@@ -307,11 +346,11 @@ class outUser
 		$query .= "ORDER BY group_id, year, lastname, firstname"; 
 
 		$db = new dbManager();
-		$db->query($query);
+		$db->dbDoQuery($query);
 		//for each user put id in an array and return it.
-		if($db->countRows() > 0)
+		if($db->dbCountRows() > 0)
 		{
-			while($user = $db->getNextArray())
+			while($user = $db->dbGetNextArray())
 			{
 				$returnArray[] = $user['id'];
 			}

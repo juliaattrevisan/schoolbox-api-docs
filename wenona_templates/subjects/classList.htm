@@ -126,11 +126,26 @@
             <td><a href="/search/userLookup.php?id={ID}">{FIRSTNAME}</a></td>
             <td>{YEARLEVEL}</td>
             <td>{HOUSE}</td>
-            <td><a href="/mail/createMail.php?replyto={EMAIL_ADDRESS}">send message</a></td>
+            <td>{EMAIL}</td>
             <td>{LASTVISIT}</td>
           </tr>
           <!-- END student_list -->
         </tbody>
+       <thead>
+        <tr> 
+            <td>&nbsp;</td> 
+            <td>&nbsp;</td> 
+            <td>&nbsp;</td> 
+            <td>&nbsp;</td> 
+            <td><br /> 
+                <form action="/mail/createMail.php" method="post"> 
+                    <input type="hidden" name="replyto" value="{SUBJECTNAME} &lt;{REPLYTO}&gt;" /> 
+                    <input type="hidden" name="bcc" value="{CLASSEMAIL}" /> 
+                    <input class="btn" type="submit" name="emailall" value="Email Class" /> 
+                </form></td> 
+            <td>&nbsp;</td>
+        </tr> 
+        </thead>
       </table>
       <!-- #EndEditable --> </div> 
 	</div> 

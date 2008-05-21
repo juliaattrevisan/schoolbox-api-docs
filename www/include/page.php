@@ -31,13 +31,13 @@ else
             AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '".$_SESSION['gid']."')
           ORDER BY parent, sequence, txt";
 
-$db->query($query);
+$db->dbDoQuery($query);
 
 //initialise root of tree
 $list[0]['id'] = 0;
 
 //fetch each record and insert into tree
-while($menuitem = $db->getNextArray() )
+while($menuitem = $db->dbGetNextArray() )
 {
 	$list = insertChild($list, $menuitem);
 }
@@ -50,9 +50,9 @@ $this->t_body->set_var("MCSSMENU", outputMenu($list[0]['children'], 1));
 //setup block
 $this->t_body->set_block("tplBODY", "mlink_block", "my_links");
 $query = "SELECT url, description FROM bookmarks WHERE owner = '".$_SESSION['id']."'";
-$db->query($query);
-if($db->countRows() > 0){
-	while($link = $db->getNextArray()){
+$db->dbDoQuery($query);
+if($db->dbCountRows() > 0){
+	while($link = $db->dbGetNextArray()){
 		if(isLocalURL($link['url'])){
 			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\">".scrubTEXT($link['description'])."</a>");	
 		}else{
@@ -75,11 +75,11 @@ $query = "SELECT category.name, userAccess.sid, userAccess.type
 		  AND userAccess.type > 0	
 		  AND category.template <> 0
 	";
-$db->query($query);
-if($db->countRows() > 0)
+$db->dbDoQuery($query);
+if($db->dbCountRows() > 0)
 {
 
-	while($group = $db->getNextArray())
+	while($group = $db->dbGetNextArray())
 	{
 			$this->t_body->set_var("MGNAME", scrubTEXT($group['name']));
 			$this->t_body->set_var("MGID", $group['sid']);	
@@ -122,7 +122,7 @@ if(is_array($_SESSION['children']))
 	foreach($_SESSION['children'] as $child)
 	{
 		$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
-		$user = $db->getRow($query);
+		$user = $db->dbGetSingleRow($query);
 		$this->t_body->set_var("MSTUDENT_ID", $child['id']);
 		$this->t_body->set_var("MSTUDENT_NAME", formatName($user,'{firstname}'));
 		$this->t_body->set_var("MSTUDENT_YEAR", $user['year']);
@@ -148,7 +148,7 @@ else
 // if configuration states mail is available and user has access to local mail account display it
 $this->t_body->set_block('tplBODY', 'webmail_tab', 'wm_tab');
 
-if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && isStaff($_SESSION['gid'])) || SITE_location == 'ormond')
+if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && (isStaff($_SESSION['gid']) || isStudent($_SESSION['gid']))) || SITE_location == 'ormond')
 {
 	$this->t_body->parse('wm_tab','webmail_tab');
 	
@@ -164,15 +164,9 @@ if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && is
 		$this->t_body->set_var('WEBMAIL_LOCATION', 'href="/mail.php"');
 	}
 	else if(SITE_location == 'wenona') {
-		if(isStaff($_SESSION['gid'])) {
-			$this->t_body->set_var('WEBMAIL_LOCATION', 'href="http://webmail.wenona.nsw.edu.au/gw/webacc" target="_blank"');
-			$this->t_body->set_var('WEBMAIL_TITLE', '<em>W</em>ebmail');
-		}
-		else {
-			$this->t_body->set_var('WEBMAIL_LOCATION', 'href="/mail.php"');
-			$this->t_body->set_var('WEBMAIL_TITLE', 'Messages');
+		$this->t_body->set_var('WEBMAIL_LOCATION', 'href="http://webmail.wenona.nsw.edu.au/gw/webacc" target="_blank"');
+		$this->t_body->set_var('WEBMAIL_TITLE', '<em>W</em>ebmail');
 
-		}
 	}
 }
 else

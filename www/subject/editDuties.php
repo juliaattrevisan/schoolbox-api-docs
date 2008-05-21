@@ -63,7 +63,7 @@ class editDuties
 		include_once("../include/page.php");
 		//$sql = "SELECT * FROM duty where date = now() AND cid = ".$this->category ;
 		$sql = "SELECT l.*, d.user, d.date, d.cid FROM luDuties l LEFT JOIN duty d ON l.dutyTypeID = d.dutyTypeID and d.date = '".$queryDate."' where l.cid = ".$this->category ;
-		$this->db->query($sql);
+		$this->db->dbDoQuery($sql);
 		$i = 0;
 		$this->t_body->set_var("DATE", date('l, jS \of F', $currentDate));
 		$this->t_body->set_var("QDATE", $queryDate);
@@ -71,7 +71,7 @@ class editDuties
                                 "&Month=".date("m",$currentDate)."&Day=".date("d", $currentDate) );
 		$this->t_body->set_var("TITLE", HEADING." - Duty Editor");
 		$this->t_body->set_var("CID", $this->category );
-		while($row = $this->db->getNextArray())
+		while($row = $this->db->dbGetNextArray())
 		{
 			if($row['user'] == ""){$update = 'false';}else{$update = 'true';}
 			
@@ -107,12 +107,12 @@ class editDuties
 				{	
 					$sql = "UPDATE duty SET user = '$user' 
 						where cid = '".$this->category."' and date = '".$queryDate."' and dutyTypeID = '$dutyTypeID'";
-					$this->db->query($sql);			
+					$this->db->dbDoQuery($sql);			
 				}
 				else
 				{	
 					$sql = "INSERT INTO duty(cid, date, dutyTypeID, user) VALUES('$this->category','$queryDate','$dutyTypeID','$user')";
-					$this->db->query($sql);
+					$this->db->dbDoQuery($sql);
 				}				
 			}
 		}
@@ -123,42 +123,32 @@ class editDuties
 			return false;
 			
 		$handle = fopen($_FILES['file']['tmp_name'], "r");
-		$column = array();
-		$i = 0;
 
-		while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-			if ($i == 0) {
-				foreach ($data as $date) {
-					list($day, $month, $year) = explode("/", $date);
-					if ($day)
-						$column[] = $year . '-' . $month . '-' . $day;
-					else
-						$column[] = '';
-				}
-				
-				$length = count($data);
-				
-			} else {
-				
-				for ($j=0; $j < $length; $j++) {
-					if (!empty($column[$j]) && !empty($data[$j])) {
-						$sql = "SELECT dutyID FROM duty WHERE date = '" . $column[$j] . "' AND dutyTypeID = $i";
-						$duty = $this->db->getRow($sql);
-						if (isset($duty['dutyID'])) {
-							$sql = "UPDATE duty SET ";
-							$where = " WHERE dutyID = " . $duty['dutyID'];
-						} else
-							$sql = "INSERT INTO duty SET ";
-							
-						$sql .= "cid = '".$this->category."', date = '" . $column[$j] . "', dutyTypeID = '" . $i . "', user = '" . $data[$j] . "'" . $where;
-						
-						$this->db->query($sql);
-					}
-				}
-							
-			}
+		while (($data = fgetcsv($handle, 4000, ",")) !== FALSE) {
 			
-			$i++;
+			list($day, $month, $year) = explode("/", $data[0]);
+			if($day)
+				$date = $year . '-' . $month . '-' . $day;
+			else
+				$date = '';
+			
+			
+			$length = count($data);
+			for ($j=0; $j < $length; $j++) {
+				if ($date && !empty($data[$j+1])) {
+					$sql = "SELECT dutyID FROM duty WHERE date = '" . $date . "' AND dutyTypeID = ".($j+1);
+					$duty = $this->db->dbGetSingleRow($sql);
+					if (isset($duty['dutyID'])) {
+						$sql = "UPDATE duty SET ";
+						$where = " WHERE dutyID = " . $duty['dutyID'];
+					} else {
+						$sql = "INSERT INTO duty SET ";
+						$where = '';
+					}
+					$sql .= "cid = '".$this->category."', date = '" . $date . "', dutyTypeID = '" . ($j+1) . "', user = '" . $data[$j+1] . "'" . $where;
+					$this->db->dbDoQuery($sql);
+				}
+			}
 		}
 		
 		

@@ -421,12 +421,7 @@ class OutPut
 					$teacher=$this->db->getRow($query);
 					if(is_array($teacher)) {
 						$name = formatName($teacher);
-			
-						if(SITE_location == 'wenona')
-							$this->t_body->set_var("MEMBER_NAME", $name);
-						else 
-							$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$teacher['id']}\">{$name}</a>");
-							
+						$this->t_body->set_var("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$teacher['id']}\">{$name}</a>");
 						$this->t_body->parse("staff_teacher_block", "staff_teachers", true);	
 					}
 				}

@@ -15,8 +15,13 @@ class customise
 {
 	function customise($cid)
 	{
-		$this->db = new dbManager;	
 		$this->cid = $cid;
+		$this->perm = perm($this->cid, HOMEPAGESERVICE);
+		if($this->perm < 2) 
+			error(14);
+		
+		$this->db = new dbManager;	
+		
 	}
 
 	function displayCustomisePage()
@@ -100,8 +105,8 @@ class customise
 	{
 			//returns the current template
 			$query = "SELECT template FROM homepage_config WHERE cid = '".$this->cid."'";
-			$this->db->query($query);
-			$temparray = $this->db->getNextArray();
+			$this->db->dbDoQuery($query);
+			$temparray = $this->db->dbGetNextArray();
 			$template = $temparray['template'];
 			return $template;
 	}
@@ -115,14 +120,14 @@ class customise
 		else
 			$query = "SELECT id, name, description FROM homepage_comp WHERE invisible = 'false' ORDER BY name";
 
-		return $this->db->getAll($query); 
+		return $this->db->dbGetAllRows($query); 
 	}
 	
 	// For retrieving selected colors
 	function getColorList()
 	{
 		$query = "SELECT large_head_fontcolour, large_head_bgcolour, large_text_fontcolour, large_text_bgcolour, small_head_fontcolour, small_head_bgcolour, small_text_fontcolour, small_text_bgcolour FROM homepage_config WHERE cid = '{$this->cid}'";
-		return $this->db->getRow($query); 
+		return $this->db->dbGetSingleRow($query); 
 	}
 }
 	
