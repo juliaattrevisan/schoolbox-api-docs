@@ -132,11 +132,25 @@ function getFileHTML($categoryID) {
 	global $openPerm;
 
 	require_once '../library/file.php';
-	$fileHandler = new File;		
+	require_once '../library/link.php';
+	$fileHandler = new File;
+	$linkHandler = new Link;		
 	
 	$fileList = $fileHandler->getAllInCategory($categoryID);
+	$linkList = $linkHandler->getAllInCategory($categoryID);
+	
 	
 	if (is_array($fileList)) {
+		if (is_array($linkList)) {
+			$fileList = array_merge($fileList, $linkList);
+		
+			foreach ($fileList as $row) {
+				$arrayOut[$row['description']]  = $row;
+			}
+			ksort($arrayOut);
+			$fileList =& $arrayOut;
+		}
+	
 		foreach ($fileList as $file) {
 			
 			if ($file['hidden'] > 0 && $openPerm < 2) continue;
@@ -144,10 +158,10 @@ function getFileHTML($categoryID) {
 			$output = array('FILE_ID' 	 	=> $file['id'],
 							'FILE_NAME' 	=> scrubText($file['description']),
 							'FILE_ICON' 	=> !is_null($file['iconFile']) ? "/images/mime/".$file['iconFile'] : "/images/mime/application-x-none.png",
-							'FILE_ALT'  	=> !is_null($file['mime_description']) ? $file['mime_description'] : "File",
-							'CAT_ID'	 	=> $parent,
+							'FILE_ALT'  	=> !is_null($file['mime_description']) ? $file['mime_description'] : $file['comment'],
+							'CAT_ID'	 	=> $file['category'],
 							'FILE_INLINE' 	=> $file['inline']=='true'?"Y":"N",
-							'URL_YN'	 	=> $file['is_url'],
+							'URL_YN'	 	=> $file['url'] ? "Y":"N",
 							'HIDDEN'	 	=> $file['hidden'] > 0 ? "style='opacity: 0.55;'" : "",
 							'FILE_LINK' 	=> urlencode($file['url']),
 							);

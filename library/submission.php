@@ -11,5 +11,26 @@ class Submission extends Model {
 		
 		parent::Model();
 	}
+	
+	function getAllForCategory($categoryID, $limit = 0) {
+		$query = "SELECT sb.id, sb.category, ft.name as typeName, sb.owner,
+				  UNIX_TIMESTAMP(sb.open_date) AS open,
+				  UNIX_TIMESTAMP(sb.date) AS date,
+				  UNIX_TIMESTAMP(sb.late_date) AS late,
+				  f.id fileID, sb.description, sb.created, ss.id studentWork, af.inline
+					
+				  FROM submission_box sb
+				  LEFT JOIN  file f ON sb.fid = f.id AND f.deleted = '0'
+				  LEFT JOIN allowedFileTypes af ON f.mime_type = mime
+				  LEFT JOIN student_submission ss ON ss.box_id = sb.id AND ss.owner = '" . $_SESSION['id'] . "'
+				  LEFT JOIN file_type ft ON sb.type = ft.id
+
+				  WHERE sb.category = '".$categoryID."' AND sb.deleted = '0' 
+				  ORDER BY sb.date DESC";
+		if ($limit > 0)
+			$query .= " LIMIT 0, $limit";
+			
+		return $this->db->getAll($query);
+	}
 }
 ?>
