@@ -1,92 +1,57 @@
 <?php
 		//assignment
 		$this->setBlock($componentHandle, "assign", "assign_block");
-
-		if(isStudent($_SESSION['gid']))
-		{
-			$query = "
-			SELECT file.id, file.description, file.realname, file.comment, 
-				DATE_FORMAT(submission_box.date, '%D %b') AS date, 
-				UNIX_TIMESTAMP(submission_box.late_date) AS late, 
-				UNIX_TIMESTAMP(submission_box.open_date) AS open,
-				submission_box.id AS box_id, student_submission.owner, inline
-			FROM file 
-				LEFT JOIN allowedFileTypes ON file.mime_type = mime 
-				LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0'
-				LEFT JOIN student_submission ON  student_submission.box_id = submission_box.id 
-					AND student_submission.owner = '".$_SESSION['id']."'
-			WHERE file.category = '".$categoryID."' AND submission_box.type = '2' AND file.deleted = '0'
-			ORDER BY submission_box.date DESC";
-		}
-		else
-		{
-			$query = "
-			SELECT file.id, file.description, file.comment, 
-				DATE_FORMAT(submission_box.date, '%D %b') AS date, 
-				submission_box.id AS box_id, submission_box.owner, file.realname, inline 
-			FROM file 
-				LEFT JOIN allowedFileTypes ON mime_type = mime
-				LEFT JOIN submission_box ON file.id = submission_box.fid AND submission_box.deleted = '0' 
-			WHERE file.category = '".$categoryID."' AND submission_box.type = '2' AND file.deleted = '0'
-			ORDER BY submission_box.date DESC";
-		}
-
-		//if no size make unlimited query else make it limited by size
-		if($config['size'] != 0 && $config['size'] != '') 
-			$query .= " LIMIT 0, {$config['size']}"; 
+		
+		require_once '../library/submission.php';
+		$submissionHandler = new Submission;
+		$assignmentList = $submissionHandler->getAssignments($categoryID, $config);
+		
+		if (is_array($assignmentList)) {
+			foreach ($assignmentList as $assignment) {
 
 
-		$this->db->query($query);
-
-		if($this->db->countRows() < 1 ){$this->setVar("assign_block", "");}
-		else
-		{
-			while($queryArray = $this->db->getNextArray() )
-			{
-
-
-
-						if($queryArray['date'])
-							$date = $queryArray['date'];
-						else
-							$date = "No date";
+				if($assignment['date'])
+					$date = outputDate("jS M", $assignment['date']);
+				else
+					$date = "No date";
+		
+				//if staff or student is enrolled and there is work due provide a link
+				if($enroled)
+				{
+					if(isStudent($_SESSION['gid']) && $assignment['owner']=='' && $assignment['late'] > date('U') && $assignment['open'] < date('U')) //student
+						$dueDate = '<a href="/submission/submitWork.php?box_id='.$assignment['box_id'].'">'.$date.'</a>';
+					else if(isStaff($_SESSION['gid']) && $assignment['owner'] == $_SESSION['id']) //if staff owns box provide link
+						$dueDate = '<a href="/submission/viewSubmission.php?box_id='.$assignment['box_id'].'">'.$date.'</a>';
+					else
+						$dueDate = $date;
+				}
+				else
+					$dueDate = $date;
+					
+					$this->setVar("ASS_DATE", $dueDate);
+		
+				//set name
+				if($assignment['realname'] != "")
+				{
+					if($assignment['inline'] == 'true')
+						$url = "<a href=\"sendframe.php?id=".$assignment['id']."\" target=\"_blank\">".scrubTEXT($assignment['description'])."</a>";
+					else
+						$url = "<a href=\"send.php?id=".$assignment['id']."\">".scrubTEXT($assignment['description'])."</a>";
+		
+					$this->setVar("ASS_NAME", $url);
+				}
+				else
+					$this->setVar("ASS_NAME", scrubTEXT($assignment['description']));
 				
-						//if staff or student is enrolled and there is work due provide a link
-						if($enroled)
-						{
-							if(isStudent($_SESSION['gid']) && $queryArray['owner']=='' && $queryArray['late'] > date('U') && $queryArray['open'] < date('U')) //student
-								$dueDate = '<a href="/submission/submitWork.php?box_id='.$queryArray['box_id'].'">'.$date.'</a>';
-							else if(isStaff($_SESSION['gid']) && $queryArray['owner'] == $_SESSION['id']) //if staff owns box provide link
-								$dueDate = '<a href="/submission/viewSubmission.php?box_id='.$queryArray['box_id'].'">'.$date.'</a>';
-							else
-								$dueDate = $date;
-						}
-						else
-							$dueDate = $date;
-							
-							$this->setVar("ASS_DATE", $dueDate);
-				
-						//set name
-						if($queryArray['realname'] != "")
-						{
-							if($queryArray['inline'] == 'true')
-								$url = "<a href=\"sendframe.php?id=".$queryArray['id']."\" target=\"_blank\">".scrubTEXT($queryArray['description'])."</a>";
-							else
-								$url = "<a href=\"send.php?id=".$queryArray['id']."\">".scrubTEXT($queryArray['description'])."</a>";
-				
-							$this->setVar("ASS_NAME", $url);
-						}
-						else
-							$this->setVar("ASS_NAME", scrubTEXT($queryArray['description']));
-						
-						$this->setVar("ASS_COMMENT", nl2br(scrubTEXT($queryArray['comment'])));
-				
-						$this->parse("assign_block", "assign", true);
+				$this->setVar("ASS_COMMENT", nl2br(scrubTEXT($assignment['comment'])));
+		
+				$this->parse("assign_block", "assign", true);
 
 
 
 			}
-		}
+		} else
+			$this->setVar("assign_block", "");
 
 		//setup block for submission button
 		$this->setBlock($componentHandle, "submit_ass", "submit_ass_block");

@@ -7,7 +7,7 @@
 //calendar object.. controls calendar events and display
 
 require_once '../include/stdfuncs.php';
-localRedir('/calendar/week');
+localRedir('/calendar/week/' . $_GET['Day'] . '-' . $_GET['Month'] . '-' . $_GET['Year']);
 
 require_once("../include/include.php");
 require_once("../include/session.php");

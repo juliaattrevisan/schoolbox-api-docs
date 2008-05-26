@@ -22,7 +22,7 @@
 		{ 
 	       	while( $thumbnail = $this->db->getNextArray() )
         	{
-				$this->t_body->set_VAR("THUMBNAIL", "<a href=\"/cms/image.php?id={$thumbnail['id']}&height=550&width=600\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
+				$this->setVar("THUMBNAIL", "<a href=\"/cms/image.php?id={$thumbnail['id']}&height=550&width=600\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
                  <img src=\"/cms/image.php?id={$thumbnail['id']}&height=".THUMBNAIL_size."&width=".THUMBNAIL_size."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
 
 				if(($count % IMAGESPERROW) == 0)
@@ -50,7 +50,7 @@
 			{
 				for(;$count % IMAGESPERROW != 0; $count++)
 				{
-					$this->t_body->set_VAR("THUMBNAIL", "");
+					$this->setVar("THUMBNAIL", "");
 					$this->parse("cell_block", "thumb_cell", true);
 				}
 		
@@ -58,7 +58,6 @@
 			}
 		}//end if
 		else
-		{
 			$this->t_body->set_VAR("row_block", "");
 
 

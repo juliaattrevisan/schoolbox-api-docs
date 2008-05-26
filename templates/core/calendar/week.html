@@ -2,7 +2,7 @@
       <center>
           <table class="calendarTable">
             <tr>
-              <td><a class="back" href="{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td>
+              <td><a class="back" href="/calendar/week/{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td>
               <td colspan="3">
                 <select name="Month" onchange="window.open('/calendar/week/{SELECTED_DAY}-'+this.value+'-{SELECTED_YEAR}', '_self', '');">
                   <!-- BEGIN month_drop -->
@@ -16,7 +16,7 @@
                   <!-- END year_drop -->
                 </select>
               </td>
-              <td><a class="forward" href="{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
+              <td><a class="forward" href="/calendar/week/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
             </tr>
             <tr>
               <th>Sun</th>

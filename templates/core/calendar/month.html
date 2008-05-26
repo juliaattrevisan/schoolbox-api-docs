@@ -4,7 +4,7 @@
       <center>
           <table id="month-nav">
             <tr>
-              <td><a class="back" href="{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td>
+              <td><a class="back" href="/calendar/month/{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td>
               <td colspan="3">
                 <select name="Month" onchange="window.open('/calendar/month/{SELECTED_DAY}-'+this.value+'-{SELECTED_YEAR}', '_self', '');">
                   <!-- BEGIN month_drop -->
@@ -18,7 +18,7 @@
                   <!-- END year_drop -->
                 </select>
               </td>
-              <td><a class="forward" href="{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
+              <td><a class="forward" href="/calendar/month/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
             </tr>
           </table>
       </center>

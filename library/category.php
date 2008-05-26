@@ -12,10 +12,20 @@ class Category extends Model {
 		parent::Model();
 	}
 	
-	function getCategoryList ($categoryID) {
+	function getCategoryList ($categoryID, $config = false) {
 		$query = "SELECT id, name, code, template, (SELECT count(*) FROM category WHERE parent = c.id) as children
 				  FROM category c
-				  WHERE parent = $categoryID ORDER BY name";
+				  WHERE parent = $categoryID ";
+		
+		$sortFields = array('name' => 'c.name', 'date' => 'c.id');
+		$config['sort'] = in_array($config['sort'], $sortFields) ? $config['sort'] : 'c.name';
+		$config['sortdir'] = strtoupper($config['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
+
+		$query .= " ORDER BY " . $config['sort'] . " " . $config['sortdir'];
+		
+		if($config['size'] > 0) 
+			$query .= " LIMIT 0, " . $config['size']; 
+							  
 		return $this->db->getAll($query);
 	}
 	

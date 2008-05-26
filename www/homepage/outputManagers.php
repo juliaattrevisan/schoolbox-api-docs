@@ -2,14 +2,13 @@
 		//output managers
 		$this->setBlock($componentHandle, "staff_members", "staff_member_block");
 
-		$query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email FROM user, userAccess
-		WHERE id = uid AND service = '" . HOMEPAGESERVICE . "' AND sid = '$categoryID' and type in(3,2) ORDER BY lastname, firstname";
-		$this->db->query($query);
-	
-		if($this->db->countRows() > 0)
-		{
-			while($manager = $this->db->getNextArray())
-			{
+		require_once '../library/user.php';
+		$userHandler = new User;
+		$managerList = $userHandler->getManagers($categoryID);
+
+		if (is_array($managerList)) {
+			foreach ($managerList as $manager) {
+			
 				$name = formatName($manager);
 				$email = formatEmail($manager);
 				
@@ -25,10 +24,7 @@
 
 			}
 			$this->setVar("EMAILALL", $emailall);
-		}
-		else
-		{
+		} else
 			$this->setVar("staff_member_block", "");
-		}
 
 ?>

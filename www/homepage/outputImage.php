@@ -29,7 +29,7 @@
 			if($config['pixel']<20){$config['pixel']=20;}
 			
 						
-			$imageurl = "cms/image.php?id={$image['id']}&height={$config['pixel']}&width={$config['pixel']}";
+			$imageurl = "/cms/image.php?id={$image['id']}&height={$config['pixel']}&width={$config['pixel']}";
 			
 			$this->setVar("PREVIEW_IMAGE_URL", $imageurl);
 			$this->setVar("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));

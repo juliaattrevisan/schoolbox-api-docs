@@ -81,17 +81,17 @@ if (is_array($componentList)) {
 		
 		$componentCount++;
 		$componentHandle = $component['name'] . $componentCount;
-		
+
 		$this->setFile($componentHandle, 'homepage/components/'.$component['filename']);
 		$this->setBlock($componentHandle, "config", "config_block");
 		
-		$this->setVar('COMPONENT_ID', $componentID);
+		$this->setVar('COMPONENT_ID', $componentCount);
 		
 		$config = unserialize($component['config']);
-		
-		if(is_array($component['config']) && CATEGORY_perms >= 2) {	
-				
-			foreach($component['config'] as $name => $value) {
+
+		if(is_array($config) && CATEGORY_perms >= 2) {	
+
+			foreach($config as $name => $value) {
 			
 				switch ($name) {
 
@@ -152,7 +152,7 @@ if (is_array($componentList)) {
 		} else
 			$this->setVar("config_block", "");	
 		
-
+		
 		if(is_file($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php')) {
 			include($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php');
 			$this->parse('COLUMN'.$component['column'], $componentHandle, true);

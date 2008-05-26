@@ -5,7 +5,7 @@ $this->setBlock($componentHandle, "duework", "duework_block");
 
 require_once '../library/submission.php';
 $submissionHandler = new Submission;
-$submissionList = $submissionHandler->getAllForCategory($categoryID, $config['size']);
+$submissionList = $submissionHandler->getAllForCategory($categoryID, $config);
 
 if (is_array($submissionList)) {
 	foreach($submissionList as $submission) {
@@ -26,7 +26,7 @@ if (is_array($submissionList)) {
 		$dateHTML = ($dateURL ? '<a href="'.$dateURL.'">' : "") . outputDate("jS M", $submission['date']) . ($dateURL ? '</a>' : "");
 
 		$output = array('DUE_NAME'	=> $nameHTML,
-						'DUE_TYPE'	=> scrubTEXT($submission['type']),
+						'DUE_TYPE'	=> scrubTEXT($submission['typeName']),
 						'DUE_DATE'	=> $dateHTML,
 						'DUE_COMMENT' => nl2br(scrubTEXT($submission['comment'])),										
 						);
