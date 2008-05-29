@@ -76,9 +76,11 @@ class clean {
 	function cleanNews()
 	{
 		//deletes all news that is either deleted or has expired
-		$query = "DELETE FROM news_items WHERE item_datetime_expires < NOW() || item_deleted = '1'";
-		$this->db->query($query);
-		print "Deleted ".$this->db->countRowsAffected()." news items<br>";
+		$query = "DELETE news_items, newsGroup, newsCampus FROM news_items, newsCampus, newsGroup 
+					WHERE news_item.item_id = newsGroup.id AND news_item.item_id = newsCampus.id 
+						AND (item_datetime_expires < NOW() || item_deleted = '1')";
+		$this->db->dbDoQuery($query);
+		print "Deleted ".$this->db->dbCountRowsAffected()." news items<br>";
 	}
 
 
