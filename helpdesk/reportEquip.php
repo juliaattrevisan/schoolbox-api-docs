@@ -15,7 +15,7 @@ class reportEquipment
 	var $lu;
 	var $tpl;
 	
-	function reportEquipment($filter, $orderby, $groupby)
+	function reportEquipment($filter, $orderby, $orderdir, $groupby)
 	{
 		
 		$this->db = new dbManager(DB_NAME, 1); 
@@ -25,23 +25,47 @@ class reportEquipment
 		
 		$this->filter = $filter;
 		$this->groupby = $groupby;
+		$this->orderby = $orderby;
+		$this->orderdir = $orderdir;
 		
 		$this->groupByLookup = array(
 			'brand' => 'm.brandID',
-			'campus' => 'l.campusID',
-			'equipmentType' => 'e.equipmentTypeID',); 
+			'campus' => 'ucampus',
+			'equipmentType' => 'e.equipmentTypeID',
+			'group'	=> 'u.group_id',
+			'model'	=> 'e.modelID',); 
 
 		if($groupby)
 			$orderbysql = $this->groupByLookup[$groupby].',';
 
 		if($orderby)
-			$orderbysql .= $orderby;
+			$orderbysql .= $orderby . ' ' .$orderdir;
 		else
 			$orderbysql .= 'serial';
 		
+		if(is_numeric($_GET['delete']))
+			$this->delete($_GET['delete']);
+		else if(is_numeric($_GET['undelete']))
+			$this->undelete($_GET['undelete']);	
 		
 		$this->createSQL($orderbysql);
 		$this->outputHTMLReport($groupby);
+	}
+
+	function delete($equipmentID) {
+		$params = array('equipmentID' => $equipmentID,
+						'active'		=> 0,
+						);
+		$sql = SQL_equipmentUpdate($params);
+		$this->db->dbDoQuery($sql);
+	}
+	
+	function undelete($equipmentID ) { 
+			$params = array('equipmentID' => $equipmentID,
+						'active'		=> 1,
+						);
+		$sql = SQL_equipmentUpdate($params);
+		$this->db->dbDoQuery($sql);
 	}
 
 	function createSQL($orderby)
@@ -52,17 +76,22 @@ class reportEquipment
 			e.serial,
 			e.equipmentTypeID,
 			t.description as equipmentType,
+			e.dateOfPurchase,
 			e.modelID,
 			m.brandID,
 			m.description as model,
 			b.description as brand,	
 			e.userID,
 			o.description as owner,
+			u.id as portalID,
 			u.firstname as firstname,
 			u.lastname as surname,
+			pc.name as ucampus,
+			g.name as `group`,
 			l.description as location, 
 			c.description as campus,
-			l.locationID
+			l.locationID,
+			e.active
 		FROM	tblEquipment e
 			left join
 			tblEquipmentType t on e.equipmentTypeID = t.equipmentTypeID
@@ -78,6 +107,12 @@ class reportEquipment
 			tblCampus c on l.campusID = c.campusID
 			left join
 			".DB_NAME_PORTAL.".user u on (e.portalUserID <> '') and (u.id = e.portalUserID)
+			left join
+			".DB_NAME_PORTAL.".userCampus uc on u.id=uc.uid
+			left join
+			".DB_NAME_PORTAL.".groups g on u.group_id=g.id
+			left join
+			".DB_NAME_PORTAL.".luCampus pc on uc.campus = pc.id
 			WHERE ";
 		
 		foreach($this->filter as $field => $value)
@@ -97,11 +132,9 @@ class reportEquipment
 		}
 		
 		if($orderby)
-			$sql .= " ORDER BY $orderby";
+			$sql .= " GROUP BY e.equipmentID ORDER BY $orderby ";
 	
 		$this->sql = $sql;
-	
-			
 	}
 
 	function outputCSVReport($sql)
@@ -147,19 +180,43 @@ class reportEquipment
 		$equip = $this->db->dbGetAllRows(SQL_LookupList('EquipmentType'));
 		$this->dropDown('EquipmentType', $equip, $this->filter['e.equipmentTypeID']);
 		
-		$campus = $this->db->dbGetAllRows(SQL_LookupList('Campus'));
-		$this->dropDown('Campus', $campus, $this->filter['l.campusID']);
+		$campus = $this->db->dbGetAllRows("SELECT id, name as description FROM ".DB_NAME_PORTAL.".luCampus");
+		$this->dropDown('Campus', $campus, $this->filter['uc.campus']);
 		
 		$brand = $this->db->dbGetAllRows(SQL_LookupList('Brand'));
 		$this->dropDown('Brand', $brand, $this->filter['m.brandID']);
 		
+		$model = $this->db->dbGetAllRows(SQL_LookupList('Model'));
 		$this->dropDown('Model', $model);
 		
 		$groupBy = array(array('id'=>'brand','description'=>'Brand'),
+						array('id'=>'model','description'=>'Model'),
 						 array('id'=>'campus','description'=>'Campus'),
+						 array('id'=>'group','description'=>'Group'),
 						 array('id'=>'equipmentType','description'=>'Type'),);
-		
 		$this->dropDown('GroupBy', $groupBy, $this->groupby);
+		
+		$orderBy = array(array('id'=>'serial','description'=>'Serial'),
+						 array('id'=>'surname','description'=>'Surname'),
+						 array('id'=>'brand','description'=>'Brand'),
+						 array('id'=>'model','description'=>'Model'),
+						 array('id'=>'campus','description'=>'Campus'),
+						 array('id'=>'equipmentType','description'=>'Type'),
+						 array('id'=>'dateOfPurchase','description'=>'DoP'),);
+		$this->dropDown('OrderBy', $orderBy, $this->orderby);
+		
+		$orderDir = array(array('id'=>'ASC','description'=>'Ascending'),
+						  array('id'=>'DESC','description'=>'Descending'),
+						  );
+		$this->dropDown('OrderDir', $orderDir, $this->orderdir);	
+		
+		$group = $this->db->dbGetAllRows("SELECT id, name as description FROM ".DB_NAME_PORTAL.".groups");
+		$this->dropDown('Group', $group, $this->filter['u.group_id']);
+		
+		$active = array(array('id'=>1,'description'=>'Yes'),
+						array('id'=>'','description'=>'No'),
+						);
+		$this->dropDown('Active', $active, $this->filter['e.active']);
 	}
 
 	function outputHTMLReport($groupby) 
@@ -169,6 +226,8 @@ class reportEquipment
 		$this->_tpl->set_file('tplContent', 'reportEquip.html');
 		$this->_tpl->set_block( 'tplContent', 'group', 'groupBlock');
 		$this->_tpl->set_block( 'group', 'item', 'itemBlock');
+		$this->_tpl->set_block( 'item', 'active', 'active_block');
+		$this->_tpl->set_block( 'item', 'non_active', 'non_active_block');
 		
 		
 		switch($groupby)
@@ -193,6 +252,7 @@ class reportEquipment
 			$this->_tpl->set_var('campus_head_block', '');	
 			$this->_tpl->set_var('campus_col_block', '');	
 			break;
+		
 		}
 		
 		$this->populateFilters();
@@ -205,8 +265,6 @@ class reportEquipment
 		while( $row = $this->db->dbGetNextArray( $query)) {
 			
 			$row = stripslashes_array($row);
-			
-			
 			if($groupby && $lastGroupField && $row[$groupby] && ($lastGroupField != $row[$groupby]))
 			{
 				$this->_tpl->set_var( 'GROUP', $lastGroupField." ($count)");
@@ -227,13 +285,37 @@ class reportEquipment
 				$fullname = '';
 			}
 			
-			$this->_tpl->set_var( 'SERIAL', $row[ 'serial']);
-			$this->_tpl->set_var( 'OWNER', $fullname);
+			if($row['serial'] == "")
+				$serial = '<a href="equipmentDetails.php?equipmentID=' . $row[ 'equipmentID'] . '">Unknown</a>';
+			else
+				$serial = '<a href="equipmentDetails.php?equipmentID=' . $row[ 'equipmentID'] . '">' . $row[ 'serial'] . '</a>';
+			
+			
+			if($row['dateOfPurchase'] != '0000-00-00' && $dop = strtotime($row['dateOfPurchase']) ) 
+				$this->_tpl->set_var( 'DOP', date('n/j/Y', $dop));
+			else
+				$this->_tpl->set_var('DOP', '');
+
+			$result = preg_replace('/(&(un)?delete=[0-9]+)/', '', $_SERVER['REQUEST_URI']);
+			$this->_tpl->set_var( 'ACTIVE', $row['active']?'checked="checked"':'');
+			$this->_tpl->set_var( 'EQUIPID', $row['equipmentID']);
+			$this->_tpl->set_var( 'SERIAL', $serial);
+			$this->_tpl->set_var( 'OWNER', '<a href="userDetails.php?portalID=' . $row[ 'portalID'] . '">'.$fullname.'</a>');
 			$this->_tpl->set_var( 'TYPE', $row['equipmentType']);
 			$this->_tpl->set_var( 'BRAND', $row['brand']);
 			$this->_tpl->set_var( 'MODEL', $row['model']);
 			$this->_tpl->set_var( 'LOCATION', $row['location']);
-			$this->_tpl->set_var( 'CAMPUS', $row['campus']);
+			$this->_tpl->set_var( 'CAMPUS', $row['campus']==''?$row['ucampus']:$row['campus']);
+			$this->_tpl->set_var( 'CURRENT_URL', $result );
+			
+			if($row['active']) {
+				$this->_tpl->parse('active_block', 'active');
+				$this->_tpl->set_var('non_active_block', '');
+			}
+			else {
+				$this->_tpl->parse('non_active_block', 'non_active');
+				$this->_tpl->set_var('active_block', '');
+			}
 			
 			$this->_tpl->parse( 'itemBlock', 'item', true);
 			
@@ -241,7 +323,7 @@ class reportEquipment
 				$lastGroupField = $row[$groupby];
 			else
 				$lastGroupField = 'Other';
-				
+								
 			$count++;
 		}
 		
@@ -262,9 +344,11 @@ $filter = array (
 			'e.equipmentTypeID'=> $_REQUEST[ 'equipmentTypeID'],
 			'm.brandID'	=> $_REQUEST[ 'brandID'],
 			'e.modelID'	=> $_REQUEST[ 'modelID'],
-			'l.campusID' => $_REQUEST['campusID'],
-			'locationID' => $_REQUEST[ 'locationID'],);
+			'uc.campus' => $_REQUEST['campusID'],
+			'locationID' => $_REQUEST[ 'locationID'],
+			'u.group_id' => $_REQUEST['groupID'], 
+			'e.active'	=> $_REQUEST['active'],);
 
 
-$page = new reportEquipment($filter, $_GET['orderby'], $_GET['groupBy']);
+$page = new reportEquipment($filter, $_GET['orderBy'], $_GET['orderDir'], $_GET['groupBy']);
 ?>

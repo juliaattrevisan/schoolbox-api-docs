@@ -768,7 +768,7 @@ function SQL_equipmentUpdate( &$parms) {
 	$sql = substr( $sql, 0, strlen( $sql) - 2);
 
 	$sql.=' where equipmentID=' . sql_escape( $parms[ 'equipmentID']);
-
+	
 	return $sql;
 }
 

@@ -2,7 +2,9 @@
 <form method="get">
 	<table>
 		<tr>
-			<td colspan="4"><strong>Filters</strong></td><td><strong>Group By</strong></td>
+			<td colspan="6"><strong>Filters</strong></td>
+			<td><strong>Group By</strong></td>
+			<td><strong>Sort By</strong></td>
 		</tr>
 		<tr>
 			<td>Campus</td>
@@ -17,11 +19,22 @@
 				<option value='{VALUE}'{SELECTED}>{NAME}</option>
 				<!-- END OPTIONS_EquipmentType -->
 			</select></td>
-			<td><select name='groupBy'>
-				<!-- BEGIN OPTIONS_GroupBy -->
+			<td>Group</td>
+            <td><select name='groupID'>
+				<!-- BEGIN OPTIONS_Group -->
 				<option value='{VALUE}'{SELECTED}>{NAME}</option>
-				<!-- END OPTIONS_GroupBy -->
-			</select></td>
+				<!-- END OPTIONS_Group -->
+                </select>             </td>
+            <td><select name='groupBy'>
+              <!-- BEGIN OPTIONS_GroupBy -->
+              <option value='{VALUE}'{SELECTED}>{NAME}</option>
+              <!-- END OPTIONS_GroupBy -->
+            </select></td>
+            <td><select name='orderBy'>
+              <!-- BEGIN OPTIONS_OrderBy -->
+              <option value='{VALUE}'{SELECTED}>{NAME}</option>
+              <!-- END OPTIONS_OrderBy -->
+            </select></td>
 		</tr>
 		<tr>
 			<td>Brand</td>
@@ -36,9 +49,20 @@
 					<option value='{VALUE}'{SELECTED}>{NAME}</option>
 					<!-- END OPTIONS_Model -->
 				</select></td>
-			<td>&nbsp;</td>
+                <td>Active Only</td>
+                <td><select name='active'>
+                <!-- BEGIN OPTIONS_Active -->
+                 <option value='{VALUE}'{SELECTED}>{NAME}</option>
+                <!-- END OPTIONS_Active -->
+                </select></td>
+			    <td>&nbsp;</td>
+		    <td><select name='orderDir'>
+              <!-- BEGIN OPTIONS_OrderDir -->
+              <option value='{VALUE}'{SELECTED}>{NAME}</option>
+              <!-- END OPTIONS_OrderDir -->
+            </select></td>
 		</tr>
-		<tr><td colspan="5"><input name="Submit" type="submit" />
+		<tr><td colspan="8"><input name="Submit" type="submit" />
 	</table>
 </form>
 <!-- BEGIN group -->
@@ -46,6 +70,7 @@
 <table class='ruler' cellpadding=0 cellspacing=0>
 	<thead>
 		<tr>
+		  	<td class="tableHeadLeft">ACTIVE</td>
 			<td class="tableHeadLeft">OWNER</td>
 			<!-- BEGIN type_head -->
 			<td class="tableHeadLeft">TYPE</td>
@@ -59,11 +84,20 @@
 			<td class="tableHeadLeft">CAMPUS</td>
 			<!-- END campus_head -->
 			<td class="tableHeadLeft">LOCATION</td>
+            <td class="tableHeadLeft">DoP</td>
 		</tr>
 	</thead>
 	<tbody>
 		<!-- BEGIN item -->
 		<tr>
+		   <td>
+           <!-- BEGIN active -->
+           	<a href="{CURRENT_URL}&delete={EQUIPID}"><img src="/images/accept.png"></a>
+           <!-- END active -->
+           <!-- BEGIN non_active --> 
+           <a href="{CURRENT_URL}&undelete={EQUIPID}"><img src="/images/delete.png"></a>
+           <!-- END non_active -->
+           </td>
 			<td>{OWNER}</td>
 			<!-- BEGIN type_col -->
 			<td>{TYPE}</td>
@@ -77,6 +111,7 @@
 			<td>{CAMPUS}</td>
 			<!-- END campus_col -->
 			<td>{LOCATION}</td>
+            <td>{DOP}</td>
 		</tr>
 		<!-- END item -->
 	</tbody>
