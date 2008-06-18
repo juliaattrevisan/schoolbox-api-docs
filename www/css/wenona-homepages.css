@@ -82,7 +82,7 @@ a.config:hover {
 }
 
 a.config {
-	background-image: url('/images/icons/modify_small.gif');
+	background-image: url('/images/icons/config.png');
 }
 
 .componentHeader {

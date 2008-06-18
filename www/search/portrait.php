@@ -18,6 +18,16 @@ define(NO_IMAGE, $_SERVER['DOCUMENT_ROOT'].'/images/no_portrait.jpg');
 	
 if(isset($_GET['id']) && $_GET['id'] && SYNERGY_enable)
 {
+	if(is_numeric($_GET['height']))
+		$height = $_GET['height'];
+	else
+		$height = 300;
+		
+	if(is_numeric($_GET['width']))
+		$width = $_GET['width'];
+	else
+		$width = 200;
+
 	//get file details
 	$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);	
 
@@ -36,7 +46,7 @@ if(isset($_GET['id']) && $_GET['id'] && SYNERGY_enable)
 		fwrite($handle, $image['Photo']);
 		fclose($handle);
 		
-		$outImage = $imageHandler->imageResize($tempFile, 300, 200, false);
+		$outImage = $imageHandler->imageResize($tempFile, $height, $width, false);
 		unlink($tempFile);
 		
 		header("Content-Type: image/jpg");

@@ -1,0 +1,42 @@
+<h1>{SUBJECTNAME}</h1>
+<table class="ruler">
+  <thead>
+    <tr>
+      <th>Photo</th>
+      <th>Surname</th>
+      <th>Preferred Name </th>
+      <th>Year Level </th>
+      <th>House</th>
+      <th>Email</th>
+      <th>Last Visited</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- BEGIN student_list -->
+    <tr>
+      <td><img src="/search/portrait.php?id={SYNERGYID}&height=40&width=40" /></td>
+      <td><a href="/search/userLookup.php?id={ID}">{SURNAME}</a></td>
+      <td><a href="/search/userLookup.php?id={ID}">{FIRSTNAME}</a></td>
+      <td>{YEARLEVEL}</td>
+      <td>{HOUSE}</td>
+      <td>{EMAIL}</td>
+      <td>{LASTVISIT}</td>
+    </tr>
+    <!-- END student_list -->
+  </tbody>
+  <thead>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><br />
+        <form action="/mail/createMail.php" method="post">
+          <input type="hidden" name="replyto" value="{SUBJECTNAME} &lt;{REPLYTO}&gt;" />
+          <input type="hidden" name="bcc" value="{CLASSEMAIL}" />
+          <input class="btn" type="submit" name="emailall" value="Email Class" />
+        </form></td>
+      <td>&nbsp;</td>
+    </tr>
+  </thead>
+</table>
