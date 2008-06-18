@@ -8,10 +8,9 @@
 	list-style:none;
 }
 #whatsnew{
-	width: 110px;
+	width: 160px;
 	margin-top: 10px !important;
 }
-#whatsnew{background:url(/images/line1.gif) repeat-y;}
 #whatsnew li{
 	line-height:20px !important;
 	margin:0 !important;

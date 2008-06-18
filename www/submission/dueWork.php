@@ -338,8 +338,8 @@ class dueWorkPage
 				//use css to indicate current day
 				if($this->currDay == $monthDay)
 					$this->t_body->set_var("MONTABLE_CSS".$day, "calTableSelected");
-				else if (in_array($monthDay, $dueDates))
-					$this->t_body->set_var("MONTABLE_CSS".$day, "calTableEntry");
+				//else if (in_array($monthDay, $dueDates))
+				//	$this->t_body->set_var("MONTABLE_CSS".$day, "calTableEntry");
 				else if($realDay == $monthDay && $monthMonth == $realMonth && $monthYear == $realYear)
 					$this->t_body->set_var("MONTABLE_CSS".$day, "calTableCurrent");
 				else

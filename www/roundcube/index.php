@@ -82,7 +82,7 @@ require_once('PEAR.php');
 
 // set PEAR error handling
 // PEAR::setErrorHandling(PEAR_ERROR_TRIGGER, E_USER_NOTICE);
-print_r($_SESSION);
+//print_r($_SESSION);
 
 // catch some url/post parameters
 $_task = strip_quotes(get_input_value('_task', RCUBE_INPUT_GPC));

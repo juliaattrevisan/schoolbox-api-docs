@@ -54,7 +54,7 @@ class file
 		
 	}
 
-	function addFile($file_name, $file_type, $file_loc, $description, $comment, $category, $hidden)
+	function addFile($file_name, $file_type, $file_loc, $description, $comment, $category, $hidden=0)
 	{
 		//check allowed perms to add to specified category before proceeding
 		$this->checkWriteAccess($category);

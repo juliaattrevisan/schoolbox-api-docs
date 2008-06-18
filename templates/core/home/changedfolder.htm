@@ -3,28 +3,28 @@
   <div class="dbx-content indent">
    <ul id="whatsnew">
     <!-- BEGIN category_block -->
-    <li><h3><a href="/homepage.php?category={NEW_CATEGORY_ID}">{NEW_CATEGORY_NAME}</a></h3>
+    <li><h3><a href="/homepage/{NEW_CATEGORY_ID}/"><img src="/images/icons/folder.png" alt="Folder" title="Folder"/>{NEW_CATEGORY_NAME}</a></h3>
         <ul>
           <!-- BEGIN due_work -->
-          <li><a href="/submission/dueWork.php">New work is now due</a></li>
+          <li><img src="/images/icons/work-due.png" alt="Due Work" title="Due Work" /><a href="/submission/dueWork.php">New work is now due</a></li>
           <!-- END due_work -->
           <!-- BEGIN ret_work -->
-          <li><a href="/submission/dueWork.php">Work has been returned</a></li>
+          <li><img src="/images/icons/submission.png" alt="Returned Work" title="Returned Work" /><a href="/submission/dueWork.php">Work has been returned</a></li>
           <!-- END ret_work -->
           <!-- BEGIN sub_work -->
-          <li><a href="/submission/listSubmission.php">Work has been submitted</a></li>
+          <li><img src="/images/icons/submission.png" alt="Submission" title="Submission" /><a href="/submission/viewSubmission.php?box_id={BOX_ID}">{BOX_NAME} has {BOX_COUNT} new</a></li>
           <!-- END sub_work -->
           <!-- BEGIN new_news -->
-          <li>{NEW_NEWS} news article{NEW_PLURAL_NEWS}</li>
+          <li><img src="/images/icons/news.png" alt="News" title="News" /> {NEW_NEWS} news article{NEW_PLURAL_NEWS}</li>
           <!-- END new_news -->
           <!-- BEGIN new_file -->
-          <li>{NEW_FILES} file{NEW_PLURAL_FILE}</li>
+          <li><img src="/images/icons/file.png" alt="Files" title="Files" /> {NEW_FILES} file{NEW_PLURAL_FILE}</li>
           <!-- END new_file -->
           <!-- BEGIN new_url -->
-          <li>{NEW_URLS} link{NEW_PLURAL_LINK}</li>
+          <li><img src="/images/mime/http-url.png" alt="URLS" title="URLS" /> {NEW_URLS} link{NEW_PLURAL_LINK}</li>
           <!-- END new_url -->
           <!-- BEGIN new_forum -->
-          <li>{NEW_FORUM} forum post{NEW_PLURAL_FORUM}</li>
+          <li><img src="/images/icons/forum.png" alt="Forum Post" title="Forum Post"  />{NEW_FORUM} forum post{NEW_PLURAL_FORUM}</li>
           <!-- END new_forum -->
         </ul>
       </li>

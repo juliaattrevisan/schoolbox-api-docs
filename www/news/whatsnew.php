@@ -27,7 +27,7 @@ class WhatsNew
 		//check for new submissions in category submission boxes
 		$subboxes = $this->newSubmission($id);
 
-		$count['subboxes'] = count($subboxes);
+		$count['subboxes'] = $subboxes;
 		return $count;
 	}	
 
@@ -127,7 +127,7 @@ class WhatsNew
 		$lastvisit = $this->lastDueWorkVisit();
 		
 		//check for due work (* currently does not check if work has been returned *)
-		$query = "SELECT COUNT(id) AS duework FROM submission_box WHERE category = '$id' AND created > '$lastvisit'"; 
+		$query = "SELECT COUNT(id) AS duework FROM submission_box WHERE category = '$id' AND created > '$lastvisit' AND owner != '".$_SESSION['id']."' AND deleted = 0"; 
 		$result = $this->db->getRow($query);
 		
 		return $result['duework'];

@@ -33,8 +33,17 @@ if(is_array($catList))
 		else
 			$this->setVar('ret_block', '');
 			
-		if($sub['subboxes'])
-			$this->parse('sub_block', 'sub_work');
+		if(is_array($sub['subboxes'])) {
+			foreach($sub['subboxes'] as $subid => $subdetails) {
+				$subout = array('BOX_ID'	=> $subid,
+								'BOX_NAME'	=> $subdetails['description'],
+								'BOX_COUNT'	=> $subdetails['count'],
+								);
+				$this->setVar($subout);
+			
+				$this->parse('sub_block', 'sub_work');
+			}
+		}
 		else
 			$this->setVar('sub_block', '');
 
