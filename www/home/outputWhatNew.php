@@ -6,6 +6,7 @@ $whatnew = new WhatsNew();
 $catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
 
 $this->setBlock($component['name'], 'category_block', 'new_category');
+$this->setBlock($component['name'], 'mail_block', 'new_mail_block');
 $this->setBlock('category_block', 'due_work', 'due_block');
 $this->setBlock('category_block', 'ret_work', 'ret_block');
 $this->setBlock('category_block', 'sub_work', 'sub_block');
@@ -15,7 +16,19 @@ $this->setBlock("category_block", "new_url", "new_url_item");
 $this->setBlock("category_block", "new_forum", "new_forum_item"); 
 $flag = 0;
 
-
+//check mail status
+if(MAIL_enable) {
+	$mailbox = $whatnew->newEmail();
+	if($mailbox->unseen > 0) {
+		$this->setVar('NEW_MAIL', $mailbox->unseen);
+		$this->parse('new_mail_block','mail_block'); 
+	}
+	else {
+		$this->setVar('new_mail_block','');
+	}
+}
+else
+	$this->setVar('new_mail_block','');
 
 //for each subject
 if(is_array($catList))

@@ -39,17 +39,11 @@ class WhatsNew
 	function newEmail()
 	{
 		include_once("mail/mail.php");
-
 		$mailbox = new mail;
 		$mailbox->checkMailDetails();
 		$inbox = $mailbox->openMailBox();
- 
-		$check = imap_mailboxmsginfo($inbox);
-
-		$this->set_var("NEW_EMAIL", $check->Unread);
-		//$this->set_var("EMAIL_RECENT", $check->Recent);
-		$this->set_var("EMAIL", $check->Nmsgs);
-		
+		if($inbox)
+ 			return $mailbox->mailboxStatus($inbox);
 	}
 
 	function lastCatVisit($id)

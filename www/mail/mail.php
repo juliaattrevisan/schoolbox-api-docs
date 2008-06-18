@@ -50,7 +50,7 @@ class Mail
 		else
 			$this->server="{".$this->mail_host.":110/pop3}INBOX";
 		
-		$inbox = @imap_open ($this->server, $this->user, $this->password) or error(4);
+		$inbox = @imap_open ($this->server, $this->user, $this->password);
 		$this->inbox = $inbox;
 		return $inbox;
 	}
