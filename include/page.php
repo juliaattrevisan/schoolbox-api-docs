@@ -64,8 +64,8 @@ class Page {
 		$this->template->set_file($handle, $file);
 	}
 	
-	function dropDown($handle, $data, $selected='') {
-		$this->setBlock(TEMPLATE_content, $handle, $handle.'_block');
+	function dropDown($handle, $data, $selected='', $template = TEMPLATE_content) {
+		$this->setBlock($template, $handle, $handle.'_block');
 		
 		foreach($data as $row) {
 			foreach($row as $key => $value) {

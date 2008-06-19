@@ -25,6 +25,19 @@ class User extends Model {
 		WHERE id = uid AND service = '" . HOMEPAGESERVICE . "' AND sid = '".$categoryID."' and type in(3,2) ORDER BY lastname, firstname";
 		return $this->db->getAll($query);
 	}
+	
+	function getByID($id) {
+	
+		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id,
+						synergy_id, local_email, alt_email, userCampus.campus
+				FROM user 
+					LEFT JOIN groups ON user.group_id = groups.id
+					LEFT JOIN userCampus ON user.id = userCampus.uid
+				WHERE user.id = '$id'";
+		return $this->db->getRow($query);
+	
+	}
+	
 }
 
 ?>

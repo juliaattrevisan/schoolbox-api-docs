@@ -1,0 +1,168 @@
+<h1>School Directory</h1>
+<table class="indent">
+  <tr>
+    <td colspan="6"><h2>Personal Information</h2></td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><strong>Name</strong></td>
+    <td colspan="2">{NAME}</td>
+    <td colspan="1"><strong>Email</strong></td>
+    <td colspan="2">{EMAIL}</td>
+    <td rowspan="12" style="vertical-align:top; text-align:center;"><!-- BEGIN portrait -->
+      <img src="portrait.php?id={SYNERGY_ID}" />
+      <!-- END portrait -->
+    </td>
+  </tr>
+  <!-- BEGIN student_synergy_form -->
+  <tr>
+    <td><strong>Date of Birth</strong></td>
+    <td colspan="2">{BIRTHDATE}</td>
+    <td><strong>Year Level</strong></td>
+    <td colspan="2">{YEAR_LEVEL}</td>
+  </tr>
+  <tr>
+    <td><strong>House</strong></td>
+    <td colspan="2">{HOUSE}</td>
+    <td><strong>Class</strong></td>
+    <td colspan="2">{FORM}</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td colspan="2">&nbsp;</td>
+    <td><strong>Class Teacher</strong></td>
+    <td colspan="2">{FORM_STAFF}</td>
+  </tr>
+  <tr>
+    <!-- END student_synergy_form -->
+    <!-- BEGIN student_synergy_tutor -->
+  <tr>
+    <td><strong>Date of Birth</strong></td>
+    <td colspan="2">{BIRTHDATE}</td>
+    <td><strong>Year Level</strong></td>
+    <td colspan="2">{YEAR_LEVEL}</td>
+  </tr>
+  <tr>
+    <td><strong>House</strong></td>
+    <td colspan="2">{HOUSE}</td>
+    <td><strong>Tutor Group</strong></td>
+    <td colspan="2">{TUTOR_GROUP}</td>
+  </tr>
+  <tr>
+    <td><strong>Head of House</strong></td>
+    <td colspan="2">{HOH}</td>
+    <td><strong>Tutor</strong></td>
+    <td colspan="2">{TUTOR}</td>
+  </tr>
+  <!-- END student_synergy_tutor -->
+  <!-- BEGIN medical -->
+  <tr>
+    <td><strong>Medical Note</strong></td>
+    <td colspan="5"><img src="/images/famicons/exclamation.png" title="important"/> {MEDICAL_NOTE}</td>
+  </tr>
+  <!-- END medical -->
+  <!-- BEGIN group_management -->
+  <tr>
+  <td colspan="6"><h2>Group Management</h2></td>
+  </tr>
+  <td><strong>Add User To Group</strong></td><td colspan="5">
+  <form action="/group/modUserGroup.php" method="GET">
+  <select name="sid">
+  	<!-- BEGIN group -->
+	<option value="{GROUP_ID}">{GROUP_NAME}</option>
+    <!-- END group -->  
+  </select>
+  <input type="hidden" name="uid" value="{ID}" />
+  <input type="hidden" name="service" value="{HOMEPAGE_SERVICE}" />
+  <input type="submit" name="submit" value="Add User" class="btn" />
+  </form>
+  </td>
+  </tr>
+  <!-- END group_management -->
+  <tr>
+    <td colspan="6"><h2>School Information</h2></td>
+  </tr>
+  <tr>
+    <td colspan="6">
+    <table width="100%">
+        <tr>
+          <td valign="top"><!-- BEGIN school_links -->
+            <ul>
+              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=1&Campus={CAMPUS_ID}">Academic Care</a></li>
+              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=2&Campus={CAMPUS_ID}">Excursions</a></li>
+              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=3&Campus={CAMPUS_ID}">Parent Handbook</a></li>
+              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=0&Campus={CAMPUS_ID}">Senior College</a></li>
+              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=12&Campus={CAMPUS_ID}">Wenona Weekly</a></li>
+            </ul></td>
+          <td valign="top"><ul>
+              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=4&Campus={CAMPUS_ID}">Assessment Information</a></li>
+              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=5&Campus={CAMPUS_ID}">Fixtures & Term Dates</a></li>
+              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=6&Campus={CAMPUS_ID}">Parent/Teacher Evenings</a></li>
+              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=8&Campus={CAMPUS_ID}">Homework Policy</a></li>
+              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=15&Campus={CAMPUS_ID}">Correspondence from Head of School</a></li>
+            </ul></td>
+          <td valign="top"><ul>
+              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=7&Campus={CAMPUS_ID}">Curriculum Information</a></li>
+              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=13&Campus={CAMPUS_ID}">Co-curricular</a></li>
+              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=14&Campus={CAMPUS_ID}">Extra-curricular</a></li>
+              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=9&Campus={CAMPUS_ID}">Performing Arts</a></li>
+              <!-- END school_links -->
+              <!-- BEGIN timetable_link -->
+              <li><a href="/timetable.php?sid={SYNERGY_ID}">Timetable</a></li>
+              <!-- END timetable_link -->
+              <!-- BEGIN due_work -->
+              <!-- <li><a href="/submission/dueWork.php?id={ID}">Due Work</a></li> -->
+              <!-- END due_work -->
+            </ul></td>
+        </tr>
+      </table>
+  </tr>
+  <!-- BEGIN contact_synergy -->
+  <tr>
+    <td colspan="6"><h2>Emergency Contact</h2>
+      <!-- BEGIN edit_emergency -->
+      <span class="header_option"><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=10">Edit Information</a></span>
+      <!-- END edit_emergency -->
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Name</strong></td>
+    <td>{EMERGENCY_NAME}</td>
+    <td><strong>Phone </strong></td>
+    <td>{EMERGENCY_PHONE}</td>
+    <td><strong>Alt. Phone </strong></td>
+    <td>{EMERGENCY_ALT_PHONE}</td>
+  </tr>
+  <tr>
+    <td colspan="6"><h2>Primary Contact </h2>
+      <!-- BEGIN edit_emergency -->
+      <span class="header_option"><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=11">Edit Information</a></span>
+      <!-- END edit_emergency -->
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Name</strong></td>
+    <td>{CONTACT_NAME_EMAIL}</td>
+    <td><strong>Mobile</strong></td>
+    <td>{CONTACT_MOBILE_PHONE}</td>
+    <td><strong>Work</strong></td>
+    <td>{CONTACT_OCCUP_PHONE}</td>
+  </tr>
+  <tr>
+    <td><strong>Name</strong></td>
+    <td>{SPOUSE_NAME_EMAIL}</td>
+    <td><strong>Mobile</strong></td>
+    <td>{SPOUSE_MOBILE_PHONE}</td>
+    <td><strong>Work</strong></td>
+    <td>{SPOUSE_OCCUP_PHONE}</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>Address</strong></td>
+    <td rowspan="2" valign="top">{CONTACT_ADDRESS}</td>
+    <td rowspan="2" valign="top"><strong>Home Phone </strong></td>
+    <td valign="top">{CONTACT_MOBILE_PHONE}</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <!-- END contact_synergy -->
+</table>

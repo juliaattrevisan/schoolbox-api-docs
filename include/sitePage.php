@@ -32,14 +32,13 @@ class SitePage extends Page {
 			$this->arg = array_slice($path,1);
 		}
 		$page = rtrim($page, '/');
-		
-		
-		if(is_file($_SERVER['DOCUMENT_ROOT'].'/'.$page . '.php') && $execute)
-			include($_SERVER['DOCUMENT_ROOT'].'/'.$page . '.php');
-		else if (is_file($_SERVER['DOCUMENT_ROOT'].'/'.$page.'/'. $this->arg[0] . '.php') && $execute) {
+
+		if (is_file($_SERVER['DOCUMENT_ROOT'].'/'.$page.'/'. $this->arg[0] . '.php') && $execute) {
 			$page2 = array_shift($this->arg);
 			include($_SERVER['DOCUMENT_ROOT'].'/'.$page.'/'. $page2 . '.php');
 		}
+		else if(is_file($_SERVER['DOCUMENT_ROOT'].'/'.$page . '.php') && $execute)
+			include($_SERVER['DOCUMENT_ROOT'].'/'.$page . '.php');
 		else if(is_file($_SERVER['DOCUMENT_ROOT'] . '/../templates/' . $this->getTemplate($page.'.html'))) {
 			$this->setFile(TEMPLATE_content, $page.'.html');
 		} else
@@ -313,6 +312,10 @@ class SitePage extends Page {
 			$this->setBlock($handle, "custom_head", "custom_head_block");
 			$this->setVar('custom_head_block', '');
 		}
+	}
+	
+	function setTitle($title) {
+		$this->setVar('TITLE', HEADING.' - '.scrubTEXT($title));
 	}
 	
 	function getTemplate($template) {

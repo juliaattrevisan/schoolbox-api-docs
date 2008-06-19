@@ -31,7 +31,7 @@ if (is_numeric($this->arg[1])) {
 
 $this->setFile(TEMPLATE_content, 'sitemap/sitemap.html');
 $this->setTab("resources");
-$this->setVar("TITLE", HEADING." - Sitemap");
+$this->setTitle('Resources');
 
 $categoryID = isset($this->arg[0]) ? $this->arg[0] : $_SESSION['smCategory'];
 $categoryID = $_SESSION['smCategory'] = is_numeric($categoryID) ? $categoryID : 0;

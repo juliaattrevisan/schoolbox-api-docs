@@ -5,26 +5,28 @@
 *                                                           *
 ************************************************************/
 //weather display object
-require_once("weather/weather.php");
+require_once("../library/weather.php");
 
 //create weather
 $weather = new Weather("All", $this->arg[0]);
 
 $this->setFile(TEMPLATE_content, 'weather/weather.html');
-$this->setVar("TITLE", HEADING." - Weather Forecast");
-$this->setVar("LOCATION", $weather->City);
+$this->setTitle('Weather Forecast');
 
 $this->setBlock(TEMPLATE_content, "current", "current_block");
 $this->setBlock(TEMPLATE_content, "forecast", "forecast_block");
 
 //set current weather
-$this->setVar("TEMP", $weather->Temp);
-$this->setVar("DIRECTION", $weather->WindCompass." (".$weather->WindDirection."&deg)");
-$this->setVar("SPEED", $weather->WindSpeed);
-$this->setVar("HUMIDITY", $weather->Humid);
-$this->setVar("RAIN", $weather->Rain);
-$this->setVar("PERIOD", date("F j, Y, g:i a", strtotime($weather->Date)));
-	
+$outputWeather = array ("LOCATION"	=> $weather->City,
+						'TEMP'		=> $weather->Temp,
+						'DIRECTION'	=> $weather->WindCompass." (".$weather->WindDirection."&deg)",
+						'SPEED'		=> $weather->WindSpeed,
+						'HUMIDITY' 	=> $weather->Humid,
+						'RAIN'		=> $weather->Rain,
+						'PERIOD' 	=> date("F j, Y, g:i a", strtotime($weather->Date)),
+					);
+$this->setVar($outputWeather);
+
 for($i = 0; $i < 4; $i++)
 {
 	//set days

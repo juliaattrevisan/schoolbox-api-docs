@@ -44,6 +44,7 @@ else
 
 
 $this->setFile(TEMPLATE_content, 'homepage/template' . $category['template'] . '.html');
+$this->setTitle($category['name']);
 
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock(TEMPLATE_content, "edit_page", "edit_page_block");
@@ -59,7 +60,6 @@ $output = array('LARGE_HEAD_BGCOLOUR'	=> $category['large_head_bgcolour'],
 				'HEADING'				=> scrubTEXT($category['name']) . (isset($code) ? '('.urlencode($category['code']).')' : '' ),
 				'CODE'					=> urlencode($category['code']),
 				'ID'					=> $categoryID,
-				'TITLE' 				=> HEADING . " - " . scrubTEXT($category['name']),
 				);
 
 $this->setVar($output);

@@ -11,8 +11,7 @@ if (strpos($_SERVER['REQUEST_URI'], 'home.php'))
 
 //displays list of files either by search or during browsing.
 $this->setFile(TEMPLATE_content, 'home.html');
-
-$this->setVar("TITLE", HEADING." - Home");
+$this->setTitle('Welcome');
 
 $this->setBlock(TEMPLATE_content, "timetable", "timetable_block");	
 

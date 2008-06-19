@@ -10,16 +10,16 @@ require_once 'include/stdfuncs.php';
 if (strpos($_SERVER['REQUEST_URI'], 'news.php'))
 	localRedir('/news');
 	
-require_once("include/permission.php");
-require_once("news/news.php");
+require_once('include/permission.php');
+require_once('news/news.php');
 
 $this->setFile(TEMPLATE_content, 'news.html');
-$this->setTab("news");
+$this->setTab('news');
 
-$this->setVar("TITLE", HEADING." - News");
+$this->setTitle('News');
 
-$this->setBlock(TEMPLATE_content, "main_stories", "stories_block");
-$this->setBlock("main_stories", "story_body", "story_block");
+$this->setBlock(TEMPLATE_content, 'main_stories', 'stories_block');
+$this->setBlock('main_stories', 'story_body', 'story_block');
 
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');

@@ -2,7 +2,7 @@
 //dont output weather if not enabled
 if(WEATHER_enable)
 {
-	require_once("weather/weather.php");
+	require_once '../library/weather/weather.php';
 	$weather = new Weather("Current");
 	
 	$this->setVar("WEATHER_ICON", $weather->forecast[0]["Icon"]);
