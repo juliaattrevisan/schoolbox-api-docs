@@ -178,7 +178,7 @@ class SitePage extends Page {
 		//custom code for each site is performed here	
 		if(SITE_location == 'wenona')
 		{
-			require_once 'include/wenona.php';
+			require_once $_SERVER['DOCUMENT_ROOT'] . '/include/wenona.php';
 			//provide encoded login details for intranet
 			$this->setVar("ENC_LOGIN", base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'].' '.$_SESSION['password'].' '.date('Y m d H i'))));
 		

@@ -1,0 +1,77 @@
+<?php
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
+
+class Poll extends Model {
+
+	function Poll () {
+	
+		$this->_table = "poll";
+		$this->_index = "pollID";
+		
+		parent::Model();
+	}
+
+	function getCurrentPoll ($categoryID) {
+		$query = "SELECT * FROM poll WHERE categoryID = $categoryID ORDER BY created DESC LIMIT 1";
+		return $this->db->getRow($query);
+	}
+
+	function getData($pollID) {
+		$poll = $this->getByID($pollID);
+		if (!$poll['pollID'])
+			return false;
+		$data = array();
+		$total = 0;
+		for ($i = 0; $i < 10; $i++) {
+			if (!empty($poll['option_' . $i])) {
+				$set['option']	= $poll['option_' . $i];
+				$set['result']	= $poll['result_' . $i];
+				$data[] = $set;
+				$total += $set['result'];
+			}
+		}
+		
+		$count = count($data);
+		for ($i = 0; $i < $count; $i++) {
+			$data[$i]['percentage'] = $total ? number_format(($data[$i]['result'] / $total) * 100, 2) : 0;
+		}
+		
+		return $data;
+	}
+
+	function hasVoted ($pollID) {
+		$poll = $this->getById($pollID);
+		switch ($poll['frequency']) {
+			case "once":
+				$cutoff = time();
+				break;
+			case "hourly":
+				$cutoff = time() - 3600;
+				break;
+			case "daily":
+				$cutoff = time() - 86400;
+				break;
+		}
+
+		$query = "SELECT count(*) FROM pollLog WHERE pollID = $pollID AND UNIX_TIMESTAMP(created) > $cutoff AND userID = " . $_SESSION['id'];
+		$vote = $this->db->getOne($query);
+		
+		if ($vote > 0)
+			return true;
+		return false;
+	}
+	
+	function placeVote ($pollID, $vote) {
+		if (is_numeric($pollID) && is_numeric($vote) && $vote >= 0 && $vote < 10 && !$this->hasVoted($pollID)) {
+			$query = "UPDATE poll SET result_" . $vote . " = result_" . $vote . " + 1 WHERE pollID = $pollID";
+			$this->db->query($query);
+			$query = "INSERT INTO pollLog SET pollID = $pollID, userID = " . $_SESSION['id']. ", created = NOW()";
+			$this->db->query($query);
+			return true;
+		}
+		return false;
+	}
+}
+
+?>

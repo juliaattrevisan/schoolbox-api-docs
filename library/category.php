@@ -8,6 +8,7 @@ class Category extends Model {
 	
 		$this->_table = "category";
 		$this->_index = "id";
+		$this->categoryTree = array();
 		
 		parent::Model();
 	}
@@ -36,7 +37,12 @@ class Category extends Model {
 	}
 	
 	function getByID($categoryID) {
-		$query = "SELECT c.*, hc.* FROM category c, homepage_config hc WHERE hc.cid = c.id AND c.id = '$categoryID'"; 
+		$query = "SELECT c.*, hc.*, u.id owner, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName 
+				  FROM (category c)
+				  LEFT JOIN homepage_config hc ON  hc.cid = c.id
+				  LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGESERVICE . "
+				  LEFT JOIN user u on u.id = a.uid 
+				  WHERE c.id = '$categoryID'"; 
 		return $this->db->getRow($query);		
 	}
 	
@@ -76,6 +82,67 @@ class Category extends Model {
 				  ORDER BY submitted";
 		return $this->db->getAll($query);
 	}
+
+
+	function getCategoryTree($parent = 0, $indent = '') {
+
+		$categoryList = $this->getCategoryList($parent);
+		if (is_array($categoryList)) {
+			foreach ($categoryList as $category) {
+
+				$thisRow['CAT_ID'] = $category['id'];
+				$thisRow['CAT_NAME'] = $indent . scrubTEXT($category['name']) . ' ' . scrubTEXT($category['code']);
+				array_push($this->categoryTree, $thisRow);
+
+				$this->getCategoryTree($category['id'], $indent . "&nbsp; &nbsp;|&nbsp;");
+			}
+		}
+		return $this->categoryTree;
+	}	
+
+	function getTemplateList() {
+
+		$output = array();
+		$query = "SELECT id, name FROM homepages";
+		$templateList =  $this->db->getAll($query);
+		if (is_array($templateList)) {
+			foreach ($templateList as $template) {
+				$row['TEMPLATE_ID'] = $template['id'];
+				$row['TEMPLATE_NAME'] = $template['name'];
+				$output[] = $row;
+			}
+		}
+		return $output;
+	}
+
+	function getGroupPerms($categoryID) {
+		$query = "SELECT id, name, type FROM groups g 
+				  LEFT JOIN perms p ON p.gid = g.id AND p.cid = '$categoryID'
+				  ORDER BY id";
+		return $this->db->getAll($query);
+	}	
+
+	function logAction ($categoryID, $action = 'modify') {
+		$query = "INSERT INTO cmsLog SET object = 'folder', objectID = '$categoryID', action = '$action', user = '" . $_SESSION['id'] . "', time = NOW()";
+		return $this->db->query($query);
+	}
+
+	function create($data) {
+		$categoryID = parent::create($data);
+		$this->logAction($categoryID, 'create');
+		return $categoryID;
+	}
+	
+	function update ($data) {
+		parent::create($data);
+		$this->logAction($data[$this->_index], 'modify');
+	}
+	
+	function delete($categoryID) {
+		parent::delete($categoryID);
+		$this->logAction($categoryID, 'delete');
+	}
+
 }
 
 ?>

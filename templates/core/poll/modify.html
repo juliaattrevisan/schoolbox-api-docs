@@ -1,0 +1,52 @@
+
+<h1>{ACTION} Poll</h1>
+
+<form class="standardForm" action="/poll/modify.php" method="post">
+<table>
+    <tr>
+        <td class="formLabelWidth"><h2>Title</h2></td>
+		<td><input type="text" name="title" value="{POLL_TITLE}" size="50" /></td>
+    </tr>
+    <tr>
+        <td><h2>Question</h2>
+        	<em>What is the poll for</em></td>
+		<td><input type="text" name="question" value="{QUESTION}" size="50" /></td>
+    </tr>
+    <tr>
+        <td><h2>Options</h2>
+        <em>You can have a maximum of 
+        ten options<br /> to vote on. You must fill in at least two.</em></td>
+		<td><input type="text" name="option_0" value="{OPTION_0}" /><br />
+        	<input type="text" name="option_1" value="{OPTION_1}" /><br />
+            <input type="text" name="option_2" value="{OPTION_2}" /><br />
+            <input type="text" name="option_3" value="{OPTION_3}" /><br />
+            <input type="text" name="option_4" value="{OPTION_4}" /><br />
+            <input type="text" name="option_5" value="{OPTION_5}" /><br />
+            <input type="text" name="option_6" value="{OPTION_6}" /><br />
+            <input type="text" name="option_7" value="{OPTION_7}" /><br />
+            <input type="text" name="option_8" value="{OPTION_8}" /><br />
+            <input type="text" name="option_9" value="{OPTION_9}" /><br /></td>
+    </tr>    
+    <tr>
+        <td><h2>Close Date</h2>
+        <em>No votes can be cast after this date.</em></td>
+		<td><input type="text" name="close" value="{CLOSE}" /></td>
+    </tr> 
+    <tr>
+      <td><h2>Voting Frequency</h2>
+      	  <em>Selected how often users can place a new vote.</em></td>
+      <td><select name="frequency">
+              <option value="once" {FREQUENCY_ONCE_SELECTED}>Once</option>
+              <option value="hourly" {FREQUENCY_HOURLY_SELECTED}>Hourly</option>
+              <option value="daily" {FREQUENCY_DAILY_SELECTED}>Daily</option>
+          </select></td>
+    </tr> 
+    <tr>
+	    <td></td>
+    	<td>
+        <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+        <input type="hidden" name="pollID" value="{POLL_ID}" />
+        <input type="submit" value="Save" /></td>
+    </tr>    
+</table>
+</form>

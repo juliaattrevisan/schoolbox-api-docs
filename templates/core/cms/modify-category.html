@@ -1,0 +1,96 @@
+<!-- BEGIN cutom_head -->
+<script language="JavaScript" type="text/javascript">
+function verify(){
+	var msg = ""
+	//check that description, url, location have been entered
+	if(document.getElementById('folderForm').name.value == ""){
+		msg += "You need to enter a name\n";
+	}
+	if(document.getElementById('folderForm').parent.value == "" || isNaN(document.getElementById('folderForm').parent.value)){
+		msg += "You need to select a proper location";
+	}
+	//if its not a group check it has enough permission to be accessed by someone
+	if(document.getElementById('folderForm').groupcheck.value != 1)
+	{
+	}
+	
+	if(msg != ""){
+		alert(msg);
+		return false;
+	}
+	else
+		return true;
+}
+</script>
+<!-- END custom_head -->
+
+			<h1>{ACTION} Folder</h1>
+			<form action="/cms/modify-category" method="post" class="standardForm" id="folderForm" onsubmit="return(verify());">
+				<table>
+					<tr>
+						<td class="formLabelWidth"><h2>Folder Name</h2></td>
+						<td><input type="text" name="name" maxlength="250" size="40" value="{NAME}" />						</td>
+					</tr>
+					<tr>
+						<td><h2>Folder Parent</h2>
+							<em>Location at which this folder should be placed</em></td>
+						<td><select name="parent">
+                        		<!-- BEGIN parent_list -->
+                                <option value="{CAT_ID}" {CAT_ID_SELECTED}>{CAT_NAME}</option><!-- END parent_list -->
+                            </select> </td>
+					</tr>
+					<tr>
+						<td><h2>Homepage</h2>
+							<em>If you would like a homepage associated with this folder select a basic layout.</em></td>
+						<td><select name="template">
+                        		<!-- BEGIN template_list -->
+                                <option value="{TEMPLATE_ID}" {TEMPLATE_ID_SELECTED}>{TEMPLATE_NAME}</option><!-- END template_list -->
+                            </select> </td>
+					</tr>
+					<tr>
+						<td><h2>Group Permissions</h2>
+							<em>Allow predefined groups of users access to this folder. </em></td>
+						<td><table>
+								<tr>
+									<th><b>Group</b></th>
+									<th><b>None</b></th>
+									<th><b>Read</b></th>
+									<th><b>Write</b></th>
+								</tr>
+                                <!-- BEGIN perm_table -->
+								<tr>
+                                	<td>{GROUP_NAME}</td>
+                                    <td><input type="radio" name="group[{GROUP_ID}]" value="0" {PERM_0_SELECTED} /></td>
+                                    <td><input type="radio" name="group[{GROUP_ID}]" value="1" {PERM_1_SELECTED} /></td>
+                                    <td><input type="radio" name="group[{GROUP_ID}]" value="2" {PERM_2_SELECTED} /></td>
+                                </tr><!-- END perm_table -->
+							</table></td>
+					</tr>
+                    <!-- BEGIN indiv_perms -->
+					<tr>
+						<td><h2>Individual Permissions</h2>
+							<em>Manage individual user access to this folder. You will automatically be assigned administration rights.</em></td>
+						<td><input type="checkbox" name="groupcheck" value="1" /></td>
+					</tr>
+                    <!-- END indiv_perms -->
+                    <!-- BEGIN indiv_modify -->
+					<tr>
+						<td><h2>Individual Permissions</h2>
+							<em>Manage individual user access to this folder. You will automatically be assigned administration rights.</em></td>
+						<td><a href="/group/modUserGroup.php?service=1&sid={CATEGORY_ID}">Modify Group</a></td>
+					</tr>
+                    <!-- END indiv_modify -->
+					<!-- BEGIN synergy_input -->
+					<tr>
+						<td><h2>Synergy Subject Code</h2>
+							<em>If you want this category to be a subject enter its code here</em></td>
+						<td><input type="text" name="code" maxlength="10" size="10" value="{CODE}" /></td>
+					</tr>
+					<!-- END synergy_input -->
+					<tr>
+						<td>&nbsp;</td>
+						<td><input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+							<input type="submit" label="Submit" name="submit" value="{ACTION} Folder" class="btn"/></td>
+					</tr>
+				</table>
+			</form>

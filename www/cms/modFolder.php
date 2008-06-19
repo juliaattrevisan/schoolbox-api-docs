@@ -276,7 +276,7 @@ if(is_numeric($_POST['parent']) && $_POST['name'])
 	{
 		$cid = $_POST['cid'];
 		//modify
-		if(isset($_POST['code'])
+		if(isset($_POST['code']))
 			$folderDB->modifyCat($cid, $_POST['name'], $_POST['parent'], $_POST['template'], $_POST['code']);
 		else
 			$folderDB->modifyCat($cid, $_POST['name'], $_POST['parent'], $_POST['template']);
