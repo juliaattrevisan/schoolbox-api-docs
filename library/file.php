@@ -14,9 +14,9 @@ class File extends Model {
 	
 	function getByID($fileID) {
 		$query = "SELECT f.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName, 
-						UNIX_TIMESTAMP(f.submitted) submitted, ft.name typeName, c.name categoryName, af.description as mimeDescription, iconFile
+						UNIX_TIMESTAMP(f.submitted) submitted, ft.name typeName, c.name categoryName, af.description as mimeDescription, iconFile, af.inline
 				  FROM file f 
-				  LEFT JOIN user u ON u.id = f.id 
+				  LEFT JOIN user u ON u.id = f.owner
 				  LEFT JOIN category c ON c.id = f.category 
 				  LEFT JOIN file_type ft ON ft.id = f.type
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
@@ -27,14 +27,14 @@ class File extends Model {
 	function getAllInCategory($categoryID, $config = false) {
 
 		$query = "SELECT f.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName, 
-						UNIX_TIMESTAMP(f.submitted) submitted, ft.name typeName, c.name categoryName, af.description as mimeDescription, iconFile
+						UNIX_TIMESTAMP(f.submitted) submitted, ft.name typeName, c.name categoryName, af.description as mimeDescription, iconFile, af.inline
 				  FROM file f 
 				  LEFT JOIN user u ON u.id = f.owner
 				  LEFT JOIN category c ON c.id = f.category 
 				  LEFT JOIN file_type ft ON ft.id = f.type
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
 				  LEFT JOIN submission_box sb on sb.fid = f.id
-				  WHERE f.category = " . $categoryID . " AND f.deleted = '0' AND sb.id IS NULL";
+				  WHERE f.category = " . $categoryID . " AND f.deleted = '0' ";
 		
 		if (perm($categoryID, HOMEPAGESERVICE) < 2)
 			$query .= " AND f.hidden = 0";				  

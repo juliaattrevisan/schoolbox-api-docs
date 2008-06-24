@@ -1,3 +1,11 @@
+    <!-- BEGIN custom_head -->
+    <link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
+    <script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
+    <script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
+    <script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
+
+    <!-- END custom_head -->
+
 
 <h1>{ACTION} Poll</h1>
 
@@ -30,7 +38,17 @@
     <tr>
         <td><h2>Close Date</h2>
         <em>No votes can be cast after this date.</em></td>
-		<td><input type="text" name="close" value="{CLOSE}" /></td>
+		<td><input name="close" id="cal_date" type="text" size="15" maxlength="10" value="{CLOSE}"/>
+						<img src="/images/ico_calendar.gif" width="16" height="13" id="cal_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+	 				 	<script type="text/javascript">
+						Calendar.setup({
+							inputField     :    "cal_date",     // id of the input field
+							ifFormat       :    "%d/%m/%Y",      // format of the input field
+							button         :    "cal_trigger",  // trigger for the calendar (button ID)
+							align          :    "br",           // alignment (defaults to "Bl")
+							singleClick    :    true
+						});
+						</script></td>
     </tr> 
     <tr>
       <td><h2>Voting Frequency</h2>

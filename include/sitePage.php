@@ -366,7 +366,21 @@ class SitePage extends Page {
 			$this->parse($handle.'_block', $handle, true); 
 		}
 	}
-	
+
+	function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content) {
+		$this->setBlock($template, $handle, $handle.'_block');
+		$selected = is_array($selected) ? $selected : array($selected);
+		foreach($data as $row) {
+			foreach($row as $key => $value) {
+				$this->setVar($key, $value);
+				if(in_array($value, $selected))
+					$this->setVar($key.'_SELECTED', 'selected="selected"');
+				else
+					$this->setVar($key.'_SELECTED', '');
+			}
+			$this->parse($handle.'_block', $handle, true); 
+		}
+	}	
 	
 	
 	//Private Functions

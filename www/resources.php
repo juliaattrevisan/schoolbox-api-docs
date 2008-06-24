@@ -15,8 +15,9 @@ if (is_numeric($this->arg[1])) {
 			if($this->arg[1] > 0) {
 				$openPerm = perm($this->arg[1], 1);
 			}	
-			$fileHTML = getFileHTML($this->arg[1]);
-			print $fileHTML;
+			list( , $windowHTML) = getCategoryHTML($this->arg[1]);			
+			$windowHTML .= getFileHTML($this->arg[1]);
+			print $windowHTML;
 			break;	
 		case "save-history":
 			$_SESSION['smCategory'] = (int)$this->arg[1];
@@ -29,7 +30,7 @@ if (is_numeric($this->arg[1])) {
 	exit;
 }
 
-$this->setFile(TEMPLATE_content, 'sitemap/sitemap.html');
+$this->setFile(TEMPLATE_content, 'resources/resources.html');
 $this->setTab("resources");
 $this->setTitle('Resources');
 
@@ -71,7 +72,7 @@ function getCategoryHTML($categoryIDList) {
 	
 	
 	$page = new SitePage();
-	$page->setFile('blockBODY', 'sitemap/sitemap_block.html');
+	$page->setFile('blockBODY', 'resources/resources_block.html');
 
 	$page->setBlock('blockBODY', 'category', 'category_block');
 	$page->setBlock('blockBODY', 'category_window', 'category_window_block');
@@ -99,12 +100,12 @@ function getCategoryHTML($categoryIDList) {
 				
 				$output = array('CAT_ID' 		=> $category['id'],
 								'CAT_NAME'      => $category['name'] . (!empty($category['code']) ? " (" . $category['code'] . ")":""),
-								'CAT_OPENCLOSE' => $category['children'] > 0 ? "<img src=\"/images/icons/sitemap-" . 
-												 ( $category['id'] == $previousCat ? "collapse" : "expand") . ".gif\" alt=\"Expand\" />":"",
+								'CAT_OPENCLOSE' => $category['children'] > 0 ? "<img src=\"/images/" . 
+												 ( $category['id'] == $previousCat ? "expanded" : "collapsed") . ".gif\" alt=\"Expand\" />":"",
 								'SUB_CATEGORY'  => ($i > 0 && $category['id'] == $previousCat)? '<div id="category_'.$category['id'].'">' . 
 																							  $previousCatHTML .'</div>' : '',
 								'CAT_MARGIN'    => ($i+1<count($categoryIDList)? "style='margin-left: 30px;'" : "") ,
-								'CAT_SELECTED'  => $category['id'] == $_SESSION['smCategory'] ? "id='sitemap-selected'" : "",
+								'CAT_SELECTED'  => $category['id'] == $_SESSION['smCategory'] ? "id='resources-selected'" : "",
 								'HOMEPAGE'	  	=> $category['template'] > 0 ? "Y" : "N",
 								);
 								
@@ -126,7 +127,7 @@ function getCategoryHTML($categoryIDList) {
 function getFileHTML($categoryID) {
 
 	$page = new SitePage();
-	$page->setFile('blockBODY', 'sitemap/sitemap_block.html');
+	$page->setFile('blockBODY', 'resources/resources_block.html');
 	$page->setBlock('blockBODY', 'file', 'file_block');
 	
 	global $openPerm;
@@ -205,7 +206,7 @@ function getFileHTML($categoryID) {
 			}
 			else if ($file['url'] != "")
 			{
-				$page->setVar("FILE_URL", "<a href=\"/redir.php?url=" . $file['url'] ."\" onclick=\"window.open(this.href, '_blank',''); return false;\">");
+				$page->setVar("FILE_URL", "<a href=\"/redir.php?url=" . $file['url'] ."\" title=\"" . $file['url'] . "\" onclick=\"window.open(this.href, '_blank',''); return false;\">");
 				$page->setVar('FILE_URL_END', '</a>');
 			}
 			
@@ -232,24 +233,22 @@ function outputDetails ($fileID) {
 	$fileHandler = new File;
 
 	$page = new SitePage();
-	$page->setFile('blockBODY', 'sitemap/sitemap_block.html');
+	$page->setFile('blockBODY', 'resources/resources_block.html');
 	$page->setBlock('blockBODY', 'file_details', 'file_details_block');
 
 	$file = $fileHandler->getByID($fileID);
-	
-	$output = array ('FILE_ID'	=> $file['id'],
-					 'CATEGORY'	=> $file['categoryName'],
-					 'OWNER'	=> $file['ownerName'],
-					 'REALNAME'	=> $file['realname'],
-					 'OWNER'	=> $file['ownerName'],
-					 'CREATED'	=> date("M j y @ g:iA", $file['submitted']),
+
+	$output = array ('FILE_ID'	 => $file['id'],
+					 'CATEGORY'	 => $file['categoryName'],
+					 'OWNER'	 => $file['ownerName'],
+					 'REALNAME'	 => $file['realname'],
+					 'CREATED'	 => date("M j y @ g:iA", $file['submitted']),
 					 'DESCRIPTION'	=> scrubText($file['description']),
-					 'COMMENT'	=> scrubText($file['comment']),
-					 'TYPE'		=> $file['typName'],
-					 'SIZE'		=> $file['file_size'],
-					 'MIME_TYPE'	=> $file['miem_type'],
-					 'HIDDEN'	=> $file['hidden'] > 0 ? 'Yes' : 'No',
-					 'OWNER'	=> $file['ownerName'],
+					 'COMMENT'	 => scrubText($file['comment']),
+					 'TYPE'		 => $file['typName'],
+					 'SIZE'		 => $file['file_size'],
+					 'MIME_TYPE' => $file['miem_type'],
+					 'HIDDEN'	 => $file['hidden'] > 0 ? 'Yes' : 'No',
 					 );
 	$page->setVar($output);
 	

@@ -1,7 +1,7 @@
 <?php
 
 require_once '../include/permission.php';
-require_once '../../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 require_once '../../library/poll.php';
 
 $pollHandler = new Poll;
@@ -27,15 +27,16 @@ else if ($_POST['title'] && $_POST['categoryID']) {
 				  'option_8'	=> $_POST['option_8'],
 				  'option_9'	=> $_POST['option_9'],
 				  'frequency'	=> $_POST['frequency'],
-				  'close'		=> $_POST['close'],
+				  'close'		=> outputDate(DATE_database, ausDateToUnix($_POST['close'])),
 				  );
+
 	if (is_numeric($_POST['pollID'])) {
 		$poll['pollID'] = $_POST['pollID'];
 		$pollHandler->update($poll);
 	} else {
 		$poll['pollID'] = $pollHandler->create($poll);
 	}
-	
+
 	localRedir("/homepage/" . $_POST['categoryID']);
 } 
 else if ($_GET['delete']) {
@@ -64,7 +65,7 @@ else if ($_GET['pollID']) {
 					'OPTION_7'	=> $poll['option_7'],
 					'OPTION_8'	=> $poll['option_8'],
 					'OPTION_9'	=> $poll['option_9'],
-					'CLOSE'		=> $poll['close'],
+					'CLOSE'		=> outputDate("d/m/Y", $poll['close']),
 					'FREQUENCY_ONCE_SELECTED'	=> '',
 					'FREQUENCY_HOURLY_SELECTED'	=> '',
 					'FREQUENCY_DAILY_SELECTED'	=> '',
@@ -94,7 +95,7 @@ else if ($_GET['categoryID']) {
 					'OPTION_7'	=> '',
 					'OPTION_8'	=> '',
 					'OPTION_9'	=> '',
-					'CLOSE'		=> '',
+					'CLOSE'		=> date("d/m/Y", strtotime("+1 month")),
 					'FREQUENCY_ONCE_SELECTED'	=> '',
 					'FREQUENCY_HOURLY_SELECTED'	=> '',
 					'FREQUENCY_DAILY_SELECTED'	=> '',					

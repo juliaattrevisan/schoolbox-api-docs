@@ -18,7 +18,7 @@
   <preloader_on_reload></preloader_on_reload>                 <!-- [false] (true / false) Whether to show preloaded when data or settings are reloaded -->
   <add_time_stamp></add_time_stamp>                           <!-- [false] (true / false) if true, a unique number will be added every time flash loads data. Mainly this feature is useful if you set reload _data_interval -->
   <precision></precision>                                     <!-- [2] (Number) shows how many numbers should be shown after comma for calculated values (percents) -->
-  <depth>15</depth>                                            <!-- [0] (Number) the depth of chart and columns (for 3D effect) -->
+  <depth>4</depth>                                            <!-- [0] (Number) the depth of chart and columns (for 3D effect) -->
   <angle>35</angle>                                            <!-- [30] (0 - 90) angle of chart area and columns (for 3D effect) -->
     
   <column>

@@ -8,27 +8,40 @@ html, body, #outerWrap, #content, #content_text {
 	margin: 0;
 	padding: 0;
 }
-
-.sitemap-details {
-	width: 100px;
-	height: 150px;
-	background-color: #efebe7;
-	border: 1px solid #000000;
+#ajax-load {
+	padding: 4px;
+	border: 0;
+	margin: 0;
+	display: none;
+	background-color: #ffffff;
 	position: absolute;
-	z-index: 100;
 	top: 200px;
-	left: 250px;
-	font: 12px Arial, Helvetica, sans-serif;
-	padding: 10px;
+	left: 300px;
+	z-index: 10;
 }
-
-#sitemap {
+.resources-properties {
+	padding: 5px;
+	margin: 0;
+	border: 0;
+}
+.resources-properties p {
+	font: 11px Arial, Helvetica, sans-serif;
+	padding: 0;
+	margin: 0;
+	
+}
+.resources-properties label {
+	display: block;
+	font: bold 11px Arial, Helvetica, sans-serif;
+	margin-top: 4px;
+}
+#resources {
 	height: 80%;
 	margin: 0;
 	padding: 0;
 }
 
-#sitemap-nav {
+#resources-nav {
 	width: 38%;
 	height: 100%;
 	float: left;
@@ -39,7 +52,7 @@ html, body, #outerWrap, #content, #content_text {
 	
 }
 
-#sitemap-window {
+#resources-window {
 	width: 56%;
 	height: 100%;
 	float: left;
@@ -49,12 +62,15 @@ html, body, #outerWrap, #content, #content_text {
 	overflow: auto;
 }
 
-#sitemap-selected {
+#resources-selected {
 	background-color: #003366;
 	color: #FFFFFF;
 	border: 1px dotted #cccccc;
 }
-.sitemap-category {
+#resources-selected a:link, #resources-selected a:hover, #resources-selected a:visited, #resources-selected a:active {
+	color: #FFFFFF;
+}
+.resources-category {
 	margin: 0;
 	padding: 0;
 	clear: both;
@@ -62,7 +78,7 @@ html, body, #outerWrap, #content, #content_text {
 	position: relative;
 }
 
-.sitemap-category p {
+.resources-category p {
 	margin: 0;
 	padding: 0;
 	font: bold 12px Arial, Helvetica, sans-serif;
@@ -70,7 +86,7 @@ html, body, #outerWrap, #content, #content_text {
 	border: 1px solid #ffffff;
 }
 
-.sitemap-openclose {
+.resources-openclose {
 	width: 25px;
 	margin: 0;
 	padding: 0;
@@ -78,33 +94,35 @@ html, body, #outerWrap, #content, #content_text {
 	cursor: default;
 
 }
-.sitemap-catname {
+.resources-catname {
 	cursor: pointer;
 	margin: inherit 5px;
 }
 
-.sitemap-caticon, .sitemap-icon {
+.resources-caticon, .resources-icon {
 	width: 35px;
 	cursor: pointer;
 	float: left;
 	position: relative;
-	top: -12px;
-
+	top: -4px;
+}
+.resources-caticon {
+	background: url(../images/resources/loading.gif) no-repeat 2px 4px;
 }
 
-.sitemap-catid, .sitemap-fileid, .sitemap-inline {
+.resources-catid, .resources-fileid, .resources-inline {
 	display: none;
 }
-.sitemap-file {
+.resources-file {
 	clear: both;
 	position: relative;
 }
 
-.sitemap-hover {
+.resources-hover {
 	background-color: #eeeeee;
 }
 
-.sitemap-file p {
+.resources-file p {
 	margin: 0;
 	padding: 0;
 	font: 12px Arial, Helvetica, sans-serif;
@@ -112,13 +130,13 @@ html, body, #outerWrap, #content, #content_text {
 	vertical-align: middle;
 	float: left;
 }
-.sitemap-filename, .sitemap-filesize {
+.resources-filename, .resources-filesize {
 	width: 30%;
 }
-.sitemap-file {
+.resources-file {
 	position: relative;
 }
-.sitemap-filename a, .sitemap-filename a:visited {
+.resources-filename a, .resources-filename a:visited {
 	color: #000000;
 }
 

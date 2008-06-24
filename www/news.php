@@ -32,8 +32,8 @@ $this->setVar('previous_button_block', '');
 $this->setVar('page_number_block', '');
 
 //can see add news link
-if(isStaff($_SESSION['gid']))
-	$this->setVar("ADD", "<b><a href=\"/news/modnews.php\">add news</a></b>");
+if(isStaff($_SESSION['gid']) || perm(0, 3) >= 2)
+	$this->setVar("ADD", "<b><a href=\"/news/modify.php\">add news</a></b>");
 else
 	$this->setVar("ADD", "");
 
@@ -49,7 +49,7 @@ if(is_array($items))
 		$this->setVar("NEWS_ID",$article['item_id']); 
 	 
 		if($article['item_owner'] == $_SESSION['id'] || $_SESSION['su'] == 1)
-			$this->setVar("MODIFY", "<a href=\"/news/modnews.php?id=".$article['item_id']."\">modify</a>");
+			$this->setVar("MODIFY", "<a href=\"/news/modify.php?newsID=".$article['item_id']."\">modify</a>");
 		else
 			$this->setVar("MODIFY", "");
 		

@@ -1,0 +1,98 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript">
+tinyMCE.init({
+	mode : "textareas",
+	theme : "advanced",
+	plugins : "table",
+	content_css : "/css/ormond-tiny.css",
+	theme_advanced_layout_manager : "RowLayout",
+	theme_advanced_containers_default_align : "left",
+	theme_advanced_container_default_class : "mceToolbar",
+	theme_advanced_containers : "row1,row2,mceEditor,mceElementpath",
+	theme_advanced_container_row1_class : "mceToolbarTop",
+	theme_advanced_container_row2_class : "mceToolbarTop",
+	theme_advanced_container_row1 : "bold,italic,underline,separator,bullist,numlist,outdent,indent,separator,sub,sup,separator,link,unlink,image,charmap,hr,separator,undo,redo",
+	theme_advanced_container_row2 : "forecolor,tablecontrols,separator,removeformat,cleanup,code",
+	extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
+});
+</script>
+<script language="JavaScript" type="text/javascript">
+function verify()
+{
+        var msg = ""
+        if(document.getElementById('newsForm').heading.value == ""){
+                msg += "You need to enter a heading\n";
+        }
+        if(msg != ""){
+                alert(msg);
+                return false;
+        }
+        else
+	{
+                return true;
+	}
+}
+function confirmDelete(newsID) {
+	if (confirm('Delete this news item?')) { 
+		window.open('/news/modify.php?delete='+newsID, '_self', '');
+	}
+}
+</script>
+<!-- END custom_head -->
+
+		<h1>{ACTION} News</h1>
+		<form id="newsForm" class="standardForm" method="post" enctype="multipart/form-data" action="/news/modify.php" onsubmit="return(verify());">
+		<input type="hidden" name="newsID" value="{NEWS_ID}" />
+		<table>
+		  <tr> 
+			<td class="formLabelWidth"><h2>Groups</h2><em>This news item will only be visible to the groups you select. You can select multiple by holding down 'crtl' while selecting.</em></td>
+			<td> <select name="group[]" size="{GROUP_TOTAL}" multiple>
+			<!-- BEGIN group_selection -->
+				<option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{GROUP_NAME}</option>
+			<!-- END group_selection -->
+			</select></td>
+		  </tr>
+		  <!-- BEGIN campus_row -->
+		  <tr>
+			<td><h2>Campus</h2><em>This news item will only be visible to users that are within this campus. You can select multple by holding down 'crtl'.</em></td>
+			<td><select name="campus[]" size="{CAMPUS_TOTAL}" multiple>           
+				<!-- BEGIN campus_selection -->
+				<option value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}>{CAMPUS_NAME}</option>
+				<!-- END campus_selection -->
+			  </select></td>
+		  </tr><!-- END campus_row -->
+		  <tr> 
+			<td><h2>News heading</h2></td>
+			<td><input type="text" name="heading" size="35" maxlength="50" value="{HEADING}" /></td>
+		  </tr>
+		  <tr> 
+			<td><h2>Expires</h2>
+			<em>Select a period for which the news item will remain available.</em></td>
+			<td><select name="expires">
+				{LEAVE_OPTION}
+				<option value="1">In 1 hour</option>
+				<option value="2">In 2 hours</option>
+				<option value="5">In 5 hours</option>
+				<option value="12">In 12 hours</option>
+				<option value="24">In 24 hours</option>
+				<option value="36">In 36 hour</option>
+				<option value="48">In 2 days</option>
+				<option value="120" {DEFAULT_TIME_SELECTED}>In 5 days</option>
+				<option value="168">In 1 week</option>
+				<option value="336">In 2 weeks</option>
+				<option value="672">In 1 month</option>
+				<option value="8760">In 1 year</option>
+			  </select></td>
+		  </tr>
+		  <tr> 
+			<td><h2>News Body</h2><em>This is the main portion of your news.</em></td>
+			<td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
+		  </tr>
+		  <tr> 
+			<td>&nbsp;</td>
+			<td><input class="btn" type="submit" name="submit" value="{ACTION} News" /> 
+				<!-- BEGIN delete_button --><input type="button" name="delete" value="Delete News" class="btn" onclick="confirmDelete({NEWS_ID});" /> <!-- END delete_button --></td>
+		  </tr>
+		</table>
+		</form>

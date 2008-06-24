@@ -18,15 +18,16 @@ if ($poll['pollID']) {
 					);
 	$this->setVar($output);
 	
-
-	if ($pollHandler->hasVoted($poll['pollID'])) {
-	
+	$pollData = $pollHandler->getData($poll['pollID']);
+	if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID'])) {
+		
+		$this->setVar('POLL_HEIGHT', count($pollData) * 30 + 70);
 		$this->setVar("poll_vote_block", "");
 		$this->parse("poll_chart_block", "poll_chart");
 	}
 	else {
 	
-		$pollData = $pollHandler->getData($poll['pollID']);
+		
 		if (is_array($pollData)) {
 			$i = 0;
 			foreach ($pollData as $data) {
@@ -44,14 +45,19 @@ if ($poll['pollID']) {
 		$this->setVar("poll_chart_block", "");
 		$this->parse("poll_vote_block", "poll_vote");
 	}
+	
+	
 } else {
 	$output = array('POLL_ID'		=> '',
 					'POLL_TITLE'	=> 'Poll',
 					'POLL_QUESTION'	=> '',
 					);
 	$this->setVar($output);
-	
-	$this->setVar("poll_chart_block", '<a href="/poll/modify.php?categoryID='.$categoryID.'">Create</a>');
+	if (CATEGORY_perms >= 2)
+		$this->setVar("poll_chart_block", '<a href="/poll/modify.php?categoryID='.$categoryID.'">Create</a>');
+	else
+		$this->setVar("poll_chart_block", "");
 	$this->setVar("poll_vote_block", "");
 }
+
 ?>

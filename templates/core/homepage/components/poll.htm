@@ -2,15 +2,14 @@
     <div class="componentHeader">
         <h2 class="large_head">{POLL_TITLE}</h2>
     </div>
+<!-- BEGIN config -->    
   <a class="config" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
   <div class="componentConfig">
     <a href="/poll/modify.php?categoryID={ID}">Create</a> |
     <a href="/poll/modify.php?pollID={POLL_ID}">Edit</a> |
     <a href="/poll/modify.php?delete={POLL_ID}" onclick="return confirm('Delete Poll?');">Delete</a>
   </div>
-    <!-- BEGIN config -->
-  
-    <!-- END config -->
+<!-- END config -->
     
   	<div style="text-align: center;">
     <p>{POLL_QUESTION}</p>
@@ -18,7 +17,7 @@
     <form action="/poll/modify.php" method="post">
     <input type="hidden" name="pollID" value="{POLL_ID}" />
     <input type="hidden" name="categoryID" value="{ID}" />
-        <ul style="list-style-type: none; width: 180px; margin: 0;">
+        <ul style="list-style-type: none; width: 180px; margin: 0; text-align: left;">
             <!-- BEGIN poll_options -->
             <li><input type="radio" name="vote" value="{POLL_OPTION_INDEX}" />{POLL_OPTION}</li><!-- END poll_options -->
             
@@ -37,7 +36,7 @@
     <script type="text/javascript" src="/javascript/swfobject.js"></script>
     <script type="text/javascript">
 		// <![CDATA[		
-		var so = new SWFObject("/flash/amcolumn.swf", "poll{COMPONENT_ID}", "180", "320", "8", "#FFFFFF");
+		var so = new SWFObject("/flash/amcolumn.swf", "poll{COMPONENT_ID}", "180", "{POLL_HEIGHT}", "8", "#FFFFFF");
 		so.addVariable("settings_file", escape("/poll/settings.xml"));
 		so.addVariable("data_file", escape("/poll/poll-xml.php?pollID={POLL_ID}"));		
 		so.addVariable("preloader_color", "#999999");	

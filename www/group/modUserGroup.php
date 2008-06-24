@@ -192,7 +192,7 @@ class modUserGroup
 
 }
 
-if(isset($_REQUEST['service']) && $_REQUEST['service'] && isset($_REQUEST['sid']) && $_REQUEST['sid'])
+if(isset($_REQUEST['service']) && $_REQUEST['service'] && isset($_REQUEST['sid']))
 {
 
 	$group = new Group($_REQUEST['service'], $_REQUEST['sid']);

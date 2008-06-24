@@ -14,7 +14,7 @@ define( 'SQL_user', 'helpdesk');
 define( 'SQL_passwd', 'n00tbOOKS');
 define( 'SQL_db', 'helpdesknew');
 
-require_once("dbManager-mysql.php");
+require_once($_SERVER['DOCUMENT_ROOT'] . "/../include/db.php");
 
 	# Templates setup
 define( 'TPL_DIR', 'templates');

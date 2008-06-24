@@ -58,6 +58,12 @@ define("FORUM_increment", 10);					//Amount of thread or posts per page
 define("CALENDAR_default_view", 'week');		//Default view style for calendar (week or month)
 define("CALENDAR_time_format", '%l:%i%p');		//Time output style 24 hour = '%k:%i', 12 hour = '%l:%i %p'
 
+define('DATE_long_format', 'l F jS Y g:ia');
+define('DATE_short_format', 'jS M Y g:ia');
+define('DATE_database', 'Y-m-d H:i:s');
+define('DATE_short_no_time','jS M Y');
+
+
 //SEARCH & BROWSE Display options
 define('FILE_date_format', '%W %M %e %Y @ %l:%i%p');		//Time output style 24 hour = '%k:%i', 12 hour = '%l:%i %p'
 define('NAME_format', '{title} {firstname} {lastname}'); 	// Format for output of name

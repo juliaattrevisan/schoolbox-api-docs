@@ -1,7 +1,7 @@
 <?php 
 require_once($_SERVER['DOCUMENT_ROOT'].'/conf/conf.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/include/dbManager-mysql.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/include/template.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . "/../include/db.php");
+require_once($_SERVER['DOCUMENT_ROOT'].'/../include/template.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/include/stdfuncs.php');
 
 //include custom code for site

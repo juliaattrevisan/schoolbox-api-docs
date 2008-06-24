@@ -12,6 +12,11 @@ class Poll extends Model {
 		parent::Model();
 	}
 
+	function getByID($pollID) {
+		$query = "SELECT *, UNIX_TIMESTAMP(close) close FROM " . $this->_table. " WHERE " . $this->_index . " = $pollID";
+		return $this->db->getRow($query);
+	}
+	
 	function getCurrentPoll ($categoryID) {
 		$query = "SELECT * FROM poll WHERE categoryID = $categoryID ORDER BY created DESC LIMIT 1";
 		return $this->db->getRow($query);
@@ -42,24 +47,30 @@ class Poll extends Model {
 
 	function hasVoted ($pollID) {
 		$poll = $this->getById($pollID);
+		$cutoff = "";
 		switch ($poll['frequency']) {
-			case "once":
-				$cutoff = time();
-				break;
 			case "hourly":
-				$cutoff = time() - 3600;
+				$cutoff = "AND UNIX_TIMESTAMP(created) > " . (time() - 3600);
 				break;
 			case "daily":
-				$cutoff = time() - 86400;
+				$cutoff = "AND UNIX_TIMESTAMP(created) > " . (time() - 86400);
 				break;
 		}
 
-		$query = "SELECT count(*) FROM pollLog WHERE pollID = $pollID AND UNIX_TIMESTAMP(created) > $cutoff AND userID = " . $_SESSION['id'];
+		$query = "SELECT count(*) FROM pollLog WHERE pollID = $pollID $cutoff AND userID = " . $_SESSION['id'];
 		$vote = $this->db->getOne($query);
-		
+
 		if ($vote > 0)
 			return true;
 		return false;
+	}
+	
+	function open($pollID) {
+		$query = "SELECT count(*) FROM poll WHERE pollID = $pollID AND close > NOW()";
+		$vote = $this->db->getOne($query);
+		if ($vote > 0)
+			return true;
+		return false;		
 	}
 	
 	function placeVote ($pollID, $vote) {
