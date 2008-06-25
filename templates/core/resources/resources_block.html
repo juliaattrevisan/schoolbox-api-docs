@@ -1,0 +1,40 @@
+<!-- BEGIN category -->
+<div class='resources-category' {CAT_MARGIN} context="menuCategory" acatid="{CAT_ID}" ahomepage="{HOMEPAGE}" acatname="{CAT_NAME}">
+    <p class='resources-openclose'>{CAT_OPENCLOSE}</p>
+    <p class='resources-caticon'><img src="/images/mime/folder_blue_full.png" alt="{CAT_NAME}" /></p>
+    <div>
+        <p class='resources-catname' {CAT_SELECTED}>{CAT_NAME}</p>
+        <p class='resources-catid'>{CAT_ID}</p>
+        {SUB_CATEGORY}
+	</div>
+</div><!-- END category -->
+<!-- BEGIN category_window -->
+<div class='resources-category' context="menuCategory" acatid="{CAT_ID}" ahomepage="{HOMEPAGE}" acatname="{CAT_NAME}">
+    <p class='resources-icon'><img src="/images/mime/folder_blue_full.png" alt="{CAT_NAME}" /></p>
+	<p class='resources-catname'>{CAT_NAME}</p>
+    <p class='resources-catid'>{CAT_ID}</p>
+</div><!-- END category_window -->
+<!-- BEGIN file -->
+<div class='resources-file' {HIDDEN} context="menuFile" afileid="{FILE_ID}" acatid="{CAT_ID}" ainline="{FILE_INLINE}" aurl="{URL_YN}" alink="{FILE_LINK}">
+    <p class='resources-icon'><img src="{FILE_ICON}" alt="{FILE_ALT}" /></p>
+    <p class='resources-filename'>{FILE_URL}{FILE_NAME}{FILE_URL_END}</p>
+    <p class='resources-filesize'>{FILE_SIZE}</p>
+	<p class='resources-fileid'>{FILE_ID}</p>
+    <p class='resources-catid'>{CAT_ID}</p>
+    <p class='resources-inline'>{FILE_INLINE}</p>
+</div><!-- END file -->
+<!-- BEGIN file_details -->
+<div class="resources-properties">
+	 <p><label style="font-size: 12px;">{DESCRIPTION}</label>
+     	<br />
+        <label>Comment</label>
+     	{COMMENT}<br />
+     	<label>Realname</label>
+     	{REALNAME}<br />
+	 <label>Owner</label>
+     	{OWNER}<br />
+        <label>Created</label>
+        {CREATED}
+     </p>
+</div>
+<!-- END file_details -->
