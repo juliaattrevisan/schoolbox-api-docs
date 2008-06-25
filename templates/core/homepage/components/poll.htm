@@ -11,19 +11,43 @@
   </div>
 <!-- END config -->
     
-  	<div style="text-align: center;">
-    <p>{POLL_QUESTION}</p>
+    
+    <p style="text-align: center;">{POLL_QUESTION}</p>
     <!-- BEGIN poll_vote -->
     <form action="/poll/modify.php" method="post">
     <input type="hidden" name="pollID" value="{POLL_ID}" />
     <input type="hidden" name="categoryID" value="{ID}" />
-        <ul style="list-style-type: none; width: 180px; margin: 0; text-align: left;">
-            <!-- BEGIN poll_options -->
-            <li><input type="radio" name="vote" value="{POLL_OPTION_INDEX}" />{POLL_OPTION}</li><!-- END poll_options -->
-            
-        </ul>
-        <input type="submit" value="Vote" />
-    </form>            
+    <table class="poll">
+    <tr>
+    <td colspan="2" class="polltitle">{POLL_TITLE}</td>
+    </tr>
+    	<!-- BEGIN poll_options -->
+    	<tr class="{POLL_ON_OFF}">
+        <td style="text-align: left;">{POLL_OPTION}</td>
+        <td><input type="radio" name="vote" class="pollOption" value="{POLL_OPTION_INDEX}" /></td>
+        </tr><!-- END poll_options -->
+    </table>
+    <div style="text-align: center;">
+    <input type="submit" value="Vote" onclick="return validatePoll();" />
+    </div>   
+    </form>    
+       
+    <script type="text/javascript">
+    function validatePoll () {
+		var valid = false;
+		$$('.pollOption').each(
+			function (o) {
+				if (o.checked == true)
+					valid = true;
+			}
+		);
+		if (valid)
+			return valid;
+			
+		alert('Please select and option.');
+		return valid;
+	}
+    </script>  
     <!-- END poll_vote -->
     
     <!-- BEGIN poll_chart -->
@@ -33,14 +57,17 @@
         </noscript>  
     </div>
     
-    <script type="text/javascript" src="/javascript/swfobject.js"></script>
+    <script type="text/javascript" src="/javascript/fusion.js"></script>
     <script type="text/javascript">
-		// <![CDATA[		
-		var so = new SWFObject("/flash/amcolumn.swf", "poll{COMPONENT_ID}", "180", "{POLL_HEIGHT}", "8", "#FFFFFF");
-		so.addVariable("settings_file", escape("/poll/settings.xml"));
-		so.addVariable("data_file", escape("/poll/poll-xml.php?pollID={POLL_ID}"));		
-		so.addVariable("preloader_color", "#999999");	
-		so.write("pollResult{COMPONENT_ID}");
+		// <![CDATA[	
+		var chart = new FusionCharts("/flash/FCF_Bar2D.swf", "myChartId", "350", "{POLL_HEIGHT}", "8", "#FFFFFF");
+		chart.setDataURL("/poll/poll-xml.php?pollID={POLL_ID}");
+		chart.render("pollResult{COMPONENT_ID}");
+		//var so = new SWFObject("/flash/FCF_Bar2D.swf", "poll{COMPONENT_ID}", "180", "{POLL_HEIGHT}", "8", "#FFFFFF");
+		//so.addVariable("settings_file", escape("/poll/settings.xml"));
+		//so.addVariable("data_file", escape("/poll/poll-xml.php?pollID={POLL_ID}"));		
+		//so.addVariable("preloader_color", "#999999");	
+		//so.write("pollResult{COMPONENT_ID}");
 		// ]]>
     </script>
     <!-- END poll_chart -->

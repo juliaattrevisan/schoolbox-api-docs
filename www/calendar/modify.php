@@ -12,8 +12,8 @@ if (isset($_POST['date'])) {
 	$event = array('owner' 		=> $_SESSION['id'],
 				   'access'		=> $_POST['level'],
 				   'sid'		=> $_POST['group'],
-				   'campus'		=> !empty($_POST['campus']) ? $_POST['campus'] : array($_SESSION['campus'][0]),
-				   'group'		=> $_POST['groupCheck'],
+				   'campusList'	=> !empty($_POST['campus']) ? $_POST['campus'] : array($_SESSION['campus'][0]),
+				   'groupList'	=> $_POST['groupCheck'],
 				   'priority'	=> $_POST['priority'],
 				   'note'		=> $_POST['note'],
 				   'date'		=> implode($date),
@@ -48,11 +48,10 @@ if (isset($_POST['date'])) {
 	if (!$event['id'])
 		error(2);
 	
-	//check security perms
-	if($event['access'] == 1 && $_SESSION['id'] != $event['owner']) {
-		if($calendarHandler->checkSecurity($event['access'], $event['id']) < 2)
-			error(34);
-	}
+	// check security perms
+	if($calendarHandler->getPerm($event['id']) < 2)
+		error(34);
+
 	
 	if ($event['startTime'] != "12:00AM")
 		preg_match("/([\d]{1,2}):([\d]{2})(AM|PM)/", $event['startTime'], $startTime);

@@ -100,5 +100,5 @@ else if (perm(0, 3) >= 2) {
 	$page->outputPage();
 	
 } else
-	error(5);
+	error(23);
 ?>

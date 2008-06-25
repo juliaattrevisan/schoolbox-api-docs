@@ -136,7 +136,7 @@ for($i=0; $i < 7; $i++) {
 		}
 	}
 
-	$eventList = $calendarHandler->getAllDayEvents($currentDay);
+	$eventList = $calendarHandler->getDayEvents($currentDay);
 	if(is_array($eventList)) {
 		foreach($eventList as $event) {
 			$output = array('TIME'		=> rtrim(
@@ -145,9 +145,7 @@ for($i=0; $i < 7; $i++) {
 										   "- "),
 							'NOTE'		=> $event['note'],
 							'PRIORITY'	=> $calendarHandler->displayColour($event['priority']),
-							'MODIFY'	=> $_SESSION['su'] || 
-										   $event['owner'] == $_SESSION['id'] || 
-										   $this->checkSecurity($event['access'], $event['sid']) > 1 ? "<a href=\"/calendar/modify/" . $event['id'] . "\">Modify</a>" : "",
+							'MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify/" . $event['id'] . "\">Modify</a>" : "",
 						  );	
 			
 			$this->setVar($output);

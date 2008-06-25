@@ -382,6 +382,13 @@ class SitePage extends Page {
 		}
 	}	
 	
+	function canRead($perm) {
+		return $perm >= 1 ? true : false;
+	}
+
+	function canWrite($perm) {
+		return $perm >= 2 ? true : false;
+	}
 	
 	//Private Functions
 	

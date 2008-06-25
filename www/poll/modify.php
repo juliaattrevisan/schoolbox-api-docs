@@ -8,11 +8,11 @@ $pollHandler = new Poll;
 $page = new SitePage;
 
 
-if(is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && $_POST['vote']) {
+if(is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_POST['vote']) && perm($_POST['categoryID'], 1) >= 1) {
 	$pollHandler->placeVote($_POST['pollID'], $_POST['vote']);
 	localRedir("/homepage/" . $_POST['categoryID']);
 }
-else if ($_POST['title'] && $_POST['categoryID']) {
+else if ($_POST['title'] && $_POST['categoryID'] && perm($_POST['categoryID'], 1) >= 2) {
 	$poll = array('categoryID'	=> $_POST['categoryID'],
 				  'title'		=> $_POST['title'],
 				  'question'	=> $_POST['question'],
@@ -39,7 +39,7 @@ else if ($_POST['title'] && $_POST['categoryID']) {
 
 	localRedir("/homepage/" . $_POST['categoryID']);
 } 
-else if ($_GET['delete']) {
+else if ($_GET['delete'] && perm($_GET['delete'], 1) >= 2) {
 	$poll = $pollHandler->getByID($_GET['delete']);
 	$pollHandler->delete($_GET['delete']);
 	localRedir("/homepage/" . $poll['categoryID']);
@@ -49,6 +49,10 @@ else if ($_GET['pollID']) {
 	$page->setVar("TITLE", HEADING." - Modify Poll");
 	
 	$poll = $pollHandler->getByID($_GET['pollID']);
+
+	if (perm($poll['categoryID'], 1) < 2)
+		error(5);
+	
 	
 	$output = array('ACTION'	=> 'Modify',
 					'POLL_ID'	=> $poll['pollID'],
@@ -76,7 +80,7 @@ else if ($_GET['pollID']) {
 	$page->outputPage();
 	
 }
-else if ($_GET['categoryID']) {
+else if ($_GET['categoryID'] && perm($_GET['categoryID'], 1) >= 2) {
 	$page->setFile(TEMPLATE_content, "poll/modify.html");
 	$page->setVar("TITLE", HEADING." - Add Poll");
 
@@ -104,5 +108,5 @@ else if ($_GET['categoryID']) {
 	$page->outputPage();
 }
 else
-	error(2);
+	error(19);
 ?>

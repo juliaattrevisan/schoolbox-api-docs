@@ -29,40 +29,52 @@ class Calendar extends Model {
 	}
 
 
-	function checkSecurity($level, $id) {
-		// check user has rights to post a message with level above personal
-		// returns 1 on read, 2 on write (can modify own) and 3 on moderate	
+	function getPerm($eventID) {
+		
+		if (is_array($eventID))
+			$event =& $eventID;
+		else
+			$event = $this->getByID($eventID);
 	
-		switch ($level) {
+		if ($_SESSION['su'])
+			return 3;
+	
+		switch ($event['access']) {
 		
 			case 1: // personal
-				return 2;
-			case 2: // group
-				if(is_array($id)) {
-					foreach($id as $serv) {
-						$value = perm($serv, 1);
-						if($value >= $perm)
-							$perm = $value;
-					}		
-				}
-				else
-					$perm = perm($id, 1);
-				return $perm;
+				return $event['owner'] == $_SESSION['id'] ? 2 : 0;
+			case 2: // single group
+				return perm($event['sid'], 2);
 				
-			case 3: // campus
-				if(is_array($id)) {
-					foreach($id as $serv) {
-						$value = perm($serv, 2);
-						if($value >= $perm)
+			case 3: // multiple campus + group
+				
+				if (is_array($event['groupList']))
+					$groupList = $event['groupList'];
+				else
+					$groupList = $this->getEventGroup($event['id']);
+					
+				if(is_array($groupList)) {
+					foreach($groupList as $group) {
+						$value = perm($group, 1);
+						if($value < $perm || !$perm)
 							$perm = $value;
 					}		
 				}
-				else
-					$perm = perm($id, 2);
-				return $perm;
 
-			case 4: // all
-				return perm(0, 2);
+				if (is_array($event['campusList']))
+					$campusList = $event['campusList'];
+				else
+					$campusList = $this->getEventCampus($event['id']);
+								
+				if(is_array($campusList)) {
+					foreach($campusList as $campus) {
+						$value = perm($campus, 2);
+						if($value < $perm || !$perm)
+							$perm = $value;
+					}		
+				}
+
+				return $perm;
 				
 			default:
 				return 0;
@@ -70,20 +82,24 @@ class Calendar extends Model {
 	}
 	
 	function getPriorityList() {
-		$priority = array(array('PRIORITY_NUMBER' => 4, 'PRIORITY_NAME'	=> 'Low (Black)'),
-						  array('PRIORITY_NUMBER' => 3, 'PRIORITY_NAME'	=> 'Medium (Blue)'),
-						  array('PRIORITY_NUMBER' => 2, 'PRIORITY_NAME'	=> 'High (Green)'),
-						  array('PRIORITY_NUMBER' => 1, 'PRIORITY_NAME'	=> 'Very High (Red)'),
+		$priority = array(array('PRIORITY_NUMBER' => 4, 
+								'PRIORITY_NAME'	=> 'Low (Black)'),
+						  array('PRIORITY_NUMBER' => 3, 
+						  		'PRIORITY_NAME'	=> 'Medium (Blue)'),
+						  array('PRIORITY_NUMBER' => 2, 
+						  		'PRIORITY_NAME'	=> 'High (Green)'),
+						  array('PRIORITY_NUMBER' => 1, 
+						  		'PRIORITY_NAME'	=> 'Very High (Red)'),
 						  );
 		return $priority;
 	}
 
 
-	function getCampusList() {
+	function getCampusList($type = 1) {
 		$query = "SELECT id, name FROM luCampus";
 		if (!$_SESSION['su']) {
 			$query .=", userAccess WHERE luCampus.id = userAccess.sid AND 
-				userAccess.service = '2' AND uid = ".$_SESSION['id']." AND type > '1'";   
+				userAccess.service = '2' AND uid = ".$_SESSION['id']." AND type > $type";   
 		}
 		$campusList = $this->db->getAll($query);
 		if (is_array($campusList)) {
@@ -96,9 +112,9 @@ class Calendar extends Model {
 		return $output;
 	}  
 
-	function getGroupList(){
+	function getGroupList($type = 1){
 		//get a list of all groups the user has write access to
-		$query = "SELECT id, name FROM userAccess, category WHERE uid = '".$_SESSION['id']."' AND service = '1' AND type > 1 AND sid = id";   
+		$query = "SELECT id, name FROM userAccess, category WHERE uid = '".$_SESSION['id']."' AND service = '1' AND type > $type AND sid = id";   
 		$groupList = $this->db->getAll($query);
 		if (is_array($groupList)) {
 			foreach ($groupList as $group) {
@@ -202,62 +218,32 @@ class Calendar extends Model {
 		return $subEvents;
 	}
 
-	function getAllDayEvents($currentDay) {
-	
-		//gets normal events and group shared events and merges them into an one array
-		$normalevents = $this->getDayEvents($currentDay);
-		$groupevents =  $this->getAllGroupDayEvents($currentDay);
-	
-		if(is_array($normalevents) && is_array($groupevents))
-			$event = array_merge($normalevents,$groupevents);
-		else if(is_array($normalevents))
-			$event = $normalevents;
-		else if(is_array($groupevents))
-			$event = $groupevents;
-		else
-			return false;
-		
-		//sort array on start time
-		usort($event,array($this,"timecmp"));
-		
-		return $event;
-	}
-	
-	function timecmp($a, $b) {
-		
-		if($a['startTimestamp'] == 0)
-			return 1;
-		if($b['startTimestamp'] == 0)
-			return -1;
-			
-		//just a quick function to enable sorting of calenar based on time
-		if ($a['startTimestamp'] == $b['startTimestamp']) {
-			return 0;
-		}
-		if($a['startTimestamp'] < $b['startTimestamp'])
-			return -1;
-		else
-			return 1;
-	}
+
 
 	function getDayEvents($currentDay) {
 		// return all events occuring on the date specified
 
 		if(is_array($_SESSION['campus']))
-			$campuslist = implode(',',$_SESSION['campus']);
+			$campusList = $_SESSION['campus'];
 		else
-			$campuslist = 1;
+			$campusList = array(1);
 		
 		
 		// get accessible groups
-		
+		$groupList = array();
+		$tempList = $this->getGroupList(0);
+		if (is_array($tempList)) {
+			foreach ($tempList as $temp) {
+				$groupList[] = $temp['GROUP_ID'];
+			}
+		}
 		
 		//give people with userAccess to moderate Calendar Access to view all Camups Posts
 		if(is_array($_SESSION['campus'])) {
-			if($this->checkSecurity(3, $_SESSION['campus'][0]) > 2 || $_SESSION['su'])
+			if(perm($_SESSION['campus'][0], 2) > 2 || $_SESSION['su'])
 				$groupChunk = "";
 			else
-				$groupChunk = "AND eventGroup.groupID = '$groupID'";
+				$groupChunk = "AND eventGroup.groupID IN(" . implode(',', $groupList) . ")";
 		}
 			
 		//get single events for the day
@@ -269,65 +255,22 @@ class Calendar extends Model {
 						LEFT JOIN eventCampus ON event.id = eventCampus.eventID
 						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 						WHERE date = '" . date("Y-m-d", $currentDay) . "'
-							AND ( (access = '4') OR (access = '1' AND owner= '".$_SESSION['id']."') 
-								OR (access = '3' AND eventCampus.campusID IN($campuslist) $groupChunk ))
+							AND (    (access = '1' AND owner = '".$_SESSION['id']."')
+								  OR (access = '2' $groupChunk)
+								  OR (access = '3' AND eventCampus.campusID IN(" . implode(',', $campusList) . ") $groupChunk )
+								  OR (access = '4')
+								)
 						GROUP BY id
 						ORDER BY event.startTime, event.endTime";
-	
+
 		return $this->db->getAll($query);	
 
 	}		
 
-	function getAllGroupDayEvents($currentDay) {
-		// return all events occuring in the users groups on the date specified
-
-		$query = "SELECT id, owner, TIME_FORMAT(startTime, '" . CALENDAR_time_format . "') as startTime, 
-							TIME_FORMAT(endTime, '" . CALENDAR_time_format . "') as endTime,
-							priority, note, access, userAccess.sid
-						FROM event, userAccess 
-						WHERE date = '" . date("Y-m-d", $currentDay) . "'
-							AND uid = '".$_SESSION['id']."' 
-							AND access = '2' 
-							AND service = '1' 
-							AND userAccess.sid = event.sid
-						ORDER BY event.startTime, event.endTime";
-	
-		
-		return $this->db->getAll($query);
-	
-	}	
-
-	function getCalendarArray($dayQuery, $weekQuery, $monthQuery) {
-	
-		$eventCount = 0;
-		$this->db->query($dayQuery);
-		while( $line = $this->db->getNextArray() )
-		{
-			$line['type'] = 'day';
-			$dayEvents[] = $line;
-		}
-	
-		$this->db->query($weekQuery);
-		while( $line = $this->db->getNextArray() )
-		{
-			$line['type'] = 'week';
-			$dayEvents[] = $line;
-		}
-	
-		$this->db->query($monthQuery);
-		while( $line = $this->db->getNextArray() )
-		{
-			$line['type'] = 'month';
-			$dayEvents[] = $line;
-		}
-	
-		return $dayEvents;
-	}		
-
 	function getStudentBirthdays($currentDay) {
 	
-		
-		$db = mssql_connect(MSSQL_host,MSSQL_user, MSSQL_passwd); 
+		require_once '../library/mssql.php';	
+		$db = new MSSQL;
 		
 		$query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
 						vStudents.StudentBirthDate, vStudents.StudentCampus, datediff(year,studentbirthdate,getdate()) as age,
@@ -340,18 +283,19 @@ class Calendar extends Model {
 						AND month(studentbirthdate) =". date("n", $currentDay) ."
 						AND StudentCampus = 'G'";
 	
-		$result = mssql_query($query, $db);
-		$i=0;
-		if($result !== FALSE && $result !== TRUE) {
-			while($line = mssql_fetch_assoc($result)) {
-				$birthdays[$i]['name'] = $line['StudentGiven1']." ".$line['StudentSurname'];
-				$birthdays[$i]['form'] = $line['StudentFormDescription'];
-				$birthdays[$i]['age'] = $line['age'];
-				$birthdays[$i]['birthdate'] = $line['la'];
-				$i++;
+		$birthdayList = $db->getAll($query);
+		if (is_array($birthdayList)) {
+			$i = 0;
+			foreach ($birthdayList as $birthday) {
+				$output[$i]['name'] = $birthday['StudentGiven1']." ".$birthday['StudentSurname'];
+				$output[$i]['form'] = $birthday['StudentFormDescription'];
+				$output[$i]['age'] 	= $birthday['age'];
+				$output[$i]['birthdate'] = $birthday['la'];
+				$i++;		
 			}
-		return $birthdays;
 		}
+		
+		return $output;
 	}
 
 	function getEventGroup($eventID) {
@@ -419,35 +363,21 @@ class Calendar extends Model {
 	}
 	
 
-	
-	
 	function create($event) {
 		
 		$hasAuth = true;
 		
-		// group permissions
-		if (is_array($event['group'])) {
-			$groupList = $event['group'];
-			foreach ($groupList as $groupID) {
-				if(!$this->checkSecurity($event['access'], $groupID))
-					$hasAuth = false;
-			}
-		}
+		if($this->getPerm($event) < 2)
+			$hasAuth = false;
 
-		// campus permissions
-		if ($hasAuth && is_array($event['campus'])) {
-			$campusList = $event['campus'];
-			foreach ($campusList as $campusID) {
-				if(!$this->checkSecurity($event['access'], $campusID))
-					$hasAuth = false;
-			}
-		}
-			
 		if (!$hasAuth)
 			error(35);
 
-		unset($event['group']);
-		unset($event['campus']);
+		$groupList = $event['groupList'];
+		$campusList = $event['campusList'];
+		
+		unset($event['groupList']);
+		unset($event['campusList']);
 
 		$eventID = parent::create($event);	
 		
@@ -461,29 +391,17 @@ class Calendar extends Model {
 		
 		$hasAuth = true;
 		
-		// group permissions
-		if (is_array($event['group'])) {
-			$groupList = $event['group'];
-			foreach ($groupList as $groupID) {
-				if(!$this->checkSecurity($event['access'], $groupID))
-					$hasAuth = false;
-			}
-		}
-
-		// campus permissions
-		if (is_array($event['campus'])) {
-			$campusList = $event['campus'];
-			foreach ($campusList as $campusID) {
-				if(!$this->checkSecurity($event['access'], $campusID))
-					$hasAuth = false;
-			}
-		}
+		if($this->getPerm($event['id']) < 2)
+			$hasAuth = false;
 		
 		if (!$hasAuth)
-			error(35);
-			
-		unset($event['group']);
-		unset($event['campus']);
+			error(34);
+
+		$groupList = $event['groupList'];
+		$campusList = $event['campusList'];
+
+		unset($event['groupList']);
+		unset($event['campusList']);
 		
 		parent::update($event);	
 		
@@ -496,6 +414,16 @@ class Calendar extends Model {
 	}
 	
 	function delete ($eventID) {
+		$event = $this->getByID($eventID);
+
+		$hasAuth = true;
+		
+		if($this->getPerm($eventID) < 2)
+			$hasAuth = false;
+		
+		if (!$hasAuth)
+			error(34);
+
 		parent::delete($eventID);
 		$this->delPerms($eventID);
 	}

@@ -5,10 +5,10 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 
 $page = new SitePage;
 $page->setFile(TEMPLATE_body, "poll/poll-xml.html");
-$page->setBlock(TEMPLATE_body, "series", "series_block");
 $page->setBlock(TEMPLATE_body, "graph", "graph_block");
 
 $pollHandler = new Poll;
+
 $pollData = $pollHandler->getData($_GET['pollID']);
 
 $colour = array('#ff0000',
@@ -24,26 +24,22 @@ $colour = array('#ff0000',
 				);
 
 if (is_array($pollData)) {
-	$pollData = array_reverse($pollData);
 	$i = 0;
 	foreach ($pollData as $data) {
-		$output = array('XID'		=> $i, 
-						'SERIES'	=> $data['option'],
+		$output = array('OPTION'	=> htmlspecialchars($data['option']),
+						'VALUE'		=> htmlspecialchars($data['result']),
 						'COLOUR'	=> $colour[$i],
-						'VALUE'		=> $data['result'],
 						);
 		$i++;
 		$page->setVar($output);
 		
-		$page->parse("series_block", "series", true);
 		$page->parse("graph_block", "graph", true);
 	}
 } else {
-	$page->setVar("series_block", "");
 	$page->setVar("graph_block", "");
 }
 
 
-header("Content-type: text/xml");
+header("Content-type: text/xml; charset=\"utf-8\"");
 $page->outputPage(true);
 ?>

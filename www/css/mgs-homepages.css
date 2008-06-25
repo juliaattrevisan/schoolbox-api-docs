@@ -108,7 +108,30 @@ a.config {
 	border-bottom:1px solid #666;
 	vertical-align:top;
 }
+table.poll {
+	border-left: 1px solid #666666;
+	border-top: 1px solid #666666;	
+	margin: 5px auto;
+	width: auto !important;
+}
+.poll td {
+	padding: 4px 10px;
+	border-right: 1px solid #666666;
+	border-bottom: 1px solid #666666;
 
+}
+.poll tr {
+	background-color: #EEEEE7;
+}
+.poll .polltitle {
+	background-color: #CF0034;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-align: center;
+}
+.poll tr.polloff { 
+	background-color: #FFFFFF;
+}
 /*div.component { padding: 0; border: 0; position: relative; display: block; margin: 0 0 10px 0; z-index: 1; }
 div.handle { display: block; cursor: move; }
 div.marker { border: 1px dashed black; margin: 0 0 8px 0; }

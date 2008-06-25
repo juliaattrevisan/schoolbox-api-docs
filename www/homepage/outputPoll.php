@@ -34,6 +34,7 @@ if ($poll['pollID']) {
 			
 				$output = array('POLL_OPTION_INDEX'	=> $i,
 								'POLL_OPTION'		=> scrubText($data['option']),
+								'POLL_ON_OFF'		=> $i % 2 ? 'polloff':'',
 								);
 				$i++;
 				$this->setVar($output);
@@ -54,7 +55,7 @@ if ($poll['pollID']) {
 					);
 	$this->setVar($output);
 	if (CATEGORY_perms >= 2)
-		$this->setVar("poll_chart_block", '<a href="/poll/modify.php?categoryID='.$categoryID.'">Create</a>');
+		$this->setVar("poll_chart_block", '<p style="text-align: center;"><a href="/poll/modify.php?categoryID='.$categoryID.'">Create</a></p>');
 	else
 		$this->setVar("poll_chart_block", "");
 	$this->setVar("poll_vote_block", "");

@@ -151,7 +151,7 @@
                         <td><input type="hidden" name="id" value="{EVENT_ID}" />
                         	<input type="hidden" name="return" value="{RETURN_TO}" />
                           <input type="submit" name="Submit" value="{FUNCTION} Event" class="btn">
-						  <!-- BEGIN delete_button --><input type="submit" name="delete" value="Delete Event" class="btn"><!-- END delete_button --></td>
+						  <!-- BEGIN delete_button --><input type="button" name="delete" value="Delete Event" class="btn" onclick="deleteEvent({EVENT_ID});" /><!-- END delete_button --></td>
                       </tr>
                     </table>
             </form>	
