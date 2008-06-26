@@ -39,10 +39,9 @@ class File extends Model {
 		if (perm($categoryID, HOMEPAGESERVICE) < 2)
 			$query .= " AND f.hidden = 0";	
 		
-		if (is_array($config['filter'])) {
-			if ($config['filter'][0] == 'document')
-				$query .= " AND ( f.mime_type LIKE '%pdf' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%') ";			  
-		}
+		if ($config['filter'] == 'document')
+				$query .= " AND ( f.mime_type LIKE '%pdf' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%') ";	
+						  
 		
 		$sortFields = array('name' => 'f.description', 'date' => 'f.submitted');
 		$config['sort'] = in_array($config['sort'], $sortFields) ? $config['sort'] : 'f.submitted';

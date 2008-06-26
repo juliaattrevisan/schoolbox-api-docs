@@ -94,7 +94,7 @@ if (is_array($componentList)) {
 		$this->setFile($componentHandle, 'homepage/components/'.$component['filename']);
 		$this->setBlock($componentHandle, "config", "config_block");
 		
-		$this->setVar('COMPONENT_ID', $componentCount);
+		$this->setVar('COMPONENT_ID', $component['component']);
 		
 		$default = unserialize($component['dfconfig']);
 		$config = unserialize($component['config']);
@@ -110,7 +110,7 @@ if (is_array($componentList)) {
 						for($i=0; $i<=10; $i++) {
 							$this->setVar('COMPONENT_CONFIG_SIZE_NAME', $i == 0 ? 'All' : $i);
 							$this->setVar('COMPONENT_CONFIG_SIZE_VALUE', $i);
-							$this->setVar('COMPONENT_CONFIG_SIZE_SELECTED', $i == $value ? ' selected="selected"' : '');
+							$this->setVar('COMPONENT_CONFIG_SIZE_SELECTED', $i == $config[$name] ? ' selected="selected"' : '');
 							$this->parse("size_block".$componentCount, "size", true);
 						}
 						break;
@@ -123,7 +123,7 @@ if (is_array($componentList)) {
 							foreach ($imageList as $image) {
 							
 								$this->setVar('COMPONENT_CONFIG_IMAGE', $image['description']);
-								$this->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', $image['description'] == $value ? ' selected="selected"' : '');
+								$this->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', $image['description'] == $config[$name] ? ' selected="selected"' : '');
 								$this->parse("image_block".$componentCount, "image", true);
 							}
 						}
@@ -136,7 +136,7 @@ if (is_array($componentList)) {
 						{
 							$this->setVar('COMPONENT_CONFIG_SORT_NAME', $sort);
 							$this->setVar('COMPONENT_CONFIG_SORT_VALUE', $sort);
-							$this->setVar('COMPONENT_CONFIG_SORT_SELECTED', $sort == $value ? ' selected="selected"' : '');
+							$this->setVar('COMPONENT_CONFIG_SORT_SELECTED', $sort == $config[$name] ? ' selected="selected"' : '');
 							$this->parse("sort_block".$componentCount, "sort", true);
 						}
 						break;
@@ -148,7 +148,7 @@ if (is_array($componentList)) {
 						{
 							$this->setVar('COMPONENT_CONFIG_SORTDIR_NAME', $sort);
 							$this->setVar('COMPONENT_CONFIG_SORTDIR_VALUE', $sort);
-							$this->setVar('COMPONENT_CONFIG_SORTDIR_SELECTED', $sort == $value ? ' selected="selected"' : '');
+							$this->setVar('COMPONENT_CONFIG_SORTDIR_SELECTED', $sort == $config[$name] ? ' selected="selected"' : '');
 							$this->parse("sortdir_block".$componentCount, "sortdir", true);
 						}
 						break;
@@ -159,12 +159,12 @@ if (is_array($componentList)) {
 						{
 							$this->setVar('COMPONENT_CONFIG_FILTER_NAME', $fname);
 							$this->setVar('COMPONENT_CONFIG_FILTER_VALUE', $fvalue);
-							$this->setVar('COMPONENT_CONFIG_FILTER_SELECTED', $sort == $value ? ' selected="selected"' : '');
+							$this->setVar('COMPONENT_CONFIG_FILTER_SELECTED', $fvalue == $config[$name] ? ' selected="selected"' : '');
 							$this->parse("filter_block".$componentCount, "filter", true);							
 						}
 						break;
 					default:
-						$this->setVar('COMPONENT_CONFIG_' . strtoupper($name), $value);
+						$this->setVar('COMPONENT_CONFIG_' . strtoupper($name), $config[$name]);
 				}
 			}
 			$this->parse("config_block", "config");	
