@@ -14,9 +14,9 @@ require_once('include/permission.php');
 require_once('news/news.php');
 
 $this->setFile(TEMPLATE_content, 'news.html');
+$this->setTitle('News');
 $this->setTab('news');
 
-$this->setTitle('News');
 
 $this->setBlock(TEMPLATE_content, 'main_stories', 'stories_block');
 $this->setBlock('main_stories', 'story_body', 'story_block');
