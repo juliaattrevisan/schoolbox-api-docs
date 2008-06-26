@@ -45,7 +45,7 @@ class modPage
 				"position" => $position
 			);
 			$result = $this->db->dbUpdateRow('homepage_comp_location', array('component', 'cid'), $query);
-			die(var_dump($result));
+			//die(var_dump($result));
 		}
 		
 		function updateComponentConfig($component, $config)
