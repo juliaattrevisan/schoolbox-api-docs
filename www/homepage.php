@@ -73,6 +73,15 @@ else {
 	$this->setVar('modify_layout_block', '');
 }
 
+$temp = unserialize('a:3:{s:4:"sort";s:4:"Date";s:7:"sortdir";s:4:"Desc";s:4:"size";s:1:"0";}');
+
+$temp['filter'] = array('',
+						array('All'	=> '',
+							  'Documents'	=> 'document',						 
+							 ),
+						);
+//print serialize($temp);
+
 $componentList = $categoryHandler->getComponents($categoryID);
 if (is_array($componentList)) {
 
@@ -87,11 +96,12 @@ if (is_array($componentList)) {
 		
 		$this->setVar('COMPONENT_ID', $componentCount);
 		
+		$default = unserialize($component['dfconfig']);
 		$config = unserialize($component['config']);
 
-		if(is_array($config) && CATEGORY_perms >= 2) {	
+		if(is_array($default) && CATEGORY_perms >= 2) {	
 
-			foreach($config as $name => $value) {
+			foreach($default as $name => $value) {
 			
 				switch ($name) {
 
@@ -100,7 +110,7 @@ if (is_array($componentList)) {
 						for($i=0; $i<=10; $i++) {
 							$this->setVar('COMPONENT_CONFIG_SIZE_NAME', $i == 0 ? 'All' : $i);
 							$this->setVar('COMPONENT_CONFIG_SIZE_VALUE', $i);
-							$this->setVar('COMPONENT_CONFIG_SIZE_SELECTED', $i == $value ? ' selected' : '');
+							$this->setVar('COMPONENT_CONFIG_SIZE_SELECTED', $i == $value ? ' selected="selected"' : '');
 							$this->parse("size_block".$componentCount, "size", true);
 						}
 						break;
@@ -113,7 +123,7 @@ if (is_array($componentList)) {
 							foreach ($imageList as $image) {
 							
 								$this->setVar('COMPONENT_CONFIG_IMAGE', $image['description']);
-								$this->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', $image['description'] == $value ? ' selected' : '');
+								$this->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', $image['description'] == $value ? ' selected="selected"' : '');
 								$this->parse("image_block".$componentCount, "image", true);
 							}
 						}
@@ -126,7 +136,7 @@ if (is_array($componentList)) {
 						{
 							$this->setVar('COMPONENT_CONFIG_SORT_NAME', $sort);
 							$this->setVar('COMPONENT_CONFIG_SORT_VALUE', $sort);
-							$this->setVar('COMPONENT_CONFIG_SORT_SELECTED', $sort == $value ? ' selected' : '');
+							$this->setVar('COMPONENT_CONFIG_SORT_SELECTED', $sort == $value ? ' selected="selected"' : '');
 							$this->parse("sort_block".$componentCount, "sort", true);
 						}
 						break;
@@ -138,11 +148,21 @@ if (is_array($componentList)) {
 						{
 							$this->setVar('COMPONENT_CONFIG_SORTDIR_NAME', $sort);
 							$this->setVar('COMPONENT_CONFIG_SORTDIR_VALUE', $sort);
-							$this->setVar('COMPONENT_CONFIG_SORTDIR_SELECTED', $sort == $value ? ' selected' : '');
+							$this->setVar('COMPONENT_CONFIG_SORTDIR_SELECTED', $sort == $value ? ' selected="selected"' : '');
 							$this->parse("sortdir_block".$componentCount, "sortdir", true);
 						}
 						break;
-					
+					case "filter":
+						$this->setBlock("config", "filter", "filter_block".$componentCount);
+						list($value, $filterOptions) = $value;
+						foreach ($filterOptions as $fname => $fvalue) 
+						{
+							$this->setVar('COMPONENT_CONFIG_FILTER_NAME', $fname);
+							$this->setVar('COMPONENT_CONFIG_FILTER_VALUE', $fvalue);
+							$this->setVar('COMPONENT_CONFIG_FILTER_SELECTED', $sort == $value ? ' selected="selected"' : '');
+							$this->parse("filter_block".$componentCount, "filter", true);							
+						}
+						break;
 					default:
 						$this->setVar('COMPONENT_CONFIG_' . strtoupper($name), $value);
 				}

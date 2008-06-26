@@ -94,7 +94,7 @@ define('TIMETABLE_day_count',serialize(array(1=>7,7,5)));
 
 
 //Webmail
-define("MAIL_enable", true);				//This will disable webmail module
+define("MAIL_enable", false);				//This will disable webmail module
 define("MAIL_interface", "roundcube");		// Options are roundcube or simple
 define("MAIL_retrieval", "imap");			//Options are pop or imap (imap has extra state information)
 define("MAIL_host", "alderaan.mgs.vic.edu.au");
