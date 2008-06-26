@@ -43,11 +43,12 @@ class File extends Model {
 				$query .= " AND ( f.mime_type LIKE '%pdf' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%') ";	
 						  
 		
-		$sortFields = array('name' => 'f.description', 'date' => 'f.submitted');
-		$config['sort'] = in_array($config['sort'], $sortFields) ? $config['sort'] : 'f.submitted';
+		$sortFields = array('Name' => 'f.description', 'Date' => 'f.submitted');
+		
+		$config['sort'] = isset($sortFields[$config['sort']]) ? $config['sort'] : 'Name';
 		$config['sortdir'] = strtoupper($config['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
 
-		$query .= " ORDER BY " . $config['sort'] . " " . $config['sortdir'];
+		$query .= " ORDER BY " . $sortFields[$config['sort']] . " " . $config['sortdir'];
 		
 		if($config['size'] > 0) 
 			$query .= " LIMIT 0, " . $config['size']; 

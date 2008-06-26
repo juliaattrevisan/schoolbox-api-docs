@@ -21,11 +21,11 @@ class Link extends Model {
 		if (perm($categoryID, HOMEPAGESERVICE) < 2)
 			$query .= " AND l.hidden = 0";	
 
-		$sortFields = array('name' => 'l.description', 'date' => 'l.submitted');
-		$config['sort'] = in_array($config['sort'], $sortFields) ? $config['sort'] : 'l.submitted';
+		$sortFields = array('Name' => 'l.description', 'Date' => 'l.submitted');
+		$config['sort'] = isset($sortFields[$config['sort']]) ? $config['sort'] : 'Name';
 		$config['sortdir'] = strtoupper($config['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
 
-		$query .= " ORDER BY " . $config['sort'] . " " . $config['sortdir'];
+		$query .= " ORDER BY " . $sortFields[$config['sort']] . " " . $config['sortdir'];
 		
 		if($config['size'] > 0) 
 			$query .= " LIMIT 0, " . $config['size']; 
