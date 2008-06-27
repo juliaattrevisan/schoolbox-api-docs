@@ -7,14 +7,14 @@
 //timetable object that displays the users timetable
 
 require_once 'include/permission.php';
-require_once 'library/synergetic-timetable.php';
-require_once 'library/user.php';
+require_once '../library/synergetic-timetable.php';
+require_once '../library/user.php';
 
 //synergy not enabled do not display page
 if(!SYNERGY_enable)
 	error(19);
 
-$this->setFile(TEMPLATE_content, 'timetable.html');
+$this->setFile(TEMPLATE_content, 'class/timetable.html');
 $this->setTitle('Timetable');
 $this->setTab('timetable');
 
@@ -142,11 +142,11 @@ function displayWeek(&$page, $sid)
 		$page->parse("timetable_listing", "timetable", true);
 		
 		//reset blocks in case we coming back...
-		$page->set_var('period_listing', '');
-		$page->set_var('day_header_listing', '');
+		$page->setVar('period_listing', '');
+		$page->setVar('day_header_listing', '');
 	}
 	else 
-		$this->t_body->set_var('timetable_listing', '');
+		$page->setVar('timetable_listing', '');
 			
 }
 

@@ -234,7 +234,7 @@ function getDayTimetable($synergy_id, $group, $campus, $daynumber)
 
 function getFullTimetable($synergy_id, $group, $campus)
 {	
-	$timetabledef = getTimetableDefinition($campus);
+	$timetabledef = $this->getTimetableDefinition($campus);
 
 	if( isStudent($group))
 	{

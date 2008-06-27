@@ -13,8 +13,6 @@ if (strpos($_SERVER['REQUEST_URI'], 'home.php'))
 $this->setFile(TEMPLATE_content, 'home.html');
 $this->setTitle('Welcome');
 
-$this->setBlock(TEMPLATE_content, "timetable", "timetable_block");	
-
 if(date("A")=="AM")
 	$greeting =  "Good Morning";
 else if(date("G") < 17)
@@ -24,12 +22,6 @@ else
 
 //set greeting
 $this->setVar("GREETING", $greeting .' '. formatName($_SESSION));
-
-//if user has timetable show it on the homepage
-if($_SESSION['timetable'])
-	$this->outputTimetable();
-else
-	$this->setVar("timetable_block", "");
 
 //fetch layout for user
 $query = "SELECT position, name, filename, function 
