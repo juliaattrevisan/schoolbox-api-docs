@@ -360,7 +360,7 @@ category.id AND f.deleted = '0'";
 	
 		// set owner
 		$fullname = formatName($fileDetails);
-		$owner = "<a href=\"/search/userLookup.php?id={$fileDetails['uid']}\">$fullname</a>";
+		$owner = "<a href=\"/search/user/{$fileDetails['uid']}\">$fullname</a>";
 		
 		//output owner
 		$this->t_body->set_var("OWNER", $owner);
@@ -402,7 +402,7 @@ category.id AND f.deleted = '0'";
 		
 		// set owner
 		$fullname = formatName($linkDetails);
-		$owner = "<a href=\"/search/userLookup.php?id={$linkDetails['uid']}\">$fullname</a>";
+		$owner = "<a href=\"/search/user/{$linkDetails['uid']}\">$fullname</a>";
 
 		$this->t_body->set_var("OWNER", $owner);		
 	

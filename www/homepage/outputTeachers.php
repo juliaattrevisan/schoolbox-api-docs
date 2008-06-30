@@ -15,7 +15,7 @@ if($code != "" && SYNERGY_enable)
 			$teacher = $user->getBySynergyID($synid);
 			if(is_array($teacher)) {
 				$name = formatName($teacher);
-				$this->setVar('MEMBER_NAME', "<a href=\"/search/userLookup.php?id={$teacher['id']}\">{$name}</a>");
+				$this->setVar('MEMBER_NAME', "<a href=\"/search/user/{$teacher['id']}\">{$name}</a>");
 				$this->parse("staff_teacher_block", "staff_teachers", true);	
 			}
 		}

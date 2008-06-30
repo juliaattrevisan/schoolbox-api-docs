@@ -12,7 +12,7 @@
 				$name = formatName($manager);
 				$email = formatEmail($manager);
 				
-				$this->setVar("MEMBER_NAME", "<a href=\"/search/userLookup.php?id={$manager['uid']}\">$name</a>");
+				$this->setVar("MEMBER_NAME", "<a href=\"/search/user/{$manager['uid']}\">$name</a>");
 					
 				if($manager['type'] == 3)
 					$name .= " (Group Admin.)";

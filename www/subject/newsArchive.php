@@ -61,7 +61,7 @@ class NewsArchive {
 				
 				$this->t_body->set_var("NEWS_HEADING", scrubTEXT($article['heading']));
 				$this->t_body->set_var("NEWS_BODY", scrubHTML($article['body']));
-				$this->t_body->set_var("EMAIL_CONTACT", "<a href=\"/search/userLookup.php?id={$article['uid']}\">$poster</a>");
+				$this->t_body->set_var("EMAIL_CONTACT", "<a href=\"/search/user/{$article['uid']}\">$poster</a>");
 				$this->t_body->set_var("POSTED_DATE", $article['datetime']);
 				$this->t_body->parse("news_block", "news", true);
 			}

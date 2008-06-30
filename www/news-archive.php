@@ -92,7 +92,7 @@ if(is_array($items))
 		$this->setVar("NEWS_TITLE", $article['item_heading']);
 		
 		$fullname = formatName($article);
-		$owner = "<a href=\"/search/userLookup.php?id={$article['uid']}\">$fullname</a>";
+		$owner = "<a href=\"/search/user/{$article['uid']}\">$fullname</a>";
 
 		$this->setVar("POSTER", $owner);
 		

@@ -14,12 +14,9 @@ class Category extends Model {
 	}
 	
 	function getCategoryList ($categoryID, $config = false) {
-		$query = "SELECT id, name, code, template, (SELECT count(*) FROM category WHERE parent = c.id) as children
-				  FROM category c
-				  WHERE parent = $categoryID ";
-		
-		$sortFields = array('name' => 'c.name', 'date' => 'c.id');
-		$config['sort'] = in_array($config['sort'], $sortFields) ? $config['sort'] : 'c.name';
+		$query = "SELECT id, name, code, template FROM category WHERE parent = $categoryID ";
+		$sortFields = array('name' => 'name', 'date' => 'id');
+		$config['sort'] = in_array($config['sort'], $sortFields) ? $config['sort'] : 'name';
 		$config['sortdir'] = strtoupper($config['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
 
 		$query .= " ORDER BY " . $config['sort'] . " " . $config['sortdir'];
@@ -30,6 +27,10 @@ class Category extends Model {
 		return $this->db->getAll($query);
 	}
 	
+	function hasChildren($categoryID) {
+		$query = "SELECT count(*) as children FROM category WHERE parent = $categoryID";
+		return $this->db->getOne($query);
+	}
 
 	function getParent($categoryID) {
 		$query = "SELECT parent FROM category WHERE id = $categoryID";

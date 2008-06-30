@@ -68,8 +68,8 @@ class stats
 	
 	function outputName($id, $firstname, $lastname)
 	{
-		$this->t_body->set_var("FNAME", "<a href=\"/search/userLookup.php?id=$id\">".$firstname."</a>");
-		$this->t_body->set_var("LNAME", "<a href=\"/search/userLookup.php?id=$id\">".$lastname."</a>");		
+		$this->t_body->set_var("FNAME", "<a href=\"/search/user/$id\">".$firstname."</a>");
+		$this->t_body->set_var("LNAME", "<a href=\"/search/user/$id\">".$lastname."</a>");		
 	}
 
 

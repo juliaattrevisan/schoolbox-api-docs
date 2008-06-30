@@ -220,6 +220,9 @@ if(is_numeric($this->arg[0])) {
 	else
 		$this->setVar('group_management_block', '');
 }
-
+else {
+	$this->setFile(TEMPLATE_content, 'user/search.html');
+	$this->setTitle('School Directory');
+}
 
 ?>

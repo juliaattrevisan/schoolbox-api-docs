@@ -171,7 +171,7 @@ class OutPut
 		
 		// set owner
 		$fullname = formatName($post);
-		$owner = "<a href=\"/search/userLookup.php?id={$post['uid']}\">$fullname</a>";
+		$owner = "<a href=\"/search/user/{$post['uid']}\">$fullname</a>";
 			
 		$this->t_body->set_var("OWNER", $owner);
 		$this->t_body->set_var("DATE", $post['fulldate']);	

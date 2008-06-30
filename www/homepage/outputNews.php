@@ -19,7 +19,7 @@ if (is_array($newsList)) {
 		
 		$this->setVar("NEWS_HEADING", scrubTEXT($news['heading']));
 		$this->setVar("NEWS_BODY", scrubHTML($news['body']));
-		$this->setVar("EMAIL_CONTACT", "<a href=\"/search/userLookup.php?id={$news['uid']}\">" . $news['ownerName'] . "</a>");
+		$this->setVar("EMAIL_CONTACT", "<a href=\"/search/user/{$news['uid']}\">" . $news['ownerName'] . "</a>");
 		$this->setVar("POSTED_DATE", $news['datetime']);
 		$this->parse("news_block", "news", true);
 	}

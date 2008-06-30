@@ -98,6 +98,8 @@ function getCategoryHTML($categoryIDList) {
 				
 				if (perm($category['id'], 1) < 1) continue;
 				
+				$category['children'] = $categoryHandler->hasChildren($category['id']);
+				
 				$output = array('CAT_ID' 		=> $category['id'],
 								'CAT_NAME'      => $category['name'] . (!empty($category['code']) ? " (" . $category['code'] . ")":""),
 								'CAT_OPENCLOSE' => $category['children'] > 0 ? "<img src=\"/images/" . 
