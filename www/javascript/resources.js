@@ -49,7 +49,7 @@ var myrules = {
 			if (!catContents || catContents.style.display == 'none') {
 				Resources.openCat(catParts.insertDiv, catParts.catID);
 				Resources.openWindow(catParts.catID);
-				if (catParts.openClose) catParts.openClose.src = '/images/icons/resources-collapse.gif';
+				if (catParts.openClose) catParts.openClose.src = '/images/expanded.gif';
 			} else {
 				Resources.openWindow(catParts.catID);
 			}
@@ -77,7 +77,7 @@ var myrules = {
 			if (!catContents || catContents.style.display == 'none') {
 				Resources.openCat(catParts.insertDiv, catParts.catID);
 				Resources.openWindow(catParts.catID);
-				if (catParts.openClose) catParts.openClose.src = '/images/icons/resources-collapse.gif';
+				if (catParts.openClose) catParts.openClose.src = '/images/expanded.gif';
 			} 	
 			el.setStyle('position', 'relative');
 			
@@ -122,7 +122,7 @@ var Resources = {
 	},
 	getFiles: function(catID) {
 		
-		var url = '/resources/file-list/' + catID;
+		var url = '/resources.php?file-list=' + catID;
 	
 		var myAjax = new Ajax(url, {
 						  	method: 'get',
@@ -148,7 +148,7 @@ var Resources = {
 
 	},
 	openDetails: function (fileID, e) {
-		var url = '/resources/details/' + fileID;
+		var url = '/resources.php?details=' + fileID;
 
 		var win = new Windoo({
 			resizable: false,
@@ -212,7 +212,7 @@ var Resources = {
 		
 	},
 	saveHistory: function (catID) {
-		var url = '/resources/save-history/' + catID;
+		var url = '/resources.php?save-history=' + catID;
 		var myAjax = new Ajax(url, {method: 'get'}).request();	
 		
 	},
@@ -221,7 +221,7 @@ var Resources = {
 		var parentDiv = catDiv.parentNode;
 		var catParts = Resources.getCatParts(parentDiv);
 		
-		var url = '/resources/cat-list/' + catID;
+		var url = '/resources.php?cat-list=' + catID;
 	
 		var myAjax = new Ajax(url, {
 								method: 'get', 

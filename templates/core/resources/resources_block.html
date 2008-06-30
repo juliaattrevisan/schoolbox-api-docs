@@ -1,23 +1,23 @@
 <!-- BEGIN category -->
-<div class='resources-category' {CAT_MARGIN} context="menuCategory" acatid="{CAT_ID}" ahomepage="{HOMEPAGE}" acatname="{CAT_NAME}">
+<div class='resources-category' {CAT_MARGIN}>
     <p class='resources-openclose'>{CAT_OPENCLOSE}</p>
-    <p class='resources-caticon'><img src="/images/mime/folder_blue_full.png" alt="{CAT_NAME}" /></p>
+    <p class='resources-caticon' context="menuCategory" acatid="{CAT_ID}" ahomepage="{HOMEPAGE}" acatname="{CAT_NAME}"><img src="/images/mime/folder_blue_full.png" alt="{CAT_NAME}" /></p>
     <div>
-        <p class='resources-catname' {CAT_SELECTED}>{CAT_NAME}</p>
+        <p class='resources-catname' {CAT_SELECTED} context="menuCategory" acatid="{CAT_ID}" ahomepage="{HOMEPAGE}" acatname="{CAT_NAME}">{CAT_NAME}</p>
         <p class='resources-catid'>{CAT_ID}</p>
         {SUB_CATEGORY}
 	</div>
 </div><!-- END category -->
 <!-- BEGIN category_window -->
-<div class='resources-category' context="menuCategory" acatid="{CAT_ID}" ahomepage="{HOMEPAGE}" acatname="{CAT_NAME}">
-    <p class='resources-icon'><img src="/images/mime/folder_blue_full.png" alt="{CAT_NAME}" /></p>
-	<p class='resources-catname'>{CAT_NAME}</p>
+<div class='resources-category'>
+    <p class='resources-icon' context="menuCategory" acatid="{CAT_ID}" ahomepage="{HOMEPAGE}" acatname="{CAT_NAME}"><img src="/images/mime/folder_blue_full.png" alt="{CAT_NAME}" /></p>
+	<p class='resources-catname' context="menuCategory" acatid="{CAT_ID}" ahomepage="{HOMEPAGE}" acatname="{CAT_NAME}">{CAT_NAME}</p>
     <p class='resources-catid'>{CAT_ID}</p>
 </div><!-- END category_window -->
 <!-- BEGIN file -->
-<div class='resources-file' {HIDDEN} context="menuFile" afileid="{FILE_ID}" acatid="{CAT_ID}" ainline="{FILE_INLINE}" aurl="{URL_YN}" alink="{FILE_LINK}">
-    <p class='resources-icon'><img src="{FILE_ICON}" alt="{FILE_ALT}" /></p>
-    <p class='resources-filename'>{FILE_URL}{FILE_NAME}{FILE_URL_END}</p>
+<div class='resources-file' {HIDDEN}>
+    <p class='resources-icon' context="menuFile" afileid="{FILE_ID}" acatid="{CAT_ID}" ainline="{FILE_INLINE}" aurl="{URL_YN}" alink="{FILE_LINK}"><img src="{FILE_ICON}" alt="{FILE_ALT}" /></p>
+    <p class='resources-filename' context="menuFile" afileid="{FILE_ID}" acatid="{CAT_ID}" ainline="{FILE_INLINE}" aurl="{URL_YN}" alink="{FILE_LINK}">{FILE_URL}{FILE_NAME}{FILE_URL_END}</p>
     <p class='resources-filesize'>{FILE_SIZE}</p>
 	<p class='resources-fileid'>{FILE_ID}</p>
     <p class='resources-catid'>{CAT_ID}</p>

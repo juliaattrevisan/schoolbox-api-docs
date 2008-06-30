@@ -216,7 +216,7 @@ var RightContext = {
 
     // type of html tags that can have context menus. You can edit this to 
     // allow more tags into the party.
-    allowedContexts: ["a","div","span","input"],
+    allowedContexts: ["a","div","span","input","p"],
 
     // object to hold a collection of menus indexed by name
     menuCollection: new Object(),

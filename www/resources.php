@@ -2,45 +2,61 @@
 
 require_once 'include/permission.php';
 
-if (is_numeric($this->arg[1])) {
-	switch ($this->arg[0]) {
-		case "cat-list":
-			if($this->arg[1] > 0) {
-				$openPerm = perm($this->arg[1], 1);
-			}	
-			list($categoryHTML) = getCategoryHTML($this->arg[1]);
-			print $categoryHTML;
-			break;
-		case "file-list":
-			if($this->arg[1] > 0) {
-				$openPerm = perm($this->arg[1], 1);
-			}	
-			list( , $windowHTML) = getCategoryHTML($this->arg[1]);			
-			$windowHTML .= getFileHTML($this->arg[1]);
-			print $windowHTML;
-			break;	
-		case "save-history":
-			$_SESSION['smCategory'] = (int)$this->arg[1];
-			break;	
-		case "details":
-			$fileDetails = outputDetails((int)$this->arg[1]);
-			print $fileDetails;
-			break;						
-	}
+if (!$this) {
+	require_once '../include/sitePage.php';
+	$page = new SitePage(false);
+	session_start();
+}
+if ( !isset($_SESSION['id'])) {
+	print "<script type=\"text/javascript\">window.open('/resources/','_self','');</script>";
 	exit;
 }
+
+if (is_numeric($_GET['cat-list'])) {
+
+	if($_GET['cat-list'] > 0) {
+		$openPerm = perm($_GET['cat-list'], 1);
+	}	
+	list($categoryHTML) = getCategoryHTML($_GET['cat-list']);
+	print $categoryHTML;
+	exit;
+
+} else if (is_numeric($_GET['file-list'])) {
+
+	if($_GET['file-list'] > 0) {
+		$openPerm = perm($_GET['file-list'], 1);
+	}	
+	list( , $windowHTML) = getCategoryHTML($_GET['file-list']);			
+	$windowHTML .= getFileHTML($_GET['file-list']);
+	print $windowHTML;
+	exit;
+
+} else if (is_numeric($_GET['save-history'])) {
+
+	$_SESSION['smCategory'] = (int)$_GET['save-history'];
+	exit;
+
+} else if (is_numeric($_GET['details'])) {
+	
+	$fileDetails = outputDetails((int)$_GET['details']);
+	print $fileDetails;
+	exit;
+}
+
 
 $this->setFile(TEMPLATE_content, 'resources/resources.html');
 $this->setTab("resources");
 $this->setTitle('Resources');
 
-$categoryID = isset($this->arg[0]) ? $this->arg[0] : $_SESSION['smCategory'];
+$categoryID = is_numeric($this->arg[0]) ? $this->arg[0] : $_SESSION['smCategory'];
 $categoryID = $_SESSION['smCategory'] = is_numeric($categoryID) ? $categoryID : 0;
 
 $this->setVar("CID", $categoryID);
 
 require_once '../library/category.php';
 $categoryHandler = new Category;
+
+
 
 // build categoryID array
 $categoryIDList = array ($categoryID);
