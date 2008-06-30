@@ -48,6 +48,7 @@ class SynergeticUser extends MSSQL{
 		
 		preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches);
 		$student['StudentBirthDate'] = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
+		return $student;
 		
 	}
 

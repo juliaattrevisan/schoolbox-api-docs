@@ -50,7 +50,7 @@ if(is_numeric($this->arg[0])) {
 	//advanced synergetic information
 	if(SYNERGY_enable)
 	{
-		require_once '../../library/synergetic-user.php';
+		require_once '../library/synergetic-user.php';
 
 		$synUserHandler = new SynergeticUser;
 		
@@ -69,7 +69,7 @@ if(is_numeric($this->arg[0])) {
 				else
 					$this->setVar("helpdesk_block", "");
 						
-				$synInfo = $synUserHandler->getStudentInfo($user['synergy_id']);
+				$synInfo = $synUserHandler->getStudent($user['synergy_id']);
 			
 				if($synInfo['StudentFormStaffName'] && $synInfo['TeacherFormID']) {
 					$form = $userHandler->getByField('synergy_id', $synInfo['TeacherFormID']);

@@ -32,10 +32,10 @@ if(isParent($_SESSION['gid']))
 }
 else
 {
-	if($_GET['sid'])
+	if($this->arg[0])
 	{
 		if(isStaff($_SESSION['gid']))
-			displayWeek(&$this, $_GET['sid']);
+			displayWeek(&$this, $this->arg[0]);
 		else
 			error(19);
 	}
