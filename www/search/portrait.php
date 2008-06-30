@@ -15,19 +15,20 @@ require_once("../include/image.php");
 
 //no image
 define(NO_IMAGE, $_SERVER['DOCUMENT_ROOT'].'/images/no_portrait.jpg');
+if(is_numeric($_GET['height']))
+	$height = $_GET['height'];
+else
+	$height = 300;
 	
+if(is_numeric($_GET['width']))
+	$width = $_GET['width'];
+else
+	$width = 200;	
+	
+$imageHandler = new Image;
+
 if(isset($_GET['id']) && $_GET['id'] && SYNERGY_enable)
 {
-	if(is_numeric($_GET['height']))
-		$height = $_GET['height'];
-	else
-		$height = 300;
-		
-	if(is_numeric($_GET['width']))
-		$width = $_GET['width'];
-	else
-		$width = 200;
-
 	//get file details
 	$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);	
 
@@ -38,7 +39,7 @@ if(isset($_GET['id']) && $_GET['id'] && SYNERGY_enable)
 	$result = mssql_query($query, $db);
 	if(mssql_num_rows($result) == 1)
 	{
-		$imageHandler = new Image;
+		
 		$image = mssql_fetch_array($result);
 		
 		$tempFile = tempnam(ZIP_directory, 'synport');
@@ -62,9 +63,10 @@ if(isset($_GET['id']) && $_GET['id'] && SYNERGY_enable)
 //if we get to here just output the no image
 if(file_exists(NO_IMAGE))
 {
+	$outImage = $imageHandler->imageResize(NO_IMAGE, $height, $width, false);
 	header("Content-Type: image/jpg");
 	header("Content-Disposition: filename=nopic.jpg"); 
-	readfile(NO_IMAGE);
+	imagejpeg($outImage);
 }		
 
 ?>

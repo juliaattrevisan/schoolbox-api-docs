@@ -55,6 +55,14 @@ function localRedir($file)
         exit;
 }
 
+//This function is used when the session is not correct simply redirects
+//user to login page with the requested url
+function goLoginPage()
+{
+        $page = rawurlencode($_SERVER['REQUEST_URI']);
+        localRedir("/login.php?page={$page}");
+}
+
 //function for returning user ip (tries to work around issues with proxies)
 function getIP() 
 {

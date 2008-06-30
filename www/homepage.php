@@ -18,8 +18,15 @@ require_once 'include/involved.php';
 require_once '../library/category.php';
 
 $categoryHandler = new Category; 
-$category = $categoryHandler->getByID($this->arg[0]);
+if(is_numeric($this->arg[0]))
+	$category = $categoryHandler->getByID($this->arg[0]);
+if(!is_array($category))
+	$category = $categoryHandler->getByField("code", urldecode($this->arg[0]));
+	
 $categoryID =& $category['id'];
+if (!$categoryID)
+	error(18);
+
 
 $categoryHandler->logPageView($categoryID);
 
@@ -30,11 +37,6 @@ define("CATEGORY_perms", perm($categoryID, HOMEPAGESERVICE));
 if (CATEGORY_perms < 1)
 	error(14);
 
-if (!$categoryID)
-	$category = $categoryHandler->getByField("code", urldecode($this->arg[0]));
-
-if (!$categoryID)
-	error(18);
 
 
 if($category['code'])

@@ -64,6 +64,16 @@ class Category extends Model {
 		$this->db->query($query);	
 	}
 	
+	function lastVisit($categoryID, $userID) {
+		//get the time since the last visit to this homepage
+		$query = "SELECT DATE_FORMAT(`datetime`, '%a %D %b %H:%i') as visit FROM homepage_log, category
+				  WHERE category.id = '$categoryID'
+				  AND	category.id = homepage_log.cid
+				  AND   homepage_log.user = '$userID'
+		"; 
+		return $this->db->getOne($query);
+	}
+	
 	function getComponents($categoryID) {
 
 		$query = "SELECT position, `column`, component, homepage_comp.config dfconfig, homepage_comp_location.config, name, method, filename 
