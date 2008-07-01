@@ -15,6 +15,7 @@ class Category extends Model {
 	
 	function getCategoryList ($categoryID, $config = false) {
 		$query = "SELECT id, name, code, template FROM category WHERE parent = $categoryID ";
+		
 		$sortFields = array('name' => 'name', 'date' => 'id');
 		$config['sort'] = in_array($config['sort'], $sortFields) ? $config['sort'] : 'name';
 		$config['sortdir'] = strtoupper($config['sortdir']) == 'DESC' ? 'DESC' : 'ASC';

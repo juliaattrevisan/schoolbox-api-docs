@@ -70,6 +70,7 @@ div.windoo-alphacube a.windoo-close-disabled, div.windoo-alphacube a.windoo-clos
 	background-position:-92px -57px;
 }
 div.windoo-alphacube a.windoo-maximize {
+	display:none;
 	top:0px;
 	right:38px;
 	background-position:-46px 0;
@@ -81,6 +82,7 @@ div.windoo-alphacube a.windoo-maximize-disabled, div.windoo-alphacube a.windoo-m
 	background-position:-46px -57px;
 }
 div.windoo-alphacube a.windoo-minimize {
+	display: none;
 	top:0px;
 	right:61px;
 	background-position:0 0;
@@ -92,6 +94,7 @@ div.windoo-alphacube a.windoo-minimize-disabled, div.windoo-alphacube a.windoo-m
 	background-position:0 -57px;
 }
 div.windoo-alphacube a.windoo-restore {
+
 	display:none;
 	top:0px;
 	right:15px;

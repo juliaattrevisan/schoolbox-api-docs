@@ -154,8 +154,8 @@ var Resources = {
 			resizable: false,
 			destroyOnClose: false,
 			title: 'Properties',
-			width: 220,
-			height: 360,
+			width: 330,
+			height: 240,
 			theme: Windoo.Themes.alphacube
 		});
 

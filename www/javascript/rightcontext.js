@@ -213,6 +213,7 @@ var RightContext = {
 
     // offset for menu from mouse pointer
     rightOffset: 5,
+	topOffset: -15,
 
     // type of html tags that can have context menus. You can edit this to 
     // allow more tags into the party.
@@ -594,9 +595,10 @@ var RightContext = {
         dim = this.getDimensions(parent);
 
         // position the container to the bottom right of the element.
-        this.position (this.contextMenu, this.mousePos.x + this.rightOffset, pos.y+dim.height);
-
-        // set some event handlers
+       // this.position (this.contextMenu, this.mousePos.x + this.rightOffset, pos.y+dim.height);
+ 		this.position (this.contextMenu, this.mousePos.x + this.rightOffset, this.mousePos.y  + this.topOffset + dim.height);
+        
+		// set some event handlers
         // if the menu is triggered by a right click, disable the right click on the menu itself
         if (this.menuTriggerEvent == "RIGHT") {
 	        this.contextMenu.oncontextmenu = function () { return false; };

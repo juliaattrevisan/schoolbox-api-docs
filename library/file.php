@@ -13,7 +13,7 @@ class File extends Model {
 	}
 	
 	function getByID($fileID) {
-		$query = "SELECT f.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName, 
+		$query = "SELECT f.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName,
 						UNIX_TIMESTAMP(f.submitted) submitted, ft.name typeName, c.name categoryName, af.description as mimeDescription, iconFile, af.inline
 				  FROM file f 
 				  LEFT JOIN user u ON u.id = f.owner

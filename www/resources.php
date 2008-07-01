@@ -14,18 +14,12 @@ if ( !isset($_SESSION['id'])) {
 
 if (is_numeric($_GET['cat-list'])) {
 
-	if($_GET['cat-list'] > 0) {
-		$openPerm = perm($_GET['cat-list'], 1);
-	}	
 	list($categoryHTML) = getCategoryHTML($_GET['cat-list']);
 	print $categoryHTML;
 	exit;
 
 } else if (is_numeric($_GET['file-list'])) {
 
-	if($_GET['file-list'] > 0) {
-		$openPerm = perm($_GET['file-list'], 1);
-	}	
 	list( , $windowHTML) = getCategoryHTML($_GET['file-list']);			
 	$windowHTML .= getFileHTML($_GET['file-list']);
 	print $windowHTML;
@@ -75,7 +69,6 @@ $this->setVar('NAV_CONTENT', $categoryHTML);
 // right column
 $windowHTML = "";
 if ($categoryID > 0) {
-	$openPerm = perm($categoryID, 1);
 	list( , $windowHTML) = getCategoryHTML($categoryID);
 }
 $windowHTML .= getFileHTML($categoryID);	
@@ -100,19 +93,23 @@ function getCategoryHTML($categoryIDList) {
 	
 	require_once '../library/category.php';
 	$categoryHandler = new Category;	
-	
+		
 	for ($i = 0; $i < count($categoryIDList); $i++) {
 
 
 		$catList = $categoryHandler->getCategoryList($categoryIDList[$i]);
-
+		$catPerm = perm($categoryIDList[$i], 1);
+		if ($catPerm < 1)
+			continue;
+		
 		$page->setVar('category_block', '');
 		$page->setVar('category_window_block', '');
 
 		if (is_array($catList)) {
 			foreach($catList as $category) {	
 				
-				if (perm($category['id'], 1) < 1) continue;
+				$subPerm = perm($category['id'], 1);
+				if ($subPerm < 1) continue;
 				
 				$category['children'] = $categoryHandler->hasChildren($category['id']);
 				
@@ -125,6 +122,7 @@ function getCategoryHTML($categoryIDList) {
 								'CAT_MARGIN'    => ($i+1<count($categoryIDList)? "style='margin-left: 30px;'" : "") ,
 								'CAT_SELECTED'  => $category['id'] == $_SESSION['smCategory'] ? "id='resources-selected'" : "",
 								'HOMEPAGE'	  	=> $category['template'] > 0 ? "Y" : "N",
+								'HAS_PERM'		=> $subPerm > 1 ? 'Y' : '',
 								);
 								
 				$page->setVar($output);
@@ -148,8 +146,6 @@ function getFileHTML($categoryID) {
 	$page->setFile('blockBODY', 'resources/resources_block.html');
 	$page->setBlock('blockBODY', 'file', 'file_block');
 	
-	global $openPerm;
-
 	require_once '../library/file.php';
 	require_once '../library/link.php';
 	$fileHandler = new File;
@@ -158,6 +154,10 @@ function getFileHTML($categoryID) {
 	$fileList = $fileHandler->getAllInCategory($categoryID);
 	$linkList = $linkHandler->getAllInCategory($categoryID);
 	
+	$catPerm = perm($categoryID, 1);
+	
+	if ($catPerm < 1)
+		error(14);
 	
 	if (is_array($fileList)) {
 		if (is_array($linkList)) {
@@ -172,7 +172,7 @@ function getFileHTML($categoryID) {
 	
 		foreach ($fileList as $file) {
 			
-			if ($file['hidden'] > 0 && $openPerm < 2) continue;
+			if ($file['hidden'] > 0 && $catPerm < 2) continue;
 		
 			$output = array('FILE_ID' 	 	=> $file['id'],
 							'FILE_NAME' 	=> scrubText($file['description']),
@@ -183,6 +183,7 @@ function getFileHTML($categoryID) {
 							'URL_YN'	 	=> $file['url'] ? "Y":"N",
 							'HIDDEN'	 	=> $file['hidden'] > 0 ? "style='opacity: 0.55;'" : "",
 							'FILE_LINK' 	=> urlencode($file['url']),
+							'HAS_PERM'		=> $catPerm > 1 ? 'Y' : '',
 							);
 
 			$filename = FILE_directory . "/" . $file['id'] . ".dat";
@@ -259,15 +260,23 @@ function outputDetails ($fileID) {
 	$output = array ('FILE_ID'	 => $file['id'],
 					 'CATEGORY'	 => $file['categoryName'],
 					 'OWNER'	 => $file['ownerName'],
+					 'OWNER_ID'	 => $file['owner'],
 					 'REALNAME'	 => $file['realname'],
 					 'CREATED'	 => date("M j y @ g:iA", $file['submitted']),
 					 'DESCRIPTION'	=> scrubText($file['description']),
 					 'COMMENT'	 => scrubText($file['comment']),
-					 'TYPE'		 => $file['typName'],
-					 'SIZE'		 => $file['file_size'],
-					 'MIME_TYPE' => $file['miem_type'],
+					 'SIZE'		 => number_format($file['file_size']/1024, 1),
+					 'MIME_TYPE' => $file['mime_type'],
 					 'HIDDEN'	 => $file['hidden'] > 0 ? 'Yes' : 'No',
 					 );
+	
+	$catPerm = perm($file['category'], 1);
+	if ($catPerm < 1)
+		error(14);
+		
+	if ($file['hidden'] > 0 && $catPerm < 2)
+		error(19);
+	
 	$page->setVar($output);
 	
 	$page->parse('file_details_block', 'file_details');

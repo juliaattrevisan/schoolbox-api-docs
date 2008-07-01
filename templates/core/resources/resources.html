@@ -26,7 +26,7 @@
 
 <script type='text/javascript'>
 	
-	menu1 = { attributes: "afileid,acatid,ainline,aurl,alink,acomments,aowner,asubmitted" ,
+	menu1 = { attributes: "afileid,acatid,ainline,aurl,alink,acomments,aowner,asubmitted,afilename,aadmin" ,
 	
 		items: [ 
 			   {type:RightContext.TYPE_MENU,
@@ -56,6 +56,11 @@
 				text:"Modify",
 				requires: ["aurl", "Y"],
 				url:"/cms/modResource.php?type=modurl&id=[afileid]"},
+				
+			   {type:RightContext.TYPE_MENU,
+				text:"Delete",
+				requires: ["aadmin", "Y"],
+				onclick:function() { if (confirm('Are you sure you want to delete [afilename]?')) { window.open("/cms/delResource.php?fileid=[afileid]",'_blank',''); }} },
 			  
 			   {type: RightContext.TYPE_SEPERATOR },
 			   
@@ -79,7 +84,7 @@
 				}]
 	};			   
 	
-	menu2 = { attributes: "acatid,ahomepage,acatname" ,
+	menu2 = { attributes: "acatid,ahomepage,acatname,aadmin" ,
 	
 		items: [ 
 			   {type:RightContext.TYPE_MENU,
@@ -101,6 +106,7 @@
 				
 			   {type:RightContext.TYPE_MENU,
 				text:"Delete",
+				requires: ["aadmin", "Y"],
 				onclick:function() { if (confirm('Are you sure you want to delete [acatname]?')) { window.open("/cms/modFolder.php?delete=[acatid]",'_blank',''); }} },
 			  
 			   {type: RightContext.TYPE_SEPERATOR },
