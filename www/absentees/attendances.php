@@ -70,23 +70,23 @@ class Attendance
 				Attendances.AttendedFlag, 
 				Attendances.PossibleAbsenceCode, 
 				Attendances.PossibleDescription
-			FROM	Students Students
-			INNER JOIN StudentSemester ON Students.ID = StudentSemester.ID
-			LEFT JOIN StudentClasses ON (
+			FROM	SynergyOne.dbo.Students Students
+			INNER JOIN SynergyOne.dbo.StudentSemester StudentSemester ON Students.ID = StudentSemester.ID
+			LEFT JOIN SynergyOne.dbo.StudentClasses StudentClasses ON (
 				StudentSemester.FileYear = StudentClasses.FileYear AND
 				StudentSemester.FileSemester = StudentClasses.FileSemester AND
 				StudentSemester.ID = StudentClasses.ID)
-			LEFT JOIN SubjectClasses ON (
+			LEFT JOIN SynergyOne.dbo.SubjectClasses SubjectClasses ON (
 				StudentClasses.FileType = SubjectClasses.FileType AND
 				StudentClasses.FileYear = SubjectClasses.FileYear AND
 				StudentClasses.FileSemester = SubjectClasses.FileSemester AND
 				StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
 				StudentClasses.ClassCode = SubjectClasses.ClassCode )
-			LEFT JOIN Community CommunityStudents ON 
+			LEFT JOIN SynergyOne.dbo.Community CommunityStudents ON 
 				Students.ID = CommunityStudents.ID
-			LEFT JOIN luStudentStatus lS ON (
+			LEFT JOIN SynergyOne.dbo.luStudentStatus lS ON (
 				StudentSemester.Status = lS.Code)
-			LEFT JOIN Attendances ON ( 
+			LEFT JOIN SynergyOne.dbo.Attendances Attendances ON ( 
 				Students.ID = Attendances.ID AND
 				Attendances.ClassCode = StudentClasses.ClassCode
 				AND Attendances.AttendancePeriod = '" . $periodnum . "'
@@ -182,8 +182,8 @@ class Attendance
 		$mydb = new dbManager;
 		$mydb->dbConnect();
 		$query = "SELECT firstname, lastname FROM user WHERE id = '".$_SESSION['id']."'";
-		$mydb->query($query);
-		$teacher = $mydb->getNextArray();
+		$mydb->dbDoQuery($query);
+		$teacher = $mydb->dbGetNextArray();
 		
 		$this->t_body->set_var("TEACHERNAME", $teacher['firstname']." ".$teacher['lastname']);
 

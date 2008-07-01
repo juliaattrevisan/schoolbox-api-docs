@@ -41,12 +41,13 @@ h3 {
 
 #left h3 {
 	margin:0;
-	padding:0 0 4px 5px;
-	background:#B51C21;
+	padding:3px 0 4px 5px;
+	background:#CC0000;
 	color:#fff;
 	font-size:80%; 
-	line-height:1.2em;
+	height:17px;
 	font-weight:bold;
+	background:url(/images/wenona/linkBG.gif) repeat-x;
 	}
 
 /*--------------------------------------------------------------------------------------*/
@@ -101,7 +102,7 @@ acronym, dfn, abbr {
 	color:#fff;
 	display:block;
 	text-decoration:none;
-	background:#002452 url(/images/wenona/white_arrow.png) no-repeat 2px 3px; /* IE6 Bug */
+	background:#003366 url(/images/wenona/white_arrow.png) no-repeat 2px 3px; /* IE6 Bug */
 	padding:2px 0 2px 14px;
 	font-weight:normal;
 	font-size:70%;
@@ -170,13 +171,13 @@ a img {
 	}
 
 #header {
-	background:#002452 url(/images/wenona/headerv2.gif) no-repeat 20px 2px;
-	height:162px;
+	background:#003366 url(/images/wenona/headerv3.gif) no-repeat 150px 0;
+	height:169px;
 	}
 
 #left{
 	position:absolute;
-	top:162px;
+	top:46px;
 	left:0;
 	width:150px;
 	z-index:2; /* this is needed so that the horizontal pop-up menu appears above this */
@@ -189,8 +190,8 @@ a img {
 
 #content_text{
 	background:#fff;
-	border-top:2px solid #B51C21;
-	border-left:2px solid #B51C21;
+	border-top:2px solid #CC0000;
+	border-left:2px solid #CC0000;
 	padding:10px;
 	font-size:80%;
 	line-height:1.4em;
@@ -226,7 +227,7 @@ a img {
 
 #topNav {
 	position:absolute;
-	top:40px;
+	top:46px;
 	left:150px;
 	padding:0;
 	background:transparent;
@@ -245,13 +246,12 @@ a img {
 	border:0;
 	}
 #topNav li.right {	
-	background:url("/images/wenona/navright_left.gif") no-repeat left top;
 	}
 #topNav li.left {	
-	background:url("/images/wenona/navleft_left.gif") no-repeat left top;
+
 	}
 #topNav li.norm {	
-	background:url("/images/wenona/navnorm_left.gif") no-repeat left top;
+
 	}
 #topNav a {
 	float:left;
@@ -265,13 +265,13 @@ a img {
 	white-space:nowrap;
 	}
 #topNav a.right {
-	background:url("/images/wenona/navright_right.gif") no-repeat right top;color:#002452;
+	color:#fff;
 	} 
 #topNav a.left {
-	background:url("/images/wenona/navleft_right.gif") no-repeat right top;color:#002452;
+	color:#fff;
 	} 
 #topNav a.norm {
-	background:url("/images/wenona/navnorm_right.gif") no-repeat right top;color:#002452;
+	color:#fff;
 	} 
 #topNav >  ul a {width:auto;}
 /* Commented Backslash Hack hides rule from IE5-Mac \*/
