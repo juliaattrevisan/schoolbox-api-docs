@@ -7,8 +7,9 @@ $calendarHandler = new Calendar;
 
 if (isset($_POST['date'])) {
 
-	$date = explode("/", $_POST['date']);
-	krsort($date);
+	$date = ausDateToUnix($_POST['date']);
+	$until = ausDateToUnix($_POST['repeat_until']);	
+		
 	$event = array('owner' 		=> $_SESSION['id'],
 				   'access'		=> $_POST['level'],
 				   'sid'		=> $_POST['group'],
@@ -16,18 +17,34 @@ if (isset($_POST['date'])) {
 				   'groupList'	=> $_POST['groupCheck'],
 				   'priority'	=> $_POST['priority'],
 				   'note'		=> $_POST['note'],
-				   'date'		=> implode($date),
 				   'startTime'	=> (($_POST['period'] == 'pm' && $_POST['hour'] != 12 ? 12 : 0) + $_POST['hour']) . ":" . $_POST['minute'] . ":00",
 				   'endTime'	=> (($_POST['toperiod'] == 'pm' && $_POST['tohour'] != 12 ? 12 : 0) + $_POST['tohour']) . ":" . $_POST['tominute'] . ":00",
 				  );
+
+	$validRepeat = array('daily' => '+1 day', 'weekly' => '+1 week', 'fortnightly' => '+2 weeks', 'monthly' => '+1 month');
+	if (isset($validRepeat[$_POST['repeat']]) && $until) {
+		$i = 0;
+		for ($date; $date <= $until; $date = strtotime($validRepeat[$_POST['repeat']], $date)) {
+			if ($i++ > 100) break;
+				
+			$dateArray[] = date("Y-m-d", $date);
+		}		
+	
+	} else {
+		$dateArray[] = date("Y-m-d", $date);
+	}	  
+				  
 	if(is_numeric($_POST['id'])) {
 	
 		$event['id'] = $_POST['id'];
+		$event['date'] = $dateArray[0];
 		$calendarHandler->update($event);
 	} 
 	else {
-
-		$event['id'] = $calendarHandler->create($event);
+		for ($i = 0; $i < count($dateArray); $i++) {
+			$event['date'] = $dateArray[$i];
+			$calendarHandler->create($event);
+		}
 	}
 
 	localRedir('/calendar/' . ($_POST['return'] == 'month' ? 'month' : 'week') . '/' . str_replace("/", "-", $_POST['date']));
@@ -42,6 +59,7 @@ if (isset($_POST['date'])) {
 	$this->setFile(TEMPLATE_content, 'calendar/modify.html');
 	$this->setTab("calendar");
 	
+	$this->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
 	$event = $calendarHandler->getByID($this->arg[0]);
@@ -107,12 +125,13 @@ if (isset($_POST['date'])) {
 	$this->dropDown('level_drop', $levelList, $event['access']);
 
 	$this->parse('delete_button_block', 'delete_button', true);
-			
+	$this->setVar('recurring_dates_block', '');		
 	
 } else {
 
 	$this->setFile(TEMPLATE_content, 'calendar/modify.html');
 	$this->setTab("calendar");
+	$this->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
 	list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->arg[0]);
@@ -169,6 +188,7 @@ if (isset($_POST['date'])) {
 	$this->dropDown('level_drop', $levelList, '');
 
 	$this->setVar('delete_button_block', '');
+	$this->parse('recurring_dates_block', 'recurring_dates');
 	
 }
 

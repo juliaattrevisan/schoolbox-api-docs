@@ -137,6 +137,7 @@ for($i=0; $i < 7; $i++) {
 	}
 
 	$eventList = $calendarHandler->getDayEvents($currentDay);
+	
 	if(is_array($eventList)) {
 		foreach($eventList as $event) {
 			$output = array('TIME'		=> rtrim(
@@ -156,6 +157,7 @@ for($i=0; $i < 7; $i++) {
 		if(!$subout) $this->setVar("note_listing", "");
 	
 	$this->parse("day_listing", "day_block", true);
+	$this->setVar("note_listing","");
 }
 
 ?>

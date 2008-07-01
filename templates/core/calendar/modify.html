@@ -59,6 +59,12 @@
                                             return;
                                     });
         }
+		function toggleRepeat(o) {
+			if (o.value == '')
+				$('repeatUntil').style.display = 'none';
+			else
+				$('repeatUntil').style.display = '';
+		}
     </script>
     <!-- END custom_head -->
 
@@ -80,6 +86,34 @@
 						});
 						</script>					 </td>
                       </tr>
+                      <!-- BEGIN recurring_dates -->
+                      <tr>
+                       <td class="formLabelWidth" valign="top"><h2>Repeat</h2>
+                       <em>The frequency that this event recurs if at all.</em></td>
+                       <td><select name="repeat" onchange="toggleRepeat(this);">
+                       	   <option value="">Single Event</option>
+                       	   <option value="daily">Daily</option>
+                           <option value="weekly">Weekly</option>
+                           <option value="fortnightly">Fortnightly</option>
+                           <option value="monthly">Monthly</option>
+                           </select></td>
+                      </tr>
+                      <tr id="repeatUntil" style="display: none;">
+                      <td class="formLabelWidth" valign="top"><h2>Repeat Until</h2>
+                      <em>The date at which recurrence should cease.</em></td>
+                      <td><input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="10" value=""/>
+						<img src="/images/ico_calendar.gif" width="16" height="13" id="repeat_until_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+	 				 	<script type="text/javascript">
+						Calendar.setup({
+							inputField     :    "repeat_until",     // id of the input field
+							ifFormat       :    "%d/%m/%Y",      // format of the input field
+							button         :    "repeat_until_trigger",  // trigger for the calendar (button ID)
+							align          :    "br",           // alignment (defaults to "Bl")
+							singleClick    :    true
+						});
+						</script></td>
+                      </tr>
+                      <!-- END recurring_dates -->
                       <tr> 
                         <td><h2>Time</h2><em>Both time slots are optional.</em></td>
                         <td> <input name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />
