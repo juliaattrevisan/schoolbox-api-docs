@@ -14,10 +14,11 @@ class CategoryNews extends Model {
 
 	function getAllForCategory($categoryID) {
 		$query = "SELECT n.id, heading, UNIX_TIMESTAMP(datetime_posted) posted, 
-					UNIX_TIMESTAMP(datetime_expires) expires, body, deleted, code, owner, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName 
+					UNIX_TIMESTAMP(datetime_expires) expires, body, deleted, code, owner, u.firstname, u.lastname, u.title, u.id as uid
 				  FROM ".$this->_table." n
 				  LEFT JOIN user u ON u.id = n.owner 
-				  WHERE code = '$categoryID'";
+				  WHERE code = '$categoryID'  AND datetime_expires > NOW() AND deleted = 0
+    			  ORDER BY datetime_posted DESC";
 
 		return $this->db->getAll($query);
 	}

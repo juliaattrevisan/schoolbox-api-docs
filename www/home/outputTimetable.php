@@ -1,6 +1,6 @@
 <?php
 
-require_once 'library/synergetic-timetable.php';
+require_once '../library/synergetic-timetable.php';
 
 $timetableHandler = new SynergeticTimetable;
 	

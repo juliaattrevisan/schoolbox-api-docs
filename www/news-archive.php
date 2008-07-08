@@ -22,7 +22,7 @@ $this->setBlock(TEMPLATE_content, 'archive_button', 'archive_button_block');
 
 //can see add news link
 if(isStaff($_SESSION['gid']))
-	$this->setVar("ADD", "<b><a href=\"/news/modnews.php\">add news</a></b>");
+	$this->setVar("ADD", "<b><a href=\"/news/modify\">add news</a></b>");
 else
 	$this->setVar("ADD", "");
 	

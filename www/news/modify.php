@@ -1,13 +1,13 @@
 <?php
 
-require_once '../include/permission.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
-require_once '../../library/news.php';
+require_once $_SERVER['DOCUMENT_ROOT'] .'/../library/news.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/include/permission.php';
 
 $newsHandler = new News;
-$page = new SitePage;
 
-if ($_POST['heading'] && perm(0, 3) >= 2) {
+$permLevel = perm(0,3);
+
+if ($_POST['heading'] && $permLevel >= 2) {
 	$news = array('item_heading' => $_POST['heading'],
 				  'item_body'		 => $_POST['body'],
 				  'groupList'	=> $_POST['group'],
@@ -25,16 +25,16 @@ if ($_POST['heading'] && perm(0, 3) >= 2) {
 
 	localRedir("/news/");
 } 
-else if (is_numeric($_GET['delete']) && perm(0, 3) >= 2) {
+else if (is_numeric($_GET['delete']) && $permLevel >= 2) {
 	$newsHandler->delete($_GET['delete']);
 	localRedir("/news/");
 }
-else if (is_numeric($_GET['newsID']) && perm(0, 3) >= 2) {
-	$page->setFile(TEMPLATE_content, "news/modify.html");
-	$page->setBlock(TEMPLATE_content, "campus_row", "campus_row_block");
-	$page->setBlock(TEMPLATE_content, "delete_button", "delete_button_block");
-	$page->setVar("TITLE", HEADING." - Modify News");
-	$page->setTab("news");
+else if (is_numeric($_GET['newsID']) && $permLevel >= 2) {
+	$this->setFile(TEMPLATE_content, "news/modify.html");
+	$this->setBlock(TEMPLATE_content, "campus_row", "campus_row_block");
+	$this->setBlock(TEMPLATE_content, "delete_button", "delete_button_block");
+	$this->setVar("TITLE", HEADING." - Modify News");
+	$this->setTab("news");
 	
 	$news = $newsHandler->getByID($_GET['newsID']);
 	
@@ -46,27 +46,27 @@ else if (is_numeric($_GET['newsID']) && perm(0, 3) >= 2) {
 					'DEFAULT_TIME_SELECTED' => '',
 					);
 					
-	$page->setVar($output);
+	$this->setVar($output);
 	
 	$groupList = $newsHandler->getGroupList();
 	$campusList = $newsHandler->getCampusList();
 	
-	$page->dropDown("group_selection", $groupList, $news['groupList']);
-	$page->dropDown("campus_selection", $campusList, $news['campusList'], "campus_row");
+	$this->dropDown("group_selection", $groupList, $news['groupList']);
+	$this->dropDown("campus_selection", $campusList, $news['campusList'], "campus_row");
 	
 	if (count($campusList) > 1)
-		$page->parse("campus_row_block", "campus_row");
+		$this->parse("campus_row_block", "campus_row");
 	else
-		$page->setVar("campus_row_block", "");
+		$this->setVar("campus_row_block", "");
 		
-	if (perm(0, 3) >= 3)
+	if ($permLevel >= 3)
 		$page->parse("delete_button_block", "delete_button");
 	else
 		$page->setVar("delete_button_block", "");
 
 	$page->outputPage();
 }
-else if (perm(0, 3) >= 2) {
+else if ($permLevel >= 2) {
 	$page->setFile(TEMPLATE_content, "news/modify.html");
 	$page->setBlock(TEMPLATE_content, "campus_row", "campus_row_block");
 	$page->setBlock(TEMPLATE_content, "delete_button", "delete_button_block");

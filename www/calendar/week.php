@@ -5,8 +5,7 @@
 *                                                           *
 ************************************************************/
 
-require_once "include/permission.php";
-require_once "../library/calendar.php";
+require_once  $_SERVER['DOCUMENT_ROOT'] ."/../library/calendar.php";
 
 $calendarHandler = new Calendar;
 

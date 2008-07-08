@@ -147,7 +147,7 @@ if(is_numeric($this->arg[0])) {
 					$this->setVar('student_synergy_form_block','');
 				}
 				
-				if($synInfo['StudentMedicalAlert'])
+				if(trim($synInfo['StudentMedicalAlert']))
 					$this->parse('medical_block', 'medical');
 				else 
 					$this->setVar('medical_block', '');

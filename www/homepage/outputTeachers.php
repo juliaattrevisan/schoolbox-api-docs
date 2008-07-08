@@ -1,14 +1,13 @@
 <?php
 // gets teachers involved in subject, outputs links to their addressbook page
-require_once '../library/synergetic-class.php';
-require_once '../library/user.php';
-$synergeticClass = new SynergeticClass;
-$userHandler = new User;
-
 $this->setBlock($componentHandle, "staff_teachers", "staff_teacher_block");
-
 if($code != "" && SYNERGY_enable)
 {	
+	require_once '../library/synergetic-class.php';
+	require_once '../library/user.php';
+	$synergeticClass = new SynergeticClass;
+	$userHandler = new User;
+	
 	$listSyns = $synergeticClass->getTeacherName($code);
 	if(is_array($listSyns)) {
 		foreach($listSyns as $synid) {

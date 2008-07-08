@@ -1,6 +1,7 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/include/permission.php';
 
 class News extends Model {
 

@@ -1,0 +1,32 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" href="/css/wenona-home.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="/css/whatsnew.css" type="text/css" media="screen" />
+<script type="text/javascript" src="/javascript/whatsnew.js"></script>
+<!-- END custom_head -->
+<h1>{GREETING}</h1>
+<!-- BEGIN timetable -->
+<h2>Timetable - Day {DAYNUMBER}</h2>
+      <table class="timetable">                    
+            <tr>
+            <!-- BEGIN timetable_header -->
+                <th>{PERIOD_NAME}</th>
+            <!-- END timetable_header -->
+            </tr>
+            <tr>
+                <!-- BEGIN timetable_period -->
+                  <td style="width:{TIMETABLE_FIELD_WIDTH}%" class="{TIMETABLE_CLASS}">{PERIOD_DESC}<br />{PERIOD_CODE}<br />{PERIOD_ROOM} {PERIOD_ABSENTEES}</td>
+                <!-- END timetable_period -->
+            </tr>
+      </table>
+<!-- END timetable -->
+<div class="dbx-group" id="news-column">
+<table class="home">
+    <tr>
+        <td style="vertical-align:top">{POS1}
+            {POS2}{POS3}{POS4}</td>
+        <td style="vertical-align:top">{POS5}
+            {POS6}{POS7}{POS8}</td>
+    </tr>
+</table>
+</div>    
+<br style="clear:both" />	

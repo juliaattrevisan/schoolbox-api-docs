@@ -2,6 +2,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/page.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/db.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/include/permission.php';
 
 class SitePage extends Page {
 

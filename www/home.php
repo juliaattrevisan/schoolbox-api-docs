@@ -32,7 +32,8 @@ while($component = $this->db->getNextArray($result))
 {
 	if($component['name'])
 	{
-		$this->setFile($component['name'], 'home/'.$component['filename']);
+		if($component['filename'])
+			$this->setFile($component['name'], 'home/'.$component['filename']);
 		
 		$funcname = $component['function'];
 		if(is_file($_SERVER['DOCUMENT_ROOT'].'/home/'.$funcname.'.php')) {

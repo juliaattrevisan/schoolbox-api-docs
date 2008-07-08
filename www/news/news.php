@@ -123,7 +123,7 @@ function deleteNews($id, $userInfo)
 function getHeadlines()
 {
     $query = "
-	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_datetime_posted, news_items.item_body
+	SELECT news_items.item_id, news_items.item_heading, news_items.item_datetime_posted, news_items.item_body
     FROM news_items 
     	JOIN newsCampus ON newsCampus.id = news_items.item_id 
 			AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).") 
@@ -132,17 +132,19 @@ function getHeadlines()
     WHERE news_items.item_owner != '".$_SESSION['id']."' 
 		AND news_items.item_datetime_expires > NOW() 
 		AND news_items.item_deleted = 0 
+	GROUP BY news_items.item_id
 	ORDER BY news_items.item_datetime_posted DESC
 	";
 	
 	$shareResults = $this->dbConnection->getAll($query);
 	
     $query = "
-	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_datetime_posted, news_items.item_body
+	SELECT news_items.item_id, news_items.item_heading, news_items.item_datetime_posted, news_items.item_body
     FROM news_items 
     WHERE news_items.item_owner = '".$_SESSION['id']."' 
 		AND news_items.item_datetime_expires > NOW() 
 		AND news_items.item_deleted = 0 
+	GROUP BY news_items.item_id
 	ORDER BY news_items.item_datetime_posted DESC
 	";
 	
@@ -202,12 +204,12 @@ function getNews($id = 0, $archive = false, $index = 0, $limit = 0)
     if($id)
             $query .="AND news_items.item_id = '$id'";
 
-    $query .= " ORDER BY news_items.item_datetime_posted DESC";
+    $query .= " GROUP BY news_items.item_id ORDER BY news_items.item_datetime_posted DESC";
 
 	$shareResults = $this->dbConnection->getAll($query);
 	
 	 	$query = "
-	SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner,
+	SELECT news_items.item_id, news_items.item_heading, news_items.item_owner,
     	news_items.item_link1, news_items.item_link2, news_items.item_link3, news_items.item_link4, news_items.item_link5,
     	DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted,
     	DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,

@@ -9,8 +9,6 @@
 /* This class provides the database abstraction for the calender system */
 /* It provides security, creation, and viewing of events		*/
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/include/permission.php');
-
 class calendar
 {
 

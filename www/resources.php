@@ -1,7 +1,5 @@
 <?php
 
-require_once 'include/permission.php';
-
 if (!$this) {
 	require_once '../include/sitePage.php';
 	$page = new SitePage(false);
