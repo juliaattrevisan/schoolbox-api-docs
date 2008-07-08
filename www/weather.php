@@ -59,7 +59,7 @@ else
 	$this->setVar("forecast_block", "");
 
 //ouput drop down box of available locations
-include("html-parse.php");
+include("include/html-parse.php");
 $this->setVar("LOCDROP", html_select("code' onchange='window.open(\"/weather/\"+this.value,\"_self\", \"\");", $weather->locationArray, $weather->areacode));
 
 ?>

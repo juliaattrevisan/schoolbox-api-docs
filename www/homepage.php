@@ -20,9 +20,12 @@ require_once '../library/category.php';
 $categoryHandler = new Category; 
 if(is_numeric($this->arg[0]))
 	$category = $categoryHandler->getByID($this->arg[0]);
-if(!is_array($category))
+if(!is_array($category)) {
 	$category = $categoryHandler->getByField("code", urldecode($this->arg[0]));
-	
+	$category = $categoryHandler->getByID($category['id']);
+}
+
+
 $categoryID =& $category['id'];
 if (!$categoryID)
 	error(18);
