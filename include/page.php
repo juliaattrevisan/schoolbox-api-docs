@@ -4,10 +4,6 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/conf/conf.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/../include/template.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/include/stdfuncs.php');
 
-define('TEMPLATE_dir', '/usr/local/www/portal/templates');
-define('TEMPLATE_body', 'bodyTpl');
-define('TEMPLATE_content', 'contentTpl');
-
 class Page {
 		
 	function Page($error = false) {

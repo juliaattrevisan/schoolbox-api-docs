@@ -32,6 +32,12 @@ define('LDAP_base', '');
 // Note that the following directories should exist outside the webroot and 
 // be writable by the apache process
 
+//Template Options
+define('TEMPLATE_dir', '/usr/local/www/portal/templates');
+define('TEMPLATE_body', 'bodyTpl');
+define('TEMPLATE_content', 'contentTpl');
+define("TPL_directory", "/usr/local/www/portal/" . SITE_location . "_templates");		//Deprecated option
+
 //CMS options
 define("FILE_directory", "/usr/local/www/portal/files");	//Files uploaded using CMS system will be stored here
 define("FILE_max_upload", "10");							// The maximum number of uploads for the multi upload system
@@ -39,7 +45,6 @@ define("CMS_allow_move", true);
 define("MYFILE_directory", "/usr/local/www/portal/myFiles");	//Files uploaded using CMS system will be stored here
 define("SUBMISSION_directory", "/usr/local/www/portal/submissions");	//All files submitted to submission box stored here
 define("RETURNS_directory", "/usr/local/www/portal/returns");		//Returned work will be stored in this directory
-define("TPL_directory", "/usr/local/www/portal/" . SITE_location . "_templates");		//Where site templates are located
 define("THUMBNAIL_IMAGE_CACHE", "/usr/local/www/portal/files/thumbnails");		//Thumbnail cache for 
 define("THUMBNAIL_size", 100); 
 define("URLS_use_frame", false);						//Open links in frame

@@ -75,7 +75,6 @@ class SynergeticUser extends MSSQL{
 		}
 		else
 		{      
-	
 			$sql = "SELECT DISTINCT(c1.ClassCode), c2.description as name
 					FROM SubjectClassStaff c1, SubjectClasses c2
 					WHERE c1.ClassCode = c2.ClassCode AND
