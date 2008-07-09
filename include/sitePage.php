@@ -336,12 +336,23 @@ class SitePage extends Page {
 			exit;
 	}
 	
-	function goLoginPage(){
+	function goLoginPage($error = '', $page = ''){
 		$this->setFile(TEMPLATE_body, 'common/login.html');
-		$this->setVar("TITLE", HEADING." - Login");
-		$this->setVar("HIDDEN",$_SERVER['REQUEST_URI']);
-		$this->setVar('ERROR', "You are currently not logged in.  Your session has either expired or you are beginning 
-			a new session.  Please log in below to continue browsing the portal. ");
+		$this->setVar('TITLE', HEADING." - Login");
+		
+		if($page)
+			$this->setVar('HIDDEN',rawurldecode($page));
+		else
+			$this->setVar('HIDDEN',$_SERVER['REQUEST_URI']);
+		
+		if($error)
+			$this->setVar('ERROR', $error);
+		else if(!$page && $_SERVER['REQUEST_URI'] != '/login/' && $_SERVER['REQUEST_URI'] != '/' )
+			$this->setVar('ERROR', 'You are currently not logged in.  Your session has either expired or you are beginning a new session.  Please log in below to continue browsing the portal.');
+		else
+			$this->setVar('ERROR', 'To begin a new session please login with your username and password.');
+			
+		
 		$this->outputPage(TRUE);
 		exit;
 	}
@@ -349,6 +360,7 @@ class SitePage extends Page {
 	function pageNotFound() {
 		header("HTTP/1.0 404 Not Found");
 		$this->setFile(TEMPLATE_body, 'common/404.html');
+		$this->setTitle('Page Not Found');
 		$this->outputPage(TRUE);
 		exit;
 	}
