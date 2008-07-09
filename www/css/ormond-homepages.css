@@ -77,20 +77,11 @@ h3 {
 a.config {
 	cursor: pointer;
 	position: absolute;
-	top: 1px;
-	right: 3px;
+	top: 0px;
+	right: 4px;
 	display: block;
-	width: 13px;
-	height: 13px;
 	background-repeat: no-repeat;
-}
-
-a.config:hover {
-	background-position: 0px -13px;
-}
-
-a.config {
-	background-image: url('/images/icons/modify_small.gif');
+	font-size: 90%;
 }
 
 .componentHeader {
