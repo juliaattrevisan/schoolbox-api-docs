@@ -1,3 +1,40 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/mootools.v.1.11.js"></script>
+<script type="text/javascript" src="/javascript/mooRainbow.js"></script>
+<script type="text/javascript">
+
+	var pickers = [
+		['largeHeadingBackground', '#5c02d9'],
+		['largeHeadingText', '#ffffff'],
+		['largeTextBackground', '#ffffff'],
+		['largeTextText', '#000000'],
+		['smallHeadingBackground', '#0066cc'],
+		['smallHeadingText', '#ffffff'],
+		['smallTextBackground', 'cccccc'],
+		['smallTextText', '#000000'],	
+	];
+	window.onload = function(){
+		for(i = 0; i < pickers.length; i++){
+			pickers[i][2] = new MooRainbow(pickers[i][0] + 'Div', pickers[i][0] + 'Input', {
+				'id': pickers[i][0] + 'Picker',
+				'imgPath': '/images/mooRainbow/',
+				'onComplete': function(color, object){
+					object.element.setStyle('background-color', color.hex);
+					object.input.value = color.hex;
+				},
+				'onChange': function(color, object){
+					object.element.setStyle('background-color', color.hex);
+					object.input.value = color.hex;
+				}
+			});
+			pickers[i][2].manualSet(pickers[i][1], 'hex');
+			$(pickers[i][0] + 'Div').setStyle('background-color', pickers[i][2].sets.hex);
+			$(pickers[i][0] + 'Input').value = pickers[i][2].sets.hex;
+		};
+	}</script>
+<link rel="stylesheet" type="text/css" href="/css/mooRainbow.css" />
+<!-- END custom_head -->
+
 						<h1>Customise</h1>
 			  <form method="post" name="customiseForm" id="customiseForm" class="indent">
 			<h2>Layout</h2>
