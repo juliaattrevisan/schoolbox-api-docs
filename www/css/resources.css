@@ -2,7 +2,7 @@
 /* CSS Document */
 
 html, body, #outerWrap, #content, #content_text {
-	height: 100%;
+
 }
 #content_text p {
 	margin: 0;
@@ -19,46 +19,26 @@ html, body, #outerWrap, #content, #content_text {
 	left: 300px;
 	z-index: 10;
 }
-.resources-properties {
-	padding: 5px;
-	margin: 0;
-	border: 0;
-}
-.resources-properties table td {
-	font: 11px Arial, Helvetica, sans-serif;
-	vertical-align: top;	
-}
-.resources-properties .bold {
-	font-weight: bold;
-	width: 85px;
-}
 #resources {
-	height: 80%;
 	margin: 0;
 	padding: 0;
+	
 }
-
 #resources-nav {
 	width: 38%;
-	height: 100%;
 	float: left;
 	padding: 20px 10px !important;
 	margin: 0;
 	padding: 0;
-	overflow:auto;
 	
 }
-
 #resources-window {
 	width: 56%;
-	height: 100%;
 	float: left;
 	margin: 0;
 	padding: 20px 10px !important;
 	border-left: 1px solid #cccccc;
-	overflow: auto;
 }
-
 #resources-selected {
 	background-color: #003366;
 	color: #FFFFFF;
@@ -70,9 +50,8 @@ html, body, #outerWrap, #content, #content_text {
 .resources-category {
 	margin: 0;
 	padding: 0;
-	clear: both;
-	white-space: nowrap;
-	position: relative;
+	float: left;
+	width: 95%;
 }
 
 .resources-category p {
@@ -111,8 +90,8 @@ html, body, #outerWrap, #content, #content_text {
 	display: none;
 }
 .resources-file {
-	clear: both;
-	position: relative;
+	float: left;
+	width: 100%;
 }
 
 .resources-hover {
@@ -135,5 +114,19 @@ html, body, #outerWrap, #content, #content_text {
 }
 .resources-filename a, .resources-filename a:visited {
 	color: #000000;
+}
+
+.resources-properties {
+	padding: 5px;
+	margin: 0;
+	border: 0;
+}
+.resources-properties table td {
+	font: 11px Arial, Helvetica, sans-serif;
+	vertical-align: top;	
+}
+.resources-properties .bold {
+	font-weight: bold;
+	width: 85px;
 }
 
