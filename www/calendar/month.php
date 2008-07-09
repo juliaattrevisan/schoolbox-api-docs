@@ -73,7 +73,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 		$this->setVar('OTHER_MONTH', ' otherMonth');
 
 	$this->setVar("DATE", date("jS", $currentDay));
-	$this->setVar("ADD", "<a href=\"/calendar/modify/".date("d-m-Y", $currentDay)."/month\">add</a>");
+	$this->setVar("ADD", "<a href=\"/calendar/modify.php?date=".date("d-m-Y", $currentDay)."&returnTo=month\">add</a>");
 	
 	
 	$sub = $calendarHandler->getSubmissionEvents($this->currDay, $this->currMonth, $this->currYear);
@@ -124,7 +124,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 										   "- "),
 							'NOTE'		=> $event['note'],
 							'PRIORITY'	=> $calendarHandler->displayColour($event['priority']),
-							'MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify/" . $event['id'] . "/month\">Modify</a>" : "",
+							'MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\">Modify</a>" : "",
 						  );	
 			
 			$this->setVar($output);

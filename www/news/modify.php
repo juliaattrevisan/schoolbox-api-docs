@@ -1,8 +1,11 @@
 <?php
 
+require_once $_SERVER['DOCUMENT_ROOT'] .'/../include/sitePage.php';
+
 require_once $_SERVER['DOCUMENT_ROOT'] .'/../library/news.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/include/permission.php';
 
+$page = new SitePage(); 
 $newsHandler = new News;
 
 $permLevel = perm(0,3);
@@ -30,11 +33,11 @@ else if (is_numeric($_GET['delete']) && $permLevel >= 2) {
 	localRedir("/news/");
 }
 else if (is_numeric($_GET['newsID']) && $permLevel >= 2) {
-	$this->setFile(TEMPLATE_content, "news/modify.html");
-	$this->setBlock(TEMPLATE_content, "campus_row", "campus_row_block");
-	$this->setBlock(TEMPLATE_content, "delete_button", "delete_button_block");
-	$this->setVar("TITLE", HEADING." - Modify News");
-	$this->setTab("news");
+	$page->setFile(TEMPLATE_content, "news/modify.html");
+	$page->setBlock(TEMPLATE_content, "campus_row", "campus_row_block");
+	$page->setBlock(TEMPLATE_content, "delete_button", "delete_button_block");
+	$page->setVar("TITLE", HEADING." - Modify News");
+	$page->setTab("news");
 	
 	$news = $newsHandler->getByID($_GET['newsID']);
 	
@@ -46,18 +49,18 @@ else if (is_numeric($_GET['newsID']) && $permLevel >= 2) {
 					'DEFAULT_TIME_SELECTED' => '',
 					);
 					
-	$this->setVar($output);
+	$page->setVar($output);
 	
 	$groupList = $newsHandler->getGroupList();
 	$campusList = $newsHandler->getCampusList();
 	
-	$this->dropDown("group_selection", $groupList, $news['groupList']);
-	$this->dropDown("campus_selection", $campusList, $news['campusList'], "campus_row");
+	$page->dropDown("group_selection", $groupList, $news['groupList']);
+	$page->dropDown("campus_selection", $campusList, $news['campusList'], "campus_row");
 	
 	if (count($campusList) > 1)
-		$this->parse("campus_row_block", "campus_row");
+		$page->parse("campus_row_block", "campus_row");
 	else
-		$this->setVar("campus_row_block", "");
+		$page->setVar("campus_row_block", "");
 		
 	if ($permLevel >= 3)
 		$page->parse("delete_button_block", "delete_button");

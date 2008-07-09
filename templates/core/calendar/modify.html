@@ -65,11 +65,19 @@
 			else
 				$('repeatUntil').style.display = '';
 		}
+		
+		function confirmDelete(eventID) {
+			if (confirm('Delete this event?')) {
+				window.open('/calendar/modify.php?delete=' + eventID + '&return={RETURN_TO}', '_self', '');
+				
+			}
+		}
+	
     </script>
     <!-- END custom_head -->
 
 		<h1>{FUNCTION} Event</h1>
-            <form class="standardForm" method="post" action="/calendar/modify/" id="eventForm">
+            <form class="standardForm" method="post" action="/calendar/modify.php" id="eventForm">
                     <table>
                       <tr> 
                         <td class="formLabelWidth" valign="top"><h2>Date</h2>
@@ -185,7 +193,7 @@
                         <td><input type="hidden" name="id" value="{EVENT_ID}" />
                         	<input type="hidden" name="return" value="{RETURN_TO}" />
                           <input type="submit" name="Submit" value="{FUNCTION} Event" class="btn">
-						  <!-- BEGIN delete_button --><input type="button" name="delete" value="Delete Event" class="btn" onclick="deleteEvent({EVENT_ID});" /><!-- END delete_button --></td>
+						  <!-- BEGIN delete_button --><input type="button" name="delete" value="Delete Event" class="btn" onclick="confirmDelete({EVENT_ID});" /><!-- END delete_button --></td>
                       </tr>
                     </table>
             </form>	

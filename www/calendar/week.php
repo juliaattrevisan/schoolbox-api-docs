@@ -96,7 +96,7 @@ for($i=0; $i < 7; $i++) {
 	$currentDay = strtotime("+$i day", $startOfWeek);
 
 	$this->setVar("DATE", date("l jS", $currentDay));
-	$this->setVar("ADD", "<a href=\"/calendar/modify/".date("d-m-Y", $currentDay)."\">add</a>");
+	$this->setVar("ADD", "<a href=\"/calendar/modify.php?date=".date("d-m-Y", $currentDay)."\">add</a>");
 	
 	// output submission events
 	for($j=0; $sub[$i]['category'][$j]; $j++) {
@@ -145,7 +145,7 @@ for($i=0; $i < 7; $i++) {
 										   "- "),
 							'NOTE'		=> $event['note'],
 							'PRIORITY'	=> $calendarHandler->displayColour($event['priority']),
-							'MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify/" . $event['id'] . "\">Modify</a>" : "",
+							'MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "\">Modify</a>" : "",
 						  );	
 			
 			$this->setVar($output);

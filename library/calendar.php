@@ -44,24 +44,12 @@ class Calendar extends Model {
 		
 			case 1: // personal
 				return $event['owner'] == $_SESSION['id'] ? 2 : 0;
+				
 			case 2: // single group
-				return perm($event['sid'], 2);
+				return perm($event['sid'], 1);
 				
-			case 3: // multiple campus + group
+			case 3: // campus
 				
-				if (is_array($event['groupList']))
-					$groupList = $event['groupList'];
-				else
-					$groupList = $this->getEventGroup($event['id']);
-					
-				if(is_array($groupList)) {
-					foreach($groupList as $group) {
-						$value = perm($group, 1);
-						if($value < $perm || !$perm)
-							$perm = $value;
-					}		
-				}
-
 				if (is_array($event['campusList']))
 					$campusList = $event['campusList'];
 				else
@@ -76,6 +64,9 @@ class Calendar extends Model {
 				}
 
 				return $perm;
+			
+			case 4:
+				return perm(0, 2);
 				
 			default:
 				return 0;
@@ -113,7 +104,7 @@ class Calendar extends Model {
 		return $output;
 	}  
 
-	function getGroupList($type = 1){
+	function getCategoryList($type = 1){
 		//get a list of all groups the user has write access to
 		$query = "SELECT id, name FROM userAccess, category WHERE uid = '".$_SESSION['id']."' AND service = '1' AND type > $type AND sid = id";   
 		$groupList = $this->db->getAll($query);
@@ -126,6 +117,19 @@ class Calendar extends Model {
 		}
 		return $output;
 	}  
+
+	function getGroupList() {
+		$query = "SELECT * FROM groups";
+		$groupList = $this->db->getAll($query);
+		if (is_array($groupList)) {
+			foreach ($groupList as $group) {
+				$data['GROUP_ID'] 	= $group['id'];
+				$data['GROUP_NAME'] = $group['name'];
+				$output[] = $data;
+			}
+		}
+		return $output;		
+	}
 
 	function getByID($eventID) {
 		$query = "SELECT id, owner, access, sid, priority, note, date, 
@@ -232,7 +236,7 @@ class Calendar extends Model {
 		
 		// get accessible groups
 		$groupList = array();
-		$tempList = $this->getGroupList(0);
+		$tempList = $this->getCategoryList(0);
 		if (is_array($tempList)) {
 			foreach ($tempList as $temp) {
 				$groupList[] = $temp['GROUP_ID'];
@@ -244,7 +248,7 @@ class Calendar extends Model {
 			if(perm($_SESSION['campus'][0], 2) > 2 || $_SESSION['su'])
 				$groupChunk = "";
 			else
-				$groupChunk = "AND eventGroup.groupID IN(" . implode(',', $groupList) . ")";
+				$groupChunk = "AND eventGroup.groupID = {$_SESSION['gid']}";
 		}
 			
 		//get single events for the day
@@ -257,13 +261,13 @@ class Calendar extends Model {
 						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 						WHERE date = '" . date("Y-m-d", $currentDay) . "'
 							AND (    (access = '1' AND owner = '".$_SESSION['id']."')
-								  OR (access = '2' $groupChunk)
+								  
 								  OR (access = '3' AND eventCampus.campusID IN(" . implode(',', $campusList) . ") $groupChunk )
 								  OR (access = '4')
 								)
 						GROUP BY id
 						ORDER BY event.startTime, event.endTime";
-
+		
 		return $this->db->getAll($query);	
 
 	}		

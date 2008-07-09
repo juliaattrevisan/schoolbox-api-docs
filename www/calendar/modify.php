@@ -1,7 +1,11 @@
 <?php
 
-require_once "include/permission.php";
-require_once "../library/calendar.php";
+require_once "../../include/sitePage.php";
+
+$page = new SitePage;
+
+require_once "../include/permission.php";
+require_once "../../library/calendar.php";
 
 $calendarHandler = new Calendar;
 
@@ -50,19 +54,22 @@ if (isset($_POST['date'])) {
 	localRedir('/calendar/' . ($_POST['return'] == 'month' ? 'month' : 'week') . '/' . str_replace("/", "-", $_POST['date']));
 
 
-} else if(isset($_POST['delete']) && is_numeric($_POST['id'])) {
-	$calendarHandler->delete($_POST['id']);
-	localRedir("/calendar/" . ($_POST['return'] == 'month' ? 'month' : 'week') . "/" . str_replace("/", "-", $_POST['date']));
+} else if(isset($_GET['delete'])) {
+	$calendar = $calendarHandler->getByID($_GET['delete']);
+	$calendarHandler->delete($_GET['delete']);
+	$date = explode("-", $calendar['date']);
+	$date = array_reverse($date);
+	localRedir("/calendar/" . ($_GET['return'] == 'month' ? 'month' : 'week') . "/" . implode("-", $date));
 	
-} elseif (is_numeric($this->arg[0])) {
+} elseif (is_numeric($_GET['eventID'])) {
 
-	$this->setFile(TEMPLATE_content, 'calendar/modify.html');
-	$this->setTab("calendar");
+	$page->setFile(TEMPLATE_content, 'calendar/modify.html');
+	$page->setTab("calendar");
 	
-	$this->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
-	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
+	$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
+	$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
-	$event = $calendarHandler->getByID($this->arg[0]);
+	$event = $calendarHandler->getByID($_GET['eventID']);
 	if (!$event['id'])
 		error(2);
 	
@@ -96,25 +103,24 @@ if (isset($_POST['date'])) {
 					'LEVEL'			=> '',
 					'GROUP'			=> '',
 					'DESCRIPTION' 	=> $event['note'],
-					'RETURN_TO'		=> scrubText($this->arg[1]),
+					'RETURN_TO'		=> scrubText($_GET['returnTo']),
 					);
 					
-	$this->setVar($output);
+	$page->setVar($output);
 
-	$this->dropDown('priority_drop', $calendarHandler->getPriorityList(), $event['priority']);
+	$page->dropDown('priority_drop', $calendarHandler->getPriorityList(), $event['priority']);
 	
 	$campusList = $calendarHandler->getCampusList();
 	if (count($campusList) > 1) {
-		$this->checkList('campus_list', $campusList, $calendarHandler->getEventCampus($event['id']));
+		$page->checkList('campus_list', $campusList, $calendarHandler->getEventCampus($event['id']));
 	} else {
-		$this->setBlock(TEMPLATE_content, 'campus_list', 'campus_list_block');
-		$this->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
+		$page->setBlock(TEMPLATE_content, 'campus_list', 'campus_list_block');
+		$page->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
 	}
-
-	$groupList = $calendarHandler->getGroupList();
-	$this->dropDown('group_drop', $groupList, $event['sid']);
-	$this->checkList('group_list', $groupList, $calendarHandler->getEventGroup($event['id']));
 	
+	$groupList = $calendarHandler->getCategoryList();
+	$page->dropDown('group_drop', $groupList, $event['sid']);
+	$page->checkList('group_list', $calendarHandler->getGroupList(), $calendarHandler->getEventGroup($event['id']));
 
 	$levelList[] = array('LEVEL_ID'	=> 1, 'LEVEL_NAME'	=> 'Personal');
 	if (count($groupList) > 0)
@@ -122,19 +128,21 @@ if (isset($_POST['date'])) {
 	if (count($campusList) > 0)
 		$levelList[] = array('LEVEL_ID'	=> 3, 'LEVEL_NAME'	=> 'Campus');
 	
-	$this->dropDown('level_drop', $levelList, $event['access']);
+	$page->dropDown('level_drop', $levelList, $event['access']);
 
-	$this->parse('delete_button_block', 'delete_button', true);
-	$this->setVar('recurring_dates_block', '');		
+	$page->parse('delete_button_block', 'delete_button', true);
+	$page->setVar('recurring_dates_block', '');	
+	
+	$page->outputPage();	
 	
 } else {
 
-	$this->setFile(TEMPLATE_content, 'calendar/modify.html');
-	$this->setTab("calendar");
-	$this->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
-	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
+	$page->setFile(TEMPLATE_content, 'calendar/modify.html');
+	$page->setTab("calendar");
+	$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
+	$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
-	list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->arg[0]);
+	list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $_GET['date']);
 	
 	$selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
 	if ($selectedDate <= 0) 
@@ -159,24 +167,25 @@ if (isset($_POST['date'])) {
 					'LEVEL'			=> '',
 					'GROUP'			=> '',
 					'DESCRIPTION'	=> '',
-					'RETURN_TO'		=> scrubText($this->arg[1])
+					'RETURN_TO'		=> scrubText($_GET['returnTo'])
 					
 					);
-	$this->setVar($output);
+	$page->setVar($output);
 	
-	$this->dropDown('priority_drop', $calendarHandler->getPriorityList(), '');
+	$page->dropDown('priority_drop', $calendarHandler->getPriorityList(), '');
 	
 	$campusList = $calendarHandler->getCampusList();
 	if (count($campusList) > 1) {
-		$this->checkList('campus_list', $campusList, array($_SESSION['campus'][0]));
+		$page->checkList('campus_list', $campusList, array($_SESSION['campus'][0]));
 	} else {
-		$this->setBlock(TEMPLATE_content, 'campus_list', 'campus_list_block');
-		$this->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
+		$page->setBlock(TEMPLATE_content, 'campus_list', 'campus_list_block');
+		$page->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
 	}
+
+	$groupList = $calendarHandler->getCategoryList();
+	$page->dropDown('group_drop', $groupList, '');
+	$page->checkList('group_list', $calendarHandler->getGroupList(), '');
 	
-	$groupList = $calendarHandler->getGroupList();
-	$this->checkList('group_list', $groupList, '');
-	$this->dropDown('group_drop', $groupList, '');
 	
 
 	$levelList[] = array('LEVEL_ID'	=> 1, 'LEVEL_NAME'	=> 'Personal');
@@ -185,10 +194,12 @@ if (isset($_POST['date'])) {
 	if (count($campusList) > 0)
 		$levelList[] = array('LEVEL_ID'	=> 3, 'LEVEL_NAME'	=> 'Campus');
 	
-	$this->dropDown('level_drop', $levelList, '');
+	$page->dropDown('level_drop', $levelList, '');
 
-	$this->setVar('delete_button_block', '');
-	$this->parse('recurring_dates_block', 'recurring_dates');
+	$page->setVar('delete_button_block', '');
+	$page->parse('recurring_dates_block', 'recurring_dates');
+	
+	$page->outputPage();
 	
 }
 
