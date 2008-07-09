@@ -10,7 +10,7 @@ if (is_array($folderList)) {
 		if(perm($folder['id'], 1) > 0)
 		{
 					//set name
-					$this->setVar("FOLDER_NAME", "<a href=\"/browse.php?category=".$folder['id']."\">".scrubTEXT($folder['name'])."</a>");
+					$this->setVar("FOLDER_NAME", "<a href=\"/resource/".$folder['id']."\">".scrubTEXT($folder['name'])."</a>");
 			
 					if($folder['template'])
 						$this->setVar("HOMEPAGE_LINK", "<a href=\"/homepage/".$folder['id']."\">homepage</a>");

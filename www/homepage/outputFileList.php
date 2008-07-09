@@ -14,9 +14,9 @@ if (is_array($fileList)) {
 		if($file['realname'] != "") {
 		
 			if($file['inline'] == 'true')
-				$url = "<a href=\"sendframe.php?id=".$file['id']."\" target=\"_blank\">".scrubTEXT($file['description'])."</a>";
+				$url = "<a href=\"/sendframe.php?id=".$file['id']."\" target=\"_blank\">".scrubTEXT($file['description'])."</a>";
 			else
-				$url = "<a href=\"send.php?id=".$file['id']."\">".scrubTEXT($file['description'])."</a>";
+				$url = "<a href=\"/send.php?id=".$file['id']."\">".scrubTEXT($file['description'])."</a>";
 
 			$this->setVar("FILE_NAME", $url);
 		}

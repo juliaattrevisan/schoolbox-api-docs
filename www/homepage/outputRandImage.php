@@ -13,7 +13,7 @@
 			if($config['size']==0){$config['size']=6;}
 				$imageSize=$config['size']*100;
 
-			$imageurl = "cms/image.php?id={$image['id']}&height={$imageSize}&width={$imageSize}";
+			$imageurl = "/cms/image.php?id={$image['id']}&height={$imageSize}&width={$imageSize}";
 			
 			$this->setVar("PREVIEW_IMAGE_URL", $imageurl);
 			$this->setVar("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));

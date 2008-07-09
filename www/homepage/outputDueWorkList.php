@@ -10,7 +10,7 @@ $submissionList = $submissionHandler->getAllForCategory($categoryID, $config);
 if (is_array($submissionList)) {
 	foreach($submissionList as $submission) {
 
-		$nameURL = $submission['fileID'] > 0 ? "send" . ($submission['inline'] == 'true' ? 'frame' : '') . ".php?id=" . $submission['fileID'] : false;
+		$nameURL = $submission['fileID'] > 0 ? "/send" . ($submission['inline'] == 'true' ? 'frame' : '') . ".php?id=" . $submission['fileID'] : false;
 
 		$date = outputDate("jS M", $submission['date']);
 		$dateURL = false;

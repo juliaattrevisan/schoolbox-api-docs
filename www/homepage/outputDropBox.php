@@ -17,7 +17,7 @@
 				foreach($fileList as $file) {
 					$output = array('DROPBOX_DESCRIPTION' => $file['description'],
 									'DROPBOX_ID'		=> $file['id'],
-									'DROP_SUBMITTED_BY' => formatName($file),
+									'DROP_SUBMITTED_BY' => "<a href=\"/search/user/{$file['uid']}\">".formatName($file).'</a>',
 									'DROP_SUBMITTED_TIME'=>$file['subdate'],
 									);
 					$this->setVar($output);

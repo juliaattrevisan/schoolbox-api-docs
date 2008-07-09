@@ -10,8 +10,6 @@ $homeworkList = $submissionHandler->getHomework($categoryID, $config);
 if (is_array($homeworkList)) {
 	foreach ($homeworkList as $homework) {
 
-		$url = "sendframe.php?id=".$homework['id'];
-
 		if($homework['date'])
 			$date = outputDate("jS M", $homework['date']);
 		else
@@ -36,9 +34,9 @@ if (is_array($homeworkList)) {
 		if($homework['realname'] != "")
 		{
 			if($homework['inline'] == 'true')
-				$url = "<a href=\"sendframe.php?id=".$homework['id']."\" target=\"_blank\">".scrubTEXT($homework['description'])."</a>";
+				$url = "<a href=\"/sendframe.php?id=".$homework['id']."\" target=\"_blank\">".scrubTEXT($homework['description'])."</a>";
 			else
-				$url = "<a href=\"send.php?id=".$homework['id']."\">".scrubTEXT($homework['description'])."</a>";
+				$url = "<a href=\"/send.php?id=".$homework['id']."\">".scrubTEXT($homework['description'])."</a>";
 
 			$this->setVar("HW_NAME", $url);
 		}
