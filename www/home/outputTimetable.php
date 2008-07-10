@@ -98,9 +98,6 @@ if($_SESSION['timetable']) {
 				//output period block
 				$this->parse("timetable_header_block", "timetable_header", true);
 				$this->parse("timetable_period_block", "timetable_period", true);
-			} else {
-				$this->setVar("timetable_header_block", "");
-				$this->setVar("timetable_period_block", "");
 			}
 		} 
 		$this->parse("timetable_block", "timetable");

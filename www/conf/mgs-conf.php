@@ -102,7 +102,7 @@ define("DROPBOX_COMPONENT", 25);
 //Webmail
 define("MAIL_enable", true);				//This will disable webmail module
 define("MAIL_interface", "roundcube");
-define("MAIL_db", "roundcubemail");
+define("MAIL_db", "intranet");
 define("MAIL_retrieval", "imap");			//Options are pop or imap (imap has extra state information)
 define("MAIL_host", "mail.mgs.vic.edu.au");
 define("MAIL_port", 143);
@@ -110,6 +110,7 @@ define("MAIL_smtp_server", "mail.mgs.vic.edu.au");
 define("MAIL_smtp_port", 25);
 define("MAIL_address", "mgs.vic.edu.au");
 define("MAIL_increment", 20);					//Amount of emails per page
+define('ROUNDCUBE_db','mysql://'.SQL_user.':'.SQL_passwd.'@'.SQL_host.'/'.SQL_db);
 
 
 //Weather options
