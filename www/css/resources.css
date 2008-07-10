@@ -25,15 +25,15 @@ float: left;
 	
 }
 #resources-nav {
-	width: 38%;
+	width: 48%;
 	float: left;
 	padding: 20px 10px !important;
 	margin: 0;
 	padding: 0;
-	
+	white-space: nowrap;
 }
 #resources-window {
-	width: 56%;
+	width: 46%;
 	float: left;
 	margin: 0;
 	padding: 20px 10px !important;
@@ -52,6 +52,7 @@ float: left;
 	padding: 0;
 	float: left;
 	width: 95%;
+	white-space: nowrap;
 }
 
 .resources-category p {
@@ -60,6 +61,7 @@ float: left;
 	font: bold 12px Arial, Helvetica, sans-serif;
 	float: left;
 	border: 1px solid #ffffff;
+	white-space: nowrap;
 }
 
 .resources-openclose {
