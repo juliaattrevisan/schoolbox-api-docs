@@ -123,7 +123,8 @@ var Resources = {
 	getFiles: function(catID) {
 		
 		var url = '/resources.php?file-list=' + catID;
-	
+		
+		
 		var myAjax = new Ajax(url, {
 						  	method: 'get',
 							onSuccess: function () {
@@ -227,8 +228,14 @@ var Resources = {
 								method: 'get', 
 								onSuccess: function () {
 									Resources.listDir(catDiv, this.response.text, catID);
+								},
+								onRequest: function () {
+									catParts.catIcon.addClass('res-loading');
+								},
+								onComplete: function () {
+									catParts.catIcon.removeClass('res-loading');
 								}
-								}).request();
+							 }).request();
 	},
 	
 	listDir: function (catDiv, data, catID) {

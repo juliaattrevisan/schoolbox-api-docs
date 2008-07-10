@@ -87,6 +87,9 @@ float: left;
 .resources-caticon {
 	background: url(../images/resources/loading.gif) no-repeat 2px 4px;
 }
+.res-loading {
+	visibility: hidden;
+}
 
 .resources-catid, .resources-fileid, .resources-inline {
 	display: none;
