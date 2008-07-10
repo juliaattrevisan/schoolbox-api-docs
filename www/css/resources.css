@@ -1,8 +1,8 @@
 @charset "utf-8";
 /* CSS Document */
 
-html, body, #outerWrap, #content, #content_text {
-
+#content_text {
+float: left;
 }
 #content_text p {
 	margin: 0;
