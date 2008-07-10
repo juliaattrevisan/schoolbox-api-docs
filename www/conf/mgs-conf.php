@@ -32,18 +32,23 @@ define('LDAP_base', '');
 // Note that the following directories should exist outside the webroot and 
 // be writable by the apache process
 
+//Template Options
+define('TEMPLATE_dir', '/usr/local/vhosts/portal/new/templates');
+define('TEMPLATE_body', 'bodyTpl');
+define('TEMPLATE_content', 'contentTpl');
+define("TPL_directory", "/usr/local/vhosts/portal/new/" . SITE_location . "_templates");		//Deprecated option
+
 //CMS options
 define("FILE_directory", "/usr/local/vhosts/portal/data/files");                //Files uploaded using CMS system will be stored here
 define("FILE_max_upload", "10");
+define("CMS_allow_move", true);
 define("SUBMISSION_directory", "/usr/local/vhosts/portal/data/submissions");    //All files submitted to submission box stored here
 define("RETURNS_directory", "/usr/local/vhosts/portal/data/returns");           //Returned work will be stored in this directory
 define("MYFILE_directory", "/usr/local/vhosts/portal/data/myfiles");
-define("TPL_directory", "/usr/local/vhosts/portal/templates");                //Where site templates are located
-define("THUMBNAIL_IMAGE_CACHE", "/usr/local/vhosts/portal/data/files/thumbnails");              
-//Thumbnail cache for
+define("THUMBNAIL_IMAGE_CACHE", "/usr/local/vhosts/portal/data/files/thumbnails");              //Thumbnail cache for
+define("THUMBNAIL_size", 100); 
 define("URLS_use_frame", false);                                                //Open links in frame
-define('ZIP_directory', '/usr/local/vhosts/portal/data/zip');
-//define('MIME_magic', '/usr/share/file/magic');
+define('ZIP_directory', '/usr/local/vhosts/portal/data/zip');//define('MIME_magic', '/usr/share/file/magic');
 define('DROPBOX_directory', '/usr/local/vhosts/portal/data/drop');
 
 //SEARCH & BROWSE Display options
@@ -60,6 +65,11 @@ define("FORUM_increment", 10);					//Amount of thread or posts per page
 //CALENDAR options
 define("CALENDAR_default_view", 'week');		//Default view style for calendar (week or month)
 define("CALENDAR_time_format", '%l:%i%p');		//Time output style 24 hour = '%k:%i', 12 hour = '%l:%i %p'
+
+define('DATE_long_format', 'l F jS Y g:ia');
+define('DATE_short_format', 'jS M Y g:ia');
+define('DATE_database', 'Y-m-d H:i:s');
+define('DATE_short_no_time','jS M Y');
 
 //MySQL config options
 define("SQL_host", "localhost");
