@@ -383,7 +383,7 @@ var RightContext = {
         var reqVar, reqVal;
         var shown = true; // by default all items are shown, unless they require something 
         // lets make sure this item does not require any condition to be true in order to display
-        if (item["requires"] != null && item["requires"] != "undefined") {
+        if ((item["requires"] != null && item["requires"] != "undefined")) {
             // yep, this one has a requirement...
             reqVar = item["requires"][0];
             reqVal = item["requires"][1];
@@ -397,6 +397,24 @@ var RightContext = {
                 shown = false;
             }
         }
+
+
+        if ((item["requires2"] != null && item["requires2"] != "undefined")) {
+            // yep, this one has a requirement...
+            reqVar = item["requires2"][0];
+            reqVal = item["requires2"][1];
+            if (objMap[reqVar] != null && objMap[reqVar] != "undefined") {
+                // if the condition is not met, do not show this item.
+                if (objMap[reqVar] != reqVal) {
+                    shown = false;    
+                }
+            } else {
+                // if the condition is not defined do not show the item
+                shown = false;
+            }
+        }
+		
+		
         return shown;
     },
     
