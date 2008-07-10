@@ -88,7 +88,8 @@ for ($i = 0; $i < $totalDays; $i++) {
 		$output = array('TIME'		=> $sub[$j]['dueTime'],
 						'NOTE'		=> "WORK DUE ".$descr,
 						'PRIORITY'	=> $calendarHandler->displayColour(1),
-						'MODIFY'	=> "",
+						'MODIFY_START'	=> "",
+						'MODIFY_END'	=> "",
 					  );					  
 		
 		$this->setVar($output);
@@ -105,7 +106,8 @@ for ($i = 0; $i < $totalDays; $i++) {
 				$output = array('TIME'		=> '',
 								'NOTE'		=> 'Student Birthday - '.$birthday['name'].' in '.$birthday['form'].' turns '.$birthday['age'],
 								'PRIORITY'	=> $calendarHandler->displayColour(3),
-								'MODIFY'	=> "",
+								'MODIFY_START'	=> "",
+								'MODIFY_END'	=> "",
 							  );					  
 				$this->setVar($output);
 				$this->parse("note_listing", "note_block", true);
@@ -124,7 +126,8 @@ for ($i = 0; $i < $totalDays; $i++) {
 										   "- "),
 							'NOTE'		=> $event['note'],
 							'PRIORITY'	=> $calendarHandler->displayColour($event['priority']),
-							'MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\">Modify</a>" : "",
+							'MODIFY_START'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">" : "",
+							'MODIFY_END'	=> $calendarHandler->getPerm($event['id']) > 1 ? "</a>" : "",
 						  );	
 			
 			$this->setVar($output);

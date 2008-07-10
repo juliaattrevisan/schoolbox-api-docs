@@ -81,14 +81,6 @@ a.config {
 	padding-left: 0;
 }
 
-.textCmp {
-	background-color: #FF0000;
-	padding: 2px;
-	font-weight: bold;
-	color: #FFFFFF;
-	display: none;
-}
-
 .component table {
 	border-collapse: collapse;
 }
