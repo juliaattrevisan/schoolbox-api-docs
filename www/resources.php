@@ -18,7 +18,7 @@ if (is_numeric($_GET['cat-list'])) {
 
 } else if (is_numeric($_GET['file-list'])) {
 
-	list( , $windowHTML) = getCategoryHTML($_GET['file-list']);			
+	list(, $windowHTML) = getCategoryHTML($_GET['file-list']);			
 	$windowHTML .= getFileHTML($_GET['file-list']);
 	print $windowHTML;
 	exit;
@@ -97,7 +97,7 @@ function getCategoryHTML($categoryIDList) {
 
 		$catList = $categoryHandler->getCategoryList($categoryIDList[$i]);
 		$catPerm = perm($categoryIDList[$i], 1);
-		if ($catPerm < 1)
+		if ($catPerm < 1 && $categoryIDList[$i]['parent'] > 0)
 			continue;
 		
 		$page->setVar('category_block', '');
@@ -153,9 +153,10 @@ function getFileHTML($categoryID) {
 	$linkList = $linkHandler->getAllInCategory($categoryID);
 	
 	$catPerm = perm($categoryID, 1);
-	
-	if ($catPerm < 1)
+	if ($catPerm < 1 && $categoryID > 0) {
+		unset($_SESSION['smCategory']);
 		error(14);
+	}
 	
 	if (is_array($fileList)) {
 		if (is_array($linkList)) {
@@ -268,12 +269,6 @@ function outputDetails ($fileID) {
 					 'HIDDEN'	 => $file['hidden'] > 0 ? 'Yes' : 'No',
 					 );
 	
-	$catPerm = perm($file['category'], 1);
-	if ($catPerm < 1)
-		error(14);
-		
-	if ($file['hidden'] > 0 && $catPerm < 2)
-		error(19);
 	
 	$page->setVar($output);
 	
