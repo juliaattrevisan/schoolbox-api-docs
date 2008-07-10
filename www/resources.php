@@ -35,7 +35,6 @@ if (is_numeric($_GET['cat-list'])) {
 	exit;
 }
 
-
 $this->setFile(TEMPLATE_content, 'resources/resources.html');
 $this->setTab("resources");
 $this->setTitle('Resources');

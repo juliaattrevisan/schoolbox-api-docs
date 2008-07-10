@@ -230,10 +230,12 @@ var Resources = {
 									Resources.listDir(catDiv, this.response.text, catID);
 								},
 								onRequest: function () {
-									catParts.catIcon.addClass('res-loading');
+									//catParts.catIcon.addClass('res-loading');
+									catParts.catIcon.style.visibility = 'hidden';
 								},
 								onComplete: function () {
-									catParts.catIcon.removeClass('res-loading');
+									//catParts.catIcon.removeClass('res-loading');
+									catParts.catIcon.style.visibility = 'visible';
 								}
 							 }).request();
 	},

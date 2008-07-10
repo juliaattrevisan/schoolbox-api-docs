@@ -29,7 +29,13 @@ class Category extends Model {
 	}
 	
 	function hasChildren($categoryID) {
-		$query = "SELECT count(*) as children FROM category WHERE parent = $categoryID";
+		$query = "SELECT count(*) as children 
+				  FROM category c, userAccess a, perms p 
+				  WHERE parent = $categoryID AND
+				  ((c.id = a.sid AND a.service = 1 AND a.type > 0 AND a.uid = '" . $_SESSION['id']. "') OR 
+				   (c.id = p.cid AND p.gid = ".$_SESSION['gid']." AND p.type > 0) OR 
+				   1 = " . (int)$_SESSION['su']. ")
+				  ";
 		return $this->db->getOne($query);
 	}
 
