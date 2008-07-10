@@ -76,7 +76,7 @@ function verify()
 			<div class="whiteWrap">
 				<ul>
 					<!-- BEGIN msubject_block -->
-					<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
+					<li><a href="/homepage/{MSUBCODE}">{MSUBJECT}</a></li>
 					<!-- END msubject_block -->
 				</ul>
 			</div>
@@ -86,7 +86,7 @@ function verify()
 		<h3>&#187;&nbsp;MY STUDENTS</h3> 
 		<ul> 
 			<!-- BEGIN mstudent_block --> 
-			<li><a href="/search/userLookup.php?id={MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
+			<li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
 			<!-- END mstudent_block --> 
 		</ul> 
 		<!-- END mstudent --> 
@@ -96,7 +96,7 @@ function verify()
 			<div class="whiteWrap">
 				<ul>
 					<!-- BEGIN mgroup_block -->
-					<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
+					<li><a href="/homepage/{MGID}">{MGNAME}</a></li>
 					<!-- END mgroup_block -->
 				</ul>
 			</div>
@@ -117,16 +117,16 @@ function verify()
 	<!-- end left -->
 	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Main_Active.lbi" -->			<div id="topNav">
 				<ul>
-					<li class="navthis left"><a class="navthis left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
-					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+					<li class="navthis left"><a class="navthis left" href="/home" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+					<li class="norm"><a class="norm" href="/news" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
 					<!-- BEGIN webmail_tab --> 
 					<li class="norm"><a class="norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><em>W</em>ebmail</a></li>
 					<!-- END webmail_tab -->
-					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+					<li class="norm"><a class="norm" href="/calendar/week" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
 					<!-- BEGIN timetable_tab -->
-					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+					<li class="norm"><a class="norm" href="/timetable" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
 					<!-- END timetable_tab -->
-					<li class="norm"><a class="norm" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+					<li class="norm"><a class="norm" href="/resources" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
                     <li class="right"><a class="right" href="/cms/browseMyFiles.php" title="Upload files to your own private area" accesskey="f">My <em>F</em>iles</a></li>
 				</ul>
 			</div><!-- #EndLibraryItem --><!-- #EndEditable -->
