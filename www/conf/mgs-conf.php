@@ -78,7 +78,7 @@ define("SQL_passwd", "Qu4LitY");
 define("SQL_db", "intranet");
 
 // Name format display options.
-define("NAME_FORMAT", "{title} {firstname} {lastname}");
+define("NAME_format", "{title} {firstname} {lastname}");
 
 //Synergy options
 define("SYNERGY_enable", true);			//Use this to disable synergy modules

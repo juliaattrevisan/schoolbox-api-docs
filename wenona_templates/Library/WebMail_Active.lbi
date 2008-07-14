@@ -1,15 +1,15 @@
 			<div id="topNav">
 				<ul>
-					<li class="left"><a class="left" href="/home.php" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
-					<li class="norm"><a class="norm" href="/news.php" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
+					<li class="left"><a class="left" href="/home/" title="Greeting page" accesskey="m" ><em>M</em>ain</a></li>
+					<li class="norm"><a class="norm" href="/news/" title="Current school news" accesskey="n"><em>N</em>ews</a></li>
 					<!-- BEGIN webmail_tab --> 
 					<li class="norm navthis"><a class="norm navthis" {WEBMAIL_LOCATION} title="Access your messages here" accesskey="w">{WEBMAIL_TITLE}</a></li>
 					<!-- END webmail_tab -->
-					<li class="norm"><a class="norm" href="/calendar/viewCalendar.php" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
+					<li class="norm"><a class="norm" href="/calendar/week/" title="School calendar events" accesskey="c"><em>C</em>alendar</a></li>
 					<!-- BEGIN timetable_tab -->
-					<li class="norm"><a class="norm" href="/timetable.php" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
+					<li class="norm"><a class="norm" href="/timetable/" title="View your school timetable" accesskey="t"><em>T</em>imetable</a></li>
 					<!-- END timetable_tab -->
-					<li class="norm"><a class="norm" href="/browse.php" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
+					<li class="norm"><a class="norm" href="/resources/" title="Browse resources and homepages" accesskey="r"><em>R</em>esources</a></li>
 					<li class="norm"><a class="norm" href="http://intranet.wenona.nsw.edu.au/?strEncrypted={ENC_LOGIN}" title="Access the school intranet" accesskey="d"><em>D</em>irectory</a></li>
                     <!-- BEGIN portfolio_tab -->
                     <li class="norm"><a class="norm" href="/cms/browseMyFiles.php" title="Access your portfolio area" accesskey="p">My <em>P</em>ortfolio</a></li>
