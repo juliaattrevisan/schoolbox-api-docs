@@ -353,8 +353,10 @@ var RightContext = {
                     break;
 
                 case this.TYPE_SEPERATOR:
-                    cell = this.addTableCell(tbl);
-                    cell.appendChild(this.getSeparator());
+					if (this.isDisplayed(items[m], objMap)) {
+						cell = this.addTableCell(tbl);
+						cell.appendChild(this.getSeparator());
+					}
                     break;
                 
                 default:
@@ -496,7 +498,7 @@ var RightContext = {
             itemAction = item["onclick"]; 
             try {
 
-	    itemSrc = item["onclick"].toString();
+	    itemSrc = itemAction.toString();
 	    if (itemSrc.indexOf('[')>-1) {
                 itemSrc = this.transform(itemSrc, objMap);
                 if (document.all) { // IE's eval won't return a parsed function.. we need to tell it to set it and then eval

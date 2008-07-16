@@ -46,7 +46,8 @@
 				requires: ["aurl", "Y"],
 				url:"/redir.php?url=[alink]"},
 			  
-			   {type: RightContext.TYPE_SEPERATOR },
+			   {type: RightContext.TYPE_SEPERATOR,
+			    requires: ["aadmin", "Y"] },
 			   
 			   {type:RightContext.TYPE_MENU,
 				text:"Modify",
@@ -65,12 +66,18 @@
 				requires: ["aadmin", "Y"],
 				onclick:function() { if (confirm('Are you sure you want to delete [afilename]?')) { window.open("/cms/delResource.php?fileid=[afileid]",'_blank',''); }} },
 			  
-			   {type: RightContext.TYPE_SEPERATOR },
+			   {type: RightContext.TYPE_SEPERATOR,
+			    requires: ["aadmin", "Y"] },
 			   
 			   {type:RightContext.TYPE_MENU,
 				text:"New File",
 				requires: ["aadmin", "Y"],
 				url:"/cms/modResource.php?type=file&cid=[acatid]"},
+				
+			   {type:RightContext.TYPE_MENU,
+				text:"Add Multiple Files",
+				requires: ["aadmin", "Y"],
+				url:"/cms/modResource.php?type=files&cid=[acatid]"},
 				
 			   {type:RightContext.TYPE_MENU,
 				text:"New Link",
@@ -86,8 +93,8 @@
 				
 			   {type:RightContext.TYPE_MENU,
 			   	text:"Properties",
-				onclick:function(e) { Resources.openDetails([afileid], e); }
-				}]
+				onclick:function(e) { Resources.openDetails([afileid], e); }}
+			   ]
 	};			   
 	
 	menu2 = { attributes: "acatid,ahomepage,acatname,aadmin" ,
@@ -103,7 +110,8 @@
 				url:"/cms/imageGallery.php?category=[acatid]"},						
 			  
 			   {type: RightContext.TYPE_SEPERATOR,
-				requires: ["ahomepage", "Y"]},
+				requires: ["ahomepage", "Y"],
+				requires2: ["aadmin", "Y"]},
 			   
 				
 			   {type:RightContext.TYPE_MENU,
@@ -116,12 +124,18 @@
 				requires: ["aadmin", "Y"],
 				onclick:function() { if (confirm('Are you sure you want to delete [acatname]?')) { window.open("/cms/modFolder.php?delete=[acatid]",'_blank',''); }} },
 			  
-			   {type: RightContext.TYPE_SEPERATOR },
+			   {type: RightContext.TYPE_SEPERATOR,
+			    requires: ["aadmin", "Y"] },
 			   
 			   {type:RightContext.TYPE_MENU,
 				text:"New File",
 				requires: ["aadmin", "Y"],
 				url:"/cms/modResource.php?type=file&cid=[acatid]"},
+			   
+			   {type:RightContext.TYPE_MENU,
+				text:"Add Multiple Files",
+				requires: ["aadmin", "Y"],
+				url:"/cms/modResource.php?type=files&cid=[acatid]"},
 				
 			   {type:RightContext.TYPE_MENU,
 				text:"New Link",
@@ -131,7 +145,13 @@
 			   {type:RightContext.TYPE_MENU,
 				text:"New Folder",
 				requires: ["aadmin", "Y"],
-				url:"/cms/modFolder.php?action=add&cid=[acatid]"} ]
+				url:"/cms/modFolder.php?action=add&cid=[acatid]"},
+			   
+			   {type:RightContext.TYPE_MENU,
+				text:"Download",
+				requires: ["aadmin", "Y"],
+				url:"/cms/fetchFolder.php?folder=[acatid]"} 
+			   ]
 			
 	};	
 	
