@@ -41,6 +41,8 @@ if (CATEGORY_perms < 1)
 	error(14);
 
 
+if(!$category['template'])
+	localRedir('/resources/'.$categoryID);
 
 if($category['code'])
 	$enroled = involvedInSubject($category['code']);

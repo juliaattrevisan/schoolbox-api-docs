@@ -29,13 +29,19 @@ class Category extends Model {
 	}
 	
 	function hasChildren($categoryID) {
-		$query = "SELECT c.id as children 
+		/*$query = "SELECT c.id as children 
 				  FROM category c, userAccess a, perms p 
 				  WHERE parent = $categoryID AND
 				  ((c.id = a.sid AND a.service = 1 AND a.type > 0 AND a.uid = '" . $_SESSION['id']. "') OR 
 				   (c.id = p.cid AND p.gid = ".$_SESSION['gid']." AND p.type > 0) OR 
 				   1 = " . (int)$_SESSION['su']. ")
 				  LIMIT 1,1";
+		*/
+		$query = "SELECT c.id as children 
+				  FROM category c
+				  WHERE parent = $categoryID
+				  LIMIT 1,1";
+		
 		return $this->db->getOne($query);
 	}
 
