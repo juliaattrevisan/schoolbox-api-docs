@@ -21,15 +21,16 @@ $categoryHandler = new Category;
 if(is_numeric($this->arg[0]))
 	$category = $categoryHandler->getByID($this->arg[0]);
 if(!is_array($category)) {
-	$category = $categoryHandler->getByField("code", urldecode($this->arg[0]));
+	$code = implode('/', $this->arg);
+	$category = $categoryHandler->getByField("code", urldecode(urldecode($code)));
 	$category = $categoryHandler->getByID($category['id']);
 }
 
 
 $categoryID =& $category['id'];
-if (!$categoryID)
+if (!$categoryID) {
 	error(18);
-
+}
 
 $categoryHandler->logPageView($categoryID);
 
@@ -64,8 +65,8 @@ $output = array('LARGE_HEAD_BGCOLOUR'	=> $category['large_head_bgcolour'],
 				'SMALL_HEAD_FONTCOLOUR'	=> $category['small_head_fontcolour'],
 				'SMALL_TEXT_BGCOLOUR'	=> $category['small_text_bgcolour'],
 				'SMALL_TEXT_FONTCOLOUR'	=> $category['small_text_fontcolour'],
-				'HEADING'				=> scrubTEXT($category['name']) . (isset($code) ? '('.urlencode($category['code']).')' : '' ),
-				'CODE'					=> urlencode($category['code']),
+				'HEADING'				=> scrubTEXT($category['name']) . (isset($code) ? ' ('.$category['code'].')' : '' ),
+				'CODE'					=> urlencode(urlencode($category['code'])),
 				'ID'					=> $categoryID,
 				);
 

@@ -107,7 +107,7 @@ class Attendance
  		{
 			$this->t_body->set_var("SURNAME", $student[0]);
 			$this->t_body->set_var("FIRSTNAME", $student[1]);
-			
+			$this->t_body->set_var("SYNERGYID", $student[2]);
 
 			//now the absentee stuff
 			$abscode = $this->createAbsCodeHTML($student['PossibleAbsenceCode']);

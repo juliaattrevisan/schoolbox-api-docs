@@ -60,7 +60,7 @@ function localRedir($file)
 function goLoginPage()
 {
         $page = rawurlencode($_SERVER['REQUEST_URI']);
-        localRedir("/login.php?page={$page}");
+        localRedir("/login/");
 }
 
 //function for returning user ip (tries to work around issues with proxies)

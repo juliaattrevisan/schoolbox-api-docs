@@ -1,7 +1,15 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tableruler.js"></script>
+<script type="text/javascript">
+	window.onload=function(){tableruler();} 
+</script>
+<!-- END custom_head -->
+
 <h1>{SUBJECTNAME} - Day {DAYNUMBER}, Period {PERNUMBER}, {DATE}</h1>
 <form action="" method="post" name="attendanceForm" class="standardForm" id="attendanceForm">
-    <table>
+    <table class="ruler">
         <tr>
+            <th>&nbsp;</th>
             <th>Surname</th>
             <th>Preferred Name</th>
             <th>Attend</th>
@@ -9,6 +17,7 @@
             <th>Reason</th>
         </tr>
         <tr>
+            <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>

@@ -31,6 +31,9 @@ class SitePage extends Page {
 		if(count($path) > 1) { 
 			$page = $path[0];
 			$this->arg = array_slice($path,1);
+			foreach($this->arg as $key => $value) {
+				if(!$value) unset($this->arg[$key]);
+			}
 		}
 		$page = rtrim($page, '/');
 
@@ -165,7 +168,7 @@ class SitePage extends Page {
 				}
 				else {
 					$this->setVar('WEBMAIL_LOCATION', 'href="/mail.php"');
-					$this->setVar('WEBMAIL_TITLE', 'Messages');
+					$this->setVar('WEBMAIL_TITLE', '<em>W</em>ebmail');
 		
 				}
 			}
@@ -254,7 +257,7 @@ class SitePage extends Page {
 				else		
 					$this->setVar("MSUBJECT", $subject['name']);
 		
-				$this->setVar("MSUBCODE", urlencode($subject['code']));
+				$this->setVar("MSUBCODE", urlencode(urlencode($subject['code'])));
 				$this->parse("my_subjects","msubject_block",true); 
 			}
 			$this->parse("msubject_section","msubject");
