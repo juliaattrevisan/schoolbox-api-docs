@@ -33,7 +33,7 @@ $this->setVar('page_number_block', '');
 
 //can see add news link
 if(isStaff($_SESSION['gid']) || perm(0, 3) >= 2)
-	$this->setVar("ADD", "<b><a href=\"/news/modify\">add news</a></b>");
+	$this->setVar("ADD", "<b><a href=\"/news/modify.php\">add news</a></b>");
 else
 	$this->setVar("ADD", "");
 

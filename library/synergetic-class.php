@@ -59,11 +59,10 @@ class SynergeticClass extends MSSQL{
 				WHERE ClassCode = '$code' AND FileYear={$_SESSION['FileYear']} AND FileSemester={$_SESSION['FileSemester']}
 				ORDER BY StaffSeq";
 			
-			$this->query($query);
+			$this->query($msQuery);
 			while($synrow = $this->getNextArray() ) {
 				$teachers[] = $synrow['StaffID'];
 			}
-			
 			return $teachers;
 	}
 }

@@ -11,10 +11,10 @@ if($code != "" && SYNERGY_enable)
 	$listSyns = $synergeticClass->getTeacherName($code);
 	if(is_array($listSyns)) {
 		foreach($listSyns as $synid) {
-			$teacher = $user->getBySynergyID($synid);
+			$teacher = $userHandler->getBySynergy($synid);
 			if(is_array($teacher)) {
 				$name = formatName($teacher);
-				$this->setVar('MEMBER_NAME', "<a href=\"/search/user/{$teacher['id']}\">{$name}</a>");
+				$this->setVar('MEMBER_NAME', "<a href=\"/search/user/{$teacher['uid']}\">{$name}</a>");
 				$this->parse("staff_teacher_block", "staff_teachers", true);	
 			}
 		}

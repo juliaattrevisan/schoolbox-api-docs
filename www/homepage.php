@@ -45,8 +45,10 @@ if (CATEGORY_perms < 1)
 if(!$category['template'])
 	localRedir('/resources/'.$categoryID);
 
-if($category['code'])
+if($category['code']) {
 	$enroled = involvedInSubject($category['code']);
+	$code = $category['code'];
+}
 else
 	$enroled = involvedInGroup($categoryID);
 

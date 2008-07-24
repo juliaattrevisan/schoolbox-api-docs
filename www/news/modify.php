@@ -36,7 +36,7 @@ else if (is_numeric($_GET['newsID']) && $permLevel >= 2) {
 	$page->setFile(TEMPLATE_content, "news/modify.html");
 	$page->setBlock(TEMPLATE_content, "campus_row", "campus_row_block");
 	$page->setBlock(TEMPLATE_content, "delete_button", "delete_button_block");
-	$page->setVar("TITLE", HEADING." - Modify News");
+	$page->setTitle("Modify News");
 	$page->setTab("news");
 	
 	$news = $newsHandler->getByID($_GET['newsID']);
@@ -73,7 +73,7 @@ else if ($permLevel >= 2) {
 	$page->setFile(TEMPLATE_content, "news/modify.html");
 	$page->setBlock(TEMPLATE_content, "campus_row", "campus_row_block");
 	$page->setBlock(TEMPLATE_content, "delete_button", "delete_button_block");
-	$page->setVar("TITLE", HEADING." - Add News");
+	$page->setTitle("Add News");
 	$page->setTab("news");
 
 	$output = array('ACTION'	=> 'Add',

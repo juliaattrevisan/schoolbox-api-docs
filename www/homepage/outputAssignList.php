@@ -19,9 +19,9 @@
 				if($enroled)
 				{
 					if(isStudent($_SESSION['gid']) && $assignment['owner']=='' && $assignment['late'] > date('U') && $assignment['open'] < date('U')) //student
-						$dueDate = '<a href="/submission/submitWork.php?box_id='.$assignment['box_id'].'">'.$date.'</a>';
+						$dueDate = '<a href="/submission/submitWork.php?box_id='.$assignment['id'].'">'.$date.'</a>';
 					else if(isStaff($_SESSION['gid']) && $assignment['owner'] == $_SESSION['id']) //if staff owns box provide link
-						$dueDate = '<a href="/submission/viewSubmission.php?box_id='.$assignment['box_id'].'">'.$date.'</a>';
+						$dueDate = '<a href="/submission/viewSubmission.php?box_id='.$assignment['id'].'">'.$date.'</a>';
 					else
 						$dueDate = $date;
 				}

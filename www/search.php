@@ -435,9 +435,9 @@ category.id AND f.deleted = '0'";
 		
 			$parent = $queryArray['parent'];
 			if($parent == 0)
-                       		$path = "<a href=\"browse.php?category=".$queryArray['id']."\">".scrubTEXT($queryArray['name']).$code."</a>".$path;
+                       		$path = "<a href=\"/resources/".$queryArray['id']."\">".scrubTEXT($queryArray['name']).$code."</a>".$path;
 			else			 
-				$path = " > <a href=\"browse.php?category=".$queryArray['id']."\">".scrubTEXT($queryArray['name']).$code."</a>".$path;
+				$path = " > <a href=\"/resources/".$queryArray['id']."\">".scrubTEXT($queryArray['name']).$code."</a>".$path;
 		}
 
 		return $path;
@@ -451,7 +451,7 @@ category.id AND f.deleted = '0'";
 		
 		//output homepage link
 		if($catDetails['template'])
-			$this->t_body->set_var("HOMEPAGE", "<a href=\"/homepage.php?category=".$catDetails['id']."\">homepage</a>");
+			$this->t_body->set_var("HOMEPAGE", "<a href=\"/homepage/".$catDetails['id']."\">homepage</a>");
 		else
 			$this->t_body->set_var("HOMEPAGE", "&nbsp;");
 		

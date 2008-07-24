@@ -19,9 +19,9 @@ if (is_array($homeworkList)) {
 		if($enroled)
 		{
 			if(isStudent($_SESSION['gid']) && $homework['owner']=='' && $homework['late'] > date('U') && $homework['open'] < date('U') ) //student
-				$dueDate = "<a href=\"/submission/submitWork.php?box_id=".$homework['box_id']."\">".$date."</a>";
+				$dueDate = "<a href=\"/submission/submitWork.php?box_id=".$homework['id']."\">".$date."</a>";
 			else if(isStaff($_SESSION['gid']) && $homework['owner'] == $_SESSION['id']) //if staff owns box provide link
-				$dueDate = "<a href=\"/submission/viewSubmission.php?box_id=".$homework['box_id']."\">".$date."</a>";
+				$dueDate = "<a href=\"/submission/viewSubmission.php?box_id=".$homework['id']."\">".$date."</a>";
 			else
 				$dueDate = $date;
 		}

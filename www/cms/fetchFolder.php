@@ -34,10 +34,14 @@ function ZipFolder($folder) {
 	
 	$folderHandler = new folder;
 	$this->folderDetails = $folderHandler->getFolder($folder);
+	if(is_numeric($this->folderDetails['id'])){
 	
-	if(perm($this->folderDetails['id'], 1) < 1) {
-		error(5);
+		if(perm($this->folderDetails['id'], 1) < 1) {
+			error(5);
+		}
 	}
+	else
+		error(13);
 }
 
 
@@ -108,8 +112,7 @@ function createDirectory($currentDir, $folderID, $depth=0) {
 		$folderList = $this->getFolders($folderID);
 		if(is_array($folderList)) {
 			foreach($folderList as $folder) {
-				if(perm($folder['id'], 1) > 0)
-				{
+				if(perm($folder['id'], 1) > 0){
 					$folderName = $this->cleanName($folder['name']);
 					$folderLocation = $currentDir.'/'.$folderName;
 					mkdir($folderLocation);

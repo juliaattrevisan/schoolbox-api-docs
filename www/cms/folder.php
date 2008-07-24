@@ -159,7 +159,7 @@ class folder
 
 	function getFolder($cid)
 	{
-		$query = "SELECT name, parent, code, template FROM category WHERE id = '$cid'";
+		$query = "SELECT id, name, parent, code, template FROM category WHERE id = '$cid'";
 		return $this->db->getRow($query);
 	}
 
