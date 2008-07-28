@@ -495,16 +495,20 @@ var RightContext = {
             // we first need to find out if the event handler contains a potential 
             // tag. if so, we grab its source, transform it and re-evaluate it. 
             // if this fails, the value reverts back to its original function
-            itemAction = item["onclick"]; 
+            
+			if (item.onclick)
+				eval('itemAction = ' + item.onclick);
+			else
+				itemAction = item["onclick"];
             try {
 
-	    itemSrc = itemAction.toString();
-	    if (itemSrc.indexOf('[')>-1) {
+			itemSrc = itemAction.toString();
+			if (itemSrc.indexOf('[')>-1) {
                 itemSrc = this.transform(itemSrc, objMap);
                 if (document.all) { // IE's eval won't return a parsed function.. we need to tell it to set it and then eval
                     eval('itemAction = ' + itemSrc);
                 } else { // firefox allows this. 
-                    itemAction = eval(itemSrc);
+                    eval('itemAction = ' + itemSrc); //itemAction = eval(itemSrc);
                 }
             }
          

@@ -64,7 +64,7 @@
 			   {type:RightContext.TYPE_MENU,
 				text:"Delete",
 				requires: ["aadmin", "Y"],
-				onclick:function() { if (confirm('Are you sure you want to delete [afilename]?')) { window.open("/cms/delResource.php?fileid=[afileid]",'_blank',''); }} },
+				onclick:function() { if (confirm('Are you sure you want to delete [afilename]?')) { window.open("/cms/delResource.php?fileid=[afileid]",'_self',''); }} },
 			  
 			   {type: RightContext.TYPE_SEPERATOR,
 			    requires: ["aadmin", "Y"] },
@@ -122,7 +122,7 @@
 			   {type:RightContext.TYPE_MENU,
 				text:"Delete",
 				requires: ["aadmin", "Y"],
-				onclick:function() { if (confirm('Are you sure you want to delete [acatname]?')) { window.open("/cms/modFolder.php?delete=[acatid]",'_blank',''); }} },
+				onclick:function() { if (confirm('Are you sure you want to delete [acatname]?')) { window.open("/cms/modFolder.php?delete=[acatid]",'_self',''); }} },
 			  
 			   {type: RightContext.TYPE_SEPERATOR,
 			    requires: ["aadmin", "Y"] },
