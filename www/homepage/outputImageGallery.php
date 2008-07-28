@@ -58,7 +58,7 @@
 			}
 		}//end if
 		else
-			$this->t_body->set_VAR("row_block", "");
+			$this->setVar("row_block", "");
 
 
 ?>
