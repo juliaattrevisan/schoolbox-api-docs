@@ -21,10 +21,6 @@ function perm($sid, $service)
 	if($_SESSION['su'] == 1)
 		return 3;
 
-	// allow staff write access to news
-	if ($service == 3 && isStaff($_SESSION['gid']) )
-		return 3;
-
 	$db = new dbManager;
 
 	//individual access
@@ -52,6 +48,10 @@ function perm($sid, $service)
 			if($perm != 1)
 				$perm = 0;
 		}
+	}
+	elseif(isStaff($_SESSION['gid']) && $service == 3 && $perm < 2)
+	{
+		$perm = 2;
 	}
 	return $perm;
 }

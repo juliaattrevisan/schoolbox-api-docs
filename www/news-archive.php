@@ -21,7 +21,8 @@ $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
 $this->setBlock(TEMPLATE_content, 'archive_button', 'archive_button_block');	
 
 //can see add news link
-if(isStaff($_SESSION['gid']))
+$permLevel = perm(0,3);
+if($permLevel >= 2)
 	$this->setVar("ADD", "<b><a href=\"/news/modify\">add news</a></b>");
 else
 	$this->setVar("ADD", "");
@@ -84,7 +85,7 @@ if(is_array($items))
 	{
 		$this->setVar("NEWS_ID",$article['item_id']); 
 	 
-		if($article['item_owner'] == $_SESSION['id'] || $_SESSION['su'] == 1)
+		if(($permLevel >= 2 && $article['item_owner'] == $_SESSION['id']) || $permLevel >= 3)
 			$this->setVar("MODIFY", "<a href=\"/news/modnews.php?id=".$article['item_id']."\">modify</a>");
 		else
 			$this->setVar("MODIFY", "");

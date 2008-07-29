@@ -40,6 +40,9 @@ else if (is_numeric($_GET['newsID']) && $permLevel >= 2) {
 	$page->setTab("news");
 	
 	$news = $newsHandler->getByID($_GET['newsID']);
+
+	if(!(($permLevel >= 2 && $news['item_owner'] == $_SESSION['id']) || $permLevel >= 3))
+		error(23);
 	
 	$output = array('ACTION'	=> 'Modify',
 					'NEWS_ID'	=> $news['item_id'],
@@ -62,10 +65,7 @@ else if (is_numeric($_GET['newsID']) && $permLevel >= 2) {
 	else
 		$page->setVar("campus_row_block", "");
 		
-	if ($permLevel >= 3 || $news['item_owner'] == $_SESSION['id'])
-		$page->parse("delete_button_block", "delete_button");
-	else
-		$page->setVar("delete_button_block", "");
+	$page->parse("delete_button_block", "delete_button");
 
 	$page->outputPage();
 }

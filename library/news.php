@@ -60,6 +60,14 @@ class News extends Model {
 		}
 		return $output;
 	}
+	
+	function hasWrite($newsID) {
+		$permLevel = perm(0,3);
+		$news = $this->getById($newsID);
+		if (($permLevel >= 2 && $news['item_owner'] == $_SESSION['id']) || $permLevel >= 3)
+			return true;
+		return false;
+	}
 		
 	function create($news) {
 		$groupList = $news['groupList'];
@@ -88,6 +96,10 @@ class News extends Model {
 	}
 	
 	function update($news) {
+
+		if (!$this->hasWrite($news['item_id']))
+			return;
+	
 		$groupList = $news['groupList'];
 		$campusList = $news['campusList'];
 		
@@ -113,6 +125,10 @@ class News extends Model {
 	
 	function delete($newsID) {
 		$newsID = (int)$newsID;
+
+		if (!$this->hasWrite($newsID))
+			return;
+					
 		$query = "UPDATE " . $this->_table . " SET item_deleted = 1 WHERE " . $this->_index . " = $newsID";
 		return $this->db->query($query);
 	}
