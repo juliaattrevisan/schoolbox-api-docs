@@ -49,10 +49,8 @@ $dayOfWeek 		= date("w", mktime(0,0,0, $selectedMonth, $selectedDay, $selectedYe
 $startOfWeek 	= mktime (0,0,0,$selectedMonth, ($selectedDay-$dayOfWeek), $selectedYear);
 $endOfWeek 	 	= strtotime("+6 days", $startOfWeek);
 
-if (date("m", $startOfWeek) != date("m", $endOfWeek))
-	$this->setVar('MONTH', date("F",$startOfWeek)." / ".date("F", $endOfWeek));
-else
-	$this->setVar('MONTH', date("F",$startOfWeek));
+
+$this->setVar('MONTH', date("F", mktime(0,0,0,$selectedMonth, 1, $selectedYear)));
 
 $output = array('YEAR'	 => date("Y",$startOfWeek),
 				'TITLE'	 => HEADING." - Calendar",

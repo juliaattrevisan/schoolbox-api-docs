@@ -18,7 +18,7 @@ if(isset($_GET['fileid'])  && $_GET['fileid'])
 	//delete file, security checks done within function
 	$fileDB->deleteFile($_GET['fileid']);	
 
-	localRedir("/browse.php?category=".$fileInfo['category']);
+	localRedir("/resources/".$fileInfo['category']);
 }
 else if(isset($_GET['linkid']) && $_GET['linkid'])
 {
@@ -30,7 +30,7 @@ else if(isset($_GET['linkid']) && $_GET['linkid'])
 	//delete url, security checks done within function
 	$urlDB->deleteUrl($_GET['linkid']);	
 
-	localRedir("/browse.php?category=".$urlInfo['category']);
+	localRedir("/resources/".$urlInfo['category']);
 
 }
 else

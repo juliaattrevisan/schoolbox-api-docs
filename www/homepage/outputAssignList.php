@@ -31,12 +31,12 @@
 					$this->setVar("ASS_DATE", $dueDate);
 		
 				//set name
-				if($assignment['realname'] != "")
+				if($assignment['realname'])
 				{
 					if($assignment['inline'] == 'true')
-						$url = "<a href=\"/sendframe.php?id=".$assignment['id']."\" target=\"_blank\">".scrubTEXT($assignment['description'])."</a>";
+						$url = "<a href=\"/sendframe.php?id=".$assignment['fileID']."\" target=\"_blank\">".scrubTEXT($assignment['description'])."</a>";
 					else
-						$url = "<a href=\"/send.php?id=".$assignment['id']."\">".scrubTEXT($assignment['description'])."</a>";
+						$url = "<a href=\"/send.php?id=".$assignment['fileID']."\">".scrubTEXT($assignment['description'])."</a>";
 		
 					$this->setVar("ASS_NAME", $url);
 				}

@@ -17,8 +17,7 @@ class Submission extends Model {
 				  UNIX_TIMESTAMP(sb.open_date) AS open,
 				  UNIX_TIMESTAMP(sb.date) AS date,
 				  UNIX_TIMESTAMP(sb.late_date) AS late,
-				  f.id fileID, sb.description, sb.created, ss.id studentWork, af.inline
-					
+				  f.id fileID, f.realname, sb.description, sb.created, ss.id studentWork, af.inline
 				  FROM submission_box sb
 				  LEFT JOIN  file f ON sb.fid = f.id AND f.deleted = '0'
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = mime
@@ -40,15 +39,13 @@ class Submission extends Model {
 				  UNIX_TIMESTAMP(sb.open_date) AS open,
 				  UNIX_TIMESTAMP(sb.date) AS date,
 				  UNIX_TIMESTAMP(sb.late_date) AS late,
-				  f.id fileID, sb.description, sb.created, ss.id studentWork, af.inline
-					
+				  f.id fileID, f.realname, sb.description, sb.created, ss.id studentWork, af.inline
 				  FROM submission_box sb
 				  LEFT JOIN  file f ON sb.fid = f.id AND f.deleted = '0'
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = mime
 				  LEFT JOIN student_submission ss ON ss.box_id = sb.id AND ss.owner = '" . $_SESSION['id'] . "'
 				  LEFT JOIN file_type ft ON sb.type = ft.id
-
-				  WHERE sb.category = '".$categoryID."' AND sb.deleted = '0' AND sb.type = '".$type."'
+				  WHERE sb.category = '".$categoryID."' AND sb.deleted = '0' AND sb.type = '".$type."' AND sb.late_date > NOW()
 				  ORDER BY sb.date DESC";
 
 		if($config['size'] > 0) 

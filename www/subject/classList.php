@@ -17,15 +17,15 @@ if(isStaff($_SESSION['gid']))
 	$userHandler = new User;
 	$categoryHandler = new Category;
 	$synergeticClass = new SynergeticClass;
-		
-	$code = urldecode($this->arg[0]);
+
 	
 	$this->setFile(TEMPLATE_content, 'class/classList.htm');
 	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
 	$this->setTitle('Class List');
 
-	
-	$category = $categoryHandler->getByField('code',$code);
+	$code = implode('/', $this->arg);
+	$category = $categoryHandler->getByField("code", urldecode($code));
+
 	if(is_array($category)) {
 		$this->setVar("SUBJECTNAME", $category['name'] ." ($code)");	
 	
@@ -65,7 +65,7 @@ if(isStaff($_SESSION['gid']))
 		}
 	}
 	else 
-		$this->t_body->set_var('student_list_block', '');
+		$this->setVar('student_list_block', '');
 	
 	
 	$this->setVar("REPLYTO", formatEmail($_SESSION));

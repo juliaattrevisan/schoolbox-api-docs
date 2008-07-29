@@ -31,12 +31,12 @@ if (is_array($homeworkList)) {
 		$this->setVar("HW_DATE", $dueDate);
 	
 		//set name
-		if($homework['realname'] != "")
+		if($homework['realname'])
 		{
 			if($homework['inline'] == 'true')
-				$url = "<a href=\"/sendframe.php?id=".$homework['id']."\" target=\"_blank\">".scrubTEXT($homework['description'])."</a>";
+				$url = "<a href=\"/sendframe.php?id=".$homework['fileID']."\" target=\"_blank\">".scrubTEXT($homework['description'])."</a>";
 			else
-				$url = "<a href=\"/send.php?id=".$homework['id']."\">".scrubTEXT($homework['description'])."</a>";
+				$url = "<a href=\"/send.php?id=".$homework['fileID']."\">".scrubTEXT($homework['description'])."</a>";
 
 			$this->setVar("HW_NAME", $url);
 		}
