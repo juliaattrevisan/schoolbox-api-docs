@@ -39,7 +39,8 @@ $this->setVar('FORWARD', date("j-n-Y", strtotime("+1 month", $selectedDate)));
 
 // output calendar
 $firstDay 		= date("w", mktime(0,0,0,$selectedMonth, 1, $selectedYear));
-$numDaysinMonth = date("d", mktime(0, 0, 0, $selectedMonth + 1, 0, $year)); // date("t", $selectedMonth);
+//$numDaysinMonth = date("t", $selectedMonth);
+$numDaysinMonth = date("d", mktime(0, 0, 0, $selectedMonth + 1, 0, $year)); // 
 $numWeeksMonth 	= ceil(($firstDay + $numDaysinMonth)/7);
 $totalDays 		= $numWeeksMonth * 7 + (6 - $firstDay);
 
@@ -60,7 +61,8 @@ $output = array('YEAR'	 => date("Y",$startOfWeek),
 $this->setVar($output);
 
 // get top left starting day of calendar view
-$startDay = mktime(0,0,0,$selectedMonth, 1, $selectedYear) - strtotime("+$firstDay day", 0);
+
+$startDay = mktime(3,0,0,$selectedMonth, 1, $selectedYear) - strtotime("+$firstDay day", 0);
 
 for ($i = 0; $i < $totalDays; $i++) {
 	$currentDay = strtotime("+$i day", $startDay);

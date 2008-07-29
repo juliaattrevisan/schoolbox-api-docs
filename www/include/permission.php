@@ -23,7 +23,7 @@ function perm($sid, $service)
 
 	// allow staff write access to news
 	if ($service == 3 && isStaff($_SESSION['gid']) )
-		return 2;
+		return 3;
 
 	$db = new dbManager;
 
