@@ -62,7 +62,7 @@ else if (is_numeric($_GET['newsID']) && $permLevel >= 2) {
 	else
 		$page->setVar("campus_row_block", "");
 		
-	if ($permLevel >= 3)
+	if ($permLevel >= 3 || $news['item_owner'] == $_SESSION['id'])
 		$page->parse("delete_button_block", "delete_button");
 	else
 		$page->setVar("delete_button_block", "");
