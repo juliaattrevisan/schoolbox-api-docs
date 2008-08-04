@@ -275,7 +275,7 @@ class SitePage extends Page {
 				if(isLocalURL($link['url'])){
 					$this->setVar("MLINK", "<a href=\"".$link['url']."\">".scrubTEXT($link['description'])."</a>");	
 				}else{
-					$this->setVar("MLINK", "<a href=\"/redir.php?url=".$link['url']."\" target=\"_blank\">".scrubTEXT($link['description'])."</a>");
+					$this->setVar("MLINK", "<a href=\"/redir.php?url=".urlencode(urlencode($link['url']))."\" target=\"_blank\">".scrubTEXT($link['description'])."</a>");
 				}
 				$this->parse("my_links", "mlink_block", true);
 			}

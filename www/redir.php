@@ -2,19 +2,17 @@
 	include_once("include/include.php");
 	require_once("include/session.php");
 	
-	if(SITE_location == 'wenona' && stristr($_GET['url'], INTRANET_site))
-	{
-		$url = $_GET['url'].'?strEncrypted='.base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'].' '.$_SESSION['password']));
-		//print $url;
+	if($_GET['url']) {
+		$url = urldecode($_GET['url']);	
+	
+		if(!URLS_use_frame)
+		{
+			header('Location: '.$url);
+			exit;
+		}
 	}
-	else
-		$url = $_GET['url'];	
-
-	if(!URLS_use_frame)
-	{
-		header('Location: '.$url);
-		exit;
-	}
+	else 
+		error(2);
 ?>
 <html>
 

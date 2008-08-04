@@ -13,7 +13,7 @@
 				if(isLocalURL($link['url']))
 					$this->setVar("LINK_NAME", "<a href=\"".$link['url']."\">".scrubTEXT($link['description'])."</a>");
 				else
-					$this->setVar("LINK_NAME", "<a href=\"/redir.php?url=".$link['url']."\" target=\"_blank\">".scrubTEXT($link['description'])."</a>");
+					$this->setVar("LINK_NAME", "<a href=\"/redir.php?url=".urlencode(urlencode($link['url']))."\" target=\"_blank\">".scrubTEXT($link['description'])."</a>");
 				
 				//set the description
 				$this->setVar("LINK_COMMENT", nl2br(scrubTEXT($link['comment'])));

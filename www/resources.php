@@ -223,7 +223,7 @@ function getFileHTML($categoryID) {
 			}
 			else if ($file['url'] != "")
 			{
-				$page->setVar("FILE_URL", "<a href=\"/redir.php?url=" . $file['url'] ."\" title=\"" . $file['url'] . "\" onclick=\"window.open(this.href, '_blank',''); return false;\">");
+				$page->setVar("FILE_URL", "<a href=\"/redir.php?url=" . urlencode(urlencode($file['url'])) ."\" title=\"" . $file['url'] . "\" onclick=\"window.open(this.href, '_blank',''); return false;\">");
 				$page->setVar('FILE_URL_END', '</a>');
 			}
 			

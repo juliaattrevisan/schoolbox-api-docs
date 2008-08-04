@@ -17,7 +17,7 @@ class ModuleEquipmentList {
 	function ModuleEquipmentList( &$searchParms) {
 		$this->_radioButtons = false;
 		$this->_noBorder = false;
-		
+		$this->searchParms = $searchParms;
 		$showUsers = 1;
 		if( func_num_args() > 1) {
 			if( func_get_arg(1) == 'radioButtons') {
@@ -102,18 +102,15 @@ class ModuleEquipmentList {
 			}
 
 			
-			if($row['active'])
+			if($row['active'] ||  $this->searchParms['serial']) {
 				$this->_tpl->set_var( 'ACTIVE', '');
-			else
-				$this->_tpl->set_var( 'ACTIVE', 'class="disabled"');
-
-			$this->_tpl->set_var( 'SERIAL', $serial);
-			$this->_tpl->set_var( 'OWNER', $fullname);
-			$this->_tpl->set_var( 'BRAND', "<a href='equipmentList.php?brandID=".$row['brandID']."'>".$row['brand']."</a>");
-			$this->_tpl->set_var( 'MODEL', "<a href='equipmentList.php?modelID=".$row['modelID']."'>".$row['model']."</a>");
-			$this->_tpl->set_var( 'LOCATION', "<a href='equipmentList.php?locationID=".$row['locationID']."'>".$row['location']."</a>");
-			$this->_tpl->parse( 'blkEquipment', 'item', true);
-		
+				$this->_tpl->set_var( 'SERIAL', $serial);
+				$this->_tpl->set_var( 'OWNER', $fullname);
+				$this->_tpl->set_var( 'BRAND', "<a href='equipmentList.php?brandID=".$row['brandID']."'>".$row['brand']."</a>");
+				$this->_tpl->set_var( 'MODEL', "<a href='equipmentList.php?modelID=".$row['modelID']."'>".$row['model']."</a>");
+				$this->_tpl->set_var( 'LOCATION', "<a href='equipmentList.php?locationID=".$row['locationID']."'>".$row['location']."</a>");
+				$this->_tpl->parse( 'blkEquipment', 'item', true);
+			}
 		}
 		
 		mysql_close();
