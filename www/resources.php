@@ -156,17 +156,19 @@ function getFileHTML($categoryID) {
 		unset($_SESSION['smCategory']);
 		error(14);
 	}
+
+	if (is_array($linkList)) {
+		$fileList = is_array($fileList) ? $fileList : array();
+		$fileList = array_merge($fileList, $linkList);
+	
+		foreach ($fileList as $row) {
+			$arrayOut[$row['description']]  = $row;
+		}
+		ksort($arrayOut);
+		$fileList =& $arrayOut;
+	}
 	
 	if (is_array($fileList)) {
-		if (is_array($linkList)) {
-			$fileList = array_merge($fileList, $linkList);
-		
-			foreach ($fileList as $row) {
-				$arrayOut[$row['description']]  = $row;
-			}
-			ksort($arrayOut);
-			$fileList =& $arrayOut;
-		}
 	
 		foreach ($fileList as $file) {
 			
