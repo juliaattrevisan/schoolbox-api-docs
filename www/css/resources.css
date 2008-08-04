@@ -114,8 +114,8 @@ height: 100%;
 	vertical-align: middle;
 	float: left;
 }
-.resources-filename, .resources-filesize {
-	width: 30%;
+.resources-filesize {
+ display: none;
 }
 .resources-file {
 	position: relative;
