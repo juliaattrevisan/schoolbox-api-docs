@@ -393,7 +393,7 @@ category.id AND f.deleted = '0'";
 		}
 		else
 		{
-			$this->t_body->set_var("LINK_URL", "/redir.php?url=".$linkDetails['url']);
+			$this->t_body->set_var("LINK_URL", "/redir.php?url=".urlencode(urlencode($linkDetails['url'])));
 			$this->t_body->set_var("LINK_TARGET", "_blank");
 		}
 		

@@ -56,7 +56,7 @@ if($db->dbCountRows() > 0){
 		if(isLocalURL($link['url'])){
 			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\">".scrubTEXT($link['description'])."</a>");	
 		}else{
-			$this->t_body->set_var("MLINK", "<a href=\"/redir.php?url=".$link['url']."\" target=\"_blank\">".scrubTEXT($link['description'])."</a>");
+			$this->t_body->set_var("MLINK", "<a href=\"/redir.php?url=".urlencode(urlencode($link['url']))."\" target=\"_blank\">".scrubTEXT($link['description'])."</a>");
 		}
 		$this->t_body->parse("my_links", "mlink_block", true);
 	}
