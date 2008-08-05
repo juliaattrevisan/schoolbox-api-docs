@@ -151,6 +151,11 @@ class Category extends Model {
 		return $this->db->query($query);
 	}
 
+	function deletePerms($cid)
+	{
+		$this->db->dbDeleteRow('perms', 'cid', $cid);
+	}
+
 	function create($data) {
 		$categoryID = parent::create($data);
 		$this->logAction($categoryID, 'create');

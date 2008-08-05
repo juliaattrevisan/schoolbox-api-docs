@@ -125,13 +125,18 @@ if(is_array($catList))
 		
 	}
 }
-
-if(!$flag)
+else
+	$this->setVar('new_category','');
+	
+if(!$flag && $mailbox->unseen == 0)
 {
 	$this->setVar('new_category','');
 	$this->setVar('POS'.$component['position'], '');
 }
-else
+else {
+	if(!$flag)
+		$this->setVar('new_category','');
+		
 	$this->parse('POS'.$component['position'], $component['name']);
-	
+}
 ?>

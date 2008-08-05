@@ -1,16 +1,14 @@
 ErrorDocument 404 /index.php?page=common/404
 
-#Options +FollowSymLinks
-#Options -Multiviews
+Options +FollowSymLinks
+Options -Multiviews
 
 RewriteEngine on
 
-#RewriteCond %{HTTP_HOST} !^www [NC]
-#RewriteRule ^(.*)$ http://www.bescon.com.au/$1 [R=301,L]
-
-RewriteCond %{SCRIPT_FILENAME}/ -d
-RewriteRule [^/]$ %{REQUEST_URI}/ [R=301,L]
+#RewriteCond %{SCRIPT_FILENAME}/ -d
+#RewriteRule [^/]$ %{REQUEST_URI}/ [R=301,L]
 
 RewriteCond %{REQUEST_URI} !/admin/.*
+RewriteCond %{REQUEST_URI} !/roundcube/.*
 RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}
 RewriteRule ^([^.]+) /index.php?page=$1 [L]

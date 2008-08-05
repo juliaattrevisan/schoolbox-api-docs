@@ -311,7 +311,7 @@ else if(isset($_GET['delete']) && $_GET['delete'])
 	$folderInfo = $folderDB->getFolder($_GET['delete']);
 	$folderDB->deleteCat($_GET['delete']);
 
-	localRedir("/browse.php?category=".$folderInfo['parent']);
+	localRedir("/resources/".$folderInfo['parent']);
 }
 else
 {

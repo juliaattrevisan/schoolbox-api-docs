@@ -1,0 +1,92 @@
+<h1>School Directory</h1>
+<table class="indent">
+  <tr>
+    <td colspan="6"><h2>Personal Information</h2></td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><strong>Name</strong></td>
+    <td colspan="2">{NAME}</td>
+    <td colspan="1"><strong>Email</strong></td>
+    <td colspan="2">{EMAIL}</td>
+    <td rowspan="12" style="vertical-align:top; text-align:center;"><!-- BEGIN portrait -->
+      <img src="/search/portrait.php?id={SYNERGY_ID}" />
+      <!-- END portrait -->
+    </td>
+  </tr>
+  <!-- BEGIN student_synergy_form -->
+  <tr>
+    <td><strong>Room</strong></td>
+    <td>{FORM}</td>
+    <td><strong>Telephone Ext.</strong></td>
+    <td>{LOCKER}</td>
+  </tr>
+  <tr>
+    <td><strong>Ormond Year</strong></td>
+    <td>{HOUSE}</td>
+    <td><strong>Uni Year</strong></td>
+    <td>{YEAR_LEVEL}</td>
+  </tr>
+  <tr>
+    <td><strong>Birthdate</strong></td>
+    <td colspan="2">{BIRTHDATE}</td>
+  </tr>
+  <!-- END student_synergy_form -->
+  <!-- BEGIN student_synergy_tutor -->
+  <tr>
+    <td><strong>Room</strong></td>
+    <td>{FORM}</td>
+    <td><strong>Telephone Ext.</strong></td>
+    <td>{LOCKER}</td>
+  </tr>
+  <tr>
+    <td><strong>Ormond Year</strong></td>
+    <td>{HOUSE}</td>
+    <td><strong>Uni Year</strong></td>
+    <td>{YEAR_LEVEL}</td>
+  </tr>
+  <tr>
+    <td><strong>Birthdate</strong></td>
+    <td colspan="2">{BIRTHDATE}</td>
+  </tr>
+  <!-- END student_synergy_tutor -->
+  <!-- BEGIN medical -->
+  <!-- END medical -->
+  <!-- BEGIN group_management -->
+  <tr>
+    <td colspan="6"><h2>Group Management</h2></td>
+  </tr>
+  <td><strong>Add User To Group</strong></td>
+    <td colspan="5"><form action="/group/modUserGroup.php" method="GET">
+        <select name="sid">
+          <!-- BEGIN group -->
+          <option value="{GROUP_ID}">{GROUP_NAME}</option>
+          <!-- END group -->
+        </select>
+        <input type="hidden" name="uid" value="{ID}" />
+        <input type="hidden" name="service" value="{HOMEPAGE_SERVICE}" />
+        <input type="submit" name="submit" value="Add User" class="btn" />
+      </form></td>
+  </tr>
+  <!-- END group_management -->
+  <tr>
+    <td colspan="6"><h2>School Information</h2></td>
+  </tr>
+  <tr>
+    <td colspan="6"><!-- BEGIN school_links -->
+      <!-- END school_links -->
+      <ul>
+        <!-- BEGIN timetable_link -->
+        <!-- END timetable_link -->
+        <!-- BEGIN due_work -->
+        <!-- END due_work -->
+        <!-- BEGIN helpdesk -->
+        <li><a href="/modules/helpdesk/index.php?id={ID}">Helpdesk Jobs</a></li>
+        <!-- END helpdesk -->
+      </ul></td>
+  </tr>
+  <!-- BEGIN contact_synergy -->
+      <!-- BEGIN edit_emergency -->
+      <!-- END edit_emergency -->
+  <!-- END contact_synergy -->
+</table>

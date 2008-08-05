@@ -23,13 +23,13 @@ if ($_POST['title']) {
 		
 	if (is_array())
 	
-	localRedir('/browse.php?category=' . $_POST['parent']);
+	localRedir('/resources/' . $_POST['parent']);
 } 
 elseif ($_POST['delete']) {
 
 	$category = $categoryHandler->getByID($_POST['delete']);
 	$categoryHandler->delete($_POST['delete']);
-	localRedir('/browse.php?category=' . $category['parent']);
+	localRedir('/resources/' . $category['parent']);
 }
 elseif ($category['id']) {
 	$this->setFile(TEMPLATE_content, "cms/modify-category.html");

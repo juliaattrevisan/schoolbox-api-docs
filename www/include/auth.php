@@ -206,15 +206,19 @@ function setSynergyInfo(&$mydb)
 		if( isParent($_SESSION['gid']))
 		{
 			$studentGroup = unserialize(STUDENTGROUPIDS);
-			$children = getEnrolledStudents($synergy_id);
-			foreach($children as $child)
-			{
-				$myquery = "SELECT id FROM user WHERE synergy_id = $child";
-				$portal = $mydb->getRow($myquery);
-				if($portal['id'])
-				{
-					$subjects = getSubjectList($child, $studentGroup[0]);
-					$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child, 'subjects'=>$subjects);
+			if($synergy_id) {
+				$children = getEnrolledStudents($synergy_id);
+				if(is_array($children)) {
+					foreach($children as $child)
+					{
+						$myquery = "SELECT id FROM user WHERE synergy_id = $child";
+						$portal = $mydb->getRow($myquery);
+						if($portal['id'])
+						{
+							$subjects = getSubjectList($child, $studentGroup[0]);
+							$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child, 'subjects'=>$subjects);
+						}
+					}
 				}
 			}
 		}
