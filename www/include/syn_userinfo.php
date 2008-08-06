@@ -78,34 +78,40 @@ function getSubjectList($synergyID, $group)
 	
 	if( isStudent($group) )
 	{
-		$sql ="SELECT DISTINCT(SubjectClasses.ClassCode), SubjectClasses.Description as name
-				FROM SubjectClasses SubjectClasses, vStudentTimetableFull vStudentTimetableFull
-				WHERE SubjectClasses.ClassCode = vStudentTimetableFull.ClassCode AND
-				SubjectClasses.FileSemester = vStudentTimetableFull.FileSemester AND
-				SubjectClasses.FileType = vStudentTimetableFull.FileType AND
-				SubjectClasses.FileYear = vStudentTimetableFull.FileYear AND
-				((vStudentTimetableFull.FileSemester=".$_SESSION['FileSemester'].") AND
-				(vStudentTimetableFull.FileYear=".$_SESSION[ 'FileYear'].") AND
-				(vStudentTimetableFull.StudentID=$synergyID))";
+		$sql ="SELECT StudentClasses.ClassCode, SubjectClasses.Description as name
+				FROM StudentClasses, SubjectClasses
+				WHERE 
+				StudentClasses.FileType = SubjectClasses.FileType AND
+				StudentClasses.FileYear = SubjectClasses.FileYear AND
+				StudentClasses.FileSemester = SubjectClasses.FileSemester AND
+				StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
+				StudentClasses.ClassCode = SubjectClasses.ClassCode AND
+				StudentClasses.FileSemester=".$_SESSION['FileSemester']." AND
+				StudentClasses.FileYear=".$_SESSION[ 'FileYear']." AND
+				StudentClasses.ID=$synergyID";
 	}
 	else
 	{      
 
 		$sql = "SELECT DISTINCT(c1.ClassCode), c2.description as name
 				FROM SubjectClassStaff c1, SubjectClasses c2
-				WHERE c1.ClassCode = c2.ClassCode AND
+				WHERE 
+				c1.FileType = c2.FileType AND
+				c1.FileYear = c2.FileYear AND
+				c1.FileSemester = c2.FileSemester AND
+				c1.ClassCampus = c2.ClassCampus AND
+				c1.ClassCode = c2.ClassCode AND
 				c1.FileSemester = ".$_SESSION['FileSemester']." AND
 				c1.FileYear = ".$_SESSION[ 'FileYear']." AND
-				c1.StaffID = $synergyID AND
-				c2.Description <= all ( select description from subjectclasses c3 where c3.classcode=c1.classcode)";
+				c1.StaffID = $synergyID";
 	}
 	
-	$result = @mssql_query( $sql);
+	$result = mssql_query( $sql);
 	if($result !== FALSE && $result !== TRUE)
 	{
 		if( mssql_num_rows( $result ) > 0 )
 		{
-			while($subject = @mssql_fetch_array($result))
+			while($subject = @mssql_fetch_assoc($result))
 			{
 					//remove study periods and rostered offs
         			if(!preg_match("/ST|RO/",$subject['ClassCode']))

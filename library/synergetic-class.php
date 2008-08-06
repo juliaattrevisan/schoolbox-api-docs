@@ -20,9 +20,9 @@ class SynergeticClass extends MSSQL{
 			CommunityStudents.Preferred as firstname,
 			StudentSemester.YearLevel as yearlevel,
 			luHouse.Description as house,
-			Students.ID as synergy_id
-		FROM    SynergyOne.dbo.Students Students
-		INNER JOIN SynergyOne.dbo.StudentSemester StudentSemester ON Students.ID = StudentSemester.ID
+			CommunityStudents.ID as synergy_id
+		FROM    SynergyOne.dbo.Community CommunityStudents
+		INNER JOIN SynergyOne.dbo.StudentSemester StudentSemester ON CommunityStudents.ID = StudentSemester.ID
 		LEFT JOIN SynergyOne.dbo.StudentClasses StudentClasses ON (
 			StudentSemester.FileYear = StudentClasses.FileYear AND
 			StudentSemester.FileSemester = StudentClasses.FileSemester AND
@@ -33,8 +33,6 @@ class SynergeticClass extends MSSQL{
 			StudentClasses.FileSemester = SubjectClasses.FileSemester AND
 			StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
 			StudentClasses.ClassCode = SubjectClasses.ClassCode )
-		LEFT JOIN SynergyOne.dbo.Community CommunityStudents ON
-                        Students.ID = CommunityStudents.ID
 		LEFT JOIN SynergyOne.dbo.luHouse luHouse ON (
 			StudentSemester.House = luHouse.Code
 			AND StudentSemester.StudentCampus = luHouse.Campus)
