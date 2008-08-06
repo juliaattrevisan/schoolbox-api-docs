@@ -35,7 +35,7 @@ if(is_numeric($this->arg[0])) {
 	
 	
 	$outputUser = array('NAME' 			=> formatName($user),
-						'ID'			=> $id,
+						'ID'			=> $this->arg[0],
 						'CAMPUS_ID'		=> $user['campus'],
 						'EMAIL_ADDRESS' => $emailAddress,
 						'EMAIL'			=> $email,

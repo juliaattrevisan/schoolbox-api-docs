@@ -86,11 +86,18 @@ class News extends Model {
 				$this->db->insert('newsGroup', array('id' => $newsID, 'gid' => $group));
 			}
 		}
+		else if(is_numeric($groupList))
+			$this->db->insert('newsGroup', array('id' => $newsID, 'gid' => $groupList));
+		
 		if (is_array($campusList)) {
 			foreach ($campusList as $campus) {
 				$this->db->insert('newsCampus', array('id' => $newsID, 'campus' => $campus));
 			}
 		}
+		else if(is_numeric($campusList))
+			$this->db->insert('newsCampus', array('id' => $newsID, 'campus' => $campusList));
+		else
+			$this->db->insert('newsCampus', array('id' => $newsID, 'campus' => 1));
 		
 		return $newsID;
 	}

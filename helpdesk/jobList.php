@@ -21,7 +21,7 @@ if( isset( $_REQUEST[ 'portalAssignedUserID'])) {
 }
 
 		# If search parms are specified, search on them
-if( sizeof( $_REQUEST) > 1) {
+if( sizeof( $_GET) > 1) {
 
 		# Make array of parameters on which to search. Fields with value 'all' set to null.
 	$searchParms =	array(	'jobID' 	=> '',
@@ -35,11 +35,11 @@ if( sizeof( $_REQUEST) > 1) {
 				'associatedUserID'=>''
 			);
 	foreach( array_keys( $searchParms) as $key) {
-		if( $_REQUEST[ $key] == 'all') {
+		if( $_GET[ $key] == 'all') {
 			$searchParms[ $key] = '';
 		}
 		else {
-			$searchParms[ $key] = $_REQUEST[ $key];
+			$searchParms[ $key] = $_GET[ $key];
 		}
 	}
 }
