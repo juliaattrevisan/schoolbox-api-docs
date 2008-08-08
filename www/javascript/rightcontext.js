@@ -555,6 +555,8 @@ var RightContext = {
             thisValue = obj.getAttribute(attribs[a]);
             if (typeof thisValue != "undefined") {
                 attrMap[thisAttr] = thisValue;
+				if (attrMap[thisAttr] != null)
+				attrMap[thisAttr] = attrMap[thisAttr].replace(/("|')/, '\\\$1');
             }
         }
         return attrMap;
