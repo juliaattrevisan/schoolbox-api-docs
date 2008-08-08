@@ -24,6 +24,9 @@ height: 100%;
 #resources {
 	margin: 0;
 	padding: 0;
+	z-index: 100;
+}
+#footer {
 	
 }
 #resources-nav {

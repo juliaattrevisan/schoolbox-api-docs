@@ -5,7 +5,7 @@ var myrules = {
 			var catParts = Resources.getCatParts(el.parentNode);
 			
 			Resources.setSelected(catParts.catName);		
-
+			
 			var catContents = $('category_' + catParts.catID);
 			if (!catContents || catContents.style.display == 'none') {
 				Resources.openCat(catParts.insertDiv, catParts.catID);
@@ -43,7 +43,7 @@ var myrules = {
 		
 			var catParts = Resources.getCatParts(catDiv);
 			
-			Resources.setSelected(catParts.catName);	
+			//Resources.setSelected(catParts.catName);	
 			
 			var catContents = $('category_' + catParts.catID);
 			if (!catContents || catContents.style.display == 'none') {
@@ -55,10 +55,10 @@ var myrules = {
 			}
 		},
 		el.onmouseover = function () {
-			if (el.setStyle) el.setStyle('text-decoration', 'underline');	
+			el.style.textDecoration = 'underline';	
 		},
 		el.onmouseout = function () {
-			if (el.setStyle) el.setStyle('text-decoration', 'none');	
+			el.style.textDecoration = 'none';	
 		},
 		el.onmousedown = function () {
 			Resources.setSelected(el);	
@@ -70,16 +70,19 @@ var myrules = {
 		el.onmousedown = function() {
 			
 			var catParts = Resources.getCatParts(el.parentNode);
-	
+			
 			Resources.setSelected(catParts.catName);	
-	
+			
 			var catContents = $('category_' + catParts.catID);
 			if (!catContents || catContents.style.display == 'none') {
 				Resources.openCat(catParts.insertDiv, catParts.catID);
+				
 				Resources.openWindow(catParts.catID);
+				
 				if (catParts.openClose) catParts.openClose.src = '/images/expanded.gif';
 			} 	
-			el.setStyle('position', 'relative');
+			
+			//el.style.position = 'relative';
 			
 		},
 		el.onmouseover = function () {
@@ -170,6 +173,28 @@ var Resources = {
 		}).request();
 
 	},
+	openLinkDetails: function (linkID, e) {
+		var url = '/resources.php?link-details=' + linkID;
+
+		var win = new Windoo({
+			resizable: false,
+			destroyOnClose: false,
+			title: 'Properties',
+			width: 330,
+			height: 240,
+			theme: Windoo.Themes.alphacube
+		});
+
+		// clear window content, display loading icon and ensure window is shown
+		win.setHTML('<div><img src="/images/resources/loading.gif" class="loading" alt="loading..."/></div>').show();
+
+		// send ajax request
+		new Windoo.Ajax(url, {
+			evalScripts: true,
+			window: win
+		}).request();
+
+	},	
 	addDrag: function () {
 
 		$$('.resources-category').each(function(o, i){
@@ -312,6 +337,7 @@ var Resources = {
 	},
 
 	setSelected: function (catName) {
+		
 		if ($('resources-selected'))
 			$('resources-selected').removeAttribute('id');
 		catName.setAttribute("id", "resources-selected");

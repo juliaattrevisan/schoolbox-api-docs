@@ -1,4 +1,5 @@
 <!-- BEGIN custom_head -->
+        
 <script type="text/javascript" src="/javascript/mootools.js"></script>
 <script type="text/javascript" src="/javascript/behaviour.js"></script>
 <script type="text/javascript" src="/javascript/rightcontext.js"></script>
@@ -6,9 +7,11 @@
 <script type="text/javascript" src="/javascript/windoo.r114.js"></script>
 
 <link rel="stylesheet" type="text/css" media="screen" href="/css/resources.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE}-resources.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/rightcontext.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/windoo/windoo.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/windoo/windoo.alphacube.css" />
+
 
 <!-- END custom_head -->
 
@@ -100,8 +103,15 @@
 				
 			   {type:RightContext.TYPE_MENU,
 			   	text:"Properties",
-				onclick:function(e) { Resources.openDetails([afileid], e); }}
-			   ]
+				requires: ["aurl", "N"],
+				onclick:function(e) { Resources.openDetails([afileid], e); }},
+
+			   {type:RightContext.TYPE_MENU,
+			   	text:"Properties",
+				requires: ["aurl", "Y"],
+				onclick:function(e) { Resources.openLinkDetails([afileid], e); }}
+				
+			  ]
 	};			   
 	
 	menu2 = { attributes: "acatid,ahomepage,acatname,aadmin" ,

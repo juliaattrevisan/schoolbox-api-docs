@@ -33,7 +33,13 @@ if (is_numeric($_GET['cat-list'])) {
 	$fileDetails = outputDetails((int)$_GET['details']);
 	print $fileDetails;
 	exit;
+} else if (is_numeric($_GET['link-details'])) {
+	
+	$linkDetails = outputLinkDetails((int)$_GET['link-details']);
+	print $linkDetails;
+	exit;
 }
+
 
 $this->setFile(TEMPLATE_content, 'resources/resources.html');
 $this->setTab("resources");
@@ -47,7 +53,7 @@ $this->setVar("CID", $categoryID);
 require_once '../library/category.php';
 $categoryHandler = new Category;
 
-
+$this->setVar("SITE", $this->site);
 
 // build categoryID array
 $categoryIDList = array ($categoryID);
@@ -278,5 +284,37 @@ function outputDetails ($fileID) {
 	return $page->getVar('file_details_block');
 	
 }
+
+function outputLinkDetails ($linkID) {
+
+	require_once '../library/link.php';
+	$linkHandler = new Link;
+
+	$page = new SitePage();
+	$page->setFile('blockBODY', 'resources/resources_block.html');
+	$page->setBlock('blockBODY', 'link_details', 'link_details_block');
+
+	$link = $linkHandler->getByID($linkID);
+
+	$output = array ('FILE_ID'	 => $link['id'],
+					 'CATEGORY'	 => $link['categoryName'],
+					 'OWNER'	 => $link['ownerName'],
+					 'OWNER_ID'	 => $link['owner'],
+					 'URL'	 	 => $link['url'],
+					 'CREATED'	 => date("M j y @ g:iA", $link['submitted']),
+					 'DESCRIPTION'	=> scrubText($link['description']),
+					 'COMMENT'	 => scrubText($link['comment']),
+					 'HIDDEN'	 => $link['hidden'] > 0 ? 'Yes' : 'No',
+					 );
+	
+	
+	$page->setVar($output);
+	
+	$page->parse('link_details_block', 'link_details');
+
+	return $page->getVar('link_details_block');
+	
+}
+
 
 ?>

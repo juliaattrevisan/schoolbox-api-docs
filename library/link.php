@@ -11,6 +11,17 @@ class Link extends Model {
 		
 		parent::Model();
 	}
+
+	function getByID($linkID) {
+		$query = "SELECT l.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName,
+						UNIX_TIMESTAMP(l.submitted) submitted, c.name categoryName 
+				  FROM link l 
+				  LEFT JOIN user u ON u.id = l.owner
+				  LEFT JOIN category c ON c.id = l.category 
+				  WHERE l.id = $linkID";
+		return $this->db->getRow($query);
+	}
+
 	
 	function getAllInCategory($categoryID, $config = false) {
 		$query = "SELECT l.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName, UNIX_TIMESTAMP(submitted) submitted, 'http-url.png' iconFile 

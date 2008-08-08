@@ -463,11 +463,11 @@ var RightContext = {
     addMenuItem: function (item, objMap, tbl) {
         var title = this.transform(item["text"], objMap);
         var url, frame, img, imgAlign, itemSrc, tmp, itemAction; 
-        var cell = this.addTableCell(tbl, "rcMenuItem", title); 
+        var cell = this.addTableCell(tbl, "rcMenuItem", title);
         cell.style.cursor = document.all?'hand':'pointer';
         this.bindEvent('mouseover', cell, function(e) { this.className="rcMenuItemHover";});
         this.bindEvent('mouseout',  cell, function(e) { this.className="rcMenuItem";     });
-        
+		
         // deal with image if applicable
         if (item["image"]!=null && item["image"]!="undefined") {
         	// get image alignment or default to absmiddle
