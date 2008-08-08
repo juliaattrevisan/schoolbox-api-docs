@@ -46,3 +46,5 @@ create table `intranet`.`pollLog`(
 	`created` datetime NULL   , 
 	KEY `pollID`(`pollID`,`userID`) 
 )Engine=MyISAM DEFAULT CHARSET='latin1';
+
+insert into `homepage_comp` (`id`, `size`, `method`, `name`, `description`, `filename`, `config`, `invisible`) values('33','2','outputPoll','Poll','Create a poll to determine group members opinion on a given subject.','poll.htm','a:0:{}','false');

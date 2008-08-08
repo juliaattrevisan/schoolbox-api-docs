@@ -97,7 +97,7 @@ class url
 
 	function getUrl($id)
 	{
-		$query = "SELECT url, category, description, comment FROM link WHERE id = '$id'";
+		$query = "SELECT url, category, description, comment, hidden FROM link WHERE id = '$id'";
 		return $this->db->getRow($query);
 	}
 

@@ -326,6 +326,7 @@ class ModResourcePage {
 		$this->t_body->set_var("URL", $url['url']); 
 		$this->t_body->set_var("DESCRIPTION", $url['description']);
 		$this->t_body->set_var("COMMENT", $url['comment']);
+		$this->t_body->set_var("HIDDEN_SELECTED", $url['hidden'] > 0 ? "checked='checked'" : "");
 		
 		if(CMS_allow_move)
 			$this->setCategoryList($url['category']);

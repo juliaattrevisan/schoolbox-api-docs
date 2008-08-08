@@ -10,22 +10,23 @@
 <style type="text/css">
 <!--
 body {
-	background:#fff;
+	background:#fff url(/images/wenona/headerv3.gif) no-repeat;
 	font-size:100%;
 	font-family:verdana, arial, sans-serif, serif;
 	}
+
+
 h1 {
-	font-family:"Lucida Grande", lucida, arial, Tahoma, sans-serif, serif;
 	font-size:140%;
 	font-weight:normal;
 	line-height:1em;
-	color:#98ddfc;
+	color:#000;
 	border:0;
 	margin:0;
 	padding:0;
 	}
 a:link, a:hover, a:active, a:visited {
-	color:#fff;
+	color:#000;
 	text-decoration:underline;
 	}
 a:hover {
@@ -33,15 +34,14 @@ a:hover {
 	}
 #front-login {
 	margin:80px auto 0 auto;
-	background:transparent url(/images/wenona/login_box.jpg) no-repeat;
-	width:450px;
+	width:500px;
 	}
 #front-login div {
 	position:relative;
 	height:450px;
 	}
 #front-login form {
-	padding:140px 0 0 146px;
+	padding:140px 0 0 0;
 	}
 #front-login form input.submit {
 	border:0;
@@ -50,9 +50,9 @@ a:hover {
 	width:46px;
 	}
 #front-login label, #front-login p {	
-	color:#fff;
+	color:#000;
 	font-weight:bold;
-	font-size:60%;
+	font-size:80%;
 	line-height:1.2em;
 	}
 #front-login p {
@@ -70,37 +70,41 @@ a:hover {
 p#login-footer{
 	font-size:50%;
 	}
+	
+
+
+#loginHeader {
+	
+}
 -->
 </style>
 </head>
 <body onload="document.getElementById('login').username.focus();">
-<div id="front-login">
     <div>
+    <div id="front-login" >
         <form name="login" id="login" method="post" action="/loginForm.php">
-		<h1>LOGIN</h1>
-        <p style="width:130px;">{ERROR}</p>
+		<h1>Portal Login</h1>
+        <p>{ERROR}</p>
             <table>
                 <tr>
-                    <td><label>Login Name:</label></td>
+                    <td><label>Username</label></td>
+                    <td align="right"><input type="text" name="username" class="field"></td>
                 </tr>
                 <tr>
-                    <td><input type="text" name="username" class="field"></td>
+                    <td><label>Password</label></td>
+                    <td align="right"><input type="password" name="password" class="field"></td>
                 </tr>
                 <tr>
-                    <td><label>Password:</label></td>
-                </tr>
-                <tr>
-                    <td><input type="password" name="password" class="field"></td>
-                </tr>
-                <tr>
-                    <td><input type="hidden" name="page" value="{HIDDEN}">
-                        <input class="submit" onmouseover="this.src='/images/wenona/login_btn_over.gif'" onmouseout="this.src='/images/wenona/login_btn.gif'" type="image" src="/images/wenona/login_btn.gif" value="" />
+                    <td>&nbsp;</td>
+                    <td align="right"><input type="hidden" name="page" value="{HIDDEN}">
+                        <input  type="submit" name="submit" value="Login" />
                     </td>
+                    
                 </tr>
             </table>
         </form>
 		<p id="login-footer">Copyright 2008 Wenona<br /><a href="/policy/wenona.htm">Terms of Use &amp; Privacy Policy</a> | <a href="feedback.php">Help</a></p>
-	</div>
+        </div>
 </div>
 
 

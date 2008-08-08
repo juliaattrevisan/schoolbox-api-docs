@@ -1,7 +1,6 @@
 <?php
 
 require_once( 'include/include.php');
-require_once( 'include/dbManager-mysql.php');
 require_once( 'mail/mail.php');
 
 define( '_MAX_STRLEN', '2048');
