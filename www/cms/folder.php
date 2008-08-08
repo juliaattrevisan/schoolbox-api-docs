@@ -89,14 +89,13 @@ class folder
 	function modifyCat($cid, $name, $parent, $template = 0, $code = 0)
 	{
 		$this->checkWriteAccess($parent);
-
 		//update folder details
 		$cat = array('id'=>$cid, 'name'=>$name, 'parent'=>$parent);
-		if($code === 0)
+		if($code !== 0)
 			$cat['code'] = $code;
 		if($template)
 			$cat['template'] = $template;
-			
+
 		$this->db->dbUpdateRow('category', 'id', $cat);
 		
 		//log modification
