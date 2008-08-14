@@ -48,7 +48,7 @@ class MSSQL {
 			if($this->debug)
 				print "<b>Query:</b> $sql_q<br />";
 			else
-				error(4);
+				error(21, 'Error in Synegetic query<br /><br />'.$sql_q );
 		}
 		
 		return $this->result;

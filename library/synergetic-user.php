@@ -40,8 +40,6 @@ class SynergeticUser extends MSSQL{
 				AND vStudents.StudentTutor=luTutor.Code
 				AND (contactDetails.StudentContactDescription='Contact 1' OR contactDetails.StudentContactDescription='Primary Contacts')
 				AND vStudents.StudentID = $synID
-			ORDER BY
-				contactDetails.FileYear DESC,contactDetails.FileSemester DESC
 				"; 
 		
 		$student = $this->getRow($query);

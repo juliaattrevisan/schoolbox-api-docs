@@ -132,8 +132,6 @@ function rcmail_compose_headers($attrib)
       // we have a set of recipients stored is session
       if (($mailto_id = get_input_value('_mailto', RCUBE_INPUT_GET)) && $_SESSION['mailto'][$mailto_id])
         $fvalue = $_SESSION['mailto'][$mailto_id];
-      else if (!empty($_GET['_to']))
-        $fvalue = get_input_value('_to', RCUBE_INPUT_GET);
         
     case 'cc':
       if (!$fname)
@@ -141,13 +139,15 @@ function rcmail_compose_headers($attrib)
         $fname = '_cc';
         $header = 'cc';
         }
+			
     case 'bcc':
       if (!$fname)
         {
         $fname = '_bcc';
         $header = 'bcc';
         }
-        
+
+		
       $allow_attrib = array('id', 'class', 'style', 'cols', 'rows', 'tabindex');
       $field_type = 'textarea';            
       break;
@@ -163,6 +163,9 @@ function rcmail_compose_headers($attrib)
  
   if ($fname && !empty($_POST[$fname]))
     $fvalue = get_input_value($fname, RCUBE_INPUT_POST, TRUE);
+	
+  if ($fname && !empty($_GET[$fname]))
+    $fvalue = get_input_value($fname, RCUBE_INPUT_GET, TRUE);
 
   else if ($header && $compose_mode == RCUBE_COMPOSE_REPLY)
     {
