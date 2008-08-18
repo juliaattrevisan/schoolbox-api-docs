@@ -13,6 +13,9 @@ if (strpos($_SERVER['REQUEST_URI'], 'home.php'))
 $this->setFile(TEMPLATE_content, 'home.html');
 $this->setTitle('Welcome');
 
+//setup required includes
+$this->setCSS('/css/'.SITE_location.'-home.css');
+
 if(date("A")=="AM")
 	$greeting =  "Good Morning";
 else if(date("G") < 17)

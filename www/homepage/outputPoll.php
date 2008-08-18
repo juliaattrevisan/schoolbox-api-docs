@@ -4,7 +4,7 @@
 $this->setBlock($componentHandle, "poll_vote", "poll_vote_block");
 $this->setBlock("poll_vote", "poll_options", "poll_options_block");
 $this->setBlock($componentHandle, "poll_chart", "poll_chart_block");
-
+$this->setJavascript('/javascript/fusion.js');
 
 require_once '../library/poll.php';
 $pollHandler = new Poll;

@@ -67,6 +67,7 @@ class SitePage extends Page {
 		$this->setFile('navTpl', 'include/nav.html' );
 		
 		
+		$this->renderScriptIncludes();
 		$this->renderSideNav();
 		$this->renderTabBar();
 		$this->renderGroupList();
@@ -286,8 +287,8 @@ class SitePage extends Page {
 	
 	function renderStudents() {
 		//my students section
-		$this->setBlock("navTpl", "mstudent", "mstudent_section");
-		$this->setBlock("mstudent", "mstudent_block", "my_students");
+		$this->setBlock('navTpl', 'mstudent', 'mstudent_section');
+		$this->setBlock('mstudent', 'mstudent_block', 'my_students');
 		
 		if(is_array($_SESSION['children']))
 		{
@@ -306,6 +307,39 @@ class SitePage extends Page {
 		}
 		else
 			$this->setVar("mstudent_section", "");
+	}
+	
+	function renderScriptIncludes() {
+		$this->setBlock('headerTpl', 'header_javascript', 'header_javascript_block');
+		$this->setBlock('headerTpl', 'header_css', 'header_css_block');
+		
+		if(is_array($this->jscript)) {
+			foreach($this->jscript as $scriptOutput) {
+				$this->setVar($scriptOutput);
+				$this->parse('header_javascript_block','header_javascript', true);
+			}
+		}
+		else
+			$this->setVar('header_javascript_block', '');
+		
+		if(is_array($this->css)) {
+			foreach($this->css as $cssOutput) {
+				$this->setVar($cssOutput);
+				$this->parse('header_css_block','header_css', true);
+			}
+		}
+		else
+			$this->setVar('header_css_block', '');
+		
+	}
+	
+	
+	function setJavascript($file) {
+		$this->jscript[] = array('HEADER_SCRIPT_LOCATION'=>$file);
+	}
+	
+	function setCSS($file, $type='screen') {
+		$this->css[] = array('HEADER_CSS_TYPE'=>$type,'HEADER_CSS_LOCATION'=>$file);
 	}
 	
 	function setFile($handle, $file) {

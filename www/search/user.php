@@ -80,7 +80,7 @@ if(is_numeric($this->arg[0])) {
 				}
 			
 				if($synInfo['StudentTutorName'] && $synInfo['TeacherTutorID']) {
-					$tutor = $userHandler->getByField('synergy_id', $synInfo['TeacherFormID']);
+					$tutor = $userHandler->getByField('synergy_id', $synInfo['TeacherTutorID']);
 					if($tutorEmail = formatEmail($tutor))
 						$tutorTeacher = '<a href="'.$_SESSION['mailhandle'].$tutorEmail.'">'.scrubTEXT($synInfo['StudentTutorName']).'</a>';
 					else

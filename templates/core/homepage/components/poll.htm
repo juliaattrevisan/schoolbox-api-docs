@@ -54,17 +54,11 @@
         </noscript>  
     </div>
     
-    <script type="text/javascript" src="/javascript/fusion.js"></script>
     <script type="text/javascript">
 		// <![CDATA[	
 		var chart = new FusionCharts("/flash/FCF_Bar2D.swf", "myChartId", "350", "{POLL_HEIGHT}", "8", "#FFFFFF");
 		chart.setDataURL("/poll/poll-xml.php?pollID={POLL_ID}");
 		chart.render("pollResult{COMPONENT_ID}");
-		//var so = new SWFObject("/flash/FCF_Bar2D.swf", "poll{COMPONENT_ID}", "180", "{POLL_HEIGHT}", "8", "#FFFFFF");
-		//so.addVariable("settings_file", escape("/poll/settings.xml"));
-		//so.addVariable("data_file", escape("/poll/poll-xml.php?pollID={POLL_ID}"));		
-		//so.addVariable("preloader_color", "#999999");	
-		//so.write("pollResult{COMPONENT_ID}");
 		// ]]>
     </script>
     <!-- END poll_chart -->
