@@ -56,9 +56,11 @@
     
     <script type="text/javascript">
 		// <![CDATA[	
+		window.onload = function () {
 		var chart = new FusionCharts("/flash/FCF_Bar2D.swf", "myChartId", "350", "{POLL_HEIGHT}", "8", "#FFFFFF");
 		chart.setDataURL("/poll/poll-xml.php?pollID={POLL_ID}");
 		chart.render("pollResult{COMPONENT_ID}");
+		};
 		// ]]>
     </script>
     <!-- END poll_chart -->
