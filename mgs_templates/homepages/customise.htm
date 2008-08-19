@@ -23,7 +23,7 @@
 <script type="text/javascript" src="/javascript/mootools.color.js"></script>
 <script type="text/javascript" src="/javascript/mooRainbow.js"></script>
 <script type="text/javascript">
-	var pickers = [
+	var pickers = new Array (
 		['largeHeadingBackground', '#{large_head_bgcolour}'],
 		['largeHeadingText', '#{large_head_fontcolour}'],
 		['largeTextBackground', '#{large_text_bgcolour}'],
@@ -31,8 +31,8 @@
 		['smallHeadingBackground', '#{small_head_bgcolour}'],
 		['smallHeadingText', '#{small_head_fontcolour}'],
 		['smallTextBackground', '{small_text_bgcolour}'],
-		['smallTextText', '#{small_text_fontcolour}'],	
-	];
+		['smallTextText', '#{small_text_fontcolour}']
+	);
 	window.onload = function(){
 		for(i = 0; i < pickers.length; i++){
 			pickers[i][2] = new MooRainbow(pickers[i][0] + 'Div', pickers[i][0] + 'Input', {
@@ -50,8 +50,8 @@
 			pickers[i][2].manualSet(pickers[i][1], 'hex');
 			$(pickers[i][0] + 'Div').setStyle('background-color', pickers[i][2].sets.hex);
 			$(pickers[i][0] + 'Input').value = pickers[i][2].sets.hex;
-		};
-	}</script>
+		}
+	};</script>
 <link rel="stylesheet" type="text/css" href="/css/mooRainbow.css" />
 <!-- #EndEditable -->
 </head>
