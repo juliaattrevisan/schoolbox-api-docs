@@ -99,13 +99,14 @@ if(is_numeric($this->arg[0])) {
 						scrubTEXT($synInfo['StudentContactSpouseTitle'].' '.$synInfo['StudentContactSpousePreferred'].' '.$synInfo['StudentContactSpouseSurname']).'</a>';
 				else
 					$spouseName = scrubTEXT($synInfo['StudentContactSpouseTitle'].' '.$synInfo['StudentContactSpousePreferred'].' '.$synInfo['StudentContactSpouseSurname']);
-				
+
 				$output = array(	'TUTOR_GROUP' 			=> scrubTEXT($synInfo['StudentTutorDescription']),
 									'TUTOR'					=> $tutorTeacher,
 									'YEAR_LEVEL'			=> scrubTEXT($synInfo['StudentYearLevel']),
 									'HOUSE'					=> scrubTEXT($synInfo['StudentHouseDescription']),
 									'HOH'					=> scrubTEXT($synInfo['StudentHeadOfHouse']),
 									'FORM'					=> scrubTEXT($synInfo['StudentForm']),
+									'FORM_DESCRIPTION'		=> scrubTEXT($synInfo['FormDescription']),
 									'FORM_STAFF'			=> $formTeacher,
 									'LOCKER'				=> scrubTEXT($synInfo['StudentLockerBook']),
 									'BIRTHDATE'				=> date('jS \o\f F, Y', $synInfo['StudentBirthDate']),
