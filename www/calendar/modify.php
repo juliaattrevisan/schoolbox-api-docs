@@ -181,12 +181,13 @@ if (isset($_POST['date'])) {
 		$page->setBlock(TEMPLATE_content, 'campus_list', 'campus_list_block');
 		$page->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
 	}
+	$page->checkList('group_list', $calendarHandler->getGroupList(), '');
 
 	$groupList = $calendarHandler->getCategoryList();
-	$page->dropDown('group_drop', $groupList, '');
-	$page->checkList('group_list', $calendarHandler->getGroupList(), '');
-	
-	
+	if($_GET['level'] == 2)
+		$page->dropDown('group_drop', $groupList, $_GET['sid']);
+	else
+		$page->dropDown('group_drop', $groupList);
 
 	$levelList[] = array('LEVEL_ID'	=> 1, 'LEVEL_NAME'	=> 'Personal');
 	if (count($groupList) > 0)
@@ -194,7 +195,7 @@ if (isset($_POST['date'])) {
 	if (count($campusList) > 0)
 		$levelList[] = array('LEVEL_ID'	=> 3, 'LEVEL_NAME'	=> 'Campus');
 	
-	$page->dropDown('level_drop', $levelList, '');
+	$page->dropDown('level_drop', $levelList, $_GET['level']);
 
 	$page->setVar('delete_button_block', '');
 	$page->parse('recurring_dates_block', 'recurring_dates');
