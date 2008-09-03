@@ -10,14 +10,13 @@ if(HELPDESK_enable) {
 	if(is_array($_SESSION['children'])) {
 		foreach($_SESSION['children'] as $child)
 		{
-			$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
+			$query = "SELECT title, firstname, lastname, year FROM ".SQL_db.".user WHERE id = {$child['id']}";
 			$user = $this->db->getRow($query);
 			$this->setVar("STUDENT_ID", $child['id']);
 			$this->setVar("STUDENT_NAME", formatName($user,'{firstname} {lastname}'));
 			$this->setVar("STUDENT_YEAR", $user['year']);
 			
-			$jobs = $this->openHelpdeskJobs($child['id']);
-		
+			$jobs = $helpdesk->openHelpdeskJobs($child['id']);
 			if(is_array($jobs)){
 				foreach ($jobs as $job) {
 					$this->setVar("PROBLEM", ucfirst($job['problem']));

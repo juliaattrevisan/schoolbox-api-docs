@@ -3,7 +3,7 @@
 class Helpdesk {
 
 	function Helpdesk() {
-		$this->db = new dbManager(HELPDESK_db);
+		$this->db = new dbManager();
 	}
 
 	function openHelpdeskJobs($userid) {
@@ -15,20 +15,20 @@ class Helpdesk {
 				j.description,
 				DATE_FORMAT(j.createdDate, '%e/%c/%Y') as createdDate,
 				s.description as status
-		FROM    tblJob j
+		FROM    ".HELPDESK_db.".tblJob j
 		INNER JOIN
-				tblProblem p on j.problemID = p.problemID
+				".HELPDESK_db.".tblProblem p on j.problemID = p.problemID
 		INNER JOIN
-				tblStatus s on j.statusID = s.statusID
+				".HELPDESK_db.".tblStatus s on j.statusID = s.statusID
 		LEFT JOIN
-				tblEquipment e on j.equipmentID = e.equipmentID
+				".HELPDESK_db.".tblEquipment e on j.equipmentID = e.equipmentID
 		LEFT JOIN
 				".SQL_db.".user assignedUser on assignedUser.id = j.portalAssignedUserID
 		WHERE s.description != 'Closed' AND (j.portalAssociatedUserID = {$userid} OR e.portalUserID ={$userid} ) 
 		ORDER BY j.createdDate DESC";
-		
+
 		$jobs = $this->db->getAll($query);
-		$this->db->changeDb(SQL_db);
+
 		return $jobs;
 	}
 }

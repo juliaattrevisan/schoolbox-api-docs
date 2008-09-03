@@ -40,10 +40,13 @@ class WhatsNew
 	{
 		include_once("mail/mail.php");
 		$mailbox = new mail;
-		$mailbox->checkMailDetails();
-		$inbox = $mailbox->openMailBox();
-		if($inbox)
- 			return $mailbox->mailboxStatus($inbox);
+		if( $mailbox->checkMailDetails() ) {
+			$inbox = $mailbox->openMailBox();
+			if($inbox)
+ 				return $mailbox->mailboxStatus($inbox);
+		}
+		else
+			return false;
 	}
 
 	function lastCatVisit($id)

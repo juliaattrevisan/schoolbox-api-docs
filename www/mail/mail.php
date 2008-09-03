@@ -18,10 +18,10 @@ class Mail
 	
 		$db = new dbManager();
 	
-		$query = "SELECT username, email_pass FROM user WHERE id = ".$_SESSION["id"];
+		$query = "SELECT username, email_pass, local_email FROM user WHERE id = ".$_SESSION["id"];
 		$info = $db->getRow($query);
-	
-		if($info["username"] == "" || $info["email_pass"] == "") 
+
+		if($info["username"] == "" || $info["email_pass"] == "" || $info['local_email'] == 0) 
 		{
 				//failed to get information about user
 				return false;
