@@ -117,7 +117,7 @@ class News extends Model {
 		
 		$this->db->delete('newsGroup', 'id', $news['item_id']);
 		$this->db->delete('newsCampus', 'id', $news['item_id']);
-
+		
 		if (is_array($groupList)) {
 			foreach ($groupList as $group) {
 				$this->db->insert('newsGroup', array('id' => $news['item_id'], 'gid' => $group));
@@ -127,7 +127,11 @@ class News extends Model {
 			foreach ($campusList as $campus) {
 				$this->db->insert('newsCampus', array('id' => $news['item_id'], 'campus' => $campus));
 			}
-		}		
+		}	
+		else if(is_numeric($campusList))
+			$this->db->insert('newsCampus', array('id' => $news['item_id'], 'campus' => $campusList));
+		else
+			$this->db->insert('newsCampus', array('id' => $news['item_id'], 'campus' => 1));	
 	}
 	
 	function delete($newsID) {

@@ -25,8 +25,7 @@
 
 function yog_mysql_connect ($host, $port, $username, $password, $db_name="") 
 {
-    //Open a connection to a MySQL Server
-    
+    $username = utf8_decode($username);    
     $ret=0;
     switch (DB_EXTENSION) 
     {
@@ -639,7 +638,7 @@ function ExecuteSingleQuery ( $mysql, $query )
     WriteLog ( "Enter ExecuteSingleQuery" );     
     
     $result     = yog_mysql_query ( $query, $mysql );   
-    foreach ($result as $value)
+    foreach ($result as $key => $value)
     {
         //$value['result'],$value['ar'];
 
@@ -994,7 +993,7 @@ function ExecuteBatchQuery ( $mysql, $query )
 
         $result = yog_mysql_query ( $prev, $mysql );
         
-        foreach ($result as $value)
+        foreach ($result as $key => $value)
         {
             //$value['result'], $value['ar']
             if ( $value['result']===-1 ) {                
@@ -1350,9 +1349,9 @@ function WriteLog ( $loginfo )
     }
 }
 
-function WriteLogSabya ( $loginfo )
+function WriteLogTemp ( $loginfo )
 {
-    if ( 1 ) 
+    if ( defined("DEBUG") ) 
     {
         $fp = fopen ( "sabya.log", "a" );
 
@@ -1495,7 +1494,7 @@ define ( "XML_CHARSET", 7 );
 /* version constant */
 /* You will need to change the version in processquery method too, where it shows: $versionheader = 'TunnelVersion:5.13.1' */
 
-define ( "tunnelversion", '6.0');
+define ( "tunnelversion", '6.16');
 define ( "tunnelversionstring", 'TunnelVersion:' );
 define ( "phpversionerror", 'PHP_VERSION_ERROR' );
 define ( "phpmoduleerror", 'PHP_MODULE_NOT_INSTALLED' );
