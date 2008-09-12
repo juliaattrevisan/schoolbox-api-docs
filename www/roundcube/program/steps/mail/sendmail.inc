@@ -160,7 +160,8 @@ $to_address_arr = $IMAP->decode_address_list($mailto);
 //$identity_arr = rcmail_get_identity(get_input_value('_from', RCUBE_INPUT_POST));
 
 //$from = $identity_arr['mailto'];
-$from = get_input_value('_from', RCUBE_INPUT_POST);
+//$from = get_input_value('_from', RCUBE_INPUT_POST);
+$from = $_SESSION['firstname'] .' '.$_SESSION['lastname'].' <'.$_SESSION['username'] . '@' . MAIL_address.'>'; 
 $first_to = is_array($to_address_arr[0]) ? $to_address_arr[0]['mailto'] : $mailto;
 
 if (empty($identity_arr['string']))
