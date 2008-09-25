@@ -67,13 +67,14 @@ class SynergeticAttendance extends MSSQL{
 	{
 		$query = "INSERT INTO SynergyOne.dbo.tAttendances
 			( ID, AttendanceMasterSeq,AttendedFlag,
-			PossibleAbsenceCode,PossibleDescription)
+			PossibleAbsenceCode,PossibleDescription, AbsenceEventsSeq)
 			VALUES
 			('".$stuid."', 
 			'".$attendSeq."',
 			'".$attend."', 
 			'".$abstype."', 
-			'".$reason."')";
+			'".$reason."',
+			'-1')";
 
 		$this->db->query($query);
 	}

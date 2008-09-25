@@ -282,13 +282,14 @@ class Attendance
 	{
 		$query = "INSERT INTO SynergyOne.dbo.tAttendances
 			( ID, AttendanceMasterSeq,AttendedFlag,
-			PossibleAbsenceCode,PossibleDescription)
+			PossibleAbsenceCode,PossibleDescription, AbsenceEventsSeq)
 			VALUES
 			('".$stuid."', 
 			'".$attendSeq."',
 			'".$attend."', 
 			'".$abstype."', 
-			'".$reason."')";
+			'".$reason."',
+			'-1')";
 
 		return $query;
 	}
@@ -415,7 +416,7 @@ if( is_numeric($_POST['daynum']) && is_numeric($_POST['pernum']) && $_POST['subc
 	$back = -2;
 	include("../include/back.php");
 }
-else if(isset($_GET['code']) && $_GET['code'] && isStaff($_SESSION['gid']) && $page->involvedInSubjectSyn($_GET['code']) )
+else if(isset($_GET['code']) && $_GET['code'] && isStaff($_SESSION['gid']) )
 {
 	//display absentee page
 	$page->displayStudentList(urldecode($_GET['code']), 0);

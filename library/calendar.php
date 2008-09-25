@@ -236,7 +236,7 @@ class Calendar extends Model {
 		
 		// get accessible groups
 		$groupList = array();
-		$tempList = $this->getCategoryList(0);
+		$tempList = $this->getCategoryList();
 		if (is_array($tempList)) {
 			foreach ($tempList as $temp) {
 				$groupList[] = $temp['GROUP_ID'];
@@ -247,8 +247,9 @@ class Calendar extends Model {
 		if(is_array($_SESSION['campus'])) {
 			if(perm($_SESSION['campus'][0], 2) > 2 || $_SESSION['su'])
 				$groupChunk = "";
-			else
+			else {
 				$groupChunk = "AND eventGroup.groupID = {$_SESSION['gid']}";
+			}
 		}
 			
 		//get single events for the day
@@ -261,7 +262,7 @@ class Calendar extends Model {
 						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 						WHERE date = '" . date("Y-m-d", $currentDay) . "'
 							AND (    (access = '1' AND owner = '".$_SESSION['id']."')
-								  
+								  OR (access = '2' AND sid IN (".implode(',', $groupList)."))
 								  OR (access = '3' AND eventCampus.campusID IN(" . implode(',', $campusList) . ") $groupChunk )
 								  OR (access = '4')
 								)
