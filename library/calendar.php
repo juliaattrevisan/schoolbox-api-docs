@@ -236,11 +236,13 @@ class Calendar extends Model {
 		
 		// get accessible groups
 		$groupList = array();
+		$groupQuery = '';
 		$tempList = $this->getCategoryList();
 		if (is_array($tempList)) {
 			foreach ($tempList as $temp) {
 				$groupList[] = $temp['GROUP_ID'];
 			}
+			$groupQuery = "OR (access = '2' AND sid IN (".implode(',', $groupList)."))";
 		}
 		
 		//give people with userAccess to moderate Calendar Access to view all Camups Posts
@@ -262,7 +264,7 @@ class Calendar extends Model {
 						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 						WHERE date = '" . date("Y-m-d", $currentDay) . "'
 							AND (    (access = '1' AND owner = '".$_SESSION['id']."')
-								  OR (access = '2' AND sid IN (".implode(',', $groupList)."))
+								  $groupQuery
 								  OR (access = '3' AND eventCampus.campusID IN(" . implode(',', $campusList) . ") $groupChunk )
 								  OR (access = '4')
 								)
