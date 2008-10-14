@@ -71,7 +71,9 @@ class SynergeticUser extends MSSQL{
 					StudentClasses.ClassCode = SubjectClasses.ClassCode AND
 					StudentClasses.FileSemester=".$_SESSION['FileSemester']." AND
 					StudentClasses.FileYear=".$_SESSION[ 'FileYear']." AND
-					StudentClasses.ID=$synergyID";
+					StudentClasses.ID=$synergyID
+					AND StudentClasses.StartDate <= getdate() 
+					AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)";
 		}
 		else
 		{      

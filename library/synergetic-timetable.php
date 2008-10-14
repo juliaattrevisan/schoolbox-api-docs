@@ -159,6 +159,7 @@ class SynergeticTimetable extends MSSQL{
 				StudentClasses.ClassCode = SubjectClasses.ClassCode AND
 				((Timetable.FileSemester=".$_SESSION['FileSemester'].") AND (Timetable.FileYear=".$_SESSION['FileYear'].") AND
 				(StudentClasses.ID='$synergy_id')) AND Timetable.DayNumber = $daynumber
+				AND StudentClasses.StartDate <= getdate() AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
 				ORDER BY Timetable.PeriodNumber";
 		}
 		else
@@ -258,6 +259,7 @@ class SynergeticTimetable extends MSSQL{
 						StudentClasses.ClassCode = SubjectClasses.ClassCode AND 
 						((Timetable.FileSemester=".$_SESSION['FileSemester'].") AND (Timetable.FileYear=".$_SESSION['FileYear'].") AND 
 						(StudentClasses.ID='$synergy_id'))
+						AND StudentClasses.StartDate <= getdate() AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
 					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber"; 
 		}
 		else
