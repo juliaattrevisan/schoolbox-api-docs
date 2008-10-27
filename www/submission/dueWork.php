@@ -392,6 +392,8 @@ class dueWorkPage
 		$currMonth = $this->currMonth;
 		$currDay = $this->currDay;
 		//output work listing
+		$this->t_body->set_var('day_list', '');
+		
 		for($j=0; $j < 7; $j++)
 		{
 			$this->t_body->set_var("DATE", date("l jS",$currentDay));
@@ -431,6 +433,8 @@ class dueWorkPage
 		$currentDay = mktime(0,0,0,$currMonth,$currDay,$currYear);
 		
 		//output work listing
+		$this->t_body->set_var('day_list', '');
+		
 		for($j=1; $j <= $this->numDaysinMonth; $j++)
 		{
 			$this->t_body->set_var("DATE", date("l jS",$currentDay));
@@ -485,6 +489,7 @@ class dueWorkPage
 		$query .= "GROUP BY DATE_FORMAT(submission_box.date,'%d %b %Y') ORDER BY submission_box.date";	
 		$res = $this->db->dbDoQuery($query);
 		$dueDates = array();
+		$this->t_body->set_var('day_list', '');
 		
 		while($data = $this->db->dbGetNextArray($res)) {
 	

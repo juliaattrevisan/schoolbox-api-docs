@@ -14,7 +14,7 @@ class MSSQL {
 		$this->host = MSSQL_host;
 		$this->user = MSSQL_user;
 		$this->passwd = MSSQL_passwd;
-		$this->debug = $debug;
+		$this->debug = 0;
 		$this->db = $db;
 		$this->connect();
 	}

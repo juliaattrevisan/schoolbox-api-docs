@@ -43,7 +43,7 @@ class SynergeticUser extends MSSQL{
 				AND vStudents.FileSemester=".$_SESSION['FileSemester']."
 				AND vStudents.FileYear=".$_SESSION[ 'FileYear']."
 				"; 
-		
+				
 		$student = $this->getRow($query);
 		
 		preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches);

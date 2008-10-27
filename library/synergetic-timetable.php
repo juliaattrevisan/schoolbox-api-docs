@@ -22,8 +22,8 @@ class SynergeticTimetable extends MSSQL{
 	$query = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
 				TimetableDefinition.TimeTo, TimetableDefinition.Description, TimetableDefinition.DayNumber
 				FROM SynergyOne.dbo.TimetableDefinition TimetableDefinition
-				WHERE TimetableDefinition.FileYear={$_SESSION['FileYear']} AND 
-					TimetableDefinition.FileSemester={$_SESSION['FileSemester']} AND
+				WHERE TimetableDefinition.FileYear='{$_SESSION['FileYear']}' AND 
+					TimetableDefinition.FileSemester='{$_SESSION['FileSemester']}' AND
 					TimetableDefinition.TimetableGroup='{$this->campusCode[$campus]}' AND
 					TimetableDefinition.DayNumber = 0
 				ORDER BY TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
@@ -157,9 +157,12 @@ class SynergeticTimetable extends MSSQL{
 				StudentClasses.FileYear = SubjectClasses.FileYear AND 
 				StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
 				StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-				((Timetable.FileSemester=".$_SESSION['FileSemester'].") AND (Timetable.FileYear=".$_SESSION['FileYear'].") AND
-				(StudentClasses.ID='$synergy_id')) AND Timetable.DayNumber = $daynumber
-				AND StudentClasses.StartDate <= getdate() AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+				Timetable.FileSemester='".$_SESSION['FileSemester']."' AND 
+				Timetable.FileYear='".$_SESSION['FileYear']."' AND
+				(StudentClasses.ID='$synergy_id' AND
+				Timetable.DayNumber = '$daynumber' AND 
+				StudentClasses.StartDate <= getdate() AND
+				(StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
 				ORDER BY Timetable.PeriodNumber";
 		}
 		else
@@ -174,8 +177,10 @@ class SynergeticTimetable extends MSSQL{
 				Timetable.FileSemester = SubjectClasses.FileSemester AND 
 				Timetable.FileType = SubjectClasses.FileType AND 
 				Timetable.FileYear = SubjectClasses.FileYear AND
-				((SubjectClasses.FileSemester=".$_SESSION['FileSemester'].") AND (SubjectClasses.FileYear=".$_SESSION['FileYear'].") AND
-				(Timetable.StaffID='$synergy_id')) AND Timetable.DayNumber = $daynumber
+				SubjectClasses.FileSemester='".$_SESSION['FileSemester']."' AND 
+				SubjectClasses.FileYear='".$_SESSION['FileYear']."' AND
+				Timetable.StaffID='$synergy_id' AND 
+				Timetable.DayNumber = '$daynumber'
 				ORDER BY Timetable.PeriodNumber";
 			} else {
 			$query = "SELECT Timetable.Room, SubjectClasses.Description,
@@ -192,8 +197,10 @@ class SynergeticTimetable extends MSSQL{
 				Timetable.FileSemester = SubjectClassStaff.FileSemester AND 
 				Timetable.FileType = SubjectClassStaff.FileType AND 
 				Timetable.FileYear = SubjectClassStaff.FileYear AND
-				((SubjectClasses.FileSemester=".$_SESSION['FileSemester'].") AND (SubjectClasses.FileYear=".$_SESSION['FileYear'].") AND
-				(SubjectClassStaff.StaffID='$synergy_id')) AND Timetable.DayNumber = $daynumber
+				SubjectClasses.FileSemester='".$_SESSION['FileSemester']."' AND 
+				SubjectClasses.FileYear='".$_SESSION['FileYear']."' AND
+				SubjectClassStaff.StaffID='$synergy_id' AND 
+				Timetable.DayNumber = '$daynumber'
 				ORDER BY Timetable.PeriodNumber";
 			}
 		}
@@ -275,9 +282,9 @@ class SynergeticTimetable extends MSSQL{
 				Timetable.FileSemester = SubjectClasses.FileSemester AND 
 				Timetable.FileType = SubjectClasses.FileType AND 
 				Timetable.FileYear = SubjectClasses.FileYear AND
-				((SubjectClasses.FileSemester=".$_SESSION['FileSemester'].") AND 
-				(SubjectClasses.FileYear=".$_SESSION['FileYear'].") AND 
-				(Timetable.StaffID='$synergy_id'))
+				SubjectClasses.FileSemester='".$_SESSION['FileSemester']."' AND 
+				SubjectClasses.FileYear='".$_SESSION['FileYear']."' AND 
+				Timetable.StaffID='$synergy_id'
 				ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
 			} else {
 			$query = "SELECT Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, 
@@ -295,9 +302,9 @@ class SynergeticTimetable extends MSSQL{
 				Timetable.FileSemester = SubjectClassStaff.FileSemester AND 
 				Timetable.FileType = SubjectClassStaff.FileType AND 
 				Timetable.FileYear = SubjectClassStaff.FileYear AND
-				((SubjectClasses.FileSemester=".$_SESSION['FileSemester'].") AND 
-				(SubjectClasses.FileYear=".$_SESSION['FileYear'].") AND 
-				(SubjectClassStaff.StaffID='$synergy_id'))
+				SubjectClasses.FileSemester='".$_SESSION['FileSemester']."' AND 
+				SubjectClasses.FileYear='".$_SESSION['FileYear']."' AND 
+				SubjectClassStaff.StaffID='$synergy_id'
 				ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
 			}	
 		}
@@ -333,7 +340,7 @@ class SynergeticTimetable extends MSSQL{
 					$desc = $this->getNextArray();
 					
 					//bad data in synergetic.. why..?? 
-					while($desc['DayNumber'] == $y)
+					while($desc['DayNumber'] == $y && $desc['PeriodNumber'] == $timetable[$x]['periodNumber'])
 						$desc = $this->getNextArray();
 				
 				}
