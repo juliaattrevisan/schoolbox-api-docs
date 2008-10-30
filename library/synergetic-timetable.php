@@ -162,7 +162,7 @@ class SynergeticTimetable extends MSSQL{
 				(StudentClasses.ID='$synergy_id' AND
 				Timetable.DayNumber = '$daynumber' AND 
 				StudentClasses.StartDate <= getdate() AND
-				(StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+				(StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL))
 				ORDER BY Timetable.PeriodNumber";
 		}
 		else
