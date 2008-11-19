@@ -181,16 +181,21 @@ class user
 	function updateUser($id, $username, $title, $firstname, $lastname, $synergyid, $local_email, $alt_email, 
 				$group, $password, $campusarray, $su, $year)
 	{
-		//update user info  
-		if ($year == "")
-			$year = "NULL";
-		else
-			$year = "'$year'";
-		$query = "UPDATE user SET username='$username', title='$title', firstname='$firstname', lastname='$lastname',
-			synergy_id='$synergyid', local_email='$local_email', alt_email='$alt_email', group_id='$group', 
-			password=PASSWORD('$password'), email_pass='$password', year=$year WHERE id ='$id'";
+		//insert information into database
+		$user  = array('id'			=> $id,
+						'username'	=> $username,
+						'title'		=> $title,
+						'firstname'	=> $firstname,
+						'lastname'	=> $lastname,
+						'synergy_id' => $synergyid,
+						'group_id'	=> $group,
+						'year'		=> $year,
+						'local_email' => $local_email,
+						'alt_email' => $alt_email,
+						'mail_handler'=> $mail_handler,
+					);
 
-		$this->db->query($query);
+		$this->db->update('user', 'id', $user);
 
 		$campusquery = "DELETE FROM userCampus WHERE uid = '$id'";
 		$this->db->query($campusquery);
@@ -231,11 +236,20 @@ class user
 			return 0;
 		
 		//insert information into database
-		$query = "INSERT INTO user (username, title, firstname, lastname, synergy_id, group_id, year, local_email, alt_email, mail_handler) VALUES
-					  ('$username', '$title', '$firstname', '$lastname', '$synergyid', '$group', '$year', '$local_email', '$alt_email', '$mail_handler')";
-		
-		$this->db->query($query);
-		$id = $this->db->dbInsertId();
+		$user  = array('username'	=> $username,
+						'title'		=> $title,
+						'firstname'	=> $firstname,
+						'lastname'	=> $lastname,
+						'synergy_id' => $synergyid,
+						'group_id'	=> $group,
+						'year'		=> $year,
+						'local_email' => $local_email,
+						'alt_email' => $alt_email,
+						'mail_handler'=> $mail_handler,
+					);
+		$this->db->insert('user', $user);
+
+		$id = $this->db->insertID();
 		
 		//if password has been set already set it
 		if($password)
@@ -244,7 +258,7 @@ class user
 			$this->db->query($query);
 		}
 		
-		if(is_array($campusarray))
+		if(is_array($campusarray) && $id)
 		{
 			foreach($campusarray as $campus)
 			{
@@ -252,7 +266,7 @@ class user
 				$this->db->query($campusquery);
 			}
 		}
-		else
+		else if($id && $campusarray)
 		{
 			$campusquery = "INSERT INTO userCampus (uid, campus) VALUES ('$id', '$campusarray')";
 			$this->db->query($campusquery);

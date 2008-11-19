@@ -184,7 +184,7 @@ class SitePage extends Page {
 		{
 			require_once $_SERVER['DOCUMENT_ROOT'] . '/include/wenona.php';
 			//provide encoded login details for intranet
-			$this->setVar("ENC_LOGIN", base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'].' '.$_SESSION['password'].' '.date('Y m d H i'))));
+			$this->setVar("ENC_LOGIN", urlencode(base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'].' '.$_SESSION['password'].' '.date('Y m d H i')))));
 		
 			$this->setBlock('tabTpl', 'portfolio_tab', 'pf_tab');
 			$this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');

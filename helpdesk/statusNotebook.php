@@ -26,7 +26,7 @@ $query = "SELECT b.description brand, m.description model, UNIX_TIMESTAMP(e.crea
 		  LEFT JOIN tblBrand b ON b.brandID = m.brandID
 		  WHERE j.latestEvent = 16 AND j.latestEvent = e.eventTypeID
 		  GROUP BY j.jobID
-		  ORDER BY e.createdDate DESC";
+		  ORDER BY equipUser.lastname, jobUser.lastname, equipUser.firstname, jobUser.firstname DESC";
 $jobList = $db->dbGetAllRows($query);
 
 if (is_array($jobList)) {
@@ -60,7 +60,7 @@ $query = "SELECT b.description brand, m.description model, UNIX_TIMESTAMP(e.crea
 		  LEFT JOIN tblBrand b ON b.brandID = m.brandID
 		  WHERE j.latestEvent = 15 AND j.latestEvent = e.eventTypeID
 		  GROUP BY j.jobID
-		  ORDER BY e.createdDate DESC";
+		  ORDER BY equipUser.lastname, jobUser.lastname, equipUser.firstname, jobUser.firstname DESC";
 
 $jobList = $db->dbGetAllRows($query);
 
