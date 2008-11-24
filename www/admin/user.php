@@ -197,6 +197,13 @@ class user
 
 		$this->db->update('user', 'id', $user);
 
+		//if password has been set already set it
+		if($password)
+		{
+			$query = "UPDATE user SET password = PASSWORD('$password'), email_pass = '$password' WHERE id = '$id'";
+			$this->db->query($query);
+		}
+
 		$campusquery = "DELETE FROM userCampus WHERE uid = '$id'";
 		$this->db->query($campusquery);
 	

@@ -83,15 +83,6 @@ else {
 	$this->setVar('modify_layout_block', '');
 }
 
-$temp = unserialize('a:3:{s:4:"sort";s:4:"Date";s:7:"sortdir";s:4:"Desc";s:4:"size";s:1:"0";}');
-
-$temp['filter'] = array('',
-						array('All'	=> '',
-							  'Documents'	=> 'document',						 
-							 ),
-						);
-//print serialize($temp);
-
 $componentList = $categoryHandler->getComponents($categoryID);
 if (is_array($componentList)) {
 
