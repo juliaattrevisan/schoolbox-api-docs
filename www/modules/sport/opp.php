@@ -58,7 +58,7 @@ class initOpp
 			default:
  				//display opposition list
 				$this->initDisplay();
-				$this->initDisplay();
+				
                                 $this->displayOpp();
 				break;
 		}		
