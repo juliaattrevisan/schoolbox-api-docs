@@ -13,6 +13,8 @@
 *                                                           *
 ************************************************************/
 
+
+
 require_once('include/session.php');
 require_once('include/include.php');
 require_once('include/permission.php');
@@ -383,6 +385,8 @@ class OutPut
 		$this->t_body->parse("cats_block", "category_listing", true);
 	}
 }
+
+localRedir('/resources/' . $_GET['category']);
 
 //setup verbose flag, default is not verbose
 if($_GET['verbose'] == 1)
