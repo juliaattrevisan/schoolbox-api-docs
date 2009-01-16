@@ -420,24 +420,26 @@ class SitePage extends Page {
 			$this->setVar($handle.'_block', '');
 	}
 
-	function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content) {
+	function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping='') {
 		$this->setBlock($template, $handle, $handle.'_block');
 		$selected = is_array($selected) ? $selected : array($selected);
 		if (is_array($data)) {
 			foreach($data as $row) {
 				foreach($row as $key => $value) {
+					$mapping[$key]?$key=$mapping[$key]:'';
 					$this->setVar($key, $value);
 					if(in_array($value, $selected))
 						$this->setVar($key.'_SELECTED', 'selected="selected"');
 					else
 						$this->setVar($key.'_SELECTED', '');
 				}
+				
 				$this->parse($handle.'_block', $handle, true); 
 			}
 		} else
 			$this->setVar($handle.'_block', '');
 	}	
-	
+
 	function canRead($perm) {
 		return $perm >= 1 ? true : false;
 	}

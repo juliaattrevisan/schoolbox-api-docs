@@ -1,0 +1,40 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tableruler.js"></script>
+<script type="text/javascript">
+	window.onload=function(){tableruler();} 
+</script>
+<!-- END custom_head -->
+<h1>Tutorials - {SHOW}</h1>
+<span class="header_option">
+<!-- BEGIN attendance_link -->
+<a href="list-attendance.php">Attendance</a> |<!-- END attendance_link -->
+<a href="list-event.php">Week</a> | <a href="list-event.php?show=upcoming">Upcoming</a> | <a href="list-event.php?show=semester">Semester</a> | <a href="list-event.php?show=all">Show All</a></span>
+<!-- BEGIN has_events -->
+<table class="ruler">
+  <thead>
+  <tr>
+    <th>Day</th>
+    <th>Tutorial</th>
+    <th>From</th>
+    <th>To</th>
+    <th>Location</th>
+    <th>Code</th>
+    <th>Tutors</th>
+  </tr>
+  </thead>
+  <tbody>
+  <!-- BEGIN event_list -->
+  <tr>
+    <td>{DATE}</td>
+    <td>{NAME}</td>
+    <td>{START}</td>
+    <td>{FINISH}</td>
+    <td>{LOCATION}</td>
+    <td>{CODE}</td>
+    <td>{TUTORS}</td>
+  </tr><!-- END event_list -->
+  </tbody>
+</table>
+<!-- END has_events -->
+
+

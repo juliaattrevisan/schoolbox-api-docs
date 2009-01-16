@@ -1,0 +1,151 @@
+<?php
+
+require_once SITE_root.'/include/model.php';
+define('TUTORIAL_db', 'tutorial');
+define('PORTAL_db', SQL_db);
+
+class Event extends Model {
+	function Event() {
+		$this->_table = "event";
+		$this->_index = "eventID";
+		
+		parent::Model();
+	}
+	
+	function getAll($filter = '') {
+		$query = "SELECT e.*, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish, concat(t1.firstname,' ',t1.lastname) tutorName1, concat(t2.firstname,' ',t2.lastname) tutorName2 FROM ".TUTORIAL_db.".".$this->_table." e
+				  LEFT JOIN ".TUTORIAL_db.".enrolment n ON n.code = e.code 
+				  LEFT JOIN ".PORTAL_db.".user t1 ON t1.id = e.tutorID_1
+				  LEFT JOIN ".PORTAL_db.".user t2 ON t2.id = e.tutorID_2 
+				  WHERE 1=1 ";
+				  
+		if ($filter == 'upcoming')
+			$query .= "AND UNIX_TIMESTAMP(date) > ".strtotime("12am today")." ";
+		elseif ($filter == 'semester')
+			$query .= "AND DATE_FORMAT(`date`, '%m') IN (".($month = date('m')).",".($month+1).",".($month-1).") ";
+		elseif ($filter != 'all')
+			$query .= "AND DATE_FORMAT(`date`, '%U') = DATE_FORMAT(NOW(),'%U') ";
+		
+		
+		if (isStaff($_SESSION['gid']))
+			$query .= "AND (e.tutorID_1 = ".$_SESSION['id']." OR e.tutorID_2 = ".$_SESSION['id'].") ";
+		elseif (!$_SESSION['su'])
+			$query .= "AND n.studentID = " . $_SESSION['id']." ";
+			
+		$query .= "GROUP BY eventID ORDER BY date DESC";
+		
+		return $this->db->getAll($query);
+	}
+	
+	function getWeek($week) {
+		$query = "SELECT e.*, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish, concat(t1.firstname,' ',t1.lastname) tutorName1, concat(t2.firstname,' ',t2.lastname) tutorName2 FROM ".TUTORIAL_db.".".$this->_table." e
+				  LEFT JOIN ".TUTORIAL_db.".enrolment n ON n.code = e.code 
+				  LEFT JOIN ".PORTAL_db.".user t1 ON t1.id = e.tutorID_1
+				  LEFT JOIN ".PORTAL_db.".user t2 ON t2.id = e.tutorID_2 
+				  WHERE DATE_FORMAT(`date`, '%U') = $week ";
+
+		if (isStaff($_SESSION['gid']))
+			$query .= "AND (e.tutorID_1 = ".$_SESSION['id']." OR e.tutorID_2 = ".$_SESSION['id'].") ";
+		elseif (!$_SESSION['su'])
+			$query .= "AND n.studentID = " . $_SESSION['id']." ";
+		
+		$query .= "GROUP BY eventID ORDER BY date DESC";
+		
+		return $this->db->getAll($query);			
+	}
+	
+	function getStatistics ($filter = '') {
+		$query = "SELECT DISTINCT e.*, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish, 
+				  concat(t1.firstname,' ',t1.lastname) tutorName1, concat(t2.firstname,' ',t2.lastname) tutorName2, COUNT(*) count,
+				  (SELECT count(*) FROM ".TUTORIAL_db.".attendance a2, ".TUTORIAL_db.".event e2 WHERE a2.eventID = e2.eventID AND e2.code = e.code AND a2.present = 'true') present,
+				  (SELECT count(*) FROM ".TUTORIAL_db.".attendance a3, ".TUTORIAL_db.".event e3 WHERE a3.eventID = e3.eventID AND e3.code = e.code) expected
+				  FROM ".TUTORIAL_db.".".$this->_table." e
+				  LEFT JOIN ".PORTAL_db.".user t1 ON t1.id = e.tutorID_1
+				  LEFT JOIN ".PORTAL_db.".user t2 ON t2.id = e.tutorID_2 
+				  WHERE 1=1 ";
+				  
+		if ($filter == 'upcoming')
+			$query .= "AND UNIX_TIMESTAMP(date) > ".strtotime("12am today")." ";
+		elseif ($filter == 'semester')
+			$query .= "AND DATE_FORMAT(`date`, '%m') IN (".($month = date('m')).",".($month+1).",".($month-1).") ";
+		elseif ($filter != 'all')
+			$query .= "AND DATE_FORMAT(`date`, '%U') = DATE_FORMAT(NOW(),'%U') ";
+		
+		$query .= "GROUP BY e.code ORDER BY date DESC";
+
+		return $this->db->getAll($query);
+	}
+
+	function getStudentCount($code) {
+		$query = "SELECT studentID FROM ".TUTORIAL_db.".attendance a, ".TUTORIAL_db.".event e WHERE a.eventID = e.eventID AND e.code = ".$this->db->smartQuote($code)." GROUP BY studentID
+				  UNION SELECT studentID FROM ".TUTORIAL_db.".enrolment n WHERE n.code = " . $this->db->smartQuote($code);
+		$result = $this->db->getAll($query);
+		return $this->db->affectedRows($result);		
+	}
+	
+	function getByID ($eventID) {
+		$query = "SELECT *, UNIX_TIMESTAMP(date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish FROM ".TUTORIAL_db.".".$this->_table." WHERE ".$this->_index." = $eventID";
+		return $this->db->getRow($query);
+	}
+	
+	function getByCode ($code) {
+		$query = "SELECT * FROM ".TUTORIAL_db.".".$this->_table." WHERE code = ". $this->db->smartQuote($code) ;
+		return $this->db->getRow($query);
+	}
+	
+	function getTutorList () {
+		$query = "SELECT id, CONCAT(lastname,', ',firstname) name FROM user WHERE group_id IN(".implode(",", unserialize(STAFFGROUPIDS)).") ORDER BY lastname, firstname";
+		return $this->db->getAll($query);
+	}
+	
+	function getTutorsByEvent ($code) {
+		$query = "SELECT CONCAT(u.firstname,' ',u.lastname) name FROM ".TUTORIAL_db.".".$this->_table." e, ".PORTAL_db.".user u 
+				  WHERE e.tutorID_1 = u.id AND e.code = " . $this->db->smartQuote($code) . " 
+				  UNION SELECT CONCAT(u.firstname,' ',u.lastname) FROM ".TUTORIAL_db.".".$this->_table." e, ".PORTAL_db.".user u 
+				  WHERE e.tutorID_2 = u.id AND e.code = " . $this->db->smartQuote($code);
+		$tutorList =  $this->db->getAll($query);
+		$output = array();
+		if (is_array($tutorList)) {
+			foreach ($tutorList as $tutor) {
+				$output[] = $tutor['name'];
+			}
+		}
+		return $output;
+	}
+
+	function create($data) {
+		if (!$_SESSION['su'] && $data['tutorID_1'] != $_SESSION['id'] && $data['tutorID_2'] != $_SESSION['id'])
+			error(8);	
+		$data['created'] = 'NOW()';
+		$data['modified'] = 'NOW()';
+		$this->db->changeDb(TUTORIAL_db);
+		$eventID = parent::create($data);
+		$this->db->changeDb(PORTAL_db);
+		
+		return $eventID;
+	}
+
+	function update($data) {
+		
+		$current = $this->getByID($data['eventID']);
+		if (!$_SESSION['su'] && $current['tutorID_1'] != $_SESSION['id'] && $current['tutorID_2'] != $_SESSION['id'])
+			error(8);
+		
+		$data['modified'] = 'NOW()';
+		$this->db->changeDb(TUTORIAL_db);
+		parent::update($data);
+		$this->db->changeDb(PORTAL_db);
+	}
+
+	function delete($eventID) {
+		$current = $this->getByID($eventID);
+		if (!$_SESSION['su'] && $current['tutorID_1'] != $_SESSION['id'] && $current['tutorID_2'] != $_SESSION['id'])
+			error(8);
+
+		$this->db->changeDb(TUTORIAL_db);		
+		parent::delete($eventID);
+		$this->db->changeDb(PORTAL_db);		
+	}
+	
+}
+?>

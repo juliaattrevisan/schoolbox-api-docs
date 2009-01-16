@@ -1,0 +1,42 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tableruler.js"></script>
+<script type="text/javascript">
+	window.onload=function(){tableruler();} 
+</script>
+<!-- END custom_head -->
+<h1>Tutorial Management - Statistics</h1>
+<span class="header_option"><a href="list-event.php">Events</a> | <a href="list-statistics.php">Statistics</a></span>
+
+<h2>{SHOW} Events</h2>
+<span class="header_option"><a href="list-statistics.php">Week</a> | <a href="list-statistics.php?show=upcoming">Upcoming</a> | <a href="list-statistics.php?show=semester">Semester</a> | <a href="list-statistics.php?show=all">Show All</a></span>
+<!-- BEGIN has_events -->
+<table class="ruler">
+  <thead>
+  <tr>
+  	<th>Tutorial</th>
+    <th>Code</th>
+    <th>Location</th>
+    <th>No.</th>
+    <th>Attendance %</th>
+    <th>Students</th>
+    <th>Tutors</th>
+    <th style="width: 80px;">Enrolments</th>
+  </tr>
+  </thead>
+  <tbody>
+  <!-- BEGIN event_list -->
+  <tr>
+    <td><a href="modify-event.php?eventID={EVENT_ID}">{NAME}</a></td>
+    <td>{CODE}</td>
+    <td>{LOCATION}</td>
+    <td>{COUNT}</td>
+    <td>{ATTENDANCE}</td>
+    <td>{STUDENT_COUNT}</td>
+    <td>{TUTORS}</td>
+    <td><a href="list-enrolment.php?code={CODE}">Enrolments</a></td>
+  </tr><!-- END event_list -->
+  </tbody>
+</table>
+<!-- END has_events -->
+
+

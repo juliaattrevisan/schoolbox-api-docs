@@ -1,0 +1,113 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" href="/css/autocompleter.css" type="text/css" />
+<style type="text/css">
+.rule tr td {
+	vertical-align: middle;
+}
+#ajax_loader {
+	visibility: hidden;
+}
+.reason_select {
+	width: 140px;
+}
+</style>
+<script type="text/javascript" src="/javascript/mootools.js"></script>
+<script type="text/javascript" src="/javascript/autocompleter.js"></script>
+<script type="text/javascript" src="/javascript/observer.js"></script>
+<script type="text/javascript">
+window.addEvent('domready', function() {
+	$$('.lookup').each(function (el) {
+		new Autocompleter.Ajax.Json(el, '/ajax/user.php?groupID=3', {
+			minLength: 2,
+			postVar: 'keyword',
+			width: '310px',
+			selectFirst: true,
+			//selectMode: 'type-ahead'
+			selectMode: 'pick'
+		});
+	});
+	$$('.reason_select').each(function (el) {
+		el.addEvent('change', function() {
+			var myRequest = new Ajax('/modules/tutorial/list-attendance.php?ajax='+el.name+'&value='+escape(el.value)).request();
+		});
+	});
+	$$('.present_check').each(function (el) {
+		el.addEvent('click', function() {
+			var value = 'false';
+			if (el.checked)
+				value = 'true';
+			var myRequest = new Ajax('/modules/tutorial/list-attendance.php?ajax='+el.name+'&value='+value).request();
+		});
+	});
+	
+	
+});
+</script>
+<script type="text/javascript" src="/javascript/tableruler.js"></script>
+<script type="text/javascript">
+	window.onload=function(){tableruler();} 
+</script>
+<!-- END custom_head -->
+<h1>Tutorial Attendance - Week Ending {WEEK_END}</h1>
+<span class="header_option"><a href="list-event.php">Events</a> | 
+    <a href="modify-event.php">Add Tutorial</a><div id="ajax_loader"><img src="/images/icon/loading.gif" /></div></span>
+
+<div class="indent">
+<!-- BEGIN event -->
+<form action="list-attendance.php" method="post">
+  <table class="ruler">
+    <thead>
+      <tr>
+        <td colspan="7"><h2>{EVENT_NAME} - {EVENT_DATE}</h2>
+        <span class="header_option"><a href="modify-event.php?eventID={EVENT_ID}" title="Modify Event">Modify</a> | <a href="modify-event.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?')" title="Delete Event">Delete</a></span>
+        </td>
+      <tr>
+      <tr>
+        <th style="width: 60px;">Remove</th>
+        <th>Student</th>
+        <th style="width: 120px;">Reason</th>
+        <th style="width: 60px;">Present</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- BEGIN student -->
+      <tr style="vertical-align: middle;">
+        <td style="text-align: center;"><a href="list-attendance.php?remove={STUDENT_ID}&eventID={EVENT_ID}&week={WEEK}" onclick="return confirm('Remove this student from the tutorial classlist?');"><img src="/images/famicons/delete.png" alt="Remove enrolment" /></a></td>
+        <td><a href="/search/userLookup.php?id={STUDENT_ID}">{STUDENT_NAME}</a></td>
+        <td><select name="reason[{STUDENT_ID}]" class="reason_select">
+            <option value="">N/A</option>
+            <!-- BEGIN reason_select -->
+            <option value="{REASON_NAME}" {REASON_SELECTED}>{REASON_NAME}</option>
+            <!-- END reason_select -->
+          </select></td>
+        <td style="text-align: center;"><input class="present_check" type="checkbox" name="present[{STUDENT_ID}]" value="1" {ATTENDANCE_SELECTED} /></td>
+      </tr>
+      <!-- END student -->
+    </tbody>
+  </table>
+  <p class="float-right">
+  <input type="hidden" name="eventID" value="{EVENT_ID}" />
+  <input type="hidden" name="week" value="{WEEK}" />
+  <input type="submit" value="Save Attendance" class="btn" /></p>
+  </form>
+  <p>
+  <form action="list-attendance.php" method="post">
+    <input class="lookup" type="text" name="keyword" />
+    <input type="hidden" name="code" value="{EVENT_CODE}" />
+    <input type="hidden" name="week" value="{WEEK}" />
+    <input type="submit" value="Add Student" class="btn" />
+   </form>
+  </p>
+  
+<!-- END event -->
+<p>
+<!-- BEGIN previous_link -->
+<a href="list-attendance.php?week={PREVIOUS_WEEK}">&lt; Previous Week</a> | <!-- END previous_link -->
+<a href="list-attendance.php">This Week</a>
+<!-- BEGIN next_link -->  |
+<a href="list-attendance.php?week={NEXT_WEEK}">Next Week &gt;</a> <!-- END next_link --> 
+
+</p>
+</div>
+
+

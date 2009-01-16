@@ -1,0 +1,55 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" href="/css/autocompleter.css" type="text/css" />
+<script type="text/javascript" src="/javascript/mootools.js"></script>
+<script type="text/javascript" src="/javascript/autocompleter.js"></script>
+<script type="text/javascript" src="/javascript/observer.js"></script>
+<script type="text/javascript">
+window.addEvent('domready', function() {
+	$$('.lookup').each(function (el) {
+		new Autocompleter.Ajax.Json(el, '/ajax/user.php?groupID=3', {
+			minLength: 2,
+			postVar: 'keyword',
+			width: '310px',
+			selectFirst: true,
+			//selectMode: 'type-ahead'
+			selectMode: 'pick'
+		});
+	});
+});
+</script>
+
+<script type="text/javascript" src="/javascript/tableruler.js"></script>
+<script type="text/javascript">
+	window.onload=function(){tableruler();} 
+</script>
+<!-- END custom_head -->
+<h1>{TUTORIAL_CODE} - {TUTORIAL_NAME} Enrolment</h1>
+<span class="header_option"><a href="list-statistics.php">Statistics</a></span>
+
+<!-- BEGIN has_enrolments -->
+<table class="ruler">
+  <thead>
+  <tr>
+    <th style="width: 60px;">Remove</th>
+    <th>Student</th>
+    <th style="width: 100px;">Attendance %</th>
+  </tr>
+  </thead>
+  <tbody>
+  <!-- BEGIN enrolment_list -->
+  <tr>
+    <td style="text-align: center;"><a href="/modules/tutorial/list-enrolment.php?delete={STUDENT_ID}&code={TUTORIAL_CODE}" onclick="return confirm('Delete student from classlist?');"><img src="/images/famicons/delete.png" /></a></td>
+    <td><a href="/search/userLookup.php?id={STUDENT_ID}">{STUDENT_NAME}</a></td>
+    <td style="text-align: right;">{ATTENDANCE}</td>
+  </tr><!-- END enrolment_list -->
+  </tbody>
+</table>
+<!-- END has_enrolments -->
+
+  <p>
+  <form action="list-enrolment.php" method="post">
+    <input class="lookup" type="text" name="keyword" />
+    <input type="hidden" name="code" value="{TUTORIAL_CODE}" />
+    <input type="submit" value="Add Student" class="btn" />
+   </form>
+  </p>
