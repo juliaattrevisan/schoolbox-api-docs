@@ -1,10 +1,10 @@
 <?
 
-require_once("news/news.php");
+require_once("../library/news.php");
 
 $this->setBlock($component['name'], "main_stories", "stories_block");
 	
-$myNews = new news();
+$myNews = new News();
 
 //output headlines
 $headlineList = $myNews->getHeadlines();

@@ -11,7 +11,7 @@ if (strpos($_SERVER['REQUEST_URI'], 'news.php'))
 	localRedir('/news');
 	
 require_once('include/permission.php');
-require_once('news/news.php');
+require_once('../library/news.php');
 
 $this->setFile(TEMPLATE_content, 'news.html');
 $this->setTitle('News');
@@ -40,7 +40,7 @@ else
 
 $this->parse('archive_button_block', 'archive_button');
 
-$myNews = new news();
+$myNews = new News();
 $items = $myNews->getNews();
 
 if(is_array($items))

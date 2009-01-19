@@ -20,27 +20,20 @@ $_SESSION['campus'][] = 1;
 $_SESSION['gid'] = 3;
 
 require_once("include/include.php");
-require_once("weather/weather.php");
-require_once("news/news.php");
-require_once("calendar/calendar.php");
-
-
+require_once("../library/weather.php");
+require_once("../library/news.php");
+require_once("../library/calendar.php");
 
 class Summary
 {
-
 	function Summary()
 	{
 		//output week to template
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "summary.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Summary");
-
-
-		
-		include_once("include/page.php");
-		
-		
+	
+		include_once("include/page.php");		
 	}
 	
 	function outputDailyNotices() {
@@ -58,10 +51,12 @@ class Summary
 		$myNews = new news($topic);
 		
 		//output headlines
-		$headlineList = $myNews->getHeadlines();
+		$headlineList = $myNews->getNews();
 		
 		if(is_array($headlineList) )
 		{
+			foreach($headlineList) {
+			
 			$length = count($headlineList);
 			if ($length > 8) $length = 8;
 			

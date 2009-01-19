@@ -7,7 +7,7 @@
 //displays news
 
 require_once("include/permission.php");
-require_once("news/news.php");
+require_once("../library/news.php");
 
 $this->setFile(TEMPLATE_content, 'news.html');
 $this->setTitle('News');
@@ -29,7 +29,7 @@ else
 	
 $this->setVar('archive_button_block', '');	
 	
-$myNews = new news('archived');
+$myNews = new News();
 
 $pageNum = $this->arg[0];
 
