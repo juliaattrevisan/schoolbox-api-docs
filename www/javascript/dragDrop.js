@@ -84,7 +84,7 @@ var initDrag = function(){
 				});
 				
 				// Update the database
-				var myAjax = new Ajax('/subject/customisePage.php?cid='+categoryID+'&column1='+order[0]+'&column2='+order[1]+'&type=components').request();
+				var myAjax = new Ajax('/homepage/configForm.php?cid='+categoryID+'&column1='+order[0]+'&column2='+order[1]+'&type=components').request();
 			},
 			'onDrag': function() {
 				var mouseX = this.mouse.now.x; var mouseY = this.mouse.now.y;

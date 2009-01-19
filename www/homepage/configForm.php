@@ -1,0 +1,69 @@
+<?php
+
+/************************************************************
+*                                                           *
+*         Copyright (c) 2002-2003 Lektec Consulting         *
+*                                                           *
+************************************************************/
+
+//allow users to customise their homepages
+
+require_once $_SERVER['DOCUMENT_ROOT'] .'/../library/homepage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] .'/../include/sitePage.php';
+$page = new SitePage;
+
+if(is_numeric($_REQUEST['cid']) ) {
+	
+	$perm = perm($_REQUEST['cid'], HOMEPAGESERVICE);
+	if($perm < 2) 
+		error(19);
+	
+	$homepage = new Homepage($_REQUEST['cid']);
+	
+	//AJAX request for drag and drop of components
+	if($_GET['cid'] && $_GET['type'] == 'components')
+	{	
+		$columns = array($_GET['column1'], $_GET['column2']);
+		foreach($columns as $key => $column)
+		{
+			// Explode the columns
+			$key++;
+			$components[$key] = explode(',', $column);
+	
+			// Update the db
+			foreach($components[$key] as $ckey => $component)
+			{
+				$ckey++;
+				$homepage->updateComponentPosition($component, $key, $ckey);
+			}
+		}
+	}
+	elseif($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component'])
+	{	
+		//Post config options from homepage
+		$config = $_GET;
+		unset($config['cid'], $config['type'], $config['component']);
+		//all remaining options and serialised and sent to db
+		$config = serialize($config);
+		$homepage->updateComponentConfig($_GET['component'], $config);
+		localRedir("/homepage/".$_GET['cid']);
+	}
+	elseif($_POST['cid'])
+	{
+		//Submission of customise page
+		$homepage->savePageTemplate($_POST['template']);
+		$homepage->updateComponents($_POST['components']);
+		
+		//strip hash
+		foreach($_POST['colors'] as $key => $value) {
+			$color[$key] = substr($value,1);
+		}
+		$homepage->saveDisplayProperties($color);
+	
+		localRedir("/homepage/".$_POST['cid']);
+	}
+}
+else
+	error(2);
+
+?>

@@ -1,10 +1,8 @@
 <?php
 
 require_once "../../include/sitePage.php";
-
 $page = new SitePage;
 
-require_once "../include/permission.php";
 require_once "../../library/calendar.php";
 
 $calendarHandler = new Calendar;

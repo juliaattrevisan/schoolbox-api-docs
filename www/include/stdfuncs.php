@@ -38,7 +38,7 @@ function error($ec, $message="")
 	$page = new SitePage(false);
 	$page->loadContent('error');
 	
-	$page->setVar("TITLE", $error['title']);
+	$page->setTitle('Error Encountered');
 	$page->setVar("OUTPUT", $output);
 	$page->outputPage();
 

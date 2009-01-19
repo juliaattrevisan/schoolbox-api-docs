@@ -171,21 +171,21 @@ class folder
 
 	function createTemplate($cid, $template)
 	{
-		require_once("../subject/modPage.php");
+		require_once("../../library/homepage-template.php");
 
-		$templateMod = new modPage($cid);
+		$templateMod = new HomepageTemplate();
 
 		if( $template == 1)
-			$templateMod->createSubjectPage();
+			$templateMod->createSubjectPage($cid);
 		else if($template == 2)
-			$templateMod->createGroupPage();
+			$templateMod->createGroupPage($cid);
 		else if($template == 3)
-			$templateMod->createGroupForumPage();
+			$templateMod->createGroupForumPage($cid);
 		else if($template == 4)
-			$templateMod->createFacultyPage();
+			$templateMod->createFacultyPage($cid);
  		else if($template == 5)
-                        $templateMod->createSubjectForumPage();
-                else if($template == 6)
+			$templateMod->createSubjectForumPage($cid);
+		else if($template == 6)
 			$templateMod->createGroupForumPage();
 	}
 
