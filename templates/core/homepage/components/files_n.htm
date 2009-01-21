@@ -1,9 +1,9 @@
 <div class="component" id="component{COMPONENT_ID}">
   <div class="componentHeader">
-    <h2 class="large_head">Files</h2>
+    <h2 class="cont-head">Files</h2>
   </div>
 <!-- BEGIN config -->
-  <a class="config large_head" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+  <a class="config cont-head" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
   <div class="componentConfig">
     <form action="/subject/customisePage.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
@@ -40,7 +40,7 @@
     <!-- BEGIN files -->
     <tr>
       <td class="large_text titleColumn"><h3>{FILE_NAME}</h3></td>
-      <td style="border-bottom:1px solid #666;" class="large_text">{FILE_COMMENT}</td>
+      <td style="border-bottom:1px solid #666;" class="large_text summ">{FILE_COMMENT}</td>
     </tr>
     <!-- END files -->
     <tr style="height:1px;">

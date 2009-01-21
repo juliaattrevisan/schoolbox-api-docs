@@ -1,9 +1,9 @@
 <div class="component" id="component{COMPONENT_ID}">
   <div class="componentHeader">
-    <h2 class="large_head">Due Work</h2>
+    <h2 class="cont-head">Due Work</h2>
   </div>
 <!-- BEGIN config -->
-  <a class="config large_head" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+  <a class="config cont-head" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
   <div class="componentConfig">
     <form action="/subject/customisePage.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
@@ -22,21 +22,18 @@
   <table>
   <!-- BEGIN duework -->
     <tr>
-      <td colspan="2" class="large_text"><strong>{DUE_NAME}</strong></td>
-     </tr>
-      <td class="large_text">{DUE_TYPE}</td>
+      <td class="large_text"><strong>{DUE_NAME}</strong></td>
+      <td class="large_text summ">{DUE_TYPE}</td>
+      <td class="large_text summ">{DUE_COMMENT}</td>
       <td class="large_text" style="text-align:right;"><strong>Due Date: </strong>{DUE_DATE}</td>
-    </tr>
-    <tr>
-      <td style="border-bottom:1px solid #666" colspan="2" class="large_text">{DUE_COMMENT}</td>
     </tr>
     <!-- END duework -->
     <tr style="height:1px;">
-      <td colspan="2" style="border-bottom:1px solid #666;"></td>
+      <td colspan="4" style="border-bottom:1px solid #666;"></td>
     </tr>
     <!-- BEGIN submit_dw -->
     <tr>
-      <td style="text-align:right;" colspan="2" class="navbar"><a href="/submission/createSubmission.php?category={ID}&type=3">POST DUE WORK</a></td>
+    	<td style="text-align:right;" colspan="4" class="navbar"><a href="/submission/createSubmission.php?category={ID}&type=3">POST DUE WORK</a></td>
     </tr>
     <!-- END submit_dw -->
   </table>

@@ -13,7 +13,7 @@
 
 <style type="text/css">
 <!--
-.large_head {
+.colour1 .cont-head {
 	background-color: #{LARGE_HEAD_BGCOLOUR};
 	color: #{LARGE_HEAD_FONTCOLOUR};
 	font-weight: bold; 
@@ -24,7 +24,7 @@
 	color: #{LARGE_TEXT_FONTCOLOUR}; 
 	font-family: Verdana; 
 }
-.small_head, .textCmp {
+.colour2 .cont-head {
 	background-color: #{SMALL_HEAD_BGCOLOUR}; 
 	color: #{SMALL_HEAD_FONTCOLOUR}; 
 	font-weight: bold; 
@@ -36,6 +36,7 @@
 	font-family: Verdana;
 }
 .textCmp { display: none; }
+.colour2 .summ { display: none; }
 -->
 </style>
 <!-- END custom_head -->
@@ -48,7 +49,7 @@
 <br />
 <table id="container">
 <tr>
-  <td id="left-homepage-col" style="width:50%; vertical-align:top"> {COLUMN1} </td>
-  <td id="right-homepage-col" style="width:50%; vertical-align:top"> {COLUMN2} </td>
+  <td id="left-homepage-col" class="colour1" style="width:50%; vertical-align:top"> {COLUMN1} </td>
+  <td id="right-homepage-col" class="colour1" style="width:50%; vertical-align:top"> {COLUMN2} </td>
 </tr>
 </table>

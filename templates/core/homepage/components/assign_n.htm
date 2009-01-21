@@ -1,9 +1,9 @@
 <div class="component" id="component{COMPONENT_ID}">
   <div class="componentHeader">
-    <h2 class="large_head">Assignments</h2>
+    <h2 class="cont-head">Assignments</h2>
   </div>
 <!-- BEGIN config -->
-  <a class="config large_head" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+  <a class="config cont-head" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
   <div class="componentConfig">
     <form action="/subject/customisePage.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
@@ -26,7 +26,7 @@
       <td class="large_text" style="text-align:right"><strong>Due Date: </strong>{ASS_DATE}</td>
     </tr>
     <tr>
-      <td colspan="2" class="large_text" style="border-bottom:1px solid #666">{ASS_COMMENT}</td>
+      <td colspan="2" class="large_text summ" style="border-bottom:1px solid #666">{ASS_COMMENT}</td>
     </tr>
     <!-- END assign -->
     <tr style="height:1px;">
