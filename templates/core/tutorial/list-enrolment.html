@@ -23,8 +23,7 @@ window.addEvent('domready', function() {
 	window.onload=function(){tableruler();} 
 </script>
 <!-- END custom_head -->
-<h1>{TUTORIAL_CODE} - {TUTORIAL_NAME} Enrolment</h1>
-<span class="header_option"><a href="list-statistics.php">Statistics</a></span>
+<h1>Enrolment - {EVENT_NAME}</h1>
 
 <!-- BEGIN has_enrolments -->
 <table class="ruler">
@@ -38,7 +37,7 @@ window.addEvent('domready', function() {
   <tbody>
   <!-- BEGIN enrolment_list -->
   <tr>
-    <td style="text-align: center;"><a href="/modules/tutorial/list-enrolment.php?delete={STUDENT_ID}&code={TUTORIAL_CODE}" onclick="return confirm('Delete student from classlist?');"><img src="/images/famicons/delete.png" /></a></td>
+    <td style="text-align: center;"><a href="/modules/tutorial/list-enrolment.php?delete={STUDENT_ID}&code={EVENT_CODE}&eventID={EVENT_ID}" onclick="return confirm('Delete student from classlist?');"><img src="/images/famicons/delete.png" /></a></td>
     <td><a href="/search/userLookup.php?id={STUDENT_ID}">{STUDENT_NAME}</a></td>
     <td style="text-align: right;">{ATTENDANCE}</td>
   </tr><!-- END enrolment_list -->
@@ -49,7 +48,8 @@ window.addEvent('domready', function() {
   <p>
   <form action="list-enrolment.php" method="post">
     <input class="lookup" type="text" name="keyword" />
-    <input type="hidden" name="code" value="{TUTORIAL_CODE}" />
+    <input type="hidden" name="code" value="{EVENT_CODE}" />
+    <input type="hidden" name="eventID" value="{EVENT_ID}" />
     <input type="submit" value="Add Student" class="btn" />
    </form>
   </p>

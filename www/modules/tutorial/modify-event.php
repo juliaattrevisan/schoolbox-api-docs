@@ -23,12 +23,13 @@ if (isset($_POST['name'])) {
 	$event = array('name'			=> $_POST['name'],
 				   'code'			=> $_POST['code'],
 				   'location'		=> $_POST['location'],
-				   'start'			=> $hour.":".$_POST['minute'].":00",
-				   'finish'			=> $tohour.":".$_POST['tominute'].":00",
+				   'start'			=> $hour.":".(int)$_POST['minute'].":00",
+				   'finish'			=> $tohour.":".(int)$_POST['tominute'].":00",
 				   'tutorID_1'		=> $_POST['tutorID_1'],
 				   'tutorID_2'		=> $_POST['tutorID_2'],
 				   'description'	=> $_POST['description'],	
 				   'visible'		=> isset($_POST['visible']) ? 'true' : 'false',	
+				   'cancelled'		=> isset($_POST['cancelled']) ? 'true' : 'false',
 				   );
 
 	
@@ -51,15 +52,18 @@ if (isset($_POST['name'])) {
 		$event['eventID'] = $_POST['eventID'];
 		$event['date'] = $dateArray[0];
 		$eventHandler->update($event);
+		
+		localRedir('/modules/tutorial/'. urldecode($_POST['return']));
 	} 
 	else {
 		for ($i = 0; $i < count($dateArray); $i++) {
 			$event['date'] = $dateArray[$i];
-			$eventHandler->create($event);
+			$event['eventID'] = $eventHandler->create($event);
 		}
+		localRedir('/modules/tutorial/list-enrolment.php?eventID='. $event['eventID']);
 	}
 		
-	localRedir('/modules/tutorial/list-attendance.php');
+	
 	
 }
 elseif (is_numeric($_GET['delete'])) {
@@ -97,7 +101,10 @@ elseif (is_numeric($_GET['eventID'])) {
 					'AMTO'			=> $toperiod == 'AM' ? 'selected="selected"' : '',
 					'PMTO'			=> $toperiod == 'PM' ? 'selected="selected"' : '',
 					'DESCRIPTION'	=> $event['description'],
+					'RETURN'		=> scrubText(urlencode($_REQUEST['return'])),
 					'VISIBLE_SELECTED'	=> $event['visible'] == 'true' ? 'checked="checked"' : '',
+					'CANCELLED_SELECTED'	=> $event['cancelled'] == 'true' ? 'checked="checked"' : '',
+					
 					
 					'WEEKDAY_SUNDAY_SELECTED'		=> '',
 					'WEEKDAY_MONDAY_SELECTED'		=> 'selected="selected"',
@@ -134,7 +141,9 @@ elseif (is_numeric($_GET['eventID'])) {
 					'TOMIN'			=> '',
 					'TOPERIOD'		=> '',
 					'DESCRIPTION'	=> '',
+					'RETURN'		=> '',
 					'VISIBLE_SELECTED'	=> 'checked="checked"',
+					'CANCELLED_SELECTED'	=> '',
 					
 					'WEEKDAY_SUNDAY_SELECTED'		=> '',
 					'WEEKDAY_MONDAY_SELECTED'		=> 'selected="selected"',

@@ -66,8 +66,8 @@ function query($sql_q)
 	if (isset($mysql_eval_error)) {
 		if($this->debug)
 		{
-			print "<b>Query:</b> $sql_q<br />";
-			print "<b>Error:</b> $mysql_eval_error";
+			print "<b>Query:</b> $sql_q<br />\n";
+			print "<b>Error:</b> $mysql_eval_error\n";
 		}
 		else
 			error(21, $mysql_eval_error);

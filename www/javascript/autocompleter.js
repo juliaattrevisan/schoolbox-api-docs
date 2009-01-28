@@ -90,6 +90,7 @@ Autocompleter.Base = new Class({
 		if (mouse && this.focussed) this.prefetch();
 		if (e.key && !e.shift) switch (e.key) {
 			case 'enter':
+			case 'tab':
 				if (this.selected && this.visible) {
 					this.choiceSelect(this.selected);
 					e.stop();

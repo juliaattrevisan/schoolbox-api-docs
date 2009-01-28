@@ -38,7 +38,7 @@ $this->setVar('FORWARD', date("j-n-Y", strtotime("+1 month", $selectedDate)));
 
 // output mini calendar
 $firstDay 		= date("w", mktime(0,0,0,$selectedMonth, 1, $selectedYear));
-$numDaysinMonth = date("d", mktime(0, 0, 0, $selectedMonth + 1, 0, $year)); // date("t", $currentMonth);
+$numDaysinMonth = date("t", $selectedDate); // date("d", mktime(0, 0, 0, $selectedMonth + 1, 0, $year)); 
 $numWeeksMonth 	= ceil(($firstDay + $numDaysinMonth)/7);
 $totalDays 		= $numWeeksMonth * 7 + (6 - $firstDay);
 

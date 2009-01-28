@@ -1,60 +1,69 @@
 <?php
+
 require_once '../../conf/conf.php';
 require_once SITE_root . '/include/sitePage.php';
 require_once SITE_root . '/www/modules/tutorial/library/event.php';
 require_once SITE_root . '/www/modules/tutorial/library/attendance.php';
+require_once SITE_root . '/www/modules/tutorial/library/enrolment.php';
 
 $page = new SitePage();
 $page->setFile(TEMPLATE_content, 'tutorial/list-attendance.html');
+
 $page->setBlock(TEMPLATE_content, 'event', 'event_block');
 $page->setBlock('event', 'student', 'student_block');
 $page->setBlock('student', 'reason_select', 'reason_select_block');
+
+$page->setBlock(TEMPLATE_content, 'previous_link', 'previous_link_block');
+$page->setBlock(TEMPLATE_content, 'next_link', 'next_link_block');
+
 $page->setTitle('Tutorial Management');
 
 $eventHandler = new Event;
 $attendanceHandler = new Attendance;
+$enrolmentHandler = new Enrolment;
 
-if (is_array($_POST['reason'])) {
-	foreach ($_POST['reason'] as $studentID => $reason)
-		$attendanceHandler->setAttendance($_POST['eventID'], $studentID, isset($_POST['present'][$studentID]), $reason);
-	localRedir('/modules/tutorial/list-attendance.php?week=' . $_POST['week']);
-}
-elseif (isset($_GET['ajax'])) {
+// check access
+if (!isStaff($_SESSION['gid']) && !$_SESSION['su'])
+	error(19);
+
+
+if (is_array($_POST['reason']) && is_numeric($_POST['eventID'])) {
 	
-	list($field, $eventID, $studentID) = explode("_", $_GET['ajax']);
-	if (is_numeric($eventID) && is_numeric($studentID)) {
-		switch ($field) {
-			case 'reason':
-				$attendanceHandler->setReason($eventID, $studentID, $_GET['value']);
-				break;
-			case 'present':
-				$value = $_GET['value'] == 'true' ? true : false;
-				$attendanceHandler->setPresent($eventID, $studentID, $value);
-				break;
-		}
+	$attendanceHandler->deleteByEvent($_POST['eventID']);
+	
+	foreach ($_POST['reason'] as $studentID => $reason) {
+		$attendance = array('eventID'	=> $_POST['eventID'],
+							'studentID'	=> $studentID,
+							'present'	=> isset($_POST['present'][$studentID]) ? 'true' : 'false',
+							'reason'	=> $reason,
+							);
+		
+		$attendanceHandler->save($attendance);
 	}
 	
-} 
+	localRedir('/modules/tutorial/list-attendance.php?week=' . $_POST['week']);
+}
 elseif (isset($_POST['keyword'])) {
-	require_once SITE_root . '/www/modules/tutorial/library/enrolment.php';
+	// add student
 	require_once SITE_root . '/library/user.php';
 	$userHandler = new User;
 	$userList = $userHandler->searchUser($_POST['keyword'], 3);
 	if (is_array($userList)) {
-		$enrolmentHandler = new Enrolment;
-		$enrolmentHandler->create($_POST['code'], $userList[0]['uid']);
+		$enrolment = array('code'		=> $_POST['code'],
+						   'eventID'	=> $_POST['eventID'],
+						   'studentID'	=> $userList[0]['uid'],
+						   );
+		$enrolmentHandler->create($enrolment);
 	}
 	localRedir('/modules/tutorial/list-attendance.php?week=' . $_POST['week']);
 }
-elseif (is_numeric($_GET['remove']) && is_numeric($_GET['eventID'])) {
-	$attendanceHandler->deleteEnrolment($_GET['eventID'], $_GET['remove']);
+elseif (is_numeric($_GET['remove']) && isset($_GET['code'])) {
+	$enrolmentHandler->deleteByStudent($_GET['remove'], $_GET['code'], $_GET['eventID']);
 	localRedir('/modules/tutorial/list-attendance.php?week=' . $_GET['week']);
 }
 else {
-
-	$page->setBlock(TEMPLATE_content, 'previous_link', 'previous_link_block');
-	$page->setBlock(TEMPLATE_content, 'next_link', 'next_link_block');
 	
+	// pagination
 	$week = $_GET['week'];
 	if (!is_numeric($week))
 		$week = date("W") - 1;
@@ -64,6 +73,7 @@ else {
 					'PREVIOUS_WEEK'	=> $week-1,
 					'WEEK'	=> $week,
 					);
+	$page->setVar($output);
 
 	if ($week < date("W", strtotime("31st Dec")))
 		$page->parse('next_link_block', 'next_link');
@@ -75,8 +85,9 @@ else {
 	else
 		$page->setVar('previous_link_block', '');				
 				
-	$page->setVar($output);
-		
+	
+	
+	// output events
 	$eventList = $eventHandler->getWeek($week);
 	$reasonList = $attendanceHandler->getReasonList();
 	if (is_array($eventList)) {
@@ -88,6 +99,7 @@ else {
 							);
 			$page->setVar($output);
 			$attendanceList = $attendanceHandler->getAllByEvent($event['eventID']);
+
 			if (is_array($attendanceList)) {
 				$page->setVar('student_block', '');
 				foreach ($attendanceList as $attendance) {
