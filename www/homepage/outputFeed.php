@@ -1,0 +1,19 @@
+<?php
+	//output users of group
+	$this->setBlock($componentHandle, 'feed', 'feed_block');
+	
+	require_once '../library/feed.php';
+	$feedHandler = new Feed;
+	
+	$feedList = $feedHandler->getFeed($categoryID, 10);
+	
+	if (is_array($feedList)) {
+		foreach ($feedList as $feed) {
+			$this->setVar('FEED_MESSAGE', $feed['messageHTML']);
+			$this->parse('feed_block', 'feed', true);
+		}
+	
+	} else
+		$this->setVar('feed_block', '');
+
+?>

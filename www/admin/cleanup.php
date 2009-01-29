@@ -77,10 +77,10 @@ class clean {
 	{
 		//deletes all news that is either deleted or has expired
 		$query = "DELETE news_items, newsGroup, newsCampus FROM news_items, newsCampus, newsGroup 
-					WHERE news_item.item_id = newsGroup.id AND news_item.item_id = newsCampus.id 
+					WHERE news_items.item_id = newsGroup.id AND news_items.item_id = newsCampus.id 
 						AND (item_datetime_expires < NOW() || item_deleted = '1')";
 		$this->db->dbDoQuery($query);
-		print "Deleted ".$this->db->dbCountRowsAffected()." news items<br>";
+		print "Deleted ".$this->db->affectedRows()." news items<br>";
 	}
 
 
@@ -89,7 +89,7 @@ class clean {
 		//deletes all news that is either deleted or has expired
 		$query = "DELETE FROM subject_news WHERE datetime_expires < NOW() || deleted = '1'";
 		$this->db->query($query);
-		print "Deleted ".$this->db->countRowsAffected()." subject news items<br>";
+		print "Deleted ".$this->db->affectedRows()." subject news items<br>";
 	}
 	
 	function cleanDeletedFiles() {
@@ -104,7 +104,7 @@ class clean {
 		
 		$query = "DELETE FROM file WHERE deleted = '1'";
 		$this->db->query($query);
-		print "Deleted ".$this->db->countRowsAffected()." files<br>";
+		print "Deleted ".$this->db->affectedRows()." files<br>";
 	}
 	
 	function cleanFileSystem() {

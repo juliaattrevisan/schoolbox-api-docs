@@ -36,7 +36,7 @@ class SitePage extends Page {
 			}
 		}
 		$page = rtrim($page, '/');
-
+		
 		if (is_file($_SERVER['DOCUMENT_ROOT'].'/'.$page.'/'. $this->arg[0] . '.php') && $execute) {
 			$page2 = array_shift($this->arg);
 			include($_SERVER['DOCUMENT_ROOT'].'/'.$page.'/'. $page2 . '.php');
@@ -154,7 +154,7 @@ class SitePage extends Page {
 			if(SITE_location == 'mgs')
 			{
 				if(isStaff($_SESSION['gid']))
-					$this->setVar("WEBMAIL_LOCATION", "href=\"https://webmail.mgs.vic.edu.au/exchange/\" target=\"_blank\"");
+					$this->setVar("WEBMAIL_LOCATION", 'href=\"https://webmail.mgs.vic.edu.au/exchange/" target="_blank"');
 				else
 					$this->setVar("WEBMAIL_LOCATION", "href=\"/mail.php\"");
 			}
@@ -164,7 +164,7 @@ class SitePage extends Page {
 			}
 			else if(SITE_location == 'wenona') {
 				if(isStaff($_SESSION['gid'])) {
-					$this->setVar('WEBMAIL_LOCATION', 'href="http://webmail.wenona.nsw.edu.au/gw/webacc" target="_blank"');
+					$this->setVar('WEBMAIL_LOCATION', 'href="http://webmail.wenona.nsw.edu.au/gw/webacc/" target="_blank"');
 					$this->setVar('WEBMAIL_TITLE', '<em>W</em>ebmail');
 				}
 				else {

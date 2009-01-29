@@ -46,6 +46,8 @@ class SynergeticClass extends MSSQL{
 			AND StudentClasses.ClassCode = '" . $subCode . "'
 			AND (SubjectClasses.FileYear='" . $_SESSION['FileYear'] . "')
 			AND (SubjectClasses.FileSemester='" . $_SESSION['FileSemester'] .  "')
+			AND StudentClasses.StartDate <= getdate() 
+			AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
 		ORDER BY CommunityStudents.Surname, CommunityStudents.Preferred ";
 
 		return $this->getAll($query);

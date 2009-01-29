@@ -70,10 +70,10 @@ if($_SESSION['timetable'] && SYNERGY_enable) {
 						$this->setVar('PERIOD_ROOM',$period['room']);
 						
 						//only show attendances to staff at mgs
-						if(isStaff($_SESSION['gid']) && SITE_location == 'mgs')
+						/*if(isStaff($_SESSION['gid']) && SITE_location == 'mgs')
 							$this->setVar('PERIOD_ABSENTEES',"<br /><a href=\"/absentees/attendances.php?code=".$period['code']."\">attendances</a>");
-						else
-							$this->setVar('PERIOD_ABSENTEES','');
+						else */
+						$this->setVar('PERIOD_ABSENTEES','');
 							
 					}		
 				

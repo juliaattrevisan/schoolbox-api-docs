@@ -25,7 +25,6 @@ class Attendance
 	{
 		$this->year = date("Y");
 		$this->date = date("Y-m-d");
-		$this->campus = 'S';
 
 		$this->msdb = mssql_connect(MSSQL_host, MSSQL_user, MSSQL_passwd);
 	}
@@ -69,7 +68,8 @@ class Attendance
 				Students.ID, 
 				Attendances.AttendedFlag, 
 				Attendances.PossibleAbsenceCode, 
-				Attendances.PossibleDescription
+				Attendances.PossibleDescription,
+				SubjectClasses.ClassCampus
 			FROM	SynergyOne.dbo.Students Students
 			INNER JOIN SynergyOne.dbo.StudentSemester StudentSemester ON Students.ID = StudentSemester.ID
 			LEFT JOIN SynergyOne.dbo.StudentClasses StudentClasses ON (
@@ -130,13 +130,17 @@ class Attendance
 			$this->t_body->set_var("REASON", $student['PossibleDescription']);
 			$this->t_body->set_var("STUDNAME", "stud".$x);
 			$this->t_body->set_var("STUDCODE", $student['ID']);
-
-
+			if($student['ClassCampus'])
+				$classCampus = $student['ClassCampus'];
+				
 			$this->t_body->parse("student_list_block", "student_list", true);		
 			$x++;
 		}		
-               	if($x==0)
+         
+		 if($x==0)
 			$this->t_body->set_var("student_list_block", "");
+
+			$this->t_body->set_var('CLASS_CAMPUS', $classCampus);
 
 		$this->t_body->pparse("finaloutput", "tplBODY");
         }
@@ -271,26 +275,26 @@ class Attendance
 	}
 
 
-	function startAttendanceInsert($code, $period,$day)
+	function startAttendanceInsert($code, $period,$day, $campus)
 	{
 		//initalise some variables to make insert faster
 		$this->code = $code;
 		$this->period = $period;
 		$this->day = $day;
+		$this->campus = $campus;
 	}
 
-	function insertAttendance($attendSeq, $stuid, $attend, $abstype, $reason)
+	function insertAttendance($batchCode, $stuid, $attend, $abstype, $reason)
 	{
-		$query = "INSERT INTO SynergyOne.dbo.tAttendances
-			( ID, AttendanceMasterSeq,AttendedFlag,
-			PossibleAbsenceCode,PossibleDescription, AbsenceEventsSeq)
+		$query = "INSERT INTO SynergyOne.dbo.xiattendances
+			( BatchNumber, ID, AttendedFlag,
+			PossibleAbsenceCode,PossibleDescription)
 			VALUES
-			('".$stuid."', 
-			'".$attendSeq."',
+			('".$batchCode."',
+			'".$stuid."', 
 			'".$attend."', 
 			'".$abstype."', 
-			'".$reason."',
-			'-1')";
+			'".$reason."')";
 
 		return $query;
 	}
@@ -339,6 +343,38 @@ class Attendance
 		else 
 			return 0;	
 	}
+	
+	function runProc($batchCode, $attendSeq) {
+		$query = "DECLARE @AttendanceMasterSeq INT ";
+		
+		if($attendSeq) {
+			$query .= "SET @AttendanceMasterSeq = @AttendanceMasterSeqAlreadySubmitted";
+		}
+		else{
+			$query .= "SET @AttendanceMasterSeq = NULL";
+		}
+		
+		$query .= "
+		EXEC SynergyOne.dbo.sptxiAttendances
+				  @BatchNumber = '$batchCode',
+				  @FileType = 'A', 			
+				  @FileYear = '".$_SESSION['FileYear']."',
+				  @FileSemester = '".$_SESSION['FileSemester']."',
+				  @ClassCampus = '".$this->campus."',
+				  @ClassCode = '".$this->code."',
+				  @StaffID = '".$_SESSION['sid']."',
+				  @AttendanceDate = '".$this->date."',
+				  @AttendancePeriod = '".$this->day."',  
+				  @AttendanceDayNumber =  '".$this->period."',
+				  @TimetableGroup = 'ALL', 
+				";
+		if($attendSeq)
+			$query .= "@AttendanceMasterSeq = '".$attendSeq."' OUTPUT";
+		else 
+			$query .= "@AttendanceMasterSeq = @AttendanceMasterSeq OUTPUT";
+			
+		return mssql_query($query, $this->msdb);
+	}
 
 	function initAttendance() {
 		//inserts attendance record into master table
@@ -369,21 +405,14 @@ if(date("w") == 0 ||date("w") == 6)
 
 if( is_numeric($_POST['daynum']) && is_numeric($_POST['pernum']) && $_POST['subcode'] )
 {
-	$page->startAttendanceInsert($_POST['subcode'], $_POST['pernum'], $_POST['daynum']);
+	$page->startAttendanceInsert($_POST['subcode'], $_POST['pernum'], $_POST['daynum'], $_POST['classCampus']);
 	
 	$query = "";
 	$stuid = "stud0";
 	
-	//ok so we check the attendance record if it exists good, if it dont we 
-	if(!$attendSeq = $page->checkAttendance()){
-		$attendCheck = 0;
-		$page->initAttendance();
-		$attendSeq = $page->checkAttendance();
-		if(!$attendSeq)
-			error(0);
-	}
-	else
-		$attendCheck = 1;
+	//ok so we check the attendance record if it exists good, if it dont we let it be created
+	$attendSeq = $page->checkAttendance();
+	$batchCode = rand(0,900000);
 
 	for($i=0; isset($_POST[$stuid]); $i++)
 	{
@@ -393,26 +422,20 @@ if( is_numeric($_POST['daynum']) && is_numeric($_POST['pernum']) && $_POST['subc
 		$reason = "reason".$i;
 		$stuid = "stud".$i;
 
-		if($attendCheck)
-		{
-			//update existing record
-			if($_POST[$attend] == 1)
-				$query .= $page->updateAttendance($attendSeq, $_POST[$stuid], 1, $_POST[$abscode], $_POST[$reason]);
-			else
-				$query .= $page->updateAttendance($attendSeq, $_POST[$stuid], 0, $_POST[$abscode], $_POST[$reason]);
-		}
-		else	
-		{
-			//insert them into database
-			if($_POST[$attend] == 1)
-				$query .= $page->insertAttendance($attendSeq, $_POST[$stuid], 1, $_POST[$abscode], $_POST[$reason]);
-			else
-				$query .= $page->insertAttendance($attendSeq, $_POST[$stuid], 0, $_POST[$abscode], $_POST[$reason]);
-		}
+		//insert them into database
+		if($_POST[$attend] == 1 && $_POST[$stuid] > 0 )
+			$query .= $page->insertAttendance($batchCode, $_POST[$stuid], 1, $_POST[$abscode], $_POST[$reason]);
+		else if( $_POST[$stuid] > 0 )
+			$query .= $page->insertAttendance($batchCode, $_POST[$stuid], 0, $_POST[$abscode], $_POST[$reason]);
 
 		$query .= "; ";
 	}
+
 	$page->runQuery($query."SELECT 1");
+	
+	$page->runProc($batchCode, $attendSeq);
+	
+	
 	
 	$back = -2;
 	include("../include/back.php");

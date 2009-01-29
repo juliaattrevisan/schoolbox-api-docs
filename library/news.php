@@ -202,18 +202,17 @@ class News extends Model {
 		JOIN newsGroup ON newsGroup.id = news_items.item_id 
 			AND newsGroup.gid = '".$_SESSION['gid']."'
 		WHERE news_items.item_owner != '".$_SESSION['id']."' AND news_items.item_deleted = 0";
-		
-		if ($archive)
+
+		if($id)
+			$query .=" AND news_items.item_id = '$id'";
+		else if($archive)
 			$query .=" AND news_items.item_datetime_expires <= NOW() ";
 		else
 			$query .=" AND news_items.item_datetime_expires > NOW() ";
-		
-		//get a single article by id if id submitted
-		if($id)
-				$query .="AND news_items.item_id = '$id'";
-	
+				
+
 		$query .= " GROUP BY news_items.item_id ORDER BY news_items.item_datetime_posted DESC";
-	
+
 		$shareResults = $this->db->getAll($query);
 		
 		$query = "
@@ -226,17 +225,16 @@ class News extends Model {
 		WHERE news_items.item_owner = '".$_SESSION['id']."'
 			AND news_items.item_deleted = 0 
 		"; 
-		//get a single article by id if id submitted
-		if($id)
-				$query .="AND news_items.item_id = '$id'";
-	
-		if ($archive)
-			$query .=" AND news_items.item_datetime_expires > NOW() ";
-		else
-			$query .=" AND news_items.item_datetime_expires <= NOW() ";
-	
-		$query .= " ORDER BY news_items.item_datetime_posted DESC;";
 		
+		if($id)
+			$query .=" AND news_items.item_id = '$id'";
+		else if($archive)
+			$query .=" AND news_items.item_datetime_expires <= NOW() ";
+		else
+			$query .=" AND news_items.item_datetime_expires > NOW() ";
+			
+		$query .= " ORDER BY news_items.item_datetime_posted DESC;";
+
 		$userResults = $this->db->getAll($query);
 	
 		//merge and sort the headlines based on time
