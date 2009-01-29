@@ -1,6 +1,6 @@
 <?php
 
-require_once '../include/model.php';
+require_once dirname(__FILE__) . '/../include/model.php';
 
 class Category extends Model {
 
@@ -29,14 +29,6 @@ class Category extends Model {
 	}
 	
 	function hasChildren($categoryID) {
-		/*$query = "SELECT c.id as children 
-				  FROM category c, userAccess a, perms p 
-				  WHERE parent = $categoryID AND
-				  ((c.id = a.sid AND a.service = 1 AND a.type > 0 AND a.uid = '" . $_SESSION['id']. "') OR 
-				   (c.id = p.cid AND p.gid = ".$_SESSION['gid']." AND p.type > 0) OR 
-				   1 = " . (int)$_SESSION['su']. ")
-				  LIMIT 1,1";
-		*/
 		$query = "SELECT c.id as children 
 				  FROM category c
 				  WHERE parent = $categoryID
@@ -51,11 +43,12 @@ class Category extends Model {
 	}
 	
 	function getByID($categoryID) {
-		$query = "SELECT c.*, hc.*, u.id owner, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName 
+		$query = "SELECT c.*, hc.*, u.id owner, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName, g.type type
 				  FROM (category c)
 				  LEFT JOIN homepage_config hc ON  hc.cid = c.id
 				  LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGESERVICE . "
 				  LEFT JOIN user u on u.id = a.uid 
+				  LEFT JOIN userGroups g ON g.cid = c.id
 				  WHERE c.id = '$categoryID'"; 
 		return $this->db->getRow($query);		
 	}
@@ -145,6 +138,8 @@ class Category extends Model {
 				  ORDER BY id";
 		return $this->db->getAll($query);
 	}	
+
+
 
 	function logAction ($categoryID, $action = 'modify') {
 		$query = "INSERT INTO cmsLog SET object = 'folder', objectID = '$categoryID', action = '$action', user = '" . $_SESSION['id'] . "', time = NOW()";
