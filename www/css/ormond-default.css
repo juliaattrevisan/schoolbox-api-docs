@@ -26,7 +26,8 @@ h1, h2, h3{
 
 h1 {
 	font-size:140%;
-	background:#fff url(/images/ormond/heading-back.gif) repeat-x;
+	background-image: url(/images/ormond/heading-bg.png);
+	background-repeat: repeat-x;
 	padding:4px;
 	border-bottom:1px dotted #1c1713;
 	margin-bottom:3px;
@@ -34,7 +35,8 @@ h1 {
 	
 h2 {
 	font-size:120%;
-	background:#fff url(/images/ormond/heading-back.gif) repeat-x;
+	background-image:url(/images/ormond/heading-bg.png);
+	background-repeat: repeat-x;
 	padding:4px;
 	border-bottom:1px dotted #1c1713;
 	margin-top:5px;
