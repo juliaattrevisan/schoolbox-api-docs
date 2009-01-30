@@ -1,0 +1,32 @@
+<div class="component" id="component{COMPONENT_ID}">
+<div class="componentHeader">
+  <h2 class="cont-head">Wiki</h2>
+</div>
+<!-- BEGIN config -->
+<a class="config" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+<div class="componentConfig">
+  <form action="/subject/customisePage.php" method="get">
+    <input type="hidden" name="cid" value="{ID}" />
+    <input type="hidden" name="type" value="config" />
+    <input type="hidden" name="component" value="{COMPONENT_ID}" />
+    <label for="size">Item Limit: </label>
+      <select name="size">
+      	<!-- BEGIN size -->
+      	<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
+      	<!-- END size -->
+      </select>
+      <input type="submit" value="Update" />
+      <input type="button" onclick="window.open('/wiki/modify/new/{ID}');" value="Create" />
+  </form>
+</div>
+<!-- END config -->
+<table>
+  <!-- BEGIN wiki_row -->
+  <tr>
+    <td><a href="/wiki/{WIKI_ID}">{WIKI_HEADING}</a></td>
+    <td class="summ"><a href="/search/user/{WIKI_AUTHOR_ID}">{WIKI_AUTHOR}</a></td>
+    <td style="text-align: right;">{WIKI_MODIFIED}</td>
+  </tr>
+  <!-- END wiki_row -->
+</table>
+</div>

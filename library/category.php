@@ -43,7 +43,7 @@ class Category extends Model {
 	}
 	
 	function getByID($categoryID) {
-		$query = "SELECT c.*, hc.*, u.id owner, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName, g.type type
+		$query = "SELECT c.*, hc.*, u.id owner, u.title, u.firstname, u.lastname, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName, g.type type
 				  FROM (category c)
 				  LEFT JOIN homepage_config hc ON  hc.cid = c.id
 				  LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGESERVICE . "

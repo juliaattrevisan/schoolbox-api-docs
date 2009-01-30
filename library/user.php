@@ -29,10 +29,11 @@ class User extends Model {
 	function getByID($id) {
 	
 		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id,
-						synergy_id, local_email, alt_email, userCampus.campus
+						synergy_id, local_email, alt_email, userCampus.campus, IF(superusers.id, 1, 0) as su
 				FROM user 
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
+					LEFT JOIN superusers ON user.id = superusers.id
 				WHERE user.id = '$id'";
 		return $this->db->getRow($query);
 	

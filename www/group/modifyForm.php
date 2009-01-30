@@ -12,22 +12,19 @@ $category = $categoryHandler->getByID($_REQUEST['categoryID']);
 
 if (!isset($category['id']))
 	error(2);
+
 	
 // check access
-if(!$_SESSION['su'] && $category['owner'] != $_SESSION['id'])
+if($groupHandler->getPermission($category['id']) < FULL_ACCESS)
 	error(19);
 
 if (is_numeric($_GET['type'])) {
 	// change group type
-	$data = array('type'	=> $_GET['type'],
-				  'cid'		=> $_GET['categoryID'],
-				  );
-	$groupHandler->db->update('userGroups', 'cid', $data);
+	$groupHandler->setType($_GET['categoryID'], $_GET['type']);
 } 
 elseif (is_numeric($_GET['write']) && is_numeric($_GET['userID'])) {
 	// change write permission
-	$groupHandler->deleteUser($_GET['userID'], $_GET['categoryID']);
-	$groupHandler->addUser($_GET['userID'], $_GET['categoryID'], $_GET['write']);
+	$groupHandler->setUserPermission($_GET['categoryID'], $_GET['userID'], $_GET['write']);
 }
 elseif (isset($_REQUEST['delete'])) {
 	// delete user
@@ -37,7 +34,7 @@ elseif (isset($_REQUEST['delete'])) {
 	$total = count($_REQUEST['delete']);
 	for ($i = 0; $i < $total; $i++) {
 		if (is_numeric($_REQUEST['delete'][$i]))
-			$groupHandler->deleteUser($_REQUEST['delete'][$i], $_REQUEST['categoryID']);
+			$groupHandler->deleteUser($_REQUEST['categoryID'], $_REQUEST['delete'][$i]);
 	}
 	
 	localRedir('/group/modify/' . $_REQUEST['categoryID']);
@@ -50,7 +47,7 @@ elseif (isset($_REQUEST['accept'])) {
 	$total = count($_REQUEST['accept']);
 	for ($i = 0; $i < $total; $i++) {
 		if (is_numeric($_REQUEST['accept'][$i]))
-			$groupHandler->acceptMember($_REQUEST['accept'][$i], $_REQUEST['categoryID']);
+			$groupHandler->setUserPermission($_REQUEST['categoryID'], $_REQUEST['accept'][$i], READ_ACCESS);
 	}
 	
 	localRedir('/group/modify/' . $_REQUEST['categoryID']);
@@ -61,7 +58,7 @@ elseif (isset($_POST['keyword'])) {
 	$userHandler = new User;
 	$userList = $userHandler->searchUser($_POST['keyword'], 0);
 	if (is_array($userList)) 
-		$groupHandler->addUser($userList[0]['uid'], $_GET['categoryID']);
+		$groupHandler->addUser($_GET['categoryID'], $userList[0]['uid']);
 
 	localRedir('/group/modify/' . $_GET['categoryID']);
 
@@ -75,18 +72,15 @@ elseif (is_numeric($_GET['owner'])) {
 	if(!$groupHandler->groupExists($_GET['categoryID']))
 		$groupHandler->createGroup($_GET['categoryID']);
 	
-	if(is_numeric($category['owner'])) {
-		$groupHandler->deleteUser($category['owner'], $_GET['categoryID']);
-		$groupHandler->addUser($category['owner'], $_GET['categoryID'], 2);
-	}
+	// demote current owner
+	if(is_numeric($category['owner']))
+		$groupHandler->setUserPermission($_GET['categoryID'], $category['owner'], WRITE_ACCESS);
 	
-	//make new person an owner
-	$groupHandler->deleteUser($_GET['owner'], $_GET['categoryID']);
-	$groupHandler->addUser($_GET['owner'], $_GET['categoryID'], 3);
+	// promote new owner
+	$groupHandler->setUserPermission($_GET['categoryID'], $_GET['owner'], FULL_ACCESS);
 
-
-	//redirect user changing ownership to homepage if they have lost ownership
-	if($_SESSION['id'] != $_GET['owner'] && !$_SESSION['su'])
+	// re-check permissions, redirect user changing ownership to homepage if they have lost ownership
+	if($groupHandler->getPermission($_GET['categoryID']) < FULL_ACCESS)
 		localRedir("/homepage/".$_GET['categoryID']);
 	else
 		localRedir("/group/modify/".$_GET['categoryID']);
@@ -109,14 +103,14 @@ elseif (isset($_POST['bulkAdd'])) {
 			$query = "SELECT id FROM user WHERE synergy_id = $key";
 			$userid = $groupHandler->db->getRow($query);
 			if($userid['id']) 
-				$groupHandler->addUser($userid['id'], $_REQUEST['categoryID']);
+				$groupHandler->addUser($_REQUEST['categoryID'], $userid['id']);
 				
 		} else {
 			//word, assume its a username
 			$query = "SELECT id FROM user WHERE username like '$key'";
 			$userid = $groupHandler->db->getRow($query);
 			if($userid['id'])
-				$groupHandler->addUser($userid['id'], $_REQUEST['categoryID']);
+				$groupHandler->addUser($_REQUEST['categoryID'], $userid['id']);
 		}
 	}
 	
