@@ -55,6 +55,7 @@ else
 
 $this->setFile(TEMPLATE_content, 'homepage/template' . $category['template'] . '.html');
 $this->setTitle($category['name']);
+$this->setTab('resources');
 
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock(TEMPLATE_content, "edit_page", "edit_page_block");

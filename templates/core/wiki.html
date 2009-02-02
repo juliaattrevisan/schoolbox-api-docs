@@ -1,18 +1,46 @@
-<h1>{HEADING}</h1>
-<span class="header_option"><a href="/wiki/modify/{WIKI_ID}">Modify</a> | <a href="/homepage/{CATEGORY_ID}">Return to Homepage</a></span>
-<div class="indent">{BODY}</div>
-<h2>Revisions</h2>
-<table>
-  <tr>
-    <th>Heading</th>
-    <th>Date</th>
-    <th>Author</th>
-  </tr>
-  <!-- BEGIN revision_list -->
-  <tr>
-    <td class="bold"><a href="/wiki/{WIKI_ID}/{REVISION_ID}">{REVISION_HEADING}</a></td>
-    <td>{REVISION_DATE}</td>
-    <td>{REVISION_AUTHOR}</td>
-  </tr>
-  <!-- END revision_list -->
-</table>
+<!-- BEGIN custom_head -->
+<style type="text/css">
+#column-1 {
+	margin-right: 260px;
+}
+#column-2 {
+	float: right;
+	width: 250px;
+	margin-left: 10px;
+	height: 100%;
+}
+hr {
+	height: 1px;
+	border: 0;
+	background-color: #CCCCCC;
+	margin: 10px 0 4px 0;
+}
+</style>
+<!-- END custom_head -->
+<div class="indent">
+  <h1>{HEADING}</h1>
+  <span class="header_option"><a href="/wiki/modify/{WIKI_ID}">Modify</a> | 
+  <!-- BEGIN delete_link -->
+  <a href="/wiki/modifyForm.php?delete={WIKI_ID}" onclick="return confirm('Are you sure you want to delete the entire wiki?');">Delete</a> | <!-- END delete_link -->
+  <!-- BEGIN revert_link -->
+  <a href="/wiki/modifyForm.php?wikiID={WIKI_ID}&revert={CURRENT_REVISION}" onclick="return confirm('Revert to this revision?');">Revert to this revision</a> | <!-- END revert_link -->
+  <a href="/homepage/{CATEGORY_ID}">Return to homepage</a></span>
+  <div id="column-2">
+    <h2>Revisions</h2>
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Author</th>
+      </tr>
+      <!-- BEGIN revision_list -->
+      <tr>
+        <td><a href="/wiki/{WIKI_ID}/{REVISION_ID}">{REVISION_DATE}</a></td>
+        <td>{REVISION_AUTHOR}</td>
+      </tr>
+      <!-- END revision_list -->
+    </table>
+  </div>
+  <div id="column-1"> {BODY}
+    <hr>
+    <span class="element_footer">Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</span> </div>
+</div>

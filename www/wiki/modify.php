@@ -16,7 +16,7 @@ if (is_numeric($this->arg[0])) {
 		error(101);
 	
 	// check permission
-	if ($groupHandler->getPermission($wiki['categoryID']) < WRITE_ACCESS)
+	if ($groupHandler->getPermission($wiki['categoryID']) < READ_ACCESS)
 		error(19);
 	
 	$output = array('ACTION'		=> 'Modify',
@@ -24,7 +24,6 @@ if (is_numeric($this->arg[0])) {
 					'CATEGORY_ID'	=> $wiki['categoryID'],
 					'HEADING'		=> scrubText($wiki['heading']),
 					'BODY'			=> $wiki['body'],
-					'CLOSED_SELECTED'	=> $wiki['closed'] == 'true' ? 'checked="checked"' : '',
 					);
 	$this->setVar($output);
 	

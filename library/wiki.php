@@ -10,12 +10,12 @@ class Wiki extends Model {
 	}
 	
 	function getByID($wikiID, $revisionID = 0) {
-		$query = "SELECT r.*, w.categoryID, w.visible, w.closed, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(w.created) modified, 
-				  u.title, u.firstname, u.lastname
+		$query = "SELECT r.*, w.categoryID, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(r.created) modified, 
+				  u.title, u.firstname, u.lastname, r.userID authorID
 				  FROM revision r
 				  LEFT JOIN ".$this->_table." w ON w.wikiID = r.wikiID
 				  LEFT JOIN user u ON u.id = r.userID
-				  WHERE r.wikiID = $wikiID ";
+				  WHERE w.deleted = 'false' AND r.wikiID = $wikiID ";
 		if ($revisionID > 0 && is_numeric($revisionID))
 			$query .= "AND r.revisionID = $revisionID ";
 			
@@ -34,12 +34,12 @@ class Wiki extends Model {
 	
 	function getByCategory($categoryID) {
 		$query = "SELECT r.*, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.lastname
-				  FROM revision r
-				  LEFT JOIN ".$this->_table." w ON w.wikiID = r.wikiID
+				  FROM wiki w
+				  LEFT JOIN revision r ON r.revisionID = (SELECT r.revisionID FROM revision r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1) 
 				  LEFT JOIN user u ON u.id = r.userID
-				  WHERE categoryID = ".(int)$categoryID." "; 
+				  WHERE w.deleted = 'false' AND categoryID = ".(int)$categoryID." "; 
 			
-		$query .= "GROUP BY r.wikiID ORDER BY r.created DESC, w.created DESC";
+		$query .= " ORDER BY r.created DESC, w.created DESC";
 		
 		return $this->db->getAll($query);
 	}
@@ -53,6 +53,23 @@ class Wiki extends Model {
 	function create($data) {
 		$data['created'] = 'NOW()';
 		return parent::create($data);
+	}
+	
+	function revert($wikiID, $revisionID) {
+		$wiki = $this->getByID($wikiID, $revisionID);
+		if (!isset($wiki['wikiID']))
+			return false;
+			
+		$data = array('wikiID'	=> $wiki['wikiID'],
+					  'heading'	=> $wiki['heading'],
+					  'body'	=> $wiki['body']);
+		return $this->createRevision($data);
+	}
+
+	function delete ($wikiID) {
+		$data = array('wikiID'	=> $wikiID,
+					  'deleted'	=> 'true');
+		return parent::update($data);
 	}
 
 }

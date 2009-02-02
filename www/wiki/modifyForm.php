@@ -11,12 +11,10 @@ $groupHandler = new Group(HOMEPAGE_SERVICE);
 if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 	
 	// check permission
-	if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS)
+	if ($groupHandler->getPermission($_POST['categoryID']) < READ_ACCESS)
 		error(19);	
 
 	$wiki = array('categoryID'	=> $_POST['categoryID'],
-				  'visible'		=> isset($_POST['visible']) ? 'true' : 'false',
-				  'closed'		=> isset($_POST['closed']) ? 'true' : 'false',
 				  );
 	if (is_numeric($_POST['wikiID'])) {
 		$wiki['wikiID'] = $_POST['wikiID'];
@@ -34,7 +32,30 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 		$wikiHandler->createRevision($revision);
 	
 	localRedir("/wiki/" . $wiki['wikiID']);
+}
+elseif (is_numeric($_GET['revert']) && is_numeric($_GET['wikiID'])) {
 
+	$wiki = $wikiHandler->getByID($_GET['wikiID']);
+
+	// check permission
+	if ($groupHandler->getPermission($wiki['categoryID']) < WRITE_ACCESS)
+		error(19);	
+		
+	$wikiHandler->revert($wiki['wikiID'], $_GET['revert']);
+	
+	localRedir('/wiki/' . $wiki['wikiID']);
+}
+elseif (is_numeric($_GET['delete'])) {
+	$wiki = $wikiHandler->getByID($_GET['delete']);
+
+	// check permission
+	if ($groupHandler->getPermission($wiki['categoryID']) < WRITE_ACCESS)
+		error(19);	
+		
+	$wikiHandler->delete($wiki['wikiID']);
+	
+	localRedir('/homepage/' . $wiki['categoryID']);
+	
 } else
 	error(2);
 
