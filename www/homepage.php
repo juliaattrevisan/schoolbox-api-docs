@@ -13,11 +13,13 @@ if (strpos($_SERVER['REQUEST_URI'], ".php?category=") ||
 	localRedir("/homepage/" . $category);
 }
 
-require_once 'include/permission.php';
-require_once 'include/involved.php';
-require_once '../library/category.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/include/involved.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 $categoryHandler = new Category; 
+$groupHandler = new Group(HOMEPAGE_SERVICE);
+
 if(is_numeric($this->arg[0]))
 	$category = $categoryHandler->getByID($this->arg[0]);
 if(!is_array($category)) {
@@ -35,10 +37,9 @@ if (!$categoryID) {
 $categoryHandler->logPageView($categoryID);
 
 define('MAX_COLUMN_COUNT',2);
-define("CATEGORY_perms", perm($categoryID, HOMEPAGESERVICE));
 
 // check perms
-if (CATEGORY_perms < 1)
+if (($permission = $groupHandler->getPermission($categoryID)) < READ_ACCESS)
 	error(14);
 
 
@@ -75,7 +76,7 @@ $output = array('LARGE_HEAD_BGCOLOUR'	=> $category['large_head_bgcolour'],
 
 $this->setVar($output);
 
-if(CATEGORY_perms >= 2) {//has elevated priviliges, can write to page
+if($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
 	$this->parse("edit_page_block", "edit_page");
 	$this->parse('modify_layout_block', 'modify_layout');
 }	
@@ -101,7 +102,7 @@ if (is_array($componentList)) {
 		$default = unserialize($component['dfconfig']);
 		$config = unserialize($component['config']);
 
-		if(is_array($default) && CATEGORY_perms >= 2) {	
+		if(is_array($default) && $permission >= WRITE_ACCESS) {	
 
 			foreach($default as $name => $value) {
 			

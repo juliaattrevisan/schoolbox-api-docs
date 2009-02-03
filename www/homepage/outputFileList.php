@@ -33,7 +33,7 @@ if (is_array($fileList)) {
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_file", "submit_file_block");
-if(CATEGORY_perms < 2)		
+if ($permission < WRITE_ACCESS)		
 	$this->setVar("submit_file_block", "");
 else
 	$this->parse("submit_file_block", "submit_file");	

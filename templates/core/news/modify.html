@@ -35,14 +35,14 @@ function verify()
 }
 function confirmDelete(newsID) {
 	if (confirm('Delete this news item?')) { 
-		window.open('/news/modify.php?delete='+newsID, '_self', '');
+		window.open('/news/modifyForm.php?delete='+newsID, '_self', '');
 	}
 }
 </script>
 <!-- END custom_head -->
 
 		<h1>{ACTION} News</h1>
-		<form id="newsForm" class="standardForm" method="post" enctype="multipart/form-data" action="/news/modify.php" onsubmit="return(verify());">
+		<form id="newsForm" class="standardForm" method="post" enctype="multipart/form-data" action="/news/modifyForm.php" onsubmit="return(verify());">
 		<input type="hidden" name="newsID" value="{NEWS_ID}" />
 		<table>
 		  <tr> 

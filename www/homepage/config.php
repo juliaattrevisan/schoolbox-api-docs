@@ -8,13 +8,15 @@
 
 //allow users to customise their homepages
 require_once $_SERVER['DOCUMENT_ROOT'] .'/../library/homepage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] .'/../library/group.php';
+
+$groupHandler = new Group(HOMEPAGE_SERVICE);
 
 if(is_numeric($this->arg[0])) {
 	
 	$cid = $this->arg[0];
 
-	$perm = perm($cid, HOMEPAGESERVICE);
-	if($perm < 2) 
+	if($groupHandler->getPermission($cid) < WRITE_ACCESS) 
 		error(19);
 	
 	$homepage = new Homepage($cid);

@@ -4,7 +4,7 @@
 		$this->setBlock($componentHandle, "drop_staff", "drop_staff_block");
 		$this->setBlock("drop_staff", "drop_file", "drop_file_block");
 	
-		if(CATEGORY_perms < 2) {
+		if ($permission < WRITE_ACCESS) {
 			$this->parse("drop_student_block", "drop_student");
 			$this->setVar("drop_staff_block", "");
 		}

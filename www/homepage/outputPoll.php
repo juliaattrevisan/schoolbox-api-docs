@@ -54,10 +54,11 @@ if ($poll['pollID']) {
 					'POLL_QUESTION'	=> '',
 					);
 	$this->setVar($output);
-	if (CATEGORY_perms >= 2)
-		$this->setVar("poll_chart_block", '<p style="text-align: center;"><a href="/poll/modify.php?categoryID='.$categoryID.'">Create</a></p>');
-	else
+	if ($permission < WRITE_ACCESS)		
 		$this->setVar("poll_chart_block", "");
+	else
+		$this->setVar("poll_chart_block", '<p style="text-align: center;"><a href="/poll/modify/new/'.$categoryID.'">Create</a></p>');
+		
 	$this->setVar("poll_vote_block", "");
 }
 

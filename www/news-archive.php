@@ -6,11 +6,12 @@
 ************************************************************/
 //displays news
 
-require_once("include/permission.php");
 require_once("../library/news.php");
+require_once("../library/group.php");
 
 $this->setFile(TEMPLATE_content, 'news.html');
 $this->setTitle('News');
+$this->setTab('news');
 
 $this->setBlock(TEMPLATE_content, "main_stories", "stories_block");
 $this->setBlock("main_stories", "story_body", "story_block");
@@ -20,9 +21,10 @@ $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
 $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');	
 $this->setBlock(TEMPLATE_content, 'archive_button', 'archive_button_block');	
 
+$groupHandler = new Group(NEWS_SERVICE);
+
 //can see add news link
-$permLevel = perm(0,3);
-if($permLevel >= 2)
+if(($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS)
 	$this->setVar("ADD", "<b><a href=\"/news/modify\">add news</a></b>");
 else
 	$this->setVar("ADD", "");
@@ -85,8 +87,8 @@ if(is_array($items))
 	{
 		$this->setVar("NEWS_ID",$article['item_id']); 
 	 
-		if(($permLevel >= 2 && $article['item_owner'] == $_SESSION['id']) || $permLevel >= 3)
-			$this->setVar("MODIFY", "<a href=\"/news/modnews.php?id=".$article['item_id']."\">modify</a>");
+		if(($permission >= WRITE_ACCESS && $article['item_owner'] == $_SESSION['id']) || $permission >= FULL_ACCESS)
+			$this->setVar("MODIFY", "<a href=\"/news/modify/".$article['item_id']."\">modify</a>");
 		else
 			$this->setVar("MODIFY", "");
 		

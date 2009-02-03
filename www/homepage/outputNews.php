@@ -10,7 +10,7 @@ $newsList = $newsHandler->getAllForCategory($categoryID);
 if (is_array($newsList)) {
 
 	foreach($newsList as $news) {
-		if($news['owner'] == $_SESSION['id'] || $_SESSION['su'] == 1 || CATEGORY_perms == 2)
+		if($news['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS)
 			$this->setVar("MOD_NEWS", "<a href=\"/subject/modSubNews.php?modify=".$news['id']."\">Modify</a>");
 		else
 			$this->setVar("MOD_NEWS", "");
@@ -29,7 +29,7 @@ if (is_array($newsList)) {
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_news", "submit_news_block");
-if(CATEGORY_perms < 2)		
+if ($permission < WRITE_ACCESS)		
 	$this->setVar("submit_news_block", "");
 else
 	$this->parse("submit_news_block", "submit_news");	

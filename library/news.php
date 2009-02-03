@@ -14,7 +14,10 @@ class News extends Model {
 	}
 
 	function getByID($newsID) {
-		$news = parent::getByID($newsID);
+		
+		$query = "SELECT * FROM ".$this->_table." WHERE ".$this->_index." = $newsID AND item_deleted = 0";
+		$news = $this->db->getRow($query);
+		
 		if ($news[$this->_index]) {
 			$query = "SELECT * FROM newsGroup WHERE id = " . $news[$this->_index];
 			$groupList = $this->db->getAll($query);

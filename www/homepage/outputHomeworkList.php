@@ -54,7 +54,7 @@ if (is_array($homeworkList)) {
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_hw", "submit_hw_block");
-if(CATEGORY_perms < 2)		
+if ($permission < WRITE_ACCESS)		
 	$this->setVar("submit_hw_block", "");
 else
 	$this->parse("submit_hw_block", "submit_hw");	

@@ -7,7 +7,7 @@ if (is_array($folderList)) {
 	$flag = 0;
 	foreach ($folderList as $folder) {
 
-		if(perm($folder['id'], 1) > 0)
+		if($groupHandler->getPermission($folder['id']) > DENY_ACCESS)
 		{
 					//set name
 					$this->setVar("FOLDER_NAME", "<a href=\"/resources/".$folder['id']."\">".scrubTEXT($folder['name'])."</a>");
@@ -27,7 +27,7 @@ if (is_array($folderList)) {
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_folder", "submit_folder_block");
-if(CATEGORY_perms < 2)		
+if ($permission < WRITE_ACCESS)		
 	$this->setVar("submit_folder_block", "");
 else
 	$this->parse("submit_folder_block", "submit_folder");	

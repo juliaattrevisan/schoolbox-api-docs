@@ -1,58 +1,25 @@
 <?php
 
-require_once '../include/permission.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/poll.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
-require_once '../../library/poll.php';
 
 $pollHandler = new Poll;
-$page = new SitePage;
+$groupHandler = new Group(HOMEPAGE_SERVICE);
 
 
-if(is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_POST['vote']) && perm($_POST['categoryID'], 1) >= 1) {
-	$pollHandler->placeVote($_POST['pollID'], $_POST['vote']);
-	localRedir("/homepage/" . $_POST['categoryID']);
-}
-else if ($_POST['title'] && $_POST['categoryID'] && perm($_POST['categoryID'], 1) >= 2) {
-	$poll = array('categoryID'	=> $_POST['categoryID'],
-				  'title'		=> $_POST['title'],
-				  'question'	=> $_POST['question'],
-				  'option_0'	=> $_POST['option_0'],
-				  'option_1'	=> $_POST['option_1'],
-				  'option_2'	=> $_POST['option_2'],
-				  'option_3'	=> $_POST['option_3'],
-				  'option_4'	=> $_POST['option_4'],
-				  'option_5'	=> $_POST['option_5'],
-				  'option_6'	=> $_POST['option_6'],
-				  'option_7'	=> $_POST['option_7'],
-				  'option_8'	=> $_POST['option_8'],
-				  'option_9'	=> $_POST['option_9'],
-				  'frequency'	=> $_POST['frequency'],
-				  'close'		=> outputDate(DATE_database, ausDateToUnix($_POST['close'])),
-				  );
-
-	if (is_numeric($_POST['pollID'])) {
-		$poll['pollID'] = $_POST['pollID'];
-		$pollHandler->update($poll);
-	} else {
-		$poll['pollID'] = $pollHandler->create($poll);
-	}
-
-	localRedir("/homepage/" . $_POST['categoryID']);
-} 
-else if ($_GET['delete'] && perm($_GET['delete'], 1) >= 2) {
-	$poll = $pollHandler->getByID($_GET['delete']);
-	$pollHandler->delete($_GET['delete']);
-	localRedir("/homepage/" . $poll['categoryID']);
-}
-else if ($_GET['pollID']) {
-	$page->setFile(TEMPLATE_content, "poll/modify.html");
-	$page->setVar("TITLE", HEADING." - Modify Poll");
+if (is_numeric($this->arg[0])) {
 	
-	$poll = $pollHandler->getByID($_GET['pollID']);
-
-	if (perm($poll['categoryID'], 1) < 2)
-		error(5);
+	$poll = $pollHandler->getByID($this->arg[0]);
+	if (!isset($poll['pollID']))
+		error(101);
 	
+	// check permission
+	if ($groupHandler->getPermission($poll['categoryID']) < WRITE_ACCESS)
+		error(19);
+
+	$this->setFile(TEMPLATE_content, "poll/modify.html");
+	$this->setVar("TITLE", HEADING." - Modify Poll");	
 	
 	$output = array('ACTION'	=> 'Modify',
 					'POLL_ID'	=> $poll['pollID'],
@@ -76,17 +43,21 @@ else if ($_GET['pollID']) {
 					'FREQUENCY_' . strtoupper($poll['frequency']) . '_SELECTED'	=> 'selected="selected"',
 					);
 					
-	$page->setVar($output);
-	$page->outputPage();
+	$this->setVar($output);
 	
 }
-else if ($_GET['categoryID'] && perm($_GET['categoryID'], 1) >= 2) {
-	$page->setFile(TEMPLATE_content, "poll/modify.html");
-	$page->setVar("TITLE", HEADING." - Add Poll");
+else if (is_numeric($this->arg[1])) {
+
+	// check permission
+	if ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS)
+		error(19);
+
+	$this->setFile(TEMPLATE_content, "poll/modify.html");
+	$this->setVar("TITLE", HEADING." - Add Poll");
 
 	$output = array('ACTION'	=> 'Add',
 					'POLL_ID'	=> '',
-					'CATEGORY_ID'	=> $_GET['categoryID'],
+					'CATEGORY_ID'	=> $this->arg[1],
 					'POLL_TITLE'	=> '',
 					'QUESTION'	=> '',
 					'OPTION_0'	=> '',
@@ -104,9 +75,8 @@ else if ($_GET['categoryID'] && perm($_GET['categoryID'], 1) >= 2) {
 					'FREQUENCY_HOURLY_SELECTED'	=> '',
 					'FREQUENCY_DAILY_SELECTED'	=> '',					
 					);
-	$page->setVar($output);
-	$page->outputPage();
+	$this->setVar($output);
 }
 else
-	error(19);
+	error(2);
 ?>

@@ -98,6 +98,7 @@ acronym, dfn, abbr {
 	list-style: none;
 	width:160px; /* Width of Menu Items */
 	z-index:2;
+	letter-spacing: 1px;
 	}
 /* FIRST LEVEL MENU UNORDERED LIST ELEMENT */
 .sideWrap li {

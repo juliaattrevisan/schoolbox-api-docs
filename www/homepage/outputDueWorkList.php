@@ -39,7 +39,7 @@ if (is_array($submissionList)) {
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_dw", "submit_dw_block");
-if(CATEGORY_perms < 2)		
+if($permission < WRITE_ACCESS)		
 	$this->setVar("submit_dw_block", "");
 else
 	$this->parse("submit_dw_block", "submit_dw");	

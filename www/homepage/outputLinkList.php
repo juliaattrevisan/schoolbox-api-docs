@@ -26,7 +26,7 @@
 
 		//setup block for submission button
 		$this->setBlock($componentHandle, "submit_link", "submit_link_block");
-		if(CATEGORY_perms < 2)		
+		if ($permission < WRITE_ACCESS)		
 			$this->setVar("submit_link_block", "");
 		else
 			$this->parse("submit_link_block", "submit_link");	

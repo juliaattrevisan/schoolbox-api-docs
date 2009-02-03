@@ -54,7 +54,7 @@
 
 		//setup block for submission button
 		$this->setBlock($componentHandle, "submit_event", "submit_event_block");
-		if(CATEGORY_perms < 2)		
+		if($permission < WRITE_ACCESS)		
 			$this->setVar("submit_event_block", "");
 		else
 			$this->parse("submit_event_block", "submit_event");	
