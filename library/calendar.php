@@ -1,15 +1,16 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/include/permission.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 class Calendar extends Model {
 
 	function Calendar () {
 	
-		
 		$this->_table = "event";
 		$this->_index = "id";
+		
+		$this->groupHandler = new Group(CALENDAR_SERVICE);
 		
 		parent::Model();
 	}
@@ -46,7 +47,10 @@ class Calendar extends Model {
 				return $event['owner'] == $_SESSION['id'] ? 2 : 0;
 				
 			case 2: // single group
-				return perm($event['sid'], 1);
+				$this->groupHandler->setService(HOMEPAGE_SERVICE);
+				$permission = $this->groupHandler->getPermission($event['sid']);
+				$this->groupHandler->setService(CALENDAR_SERVICE);
+				return $permission;
 				
 			case 3: // campus
 				
@@ -54,19 +58,16 @@ class Calendar extends Model {
 					$campusList = $event['campusList'];
 				else
 					$campusList = $this->getEventCampus($event['id']);
-								
+						
 				if(is_array($campusList)) {
 					foreach($campusList as $campus) {
-						$value = perm($campus, 2);
-						if($value < $perm || !$perm)
-							$perm = $value;
+						$permission = $this->groupHandler->getPermission($campus);
+						if($output < $permission || !$output)
+							$output = $permission;
 					}		
 				}
 
-				return $perm;
-			
-			case 4:
-				return perm(0, 2);
+				return $output;
 				
 			default:
 				return 0;
@@ -247,7 +248,7 @@ class Calendar extends Model {
 		
 		//give people with userAccess to moderate Calendar Access to view all Camups Posts
 		if(is_array($_SESSION['campus'])) {
-			if(perm($_SESSION['campus'][0], 2) > 2 || $_SESSION['su'])
+			if($this->groupHandler->getPermission($_SESSION['campus'][0]) > WRITE_ACCESS)
 				$groupChunk = "";
 			else {
 				$groupChunk = "AND eventGroup.groupID = {$_SESSION['gid']}";
@@ -373,12 +374,7 @@ class Calendar extends Model {
 
 	function create($event) {
 		
-		$hasAuth = true;
-		
-		if($this->getPerm($event) < 2)
-			$hasAuth = false;
-
-		if (!$hasAuth)
+		if($this->getPerm($event) < WRITE_ACCESS)
 			error(35);
 
 		$groupList = $event['groupList'];
@@ -397,12 +393,7 @@ class Calendar extends Model {
 	
 	function update($event) {
 		
-		$hasAuth = true;
-		
-		if($this->getPerm($event['id']) < 2)
-			$hasAuth = false;
-		
-		if (!$hasAuth)
+		if($this->getPerm($event['id']) < WRITE_ACCESS)
 			error(34);
 
 		$groupList = $event['groupList'];
@@ -424,12 +415,7 @@ class Calendar extends Model {
 	function delete ($eventID) {
 		$event = $this->getByID($eventID);
 
-		$hasAuth = true;
-		
-		if($this->getPerm($eventID) < 2)
-			$hasAuth = false;
-		
-		if (!$hasAuth)
+		if($this->getPerm($eventID) < WRITE_ACCESS)
 			error(34);
 
 		parent::delete($eventID);

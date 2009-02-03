@@ -14,12 +14,18 @@
 		
 		
 		$query = "SELECT id, DATE_FORMAT(date, '%a %D %b') as outputDate,
-						DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
-						TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTimeString, TIME_FORMAT(endTime, 
-				'".CALENDAR_time_format."') as endTimeString,priority, note
+					DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
+					TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTimeString, TIME_FORMAT(endTime, 
+					'".CALENDAR_time_format."') as endTimeString,priority, note
 				FROM event
-        				JOIN eventCampus ON event.id = eventCampus.eventID
-				WHERE access = 3 AND eventCampus.campusID = 3 AND ( date >= DATE(NOW()) $where) ORDER BY date, startTime";
+        			JOIN eventCampus ON event.id = eventCampus.eventID
+					JOIN eventGroup ON event.id = eventGroup.eventID
+				WHERE access = 3 
+					AND eventCampus.campusID IN(".implode(",", $_SESSION['campus']).") 
+					AND eventGroup.groupID = {$_SESSION['gid']} 
+					AND ( date >= DATE(NOW()) $where) 
+				ORDER BY date, startTime";
+		
 		$eventList = $this->db->getAll($query);	
 
 		if (is_array($eventList)) {

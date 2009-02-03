@@ -24,6 +24,10 @@ class Group extends Model {
 		
 		parent::Model();
 	}
+	
+	function setService($service = HOMEPAGE_SERVICE) {
+		$this->_service = $service;
+	}
 
 	function getAllByType ($type) {
 		$query = "SELECT name, id, userAccess.type accessType
