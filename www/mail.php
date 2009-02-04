@@ -28,6 +28,8 @@ if(MAIL_enable)
 	$page->setVar('ROUNDCUBE_PARAMS', $params);
 	
 	$page->outputPage();
+	
+	exit;
 }
 else
 	error(19);

@@ -253,7 +253,7 @@ class modUser
 	function displayLogin($username) {
 		$this->t_body->set_block("tplBODY", "login_log", "login_block");
 		
-		$query = "SELECT date, ip, login FROM login_log WHERE username like '$username' ORDER BY date DESC LIMIT 0,10";
+		$query = "SELECT date, ip, login FROM login_log WHERE username like ".$this->db->smartQuote($username)." ORDER BY date DESC LIMIT 0,10";
 				
 		$this->db->query($query);
 		if($this->db->countRows() > 0) {
