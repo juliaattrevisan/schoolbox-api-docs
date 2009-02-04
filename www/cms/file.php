@@ -1,134 +1,88 @@
 <?php
-/************************************************************
-*                                                           *
-*         Copyright (c) 2002-2003 Lektec Consulting         *
-*                                                           *
-************************************************************/
 
-/* Class defines interface between file database and software.         *
- * The following actions can be performed; delete, add, update */
-
-class file
-{
-	function file()
-	{
-		//always gonna need the db so lets create one..
-		$this->db = new dbManager();
-	}
-
-	function checkWriteAccess($category)
-	{
-		require_once("../include/permission.php");
-		
-		//dont allow write to root fullstop!!
-		if($category == 0)
-			error(2);
-
-		if(perm($category, HOMEPAGESERVICE) < 2)
-			error(6);
-	} 
-
-	function modifyFile($description, $comment, $category, $type, $modid, $hidden)
-	{
-		//check allowed perms to add to specified category before proceeding
-		$this->checkWriteAccess($category);		
-		
-		$file = array(	'id'			=> $modid,
-						'description'	=> $description,
-						'comment'	 	=> $comment,
-						'category'		=> $category,
-						'type'			=> $type,
-						'hidden'		=> $hidden,
-							);
-			
-		
-		$this->db->dbUpdateRow('file', 'id', $file);
-		
-		$logEntry = array(	'object'		=> 'file',
-							'objectId'		=> $modid,
-							'action'		=> 'modify',
-							'user'			=> $_SESSION['id'],
-							);
-		
-		$this->db->dbInsertRow('cmsLog', $logEntry);
-		
-	}
-
-	function addFile($file_name, $file_type, $file_loc, $description, $comment, $category, $hidden=0)
-	{
-		//check allowed perms to add to specified category before proceeding
-		$this->checkWriteAccess($category);
-		
-		if(is_readable($file_loc))		
-			$filesize = filesize($file_loc);
-		
-		$file = array(	'description'	=> $description,
-						'comment'	 	=> $comment,
-						'category'		=> $category,
-						'owner'			=> $_SESSION['id'],
-						
-						'realname'		=> $file_name,
-						'submitted'		=> 'NOW()',
-						'mime_type'		=> $file_type,
-						'file_size'		=> $filesize,
-						'hidden'		=> $hidden,
-							);
-		
-		$this->db->dbInsertRow('file', $file);
+if(is_numeric($this->arg[0])) {
 	
-		//get file ID from INSERT
-		$fileId = $this->db->dbInsertId();
+	/* Modify existing file */
 	
-		if( $file_loc )
-		{
-				//save file using file ID as name
-				$newFileName = $fileId . ".dat";
-				copy($file_loc, FILE_directory ."/". $newFileName);
-		}
+	require_once '../library/file.php';
+	require_once '../library/submission-box.php'
+	$fileHandler = new File;
 	
-		$logEntry = array(	'object'	=> 'file',
-							'objectId'	=> $fileId,
-							'action'	=> 'create',
-							'user'		=> $_SESSION['id'],
-							);
-		
-		$this->db->dbInsertRow('cmsLog', $logEntry);
-	
-		return $fileId;
-	
-	}
+	$file = $fileHandler->getByID($this->arg[0]);
+	if(!is_array($file))
+		error(41);
 
-	function deleteFile($id)
-	{
-		//check sanity and valid rights
-		//check file exists. and user has nescessary rights
-		$fileInfo = $this->getFile($id);
-		if($fileInfo['category'])
-			$this->checkWriteAccess($fileInfo['category']);	
+	$this->setFile(TEMPLATE_content, 'cms/modify-file.html');
+	
+	$this->setBlock(TEMPLATE_content, 'submission', 'submission_block');
+	$this->setBlock(TEMPLATE_content, 'browse', 'browse_block');
+	$this->setBlock(TEMPLATE_content, 'indiv_modify', 'indiv_modify_block');
+
+	$this->setTitle('Modify File');	
+	
+	$output = array('ACTION'			=> 'Modify',
+					'FILE_ID'			=> $file['id'],
+					'DESCRIPTION'		=> scrubText($file['description']),
+					'COMMENT'			=> scrubText($file['comment']),	
+					'HIDDEN_SELECTED'	=> 	$file['hidden'] > 0 ? 'checked="checked"' : '',
+					'MAX_FILE_SIZE'		=> MAX_FILE_SIZE,
+					'CATEGORY_NAME'		=> scrubText($file['categoryName']),
+					);
+	$this->setVar($output);
+	
+	/* Output different controls for submission boxes */
+	$subBoxHandler = new SubmissionBox;
+	$subBox = $subBoxHandler->getByField('fid', $file['id']);
+	
+	if(is_array($subBox)) {
+		if($subBox['deleted'])
+			$this->setVar('SUB_BOX', "<a href=\"/submission/listSubmission.php?undelete=".$subBox['id']."\">undelete box</a>");
 		else
-			error(41);
-
-		//ok all checks completed
-
-		//now delete file by updating it as deleted
-		$this->db->dbUpdateRow('file', 'id', array('id'=>$id, 'deleted'=>1));
-
-		$logEntry = array(	'object'	=> 'file',
-							'objectId'	=> $id,
-							'action'	=> 'delete',
-							'user'		=> $_SESSION['id'],
-							);
-		
-		$this->db->dbInsertRow('cmsLog', $logEntry);
-
-		//we leave file incase we need it but we should clean up any cached files right now
+			$this->setVar("SUBBOX", "<a href=\"/submission/listSubmission.php?delete=".$subBox['id']."\">delete 
+				</a> // <a href=\"/submission/createSubmission.php?sid=".$subBox['id']."\">modify</a>");
 	}
+	else {
+		$this->setVar("SUBBOX", "<a href=\"/submission/createSubmission.php?cid=".$file['category']."&fileid=".$file['id']."\">create</a>");
+	}
+	
+	$this->parse('submission_block','submission', true);
+	
+} else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+	
+	/* Add new file to system */
+	require_once '../library/category.php';
+	
+	$this->setFile(TEMPLATE_content, 'cms/modify-file.html');
+	
+	$this->setBlock(TEMPLATE_content, 'submission', 'submission_block');
+	$this->setBlock(TEMPLATE_content, 'browse', 'browse_block');
+	$this->setBlock(TEMPLATE_content, 'indiv_modify', 'indiv_modify_block');
 
-	function getFile($id)
-	{
-                $query = "SELECT category, description, comment, type, realname, mime_type, hidden FROM file WHERE id = '$id'";
-                return $this->db->getRow($query);
-	} 
+	$this->setTitle('Add File');	
+	
+	$categoryHandler = new Category;
+	$category = $categoryHandler->getByID($this->arg[1]);
+	if(is_array($category))
+		error(13);
+
+	$output = array('ACTION'			=> 'Add',
+					'FILE_ID'			=> '',
+					'DESCRIPTION'		=> '',
+					'COMMENT'			=> '',	
+					'HIDDEN_SELECTED'	=> '',
+					'MAX_FILE_SIZE'		=> MAX_FILE_SIZE,
+					'SUBBOX'			=> '<input type="checkbox" name="submission" value="1" >',
+					'CATEGORY_NAME'		=> scrubTEXT($category['categoryName']),
+					);
+	$this->setVar($output);
+
+	$this->parse('submission_block','submission', true); 
+	
+
 
 }
+else {
+	error(2);
+}
+
 ?>

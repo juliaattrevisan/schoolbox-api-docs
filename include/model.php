@@ -30,6 +30,28 @@ class Model {
 		return $this->db->getRow($query);
 	}
 	
+	function getByArray($fieldList, $termOp='AND') {
+		$query = "SELECT * FROM `".$this->_table."` WHERE ";
+		
+		if(is_array($fieldList)) {
+	 		if($termOp == 'AND')
+				$query .= '1 = 1';
+			else
+				$query .= '1 = 0';
+				
+			foreach($fieldList as $field => $value) {					
+				if(is_numeric($value))
+					$query .= " $termOp `$field` = ".$this->db->smartQuote($value);
+				else
+					$query .= " $termOp `$field` like ".$this->db->smartQuote($value);
+			}
+		
+			return $this->db->getRow($query);
+		}
+		else 
+			return false;
+	}
+	
 	function getAllByField($field, $id) {
 		$query = "	SELECT * 
 					FROM `".$this->_table."` WHERE `".$field."` = ".$this->db->smartQuote($id);
