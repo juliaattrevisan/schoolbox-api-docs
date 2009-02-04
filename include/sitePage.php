@@ -113,12 +113,16 @@ class SitePage extends Page {
 		//this section handles the drop down menu
 		if($_SESSION['su'])
 			$query = "SELECT sideMenu.id, parent, txt, url, target FROM sideMenu ORDER BY parent, sequence, txt";
-		else
+		else if(is_array($_SESSION['campus'])) 
 			$query = "	SELECT DISTINCT(sideMenu.id), parent, txt, url, target FROM sideMenu, sideMenuCampus, sideMenuGroup
           				WHERE (sideMenu.id = sideMenuCampus.id AND sideMenuCampus.campus IN (".implode(',',$_SESSION['campus']).") )
             				AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '".$_SESSION['gid']."')
           				ORDER BY parent, sequence, txt";
-
+		else
+			$query = "	SELECT DISTINCT(sideMenu.id), parent, txt, url, target FROM sideMenu, sideMenuCampus, sideMenuGroup
+          				WHERE (sideMenu.id = sideMenuCampus.id AND sideMenuCampus.campus = 1)
+            				AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '".$_SESSION['gid']."')
+          				ORDER BY parent, sequence, txt";
 		$this->db->query($query);
 
 		//initialise root of tree
@@ -156,11 +160,11 @@ class SitePage extends Page {
 				if(isStaff($_SESSION['gid']))
 					$this->setVar("WEBMAIL_LOCATION", 'href=\"https://webmail.mgs.vic.edu.au/exchange/" target="_blank"');
 				else
-					$this->setVar("WEBMAIL_LOCATION", "href=\"/mail.php\"");
+					$this->setVar("WEBMAIL_LOCATION", "href=\"/mail/\"");
 			}
 			else if(SITE_location == 'ormond') 
 			{
-				$this->setVar('WEBMAIL_LOCATION', 'href="/mail.php"');
+				$this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
 			}
 			else if(SITE_location == 'wenona') {
 				if(isStaff($_SESSION['gid'])) {
@@ -168,7 +172,7 @@ class SitePage extends Page {
 					$this->setVar('WEBMAIL_TITLE', '<em>W</em>ebmail');
 				}
 				else {
-					$this->setVar('WEBMAIL_LOCATION', 'href="/mail.php"');
+					$this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
 					$this->setVar('WEBMAIL_TITLE', '<em>W</em>ebmail');
 		
 				}

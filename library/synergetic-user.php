@@ -32,8 +32,7 @@ class SynergeticUser extends MSSQL{
 					SynergyOne.dbo.vStudents vStudents,
 					SynergyOne.dbo.luForm,
 					SynergyOne.dbo.luTutor
-			WHERE 	vStudents.CurrentSemesterOnlyFlag = contactDetails.CurrentSemesterOnlyFlag 
-				AND vStudents.FileSemester = contactDetails.FileSemester 
+			WHERE 	vStudents.FileSemester = contactDetails.FileSemester 
 				AND vStudents.FileYear = contactDetails.FileYear 
 				AND vStudents.StudentID = contactDetails.ID
 				AND vStudents.StudentForm=luForm.Code

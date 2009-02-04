@@ -1,8 +1,8 @@
 <?php
 
 /* Template management for homepages */
+require_once($_SERVER['DOCUMENT_ROOT'].'/../include/model.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/../library/homepage.php');
-
 
 class HomepageTemplate extends  Model {
 
@@ -107,8 +107,6 @@ class HomepageTemplate extends  Model {
 			// Default colors
 			$homepage->saveDisplayProperties(unserialize(HOMEPAGE_colors));
 		}
-}
-
 }
 
 ?>
