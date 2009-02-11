@@ -2,32 +2,32 @@
 
 /*
 
- +-----------------------------------------------------------------------+
- | localization/zh_CN/messages.inc                                       |
- |                                                                       |
- | Language file of the RoundCube Webmail client                         |
- | Copyright (C) 2005-2007, RoundCube Dev. - Switzerland                 |
- | Licensed under the GNU GPL                                            |
- |                                                                       |
- +-----------------------------------------------------------------------+
- | Author: kourge <kourge@gmail.com>                                     |
- |         Xue zhong sheng <xue.zhongsheng@gmail.com>                    |
- +-----------------------------------------------------------------------+
++-----------------------------------------------------------------------+
+| localization/zh_CN/messages.inc                                       |
+|                                                                       |
+| Language file of the RoundCube Webmail client                         |
+| Copyright (C) 2005-2008, RoundCube Dev. - Switzerland                 |
+| Licensed under the GNU GPL                                            |
+|                                                                       |
++-----------------------------------------------------------------------+
+| Author: Xue zhong sheng <xue.zhongsheng@gmail.com>                    |
+|         Zhang Huang bin <michaelbibby@gmail.com>                      |
++-----------------------------------------------------------------------+
 
- @version $Id: messages.inc 672 2007-08-10 14:46:53Z thomasb $
+@version $Id: messages.inc 2136 2008-12-08 20:44:46Z yllar $
 
 */
 
 $messages = array();
 $messages['loginfailed'] = '登录失败';
-$messages['cookiesdisabled'] = '你的浏览器不接受 cookies';
+$messages['cookiesdisabled'] = '您的浏览器不接受 cookies';
 $messages['sessionerror'] = '会话已过期';
 $messages['imaperror'] = '连接到邮件服务器失败';
 $messages['nomessagesfound'] = '此邮件夹内无邮件';
-$messages['loggedout'] = '你已成功注销';
+$messages['loggedout'] = '您已成功注销';
 $messages['mailboxempty'] = '邮件夹为空';
-$messages['loading'] = '加载中...';
-$messages['loadingdata'] = '数据加载中...';
+$messages['loading'] = '正在加载...';
+$messages['loadingdata'] = '正在加载数据...';
 $messages['checkingmail'] = '检查新邮件...';
 $messages['sendingmessage'] = '正在发送邮件...';
 $messages['messagesent'] = '邮件发送成功';
@@ -41,28 +41,35 @@ $messages['encryptedmessage'] = '因此邮件已加密，无法正常显示';
 $messages['nocontactsfound'] = '未找到联系人';
 $messages['contactnotfound'] = '未找到指定的联系人';
 $messages['sendingfailed'] = '发送失败';
+$messages['senttooquickly'] = '您需要等待 $sec 秒才能发送邮件';
+$messages['errorsavingsent'] = '保存已发送邮件时出现错误';
 $messages['errorsaving'] = '保存过程中发生错误';
 $messages['errormoving'] = '无法移动邮件';
 $messages['errordeleting'] = '无法删除邮件';
-$messages['deletecontactconfirm'] = '你是否确认要删除已选中的联系人？';
-$messages['deletemessagesconfirm'] = '你是否确认要删除已选中的邮件？';
-$messages['deletefolderconfirm'] = '你是否确认要删除已选中的邮件夹？';
-$messages['purgefolderconfirm'] = '你是否确认要删除当前邮件夹中的所有邮件？';
+$messages['deletecontactconfirm'] = '确定要删除已选中的联系人？';
+$messages['deletemessagesconfirm'] = '确定要删除已选中的邮件？';
+$messages['deletefolderconfirm'] = '确定要删除已选中的邮件夹？';
+$messages['purgefolderconfirm'] = '是否确认要删除当前邮件夹中的所有邮件？';
+$messages['foldercreating'] = '正在创建邮件夹';
+$messages['folderdeleting'] = '正在删除邮件夹';
+$messages['folderrenaming'] = '正在重命名邮件夹';
+$messages['foldermoving'] = '正在移动目录...';
 $messages['formincomplete'] = '当前表单未填写完整，请完整填写';
 $messages['noemailwarning'] = '请输入一个有效的邮件地址';
 $messages['nonamewarning'] = '请输入名字';
 $messages['nopagesizewarning'] = '请输入每页显示的邮件数量';
+$messages['nosenderwarning'] = '请输入发件人的邮件地址';
 $messages['norecipientwarning'] = '至少需要一个收件人';
-$messages['nosubjectwarning'] = '主题为空。你要输入一个主题吗？';
+$messages['nosubjectwarning'] = '主题为空。您要输入一个主题吗？';
 $messages['nobodywarning'] = '要发送无正文的邮件吗？';
-$messages['notsentwarning'] = '邮件未发送。你确定要离开并废弃当前邮件？';
+$messages['notsentwarning'] = '邮件未发送。您确定要离开并废弃当前邮件吗？';
 $messages['noldapserver'] = '请选择一个LDAP服务器进行查找';
 $messages['nocontactsreturned'] = '未找到联系人';
 $messages['nosearchname'] = '请输入一个联系人姓名或电子邮件地址';
-$messages['searchsuccessful'] = '共找到 $n 封邮件';
+$messages['searchsuccessful'] = '共找到 $nr 封邮件';
 $messages['searchnomatch'] = '未找到任何符合条件的邮件';
-$messages['searching'] = '查找中...';
-$messages['checking'] = '检查中...';
+$messages['searching'] = '正在查找...';
+$messages['checking'] = '正在检查...';
 $messages['nospellerrors'] = '未发现拼写错误';
 $messages['folderdeleted'] = '邮件夹已被成功删除';
 $messages['deletedsuccessfully'] = '删除成功';
@@ -74,5 +81,19 @@ $messages['copysuccess'] = '成功复制 $nr 个地址';
 $messages['copyerror'] = '无法复制地址';
 $messages['sourceisreadonly'] = '源地址为只读';
 $messages['errorsavingcontact'] = '无法保存联系人的地址';
+$messages['movingmessage'] = '移动邮件到...';
+$messages['receiptsent'] = '成功发送了一个已读回执';
+$messages['errorsendingreceipt'] = '无法发送回执';
+$messages['nodeletelastidentity'] = '无法删除这个身份，这是最后一个。';
+$messages['addsubfolderhint'] = '新建的文件夹将成为所选文件夹的子文件夹';
+$messages['forbiddencharacter'] = '目录名包含隐藏字符';
+$messages['selectimportfile'] = '请选择要上传的文件';
+$messages['addresswriterror'] = '已选择的地址簿不可写';
+$messages['importwait'] = '正在导入，请稍后...';
+$messages['importerror'] = '导入失败！所上传的文件不是有效的 vCard 文件。';
+$messages['importconfirm'] = '<b>成功导入 $inserted 联系人，$skipped 乎略已存在的联系人</b>:<p><em>$names</em></p>';
+$messages['opnotpermitted'] = '不允许的操作';
+$messages['nofromaddress'] = '选种的身份中没有邮件地址';
+$messages['editorwarning'] = '切换到纯文本编辑器将导致邮件正文中的所有文本格式失效，您确定要这样做吗？';
 
 ?>

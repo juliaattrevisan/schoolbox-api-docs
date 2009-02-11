@@ -15,7 +15,7 @@
  | Author: Sjon Hortensius <sjon@hortensius.net>                         |
  +-----------------------------------------------------------------------+
 
- $Id: rss.inc 850 2007-10-03 00:13:32Z ihug $
+ $Id: rss.inc 931 2007-11-25 19:45:38Z thomasb $
 
 */
 
@@ -79,7 +79,7 @@ echo '
 
 // Check if the user wants to override the default sortingmethode
 if (isset($_GET['_sort']))
-  list($sort_col, $sort_order) = explode('_', $_GET['_sort']);
+  list($sort_col, $sort_order) = explode('_', get_input_value('_sort', RCUBE_INPUT_GET));
 
 // Add message to output
 if ($messagecount > 0)

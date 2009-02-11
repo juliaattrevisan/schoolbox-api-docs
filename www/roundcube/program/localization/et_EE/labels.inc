@@ -2,18 +2,18 @@
 
 /*
 
- +-----------------------------------------------------------------------+
- | language/et_EE/labels.inc                                             |
- |                                                                       |
- | Language file of the RoundCube Webmail client                         |
- | Copyright (C) 2005-2007, RoundCube Dev. - Switzerland                 |
- | Licensed under the GNU GPL                                            |
- |                                                                       |
- +-----------------------------------------------------------------------+
- | Author: Üllar Pajus <yllar.pajus@gmail.com>                           |
- +-----------------------------------------------------------------------+
++-----------------------------------------------------------------------+
+| language/et_EE/labels.inc                                             |
+|                                                                       |
+| Language file of the RoundCube Webmail client                         |
+| Copyright (C) 2005-2008, RoundCube Dev. - Switzerland                 |
+| Licensed under the GNU GPL                                            |
+|                                                                       |
++-----------------------------------------------------------------------+
+| Author: Üllar Pajus <yllar.pajus@gmail.com>                           |
++-----------------------------------------------------------------------+
 
- @version $Id$
+@version $Id$
 
 */
 
@@ -68,6 +68,30 @@ $labels['wednesday'] = 'Kolmapäev';
 $labels['thursday'] = 'Neljapäev';
 $labels['friday'] = 'Reede';
 $labels['saturday'] = 'Laupäev';
+$labels['jan'] = 'jaan';
+$labels['feb'] = 'veebr';
+$labels['mar'] = 'märts';
+$labels['apr'] = 'apr';
+$labels['may'] = 'mai';
+$labels['jun'] = 'juuni';
+$labels['jul'] = 'juuli';
+$labels['aug'] = 'aug';
+$labels['sep'] = 'sept';
+$labels['oct'] = 'okt';
+$labels['nov'] = 'nov';
+$labels['dec'] = 'dets';
+$labels['longjan'] = 'Jaanuar';
+$labels['longfeb'] = 'Veebruar';
+$labels['longmar'] = 'Märts';
+$labels['longapr'] = 'Aprill';
+$labels['longmay'] = 'Mai';
+$labels['longjun'] = 'Juuni';
+$labels['longjul'] = 'Juuli';
+$labels['longaug'] = 'August';
+$labels['longsep'] = 'September';
+$labels['longoct'] = 'Oktoober';
+$labels['longnov'] = 'November';
+$labels['longdec'] = 'Detsember';
 $labels['today'] = 'Täna';
 $labels['checkmail'] = 'Kontrolli uusi kirju';
 $labels['writenewmessage'] = 'Kirjuta uus kiri';
@@ -87,10 +111,18 @@ $labels['lastmessage'] = 'Näita viimast kirja';
 $labels['lastmessages'] = 'Näita viimast kirjade komplekti';
 $labels['backtolist'] = 'Tagasi kirjade nimekirja';
 $labels['viewsource'] = 'Näita lähtekoodi';
+$labels['markmessages'] = 'Märgi kirjad';
+$labels['markread'] = 'Loetuks';
+$labels['markunread'] = 'Mitte loetuks';
+$labels['markflagged'] = 'Lisa lipik';
+$labels['markunflagged'] = 'Eemalda lipik';
 $labels['select'] = 'Vali';
 $labels['all'] = 'kõik';
 $labels['none'] = 'mitte midagi';
 $labels['unread'] = 'mitte loetud';
+$labels['flagged'] = 'Märgistatud';
+$labels['unanswered'] = 'Vastamata';
+$labels['filter'] = 'Filtreeri';
 $labels['compact'] = 'Tihenda';
 $labels['empty'] = 'Tühjenda';
 $labels['purge'] = 'Puhasta';
@@ -99,9 +131,10 @@ $labels['unknown'] = 'teadmata';
 $labels['unlimited'] = 'piiramatu';
 $labels['quicksearch'] = 'Kiirotsing';
 $labels['resetsearch'] = 'Lähtesta otsing';
+$labels['openinextwin'] = 'Ava uues aknas';
 $labels['compose'] = 'Koosta kiri';
-$labels['sendmessage'] = 'Saada kiri kohe';
 $labels['savemessage'] = 'Salvesta see mustand';
+$labels['sendmessage'] = 'Saada kiri kohe';
 $labels['addattachment'] = 'Lisa fail';
 $labels['charset'] = 'Märgistik';
 $labels['editortype'] = 'Redaktori tüüp';
@@ -119,11 +152,19 @@ $labels['high'] = 'Kõrge';
 $labels['highest'] = 'Kõrgeim';
 $labels['nosubject'] = '(teema puudub)';
 $labels['showimages'] = 'Näita pilte';
+$labels['alwaysshow'] = 'Alati näita $sender saadetud pilte';
 $labels['htmltoggle'] = 'HTML';
 $labels['plaintoggle'] = 'Lihttekst';
+$labels['savesentmessagein'] = 'Salvesta saadetud kirjad kausta';
+$labels['dontsave'] = 'ära salvesta';
+$labels['maxuploadsize'] = 'Faili maksimaalne lubatud suurus on $size';
 $labels['addcc'] = 'Lisa koopia';
 $labels['addbcc'] = 'Lisa pimekoopia';
 $labels['addreplyto'] = 'Lisa vastus aadressile';
+$labels['mdnrequest'] = 'Selle kirja saatja soovib saada kinnitust kirja lugemise kohta. Soovid kinnituse saata ?';
+$labels['receiptread'] = 'Kättesaamiskinnitus (leotud)';
+$labels['yourmessage'] = 'See on sinu saadetud kirja kättesaamiskinnitus';
+$labels['receiptnote'] = 'Märkus: Kättesaamiskinnituse saamine tähendab ainult seda, et saaja on kirja avanud. Pole mingit garantiid, et ta kirja tegelikult luges ja selle sisust aru sai.';
 $labels['name'] = 'Näidatav nimi';
 $labels['firstname'] = 'Eesnimi';
 $labels['surname'] = 'Perekonnanimi';
@@ -140,12 +181,19 @@ $labels['composeto'] = 'Kirjuta kiri';
 $labels['contactsfromto'] = 'Kirjed $from kuni $to, kokku $count';
 $labels['print'] = 'Trüki';
 $labels['export'] = 'Ekspordi';
+$labels['exportvcards'] = 'Ekspordi kontaktid vCardi formaadis';
 $labels['previouspage'] = 'Näita eelmist lehte';
 $labels['firstpage'] = 'Näita esimest komplekti';
 $labels['nextpage'] = 'Näita järgmist lehte';
 $labels['lastpage'] = 'Näita viimast komplekti';
 $labels['groups'] = 'Grupid';
 $labels['personaladrbook'] = 'Isiklikud aadressid';
+$labels['import'] = 'Impordi';
+$labels['importcontacts'] = 'Impordi kontakte';
+$labels['importfromfile'] = 'Impordi failist:';
+$labels['importreplace'] = 'Asenda kogu aadressiraamat';
+$labels['importtext'] = 'Sa saad sisestada kontakte olemasolevast aadressiraamatust. Praegu on toetatud <a href="http://en.wikipedia.org/wiki/VCard">vCard</a> formaat.';
+$labels['done'] = 'Valmis';
 $labels['settingsfor'] = 'Kasutajaeelistused kontole';
 $labels['preferences'] = 'Eelistused';
 $labels['userpreferences'] = 'Kasutaja eelistused';
@@ -156,6 +204,7 @@ $labels['newidentity'] = 'Uus identiteet';
 $labels['newitem'] = 'Uus sissekanne';
 $labels['edititem'] = 'Muuda sissekannet';
 $labels['setdefault'] = 'Muuda vaikeseadeks';
+$labels['autodetect'] = 'Automaatne';
 $labels['language'] = 'Keel';
 $labels['timezone'] = 'Ajatsoon';
 $labels['pagesize'] = 'Ridu lehe kohta';
@@ -164,21 +213,55 @@ $labels['dstactive'] = 'Suveaeg';
 $labels['htmleditor'] = 'Kasuta HTML redaktorit';
 $labels['htmlsignature'] = 'HTML allkiri';
 $labels['previewpane'] = 'Näita eelvaate akent';
+$labels['skin'] = 'Kliendi välimus';
+$labels['logoutclear'] = 'Tühjenda väljumisel prügikast';
+$labels['logoutcompact'] = 'Tihenda väljumisel sissetulevate kaust';
+$labels['uisettings'] = 'Kasutajaliides';
+$labels['serversettings'] = 'Serveri seaded';
+$labels['mailboxview'] = 'Postkasti vaade';
+$labels['mdnrequests'] = 'Kättesaamis kinnitus';
+$labels['askuser'] = 'küsi kasutajalt';
+$labels['autosend'] = 'saada automaatselt';
+$labels['ignore'] = 'ignoreeri';
+$labels['readwhendeleted'] = 'Märgi kiri kustutamisel loetuks';
+$labels['flagfordeletion'] = 'Kustutamise asemel märgi kiri kustutatavaks';
+$labels['skipdeleted'] = 'Ära näita kustutatud kirju';
+$labels['showremoteimages'] = 'Näita kirjas kaugelt kaasatud pilte';
+$labels['fromknownsenders'] = 'tuntud saatjatelt';
+$labels['always'] = 'alati';
+$labels['showinlineimages'] = 'Näita manustatud pilte kirja all';
 $labels['autosavedraft'] = 'Salvesta mustandid automaatselt';
 $labels['everynminutes'] = 'iga $n minuti tagant';
+$labels['keepaliveevery'] = 'iga $n minuti tagant';
+$labels['keepalive'] = 'Kontrolli uusi kirju';
 $labels['never'] = 'mitte kunagi';
+$labels['messagesdisplaying'] = 'Kirjade näitamine';
+$labels['messagescomposition'] = 'Kirja koostamine ';
+$labels['mimeparamfolding'] = 'Manuste nimed';
+$labels['2231folding'] = 'Täielik RFC 2231 (Thunderbird)';
+$labels['miscfolding'] = 'RFC 2047/2231 (MS Outlook)';
+$labels['2047folding'] = 'Täielik RFC 2047 (muu)';
+$labels['advancedoptions'] = 'Lisaseadistused';
+$labels['focusonnewmessage'] = 'Fokusseeri brauseri aken uue kirja korral';
+$labels['checkallfolders'] = 'Kontrolli uusi kirju kõigist kaustadest';
 $labels['folder'] = 'Kaust';
 $labels['folders'] = 'Kaustad';
 $labels['foldername'] = 'Kausta nimi';
 $labels['subscribed'] = 'Näitan';
+$labels['messagecount'] = 'Kirju';
 $labels['create'] = 'Loo';
 $labels['createfolder'] = 'Uue kausta loomine';
 $labels['rename'] = 'Nimeta ümber';
 $labels['renamefolder'] = 'Nimeta olemasolev kaust ümber';
 $labels['deletefolder'] = 'Kustuta kaust';
 $labels['managefolders'] = 'Halda kaustu';
+$labels['specialfolders'] = 'Erilised kaustad';
 $labels['sortby'] = 'Järjesta';
 $labels['sortasc'] = 'Järjesta kasvavalt';
 $labels['sortdesc'] = 'Järjesta kahanevalt';
+$labels['B'] = 'B';
+$labels['KB'] = 'KB';
+$labels['MB'] = 'MB';
+$labels['GB'] = 'GB';
 
 ?>

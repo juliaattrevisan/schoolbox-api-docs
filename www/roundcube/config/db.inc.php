@@ -39,11 +39,15 @@ $rcmail_config['db_persistent'] = FALSE;
 
 
 // you can define specific table names used to store webmail data
+$rcmail_config['db_table_users'] = 'user';
+
 $rcmail_config['db_table_contacts'] = 'user';
 
 $rcmail_config['db_table_cache'] = 'cache';
 
 $rcmail_config['db_table_messages'] = 'messages';
+
+$rcmail_config['db_table_identities'] = 'identities';
 
 
 // you can define specific sequence names used in PostgreSQL

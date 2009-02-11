@@ -1,26 +1,34 @@
 <?php
-	$spellCheckerConfig = array();
 
-	// Spellchecker class use
-	// require_once("classes/TinyPspellShell.class.php"); // Command line pspell
-	require_once("classes/TinyGoogleSpell.class.php"); // Google web service
-	// require_once("classes/TinyPspell.class.php"); // Internal PHP version
+	/** start RoundCube specific code */
+	
+	define('INSTALL_PATH', preg_replace('/program[\\\\\/]js[\\\\\/].+$/', '', getcwd()));
+	require_once INSTALL_PATH . 'program/include/iniset.php';
+	
+	$rcmail_config = new rcube_config();
+	$config['general.engine'] = $rcmail_config->get('spellcheck_engine') == 'pspell' ? 'PSpell' : 'GoogleSpell';
+	$config['GoogleSpell.rpc_uri'] = $rcmail_config->get('spellcheck_uri');
+	
+	/** end RoundCube specific code */
 
 	// General settings
-	$spellCheckerConfig['enabled'] = true;
+	//$config['general.engine'] = 'GoogleSpell';
+	//$config['general.engine'] = 'PSpell';
+	//$config['general.engine'] = 'PSpellShell';
+	//$config['general.remote_rpc_url'] = 'http://some.other.site/some/url/rpc.php';
 
-	// Default settings
-	$spellCheckerConfig['default.language'] = 'en';
-	$spellCheckerConfig['default.mode'] = PSPELL_FAST;
+	// PSpell settings
+	$config['PSpell.mode'] = PSPELL_FAST;
+	$config['PSpell.spelling'] = "";
+	$config['PSpell.jargon'] = "";
+	$config['PSpell.encoding'] = "";
 
-	// Normaly not required to configure
-	$spellCheckerConfig['default.spelling'] = "";
-	$spellCheckerConfig['default.jargon'] = "";
-	$spellCheckerConfig['default.encoding'] = "";
-
-	// Pspell shell specific settings
-	$spellCheckerConfig['tinypspellshell.aspell'] = '/usr/bin/aspell';
-	$spellCheckerConfig['tinypspellshell.tmp'] = '/tmp';
+	// PSpellShell settings
+	$config['PSpellShell.mode'] = PSPELL_FAST;
+	$config['PSpellShell.aspell'] = '/usr/bin/aspell';
+	$config['PSpellShell.tmp'] = '/tmp';
 	
-	$spellCheckerConfig['googlespell.url'] = 'https://www.google.com/tbproxy/spell?hl=en'
+	// Windows PSpellShell settings
+	//$config['PSpellShell.aspell'] = '"c:\Program Files\Aspell\bin\aspell.exe"';
+	//$config['PSpellShell.tmp'] = 'c:/temp';
 ?>

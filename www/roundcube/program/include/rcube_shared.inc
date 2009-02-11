@@ -15,7 +15,7 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: rcube_shared.inc 839 2007-09-29 18:15:05Z thomasb $
+ $Id: rcube_shared.inc 2147 2008-12-11 17:29:50Z alec $
 
 */
 
@@ -28,177 +28,6 @@
 
 
 /**
- * Provide details about the client's browser
- *
- * @return array Key-value pairs of browser properties
- */
-function rcube_browser()
-{
-  $HTTP_USER_AGENT = $_SERVER['HTTP_USER_AGENT'];
-
-  $bw['ver'] = 0;
-  $bw['win'] = stristr($HTTP_USER_AGENT, 'win');
-  $bw['mac'] = stristr($HTTP_USER_AGENT, 'mac');
-  $bw['linux'] = stristr($HTTP_USER_AGENT, 'linux');
-  $bw['unix']  = stristr($HTTP_USER_AGENT, 'unix');
-
-  $bw['ns4'] = stristr($HTTP_USER_AGENT, 'mozilla/4') && !stristr($HTTP_USER_AGENT, 'msie');
-  $bw['ns']  = ($bw['ns4'] || stristr($HTTP_USER_AGENT, 'netscape'));
-  $bw['ie']  = stristr($HTTP_USER_AGENT, 'msie');
-  $bw['mz']  = stristr($HTTP_USER_AGENT, 'mozilla/5');
-  $bw['opera'] = stristr($HTTP_USER_AGENT, 'opera');
-  $bw['safari'] = stristr($HTTP_USER_AGENT, 'safari');
-
-  if($bw['ns'])
-  {
-    $test = eregi("mozilla\/([0-9\.]+)", $HTTP_USER_AGENT, $regs);
-    $bw['ver'] = $test ? (float)$regs[1] : 0;
-  }
-  if($bw['mz'])
-  {
-    $test = ereg("rv:([0-9\.]+)", $HTTP_USER_AGENT, $regs);
-    $bw['ver'] = $test ? (float)$regs[1] : 0;
-  }
-  if($bw['ie'])
-  {
-    $test = eregi("msie ([0-9\.]+)", $HTTP_USER_AGENT, $regs);
-    $bw['ver'] = $test ? (float)$regs[1] : 0;
-  }
-  if($bw['opera'])
-  {
-    $test = eregi("opera ([0-9\.]+)", $HTTP_USER_AGENT, $regs);
-    $bw['ver'] = $test ? (float)$regs[1] : 0;
-  }
-
-  if(eregi(" ([a-z]{2})-([a-z]{2})", $HTTP_USER_AGENT, $regs))
-    $bw['lang'] =  $regs[1];
-  else
-    $bw['lang'] =  'en';
-
-  $bw['dom'] = ($bw['mz'] || $bw['safari'] || ($bw['ie'] && $bw['ver']>=5) || ($bw['opera'] && $bw['ver']>=7));
-  $bw['pngalpha'] = $bw['mz'] || $bw['safari'] || ($bw['ie'] && $bw['ver']>=5.5) ||
-                    ($bw['ie'] && $bw['ver']>=5 && $bw['mac']) || ($bw['opera'] && $bw['ver']>=7) ? TRUE : FALSE;
-
-  return $bw;
-}
-
-
-/**
- * Get localized text in the desired language
- *
- * @param mixed Named parameters array or label name
- * @return string Localized text
- */
-function rcube_label($attrib)
-{
-  global $sess_user_lang, $INSTALL_PATH, $OUTPUT;
-  static $sa_text_data, $s_language, $utf8_decode;
-
-  // extract attributes
-  if (is_string($attrib))
-    $attrib = array('name' => $attrib);
-    
-  $nr = is_numeric($attrib['nr']) ? $attrib['nr'] : 1;
-  $vars = isset($attrib['vars']) ? $attrib['vars'] : '';
-
-  $command_name = !empty($attrib['command']) ? $attrib['command'] : NULL;
-  $alias = $attrib['name'] ? $attrib['name'] : ($command_name && $command_label_map[$command_name] ? $command_label_map[$command_name] : '');
-
-
-  // load localized texts
-  if (!$sa_text_data || $s_language != $sess_user_lang)
-    {
-    $sa_text_data = array();
-    
-    // get english labels (these should be complete)
-    @include($INSTALL_PATH.'program/localization/en_US/labels.inc');
-    @include($INSTALL_PATH.'program/localization/en_US/messages.inc');
-
-    if (is_array($labels))
-      $sa_text_data = $labels;
-    if (is_array($messages))
-      $sa_text_data = array_merge($sa_text_data, $messages);
-    
-    // include user language files
-    if ($sess_user_lang!='en' && is_dir($INSTALL_PATH.'program/localization/'.$sess_user_lang))
-    {
-      include_once($INSTALL_PATH.'program/localization/'.$sess_user_lang.'/labels.inc');
-      include_once($INSTALL_PATH.'program/localization/'.$sess_user_lang.'/messages.inc');
-
-      if (is_array($labels))
-        $sa_text_data = array_merge($sa_text_data, $labels);
-      if (is_array($messages))
-        $sa_text_data = array_merge($sa_text_data, $messages);
-    }
-      
-    $s_language = $sess_user_lang;
-  }
-
-  // text does not exist
-  if (!($text_item = $sa_text_data[$alias]))
-  {
-    /*
-    raise_error(array(
-      'code' => 500,
-      'type' => 'php',
-      'line' => __LINE__,
-      'file' => __FILE__,
-      'message' => "Missing localized text for '$alias' in '$sess_user_lang'"), TRUE, FALSE);
-    */
-    return "[$alias]";
-  }
-
-  // make text item array 
-  $a_text_item = is_array($text_item) ? $text_item : array('single' => $text_item);
-
-  // decide which text to use
-  if ($nr==1)
-    $text = $a_text_item['single'];
-  else if ($nr>0)
-    $text = $a_text_item['multiple'];
-  else if ($nr==0)
-  {
-    if ($a_text_item['none'])
-      $text = $a_text_item['none'];
-    else if ($a_text_item['single'])
-      $text = $a_text_item['single'];
-    else if ($a_text_item['multiple'])
-      $text = $a_text_item['multiple'];
-  }
-
-  // default text is single
-  if ($text=='')
-    $text = $a_text_item['single'];
-
-  // replace vars in text
-  if (is_array($attrib['vars']))
-  {
-    foreach ($attrib['vars'] as $var_key=>$var_value)
-      $a_replace_vars[substr($var_key, 0, 1)=='$' ? substr($var_key, 1) : $var_key] = $var_value;
-  }
-
-  if ($a_replace_vars)
-    $text = preg_replace('/\${?([_a-z]{1}[_a-z0-9]*)}?/ei', '$a_replace_vars["\1"]', $text);
-
-  // remove variables in text which were not available in arg $vars and $nr
-  eval("\$text = <<<EOF
-$text
-EOF;
-");
-
-  // format output
-  if (($attrib['uppercase'] && strtolower($attrib['uppercase']=='first')) || $attrib['ucfirst'])
-    return ucfirst($text);
-  else if ($attrib['uppercase'])
-    return strtoupper($text);
-  else if ($attrib['lowercase'])
-    return strtolower($text);
-
-  return $text;
-}
-
-
-/**
  * Send HTTP headers to prevent caching this page
  */
 function send_nocacheing_headers()
@@ -208,8 +37,14 @@ function send_nocacheing_headers()
 
   header("Expires: ".gmdate("D, d M Y H:i:s")." GMT");
   header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");
-  header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
+  header("Cache-Control: private, must-revalidate, post-check=0, pre-check=0");
   header("Pragma: no-cache");
+  
+  // We need to set the following headers to make downloads work using IE in HTTPS mode.
+  if (isset($_SERVER['HTTPS'])) {
+    header('Pragma: ');
+    header('Cache-Control: ');
+  }
 }
 
 
@@ -236,18 +71,22 @@ function send_future_expire_header($offset=2600000)
  * @param int Modified date as unix timestamp
  * @param string Etag value for caching
  */
-function send_modified_header($mdate, $etag=null)
+function send_modified_header($mdate, $etag=null, $skip_check=false)
 {
   if (headers_sent())
     return;
     
   $iscached = false;
-  if ($_SERVER['HTTP_IF_MODIFIED_SINCE'] && strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $mdate)
-    $iscached = true;
-  
   $etag = $etag ? "\"$etag\"" : null;
-  if ($etag && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag)
-    $iscached = true;
+
+  if (!$skip_check)
+  {
+    if ($_SERVER['HTTP_IF_MODIFIED_SINCE'] && strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $mdate)
+      $iscached = true;
+  
+    if ($etag)
+      $iscached = ($_SERVER['HTTP_IF_NONE_MATCH'] == $etag);
+  }
   
   if ($iscached)
     header("HTTP/1.x 304 Not Modified");
@@ -262,7 +101,35 @@ function send_modified_header($mdate, $etag=null)
     header("Etag: $etag");
   
   if ($iscached)
+    {
+    ob_end_clean();
     exit;
+    }
+}
+
+
+/**
+ * Returns whether an $str is a reserved word for any of the version of Javascript or ECMAScript
+ * @param str String to check
+ * @return boolean True if $str is a reserver word, False if not
+ */
+function is_js_reserved_word($str)
+{
+  return in_array($str, array(
+    // ECMASript ver 4 reserved words
+    'as','break','case','catch','class','const','continue',
+    'default','delete','do','else','export','extends','false','finally','for','function',
+    'if','import','in','instanceof','is','namespace','new','null','package','private',
+    'public','return','super','switch','this','throw','true','try','typeof','use','var',
+    'void','while','with',
+    // ECMAScript ver 4 future reserved words
+    'abstract','debugger','enum','goto','implements','interface','native','protected',
+    'synchronized','throws','transient','volatile',
+    // special meaning in some contexts
+    'get','set',
+    // were reserved in ECMAScript ver 3
+    'boolean','byte','char','double','final','float','int','long','short','static'
+  ));
 }
 
 
@@ -303,7 +170,7 @@ function json_serialize($var)
       foreach ($var as $key => $value)
       {
         // enclose key with quotes if it is not variable-name conform
-        if (!ereg("^[_a-zA-Z]{1}[_a-zA-Z0-9]*$", $key) /* || is_js_reserved_word($key) */)
+        if (!ereg("^[_a-zA-Z]{1}[_a-zA-Z0-9]*$", $key) || is_js_reserved_word($key))
           $key = "'$key'";
 
         $pairs[] = sprintf("%s%s", $is_assoc ? "$key:" : '', json_serialize($value));
@@ -312,7 +179,7 @@ function json_serialize($var)
       return $brackets{0} . implode(',', $pairs) . $brackets{1};
     }
   }
-  else if (is_numeric($var) && strval(intval($var)) === strval($var))
+  else if (!is_string($var) && strval(intval($var)) === strval($var))
     return $var;
   else if (is_bool($var))
     return $var ? '1' : '0';
@@ -320,6 +187,7 @@ function json_serialize($var)
     return "'".JQ($var)."'";
 
 }
+
 
 /**
  * Function to convert an array to a javascript array
@@ -341,8 +209,9 @@ function array2js($arr, $type='')
  */
 function in_array_nocase($needle, $haystack)
 {
+  $needle = rc_strtolower($needle);
   foreach ($haystack as $value)
-    if (strtolower($needle)===strtolower($value))
+    if ($needle===rc_strtolower($value))
       return true;
   
   return false;
@@ -407,17 +276,17 @@ function show_bytes($bytes)
   if ($bytes > 1073741824)
   {
     $gb = $bytes/1073741824;
-    $str = sprintf($gb>=10 ? "%d GB" : "%.1f GB", $gb);
+    $str = sprintf($gb>=10 ? "%d " : "%.1f ", $gb) . rcube_label('GB');
   }
   else if ($bytes > 1048576)
   {
     $mb = $bytes/1048576;
-    $str = sprintf($mb>=10 ? "%d MB" : "%.1f MB", $mb);
+    $str = sprintf($mb>=10 ? "%d " : "%.1f ", $mb) . rcube_label('MB');
   }
   else if ($bytes > 1024)
-    $str = sprintf("%d KB",  round($bytes/1024));
+    $str = sprintf("%d ",  round($bytes/1024)) . rcube_label('KB');
   else
-    $str = sprintf('%d B', $bytes);
+    $str = sprintf('%d ', $bytes) . rcube_label('B');
 
   return $str;
 }
@@ -493,6 +362,17 @@ function rc_strtolower($str)
 }
 
 /**
+ * Wrapper function for strtoupper
+ */
+function rc_strtoupper($str)
+{
+  if (function_exists('mb_strtoupper'))
+    return mb_strtoupper($str);
+  else
+    return strtoupper($str);
+}
+
+/**
  * Wrapper function for substr
  */
 function rc_substr($str, $start, $len=null)
@@ -557,9 +437,9 @@ function rc_request_header($name)
  * @param string Input string
  * @param int    Max. length
  * @param string Replace removed chars with this
- * @return string Abbrevated string
+ * @return string Abbreviated string
  */
-function abbrevate_string($str, $maxlength, $place_holder='...')
+function abbreviate_string($str, $maxlength, $place_holder='...')
 {
   $length = rc_strlen($str);
   $first_part_length = floor($maxlength/2) - rc_strlen($place_holder);
@@ -652,27 +532,71 @@ function get_offset_time($offset_str, $factor=1)
 
 
 /**
- * Return the last occurence of a string in another string
+ * A method to guess the mime_type of an attachment.
  *
- * @param haystack string string in which to search
- * @param needle string string for which to search
- * @return index of needle within haystack, or false if not found
+ * @param string $path     Path to the file.
+ * @param string $failover Mime type supplied for failover.
+ *
+ * @return string
+ * @author Till Klampaeckel <till@php.net>
+ * @see    http://de2.php.net/manual/en/ref.fileinfo.php
+ * @see    http://de2.php.net/mime_content_type
  */
-function strrstr($haystack, $needle)
+function rc_mime_content_type($path, $failover = 'application/octet-stream')
 {
-  $pver = phpversion();
-  if ($pver[0] >= 5)
-      return strrpos($haystack, $needle);
-  else
-  {
-    $index = strpos(strrev($haystack), strrev($needle));
-    if($index === false)
-        return false;
+    $mime_type = null;
+    $mime_magic = rcmail::get_instance()->config->get('mime_magic');
+
+    if (!extension_loaded('fileinfo')) {
+        @dl('fileinfo.' . PHP_SHLIB_SUFFIX);
+    }
+
+    if (function_exists('finfo_open')) {
+        if ($finfo = finfo_open(FILEINFO_MIME, $mime_magic)) {
+            $mime_type = finfo_file($finfo, $path);
+            finfo_close($finfo);
+        }
+    }
+    if (!$mime_type && function_exists('mime_content_type')) {
+      $mime_type = mime_content_type($path); 
+    }
     
-    $index = strlen($haystack) - strlen($needle) - $index;
-    return $index;
-  }
+    if (!$mime_type) {
+        $mime_type = $failover;
+    }
+
+    return $mime_type;
 }
 
+
+/**
+ * A method to guess encoding of a string.
+ *
+ * @param string $string     	String.
+ * @param string $failover 	Default result for failover.
+ *
+ * @return string
+ */
+function rc_detect_encoding($string, $failover='')
+{
+    if (!function_exists('mb_detect_encoding')) {
+        return $failover;
+    }
+
+    // FIXME: the order is important, because sometimes 
+    // iso string is detected as euc-jp and etc.
+    $enc = array(
+      'UTF-8', 'SJIS', 'BIG5', 'GB2312',
+      'ISO-8859-1', 'ISO-8859-2', 'ISO-8859-3', 'ISO-8859-4',
+      'ISO-8859-5', 'ISO-8859-6', 'ISO-8859-7', 'ISO-8859-8', 'ISO-8859-9',
+      'ISO-8859-10', 'ISO-8859-13', 'ISO-8859-14', 'ISO-8859-15', 'ISO-8859-16',
+      'WINDOWS-1252', 'WINDOWS-1251', 'EUC-JP', 'EUC-TW', 'KOI8-R', 
+      'ISO-2022-KR', 'ISO-2022-JP'
+    );
+
+    $result = mb_detect_encoding($string, join(',', $enc));
+
+    return $result ? $result : $failover;
+}
 
 ?>

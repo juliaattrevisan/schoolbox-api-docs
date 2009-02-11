@@ -1,21 +1,38 @@
 <?php
+/*
 
-require_once('../program/lib/html2text.inc');
+ +-----------------------------------------------------------------------+
+ | bin/html2text.php                                                     |
+ |                                                                       |
+ | This file is part of the RoundCube Webmail client                     |
+ | Copyright (C) 2005-2008, RoundCube Dev. - Switzerland                 |
+ | Licensed under the GNU GPL                                            |
+ |                                                                       |
+ | PURPOSE:                                                              |
+ |   Convert HTML message to plain text                                  |
+ |                                                                       |
+ +-----------------------------------------------------------------------+
+ | Author: Thomas Bruederli <roundcube@gmail.com>                        |
+ +-----------------------------------------------------------------------+
 
-$htmlText = $HTTP_RAW_POST_DATA;
-$converter = new html2text($htmlText);
+ $Id: html2text.php 2187 2008-12-24 14:19:27Z thomasb $
 
-header('Content-Type: text/plain; charset=UTF-8');
-$plaintext = $converter->get_text();
+*/
 
-$phpver = explode('.', phpversion());
-$vernum = $phpver[0] . $phpver[1] . $phpver[2];
+define('INSTALL_PATH', realpath(dirname(__FILE__) . '/..') . '/');
+require INSTALL_PATH . 'program/include/iniset.php';
 
-# html_entity_decode doesn't handle UTF character sets in PHP 4.x
+$RCMAIL = rcmail::get_instance();
 
-if (($vernum >= 500) && function_exists('html_entity_decode'))
-	print html_entity_decode($plaintext, ENT_COMPAT, 'UTF-8');
-else
-	print $plaintext;
+if (!empty($RCMAIL->user->ID)) {
+  $converter = new html2text($HTTP_RAW_POST_DATA);
+
+  header('Content-Type: text/plain; charset=UTF-8');
+  print trim($converter->get_text());
+}
+else {
+  header("HTTP/1.0 403 Forbidden");
+  echo "Requires a valid user session";
+}
 
 ?>

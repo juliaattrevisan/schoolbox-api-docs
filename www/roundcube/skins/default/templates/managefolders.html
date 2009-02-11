@@ -4,8 +4,9 @@
 <title><roundcube:object name="pagetitle" /></title>
 <roundcube:include file="/includes/links.html" />
 <link rel="stylesheet" type="text/css" href="/settings.css" />
+<script type="text/javascript" src="/functions.js"></script>
 </head>
-<body>
+<body onload="rcube_init_settings_tabs()">
 
 <roundcube:include file="/includes/taskbar.html" />
 <roundcube:include file="/includes/header.html" />
@@ -17,7 +18,7 @@
 <roundcube:object name="foldersubscription" form="subscriptionform" id="subscription-table"
   cellpadding="1" cellspacing="0" summary="Folder subscription table"
   deleteIcon="/images/icons/folder-trash.png"
-  renameIcon="/images/icons/edit.png" />
+  renameIcon="/images/icons/rename.png" />
 </div>
 
 <div id="bottomboxes">
@@ -26,16 +27,15 @@
 
 <div class="settingspart">
 <roundcube:label name="foldername" />:&nbsp;
-<roundcube:object name="createfolder" form="subscriptionform" />
+<roundcube:object name="createfolder" form="subscriptionform" hintbox="rcmailaddfolderhint" />
 <roundcube:button command="create-folder" type="input" class="button" label="create" />
+<div id="rcmailaddfolderhint" class="hint" style="margin-top:1em; height:16px"></div>
 </div>
 </div>
 
 </div>
 
 </form>
-
-<roundcube:include file="/includes/settingscripts.html" />
 
 </body>
 </html>

@@ -15,72 +15,70 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: edit_identity.inc 543 2007-04-28 18:07:12Z thomasb $
+ $Id: edit_identity.inc 2040 2008-11-05 10:19:44Z alec $
 
 */
 
-if (($_GET['_iid'] || $_POST['_iid']) && $_action=='edit-identity')
-  {
-  $DB->query("SELECT * FROM ".get_table_name('identities')."
-              WHERE  identity_id=?
-              AND    user_id=?
-              AND    del<>1",
-              get_input_value('_iid', RCUBE_INPUT_GPC),
-              $_SESSION['user_id']);
-  
-  $IDENTITY_RECORD = $DB->fetch_assoc();
+define('IDENTITIES_LEVEL', intval($RCMAIL->config->get('identities_level', 0)));
+
+// edit-identity
+if (($_GET['_iid'] || $_POST['_iid']) && $RCMAIL->action=='edit-identity') {
+  $IDENTITY_RECORD = $USER->get_identity(get_input_value('_iid', RCUBE_INPUT_GPC));
   
   if (is_array($IDENTITY_RECORD))
     $OUTPUT->set_env('iid', $IDENTITY_RECORD['identity_id']);
-
-  $OUTPUT->set_pagetitle(rcube_label('edititem'));
+  else {
+    $OUTPUT->show_message('opnotpermitted', 'error');
+    // go to identities page
+    rcmail_overwrite_action('identities');
+    return;
   }
-else
-  $OUTPUT->set_pagetitle(rcube_label('newitem'));
-
-
-$OUTPUT->include_script('list.js');
+}
+// add-identity
+else {
+  if (IDENTITIES_LEVEL > 1) {
+    $OUTPUT->show_message('opnotpermitted', 'error');
+    // go to identities page
+    rcmail_overwrite_action('identities');
+    return;
+  }
+  else if (IDENTITIES_LEVEL == 1)
+    $IDENTITY_RECORD['email'] = rcmail_get_email();
+}
 
 
 function rcube_identity_form($attrib)
   {
-  global $IDENTITY_RECORD, $OUTPUT;
+  global $IDENTITY_RECORD, $RCMAIL, $OUTPUT;
 
-  $OUTPUT->include_script('tiny_mce/tiny_mce_src.js');
-  $OUTPUT->add_script("tinyMCE.init({ mode : 'specific_textareas'," .
-                                    "apply_source_formatting : true," .
-                                    "content_css : '\$__skin_path' + '/editor_content.css'," .
-                                    "popups_css : '\$__skin_path' + '/editor_popups.css'," .
-                                    "editor_css : '\$__skin_path' + '/editor_ui.css'," .
-                                    "theme : 'advanced'," .
-                                    "theme_advanced_toolbar_location : 'top'," .
-                                    "theme_advanced_toolbar_align : 'left'," .
-                                    "theme_advanced_buttons1 : 'bold,italic,underline,strikethrough,justifyleft,justifycenter,justifyright,justifyfull,separator,outdent,indent,charmap,hr'," .
-                                    "theme_advanced_buttons2 : 'link,unlink,code,forecolor,fontselect,fontsizeselect'," .
-                                    "theme_advanced_buttons3 : '' });");
-
-  if (!$IDENTITY_RECORD && $GLOBALS['_action']!='add-identity')
-    return rcube_label('notfound');
+  rcube_html_editor('identity');
 
   // add some labels to client
-  rcube_add_label('noemailwarning', 'nonamewarning');
+  $OUTPUT->add_label('noemailwarning', 'nonamewarning', 'converting', 'editorwarning');
 
+  $i_size = !empty($attrib['size']) ? $attrib['size'] : 40;
+  $t_rows = !empty($attrib['textarearows']) ? $attrib['textarearows'] : 6;
+  $t_cols = !empty($attrib['textareacols']) ? $attrib['textareacols'] : 40;
 
   list($form_start, $form_end) = get_form_tags($attrib, 'save-identity', array('name' => '_iid', 'value' => $IDENTITY_RECORD['identity_id']));
   unset($attrib['form']);
 
-
   // list of available cols
-  $a_show_cols = array('name'         => array('type' => 'text'),
-                       'email'        => array('type' => 'text'),
-                       'organization' => array('type' => 'text'),
-                       'reply-to'     => array('type' => 'text', 'label' => 'replyto'),
-                       'bcc'          => array('type' => 'text'),
-                       'signature'	  => array('type' => 'textarea', 'size' => "40", 'rows' => "6"),
-                       'html_signature'=>array('type' => 'checkbox', 'label' => 'htmlsignature', 'onclick' => 'return rcmail.toggle_editor(this, \'_signature\');'),
+  $a_show_cols = array('name'         => array('type' => 'text', 'size' => $i_size),
+                       'email'        => array('type' => 'text', 'size' => $i_size),
+                       'organization' => array('type' => 'text', 'size' => $i_size),
+                       'reply-to'     => array('type' => 'text', 'label' => 'reply-to', 'size' => $i_size),
+                       'bcc'          => array('type' => 'text', 'size' => $i_size),
+                       'signature'	  => array('type' => 'textarea', 'size' => $t_cols, 'rows' => $t_rows),
+                       'html_signature'=>array('type' => 'checkbox', 'label' => 'htmlsignature', 'onclick' => 'return rcmail_toggle_editor(this.checked, \'rcmfd_signature\');'),
                        'standard'     => array('type' => 'checkbox', 'label' => 'setdefault'));
 
-
+  // disable some field according to access level
+  if (IDENTITIES_LEVEL == 1 || IDENTITIES_LEVEL == 3) {
+    $a_show_cols['email']['disabled'] = true;
+    $a_show_cols['email']['class'] = 'disabled';
+  }
+  
   // a specific part is requested
   if ($attrib['part'])
     {
@@ -101,31 +99,22 @@ function rcube_identity_form($attrib)
 
   foreach ($a_show_cols as $col => $colprop)
     {
-    $attrib['id'] = 'rcmfd_'.$col;
-
-    if (strlen($colprop['onclick']))
-      $attrib['onclick'] = $colprop['onclick'];
-    else
-      unset($attrib['onclick']);
+    $colprop['id'] = 'rcmfd_'.$col;
 
     if ($col == 'signature')
       {
-      $attrib['size'] = $colprop['size'];
-      $attrib['rows'] = $colprop['rows'];
-      $attrib['mce_editable'] = $IDENTITY_RECORD['html_signature'] ? "true" : "false";
-      }
-    else
-      {
-      unset($attrib['size']);
-      unset($attrib['rows']);
-      unset($attrib['mce_editable']);
+      $colprop['spellcheck'] = true;
+      if ($IDENTITY_RECORD['html_signature'])
+        {
+        $colprop['class'] = 'mce_editor';
+        }
       }
 
     $label = strlen($colprop['label']) ? $colprop['label'] : $col;
-    $value = rcmail_get_edit_field($col, $IDENTITY_RECORD[$col], $attrib, $colprop['type']);
+    $value = rcmail_get_edit_field($col, $IDENTITY_RECORD[$col], $colprop, $colprop['type']);
 
     $out .= sprintf("<tr><td class=\"title\"><label for=\"%s\">%s</label></td><td>%s</td></tr>\n",
-                    $attrib['id'],
+                    $colprop['id'],
                     Q(rcube_label($label)),
                     $value);
     }
@@ -135,10 +124,15 @@ function rcube_identity_form($attrib)
   return $out;  
   }
 
+$OUTPUT->include_script('list.js');
 $OUTPUT->add_handler('identityform', 'rcube_identity_form');
+$OUTPUT->set_env('identities_level', IDENTITIES_LEVEL);
 
-if ($_action=='add-identity' && template_exists('addidentity'))
-  parse_template('addidentity');
+$OUTPUT->set_pagetitle(rcube_label(($RCMAIL->action=='add-identity' ? 'newidentity' : 'edititem')));
 
-parse_template('editidentity');
+if ($RCMAIL->action=='add-identity' && $OUTPUT->template_exists('addidentity'))
+  $OUTPUT->send('addidentity');
+
+$OUTPUT->send('editidentity');
+
 ?>

@@ -6,12 +6,12 @@
   position: absolute;
   top: 50px;
   left: 220px;
-  right: 60px;
+  right: 20px;
   height: 22px;
   border-bottom: 1px solid #999999;
   white-space: nowrap;
   /* css hack for IE */
-  width: expression((parseInt(document.documentElement.clientWidth)-280)+'px');
+  width: expression((parseInt(document.documentElement.clientWidth)-240)+'px');
 }
 
 span.tablink,
@@ -49,14 +49,32 @@ span.tablink-selected a
   position: absolute;
   top: 95px;
   left: 20px;
-  width: 600px;
-  border: 1px solid #999999;  
+  bottom: 60px;
+  right: 20px;
+  overflow: auto;
+  border: 1px solid #999999;
+  /* css hack for IE */
+  height: expression((parseInt(document.documentElement.clientHeight)-155)+'px');
+  width: expression((parseInt(document.documentElement.clientWidth)-40)+'px');
 }
 
 #userprefs-box table td.title
 {
   color: #666666;
   padding-right: 10px;
+  white-space: nowrap;
+}
+
+#userprefs-box table tr.advanced
+{
+  display: none;
+}
+
+.userprefs-block
+{
+  float: left;
+  margin-right: 14px;
+  width: 520px;
 }
 
 #identities-list,
@@ -65,15 +83,17 @@ span.tablink-selected a
   position: absolute;
   top: 95px;
   left: 20px;
+  overflow: auto;
 }
 
 #folder-manager
 {
-  width: 500px;
-  bottom: 120px;
+  width: 600px;
+  bottom: 140px;
   overflow: auto;
   border: 1px solid #999999;
-  height: expression((parseInt(document.documentElement.clientHeight)-215)+'px');
+  /* css hack for IE */
+  height: expression((parseInt(document.documentElement.clientHeight)-235)+'px');
 }
 
 #folder-manager.droptarget
@@ -82,16 +102,44 @@ span.tablink-selected a
   background-color: #FFFFA6;
 }
 
+#identities-list
+{
+  bottom: 60px;
+  width: 420px;
+  border: 1px solid #999999;
+  /* css hack for IE */
+  height: expression((parseInt(document.documentElement.clientHeight)-155)+'px');
+}
+
+#listbuttons
+{
+  position: absolute;
+  left: 20px;
+  bottom: 18px;
+}
+
 #identities-table
 {
-  width: 600px;
-  border: 1px solid #999999;
+  width: 420px;
+  table-layout: fixed;
   background-color: #F9F9F9;
 }
 
 #identities-table tbody td
 {
-  cursor: pointer;
+  cursor: default;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#identities-table thead td.name
+{
+  width: 55%;
+}
+
+#identities-table thead td.email
+{
+  width: 45%;
 }
 
 #identity-frame
@@ -103,9 +151,16 @@ span.tablink-selected a
 
 #identity-details
 {
-  margin-top: 30px;
-  width: 500px;
+  position: absolute;
+  top: 95px;
+  left: 450px;
+  right: 20px;
+  bottom: 60px;
   border: 1px solid #999999;
+  overflow: auto;
+  /* css hack for IE */
+  width: expression((parseInt(document.documentElement.clientWidth)-470)+'px');
+  height: expression((parseInt(document.documentElement.clientHeight)-155)+'px');
 }
 
 #identity-details table td.title
@@ -116,11 +171,16 @@ span.tablink-selected a
   padding-right: 10px;
 }
 
+input.disabled
+{
+  color: #999999;
+}
+
 #bottomboxes
 {
   position: absolute;
-  width: 500px;
-  height: 100px;
+  width: 600px;
+  height: 120px;
   left: 20px;
   bottom: 20px;
 }
@@ -142,9 +202,8 @@ div.boxtitle,
 
 div.settingsbox
 {
-  width: 500px;
+  width: 600px;
   margin-top: 20px;
-  margin-bottom: 20px;
   border: 1px solid #999999;
 }
 
@@ -157,17 +216,24 @@ div.settingspart
 #subscription-table
 {
   width: 100%;
-  table-layout: fixed;
+  /* css hack for IE */ 
+  width: expression('auto');
 }
 
 #subscription-table tbody td
 {
+  height: 20px;
   padding-left: 6px;
-  padding-right: 20px;
+  padding-right: 10px;
   white-space: nowrap;
   border-bottom: 1px solid #EBEBEB;
   background-color: #F9F9F9;
-  cursor: pointer;
+  cursor: default;
+}
+
+#subscription-table tr.virtual td
+{
+  color: #666;
 }
 
 #subscription-table tr.selected td,
@@ -183,12 +249,39 @@ div.settingspart
   background-color: #FFFFA6;
 }
 
-#subscription-table td.name
+#subscription-table thead td.name
 {
-  width: 280px;
+  width: 250px;
 }
 
-#subscription-table td.subscribed
+#subscription-table thead td.msgcount
 {
-  width: 80px;
+  width: 90px;
+}
+
+#subscription-table thead td.subscribed
+{
+  width: 90px;
+}
+
+fieldset 
+{
+  margin-bottom: 0.5em;
+  border: 1px solid #999999;
+  padding: 4px 8px 9px 8px; 
+}
+
+legend
+{
+  color: #999999;
+}
+
+div.advswitch
+{
+  white-space: nowrap;
+  text-align: right;
+  position: absolute;
+  bottom: 35px;
+  right: 20px;
+  width: 460px;
 }

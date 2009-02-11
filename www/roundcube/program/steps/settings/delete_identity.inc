@@ -15,32 +15,25 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: delete_identity.inc 543 2007-04-28 18:07:12Z thomasb $
+ $Id: delete_identity.inc 2008 2008-10-24 08:30:52Z alec $
 
 */
 
 if (($ids = get_input_value('_iid', RCUBE_INPUT_GET)) && preg_match('/^[0-9]+(,[0-9]+)*$/', $ids))
 {
-  $DB->query(
-    "UPDATE ".get_table_name('identities')."
-     SET    del=1
-     WHERE  user_id=?
-     AND    identity_id IN (".$ids.")",
-    $_SESSION['user_id']);
-
-  $count = $DB->affected_rows();
-  if ($count)
+  if ($USER->delete_identity($ids)) {
     $OUTPUT->show_message('deletedsuccessfully', 'confirmation');
-
+  }
+  else {
+    $OUTPUT->show_message('nodeletelastidentity', 'error');
+  }
   // send response
   if ($OUTPUT->ajax_call)
     $OUTPUT->send();
 }
 
-
 if ($OUTPUT->ajax_call)
   exit;
-
 
 // go to identities page
 rcmail_overwrite_action('identities');

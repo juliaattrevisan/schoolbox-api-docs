@@ -15,7 +15,7 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: edit.inc 543 2007-04-28 18:07:12Z thomasb $
+ $Id: edit.inc 1939 2008-10-05 07:18:15Z alec $
 
 */
 
@@ -33,18 +33,17 @@ if ($CONTACTS->readonly)
 
 function rcmail_contact_editform($attrib)
 {
-  global $CONTACTS, $OUTPUT;
+  global $RCMAIL, $CONTACTS, $OUTPUT;
 
   // check if we have a valid result
-  if ($GLOBALS['_action'] != 'add' && !(($result = $CONTACTS->get_result()) && ($record = $result->first())))
+  if ($RCMAIL->action != 'add' && !(($result = $CONTACTS->get_result()) && ($record = $result->first())))
   {
     $OUTPUT->show_message('contactnotfound');
     return false;
   }
 
   // add some labels to client
-  rcube_add_label('noemailwarning');
-  rcube_add_label('nonamewarning');
+  $OUTPUT->add_label('noemailwarning', 'nonamewarning');
 
   list($form_start, $form_end) = get_form_tags($attrib);
   unset($attrib['form']);
@@ -83,20 +82,21 @@ $OUTPUT->add_handler('contacteditform', 'rcmail_contact_editform');
 // similar function as in /steps/settings/edit_identity.inc
 function get_form_tags($attrib)
   {
-  global $CONTACTS, $OUTPUT, $EDIT_FORM, $SESS_HIDDEN_FIELD;  
+  global $CONTACTS, $EDIT_FORM, $RCMAIL;
 
   $result = $CONTACTS->get_result();
   $form_start = '';
   if (!strlen($EDIT_FORM))
     {
-    $hiddenfields = new hiddenfield(array('name' => '_task', 'value' => $GLOBALS['_task']));
-    $hiddenfields->add(array('name' => '_action', 'value' => 'save', 'source' => get_input_value('_source', RCUBE_INPUT_GPC)));
+    $hiddenfields = new html_hiddenfield(array('name' => '_task', 'value' => $RCMAIL->task));
+    $hiddenfields->add(array('name' => '_action', 'value' => 'save'));
+    $hiddenfields->add(array('name' => '_source', 'value' => get_input_value('_source', RCUBE_INPUT_GPC)));
+    $hiddenfields->add(array('name' => '_framed', 'value' => (empty($_REQUEST['_framed']) ? 0 : 1)));
     
     if (($result = $CONTACTS->get_result()) && ($record = $result->first()))
       $hiddenfields->add(array('name' => '_cid', 'value' => $record['ID']));
     
-    $form_start = !strlen($attrib['form']) ? '<form name="form" action="./" method="post">' : '';
-    $form_start .= "\n$SESS_HIDDEN_FIELD\n";
+    $form_start = !strlen($attrib['form']) ? $RCMAIL->output->form_tag(array('name' => "form", 'method' => "post")) : '';
     $form_start .= $hiddenfields->show();
     }
     
@@ -104,18 +104,18 @@ function get_form_tags($attrib)
   $form_name = strlen($attrib['form']) ? $attrib['form'] : 'form';
   
   if (!strlen($EDIT_FORM))
-    $OUTPUT->add_gui_object('editform', $form_name);
+    $RCMAIL->output->add_gui_object('editform', $form_name);
   
   $EDIT_FORM = $form_name;
 
-  return array($form_start, $form_end);  
+  return array($form_start, $form_end); 
   }
 
 
 
-if (!$CONTACTS->get_result() && template_exists('addcontact'))
-  parse_template('addcontact');
+if (!$CONTACTS->get_result() && $OUTPUT->template_exists('addcontact'))
+  $OUTPUT->send('addcontact');
 
 // this will be executed if no template for addcontact exists
-parse_template('editcontact');
+$OUTPUT->send('editcontact');
 ?>

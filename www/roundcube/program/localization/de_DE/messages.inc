@@ -2,23 +2,23 @@
 
 /*
 
- +-----------------------------------------------------------------------+
- | language/de_DE/messages.inc                                           |
- |                                                                       |
- | Language file of the RoundCube Webmail client                         |
- | Copyright (C) 2005-2007, RoundCube Dev. - Switzerland                 |
- | Licensed under the GNU GPL                                            |
- |                                                                       |
- +-----------------------------------------------------------------------+
- | Author: Stephan Diehl <info@sd-edv.de>                                |
- +-----------------------------------------------------------------------+
++-----------------------------------------------------------------------+
+| language/de_DE/messages.inc                                           |
+|                                                                       |
+| Language file of the RoundCube Webmail client                         |
+| Copyright (C) 2005-2008, RoundCube Dev. - Switzerland                 |
+| Licensed under the GNU GPL                                            |
+|                                                                       |
++-----------------------------------------------------------------------+
+| Author: Marcel Schlesinger <info@marcel-schlesinger.de>               |
++-----------------------------------------------------------------------+
 
- @version $Id: messages.inc 842 2007-10-01 13:55:02Z tomekp $
+@version $Id: messages.inc 2063 2008-11-17 18:52:43Z alec $
 
 */
 
 $messages = array();
-$messages['loginfailed'] = 'Anmelden fehlgeschlagen';
+$messages['loginfailed'] = 'Anmeldung fehlgeschlagen';
 $messages['cookiesdisabled'] = 'Ihr Browser akzeptiert keine Cookies';
 $messages['sessionerror'] = 'Ihre Session ist ungültig oder abgelaufen';
 $messages['imaperror'] = 'Keine Verbindung zum IMAP-Server';
@@ -40,6 +40,8 @@ $messages['encryptedmessage'] = 'Dies ist eine verschlüsselte Nachricht und kan
 $messages['nocontactsfound'] = 'Keine Kontakte gefunden';
 $messages['contactnotfound'] = 'Der angeforderte Kontakt wurde nicht gefunden';
 $messages['sendingfailed'] = 'Versenden der Nachricht fehlgeschlagen';
+$messages['senttooquickly'] = 'Bitte warten Sie $sec Sekunde(n) vor dem Senden dieser Nachricht';
+$messages['errorsavingsent'] = 'Ein Fehler ist beim Speichern der gesendeten Nachricht aufgetreten';
 $messages['errorsaving'] = 'Beim Speichern ist ein Fehler aufgetreten';
 $messages['errormoving'] = 'Nachricht konnte nicht verschoben werden';
 $messages['errordeleting'] = 'Nachricht konnte nicht gelöscht werden';
@@ -47,10 +49,15 @@ $messages['deletecontactconfirm'] = 'Wollen Sie die ausgewählten Kontakte wirkl
 $messages['deletemessagesconfirm'] = 'Wollen Sie die ausgewählten Nachrichten wirklich löschen?';
 $messages['deletefolderconfirm'] = 'Wollen Sie diesen Ordner wirklich löschen?';
 $messages['purgefolderconfirm'] = 'Wollen Sie diesen Ordner wirklich leeren?';
+$messages['foldercreating'] = 'Erstelle Ordner...';
+$messages['folderdeleting'] = 'Lösche Ordner...';
+$messages['folderrenaming'] = 'Nenne Ordner um...';
+$messages['foldermoving'] = 'Verschiebe Ordner...';
 $messages['formincomplete'] = 'Das Formular wurde nicht vollständig ausgefüllt';
 $messages['noemailwarning'] = 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
 $messages['nonamewarning'] = 'Bitte geben Sie einen Namen ein';
 $messages['nopagesizewarning'] = 'Bitte geben Sie die Einträge pro Seite an';
+$messages['nosenderwarning'] = 'Bitte geben Sie die E-Mail-Adresse des Senders an';
 $messages['norecipientwarning'] = 'Bitte geben Sie mindestens einen Empfänger an';
 $messages['nosubjectwarning'] = 'Die Betreffzeile ist leer. Möchten Sie jetzt einen Betreff eingeben?';
 $messages['nobodywarning'] = 'Diese Nachricht ohne Inhalt senden?';
@@ -59,13 +66,13 @@ $messages['noldapserver'] = 'Bitte wählen Sie einen LDAP-Server aus';
 $messages['nocontactsreturned'] = 'Es wurden keine Kontakte gefunden';
 $messages['nosearchname'] = 'Bitte geben Sie einen Namen oder eine E-Mail-Adresse ein';
 $messages['searchsuccessful'] = '$nr Nachrichten gefunden';
-$messages['searchnomatch'] = 'Keine Treffer';
+$messages['searchnomatch'] = 'Die Suche lieferte keine Treffer';
 $messages['searching'] = 'Suche...';
 $messages['checking'] = 'Prüfe...';
 $messages['nospellerrors'] = 'Keine Rechtschreibfehler gefunden';
 $messages['folderdeleted'] = 'Ordner erfolgreich gelöscht';
 $messages['deletedsuccessfully'] = 'Erfolgreich gelöscht';
-$messages['converting'] = 'Entferne Formatierung der Nachricht...';
+$messages['converting'] = 'Entferne Formatierungen der Nachricht...';
 $messages['messageopenerror'] = 'Die Nachricht konnte nicht vom Server geladen werden';
 $messages['fileuploaderror'] = 'Hochladen der Datei fehlgeschlagen';
 $messages['filesizeerror'] = 'Die hochzuladende Datei überschreitet die Maximalgröße von $size';
@@ -74,5 +81,18 @@ $messages['copyerror'] = 'Die Adressen konnten nicht kopiert werden';
 $messages['sourceisreadonly'] = 'Das Adressverzeichnis kann nicht verändert werden';
 $messages['errorsavingcontact'] = 'Die Änderungen konnten nicht gespeichert werden';
 $messages['movingmessage'] = 'Die E-Mail wird verschoben...';
+$messages['receiptsent'] = 'Lesebestätigung erfolgreich gesendet';
+$messages['errorsendingreceipt'] = 'Bestätigung konnte nicht gesendet werden';
+$messages['nodeletelastidentity'] = 'Diese Identität kann nicht gelöscht werden, da dies die letzte ist.';
+$messages['addsubfolderhint'] = 'Wird als Unterordner des aktuell selektieren Ordners erstellt';
+$messages['forbiddencharacter'] = 'Der Ordnername enthält ein ungültiges Zeichen';
+$messages['selectimportfile'] = 'Bitte wählen Sie eine Datei zum Importieren aus';
+$messages['addresswriterror'] = 'Das ausgewählte Adressbuch kann nicht verändert werden';
+$messages['importwait'] = 'Daten werden importiert, bitte warten...';
+$messages['importerror'] = 'Import fehlgeschlagen! Die hochgeladene Datei ist nicht im vCard-Format.';
+$messages['importconfirm'] = '<b>Es wurden $inserted Adressen erfolgreich importiert und $skipped bestehende Einträge übersprungen</b>:<p><em>$names</em></p>';
+$messages['opnotpermitted'] = 'Operation nicht erlaubt!';
+$messages['nofromaddress'] = 'Fehlende E-Mail-Adresse in ausgewählter Identität';
+$messages['editorwarning'] = 'Beim Wechseln in den Texteditor gehen alle Textformatierungen verloren. Möchten Sie fortfahren?';
 
 ?>

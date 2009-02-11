@@ -15,13 +15,13 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: folders.inc 850 2007-10-03 00:13:32Z ihug $
+ $Id: folders.inc 1570 2008-06-24 13:04:57Z alec $
 */
 
 $mbox_name = $IMAP->get_mailbox_name();
 
 // send EXPUNGE command
-if ($_action=='expunge' && ($mbox = get_input_value('_mbox', RCUBE_INPUT_POST)))
+if ($RCMAIL->action=='expunge' && ($mbox = get_input_value('_mbox', RCUBE_INPUT_POST)))
 {
   $success = $IMAP->expunge($mbox);
 
@@ -29,7 +29,7 @@ if ($_action=='expunge' && ($mbox = get_input_value('_mbox', RCUBE_INPUT_POST)))
   if ($success && !empty($_REQUEST['_reload']))
   {
     $OUTPUT->command('message_list.clear');
-    $_action = 'list';
+    $RCMAIL->action = 'list';
     return;
   }
   else
@@ -37,20 +37,29 @@ if ($_action=='expunge' && ($mbox = get_input_value('_mbox', RCUBE_INPUT_POST)))
 }
 
 // clear mailbox
-else if ($_action=='purge' && ($mbox = get_input_value('_mbox', RCUBE_INPUT_POST)))
+else if ($RCMAIL->action=='purge' && ($mbox = get_input_value('_mbox', RCUBE_INPUT_POST)))
 {
-  $success = $IMAP->clear_mailbox($mbox);
-  
-  if ($success && !empty($_REQUEST['_reload']))
+  $delimiter = $IMAP->get_hierarchy_delimiter();
+  $trash_regexp = '/^' . preg_quote($CONFIG['trash_mbox'] . $delimiter, '/') . '/';
+  $junk_regexp = '/^' . preg_quote($CONFIG['junk_mbox'] . $delimiter, '/') . '/';		      
+
+  // we should only be purging trash and junk (or their subfolders)
+  if ($mbox == $CONFIG['trash_mbox'] || $mbox == $CONFIG['junk_mbox']
+    || preg_match($trash_regexp, $mbox) || preg_match($junk_regexp, $mbox))
   {
-    $OUTPUT->set_env('messagecount', 0);
-    $OUTPUT->set_env('pagecount', 0);
-    $OUTPUT->command('message_list.clear');
-    $OUTPUT->command('set_rowcount', rcmail_get_messagecount_text());
-    $OUTPUT->command('set_unread_count', $mbox_name, 0);
+    $success = $IMAP->clear_mailbox($mbox);
+  
+    if ($success && !empty($_REQUEST['_reload']))
+    {
+      $OUTPUT->set_env('messagecount', 0);
+      $OUTPUT->set_env('pagecount', 0);
+      $OUTPUT->command('message_list.clear');
+      $OUTPUT->command('set_rowcount', rcmail_get_messagecount_text());
+      $OUTPUT->command('set_unread_count', $mbox_name, 0);
+    }
+    else
+      $commands = "// purged: $success";
   }
-  else
-    $commands = "// purged: $success";
 }
 
 $OUTPUT->send($commands);

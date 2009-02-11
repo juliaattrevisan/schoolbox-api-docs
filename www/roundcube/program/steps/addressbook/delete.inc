@@ -15,11 +15,14 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: delete.inc 573 2007-05-18 11:29:25Z thomasb $
+ $Id: delete.inc 1361 2008-05-07 22:16:00Z richs $
 
 */
 
-if (($cid = get_input_value('_cid', RCUBE_INPUT_POST)) && preg_match('/^[0-9]+(,[0-9]+)*$/', $cid))
+if (($cid = get_input_value('_cid', RCUBE_INPUT_POST)) &&
+    (preg_match('/^[0-9]+(,[0-9]+)*$/', $cid) ||
+     preg_match('/^[a-zA-Z0-9=]+(,[a-zA-Z0-9=]+)*$/', $cid))
+   )
   {
   $deleted = $CONTACTS->delete($cid);
   if (!$deleted)

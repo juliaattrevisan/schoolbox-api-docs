@@ -15,27 +15,18 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: func.inc 582 2007-05-18 14:38:11Z thomasb $
+ $Id: func.inc 1939 2008-10-05 07:18:15Z alec $
 
 */
 
-require_once('include/rcube_contacts.inc');
-require_once('include/rcube_ldap.inc');
-
 // instantiate a contacts object according to the given source
-if (($source = get_input_value('_source', RCUBE_INPUT_GPC)) && isset($CONFIG['ldap_public'][$source]))
-  $CONTACTS = new rcube_ldap($CONFIG['ldap_public'][$source]);
-else
-  $CONTACTS = new rcube_contacts($DB, $_SESSION['user_id']);
+$CONTACTS = $RCMAIL->get_address_book(($source = get_input_value('_source', RCUBE_INPUT_GPC)));
 
 $CONTACTS->set_pagesize($CONFIG['pagesize']);
 
 // set list properties and session vars
 if (!empty($_GET['_page']))
-  {
-  $CONTACTS->set_page(intval($_GET['_page']));
-  $_SESSION['page'] = $_GET['_page'];
-  }
+  $CONTACTS->set_page(($_SESSION['page'] = intval($_GET['_page'])));
 else
   $CONTACTS->set_page(isset($_SESSION['page']) ?$_SESSION['page'] : 1);
 
@@ -48,9 +39,15 @@ $OUTPUT->set_env('source', $source ? $source : '0');
 $OUTPUT->set_env('readonly', $CONTACTS->readonly, false);
 
 // add list of address sources to client env
-$js_list = array("0" => array('id' => 0, 'readonly' => false));
-foreach ((array)$CONFIG['ldap_public'] as $id => $prop)
-  $js_list[$id] = array('id' => $id, 'readonly' => !$prop['writeable']);
+$js_list = array();
+if (strtolower($CONFIG['address_book_type']) != 'ldap') {
+  // We are using the DB address book, add it.
+  $js_list = array("0" => array('id' => 0, 'readonly' => false));
+}
+if (is_array($CONFIG['ldap_public'])) {
+  foreach ($CONFIG['ldap_public'] as $id => $prop)
+    $js_list[$id] = array('id' => $id, 'readonly' => !$prop['writable']);
+}
 $OUTPUT->set_env('address_sources', $js_list);
 
 
@@ -61,55 +58,34 @@ function rcmail_directory_list($attrib)
   if (!$attrib['id'])
     $attrib['id'] = 'rcmdirectorylist';
 
+  $out = '';
   $local_id = '0';
   $current = get_input_value('_source', RCUBE_INPUT_GPC);
-  $line_templ = '<li id="%s" class="%s"><a href="%s"' .
-    ' onclick="return %s.command(\'list\',\'%s\',this)"' .
-    ' onmouseover="return %s.focus_folder(\'%s\')"' .
-    ' onmouseout="return %s.unfocus_folder(\'%s\')"' .
-    ' onmouseup="return %s.folder_mouse_up(\'%s\')">%s'.
-    "</a></li>\n";
+  $line_templ = html::tag('li', array('id' => 'rcmli%s', 'class' => '%s'),
+    html::a(array('href' => '%s', 'onclick' => "return ".JS_OBJECT_NAME.".command('list','%s',this)"), '%s'));
     
-  // allow the following attributes to be added to the <ul> tag
-  $out = '<ul' . create_attrib_string($attrib, array('style', 'class', 'id')) . ">\n";
-  $out .= sprintf($line_templ,
-    'rcmli'.$local_id,
-    !$current ? 'selected' : '',
-    Q(rcmail_url('list', array('_source' => 0))),
-    JS_OBJECT_NAME,
-    $local_id,
-    JS_OBJECT_NAME,
-    $local_id,
-    JS_OBJECT_NAME,
-    $local_id,
-    JS_OBJECT_NAME,
-    $local_id,
-    rcube_label('personaladrbook'));
+  if (strtolower($CONFIG['address_book_type']) != 'ldap') {
+    $out .= sprintf($line_templ, $local_id, (!$current ? 'selected' : ''),
+      Q(rcmail_url(null, array('_source' => $local_id))), $local_id, rcube_label('personaladrbook'));
+  } // end if
+  else {
+    // DB address book not used, see if a source is set, if not use the
+    // first LDAP directory.
+    if (!$current) {
+      $current = key((array)$CONFIG['ldap_public']);
+    } // end if
+  } // end else
   
-  foreach ((array)$CONFIG['ldap_public'] as $id => $prop)
-  {
+  foreach ((array)$CONFIG['ldap_public'] as $id => $prop) {
     $js_id = JQ($id);
     $dom_id = preg_replace('/[^a-z0-9\-_]/i', '', $id);
-    $out .= sprintf($line_templ,
-      'rcmli'.$dom_id,
-      $current == $id ? 'selected' : '',
-      Q(rcmail_url('list', array('_source' => $id))),
-      JS_OBJECT_NAME,
-      $js_id,
-      JS_OBJECT_NAME,
-      $js_id,
-      JS_OBJECT_NAME,
-      $js_id,
-      JS_OBJECT_NAME,
-      $js_id,
-      !empty($prop['name']) ? Q($prop['name']) : Q($id));
+    $out .= sprintf($line_templ, $dom_id, ($current == $id ? 'selected' : ''),
+      Q(rcmail_url(null, array('_source' => $id))), $js_id, (!empty($prop['name']) ? Q($prop['name']) : Q($id)));
   }
   
-  $out .= '</ul>';
-
   $OUTPUT->add_gui_object('folderlist', $attrib['id']);
   
-  return $out;
+  return html::tag('ul', $attrib, $out, html::$common_attrib);
 }
 
 
@@ -138,7 +114,7 @@ function rcmail_contacts_list($attrib)
   $OUTPUT->include_script('list.js');
   
   // add some labels to client
-  rcube_add_label('deletecontactconfirm');
+  $OUTPUT->add_label('deletecontactconfirm');
   
   return $out;
   }
@@ -160,7 +136,7 @@ function rcmail_js_contacts_list($result, $prefix='')
     
     // format each col
     foreach ($a_show_cols as $col)
-      $a_row_cols[$col] = $row[$col];
+      $a_row_cols[$col] = Q($row[$col]);
     
     $OUTPUT->command($prefix.'add_contact_row', $row['ID'], $a_row_cols);
     }
@@ -176,11 +152,11 @@ function rcmail_contact_frame($attrib)
     $attrib['id'] = 'rcmcontactframe';
     
   $attrib['name'] = $attrib['id'];
-  $attrib_str = create_attrib_string($attrib, array('name', 'id', 'class', 'style', 'src', 'width', 'height', 'frameborder'));
 
   $OUTPUT->set_env('contentframe', $attrib['name']);
   $OUTPUT->set_env('blankpage', $attrib['src'] ? $OUTPUT->abs_url($attrib['src']) : 'program/blank.gif');
-  return '<iframe'. $attrib_str . '></iframe>';
+
+  return html::iframe($attrib);
   }
 
 
@@ -193,13 +169,7 @@ function rcmail_rowcount_display($attrib)
 
   $OUTPUT->add_gui_object('countdisplay', $attrib['id']);
 
-  // allow the following attributes to be added to the <span> tag
-  $attrib_str = create_attrib_string($attrib, array('style', 'class', 'id'));
-
-  $out = '<span' . $attrib_str . '>';
-  $out .= rcmail_get_rowcount_text();
-  $out .= '</span>';
-  return $out;
+  return html::span($attrib, rcmail_get_rowcount_text());
   }
 
 
@@ -226,7 +196,9 @@ function rcmail_get_rowcount_text()
 
   return $out;
   }
-  
+
+
+$OUTPUT->set_pagetitle(rcube_label('addressbook'));
   
 // register UI objects
 $OUTPUT->add_handlers(array(
@@ -234,7 +206,7 @@ $OUTPUT->add_handlers(array(
   'addresslist' => 'rcmail_contacts_list',
   'addressframe' => 'rcmail_contact_frame',
   'recordscountdisplay' => 'rcmail_rowcount_display',
-  'searchform' => 'rcmail_search_form'
+  'searchform' => array($OUTPUT, 'search_form')
 ));
 
 ?>

@@ -15,7 +15,7 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: rcube_smtp.inc 805 2007-09-20 13:36:57Z robin $
+ $Id: rcube_smtp.inc 2155 2008-12-16 13:00:55Z alec $
 
 */
 
@@ -55,34 +55,35 @@ $SMTP_CONN = null;
  */
 function smtp_mail($from, $recipients, &$headers, &$body, &$response)
   {
-  global $SMTP_CONN, $CONFIG;
+  global $SMTP_CONN, $CONFIG, $RCMAIL;
   $smtp_timeout = null;
   $smtp_host = $CONFIG['smtp_server'];
   $smtp_port = is_numeric($CONFIG['smtp_port']) ? $CONFIG['smtp_port'] : 25;
   $smtp_host_url = parse_url($CONFIG['smtp_server']);
   
   // overwrite port
-  if ($smtp_host_url['host'] && $smtp_host_url['port'])
+  if (isset($smtp_host_url['host']) && isset($smtp_host_url['port']))
     {
     $smtp_host = $smtp_host_url['host'];
     $smtp_port = $smtp_host_url['port'];
     }
 
   // re-write smtp host
-  if ($smtp_host_url['host'] && $smtp_host_url['scheme'])
+  if (isset($smtp_host_url['host']) && isset($smtp_host_url['scheme']))
     $smtp_host = sprintf('%s://%s', $smtp_host_url['scheme'], $smtp_host_url['host']);
 
 
   // create Net_SMTP object and connect to server
-  if (!is_object($smtp_conn))
+  if (!is_object($SMTP_CONN))
     {
-    $helo_host = empty($CONFIG['smtp_helo_host']) ? (empty($_SERVER['SERVER_NAME']) ? 'localhost' : $_SERVER['SERVER_NAME']) : $CONFIG['smtp_helo_host'];
+    if (!empty($CONFIG['smtp_helo_host']))
+      $helo_host = $CONFIG['smtp_helo_host'];
+    else if (!empty($_SERVER['SERVER_NAME']))
+      $helo_host = preg_replace('/:\d+$/', '', $_SERVER['SERVER_NAME']);
+    else
+      $helo_host = 'localhost';
+
     $SMTP_CONN = new Net_SMTP($smtp_host, $smtp_port, $helo_host);
-
-    // set debugging
-    if ($CONFIG['debug_level'] & 8)
-      $SMTP_CONN->setDebug(TRUE);
-
 
     // try to connect to server and exit on failure
     $result = $SMTP_CONN->connect($smtp_timeout);
@@ -102,7 +103,7 @@ function smtp_mail($from, $recipients, &$headers, &$body, &$response)
         $smtp_user = $CONFIG['smtp_user'];
 
       if (strstr($CONFIG['smtp_pass'], '%p'))
-        $smtp_pass = str_replace('%p', decrypt_passwd($_SESSION['password']), $CONFIG['smtp_pass']);
+        $smtp_pass = str_replace('%p', $RCMAIL->decrypt_passwd($_SESSION['password']), $CONFIG['smtp_pass']);
       else
         $smtp_pass = $CONFIG['smtp_pass'];
 
@@ -112,7 +113,7 @@ function smtp_mail($from, $recipients, &$headers, &$body, &$response)
       if (PEAR::isError($result))
         {
         smtp_reset();
-        $response[] .= "Authentication failure: ".$result->getMessage();
+        $response[] .= 'Authentication failure: ' . $result->getMessage() . ' (Code: ' . $result->getCode() . ')';
         return FALSE;
         }
       }

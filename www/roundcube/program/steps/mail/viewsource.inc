@@ -5,7 +5,7 @@
  | program/steps/mail/viewsource.inc                                     |
  |                                                                       |
  | This file is part of the RoundCube Webmail client                     |
- | Copyright (C) 2005-2007, RoundCube Dev. - Switzerland                 |
+ | Copyright (C) 2005-2008, RoundCube Dev. - Switzerland                 |
  | Licensed under the GNU GPL                                            |
  |                                                                       |
  | PURPOSE:                                                              |
@@ -15,26 +15,28 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: viewsource.inc 850 2007-10-03 00:13:32Z ihug $
+ $Id: viewsource.inc 1195 2008-03-21 11:45:46Z thomasb $
 
 */
 
 
 // similar code as in program/steps/mail/get.inc
 if ($uid = get_input_value('_uid', RCUBE_INPUT_GET))
-  {
-  header('Content-Type: text/plain');
-  //@ob_end_clean();
+{
+  $headers = $IMAP->get_headers($uid);
+  $charset = $headers->charset ? $headers->charset : $IMAP->default_charset;
+  header("Content-Type: text/plain; charset={$charset}");
   $IMAP->print_raw_body($uid);
-  }
+}
 else
-  {
-  raise_error(array('code' => 500,
-                    'type' => 'php',
-                    'message' => 'Message UID '.$uid.' not found'),
-              TRUE,
-              TRUE);
-  }
+{
+  raise_error(array(
+      'code' => 500,
+      'type' => 'php',
+      'message' => 'Message UID '.$uid.' not found'),
+    true,
+    true);
+}
 
 exit;
 ?>

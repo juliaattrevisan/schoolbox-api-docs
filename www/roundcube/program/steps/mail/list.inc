@@ -15,11 +15,10 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: list.inc 850 2007-10-03 00:13:32Z ihug $
+ $Id: list.inc 2109 2008-12-03 08:16:44Z alec $
 
 */
 
-$OUTPUT_TYPE = 'js';
 // is there a sort type for this request?
 if ($sort = get_input_value('_sort', RCUBE_INPUT_GET))
 {
@@ -27,8 +26,11 @@ if ($sort = get_input_value('_sort', RCUBE_INPUT_GET))
   list($sort_col, $sort_order) = explode('_', $sort);
 
   // set session vars for sort (so next page and task switch know how to sort)
-  $_SESSION['sort_col'] = $sort_col;
-  $_SESSION['sort_order'] = $sort_order;
+  $save_arr = array();
+  $_SESSION['sort_col'] = $save_arr['message_sort_col'] = $sort_col;
+  $_SESSION['sort_order'] = $save_arr['message_sort_order'] = $sort_order;
+  
+  $RCMAIL->user->save_prefs($save_arr);
 }
 else
 {
@@ -39,10 +41,22 @@ else
 
 $mbox_name = $IMAP->get_mailbox_name();
 
+// initialize searching result if search_filter is used
+if ($_SESSION['search_filter'] && $_SESSION['search_filter'] != 'ALL')
+{
+  $search_request = md5($mbox_name.$_SESSION['search_filter']);
+
+  $IMAP->search($mbox_name, $_SESSION['search_filter'], RCMAIL_CHARSET, $sort_col);
+  $_SESSION['search'][$search_request] = $IMAP->get_search_set();
+  $OUTPUT->set_env('search_request', $search_request);
+}
+			      
+
 // fetch message headers
-if ($count = $IMAP->messagecount($mbox_name, 'ALL', !empty($_REQUEST['_refresh'])))
+if ($IMAP->messagecount($mbox_name, 'ALL', !empty($_REQUEST['_refresh'])))
   $a_headers = $IMAP->list_headers($mbox_name, NULL, $sort_col, $sort_order);
 
+$count = $IMAP->messagecount($mbox_name);
 $unseen = $IMAP->messagecount($mbox_name, 'UNSEEN', !empty($_REQUEST['_refresh']));
 
 // update message count display
@@ -50,17 +64,23 @@ $pages = ceil($count/$IMAP->page_size);
 $OUTPUT->set_env('messagecount', $count);
 $OUTPUT->set_env('pagecount', $pages);
 $OUTPUT->command('set_rowcount', rcmail_get_messagecount_text($count));
-
-// update mailboxlist
-$OUTPUT->command('set_unread_count', $mbox_name, $unseen);
-
+$OUTPUT->command('set_mailboxname', rcmail_get_mailbox_name_text());
 
 // add message rows
 if (isset($a_headers) && count($a_headers))
+{
   rcmail_js_message_list($a_headers);
+  if ($search_request)
+    $OUTPUT->show_message('searchsuccessful', 'confirmation', array('nr' => $count));
+}
+else if ($search_request)
+  $OUTPUT->show_message('searchnomatch', 'notice');
 else
   $OUTPUT->show_message('nomessagesfound', 'notice');
   
+// update mailboxlist
+$OUTPUT->command('set_unread_count', $mbox_name, $unseen, ($mbox_name == 'INBOX'));
+
 // send response
 $OUTPUT->send();
 

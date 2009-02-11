@@ -5,7 +5,7 @@
  | program/steps/error.inc                                               |
  |                                                                       |
  | This file is part of the RoundCube Webmail client                     |
- | Copyright (C) 2005-2007, RoundCube Dev. - Switzerland                 |
+ | Copyright (C) 2005-2008, RoundCube Dev. - Switzerland                 |
  | Licensed under the GNU GPL                                            |
  |                                                                       |
  | PURPOSE:                                                              |
@@ -15,14 +15,13 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: error.inc 850 2007-10-03 00:13:32Z ihug $
+ $Id: error.inc 1946 2008-10-06 18:59:22Z alec $
 
 */
 
 
 // browser is not compatible with this application
-if ($ERROR_CODE==409)
-  {
+if ($ERROR_CODE==409) {
   $user_agent = $GLOBALS['HTTP_SERVER_VARS']['HTTP_USER_AGENT'];
   $__error_title = 'Your browser does not suit the requirements for this application';
   $__error_text = <<<EOF
@@ -39,19 +38,17 @@ if ($ERROR_CODE==409)
 <p><i>Your configuration:</i><br />
 $user_agent</p>
 EOF;
-  }
+}
 
 // authorization error
-else if ($ERROR_CODE==401)
-  {
+else if ($ERROR_CODE==401) {
   $__error_title = "AUTHORIZATION FAILED";
   $__error_text  = "Could not verify that you are authorized to access this service!<br />\n".
                    "Please contact your server-administrator.";
-  }
+}
   
 // failed request (wrong step in URL)
-else if ($ERROR_CODE==404)
-  {
+else if ($ERROR_CODE==404) {
   $__error_title = "REQUEST FAILED/FILE NOT FOUND";
   $request_url = htmlentities($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
   $__error_text  = <<<EOF
@@ -61,21 +58,23 @@ Please contact your server-administrator.
 <p><i>Failed request:</i><br />
 http://$request_url</p>
 EOF;
-  }
+}
 
 // database connection error
-else if ($ERROR_CODE==603)
-  {
+else if ($ERROR_CODE==601)
+{
+  $__error_title = "CONFIGURATION ERROR";
+  $__error_text  =  nl2br($ERROR_MESSAGE) . "<br />Please read the INSTALL instructions!";
+}
+
+// database connection error
+else if ($ERROR_CODE==603) {
   $__error_title = "DATABASE ERROR: CONNECTION FAILED!";
-  $__error_text  =  <<<EOF
-Unable to connect to the database!<br /> 
-Please contact your server-administrator. 
-EOF;
-  }
+  $__error_text  =  "Unable to connect to the database!<br />Please contact your server-administrator.";
+}
 
 // system error
-else
-  {
+else {
   $__error_title = "SERVICE CURRENTLY NOT AVAILABLE!";
   $__error_text  = "Please contact your server-administrator.";
 
@@ -83,7 +82,7 @@ else
     $__error_text = $ERROR_MESSAGE;
   else
     $__error_text = sprintf('Error No. [0x%04X]', $ERROR_CODE);
-  }
+}
 
 
 // compose page content
@@ -97,20 +96,19 @@ EOF;
 
 
 
-if (template_exists('error'))
-  {
-  $OUTPUT->scripts = array();
-  $OUTPUT->script_files = array();
-  parse_template('error');
-  }
+if ($OUTPUT && $OUTPUT->template_exists('error')) {
+  $OUTPUT->reset();
+  $OUTPUT->send('error');
+}
 
+$__skin = $CONFIG->skin ? $CONFIG->skin : 'default';
 
 // print system error page
 print <<<EOF
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"><head>
 <title>RoundCube|Mail : ERROR $ERROR_CODE</title>
-<link rel="stylesheet" type="text/css" href="program/style.css" />
+<link rel="stylesheet" type="text/css" href="skins/$__skin/common.css" />
 </head>
 <body>
 
@@ -124,4 +122,5 @@ $__page_content
 </html>
 EOF;
 
+exit;
 ?>
