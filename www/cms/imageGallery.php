@@ -1,7 +1,7 @@
 <?php
 /************************************************************
 *                                                           *
-*         Copyright (c) 2002-2005 Lektec Consulting         *
+*         Copyright (c) 2009 Lektec Consulting         *
 *                                                           *
 ************************************************************/
 
@@ -11,81 +11,59 @@
  * Clicking the large image makes it open in a new window at 	*
  * its orginal size						*/
 
-require_once("../include/include.php");
-require_once("../include/session.php");
-require_once("../include/permission.php");
+require_once '../../library/group.php';
+require_once '../../library/category.php';
 
-define("IMAGESPERROW", 5);
+define('IMAGESPERROW', 5);
 
-class ImageGallery {
 
-function ImageGallery($cid) {
-
-	//display page
-	$this->t_body = new Template(TPL_directory);
-	$this->t_body->set_file("tplBODY", "cms/imageGallery.htm");
-	$this->t_body->set_var("TITLE", HEADING." - Image Gallery");
-	include("../include/page.php");	
-
-	$db = new dbManager;
-
-	$query = "SELECT id, name FROM category WHERE id = $cid";
-	$catInfo = $db->getRow($query);
-
-	$this->t_body->set_var("FOLDER_NAME", $catInfo['name']);
-	$this->t_body->set_var("ID", $catInfo['id']);
-
-	//output thumbnails
-	$this->t_body->set_block("tplBODY", "thumb_row", "row_block");
-	$this->t_body->set_block("thumb_row", "thumb_cell", "cell_block");
+if(isset($_GET['category']) && ) {
 	
-	$query = "SELECT id, description FROM file WHERE category = {$cid} AND deleted = '0' AND INSTR(mime_type, 'image/') 
-		ORDER BY submitted";
-	$db->query($query);
+	$categoryHandler = new Category;
+	if(!$category = $categoryHandler->getByID($_GET['category']))
+		error(2);
+	
+	$groupHandler = new Group;
+	if ($groupHandler->getPermission($_GET['category']) < READ_ACCESS)
+		error(6)
+
+	$this->setFile(TEMPLATE_content, 'cms/image-gallery.html');
+	$this->setTitle('Image Gallery for '.$category['name']);
+	
+	$this->setBlock(TEMPLATE_content, 'thumb_row', 'row_block');
+	$this->setBlock('thumb_row', 'thumb_cell', 'cell_block');
+	
+	$this->setVar('FOLDER_NAME', $category['name']);
+	$this->setVar('ID',	$category['id']);
+
+	$imageList = $categoryHandler->getImages($category['id']);
 
 	$count = 1; 
-	$flag = 0;
-
-	while( $thumbnail = $db->getNextArray() )
-	{
-		$this->t_body->set_VAR("THUMBNAIL", "<a href=\"image.php?id={$thumbnail['id']}&height=550&width=600\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
-				<img src=\"image.php?id={$thumbnail['id']}&height=".THUMBNAIL_size."&width=".THUMBNAIL_size."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
-
-
-		if(($count % IMAGESPERROW) == 0)
-		{
-			$this->t_body->parse("cell_block", "thumb_cell", true);
-			$this->t_body->parse("row_block", "thumb_row", true);
-			$flag = 1;
-		}		
-		else if($flag)
-		{
-			$this->t_body->parse("cell_block", "thumb_cell", false);
-			$flag = 0;
-		}
-		else
-		{
-			$this->t_body->parse("cell_block", "thumb_cell", true);
-		}
+	if(is_array($imageList) ) {
+		foreach( $imageList as $thumbnail ) {
+			$this->setVar('THUMBNAIL', "<a href=\"image.php?id={$thumbnail['id']}&height=550&width=600\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
+					<img src=\"image.php?id={$thumbnail['id']}&height=".THUMBNAIL_size."&width=".THUMBNAIL_size."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
 	
-		$count++;
-	}				
-
-	for(;$count % IMAGESPERROW != 0; $count++)
-	{
-		$this->t_body->set_VAR("THUMBNAIL", "");
-		$this->t_body->parse("cell_block", "thumb_cell", true);
-	}			
-
-	$this->t_body->parse("row_block", "thumb_row", true);
-
-	$this->t_body->pparse("finaloutput", "tplBODY");
+			$this->parse('cell_block', 'thumb_cell', true);
+			if(($count % IMAGESPERROW) == 0) {
+				$this->parse('row_block', 'thumb_row', true);
+				$this->setVar('cell_block', '');
+			}		
+			
+			$count++;
+		}				
 	
-}
+		for(;$count % IMAGESPERROW != 0; $count++) {
+			$this->setVar('THUMBNAIL', '');
+			$this->parse('cell_block', 'thumb_cell', true);
+		}			
+
+		$this->parse('row_block', 'thumb_row', true);
+	}
+	else
+		$this->setVar('row_block', '');
 }
 
-if(isset($_GET['category']) && perm($_GET['category'], HOMEPAGESERVICE))
-	$page = new ImageGallery($_GET['category']);
 else 
 	error(2);  
 

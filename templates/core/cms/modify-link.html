@@ -10,10 +10,6 @@ function verify()
 	if(document.getElementById('urlForm').url.value == ""){
 		msg += "You need to enter a URL\n";
 	}
-	//maybe write a test to validate url?
-	if(document.getElementById('urlForm').category.value == "" || isNaN(document.getElementById('urlForm').category.value)){
-		msg += "You need to select a proper location";
-	}
 	
 	if(msg != ""){
 		alert(msg);
@@ -26,7 +22,7 @@ function verify()
 <!-- END custom_head -->
 
 <h1>{ACTION} URL</h1>
-<form action="" method="post" id="urlForm" class="standardForm" onSubmit="return(verify());" action="linkForm.php">
+<form method="post" id="urlForm" class="standardForm" onSubmit="return(verify());" action="/cms/linkForm.php">
   <table>
     <tr>
       <td class="formLabelWidth"><h2>URL</h2></td>
@@ -48,7 +44,8 @@ function verify()
     <tr>
       <td><h2>Location</h2>
         <em>The link will be located in this folder</em></td>
-      <td>{CATEGORY_NAME}</td>
+      <td>{CATEGORY_NAME}
+      <input name="category" value="{CATEGORY_ID}" type="hidden" /></td>
     </tr>
     <tr>
       <td><h2>Hidden</h2>

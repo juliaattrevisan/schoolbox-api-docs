@@ -26,7 +26,11 @@ if(is_numeric($this->arg[0])) {
 					'COMMENT'			=> scrubText($file['comment']),	
 					'HIDDEN_SELECTED'	=> 	$file['hidden'] > 0 ? 'checked="checked"' : '',
 					'MAX_FILE_SIZE'		=> MAX_FILE_SIZE,
+					'CATEGORY_ID'		=> $file['cid'],
 					'CATEGORY_NAME'		=> scrubText($file['categoryName']),
+					'DUE_DAY'			=> '',
+					'DUE_MONTH'			=> '',
+					'DUE_YEAR'			=> '',
 					);
 	$this->setVar($output);
 	
@@ -73,7 +77,11 @@ if(is_numeric($this->arg[0])) {
 					'MAX_FILE_SIZE'		=> MAX_FILE_SIZE,
 					'SUBBOX'			=> '<input type="checkbox" name="submission" value="1" >',
 					'CATEGORY_NAME'		=> scrubTEXT($category['categoryName']),
-					);
+					'CATEGORY_ID'		=> $category['id'],
+					'DUE_DAY'			=> is_numeric($this->arg[2]):$this->arg[2]:'',
+					'DUE_MONTH'			=> is_numeric($this->arg[3]):$this->arg[3]:'',
+					'DUE_YEAR'			=> is_numeric($this->arg[4]):$this->arg[4]:'',
+
 	$this->setVar($output);
 
 	$this->parse('submission_block','submission', true); 

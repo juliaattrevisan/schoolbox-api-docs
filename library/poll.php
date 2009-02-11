@@ -83,6 +83,11 @@ class Poll extends Model {
 		}
 		return false;
 	}
+	
+	function cleanHomepage($cid) {
+		$query = "DELETE FROM  `".$this->_table."` p, pollLog l WHERE p.pollID=l.pollID AND categoryID='$cid'";
+		$this->db->query($query);
+	}
 }
 
 ?>

@@ -52,9 +52,10 @@ class SitePage extends Page {
 	
 	
 	function outputPage($lite=FALSE) {
-		if(!$lite)
+		if(!$lite) {
 			$this->buildPage();
-			
+			$this->saveHistory();
+		}
 		$this->template->pparse('finaloutput', TEMPLATE_body);
 	}
 	
@@ -107,6 +108,34 @@ class SitePage extends Page {
 		
 		//reset session timer
 		$_SESSION['lasttime'] = mktime();
+	}
+	
+	function saveHistory() {
+		/* Function saves user page history in session so we can go back to where they came from */
+		if(!is_array($_SESSION['history']))
+			$_SESSION['history'] = array();
+		
+		/* Dont handle duplicates (page refreshes) */
+		if($_SESSION['history'][0] != $_SERVER['REQUEST_URI']) {
+		
+			array_unshift($_SESSION['history'], $_SERVER['REQUEST_URI']);
+			
+			if(count($_SESSION['history']) > 3)
+				array_pop($_SESSION['history']);
+		}
+	}
+	
+	function backToTheFuture($page) {
+		/* In Dans honour, time is ours */
+		if(is_array($_SESSION['history']) ) {
+			if(count($_SESSION['history']) >= $page)
+				localRedir($_SESSION['history'][$page-1]);
+			else 
+				localRedir($_SESSION['history'][(count($_SESSION['history'])-1)]);
+		}
+		else /* Lost in space and time, just go home */
+			localRedir('/');
+		
 	}
 	
 	function renderSideNav() {

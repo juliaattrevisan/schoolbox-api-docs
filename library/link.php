@@ -1,6 +1,6 @@
 <?php
 
-require_once '../include/model.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
 
 class Link extends Model {
 
@@ -14,7 +14,7 @@ class Link extends Model {
 
 	function getByID($linkID) {
 		$query = "SELECT l.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName,
-						UNIX_TIMESTAMP(l.submitted) submitted, c.name categoryName 
+						UNIX_TIMESTAMP(l.submitted) submitted, c.name categoryName, c.id cid
 				  FROM link l 
 				  LEFT JOIN user u ON u.id = l.owner
 				  LEFT JOIN category c ON c.id = l.category 
@@ -24,7 +24,7 @@ class Link extends Model {
 
 	
 	function getAllInCategory($categoryID, $config = false) {
-		$query = "SELECT l.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName, UNIX_TIMESTAMP(submitted) submitted, 'http-url.png' iconFile 
+		$query = "SELECT l.*, u.firstname, u.lastname, u.title, UNIX_TIMESTAMP(submitted) submitted, 'http-url.png' iconFile 
 				  FROM link l
 				  LEFT JOIN user u ON u.id = l.owner
 				  WHERE category = '".$categoryID."'";
@@ -43,6 +43,55 @@ class Link extends Model {
 			
 							  
 		return $this->db->getAll($query);
+	}
+	
+	function appendHTTP($url) {
+		if( strncasecmp($url,"http://", 7) && strncasecmp($url, "https://", 8) )
+			$url = "http://".$url;
+		return $url;
+	}
+	
+	function logAction ($linkID, $action) {
+		$logEntry = array(	'object'	=> 'link',
+							'objectId'	=> $linkID,
+							'action'	=> $action,
+							'user'		=> $_SESSION['id'],
+							);
+		
+		$this->db->insert('cmsLog', $logEntry);
+	}
+	
+	function update($data) {
+	
+		$data['url'] = $this->appendHTTP(trim($data['url']));
+		
+		parent::update($data);
+		
+		/* Update log entry */
+		$this->logAction($data[$this->_index], 'modify');
+	
+	}
+	
+	function create($data) {
+		
+		$data['submitted'] = 'NOW()';
+		$data['url'] = $this->appendHTTP(trim($data['url']));
+		
+		$linkID = parent::create($data);
+		
+		/* Insert log entry */
+		$this->logAction($linkID, 'create');
+		
+		return $linkID;
+	}
+	
+	function delete($id) {
+		
+		parent::delete($id);
+	
+		/* Delete log entry */
+		$this->logAction($id, 'delete');
+	
 	}
 }
 ?>

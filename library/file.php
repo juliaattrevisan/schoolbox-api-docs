@@ -1,6 +1,6 @@
 <?php
 
-require_once '../include/model.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
 
 class File extends Model {
 
@@ -14,7 +14,7 @@ class File extends Model {
 	
 	function getByID($fileID) {
 		$query = "SELECT f.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName,
-						UNIX_TIMESTAMP(f.submitted) submitted, ft.name typeName, c.name categoryName, af.description as mimeDescription, iconFile, af.inline
+						UNIX_TIMESTAMP(f.submitted) submitted, ft.name typeName, c.name categoryName, c.id cid, af.description as mimeDescription, iconFile, af.inline
 				  FROM file f 
 				  LEFT JOIN user u ON u.id = f.owner
 				  LEFT JOIN category c ON c.id = f.category 
@@ -26,7 +26,7 @@ class File extends Model {
 
 	function getAllInCategory($categoryID, $config = false) {
 
-		$query = "SELECT f.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName, 
+		$query = "SELECT f.*, u.firstname, u.lastname, u.title, 
 						UNIX_TIMESTAMP(f.submitted) submitted, ft.name typeName, c.name categoryName, af.description as mimeDescription, iconFile, af.inline
 				  FROM file f 
 				  LEFT JOIN user u ON u.id = f.owner
@@ -57,6 +57,65 @@ class File extends Model {
 	
 	}
 	
+	function logAction ($fileID, $action) {
+		$logEntry = array(	'object'	=> 'file',
+							'objectId'	=> $fileID,
+							'action'	=> $action,
+							'user'		=> $_SESSION['id'],
+							);
+		
+		$this->db->insert('cmsLog', $logEntry);
+	}
+	
+	function create($data, $file = '') {
+				
+		$data['submitted'] = 'NOW()';		
 
+		if(is_file($file) && is_readable($file) ) {
+			$data['file_size'] = filesize($file);
+			$data['realname'] = $file['name'];
+			$data['mime_type'] = $file['type']; /* should hook up to allowedFile to get mime type properly */
+			
+			if($fileID = parent::create($data)) {
+				$filename = FILE_directory.'/'.$fileID.'.dat';
+				@unlink($filename);
+				rename($file, $filename);
+			}
+		}
+		else
+			$fileID = parent::create($data);
+		
+		/* Insert log entry */
+		$this->logAction($fileID, 'create');
+		
+		
+		return $fileID;
+	}
+	
+	function update($data) {
+		
+		parent::update($data);
+		
+		/* Update log entry */
+		$this->logAction($data[$this->_index], 'modify');
+	}
+	
+	function delete($id, $clean = false) {
+		
+		if($clean) {
+			parent::delete($id);
+			$filename = FILE_directory.'/'.$id.'.dat';
+			@unlink($filename);
+		}
+		else {
+			/* We just mark files as deleted */		
+			parent::update(array('id'=>$id, 'deleted'=>1));
+		}
+
+		/* Delete log entry */
+		$this->logAction($id, 'delete');
+		
+
+	}
 }	
 ?>

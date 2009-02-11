@@ -60,7 +60,32 @@ class Homepage {
 	function deleteHomepage()
 	{		
 		$this->db->delete('homepage_config', 'cid', $this->cid);
-		$this->deleteComponentPositions();		
+		$this->deleteComponentPositions();
+		
+		require_once dirname(__FILE__) . '/group.php';
+		$groupHandler = new Group;
+		$groupHandler->disbandGroup($this->cid);
+		
+		/* Delete components, TODO move this into calling component delete functions */
+		$this->db->delete('forum', 'cid', $this->cid);
+		
+		require_once dirname(__FILE__) . '/categoryNews.php';
+		$newsHandler = new CategoryNews;
+		$newsHandler->homepageClean($this->cid);		
+		
+		require_once dirname(__FILE__) . '/wiki.php';
+		$wikiHandler = new Wiki;
+		$pollHandler->homepageClean($this->cid);
+		
+		require_once dirname(__FILE__) . '/poll.php';
+		$pollHandler = new Poll;
+		$pollHandler->homepageClean($this->cid);
+		
+		require_once dirname(__FILE__) . '/dropbox.php';
+		$pollHandler = new Dropbox;
+		$pollHandler->homepageClean($this->cid);
+		
+		
 	}
 	
 	function deleteComponentPositions()

@@ -7,22 +7,21 @@
 
 /* Class defines interface between file database and software.         *
  * The following actions can be performed; delete, add, update */
+require_once dirname(__FILE__) . '/group.php';
 
-class dropbox
+class Dropbox
 {
-	function dropbox()
+	function Dropbox()
 	{
 		//always gonna need the db so lets create one..
 		$this->db = new dbManager();
+		$this->groupHandler = new Group;
 	}
 
 	function checkWriteAccess($category)
 	{
-		require_once("../include/permission.php");
-		
 		//anyone with read can put something in the dropbox
-		$perm = perm($category, HOMEPAGESERVICE);
-		if($perm < 1)
+		if ($this->groupHandler->getPermission($category) < READ_ACCESS)
 			error(6);
 
 		//check dropbox exists on page
@@ -134,6 +133,17 @@ class dropbox
 		header ("Content-Length: ".filesize($filename));
 		readfile($filename);
 		exit;
+	}
+	
+	function homepageClean($cid) {
+	
+		$query = "SELECT id FROM dropbox WHERE category = '$cid'";
+		$result = $this->db->query($query);
+	
+		while($row = $this->getNextArray($result) ) {
+			$this->deleteFile($row['id']);
+		}
+	
 	}
 }
 

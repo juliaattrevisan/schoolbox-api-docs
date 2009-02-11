@@ -84,12 +84,15 @@ class Group extends Model {
 
 	function disbandGroup($relationID) {
 		//delete an entire group including owner
+
 		$query = "DELETE FROM userAccess WHERE service = ".$this->_service." AND sid = $relationID";
 		$this->db->query($query);
 		
-		$query = "DELETE FROM userGroups WHERE cid = $relationID";
+		$this->db->delete('userGroups', 'cid', $relationID);
+		
+		/* Delete groups calendar */
+		$query = "DELETE FROM event WHERE access = 2 AND sid = '$relationID'";
 		$this->db->query($query);
-
 	}
 
 	function getMemberList($relationID) {

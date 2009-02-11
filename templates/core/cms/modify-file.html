@@ -28,7 +28,7 @@ function clearBrowse(obj, id) {
 <!-- END custom_head -->
 
 <h1>{ACTION} File </h1>
-<form method="post" enctype="multipart/form-data" id="fileForm" class="standardForm" onsubmit="return(verify());" action="fileForm.php">
+<form method="post" enctype="multipart/form-data" id="fileForm" class="standardForm" onsubmit="return(verify());" action="/cms/fileForm.php">
   <table>
     <!-- BEGIN browse -->
     <tr>
@@ -69,7 +69,7 @@ function clearBrowse(obj, id) {
     <tr>
       <td><h2>Location</h2>
         <em>The file will be located in this folder</em></td>
-      <td>{CATEGORY_NAME}</td>
+      <td>{CATEGORY_NAME}<input name="category" value="{CATEGORY_ID}" type="hidden" /></td>
     </tr>
     <tr>
       <td><h2>Hidden</h2>

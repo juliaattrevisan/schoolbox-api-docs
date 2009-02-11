@@ -22,6 +22,10 @@ class CategoryNews extends Model {
 
 		return $this->db->getAll($query);
 	}
+	
+	function homepageClean($cid) {
+		$this->db->delete('subject_news', 'code', $cid);
+	}
 }
 
 ?>

@@ -27,6 +27,7 @@ if(is_numeric($this->arg[0])) {
 					'DESCRIPTION'		=> scrubText($link['description']),
 					'COMMENT'			=> scrubText($link['comment']),	
 					'CATEGORY_NAME'		=> scrubText($link['categoryName']),
+					'CATEGORY_ID'		=> $link['cid'],
 					'HIDDEN_SELECTED'	=> 	$link['hidden'] > 0 ? 'checked="checked"' : '',
 					);
 	$this->setVar($output);
@@ -57,6 +58,7 @@ if(is_numeric($this->arg[0])) {
 					'COMMENT'			=> '',	
 					'HIDDEN_SELECTED'	=> '',
 					'CATEGORY_NAME'		=> scrubText($category['categoryName']),
+					'CATEGORY_ID'		=> $category['id'],
 					);
 	$this->setVar($output);
 	

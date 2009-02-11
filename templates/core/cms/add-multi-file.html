@@ -1,0 +1,41 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/multifilecms.js"></script>
+<script type="text/javascript">
+	multi_selector = new MultiSelector();
+</script>
+<!-- END custom_head -->
+
+<h1>Upload Multiple Files</h1>
+<form method="post" enctype="multipart/form-data" id="fileForm" class="standardForm" onsubmit="return multi_selector.check();">
+    <table>
+        <tr>
+            <td><h2>Location</h2>
+                <em>Select an appropriate location within the system that reflects the use of the file</em></td>
+            <td>{CATLIST}</td>
+        </tr>
+        <tr>
+        <td>&nbsp;</td>
+        <td>
+            <table>
+            <thead>
+            <tr>
+                <td><h2>Description</h2></td>
+                <td><h2>File</h2></td>
+                <td></td>
+            </tr>
+            </thead>
+            <tbody id="files_list">
+            </tbody>
+            </table>
+            <script type="text/javascript">
+                multi_selector.init(document.getElementById('files_list'), {FILE_max_upload});
+            </script>
+        </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td><input type="submit" name="Submit" value="Upload Files" class="btn" />
+            </td>
+        </tr>
+    </table>
+</form>

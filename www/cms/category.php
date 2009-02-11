@@ -1,37 +1,12 @@
 <?php
-// replacement of cms/modFolder.php
-
 require_once '../library/category.php';
 $categoryHandler = new Category;
 
-$category = $categoryHandler->getByID($this->arg[0]);
-
-if ($_POST['title']) {
-
-	$category = array('name'		=> $_POST['name'],
-					  'parent'		=> $_POST['parent'],
-					  'template'	=> $_POST['template'],
-					  'code'		=> $_POST['code'],
-					  );
-
-	if (isset($_POST['id'])) {
-		$category['id'] = $_POST['id'];
-		$categoryHandler->update($category);
-	}
-	else
-		$categoryHandler->create($category);
-		
-	if (is_array())
+if(is_numeric($this->arg[0])) {
 	
-	localRedir('/resources/' . $_POST['parent']);
-} 
-elseif ($_POST['delete']) {
-
-	$category = $categoryHandler->getByID($_POST['delete']);
-	$categoryHandler->delete($_POST['delete']);
-	localRedir('/resources/' . $category['parent']);
-}
-elseif ($category['id']) {
+	if($category = $categoryHandler->getByID($this->arg[0]))
+		error(2);
+	
 	$this->setFile(TEMPLATE_content, "cms/modify-category.html");
 	$this->setBlock(TEMPLATE_content, 'perm_table', 'perm_table_block');
 	$this->setBlock(TEMPLATE_content, 'indiv_perms', 'indiv_perms_block');
@@ -126,6 +101,7 @@ elseif ($category['id']) {
 	$this->parse('indiv_perms_block', 'indiv_perms');
 	$this->setVar('indiv_modify_block', '');
 
+	
 }
 
 ?>

@@ -1,6 +1,7 @@
 <?php
 
 require_once dirname(__FILE__) . '/../include/model.php';
+require_once dirname(__FILE__) . '/homepage-template.php';
 
 class Category extends Model {
 
@@ -91,13 +92,19 @@ class Category extends Model {
 	
 	}
 	
-	function getImages($categoryID) {
+	function getImages($categoryID, $config = false) {
 		$query = "SELECT id, file.description 
 				  FROM file 
 				  LEFT JOIN allowedFileTypes ON mime_type = mime 
 				  WHERE category = '{$categoryID}' 
 				  AND deleted = '0' AND INSTR(mime_type, 'image/') AND inline = 'true'
 				  ORDER BY submitted";
+				  
+		if ($config['size'] == 0)
+			$lim = "";
+		else
+			$lim = " LIMIT 1, ".IMAGESPERROW * $config['size'];
+			
 		return $this->db->getAll($query);
 	}
 
@@ -164,16 +171,52 @@ class Category extends Model {
 		return $this->db->getAll($query);
 	}	
 
+	function checkForChildren($id)
+	{
+		//check for child folders
+		$query = "SELECT id FROM category WHERE parent = '".$id."' LIMIT 1";
+		if( $this->db->getOne($query) )
+			return true;
+
+		
+		//check for files/links in category
+		$query = "SELECT id FROM link WHERE category = '".$id."' LIMIT 1";
+		if( $this->db->getOne($query) )
+			return true;
+		
+		$query = "SELECT id FROM file WHERE category = '".$id."' AND deleted = '0' LIMIT 1";
+		if( $this->db->getOne($query) )
+			return true;
+	
+		return false;
+	}
 
 
-	function logAction ($categoryID, $action = 'modify') {
-		$query = "INSERT INTO cmsLog SET object = 'folder', objectID = '$categoryID', action = '$action', user = '" . $_SESSION['id'] . "', time = NOW()";
-		return $this->db->query($query);
+	function logAction ($categoryID, $action) {
+		$logEntry = array(	'object'	=> 'folder',
+							'objectId'	=> $cateogryID,
+							'action'	=> $action,
+							'user'		=> $_SESSION['id'],
+							);
+		
+		$this->db->insert('cmsLog', $logEntry);
+	}
+	
+	function deletePerms($cid) {
+		$this->db->delete('perms', 'cid', $cid);
+	}
+
+	function insertPerm($cid, $group, $access) {
+		$perm = array(	'cid'		=> $cid,
+						'gid'		=> $group,
+						'type' 	=> $access,
+					);
+		$this->db->insert('perms', $perm); 
 	}
 
 	function deletePerms($cid)
 	{
-		$this->db->dbDeleteRow('perms', 'cid', $cid);
+		$this->db->delete('perms', 'cid', $cid);
 	}
 
 	function create($data) {
@@ -184,14 +227,73 @@ class Category extends Model {
 	
 	function update ($data) {
 		parent::create($data);
+		
+		if($data['template']) {
+			$templateHandler = new HomepageTemplate
+			$this->createTemplate($cid, $template);
+		}
+		
 		$this->logAction($data[$this->_index], 'modify');
 	}
 	
 	function delete($categoryID) {
+		
+		/* Check its empty before deleting */
+		if($this->checkForChildren($categoryID) )
+			error(12); 
+		
+		$this->deletePerms($categoryID);
 		parent::delete($categoryID);
+		
+		require_once dirname(__FILE__) . '/homepage.php';
+		$homepageHandler = new Homepage($categoryID);
+		$homepageHandler->deleteHomepage();
+	
+		require_once dirname(__FILE__) . '/submission-box.php';
+		$submissionBoxHandler = new SubmissionBox;
+		$submissionBoxHandler->cleanHomepage($categoryID);
+		
 		$this->logAction($categoryID, 'delete');
 	}
 
+	function recursiveDelete($categoryID) {
+	
+		require_once dirname(__FILE__) . '/file.php';
+		require_once dirname(__FILE__) . '/link.php';
+		
+		$childList = $this->getCategoryList($categoryID);
+		
+		if(is_array($childList)) {
+			/* Recurse into child folders */		
+			foreach($childList as $child) {
+				$this->recursiveDelete($child['id']);		
+			}
+		}
+
+		/* Delete all files */
+		$fileHandler = new File;
+		$fileList = $fileHandler->getAllInCategory($categoryID);
+		if(is_array($fileList)) {
+			foreach($fileList as $file) {
+				$fileHandler->delete($file['id']);
+			}
+		}
+		
+		/* Delete all links */
+		$linkHandler = new Link
+		$linkList = $linkHandler->getAllInCategory($categoryID);
+		if(is_array($linkList)) {
+			foreach($linkList as $link) {
+				$linkHandler->delete($link['id']);
+			}
+		}
+		
+		/* Delete folder */
+		$this->delete($categoryID);
+	
+		
+	
+	}
 }
 
 ?>
