@@ -9,12 +9,13 @@ class Category extends Model {
 		$this->_table = "category";
 		$this->_index = "id";
 		$this->categoryTree = array();
+		$this->nodeList = array();
 		
 		parent::Model();
 	}
 	
 	function getCategoryList ($categoryID, $config = false) {
-		$query = "SELECT id, name, code, template FROM category WHERE parent = $categoryID ";
+		$query = "SELECT id, name, code, template, parent FROM category WHERE parent = $categoryID ";
 		
 		$sortFields = array('name' => 'name', 'date' => 'id');
 		$config['sort'] = in_array($config['sort'], $sortFields) ? $config['sort'] : 'name';
@@ -24,7 +25,7 @@ class Category extends Model {
 		
 		if($config['size'] > 0) 
 			$query .= " LIMIT 0, " . $config['size']; 
-							  
+		
 		return $this->db->getAll($query);
 	}
 	
@@ -32,7 +33,7 @@ class Category extends Model {
 		$query = "SELECT c.id as children 
 				  FROM category c
 				  WHERE parent = $categoryID
-				  LIMIT 1,1";
+				  LIMIT 1";
 		
 		return $this->db->getOne($query);
 	}
@@ -115,7 +116,31 @@ class Category extends Model {
 			}
 		}
 		return $this->categoryTree;
-	}	
+	}
+
+	function getCategoryNode($categoryID = 0) {
+		
+		// get folder contents
+		$categoryList = $this->getCategoryList($categoryID);
+
+		if ($categoryID > 0) {
+			// get parent folder contents
+			$siblingList = $this->getCategoryNode($this->getParent($categoryID));
+			
+			// find index of parent node in siblingList
+			$total = count($siblingList);
+			for ($i = 0; $i < $total; $i++)
+				if ($siblingList[$i]['id'] == $categoryID) break;
+				
+			// insert folder contents next to parent node
+			array_splice($siblingList, $i+1, 0, $categoryList);
+			return $siblingList;
+		}
+		else {
+			return $categoryList;
+		}
+	}
+
 
 	function getTemplateList() {
 

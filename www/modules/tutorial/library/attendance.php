@@ -13,17 +13,28 @@ class Attendance extends Model {
 	}
 	
 	function getAllByEvent($eventID) {
-		$query = "SELECT e.eventID, n.studentID, a.present, a.reason, CONCAT(u.lastname,', ',u.firstname) studentName 
+		
+		// who should have attended
+		$query = "(SELECT e.eventID, n.studentID, a.present, a.reason, u.lastname ,u.firstname, u.title
 				  FROM ".TUTORIAL_db.".event e
 				  LEFT JOIN ".TUTORIAL_db.".enrolment n ON ((n.code = e.code AND n.code != '') OR n.eventID = e.eventID) AND n.from <= e.date 
 				  LEFT JOIN ".TUTORIAL_db.".attendance a ON a.eventID = e.eventID AND a.studentID = n.studentID
 				  LEFT JOIN ".PORTAL_db.".user u ON u.id = n.studentID			  
 				  WHERE e.eventID = $eventID 
-				  AND n.studentID IS NOT NULL 
+				  AND n.studentID IS NOT NULL )
 				  
-				  ORDER BY u.lastname, u.firstname ";
-				
-		return $this->db->getAll($query);	
+				  UNION";
+		
+		// who did attend
+		$query .= "(SELECT e.eventID, a.studentID, a.present, a.reason, u.lastname ,u.firstname, u.title
+				  FROM ".TUTORIAL_db.".event e
+				  LEFT JOIN ".TUTORIAL_db.".attendance a ON a.eventID = e.eventID
+				  LEFT JOIN ".PORTAL_db.".user u ON u.id = a.studentID			  
+				  WHERE e.eventID = $eventID AND a.studentID IS NOT NULL) 
+				  ORDER BY lastname, firstname ";
+		
+		return $this->db->getAll($query);
+		
 	}
 	
 	function getByStudent($studentID, $code) {

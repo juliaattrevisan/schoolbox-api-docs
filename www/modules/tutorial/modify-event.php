@@ -18,6 +18,8 @@ if (isset($_POST['name'])) {
 	$date = ausDateToUnix($_POST['date']);
 	$until = ausDateToUnix($_POST['repeat_until']);	
 	$hour = $_POST['period'] == 'pm' && $_POST['hour'] < 12 ? $_POST['hour'] + 12 : $_POST['hour'];
+	if (empty($_POST['tohour']))
+		$_POST['tohour'] = $_POST['hour'] + 1;
 	$tohour = $_POST['toperiod'] == 'pm' && $_POST['tohour'] < 12 ? $_POST['tohour'] + 12 : $_POST['tohour'];
 
 	$event = array('name'			=> $_POST['name'],
@@ -53,14 +55,16 @@ if (isset($_POST['name'])) {
 		$event['date'] = $dateArray[0];
 		$eventHandler->update($event);
 		
-		localRedir('/modules/tutorial/'. urldecode($_POST['return']));
+		$page->backToTheFuture(2);
+		
 	} 
 	else {
 		for ($i = 0; $i < count($dateArray); $i++) {
 			$event['date'] = $dateArray[$i];
 			$event['eventID'] = $eventHandler->create($event);
 		}
-		localRedir('/modules/tutorial/list-enrolment.php?eventID='. $event['eventID']);
+		//localRedir('/modules/tutorial/list-enrolment.php?eventID='. $event['eventID']);
+		$page->backToTheFuture(2);
 	}
 		
 	
@@ -101,7 +105,6 @@ elseif (is_numeric($_GET['eventID'])) {
 					'AMTO'			=> $toperiod == 'AM' ? 'selected="selected"' : '',
 					'PMTO'			=> $toperiod == 'PM' ? 'selected="selected"' : '',
 					'DESCRIPTION'	=> $event['description'],
-					'RETURN'		=> scrubText(urlencode($_REQUEST['return'])),
 					'VISIBLE_SELECTED'	=> $event['visible'] == 'true' ? 'checked="checked"' : '',
 					'CANCELLED_SELECTED'	=> $event['cancelled'] == 'true' ? 'checked="checked"' : '',
 					
@@ -132,7 +135,7 @@ elseif (is_numeric($_GET['eventID'])) {
 					'NAME'			=> '',
 					'CODE'			=> '',
 					'LOCATION'		=> '',
-					'DATE'			=> '',
+					'DATE'			=> date("d/m/Y"),
 					'HOUR'			=> '',
 					'MIN'			=> '',
 					'AM'			=> '',
@@ -141,7 +144,6 @@ elseif (is_numeric($_GET['eventID'])) {
 					'TOMIN'			=> '',
 					'TOPERIOD'		=> '',
 					'DESCRIPTION'	=> '',
-					'RETURN'		=> '',
 					'VISIBLE_SELECTED'	=> 'checked="checked"',
 					'CANCELLED_SELECTED'	=> '',
 					

@@ -17,39 +17,40 @@ window.addEvent('domready', function() {
 	});
 });
 </script>
-
 <script type="text/javascript" src="/javascript/tableruler.js"></script>
 <script type="text/javascript">
 	window.onload=function(){tableruler();} 
 </script>
 <!-- END custom_head -->
 <h1>Enrolment - {EVENT_NAME}</h1>
-
 <!-- BEGIN has_enrolments -->
 <table class="ruler">
   <thead>
-  <tr>
-    <th style="width: 60px;">Remove</th>
-    <th>Student</th>
-    <th style="width: 100px;">Attendance %</th>
-  </tr>
+    <tr>
+      <th style="width: 60px;">Remove</th>
+      <th>Student</th>
+      <th style="width: 100px;">Attendance %</th>
+    </tr>
   </thead>
   <tbody>
-  <!-- BEGIN enrolment_list -->
-  <tr>
-    <td style="text-align: center;"><a href="/modules/tutorial/list-enrolment.php?delete={STUDENT_ID}&code={EVENT_CODE}&eventID={EVENT_ID}" onclick="return confirm('Delete student from classlist?');"><img src="/images/famicons/delete.png" /></a></td>
-    <td><a href="/search/userLookup.php?id={STUDENT_ID}">{STUDENT_NAME}</a></td>
-    <td style="text-align: right;">{ATTENDANCE}</td>
-  </tr><!-- END enrolment_list -->
+    <!-- BEGIN enrolment_list -->
+    <tr>
+      <td style="text-align: center;"><a href="list-enrolment.php?delete={STUDENT_ID}&code={EVENT_CODE}&eventID={EVENT_ID}" onclick="return confirm('Delete student from classlist?');"><img src="/images/famicons/delete.png" /></a></td>
+      <td><a href="/search/userLookup.php?id={STUDENT_ID}">{STUDENT_NAME}</a></td>
+      <td style="text-align: right;">{ATTENDANCE}</td>
+    </tr>
+    <!-- END enrolment_list -->
   </tbody>
 </table>
 <!-- END has_enrolments -->
-
-  <p>
-  <form action="list-enrolment.php" method="post">
-    <input class="lookup" type="text" name="keyword" />
-    <input type="hidden" name="code" value="{EVENT_CODE}" />
-    <input type="hidden" name="eventID" value="{EVENT_ID}" />
-    <input type="submit" value="Add Student" class="btn" />
-   </form>
-  </p>
+<p class="float-right">
+  <input type="button" value="Back" onclick="javascript: history.go(-1);" />
+</p>
+<p>
+<form action="list-enrolment.php" method="post">
+  <input class="lookup" type="text" name="keyword" />
+  <input type="hidden" name="code" value="{EVENT_CODE}" />
+  <input type="hidden" name="eventID" value="{EVENT_ID}" />
+  <input type="submit" value="Add Student" class="btn" />
+</form>
+</p>

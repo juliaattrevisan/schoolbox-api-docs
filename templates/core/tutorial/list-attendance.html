@@ -29,7 +29,7 @@ window.addEvent('domready', function() {
 	});
 	$$('.reason_select').each(function (el) {
 		el.addEvent('change', function() {
-			var myRequest = new Ajax('/modules/tutorial/list-attendance.php?ajax='+el.name+'&value='+escape(el.value)).request();
+			var myRequest = new Ajax('list-attendance.php?ajax='+el.name+'&value='+escape(el.value)).request();
 		});
 	});
 	$$('.present_check').each(function (el) {
@@ -37,7 +37,7 @@ window.addEvent('domready', function() {
 			var value = 'false';
 			if (el.checked)
 				value = 'true';
-			var myRequest = new Ajax('/modules/tutorial/list-attendance.php?ajax='+el.name+'&value='+value).request();
+			var myRequest = new Ajax('list-attendance.php?ajax='+el.name+'&value='+value).request();
 		});
 	});
 	
@@ -61,7 +61,8 @@ window.addEvent('domready', function() {
     <thead>
       <tr>
         <td colspan="7"><h2>{EVENT_NAME} - {EVENT_DATE}</h2>
-        <span class="header_option"><a href="modify-event.php?eventID={EVENT_ID}&return=list-attendance.php%3Fweek%3D{WEEK}" title="Modify Event">Modify</a> | <a href="modify-event.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?')" title="Delete Event">Delete</a></span>
+        <span class="header_option"><a href="modify-event.php?eventID={EVENT_ID}" title="Modify Event">Modify</a> | 
+        <a href="modify-event.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?')" title="Delete Event">Delete</a></span>
         </td>
       <tr>
       <tr>
@@ -74,8 +75,8 @@ window.addEvent('domready', function() {
     <tbody>
       <!-- BEGIN student -->
       <tr style="vertical-align: middle;">
-        <td style="text-align: center;"><a href="list-attendance.php?remove={STUDENT_ID}&code={EVENT_CODE}&eventID={EVENT_ID}&week={WEEK}" onclick="return confirm('Remove this student from the tutorial classlist?');"><img src="/images/famicons/delete.png" alt="Remove enrolment" /></a></td>
-        <td><a href="/search/userLookup.php?id={STUDENT_ID}">{STUDENT_NAME}</a></td>
+        <td style="text-align: center;"><a href="list-attendance.php?remove={STUDENT_ID}&code={EVENT_CODE}&eventID={EVENT_ID}&week={WEEK}" onclick="return confirm('Remove this student from the tutorial classlist? Please note the student will not be removed from events that have already passed.');"><img src="/images/famicons/delete.png" alt="Remove enrolment" /></a></td>
+        <td><a href="/search/user/{STUDENT_ID}">{STUDENT_NAME}</a></td>
         <td><select name="reason[{STUDENT_ID}]" class="reason_select">
             <option value="">N/A</option>
             <!-- BEGIN reason_select -->
@@ -104,6 +105,7 @@ window.addEvent('domready', function() {
   </p>
   
 <!-- END event -->
+
 <p>
 <!-- BEGIN previous_link -->
 <a href="list-attendance.php?week={PREVIOUS_WEEK}">&lt; Previous Week</a> | <!-- END previous_link -->

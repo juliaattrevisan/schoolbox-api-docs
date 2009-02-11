@@ -227,19 +227,13 @@ function convertToURL($string)
 	return preg_replace(array("/[^a-zA-Z\d\s]*/", "/\ +/"), array("", "-"), $string);
 }
 
-function cutSentence($content, $chars) {
-	/* Cut off a summary at the fullstop within the character limit, alternatively just at the word */
-	$summary=substr($content, 0, $chars);
-	$position=strrpos($summary, ".")+1;
-	if($position > 1) {
-		$output=substr($summary, 0, $position);
-		return $output;
-	}
-	else {
-		$position = strrpos($summary, " ");
-		$output=substr($summary, 0, $position);
-		return $output."...";
-	}
+function cutString($content, $chars) {
+	/* cut a string to the character limit and append ... */
+	$summary = substr($content, 0, $chars);
+	$length = strlen($content);
+
+	return $summary . (strlen($content) > strlen($summary) ? ".." : "");
+	
 }
 
 function delfile($str)

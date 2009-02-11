@@ -1,6 +1,7 @@
 <?php
 
 require_once SITE_root.'/include/model.php';
+require_once SITE_root.'/library/group.php';
 define('TUTORIAL_db', 'tutorial');
 define('PORTAL_db', SQL_db);
 
@@ -12,11 +13,12 @@ class Event extends Model {
 		parent::Model();
 	}
 	
+	
 	function getAll($filter = '') {
 		$query = "SELECT e.*, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish, 
 					concat(t1.firstname,' ',t1.lastname) tutorName1, concat(t2.firstname,' ',t2.lastname) tutorName2 
 				  FROM ".TUTORIAL_db.".".$this->_table." e
-				  LEFT JOIN ".TUTORIAL_db.".enrolment n ON n.code = e.code OR n.eventID = e.eventID
+				  LEFT JOIN ".TUTORIAL_db.".enrolment n ON (n.code = e.code AND n.code != '') OR n.eventID = e.eventID
 				  LEFT JOIN ".PORTAL_db.".user t1 ON t1.id = e.tutorID_1
 				  LEFT JOIN ".PORTAL_db.".user t2 ON t2.id = e.tutorID_2 
 				  WHERE 1=1 ";
@@ -49,7 +51,7 @@ class Event extends Model {
 		elseif (!$_SESSION['su'])
 			$query .= "AND n.studentID = " . $_SESSION['id']." ";
 		
-		$query .= "GROUP BY eventID ORDER BY date DESC";
+		$query .= "GROUP BY eventID ORDER BY date ASC";
 		
 		return $this->db->getAll($query);			
 	}
@@ -151,8 +153,21 @@ class Event extends Model {
 	}
 	
 	function getTutorList () {
-		$query = "SELECT id, CONCAT(lastname,', ',firstname) name FROM user WHERE group_id IN(".implode(",", unserialize(STAFFGROUPIDS)).") ORDER BY lastname, firstname";
-		return $this->db->getAll($query);
+		$query = "SELECT id, title, firstname, lastname 
+				  FROM user u
+				  LEFT JOIN userAccess a ON a.uid = u.id AND a.service = ".TUTORIAL_SERVICE."
+				  WHERE a.type >= ".WRITE_ACCESS." ORDER BY lastname, firstname";
+		
+		$tutorList = $this->db->getAll($query);
+		$output = array();
+		if (is_array($tutorList)) {
+			foreach ($tutorList as $tutor) {
+				$output[] = array('id'		=> $tutor['id'],
+								  'name'	=> formatName($tutor),
+								  );
+			}
+		}
+		return $output;
 	}
 	
 	function getTutorsByEvent ($code) {

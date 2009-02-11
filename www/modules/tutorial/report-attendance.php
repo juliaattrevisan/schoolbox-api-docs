@@ -30,7 +30,7 @@ $eventList = $eventHandler->getUncompleted($from, $to);
 if (is_array($eventList)) {
 	foreach ($eventList as $event) {
 		$output = array('NAME'		=> scrubText($event['name']),
-						'CODE'		=> scrubText($event['code']),
+						'CODE'		=> !empty($event['code']) ? scrubText($event['code']) : "N/A",
 						'DATE'		=> outputDate(DATE_short_no_time, $event['date']),
 						'TUTOR1'	=> scrubText($event['tutorName1']),
 						'TUTOR2'	=> scrubText($event['tutorName2']),

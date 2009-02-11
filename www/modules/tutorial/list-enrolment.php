@@ -46,6 +46,7 @@ elseif (is_numeric($_GET['delete']) && isset($_GET['code'])) {
 	$output = array('EVENT_NAME'	=> scrubText($event['name']),
 					'EVENT_CODE'	=> scrubText($event['code']),
 					'EVENT_ID'		=> $event['eventID'],
+					'WEEK'			=> date("W", $event['date']),
 					);
 	$page->setVar($output);
 	

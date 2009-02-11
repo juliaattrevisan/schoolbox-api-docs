@@ -104,7 +104,7 @@ else {
 				$page->setVar('student_block', '');
 				foreach ($attendanceList as $attendance) {
 					$output = array('STUDENT_ID'	=> $attendance['studentID'],
-									'STUDENT_NAME'	=> $attendance['studentName'],
+									'STUDENT_NAME'	=> formatName($attendance),
 									'ATTENDANCE_SELECTED'	=> $attendance['present'] == 'true' ? 'checked="checked"' : '',
 									);
 					$page->setVar($output);
