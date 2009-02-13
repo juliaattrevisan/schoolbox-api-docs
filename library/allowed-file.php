@@ -73,7 +73,7 @@ class AllowedFile extends Model {
 			error(10);
 		
 		if($typeCheck)
-			$this->checkMime($file)
+			$this->checkMime($file);
 	}
 
 }

@@ -1,0 +1,66 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#category-list, #file-list").treeTable({
+		initialState: "collapsed"
+	});
+	
+});
+</script>
+<style type="text/css">
+	#column-1 {
+		width: 30%;
+		float: left;
+		height: 100%;
+	}
+	#column-2 {
+		margin-left: 31%;
+		height: 100%;
+	}
+	
+	/* wrap mimetypes in classes */
+	<!-- BEGIN allowed_files -->
+	.treeTable span.file.{NAME} {
+		background-image: url(/images/mime/{ICON});
+	}
+	<!-- END allowed_files -->
+	
+</style>
+<!-- END custom_head -->
+<div id="container">
+<div id="column-1">
+  <table id="category-list">
+    <thead>
+    <th>Folders</th>
+      </thead>
+    <tbody>
+      <tr id="node-0" class="expanded populated">
+      	<td><span class="top">Top</span></td>
+      </tr>
+      <!-- BEGIN category_list -->
+      <tr id="node-{CATEGORY_ID}" class="{CLASS}">
+        <td><span class="folder">{CATEGORY_NAME}</span></td>
+      </tr>
+      <!-- END category_list -->
+    </tbody>
+  </table>
+</div>
+<div id="column-2">
+  <table id="file-list">
+    <thead>
+      <th>Name</th>
+      <th>Size</th>
+      <th>Modified</th>
+    </thead>
+    <tbody>
+      <!-- BEGIN file_list -->
+      <tr id="file-{FILE_ID}" class="category-{CATEGORY_ID}">
+        <td><span class="file ui-draggable {CLASS}">{FILE_NAME}</span></td>
+        <td>{FILE_SIZE}</td>
+        <td>{FILE_MODIFIED}</td>
+      </tr>
+      <!-- END file_list -->
+    </tbody>
+  </table>
+</div>
+</div>

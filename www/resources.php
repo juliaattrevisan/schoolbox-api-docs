@@ -1,320 +1,138 @@
 <?php
 
-if (!$this) {
-	require_once '../include/sitePage.php';
-	$page = new SitePage(false);
-	session_start();
-}
-if ( !isset($_SESSION['id'])) {
-	print "<script type=\"text/javascript\">window.open('/resources/','_self','');</script>";
-	exit;
-}
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/link.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
-if (is_numeric($_GET['cat-list'])) {
+$this->setFile(TEMPLATE_content, 'resources.html');
+$this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
+$this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
+$this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 
-	list($categoryHTML) = getCategoryHTML($_GET['cat-list']);
-	print $categoryHTML;
-	exit;
+$this->setJavascript('/javascript/jquery.js');
+$this->setJavascript('/javascript/jquery.ui.js');
+$this->setJavascript('/javascript/jquery.contextmenu.js');
+$this->setJavascript('/javascript/jquery.slimbox.js');
+$this->setJavascript('/javascript/jquery.resources.js');
 
-} else if (is_numeric($_GET['file-list'])) {
-
-	list(, $windowHTML) = getCategoryHTML($_GET['file-list']);			
-	$windowHTML .= getFileHTML($_GET['file-list']);
-	print $windowHTML;
-	exit;
-
-} else if (is_numeric($_GET['save-history'])) {
-
-	$_SESSION['smCategory'] = (int)$_GET['save-history'];
-	exit;
-
-} else if (is_numeric($_GET['details'])) {
-	
-	$fileDetails = outputDetails((int)$_GET['details']);
-	print $fileDetails;
-	exit;
-} else if (is_numeric($_GET['link-details'])) {
-	
-	$linkDetails = outputLinkDetails((int)$_GET['link-details']);
-	print $linkDetails;
-	exit;
-}
+$this->setCss('/css/jquery.contextmenu.css');
+$this->setCss('/css/jquery.slimbox.css');
+$this->setCss('/css/jquery.resources.css');
 
 
-$this->setFile(TEMPLATE_content, 'resources/resources.html');
-$this->setTab("resources");
+
 $this->setTitle('Resources');
+$this->setTab('resources');
 
-$categoryID = is_numeric($this->arg[0]) ? $this->arg[0] : $_SESSION['smCategory'];
-$categoryID = $_SESSION['smCategory'] = is_numeric($categoryID) ? $categoryID : 0;
-
-$this->setVar("CID", $categoryID);
-
-require_once '../library/category.php';
 $categoryHandler = new Category;
+$fileHandler = new File;
+$linkHandler = new Link;	
+$groupHandler = new Group;
+$allowedFiles = new AllowedFile;
 
-$this->setVar("SITE", $this->site);
+$openCategory = (int)$this->arg[0];
 
-// build categoryID array
-$categoryIDList = array ($categoryID);
-$parent = $categoryID;
-while ($parent > 0) {
+// get parentIDs from openCategory to 0
+$parentList[] = $parentID = $openCategory;
+while ($parentID > 0)
+	$parentList[] = $parentID = $categoryHandler->getParent($parentID);
+
+
+// output folders, column 1
+$categoryList = $categoryHandler->getCategoryNode($openCategory);
+if (is_array($categoryList)) {
 	
-	$parent = $categoryHandler->getParent($parent);
-	array_push($categoryIDList, (int)$parent);
-} 
-
-// left column
-list($categoryHTML) = getCategoryHTML($categoryIDList);
-$this->setVar('NAV_CONTENT', $categoryHTML);
-
-
-// right column
-$windowHTML = "";
-if ($categoryID > 0) {
-	list( , $windowHTML) = getCategoryHTML($categoryID);
-}
-$windowHTML .= getFileHTML($categoryID);	
-$this->setVar('WINDOW_CONTENT', '<div id="window_'.$categoryID.'">' . $windowHTML . '</div>');		
-
-
-
-// functions
-function getCategoryHTML($categoryIDList) {
-	
-	
-	$page = new SitePage();
-	$page->setFile('blockBODY', 'resources/resources_block.html');
-
-	$page->setBlock('blockBODY', 'category', 'category_block');
-	$page->setBlock('blockBODY', 'category_window', 'category_window_block');
-
-
-	if (!is_array($categoryIDList)) {
-		$categoryIDList = array($categoryIDList);
-	}
-	
-	require_once '../library/category.php';
-	$categoryHandler = new Category;	
+	foreach ($categoryList as $category) {
+		$category['children'] = $categoryHandler->hasChildren($category['id']);
 		
-	for ($i = 0; $i < count($categoryIDList); $i++) {
-
-
-		$catList = $categoryHandler->getCategoryList($categoryIDList[$i]);
-		$catPerm = perm($categoryIDList[$i], 1);
-		if ($catPerm < 1 && $categoryIDList[$i]['parent'] > 0)
-			continue;
+		$class = array();
 		
-		$page->setVar('category_block', '');
-		$page->setVar('category_window_block', '');
-
-		if (is_array($catList)) {
-			foreach($catList as $category) {	
-				
-				$subPerm = perm($category['id'], 1);
-				if ($subPerm < 1) continue;
-				
-				$category['children'] = $categoryHandler->hasChildren($category['id']);
-				
-				$output = array('CAT_ID' 		=> $category['id'],
-								'CAT_NAME'      => $category['name'] . (!empty($category['code']) ? " (" . $category['code'] . ")":""),
-								'CAT_OPENCLOSE' => $category['children'] > 0 ? "<img src=\"/images/" . 
-												 ( $category['id'] == $previousCat ? "expanded" : "collapsed") . ".gif\" alt=\"Expand\" />":"",
-								'SUB_CATEGORY'  => ($i > 0 && $category['id'] == $previousCat)? '<div id="category_'.$category['id'].'">' . 
-																							  $previousCatHTML .'</div>' : '',
-								'CAT_MARGIN'    => ($i+1<count($categoryIDList)? "style='margin-left: 30px;'" : "") ,
-								'CAT_SELECTED'  => $category['id'] == $_SESSION['smCategory'] ? "id='resources-selected'" : "",
-								'HOMEPAGE'	  	=> $category['template'] > 0 ? "Y" : "N",
-								'HAS_PERM'		=> $subPerm > 1 ? 'Y' : '',
-								);
-								
-				$page->setVar($output);
-
-				$page->parse('category_block', 'category', true);
-				$page->parse('category_window_block', 'category_window', true);
-								
-				
-			}
-			$previousCat = $categoryIDList[$i];
-			$previousCatHTML = $page->getVar('category_block');
-		} 
+		// set parent category
+		$class[] = "child-of-node-{$category['parent']}";
+		
+		// has children
+		$category['children'] > 0 ? $class[] = "parent" : null;
+		
+		// is currently expanded
+		in_array($category['id'], $parentList) ? $class[] = "expanded populated" : null;
+		
+		// has files showing
+		$category["id"] == $openCategory ? $class[] = "opened selected" : null;
+		
+		// has homepage
+		$category['template'] > 0 ? $class[] = "homepage" : null;
+		
+		// write access
+		$groupHandler->getPermission($category['id']) >= WRITE_ACCESS ? $class[] = "write" : null;
+		
+		$output = array('CATEGORY_ID'		=> $category['id'],
+						'CATEGORY_NAME'		=> scrubText($category['name']),
+						'CLASS'				=> implode(" ", $class),
+						);	
+		$this->setVar($output);
+		$this->parse('category_list_block', 'category_list', true);
 	}
-	
-	return array($page->getVar('category_block'), $page->getVar('category_window_block'));
 }
 
-function getFileHTML($categoryID) {
+// output files, column 2
+$fileList = $fileHandler->mergeLinks( $fileHandler->getAllInCategory($openCategory), $linkHandler->getAllInCategory($openCategory));
+$permission = $groupHandler->getPermission($openCategory);
 
-	$page = new SitePage();
-	$page->setFile('blockBODY', 'resources/resources_block.html');
-	$page->setBlock('blockBODY', 'file', 'file_block');
+if (is_array($fileList)) {
 	
-	require_once '../library/file.php';
-	require_once '../library/link.php';
-	$fileHandler = new File;
-	$linkHandler = new Link;		
-	
-	$fileList = $fileHandler->getAllInCategory($categoryID);
-	$linkList = $linkHandler->getAllInCategory($categoryID);
-	
-	$catPerm = perm($categoryID, 1);
-	if ($catPerm < 1 && $categoryID > 0) {
-		unset($_SESSION['smCategory']);
-		error(14);
-	}
-
-	if (is_array($linkList)) {
-		$fileList = is_array($fileList) ? $fileList : array();
-		$fileList = array_merge($fileList, $linkList);
-	
-		foreach ($fileList as $row) {
-			$arrayOut[$row['description']]  = $row;
-		}
-		ksort($arrayOut);
-		$fileList =& $arrayOut;
-	}
-	
-	if (is_array($fileList)) {
-	
-		foreach ($fileList as $file) {
-			
-			if ($file['hidden'] > 0 && $catPerm < 2) continue;
+	foreach ($fileList as $file) {
 		
-			$output = array('FILE_ID' 	 	=> $file['id'],
-							'FILE_NAME' 	=> scrubText($file['description']),
-							'FILE_ICON' 	=> !is_null($file['iconFile']) ? "/images/mime/".$file['iconFile'] : "/images/mime/application-x-none.png",
-							'FILE_ALT'  	=> !is_null($file['mime_description']) ? $file['mime_description'] : $file['comment'],
-							'CAT_ID'	 	=> $file['category'],
-							'FILE_INLINE' 	=> $file['inline']=='true'?"Y":"N",
-							'URL_YN'	 	=> $file['url'] ? "Y":"N",
-							'HIDDEN'	 	=> $file['hidden'] > 0 ? "style='opacity: 0.55;'" : "",
-							'FILE_LINK' 	=> urlencode($file['url']),
-							'HAS_PERM'		=> $catPerm > 1 ? 'Y' : '',
+		$class = array();
+		
+		// is link
+		$file['url'] ? $class[] = "link" : null;
+		
+		// write access
+		$permission >= WRITE_ACCESS ? $class[] = "write" : null;
+
+		// is hidden
+		$file['hidden'] > 0 ? $class[] = "hidden" : null;
+		
+		// icon
+		$class[] = !empty($file['iconFile']) ? substr($file["iconFile"], 0, strpos($file["iconFile"], ".")) : "textfile";
+	
+		$output = array('FILE_ID' 	 	=> $file['id'],
+						'FILE_NAME' 	=> scrubText($file['description']),
+						'FILE_MODIFIED'	=> outputDate(DATE_short_format, $file['submitted']),
+						'FILE_SIZE'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
+						'CATEGORY_ID'	=> $file['category'],
+						'CLASS'			=> implode(" ", $class),
+						);
+						
+		$this->setVar($output);
+		$this->parse('file_list_block', 'file_list', true);
+
+	}
+} else
+	$this->setVar('file_list_block', '');	
+
+// output mime classes
+$allowedList = $allowedFiles->getAll();
+if (is_array($allowedList)) {
+	
+	// append link icon to resutls
+	$allowedList[]['iconFile'] = "http-url.png";
+	$last = '';
+	foreach ($allowedList as $allowed) {
+		if ($last != $allowed["iconFile"]) {
+			$output = array("NAME"	=> substr($allowed["iconFile"], 0, strpos($allowed["iconFile"], ".")),
+							"ICON"	=> $allowed["iconFile"],
 							);
-
-			$filename = FILE_directory . "/" . $file['id'] . ".dat";
-
-			// set file size
-			if($file['realname'] != "")
-			{
-				if($file['file_size'])
-					$filesize = $file['file_size'];
-				else
-					$filesize = @filesize($filename);
-				
-				if($filesize == FALSE) //if we cannot find the file (something is wrong dont link to it)
-				{
-					$page->setVar("FILE_SIZE", "");
-					$file['realname'] = "";	
-				}
-				else
-					$page->setVar("FILE_SIZE", bytesToString($filesize));
-			}
-			else
-				$page->setVar("FILE_SIZE", "");	
-				
-
-			if($file['realname'] != "")
-			{
-				//if inline open in new window, if not give user a save dialog box
-				if($file['inline'] == 'true')
-					$page->setVar("FILE_URL", "<a href=\"/sendframe.php?id=".$file['id']."\" onclick=\"window.open(this.href, '_blank',''); return false;\">");
-				else
-					$page->setVar("FILE_URL", "<a href=\"/send.php?id=".$file['id']."&save=1\">");
-					
-				$page->setVar('FILE_URL_END', '</a>');
 			
-			} else if(isLocalURL($file['url']))
-			{
-				$page->setVar("FILE_URL", "<a href=\"" . $file['url'] ."\" onclick=\"window.open(this.href, '_self',''); return false;\">");
-				$page->setVar('FILE_URL_END', '</a>');
-			}
-			else if ($file['url'] != "")
-			{
-				$page->setVar("FILE_URL", "<a href=\"/redir.php?url=" . urlencode(urlencode($file['url'])) ."\" title=\"" . $file['url'] . "\" onclick=\"window.open(this.href, '_blank',''); return false;\">");
-				$page->setVar('FILE_URL_END', '</a>');
-			}
+			$this->setVar($output);
+			$this->parse("allowed_files_block", "allowed_files", true);
 			
-			else
-			{
-				$page->setVar('FILE_URL', '');
-				$page->setVar('FILE_URL_END', '');
-			}										
-							
-			$page->setVar($output);
-			$page->parse('file_block', 'file', true);
-
+			$last = $allowed["iconFile"];
 		}
-	} else
-		$page->setVar('file_block', '');	
-		
-	return $page->getVar('file_block');
-
-}
-
-function outputDetails ($fileID) {
-
-	require_once '../library/file.php';
-	$fileHandler = new File;
-
-	$page = new SitePage();
-	$page->setFile('blockBODY', 'resources/resources_block.html');
-	$page->setBlock('blockBODY', 'file_details', 'file_details_block');
-
-	$file = $fileHandler->getByID($fileID);
-
-	$output = array ('FILE_ID'	 => $file['id'],
-					 'CATEGORY'	 => $file['categoryName'],
-					 'OWNER'	 => $file['ownerName'],
-					 'OWNER_ID'	 => $file['owner'],
-					 'REALNAME'	 => $file['realname'],
-					 'CREATED'	 => date("M j y @ g:iA", $file['submitted']),
-					 'DESCRIPTION'	=> scrubText($file['description']),
-					 'COMMENT'	 => scrubText($file['comment']),
-					 'SIZE'		 => number_format($file['file_size']/1024, 1),
-					 'MIME_TYPE' => $file['mime_type'],
-					 'HIDDEN'	 => $file['hidden'] > 0 ? 'Yes' : 'No',
-					 );
-	
-	
-	$page->setVar($output);
-	
-	$page->parse('file_details_block', 'file_details');
-
-	return $page->getVar('file_details_block');
-	
-}
-
-function outputLinkDetails ($linkID) {
-
-	require_once '../library/link.php';
-	$linkHandler = new Link;
-
-	$page = new SitePage();
-	$page->setFile('blockBODY', 'resources/resources_block.html');
-	$page->setBlock('blockBODY', 'link_details', 'link_details_block');
-
-	$link = $linkHandler->getByID($linkID);
-
-	$output = array ('FILE_ID'	 => $link['id'],
-					 'CATEGORY'	 => $link['categoryName'],
-					 'OWNER'	 => $link['ownerName'],
-					 'OWNER_ID'	 => $link['owner'],
-					 'URL'	 	 => $link['url'],
-					 'CREATED'	 => date("M j y @ g:iA", $link['submitted']),
-					 'DESCRIPTION'	=> scrubText($link['description']),
-					 'COMMENT'	 => scrubText($link['comment']),
-					 'HIDDEN'	 => $link['hidden'] > 0 ? 'Yes' : 'No',
-					 );
-	
-	
-	$page->setVar($output);
-	
-	$page->parse('link_details_block', 'link_details');
-
-	return $page->getVar('link_details_block');
-	
-}
-
+	}
+} else
+	$this->setVar('allowed_files_block', '');
 
 ?>

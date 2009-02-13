@@ -61,7 +61,7 @@ if (isset($_POST['name'])) {
 	else {
 		for ($i = 0; $i < count($dateArray); $i++) {
 			$event['date'] = $dateArray[$i];
-			$event['eventID'] = $eventHandler->create($event);
+			$eventID = $eventHandler->create($event);
 		}
 		//localRedir('/modules/tutorial/list-enrolment.php?eventID='. $event['eventID']);
 		$page->backToTheFuture(2);

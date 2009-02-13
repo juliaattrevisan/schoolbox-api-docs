@@ -22,14 +22,19 @@ window.addEvent('domready', function() {
 	window.onload=function(){tableruler();} 
 </script>
 <!-- END custom_head -->
-<h1>Enrolment - {EVENT_NAME}</h1>
+<h1>Class list - {EVENT_NAME}</h1>
+<span class="header_option"><a href="list-attendance.php?week={WEEK}" title="Attendance history">Mark Attendance</a> | 
+<a href="modify-event.php?eventID={EVENT_ID}" title="Modify Event">Modify</a> | 
+<a href="modify-event.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?')" title="Delete Event">Delete</a></span>
 <!-- BEGIN has_enrolments -->
 <table class="ruler">
   <thead>
     <tr>
       <th style="width: 60px;">Remove</th>
       <th>Student</th>
-      <th style="width: 100px;">Attendance %</th>
+      <!-- BEGIN date_list -->
+      <th>{DATE}</th><!-- END date_list -->
+      <th style="text-align: right;">Attendance</th>
     </tr>
   </thead>
   <tbody>
@@ -37,7 +42,11 @@ window.addEvent('domready', function() {
     <tr>
       <td style="text-align: center;"><a href="list-enrolment.php?delete={STUDENT_ID}&code={EVENT_CODE}&eventID={EVENT_ID}" onclick="return confirm('Delete student from classlist?');"><img src="/images/famicons/delete.png" /></a></td>
       <td><a href="/search/userLookup.php?id={STUDENT_ID}">{STUDENT_NAME}</a></td>
-      <td style="text-align: right;">{ATTENDANCE}</td>
+      <!-- BEGIN attendance_list -->
+      <td>
+      	<!-- BEGIN image -->
+        <img src="/images/famicons/{ATTENDANCE}.png" title="{REASON}" /><!-- END image --></td><!-- END attendance_list -->
+      <td style="text-align: right;">{PERCENTAGE}</td>
     </tr>
     <!-- END enrolment_list -->
   </tbody>

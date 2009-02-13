@@ -96,19 +96,25 @@ else {
 							'EVENT_DATE'	=> outputDate(DATE_short_no_time, $event['date']),
 							'EVENT_NAME'	=> scrubText($event['name']),
 							'EVENT_CODE'	=> scrubText($event['code']),
+							'ACTION'		=> 'Save',
+							'DISABLED'		=> $event['date'] < strtotime("-1 month")  ? "disabled" : "", // disable modifying attendance after 1 month
+							'ALLOWADD'		=> date("W", $event['date']) < date("W")  ? "disabled" : "", // disable add student if date has passed
 							);
 			$page->setVar($output);
 			$attendanceList = $attendanceHandler->getAllByEvent($event['eventID']);
-
+			
+			// output each student
 			if (is_array($attendanceList)) {
 				$page->setVar('student_block', '');
 				foreach ($attendanceList as $attendance) {
 					$output = array('STUDENT_ID'	=> $attendance['studentID'],
 									'STUDENT_NAME'	=> formatName($attendance),
-									'ATTENDANCE_SELECTED'	=> $attendance['present'] == 'true' ? 'checked="checked"' : '',
+									'ATTENDANCE_SELECTED'	=> $attendance['present'] != 'false' ? 'checked="checked"' : '',
+									'ACTION'	=> !empty($attendance['present']) ? "Modify" : "Save",
 									);
 					$page->setVar($output);
 					
+					// reason dropdown, $page->dropDown wasn't working for me
 					if (is_array($reasonList)) {
 						$page->setVar('reason_select_block', '');
 						foreach ($reasonList as $reason) {
@@ -120,6 +126,7 @@ else {
 						}
 					}
 					//$page->dropDown('reason_select', $attendanceHandler->getReasonList(), $attendance['reason'], 'student', array('reason' => 'REASON'));
+					
 					$page->parse('student_block', 'student', true);
 					
 

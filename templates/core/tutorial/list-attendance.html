@@ -27,20 +27,13 @@ window.addEvent('domready', function() {
 			//selectMode: 'pick'
 		});
 	});
-	$$('.reason_select').each(function (el) {
-		el.addEvent('change', function() {
-			var myRequest = new Ajax('list-attendance.php?ajax='+el.name+'&value='+escape(el.value)).request();
-		});
-	});
-	$$('.present_check').each(function (el) {
-		el.addEvent('click', function() {
-			var value = 'false';
-			if (el.checked)
-				value = 'true';
-			var myRequest = new Ajax('list-attendance.php?ajax='+el.name+'&value='+value).request();
-		});
-	});
 	
+	// disable all elements in forms with class disabled
+	$$(".disabled input, .disabled select").each(function (el) {
+		//el.getChildren("input").each(function (ip) {
+			el.setAttribute("disabled", "true");
+		//});
+	});
 	
 });
 </script>
@@ -56,12 +49,13 @@ window.addEvent('domready', function() {
 
 <div class="indent">
 <!-- BEGIN event -->
-<form action="list-attendance.php" method="post">
+<form action="list-attendance.php" method="post" class="{DISABLED}">
   <table class="ruler">
     <thead>
       <tr>
         <td colspan="7"><h2>{EVENT_NAME} - {EVENT_DATE}</h2>
-        <span class="header_option"><a href="modify-event.php?eventID={EVENT_ID}" title="Modify Event">Modify</a> | 
+        <span class="header_option"><a href="list-enrolment.php?eventID={EVENT_ID}" title="Attendance history">Attendance history</a> | 
+        <a href="modify-event.php?eventID={EVENT_ID}" title="Modify Event">Modify</a> | 
         <a href="modify-event.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?')" title="Delete Event">Delete</a></span>
         </td>
       <tr>
@@ -88,14 +82,15 @@ window.addEvent('domready', function() {
       <!-- END student -->
     </tbody>
   </table>
-  
   <p class="float-right">
   <input type="hidden" name="eventID" value="{EVENT_ID}" />
   <input type="hidden" name="week" value="{WEEK}" />
-  <input type="submit" value="Save Attendance" class="btn" /></p>
+  <input type="submit" value="{ACTION} Attendance" class="btn" /></p>
   </form>
+
+  <!-- BEGIN add_student -->
   <p>
-  <form action="list-attendance.php" method="post">
+  <form action="list-attendance.php" method="post" class="{ALLOWADD}">
     <input class="lookup" type="text" name="keyword" />
     <input type="hidden" name="code" value="{EVENT_CODE}" />
     <input type="hidden" name="eventID" value="{EVENT_ID}" />
@@ -103,6 +98,7 @@ window.addEvent('domready', function() {
     <input type="submit" value="Add Student" class="btn" />
    </form>
   </p>
+  <!-- END add_student -->
   
 <!-- END event -->
 

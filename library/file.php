@@ -25,6 +25,9 @@ class File extends Model {
 	}
 
 	function getAllInCategory($categoryID, $config = false) {
+	
+		require_once dirname(__FILE__) . '/group.php';
+		$groupHandler = new Group;
 
 		$query = "SELECT f.*, u.firstname, u.lastname, u.title, 
 						UNIX_TIMESTAMP(f.submitted) submitted, ft.name typeName, c.name categoryName, af.description as mimeDescription, iconFile, af.inline
@@ -36,7 +39,7 @@ class File extends Model {
 				  LEFT JOIN submission_box sb on sb.fid = f.id
 				  WHERE f.category = " . $categoryID . " AND f.deleted = '0' ";
 		
-		if (perm($categoryID, HOMEPAGESERVICE) < 2)
+		if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS)
 			$query .= " AND f.hidden = 0";	
 		
 		if ($config['filter'] == 'document')
@@ -55,6 +58,19 @@ class File extends Model {
 
 		return $this->db->getAll($query);
 	
+	}
+	
+	function mergeLinks($fileList, $linkList) {
+		$fileList = is_array($fileList) ? $fileList : array();
+		$linkList = is_array($linkList) ? $linkList : array();
+		
+		$fileList = array_merge($fileList, $linkList);
+		usort($fileList, array("File", "sortResult"));
+		return $fileList;
+	}
+	
+	function sortResult($data1, $data2) {
+		return strcmp($data1['description'], $data2['description']);
 	}
 	
 	function logAction ($fileID, $action) {

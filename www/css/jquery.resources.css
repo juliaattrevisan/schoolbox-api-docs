@@ -1,0 +1,107 @@
+/* jQuery TreeTable Core 2.0 stylesheet
+ *
+ * This file contains styles that are used to display the tree table. Each tree
+ * table is assigned the +treeTable+ class.
+ * ========================================================================= */
+
+/* TABLE
+ * ========================================================================= */
+.treeTable {
+  border: 1px solid #888;
+  border-collapse: collapse;
+  line-height: 1.4;
+}
+
+/* Header
+ * ------------------------------------------------------------------------- */
+
+.treeTable thead tr th {
+  border: 1px solid #888;
+  font-weight: normal;
+  padding: .3em 1.67em .1em 1.67em;
+  text-align: left;
+}
+
+/* Body
+ * ------------------------------------------------------------------------- */
+.treeTable tbody tr td {
+  cursor: default;
+  padding: .3em 1.5em;
+}
+
+.treeTable tbody tr.even {
+  background: #f3f3f3;
+}
+
+.treeTable tbody tr.odd {
+  background: #fff;
+}
+
+.treeTable span {
+  background-position: center left;
+  background-repeat: no-repeat;
+  padding: .2em 0 .2em 2em;
+}
+
+.treeTable span.file {
+  background-image: url(/images/mime/textfile.png);
+}
+
+.treeTable span.folder, .treeTable span.top {
+  background-image: url(/images/mime/folder_blue_full.png);
+}
+
+.treeTable span.hidden {
+  opacity: 0.55;
+}
+
+.treeTable span.folder.loading {
+  background-image: url(/images/resources/ajax.gif);
+}
+
+.treeTable tr.selected span.folder.loading {
+  background-image: url(/images/resources/ajax-selected.gif);
+}
+
+.treeTable span.folder.error {
+  background-image: url(/images/mime/folder_blue_error.png);
+}
+
+/* jquery.treeTable.collapsible
+ * ------------------------------------------------------------------------- */
+.treeTable tr td .expander {
+  background-position: left center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  padding: 0;
+  zoom: 1; /* IE7 Hack */
+}
+
+.treeTable tr.collapsed td .expander {
+  background-image: url(/images/resources/toggle-expand-dark.png);
+}
+
+.treeTable tr.expanded td .expander {
+  background-image: url(/images/resources/toggle-collapse-dark.png);
+}
+
+/* jquery.treeTable.sortable
+ * ------------------------------------------------------------------------- */
+.treeTable tr.selected, .treeTable tr.accept {
+  background-color: #3875d7;
+  color: #fff;
+}
+
+.treeTable tr.collapsed.selected td .expander, .treeTable tr.collapsed.accept td .expander {
+  background-image: url(/images/resources/toggle-expand-light.png);
+}
+
+.treeTable tr.expanded.selected td .expander, .treeTable tr.expanded.accept td .expander {
+  background-image: url(/images/resources/toggle-collapse-light.png);
+}
+
+.treeTable .ui-draggable-dragging {
+  color: #000;
+  z-index: 1;
+}
+

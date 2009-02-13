@@ -14,7 +14,7 @@ class Attendance extends Model {
 	
 	function getAllByEvent($eventID) {
 		
-		// who should have attended
+		// who might have attended
 		$query = "(SELECT e.eventID, n.studentID, a.present, a.reason, u.lastname ,u.firstname, u.title
 				  FROM ".TUTORIAL_db.".event e
 				  LEFT JOIN ".TUTORIAL_db.".enrolment n ON ((n.code = e.code AND n.code != '') OR n.eventID = e.eventID) AND n.from <= e.date 
@@ -25,7 +25,7 @@ class Attendance extends Model {
 				  
 				  UNION";
 		
-		// who did attend
+		// and who did attend
 		$query .= "(SELECT e.eventID, a.studentID, a.present, a.reason, u.lastname ,u.firstname, u.title
 				  FROM ".TUTORIAL_db.".event e
 				  LEFT JOIN ".TUTORIAL_db.".attendance a ON a.eventID = e.eventID
@@ -35,6 +35,18 @@ class Attendance extends Model {
 		
 		return $this->db->getAll($query);
 		
+	}
+	
+	function getAllByStudent($studentID, $code, $eventID) {
+		$query = "SELECT *, UNIX_TIMESTAMP(e.date) date FROM ".TUTORIAL_db.".event e 
+				  LEFT JOIN ".TUTORIAL_db.".attendance a ON a.eventID = e.eventID AND a.studentID = $studentID
+				  WHERE ";
+		if (!empty($code))
+			$query .= "e.code = ". $this->db->smartQuote($code)." ";	
+		else
+			$query .= "e.eventID = $eventID "; 
+
+		return $this->db->getAll($query);			  
 	}
 	
 	function getByStudent($studentID, $code) {

@@ -1,9 +1,21 @@
 <?php 
 	include_once("include/include.php");
 	require_once("include/session.php");
+
+	$url = '';
 	
-	if($_GET['url']) {
-		$url = urldecode($_GET['url']);	
+	if($_GET['url'])
+		$url = $_GET['url'];		
+	elseif (is_numeric($_GET['id'])) {
+		// lookup link if id given
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/link.php';
+		$linkHandler = new Link;
+		$link = $linkHandler->getByID($_GET['id']);
+		$url = $link['url'];
+	}
+	
+	if (!empty($url)) {
+		$url = urldecode($url);	
 	
 		if(!URLS_use_frame)
 		{

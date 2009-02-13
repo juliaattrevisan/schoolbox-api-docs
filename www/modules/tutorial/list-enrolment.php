@@ -7,7 +7,11 @@ require_once SITE_root . '/www/modules/tutorial/library/attendance.php';
 
 $page = new SitePage();
 $page->setFile(TEMPLATE_content, 'tutorial/list-enrolment.html');
+$page->setBlock(TEMPLATE_content, 'date_list', 'date_list_block');
 $page->setBlock(TEMPLATE_content, 'enrolment_list', 'enrolment_list_block');
+$page->setBlock('enrolment_list', 'attendance_list', 'attendance_list_block');
+$page->setBlock('attendance_list', 'image', 'image_block');
+
 $page->setTitle('Tutorial Management');
 
 $eventHandler = new Event;
@@ -46,20 +50,48 @@ elseif (is_numeric($_GET['delete']) && isset($_GET['code'])) {
 	$output = array('EVENT_NAME'	=> scrubText($event['name']),
 					'EVENT_CODE'	=> scrubText($event['code']),
 					'EVENT_ID'		=> $event['eventID'],
-					'WEEK'			=> date("W", $event['date']),
+					'WEEK'			=> date("W", $event['date']) - 1,
 					);
 	$page->setVar($output);
 	
 	$enrolmentList = $enrolmentHandler->getAllByEvent($event['code'], $event['eventID']);
 	if (is_array($enrolmentList)) {
+		$i = 0;
 		foreach ($enrolmentList as $enrolment) {
+			$i++;
 			$attendance = $attendanceHandler->getByStudent($enrolment['studentID'], $event['code']);
-			$percentage = $attendance['expected'] > 0 ? number_format(($attendance['present']/$attendance['expected'])*100, 2) : 'N/A';
+			$percentage = $attendance['expected'] > 0 ? number_format(($attendance['present']/$attendance['expected'])*100, 2) . " %" : 'N/A';
 			$output = array('STUDENT_ID'	=> $enrolment['studentID'],
 							'STUDENT_NAME'	=> $enrolment['studentName'],
-							'ATTENDANCE'	=> $percentage,
+							'PERCENTAGE'	=> $percentage,
 							);
 			$page->setVar($output);
+			
+			// output attendance per date
+			$attendanceList = $attendanceHandler->getAllByStudent($enrolment['studentID'], $event['code'], $event['eventID']);
+			if (is_array($attendanceList)) {
+				$page->setVar('attendance_list_block', '');
+				foreach ($attendanceList as $attendance) {
+					$output = array('DATE'			=> outputDate("j/n", $attendance['date']),
+									'ATTENDANCE' 	=> $attendance['present'] == 'true' ? "tick" : "cross",
+									'REASON'		=> scrubText($attendance['reason']),
+									);
+					$page->setVar($output);
+					
+					// hide image if attendance not marked
+					$page->setVar('image_block', '');
+					if (!empty($attendance['present']))
+						$page->parse('image_block', 'image');
+					
+					// only parse date headings once
+					if ($i == 1)
+						$page->parse('date_list_block', 'date_list', true);
+						
+					$page->parse('attendance_list_block', 'attendance_list', true);
+				}
+			}
+			
+			
 			$page->parse('enrolment_list_block', 'enrolment_list', true);
 		}
 	} else

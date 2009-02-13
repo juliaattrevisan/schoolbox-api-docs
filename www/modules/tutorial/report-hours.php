@@ -24,14 +24,20 @@ if (!$_SESSION['su'])
 $from = ausDateToUnix($_GET['from']);
 $to = ausDateToUnix($_GET['to']);
 
+$output = array('FROM'		=> outputDate("d/m/Y", $from),
+				'TO'		=> outputDate("d/m/Y", $to),
+);
+$page->setVar($output);
+
 $eventHandler = new Event;
 $tutorList = $eventHandler->getTutorList();
 if (is_array($tutorList)) {
 	foreach ($tutorList as $tutor) {
 	
 		$eventList = $eventHandler->getByTutor($tutor['id'], $from, $to);
+		$i = 0;
 		if (is_array($eventList)) {
-			
+			$i++;
 			$totalHours = 0;
 			foreach ($eventList as $event) {
 				$output = array('DATE'		=> outputDate(DATE_short_no_time, $event['date']),
@@ -42,8 +48,6 @@ if (is_array($tutorList)) {
 								'CODE'		=> scrubText($event['code']),
 								'STUDENTS'	=> $event['students'],
 								'HOURS'		=> number_format($event['hours'], 2),
-								'FROM'		=> outputDate("d/m/Y", $from),
-								'TO'		=> outputDate("d/m/Y", $to),
 								);
 				$page->setVar($output);
 				$page->parse('event_list_block', 'event_list', true);
@@ -62,6 +66,10 @@ if (is_array($tutorList)) {
 		} //else
 			//$page->setVar('tutor_list_block', '');	
 	}
+	
+	if ($i == 0)
+		$page->setVar('tutor_list_block', '<p>All attendance completed.</p>');
+	
 	$page->parse('has_events_block', 'has_events');
 } else
 	$page->setVar('has_events_block', '<p>All attendance completed.</p>');	

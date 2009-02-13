@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<title>MGS Portal - Resource Properties</title>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/resources.css" />
+
+</head>
+<body>
+<div class="resources-properties">
+  <table>
+    <tr>
+      <td class='bold'>Description</td>
+      <td>{DESCRIPTION}</td>
+    </tr>
+    <tr>
+      <td class='bold'>Category</td>
+      <td>{CATEGORY}</td>
+    </tr>
+    <!-- BEGIN realname -->
+    <tr>
+      <td class='bold'>Filename</td>
+      <td>{REALNAME}</td>
+    </tr>
+    <!-- END realname -->
+    <!-- BEGIN link -->
+    <tr>
+      <td class='bold'>URL</td>
+      <td>{URL}</td>
+    </tr>
+    <!-- END link -->
+    <tr>
+      <td class='bold'>Owner</td>
+      <td><a href="/search/user/{OWNER_ID}">{OWNER}</a></td>
+    </tr>
+    <tr>
+      <td class='bold'>Created</td>
+      <td>{CREATED}</td>
+    </tr>
+    <!-- BEGIN file -->
+    <tr>
+      <td class='bold'>Size</td>
+      <td>{SIZE} KB</td>
+    </tr>
+    <tr>
+      <td class='bold'>Mime Type</td>
+      <td>{MIME_TYPE}</td>
+    </tr>
+    <!-- END file -->
+    <tr>
+      <td class='bold'>Hidden</td>
+      <td>{HIDDEN}</td>
+    </tr>
+    <tr>
+      <td class='bold'>Comment</td>
+      <td>{COMMENT}</td>
+    </tr>
+  </table>
+</div>
+</body>
+</html>

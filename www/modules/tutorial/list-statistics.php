@@ -73,7 +73,7 @@ if (is_array($eventList)) {
 
 	$page->parse('has_events_block', 'has_events');
 } else
-	$page->setVar('has_events_block', 'There are no upcoming events assigned to you.');
+	$page->setVar('has_events_block', 'No events to display.');
 	
 $page->outputPage();
 ?>
