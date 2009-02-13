@@ -9,16 +9,7 @@
     
     This page exposes the MySQL API as a set of web-services which is consumed by SQLyog - the most popular GUI to MySQL.
     
-    This page allows SQLyog to manage MySQL even if the MySQL port is blocked or remote access to MySQL is not allowed.
-    
-    By:
-    Ritesh Nadhani <ritesh@webyog.com>
-    Shunro Dozono <dozono@gmail.com>
-    Peter Laursen <peter.laursen@webyog.com>
-    Roy Varley  
-    Andrey Adaikin, IVA Team, <IVATeam@gmail.com>
-    Sabyasachi Ruj <ruj.sabya@gmail.com>
-
+    This page allows SQLyog to manage MySQL even if the MySQL port is blocked or remote access to MySQL is not allowed.    
 */
 
 /*Wrapper Functions for PHP-MYSQL and PHP-MYSQLI*/
@@ -1070,6 +1061,10 @@ function startElement ( $parser, $name, $attrs )
 
     WriteLog ( "Enter startelement" );
 
+    //Done for bug in PHP 5.2.6 and libXML 2.7,2. 
+    // Special HTML characters were being dropped. So, now we provide to send always as base 64 encoded data.
+    $base  = (( $attrs['E'] == '1' )?(1):(0)); 
+
     switch ( strtolower ( $name ) ) 
     {
 
@@ -1096,7 +1091,6 @@ function startElement ( $parser, $name, $attrs )
         $xml_state  = XML_QUERY;
         /* track whether the query(s) has to be processed in batch mode */
         $batch = (( $attrs['B'] == '1' )?(1):(0));
-        $base  = (( $attrs['E'] == '1' )?(1):(0)); 
         break;        
     }
     WriteLog ( "Exit startelement" );
@@ -1133,6 +1127,13 @@ function charHandler ( $parser, $data )
 
     WriteLog ( "Enter charhandler" );
 
+    //Done for bug in PHP 5.2.6 and libXML 2.7,2. 
+    // Special HTML characters were being dropped. So, now we provide to send always as base 64 encoded data.
+    if ( $base ) 
+    {
+        $data      = base64_decode ( $data );
+    }
+
     if ( $xml_state == XML_HOST ) 
     {
         $host       .= $data;
@@ -1159,11 +1160,7 @@ function charHandler ( $parser, $data )
     }
     else if ( $xml_state == XML_QUERY )
     {
-        if ( $base ) {
-            $query      .= base64_decode ( $data );
-        } else {
-            $query      .= $data;   
-        }
+        $query      .= $data;        
     }
 
     WriteLog ( "Exit charhandler" );
@@ -1494,7 +1491,7 @@ define ( "XML_CHARSET", 7 );
 /* version constant */
 /* You will need to change the version in processquery method too, where it shows: $versionheader = 'TunnelVersion:5.13.1' */
 
-define ( "tunnelversion", '6.16');
+define ( "tunnelversion", '7.15');
 define ( "tunnelversionstring", 'TunnelVersion:' );
 define ( "phpversionerror", 'PHP_VERSION_ERROR' );
 define ( "phpmoduleerror", 'PHP_MODULE_NOT_INSTALLED' );
