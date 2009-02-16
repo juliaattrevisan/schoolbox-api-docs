@@ -5,6 +5,7 @@ require_once SITE_root . '/include/sitePage.php';
 require_once SITE_root . '/www/modules/tutorial/library/event.php';
 require_once SITE_root . '/www/modules/tutorial/library/attendance.php';
 require_once SITE_root . '/www/modules/tutorial/library/enrolment.php';
+require_once SITE_root . '/library/group.php';
 
 $page = new SitePage();
 $page->setFile(TEMPLATE_content, 'tutorial/list-attendance.html');
@@ -21,13 +22,23 @@ $page->setTitle('Tutorial Management');
 $eventHandler = new Event;
 $attendanceHandler = new Attendance;
 $enrolmentHandler = new Enrolment;
+$groupHandler = new Group(TUTORIAL_SERVICE);
 
 // check access
-if (!isStaff($_SESSION['gid']) && !$_SESSION['su'])
+if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)
 	error(19);
 
-
 if (is_array($_POST['reason']) && is_numeric($_POST['eventID'])) {
+	
+	// check user is one of the tutors
+	$event = $eventHandler->getByID($_POST['eventID']);
+	if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($event['tutorID_1'], $event['tutorID_2'])))
+		error(19);
+
+	// check event isn't too old
+	if ($event['date'] < strtotime("-1 month"))
+		error(19);
+	
 	
 	$attendanceHandler->deleteByEvent($_POST['eventID']);
 	
@@ -43,7 +54,13 @@ if (is_array($_POST['reason']) && is_numeric($_POST['eventID'])) {
 	
 	localRedir('/modules/tutorial/list-attendance.php?week=' . $_POST['week']);
 }
-elseif (isset($_POST['keyword'])) {
+elseif (isset($_POST['keyword']) && is_numeric($_POST['eventID'])) {
+
+	// check user is one of the tutors
+	$event = $eventHandler->getByID($_POST['eventID']);
+	if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($event['tutorID_1'], $event['tutorID_2'])))
+		error(19);
+		
 	// add student
 	require_once SITE_root . '/library/user.php';
 	$userHandler = new User;
@@ -57,7 +74,13 @@ elseif (isset($_POST['keyword'])) {
 	}
 	localRedir('/modules/tutorial/list-attendance.php?week=' . $_POST['week']);
 }
-elseif (is_numeric($_GET['remove']) && isset($_GET['code'])) {
+elseif (is_numeric($_GET['remove']) && isset($_GET['code']) && is_numeric($_GET['eventID'])) {
+
+	// check user is one of the tutors
+	$event = $eventHandler->getByID($_GET['eventID']);
+	if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($event['tutorID_1'], $event['tutorID_2'])))
+		error(19);
+
 	$enrolmentHandler->deleteByStudent($_GET['remove'], $_GET['code'], $_GET['eventID']);
 	localRedir('/modules/tutorial/list-attendance.php?week=' . $_GET['week']);
 }

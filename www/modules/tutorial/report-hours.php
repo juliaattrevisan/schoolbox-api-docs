@@ -2,6 +2,7 @@
 require_once '../../conf/conf.php';
 require_once SITE_root . '/include/sitePage.php';
 require_once SITE_root . '/www/modules/tutorial/library/event.php';
+require_once SITE_root . '/library/group.php';
 
 $page = new SitePage();
 $page->setFile(TEMPLATE_content, 'tutorial/report-hours.html');
@@ -18,9 +19,11 @@ if (!isset($_GET['from']))
 	$_GET['from'] = date("d/m/Y", strtotime("-2 week, sunday"));
 
 // check access
-if (!$_SESSION['su'])
+$groupHandler = new Group(TUTORIAL_SERVICE);
+if ($groupHandler->getPermission(0) < FULL_ACCESS)
 	error(19);
-
+	
+	
 $from = ausDateToUnix($_GET['from']);
 $to = ausDateToUnix($_GET['to']);
 
@@ -32,14 +35,16 @@ $page->setVar($output);
 $eventHandler = new Event;
 $tutorList = $eventHandler->getTutorList();
 if (is_array($tutorList)) {
+	$i = 0;
 	foreach ($tutorList as $tutor) {
 	
 		$eventList = $eventHandler->getByTutor($tutor['id'], $from, $to);
-		$i = 0;
+		
 		if (is_array($eventList)) {
 			$i++;
 			$totalHours = 0;
 			foreach ($eventList as $event) {
+			
 				$output = array('DATE'		=> outputDate(DATE_short_no_time, $event['date']),
 								'MARKED'	=> outputDate(DATE_short_no_time, $event['marked']),
 								'START'		=> $event['start'],
@@ -63,16 +68,16 @@ if (is_array($tutorList)) {
 			$page->parse('tutor_list_block', 'tutor_list', true);
 			$page->setVar('event_list_block', '');
 
-		} //else
-			//$page->setVar('tutor_list_block', '');	
+		}
 	}
 	
 	if ($i == 0)
 		$page->setVar('tutor_list_block', '<p>All attendance completed.</p>');
 	
 	$page->parse('has_events_block', 'has_events');
+	
 } else
-	$page->setVar('has_events_block', '<p>All attendance completed.</p>');	
+	$page->setVar('has_events_block', 'No tutors to display.');	
 
 
 

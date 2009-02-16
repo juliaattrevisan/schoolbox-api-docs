@@ -4,6 +4,8 @@ require_once SITE_root . '/include/sitePage.php';
 require_once SITE_root . '/www/modules/tutorial/library/event.php';
 require_once SITE_root . '/www/modules/tutorial/library/enrolment.php';
 require_once SITE_root . '/www/modules/tutorial/library/attendance.php';
+require_once SITE_root . '/library/group.php';
+
 
 $page = new SitePage();
 $page->setFile(TEMPLATE_content, 'tutorial/list-enrolment.html');
@@ -19,10 +21,18 @@ $enrolmentHandler = new Enrolment;
 $attendanceHandler = new Attendance;
 
 // check access
-if (!$_SESSION['su'] && isStaff($_SESSION['gid']))
+$groupHandler = new Group(TUTORIAL_SERVICE);
+if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)
 	error(19);
 
-if (isset($_POST['keyword'])) {
+if (isset($_POST['keyword']) && is_numeric($_POST['eventID'])) {
+
+	// check user is one of the tutors
+	$event = $eventHandler->getByID($_POST['eventID']);
+	if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($event['tutorID_1'], $event['tutorID_2'])))
+		error(19);
+
+
 	require_once SITE_root . '/library/user.php';
 	$userHandler = new User;
 	$userList = $userHandler->searchUser($_POST['keyword'], 3);
@@ -35,18 +45,29 @@ if (isset($_POST['keyword'])) {
 	}
 	localRedir('/modules/tutorial/list-enrolment.php?eventID='.$_POST['eventID']);
 }
-elseif (is_numeric($_GET['delete']) && isset($_GET['code'])) {
+elseif (is_numeric($_GET['delete']) && isset($_GET['code']) && is_numeric($_GET['eventID'])) {
+
+	// check user is one of the tutors
+	$event = $eventHandler->getByID($_GET['eventID']);
+	if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($event['tutorID_1'], $event['tutorID_2'])))
+		error(19);
+
 
 	$enrolmentHandler->deleteByStudent($_GET['delete'], $_GET['code'], $_GET['eventID']);
 
 	localRedir('/modules/tutorial/list-enrolment.php?eventID=' . $_GET['eventID']);
 
-} else {
+} elseif (is_numeric($_GET['eventID'])) {
 	
 	$event = $eventHandler->getByID($_GET['eventID']);
 	if (!isset($event['eventID'])) 
 		error(2);
 		
+	// check user is one of the tutors
+	if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($event['tutorID_1'], $event['tutorID_2'])))
+		error(19);
+
+
 	$output = array('EVENT_NAME'	=> scrubText($event['name']),
 					'EVENT_CODE'	=> scrubText($event['code']),
 					'EVENT_ID'		=> $event['eventID'],
@@ -98,6 +119,8 @@ elseif (is_numeric($_GET['delete']) && isset($_GET['code'])) {
 		$page->setVar('enrolment_list_block', '');
 	
 	$page->outputPage();
-}
+	
+} else
+	error(2);
 
 ?>

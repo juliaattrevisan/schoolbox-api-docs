@@ -1,11 +1,12 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/tableruler.js"></script>
-<script type="text/javascript">
-	window.onload=function(){tableruler();} 
-</script>
+<script type="text/javascript" src="/javascript/jquery.js"></script>
+<script type="text/javascript" src="/javascript/jquery.tableruler.js"></script>
 <style type="text/css">
-.cancelled {
+.cancelled td {
 	text-decoration: line-through;
+}
+.passed td {
+	opacity: 0.5;
 }
 </style>
 <!-- END custom_head -->
@@ -20,7 +21,7 @@
 <h1>{SHOW} Events</h1>
 
 <span class="header_option">
-View <a href="list-event.php">Week</a> | <a href="list-event.php?show=upcoming">Upcoming</a> | <a href="list-event.php?show=semester">Semester</a> | <a href="list-event.php?show=all">Year</a>
+View <a href="list-event.php">Week</a> | <a href="list-event.php?show=semester">Semester</a> 
 </span>
 
 <!-- BEGIN has_events -->
@@ -40,16 +41,16 @@ View <a href="list-event.php">Week</a> | <a href="list-event.php?show=upcoming">
   </thead>
   <tbody>
   <!-- BEGIN event_list -->
-  <tr>
-    <td class="{CANCELLED}">{DATE}</td>
-    <td class="{CANCELLED}">{NAME}</td>
-    <td class="{CANCELLED}">{START}</td>
-    <td class="{CANCELLED}">{FINISH}</td>
-    <td class="{CANCELLED}">{LOCATION}</td>
-    <td class="{CANCELLED}">{CODE}</td>
-    <td class="{CANCELLED}">{TUTORS}</td>
+  <tr class="{PASSED} {CANCELLED}">
+    <td>{DATE}</td>
+    <td>{NAME}</td>
+    <td>{START}</td>
+    <td>{FINISH}</td>
+    <td>{LOCATION}</td>
+    <td>{CODE}</td>
+    <td>{TUTORS}</td>
     <!-- BEGIN modify_link -->
-    <td class="{CANCELLED}"><a href="modify-event.php?eventID={EVENT_ID}">Modify</a></td><!-- END modify_link -->
+    <td><a href="modify-event.php?eventID={EVENT_ID}">Modify</a></td><!-- END modify_link -->
     
   </tr><!-- END event_list -->
   </tbody>

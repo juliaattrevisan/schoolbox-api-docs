@@ -3,6 +3,7 @@ require_once '../../conf/conf.php';
 require_once SITE_root . '/include/sitePage.php';
 require_once SITE_root . '/www/modules/tutorial/library/event.php';
 require_once SITE_root . '/library/user.php';
+require_once SITE_root . '/library/group.php';
 
 $page = new SitePage();
 $page->setFile(TEMPLATE_content, 'tutorial/report-student.html');
@@ -13,7 +14,8 @@ $page->setBlock('class_list', 'event_list', 'event_list_block');
 $page->setTitle('Tutorial Management');
 
 // check access
-if (!$_SESSION['su'])
+$groupHandler = new Group(TUTORIAL_SERVICE);
+if ($groupHandler->getPermission(0) < FULL_ACCESS)
 	error(19);
 
 if (!isset($_GET['to']))

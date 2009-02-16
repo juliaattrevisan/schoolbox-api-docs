@@ -64,9 +64,9 @@ class SitePage extends Page {
 		$this->setFile(TEMPLATE_body, 'include/body.html' );
 		$this->setFile('headerTpl', 'include/header.html' );
 		$this->setFile('footerTpl', 'include/footer.html' );
-		$this->setFile('tabTpl', 'include/tab.html' );
+		$this->setFile('bannerTpl', 'include/banner.html' );
 		$this->setFile('navTpl', 'include/nav.html' );
-		
+		$this->setFile('tabTpl', 'include/tab.html' );
 		
 		$this->renderScriptIncludes();
 		$this->renderSideNav();
@@ -76,11 +76,18 @@ class SitePage extends Page {
 		$this->renderLinkList();
 		$this->renderStudents();
 		
-		
 		$this->parse('MAIN_HEADER_REGION', 'headerTpl');
 		$this->parse('MAIN_FOOTER_REGION', 'footerTpl');
-		$this->parse('MAIN_TAB_REGION', 'tabTpl');
-		$this->parse('MAIN_NAV_REGION', 'navTpl');
+		$this->parse('MAIN_BANNER_REGION', 'bannerTpl');
+		
+		if ($_SESSION['id']) {
+			$this->parse('MAIN_NAV_REGION', 'navTpl');
+			$this->parse('MAIN_TAB_REGION', 'tabTpl');
+		} else {
+			$this->setVar('MAIN_NAV_REGION', '');
+			$this->setVar('MAIN_TAB_REGION', '');
+		}
+		
 		$this->parse('MAIN_CONTENT_REGION', TEMPLATE_content);
 		
 		if ($this->getVar('custom_head'))
@@ -136,6 +143,29 @@ class SitePage extends Page {
 		else /* Lost in space and time, just go home */
 			localRedir('/');
 		
+	}
+
+	function error($ec, $message = "") {
+		
+		require_once($_SERVER['DOCUMENT_ROOT'].'/../include/db.php');
+		
+		$db = new dbManager(SQL_db, 1);
+	
+		$query = "SELECT message FROM error WHERE id = '$ec'";
+		$error = $db->getRow($query);
+	
+		$output = str_replace("%MESSAGE%", $message, $error['message']);
+		
+		header("HTTP/1.0 400 Bad Request");
+		$this->setVar(TEMPLATE_content, '');
+		
+		$this->setFile(TEMPLATE_content, 'common/error.html');
+		$this->setTitle('Error Encountered');
+		$this->setVar("OUTPUT", $output);
+		$this->buildPage();
+		$this->outputPage(true);
+		exit;
+	
 	}
 	
 	function renderSideNav() {

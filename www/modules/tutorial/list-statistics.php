@@ -3,6 +3,7 @@
 require_once '../../conf/conf.php';
 require_once SITE_root . '/include/sitePage.php';
 require_once SITE_root.'/www/modules/tutorial/library/event.php';
+require_once SITE_root.'/library/group.php';
 
 $page = new SitePage();
 $page->setFile(TEMPLATE_content, 'tutorial/list-statistics.html');
@@ -12,8 +13,10 @@ $page->setBlock('event_list', 'attendance', 'attendance_block');
 
 $page->setTitle('Tutorials');
 
+$groupHandler = new Group(TUTORIAL_SERVICE);
+
 // check access
-if (!$_SESSION['su'])
+if ($groupHandler->getPermission(0) < WRITE_ACCESS)
 	error(19);
 
 if (!isset($_GET['show']))

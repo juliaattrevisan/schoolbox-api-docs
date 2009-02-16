@@ -31,6 +31,8 @@ $this->setVar('next_button_block', '');
 $this->setVar('previous_button_block', '');
 $this->setVar('page_number_block', '');
 
+
+
 $groupHandler = new Group(NEWS_SERVICE);
 
 //can see add news link

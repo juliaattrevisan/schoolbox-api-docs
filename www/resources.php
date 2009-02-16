@@ -80,7 +80,7 @@ if (is_array($categoryList)) {
 $fileList = $fileHandler->mergeLinks( $fileHandler->getAllInCategory($openCategory), $linkHandler->getAllInCategory($openCategory));
 $permission = $groupHandler->getPermission($openCategory);
 
-if (is_array($fileList)) {
+if (is_array($fileList) && count($fileList) > 0) {
 	
 	foreach ($fileList as $file) {
 		

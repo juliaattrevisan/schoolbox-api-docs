@@ -17,10 +17,6 @@ window.addEvent('domready', function() {
 	});
 });
 </script>
-<script type="text/javascript" src="/javascript/tableruler.js"></script>
-<script type="text/javascript">
-	window.onload=function(){tableruler();} 
-</script>
 <!-- END custom_head -->
 <h1>Class list - {EVENT_NAME}</h1>
 <span class="header_option"><a href="list-attendance.php?week={WEEK}" title="Attendance history">Mark Attendance</a> | 
@@ -52,9 +48,7 @@ window.addEvent('domready', function() {
   </tbody>
 </table>
 <!-- END has_enrolments -->
-<p class="float-right">
-  <input type="button" value="Back" onclick="javascript: history.go(-1);" />
-</p>
+
 <p>
 <form action="list-enrolment.php" method="post">
   <input class="lookup" type="text" name="keyword" />

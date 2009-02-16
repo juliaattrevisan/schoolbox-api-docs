@@ -10,11 +10,16 @@ class Event extends Model {
 		$this->_table = "event";
 		$this->_index = "eventID";
 		
+		$groupHandler = new Group(TUTORIAL_SERVICE);
+		$this->permission = $groupHandler->getPermission(0);
+		
 		parent::Model();
 	}
 	
 	
 	function getAll($filter = '') {
+		
+		
 		$query = "SELECT e.*, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish, 
 					concat(t1.firstname,' ',t1.lastname) tutorName1, concat(t2.firstname,' ',t2.lastname) tutorName2 
 				  FROM ".TUTORIAL_db.".".$this->_table." e
@@ -23,15 +28,17 @@ class Event extends Model {
 				  LEFT JOIN ".PORTAL_db.".user t2 ON t2.id = e.tutorID_2 
 				  WHERE 1=1 ";
 				  
-		if ($filter == 'upcoming')
-			$query .= "AND UNIX_TIMESTAMP(date) > ".strtotime("12am today")." ";
-		elseif ($filter == 'semester')
-			$query .= "AND DATE_FORMAT(`date`, '%m') IN (".($month = date('m')).",".($month+1).",".($month-1).") ";
-		elseif ($filter != 'all')
+		if ($filter == 'semester') {
+			if (date('m') <= 6)
+				$query .= "AND DATE_FORMAT(`date`, '%m') IN (1,2,3,4,5,6) "; // Jan 1 - Jun 30
+			else
+				$query .= "AND DATE_FORMAT(`date`, '%m') IN (7,8,9,10,11,12) "; // Jul 1 - Dec 31
+		}
+		else
 			$query .= "AND DATE_FORMAT(`date`, '%U') = DATE_FORMAT(NOW(),'%U') ";
 		
 		
-		if (!$_SESSION['su'])
+		if ($this->permission < FULL_ACCESS)
 			$query .= "AND (e.tutorID_1 = ".$_SESSION['id']." OR e.tutorID_2 = ".$_SESSION['id']." OR n.studentID = " . $_SESSION['id'].") ";
 			
 		$query .= "GROUP BY eventID ORDER BY e.date, e.start";
@@ -46,10 +53,10 @@ class Event extends Model {
 				  LEFT JOIN ".PORTAL_db.".user t2 ON t2.id = e.tutorID_2 
 				  WHERE DATE_FORMAT(`date`, '%U') = $week ";
 
-		if (isStaff($_SESSION['gid']))
-			$query .= "AND (e.tutorID_1 = ".$_SESSION['id']." OR e.tutorID_2 = ".$_SESSION['id'].") ";
-		elseif (!$_SESSION['su'])
+		if ($this->permission < WRITE_ACCESS)
 			$query .= "AND n.studentID = " . $_SESSION['id']." ";
+		elseif ($this->permission < FULL_ACCESS)
+			$query .= "AND (e.tutorID_1 = ".$_SESSION['id']." OR e.tutorID_2 = ".$_SESSION['id'].") ";			
 		
 		$query .= "GROUP BY eventID ORDER BY date ASC";
 		
@@ -66,15 +73,19 @@ class Event extends Model {
 				  LEFT JOIN ".PORTAL_db.".user t2 ON t2.id = e.tutorID_2 
 				  WHERE 1=1 ";
 				  
-		if ($filter == 'upcoming')
-			$query .= "AND UNIX_TIMESTAMP(date) > ".strtotime("12am today")." ";
-		elseif ($filter == 'semester')
-			$query .= "AND DATE_FORMAT(`date`, '%m') IN (".($month = date('m')).",".($month+1).",".($month-1).") ";
+		if ($filter == 'semester') {
+			if (date('m') <= 6)
+				$query .= "AND DATE_FORMAT(`date`, '%m') IN (1,2,3,4,5,6) "; // Jan 1 - Jun 30
+			else
+				$query .= "AND DATE_FORMAT(`date`, '%m') IN (7,8,9,10,11,12) "; // Jul 1 - Dec 31
+		}
 		elseif ($filter == 'week')
 			$query .= "AND DATE_FORMAT(`date`, '%U') = DATE_FORMAT(NOW(),'%U') ";
 		
+		if ($this->permission < FULL_ACCESS)
+			$query .= "AND (e.tutorID_1 = ".$_SESSION['id']." OR e.tutorID_2 = ".$_SESSION['id'].")";
+		
 		$query .= "ORDER BY e.code, date";
-
 		return $this->db->getAll($query);
 	}
 
@@ -98,7 +109,7 @@ class Event extends Model {
 	
 	function getByTutor ($tutorID, $from = 0, $to = 0) {
 		$query = "SELECT *, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish, 
-					(TIME_TO_SEC(SUBTIME(finish, start))/3600) hours, count(a.studentID) students , UNIX_TIMESTAMP(a.created) marked
+					(TIME_TO_SEC(TIMEDIFF(finish, start))/3600) hours, count(a.studentID) students , UNIX_TIMESTAMP(a.created) marked
 				  FROM ".TUTORIAL_db.".".$this->_table." e
 				  LEFT JOIN ".TUTORIAL_db.".attendance a ON a.eventID = e.eventID
 				  WHERE a.studentID IS NOT NULL AND (e.tutorID_1 = $tutorID OR e.tutorID_2 = $tutorID) ";
@@ -109,7 +120,7 @@ class Event extends Model {
 			$query .= "AND DATE(a.created) <= DATE('".outputDate("Y-m-d",$to)."')";
 			
 		$query .= "GROUP BY a.eventID ORDER BY e.date";
-
+		
 		return $this->db->getAll($query);				 
 	}
 
@@ -186,8 +197,7 @@ class Event extends Model {
 	}
 
 	function create($data) {
-		if (!$_SESSION['su'] && $data['tutorID_1'] != $_SESSION['id'] && $data['tutorID_2'] != $_SESSION['id'])
-			error(8);	
+		
 		$data['created'] = 'NOW()';
 		$data['modified'] = 'NOW()';
 		$this->db->changeDb(TUTORIAL_db);
@@ -199,10 +209,6 @@ class Event extends Model {
 
 	function update($data) {
 		
-		$current = $this->getByID($data['eventID']);
-		if (!$_SESSION['su'] && $current['tutorID_1'] != $_SESSION['id'] && $current['tutorID_2'] != $_SESSION['id'])
-			error(8);
-		
 		$data['modified'] = 'NOW()';
 		$this->db->changeDb(TUTORIAL_db);
 		parent::update($data);
@@ -210,10 +216,7 @@ class Event extends Model {
 	}
 
 	function delete($eventID) {
-		$current = $this->getByID($eventID);
-		if (!$_SESSION['su'] && $current['tutorID_1'] != $_SESSION['id'] && $current['tutorID_2'] != $_SESSION['id'])
-			error(8);
-
+		
 		require_once SITE_root . '/www/modules/tutorial/library/attendance.php';
 		$attendanceHandler = new Attendance;
 		$attendanceHandler->deleteByEvent($eventID);

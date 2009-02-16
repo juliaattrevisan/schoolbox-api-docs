@@ -15,7 +15,7 @@ class dbManager
 {
 
 /* Constuctor sets up variables and connects to database */
-function dbManager($db = SQL_db, $debug = 1)
+function dbManager($db = SQL_db, $debug = 0)
 {
 	$this->host = SQL_host;
 	$this->user = SQL_user;

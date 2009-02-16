@@ -215,7 +215,7 @@ class Group extends Model {
 		else
 			return false;
 	}
-	
+
 	function isParent($userID = 0) {
 		// checks if user is a parent
 		
