@@ -35,7 +35,7 @@ class Submission extends Model {
 	
 	function getHomework($categoryID, $config = false, $type = 3) {
 
-		$query = "SELECT sb.id, sb.category, ft.name as typeName, ss.owner,
+		$query = "SELECT sb.id, sb.category, ft.name as typeName, sb.owner,
 				  UNIX_TIMESTAMP(sb.open_date) AS open,
 				  UNIX_TIMESTAMP(sb.date) AS date,
 				  UNIX_TIMESTAMP(sb.late_date) AS late,
