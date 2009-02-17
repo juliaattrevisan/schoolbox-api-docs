@@ -25,7 +25,7 @@ if($_POST['url'] && $_POST['description'] && is_numeric($_POST['category'])) {
 		
 		/* Double check permission on link */
 		$currentLink = $linkHandler->getById($_POST['linkID']);
-		if ($groupHandler->getPermission($currentLink['cid'] < WRITE_ACCESS)
+		if ($groupHandler->getPermission($currentLink['cid'] < WRITE_ACCESS))
 			error(6);
 		
 		$link['id'] = $_POST['linkID'];
@@ -43,9 +43,24 @@ if($_POST['url'] && $_POST['description'] && is_numeric($_POST['category'])) {
 		$page->backToTheFuture(2);
 	}
 }
+else if(is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
+	
+	/* Move link from one category to another, after checking permission on both from and to categories */
+	if(!$link = $linkHandler->getByID($_POST['move']))
+		echo "Failed";
+
+	if ($groupHandler->getPermission($link['cid']) < WRITE_ACCESS)
+		echo "Insufficient permssions";
+
+	if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS)
+		echo "Insufficient permssions";
+	
+	$linkHandler->update(array('id'=>$_POST['move'], 'category'=> $_POST['categoryID']));
+
+}
 else if($_GET['delete']) {
 
-	if($link = $linkHandler->getByID($_GET['delete']))
+	if(!$link = $linkHandler->getByID($_GET['delete']))
 		error(2);
 
 	if ($groupHandler->getPermission($link['cid']) < WRITE_ACCESS)

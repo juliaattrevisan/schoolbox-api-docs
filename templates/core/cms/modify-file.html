@@ -42,15 +42,13 @@ function clearBrowse(obj, id) {
       <td><span style='font-weight: bold; float: right; margin-right: 2px; position: relative; top: -20px;'>or</span></td>
       <td><select name='myfile' id="myfile" onchange="clearBrowse(this, 'browse');">
           <option value=''></option>
-          <!-- BEGIN optgroup_start -->
+          <!-- BEGIN optgroup -->
           <optgroup label="{MYFOLDER_NAME}"  style="margin-left: {MARGIN_LEFT}px;">
-          <!-- END optgroup_start -->
           <!-- BEGIN my_files -->
           <option value="{MYFILE_ID}" style="margin-left: {MARGIN_LEFT}px;">{MYFILE_NAME}</option>
           <!-- END my_files -->
-          <!-- BEGIN optgroup_end -->
           </optgroup>
-          <!-- END optgroup_end -->
+          <!-- END optgroup -->
         </select></td>
     </tr>
     <!-- END browse -->
@@ -76,13 +74,11 @@ function clearBrowse(obj, id) {
         <em>Hide this file from students.</em></td>
       <td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
     </tr>
-    <!-- BEGIN submission -->
     <tr>
       <td><h2>Submission box</h2>
         <em>Would you like students to submit responses to this file electronically</em></td>
       <td>{SUBBOX}</td>
     </tr>
-    <!-- END submission -->
     <tr>
       <td><input type='hidden' name='Day' value='{DUE_DAY}' />
         <input type='hidden' name='Month' value='{DUE_MONTH}' />

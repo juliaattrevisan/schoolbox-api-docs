@@ -20,7 +20,7 @@ class File extends Model {
 				  LEFT JOIN category c ON c.id = f.category 
 				  LEFT JOIN file_type ft ON ft.id = f.type
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
-				  WHERE f.id = $fileID AND deleted = 0";
+				  WHERE f.id = '$fileID' AND deleted = 0";
 		return $this->db->getRow($query);
 	}
 
@@ -87,15 +87,15 @@ class File extends Model {
 				
 		$data['submitted'] = 'NOW()';		
 
-		if(is_file($file) && is_readable($file) ) {
-			$data['file_size'] = filesize($file);
+		if(is_file($file['tmp_name']) && is_readable($file['tmp_name']) ) {
+			$data['file_size'] = filesize($file['tmp_name']);
 			$data['realname'] = $file['name'];
 			$data['mime_type'] = $file['type']; /* should hook up to allowedFile to get mime type properly */
 			
 			if($fileID = parent::create($data)) {
 				$filename = FILE_directory.'/'.$fileID.'.dat';
 				@unlink($filename);
-				rename($file, $filename);
+				rename($file['tmp_name'], $filename);
 			}
 		}
 		else

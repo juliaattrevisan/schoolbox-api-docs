@@ -26,7 +26,7 @@ if($_POST['description'] && is_numeric($_POST['category'])) {
 		
 		/* Double check permission on file */
 		$currentfile = $fileHandler->getById($_POST['fileID']);
-		if ($groupHandler->getPermission($currentfile['cid'] < WRITE_ACCESS)
+		if ($groupHandler->getPermission($currentfile['cid'] < WRITE_ACCESS))
 			error(6);
 		
 		$file['id'] = $_POST['fileID'];
@@ -82,9 +82,26 @@ if($_POST['description'] && is_numeric($_POST['category'])) {
 			$page->backToTheFuture(2);
 	}
 }
-else if($_GET['delete']) {
+else if(is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
+	
+	/* Move file from one category to another, after checking permission on both from and to categories */
+	if(!$file = $fileHandler->getByID($_POST['move']))
+		echo "Failed";
 
-	if($file = $fileHandler->getByID($_GET['delete']))
+	if ($groupHandler->getPermission($file['cid']) < WRITE_ACCESS)
+		echo "Insufficient permssions";
+
+	if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS)
+		echo "Insufficient permssions";
+	
+	$fileHandler->update(array('id'=>$_POST['move'], 'category'=>$_POST['categoryID']));
+
+}
+else if(is_numeric($_GET['delete'])) {
+	
+	/* Delete file from system after permission checks */
+	
+	if(!$file = $fileHandler->getByID($_GET['delete']))
 		error(2);
 
 	if ($groupHandler->getPermission($file['cid']) < WRITE_ACCESS)

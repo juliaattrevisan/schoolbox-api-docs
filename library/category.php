@@ -45,9 +45,8 @@ class Category extends Model {
 	}
 	
 	function getByID($categoryID) {
-		$query = "SELECT c.*, hc.*, u.id owner, u.title, u.firstname, u.lastname, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName, g.type type
+		$query = "SELECT c.*, u.id owner, u.title, u.firstname, u.lastname, g.type type
 				  FROM (category c)
-				  LEFT JOIN homepage_config hc ON  hc.cid = c.id
 				  LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGESERVICE . "
 				  LEFT JOIN user u on u.id = a.uid 
 				  LEFT JOIN userGroups g ON g.cid = c.id
@@ -214,11 +213,6 @@ class Category extends Model {
 		$this->db->insert('perms', $perm); 
 	}
 
-	function deletePerms($cid)
-	{
-		$this->db->delete('perms', 'cid', $cid);
-	}
-
 	function create($data) {
 		$categoryID = parent::create($data);
 		$this->logAction($categoryID, 'create');
@@ -229,7 +223,7 @@ class Category extends Model {
 		parent::create($data);
 		
 		if($data['template']) {
-			$templateHandler = new HomepageTemplate
+			$templateHandler = new HomepageTemplate;
 			$this->createTemplate($cid, $template);
 		}
 		
@@ -280,7 +274,7 @@ class Category extends Model {
 		}
 		
 		/* Delete all links */
-		$linkHandler = new Link
+		$linkHandler = new Link;
 		$linkList = $linkHandler->getAllInCategory($categoryID);
 		if(is_array($linkList)) {
 			foreach($linkList as $link) {

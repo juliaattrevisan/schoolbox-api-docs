@@ -1,7 +1,7 @@
 <?php
 
-require_once '../include/model.php';
-require_once '../library/my-folder.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
 
 class MyFile extends Model {
 
@@ -40,7 +40,6 @@ class MyFile extends Model {
 			$tree[$x]['folders'] = $this->getTreeNode($folderList[$x]['id']);
 		}
 		
-	}
 	
 		if ($parent == 0) {
 			$myFolders[0] = array('id' => '0', 'name' => 'TOP');	
@@ -90,7 +89,7 @@ class MyFile extends Model {
 			}
 			$this->depth--;
 			$this->t_body->parse('my_files_block', 'optgroup_end', true);
-	
+		}
 	}
 }
 ?>

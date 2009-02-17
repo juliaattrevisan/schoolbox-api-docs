@@ -10,7 +10,7 @@ class SitePage extends Page {
 		parent::Page();
 		$this->site = SITE_location;
 		$this->db = new dbManager;
-		$this->currentTab = "main";
+		$this->setTab('main');
 		
 		if($login)
 			$this->initSession();

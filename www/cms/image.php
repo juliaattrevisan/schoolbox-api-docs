@@ -53,6 +53,7 @@ function image_resize($src, $maxWidth,$maxHeight,$resample=1, $quality=75)
 	$filename = THUMBNAIL_IMAGE_CACHE."/".$_GET['id']."-".$maxHeight."x".$maxWidth.".jpg";
 	if(file_exists($filename))
 	{
+		
 		outputImageFile($filename);
 		exit;
 	}

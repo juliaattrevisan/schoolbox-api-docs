@@ -65,7 +65,7 @@ class AllowedFile extends Model {
 		$this->checkError($file['error']);
 	
 		//check file is in upload dir
-		if(!is_uploaded_file($file['name']))
+		if(!is_uploaded_file($file['tmp_name']))
 			error(9, "Security infringement, possible file upload attack.");
 		
 		//file size test

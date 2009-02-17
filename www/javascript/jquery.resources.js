@@ -18,25 +18,25 @@
 		{"Modify": function () {
 			var _file = $(this).find(".file");
 			if (_file.hasClass("link"))
-				window.open("/cms/modResource.php?type=modurl&id="+$(this).attr("id").substring(5),"_self"); 
+				window.open("/cms/link/"+$(this).attr("id").substring(5),"_self"); 
 			else
-				window.open("/cms/modResource.php?type=modfile&id="+$(this).attr("id").substring(5),"_self"); 
+				window.open("/cms/file/"+$(this).attr("id").substring(5),"_self"); 
 		}},
 		{"Delete": function () {
 			var _file = $(this).find(".file");
 			if (_file.hasClass("link")) {
 				if (confirm("Delete this link?")) 
-					window.open("/cms/delResource.php?linkid="+$(this).attr("id").substring(5),"_self");
+					window.open("/cms/linkForm.php?delete="+$(this).attr("id").substring(5),"_self");
 			} else {
 				if (confirm("Delete this file?")) 
-					window.open("/cms/delResource.php?fileid="+$(this).attr("id").substring(5),"_self");
+					window.open("/cms/fileForm.php?delete="+$(this).attr("id").substring(5),"_self");
 			}
 		}},
 		$.contextMenu.separator,
-		{"New File": function () { window.open("/cms/modResource.php?type=file&cid="+$(this).data("category"),"_self"); }},
-		{"Add Multiple Files": function () { window.open("/cms/modResource.php?type=files&cid="+$(this).data("category"),"_self"); }},
-		{"New Link": function () { window.open("/cms/modResource.php?type=url&cid="+$(this).data("category"),"_self"); }},
-		{"New Folder": function () { window.open("/cms/modFolder.php?action=add&cid="+$(this).data("category"),"_self"); }},
+		{"New File": function () { window.open("/cms/file/new/"+$(this).data("category"),"_self"); }},
+		{"Add Multiple Files": function () { window.open("/cms/file/multi/"+$(this).data("category"),"_self"); }},
+		{"New Link": function () { window.open("/cms/link/new/"+$(this).data("category"),"_self"); }},
+		{"New Folder": function () { window.open("/cms/category/new/"+$(this).data("category"),"_self"); }},
 		$.contextMenu.separator,
 		{"Properties": function () { 
 			var _file = $(this).find(".file");
@@ -49,15 +49,15 @@
 	// define folder context menu
 	var folderMenu = [
 		{"View Homepage": function () { window.open("/homepage/"+$(this).attr("id").substring(5),"_self"); }},
-		{"Image Gallery": function () { window.open("/cms/imageGallery.php?category="+$(this).attr("id").substring(5),"_self"); }},
+		{"Image Gallery": function () { window.open("/cms/imageGallery/"+$(this).attr("id").substring(5),"_self"); }},
 		$.contextMenu.separator,
-		{"Modify": function () { window.open("/cms/modFolder.php?action=mod&cid="+$(this).attr("id").substring(5),"_self"); }},
+		{"Modify": function () { window.open("/cms/category/"+$(this).attr("id").substring(5),"_self"); }},
 		{"Delete": function () { if (confirm("Delete this folder?")) window.open("/cms/modFolder.php?delete="+$(this).attr("id").substring(5),"_self"); }},
 		$.contextMenu.separator,
-		{"New File": function () { window.open("/cms/modResource.php?type=file&cid="+$(this).attr("id").substring(5),"_self"); }},
-		{"Add Multiple Files": function () { window.open("/cms/modResource.php?type=files&cid="+$(this).attr("id").substring(5),"_self"); }},
-		{"New Link": function () { window.open("/cms/modResource.php?type=url&cid="+$(this).attr("id").substring(5),"_self"); }},
-		{"New Folder": function () { window.open("/cms/modFolder.php?action=add&cid="+$(this).attr("id").substring(5),"_self"); }},
+		{"New File": function () { window.open("/cms/file/new/"+$(this).attr("id").substring(5),"_self"); }},
+		{"Add Multiple Files": function () { window.open("//cms/file/multi/"+$(this).attr("id").substring(5),"_self"); }},
+		{"New Link": function () { window.open("/cms/link/new/"+$(this).attr("id").substring(5),"_self"); }},
+		{"New Folder": function () { window.open("/cms/category/new/"+$(this).attr("id").substring(5),"_self"); }},
 		$.contextMenu.separator,
 		{"Download": function () { window.open("/cms/fetchFolder.php?folder="+$(this).attr("id").substring(5),"_self"); }},
 	];

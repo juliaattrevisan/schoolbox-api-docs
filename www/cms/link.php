@@ -20,6 +20,7 @@ if(is_numeric($this->arg[0])) {
 	$this->setFile(TEMPLATE_content, 'cms/modify-link.html');
 
 	$this->setTitle('Modify Link');	
+	$this->setTab('resources');
 	
 	$output = array('ACTION'			=> 'Modify',
 					'LINK_ID'			=> $link['id'],
@@ -40,15 +41,16 @@ if(is_numeric($this->arg[0])) {
 	
 	/* Add new link to system */
 	$this->setFile(TEMPLATE_content, 'cms/modify-link.html');
-	$this->setTitle('Add Link');	
+	$this->setTitle('Add Link');
+	$this->setTab('resources');
 	
 	/* Check folder exists */
 	$category = $categoryHandler->getByID($this->arg[1]);
-	if(is_array($category))
+	if(!is_array($category))
 		error(13);
 	
 	/* Check permissions to submit */
-	if($groupHandler->getPermission($folder['id']) < WRITE_ACCESS )
+	if($groupHandler->getPermission($category['id']) < WRITE_ACCESS )
 		error(6);
 		
 	$output = array('ACTION'			=> 'Add',
@@ -57,7 +59,7 @@ if(is_numeric($this->arg[0])) {
 					'DESCRIPTION'		=> '',
 					'COMMENT'			=> '',	
 					'HIDDEN_SELECTED'	=> '',
-					'CATEGORY_NAME'		=> scrubText($category['categoryName']),
+					'CATEGORY_NAME'		=> scrubText($category['name']),
 					'CATEGORY_ID'		=> $category['id'],
 					);
 	$this->setVar($output);

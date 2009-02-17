@@ -11,24 +11,25 @@
  * Clicking the large image makes it open in a new window at 	*
  * its orginal size						*/
 
-require_once '../../library/group.php';
-require_once '../../library/category.php';
+require_once '../library/group.php';
+require_once '../library/category.php';
 
 define('IMAGESPERROW', 5);
 
 
-if(isset($_GET['category']) && ) {
+if(is_numeric($this->arg[0]) ) {
 	
 	$categoryHandler = new Category;
-	if(!$category = $categoryHandler->getByID($_GET['category']))
+	if(!$category = $categoryHandler->getByID($this->arg[0]))
 		error(2);
 	
 	$groupHandler = new Group;
-	if ($groupHandler->getPermission($_GET['category']) < READ_ACCESS)
-		error(6)
+	if ($groupHandler->getPermission($this->arg[0]) < READ_ACCESS)
+		error(6);
 
 	$this->setFile(TEMPLATE_content, 'cms/image-gallery.html');
 	$this->setTitle('Image Gallery for '.$category['name']);
+	$this->setTab('resources');
 	
 	$this->setBlock(TEMPLATE_content, 'thumb_row', 'row_block');
 	$this->setBlock('thumb_row', 'thumb_cell', 'cell_block');
@@ -41,8 +42,8 @@ if(isset($_GET['category']) && ) {
 	$count = 1; 
 	if(is_array($imageList) ) {
 		foreach( $imageList as $thumbnail ) {
-			$this->setVar('THUMBNAIL', "<a href=\"image.php?id={$thumbnail['id']}&height=550&width=600\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
-					<img src=\"image.php?id={$thumbnail['id']}&height=".THUMBNAIL_size."&width=".THUMBNAIL_size."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
+			$this->setVar('THUMBNAIL', "<a href=\"/cms/image.php?id={$thumbnail['id']}&height=550&width=600\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
+					<img src=\"/cms/image.php?id={$thumbnail['id']}&height=".THUMBNAIL_size."&width=".THUMBNAIL_size."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
 	
 			$this->parse('cell_block', 'thumb_cell', true);
 			if(($count % IMAGESPERROW) == 0) {

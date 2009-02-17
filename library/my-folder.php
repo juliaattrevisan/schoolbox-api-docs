@@ -1,6 +1,6 @@
 <?php
 
-require_once '../include/model.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
 
 class MyFolder extends Model {
 

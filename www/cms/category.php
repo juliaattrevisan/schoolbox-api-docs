@@ -13,6 +13,7 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'indiv_modify', 'indiv_modify_block');
 
 	$this->setVar('TITLE', HEADING . " - Modify Category");	
+	$this->setTab('resources');
 	
 	$output = array('ACTION'	=> 'Modify',
 					'CATEGORY_ID'	=> $category['id'],
@@ -65,7 +66,8 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'indiv_perms', 'indiv_perms_block');
 	$this->setBlock(TEMPLATE_content, 'indiv_modify', 'indiv_modify_block');
 
-	$this->setVar('TITLE', HEADING . " - Add Category");	
+	$this->setVar('TITLE', HEADING . " - Add Category");
+	$this->setTab('resources');	
 
 	$output = array('ACTION'		=> 'Add',
 					'CATEGORY_ID'	=> '',
