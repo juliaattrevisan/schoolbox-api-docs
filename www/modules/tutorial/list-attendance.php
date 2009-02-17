@@ -89,16 +89,16 @@ else {
 	// pagination
 	$week = $_GET['week'];
 	if (!is_numeric($week))
-		$week = date("W") - 1;
+		$week = date("YW") - 1;
 	
-	$output = array('WEEK_END'	=> date(DATE_short_no_time, strtotime("+$week week Saturday", strtotime("1st Jan"))),
+	$output = array('WEEK_END'	=> date(DATE_short_no_time, strtotime("+".substr($week, 4)." week Saturday", strtotime("1st Jan"))),
 					'NEXT_WEEK'	=> $week+1,
 					'PREVIOUS_WEEK'	=> $week-1,
 					'WEEK'	=> $week,
 					);
 	$page->setVar($output);
 
-	if ($week < date("W", strtotime("31st Dec")))
+	if ($week < date("YW", strtotime("31st Dec")))
 		$page->parse('next_link_block', 'next_link');
 	else
 		$page->setVar('next_link_block', '');	

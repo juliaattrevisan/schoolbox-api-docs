@@ -51,7 +51,7 @@ class Event extends Model {
 				  LEFT JOIN ".TUTORIAL_db.".enrolment n ON n.code = e.code 
 				  LEFT JOIN ".PORTAL_db.".user t1 ON t1.id = e.tutorID_1
 				  LEFT JOIN ".PORTAL_db.".user t2 ON t2.id = e.tutorID_2 
-				  WHERE DATE_FORMAT(`date`, '%U') = $week ";
+				  WHERE DATE_FORMAT(`date`, '%Y%U') = $week ";
 
 		if ($this->permission < WRITE_ACCESS)
 			$query .= "AND n.studentID = " . $_SESSION['id']." ";
@@ -86,6 +86,7 @@ class Event extends Model {
 			$query .= "AND (e.tutorID_1 = ".$_SESSION['id']." OR e.tutorID_2 = ".$_SESSION['id'].")";
 		
 		$query .= "ORDER BY e.code, date";
+		
 		return $this->db->getAll($query);
 	}
 

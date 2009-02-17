@@ -115,8 +115,10 @@ elseif (is_numeric($_GET['delete']) && isset($_GET['code']) && is_numeric($_GET[
 			
 			$page->parse('enrolment_list_block', 'enrolment_list', true);
 		}
-	} else
+	} else {
 		$page->setVar('enrolment_list_block', '');
+		$page->setVar('date_list_block', '');
+	}
 	
 	$page->outputPage();
 	

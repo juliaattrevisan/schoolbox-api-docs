@@ -37,8 +37,6 @@ if (isset($_POST['name'])) {
 				   'finish'			=> $tohour.":".(int)$_POST['tominute'].":00",
 				   'tutorID_1'		=> $_POST['tutorID_1'],
 				   'tutorID_2'		=> $_POST['tutorID_2'],
-				   'description'	=> $_POST['description'],	
-				   'visible'		=> isset($_POST['visible']) ? 'true' : 'false',	
 				   'cancelled'		=> isset($_POST['cancelled']) ? 'true' : 'false',
 				   );
 
@@ -132,7 +130,6 @@ elseif (is_numeric($_GET['eventID'])) {
 					'AMTO'			=> $toperiod == 'AM' ? 'selected="selected"' : '',
 					'PMTO'			=> $toperiod == 'PM' ? 'selected="selected"' : '',
 					'DESCRIPTION'	=> $event['description'],
-					'VISIBLE_SELECTED'	=> $event['visible'] == 'true' ? 'checked="checked"' : '',
 					'CANCELLED_SELECTED'	=> $event['cancelled'] == 'true' ? 'checked="checked"' : '',
 					
 					
@@ -171,7 +168,6 @@ elseif (is_numeric($_GET['eventID'])) {
 					'TOMIN'			=> '',
 					'TOPERIOD'		=> '',
 					'DESCRIPTION'	=> '',
-					'VISIBLE_SELECTED'	=> 'checked="checked"',
 					'CANCELLED_SELECTED'	=> '',
 					
 					'WEEKDAY_SUNDAY_SELECTED'		=> '',
