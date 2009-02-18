@@ -10,7 +10,7 @@ $page = new SitePage;
 $fileHandler = new File;
 $groupHandler = new Group;
 
-if($_POST['description'] && is_numeric($_POST['category'])) {
+if(is_string($_POST['description']) && is_numeric($_POST['category'])) {
 
 	if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS)
 		error(6);
@@ -81,6 +81,30 @@ if($_POST['description'] && is_numeric($_POST['category'])) {
 		else
 			$page->backToTheFuture(2);
 	}
+}
+else if(is_array($_POST['description']) && is_numeric($_POST['category'])) {
+	
+	/* Upload multiple files to single location */
+	if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS)
+		error(6);
+
+	for($x = 0; $_POST['description'][$x]; $x++) {
+		$file = array(	'description' 	=> $_POST['description'][$x],
+						'hidden'		=> $_POST['hidden'],
+						'category'		=> $_POST['category'], 
+						'owner' 		=> $_SESSION['id'],
+					);
+					
+		//grab file out of silly array
+		foreach($_FILES['file'] as $key => $value) {
+			$fileData[$key] = $value[$x];
+		}			
+					
+		$fileID = $fileHandler->create($file, $fileData);
+	}
+	
+	$page->backToTheFuture(2);
+	
 }
 else if(is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
 	

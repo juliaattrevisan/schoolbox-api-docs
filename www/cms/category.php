@@ -12,7 +12,7 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'indiv_perms', 'indiv_perms_block');
 	$this->setBlock(TEMPLATE_content, 'indiv_modify', 'indiv_modify_block');
 
-	$this->setVar('TITLE', HEADING . " - Modify Category");	
+	$this->setTitle('Modify Category');	
 	$this->setTab('resources');
 	
 	$output = array('ACTION'	=> 'Modify',
@@ -59,14 +59,14 @@ if(is_numeric($this->arg[0])) {
 		$this->setVar('indiv_modify_block', '');
 	}
 	
-} else {
+} else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
-	$this->setFile(TEMPLATE_content, "cms/modify-category.html");
+	$this->setFile(TEMPLATE_content, 'cms/modify-category.html');
 	$this->setBlock(TEMPLATE_content, 'perm_table', 'perm_table_block');
 	$this->setBlock(TEMPLATE_content, 'indiv_perms', 'indiv_perms_block');
 	$this->setBlock(TEMPLATE_content, 'indiv_modify', 'indiv_modify_block');
 
-	$this->setVar('TITLE', HEADING . " - Add Category");
+	$this->setTitle('Add Category');
 	$this->setTab('resources');	
 
 	$output = array('ACTION'		=> 'Add',
@@ -79,7 +79,7 @@ if(is_numeric($this->arg[0])) {
 
 	$categoryTree = $categoryHandler->getCategoryTree();
 	array_unshift($categoryTree, array('CAT_ID' => 0, 'CAT_NAME' => 'Top Level'));
-	$this->dropDown('parent_list', $categoryTree);
+	$this->dropDown('parent_list', $categoryTree, $this->arg[1]);
 
 	$templateList = $categoryHandler->getTemplateList();
 	array_unshift($templateList, array('TEMPLATE_ID' => 0, 'TEMPLATE_NAME' => 'No Homepage'));

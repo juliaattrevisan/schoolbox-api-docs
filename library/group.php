@@ -244,5 +244,53 @@ class Group extends Model {
 		return false;
 	}
 	
+	function involvedInGroup($uid, $cid) {
+		//returns true on user being involved in group	
+		$query = "SELECT category.id FROM userAccess, category 
+			WHERE userAccess.service = ".$this->_service." AND userAccess.uid = '$uid' 
+			AND userAccess.sid = category.id AND category.id = '$cid'";
+		return $this->db->getOne();
+	}
+	
+	function involvedInSubject($code) {
+		//returns true on user being involved in subject (case-insensitive)
+		
+		if(is_array($_SESSION['subjects'])) {
+			$code = strtoupper($code);
+			foreach($_SESSION['subjects'] as $subject) {
+				if($code == strtoupper($subject['code']))
+					return true;
+			}
+		}
+		return false;
+	}
+	
+	function involvedCategoryList($id, $subjects, $accessType=1) {
+		//returns a list of categories that the user is involved in
+		//optional accessType specifies read=1 , write=2, ownership=3 access levels
+	
+		if(is_array($subjects)) {
+			foreach($subjects as $subject) {
+				//convert code to id and get name
+				$query = "SELECT name, id, code FROM category, userAccess 
+							WHERE userAccess.sid = category.id AND  userAccess.service = ".$this->_service." AND
+							userAccess.type >= '$accessType' AND code = '".$subject['code']."'";
+				$catList[] = $this->db->getRow($query);
+			}
+		}
+	
+		//get list of groups involved in
+		$query = "SELECT category.name, category.id FROM userAccess, category 
+		WHERE userAccess.uid = $id AND userAccess.sid = category.id AND userAccess.service = ".$this->_service."
+		AND userAccess.type >= '$accessType'";
+	
+		$this->db->query($query);
+		while($result = $this->db->getNextArray()) {
+			$catList[] = $result;
+		}
+		
+		return $catList;
+	}
+	
 }
 ?>

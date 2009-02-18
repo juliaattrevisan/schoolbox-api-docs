@@ -65,14 +65,15 @@ function clearBrowse(obj, id) {
       </td>
     </tr>
     <tr>
-      <td><h2>Location</h2>
-        <em>The file will be located in this folder</em></td>
-      <td>{CATEGORY_NAME}<input name="category" value="{CATEGORY_ID}" type="hidden" /></td>
-    </tr>
-    <tr>
       <td><h2>Hidden</h2>
         <em>Hide this file from students.</em></td>
       <td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
+    </tr>
+    <tr>
+      <td><h2>Location</h2>
+        <em>The file will be located in this folder</em></td>
+      <td>{CATEGORY_NAME}
+        <input name="category" value="{CATEGORY_ID}" type="hidden" /></td>
     </tr>
     <tr>
       <td><h2>Submission box</h2>

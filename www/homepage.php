@@ -47,11 +47,11 @@ if(!$category['template'])
 	localRedir('/resources/'.$categoryID);
 
 if($category['code']) {
-	$enroled = involvedInSubject($category['code']);
+	$enroled = $groupHandler->involvedInSubject($category['code']);
 	$code = $category['code'];
 }
 else
-	$enroled = involvedInGroup($categoryID);
+	$enroled = $groupHandler->involvedInGroup($_SESSION['id'], $categoryID);
 
 
 $this->setFile(TEMPLATE_content, 'homepage/template' . $category['template'] . '.html');

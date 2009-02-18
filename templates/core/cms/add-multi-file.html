@@ -6,21 +6,27 @@
 <!-- END custom_head -->
 
 <h1>Upload Multiple Files</h1>
-<form method="post" enctype="multipart/form-data" id="fileForm" class="standardForm" onsubmit="return multi_selector.check();">
+<form method="post" enctype="multipart/form-data" id="fileForm" class="standardForm" onsubmit="return multi_selector.check();" action="/cms/fileForm.php">
     <table>
+    <tr>
+      <td class="formLabelWidth"><h2>Location</h2>
+        <em>These files will be located in this folder</em></td>
+      <td>{CATEGORY_NAME}<input name="category" value="{CATEGORY_ID}" type="hidden" /></td>
+    </tr>
         <tr>
-            <td><h2>Location</h2>
-                <em>Select an appropriate location within the system that reflects the use of the file</em></td>
-            <td>{CATLIST}</td>
-        </tr>
+      <td><h2>Hidden</h2>
+        <em>Hide these files from students.</em></td>
+      <td><input type='checkbox' name='hidden' value='1' /></td>
+    </tr>
         <tr>
-        <td>&nbsp;</td>
+        <td><h2>Files</h2>
+        <em>Each file must have a description and location, a new row will appear when these requirements are met</em></td>
         <td>
             <table>
             <thead>
             <tr>
                 <td><h2>Description</h2></td>
-                <td><h2>File</h2></td>
+                <td><h2>Location</h2></td>
                 <td></td>
             </tr>
             </thead>
