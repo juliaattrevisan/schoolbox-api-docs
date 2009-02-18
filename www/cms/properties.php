@@ -10,7 +10,7 @@ $fileHandler = new File;
 $linkHandler = new Link;
 $groupHandler = new Group;
 
-$page->setFile(TEMPLATE_body, 'resources/properties.html');
+$page->setFile(TEMPLATE_body, 'cms/properties.html');
 $page->setBlock(TEMPLATE_body, 'realname', 'realname_block');
 $page->setBlock(TEMPLATE_body, 'link', 'link_block');
 $page->setBlock(TEMPLATE_body, 'file', 'file_block');
@@ -30,7 +30,7 @@ if (is_numeric($_GET['fileID'])) {
 					 'OWNER'	 => $file['ownerName'],
 					 'OWNER_ID'	 => $file['owner'],
 					 'REALNAME'	 => $file['realname'],
-					 'CREATED'	 => date("M j y @ g:iA", $file['submitted']),
+					 'CREATED'	 => date(DATE_short_format, $file['submitted']),
 					 'DESCRIPTION'	=> scrubText($file['description']),
 					 'COMMENT'	 => scrubText($file['comment']),
 					 'SIZE'		 => number_format($file['file_size']/1024, 1),
@@ -61,7 +61,7 @@ elseif (is_numeric($_GET['linkID'])) {
 					 'OWNER'	 => $link['ownerName'],
 					 'OWNER_ID'	 => $link['owner'],
 					 'URL'	 	 => $link['url'],
-					 'CREATED'	 => date("M j y @ g:iA", $link['submitted']),
+					 'CREATED'	 => date(DATE_short_format, $link['submitted']),
 					 'DESCRIPTION'	=> scrubText($link['description']),
 					 'COMMENT'	 => scrubText($link['comment']),
 					 'HIDDEN'	 => $link['hidden'] > 0 ? 'Yes' : 'No',

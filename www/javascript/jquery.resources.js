@@ -39,11 +39,33 @@
 		{"New Folder": function () { window.open("/cms/category/new/"+$(this).data("category"),"_self"); }},
 		$.contextMenu.separator,
 		{"Properties": function () { 
-			var _file = $(this).find(".file");
+			var _file = $(this).find(".file"), ajaxURL;
 			if (_file.hasClass("link"))
-				jQuery.slimbox("/images/print.gif"); 
+				ajaxURL = "/cms/properties.php?linkID="+$(this).attr("id").substring(5);
 			else
-				jQuery.slimbox("/resources/properties.php?fileID="+$(this).attr("id").substring(5)); 
+				ajaxURL = "/cms/properties.php?fileID="+$(this).attr("id").substring(5);
+			
+			$.get(ajaxURL, function (data) {
+				$(data).modal({
+					position: ["15%",],
+					overlayId: 'properties-overlay',
+					containerId: 'properties-container',
+					onOpen: function (dialog) { 
+						dialog.overlay.fadeIn(200, function () { 
+							dialog.container.fadeIn(200, function () {
+								dialog.data.show();
+							}); 
+						}); 
+					},
+					onClose: function (dialog) { 
+						dialog.container.fadeOut(200, function () { 
+							dialog.overlay.fadeOut(200, function () { 
+									$.modal.close(); 
+							});  
+						}); 
+					}					
+				});
+			});
 		}},
 	];
 	// define folder context menu
@@ -55,7 +77,7 @@
 		{"Delete": function () { if (confirm("Delete this folder?")) window.open("/cms/modFolder.php?delete="+$(this).attr("id").substring(5),"_self"); }},
 		$.contextMenu.separator,
 		{"New File": function () { window.open("/cms/file/new/"+$(this).attr("id").substring(5),"_self"); }},
-		{"Add Multiple Files": function () { window.open("//cms/file/multi/"+$(this).attr("id").substring(5),"_self"); }},
+		{"Add Multiple Files": function () { window.open("/cms/file/multi/"+$(this).attr("id").substring(5),"_self"); }},
 		{"New Link": function () { window.open("/cms/link/new/"+$(this).attr("id").substring(5),"_self"); }},
 		{"New Folder": function () { window.open("/cms/category/new/"+$(this).attr("id").substring(5),"_self"); }},
 		$.contextMenu.separator,
@@ -66,6 +88,7 @@
   $.fn.treeTable = function(opts) {
     options = $.extend({}, $.fn.treeTable.defaults, opts);
     addDrop($(".top"));
+	jQuery(document.createElement("div")).attr("id", "simpleModal").appendTo(document.body);
     return this.each(function() {
       $(this).addClass("treeTable").find("tbody tr").each(function() {
         // Initialize root nodes only whenever possible
@@ -111,6 +134,7 @@
 		$(this).loadFolders();
 		$(this).addClass("populated");
 	}
+		
 	
     childrenOf($(this)).each(function() {
 	  initialize($(this));
@@ -178,12 +202,21 @@
     return this;
   };
 
-  $.fn.moveFile = function(categoryID) {
-	 var _file = $(this);
+  $.fn.move = function(categoryID) {
+	 // matches file-, link-, node-
+	 var id = $($(this).parents("tr")[0]).attr("id").substring(5), ajaxURL;
+	
+	if ($(this).hasClass("link"))
+		ajaxURL = "/cms/linkForm.php";
+	 else if ($(this).hasClass("file"))
+		ajaxURL = "/cms/fileForm.php";
+	 else
+		ajaxURL = "/cms/categoryForm.php";		 
+	 
 	 $.ajax({
 		type: "POST",
-		url: "/cms/fileForm.php",
-		data: {"move": $(_file.parents("tr")[0]).attr("id").substring(5), "categoryID": categoryID}
+		url: ajaxURL,
+		data: {"move": id, "categoryID": categoryID}
 	 }); 
 	 $("node-"+categoryID).removeClass("populated");
   };
@@ -199,7 +232,16 @@
 		clearTimeout($(this).data("timeout"));
 	});
   };
-  
+
+  $.fn.saveID = function() {
+	var id = $(this).attr("id").substring(5);
+	$.ajax({
+		url: options.ajaxURL,
+		type: "POST",
+		data: {"resourcesID": id}
+	});
+  };
+
  $.fn.loadFolders = function() {
 	  
 	  var _node = $(this), parentID = $(this).attr("id").substring(5)
@@ -207,6 +249,7 @@
 	  // request folders
 	  $.ajax({
 			 url: options.ajaxURL, 
+			 type: "POST",
 			 data: {"folders": parentID}, 
 			 dataType: "json",
 			 beforeSend: function () { _node.find(".folder").addClass("loading"); },
@@ -248,7 +291,7 @@
 
   $.fn.loadFiles = function() {
 
-	var _node = $(this), parentID = $(this).attr("id").substring(5);
+	 var _node = $(this), parentID = $(this).attr("id").substring(5);
 	 
 	 // hide all files
 	 $("#file-list tbody tr").each(function () {
@@ -258,18 +301,24 @@
 	  var fileNodes = $("#file-list .category-"+parentID);
 	 
 	  if (_node.hasClass("opened") == 0) {
+		  _node.addClass("opened");
 		  // request files and build dom
-		
 		  $.ajax({
 				 url: options.ajaxURL, 
+				 type: "POST",
 				 data: {"files": parentID}, 
 				 dataType: "json",
 				 beforeSend: function () { _node.find(".folder").addClass("loading"); },
 				 success: function (data) {
 					$.each(data, function (i, item) {
 						// table row
+						if (item.link == 'true')
+						   newID = "link-"+(item.id);
+						else
+						   newID = "file-"+(item.id);
+						   
 						myRow = jQuery(document.createElement("tr"))
-						  .attr("id", "file-"+(item.id))
+						  .attr("id", newID)
 						  .addClass("category-"+parentID)
 						  .appendTo("#file-list tbody");
 						
@@ -280,7 +329,7 @@
 						  .append(item.name)
 						  .attr({title: item.name})
 						  .appendTo(
-							jQuery(document.createElement("td")).appendTo("#file-"+(item.id))
+							jQuery(document.createElement("td")).appendTo(myRow)
 						  );
 						  
 						 if (item.link == 'true')
@@ -292,31 +341,34 @@
 						 // filesize column
 						 jQuery(document.createElement("td"))
 							.append(item.size)
-							.appendTo("#file-"+(item.id));
+							.appendTo(myRow);
 			
 						 // date column
 						 jQuery(document.createElement("td"))
 							.append(item.modified)
-							.appendTo("#file-"+(item.id));
+							.appendTo(myRow);
 						 
 						 initialize(myRow); 
 					});
 					_node.find(".folder").removeClass("loading");
-					_node.addClass("opened");
+					
 				 },
 				 error: function () { _node.find(".folder").addClass("error"); }
 		  });
 		  
 	  }
 	  else {
-		// display selected files
+	    // display selected files
 	  	fileNodes.each(function () {
 			$(this).show();
 		});   
+		
+		// remember this view
+		$(this).saveID();	
 	  }
 	  
   };
-
+  
   // === Private functions
   
   function ancestorsOf(node) {
@@ -343,7 +395,8 @@
   };
 
   function initialize(node) {
-    if(!node.hasClass("initialized")) {
+  
+   if(!node.hasClass("initialized")) {
       node.addClass("initialized");
 
       var childNodes = childrenOf(node);
@@ -497,15 +550,37 @@
 			$(this).clearDelay();
 		},
         drop: function(e, ui) { 
+		  var targetID = $(this).attr("id").substring(5);
+		  var node = $($(ui.draggable).parents("tr")[0]);
+		  
+		  /* files */
 		  if ($(ui.draggable).hasClass("file")) {
-		  	$(ui.draggable).moveFile($(this).attr("id").substring(5));
-			$($(ui.draggable).parents("tr")[0]).hide();
+		  	
+			// ajax move request
+			$(ui.draggable).move(targetID);
+			
+			if ($(this).hasClass("opened") && targetID != node.data("category")) {
+				// move node if target is already loaded
+				node.removeClass("category-"+node.data("category"));
+				node.addClass("category-"+targetID);
+		    	node.hide();
+				node.removeClass("selected");
+				node.data("category", targetID);
+			} else if (targetID != node.data("category"))
+				// destroy node, target not loaded
+				node.delay(100, function () { node.remove(); });
+		    
+		  /* folders */
 		  } else {
-            $($(ui.draggable).parents("tr")[0]).appendBranchTo(this);
+			// ajax move request
+			$(ui.draggable).move(targetID);
+			
+			// move node and expand target
+            node.appendBranchTo(this);
 		    $(this).expand();
 		  }
 		  
-        }		
+        }
       });
     });	  
   };

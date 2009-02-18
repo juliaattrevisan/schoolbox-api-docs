@@ -5,14 +5,16 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/link.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+
 $page = new SitePage;
+
 $categoryHandler = new Category;
 $fileHandler = new File;
 $linkHandler = new Link;
 $groupHandler = new Group;
 
-if (is_numeric($_GET['folders'])) {
-	$categoryList = $categoryHandler->getCategoryList($_GET['folders']);
+if (is_numeric($_POST['folders'])) {
+	$categoryList = $categoryHandler->getCategoryList($_POST['folders']);
 	$output = array();
 	if (is_array($categoryList)) {
 		foreach ($categoryList as $category) {
@@ -27,9 +29,13 @@ if (is_numeric($_GET['folders'])) {
 	header("Content-type: application/json");
 	print json_encode($output);
 }
-elseif (is_numeric($_GET['files'])) {
-	$fileList = $fileHandler->mergeLinks( $fileHandler->getAllInCategory($_GET['files']), $linkHandler->getAllInCategory($_GET['files']));
-	$permission = $groupHandler->getPermission($_GET['files']);
+elseif (is_numeric($_POST['files'])) {
+	
+	// save current view
+	$_SESSION['resourcesID'] = $_POST['files'];
+	
+	$fileList = $fileHandler->mergeLinks( $fileHandler->getAllInCategory($_POST['files']), $linkHandler->getAllInCategory($_POST['files']));
+	$permission = $groupHandler->getPermission($_POST['files']);
 	$output = array();
 	if (is_array($fileList)) {
 		foreach ($fileList as $file) {
@@ -47,6 +53,10 @@ elseif (is_numeric($_GET['files'])) {
 	
 	header("Content-type: application/json");
 	print json_encode($output);
+} 
+elseif (is_numeric($_POST['resourcesID'])) {
+	// save current view
+	$_SESSION['resourcesID'] = $_POST['resourcesID'];
 }
 
 

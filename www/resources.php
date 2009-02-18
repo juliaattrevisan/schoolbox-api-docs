@@ -14,14 +14,11 @@ $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 $this->setJavascript('/javascript/jquery.js');
 $this->setJavascript('/javascript/jquery.ui.js');
 $this->setJavascript('/javascript/jquery.contextmenu.js');
-$this->setJavascript('/javascript/jquery.slimbox.js');
+$this->setJavascript('/javascript/jquery.simplemodal.js');
 $this->setJavascript('/javascript/jquery.resources.js');
 
 $this->setCss('/css/jquery.contextmenu.css');
-$this->setCss('/css/jquery.slimbox.css');
 $this->setCss('/css/jquery.resources.css');
-
-
 
 $this->setTitle('Resources');
 $this->setTab('resources');
@@ -32,54 +29,74 @@ $linkHandler = new Link;
 $groupHandler = new Group;
 $allowedFiles = new AllowedFile;
 
-$openCategory = (int)$this->arg[0];
+
+if (is_numeric($this->arg[0])) {
+	$_SESSION['resourcesID'] = $this->arg[0];
+	localRedir('/resources/');
+} else
+	$openCategory = (int)$_SESSION['resourcesID'];
+
+// check permissions on selected category
+if ($groupHandler->getPermission($openCategory) < READ_ACCESS)
+	$openCategory = 0;
 
 // get parentIDs from openCategory to 0
 $parentList[] = $parentID = $openCategory;
 while ($parentID > 0)
 	$parentList[] = $parentID = $categoryHandler->getParent($parentID);
 
-
 // output folders, column 1
 $categoryList = $categoryHandler->getCategoryNode($openCategory);
 if (is_array($categoryList)) {
-	
+
 	foreach ($categoryList as $category) {
-		$category['children'] = $categoryHandler->hasChildren($category['id']);
+	
+		// get permissions
+		if (!isset($permission[$category['id']]))
+			$permission[$category['id']] = $groupHandler->getPermission($category['id']);
 		
-		$class = array();
+		// limit permission by parent
+		if (isset($permission[$category['parent']]) && $permission[$category['id']] > $permission[$category['parent']])
+			$permission[$category['id']] = $permission[$category['parent']];
 		
-		// set parent category
-		$class[] = "child-of-node-{$category['parent']}";
+		// check permission
+		if ($permission[$category['id']] >= READ_ACCESS) {
 		
-		// has children
-		$category['children'] > 0 ? $class[] = "parent" : null;
-		
-		// is currently expanded
-		in_array($category['id'], $parentList) ? $class[] = "expanded populated" : null;
-		
-		// has files showing
-		$category["id"] == $openCategory ? $class[] = "opened selected" : null;
-		
-		// has homepage
-		$category['template'] > 0 ? $class[] = "homepage" : null;
-		
-		// write access
-		$groupHandler->getPermission($category['id']) >= WRITE_ACCESS ? $class[] = "write" : null;
-		
-		$output = array('CATEGORY_ID'		=> $category['id'],
-						'CATEGORY_NAME'		=> scrubText($category['name']),
-						'CLASS'				=> implode(" ", $class),
-						);	
-		$this->setVar($output);
-		$this->parse('category_list_block', 'category_list', true);
+			$category['children'] = $categoryHandler->hasChildren($category['id']);
+			
+			$class = array();
+			
+			// set parent category
+			$class[] = "child-of-node-{$category['parent']}";
+			
+			// has children
+			$category['children'] > 0 ? $class[] = "parent" : null;
+			
+			// is currently expanded
+			in_array($category['id'], $parentList) ? $class[] = "expanded populated" : null;
+			
+			// has files showing
+			$category["id"] == $openCategory ? $class[] = "opened selected" : null;
+			
+			// has homepage
+			$category['template'] > 0 ? $class[] = "homepage" : null;
+			
+			// write access
+			$permission[$category['id']] >= WRITE_ACCESS ? $class[] = "write" : null;
+			
+			$output = array('CATEGORY_ID'		=> $category['id'],
+							'CATEGORY_NAME'		=> scrubText($category['name']),
+							'CLASS'				=> implode(" ", $class),
+							);	
+			$this->setVar($output);
+			$this->parse('category_list_block', 'category_list', true);
+		}
 	}
 }
 
 // output files, column 2
 $fileList = $fileHandler->mergeLinks( $fileHandler->getAllInCategory($openCategory), $linkHandler->getAllInCategory($openCategory));
 $permission = $groupHandler->getPermission($openCategory);
-
 if (is_array($fileList) && count($fileList) > 0) {
 	
 	foreach ($fileList as $file) {

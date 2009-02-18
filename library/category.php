@@ -133,13 +133,15 @@ class Category extends Model {
 			// get parent folder contents
 			$siblingList = $this->getCategoryNode($this->getParent($categoryID));
 			
-			// find index of parent node in siblingList
-			$total = count($siblingList);
-			for ($i = 0; $i < $total; $i++)
-				if ($siblingList[$i]['id'] == $categoryID) break;
-				
-			// insert folder contents next to parent node
-			array_splice($siblingList, $i+1, 0, $categoryList);
+			if (is_array($categoryList)) {
+				// find index of parent node in siblingList
+				$total = count($siblingList);
+				for ($i = 0; $i < $total; $i++)
+					if ($siblingList[$i]['id'] == $categoryID) break;
+					
+				// insert folder contents next to parent node
+				array_splice($siblingList, $i+1, 0, $categoryList);
+			}
 			return $siblingList;
 		}
 		else {

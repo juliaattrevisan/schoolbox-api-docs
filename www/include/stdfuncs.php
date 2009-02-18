@@ -24,26 +24,16 @@ function conType()
 //Function for handling error conditions
 function error($ec, $message="")
 {
-	require_once($_SERVER['DOCUMENT_ROOT'].'/../include/db.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/../include/sitePage.php');
-	
-	header("HTTP/1.0 400 Bad Request");
-
-	$db = new dbManager(SQL_db, 1);
-
-	$query = "SELECT message FROM error WHERE id = '$ec'";
-	$error = $db->getRow($query);
-
-	$output = str_replace("%MESSAGE%", $message, $error['message']);
-	$page = new SitePage(false);
-	$page->loadContent('error');
-	
-	$page->setTitle('Error Encountered');
-	$page->setVar("OUTPUT", $output);
-	$page->outputPage();
-
-	exit;
-
+	global $page;
+	if (is_object($page))
+		$page->error($ec, $message);
+	elseif (is_object($this))
+		$this->error($ec, $message);
+	else {
+		require_once dirname(__FILE__) . '/../../include/sitePage.php';
+		$page = new SitePage;
+		$page->error($ec, $message);
+	}
 }
  
 //Function for redirecting to a specified file
