@@ -222,7 +222,7 @@ class Category extends Model {
 	}
 	
 	function update ($data) {
-		parent::create($data);
+		parent::update($data);
 		
 		if($data['template']) {
 			$templateHandler = new HomepageTemplate;
