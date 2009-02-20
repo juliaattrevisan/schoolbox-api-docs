@@ -1,6 +1,6 @@
 <?php
 
-require_once '../include/model.php';
+require_once $_SERVER['DOCUMENT_ROOT'] .'/../include/model.php';
 
 class CategoryNews extends Model {
 
@@ -25,6 +25,15 @@ class CategoryNews extends Model {
 	
 	function homepageClean($cid) {
 		$this->db->delete('subject_news', 'code', $cid);
+	}
+	
+	function create($news) {
+		$news['datetime_posted'] = 'NOW()';
+		parent::create($news);
+	}
+	
+	function delete($id) {
+		$this->update(array('id','deleted'=>1));
 	}
 }
 

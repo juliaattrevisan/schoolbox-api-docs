@@ -1,6 +1,6 @@
 <?php
 //news output
-$this->setBlock($componentHandle, "news", "news_block");
+$this->setBlock($componentHandle, 'news', 'news_block');
 
 require_once '../library/categoryNews.php';
 $newsHandler = new CategoryNews;
@@ -11,9 +11,9 @@ if (is_array($newsList)) {
 
 	foreach($newsList as $news) {
 		if($news['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS)
-			$this->setVar("MOD_NEWS", "<a href=\"/subject/modSubNews.php?modify=".$news['id']."\">Modify</a>");
+			$this->setVar('MOD_NEWS', '<a href="/news/homepage/'.$news['id'].'">Modify</a>');
 		else
-			$this->setVar("MOD_NEWS", "");
+			$this->setVar('MOD_NEWS', '');
 		
 		$poster = formatName($news);
 		
