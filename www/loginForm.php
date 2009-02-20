@@ -1,6 +1,6 @@
 <?php
 
-include('include/auth.php');
+require_once 'include/auth.php';
 require_once '../include/sitePage.php';
 session_start();	
 
@@ -22,7 +22,7 @@ if( (isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
 	
 	if (authenticate(&$db, $_POST['username'], $_POST['password']) )
 	{
-		if(isset($_POST['page']) && $_POST['page'])
+		if(isset($_POST['page']) && $_POST['page'] && $_POST['page'] != '/')
 		{ 
 			$page = rawurldecode($_POST['page']);
 			localRedir($page);

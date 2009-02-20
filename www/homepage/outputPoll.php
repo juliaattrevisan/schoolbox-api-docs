@@ -19,7 +19,7 @@ if ($poll['pollID']) {
 	$this->setVar($output);
 	
 	$pollData = $pollHandler->getData($poll['pollID']);
-	if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID'])) {
+	if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']) || isset($_GET['showResults'])) {
 		
 		$this->setVar('POLL_HEIGHT', count($pollData) * 30 + 70);
 		$this->setVar("poll_vote_block", "");

@@ -106,7 +106,7 @@ function scrubTEXT($text)
 
 	//this in built function encode html chars
 	//the ENT_QUOTES converts all talking marks
-	$text = htmlentities($text, ENT_QUOTES);
+	$text = htmlentities($text, ENT_QUOTES, "UTF-8");
 
 	//get rid of any possible bad chars
 	$text = scrubHTML($text);

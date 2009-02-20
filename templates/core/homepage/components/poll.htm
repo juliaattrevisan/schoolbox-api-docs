@@ -14,7 +14,7 @@
     
     <p style="text-align: center;">{POLL_QUESTION}</p>
     <!-- BEGIN poll_vote -->
-    <form action="/poll/modifyForm.php" method="post">
+    <form action="/poll/modifyForm.php" method="post" id="pollForm">
     <input type="hidden" name="pollID" value="{POLL_ID}" />
     <input type="hidden" name="categoryID" value="{ID}" />
     <table class="poll">
@@ -26,6 +26,7 @@
     </table>
     <div style="text-align: center;">
     <input type="submit" value="Vote" onclick="return validatePoll();" />
+    <p><a href="/homepage/{ID}&showResults">Show results</a></p>
     </div>   
     </form>    
        
@@ -53,7 +54,7 @@
             <p>Flash player v9.0 required to view poll.</p>
         </noscript>  
     </div>
-    
+    <script type="text/javascript" src="/javascript/fusion.js"></script>
     <script type="text/javascript">
 		// <![CDATA[	
 		window.addEvent('domready', function () {

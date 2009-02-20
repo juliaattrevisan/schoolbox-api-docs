@@ -7,9 +7,9 @@
 *   $Id: auth.php,v 1.16 2004/04/27 05:16:48 jleckie Exp $						    
 *                                                           *
 ************************************************************/
-include('permission.php');
-include('include.php');
-include('syn_userinfo.php');
+require_once('permission.php');
+require_once('include.php');
+require_once('syn_userinfo.php');
 
 function checkBruteForce(&$db)
 {

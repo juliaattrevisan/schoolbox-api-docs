@@ -53,7 +53,9 @@ if(isset($_GET['id']) && $_GET['id'])
 					header ("Content-Type: {$resultArray['mime_type']}"); 
 				else
 					header ("Content-Type: application/octet-stream"); 
-			
+
+				header ("Pragma: ");
+				header ("Cache-control: ");			
 				header ("Content-Disposition: $attach filename=\"".$resultArray['realname']."\""); 
 				header ("Content-Length: $filesize");	
 				readfile($filename);
@@ -73,7 +75,9 @@ if(isset($_GET['id']) && $_GET['id'])
 				header ("Content-Type: {$resultArray['mime_type']}"); 
 			else
 				header ("Content-Type: application/octet-stream"); 
-		
+
+			header ("Pragma: ");
+			header ("Cache-control: ");		
 			header ("Content-Disposition: $attach filename=\"".$resultArray['realname']."\""); 
 			header ("Content-Length: $filesize");	
 			readfile($filename);
