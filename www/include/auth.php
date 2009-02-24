@@ -139,12 +139,15 @@ function authenticate(&$db, $username, $password, $remember = 0)
 				WHERE uid = '".$user['id']."'
 				ORDER BY defaultCampus DESC
 				";
+		
 		$db->query($campusquery);
-		while($campus = $db->getNextArray() )
-		{
-			if($campus['campus'])
-				$_SESSION['campus'][] = $campus['campus'];
-		}
+		if($db->countRows() > 0) {
+			while($campus = $db->getNextArray() ) {
+				if($campus['campus'])
+					$_SESSION['campus'][] = $campus['campus'];
+			}
+		else
+			$_SESSION['campus'][] = 1;
 
 		if(SYNERGY_enable)
 			setSynergyInfo(&$db);
