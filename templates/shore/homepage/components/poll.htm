@@ -1,0 +1,69 @@
+<div class="component" id="component{COMPONENT_ID}">
+    <div class="componentHeader">
+        <h2 class="cont-head">{POLL_TITLE}</h2>
+    </div>
+<!-- BEGIN config -->    
+  <a class="config" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+  <div class="componentConfig">
+    <a href="/poll/modify/new/{ID}">Create</a> |
+    <a href="/poll/modify/{POLL_ID}">Edit</a> |
+    <a href="/poll/modifyForm.php?delete={POLL_ID}" onclick="return confirm('Delete Poll?');">Delete</a>
+  </div>
+<!-- END config -->
+    
+    
+    <p style="text-align: center;">{POLL_QUESTION}</p>
+    <!-- BEGIN poll_vote -->
+    <form action="/poll/modifyForm.php" method="post" id="pollForm">
+    <input type="hidden" name="pollID" value="{POLL_ID}" />
+    <input type="hidden" name="categoryID" value="{ID}" />
+    <table class="poll">
+    	<!-- BEGIN poll_options -->
+    	<tr class="{POLL_ON_OFF}">
+        <td style="text-align: left;">{POLL_OPTION}</td>
+        <td><input type="radio" name="vote" class="pollOption" value="{POLL_OPTION_INDEX}" /></td>
+        </tr><!-- END poll_options -->
+    </table>
+    <div style="text-align: center;">
+    <input type="submit" value="Vote" onclick="return validatePoll();" />
+    <p><a href="/homepage/{ID}&showResults">Show results</a></p>
+    </div>   
+    </form>    
+       
+    <script type="text/javascript">
+    function validatePoll () {
+		var valid = false;
+		$$('.pollOption').each(
+			function (o) {
+				if (o.checked == true)
+					valid = true;
+			}
+		);
+		if (valid)
+			return valid;
+			
+		alert('Please select an option.');
+		return valid;
+	}
+    </script>  
+    <!-- END poll_vote -->
+    
+    <!-- BEGIN poll_chart -->
+    <div id="pollResult{COMPONENT_ID}" style="margin-top: 5px; ">
+        <noscript>
+            <p>Flash player v9.0 required to view poll.</p>
+        </noscript>  
+    </div>
+    <script type="text/javascript" src="/javascript/fusion.js"></script>
+    <script type="text/javascript">
+		// <![CDATA[	
+		window.addEvent('domready', function () {
+			var chart = new FusionCharts("/flash/FCF_Bar2D.swf", "myChartId", "350", "{POLL_HEIGHT}", "8", "#FFFFFF");
+			chart.setDataURL("/poll/poll-xml.php?pollID={POLL_ID}");
+			chart.render("pollResult{COMPONENT_ID}");
+		});
+		// ]]>
+    </script>
+    <!-- END poll_chart -->
+  </div>
+</div>

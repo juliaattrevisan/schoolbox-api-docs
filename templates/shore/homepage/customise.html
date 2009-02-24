@@ -1,0 +1,154 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/mootools.v.1.11.js"></script>
+<script type="text/javascript" src="/javascript/mooRainbow.js"></script>
+<script type="text/javascript">
+
+	var pickers = [
+		['largeHeadingBackground', '#5c02d9'],
+		['largeHeadingText', '#ffffff'],
+		['largeTextBackground', '#ffffff'],
+		['largeTextText', '#000000'],
+		['smallHeadingBackground', '#0066cc'],
+		['smallHeadingText', '#ffffff'],
+		['smallTextBackground', 'cccccc'],
+		['smallTextText', '#000000'],	
+	];
+	window.onload = function(){
+		for(i = 0; i < pickers.length; i++){
+			pickers[i][2] = new MooRainbow(pickers[i][0] + 'Div', pickers[i][0] + 'Input', {
+				'id': pickers[i][0] + 'Picker',
+				'imgPath': '/images/mooRainbow/',
+				'onComplete': function(color, object){
+					object.element.setStyle('background-color', color.hex);
+					object.input.value = color.hex;
+				},
+				'onChange': function(color, object){
+					object.element.setStyle('background-color', color.hex);
+					object.input.value = color.hex;
+				}
+			});
+			pickers[i][2].manualSet(pickers[i][1], 'hex');
+			$(pickers[i][0] + 'Div').setStyle('background-color', pickers[i][2].sets.hex);
+			$(pickers[i][0] + 'Input').value = pickers[i][2].sets.hex;
+		};
+	}</script>
+<link rel="stylesheet" type="text/css" href="/css/mooRainbow.css" />
+<!-- END custom_head -->
+
+						<h1>Homepage Customisation</h1>
+			  <form method="post" name="customiseForm" id="customiseForm" class="indent" action="/homepage/configForm.php">
+			<h2>Layout</h2>
+			<table class="standardForm">
+				<tr>
+					<td><input type="radio" name="template" value="1" {templateChecked1} /></td>
+					<td><strong>70%/30%</strong></td>
+					<td><input type="radio" name="template" value="2" {templateChecked2} /></td>
+					<td><strong>50%/50%</strong></td>
+					<td><input type="radio" name="template" value="3" {templateChecked3} /></td>
+					<td><strong>100%</strong></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><img src="/images/70-30.png" width="75" height="70" /></td>
+					<td></td>
+					<td><img src="/images/50-50.png" width="75" height="70" /></td>
+					<td></td>
+					<td><img src="/images/100-0.png" width="75" height="70" /></td>
+				</tr>
+			</table>
+			<h2>Components</h2>
+			<table>
+				<tr>
+				<!-- BEGIN componentGroup -->
+					<td class="indent" style="vertical-align:top;">
+						<h2>{componentGroupName}</h2>
+						<table class="standardForm">
+						<!-- BEGIN componentRow -->
+							<tr>
+							<!-- BEGIN componentCol -->
+								<td style="vertical-align:top"><input type="checkbox" name="components[]" value="{componentID}" {componentChecked} /></td> 
+                                <td style="vertical-align:top"><strong>{componentName}</strong>
+                                <br /><em>{componentDescription}</em></td>
+							<!-- END componentCol -->
+							</tr>
+						<!-- END componentRow -->
+						</table>					</td>
+				<!-- END componentGroup -->
+				</tr>
+			</table>
+			<h2>Colours</h2>
+			<table>
+				<tr>
+					<td class="indent">
+						<h2>Headings for Large Components</h2>
+						<table class="standardForm">
+							<tr>
+								<td>Background Color</td>
+								<td>
+									<div id="largeHeadingBackgroundDiv" class="colorBox">
+									<input id="largeHeadingBackgroundInput" name="colors[large_head_bgcolour]" type="hidden" />								</td>
+							</tr>
+							<tr>
+								<td>Text Color</td>
+								<td>
+									<div id="largeHeadingTextDiv" class="colorBox"></div>
+									<input id="largeHeadingTextInput" name="colors[large_head_fontcolour]" type="hidden" />								</td>
+							</tr>
+						</table>					</td>
+					<td class="indent">
+						<h2>Headings for Small Components</h2>
+						<table class="standardForm">
+							<tr>
+								<td>Background Color</td>
+								<td>
+									<div id="smallHeadingBackgroundDiv" class="colorBox">
+									<input id="smallHeadingBackgroundInput" name="colors[small_head_bgcolour]" type="hidden" />								</td>
+							</tr>
+							<tr>
+								<td>Text Color</td>
+								<td>
+									<div id="smallHeadingTextDiv" class="colorBox"></div>
+									<input id="smallHeadingTextInput" name="colors[small_head_fontcolour]" type="hidden" />								</td>
+							</tr>
+						</table>					</td>
+				</tr>
+				<tr>
+					<td class="indent">
+						<h2>Text for Large Components</h2>
+						<table class="standardForm">
+							<tr>
+								<td>Background Color</td>
+								<td>
+									<div id="largeTextBackgroundDiv" class="colorBox">
+									<input id="largeTextBackgroundInput" name="colors[large_text_bgcolour]" type="hidden" />								</td>
+							</tr>
+							<tr>
+								<td>Text Color</td>
+								<td>
+									<div id="largeTextTextDiv" class="colorBox"></div>
+									<input id="largeTextTextInput" name="colors[large_text_fontcolour]" type="hidden" />								</td>
+							</tr>
+						</table>					</td>
+					<td class="indent">
+						<h2>Text for Small Components</h2>
+						<table class="standardForm">
+							<tr>
+								<td>Background Color</td>
+								<td>
+									<div id="smallTextBackgroundDiv" class="colorBox">
+									<input id="smallTextBackgroundInput" name="colors[small_text_bgcolour]" type="hidden" />								</td>
+							</tr>
+							<tr>
+								<td>Text Color</td>
+								<td>
+									<div id="smallTextTextDiv" class="colorBox"></div>
+									<input id="smallTextTextInput" name="colors[small_text_fontcolour]" type="hidden" />								</td>
+							</tr>
+						</table>					</td>
+				</tr>
+			</table>
+			<input type="hidden" name="cid" value="{CID}" />
+			<div align="right">
+				<input type="submit" name="Submit" value="Update Page" />
+			</div>
+			            </form>

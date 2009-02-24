@@ -1,13 +1,19 @@
 <ul id="tabs">
-	<li><a class="current" href="#" title="">Main</a></li>
-  <li><a href="#" title="">News</a></li>
-  <li><a href="#" title="">Webmail</a></li>
-  <li><a href="#" title="">Calendar</a></li>
-  <li><a href="#" title="">Resources</a></li>
-  <li><a href="#" title="">My Files</a></li>
+	<li><a class="current" href="/home/" title="Greeting page">Main</a></li>
+  <li><a href="/news/" title="Current school news">News</a></li>
+  <!-- BEGIN webmail_tab -->
+  <li><a {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
+  <!-- END webmail_tab -->
+  <li><a href="/calendar/week/" title="School calendar events">Calendar</a></li>
+  <!-- BEGIN timetable_tab -->
+  <li><a href="/timetable/" title="View your school timetable">Timetable</a></li>
+  <!-- END timetable_tab -->
+  <li><a href="/resources/" title="Browse resources and homepages">Resources</a></li>
+  <!-- BEGIN portfolio_tab -->
+  <li><a href="/cms/browseMyFiles.php" title="Access your portfolio area">My Portfolio</a></li>
+  <!-- END portfolio_tab -->
+  <!-- BEGIN myfiles_tab -->
+  <li><a href="#" title="Access your H:\ files">My Files</a></li>
+  <!-- END myfiles_tab -->
   <li><a href="#" title="">Logout</a></li>
 </ul>
-<!-- BEGIN webmail_tab --> 
-<!-- END webmail_tab -->
-<!-- BEGIN timetable_tab -->
-<!-- END timetable_tab -->

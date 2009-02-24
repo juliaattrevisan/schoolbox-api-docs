@@ -1,0 +1,29 @@
+<div class="box image">
+  <h2>Feature Image</h2>
+  <!-- BEGIN config -->
+    <div class="edit"><a onclick="toggleConfig('component{COMPONENT_ID}');">edit</a></div>
+    <div class="editPanel">
+      <form action="/homepage/configForm.php" method="get">
+        <input type="hidden" name="cid" value="{ID}" />
+        <input type="hidden" name="type" value="config" />
+        <input type="hidden" name="component" value="{COMPONENT_ID}" />
+        <label for="url">URL:</label>
+        <input type="text" name="url" value="{COMPONENT_CONFIG_URL}" size="25"/>
+        <label for="image">Image: </label>
+        <select name="image">
+          <!-- BEGIN image -->
+          <option value="{COMPONENT_CONFIG_IMAGE}"{COMPONENT_CONFIG_IMAGE_SELECTED}>{COMPONENT_CONFIG_IMAGE}</option>
+          <!-- END image -->
+        </select>
+        <label for="url">Pixels:</label>
+      	<input type="text" name="pixel" value="{COMPONENT_CONFIG_PIXEL}" size="4"/>
+        <input type="submit" value="Update" />
+      </form>
+    </div>
+  <!-- END config -->
+  <div class="text">
+  <!-- BEGIN previewimage -->
+    <img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}" />
+  <!-- END previewimage -->
+  </div>
+</div>

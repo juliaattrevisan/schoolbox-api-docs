@@ -1,139 +1,30 @@
-<div id="content">
+<!-- BEGIN custom_head -->
+<!-- END custom_head -->
 	<h1>Good Morning <strong>Nicholas Taranto</strong></h1>
+  
+  <!-- BEGIN timetable -->
   <div class="box">
-  	<h2>Timetable <span>- Monday 1st February</span></h2>
+  	<h2>Timetable <span>- Day {DAYNUMBER}</span></h2>
     <div class="text">
       
-      <div class="box-mini">
-        <h3>Period 1</h3>
+      <!-- BEGIN timetable_period -->
+      <div class="box-mini">     	
+        <h3>{PERIOD_NAME}</h3>
         <div class="text">
-          <p><a href="#">English (08ENG6) RM6</a></p>
+          <p><a href="#">{PERIOD_DESC}</a><br />{PERIOD_CODE}<br />{PERIOD_ROOM} {PERIOD_ABSENTEES}</p>
         </div>
       </div>
-      
-      <div class="box-mini">
-        <h3>Period 2</h3>
-        <div class="text">
-          <p><a href="#">English (08ENG6) RM6</a></p>
-        </div>
-      </div>
-      
-      <div class="box-mini">
-        <h3>Period 3</h3>
-        <div class="text">
-          <p><a href="#">English (08ENG6) RM6</a></p>
-        </div>
-      </div>
-      
-      <div class="box-mini">
-        <h3>Period 4</h3>
-        <div class="text">
-          <p><a href="#">English (08ENG6) RM6</a></p>
-        </div>
-      </div>
-      
-      <div class="box-mini">
-        <h3>Period 5</h3>
-        <div class="text">
-          <p><a href="#">English (08ENG6) RM6</a></p>
-        </div>
-      </div>
-      
-      <div class="box-mini last">
-        <h3>Period 6</h3>
-        <div class="text">
-          <p><a href="#">English (08ENG6) RM6</a></p>
-        </div>
-      </div>
+      <!-- END timetable_period -->
       
       <div class="float-fix"></div>
     </div>
-    
   </div>
+  <!-- END timetable -->
   
   <div class="left">
-  
-  	<div class="box">
-      <h2>Today's Events</h2>
-      <div class="text">
-        <p>09:00 - 10:00&nbsp;&nbsp;&nbsp;&nbsp;IT Support - January &amp; February 2009</p>
-        <p>12:00 - 13:00&nbsp;&nbsp;&nbsp;&nbsp;College Martial Law Fri 31 Oct 08 - Sun 2 Mar 09</p>
-        <p>13:00 - 15:00&nbsp;&nbsp;&nbsp;&nbsp;Backup to the Network - Your Francis Folder</p>
-      </div>
-    </div>
-    
-    <div class="box">
-      <h2>National Headline</h2>
-      <div class="text">
-        <ul>
-          <li><a href="#">18 months' jail for Patti Newton handbag thief</a></li>
-          <li><a href="#">Missing girl found drowned at beach</a></li>
-          <li><a href="#">Rudd offers credit lifeline</a></li>
-          <li><a href="#">Mokbel brother faces jail over silence</a></li>
-          <li><a href="#">Fire threatens homes as temperatures soar</a></li>
-        </ul>
-      </div>      
-    </div>
-         
+  	{POS1}{POS2}{POS3}{POS4}        
   </div>
   
   <div class="right">
-  
-  	<div class="box">
-      <h2>Current Weather</h2>
-      <div class="text">
-        
-        <img class="weather-icon" src="/images/weather.gif" alt="" />
-        
-        <p class="float-left"><strong>Temperature:</strong> 26.0<br />
-        <strong>Wind:</strong> ESE 7.6 km/h<br />
-        <strong>Humidity:</strong> 73</p>
-        
-        <p class="float-left">Issued at 9:03 AM<br />
-				<a href="#">More Weather...</a></p>
-                
-      </div>  
-    </div>
-    
-    <div class="box">
-      <h2>What's New</h2>
-      <div class="text">
-        
-        <ul class="tree">
-        	<li class="plus"><a onclick="swap(this);">Folder</a></li>
-          <li class="plus"><a onclick="swap(this);">Folder</a></li>
-          <li class="plus"><a onclick="swap(this);">Folder</a></li>
-          <li class="minus"><a onclick="swap(this);">Folder</a>
-          	<ul>
-            	<li class="icon"><a href="#">File</a></li>
-              <li class="icon"><a href="#">File</a></li>
-            </ul>
-          </li>
-          <li class="plus"><a onclick="swap(this);">Folder</a></li>
-          <li class="plus"><a onclick="swap(this);">Folder</a></li>
-        </ul>
-        
-        <script type="text/javascript">
-					function swap(el) {
-						var par = el.parentNode;
-							if(par.className == 'minus') par.className = 'plus';
-							else {par.className = 'minus'}
-						}
-				</script>
-              
-      </div>  
-    </div>
-    
+  	{POS5}{POS6}{POS7}{POS8}    
   </div>
-  <div class="float-fix"></div>
-  
-  
-</div>
-<!-- BEGIN custom_head -->
-<!-- END custom_head -->
-<!-- BEGIN timetable -->
-<!-- BEGIN timetable_header -->
-<!-- END timetable_header -->
-<!-- BEGIN timetable_period -->
-<!-- END timetable_period -->
-<!-- END timetable -->

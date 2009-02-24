@@ -1,47 +1,33 @@
 <div id="nav">
+	<!-- BEGIN msubject -->
 	<h3>Intranet Menu</h3>
   <ul>
-  	<li><a href="#" title="">Staff Resources</a></li>
-    <li><a href="#" title="">School Events</a></li>
-    <li><a href="#" title="">Staff Data</a></li>
-    <li><a href="#" title="">Student Data</a></li>
-    <li><a href="#" title="">Staff Links</a></li>
-    <li><a href="#" title="">Synergetic</a></li>
-    <li><a href="#" title="">Requests</a></li>
-    <li><a href="#" title="">Spotless Catering</a></li>
-    <li><a href="#" title="">ICT Service Desk</a></li>
+    <!-- BEGIN msubject_block --> 
+    <li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li> 
+    <!-- END msubject_block -->
   </ul>
-  <h3>Teacher Admin</h3>
+  <!-- END msubject -->
+  <!-- BEGIN mstudent -->
+	<h3>My Students</h3>
   <ul>
-  	<li><a href="#" title="">Attendance</a></li>
-    <li><a href="#" title="">Results</a></li>
-    <li><a href="#" title="">Coursework</a></li>
+    <!-- BEGIN mstudent_block --> 
+    <li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
+    <!-- END mstudent_block -->
   </ul>
+  <!-- END mstudent -->
+  <!-- BEGIN mgroup --> 
   <h3>My Groups</h3>
   <ul>
-  	<li><a href="#" title="">My House</a></li>
-    <li><a href="#" title="">My Classes</a></li>
-    <li><a href="#" title="">My Sport</a></li>
+  	<!-- BEGIN mgroup_block --> 
+		<li><a href="/homepage/{MGID}/">{MGNAME}</a></li> 
+		<!-- END mgroup_block -->
   </ul>	
+  <!-- END mgroup --> 
   <h3>My Links</h3>
   <ul>
-  	<li><a href="#" title="">Attendance</a></li>
-    <li><a href="#" title="">Results</a></li>
+  	<!-- BEGIN mlink_block -->
+  	<li>{MLINK}</li>
+    <!-- END mlink_block --> 
+    <li><a href="/editLinks.php">Add Link</a></li>
   </ul>	
 </div>
-
-<!-- BEGIN msubject --> 
-<!-- BEGIN msubject_block --> 
-<!-- END msubject_block --> 
-<!-- END msubject -->
-<!-- BEGIN mstudent --> 
-<!-- BEGIN mstudent_block --> 
-<!-- END mstudent_block --> 
-<!-- END mstudent --> 
-<!-- BEGIN mgroup --> 
-<!-- BEGIN mgroup_block --> 
-<!-- END mgroup_block --> 
-<!-- END mgroup --> 
-<!-- BEGIN mlink_block --> 
-<!-- END mlink_block --> 
-<!-- end left --> 

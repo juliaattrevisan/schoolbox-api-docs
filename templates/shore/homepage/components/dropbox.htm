@@ -1,0 +1,37 @@
+<div class="component" id="component{COMPONENT_ID}">
+  <div class="componentHeader">
+    <h2 class="cont-head">Drop Box</h2>
+  </div>
+  <!-- BEGIN drop_student -->
+  <form action="/subject/modDropBox.php" method="post" enctype="multipart/form-data" class="standardForm" >
+    <table cellspacing="0">
+      <tr>
+        <td class="small_text"><h3>Description</h3></td>
+        <td class="small_text"><input name="description" type="text" /><input type="hidden" name="category" value="{ID}" /></td>
+      </tr>
+      <tr>
+        <td class="small_text"><h3>File</h3></td>
+        <td class="small_text"><input name="file" type="file" /></td>
+      </tr>
+      <tr><td class="small_text">&nbsp;</td><td class="small_text"><input type="submit" name="submit" value="Upload" /></td></tr>
+    </table>
+  </form>
+  <!-- END drop_student -->
+  <!-- BEGIN drop_staff -->
+  <table cellspacing="0">
+    <!-- BEGIN drop_file -->
+    <tr>
+      <td class="small_text"><a href="/subject/modDropBox.php?id={DROPBOX_ID}">
+        <h3>{DROPBOX_DESCRIPTION}</h3>
+        </a>
+      </td><td class="small_text" style="text-align:right">
+      <a href="/subject/modDropBox.php?delete={DROPBOX_ID}">Delete</a>
+      </td>
+    </tr>
+    <tr>
+      <td style="border-bottom:1px solid #666;" class="small_text" colspan="2">By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}</td>
+    </tr>
+    <!-- END drop_file -->
+  </table>
+  <!-- END drop_staff -->
+</div>
