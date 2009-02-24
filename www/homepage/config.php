@@ -36,17 +36,15 @@ if(is_numeric($this->arg[0])) {
 	}
 	
 	// Components
-	$this->setBlock(TEMPLATE_content, 'componentGroup', 'componentGroupBlock');
-	$this->setBlock('componentGroup', 'componentRow', 'componentRowBlock');
+	$this->setBlock(TEMPLATE_content, 'componentRow', 'componentRowBlock');
 	$this->setBlock('componentRow', 'componentCol', 'componentColBlock');
-	$this->setVar('componentGroupName', 'Large Components');
 	
-	$listLargeComp = $homepage->getComponentList(1);
-	foreach($listLargeComp as $key => $largeComp){
-		$this->setVar('componentID', $largeComp['id']);
-		$this->setVar('componentName', $largeComp['name']);
-		$this->setVar('componentDescription', $largeComp['description']);
-		if(!empty($largeComp['component']))
+	$listComp = $homepage->getComponentList(0);
+	foreach($listComp as $key => $component){
+		$this->setVar('componentID', $component['id']);
+		$this->setVar('componentName', $component['name']);
+		$this->setVar('componentDescription', $component['description']);
+		if(!empty($component['component']))
 			$this->setVar('componentChecked', 'checked');
 		else
 			$this->setVar('componentChecked', '');
@@ -54,37 +52,11 @@ if(is_numeric($this->arg[0])) {
 		
 		$this->parse('componentColBlock', 'componentCol', true);
 		
-		if((++$key % 2) == 0 or $largeComp == end($listLargeComp)) {
+		if((++$key % 3) == 0 or $component == end($listComp)) {
 			$this->parse('componentRowBlock', 'componentRow', true);
 			$this->setVar('componentColBlock','');
 		}
 	}
-	
-	$this->parse('componentGroupBlock', 'componentGroup',true);
-	
-	$this->setVar('componentColBlock','');
-	$this->setVar('componentRowBlock','');
-	$this->setVar('componentGroupName', 'Small Components');
-	
-	$listSmallComp = $homepage->getComponentList(2);
-	foreach($listSmallComp as $key => $smallComp){
-		$this->setVar('componentID', $smallComp['id']);
-		$this->setVar('componentName', $smallComp['name']);
-		$this->setVar('componentDescription', $smallComp['description']);
-		if(!empty($smallComp['component']))
-			$this->setVar('componentChecked', 'checked');
-		else
-			$this->setVar('componentChecked', '');
-		
-		$this->parse('componentColBlock', 'componentCol', true);
-		
-		if($key % 2 or $smallComp == end($listSmallComp)) {
-			$this->parse('componentRowBlock', 'componentRow', true);
-			$this->setVar('componentColBlock','');
-		}
-	}
-	
-	$this->parse('componentGroupBlock', 'componentGroup',true);
 			
 	// Colors
 	$listColor = $homepage->getColorList();
