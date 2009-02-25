@@ -46,7 +46,7 @@ class Model {
 					$query .= " $termOp `$field` like ".$this->db->smartQuote($value);
 			}
 		
-			return $this->db->getRow($query);
+			return $this->db->getAll($query);
 		}
 		else 
 			return false;

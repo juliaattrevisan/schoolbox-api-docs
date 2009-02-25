@@ -24,7 +24,7 @@ if(is_numeric($this->arg[0]))
 	$category = $categoryHandler->getByID($this->arg[0]);
 if(!is_array($category)) {
 	$code = implode('/', $this->arg);
-	$category = $categoryHandler->getByField("code", urldecode(urldecode($code)));
+	$category = $categoryHandler->getByCode(urldecode(urldecode($code)));
 	$category = $categoryHandler->getByID($category['id']);
 }
 

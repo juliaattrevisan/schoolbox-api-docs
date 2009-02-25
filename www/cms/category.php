@@ -4,7 +4,7 @@ $categoryHandler = new Category;
 
 if(is_numeric($this->arg[0])) {
 	
-	if($category = $categoryHandler->getByID($this->arg[0]))
+	if(!($category = $categoryHandler->getByID($this->arg[0])))
 		error(2);
 	
 	$this->setFile(TEMPLATE_content, "cms/modify-category.html");

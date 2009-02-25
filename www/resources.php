@@ -116,6 +116,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 		$class[] = !empty($file['iconFile']) ? substr($file["iconFile"], 0, strpos($file["iconFile"], ".")) : "textfile";
 	
 		$output = array('FILE_ID' 	 	=> $file['id'],
+						'TYPE'			=> $file['url'] ? 'link' : 'file',
 						'FILE_NAME' 	=> scrubText($file['description']),
 						'FILE_MODIFIED'	=> outputDate(DATE_short_format, $file['submitted']),
 						'FILE_SIZE'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",

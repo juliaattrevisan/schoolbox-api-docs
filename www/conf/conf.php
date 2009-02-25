@@ -11,7 +11,7 @@
 define("HEADING", "MGS Portal");			//This will appear on the window title of each page
 define("SITE_name", "portal");
 define("MAX_FILE_SIZE", 10485760); 			//Maximum filesize in bytes allowed to be uploaded (default 10MB) (also set in php.ini)
-define("SITE_location", "ormond");				//This defines the location, allows specific code for each location
+define("SITE_location", "shore");				//This defines the location, allows specific code for each location
 define("SITE_root", dirname(__FILE__)."/../../");
 
 //Security options
@@ -151,7 +151,7 @@ define("ALLCAMPUS", 4);					//Value that represents all campuses in the luCampus
 define("HOMEPAGESERVICE", 1);				//Value that represents the homepage module in the service table
 define("FORUM_COMPONENT", 5);
 
-define("STUDENTGROUPIDS", serialize(array(3)));	//List of id numbers representing student groups
+define("STUDENTGROUPIDS", serialize(array(3,5)));	//List of id numbers representing student groups
 define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
 define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 

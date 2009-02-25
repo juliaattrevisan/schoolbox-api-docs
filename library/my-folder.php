@@ -20,10 +20,50 @@ class MyFolder extends Model {
 		$fields = array('owner'=>$this->owner,
 						'parent'=>$parent,
 						);
-		return $this->db->getByArray($fields);
-	
+		return $this->getByArray($fields);
 	
 	}
+	
+	function getParent($id) {
+		$query = "SELECT parent FROM ".$this->_table." WHERE id = " . (int)$id;
+		return $this->db->getOne($query);
+	}
+
+	function getFolderNode($folderID = 0) {
+		
+		// get folder contents
+		$folderList = $this->getFolderList($folderID);
+
+		if ($folderID > 0) {
+			// get parent folder contents
+			$siblingList = $this->getFolderNode($this->getParent($folderID));
+			
+			if (is_array($folderList)) {
+				// find index of parent node in siblingList
+				$total = count($siblingList);
+				for ($i = 0; $i < $total; $i++)
+					if ($siblingList[$i]['id'] == $folderID) break;
+					
+				// insert folder contents next to parent node
+				array_splice($siblingList, $i+1, 0, $folderList);
+			}
+			return $siblingList;
+		}
+		else {
+			return $folderList;
+		}
+	}
+	
+	function hasChildren($folderID) {
+		$query = "SELECT f.id as children 
+				  FROM myFolder f
+				  WHERE parent = $folderID
+				  LIMIT 1";
+		
+		return $this->db->getOne($query);
+	}
+
+
 }
 
 ?>

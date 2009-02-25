@@ -17,6 +17,13 @@ class MyFile extends Model {
 		parent::Model();
 	}
 
+	function getAllInFolder($folderID) {
+		$query = "SELECT f.*, UNIX_TIMESTAMP(f.submitted) submitted, af.iconFile FROM ".$this->_table." f
+				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
+				  WHERE parent = ".(int)$folderID."";
+		return $this->db->getAll($query);
+	}
+
 	function getFolderFileList($folder) {
 		$fields = array('owner'=>$this->owner,
 						'parent'=>$folder,

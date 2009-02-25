@@ -16,7 +16,11 @@ class Category extends Model {
 	}
 	
 	function getCategoryList ($categoryID, $config = false) {
-		$query = "SELECT id, name, code, template, parent FROM category WHERE parent = $categoryID ";
+		$query = "SELECT id, name, GROUP_CONCAT(co.code) code, template, parent 
+				  FROM category ca 
+				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
+				  WHERE parent = $categoryID 
+				  GROUP BY ca.id";
 		
 		$sortFields = array('name' => 'name', 'date' => 'id');
 		$config['sort'] = in_array($config['sort'], $sortFields) ? $config['sort'] : 'name';
@@ -45,13 +49,21 @@ class Category extends Model {
 	}
 	
 	function getByID($categoryID) {
-		$query = "SELECT c.*, u.id owner, u.title, u.firstname, u.lastname, g.type type
+		$query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type
 				  FROM (category c)
+				  LEFT JOIN categoryCode co ON co.categoryID = c.id
 				  LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGESERVICE . "
 				  LEFT JOIN user u on u.id = a.uid 
 				  LEFT JOIN userGroups g ON g.cid = c.id
-				  WHERE c.id = '$categoryID'"; 
+				  WHERE c.id = '$categoryID' 
+				  GROUP BY c.id"; 
 		return $this->db->getRow($query);		
+	}
+	
+	function getByCode($code) {
+		$query = "SELECT categoryID FROM categoryCode WHERE code = ".$this->db->smartQuote($code)." ";
+		$categoryID = $this->db->getOne($query);
+		return $this->getByID($categoryID);
 	}
 	
 	function logPageView($categoryID) {
@@ -217,6 +229,16 @@ class Category extends Model {
 
 	function create($data) {
 		$categoryID = parent::create($data);
+		
+		// insert codes
+		$codeList = explode(",", $data['code']);
+		if (is_array($codeList)) {
+			array_walk($codeList, create_function(&$code, '$code = trim($code);'));
+			$codeList = array_unique($codeList);
+			foreach ($codeList as $code)
+				$this->db->insert('categoryCode', array('categoryID' => $categoryID, 'code' => $code));
+		}
+		
 		$this->logAction($categoryID, 'create');
 		return $categoryID;
 	}
@@ -227,6 +249,18 @@ class Category extends Model {
 		if($data['template']) {
 			$templateHandler = new HomepageTemplate;
 			$this->createTemplate($cid, $template);
+		}
+
+		// clear current codes
+		$this->db->delete('categoryCode', 'categoryID', $data['id']);
+
+		// insert codes
+		$codeList = explode(",", $data['code']);
+		if (is_array($codeList)) {
+			array_walk($codeList, create_function(&$code, '$code = trim($code);'));
+			$codeList = array_unique($codeList);
+			foreach ($codeList as $code)
+				$this->db->insert('categoryCode', array('categoryID' => $data['id'], 'code' => $code));
 		}
 		
 		$this->logAction($data[$this->_index], 'modify');

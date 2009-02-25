@@ -4,86 +4,6 @@
   // TODO: This gives problems when there are both expandable and non-expandable
   // trees on a page. The options shouldn't be global to all these instances!
   var options;
-	// define file context menu 
-	var fileMenu = [
-		{"Open": function () { 
-			var _file = $(this).find(".file");
-			if (_file.hasClass("link"))
-				window.open("/redir.php?id="+$(this).attr("id").substring(5),"_blank"); 
-			else
-				window.open("/send.php?id="+$(this).attr("id").substring(5),"_blank"); 
-		}},
-		{"Save As": function () { window.open("/send.php?save=1&id="+$(this).attr("id").substring(5),"_self"); }},
-		$.contextMenu.separator,
-		{"Modify": function () {
-			var _file = $(this).find(".file");
-			if (_file.hasClass("link"))
-				window.open("/cms/link/"+$(this).attr("id").substring(5),"_self"); 
-			else
-				window.open("/cms/file/"+$(this).attr("id").substring(5),"_self"); 
-		}},
-		{"Delete": function () {
-			var _file = $(this).find(".file");
-			if (_file.hasClass("link")) {
-				if (confirm("Delete this link?")) 
-					window.open("/cms/linkForm.php?delete="+$(this).attr("id").substring(5),"_self");
-			} else {
-				if (confirm("Delete this file?")) 
-					window.open("/cms/fileForm.php?delete="+$(this).attr("id").substring(5),"_self");
-			}
-		}},
-		$.contextMenu.separator,
-		{"New File": function () { window.open("/cms/file/new/"+$(this).data("category"),"_self"); }},
-		{"Add Multiple Files": function () { window.open("/cms/file/multi/"+$(this).data("category"),"_self"); }},
-		{"New Link": function () { window.open("/cms/link/new/"+$(this).data("category"),"_self"); }},
-		{"New Folder": function () { window.open("/cms/category/new/"+$(this).data("category"),"_self"); }},
-		$.contextMenu.separator,
-		{"Properties": function () { 
-			var _file = $(this).find(".file"), ajaxURL;
-			if (_file.hasClass("link"))
-				ajaxURL = "/cms/properties.php?linkID="+$(this).attr("id").substring(5);
-			else
-				ajaxURL = "/cms/properties.php?fileID="+$(this).attr("id").substring(5);
-			
-			$.get(ajaxURL, function (data) {
-				$(data).modal({
-					position: ["15%",],
-					overlayId: 'properties-overlay',
-					containerId: 'properties-container',
-					onOpen: function (dialog) { 
-						dialog.overlay.fadeIn(200, function () { 
-							dialog.container.fadeIn(200, function () {
-								dialog.data.show();
-							}); 
-						}); 
-					},
-					onClose: function (dialog) { 
-						dialog.container.fadeOut(200, function () { 
-							dialog.overlay.fadeOut(200, function () { 
-									$.modal.close(); 
-							});  
-						}); 
-					}					
-				});
-			});
-		}},
-	];
-	// define folder context menu
-	var folderMenu = [
-		{"View Homepage": function () { window.open("/homepage/"+$(this).attr("id").substring(5),"_self"); }},
-		{"Image Gallery": function () { window.open("/cms/imageGallery/"+$(this).attr("id").substring(5),"_self"); }},
-		$.contextMenu.separator,
-		{"Modify": function () { window.open("/cms/category/"+$(this).attr("id").substring(5),"_self"); }},
-		{"Delete": function () { if (confirm("Delete this folder?")) window.open("/cms/modFolder.php?delete="+$(this).attr("id").substring(5),"_self"); }},
-		$.contextMenu.separator,
-		{"New File": function () { window.open("/cms/file/new/"+$(this).attr("id").substring(5),"_self"); }},
-		{"Add Multiple Files": function () { window.open("/cms/file/multi/"+$(this).attr("id").substring(5),"_self"); }},
-		{"New Link": function () { window.open("/cms/link/new/"+$(this).attr("id").substring(5),"_self"); }},
-		{"New Folder": function () { window.open("/cms/category/new/"+$(this).attr("id").substring(5),"_self"); }},
-		$.contextMenu.separator,
-		{"Download": function () { window.open("/cms/fetchFolder.php?folder="+$(this).attr("id").substring(5),"_self"); }},
-	];
-
 
   $.fn.treeTable = function(opts) {
     options = $.extend({}, $.fn.treeTable.defaults, opts);
@@ -106,7 +26,11 @@
 	
     initialState: "collapsed",
     treeColumn: 0,
-	ajaxURL: "/resourcesForm.php"
+	ajaxURL: "/resourcesForm.php",
+	resourcesID: "resourcesID",
+	ajaxLinkURL: "/cms/linkForm.php",
+	ajaxFileURL: "/cms/fileForm.php",
+	ajaxCategoryURL: "/cms/categoryForm.php"
   };
   
   // Recursively hide all node's children in a tree
@@ -207,11 +131,11 @@
 	 var id = $($(this).parents("tr")[0]).attr("id").substring(5), ajaxURL;
 	
 	if ($(this).hasClass("link"))
-		ajaxURL = "/cms/linkForm.php";
+		ajaxURL = options.ajaxLinkURL; 
 	 else if ($(this).hasClass("file"))
-		ajaxURL = "/cms/fileForm.php";
+		ajaxURL = options.ajaxFileURL;
 	 else
-		ajaxURL = "/cms/categoryForm.php";		 
+		ajaxURL = options.ajaxCategoryURL;  
 	 
 	 $.ajax({
 		type: "POST",
@@ -238,7 +162,7 @@
 	$.ajax({
 		url: options.ajaxURL,
 		type: "POST",
-		data: {"resourcesID": id}
+		data: {saveID: id}
 	});
   };
 
@@ -409,7 +333,7 @@
 	  
 	  // add extras
 	  if (span.hasClass(".folder")) {
-		addContext(span);
+		options.addContext(span);
 		addDrag(span);
 		addDrop(span);
 	  	addSelect(node);
@@ -418,7 +342,7 @@
 	  else if (span.hasClass(".file")) {
 		// store category id
 		node.data("category", getCategory(node));
-		addContext(span);
+		options.addContext(span);
 		addDrag(span);
 		addSelect(node);
 	  }
@@ -482,44 +406,6 @@
     }	  
   };
 
-  function addContext (node) {
-	
-	if ($(node).hasClass("folder")) {
-		
-		$($(node).parents("tr")[0]).contextMenu(folderMenu, {
-			beforeShow: function () {
-				if ($(this.target).hasClass("homepage") == 0)
-					$($(this.menu).find('.context-menu-item')[0]).toggleClass("context-menu-item-disabled"); 
-
-				if ($(this.target).hasClass("write") == 0) {
-					// disable from modify onwards
-					for (var i = 2; i <= 8; i++)
-						$($(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled"); 
-				}
-				
-			}
-		});
-		
-	}
-	else if ($(node).hasClass("file")) {
-		
-		$($(node).parents("tr")[0]).contextMenu(fileMenu, {
-			beforeShow: function () {
-				var _file = $(this.target).find(".file");
-				
-				if (_file.hasClass("link"))
-					$($(this.menu).find('.context-menu-item')[1]).toggleClass("context-menu-item-disabled"); 
-
-				if (_file.hasClass("write") == 0) {
-					// disable from modify to new folder
-					for (var i = 2; i <= 7; i++)
-						$($(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled"); 
-				}
-			}
-		});
-	}
-	  
-  }; 
 
   function addDrag (node) {
     $(node).draggable({

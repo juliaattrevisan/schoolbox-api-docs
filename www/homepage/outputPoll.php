@@ -3,6 +3,7 @@
 
 $this->setBlock($componentHandle, "poll_vote", "poll_vote_block");
 $this->setBlock("poll_vote", "poll_options", "poll_options_block");
+$this->setBlock("poll_vote", "show_results", "show_results_block");
 $this->setBlock($componentHandle, "poll_chart", "poll_chart_block");
 $this->setJavascript('/javascript/fusion.js');
 
@@ -42,6 +43,10 @@ if ($poll['pollID']) {
 				
 			}
 		}
+		
+		$this->setVar('show_results_block', '');
+		if ($pollHandler->hasResults($poll['pollID']))
+			$this->parse('show_results_block', 'show_results');
 		
 		$this->setVar("poll_chart_block", "");
 		$this->parse("poll_vote_block", "poll_vote");

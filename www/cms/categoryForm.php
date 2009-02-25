@@ -7,7 +7,7 @@ $page = new SitePage;
 $categoryHandler = new Category;
 $groupHandler = new Group;
 
-if ($_POST['title']) {
+if ($_POST['name']) {
 
 	if ($groupHandler->getPermission($_POST['parent']) < WRITE_ACCESS)
 		error(6);
@@ -17,9 +17,9 @@ if ($_POST['title']) {
 					  'template'	=> $_POST['template'],
 					  'code'		=> $_POST['code'],
 					  );
-
-	if (isset($_POST['id'])) {
-		$category['id'] = $_POST['id'];
+	
+	if (isset($_POST['categoryID'])) {
+		$category['id'] = $_POST['categoryID'];
 		$categoryHandler->update($category);
 	}
 	else

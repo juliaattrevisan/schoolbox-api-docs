@@ -214,12 +214,12 @@ function setSynergyInfo(&$mydb)
 				if(is_array($children)) {
 					foreach($children as $child)
 					{
-						$myquery = "SELECT id FROM user WHERE synergy_id = $child";
+						$myquery = "SELECT id, group_id FROM user WHERE synergy_id = $child";
 						$portal = $mydb->getRow($myquery);
 						if($portal['id'])
 						{
 							$subjects = getSubjectList($child, $studentGroup[0]);
-							$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child, 'subjects'=>$subjects);
+							$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child, 'gid'=>$portal['group_id'], 'subjects'=>$subjects);
 						}
 					}
 				}

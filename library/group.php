@@ -249,7 +249,7 @@ class Group extends Model {
 		$query = "SELECT category.id FROM userAccess, category 
 			WHERE userAccess.service = ".$this->_service." AND userAccess.uid = '$uid' 
 			AND userAccess.sid = category.id AND category.id = '$cid'";
-		return $this->db->getOne();
+		return $this->db->getOne($query);
 	}
 	
 	function involvedInSubject($code) {

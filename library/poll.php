@@ -84,6 +84,17 @@ class Poll extends Model {
 		return false;
 	}
 	
+	function hasResults($pollID) {
+		$poll = $this->getByID($pollID);
+		
+		$total = 0;
+		for ($i = 0; $i < 10; $i++) {
+			$total += $poll["result_{$i}"];
+		}
+		
+		return ($total > 0);
+	}
+	
 	function cleanHomepage($cid) {
 		$query = "DELETE FROM  `".$this->_table."` p, pollLog l WHERE p.pollID=l.pollID AND categoryID='$cid'";
 		$this->db->query($query);

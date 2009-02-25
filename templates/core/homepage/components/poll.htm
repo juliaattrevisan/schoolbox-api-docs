@@ -26,7 +26,7 @@
     </table>
     <div style="text-align: center;">
     <input type="submit" value="Vote" onclick="return validatePoll();" />
-    <p><a href="/homepage/{ID}&showResults">Show results</a></p>
+    <!-- BEGIN show_results --><p><a href="/homepage/{ID}&showResults">Show results</a></p><!-- END show_results -->
     </div>   
     </form>    
        
@@ -49,7 +49,7 @@
     <!-- END poll_vote -->
     
     <!-- BEGIN poll_chart -->
-    <div id="pollResult{COMPONENT_ID}" style="margin-top: 5px; ">
+    <div id="pollResult{COMPONENT_ID}" style="margin-top: 5px; text-align: center;">
         <noscript>
             <p>Flash player v9.0 required to view poll.</p>
         </noscript>  

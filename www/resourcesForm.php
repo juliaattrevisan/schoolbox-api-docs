@@ -26,6 +26,7 @@ if (is_numeric($_POST['folders'])) {
 							  );
 		}
 	}
+	
 	header("Content-type: application/json");
 	print json_encode($output);
 }
@@ -54,9 +55,9 @@ elseif (is_numeric($_POST['files'])) {
 	header("Content-type: application/json");
 	print json_encode($output);
 } 
-elseif (is_numeric($_POST['resourcesID'])) {
+elseif (is_numeric($_POST['saveID'])) {
 	// save current view
-	$_SESSION['resourcesID'] = $_POST['resourcesID'];
+	$_SESSION['resourcesID'] = $_POST['saveID'];
 }
 
 
