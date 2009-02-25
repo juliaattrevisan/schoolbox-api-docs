@@ -1,4 +1,5 @@
 <?php
+
 		//outputs an custom image and link to the homepage
 		$this->setBlock($componentHandle, "previewimage", "preview_block");
 

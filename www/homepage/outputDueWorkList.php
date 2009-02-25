@@ -1,4 +1,7 @@
 <?php
+//reset ON_OFF
+$j=0;
+
 //due output
 $this->setBlock($componentHandle, "duework", "duework_block");
 
@@ -28,12 +31,12 @@ if (is_array($submissionList)) {
 		$output = array('DUE_NAME'	=> $nameHTML,
 						'DUE_TYPE'	=> scrubTEXT($submission['typeName']),
 						'DUE_DATE'	=> $dateHTML,
-						'DUE_COMMENT' => nl2br(scrubTEXT($submission['comment'])),										
+						'DUE_COMMENT' => nl2br(scrubTEXT($submission['comment'])),
+						'ON_OFF' => $j++%2? '' : 'dark',										
 						);
 						
 		$this->setVar($output);
 		$this->parse("duework_block", "duework", true);
-		$this->setVar('ON_OFF', ++$i%2? '' : 'dark');
 	}
 } else
 	$this->setVar('duework_block', '');

@@ -1,4 +1,7 @@
 <?php
+//reset ON_OFF
+$j=0;
+
 		//output users of group
 		$this->setBlock($componentHandle, "members", "members_block");
 		
@@ -21,7 +24,7 @@
 					$emailall .= $email.",";
 				
 				$this->parse("members_block", "members", true);	
-				$this->setVar('ON_OFF', $i++%2? '' : 'dark');
+				$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 			}
 			$this->setVar("REPLYTO", formatEmail($_SESSION));
 			$this->setVar("EMAILALL", $emailall);

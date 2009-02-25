@@ -1,4 +1,7 @@
 <?php
+//reset ON_OFF
+$j=0;
+
 		//output managers
 		$this->setBlock($componentHandle, "staff_members", "staff_member_block");
 
@@ -21,7 +24,7 @@
 					$emailall .= $email.",";
 				
 				$this->parse("staff_member_block", "staff_members", true);
-				$this->setVar('ON_OFF', $i++%2? '' : 'dark');
+				$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 
 			}
 			$this->setVar("EMAILALL", $emailall);

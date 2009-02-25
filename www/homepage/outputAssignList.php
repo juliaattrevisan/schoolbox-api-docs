@@ -1,4 +1,7 @@
 <?php
+//reset ON_OFF
+$j=0;
+
 		//assignment
 		$this->setBlock($componentHandle, "assign", "assign_block");
 		
@@ -46,7 +49,7 @@
 				$this->setVar("ASS_COMMENT", nl2br(scrubTEXT($assignment['comment'])));
 		
 				$this->parse("assign_block", "assign", true);
-				$this->setVar('ON_OFF', $i++%2? '' : 'dark');
+				$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 
 
 

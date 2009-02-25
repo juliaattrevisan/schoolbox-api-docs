@@ -1,4 +1,7 @@
 <?php
+//reset ON_OFF
+$j=0;
+
 		//link output
 		$this->setBlock($componentHandle, "link", "link_block");
 		
@@ -20,7 +23,7 @@
 		
 				$this->parse("link_block", "link", true);
 				
-				$this->setVar('ON_OFF', $i++%2? '' : 'dark');
+				$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 
 			}
 		} else

@@ -1,4 +1,6 @@
 <?php
+//reset ON_OFF
+$j=0;
 
 //homework output
 $this->setBlock($componentHandle, "homework", "homework_block");
@@ -29,7 +31,7 @@ if (is_array($homeworkList)) {
 			$dueDate = $date;
 			
 		$this->setVar("HW_DATE", $dueDate);
-		$this->setVar('ON_OFF', ++$i%2? '' : 'dark');
+		$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 	
 		//set name
 		if($homework['realname'])

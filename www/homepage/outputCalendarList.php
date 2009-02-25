@@ -1,4 +1,6 @@
 <?php
+//Reset ON_OFF
+$j=0;
 		//event output
 		$this->setBlock($componentHandle, "group_events", "group_events_block");
 	
@@ -50,7 +52,8 @@
 				$this->setVar("CAL_NOTE", nl2br(scrubTEXT($event['note'])));
 		
 				$this->parse("group_events_block", "group_events", true);
-		
+				
+				$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 			}
 		} else
 			$this->setVar("group_events_block", '');

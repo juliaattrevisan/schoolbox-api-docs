@@ -1,4 +1,7 @@
 <?php
+//Reset ON_OFF
+$j=0;
+
 	//output users of group
 	$this->setBlock($componentHandle, 'feed', 'feed_block');
 	
@@ -10,7 +13,7 @@
 	if (is_array($feedList)) {
 		foreach ($feedList as $feed) {
 			$this->setVar('FEED_MESSAGE', $feed['messageHTML']);
-			$this->setVar('ON_OFF', $i++%2? '' : 'dark');
+			$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 			$this->parse('feed_block', 'feed', true);
 		}
 	

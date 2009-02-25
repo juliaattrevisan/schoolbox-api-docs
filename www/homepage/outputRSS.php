@@ -1,4 +1,7 @@
 <?php
+//reset ON_OFF
+$j=0;
+
 		$this->setBlock($componentHandle, "rss_stories", "rss_block");
 		
 		require_once('include/lastRSS.php');
@@ -19,6 +22,7 @@
 				$this->setVar("RSS_URL", $item['link']); 
 				$this->setVar("RSS_BRIEF", $item['description']);
 				$this->parse("rss_block", "rss_stories", true);
+				$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 	    	}
 		}
 		else

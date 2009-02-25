@@ -1,5 +1,6 @@
 <?php
-
+//reset ON_OFF
+$j=0;
 		$continue = true;
 		//dont show forums to parents if they not a direct member of group
 		if(isParent($_SESSION['gid']))
@@ -32,6 +33,7 @@
 					$this->setVar("FORUM_HEAD", "<a href=\"$url\">".scrubTEXT($thread['heading'])."</a>");
 		
 				$this->parse("forum_block", "forum", true);
+				$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 				
 			}
 		} else

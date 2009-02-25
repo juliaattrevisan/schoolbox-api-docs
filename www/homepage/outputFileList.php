@@ -1,4 +1,7 @@
 <?php
+//Reset ON_OFF
+$j =0;
+
 //file output
 $this->setBlock($componentHandle, "files", "files_block");
 
@@ -27,7 +30,7 @@ if (is_array($fileList)) {
 
 		$this->parse("files_block", "files", true);
 		
-		$this->setVar('ON_OFF', ++$i%2? '' : 'dark');
+		$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 
 	}
 } else

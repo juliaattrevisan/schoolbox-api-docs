@@ -1,4 +1,7 @@
 <?php
+//reset ON_OFF
+$j=0;
+
 //news output
 $this->setBlock($componentHandle, 'news', 'news_block');
 
@@ -22,6 +25,7 @@ if (is_array($newsList)) {
 		$this->setVar("EMAIL_CONTACT", "<a href=\"/search/user/{$news['uid']}\">" . formatName($news) . "</a>");
 		$this->setVar("POSTED_DATE", date(DATE_short_format, $news['posted']));
 		$this->parse("news_block", "news", true);
+		$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 	}
 	
 } else

@@ -1,4 +1,7 @@
 <?php
+//Reset ON_OFF
+$j=0;
+
 	$this->setBlock($componentHandle, "duties", "d_block");
 	
 	require_once '../library/duty.php';
@@ -15,6 +18,7 @@
 				$this->setVar("ASSIGNEDUSER", $duty['user']);
 				$this->parse("d_block", "duties", true);
 				$block = true;
+				$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 		}
 	} else {
 			$this->setVar("DUTY", "No Duties set for today");

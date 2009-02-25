@@ -1,4 +1,7 @@
 <?php
+//reset ON_OFF
+$j=0;
+
 $this->setBlock($componentHandle, "wiki_row", "wiki_row_block");
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/wiki.php';
@@ -13,6 +16,7 @@ if (is_array($wikiList)) {
 						'WIKI_AUTHOR'	=> formatName($wiki),
 						'WIKI_AUTHOR_ID'	=> $wiki['userID'],
 						'WIKI_MODIFIED'	=> outputDate(DATE_short_format, $wiki['modified']),
+						'ON_OFF' => $j++%2? '' : 'dark',
 						);
 		$this->setVar($output);
 		$this->parse('wiki_row_block', 'wiki_row', true);

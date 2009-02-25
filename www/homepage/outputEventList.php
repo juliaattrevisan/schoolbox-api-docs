@@ -1,4 +1,6 @@
 <?php
+//Reset ON_OFF
+$j =0;
 
 //event output
 $this->setBlock($componentHandle, "group_events", "group_events_block");
@@ -17,7 +19,7 @@ if (is_array($eventList)) {
 		$this->setVar("CAL_YEAR", $event['year']);
 		$this->setVar("CAL_MONTH", $event['month']);
 		$this->setVar("CAL_DAY", $event['day']);
-	
+		$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 		if($event['startTimeString'] == "0:00" || $event['startTimeString'] == "")
 				$this->setVar("CAL_TIME", "");
 		else if($event['endTimeString'] == "0:00")
