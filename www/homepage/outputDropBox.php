@@ -22,7 +22,7 @@ $j=0;
 									'DROPBOX_ID'		=> $file['id'],
 									'DROP_SUBMITTED_BY' => "<a href=\"/search/user/{$file['uid']}\">".formatName($file).'</a>',
 									'DROP_SUBMITTED_TIME'=>$file['subdate'],
-									'ON_OFF' => $j++%2? '' : 'dark',
+									'ON_OFF' => ++$j%2? '' : 'dark',
 									);
 					$this->setVar($output);
 					$this->parse("drop_file_block", "drop_file", true);

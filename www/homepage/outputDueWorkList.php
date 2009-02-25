@@ -32,7 +32,7 @@ if (is_array($submissionList)) {
 						'DUE_TYPE'	=> scrubTEXT($submission['typeName']),
 						'DUE_DATE'	=> $dateHTML,
 						'DUE_COMMENT' => nl2br(scrubTEXT($submission['comment'])),
-						'ON_OFF' => $j++%2? '' : 'dark',										
+						'ON_OFF' => ++$j%2? '' : 'dark',										
 						);
 						
 		$this->setVar($output);

@@ -31,7 +31,7 @@ if (is_array($homeworkList)) {
 			$dueDate = $date;
 			
 		$this->setVar("HW_DATE", $dueDate);
-		$this->setVar('ON_OFF', $j++%2? '' : 'dark');
+		$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 	
 		//set name
 		if($homework['realname'])

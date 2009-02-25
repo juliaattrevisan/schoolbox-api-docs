@@ -27,10 +27,10 @@ if (is_array($fileList)) {
 		$this->setVar("FILE_NAME", scrubTEXT($file['description']));
 		
 		$this->setVar("FILE_COMMENT", nl2br(scrubTEXT($file['comment'])));
-
+		$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 		$this->parse("files_block", "files", true);
 		
-		$this->setVar('ON_OFF', $j++%2? '' : 'dark');
+		
 
 	}
 } else

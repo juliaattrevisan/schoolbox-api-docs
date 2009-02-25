@@ -8,7 +8,7 @@ $folderList = $categoryHandler->getCategoryList($categoryID, $config);
 if (is_array($folderList)) {
 	$flag = 0;
 	foreach ($folderList as $folder) {
-		$this->setVar('ON_OFF', $j++%2? '' : 'dark');
+		$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 		if($groupHandler->getPermission($folder['id']) > DENY_ACCESS)
 		{
 					//set name

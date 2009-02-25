@@ -23,8 +23,8 @@ $j=0;
 				if($email)
 					$emailall .= $email.",";
 				
+				$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 				$this->parse("staff_member_block", "staff_members", true);
-				$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 
 			}
 			$this->setVar("EMAILALL", $emailall);

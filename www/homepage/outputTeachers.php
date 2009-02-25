@@ -20,7 +20,7 @@ if($code != "" && SYNERGY_enable)
 				$this->setVar('MEMBER_NAME', "<a href=\"/search/user/{$teacher['uid']}\">{$name}</a>");
 				$this->parse("staff_teacher_block", "staff_teachers", true);	
 			}
-			$this->setVar('ON_OFF', $j++%2? '' : 'dark');
+			$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 		}
 	}
 }

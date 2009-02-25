@@ -53,7 +53,7 @@ $j=0;
 		
 				$this->parse("group_events_block", "group_events", true);
 				
-				$this->setVar('ON_OFF', $j++%2? '' : 'dark');
+				$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 			}
 		} else
 			$this->setVar("group_events_block", '');

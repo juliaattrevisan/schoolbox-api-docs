@@ -18,7 +18,7 @@ $j=0;
 				$this->setVar("ASSIGNEDUSER", $duty['user']);
 				$this->parse("d_block", "duties", true);
 				$block = true;
-				$this->setVar('ON_OFF', $j++%2? '' : 'dark');
+				$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 		}
 	} else {
 			$this->setVar("DUTY", "No Duties set for today");

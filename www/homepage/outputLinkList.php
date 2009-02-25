@@ -20,10 +20,10 @@ $j=0;
 				
 				//set the description
 				$this->setVar("LINK_COMMENT", nl2br(scrubTEXT($link['comment'])));
-		
+				
+				$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 				$this->parse("link_block", "link", true);
 				
-				$this->setVar('ON_OFF', $j++%2? '' : 'dark');
 
 			}
 		} else

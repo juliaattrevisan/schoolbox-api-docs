@@ -47,9 +47,10 @@ $j=0;
 					$this->setVar("ASS_NAME", scrubTEXT($assignment['description']));
 				
 				$this->setVar("ASS_COMMENT", nl2br(scrubTEXT($assignment['comment'])));
-		
+				
+				$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 				$this->parse("assign_block", "assign", true);
-				$this->setVar('ON_OFF', $j++%2? '' : 'dark');
+				
 
 
 
