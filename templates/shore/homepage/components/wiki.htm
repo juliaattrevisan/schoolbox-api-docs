@@ -1,10 +1,8 @@
-<div class="component" id="component{COMPONENT_ID}">
-<div class="componentHeader">
-  <h2 class="cont-head">Wiki</h2>
-</div>
+<div class="box">
+  <h2>Wiki</h2>
 <!-- BEGIN config -->
-<a class="config" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
-<div class="componentConfig">
+<a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+<div class="editPanel">
   <form action="/homepage/configForm.php" method="get">
     <input type="hidden" name="cid" value="{ID}" />
     <input type="hidden" name="type" value="config" />
@@ -20,13 +18,16 @@
   </form>
 </div>
 <!-- END config -->
-<table>
-  <!-- BEGIN wiki_row -->
-  <tr>
-    <td><a href="/wiki/{WIKI_ID}">{WIKI_HEADING}</a></td>
-    <td class="summ"><a href="/search/user/{WIKI_AUTHOR_ID}">{WIKI_AUTHOR}</a></td>
-    <td style="text-align: right;">{WIKI_MODIFIED}</td>
-  </tr>
-  <!-- END wiki_row -->
-</table>
+  <div class="text listing">
+  <ul>
+  	<!-- BEGIN wiki_row -->
+  	<li>
+    	<h3><a href="/wiki/{WIKI_ID}">{WIKI_HEADING}</a></h3>
+    	<p class="interact"><a href="/search/user/{WIKI_AUTHOR_ID}">{WIKI_AUTHOR}</a></p>
+    	<p>{WIKI_MODIFIED}</p>
+    </li>
+  	<!-- END wiki_row -->
+  </ul>
+  </div>
+    
 </div>

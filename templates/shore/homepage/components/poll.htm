@@ -1,16 +1,14 @@
-<div class="component" id="component{COMPONENT_ID}">
-    <div class="componentHeader">
-        <h2 class="cont-head">{POLL_TITLE}</h2>
+<div class="box">
+  <h2>{POLL_TITLE}</h2>
+  <!-- BEGIN config -->    
+    <a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+    <div class="editPanel">
+      <a href="/poll/modify/new/{ID}">Create</a> |
+      <a href="/poll/modify/{POLL_ID}">Edit</a> |
+      <a href="/poll/modifyForm.php?delete={POLL_ID}" onclick="return confirm('Delete Poll?');">Delete</a>
     </div>
-<!-- BEGIN config -->    
-  <a class="config" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
-  <div class="componentConfig">
-    <a href="/poll/modify/new/{ID}">Create</a> |
-    <a href="/poll/modify/{POLL_ID}">Edit</a> |
-    <a href="/poll/modifyForm.php?delete={POLL_ID}" onclick="return confirm('Delete Poll?');">Delete</a>
-  </div>
-<!-- END config -->
-    
+  <!-- END config -->
+   <div class="text">
     
     <p style="text-align: center;">{POLL_QUESTION}</p>
     <!-- BEGIN poll_vote -->

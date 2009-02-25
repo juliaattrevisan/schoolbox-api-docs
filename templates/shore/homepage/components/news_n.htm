@@ -1,10 +1,8 @@
-<div class="component" id="component{COMPONENT_ID}">
-  <div class="componentHeader">
-    <h2 class="cont-head">News</h2>
-  </div>
+<div class="box">
+  <h2>News</h2>
     <!-- BEGIN config -->
-  <a class="config" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
-  <div class="componentConfig">
+  <a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+  <div class="editPanel">
     <form action="/homepage/configForm.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
@@ -19,22 +17,19 @@
     </form>
   </div>
 <!-- END config -->
-  <table cellspacing="0px" class="componentContent" style="border-bottom:1px solid #666;">
-    <!-- BEGIN news -->
-    <tr>
-      <td class="large_text"><h3>{NEWS_HEADING}</h3></td>
-      <td class="large_text" style="text-align:right;">{MOD_NEWS}</td>
-    </tr>
-    <tr>
-      <td class="large_text" colspan="2">{NEWS_BODY}</td>
-    </tr>
-    <tr>
-      <td class="large_text" style="text-align:right; border-bottom:1px solid #666;" colspan="2"><span class="element_footer">Posted by {EMAIL_CONTACT} on {POSTED_DATE}</span></td>
-    </tr>
-    <!-- END news -->
-  </table>
-  <div class="componentNav" style="text-align:right;"><a href="/subject/newsArchive.php?category={ID}">VIEW ARCHIVE</a></div>
-  <!-- BEGIN submit_news -->
-  <div class="componentNav" style="text-align:right;"><a href="/news/homepage/new/{ID}">POST NEWS</a></div>
-  <!-- END submit_news -->
+	<div class="text listing">
+  	<ul>
+    	<!-- BEGIN news -->
+    	<li>
+      	<h3>{NEWS_HEADING}</h3>
+        <p class="interact">{MOD_NEWS}</p>
+        <p>{NEWS_BODY}</p>
+        <p class="small">Posted by {EMAIL_CONTACT} on {POSTED_DATE}</p>
+      </li>
+      <!-- END news -->
+    </ul>
+    <!-- BEGIN submit_news -->
+  	<p class="interact"><a href="/news/homepage/new/{ID}">Post News</a></p>
+  	<!-- END submit_news -->
+  </div>
 </div>
