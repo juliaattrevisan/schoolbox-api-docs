@@ -49,8 +49,9 @@ function localRedir($file)
 //user to login page with the requested url
 function goLoginPage()
 {
-        $page = rawurlencode($_SERVER['REQUEST_URI']);
-        localRedir("/login/");
+		require_once dirname(__FILE__) . '/../../include/sitePage.php';
+		$page = new SitePage;
+		$page->goLoginPage();
 }
 
 //function for returning user ip (tries to work around issues with proxies)

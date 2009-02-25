@@ -8,7 +8,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] .'/../include/sitePage.php';
 $page = new SitePage(); 
 
-if( ((SITE_location == 'mgs' || SITE_location == 'wenona') && !isStudent($_SESSION['gid'])) )
+if( ((SITE_location == 'mgs' || SITE_location == 'wenona') && !isStudent($_SESSION['gid'])  || (SITE_location == 'ormond' && $_SESSION['exchange'])) )
 {	 
 	
 	$page->setFile(TEMPLATE_content, 'mail/send.html');

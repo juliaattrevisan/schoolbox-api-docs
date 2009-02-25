@@ -108,6 +108,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 		$_SESSION['local_email'] = $user['local_email'];
 		$_SESSION['lasttime'] = mktime();
 		$_SESSION['username'] = $user['username'];
+		$_SESSION['password'] = $user['email_pass'];
 
 		//remember users session (i.e. never let it expire)
 		if(REMEMBERSESSION && $remember)
@@ -121,11 +122,8 @@ function authenticate(&$db, $username, $password, $remember = 0)
 		else
 			$_SESSION['mailhandle'] = "/mail/createMail.php?replyto=";
 
-		//if wenona store password in session for single signon
-		//if(SITE_location == 'wenona')
-		//{
-			$_SESSION['password'] = $user['email_pass'];
-		//}
+		
+			
 		//superuser value, used to bypass most security checks
 		if($user['su'] != "")
 			$_SESSION['su'] = 1;
@@ -146,6 +144,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 				if($campus['campus'])
 					$_SESSION['campus'][] = $campus['campus'];
 			}
+		}
 		else
 			$_SESSION['campus'][] = 1;
 
@@ -156,6 +155,9 @@ function authenticate(&$db, $username, $password, $remember = 0)
 			if($_SESSION['id'] == 6277)
 				$_SESSION['children'][] = array('id'=>2673,'sid'=>48826);
 		}
+		
+		if(LDAP_enable)
+			setLDAPInfo();
 
 		$loginlogquery .= ", '1')";
 		$db->query($loginlogquery);
@@ -193,6 +195,15 @@ function firsttime(&$db, $username, $password)
         $db->query($query);
 
 	return 1;
+}
+
+function setLDAPInfo() {
+	$ds=@ldap_connect(LDAP_host);
+	$result = @ldap_search($ds, LDAP_base,'uid='.$username,array('dn','exchangeActive'));
+	$entries = @ldap_get_entries($ds, $result);
+	if($entries[0]['exchangeactive'][0] == 'TRUE')
+		$_SESSION['exchange'] = true;
+
 }
 
 function setSynergyInfo(&$mydb)

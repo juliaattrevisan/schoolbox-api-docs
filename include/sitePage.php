@@ -223,7 +223,10 @@ class SitePage extends Page {
 			}
 			else if(SITE_location == 'ormond') 
 			{
-				$this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
+				if($_SESSION['exchange'])
+					$this->setVar("WEBMAIL_LOCATION", 'href="http://owa.ormond.unimelb.edu.au" target="_blank"');
+				else
+					$this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
 			}
 			else if(SITE_location == 'wenona') {
 				if(isStaff($_SESSION['gid'])) {
