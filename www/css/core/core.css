@@ -81,7 +81,6 @@ body {
 --------------------------------------------------------------*/
 a { text-decoration: none; }
 a:hover { text-decoration: underline; }
-.box .edit a { font-weight: bold; margin-right: 10px; color: #fff; cursor: pointer; }
 /*--------------------------------------------------------------
  Text formatting styles 
 --------------------------------------------------------------*/
@@ -227,10 +226,16 @@ Side Nav styles
 .box {
 	background: #ebebeb;
 	margin-bottom: 20px;
+	position: relative;
 	}
 .box .text {
 	padding: 11px 10px;
 	display: inline-block;
+	}
+.box .text.listing {
+	background: #fff;
+	padding: 0;
+	display: block;
 	}
 .box.image .text {
 	text-align: center;
@@ -243,8 +248,6 @@ Side Nav styles
 	padding: 6px 0;
 	text-indent: 16px;
 	position: relative;
-	width: 90%;
-	float: left;
 	}
 .box h2 span {
 	font-weight: normal;
@@ -285,11 +288,50 @@ Side Nav styles
 .box a {
 	color: #2c2c2c;
 	}
-.box .edit { float: right; text-align: right; width: 10%; background: #003a77; line-height: 26px; }
+.box .edit {
+	padding: 0 17px;
+	color: #fff;
+	cursor: pointer;
+	background: #002b58;
+	display: block;
+	height: 26px;
+	line-height: 26px;
+	float: left;
+	position: absolute;
+	top: 1px;
+	right: 0;
+	}
+.box .edit:hover { background: #0065ce; }
 .box .editPanel {
 	clear: both;
 	padding: 10px;
+	background: #c0c0c0;
 	}
+.box .listing ul {
+	list-style: none;
+	margin: 0 0 0.5em 0;
+	padding: 0;
+	display: block;
+	}
+.box .listing ul li {
+	margin: 0;
+	padding: 0;
+	display: block;
+	padding: 5px 15px;
+	}
+.box .listing ul li.dark {
+	background: #ececec;
+	}
+.listing h3 { float: left; line-height: 1.6; }
+.listing h3 a:hover { color: #003e7e; }
+.listing p { clear: both; margin: 0 0 0.5em; }
+.box p.interact { font-size: 90%; float: right; clear: none; margin: 0 15px 0 0; }
+.box li p.interact { margin: 0; }
+.box p.interact a { color: #003e7e; }
+.listing p.small { font-size: 90%; float: right; color: #989898; }
+.listing p.small a { color: #5c5151; text-decoration: none; }
+.listing p.small a:hover { text-decoration: underline; }
+.listing a { color: #003e7e; }
 /*--------------------------------------------------------------
 Tree styles 
 --------------------------------------------------------------*/

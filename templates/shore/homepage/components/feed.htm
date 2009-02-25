@@ -1,10 +1,8 @@
-<div class="component" id="component{COMPONENT_ID}">
-  <div class="componentHeader">
-    <h2 class="cont-head">Homepage Feed</h2>
-  </div>
+<div class="box">
+  <h2>Homepage Feed</h2>
 <!-- BEGIN config -->
-  <a class="config" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
-  <div class="componentConfig">
+  <a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+  <div class="editPanel">
     <form action="/homepage/configForm.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
@@ -19,14 +17,11 @@
     </form>
   </div>
 <!-- END config -->
-  <table>
-    <!-- BEGIN feed -->
-    <tr>
-      <td class="small_text">{FEED_MESSAGE}</td>
-    </tr>
-    <!-- END feed -->
-    <tr style="height:2px;">
-      <td colspan="2" style="background:#666;"></td>
-    </tr>
-  </table>
+	<div class="text listing">
+  	<ul>
+    	<!-- BEGIN feed -->
+    	<li class="{ON_OFF}">{FEED_MESSAGE}</li>
+      <!-- END feed -->
+    </ul>
+  </div>
 </div>

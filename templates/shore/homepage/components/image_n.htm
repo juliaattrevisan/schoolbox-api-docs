@@ -1,7 +1,7 @@
 <div class="box image">
   <h2>Feature Image</h2>
   <!-- BEGIN config -->
-    <div class="edit"><a onclick="toggleConfig('component{COMPONENT_ID}');">edit</a></div>
+    <a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
     <div class="editPanel">
       <form action="/homepage/configForm.php" method="get">
         <input type="hidden" name="cid" value="{ID}" />
