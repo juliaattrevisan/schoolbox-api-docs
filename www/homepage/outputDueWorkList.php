@@ -33,6 +33,7 @@ if (is_array($submissionList)) {
 						
 		$this->setVar($output);
 		$this->parse("duework_block", "duework", true);
+		$this->setVar('ON_OFF', ++$i%2? '' : 'dark');
 	}
 } else
 	$this->setVar('duework_block', '');

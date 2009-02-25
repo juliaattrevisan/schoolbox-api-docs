@@ -10,7 +10,7 @@
 	if (is_array($feedList)) {
 		foreach ($feedList as $feed) {
 			$this->setVar('FEED_MESSAGE', $feed['messageHTML']);
-			$this->setVar('ON_OFF', $i%2? '' : 'dark');
+			$this->setVar('ON_OFF', $i++%2? '' : 'dark');
 			$this->parse('feed_block', 'feed', true);
 		}
 	

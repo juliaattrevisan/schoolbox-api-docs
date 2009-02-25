@@ -89,8 +89,8 @@ ul, ol      { margin: 0 0 1.5em 1.5em; line-height: 1.5; }
 /*--------------------------------------------------------------
  Heading Styles 
 --------------------------------------------------------------*/
-h1 { font-size: 1.33em; font-weight: normal; border-bottom: 1px dashed #7f7f7f; line-height: 2.5; margin-bottom: 1.5em; }
-h1 a { float: right; font-size: 70%; }
+h1 { font-size: 1.33em; font-weight: normal; border-bottom: 1px dashed #7f7f7f; line-height: 2.5; margin-bottom: 1.5em; position: relative; }
+h1 a.customise { position: absolute; top: 0; right: 0; font-size: 70%; }
 h3 { font-size: 1em; }
 /*--------------------------------------------------------------
  Table Styles 
@@ -307,6 +307,10 @@ Side Nav styles
 	padding: 10px;
 	background: #c0c0c0;
 	}
+.box .listing form {
+	text-align: right;
+	margin-right: 15px;
+	}
 .box .listing ul {
 	list-style: none;
 	margin: 0 0 0.5em 0;
@@ -318,6 +322,10 @@ Side Nav styles
 	padding: 0;
 	display: block;
 	padding: 5px 15px;
+	}
+.box .listing ul li .col {
+	float: left;
+	width: 50%;
 	}
 .box .listing ul li.dark {
 	background: #ececec;

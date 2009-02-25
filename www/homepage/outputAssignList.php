@@ -46,6 +46,7 @@
 				$this->setVar("ASS_COMMENT", nl2br(scrubTEXT($assignment['comment'])));
 		
 				$this->parse("assign_block", "assign", true);
+				$this->setVar('ON_OFF', $i++%2? '' : 'dark');
 
 
 

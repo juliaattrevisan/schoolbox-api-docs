@@ -21,11 +21,13 @@ if (is_array($fileList)) {
 			$this->setVar("FILE_NAME", $url);
 		}
 		else
-			$this->setVar("FILE_NAME", scrubTEXT($file['description']));
+		$this->setVar("FILE_NAME", scrubTEXT($file['description']));
 		
 		$this->setVar("FILE_COMMENT", nl2br(scrubTEXT($file['comment'])));
 
 		$this->parse("files_block", "files", true);
+		
+		$this->setVar('ON_OFF', ++$i%2? '' : 'dark');
 
 	}
 } else

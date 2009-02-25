@@ -1,10 +1,8 @@
-<div class="component" id="component{COMPONENT_ID}">
-  <div class="componentHeader">
-    <h2 class="cont-head">Due Work</h2>
-  </div>
-<!-- BEGIN config -->
-  <a class="config" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
-  <div class="componentConfig">
+<div class="box">
+  <h2>Due Work</h2>
+	<!-- BEGIN config -->
+  <a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+  <div class="editPanel">
     <form action="/homepage/configForm.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
@@ -18,23 +16,20 @@
       <input type="submit" value="Update" />
     </form>
   </div>
-<!-- END config -->
-  <table>
-  <!-- BEGIN duework -->
-    <tr>
-      <td class="large_text"><strong>{DUE_NAME}</strong></td>
-      <td class="large_text summ">{DUE_TYPE}</td>
-      <td class="large_text summ">{DUE_COMMENT}</td>
-      <td class="large_text" style="text-align:right;"><strong>Due Date: </strong>{DUE_DATE}</td>
-    </tr>
-    <!-- END duework -->
-    <tr style="height:1px;">
-      <td colspan="4" style="border-bottom:1px solid #666;"></td>
-    </tr>
+	<!-- END config -->
+  <div class="text listing">
+  	<ul>
+    	<!-- BEGIN duework -->
+      <li class="{ON_OFF}">
+      	<h3><a href="#">{DUE_NAME}</a></h3>
+        <p class="interact">{DUE_DATE}</p>
+        <p><strong>{DUE_TYPE}</strong> - {DUE_COMMENT}</p>
+      </li>
+    	<!-- END duework -->
+    </ul>
     <!-- BEGIN submit_dw -->
-    <tr>
-    	<td style="text-align:right;" colspan="4" class="navbar"><a href="/submission/createSubmission.php?category={ID}&type=3">POST DUE WORK</a></td>
-    </tr>
+    <p class="interact"><a href="/submission/createSubmission.php?category={ID}&type=3">Post Due Work</a></p>
     <!-- END submit_dw -->
-  </table>
+    <div class="float-fix"></div>
+  </div>
 </div>

@@ -21,9 +21,11 @@
 					$emailall .= $email.",";
 				
 				$this->parse("members_block", "members", true);	
+				$this->setVar('ON_OFF', $i++%2? '' : 'dark');
 			}
 			$this->setVar("REPLYTO", formatEmail($_SESSION));
 			$this->setVar("EMAILALL", $emailall);
+			
 		}
 		else
 			$this->setVar("members_block", "");

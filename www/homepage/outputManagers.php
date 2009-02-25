@@ -21,6 +21,7 @@
 					$emailall .= $email.",";
 				
 				$this->parse("staff_member_block", "staff_members", true);
+				$this->setVar('ON_OFF', $i++%2? '' : 'dark');
 
 			}
 			$this->setVar("EMAILALL", $emailall);

@@ -19,6 +19,8 @@
 				$this->setVar("LINK_COMMENT", nl2br(scrubTEXT($link['comment'])));
 		
 				$this->parse("link_block", "link", true);
+				
+				$this->setVar('ON_OFF', $i++%2? '' : 'dark');
 
 			}
 		} else
