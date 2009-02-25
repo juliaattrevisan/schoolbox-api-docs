@@ -13,8 +13,8 @@ $imageList = $categoryHandler->getImages($categoryID, $config);
 $count = 1; 
 if(is_array($imageList) ) {
 	foreach( $imageList as $thumbnail ) {
-		$this->setVar('THUMBNAIL', "<a href=\"image.php?id={$thumbnail['id']}&height=550&width=600\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
-				<img src=\"image.php?id={$thumbnail['id']}&height=".THUMBNAIL_size."&width=".THUMBNAIL_size."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
+		$this->setVar('THUMBNAIL', "<a class=\"thumb\" href=\"/cms/image.php?id={$thumbnail['id']}&height=550&width=600\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
+				<img src=\"/cms/image.php?id={$thumbnail['id']}&height=".THUMBNAIL_size."&width=".THUMBNAIL_size."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
 	
 		$this->parse('cell_block', 'thumb_cell', true);
 		if(($count % IMAGESPERROW) == 0) {

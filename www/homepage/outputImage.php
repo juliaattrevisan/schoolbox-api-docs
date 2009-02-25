@@ -27,7 +27,7 @@
 		if ($continue) {
 			
 
-			if($config['pixel']>400){$config['pixel']=400;}
+			if($config['pixel']>365){$config['pixel']=365;}
 			if($config['pixel']<20){$config['pixel']=20;}
 			
 			$imageurl = "/cms/image.php?id={$image['id']}&height={$config['pixel']}&width={$config['pixel']}";
