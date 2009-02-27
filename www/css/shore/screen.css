@@ -1,0 +1,31 @@
+/*---------------------------------------
+	Component Styles
+----------------------------------------*/
+.box h2 {
+	background: #003e7e url(/images/shore/box-bg.png) repeat-x;
+	}
+	
+/*---------------------------------------
+	Nav Styles
+----------------------------------------*/
+#nav h3 {
+	border-top: 1px solid #003d7b;
+	border-bottom: 1px solid #001c3a;
+	background: #002349 url(/images/shore/nav-title-bg.gif) repeat-x;
+	}
+#nav li {
+	border-top: 1px solid #144d88;
+	border-bottom: 1px solid #002c59;
+	}
+#nav li a {
+	background: #00376f url(/images/shore/nav-link-bg.gif) repeat-x;
+	}
+#nav li a:hover {
+	background: #1965b4;
+	}
+/*---------------------------------------
+	Header Styles
+----------------------------------------*/
+#header {
+	background: url(/images/shore/watermark.gif) no-repeat 115% -250px;
+	}

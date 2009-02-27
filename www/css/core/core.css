@@ -121,6 +121,30 @@ th      { font-weight:bold; }
 	width: 49.5%;
 	float: left;
 	}
+.template2 .left {
+	min-width: 535px;
+	width: 69.5%;
+	}
+.template2 .right {
+	min-width: 229px;
+	width: 29.5%;
+	}
+.template3 .left {
+	min-width: 764px;
+	width: 100%;
+	margin-right: 0;
+	}
+.template3 .right {
+	display: none;
+	}
+.template4 .right {
+	min-width: 535px;
+	width: 69.5%;
+	}
+.template4 .left {
+	min-width: 229px;
+	width: 29.5%;
+	}	
 /*--------------------------------------------------------------
  Header styles 
 -------------------------------------------------------------*/
@@ -133,11 +157,8 @@ th      { font-weight:bold; }
 	}
 #logo {
 	position: absolute;
-	width: 240px;
-	height: 70px;
 	top: 10px;
 	left: 20px;
-	background: #ccc;
 	}
 #search {
 	float: right;
@@ -227,6 +248,7 @@ Side Nav styles
 	background: #ebebeb;
 	margin-bottom: 20px;
 	position: relative;
+	overflow: hidden;
 	}
 .box .text {
 	padding: 11px 10px;
@@ -245,7 +267,9 @@ Side Nav styles
 	color: #fff;
 	background: #003a77;
 	font-size: 116%;
-	padding: 6px 0;
+	padding: 0;
+	line-height: 26px;
+	height: 26px;
 	text-indent: 16px;
 	position: relative;
 	}
@@ -298,7 +322,7 @@ Side Nav styles
 	line-height: 26px;
 	float: left;
 	position: absolute;
-	top: 1px;
+	top: 0;
 	right: 0;
 	}
 .box .edit:hover { background: #0065ce; }
@@ -306,6 +330,9 @@ Side Nav styles
 	clear: both;
 	padding: 10px;
 	background: #c0c0c0;
+	}
+.box .editPanel form {
+	text-align: right;
 	}
 .box .listing form {
 	text-align: right;
