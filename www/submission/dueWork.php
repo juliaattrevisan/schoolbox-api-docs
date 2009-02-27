@@ -711,7 +711,7 @@ if(isset($_REQUEST['view']) && $_REQUEST['view'])
 //mark work deleted and then display
 else if(isset($_REQUEST['delete']) && $_REQUEST['delete']) {
 	$page->deleteReturnedWork($_REQUEST['delete']);
-	$page->showPage();
+	localRedir('/submission/dueWork.php');
 }
 
 $page->displayDueWork($_GET['id'], $_GET['Year'], $_GET['Month'], $_GET['Day']);

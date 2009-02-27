@@ -1,0 +1,55 @@
+<!-- BEGIN custom_head -->
+<script language="JavaScript" type="text/javascript">
+function verify()
+{
+	var msg = ""
+	//check that description and category have been entered
+	if(document.getElementById('fileForm').description.value == ""){
+		msg += "You need to enter a description\n";
+	}
+	if(msg != ""){
+		alert(msg);
+		return false;
+	}
+	else
+		return true;
+}
+	
+</script>
+<!-- END custom_head -->
+
+<h1>{ACTION} File </h1>
+<form method="post" action="/cms/myFileForm.php" enctype="multipart/form-data" id="fileForm" class="standardForm" onSubmit="return(verify());">
+  <table>
+    <!-- BEGIN browse_row -->
+    <tr>
+      <td class="formLabelWidth"><h2>File</h2></td>
+      <td><input type="file" name="file" />
+        <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
+      </td>
+    </tr>
+    <!-- END browse_row -->
+    <tr>
+      <td><h2>Description</h2>
+        <em>One line description of the file for use as the title</em> </td>
+      <td ><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" />
+      </td>
+    </tr>
+    <tr>
+      <td><h2>Location</h2>
+        <em>Select an appropriate location within the system that reflects the use of the file</em></td>
+      <td><select name="parent">
+          <!-- BEGIN folder_list -->
+          <option value="{FOLDER_ID}" {FOLDER_ID_SELECTED}>{FOLDER_NAME}</option>
+          <!-- END folder_list -->
+        </select></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>
+      <input type="hidden" name="fileID" value="{FILE_ID}" />
+      <input type="submit" name="Submit" value="{ACTION} File" class="btn" />
+      </td>
+    </tr>
+  </table>
+</form>

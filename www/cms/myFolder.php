@@ -1,99 +1,55 @@
 <?php
-/************************************************************
-*                                                           *
-*         Copyright (c) 2002-2003 Lektec Consulting         *
-*                                                           *
-************************************************************/
+require_once '../library/my-folder.php';
+$folderHandler = new MyFolder;
 
-/* Class defines interface between category/folder database and software.         *
- * The following actions can be performed; delete, add, update, get */
-
-class myFolder
-{
-	function myFolder()
-	{
-		//always gonna need the db so lets create one..
-		$this->db = new dbManager();
-	}
-
-	function insertCat($name, $parent)
-	{  
-  		$myFolder = array(	'name'			=> $name,
-							'parent'	 	=> $parent,
-							'owner'			=> $_SESSION['id']
-								);
-		
-		$this->db->dbInsertRow('myFolder', $myFolder);
-  
-		$catid = $this->db->dbInsertId();
-		
-		$logEntry = array(	'object'			=> 'myFolder',
-										'objectId'		=> $catid,
-										'action'			=> 'create',
-										'user'			=> $_SESSION['id'],
-							);
-		
-		$this->db->dbInsertRow('cmsLog', $logEntry);
+if(is_numeric($this->arg[0])) {
 	
-		return $catid;
-	}
+	if(!($folder = $folderHandler->getByID($this->arg[0])))
+		error(2);
+	
+	$this->setFile(TEMPLATE_content, "cms/myFolder.html");
+	$this->setBlock(TEMPLATE_content, 'perm_table', 'perm_table_block');
+	$this->setBlock(TEMPLATE_content, 'indiv_perms', 'indiv_perms_block');
+	$this->setBlock(TEMPLATE_content, 'indiv_modify', 'indiv_modify_block');
 
-	function modifyCat($catid, $name, $parent)
-	{		
-		//update folder details
-		$cat = array('id'=>$catid, 'name'=>$name, 'parent'=>$parent);
-					
-		$this->db->dbUpdateRow('myFolder', 'id', $cat);
-		
-		//log modification
-		$log = array(	'object'		=>'myFolder', 
-								'objectId'	=>$catid, 
-								'action'		=>'modify', 
-								'user'		=>$_SESSION['id']
-							);
-		$this->db->dbInsertRow('cmsLog', $log);
-				
-		return $catid;
-	}
+	$this->setTitle('Modify Folder');	
+	$this->setTab('resources');
+	
+	$output = array('ACTION'		=> 'Modify',
+					'FOLDER_ID'		=> $folder['id'],
+					'NAME'			=> scrubText($folder['name']),
+					);
+	$this->setVar($output);
 
-	function deleteCat($catid)
-	{
-		//do security and child check before removing folder and related info
-		$folderInfo = $this->getFolder($catid);
-		$this->checkForChildren($catid);
-		
-		$this->db->dbDeleteRow('myFolder', 'id', $catid);
-						
-		$logEntry = array(	'object'			=> 'myFolder',
-										'objectId'		=> $id,
-										'action'			=> 'delete',
-										'user'			=> $_SESSION['id'],
-							);
-		
-		$this->db->dbInsertRow('cmsLog', $logEntry);
+	$folderTree = $folderHandler->getFolderTree(0, '&nbsp;&nbsp;');
+	array_unshift($folderTree, array('id' => 0, 'name' => 'Top Level'));
+	$this->dropDown('parent_list', $folderTree, $folder['parent'], TEMPLATE_content, array('id' => 'PARENT_ID', 'name' => 'PARENT_NAME'));
 
-	}
 
-	function getFolder($catid)
-	{
-		$query = "SELECT * FROM myFolder WHERE id = '$catid'";
-		return $this->db->getRow($query);
-	}
+	
+} else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
-	function checkForChildren($id)
-	{
-		//check for child folders
-		$query = "SELECT id FROM myFolder WHERE parent = '".$id."'";
-		$this->db->query($query);
-		if($this->db->countRows() > 0)
-			error(12); //children exist exit with error
-		
-		//check for files in category
-		$query = "SELECT id FROM myFile WHERE parent = '".$id."' AND deleted = '0'";
-		$this->db->query($query);
-		if($this->db->countRows() > 0)
-			error(12); //children exist exit with error
+	$this->setFile(TEMPLATE_content, 'cms/myFolder.html');
+	$this->setBlock(TEMPLATE_content, 'perm_table', 'perm_table_block');
+	$this->setBlock(TEMPLATE_content, 'indiv_perms', 'indiv_perms_block');
+	$this->setBlock(TEMPLATE_content, 'indiv_modify', 'indiv_modify_block');
 
-	}
-}
+	$this->setTitle('Add Folder');
+	$this->setTab('resources');	
+
+	$output = array('ACTION'		=> 'Add',
+					'FOLDER_ID'		=> '',
+					'NAME'			=> '',
+					);
+	$this->setVar($output);
+	
+
+	$folderTree = $folderHandler->getFolderTree(0, '&nbsp;&nbsp;');
+	array_unshift($folderTree, array('id' => 0, 'name' => 'Top Level'));
+	$this->dropDown('parent_list', $folderTree, $this->arg[1], TEMPLATE_content, array('id' => 'PARENT_ID', 'name' => 'PARENT_NAME'));
+
+	
+} else
+	$this->error(2);
+
 ?>

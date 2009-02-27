@@ -8,7 +8,7 @@ class ListSubmissionPage {
 	function ListSubmissionPage()
 	{
 		$this->t_body = new Template(TPL_directory);
-               	$this->t_body->set_file("tplBODY", "submission/listSub.htm");
+		       	$this->t_body->set_file("tplBODY", "submission/listSub.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Submission Boxes");
 		$this->t_body->set_block("tplBODY", "submission_block", "submission_listing");		
 		$this->t_body->set_block("tplBODY", "category_block", "category_listing");

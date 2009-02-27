@@ -32,7 +32,7 @@ class SitePage extends Page {
 			$page = $path[0];
 			$this->arg = array_slice($path,1);
 			foreach($this->arg as $key => $value) {
-				if(!$value) unset($this->arg[$key]);
+				if($value == '') unset($this->arg[$key]);
 			}
 		}
 		$page = rtrim($page, '/');

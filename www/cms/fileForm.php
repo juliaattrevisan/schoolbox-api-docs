@@ -26,7 +26,7 @@ if(is_string($_POST['description']) && is_numeric($_POST['category'])) {
 		
 		/* Double check permission on file */
 		$currentfile = $fileHandler->getById($_POST['fileID']);
-		if ($groupHandler->getPermission($currentfile['cid'] < WRITE_ACCESS))
+		if ($groupHandler->getPermission($currentfile['cid']) < WRITE_ACCESS)
 			error(6);
 		
 		$file['id'] = $_POST['fileID'];

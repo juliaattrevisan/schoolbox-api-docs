@@ -7,17 +7,17 @@ require_once("../include/html-time.php");
 require_once('../include/syn_userinfo.php');
 require_once('../include/involved.php');
 require_once("../include/fileSecurity.php");
-require_once("../cms/file.php");
+require_once("../../library/file.php");
 
 require_once("subbox.php");
 
 class CreateSubmissionPage {
 	function CreateSubmissionPage()
 	{
-				$this->db = new dbManager;
-                $this->t_body = new Template(TPL_directory);
-               	$this->t_body->set_file("tplBODY", "submission/createSub.htm");		
-				$this->t_body->set_block('tplBODY', 'browse_row', 'browse_block');
+		$this->db = new dbManager;
+		$this->t_body = new Template(TPL_directory);
+		$this->t_body->set_file("tplBODY", "submission/createSub.htm");		
+		$this->t_body->set_block('tplBODY', 'browse_row', 'browse_block');
 	}
 
 	function setFileTypeList($type=0)
@@ -58,7 +58,7 @@ class CreateSubmissionPage {
 
 			//convert times into timestamps
 			$open_date = strtotime($details['open_date']);
-			$due_date = strtotime($details['date']);
+			$due_date  = strtotime($details['date']);
 			$late_date = strtotime($details['late_date']);	
 	
 			$open_hour = date('g',$open_date);
@@ -322,8 +322,8 @@ if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['la
 	//submission box id and times sent so update the submission box times
 	$subbox->updateSubmissionDate($_POST['sid'], 
 		$_POST['open_date'], $_POST['open_hour'], $_POST['open_minute'], $_POST['open_period'],
-		$_POST['due_date'], $_POST['due_hour'], $_POST['due_min'], $_POST['due_period'], 
-		$_POST['late_date'], $_POST['late_hour'], $_POST['late_min'], $_POST['late_period'], 
+		$_POST['due_date'], $_POST['due_hour'], $_POST['due_minute'], $_POST['due_period'], 
+		$_POST['late_date'], $_POST['late_hour'], $_POST['late_minute'], $_POST['late_period'], 
 		$_POST['description'], $_POST['type']);
 	localRedir("/submission/listSubmission.php");
 }
@@ -331,7 +331,7 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
 {
 
 	$fileId = $_POST['fileId'];
-	$fileDB = new file; 
+	$fileHandler = new File; 
 	//form has been submitted 
 	if( isset($_FILES['file']['name']) && $_FILES['file']['name'] )
 	{
@@ -339,11 +339,12 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
 		
 		fileSecurityCheck($_FILES['file']['error'], $_FILES['file']['name'], $_FILES['file']['tmp_name'], $_FILES['file']['size'], $_FILES['file']['type']);
 
-		
-		
-		
-		$fileId = $fileDB->addFile($_FILES['file']['name'], $_FILES['file']['type'], $_FILES['file']['tmp_name'], $_POST['description'], 
-											$_POST['comment'], $_POST['cid']);
+		$data = array('description'		=> $_POST['description'],
+					  'comment'			=> $_POST['comment'],
+					  'category'		=> $_POST['cid'],
+					  'owner'			=> $_SESSION['id'],
+					  );
+		$fileId = $fileHandler->create($data, $_FILES['file']);
 		
 		
 	} else if (!is_numeric($_POST['fileId'])) {

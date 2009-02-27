@@ -72,7 +72,7 @@ class returnWorkPage {
         function showPage($box_id, $sid)
         {
                 $this->t_body = new Template(TPL_directory);
-               	$this->t_body->set_file("tplBODY", "submission/returnWork.htm");
+				$this->t_body->set_file("tplBODY", "submission/returnWork.htm");
 		$this->t_body->set_var("TITLE", HEADING." - File Submission");
 		
 		include_once("../include/page.php");

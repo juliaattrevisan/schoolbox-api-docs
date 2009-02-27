@@ -27,7 +27,7 @@ if(is_numeric($this->arg[0])) {
 	
 	//Template control
 	$template = $homepage->getTemplate();
-	for($x = 1; $x <= 3; $x++)
+	for($x = 1; $x <= 4; $x++)
 	{
 		if($template == $x)
 			$this->setVar("templateChecked$x", "checked");
@@ -45,7 +45,7 @@ if(is_numeric($this->arg[0])) {
 		$this->setVar('componentName', $component['name']);
 		$this->setVar('componentDescription', $component['description']);
 		if(!empty($component['component']))
-			$this->setVar('componentChecked', 'checked');
+			$this->setVar('componentChecked', 'checked="checked"');
 		else
 			$this->setVar('componentChecked', '');
 

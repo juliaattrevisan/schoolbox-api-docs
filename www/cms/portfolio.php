@@ -31,14 +31,17 @@ $allowedFiles = new AllowedFile;
 
 if (is_numeric($this->arg[0])) {
 	$_SESSION['portfolioID'] = $this->arg[0];
-	localRedir('/portfolio/');
+	localRedir('/cms/portfolio/');
 } else
 	$openFolder = (int)$_SESSION['portfolioID'];
+
+
 
 // get parentIDs from openFolder to 0
 $parentList[] = $parentID = $openFolder;
 while ($parentID > 0)
 	$parentList[] = $parentID = $folderHandler->getParent($parentID);
+	
 
 // output folders, column 1
 $folderList = $folderHandler->getFolderNode($openFolder);

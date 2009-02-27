@@ -1,105 +1,55 @@
 <?php
-/************************************************************
-*                                                           *
-*         Copyright (c) 2002-2003 Lektec Consulting         *
-*                                                           *
-************************************************************/
+require_once '../library/my-file.php';
+require_once '../library/my-folder.php';
 
-/* Class defines interface between file database and software.         *
- * The following actions can be performed; delete, add, update */
+$fileHandler = new MyFile;
+$folderHandler = new MyFolder;
 
-class myFile
-{
-	function myFile()
-	{
-		//always gonna need the db so lets create one..
-		$this->db = new dbManager();
-	}
+if(is_numeric($this->arg[0])) {
+	
+	/* Modify existing file */
+	
+	$file = $fileHandler->getByID($this->arg[0]);
+	if(!is_array($file))
+		error(41);
 
-	function modifyFile($parent, $description, $modid)
-	{		
-		$file = array(	'id'				=> $modid,
-						'parent'		=> $parent,
-						'description'	=> $description
+	$this->setFile(TEMPLATE_content, 'cms/myFile.html');
+	$this->setBlock(TEMPLATE_content, 'browse_row', 'browse_row_block');
+	$this->setTitle('Modify File');	
+	$this->setTab('myfiles');
+	
+	$this->setVar('browse_row_block', '');
+	
+	$output = array('ACTION'			=> 'Modify',
+					'FILE_ID'			=> $file['id'],
+					'DESCRIPTION'		=> scrubText($file['description']),
+					'MAX_FILE_SIZE'		=> MAX_FILE_SIZE,
 					);
-		
-		$this->db->dbUpdateRow('myFile', 'id', $file);
-		
-		$logEntry = array(	'object'			=> 'myFile',
-										'objectId'		=> $modid,
-										'action'			=> 'modify',
-										'user'			=> $_SESSION['id'],
-							);
-		
-		$this->db->dbInsertRow('cmsLog', $logEntry);
-		
-	}
-
-	function addFile($parent, $file_name, $file_type, $description)
-	{
-		$filesize = @filesize($_FILES['file']['tmp_name']);
+	$this->setVar($output);
 	
-		$file = array(	'description'	=> $description,
-								'parent'		=> $parent,
-								'owner'			=> $_SESSION['id'],
-								'realname'	=> $file_name,
-								'submitted'	=> 'NOW()',
-								'mime_type'	=> $file_type,
-								'file_size'		=> $filesize
-							);
-		
-		$this->db->dbInsertRow('myFile', $file);
+	$this->dropDown('folder_list', $folderHandler->getFolderTree(), $file['parent'], TEMPLATE_content, array('id' => 'FOLDER_ID', 'name' => 'FOLDER_NAME'));
 	
-		//get file ID from INSERT
-		$fileId = $this->db->dbInsertId();
+} 
+elseif($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	
-		if( $_FILES['file']['tmp_name'] )
-		{
-				//save file using file ID as name
-				$newFileName = $fileId . ".dat";
-				copy($_FILES['file']['tmp_name'], MYFILE_directory ."/". $newFileName);
-		}
+	/* Add new file to system */
 	
-		$logEntry = array(	'object'			=> 'myFile',
-										'objectId'		=> $fileId,
-										'action'			=> 'create',
-										'user'			=> $_SESSION['id'],
-							);
-		
-		$this->db->dbInsertRow('cmsLog', $logEntry);
+	$this->setFile(TEMPLATE_content, 'cms/myFile.html');
+	$this->setTitle('Add File');	
+	$this->setTab('resources');
 	
-		return $fileId;
-	
-	}
+	$output = array('ACTION'			=> 'Add',
+					'FILE_ID'			=> '',
+					'DESCRIPTION'		=> '',
+					'MAX_FILE_SIZE'		=> MAX_FILE_SIZE,
+				);
 
-	function deleteFile($id)
-	{
-		//check sanity and valid rights
-		//check file exists. and user has nescessary rights
-		$fileInfo = $this->getFile($id);
+	$this->setVar($output);
 
-		//now delete file by updating it as deleted
-		$this->db->dbUpdateRow('myFile', 'id', array('id'=>$id, 'deleted'=>1));
-
-		$logEntry = array(	'object'			=> 'myFile',
-										'objectId'		=> $id,
-										'action'			=> 'delete',
-										'user'			=> $_SESSION['id'],
-							);
-		
-		$this->db->dbInsertRow('cmsLog', $logEntry);
-
-		//we leave file incase we need it but we should clean up any cached files right now
-		
-
-	}
-
-	function getFile($id)
-	{
-                $query = "SELECT * FROM myFile WHERE id = '$id'";
-                return $this->db->getRow($query);
-	} 
+	$this->dropDown('folder_list', $folderHandler->getFolderTree(), $this->arg[1], TEMPLATE_content, array('id' => 'FOLDER_ID', 'name' => 'FOLDER_NAME'));
 
 }
+else
+	error(2);
 
 ?>

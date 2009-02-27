@@ -16,9 +16,10 @@ class Category extends Model {
 	}
 	
 	function getCategoryList ($categoryID, $config = false) {
-		$query = "SELECT id, name, GROUP_CONCAT(co.code) code, template, parent 
+		$query = "SELECT id, name, GROUP_CONCAT(co.code) code, cf.template, parent 
 				  FROM category ca 
 				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
+				  LEFT JOIN homepage_config cf ON cf.cid = ca.id
 				  WHERE parent = $categoryID 
 				  GROUP BY ca.id";
 		
@@ -49,12 +50,13 @@ class Category extends Model {
 	}
 	
 	function getByID($categoryID) {
-		$query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type
+		$query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type, cf.template
 				  FROM (category c)
 				  LEFT JOIN categoryCode co ON co.categoryID = c.id
 				  LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGESERVICE . "
 				  LEFT JOIN user u on u.id = a.uid 
 				  LEFT JOIN userGroups g ON g.cid = c.id
+				  LEFT JOIN homepage_config cf ON cf.cid = c.id
 				  WHERE c.id = '$categoryID' 
 				  GROUP BY c.id"; 
 		return $this->db->getRow($query);		

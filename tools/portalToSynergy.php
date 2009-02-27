@@ -21,11 +21,13 @@ while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
 	$query = "SELECT * FROM user WHERE id = ".(int)$data[0];
 	$user = $userHandler->db->getRow($query);
 	
+	print trim($data[0]).",";
 	if (isset($user['id'])) {
 		//print formatName($user)."\n";
 		print $user['synergy_id']."\n";
 		//$groupHandler->addUser(0, $user['uid'], WRITE_ACCESS);
-	}
+	} else
+		print "N/A\n";
 }
 print "</pre>";
 ?>

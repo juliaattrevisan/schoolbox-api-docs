@@ -20,7 +20,7 @@ class MyFile extends Model {
 	function getAllInFolder($folderID) {
 		$query = "SELECT f.*, UNIX_TIMESTAMP(f.submitted) submitted, af.iconFile FROM ".$this->_table." f
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
-				  WHERE parent = ".(int)$folderID."";
+				  WHERE parent = ".(int)$folderID." AND deleted = 0";
 		return $this->db->getAll($query);
 	}
 
@@ -32,8 +32,8 @@ class MyFile extends Model {
 	}
 	
 	function getTree($parent = 0) {
-			$this->myFolderHandler = new MyFolder($this->owner);
-			$this->getTreeNode($parent);
+		$this->myFolderHandler = new MyFolder($this->owner);
+		$this->getTreeNode($parent);
 	}
 		
 	
@@ -96,6 +96,53 @@ class MyFile extends Model {
 			}
 			$this->depth--;
 			$this->t_body->parse('my_files_block', 'optgroup_end', true);
+		}
+	}
+
+	function logAction ($fileID, $action) {
+		$logEntry = array(	'object'	=> 'myfile',
+							'objectId'	=> $fileID,
+							'action'	=> $action,
+							'user'		=> $_SESSION['id'],
+							);
+		
+		$this->db->insert('cmsLog', $logEntry);
+	}
+	
+	function create	($data, $file) {
+		
+		$data['submitted']	= 'NOW()';
+		$fileID = parent::create($data);
+		
+		if (is_readable($file)) {
+			$save = MYFILE_directory . '/' . $fileID . '.dat';
+			move_uploaded_file($file, $save);
+		}
+		
+		$this->logAction($fileID, 'create');
+		
+		return $fileID;
+	}
+	
+	function update ($data) {
+		$this->logAction($data['id'], 'modify');
+		return parent::update($data);
+	}
+	
+	function delete ($fileID) {
+		$this->logAction($fileID, "delete");
+		$data = array('id'		=> $fileID,
+					  'deleted'	=> 1);
+					  
+		return parent::update($data);
+	}
+	
+	function deleteByParent ($parentID) {
+		$fileList = $this->getAllInFolder($parentID);
+		if (is_array($fileList)) {
+			foreach ($fileList as $file) {
+				$this->delete($file['id']);
+			}
 		}
 	}
 }

@@ -28,7 +28,7 @@ class MyFolder extends Model {
 		$query = "SELECT parent FROM ".$this->_table." WHERE id = " . (int)$id;
 		return $this->db->getOne($query);
 	}
-
+	
 	function getFolderNode($folderID = 0) {
 		
 		// get folder contents
@@ -54,6 +54,30 @@ class MyFolder extends Model {
 		}
 	}
 	
+	function getFolderTree($folderID = 0, $indent = '') {
+	
+		$folderList = $this->getFolderList($folderID);
+		$output = array();
+		
+		if (is_array($folderList)) {
+			$total = count($folderList);
+			for ($i = 0; $i < $total; $i++) {
+				
+				$output[] = array('id'	=> $folderList[$i]['id'],
+								  'name'	=> $indent . '&gt;&nbsp;'. $folderList[$i]['name'],
+								 );
+				
+				$childrenList = $this->getFolderTree($folderList[$i]['id'], $indent . '&nbsp;&nbsp;&nbsp;');
+				if (is_array($childrenList))
+					$output = array_merge($output, $childrenList); //array_splice($folderList, $i+1, 0, $childrenList);
+			}
+			
+			return $output;
+		} 
+		
+	}	
+
+	
 	function hasChildren($folderID) {
 		$query = "SELECT f.id as children 
 				  FROM myFolder f
@@ -61,6 +85,41 @@ class MyFolder extends Model {
 				  LIMIT 1";
 		
 		return $this->db->getOne($query);
+	}
+	
+	function logAction ($folderID, $action) {
+		$logEntry = array(	'object'	=> 'myfolder',
+							'objectId'	=> $folderID,
+							'action'	=> $action,
+							'user'		=> $_SESSION['id'],
+							);
+		
+		$this->db->insert('cmsLog', $logEntry);
+	}
+
+	function create ($data) {
+		$data['owner'] = $_SESSION['id'];
+		$folderID = parent::create($data);
+		
+		$this->logAction($folderID, "create");
+		
+		return $folderID;
+	}
+	
+	function update ($data) {
+		$this->logAction($data['id'], "modify");
+		return parent::update($data);
+	}
+	
+	function delete ($folderID) {
+		
+		// delete files
+		require_once dirname(__FILE__) . '/my-file.php';
+		$fileHandler = new MyFile;
+		$fileHandler->deleteByParent($folderID);
+		
+		$this->logAction($folderID, "delete");
+		return parent::delete($folderID);
 	}
 
 

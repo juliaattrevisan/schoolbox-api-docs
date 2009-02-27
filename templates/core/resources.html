@@ -90,12 +90,12 @@ $(document).ready(function() {
 		$($(node).parents("tr")[0]).contextMenu(folderMenu, {
 			beforeShow: function () {
 				if ($(this.target).hasClass("homepage") == 0)
-					$($(this.menu).find('.context-menu-item')[0]).toggleClass("context-menu-item-disabled"); 
+					$($(this.menu).find('.context-menu-item')[0]).toggleClass("context-menu-item-disabled", true); 
 
 				if ($(this.target).hasClass("write") == 0) {
 					// disable from modify onwards
 					for (var i = 2; i <= 8; i++)
-						$($(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled"); 
+						$($(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
 				}
 			}
 		});
@@ -106,12 +106,12 @@ $(document).ready(function() {
 				var _file = $(this.target).find(".file");
 				
 				if (_file.hasClass("link"))
-					$($(this.menu).find('.context-menu-item')[1]).toggleClass("context-menu-item-disabled"); 
+					$($(this.menu).find('.context-menu-item')[1]).toggleClass("context-menu-item-disabled", true); 
 
 				if (_file.hasClass("write") == 0) {
 					// disable from modify to new folder
 					for (var i = 2; i <= 7; i++)
-						$($(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled"); 
+						$($(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
 				}
 			}
 		});

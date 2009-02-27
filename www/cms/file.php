@@ -13,9 +13,11 @@ if(is_numeric($this->arg[0])) {
 		error(41);
 
 	$this->setFile(TEMPLATE_content, 'cms/modify-file.html');
-
+	$this->setBlock(TEMPLATE_content, 'browse', 'browse_block');
 	$this->setTitle('Modify File');	
 	$this->setTab('resources');
+	
+	$this->setVar('browse_block', '');
 	
 	$output = array('ACTION'			=> 'Modify',
 					'FILE_ID'			=> $file['id'],

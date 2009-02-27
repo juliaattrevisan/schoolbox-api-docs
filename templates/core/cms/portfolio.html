@@ -5,9 +5,9 @@ $(document).ready(function() {
 	// define file context menu 
 	var fileMenu = [
 		{"Open": function () { 
-			window.open("/send.php?id="+$(this).attr("id").substring(5),"_blank"); 
+			window.open("/send.php?myFile=1&id="+$(this).attr("id").substring(5),"_blank"); 
 		}},
-		{"Save As": function () { window.open("/send.php?save=1&id="+$(this).attr("id").substring(5),"_self"); }},
+		{"Save As": function () { window.open("/send.php?save=1&myFile=1&id="+$(this).attr("id").substring(5),"_self"); }},
 		$.contextMenu.separator,
 		{"Modify": function () {
 			window.open("/cms/myFile/"+$(this).attr("id").substring(5),"_self"); 
@@ -33,13 +33,23 @@ $(document).ready(function() {
 		{"Download": function () { window.open("/cms/fetchFolder.php?folder="+$(this).attr("id").substring(5),"_self"); }},
 	];
 
-  function addContext(node) {
-	if ($(node).hasClass("folder"))
-		$($(node).parents("tr")[0]).contextMenu(folderMenu);
-
-	else if ($(node).hasClass("file"))
-		$($(node).parents("tr")[0]).contextMenu(fileMenu);
-  }; 
+	function addContext(node) {
+		
+		if ($(node).hasClass("folder"))
+			$($(node).parents("tr")[0]).contextMenu(folderMenu);
+		
+		else if ($(node).hasClass("file"))
+			$($(node).parents("tr")[0]).contextMenu(fileMenu);
+		
+		else if ($(node).hasClass("top"))
+			$($(node).parents("tr")[0]).contextMenu(folderMenu, {
+				beforeShow: function () {
+					// disable modify / delete
+					for (var i = 0; i <= 1; i++)
+						$($(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
+				}
+			});
+	}; 
 
 	$("#category-list, #file-list").treeTable({
 		initialState: "collapsed",
@@ -75,6 +85,10 @@ $(document).ready(function() {
 </style>
 <![endif]-->
 <!-- END custom_head -->
+<h1>Portfolio</h1>
+<span class="header_option">
+<a href="/cms/myFile/">Add File</a> | <a href="/cms/myFolder">Add Folder</a>
+</span>
 <div id="container">
 <div id="column-1">
   <table id="category-list">
@@ -102,7 +116,7 @@ $(document).ready(function() {
     </thead>
     <tbody>
       <!-- BEGIN file_list -->
-      <tr id="{TYPE}-{FILE_ID}" class="category-{CATEGORY_ID}">
+      <tr id="{TYPE}-{FILE_ID}" class="category-{FOLDER_ID}">
         <td><span class="file ui-draggable {CLASS}">{FILE_NAME}</span></td>
         <td>{FILE_SIZE}</td>
         <td>{FILE_MODIFIED}</td>

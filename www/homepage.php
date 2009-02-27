@@ -54,12 +54,13 @@ else
 	$enroled = $groupHandler->involvedInGroup($_SESSION['id'], $categoryID);
 
 
-$this->setFile(TEMPLATE_content, 'homepage/template' . $category['template'] . '.html');
+$this->setFile(TEMPLATE_content, 'homepage/template.html');
 $this->setTitle($category['name']);
 $this->setTab('resources');
 
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock(TEMPLATE_content, "edit_page", "edit_page_block");
+
 
 $output = array('LARGE_HEAD_BGCOLOUR'	=> $category['large_head_bgcolour'],
 				'LARGE_HEAD_FONTCOLOUR'	=> $category['large_head_fontcolour'],
@@ -72,6 +73,7 @@ $output = array('LARGE_HEAD_BGCOLOUR'	=> $category['large_head_bgcolour'],
 				'HEADING'				=> scrubTEXT($category['name']) . (isset($code) ? ' ('.$category['code'].')' : '' ),
 				'CODE'					=> urlencode(urlencode($category['code'])),
 				'ID'					=> $categoryID,
+				'TEMPLATE'				=> 'template'.$category['template'],
 				);
 
 $this->setVar($output);
