@@ -95,8 +95,8 @@ h3 { font-size: 1em; }
 /*--------------------------------------------------------------
  Table Styles 
 --------------------------------------------------------------*/
-table   { margin-bottom: 1.4em; border-top:0.1em solid #ddd; border-left:0.1em solid #ddd; }
-th,td   { height: 1em; padding:0.2em 0.4em; border-bottom:0.1em solid #ddd; border-right:0.1em solid #ddd; }
+table   { margin-bottom: 1.4em; border: 0; }
+th,td   { height: 1em; padding:0.2em 1em; border: 0; }
 th      { font-weight:bold; }
 /*--------------------------------------------------------------
  Layout element styles 
@@ -206,6 +206,34 @@ th      { font-weight:bold; }
 	border-bottom-color: #fff;
 	}
 /*--------------------------------------------------------------
+ Table styles 
+-------------------------------------------------------------*/
+#category-window, #file-window {
+	width: 100%;
+	height: 430px;
+	margin: 0;
+	overflow: auto;
+	border: 1px solid #ccc;
+	}
+#category-list, #file-list { border: 0; width: auto;  }
+#category-list th, #file-list th { border: 0; font-weight: bold; background:#eee; line-height: 25px; }
+#category-list td, #file-list td { width: auto; }
+#category-list thead {
+	padding: 10px;
+	}
+#file-window #file-list tbody tr td {
+	padding: 0.3em 3em 0.3em 0.6em;
+	}
+#file-window #file-list tbody tr td span {
+	line-height: 22px;
+	display: block;
+	padding: 0 0 0 28px;
+	}
+.treeTable tr.selected td {
+	background: #3875D7;
+	color: #fff;
+	}
+/*--------------------------------------------------------------
 Side Nav styles 
 --------------------------------------------------------------*/
 #nav {
@@ -245,10 +273,12 @@ Side Nav styles
  Box styles 
 --------------------------------------------------------------*/
 .box {
-	background: #ebebeb;
 	margin-bottom: 20px;
 	position: relative;
 	overflow: hidden;
+	}
+.box.grey {
+	background: #ebebeb;
 	}
 .box .text {
 	padding: 11px 10px;
