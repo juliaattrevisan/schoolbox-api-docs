@@ -42,8 +42,11 @@ if ($groupHandler->getPermission($openCategory) < READ_ACCESS)
 
 // get parentIDs from openCategory to 0
 $parentList[] = $parentID = $openCategory;
-while ($parentID > 0)
-	$parentList[] = $parentID = $categoryHandler->getParent($parentID);
+$i = 0;
+while ($parentID > 0) {
+	if ($i++ > 100) break;
+	$parentList[] = $parentID = (int)$categoryHandler->getParent($parentID);
+}
 
 // output folders, column 1
 $categoryList = $categoryHandler->getCategoryNode($openCategory);
