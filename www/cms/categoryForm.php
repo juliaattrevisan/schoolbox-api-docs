@@ -16,6 +16,7 @@ if ($_POST['name']) {
 					  'parent'		=> $_POST['parent'],
 					  'template'	=> $_POST['template'],
 					  'code'		=> $_POST['code'],
+					  'group'		=> $_POST['group'],
 					  );
 	
 	if (isset($_POST['categoryID'])) {

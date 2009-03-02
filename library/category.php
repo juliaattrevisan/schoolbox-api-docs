@@ -232,6 +232,12 @@ class Category extends Model {
 	function create($data) {
 		$categoryID = parent::create($data);
 		
+		/* Setup group permissions */
+		foreach($data['group'] as $groupID => $perm) {
+			$this->insertPerm($data['id'], $groupID, $perm);
+		}
+		unset($data['group']);
+		
 		// insert codes
 		$codeList = explode(",", $data['code']);
 		if (is_array($codeList)) {
@@ -246,12 +252,25 @@ class Category extends Model {
 	}
 	
 	function update ($data) {
-		parent::update($data);
 		
+		/* Redo group permissions */
+		$this->deletePerms($data['id']);
+		foreach($data['group'] as $groupID => $perm) {
+			$this->insertPerm($data['id'], $groupID, $perm);
+		}
+		unset($data['group']);
+	
+		/* Setup homepage template */
 		if($data['template']) {
 			$templateHandler = new HomepageTemplate;
-			$this->createTemplate($cid, $template);
+			$this->createTemplate($data['id'], $template);
 		}
+		else
+			unset($data['template']);
+			
+		parent::update($data);
+		
+
 
 		// clear current codes
 		$this->db->delete('categoryCode', 'categoryID', $data['id']);
