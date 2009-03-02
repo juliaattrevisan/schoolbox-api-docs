@@ -192,7 +192,8 @@ class Homepage {
 		}
 		$query = substr($query, 0, -2);
 		$query .= " WHERE cid = '".$this->cid."'";
-		$this->db->query($query);
+		return $this->db->query($query);
+		
 	}
 }
 

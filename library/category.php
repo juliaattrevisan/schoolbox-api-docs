@@ -139,10 +139,11 @@ class Category extends Model {
 	}
 
 	function getCategoryNode($categoryID = 0) {
+		$categoryID = (int)$categoryID;
 		
 		// get folder contents
 		$categoryList = $this->getCategoryList($categoryID);
-
+		
 		if ($categoryID > 0) {
 			// get parent folder contents
 			$siblingList = $this->getCategoryNode($this->getParent($categoryID));

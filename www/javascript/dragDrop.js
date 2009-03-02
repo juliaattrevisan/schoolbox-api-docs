@@ -98,7 +98,8 @@ var initDrag = function(){
 				webBoxTargetDiv = null;
 
 				// X - Which column?
-				$$(".left, .right").each(function(element, i){
+				$$(".left", ".right").each(function(element, i){
+												 
 					if (mouseX > element.getCoordinates().left) webBoxTargetCol = element;
 				});
 				
@@ -112,8 +113,9 @@ var initDrag = function(){
 				// Place the marker
 				if (webBoxTargetDiv == null)
 				{
+					
 					// On top
-					if (webBoxTargetCol.getChildren()[0] != marker) marker.injectTop(webBoxTargetCol);
+					if (webBoxTargetCol.getChildren()[0] != marker) marker.inject(webBoxTargetCol, 'top');
 				}
 				else
 				{

@@ -23,7 +23,6 @@ if(is_numeric($this->arg[0])) {
 	
 	$this->setFile(TEMPLATE_content, 'homepage/customise.html');
 	$this->setTitle('Homepage Customisation');
-	$this->setVar('CID', $cid);
 	
 	//Template control
 	$template = $homepage->getTemplate();
@@ -34,6 +33,11 @@ if(is_numeric($this->arg[0])) {
 		else
 			$this->setVar("templateChecked$x", "");
 	}
+
+	$output = array('CID'		=> $cid,
+					'TEMPLATE'	=> $template,
+					);
+	$this->setVar($output);
 	
 	// Components
 	$this->setBlock(TEMPLATE_content, 'componentRow', 'componentRowBlock');
