@@ -1,4 +1,4 @@
-<div class="box">
+<div class="box" id="component{COMPONENT_ID}">
   <h2>Due Work</h2>
 	<!-- BEGIN config -->
   <a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
@@ -21,7 +21,7 @@
   	<ul>
     	<!-- BEGIN duework -->
       <li class="{ON_OFF}">
-      	<h3><a href="#">{DUE_NAME}</a></h3>
+      	<h3>{DUE_NAME}</h3>
         <p class="interact">{DUE_DATE}</p>
         <p><strong>{DUE_TYPE}</strong> - {DUE_COMMENT}</p>
       </li>

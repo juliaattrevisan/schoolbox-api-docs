@@ -24,9 +24,9 @@ if(is_numeric($_REQUEST['cid']) ) {
 	$homepage = new Homepage($_REQUEST['cid']);
 	
 	//AJAX request for drag and drop of components
-	if($_GET['cid'] && $_GET['type'] == 'components')
+	if($_POST['cid'] && $_POST['type'] == 'components')
 	{	
-		$columns = array($_GET['column1'], $_GET['column2']);
+		$columns = array($_POST['column1'], $_POST['column2']);
 		foreach($columns as $key => $column)
 		{
 			// Explode the columns

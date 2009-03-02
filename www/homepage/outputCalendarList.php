@@ -3,7 +3,8 @@
 $j=0;
 		//event output
 		$this->setBlock($componentHandle, "group_events", "group_events_block");
-	
+		$this->setBlock('group_events', "modify", "modify_block");
+		
 		require_once '../library/calendar.php';
 		$calendarHandler = new Calendar;
 	
@@ -13,7 +14,7 @@ $j=0;
 		else
 				$where = "";
 		
-		
+		$this->setVar('CALENDAR_TITLE', 'Campus Calendar');
 		
 		$query = "SELECT id, DATE_FORMAT(date, '%a %D %b') as outputDate,
 					DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
@@ -25,24 +26,32 @@ $j=0;
 				WHERE access = 3 
 					AND eventCampus.campusID IN(".implode(",", $_SESSION['campus']).") 
 					AND eventGroup.groupID = {$_SESSION['gid']} 
-					AND ( date >= DATE(NOW()) $where) 
+					AND ( date >= CURRENT_DATE() $where) 
 				ORDER BY date, startTime";
 		
 		$eventList = $this->db->getAll($query);	
-
+		
+		$this->setVar('group_events_block', '');
+		
 		if (is_array($eventList)) {
+			
 			foreach ($eventList as $event) {
 		
 				$event['colour'] = $calendarHandler->displayColour($event['priority']);
 		
-				$this->setVar("CAL_DATE", $event['outputDate']);
-				$this->setVar("CAL_YEAR", $event['year']);
-				$this->setVar("CAL_MONTH", $event['month']);
-				$this->setVar("CAL_DAY", $event['day']);
+				$output = array('CAL_DATE'	=> $event['outputDate'],
+								'CAL_YEAR'	=> $event['year'],
+								'CAL_MONTH'	=> $event['month'],
+								'CAL_DAY'	=> $event['day'],
+								'CAL_ID'	=> $event['id'],
+								'ON_OFF'	=> ++$j%2? '' : 'dark',
+								);
+				
+				$this->setVar($output);
 			
-				if($event['startTimeString'] == "0:00" || $event['startTimeString'] == "")
+				if($event['startTimeString'] == "12:00AM" || $event['startTimeString'] == "")
 						$this->setVar("CAL_TIME", "");
-				else if($event['endTimeString'] == "0:00")
+				else if($event['endTimeString'] == "12:00AM")
 						$this->setVar("CAL_TIME", $event['startTimeString']);
 				else
 						$this->setVar("CAL_TIME", $event['startTimeString']." - ".$event['endTimeString']);
@@ -51,9 +60,13 @@ $j=0;
 				
 				$this->setVar("CAL_NOTE", nl2br(scrubTEXT($event['note'])));
 		
+				$this->setVar('modify_block', '');
+				if ($calendarHandler->getPerm($event['id']) >= WRITE_ACCESS)
+					$this->parse('modify_block', 'modify');
+		
 				$this->parse("group_events_block", "group_events", true);
 				
-				$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
+				
 			}
 		} else
 			$this->setVar("group_events_block", '');

@@ -24,10 +24,16 @@ if (is_array($fileList)) {
 			$this->setVar("FILE_NAME", $url);
 		}
 		else
-		$this->setVar("FILE_NAME", scrubTEXT($file['description']));
+			$this->setVar("FILE_NAME", scrubTEXT($file['description']));
 		
-		$this->setVar("FILE_COMMENT", nl2br(scrubTEXT($file['comment'])));
-		$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
+		$output = array('FILE_POSTED_BY'	=> formatName($file),
+						'FILE_POSTED_BY_ID'	=> $file['owner'],
+						'FILE_POSTED_DATE'	=> outputDate(DATE_short_format, $file['submitted']),
+						'FILE_COMMENT'		=> nl2br(scrubTEXT($file['comment'])),
+						'ON_OFF'			=> ++$j%2? '' : 'dark',
+						);
+		$this->setVar($output);
+		
 		$this->parse("files_block", "files", true);
 		
 		

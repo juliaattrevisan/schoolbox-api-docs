@@ -1,5 +1,5 @@
-<div class="box">
-  <h2>Upcoming Events</h2>
+<div class="box" id="component{COMPONENT_ID}">
+  <h2>{CALENDAR_TITLE}</h2>
   <!-- BEGIN config -->
   <a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
   <div class="editPanel">
@@ -22,7 +22,7 @@
     	<!-- BEGIN group_events -->
     	<li>
       	<h3><a href="/calendar/week/{CAL_DAY}-{CAL_MONTH}-{CAL_YEAR}">{CAL_DATE}</a> {CAL_TIME}</h3>
-        <p class="interact"><a href="#">Modify</a></p>
+        <p class="interact"><!-- BEGIN modify --><a href="/calendar/modify.php?eventID={CAL_ID}">Modify</a><!-- END modify --></p>
       	<p>{CAL_NOTE}</p>
       </li>
       <!-- END group_events -->

@@ -153,7 +153,7 @@ class Calendar extends Model {
 						DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
 						TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTimeString, TIME_FORMAT(endTime, 
 		'".CALENDAR_time_format."') as endTimeString,priority, note
-				  FROM event WHERE access = '2' AND sid = '".$categoryID."' AND( date >= NOW() $where) ORDER BY date, startTime";
+				  FROM event WHERE access = '2' AND sid = '".$categoryID."' AND( date >= CURRENT_DATE() $where) ORDER BY date, startTime";
 		
 		return $this->db->getAll($query);
 	}

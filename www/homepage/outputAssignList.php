@@ -31,22 +31,22 @@ $j=0;
 				else
 					$dueDate = $date;
 					
-					$this->setVar("ASS_DATE", $dueDate);
+					$this->setVar("ASSIGN_DATE", $dueDate);
 		
 				//set name
 				if($assignment['realname'])
 				{
 					if($assignment['inline'] == 'true')
-						$url = "<a href=\"/sendframe.php?id=".$assignment['fileID']."\" target=\"_blank\">".scrubTEXT($assignment['description'])."</a>";
+						$url = "<a href=\"/sendframe.php?id=".$assignment['fileID']."\" onclick=\"window.open(this.href,'_blank',''); return false;\">".scrubTEXT($assignment['description'])."</a>";
 					else
 						$url = "<a href=\"/send.php?id=".$assignment['fileID']."\">".scrubTEXT($assignment['description'])."</a>";
 		
-					$this->setVar("ASS_NAME", $url);
+					$this->setVar("ASSIGN_NAME", $url);
 				}
 				else
-					$this->setVar("ASS_NAME", scrubTEXT($assignment['description']));
+					$this->setVar("ASSIGN_NAME", scrubTEXT($assignment['description']));
 				
-				$this->setVar("ASS_COMMENT", nl2br(scrubTEXT($assignment['comment'])));
+				$this->setVar("ASSIGN_COMMENT", nl2br(scrubTEXT($assignment['comment'])));
 				
 				$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 				$this->parse("assign_block", "assign", true);

@@ -50,7 +50,7 @@ class Submission extends Model {
 
 		if($config['size'] > 0) 
 			$query .= " LIMIT 0, " . $config['size']; 
-			
+		
 		return $this->db->getAll($query);	
 	}
 

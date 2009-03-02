@@ -11,8 +11,9 @@ $submissionHandler = new Submission;
 $submissionList = $submissionHandler->getAllForCategory($categoryID, $config);
 
 if (is_array($submissionList)) {
+	
 	foreach($submissionList as $submission) {
-
+		
 		$nameURL = $submission['realname'] != '' ? "/send" . ($submission['inline'] == 'true' ? 'frame' : '') . ".php?id=" . $submission['fileID'] : false;
 
 		$date = outputDate("jS M", $submission['date']);
