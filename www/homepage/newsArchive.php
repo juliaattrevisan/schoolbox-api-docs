@@ -11,10 +11,11 @@ $this->setFile(TEMPLATE_content, "homepage/newsArchive.html");
 $this->setBlock(TEMPLATE_content, "submit_news", "submit_news_block");
 $this->setBlock(TEMPLATE_content, "news", "news_block");
 if (!($category = $categoryHandler->getByID($this->arg[0])))
-	//$this->error(2);
-print_r($category);
+	$this->error(2);
 
 $output = array('CATEGORY_NAME'	=> scrubText($category['name']),
+				'TITLE'			=> 'News Archive',
+				'ID'			=> $category['id'],
 				);
 $this->setVar($output);
 
@@ -23,14 +24,14 @@ if($groupHandler->getPermission($category['id']) >= WRITE_ACCESS)
 	$this->parse("submit_news_block", "submit_news");
 else
 	$this->setVar("submit_news_block", "");
-	
+
 	
 $newsList = $newsHandler->getAllForCategory($category['id'], true);
 
 if(is_array($newsList)) {
 	foreach($newsList as $news) {
 		if($article['owner'] == $_SESSION['id'] || $groupHandler->getPermission($category['id']) >= WRITE_ACCESS)
-			$this->setVar("MOD_NEWS", "<a href=\"/subject/modSubNews.php?modify=".$article['id']."\">Modify</a>");
+			$this->setVar("MOD_NEWS", "<a href=\"/news/homepage/".$news['id']."\">Modify</a>");
 		else
 			$this->setVar("MOD_NEWS", "");
 		
