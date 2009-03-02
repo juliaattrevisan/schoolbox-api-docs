@@ -31,51 +31,47 @@
 			$(pickers[i][0] + 'Div').setStyle('background-color', pickers[i][2].sets.hex);
 			$(pickers[i][0] + 'Input').value = pickers[i][2].sets.hex;
 		};
-	}</script>
+	}
+	
+	function template(el) {
+		var input = $('template-choice');
+		input.value = el.title;
+		}
+</script>
 <link rel="stylesheet" type="text/css" href="/css/mooRainbow.css" />
 <!-- END custom_head -->
-
-						<h1>Homepage Customisation</h1>
-			  <form method="post" name="customiseForm" id="customiseForm" class="indent" action="/homepage/configForm.php">
-			<h2>Layout</h2>
-			<table class="standardForm">
-				<tr>
-					<td><input type="radio" name="template" value="1" {templateChecked1} /></td>
-					<td><strong>70%/30%</strong></td>
-					<td><input type="radio" name="template" value="2" {templateChecked2} /></td>
-					<td><strong>50%/50%</strong></td>
-					<td><input type="radio" name="template" value="3" {templateChecked3} /></td>
-					<td><strong>100%</strong></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td><img src="/images/70-30.png" width="75" height="70" /></td>
-					<td></td>
-					<td><img src="/images/50-50.png" width="75" height="70" /></td>
-					<td></td>
-					<td><img src="/images/100-0.png" width="75" height="70" /></td>
-				</tr>
-			</table>
-			<h2>Components</h2>
-			<table>
-				<tr>
-				<!-- BEGIN componentGroup -->
-					<td class="indent" style="vertical-align:top;">
-						<h2>{componentGroupName}</h2>
-						<table class="standardForm">
+<div class="template3">
+			<h1>Homepage Customisation</h1>
+      <div class="left">
+			 <form method="post" name="customiseForm" id="customiseForm" class="indent" action="/homepage/configForm.php">
+			
+      <div class="box grey">
+        <h2>Layout</h2>
+        <div class="text">
+          <a onclick="template(this);" class="layout" title="1" href="#"><img src="/images/70-30.png" width="75" height="70" /></a>
+          <a onclick="template(this);" class="layout" title="2" href="#"><img src="/images/50-50.png" width="75" height="70" /></a>
+          <a onclick="template(this);" class="layout" title="3" href="#"><img src="/images/100-0.png" width="75" height="70" /></a>
+        </div>
+      </div>
+      
+      <div class="box grey">
+				<h2>Components</h2>
+      	<div class="text">
+        	<ul id="component-list">
+					<!-- BEGIN componentGroup -->
 						<!-- BEGIN componentRow -->
-							<tr>
 							<!-- BEGIN componentCol -->
-								<td style="vertical-align:top"><input type="checkbox" name="components[]" value="{componentID}" {componentChecked} /></td> 
-                                <td style="vertical-align:top"><strong>{componentName}</strong>
-                                <br /><em>{componentDescription}</em></td>
+              <li>
+								<input type="checkbox" name="components[]" value="{componentID}" {componentChecked} />
+                <p><strong>{componentName}</strong></p>
+                <p><small>{componentDescription}</small></p>
+              </li>
 							<!-- END componentCol -->
-							</tr>
 						<!-- END componentRow -->
-						</table>					</td>
-				<!-- END componentGroup -->
-				</tr>
-			</table>
+					<!-- END componentGroup -->
+        	</ul>
+				</div>
+        </div>
 			<h2>Colours</h2>
 			<table>
 				<tr>
@@ -85,7 +81,7 @@
 							<tr>
 								<td>Background Color</td>
 								<td>
-									<div id="largeHeadingBackgroundDiv" class="colorBox">
+									<div id="largeHeadingBackgroundDiv" class="colorBox"></div>
 									<input id="largeHeadingBackgroundInput" name="colors[large_head_bgcolour]" type="hidden" />								</td>
 							</tr>
 							<tr>
@@ -101,7 +97,7 @@
 							<tr>
 								<td>Background Color</td>
 								<td>
-									<div id="smallHeadingBackgroundDiv" class="colorBox">
+									<div id="smallHeadingBackgroundDiv" class="colorBox"></div>
 									<input id="smallHeadingBackgroundInput" name="colors[small_head_bgcolour]" type="hidden" />								</td>
 							</tr>
 							<tr>
@@ -119,7 +115,7 @@
 							<tr>
 								<td>Background Color</td>
 								<td>
-									<div id="largeTextBackgroundDiv" class="colorBox">
+									<div id="largeTextBackgroundDiv" class="colorBox"></div>
 									<input id="largeTextBackgroundInput" name="colors[large_text_bgcolour]" type="hidden" />								</td>
 							</tr>
 							<tr>
@@ -135,7 +131,7 @@
 							<tr>
 								<td>Background Color</td>
 								<td>
-									<div id="smallTextBackgroundDiv" class="colorBox">
+									<div id="smallTextBackgroundDiv" class="colorBox"></div>
 									<input id="smallTextBackgroundInput" name="colors[small_text_bgcolour]" type="hidden" />								</td>
 							</tr>
 							<tr>
@@ -147,8 +143,12 @@
 						</table>					</td>
 				</tr>
 			</table>
-			<input type="hidden" name="cid" value="{CID}" />
+			<input id="template-choice" type="hidden" name="template" value="0" />
+      <input type="hidden" name="cid" value="{CID}" />
 			<div align="right">
 				<input type="submit" name="Submit" value="Update Page" />
 			</div>
 			            </form>
+                  
+                  </div>
+                  </div>
