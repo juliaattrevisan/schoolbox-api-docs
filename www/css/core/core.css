@@ -277,7 +277,7 @@ Side Nav styles
 	position: relative;
 	overflow: hidden;
 	}
-.box.manage {
+.box.manage h2 {
 	display: none;
 	}
 .marker {
@@ -292,7 +292,6 @@ Side Nav styles
 	display: inline-block;
 	}
 .box .text.listing {
-	background: #fff;
 	padding: 0;
 	display: block;
 	}
@@ -363,6 +362,9 @@ h2 span {
 	right: 0;
 	}
 .box .edit:hover { background: #0065ce; }
+.box .editPanel.hide {
+	display: none;
+	}
 .box .editPanel {
 	clear: both;
 	padding: 10px;
@@ -433,9 +435,30 @@ a.layout {
 	display: block;
 	float: left;
 	}
+.text a.layout.current {
+	background: #999;
+	}
 a.layout:hover {
 	background: #ccc;
 	}
+.colours {
+	float: left;
+	margin-right: 25px;
+	background: #ddd;
+	padding: 10px;
+	width: 200px;
+	}
+.colours h3 {
+	padding-bottom: 1em;
+	}
+.colours div {
+	float: left;
+	margin-right: 10px;
+	}
+.colorBox {
+	width: 20px;
+	height: 20px;
+	}	
 /*--------------------------------------------------------------
 Tree styles 
 --------------------------------------------------------------*/

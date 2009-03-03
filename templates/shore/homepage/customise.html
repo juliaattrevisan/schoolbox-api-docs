@@ -1,4 +1,5 @@
 <!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" href="/css/mooRainbow.css" />
 <script type="text/javascript" src="/javascript/mootools.v.1.11.js"></script>
 <script type="text/javascript" src="/javascript/mooRainbow.js"></script>
 <script type="text/javascript">
@@ -7,11 +8,8 @@
 		['largeHeadingBackground', '#{large_head_bgcolour}'],
 		['largeHeadingText', '#{large_head_fontcolour}'],
 		['largeTextBackground', '#{large_text_bgcolour}'],
-		['largeTextText', '#{large_text_fontcolour}'],
-		['smallHeadingBackground', '#{small_head_bgcolour}'],
-		['smallHeadingText', '#{small_head_fontcolour}'],
-		['smallTextBackground', '#{small_text_bgcolour}'],
-		['smallTextText', '#{small_text_fontcolour}'],	
+		['largeTextBackground2', '#{large_text_bgcolour2}'],
+		['largeTextText', '#{large_text_fontcolour}'],	
 	];
 	window.onload = function(){
 		for(i = 0; i < pickers.length; i++){
@@ -33,23 +31,31 @@
 		};
 	}
 	
+	function removeClasses() {
+		var x = $$('.layouts a');
+		x.each(function(l){
+			l.removeClass('current');	
+		});
+		}
+	
 	function template(el) {
 		var temp = $('template-choice');
-		temp.value = el.title;
+		temp.setAttribute('value', el.getAttribute('title'));
+		removeClasses();
+		el.addClass('current');		
 		}
 </script>
-<link rel="stylesheet" type="text/css" href="/css/mooRainbow.css" />
 <!-- END custom_head -->
 <div class="template3">
 			<h1>Homepage Customisation</h1>
       <div class="left">
-			 <form method="post" name="customiseForm" id="customiseForm" class="indent" action="/homepage/configForm.php">
+			<form method="post" name="customiseForm" id="customiseForm" class="indent" action="/homepage/configForm.php">
 			
       <div class="box grey">
         <h2>Layout</h2>
-        <div class="text">
-          <a onclick="template(this);" class="layout" title="1" href="#"><img src="/images/70-30.png" width="75" height="70" /></a>
-          <a onclick="template(this);" class="layout" title="2" href="#"><img src="/images/50-50.png" width="75" height="70" /></a>
+        <div class="text layouts">
+          <a onclick="template(this);" class="layout" title="1" href="#"><img src="/images/50-50.png" width="75" height="70" /></a>
+          <a onclick="template(this);" class="layout" title="2" href="#"><img src="/images/70-30.png" width="75" height="70" /></a>
           <a onclick="template(this);" class="layout" title="3" href="#"><img src="/images/100-0.png" width="75" height="70" /></a>
         </div>
       </div>
@@ -71,84 +77,44 @@
 					<!-- END componentGroup -->
         	</ul>
 				</div>
-        </div>
+      </div>
+        
+      <div class="box grey">
 			<h2>Colours</h2>
-			<table>
-				<tr>
-					<td class="indent">
-						<h2>Headings for Large Components</h2>
-						<table class="standardForm">
-							<tr>
-								<td>Background Color</td>
-								<td>
-									<div id="largeHeadingBackgroundDiv" class="colorBox"></div>
-									<input id="largeHeadingBackgroundInput" name="colors[large_head_bgcolour]" type="hidden" />								</td>
-							</tr>
-							<tr>
-								<td>Text Color</td>
-								<td>
-									<div id="largeHeadingTextDiv" class="colorBox"></div>
-									<input id="largeHeadingTextInput" name="colors[large_head_fontcolour]" type="hidden" />								</td>
-							</tr>
-						</table>					</td>
-					<td class="indent">
-						<h2>Headings for Small Components</h2>
-						<table class="standardForm">
-							<tr>
-								<td>Background Color</td>
-								<td>
-									<div id="smallHeadingBackgroundDiv" class="colorBox"></div>
-									<input id="smallHeadingBackgroundInput" name="colors[small_head_bgcolour]" type="hidden" />								</td>
-							</tr>
-							<tr>
-								<td>Text Color</td>
-								<td>
-									<div id="smallHeadingTextDiv" class="colorBox"></div>
-									<input id="smallHeadingTextInput" name="colors[small_head_fontcolour]" type="hidden" />								</td>
-							</tr>
-						</table>					</td>
-				</tr>
-				<tr>
-					<td class="indent">
-						<h2>Text for Large Components</h2>
-						<table class="standardForm">
-							<tr>
-								<td>Background Color</td>
-								<td>
-									<div id="largeTextBackgroundDiv" class="colorBox"></div>
-									<input id="largeTextBackgroundInput" name="colors[large_text_bgcolour]" type="hidden" />								</td>
-							</tr>
-							<tr>
-								<td>Text Color</td>
-								<td>
-									<div id="largeTextTextDiv" class="colorBox"></div>
-									<input id="largeTextTextInput" name="colors[large_text_fontcolour]" type="hidden" />								</td>
-							</tr>
-						</table>					</td>
-					<td class="indent">
-						<h2>Text for Small Components</h2>
-						<table class="standardForm">
-							<tr>
-								<td>Background Color</td>
-								<td>
-									<div id="smallTextBackgroundDiv" class="colorBox"></div>
-									<input id="smallTextBackgroundInput" name="colors[small_text_bgcolour]" type="hidden" />								</td>
-							</tr>
-							<tr>
-								<td>Text Color</td>
-								<td>
-									<div id="smallTextTextDiv" class="colorBox"></div>
-									<input id="smallTextTextInput" name="colors[small_text_fontcolour]" type="hidden" />								</td>
-							</tr>
-						</table>					</td>
-				</tr>
-			</table>
+				<div class="text">
+        	<div class="colours">
+      			<h3>Headings of Components</h3>            
+						<div id="largeHeadingBackgroundDiv" class="colorBox"></div>
+						<input id="largeHeadingBackgroundInput" name="colors[large_head_bgcolour]" type="hidden" />
+            <p>Background Color</p>
+            
+						<div id="largeHeadingTextDiv" class="colorBox"></div>
+						<input id="largeHeadingTextInput" name="colors[large_head_fontcolour]" type="hidden" />
+            <p>Text Color</p>
+        	</div>
+          
+          <div class="colours">
+      			<h3>Text of Components</h3>
+            
+						<div id="largeTextBackgroundDiv" class="colorBox"></div>
+						<input id="largeTextBackgroundInput" name="colors[large_text_bgcolour]" type="hidden" />
+            <p>Primary Background Color</p>
+            
+            <div id="largeTextBackground2Div" class="colorBox"></div>
+						<input id="largeTextBackground2Input" name="colors[large_text_bgcolour2]" type="hidden" />
+            <p>Secondary Background Color</p>
+            
+						<div id="largeTextTextDiv" class="colorBox"></div>
+						<input id="largeTextTextInput" name="colors[large_text_fontcolour]" type="hidden" />
+            <p>Text Color</p>
+        	</div>
+        </div>
+      </div>	
+						
 			<input id="template-choice" type="hidden" name="template" value="0" />
       <input type="hidden" name="cid" value="{CID}" />
-			<div align="right">
-				<input type="submit" name="Submit" value="Update Page" />
-			</div>
-			            </form>
+			<input type="submit" class="float-right" name="Submit" value="Update Page" />
+			</form>
                   
-                  </div>
-                  </div>
+      </div>
+      </div>
