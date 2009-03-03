@@ -1,6 +1,8 @@
 <?php
 require_once '../library/category.php';
+require_once '../library/homepage-template.php';
 $categoryHandler = new Category;
+$homeTemplateHandler = new HomepageTemplate;
 
 if(is_numeric($this->arg[0])) {
 	
@@ -26,7 +28,7 @@ if(is_numeric($this->arg[0])) {
 	array_unshift($categoryTree, array('CAT_ID' => 0, 'CAT_NAME' => 'Top Level'));
 	$this->dropDown('parent_list', $categoryTree, $category['parent']);
 
-	$templateList = $categoryHandler->getTemplateList();
+	$templateList = $homeTemplateHandler->getTemplateListDropDown();
 	array_unshift($templateList, array('TEMPLATE_ID' => 0, 'TEMPLATE_NAME' => 'Keep Existing'));
 	$this->dropDown('template_list', $templateList);	
 	

@@ -164,22 +164,6 @@ class Category extends Model {
 		}
 	}
 
-
-	function getTemplateList() {
-
-		$output = array();
-		$query = "SELECT id, name FROM homepages";
-		$templateList =  $this->db->getAll($query);
-		if (is_array($templateList)) {
-			foreach ($templateList as $template) {
-				$row['TEMPLATE_ID'] = $template['id'];
-				$row['TEMPLATE_NAME'] = $template['name'];
-				$output[] = $row;
-			}
-		}
-		return $output;
-	}
-
 	function getGroupPerms($categoryID) {
 		$query = "SELECT id, name, type FROM groups g 
 				  LEFT JOIN perms p ON p.gid = g.id AND p.cid = '$categoryID'
@@ -231,21 +215,36 @@ class Category extends Model {
 	}
 
 	function create($data) {
+	
+		$group = $data['group'];
+		unset($data['group']);
+		
 		$categoryID = parent::create($data);
 		
 		/* Setup group permissions */
-		foreach($data['group'] as $groupID => $perm) {
-			$this->insertPerm($data['id'], $groupID, $perm);
+		if(is_array($group)) {
+			foreach($group as $groupID => $perm) {
+				$this->insertPerm($categoryID, $groupID, $perm);
+			}
 		}
-		unset($data['group']);
 		
-		// insert codes
+		/* Setup homepage template */
+		if($data['template']) {
+			$templateHandler = new HomepageTemplate;
+			$templateHandler->createTemplate($data['id'], $template);
+		}
+		else
+			unset($data['template']);
+		
+		/* Insert synergetic subject code */
 		$codeList = explode(",", $data['code']);
 		if (is_array($codeList)) {
-			array_walk($codeList, create_function(&$code, '$code = trim($code);'));
+			$codeList = array_map('trim',$codeList);
 			$codeList = array_unique($codeList);
-			foreach ($codeList as $code)
-				$this->db->insert('categoryCode', array('categoryID' => $categoryID, 'code' => $code));
+			foreach ($codeList as $code) {
+				if($code)
+					$this->db->insert('categoryCode', array('categoryID' => $categoryID, 'code' => $code));
+			}
 		}
 		
 		$this->logAction($categoryID, 'create');
@@ -264,27 +263,24 @@ class Category extends Model {
 		/* Setup homepage template */
 		if($data['template']) {
 			$templateHandler = new HomepageTemplate;
-			$this->createTemplate($data['id'], $template);
+			$templateHandler->createTemplate($data['id'], $template);
 		}
 		else
 			unset($data['template']);
 			
 		parent::update($data);
 		
-
-
-		// clear current codes
+		/* Insert synergetic subject code */
 		$this->db->delete('categoryCode', 'categoryID', $data['id']);
-
-		// insert codes
 		$codeList = explode(",", $data['code']);
 		if (is_array($codeList)) {
-			array_walk($codeList, create_function(&$code, '$code = trim($code);'));
+			$codeList = array_map('trim',$codeList);
 			$codeList = array_unique($codeList);
-			foreach ($codeList as $code)
-				$this->db->insert('categoryCode', array('categoryID' => $data['id'], 'code' => $code));
+			foreach ($codeList as $code) {
+				if($code) 
+					$this->db->insert('categoryCode', array('categoryID' => $data['id'], 'code' => $code));
+			}
 		}
-		
 		$this->logAction($data[$this->_index], 'modify');
 	}
 	

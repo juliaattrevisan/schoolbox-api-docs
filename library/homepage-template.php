@@ -7,7 +7,39 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../library/homepage.php');
 class HomepageTemplate extends  Model {
 
 		function HomepageTemplate() {
+			$this->_table = 'homepages';
+			$this->_index = 'id';
 			
+			parent::Model();
+		}
+
+		function getTemplateListDropDown() {
+			$templateList =  $this->getAll('name');
+			if (is_array($templateList)) {
+				foreach ($templateList as $template) {
+					$row['TEMPLATE_ID'] = $template['id'];
+					$row['TEMPLATE_NAME'] = $template['name'];
+					$output[] = $row;
+				}
+			}
+			return $output;
+		}
+
+		function createTemplate($cid, $template)
+		{
+		
+			if( $template == 1)
+				$this->createSubjectPage($cid);
+			else if($template == 2)
+				$this->createGroupPage($cid);
+			else if($template == 3)
+				$this->createGroupForumPage($cid);
+			else if($template == 4)
+				$this->createFacultyPage($cid);
+			else if($template == 5)
+				$this->createSubjectForumPage($cid);
+			else if($template == 6)
+				$this->createGroupForumPage();
 		}
 
 		// Default subject page

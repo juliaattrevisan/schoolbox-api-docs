@@ -18,16 +18,15 @@ if ($_POST['name']) {
 					  'code'		=> $_POST['code'],
 					  'group'		=> $_POST['group'],
 					  );
-	
-	if (isset($_POST['categoryID'])) {
+
+	if (is_numeric($_POST['categoryID'])) {
 		$category['id'] = $_POST['categoryID'];
 		$categoryHandler->update($category);
 	}
 	else
 		$categoryHandler->create($category);
 	
-	$page->backToTheFuture(2);
-			
+	$page->backToTheFuture(2);		
 	
 }
 else if(is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
