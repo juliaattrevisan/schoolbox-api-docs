@@ -36,7 +36,8 @@ View <a href="list-event.php">Week</a> | <a href="list-event.php?show=semester">
     <th>Code</th>
     <th>Tutors</th>
     <!-- BEGIN modify_title -->
-    <th>Modify</th><!-- END modify_title -->
+    <th>Modify</th>
+    <th>Delete</th><!-- END modify_title -->
   </tr>
   </thead>
   <tbody>
@@ -50,7 +51,8 @@ View <a href="list-event.php">Week</a> | <a href="list-event.php?show=semester">
     <td>{CODE}</td>
     <td>{TUTORS}</td>
     <!-- BEGIN modify_link -->
-    <td><a href="modify-event.php?eventID={EVENT_ID}">Modify</a></td><!-- END modify_link -->
+    <td><a href="modify-event.php?eventID={EVENT_ID}">Modify</a></td>
+    <td><a href="modify-event.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?');">Delete</a></td><!-- END modify_link -->
     
   </tr><!-- END event_list -->
   </tbody>

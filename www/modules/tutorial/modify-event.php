@@ -4,16 +4,18 @@ require_once '../../conf/conf.php';
 require_once SITE_root . '/include/sitePage.php';
 require_once SITE_root . '/www/modules/tutorial/library/event.php';
 require_once SITE_root . '/library/group.php';
+require_once SITE_root . '/library/user.php';
 
+	
 $page = new SitePage();
 $page->setFile(TEMPLATE_content, 'tutorial/modify-event.html');
 $page->setTitle("Tutorial Management");
 
 $eventHandler = new Event;
 $groupHandler = new Group(TUTORIAL_SERVICE);
+$userHandler = new User;
 
 // check access
-$groupHandler = new Group(TUTORIAL_SERVICE);
 if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)
 	$page->error(19);
 
@@ -29,14 +31,23 @@ if (isset($_POST['name'])) {
 	else
 		$tohour = $_POST['toperiod'] == 'pm' && $_POST['tohour'] < 12 ? $_POST['tohour'] + 12 : $_POST['tohour'];
 
+	
+
+
+	if (is_numeric($_POST['tutorID_1']) && !($tutor1 = $userHandler->getBySynergy($_POST['tutorID_1']))) 
+		error(31);
+
+	if (is_numeric($_POST['tutorID_2']) && !($tutor2 = $userHandler->getBySynergy($_POST['tutorID_2']))) 
+		error(31);
+		
 
 	$event = array('name'			=> $_POST['name'],
 				   'code'			=> $_POST['code'],
 				   'location'		=> $_POST['location'],
 				   'start'			=> $hour.":".(int)$_POST['minute'].":00",
 				   'finish'			=> $tohour.":".(int)$_POST['tominute'].":00",
-				   'tutorID_1'		=> $_POST['tutorID_1'],
-				   'tutorID_2'		=> $_POST['tutorID_2'],
+				   'tutorID_1'		=> $tutor1['uid'],
+				   'tutorID_2'		=> $tutor2['uid'],
 				   'cancelled'		=> isset($_POST['cancelled']) ? 'true' : 'false',
 				   );
 
@@ -59,7 +70,7 @@ if (isset($_POST['name'])) {
 		
 		// check user is one of the tutors
 		$current = $eventHandler->getByID($_POST['eventID']);
-		if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($current['tutorID_1'], $current['tutorID_2'])))
+		if ($permission < FULL_ACCESS && !in_array($_SESSION['sid'], array($current['tutorID_1'], $current['tutorID_2'])))
 			$page->error(19);
 		
 		$event['eventID'] = $_POST['eventID'];
@@ -146,8 +157,11 @@ elseif (is_numeric($_GET['eventID'])) {
 					'RECURRENCE_FORTNIGHT_SELECTED'	=> '',
 					);
 
-	$page->dropDown('tutor_list_1', $eventHandler->getTutorList(), $event['tutorID_1'], TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
-	$page->dropDown('tutor_list_2', $eventHandler->getTutorList(), $event['tutorID_2'], TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
+	$tutor1 = $userHandler->getByID($event['tutorID_1']);
+	$tutor2 = $userHandler->getByID($event['tutorID_2']);
+
+	$page->dropDown('tutor_list_1', $eventHandler->getTutorList(), $tutor1['synergy_id'], TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
+	$page->dropDown('tutor_list_2', $eventHandler->getTutorList(), $tutor2['synergy_id'], TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
 	
 	
 	$page->setVar($output);
@@ -183,7 +197,7 @@ elseif (is_numeric($_GET['eventID'])) {
 					'RECURRENCE_FORTNIGHT_SELECTED'	=> '',
 					);
 
-	$page->dropDown('tutor_list_1', $eventHandler->getTutorList(), $_SESSION['id'], TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
+	$page->dropDown('tutor_list_1', $eventHandler->getTutorList(), $_SESSION['sid'], TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
 	$page->dropDown('tutor_list_2', $eventHandler->getTutorList(), '', TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
 	
 	

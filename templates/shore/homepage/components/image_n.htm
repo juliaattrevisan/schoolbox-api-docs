@@ -2,7 +2,7 @@
   <h2>Feature Image</h2>
   <!-- BEGIN config -->
     <a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
-    <div class="editPanel">
+    <div class="editPanel hide">
       <form action="/homepage/configForm.php" method="get">
         <input type="hidden" name="cid" value="{ID}" />
         <input type="hidden" name="type" value="config" />
@@ -23,7 +23,7 @@
   <!-- END config -->
   <div class="text">
   <!-- BEGIN previewimage -->
-    <img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}" />
+    {CONTENT_URL_START}<img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}" />{CONTENT_URL_END}
   <!-- END previewimage -->
   </div>
 </div>

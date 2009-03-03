@@ -3,6 +3,7 @@
 		
 		//outputs an custom image and link to the homepage
 		$this->setBlock($componentHandle, "previewimage", "preview_block");
+		$this->setVar('IMAGE_TITLE', 'Image Simple');
 		
 		// Make sure there a config option
 		if(empty($config['image'])) {
@@ -28,7 +29,7 @@
 		if ($continue) {
 			
 
-			if($config['pixel']>365){$config['pixel']=365;}
+			if($config['pixel']>600){$config['pixel']=600;}
 			if($config['pixel']<20){$config['pixel']=20;}
 			
 			$imageurl = "/cms/image.php?id={$image['id']}&height={$config['pixel']}&width={$config['pixel']}";

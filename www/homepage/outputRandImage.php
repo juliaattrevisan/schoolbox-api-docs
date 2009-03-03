@@ -2,6 +2,7 @@
 
 		//outputs an custom image and link to the homepage
 		$this->setBlock($componentHandle, "previewimage", "preview_block");
+		$this->setVar('IMAGE_TITLE', 'Random Image');
 
 		//get image id
 		$query = "SELECT id, comment FROM file WHERE category = {$categoryID} AND deleted = '0' AND hidden = '0' AND INSTR(mime_type, 'image/')

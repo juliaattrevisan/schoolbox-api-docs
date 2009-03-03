@@ -165,16 +165,28 @@ class Event extends Model {
 	}
 	
 	function getTutorList () {
-		$query = "SELECT id, title, firstname, lastname 
-				  FROM user u
-				  LEFT JOIN userAccess a ON a.uid = u.id AND a.service = ".TUTORIAL_SERVICE."
-				  WHERE a.type >= ".WRITE_ACCESS." ORDER BY lastname, firstname";
 		
-		$tutorList = $this->db->getAll($query);
+		if (SYNERGY_enable) {
+			$query = "SELECT ID synergy_id, Title title, Given1 firstname, Surname lastname
+					  FROM SynergyOne.dbo.vCommunityAddressesConstit vCommunityAddressesConstit
+					  WHERE (vCommunityAddressesConstit.ConstitCode='TUTRES2009') OR (vCommunityAddressesConstit.ConstitCode='TUTNONRES2009')";
+			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/mssql.php';
+			$mssql = new MSSQL;
+			$tutorList = $mssql->getAll($query);
+			
+		} else {
+			$query = "SELECT synergy_id, title, firstname, lastname 
+					  FROM user u
+					  LEFT JOIN userAccess a ON a.uid = u.id AND a.service = ".TUTORIAL_SERVICE."
+					  WHERE a.type >= ".WRITE_ACCESS." ORDER BY lastname, firstname";
+			
+			$tutorList = $this->db->getAll($query);
+		}
+		
 		$output = array();
 		if (is_array($tutorList)) {
 			foreach ($tutorList as $tutor) {
-				$output[] = array('id'		=> $tutor['id'],
+				$output[] = array('id'		=> $tutor['synergy_id'],
 								  'name'	=> formatName($tutor),
 								  );
 			}

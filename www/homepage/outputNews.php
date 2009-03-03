@@ -8,7 +8,7 @@ $this->setBlock($componentHandle, 'news', 'news_block');
 require_once '../library/categoryNews.php';
 $newsHandler = new CategoryNews;
 
-$newsList = $newsHandler->getAllForCategory($categoryID);
+$newsList = $newsHandler->getAllForCategory($categoryID, $config);
 
 if (is_array($newsList)) {
 

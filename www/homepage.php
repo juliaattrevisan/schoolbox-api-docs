@@ -15,6 +15,7 @@ if (strpos($_SERVER['REQUEST_URI'], ".php?category=") ||
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/include/involved.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/homepage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 $categoryHandler = new Category; 
@@ -34,6 +35,8 @@ if (!$categoryID) {
 	error(18);
 }
 
+$homepageHandler = new Homepage($category['id']);
+
 $categoryHandler->logPageView($categoryID);
 
 define('MAX_COLUMN_COUNT',2);
@@ -43,7 +46,7 @@ if (($permission = $groupHandler->getPermission($categoryID)) < READ_ACCESS)
 	error(14);
 
 
-if(!$category['template'])
+if(!isset($category['template']))
 	localRedir('/resources/'.$categoryID);
 
 if($category['code']) {
@@ -61,15 +64,16 @@ $this->setTab('resources');
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock(TEMPLATE_content, "edit_page", "edit_page_block");
 
+$colours = $homepageHandler->getColorList();
 
-$output = array('LARGE_HEAD_BGCOLOUR'	=> $category['large_head_bgcolour'],
-				'LARGE_HEAD_FONTCOLOUR'	=> $category['large_head_fontcolour'],
-				'LARGE_TEXT_BGCOLOUR'	=> $category['large_text_bgcolour'],
-				'LARGE_TEXT_FONTCOLOUR'	=> $category['large_text_fontcolour'],
-				'SMALL_HEAD_BGCOLOUR'	=> $category['small_head_bgcolour'],
-				'SMALL_HEAD_FONTCOLOUR'	=> $category['small_head_fontcolour'],
-				'SMALL_TEXT_BGCOLOUR'	=> $category['small_text_bgcolour'],
-				'SMALL_TEXT_FONTCOLOUR'	=> $category['small_text_fontcolour'],
+$output = array('LARGE_HEAD_BGCOLOUR'	=> $colours['large_head_bgcolour'],
+				'LARGE_HEAD_FONTCOLOUR'	=> $colours['large_head_fontcolour'],
+				'LARGE_TEXT_BGCOLOUR'	=> $colours['large_text_bgcolour'],
+				'LARGE_TEXT_FONTCOLOUR'	=> $colours['large_text_fontcolour'],
+				'SMALL_HEAD_BGCOLOUR'	=> $colours['small_head_bgcolour'],
+				'SMALL_HEAD_FONTCOLOUR'	=> $colours['small_head_fontcolour'],
+				'SMALL_TEXT_BGCOLOUR'	=> $colours['small_text_bgcolour'],
+				'SMALL_TEXT_FONTCOLOUR'	=> $colours['small_text_fontcolour'],
 				'HEADING'				=> scrubTEXT($category['name']) . (isset($code) ? ' ('.$category['code'].')' : '' ),
 				'CODE'					=> urlencode(urlencode($category['code'])),
 				'ID'					=> $categoryID,

@@ -26,7 +26,7 @@ else
 	$this->setVar("submit_news_block", "");
 
 	
-$newsList = $newsHandler->getAllForCategory($category['id'], true);
+$newsList = $newsHandler->getAllForCategory($category['id'], false, true);
 
 if(is_array($newsList)) {
 	foreach($newsList as $news) {

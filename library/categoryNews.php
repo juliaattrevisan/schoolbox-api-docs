@@ -12,7 +12,7 @@ class CategoryNews extends Model {
 		parent::Model();
 	}
 
-	function getAllForCategory($categoryID, $archive = false) {
+	function getAllForCategory($categoryID, $config = false, $archive = false) {
 		$query = "SELECT n.id, heading, UNIX_TIMESTAMP(datetime_posted) posted, 
 					UNIX_TIMESTAMP(datetime_expires) expires, body, deleted, code, owner, u.firstname, u.lastname, u.title, u.id as uid
 				  FROM ".$this->_table." n
@@ -24,6 +24,9 @@ class CategoryNews extends Model {
 			$query .= "AND datetime_expires > CURRENT_DATE()";
 
 		$query .= "ORDER BY datetime_posted DESC";
+		
+		if($config['size'] > 0) 
+			$query .= " LIMIT 0, " . $config['size']; 
 
 		return $this->db->getAll($query);
 	}

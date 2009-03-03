@@ -9,6 +9,8 @@
  * The following actions can be performed; delete, add, update */
 require_once dirname(__FILE__) . '/group.php';
 
+define('DROPBOX_COMPONENT', 25);
+
 class Dropbox
 {
 	function Dropbox()
@@ -21,19 +23,19 @@ class Dropbox
 	function checkWriteAccess($category)
 	{
 		//anyone with read can put something in the dropbox
-		if ($this->groupHandler->getPermission($category) < READ_ACCESS)
+		if (($permission = $this->groupHandler->getPermission($category)) < READ_ACCESS)
 			error(6);
 
 		//check dropbox exists on page
 		if(!$this->checkDropBoxExists($category))
 			error(6);
 	
-		return $perm;
+		return $permission;
 	} 
 
 	function checkDropBoxExists($cid)
 	{
-		$query = "SELECT position FROM homepage_comp_location WHERE cid = $cid AND component IN (".DROPBOX_COMPONENT.")";
+		$query = "SELECT position FROM homepage_comp_location WHERE cid = $cid AND component = ". DROPBOX_COMPONENT;
 		if($this->db->getRow($query))
 			return true;
 		else
@@ -79,7 +81,7 @@ class Dropbox
 		//check file exists. and user has nescessary rights
 		$fileInfo = $this->getFile($id);
 		if($fileInfo['category']) {
-			if($this->checkWriteAccess($fileInfo['category']) < 2)
+			if($this->checkWriteAccess($fileInfo['category']) < WRITE_ACCESS)
 				error(6);
 		}
 		else

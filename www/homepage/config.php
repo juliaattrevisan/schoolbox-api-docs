@@ -26,12 +26,10 @@ if(is_numeric($this->arg[0])) {
 	
 	//Template control
 	$template = $homepage->getTemplate();
-	for($x = 1; $x <= 4; $x++)
-	{
-		if($template == $x)
-			$this->setVar("templateChecked$x", "checked");
-		else
-			$this->setVar("templateChecked$x", "");
+	for($x = 1; $x <= 4; $x++) {
+		$output = array("CURRENT_$x"	=> $template == $x ? 'current' : '',
+						);
+		$this->setVar($output);
 	}
 
 	$output = array('CID'		=> $cid,

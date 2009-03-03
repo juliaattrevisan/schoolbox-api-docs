@@ -1,3 +1,9 @@
 function toggleConfig(div){		
-	$(div).toggleClass("hidden");
+	var editPanel = $(div).getChildren();
+
+	for (i in editPanel)
+		if (editPanel[i].hasClass("editPanel"))
+			break;
+
+	editPanel[i].toggleClass("hide");
 } 

@@ -178,8 +178,36 @@ class Group extends Model {
 		if(isStaff($user['group_id']) && $this->_service == NEWS_SERVICE && $permission < WRITE_ACCESS)
 			$permission = WRITE_ACCESS;
 		
+		// check synergy tutor list
+		if ($permission < WRITE_ACCESS && $this->_service == TUTORIAL_SERVICE && SYNERGY_enable) {
+			$tutorialPermission = $this->getTutorialPermission($userID);
+			if ($tutorialPermission)
+				$permission = $tutorialPermission;
+		}
 		
 		return $permission;
+	}
+	
+	function getTutorialPermission($userID) {
+		
+		require_once dirname(__FILE__) . '/user.php';
+		require_once dirname(__FILE__) . '/mssql.php';
+		$userHandler = new User;
+		$mssql = new MSSQL;
+		
+		$user = $userHandler->getByID($userID);
+		
+		$query = "SELECT ID
+					  FROM SynergyOne.dbo.vCommunityAddressesConstit vCommunityAddressesConstit
+					  WHERE ((vCommunityAddressesConstit.ConstitCode='TUTRES2009') OR (vCommunityAddressesConstit.ConstitCode='TUTNONRES2009')) 
+					  AND ID = " . $user['synergy_id'];
+		
+		$tutor = $mssql->getRow($query);
+		
+		if (isset($tutor['ID']))
+			return WRITE_ACCESS;
+		else
+			return DENY_ACCESS;
 	}
 
 	function isStudent($userID = 0) {
