@@ -108,6 +108,9 @@
 			node.addClass(options.childPrefix + destination.id);
 			move(node, destination); // Recursively move nodes to new location
 			indent(node, ancestorsOf(node).length * options.indent);
+		
+			// ajax move request
+			$(ui.draggable).move(targetID);
 		}
 		
 		return this;
@@ -449,8 +452,6 @@
 					
 					} else {
 						/* folders */
-						// ajax move request
-						$(ui.draggable).move(targetID);
 						
 						// move node and expand target
 						node.appendBranchTo(this);

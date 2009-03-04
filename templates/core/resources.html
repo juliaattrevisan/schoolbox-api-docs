@@ -148,40 +148,44 @@ $(document).ready(function() {
 </style>
 <![endif]-->
 <!-- END custom_head -->
-<div id="container">
-<div id="column-1">
-  <table id="category-list">
-    <thead>
-    <th>Folders</th>
-      </thead>
-    <tbody>
-      <tr id="node-0" class="expanded populated">
-      	<td><span class="top">Top</span></td>
-      </tr>
-      <!-- BEGIN category_list -->
-      <tr id="node-{CATEGORY_ID}" class="{CLASS}">
-        <td><span class="folder">{CATEGORY_NAME}</span></td>
-      </tr>
-      <!-- END category_list -->
-    </tbody>
-  </table>
-</div>
-<div id="column-2">
-  <table id="file-list">
-    <thead>
-      <th>Name</th>
-      <th>Size</th>
-      <th>Modified</th>
-    </thead>
-    <tbody>
-      <!-- BEGIN file_list -->
-      <tr id="{TYPE}-{FILE_ID}" class="category-{CATEGORY_ID}">
-        <td><span class="file ui-draggable {CLASS}">{FILE_NAME}</span></td>
-        <td>{FILE_SIZE}</td>
-        <td>{FILE_MODIFIED}</td>
-      </tr>
-      <!-- END file_list -->
-    </tbody>
-  </table>
-</div>
+<div class="template4">
+  <div class="left">
+    <div id="category-window">
+      <table id="category-list">
+        <thead>
+        <th>Folders</th>
+          </thead>
+        <tbody>
+          <tr id="node-0" class="expanded populated">
+            <td><span class="top">Top</span></td>
+          </tr>
+          <!-- BEGIN category_list -->
+          <tr id="node-{CATEGORY_ID}" class="{CLASS}">
+            <td><span class="folder">{CATEGORY_NAME}</span></td>
+          </tr>
+          <!-- END category_list -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="right">
+    <div id="file-window">
+      <table id="file-list">
+        <thead>
+        <th>Name</th>
+          <th>Size</th>
+          <th>Modified</th>
+          </thead>
+        <tbody>
+          <!-- BEGIN file_list -->
+          <tr id="{TYPE}-{FILE_ID}" class="category-{CATEGORY_ID}">
+            <td><span class="file ui-draggable {CLASS}">{FILE_NAME}</span></td>
+            <td>{FILE_SIZE}</td>
+            <td>{FILE_MODIFIED}</td>
+          </tr>
+          <!-- END file_list -->
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
