@@ -23,8 +23,8 @@ $j=0;
 				if($email)
 					$emailall .= $email.",";
 				
-				$this->parse("members_block", "members", true);	
 				$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
+				$this->parse("members_block", "members", true);	
 			}
 			$this->setVar("REPLYTO", formatEmail($_SESSION));
 			$this->setVar("EMAILALL", $emailall);

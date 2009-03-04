@@ -1,26 +1,22 @@
-<h1>News</h1>
-<span class="header_option">{ADD}</span>
+<h1>News {ADD}</h1>
 <!-- BEGIN main_stories -->
-<a name="{NEWS_ID}"></a>
-<h2>{NEWS_TITLE}</h2>
-<span class="header_option">{MODIFY}</span>
-    <!-- BEGIN story_body -->
-    {NEWS_BODY}
-    <hr>
-    <span class="element_footer">Submitted by {POSTER} on {DATETIME}</span>
-    </td>
-    <!-- END story_body -->
-    
+	<h3 id="news-header">{NEWS_TITLE}</h3>
+  <!-- BEGIN story_body -->
+  {NEWS_BODY}
+  <hr />
+  <p class="interact">Submitted by {POSTER} on {DATETIME} | {MODIFY}</p>
+  <!-- END story_body -->  
 <!-- END main_stories -->
 
-<div class="pagination indent" style="margin: 10px 0;">
-<!-- BEGIN previous_button -->
-<a class="prev" href="/news-archive/{PREVIOUS_PAGE}">&lt;&lt; Prev</a><!-- END previous_button -->
-<!-- BEGIN page_number -->
-<a class="number{CURRENT}" href="/news-archive/{PAGE_INDEX}">{PAGE_INDEX}</a><!-- END page_number -->
-<!-- BEGIN next_button -->
-<a class="next" href="/news-archive/{NEXT_PAGE}">Next &gt;&gt;</a><!-- END next_button -->
+<div class="pagination">
+  <!-- BEGIN previous_button -->
+  <a class="prev" href="/news-archive/{PREVIOUS_PAGE}">&lt;&lt; Prev</a><!-- END previous_button -->
+  <!-- BEGIN page_number -->
+  <a class="number{CURRENT}" href="/news-archive/{PAGE_INDEX}">{PAGE_INDEX}</a><!-- END page_number -->
+  <!-- BEGIN next_button -->
+  <a class="next" href="/news-archive/{NEXT_PAGE}">Next &gt;&gt;</a><!-- END next_button -->
 </div>
 
 <!-- BEGIN archive_button -->
-<a href="/news-archive/">View Archived News</a><!-- END archive_button -->
+	<p class="interact"><a href="/news-archive/">View Archived News</a></p>
+<!-- END archive_button -->

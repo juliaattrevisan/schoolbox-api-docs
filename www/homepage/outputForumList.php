@@ -31,9 +31,9 @@ $j=0;
 					$this->setVar("FORUM_HEAD", scrubTEXT($thread['heading']));
 				else
 					$this->setVar("FORUM_HEAD", "<a href=\"$url\">".scrubTEXT($thread['heading'])."</a>");
-		
-				$this->parse("forum_block", "forum", true);
+				
 				$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
+				$this->parse("forum_block", "forum", true);				
 				
 			}
 		} else

@@ -1,0 +1,64 @@
+      <div id="calendar">
+      <h1>{MONTH} - {YEAR} <a class="customise" href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}">Month View</a></h1>
+      
+      <center>
+          <table class="calendarTable">
+            <tr>
+              <td><a class="back" href="/calendar/week/{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td>
+              <td colspan="3">
+                <select name="Month" onchange="window.open('/calendar/week/{SELECTED_DAY}-'+this.value+'-{SELECTED_YEAR}', '_self', '');">
+                  <!-- BEGIN month_drop -->
+                  <option value="{DROP_MONTH_NUMBER}" {DROP_MONTH_NUMBER_SELECTED}>{DROP_MONTH_NAME}</option>
+                  <!-- END month_drop -->
+                </select>
+              </td>
+              <td colspan="2"><select name="Year" onchange="window.open('/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-'+this.value, '_self', '');">
+                  <!-- BEGIN year_drop -->
+                  <option value="{DROP_YEAR_NUMBER}" {DROP_YEAR_NUMBER_SELECTED}>{DROP_YEAR_NUMBER}</option>
+                  <!-- END year_drop -->
+                </select>
+              </td>
+              <td><a class="forward" href="/calendar/week/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
+            </tr>
+            <tr>
+              <th>Sun</th>
+              <th>Mon</th>
+              <th>Tue</th>
+              <th>Wed</th>
+              <th>Thu</th>
+              <th>Fri</th>
+              <th>Sat</th>
+            </tr>
+            <!-- BEGIN week_block -->
+            <tr>
+              <td class="{MONTABLE_CSS0}" onclick="location.href='{DAYURL0}';">{DAY0}</td>
+              <td class="{MONTABLE_CSS1}" onclick="location.href='{DAYURL1}';">{DAY1}</td>
+              <td class="{MONTABLE_CSS2}" onclick="location.href='{DAYURL2}';">{DAY2}</td>
+              <td class="{MONTABLE_CSS3}" onclick="location.href='{DAYURL3}';">{DAY3}</td>
+              <td class="{MONTABLE_CSS4}" onclick="location.href='{DAYURL4}';">{DAY4}</td>
+              <td class="{MONTABLE_CSS5}" onclick="location.href='{DAYURL5}';">{DAY5}</td>
+              <td class="{MONTABLE_CSS6}" onclick="location.href='{DAYURL6}';">{DAY6}</td>
+            </tr>
+            <!-- END week_block -->
+          </table>
+      </center>
+      <table class="ruler">
+        <!-- BEGIN day_block -->
+        <thead>
+          <tr>
+            <td colspan="3"><h2>{DATE}</h2>
+              <span class="header_option">{ADD}</span></td>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- BEGIN note_block -->
+          <tr>
+            <td class="indent calendarTime"><span style="color:{PRIORITY};">{TIME}</span></td>
+            <td><span style="color:{PRIORITY};">{NOTE}</span></td>
+            <td style="text-align:right;vertical-align:top;">{MODIFY}</td>
+          </tr>
+          <!-- END note_block -->
+        </tbody>
+        <!-- END day_block -->
+      </table>
+      </div>

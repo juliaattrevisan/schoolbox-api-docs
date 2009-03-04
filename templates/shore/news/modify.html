@@ -46,7 +46,7 @@ function confirmDelete(newsID) {
 		<input type="hidden" name="newsID" value="{NEWS_ID}" />
 		<table>
 		  <tr> 
-			<td class="formLabelWidth"><h2>Groups</h2><em>This news item will only be visible to the groups you select. You can select multiple by holding down 'crtl' while selecting.</em></td>
+			<td class="formLabelWidth"><h3>Groups</h3><em>This news item will only be visible to the groups you select. You can select multiple by holding down 'crtl' while selecting.</em></td>
 			<td> <select name="group[]" size="{GROUP_TOTAL}" multiple>
 			<!-- BEGIN group_selection -->
 				<option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{GROUP_NAME}</option>
@@ -55,7 +55,7 @@ function confirmDelete(newsID) {
 		  </tr>
 		  <!-- BEGIN campus_row -->
 		  <tr>
-			<td><h2>Campus</h2><em>This news item will only be visible to users that are within this campus. You can select multple by holding down 'crtl'.</em></td>
+			<td><h3>Campus</h3><em>This news item will only be visible to users that are within this campus. You can select multple by holding down 'crtl'.</em></td>
 			<td><select name="campus[]" size="{CAMPUS_TOTAL}" multiple>           
 				<!-- BEGIN campus_selection -->
 				<option value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}>{CAMPUS_NAME}</option>
@@ -63,11 +63,11 @@ function confirmDelete(newsID) {
 			  </select></td>
 		  </tr><!-- END campus_row -->
 		  <tr> 
-			<td><h2>News heading</h2></td>
+			<td><h3>News heading</h3></td>
 			<td><input type="text" name="heading" size="35" maxlength="50" value="{HEADING}" /></td>
 		  </tr>
 		  <tr> 
-			<td><h2>Expires</h2>
+			<td><h3>Expires</h3>
 			<em>Select a period for which the news item will remain available.</em></td>
 			<td><select name="expires">
 				{LEAVE_OPTION}
@@ -86,7 +86,7 @@ function confirmDelete(newsID) {
 			  </select></td>
 		  </tr>
 		  <tr> 
-			<td><h2>News Body</h2><em>This is the main portion of your news.</em></td>
+			<td><h3>News Body</h3><em>This is the main portion of your news.</em></td>
 			<td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
 		  </tr>
 		  <tr> 

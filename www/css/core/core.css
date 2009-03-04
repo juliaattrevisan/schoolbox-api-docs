@@ -79,23 +79,25 @@ body {
 /*--------------------------------------------------------------
  Main Link Styles 
 --------------------------------------------------------------*/
-a { text-decoration: none; }
+a { text-decoration: none; color: #1965B4; }
 a:hover { text-decoration: underline; }
 /*--------------------------------------------------------------
  Text formatting styles 
 --------------------------------------------------------------*/
 p           { margin: 0 0 1em 0; text-align:left; line-height: 1.5; }
 ul, ol      { margin: 0 0 1.5em 1.5em; line-height: 1.5; }
+hr { color: #ccc; background: #ccc; }
 /*--------------------------------------------------------------
  Heading Styles 
 --------------------------------------------------------------*/
 h1 { font-size: 1.33em; font-weight: normal; border-bottom: 1px dashed #7f7f7f; line-height: 2.5; margin-bottom: 1.5em; position: relative; }
 h1 a.customise { position: absolute; top: 0; right: 0; font-size: 70%; }
 h3 { font-size: 1em; }
+#news-header { margin-bottom: 1em; }
 /*--------------------------------------------------------------
  Table Styles 
 --------------------------------------------------------------*/
-table   { margin-bottom: 1.4em; border: 0; }
+table   { margin-bottom: 0; border: 0; }
 th,td   { height: 1em; padding:0.2em 1em; border: 0; }
 th      { font-weight:bold; }
 /*--------------------------------------------------------------
@@ -201,9 +203,22 @@ th      { font-weight:bold; }
 	background: #e1f0ff;
 	text-decoration: none;
 	}
-#header #tabs li a.current {
+#header #tabs li a.navthis {
 	background: #fff;
 	border-bottom-color: #fff;
+	}
+/*--------------------------------------------------------------
+ Login styles 
+-------------------------------------------------------------*/
+#loginForm label {
+	width: 110px;
+	display: block;
+	float: left;
+	font-weight: bold;
+	line-height: 22px;
+	}
+#loginForm fieldset {
+	margin-bottom: 20px;
 	}
 /*--------------------------------------------------------------
  Table styles 
@@ -289,7 +304,7 @@ Side Nav styles
 	}
 .box .text {
 	padding: 11px 10px;
-	display: inline-block;
+	margin-bottom: 0.5em;
 	}
 .box .text.listing {
 	padding: 0;
@@ -298,6 +313,9 @@ Side Nav styles
 .box.image .text {
 	text-align: center;
 	display: block;
+	}
+.box.image .text img {
+	
 	}
 h2 {
 	color: #fff;
@@ -370,7 +388,7 @@ h2 span {
 	padding: 10px;
 	background: #c0c0c0;
 	}
-.box .editPanel form {
+.box form {
 	text-align: right;
 	}
 .box .listing form {
@@ -379,7 +397,7 @@ h2 span {
 	}
 .box .listing ul {
 	list-style: none;
-	margin: 0 0 0.5em 0;
+	margin: 0;
 	padding: 0;
 	display: block;
 	}
@@ -399,15 +417,20 @@ h2 span {
 .listing h3 { float: left; line-height: 1.6; }
 .listing h3 a:hover { color: #003e7e; }
 .listing p { clear: both; margin: 0 0 0.5em; }
-.box p.interact { font-size: 90%; float: right; clear: none; margin: 0 15px 0 0; }
-.box li p.interact { margin: 0; }
-.box p.interact a { color: #003e7e; }
+p.interact { font-size: 90%; text-align: right; clear: none; }
+li p.interact { margin: 0; }
+p.interact a { color: #003e7e; }
 .listing p.small { font-size: 90%; float: right; color: #989898; }
 .listing p.small a { color: #5c5151; text-decoration: none; }
 .listing p.small a:hover { text-decoration: underline; }
 .listing a { color: #003e7e; }
-.box .thumb { margin: 0 15px 15px 0; }
-
+.box .thumb {
+	margin: 0 15px 15px 0;
+	display: block;
+	float: left;
+	height: 100px;
+	width: 100px;
+	}
 #component-list {
 	list-style: none;
 	margin: 0;
@@ -434,12 +457,21 @@ a.layout {
 	padding: 5px;
 	display: block;
 	float: left;
+	text-align: center;
 	}
-.text a.layout.current {
-	background: #999;
+a.layout img {
+	display: block;
+	padding: 3px;
+	margin-bottom: 5px;
+	}
+.text a.layout.current img {
+	background: #414141;
 	}
 a.layout:hover {
-	background: #ccc;
+	text-decoration: none;
+	}
+a.layout:hover img {
+	background: #999;
 	}
 .colours {
 	float: left;
@@ -459,6 +491,22 @@ a.layout:hover {
 	width: 20px;
 	height: 20px;
 	}	
+#pollForm {
+	text-align: left;
+	}
+#pollForm h3 {
+	margin-bottom: 1em;
+	}
+#pollForm label {
+	display: block;
+	margin-bottom: 0.5em;
+	}
+#pollForm label input {
+	margin-right: 10px;
+	}
+.text.poll {
+	text-align: center;
+	}
 /*--------------------------------------------------------------
 Tree styles 
 --------------------------------------------------------------*/
@@ -525,10 +573,59 @@ ul.tree li.icon a {
 	font-weight: normal;
 	}
 /*--------------------------------------------------------------
- Other styles 
+ Form styles 
 --------------------------------------------------------------*/
-
-
+.standardForm table {
+	width: 100%;
+	}
+.standardForm h3 {
+	margin-bottom: 0.5em;
+	}
+.standardForm td {
+	vertical-align: top;
+	padding: 20px;
+	}
+.standardForm td td {
+	padding: 0;
+	}
+.standardForm tr,
+.standardForm td {
+	border-bottom: 1px solid #ccc;
+	}
+.standardForm tr.dark,
+.standardForm tr.dark td {
+	background: #eee;
+	}
+.standardForm em {
+	font-size: 80%;
+	font-style: normal;
+	}
+/*--------------------------------------------------------------
+ Calander styles 
+--------------------------------------------------------------*/
+#calendar table {
+	width: 100%;
+	}
+#calendar table.calendarTable {
+	width: auto;
+	border: 2px solid #003E7E;
+	}
+#calendar table.calendarTable td,
+#calendar table.calendarTable tr {
+	border-top: 1px solid #ccc;
+	border-left: 1px solid #ccc;
+	}
+#calendar h2 {
+	background: 0;
+	color: #003E7E;
+	border-bottom: 1px solid #666;
+	text-indent: 0;
+	}
+.header_option {
+	float:right;
+	margin:-21px 0 0 0;
+	padding:0;
+	}
 /*--------------------------------------------------------------
  Miscellaneous styles 
 --------------------------------------------------------------*/

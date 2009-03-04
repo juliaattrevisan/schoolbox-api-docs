@@ -8,7 +8,6 @@
 		['largeHeadingBackground', '#{large_head_bgcolour}'],
 		['largeHeadingText', '#{large_head_fontcolour}'],
 		['largeTextBackground', '#{large_text_bgcolour}'],
-		['largeTextBackground2', '#{large_text_bgcolour2}'],
 		['largeTextText', '#{large_text_fontcolour}'],	
 	];
 	window.onload = function(){
@@ -54,9 +53,11 @@
       <div class="box grey">
         <h2>Layout</h2>
         <div class="text layouts">
-          <a onclick="template(this);" class="layout" title="1" href="#"><img src="/images/50-50.png" width="75" height="70" /></a>
-          <a onclick="template(this);" class="layout" title="2" href="#"><img src="/images/70-30.png" width="75" height="70" /></a>
-          <a onclick="template(this);" class="layout" title="3" href="#"><img src="/images/100-0.png" width="75" height="70" /></a>
+        	<a onclick="template(this);" class="layout {CURRENT_1}" title="1" href="#"><img src="/images/50-50.gif" />50-50</a>
+          <a onclick="template(this);" class="layout {CURRENT_2}" title="2" href="#"><img src="/images/70-30.gif" />70-30</a>         
+          <a onclick="template(this);" class="layout {CURRENT_4}" title="4" href="#"><img src="/images/30-70.gif" />30-70</a>
+          <a onclick="template(this);" class="layout {CURRENT_3}" title="3" href="#"><img src="/images/100-0.gif" />100-0</a>
+          <div class="float-fix"></div>
         </div>
       </div>
       
@@ -82,32 +83,35 @@
       <div class="box grey">
 			<h2>Colours</h2>
 				<div class="text">
+        
         	<div class="colours">
-      			<h3>Headings of Components</h3>            
-						<div id="largeHeadingBackgroundDiv" class="colorBox"></div>
-						<input id="largeHeadingBackgroundInput" name="colors[large_head_bgcolour]" type="hidden" />
+      			<h3>Main</h3>            
+						<div id="bg" class="colorBox"></div>
+						<input id="bgInput" name="colors[bg]" type="hidden" />
             <p>Background Color</p>
-            
-						<div id="largeHeadingTextDiv" class="colorBox"></div>
-						<input id="largeHeadingTextInput" name="colors[large_head_fontcolour]" type="hidden" />
-            <p>Text Color</p>
         	</div>
           
           <div class="colours">
-      			<h3>Text of Components</h3>
-            
-						<div id="largeTextBackgroundDiv" class="colorBox"></div>
-						<input id="largeTextBackgroundInput" name="colors[large_text_bgcolour]" type="hidden" />
+      			<h3>Left Column</h3>
+                      
+						<div id="leftPrimaryBg" class="colorBox"></div>
+						<input id="leftPrimaryBgInput" name="colors[leftPrimaryBg]" type="hidden" />
             <p>Primary Background Color</p>
             
-            <div id="largeTextBackground2Div" class="colorBox"></div>
-						<input id="largeTextBackground2Input" name="colors[large_text_bgcolour2]" type="hidden" />
+            <div id="leftSecondaryBg" class="colorBox"></div>
+						<input id="leftSecondaryBgInput" name="colors[leftSecondaryBg]" type="hidden" />
             <p>Secondary Background Color</p>
             
-						<div id="largeTextTextDiv" class="colorBox"></div>
-						<input id="largeTextTextInput" name="colors[large_text_fontcolour]" type="hidden" />
-            <p>Text Color</p>
+            <div id="leftFont" class="colorBox"></div>
+						<input id="leftFontInput" name="colors[leftFont]" type="hidden" />
+            <p>Font Color</p>
+            
+            <div id="leftLink" class="colorBox"></div>
+						<input id="leftLinkInput" name="colors[leftLink]" type="hidden" />
+            <p>Link Color</p>
         	</div>
+          
+          
         </div>
       </div>	
 						

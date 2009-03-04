@@ -8,27 +8,23 @@
       <a href="/poll/modifyForm.php?delete={POLL_ID}" onclick="return confirm('Delete Poll?');">Delete</a>
     </div>
   <!-- END config -->
-   <div class="text">
     
-    <p style="text-align: center;">{POLL_QUESTION}</p>
     <!-- BEGIN poll_vote -->
+   	<div class="text">
+    
     <form action="/poll/modifyForm.php" method="post" id="pollForm">
+    <h3>{POLL_QUESTION}</h3>
     <input type="hidden" name="pollID" value="{POLL_ID}" />
     <input type="hidden" name="categoryID" value="{ID}" />
-    <table class="poll">
     	<!-- BEGIN poll_options -->
-    	<tr class="{POLL_ON_OFF}">
-        <td style="text-align: left;">{POLL_OPTION}</td>
-        <td><input type="radio" name="vote" class="pollOption" value="{POLL_OPTION_INDEX}" /></td>
-        </tr><!-- END poll_options -->
-    </table>
-    <div style="text-align: center;">
+        <label for="{POLL_OPTION_INDEX}"><input type="radio" name="vote" class="pollOption" id="{POLL_OPTION_INDEX}" value="{POLL_OPTION_INDEX}" />{POLL_OPTION}</label>
+      <!-- END poll_options -->
+		<p>&nbsp;</p>
     <input type="submit" value="Vote" onclick="return validatePoll();" />
+    </form>
     <!-- BEGIN show_results -->
-    <p><a href="/homepage/{ID}&showResults">Show results</a></p> <!-- END show_results -->
-    </div>   
-    </form>    
-       
+    <p class="interact"><a href="/homepage/{ID}&showResults">Show results</a></p>
+    <!-- END show_results -->  
     <script type="text/javascript">
     function validatePoll () {
 		var valid = false;
@@ -44,10 +40,12 @@
 		alert('Please select an option.');
 		return valid;
 	}
-    </script>  
+    </script>
+    </div> 
     <!-- END poll_vote -->
     
     <!-- BEGIN poll_chart -->
+    <div class="text poll">
     <div id="pollResult{COMPONENT_ID}" style="margin-top: 5px; ">
         <noscript>
             <p>Flash player v9.0 required to view poll.</p>
@@ -63,6 +61,7 @@
 		});
 		// ]]>
     </script>
+    </div>
     <!-- END poll_chart -->
-  </div>
+   
 </div>
