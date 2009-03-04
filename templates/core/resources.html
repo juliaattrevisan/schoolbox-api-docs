@@ -4,37 +4,60 @@ $(document).ready(function() {
 
 	// define file context menu 
 	var fileMenu = [
-		{"Open": function () { 
-			var _file = $(this).find(".file");
-			if (_file.hasClass("link"))
-				window.open("/redir.php?id="+$(this).attr("id").substring(5),"_blank"); 
-			else
-				window.open("/send.php?id="+$(this).attr("id").substring(5),"_blank"); 
+		{"Open": {
+			onclick: function () { 
+				var _file = $(this).find(".file");
+				if (_file.hasClass("link"))
+					window.open("/redir.php?id="+$(this).attr("id").substring(5),"_blank"); 
+				else
+					window.open("/send.php?id="+$(this).attr("id").substring(5),"_blank"); 
+			},
+			icon: '/images/famicons/page_go.png'
 		}},
-		{"Save As": function () { window.open("/send.php?save=1&id="+$(this).attr("id").substring(5),"_self"); }},
-		$.contextMenu.separator,
-		{"Modify": function () {
-			var _file = $(this).find(".file");
-			if (_file.hasClass("link"))
-				window.open("/cms/link/"+$(this).attr("id").substring(5),"_self"); 
-			else
-				window.open("/cms/file/"+$(this).attr("id").substring(5),"_self"); 
-		}},
-		{"Delete": function () {
-			var _file = $(this).find(".file");
-			if (_file.hasClass("link")) {
-				if (confirm("Delete this link?")) 
-					window.open("/cms/linkForm.php?delete="+$(this).attr("id").substring(5),"_self");
-			} else {
-				if (confirm("Delete this file?")) 
-					window.open("/cms/fileForm.php?delete="+$(this).attr("id").substring(5),"_self");
-			}
+		{"Save As": {
+			onclick: function () { window.open("/send.php?save=1&id="+$(this).attr("id").substring(5),"_self"); },
+			icon: '/images/famicons/disk.png'
 		}},
 		$.contextMenu.separator,
-		{"New File": function () { window.open("/cms/file/new/"+$(this).data("category"),"_self"); }},
+		{"Modify": {
+			onclick: function () {
+				var _file = $(this).find(".file");
+				if (_file.hasClass("link"))
+					window.open("/cms/link/"+$(this).attr("id").substring(5),"_self"); 
+				else
+					window.open("/cms/file/"+$(this).attr("id").substring(5),"_self"); 
+			},
+			icon: '/images/famicons/page_edit.png'
+		}},
+		{"Delete": {
+			onclick: function () {
+				var _file = $(this).find(".file");
+				var _name = _file.text();
+				if (_file.hasClass("link")) {
+					if (confirm("Are you sure you want to delete "+_name+"?")) 
+						window.open("/cms/linkForm.php?delete="+$(this).attr("id").substring(5),"_self");
+				} else {
+					if (confirm("Are you sure you want to delete "+_name+"?")) 
+						window.open("/cms/fileForm.php?delete="+$(this).attr("id").substring(5),"_self");
+				}
+			},
+			icon: '/images/famicons/page_delete.png'
+			
+		}},
+		$.contextMenu.separator,
+		{"New File": {
+			onclick: function () { window.open("/cms/file/new/"+$(this).data("category"),"_self"); },
+			icon: '/images/famicons/page_add.png'
+		}},
 		{"Add Multiple Files": function () { window.open("/cms/file/multi/"+$(this).data("category"),"_self"); }},
-		{"New Link": function () { window.open("/cms/link/new/"+$(this).data("category"),"_self"); }},
-		{"New Folder": function () { window.open("/cms/category/new/"+$(this).data("category"),"_self"); }},
+		{"New Link": {
+			onclick: function () { window.open("/cms/link/new/"+$(this).data("category"),"_self"); },
+			icon: '/images/famicons/link_add.png'
+		}},
+		{"New Folder": {
+			onclick: function () { window.open("/cms/category/new/"+$(this).data("category"),"_self"); },
+			icon: '/images/famicons/folder_add.png'
+		}},
 		$.contextMenu.separator,
 		{"Properties": function () { 
 			var _file = $(this).find(".file"), ajaxURL;
@@ -69,18 +92,52 @@ $(document).ready(function() {
 	
 	// define folder context menu
 	var folderMenu = [
-		{"View Homepage": function () { window.open("/homepage/"+$(this).attr("id").substring(5),"_self"); }},
-		{"Image Gallery": function () { window.open("/cms/imageGallery/"+$(this).attr("id").substring(5),"_self"); }},
+		{"View Homepage": {
+			onclick: function () { window.open("/homepage/"+$(this).attr("id").substring(5),"_self"); },
+			icon: '/images/famicons/house.png'
+		}},
+		{"Image Gallery": {
+			onclick: function () { window.open("/cms/imageGallery/"+$(this).attr("id").substring(5),"_self"); },
+			icon: '/images/famicons/images.png'
+		}},
 		$.contextMenu.separator,
-		{"Modify": function () { window.open("/cms/category/"+$(this).attr("id").substring(5),"_self"); }},
-		{"Delete": function () { if (confirm("Delete this folder?")) window.open("/cms/modFolder.php?delete="+$(this).attr("id").substring(5),"_self"); }},
+		{"Modify": { 
+			onclick: function () { window.open("/cms/category/"+$(this).attr("id").substring(5),"_self"); },
+			icon: '/images/famicons/folder_edit.png'
+		}},
+		{"Delete": {
+			onclick: function () { 
+				var _name = $(this).find(".folder").text();
+				if (confirm("Are you sure you want to delete "+_name+"?")) window.open("/cms/categoryForm.php?delete="+$(this).attr("id").substring(5),"_self"); 
+			},
+			icon: '/images/famicons/folder_delete.png'
+		}},
+		{"Delete All": {
+			onclick: function () { 
+				var _name = $(this).find(".folder").text();
+				if (confirm("Are you sure you want to delete "+_name+" and all its contents?")) window.open("/cms/categoryForm.php?deleteAll="+$(this).attr("id").substring(5),"_self"); 
+			}
+			
+		}},
 		$.contextMenu.separator,
-		{"New File": function () { window.open("/cms/file/new/"+$(this).attr("id").substring(5),"_self"); }},
+		{"New File": {
+			onclick: function () { window.open("/cms/file/new/"+$(this).attr("id").substring(5),"_self"); },
+			icon: '/images/famicons/page_add.png'
+		}},
 		{"Add Multiple Files": function () { window.open("/cms/file/multi/"+$(this).attr("id").substring(5),"_self"); }},
-		{"New Link": function () { window.open("/cms/link/new/"+$(this).attr("id").substring(5),"_self"); }},
-		{"New Folder": function () { window.open("/cms/category/new/"+$(this).attr("id").substring(5),"_self"); }},
+		{"New Link": {
+			onclick: function () { window.open("/cms/link/new/"+$(this).attr("id").substring(5),"_self"); },
+			icon: '/images/famicons/link_add.png'
+		}},
+		{"New Folder": {
+			onclick: function () { window.open("/cms/category/new/"+$(this).attr("id").substring(5),"_self"); },
+			icon: '/images/famicons/folder_add.png'
+		}},
 		$.contextMenu.separator,
-		{"Download": function () { window.open("/cms/fetchFolder.php?folder="+$(this).attr("id").substring(5),"_self"); }},
+		{"Download": {
+			onclick: function () { window.open("/cms/fetchFolder.php?folder="+$(this).attr("id").substring(5),"_self"); },
+			icon: '/images/famicons/page_white_compressed.png'
+		}},
 	];
 
 
@@ -88,27 +145,34 @@ $(document).ready(function() {
 	if ($(node).hasClass("folder")) {
 		
 		$($(node).parents("tr")[0]).contextMenu(folderMenu, {
+			theme: 'vista',
 			beforeShow: function () {
 				if ($(this.target).hasClass("homepage") == 0)
 					$($(this.menu).find('.context-menu-item')[0]).toggleClass("context-menu-item-disabled", true); 
 
-				if ($(this.target).hasClass("write") == 0) {
+				if ($(this.target).hasClass("write") == 0 && $(this.target).hasClass("full") == 0) {
 					// disable from modify onwards
-					for (var i = 2; i <= 8; i++)
+					for (var i = 2; i <= 9; i++)
 						$($(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
 				}
+				
+				// disable delete all
+				if ($(this.target).hasClass("full") == 0)
+					$($(this.menu).find('.context-menu-item')[4]).toggleClass("context-menu-item-disabled", true); 
+				
 			}
 		});
 	}
 	else if ($(node).hasClass("file")) {
 		$($(node).parents("tr")[0]).contextMenu(fileMenu, {
+			theme: 'vista',
 			beforeShow: function () {
 				var _file = $(this.target).find(".file");
 				
 				if (_file.hasClass("link"))
 					$($(this.menu).find('.context-menu-item')[1]).toggleClass("context-menu-item-disabled", true); 
 
-				if (_file.hasClass("write") == 0) {
+				if (_file.hasClass("write") == 0 && _file.hasClass("full") == 0) {
 					// disable from modify to new folder
 					for (var i = 2; i <= 7; i++)
 						$($(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
@@ -173,14 +237,14 @@ $(document).ready(function() {
       <table id="file-list">
         <thead>
         <th>Name</th>
-          <th>Size</th>
+          <th>Owner</th>
           <th>Modified</th>
           </thead>
         <tbody>
           <!-- BEGIN file_list -->
           <tr id="{TYPE}-{FILE_ID}" class="category-{CATEGORY_ID}">
             <td><span class="file ui-draggable {CLASS}">{FILE_NAME}</span></td>
-            <td>{FILE_SIZE}</td>
+            <td>{FILE_OWNER}</td>
             <td>{FILE_MODIFIED}</td>
           </tr>
           <!-- END file_list -->

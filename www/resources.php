@@ -85,7 +85,10 @@ if (is_array($categoryList)) {
 			$category['template'] > 0 ? $class[] = "homepage" : null;
 			
 			// write access
-			$permission[$category['id']] >= WRITE_ACCESS ? $class[] = "write" : null;
+			$permission[$category['id']] == WRITE_ACCESS ? $class[] = "write" : null;
+			
+			// write access
+			$permission[$category['id']] == FULL_ACCESS ? $class[] = "full" : null;
 			
 			$output = array('CATEGORY_ID'		=> $category['id'],
 							'CATEGORY_NAME'		=> scrubText($category['name']),
@@ -95,7 +98,8 @@ if (is_array($categoryList)) {
 			$this->parse('category_list_block', 'category_list', true);
 		}
 	}
-}
+} else
+	$this->setVar('category_list_block', '');
 
 // output files, column 2
 $fileList = $fileHandler->mergeLinks( $fileHandler->getAllInCategory($openCategory), $linkHandler->getAllInCategory($openCategory));
@@ -122,6 +126,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 						'TYPE'			=> $file['url'] ? 'link' : 'file',
 						'FILE_NAME' 	=> scrubText($file['description']),
 						'FILE_MODIFIED'	=> outputDate(DATE_short_format, $file['submitted']),
+						'FILE_OWNER'	=> formatName($file),
 						'FILE_SIZE'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
 						'CATEGORY_ID'	=> $file['category'],
 						'CLASS'			=> implode(" ", $class),

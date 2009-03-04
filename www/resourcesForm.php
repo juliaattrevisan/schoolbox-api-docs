@@ -18,11 +18,14 @@ if (is_numeric($_POST['folders'])) {
 	$output = array();
 	if (is_array($categoryList)) {
 		foreach ($categoryList as $category) {
+			$permission = $groupHandler->getPermission($category['id']);
 			$children = (int)$categoryHandler->hasChildren($category['id']);
 			$output[] = array('id'			=> $category['id'],
 							  'name'		=> scrubText($category['name']),
 							  'parent'		=> $category['parent'],
 							  'children'	=> $children,
+							  'write'		=> $permission == WRITE_ACCESS ? 'true' : 'false',
+							  'full'		=> $permission == FULL_ACCESS ? 'true' : 'false',
 							  );
 		}
 	}
@@ -44,10 +47,13 @@ elseif (is_numeric($_POST['files'])) {
 							  'name'		=> scrubText($file['description']),
 							  'category'	=> $file['category'],
 							  'modified'	=> outputDate(DATE_short_format, $file['submitted']),
-							  'size'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
+							//'size'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
+							  'owner'		=> formatName($file),
 							  'icon'		=> !empty($file['iconFile']) ? substr($file["iconFile"], 0, strpos($file["iconFile"], ".")) : "textfile",
 							  'link'		=> isset($file['url']) ? 'true' : 'false',
-							  'write'		=> $permission >= WRITE_ACCESS ? 'true' : 'false',
+							  'hidden'		=> $file['hidden'] ? 'true' : 'false',
+							  'write'		=> $permission == WRITE_ACCESS ? 'true' : 'false',
+							  'full'		=> $permission == FULL_ACCESS ? 'true' : 'false',
 							  );
 		}
 	}

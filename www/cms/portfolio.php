@@ -76,7 +76,8 @@ if (is_array($folderList)) {
 		$this->setVar($output);
 		$this->parse('folder_list_block', 'folder_list', true);
 	}
-}
+} else
+	$this->setVar('folder_list_block', '');
 
 // output files, column 2
 $fileList = $fileHandler->getAllInFolder($openFolder);

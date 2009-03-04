@@ -66,6 +66,8 @@
 
 .treeTable span.folder, .treeTable span.top {
   background-image: url(/images/mime/folder_blue_full.png);
+ 
+  white-space: nowrap;
 }
 
 .treeTable span.hidden {
