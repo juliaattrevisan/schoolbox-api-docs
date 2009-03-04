@@ -78,15 +78,19 @@ class Homepage {
 		
 		require_once dirname(__FILE__) . '/wiki.php';
 		$wikiHandler = new Wiki;
-		$pollHandler->homepageClean($this->cid);
+		$wikiHandler->homepageClean($this->cid);
 		
 		require_once dirname(__FILE__) . '/poll.php';
 		$pollHandler = new Poll;
 		$pollHandler->homepageClean($this->cid);
 		
 		require_once dirname(__FILE__) . '/dropbox.php';
-		$pollHandler = new Dropbox;
-		$pollHandler->homepageClean($this->cid);
+		$dboxHandler = new Dropbox;
+		$dboxHandler->homepageClean($this->cid);
+		
+		require_once dirname(__FILE__) . '/submission-box.php';
+		$submissionBoxHandler = new SubmissionBox;
+		$submissionBoxHandler->homepageClean($this->cid);
 		
 		
 	}

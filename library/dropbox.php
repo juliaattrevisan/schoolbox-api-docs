@@ -141,8 +141,8 @@ class Dropbox
 	
 		$query = "SELECT id FROM dropbox WHERE category = '$cid'";
 		$result = $this->db->query($query);
-	
-		while($row = $this->getNextArray($result) ) {
+		
+		while($row = $this->db->getNextArray($result) ) {
 			$this->deleteFile($row['id']);
 		}
 	

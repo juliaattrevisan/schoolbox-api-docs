@@ -23,37 +23,57 @@ if ($_POST['name']) {
 		$category['id'] = $_POST['categoryID'];
 		$categoryHandler->update($category);
 	}
-	else
-		$categoryHandler->create($category);
-	
+	else {
+		$categoryID = $categoryHandler->create($category);
+		
+		if($_POST['groupcheck']) {
+			/* Setup group and forward to group management page */
+			$groupHandler->createGroup($categoryID);
+			$groupHandler->addUser($categoryID, $_SESSION['id'], 3);
+			localRedir('/group/modify/'.$categoryID);
+		}
+	}
 	$page->backToTheFuture(2);		
 	
 }
 else if(is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
 	
 	/* Move link from one category to another, after checking permission on both from and to categories */
-	if(!$category = $categoryHandler->getByID($_POST['move']))
+	if ($_POST['move'] == $_POST['categoryID'] || !$category = $categoryHandler->getByID($_POST['move']) ) {
 		echo "Failed";
+		exit;
+	}
 
-	if ($groupHandler->getPermission($_POST['move']) < WRITE_ACCESS)
+	if ($groupHandler->getPermission($_POST['move']) < WRITE_ACCESS  || $groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
 		echo "Insufficient permssions";
-
-	if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS)
-		echo "Insufficient permssions";
+		exit;
+	}	
 	
 	$categoryHandler->update(array('id'=>$_POST['move'], 'parent'=> $_POST['categoryID']));
 
 }
-elseif ($_GET['delete']) {
+elseif (is_numeric($_GET['delete'])) {
 
-	if($category = $categoryHandler->getByID($_GET['delete']))
+	if(!$category = $categoryHandler->getByID($_GET['delete']))
 		error(2);
 		
 	if ($groupHandler->getPermission($file['cid']) < WRITE_ACCESS)
 		error(6);
 	
 	$categoryHandler->delete($_GET['delete']);
+	$_SESSION['resourcesID'] = $category['parent'];
 	$page->backToTheFuture(1);
 }
+elseif (is_numeric($_GET['deleteAll'])) {
+
+	if(!$category = $categoryHandler->getByID($_GET['deleteAll']))
+		error(2);
+			
+	$categoryHandler->recursiveDelete($_GET['deleteAll']);
+	$_SESSION['resourcesID'] = $category['parent'];
+	$page->backToTheFuture(1);
+}
+else
+	error(2);
 
 ?>

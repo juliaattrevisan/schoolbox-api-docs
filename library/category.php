@@ -1,7 +1,6 @@
 <?php
 
 require_once dirname(__FILE__) . '/../include/model.php';
-require_once dirname(__FILE__) . '/homepage-template.php';
 
 class Category extends Model {
 
@@ -215,7 +214,7 @@ class Category extends Model {
 	}
 
 	function create($data) {
-	
+			
 		$group = $data['group'];
 		unset($data['group']);
 		
@@ -230,8 +229,9 @@ class Category extends Model {
 		
 		/* Setup homepage template */
 		if($data['template']) {
+			require_once dirname(__FILE__) . '/homepage-template.php';
 			$templateHandler = new HomepageTemplate;
-			$templateHandler->createTemplate($data['id'], $template);
+			$templateHandler->createTemplate($data['id'], $data['template']);
 		}
 		else
 			unset($data['template']);
@@ -262,17 +262,17 @@ class Category extends Model {
 	
 		/* Setup homepage template */
 		if($data['template']) {
+			require_once dirname(__FILE__) . '/homepage-template.php';
 			$templateHandler = new HomepageTemplate;
-			$templateHandler->createTemplate($data['id'], $template);
+			$templateHandler->createTemplate($data['id'], $data['template']);
 		}
 		else
 			unset($data['template']);
-			
-		parent::update($data);
 		
 		/* Insert synergetic subject code */
 		$this->db->delete('categoryCode', 'categoryID', $data['id']);
 		$codeList = explode(",", $data['code']);
+		unset($data['code']);
 		if (is_array($codeList)) {
 			$codeList = array_map('trim',$codeList);
 			$codeList = array_unique($codeList);
@@ -281,6 +281,9 @@ class Category extends Model {
 					$this->db->insert('categoryCode', array('categoryID' => $data['id'], 'code' => $code));
 			}
 		}
+		
+		parent::update($data);
+		
 		$this->logAction($data[$this->_index], 'modify');
 	}
 	
@@ -296,18 +299,25 @@ class Category extends Model {
 		require_once dirname(__FILE__) . '/homepage.php';
 		$homepageHandler = new Homepage($categoryID);
 		$homepageHandler->deleteHomepage();
-	
-		require_once dirname(__FILE__) . '/submission-box.php';
-		$submissionBoxHandler = new SubmissionBox;
-		$submissionBoxHandler->cleanHomepage($categoryID);
+		
+		/* Delete group */
+		require_once dirname(__FILE__) . '/group.php';
+		$groupHandler = new Group();
+		$groupHandler->disbandGroup($categoryID);
 		
 		$this->logAction($categoryID, 'delete');
 	}
 
 	function recursiveDelete($categoryID) {
-	
+
 		require_once dirname(__FILE__) . '/file.php';
 		require_once dirname(__FILE__) . '/link.php';
+		require_once dirname(__FILE__) . '/group.php';
+		
+		$groupHandler = new Group;
+		
+		if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS)
+			error(6);
 		
 		$childList = $this->getCategoryList($categoryID);
 		

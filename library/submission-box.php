@@ -1,6 +1,6 @@
 <?php
 
-require_once '../include/model.php';
+require_once dirname(__FILE__) . '/../include/model.php';
 
 class SubmissionBox extends Model {
 

@@ -44,8 +44,8 @@ class Wiki extends Model {
 		return $this->db->getAll($query);
 	}
 
-	function cleanHomepage($cid) {
-		$query = "DELETE FROM  `".$this->_table."` w, revision r WHERE w.wikiID=r.wikiID AND categoryID='$cid'";
+	function homepageClean($cid) {
+		$query = "DELETE w, r FROM  `".$this->_table."` w, revision r  WHERE w.wikiID=r.wikiID AND categoryID='$cid'";
 		$this->db->query($query);
 	}
 	

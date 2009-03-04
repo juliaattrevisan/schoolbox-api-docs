@@ -83,7 +83,7 @@ if(is_numeric($this->arg[0])) {
 	array_unshift($categoryTree, array('CAT_ID' => 0, 'CAT_NAME' => 'Top Level'));
 	$this->dropDown('parent_list', $categoryTree, $this->arg[1]);
 
-	$templateList = $categoryHandler->getTemplateList();
+	$templateList = $homeTemplateHandler->getTemplateListDropDown();
 	array_unshift($templateList, array('TEMPLATE_ID' => 0, 'TEMPLATE_NAME' => 'No Homepage'));
 	$this->dropDown('template_list', $templateList);	
 
@@ -92,7 +92,7 @@ if(is_numeric($this->arg[0])) {
 		foreach ($groupPermList as $group) {
 			$output = array('GROUP_NAME'		=> scrubText($group['name']),
 							'GROUP_ID'			=> $group['id'],
-							'PERM_0_SELECTED'	=> '',
+							'PERM_0_SELECTED'	=> 'checked="checked"',
 							'PERM_1_SELECTED'	=> '',
 							'PERM_2_SELECTED'	=> '',
 							);
