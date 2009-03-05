@@ -600,32 +600,7 @@ ul.tree li.icon a {
 	font-size: 80%;
 	font-style: normal;
 	}
-/*--------------------------------------------------------------
- Calander styles 
---------------------------------------------------------------*/
-#calendar table {
-	width: 100%;
-	}
-#calendar table.calendarTable {
-	width: auto;
-	border: 2px solid #003E7E;
-	}
-#calendar table.calendarTable td,
-#calendar table.calendarTable tr {
-	border-top: 1px solid #ccc;
-	border-left: 1px solid #ccc;
-	}
-#calendar h2 {
-	background: 0;
-	color: #003E7E;
-	border-bottom: 1px solid #666;
-	text-indent: 0;
-	}
-.header_option {
-	float:right;
-	margin:-21px 0 0 0;
-	padding:0;
-	}
+
 /*--------------------------------------------------------------
  Miscellaneous styles 
 --------------------------------------------------------------*/
