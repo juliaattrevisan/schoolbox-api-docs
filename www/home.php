@@ -24,7 +24,8 @@ else
 	$greeting =  "Good Evening";
 
 //set greeting
-$this->setVar("GREETING", $greeting .' '. formatName($_SESSION));
+$this->setVar('GREETING', $greeting);
+$this->setVar('NAME', formatName($_SESSION));
 
 //fetch layout for user
 $query = "SELECT position, name, filename, function 

@@ -7,3 +7,5 @@ UPDATE homepage_comp_location SET component = 26 WHERE component = 27;
 UPDATE homepage_comp_location SET component = 28 WHERE component = 29;
 
 UPDATE homepage_comp SET invisible='true' WHERE id IN(6,7,11,12,22,27,29);
+
+UPDATE file SET modified = submitted

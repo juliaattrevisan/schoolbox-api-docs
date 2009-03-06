@@ -540,21 +540,22 @@ class SitePage extends Page {
 
 	function __outputMenu($list, $level)
 	{
-		if($level == 1)
-			$text = "\n<ul  id=\"udm\" class=\"udm\">\n";
-		else
-			$text = "<ul class=\"ormondMenu\">\n";
+
+		$text = "<ul>\n";
 		
 		for($i=0; $list[$i]; $i++)
 		{
 			if($list[$i]['target'])
 				$target = " target={$list[$i]['target']}";
 			else $target = '';
-				
-			$text .= '<li class="ormondMenuItem"><a href="'.$list[$i]['url'].'"'.$target.'>'.$list[$i]['txt'].'</a>';
-			if(is_array($list[$i]['children']))
-				$text .= $this->__outputMenu($list[$i]['children'], ($level + 1));
 			
+			if(is_array($list[$i]['children'])) {
+				$text .= '<li class="parent"><a href="'.$list[$i]['url'].'"'.$target.'><span>'.$list[$i]['txt'].'</span></a>';
+				$text .= $this->__outputMenu($list[$i]['children'], ($level + 1));
+			}
+			else 
+				$text .= '<li><a href="'.$list[$i]['url'].'"'.$target.'><span>'.$list[$i]['txt'].'</span></a>';
+				
 			$text .= "</li>\n";
 		}
 		$text .= "</ul>\n";
