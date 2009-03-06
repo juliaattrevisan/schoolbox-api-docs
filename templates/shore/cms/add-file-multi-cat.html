@@ -32,7 +32,7 @@ function clearBrowse(obj, id) {
   <table>
     <!-- BEGIN browse -->
     <tr>
-      <td class="formLabelWidth"><h2>File</h2>
+      <td class="formLabelWidth"><h3>File</h3>
         <em>Browse your local disk for a file or upload from your 'my files'.</em></td>
       <td><input type="file" name="file"  id="browse" onchange="clearBrowse(this, 'myfile');" />
         <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
@@ -53,24 +53,24 @@ function clearBrowse(obj, id) {
     </tr>
     <!-- END browse -->
     <tr>
-      <td><h2>Description</h2>
+      <td><h3>Description</h3>
         <em>One line description of the file for use as the title</em> </td>
       <td ><input type="text" name="description" maxlength="250" size="40" value="" />
       </td>
     </tr>
     <tr>
-      <td><h2>Comments</h2>
+      <td><h3>Comments</h3>
         <em>Any further details you wish to make about the file, useful for enhancing search results</em></td>
       <td><textarea name="comment" cols="40" rows="4"></textarea>
       </td>
     </tr>
     <tr>
-      <td><h2>Hidden</h2>
+      <td><h3>Hidden</h3>
         <em>Hide this file from students.</em></td>
       <td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
     </tr>
     <tr>
-      <td><h2>Location</h2>
+      <td><h3>Location</h3>
         <em>Select the locations where this file should be placed</em></td>
       <td><!-- BEGIN category_list -->
         <input type="checkbox" name="category[]" value="{CATEGORY_ID}">

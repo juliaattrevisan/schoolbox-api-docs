@@ -1,7 +1,7 @@
 <h1>School Directory</h1>
 <table class="indent">
   <tr>
-    <td colspan="6"><h2>Personal Information</h2></td>
+    <td colspan="6"><h3>Personal Information</h3></td>
     <td>&nbsp;</td>
   </tr>
   <tr>
@@ -16,77 +16,131 @@
   </tr>
   <!-- BEGIN student_synergy_form -->
   <tr>
-    <td><strong>Room/Phone</strong></td>
-    <td>{FORM_DESCRIPTION}</td>
-    <td><strong>Study/Phone</strong></td>
-    <td>{LOCKER}</td>
-  </tr>
-  <tr>
-    <td><strong>Ormond Year</strong></td>
-    <td>{HOUSE}</td>
-    <td><strong>Uni Year</strong></td>
-    <td>{YEAR_LEVEL}</td>
-  </tr>
-  <tr>
-    <td><strong>Birthdate</strong></td>
+    <td><strong>Date of Birth</strong></td>
     <td colspan="2">{BIRTHDATE}</td>
-  </tr>
-  <!-- END student_synergy_form -->
-  <!-- BEGIN student_synergy_tutor -->
-  <tr>
-    <td><strong>Room/Phone</strong></td>
-    <td>{FORM_DESCRIPTION}</td>
-    <td><strong>Study/Phone</strong></td>
-    <td>{LOCKER}</td>
+    <td><strong>Year Level</strong></td>
+    <td colspan="2">{YEAR_LEVEL}</td>
   </tr>
   <tr>
-    <td><strong>Ormond Year</strong></td>
-    <td>{HOUSE}</td>
-    <td><strong>Uni Year</strong></td>
-    <td>{YEAR_LEVEL}</td>
+    <td><strong>House</strong></td>
+    <td colspan="2">{HOUSE}</td>
+    <td><strong>Class</strong></td>
+    <td colspan="2">{FORM}</td>
   </tr>
   <tr>
-    <td><strong>Birthdate</strong></td>
+    <td>&nbsp;</td>
+    <td colspan="2">&nbsp;</td>
+    <td><strong>Class Teacher</strong></td>
+    <td colspan="2">{FORM_STAFF}</td>
+  </tr>
+  <tr>
+    <!-- END student_synergy_form -->
+    <!-- BEGIN student_synergy_tutor -->
+  <tr>
+    <td><strong>Date of Birth</strong></td>
     <td colspan="2">{BIRTHDATE}</td>
+    <td><strong>Year Level</strong></td>
+    <td colspan="2">{YEAR_LEVEL}</td>
+  </tr>
+  <tr>
+    <td><strong>House</strong></td>
+    <td colspan="2">{HOUSE}</td>
+    <td><strong>Tutor Group</strong></td>
+    <td colspan="2">{TUTOR_GROUP}</td>
+  </tr>
+  <tr>
+    <td><strong>Head of House</strong></td>
+    <td colspan="2">{HOH}</td>
+    <td><strong>Tutor</strong></td>
+    <td colspan="2">{TUTOR}</td>
   </tr>
   <!-- END student_synergy_tutor -->
   <!-- BEGIN medical -->
+  <tr>
+    <td><strong>Medical Note</strong></td>
+    <td colspan="5"><img src="/images/famicons/exclamation.png" title="important"/> {MEDICAL_NOTE}</td>
+  </tr>
   <!-- END medical -->
   <!-- BEGIN group_management -->
   <tr>
-    <td colspan="6"><h2>Group Management</h2></td>
+  <td colspan="6"><h3>Group Management</h3></td>
   </tr>
-  <td><strong>Add User To Group</strong></td>
-    <td colspan="5"><form action="/group/modUserGroup.php" method="GET">
-        <select name="sid">
-          <!-- BEGIN group -->
-          <option value="{GROUP_ID}">{GROUP_NAME}</option>
-          <!-- END group -->
-        </select>
-        <input type="hidden" name="uid" value="{ID}" />
-        <input type="hidden" name="service" value="{HOMEPAGE_SERVICE}" />
-        <input type="submit" name="submit" value="Add User" class="btn" />
-      </form></td>
+  <td><strong>Add User To Group</strong></td><td colspan="5">
+  <form action="/group/modUserGroup.php" method="GET">
+  <select name="sid">
+  	<!-- BEGIN group -->
+	<option value="{GROUP_ID}">{GROUP_NAME}</option>
+    <!-- END group -->  
+  </select>
+  <input type="hidden" name="uid" value="{ID}" />
+  <input type="hidden" name="service" value="{HOMEPAGE_SERVICE}" />
+  <input type="submit" name="submit" value="Add User" class="btn" />
+  </form>
+  </td>
   </tr>
   <!-- END group_management -->
   <tr>
     <td colspan="6"><h2>School Information</h2></td>
   </tr>
   <tr>
-    <td colspan="6"><!-- BEGIN school_links -->
-      <!-- END school_links -->
-      <ul>
-        <!-- BEGIN timetable_link -->
-        <!-- END timetable_link -->
-        <!-- BEGIN due_work -->
-        <!-- END due_work -->
-        <!-- BEGIN helpdesk -->
-        <li><a href="/modules/helpdesk/index.php?id={ID}">Helpdesk Jobs</a></li>
-        <!-- END helpdesk -->
-      </ul></td>
+    <td colspan="6"><!-- BEGIN school_links --><!-- END school_links -->
+             <ul>
+              <!-- BEGIN timetable_link -->
+              <li><a href="/timetable/{SYNERGY_ID}">Timetable</a></li>
+              <!-- END timetable_link -->
+              <!-- BEGIN due_work -->
+              <li><a href="/submission/dueWork.php?id={ID}">Due Work</a></li>
+              <!-- END due_work -->
+              <!-- BEGIN helpdesk -->
+              <li><a href="/modules/helpdesk/index.php?id={ID}">Helpdesk Jobs</a></li>
+              <!-- END helpdesk -->
+            </ul></td>
+
   </tr>
   <!-- BEGIN contact_synergy -->
+  <tr>
+    <td colspan="6"><h2>Emergency Contact</h2>
       <!-- BEGIN edit_emergency -->
       <!-- END edit_emergency -->
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Name</strong></td>
+    <td>{EMERGENCY_NAME}</td>
+    <td><strong>Phone </strong></td>
+    <td>{EMERGENCY_PHONE}</td>
+    <td><strong>Alt. Phone </strong></td>
+    <td>{EMERGENCY_ALT_PHONE}</td>
+  </tr>
+  <tr>
+    <td colspan="6"><h2>Primary Contact </h2>
+      <!-- BEGIN edit_emergency -->
+      <!-- END edit_emergency -->
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Name</strong></td>
+    <td>{CONTACT_NAME_EMAIL}</td>
+    <td><strong>Mobile</strong></td>
+    <td>{CONTACT_MOBILE_PHONE}</td>
+    <td><strong>Work</strong></td>
+    <td>{CONTACT_OCCUP_PHONE}</td>
+  </tr>
+  <tr>
+    <td><strong>Name</strong></td>
+    <td>{SPOUSE_NAME_EMAIL}</td>
+    <td><strong>Mobile</strong></td>
+    <td>{SPOUSE_MOBILE_PHONE}</td>
+    <td><strong>Work</strong></td>
+    <td>{SPOUSE_OCCUP_PHONE}</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>Address</strong></td>
+    <td rowspan="2" valign="top">{CONTACT_ADDRESS}</td>
+    <td rowspan="2" valign="top"><strong>Home Phone </strong></td>
+    <td valign="top">{CONTACT_HOME_PHONE}</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
   <!-- END contact_synergy -->
 </table>

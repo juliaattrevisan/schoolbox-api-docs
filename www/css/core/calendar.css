@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------
  Calander styles 
 --------------------------------------------------------------*/
-.calTableSelected { font-weight: bold; }
+.calTableSelected { font-weight: bold; background: #ccc; }
 #calendar table {
 	width: 100%;
 	border-collapse: separate;
@@ -32,6 +32,7 @@
 	}
 .header_option {
 	float:right;
+	margin-top: 7px;
 	}
 #month-view {
 	border-top: 1px dotted #cccccc;

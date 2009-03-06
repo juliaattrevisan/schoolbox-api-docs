@@ -159,7 +159,7 @@ th      { font-weight:bold; }
 	}
 #logo {
 	position: absolute;
-	top: 10px;
+	top: 14px;
 	left: 20px;
 	}
 #search {
@@ -257,6 +257,7 @@ Side Nav styles
 	left: 0;
 	width: 180px;
 	text-align: left;
+	z-index: 1;
 	}
 #nav h3 {
 	font-weight: bold;
@@ -575,6 +576,13 @@ ul.tree li.icon a {
 /*--------------------------------------------------------------
  Form styles 
 --------------------------------------------------------------*/
+.standardForm {
+	border: 1px solid #CCCCCC;
+	background: #eee;
+	padding: 10px;
+	float: left;
+	width: 759px;
+	}
 .standardForm table {
 	width: 100%;
 	}
@@ -583,7 +591,7 @@ ul.tree li.icon a {
 	}
 .standardForm td {
 	vertical-align: top;
-	padding: 20px;
+	padding: 10px;
 	}
 .standardForm td td {
 	padding: 0;

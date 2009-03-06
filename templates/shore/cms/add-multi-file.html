@@ -9,24 +9,24 @@
 <form method="post" enctype="multipart/form-data" id="fileForm" class="standardForm" onsubmit="return multi_selector.check();" action="/cms/fileForm.php">
     <table>
     <tr>
-      <td class="formLabelWidth"><h2>Location</h2>
+      <td class="formLabelWidth"><h3>Location</h3>
         <em>These files will be located in this folder</em></td>
       <td>{CATEGORY_NAME}<input name="category" value="{CATEGORY_ID}" type="hidden" /></td>
     </tr>
         <tr>
-      <td><h2>Hidden</h2>
+      <td><h3>Hidden</h3>
         <em>Hide these files from students.</em></td>
       <td><input type='checkbox' name='hidden' value='1' /></td>
     </tr>
         <tr>
-        <td><h2>Files</h2>
+        <td><h3>Files</h3>
         <em>Each file must have a description and location, a new row will appear when these requirements are met</em></td>
         <td>
             <table>
             <thead>
             <tr>
-                <td><h2>Description</h2></td>
-                <td><h2>Location</h2></td>
+                <td><h3>Description</h3></td>
+                <td><h3>Location</h3></td>
                 <td></td>
             </tr>
             </thead>

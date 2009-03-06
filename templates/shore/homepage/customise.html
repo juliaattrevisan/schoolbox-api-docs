@@ -5,14 +5,26 @@
 <script type="text/javascript">
 
 	var pickers = [
-		['largeHeadingBackground', '#{large_head_bgcolour}'],
-		['largeHeadingText', '#{large_head_fontcolour}'],
-		['largeTextBackground', '#{large_text_bgcolour}'],
-		['largeTextText', '#{large_text_fontcolour}'],	
+		['left_head_font', '#{left_head_font}'],
+		['left_head_bg', '#{left_head_bg}'],
+		['left_font', '#{left_font}'],
+		['left_bg_primary', '#{left_bg_primary}'],
+		['left_bg_secondary', '#{left_bg_secondary}'],
+		['left_link', '#{left_link}'],
+		['left_hover', '#{left_hover}'],
+		
+		['right_head_font', '#{right_head_font}'],
+		['right_head_bg', '#{right_head_bg}'],
+		['right_font', '#{right_font}'],
+		['right_bg_primary', '#{right_bg_primary}'],
+		['right_bg_secondary', '#{right_bg_secondary}'],
+		['right_link', '#{right_link}'],
+		['right_hover', '#{right_hover}'],
 	];
+
 	window.onload = function(){
 		for(i = 0; i < pickers.length; i++){
-			pickers[i][2] = new MooRainbow(pickers[i][0] + 'Div', pickers[i][0] + 'Input', {
+			pickers[i][2] = new MooRainbow(pickers[i][0] + '_div', pickers[i][0] + '_input', {
 				'id': pickers[i][0] + 'Picker',
 				'imgPath': '/images/mooRainbow/',
 				'onComplete': function(color, object){
@@ -25,15 +37,15 @@
 				}
 			});
 			pickers[i][2].manualSet(pickers[i][1], 'hex');
-			$(pickers[i][0] + 'Div').setStyle('background-color', pickers[i][2].sets.hex);
-			$(pickers[i][0] + 'Input').value = pickers[i][2].sets.hex;
+			$(pickers[i][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
+			$(pickers[i][0] + '_input').value = pickers[i][2].sets.hex;
 		};
 	}
 	
 	function removeClasses() {
 		var x = $$('.layouts a');
 		x.each(function(l){
-			l.removeClass('current');	
+			l.removeClass('current');
 		});
 		}
 	
@@ -83,35 +95,72 @@
       <div class="box grey">
 			<h2>Colours</h2>
 				<div class="text">
-        
-        	<div class="colours">
-      			<h3>Main</h3>            
-						<div id="bg" class="colorBox"></div>
-						<input id="bgInput" name="colors[bg]" type="hidden" />
-            <p>Background Color</p>
-        	</div>
           
           <div class="colours">
       			<h3>Left Column</h3>
                       
-						<div id="leftPrimaryBg" class="colorBox"></div>
-						<input id="leftPrimaryBgInput" name="colors[leftPrimaryBg]" type="hidden" />
+						<div id="left_bg_primary_div" class="colorBox"></div>
+						<input id="left_bg_primary_input" name="colors[left_bg_primary]" type="hidden" />
             <p>Primary Background Color</p>
             
-            <div id="leftSecondaryBg" class="colorBox"></div>
-						<input id="leftSecondaryBgInput" name="colors[leftSecondaryBg]" type="hidden" />
+            <div id="left_bg_secondary_div" class="colorBox"></div>
+						<input id="left_bg_secondary_input" name="colors[left_bg_secondary]" type="hidden" />
             <p>Secondary Background Color</p>
             
-            <div id="leftFont" class="colorBox"></div>
-						<input id="leftFontInput" name="colors[leftFont]" type="hidden" />
-            <p>Font Color</p>
+            <div id="left_head_font_div" class="colorBox"></div>
+						<input id="left_head_font_input" name="colors[left_head_font]" type="hidden" />
+            <p>Heading Text Colour</p>
             
-            <div id="leftLink" class="colorBox"></div>
-						<input id="leftLinkInput" name="colors[leftLink]" type="hidden" />
-            <p>Link Color</p>
+            <div id="left_head_bg_div" class="colorBox"></div>
+						<input id="left_head_bg_input" name="colors[left_head_bg]" type="hidden" />
+            <p>Heading Background Colour</p>
+            
+            <div id="left_font_div" class="colorBox"></div>
+						<input id="left_font_input" name="colors[left_font]" type="hidden" />
+            <p>Text Colour</p>
+            
+            <div id="left_link_div" class="colorBox"></div>
+						<input id="left_link_input" name="colors[left_link]" type="hidden" />
+            <p>Link Colour</p>
+            
+            <div id="left_hover_div" class="colorBox"></div>
+						<input id="left_hover_input" name="colors[left_hover]" type="hidden" />
+            <p>Link Hover Colour</p>
         	</div>
           
+          <div class="colours">
+      			<h3>Right Column</h3>
+                      
+						<div id="right_bg_primary_div" class="colorBox"></div>
+						<input id="right_bg_primary_input" name="colors[right_bg_primary]" type="hidden" />
+            <p>Primary Background Color</p>
+            
+            <div id="right_bg_secondary_div" class="colorBox"></div>
+						<input id="right_bg_secondary_input" name="colors[right_bg_secondary]" type="hidden" />
+            <p>Secondary Background Color</p>
+            
+            <div id="right_head_font_div" class="colorBox"></div>
+						<input id="right_head_font_input" name="colors[right_head_font]" type="hidden" />
+            <p>Heading Text Colour</p>
+            
+            <div id="right_head_bg_div" class="colorBox"></div>
+						<input id="right_head_bg_input" name="colors[right_head_bg]" type="hidden" />
+            <p>Heading Background Colour</p>
+            
+            <div id="right_font_div" class="colorBox"></div>
+						<input id="right_font_input" name="colors[right_font]" type="hidden" />
+            <p>Text Colour</p>
+            
+            <div id="right_link_div" class="colorBox"></div>
+						<input id="right_link_input" name="colors[right_link]" type="hidden" />
+            <p>Link Colour</p>
+            
+            <div id="right_hover_div" class="colorBox"></div>
+						<input id="right_hover_input" name="colors[right_hover]" type="hidden" />
+            <p>Link Hover Colour</p>
+        	</div>
           
+          <div class="float-fix"></div>
         </div>
       </div>	
 						
@@ -120,5 +169,5 @@
 			<input type="submit" class="float-right" name="Submit" value="Update Page" />
 			</form>
                   
-      </div>
-      </div>
+    </div>
+ </div>

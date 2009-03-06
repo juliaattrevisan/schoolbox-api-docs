@@ -1,7 +1,7 @@
 .colorBox {
 	width: 15px;
 	height: 15px;
-	border: thin solid black;
+	border: 1px solid #000;
 };
 
 /***

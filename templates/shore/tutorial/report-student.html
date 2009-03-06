@@ -1,0 +1,92 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
+<link rel="stylesheet" href="/css/autocompleter.css" type="text/css" />
+<script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
+<script type="text/javascript" src="/javascript/mootools.js"></script>
+<script type="text/javascript" src="/javascript/autocompleter.js"></script>
+<script type="text/javascript" src="/javascript/observer.js"></script>
+<script type="text/javascript">
+window.addEvent('domready', function() {
+	$$('.lookup').each(function (el) {
+		new Autocompleter.Ajax.Json(el, '/ajax/user.php?groupID=3', {
+			minLength: 2,
+			postVar: 'keyword',
+			width: '310px',
+			selectFirst: true,
+			//selectMode: 'type-ahead'
+			selectMode: 'pick'
+		});
+	});
+	
+});
+</script>
+<!-- END custom_head -->
+<h1>Student Report - {STUDENT}</h1>
+<form action="report-student.php" method="get">
+  <table style="width: 650px;">
+    <tr>
+    	<td>Student</td>
+        <td><input class="lookup" type="text" name="keyword" value="{STUDENT}" /></td>
+      <td>From:</td>
+      <td><input name="from" id="from" type="text" size="15" maxlength="10" value="{FROM}"/>
+        <img src="/images/ico_calendar.gif" width="16" height="13" id="from_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+        <script type="text/javascript">
+		Calendar.setup({
+			inputField     :    "from",     // id of the input field
+			ifFormat       :    "%d/%m/%Y",      // format of the input field
+			button         :    "from_trigger",  // trigger for the calendar (button ID)
+			align          :    "br",           // alignment (defaults to "Bl")
+			singleClick    :    true
+		});
+		</script></td>
+      <td>To:</td>
+      <td><input name="to" id="to" type="text" size="15" maxlength="10" value="{TO}"/>
+        <img src="/images/ico_calendar.gif" width="16" height="13" id="to_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+        <script type="text/javascript">
+		Calendar.setup({
+			inputField     :    "to",     // id of the input field
+			ifFormat       :    "%d/%m/%Y",      // format of the input field
+			button         :    "to_trigger",  // trigger for the calendar (button ID)
+			align          :    "br",           // alignment (defaults to "Bl")
+			singleClick    :    true
+		});
+		</script></td>
+      <td><input type="submit" name="submit" value="Report" /></td>
+    </tr>
+  </table>
+</form>
+<!-- BEGIN has_events -->
+<table>
+  <!-- BEGIN class_list -->
+  <tr>
+    <td colspan="7"><h3>{CODE} - {TUTORIAL}</h3></td>
+  </tr>
+  <tr>
+    <th style="width: 20%;">Date</th>
+    <th style="width: 20%;">Start</th>
+    <th style="width: 20%;">Finish</th>
+    <th style="width: 20%;">Hours Missed</th>
+    <th style="width: 20%;">Hours Attended</th>
+  </tr>
+  <!-- BEGIN event_list -->
+  <tr>
+    <td>{DATE}</td>
+    <td>{START}</td>
+    <td>{FINISH}</td>
+   
+    <td style="text-align: right;">{HOURS_MISSED}</td>
+     <td style="text-align: right;">{HOURS_ATTENDED}</td>
+  </tr>
+  <!-- END event_list -->
+  <tr>
+    <td colspan="2" class="bold">Total</td>
+    <td class="bold">{ATTENDANCE}% Attendance</td>
+    
+    <td class="bold" style="text-align: right;">{TOTAL_MISSED}</td>
+    <td class="bold" style="text-align: right;">{TOTAL_ATTENDED}</td>
+  </tr>
+  <!-- END class_list -->
+</table>
+<!-- END has_events -->

@@ -541,9 +541,9 @@ class SitePage extends Page {
 	function __outputMenu($list, $level)
 	{
 		if($level == 1)
-			$text = "\n<ul  id=\"udm\" class=\"udm\">";
+			$text = "\n<ul  id=\"udm\" class=\"udm\">\n";
 		else
-			$text = "<ul class=\"ormondMenu\">";
+			$text = "<ul class=\"ormondMenu\">\n";
 		
 		for($i=0; $list[$i]; $i++)
 		{
@@ -555,7 +555,7 @@ class SitePage extends Page {
 			if(is_array($list[$i]['children']))
 				$text .= $this->__outputMenu($list[$i]['children'], ($level + 1));
 			
-			$text .= "</li>";
+			$text .= "</li>\n";
 		}
 		$text .= "</ul>\n";
 		return $text;

@@ -1,0 +1,82 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript">
+tinyMCE.init({
+	mode : "textareas",
+	theme : "advanced",
+	plugins : "table",
+	content_css : "/css/mgs-tiny.css",
+	theme_advanced_layout_manager : "RowLayout",
+	theme_advanced_containers_default_align : "left",
+	theme_advanced_container_default_class : "mceToolbar",
+	theme_advanced_containers : "row1,row2,mceEditor,mceElementpath",
+	theme_advanced_container_row1_class : "mceToolbarTop",
+	theme_advanced_container_row2_class : "mceToolbarTop",
+	theme_advanced_container_row1 : "bold,italic,underline,separator,bullist,numlist,outdent,indent,separator,sub,sup,separator,link,unlink,charmap,hr,separator,undo,redo",
+	theme_advanced_container_row2 : "forecolor,tablecontrols,separator,removeformat,cleanup,code",
+	extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
+});
+</script>
+<script language="JavaScript" type="text/javascript">
+function verify()
+{
+        var msg = ""
+        if(document.getElementById('mailForm').to.value == ""){
+                msg += "You need to have a recipient\n";
+        }
+        if(msg != ""){
+                alert(msg);
+                return false;
+        }
+        else
+	{
+                return true;
+	}
+}
+</script>
+<script type="text/javascript" src="/javascript/multifile.js"></script>
+<!-- END custom_head -->
+
+<h1>Compose Email</h1>
+<form class="standardForm" action="send.php" method="post" enctype="multipart/form-data" name="mailForm" id="mailForm">
+  <table>
+    <tr>
+      <td><h3>To:</h3></td>
+      <td><input type="text" name="to" size="50" value="{REPLYTO}" />
+        <a href="/search/user/">address book</a></td>
+    </tr>
+    <tr>
+      <td><h3>CC:</h3></td>
+      <td><input type="text" name="cc" size="50" />
+      </td>
+    </tr>
+    <tr>
+      <td><h3>BCC:</h3></td>
+      <td><input type="text" name="bcc" size="50" value="{BCC}" />
+      </td>
+    </tr>
+    <tr>
+      <td><h3>Subject:</h3></td>
+      <td><input type="text" name="subject" size="60" value="{SUBJECT}" /></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td><textarea name="message" style="width:100%;height:350px">{BODY}</textarea></td>
+    </tr>
+    <tr>
+      <td><h3>Attachments:</h3></td>
+      <td><input id="attachment" type="file" name="file[]" />
+        <div id="files_list"></div>
+        <script type="text/javascript">
+						<!-- Create an instance of the multiSelector class, pass it the output target and the max number of files -->
+						var multi_selector = new MultiSelector( document.getElementById( 'files_list' ), 5 );
+						<!-- Pass in the file element -->
+						multi_selector.addElement( document.getElementById( 'attachment' ) );
+						</script></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td><input type="submit" name="submit" value="Send" /></td>
+    </tr>
+  </table>
+</form>

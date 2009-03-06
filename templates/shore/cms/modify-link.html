@@ -25,30 +25,30 @@ function verify()
 <form method="post" id="urlForm" class="standardForm" onSubmit="return(verify());" action="/cms/linkForm.php">
   <table>
     <tr>
-      <td class="formLabelWidth"><h2>URL</h2></td>
+      <td class="formLabelWidth"><h3>URL</h3></td>
       <td><input type="text" name="url" size="40" maxlength="250" value="{URL}" />
       </td>
     </tr>
     <tr>
-      <td><h2>Description</h2>
+      <td><h3>Description</h3>
         <em>One line description of the URL for the title </em> </td>
       <td ><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" />
       </td>
     </tr>
     <tr>
-      <td><h2>Comments</h2>
+      <td><h3>Comments</h3>
         <em>Any further details you wish to make about the URL, useful for enhancing search results</em> </td>
       <td><textarea name="comment" cols="40" rows="4">{COMMENT}</textarea>
       </td>
     </tr>
     <tr>
-      <td><h2>Location</h2>
+      <td><h3>Location</h3>
         <em>The link will be located in this folder</em></td>
       <td>{CATEGORY_NAME}
       <input name="category" value="{CATEGORY_ID}" type="hidden" /></td>
     </tr>
     <tr>
-      <td><h2>Hidden</h2>
+      <td><h3>Hidden</h3>
         <em>Hide this URL from students.</em></td>
       <td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
     </tr>

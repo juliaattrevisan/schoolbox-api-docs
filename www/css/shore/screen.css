@@ -18,9 +18,20 @@ h2 {
 	}
 #nav li a {
 	background: #00376f url(/images/shore/nav-link-bg.gif) repeat-x;
+	padding: 6px 14px 6px 16px;
+	line-height: normal;
+	width: 150px;
 	}
 #nav li a:hover {
-	background: #1965b4;
+	background-color: #1965b4;
+	}
+#nav li.parent > a span {
+	display: block;
+	width: 100%;
+	background: url(/images/shore/nav-arrow.gif) no-repeat 100% 3px;
+	}
+#nav li.parent > a.hover span {
+	background: url(/images/shore/nav-arrow-over.gif) no-repeat 100% 3px;
 	}
 /*---------------------------------------
 	Header Styles
