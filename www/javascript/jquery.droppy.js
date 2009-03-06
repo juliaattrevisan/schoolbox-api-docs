@@ -1,3 +1,4 @@
+(function($) {
 /*
  * Droppy 0.1.2
  * (c) 2008 Jason Frame (jason@onehackoranother.com)
@@ -59,3 +60,4 @@ $.fn.droppy = function(options) {
   });
   
 };
+})(jQuery);

@@ -25,7 +25,7 @@
  * @todo More themes
  * @todo Nested context menus
  */
-;(function($){
+(function($){
 	$.contextMenu = {
 		shadow:true,
 		shadowOffset:0,
