@@ -14,7 +14,8 @@ class File extends Model {
 	
 	function getByID($fileID) {
 		$query = "SELECT f.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName,
-						UNIX_TIMESTAMP(f.submitted) submitted, ft.name typeName, c.name categoryName, c.id cid, af.description as mimeDescription, iconFile, af.inline
+						UNIX_TIMESTAMP(f.submitted) submitted, UNIX_TIMESTAMP(f.modified) modified, 
+						ft.name typeName, c.name categoryName, c.id cid, af.description as mimeDescription, iconFile, af.inline
 				  FROM file f 
 				  LEFT JOIN user u ON u.id = f.owner
 				  LEFT JOIN category c ON c.id = f.category 
@@ -30,7 +31,8 @@ class File extends Model {
 		$groupHandler = new Group;
 
 		$query = "SELECT f.*, u.firstname, u.lastname, u.title, 
-						UNIX_TIMESTAMP(f.submitted) submitted, ft.name typeName, c.name categoryName, af.description as mimeDescription, iconFile, af.inline
+						UNIX_TIMESTAMP(f.submitted) submitted, UNIX_TIMESTAMP(f.modified) modified,
+						ft.name typeName, c.name categoryName, af.description as mimeDescription, iconFile, af.inline
 				  FROM file f 
 				  LEFT JOIN user u ON u.id = f.owner
 				  LEFT JOIN category c ON c.id = f.category 
@@ -86,6 +88,7 @@ class File extends Model {
 	function create($data, $file = '') {
 				
 		$data['submitted'] = 'NOW()';		
+		$data['modified'] = 'NOW()';	
 
 		if(is_file($file['tmp_name']) && is_readable($file['tmp_name']) ) {
 			$data['file_size'] = filesize($file['tmp_name']);
@@ -109,6 +112,8 @@ class File extends Model {
 	}
 	
 	function update($data) {
+	
+		$data['modified'] = 'NOW()';
 		
 		parent::update($data);
 		

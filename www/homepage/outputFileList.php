@@ -3,7 +3,10 @@
 $j =0;
 
 //file output
-$this->setBlock($componentHandle, "files", "files_block");
+$this->setBlock($componentHandle, 'files', 'files_block');
+$this->setBlock('files', 'file_url', 'file_url_block');
+$this->setBlock('files', 'file_no_url', 'file_no_url_block');
+$this->setBlock('files', 'modify_file', 'modify_file_block');
 
 require_once '../library/file.php';
 $fileHandler = new File;
@@ -16,23 +19,38 @@ if (is_array($fileList)) {
 		//set name
 		if($file['realname'] != "") {
 		
-			if($file['inline'] == 'true')
-				$url = "<a href=\"/sendframe.php?id=".$file['id']."\" target=\"_blank\">".scrubTEXT($file['description'])."</a>";
-			else
-				$url = "<a href=\"/send.php?id=".$file['id']."\">".scrubTEXT($file['description'])."</a>";
-
-			$this->setVar("FILE_NAME", $url);
+			if($file['inline'] == 'true') {
+				$this->setVar('FILE_URL', '/sendframe.php?id='.$file['id']);
+				$this->setVar('FILE_TARGET', '_blank');
+			}
+			else {
+				$this->setVar('FILE_URL', '/send.php?id='.$file['id']);
+				$this->setVar('FILE_TARGET', '_blank');
+			}
+			$this->setVar('file_no_url_block', '');
+			$this->parse('file_url_block', 'file_url');
 		}
-		else
-			$this->setVar("FILE_NAME", scrubTEXT($file['description']));
+		else {
+			$this->setVar('file_url_block', '');
+			$this->parse('file_no_url_block', 'file_no_url');
+			
+		}
 		
-		$output = array('FILE_POSTED_BY'	=> formatName($file),
+		$output = array('FILE_NAME'			=> scrubTEXT($file['description']),
+						'FILE_ID'			=> $file['id'],
+						'FILE_MIME_IMAGE'	=> $file['iconFile'],
+						'FILE_POSTED_BY'	=> formatName($file),
 						'FILE_POSTED_BY_ID'	=> $file['owner'],
 						'FILE_POSTED_DATE'	=> outputDate(DATE_short_format, $file['submitted']),
 						'FILE_COMMENT'		=> nl2br(scrubTEXT($file['comment'])),
 						'ON_OFF'			=> ++$j%2? '' : 'dark',
 						);
 		$this->setVar($output);
+		
+		if($permission >= WRITE_ACCESS)
+			$this->parse('modify_file_block', 'modify_file');
+		else
+			$this->setVar('modify_file_block','');
 		
 		$this->parse("files_block", "files", true);
 		

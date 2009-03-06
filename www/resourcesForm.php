@@ -46,7 +46,7 @@ elseif (is_numeric($_POST['files'])) {
 			$output[] = array('id'			=> $file['id'],
 							  'name'		=> scrubText($file['description']),
 							  'category'	=> $file['category'],
-							  'modified'	=> outputDate(DATE_short_format, $file['submitted']),
+							  'modified'	=> outputDate(DATE_short_format, $file['modified']),
 							//'size'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
 							  'owner'		=> formatName($file),
 							  'icon'		=> !empty($file['iconFile']) ? substr($file["iconFile"], 0, strpos($file["iconFile"], ".")) : "textfile",

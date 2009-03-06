@@ -38,8 +38,14 @@
   	<ul>
     	<!-- BEGIN files -->
       <li class="{ON_OFF}">
-      	<h3>{FILE_NAME}</h3>
-        <p class="interact"><a href="#">Download</a></p>
+      	
+        <!-- BEGIN file_url -->
+        <h3><a href="{FILE_URL}" target="{FILE_TARGET}" ><img src="/images/mime/{FILE_MIME_IMAGE}"  />{FILE_NAME}</a></h3>
+        <!-- END file_url -->
+        <!-- BEGIN file_no_url -->
+        <h3>{FILE_NAME}</h3>
+        <!-- END file_no_url -->
+        <p class="interact"><!-- BEGIN modify_file --><a href="/cms/file/{FILE_ID}">Modify</a><!-- END modify_file --></p>
         <p>{FILE_COMMENT}</p>
         <p class="small">Posted by <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a> on {FILE_POSTED_DATE}</p>
         <div class="float-fix"></div>

@@ -1,7 +1,4 @@
 <?php
-//Reset ON_OFF
-$j=0;
-
 //output drop box
 $this->setBlock($componentHandle, "drop_student", "drop_student_block");
 $this->setBlock($componentHandle, "drop_staff", "drop_staff_block");

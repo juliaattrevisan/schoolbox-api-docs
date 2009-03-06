@@ -1,7 +1,4 @@
 <?php
-//reset ON_OFF
-$j=0;
-
 //due output
 $this->setBlock($componentHandle, "duework", "duework_block");
 

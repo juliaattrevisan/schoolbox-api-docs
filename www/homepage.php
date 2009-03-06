@@ -92,7 +92,8 @@ if (is_array($componentList)) {
 		
 		$componentCount++;
 		$componentHandle = $component['name'] . $componentCount;
-
+		$j =0;
+		
 		$this->setFile($componentHandle, 'homepage/components/'.$component['filename']);
 		$this->setBlock($componentHandle, "config", "config_block");
 		

@@ -1,31 +1,35 @@
 <?php
-//Reset ON_OFF
-$j =0;
 //file output
-$this->setBlock($componentHandle, "folders", "folders_block");
+$this->setBlock($componentHandle, 'folders', 'folders_block');
+$this->setBlock('folders', 'homepage_folder', 'homepage_folder_block');
+
 
 $folderList = $categoryHandler->getCategoryList($categoryID, $config);
 if (is_array($folderList)) {
 	$flag = 0;
 	foreach ($folderList as $folder) {
-		$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 		if($groupHandler->getPermission($folder['id']) > DENY_ACCESS)
 		{
 					//set name
-					$this->setVar("FOLDER_NAME", "<a href=\"/resources/".$folder['id']."\">".scrubTEXT($folder['name'])."</a>");
-			
+					$output = array('FOLDER_ID'		=> $folder['id'],
+									'FOLDER_NAME'	=> scrubTEXT($folder['name']),
+									'ON_OFF'		=> ++$j%2? '' : 'dark',
+									);
+					$this->setVar($output);	
+					
 					if($folder['template'])
-						$this->setVar("HOMEPAGE_LINK", "<a href=\"/homepage/".$folder['id']."\">homepage</a>");
+						$this->parse('homepage_folder_block', 'homepage_folder');
 					else
-						$this->setVar("HOMEPAGE_LINK", "");
-			
-					$this->parse("folders_block", "folders", true);
+						$this->setVar('homepage_folder_block', '');
+							
+						
+					$this->parse('folders_block', 'folders', true);
 					$flag = 1;
 		}
 	}
-	if(!$flag) { $this->setVar("folders_block", "");}
+	if(!$flag) { $this->setVar('folders_block', '');}
 } else
-	$this->setVar("folders_block", "");
+	$this->setVar('folders_block', '');
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_folder", "submit_folder_block");

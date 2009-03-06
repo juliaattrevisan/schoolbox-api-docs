@@ -125,7 +125,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 		$output = array('FILE_ID' 	 	=> $file['id'],
 						'TYPE'			=> $file['url'] ? 'link' : 'file',
 						'FILE_NAME' 	=> scrubText($file['description']),
-						'FILE_MODIFIED'	=> outputDate(DATE_short_format, $file['submitted']),
+						'FILE_MODIFIED'	=> outputDate(DATE_short_format, $file['modified']),
 						'FILE_OWNER'	=> formatName($file),
 						'FILE_SIZE'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
 						'CATEGORY_ID'	=> $file['category'],
