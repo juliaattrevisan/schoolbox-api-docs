@@ -38,8 +38,8 @@ class Homepage {
 	
 	function getColorList()
 	{
-		$query = "SELECT large_head_fontcolour, large_head_bgcolour, large_text_fontcolour, large_text_bgcolour, 
-						small_head_fontcolour, small_head_bgcolour, small_text_fontcolour, small_text_bgcolour 
+		$query = "SELECT left_head_font, left_head_bg, left_font, left_bg_primary, left_bg_secondary, left_link, left_hover, 
+						right_head_font, right_head_bg, right_font, right_bg_primary, right_bg_secondary, right_link, right_hover
 						FROM homepage_config WHERE cid = '{$this->cid}'";
 		return $this->db->dbGetSingleRow($query); 
 	}

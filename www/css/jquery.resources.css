@@ -64,9 +64,8 @@
   background-image: url(/images/mime/textfile.png);
 }
 
-.treeTable span.folder, .treeTable span.top {
+.treeTable span.folder, .treeTable span#top {
   background-image: url(/images/mime/folder_blue_full.png);
- 
   white-space: nowrap;
 }
 

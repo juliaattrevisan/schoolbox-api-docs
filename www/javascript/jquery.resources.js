@@ -7,10 +7,11 @@
 
 	$.fn.treeTable = function(opts) {
 		options = $.extend({}, $.fn.treeTable.defaults, opts);
-		addDrop($(".top"));
-		options.addContext($(".top"));
-		addSelect($(".top").parents("tr")[0]);
-		addOpen($(".top").parents("tr")[0]);
+		var topSpan = $("span#top"), topRow = topSpan.parents("tr")[0];
+		addDrop(topSpan);
+		options.addContext(topSpan);
+		addSelect(topRow);
+		addOpen(topRow);
 		jQuery(document.createElement("div")).attr("id", "simpleModal").appendTo(document.body);
 		return this.each(function() {
 			$(this).addClass("treeTable").find("tbody tr").each(function() {
@@ -72,11 +73,6 @@
 		});
 		
 		return this;
-	};
-  
-	$.fn.open = function() {
-		if ($(this).hasClass("selected"))
-			$(this).loadFiles();
 	};
   
 	$.fn.select = function() {
@@ -230,7 +226,7 @@
 		if (_node.hasClass("opened")) {
 
 			// display selected files
-			$("#file-list .category-"+parentID).each(function () {
+			$("#file-list tr.category-"+parentID).each(function () {
 				$(this).show();
 			});   
 			// remember this view

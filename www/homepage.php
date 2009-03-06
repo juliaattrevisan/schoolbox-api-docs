@@ -65,16 +65,9 @@ $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock(TEMPLATE_content, "edit_page", "edit_page_block");
 
 $colours = $homepageHandler->getColorList();
+$this->setVar($colours);
 
-$output = array('LARGE_HEAD_BGCOLOUR'	=> $colours['large_head_bgcolour'],
-				'LARGE_HEAD_FONTCOLOUR'	=> $colours['large_head_fontcolour'],
-				'LARGE_TEXT_BGCOLOUR'	=> $colours['large_text_bgcolour'],
-				'LARGE_TEXT_FONTCOLOUR'	=> $colours['large_text_fontcolour'],
-				'SMALL_HEAD_BGCOLOUR'	=> $colours['small_head_bgcolour'],
-				'SMALL_HEAD_FONTCOLOUR'	=> $colours['small_head_fontcolour'],
-				'SMALL_TEXT_BGCOLOUR'	=> $colours['small_text_bgcolour'],
-				'SMALL_TEXT_FONTCOLOUR'	=> $colours['small_text_fontcolour'],
-				'HEADING'				=> scrubTEXT($category['name']) . (isset($code) ? ' ('.$category['code'].')' : '' ),
+$output = array('HEADING'				=> scrubTEXT($category['name']) . (isset($code) ? ' ('.$category['code'].')' : '' ),
 				'CODE'					=> urlencode(urlencode($category['code'])),
 				'ID'					=> $categoryID,
 				'TEMPLATE'				=> 'template'.$category['template'],
