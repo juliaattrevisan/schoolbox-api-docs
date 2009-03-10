@@ -16,6 +16,10 @@ h2 {
 	border-top: 1px solid #144d88;
 	border-bottom: 1px solid #002c59;
 	}
+#nav li li {
+	border-bottom: 1px solid #0451a3;
+	border-top: 0;
+	}
 #nav li a {
 	background: #00376f url(/images/shore/nav-link-bg.gif) repeat-x;
 	padding: 6px 14px 6px 16px;

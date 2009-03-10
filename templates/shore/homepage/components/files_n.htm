@@ -40,14 +40,14 @@
       <li class="{ON_OFF}">
       	
         <!-- BEGIN file_url -->
-        <h3><a href="{FILE_URL}" target="{FILE_TARGET}" ><img src="/images/mime/{FILE_MIME_IMAGE}"  />{FILE_NAME}</a></h3>
+        <h3 class="icons {FILE_MIME_IMAGE}"><a href="{FILE_URL}" target="{FILE_TARGET}" >{FILE_NAME}</a></h3>
         <!-- END file_url -->
         <!-- BEGIN file_no_url -->
         <h3>{FILE_NAME}</h3>
         <!-- END file_no_url -->
         <p class="interact"><!-- BEGIN modify_file --><a href="/cms/file/{FILE_ID}">Modify</a><!-- END modify_file --></p>
-        <p>{FILE_COMMENT}</p>
-        <p class="small">Posted by <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a> on {FILE_POSTED_DATE}</p>
+        <p class="summ">{FILE_COMMENT}</p>
+        <p class="small summ">Posted by <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a> on {FILE_POSTED_DATE}</p>
         <div class="float-fix"></div>
       </li>
       <!-- END files -->

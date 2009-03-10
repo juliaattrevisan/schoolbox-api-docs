@@ -86,7 +86,7 @@ a:hover { text-decoration: underline; }
 --------------------------------------------------------------*/
 p           { margin: 0 0 1em 0; text-align:left; line-height: 1.5; }
 ul, ol      { margin: 0 0 1.5em 1.5em; line-height: 1.5; }
-hr { color: #ccc; background: #ccc; }
+hr { background-color: #d2d2d2; border: 0; height: 1px; }
 /*--------------------------------------------------------------
  Heading Styles 
 --------------------------------------------------------------*/
@@ -146,7 +146,11 @@ th      { font-weight:bold; }
 .template4 .left {
 	min-width: 229px;
 	width: 29.5%;
-	}	
+	}
+.template2 .right .summ,
+.template4 .left .summ {
+	display: none;
+	}
 /*--------------------------------------------------------------
  Header styles 
 -------------------------------------------------------------*/
@@ -271,7 +275,12 @@ Side Nav styles
 	margin: 0;
 	padding: 0;
 	}
-#nav li {
+#nav li li a {
+	background: #1965b3;
+	}
+#nav li li a:hover {
+	background: #3288df;
+	text-decoration: underline;
 	}
 #nav li a {
 	color: #fff;
@@ -508,6 +517,27 @@ a.layout:hover img {
 .text.poll {
 	text-align: center;
 	}
+.icons {
+	padding-left: 30px;
+	display: block;
+	height: 22px;
+	line-height: 22px;
+	background-repeat: no-repeat;
+	}
+.folder_blue_full {
+	background-image: url(/images/mime/folder_blue_full.png);
+	}
+.house {
+	background-image: url(/images/famicons/house.png);
+	}
+/*--------------------------------------------------------------
+News styles 
+--------------------------------------------------------------*/
+.news-item {
+	background: #eee;
+	padding: 10px 10px 1px;
+	margin-bottom: 1em;
+	}
 /*--------------------------------------------------------------
 Tree styles 
 --------------------------------------------------------------*/
@@ -596,6 +626,9 @@ ul.tree li.icon a {
 .standardForm td td {
 	padding: 0;
 	}
+#deleteForm td {
+	padding: 0.1em;
+	}
 .standardForm tr,
 .standardForm td {
 	border-bottom: 1px solid #ccc;
@@ -608,7 +641,10 @@ ul.tree li.icon a {
 	font-size: 80%;
 	font-style: normal;
 	}
-
+select.small, input.small {
+	width: 100px;
+	}
+input.timeField { width: 30px; }
 /*--------------------------------------------------------------
  Miscellaneous styles 
 --------------------------------------------------------------*/
