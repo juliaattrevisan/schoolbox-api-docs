@@ -11,7 +11,6 @@ $this->setBlock(TEMPLATE_content, 'folder_list', 'folder_list_block');
 $this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 
-$this->setJavascript('/javascript/jquery.js');
 $this->setJavascript('/javascript/jquery.ui.js');
 $this->setJavascript('/javascript/jquery.contextmenu.js');
 $this->setJavascript('/javascript/jquery.simplemodal.js');

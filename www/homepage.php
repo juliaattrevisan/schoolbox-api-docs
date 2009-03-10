@@ -17,9 +17,11 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/include/involved.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/homepage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
 $categoryHandler = new Category; 
 $groupHandler = new Group(HOMEPAGE_SERVICE);
+$allowedFiles = new AllowedFile;
 
 if(is_numeric($this->arg[0]))
 	$category = $categoryHandler->getByID($this->arg[0]);
@@ -62,7 +64,9 @@ $this->setTitle($category['name']);
 $this->setTab('resources');
 
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
+$this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 $this->setBlock(TEMPLATE_content, "edit_page", "edit_page_block");
+
 
 $colours = $homepageHandler->getColorList();
 $this->setVar($colours);
@@ -84,6 +88,29 @@ else {
 	$this->setVar('modify_layout_block', '');
 }
 
+// output mime classes
+$allowedList = $allowedFiles->getAll();
+if (is_array($allowedList)) {
+	
+	// append link icon to resutls
+	$allowedList[]['iconFile'] = "http-url.png";
+	$last = '';
+	foreach ($allowedList as $allowed) {
+		if ($last != $allowed["iconFile"]) {
+			$output = array("NAME"	=> str_replace(".", "-", substr($allowed["iconFile"], 0, strrpos($allowed["iconFile"], "."))),
+							"ICON"	=> $allowed["iconFile"],
+							);
+			
+			$this->setVar($output);
+			$this->parse("allowed_files_block", "allowed_files", true);
+			
+			$last = $allowed["iconFile"];
+		}
+	}
+} else
+	$this->setVar('allowed_files_block', '');
+
+// output components
 $componentList = $categoryHandler->getComponents($categoryID);
 if (is_array($componentList)) {
 

@@ -117,9 +117,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 			$_SESSION['remember'] = 0;			
 		
 		//if no webmail enabled or user has elected to use external client set mailhandle to mailto:
-		if (SITE_location == "wenona" && isParent($user['group_id']) && !$user['local_email'])
-			$_SESSION['mailhandle'] = "mailto:";		
-		elseif(MAIL_enable == 0 || $user['mail_handler'])
+		if(MAIL_enable == 0 || $user['mail_handler'] || (isParent($user['group_id']) && !$user['local_email']))
 			$_SESSION['mailhandle'] = "mailto:";
 		else
 			$_SESSION['mailhandle'] = "/mail/createMail.php?replyto=";

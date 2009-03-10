@@ -7,7 +7,7 @@
 
 	$.fn.treeTable = function(opts) {
 		options = $.extend({}, $.fn.treeTable.defaults, opts);
-		var topSpan = $("span#top"), topRow = topSpan.parents("tr")[0];
+		var topSpan = $("#top"), topRow = topSpan.parents("tr")[0];
 		addDrop(topSpan);
 		options.addContext(topSpan);
 		addSelect(topRow);

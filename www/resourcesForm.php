@@ -49,7 +49,7 @@ elseif (is_numeric($_POST['files'])) {
 							  'modified'	=> outputDate(DATE_short_format, $file['modified']),
 							//'size'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
 							  'owner'		=> formatName($file),
-							  'icon'		=> !empty($file['iconFile']) ? substr($file["iconFile"], 0, strpos($file["iconFile"], ".")) : "textfile",
+							  'icon'		=> !empty($file['iconFile']) ? str_replace(".", "-", substr($file["iconFile"], 0, strrpos($file["iconFile"], "."))) : "textfile",
 							  'link'		=> isset($file['url']) ? 'true' : 'false',
 							  'hidden'		=> $file['hidden'] ? 'true' : 'false',
 							  'write'		=> $permission == WRITE_ACCESS ? 'true' : 'false',

@@ -1,73 +1,73 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
-$(document).ready(function() {
+$j(document).ready(function() {
 
 	// define file context menu 
 	var fileMenu = [
 		{"Open": {
 			onclick: function () { 
-				var _file = $(this).find(".file");
+				var _file = $j(this).find(".file");
 				if (_file.hasClass("link"))
-					window.open("/redir.php?id="+$(this).attr("id").substring(5),"_blank"); 
+					window.open("/redir.php?id="+$j(this).attr("id").substring(5),"_blank"); 
 				else
-					window.open("/send.php?id="+$(this).attr("id").substring(5),"_blank"); 
+					window.open("/send.php?id="+$j(this).attr("id").substring(5),"_blank"); 
 			},
 			icon: '/images/famicons/page_go.png'
 		}},
 		{"Save As": {
-			onclick: function () { window.open("/send.php?save=1&id="+$(this).attr("id").substring(5),"_self"); },
+			onclick: function () { window.open("/send.php?save=1&id="+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/disk.png'
 		}},
-		$.contextMenu.separator,
+		$j.contextMenu.separator,
 		{"Modify": {
 			onclick: function () {
-				var _file = $(this).find(".file");
+				var _file = $j(this).find(".file");
 				if (_file.hasClass("link"))
-					window.open("/cms/link/"+$(this).attr("id").substring(5),"_self"); 
+					window.open("/cms/link/"+$j(this).attr("id").substring(5),"_self"); 
 				else
-					window.open("/cms/file/"+$(this).attr("id").substring(5),"_self"); 
+					window.open("/cms/file/"+$j(this).attr("id").substring(5),"_self"); 
 			},
 			icon: '/images/famicons/page_edit.png'
 		}},
 		{"Delete": {
 			onclick: function () {
-				var _file = $(this).find(".file");
+				var _file = $j(this).find(".file");
 				var _name = _file.text();
 				if (_file.hasClass("link")) {
 					if (confirm("Are you sure you want to delete "+_name+"?")) 
-						window.open("/cms/linkForm.php?delete="+$(this).attr("id").substring(5),"_self");
+						window.open("/cms/linkForm.php?delete="+$j(this).attr("id").substring(5),"_self");
 				} else {
 					if (confirm("Are you sure you want to delete "+_name+"?")) 
-						window.open("/cms/fileForm.php?delete="+$(this).attr("id").substring(5),"_self");
+						window.open("/cms/fileForm.php?delete="+$j(this).attr("id").substring(5),"_self");
 				}
 			},
 			icon: '/images/famicons/page_delete.png'
 			
 		}},
-		$.contextMenu.separator,
+		$j.contextMenu.separator,
 		{"New File": {
-			onclick: function () { window.open("/cms/file/new/"+$(this).data("category"),"_self"); },
+			onclick: function () { window.open("/cms/file/new/"+$j(this).data("category"),"_self"); },
 			icon: '/images/famicons/page_add.png'
 		}},
-		{"Add Multiple Files": function () { window.open("/cms/file/multi/"+$(this).data("category"),"_self"); }},
+		{"Add Multiple Files": function () { window.open("/cms/file/multi/"+$j(this).data("category"),"_self"); }},
 		{"New Link": {
-			onclick: function () { window.open("/cms/link/new/"+$(this).data("category"),"_self"); },
+			onclick: function () { window.open("/cms/link/new/"+$j(this).data("category"),"_self"); },
 			icon: '/images/famicons/link_add.png'
 		}},
 		{"New Folder": {
-			onclick: function () { window.open("/cms/category/new/"+$(this).data("category"),"_self"); },
+			onclick: function () { window.open("/cms/category/new/"+$j(this).data("category"),"_self"); },
 			icon: '/images/famicons/folder_add.png'
 		}},
-		$.contextMenu.separator,
+		$j.contextMenu.separator,
 		{"Properties": function () { 
-			var _file = $(this).find(".file"), ajaxURL;
+			var _file = $j(this).find(".file"), ajaxURL;
 			if (_file.hasClass("link"))
-				ajaxURL = "/cms/properties.php?linkID="+$(this).attr("id").substring(5);
+				ajaxURL = "/cms/properties.php?linkID="+$j(this).attr("id").substring(5);
 			else
-				ajaxURL = "/cms/properties.php?fileID="+$(this).attr("id").substring(5);
+				ajaxURL = "/cms/properties.php?fileID="+$j(this).attr("id").substring(5);
 			
-			$.get(ajaxURL, function (data) {
-				$(data).modal({
+			$j.get(ajaxURL, function (data) {
+				$j(data).modal({
 					position: ["15%",],
 					overlayId: 'properties-overlay',
 					containerId: 'properties-container',
@@ -81,7 +81,7 @@ $(document).ready(function() {
 					onClose: function (dialog) { 
 						dialog.container.fadeOut(200, function () { 
 							dialog.overlay.fadeOut(200, function () { 
-									$.modal.close(); 
+									$j.modal.close(); 
 							});  
 						}); 
 					}					
@@ -93,96 +93,96 @@ $(document).ready(function() {
 	// define folder context menu
 	var folderMenu = [
 		{"View Homepage": {
-			onclick: function () { window.open("/homepage/"+$(this).attr("id").substring(5),"_self"); },
+			onclick: function () { window.open("/homepage/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/house.png'
 		}},
 		{"Image Gallery": {
-			onclick: function () { window.open("/cms/imageGallery/"+$(this).attr("id").substring(5),"_self"); },
+			onclick: function () { window.open("/cms/imageGallery/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/images.png'
 		}},
-		$.contextMenu.separator,
+		$j.contextMenu.separator,
 		{"Modify": { 
-			onclick: function () { window.open("/cms/category/"+$(this).attr("id").substring(5),"_self"); },
+			onclick: function () { window.open("/cms/category/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/folder_edit.png'
 		}},
 		{"Delete": {
 			onclick: function () { 
-				var _name = $(this).find(".folder").text();
-				if (confirm("Are you sure you want to delete "+_name+"?")) window.open("/cms/categoryForm.php?delete="+$(this).attr("id").substring(5),"_self"); 
+				var _name = $j(this).find(".folder").text();
+				if (confirm("Are you sure you want to delete "+_name+"?")) window.open("/cms/categoryForm.php?delete="+$j(this).attr("id").substring(5),"_self"); 
 			},
 			icon: '/images/famicons/folder_delete.png'
 		}},
 		{"Delete All": {
 			onclick: function () { 
-				var _name = $(this).find(".folder").text();
-				if (confirm("Are you sure you want to delete "+_name+" and all its contents?")) window.open("/cms/categoryForm.php?deleteAll="+$(this).attr("id").substring(5),"_self"); 
+				var _name = $j(this).find(".folder").text();
+				if (confirm("Are you sure you want to delete "+_name+" and all its contents?")) window.open("/cms/categoryForm.php?deleteAll="+$j(this).attr("id").substring(5),"_self"); 
 			}
 			
 		}},
-		$.contextMenu.separator,
+		$j.contextMenu.separator,
 		{"New File": {
-			onclick: function () { window.open("/cms/file/new/"+$(this).attr("id").substring(5),"_self"); },
+			onclick: function () { window.open("/cms/file/new/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/page_add.png'
 		}},
-		{"Add Multiple Files": function () { window.open("/cms/file/multi/"+$(this).attr("id").substring(5),"_self"); }},
+		{"Add Multiple Files": function () { window.open("/cms/file/multi/"+$j(this).attr("id").substring(5),"_self"); }},
 		{"New Link": {
-			onclick: function () { window.open("/cms/link/new/"+$(this).attr("id").substring(5),"_self"); },
+			onclick: function () { window.open("/cms/link/new/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/link_add.png'
 		}},
 		{"New Folder": {
-			onclick: function () { window.open("/cms/category/new/"+$(this).attr("id").substring(5),"_self"); },
+			onclick: function () { window.open("/cms/category/new/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/folder_add.png'
 		}},
-		$.contextMenu.separator,
+		$j.contextMenu.separator,
 		{"Download": {
-			onclick: function () { window.open("/cms/fetchFolder.php?folder="+$(this).attr("id").substring(5),"_self"); },
+			onclick: function () { window.open("/cms/fetchFolder.php?folder="+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/page_white_compressed.png'
 		}},
 	];
 
 
   function addContext(node) {
-	if ($(node).hasClass("folder")) {
+	if ($j(node).hasClass("folder")) {
 		
-		$($(node).parents("tr")[0]).contextMenu(folderMenu, {
+		$j($j(node).parents("tr")[0]).contextMenu(folderMenu, {
 			theme: 'vista',
 			beforeShow: function () {
-				if ($(this.target).hasClass("homepage") == 0)
-					$($(this.menu).find('.context-menu-item')[0]).toggleClass("context-menu-item-disabled", true); 
+				if ($j(this.target).hasClass("homepage") == 0)
+					$j($j(this.menu).find('.context-menu-item')[0]).toggleClass("context-menu-item-disabled", true); 
 
-				if ($(this.target).hasClass("write") == 0 && $(this.target).hasClass("full") == 0) {
+				if ($j(this.target).hasClass("write") == 0 && $j(this.target).hasClass("full") == 0) {
 					// disable from modify onwards
 					for (var i = 2; i <= 9; i++)
-						$($(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
+						$j($j(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
 				}
 				
 				// disable delete all
-				if ($(this.target).hasClass("full") == 0)
-					$($(this.menu).find('.context-menu-item')[4]).toggleClass("context-menu-item-disabled", true); 
+				if ($j(this.target).hasClass("full") == 0)
+					$j($j(this.menu).find('.context-menu-item')[4]).toggleClass("context-menu-item-disabled", true); 
 				
 			}
 		});
 	}
-	else if ($(node).hasClass("file")) {
-		$($(node).parents("tr")[0]).contextMenu(fileMenu, {
+	else if ($j(node).hasClass("file")) {
+		$j($j(node).parents("tr")[0]).contextMenu(fileMenu, {
 			theme: 'vista',
 			beforeShow: function () {
-				var _file = $(this.target).find(".file");
+				var _file = $j(this.target).find(".file");
 				
 				if (_file.hasClass("link"))
-					$($(this.menu).find('.context-menu-item')[1]).toggleClass("context-menu-item-disabled", true); 
+					$j($j(this.menu).find('.context-menu-item')[1]).toggleClass("context-menu-item-disabled", true); 
 
 				if (_file.hasClass("write") == 0 && _file.hasClass("full") == 0) {
 					// disable from modify to new folder
 					for (var i = 2; i <= 7; i++)
-						$($(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
+						$j($j(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
 				}
 			}
 		});
 	}
   }; 
 
-	$("#category-list, #file-list").treeTable({
+	$j("#category-list, #file-list").treeTable({
 		initialState: "collapsed",
 		addContext: addContext
 	});
