@@ -22,11 +22,12 @@ class SynergeticUser extends MSSQL{
 					luForm.ID as TeacherFormID, vStudents.StudentForm, luTutor.ID as TeacherTutorID, vStudents.StudentTutor, luForm.Description as FormDescription,
 					vStudents.StudentHouseDescription, vStudents.StudentHouse, vStudents.StudentYearLevel, vStudents.StudentLockerBook,
 					vStudents.StudentEmergencyName, vStudents.StudentEmergencyPhone, vStudents.StudentEmergencyPhoneAlt, vStudents.StudentMedicalAlert,
-					contactDetails.StudentContactTitle, contactDetails.StudentContactPreferred, contactDetails.StudentContactSurname, contactDetails.StudentContactDefaultEmail,
+					contactDetails.StudentContactID, contactDetails.StudentContactTitle, contactDetails.StudentContactPreferred, contactDetails.StudentContactSurname, contactDetails.StudentContactDefaultEmail,
 					contactDetails.StudentContactAddress1, contactDetails.StudentContactSuburb, contactDetails.StudentContactPostCode, contactDetails.StudentContactState,
 					contactDetails.StudentContactPhoneActual, contactDetails.StudentContactMobilePhone, contactDetails.StudentContactOccupPhone,
 					contactDetails.StudentContactSpouseTitle, contactDetails.StudentContactSpousePreferred, contactDetails.StudentContactSpouseSurname,
 					contactDetails.StudentContactSpouseMobilePhone, contactDetails.StudentContactSpouseOccupPhone,contactDetails.StudentContactSpouseDefaultEmail
+					
 			FROM 
 					SynergyOne.dbo.vStudentContactAllAddress contactDetails, 
 					SynergyOne.dbo.vStudents vStudents,
@@ -49,6 +50,22 @@ class SynergeticUser extends MSSQL{
 		$student['StudentBirthDate'] = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
 		return $student;
 		
+	}
+
+	function getStudentContactList ($synID) {
+		$query = "SELECT StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
+					StudentContactAddress1, StudentContactSuburb, StudentContactPostCode, StudentContactState,
+					StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
+					StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
+					StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType
+				  FROM 
+				  	SynergyOne.dbo.vStudentContactAllAddress
+				  WHERE
+				  	(StudentContactType = 'SC1' OR StudentContactType = 'SC2') AND StudentID = $synID
+					AND FileSemester=".$_SESSION['FileSemester']."
+					AND FileYear=".$_SESSION[ 'FileYear']."
+				  ";
+		return $this->getAll($query);
 	}
 
 	function getCurrentSemester()

@@ -16,6 +16,7 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, "student_synergy_form", "student_synergy_form_block");
 	$this->setBlock(TEMPLATE_content, "student_synergy_tutor", "student_synergy_tutor_block");
 	$this->setBlock(TEMPLATE_content, "contact_synergy", "contact_synergy_block");
+	$this->setBlock('contact_synergy', "contact_details", "contact_details_block");
 	$this->setBlock(TEMPLATE_content, "medical", "medical_block");
 	$this->setBlock(TEMPLATE_content, 'group_management', 'group_management_block');
 	$this->setBlock('group_management', 'group', 'group_block');
@@ -87,50 +88,67 @@ if(is_numeric($this->arg[0])) {
 						$tutorTeacher = scrubTEXT($synInfo['StudentTutorName']);
 				}
 				
-				if($synInfo['StudentContactDefaultEmail'])
-					$contactName = '<a href="'.$_SESSION['mailhandle'].$synInfo['StudentContactDefaultEmail'].'">'. 
-						scrubTEXT($synInfo['StudentContactTitle'].' '.$synInfo['StudentContactPreferred'].' '.$synInfo['StudentContactSurname']).'</a>';
-				else
-					$contactName = scrubTEXT($synInfo['StudentContactTitle'].' '.$synInfo['StudentContactPreferred'].' '.$synInfo['StudentContactSurname']);
-					
-				
-				if($synInfo['StudentContactSpouseDefaultEmail'])
-					$spouseName = '<a href="'.$_SESSION['mailhandle'].$synInfo['StudentContactSpouseDefaultEmail'].'">'. 
-						scrubTEXT($synInfo['StudentContactSpouseTitle'].' '.$synInfo['StudentContactSpousePreferred'].' '.$synInfo['StudentContactSpouseSurname']).'</a>';
-				else
-					$spouseName = scrubTEXT($synInfo['StudentContactSpouseTitle'].' '.$synInfo['StudentContactSpousePreferred'].' '.$synInfo['StudentContactSpouseSurname']);
-
-				$output = array(	'TUTOR_GROUP' 			=> scrubTEXT($synInfo['StudentTutorDescription']),
-									'TUTOR'					=> $tutorTeacher,
-									'YEAR_LEVEL'			=> scrubTEXT($synInfo['StudentYearLevel']),
-									'HOUSE'					=> scrubTEXT($synInfo['StudentHouseDescription']),
-									'HOH'					=> scrubTEXT($synInfo['StudentHeadOfHouse']),
-									'FORM'					=> scrubTEXT($synInfo['StudentForm']),
-									'FORM_DESCRIPTION'		=> scrubTEXT($synInfo['FormDescription']),
-									'FORM_STAFF'			=> $formTeacher,
-									'LOCKER'				=> scrubTEXT($synInfo['StudentLockerBook']),
-									'BIRTHDATE'				=> date('jS \o\f F, Y', $synInfo['StudentBirthDate']),
-									'EMERGENCY_NAME'		=> scrubTEXT($synInfo['StudentEmergencyName']),
-									'EMERGENCY_PHONE'		=> scrubTEXT($synInfo['StudentEmergencyPhone']),
-									'EMERGENCY_ALT_PHONE'	=>scrubTEXT($synInfo['StudentEmergencyPhoneAlt']),
-									'CONTACT_NAME'			=> scrubTEXT($synInfo['StudentContactTitle'].' '.
-															$synInfo['StudentContactPreferred'].' '.$synInfo['StudentContactSurname']),
-									'CONTACT_ADDRESS'		=> scrubTEXT($synInfo['StudentContactAddress1']).'<br>'.scrubTEXT($synInfo['StudentContactSuburb'].', '.
-															$synInfo['StudentContactState'].' '.$synInfo['StudentContactPostCode']),
-									'CONTACT_HOME_PHONE' 	=> scrubTEXT($synInfo['StudentContactPhoneActual']),
-									'CONTACT_MOBILE_PHONE' 	=> scrubTEXT($synInfo['StudentContactMobilePhone']),
-									'CONTACT_OCCUP_PHONE'	=> scrubTEXT($synInfo['StudentContactOccupPhone']),
-									'CONTACT_EMAIL'			=> $synInfo['StudentContactDefaultEmail'],
-									'CONTACT_NAME_EMAIL'	=> $contactName,
-									'SPOUSE_NAME'			=> scrubTEXT($synInfo['StudentContactSpouseTitle'].' '.$synInfo['StudentContactSpousePreferred'].' '.
-															$synInfo['StudentContactSpouseSurname']),
-									'SPOUSE_MOBILE_PHONE'	=> scrubTEXT($synInfo['StudentContactSpouseMobilePhone']),
-									'SPOUSE_OCCUP_PHONE'	=> scrubTEXT($synInfo['StudentContactSpouseOccupPhone']),
-									'SPOUSE_EMAIL'			=> $synInfo['StudentContactSpouseDefaultEmail'],
-									'SPOUSE_NAME_EMAIL'		=> $spouseName,
-									'MEDICAL_NOTE'			=> scrubTEXT($synInfo['StudentMedicalAlert']),
+				$output = array('TUTOR_GROUP' 			=> scrubTEXT($synInfo['StudentTutorDescription']),
+								'TUTOR'					=> $tutorTeacher,
+								'YEAR_LEVEL'			=> scrubTEXT($synInfo['StudentYearLevel']),
+								'HOUSE'					=> scrubTEXT($synInfo['StudentHouseDescription']),
+								'HOH'					=> scrubTEXT($synInfo['StudentHeadOfHouse']),
+								'FORM'					=> scrubTEXT($synInfo['StudentForm']),
+								'FORM_DESCRIPTION'		=> scrubTEXT($synInfo['FormDescription']),
+								'FORM_STAFF'			=> $formTeacher,
+								'LOCKER'				=> scrubTEXT($synInfo['StudentLockerBook']),
+								'BIRTHDATE'				=> date('jS \o\f F, Y', $synInfo['StudentBirthDate']),
+								'EMERGENCY_NAME'		=> scrubTEXT($synInfo['StudentEmergencyName']),
+								'EMERGENCY_PHONE'		=> scrubTEXT($synInfo['StudentEmergencyPhone']),
+								'EMERGENCY_ALT_PHONE'	=>scrubTEXT($synInfo['StudentEmergencyPhoneAlt']),
+								'MEDICAL_NOTE'			=> scrubTEXT($synInfo['StudentMedicalAlert']),
 								);
 				$this->setVar($output);
+				
+				$studentContactList = $synUserHandler->getStudentContactList($user['synergy_id']);
+				if (is_array($studentContactList)) {
+					foreach ($studentContactList as $studentContact) {
+						if ($studentContact['StudentContactID'] == $_SESSION['sid'] || $studentContact['StudentContactSpouseID'] == $_SESSION['sid'] || isStaff($_SESSION['gid']) || $_SESSION['su']) {
+							$j++;
+							if($studentContact['StudentContactDefaultEmail'])
+								$contactName = '<a href="'.$_SESSION['mailhandle'].$studentContact['StudentContactDefaultEmail'].'">'. 
+									scrubTEXT($studentContact['StudentContactTitle'].' '.$studentContact['StudentContactPreferred'].' '.$studentContact['StudentContactSurname']).'</a>';
+							else
+								$contactName = scrubTEXT($studentContact['StudentContactTitle'].' '.$studentContact['StudentContactPreferred'].' '.$studentContact['StudentContactSurname']);
+								
+							
+							if($studentContact['StudentContactSpouseDefaultEmail'])
+								$spouseName = '<a href="'.$_SESSION['mailhandle'].$studentContact['StudentContactSpouseDefaultEmail'].'">'. 
+									scrubTEXT($studentContact['StudentContactSpouseTitle'].' '.$studentContact['StudentContactSpousePreferred'].' '.$studentContact['StudentContactSpouseSurname']).'</a>';
+							else
+								$spouseName = scrubTEXT($studentContact['StudentContactSpouseTitle'].' '.$studentContact['StudentContactSpousePreferred'].' '.$studentContact['StudentContactSpouseSurname']);
+			
+							$output = array('CONTACT_NAME'			=> scrubTEXT($studentContact['StudentContactTitle'].' '.
+																	$studentContact['StudentContactPreferred'].' '.$studentContact['StudentContactSurname']),
+											'CONTACT_ADDRESS'		=> scrubTEXT($studentContact['StudentContactAddress1']).'<br>'.scrubTEXT($studentContact['StudentContactSuburb'].', '.
+																	$studentContact['StudentContactState'].' '.$studentContact['StudentContactPostCode']),
+											'CONTACT_HOME_PHONE' 	=> scrubTEXT($studentContact['StudentContactPhoneActual']),
+											'CONTACT_MOBILE_PHONE' 	=> scrubTEXT($studentContact['StudentContactMobilePhone']),
+											'CONTACT_OCCUP_PHONE'	=> scrubTEXT($studentContact['StudentContactOccupPhone']),
+											'CONTACT_EMAIL'			=> $studentContact['StudentContactDefaultEmail'],
+											'CONTACT_NAME_EMAIL'	=> $contactName,
+											'SPOUSE_NAME'			=> scrubTEXT($studentContact['StudentContactSpouseTitle'].' '.$studentContact['StudentContactSpousePreferred'].' '.
+																	$studentContact['StudentContactSpouseSurname']),
+											'SPOUSE_MOBILE_PHONE'	=> scrubTEXT($studentContact['StudentContactSpouseMobilePhone']),
+											'SPOUSE_OCCUP_PHONE'	=> scrubTEXT($studentContact['StudentContactSpouseOccupPhone']),
+											'SPOUSE_EMAIL'			=> $studentContact['StudentContactSpouseDefaultEmail'],
+											'SPOUSE_NAME_EMAIL'		=> $spouseName,
+												
+											);
+							$this->setVar($output);
+							$this->parse('contact_details_block', 'contact_details', true);						
+						
+						}
+					}	
+				}
+				
+				if (!$j)
+					$this->setVar('contact_details_block', '');
 				
 				$this->parse("contact_synergy_block", "contact_synergy");
 				
