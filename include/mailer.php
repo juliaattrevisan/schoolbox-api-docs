@@ -30,7 +30,7 @@ function Mailer($template, $subject = "", $to="") {
 	$this->template->set_var('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
 	
 	//setup MIME email
-	$this->email = new Mail_mime("\r\n");
+	$this->email = new Mail_mime("\n");
 
 	//$this->text = "Please view this email in a HTML capable client.";
 }
@@ -78,7 +78,14 @@ function setSubject($subject) {
 }
 
 function loadTemplate($file) {
-	$this->template->set_file($this->t_label, $file);
+	$this->template->set_file($this->t_label, $this->getTemplate($file));
+}
+
+function getTemplate($template) {
+	if(is_file(MAIL_templates.'/'.SITE_location.'/email/'.$template))
+		return SITE_location.'/email/'.$template;
+	else
+		return 'core/email/'.$template;
 }
 
 function setVar($name, $value='') {

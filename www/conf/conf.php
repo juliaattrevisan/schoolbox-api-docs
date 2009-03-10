@@ -112,6 +112,10 @@ define("MAIL_increment", 20);					//Amount of emails per page
 define("MAIL_db", "roundcubemail");
 define('ROUNDCUBE_db','mysql://'.SQL_user.':'.SQL_passwd.'@'.SQL_host.'/'.SQL_db);
 
+// mailer
+define('MAIL_templates', TEMPLATE_dir);
+define('FROM_address', 'portal@lektec.com.au');
+define('FROM_name', HEADING);
 
 //RSS Feed 
 define('RSS_url', 'http://www.abc.net.au/news/indexes/justin/rss.xml');

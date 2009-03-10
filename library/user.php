@@ -84,7 +84,51 @@ class User extends Model {
 		return $this->db->getAll($query);
 
 	}
+
+	function setPassword($userID, $oldPassword, $newPassword) {
+		$oldPassword = mysql_real_escape_string($oldPassword);
+		$newPassword = mysql_real_escape_string($newPassword);
+		$query = "UPDATE `".$this->_table."` SET password = PASSWORD('$newPassword') WHERE `".$this->_index."` = $userID AND password = PASSWORD('$oldPassword')";
+		$this->db->query($query);
+
+		return $this->db->affectedRows();
+	}
+
+	function sendResetPasswordEmail($email) {
+		if (false != ($user = $this->getByField('alt_email', $email))) {
+			$hash = substr(md5(uniqid().time()),0, 25);
+			$this->update(array('id' => $user['id'], 'hash' => $hash));
+			
+			require_once SITE_root . '/include/mailer.php';
+			$mailHandler = new Mailer('reset-password.html', HEADING . ' Password Reset', $user['alt_email']);
+			$mailHandler->setVar('NAME', $user['firstname']);
+			$mailHandler->setVar('RESET_LINK', "http://" . $_SERVER['HTTP_HOST'] . "/reset-password.php?id={$user['id']}&h=" . $hash);
+			return $mailHandler->send();
+		}
+		return false;
+		
+	}
 	
+	function resetPassword($userID, $hash) {
+		
+		$password = substr(md5(uniqid().time()), 0, 8);
+		$query = "UPDATE `" .$this->_table. "` SET password = PASSWORD(".$this->db->smartQuote($password)."), `hash` = NULL 
+				  WHERE `".$this->_index."` = ".$this->db->smartQuote($userID)." AND `hash` = ".$this->db->smartQuote($hash)." AND `hash` IS NOT NULL";
+		$this->db->query($query);
+		
+		if ($this->db->affectedRows()) {
+			$user = $this->getByID($userID);
+			require_once SITE_root . '/include/mailer.php';
+			$mailHandler = new Mailer('new-password.html', HEADING . ' Login Details', $user['alt_email']);
+			$mailHandler->setVar('NAME', $user['firstname']);
+			$mailHandler->setVar('USERNAME', $user['username']);
+			$mailHandler->setVar('PASSWORD', $password);
+			$mailHandler->send();
+			
+			return true;
+		} else
+			return false;	
+	}
 
 	
 	
