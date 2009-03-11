@@ -91,7 +91,7 @@ hr { background-color: #d2d2d2; border: 0; height: 1px; }
  Heading Styles 
 --------------------------------------------------------------*/
 h1 { font-size: 1.33em; font-weight: bold; border-bottom: 1px dashed #7f7f7f; line-height: 2; margin-bottom: 1em; position: relative; }
-h1 a.customise { position: absolute; top: 0; right: 0; font-size: 70%; }
+h1 a.customise { position: absolute; top: 0; right: 0; font-size: 70%; font-weight: normal; }
 h3 { font-size: 1em; }
 #news-header { margin-bottom: 1em; }
 /*--------------------------------------------------------------
@@ -275,6 +275,7 @@ Side Nav styles
 	margin: 0;
 	padding: 0;
 	}
+#nav ul ul { border: 1px solid #0451a3; }
 #nav li li a {
 	background: #1965b3;
 	}
@@ -536,7 +537,8 @@ a.layout:hover img {
 	background-image: url(/images/mime/folder_blue_full.png);
 	}
 .house {
-	background-image: url(/images/famicons/house.png);
+	background: url(/images/famicons/house.png) no-repeat 100% 50%;
+	float: right;
 	}
 /*--------------------------------------------------------------
 News styles 

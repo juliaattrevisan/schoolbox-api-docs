@@ -1,4 +1,12 @@
 /*---------------------------------------
+	Layout Styles
+----------------------------------------*/
+#logo {
+	width: 270px;
+	height: 64px;
+	background: url(/images/shore/shore-logo.gif) no-repeat;
+	}
+/*---------------------------------------
 	Component Styles
 ----------------------------------------*/
 h2 {

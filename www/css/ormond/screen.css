@@ -1,0 +1,93 @@
+/*---------------------------------------
+	Layout Styles
+----------------------------------------*/
+body {
+	background: 0;
+	}
+#header {
+	height: 119px;
+	background: #C90033 url(/images/ormond/header-back.gif) repeat-x;
+	border: 0;
+	}
+#content {
+	padding-top: 20px;
+	}
+#logo {
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: url(/images/ormond/ormond_logo.jpg) no-repeat;
+	width: 782px;
+	height: 119px;
+	}
+#tabs {
+	bottom: 0;
+	right: 0;
+	left: 189px;
+	}
+#tabs li a {
+	color: #fff;
+	font-weight: bold;
+	background: #525456;
+	border: 1px solid #292929;
+	padding: 0 15px;
+	display: block;
+	line-height: 31px;
+	}
+#tabs li a:hover {
+	background: #3f4042;
+	}
+#tabs li a.navthis {
+	color: #3f4042;
+	background: #fff;
+	}
+/*---------------------------------------
+	Component Styles
+----------------------------------------*/
+h1 {
+	background: #fff url(/images/ormond/heading-back.gif) repeat-x;
+	font-size: 1.33em;
+	font-weight: bold; 
+	border-bottom: 1px dotted #1C1713;
+	line-height: normal;
+	margin-bottom: 10px;
+	padding: 4px;
+	position: relative;
+	}
+	}
+h2 {
+	background: #fff url(/images/ormond/heading-back.gif) repeat-x;
+	font-weight: normal;
+	color: #000;
+	}	
+/*---------------------------------------
+	Nav Styles
+----------------------------------------*/
+#nav h3 {
+	border-bottom: 1px solid #fff;
+	background: #CF0034;
+	color: #fff;
+	text-transform: uppercase;
+	}
+#nav ul ul { border: 1px solid #ddbdc5; }
+#nav li li a {
+	background: #eeeee7;
+	}
+#nav li {
+	border-bottom: 1px solid #fff;
+	}
+#nav li li {
+	border-bottom: 1px solid #fff;
+	}
+#nav li a {
+	background: #EEEEE7;
+	color: #222223;
+	}
+#nav li li a:hover,
+#nav li a:hover {
+	background: #DEDEDE;
+	color: #f00;
+	}
+#nav li.parent > a span, #nav li.parent > a:hover span {
+	background: url(/images/ormond/nav-arrow.gif) no-repeat 100% 5px;
+	}

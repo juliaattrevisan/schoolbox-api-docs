@@ -5,11 +5,11 @@
   #nav ul a { display: block; }
   #nav ul ul { display: none; position: absolute; left: 0; margin: 0; padding: 0; }
   * html #nav ul ul { line-height: 0; } /* IE6 "fix" */
-  	#nav ul ul a { zoom: 1; } /* IE6/7 fix */
-    #nav ul ul li { float: none; }
-    #nav ul ul ul { top: 0; }
+	#nav ul ul a { zoom: 1; } /* IE6/7 fix */
+	#nav ul ul li { float: none; }
+	#nav ul ul ul { top: 0; }
     
 /* Essentials - configure this */
 
-#nav ul ul { width: 180px; left: 180px; top: -2px; border: 1px solid #0451a3; }
+#nav ul ul { width: 180px; left: 180px; top: -2px; }
 #nav ul ul ul { left: 180px; top: -2px; }

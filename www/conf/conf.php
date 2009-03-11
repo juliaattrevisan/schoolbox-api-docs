@@ -11,7 +11,7 @@
 define("HEADING", "MGS Portal");			//This will appear on the window title of each page
 define("SITE_name", "portal");
 define("MAX_FILE_SIZE", 10485760); 			//Maximum filesize in bytes allowed to be uploaded (default 10MB) (also set in php.ini)
-define("SITE_location", "shore");				//This defines the location, allows specific code for each location
+define("SITE_location", "ormond");				//This defines the location, allows specific code for each location
 define("SITE_root", dirname(__FILE__)."/../../");
 
 //Security options
