@@ -96,6 +96,7 @@ class SitePage extends Page {
 			$this->setVar('CUSTOM_HEADER_REGION', '');	
 			
 		$this->setVar('TEMPLATE_FILE', $this->templateFile);
+		$this->setVar('SITE_LOCATION', $this->site);
 	}
 	
 	function setTab($tab) {
