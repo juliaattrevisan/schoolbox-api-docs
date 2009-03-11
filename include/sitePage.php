@@ -94,6 +94,8 @@ class SitePage extends Page {
 			$this->parse('CUSTOM_HEADER_REGION', 'custom_head');
 		else
 			$this->setVar('CUSTOM_HEADER_REGION', '');	
+			
+		$this->setVar('TEMPLATE_FILE', $this->templateFile);
 	}
 	
 	function setTab($tab) {
@@ -410,6 +412,9 @@ class SitePage extends Page {
 	
 	function setFile($handle, $file) {
 		$this->template->set_file($handle, $this->getTemplate($file));
+		
+		if($handle == TEMPLATE_content)
+			$this->templateFile = $file;
 		
 		$contents = @file_get_contents($this->templateRoot . '/' . $this->getTemplate($file));
 		if (strpos($contents, "<!-- BEGIN custom_head -->") !== false) {
