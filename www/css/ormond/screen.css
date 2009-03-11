@@ -3,6 +3,7 @@
 ----------------------------------------*/
 body {
 	background: 0;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
 	}
 #header {
 	height: 119px;
@@ -41,6 +42,9 @@ body {
 	color: #3f4042;
 	background: #fff;
 	}
+.box.grey { background: 0; }
+.box a { color: #CF0034; }
+.box a:hover { color: #C3536F; }
 /*---------------------------------------
 	Component Styles
 ----------------------------------------*/
@@ -51,12 +55,12 @@ h1 {
 	border-bottom: 1px dotted #1C1713;
 	line-height: normal;
 	margin-bottom: 10px;
-	padding: 4px;
+	padding: 3px;
 	position: relative;
-	}
 	}
 h2 {
 	background: #fff url(/images/ormond/heading-back.gif) repeat-x;
+	border-bottom: 1px dotted #1C1713;
 	font-weight: normal;
 	color: #000;
 	}	
