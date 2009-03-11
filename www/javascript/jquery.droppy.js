@@ -32,9 +32,10 @@ $.fn.droppy = function(options) {
       var subnav = getSubnav(this);
       if (!subnav) return;
       $.data(subnav, 'cancelHide', false);
+	  $(subnav).addClass('closing');
       setTimeout(function() {
         if (!$.data(subnav, 'cancelHide')) {
-          $(subnav).slideUp(options.speed);
+          $(subnav).slideUp(options.speed).removeClass("closing");
         }
       }, 500);
     }
@@ -42,7 +43,12 @@ $.fn.droppy = function(options) {
     function show() {
       var subnav = getSubnav(this);
       if (!subnav) return;
-      $.data(subnav, 'cancelHide', true);
+	  $.data(subnav, 'cancelHide', true);
+	  $('ul.closing').each(function () {
+	  	if (!$.data($(this), 'cancelHide'))
+			$(this).slideUp(options.speed).removeClass("closing"); 
+	  });
+	  $(subnav).slideUp(options.speed);
       $(subnav).css({zIndex: zIndex++}).slideDown(options.speed);
       if (this.nodeName.toLowerCase() == 'ul') {
         var li = getActuator(this);
