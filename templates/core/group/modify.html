@@ -56,17 +56,17 @@ window.addEvent('domready', function () {
 }
 </style>
 <!-- END custom_head -->
-<h1>User Group Maintenance - {CATEGORY_NAME}</h1>
-<span class="header_option"><a href="/homepage/{CATEGORY_ID}">Return to Homepage</a></span>
+<h1>User Group Maintenance - {CATEGORY_NAME} <a class="customise" href="/homepage/{CATEGORY_ID}">Return to Homepage</a></h1>
+
 <div class="standardForm">
   <table>
     <tr>
-      <td style="width:300px"><h2>Group Admin</h2></td>
+      <td style="width:300px"><h3>Group Admin</h3></td>
       <td><a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a><br />
         <a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" onclick="return confirm('Disband this group?');">Disband Group</a></td>
     </tr>
     <tr>
-      <td valign="top"><h2>Add users</h2>
+      <td valign="top"><h3>Add users</h3>
         <em>You may add users individually by typing their name and selecting from the list.  Alternatively you can add many users via a list of synergetic id's or usernames.</em></td>
       <td><form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" method="post">
           <p>
@@ -77,7 +77,7 @@ window.addEvent('domready', function () {
         <a href="/group/bulk/{CATEGORY_ID}">Add Bulk Members</a></td>
     </tr>
     <tr>
-      <td valign="top"><h2>Access Type</h2>
+      <td valign="top"><h3>Access Type</h3>
         <em>Restricted groups are private and only administrated by the group admin. Users may request access to moderated groups but only be granted by the group admin.  Free groups can be joined and left by anyone.  See the <a href="/group/join">group page</a> for available groups.</em> </td>
       <td><form action="" method="post" id="type_form">
           <input name="type" type="radio" value="1" {GROUP_TYPE_1} />
@@ -89,7 +89,7 @@ window.addEvent('domready', function () {
         </form></td>
     </tr>
     <tr>
-      <td valign="top"><h2>Members</h2>
+      <td valign="top"><h3>Members</h3>
         <em>You can give write access to any member of the group, this will enable them to post resources and moderate the forum.  Only one user may be the group admin and it cannot be a student.  Making another user the group admin will relinquish your control over the group.</em></td>
       <td><form action="/group/modifyForm.php" method="post" id="deleteForm">
           <table>
@@ -120,7 +120,7 @@ window.addEvent('domready', function () {
     </tr>
     <!-- BEGIN authorisation -->
     <tr>
-      <td><h2>Awaiting Authorisation</h2>
+      <td><h3>Awaiting Authorisation</h3>
         <em>These users are currently awaiting your authorisation to join this group</em></td>
       <td><form action="/group/modifyForm.php" method="post" id="acceptForm">
       <table>

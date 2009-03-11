@@ -28,11 +28,11 @@ function verify(){
 			<form action="/cms/categoryForm.php" method="post" class="standardForm" id="folderForm" onsubmit="return(verify());">
 				<table>
 					<tr>
-						<td class="formLabelWidth"><h2>Folder Name</h2></td>
+						<td class="formLabelWidth"><h3>Folder Name</h3></td>
 						<td><input type="text" name="name" maxlength="250" size="40" value="{NAME}" />						</td>
 					</tr>
 					<tr>
-						<td><h2>Folder Parent</h2>
+						<td><h3>Folder Parent</h3>
 							<em>Location at which this folder should be placed</em></td>
 						<td><select name="parent">
                         		<!-- BEGIN parent_list -->
@@ -40,7 +40,7 @@ function verify(){
                             </select> </td>
 					</tr>
 					<tr>
-						<td><h2>Homepage</h2>
+						<td><h3>Homepage</h3>
 							<em>If you would like a homepage associated with this folder select a basic layout.</em></td>
 						<td><select name="template">
                         		<!-- BEGIN template_list -->
@@ -48,7 +48,7 @@ function verify(){
                             </select> </td>
 					</tr>
 					<tr>
-						<td><h2>Group Permissions</h2>
+						<td><h3>Group Permissions</h3>
 							<em>Allow predefined groups of users access to this folder. </em></td>
 						<td><table>
 								<tr>
@@ -68,21 +68,21 @@ function verify(){
 					</tr>
                     <!-- BEGIN indiv_perms -->
 					<tr>
-						<td><h2>Individual Permissions</h2>
+						<td><h3>Individual Permissions</h3>
 							<em>Manage individual user access to this folder. You will automatically be assigned administration rights.</em></td>
 						<td><input type="checkbox" name="groupcheck" value="1" /></td>
 					</tr>
                     <!-- END indiv_perms -->
                     <!-- BEGIN indiv_modify -->
 					<tr>
-						<td><h2>Individual Permissions</h2>
-							<em>Manage individual user access to this folder.</em></td>
-						<td><a href="/group/modify/{CATEGORY_ID}">Modify Group</a></td>
+						<td><h3>Individual Permissions</h3>
+							<em>Manage individual user access to this folder. You will automatically be assigned administration rights.</em></td>
+						<td><a href="/group/modUserGroup.php?service=1&sid={CATEGORY_ID}">Modify Group</a></td>
 					</tr>
                     <!-- END indiv_modify -->
 					<!-- BEGIN synergy_input -->
 					<tr>
-						<td><h2>Synergy Subject Codes</h2>
+						<td><h3>Synergy Subject Codes</h3>
 							<em>If you want this category to be a subject enter its code here. You may enter multiple codes by seperating them with a comma.</em></td>
 						<td><input type="text" name="code" size="40" value="{CODE}" /></td>
 					</tr>

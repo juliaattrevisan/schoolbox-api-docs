@@ -1,37 +1,46 @@
-<div class="dbx-box">
-  <h2 class="dbx-handle">What's New</h2>
-  <div class="dbx-content indent">
-   <!-- BEGIN mail_block -->
-   <p><img src="/images/icons/mail.png" /> You have {NEW_MAIL} unread emails</p>
-   <!-- END mail_block -->
-   <ul id="whatsnew">
+<div class="box grey">
+  <h2>What's New</h2>
+  <div class="text">
+    <!-- BEGIN mail_block -->
+   	<p><img src="/images/icons/mail.png" /> You have {NEW_MAIL} unread emails</p>
+   	<!-- END mail_block -->
+    <ul class="tree">
     <!-- BEGIN category_block -->
-    <li><h3><a href="/homepage/{NEW_CATEGORY_ID}/"><img src="/images/icons/folder.png" alt="Folder" title="Folder"/> {NEW_CATEGORY_NAME}</a></h3>
+    <li class="plus"><a onclick="swap(this);">Folder</a>
         <ul>
-          <!-- BEGIN due_work -->
-          <li><img src="/images/icons/work-due.png" alt="Due Work" title="Due Work" /><a href="/submission/dueWork.php">New work due</a></li>
-          <!-- END due_work -->
-          <!-- BEGIN ret_work -->
-          <li><img src="/images/icons/submission.png" alt="Returned Work" title="Returned Work" /><a href="/submission/dueWork.php">Work returned</a></li>
-          <!-- END ret_work -->
-          <!-- BEGIN sub_work -->
-          <li><img src="/images/icons/submission.png" alt="Submission" title="Submission" /><a href="/submission/viewSubmission.php?box_id={BOX_ID}">{BOX_NAME} has {BOX_COUNT} new</a></li>
-          <!-- END sub_work -->
-          <!-- BEGIN new_news -->
-          <li><a href="/homepage/{NEW_CATEGORY_ID}/"><img src="/images/icons/news.png" alt="News" title="News" /> {NEW_NEWS} News Article{NEW_PLURAL_NEWS}</a></li>
-          <!-- END new_news -->
-          <!-- BEGIN new_file -->
-          <li><a href="/resources/{NEW_CATEGORY_ID}/"><img src="/images/icons/file.png" alt="Files" title="Files" /> {NEW_FILES} File{NEW_PLURAL_FILE}</a></li>
-          <!-- END new_file -->
-          <!-- BEGIN new_url -->
-          <li><a href="/resources/{NEW_CATEGORY_ID}/"><img src="/images/mime/http-url.png" alt="URLS" title="URLS" /> {NEW_URLS} Link{NEW_PLURAL_LINK}</a></li>
-          <!-- END new_url -->
-          <!-- BEGIN new_forum -->
-          <li><a href="/forum/viewForum.php?cid={NEW_CATEGORY_ID}"><img src="/images/icons/forum.png" alt="Forum Post" title="Forum Post"  />{NEW_FORUM} Forum Post{NEW_PLURAL_FORUM}</a></li>
-          <!-- END new_forum -->
+        <!-- BEGIN due_work -->
+        <li class="icon"><a href="/submission/dueWork.php">New work due</a></li>
+        <!-- END due_work -->
+        <!-- BEGIN ret_work -->
+        <li class="icon"><a href="/submission/dueWork.php">Work returned</a></li>
+        <!-- END ret_work -->
+        <!-- BEGIN sub_work -->
+        <li class="icon"><a href="/submission/viewSubmission.php?box_id={BOX_ID}">{BOX_NAME} has {BOX_COUNT} new</a></li>
+        <!-- END sub_work -->
+        <!-- BEGIN new_news -->
+        <li class="icon"><a href="/homepage/{NEW_CATEGORY_ID}/">{NEW_NEWS} News Article{NEW_PLURAL_NEWS}</a></li>
+        <!-- END new_news -->
+        <!-- BEGIN new_file -->
+        <li class="icon"><a href="/resources/{NEW_CATEGORY_ID}/">{NEW_FILES} File{NEW_PLURAL_FILE}</a></li>
+        <!-- END new_file -->
+        <!-- BEGIN new_url -->
+        <li class="icon"><a href="/resources/{NEW_CATEGORY_ID}/">{NEW_URLS} Link{NEW_PLURAL_LINK}</a></li>
+        <!-- END new_url -->
+        <!-- BEGIN new_forum -->
+        <li class="icon"><a href="/forum/viewForum.php?cid={NEW_CATEGORY_ID}">{NEW_FORUM} Forum Post{NEW_PLURAL_FORUM}</a></li>
+        <!-- END new_forum -->
         </ul>
-      </li>
-    <!-- END category_block -->
-	</ul> 
-  </div>
+    </li>
+    <!-- END category_block -->      
+    </ul>
+    
+    <script type="text/javascript">
+      function swap(el) {
+        var par = el.parentNode;
+          if(par.className == 'minus') par.className = 'plus';
+          else {par.className = 'minus'}
+        }
+    </script>
+          
+  </div>  
 </div>

@@ -12,16 +12,16 @@
 <form class="standardForm" action="/poll/modifyForm.php" method="post">
 <table>
     <tr>
-        <td class="formLabelWidth"><h2>Title</h2></td>
+        <td class="formLabelWidth"><h3>Title</h3></td>
 		<td><input type="text" name="title" value="{POLL_TITLE}" size="50" /></td>
     </tr>
     <tr>
-        <td><h2>Question</h2>
+        <td><h3>Question</h3>
         	<em>What is the poll for</em></td>
 		<td><input type="text" name="question" value="{QUESTION}" size="50" /></td>
     </tr>
     <tr>
-        <td><h2>Options</h2>
+        <td><h3>Options</h3>
         <em>You can have a maximum of 
         ten options<br /> to vote on. You must fill in at least two.</em></td>
 		<td><input type="text" name="option_0" value="{OPTION_0}" /><br />
@@ -36,7 +36,7 @@
             <input type="text" name="option_9" value="{OPTION_9}" /><br /></td>
     </tr>    
     <tr>
-        <td><h2>Close Date</h2>
+        <td><h3>Close Date</h3>
         <em>No votes can be cast after this date.</em></td>
 		<td><input name="close" id="cal_date" type="text" size="15" maxlength="10" value="{CLOSE}"/>
 						<img src="/images/ico_calendar.gif" width="16" height="13" id="cal_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
@@ -51,7 +51,7 @@
 						</script></td>
     </tr> 
     <tr>
-      <td><h2>Voting Frequency</h2>
+      <td><h3>Voting Frequency</h3>
       	  <em>Selected how often users can place a new vote.</em></td>
       <td><select name="frequency">
               <option value="once" {FREQUENCY_ONCE_SELECTED}>Once</option>

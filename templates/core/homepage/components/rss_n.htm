@@ -1,10 +1,8 @@
-<div class="component" id="component{COMPONENT_ID}">
-  <div class="componentHeader">
-    <h2 class="cont-head">{RSS_NAME}</h2>
-  </div>
+<div class="box image" id="component{COMPONENT_ID}">
+  <h2>{RSS_NAME}</h2>
 <!-- BEGIN config -->
-  <a class="config" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
-  <div class="componentConfig">
+  <a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+  <div class="editPanel hide">
     <form action="/homepage/configForm.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
@@ -21,15 +19,14 @@
     </form>
   </div>
 <!-- END config -->
-  <table>
-    <!-- BEGIN rss_stories -->
-    <tr>
-      <td class="large_text titleColumn"><h3><a href="/redir.php?url={RSS_URL}">{RSS_TITLE}</a></h3></td>
-      <td style="border-bottom:1px solid #666;" class="large_text">{RSS_BRIEF}</td>
-    </tr>
-    <!-- END rss_stories -->
-    <tr style="height:1px;">
-      <td colspan="2" style="border-bottom:1px solid #666;"></td>
-    </tr>
-  </table>
+	<div class="text listing">
+  	<ul>
+    	<!-- BEGIN rss_stories -->
+    	<li>
+      	<h3>{RSS_TITLE}</h3>
+        <p>{RSS_BRIEF}</p>
+      </li>
+      <!-- END rss_stories -->
+    </ul>
+  </div>
 </div>

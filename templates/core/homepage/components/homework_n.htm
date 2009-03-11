@@ -1,10 +1,8 @@
-<div class="component" id="component{COMPONENT_ID}">
-  <div class="componentHeader">
-    <h2 class="cont-head">Homework</h2>
-  </div>
+<div class="box" id="component{COMPONENT_ID}">
+  <h2>Homework</h2>
 <!-- BEGIN config -->
-  <a class="config" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
-  <div class="componentConfig">
+  <a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+  <div class="editPanel hide">
     <form action="/homepage/configForm.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
@@ -19,23 +17,20 @@
     </form>
   </div>
 <!-- END config -->
-  <table>
-    <!-- BEGIN homework -->
-    <tr>
-      <td class="large_text"><h3>{HW_NAME}</h3></td>
-      <td class="large_text" style="text-align:right;"><strong>Due Date: </strong>{HW_DATE}</td>
-    </tr>
-    <tr>
-      <td style="border-bottom:1px solid #666" colspan="2" class="large_text">{HW_COMMENT}</td>
-    </tr>
-    <!-- END homework -->
-    <tr style="height:1px;">
-      <td colspan="2" style="border-bottom:1px solid #666;"></td>
-    </tr>
-    <!-- BEGIN submit_hw -->
-    <tr>
-      <td style="text-align:right;" colspan="2" class="navbar"><a href="/submission/createSubmission.php?category={ID}&type=3">POST HOMEWORK</a></td>
-    </tr>
+  <div class="text listing">
+  	<ul>
+    	<!-- BEGIN homework -->
+      <li class="{ON_OFF}">
+      	<h3>{HW_NAME}</h3>
+        <p class="interact">Due Date: {HW_DATE}</p>
+        <p>{HW_COMMENT}</p>
+      </li>
+      <!-- END homework -->
+    </ul>
+    
+    <div class="float-fix"></div>
+  </div>
+  <!-- BEGIN submit_hw -->
+    <p class="interact"><a href="/submission/createSubmission.php?category={ID}&type=3">Post Homepage</a></p>
     <!-- END submit_hw -->
-  </table>
 </div>

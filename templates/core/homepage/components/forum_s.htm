@@ -1,10 +1,8 @@
-<div class="component" id="component{COMPONENT_ID}">
-  <div class="componentHeader">
-    <h2 class="cont-head">Hot Topics</h2>
-  </div>
+<div class="box" id="component{COMPONENT_ID}">
+  <h2>Hot Topics</h2>
 <!-- BEGIN config -->
-  <a class="config" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
-  <div class="componentConfig">
+  <a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+  <div class="editPanel hide">
     <form action="/homepage/configForm.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
@@ -19,17 +17,12 @@
     </form>
   </div>
 <!-- END config -->
-  <table>
-    <!-- BEGIN forum -->
-    <tr>
-      <td class="small_text">{FORUM_HEAD}</td>
-    </tr>
-    <!-- END forum -->
-    <tr style="height:2px;">
-      <td colspan="2" style="background:#666;"></td>
-    </tr>
-    <tr>
-      <td style="text-align:right;"><a href="/forum/viewForum.php?cid={ID}">GOTO FORUM</a></td>
-    </tr>
-  </table>
+  <div class="text listing">
+  	<ul>
+    	<!-- BEGIN forum -->
+      <li class="{ON_OFF}">{FORUM_HEAD}</li>
+      <!-- END forum -->
+    </ul>
+  </div>
+  <p class="interact"><a href="/forum/viewForum.php?cid={ID}">Goto Forum</a></p>
 </div>

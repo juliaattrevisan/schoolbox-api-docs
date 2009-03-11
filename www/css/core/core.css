@@ -90,7 +90,7 @@ hr { background-color: #d2d2d2; border: 0; height: 1px; }
 /*--------------------------------------------------------------
  Heading Styles 
 --------------------------------------------------------------*/
-h1 { font-size: 1.33em; font-weight: normal; border-bottom: 1px dashed #7f7f7f; line-height: 2.5; margin-bottom: 1.5em; position: relative; }
+h1 { font-size: 1.33em; font-weight: bold; border-bottom: 1px dashed #7f7f7f; line-height: 2; margin-bottom: 1em; position: relative; }
 h1 a.customise { position: absolute; top: 0; right: 0; font-size: 70%; }
 h3 { font-size: 1em; }
 #news-header { margin-bottom: 1em; }
@@ -287,12 +287,20 @@ Side Nav styles
 	display: block;
 	text-decoration: none;
 	background: #003a77;
-	padding:  0 0 0 16px;
-	line-height: 28px;
-	width: 164px;
+	padding: 6px 14px 6px 16px;
+	line-height: normal;
+	width: 150px;
 	}
 #nav li a:hover {
 	background: #1965b4;
+	}
+#nav li.parent > a span {
+	display: block;
+	width: 100%;
+	background: url(/images/nav-arrow.gif) no-repeat 100% 3px;
+	}
+#nav li.parent > a.hover span {
+	background: url(/images/nav-arrow-over.gif) no-repeat 100% 3px;
 	}
 /*--------------------------------------------------------------
  Box styles 

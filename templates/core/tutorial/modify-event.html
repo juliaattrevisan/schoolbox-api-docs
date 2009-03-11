@@ -50,19 +50,19 @@ function toggleRepeat(o) {
 <form id="eventForm" class="standardForm" method="post" action="modify-event.php" onsubmit="return(verify());">
   <table>
     <tr>
-      <td class="formLabelWidth"><h2>Name</h2><em>Required field.</em></td>
+      <td class="formLabelWidth"><h3>Name</h3><em>Required field.</em></td>
       <td><input type="text" name="name" id="name" size="50" maxlength="50" value="{NAME}" /></td>
     </tr>
     <tr>
-      <td class="formLabelWidth"><h2>Code</h2><em>Required field.</em></td>
+      <td class="formLabelWidth"><h3>Code</h3><em>Required field.</em></td>
       <td><input type="text" name="code" id="code" size="40"  value="{CODE}" /></td>
     </tr>
     <tr>
-      <td class="formLabelWidth"><h2>Room</h2></td>
+      <td class="formLabelWidth"><h3>Room</h3></td>
       <td><input type="text" name="location" size="40" maxlength="50" value="{LOCATION}" /></td>
     </tr> 
     <tr>
-      <td class="formLabelWidth" valign="top"><h2>Date</h2>
+      <td class="formLabelWidth" valign="top"><h3>Date</h3>
         <em>Required field. Dates should be in dd/mm/yyyy format. </em></td>
       <td><input name="date" id="cal_date" type="text" size="15" maxlength="10" value="{DATE}"/>
         <img src="/images/ico_calendar.gif" width="16" height="13" id="cal_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
@@ -79,7 +79,7 @@ function toggleRepeat(o) {
     </tr>
     <!-- BEGIN recurring_dates -->
     <tr>
-      <td class="formLabelWidth" valign="top"><h2>Repeat</h2>
+      <td class="formLabelWidth" valign="top"><h3>Repeat</h3>
         <em>The frequency that this tutorial recurs if at all.</em></td>
       <td><select name="repeat" onchange="toggleRepeat(this);">
           <option value="">Single Meeting</option>
@@ -89,7 +89,7 @@ function toggleRepeat(o) {
         </select></td>
     </tr>
     <tr id="repeatUntil" style="display: none;">
-      <td class="formLabelWidth" valign="top"><h2>Repeat Until</h2>
+      <td class="formLabelWidth" valign="top"><h3>Repeat Until</h3>
         <em>The date at which recurrence should cease.</em></td>
       <td><input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="10" value=""/>
         <img src="/images/ico_calendar.gif" width="16" height="13" id="repeat_until_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
@@ -105,7 +105,7 @@ function toggleRepeat(o) {
     </tr>
     <!-- END recurring_dates -->
   <tr> 
-    <td><h2>Time</h2></td>
+    <td><h3>Time</h3></td>
     <td> <input name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />
       : 
       <input name="minute" type="text" maxlength="2" value="{MIN}" class="timeField" /> 
@@ -124,7 +124,7 @@ function toggleRepeat(o) {
   </tr>
 
     <tr>
-      <td><h2>Tutor</h2></td>
+      <td><h3>Tutor</h3></td>
       <td><table celsspacing="0">
           <tr>
             <td style="width: 100px;"><strong>Primary</strong></td>
@@ -149,7 +149,7 @@ function toggleRepeat(o) {
     </tr>
     <!--
     <tr>
-      <td><h2>Description</h2>
+      <td><h3>Description</h3>
         <em>Optional. Additional information relating to the tutorial.</em></td>
       <td><textarea id="description" name="description" style="width:600px; height:250px">{DESCRIPTION}</textarea></td>
     </tr>
@@ -159,7 +159,7 @@ function toggleRepeat(o) {
         <td>&nbsp;</td>
     </tr>
     <tr>
-        <td><h2>Cancelled</h2></td>
+        <td><h3>Cancelled</h3></td>
         <td><input type="checkbox" value="1" name="cancelled" {CANCELLED_SELECTED} /></td>
     </tr>
 

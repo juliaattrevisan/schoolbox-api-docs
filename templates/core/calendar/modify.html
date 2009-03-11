@@ -80,7 +80,7 @@
             <form class="standardForm" method="post" action="/calendar/modify.php" id="eventForm">
                     <table>
                       <tr> 
-                        <td class="formLabelWidth" valign="top"><h2>Date</h2>
+                        <td class="formLabelWidth" valign="top"><h3>Date</h3>
                         	<em>The date on which the event will occur. The date should be formatted like this dd/mm/yyyy. </em></td>
                         <td><input name="date" id="cal_date" type="text" size="15" maxlength="10" value="{DATE}"/>
 						<img src="/images/ico_calendar.gif" width="16" height="13" id="cal_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
@@ -96,7 +96,7 @@
                       </tr>
                       <!-- BEGIN recurring_dates -->
                       <tr>
-                       <td class="formLabelWidth" valign="top"><h2>Repeat</h2>
+                       <td class="formLabelWidth" valign="top"><h3>Repeat</h3>
                        <em>The frequency that this event recurs if at all.</em></td>
                        <td><select name="repeat" onchange="toggleRepeat(this);">
                        	   <option value="">Single Event</option>
@@ -107,7 +107,7 @@
                            </select></td>
                       </tr>
                       <tr id="repeatUntil" style="display: none;">
-                      <td class="formLabelWidth" valign="top"><h2>Repeat Until</h2>
+                      <td class="formLabelWidth" valign="top"><h3>Repeat Until</h3>
                       <em>The date at which recurrence should cease.</em></td>
                       <td><input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="10" value=""/>
 						<img src="/images/ico_calendar.gif" width="16" height="13" id="repeat_until_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
@@ -123,7 +123,7 @@
                       </tr>
                       <!-- END recurring_dates -->
                       <tr> 
-                        <td><h2>Time</h2><em>Both time slots are optional.</em></td>
+                        <td><h3>Time</h3><em>Both time slots are optional.</em></td>
                         <td> <input name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />
                           : 
                           <input name="minute" type="text" maxlength="2" value="{MIN}" class="timeField" /> 
@@ -131,7 +131,7 @@
                             <option value="am" {AM} >AM</option>
                             <option value="pm" {PM} >PM</option>
                           </select>
-                          to 
+                          to<br /><br /> 
                           <input name="tohour" type="text" maxlength="2" value="{TOHOUR}" class="timeField" />
                           : 
                           <input name="tominute" type="text" maxlength="2" value="{TOMIN}" class="timeField" /> 
@@ -141,7 +141,7 @@
                           </select></td>
                       </tr>
                       <tr> 
-                        <td><h2>Priority</h2>
+                        <td><h3>Priority</h3>
                         	<em>This will determine the colour that the note shall appear on the calendar</em>                        </td>
                         <td><select name="priority">
                              <!-- BEGIN priority_drop -->
@@ -150,7 +150,7 @@
                           </select></td>
                       </tr>
                       <tr> 
-                        <td><h2>Level</h2><em>Select who you would like to be able to see this event</em></td>
+                        <td><h3>Level</h3><em>Select who you would like to be able to see this event</em></td>
                         <td><select name="level" id="level" onChange="showRow()">
                        		 <!-- BEGIN level_drop -->
                               <option value="{LEVEL_ID}" {LEVEL_ID_SELECTED}>{LEVEL_NAME}</option>
@@ -158,7 +158,7 @@
                         </select></td>
                       </tr>
                       <tr id="groupDrop" style="display:none;"> 
-                        <td><h2>Group</h2><em>Select the group which will be able to view this event</em></td>
+                        <td><h3>Group</h3><em>Select the group which will be able to view this event</em></td>
                         <td>
                         <select name="group">
                             <!-- BEGIN group_drop -->
@@ -168,7 +168,7 @@
                         </td>
                       </tr>                      
                       <tr id="campusList" style="display:none;"> 
-                        <td><h2>Campus</h2><em>Select the campus' which will be able to view this event</em></td>
+                        <td><h3>Campus</h3><em>Select the campus' which will be able to view this event</em></td>
                         <td>
 						<!-- BEGIN campus_list -->
 							<label><input type="checkbox" class="campusCheck" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}</label><br />
@@ -177,7 +177,7 @@
 						</td>
                       </tr>
                       <tr id="groupList" style="display:none;"> 
-                        <td><h2>Group</h2><em>Select the group which will be able to view this event</em></td>
+                        <td><h3>Group</h3><em>Select the group which will be able to view this event</em></td>
                         <td>
 						<!-- BEGIN group_list -->
 							<label><input type="checkbox" name="groupCheck[]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />{GROUP_NAME}</label><br />
@@ -185,7 +185,7 @@
                         </td>
                       </tr>
                       <tr> 
-                        <td><h2>Description</h2></td>
+                        <td><h3>Description</h3></td>
                         <td ><textarea name="note" cols="50" rows="3">{DESCRIPTION}</textarea></td>
                       </tr>
                       <tr> 

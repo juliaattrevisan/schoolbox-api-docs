@@ -1,22 +1,18 @@
-<div class="component" id="component{COMPONENT_ID}">
-  <div class="componentHeader">
-    <h2 class="cont-head">Members</h2>
+<div class="box" id="component{ID}">
+  <h2>Members</h2>
+  <div class="text listing">
+  	<ul>
+    	<!-- BEGIN members -->
+    	<li class="{ON_OFF}">
+      	{MEMBER_NAME}
+      </li>
+      <!-- END members -->
+    </ul>
+    
   </div>
-  <table>
-    <!-- BEGIN members -->
-    <tr>
-      <td class="small_text">{MEMBER_NAME}</td>
-    </tr>
-    <!-- END members -->
-    <tr style="height:2px;">
-      <td colspan="2" style="background:#666;"></td>
-    </tr>
-    <tr>
-      <td style="text-align:right;"><form action="/mail/createMail.php" method="post" name="form2">
-          <input type="hidden" name="replyto" value="{HEADING} &lt;{REPLYTO}&gt;" />
-          <input type="hidden" name="bcc" value="{EMAILALL}" />
-          <input class="emailall" type="submit" name="emailall" value="Email all" />
-        </form></td>
-    </tr>
-  </table>
+  <form action="/mail/createMail.php" method="post" name="form2">
+      <input type="hidden" name="replyto" value="{HEADING} &lt;{REPLYTO}&gt;" />
+      <input type="hidden" name="bcc" value="{EMAILALL}" />
+      <input class="emailall" type="submit" name="emailall" value="Email all" />
+    </form>
 </div>

@@ -1,10 +1,8 @@
-<div class="component" id="component{COMPONENT_ID}">
-  <div class="componentHeader">
-    <h2 class="cont-head">Assignments</h2>
-  </div>
+<div class="box" id="component{COMPONENT_ID}">
+  <h2>Assignment</h2>
 <!-- BEGIN config -->
-  <a class="config" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
-  <div class="componentConfig">
+  <a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+  <div class="editPanel hide">
     <form action="/homepage/configForm.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
@@ -19,23 +17,20 @@
     </form>
   </div>
 <!-- END config -->
-  <table>
-    <!-- BEGIN assign -->
-    <tr>
-      <td class="large_text"><h3>{ASS_NAME}</h3></td>
-      <td class="large_text" style="text-align:right"><strong>Due Date: </strong>{ASS_DATE}</td>
-    </tr>
-    <tr>
-      <td colspan="2" class="large_text summ" style="border-bottom:1px solid #666">{ASS_COMMENT}</td>
-    </tr>
-    <!-- END assign -->
-    <tr style="height:1px;">
-      <td colspan="2" style="border-bottom:1px solid #666;"></td>
-    </tr>
-    <!-- BEGIN submit_ass -->
-    <tr>
-      <td style="text-align:right;" colspan="2"><a href="/submission/createSubmission.php?category={ID}&type=2">POST ASSIGNMENT</a></td>
-    </tr>
-    <!-- END submit_ass -->
-  </table>
+	<div class="text listing">
+  	<ul>
+    	<!-- BEGIN assign -->
+      <li class="{ON_OFF}">
+      	<h3>{ASSIGN_NAME}</h3>
+        <p class="interact">{ASSIGN_DATE}</p>
+        <p>{ASSIGN_COMMENT}</p>
+        <div class="float-fix"></div>
+      </li>
+      <!-- END assign -->
+    </ul>
+    <div class="float-fix"></div>
+  </div>
+  <!-- BEGIN submit_ass -->
+    <p class="interact"><a href="/submission/createSubmission.php?category={ID}&type=2">Post Assignment</a></p>
+  <!-- END submit_ass -->
 </div>

@@ -1,5 +1,7 @@
-      <h1>{MONTH} - {YEAR}</h1>
-      <span class="header_option"><a href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}">Month View</a></span>
+      <link rel="stylesheet" type="text/css" href="/css/core/calendar.css" />
+      <div id="calendar">
+      <h1>{MONTH} - {YEAR} <a class="customise" href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}">Month View</a></h1>
+      
       <center>
           <table class="calendarTable">
             <tr>
@@ -11,7 +13,7 @@
                   <!-- END month_drop -->
                 </select>
               </td>
-              <td colspan="2"><select name="Year" onchange="window.open('/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-'+this.value, '_self', '');">
+              <td colspan="2"><select class="small" name="Year" onchange="window.open('/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-'+this.value, '_self', '');">
                   <!-- BEGIN year_drop -->
                   <option value="{DROP_YEAR_NUMBER}" {DROP_YEAR_NUMBER_SELECTED}>{DROP_YEAR_NUMBER}</option>
                   <!-- END year_drop -->
@@ -60,3 +62,4 @@
         </tbody>
         <!-- END day_block -->
       </table>
+      </div>

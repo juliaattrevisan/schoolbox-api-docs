@@ -1,7 +1,6 @@
-<div class="component" id="component{COMPONENT_ID}">
-  <div class="componentHeader">
-    <h2 class="cont-head">Drop Box</h2>
-  </div>
+<div class="box" id="component{ID}">
+  <h2>Drop Box</h2>
+  <div class="text listing">
   <!-- BEGIN drop_student -->
   <form action="/subject/modDropBox.php" method="post" enctype="multipart/form-data" class="standardForm" >
     <table cellspacing="0">
@@ -18,20 +17,17 @@
   </form>
   <!-- END drop_student -->
   <!-- BEGIN drop_staff -->
-  <table cellspacing="0">
+  <ul>
     <!-- BEGIN drop_file -->
-    <tr>
-      <td class="small_text"><a href="/subject/modDropBox.php?id={DROPBOX_ID}">
-        <h3>{DROPBOX_DESCRIPTION}</h3>
-        </a>
-      </td><td class="small_text" style="text-align:right">
-      <a href="/subject/modDropBox.php?delete={DROPBOX_ID}">Delete</a>
-      </td>
-    </tr>
-    <tr>
-      <td style="border-bottom:1px solid #666;" class="small_text" colspan="2">By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}</td>
-    </tr>
+    <li class="{ON_OFF}">
+    	<h3><a href="/subject/modDropBox.php?id={DROPBOX_ID}">{DROPBOX_DESCRIPTION}</a></h3>
+      <p class="interact"><a href="/subject/modDropBox.php?delete={DROPBOX_ID}">Delete</a></p>
+      <p class="small">By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}</p>
+      <div class="float-fix"></div>
+    </li>
     <!-- END drop_file -->
-  </table>
+  </ul>
   <!-- END drop_staff -->
+  <div class="float-fix"></div>
+  </div>
 </div>

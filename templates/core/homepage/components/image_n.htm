@@ -1,32 +1,29 @@
-<div class="component" id="component{COMPONENT_ID}">
-  <div class="componentHeader">
-    <h2 class="cont-head">Image</h2>
+<div class="box image" id="component{COMPONENT_ID}">
+  <h2>Feature Image</h2>
+  <!-- BEGIN config -->
+    <a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+    <div class="editPanel hide">
+      <form action="/homepage/configForm.php" method="get">
+        <input type="hidden" name="cid" value="{ID}" />
+        <input type="hidden" name="type" value="config" />
+        <input type="hidden" name="component" value="{COMPONENT_ID}" />
+        <label for="url">URL:</label>
+        <input type="text" name="url" value="{COMPONENT_CONFIG_URL}" size="25"/>
+        <label for="image">Image: </label>
+        <select name="image">
+          <!-- BEGIN image -->
+          <option value="{COMPONENT_CONFIG_IMAGE}"{COMPONENT_CONFIG_IMAGE_SELECTED}>{COMPONENT_CONFIG_IMAGE}</option>
+          <!-- END image -->
+        </select>
+        <label for="url">Pixels:</label>
+      	<input type="text" name="pixel" value="{COMPONENT_CONFIG_PIXEL}" size="4"/>
+        <input type="submit" value="Update" />
+      </form>
+    </div>
+  <!-- END config -->
+  <div class="text">
+  <!-- BEGIN previewimage -->
+    {CONTENT_URL_START}<img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}" />{CONTENT_URL_END}
+  <!-- END previewimage -->
   </div>
-<!-- BEGIN config -->
-  <a class="config" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
-  <div class="componentConfig">
-    <form action="/homepage/configForm.php" method="get">
-      <input type="hidden" name="cid" value="{ID}" />
-      <input type="hidden" name="type" value="config" />
-      <input type="hidden" name="component" value="{COMPONENT_ID}" />
-  	<label for="url">URL:</label>
-    <input type="text" name="url" value="{COMPONENT_CONFIG_URL}" size="25"/>
-      <label for="image">Image: </label>
-      <select name="image">
-      	<!-- BEGIN image -->
-      	<option value="{COMPONENT_CONFIG_IMAGE}"{COMPONENT_CONFIG_IMAGE_SELECTED}>{COMPONENT_CONFIG_IMAGE}</option>
-      	<!-- END image -->
-      </select>
-      <label for="url">Pixels:</label>
-    <input type="text" name="pixel" value="{COMPONENT_CONFIG_PIXEL}" size="4"/>
-      <input type="submit" value="Update" />
-    </form>
-  </div>
-<!-- END config -->
-	  <!-- BEGIN previewimage -->
-	  <div style="text-align:center;">
-	    {CONTENT_URL_START}<img src="{PREVIEW_IMAGE_URL}" border="0" alt="{PREVIEW_IMAGE_DESC}" title="{PREVIEW_IMAGE_DESC}" />{CONTENT_URL_END}
-	  </div>
-	  <br style="clear:both;" />
-	  <!-- END previewimage -->
 </div>
