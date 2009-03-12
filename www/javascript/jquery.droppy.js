@@ -48,7 +48,7 @@ $.fn.droppy = function(options) {
 	  	if (!$.data($(this), 'cancelHide'))
 			$(this).slideUp(options.speed).removeClass("closing"); 
 	  });
-	  $(subnav).slideUp(options.speed);
+	  
       $(subnav).css({zIndex: zIndex++}).slideDown(options.speed);
       if (this.nodeName.toLowerCase() == 'ul') {
         var li = getActuator(this);
