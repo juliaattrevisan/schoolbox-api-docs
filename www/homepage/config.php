@@ -60,9 +60,19 @@ if(is_numeric($this->arg[0])) {
 		}
 	}
 			
+	
+	$this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 	// Colors
 	$listColor = $homepage->getColorList();
+	$this->setVar('COLOUR_ARRAY', 'pickers');
 	$this->setVar($listColor);
+	$this->parse('colour_list_block', 'colour_list', true);
+	
+	// defaults
+	$defaultColour = unserialize(HOMEPAGE_colors);
+	$this->setVar('COLOUR_ARRAY', 'defaults');
+	$this->setVar($defaultColour);
+	$this->parse('colour_list_block', 'colour_list', true);
 }
 else
 	error(18);

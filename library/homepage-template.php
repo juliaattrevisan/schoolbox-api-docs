@@ -54,7 +54,7 @@ class HomepageTemplate extends  Model {
 			$homepage->saveComponentPosition(8, 1, 1, '');
 			$homepage->saveComponentPosition(3, 1, 2, serialize(array('size' => 5)));
 			$homepage->saveComponentPosition(2, 1, 3, serialize(array('size' => 5)));
-			$homepage->saveComponentPosition(12, 2, 1, serialize(array('size' => 7)));
+			$homepage->saveComponentPosition(17, 2, 1, serialize(array('size' => 7)));
 			$homepage->saveComponentPosition(11, 2, 2, serialize(array('size' => 7)));
 			$homepage->saveComponentPosition(9, 2, 3, '');
 			$homepage->saveComponentPosition(10, 2, 4, '');
@@ -74,7 +74,7 @@ class HomepageTemplate extends  Model {
 			$homepage->saveComponentPosition(8, 1, 1, '');
 			$homepage->saveComponentPosition(3, 1, 2, serialize(array('size' => 5)));
 			$homepage->saveComponentPosition(2, 1, 3, serialize(array('size' => 5)));
-			$homepage->saveComponentPosition(12, 2, 1, serialize(array('size' => 7)));
+			$homepage->saveComponentPosition(17, 2, 1, serialize(array('size' => 7)));
 			$homepage->saveComponentPosition(11, 2, 2, serialize(array('size' => 7)));
 			$homepage->saveComponentPosition(5, 2, 3, serialize(array('size' => 5)));
 			$homepage->saveComponentPosition(9, 2, 3, '');

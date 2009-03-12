@@ -139,15 +139,22 @@ define('HOMEPAGE_small_text_font', 4);
 define('HOMEPAGE_small_text_bg', 2);
 
 define('HOMEPAGE_colors', serialize(array(
-			'large_head_fontcolour' => '000000', 
-			'large_head_bgcolour' => '003399', 
-			'large_text_fontcolour' => '000000', 
-			'large_text_bgcolour' => 'FFFFFF', 
-			'small_head_fontcolour' => '000000', 
-			'small_head_bgcolour' => '0066CC', 
-			'small_text_fontcolour' => '000000', 
-			'small_text_bgcolour' => 'FFFFDF'
-		)));
+	'left_head_font' => '000000', 
+	'left_head_bg' => 'ffffff', 
+	'left_font' => '000000', 
+	'left_bg_primary' => 'FFFFFF', 
+	'left_bg_secondary' => 'dbdbdb', 
+	'left_link' => 'cf0034', 
+	'left_hover' => 'c3536f', 
+	'right_head_font' => '000000', 
+	'right_head_bg' => 'ffffff', 
+	'right_font' => '000000', 
+	'right_bg_primary' => 'FFFFFF', 
+	'right_bg_secondary' => 'dbdbdb', 
+	'right_link' => 'cf0034', 
+	'right_hover' => 'c3536f',  
+	
+)));
 
 //module config options
 define('HELPDESK_enable', false);

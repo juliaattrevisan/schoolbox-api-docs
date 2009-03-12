@@ -41,7 +41,16 @@ class Homepage {
 		$query = "SELECT left_head_font, left_head_bg, left_font, left_bg_primary, left_bg_secondary, left_link, left_hover, 
 						right_head_font, right_head_bg, right_font, right_bg_primary, right_bg_secondary, right_link, right_hover
 						FROM homepage_config WHERE cid = '{$this->cid}'";
-		return $this->db->dbGetSingleRow($query); 
+		$colourList = $this->db->getRow($query); 
+
+		// use defaults for missing colours
+		$defaultColours = unserialize(HOMEPAGE_colors);
+		if (is_array($colourList)) {
+			foreach ($colourList as $key => $value) {
+				if (empty($value)) $colourList[$key] = $defaultColours[$key];
+			}
+		}
+		return $colourList;
 	}
 
 	
