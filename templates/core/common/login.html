@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="James Leckie, Lektec Consulting"/>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/shore/screen.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/screen.css" />
 <script type="text/javascript">
 window.onload = init;
 function init(){
@@ -20,10 +20,10 @@ function init(){
 
 <div id="container">
   <div id="header">
-    	<img id="logo" src="/images/shore/shore-logo.gif" alt="" />
+    	<img id="logo" src="/images/{SITE_LOCATION}/{SITE_LOCATION}-logo.gif" alt="" />
   </div>
   <div id="content">
-    <h1>Shore Portal</h1>
+    <h1>{SITE_LOCATION} Portal</h1>
     <p class="error">{ERROR}</p>
     <form id="loginForm" method="post" action="/loginForm.php">
     	<fieldset>
@@ -43,7 +43,7 @@ function init(){
 
 <div id="footer">
 	<ul>
-  	<li>2008 &copy; Copyright Shore</li>
+  	<li>2008 &copy; Copyright {SITE_LOCATION}</li>
     <li><a href="#">Guidelines of Use and Privacy Policy</a></li>
     <li class="last"><a href="#">Developed By Lektec Consulting</a></li>
   </ul>

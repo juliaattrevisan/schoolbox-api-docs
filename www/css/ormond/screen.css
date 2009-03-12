@@ -5,13 +5,16 @@ body {
 	background: 0;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	}
+#container { padding: 0; }
+#nav { position: absolute; float: left; top: 139px; }
 #header {
 	height: 119px;
 	background: #C90033 url(/images/ormond/header-back.gif) repeat-x;
 	border: 0;
 	}
+#search { width: 243px; margin-top: 75px; }
 #content {
-	padding-top: 20px;
+	padding: 20px 20px 20px 190px;
 	}
 #logo {
 	position: absolute;
@@ -26,14 +29,17 @@ body {
 	right: 0;
 	left: 189px;
 	}
+#tabs li {
+	margin-left: -1px;
+	}
 #tabs li a {
 	color: #fff;
 	font-weight: bold;
 	background: #525456;
 	border: 1px solid #292929;
-	padding: 0 15px;
+	padding: 0 10px;
 	display: block;
-	line-height: 31px;
+	line-height: 27px;
 	}
 #tabs li a:hover {
 	background: #3f4042;
@@ -45,11 +51,41 @@ body {
 .box.grey { background: 0; }
 .box a { color: #CF0034; }
 .box a:hover { color: #C3536F; }
+.box a.edit { color: #000; background: 0; }
+#content .box a.edit:hover { color: #fff; background: #CF0034; }
+
+.box ul {
+	list-style: none;
+	}
+.box ul li, .news-item ul li {
+	list-style: none;
+	background: url(/images/ormond/bullet.gif) no-repeat 0 4px;
+	padding-left: 20px;
+	} 
+.box .listing ul li {
+	background: 0;
+	} 
+/*---------------------------------------
+	News Styles
+----------------------------------------*/
+h3#news-header {
+	font-size: 116%;
+	line-height: 26px;
+	text-indent: 4px;
+	background: #fff url(/images/ormond/heading-back.gif) repeat-x;
+	border-bottom: 1px dotted #1C1713;
+	font-weight: bold;
+	color: #000;
+	}
+.news-item {
+	padding: 0;
+	background: 0;
+	}
 /*---------------------------------------
 	Component Styles
 ----------------------------------------*/
 h1 {
-	background: #fff url(/images/ormond/heading-back.gif) repeat-x;
+	background: #f9f8f1 url(/images/ormond/heading-back.png) repeat-x;
 	font-size: 1.33em;
 	font-weight: bold; 
 	border-bottom: 1px dotted #1C1713;
@@ -57,16 +93,20 @@ h1 {
 	margin-bottom: 10px;
 	padding: 3px;
 	position: relative;
+	text-transform: capitalize;
 	}
+h1 a.customise { color: #CF0034; font-weight: bold; top: 5px; right: 5px; }
 h2 {
-	background: #fff url(/images/ormond/heading-back.gif) repeat-x;
+	background: #f9f8f1 url(/images/ormond/heading-back.png) repeat-x;
 	border-bottom: 1px dotted #1C1713;
-	font-weight: normal;
+	font-weight: bold;
 	color: #000;
-	}	
+	}
+
 /*---------------------------------------
 	Nav Styles
 ----------------------------------------*/
+#nav { width: 170px; }
 #nav h3 {
 	border-bottom: 1px solid #fff;
 	background: #CF0034;
@@ -86,12 +126,17 @@ h2 {
 #nav li a {
 	background: #EEEEE7;
 	color: #222223;
+	width: 140px;
 	}
 #nav li li a:hover,
 #nav li a:hover {
 	background: #DEDEDE;
 	color: #f00;
+	text-decoration: none;
 	}
-#nav li.parent > a span, #nav li.parent > a:hover span {
-	background: url(/images/ormond/nav-arrow.gif) no-repeat 100% 5px;
+#nav li.parent > a.hover span, #nav li.parent > a span, #nav li.parent > a:hover span {
+	background: url(/images/ormond/nav-arrow.gif) no-repeat 100% 4px;
+	cursor: pointer;
 	}
+#nav ul ul { width: 170px; left: 170px; top: -2px; }
+#nav ul ul ul { left: 170px; top: -2px; }

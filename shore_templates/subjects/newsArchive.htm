@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/main.dwt" codeOutsideHTMLIsLocked="false" -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<title>{TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/> 
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/ormond/screen.css" />
+
+<!-- BEGIN header_css -->
+<link rel="stylesheet" type="text/css" media="{HEADER_CSS_TYPE}" href="{HEADER_CSS_LOCATION}" />
+<!-- END header_css -->
+
+
+<script type="text/javascript" src="/javascript/jquery.js"></script>
+<script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
+<script type='text/javascript'>
+  var $j = jQuery.noConflict();
+	
+	$j(function() {
+    $j('#nav ul').droppy({speed: 0});
+  });
+</script>
+<!-- BEGIN header_javascript -->
+<script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>
+<!-- END header_javascript -->
+
+</head>
+<body>
+<!-- InstanceBeginEditable name="head" -->
+
+<!-- InstanceEndEditable -->
+
+<div id="nav">
+	<h3>ORMOND INTRANET</h3>
+  {MCSSMENU}
+	<!-- BEGIN msubject -->
+	<h3>Intranet Menu</h3>
+  <ul>
+    <!-- BEGIN msubject_block --> 
+    <li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li> 
+    <!-- END msubject_block -->
+  </ul>
+  <!-- END msubject -->
+  <!-- BEGIN mstudent -->
+	<h3>My Students</h3>
+  <ul>
+    <!-- BEGIN mstudent_block --> 
+    <li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
+    <!-- END mstudent_block -->
+  </ul>
+  <!-- END mstudent -->
+  <!-- BEGIN mgroup --> 
+  <h3>My Groups</h3>
+  <ul>
+  	<!-- BEGIN mgroup_block --> 
+		<li><a href="/homepage/{MGID}/">{MGNAME}</a></li> 
+		<!-- END mgroup_block -->
+  </ul>	
+  <!-- END mgroup --> 
+  <h3>My Links</h3>
+  <ul>
+  	<!-- BEGIN mlink_block -->
+  	<li>{MLINK}</li>
+    <!-- END mlink_block --> 
+    <li><a href="/editLinks.php">Add Link</a></li>
+  </ul>	
+</div>
+
+<div id="container">
+  <div id="header">
+    <div id="logo"></div>
+    <form id="search" action="" method="post">
+      <fieldset>
+        <input id="search-field" type="text" />
+        <input id="search-button" type="image" src="/images/ormond/search-button.gif" value="Search" />
+      </fieldset>
+    </form>  
+    <ul id="tabs">
+	<li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Main</a></li>
+  <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">News</a></li>
+  <!-- BEGIN webmail_tab -->
+  <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
+  <!-- END webmail_tab -->
+  <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
+  <!-- BEGIN timetable_tab -->
+  <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
+  <!-- END timetable_tab -->
+  <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
+  <!-- BEGIN portfolio_tab -->
+  <li><a class="{TAB_PORTFOLIO_ON}" href="/cms/portfolio" title="Access your portfolio area">My Portfolio</a></li>
+  <!-- END portfolio_tab -->
+  <li><a href="/logout.php" title="">Logout</a></li>
+</ul>	
+  </div>
+  <div id="content">
+  <!-- InstanceBeginEditable name="content" -->			
+        <h1>News Archive for {CATEGORY_NAME}</h1>
+              <!-- BEGIN submit_news -->
+  				<span class="header_option"><a href="/subject/modSubNews.php?category={ID}">POST NEWS</a></span>
+ 			 <!-- END submit_news -->
+			 <!-- BEGIN news -->
+			<a name="{NEWS_ID}"></a>
+			<h2>{NEWS_HEADING}</h2>
+			<span class="header_option">{MOD_NEWS}</span>
+			<div class="indent">
+				{NEWS_BODY}
+				<hr>
+				<span class="element_footer">Posted by {EMAIL_CONTACT} on {POSTED_DATE}</span>
+				</td>
+			</div>
+            <!-- END news -->
+			<!-- InstanceEndEditable -->
+  <div class="float-fix"></div>
+  </div>
+</div>
+  
+</body>
+<!-- InstanceEnd --></html>

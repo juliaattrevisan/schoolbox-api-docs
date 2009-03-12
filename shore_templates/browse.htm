@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<title>{TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/> 
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/ormond/screen.css" />
+
+<!-- BEGIN header_css -->
+<link rel="stylesheet" type="text/css" media="{HEADER_CSS_TYPE}" href="{HEADER_CSS_LOCATION}" />
+<!-- END header_css -->
+
+
+<script type="text/javascript" src="/javascript/jquery.js"></script>
+<script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
+<script type='text/javascript'>
+  var $j = jQuery.noConflict();
+	
+	$j(function() {
+    $j('#nav ul').droppy({speed: 0});
+  });
+</script>
+<!-- BEGIN header_javascript -->
+<script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>
+<!-- END header_javascript -->
+
+</head>
+<body>
+<!-- #BeginEditable "head" --><!-- #EndEditable -->
+
+<div id="nav">
+	<h3>ORMOND INTRANET</h3>
+  {MCSSMENU}
+	<!-- BEGIN msubject -->
+	<h3>Intranet Menu</h3>
+  <ul>
+    <!-- BEGIN msubject_block --> 
+    <li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li> 
+    <!-- END msubject_block -->
+  </ul>
+  <!-- END msubject -->
+  <!-- BEGIN mstudent -->
+	<h3>My Students</h3>
+  <ul>
+    <!-- BEGIN mstudent_block --> 
+    <li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
+    <!-- END mstudent_block -->
+  </ul>
+  <!-- END mstudent -->
+  <!-- BEGIN mgroup --> 
+  <h3>My Groups</h3>
+  <ul>
+  	<!-- BEGIN mgroup_block --> 
+		<li><a href="/homepage/{MGID}/">{MGNAME}</a></li> 
+		<!-- END mgroup_block -->
+  </ul>	
+  <!-- END mgroup --> 
+  <h3>My Links</h3>
+  <ul>
+  	<!-- BEGIN mlink_block -->
+  	<li>{MLINK}</li>
+    <!-- END mlink_block --> 
+    <li><a href="/editLinks.php">Add Link</a></li>
+  </ul>	
+</div>
+
+<div id="container">
+  <div id="header">
+    <div id="logo"></div>
+    <form id="search" action="" method="post">
+      <fieldset>
+        <input id="search-field" type="text" />
+        <input id="search-button" type="image" src="/images/ormond/search-button.gif" value="Search" />
+      </fieldset>
+    </form>  
+    <ul id="tabs">
+	<li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Main</a></li>
+  <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">News</a></li>
+  <!-- BEGIN webmail_tab -->
+  <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
+  <!-- END webmail_tab -->
+  <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
+  <!-- BEGIN timetable_tab -->
+  <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
+  <!-- END timetable_tab -->
+  <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
+  <!-- BEGIN portfolio_tab -->
+  <li><a class="{TAB_PORTFOLIO_ON}" href="/cms/portfolio" title="Access your portfolio area">My Portfolio</a></li>
+  <!-- END portfolio_tab -->
+  <li><a href="/logout.php" title="">Logout</a></li>
+</ul>	
+  </div>
+  <div id="content">
+  <!-- #BeginEditable "content" --> 
+            <h1>{CATEGORY_PATH}</h1>
+			<p>
+			<!-- BEGIN view_expand --><a href="browse.php?category={CID}&verbose=1">expand view</a>
+			<!-- END view_expand -->
+			<!-- BEGIN view_collapse --><a href="browse.php?category={CID}">collapse view</a>
+			<!-- END view_collapse -->
+			<!-- BEGIN view_homepage -->
+			// <a href="/homepage.php?category={CID}">view homepage</a> 
+			<!-- END view_homepage -->
+			<!-- BEGIN view_image_gallery -->
+			// <a href="/cms/imageGallery.php?category={CID}">view images</a>
+			<!-- END view_image_gallery -->
+			<!-- BEGIN modify_access -->
+			// <a href="/cms/modFolder.php?action=mod&cid={CID}">modify folder</a>
+			// <a href="/cms/modResource.php?type=file&cid={CID}">add file</a>
+			// <a href="/cms/modResource.php?type=files&cid={CID}">add multiple file</a>
+			// <a href="/cms/modResource.php?type=url&cid={CID}">add link</a>
+			// <a href="/cms/modFolder.php?action=add&cid={CID}">add folder</a>
+			// <a href="/cms/fetchFolder.php?folder={CID}">download</a>
+			<!-- END modify_access -->
+			 </p>
+			<hr />
+                  <table>
+					<!-- BEGIN category_listing -->                    
+					<tr> 
+                      <td><a href="{CATEGORY_LINK}"><img  src="/images/mime/folder_blue_full.png" width="30" height="30" border="0" alt="Folder"/></a>
+						  <a href="{CATEGORY_LINK}">{CATEGORY_NAME}</a></td>
+                      <td class="cntr">{HOMEPAGE}</td>
+                      <!-- BEGIN mod_cat -->
+                      <td class="cntr"><a href="/cms/modFolder.php?action=mod&amp;cid={CATID}">modify</a></td>
+                      <td><a href="/cms/modFolder.php?delete={CATID}" onclick="return(confirm('Remove folder {CATEGORY_NAME_ESCAPED}?'));">delete</a></td>
+                      <!-- END mod_cat -->
+                    </tr>
+                  <!-- END category_listing -->
+                  <!-- BEGIN file_listing -->
+                    <tr> 
+                       <td colspan="2">{FILE_URL}<img src="{FILE_IMAGE}" width="25" height="27" border="0" alt="{FILE_MIME}" />{FILE_URL_END} {FILE_URL}{FILE_DESCRIPTION}{FILE_URL_END} <em>{SIZE}</em></td>
+                      <!-- BEGIN mod_file -->
+                      <td class="cntr"><a href="/cms/modResource.php?type=modfile&amp;id={FILEID}">modify</a></td>
+                      <td><a href="/cms/delResource.php?fileid={FILEID}" onclick=" return(confirm('Remove file {FILE_DESCRIPTION_ESCAPED}?'));">delete</a></td>
+                      <!-- END mod_file -->
+                    </tr>
+                    <!-- BEGIN file_desc -->
+                    <tr>
+                      <td colspan="2">{COMMENT}</td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2"><p class="element_footer">Submitted by {OWNER} on {DATETIME}</p></td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                    </tr>
+                  <!-- END file_desc -->
+                  <!-- END file_listing -->
+                  <!-- BEGIN link_listing -->
+                    <tr>
+                      <td colspan="2"><a href="{LINK_URL}" target="{LINK_TARGET}"><img src="/images/mime/http-url.png" width="25" height="27" border="0" alt="URL" /></a> <a href="{LINK_URL}" target="{LINK_TARGET}">{LINK_DESCRIPTION}</a></td>
+                      <!-- BEGIN mod_link -->
+                      <td class="cntr"><a href="/cms/modResource.php?type=modurl&amp;id={LINKID}">modify</a> </td>
+                      <td><a href="/cms/delResource.php?linkid={LINKID}" onclick="return(confirm('Remove link {LINK_DESCRIPTION_ESCAPED}?'));">delete</a> </td>
+                      <!-- END mod_link -->
+                    </tr>
+                    <!-- BEGIN link_desc -->
+                    <tr>
+                      <td colspan="2">{COMMENT}</td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2"><p class="element_footer">Submitted by {OWNER} on {DATETIME}</p></td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                    </tr>
+                    <!-- END link_desc -->
+					<!-- END link_listing -->
+                  </table>
+            <!-- #EndEditable -->
+  <div class="float-fix"></div>
+  </div>
+</div>
+  
+</body>
+<!-- #EndTemplate --></html>

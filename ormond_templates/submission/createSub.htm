@@ -3,116 +3,106 @@
 <!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
 <!--  Visit us at www.lektec.com.au -->
 <head>
-<!-- #BeginEditable "doctitle" -->
 <title>{TITLE}</title>
-<!-- #EndEditable -->
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="James Leckie, Lektec Consulting"/>
-<meta name="ROBOTS" content="INDEX, FOLLOW" />
-<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/ormond-default.css" />
-<link rel="stylesheet" type="text/css" media="print" href="/css/ormond-print.css" />
-<!--<script type="text/javascript" src="/javascript/drop_down.js"></script> -->
-<!-- ULTIMATE DROP DOWN MENU Version 4.5 by Brothercake -->
-<!-- http://www.udm4.com/ -->
-<script type="text/javascript" src="/javascript/udm-resources/udm-custom_ormond.js"></script>
-<script type="text/javascript" src="/javascript/udm-resources/udm-control.js"></script>
-<script type="text/javascript" src="/javascript/udm-resources/udm-style.js"></script>
-<!-- #BeginEditable "scripts" -->
+<meta name="author" content="James Leckie, Lektec Consulting"/> 
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/ormond/screen.css" />
+
+<!-- BEGIN header_css -->
+<link rel="stylesheet" type="text/css" media="{HEADER_CSS_TYPE}" href="{HEADER_CSS_LOCATION}" />
+<!-- END header_css -->
+
+
+<script type="text/javascript" src="/javascript/jquery.js"></script>
+<script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
+<script type='text/javascript'>
+  var $j = jQuery.noConflict();
+	
+	$j(function() {
+    $j('#nav ul').droppy({speed: 0});
+  });
+</script>
+<!-- BEGIN header_javascript -->
+<script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>
+<!-- END header_javascript -->
+
+</head>
+<body>
+<!-- #BeginEditable "head" -->
 
 <link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
 <script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
 <script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
 <script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
 <!-- #EndEditable -->
-</head>
-<body>
-<script type="text/javascript" src="/javascript/udm-resources/udm-dom.js"></script>
-<script type="text/javascript" src="/javascript/udm-resources/udm-mod-keyboard.js"></script>
-<div id="outerWrap">
-	<div id="header">
-		<div id="ormond-logo"></div>
-		<form id="searchForm" action="/search.php" method="get">
-			<table cellpadding="0" cellspacing="0">
-				<tr>
-					<td><label for="keyword">Search</label>
-						<input type="text" name="keyword" id="keyword" /></td>
-					<td class="go"><input type="image" src="/images/ormond/go.gif" alt="Search" name="Submit" /></td>
-				</tr>
-			</table>
-			
-		</form>		
-	</div>
-	<div id="left">
-		<div id="udmMenuWrap">
-			<h3>ORMOND INTRANET</h3>
-			{MCSSMENU}
-		</div>
-		<!-- BEGIN msubject -->
-		<div class="sideWrap">
-			<h3>MY SUBJECTS</h3>
-			<div class="whiteWrap">
-				<ul>
-					<!-- BEGIN msubject_block -->
-					<li><a href="/homepage.php?code={MSUBCODE}">{MSUBJECT}</a></li>
-					<!-- END msubject_block -->
-				</ul>
-			</div>
-		</div>
-		<!-- END msubject -->
-         <!-- BEGIN mstudent --> 
-		<h3>MY STUDENTS</h3> 
-		<ul> 
-			<!-- BEGIN mstudent_block --> 
-			<li><a href="/search/userLookup.php?id={MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
-			<!-- END mstudent_block --> 
-		</ul> 
-		<!-- END mstudent --> 
-		<!-- BEGIN mgroup -->
-		<div class="sideWrap">
-			<h3>MY GROUPS</h3>
-			<div class="whiteWrap">
-				<ul>
-					<!-- BEGIN mgroup_block -->
-					<li><a href="/homepage.php?category={MGID}">{MGNAME}</a></li>
-					<!-- END mgroup_block -->
-				</ul>
-			</div>
-		</div>
-		<!-- END mgroup -->
-		<div class="sideWrap">
-			<h3>MY LINKS</h3>
-			<div class="whiteWrap">
-				<ul>
-					<!-- BEGIN mlink_block -->
-					<li>{MLINK}</li>
-					<!-- END mlink_block -->
-					<li><a href="/editLinks.php">ADD LINK</a></li>
-				</ul>
-			</div>
-		</div>
-	</div>
-	<!-- end left -->
-	<!-- #BeginEditable "tabs" --><!-- #BeginLibraryItem "/Library/Browse_Active.lbi" -->
-    <div id="topNav">
-      <ul>
-        <li class="left"><a class="left" href="/home" title="Greeting page" accesskey="m" ><span><em>M</em>ain</span></a></li>
-        <li class="norm"><a class="norm" href="/news" title="Current school news" accesskey="n"><span><em>N</em>ews</span></a></li>
-        <!-- BEGIN webmail_tab -->
-        <li class="norm"><a class="norm" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><span><em>W</em>ebmail</span></a></li>
-        <!-- END webmail_tab -->
-        <li class="norm"><a class="norm" href="/calendar/week" title="School calendar events" accesskey="c"><span><em>C</em>alendar</span></a></li>
-        <!-- BEGIN timetable_tab -->
-        <li class="norm"><a class="norm" href="/timetable" title="View your school timetable" accesskey="t"><span><em>T</em>imetable</span></a></li>
-        <!-- END timetable_tab -->
-        <li class="navthis norm"><a class="navthis norm" href="/resources" title="Browse resources and homepages" accesskey="r"><span><em>R</em>esources<span></a></li>
-        <li class="right"><a class="right" href="/cms/browseMyFiles.php" title="Upload files to your own private area" accesskey="f"><span>My <em>F</em>iles<span></a></li>
-      </ul>
-    </div>
-	<!-- #EndLibraryItem --><!-- #EndEditable -->
-	<div id="content">
-		<div id="content_text"> <!-- #BeginEditable "main" -->
+
+<div id="nav">
+	<h3>ORMOND INTRANET</h3>
+  {MCSSMENU}
+	<!-- BEGIN msubject -->
+	<h3>Intranet Menu</h3>
+  <ul>
+    <!-- BEGIN msubject_block --> 
+    <li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li> 
+    <!-- END msubject_block -->
+  </ul>
+  <!-- END msubject -->
+  <!-- BEGIN mstudent -->
+	<h3>My Students</h3>
+  <ul>
+    <!-- BEGIN mstudent_block --> 
+    <li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
+    <!-- END mstudent_block -->
+  </ul>
+  <!-- END mstudent -->
+  <!-- BEGIN mgroup --> 
+  <h3>My Groups</h3>
+  <ul>
+  	<!-- BEGIN mgroup_block --> 
+		<li><a href="/homepage/{MGID}/">{MGNAME}</a></li> 
+		<!-- END mgroup_block -->
+  </ul>	
+  <!-- END mgroup --> 
+  <h3>My Links</h3>
+  <ul>
+  	<!-- BEGIN mlink_block -->
+  	<li>{MLINK}</li>
+    <!-- END mlink_block --> 
+    <li><a href="/editLinks.php">Add Link</a></li>
+  </ul>	
+</div>
+
+<div id="container">
+  <div id="header">
+    <div id="logo"></div>
+    <form id="search" action="" method="post">
+      <fieldset>
+        <input id="search-field" type="text" />
+        <input id="search-button" type="image" src="/images/ormond/search-button.gif" value="Search" />
+      </fieldset>
+    </form>  
+    <ul id="tabs">
+	<li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Main</a></li>
+  <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">News</a></li>
+  <!-- BEGIN webmail_tab -->
+  <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
+  <!-- END webmail_tab -->
+  <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
+  <!-- BEGIN timetable_tab -->
+  <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
+  <!-- END timetable_tab -->
+  <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
+  <!-- BEGIN portfolio_tab -->
+  <li><a class="{TAB_PORTFOLIO_ON}" href="/cms/portfolio" title="Access your portfolio area">My Portfolio</a></li>
+  <!-- END portfolio_tab -->
+  <li><a href="/logout.php" title="">Logout</a></li>
+</ul>	
+  </div>
+  <div id="content">
+  <!-- #BeginEditable "content" -->
 			<h1>{HEADING} Submission Box</h1>
 			<form action="" method="post" name="form" id="form" class="standardForm" enctype="multipart/form-data">
 				<table>
@@ -209,8 +199,10 @@
 					</tr>
 				</table>
 			</form>
-			<!-- #EndEditable --> </div>
-	</div>
+			<!-- #EndEditable -->
+  <div class="float-fix"></div>
+  </div>
 </div>
+  
 </body>
 <!-- #EndTemplate --></html>

@@ -98,8 +98,16 @@ h3 { font-size: 1em; }
  Table Styles 
 --------------------------------------------------------------*/
 table   { margin-bottom: 0; border: 0; }
-th,td   { height: 1em; padding:0.2em 1em; border: 0; }
+th,td   { height: 1em; padding:0.4em 1em; border: 0; }
 th      { font-weight:bold; }
+#search-results td { padding: 0.5em; }
+#search-results thead th { border-bottom: 1px dotted #000; }
+
+#directory { width: 100%; }
+#directory td { padding: 0.2em 0; }
+#directory h2 {
+	float: none;
+	}
 /*--------------------------------------------------------------
  Layout element styles 
 -------------------------------------------------------------*/
@@ -460,6 +468,7 @@ p.interact a { color: #003e7e; }
 	width: 46%;
 	margin-right: 25px;
 	min-height: 80px;
+	background: 0;
 	}
 #component-list li input {
 	float: left;
@@ -556,6 +565,10 @@ ul.tree, ul.tree ul {
 	margin: 0;
 	padding: 0;
 	}
+#content ul.tree li {
+	background: 0;
+	padding-left: 5px;
+	}
 ul.tree li a {
 	background: url(/images/folder-img-plus.gif) no-repeat;
 	line-height: 18px;
@@ -572,7 +585,7 @@ ul.tree li.minus ul {
 ul.tree li.minus a {
 	background: url(/images/folder-img-minus.gif) no-repeat;
 	}
-ul.tree ul li {
+#content ul.tree ul li {
 	background: 0;
 	padding-left: 0;
 	margin-bottom: 7px;
