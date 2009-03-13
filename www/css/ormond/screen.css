@@ -5,6 +5,8 @@ body {
 	background: 0;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	}
+a { color: #CF0034; }
+a:hover { color: #C3536F; }
 #container { padding: 0; }
 #nav { position: absolute; float: left; top: 139px; }
 #header {
@@ -64,7 +66,10 @@ body {
 	} 
 .box .listing ul li {
 	background: 0;
-	} 
+	}
+.header_option {
+	margin-top: -30px;
+	}
 /*---------------------------------------
 	News Styles
 ----------------------------------------*/

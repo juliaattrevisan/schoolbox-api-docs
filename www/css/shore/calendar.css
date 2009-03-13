@@ -31,10 +31,6 @@
 	text-indent: 0;
 	float: left;
 	}
-.header_option {
-	float:right;
-	margin-top: 7px;
-	}
 #month-view {
 	border-top: 1px dotted #cccccc;
 	border-left: 1px dotted #cccccc;

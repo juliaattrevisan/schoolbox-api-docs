@@ -6,11 +6,13 @@ body {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	background: url(/images/wenona/bg.gif) repeat-y;
 	}
+a { color: #006; }
+a:hover { color: #c00; }
 #container { padding: 0; }
 #nav { position: absolute; float: left; top: 46px; width: 150px; }
 #header {
 	height: 70px;
-	background: #003366 url(/images/wenona/headerv3.gif) no-repeat scroll 150px 0;
+	background: #003366 url(/images/wenona/headerv3.gif) scroll 150px 0;
 	border-bottom: 2px solid #cc0000;
 	}
 #search { width: 455px; margin-top: 10px; }
@@ -54,9 +56,9 @@ body {
 	background: #fff;
 	}
 .box.grey { background: 0; }
-.box a { color: #CF0034; }
-.box a:hover { color: #C3536F; }
-.box a.edit { color: #000; background: 0; }
+.box a { color: #006; }
+.box a:hover { color: #c00; }
+.box a.edit { color: #000; background: 0; height: 18px; line-height: 18px; }
 #content .box a.edit:hover { color: #fff; background: #CF0034; }
 
 .box ul {
@@ -69,7 +71,12 @@ body {
 	} 
 .box .listing ul li {
 	background: 0;
-	} 
+	}
+.box h2 {
+	height: 18px;
+	line-height: 18px;
+	font-size: 110%;
+	}
 /*---------------------------------------
 	News Styles
 ----------------------------------------*/
@@ -154,3 +161,24 @@ h2 {
 	}
 #nav ul ul { width: 150px; left: 150px; top: -2px; }
 #nav ul ul ul { left: 150px; top: -2px; }
+
+/*---------------------------------------
+	Footer Styles
+----------------------------------------*/
+#footer {
+	margin: 0 0 0 10px;
+	padding: 0;
+	border: 0;
+	width: 130px;
+	}
+#footer ul li {
+	display: block;
+	color: #fff;
+	font-size: 80%;
+	background: 0;
+	margin: 0;
+	padding: 0;
+	}
+#footer ul li a {
+	color: #fff;
+	}

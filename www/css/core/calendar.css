@@ -10,6 +10,7 @@
 #calendar table thead td {
 	border-bottom: 1px solid #666;
 	}
+.calendarTime { font-size: 80%; }
 #month-view thead td {
 	background: #666;
 	color: #fff;
@@ -32,8 +33,10 @@
 	float: left;
 	}
 .header_option {
-	float:right;
-	margin-top: 7px;
+	margin-top: 8px;
+	}
+.header_option a:hover {
+	text-decoration: underline;
 	}
 #month-view {
 	border-top: 1px dotted #cccccc;

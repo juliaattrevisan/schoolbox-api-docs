@@ -51,11 +51,6 @@
 	text-indent: 4px;
 	border: 0;
 	}
-.header_option {
-	float:right;
-	margin: 7px 5px 0 0;
-	z-index: 10;
-	}
 .header_option a {
 	color: #CF0034;
 	}

@@ -90,7 +90,7 @@ hr { background-color: #d2d2d2; border: 0; height: 1px; }
 /*--------------------------------------------------------------
  Heading Styles 
 --------------------------------------------------------------*/
-h1 { font-size: 1.33em; font-weight: bold; border-bottom: 1px dashed #7f7f7f; line-height: 2; margin-bottom: 1em; position: relative; }
+h1 { font-size: 1.33em; font-weight: bold; border-bottom: 1px dashed #7f7f7f; line-height: 2; margin-bottom: 1em; position: relative; text-transform: capitalize; }
 h1 a.customise { position: absolute; top: 0; right: 0; font-size: 70%; font-weight: normal; }
 h3 { font-size: 1em; }
 #news-header { margin-bottom: 1em; }
@@ -261,6 +261,16 @@ table.ruler { width: 100%; }
 	background: #3875D7;
 	color: #fff;
 	}
+.header_option {
+	text-align: right;
+	display: block;
+	float: right;
+	margin: -33px 5px 0 0;
+	position: relative;
+}
+.header_option a:hover {
+	text-decoration: underline;
+}
 /*--------------------------------------------------------------
 Side Nav styles 
 --------------------------------------------------------------*/
