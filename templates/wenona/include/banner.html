@@ -1,16 +1,12 @@
-<script type="text/javascript" src="/javascript/udm-resources/udm-dom.js"></script>
-<div id="outerWrap"> 
-	<div id="header"></div> 
-	<div id="searchBox"> 
-		<form class="standardForm" id="searchForm" action="/search.php" method="get"> 
-			<p style="margin:0;"> 
-				<input class="short" type="text" name="keyword" /> 
+
+		<form id="search" action="/search.php" method="get"> 
+    	<fieldset>
+				<input id="search-field" type="text" name="keyword" /> 
 				<select class="short" name="where"> 
 					<option value="0" selected="selected">portal</option> 
 					<option value="1">google</option> 
 					<option value="2">yahoo</option> 
 				</select> 
-				<input class="img" type="image" src="/images/wenona/searchbutton.gif" alt="Search" name="Submit" /> 
-			</p> 
-		</form> 
-	</div> 
+				<input id="search-button" type="image" src="/images/{SITE_LOCATION}/search-button.gif" value="Search" />
+       </fieldset>
+		</form>

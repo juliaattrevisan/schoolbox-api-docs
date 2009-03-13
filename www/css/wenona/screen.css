@@ -1,0 +1,156 @@
+/*---------------------------------------
+	Layout Styles
+----------------------------------------*/
+body {
+	background: 0;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	background: url(/images/wenona/bg.gif) repeat-y;
+	}
+#container { padding: 0; }
+#nav { position: absolute; float: left; top: 46px; width: 150px; }
+#header {
+	height: 70px;
+	background: #003366 url(/images/wenona/headerv3.gif) no-repeat scroll 150px 0;
+	border-bottom: 2px solid #cc0000;
+	}
+#search { width: 455px; margin-top: 10px; }
+#search-button { margin-top: 4px; }
+#search select {
+	border:1px solid #B8B8B8;
+	float:left;
+	width: 175px;
+	margin: 0 0 0 20px;
+	}
+#search select option {
+	padding:2px 5px;
+	}
+#content {
+	padding: 20px 20px 20px 160px;
+	background: 0;
+	}
+#tabs {
+	bottom: 0;
+	right: 0;
+	left: 151px;
+	}
+#tabs li {
+	margin: 0 15px 0 0;
+	}
+#tabs li a {
+	color: #fff;
+	font-weight: bold;
+	background: 0;
+	border: 0;
+	padding: 0 10px;
+	display: block;
+	line-height: 24px;
+	font-size: 90%;
+	}
+#tabs li a:hover {
+	background: 0;
+	}
+#tabs li a.navthis {
+	color: #3f4042;
+	background: #fff;
+	}
+.box.grey { background: 0; }
+.box a { color: #CF0034; }
+.box a:hover { color: #C3536F; }
+.box a.edit { color: #000; background: 0; }
+#content .box a.edit:hover { color: #fff; background: #CF0034; }
+
+.box ul {
+	list-style: none;
+	}
+.box ul li, .news-item ul li {
+	list-style: none;
+	background: url(/images/ormond/bullet.gif) no-repeat 0 4px;
+	padding-left: 20px;
+	} 
+.box .listing ul li {
+	background: 0;
+	} 
+/*---------------------------------------
+	News Styles
+----------------------------------------*/
+h3#news-header {
+	font-size: 116%;
+	line-height: 26px;
+	text-indent: 4px;
+	background: 0;
+	border-bottom: 2px solid #002452;
+	font-weight: bold;
+	color: #000;
+	}
+.news-item {
+	padding: 0;
+	background: 0;
+	clear: left;
+	}
+.news-item .interact {
+	float: left;
+	}
+/*---------------------------------------
+	Component Styles
+----------------------------------------*/
+h1 {
+	background: 0;
+	font-size: 1.5em;
+	font-weight: bold; 
+	border-bottom: 2px solid #B51C21;
+	line-height: normal;
+	margin-bottom: 10px;
+	padding: 3px;
+	position: relative;
+	text-transform: capitalize;
+	}
+h1 a.customise { color: #006; font-weight: bold; top: 5px; right: 5px; }
+h2 {
+	border-bottom: 2px solid #002452;
+	font-weight: bold;
+	color: #000;
+	background: 0;
+	text-indent: 4px;
+	}
+
+/*---------------------------------------
+	Nav Styles
+----------------------------------------*/
+#nav h3 {
+	background: url(/images/wenona/linkBG.gif) repeat-x;
+	line-height: 24px;
+	padding-left: 5px;
+	}
+#nav ul ul { border: 1px solid #00458C; border-bottom: 0; background: #9CC7DE; }
+#nav li li a {
+	background: #9CC7DE;
+	color: #000;
+	}
+#nav li {
+	border-bottom: 0;
+	}
+#nav li li {
+	border-bottom: 1px solid #00458C;
+	}
+#nav li a {
+	background: #003366 url(/images/wenona/white_arrow.png) no-repeat scroll 2px 5px;
+	width: 130px;
+	font-size: 90%;
+	color: #fff;
+	padding: 3px 6px 3px 14px;
+	}
+#nav li li a:hover {
+	background: #0054ac;
+	color: #fff;
+	text-decoration: none;
+	}
+#nav li a:hover {
+	background-color: #9CC7DE;
+	text-decoration: none;
+	}
+#nav li.parent > a.hover span, #nav li.parent > a span, #nav li.parent > a:hover span {
+	background: url(/images/wenona/nav-arrow.gif) no-repeat 100% 4px;
+	cursor: pointer;
+	}
+#nav ul ul { width: 150px; left: 150px; top: -2px; }
+#nav ul ul ul { left: 150px; top: -2px; }

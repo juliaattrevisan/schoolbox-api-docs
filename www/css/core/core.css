@@ -104,10 +104,11 @@ th      { font-weight:bold; }
 #search-results thead th { border-bottom: 1px dotted #000; }
 
 #directory { width: 100%; }
-#directory td { padding: 0.2em 0; }
+#directory td { padding: 0.5em 0; }
 #directory h2 {
 	float: none;
 	}
+table.ruler { width: 100%; }
 /*--------------------------------------------------------------
  Layout element styles 
 -------------------------------------------------------------*/
@@ -277,6 +278,8 @@ Side Nav styles
 	background: #00264d;
 	padding:  0 0 0 16px;
 	line-height: 28px;
+	text-transform: capitalize;
+	clear: left;
 	}
 #nav ul {
 	list-style: none;
@@ -541,6 +544,7 @@ a.layout:hover img {
 	height: 22px;
 	line-height: 22px;
 	background-repeat: no-repeat;
+	background-image: url(/images/mime/text-file.png);
 	}
 .folder_blue_full {
 	background-image: url(/images/mime/folder_blue_full.png);
@@ -679,6 +683,8 @@ input.timeField { width: 30px; }
 	float: left;
 	margin: 5px 20px 10px 10px;
 	}
+.cancelled { text-decoration: line-through; }
+.file { background-repeat: no-repeat; }
 /*--------------------------------------------------------------
  sIFR Replacements
 --------------------------------------------------------------*/
