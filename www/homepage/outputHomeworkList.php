@@ -1,7 +1,4 @@
 <?php
-//reset ON_OFF
-$j=0;
-
 //homework output
 $this->setBlock($componentHandle, "homework", "homework_block");
 
@@ -20,9 +17,9 @@ if (is_array($homeworkList)) {
 		//if staff or student is enrolled and there is work due provide a link
 		if($enroled)
 		{
-			if(isStudent($_SESSION['gid']) &&!is_numeric($homework['studentWork']) && $homework['late'] > date('U') && $homework['open'] < date('U') ) //student
+			if($groupHandler->isStudent() &&!is_numeric($homework['studentWork']) && $homework['late'] > date('U') && $homework['open'] < date('U') ) //student
 				$dueDate = "<a href=\"/submission/submitWork.php?box_id=".$homework['id']."\">".$date."</a>";
-			else if(isStaff($_SESSION['gid']) && $homework['owner'] == $_SESSION['id']) //if staff owns box provide link
+			else if($groupHandler->isStaff() && $homework['owner'] == $_SESSION['id']) //if staff owns box provide link
 				$dueDate = "<a href=\"/submission/viewSubmission.php?box_id=".$homework['id']."\">".$date."</a>";
 			else
 				$dueDate = $date;

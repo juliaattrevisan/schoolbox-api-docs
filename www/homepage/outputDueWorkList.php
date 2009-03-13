@@ -17,9 +17,9 @@ if (is_array($submissionList)) {
 		$dateURL = false;
 
 		if($enroled) {
-			if(isStudent($_SESSION['gid']) && !is_numeric($submission['studentWork']) && $submission['late'] > time() && $submission['open'] < time())
+			if($groupHandler->isStudent() && !is_numeric($submission['studentWork']) && $submission['late'] > time() && $submission['open'] < time())
 				$dateURL = "/submission/submitWork.php?box_id=" . $submission['id'];
-			else if(isStaff($_SESSION['gid']) && $submission['owner'] == $_SESSION['id'])
+			else if($groupHandler->isStaff() && $submission['owner'] == $_SESSION['id'])
 				$dateURL = "/submission/viewSubmission.php?box_id=" . $submission['id'];
 		}
 		

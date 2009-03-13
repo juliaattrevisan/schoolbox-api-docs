@@ -347,11 +347,7 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
 		$fileId = $fileHandler->create($data, $_FILES['file']);
 		
 		
-	} else if (!is_numeric($_POST['fileId'])) {
-		
-		$fileId = $fileDB->addFile("", "", "", $_POST['description'], $_POST['comment'], $_POST['cid']);
-	}
-	
+	} 	
 	
 	$subbox->createSubmission($_POST['cid'], 
 			$_POST['open_date'], $_POST['open_hour'], $_POST['open_minute'], $_POST['open_period'],

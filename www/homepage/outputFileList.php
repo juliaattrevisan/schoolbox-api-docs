@@ -1,7 +1,4 @@
 <?php
-//Reset ON_OFF
-$j =0;
-
 //file output
 $this->setBlock($componentHandle, 'files', 'files_block');
 $this->setBlock('files', 'file_url', 'file_url_block');
@@ -15,6 +12,17 @@ $fileList = $fileHandler->getAllInCategory($categoryID, $config);
 
 if (is_array($fileList)) {
 	foreach ($fileList as $file) {
+	
+		$output = array('FILE_DESCRIPTION'	=> scrubTEXT($file['description']),
+						'FILE_ID'			=> $file['id'],
+						'FILE_MIME_IMAGE'	=> str_replace(".", "-", substr($file["iconFile"], 0, strrpos($file["iconFile"], "."))),
+						'FILE_POSTED_BY'	=> formatName($file),
+						'FILE_POSTED_BY_ID'	=> $file['owner'],
+						'FILE_POSTED_DATE'	=> outputDate(DATE_short_format, $file['submitted']),
+						'FILE_COMMENT'		=> nl2br(scrubTEXT($file['comment'])),
+						'ON_OFF'			=> ++$j%2? '' : 'dark',
+						);
+		$this->setVar($output);
 
 		//set name
 		if($file['realname'] != "") {
@@ -35,17 +43,7 @@ if (is_array($fileList)) {
 			$this->parse('file_no_url_block', 'file_no_url');
 			
 		}
-		
-		$output = array('FILE_NAME'			=> scrubTEXT($file['description']),
-						'FILE_ID'			=> $file['id'],
-						'FILE_MIME_IMAGE'	=> str_replace(".", "-", substr($file["iconFile"], 0, strrpos($file["iconFile"], "."))),
-						'FILE_POSTED_BY'	=> formatName($file),
-						'FILE_POSTED_BY_ID'	=> $file['owner'],
-						'FILE_POSTED_DATE'	=> outputDate(DATE_short_format, $file['submitted']),
-						'FILE_COMMENT'		=> nl2br(scrubTEXT($file['comment'])),
-						'ON_OFF'			=> ++$j%2? '' : 'dark',
-						);
-		$this->setVar($output);
+
 		
 		if($permission >= WRITE_ACCESS)
 			$this->parse('modify_file_block', 'modify_file');
@@ -53,8 +51,6 @@ if (is_array($fileList)) {
 			$this->setVar('modify_file_block','');
 		
 		$this->parse("files_block", "files", true);
-		
-		
 
 	}
 } else

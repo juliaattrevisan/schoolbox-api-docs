@@ -1,6 +1,4 @@
 <?php
-//reset ON_OFF
-$j=0;
 
 		//output users of group
 		$this->setBlock($componentHandle, "members", "members_block");

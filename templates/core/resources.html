@@ -179,6 +179,12 @@ $j(document).ready(function() {
 				}
 			}
 		});
+		$j($j(node).parents("tr")[0]).dblclick(function () {
+			if ($j(node).hasClass("link"))
+				window.open("/redir.php?id="+$j(this).attr("id").substring(5),"_blank"); 
+			else
+				window.open("/send.php?id="+$j(this).attr("id").substring(5),"_blank"); 
+		});
 	}
   }; 
 

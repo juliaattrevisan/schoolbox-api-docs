@@ -159,22 +159,21 @@ define("STUDENTGROUPIDS", serialize(array(3,5)));	//List of id numbers represent
 define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
 define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 
-//homepage config
 define('HOMEPAGE_colors', serialize(array(
-	'left_head_font' => '000000', 
-	'left_head_bg' => 'ffffff', 
+	'left_head_font' => 'FFFFFF', 
+	'left_head_bg' => '002750', 
 	'left_font' => '000000', 
 	'left_bg_primary' => 'FFFFFF', 
-	'left_bg_secondary' => 'dbdbdb', 
-	'left_link' => 'cf0034', 
-	'left_hover' => 'c3536f', 
-	'right_head_font' => '000000', 
-	'right_head_bg' => 'ffffff', 
+	'left_bg_secondary' => 'ECECEC', 
+	'left_link' => '002B58', 
+	'left_hover' => '0065CE', 
+	'right_head_font' => 'FFFFFF', 
+	'right_head_bg' => '9EC6D9', 
 	'right_font' => '000000', 
-	'right_bg_primary' => 'FFFFFF', 
-	'right_bg_secondary' => 'dbdbdb', 
-	'right_link' => 'cf0034', 
-	'right_hover' => 'c3536f',  
+	'right_bg_primary' => 'CCCCCC', 
+	'right_bg_secondary' => 'ECECEC', 
+	'right_link' => '002B58', 
+	'right_hover' => '0065CE',  
 	
 )));
 

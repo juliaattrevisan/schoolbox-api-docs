@@ -1,6 +1,4 @@
 <?php
-//reset ON_OFF
-$j=0;
 
 $this->setBlock($componentHandle, "wiki_row", "wiki_row_block");
 

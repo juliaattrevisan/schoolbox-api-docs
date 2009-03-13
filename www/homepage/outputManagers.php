@@ -1,6 +1,4 @@
 <?php
-//reset ON_OFF
-$j=0;
 
 		//output managers
 		$this->setBlock($componentHandle, "staff_members", "staff_member_block");

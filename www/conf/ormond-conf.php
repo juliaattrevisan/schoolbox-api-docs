@@ -140,14 +140,14 @@ define('HOMEPAGE_small_text_bg', 2);
 
 define('HOMEPAGE_colors', serialize(array(
 	'left_head_font' => '000000', 
-	'left_head_bg' => 'ffffff', 
+	'left_head_bg' => 'f9f8f1', 
 	'left_font' => '000000', 
 	'left_bg_primary' => 'FFFFFF', 
 	'left_bg_secondary' => 'dbdbdb', 
 	'left_link' => 'cf0034', 
 	'left_hover' => 'c3536f', 
 	'right_head_font' => '000000', 
-	'right_head_bg' => 'ffffff', 
+	'right_head_bg' => 'f9f8f1', 
 	'right_font' => '000000', 
 	'right_bg_primary' => 'FFFFFF', 
 	'right_bg_secondary' => 'dbdbdb', 

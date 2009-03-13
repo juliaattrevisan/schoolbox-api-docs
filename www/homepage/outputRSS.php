@@ -1,7 +1,4 @@
 <?php
-//reset ON_OFF
-$j=0;
-
 		$this->setBlock($componentHandle, "rss_stories", "rss_block");
 		
 		require_once('include/lastRSS.php');

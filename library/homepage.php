@@ -139,47 +139,54 @@ class Homepage {
 			WHERE cid = '{$this->cid}'
 			ORDER BY `position`";
 		$currentListComp = $this->db->getAll($query);
-	
-		// Remove deleted ones
-		foreach($currentListComp as $key => $comp)
-		{
-			if(!in_array($comp['component'], $submitListComp))
+		if (is_array($currentListComp)) {
+			// Remove deleted ones
+			foreach($currentListComp as $key => $comp)
 			{
-				unset($currentListComp[$key]);
+				if(!in_array($comp['component'], $submitListComp))
+				{
+					unset($currentListComp[$key]);
+				}
+				else
+					unset($submitListComp[array_search($comp['component'], $submitListComp)]);
 			}
-			else
-				unset($submitListComp[array_search($comp['component'], $submitListComp)]);
 		}
 		
 		// Add new ones to end finding their 
 		$newListComp = $currentListComp;
-		foreach($submitListComp as $key => $comp)
-		{
-			$query = "SELECT size, config FROM homepage_comp WHERE id = $comp";
-			$result = $this->db->getRow($query);
-			$newComp = array(
-				"cid" => $this->cid,
-				"position" => "",
-				"column" => $result['size'],
-				"component" => $comp,
-				"config" => $result['config']
-			);
-			$newListComp[] = $newComp;
+		if (is_array($submitListComp)) {
+			foreach($submitListComp as $key => $comp)
+			{
+				$query = "SELECT size, config FROM homepage_comp WHERE id = $comp";
+				$result = $this->db->getRow($query);
+				$newComp = array(
+					"cid" => $this->cid,
+					"position" => "",
+					"column" => $result['size'],
+					"component" => $comp,
+					"config" => $result['config']
+				);
+				$newListComp[] = $newComp;
+			}
 		}
-		
 		// Reposition both columns and reorder array
 		$count = array(1, 1);
-		foreach($newListComp as $key => $newComp)
-		{
-			$newListComp[$key]['position'] = $count[$newComp['column'] - 1];
-			$count[$newComp['column'] - 1]++;
+		if (is_array($newListComp)) {
+			foreach($newListComp as $key => $newComp)
+			{
+				$newListComp[$key]['position'] = $count[$newComp['column'] - 1];
+				$count[$newComp['column'] - 1]++;
+			}
 		}
+		$newListComp = is_array($newListComp) ? $newListComp : array();
 		$newListComp = array_values($newListComp);
 		
 		// Update
 		$this->deleteComponentPositions();
-		foreach($newListComp as $newComp)
-			$this->saveComponentPosition($newComp['component'], $newComp['column'], $newComp['position'], $newComp['config']);
+		if (is_array($newListComp)) {
+			foreach($newListComp as $newComp)
+				$this->saveComponentPosition($newComp['component'], $newComp['column'], $newComp['position'], $newComp['config']);
+		}
 	}
 	
 	

@@ -130,18 +130,23 @@ define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
 define("PARENTGROUPIDS", serialize(array(4)));
 
 
-
-//homepage config
 define('HOMEPAGE_colors', serialize(array(
-			'large_head_fontcolour' => 'FFFFFF', 
-			'large_head_bgcolour' => '002750', 
-			'large_text_fontcolour' => '000000', 
-			'large_text_bgcolour' => 'FFFFFF', 
-			'small_head_fontcolour' => 'FFFFFF', 
-			'small_head_bgcolour' => '9EC6D9', 
-			'small_text_fontcolour' => '000000', 
-			'small_text_bgcolour' => 'CCCCCC'
-		)));
+	'left_head_font' => 'FFFFFF', 
+	'left_head_bg' => '002750', 
+	'left_font' => '000000', 
+	'left_bg_primary' => 'FFFFFF', 
+	'left_bg_secondary' => 'ECECEC', 
+	'left_link' => '002B58', 
+	'left_hover' => '0065CE', 
+	'right_head_font' => 'FFFFFF', 
+	'right_head_bg' => '9EC6D9', 
+	'right_font' => '000000', 
+	'right_bg_primary' => 'CCCCCC', 
+	'right_bg_secondary' => 'ECECEC', 
+	'right_link' => '002B58', 
+	'right_hover' => '0065CE',  
+	
+)));
 
 
 

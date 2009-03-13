@@ -85,7 +85,7 @@
 				cmenu.menu = cmenu.createMenu(menu,cmenu);
 			}
 			if (cmenu.menu) {
-				cmenu.menu.css({display:'none'});
+				cmenu.menu.css({display:'none'}).addClass("contextMenu");
 				$(cmenu.appendTo).append(cmenu.menu);
 			}
 			

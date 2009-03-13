@@ -1,3 +1,7 @@
+table.contextMenu td {
+	padding: 0;
+	line-height: 1.2;
+}
 /* Classic Windows Theme (default) */
 /* =============================== */
 .context-menu-theme-default {

@@ -62,7 +62,7 @@ var initDrag = function(){
 			},
 			'onComplete': function() {
 				// Replace the draging webBox
-				element.injectBefore(marker).setStyles({'opacity': '1', 'z-index': '1', 'position': 'relative', 'top': '0', 'left': '0'});
+				element.injectBefore(marker).setStyles({'opacity': '1', 'z-index': '0', 'position': 'relative', 'top': '0', 'left': '0'});
 				
 				// Remove width
 				element.setStyle('width', '');

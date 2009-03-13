@@ -34,6 +34,8 @@ class Event extends Model {
 			else
 				$query .= "AND DATE_FORMAT(`date`, '%m') IN (7,8,9,10,11,12) "; // Jul 1 - Dec 31
 		}
+		elseif ($filter == 'day')
+			$query .= "AND DATE(`date`) = CURDATE() ";
 		else
 			$query .= "AND DATE_FORMAT(`date`, '%U') = DATE_FORMAT(NOW(),'%U') ";
 		

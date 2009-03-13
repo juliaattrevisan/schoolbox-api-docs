@@ -1,7 +1,4 @@
 <?php
-//reset ON_OFF
-$j=0;
-
 //news output
 $this->setBlock($componentHandle, 'news', 'news_block');
 

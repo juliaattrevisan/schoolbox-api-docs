@@ -1,7 +1,4 @@
 <?php
-//reset ON_OFF
-$j=0;
-
 // gets teachers involved in subject, outputs links to their addressbook page
 $this->setBlock($componentHandle, "staff_teachers", "staff_teacher_block");
 if($code != "" && SYNERGY_enable)
