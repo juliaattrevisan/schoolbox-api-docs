@@ -14,7 +14,6 @@
       	<!-- END size -->
       </select>
       <input type="submit" value="Update" />
-      <input type="button" onclick="window.open('/wiki/modify/new/{ID}','_self');" value="Create" />
   </form>
 </div>
 <!-- END config -->
@@ -23,12 +22,19 @@
   	<!-- BEGIN wiki_row -->
   	<li class="{ON_OFF}">
     	<h3><a href="/wiki/{WIKI_ID}">{WIKI_HEADING}</a></h3>
-    	<p class="interact"><a href="/search/user/{WIKI_AUTHOR_ID}">{WIKI_AUTHOR}</a></p>
-    	<p>{WIKI_MODIFIED}</p>
+		        <p class="interact">
+          <!-- BEGIN modify_wiki -->
+          <a href="/wiki/modify/{WIKI_ID}">Modify</a>
+          <!-- END modify_wiki -->
+        </p>
+    	<p class="small summ">Created by <a href="/search/user/{WIKI_AUTHOR_ID}">{WIKI_AUTHOR}</a> on {WIKI_MODIFIED}</p>
       <div class="float-fix"></div>
     </li>
   	<!-- END wiki_row -->
   </ul>
   </div>
+    <!-- BEGIN submit_wiki -->
+  <p class="interact"><a href="/wiki/modify/new/{ID}">Create Document</a></p>
+  <!-- END submit_wiki -->
     
 </div>

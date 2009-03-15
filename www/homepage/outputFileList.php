@@ -50,11 +50,11 @@ if (is_array($fileList)) {
 		else
 			$this->setVar('modify_file_block','');
 		
-		$this->parse("files_block", "files", true);
+		$this->parse('files_block', 'files', true);
 
 	}
 } else
-	$this->setVar("files_block", '');
+	$this->setVar('files_block', '');
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_file", "submit_file_block");

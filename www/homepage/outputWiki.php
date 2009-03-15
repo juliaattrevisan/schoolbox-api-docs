@@ -1,6 +1,7 @@
 <?php
 
-$this->setBlock($componentHandle, "wiki_row", "wiki_row_block");
+$this->setBlock($componentHandle, 'wiki_row', 'wiki_row_block');
+$this->setBlock('wiki_row', 'modify_wiki', 'modify_wiki_block');
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/wiki.php';
 $wikiHandler = new Wiki; 
@@ -17,10 +18,22 @@ if (is_array($wikiList)) {
 						'ON_OFF' => ++$j%2? '' : 'dark',
 						);
 		$this->setVar($output);
+		
+		if($permission >= READ_ACCESS)
+			$this->parse('modify_wiki_block', 'modify_wiki');
+		else
+			$this->setVar('modify_wiki_block','');
+		
 		$this->parse('wiki_row_block', 'wiki_row', true);
 	}
 } else
 	$this->setVar('wiki_row_block', '');
 
-		
+//setup block for submission button
+$this->setBlock($componentHandle, 'submit_wiki', 'submit_wiki_block');
+if ($permission < WRITE_ACCESS)
+	$this->setVar('submit_wiki_block', '');
+else
+	$this->parse('submit_wiki_block', 'submit_wiki');	
+
 ?>

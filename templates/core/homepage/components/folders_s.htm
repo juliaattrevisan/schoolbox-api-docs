@@ -23,6 +23,11 @@
       <!-- BEGIN folders -->
       <li class="{ON_OFF}">
         <span class="col"><a class="icons folder_blue_full" href="/resources/{FOLDER_ID}/" >{FOLDER_NAME}</a></span>
+		 <p class="interact">
+          <!-- BEGIN modify_folder -->
+          <a href="/cms/category/{FOLDER_ID}">Modify</a>
+          <!-- END modify_folder -->
+        </p>
         <!-- BEGIN homepage_folder -->
         <span class="col"><a class="icons house" href="/homepage/{FOLDER_ID}/"></a></span>
         <!-- END homepage_folder -->
@@ -33,6 +38,6 @@
     
   </div>
   <!-- BEGIN submit_folder -->
-  <p class="interact"><a href="/cms/modFolder.php?action=add&cid={ID}">Add Folder</a></p>
+  <p class="interact"><a href="/cms/category/new/{ID}">Add Folder</a></p>
   <!-- END submit_folder -->  
 </div>

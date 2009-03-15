@@ -193,7 +193,7 @@ class Category extends Model {
 
 	function logAction ($categoryID, $action) {
 		$logEntry = array(	'object'	=> 'folder',
-							'objectId'	=> $cateogryID,
+							'objectId'	=> $categoryID,
 							'action'	=> $action,
 							'user'		=> $_SESSION['id'],
 							);
@@ -231,7 +231,7 @@ class Category extends Model {
 		if($data['template']) {
 			require_once dirname(__FILE__) . '/homepage-template.php';
 			$templateHandler = new HomepageTemplate;
-			$templateHandler->createTemplate($data['id'], $data['template']);
+			$templateHandler->createTemplate($categoryID, $data['template']);
 		}
 		else
 			unset($data['template']);
