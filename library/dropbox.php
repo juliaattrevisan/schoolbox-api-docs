@@ -103,8 +103,12 @@ class Dropbox
 	} 
 
 	function getFileList($cid) {
-		$query = "SELECT d.id, description, u.id as uid, title, firstname, lastname,  DATE_FORMAT(submitted, '".FILE_date_format."') as subdate 
-				FROM dropbox d LEFT JOIN user u ON owner = u.id WHERE category = '$cid'";
+		$query = "SELECT d.id, d.description, u.id as uid, title, firstname, lastname,  
+						DATE_FORMAT(submitted, '".FILE_date_format."') as subdate, iconFile 
+					FROM dropbox d 
+						LEFT JOIN user u ON owner = u.id 
+						LEFT JOIN allowedFileTypes af ON d.mime_type = af.mime 
+					WHERE category = '$cid'";
 		return $this->db->getAll($query);
 	}
 

@@ -2,21 +2,22 @@
 //output drop box
 $this->setBlock($componentHandle, "drop_student", "drop_student_block");
 $this->setBlock($componentHandle, "drop_staff", "drop_staff_block");
-$this->setBlock("drop_staff", "drop_file", "drop_file_block");
+$this->setBlock('drop_staff', 'drop_file', 'drop_file_block');
 
 if ($permission < WRITE_ACCESS) {
-	$this->parse("drop_student_block", "drop_student");
-	$this->setVar("drop_staff_block", "");
+	$this->parse('drop_student_block', 'drop_student');
+	$this->setVar('drop_staff_block', '');
 }
 else {
 	
-	$this->setVar("drop_student_block", "");
-	require_once("subject/dropbox.php");
-	$dropbox = new dropbox;
+	$this->setVar('drop_student_block', '');
+	require_once '../library/dropbox.php';
+	$dropbox = new Dropbox;
 	$fileList = $dropbox->getFileList($categoryID);
 	if(is_array($fileList)) {
 		foreach($fileList as $file) {
-			$output = array('DROPBOX_DESCRIPTION' => $file['description'],
+			$output = array('DROPBOX_MIME_IMAGE'	=> str_replace(".", "-", substr($file["iconFile"], 0, strrpos($file["iconFile"], "."))),
+							'DROPBOX_DESCRIPTION' => scrubTEXT($file['description']),
 							'DROPBOX_ID'		=> $file['id'],
 							'DROP_SUBMITTED_BY' => "<a href=\"/search/user/{$file['uid']}\">".formatName($file).'</a>',
 							'DROP_SUBMITTED_TIME'=>$file['subdate'],
