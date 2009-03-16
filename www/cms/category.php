@@ -9,6 +9,9 @@ if(is_numeric($this->arg[0])) {
 	if(!($category = $categoryHandler->getByID($this->arg[0])))
 		error(2);
 	
+	if(!($categoryParent = $categoryHandler->getByID($category['parent'])))
+		error(2);
+	
 	$this->setFile(TEMPLATE_content, "cms/modify-category.html");
 	$this->setBlock(TEMPLATE_content, 'perm_table', 'perm_table_block');
 	$this->setBlock(TEMPLATE_content, 'indiv_perms', 'indiv_perms_block');
@@ -17,16 +20,15 @@ if(is_numeric($this->arg[0])) {
 	$this->setTitle('Modify Category');	
 	$this->setTab('resources');
 	
-	$output = array('ACTION'	=> 'Modify',
+	$output = array('ACTION'		=> 'Modify',
 					'CATEGORY_ID'	=> $category['id'],
-					'NAME'		=> scrubText($category['name']),
-					'CODE'		=> scrubText($category['code']),				
+					'NAME'			=> scrubText($category['name']),
+					'CODE'			=> scrubText($category['code']),				
+					'PARENT_ID'		=> $category['parent'],
+					'PARENT_NAME'	=> scrubText($categoryParent['name']),
 					);
-	$this->setVar($output);
 	
-	$categoryTree = $categoryHandler->getCategoryTree();
-	array_unshift($categoryTree, array('CAT_ID' => 0, 'CAT_NAME' => 'Top Level'));
-	$this->dropDown('parent_list', $categoryTree, $category['parent']);
+	$this->setVar($output);
 
 	$templateList = $homeTemplateHandler->getTemplateListDropDown();
 	array_unshift($templateList, array('TEMPLATE_ID' => 0, 'TEMPLATE_NAME' => 'Keep Existing'));
@@ -63,6 +65,9 @@ if(is_numeric($this->arg[0])) {
 	
 } else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
+	if(!($categoryParent = $categoryHandler->getByID($this->arg[1])))
+		error(2);
+
 	$this->setFile(TEMPLATE_content, 'cms/modify-category.html');
 	$this->setBlock(TEMPLATE_content, 'perm_table', 'perm_table_block');
 	$this->setBlock(TEMPLATE_content, 'indiv_perms', 'indiv_perms_block');
@@ -74,15 +79,12 @@ if(is_numeric($this->arg[0])) {
 	$output = array('ACTION'		=> 'Add',
 					'CATEGORY_ID'	=> '',
 					'NAME'			=> '',
-					'CODE'			=> '',				
+					'CODE'			=> '',
+					'PARENT_ID'		=> $categoryParent['id'],
+					'PARENT_NAME'	=> scrubText($categoryParent['name']),				
 					);
 	$this->setVar($output);
 	
-
-	$categoryTree = $categoryHandler->getCategoryTree();
-	array_unshift($categoryTree, array('CAT_ID' => 0, 'CAT_NAME' => 'Top Level'));
-	$this->dropDown('parent_list', $categoryTree, $this->arg[1]);
-
 	$templateList = $homeTemplateHandler->getTemplateListDropDown();
 	array_unshift($templateList, array('TEMPLATE_ID' => 0, 'TEMPLATE_NAME' => 'No Homepage'));
 	$this->dropDown('template_list', $templateList);	
