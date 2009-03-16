@@ -42,7 +42,7 @@ class User extends Model {
 	function getBySynergy($sid) {
 	
 		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id,
-						synergy_id, local_email, alt_email, userCampus.campus
+						synergy_id, local_email, alt_email, userCampus.campus, year
 				FROM user 
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
