@@ -23,14 +23,15 @@
       <!-- BEGIN folders -->
       <li class="{ON_OFF}">
         <span class="col"><a class="icons folder_blue_full" href="/resources/{FOLDER_ID}/" >{FOLDER_NAME}</a></span>
-		 <p class="interact">
-          <!-- BEGIN modify_folder -->
-          <a href="/cms/category/{FOLDER_ID}">Modify</a>
-          <!-- END modify_folder -->
-        </p>
+		 		
+        <span class="col">
+        <!-- BEGIN modify_folder -->
+        <p class="interact"><a href="/cms/category/{FOLDER_ID}">Modify</a></p>
+        <!-- END modify_folder -->
         <!-- BEGIN homepage_folder -->
-        <span class="col"><a class="icons house" href="/homepage/{FOLDER_ID}/"></a></span>
+        <a class="icons house" href="/homepage/{FOLDER_ID}/"></a>
         <!-- END homepage_folder -->
+        </span>
         <div class="float-fix"></div>
       </li>
       <!-- END folders -->

@@ -458,7 +458,7 @@ h2 span {
 .listing h3 a:hover { color: #003e7e; }
 .listing p { clear: both; margin: 0 0 0.5em; }
 p.interact { font-size: 90%; text-align: right; clear: none; }
-li p.interact { margin: 0; }
+li p.interact { margin: 0 0 0 15px; float: right; }
 p.interact a { color: #003e7e; }
 .listing p.small { font-size: 90%; float: right; color: #989898; }
 .listing p.small a { color: #5c5151; text-decoration: none; }
@@ -554,7 +554,7 @@ a.layout:hover img {
 	height: 22px;
 	line-height: 22px;
 	background-repeat: no-repeat;
-	background-image: url(/images/mime/text-file.png);
+	background-image: url(/images/mime/textfile.png);
 	}
 .folder_blue_full {
 	background-image: url(/images/mime/folder_blue_full.png);
@@ -650,6 +650,7 @@ ul.tree li.icon a {
 	float: left;
 	width: 759px;
 	}
+.standardForm .formLabelWidth { width: 40%; }
 .standardForm table {
 	width: 100%;
 	}
