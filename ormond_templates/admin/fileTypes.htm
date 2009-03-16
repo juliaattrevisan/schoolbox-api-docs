@@ -77,28 +77,25 @@
 <div id="container">
   <div id="header">
     <div id="logo"></div>
-    <form id="search" action="" method="post">
+    <form id="search" action="/search.php" method="post">
       <fieldset>
         <input id="search-field" type="text" />
         <input id="search-button" type="image" src="/images/ormond/search-button.gif" value="Search" />
       </fieldset>
     </form>  
     <ul id="tabs">
-	<li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Main</a></li>
-  <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">News</a></li>
-  <!-- BEGIN webmail_tab -->
-  <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
-  <!-- END webmail_tab -->
-  <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
-  <!-- BEGIN timetable_tab -->
-  <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
-  <!-- END timetable_tab -->
-  <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
-  <!-- BEGIN portfolio_tab -->
-  <li><a class="{TAB_PORTFOLIO_ON}" href="/cms/portfolio" title="Access your portfolio area">My Portfolio</a></li>
-  <!-- END portfolio_tab -->
-  <li><a href="/logout.php" title="">Logout</a></li>
-</ul>	
+        <li class="left{TAB_MAIN_ON}"><a class="left{TAB_MAIN_ON}" href="/home/" title="Greeting page" accesskey="m" ><span><em>M</em>ain</span></a></li>
+        <li class="norm{TAB_NEWS_ON}"><a class="norm{TAB_NEWS_ON}" href="/news/" title="Current school news" accesskey="n"><span><em>N</em>ews</span></a></li>
+        <!-- BEGIN webmail_tab --> 
+        <li class="norm{TAB_WEBMAIL_ON}"><a class="norm{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your webmail here" accesskey="w"><span><em>W</em>ebmail</span></a></li>
+        <!-- END webmail_tab -->
+        <li class="norm{TAB_CALENDAR_ON}"><a class="norm{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events" accesskey="c"><span><em>C</em>alendar</span></a></li>
+        <!-- BEGIN timetable_tab -->
+        <li class="norm{TAB_TIMETABLE_ON}"><a class="norm{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable" accesskey="t"><span><em>T</em>imetable</span></a></li>
+        <!-- END timetable_tab -->
+        <li class="norm{TAB_RESOURCES_ON}"><a class="norm{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages" accesskey="r"><span><em>R</em>esources</span></a></li>
+        <li class="right{TAB_MYFILES_ON}"><a class="right{TAB_MYFILES_ON}" href="/cms/browseMyFiles.php" title="Upload files to your own private area" accesskey="f"><span>My <em>F</em>iles</span></a></li>
+    </ul>	
   </div>
   <div id="content">
   <!-- InstanceBeginEditable name="content" -->
@@ -113,7 +110,7 @@
 				<th class="cntr">Delete</th>
 			</tr>
 			<!-- BEGIN file_type -->
-			<tr>
+			<tr class="{ON_OFF}">
 				<td><a href="modFileType.php?id={FILETYPE_ID}"><img src="/images/mime/{ICON}" alt="{MIME}"/></a></td>
 				<td><a href="modFileType.php?id={FILETYPE_ID}">{DESCRIPTION}</a></td>
 				<td><a href="modFileType.php?id={FILETYPE_ID}">{MIME}</a></td>

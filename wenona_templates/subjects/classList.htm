@@ -38,7 +38,7 @@
 <!-- #EndEditable -->
 
 <div id="nav">
-	<h3>WENONA INTRANET</h3>
+	<h3>&raquo; Go To</h3>
   {MCSSMENU}
 	<!-- BEGIN msubject -->
 	<h3>Intranet Menu</h3>
@@ -76,30 +76,39 @@
 <div id="container">
   <div id="header">
     <div id="logo"></div>
-    <form id="search" action="" method="post">
-      <fieldset>
-        <input id="search-field" type="text" />
-        <input id="search-button" type="image" src="/images/wenona/search-button.gif" value="Search" />
-      </fieldset>
-    </form>  
+    <form id="search" action="/search.php" method="get"> 
+    	<fieldset>
+				<input id="search-field" type="text" name="keyword" /> 
+				<select class="short" name="where"> 
+					<option value="0" selected="selected">portal</option> 
+					<option value="1">google</option> 
+					<option value="2">yahoo</option> 
+				</select> 
+				<input id="search-button" type="image" src="/images/wenona/search-button.gif" value="Search" />
+       </fieldset>
+		</form>  
     <ul id="tabs">
-	<li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Main</a></li>
-  <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">News</a></li>
-  <!-- BEGIN webmail_tab -->
-  <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
-  <!-- END webmail_tab -->
-  <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
-  <!-- BEGIN timetable_tab -->
-  <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
-  <!-- END timetable_tab -->
-  <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
-  <!-- BEGIN portfolio_tab -->
-  <li><a class="{TAB_PORTFOLIO_ON}" href="/cms/portfolio" title="Access your portfolio area">My Portfolio</a></li>
-  <!-- END portfolio_tab -->
-  <li><a href="/logout.php" title="">Logout</a></li>
-  <!-- BEGIN myfiles_tab -->
-  <!-- END myfiles_tab -->
-</ul>	
+      <li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Main</a></li>
+      <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">News</a></li>
+      <!-- BEGIN webmail_tab -->
+      <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
+      <!-- END webmail_tab -->
+      <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
+      <!-- BEGIN timetable_tab -->
+      <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
+      <!-- END timetable_tab -->
+      <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
+      <!-- BEGIN portfolio_tab -->
+      <li><a class="{TAB_PORTFOLIO_ON}" href="/cms/portfolio" title="Access your portfolio area">My Portfolio</a></li>
+      <!-- END portfolio_tab -->
+      <!-- BEGIN directory_tab -->
+      <li><a class="{TAB_DIRECTORY_ON}" href="http://intranet.wenona.nsw.edu.au/" title="Access your portfolio area">Directory</a></li>
+      <!-- END directory_tab -->
+      <!-- BEGIN myfiles_tab -->
+      <li><a class="{TAB_MY_FILES_ON}" href="http://myfiles.wenona.nsw.edu.au/NetStorage" title="Access your portfolio area">My Files</a></li>  
+      <!-- END myfiles_tab -->
+      <li><a href="/logout.php" title="">Logout</a></li>
+    </ul>
   </div>
   <div id="content">
   <!-- #BeginEditable "content" -->
