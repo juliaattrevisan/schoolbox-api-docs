@@ -76,25 +76,21 @@ for ($i = 0; $i < $totalDays; $i++) {
 	$this->setVar("ADD", "<a href=\"/calendar/modify.php?date=".date("d-m-Y", $currentDay)."&returnTo=month\">add</a>");
 	
 	
-	$sub = $calendarHandler->getSubmissionEvents($this->currDay, $this->currMonth, $this->currYear);
-	// output submission events
-	for($j=0; $sub[$j]; $j++) {
+	$submissionList = $calendarHandler->getSubmissionEvents($currentDay);
+	if (is_array($submissionList)) {
+		foreach ($submissionList as $submission) {	
 	
-		if($sub[$i]['synergyCode'][$j])
-			$descr = $sub[$j]['category']." (".$sub[$j]['synergyCode'].") - ".$sub[$j]['description'];
-		else
-			$descr = $sub[$j]['category']." - ".$sub[$j]['description'];
-		
-		$output = array('TIME'		=> $sub[$j]['dueTime'],
-						'NOTE'		=> "WORK DUE ".$descr,
-						'PRIORITY'	=> $calendarHandler->displayColour(1),
-						'MODIFY_START'	=> "",
-						'MODIFY_END'	=> "",
-					  );					  
-		
-		$this->setVar($output);
-		$this->parse("note_listing", "note_block", true);
-		$subout = 1;
+			$output = array('TIME'			=> $submission['dueTime'],
+							'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['description'],
+							'PRIORITY'		=> $calendarHandler->displayColour(1),
+							'MODIFY_START'	=> "",
+							'MODIFY_END'	=> "",
+						  );					  
+			
+			$this->setVar($output);
+			$this->parse("note_listing", "note_block", true);
+			$subout = 1;
+		}
 	}
 
 

@@ -89,8 +89,6 @@ $output = array('YEAR'	 => date("Y",$startOfWeek),
 $this->setVar($output);
 
 // week list
-$sub = $calendarHandler->getWeekSubmissionEvents($currentDay);
-
 for($i=0; $i < 7; $i++) {
 
 	$currentDay = strtotime("+$i day", $startOfWeek);
@@ -99,23 +97,22 @@ for($i=0; $i < 7; $i++) {
 	$this->setVar("ADD", "<a href=\"/calendar/modify.php?date=".date("d-m-Y", $currentDay)."\">add</a>");
 	
 	// output submission events
-	for($j=0; $sub[$i]['category'][$j]; $j++) {
+	$submissionList = $calendarHandler->getSubmissionEvents($currentDay);
+	if (is_array($submissionList)) {
+		foreach ($submissionList as $submission) {	
 	
-		if($sub[$i]['synergyCode'][$j])
-			$descr = $sub[$i]['category'][$j]." (".$sub[$i]['synergyCode'][$j].") - ".$sub[$i]['description'][$j];
-		else
-			$descr = $sub[$i]['category'][$j]." - ".$sub[$i]['description'][$j];
-		
-		$output = array('TIME'		=> $sub[$i]['dueTime'][$j],
-						'NOTE'		=> "WORK DUE ".$descr,
-						'PRIORITY'	=> $calendarHandler->displayColour(1),
-						'MODIFY'	=> "",
-					  );					  
-		
-		$this->setVar($output);
-		$this->parse("note_listing", "note_block", true);
-		$subout = 1;
+			$output = array('TIME'			=> $submission['dueTime'],
+							'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['description'],
+							'PRIORITY'		=> $calendarHandler->displayColour(1),
+							'MODIFY'		=> "",
+						  );					  
+			
+			$this->setVar($output);
+			$this->parse("note_listing", "note_block", true);
+			$subout = 1;
+		}
 	}
+
 
 	if(SITE_location == "mgs" && SYNERGY_enable) {
 		$birthdayList = $calendarHandler->getStudentBirthdays($currentDay);

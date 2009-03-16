@@ -1,8 +1,13 @@
 <div class="box grey">
   <h2>Today's Events <span>- {DATE}</span></h2>
   <div class="text">
+  <table>
   	<!-- BEGIN note_block -->
-    <p>{TIME}&nbsp;&nbsp;&nbsp;&nbsp;{NOTE}</p>
+    <tr style="color: {NOTE_COLOUR}">
+    <td>{TIME}</td>
+    <td>{NOTE_CATEGORY} {NOTE_DESCRIPTION}</td>
+    </tr>
     <!-- END note_block -->
+    </table>
   </div>
 </div>

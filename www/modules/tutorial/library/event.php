@@ -171,7 +171,8 @@ class Event extends Model {
 		if (SYNERGY_enable) {
 			$query = "SELECT ID synergy_id, Title title, Given1 firstname, Surname lastname
 					  FROM SynergyOne.dbo.vCommunityAddressesConstit vCommunityAddressesConstit
-					  WHERE (vCommunityAddressesConstit.ConstitCode='TUTRES2009') OR (vCommunityAddressesConstit.ConstitCode='TUTNONRES2009')";
+					  WHERE (vCommunityAddressesConstit.ConstitCode='TUTRES2009') OR (vCommunityAddressesConstit.ConstitCode='TUTNONRES2009')
+					  ORDER BY Surname, Given1";
 			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/mssql.php';
 			$mssql = new MSSQL;
 			$tutorList = $mssql->getAll($query);
@@ -209,6 +210,21 @@ class Event extends Model {
 			}
 		}
 		return $output;
+	}
+	
+	function getClass($classID) {
+		$query = "SELECT * FROM ".TUTORIAL_db.".luClass WHERE classID = $classID";
+		return $this->db->getRow($query);
+	}
+	
+	function getClassList() {
+		$query = "SELECT * FROM ".TUTORIAL_db.".luClass ORDER BY `class`, `code`";
+		return $this->db->getAll($query);
+	}
+
+	function getTypeList() {
+		$query = "SELECT * FROM ".TUTORIAL_db.".luType ORDER BY `typeID`";
+		return $this->db->getAll($query);
 	}
 
 	function create($data) {

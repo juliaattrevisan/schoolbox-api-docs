@@ -158,70 +158,33 @@ class Calendar extends Model {
 		return $this->db->getAll($query);
 	}
 
-
-	function getWeekSubmissionEvents($currentDay) {
-	
-		//get a list of all the possible submission box categories
-		require_once($_SERVER['DOCUMENT_ROOT']."/include/involved.php");
-		$catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
-	
-		if(is_array($catList))
-		{
-			$start_date = $currentDay;
-			$end_date = strtotime("+7 days", $currentDay); 
-	
-			foreach($catList as $cat)
-			{
-				$query = "SELECT category.name AS category, category.code AS synergyCode, submission_box.description, submission_box.owner,
-							DATE_FORMAT(submission_box.date, '%w') as dayIndex, 
-							DATE_FORMAT(submission_box.date, '" . CALENDAR_time_format . "') as dueTime
-						  FROM category, file, submission_box 
-						  WHERE category.id = submission_box.category 
-							AND file.id = submission_box.fid 
-							AND submission_box.category = {$cat['id']} 
-							AND submission_box.deleted = 0 
-							AND	submission_box.date >= FROM_UNIXTIME('$start_date') 
-							AND submission_box.date <= FROM_UNIXTIME('$end_date')
-						  ORDER BY submission_box.date ";
-				$this->db->query($query);
-				while($subEvent = $this->db->getNextArray())
-				{ 		
-					$subEvents[$subEvent['dayIndex']]['category'][] = $subEvent['category'];
-					$subEvents[$subEvent['dayIndex']]['owner'][] = $subEvent['owner'];
-					$subEvents[$subEvent['dayIndex']]['description'][] = $subEvent['description'];
-					$subEvents[$subEvent['dayIndex']]['synergyCode'][] = $subEvent['synergyCode'];
-					$subEvents[$subEvent['dayIndex']]['dueTime'][] = $subEvent['dueTime'];
-				}
-			}
-		}
-	
-		return $subEvents;
-	}
-
 	function getSubmissionEvents($currentDay) {
 	
 		//get a list of all the possible submission box categories
 		require_once($_SERVER['DOCUMENT_ROOT']."/include/involved.php");
 		$catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
-	
+		
 		if(is_array($catList)) {
-	
-			foreach($catList as $cat) {
-				$query = "SELECT category.name AS category, category.code AS synergyCode, submission_box.description, submission_box.owner,
-							DATE_FORMAT(submission_box.date, '%w') as dayIndex, 
-							DATE_FORMAT(submission_box.date, '" . CALENDAR_time_format . "') as dueTime
-						  FROM category, file, submission_box 
-						  WHERE category.id = submission_box.category 
-							AND file.id = submission_box.fid 
-							AND submission_box.category = {$cat['id']} 
-							AND submission_box.deleted = 0 
-							AND	submission_box.date >= FROM_UNIXTIME('$currentDay') 
-							AND submission_box.date <= FROM_UNIXTIME('$currentDay')
-						  ORDER BY submission_box.date ";
-				$subEvents[] = $this->db->getAll($query);
-			}
-		}
-		return $subEvents;
+			foreach($catList as $cat)
+				$catQuery[] = $cat['id'];
+		} else
+			$catQuery = array('NULL');
+			
+		$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.description, submission_box.owner,
+					DATE_FORMAT(submission_box.date, '%w') as dayIndex, 
+					DATE_FORMAT(submission_box.date, '" . CALENDAR_time_format . "') as dueTime
+				  FROM (category, submission_box )
+				  LEFT JOIN `file` f ON f.id = submission_box.fid 
+				  LEFT JOIN categoryCode co ON co.categoryID = category.id
+				  WHERE category.id = submission_box.category 
+					AND submission_box.category IN (".implode(',', $catQuery).")
+					AND submission_box.deleted = 0 
+					AND	DATE(submission_box.date) = DATE(FROM_UNIXTIME('$currentDay'))
+				  GROUP BY submission_box.id, category.id
+				  ORDER BY submission_box.date ";
+				
+		return $this->db->getAll($query);
+
 	}
 
 

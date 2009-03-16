@@ -1,35 +1,35 @@
 <?php
 
-require_once("calendar/calendar.php");
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/calendar.php';
 
 $this->setBlock($component['name'], "note_block", "note_listing");
 
-$cal = new Calendar;
+$calendarHandler = new Calendar;
 
-$currDay = date("d");
-$currMonth = date("m");
-$currYear = date("Y");
+$currDay = time();
 
 $this->setVar("DATE", date("l jS F"));
 
 //first lets output submission events
-$sub = $cal->getSubmissionEvents($currDay, $currMonth, $currYear);
-for($i=0; $sub['category'][$i]; $i++)
-{
-	$this->setVar("TIME", $sub['dueTime'][$i]);
-	if($sub['synergyCode'][$i])
-		$descr = $sub['category'][$i]." (".$sub['synergyCode'][$i].") - ".$sub['description'][$i];
-	else
-		$descr = $sub['category'][$i]." - ".$sub['description'][$i];
-		
-	$this->setVar("NOTE", "WORK DUE ".$descr); 
-	$this->setVar("NOTE_COLOUR", $cal->displayColour(1));
+$submissionList = $calendarHandler->getSubmissionEvents($currDay);
+if (is_array($submissionList)) {
+	foreach ($submissionList as $submission) {
 	
-	$this->parse("note_listing","note_block", true);
-	$subout = 1;
+		$output = array('TIME'				=> $submission['dueTime'],
+						'NOTE_CATEGORY'		=> 'WORK DUE ' . $submission['category'] . (isset($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ',
+						'NOTE_DESCRIPTION'	=> $submission['description'],
+						'NOTE_COLOUR'		=> $calendarHandler->displayColour(1),
+						);
+			
+		$this->setVar($output); 
+		
+		$this->parse("note_listing","note_block", true);
+		$subout = 1;
+	}
 }
+	
 
-$eventList = $cal->getAllDayEvents($currDay, $currMonth, $currYear);
+$eventList = $calendarHandler->getDayEvents($currDay);
 
 if(!is_array($eventList))
 {
@@ -46,8 +46,12 @@ else
 		else
 				$this->setVar("TIME", $event['startTime']." - ".$event['endTime']);
 		
-		$this->setVar("NOTE_COLOUR", $cal->displayColour($event['priority']));
-		$this->setVar("NOTE", $event['note']);
+		$output = array('NOTE_CATEGORY'		=> '',
+						'NOTE_DESCRIPTION'	=> $event['note'],
+						'NOTE_COLOUR'		=> $calendarHandler->displayColour($event['priority']),
+						);
+		
+		$this->setVar($output);
 		$this->parse("note_listing","note_block", true);
 
 	}

@@ -55,19 +55,20 @@ class Summary
 		
 		if(is_array($headlineList) )
 		{
-			foreach($headlineList) {
-			
-			$length = count($headlineList);
-			if ($length > 8) $length = 8;
-			
-			for($i = 0; $i < $length; $i++)
-			{
-				if (stristr($headlineList[$i]['item_heading'], 'Daily Notices')) { $length++; continue; }
+			foreach($headlineList as $headline) {
 				
-				$this->t_body->set_var("NEWS_TITLE", $headlineList[$i]['item_heading']);
-				$this->t_body->set_var("NEWS_BRIEF", $headlineList[$i]['item_body']); 
-				$this->t_body->parse("stories_block", "main_stories", true);
-	    	}
+				$length = count($headlineList);
+				if ($length > 8) $length = 8;
+				
+				for($i = 0; $i < $length; $i++)
+				{
+					if (stristr($headlineList[$i]['item_heading'], 'Daily Notices')) { $length++; continue; }
+					
+					$this->t_body->set_var("NEWS_TITLE", $headlineList[$i]['item_heading']);
+					$this->t_body->set_var("NEWS_BRIEF", $headlineList[$i]['item_body']); 
+					$this->t_body->parse("stories_block", "main_stories", true);
+				}
+			}
 		}
 		else
 		{
@@ -112,28 +113,30 @@ class Summary
 		
 		$cal = new Calendar;
 		
-		$currDay = date("d");
+		$currDay = time();
 		$currMonth = date("m");
 		$currYear = date("Y");
 		
 		$this->t_body->set_var("DATE", date("l jS F"));
 		
 		//first lets output submission events
-		$sub = $cal->getSubmissionEvents($currDay, $currMonth, $currYear);
-		for($i=0; $sub['category'][$i]; $i++)
-		{
-			$this->t_body->set_var("TIME", $sub['dueTime'][$i]);
-			if($sub['synergyCode'][$i])
-				$descr = $sub['category'][$i]." (".$sub['synergyCode'][$i].") - ".$sub['description'][$i];
-			else
-				$descr = $sub['category'][$i]." - ".$sub['description'][$i];
-				
-			$this->t_body->set_var("NOTE", "WORK DUE ".$descr); 
-			$this->t_body->set_var("NOTE_COLOUR", $cal->displayColour(1));
+		$submissionList = $calendarHandler->getSubmissionEvents($currDay);
+		if (is_array($submissionList)) {
+			foreach ($submissionList as $submission) {
 			
-			$this->t_body->parse("note_listing","note_block", true);
-			$subout = 1;
-		}
+				$output = array('TIME'				=> $submission['dueTime'],
+								'NOTE_CATEGORY'		=> 'WORK DUE ' . $submission['category'] . (isset($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ',
+								'NOTE_DESCRIPTION'	=> $submission['description'],
+								'NOTE_COLOUR'		=> $calendarHandler->displayColour(1),
+								);
+					
+				$this->setVar($output); 
+				
+				$this->parse("note_listing","note_block", true);
+				$subout = 1;
+			}
+		}		
+
 		
 		$eventList = $cal->getAllDayEvents($currDay, $currMonth, $currYear);
 		

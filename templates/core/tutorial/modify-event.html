@@ -25,11 +25,14 @@ tinyMCE.init({
 <script language="JavaScript" type="text/javascript">
 function verify () {
 	var msg = ""
-	if($('name').value == "")
+	if($('classSelect').value == 2 && $('name').value == "")
 		msg += "Name is a required field\n";
 	
 	if($('cal_date').value == "")
 		msg += "Date is a required field\n";
+	
+	if (!checkTime())
+		msg += "Start time cannot be after the finish time\n";
 	
 	if(msg != ""){
 		alert(msg);
@@ -44,18 +47,60 @@ function toggleRepeat(o) {
 		$('repeatUntil').style.display = '';
 
 }
+function checkTime() {
+	if ($('tohour').value == '')
+		return true;
+	else if ($('period').value == $('toperiod').value) {
+		if (parseInt($('hour').value) > parseInt($('tohour').value))
+			return false;
+		else if ($('hour').value == $('tohour').value) {
+			if (parseInt($('minute').value) > parseInt($('tominute').value))
+				return false;
+			else
+				return true;
+		} else
+			return true;
+		
+	} else if ($('toperiod').value == 'am')
+		return false;
+	else
+		return true;
+}
+
+window.addEvent('domready', function () {
+	$('typeSelect').addEvent('change', function () {
+		if ($(this).value == 1) {
+			$('nameRow').setStyle('display', 'none');
+			$('classRow').setStyle('display', 'table-row');
+		} else {
+			$('nameRow').setStyle('display', 'table-row');
+			$('classRow').setStyle('display', 'none');
+		}
+	});
+});
 </script>
 <!-- END custom_head -->
 <h1>{ACTION} Tutorial</h1>
-<form id="eventForm" class="standardForm" method="post" action="modify-event.php" onsubmit="return(verify());">
+<form id="eventForm" class="standardForm" method="post" action="modify-event.php" onsubmit="return verify();">
   <table>
     <tr>
-      <td class="formLabelWidth"><h3>Name</h3><em>Required field.</em></td>
-      <td><input type="text" name="name" id="name" size="50" maxlength="50" value="{NAME}" /></td>
+     <td class="formLabelWidth"><h3>Type</h3></td>
+     <td><select name="typeID" id="typeSelect">
+     <!-- BEGIN type_list -->
+     <option value="{TYPE_ID}" {TYPE_ID_SELECTED}>{TYPE_NAME}</option><!-- END type_list -->
+     </select></td>
     </tr>
-    <tr>
-      <td class="formLabelWidth"><h3>Code</h3><em>Required field.</em></td>
-      <td><input type="text" name="code" id="code" size="40"  value="{CODE}" /></td>
+    <tr id="classRow" style="display: {CLASS_ENABLED};">
+      <td><h3>Name</h3><em>Required field.</em></td>
+      <td><select name="classID" id="classSelect">
+      	  <option value=''></option>
+          <!-- BEGIN class_list -->
+      	  <option value="{CLASS_ID}" {CLASS_ID_SELECTED}>{CLASS_NAME} ({CLASS_CODE})</option><!-- END class_list -->
+          </select>
+    </tr>
+    <tr id="nameRow" style="display: {NAME_ENABLED};">
+      <td><h3>Name</h3><em>Required field.</em></td>
+      <td><input type="text" name="name" id="name" size="50" maxlength="50" value="{NAME}" /></td>
     </tr>
     <tr>
       <td class="formLabelWidth"><h3>Room</h3></td>
@@ -106,10 +151,10 @@ function toggleRepeat(o) {
     <!-- END recurring_dates -->
   <tr> 
     <td><h3>Time</h3></td>
-    <td> <input name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />
+    <td> <input id="hour" name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />
       : 
-      <input name="minute" type="text" maxlength="2" value="{MIN}" class="timeField" /> 
-      <select name="period">
+      <input id="minute" name="minute" type="text" maxlength="2" value="{MIN}" class="timeField" /> 
+      <select id="period" name="period">
         <option value="am" {AM} >AM</option>
         <option value="pm" {PM} >PM</option>
       </select>
@@ -117,7 +162,7 @@ function toggleRepeat(o) {
       <input name="tohour" id="tohour" type="text" maxlength="2" value="{TOHOUR}" class="timeField" />
       : 
       <input name="tominute" id="tominute" type="text" maxlength="2" value="{TOMIN}" class="timeField" /> 
-      <select name="toperiod">
+      <select id="toperiod" name="toperiod">
         <option value="am" {AMTO}>AM</option>
         <option value="pm" {PMTO}>PM</option>
       </select></td>

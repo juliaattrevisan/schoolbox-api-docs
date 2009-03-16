@@ -19,7 +19,7 @@ $userHandler = new User;
 if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)
 	$page->error(19);
 
-if (isset($_POST['name'])) {
+if (isset($_POST['date'])) {
 
 	$date = ausDateToUnix($_POST['date']);
 	$until = ausDateToUnix($_POST['repeat_until']);	
@@ -31,24 +31,30 @@ if (isset($_POST['name'])) {
 	else
 		$tohour = $_POST['toperiod'] == 'pm' && $_POST['tohour'] < 12 ? $_POST['tohour'] + 12 : $_POST['tohour'];
 
-	
-
 
 	if (is_numeric($_POST['tutorID_1']) && !($tutor1 = $userHandler->getBySynergy($_POST['tutorID_1']))) 
 		error(31);
 
 	if (is_numeric($_POST['tutorID_2']) && !($tutor2 = $userHandler->getBySynergy($_POST['tutorID_2']))) 
 		error(31);
+	
+	if ($_POST['typeID'] == 1 && is_numeric($_POST['classID'])) {
+		$class = $eventHandler->getClass($_POST['classID']);
 		
+		$_POST['name'] = $class['class'];
+		$_POST['code'] = $class['code'];
+	}
 
-	$event = array('name'			=> $_POST['name'],
-				   'code'			=> $_POST['code'],
-				   'location'		=> $_POST['location'],
-				   'start'			=> $hour.":".(int)$_POST['minute'].":00",
-				   'finish'			=> $tohour.":".(int)$_POST['tominute'].":00",
-				   'tutorID_1'		=> $tutor1['uid'],
-				   'tutorID_2'		=> $tutor2['uid'],
-				   'cancelled'		=> isset($_POST['cancelled']) ? 'true' : 'false',
+	$event = array('typeID'		=> $_POST['typeID'],
+				   'classID'	=> $_POST['classID'],
+				   'name'		=> $_POST['name'],
+				   'code'		=> $_POST['code'],
+				   'location'	=> $_POST['location'],
+				   'start'		=> $hour.":".(int)$_POST['minute'].":00",
+				   'finish'		=> $tohour.":".(int)$_POST['tominute'].":00",
+				   'tutorID_1'	=> $tutor1['uid'],
+				   'tutorID_2'	=> $tutor2['uid'],
+				   'cancelled'	=> isset($_POST['cancelled']) ? 'true' : 'false',
 				   );
 
 	
@@ -143,6 +149,8 @@ elseif (is_numeric($_GET['eventID'])) {
 					'DESCRIPTION'	=> $event['description'],
 					'CANCELLED_SELECTED'	=> $event['cancelled'] == 'true' ? 'checked="checked"' : '',
 					
+					'NAME_ENABLED'	=> $event['typeID']==2 ? 'table-row' : 'none',
+					'CLASS_ENABLED'	=> $event['typeID']==1 ? 'table-row' : 'none',
 					
 					'WEEKDAY_SUNDAY_SELECTED'		=> '',
 					'WEEKDAY_MONDAY_SELECTED'		=> 'selected="selected"',
@@ -162,7 +170,9 @@ elseif (is_numeric($_GET['eventID'])) {
 
 	$page->dropDown('tutor_list_1', $eventHandler->getTutorList(), $tutor1['synergy_id'], TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
 	$page->dropDown('tutor_list_2', $eventHandler->getTutorList(), $tutor2['synergy_id'], TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
-	
+
+	$page->dropDown('type_list', $eventHandler->getTypeList(), $event['typeID'], TEMPLATE_content, array('typeID' => 'TYPE_ID', 'type' => 'TYPE_NAME'));	
+	$page->dropDown('class_list', $eventHandler->getClassList(), $event['classID'], TEMPLATE_content, array('classID' => 'CLASS_ID', 'class' => 'CLASS_NAME', 'code' => 'CLASS_CODE'));	
 	
 	$page->setVar($output);
 
@@ -183,6 +193,9 @@ elseif (is_numeric($_GET['eventID'])) {
 					'TOPERIOD'		=> '',
 					'DESCRIPTION'	=> '',
 					'CANCELLED_SELECTED'	=> '',
+
+					'NAME_ENABLED'	=> 'none',
+					'CLASS_ENABLED'	=> 'table-row',					
 					
 					'WEEKDAY_SUNDAY_SELECTED'		=> '',
 					'WEEKDAY_MONDAY_SELECTED'		=> 'selected="selected"',
@@ -199,6 +212,9 @@ elseif (is_numeric($_GET['eventID'])) {
 
 	$page->dropDown('tutor_list_1', $eventHandler->getTutorList(), $_SESSION['sid'], TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
 	$page->dropDown('tutor_list_2', $eventHandler->getTutorList(), '', TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
+
+	$page->dropDown('type_list', $eventHandler->getTypeList(), '', TEMPLATE_content, array('typeID' => 'TYPE_ID', 'type' => 'TYPE_NAME'));	
+	$page->dropDown('class_list', $eventHandler->getClassList(), '', TEMPLATE_content, array('classID' => 'CLASS_ID', 'class' => 'CLASS_NAME', 'code'	=> 'CLASS_CODE'));	
 	
 	
 	$page->setVar($output);
