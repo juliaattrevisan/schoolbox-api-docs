@@ -75,6 +75,10 @@ class AllowedFile extends Model {
 		if($typeCheck)
 			$this->checkMime($file);
 	}
+	
+	function getClass ($iconFile) {
+		return convertToURL(substr($iconFile, 0, strrpos($iconFile, ".")));
+	}
 
 }
 

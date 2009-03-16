@@ -87,7 +87,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 		$class = array();
 		
 		// icon
-		$class[] = !empty($file['iconFile']) ? substr($file["iconFile"], 0, strpos($file["iconFile"], ".")) : "textfile";
+		$class[] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
 	
 		$output = array('FILE_ID' 	 	=> $file['id'],
 						'TYPE'			=> 'file',
@@ -112,7 +112,7 @@ if (is_array($allowedList)) {
 	$last = '';
 	foreach ($allowedList as $allowed) {
 		if ($last != $allowed["iconFile"]) {
-			$output = array("NAME"	=> substr($allowed["iconFile"], 0, strpos($allowed["iconFile"], ".")),
+			$output = array("NAME"	=> $allowedFiles->getClass($allowed["iconFile"]),
 							"ICON"	=> $allowed["iconFile"],
 							);
 			

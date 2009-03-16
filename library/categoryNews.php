@@ -19,15 +19,15 @@ class CategoryNews extends Model {
 				  LEFT JOIN user u ON u.id = n.owner 
 				  WHERE code = '$categoryID'  AND deleted = 0 ";
 		if ($archive)
-			$query .= "AND datetime_expires < CURRENT_DATE()";
+			$query .= "AND datetime_expires < NOW()";
     	else
-			$query .= "AND datetime_expires > CURRENT_DATE()";
+			$query .= "AND datetime_expires > NOW()";
 
 		$query .= "ORDER BY datetime_posted DESC";
 		
 		if($config['size'] > 0) 
 			$query .= " LIMIT 0, " . $config['size']; 
-
+	
 		return $this->db->getAll($query);
 	}
 	

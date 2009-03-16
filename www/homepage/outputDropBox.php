@@ -16,7 +16,7 @@ else {
 	$fileList = $dropbox->getFileList($categoryID);
 	if(is_array($fileList)) {
 		foreach($fileList as $file) {
-			$output = array('DROPBOX_MIME_IMAGE'	=> str_replace(".", "-", substr($file["iconFile"], 0, strrpos($file["iconFile"], "."))),
+			$output = array('DROPBOX_MIME_IMAGE'	=> $allowedFiles->getClass($file["iconFile"]),
 							'DROPBOX_DESCRIPTION' => scrubTEXT($file['description']),
 							'DROPBOX_ID'		=> $file['id'],
 							'DROP_SUBMITTED_BY' => "<a href=\"/search/user/{$file['uid']}\">".formatName($file).'</a>',

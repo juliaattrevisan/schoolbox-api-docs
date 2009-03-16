@@ -120,7 +120,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 		$file['hidden'] > 0 ? $class[] = "hidden" : null;
 		
 		// icon
-		$class[] = !empty($file['iconFile']) ? str_replace(".", "-", substr($file["iconFile"], 0, strrpos($file["iconFile"], "."))) : "textfile";
+		$class[] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
 	
 		$output = array('FILE_ID' 	 	=> $file['id'],
 						'TYPE'			=> $file['url'] ? 'link' : 'file',
@@ -148,7 +148,7 @@ if (is_array($allowedList)) {
 	$last = '';
 	foreach ($allowedList as $allowed) {
 		if ($last != $allowed["iconFile"]) {
-			$output = array("NAME"	=> str_replace(".", "-", substr($allowed["iconFile"], 0, strrpos($allowed["iconFile"], "."))),
+			$output = array("NAME"	=> $allowedFiles->getClass($allowed["iconFile"]),
 							"ICON"	=> $allowed["iconFile"],
 							);
 			

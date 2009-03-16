@@ -97,7 +97,7 @@ if (is_array($allowedList)) {
 	$last = '';
 	foreach ($allowedList as $allowed) {
 		if ($last != $allowed["iconFile"]) {
-			$output = array("NAME"	=> str_replace(".", "-", substr($allowed["iconFile"], 0, strrpos($allowed["iconFile"], "."))),
+			$output = array("NAME"	=> $allowedFiles->getClass($allowed["iconFile"]),
 							"ICON"	=> $allowed["iconFile"],
 							);
 			

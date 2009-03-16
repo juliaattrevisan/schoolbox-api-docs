@@ -15,7 +15,7 @@ if (is_array($fileList)) {
 	
 		$output = array('FILE_DESCRIPTION'	=> scrubTEXT($file['description']),
 						'FILE_ID'			=> $file['id'],
-						'FILE_MIME_IMAGE'	=> str_replace(".", "-", substr($file["iconFile"], 0, strrpos($file["iconFile"], "."))),
+						'FILE_MIME_IMAGE'	=> $allowedFiles->getClass($file["iconFile"]),
 						'FILE_POSTED_BY'	=> formatName($file),
 						'FILE_POSTED_BY_ID'	=> $file['owner'],
 						'FILE_POSTED_DATE'	=> outputDate(DATE_short_format, $file['submitted']),

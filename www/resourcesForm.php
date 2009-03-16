@@ -1,19 +1,16 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/link.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 $page = new SitePage;
-
-$categoryHandler = new Category;
-$fileHandler = new File;
-$linkHandler = new Link;
 $groupHandler = new Group;
 
 if (is_numeric($_POST['folders'])) {
+
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
+	$categoryHandler = new Category;
+
 	$categoryList = $categoryHandler->getCategoryList($_POST['folders']);
 	$output = array();
 	if (is_array($categoryList)) {
@@ -34,6 +31,14 @@ if (is_numeric($_POST['folders'])) {
 	print json_encode($output);
 }
 elseif (is_numeric($_POST['files'])) {
+
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/link.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
+
+	$fileHandler = new File;
+	$linkHandler = new Link;
+	$allowedFiles = new AllowedFile;
 	
 	// save current view
 	$_SESSION['resourcesID'] = $_POST['files'];
@@ -49,7 +54,7 @@ elseif (is_numeric($_POST['files'])) {
 							  'modified'	=> outputDate(DATE_short_format, $file['modified']),
 							//'size'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
 							  'owner'		=> formatName($file),
-							  'icon'		=> !empty($file['iconFile']) ? str_replace(".", "-", substr($file["iconFile"], 0, strrpos($file["iconFile"], "."))) : "textfile",
+							  'icon'		=> !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile",
 							  'link'		=> isset($file['url']) ? 'true' : 'false',
 							  'hidden'		=> $file['hidden'] ? 'true' : 'false',
 							  'write'		=> $permission == WRITE_ACCESS ? 'true' : 'false',

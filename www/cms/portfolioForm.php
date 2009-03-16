@@ -1,15 +1,14 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
 
 $page = new SitePage;
 
-$folderHandler = new MyFolder;
-$fileHandler = new MyFile;
-
 if (is_numeric($_POST['folders'])) {
+
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
+	$folderHandler = new MyFolder;
+
 	$folderList = $folderHandler->getFolderList($_POST['folders']);
 	$output = array();
 	if (is_array($folderList)) {
@@ -26,6 +25,12 @@ if (is_numeric($_POST['folders'])) {
 	print json_encode($output);
 }
 elseif (is_numeric($_POST['files'])) {
+
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
+	
+	$fileHandler = new MyFile;
+	$allowedFiles = new AllowedFile;
 	
 	// save current view
 	$_SESSION['portfolioID'] = $_POST['files'];
@@ -40,7 +45,7 @@ elseif (is_numeric($_POST['files'])) {
 							  'category'	=> $file['category'],
 							  'modified'	=> outputDate(DATE_short_format, $file['submitted']),
 							  'size'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
-							  'icon'		=> !empty($file['iconFile']) ? substr($file["iconFile"], 0, strpos($file["iconFile"], ".")) : "textfile",
+							  'icon'		=> !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile",
 							  );
 		}
 	}
