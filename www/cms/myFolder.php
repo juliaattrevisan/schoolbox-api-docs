@@ -21,7 +21,7 @@ if(is_numeric($this->arg[0])) {
 					);
 	$this->setVar($output);
 
-	$folderTree = $folderHandler->getFolderTree(0, '&nbsp;&nbsp;');
+	$folderTree = $folderHandler->getFolderTree(0, '&nbsp;&nbsp;', $folder['id']);
 	array_unshift($folderTree, array('id' => 0, 'name' => 'Top Level'));
 	$this->dropDown('parent_list', $folderTree, $folder['parent'], TEMPLATE_content, array('id' => 'PARENT_ID', 'name' => 'PARENT_NAME'));
 

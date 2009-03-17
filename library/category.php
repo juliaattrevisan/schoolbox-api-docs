@@ -100,6 +100,7 @@ class Category extends Model {
 				  FROM homepage_comp_location, homepage_comp 
 				  WHERE component = id AND cid = '" . $categoryID . "'
 				  ORDER BY position";
+		
 		return $this->db->getAll($query);
 	
 	}

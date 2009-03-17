@@ -11,7 +11,7 @@ require_once("../include/include.php");
 require_once("../include/session.php");
 require_once("../include/adminonly.php");
 require_once("user.php");
-require_once("../group/group.php");
+require_once $_SERVER['DOCUMENT_ROOT'] . "/../library/group.php";
 
 class modUser
 {
@@ -463,5 +463,4 @@ else
 	$myPage->displayFindUser();
 
 
-
-
+?>

@@ -102,7 +102,14 @@
 			node.addClass(options.childPrefix + destination.id);
 			move(node, destination); // Recursively move nodes to new location
 			indent(node, ancestorsOf(node).length * options.indent);
-		
+			
+			$(destination).addClass('parent');
+			$($(destination).children("td")[options.treeColumn]).addExpander();
+			
+			if (childrenOf(parent).length == 0) {
+				parent.removeClass('parent');
+				$(parent.children("td")[options.treeColumn]).removeExpander();
+			}
 		
 		}
 		
@@ -142,6 +149,15 @@
 			data: {"move": id, "categoryID": categoryID}
 		}); 
 		$("node-"+categoryID).removeClass("populated");
+	};
+	
+	$.fn.addExpander = function () {
+		$(this).prepend('<span style="margin-left: -' + 19 + 'px; padding-left: ' + 19 + 'px" class="expander"></span>');
+		$($(this)[0].firstChild).click(function() { $($(this).parents("tr")[0]).toggleBranch(); });		
+	};
+
+	$.fn.removeExpander = function () {
+		$(this).find("span.expander").remove();
 	};
 
 	$.fn.delay = function(time,func){
@@ -192,6 +208,9 @@
 					
 					if (item.full == 'true')
 						myRow.addClass('full');
+					
+					if (item.homepage == 'true')
+						myRow.addClass('homepage');
 
 					// folder span
 					mySpan = jQuery(document.createElement("span"))
@@ -365,8 +384,9 @@
 				});
 				
 				if(options.expandable) {
-					cell.prepend('<span style="margin-left: -' + 19 + 'px; padding-left: ' + 19 + 'px" class="expander"></span>');
-					$(cell[0].firstChild).click(function() { node.toggleBranch(); });
+					cell.addExpander();
+					//cell.prepend('<span style="margin-left: -' + 19 + 'px; padding-left: ' + 19 + 'px" class="expander"></span>');
+					//$(cell[0].firstChild).click(function() { node.toggleBranch(); });
 					
 					node.dblclick(function() { node.toggleBranch(); });
 					node.children("span").dblclick(function() { node.trigger("dblclick"); });	 		

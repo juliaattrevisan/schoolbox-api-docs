@@ -107,7 +107,10 @@ $permission = $groupHandler->getPermission($openCategory);
 if (is_array($fileList) && count($fileList) > 0) {
 	
 	foreach ($fileList as $file) {
-		
+
+		if (empty($file['modified']))
+			$file['modified'] = $file['submitted'];
+						
 		$class = array();
 		
 		// is link

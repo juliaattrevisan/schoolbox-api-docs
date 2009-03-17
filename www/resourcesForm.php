@@ -21,6 +21,7 @@ if (is_numeric($_POST['folders'])) {
 							  'name'		=> scrubText($category['name']),
 							  'parent'		=> $category['parent'],
 							  'children'	=> $children,
+							  'homepage'	=> $category['template'] > 0 ? 'true' : 'false',
 							  'write'		=> $permission == WRITE_ACCESS ? 'true' : 'false',
 							  'full'		=> $permission == FULL_ACCESS ? 'true' : 'false',
 							  );
@@ -48,6 +49,10 @@ elseif (is_numeric($_POST['files'])) {
 	$output = array();
 	if (is_array($fileList)) {
 		foreach ($fileList as $file) {
+			
+			if (empty($file['modified']))
+				$file['modified'] = $file['submitted'];
+				
 			$output[] = array('id'			=> $file['id'],
 							  'name'		=> scrubText($file['description']),
 							  'category'	=> $file['category'],

@@ -113,7 +113,7 @@ if (is_array($allowedList)) {
 // output components
 $componentList = $categoryHandler->getComponents($categoryID);
 if (is_array($componentList)) {
-
+	
 	$componentCount = 0;
 	foreach ($componentList as $component) {
 		

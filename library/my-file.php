@@ -112,13 +112,22 @@ class MyFile extends Model {
 	function create	($data, $file) {
 		
 		$data['submitted']	= 'NOW()';
-		$fileID = parent::create($data);
+		$data['owner']	= $_SESSION['id'];
 		
-		if (is_readable($file)) {
-			$save = MYFILE_directory . '/' . $fileID . '.dat';
-			move_uploaded_file($file, $save);
+		if(is_file($file['tmp_name']) && is_readable($file['tmp_name']) ) {
+			$data['file_size'] = filesize($file['tmp_name']);
+			$data['realname'] = $file['name'];
+			$data['mime_type'] = $file['type']; /* should hook up to allowedFile to get mime type properly */
+			
+			if($fileID = parent::create($data)) {
+				$filename = MYFILE_directory.'/'.$fileID.'.dat';
+				@unlink($filename);
+				rename($file['tmp_name'], $filename);
+			}
 		}
-		
+		else
+			$fileID = parent::create($data);
+
 		$this->logAction($fileID, 'create');
 		
 		return $fileID;
