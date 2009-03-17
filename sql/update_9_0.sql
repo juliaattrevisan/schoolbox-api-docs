@@ -393,4 +393,8 @@ UPDATE homepage_comp_location SET component = 28 WHERE component = 29;
 
 UPDATE homepage_comp SET invisible='true' WHERE id IN(6,7,11,12,22,27,29);
 
-UPDATE file SET modified = submitted
+UPDATE file SET modified = submitted;
+UPDATE link SET modified = submitted;
+
+INSERT INTO categoryCode (categoryID, `code`)
+SELECT `id`, `code` FROM category WHERE `code` IS NOT NULL AND `code` != '';

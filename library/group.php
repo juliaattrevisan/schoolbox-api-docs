@@ -161,7 +161,9 @@ class Group extends Model {
 			return FULL_ACCESS;
 	
 		// check individual access
-		$query = "SELECT type FROM userAccess WHERE service = ".$this->_service." AND sid = ".$relationID." AND uid = ".$userID."";
+		$query = "SELECT type FROM userAccess WHERE service = ".$this->_service." AND uid = ".$userID." ";
+		if (in_array($this->_service, array(HOMEPAGE_SERVICE, CALENDAR_SERVICE)))
+			$query .= "AND sid = ".$relationID." ";
 		$permission = $this->db->getOne($query);    
 		$permission = (int)$permission;       
 
