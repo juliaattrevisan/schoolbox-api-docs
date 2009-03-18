@@ -1,0 +1,219 @@
+body {
+	background: #182484 url(/images/mgs/background.gif);
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	color: #000;
+	}
+#container {
+	padding: 0 10px 0 160px;
+	}
+#content {
+	border: 3px solid #00458C;
+	padding: 10px;
+	}
+.box a, a { color: #0033CC; }
+a:hover { color: #0066CC; }
+
+.box ul {
+	list-style: none;
+	}
+.box ul li, .news-item ul li {
+	list-style: none;
+	background: url(/images/mgs/bullet.gif) no-repeat 0 4px;
+	padding-left: 20px;
+	} 
+.box .listing ul li {
+	background: 0;
+	}
+/*---------------------------------------
+	Header Styles
+----------------------------------------*/
+#logo {
+	width: 129px;
+	height: 54px;
+	background: url(/images/mgs/logo.gif) no-repeat;
+	top: 4px;
+	right: 0;
+	left: auto;
+	}
+#header {
+	height: 62px;
+	border: 0;
+	background: #1f2482;
+	padding: 0;
+	margin-left: 11%;
+	}
+#yellowstripe {
+	border-bottom: 8px solid #FFFFA4;
+	font-size: 0;
+	margin: 0 0 10px 6%;
+	}
+/*---------------------------------------
+	Nav Styles
+----------------------------------------*/
+#nav {
+	top: 76px;
+	left: 10px;
+	width: 140px;
+	}
+#nav ul {
+	margin-bottom: 1em;
+	border-left: 5px solid #0065ce;
+	}
+#nav h3 {
+	color: #fff;
+	padding: 0;
+	background: #0065ce;
+	font-size: 80%;
+	text-transform: uppercase;
+	width: 119px;
+	padding: 3px 0 3px 6px;
+	line-height: normal;
+	}
+#nav li a {
+	width: 120px;
+	padding: 3px 6px 3px 9px;
+	background: #fff;
+	color: #0033cc;
+	font-size: 90%;
+	}
+#nav li li {
+	border-bottom: 1px solid #00458c;
+	}
+#nav li li:last-child {
+	border-bottom: 0;
+	}
+#nav li li a {
+	color: #fff;
+	background: #0065ce;
+	}
+#nav li li a:hover {
+	background: #00458c;
+	text-decoration: none;
+	}
+#nav li.parent > a span {
+	background: url(/images/mgs/nav-arrow.gif) no-repeat 100% 4px;
+	}
+#nav li li.parent > a span, #nav li li.parent > a:hover span {
+	background: url(/images/mgs/nav-arrow-white.gif) no-repeat 100% 4px;
+	}
+#nav li a:hover {
+	background: #cef3ff;
+	}
+#nav li.parent > a:hover span, #nav li.parent > a.hover span {
+	background: url(/images/mgs/nav-arrow.gif) no-repeat 100% 4px;
+	cursor: pointer;
+	}
+#nav ul ul { width: 135px; left: 135px; top: -1px; }
+#nav ul ul ul { left: 135px; top: -1px; }
+
+#search-field {
+	width: 109px;
+	border: 1px solid #0065CE;
+	padding: 2px;
+	margin-bottom: 5px;
+	}
+#search-button {
+	float: left;
+	}
+#nav ul li.form {
+	background: #fff;
+	padding: 10px;
+	}
+/*---------------------------------------
+	Tab Styles
+----------------------------------------*/
+#tabs {
+	position: static;
+	bottom: auto;
+	right: auto;
+	float: left;
+	border: 3px solid #00458a;
+	border-bottom: 0;
+	}
+#tabs li {
+	margin: 0;
+	border-right: 1px solid #00458a;
+	}
+#tabs li:last-child {
+	border-right: 0;
+	}
+#tabs li a {
+	background: #caf2ff;
+	color: #333333;
+	font-weight: bold;
+	border: 0;
+	padding: 5px 15px;
+	line-height: normal;
+	font-size: 90%;
+	}
+#container #tabs li a.navthis {
+	background: #00458a;
+	color: #fff;
+	}
+#tabs li a:hover {
+	background: #caf2ff;
+	color: #00458c;
+	}
+/*---------------------------------------
+	Box Styles
+----------------------------------------*/
+h1 {
+	border-bottom: 4px solid #00458C;
+	border-left: 20px solid #00458C;
+	padding: 0 0 0 3px;
+	margin-top: 10px;
+	color: #000;
+	font-size: 120%;
+	}
+h2, .news-item h3 {
+	border-bottom: 4px solid #0066CC;
+	border-left: 10px solid #0066CC;
+	padding: 0 0 0 3px;
+	color: #000;
+	font-size: 110%;
+	background: 0;
+	text-indent: 0;
+	}
+.news-item h3 {
+	padding-bottom: 3px;
+	}
+#calendar h2 {
+	border: 0;
+	color: #000;
+	}
+#calendar table thead td {
+	border-bottom: 4px solid #0066CC;
+	border-left: 10px solid #0066CC;
+	padding: 0;
+	}	
+.box.grey {
+	background: 0;
+	}
+.news-item {
+	background: 0;
+	padding-right: 0;
+	}
+.header_option {
+	font-size: 80%;
+	}
+a.edit {
+	background: #fff;
+	color: #002B58;
+	}
+/*---------------------------------------
+	Footer Styles
+----------------------------------------*/
+#footer {
+	float: right;
+	margin: 0 10px 0 0;
+	border: 0;
+	}
+#footer p {
+	margin: 0;
+	text-align: right;
+	color: #ccc;
+	font-size: 80%;
+	}
+#footer p a {
+	color: #ccc;
+	}
