@@ -119,7 +119,9 @@ h2 {
 	background: 0;
 	text-indent: 4px;
 	}
-
+.homepage h2 {
+	background-position: 0 -4px;
+	}
 /*---------------------------------------
 	Nav Styles
 ----------------------------------------*/

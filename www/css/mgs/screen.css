@@ -51,7 +51,7 @@ a:hover { color: #0066CC; }
 	Nav Styles
 ----------------------------------------*/
 #nav {
-	top: 76px;
+	top: 80px;
 	left: 10px;
 	width: 140px;
 	}
@@ -118,6 +118,7 @@ a:hover { color: #0066CC; }
 #nav ul li.form {
 	background: #fff;
 	padding: 10px;
+	width: 115px;
 	}
 /*---------------------------------------
 	Tab Styles
@@ -176,6 +177,9 @@ h2, .news-item h3 {
 	}
 .news-item h3 {
 	padding-bottom: 3px;
+	}
+.homepage h2 {
+	background-color: #00458C;
 	}
 #calendar h2 {
 	border: 0;

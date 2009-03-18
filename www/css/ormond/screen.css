@@ -101,7 +101,7 @@ h1 {
 	text-transform: capitalize;
 	}
 h1 a.customise { color: #CF0034; font-weight: bold; top: 5px; right: 5px; }
-h2 {
+h2, .homepage h2 {
 	background: #f9f8f1 url(/images/ormond/heading-back.png) repeat-x;
 	border-bottom: 1px dotted #1C1713;
 	font-weight: bold;

@@ -328,6 +328,12 @@ Side Nav styles
 /*--------------------------------------------------------------
  Box styles 
 --------------------------------------------------------------*/
+.homepage h2 {
+	border: 0;
+	color: #fff;
+	background: #00458C url(/images/box-bg.png) repeat-x;
+	text-indent: 10px;
+	}
 .box {
 	margin-bottom: 20px;
 	position: relative;
@@ -657,12 +663,20 @@ ul.tree li.icon a {
 	border: 1px solid #CCCCCC;
 	background: #eee;
 	padding: 10px;
-	float: left;
 	width: 759px;
+	margin-bottom: 20px;
 	}
 .standardForm .formLabelWidth { width: 40%; }
 .standardForm table {
 	width: 100%;
+	}
+.standardForm h2 {
+	color: #000;
+	background: 0;
+	text-indent: 0;
+	border: 0;
+	padding: 0;
+	margin: 0;
 	}
 .standardForm h3 {
 	margin-bottom: 0.5em;

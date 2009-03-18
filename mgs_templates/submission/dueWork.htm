@@ -27,6 +27,7 @@
 <script type="text/javascript">
 	window.onload=function(){tableruler();} 
 </script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs/calendar.css" />
 <!-- #EndEditable -->
 </head>
 <body>
@@ -108,19 +109,19 @@
       <h1>Due Work</h1>
 
  		<center>
+    	<div id="calendar">
         <form method="get" action="dueWork.php">
           <table class="calendarTable">
             <tr>
               <td><a class="back" href="{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td>
               <td colspan="3"><input type="hidden" name="Day" value="{DAY}">
-                <div style="float:left;width:100px;">
                 <select name="Month" onchange="this.form.submit();">
                   <!-- BEGIN month_drop -->
                   <option value="{DROP_MONTH_NUMBER}" {DROP_MONTH_SELECTED}>{DROP_MONTH_NAME}</option>
                   <!-- END month_drop -->
                 </select>
               </td>
-              <td colspan="2"><select name="Year" onchange="this.form.submit();">
+              <td colspan="2"><select class="small" name="Year" onchange="this.form.submit();">
                   <!-- BEGIN year_drop -->
                   <option value="{DROP_YEAR_NUMBER}" {DROP_YEAR_SELECTED}>{DROP_YEAR_NUMBER}</option>
                   <!-- END year_drop -->
@@ -150,6 +151,7 @@
             <!-- END week_block -->
           </table>
         </form>
+        </div>
       </center>       
       
       <p class="indent">{LISTBY} This list shows all work that is to be completed. Work in red has passed its due by date. </p>
