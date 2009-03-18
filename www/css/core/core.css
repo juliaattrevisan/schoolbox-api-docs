@@ -199,6 +199,7 @@ table.ruler { width: 100%; }
 	margin: 0;
 	padding: 0;
 	}
+#tabs em { font-style: normal; text-decoration: underline; }
 #tabs li {
 	float: left;
 	margin-left: 1px;
