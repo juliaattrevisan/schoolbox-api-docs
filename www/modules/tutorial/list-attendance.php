@@ -54,7 +54,7 @@ if (is_array($_POST['reason']) && is_numeric($_POST['eventID'])) {
 	
 	localRedir('/modules/tutorial/list-attendance.php?week=' . $_POST['week']);
 }
-elseif (isset($_POST['keyword']) && is_numeric($_POST['eventID'])) {
+elseif (is_numeric($_POST['userID']) && is_numeric($_POST['eventID'])) {
 
 	// check user is one of the tutors
 	$event = $eventHandler->getByID($_POST['eventID']);
@@ -64,11 +64,11 @@ elseif (isset($_POST['keyword']) && is_numeric($_POST['eventID'])) {
 	// add student
 	require_once SITE_root . '/library/user.php';
 	$userHandler = new User;
-	$userList = $userHandler->searchUser($_POST['keyword'], 3);
-	if (is_array($userList)) {
+	$user = $userHandler->getByID($_POST['userID']);
+	if (isset($user['uid'])) {
 		$enrolment = array('code'		=> $_POST['code'],
 						   'eventID'	=> $_POST['eventID'],
-						   'studentID'	=> $userList[0]['uid'],
+						   'studentID'	=> $user['uid'],
 						   );
 		$enrolmentHandler->create($enrolment);
 	}

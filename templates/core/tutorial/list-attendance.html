@@ -1,5 +1,5 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" href="/css/autocompleter.css" type="text/css" />
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
 <style type="text/css">
 .rule tr td {
 	vertical-align: middle;
@@ -11,31 +11,33 @@
 	width: 140px;
 }
 </style>
-<script type="text/javascript" src="/javascript/mootools.js"></script>
-<script type="text/javascript" src="/javascript/autocompleter.js"></script>
-<script type="text/javascript" src="/javascript/observer.js"></script>
+<script type="text/javascript" src="/javascript/jquery.js"></script>
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript">
-window.addEvent('domready', function() {
-	$$('.lookup').each(function (el) {
-		new Autocompleter.Ajax.Json(el, '/ajax/user.php?groupID=3', {
-			minLength: 2,
-			postVar: 'keyword',
-			width: '310px',
-			selectFirst: true,
-			useSelection: false
-			//selectMode: 'type-ahead'
-			//selectMode: 'pick'
+var $j = jQuery.noConflict();
+$j(document).ready(function () {
+	$j('.lookup').each(function () {
+		var node = $j(this);
+		
+		$j(this).autocomplete({
+			serviceUrl: '/ajax/user.php?groupID=0',
+			minChars: 2,
+			maxHeight: 400,
+			width: node.width(),
+			onSelect: function (value, data) {
+				node.parents("form:first").children("input.userID").val(data);
+				return false;
+			}
 		});
 	});
 	
 	// disable all elements in forms with class disabled
-	$$(".disabled input, .disabled select").each(function (el) {
-		//el.getChildren("input").each(function (ip) {
-			el.setAttribute("disabled", "true");
-		//});
-	});
+	$j(".disabled input, .disabled select").each(function () {
+		$j(this).attr("disabled", "true");
+	});	
 	
 });
+
 </script>
 
 <!-- END custom_head -->
@@ -89,6 +91,7 @@ window.addEvent('domready', function() {
   <p>
   <form action="list-attendance.php" method="post" class="{ALLOWADD}">
     <input class="lookup" type="text" name="keyword" />
+    <input type="hidden" name="userID" class="userID" />
     <input type="hidden" name="code" value="{EVENT_CODE}" />
     <input type="hidden" name="eventID" value="{EVENT_ID}" />
     <input type="hidden" name="week" value="{WEEK}" />

@@ -1,10 +1,57 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" href="/css/autocompleter.css" type="text/css" />
-<script type="text/javascript" src="/javascript/mootools.js"></script>
-<script type="text/javascript" src="/javascript/autocompleter.js"></script>
-<script type="text/javascript" src="/javascript/observer.js"></script>
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript">
 <!--
+$j(document).ready(function () {
+	$j('#addUser').autocomplete({
+		serviceUrl: '/ajax/user.php?groupID=0',
+		minChars: 2,
+		maxHeight: 400,
+		width: $j('#addUser').width(),
+		onSelect: function (value, data) {
+			$j('#userID').val(data);
+			return false;
+		}
+	});
+	
+	$j('#type_form input').each(function () {
+		$j(this).click(function () {
+			$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', type: $j(this).val()});
+		});
+	});
+	
+	$j('img.greenCheck').each(function () {
+		$j(this).click(function () {
+			if ($j(this).attr('src').indexOf('greentick') != -1) {
+				$j(this).attr('src', '/images/emptybox.gif');
+				$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', userID: $j(this).attr('rel'), write: 1});
+			} else {
+				$j(this).attr('src', '/images/greentick.gif');
+				$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', userID: $j(this).attr('rel'), write: 2});
+			}		
+		});
+		$j(this).css('cursor','pointer');
+	});
+	
+	$j('input.checkAll').each(function () {
+		$j(this).mouseup(function () {
+			var node = $j(this);
+			$j("input." + $j(this).attr("id")).each(function () {
+				
+				$j(this).attr("checked",  !(node.attr("checked")));
+			});			
+		});
+	});
+	
+	$j('#deleteButton').click(function () {
+		if (confirm('Delete all selected users?')) 
+			$j('#deleteForm').submit();
+	});
+	
+	
+});
+/*
 window.addEvent('domready', function () {
 	new Autocompleter.Ajax.Json($('addUser'), '/ajax/user.php?groupID=0', {
 		minLength: 2,
@@ -14,39 +61,10 @@ window.addEvent('domready', function () {
 		useSelection: false
 	});
 
-	$$('#type_form input').each(function (el) {
-		el.addEvent('click', function () {
-			var myRequest = new Ajax('/group/modifyForm.php?categoryID={CATEGORY_ID}&type='+escape(el.value)).request();
-		});
-	});
-	
-	$$('.greenCheck').each(function (el) {
-		el.addEvent('click', function () {
-			if (el.getAttribute('src').indexOf('greentick') != -1) {
-				el.setAttribute('src', '/images/emptybox.gif');
-				var myRequest = new Ajax('/group/modifyForm.php?categoryID={CATEGORY_ID}&userID='+el.getAttribute('rel')+'&write=1').request();
-			} else {
-				el.setAttribute('src', '/images/greentick.gif');
-				var myRequest = new Ajax('/group/modifyForm.php?categoryID={CATEGORY_ID}&userID='+el.getAttribute('rel')+'&write=2').request();
-			}		
-		});
-		el.setStyle('cursor','pointer');
-	});
-	
-	$$('.checkAll').each(function (el) {
-		el.addEvent('mouseup', function () {
-			$$('.'+(el.getAttribute('id'))).each(function (ck) {
-				ck.checked = !(el.checked);
-			});			
-		});
-	});
-	
-	$('deleteButton').addEvent('mousedown', function () {
-		if (confirm('Delete all selected users?')) 
-			$('deleteForm').submit();
-	});
+
 
 });
+*/
 -->
 </script>
 <style type="text/css">
@@ -70,7 +88,8 @@ window.addEvent('domready', function () {
         <em>You may add users individually by typing their name and selecting from the list.  Alternatively you can add many users via a list of synergetic id's or usernames.</em></td>
       <td><form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" method="post">
           <p>
-          <input id="addUser" type="text" name="keyword" size="30" />
+          <input id="addUser" type="text" size="30" />
+          <input type="hidden" name="userID" id="userID" />
           <input type="submit" value="Add User" class="btn" />
         	</p>
         </form>

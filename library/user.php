@@ -51,7 +51,7 @@ class User extends Model {
 	
 	}
 	
-	function searchUser($keyword, $group = 0)
+	function searchUser($keyword, $group = 0, $limit = false)
 	{
 		//search for a user based on at least one of the above fields
 		//assumes at least one contains something
@@ -80,6 +80,9 @@ class User extends Model {
 			error(2);
 
 		$query .= "ORDER BY group_id, year, lastname, firstname"; 
+		
+		if (is_numeric($limit))
+			$query .= "LIMIT $limit";
 
 		return $this->db->getAll($query);
 

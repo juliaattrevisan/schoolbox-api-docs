@@ -221,25 +221,25 @@ function insertChild($list, $element)
 
 function outputMenu($list, $level)
 {
-	if($level == 1)
-		$text = "\n<ul  id=\"udm\" class=\"udm\">";
-	else
-		$text = "<ul class=\"ormondMenu\">";
-	
-	for($i=0; $list[$i]; $i++)
-	{
-		if($list[$i]['target'])
-			$target = " target={$list[$i]['target']}";
-		else $target = '';
-			
-		$text .= '<li class="ormondMenuItem"><a href="'.$list[$i]['url'].'"'.$target.'>'.$list[$i]['txt'].'</a>';
-		if(is_array($list[$i]['children']))
-			$text .= outputMenu($list[$i]['children'], ($level + 1));
+		$text = "<ul>\n";
 		
-		$text .= "</li>";
-	}
-	$text .= "</ul>\n";
-	return $text;
+		for($i=0; $list[$i]; $i++)
+		{
+			if($list[$i]['target'])
+				$target = " target={$list[$i]['target']}";
+			else $target = '';
+			
+			if(is_array($list[$i]['children'])) {
+				$text .= '<li class="parent"><a href="'.$list[$i]['url'].'"'.$target.'><span>'.$list[$i]['txt'].'</span></a>';
+				$text .= outputMenu($list[$i]['children'], ($level + 1));
+			}
+			else 
+				$text .= '<li><a href="'.$list[$i]['url'].'"'.$target.'><span>'.$list[$i]['txt'].'</span></a>';
+				
+			$text .= "</li>\n";
+		}
+		$text .= "</ul>\n";
+		return $text;
 }
 		
 ?>

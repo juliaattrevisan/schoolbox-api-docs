@@ -52,13 +52,13 @@ elseif (isset($_REQUEST['accept'])) {
 	
 	localRedir('/group/modify/' . $_REQUEST['categoryID']);
 }
-elseif (isset($_POST['keyword'])) {
+elseif (isset($_POST['userID'])) {
 	// add user
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 	$userHandler = new User;
-	$userList = $userHandler->searchUser($_POST['keyword'], 0);
-	if (is_array($userList)) 
-		$groupHandler->addUser($_GET['categoryID'], $userList[0]['uid']);
+	$user = $userHandler->getByID($_POST['userID']);
+	if (isset($user['uid'])) 
+		$groupHandler->addUser($_GET['categoryID'], $user['uid']);
 
 	localRedir('/group/modify/' . $_GET['categoryID']);
 

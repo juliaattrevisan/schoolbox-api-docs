@@ -25,7 +25,7 @@ $groupHandler = new Group(TUTORIAL_SERVICE);
 if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)
 	error(19);
 
-if (isset($_POST['keyword']) && is_numeric($_POST['eventID'])) {
+if (is_numeric($_POST['userID']) && is_numeric($_POST['eventID'])) {
 
 	// check user is one of the tutors
 	$event = $eventHandler->getByID($_POST['eventID']);
@@ -35,11 +35,11 @@ if (isset($_POST['keyword']) && is_numeric($_POST['eventID'])) {
 
 	require_once SITE_root . '/library/user.php';
 	$userHandler = new User;
-	$userList = $userHandler->searchUser($_POST['keyword'], 3);
-	if (is_array($userList)) {
+	$user = $userHandler->getByID($_POST['userID']);
+	if (isset($user['uid'])) {
 		$enrolment = array('code'		=> $_POST['code'],
 						   'eventID'	=> $_POST['eventID'],
-						   'studentID'	=> $userList[0]['uid'],
+						   'studentID'	=> $user['uid'],
 						   );
 		$enrolmentHandler->create($enrolment);
 	}
