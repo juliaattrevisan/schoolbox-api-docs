@@ -674,6 +674,9 @@ table {
 	width: 100%;
 	margin-bottom: 1em;
 	}
+table.contextMenu {
+	width: auto;
+	}
 table .header_option {
 	margin-top: -23px;
 	}
@@ -683,7 +686,7 @@ table .header_option {
 	text-align: right;
 	float: right;
 	}
-.indent {
+div.indent {
 	width: 100%;
 	}
 #column-1 {
