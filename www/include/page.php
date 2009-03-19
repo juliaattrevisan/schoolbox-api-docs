@@ -22,6 +22,9 @@ else if(!isset($db))
 	$db->dbConnect();
 }
 
+$this->t_body->set_var('TEMPLATE_FILE', $this->templateFile);
+$this->t_body->set_var('YEAR', date('Y')); 
+
 //this section handles the drop down menu
 if($_SESSION['su'])
 	$query = "SELECT sideMenu.id, parent, txt, url, target FROM sideMenu ORDER BY parent, sequence, txt";
