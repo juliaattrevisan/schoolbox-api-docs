@@ -6,7 +6,7 @@
 <!-- END custom_head -->
 <h1>Uncompleted Attendance</h1>
 <form action="report-attendance.php" method="get">
-  <table style="width: 500px;">
+  <table style="width: 600px;">
     <tr>
       <td>From:</td>
       <td><input name="from" id="from" type="text" size="15" maxlength="10" value="{FROM}"/>
@@ -46,7 +46,7 @@
     <th>Code</th>
   </tr>
   <!-- BEGIN event_list -->
-  <tr>
+  <tr class="{ON_OFF}">
     <td>{TUTOR1}</td>
     <td>{TUTOR2}</td>
     <td>{DATE}</td>
