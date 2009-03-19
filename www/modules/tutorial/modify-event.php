@@ -76,7 +76,8 @@ if (isset($_POST['date'])) {
 		
 		// check user is one of the tutors
 		$current = $eventHandler->getByID($_POST['eventID']);
-		if ($permission < FULL_ACCESS && !in_array($_SESSION['sid'], array($current['tutorID_1'], $current['tutorID_2'])))
+		
+		if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($current['tutorID_1'], $current['tutorID_2'])))
 			$page->error(19);
 		
 		$event['eventID'] = $_POST['eventID'];
@@ -89,7 +90,7 @@ if (isset($_POST['date'])) {
 	else {
 
 		// check user is one of the tutors
-		if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($_POST['tutorID_1'], $_POST['tutorID_2'])))
+		if ($permission < FULL_ACCESS && !in_array($_SESSION['sid'], array($_POST['tutorID_1'], $_POST['tutorID_2'])))
 			$page->error(19);
 
 		for ($i = 0; $i < count($dateArray); $i++) {

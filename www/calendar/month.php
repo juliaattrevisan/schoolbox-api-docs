@@ -72,8 +72,12 @@ for ($i = 0; $i < $totalDays; $i++) {
 	else
 		$this->setVar('OTHER_MONTH', ' otherMonth');
 
-	$this->setVar("DATE", date("jS", $currentDay));
-	$this->setVar("ADD", "<a href=\"/calendar/modify.php?date=".date("d-m-Y", $currentDay)."&returnTo=month\">add</a>");
+	$output = array("DATE"		=> date("jS", $currentDay),
+					"ADD"		=> "<a href=\"/calendar/modify.php?date=".date("d-m-Y", $currentDay)."&returnTo=month\">add</a>",
+					"ON_OFF"	=> !($day%2) ? 'dark' : '',
+					);
+
+	$this->setVar($output);
 	
 	
 	$submissionList = $calendarHandler->getSubmissionEvents($currentDay);

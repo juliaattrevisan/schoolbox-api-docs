@@ -1,7 +1,7 @@
 <div class="box" id="component{COMPONENT_ID}">
   <h2>{POLL_TITLE}</h2>
   <!-- BEGIN config -->    
-    <a class="edit" onclick="toggleConfig('component{COMPONENT_ID}');">edit</a>
+    <a class="edit">edit</a>
     <div class="editPanel hide">
       <a href="/poll/modify/new/{ID}">Create</a> |
       <a href="/poll/modify/{POLL_ID}">Edit</a> |
@@ -28,10 +28,9 @@
     <script type="text/javascript">
     function validatePoll () {
 		var valid = false;
-		$$('.pollOption').each(
-			function (o) {
-				if (o.checked == true)
-					valid = true;
+		$j('input.pollOption').each(function () {
+			if ($j(this).attr('checked'))
+				valid = true;
 			}
 		);
 		if (valid)
@@ -54,7 +53,7 @@
     <script type="text/javascript" src="/javascript/fusion.js"></script>
     <script type="text/javascript">
 		// <![CDATA[	
-		window.addEvent('domready', function () {
+		$j(document).ready(function () {
 			var chart = new FusionCharts("/flash/FCF_Bar2D.swf", "myChartId", "350", "{POLL_HEIGHT}", "8", "#FFFFFF");
 			chart.setDataURL("/poll/poll-xml.php?pollID={POLL_ID}");
 			chart.render("pollResult{COMPONENT_ID}");
