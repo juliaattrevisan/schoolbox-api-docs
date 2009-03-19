@@ -1,21 +1,4 @@
 <!-- BEGIN custom_head -->
-<style type="text/css">
-#column-1 {
-	margin-right: 260px;
-}
-#column-2 {
-	float: right;
-	width: 250px;
-	margin-left: 10px;
-	height: 100%;
-}
-hr {
-	height: 1px;
-	border: 0;
-	background-color: #CCCCCC;
-	margin: 10px 0 4px 0;
-}
-</style>
 <!-- END custom_head -->
 <div class="indent">
   <h1>{HEADING}</h1>
@@ -25,8 +8,9 @@ hr {
   <!-- BEGIN revert_link -->
   <a href="/wiki/modifyForm.php?wikiID={WIKI_ID}&revert={CURRENT_REVISION}" onclick="return confirm('Revert to this revision?');">Revert to this revision</a> | <!-- END revert_link -->
   <a href="/homepage/{CATEGORY_ID}">Return to homepage</a></span>
+  <div class="float-fix"></div>
   <div id="column-2">
-    <h3>Revisions</h3>
+    <h2>Revisions</h2>
     <table>
       <tr>
         <th>Date</th>
@@ -42,5 +26,5 @@ hr {
   </div>
   <div id="column-1"> {BODY}
     <hr>
-    <span class="element_footer">Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</span> </div>
-</div>
+    <span class="element_footer">Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</span></div>
+	</div>

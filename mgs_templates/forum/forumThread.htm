@@ -24,7 +24,7 @@
 
 <!-- #BeginEditable "head" -->
 
-<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-forum.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/forum.css" />
 <script type="text/javascript" src="/javascript/forum.js" ></script>
 <script type="text/javascript">
 function initialise(){ showPosts({INIT_POST_LIST}); }
@@ -68,7 +68,7 @@ window.onload=initialise;
   <h3>&raquo; My Groups</h3>
   <ul>
   	<!-- BEGIN mgroup_block --> 
-		<li><a href="/homepage/{MGID}/">{MGNAME}</a></li> 
+		<li><a href="/homepage/{MGID}/"><span>{MGNAME}</span></a></li> 
 		<!-- END mgroup_block -->
   </ul>	
   <!-- END mgroup --> 
@@ -77,7 +77,7 @@ window.onload=initialise;
   	<!-- BEGIN mlink_block -->
   	<li>{MLINK}</li>
     <!-- END mlink_block --> 
-    <li><a href="/editLinks.php">Add Link</a></li>
+    <li><a href="/editLinks.php"><span>Add Link</span></a></li>
   </ul>	
 </div>
 

@@ -66,7 +66,7 @@
   <h3>&raquo; My Groups</h3>
   <ul>
   	<!-- BEGIN mgroup_block --> 
-		<li><a href="/homepage/{MGID}/">{MGNAME}</a></li> 
+		<li><a href="/homepage/{MGID}/"><span>{MGNAME}</span></a></li> 
 		<!-- END mgroup_block -->
   </ul>	
   <!-- END mgroup --> 
@@ -75,7 +75,7 @@
   	<!-- BEGIN mlink_block -->
   	<li>{MLINK}</li>
     <!-- END mlink_block --> 
-    <li><a href="/editLinks.php">Add Link</a></li>
+    <li><a href="/editLinks.php"><span>Add Link</span></a></li>
   </ul>	
 </div>
 
@@ -118,7 +118,7 @@
 				</tr>
 			<tbody> 
 				<!-- BEGIN userlist -->
-				<tr>
+				<tr class="{ON_OFF}">
 					<td><a href="/admin/modUser.php?id={ID}">{ID}</a></td>
 					<td><a href="/admin/modUser.php?id={ID}">{USERNAME}</a></td>
 					<td><a href="/admin/modUser.php?id={ID}">{FIRSTNAME}</a></td>

@@ -106,6 +106,7 @@ select {
 }
 #month-nav {
 	margin-bottom: 25px;
+	width: auto;
 }
 #month-nav td {
 	text-align: center;

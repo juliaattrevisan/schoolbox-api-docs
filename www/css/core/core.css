@@ -269,7 +269,7 @@ table td { vertical-align: middle; }
 	text-align: right;
 	display: block;
 	float: right;
-	margin: -33px 5px 0 0;
+	margin: -37px 5px 0 0;
 	position: relative;
 	text-transform: capitalize;
 }
@@ -580,6 +580,8 @@ a.layout:hover img {
 .house {
 	background: url(/images/famicons/house.png) no-repeat 100% 50%;
 	float: right;
+	height: 16px;
+	width: 16px;
 	}
 td.small {
 	font-size: 80%;
@@ -664,6 +666,36 @@ ul.tree li.icon a {
 #footer ul li a {
 	color: #888;
 	font-weight: normal;
+	}
+/*--------------------------------------------------------------
+ Forum styles 
+--------------------------------------------------------------*/
+table {
+	width: 100%;
+	margin-bottom: 1em;
+	}
+table .header_option {
+	margin-top: -23px;
+	}
+.element_footer {
+	color: #000;
+	font-size: 90%;
+	text-align: right;
+	float: right;
+	}
+.indent {
+	width: 100%;
+	}
+#column-1 {
+	float: left;
+	width: 69.5%;	
+}
+#column-2 {
+	width: 29.5%;
+	float: right;
+}
+#column-2 table {
+	background: #eee;
 	}
 /*--------------------------------------------------------------
  Form styles 

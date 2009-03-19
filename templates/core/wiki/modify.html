@@ -23,12 +23,12 @@ tinyMCE.init({
 <form class="standardForm" action="/wiki/modifyForm.php" method="post">
   <table>
     <tr>
-      <td style="width:300px"><h3>Heading</h3></td>
+      <td class="formLabelWidth"><h3>Heading</h3></td>
       <td><input type="text" name="heading" size="60" value="{HEADING}" /></td>
     </tr>
     <tr>
       <td><h3>Body</h3></td>
-      <td><textarea name="body" cols="100">{BODY}</textarea></td>
+      <td><textarea name="body" style="width:100%;height:350px" >{BODY}</textarea></td>
     </tr>
     <tr>
     <td>&nbsp;</td>
