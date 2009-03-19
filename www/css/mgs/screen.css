@@ -24,6 +24,9 @@ a:hover { color: #0066CC; }
 .box .listing ul li {
 	background: 0;
 	}
+#loginForm .login {
+	margin-left: 210px;
+	}
 /*---------------------------------------
 	Header Styles
 ----------------------------------------*/
@@ -70,8 +73,8 @@ a:hover { color: #0066CC; }
 	line-height: normal;
 	}
 #nav li a {
-	width: 120px;
-	padding: 3px 6px 3px 9px;
+	width: 135px;
+	padding: 3px 0 3px;
 	background: #fff;
 	color: #0033cc;
 	font-size: 90%;
@@ -86,21 +89,26 @@ a:hover { color: #0066CC; }
 	color: #fff;
 	background: #0065ce;
 	}
+#nav li a span {
+	display: block;
+	width: 120px;
+	padding: 0 6px 0 9px;
+	}
 #nav li li a:hover {
 	background: #00458c;
 	text-decoration: none;
 	}
 #nav li.parent > a span {
-	background: url(/images/mgs/nav-arrow.gif) no-repeat 100% 4px;
+	background: url(/images/mgs/nav-arrow.gif) no-repeat 120px 4px;
 	}
 #nav li li.parent > a span, #nav li li.parent > a:hover span {
-	background: url(/images/mgs/nav-arrow-white.gif) no-repeat 100% 4px;
+	background: url(/images/mgs/nav-arrow-white.gif) no-repeat 120px 4px;
 	}
 #nav li a:hover {
 	background: #cef3ff;
 	}
 #nav li.parent > a:hover span, #nav li.parent > a.hover span {
-	background: url(/images/mgs/nav-arrow.gif) no-repeat 100% 4px;
+	background: url(/images/mgs/nav-arrow.gif) no-repeat 120px 4px;
 	cursor: pointer;
 	}
 #nav ul ul { width: 135px; left: 135px; top: -1px; }
@@ -165,6 +173,7 @@ h1 {
 	margin-top: 10px;
 	color: #000;
 	font-size: 120%;
+	line-height: 1.4;
 	}
 h2, .news-item h3 {
 	border-bottom: 4px solid #0066CC;
@@ -174,12 +183,15 @@ h2, .news-item h3 {
 	font-size: 110%;
 	background: 0;
 	text-indent: 0;
+	line-height: 18px;
+	height: 18px;
 	}
 .news-item h3 {
 	padding-bottom: 3px;
 	}
 .homepage h2 {
 	background-color: #00458C;
+	background-position: 0 10px;
 	}
 #calendar h2 {
 	border: 0;
@@ -200,9 +212,14 @@ h2, .news-item h3 {
 .header_option {
 	font-size: 80%;
 	}
+.box .edit {
+	height: auto;
+	line-height: 18px;
+	}
 a.edit {
 	background: #fff;
 	color: #002B58;
+	font-size: 80%;
 	}
 /*---------------------------------------
 	Footer Styles

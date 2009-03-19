@@ -91,7 +91,7 @@ hr { background-color: #d2d2d2; border: 0; height: 1px; }
  Heading Styles 
 --------------------------------------------------------------*/
 h1 { font-size: 1.33em; font-weight: bold; border-bottom: 1px dashed #7f7f7f; line-height: 2; margin-bottom: 1em; position: relative; text-transform: capitalize; }
-h1 a.customise { position: absolute; top: 0; right: 0; font-size: 70%; font-weight: normal; }
+h1 a.customise { position: absolute; top: 0; right: 0; font-size: 80%; font-weight: normal; }
 h3 { font-size: 1em; }
 #news-header { margin-bottom: 1em; }
 /*--------------------------------------------------------------
@@ -126,11 +126,13 @@ table.ruler { width: 100%; }
 	width: 49.5%;
 	float: left;
 	margin-right: 1%;
+	overflow: hidden;
 	}
 .right {
 	min-width: 382px;
 	width: 49.5%;
 	float: left;
+	overflow: hidden;
 	}
 .template2 .left {
 	min-width: 535px;
@@ -269,6 +271,7 @@ table td { vertical-align: middle; }
 	float: right;
 	margin: -33px 5px 0 0;
 	position: relative;
+	text-transform: capitalize;
 }
 .header_option a:hover {
 	text-decoration: underline;
@@ -298,7 +301,7 @@ Side Nav styles
 	margin: 0;
 	padding: 0;
 	}
-#nav ul ul { border: 1px solid #0451a3; }
+#nav ul ul { border: 1px solid #0451a3; background: #1965b3; }
 #nav li li a {
 	background: #1965b3;
 	}
@@ -314,13 +317,16 @@ Side Nav styles
 	padding: 6px 14px 6px 16px;
 	line-height: normal;
 	width: 150px;
+	cursor: pointer;
+	}
+#nav li a span {
+	display: block;
+	width: 100%;
 	}
 #nav li a:hover {
 	background: #1965b4;
 	}
-#nav li.parent > a span {
-	display: block;
-	width: 100%;
+#nav li.parent > a span {	
 	background: url(/images/nav-arrow.gif) no-repeat 100% 3px;
 	}
 #nav li.parent > a.hover span {
@@ -361,9 +367,6 @@ Side Nav styles
 .box.image .text {
 	text-align: center;
 	display: block;
-	}
-.box.image .text img {
-	
 	}
 h2 {
 	color: #fff;
@@ -426,6 +429,7 @@ h2 span {
 	position: absolute;
 	top: 0;
 	right: 0;
+	text-transform: capitalize;
 	}
 .box .edit:hover { background: #0065ce; }
 .box .editPanel.hide {
@@ -460,7 +464,6 @@ h2 span {
 .box .listing ul li {
 	margin: 0;
 	padding: 0;
-	display: block;
 	padding: 5px 15px;
 	}
 .box .listing ul li .col {
@@ -474,7 +477,7 @@ table tr.dark {
 .listing h3 { float: left; line-height: 1.6; }
 .listing h3 a:hover { color: #003e7e; }
 .listing p { clear: both; margin: 0 0 0.5em; }
-p.interact { font-size: 90%; text-align: right; clear: none; }
+p.interact { font-size: 90%; text-align: right; clear: none; white-space: nowrap; }
 li p.interact { margin: 0 0 0 15px; float: right; }
 p.interact a { color: #003e7e; }
 .listing p.small { font-size: 90%; float: right; color: #989898; }
@@ -566,10 +569,8 @@ a.layout:hover img {
 	text-align: center;
 	}
 .icons {
-	padding-left: 30px;
+	padding: 3px 0 3px 30px;
 	display: block;
-	height: 22px;
-	line-height: 22px;
 	background-repeat: no-repeat;
 	background-image: url(/images/mime/textfile.png);
 	}
@@ -580,6 +581,9 @@ a.layout:hover img {
 	background: url(/images/famicons/house.png) no-repeat 100% 50%;
 	float: right;
 	}
+td.small {
+	font-size: 80%;
+	}
 /*--------------------------------------------------------------
 News styles 
 --------------------------------------------------------------*/
@@ -587,6 +591,10 @@ News styles
 	background: #eee;
 	padding: 10px 10px 1px;
 	margin-bottom: 1em;
+	}
+.modify {
+	text-align: right;
+	font-size: 80%;
 	}
 /*--------------------------------------------------------------
 Tree styles 

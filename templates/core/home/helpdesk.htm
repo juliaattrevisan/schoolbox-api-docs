@@ -1,11 +1,15 @@
-<div class="dbx-box">
-	<h2 class="dbx-handle">Current Helpdesk Jobs</h2>
-	<div class="dbx-content indent">
-		<table>
-        <!-- BEGIN helpdesk_block -->
-		<tr><td>{CREATED}</td><td>{PROBLEM}</td><td>{STATUS}</td></tr>
-		<!-- END helpdesk_block -->
-        </table>
-     <a href="/modules/helpdesk/index.php">View More Information</a>
-	</div>
+<div class="box grey">
+<h2>Current Helpdesk Jobs</h2>
+  <div class="text listing">
+    <ul>
+      <!-- BEGIN helpdesk_block -->
+      <li class="{ON_OFF}">
+      	<h3>{PROBLEM}</h3>
+        <p class="interact">{STATUS}</p>
+        <p>{CREATED}</p>        
+      </li>
+      <!-- END helpdesk_block -->
+    </ul>
+    <p class="interact"><a href="/modules/helpdesk/index.php">View More Information</a></p>
+  </div>
 </div>

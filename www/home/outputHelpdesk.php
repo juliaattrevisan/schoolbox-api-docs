@@ -13,6 +13,7 @@ if(HELPDESK_enable) {
 			$this->setVar("PROBLEM", ucfirst($job['problem']));
 			$this->setVar("CREATED", $job['createdDate']);
 			$this->setVar("STATUS", $job['status']);
+			$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 			$this->parse("helpdesk_jobs", "helpdesk_block", true);
 		}
 	

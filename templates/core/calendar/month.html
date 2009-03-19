@@ -28,29 +28,28 @@
       <table id="month-view">
       	<thead>
       	<tr>
-        	<td>Sunday</td>
+        		<td class="dark">Sunday</td>
             <td>Monday</td>
-            <td>Tuesday</td>
+            <td class="dark">Tuesday</td>
             <td>Wednesday</td>
-            <td>Thursday</td>
+            <td class="dark">Thursday</td>
             <td>Friday</td>
-            <td>Saturday</td>
+            <td class="dark">Saturday</td>
         </tr>
         </thead>
         <tbody>
         <!-- BEGIN month_week -->
         <tr class="month-week">
         	<!-- BEGIN day_block -->
-        	<td class="day-block{OTHER_MONTH}">
-           <p class="header_option">{ADD}</p>
+        	<td class="day-block{OTHER_MONTH} {ON_OFF}">
+            <p class="header_option">{ADD}</p>
             <p class="day-num">{DATE}</p>
-             <div class='float-fix'></div> 
-              <!-- BEGIN note_block -->
-              <p style="color:{PRIORITY};">{TIME}
-              {MODIFY_START}{NOTE}{MODIFY_END}</p>
-              <!-- END note_block -->
-              
-            </td>
+            <div class='float-fix'></div> 
+            <!-- BEGIN note_block -->
+            <p style="color:{PRIORITY};">{TIME}
+            {MODIFY_START}{NOTE}{MODIFY_END}</p>
+            <!-- END note_block -->
+          </td>
         	<!-- END day_block -->
         </tr>
         <!-- END month_week -->

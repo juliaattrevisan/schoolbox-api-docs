@@ -12,8 +12,10 @@
 	}
 .calendarTime { font-size: 80%; }
 #month-view thead td {
-	background: #666;
 	color: #fff;
+	}
+#month-view td.dark {
+	background: #eee;
 	}
 #calendar table.calendarTable {
 	width: auto;
@@ -33,7 +35,7 @@
 	float: left;
 	}
 .header_option {
-	margin-top: 8px;
+	margin-top: 4px;
 	}
 .header_option a:hover {
 	text-decoration: underline;
