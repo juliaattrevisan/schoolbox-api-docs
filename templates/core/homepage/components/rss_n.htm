@@ -1,5 +1,5 @@
 <div class="box image" id="component{COMPONENT_ID}">
-  <h2>{RSS_NAME}</h2>
+  <h2>RSS Feed - {RSS_NAME}</h2>
 <!-- BEGIN config -->
   <a class="edit">edit</a>
   <div class="editPanel hide">
@@ -22,9 +22,13 @@
 	<div class="text listing">
   	<ul>
     	<!-- BEGIN rss_stories -->
-    	<li>
-      	<h3>{RSS_TITLE}</h3>
-        <p>{RSS_BRIEF}</p>
+    	<li class="{ON_OFF}">
+      	<h3><a href="/redir.php?url={RSS_URL}">{RSS_TITLE}</a></h3>
+        <p class="summ">{RSS_BRIEF}</p>
+        <!-- BEGIN rss_date -->
+        <p class="small summ">Posted on {RSS_POSTED_DATE}</p>
+        <!-- END rss_date -->
+        <div class="float-fix"></div>
       </li>
       <!-- END rss_stories -->
     </ul>

@@ -10,22 +10,7 @@
   <!-- END config -->
     
     <!-- BEGIN poll_vote -->
-   	<div class="text">
-    
-    <form action="/poll/modifyForm.php" method="post" id="pollForm">
-    <h3>{POLL_QUESTION}</h3>
-    <input type="hidden" name="pollID" value="{POLL_ID}" />
-    <input type="hidden" name="categoryID" value="{ID}" />
-    	<!-- BEGIN poll_options -->
-        <label for="{POLL_OPTION_INDEX}"><input type="radio" name="vote" class="pollOption" id="{POLL_OPTION_INDEX}" value="{POLL_OPTION_INDEX}" />{POLL_OPTION}</label>
-      <!-- END poll_options -->
-		<p>&nbsp;</p>
-    <input type="submit" value="Vote" onclick="return validatePoll();" />
-    </form>
-    <!-- BEGIN show_results -->
-    <p class="interact"><a href="/homepage/{ID}/pollResults">Show results</a></p>
-    <!-- END show_results -->  
-    <script type="text/javascript">
+   <script type="text/javascript">
     function validatePoll () {
 		var valid = false;
 		$j('input.pollOption').each(function () {
@@ -40,6 +25,19 @@
 		return valid;
 	}
     </script>
+    <div class="text">
+    <h3>{POLL_QUESTION}</h3>
+    <form action="/poll/modifyForm.php" method="post" id="pollForm">
+    <input type="hidden" name="pollID" value="{POLL_ID}" />
+    <input type="hidden" name="categoryID" value="{ID}" />
+    	<!-- BEGIN poll_options -->
+        <label for="{POLL_OPTION_INDEX}"><input type="radio" name="vote" class="pollOption" id="{POLL_OPTION_INDEX}" value="{POLL_OPTION_INDEX}" />{POLL_OPTION}</label>
+      <!-- END poll_options -->
+    <input type="submit" value="Vote" onclick="return validatePoll();" />
+    </form>
+    <!-- BEGIN show_results -->
+    <p class="interact"><a href="/homepage/{ID}/pollResults">Show results</a></p>
+    <!-- END show_results --> 
     </div> 
     <!-- END poll_vote -->
     
