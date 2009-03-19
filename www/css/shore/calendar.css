@@ -11,13 +11,19 @@
 	border-bottom: 1px solid #666;
 	}
 #month-view thead td {
-	background: #666;
-	color: #fff;
+	color: #000;
+	}
+#calendar .header_option {
+	margin-top: 8px;
 	}
 #calendar table.calendarTable {
 	width: auto;
 	border: 2px solid #003E7E;
 	text-align: center;
+	}
+#calendar table.calendarTable th {
+	background: #00376F ;
+	color: #fff;
 	}
 #calendar table.calendarTable td,
 #calendar table.calendarTable tr {
