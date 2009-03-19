@@ -81,7 +81,7 @@ window.addEvent('domready', function () {
     <tr>
       <td style="width:300px"><h3>Group Admin</h3></td>
       <td><a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a><br />
-        <a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" onclick="return confirm('Disband this group?');">Disband Group</a></td>
+        </td>
     </tr>
     <tr>
       <td valign="top"><h3>Add users</h3>
@@ -124,9 +124,9 @@ window.addEvent('domready', function () {
               <td style="text-align: center;"><input class="delCheck" type="checkbox" name="delete[]" value="{USER_ID}"  /></td>
               <td style="white-space: nowrap;"><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
               <td style="text-align: center;"><img src="/images/{GREEN_CHECK}.gif" width="13" height="12" border="0" class="greenCheck" rel="{USER_ID}" alt="Write access" /></td>
-              <td style="text-align: center;"><a href="/group/modifyForm.php?delete={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Remove {USER_JAVA}?');">delete</a></td>
+              <td style="text-align: center;"><a href="/group/modifyForm.php?delete={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Remove {USER_JAVA}?');">Delete</a></td>
               <td style="text-align: center; white-space: nowrap;"><!-- BEGIN make_owner -->
-                <a href="/group/modifyForm.php?owner={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Promote {USER_JAVA} to group admin?');">make admin</a>
+                <a href="/group/modifyForm.php?owner={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Promote {USER_JAVA} to group admin?');">Make Admin</a>
                 <!-- END make_owner --></td>
             </tr>
             <!-- END member -->
@@ -152,7 +152,7 @@ window.addEvent('domready', function () {
           <tr>
             <td style="text-align: center;"><input class="acceptCheck" type="checkbox" name="accept[]" value="{WAITING_ID}" /></td>
             <td><a href="/search/userLookup.php?id={WAITING_ID}">{WAITING_NAME}</a></td>
-            <td style="text-align: center;"><a href="/group/modifyForm.php?accept={WAITING_ID}&categoryID={CATEGORY_ID}">add</a></td>
+            <td style="text-align: center;"><a href="/group/modifyForm.php?accept={WAITING_ID}&categoryID={CATEGORY_ID}">Add</a></td>
           </tr>
           <!-- END waiting -->
         </table>
@@ -164,5 +164,9 @@ window.addEvent('domready', function () {
         </td>
     </tr>
     <!-- END authorisation -->
+        <tr><td valign="top"><h3>Disband Group</h3>
+    <em>Removes all members of the group including admin, but leaves all content</td>
+    <td><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" onclick="return confirm('Disband this group?');">Disband Now</a></td>
+    </tr>
   </table>
 </div>

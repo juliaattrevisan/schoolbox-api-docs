@@ -56,7 +56,11 @@ class Mail
 	}
 	
 	function mailboxStatus($inbox){
-		return imap_status($inbox, $this->server, SA_ALL);
+		if($status =  imap_status($inbox, $this->server, SA_ALL) )
+			return $status;
+		else
+			print "imap failed: ".imap_last_error();	
+	
 	}
 
 	function mailExists($msgid, $inbox)

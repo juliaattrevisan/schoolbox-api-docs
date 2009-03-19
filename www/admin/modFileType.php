@@ -107,6 +107,7 @@ class modFileType
 			$this->t_body->set_var('MIME', $fileType['mime']);
 			$this->t_body->set_var('ICON', $fileType['iconFile']);
 			$this->t_body->set_var('FILETYPE_ID', $fileType['fileTypeID']);
+			$this->t_body->set_var('ON_OFF', ++$x%2 ? 'dark':'');
 			
 			if($fileType['enable'] == 'true')
 				$this->t_body->set_var('STATUS', 'Enabled');

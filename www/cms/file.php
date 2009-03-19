@@ -39,13 +39,13 @@ if(is_numeric($this->arg[0])) {
 	
 	if(is_array($subBox)) {
 		if($subBox['deleted'])
-			$this->setVar('SUBBOX', "<a href=\"/submission/listSubmission.php?undelete=".$subBox['id']."\">undelete box</a>");
+			$this->setVar('SUBBOX', "<a href=\"/submission/listSubmission.php?undelete=".$subBox['id']."\">Undelete Box</a>");
 		else
-			$this->setVar("SUBBOX", "<a href=\"/submission/listSubmission.php?delete=".$subBox['id']."\">delete 
-				</a> // <a href=\"/submission/createSubmission.php?sid=".$subBox['id']."\">modify</a>");
+			$this->setVar("SUBBOX", "<p><a href=\"/submission/listSubmission.php?delete=".$subBox['id']."\">Delete</a></p>
+				<a href=\"/submission/createSubmission.php?sid=".$subBox['id']."\">Modify</a>");
 	}
 	else {
-		$this->setVar("SUBBOX", "<a href=\"/submission/createSubmission.php?cid=".$file['category']."&fileid=".$file['id']."\">create</a>");
+		$this->setVar("SUBBOX", "<a href=\"/submission/createSubmission.php?cid=".$file['category']."&fileid=".$file['id']."\">Create</a>");
 	}
 	
 	

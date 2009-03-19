@@ -15,11 +15,9 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, "helpdesk", "helpdesk_block");
 	$this->setBlock(TEMPLATE_content, "student_synergy_form", "student_synergy_form_block");
 	$this->setBlock(TEMPLATE_content, "student_synergy_tutor", "student_synergy_tutor_block");
-	$this->setBlock(TEMPLATE_content, "contact_synergy", "contact_synergy_block");
-	$this->setBlock('contact_synergy', "contact_details", "contact_details_block");
-	$this->setBlock(TEMPLATE_content, "medical", "medical_block");
-	$this->setBlock(TEMPLATE_content, 'group_management', 'group_management_block');
-	$this->setBlock('group_management', 'group', 'group_block');
+	$this->setBlock(TEMPLATE_content, 'contact_synergy', 'contact_synergy_block');
+	$this->setBlock('contact_synergy', 'contact_details', 'contact_details_block');
+	$this->setBlock(TEMPLATE_content, 'medical', 'medical_block');
 
 	$userHandler = new User;
 	
@@ -216,28 +214,6 @@ if(is_numeric($this->arg[0])) {
 						);
 		$this->setVar($blank);		
 	}
-	
-	//display list of groups owner is in charge of so they can add the user
-	$query = "SELECT sid, category.name FROM userAccess, category 
-	WHERE service = ".HOMEPAGESERVICE." AND sid = category.id AND uid = '".$_SESSION['id']."' AND type = '3'"; 
-	
-	$this->db->query($query);
-	if($this->db->countRows() > 0 && $_SESSION['id'] != $id)
-	{
-		while($group = $this->db->getNextArray())
-		{
-			$outputGroup = array('GROUP_ID'	=> $group['sid'],
-								'GROUP_NAME'=> $group['name'],
-								);
-			$this->setVar($outputGroup);
-			$this->parse('group_block', 'group', true);
-		}		
-		$this->setVar('HOMEPAGE_SERVICE', HOMEPAGESERVICE);
-		
-		$this->parse('group_management_block','group_management');
-	}
-	else
-		$this->setVar('group_management_block', '');
 }
 else {
 	$this->setFile(TEMPLATE_content, 'user/search.html');
