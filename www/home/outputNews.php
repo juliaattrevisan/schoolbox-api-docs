@@ -13,7 +13,8 @@ if(is_array($headlineList) )
 	foreach($headlineList as $item)
 	{
 		$this->setVar("NEWS_TITLE", $item['item_heading']);
-		$this->setVar("NEWS_URL", "/news/#".$item['item_id']); 
+		$this->setVar("NEWS_URL", "/news/#".$item['item_id']);
+		$this->setVar('ON_OFF', ++$j%2? '' : 'dark'); 
 		$this->parse("stories_block", "main_stories", true);
 	}
 }

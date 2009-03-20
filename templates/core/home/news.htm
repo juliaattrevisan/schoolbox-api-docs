@@ -1,9 +1,15 @@
-<div class="box grey">
+<div class="box">
   <h2>News Headlines</h2>
-  <div class="text">
+  <div class="text listing">
     <ul>
       <!-- BEGIN main_stories -->
-      <li><a href="{NEWS_URL}">{NEWS_TITLE}</a></li>
+      <li class="{ON_OFF}">
+      	<h3>{NEWS_HEADING}</h3>
+        <p class="interact">{MOD_NEWS}</p>
+        <p>{NEWS_BODY}</p>
+        <p class="small summ">Posted by {EMAIL_CONTACT} on {POSTED_DATE}</p>
+        <div class="float-fix"></div>
+      </li>
       <!-- END main_stories -->
     </ul>
   </div>      

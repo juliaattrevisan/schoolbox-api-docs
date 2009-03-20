@@ -52,6 +52,7 @@ else
 						);
 		
 		$this->setVar($output);
+		$this->setVar('ON_OFF', ++$j%2? '' : 'dark'); 
 		$this->parse("note_listing","note_block", true);
 
 	}

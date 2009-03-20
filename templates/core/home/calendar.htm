@@ -1,13 +1,15 @@
-<div class="box grey">
+<div class="box">
   <h2>Today's Events <span>- {DATE}</span></h2>
-  <div class="text">
-  <table>
+  <div class="text listing">
+  	<ul>
   	<!-- BEGIN note_block -->
-    <tr style="color: {NOTE_COLOUR}">
-    <td class="small">{TIME}</td>
-    <td>{NOTE_CATEGORY} {NOTE_DESCRIPTION}</td>
-    </tr>
+    <li class="{ON_OFF}">
+      	<h3><a href="/calendar/week/{CAL_DAY}-{CAL_MONTH}-{CAL_YEAR}">{CAL_NOTE}</a></h3>
+        <p class="interact"><!-- BEGIN modify --> <a href="/calendar/modify.php?eventID={CAL_ID}">Modify</a><!-- END modify --></p>
+        <p class="small">{CAL_DATE} {CAL_TIME}</p>
+        <div class="float-fix"></div>
+      </li>
     <!-- END note_block -->
-    </table>
+    </ul>
   </div>
 </div>

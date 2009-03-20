@@ -236,6 +236,9 @@ table.ruler { width: 100%; }
 #loginForm fieldset {
 	margin-bottom: 20px;
 	}
+#loginForm fieldset input {
+	width: 150px;
+	}
 /*--------------------------------------------------------------
  Table styles 
 -------------------------------------------------------------*/
@@ -473,7 +476,7 @@ h2 span {
 table tr.dark {
 	background: #ececec;
 	}
-.listing h3 { float: left; line-height: 1.6; clear:left; }
+.listing h3 { float: left; line-height: 1.6; width: 70%; }
 .listing h3 a:hover { color: #003e7e; }
 .listing p { clear: both; margin: 0 0 0.5em; }
 p.interact { font-size: 90%; text-align: right; clear: none; white-space: nowrap; }
@@ -706,12 +709,16 @@ div.indent {
 	border: 1px solid #CCCCCC;
 	background: #eee;
 	padding: 10px;
-	width: 759px;
 	margin-bottom: 20px;
 	}
 .standardForm .formLabelWidth { width: 40%; }
 .standardForm table {
 	width: 100%;
+	}
+.standardForm .checkAll,
+.standardForm .delCheck,
+.standardForm .acceptCheck {
+	top: 0;
 	}
 .standardForm h2 {
 	color: #000;
@@ -733,6 +740,10 @@ div.indent {
 	}
 #deleteForm td {
 	padding: 0.3em;
+	vertical-align: middle;
+	}
+#deleteForm td input {
+	vertical-align: middle;
 	}
 .standardForm tr,
 .standardForm td {

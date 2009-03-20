@@ -10,11 +10,12 @@
 #calendar table thead td {
 	border-bottom: 1px solid #666;
 	}
+#calendar .ruler thead td { padding-bottom: 0; }
 #month-view thead td {
 	color: #000;
 	}
 #calendar .header_option {
-	margin-top: 8px;
+	margin: 8px 0 0 0;
 	}
 #calendar table.calendarTable {
 	width: auto;
@@ -36,6 +37,7 @@
 	color: #003E7E;
 	text-indent: 0;
 	float: left;
+	border: 0;
 	}
 #month-view {
 	border-top: 1px dotted #cccccc;

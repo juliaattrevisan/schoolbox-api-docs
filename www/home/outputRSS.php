@@ -18,6 +18,7 @@ if(is_array($headlineList['items']) ) {
 	foreach($headlineList['items'] as $item) {
 		$this->setVar("RSS_TITLE", scrubTEXT($item['title']));
 		$this->setVar("RSS_URL", scrubHTML($item['link'])); 
+		$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 		//$this->setVar("RSS_BRIEF", scrubTEXT($item['description']));
 		$this->parse("rss_block", "rss_stories", true);
 	}

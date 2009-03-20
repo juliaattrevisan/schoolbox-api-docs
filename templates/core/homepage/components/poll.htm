@@ -26,8 +26,8 @@
 	}
     </script>
     <div class="text">
-    <h3>{POLL_QUESTION}</h3>
-    <form action="/poll/modifyForm.php" method="post" id="pollForm">
+    <h3>{POLL_QUESTION}</h3><br />
+    <form class="standardForm" action="/poll/modifyForm.php" method="post" id="pollForm">
     <input type="hidden" name="pollID" value="{POLL_ID}" />
     <input type="hidden" name="categoryID" value="{ID}" />
     	<!-- BEGIN poll_options -->
@@ -35,10 +35,11 @@
       <!-- END poll_options -->
     <input type="submit" value="Vote" onclick="return validatePoll();" />
     </form>
+		 
+    </div>
     <!-- BEGIN show_results -->
     <p class="interact"><a href="/homepage/{ID}/pollResults">Show results</a></p>
     <!-- END show_results --> 
-    </div> 
     <!-- END poll_vote -->
     
     <!-- BEGIN poll_chart -->

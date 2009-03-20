@@ -6,11 +6,28 @@
 	height: 64px;
 	background: url(/images/shore/shore-logo.gif) no-repeat;
 	}
+#content {
+	padding: 5px 15px 15px;
+	}
 /*---------------------------------------
 	Component Styles
 ----------------------------------------*/
+h1 a.customise {
+	top: 0;
+	right: 5px;
+	font-size: 12px;
+	}
 h2 {
 	background: #003e7e url(/images/shore/box-bg.png) repeat-x;
+	}
+table h2 {
+	background: 0;
+	border-bottom: 1px dashed #7F7F7F;
+	color: #000;
+	text-indent: 0;
+	}
+#content h2 a {
+	color: #fff;
 	}	
 /*---------------------------------------
 	Nav Styles
@@ -41,5 +58,20 @@ h2 {
 	background: url(/images/shore/watermark.gif) no-repeat 115% -250px;
 	}
 .header_option {
-	margin-top: -25px;
+	margin-top: -36px;
+	}
+table .header_option {
+	margin-top: -20px;
+	}
+.news-item .header_option {
+	margin-top: -23px;
+	}
+p.interact {
+	font-size: 110%;
+	}
+.text p.interact {
+	font-size: 90%;
+	}
+p.interact a {
+	color: #1965B4;
 	}
