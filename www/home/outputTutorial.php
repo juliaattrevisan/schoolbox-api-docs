@@ -18,7 +18,7 @@ if (is_array($eventList)) {
 		$this->parse('tutorial_list_block', 'tutorial_list', true);
 	}
 } else
-	$this->setVar('tutorial_list_block', 'There are no events assigned to you today.');
+	$this->setVar('tutorial_list_block', '<li><p>There are no events assigned to you today.</p></li>');
 
 $this->parse('POS'.$component['position'], $component['name']);
 	
