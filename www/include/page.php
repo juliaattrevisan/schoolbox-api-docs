@@ -57,9 +57,9 @@ $db->dbDoQuery($query);
 if($db->dbCountRows() > 0){
 	while($link = $db->dbGetNextArray()){
 		if(isLocalURL($link['url'])){
-			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\">".scrubTEXT($link['description'])."</a>");	
+			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\"><span>".scrubTEXT($link['description'])."</span></a>");	
 		}else{
-			$this->t_body->set_var("MLINK", "<a href=\"/redir.php?url=".urlencode(urlencode($link['url']))."\" target=\"_blank\">".scrubTEXT($link['description'])."</a>");
+			$this->t_body->set_var("MLINK", "<a href=\"/redir.php?url=".urlencode(urlencode($link['url']))."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
 		}
 		$this->t_body->parse("my_links", "mlink_block", true);
 	}

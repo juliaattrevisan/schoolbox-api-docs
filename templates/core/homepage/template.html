@@ -2,65 +2,7 @@
 
 <!-- BEGIN modify_layout -->
 <script type="text/javascript" src="/javascript/jquery.ui.js"></script>
-<script type="text/javascript">
-$j(document).ready(function () {
-	/* add drag/drop */
-	$j('div.left, div.right').sortable({
-		connectWith: 'div.left, div.right',
-		cursor: 'move',
-		distance: 0,
-		forcePlaceholderSize: true,
-		handle: 'h2',
-		helper: 'clone',
-		items: 'div.box',
-		placeholder: 'marker',
-		tolerance: 'pointer',
-		update: function () {
-			var left = '', right = '';
-			$j('div.left').children('div.box').each(function () {
-				left += $j(this).attr('id').substring(9) + ',';
-			});
-			$j('div.right').children('div.box').each(function () {
-				right += $j(this).attr('id').substring(9) + ',';
-			});
-			$j.post('/homepage/configForm.php', {cid: '{ID}', type: 'components', column1: left, column2: right});
-		}
-	});
-	$j('div.box h2').css('cursor', 'move');
-
-	/* show/hide text based components */
-	$j(document).keydown(function (event) {
-		if (event.shiftKey) {
-			$j('div.manage h2').each(function () {
-				$j(this).css('display', 'block');
-			});
-		}
-	});
-	$j(document).keyup(function (event) {
-		$j('div.manage h2').each(function () {
-			$j(this).css('display', 'none');
-		});
-	});
-	
-	/* show/hide edit panel */
-	$j('a.edit').each(function () {
-		$j(this).click(function () {
-			$j(this).siblings('div.editPanel:first').toggleClass("hide");
-		});
-		
-	});
-	function toggleConfig(div){		
-		var editPanel = $(div).getChildren();
-	
-		for (i in editPanel)
-			if (editPanel[i].hasClass("editPanel"))
-				break;
-	
-		editPanel[i].toggleClass("hide");
-	} 
-
-});
-</script>
+<script type="text/javascript" src="/javascript/jquery.component.js"></script>
 <!-- END modify_layout -->
 <style type="text/css">
 		
@@ -97,7 +39,8 @@ $j(document).ready(function () {
   <!-- END edit_page -->
 </h1>
 
-<div class="{TEMPLATE}">
+<div class="{TEMPLATE} homepage">
 <div class="left">{COLUMN1}</div>
 <div class="right">{COLUMN2}</div>
 </div>
+<input type="hidden" id="categoryID" value="{ID}" />

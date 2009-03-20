@@ -28,17 +28,18 @@ $to = ausDateToUnix($_GET['to']);
 $eventHandler = new Event;
 $userHandler = new User;
 
-if (isset($_GET['keyword'])) {
+if (is_numeric($_GET['userID'])) {
 	
-	$userList = $userHandler->searchUser($_GET['keyword'], 3);
-	if (is_array($userList))
-		$studentID	= $userList[0]['uid'];
+	$user = $userHandler->getByID($_GET['userID'], 3);
+	if (isset($user['uid']))
+		$studentID	= $user['uid'];
 } else
 	$studentID = $_GET['studentID'];
 
-$output = array('FROM'		=> outputDate("d/m/Y", $from),
-				'TO'		=> outputDate("d/m/Y", $to),
-				'STUDENT'	=> 'N/A',
+$output = array('FROM'			=> outputDate("d/m/Y", $from),
+				'TO'			=> outputDate("d/m/Y", $to),
+				'STUDENT'		=> 'N/A',
+				'STUDENT_ID'	=> '',
 				);
 $page->setVar($output);
 
@@ -84,7 +85,8 @@ if (is_numeric($studentID)) {
 								'PRESENT'	=> $event['present']=='true'?'Present':'<em>Absent</em>',
 								'HOURS_ATTENDED'	=> number_format($hoursAttended, 2),
 								'HOURS_MISSED'		=> number_format($hoursMissed, 2),
-								'STUDENT'	=> scrubText($event['studentName']),
+								'STUDENT'		=> scrubText($event['studentName']),
+								'STUDENT_ID'	=> $event['studentID'],
 								);
 				$page->setVar($output);
 				$page->parse('event_list_block', 'event_list', true);

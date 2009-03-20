@@ -1,81 +1,125 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" type="text/css" href="/css/mooRainbow.css" />
-<script type="text/javascript" src="/javascript/mootools.js"></script>
-<script type="text/javascript" src="/javascript/mooRainbow.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/jquery.farbtastic.css" />
+<script type="text/javascript" src="/javascript/jquery.farbtastic.js"></script>
 <script type="text/javascript">
-	<!-- BEGIN colour_list -->
-	var {COLOUR_ARRAY} = [
-		['left_head_font', '#{left_head_font}'],
-		['left_head_bg', '#{left_head_bg}'],
-		['left_font', '#{left_font}'],
-		['left_bg_primary', '#{left_bg_primary}'],
-		['left_bg_secondary', '#{left_bg_secondary}'],
-		['left_link', '#{left_link}'],
-		['left_hover', '#{left_hover}'],
-		
-		['right_head_font', '#{right_head_font}'],
-		['right_head_bg', '#{right_head_bg}'],
-		['right_font', '#{right_font}'],
-		['right_bg_primary', '#{right_bg_primary}'],
-		['right_bg_secondary', '#{right_bg_secondary}'],
-		['right_link', '#{right_link}'],
-		['right_hover', '#{right_hover}'],
-	];
-	<!-- END colour_list -->
+<!-- BEGIN colour_list -->
+var {COLOUR_ARRAY} = [
+	['left_head_font', '#{left_head_font}'],
+	['left_head_bg', '#{left_head_bg}'],
+	['left_font', '#{left_font}'],
+	['left_bg_primary', '#{left_bg_primary}'],
+	['left_bg_secondary', '#{left_bg_secondary}'],
+	['left_link', '#{left_link}'],
+	['left_hover', '#{left_hover}'],
 	
-	window.onload = function(){
-		for(i = 0; i < pickers.length; i++){
-			pickers[i][2] = new MooRainbow(pickers[i][0] + '_div', pickers[i][0] + '_input', {
-				'id': pickers[i][0] + 'Picker',
-				'imgPath': '/images/mooRainbow/',
-				'onComplete': function(color, object){
-					object.element.setStyle('background-color', color.hex);
-					object.input.value = color.hex;
-				},
-				'onChange': function(color, object){
-					object.element.setStyle('background-color', color.hex);
-					object.input.value = color.hex;
-				}
+	['right_head_font', '#{right_head_font}'],
+	['right_head_bg', '#{right_head_bg}'],
+	['right_font', '#{right_font}'],
+	['right_bg_primary', '#{right_bg_primary}'],
+	['right_bg_secondary', '#{right_bg_secondary}'],
+	['right_link', '#{right_link}'],
+	['right_hover', '#{right_hover}'],
+];
+<!-- END colour_list -->
+
+
+$j(document).ready(function () {
+	
+	$j('body').click(function () {
+		$j('#picker').hide();
+	});		
+	
+	var p = $j.farbtastic('#picker');
+
+	$j('#left_bg_primary_div, #left_bg_secondary_div').each(function () {
+		$j(this).click(function () {
+			var node = $j(this), left = $j(this).position().left + ($j(this).width()*2), top = $j(this).position().top;
+			
+			$j('#picker').css({top: top, left: left}).show();
+		
+			p.linkTo(function () {
+				node.css("background-color", p.color);
+				$j('#left_bg_primary_input').val(p.color)
 			});
-			pickers[i][2].manualSet(pickers[i][1], 'hex');
-			$(pickers[i][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
-			$(pickers[i][0] + '_input').value = pickers[i][2].sets.hex;
-		};
+			
+			p.setColor($j('#left_bg_primary_input').val());	
+		});	
+	});
+	
 
-		$("loadDefaults").addEvent('click', function () {
-			for(i = 0; i < pickers.length; i++){
-				pickers[i][2].manualSet(defaults[i][1], 'hex');
-				$(pickers[i][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
-				$(pickers[i][0] + '_input').value = pickers[i][2].sets.hex;		
-			}
-		});
+
+	/*
+	for(i = 0; i < pickers.length; i++){
+	
 		
-		$("leftRight").addEvent('click', function () {
-			var half = pickers.length/2;
-			for (i = 0; i < half; i++) {
-				pickers[(i+half)][2].manualSet(pickers[i][1], 'hex');
-				$(pickers[(i+half)][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
-				$(pickers[(i+half)][0] + '_input').value = pickers[i][2].sets.hex;		
+		pickers[i][2] = new MooRainbow(pickers[i][0] + '_div', pickers[i][0] + '_input', {
+			'id': pickers[i][0] + 'Picker',
+			'imgPath': '/images/mooRainbow/',
+			'onComplete': function(color, object){
+				object.element.setStyle('background-color', color.hex);
+				object.input.value = color.hex;
+			},
+			'onChange': function(color, object){
+				object.element.setStyle('background-color', color.hex);
+				object.input.value = color.hex;
 			}
 		});
-	}
+		pickers[i][2].manualSet(pickers[i][1], 'hex');
+		$(pickers[i][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
+		$(pickers[i][0] + '_input').value = pickers[i][2].sets.hex;
+	};
+
+	$("loadDefaults").addEvent('click', function () {
+		for(i = 0; i < pickers.length; i++){
+			pickers[i][2].manualSet(defaults[i][1], 'hex');
+			$(pickers[i][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
+			$(pickers[i][0] + '_input').value = pickers[i][2].sets.hex;		
+		}
+	});
+	
+	$("leftRight").addEvent('click', function () {
+		var half = pickers.length/2;
+		for (i = 0; i < half; i++) {
+			pickers[(i+half)][2].manualSet(pickers[i][1], 'hex');
+			$(pickers[(i+half)][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
+			$(pickers[(i+half)][0] + '_input').value = pickers[i][2].sets.hex;		
+		}
+	});
+	*/
+});
 	
 
-	
-	function removeClasses() {
-		var x = $$('.layouts a');
-		x.each(function(l){
-			l.removeClass('current');
-		});
-		}
-	
-	function template(el) {
-		var temp = $('template-choice');
-		temp.setAttribute('value', el.getAttribute('title'));
-		removeClasses();
-		el.addClass('current');		
-		}
+
+function removeClasses() {
+	var x = $$('.layouts a');
+	x.each(function(l){
+		l.removeClass('current');
+	});
+	}
+
+function template(el) {
+	var temp = $('template-choice');
+	temp.setAttribute('value', el.getAttribute('title'));
+	removeClasses();
+	el.addClass('current');		
+	}
 </script>
+<style type="text/css">
+#picker {
+	background-color: #414141;
+	width: auto;
+	z-index: 10;
+	position: absolute;
+	left: 200px;
+	padding: 4px;
+	display: none;
+}
+.colorBox {
+	width: 15px;
+	height: 15px;
+	border: 1px solid #000;
+}
+</style>
 <!-- END custom_head -->
 <div class="template3">
 			<h1>Homepage Customisation</h1>
@@ -181,6 +225,7 @@
             <p>Link Hover Colour</p>
         	</div>
           
+          <div id="picker"></div>
           <div class="float-fix"></div>
           
           </div>

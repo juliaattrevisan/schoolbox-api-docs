@@ -1,34 +1,36 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
-<link rel="stylesheet" href="/css/autocompleter.css" type="text/css" />
 <script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
 <script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
 <script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
-<script type="text/javascript" src="/javascript/mootools.js"></script>
-<script type="text/javascript" src="/javascript/autocompleter.js"></script>
-<script type="text/javascript" src="/javascript/observer.js"></script>
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<script type="text/javascript" src="/javascript/jquery.js"></script>
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript">
-window.addEvent('domready', function() {
-	$$('.lookup').each(function (el) {
-		new Autocompleter.Ajax.Json(el, '/ajax/user.php?groupID=3', {
-			minLength: 2,
-			postVar: 'keyword',
-			width: '310px',
-			selectFirst: true,
-			//selectMode: 'type-ahead'
-			selectMode: 'pick'
+var $j = jQuery.noConflict();
+$j(document).ready(function () {
+	$j('.lookup').each(function () {
+		$j(this).autocomplete({
+			serviceUrl: '/ajax/user.php?groupID=0',
+			minChars: 2,
+			maxHeight: 400,
+			width: node.width(),
+			onSelect: function (value, data) {
+				$j("#userID").val(data);
+				return false;
+			}
 		});
 	});
-	
 });
+
 </script>
 <!-- END custom_head -->
 <h1>Student Report - {STUDENT}</h1>
 <form action="report-student.php" method="get">
   <table style="width: 650px;">
     <tr>
-    	<td>Student</td>
-        <td><input class="lookup" type="text" name="keyword" value="{STUDENT}" /></td>
+      <td>Student</td>
+      <td><input class="lookup" type="text" name="keyword" value="{STUDENT}" /></td>
       <td>From:</td>
       <td><input name="from" id="from" type="text" size="15" maxlength="10" value="{FROM}"/>
         <img src="/images/ico_calendar.gif" width="16" height="13" id="from_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
@@ -53,7 +55,9 @@ window.addEvent('domready', function() {
 			singleClick    :    true
 		});
 		</script></td>
-      <td><input type="submit" name="submit" value="Report" /></td>
+      <td>
+      <input class="userID" type="hidden" name="userID" id="userID" value="{STUDENT_ID}" />
+      <input type="submit" name="submit" value="Report" /></td>
     </tr>
   </table>
 </form>

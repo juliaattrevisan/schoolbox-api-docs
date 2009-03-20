@@ -155,6 +155,7 @@ class modSideMenu
 				$this->t_body->set_var("ITEM_IDENT", $item['indent']);
 				$this->t_body->set_var("ITEM_TXT", $item['txt']);
 				$this->t_body->set_var("ITEM_ID", $item['id']);
+				$this->t_body->set_var("ON_OFF", ++$i%2 ? 'dark' : '');
 				
 				if($item['first'])
 					$this->t_body->set_var("up_button_block", "");
