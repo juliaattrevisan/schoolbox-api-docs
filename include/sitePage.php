@@ -2,7 +2,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/page.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/db.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/include/permission.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 class SitePage extends Page {
 
@@ -68,6 +68,8 @@ class SitePage extends Page {
 	
 	function buildPage() {
 	
+		$groupHandler = new Group;
+		
 		$this->setFile(TEMPLATE_body, 'include/body.html' );
 		$this->setFile('headerTpl', 'include/header.html' );
 		$this->setFile('footerTpl', 'include/footer.html' );
@@ -217,13 +219,13 @@ class SitePage extends Page {
 		// if configuration states mail is available and user has access to local mail account display it
 		$this->setBlock('tabTpl', 'webmail_tab', 'wm_tab');
 		
-		if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && isStaff($_SESSION['gid'])) || SITE_location == 'ormond')
+		if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && $groupHandler->isStaff()) || SITE_location == 'ormond')
 		{
 			$this->parse('wm_tab','webmail_tab');
 			
 			if(SITE_location == 'mgs')
 			{
-				if(isStaff($_SESSION['gid']))
+				if($groupHandler->isStaff())
 					$this->setVar("WEBMAIL_LOCATION", 'href=\"https://webmail.mgs.vic.edu.au/exchange/" target="_blank"');
 				else
 					$this->setVar("WEBMAIL_LOCATION", "href=\"/mail/\"");
@@ -236,7 +238,7 @@ class SitePage extends Page {
 					$this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
 			}
 			else if(SITE_location == 'wenona') {
-				if(isStaff($_SESSION['gid'])) {
+				if($groupHandler->isStaff()) {
 					$this->setVar('WEBMAIL_LOCATION', 'href="http://webmail.wenona.nsw.edu.au/gw/webacc/" target="_blank"');
 					$this->setVar('WEBMAIL_TITLE', '<em>W</em>ebmail');
 				}
@@ -261,7 +263,7 @@ class SitePage extends Page {
 		
 			$this->setBlock('tabTpl', 'portfolio_tab', 'pf_tab');
 			$this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
-			if(isStaff($_SESSION['gid'])) {
+			if($groupHandler->isStaff()) {
 				$this->parse('pf_tab', 'portfolio_tab');
 				$this->parse('mf_tab', 'myfiles_tab');
 			}
@@ -326,7 +328,7 @@ class SitePage extends Page {
 		{
 			foreach($_SESSION['subjects'] as $subject)
 			{
-				if(isStaff($_SESSION['gid']))
+				if($groupHandler->isStaff())
 					$this->setVar("MSUBJECT", $subject['name']." (".$subject['code'].")");
 				else		
 					$this->setVar("MSUBJECT", $subject['name']);

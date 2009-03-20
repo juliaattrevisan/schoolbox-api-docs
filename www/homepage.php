@@ -13,7 +13,6 @@ if (strpos($_SERVER['REQUEST_URI'], ".php?category=") ||
 	localRedir("/homepage/" . $category);
 }
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/include/involved.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/homepage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';

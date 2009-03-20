@@ -43,7 +43,13 @@
             <!-- END forecast -->
 			<table>
               <tr>
-                <td> Get more weather from around Australia {LOCDROP} </td>
+                <td> Get more weather from around Australia 
+                <select name="code" onchange='window.open("/weather/"+this.value,"_self", "");'>
+                <!-- BEGIN regions -->
+                <option value="{LOCATION_CODE}">{LOCATION_NAME}</option>
+                <!-- END regions -->
+                </select>
+                </td>
                 <td><span class="sub_footer"> Weather Supplied By <a href="/redir.php?url=http://www.theweather.com.au" target="_blank">The Weather Co.</a></span></td>
               </tr>
             </table>

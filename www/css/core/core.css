@@ -473,7 +473,7 @@ h2 span {
 table tr.dark {
 	background: #ececec;
 	}
-.listing h3 { float: left; line-height: 1.6; }
+.listing h3 { float: left; line-height: 1.6; clear:left; }
 .listing h3 a:hover { color: #003e7e; }
 .listing p { clear: both; margin: 0 0 0.5em; }
 p.interact { font-size: 90%; text-align: right; clear: none; white-space: nowrap; }

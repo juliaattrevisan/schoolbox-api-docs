@@ -7,9 +7,6 @@
 
 //display what has change since the last login for the user
 
-require_once("include/permission.php");
-require_once("include/involved.php");
-
 class WhatsNew
 {
 	function WhatsNew()
