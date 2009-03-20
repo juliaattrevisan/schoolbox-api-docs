@@ -10,10 +10,7 @@ $page = new SitePage;
 $fileHandler = new File;
 $groupHandler = new Group;
 
-if(is_string($_POST['description']) && is_numeric($_POST['category'])) {
-
-	if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS)
-		error(6);
+if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_array($_POST['category']) ) ) {
 
 	$file = array(	'description'	=> $_POST['description'],
 					'comment'		=> $_POST['comment'],
@@ -36,7 +33,6 @@ if(is_string($_POST['description']) && is_numeric($_POST['category'])) {
 	}
 	else {
 		/* Add file */
-		$file['category'] = $_POST['category'];
 		$file['owner'] = $_SESSION['id'];
 		$allowedFileHandler = new AllowedFile;
 		
@@ -44,16 +40,22 @@ if(is_string($_POST['description']) && is_numeric($_POST['category'])) {
 			/* Submitted file with form, run security checks */	
 			$allowedFileHandler->fileSecurityCheck($_FILES['file']);
 			
-			/* Submit to multiple locations */
-			if($_POST['catCount']) {
-				for($x=0; $_POST['catCount'] > $x; $x++) {	
-					if($_POST['mulc'][$x]) {
-						$file['category'] = $_POST['mulc'][$x];
-						$fileID = $fileHandler->create($file, $_FILES['file']);
-					}
+			/* Add to multiple locations */
+			if(is_array($_POST['category']) ){
+				foreach($_POST['category'] as $cat ){
+					
+					if ($groupHandler->getPermission($cat) < WRITE_ACCESS)
+						error(6);
+					
+					$file['category'] = $cat;
+					$fileHandler->create($file, $_FILES['file']);
 				}
 			}
-			else {	/* Basic file submit */
+			else { 
+				if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS)
+						error(6);
+			
+				$file['category'] = $_POST['category'];	
 				$fileID = $fileHandler->create($file, $_FILES['file']);
 			}
 				
@@ -68,11 +70,13 @@ if(is_string($_POST['description']) && is_numeric($_POST['category'])) {
 							);
 			/* Make sure the mime is ok for public */
 			$allowedFileHandler->checkMime($myFile);
+			
+			if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS)
+				error(6);
+			
+			$file['category'] = $_POST['category'];	
 			$fileHandler->create($file, $myFile);
 		
-		}
-		else {
-			$fileHandler->create($file);
 		}
 		
 		/* Redirect to submission page */

@@ -8,10 +8,7 @@ $page = new SitePage;
 $linkHandler = new Link;
 $groupHandler = new Group();
 
-if($_POST['url'] && $_POST['description'] && is_numeric($_POST['category'])) {
-
-	if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS)
-		error(6);
+if($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) || is_array($_POST['category']) ) ) {
 
 	$link = array(	'url'			=> $_POST['url'],
 					'description'	=> $_POST['description'],
@@ -35,10 +32,26 @@ if($_POST['url'] && $_POST['description'] && is_numeric($_POST['category'])) {
 	}
 	else {
 		/* Add link */
-		$link['category'] = $_POST['category'];
 		$link['owner'] = $_SESSION['id'];
 		
-		$linkHandler->create($link);
+		/* Add to multiple locations */
+		if(is_array($_POST['category']) ){
+			foreach($_POST['category'] as $cat ){
+				
+				if ($groupHandler->getPermission($cat) < WRITE_ACCESS)
+					error(6);
+				
+				$link['category'] = $cat;
+				$linkHandler->create($link);
+			}
+		}
+		else { 
+			if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS)
+					error(6);
+		
+			$link['category'] = $_POST['category'];	
+			$linkHandler->create($link);
+		}
 		
 		$page->backToTheFuture(2);
 	}

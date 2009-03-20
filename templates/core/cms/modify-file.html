@@ -33,7 +33,7 @@ function clearBrowse(obj, id) {
     <!-- BEGIN browse -->
     <tr>
       <td class="formLabelWidth"><h3>File</h3>
-        <em>Browse your local disk for a file or upload from your 'my files'.</em></td>
+        <em>Browse your local disk for a file or upload from your 'my files'. You can <a href="/cms/file/multi/{CATEGORY_ID}">upload multiple files</a> here.</em></td>
       <td><input type="file" name="file"  id="browse" onchange="clearBrowse(this, 'myfile');" />
         <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
       </td>
@@ -66,7 +66,7 @@ function clearBrowse(obj, id) {
     </tr>
     <tr>
       <td><h3>Location</h3>
-        <em>The file will be located in this folder</em></td>
+        <em>The file will be located in this folder. You can <a href="/cms/file/multicat/">upload a file to multiple locations</a> here.</em></td>
       <td>{CATEGORY_NAME}
         <input name="category" value="{CATEGORY_ID}" type="hidden" /></td>
     </tr>

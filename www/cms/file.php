@@ -110,7 +110,7 @@ else if($this->arg[0] == 'multicat') {
 	$this->setFile(TEMPLATE_content, 'cms/add-file-multi-cat.html');
 	$this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
 
-	$this->setTitle('Upload Multiple Files');	
+	$this->setTitle('Upload a File to Multiple Locations');	
 	$this->setTab('resources');
 	
 	$groupHandler = new Group;

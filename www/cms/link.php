@@ -65,6 +65,29 @@ if(is_numeric($this->arg[0])) {
 	$this->setVar($output);
 	
 }
+else if($this->arg[0] == 'multicat') {
+	/* Upload a link to multiple categories */
+	require_once '../library/group.php';
+	
+	$this->setFile(TEMPLATE_content, 'cms/add-link-multi-cat.html');
+	$this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
+
+	$this->setTitle('Upload a Link to Multiple Locations');	
+	$this->setTab('resources');
+	
+	$groupHandler = new Group;
+	$categoryList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 2);
+
+	if(is_array($categoryList)) {
+		foreach($categoryList as $category) {
+			$output = array('CATEGORY_NAME'		=> scrubTEXT($category['name']),
+							'CATEGORY_ID'		=> $category['id'],
+					);
+			$this->setVar($output);
+			$this->parse('category_list_block', 'category_list', true);
+		}
+	}
+}
 else {
 	error(2);
 }

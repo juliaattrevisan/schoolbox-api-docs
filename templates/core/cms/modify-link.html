@@ -21,11 +21,12 @@ function verify()
 </script>
 <!-- END custom_head -->
 
-<h1>{ACTION} URL</h1>
+<h1>{ACTION} Link</h1>
 <form method="post" id="urlForm" class="standardForm" onSubmit="return(verify());" action="/cms/linkForm.php">
   <table>
     <tr>
-      <td class="formLabelWidth"><h3>URL</h3></td>
+      <td class="formLabelWidth"><h3>URL</h3>
+     <em>The internet address for the website, eg. http://www.google.com</em></td>
       <td><input type="text" name="url" size="40" maxlength="250" value="{URL}" />
       </td>
     </tr>
@@ -43,7 +44,7 @@ function verify()
     </tr>
     <tr>
       <td><h3>Location</h3>
-        <em>The link will be located in this folder</em></td>
+        <em>The link will be located in this folder. You can <a href="/cms/link/multicat/">upload a link to multiple locations</a> here.</em></td>
       <td>{CATEGORY_NAME}
       <input name="category" value="{CATEGORY_ID}" type="hidden" /></td>
     </tr>
@@ -55,7 +56,7 @@ function verify()
     <tr>
       <td >&nbsp;</td>
       <td><input type='hidden' name='linkID' value='{LINK_ID}'  />
-        <input type="submit" name="Submit" value="{ACTION} URL" class="btn" />
+        <input type="submit" name="Submit" value="{ACTION} Link" class="btn" />
       </td>
     </tr>
   </table>
