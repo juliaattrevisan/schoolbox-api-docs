@@ -23,7 +23,7 @@ if(is_array($headlineList['items']) ) {
 		$this->setVar("RSS_BRIEF", scrubTEXT($headlineList['items'][$i]['description']));
 		
 		if($headlineList['items'][$i]['pubDate']) {
-			$this->setVar('RSS_POSTED_DATE', date(DATE_short_format, strtotime($headlineList['items'][$i]['pubDate'])));
+			$this->setVar('RSS_POSTED_DATE', getRelativeTime($headlineList['items'][$i]['pubDate']));
 			$this->parse('rss_date_block', 'rss_date');
 		}
 		else

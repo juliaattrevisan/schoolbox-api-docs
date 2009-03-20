@@ -227,6 +227,38 @@ function cutString($content, $chars) {
 	
 }
 
+function cutSentence($content, $chars) {
+	/* Cut off a summary at the fullstop within the character limit, alternatively just at the word */
+	if(strlen($content) < $chars)
+		return $content;
+		
+	$summary=substr($content, 0, $chars);
+	$position=strrpos($summary, ".")+1;
+	$positionQ = strrpos($summary, "?")+1;
+	$positionB = strrpos($summary, "!")+1;
+	if($position > 1 && $position > $positionQ && $position > $positionB) {
+		$output=substr($summary, 0, $position);
+		return $output;
+	}
+	else if($positionQ > 1 && $positionQ > $positionB) {
+		$output=substr($summary, 0, $positionQ);
+		return $output;
+	}
+	else if($positionB > 1) {
+		$output=substr($summary, 0, $positionB);
+		return $output;
+	}
+	else {
+		$position = strrpos($summary, " ");
+		$output=substr($summary, 0, $position);
+		if($output)
+			return $output."...";
+		else
+			return "";
+	}
+}
+
+
 function delfile($str)
 {
     foreach(glob($str) as $fn) {
@@ -327,8 +359,16 @@ function plural($num) {
 		return "s";
 }
 
-function getRelativeTime($date) {
-	$diff = time() - strtotime($date);
+function getRelativeTime($date, $now = 0, $prefix = 'on') {
+	
+	if(!$now) 
+		$now = time();
+	
+	if(!is_numeric($date))
+		$date = strtotime($date);		
+		
+	$diff = $now - $date;
+	
 	if ($diff<60)
 		return $diff . " second" . plural($diff) . " ago";
 	$diff = round($diff/60);
@@ -338,12 +378,16 @@ function getRelativeTime($date) {
 	if ($diff<24)
 		return $diff . " hour" . plural($diff) . " ago";
 	$diff = round($diff/24);
+	if ($diff<2)
+		return ' yesterday';
 	if ($diff<7)
 		return $diff . " day" . plural($diff) . " ago";
 	$diff = round($diff/7);
+	if ($diff<2)
+		return ' last week';
 	if ($diff<4)
 		return $diff . " week" . plural($diff) . " ago";
-	return date("F j, Y", strtotime($date));
+	return $prefix.' '.date(DATE_short_no_time, $date);
 }
 
 ?>

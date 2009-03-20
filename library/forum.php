@@ -13,7 +13,10 @@ class Forum extends Model {
 	}
 	
 	function getThreads($categoryID, $config) {
-		$query = "SELECT thread, id, heading FROM forum WHERE cid='".$categoryID."' AND deleted = '0' GROUP BY thread ORDER BY date DESC";
+		$query = "SELECT thread, forum.id, heading, date, message,
+		user.id as uid, user.title, user.firstname, user.lastname 
+		FROM forum LEFT JOIN user ON user.id = owner
+		WHERE cid='".$categoryID."' AND deleted = '0' GROUP BY thread ORDER BY date DESC";
 		if($config['size'] != 0 && $config['size'] != '') 
 			$query .= " LIMIT 0, {$config['size']}";  
 		

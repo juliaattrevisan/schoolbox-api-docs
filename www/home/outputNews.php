@@ -14,7 +14,7 @@ if(is_array($headlineList) )
 	{
 		$this->setVar("NEWS_TITLE", $item['item_heading']);
 		$this->setVar("NEWS_URL", "/news/#".$item['item_id']);
-		$this->setVar('NEWS_TIME', getRelativeTime($item['item_datetime_posted']));
+		$this->setVar('NEWS_TIME', getRelativeTime($item['item_datetime_posted'], 0 , ''));
 		$this->setVar('ON_OFF', ++$j%2? '' : 'dark'); 
 		$this->parse("stories_block", "main_stories", true);
 	}
