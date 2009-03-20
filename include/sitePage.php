@@ -56,7 +56,13 @@ class SitePage extends Page {
 			$this->buildPage();
 			$this->saveHistory();
 		}
-		$this->setVar('SITE_LOCATION', $this->site);
+		
+		$templateVar = array(	'TEMPLATE_YEAR' => date('Y'),
+								'SITE_NAME'		=> SITE_name,
+								'SITE_ADDRESS'	=> SITE_address,
+								'SITE_LOCATION'	=> $this->site,
+							);
+		$this->setVar($templateVar);
 		$this->template->pparse('finaloutput', TEMPLATE_body);
 	}
 	
@@ -95,9 +101,6 @@ class SitePage extends Page {
 			$this->parse('CUSTOM_HEADER_REGION', 'custom_head');
 		else
 			$this->setVar('CUSTOM_HEADER_REGION', '');	
-			
-		$this->setVar('TEMPLATE_FILE', $this->templateFile);
-		$this->setVar('YEAR', date('Y')); 
 	}
 	
 	function setTab($tab) {

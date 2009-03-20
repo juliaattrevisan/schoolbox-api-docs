@@ -5,7 +5,7 @@ $this->setBlock($componentHandle, 'feed', 'feed_block');
 require_once '../library/feed.php';
 $feedHandler = new Feed;
 
-$feedList = $feedHandler->getFeed($categoryID, 10);
+$feedList = $feedHandler->getFeed($categoryID, $config['size']);
 
 if (is_array($feedList)) {
 	foreach ($feedList as $feed) {

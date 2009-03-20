@@ -8,11 +8,12 @@
 
 
 //Site Directives
-define("HEADING", "MGS Portal");			//This will appear on the window title of each page
-define("SITE_name", "portal");
+define("HEADING", 'OurSchool');			//This will appear on the window title of each page
+define("SITE_name", "Alaress Pty Ltd");
 define("MAX_FILE_SIZE", 10485760); 			//Maximum filesize in bytes allowed to be uploaded (default 10MB) (also set in php.ini)
 define("SITE_location", "shore");				//This defines the location, allows specific code for each location
 define("SITE_root", dirname(__FILE__)."/../../");
+define('SITE_address', 'http://www.alaress.com.au');
 
 //Security options
 define("LOGINGRACE", "60");				//Time measured between logins (secs)

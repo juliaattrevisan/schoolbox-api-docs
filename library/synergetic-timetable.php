@@ -167,7 +167,6 @@ class SynergeticTimetable extends MSSQL{
 		}
 		else
 		{
-		//	if(SITE_location == 'mgs') {
 			$query = "SELECT Timetable.Room, SubjectClasses.Description,
 				Timetable.PeriodNumber, Timetable.ClassCode
 				FROM SynergyOne.dbo.SubjectClasses SubjectClasses, 
@@ -182,29 +181,6 @@ class SynergeticTimetable extends MSSQL{
 				Timetable.StaffID='$synergy_id' AND 
 				Timetable.DayNumber = '$daynumber'
 				ORDER BY Timetable.PeriodNumber";
-			/*
-			
-			} else {
-			$query = "SELECT Timetable.Room, SubjectClasses.Description,
-				Timetable.PeriodNumber, Timetable.ClassCode
-				FROM SynergyOne.dbo.SubjectClasses SubjectClasses, 
-				SynergyOne.dbo.Timetable Timetable,
-				SynergyOne.dbo.SubjectClassStaff SubjectClassStaff
-				WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
-				Timetable.ClassCode = SubjectClasses.ClassCode AND 
-				Timetable.FileSemester = SubjectClasses.FileSemester AND 
-				Timetable.FileType = SubjectClasses.FileType AND 
-				Timetable.FileYear = SubjectClasses.FileYear AND
-				Timetable.ClassCode = SubjectClassStaff.ClassCode AND 
-				Timetable.FileSemester = SubjectClassStaff.FileSemester AND 
-				Timetable.FileType = SubjectClassStaff.FileType AND 
-				Timetable.FileYear = SubjectClassStaff.FileYear AND
-				SubjectClasses.FileSemester='".$_SESSION['FileSemester']."' AND 
-				SubjectClasses.FileYear='".$_SESSION['FileYear']."' AND
-				SubjectClassStaff.StaffID='$synergy_id' AND 
-				Timetable.DayNumber = '$daynumber'
-				ORDER BY Timetable.PeriodNumber";
-			}*/
 		}
 		
 		$periodCount = $timetabledef['periodCount'];

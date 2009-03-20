@@ -360,6 +360,7 @@ class modUser
 			$this->t_body->set_var("GROUP", $userdetails['group']);
 			$this->t_body->set_var("SYNERGYID", $userdetails['synergy_id']);
 			$this->t_body->set_var("ID", $userdetails['id']);
+			$this->t_body->set_var('ON_OFF', ++$j%2?'dark':'');
 			$this->t_body->parse("user_block", "userlist", true);
 		}
 

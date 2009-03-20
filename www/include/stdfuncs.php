@@ -237,8 +237,8 @@ function delfile($str)
 function isLocalURL($url)
 {	
 	//returns true if the url is for a local page
-	if( strncasecmp($url, "http://".SITE_name, 7+strlen(SITE_name)) && 
-	strncasecmp($url, "https://".SITE_name, 8+strlen(SITE_name)) )
+	if( strncasecmp($url, "http://".$_SERVER['HTTP_HOST'], 7+strlen($_SERVER['HTTP_HOST'])) && 
+	strncasecmp($url, "https://".$_SERVER['HTTP_HOST'], 8+strlen($_SERVER['HTTP_HOST'])) )
 		return false;
 	else
 		return true;

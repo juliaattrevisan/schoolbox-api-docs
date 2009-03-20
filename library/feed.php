@@ -15,6 +15,10 @@ class Feed {
 	}
 
 	function getFeed($cid, $limit) {
+		
+		if($limit == 0 || $limit > 50)
+			$limit = 50; 
+			
 	
 		$files = $this->getFiles($cid, $limit);
 		$links = $this->getLinks($cid, $limit);
