@@ -1,7 +1,7 @@
 <?php 
-	include_once("include/include.php");
-	require_once("include/session.php");
-
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+	$page = new SitePage;
+	
 	$url = '';
 	
 	if($_GET['url'])

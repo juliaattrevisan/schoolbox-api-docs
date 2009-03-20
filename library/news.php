@@ -1,7 +1,7 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/include/permission.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 class News extends Model {
 
@@ -65,7 +65,9 @@ class News extends Model {
 	}
 	
 	function hasWrite($newsID) {
-		$permLevel = perm(0,3);
+		$groupHandler = new Group(NEWS_SERVICE);
+		
+		$permLevel = $groupHandler->getPermission(0);
 		$news = $this->getById($newsID);
 		if (($permLevel >= 2 && $news['item_owner'] == $_SESSION['id']) || $permLevel >= 3)
 			return true;

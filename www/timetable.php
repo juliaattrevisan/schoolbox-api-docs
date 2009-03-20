@@ -5,14 +5,15 @@
 *                                                           *
 ************************************************************/
 //timetable object that displays the users timetable
-
-require_once 'include/permission.php';
 require_once '../library/synergetic-timetable.php';
 require_once '../library/user.php';
+require_once '../library/group.php';
 
 //synergy not enabled do not display page
 if(!SYNERGY_enable)
 	error(19);
+
+$groupHandler = new Group;
 
 $this->setFile(TEMPLATE_content, 'class/timetable.html');
 $this->setTitle('Timetable');
@@ -23,7 +24,7 @@ $this->setBlock("timetable", "period", "period_listing");
 $this->setBlock("period", "day", "day_listing");
 $this->setBlock("timetable", "day_header", "day_header_listing");
 
-if(isParent($_SESSION['gid']))
+if($groupHandler->isParent())
 {
 	foreach($_SESSION['children'] as $child)
 	{
@@ -34,7 +35,7 @@ else
 {
 	if($this->arg[0])
 	{
-		if(isStaff($_SESSION['gid']))
+		if($groupHandler->isStaff())
 			displayWeek(&$this, $this->arg[0]);
 		else
 			error(19);

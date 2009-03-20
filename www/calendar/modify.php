@@ -49,7 +49,7 @@ if (isset($_POST['date'])) {
 		}
 	}
 
-	localRedir('/calendar/' . ($_POST['return'] == 'month' ? 'month' : 'week') . '/' . str_replace("/", "-", $_POST['date']));
+	$page->backToTheFuture(2);
 
 
 } else if(isset($_GET['delete'])) {
@@ -57,7 +57,7 @@ if (isset($_POST['date'])) {
 	$calendarHandler->delete($_GET['delete']);
 	$date = explode("-", $calendar['date']);
 	$date = array_reverse($date);
-	localRedir("/calendar/" . ($_GET['return'] == 'month' ? 'month' : 'week') . "/" . implode("-", $date));
+	$page->backToTheFuture(2);
 	
 } elseif (is_numeric($_GET['eventID'])) {
 

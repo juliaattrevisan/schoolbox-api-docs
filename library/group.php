@@ -152,6 +152,11 @@ class Group extends Model {
 		if ($userID == 0)
 			$userID = $_SESSION['id'];
 		
+		/* Cached results */
+		if(isset($this->cache[$this->_service][$relationID][$userID])) {
+			return $this->cache[$this->_service][$relationID][$userID];
+		}
+		
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 		$userHandler = new User;
 		$user = $userHandler->getByID($userID);
@@ -187,6 +192,9 @@ class Group extends Model {
 				$permission = $tutorialPermission;
 		}
 		
+		/* Set cache */
+		$this->cache[$this->_service][$relationID][$userID] = $permission;
+		
 		return $permission;
 	}
 	
@@ -216,14 +224,17 @@ class Group extends Model {
 		// checks if user is a student
 		
 		// default to current user
-		if ($userID == 0)
-			$userID = $_SESSION['id'];
-		 
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
-		$userHandler = new User;
-		$user = $userHandler->getByID($userID);
+		if (is_numeric($_SESSION['gid']) ) { 
+			$groupID = $_SESSION['gid'];
+		}
+		else if(is_numeric($userID) ) {
+			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+			$userHandler = new User;
+			$user = $userHandler->getByID($userID);
+			$groupID = $user['group_id'];
+		}
 		
-		if(in_array($user['group_id'], unserialize(STUDENTGROUPIDS)))
+		if(in_array($groupID, unserialize(STUDENTGROUPIDS)))
 			return true;
 		else
 			return false;
@@ -233,14 +244,17 @@ class Group extends Model {
 		// checks if user is staff
 		
 		// default to current user
-		if ($userID == 0)
-			$userID = $_SESSION['id'];
-		 
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
-		$userHandler = new User;
-		$user = $userHandler->getByID($userID);
+		if (is_numeric($_SESSION['gid']) ) { 
+			$groupID = $_SESSION['gid'];
+		}
+		else {
+			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+			$userHandler = new User;
+			$user = $userHandler->getByID($userID);
+			$groupID = $user['group_id'];
+		}
 		
-		if(in_array($user['group_id'], unserialize(STAFFGROUPIDS)))
+		if(in_array($groupID, unserialize(STAFFGROUPIDS)))
 			return true;
 		else
 			return false;
@@ -250,14 +264,17 @@ class Group extends Model {
 		// checks if user is a parent
 		
 		// default to current user
-		if ($userID == 0)
-			$userID = $_SESSION['id'];
-		 
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
-		$userHandler = new User;
-		$user = $userHandler->getByID($userID);
+		if (is_numeric($_SESSION['gid']) ) { 
+			$groupID = $_SESSION['gid'];
+		}
+		else {
+			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+			$userHandler = new User;
+			$user = $userHandler->getByID($userID);
+			$groupID = $user['group_id'];
+		}
 
-		if(in_array($user['group_id'], unserialize(PARENTGROUPIDS)))
+		if(in_array($groupID, unserialize(PARENTGROUPIDS)))
 			return true;
 		else
 			return false;

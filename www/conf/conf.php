@@ -50,6 +50,7 @@ define("RETURNS_directory", "/usr/local/www/portal/returns");		//Returned work w
 define("THUMBNAIL_IMAGE_CACHE", "/usr/local/www/portal/files/thumbnails");		//Thumbnail cache for 
 define("THUMBNAIL_size", 100); 
 define("URLS_use_frame", false);						//Open links in frame
+define('FILE_use_frame', false);
 define('ZIP_directory', '/usr/local/www/portal/zip');
 define('MIME_magic', '/usr/share/file/magic');
 define('DROPBOX_directory', '/usr/local/www/portal/drop');

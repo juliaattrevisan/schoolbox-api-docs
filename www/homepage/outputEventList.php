@@ -16,18 +16,15 @@ if (is_array($eventList)) {
 		$event['colour'] = $calendarHandler->displayColour($event['priority']);
 
 		$this->setVar("CAL_DATE", $event['outputDate']);
-		$this->setVar("CAL_YEAR", $event['year']);
-		$this->setVar("CAL_MONTH", $event['month']);
-		$this->setVar("CAL_DAY", $event['day']);
 		$this->setVar("CAL_ID", $event['id']);
-		
 		$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
+		
 		if($event['startTimeString'] == "12:00AM" || $event['startTimeString'] == "")
 				$this->setVar("CAL_TIME", "");
 		else if($event['endTimeString'] == "12:00AM")
 				$this->setVar("CAL_TIME", $event['startTimeString']);
 		else
-				$this->setVar("CAL_TIME", $event['startTimeString']." - ".$event['endTimeString']);
+				$this->setVar("CAL_TIME", $event['startTimeString']." till ".$event['endTimeString']);
 
 		$this->setVar("CAL_COLOUR",$event['colour']);
 		

@@ -15,12 +15,7 @@ $this->setVar('RSS_LINK', $headlineList['link']);
 
 //output headlines
 if(is_array($headlineList['items']) ) {
-	foreach($headlineList['items'] as $item) {
-		$this->setVar("RSS_TITLE", scrubTEXT($item['title']));
-		$this->setVar("RSS_URL", scrubHTML($item['link'])); 
-		$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
-		//$this->setVar("RSS_BRIEF", scrubTEXT($item['description']));
-		$this->parse("rss_block", "rss_stories", true);
+	for($i = 0; $headlineList['items'][$i]['title'] && $i < RSS_limit; $i++ ) {			$this->setVar('ON_OFF', ++$j%2? '' : 'dark');		$this->setVar("RSS_TITLE", scrubTEXT($headlineList['items'][$i]['title']));		$this->setVar("RSS_URL", scrubHTML($headlineList['items'][$i]['link'])); 		$this->parse("rss_block", "rss_stories", true);
 	}
 	
 	$this->parse('POS'.$component['position'], $component['name']);

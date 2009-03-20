@@ -14,8 +14,7 @@ else
 
 $this->setVar('CALENDAR_TITLE', 'Campus Calendar');
 
-$query = "SELECT id, DATE_FORMAT(date, '%a %D %b') as outputDate,
-			DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
+$query = "SELECT id, UNIX_TIMESTAMP(date) as outputDate,
 			TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTimeString, TIME_FORMAT(endTime, 
 			'".CALENDAR_time_format."') as endTimeString,priority, note
 		FROM event
@@ -37,11 +36,10 @@ if (is_array($eventList)) {
 
 		$event['colour'] = $calendarHandler->displayColour($event['priority']);
 
-		$output = array('CAL_DATE'	=> $event['outputDate'],
-						'CAL_YEAR'	=> $event['year'],
-						'CAL_MONTH'	=> $event['month'],
-						'CAL_DAY'	=> $event['day'],
+		$output = array('CAL_DATE'	=> date(DATE_short_no_time, $event['outputDate']),
 						'CAL_ID'	=> $event['id'],
+						'CAL_COLOUR'=> $event['colour'],
+						'CAL_NOTE'	=> nl2br(scrubTEXT($event['note'])),
 						'ON_OFF'	=> ++$j%2? '' : 'dark',
 						);
 		
@@ -52,11 +50,7 @@ if (is_array($eventList)) {
 		else if($event['endTimeString'] == "12:00AM")
 				$this->setVar("CAL_TIME", $event['startTimeString']);
 		else
-				$this->setVar("CAL_TIME", $event['startTimeString']." - ".$event['endTimeString']);
-
-		$this->setVar("CAL_COLOUR",$event['colour']);
-		
-		$this->setVar("CAL_NOTE", nl2br(scrubTEXT($event['note'])));
+				$this->setVar("CAL_TIME", $event['startTimeString']." till ".$event['endTimeString']);
 
 		$this->setVar('modify_block', '');
 		if ($calendarHandler->getPerm($event['id']) >= WRITE_ACCESS)
