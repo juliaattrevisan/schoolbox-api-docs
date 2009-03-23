@@ -280,6 +280,7 @@ table td { vertical-align: middle; }
 }
 .standardForm table table td {
 	padding: 0.3em 0;
+	vertical-align: middle;
 	}
 /*--------------------------------------------------------------
 Side Nav styles 

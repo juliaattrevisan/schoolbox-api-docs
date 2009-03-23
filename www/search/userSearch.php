@@ -25,6 +25,7 @@ else if($userCount > 1) {
 							'YEAR' 		=> $user['year'],
 							'GROUP'		=> $user['gname'],
 							'EMAIL'		=> formatEmail($user),
+							'ON_OFF'  => ++$j%2? '' : 'dark',
 							);
 		$page->setVar($outputUser);
 		$page->parse('userlist_block', 'userlist', true);
