@@ -122,8 +122,11 @@ function template(el) {
 </style>
 <!-- END custom_head -->
 <div class="template3">
-			<h1>Homepage Customisation</h1>
-            <span class="header_option"><a href="/homepage/{CID}">Return to Homepage</a></span>
+			<h1>
+      Homepage Customisation
+      <a class="customise" href="/homepage/{CID}">Return to Homepage</a>
+      </h1>
+            
       <div class="left">
 			<form method="post" name="customiseForm" id="customiseForm" class="indent" action="/homepage/configForm.php">
 			

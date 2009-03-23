@@ -91,7 +91,7 @@ hr { background-color: #d2d2d2; border: 0; height: 1px; }
  Heading Styles 
 --------------------------------------------------------------*/
 h1 { font-size: 1.33em; font-weight: bold; border-bottom: 1px dashed #7f7f7f; line-height: 2; margin-bottom: 1em; position: relative; text-transform: capitalize; }
-h1 a.customise { position: absolute; top: 0; right: 0; font-size: 80%; font-weight: normal; }
+h1 a.customise { font-size: 80%; font-weight: normal; float: right; margin-top: -27px; }
 h3 { font-size: 1em; }
 #news-header { margin-bottom: 1em; }
 /*--------------------------------------------------------------
@@ -476,7 +476,8 @@ h2 span {
 	width: 50%;
 	}
 .box .listing ul li.dark,
-table tr.dark {
+#content table tr.dark,
+#content table tr.dark td {
 	background: #ececec;
 	}
 .listing h3 { float: left; line-height: 1.6; width: 70%; }

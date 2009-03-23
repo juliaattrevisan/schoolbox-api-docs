@@ -175,6 +175,7 @@ h1 {
 	font-size: 120%;
 	line-height: 1.4;
 	}
+h1 a.customise { position: absolute; margin: 0; top: 2; right: 0; }
 h2, .news-item h3 {
 	border-bottom: 4px solid #0066CC;
 	border-left: 10px solid #0066CC;
