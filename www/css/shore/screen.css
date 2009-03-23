@@ -29,6 +29,9 @@ table h2 {
 #content h2 a {
 	color: #fff;
 	}	
+#content .header_option a {
+	color: #1965B4;
+	}	
 /*---------------------------------------
 	Nav Styles
 ----------------------------------------*/
@@ -61,7 +64,7 @@ table h2 {
 	margin-top: -36px;
 	}
 table .header_option {
-	margin-top: -20px;
+	margin-top: -25px;
 	}
 .news-item .header_option {
 	margin-top: -23px;

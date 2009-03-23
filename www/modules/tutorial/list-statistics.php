@@ -44,7 +44,7 @@ if (is_array($eventList)) {
 							'COUNT'		=> $eventTotal,
 							'STUDENT_COUNT'	=> $eventHandler->getStudentCount($last['code'], $last['eventID']),
 							'ATTENDANCE' 	=> $last['expected'] > 0 ? number_format(($last['present'] / $last['expected'])*100, 2) : 'N/A',
-							
+							'ON_OFF' =>  ++$j%2? 'dark' : '',
 							);
 			$page->setVar($output);
 			$page->parse('event_list_block', 'event_list', true);

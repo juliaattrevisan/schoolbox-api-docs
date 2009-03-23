@@ -278,6 +278,9 @@ table td { vertical-align: middle; }
 .header_option a:hover {
 	text-decoration: underline;
 }
+.standardForm table table td {
+	padding: 0.3em 0;
+	}
 /*--------------------------------------------------------------
 Side Nav styles 
 --------------------------------------------------------------*/
@@ -680,7 +683,7 @@ table.contextMenu {
 	width: auto;
 	}
 table .header_option {
-	margin-top: -23px;
+	margin-top: -25px;
 	}
 .element_footer {
 	color: #000;

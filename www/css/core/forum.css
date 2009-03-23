@@ -1,8 +1,16 @@
 #forumNav ul {
-	margin: 0 0 0 1em;
+	padding: 1em;
+	margin: 10px 0 0 0;
+	border: 1px solid #CCCCCC;
+	background: #eee;
+}
+#forumNav ul ul {
+	border: 0;
+	background: 0;
+	padding: 0;
+	margin: 0;
 }
 #forumNav ul li{
-	background: url(/images/mgs/bullet.gif) no-repeat 0 4px;
 	padding-left: 15px;
 }
 #forumNav ul li a{
@@ -10,8 +18,4 @@
 }
 #content #forumNav {
 	margin-left: 0;
-}
-.parentPost h2{
-	margin-top: 0pt;
-	border-color:#FFFFA5;
 }

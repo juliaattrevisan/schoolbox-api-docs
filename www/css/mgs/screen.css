@@ -215,6 +215,12 @@ h2, .news-item h3 {
 .header_option {
 	font-size: 100%;
 	}
+#calendar table .header_option {
+	margin-top: 0;
+	}
+table .header_option {
+	margin-top: -17px;
+	}
 .box .edit {
 	height: auto;
 	line-height: 18px;

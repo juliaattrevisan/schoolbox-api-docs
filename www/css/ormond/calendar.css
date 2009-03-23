@@ -11,6 +11,7 @@
 	width: 100%;
 	border-collapse: separate;
 	}
+#calendar .calendarTable { width: auto; }
 #calendar table thead td {
 	border-bottom: 0;
 	}
@@ -20,6 +21,9 @@
 #month-view thead td {
 	background: #fff;
 	color: #000;
+	}
+#calendar table .header_option {
+	margin-top: 7px;
 	}
 #calendar table.calendarTable {
 	width: auto;

@@ -43,6 +43,7 @@ if (is_array($eventList)) {
 						'TUTORS'	=> scrubText($event['tutorName1'] . (!empty($event['tutorName2'])?", ".$event['tutorName2']:"")),
 						'CANCELLED'	=> $event['cancelled'] == 'true' ? 'cancelled' : '',
 						'PASSED'	=> $event['date'] < strtotime("12am") ? 'passed' : '',
+						'ON_OFF' =>  ++$j%2? 'dark' : '',
 						
 						);
 		$page->setVar($output);

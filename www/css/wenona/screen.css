@@ -77,6 +77,9 @@ a:hover { color: #c00; }
 	line-height: 18px;
 	font-size: 110%;
 	}
+#calendar table .header_option {
+	margin-top: 7px;
+	}
 /*---------------------------------------
 	News Styles
 ----------------------------------------*/

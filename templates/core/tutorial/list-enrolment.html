@@ -1,6 +1,5 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
-<script type="text/javascript" src="/javascript/jquery.js"></script>
 <script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript">
 var $j = jQuery.noConflict();
@@ -40,7 +39,7 @@ $j(document).ready(function () {
   </thead>
   <tbody>
     <!-- BEGIN enrolment_list -->
-    <tr>
+    <tr class="{ON_OFF}">
       <td style="text-align: center;"><a href="list-enrolment.php?delete={STUDENT_ID}&code={EVENT_CODE}&eventID={EVENT_ID}" onclick="return confirm('Delete student from classlist?');"><img src="/images/famicons/delete.png" /></a></td>
       <td><a href="/search/userLookup.php?id={STUDENT_ID}">{STUDENT_NAME}</a></td>
       <!-- BEGIN attendance_list -->

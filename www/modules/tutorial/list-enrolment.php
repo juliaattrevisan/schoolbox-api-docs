@@ -72,6 +72,7 @@ elseif (is_numeric($_GET['delete']) && isset($_GET['code']) && is_numeric($_GET[
 					'EVENT_CODE'	=> scrubText($event['code']),
 					'EVENT_ID'		=> $event['eventID'],
 					'WEEK'			=> date("W", $event['date']) - 1,
+					'ON_OFF' =>  ++$j%2? 'dark' : '',
 					);
 	$page->setVar($output);
 	
