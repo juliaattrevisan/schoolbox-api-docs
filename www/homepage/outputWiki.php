@@ -14,7 +14,7 @@ if (is_array($wikiList)) {
 						'WIKI_HEADING'	=> scrubText($wiki['heading']),
 						'WIKI_AUTHOR'	=> formatName($wiki),
 						'WIKI_AUTHOR_ID'	=> $wiki['userID'],
-						'WIKI_MODIFIED'	=> outputDate(DATE_short_format, $wiki['modified']),
+						'WIKI_MODIFIED'	=> getRelativeTime($wiki['modified']),
 						'ON_OFF' => ++$j%2? '' : 'dark',
 						);
 		$this->setVar($output);

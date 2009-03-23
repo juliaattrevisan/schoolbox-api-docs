@@ -23,6 +23,7 @@ if(is_numeric($this->arg[0])) {
 	
 	$this->setFile(TEMPLATE_content, 'homepage/customise.html');
 	$this->setTitle('Homepage Customisation');
+	$this->setTab('resources');
 	
 	//Template control
 	$template = $homepage->getTemplate();

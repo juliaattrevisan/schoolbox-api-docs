@@ -29,7 +29,7 @@
 				$this->setVar('FORUM_POSTER', formatName($thread));
 				$this->setVar('FORUM_POSTER_ID', $thread['uid']);
 				$this->setVar('FORUM_POSTED_DATE', getRelativeTime($thread['date']));
-				$this->setVar('FORUM_BRIEF', cutSentence($thread['message'],300));
+				//$this->setVar('FORUM_BRIEF', cutSentence($thread['message'],300));
 				
 				//set name
 				if($thread['id'] == "")
