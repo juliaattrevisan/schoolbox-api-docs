@@ -75,7 +75,7 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 				error(6);
 			
 			$file['category'] = $_POST['category'];	
-			$fileHandler->create($file, $myFile);
+			$fileID = $fileHandler->create($file, $myFile);
 		
 		}
 		

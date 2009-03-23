@@ -26,7 +26,7 @@ if(is_numeric($_GET['id']))
 		if(!is_array($file))
 			error(41);
 			
-		if($resultArray['owner'] != $_SESSION['id'])
+		if($file['owner'] != $_SESSION['id'])
 			error(5);
 		
 		$filename = MYFILE_directory ."/". $file['id'] . ".dat";

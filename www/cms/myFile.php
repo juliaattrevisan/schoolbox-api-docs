@@ -15,6 +15,7 @@ if(is_numeric($this->arg[0])) {
 
 	$this->setFile(TEMPLATE_content, 'cms/myFile.html');
 	$this->setBlock(TEMPLATE_content, 'browse_row', 'browse_row_block');
+	$this->setBlock(TEMPLATE_content, 'folder_list', 'folder_list_block');
 	$this->setTitle('Modify File');	
 	$this->setTab('myfiles');
 	
@@ -27,7 +28,20 @@ if(is_numeric($this->arg[0])) {
 					);
 	$this->setVar($output);
 	
-	$this->dropDown('folder_list', $folderHandler->getFolderTree(), $file['parent'], TEMPLATE_content, array('id' => 'FOLDER_ID', 'name' => 'FOLDER_NAME'));
+	$folderTree = $folderHandler->getFolderTree();
+	if (is_array($folderTree)) {
+		foreach ($folderTree as $folder) {
+			$output = array('FOLDER_ID'			=> $folder['id'],
+							'FOLDER_NAME'		=> $folder['name'],
+							'FOLDER_LEFT'		=> number_format($folder['depth'] * 14, 0),
+							'FOLDER_SELECTED'	=> '',
+							);
+			$this->setVar($output);
+			$this->parse('folder_list_block', 'folder_list', true);
+		}
+	}
+
+
 	
 } 
 elseif($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
@@ -35,6 +49,7 @@ elseif($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	/* Add new file to system */
 	
 	$this->setFile(TEMPLATE_content, 'cms/myFile.html');
+	$this->setBlock(TEMPLATE_content, 'folder_list', 'folder_list_block');
 	$this->setTitle('Add File');	
 	$this->setTab('resources');
 	
@@ -45,8 +60,20 @@ elseif($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 				);
 
 	$this->setVar($output);
+	
+	$folderTree = $folderHandler->getFolderTree();
+	if (is_array($folderTree)) {
+		foreach ($folderTree as $folder) {
+			$output = array('FOLDER_ID'			=> $folder['id'],
+							'FOLDER_NAME'		=> $folder['name'],
+							'FOLDER_LEFT'		=> number_format($folder['depth'] * 14, 0),
+							'FOLDER_SELECTED'	=> '',
+							);
+			$this->setVar($output);
+			$this->parse('folder_list_block', 'folder_list', true);
+		}
+	}
 
-	$this->dropDown('folder_list', $folderHandler->getFolderTree(), $this->arg[1], TEMPLATE_content, array('id' => 'FOLDER_ID', 'name' => 'FOLDER_NAME'));
 
 }
 else

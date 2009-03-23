@@ -54,7 +54,7 @@ class MyFolder extends Model {
 		}
 	}
 	
-	function getFolderTree($folderID = 0, $indent = '', $ignore = false) {
+	function getFolderTree($folderID = 0, $depth = 0, $ignore = false) {
 	
 		$folderList = $this->getFolderList($folderID);
 		$output = array();
@@ -64,10 +64,11 @@ class MyFolder extends Model {
 			for ($i = 0; $i < $total; $i++) {
 				if ($folderList[$i]['id'] != $ignore) {
 					$output[] = array('id'	=> $folderList[$i]['id'],
-									  'name'	=> $indent . '&gt;&nbsp;'. $folderList[$i]['name'],
+									  'name'	=> $folderList[$i]['name'],
+									  'depth'	=> $depth,
 									 );
 					
-					$childrenList = $this->getFolderTree($folderList[$i]['id'], $indent . '&nbsp;&nbsp;&nbsp;', $ignore);
+					$childrenList = $this->getFolderTree($folderList[$i]['id'], $depth + 1, $ignore);
 					if (is_array($childrenList))
 						$output = array_merge($output, $childrenList); //array_splice($folderList, $i+1, 0, $childrenList);
 				}

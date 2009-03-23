@@ -1,6 +1,7 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" type="text/css" href="/css/jquery.farbtastic.css" />
-<script type="text/javascript" src="/javascript/jquery.farbtastic.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/mooRainbow.css" />
+<script type="text/javascript" src="/javascript/mootools.js"></script>
+<script type="text/javascript" src="/javascript/mooRainbow.js"></script>
 <script type="text/javascript">
 <!-- BEGIN colour_list -->
 var {COLOUR_ARRAY} = [
@@ -22,7 +23,7 @@ var {COLOUR_ARRAY} = [
 ];
 <!-- END colour_list -->
 
-
+/*
 $j(document).ready(function () {
 	
 	$j('body').click(function () {
@@ -45,10 +46,9 @@ $j(document).ready(function () {
 			p.setColor($j('#left_bg_primary_input').val());	
 		});	
 	});
-	
+	*/
 
-
-	/*
+window.addEvent('domready', function () {
 	for(i = 0; i < pickers.length; i++){
 	
 		
@@ -85,7 +85,7 @@ $j(document).ready(function () {
 			$(pickers[(i+half)][0] + '_input').value = pickers[i][2].sets.hex;		
 		}
 	});
-	*/
+	
 });
 	
 

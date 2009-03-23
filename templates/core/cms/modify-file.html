@@ -43,9 +43,9 @@ function clearBrowse(obj, id) {
       <td><select name='myfile' id="myfile" onchange="clearBrowse(this, 'browse');">
           <option value=''></option>
           <!-- BEGIN optgroup -->
-          <optgroup label="{MYFOLDER_NAME}"  style="margin-left: {MARGIN_LEFT}px;">
+          <optgroup label="&gt; {MYFOLDER_NAME}"  style="padding-left: {MYFOLDER_LEFT}px;">
           <!-- BEGIN my_files -->
-          <option value="{MYFILE_ID}" style="margin-left: {MARGIN_LEFT}px;">{MYFILE_NAME}</option>
+          <option value="{MYFILE_ID}" style="padding-left: 14px;">{MYFILE_NAME}</option>
           <!-- END my_files -->
           </optgroup>
           <!-- END optgroup -->

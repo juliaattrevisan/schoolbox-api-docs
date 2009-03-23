@@ -41,10 +41,10 @@ class MyFile extends Model {
 	
 		$folderList = $this->myFolderHandler->getFolderList($parent);
 		
-		for($x=0; count($folderList) > $x; $x++) {
-			$tree[$x] = $folderList;
-			$tree[$x]['files'] = $this->getFolderFileList($folderList[$x]['id']);
-			$tree[$x]['folders'] = $this->getTreeNode($folderList[$x]['id']);
+		$total = count($folderList);
+		for($i=0; $i < $total; $i++) {
+			$tree[$i]['files'] = $this->getFolderFileList($folderList[$x]['id']);
+			$tree[$i]['folders'] = $this->getTreeNode($folderList[$x]['id']);
 		}
 		
 	

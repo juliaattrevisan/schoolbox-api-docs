@@ -30,7 +30,30 @@
 
 </head>
 <body>
-<!-- #BeginEditable "head" --><!-- #EndEditable -->
+<!-- #BeginEditable "head" -->
+<script language="JavaScript" type="text/javascript">
+
+function verify()
+{
+	var msg = ""
+	//check that description, url, location have been entered
+	if(document.form.text.value == ""){
+		msg += "You need to enter some text\n";
+	}
+	if(document.form.url.value == ""){
+		msg += "You need to enter a URL\n";
+	}
+	
+	if(msg != ""){
+		alert(msg);
+		return false;
+	}
+	else
+		return true;
+}
+	
+</script>
+<!-- #EndEditable -->
 
 <div id="nav">
 	<h3>&raquo; Go To</h3>
