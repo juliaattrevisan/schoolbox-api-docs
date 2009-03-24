@@ -1,9 +1,14 @@
 <?php
 
 require_once("news/whatsnew.php");
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+
+
 $whatnew = new WhatsNew();
 
-$catList = involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
+$groupHandler = new Group;
+
+$catList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
 
 $this->setBlock($component['name'], 'category_block', 'new_category');
 $this->setBlock($component['name'], 'mail_block', 'new_mail_block');

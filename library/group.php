@@ -74,10 +74,7 @@ class Group extends Model {
 	function allowOwner($userID) {
 		//checks if the user can become the owner of group
 		if(GROUP_staff_only_owner) {
-			//only staff may be owners
-			$query = "SELECT group_id FROM user WHERE id = '$userID'";
-			$group = $this->db->getRow($query);
-			return isStaff($group['group_id']);
+			return $this->isStaff($userID);
 		} else
 			return true;
 	}

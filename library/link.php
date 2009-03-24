@@ -24,12 +24,16 @@ class Link extends Model {
 
 	
 	function getAllInCategory($categoryID, $config = false) {
+		
+		require_once dirname(__FILE__) . '/group.php';
+		$groupHandler = new Group;
+		
 		$query = "SELECT l.*, u.firstname, u.lastname, u.title, UNIX_TIMESTAMP(submitted) submitted, 'http-url.png' iconFile 
 				  FROM link l
 				  LEFT JOIN user u ON u.id = l.owner
 				  WHERE category = '".$categoryID."'";
 
-		if (perm($categoryID, HOMEPAGESERVICE) < 2)
+		if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS)
 			$query .= " AND l.hidden = 0";	
 
 		$sortFields = array('Name' => 'l.description', 'Date' => 'l.submitted');

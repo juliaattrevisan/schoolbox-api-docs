@@ -161,7 +161,7 @@ class Calendar extends Model {
 	function getSubmissionEvents($currentDay) {
 	
 		//get a list of all the possible submission box categories		
-		$catList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
+		$catList = $this->groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
 		
 		if(is_array($catList)) {
 			foreach($catList as $cat)

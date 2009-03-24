@@ -2,9 +2,9 @@
 
 		$continue = true;
 		//dont show forums to parents if they not a direct member of group
-		if(isParent($_SESSION['gid']))
+		if($groupHandler->isParent())
 		{
-			if(!isMember($categoryID, $_SESSION['id']))
+			if(!$groupHandler->involvedInGroup($_SESSION['id'], $categoryID))
 			{
 				$this->setVar($name, "");
 				$continue = false;
