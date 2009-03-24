@@ -48,6 +48,11 @@ while ($parentID > 0) {
 	$parentList[] = $parentID = (int)$categoryHandler->getParent($parentID);
 }
 
+$output = array('WRITE'	=> $groupHandler->getPermission(0) >= WRITE_ACCESS ? 'write' : '',
+				'FULL'	=> $groupHandler->getPermission(0) >= FULL_ACCESS ? 'full' : '',
+				);
+$this->setVar($output);
+
 // output folders, column 1
 $categoryList = $categoryHandler->getCategoryNode($openCategory);
 if (is_array($categoryList)) {
@@ -59,8 +64,8 @@ if (is_array($categoryList)) {
 			$permission[$category['id']] = $groupHandler->getPermission($category['id']);
 		
 		// limit permission by parent
-		if (isset($permission[$category['parent']]) && $permission[$category['id']] > $permission[$category['parent']])
-			$permission[$category['id']] = $permission[$category['parent']];
+		//if (isset($permission[$category['parent']]) && $permission[$category['id']] > $permission[$category['parent']])
+		//	$permission[$category['id']] = $permission[$category['parent']];
 		
 		// check permission
 		if ($permission[$category['id']] >= READ_ACCESS) {

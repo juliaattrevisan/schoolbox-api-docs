@@ -1,16 +1,23 @@
 <?php
 require_once '../library/category.php';
 require_once '../library/homepage-template.php';
+require_once '../library/group.php';
 $categoryHandler = new Category;
 $homeTemplateHandler = new HomepageTemplate;
+$groupHandler = new Group;
 
 if(is_numeric($this->arg[0])) {
 	
 	if(!($category = $categoryHandler->getByID($this->arg[0])))
 		error(2);
-	
-	if(!($categoryParent = $categoryHandler->getByID($category['parent'])))
+
+	if ($category['parent'] == 0)
+		$categoryParent = array('id' => 0, 'name' => 'Top');	
+	elseif(!($categoryParent = $categoryHandler->getByID($category['parent'])))
 		error(2);
+	
+	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS)
+		error(6);
 	
 	$this->setFile(TEMPLATE_content, "cms/modify-category.html");
 	$this->setBlock(TEMPLATE_content, 'perm_table', 'perm_table_block');
@@ -65,8 +72,13 @@ if(is_numeric($this->arg[0])) {
 	
 } else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
-	if(!($categoryParent = $categoryHandler->getByID($this->arg[1])))
+	if ($this->arg[1] == 0)
+		$categoryParent = array('id' => 0, 'name' => 'Top');
+	elseif(!($categoryParent = $categoryHandler->getByID($this->arg[1])))
 		error(2);
+
+	if ($groupHandler->getPermission($categoryParent['id']) < WRITE_ACCESS)
+		error(6);
 
 	$this->setFile(TEMPLATE_content, 'cms/modify-category.html');
 	$this->setBlock(TEMPLATE_content, 'perm_table', 'perm_table_block');

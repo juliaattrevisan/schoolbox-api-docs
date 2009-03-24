@@ -14,8 +14,8 @@
 require_once("../include/include.php");
 require_once("../include/session.php");
 require_once('../include/pclzip.lib.php');
-require_once('../include/permission.php');
-require_once('folder.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 
 
 class ZipFolder {
@@ -31,12 +31,13 @@ function ZipFolder($folder) {
 	$this->maxDepth = 5;
 	$this->maxSize = 262144000; //250MB
 	
-	
-	$folderHandler = new folder;
-	$this->folderDetails = $folderHandler->getFolder($folder);
+	$this->groupHandler = new Group;
+
+	$categoryHandler = new Category;
+	$this->folderDetails = $categoryHandler->getByID($folder);
 	if(is_numeric($this->folderDetails['id'])){
 	
-		if(perm($this->folderDetails['id'], 1) < 1) {
+		if($this->groupHandler->getPermission($this->folderDetails['id']) < READ_ACCESS) {
 			error(5);
 		}
 	}
@@ -78,6 +79,8 @@ function sendZip() {
 		$filename = $this->cleanName($this->folderDetails['name']);
 		
 		$filesize = filesize($this->tmpZip);
+		header ("Pragma: ");
+		header ("Cache-control: ");			
 		header ("Content-Type: application/x-zip-compressed"); 
 		header ("Content-Disposition: attachment; filename=\"".$filename.".zip\"");
 		header ("Content-Length: $filesize"); 
@@ -104,18 +107,18 @@ function createDirectory($currentDir, $folderID, $depth=0) {
 			}
 		}
 	}
-	
+
 	//dont recurse deeper than max depth or max size	
 	if($this->maxDepth > $depth && $this->maxSize > $this->size) {
-	
+		
 		//get subfolders and recurse through them
 		$folderList = $this->getFolders($folderID);
 		if(is_array($folderList)) {
 			foreach($folderList as $folder) {
-				if(perm($folder['id'], 1) > 0){
+				if($this->groupHandler->getPermission($folder['id']) > DENY_ACCESS){
 					$folderName = $this->cleanName($folder['name']);
 					$folderLocation = $currentDir.'/'.$folderName;
-					mkdir($folderLocation);
+					@mkdir($folderLocation);
 					$this->createDirectory($folderLocation, $folder['id'], ++$depth);
 				}
 			}

@@ -142,7 +142,7 @@ $j(document).ready(function() {
 
 
   function addContext(node) {
-	if ($j(node).hasClass("folder")) {
+	if ($j(node).hasClass("folder") || $j(node).is('#top')) {
 		
 		$j($j(node).parents("tr")[0]).contextMenu(folderMenu, {
 			theme: 'vista',
@@ -153,6 +153,12 @@ $j(document).ready(function() {
 				if ($j(this.target).hasClass("write") == 0 && $j(this.target).hasClass("full") == 0) {
 					// disable from modify onwards
 					for (var i = 2; i <= 9; i++)
+						$j($j(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
+				} 
+				
+				if ($j(node).is('#top')) {
+					// disable from modify / delete
+					for (var i = 0; i <= 7; i++)
 						$j($j(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
 				}
 				
@@ -226,7 +232,7 @@ $j(document).ready(function() {
         <th>Folders</th>
           </thead>
         <tbody>
-          <tr id="node-0" class="expanded populated">
+          <tr id="node-0" class="expanded populated {FULL} {WRITE}">
             <td><span id="top">Top</span></td>
           </tr>
           <!-- BEGIN category_list -->

@@ -8,7 +8,8 @@
 	$.fn.treeTable = function(opts) {
 		options = $.extend({}, $.fn.treeTable.defaults, opts);
 		var topSpan = $("#top"), topRow = topSpan.parents("tr")[0];
-		addDrop(topSpan);
+		if (topSpan.hasClass('write') || topSpan.hasClass('full'))
+			addDrop(topSpan);
 		options.addContext(topSpan);
 		addSelect(topRow);
 		addOpen(topRow);
@@ -361,8 +362,10 @@
 			// add extras
 			if (span.hasClass(".folder")) {
 				options.addContext(span);
-				addDrag(span);
-				addDrop(span);
+				if (node.hasClass('write') || node.hasClass('full')) {
+					addDrag(span);
+					addDrop(span);
+				}
 				addSelect(node);
 				addOpen(node);
 			}
@@ -370,7 +373,8 @@
 				// store category id
 				node.data("category", getCategory(node));
 				options.addContext(span);
-				addDrag(span);
+				if (span.hasClass('write') || span.hasClass('full'))
+					addDrag(span);
 				addSelect(node);
 			}
 			
@@ -433,6 +437,7 @@
 
 	function addDrag (node) {
 		$(node).draggable({
+			cursor: 'move',
 			helper: "clone",
 			opacity: .75,
 			revert: "invalid",
@@ -488,6 +493,7 @@
 						// ajax move request
 						if (node.hasClass("child-of-node-"+targetID) && node.attr("id").substring(5) != targetID)
 							$(ui.draggable).move(targetID);
+						
 						
 					}
 				}

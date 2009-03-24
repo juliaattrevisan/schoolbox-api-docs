@@ -35,10 +35,26 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 		/* Add file */
 		$file['owner'] = $_SESSION['id'];
 		$allowedFileHandler = new AllowedFile;
+
+		if(is_numeric($_POST['myfile'])) {
+			/* Make this appear as a file upload */
+			$myFileHandler = new MyFile;
+			if (!$privFile = $myFileHandler->getByID($_POST['myfile']))
+				error(41);
+			
+			$_FILES['file'] = array('name' 		=> $privFile['realname'],
+									'type' 		=> $privFile['mime_type'],
+									'tmp_name'	=> MYFILE_directory . '/' . $privFile['id'] . '.dat',
+									);
+
+		}
 		
 		if($_FILES['file']['name'])	{
 			/* Submitted file with form, run security checks */	
-			$allowedFileHandler->fileSecurityCheck($_FILES['file']);
+			if (is_numeric($_POST['myfile']))
+				$allowedFileHandler->checkMime($_FILES['file']);
+			else
+				$allowedFileHandler->fileSecurityCheck($_FILES['file']);
 			
 			/* Add to multiple locations */
 			if(is_array($_POST['category']) ){
@@ -49,7 +65,11 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 					
 					$file['category'] = $cat;
 					$fileHandler->create($file, $_FILES['file']);
+					
 				}
+				
+				// page only accessible through the standard file upload
+				$page->backToTheFuture(3);
 			}
 			else { 
 				if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS)
@@ -59,25 +79,8 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 				$fileID = $fileHandler->create($file, $_FILES['file']);
 			}
 				
-		}
-		else if($_POST['myfile']) {
-			$myFileHandler = new MyFile;
-			$privFile = $myFileHandler->getByID($_POST['myfile']);
-		
-			$myFile = array('name' 		=> $privFile['realname'],
-							'type' 		=> $privFile['mime_type'],
-							'tmp_name'	=> MYFILE_directory . '/' . $privFile['id'] . '.dat',
-							);
-			/* Make sure the mime is ok for public */
-			$allowedFileHandler->checkMime($myFile);
-			
-			if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS)
-				error(6);
-			
-			$file['category'] = $_POST['category'];	
-			$fileID = $fileHandler->create($file, $myFile);
-		
-		}
+		} elseif (!isset($_POST['submission']))
+			error(2);
 		
 		/* Redirect to submission page */
 		if($_POST['submission'])
@@ -107,7 +110,8 @@ else if(is_array($_POST['description']) && is_numeric($_POST['category'])) {
 		$fileID = $fileHandler->create($file, $fileData);
 	}
 	
-	$page->backToTheFuture(2);
+	localRedir('/resources/' . $_POST['category']);
+	//$page->backToTheFuture(2);
 	
 }
 else if(is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {

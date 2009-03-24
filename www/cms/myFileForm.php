@@ -2,6 +2,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
 $page = new SitePage;
 $fileHandler = new MyFile;
@@ -20,9 +21,13 @@ if (isset($_POST['description'])) {
 	
 		$file['id'] = $_POST['fileID'];
 		$fileHandler->update($file);
-	} else
-		$fileHandler->create($file, $_FILES['file']);
+	} else {
+		$allowedFileHandler = new AllowedFile;
+		$allowedFileHandler->fileSecurityCheck($_FILES['file']);
 		
+		$fileHandler->create($file, $_FILES['file']);
+	}
+	
 	localRedir('/cms/portfolio/' . $_POST['parent']);
 }
 elseif (is_numeric($_GET['delete'])) {

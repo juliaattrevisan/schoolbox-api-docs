@@ -30,11 +30,12 @@ if(is_numeric($this->arg[0])) {
 	
 	$folderTree = $folderHandler->getFolderTree();
 	if (is_array($folderTree)) {
+		array_unshift($folderTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
 		foreach ($folderTree as $folder) {
 			$output = array('FOLDER_ID'			=> $folder['id'],
 							'FOLDER_NAME'		=> $folder['name'],
-							'FOLDER_LEFT'		=> number_format($folder['depth'] * 14, 0),
-							'FOLDER_SELECTED'	=> '',
+							'FOLDER_INDENT'		=> str_repeat('&nbsp;', ($folder['depth'] + 1) * 4),
+							'FOLDER_SELECTED'	=> $folder['id'] == $file['parent'] ? 'selected="selected"' : '',
 							);
 			$this->setVar($output);
 			$this->parse('folder_list_block', 'folder_list', true);
@@ -47,6 +48,8 @@ if(is_numeric($this->arg[0])) {
 elseif($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	
 	/* Add new file to system */
+	if (!$parent = $folderHandler->getByID($this->arg[1]))
+		error(13);
 	
 	$this->setFile(TEMPLATE_content, 'cms/myFile.html');
 	$this->setBlock(TEMPLATE_content, 'folder_list', 'folder_list_block');
@@ -63,11 +66,12 @@ elseif($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	
 	$folderTree = $folderHandler->getFolderTree();
 	if (is_array($folderTree)) {
+		array_unshift($folderTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
 		foreach ($folderTree as $folder) {
 			$output = array('FOLDER_ID'			=> $folder['id'],
 							'FOLDER_NAME'		=> $folder['name'],
-							'FOLDER_LEFT'		=> number_format($folder['depth'] * 14, 0),
-							'FOLDER_SELECTED'	=> '',
+							'FOLDER_INDENT'		=> str_repeat('&nbsp;', ($folder['depth'] +1) * 4),
+							'FOLDER_SELECTED'	=> $folder['id'] == $parent['id'] ? 'selected="selected"' : '',
 							);
 			$this->setVar($output);
 			$this->parse('folder_list_block', 'folder_list', true);

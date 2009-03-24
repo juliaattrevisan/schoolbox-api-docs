@@ -72,7 +72,7 @@ class File extends Model {
 	}
 	
 	function sortResult($data1, $data2) {
-		return strcmp($data1['description'], $data2['description']);
+		return strcmp(strtolower($data1['description']), strtolower($data2['description']));
 	}
 	
 	function logAction ($fileID, $action) {

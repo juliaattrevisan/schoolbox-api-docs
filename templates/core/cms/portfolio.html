@@ -64,7 +64,7 @@ $j(document).ready(function() {
 	];
 
   function addContext(node) {
-	if ($j(node).hasClass("folder"))
+	if ($j(node).hasClass("folder") || $j(node).is("#top"))
 		$j($j(node).parents("tr")[0]).contextMenu(folderMenu, {theme: "vista"});
 
 	else if ($j(node).hasClass("file")) {

@@ -5,10 +5,22 @@ function verify(){
 	var msg = ""
 	//check that description, url, location have been entered
 	if($('name').value == "")
-		msg += "You need to enter a name\n";
+		msg += "You need to enter a name.\n";
 
 	if($('parent').value == "" || isNaN($('parent').value))
-		msg += "You need to select a proper location";
+		msg += "You need to select a proper location.\n";
+	
+	if ($('groupcheck') && !$('groupcheck').checked) {
+		
+		var ok = false;
+		$$('.no_permission').each(function (o) {
+		
+			if (!o.checked)
+				ok = true;
+		});
+		if (!ok)
+			msg += "You need to assign permissions.";
+	}
 	
 	if(msg != "") {
 		alert(msg);

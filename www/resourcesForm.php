@@ -15,16 +15,23 @@ if (is_numeric($_POST['folders'])) {
 	$output = array();
 	if (is_array($categoryList)) {
 		foreach ($categoryList as $category) {
-			$permission = $groupHandler->getPermission($category['id']);
-			$children = (int)$categoryHandler->hasChildren($category['id']);
-			$output[] = array('id'			=> $category['id'],
-							  'name'		=> scrubText($category['name']),
-							  'parent'		=> $category['parent'],
-							  'children'	=> $children,
-							  'homepage'	=> $category['template'] > 0 ? 'true' : 'false',
-							  'write'		=> $permission == WRITE_ACCESS ? 'true' : 'false',
-							  'full'		=> $permission == FULL_ACCESS ? 'true' : 'false',
-							  );
+			
+			// get permissions
+			if (!isset($permission[$category['id']]))
+				$permission[$category['id']] = $groupHandler->getPermission($category['id']);
+
+			if ($permission[$category['id']] >= READ_ACCESS) {
+			
+				$children = (int)$categoryHandler->hasChildren($category['id']);
+				$output[] = array('id'			=> $category['id'],
+								  'name'		=> scrubText($category['name']),
+								  'parent'		=> $category['parent'],
+								  'children'	=> $children,
+								  'homepage'	=> $category['template'] > 0 ? 'true' : 'false',
+								  'write'		=> $permission[$category['id']] == WRITE_ACCESS ? 'true' : 'false',
+								  'full'		=> $permission[$category['id']] == FULL_ACCESS ? 'true' : 'false',
+								  );
+			}
 		}
 	}
 	
@@ -47,7 +54,7 @@ elseif (is_numeric($_POST['files'])) {
 	$fileList = $fileHandler->mergeLinks( $fileHandler->getAllInCategory($_POST['files']), $linkHandler->getAllInCategory($_POST['files']));
 	$permission = $groupHandler->getPermission($_POST['files']);
 	$output = array();
-	if (is_array($fileList)) {
+	if (is_array($fileList) && $permission >= READ_ACCESS) {
 		foreach ($fileList as $file) {
 			
 			if (empty($file['modified']))

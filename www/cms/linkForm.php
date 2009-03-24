@@ -44,6 +44,8 @@ if($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) || 
 				$link['category'] = $cat;
 				$linkHandler->create($link);
 			}
+			// multi link only accessible through link
+			$page->backToTheFuture(3);
 		}
 		else { 
 			if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS)

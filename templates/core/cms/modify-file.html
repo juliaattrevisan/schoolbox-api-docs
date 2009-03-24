@@ -3,6 +3,9 @@
 function verify()
 {
 	var msg = ""
+	
+	if ($j('#submission') && !$j('#submission').attr("checked") && $j('#browse').val() == '' && $j('#myfile').val() == '')
+		msg += 'You must select a file to upload.\n';
 	//check that description and category have been entered
 	if(document.getElementById('fileForm').description.value == ""){
 		msg += "You need to enter a description\n";
@@ -34,7 +37,7 @@ function clearBrowse(obj, id) {
     <tr>
       <td class="formLabelWidth"><h3>File</h3>
         <em>Browse your local disk for a file or upload from your 'my files'. You can <a href="/cms/file/multi/{CATEGORY_ID}">upload multiple files</a> here.</em></td>
-      <td><input type="file" name="file"  id="browse" onchange="clearBrowse(this, 'myfile');" />
+      <td><input type="file" name="file" id="browse" onchange="clearBrowse(this, 'myfile');" />
         <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
       </td>
     </tr>
@@ -75,11 +78,13 @@ function clearBrowse(obj, id) {
         <em>Hide this file from students.</em></td>
       <td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
     </tr>
+    <!-- BEGIN submission_box -->
     <tr>
       <td><h3>Submission box</h3>
         <em>Would you like students to submit responses to this file electronically</em></td>
       <td>{SUBBOX}</td>
     </tr>
+    <!-- END submission_box -->
     <tr>
       <td><input type='hidden' name='Day' value='{DUE_DAY}' />
         <input type='hidden' name='Month' value='{DUE_MONTH}' />

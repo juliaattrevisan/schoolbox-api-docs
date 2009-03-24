@@ -19,7 +19,7 @@ var {COLOUR_ARRAY} = [
 	['right_bg_primary', '#{right_bg_primary}'],
 	['right_bg_secondary', '#{right_bg_secondary}'],
 	['right_link', '#{right_link}'],
-	['right_hover', '#{right_hover}'],
+	['right_hover', '#{right_hover}']
 ];
 <!-- END colour_list -->
 
@@ -97,7 +97,7 @@ function removeClasses() {
 	});
 	}
 
-function template(el) {
+function templateX(el) {
 	var temp = $('template-choice');
 	temp.setAttribute('value', el.getAttribute('title'));
 	removeClasses();
@@ -133,10 +133,10 @@ function template(el) {
       <div class="box grey">
         <h2>Layout</h2>
         <div class="text layouts">
-        	<a onclick="template(this);" class="layout {CURRENT_1}" title="1" href="#"><img src="/images/50-50.gif" />50-50</a>
-          <a onclick="template(this);" class="layout {CURRENT_2}" title="2" href="#"><img src="/images/70-30.gif" />70-30</a>         
-          <a onclick="template(this);" class="layout {CURRENT_4}" title="4" href="#"><img src="/images/30-70.gif" />30-70</a>
-          <a onclick="template(this);" class="layout {CURRENT_3}" title="3" href="#"><img src="/images/100-0.gif" />100-0</a>
+        	<a onclick="templateX(this);" class="layout {CURRENT_1}" title="1" href="#"><img src="/images/50-50.gif" />50-50</a>
+          <a onclick="templateX(this);" class="layout {CURRENT_2}" title="2" href="#"><img src="/images/70-30.gif" />70-30</a>         
+          <a onclick="templateX(this);" class="layout {CURRENT_4}" title="4" href="#"><img src="/images/30-70.gif" />30-70</a>
+          <a onclick="templateX(this);" class="layout {CURRENT_3}" title="3" href="#"><img src="/images/100-0.gif" />100-0</a>
           <div class="float-fix"></div>
         </div>
       </div>

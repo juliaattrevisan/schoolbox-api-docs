@@ -21,17 +21,16 @@ if(is_numeric($this->arg[0])) {
 	$this->setVar($output);
 
 	$parentTree = $folderHandler->getFolderTree(0, 0, $folder['id']);
-	if (is_array($parentTree)) {
-		array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
-		foreach ($parentTree as $parent) {
-			$output = array('PARENT_ID'			=> $parent['id'],
-							'PARENT_NAME'		=> $parent['name'],
-							'PARENT_LEFT'		=> number_format(($parent['depth'] + 1) * 14, 0),
-							'PARENT_SELECTED'	=> $parent['id'] == $folder['parent'] ? 'selected="selected"' : '',
-							);
-			$this->setVar($output);
-			$this->parse('parent_list_block', 'parent_list', true);
-		}
+	$parentTree = is_array($parentTree) ? $parentTree : array();
+	array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
+	foreach ($parentTree as $parent) {
+		$output = array('PARENT_ID'			=> $parent['id'],
+						'PARENT_NAME'		=> $parent['name'],
+						'PARENT_INDENT'		=> str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
+						'PARENT_SELECTED'	=> $parent['id'] == $folder['parent'] ? 'selected="selected"' : '',
+						);
+		$this->setVar($output);
+		$this->parse('parent_list_block', 'parent_list', true);
 	}
 
 
@@ -54,18 +53,18 @@ if(is_numeric($this->arg[0])) {
 
 
 	$parentTree = $folderHandler->getFolderTree();
-	if (is_array($parentTree)) {
-		array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
-		foreach ($parentTree as $parent) {
-			$output = array('PARENT_ID'			=> $parent['id'],
-							'PARENT_NAME'		=> $parent['name'],
-							'PARENT_LEFT'		=> number_format(($parent['depth'] + 1) * 14, 0),
-							'PARENT_SELECTED'	=> $parent['id'] == $this->arg[1] ? 'selected="selected"' : '',
-							);
-			$this->setVar($output);
-			$this->parse('parent_list_block', 'parent_list', true);
-		}
+	$parentTree = is_array($parentTree) ? $parentTree : array();
+	array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
+	foreach ($parentTree as $parent) {
+		$output = array('PARENT_ID'			=> $parent['id'],
+						'PARENT_NAME'		=> $parent['name'],
+						'PARENT_INDENT'		=> str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
+						'PARENT_SELECTED'	=> $parent['id'] == $this->arg[1] ? 'selected="selected"' : '',
+						);
+		$this->setVar($output);
+		$this->parse('parent_list_block', 'parent_list', true);
 	}
+	
 
 	
 } else

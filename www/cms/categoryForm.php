@@ -9,9 +9,6 @@ $groupHandler = new Group;
 
 if ($_POST['name']) {
 
-	if ($groupHandler->getPermission($_POST['parent']) < WRITE_ACCESS)
-		error(6);
-
 	$category = array('name'		=> $_POST['name'],
 					  'parent'		=> $_POST['parent'],
 					  'template'	=> $_POST['template'],
@@ -20,20 +17,27 @@ if ($_POST['name']) {
 					  );
 
 	if (is_numeric($_POST['categoryID'])) {
+		if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS)
+			error(6);
+
 		$category['id'] = $_POST['categoryID'];
 		$categoryHandler->update($category);
 	}
 	else {
-		$categoryID = $categoryHandler->create($category);
+		if ($groupHandler->getPermission($_POST['parent']) < WRITE_ACCESS)
+			error(6);
+	
+		$category['id'] = $categoryHandler->create($category);
 		
-		if($_POST['groupcheck']) {
-			/* Setup group and forward to group management page */
-			$groupHandler->createGroup($categoryID);
-			$groupHandler->addUser($categoryID, $_SESSION['id'], 3);
-			localRedir('/group/modify/'.$categoryID);
-		}
 	}
-	$page->backToTheFuture(2);		
+	
+	if($_POST['groupcheck']) {
+		/* Setup group and forward to group management page */
+		$groupHandler->createGroup($category['id']);
+		$groupHandler->addUser($category['id'], $_SESSION['id'], 3);
+		localRedir('/group/modify/'.$category['id']);
+	} else
+		$page->backToTheFuture(2);		
 	
 }
 else if(is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
@@ -57,7 +61,7 @@ elseif (is_numeric($_GET['delete'])) {
 	if(!$category = $categoryHandler->getByID($_GET['delete']))
 		error(2);
 		
-	if ($groupHandler->getPermission($file['cid']) < WRITE_ACCESS)
+	if ($groupHandler->getPermission($category['cid']) < WRITE_ACCESS)
 		error(6);
 	
 	$categoryHandler->delete($_GET['delete']);

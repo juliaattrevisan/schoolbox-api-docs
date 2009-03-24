@@ -39,7 +39,7 @@ if(is_numeric($_GET['id']))
 		if(!is_array($file))
 			error(41);
 			
-		if($groupHandler->getPermission($_GET['id']) < READ_ACCESS) 
+		if($groupHandler->getPermission($file['category']) < READ_ACCESS) 
 			error(5);
 		
 		$filename = FILE_directory ."/". $_GET['id'] . ".dat";

@@ -10,6 +10,14 @@ function verify()
 	if(document.getElementById('urlForm').url.value == ""){
 		msg += "You need to enter a URL\n";
 	}
+	var ok = false;
+	$j('input.category').each(function () {
+		if ($j(this).attr("checked"))
+			ok = true;
+	});
+	if (!ok)
+		msg += "You need to select a location";
+
 	
 	if(msg != ""){
 		alert(msg);
@@ -51,7 +59,7 @@ function verify()
       <td><h3>Location</h3>
         <em>Select the locations where this file should be placed</em></td>
       <td><!-- BEGIN category_list -->
-        <input type="checkbox" name="category[]" value="{CATEGORY_ID}">
+        <input type="checkbox" class="category" name="category[]" value="{CATEGORY_ID}">
         {CATEGORY_NAME}<br />
         <!-- END category_list -->
       </td>
