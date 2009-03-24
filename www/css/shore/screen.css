@@ -37,6 +37,12 @@ table h2 {
 	border-top: 1px solid #003d7b;
 	border-bottom: 1px solid #001c3a;
 	background: #002349 url(/images/shore/nav-title-bg.gif) repeat-x;
+	text-transform: uppercase;
+	}
+#nav h3.pink {
+	border-top: 1px solid #da68b3;
+	border-bottom: 1px solid #a9287e;
+	background: #d4329d url(/images/shore/h3-pink.gif) repeat-x;
 	}
 #nav li {
 	border-top: 1px solid #144d88;
