@@ -68,8 +68,8 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 					
 				}
 				
-				// page only accessible through the standard file upload
-				$page->backToTheFuture(3);
+				// redirect to first category
+				localRedir('/resources/' . $_POST['category'][0]);
 			}
 			else { 
 				if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS)
