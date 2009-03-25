@@ -7,6 +7,7 @@
 *                                                           *
 ************************************************************/
 require_once '../library/mssql.php';
+require_once '../library/group.php';
 
 class SynergeticTimetable extends MSSQL{
 
@@ -15,6 +16,8 @@ class SynergeticTimetable extends MSSQL{
 		
 		$this->campusCode = unserialize(SYN_CAMPUS_Codes);
 		$this->days = unserialize(TIMETABLE_day_count);
+		
+		$this->groupHandler = new Group;
 	}
 	
 	function getTimetableDefinition($campus) {
@@ -134,11 +137,11 @@ class SynergeticTimetable extends MSSQL{
 		return $this->getRow($query);
 	}
 
-	function getDayTimetable($synergy_id, $group, $campus, $daynumber)
+	function getDayTimetable($synergy_id, $userID, $campus, $daynumber)
 	{
 		$timetabledef = $this->getTimetableDefinition($campus);
 	
-		if(isStudent($group))
+		if($this->groupHandler->isStudent($userID))
 		{
 			$query ="SELECT 
 				Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCode
@@ -219,11 +222,11 @@ class SynergeticTimetable extends MSSQL{
 	
 	}
 
-	function getFullTimetable($synergy_id, $group, $campus)
+	function getFullTimetable($synergy_id, $userID, $campus)
 	{	
 		$timetabledef = $this->getTimetableDefinition($campus);
 	
-		if( isStudent($group))
+		if( $this->groupHandler->isStudent($userID))
 		{
 			$query ="SELECT 
 						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber, Timetable.ClassCode 

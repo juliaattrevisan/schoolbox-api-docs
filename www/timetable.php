@@ -61,7 +61,7 @@ function displayWeek(&$page, $sid)
 	$periodCurrent = $timetableHandler->getPeriodNumber($user['campus']);
 	$dayCurrent = $timetableHandler->getDayNumber($user['campus']);	
 					
-	$timetable = $timetableHandler->getFullTimetable($sid, $user['group_id'], $user['campus']);
+	$timetable = $timetableHandler->getFullTimetable($sid, $user['id'], $user['campus']);
 	if(is_array($timetable)) {
 		$days = count($timetable[0]['day']);	
 		//timetable field width

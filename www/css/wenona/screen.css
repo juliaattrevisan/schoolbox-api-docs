@@ -58,7 +58,7 @@ a:hover { color: #c00; }
 .box.grey { background: 0; }
 .box a { color: #006; }
 .box a:hover { color: #c00; }
-.box a.edit { color: #000; background: 0; height: 18px; line-height: 18px; }
+.box a.edit { background: 0; height: 18px; line-height: 18px; }
 #content .box a.edit:hover { color: #fff; background: #CF0034; }
 
 .box ul {

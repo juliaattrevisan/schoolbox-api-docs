@@ -4,7 +4,7 @@ require_once '../library/synergetic-timetable.php';
 	
 $this->setBlock(TEMPLATE_content, "timetable", "timetable_block");	
 $this->setBlock("timetable", "timetable_period", "timetable_period_block");
-$this->setBlock("timetable", "timetable_header", "timetable_header_block");
+//$this->setBlock("timetable", "timetable_header", "timetable_header_block");
 
 //if user has timetable show it on the homepage
 if($_SESSION['timetable'] && SYNERGY_enable) {
@@ -16,22 +16,21 @@ if($_SESSION['timetable'] && SYNERGY_enable) {
 	
 	$this->setVar("DAYNUMBER", $daynumber);
 	
-	$timetable = $timetableHandler->getDayTimetable($_SESSION['sid'], $_SESSION['gid'], $_SESSION['campus'][0], $daynumber);
+	$timetable = $timetableHandler->getDayTimetable($_SESSION['sid'], $_SESSION['id'], $_SESSION['campus'][0], $daynumber);
 	
-	$periods = count($timetable);
+	$periodCount=0;
 	
-	if($periods) {
-		//timetable field width
-		$this->setVar("TIMETABLE_FIELD_WIDTH", round((100 / $periods),1));
+	if(is_array($timetable)) {
 		
 		//for each period set result
 		foreach($timetable as $period)
 		{
-			if($period['periodSequence'] == 1)
+			if($period['periodSequence'] == 1 && $period['description'])
 			{
 				$this->setVar("PERIOD_NAME", $period['periodName']);
 				$this->setVar("PERIOD_START", $period['periodStart']);
 				$this->setVar("PERIOD_END", $period['periodEnd']);
+				$periodCount++; 
 				
 				if($period['description'])
 				{
@@ -94,10 +93,14 @@ if($_SESSION['timetable'] && SYNERGY_enable) {
 			
 			
 				//output period block
-				$this->parse("timetable_header_block", "timetable_header", true);
+				//$this->parse("timetable_header_block", "timetable_header", true);
 				$this->parse("timetable_period_block", "timetable_period", true);
 			}
 		} 
+		
+				//timetable field width
+		$this->setVar("TIMETABLE_FIELD_WIDTH", floor((( 98 - ($periodCount * 0.05) ) / $periodCount)));
+		
 		$this->parse("timetable_block", "timetable");
 	}
 	else

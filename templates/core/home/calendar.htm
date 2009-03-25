@@ -1,10 +1,10 @@
 <div class="box">
-  <h2>Today's Events <span>- {DATE}</span></h2>
+  <h2>Today's Events <span>- <a href="/calendar/week/">{DATE}</a></span></h2>
   <div class="text listing">
   	<ul>
   	<!-- BEGIN note_block -->
     <li class="{ON_OFF}">
-      	<h3><a style="color:{NOTE_COLOUR}" href="/calendar/week/{CAL_DAY}-{CAL_MONTH}-{CAL_YEAR}">{NOTE_DESCRIPTION}</a></h3>
+      	<h3 style="color:{NOTE_COLOUR}">{NOTE_DESCRIPTION}</h3>
         <p class="interact">{TIME}</p>
         <div class="float-fix"></div>
       </li>

@@ -316,13 +316,11 @@ class Group extends Model {
 		if(is_array($subjects)) {
 			foreach($subjects as $subject) {
 				//convert code to id and get name
-				$query = "SELECT name, id, code FROM category, userAccess 
-							WHERE userAccess.sid = category.id AND  userAccess.service = ".$this->_service." AND
-							userAccess.type >= '$accessType' AND code = '".$subject['code']."'";
+				$query = "SELECT name, id, code FROM category WHERE code = '".$subject['code']."'";
 				$catList[] = $this->db->getRow($query);
 			}
 		}
-	
+
 		//get list of groups involved in
 		$query = "SELECT category.name, category.id FROM userAccess, category 
 		WHERE userAccess.uid = $id AND userAccess.sid = category.id AND userAccess.service = ".$this->_service."

@@ -383,6 +383,87 @@ CREATE TABLE `wiki`(
 	PRIMARY KEY (`wikiID`) 
 ) ENGINE=MyISAM DEFAULT CHARSET='utf8';
 
+/* Create table in target */
+CREATE TABLE `homepageTemplate`(
+	`id` int(11) NOT NULL  auto_increment , 
+	`name` varchar(255) COLLATE utf8_general_ci NULL  , 
+	`layout` smallint(6) NULL  DEFAULT '1' , 
+	PRIMARY KEY (`id`) 
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `homepageTemplateLayout`(
+	`templateID` int(11) NULL  , 
+	`componentId` int(11) NULL  , 
+	`column` smallint(6) NULL  , 
+	`position` smallint(6) NULL  , 
+	UNIQUE KEY `table`(`templateID`,`componentId`,`column`,`position`) , 
+	KEY `homepageID`(`templateID`) 
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+insert into `homepageTemplate` (`id`, `name`, `layout`) values('1','Class','1');
+insert into `homepageTemplate` (`id`, `name`, `layout`) values('2','Collab Group','1');
+insert into `homepageTemplate` (`id`, `name`, `layout`) values('4','Faculty','1');
+insert into `homepageTemplate` (`id`, `name`, `layout`) values('3','Extra-Curricular','1');
+insert into `homepageTemplate` (`id`, `name`, `layout`) values('5','Committee','1');
+insert into `homepageTemplate` (`id`, `name`, `layout`) values('6','House','1');
+
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('1','2','2','3');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('1','3','1','3');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('1','8','1','1');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('1','9','2','5');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('1','10','2','6');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('1','25','2','2');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('1','28','1','2');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('1','30','2','1');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('1','35','2','4');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('2','3','1','3');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('2','4','2','1');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('2','5','2','3');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('2','8','1','1');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('2','10','2','5');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('2','21','2','2');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('2','34','1','2');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('2','35','2','4');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('3','2','2','5');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('3','3','1','3');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('3','4','2','2');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('3','5','2','3');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('3','8','1','2');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('3','10','2','6');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('3','21','2','1');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('3','23','1','1');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('3','33','2','4');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('3','35','1','4');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('4','2','2','3');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('4','3','1','3');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('4','8','1','2');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('4','10','2','4');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('4','13','2','1');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('4','15','1','1');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('4','20','2','2');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('5','3','1','3');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('5','4','2','2');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('5','5','2','3');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('5','8','1','1');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('5','10','2','5');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('5','21','2','2');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('5','34','1','2');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('5','35','2','4');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('6','3','1','3');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('6','4','2','1');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('6','5','2','3');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('6','8','1','1');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('6','10','2','5');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('6','21','2','2');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('6','34','1','2');
+insert into `homepageTemplateLayout` (`templateID`, `componentId`, `column`, `position`) values('6','35','2','4');
+
+DROP TABLE homepages;
+
+DROP TABLE ph_ext;
+
 UPDATE homepage_comp_location SET component = 2 WHERE component = 6;
 UPDATE homepage_comp_location SET component = 3 WHERE component = 7;
 UPDATE homepage_comp_location SET component = 16 WHERE component = 11;

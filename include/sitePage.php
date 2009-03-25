@@ -68,7 +68,7 @@ class SitePage extends Page {
 	
 	function buildPage() {
 	
-		$groupHandler = new Group;
+		$this->groupHandler = new Group;
 		
 		$this->setFile(TEMPLATE_body, 'include/body.html' );
 		$this->setFile('headerTpl', 'include/header.html' );
@@ -219,13 +219,13 @@ class SitePage extends Page {
 		// if configuration states mail is available and user has access to local mail account display it
 		$this->setBlock('tabTpl', 'webmail_tab', 'wm_tab');
 		
-		if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && $groupHandler->isStaff()) || SITE_location == 'ormond')
+		if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && $this->groupHandler->isStaff()) || SITE_location == 'ormond')
 		{
 			$this->parse('wm_tab','webmail_tab');
 			
 			if(SITE_location == 'mgs')
 			{
-				if($groupHandler->isStaff())
+				if($this->groupHandler->isStaff())
 					$this->setVar("WEBMAIL_LOCATION", 'href=\"https://webmail.mgs.vic.edu.au/exchange/" target="_blank"');
 				else
 					$this->setVar("WEBMAIL_LOCATION", "href=\"/mail/\"");
@@ -238,7 +238,7 @@ class SitePage extends Page {
 					$this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
 			}
 			else if(SITE_location == 'wenona') {
-				if($groupHandler->isStaff()) {
+				if($this->groupHandler->isStaff()) {
 					$this->setVar('WEBMAIL_LOCATION', 'href="http://webmail.wenona.nsw.edu.au/gw/webacc/" target="_blank"');
 					$this->setVar('WEBMAIL_TITLE', '<em>W</em>ebmail');
 				}
@@ -263,11 +263,11 @@ class SitePage extends Page {
 		
 			$this->setBlock('tabTpl', 'portfolio_tab', 'pf_tab');
 			$this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
-			if($groupHandler->isStaff()) {
+			if($this->groupHandler->isStaff()) {
 				$this->parse('pf_tab', 'portfolio_tab');
 				$this->parse('mf_tab', 'myfiles_tab');
 			}
-			else if(isStudent($_SESSION['gid'])) {
+			else if($this->groupHandler->isStudent()) {
 				$this->parse('mf_tab', 'myfiles_tab');
 				$this->setVar('pf_tab', '');
 			}
@@ -328,7 +328,7 @@ class SitePage extends Page {
 		{
 			foreach($_SESSION['subjects'] as $subject)
 			{
-				if($groupHandler->isStaff())
+				if($this->groupHandler->isStaff())
 					$this->setVar("MSUBJECT", $subject['name']." (".$subject['code'].")");
 				else		
 					$this->setVar("MSUBJECT", $subject['name']);

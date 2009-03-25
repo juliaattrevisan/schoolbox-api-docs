@@ -1,6 +1,7 @@
 <?php
 //link output
-$this->setBlock($componentHandle, "link", "link_block");
+$this->setBlock($componentHandle, 'link', 'link_block');
+$this->setBlock('link', 'modify_link', 'modify_link_block');
 
 require_once '../library/link.php';
 $linkHandler = new Link;
@@ -20,6 +21,11 @@ if (is_array($linkList)) {
 				'ON_OFF'			=> ++$j%2? '' : 'dark',
 				);
 		$this->setVar($output);
+		
+		if ($permission < WRITE_ACCESS)		
+			$this->setVar('modify_link_block', '');
+		else
+			$this->parse('modify_link_block', 'modify_link');	
 		
 		$this->parse("link_block", "link", true);
 		

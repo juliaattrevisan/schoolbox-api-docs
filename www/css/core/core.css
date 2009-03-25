@@ -134,11 +134,11 @@ table.ruler { width: 100%; }
 	float: left;
 	overflow: hidden;
 	}
-.template2 .left {
+.template1 .left {
 	min-width: 535px;
 	width: 69.5%;
 	}
-.template2 .right {
+.template1 .right {
 	min-width: 229px;
 	width: 29.5%;
 	}
@@ -390,7 +390,7 @@ h2 span {
 .box-mini {
 	background: #fff;
 	float: left;
-	margin-right: 0.8%;
+	margin-right: 0.4%;
 	width: 16%;
 	}
 .box-mini.last {
@@ -399,10 +399,10 @@ h2 span {
 .box-mini h3 {
 	background: #6b6b6b;
 	color: #fff;
-	padding: 6px 16px;
+	padding: 6px 10px;
 	}
 .box-mini .text {
-	padding: 6px 16px;
+	padding: 6px 10px;
 	display: block;
 	}
 .box-mini p {
@@ -459,7 +459,7 @@ h2 span {
 	}
 .box .listing form {
 	text-align: right;
-	margin-right: 15px;
+	margin: 0;
 	}
 .box .listing ul {
 	list-style: none;
