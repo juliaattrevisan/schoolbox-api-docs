@@ -35,25 +35,25 @@ define('LDAP_base', '');
 // be writable by the apache process
 
 //Template Options
-define('TEMPLATE_dir', '/usr/local/www/portal/templates');
+define('TEMPLATE_dir', SITE_root.'/templates');
 define('TEMPLATE_body', 'bodyTpl');
 define('TEMPLATE_content', 'contentTpl');
-define("TPL_directory", "/usr/local/www/portal/" . SITE_location . "_templates");		//Deprecated option
+define("TPL_directory", SITE_root.'/'. SITE_location . "_templates");		//Deprecated option
 
 //CMS options
-define("FILE_directory", "/usr/local/www/portal/files");	//Files uploaded using CMS system will be stored here
+define("FILE_directory", SITE_root.'/files');	//Files uploaded using CMS system will be stored here
 define("FILE_max_upload", "10");							// The maximum number of uploads for the multi upload system
 define("CMS_allow_move", true);
-define("MYFILE_directory", "/usr/local/www/portal/myFiles");	//Files uploaded using CMS system will be stored here
-define("SUBMISSION_directory", "/usr/local/www/portal/submissions");	//All files submitted to submission box stored here
-define("RETURNS_directory", "/usr/local/www/portal/returns");		//Returned work will be stored in this directory
-define("THUMBNAIL_IMAGE_CACHE", "/usr/local/www/portal/files/thumbnails");		//Thumbnail cache for 
+define("MYFILE_directory",  SITE_root.'/myFiles');	//Files uploaded using CMS system will be stored here
+define("SUBMISSION_directory", SITE_root.'/submissions');	//All files submitted to submission box stored here
+define("RETURNS_directory", SITE_root.'/returns');		//Returned work will be stored in this directory
+define("THUMBNAIL_IMAGE_CACHE", SITE_root.'/thumbnails');		//Thumbnail cache for 
 define("THUMBNAIL_size", 100); 
 define("URLS_use_frame", false);						//Open links in frame
 define('FILE_use_frame', false);
-define('ZIP_directory', '/usr/local/www/portal/zip');
+define('ZIP_directory', SITE_root.'/zip');
 define('MIME_magic', '/usr/share/file/magic');
-define('DROPBOX_directory', '/usr/local/www/portal/drop');
+define('DROPBOX_directory', SITE_root.'/drop');
 
 //GROUP options
 define("GROUP_staff_only_owner", true);			//Determines if students can be group owner or not
@@ -121,7 +121,7 @@ define('FROM_name', HEADING);
 
 //RSS Feed 
 define('RSS_url', 'http://www.abc.net.au/news/indexes/justin/rss.xml');
-define('RSS_cache_dir', '/usr/local/www/portal/files/');
+define('RSS_cache_dir', SITE_root.'/files/');
 define('RSS_cache_time', 3000);
 define('RSS_limit', 6);
 
