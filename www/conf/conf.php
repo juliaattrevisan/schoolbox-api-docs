@@ -11,7 +11,7 @@
 define("HEADING", 'OurSchool');			//This will appear on the window title of each page
 define("SITE_name", "Alaress Pty Ltd");
 define("MAX_FILE_SIZE", 10485760); 			//Maximum filesize in bytes allowed to be uploaded (default 10MB) (also set in php.ini)
-define("SITE_location", "shore");				//This defines the location, allows specific code for each location
+define("SITE_location", "mgs");				//This defines the location, allows specific code for each location
 define("SITE_root", dirname(__FILE__)."/../../");
 define('SITE_address', 'http://www.alaress.com.au');
 
@@ -163,19 +163,19 @@ define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 
 define('HOMEPAGE_colors', serialize(array(
 	'left_head_font' => 'FFFFFF', 
-	'left_head_bg' => '002750', 
+	'left_head_bg' => '051252', 
 	'left_font' => '000000', 
 	'left_bg_primary' => 'FFFFFF', 
 	'left_bg_secondary' => 'ECECEC', 
-	'left_link' => '002B58', 
-	'left_hover' => '0065CE', 
+	'left_link' => '0033CC', 
+	'left_hover' => '0066CC', 
 	'right_head_font' => 'FFFFFF', 
-	'right_head_bg' => '9EC6D9', 
+	'right_head_bg' => '051252', 
 	'right_font' => '000000', 
-	'right_bg_primary' => 'CCCCCC', 
+	'right_bg_primary' => 'FFFFFF', 
 	'right_bg_secondary' => 'ECECEC', 
-	'right_link' => '002B58', 
-	'right_hover' => '0065CE',  
+	'right_link' => '0033CC', 
+	'right_hover' => '0066CC', 
 	
 )));
 
