@@ -2,7 +2,7 @@
 		//output mangement/userlist link to owner of subject
 		$this->setBlock($componentHandle, "class_list", "class_list_block");
 	
-		if(SYNERGY_enable == false || $permission < WRITE_ACESS || $category['code'] == '' )
+		if(SYNERGY_enable == false || $permission < WRITE_ACCESS || $category['code'] == '' )
 			$this->setVar("class_list_block", "");
 		else
 			$this->parse("class_list_block", "class_list");	
