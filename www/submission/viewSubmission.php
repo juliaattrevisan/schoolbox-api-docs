@@ -83,6 +83,7 @@ class ViewSubmissionPage {
 										'COLOUR'	=> $line['late']?'#ff0000':'#000000',
 										'MARKED'	=> $line['marked']?'<img src="/images/greentick.gif" width="13" height="12">':'<img src="/images/emptybox.gif" width="13" height="12">',
 										'RETURN'	=> $line['marked']?'':"<a href=\"returnWork.php?box_id=$box_id&sid=".$line['uid']."\">Return</a>",
+										'ON_OFF'		=> ++$i%2?'':'dark',
 									);
 									$this->t_body->set_var($output);
 									$this->t_body->parse('mark_block', 'mark', false);
@@ -97,6 +98,7 @@ class ViewSubmissionPage {
 										'DATE'		=> '',
 										'MARKED'	=> '',
 										'RETURN'	=> '',
+										'ON_OFF'		=> ++$i%2?'':'dark',
 									);
 					$this->t_body->set_var($output);
 					
@@ -123,6 +125,7 @@ class ViewSubmissionPage {
 									'COLOUR'	=> $line['late']?'#ff0000':'#000000',
 									'MARKED'	=> $line['marked']?'<img src="/images/greentick.gif" width="13" height="12">':'<img src="/images/emptybox.gif" width="13" height="12">',
 									'RETURN'	=> $line['marked']?'':"<a href=\"returnWork.php?box_id=$box_id&sid=".$line['uid']."\">Return</a>",
+									'ON_OFF'		=> ++$i%2?'':'dark',
 									);
 				$this->t_body->parse('mark_block', 'mark', false);
 				$this->t_body->set_var($output);

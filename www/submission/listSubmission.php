@@ -29,6 +29,7 @@ class ListSubmissionPage {
 		$this->t_body->set_var("MARKED", $marked);
 		//$this->t_body->set_var("UNMARKED", ($total-$marked));
 		$this->t_body->set_var("TOTAL", $total);
+		$this->t_body->set_var('ON_OFF', ++$this->i%2?'':'dark');
 
 		$this->t_body->parse("submission_listing","submission_block",true);
 	}
@@ -71,6 +72,7 @@ class ListSubmissionPage {
 
 					$this->t_body->parse("category_listing", "category_block", true);
 					$this->t_body->set_var("submission_listing", "");
+					$this->i = 0;
 
 				}
 
