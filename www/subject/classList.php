@@ -56,6 +56,7 @@ if(isStaff($_SESSION['gid']))
 										'SYNERGYID'	=> $student['synergy_id'],
 										'EMAIL'		=> $emailaddr?$emaillink:'',
 										'EMAIL_ADDRESS'=> $emailaddr,
+										'ON_OFF' => ++$j%2? '' : 'dark',
 										);
 									
 				$this->setVar($studentOutput);

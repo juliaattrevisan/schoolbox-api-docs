@@ -31,10 +31,6 @@
 </head>
 <body>
 <!-- #BeginEditable "head" -->
-<script type="text/javascript" src="/javascript/tableruler.js"></script>
-<script type="text/javascript">
-	window.onload=function(){tableruler();} 
-</script>
 <!-- #EndEditable -->
 
 <div id="nav">
@@ -133,7 +129,7 @@
 					</thead>
 					<tbody>
 					<!-- BEGIN submission_block --> 
-					<tr> 
+					<tr class="{ON_OFF}"> 
 						<td><a href="/submission/viewSubmission.php?box_id={ID}">{ASSDESC}</a></td>
                         <td>{TYPE}</td>
                         <td><a href="/submission/createSubmission.php?sid={ID}">{OPENDATE}</a></td>

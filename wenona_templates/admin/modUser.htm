@@ -31,10 +31,6 @@
 </head>
 <body>
 <!-- #BeginEditable "head" -->
-<script type="text/javascript" src="/javascript/tableruler.js"></script>
-<script type="text/javascript">
-	window.onload=function(){tableruler();} 
-</script>
 <script language="JavaScript" type="text/javascript">
 function verify()
 {
@@ -222,7 +218,7 @@ function verify()
             <th>Remove</th>
           </tr>
           <!-- BEGIN group_block -->
-          <tr>
+          <tr class="{ON_OFF}">
             <td>{GROUP_NAME}</td>
             <td>{BOX}</td>
             <td>{OWNER}</td>
@@ -250,7 +246,7 @@ function verify()
             <th>Remove</th>
           </tr>
           <!-- BEGIN perm_block -->
-          <tr>
+          <tr class="{ON_OFF}">
             <td>{SERVICE_NAME}</td>
             <td>{SERVICE_ID}</td>
             <td>{SERVICE_TYPE}</td>
@@ -275,7 +271,7 @@ function verify()
           <th>Result</th>
         </tr>
         <!-- BEGIN login_log -->
-        <tr>
+        <tr class="{ON_OFF}">
           <td>{LOGIN_DATE}</td>
           <td>{LOGIN_IP}</td>
           <td>{LOGIN_RESULT}</td>
@@ -291,7 +287,7 @@ function verify()
           <th>Name</th>
         </tr>
         <!-- BEGIN action_log -->
-        <tr>
+        <tr class="{ON_OFF}">
           <td>{ACTION_DATE}</td>
           <td>{ACTION_ACTION}</td>
           <td>{ACTION_OBJECT}</td>
