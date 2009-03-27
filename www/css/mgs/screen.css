@@ -170,7 +170,6 @@ h1 {
 	border-bottom: 4px solid #00458C;
 	border-left: 20px solid #00458C;
 	padding: 0 0 0 3px;
-	margin-top: 10px;
 	color: #000;
 	font-size: 120%;
 	line-height: 1.4;
@@ -215,6 +214,7 @@ h2, .news-item h3 {
 	}
 .header_option {
 	font-size: 100%;
+	margin-top: -35px;
 	}
 #calendar table .header_option {
 	margin-top: 0;
