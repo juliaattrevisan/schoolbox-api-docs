@@ -25,7 +25,7 @@ if($_SESSION['timetable'] && SYNERGY_enable) {
 		//for each period set result
 		foreach($timetable as $period)
 		{
-			if($period['periodSequence'] == 1 && $period['description'])
+			if($period['periodSequence'] == 1)
 			{
 				$this->setVar("PERIOD_NAME", $period['periodName']);
 				$this->setVar("PERIOD_START", $period['periodStart']);

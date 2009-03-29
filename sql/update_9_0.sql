@@ -464,15 +464,44 @@ DROP TABLE homepages;
 
 DROP TABLE ph_ext;
 
+UPDATE homepage_comp SET id = 21 WHERE id = 1000;
+UPDATE homepage_comp SET id = 22 WHERE id = 1001;
+UPDATE homepage_comp SET id = 23 WHERE id = 1002;
+UPDATE homepage_comp SET id = 24 WHERE id = 1003;
+UPDATE homepage_comp SET id = 25 WHERE id = 1004;
+UPDATE homepage_comp SET id = 26 WHERE id = 1005;
+UPDATE homepage_comp SET id = 27 WHERE id = 1006;
+UPDATE homepage_comp SET id = 28 WHERE id = 1007;
+UPDATE homepage_comp SET id = 29 WHERE id = 1008;
+UPDATE homepage_comp SET id = 30 WHERE id = 1009;
+UPDATE homepage_comp SET id = 31 WHERE id = 1010;
+UPDATE homepage_comp SET id = 32 WHERE id = 1011;
+
+UPDATE homepage_comp_location SET component = 21 WHERE component = 1000;
+UPDATE homepage_comp_location SET component = 22 WHERE component = 1001;
+UPDATE homepage_comp_location SET component = 23 WHERE component = 1002;
+UPDATE homepage_comp_location SET component = 24 WHERE component = 1003;
+UPDATE homepage_comp_location SET component = 25 WHERE component = 1004;
+UPDATE homepage_comp_location SET component = 26 WHERE component = 1005;
+UPDATE homepage_comp_location SET component = 27 WHERE component = 1006;
+UPDATE homepage_comp_location SET component = 28 WHERE component = 1007;
+UPDATE homepage_comp_location SET component = 29 WHERE component = 1008;
+UPDATE homepage_comp_location SET component = 30 WHERE component = 1009;
+UPDATE homepage_comp_location SET component = 31 WHERE component = 1010;
+UPDATE homepage_comp_location SET component = 32 WHERE component = 1011;
+
+
 UPDATE homepage_comp_location SET component = 2 WHERE component = 6;
 UPDATE homepage_comp_location SET component = 3 WHERE component = 7;
 UPDATE homepage_comp_location SET component = 16 WHERE component = 11;
 UPDATE homepage_comp_location SET component = 17 WHERE component = 12;
+UPDATE homepage_comp_location SET component = 15 WHERE component = 14;
 UPDATE homepage_comp_location SET component = 21 WHERE component = 22;
 UPDATE homepage_comp_location SET component = 26 WHERE component = 27;
 UPDATE homepage_comp_location SET component = 28 WHERE component = 29;
 
-UPDATE homepage_comp SET invisible='true' WHERE id IN(6,7,11,12,22,27,29);
+UPDATE homepage_comp SET invisible='true' WHERE id IN(6,7,11,12,14,22,27,29,32,31);
+
 
 UPDATE file SET modified = submitted;
 UPDATE link SET modified = submitted;

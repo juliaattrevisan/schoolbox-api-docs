@@ -22,7 +22,7 @@ $this->setBlock("category_block", "new_forum", "new_forum_item");
 $flag = 0;
 
 //check mail status
-if(MAIL_enable && !(SITE_location == 'mgs' && isStaff($_SESSION['gid'])) ) {
+if(MAIL_enable && !(SITE_location == 'mgs' && $groupHandler->isStaff()) ) {
 
 	$mailbox = $whatnew->newEmail();
 	if($mailbox->unseen > 0) {
