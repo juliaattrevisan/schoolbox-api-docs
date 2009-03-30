@@ -1,7 +1,7 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
 <style type="text/css">
-.rule tr td {
+.ruler tr td {
 	vertical-align: middle;
 }
 #ajax_loader {
@@ -11,7 +11,6 @@
 	width: 140px;
 }
 </style>
-<script type="text/javascript" src="/javascript/jquery.js"></script>
 <script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript">
 var $j = jQuery.noConflict();
@@ -43,21 +42,19 @@ $j(document).ready(function () {
 <!-- END custom_head -->
 <h1>Tutorial Management - Attendance Week Ending {WEEK_END}</h1>
 <span class="header_option">
-<a href="modify-event.php">Add Tutorial</a>
+<a href="/modules/tutorial/event/modify.php">Add Tutorial</a>
 </span>
 
 <div class="indent">
 <!-- BEGIN event -->
-<form action="list-attendance.php" method="post" class="{DISABLED}">
+<form action="/modules/tutorial/attendance/modifyForm.php" method="post" class="{DISABLED}">
+ 
+<h2>{EVENT_NAME} - {EVENT_DATE}</h2>
+        <span class="header_option"><a href="/modules/tutorial/enrolment/list.php?eventID={EVENT_ID}" title="Attendance history">Attendance history</a> | 
+        <a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}" title="Modify Event">Modify</a> | 
+        <a href="/modules/tutorial/event/modify.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?')" title="Delete Event">Delete</a></span>
   <table class="ruler">
     <thead>
-      <tr>
-        <td colspan="7"><h3>{EVENT_NAME} - {EVENT_DATE}</h3>
-        <span class="header_option"><a href="list-enrolment.php?eventID={EVENT_ID}" title="Attendance history">Attendance history</a> | 
-        <a href="modify-event.php?eventID={EVENT_ID}" title="Modify Event">Modify</a> | 
-        <a href="modify-event.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?')" title="Delete Event">Delete</a></span>
-        </td>
-      <tr>
       <tr>
         <th style="width: 60px;">Remove</th>
         <th>Student</th>
@@ -67,8 +64,8 @@ $j(document).ready(function () {
     </thead>
     <tbody>
       <!-- BEGIN student -->
-      <tr style="vertical-align: middle;">
-        <td style="text-align: center;"><a href="list-attendance.php?remove={STUDENT_ID}&code={EVENT_CODE}&eventID={EVENT_ID}&week={WEEK}" onclick="return confirm('Remove this student from the tutorial classlist? Please note the student will not be removed from events that have already passed.');"><img src="/images/famicons/delete.png" alt="Remove enrolment" /></a></td>
+      <tr style="vertical-align: middle;" class="{ON_OFF}">
+        <td style="text-align: center;"><a href="/modules/tutorial/enrolment/modifyForm.php?delete={STUDENT_ID}&code={EVENT_CODE}&eventID={EVENT_ID}" onclick="return confirm('Remove this student from the tutorial classlist? Please note the student will not be removed from events that have already passed.');"><img src="/images/famicons/delete.png" alt="Remove enrolment" /></a></td>
         <td><a href="/search/user/{STUDENT_ID}">{STUDENT_NAME}</a></td>
         <td><select name="reason[{STUDENT_ID}]" class="reason_select">
             <option value="">N/A</option>
@@ -81,20 +78,19 @@ $j(document).ready(function () {
       <!-- END student -->
     </tbody>
   </table>
-  <p class="float-right">
+  <p class="float-right" style="padding: 10px;">
   <input type="hidden" name="eventID" value="{EVENT_ID}" />
   <input type="hidden" name="week" value="{WEEK}" />
   <input type="submit" value="{ACTION} Attendance" class="btn" /></p>
   </form>
 
   <!-- BEGIN add_student -->
-  <p>
-  <form action="list-attendance.php" method="post" class="{ALLOWADD}">
+  <p class="float-left">
+  <form action="/modules/tutorial/enrolment/modifyForm.php" method="post" class="standardForm {ALLOWADD}">
     <input class="lookup" type="text" name="keyword" />
     <input type="hidden" name="userID" class="userID" />
     <input type="hidden" name="code" value="{EVENT_CODE}" />
     <input type="hidden" name="eventID" value="{EVENT_ID}" />
-    <input type="hidden" name="week" value="{WEEK}" />
     <input type="submit" value="Add Student" class="btn" />
    </form>
   </p>
@@ -104,10 +100,10 @@ $j(document).ready(function () {
 
 <p>
 <!-- BEGIN previous_link -->
-<a href="list-attendance.php?week={PREVIOUS_WEEK}">&lt; Previous Week</a> | <!-- END previous_link -->
-<a href="list-attendance.php">This Week</a>
+<a href="/modules/tutorial/attendance/list.php?week={PREVIOUS_WEEK}">&lt; Previous Week</a> | <!-- END previous_link -->
+<a href="/modules/tutorial/attendance/list.php">This Week</a>
 <!-- BEGIN next_link -->  |
-<a href="list-attendance.php?week={NEXT_WEEK}">Next Week &gt;</a> <!-- END next_link --> 
+<a href="/modules/tutorial/attendance/list.php?week={NEXT_WEEK}">Next Week &gt;</a> <!-- END next_link --> 
 
 </p>
 </div>

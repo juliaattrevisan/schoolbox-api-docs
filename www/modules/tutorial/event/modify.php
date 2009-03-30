@@ -1,14 +1,12 @@
 <?php
 
-require_once '../../conf/conf.php';
-require_once SITE_root . '/include/sitePage.php';
-require_once SITE_root . '/www/modules/tutorial/library/event.php';
-require_once SITE_root . '/library/group.php';
-require_once SITE_root . '/library/user.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 
-	
 $page = new SitePage();
-$page->setFile(TEMPLATE_content, 'tutorial/modify-event.html');
+$page->setFile(TEMPLATE_content, 'tutorial/event/modify.html');
 $page->setTitle("Tutorial Management");
 
 $eventHandler = new Event;
@@ -19,113 +17,42 @@ $userHandler = new User;
 if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)
 	$page->error(19);
 
-if (isset($_POST['date'])) {
-
-	$date = ausDateToUnix($_POST['date']);
-	$until = ausDateToUnix($_POST['repeat_until']);	
-	$hour = $_POST['period'] == 'pm' && $_POST['hour'] < 12 ? $_POST['hour'] + 12 : $_POST['hour'];
+if (is_numeric($_GET['eventID'])) {
 	
-	// default finish time to +1 hour
-	if (empty($_POST['tohour']))
-		$tohour = $hour + 1;
-	else
-		$tohour = $_POST['toperiod'] == 'pm' && $_POST['tohour'] < 12 ? $_POST['tohour'] + 12 : $_POST['tohour'];
-
-
-	if (is_numeric($_POST['tutorID_1']) && !($tutor1 = $userHandler->getBySynergy($_POST['tutorID_1']))) 
-		error(31);
-
-	if (is_numeric($_POST['tutorID_2']) && !($tutor2 = $userHandler->getBySynergy($_POST['tutorID_2']))) 
-		error(31);
-	
-	if ($_POST['typeID'] == 1 && is_numeric($_POST['classID'])) {
-		$class = $eventHandler->getClass($_POST['classID']);
-		
-		$_POST['name'] = $class['class'];
-		$_POST['code'] = $class['code'];
-	}
-
-	$event = array('typeID'		=> $_POST['typeID'],
-				   'classID'	=> $_POST['classID'],
-				   'name'		=> $_POST['name'],
-				   'code'		=> $_POST['code'],
-				   'location'	=> $_POST['location'],
-				   'start'		=> $hour.":".(int)$_POST['minute'].":00",
-				   'finish'		=> $tohour.":".(int)$_POST['tominute'].":00",
-				   'tutorID_1'	=> $tutor1['uid'],
-				   'tutorID_2'	=> $tutor2['uid'],
-				   'cancelled'	=> isset($_POST['cancelled']) ? 'true' : 'false',
-				   );
-
-	
-					   
-	$validRepeat = array('weekly' => '+1 week', 'fortnightly' => '+2 weeks', 'monthly' => '+1 month');
-	if (isset($validRepeat[$_POST['repeat']]) && $until) {
-		$i = 0;
-		for ($date; $date <= $until; $date = strtotime($validRepeat[$_POST['repeat']], $date)) {
-			if ($i++ > 100) break;
-				
-			$dateArray[] = date("Y-m-d", $date);
-		}		
-	
-	} else {
-		$dateArray[] = date("Y-m-d", $date);
-	}	  
-				  
-	if(is_numeric($_POST['eventID'])) {
-		
-		// check user is one of the tutors
-		$current = $eventHandler->getByID($_POST['eventID']);
-		
-		if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($current['tutorID_1'], $current['tutorID_2'])))
-			$page->error(19);
-		
-		$event['eventID'] = $_POST['eventID'];
-		$event['date'] = $dateArray[0];
-		$eventHandler->update($event);
-		
-		$page->backToTheFuture(2);
-		
-	} 
-	else {
-
-		// check user is one of the tutors
-		if ($permission < FULL_ACCESS && !in_array($_SESSION['sid'], array($_POST['tutorID_1'], $_POST['tutorID_2'])))
-			$page->error(19);
-
-		for ($i = 0; $i < count($dateArray); $i++) {
-			$event['date'] = $dateArray[$i];
-			$eventID = $eventHandler->create($event);
-		}
-		//localRedir('/modules/tutorial/list-enrolment.php?eventID='. $event['eventID']);
-		$page->backToTheFuture(2);
-	}
-	
-}
-elseif (is_numeric($_GET['delete'])) {
-
-	// check user is one of the tutors
-	$event = $eventHandler->getByID($_GET['delete']);
-	if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($event['tutorID_1'], $event['tutorID_2'])))
-		$page->error(19);
-
-	$eventHandler->delete($_GET['delete']);
-	localRedir('/modules/tutorial/list-attendance.php');
-}
-elseif (is_numeric($_GET['eventID'])) {
-
 	$event = $eventHandler->getByID($_GET['eventID']);
 	if (!isset($event['eventID']))
 		$page->error(2);
 
 	// check user is one of the tutors
-	if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($event['tutorID_1'], $event['tutorID_2'])))
+	if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($event['tutor1ID'], $event['tutor2ID'])))
 		$page->error(19);
 
-	
+	$page->setBlock(TEMPLATE_content, 'sequence_link', 'sequence_link_block');
+	$page->setBlock(TEMPLATE_content, 'date', 'date_block');
+	$page->setBlock(TEMPLATE_content, 'date_sequence', 'date_sequence_block');
 	$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
+	$page->setBlock(TEMPLATE_content, 'delete_sequence', 'delete_sequence_block');
+	
 	$page->setVar('recurring_dates_block', '');
 	
+	$page->setVar('date_block', '');
+	$page->setVar('date_sequence_block', '');
+	$page->setVar('sequence_link_block', '');
+	$page->setVar('delete_sequence_block', '');
+	
+	if (!isset($_GET['sequence'])) {
+		/* modify page */
+		$page->parse('date_block', 'date');	
+		$page->setVar('HEADING', 'Modify Tutorial');
+		$page->parse('sequence_link_block', 'sequence_link');
+	} else {
+		/* modify sequence page */
+		$page->setVar('HEADING', 'Modify Tutorial Sequence');
+		$page->parse('date_sequence_block', 'date_sequence');
+		$page->parse('delete_sequence_block', 'delete_sequence');
+	}
+	
+	$sequence = $eventHandler->getSequence($event['sequenceID']);	
 
 	list($hour, $minute) = explode(":", $event['start']);
 	list($minute, $period) = explode(" ", $minute);
@@ -134,7 +61,9 @@ elseif (is_numeric($_GET['eventID'])) {
 	list($tominute, $toperiod) = explode(" ", $tominute);	
 
 	$output = array('ACTION'		=> 'Modify',
+					'ACTION_TYPE'	=> isset($_GET['sequence']) ? 'sequence' : 'single',
 					'EVENT_ID'		=> $event['eventID'],
+					'SEQUENCE_ID'	=> $event['sequenceID'],
 					'NAME'			=> $event['name'],
 					'CODE'			=> $event['code'],
 					'LOCATION'		=> $event['location'],
@@ -164,10 +93,14 @@ elseif (is_numeric($_GET['eventID'])) {
 					'RECURRENCE_ONCE_SELECTED'		=> '',
 					'RECURRENCE_WEEK_SELECTED'		=> 'selected="selected"',
 					'RECURRENCE_FORTNIGHT_SELECTED'	=> '',
+					
+					'TOTAL_EVENTS'	=> $sequence['total'],
+					'START_DATE'	=> outputDate("d/m/Y", $sequence['start_date']),
+					'END_DATE'		=> outputDate("d/m/Y", $sequence['end_date']),
 					);
 
-	$tutor1 = $userHandler->getByID($event['tutorID_1']);
-	$tutor2 = $userHandler->getByID($event['tutorID_2']);
+	$tutor1 = $userHandler->getByID($event['tutor1ID']);
+	$tutor2 = $userHandler->getByID($event['tutor2ID']);
 
 	$page->dropDown('tutor_list_1', $eventHandler->getTutorList(), $tutor1['synergy_id'], TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
 	$page->dropDown('tutor_list_2', $eventHandler->getTutorList(), $tutor2['synergy_id'], TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
@@ -178,8 +111,19 @@ elseif (is_numeric($_GET['eventID'])) {
 	$page->setVar($output);
 
 } else {
+
+
+	$page->setBlock(TEMPLATE_content, 'sequence_link', 'sequence_link_block');
+	$page->setBlock(TEMPLATE_content, 'date_sequence', 'date_sequence_block');
+	$page->setBlock(TEMPLATE_content, 'delete_sequence', 'delete_sequence_block');
+
+
+	$page->setVar('sequence_link_block', '');
+	$page->setVar('date_sequence_block', '');
+	$page->setVar('delete_sequence_block', '');
 	
 	$output = array('ACTION'		=> 'Add',
+					'HEADING'		=> 'Add Tutorial',
 					'EVENT_ID'		=> '',
 					'NAME'			=> '',
 					'CODE'			=> '',

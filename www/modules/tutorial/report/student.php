@@ -1,12 +1,12 @@
 <?php
-require_once '../../conf/conf.php';
-require_once SITE_root . '/include/sitePage.php';
-require_once SITE_root . '/www/modules/tutorial/library/event.php';
-require_once SITE_root . '/library/user.php';
-require_once SITE_root . '/library/group.php';
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 $page = new SitePage();
-$page->setFile(TEMPLATE_content, 'tutorial/report-student.html');
+$page->setFile(TEMPLATE_content, 'tutorial/report/student.html');
 $page->setBlock(TEMPLATE_content, 'has_events', 'has_events_block');
 $page->setBlock('has_events', 'class_list', 'class_list_block');
 $page->setBlock('class_list', 'event_list', 'event_list_block');
@@ -33,12 +33,11 @@ if (is_numeric($_GET['userID'])) {
 	$user = $userHandler->getByID($_GET['userID'], 3);
 	if (isset($user['uid']))
 		$studentID	= $user['uid'];
-} else
-	$studentID = $_GET['studentID'];
+} 
 
 $output = array('FROM'			=> outputDate("d/m/Y", $from),
 				'TO'			=> outputDate("d/m/Y", $to),
-				'STUDENT'		=> 'N/A',
+				'STUDENT'		=> '',
 				'STUDENT_ID'	=> '',
 				);
 $page->setVar($output);
@@ -57,6 +56,7 @@ if (is_numeric($studentID)) {
 					
 					$output = array('TUTORIAL'		=> scrubText($last['name']),
 									'CODE'			=> scrubText($last['code']),
+									'TYPE'			=> $last['typeName'],
 									'ATTENDANCE'	=> number_format(($totalAttended/($totalAttended+$totalMissed))*100, 2),
 									'TOTAL_ATTENDED'	=> number_format($totalAttended, 2),
 									'TOTAL_MISSED'		=> number_format($totalMissed, 2),
@@ -79,7 +79,8 @@ if (is_numeric($studentID)) {
 					
 				}
 				
-				$output = array('DATE'		=> outputDate(DATE_short_no_time, $event['date']),
+				$output = array('EVENT_ID'	=> $event['eventID'],
+								'DATE'		=> outputDate(DATE_short_no_time, $event['date']),
 								'START'		=> $event['start'],
 								'FINISH'	=> $event['finish'],
 								'PRESENT'	=> $event['present']=='true'?'Present':'<em>Absent</em>',
@@ -87,6 +88,7 @@ if (is_numeric($studentID)) {
 								'HOURS_MISSED'		=> number_format($hoursMissed, 2),
 								'STUDENT'		=> scrubText($event['studentName']),
 								'STUDENT_ID'	=> $event['studentID'],
+								'ON_OFF'		=> ++$j%2? 'dark' : '',
 								);
 				$page->setVar($output);
 				$page->parse('event_list_block', 'event_list', true);
@@ -100,6 +102,7 @@ if (is_numeric($studentID)) {
 			// last class
 			$output = array('TUTORIAL'		=> scrubText($last['name']),
 							'CODE'			=> scrubText($last['code']),
+							'TYPE'			=> $last['typeName'],
 							'ATTENDANCE'	=> number_format(($totalAttended/($totalAttended+$totalMissed))*100, 2),
 							'TOTAL_ATTENDED'	=> number_format($totalAttended, 2),
 							'TOTAL_MISSED'		=> number_format($totalMissed, 2),
@@ -111,8 +114,9 @@ if (is_numeric($studentID)) {
 			$page->setVar('class_list_block', '<p>No attendance to display.</p>');	
 		
 		$page->parse('has_events_block', 'has_events');
-} else
-	$page->setVar('has_events_block', '<p>Student not found</p>');	
+} 	
+else
+	$page->setVar('has_events_block', '');	
 
 
 

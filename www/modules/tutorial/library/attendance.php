@@ -1,6 +1,6 @@
 <?php
 
-require_once SITE_root.'/include/model.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
 define('TUTORIAL_db', 'tutorial');
 define('PORTAL_db', SQL_db);
 
@@ -50,9 +50,17 @@ class Attendance extends Model {
 	}
 	
 	function getByStudent($studentID, $code) {
-		$query = "SELECT count(*) present,
-				  (SELECT count(*) FROM ".TUTORIAL_db.".attendance a, ".TUTORIAL_db.".event e WHERE a.studentID = $studentID AND a.eventID = e.eventID AND e.code = ".$this->db->smartQuote($code).") expected
-				  FROM ".TUTORIAL_db.".attendance a, ".TUTORIAL_db.".event e WHERE a.studentID = $studentID AND a.eventID = e.eventID AND a.present = 'true' AND e.code = " . $this->db->smartQuote($code);
+		$query = "SELECT count(*) present, (SELECT count(*)
+                          FROM ".TUTORIAL_db.".attendance a, ".TUTORIAL_db.".event e
+                          WHERE a.studentID = $studentID
+                              AND a.eventID = e.eventID
+                              AND e.code = ".$this->db->smartQuote($code).") expected
+				  FROM ".TUTORIAL_db.".attendance a, ".TUTORIAL_db.".event e
+				  WHERE a.studentID = $studentID
+					  AND a.eventID = e.eventID
+					  AND a.present = 'true'
+					  AND e.code = ".$this->db->smartQuote($code);
+					  
 		return $this->db->getRow($query);
 	}
 	

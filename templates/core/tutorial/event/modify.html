@@ -4,39 +4,26 @@
 <script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
 <script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
 <script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript">
-tinyMCE.init({
-	mode : "textareas",
-	theme : "advanced",
-	plugins : "table",
-	content_css : "/css/ormond-tiny.css",
-	theme_advanced_layout_manager : "RowLayout",
-	theme_advanced_containers_default_align : "left",
-	theme_advanced_container_default_class : "mceToolbar",
-	theme_advanced_containers : "row1,row2,mceEditor,mceElementpath",
-	theme_advanced_container_row1_class : "mceToolbarTop",
-	theme_advanced_container_row2_class : "mceToolbarTop",
-	theme_advanced_container_row1 : "bold,italic,underline,separator,bullist,numlist,outdent,indent,separator,sub,sup,separator,link,unlink,image,charmap,hr,separator,undo,redo",
-	theme_advanced_container_row2 : "forecolor,tablecontrols,separator,removeformat,cleanup,code",
-	extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
-});
-</script>
 <script language="JavaScript" type="text/javascript">
 function verify () {
 	var msg = ""
-	if($('classSelect').value == 2 && $('name').value == "")
+	if($('typeSelect').value == 2 && $('name').value == "")
+		msg += "Name is a required field\n";
+
+	if($('typeSelect').value == 1 && $('classSelect').value == "")
 		msg += "Name is a required field\n";
 	
-	if($('cal_date').value == "")
+	if($('cal_date') && $('cal_date').value == "")
 		msg += "Date is a required field\n";
 	
 	if (!checkTime())
 		msg += "Start time cannot be after the finish time\n";
-	
+
 	if(msg != ""){
 		alert(msg);
 		return false;
+	} else if ($('actionType').value == 'sequence') {
+		return confirm('This will modify all events in the sequence. Press OK to continue.');
 	} else
 		return true;
 }
@@ -77,11 +64,18 @@ window.addEvent('domready', function () {
 			$('classRow').setStyle('display', 'none');
 		}
 	});
+	if ($('deleteSequence')) {
+		$('deleteSequence').addEvent('click', function () {
+			if (confirm('Are you sure you want to delete all {TOTAL_EVENTS} events in this sequence?'))
+				window.open('/modules/tutorial/event/modifyForm.php?deleteSequence={EVENT_ID}','_self','');
+		});
+	}
 });
 </script>
 <!-- END custom_head -->
-<h1>{ACTION} Tutorial</h1>
-<form id="eventForm" class="standardForm" method="post" action="modify-event.php" onsubmit="return verify();">
+<h1>{HEADING}</h1>
+<span class="header_option"><!-- BEGIN sequence_link --><a href="modify.php?eventID={EVENT_ID}&sequence=1">Modify Sequence</a><!-- END sequence_link --></span>
+<form id="eventForm" class="standardForm" method="post" action="modifyForm.php" onsubmit="return verify();">
   <table>
     <tr>
      <td class="formLabelWidth"><h3>Type</h3></td>
@@ -106,6 +100,7 @@ window.addEvent('domready', function () {
       <td class="formLabelWidth"><h3>Room</h3></td>
       <td><input type="text" name="location" size="40" maxlength="50" value="{LOCATION}" /></td>
     </tr> 
+    <!-- BEGIN date -->
     <tr>
       <td class="formLabelWidth" valign="top"><h3>Date</h3>
         <em>Required field. Dates should be in dd/mm/yyyy format. </em></td>
@@ -122,6 +117,13 @@ window.addEvent('domready', function () {
     </script>
       </td>
     </tr>
+    <!-- END date -->
+    <!-- BEGIN date_sequence -->
+    <tr>
+    <td><h3>Date Sequence</h3></td>
+    <td class="bold">{TOTAL_EVENTS} events, from {START_DATE} to {END_DATE}</td>
+    </tr>
+    <!-- END date_sequence -->
     <!-- BEGIN recurring_dates -->
     <tr>
       <td class="formLabelWidth" valign="top"><h3>Repeat</h3>
@@ -170,10 +172,10 @@ window.addEvent('domready', function () {
 
     <tr>
       <td><h3>Tutor</h3></td>
-      <td><table celsspacing="0">
+      <td><table cellspacing="0">
           <tr>
             <td style="width: 100px;"><strong>Primary</strong></td>
-            <td><select id="tutorID_1" name="tutorID_1">
+            <td><select id="tutor1ID" name="tutor1ID">
                 <option value="">N/A</option>
                 <!-- BEGIN tutor_list_1 -->
                 <option value="{TUTOR_ID}" {TUTOR_ID_SELECTED}>{TUTOR_NAME}</option>
@@ -181,9 +183,9 @@ window.addEvent('domready', function () {
               </select>
             </td>
           </tr>
-          <tr>
+          <tr class="pedantic">
             <td><strong>Seconday</strong></td>
-            <td><select id="tutorID_2" name="tutorID_2">
+            <td><select id="tutor2ID" name="tutor2ID">
             	<option value="">N/A</option>
                 <!-- BEGIN tutor_list_2 -->
                 <option value="{TUTOR_ID}" {TUTOR_ID_SELECTED}>{TUTOR_NAME}</option>
@@ -192,26 +194,19 @@ window.addEvent('domready', function () {
           </tr>
         </table></td>
     </tr>
-    <!--
-    <tr>
-      <td><h3>Description</h3>
-        <em>Optional. Additional information relating to the tutorial.</em></td>
-      <td><textarea id="description" name="description" style="width:600px; height:250px">{DESCRIPTION}</textarea></td>
-    </tr>
-    -->
-    <tr>
-    	<td>&nbsp;</td>
-        <td>&nbsp;</td>
-    </tr>
     <tr>
         <td><h3>Cancelled</h3></td>
         <td><input type="checkbox" value="1" name="cancelled" {CANCELLED_SELECTED} /></td>
     </tr>
 
-    <tr>
+    <tr class="pedantic">
       <td>&nbsp;</td>
-      <td><input type="hidden" name="eventID" value="{EVENT_ID}" />
+      <td>
+        <input type="hidden" name="actionType" id="actionType" value="{ACTION_TYPE}" />
+        <input type="hidden" name="eventID" value="{EVENT_ID}" />
         <input class="btn" type="submit" name="submit" value="{ACTION}" />
+        <!-- BEGIN delete_sequence -->
+        <input class="btn" type="button" name="delete" id="deleteSequence" value="Delete Sequence" /><!-- END delete_sequence -->
       </td>
     </tr>
   </table>

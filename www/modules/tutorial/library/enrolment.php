@@ -1,6 +1,6 @@
 <?php
 
-require_once SITE_root.'/include/model.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
 define('TUTORIAL_db', 'tutorial');
 define('PORTAL_db', SQL_db);
 
@@ -13,7 +13,7 @@ class Enrolment extends Model {
 	}
 	
 	function getAllByEvent($code, $eventID) {
-		$query = "SELECT n.*, CONCAT(u.lastname,', ',u.firstname) studentName 
+		$query = "SELECT *
 				  FROM ".TUTORIAL_db.".enrolment n
 				  LEFT JOIN ".PORTAL_db.".user u ON u.id = n.studentID			  
 				  WHERE (n.code = ".$this->db->smartQuote($code)." AND TRIM(n.code) != '') OR n.eventID = $eventID  ORDER BY u.lastname, u.firstname";
@@ -33,7 +33,7 @@ class Enrolment extends Model {
 	
 	function create($data) {
 	
-		require_once SITE_root . '/www/modules/tutorial/library/event.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
 		$eventHandler = new Event;
 		$event = $eventHandler->getByID($data['eventID']);
 		$data['from'] = outputDate("Y-m-d",$event['date']);

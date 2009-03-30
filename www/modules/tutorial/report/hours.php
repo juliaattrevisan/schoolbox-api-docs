@@ -1,12 +1,12 @@
 <?php
-require_once '../../conf/conf.php';
-require_once SITE_root . '/include/sitePage.php';
-require_once SITE_root . '/www/modules/tutorial/library/event.php';
-require_once SITE_root . '/library/group.php';
-require_once SITE_root . '/library/user.php';
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 
 $page = new SitePage();
-$page->setFile(TEMPLATE_content, 'tutorial/report-hours.html');
+$page->setFile(TEMPLATE_content, 'tutorial/report/hours.html');
 $page->setBlock(TEMPLATE_content, 'has_events', 'has_events_block');
 $page->setBlock('has_events', 'tutor_list', 'tutor_list_block');
 $page->setBlock('tutor_list', 'event_list', 'event_list_block');
@@ -49,12 +49,14 @@ if (is_array($tutorList)) {
 				$totalHours = 0;
 				foreach ($eventList as $event) {
 				
-					$output = array('DATE'		=> outputDate(DATE_short_no_time, $event['date']),
+					$output = array('EVENT_ID'	=> $event['eventID'],
+									'DATE'		=> outputDate(DATE_short_no_time, $event['date']),
 									'MARKED'	=> outputDate(DATE_short_no_time, $event['marked']),
 									'START'		=> $event['start'],
 									'FINISH'	=> $event['finish'],
 									'TUTORIAL'	=> scrubText($event['name']),
-									'CODE'		=> scrubText($event['code']),
+									'CODE'		=> !empty($event['code']) ? scrubText($event['code']) : 'N/A',
+									'TYPE'		=> $event['typeName'],
 									'STUDENTS'	=> $event['students'],
 									'HOURS'		=> number_format($event['hours'], 2),
 									);

@@ -82,7 +82,7 @@ class User extends Model {
 		$query .= "ORDER BY group_id, year, lastname, firstname"; 
 		
 		if (is_numeric($limit))
-			$query .= "LIMIT $limit";
+			$query .= " LIMIT $limit";
 
 		return $this->db->getAll($query);
 

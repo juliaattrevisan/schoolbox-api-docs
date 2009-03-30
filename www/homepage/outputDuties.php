@@ -29,5 +29,5 @@ if ($permission < WRITE_ACCESS)
 		$this->setVar("edit_duties_block", "");
 else
 		$this->parse("edit_duties_block", "edit_duties");
-					
+				
 ?>

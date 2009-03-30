@@ -1,0 +1,47 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.js"></script>
+<script type="text/javascript" src="/javascript/jquery.tableruler.js"></script>
+<!-- END custom_head -->
+<h1>Tutorial Management - Statistics</h1>
+<span class="header_option">
+<a href="/modules/tutorial/event/modify.php">Add Tutorial</a>
+</span>
+
+<h1>{SHOW} Events</h1>
+<span class="header_option">
+View <a href="/modules/tutorial/report/statistics.php">All</a> | <a href="/modules/tutorial/report/statistics.php?show=week">Week</a> | <a href="/modules/tutorial/report/statistics.php?show=semester">Semester</a>
+</span>
+<!-- BEGIN has_events -->
+<table class="ruler">
+  <thead>
+  <tr>
+  	<th>Tutorial</th>
+    <th>Code</th>
+    <th>Type</th>
+    <th>Location</th>
+    <th>Count</th>
+    <th>Attendance %</th>
+    <th>Students</th>
+    <th>Tutors</th>
+    <th style="width: 80px;">Enrolments</th>
+  </tr>
+  </thead>
+  <tbody>
+  <!-- BEGIN event_list -->
+  <tr class="{ON_OFF}">
+    <td>{NAME}</td>
+    <td>{CODE}</td>
+    <td>{TYPE}</td>
+    <td>{LOCATION}</td>
+    <td>{COUNT}</td>
+    <td>{ATTENDANCE}</td>
+    <td>{STUDENT_COUNT}</td>
+    <td><!-- BEGIN tutor -->
+    <a href="/search/user/{TUTOR_ID}">{TUTOR_NAME}</a><!-- END tutor --></td>
+    <td><a href="/modules/tutorial/enrolment/list.php?eventID={EVENT_ID}">Class list</a></td>
+  </tr><!-- END event_list -->
+  </tbody>
+</table>
+<!-- END has_events -->
+
+

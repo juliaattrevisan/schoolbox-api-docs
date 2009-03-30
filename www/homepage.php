@@ -201,7 +201,6 @@ if (is_array($componentList)) {
 		} else
 			$this->setVar("config_block", "");	
 		
-		
 		if(is_file($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php')) {
 			include($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php');
 			$this->parse('COLUMN'.$component['column'], $componentHandle, true);

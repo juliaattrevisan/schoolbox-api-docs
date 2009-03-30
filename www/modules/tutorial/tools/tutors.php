@@ -1,11 +1,8 @@
 <?php
 
-require_once '../../../conf/conf.php';
-$_SERVER['DOCUMENT_ROOT'] = SITE_root . '/www';
-
-require_once SITE_root.'/library/user.php';
-require_once SITE_root.'/library/group.php';
-require_once SITE_root.'/www/include/stdfuncs.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/include/stdfuncs.php';
 
 $userHandler = new User;
 $groupHandler = new Group(TUTORIAL_SERVICE);

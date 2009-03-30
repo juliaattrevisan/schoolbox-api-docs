@@ -9,7 +9,7 @@ $keyword = $_GET['keyword'];
 $groupID = $_GET['groupID'];
 
 if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && is_numeric($groupID)) {
-	$userList = $userHandler->searchUser($keyword, $groupID);
+	$userList = $userHandler->searchUser($keyword, $groupID, 30);
 	if (is_array($userList)) {
 		foreach ($userList as $user) {
 			$suggestions[] = scrubText($user['firstname']." ".$user['lastname']);
