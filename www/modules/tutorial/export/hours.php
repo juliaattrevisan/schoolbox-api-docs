@@ -4,10 +4,12 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/attendance.php';
 
 $page = new SitePage;
 $userHandler = new User;
 $eventHandler = new Event;
+$attendaceHandler = new Attendance;
 
 // check access
 $groupHandler = new Group(TUTORIAL_SERVICE);
@@ -17,7 +19,7 @@ if ($groupHandler->getPermission(0) < FULL_ACCESS)
 $from = ausDateToUnix($_GET['from']);
 $to = ausDateToUnix($_GET['to']);
 
-$line = "PortalID,SynergyID,Title,Firstname,Surname,Email,Marked,Tutorial,Code,Type,Tutorial Date,Start Time,Finish Time,Total Students,Hours\n";
+$line = "PortalID,SynergyID,Title,Firstname,Surname,Email,Marked,Tutorial,Code,Type,Tutorial Date,Start Time,Finish Time,Students Enrolled,Student Attended,Hours,Processed\n";
 
 
 $tutorList = $eventHandler->getTutorList();
@@ -30,6 +32,11 @@ if (is_array($tutorList)) {
 			
 			if (is_array($eventList)) {
 				foreach ($eventList as $event) {
+				
+					if ($event['tutor1ID'] == $user['uid'])
+						$processed = $event['tutor1Processed'];
+					else
+						$processed = $event['tutor2Processed'];
 					
 					$output = array($user['uid'],
 								  	$user['synergy_id'],
@@ -44,8 +51,10 @@ if (is_array($tutorList)) {
 									outputDate('Y-m-d', $event['date']),
 									$event['start'],
 									$event['finish'],
-									$event['students'],
+									$event['enrolled'],
+									$attendaceHandler->getCountByEvent($event['eventID']),
 									number_format($event['hours'], 2),
+									'PROCESSED_SELECTED' => $processed == 'true' ? 'Processed' : '',
 									);
 					
 					$line .= outputCSV($output)."\n";

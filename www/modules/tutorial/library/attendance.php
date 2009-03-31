@@ -64,6 +64,11 @@ class Attendance extends Model {
 		return $this->db->getRow($query);
 	}
 	
+	function getCountByEvent($eventID) {
+		$query = "SELECT COUNT(*) FROM ".TUTORIAL_db.".attendance a WHERE a.eventID = $eventID AND a.present = 'true'";
+		return $this->db->getOne($query);
+	}
+	
 	function getReasonList () {
 		$query = "SELECT * FROM ".TUTORIAL_db.".luReason";
 		return $this->db->getAll($query);

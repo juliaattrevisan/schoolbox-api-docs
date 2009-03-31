@@ -38,7 +38,7 @@ function checkTime() {
 	if ($('tohour').value == '')
 		return true;
 	else if ($('period').value == $('toperiod').value) {
-		if (parseInt($('hour').value) > parseInt($('tohour').value))
+		if (parseInt($('hour').value) > parseInt($('tohour').value) && parseInt($('hour').value) != 12)
 			return false;
 		else if ($('hour').value == $('tohour').value) {
 			if (parseInt($('minute').value) > parseInt($('tominute').value))

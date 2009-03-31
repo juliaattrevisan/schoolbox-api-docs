@@ -5,18 +5,25 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
 $eventHandler = new Event;
 $groupHandler = new Group(TUTORIAL_SERVICE);
 
-$this->setBlock($component['name'], 'tutorial_list', 'tutorial_list_block');
+$this->setBlock($component['name'], 'has_tutorials', 'has_tutorials_block');
+$this->setBlock('has_tutorials', 'tutorial_list', 'tutorial_list_block');
 $this->setBlock('tutorial_list', 'modify_tutorial', 'modify_tutorial_block');
 
-$eventList = $eventHandler->getAll('day');
+$this->setBlock($component['name'], 'has_unmarked', 'has_unmarked_block');
+$this->setBlock('has_unmarked', 'unmarked_list', 'unmarked_list_block');
+
+$eventList = $eventHandler->getHome();
 if (is_array($eventList)) {
+	$j = 0;
 	foreach ($eventList as $event) {
 		$output = array('TUTORIAL_ID'			=> $event['eventID'],
+						'TUTORIAL_DATE'			=> outputDate(DATE_long_format, $event['date']),
 						'TUTORIAL_START'		=> $event['start'],
 						'TUTORIAL_FINISH'		=> $event['finish'],
 						'TUTORIAL_NAME'			=> scrubText($event['name']),
 						'TUTORIAL_LOCATION'		=> scrubText($event['location']),
 						'TUTORIAL_CANCELLED'	=> $event['cancelled'] == 'true' ? 'cancelled' : '',
+						'ON_OFF'				=> ++$j%2 ? 'dark' : '', 
 						);
 		$this->setVar($output);
 		
@@ -28,8 +35,35 @@ if (is_array($eventList)) {
 		
 		$this->parse('tutorial_list_block', 'tutorial_list', true);
 	}
+	$this->parse('has_tutorials_block', 'has_tutorials');
+	
 } else
-	$this->setVar('tutorial_list_block', '<li><p>There are no events assigned to you today.</p></li>');
+	$this->setVar('has_tutorials_block', '');
+
+$eventList = $eventHandler->getUncompleted(0, strtotime("-1 day"), $_SESSION['id']);
+if (is_array($eventList)) {
+	$j = 0;
+	foreach ($eventList as $event) {
+		$output = array('TUTORIAL_ID'			=> $event['eventID'],
+						'TUTORIAL_WEEK'			=> outputDate('YW', $event['date']) - 1,
+						'TUTORIAL_DATE'			=> outputDate(DATE_short_format, $event['date']),
+						'TUTORIAL_START'		=> $event['start'],
+						'TUTORIAL_FINISH'		=> $event['finish'],
+						'TUTORIAL_NAME'			=> scrubText($event['name']),
+						'TUTORIAL_LOCATION'		=> scrubText($event['location']),
+						'TUTORIAL_CANCELLED'	=> $event['cancelled'] == 'true' ? 'cancelled' : '',
+						'ON_OFF'				=> ++$j%2 ? 'dark' : '', 
+						);
+		$this->setVar($output);
+	
+		$this->parse('unmarked_list_block', 'unmarked_list', true);
+	}
+	$this->parse('has_unmarked_block', 'has_unmarked');
+	
+} else
+	$this->setVar('has_unmarked_block', '');
+
+
 
 $this->parse('POS'.$component['position'], $component['name']);
 	

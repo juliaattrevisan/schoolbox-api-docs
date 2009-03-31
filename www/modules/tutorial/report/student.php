@@ -24,27 +24,22 @@ if (!isset($_GET['to']))
 $from = ausDateToUnix($_GET['from']);
 $to = ausDateToUnix($_GET['to']);
 
-
 $eventHandler = new Event;
 $userHandler = new User;
 
-if (is_numeric($_GET['userID'])) {
-	
+if (is_numeric($_GET['userID']))
 	$user = $userHandler->getByID($_GET['userID'], 3);
-	if (isset($user['uid']))
-		$studentID	= $user['uid'];
-} 
 
 $output = array('FROM'			=> outputDate("d/m/Y", $from),
 				'TO'			=> outputDate("d/m/Y", $to),
-				'STUDENT'		=> '',
-				'STUDENT_ID'	=> '',
+				'STUDENT'		=> isset($user) ? formatName($user) : '',
+				'STUDENT_ID'	=> $user['uid'],
 				);
 $page->setVar($output);
 
-if (is_numeric($studentID)) {
+if (isset($user['uid'])) {
 	
-		$eventList = $eventHandler->getByStudent($studentID, $from, $to);
+		$eventList = $eventHandler->getByStudent($user['uid'], $from, $to);
 		if (is_array($eventList)) {
 			
 			$i = 0;
@@ -86,8 +81,6 @@ if (is_numeric($studentID)) {
 								'PRESENT'	=> $event['present']=='true'?'Present':'<em>Absent</em>',
 								'HOURS_ATTENDED'	=> number_format($hoursAttended, 2),
 								'HOURS_MISSED'		=> number_format($hoursMissed, 2),
-								'STUDENT'		=> scrubText($event['studentName']),
-								'STUDENT_ID'	=> $event['studentID'],
 								'ON_OFF'		=> ++$j%2? 'dark' : '',
 								);
 				$page->setVar($output);

@@ -53,6 +53,8 @@ $j(document).ready(function () {
         <span class="header_option"><a href="/modules/tutorial/enrolment/list.php?eventID={EVENT_ID}" title="Attendance history">Attendance history</a> | 
         <a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}" title="Modify Event">Modify</a> | 
         <a href="/modules/tutorial/event/modify.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?')" title="Delete Event">Delete</a></span>
+  
+  <!-- BEGIN has_students -->
   <table class="ruler">
     <thead>
       <tr>
@@ -78,6 +80,8 @@ $j(document).ready(function () {
       <!-- END student -->
     </tbody>
   </table>
+  <!-- END has_students -->
+  
   <p class="float-right" style="padding: 10px;">
   <input type="hidden" name="eventID" value="{EVENT_ID}" />
   <input type="hidden" name="week" value="{WEEK}" />

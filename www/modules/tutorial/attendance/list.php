@@ -14,7 +14,8 @@ $groupHandler = new Group(TUTORIAL_SERVICE);
 
 $page->setFile(TEMPLATE_content, 'tutorial/attendance/list.html');
 $page->setBlock(TEMPLATE_content, 'event', 'event_block');
-$page->setBlock('event', 'student', 'student_block');
+$page->setBlock('event', 'has_students', 'has_students_block');
+$page->setBlock('has_students', 'student', 'student_block');
 $page->setBlock('student', 'reason_select', 'reason_select_block');
 $page->setBlock(TEMPLATE_content, 'previous_link', 'previous_link_block');
 $page->setBlock(TEMPLATE_content, 'next_link', 'next_link_block');
@@ -70,6 +71,7 @@ if (is_array($eventList)) {
 		if (is_array($attendanceList)) {
 			$j = 0;
 			$page->setVar('student_block', '');
+			$page->setVar('has_students_block', '');
 			foreach ($attendanceList as $attendance) {
 				$output = array('STUDENT_ID'	=> $attendance['studentID'],
 								'STUDENT_NAME'	=> formatName($attendance),
@@ -93,11 +95,11 @@ if (is_array($eventList)) {
 				//$page->dropDown('reason_select', $attendanceHandler->getReasonList(), $attendance['reason'], 'student', array('reason' => 'REASON'));
 				
 				$page->parse('student_block', 'student', true);
-				
 
 			}
+			$page->parse('has_students_block', 'has_students');
 		} else
-			$page->setVar('student_block', '');
+			$page->setVar('has_students_block', '<p>There are no students enrolled for this event.</p>');
 			
 		$page->parse('event_block', 'event', true);
 	}

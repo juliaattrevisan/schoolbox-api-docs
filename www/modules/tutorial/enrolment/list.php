@@ -13,7 +13,8 @@ $attendanceHandler = new Attendance;
 
 $page->setFile(TEMPLATE_content, 'tutorial/enrolment/list.html');
 $page->setBlock(TEMPLATE_content, 'date_list', 'date_list_block');
-$page->setBlock(TEMPLATE_content, 'enrolment_list', 'enrolment_list_block');
+$page->setBlock(TEMPLATE_content, 'has_enrolments', 'has_enrolments_block');
+$page->setBlock('has_enrolments', 'enrolment_list', 'enrolment_list_block');
 $page->setBlock('enrolment_list', 'attendance_list', 'attendance_list_block');
 $page->setBlock('attendance_list', 'image', 'image_block');
 
@@ -92,10 +93,10 @@ if (is_numeric($_GET['eventID'])) {
 						
 		$page->setVar($output);
 		
-	} else {
-		$page->setVar('enrolment_list_block', '');
-		$page->setVar('date_list_block', '');
-	}
+		$page->parse('has_enrolments_block', 'has_enrolments');
+		
+	} else
+		$page->setVar('has_enrolments_block', '<p>There are no students enrolled in this class.</p>');
 	
 	$page->outputPage();
 	

@@ -17,17 +17,18 @@ class Event extends Model {
 	}
 	
 	
-	function getAll($filter = '') {
+	function getAll($filter = '', $order = 'name', $dir = 'asc', $userID = false) {
 		
-		
-		$query = "SELECT e.*, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish, 
-					concat(t1.firstname,' ',t1.lastname) tutorName1, concat(t2.firstname,' ',t2.lastname) tutorName2 
+		$query = "SELECT e.*, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') startTime, TIME_FORMAT(finish, '%l:%i %p') finishTime, 
+					concat(t1.firstname,' ',t1.lastname) tutorName1, concat(t2.firstname,' ',t2.lastname) tutorName2, y.type typeName
 				  FROM ".TUTORIAL_db.".".$this->_table." e
 				  LEFT JOIN ".TUTORIAL_db.".enrolment n ON (n.code = e.code AND n.code != '') OR n.eventID = e.eventID
 				  LEFT JOIN ".PORTAL_db.".user t1 ON t1.id = e.tutor1ID
 				  LEFT JOIN ".PORTAL_db.".user t2 ON t2.id = e.tutor2ID 
+				  LEFT JOIN ".TUTORIAL_db.".luType y ON y.typeID = e.typeID
 				  WHERE 1=1 ";
-				  
+		
+		$filter = strtolower($filter);	  
 		if ($filter == 'semester') {
 			if (date('m') <= 6)
 				$query .= "AND DATE_FORMAT(`date`, '%m') IN (1,2,3,4,5,6) "; // Jan 1 - Jun 30
@@ -36,14 +37,38 @@ class Event extends Model {
 		}
 		elseif ($filter == 'day')
 			$query .= "AND DATE(`date`) = CURDATE() ";
-		else
+		elseif ($filter != 'all')
 			$query .= "AND DATE_FORMAT(`date`, '%U') = DATE_FORMAT(NOW(),'%U') ";
+
 		
+		if ($this->permission >= FULL_ACCESS && $userID) {
+			$query .= "AND (e.tutor1ID = ".$userID." OR e.tutor2ID = ".$userID." OR n.studentID = " . $userID.") ";
 		
-		if ($this->permission < FULL_ACCESS)
+		} elseif ($this->permission < FULL_ACCESS)
 			$query .= "AND (e.tutor1ID = ".$_SESSION['id']." OR e.tutor2ID = ".$_SESSION['id']." OR n.studentID = " . $_SESSION['id'].") ";
 			
-		$query .= "GROUP BY eventID ORDER BY e.date, e.start";
+		$query .= "GROUP BY eventID ";
+		
+		if ($order)
+			$query .= "ORDER BY `" . $order . "` " . ($dir == 'asc' ? 'ASC' : 'DESC');
+		
+		return $this->db->getAll($query);
+	}
+
+	function getHome () {
+		
+		$query = "SELECT e.*, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish, 
+					concat(t1.firstname,' ',t1.lastname) tutorName1, concat(t2.firstname,' ',t2.lastname) tutorName2, y.type typeName
+				  FROM ".TUTORIAL_db.".".$this->_table." e
+				  LEFT JOIN ".TUTORIAL_db.".enrolment n ON (n.code = e.code AND n.code != '') OR n.eventID = e.eventID
+				  LEFT JOIN ".PORTAL_db.".user t1 ON t1.id = e.tutor1ID
+				  LEFT JOIN ".PORTAL_db.".user t2 ON t2.id = e.tutor2ID 
+				  LEFT JOIN ".TUTORIAL_db.".luType y ON y.typeID = e.typeID
+				  WHERE DATE_FORMAT(`date`, '%U') = DATE_FORMAT(NOW(),'%U')
+				  AND DATE(`date`) >= CURDATE()
+				  AND (e.tutor1ID = ".$_SESSION['id']." OR e.tutor2ID = ".$_SESSION['id']." OR n.studentID = " . $_SESSION['id'].") 
+				  GROUP BY eventID 
+				  ORDER BY date ASC, start ASC";
 		
 		return $this->db->getAll($query);
 	}
@@ -93,7 +118,7 @@ class Event extends Model {
 		return $this->db->getAll($query);
 	}
 
-	function getUncompleted ($from = 0, $to = 0) {
+	function getUncompleted ($from = 0, $to = 0, $userID = false) {
 		$query = "SELECT e.*, UNIX_TIMESTAMP(e.date) date, concat(t1.firstname,' ',t1.lastname) tutorName1, concat(t2.firstname,' ',t2.lastname) tutorName2 , y.type typeName
 				  FROM ".TUTORIAL_db.".".$this->_table." e
 				  LEFT JOIN ".TUTORIAL_db.".attendance a ON a.eventID = e.eventID
@@ -103,27 +128,38 @@ class Event extends Model {
 				  WHERE a.studentID IS NULL ";
 				  
 		if ($from > 0)
-			$query .= "AND DATE(e.date) >= DATE('".outputDate("Y-m-d",$from)."')";
+			$query .= "AND DATE(e.date) >= DATE('".outputDate("Y-m-d",$from)."') ";
 		if ($to > 0)
-			$query .= "AND DATE(e.date) <= DATE('".outputDate("Y-m-d",$to)."')";
+			$query .= "AND DATE(e.date) <= DATE('".outputDate("Y-m-d",$to)."') ";
+		
+		if ($userID)
+			$query .= "AND (e.tutor1ID = ".$userID." OR e.tutor2ID = ".$userID.") ";
 			
 		$query .= "GROUP BY e.eventID ORDER BY e.date";
 		return $this->db->getAll($query);
 	
 	}
 	
-	function getByTutor ($tutorID, $from = 0, $to = 0) {
+	function getByTutor ($tutorID, $from = 0, $to = 0, $filter = 'both') {
 		$query = "SELECT *, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish, 
-					(TIME_TO_SEC(TIMEDIFF(finish, start))/3600) hours, count(a.studentID) students , UNIX_TIMESTAMP(a.created) marked, y.type typeName
+					(TIME_TO_SEC(TIMEDIFF(finish, start))/3600) hours, count(a.studentID) enrolled , UNIX_TIMESTAMP(a.created) marked, y.type typeName
+					
 				  FROM ".TUTORIAL_db.".".$this->_table." e
 				  LEFT JOIN ".TUTORIAL_db.".attendance a ON a.eventID = e.eventID
 				  LEFT JOIN ".TUTORIAL_db.".luType y ON y.typeID = e.typeID
-				  WHERE a.studentID IS NOT NULL AND (e.tutor1ID = $tutorID OR e.tutor2ID = $tutorID) ";
+				  WHERE a.studentID IS NOT NULL ";
 				 
 		if ($from > 0)
-			$query .= "AND DATE(a.created) >= DATE('".outputDate("Y-m-d",$from)."')";
+			$query .= "AND DATE(a.created) >= DATE('".outputDate("Y-m-d",$from)."') ";
 		if ($to > 0)
-			$query .= "AND DATE(a.created) <= DATE('".outputDate("Y-m-d",$to)."')";
+			$query .= "AND DATE(a.created) <= DATE('".outputDate("Y-m-d",$to)."') ";
+		
+		if ($filter == 'unprocessed')
+			$query .= "AND ((e.tutor1ID = $tutorID AND e.tutor1Processed = 'false') OR (e.tutor2ID = $tutorID AND e.tutor2Processed = 'false')) ";
+		elseif ($filter == 'processed')
+			$query .= "AND ((e.tutor1ID = $tutorID AND e.tutor1Processed = 'true') OR (e.tutor2ID = $tutorID AND e.tutor2Processed = 'true')) ";
+		else
+			$query .= "AND (e.tutor1ID = $tutorID OR e.tutor2ID = $tutorID) ";
 			
 		$query .= "GROUP BY a.eventID ORDER BY e.date";
 
@@ -197,8 +233,8 @@ class Event extends Model {
 	
 	function getNewSequenceID () {
 		$query = "SELECT MAX(sequenceID) sequenceID FROM ".TUTORIAL_db.".".$this->_table." ";
-		$sequenceID = $this->db->getRow($query);
-		return $sequence['sequenceID'] + 1;
+		$sequence = $this->db->getRow($query);
+		return ($sequence['sequenceID'] + 1);
 		
 	}
 	
@@ -255,6 +291,18 @@ class Event extends Model {
 	function getTypeList() {
 		$query = "SELECT * FROM ".TUTORIAL_db.".luType ORDER BY `typeID`";
 		return $this->db->getAll($query);
+	}
+	
+	function process($eventID, $tutorID, $processed = true) {
+		$event = $this->getByID($eventID);
+		$data = array('eventID' => $event['eventID']);
+
+		if ($event['tutor1ID'] == $tutorID)
+			$data['tutor1Processed'] = $processed ? 'true' : 'false';
+		elseif ($event['tutor2ID'] == $tutorID)
+			$data['tutor2Processed'] = $processed ? 'true' : 'false';
+
+		$this->update($data);
 	}
 	
 	function deleteBySequence($sequenceID) {
