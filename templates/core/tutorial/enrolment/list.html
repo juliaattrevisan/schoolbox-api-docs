@@ -41,7 +41,7 @@ $j(document).ready(function () {
   <tbody>
     <!-- BEGIN enrolment_list -->
     <tr class="{ON_OFF}">
-      <td style="text-align: center;"><a href="/modules/tutorial/enrolment/modifyForm.php?delete={STUDENT_ID}&code={EVENT_CODE}&eventID={EVENT_ID}" onclick="return confirm('Delete student from classlist?');"><img src="/images/famicons/delete.png" /></a></td>
+      <td style="text-align: center;"><a href="/modules/tutorial/enrolment/modifyForm.php?delete={STUDENT_ID}&eventID={EVENT_ID}" onclick="return confirm('Delete student from classlist?');"><img src="/images/famicons/delete.png" /></a></td>
       <td><a href="/search/user/{STUDENT_ID}">{STUDENT_NAME}</a></td>
       <!-- BEGIN attendance_list -->
       <td>
@@ -54,19 +54,18 @@ $j(document).ready(function () {
 </table>
 <!-- END has_enrolments -->
 
-<p>
+
 <form action="/mail/createMail.php" method="post" class="float-right" style="padding: 10px;">
   <input type="hidden" name="replyto" value="{EVENT_NAME} &lt;{REPLY_TO}&gt;" />
   <input type="hidden" name="bcc" value="{EMAIL_ALL}" />
   <input class="emailall" type="submit" name="emailall" value="Email all" />
 </form>
-</p>
-<p class="float-left">
+
+
 <form action="/modules/tutorial/enrolment/modifyForm.php" method="post" class="standardForm">
   <input class="lookup" type="text" name="keyword" />
   <input type="hidden" name="userID" class="userID" />
-  <input type="hidden" name="code" value="{EVENT_CODE}" />
   <input type="hidden" name="eventID" value="{EVENT_ID}" />
   <input type="submit" value="Add Student" class="btn" />
 </form>
-</p>
+

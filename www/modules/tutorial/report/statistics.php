@@ -50,7 +50,7 @@ if (is_array($eventList)) {
 			
 			// output tutors
 			$page->setVar('tutor_block', '');			
-			$tutorList = $eventHandler->getTutorsByEvent($last['code']);
+			$tutorList = $eventHandler->getTutorsByEvent($last['code'], $last['eventID']);
 			if (is_array($tutorList)) {
 				foreach ($tutorList as $tutor) {
 					$output = array('TUTOR_NAME'	=> formatName($tutor),
@@ -89,7 +89,7 @@ if (is_array($eventList)) {
 
 	// output tutors
 	$page->setVar('tutor_block', '');			
-	$tutorList = $eventHandler->getTutorsByEvent($last['code']);
+	$tutorList = $eventHandler->getTutorsByEvent($last['code'], $event['eventID']);
 	if (is_array($tutorList)) {
 		foreach ($tutorList as $tutor) {
 			$output = array('TUTOR_NAME'	=> formatName($tutor),

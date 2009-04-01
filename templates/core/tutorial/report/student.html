@@ -4,7 +4,6 @@
 <script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
 <script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
 <link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
-
 <script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript">
 var $j = jQuery.noConflict();
@@ -27,9 +26,7 @@ $j(document).ready(function () {
 </script>
 <!-- END custom_head -->
 <h1>Student Report - {STUDENT}</h1>
-<span class="header_option">
-    <a href="/search/user/{STUDENT_ID}">View</a>
-</span>
+<span class="header_option"> <a href="/search/user/{STUDENT_ID}">View</a> </span>
 <form action="/modules/tutorial/report/student.php" method="get">
   <table style="width: 650px;">
     <tr>
@@ -59,9 +56,8 @@ $j(document).ready(function () {
 			singleClick    :    true
 		});
 		</script></td>
-      <td>
-      <input class="userID" type="hidden" name="userID" id="userID" value="{STUDENT_ID}" />
-      <input type="submit" name="submit" value="Report" /></td>
+      <td><input class="userID" type="hidden" name="userID" id="userID" value="{STUDENT_ID}" />
+        <input type="submit" name="submit" value="Report" /></td>
     </tr>
   </table>
 </form>
@@ -69,11 +65,8 @@ $j(document).ready(function () {
 <table cellspacing="0" class="ruler">
   <!-- BEGIN class_list -->
   <tr class="obsessive">
-    <td colspan="7"><h2>{TUTORIAL} - {CODE} - {TYPE}</h2>
-    <span class="header_option">
-    	<a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}">Modify</a>
-    </span>
-    </td>
+    <td colspan="7"><h2>{TUTORIAL} - {CODE} - {TYPE} - {ATTENDANCE}%</h2>
+      <span class="header_option"> <a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}">Modify</a> </span> </td>
   </tr>
   <tr>
     <th style="width: 20%;">Date</th>
@@ -87,20 +80,15 @@ $j(document).ready(function () {
     <td>{DATE}</td>
     <td>{START}</td>
     <td>{FINISH}</td>
-   
     <td style="text-align: right;">{HOURS_MISSED}</td>
-     <td style="text-align: right;">{HOURS_ATTENDED}</td>
+    <td style="text-align: right;">{HOURS_ATTENDED}</td>
   </tr>
   <!-- END event_list -->
-  <tfoot>
-  <tr>
-    <td colspan="2" class="bold">Total</td>
-    <td class="bold">{ATTENDANCE}% Attendance</td>
-    
+  <tr style="margin-bottom: 10px;">
+    <td colspan="3" style="font-weight: bold;">Total</td>
     <td class="bold" style="text-align: right;">{TOTAL_MISSED}</td>
     <td class="bold" style="text-align: right;">{TOTAL_ATTENDED}</td>
   </tr>
-  </tfoot>
   <!-- END class_list -->
 </table>
 <!-- END has_events -->

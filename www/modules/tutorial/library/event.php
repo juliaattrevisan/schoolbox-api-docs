@@ -269,11 +269,21 @@ class Event extends Model {
 		return $output;
 	}
 	
-	function getTutorsByEvent ($code) {
+	function getTutorsByEvent ($code = '', $eventID) {
 		$query = "SELECT u.* FROM ".TUTORIAL_db.".".$this->_table." e, ".PORTAL_db.".user u 
-				  WHERE e.tutor1ID = u.id AND e.code = " . $this->db->smartQuote($code) . " 
-				  UNION SELECT u.* FROM ".TUTORIAL_db.".".$this->_table." e, ".PORTAL_db.".user u 
-				  WHERE e.tutor2ID = u.id AND e.code = " . $this->db->smartQuote($code);
+				  WHERE e.tutor1ID = u.id AND ";
+		if (!empty($code))
+			$query .= "e.code = " . $this->db->smartQuote($code) . " "; 
+		else
+			$query .= "e.eventID = " . (int)$eventID . " ";
+		
+		$query .= "UNION SELECT u.* FROM ".TUTORIAL_db.".".$this->_table." e, ".PORTAL_db.".user u 
+				  WHERE e.tutor2ID = u.id AND ";
+		if (!empty($code))
+			$query .= "e.code = " . $this->db->smartQuote($code) . " "; 
+		else
+			$query .= "e.eventID = " . (int)$eventID . " ";
+							  
 		return $this->db->getAll($query);
 		
 	}

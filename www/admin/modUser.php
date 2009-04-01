@@ -285,7 +285,7 @@ class modUser
 			$this->t_body->set_var("SERVICE_TYPE", $perm[$i]['type']);
 
 			$this->t_body->set_var("SERVICE_REMOVE", 
-				"<a href=\"/group/modUserGroup.php?delete=$id&service=".$perm[$i]['service']."&sid=".$perm[$i]['sid']."&user=$id\">remove</a>");
+				"<a href=\"/group/modifyForm.php?delete=$id&service=".$perm[$i]['service']."&categoryID=".$perm[$i]['sid']."\">remove</a>");
 		
 			$this->t_body->parse("perm", "perm_block", true);
 		}
@@ -402,8 +402,8 @@ $myPage = new modUser;
 
 if(isset($_POST['permSubmit']) && $_POST['permSubmit'] == 'Add')
 {
-	$groupPerm = new Group($_POST['service'], $_POST['sid']);
-	$groupPerm->addMember($_POST['uid'], $_POST['type']);
+	$groupPerm = new Group($_POST['service']);
+	$groupPerm->addUser($_POST['sid'], $_POST['uid'], $_POST['type']);
 }
 
 if(isset($_POST['delete']) && isset($_POST['id']) && $_POST['delete'] && $_POST['id'])

@@ -22,13 +22,17 @@ if (is_numeric($_POST['userID']) && is_numeric($_POST['eventID'])) {
 	$event = $eventHandler->getByID($_POST['eventID']);
 	if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($event['tutor1ID'], $event['tutor2ID'])))
 		error(19);
+		
+	// check event isn't too old
+	if (date("W", $event['date']) < date("W"))
+		error(19);
 
 
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 	$userHandler = new User;
 	$user = $userHandler->getByID($_POST['userID']);
 	if (isset($user['uid'])) {
-		$enrolment = array('code'		=> $_POST['code'],
+		$enrolment = array('code'		=> $event['code'],
 						   'eventID'	=> $_POST['eventID'],
 						   'studentID'	=> $user['uid'],
 						   );
@@ -37,7 +41,7 @@ if (is_numeric($_POST['userID']) && is_numeric($_POST['eventID'])) {
 	
 	$page->backToTheFuture(1);
 }
-elseif (is_numeric($_GET['delete']) && isset($_GET['code']) && is_numeric($_GET['eventID'])) {
+elseif (is_numeric($_GET['delete']) && is_numeric($_GET['eventID'])) {
 
 	/* delete student */
 	
@@ -47,7 +51,7 @@ elseif (is_numeric($_GET['delete']) && isset($_GET['code']) && is_numeric($_GET[
 		error(19);
 
 
-	$enrolmentHandler->deleteByStudent($_GET['delete'], $_GET['code'], $_GET['eventID']);
+	$enrolmentHandler->deleteByStudent($_GET['delete'], $event['code'], $_GET['eventID']);
 
 	$page->backToTheFuture(1);
 

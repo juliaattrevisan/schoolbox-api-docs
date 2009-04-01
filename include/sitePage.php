@@ -66,7 +66,7 @@ class SitePage extends Page {
 		$this->template->pparse('finaloutput', TEMPLATE_body);
 	}
 	
-	function buildPage() {
+	function buildPage($customHead = true) {
 	
 		$this->groupHandler = new Group;
 		
@@ -99,7 +99,7 @@ class SitePage extends Page {
 		
 		$this->parse('MAIN_CONTENT_REGION', TEMPLATE_content);
 		
-		if ($this->getVar('custom_head'))
+		if ($this->getVar('custom_head') && $customHead)
 			$this->parse('CUSTOM_HEADER_REGION', 'custom_head');
 		else
 			$this->setVar('CUSTOM_HEADER_REGION', '');	
@@ -171,7 +171,7 @@ class SitePage extends Page {
 		$this->setFile(TEMPLATE_content, 'common/error.html');
 		$this->setTitle('Error Encountered');
 		$this->setVar("OUTPUT", $output);
-		$this->buildPage();
+		$this->buildPage(false);
 		$this->outputPage(true);
 		exit;
 	

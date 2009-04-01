@@ -8,14 +8,11 @@ $page = new SitePage;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 $categoryHandler = new Category;
 
-$category = $categoryHandler->getByID($_REQUEST['categoryID']);
-
-if (!isset($category['id']))
+if (!is_numeric($_REQUEST['categoryID']))
 	error(2);
 
-	
 // check access
-if($groupHandler->getPermission($category['id']) < FULL_ACCESS)
+if($groupHandler->getPermission($_REQUEST['categoryID']) < FULL_ACCESS)
 	error(19);
 
 if (is_numeric($_GET['type'])) {
@@ -30,14 +27,17 @@ elseif (isset($_REQUEST['delete'])) {
 	// delete user
 	if (!is_array($_REQUEST['delete']))
 		$_REQUEST['delete'] = array($_REQUEST['delete']);
-		
+
+	if (isset($_REQUEST['service']))
+		$groupHandler = new Group($_REQUEST['service']);
+
 	$total = count($_REQUEST['delete']);
 	for ($i = 0; $i < $total; $i++) {
 		if (is_numeric($_REQUEST['delete'][$i]))
 			$groupHandler->deleteUser($_REQUEST['categoryID'], $_REQUEST['delete'][$i]);
 	}
 	
-	localRedir('/group/modify/' . $_REQUEST['categoryID']);
+	$page->backToTheFuture(1);
 }
 elseif (isset($_REQUEST['accept'])) {
 	// accept user
@@ -64,6 +64,12 @@ elseif (isset($_POST['userID'])) {
 
 }
 elseif (is_numeric($_GET['owner'])) {
+	$category = $categoryHandler->getByID($_REQUEST['categoryID']);
+	
+	if (!isset($category['id']))
+		error(2);
+
+
 	//check if member is allowed to become a owner
 	if(!$groupHandler->allowOwner($_GET['owner']))
 		error(30);

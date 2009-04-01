@@ -45,6 +45,8 @@ class Attendance extends Model {
 			$query .= "e.code = ". $this->db->smartQuote($code)." ";	
 		else
 			$query .= "e.eventID = $eventID "; 
+		
+		$query .= "ORDER BY e.date ASC";
 
 		return $this->db->getAll($query);			  
 	}

@@ -58,9 +58,9 @@ window.addEvent('domready', function () {
 	$('typeSelect').addEvent('change', function () {
 		if ($(this).value == 1) {
 			$('nameRow').setStyle('display', 'none');
-			$('classRow').setStyle('display', 'table-row');
+			$('classRow').setStyle('display', '');
 		} else {
-			$('nameRow').setStyle('display', 'table-row');
+			$('nameRow').setStyle('display', '');
 			$('classRow').setStyle('display', 'none');
 		}
 	});

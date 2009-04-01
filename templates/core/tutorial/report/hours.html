@@ -4,6 +4,7 @@
 <script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
 <script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
 <script type="text/javascript">
+var $j = jQuery.noConflict();
 $j(document).ready(function () {
 	$j('#processAll').click(function () {
 		var node = $j(this);
@@ -19,6 +20,7 @@ $j(document).ready(function () {
 		white-space: nowrap;
 		padding: 4px;
 	}
+
 </style>
 <!-- END custom_head -->
 <h1>Hours Performed</h1>
@@ -27,7 +29,7 @@ $j(document).ready(function () {
 </span>
 <form action="/modules/tutorial/report/hours.php" method="get">
   <table class="nowrap">
-    <tr>
+    <tr class="pedantic">
       <td>From:</td>
       <td><input name="from" id="from" type="text" size="15" maxlength="10" value="{FROM}"/>
         <img src="/images/ico_calendar.gif" width="16" height="13" id="from_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>

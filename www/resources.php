@@ -58,7 +58,6 @@ $categoryList = $categoryHandler->getCategoryNode($openCategory);
 if (is_array($categoryList)) {
 
 	foreach ($categoryList as $category) {
-	
 		// get permissions
 		if (!isset($permission[$category['id']]))
 			$permission[$category['id']] = $groupHandler->getPermission($category['id']);

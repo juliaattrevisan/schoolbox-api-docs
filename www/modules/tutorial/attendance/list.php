@@ -16,6 +16,8 @@ $page->setFile(TEMPLATE_content, 'tutorial/attendance/list.html');
 $page->setBlock(TEMPLATE_content, 'event', 'event_block');
 $page->setBlock('event', 'has_students', 'has_students_block');
 $page->setBlock('has_students', 'student', 'student_block');
+$page->setBlock('student', 'remove', 'remove_block');
+$page->setBlock('student', 'remove_grey', 'remove_grey_block');
 $page->setBlock('student', 'reason_select', 'reason_select_block');
 $page->setBlock(TEMPLATE_content, 'previous_link', 'previous_link_block');
 $page->setBlock(TEMPLATE_content, 'next_link', 'next_link_block');
@@ -73,13 +75,22 @@ if (is_array($eventList)) {
 			$page->setVar('student_block', '');
 			$page->setVar('has_students_block', '');
 			foreach ($attendanceList as $attendance) {
-				$output = array('STUDENT_ID'	=> $attendance['studentID'],
-								'STUDENT_NAME'	=> formatName($attendance),
+				$output = array('STUDENT_ID'			=> $attendance['studentID'],
+								'STUDENT_NAME'			=> formatName($attendance),
+								'STUDENT_NAME_ESCAPED' 	=> addslashes(scrubText(formatName($attendance))),
 								'ATTENDANCE_SELECTED'	=> $attendance['present'] != 'false' ? 'checked="checked"' : '',
-								'ACTION'		=> !empty($attendance['present']) ? "Modify" : "Save",
-								'ON_OFF'		=> ++$j%2 ? 'dark':'',
+								'ACTION'				=> !empty($attendance['present']) ? "Modify" : "Save",
+								'ON_OFF'				=> ++$j%2 ? 'dark':'',
 								);
 				$page->setVar($output);
+				
+				// remove button
+				$page->setVar('remove_block', '');
+				$page->setVar('remove_grey_block', '');
+				if (empty($attendance['present']))
+					$page->parse('remove_block', 'remove');
+				else
+					$page->parse('remove_grey_block', 'remove_grey');
 				
 				// reason dropdown, $page->dropDown wasn't working for me
 				if (is_array($reasonList)) {

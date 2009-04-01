@@ -1,5 +1,4 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.js"></script>
 <script type="text/javascript" src="/javascript/jquery.tablerow.js"></script>
 <style type="text/css">
 .cancelled td {
@@ -8,16 +7,19 @@
 .passed td {
 	opacity: 0.5;
 }
+#content table th {
+	background: transparent;
+}
 th.over {
 	text-decoration: underline;
 }
 th.desc {
 	text-decoration: underline;
-	background: url(/images/down-arrow.gif) no-repeat 100% 60%;
+	background: url(/images/tutorial/down-arrow.gif) no-repeat 100% 60% !important;
 	}
 th.asc {
 	text-decoration: underline;
-	background: url(/images/up-arrow.gif) no-repeat 100% 60%;
+	background: url(/images/tutorial/up-arrow.gif) no-repeat 100% 60% !important;
 	}
 </style>
 <!-- END custom_head -->
@@ -66,7 +68,7 @@ View <a href="/modules/tutorial/event/list.php?{USER_URL}">Week</a> | <a href="/
     <td>{TUTORS}</td>
     <!-- BEGIN modify_link -->
     <td><a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}">Modify</a></td>
-    <td><a href="/modules/tutorial/event/modify.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?');">Delete</a></td><!-- END modify_link -->
+    <td><a href="/modules/tutorial/event/modifyForm.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?');">Delete</a></td><!-- END modify_link -->
     
   </tr><!-- END event_list -->
   </tbody>

@@ -1,11 +1,11 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
 
-$page = new SitePage();
+$page = new SitePage;
 
 $eventHandler = new Event;
 $groupHandler = new Group(TUTORIAL_SERVICE);

@@ -57,8 +57,9 @@
 .treeTable span {
   background-position: center left;
   background-repeat: no-repeat;
-  padding: .2em 0 .2em 2em;
+  padding: 2px 0 2px 24px;
 }
+
 
 .treeTable span.file {
   background-image: url(/images/mime/textfile.png);
@@ -66,7 +67,7 @@
 
 .treeTable span.folder, #top {
   background-image: url(/images/mime/folder_blue_full.png);
-  white-space: nowrap;
+  white-space: pre;
 }
 
 .treeTable span.hidden {
