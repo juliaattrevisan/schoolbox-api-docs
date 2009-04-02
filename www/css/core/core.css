@@ -248,6 +248,7 @@ table td { vertical-align: middle; }
 	margin: 0;
 	overflow-y: auto;
 	border: 1px solid #ccc;
+	position: relative;
 	}
 #category-list, #file-list { border: 0; width: 100%; }
 #category-head th, #file-list th { border: 0; font-weight: bold; background:#eee; line-height: 25px; }

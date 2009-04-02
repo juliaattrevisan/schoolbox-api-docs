@@ -17,6 +17,15 @@
 #file-list tbody td {
 	white-space: nowrap;
 }
+
+div.loading {
+	width: 100%;
+	height: 100%;
+	background: #FFFFFF url(/images/slimbox/loading.gif) no-repeat 50% 50%;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+}
 	
 /* TABLE
  * ========================================================================= */

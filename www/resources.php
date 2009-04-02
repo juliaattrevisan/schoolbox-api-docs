@@ -16,6 +16,7 @@ $this->setJavascript('/javascript/jquery.ui.js');
 $this->setJavascript('/javascript/jquery.contextmenu.js');
 $this->setJavascript('/javascript/jquery.simplemodal.js');
 $this->setJavascript('/javascript/jquery.resources.js');
+$this->setJavascript('/javascript/jquery.scrollTo.js');
 
 $this->setCss('/css/jquery.contextmenu.css');
 $this->setCss('/css/jquery.resources.css');
@@ -50,6 +51,7 @@ while ($parentID > 0) {
 
 $output = array('WRITE'	=> $groupHandler->getPermission(0) >= WRITE_ACCESS ? 'write' : '',
 				'FULL'	=> $groupHandler->getPermission(0) >= FULL_ACCESS ? 'full' : '',
+				'OPEN' 	=> $openCategory,
 				);
 $this->setVar($output);
 

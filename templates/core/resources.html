@@ -199,6 +199,9 @@ $j(document).ready(function() {
 		addContext: addContext
 	});
 	
+	$j("div.loading").hide();
+	$j("#category-window").scrollTo($j("#node-{OPEN}"), 200);
+	
 });
 </script>
 <style type="text/css">
@@ -227,6 +230,7 @@ $j(document).ready(function() {
 <div class="template4">
   <div class="left">
     <div id="category-window">
+    <div class="loading"></div>
       <table id="category-head">
       	<thead>
         	<th>Folders</th>
@@ -245,9 +249,11 @@ $j(document).ready(function() {
         </tbody>
       </table>
     </div>
+    
   </div>
   <div class="right">
     <div id="file-window">
+      <div class="loading"></div>
       <table id="file-list">
         <thead>
         <th>Name</th>
