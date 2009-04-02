@@ -24,7 +24,7 @@ if (is_numeric($_POST['userID']) && is_numeric($_POST['eventID'])) {
 		error(19);
 		
 	// check event isn't too old
-	if (date("W", $event['date']) < date("W"))
+	if ($event['date'] < strtotime("-1 month"))
 		error(19);
 
 

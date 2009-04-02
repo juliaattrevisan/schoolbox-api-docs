@@ -77,7 +77,7 @@ $j(document).ready(function () {
             	onclick="return confirm('{STUDENT_NAME_ESCAPED} will be removed from this class. Press OK to continue.');" title="Remove student from class.">
              	<img src="/images/tutorial/enrolment-delete.gif" alt="Remove enrolment" /></a><!-- END remove -->
             <!-- BEGIN remove_grey -->
-            <img src="/images/tutorial/enrolment-delete-grey.gif" title="You cannot remove this attendance" alt="" /><!-- END remove_grey -->
+            <img src="/images/tutorial/enrolment-delete-grey.gif" title="You cannot remove attendance" alt="" /><!-- END remove_grey -->
         </td>
         <td><a href="/search/user/{STUDENT_ID}">{STUDENT_NAME}</a></td>
         <td><select name="reason[{STUDENT_ID}]" class="reason_select">
@@ -100,7 +100,7 @@ $j(document).ready(function () {
   </form>
 
   <!-- BEGIN add_student -->
-  <form action="/modules/tutorial/enrolment/modifyForm.php" method="post" class="standardForm {ALLOWADD}" onsubmit="return this.userID.value != ''; ">
+  <form action="/modules/tutorial/enrolment/modifyForm.php" method="post" class="standardForm {DISABLED}" onsubmit="return this.userID.value != ''; ">
     <input class="lookup" type="text" name="keyword" />
     <input type="hidden" name="userID" class="userID" />
     <input type="hidden" name="eventID" value="{EVENT_ID}" />

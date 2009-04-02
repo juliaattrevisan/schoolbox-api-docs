@@ -63,7 +63,6 @@ if (is_array($eventList)) {
 						'EVENT_CODE'	=> scrubText($event['code']),
 						'ACTION'		=> 'Save',
 						'DISABLED'		=> $event['date'] < strtotime("-1 month")  ? "disabled" : "", // disable modifying attendance after 1 month
-						'ALLOWADD'		=> date("W", $event['date']) < date("W")  ? "disabled" : "", // disable add student if date has passed
 						
 						);
 		$page->setVar($output);
