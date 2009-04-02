@@ -1,6 +1,5 @@
 <div class="box" id="component{COMPONENT_ID}">
     <h2 class="cont-head">Duties</h2>
-  </div>
   <table>
     <tr>
       <td colspan="2" class="large_text"><b>{DATE}</b></td>
@@ -10,7 +9,7 @@
       <td class="large_text" ><b>Staff Assigned</b></td>
     </tr>
     <!-- BEGIN duties -->
-    <tr>
+    <tr class="{ON_OFF}">
       <td class="large_text" >{DUTY}</td>
       <td class="large_text" >{ASSIGNEDUSER}</td>
     </tr>
@@ -21,8 +20,7 @@
     <!-- BEGIN edit_duties -->
     <tr>
       <td style="text-align:right;" colspan="2" 
-class="navbar"><img src="/images/mgs/arrow_bullet.gif" alt="small arrow" 
-/><a href="/subject/editDuties.php?category={ID}">EDIT DUTIES</a></td>
+class="navbar"><a href="/subject/editDuties.php?category={ID}">Edit Duites</a></td>
     </tr>
     <!-- END edit_duties -->
   </table>

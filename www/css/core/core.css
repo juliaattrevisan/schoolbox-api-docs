@@ -84,8 +84,8 @@ a:hover { text-decoration: underline; }
 /*--------------------------------------------------------------
  Text formatting styles 
 --------------------------------------------------------------*/
-p           { margin: 0 0 1em 0; text-align:left; line-height: 1.5; }
-ul, ol      { margin: 0 0 1.5em 1.5em; line-height: 1.5; }
+p           { margin: 0 0 1em 0; text-align:left; line-height: 1.2; }
+ul, ol      { margin: 0 0 1.5em 1.5em; line-height: 1.2; }
 hr { background-color: #d2d2d2; border: 0; height: 1px; }
 /*--------------------------------------------------------------
  Heading Styles 
@@ -115,32 +115,32 @@ table.ruler { width: 100%; }
 #container {
 	padding-left:180px;
 	text-align: left;
-	min-width: 819px;
+	min-width: 996px;
 	} 
 #content {
 	padding: 5px 20px 20px 20px;
 	background: #fff;
 	}
 .left {
-	min-width: 382px;
-	width: 49.5%;
+	min-width: 535px;
+	width: 69%;
 	float: left;
 	margin-right: 1%;
 	overflow: hidden;
 	}
 .right {
-	min-width: 382px;
-	width: 49.5%;
+	min-width: 229px;
+	width: 29.5%;
 	float: left;
 	overflow: hidden;
 	}
-.template1 .left {
-	min-width: 535px;
-	width: 69.5%;
+.template2 .left {
+	min-width: 382px;
+	width: 49.5%;
 	}
-.template1 .right {
-	min-width: 229px;
-	width: 29.5%;
+.template2 .right {
+	min-width: 382px;
+	width: 49.5%;
 	}
 .template3 .left {
 	min-width: 764px;
@@ -244,18 +244,19 @@ table.ruler { width: 100%; }
 -------------------------------------------------------------*/
 table td { vertical-align: middle; }
 #category-window, #file-window {
-	height: 430px;
+	height: 420px;
 	margin: 0;
-	overflow-y: auto;
 	border: 1px solid #ccc;
 	position: relative;
 	}
-#category-list, #file-list { border: 0; width: 100%; }
+#category-head, #file-head { margin: 0; }
+#category-list, #file-list { border: 0; width: 100%; overflow: auto; margin-top:1em; }
 #category-head th, #file-list th { border: 0; font-weight: bold; background:#eee; line-height: 25px; }
 #category-list td, #file-list td { width: auto; }
 #category-list thead {
 	padding: 10px;
 	}
+.scroller { height: 384px; overflow: auto; }
 #file-window #file-list tbody tr td {
 	padding: 0.3em 3em 0.3em 0.6em;
 	}
@@ -384,6 +385,10 @@ h2 {
 	height: 26px;
 	text-indent: 16px;
 	position: relative;
+	margin-bottom: 10px;
+	}
+.left h2, .right h2 {
+	margin-bottom: 0;
 	}
 h2 span {
 	font-weight: normal;
@@ -426,6 +431,8 @@ h2 span {
 	background: #fff;
 	padding: 0;
 	font-size: 80%;
+	width: 10%;
+	vertical-align: top;
 	}
 #timetable h3 {
 	background: #6b6b6b;
@@ -505,11 +512,12 @@ h2 span {
 #content table tr.dark td {
 	background: #ececec;
 	}
-.listing h3 { float: left; line-height: 1.6; width: 70%; }
+.listing h3 { float: left; line-height: 1.2; width: 70%; }
 .listing h3 a:hover { color: #003e7e; }
 .listing p { clear: both; margin: 0; }
-.listing p.float { float: left; width: 70%; }
+.listing p.float { float: left; width: 70%; clear: none; }
 p.interact { font-size: 90%; text-align: right; clear: none; white-space: nowrap; }
+p.interact-left { font-size: 90%; float: left; clear: none; white-space: nowrap; width: 30%; }
 li p.interact { margin: 0 0 0 15px; float: right; }
 p.interact a { color: #003e7e; }
 .listing p.small { font-size: 90%; float: right; color: #989898; }
@@ -777,6 +785,13 @@ div.indent {
 .standardForm tr,
 .standardForm td {
 	border-bottom: 1px solid #ccc;
+	}
+.standardForm tr.pedantic,
+.standardForm .pedantic td {
+	border-bottom: 0;
+	}
+tr.obsessive, .obsessive td {
+	padding: 0;
 	}
 .standardForm tr.dark,
 .standardForm tr.dark td {
