@@ -10,7 +10,7 @@
 //Site Directives
 define("HEADING", 'OurSchool');			//This will appear on the window title of each page
 define("SITE_name", "Alaress Pty Ltd");
-define("MAX_FILE_SIZE", 10485760); 			//Maximum filesize in bytes allowed to be uploaded (default 10MB) (also set in php.ini)
+
 define("SITE_location", "ormond");				//This defines the location, allows specific code for each location
 define("SITE_root", dirname(__FILE__)."/../../");
 define('SITE_address', 'http://www.alaress.com.au');
@@ -50,6 +50,7 @@ define('ZIP_directory', 		SITE_root.'/zip');			//Cache for zip files
 define("THUMBNAIL_IMAGE_CACHE", SITE_root.'/thumbnails');	//Thumbnail cache 
 define("THUMBNAIL_size", 		100); 
 define("FILE_max_upload", 		"10");						//Maximum number of files that can be uploaded via bulk uploader
+define("MAX_FILE_SIZE", 		10485760); 					//Maximum filesize in bytes allowed to be uploaded (default 10MB) (also set in php.ini)
 define("URLS_use_frame", 		false);						//Open links in frame
 define('FILE_use_frame', 		false);
 define('MIME_magic', 			'/usr/share/file/magic');

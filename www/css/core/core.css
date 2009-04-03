@@ -517,7 +517,7 @@ h2 span {
 .listing p { clear: both; margin: 0; }
 .listing p.float { float: left; width: 70%; clear: none; }
 p.interact { font-size: 90%; text-align: right; clear: none; white-space: nowrap; }
-p.interact-left { font-size: 90%; float: left; clear: none; white-space: nowrap; width: 30%; }
+p.interact-left { font-size: 90%; float: left; clear: none; white-space: nowrap; width: 120px; }
 li p.interact { margin: 0 0 0 15px; float: right; }
 p.interact a { color: #003e7e; }
 .listing p.small { font-size: 90%; float: right; color: #989898; }

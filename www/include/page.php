@@ -167,7 +167,7 @@ if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && (i
 		$this->t_body->set_var('WEBMAIL_LOCATION', 'href="/mail.php"');
 	}
 	else if(SITE_location == 'wenona') {
-		$this->t_body->set_var('WEBMAIL_LOCATION', 'href="http://webmail.wenona.nsw.edu.au/gw/webacc" target="_blank"');
+		$this->t_body->set_var('WEBMAIL_LOCATION', 'href="https://webmail.wenona.nsw.edu.au/owa" target="_blank"');
 		$this->t_body->set_var('WEBMAIL_TITLE', '<em>W</em>ebmail');
 
 	}

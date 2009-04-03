@@ -226,9 +226,9 @@ class SitePage extends Page {
 			if(SITE_location == 'mgs')
 			{
 				if($this->groupHandler->isStaff())
-					$this->setVar("WEBMAIL_LOCATION", 'href=\"https://webmail.mgs.vic.edu.au/exchange/" target="_blank"');
+					$this->setVar("WEBMAIL_LOCATION", 'href="https://webmail.mgs.vic.edu.au/exchange/" target="_blank"');
 				else
-					$this->setVar("WEBMAIL_LOCATION", "href=\"/mail/\"");
+					$this->setVar("WEBMAIL_LOCATION", 'href="/mail/"');
 			}
 			else if(SITE_location == 'ormond') 
 			{
@@ -239,13 +239,10 @@ class SitePage extends Page {
 			}
 			else if(SITE_location == 'wenona') {
 				if($this->groupHandler->isStaff()) {
-					$this->setVar('WEBMAIL_LOCATION', 'href="http://webmail.wenona.nsw.edu.au/gw/webacc/" target="_blank"');
-					$this->setVar('WEBMAIL_TITLE', '<em>W</em>ebmail');
+					$this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.wenona.nsw.edu.au/owa" target="_blank"');
 				}
 				else {
 					$this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
-					$this->setVar('WEBMAIL_TITLE', '<em>W</em>ebmail');
-		
 				}
 			}
 		}
