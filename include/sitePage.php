@@ -420,14 +420,12 @@ class SitePage extends Page {
 	function setFile($handle, $file) {
 		$this->template->set_file($handle, $this->getTemplate($file));
 		
-		if($handle == TEMPLATE_content)
+		if($handle == TEMPLATE_content) {
 			$this->templateFile = $file;
-		
-		$contents = @file_get_contents($this->templateRoot . '/' . $this->getTemplate($file));
-		if (strpos($contents, "<!-- BEGIN custom_head -->") !== false) {
 			$this->setBlock($handle, "custom_head", "custom_head_block");
 			$this->setVar('custom_head_block', '');
 		}
+
 	}
 	
 	function setTitle($title) {
