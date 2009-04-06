@@ -91,15 +91,10 @@ class Event extends Model {
 	}
 	
 	function getStatistics ($filter = '') {
-		$query = "SELECT DISTINCT e.*, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish, 
-				  concat(t1.firstname,' ',t1.lastname) tutorName1, concat(t2.firstname,' ',t2.lastname) tutorName2,
-				  (SELECT count(*) FROM ".TUTORIAL_db.".attendance a2, ".TUTORIAL_db.".event e2 WHERE a2.eventID = e2.eventID AND e2.code = e.code AND a2.present = 'true') present,
-				  (SELECT count(*) FROM ".TUTORIAL_db.".attendance a3, ".TUTORIAL_db.".event e3 WHERE a3.eventID = e3.eventID AND e3.code = e.code) expected, y.type typeName
-				  FROM ".TUTORIAL_db.".".$this->_table." e
-				  LEFT JOIN ".PORTAL_db.".user t1 ON t1.id = e.tutor1ID
-				  LEFT JOIN ".PORTAL_db.".user t2 ON t2.id = e.tutor2ID 
-				  LEFT JOIN ".TUTORIAL_db.".luType y ON y.typeID = e.typeID
-				  WHERE 1=1 ";
+		$query = "SELECT e.*, COUNT( a.studentID) expected, COUNT(IF(a.present='true',1,NULL)) attended, COUNT(DISTINCT e.eventID) classes 
+				  FROM ".TUTORIAL_db.".event e
+				  LEFT JOIN ".TUTORIAL_db.".attendance a ON a.eventID = e.eventID
+				  WHERE e.typeID = 1 ";
 				  
 		if ($filter == 'semester') {
 			if (date('m') <= 6)
@@ -113,7 +108,29 @@ class Event extends Model {
 		if ($this->permission < FULL_ACCESS)
 			$query .= "AND (e.tutor1ID = ".$_SESSION['id']." OR e.tutor2ID = ".$_SESSION['id'].")";
 		
-		$query .= "ORDER BY e.code, date";
+		$query .= "GROUP BY e.code ORDER BY e.code, date";
+		
+		return $this->db->getAll($query);
+	}
+
+	function getConsultationStatistics ($filter = '') {
+		$query = "SELECT e.*, COUNT( a.studentID) expected, COUNT(IF(a.present='true',1,NULL)) attended FROM ".TUTORIAL_db.".event e 
+				  LEFT JOIN ".TUTORIAL_db.".attendance a ON a.eventID = e.eventID
+				  WHERE e.typeID = 2  ";
+				  
+		if ($filter == 'semester') {
+			if (date('m') <= 6)
+				$query .= "AND DATE_FORMAT(`date`, '%m') IN (1,2,3,4,5,6) "; // Jan 1 - Jun 30
+			else
+				$query .= "AND DATE_FORMAT(`date`, '%m') IN (7,8,9,10,11,12) "; // Jul 1 - Dec 31
+		}
+		elseif ($filter == 'week')
+			$query .= "AND DATE_FORMAT(`date`, '%U') = DATE_FORMAT(NOW(),'%U') ";
+		
+		if ($this->permission < FULL_ACCESS)
+			$query .= "AND (e.tutor1ID = ".$_SESSION['id']." OR e.tutor2ID = ".$_SESSION['id'].")";
+		
+		$query .= " GROUP BY e.eventID ORDER BY e.name, date";
 		
 		return $this->db->getAll($query);
 	}
@@ -203,13 +220,18 @@ class Event extends Model {
 	}
 
 	function getStudentCount($code, $eventID) {
-		$query = "SELECT studentID FROM ".TUTORIAL_db.".attendance a, ".TUTORIAL_db.".event e 
-				  WHERE (a.eventID = e.eventID AND e.code = ".$this->db->smartQuote($code)." AND TRIM(e.code) != '' ) OR a.eventID = $eventID GROUP BY studentID
-				  UNION SELECT studentID FROM ".TUTORIAL_db.".enrolment n 
-				  WHERE (n.code = " . $this->db->smartQuote($code)." AND TRIM(n.code) != '' ) OR n.eventID = $eventID";
-				
-		$result = $this->db->getAll($query);
-		return $this->db->affectedRows($result);		
+		
+		if (!empty($code))
+			$query = "SELECT COUNT(*) FROM ".TUTORIAL_db.".enrolment n WHERE n.code = " . $this->db->smartQuote($code);
+		else
+			$query = "SELECT COUNT(DISTINCT studentID) FROM ".TUTORIAL_db.".attendance a, ".TUTORIAL_db.".event e WHERE a.eventID = $eventID";
+			
+		return $this->db->getOne($query);
+	}
+	
+	function getEventCount($code, $eventID) {
+		$query = "SELECT COUNT(*) FROM ".TUTORIAL_db.".event e WHERE (e.code = " . $this->db->smartQuote($code)." AND TRIM(e.code) != '') OR e.eventID = $eventID";
+		return $this->db->getOne($query);
 	}
 	
 	function getByID ($eventID) {

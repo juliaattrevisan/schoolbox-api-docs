@@ -1,5 +1,6 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<script type="text/javascript" src="/javascript/jquery.js"></script>
 <script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript">
 var $j = jQuery.noConflict();
@@ -41,7 +42,13 @@ $j(document).ready(function () {
   <tbody>
     <!-- BEGIN enrolment_list -->
     <tr class="{ON_OFF}">
-      <td style="text-align: center;"><a href="/modules/tutorial/enrolment/modifyForm.php?delete={STUDENT_ID}&eventID={EVENT_ID}" onclick="return confirm('Delete student from classlist?');"><img src="/images/famicons/delete.png" /></a></td>
+      <td style="text-align: center;">
+      <!-- BEGIN remove -->
+      <a href="/modules/tutorial/enrolment/modifyForm.php?delete={STUDENT_ID}&eventID={EVENT_ID}" onclick="return confirm('Delete student from classlist?');">
+      <img src="/images/famicons/delete.png" /></a><!-- END remove -->
+      <!-- BEGIN remove_grey -->
+            <img src="/images/tutorial/enrolment-delete-grey.gif" title="You cannot remove attendance" alt="" /><!-- END remove_grey -->
+      </td>
       <td><a href="/search/user/{STUDENT_ID}">{STUDENT_NAME}</a></td>
       <!-- BEGIN attendance_list -->
       <td>

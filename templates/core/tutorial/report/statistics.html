@@ -1,26 +1,23 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.tableruler.js"></script>
-<!-- END custom_head -->
-<h1>Tutorial Management - Statistics</h1>
+<h1>Tutorial Management - Statistics - {SHOW} Events</h1>
 <span class="header_option">
+
+View <a href="/modules/tutorial/report/statistics.php">All</a> | <a href="/modules/tutorial/report/statistics.php?show=week">Week</a> | 
+<a href="/modules/tutorial/report/statistics.php?show=semester">Semester</a> | 
+
 <a href="/modules/tutorial/event/modify.php">Add Tutorial</a>
 </span>
 
-<h1>{SHOW} Events</h1>
-<span class="header_option">
-View <a href="/modules/tutorial/report/statistics.php">All</a> | <a href="/modules/tutorial/report/statistics.php?show=week">Week</a> | <a href="/modules/tutorial/report/statistics.php?show=semester">Semester</a>
-</span>
 <!-- BEGIN has_events -->
+<h2>{TYPE}</h1>
 <table class="ruler">
   <thead>
   <tr>
   	<th>Tutorial</th>
     <th>Code</th>
-    <th>Type</th>
     <th>Location</th>
     <th>Classes</th>
     <th>Attendance %</th>
-    <th>Students</th>
+    <th>Enrolled</th>
     <th>Tutors</th>
   </tr>
   </thead>
@@ -29,7 +26,6 @@ View <a href="/modules/tutorial/report/statistics.php">All</a> | <a href="/modul
   <tr class="{ON_OFF}">
     <td><a href="/modules/tutorial/enrolment/list.php?eventID={EVENT_ID}">{NAME}</a></td>
     <td>{CODE}</td>
-    <td>{TYPE}</td>
     <td>{LOCATION}</td>
     <td>{COUNT}</td>
     <td>{ATTENDANCE}</td>

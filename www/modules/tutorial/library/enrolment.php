@@ -13,11 +13,27 @@ class Enrolment extends Model {
 	}
 	
 	function getAllByEvent($code, $eventID) {
-		$query = "SELECT *
-				  FROM ".TUTORIAL_db.".enrolment n
-				  LEFT JOIN ".PORTAL_db.".user u ON u.id = n.studentID			  
-				  WHERE (n.code = ".$this->db->smartQuote($code)." AND TRIM(n.code) != '') OR n.eventID = $eventID  ORDER BY u.lastname, u.firstname";
+		if (!empty($code)) {
+			$query = "SELECT n.studentID FROM ".TUTORIAL_db.".enrolment n WHERE n.code = ".$this->db->smartQuote($code)."
+					  UNION SELECT a.studentID FROM ".TUTORIAL_db.".attendance a, ".TUTORIAL_db.".event e WHERE a.eventID = e.eventID AND e.code = ".$this->db->smartQuote($code)."";
+		} else {
+			$query = "SELECT n.studentID FROM ".TUTORIAL_db.".enrolment n WHERE n.eventID = " . $eventID . "
+					  UNION SELECT a.studentID FROM ".TUTORIAL_db.".attendance a WHERE a.eventID = " . $eventID;
+		}
+		
 		return $this->db->getAll($query);	
+	}
+	
+	function isEnrolled($studentID, $code, $eventID) {
+		if (!empty($code))
+			$query = "SELECT * FROM ".TUTORIAL_db.".enrolment n WHERE n.studentID = " . $studentID . " AND n.code = ".$this->db->smartQuote($code)."";
+		else
+			$query = "SELECT * FROM ".TUTORIAL_db.".enrolment n WHERE n.studentID = " . $studentID . " AND n.eventID = ".$eventID."";
+		$result = $this->db->getRow($query);
+		if (isset($result['studentID']))
+			return true;
+		else
+			return false;
 	}
 	
 	function deleteByStudent($studentID, $code, $eventID = 0) {

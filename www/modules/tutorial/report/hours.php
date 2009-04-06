@@ -76,7 +76,6 @@ if (is_array($_POST['processed'])) {
 
 						$output = array('TUTOR_ID'		=> $user['uid'],
 										'TUTOR_NAME'	=> scrubText($tutor['name']),
-										'TOTAL'			=> number_format($totalHours, 2),
 										);
 						$page->setVar($output);
 					
@@ -107,7 +106,9 @@ if (is_array($_POST['processed'])) {
 						
 					}
 
-					
+					$output = array('TOTAL'			=> number_format($totalHours, 2),
+									);
+					$page->setVar($output);
 		
 					$page->parse('tutor_list_block', 'tutor_list', true);
 					$page->setVar('event_list_block', '');

@@ -2,6 +2,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/enrolment.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/attendance.php';
@@ -10,11 +11,14 @@ $page = new SitePage;
 $eventHandler = new Event;
 $enrolmentHandler = new Enrolment;
 $attendanceHandler = new Attendance;
+$userHandler = new User;
 
 $page->setFile(TEMPLATE_content, 'tutorial/enrolment/list.html');
 $page->setBlock(TEMPLATE_content, 'date_list', 'date_list_block');
 $page->setBlock(TEMPLATE_content, 'has_enrolments', 'has_enrolments_block');
 $page->setBlock('has_enrolments', 'enrolment_list', 'enrolment_list_block');
+$page->setBlock('enrolment_list', 'remove', 'remove_block');
+$page->setBlock('enrolment_list', 'remove_grey', 'remove_grey_block');
 $page->setBlock('enrolment_list', 'attendance_list', 'attendance_list_block');
 $page->setBlock('attendance_list', 'image', 'image_block');
 
@@ -50,14 +54,25 @@ if (is_numeric($_GET['eventID'])) {
 			$i++;
 			$attendance = $attendanceHandler->getByStudent($enrolment['studentID'], $event['code']);
 			$percentage = $attendance['expected'] > 0 ? number_format(($attendance['present']/$attendance['expected'])*100, 2) . " %" : 'N/A';
+			$user = $userHandler->getByID($enrolment['studentID']);
+			
 			$output = array('STUDENT_ID'	=> $enrolment['studentID'],
-							'STUDENT_NAME'	=> formatName($enrolment),
+							'STUDENT_NAME'	=> formatName($user),
 							'PERCENTAGE'	=> $percentage,
 							'ON_OFF' 		=>  ++$j%2? 'dark' : '',
 							);
 			$page->setVar($output);
 			
-			$emailAll .= formatEmail($enrolment).",";
+			// remove button
+			$page->setVar('remove_block', '');
+			$page->setVar('remove_grey_block', '');
+			if ($enrolmentHandler->isEnrolled($enrolment['studentID'], $event['code'], $event['eventID']))
+				$page->parse('remove_block', 'remove');
+			else
+				$page->parse('remove_grey_block', 'remove_grey');
+		
+			$emailAll .= formatEmail($user).",";
+			
 			
 			// output attendance per date
 			$attendanceList = $attendanceHandler->getAllByStudent($enrolment['studentID'], $event['code'], $event['eventID']);
