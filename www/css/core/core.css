@@ -512,10 +512,10 @@ h2 span {
 #content table tr.dark td {
 	background: #ececec;
 	}
-.listing h3 { float: left; line-height: 1.2; width: 70%; }
+.listing h3 { float: left; line-height: 1.2; width: 60%; }
 .listing h3 a:hover { color: #003e7e; }
 .listing p { clear: both; margin: 0; }
-.listing p.float { float: left; width: 70%; clear: none; }
+.listing h4 { float: left; width: 60%; clear: none; font-weight: normal; line-height: 1.2; }
 p.interact { font-size: 90%; text-align: right; clear: none; white-space: nowrap; }
 p.interact-left { font-size: 90%; float: left; clear: none; white-space: nowrap; width: 120px; }
 li p.interact { margin: 0 0 0 15px; float: right; }
