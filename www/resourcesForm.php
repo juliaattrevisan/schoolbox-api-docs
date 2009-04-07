@@ -22,9 +22,14 @@ if (is_numeric($_POST['folders'])) {
 
 			if ($permission[$category['id']] >= READ_ACCESS) {
 			
+				//append code to name
+				$name = scrubTEXT($category['name']);
+				if($category['code'] != '' && $category['code'] != $category['name'])
+					$name .= ' ('.scrubTEXT($category['code']).')';
+			
 				$children = (int)$categoryHandler->hasChildren($category['id']);
 				$output[] = array('id'			=> $category['id'],
-								  'name'		=> scrubText($category['name']),
+								  'name'		=> $name,
 								  'parent'		=> $category['parent'],
 								  'children'	=> $children,
 								  'homepage'	=> $category['template'] > 0 ? 'true' : 'false',
@@ -59,11 +64,11 @@ elseif (is_numeric($_POST['files'])) {
 			
 			if (empty($file['modified']))
 				$file['modified'] = $file['submitted'];
-				
+			
 			$output[] = array('id'			=> $file['id'],
 							  'name'		=> scrubText($file['description']),
 							  'category'	=> $file['category'],
-							  'modified'	=> outputDate(DATE_short_format, $file['modified']),
+							  'modified'	=> getRelativeTime($file['modified'], 0, ''),
 							//'size'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
 							  'owner'		=> formatName($file),
 							  'icon'		=> !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile",

@@ -96,8 +96,14 @@ if (is_array($categoryList)) {
 			// write access
 			$permission[$category['id']] == FULL_ACCESS ? $class[] = "full" : null;
 			
+			$name = scrubTEXT($category['name']);
+			
+			//append code to name
+			if($category['code'] != '' && $category['code'] != $category['name'])
+				$name .= ' ('.scrubTEXT($category['code']).')';
+			
 			$output = array('CATEGORY_ID'		=> $category['id'],
-							'CATEGORY_NAME'		=> scrubText($category['name']),
+							'CATEGORY_NAME'		=> $name,
 							'CLASS'				=> implode(" ", $class),
 							);	
 			$this->setVar($output);
@@ -134,7 +140,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 		$output = array('FILE_ID' 	 	=> $file['id'],
 						'TYPE'			=> $file['url'] ? 'link' : 'file',
 						'FILE_NAME' 	=> scrubText($file['description']),
-						'FILE_MODIFIED'	=> outputDate(DATE_short_format, $file['modified']),
+						'FILE_MODIFIED'	=> getRelativeTime($file['modified'], 0, ''),
 						'FILE_OWNER'	=> formatName($file),
 						'FILE_SIZE'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
 						'CATEGORY_ID'	=> $file['category'],
