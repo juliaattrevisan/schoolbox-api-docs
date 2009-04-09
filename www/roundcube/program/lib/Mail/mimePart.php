@@ -47,7 +47,7 @@
  * @author     Sean Coates <sean@php.net>
  * @copyright  2003-2006 PEAR <pear-group@php.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
- * @version    CVS: $Id: mimePart.php 2186 2008-12-22 18:27:25Z alec $
+ * @version    CVS: $Id: mimePart.php 2281 2009-02-08 17:05:23Z alec $
  * @link       http://pear.php.net/package/Mail_mime
  */
 
@@ -436,7 +436,7 @@ class Mail_mimePart {
             }
             $headCount++;
         }
-        $headers = implode(MAIL_MIMEPART_CRLF, $headers) . ';';
+        $headers = implode(';' . MAIL_MIMEPART_CRLF, $headers) . ';';
         return $headers;
     }
 

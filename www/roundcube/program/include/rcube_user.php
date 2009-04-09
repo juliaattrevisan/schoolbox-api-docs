@@ -5,7 +5,7 @@
  | program/include/rcube_user.inc                                        |
  |                                                                       |
  | This file is part of the RoundCube Webmail client                     |
- | Copyright (C) 2005-2008, RoundCube Dev. - Switzerland                 |
+ | Copyright (C) 2005-2009, RoundCube Dev. - Switzerland                 |
  | Licensed under the GNU GPL                                            |
  |                                                                       |
  | PURPOSE:                                                              |
@@ -141,7 +141,6 @@ class rcube_user
   {
     $sql_result = $this->list_identities($id ? sprintf('AND identity_id=%d', $id) : '');
     return $this->db->fetch_assoc($sql_result);
-  	return false;
   }
   
   

@@ -5,7 +5,7 @@
  | program/steps/mail/func.inc                                           |
  |                                                                       |
  | This file is part of the RoundCube Webmail client                     |
- | Copyright (C) 2005-2008, RoundCube Dev. - Switzerland                 |
+ | Copyright (C) 2005-2009, RoundCube Dev. - Switzerland                 |
  | Licensed under the GNU GPL                                            |
  |                                                                       |
  | PURPOSE:                                                              |
@@ -15,14 +15,13 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: func.inc 2197 2008-12-30 13:30:20Z thomasb $
+ $Id: func.inc 2324 2009-03-02 17:34:18Z thomasb $
 
 */
 
-require_once('lib/enriched.inc');
 require_once('include/rcube_smtp.inc');
 
-$EMAIL_ADDRESS_PATTERN = '/([a-z0-9][a-z0-9\-\.\+\_]*@[a-z0-9]([a-z0-9\-][.]?)*[a-z0-9]\\.[a-z]{2,5})/i';
+$EMAIL_ADDRESS_PATTERN = '([a-z0-9][a-z0-9\-\.\+\_]*@[a-z0-9]([a-z0-9\-][.]?)*[a-z0-9]\\.[a-z]{2,5})';
 
 // actions that do not require imap connection
 $NOIMAP_ACTIONS = array('spell', 'addcontact', 'autocomplete', 'upload', 'display-attachment', 'remove-attachment');
@@ -295,8 +294,7 @@ function rcmail_message_list($attrib)
     $out .= sprintf("<td class=\"icon\">%s</td>\n", $message_icon ? sprintf($image_tag, $skin_path, $message_icon, '') : '');
 
 
-    if (!empty($header->charset))
-      $IMAP->set_charset($header->charset);
+    $IMAP->set_charset(!empty($header->charset) ? $header->charset : $CONFIG['default_charset']);
   
     // format each col
     foreach ($a_show_cols as $col)
@@ -404,8 +402,7 @@ function rcmail_js_message_list($a_headers, $insert_top=FALSE)
     if (empty($header))
       continue;
 
-    if (!empty($header->charset))
-      $IMAP->set_charset($header->charset);
+    $IMAP->set_charset(!empty($header->charset) ? $header->charset : $CONFIG['default_charset']);
 
     // remove 'attachment' and 'flag' columns, we don't need them here
     if(($key = array_search('attachment', $a_show_cols)) !== FALSE)
@@ -613,22 +610,128 @@ function rcmail_get_mailbox_name_text()
     return rcmail_localize_foldername($RCMAIL->imap->get_mailbox_name());
 }
 
+/**
+ * Sets message is_safe flag according to 'show_images' option value
+ *
+ * @param object rcube_message Message
+ */
+function rcmail_check_safe(&$message)
+{
+  global $RCMAIL;
+
+  $show_images = $RCMAIL->config->get('show_images');
+  if (!$message->is_safe
+    && !empty($show_images)
+    && $message->has_html_part())
+  {
+    switch($show_images) {
+      case '1': // known senders only
+        $CONTACTS = new rcube_contacts($RCMAIL->db, $_SESSION['user_id']);
+        if ($CONTACTS->search('email', $message->sender['mailto'], true, false)->count) {
+          $message->set_safe(true);
+        }
+      break;
+      case '2': // always
+        $message->set_safe(true);
+      break;
+    }
+  }
+}
+
+/**
+ * Cleans up the given message HTML Body (for displaying)
+ *
+ * @param string HTML
+ * @param array  Display parameters 
+ * @param array  CID map replaces (inline images)
+ * @return string Clean HTML
+ */
+function rcmail_wash_html($html, $p = array(), $cid_replaces)
+{
+  global $REMOTE_OBJECTS;
+  
+  $p += array('safe' => false, 'inline_html' => true);
+  
+  // special replacements (not properly handled by washtml class)
+  $html_search = array(
+    '/(<\/nobr>)(\s+)(<nobr>)/i',	// space(s) between <NOBR>
+    '/(<[\/]*st1:[^>]+>)/i',		// Microsoft's Smart Tags <ST1>
+    '/<\/?rte_text>/i',			// Rich Text Editor tags (#1485647)
+    '/<title>.*<\/title>/i',		// PHP bug #32547 workaround: remove title tag
+    '/<html[^>]*>/im',			// malformed html: remove html tags (#1485139)
+    '/<\/html>/i',			// malformed html: remove html tags (#1485139)
+    '/^[\xFE\xFF\xBB\xBF\x00]+((?:<\!doctype|\<html))/im',	// remove byte-order mark (only outlook?)
+  );
+  $html_replace = array(
+    '\\1'.' &nbsp; '.'\\3',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '\\1',
+  );
+  $html = preg_replace($html_search, $html_replace, $html);
+
+  // charset was converted to UTF-8 in rcube_imap::get_message_part() -> change charset specification in HTML accordingly
+  $charset_pattern = '/(\s+content=[\'"]?\w+\/\w+;\s*charset)=([a-z0-9-_]+)/i';
+  if (preg_match($charset_pattern, $html)) {
+    $html = preg_replace($charset_pattern, '\\1='.RCMAIL_CHARSET, $html);
+  }
+  else {
+    // add head for malformed messages, washtml cannot work without that
+    if (!preg_match('/<head[^>]*>(.*)<\/head>/Uims', $html))
+      $html = '<head></head>'. $html;
+    $html = substr_replace($html, '<meta http-equiv="content-type" content="text/html; charset='.RCMAIL_CHARSET.'" />', intval(stripos($html, '<head>')+6), 0);
+  }
+    
+  // turn relative into absolute urls
+  $html = rcmail_resolve_base($html);
+
+  // clean HTML with washhtml by Frederic Motte
+  $wash_opts = array(
+    'show_washed' => false,
+    'allow_remote' => $p['safe'],
+    'blocked_src' => "./program/blocked.gif",
+    'charset' => RCMAIL_CHARSET,
+    'cid_map' => $cid_replaces,
+    'html_elements' => array('body'),
+  );
+    
+  if (!$p['inline_html']) {
+    $wash_opts['html_elements'] = array('html','head','title','body');
+  }
+  if ($p['safe']) {
+    $wash_opts['html_elements'][] = 'link';
+    $wash_opts['html_attribs'] = array('rel','type');
+  }
+    
+  $washer = new washtml($wash_opts);
+  $washer->add_callback('form', 'rcmail_washtml_callback');
+
+  if ($p['safe']) {  // allow CSS styles, will be sanitized by rcmail_washtml_callback()
+    $washer->add_callback('style', 'rcmail_washtml_callback');
+  }
+    
+  $html = $washer->wash($html);
+  $REMOTE_OBJECTS = $washer->extlinks;
+  
+  return $html;
+}
+
 
 /**
  * Convert the given message part to proper HTML
  * which can be displayed the message view
  *
  * @param object rcube_message_part Message part
- * @param bool  True if external objects (ie. images ) are allowed
- * @param bool  True if part should be converted to plaintext
+ * @param array  Display parameters array 
  * @return string Formatted HTML string
  */
 function rcmail_print_body($part, $p = array())
 {
-  global $REMOTE_OBJECTS;
-  
   $p += array('safe' => false, 'plain' => false, 'inline_html' => true);
-  
+
   // convert html to text/plain
   if ($part->ctype_secondary == 'html' && $p['plain']) {
     $txt = new html2text($part->body, false, true);
@@ -637,70 +740,12 @@ function rcmail_print_body($part, $p = array())
   }
   // text/html
   else if ($part->ctype_secondary == 'html') {
-    $html = $part->body;
-
-    // special replacements (not properly handled by washtml class)
-    $html_search = array(
-      '/(<\/nobr>)(\s+)(<nobr>)/i',	// space(s) between <NOBR>
-      '/(<[\/]*st1:[^>]+>)/i',		// Microsoft's Smart Tags <ST1>
-      '/<\/?rte_text>/i',		// Rich Text Editor tags (#1485647)
-      '/<title>.*<\/title>/i',		// PHP bug #32547 workaround: remove title tag
-      '/<html[^>]*>/im',		// malformed html: remove html tags (#1485139)
-      '/<\/html>/i',			// malformed html: remove html tags (#1485139)
-      '/^[\xFE\xFF\xBB\xBF\x00]+((?:<\!doctype|\<html))/im',	// remove byte-order mark (only outlook?)
-    );
-    $html_replace = array(
-      '\\1'.' &nbsp; '.'\\3',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '\\1',
-    );
-    $html = preg_replace($html_search, $html_replace, $html);
-
-    // charset was converted to UTF-8 in rcube_imap::get_message_part() -> change charset specification in HTML accordingly
-    $charset_pattern = '/(\s+content=[\'"]?\w+\/\w+;\s*charset)=([a-z0-9-_]+)/i';
-    if (preg_match($charset_pattern, $html)) {
-      $html = preg_replace($charset_pattern, '\\1='.RCMAIL_CHARSET, $html);
-    }
-    else {
-      // add head for malformed messages, washtml cannot work without that
-      if (!preg_match('/<head[^>]*>(.*)<\/head>/Uims', $html))
-        $html = '<head></head>'. $html;
-      $html = substr_replace($html, '<meta http-equiv="content-type" content="text/html; charset='.RCMAIL_CHARSET.'" />', intval(stripos($html, '<head>')+6), 0);
-    }
-
-    // clean HTML with washhtml by Frederic Motte
-    $wash_opts = array(
-      'show_washed' => false,
-      'allow_remote' => $p['safe'],
-      'blocked_src' => "./program/blocked.gif",
-      'charset' => RCMAIL_CHARSET,
-      'cid_map' => $part->replaces,
-      'html_elements' => array('body'),
-    );
-    
-    if (!$p['inline_html']) {
-      $wash_opts['html_elements'] = array('html','head','title','body');
-    }
-    
-    $washer = new washtml($wash_opts);
-    $washer->add_callback('form', 'rcmail_washtml_callback');
-    
-    if ($p['safe']) {  // allow CSS styles, will be sanitized by rcmail_washtml_callback()
-      $washer->add_callback('style', 'rcmail_washtml_callback');
-    }
-    
-    $body = $washer->wash($html);
-    $REMOTE_OBJECTS = $washer->extlinks;
-
-    return $body;
+    return rcmail_wash_html($part->body, $p, $part->replaces);
   }
   // text/enriched
   else if ($part->ctype_secondary=='enriched') {
     $part->ctype_secondary = 'html';
+    require_once('lib/enriched.inc');
     return Q(enriched_to_html($part->body), 'show');
   }
   else
@@ -710,22 +755,15 @@ function rcmail_print_body($part, $p = array())
   /**** assert plaintext ****/
 
   // make links and email-addresses clickable
-  $convert_patterns = $convert_replaces = $replace_strings = array();
+  $replacements = new rcube_string_replacer;
   
   $url_chars = 'a-z0-9_\-\+\*\$\/&%=@#:;';
   $url_chars_within = '\?\.~,!';
-
-  $convert_patterns[] = "/([\w]+):\/\/([a-z0-9\-\.]+[a-z]{2,4}([$url_chars$url_chars_within]*[$url_chars])?)/ie";
-  $convert_replaces[] = "rcmail_str_replacement('<a href=\"\\1://\\2\" target=\"_blank\">\\1://\\2</a>', \$replace_strings)";
-
-  $convert_patterns[] = "/([^\/:]|\s)(www\.)([a-z0-9\-]{2,}[a-z]{2,4}([$url_chars$url_chars_within]*[$url_chars])?)/ie";
-  $convert_replaces[] = "rcmail_str_replacement('\\1<a href=\"http://\\2\\3\" target=\"_blank\">\\2\\3</a>', \$replace_strings)";
-  
-  $convert_patterns[] = '/([a-z0-9][a-z0-9\-\.\+\_]*@[a-z0-9]([a-z0-9\-][.]?)*[a-z0-9]\\.[a-z]{2,5})/ie';
-  $convert_replaces[] = "rcmail_str_replacement('<a href=\"mailto:\\1\" onclick=\"return ".JS_OBJECT_NAME.".command(\'compose\',\'\\1\',this)\">\\1</a>', \$replace_strings)";
   
   // search for patterns like links and e-mail addresses
-  $body = preg_replace($convert_patterns, $convert_replaces, $body);
+  $body = preg_replace_callback("/([\w]+):\/\/([a-z0-9\-\.]+[a-z]{2,4}([$url_chars$url_chars_within]*[$url_chars])?)/i", array($replacements, 'link_callback'), $body);
+  $body = preg_replace_callback("/([^\/:]|\s)(www\.)([a-z0-9\-]{2,}[a-z]{2,4}([$url_chars$url_chars_within]*[$url_chars])?)/i", array($replacements, 'link_callback'), $body);
+  $body = preg_replace_callback('/([a-z0-9][a-z0-9\-\.\+\_]*@[a-z0-9]([a-z0-9\-][.]?)*[a-z0-9]\\.[a-z]{2,5})/i', array($replacements, 'mailto_callback'), $body);
 
   // split body into single lines
   $a_lines = preg_split('/\r?\n/', $body);
@@ -754,10 +792,11 @@ function rcmail_print_body($part, $p = array())
   }
 
   // insert the links for urls and mailtos
-  $body = preg_replace("/##string_replacement\{([0-9]+)\}##/e", "\$replace_strings[\\1]", join("\n", $a_lines));
+  $body = $replacements->resolve(join("\n", $a_lines));
 
   return html::tag('pre', array(), $body);
 }
+
 
 /**
  * add a string to the replacement array and return a replacement string
@@ -956,19 +995,30 @@ function rcmail_message_body($attrib)
   }
 
 
+/**
+ * Convert all relative URLs according to a <base> in HTML
+ */
+function rcmail_resolve_base($body)
+{
+  // check for <base href=...>
+  if (preg_match('!(<base.*href=["\']?)([hftps]{3,5}://[a-z0-9/.%-]+)!i', $body, $regs)) {
+    $replacer = new rcube_base_replacer($regs[2]);
+
+    // replace all relative paths
+    $body = preg_replace_callback('/(src|background|href)=(["\']?)([\.\/]+[^"\'\s]+)(\2|\s|>)/Ui', array($replacer, 'callback'), $body);
+    $body = preg_replace_callback('/(url\s*\()(["\']?)([\.\/]+[^"\'\)\s]+)(\2)\)/Ui', array($replacer, 'callback'), $body);
+  }
+
+  return $body;
+}
 
 /**
  * modify a HTML message that it can be displayed inside a HTML page
  */
 function rcmail_html4inline($body, $container_id)
   {
-  $base_url = "";
   $last_style_pos = 0;
   $body_lc = strtolower($body);
-  
-  // check for <base href>
-  if (preg_match(($base_reg = '/(<base.*href=["\']?)([hftps]{3,5}:\/{2}[^"\'\s]+)([^<]*>)/i'), $body, $base_regs))
-    $base_url = $base_regs[2];
   
   // find STYLE tags
   while (($pos = strpos($body_lc, '<style', $last_style_pos)) && ($pos2 = strpos($body_lc, '</style>', $pos)))
@@ -976,23 +1026,17 @@ function rcmail_html4inline($body, $container_id)
     $pos = strpos($body_lc, '>', $pos)+1;
 
     // replace all css definitions with #container [def]
-    $styles = rcmail_mod_css_styles(substr($body, $pos, $pos2-$pos), $container_id, $base_url);
+    $styles = rcmail_mod_css_styles(substr($body, $pos, $pos2-$pos), $container_id);
 
     $body = substr($body, 0, $pos) . $styles . substr($body, $pos2);
     $body_lc = strtolower($body);
     $last_style_pos = $pos2;
     }
 
-  // resolve <base href>
-  if ($base_url)
-    {
-    $body = preg_replace('/(src|background|href)=(["\']?)([\.\/]+[^"\'\s]+)(\2|\s|>)/Uie', "'\\1=\"'.make_absolute_url('\\3', '$base_url').'\"'", $body);
-    $body = preg_replace('/(url\s*\()(["\']?)([\.\/]+[^"\'\)\s]+)(\2)\)/Uie', "'\\1\''.make_absolute_url('\\3', '$base_url').'\')'", $body);
-    $body = preg_replace($base_reg, '', $body);
-    }
-    
   // modify HTML links to open a new window if clicked
-  $body = preg_replace('/<(a|link)\s+([^>]+)>/Uie', "rcmail_alter_html_link('\\1','\\2', '$container_id');", $body);
+  $GLOBALS['rcmail_html_container_id'] = $container_id;
+  $body = preg_replace_callback('/<(a|link)\s+([^>]+)>/Ui', 'rcmail_alter_html_link', $body);
+  unset($GLOBALS['rcmail_html_container_id']);
 
   // add comments arround html and other tags
   $out = preg_replace(array(
@@ -1020,20 +1064,24 @@ function rcmail_html4inline($body, $container_id)
 /**
  * parse link attributes and set correct target
  */
-function rcmail_alter_html_link($tag, $attrs, $container_id)
+function rcmail_alter_html_link($matches)
 {
-  $attrib = parse_attrib_string($attrs);
+  global $EMAIL_ADDRESS_PATTERN;
+  
+  $tag = $matches[1];
+  $attrib = parse_attrib_string($matches[2]);
   $end = '>';
 
   if ($tag == 'link' && preg_match('/^https?:\/\//i', $attrib['href'])) {
-    $attrib['href'] = "./bin/modcss.php?u=" . urlencode($attrib['href']) . "&amp;c=" . urlencode($container_id);
+    $attrib['href'] = "./bin/modcss.php?u=" . urlencode($attrib['href']) . "&amp;c=" . urlencode($GLOBALS['rcmail_html_container_id']);
     $end = ' />';
   }
-  else if (stristr((string)$attrib['href'], 'mailto:')) {
+  else if (preg_match("/^mailto:$EMAIL_ADDRESS_PATTERN/i", $attrib['href'], $mailto)) {
+    $attrib['href'] = $mailto[0];
     $attrib['onclick'] = sprintf(
       "return %s.command('compose','%s',this)",
       JS_OBJECT_NAME,
-      JQ(substr($attrib['href'], 7)));
+      JQ($mailto[1]));
   }
   else if (!empty($attrib['href']) && $attrib['href'][0] != '#') {
     $attrib['target'] = '_blank';
@@ -1064,7 +1112,7 @@ function rcmail_address_string($input, $max=null, $linked=false, $addicon=null)
     if ($PRINT_MODE) {
       $out .= sprintf('%s &lt;%s&gt;', Q($part['name']), $part['mailto']);
     }
-    else if (preg_match($EMAIL_ADDRESS_PATTERN, $part['mailto'])) {
+    else if (preg_match("/$EMAIL_ADDRESS_PATTERN/i", $part['mailto'])) {
       if ($linked) {
         $out .= html::a(array(
             'href' => 'mailto:'.$part['mailto'],
@@ -1293,7 +1341,8 @@ function rcmail_send_mdn($uid)
 
   $message = new rcube_message($uid);
   
-  if ($message->headers->mdn_to && !$message->headers->mdn_sent && $IMAP->check_permflag('MDNSENT'))
+  if ($message->headers->mdn_to && !$message->headers->mdn_sent &&
+    ($IMAP->check_permflag('MDNSENT') || $IMAP->check_permflag('*')))
   {
     $identity = $RCMAIL->user->get_identity();
     $sender = format_email_recipient($identity['email'], $identity['name']);

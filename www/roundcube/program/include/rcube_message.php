@@ -5,7 +5,7 @@
  | program/include/rcube_message.php                                     |
  |                                                                       |
  | This file is part of the RoundCube Webmail client                     |
- | Copyright (C) 2008, RoundCube Dev. - Switzerland                      |
+ | Copyright (C) 2008-2009, RoundCube Dev. - Switzerland                 |
  | Licensed under the GNU GPL                                            |
  |                                                                       |
  | PURPOSE:                                                              |
@@ -65,19 +65,19 @@ class rcube_message
     $this->imap = $this->app->imap;
     
     $this->uid = $uid;
-    $this->headers = $this->imap->get_headers($uid);
+    $this->headers = $this->imap->get_headers($uid, NULL, true, true);
+
     $this->subject = rcube_imap::decode_mime_string($this->headers->subject, $this->headers->charset);
     list(, $this->sender) = each($this->imap->decode_address_list($this->headers->from));
     
     $this->set_safe((intval($_GET['_safe']) || $_SESSION['safe_messages'][$uid]));
-    
     $this->opt = array(
       'safe' => $this->is_safe,
       'prefer_html' => $this->app->config->get('prefer_html'),
       'get_url' => rcmail_url('get', array('_mbox' => $this->imap->get_mailbox_name(), '_uid' => $uid))
     );
 
-    if ($this->structure = $this->imap->get_structure($uid)) {
+    if ($this->structure = $this->imap->get_structure($uid, $this->headers->body_structure)) {
       $this->get_mime_numbers($this->structure);
       $this->parse_structure($this->structure);
     }
@@ -166,17 +166,13 @@ class rcube_message
    */
   function first_html_part()
     {
-    $html_part = null;
-
     // check all message parts
     foreach ($this->mime_parts as $mime_id => $part) {
       $mimetype = strtolower($part->ctype_primary . '/' . $part->ctype_secondary);
       if ($mimetype == 'text/html') {
-        $html_part = $this->imap->get_message_part($this->uid, $mime_id, $part);
+        return $this->imap->get_message_part($this->uid, $mime_id, $part);
       }
     }
-
-    return $html_part;
   }
 
 
@@ -266,7 +262,7 @@ class rcube_message
           $html_part = $p;
         else if ($sub_ctype_primary=='text' && $sub_ctype_secondary=='enriched')
           $enriched_part = $p;
-        else if ($sub_ctype_primary=='multipart' && ($sub_ctype_secondary=='related' || $sub_ctype_secondary=='mixed'))
+        else if ($sub_ctype_primary=='multipart' && in_array($sub_ctype_secondary, array('related', 'mixed', 'alternative')))
           $related_part = $p;
       }
 
@@ -366,6 +362,14 @@ class rcube_message
         // ignore "virtual" protocol parts
         else if ($primary_type == 'protocol')
           continue;
+          
+        // part is Microsoft outlook TNEF (winmail.dat)
+        else if ($primary_type == 'application' && $secondary_type == 'ms-tnef') {
+          foreach ((array)$this->imap->tnef_decode($mail_part, $structure->headers['uid']) as $tnef_part) {
+            $this->mime_parts[$tnef_part->mime_id] = $tnef_part;
+            $this->attachments[] = $tnef_part;
+          }
+        }
 
         // part is file/attachment
         else if ($mail_part->disposition == 'attachment' || $mail_part->disposition == 'inline' ||
@@ -381,10 +385,10 @@ class rcube_message
             if ($mail_part->headers['content-location'])
               $mail_part->content_location = $mail_part->headers['content-base'] . $mail_part->headers['content-location'];
             
-	    if ($mail_part->content_id || $mail_part->content_location) {
+            if ($mail_part->content_id || $mail_part->content_location) {
               $this->inline_parts[] = $mail_part;
             }
-	  }
+          }
           // is regular attachment
           else {
             if (!$mail_part->filename)

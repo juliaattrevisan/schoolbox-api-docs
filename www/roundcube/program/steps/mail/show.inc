@@ -5,7 +5,7 @@
  | program/steps/mail/show.inc                                           |
  |                                                                       |
  | This file is part of the RoundCube Webmail client                     |
- | Copyright (C) 2005-2008, RoundCube Dev. - Switzerland                 |
+ | Copyright (C) 2005-2009, RoundCube Dev. - Switzerland                 |
  | Licensed under the GNU GPL                                            |
  |                                                                       |
  | PURPOSE:                                                              |
@@ -15,7 +15,7 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: show.inc 2115 2008-12-04 10:21:34Z alec $
+ $Id: show.inc 2301 2009-02-18 19:15:36Z alec $
 
 */
 
@@ -43,23 +43,7 @@ if ($_GET['_uid']) {
   $mbox_name = $IMAP->get_mailbox_name();
   
   // show images?
-  $show_images = $RCMAIL->config->get('show_images');
-  if(!$MESSAGE->is_safe
-	&& !empty($show_images)
-	&& $MESSAGE->has_html_part())
-  {
-    switch($show_images) {
-      case '1': // known senders only
-        $CONTACTS = new rcube_contacts($DB, $_SESSION['user_id']);
-	if ($CONTACTS->search('email', $MESSAGE->sender['mailto'], true, false)->count) {
-          $MESSAGE->set_safe(true);
-	  }
-      break;
-      case '2': // always
-        $MESSAGE->set_safe(true);
-      break;
-    }
-  }
+  rcmail_check_safe($MESSAGE);
 
   // calculate Etag for this request
   $etag = md5($MESSAGE->uid.$mbox_name.session_id()
@@ -91,7 +75,7 @@ if ($_GET['_uid']) {
   // check for unset disposition notification
   if ($MESSAGE->headers->mdn_to &&
       !$MESSAGE->headers->mdn_sent && !$MESSAGE->headers->seen &&
-      $IMAP->check_permflag('MDNSENT') &&
+      ($IMAP->check_permflag('MDNSENT') || $IMAP->check_permflag('*')) &&
       $mbox_name != $CONFIG['drafts_mbox'] &&
       $mbox_name != $CONFIG['sent_mbox'])
   {

@@ -5,7 +5,7 @@
  | program/steps/mail/sendmail.inc                                       |
  |                                                                       |
  | This file is part of the RoundCube Webmail client                     |
- | Copyright (C) 2005-2008, RoundCube Dev. - Switzerland                 |
+ | Copyright (C) 2005-2009, RoundCube Dev. - Switzerland                 |
  | Licensed under the GNU GPL                                            |
  |                                                                       |
  | PURPOSE:                                                              |
@@ -16,7 +16,7 @@
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
 
- $Id: sendmail.inc 2193 2008-12-29 14:43:45Z alec $
+ $Id: sendmail.inc 2320 2009-03-01 07:55:39Z alec $
 
 */
 
@@ -30,7 +30,7 @@ $savedraft = !empty($_POST['_draft']) ? TRUE : FALSE;
 /****** checks ********/
 
 if (!isset($_SESSION['compose']['id'])) {
-  raise_error(array('code' => 500, 'file' => __FILE__, 'message' => "Invalid compose ID"), true, false);
+  raise_error(array('code' => 500, 'type' => 'smtp', 'file' => __FILE__, 'message' => "Invalid compose ID"), true, false);
   console("Sendmail error", $_SESSION['compose']);
   $OUTPUT->show_message("An internal error occured. Please try again.", 'error');
   $OUTPUT->send('iframe');
@@ -98,49 +98,85 @@ function rcmail_attach_emoticons(&$mime_message)
 {
   global $CONFIG;
 
-  $htmlContents = $mime_message->getHtmlBody();
+  $body = $mime_message->getHtmlBody();
 
   // remove any null-byte characters before parsing
-  $body = preg_replace('/\x00/', '', $htmlContents);
+  $body = preg_replace('/\x00/', '', $body);
   
-  $last_img_pos = 0;
   $searchstr = 'program/js/tiny_mce/plugins/emotions/img/';
-  $path_len = strlen(INSTALL_PATH . '/');
+  $offset = 0;
 
   // keep track of added images, so they're only added once
   $included_images = array();
 
-  // find emoticon image tags
-  while ($pos = strpos($body, $searchstr, $last_img_pos))
-    {
-    $pos2 = strpos($body, '"', $pos);
-    $body_pre = substr($body, 0, $pos);
-    $body_post = substr($body, $pos2);
+  if (preg_match_all('# src=[\'"]([^\'"]+)#', $body, $matches, PREG_OFFSET_CAPTURE)) {
+    foreach ($matches[1] as $m) {
+      // find emoticon image tags
+      if (preg_match('#'.$searchstr.'(.*)$#', $m[0], $imatches)) {
+        $image_name = $imatches[1];
 
-    $image_name = substr($body,
-                         $pos + strlen($searchstr),
-                         $pos2 - ($pos + strlen($searchstr)));
+        // sanitize image name so resulting attachment doesn't leave images dir
+        $image_name = preg_replace('/[^a-zA-Z0-9_\.\-]/i', '', $image_name);
+        $img_file = INSTALL_PATH . '/' . $searchstr . $image_name;
 
-    // sanitize image name so resulting attachment doesn't leave images dir
-    $image_name = preg_replace('/[^a-zA-Z0-9_\.\-]/i','',$image_name);
-    $img_file = INSTALL_PATH . '/' . $searchstr . $image_name;
+        if (! in_array($image_name, $included_images)) {
+          // add the image to the MIME message
+          if(! $mime_message->addHTMLImage($img_file, 'image/gif', '', true, $image_name))
+            $OUTPUT->show_message("emoticonerror", 'error');
+          array_push($included_images, $image_name);
+        }
 
-    if (! in_array($image_name, $included_images))
-      {
-      // add the image to the MIME message
-      if(! $mime_message->addHTMLImage($img_file, 'image/gif', '', true, $image_name))
-        $OUTPUT->show_message("emoticonerror", 'error');
-      array_push($included_images, $image_name);
+        $body = substr_replace($body, $img_file, $m[1] + $offset, strlen($m[0]));
+        $offset += strlen($img_file) - strlen($m[0]);
       }
-    
-    $body = $body_pre . $img_file . $body_post;
-
-    $last_img_pos = $pos2 + $path_len;
     }
+  }
 
   $mime_message->setHTMLBody($body);
+
+  return $body;
 }
 
+// parse email address input
+function rcmail_mailto_format($mailto)
+{
+  $regexp = array('/[,;]\s*[\r\n]+/', '/[\r\n]+/', '/[,;]\s*$/m', '/;/', '/(\S{1})(<\S+@\S+>)/U');
+  $replace = array(', ', ', ', '', ',', '\\1 \\2');
+
+  // replace new lines and strip ending ', ', make address input more valid
+  $mailto = trim(preg_replace($regexp, $replace, $mailto));
+
+  $result = array();
+  $items = rcube_explode_quoted_string(',', $mailto);
+
+  foreach($items as $item) {
+    $item = trim($item);
+    // address in brackets without name (do nothing)
+    if (preg_match('/^<\S+@\S+>$/', $item)) {
+      $result[] = $item;
+    // address without brackets and without name (add brackets)
+    } else if (preg_match('/^\S+@\S+$/', $item)) {
+      $result[] = '<'.$item.'>';
+    // address with name (handle name)
+    } else if (preg_match('/\S+@\S+>*$/', $item, $matches)) {
+      $address = $matches[0];
+      $name = str_replace($address, '', $item);
+      $name = trim($name);
+      if ($name && ($name[0] != '"' || $name[strlen($name)-1] != '"')
+          && preg_match('/[\(\)\<\>\\\.\[\]@,;:"]/', $name)) {
+	  $name = '"'.addcslashes($name, '"').'"';
+      }
+      if (!preg_match('/^<\S+@\S+>$/', $address))
+        $address = '<'.$address.'>';
+
+      $result[] = $name.' '.$address;
+    } else if (trim($item)) {
+      // @TODO: handle errors
+    }
+  }
+
+  return implode(', ', $result);
+}
 
 /****** compose message ********/
 
@@ -153,13 +189,9 @@ $message_id = sprintf('<%s@%s>', md5(uniqid('rcmail'.rand(),true)), $RCMAIL->con
 $input_charset = $OUTPUT->get_charset();
 $message_charset = isset($_POST['_charset']) ? $_POST['_charset'] : $input_charset;
 
-$mailto_regexp = array('/[,;]\s*[\r\n]+/', '/[\r\n]+/', '/[,;]\s*$/m', '/;/', '/(\S{1})(<\S+@\S+>)/U');
-$mailto_replace = array(', ', ', ', '', ',', '\\1 \\2');
-
-// replace new lines and strip ending ', ', make address strings more valid also
-$mailto = preg_replace($mailto_regexp, $mailto_replace, get_input_value('_to', RCUBE_INPUT_POST, TRUE, $message_charset));
-$mailcc = preg_replace($mailto_regexp, $mailto_replace, get_input_value('_cc', RCUBE_INPUT_POST, TRUE, $message_charset));
-$mailbcc = preg_replace($mailto_regexp, $mailto_replace, get_input_value('_bcc', RCUBE_INPUT_POST, TRUE, $message_charset));
+$mailto = rcmail_mailto_format(get_input_value('_to', RCUBE_INPUT_POST, TRUE, $message_charset));
+$mailcc = rcmail_mailto_format(get_input_value('_cc', RCUBE_INPUT_POST, TRUE, $message_charset));
+$mailbcc = rcmail_mailto_format(get_input_value('_bcc', RCUBE_INPUT_POST, TRUE, $message_charset));
 
 if (empty($mailto) && !empty($mailcc)) {
   $mailto = $mailcc;
@@ -180,7 +212,6 @@ if ($identity_arr)
 
 if (empty($identity_arr['string']))
   $identity_arr['string'] = $from;
-
 
 // compose headers array
 $headers = array('Date' => date('r'),
@@ -204,7 +235,7 @@ if (!empty($identity_arr['organization']))
   $headers['Organization'] = $identity_arr['organization'];
 
 if (!empty($_POST['_replyto']))
-  $headers['Reply-To'] = preg_replace($mailto_regexp, $mailto_replace, get_input_value('_replyto', RCUBE_INPUT_POST, TRUE, $message_charset));
+  $headers['Reply-To'] = rcmail_mailto_format(get_input_value('_replyto', RCUBE_INPUT_POST, TRUE, $message_charset));
 else if (!empty($identity_arr['reply-to']))
   $headers['Reply-To'] = $identity_arr['reply-to'];
 
@@ -251,13 +282,17 @@ $isHtml = ($isHtmlVal == "1");
 // fetch message body
 $message_body = get_input_value('_message', RCUBE_INPUT_POST, TRUE, $message_charset);
 
-// remove signature's div ID
-if (!$savedraft && $isHtml)
-  $message_body = preg_replace('/\s*id="_rc_sig"/', '', $message_body);
+if (!$savedraft) {
+  // remove signature's div ID
+  if ($isHtml)
+    $message_body = preg_replace('/\s*id="_rc_sig"/', '', $message_body);
 
-// append generic footer to all messages
-if (!$savedraft && !empty($CONFIG['generic_message_footer']) && ($footer = file_get_contents(realpath($CONFIG['generic_message_footer']))))
-  $message_body .= "\r\n" . rcube_charset_convert($footer, 'UTF-8', $message_charset);
+  // generic footer for all messages
+  if (!empty($CONFIG['generic_message_footer'])) {
+    $footer = file_get_contents(realpath($CONFIG['generic_message_footer']));
+    $footer = rcube_charset_convert($footer, 'UTF-8', $message_charset);
+  }
+}
 
 // create extended PEAR::Mail_mime instance
 $MAIL_MIME = new rcube_mail_mime($RCMAIL->config->header_delimiter());
@@ -267,11 +302,12 @@ $MAIL_MIME = new rcube_mail_mime($RCMAIL->config->header_delimiter());
 
 if ($isHtml)
   {
-  $MAIL_MIME->setHTMLBody($message_body);
+  $MAIL_MIME->setHTMLBody($message_body . ($footer ? "\r\n<pre>".$footer.'</pre>' : ''));
 
   // add a plain text version of the e-mail as an alternative part.
   $h2t = new html2text($message_body);
-  $plainTextPart = wordwrap($h2t->get_text(), 998, "\r\n", true);
+  $plainTextPart = $h2t->get_text() . ($footer ? "\r\n".$footer : '');
+  $plainTextPart = wordwrap($plainTextPart, 998, "\r\n", true);
   if (!strlen($plainTextPart)) 
     { 
     // empty message body breaks attachment handling in drafts 
@@ -280,11 +316,13 @@ if ($isHtml)
   $MAIL_MIME->setTXTBody($plainTextPart);
 
   // look for "emoticon" images from TinyMCE and copy into message as attachments
-  rcmail_attach_emoticons($MAIL_MIME);
+  $message_body = rcmail_attach_emoticons($MAIL_MIME);
   }
 else
   {
   $message_body = wordwrap($message_body, 75, "\r\n");
+  if ($footer)
+    $message_body .= "\r\n" . $footer;
   $message_body = wordwrap($message_body, 998, "\r\n", true);
   if (!strlen($message_body))  
     { 
@@ -302,12 +340,12 @@ $transfer_encoding = in_array(strtoupper($message_charset), $charset_7bit) ? '7b
 if (is_array($_SESSION['compose']['attachments']))
   foreach ($_SESSION['compose']['attachments'] as $id => $attachment)
   {
-    $dispurl = '/\ssrc\s*=\s*[\'"]?\S+display-attachment\S+file=rcmfile' . $id . '[\'"]?/';
-    $match = preg_match($dispurl, $message_body);
+    $dispurl = '/\ssrc\s*=\s*[\'"]*\S+display-attachment\S+file=rcmfile' . $id . '[\s\'"]\s*/';
+    $match = preg_match($dispurl, $message_body, $matches);
     if ($isHtml && ($match > 0))
     {
-      $message_body = preg_replace($dispurl, ' src="'.$attachment['name'].'"', $message_body);
-      $MAIL_MIME->setHTMLBody($message_body);
+      $message_body = preg_replace($dispurl, ' src="'.$attachment['name'].'" ', $message_body);
+      $MAIL_MIME->setHTMLBody($message_body. ($footer ? "\r\n<pre>".$footer.'</pre>' : ''));
       $MAIL_MIME->addHTMLImage($attachment['path'], $attachment['mimetype'], $attachment['name']);
     }
     else

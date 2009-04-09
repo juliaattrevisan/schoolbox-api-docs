@@ -5,7 +5,7 @@
  | program/include/rcube_vcard.php                                       |
  |                                                                       |
  | This file is part of the RoundCube Webmail client                     |
- | Copyright (C) 2008, RoundCube Dev. - Switzerland                      |
+ | Copyright (C) 2008-2009, RoundCube Dev. - Switzerland                 |
  | Licensed under the GNU GPL                                            |
  |                                                                       |
  | PURPOSE:                                                              |
@@ -226,10 +226,14 @@ class rcube_vcard
     return $vcard;
   }
 
+  private static function rfc2425_fold_callback($matches)
+  {
+    return ":\n  ".rtrim(chunk_split($matches[1], 72, "\n  "));
+  }
 
   private static function rfc2425_fold($val)
   {
-    return preg_replace('/:([^\n]{72,})/e', '":\n  ".rtrim(chunk_split("\\1", 72, "\n  "))', $val) . "\n";
+    return preg_replace_callback('/:([^\n]{72,})/', array('self', 'rfc2425_fold_callback'), $val) . "\n";
   }
 
 

@@ -5,7 +5,7 @@
  | program/include/iniset.php                                            |
  |                                                                       |
  | This file is part of the RoundCube Webmail client                     |
- | Copyright (C) 2008, RoundCube Dev, - Switzerland                      |
+ | Copyright (C) 2008-2009, RoundCube Dev, - Switzerland                 |
  | Licensed under the GNU GPL                                            |
  |                                                                       |
  | PURPOSE:                                                              |
@@ -20,8 +20,9 @@
 
 */
 
+
 // application constants
-define('RCMAIL_VERSION', '0.2-stable');
+define('RCMAIL_VERSION', '0.2.1');
 define('RCMAIL_CHARSET', 'UTF-8');
 define('JS_OBJECT_NAME', 'rcmail');
 
@@ -67,6 +68,7 @@ if(extension_loaded('mbstring'))
  * Use PHP5 autoload for dynamic class loading
  * 
  * @todo Make Zend, PEAR etc play with this
+ * @todo Make our classes conform to a more straight forward CS.
  */
 function __autoload($classname)
 {
@@ -85,7 +87,7 @@ function __autoload($classname)
 	),
       $classname
   );
-  include_once $filename. '.php';
+  include $filename. '.php';
 }
 
 /**
@@ -104,6 +106,6 @@ require_once 'include/bugs.inc';
 require_once 'include/main.inc';
 require_once 'include/rcube_shared.inc';
 
+
 // set PEAR error handling (will also load the PEAR main class)
 PEAR::setErrorHandling(PEAR_ERROR_CALLBACK, 'rcube_pear_error');
-

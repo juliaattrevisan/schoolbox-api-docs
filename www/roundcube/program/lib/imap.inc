@@ -53,7 +53,7 @@
 		- Removed some debuggers (echo ...)
 		File altered by Aleksander Machniak <alec@alec.pl>
 		- trim(chop()) replaced by trim()
-		- added iil_Escape() with support for " and \ in folder names
+		- added iil_Escape()/iil_UnEscape() with support for " and \ in folder names
 		- support \ character in username in iil_C_Login()
 		- fixed iil_MultLine(): use iil_ReadBytes() instead of iil_ReadLine()
 		- fixed iil_C_FetchStructureString() to handle many literal strings in response
@@ -68,7 +68,7 @@
 		- iil_C_HandlePartBody(): added 6th argument and fixed endless loop
 		- added iil_PutLineC() 
 		- fixed iil_C_Sort() to support very long and/or divided responses
-		- added BYE response simple support for endless loop prevention
+		- added BYE/BAD response simple support for endless loop prevention
 		- added 3rd argument in iil_StartsWith* functions
 		- fix iil_C_FetchPartHeader() in some cases by use of iil_C_HandlePartBody()
 		- allow iil_C_HandlePartBody() to fetch whole message
@@ -76,6 +76,9 @@
 		- added 4th argument to iil_Connect()
 		- allow setting rootdir and delimiter before connect
 		- support multiquota result
+		- include BODYSTRUCTURE in iil_C_FetchHeaders()
+		- added iil_C_FetchMIMEHeaders() function
+		- added \* flag support 
 
 ********************************************************/
 
@@ -112,7 +115,9 @@ $GLOBALS['IMAP_FLAGS'] = array(
     'DRAFT'    => '\\Draft',
     'FLAGGED'  => '\\Flagged',
     'FORWARDED' => '$Forwarded',
-    'MDNSENT'  => '$MDNSent');
+    'MDNSENT'  => '$MDNSent',
+    '*'        => '\\*',
+);
 
 $iil_error;
 $iil_errornum;
@@ -163,6 +168,7 @@ class iilBasicHeader
 	var $flags;
 	var $timestamp;
 	var $f;
+	var $body_structure;
 	var $internaldate;
 	var $references;
 	var $priority;
@@ -214,6 +220,9 @@ function iil_PutLineC($fp, $string, $endln=true) {
 			if(preg_match('/^\{[0-9]+\}\r\n$/', $parts[$i+1])) {
 				$res += iil_PutLine($fp, $parts[$i].$parts[$i+1], false);
 				$line = iil_ReadLine($fp, 1000);
+				// handle error in command
+				if ($line[0] != '+')
+					return false;
 				$i++;
 			}
 			else
@@ -286,7 +295,7 @@ function iil_ReadReply($fp) {
 }
 
 function iil_ParseResult($string) {
-	$a=explode(' ', $string);
+	$a = explode(' ', $string);
 	if (count($a) > 2) {
 		if (strcasecmp($a[1], 'OK') == 0) {
 			return 0;
@@ -301,8 +310,8 @@ function iil_ParseResult($string) {
 	return -4;
 }
 
-// check if $string starts with $match
-function iil_StartsWith($string, $match, $bye=false) {
+// check if $string starts with $match (or * BYE/BAD)
+function iil_StartsWith($string, $match, $error=false) {
 	$len = strlen($match);
 	if ($len == 0) {
 		return false;
@@ -310,7 +319,7 @@ function iil_StartsWith($string, $match, $bye=false) {
 	if (strncmp($string, $match, $len) == 0) {
 		return true;
 	}
-	if ($bye && strncmp($string, '* BYE ', 6) == 0) {
+	if ($error && preg_match('/^\* (BYE|BAD) /', $string)) {
 		return true;
 	}
 	return false;
@@ -333,6 +342,11 @@ function iil_StartsWithI($string, $match, $bye=false) {
 function iil_Escape($string)
 {
 	return strtr($string, array('"'=>'\\"', '\\' => '\\\\')); 
+}
+
+function iil_UnEscape($string)
+{
+	return strtr($string, array('\\"'=>'"', '\\\\' => '\\')); 
 }
 
 function iil_C_GetCapability(&$conn, $name)
@@ -494,6 +508,7 @@ function iil_C_NameSpace(&$conn) {
 		$line = iil_ReadLine($conn->fp, 1024);
 		if (iil_StartsWith($line, '* NAMESPACE')) {
 			$i    = 0;
+			$line = iil_UnEscape($line);
 			$data = iil_ParseNamespace2(substr($line,11), $i, 0, 0);
 		}
 	} while (!iil_StartsWith($line, 'ns1', true));
@@ -543,7 +558,7 @@ function iil_Connect($host, $user, $password, $options=null) {
 	}
 
 	if (empty($auth_method))
-    		$auth_method = 'plain';
+    		$auth_method = 'check';
 		
 	$message = "INITIAL: $auth_method\n";
 		
@@ -1617,7 +1632,7 @@ function iil_IndexThreads(&$tree) {
 	return $t_index;
 }
 
-function iil_C_FetchHeaders(&$conn, $mailbox, $message_set, $uidfetch=false)
+function iil_C_FetchHeaders(&$conn, $mailbox, $message_set, $uidfetch=false, $bodystr=false)
 {
 	global $IMAP_USE_INTERNAL_DATE;
 	
@@ -1661,7 +1676,10 @@ function iil_C_FetchHeaders(&$conn, $mailbox, $message_set, $uidfetch=false)
 	/* FETCH uid, size, flags and headers */
 	$key  	  = 'FH12';
 	$request  = $key . ($uidfetch ? ' UID' : '') . " FETCH $message_set ";
-	$request .= "(UID RFC822.SIZE FLAGS INTERNALDATE BODY.PEEK[HEADER.FIELDS ";
+	$request .= "(UID RFC822.SIZE FLAGS INTERNALDATE ";
+	if ($bodystr)
+		$request .= "BODYSTRUCTURE ";
+	$request .= "BODY.PEEK[HEADER.FIELDS ";
 	$request .= "(DATE FROM TO SUBJECT REPLY-TO IN-REPLY-TO CC BCC ";
 	$request .= "CONTENT-TRANSFER-ENCODING CONTENT-TYPE MESSAGE-ID ";
 	$request .= "REFERENCES DISPOSITION-NOTIFICATION-TO X-PRIORITY)])";
@@ -1670,7 +1688,9 @@ function iil_C_FetchHeaders(&$conn, $mailbox, $message_set, $uidfetch=false)
 		return false;
 	}
 	do {
-		$line = chop(iil_ReadLine($fp, 1024));
+		$line = iil_ReadLine($fp, 1024);
+		$line = iil_MultLine($fp, $line);
+
 		$a    = explode(' ', $line);
 		if (($line[0] == '*') && ($a[2] == 'FETCH')) {
 			$id = $a[1];
@@ -1680,22 +1700,25 @@ function iil_C_FetchHeaders(&$conn, $mailbox, $message_set, $uidfetch=false)
 			$result[$id]->subject   = '';
 			$result[$id]->messageID = 'mid:' . $id;
 
+			$lines = array();
+			$ln = 0;
 			/*
 			    Sample reply line:
 			    * 321 FETCH (UID 2417 RFC822.SIZE 2730 FLAGS (\Seen)
-			    INTERNALDATE "16-Nov-2008 21:08:46 +0100" BODY[HEADER.FIELDS ...
+			    INTERNALDATE "16-Nov-2008 21:08:46 +0100" BODYSTRUCTURE (...)
+			    BODY[HEADER.FIELDS ...
 			*/
-			
-			if (preg_match('/^\* [0-9]+ FETCH \((.*) BODY\[HEADER/', $line, $matches)) {
+
+			if (preg_match('/^\* [0-9]+ FETCH \((.*) BODY/s', $line, $matches)) {
 				$str = $matches[1];
 
-				//swap parents with quotes, then explode
+				// swap parents with quotes, then explode
 				$str = eregi_replace("[()]", "\"", $str);
 				$a = iil_ExplodeQuotedString(' ', $str);
 
-				//did we get the right number of replies?
+				// did we get the right number of replies?
 				$parts_count = count($a);
-				if ($parts_count>=8) {
+				if ($parts_count>=6) {
 					for ($i=0; $i<$parts_count; $i=$i+2) {
 						if (strcasecmp($a[$i],'UID') == 0)
 							$result[$id]->uid = $a[$i+1];
@@ -1705,34 +1728,6 @@ function iil_C_FetchHeaders(&$conn, $mailbox, $message_set, $uidfetch=false)
 							$time_str = $a[$i+1];
 						else if (strcasecmp($a[$i],'FLAGS') == 0)
 							$flags_str = $a[$i+1];
-					}
-
-					// process flags
-					$flags_str = eregi_replace('[\\\"]', '', $flags_str);
-					$flags_a   = explode(' ', $flags_str);
-					
-					if (is_array($flags_a)) {
-						reset($flags_a);
-						while (list(,$val)=each($flags_a)) {
-							if (strcasecmp($val,'Seen') == 0) {
-							    $result[$id]->seen = true;
-							} else if (strcasecmp($val, 'Deleted') == 0) {
-							    $result[$id]->deleted=true;
-							} else if (strcasecmp($val, 'Recent') == 0) {
-							    $result[$id]->recent = true;
-							} else if (strcasecmp($val, 'Answered') == 0) {
-							    $result[$id]->answered = true;
-							} else if (strcasecmp($val, '$Forwarded') == 0) {
-							    $result[$id]->forwarded = true;
-							} else if (strcasecmp($val, 'Draft') == 0) {
-							    $result[$id]->is_draft = true;
-							} else if (strcasecmp($val, '$MDNSent') == 0) {
-							    $result[$id]->mdn_sent = true;
-							} else if (strcasecmp($val, 'Flagged') == 0) {
-							     $result[$id]->flagged = true;
-							}
-						}
-						$result[$id]->flags = $flags_a;
 					}
 
 					$time_str = str_replace('"', '', $time_str);
@@ -1761,6 +1756,27 @@ function iil_C_FetchHeaders(&$conn, $mailbox, $message_set, $uidfetch=false)
 					$result[$id]->timestamp = $timestamp;
 					$result[$id]->date = $time_str;
 				}
+
+				// BODYSTRUCTURE 
+				if($bodystr) {
+					while (!preg_match('/ BODYSTRUCTURE (.*) BODY\[HEADER.FIELDS/s', $line, $m)) {
+						$line2 = iil_ReadLine($fp, 1024);
+						$line .= iil_MultLine($fp, $line2);
+					}
+					$result[$id]->body_structure = $m[1];
+				}
+
+				// the rest of the result
+				preg_match('/ BODY\[HEADER.FIELDS \(.*\)\]\s*(.*)/s', $line, $m);
+				$reslines = explode("\n", trim($m[1], '"'));
+				// re-parse (see below)
+				foreach ($reslines as $line) {
+					if (ord($line[0])<=32) {
+						$lines[$ln] .= (empty($lines[$ln])?'':"\n").trim($line);
+					} else {
+						$lines[++$ln] = trim($line);
+					}
+				}
 			}
 
 			/*
@@ -1770,36 +1786,38 @@ function iil_C_FetchHeaders(&$conn, $mailbox, $message_set, $uidfetch=false)
 				to the next valid header line.
 			*/
 	
-			$i     = 0;
-			$lines = array();
 			do {
 				$line = chop(iil_ReadLine($fp, 300), "\r\n");
 
-				if (ord($line[0])<=32) {
-				    $lines[$i] .= (empty($lines[$i])?'':"\n").trim($line);
-				} else {
-					$i++;
-					$lines[$i] = trim($line);
-				}
-				/* 
-					The preg_match below works around communigate imap, which outputs " UID <number>)".
-					Without this, the while statement continues on and gets the "FH0 OK completed" message.
-					If this loop gets the ending message, then the outer loop does not receive it from radline on line 1249.  
-					This in causes the if statement on line 1278 to never be true, which causes the headers to end up missing
-					If the if statement was changed to pick up the fh0 from this loop, then it causes the outer loop to spin
-					An alternative might be:
-					if (!preg_match("/:/",$line) && preg_match("/\)$/",$line)) break;
-					however, unsure how well this would work with all imap clients.
-				*/
+				// The preg_match below works around communigate imap, which outputs " UID <number>)".
+				// Without this, the while statement continues on and gets the "FH0 OK completed" message.
+				// If this loop gets the ending message, then the outer loop does not receive it from radline on line 1249.  
+				// This in causes the if statement on line 1278 to never be true, which causes the headers to end up missing
+				// If the if statement was changed to pick up the fh0 from this loop, then it causes the outer loop to spin
+				// An alternative might be:
+				// if (!preg_match("/:/",$line) && preg_match("/\)$/",$line)) break;
+				// however, unsure how well this would work with all imap clients.
 				if (preg_match("/^\s*UID [0-9]+\)$/", $line)) {
 				    break;
+				}
+
+				// handle FLAGS reply after headers (AOL, Zimbra?)
+				if (preg_match('/\s+FLAGS \((.*)\)\)$/', $line, $matches)) {
+					$flags_str = $matches[1];
+					break;
+				}
+
+				if (ord($line[0])<=32) {
+					$lines[$ln] .= (empty($lines[$ln])?'':"\n").trim($line);
+				} else {
+					$lines[++$ln] = trim($line);
 				}
 			// patch from "Maksim Rubis" <siburny@hotmail.com>
 			} while (trim($line[0]) != ')' && strncmp($line, $key, strlen($key)));
 
 			if (strncmp($line, $key, strlen($key))) { 
-				//process header, fill iilBasicHeader obj.
-				//	initialize
+				// process header, fill iilBasicHeader obj.
+				// initialize
 				if (is_array($headers)) {
 					reset($headers);
 					while (list($k, $bar) = each($headers)) {
@@ -1807,7 +1825,7 @@ function iil_C_FetchHeaders(&$conn, $mailbox, $message_set, $uidfetch=false)
 					}
 				}
 	
-				//	create array with header field:data
+				// create array with header field:data
 				while ( list($lines_key, $str) = each($lines) ) {
 					list($field, $string) = iil_SplitHeaderLine($str);
 					
@@ -1881,15 +1899,45 @@ function iil_C_FetchHeaders(&$conn, $mailbox, $message_set, $uidfetch=false)
 			} else {
 				$a = explode(' ', $line);
 			}
+
+			// process flags
+			if (!empty($flags_str)) {
+				$flags_str = eregi_replace('[\\\"]', '', $flags_str);
+				$flags_a   = explode(' ', $flags_str);
+					
+				if (is_array($flags_a)) {
+					reset($flags_a);
+					while (list(,$val)=each($flags_a)) {
+						if (strcasecmp($val,'Seen') == 0) {
+						    $result[$id]->seen = true;
+						} else if (strcasecmp($val, 'Deleted') == 0) {
+						    $result[$id]->deleted=true;
+						} else if (strcasecmp($val, 'Recent') == 0) {
+						    $result[$id]->recent = true;
+						} else if (strcasecmp($val, 'Answered') == 0) {
+							$result[$id]->answered = true;
+						} else if (strcasecmp($val, '$Forwarded') == 0) {
+							$result[$id]->forwarded = true;
+						} else if (strcasecmp($val, 'Draft') == 0) {
+							$result[$id]->is_draft = true;
+						} else if (strcasecmp($val, '$MDNSent') == 0) {
+							$result[$id]->mdn_sent = true;
+						} else if (strcasecmp($val, 'Flagged') == 0) {
+						         $result[$id]->flagged = true;
+						}
+					}
+					$result[$id]->flags = $flags_a;
+				}
+			}
 		}
 	} while (strcmp($a[0], $key) != 0);
 
 	return $result;
 }
 
-function iil_C_FetchHeader(&$conn, $mailbox, $id, $uidfetch=false) {
+function iil_C_FetchHeader(&$conn, $mailbox, $id, $uidfetch=false, $bodystr=false) {
 
-	$a  = iil_C_FetchHeaders($conn, $mailbox, $id, $uidfetch);
+	$a  = iil_C_FetchHeaders($conn, $mailbox, $id, $uidfetch, $bodystr);
 	if (is_array($a)) {
 		return array_shift($a);
 	}
@@ -2104,7 +2152,9 @@ function iil_C_Search(&$conn, $folder, $criteria) {
 		$c = 0;
 		
 		$query = 'srch1 SEARCH ' . chop($criteria);
-		iil_PutLineC($fp, $query);
+		if (!iil_PutLineC($fp, $query)) {
+			return false;
+		}
 		do {
 			$line=trim(iil_ReadLine($fp, 10000));
 			if (eregi("^\* SEARCH", $line)) {
@@ -2170,7 +2220,7 @@ function iil_C_GetHierarchyDelimiter(&$conn) {
 		$line=iil_ReadLine($fp, 500);
 		if ($line[0] == '*') {
 			$line = rtrim($line);
-			$a=iil_ExplodeQuotedString(' ', $line);
+			$a=iil_ExplodeQuotedString(' ', iil_UnEscape($line));
 			if ($a[0] == '*') {
 			    $delimiter = str_replace('"', '', $a[count($a)-2]);
         		}
@@ -2180,7 +2230,7 @@ function iil_C_GetHierarchyDelimiter(&$conn) {
 	if (strlen($delimiter)>0) {
 	    return $delimiter;
 	}
-    
+
 	//if that fails, try namespace extension
 	//try to fetch namespace data
 	iil_PutLine($conn->fp, "ns1 NAMESPACE");
@@ -2188,6 +2238,7 @@ function iil_C_GetHierarchyDelimiter(&$conn) {
 		$line = iil_ReadLine($conn->fp, 1024);
 		if (iil_StartsWith($line, '* NAMESPACE')) {
 			$i = 0;
+			$line = iil_UnEscape($line);
 			$data = iil_ParseNamespace2(substr($line,11), $i, 0, 0);
 		}
 	} while (!iil_StartsWith($line, 'ns1', true));
@@ -2366,11 +2417,51 @@ function iil_C_UnSubscribe(&$conn, $folder) {
 	return iil_ParseResult($line);
 }
 
+function iil_C_FetchMIMEHeaders(&$conn, $mailbox, $id, $parts) {
+	
+	$fp     = $conn->fp;
+
+	if (!iil_C_Select($conn, $mailbox)) {
+		return false;
+	}
+	
+	$result = false;
+	$parts = (array) $parts;
+	$key = 'fmh0';
+	$peeks = '';
+	$idx = 0;
+
+	// format request
+	foreach($parts as $part)
+		$peeks[] = "BODY[$part.MIME]";
+	
+	$request = "$key FETCH $id (" . implode(' ', $peeks) . ')';
+
+	// send request
+	if (!iil_PutLine($fp, $request)) {
+	    return false;
+	}
+        
+	do {
+        	$line = iil_ReadLine($fp, 1000);
+        	$line = iil_MultLine($fp, $line);
+
+		if (preg_match('/BODY\[([0-9\.]+)\.MIME\]/', $line, $matches)) {
+			$idx = $matches[1];
+			$result[$idx] = preg_replace('/^(\* '.$id.' FETCH \()?\s*BODY\['.$idx.'\.MIME\]\s+/', '', $line);
+			$result[$idx] = trim($result[$idx], '"');
+	    		$result[$idx] = rtrim($result[$idx], "\t\r\n\0\x0B");
+    		}
+	} while (!iil_StartsWith($line, $key, true));
+
+	return $result;
+}
+
 function iil_C_FetchPartHeader(&$conn, $mailbox, $id, $part) {
 
 	$part = empty($part) ? 'HEADER' : $part.'.MIME';
 
-	return iil_C_HandlePartBody($conn, $mailbox, $id, $part, 1);
+        return iil_C_HandlePartBody($conn, $mailbox, $id, $part, 1);
 }
 
 function iil_C_HandlePartBody(&$conn, $mailbox, $id, $part='', $mode=1, $file=NULL) {
@@ -2429,7 +2520,8 @@ function iil_C_HandlePartBody(&$conn, $mailbox, $id, $part='', $mode=1, $file=NU
         		$len      = $to - $from;
 	                $sizeStr  = substr($line, $from, $len);
         		$bytes    = (int)$sizeStr;
-
+			$prev	  = '';
+			
         		while ($bytes > 0) {
     		                $line      = iil_ReadLine($fp, 1024);
             			$len       = strlen($line);
@@ -2439,14 +2531,27 @@ function iil_C_HandlePartBody(&$conn, $mailbox, $id, $part='', $mode=1, $file=NU
 		                }
             			$bytes -= strlen($line);
 
+				$line = rtrim($line, "\t\r\n\0\x0B");
+
 		                if ($mode == 1) {
 					if ($file)
-						fwrite($file, rtrim($line, "\t\r\n\0\x0B") . "\n");
+						fwrite($file, $line . "\n");
             			        else
-						$result .= rtrim($line, "\t\r\n\0\x0B") . "\n";
+						$result .= $line . "\n";
 		                } else if ($mode == 2) {
-            			        echo rtrim($line, "\t\r\n\0\x0B") . "\n";
+            			        echo $line . "\n";
 		                } else if ($mode == 3) {
+					// create chunks with proper length for base64 decoding
+					$line = $prev.$line;
+					$length = strlen($line);
+					if ($length % 4) {
+						$length = floor($length / 4) * 4;
+						$prev = substr($line, $length);
+						$line = substr($line, 0, $length);
+					}
+					else
+						$prev = '';
+
 					if ($file)
 						fwrite($file, base64_decode($line));
             				else
