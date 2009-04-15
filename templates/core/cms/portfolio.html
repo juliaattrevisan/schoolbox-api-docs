@@ -111,42 +111,56 @@ $j(document).ready(function() {
 <!-- END custom_head -->
 <div class="template4">
 <div class="left">
-<div id="category-window">
-  <table id="category-list">
-    <thead>
-    <th>Folders</th>
+  <div id="category-window">
+    <table id="category-head">
+      <thead>
+        <th>Folders</th>
       </thead>
-    <tbody>
-      <tr id="node-0" class="expanded populated">
-      	<td><span id="top">Top</span></td>
-      </tr>
-      <!-- BEGIN folder_list -->
-      <tr id="node-{FOLDER_ID}" class="{CLASS}">
-        <td><span class="folder">{FOLDER_NAME}</span></td>
-      </tr>
-      <!-- END folder_list -->
-    </tbody>
-  </table>
+    </table>
+    <div class="scroller">
+    <table id="category-list">
+      <tbody>
+        <tr id="node-0" class="expanded populated">
+          <td><span id="top">Top</span></td>
+        </tr>
+        <!-- BEGIN category_list -->
+        <tr id="node-{FOLDER_ID}" class="{CLASS}">
+          <td><span class="folder">{FOLDER_NAME}</span></td>
+        </tr>
+        <!-- END category_list -->
+      </tbody>
+    </table>
+    </div>
+  </div>
 </div>
-</div>
+  
 <div class="right">
-	<div id="file-window">
-  <table id="file-list">
-    <thead>
-      <th>Name</th>
-      <th>Size</th>
-      <th>Modified</th>
-    </thead>
-    <tbody>
-      <!-- BEGIN file_list -->
-      <tr id="{TYPE}-{FILE_ID}" class="category-{FOLDER_ID}">
-        <td><span class="file ui-draggable {CLASS}">{FILE_NAME}</span></td>
-        <td>{FILE_SIZE}</td>
-        <td>{FILE_MODIFIED}</td>
-      </tr>
-      <!-- END file_list -->
-    </tbody>
-  </table>
+  <div id="file-window">
+    <table id="file-head">
+      <col width="55%" />
+      <col width="23%" />
+      <col width="22%" />   
+      <thead>
+        <th>Name</th>
+        <th>Size</th>
+        <th>Modified</th>
+      </thead>
+    </table>
+    <div class="scroller">
+    <table id="file-list">  
+      <col width="55%" />
+      <col width="23%" />
+      <col width="22%" />      
+        <!-- BEGIN file_list -->
+        <tr id="{TYPE}-{FILE_ID}" class="category-{FOLDER_ID}">
+          <td><span class="file ui-draggable {CLASS}">{FILE_NAME}</span></td>
+          <td>{FILE_SIZE}</td>
+          <td>{FILE_MODIFIED}</td>
+        </tr>
+        <!-- END file_list -->
+    </table>
+    </div>
   </div>
-  </div>
+</div>
+  
 </div>
