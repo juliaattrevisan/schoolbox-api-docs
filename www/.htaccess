@@ -5,6 +5,14 @@ Options -Multiviews
 
 RewriteEngine on
 
+#PHP Error handling
+php_flag display_startup_errors on
+php_flag display_errors on
+php_flag html_errors off
+php_flag log_errors on
+php_value docref_root 0
+php_value docref_ext 0
+
 # apply ssl
 #RewriteCond %{SERVER_PORT} !^443$
 #RewriteCond %{REQUEST_URI} ^/$

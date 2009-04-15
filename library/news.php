@@ -260,6 +260,11 @@ class News extends Model {
 		return $allNews;
 	}
 
+	function getDailyNotice() {
+		$query = "SELECT item_heading, item_body FROM news_items WHERE item_heading LIKE '%Daily Notices%' ORDER BY item_datetime_posted DESC LIMIT 1";
+		return $this->db->getRow($query);
+	}
+
 	function timecmp($a, $b)
 	{
 		//just a quick function to enable sorting of news based on time

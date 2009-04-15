@@ -95,10 +95,9 @@ if (is_array($categoryList)) {
 			
 			// write access
 			$permission[$category['id']] == FULL_ACCESS ? $class[] = "full" : null;
-			
-			$name = scrubTEXT($category['name']);
-			
+
 			//append code to name
+			$name = scrubTEXT($category['name']);
 			if($category['code'] != '' && $category['code'] != $category['name'])
 				$name .= ' ('.scrubTEXT($category['code']).')';
 			
