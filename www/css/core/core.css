@@ -524,6 +524,10 @@ p.interact a { color: #003e7e; }
 .listing p.small a { color: #5c5151; text-decoration: none; }
 .listing p.small a:hover { text-decoration: underline; }
 .listing a { color: #003e7e; }
+.weather p.float-left { font-size: 90%; margin: 0; padding: 0 0 0 20px; }
+.weather p span { color: #ccc; font-size: 90%; }
+.weather p span a { color: #ccc; }
+.weather img { margin: 0 0 15px 0; }
 .box .thumb {
 	margin: 0 15px 15px 0;
 	display: block;

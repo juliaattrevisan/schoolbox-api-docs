@@ -1,5 +1,5 @@
 <?php
-
+$j = 0;
 $this->setBlock($component['name'], "rss_stories", "rss_block");
 
 require_once('include/lastRSS.php');

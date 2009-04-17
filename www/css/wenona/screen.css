@@ -80,6 +80,17 @@ a:hover { color: #c00; }
 #calendar table .header_option {
 	margin-top: 7px;
 	}
+#nav #footer li {
+	background: 0;
+}
+#nav #footer li a {
+	width: auto;
+	background: 0;
+	padding: 0;
+}
+#nav #footer li a:hover {
+	text-decoration: underline;
+}
 /*---------------------------------------
 	News Styles
 ----------------------------------------*/
@@ -179,6 +190,9 @@ h2 {
 	border: 0;
 	width: 130px;
 	}
+#footer ul {
+	margin-top: 20px;
+}
 #footer ul li {
 	display: block;
 	color: #fff;
