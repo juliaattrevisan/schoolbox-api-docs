@@ -27,8 +27,6 @@ if($_POST['heading'] && is_numeric($_POST['code'])) {
 		if ($permission == WRITE_ACCESS && $current['owner'] != $_SESSION['id'] && !NEWS_teacher_edit_other)
 			error(23);
 		
-		var_dump ($permission);
-		die('x');		
 		/* Delete news */
 		if($_POST['delete']) {
 			$newsHandler->delete($_POST['id']);

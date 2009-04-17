@@ -54,7 +54,7 @@ define("MAX_FILE_SIZE", 		10485760); 					//Maximum filesize in bytes allowed to
 define("URLS_use_frame", 		false);						//Open links in frame
 define('FILE_use_frame', 		false);
 define('MIME_magic', 			'/usr/share/file/magic');
-define('NEWS_teacher_edit_other', false);
+define('NEWS_teacher_edit_other', true);
 
 
 //GROUP options
