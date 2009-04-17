@@ -406,8 +406,8 @@ $MAIL_MIME->headers($headers);
 if (!$savedraft)
 {
   // check for 'From' address (identity may be incomplete)
-  if ($identity_arr && !$identity_arr['mailto']) {
-    $OUTPUT->show_message('nofromaddress', 'error');
+  if (false && $identity_arr && !$identity_arr['mailto']) {
+  	$OUTPUT->show_message('nofromaddress', 'error');
     $OUTPUT->send('iframe'); 
   }
 

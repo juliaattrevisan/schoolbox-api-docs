@@ -1,0 +1,51 @@
+<div class="box" id="component{COMPONENT_ID}">
+  <h2>{TEXTBOX_HEADING}</h2>
+  <!-- BEGIN config -->
+  <!-- END config -->
+  <!-- BEGIN text_editable -->
+  <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+  <script type="text/javascript">
+  tinyMCE.init({
+  	  mode : "exact",
+	  elements: "textBoxBody",
+	  theme : "advanced",
+	  plugins : "table,inlinepopups,assetmanager",
+	  content_css : "/css/ormond-tiny.css",
+	  theme_advanced_layout_manager : "RowLayout",
+	  theme_advanced_containers_default_align : "left",
+	  theme_advanced_container_default_class : "mceToolbar",
+	  theme_advanced_containers : "row1,row2,mceEditor,mceElementpath",
+	  theme_advanced_container_row1_class : "mceToolbarTop",
+	  theme_advanced_container_row2_class : "mceToolbarTop",
+	  theme_advanced_container_row1 : "bold,italic,underline,separator,bullist,numlist,outdent,indent,separator,sub,sup,separator,link,unlink,image,charmap,hr,separator,undo,redo",
+	  theme_advanced_container_row2 : "forecolor,tablecontrols,separator,removeformat,cleanup,code",
+	  extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+  	  file_browser_callback: 'TinyMCE_AssetManagerPlugin_browse',
+	  category_id: '{ID}'
+  });
+  </script>  
+  <div class="text">
+    <form action="/homepage/textBoxForm.php" method="post" id="textBoxForm" class="standardForm">
+     
+      <p><input type="text"  style="width: 99%;" name="textBoxHeading" value="{TEXTBOX_HEADING}" /></p>
+      <p>
+      <textarea rows="12" style="width: 100%;" name="textBoxBody" id="textBoxBody">{TEXTBOX_BODY}</textarea></p>
+      <input type="hidden" name="categoryID" value="{ID}" />
+      <input type="hidden" name="textBoxID" value="{TEXTBOX_ID}" />
+    </form>
+  </div>
+  <p class="interact"><a href="#" onclick="$j('#textBoxForm').submit(); return false;">Save Document</a></p>
+  <!-- END text_editable -->
+  
+  <!-- BEGIN text_locked -->
+      
+      <div class="text"> 
+      	{TEXTBOX_BODY}
+      </div>
+      
+      <!-- BEGIN modify_text -->
+      <p class="interact"><a href="/homepage/{ID}/textBoxModify">Modify Document</a></p>
+      <!-- END modify_text -->
+      
+  <!-- END text_locked -->
+</div>

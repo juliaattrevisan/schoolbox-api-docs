@@ -215,6 +215,7 @@ class Homepage {
 		return $this->db->query($query);
 		
 	}
+
 }
 
 

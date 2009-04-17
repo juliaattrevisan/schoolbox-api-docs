@@ -15,6 +15,10 @@ if(is_numeric($this->arg[0])) {
 	
 	if (($permission = $groupHandler->getPermission($newsItem['code'])) < WRITE_ACCESS)
 		error(23);
+		
+	// check user is owner
+	if ($permission == WRITE_ACCESS && $newsItem['owner'] != $_SESSION['id'] && !NEWS_teacher_edit_other)
+		error(23);
 	
 	$this->setFile(TEMPLATE_content, 'news/homepage.html');
 	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
@@ -42,7 +46,8 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	
 	if (($permission = $groupHandler->getPermission($this->arg[1])) < WRITE_ACCESS)
 		error(23);
-	
+
+			
 	$this->setFile(TEMPLATE_content, 'news/homepage.html');
 	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 	

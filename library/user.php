@@ -105,7 +105,7 @@ class User extends Model {
 			require_once SITE_root . '/include/mailer.php';
 			$mailHandler = new Mailer('reset-password.html', HEADING . ' Password Reset', $user['alt_email']);
 			$mailHandler->setVar('NAME', $user['firstname']);
-			$mailHandler->setVar('RESET_LINK', "http://" . $_SERVER['HTTP_HOST'] . "/reset-password.php?id={$user['id']}&h=" . $hash);
+			$mailHandler->setVar('RESET_LINK', "http://" . $_SERVER['HTTP_HOST'] . "/reset.php?id={$user['id']}&h=" . $hash);
 			return $mailHandler->send();
 		}
 		return false;
@@ -114,18 +114,18 @@ class User extends Model {
 	
 	function resetPassword($userID, $hash) {
 		
-		$password = substr(md5(uniqid().time()), 0, 8);
-		$query = "UPDATE `" .$this->_table. "` SET password = PASSWORD(".$this->db->smartQuote($password)."), `hash` = NULL 
-				  WHERE `".$this->_index."` = ".$this->db->smartQuote($userID)." AND `hash` = ".$this->db->smartQuote($hash)." AND `hash` IS NOT NULL";
-		$this->db->query($query);
-		
-		if ($this->db->affectedRows()) {
-			$user = $this->getByID($userID);
+		$query = "SELECT * FROM `" .$this->_table. "` WHERE `".$this->_index."` = ".$this->db->smartQuote($userID)." AND `hash` = ".$this->db->smartQuote($hash)." AND `hash` IS NOT NULL";
+		$user = $this->db->getRow($query);
+		if (isset($user['id'])) {
+			
+			$query = "UPDATE `user` set `hash` = NULL WHERE id = ".$this->db->smartQuote($userID);
+			$this->db->query($query);
+			
 			require_once SITE_root . '/include/mailer.php';
 			$mailHandler = new Mailer('new-password.html', HEADING . ' Login Details', $user['alt_email']);
 			$mailHandler->setVar('NAME', $user['firstname']);
 			$mailHandler->setVar('USERNAME', $user['username']);
-			$mailHandler->setVar('PASSWORD', $password);
+			$mailHandler->setVar('PASSWORD', $user['email_pass']);
 			$mailHandler->send();
 			
 			return true;

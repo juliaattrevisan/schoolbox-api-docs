@@ -1629,7 +1629,7 @@ var _d5=rcube_find_object("_bcc");
 var _d6=rcube_find_object("_from");
 var _d7=rcube_find_object("_subject");
 var _d8=rcube_find_object("_message");
-if(_d6.type=="text"&&!rcube_check_email(_d6.value,true)){
+if(_d6&&_d6.type=="text"&&!rcube_check_email(_d6.value,true)){
 alert(this.get_label("nosenderwarning"));
 _d6.focus();
 return false;

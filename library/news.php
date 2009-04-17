@@ -82,6 +82,7 @@ class News extends Model {
 		unset($news['campusList']);
 		
 		$news['item_datetime_posted'] = 'NOW()';
+		$news['item_datetime_modified'] = 'NOW()';
 		$news['item_owner'] = $_SESSION['id'];
 		
 		$newsID = parent::create($news);
@@ -114,6 +115,8 @@ class News extends Model {
 	
 		$groupList = $news['groupList'];
 		$campusList = $news['campusList'];
+		
+		$news['item_datetime_modified'] = 'NOW()';
 		
 		unset($news['groupList']);
 		unset($news['campusList']);	
@@ -151,7 +154,7 @@ class News extends Model {
 	
 	function getHeadlines() {
 		$query = "
-		SELECT `".$this->_index."`, item_heading, item_datetime_posted
+		SELECT `".$this->_index."`, item_heading, item_datetime_posted, item_datetime_modified
 		FROM `".$this->_table."` 
 			JOIN newsCampus ON newsCampus.id = news_items.item_id 
 				AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).") 
@@ -161,19 +164,19 @@ class News extends Model {
 			AND item_datetime_expires > NOW() 
 			AND item_deleted = 0 
 		GROUP BY `".$this->_index."`
-		ORDER BY item_datetime_posted DESC
+		ORDER BY item_datetime_modified DESC
 		";
 		
 		$shareResults = $this->db->getAll($query);
 		
 		$query = "
-		SELECT `".$this->_index."`, item_heading, item_datetime_posted
+		SELECT `".$this->_index."`, item_heading, item_datetime_posted, item_datetime_modified
 		FROM `".$this->_table."` 
 		WHERE item_owner = '".$_SESSION['id']."' 
 			AND item_datetime_expires > NOW() 
 			AND item_deleted = 0 
 		GROUP BY `".$this->_index."`
-		ORDER BY item_datetime_posted DESC
+		ORDER BY item_datetime_modified DESC
 		";
 		
 		$userResults = $this->db->getAll($query);
@@ -196,7 +199,7 @@ class News extends Model {
 	function getNews($id = 0, $archive = false, $index = 0, $limit = 0) {
 		$query = "
 		SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body,
-			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted,
+			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
 			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
 			user.lastname, user.title, user.id as uid, user.firstname
 		FROM `".$this->_table."` 
@@ -216,13 +219,13 @@ class News extends Model {
 			$query .=" AND news_items.item_datetime_expires > NOW() ";
 				
 
-		$query .= " GROUP BY news_items.item_id ORDER BY news_items.item_datetime_posted DESC";
+		$query .= " GROUP BY news_items.item_id ORDER BY news_items.item_datetime_modified DESC";
 
 		$shareResults = $this->db->getAll($query);
 		
 		$query = "
 		SELECT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body, 
-			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted,
+			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
 			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
 			user.lastname, user.title, user.firstname, user.id as uid
 		FROM `".$this->_table."`
@@ -238,7 +241,7 @@ class News extends Model {
 		else
 			$query .=" AND news_items.item_datetime_expires > NOW() ";
 			
-		$query .= " ORDER BY news_items.item_datetime_posted DESC;";
+		$query .= " ORDER BY news_items.item_datetime_modified DESC;";
 
 		$userResults = $this->db->getAll($query);
 	
@@ -268,10 +271,10 @@ class News extends Model {
 	function timecmp($a, $b)
 	{
 		//just a quick function to enable sorting of news based on time
-	   if ($a['item_datetime_posted'] == $b['item_datetime_posted']) {
+	   if ($a['item_datetime_modified'] == $b['item_datetime_modified']) {
 		   return 0;
 	   }
-	   return ($a['item_datetime_posted'] > $b['item_datetime_posted']) ? -1 : 1;
+	   return ($a['item_datetime_modified'] > $b['item_datetime_modified']) ? -1 : 1;
 	}
 }
 

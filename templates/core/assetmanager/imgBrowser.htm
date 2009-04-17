@@ -1,0 +1,43 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>{$lang_assetmanager_title}</title>
+    <link rel="stylesheet" type="text/css" href="css/imgBrowser.css" />
+	<script language="javascript" type="text/javascript" src="../../tiny_mce_popup.js"></script>
+    <script language="javascript" type="text/javascript" src="jscripts/functions.js"></script>
+	<base target="_self" />
+</head>
+<body> 
+	
+  
+    <form action="/cms/fileForm.php" method="post" enctype="multipart/form-data">
+        <div id="assetmanager_window">
+            <!-- BEGIN image_row -->
+            <div class="assetmanager_container">
+                <div class='assetmanager_imagebox' {SELECTED} onClick="setCurrent(this);">
+                    <img src="{URL}" alt="{TITLE}" width="{WIDTH}" height="{HEIGHT}" style="vertical-align: middle;" />
+                    <input type='hidden' name='desc{FILE_ID}' id='desc{FILE_ID}' value="{DESC}" />
+                </div>
+                <p class="assetmanager_text"><span style='font-weight: bold;'>{TITLE_SHORT}</span> ({SIZE}kB)</p>
+            </div>
+            <!-- END image_row -->
+    </div>
+   
+   <div id="assetmanager_menu">
+       <div style="float: left;">
+            <input type="button" value="insert" onClick="insertImage();" style='float: left; margin-right: 10px;' />
+            <input type="button" value="cancel" onClick="tinyMCEPopup.close();" style='float: left; margin-right: 10px;' />
+       </div>
+       
+        <div style='float: right; display: none;' >
+            <input type="file" name="file" />
+            <input type='submit' value='upload' />
+            <input type="hidden" name="category" value="{CATEGORY_ID}" />
+            <input type="hidden" name="description" value="{CATEGORY_ID}" />
+            <input type="hidden" name="redirect" value="assetIM" />
+        </div> 
+        </form>
+    </div> 
+    
+    
+</body> 
+</html> 

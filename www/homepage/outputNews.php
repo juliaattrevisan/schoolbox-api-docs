@@ -10,7 +10,7 @@ $newsList = $newsHandler->getAllForCategory($categoryID, $config);
 if (is_array($newsList)) {
 
 	foreach($newsList as $news) {
-		if($news['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS)
+		if($news['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || (NEWS_teacher_edit_other && $permission >= WRITE_ACCESS))
 			$this->setVar('MOD_NEWS', '<a href="/news/homepage/'.$news['id'].'">Modify</a>');
 		else
 			$this->setVar('MOD_NEWS', '');

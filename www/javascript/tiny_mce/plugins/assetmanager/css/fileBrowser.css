@@ -1,0 +1,54 @@
+@charset "utf-8";
+/* CSS Document */
+
+#assetmanager_window {
+	width: 506px;
+	height: 480px;
+	border: 1px solid #cccccc;
+	background-color: #ffffff;
+	padding: 5px;
+	margin: 5px;
+	overflow: auto;
+}
+#assetmanager_menu {
+	width: 506px;
+	height: 18px;
+	border: 1px solid #cccccc;
+	background-color: #ffffff;
+	padding: 6px;
+	margin: 5px;
+	overflow: auto;
+}
+#assetmanager_file_list {
+	width: 100%;
+}
+#assetmanager_file_list thead td {
+	font-weight: bold;
+	height: 20px;
+	line-height: 20px;
+	border-bottom: 1px solid #000000;
+}
+#assetmanager_file_list tbody td {
+	
+	height: 20px;
+	line-height: 20px;
+	border-bottom: 1px solid #666666;
+	
+}
+#assetmanager_current {
+	cursor: default;
+	border-width: 3px;
+	padding: 3px;
+}
+#assetmanager_current td {
+	
+	background-color: #eeeeee;
+}
+
+.assetmanager_file_row td {
+	cursor: default;
+	border-bottom: 1px solid #ffffff;
+	padding: 2px;
+	background-color: #eeeeee;
+}
+

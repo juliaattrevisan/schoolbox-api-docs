@@ -218,6 +218,8 @@ ALTER TABLE `myFolder`
 ALTER TABLE `news_items` 
 	CHANGE `item_topic_id` `item_topic_id` smallint(5) unsigned   NULL DEFAULT '0' after `item_id`, 
 	CHANGE `item_heading` `item_heading` varchar(50)  COLLATE utf8_general_ci NOT NULL DEFAULT '' after `item_topic_id`, 
+	ADD COLUMN `item_datetime_modified` datetime   NULL after `item_datetime_expires`, 
+	CHANGE `item_mainpage` `item_mainpage` tinyint(3) unsigned   NOT NULL DEFAULT '0' after `item_datetime_modified`,
 	CHANGE `item_body` `item_body` mediumtext  COLLATE utf8_general_ci NOT NULL after `item_mainpage`, 
 	CHANGE `item_link1` `item_link1` varchar(255)  COLLATE utf8_general_ci NULL after `item_body`, 
 	CHANGE `item_link2` `item_link2` varchar(255)  COLLATE utf8_general_ci NULL after `item_link1`, 
@@ -508,3 +510,10 @@ UPDATE link SET modified = submitted;
 
 INSERT INTO categoryCode (categoryID, `code`)
 SELECT `id`, `code` FROM category WHERE `code` IS NOT NULL AND `code` != '';
+
+UPDATE news_items SET item_datetime_modified = item_datetime_posted;
+
+INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (34,1,'outputWiki','Wiki','Provides an area for group members to work together on joint documents.','wiki.htm','a:1:{s:4:\"size\";i:0;}','false');
+INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (35,1,'outputFeed','Homepage Feed','Provides a running commentary on recent changes to the homepage','feed.htm','a:1:{s:4:\"size\";i:0;}','false');
+INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (36,1,'outputTextBox','Text Box','An editable region to enter text','textBox.html','a:0:{}','false');
+

@@ -10,7 +10,7 @@ $groupHandler = new Group;
 
 if($_POST['heading'] && is_numeric($_POST['code'])) {
 
-	if ($permission = $groupHandler->getPermission($_POST['code']) < WRITE_ACCESS)
+	if (($permission = $groupHandler->getPermission($_POST['code'])) < WRITE_ACCESS)
 		error(19);
 
 	$news = array(	'heading'	=> $_POST['heading'],
@@ -20,7 +20,15 @@ if($_POST['heading'] && is_numeric($_POST['code'])) {
 				);
 
 	if(is_numeric($_POST['id'])) {
+	
+		$current = $newsHandler->getByID($_POST['id']);
 		
+		// check user is owner
+		if ($permission == WRITE_ACCESS && $current['owner'] != $_SESSION['id'] && !NEWS_teacher_edit_other)
+			error(23);
+		
+		var_dump ($permission);
+		die('x');		
 		/* Delete news */
 		if($_POST['delete']) {
 			$newsHandler->delete($_POST['id']);

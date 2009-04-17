@@ -46,6 +46,10 @@ class File extends Model {
 		
 		if ($config['filter'] == 'document')
 				$query .= " AND ( f.mime_type LIKE '%pdf' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%') ";	
+		
+		if ($config['filter'] == 'image')
+				$query .= " AND ( f.mime_type LIKE '%image%' ) ";	
+
 						  
 		
 		$sortFields = array('Name' => 'f.description', 'Date' => 'f.submitted');
@@ -57,7 +61,7 @@ class File extends Model {
 		
 		if($config['size'] > 0) 
 			$query .= " LIMIT 0, " . $config['size']; 
-
+		
 		return $this->db->getAll($query);
 	
 	}

@@ -34,6 +34,7 @@ $query = "SELECT position, name, filename, function
 $result = $this->db->query($query);
 while($component = $this->db->getNextArray($result))
 {
+	$j = 0;
 	if($component['name'])
 	{
 		if($component['filename'])

@@ -6,7 +6,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 $page = new SitePage(false);
 $userHandler = new User;
 
-$page->setFile(TEMPLATE_body, 'common/reset-password.html');
+$page->setFile(TEMPLATE_body, 'common/reset.html');
 $page->setBlock(TEMPLATE_body, 'check_email', 'check_email_block');
 $page->setBlock(TEMPLATE_body, 'reset_failed', 'reset_failed_block');
 
