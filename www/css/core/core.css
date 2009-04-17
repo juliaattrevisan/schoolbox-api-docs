@@ -84,8 +84,8 @@ a:hover { text-decoration: underline; }
 /*--------------------------------------------------------------
  Text formatting styles 
 --------------------------------------------------------------*/
-p           { margin: 0 0 1em 0; text-align:left; line-height: 1.2; }
-ul, ol      { margin: 0 0 1.5em 1.5em; line-height: 1.2; }
+p           { margin: 0 0 1em 0; text-align:left; line-height: 1.3; }
+ul, ol      { margin: 0 0 1.5em 1.5em; line-height: 1.3; }
 hr { background-color: #d2d2d2; border: 0; height: 1px; }
 /*--------------------------------------------------------------
  Heading Styles 
@@ -512,10 +512,10 @@ h2 span {
 #content table tr.dark td {
 	background: #ececec;
 	}
-.listing h3 { float: left; line-height: 1.2; width: 60%; }
+.listing h3 { float: left; line-height: 1.3; width: 60%; }
 .listing h3 a:hover { color: #003e7e; }
 .listing p { clear: both; margin: 0; }
-.listing h4 { float: left; width: 60%; clear: none; font-weight: normal; line-height: 1.2; }
+.listing h4 { float: left; width: 60%; clear: none; font-weight: normal; line-height: 1.3; }
 p.interact { font-size: 90%; text-align: right; clear: none; white-space: nowrap; }
 p.interact-left { font-size: 90%; float: left; clear: none; white-space: nowrap; width: 120px; }
 li p.interact { margin: 0 0 0 15px; float: right; }

@@ -11,7 +11,7 @@
 define("HEADING", 'OurSchool');			//This will appear on the window title of each page
 define("SITE_name", "Alaress Pty Ltd");
 
-define("SITE_location", "wenona");				//This defines the location, allows specific code for each location
+define("SITE_location", "mgs");				//This defines the location, allows specific code for each location
 define("SITE_root", dirname(__FILE__)."/../../");
 define('SITE_address', 'http://www.alaress.com.au');
 
@@ -54,6 +54,7 @@ define("MAX_FILE_SIZE", 		10485760); 					//Maximum filesize in bytes allowed to
 define("URLS_use_frame", 		false);						//Open links in frame
 define('FILE_use_frame', 		false);
 define('MIME_magic', 			'/usr/share/file/magic');
+define('NEWS_teacher_edit_other', false);
 
 
 //GROUP options
