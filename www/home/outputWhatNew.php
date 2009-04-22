@@ -35,7 +35,7 @@ if(MAIL_enable && !(SITE_location == 'mgs' && $groupHandler->isStaff()) ) {
 }
 else
 	$this->setVar('new_mail_block','');
-print_r($catList);
+
 //for each subject
 if(is_array($catList))
 {
