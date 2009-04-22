@@ -9,9 +9,12 @@
 
 //Site Directives
 define("HEADING", "Ormond Portal");			//This will appear on the window title of each page
-define("SITE_name", "portal");
-define("MAX_FILE_SIZE", 10485760); 			//Maximum filesize in bytes allowed to be uploaded (default 10MB) (also set in php.ini)
+define("SITE_name", "Ormond College");
+
 define("SITE_location", "ormond");				//This defines the location, allows specific code for each location
+define("SITE_root", dirname(__FILE__)."/../../");
+define('SITE_address', 'http://www.ormond.unimelb.edu.au');
+
 
 //Security options
 define("LOGINGRACE", "60");				//Time measured between logins (secs)
@@ -24,26 +27,35 @@ define("REGISTER_FIRSTIME", false);			//Detects no password and checks password 
 
 //LDAP Authentcation
 define('LDAP_enable', true);
-define('LDAP_host', 'ldap://francis.ormond.unimelb.edu.au');
+define('LDAP_host', 'ldap://francis2.ormond.unimelb.edu.au');
 define('LDAP_user', 'cn=admin,dc=ormond,dc=unimelb,dc=edu,dc=au');
-define('LDAP_pass', 'J0RkuJZ8');
+define('LDAP_pass', 'cHin4#');
 define('LDAP_base', 'dc=ormond,dc=unimelb,dc=edu,dc=au');
 
 // Note that the following directories should exist outside the webroot and 
 // be writable by the apache process
 
+//Template Options
+define('TEMPLATE_dir', 			SITE_root.'/templates');
+define('TEMPLATE_body', 		'bodyTpl');
+define('TEMPLATE_content', 		'contentTpl');
+define('TPL_directory', 		SITE_root.'/'. SITE_location . "_templates");		//Deprecated option
+
 //CMS options
-define("FILE_directory", "/var/www/portal/files");	//Files uploaded using CMS system will be stored here
-define("FILE_max_upload", "10");
-define("SUBMISSION_directory", "/var/www/portal/submissions");	//All files submitted to submission box stored here
-define("RETURNS_directory", "/var/www/portal/returns");		//Returned work will be stored in this directory
-define("MYFILE_directory", "/var/www/portal/myfiles");
-define("TPL_directory", "/var/www/portal/ormond_templates");		//Where site templates are located
-define("THUMBNAIL_IMAGE_CACHE", "/var/www/portal/files/thumbnails");		//Thumbnail cache for 
-define("URLS_use_frame", false);						//Open links in frame
-define('ZIP_directory', '/var/www/portal/zip');
-//define('MIME_magic', '/usr/share/file/magic');
-define('DROPBOX_directory', '/usr/local/www/portal/drop');
+define("FILE_directory",		SITE_root.'/files');		//Files uploads
+define("MYFILE_directory",  	SITE_root.'/myfiles');		//Personal file uploads
+define("SUBMISSION_directory", 	SITE_root.'/submissions');	//Student submission files
+define("RETURNS_directory", 	SITE_root.'/returns');		//Returned work files
+define('DROPBOX_directory', 	SITE_root.'/drop');			//Student dropbox files
+define('ZIP_directory', 		SITE_root.'/zip');			//Cache for zip files 
+define("THUMBNAIL_IMAGE_CACHE", SITE_root.'/files/thumbnails');	//Thumbnail cache 
+define("THUMBNAIL_size", 		100); 
+define("FILE_max_upload", 		"10");						//Maximum number of files that can be uploaded via bulk uploader
+define("MAX_FILE_SIZE", 		10485760); 					//Maximum filesize in bytes allowed to be uploaded (default 10MB) (also set in php.ini)
+define("URLS_use_frame", 		false);						//Open links in frame
+define('FILE_use_frame', 		false);
+//define('MIME_magic', 			'/usr/share/file/magic');
+define('NEWS_teacher_edit_other', true);
 
 //GROUP options
 define("GROUP_staff_only_owner", false);			//Determines if students can be group owner or not
@@ -75,7 +87,7 @@ define("MSSQL_passwd","");
 define("MSSQL_db","SynergyOne");  
 
 //Synergy campus code lookup table
-define('SYN_CAMPUS_Codes', serialize(array(
+/*define('SYN_CAMPUS_Codes', serialize(array(
 		1=>'SEN',
 		2=>'WAD',
 		3=>'GRIM',
@@ -83,7 +95,7 @@ define('SYN_CAMPUS_Codes', serialize(array(
 
 //Timetable days as this is not found in synergetic and it can be a bit hard to calculate pre-timetable
 define('TIMETABLE_day_count',serialize(array(1=>7,7,5)));
-
+*/
 
 //Webmail
 define("MAIL_enable", true);				//This will disable webmail module
@@ -112,12 +124,14 @@ define("WEATHER_LOCATION", "");
 
 //RSS Feed 
 define('RSS_url', 'http://www.abc.net.au/news/indexes/justin/rss.xml');
-define('RSS_cache_dir', '/var/www/portal/files');
+define('RSS_cache_dir', SITE_root.'/files/');
 define('RSS_cache_time', 3000);
 define('RSS_limit', 6);
 
 define("ALLCAMPUS", 4);					//Value that represents all campuses in the luCampus table
 define("HOMEPAGESERVICE", 1);				//Value that represents the homepage module in the service table
+define("DROPBOX_COMPONENT", 25);
+define("FORUM_COMPONENT", 5);
 
 define("STUDENTGROUPIDS", serialize(array(3)));	//List of id numbers representing student groups
 define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
@@ -126,18 +140,9 @@ define("PARENTGROUPIDS", serialize(array(6)));		//Parent group ids
 // Name format display options.
 define("NAME_FORMAT", "{title} {firstname} {lastname}");
 
-define("DROPBOX_COMPONENT", 25);
+
 
 //homepage config
-define('HOMEPAGE_large_head_font', 4);
-define('HOMEPAGE_large_head_bg', 3);
-define('HOMEPAGE_large_text_font', 4);
-define('HOMEPAGE_large_text_bg', 5);
-define('HOMEPAGE_small_head_font', 4);
-define('HOMEPAGE_small_head_bg', 3);
-define('HOMEPAGE_small_text_font', 4);
-define('HOMEPAGE_small_text_bg', 2);
-
 define('HOMEPAGE_colors', serialize(array(
 	'left_head_font' => '000000', 
 	'left_head_bg' => 'f9f8f1', 
@@ -157,7 +162,7 @@ define('HOMEPAGE_colors', serialize(array(
 )));
 
 //module config options
-define('HELPDESK_enable', false);
+define('HELPDESK_enable', true);
 define('HELPDESK_location', '/var/www/helpdesk');
 define('HELPDESK_db', 'helpdesk');
 ?>

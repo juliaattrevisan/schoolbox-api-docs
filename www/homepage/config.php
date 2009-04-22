@@ -42,7 +42,7 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'componentRow', 'componentRowBlock');
 	$this->setBlock('componentRow', 'componentCol', 'componentColBlock');
 	
-	$listComp = $homepage->getComponentList(0);
+	$listComp = $homepage->getComponentList();
 	foreach($listComp as $key => $component){
 		$this->setVar('componentID', $component['id']);
 		$this->setVar('componentName', $component['name']);
