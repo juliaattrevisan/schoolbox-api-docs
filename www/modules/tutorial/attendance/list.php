@@ -59,6 +59,8 @@ if (is_array($eventList)) {
 	foreach ($eventList as $event) {
 		$output = array('EVENT_ID'		=> $event['eventID'],
 						'EVENT_DATE'	=> outputDate(DATE_short_no_time, $event['date']),
+						'EVENT_START'	=> $event['start'],
+						'EVENT_FINISH'	=> $event['finish'],
 						'EVENT_NAME'	=> scrubText($event['name']),
 						'EVENT_CODE'	=> scrubText($event['code']),
 						'ACTION'		=> 'Save',

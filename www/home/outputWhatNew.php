@@ -35,12 +35,14 @@ if(MAIL_enable && !(SITE_location == 'mgs' && $groupHandler->isStaff()) ) {
 }
 else
 	$this->setVar('new_mail_block','');
-
+print_r($catList);
 //for each subject
 if(is_array($catList))
 {
 	foreach($catList as $catInfo)
 	{
+		$this->setVar("NEW_CATEGORY_ID", $catInfo['id']);
+		
 		$sub = $whatnew->submissionDetails($catInfo['id']);
 		if($sub['duework'])
 			$this->parse('due_block', 'due_work');
@@ -68,6 +70,7 @@ if(is_array($catList))
 
 	
 		$cat = $whatnew->newCategory($catInfo['id']);
+		
 		if($cat['news'])
 		{
 			if($cat['news'] > 1)
@@ -123,7 +126,6 @@ if(is_array($catList))
 				$this->setVar("NEW_CATEGORY_NAME", $catInfo['name'].' ('.$catInfo['code'].')');
 			else
 				$this->setVar("NEW_CATEGORY_NAME", $catInfo['name']);
-			$this->setVar("NEW_CATEGORY_ID", $catInfo['id']);
 			$this->parse("new_category", "category_block", true);
 			$flag = 1;
 		}
