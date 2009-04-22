@@ -112,15 +112,13 @@ class User extends Model {
 		
 	}
 	
-	function resetPassword($userID, $hash) {
-		
-		$query = "SELECT * FROM `" .$this->_table. "` WHERE `".$this->_index."` = ".$this->db->smartQuote($userID)." AND `hash` = ".$this->db->smartQuote($hash)." AND `hash` IS NOT NULL";
-		$user = $this->db->getRow($query);
+	function sendPassword($email) {
+		if (empty($email))
+			return false;
+			
+		$user = $this->getByField('alt_email', $email);
 		if (isset($user['id'])) {
-			
-			$query = "UPDATE `user` set `hash` = NULL WHERE id = ".$this->db->smartQuote($userID);
-			$this->db->query($query);
-			
+		
 			require_once SITE_root . '/include/mailer.php';
 			$mailHandler = new Mailer('new-password.html', HEADING . ' Login Details', $user['alt_email']);
 			$mailHandler->setVar('NAME', $user['firstname']);

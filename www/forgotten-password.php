@@ -16,7 +16,7 @@ if (isset($_POST['email']) && isEmail($_POST['email'])) {
 	
 	$userHandler = new User;
 	
-	if ($userHandler->sendResetPasswordEmail($_POST['email']))
+	if ($userHandler->sendPassword($_POST['email']))
 		$page->parse('email_sent_block', 'email_sent');
 	else
 		$page->parse('not_found_block', 'not_found');
