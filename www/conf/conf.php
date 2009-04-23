@@ -163,6 +163,8 @@ define("STUDENTGROUPIDS", serialize(array(3,5)));	//List of id numbers represent
 define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
 define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 
+define('GROUP_can_change_password', serialize(array(1,2,3,4,5)));
+
 define('HOMEPAGE_colors', serialize(array(
 	'left_head_font' => 'FFFFFF', 
 	'left_head_bg' => '051252', 
