@@ -17,9 +17,8 @@ $this->setFile(TEMPLATE_content, 'news.html');
 $this->setTitle('News');
 $this->setTab('news');
 
-
-$this->setBlock(TEMPLATE_content, 'main_stories', 'stories_block');
-$this->setBlock('main_stories', 'story_body', 'story_block');
+$this->setBlock(TEMPLATE_content, 'topic', 'topic_block');
+$this->setBlock('topic', 'news', 'news_block');
 
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
@@ -48,37 +47,60 @@ $items = $myNews->getNews();
 
 if(is_array($items))
 {
+	$i = 0;
+	$total = count($items);
 	foreach($items as $article)
 	{
-		$this->setVar("NEWS_ID",$article['item_id']); 
-	 
+		$i++;
+
 		if(($permission >= WRITE_ACCESS && $article['item_owner'] == $_SESSION['id']) || $permission >= FULL_ACCESS)
 			$this->setVar("MODIFY", "<a href=\"/news/modify/".$article['item_id']."\">modify</a>");
 		else
 			$this->setVar("MODIFY", "");
 		
-		$this->setVar("NEWS_TITLE", $article['item_heading']);
-		
 		$fullname = formatName($article);
 		$owner = "<a href=\"/search/user/{$article['uid']}\">$fullname</a>";
-
-		$this->setVar("POSTER", $owner);
+	
+		$output = array('NEWS_ID'		=> $article['item_id'],
+						'NEWS_TITLE'	=> $article['item_heading'],
+						'POSTER'		=> $owner,
+						'DATETIME' 		=> $_SESSION['su'] == 1 ? $article['post_datetime']." expires on ".$article['expire_datetime'] : $article['post_datetime'],
+						'NEWS_BODY'		=> nl2br(scrubHTML($article['item_body'])),
+						'TOPIC_NAME'	=> scrubText($previous['topicName']),
+						);
+						
+		$this->setVar($output);
 		
-		if($_SESSION['su'] == 1)
-			$this->setVar("DATETIME", $article['post_datetime']." expires on ".$article['expire_datetime']);
-		else
-			$this->setVar("DATETIME", $article['post_datetime']);
+		if ($article['topicName'] != $previous['topicName'] && $i > 1) {
+			/* end topic */
+			$this->parse('topic_block', 'topic', true);
 			
-		$this->setVar("NEWS_BODY", nl2br(scrubHTML($article['item_body'])));
+			$this->setVar("news_block", "");
+			$this->parse("news_block", "news", true);
+			
+			/* last rotation */
+			if ($total == $i) {
+				$this->setVar('TOPIC_NAME', scrubText($article['topicName']));
+				$this->parse('topic_block', 'topic', true);
+			}
+			
+		} elseif ($total == $i) {
+			/* last rotation */
+			$this->parse("news_block", "news", true);
+			
+			$this->parse('topic_block', 'topic', true);
+		} else {
+			/* normal rotation */
+			$this->parse("news_block", "news", true);		
+		}
 		
-		$this->parse("story_block", "story_body");
-		$this->parse("stories_block", "main_stories", true);
+		$previous = $article;
 
 	}
 }
 else
 {
-		$this->setVar("stories_block", "No news items found");
+		$this->setVar("topic_block", "No news items found");
 }
 
 ?>

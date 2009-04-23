@@ -43,6 +43,8 @@ if (is_numeric($this->arg[0])) {
 	$this->dropDown("group_selection", $groupList, $news['groupList']);
 	$this->dropDown("campus_selection", $campusList, $news['campusList'], "campus_row");
 	
+	$this->dropDown("topic_list", $newsHandler->getTopicList(), $news['item_topic_id'], TEMPLATE_content, array('newsTopicID' => 'TOPIC_ID', 'name' => 'TOPIC_NAME'));
+	
 	if (count($campusList) > 1)
 		$this->parse("campus_row_block", "campus_row");
 	else
@@ -75,6 +77,9 @@ else {
 
 	$this->dropDown("group_selection", $groupList);
 	$this->dropDown("campus_selection", $campusList, array(), "campus_row");
+
+	$this->dropDown("topic_list", $newsHandler->getTopicList(), '', TEMPLATE_content, array('newsTopicID' => 'TOPIC_ID', 'name' => 'TOPIC_NAME'));
+
 
 	if (count($campusList) > 1)
 		$this->parse("campus_row_block", "campus_row");

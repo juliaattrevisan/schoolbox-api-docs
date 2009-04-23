@@ -67,6 +67,13 @@ function confirmDelete(newsID) {
 			<td><input type="text" name="heading" size="35" maxlength="50" value="{HEADING}" /></td>
 		  </tr>
 		  <tr> 
+			<td><h3>Topic</h3></td>
+			<td><select name="item_topic_id">
+            <!-- BEGIN topic_list -->
+            <option value="{TOPIC_ID}" {TOPIC_ID_SELECTED}>{TOPIC_NAME}</option><!-- END topic_list -->
+            </select></td>
+		  </tr>          
+		  <tr> 
 			<td><h3>Expires</h3>
 			<em>Select a period for which the news item will remain available.</em></td>
 			<td><select name="expires">

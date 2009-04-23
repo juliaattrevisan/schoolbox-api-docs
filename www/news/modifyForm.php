@@ -8,14 +8,15 @@ $page = new SitePage;
 $newsHandler = new News;
 $groupHandler = new Group(NEWS_SERVICE);
 
-if ($permission = $groupHandler->getPermission(0) < WRITE_ACCESS)
+if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)
 	error(19);
 
 if ($_POST['heading']) {
-	$news = array('item_heading' => $_POST['heading'],
-				  'item_body'		 => $_POST['body'],
-				  'groupList'	=> $_POST['group'],
-				  'campusList'	=> $_POST['campus'],
+	$news = array('item_heading' 	=> $_POST['heading'],
+				  'item_body'		=> $_POST['body'],
+				  'groupList'		=> $_POST['group'],
+				  'campusList'		=> $_POST['campus'],
+				  'item_topic_id' 	=> $_POST['item_topic_id'],
 				  );
 	
 	if ((int)$_POST['expires'] > 0)

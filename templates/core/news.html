@@ -1,15 +1,17 @@
 <h1>News {ADD}</h1>
-<!-- BEGIN main_stories -->
+<!-- BEGIN topic -->
+<h2>{TOPIC_NAME}</h2>
+<!-- BEGIN news -->
 <div class="news-item">
 	<h3 id="news-header"><a name="{NEWS_ID}"></a>{NEWS_TITLE}</h3>
   <span class="header_option">{MODIFY}</span>
-  <!-- BEGIN story_body -->
   {NEWS_BODY}
   <hr />
   <p class="interact">Submitted by {POSTER} on {DATETIME}</p>
-  <!-- END story_body -->
 </div>  
-<!-- END main_stories -->
+<!-- END news -->
+<br />
+<!-- END topic -->
 
 <div class="pagination">
   <!-- BEGIN previous_button -->

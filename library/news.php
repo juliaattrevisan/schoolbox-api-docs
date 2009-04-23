@@ -154,12 +154,13 @@ class News extends Model {
 	
 	function getHeadlines() {
 		$query = "
-		SELECT `".$this->_index."`, item_heading, item_datetime_posted, item_datetime_modified
+		SELECT `".$this->_index."`, item_heading, item_datetime_posted, item_datetime_modified, newsTopic.name topicName
 		FROM `".$this->_table."` 
 			JOIN newsCampus ON newsCampus.id = news_items.item_id 
 				AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).") 
 			JOIN newsGroup ON newsGroup.id = news_items.item_id 
 				AND newsGroup.gid = '".$_SESSION['gid']."'
+			JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
 		WHERE news_items.item_owner != '".$_SESSION['id']."' 
 			AND item_datetime_expires > NOW() 
 			AND item_deleted = 0 
@@ -170,8 +171,9 @@ class News extends Model {
 		$shareResults = $this->db->getAll($query);
 		
 		$query = "
-		SELECT `".$this->_index."`, item_heading, item_datetime_posted, item_datetime_modified
+		SELECT `".$this->_index."`, item_heading, item_datetime_posted, item_datetime_modified, newsTopic.name topicName
 		FROM `".$this->_table."` 
+		JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
 		WHERE item_owner = '".$_SESSION['id']."' 
 			AND item_datetime_expires > NOW() 
 			AND item_deleted = 0 
@@ -201,7 +203,7 @@ class News extends Model {
 		SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body,
 			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
 			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
-			user.lastname, user.title, user.id as uid, user.firstname
+			user.lastname, user.title, user.id as uid, user.firstname, newsTopic.name topicName
 		FROM `".$this->_table."` 
 		JOIN user ON news_items.item_owner = user.id
 		JOIN newsCampus ON newsCampus.id = news_items.item_id 
@@ -209,6 +211,7 @@ class News extends Model {
 			OR news_items.item_campus='4' 
 		JOIN newsGroup ON newsGroup.id = news_items.item_id 
 			AND newsGroup.gid = '".$_SESSION['gid']."'
+		JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
 		WHERE news_items.item_owner != '".$_SESSION['id']."' AND news_items.item_deleted = 0";
 
 		if($id)
@@ -219,7 +222,7 @@ class News extends Model {
 			$query .=" AND news_items.item_datetime_expires > NOW() ";
 				
 
-		$query .= " GROUP BY news_items.item_id ORDER BY news_items.item_datetime_modified DESC";
+		$query .= " GROUP BY news_items.item_id ORDER BY newsTopic.name, news_items.item_datetime_modified DESC";
 
 		$shareResults = $this->db->getAll($query);
 		
@@ -227,9 +230,10 @@ class News extends Model {
 		SELECT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body, 
 			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
 			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
-			user.lastname, user.title, user.firstname, user.id as uid
+			user.lastname, user.title, user.firstname, user.id as uid, newsTopic.name topicName
 		FROM `".$this->_table."`
 		JOIN user ON news_items.item_owner = user.id
+		JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
 		WHERE news_items.item_owner = '".$_SESSION['id']."'
 			AND news_items.item_deleted = 0 
 		"; 
@@ -241,7 +245,7 @@ class News extends Model {
 		else
 			$query .=" AND news_items.item_datetime_expires > NOW() ";
 			
-		$query .= " ORDER BY news_items.item_datetime_modified DESC;";
+		$query .= " ORDER BY newsTopic.name, news_items.item_datetime_modified DESC;";
 
 		$userResults = $this->db->getAll($query);
 	
@@ -270,11 +274,26 @@ class News extends Model {
 
 	function timecmp($a, $b)
 	{
-		//just a quick function to enable sorting of news based on time
-	   if ($a['item_datetime_modified'] == $b['item_datetime_modified']) {
-		   return 0;
-	   }
-	   return ($a['item_datetime_modified'] > $b['item_datetime_modified']) ? -1 : 1;
+	
+		if (($topicResult = strcmp($a['topicName'], $b['topicName'])) == 0) {
+			//just a quick function to enable sorting of news based on time
+			if ($a['item_datetime_modified'] == $b['item_datetime_modified']) {
+				return 0;
+			}
+			return ($a['item_datetime_modified'] > $b['item_datetime_modified']) ? -1 : 1;
+		} else {
+			return $topicResult;
+		}
+	}
+	
+	function getTopicByID($newsTopicID) {
+		$query = "SELECT * FROM `newsTopic` WHERE `newsTopicID` = $newsTopicID";
+		return $this->db->getRow($query);
+	}
+	
+	function getTopicList() {
+		$query = "SELECT * FROM `newsTopic` ORDER BY `name`";
+		return $this->db->getAll($query);
 	}
 }
 
