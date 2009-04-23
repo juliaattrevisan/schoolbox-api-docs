@@ -381,12 +381,12 @@ function getRelativeTime($date, $now = 0, $prefix = 'on') {
 	if ($diff<2)
 		return ' Yesterday';
 	if ($diff<7)
-		return $diff . " day" . plural($diff) . " ago";
+		return $diff . " days ago";
 	$diff = round($diff/7);
 	if ($diff<2)
-		return ' Last Week';
+		return ' Last week';
 	if ($diff<4)
-		return $diff . " week" . plural($diff) . " ago";
+		return $diff . " weeks ago";
 	return $prefix.' '.date(DATE_short_no_time, $date);
 }
 

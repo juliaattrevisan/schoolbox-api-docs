@@ -41,7 +41,7 @@ class CategoryNews extends Model {
 	}
 	
 	function delete($id) {
-		$this->update(array('id','deleted'=>1));
+		$this->update(array('id'=>$id,'deleted'=>1));
 	}
 }
 
