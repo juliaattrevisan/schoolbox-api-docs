@@ -7,7 +7,10 @@ body {
 	}
 a { color: #CF0034; }
 a:hover { color: #C3536F; }
-#container { padding: 0; }
+#container {
+	padding: 0;
+	min-width: 996px;
+	}
 #nav { position: absolute; float: left; top: 139px; }
 #header {
 	height: 119px;
@@ -68,7 +71,7 @@ a:hover { color: #C3536F; }
 	background: 0;
 	}
 .header_option {
-	margin-top: -30px;
+	margin-top: -33px;
 	}
 table .header_option {
 	margin-top: -29px;
