@@ -16,6 +16,7 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, "student_synergy_form", "student_synergy_form_block");
 	$this->setBlock(TEMPLATE_content, "student_synergy_tutor", "student_synergy_tutor_block");
 	$this->setBlock(TEMPLATE_content, 'contact_synergy', 'contact_synergy_block');
+	$this->setBlock('contact_synergy', 'edit_emergency', 'edit_emergency_block');
 	$this->setBlock('contact_synergy', 'contact_details', 'contact_details_block');
 	$this->setBlock(TEMPLATE_content, 'medical', 'medical_block');
 
@@ -148,12 +149,16 @@ if(is_numeric($this->arg[0])) {
 				if (!$j)
 					$this->setVar('contact_details_block', '');
 				
-				$this->parse("contact_synergy_block", "contact_synergy");
+				$this->parse('contact_synergy_block', 'contact_synergy');
 				
-				if(SITE_location == 'wenona')
-					$this->parse("school_links_block","school_links");
-				else
-					$this->setVar("school_links_block","");
+				if(SITE_location == 'wenona') {
+					$this->parse('school_links_block','school_links');
+					$this->parse('edit_emergency_block', 'edit_emergency');
+				}
+				else {
+					$this->setVar('school_links_block','');
+					$this->setVar('edit_emergency_block', '');
+				}
 				
 				if($synInfo['StudentYearLevel'] < 7) {
 					$this->parse('student_synergy_form_block', 'student_synergy_form');
