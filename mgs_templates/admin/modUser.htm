@@ -49,7 +49,25 @@ function verify()
 	else
 		return true;
 }
+
+$j(document).ready(function () {
+
+	$j('img.greenCheck').each(function () {
+		$j(this).click(function () {
+			if ($j(this).attr('src').indexOf('greentick') != -1) {
+				$j(this).attr('src', '/images/emptybox.gif');
+				$j.get('/group/modifyForm.php', {categoryID: $j(this).attr('rel'), userID: '{ID}', write: 1});
+			} else {
+				$j(this).attr('src', '/images/greentick.gif');
+				$j.get('/group/modifyForm.php', {categoryID: $j(this).attr('rel'), userID: '{ID}', write: 2});
+			}		
+		});
+		$j(this).css('cursor','pointer');
+	});
 	
+	
+	
+});
 </script>
 <!-- #EndEditable -->
 </head>
@@ -131,7 +149,11 @@ function verify()
         <table>
           <tr>
             <td><h2>Preferred</h2></td>
-            <td><select name="title">{TITLELIST}</select>
+            <td><select name="title">
+                
+								{TITLELIST}
+							
+              </select>
               <input type="text" name="firstname" value="{FIRSTNAME}" />
             </td>
             <td><h2>Surname</h2></td>
@@ -164,9 +186,7 @@ function verify()
             <td><input type="checkbox" name="su" value="1" {SUPERUSER} onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME} superuser status?'));" />
             </td>
             <td><h2>Group</h2></td>
-            <td><select name="group">
-                {GROUPLIST}
-              </select>
+            <td><select name="group">{GROUPLIST}</select>
             </td>
           </tr>
           <tr>
@@ -201,8 +221,8 @@ function verify()
       <!-- END login -->
       <!-- BEGIN groups -->
       <h1>Groups</h1>
-      <form action="/group/modUserGroup.php" method="post" id="groupForm" class="standardForm">
-        <table class="ruler">
+      <form action="" method="post" id="groupForm" class="standardForm">
+        <table>
           <tr>
             <th>Group Name</th>
             <th>Access</th>
@@ -255,7 +275,7 @@ function verify()
         </table>
       </form>
       <!-- END perms -->
-      <h1>Recent Login Log</h1>
+ <h1>Recent Login Log</h1>
       <table class="ruler">
         <tr>
           <th>Date</th>

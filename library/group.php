@@ -108,7 +108,7 @@ class Group extends Model {
 	}
 
 	function isUser($relationID, $userID) {
-		$query = "SELECT uid FROM userAccess WHERE service = ".$this->_service." AND sid = $relationID AND uid = $userID";
+		$query = "SELECT uid FROM userAccess WHERE service = '".$this->_service."' AND sid = '$relationID' AND uid = '$userID'";
 		$this->db->query($query);
 	
 		if($this->db->countRows() > 0)

@@ -62,8 +62,29 @@ function verify()
 	else
 		return true;
 }
+
+$j(document).ready(function () {
+
+	$j('img.greenCheck').each(function () {
+		$j(this).click(function () {
+			if ($j(this).attr('src').indexOf('greentick') != -1) {
+				$j(this).attr('src', '/images/emptybox.gif');
+				$j.get('/group/modifyForm.php', {categoryID: $j(this).attr('rel'), userID: '{ID}', write: 1});
+			} else {
+				$j(this).attr('src', '/images/greentick.gif');
+				$j.get('/group/modifyForm.php', {categoryID: $j(this).attr('rel'), userID: '{ID}', write: 2});
+			}		
+		});
+		$j(this).css('cursor','pointer');
+	});
+	
+	
+	
+});
 	
 </script>
+
+
 <!-- #EndEditable -->
 
 <div id="nav">
@@ -204,7 +225,7 @@ function verify()
       <!-- END login -->
       <!-- BEGIN groups -->
       <h1>Groups</h1>
-      <form action="/group/modUserGroup.php" method="post" id="groupForm" class="standardForm">
+      <form action="" method="post" id="groupForm" class="standardForm">
         <table>
           <tr>
             <th>Group Name</th>

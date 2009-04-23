@@ -187,12 +187,10 @@ class modUser
 			//setup tick box
 			if($group[$i]['type'] == 1)
 				$this->t_body->set_var("BOX", 
-				"<a href=\"/group/modUserGroup.php?write=$id&service=1&sid=".$group[$i]['id']."&user=$id\" border='0'>
-				<img src=\"/images/emptybox.gif\" border=\"0\"></a>");
+				"<img class=\"greenCheck\" src=\"/images/emptybox.gif\" border=\"0\" rel=\"{$group[$i]['id']}\"></a>");
 			else if($group[$i]['type'] == 2)
 				$this->t_body->set_var("BOX", 
-				"<a href=\"/group/modUserGroup.php?unwrite=$id&service=1&sid=".$group[$i]['id']."&user=$id\" border='0'>
-				<img src=\"/images/greentick.gif\" border=\"0\"></a>");
+				"<img class=\"greenCheck\" src=\"/images/greentick.gif\" border=\"0\" rel=\"{$group[$i]['id']}\"></a>");
 			else
 				$this->t_body->set_var("BOX", "");
 
@@ -201,11 +199,11 @@ class modUser
 				$this->t_body->set_var("OWNER", "owner");
 			else
 				$this->t_body->set_var("OWNER", 
-				"<a href=\"/group/modUserGroup.php?owner=$id&service=1&sid=".$group[$i]['id']."&user=$id\">
+				"<a href=\"/group/modifyForm.php?owner=$id&categoryID=".$group[$i]['id']."\">
 				make owner</a>");
 
 			$this->t_body->set_var("REMOVE", 
-				"<a href=\"/group/modUserGroup.php?delete=$id&service=1&sid=".$group[$i]['id']."&user=$id\">
+				"<a href=\"/group/modifyForm.php?delete=$id&categoryID=".$group[$i]['id']."\">
 				remove</a>");
 		
 			$this->t_body->parse("group", "group_block", true);
@@ -404,6 +402,7 @@ if(isset($_POST['permSubmit']) && $_POST['permSubmit'] == 'Add')
 {
 	$groupPerm = new Group($_POST['service']);
 	$groupPerm->addUser($_POST['sid'], $_POST['uid'], $_POST['type']);
+	$myPage->displayUser($_POST['id']);
 }
 
 if(isset($_POST['delete']) && isset($_POST['id']) && $_POST['delete'] && $_POST['id'])
@@ -443,13 +442,12 @@ else if(isset($_GET['search']) && $_GET['search'])
 {
 	$users = $myPage->searchUser($_GET['search']);
 }
-else if(isset($_POST['addgroup']) && $_POST['addgroup'])
+else if(isset($_POST['groupSubmit']) && $_POST['groupSubmit'])
 {
-	include("../group/group.php");
-	$group = new Group(1, $_POST['addgroup']);
 
-	$group->addMember($_POST['id'], 1);
-	$myPage->displayUser($_POST['id']);
+	$group = new Group($_POST['service']);
+	$group->addUser($_POST['sid'], $_POST['uid'], 1);
+	$myPage->displayUser($_POST['uid']);
 
 }
 else if(isset($_GET['id']) && $_GET['id'])		
