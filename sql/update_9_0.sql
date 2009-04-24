@@ -522,3 +522,5 @@ CREATE TABLE `newsTopic` (
   `name` varchar(150) default NULL,
   PRIMARY KEY  (`newsTopicID`)
 ) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+update `homepage_comp` set `id`='24',`size`='1',`method`='outputRandImage',`name`='Random Image',`description`='Display a random image selected from the images on this homepage.',`filename`='image_s.htm',`config`='a:1:{s:5:\"pixel\";i:400;}',`invisible`='false' where `id`='24';
