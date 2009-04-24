@@ -124,11 +124,12 @@ h1 {
 	border-bottom: 2px solid #B51C21;
 	line-height: normal;
 	margin-bottom: 10px;
-	padding: 3px;
+	text-indent: 3px;
+	padding: 3px 0;
 	position: relative;
 	text-transform: capitalize;
 	}
-h1 a.customise { position: absolute; margin: 0; top: 5px; right: 0; font-size: 12px; }
+h1 a.customise { font-size: 12px; }
 h2 {
 	border-bottom: 2px solid #002452;
 	font-weight: bold;

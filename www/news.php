@@ -36,7 +36,7 @@ $groupHandler = new Group(NEWS_SERVICE);
 
 //can see add news link
 if(($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS)
-	$this->setVar("ADD", "<b><a class=\"customise\" href=\"/news/modify\">add news</a></b>");
+	$this->setVar("ADD", "<a class=\"customise\" href=\"/news/modify\">add news</a>");
 else
 	$this->setVar("ADD", "");
 

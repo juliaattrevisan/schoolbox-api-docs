@@ -90,8 +90,27 @@ hr { background-color: #d2d2d2; border: 0; height: 1px; }
 /*--------------------------------------------------------------
  Heading Styles 
 --------------------------------------------------------------*/
-h1 { font-size: 1.33em; font-weight: bold; border-bottom: 1px dashed #7f7f7f; line-height: 2; margin-bottom: 1em; position: relative; text-transform: capitalize; }
-h1 a.customise { font-size: 80%; font-weight: normal; float: right; margin-top: -27px; }
+h1 {
+	font-size: 1.33em;
+	font-weight: bold;
+	border-bottom: 1px dashed #7f7f7f;
+	line-height: 2;
+	margin-bottom: 1em;
+	position: relative;
+	text-transform: capitalize;
+	width: 100%;
+	position: relative;
+}
+h1 a.customise {
+	font-size: 80%;
+	font-weight: normal;
+	text-align: right;
+	line-height:normal;
+	display: block;
+	position:absolute;
+	right: 0;
+	top: 10px;
+	}
 h3 { font-size: 1em; }
 #news-header { margin-bottom: 1em; }
 /*--------------------------------------------------------------
@@ -520,7 +539,7 @@ p.interact { font-size: 90%; text-align: right; clear: none; white-space: nowrap
 p.interact-left { font-size: 90%; float: left; clear: none; white-space: nowrap; width: 120px; }
 li p.interact { margin: 0 0 0 15px; float: right; }
 p.interact a { color: #003e7e; }
-.listing p.small { font-size: 90%; float: right; color: #989898; }
+.listing p.small { font-size: 90%; text-align: right; color: #989898; }
 .listing p.small a { color: #5c5151; text-decoration: none; }
 .listing p.small a:hover { text-decoration: underline; }
 .listing a { color: #003e7e; }
@@ -644,6 +663,41 @@ News styles
 	text-align: right;
 	font-size: 80%;
 	}
+
+#category {
+	list-style: none;
+	margin-top: 10px;
+	float: left;
+}
+#category li {
+	float: left;
+	background: #ececec;
+	border: 1px solid #ccc;
+	border-bottom: 0;
+	padding: 0;
+	margin: 0 2px 0 0;
+}
+#category li a {
+	display: block;
+	padding: 5px 10px;
+}
+#category li a.selected {
+	background: #ccc;
+}
+.topic {
+	border: 1px solid #ccc;
+	clear: both;
+	margin: 0;
+	padding: 0;
+}
+.box .listing .topic > li {
+	padding: 0;
+	margin: 0;
+	height: 1%;
+}
+.topic li.hide {
+	display: none;
+}
 /*--------------------------------------------------------------
 Tree styles 
 --------------------------------------------------------------*/
