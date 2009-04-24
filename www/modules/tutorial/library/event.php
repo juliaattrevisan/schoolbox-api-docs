@@ -136,7 +136,8 @@ class Event extends Model {
 	}
 
 	function getUncompleted ($from = 0, $to = 0, $userID = false) {
-		$query = "SELECT e.*, UNIX_TIMESTAMP(e.date) date, concat(t1.firstname,' ',t1.lastname) tutorName1, concat(t2.firstname,' ',t2.lastname) tutorName2 , y.type typeName
+		$query = "SELECT e.*, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish,
+					concat(t1.firstname,' ',t1.lastname) tutorName1, concat(t2.firstname,' ',t2.lastname) tutorName2 , y.type typeName
 				  FROM ".TUTORIAL_db.".".$this->_table." e
 				  LEFT JOIN ".TUTORIAL_db.".attendance a ON a.eventID = e.eventID
 				  LEFT JOIN ".PORTAL_db.".user t1 ON t1.id = e.tutor1ID

@@ -48,7 +48,10 @@ class File extends Model {
 				$query .= " AND ( f.mime_type LIKE '%pdf' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%') ";	
 		
 		if ($config['filter'] == 'image')
-				$query .= " AND ( f.mime_type LIKE '%image%' ) ";	
+				$query .= " AND ( f.mime_type LIKE '%image%' ) ";
+			
+		if ($config['filter'] == 'audio')
+				$query .= " AND ( f.mime_type LIKE '%audio%' ) ";	
 
 						  
 		

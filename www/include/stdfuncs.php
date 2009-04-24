@@ -215,7 +215,7 @@ function convertFromURL($string)
 
 function convertToURL($string)
 {
-	return preg_replace(array("/[^a-zA-Z\d\s]*/", "/\ +/"), array("", "-"), $string);
+	return strtolower(preg_replace(array("/[^a-zA-Z\d\s\-\+\/]*/", "/(\s|-|\/)+/", "/\+/"), array("", "-", "p"), trim($string)));
 }
 
 function cutString($content, $chars) {

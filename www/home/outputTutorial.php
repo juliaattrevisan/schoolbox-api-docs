@@ -13,6 +13,7 @@ $this->setBlock($component['name'], 'has_unmarked', 'has_unmarked_block');
 $this->setBlock('has_unmarked', 'unmarked_list', 'unmarked_list_block');
 
 $eventList = $eventHandler->getHome();
+
 if (is_array($eventList)) {
 	$j = 0;
 	foreach ($eventList as $event) {

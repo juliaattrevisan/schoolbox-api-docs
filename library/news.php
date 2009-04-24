@@ -197,7 +197,7 @@ class News extends Model {
 		
 		return $headlines;
 	}
-
+	
 	function getNews($id = 0, $archive = false, $index = 0, $limit = 0) {
 		$query = "
 		SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body,
