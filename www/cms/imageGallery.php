@@ -42,7 +42,7 @@ if(is_numeric($this->arg[0]) ) {
 	$count = 1; 
 	if(is_array($imageList) ) {
 		foreach( $imageList as $thumbnail ) {
-			$this->setVar('THUMBNAIL', "<a href=\"/cms/image.php?id={$thumbnail['id']}&height=550&width=600\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
+			$this->setVar('THUMBNAIL', "<a href=\"/cms/image.php?id={$thumbnail['id']}&height=600&width=800\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
 					<img src=\"/cms/image.php?id={$thumbnail['id']}&height=".THUMBNAIL_size."&width=".THUMBNAIL_size."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
 	
 			$this->parse('cell_block', 'thumb_cell', true);

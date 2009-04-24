@@ -12,10 +12,13 @@
 		if($image = $this->db->getNextArray())
 		{
 			//get link
-			if($config['size']==0){$config['size']=6;}
-				$imageSize=$config['size']*100;
+			if($config['pixel']==0)
+				$config['pixel']=400;
+			if($config['pixel']>600)
+				$config['pixel']=600;
+				
 
-			$imageurl = "/cms/image.php?id={$image['id']}&height={$imageSize}&width={$imageSize}";
+			$imageurl = "/cms/image.php?id={$image['id']}&height={$config['pixel']}&width={$config['pixel']}";
 			
 			$this->setVar("PREVIEW_IMAGE_URL", $imageurl);
 			$this->setVar("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));
