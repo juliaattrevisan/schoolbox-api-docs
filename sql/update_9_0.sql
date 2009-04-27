@@ -515,7 +515,7 @@ UPDATE news_items SET item_datetime_modified = item_datetime_posted;
 
 INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (34,1,'outputWiki','Wiki','Provides an area for group members to work together on joint documents.','wiki.htm','a:1:{s:4:\"size\";i:0;}','false');
 INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (35,1,'outputFeed','Homepage Feed','Provides a running commentary on recent changes to the homepage','feed.htm','a:1:{s:4:\"size\";i:0;}','false');
-INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (36,1,'outputTextBox','Text Box','An editable region to enter text','textBox.html','a:0:{}','false');
+INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (36,1,'outputTextBox','Text Box','An area to write an introduction or information relating to your homepage','a:0:{}','false');
 
 CREATE TABLE `newsTopic` (
   `newsTopicID` int(11) NOT NULL auto_increment,

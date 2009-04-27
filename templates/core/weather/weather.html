@@ -1,6 +1,6 @@
 		<h1>Weather Forecast for {LOCATION}</h1>
             <!-- BEGIN current -->
-			<h3>Currently</h3>
+			<h2>Currently</h2>
 			<ul>
 				<li><strong>Temperature :</strong> {TEMP}&deg;</li>
 				<li><strong>Wind Direction : </strong>{DIRECTION}</li>
@@ -13,7 +13,7 @@
             <!-- END current -->
             <!-- BEGIN forecast -->
             <br />
-            <h3>Forecast</h3>
+            <h2>Forecast</h2>
 			<div class="indent">
 			<table>
                     <tr> 
@@ -46,7 +46,7 @@
                 <td> Get more weather from around Australia 
                 <select name="code" onchange='window.open("/weather/"+this.value,"_self", "");'>
                 <!-- BEGIN regions -->
-                <option value="{LOCATION_CODE}">{LOCATION_NAME}</option>
+                <option value="{LOCATION_CODE}" {LOCATION_CODE_SELECTED}>{LOCATION_NAME}</option>
                 <!-- END regions -->
                 </select>
                 </td>

@@ -398,14 +398,14 @@ $userDb = new user;
 $myPage = new modUser;
 
 
-if(isset($_POST['permSubmit']) && $_POST['permSubmit'] == 'Add')
+if(is_numeric($_POST['service']) && is_numeric($_POST['sid']) && is_numeric($_POST['uid']) )
 {
+	$_POST['type'] > 1 ? $type = $_POST['type'] : $type=1;
 	$groupPerm = new Group($_POST['service']);
-	$groupPerm->addUser($_POST['sid'], $_POST['uid'], $_POST['type']);
-	$myPage->displayUser($_POST['id']);
+	$groupPerm->addUser($_POST['sid'], $_POST['uid'], $type);
+	$myPage->displayUser($_POST['uid']);
 }
-
-if(isset($_POST['delete']) && isset($_POST['id']) && $_POST['delete'] && $_POST['id'])
+else if(isset($_POST['delete']) && isset($_POST['id']) && $_POST['delete'] && $_POST['id'])
 {
 	$userDb->deleteUser($_POST['id'], 1);
 	localRedir("/admin/formValid.php?msg=User Deleted Sucessfully&loc=/admin/modUser.php");
@@ -441,14 +441,6 @@ else if($_POST['username'] && $_POST['lastname'] && $_POST['group'] && $_POST['c
 else if(isset($_GET['search']) && $_GET['search'])
 {
 	$users = $myPage->searchUser($_GET['search']);
-}
-else if(isset($_POST['groupSubmit']) && $_POST['groupSubmit'])
-{
-
-	$group = new Group($_POST['service']);
-	$group->addUser($_POST['sid'], $_POST['uid'], 1);
-	$myPage->displayUser($_POST['uid']);
-
 }
 else if(isset($_GET['id']) && $_GET['id'])		
 {

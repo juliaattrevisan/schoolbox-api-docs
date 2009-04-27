@@ -26,13 +26,12 @@ if(is_array($headlineList) )
 						'TOPIC_CLEAN'	=> convertToURL($previous['topicName']),
 						);
 		$this->setVar($output);
-
+		$topicList[$item['topicName']] = 1;
+		
 		if ($item['topicName'] != $previous['topicName'] && $j > 1) {
 			
 			/* end topic */
 			$this->parse('topic_block', 'topic', true);
-			
-			$topicList[] = $previous['topicName'];
 			
 			$k = 0;
 			$this->setVar('ON_OFF', ++$k%2? '' : 'dark');
@@ -41,9 +40,7 @@ if(is_array($headlineList) )
 			$this->parse("news_block", "news", true);
 			
 			/* last rotation */
-			if ($total == $j) {
-				$topicList[] = $item['topicName'];
-				
+			if ($total == $j) {				
 				$this->setVar('NEWS_TOPIC', scrubText($item['topicName']));
 				$this->setVar('TOPIC_CLEAN', convertToURL($item['topicName']));
 				
@@ -71,7 +68,7 @@ else
 }
 
 // output tabs
-foreach ($topicList as $topic) {
+foreach ($topicList as $topic => $bin) {
 	$output = array('NEWS_TOPIC'	=> scrubText($topic),
 				    'TOPIC_CLEAN'	=> convertToURL($topic),
 					);

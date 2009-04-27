@@ -59,7 +59,7 @@ else
 	$this->setVar("forecast_block", "");
 
 //ouput drop down box of available locations
-foreach($weather->locationArray as $code => $label) {
+foreach($weather->locationArray as $label => $code) {
 	$locations[] = array('LOCATION_CODE' => $code,
 						'LOCATION_NAME' => $label);
 } 
