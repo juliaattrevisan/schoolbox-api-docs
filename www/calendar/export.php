@@ -9,9 +9,10 @@
 *							                                *
 /************************************************************/
 
-require_once('../include/include.php');
-require_once('../include/iCalcreator.class.php');
-require_once('calendar.php');
+require_once '../../include/sitePage.php';
+require_once '../include/iCalcreator.class.php';
+require_once '../../library/calendar.php';
+$page = new SitePage(false);
 
 $v = new vcalendar();
 $cal = new Calendar;
@@ -58,7 +59,7 @@ for($x=1; $x < 364; $x++) {
  	$month = date('n', $date);
 	$day = date('j', $date);
  
-	$events = $cal->getAllDayEvents($day, $month, $year, 1, 3);
+	$events = $cal->getDayEvents($date);
 	
 	if(is_array($events)) {
 		foreach($events as $event) {
