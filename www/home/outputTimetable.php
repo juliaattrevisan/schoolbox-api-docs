@@ -4,7 +4,7 @@ require_once '../library/synergetic-timetable.php';
 	
 $this->setBlock(TEMPLATE_content, "timetable", "timetable_block");	
 $this->setBlock("timetable", "timetable_period", "timetable_period_block");
-//$this->setBlock("timetable", "timetable_header", "timetable_header_block");
+$this->setBlock("timetable", "timetable_header", "timetable_header_block");
 
 //if user has timetable show it on the homepage
 if($_SESSION['timetable'] && SYNERGY_enable) {
@@ -93,7 +93,7 @@ if($_SESSION['timetable'] && SYNERGY_enable) {
 			
 			
 				//output period block
-				//$this->parse("timetable_header_block", "timetable_header", true);
+				$this->parse("timetable_header_block", "timetable_header", true);
 				$this->parse("timetable_period_block", "timetable_period", true);
 			}
 		} 

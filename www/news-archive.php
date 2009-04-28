@@ -13,6 +13,7 @@ $this->setFile(TEMPLATE_content, 'news/archive.html');
 $this->setTitle('News');
 $this->setTab('news');
 
+$this->setBlock(TEMPLATE_content, 'news', 'news_block');
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
 $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');	
