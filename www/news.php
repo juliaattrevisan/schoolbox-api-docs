@@ -17,6 +17,7 @@ $this->setFile(TEMPLATE_content, 'news.html');
 $this->setTitle('News');
 $this->setTab('news');
 
+$this->setBlock(TEMPLATE_content, 'topic_header', 'topic_header_block');
 $this->setBlock(TEMPLATE_content, 'topic', 'topic_block');
 $this->setBlock('topic', 'news', 'news_block');
 
@@ -67,9 +68,11 @@ if(is_array($items))
 						'DATETIME' 		=> $_SESSION['su'] == 1 ? $article['post_datetime']." expires on ".$article['expire_datetime'] : $article['post_datetime'],
 						'NEWS_BODY'		=> nl2br(scrubHTML($article['item_body'])),
 						'TOPIC_NAME'	=> scrubText($previous['topicName']),
+						'TOPIC_CLEAN'	=> convertToURL($previous['topicName']),
 						);
 						
 		$this->setVar($output);
+		$topicList[$article['topicName']] = 1;
 		
 		if ($article['topicName'] != $previous['topicName'] && $i > 1) {
 			/* end topic */
@@ -81,6 +84,7 @@ if(is_array($items))
 			/* last rotation */
 			if ($total == $i) {
 				$this->setVar('TOPIC_NAME', scrubText($article['topicName']));
+				$this->setVar('TOPIC_CLEAN', convertToURL($article['topicName']));
 				$this->parse('topic_block', 'topic', true);
 			}
 			
@@ -96,6 +100,15 @@ if(is_array($items))
 		
 		$previous = $article;
 
+	}
+		
+	// output tabs
+	foreach ($topicList as $topic => $bin) {
+		$output = array('NEWS_TOPIC'	=> scrubText($topic),
+						'TOPIC_CLEAN'	=> convertToURL($topic),
+					);
+		$this->setVar($output);
+		$this->parse('topic_header_block', 'topic_header', true);
 	}
 }
 else

@@ -9,12 +9,9 @@
 require_once("../library/news.php");
 require_once("../library/group.php");
 
-$this->setFile(TEMPLATE_content, 'news.html');
+$this->setFile(TEMPLATE_content, 'news/archive.html');
 $this->setTitle('News');
 $this->setTab('news');
-
-$this->setBlock(TEMPLATE_content, 'topic', 'topic_block');
-$this->setBlock('topic', 'news', 'news_block');
 
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
@@ -99,6 +96,7 @@ if(is_array($items))
 	
 		$output = array('NEWS_ID'		=> $article['item_id'],
 						'NEWS_TITLE'	=> $article['item_heading'],
+						'TOPIC'			=> $article['topicName'],
 						'POSTER'		=> $owner,
 						'DATETIME' 		=> $_SESSION['su'] == 1 ? $article['post_datetime']." expires on ".$article['expire_datetime'] : $article['post_datetime'],
 						'NEWS_BODY'		=> nl2br(scrubHTML($article['item_body'])),
@@ -107,36 +105,14 @@ if(is_array($items))
 						
 		$this->setVar($output);
 		
-		if ($article['topicName'] != $previous['topicName'] && $i > 1) {
-			/* end topic */
-			$this->parse('topic_block', 'topic', true);
-			
-			$this->setVar("news_block", "");
-			$this->parse("news_block", "news", true);
-			
-			/* last rotation */
-			if ($total == $i) {
-				$this->setVar('TOPIC_NAME', scrubText($article['topicName']));
-				$this->parse('topic_block', 'topic', true);
-			}
-			
-		} elseif ($total == $i) {
-			/* last rotation */
-			$this->parse("news_block", "news", true);
-			
-			$this->parse('topic_block', 'topic', true);
-		} else {
-			/* normal rotation */
-			$this->parse("news_block", "news", true);		
-		}
 		
-		$previous = $article;
+		$this->parse("news_block", "news", true);		
 
 	}
 }
 else
 {
-		$this->setVar("topic_block", "No news items found");
+		$this->setVar("news_block", "No news items found");
 }
 
 ?>

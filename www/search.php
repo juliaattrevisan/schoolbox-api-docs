@@ -52,15 +52,20 @@ class OutPut
 
 	function listSearch($keyword, $type=6, $sort=2)
 	{
-		$tokens = $this->stringTokenise(stripslashes($keyword));
-		if(count($tokens) > 0)
-		{
-			$this->catSearch($tokens);
-			$this->fileSearch($tokens, $type, $sort);
-			$this->linkSearch($tokens, $type, $sort);
+		if(strlen($keyword) > 3) {
+			$tokens = $this->stringTokenise(stripslashes(trim($keyword)));
+			if(count($tokens) > 0)
+			{
+				$this->catSearch($tokens);
+				$this->fileSearch($tokens, $type, $sort);
+				$this->linkSearch($tokens, $type, $sort);
+			}
+			else
+				error(45); //not enough tokens to perform search
 		}
-		else
-			error(45); //not enough tokens to perform search
+		else {
+			error(45);
+		}
 	}
 
 	function stringTokenise($str)
