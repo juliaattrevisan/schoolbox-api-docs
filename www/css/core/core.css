@@ -704,7 +704,8 @@ div.topic {
 	margin: 0;
 	height: 1%;
 }
-.topic li.hide {
+.topic li.hide,
+.topic div.hide {
 	display: none;
 }
 /*--------------------------------------------------------------
