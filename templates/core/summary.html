@@ -27,8 +27,8 @@
 #content {
 	margin: 10px 0 0 10px;
 }
-#daily-notices, #news-headlines, #calendar-weather {
-	width: 31%;
+#daily-notices, #calendar-weather {
+	width: 49.5%;
 	float: left;
 	margin-right: 5px;
 	height: 410px;
@@ -100,24 +100,6 @@ function cycleNews () {
 	  </marquee>
 	</div>
 
-    <div id="news-headlines">
-      <h1>News Headlines</h1>
-      <div>
-   	   <!-- BEGIN main_stories -->
-        <ul style='margin: 10px 0;'>
-         <li style='margin: 0;'>{NEWS_TITLE}</li>
-        </ul>
-        <!-- END main_stories -->
-        </div>
-        <h2 style='margin-left: 0;'>{RSS_NAME}</h2>
-   	   <!-- BEGIN rss_stories -->
-        <div class="news-item hide">
-         <h3 class="news-title">{RSS_TITLE}</h3>
-         <p class="news_body">{RSS_BRIEF}</p>
-        </div>
-        <!-- END rss_stories -->        
-    </div>	
-    
     <div id="calendar-weather">
       <h1>Calendar &amp Weather</h1>
       <div class="indent">
@@ -125,7 +107,7 @@ function cycleNews () {
           <!-- BEGIN note_block -->
           <tr style="color:{NOTE_COLOUR}">
             <td class="calendarTime">{TIME}</td>
-            <td>{NOTE_CATEGORY} {NOTE_DESCRIPTION}</td>
+            <td>{NOTE_DESCRIPTION}</td>
           </tr>
           <!-- END note_block -->
         </table>

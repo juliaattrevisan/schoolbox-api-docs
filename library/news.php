@@ -267,9 +267,30 @@ class News extends Model {
 		return $allNews;
 	}
 
-	function getDailyNotice() {
-		$query = "SELECT item_heading, item_body FROM news_items WHERE item_heading LIKE '%Daily Notices%' ORDER BY item_datetime_posted DESC LIMIT 1";
-		return $this->db->getRow($query);
+	function getDailyNotice($limit = 1) {
+		$query = "SELECT item_heading, UNIX_TIMESTAMP(item_datetime_posted) item_datetime_posted, UNIX_TIMESTAMP(item_datetime_modified) item_datetime_modified, item_body FROM news_items WHERE item_heading LIKE '%Daily Notices%' ORDER BY item_datetime_posted DESC ";
+		if ($limit)
+			$query .= "LIMIT $limit";
+		return $this->db->getAll($query);
+	}
+	
+	function getAllByGroup($groupList, $campusList) {
+		$query = "SELECT `".$this->_index."`, item_heading, UNIX_TIMESTAMP(item_datetime_posted) item_datetime_posted, UNIX_TIMESTAMP(item_datetime_modified) item_datetime_modified, item_body, newsTopic.name topicName
+				  FROM `".$this->_table."` 
+				  JOIN user ON news_items.item_owner = user.id
+				  JOIN newsCampus ON newsCampus.id = news_items.item_id 
+					AND newsCampus.campus IN(" . implode(',', $campusList) . ") 
+					OR news_items.item_campus='4' 
+				  JOIN newsGroup ON newsGroup.id = news_items.item_id 
+					AND newsGroup.gid IN (" . implode(',', $groupList) . ")
+				  JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
+				  WHERE item_datetime_expires > NOW() 
+					AND item_deleted = 0 
+				  GROUP BY `".$this->_index."`
+				  ORDER BY item_datetime_modified DESC";
+		
+		return $this->db->getAll($query);
+
 	}
 
 	function timecmp($a, $b)

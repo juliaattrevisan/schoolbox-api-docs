@@ -236,7 +236,27 @@ class Calendar extends Model {
 		
 		return $this->db->getAll($query);	
 
-	}		
+	}	
+	
+	function getDayByGroup($currentDay, $groupList, $campusList) {
+		
+		$query = "SELECT DISTINCT id, owner,
+							TIME_FORMAT(startTime, '" . CALENDAR_time_format . "') as startTime, 
+							TIME_FORMAT(endTime, '" . CALENDAR_time_format . "') as endTime,
+							priority, note, access, eventCampus.campusID as sid
+						FROM event 
+						LEFT JOIN eventCampus ON event.id = eventCampus.eventID
+						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
+						WHERE date = '" . date("Y-m-d", $currentDay) . "'
+							AND (    
+								  (access = '3' AND eventCampus.campusID IN(" . implode(',', $campusList) . ") AND eventGroup.groupID IN(" . implode(',', $groupList) . ") )
+								  OR (access = '4')
+								)
+						GROUP BY id
+						ORDER BY event.startTime, event.endTime";
+		
+		return $this->db->getAll($query);		
+	}	
 
 	function getStudentBirthdays($currentDay) {
 	
