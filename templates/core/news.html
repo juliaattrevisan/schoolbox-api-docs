@@ -1,19 +1,42 @@
+<script type="text/javascript">
+	$j(function() {
+		$j('#category li:first-child a').addClass('selected');
+		$j('div.topic > div:first-child').show();
+		
+		$j('#category a').click(function() {
+			$j('#category a').removeClass('selected');
+			$j(this).addClass('selected');	
+			var el = $j(this).attr('title');
+			$j('div.topic > div').hide();
+			$j('div.topic > div.' + el).show();
+		});
+	});
+</script>
+
+
 <h1><span>News</span> {ADD}</h1>
 <div class="float-fix"></div>
+<ul id="category">
+  <!-- BEGIN topic_header -->
+  <li><a href="#" title="{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
+  <!-- END topic_header -->
+</ul>
+<div class="topic">
 <!-- BEGIN topic -->
-<h2>{TOPIC_NAME}</h2>
-<!-- BEGIN news -->
-<div class="news-item">
-	<h3 id="news-header"><a name="{NEWS_ID}"></a>{NEWS_TITLE}</h3>
-  <span class="header_option">{MODIFY}</span>
-  {NEWS_BODY}
-  <hr />
-  <p class="interact">Submitted by {POSTER} on {DATETIME}</p>
-</div>  
-<!-- END news -->
-<br />
-<div class="float-fix"></div>
+<div class="{TOPIC_CLEAN} hide">
+    
+  <!-- BEGIN news -->
+  <div class="news-item">
+    <h3 id="news-header"><a name="{NEWS_ID}"></a>{NEWS_TITLE}</h3>
+    <span class="header_option">{MODIFY}</span>
+    {NEWS_BODY}
+    <hr />
+    <p class="interact">Submitted by {POSTER} on {DATETIME}</p>
+  </div>
+  <!-- END news -->
+</div>
 <!-- END topic -->
+</div>
 
 <div class="pagination">
   <!-- BEGIN previous_button -->

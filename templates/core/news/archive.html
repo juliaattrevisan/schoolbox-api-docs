@@ -1,0 +1,24 @@
+<h1>News {ADD}</h1>
+<!-- BEGIN main_stories -->
+<div class="news-item">
+	<h3 id="news-header">{NEWS_TITLE}</h3>
+  <!-- BEGIN story_body -->
+  {NEWS_BODY}
+  <hr />
+  <p class="interact">Submitted by {POSTER} on {DATETIME} | {MODIFY}</p>
+  <!-- END story_body -->
+</div>  
+<!-- END main_stories -->
+
+<div class="pagination">
+  <!-- BEGIN previous_button -->
+  <a class="prev" href="/news-archive/{PREVIOUS_PAGE}">&lt;&lt; Prev</a><!-- END previous_button -->
+  <!-- BEGIN page_number -->
+  <a class="number{CURRENT}" href="/news-archive/{PAGE_INDEX}">{PAGE_INDEX}</a><!-- END page_number -->
+  <!-- BEGIN next_button -->
+  <a class="next" href="/news-archive/{NEXT_PAGE}">Next &gt;&gt;</a><!-- END next_button -->
+</div>
+
+<!-- BEGIN archive_button -->
+	<p class="interact"><a href="/news-archive/">View Archived News</a></p>
+<!-- END archive_button -->

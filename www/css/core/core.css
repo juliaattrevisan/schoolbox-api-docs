@@ -663,8 +663,12 @@ News styles
 	text-align: right;
 	font-size: 80%;
 	}
-
 #category {
+	list-style: none;
+	margin: 0;
+	float: left;
+}
+.listing #category {
 	list-style: none;
 	margin-top: 10px;
 	float: left;
@@ -689,6 +693,11 @@ News styles
 	clear: both;
 	margin: 0;
 	padding: 0;
+}
+div.topic {
+	border: 0;
+	border-top: 1px solid #ccc;
+	padding: 10px 0 0 0;
 }
 .box .listing .topic > li {
 	padding: 0;
