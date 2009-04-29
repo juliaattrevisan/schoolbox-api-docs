@@ -55,27 +55,6 @@ marquee {
 </style>
 <!-- ULTIMATE DROP DOWN MENU Version 4.5 by Brothercake -->
 <!-- http://www.udm4.com/ -->
-<script type="text/javascript" src="/javascript/mootools.js"></script>
-<script type="text/javascript" src="/javascript/behaviour.js"></script>
-<script>
-
-Behaviour.addLoadEvent(function () { cycleNews(); });
-
-var j = 0;
-function cycleNews () {
-	var news = $ES('.news-item');
-	for(var i=0; i < news.length; i++) {
-		news[i].style.display = 'none';
-	}
-	j++;
-	if (!news[j])
-	j = 0;
-	news[j].style.display = 'block';
-	
-	setTimeout("cycleNews()", 15000);
-}
-
-</script>
 </head>
 <body>
 <!-- BEGIN msubject -->

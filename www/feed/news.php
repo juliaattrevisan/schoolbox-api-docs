@@ -17,10 +17,11 @@ $output = array('TITLE'			=> HEADING . ' - News',
 $page->setVar($output);
 
 $newsList = $newsHandler->getAllByGroup(unserialize(STUDENTGROUPIDS), array(1,2,3));
+
 if (is_array($newsList)) {
 	foreach ($newsList as $news) {
 		$output = array('ITEM_TITLE'		=> scrubText($news['item_heading']),
-						'ITEM_DESCRIPTION'	=> cutSentence(strip_tags($news['item_body']), 125),
+						'ITEM_DESCRIPTION'	=> "<![CDATA[" . $news['item_body'] ."]]>",
 						'ITEM_DATE'			=> outputDate('r', $news['item_datetime_posted']),
 						'ITEM_LINK'			=> SITE_address . '/news/#' . $news['item_id'],
 						);
