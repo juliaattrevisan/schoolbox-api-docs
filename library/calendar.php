@@ -221,6 +221,8 @@ class Calendar extends Model {
 		$query = "SELECT DISTINCT id, owner,
 							TIME_FORMAT(startTime, '" . CALENDAR_time_format . "') as startTime, 
 							TIME_FORMAT(endTime, '" . CALENDAR_time_format . "') as endTime,
+                            TIME_TO_SEC(startTime) as startTimestamp,
+                            TIME_TO_SEC(endTime) as endTimestamp,
 							priority, note, access, eventCampus.campusID as sid
 						FROM event 
 						LEFT JOIN eventCampus ON event.id = eventCampus.eventID
