@@ -113,6 +113,7 @@
 			});
 			
 		});
+		
 	});
 
 })(jQuery);
@@ -174,6 +175,8 @@ var initDrag = function(){
 				var myAjax = new Ajax('/homepage/configForm.php', {
 					data: 'cid='+categoryID+'&column1='+order[0]+'&column2='+order[1]+'&type=components'
 				}).request();
+				
+				jQuery(document).triggerHandler("componentMove");
 			},
 			'onDrag': function() {
 				var mouseX = this.mouse.now.x; var mouseY = this.mouse.now.y;

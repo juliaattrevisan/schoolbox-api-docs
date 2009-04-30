@@ -47,6 +47,13 @@ elseif ($_POST['title'] && is_numeric($_POST['categoryID'])) {
 		$poll['pollID'] = $pollHandler->create($poll);
 	}
 
+	/* select this textBox */
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/homepage.php';
+	$homepageHandler = new Homepage($_POST['categoryID']);
+	$config = serialize(array('pollID' => $poll['pollID']));
+	$homepageHandler->updateComponentConfig(33, $config);
+
+
 	localRedir("/homepage/" . $_POST['categoryID']);
 } 
 elseif (is_numeric($_GET['delete'])) {
@@ -57,6 +64,15 @@ elseif (is_numeric($_GET['delete'])) {
 		error(19);
 
 	$pollHandler->delete($_GET['delete']);
+
+	/* select next textBox */
+	$current = $pollHandler->getCurrentPoll($poll['categoryID']);
+	if ($current['pollID']) {
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/homepage.php';
+		$homepageHandler = new Homepage($current['categoryID']);
+		$config = serialize(array('pollID' => $current['pollID']));
+		$homepageHandler->updateComponentConfig(33, $config);
+	}
 	localRedir("/homepage/" . $poll['categoryID']);
 }
 

@@ -1,16 +1,18 @@
 <?php
 
+$c = array('select' => 0);
+//print serialize($c);
 
 $this->setBlock($componentHandle, "poll_vote", "poll_vote_block");
 $this->setBlock("poll_vote", "poll_options", "poll_options_block");
-$this->setBlock("poll_vote", "show_results", "show_results_block");
+$this->setBlock($componentHandle, "show_results", "show_results_block");
 $this->setBlock($componentHandle, "poll_chart", "poll_chart_block");
 $this->setJavascript('/javascript/fusion.js');
 
 require_once '../library/poll.php';
 $pollHandler = new Poll;
 
-$poll = $pollHandler->getCurrentPoll($categoryID);
+$poll = $pollHandler->getCurrentPoll($categoryID, $config['pollID']);
 if ($poll['pollID']) {
 
 	$output = array('POLL_ID'		=> $poll['pollID'],
@@ -44,10 +46,6 @@ if ($poll['pollID']) {
 			}
 		}
 		
-		$this->setVar('show_results_block', '');
-		if ($pollHandler->hasResults($poll['pollID']))
-			$this->parse('show_results_block', 'show_results');
-		
 		$this->setVar("poll_chart_block", "");
 		$this->parse("poll_vote_block", "poll_vote");
 	}
@@ -59,12 +57,37 @@ if ($poll['pollID']) {
 					'POLL_QUESTION'	=> '',
 					);
 	$this->setVar($output);
-	if ($permission < WRITE_ACCESS)		
-		$this->setVar("poll_chart_block", "");
-	else
-		$this->setVar("poll_chart_block", '<p style="text-align: center;"><a href="/poll/modify/new/'.$categoryID.'">Create</a></p>');
+	$this->setVar("poll_chart_block", '');
 		
 	$this->setVar("poll_vote_block", "");
 }
+
+$current = $poll;
+
+/* poll selection */
+$this->setBlock("config", "select", "select_block".$componentCount);
+$pollList = $pollHandler->getAllByCategory($categoryID);
+if (is_array($pollList)) {
+	foreach ($pollList as $poll) {
+		$output = array('COMPONENT_CONFIG_SELECT_NAME' 		=> scrubText($poll['title']),
+						'COMPONENT_CONFIG_SELECT_VALUE' 	=> $poll['pollID'],
+						'COMPONENT_CONFIG_SELECT_SELECTED'	=> $poll['pollID'] == $current['pollID'] ? 'selected="selected"' : '',
+						);
+		$this->setVar($output);
+		$this->parse("select_block".$componentCount, "select", true);
+	}
+}
+
+/* show results */
+$this->setVar('show_results_block', '');
+if ($pollHandler->hasResults($poll['pollID']))
+	$this->parse('show_results_block', 'show_results');
+
+/* admin controls */
+$this->setBlock($componentHandle, "modify_poll", "modify_poll_block");
+if ($permission < WRITE_ACCESS)		
+	$this->setVar("modify_poll_block", "");
+else
+	$this->parse("modify_poll_block", "modify_poll");	
 
 ?>

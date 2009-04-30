@@ -122,11 +122,16 @@ if (is_array($componentList)) {
 		
 		$this->setFile($componentHandle, 'homepage/components/'.$component['filename']);
 		$this->setBlock($componentHandle, "config", "config_block");
+
 		
 		$this->setVar('COMPONENT_ID', $component['component']);
 		
 		$default = unserialize($component['dfconfig']);
 		$config = unserialize($component['config']);
+
+		if(is_file($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php'))
+			include($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php');
+
 
 		if(is_array($default) && $permission >= WRITE_ACCESS) {	
 
@@ -201,12 +206,9 @@ if (is_array($componentList)) {
 		} else
 			$this->setVar("config_block", "");	
 		
-		if(is_file($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php')) {
-			include($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php');
-			$this->parse('COLUMN'.$component['column'], $componentHandle, true);
-			
-			$columnFlag[$component['column']] = true;
-		}
+		$this->parse('COLUMN'.$component['column'], $componentHandle, true);
+		$columnFlag[$component['column']] = true;
+		
 	}
 }
 

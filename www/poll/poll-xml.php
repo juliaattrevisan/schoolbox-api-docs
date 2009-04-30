@@ -27,6 +27,7 @@ if (is_array($pollData)) {
 	$i = 0;
 	foreach ($pollData as $data) {
 		$output = array('OPTION'	=> htmlspecialchars($data['option']),
+						'OPTION_SHORT'	=> htmlspecialchars(substr($data['option'], 0, 15)) . " ",
 						'VALUE'		=> htmlspecialchars($data['result']),
 						'COLOUR'	=> $colour[$i],
 						);

@@ -17,9 +17,18 @@ class Poll extends Model {
 		return $this->db->getRow($query);
 	}
 	
-	function getCurrentPoll ($categoryID) {
-		$query = "SELECT * FROM poll WHERE categoryID = $categoryID ORDER BY created DESC LIMIT 1";
+	function getCurrentPoll ($categoryID, $pollID = 0) {
+		if ($pollID)
+			$query = "SELECT * FROM poll WHERE categoryID = $categoryID AND pollID = $pollID";
+		else
+			/* get most recent */
+			$query = "SELECT * FROM poll WHERE categoryID = $categoryID ORDER BY created DESC LIMIT 1";
 		return $this->db->getRow($query);
+	}
+
+	function getAllByCategory ($categoryID) {
+		$query = "SELECT * FROM poll WHERE categoryID = $categoryID ORDER BY created DESC";
+		return $this->db->getAll($query);
 	}
 
 	function getData($pollID) {
