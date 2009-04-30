@@ -652,6 +652,22 @@ td.small {
 p.forgot a {
 	font-size: 90%;
 	}
+.play-button {
+	height: 22px;
+	width: 22px;
+	float: right;
+	}
+.play-button a {
+	display: block;
+	height: 22px;
+	width: 22px;
+	background: url(/images/play-button.png) no-repeat;
+	}
+.play-button a:hover {
+	background-position: 0 -22px;
+	cursor: pointer;
+	}
+
 /*--------------------------------------------------------------
 News styles 
 --------------------------------------------------------------*/
