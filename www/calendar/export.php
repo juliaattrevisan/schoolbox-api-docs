@@ -72,8 +72,19 @@ for($x=1; $x < 364; $x++) {
 			if($event['startTimestamp']) {
 				$startHour = floor($event['startTimestamp'] / 60 / 60);
 				$startMinute = ($event['startTimestamp'] /60) % 60;
-				$e->setProperty('dtstart', $year, $month, $day, $startHour, $startMinute,array('VALUE'=>'DATE-TIME') );
-				$e->setProperty('duration', 0, 0, 1, 0 );
+
+                if($event['endTimestamp']){
+                    $duration = $event['endTimestamp'] - $event['startTimestamp'];
+                    $durHour = floor($duration / 60 / 60);
+                    $durMinute = ($duration /60) % 60;
+                }
+                else {
+                    $durHour = 1;
+                    $durMinute = 0;
+                }
+
+                $e->setProperty('dtstart', $year, $month, $day, $startHour, $startMinute,array('VALUE'=>'DATE-TIME') );
+				$e->setProperty('duration', 0, 0, $durHour, $durMinute );
 			}   
 			else
 				$e->setProperty('dtstart', $year, $month, $day,FALSE,FALSE,array('VALUE'=>'DATE'));

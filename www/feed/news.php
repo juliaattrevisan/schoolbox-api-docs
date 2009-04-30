@@ -34,4 +34,6 @@ if (is_array($newsList)) {
 header('Content-type: application/rss+xml');
 $page->outputPage(true);
 
+exit;
+
 ?>
