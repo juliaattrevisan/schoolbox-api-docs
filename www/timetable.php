@@ -33,7 +33,7 @@ if($groupHandler->isParent())
 }
 else
 {
-	if($this->arg[0])
+	if(is_numeric($this->arg[0]))
 	{
 		if($groupHandler->isStaff())
 			displayWeek(&$this, $this->arg[0]);
@@ -60,8 +60,9 @@ function displayWeek(&$page, $sid)
 	
 	$periodCurrent = $timetableHandler->getPeriodNumber($user['campus']);
 	$dayCurrent = $timetableHandler->getDayNumber($user['campus']);	
-					
-	$timetable = $timetableHandler->getFullTimetable($sid, $user['id'], $user['campus']);
+
+	$timetable = $timetableHandler->getFullTimetable($sid, $user['uid'], $user['campus']);
+
 	if(is_array($timetable)) {
 		$days = count($timetable[0]['day']);	
 		//timetable field width
