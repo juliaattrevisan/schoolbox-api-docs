@@ -513,6 +513,16 @@ SELECT `id`, `code` FROM category WHERE `code` IS NOT NULL AND `code` != '';
 
 UPDATE news_items SET item_datetime_modified = item_datetime_posted;
 
+CREATE TABLE `textBox`(
+	`textBoxID` int(11) NOT NULL  auto_increment , 
+	`categoryID` int(11) NULL  , 
+	`heading` varchar(100) COLLATE utf8_general_ci NULL  , 
+	`body` text COLLATE utf8_general_ci NULL  , 
+	`deleted` enum('true','false') COLLATE utf8_general_ci NOT NULL  DEFAULT 'false' , 
+	PRIMARY KEY (`textBoxID`) , 
+	KEY `categoryID`(`categoryID`) 
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
 INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (34,1,'outputWiki','Wiki','Provides an area for group members to work together on joint documents.','wiki.htm','a:1:{s:4:\"size\";i:0;}','false');
 INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (35,1,'outputFeed','Homepage Feed','Provides a running commentary on recent changes to the homepage','feed.htm','a:1:{s:4:\"size\";i:0;}','false');
 INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (36,1,'outputTextBox','Text Box','An area to write an introduction or information relating to your homepage','a:0:{}','false');

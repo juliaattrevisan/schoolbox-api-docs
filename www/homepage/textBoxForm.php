@@ -34,5 +34,18 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 	localRedir('/homepage/' . $_POST['categoryID']);
 	
 }
+elseif (is_numeric($_GET['delete'])) {
+	$textBox = $textBoxHandler->getByID($_GET['delete']);
+	$textBoxHandler->delete($_GET['delete']);
+	
+	$current = $textBoxHandler->getCurrent($textBox['categoryID']);
+	/* select new textBox */
+	$homepageHandler = new Homepage($current['categoryID']);
+	$config = serialize(array('textBoxID' => $current['textBoxID']));
+	$homepageHandler->updateComponentConfig(36, $config);
+
+	localRedir('/homepage/' . $textBox['categoryID']);
+		
+}
 
 ?>

@@ -1,6 +1,21 @@
 <div class="box" id="component{COMPONENT_ID}">
   <h2>{TEXTBOX_HEADING}</h2>
   <!-- BEGIN config -->
+  <a class="edit">edit</a>
+  <div class="editPanel hide">
+    <form action="/homepage/configForm.php" method="get">
+      <input type="hidden" name="cid" value="{ID}" />
+      <input type="hidden" name="type" value="config" />
+      <input type="hidden" name="component" value="{COMPONENT_ID}" />
+      <label for="size">Text Box: </label>
+      <select name="textBoxID">
+        <!-- BEGIN select -->
+        <option value="{COMPONENT_CONFIG_SELECT_VALUE}"{COMPONENT_CONFIG_SELECT_SELECTED}>{COMPONENT_CONFIG_SELECT_NAME}</option>
+        <!-- END select -->
+      </select>
+      <input type="submit" value="Update" />
+    </form>
+  </div>
   <!-- END config -->
   <!-- BEGIN text_editable -->
   <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
@@ -44,7 +59,9 @@
       </div>
       
       <!-- BEGIN modify_text -->
-      <p class="interact"><a href="/homepage/{ID}/textBoxModify">Modify Document</a></p>
+      <p class="interact"><a href="/homepage/{ID}/textBoxCreate">Create</a>
+       | <a href="/homepage/{ID}/textBoxModify">Modify</a>
+       | <a href="/homepage/textBoxForm.php?delete={TEXTBOX_ID}" onclick="return confirm('Are you sure you want to delete this text box?');">Delete</a></p>
       <!-- END modify_text -->
       
   <!-- END text_locked -->
