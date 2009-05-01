@@ -225,7 +225,7 @@ class SynergeticTimetable extends MSSQL{
 	function getFullTimetable($synergy_id, $userID, $campus)
 	{	
 		$timetabledef = $this->getTimetableDefinition($campus);
-	
+
 		if( $this->groupHandler->isStudent($userID))
 		{
 			$query ="SELECT 

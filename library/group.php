@@ -221,16 +221,16 @@ class Group extends Model {
 		// checks if user is a student
 		
 		// default to current user
-		if (is_numeric($_SESSION['gid']) ) { 
-			$groupID = $_SESSION['gid'];
-		}
-		else if(is_numeric($userID) ) {
+		if(is_numeric($userID) ) {
 			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 			$userHandler = new User;
 			$user = $userHandler->getByID($userID);
 			$groupID = $user['group_id'];
 		}
-		
+        else if (is_numeric($_SESSION['gid']) ) {
+			$groupID = $_SESSION['gid'];
+		}
+
 		if(in_array($groupID, unserialize(STUDENTGROUPIDS)))
 			return true;
 		else
