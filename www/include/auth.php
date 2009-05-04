@@ -157,7 +157,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 		}
 		
 		if(LDAP_enable)
-			setLDAPInfo();
+			setLDAPInfo($username);
 
 		$loginlogquery .= ", '1')";
 		$db->query($loginlogquery);
@@ -197,7 +197,7 @@ function firsttime(&$db, $username, $password)
 	return 1;
 }
 
-function setLDAPInfo() {
+function setLDAPInfo($username) {
 	$ds=@ldap_connect(LDAP_host);
 	$result = @ldap_search($ds, LDAP_base,'uid='.$username,array('dn','exchangeActive'));
 	$entries = @ldap_get_entries($ds, $result);
