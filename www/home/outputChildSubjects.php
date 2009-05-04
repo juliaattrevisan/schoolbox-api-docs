@@ -19,7 +19,7 @@ if(is_array($_SESSION['children'])) {
 				foreach($child['subjects'] as $subject)
 				{
 					$this->setVar("STUDENT_SUBJECT_NAME", $subject['name']);
-					$this->setVar("STUDENT_SUBJECT_CODE", $subject['code']);
+					$this->setVar("STUDENT_SUBJECT_CODE", urlencode(urlencode($subject['code'])));
 					$this->parse("subject_item", "subject_block", true);
 				}
 			}

@@ -229,7 +229,19 @@ function setSynergyInfo(&$mydb)
 						$portal = $mydb->getRow($myquery);
 						if($portal['id'])
 						{
-							$subjects = getSubjectList($child, $studentGroup[0]);
+							$subjectList = getSubjectList($child, $studentGroup[0]);
+                            if( is_array($subjectList))
+                            {
+                                foreach($subjectList as $subject)
+                                {
+                                    //check subject exists.. we cant link to subjects that dont exist its ugly
+                                    $myquery = "SELECT id FROM category WHERE code = '".$subject['code']."'";
+                                    $mydb->query($myquery);
+                                    if($mydb->countRows() > 0)
+                                        $subjects[] = $subject;
+                                }
+                            }
+
 							$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child, 'gid'=>$portal['group_id'], 'subjects'=>$subjects);
 						}
 					}
