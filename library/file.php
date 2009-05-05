@@ -44,9 +44,10 @@ class File extends Model {
 		if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS)
 			$query .= " AND f.hidden = 0";	
 		
-		$config['filter'] = is_array($config['filter']) ? $config['filter'] : array($config['filter']);
-		
 		if (!empty($config['filter']) && $config['filter'][0] != 'all') {
+		
+			$config['filter'] = is_array($config['filter']) ? $config['filter'] : array($config['filter']);
+			
 			$query .= " AND ( 1=2 ";
 			if (in_array('document', $config['filter']))
 				$query .= " OR ( f.mime_type LIKE '%pdf' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%') ";	
