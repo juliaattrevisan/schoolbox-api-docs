@@ -2,14 +2,13 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
+	
 $page = new SitePage;
 $groupHandler = new Group;
+$categoryHandler = new Category;
 
 if (is_numeric($_POST['folders'])) {
-
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
-	$categoryHandler = new Category;
 
 	$categoryList = $categoryHandler->getCategoryList($_POST['folders']);
 	$output = array();
@@ -55,6 +54,9 @@ elseif (is_numeric($_POST['files'])) {
 	
 	// save current view
 	$_SESSION['resourcesID'] = $_POST['files'];
+	
+	// log view
+	$categoryHandler->logPageView($_SESSION['resourcesID']);
 	
 	$fileList = $fileHandler->mergeLinks( $fileHandler->getAllInCategory($_POST['files']), $linkHandler->getAllInCategory($_POST['files']));
 	$permission = $groupHandler->getPermission($_POST['files']);

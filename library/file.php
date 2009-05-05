@@ -44,16 +44,27 @@ class File extends Model {
 		if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS)
 			$query .= " AND f.hidden = 0";	
 		
-		if ($config['filter'] == 'document')
-				$query .= " AND ( f.mime_type LIKE '%pdf' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%') ";	
+		$config['filter'] = is_array($config['filter']) ? $config['filter'] : array($config['filter']);
 		
-		if ($config['filter'] == 'image')
-				$query .= " AND ( f.mime_type LIKE '%image%' ) ";
+		if (!empty($config['filter']) && $config['filter'][0] != 'all') {
+			$query .= " AND ( 1=2 ";
+			if (in_array('document', $config['filter']))
+				$query .= " OR ( f.mime_type LIKE '%pdf' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%') ";	
 			
-		if ($config['filter'] == 'audio')
-				$query .= " AND ( f.mime_type LIKE '%audio%' ) ";	
+			if (in_array('image', $config['filter']))
+				$query .= " OR ( f.mime_type LIKE '%image%' ) ";
+				
+			if (in_array('audio', $config['filter']))
+				$query .= " OR ( f.mime_type LIKE '%audio%' ) ";	
 
-						  
+			if (in_array('video', $config['filter']))
+				$query .= " OR ( f.mime_type LIKE '%video%' ) ";	
+			
+			if (in_array('other', $config['filter']))
+				$query .= " OR ( f.mime_type LIKE 'application%' AND f.mime_type NOT LIKE '%pdf' AND f.mime_type NOT LIKE '%msword' AND f.mime_type NOT LIKE '%rtf' AND f.mime_type NOT LIKE 'text%') ";	
+
+			$query .= ") ";
+		}
 		
 		$sortFields = array('Name' => 'f.description', 'Date' => 'f.submitted');
 		

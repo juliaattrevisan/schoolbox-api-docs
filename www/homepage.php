@@ -123,7 +123,6 @@ if (is_array($componentList)) {
 		$this->setFile($componentHandle, 'homepage/components/'.$component['filename']);
 		$this->setBlock($componentHandle, "config", "config_block");
 
-		
 		$this->setVar('COMPONENT_ID', $component['component']);
 		
 		$default = unserialize($component['dfconfig']);
@@ -184,17 +183,6 @@ if (is_array($componentList)) {
 							$this->setVar('COMPONENT_CONFIG_SORTDIR_VALUE', $sort);
 							$this->setVar('COMPONENT_CONFIG_SORTDIR_SELECTED', $sort == $config[$name] ? ' selected="selected"' : '');
 							$this->parse("sortdir_block".$componentCount, "sortdir", true);
-						}
-						break;
-					case "filter":
-						$this->setBlock("config", "filter", "filter_block".$componentCount);
-						list($value, $filterOptions) = $value;
-						foreach ($filterOptions as $fname => $fvalue) 
-						{
-							$this->setVar('COMPONENT_CONFIG_FILTER_NAME', $fname);
-							$this->setVar('COMPONENT_CONFIG_FILTER_VALUE', $fvalue);
-							$this->setVar('COMPONENT_CONFIG_FILTER_SELECTED', $fvalue == $config[$name] ? ' selected="selected"' : '');
-							$this->parse("filter_block".$componentCount, "filter", true);							
 						}
 						break;
 					default:

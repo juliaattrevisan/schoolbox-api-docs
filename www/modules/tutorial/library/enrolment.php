@@ -14,11 +14,13 @@ class Enrolment extends Model {
 	
 	function getAllByEvent($code, $eventID) {
 		if (!empty($code)) {
-			$query = "SELECT n.studentID FROM ".TUTORIAL_db.".enrolment n WHERE n.code = ".$this->db->smartQuote($code)."
-					  UNION SELECT a.studentID FROM ".TUTORIAL_db.".attendance a, ".TUTORIAL_db.".event e WHERE a.eventID = e.eventID AND e.code = ".$this->db->smartQuote($code)."";
+			$query = "(SELECT n.studentID, u.lastname, u.firstname FROM ".TUTORIAL_db.".enrolment n LEFT JOIN ".PORTAL_db.".user u ON u.id = n.studentID WHERE n.code = ".$this->db->smartQuote($code)." )
+					  UNION (SELECT a.studentID, s.lastname, s.firstname FROM (".TUTORIAL_db.".attendance a, ".TUTORIAL_db.".event e) LEFT JOIN ".PORTAL_db.".user s ON s.id = a.studentID WHERE a.eventID = e.eventID AND e.code = ".$this->db->smartQuote($code).")
+					  ORDER BY lastname, firstname";
 		} else {
-			$query = "SELECT n.studentID FROM ".TUTORIAL_db.".enrolment n WHERE n.eventID = " . $eventID . "
-					  UNION SELECT a.studentID FROM ".TUTORIAL_db.".attendance a WHERE a.eventID = " . $eventID;
+			$query = "(SELECT n.studentID, u.lastname, u.firstname FROM ".TUTORIAL_db.".enrolment n LEFT JOIN ".PORTAL_db.".user u ON u.id = n.studentID WHERE n.eventID = " . $eventID . " )
+					  UNION ( SELECT s.studentID, a.lastname, s.firstname FROM ".TUTORIAL_db.".attendance a LEFT JOIN ".PORTAL_db.".user s ON s.id = a.studentID WHERE a.eventID = " . $eventID . " )
+					  ORDER BY lastname, firstname";
 		}
 		
 		return $this->db->getAll($query);	

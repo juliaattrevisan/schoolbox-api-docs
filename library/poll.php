@@ -13,17 +13,13 @@ class Poll extends Model {
 	}
 
 	function getByID($pollID) {
-		$query = "SELECT *, UNIX_TIMESTAMP(close) close FROM " . $this->_table. " WHERE " . $this->_index . " = $pollID";
+		$query = "SELECT *, UNIX_TIMESTAMP(close) close FROM " . $this->_table. " WHERE " . $this->_index . " = '$pollID'";
 		return $this->db->getRow($query);
 	}
 	
-	function getCurrentPoll ($categoryID, $pollID = 0) {
-		if ($pollID)
-			$query = "SELECT * FROM poll WHERE categoryID = $categoryID AND pollID = $pollID";
-		else
-			/* get most recent */
-			$query = "SELECT * FROM poll WHERE categoryID = $categoryID ORDER BY created DESC LIMIT 1";
-		return $this->db->getRow($query);
+	function getCurrentPoll ($categoryID) {
+		$pollList = $this->getAllByCategory($categoryID);
+		return $pollList[0];
 	}
 
 	function getAllByCategory ($categoryID) {

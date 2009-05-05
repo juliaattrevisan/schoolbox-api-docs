@@ -4,6 +4,15 @@ $this->setBlock($componentHandle, 'files', 'files_block');
 $this->setBlock('files', 'file_url', 'file_url_block');
 $this->setBlock('files', 'file_no_url', 'file_no_url_block');
 $this->setBlock('files', 'modify_file', 'modify_file_block');
+/*
+$c = array('filter'	=> array('document','audio','video','image','other'),
+		   'filterOptions' => array('document','audio','video','image','other'),
+		   'sort'	=> 'Date',
+		   'sortdir'	=> 'Desc',
+		   'size' => 0,
+			);
+print serialize($c);
+*/
 
 require_once '../library/file.php';
 $fileHandler = new File;
@@ -55,6 +64,19 @@ if (is_array($fileList)) {
 	}
 } else
 	$this->setVar('files_block', '');
+
+
+/* filter config */
+$config['filter'] = is_array($config['filter']) ? $config['filter'] : array($config['filter']);
+$this->setBlock("config", "filter", "filter_block".$componentCount);
+foreach ($default['filterOptions'] as $option) {
+	$output = array('COMPONENT_CONFIG_FILTER_VALUE' 	=> $option,
+					'COMPONENT_CONFIG_FILTER_NAME' 		=> ucwords($option),
+					'COMPONENT_CONFIG_FILTER_SELECTED' 	=> in_array($option, $config['filter']) ? 'checked="checked"' : '',
+					);
+	$this->setVar($output);
+	$this->parse("filter_block".$componentCount, "filter", true);			
+}
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_file", "submit_file_block");

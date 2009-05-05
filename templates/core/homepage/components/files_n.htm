@@ -7,13 +7,12 @@
       <input type="hidden" name="cid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
       <input type="hidden" name="component" value="{COMPONENT_ID}" />
-      <label for="filter">Show</label>
-      <select name="filter">
-        <!-- BEGIN filter -->
-        <option value="{COMPONENT_CONFIG_FILTER_VALUE}"{COMPONENT_CONFIG_FILTER_SELECTED}>{COMPONENT_CONFIG_FILTER_NAME}</option>
-        <!-- END filter -->
-      </select>
+       <!-- BEGIN filter -->
+      <label for="{COMPONENT_CONFIG_FILTER_VALUE}"><input type="checkbox" name="filter[]" value="{COMPONENT_CONFIG_FILTER_VALUE}" {COMPONENT_CONFIG_FILTER_SELECTED} />{COMPONENT_CONFIG_FILTER_NAME}</label>
+        
+      <!-- END filter -->
       <label for="sort">Sort: </label>
+     
       <select name="sort">
         <!-- BEGIN sort -->
         <option value="{COMPONENT_CONFIG_SORT_VALUE}"{COMPONENT_CONFIG_SORT_SELECTED}>{COMPONENT_CONFIG_SORT_NAME}</option>

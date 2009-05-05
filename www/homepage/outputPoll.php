@@ -12,7 +12,12 @@ $this->setJavascript('/javascript/fusion.js');
 require_once '../library/poll.php';
 $pollHandler = new Poll;
 
-$poll = $pollHandler->getCurrentPoll($categoryID, $config['pollID']);
+if (is_numeric($config['pollID']))
+	$poll = $pollHandler->getByID($config['pollID']);
+
+if (!isset($poll['pollID']))
+	$poll = $pollHandler->getCurrentPoll($categoryID);
+
 if ($poll['pollID']) {
 
 	$output = array('POLL_ID'		=> $poll['pollID'],

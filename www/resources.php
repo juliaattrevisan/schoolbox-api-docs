@@ -41,6 +41,10 @@ if (is_numeric($this->arg[0])) {
 if ($groupHandler->getPermission($openCategory) < READ_ACCESS)
 	$openCategory = 0;
 
+// log view
+if ($openCategory > 0)
+	$categoryHandler->logPageView($openCategory);
+	
 // get parentIDs from openCategory to 0
 $parentList[] = $parentID = $openCategory;
 $i = 0;
