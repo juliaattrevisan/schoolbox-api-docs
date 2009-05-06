@@ -57,7 +57,7 @@ if(is_numeric($_GET['id']))
 		error(41);
 
 	//send headers
-	if($resultArray['mime_type'])		
+	if($file['mime_type'])		
 		header ("Content-Type: {$file['mime_type']}"); 
 	else
 		header ("Content-Type: application/octet-stream"); 
