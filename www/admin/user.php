@@ -150,10 +150,6 @@ class user
 		$query = "DELETE FROM bookmarks WHERE owner = '$id'";
 		$this->db->query($query);
 
-		//ph extension
-		$query = "DELETE FROM ph_ext WHERE owner = '$id'";
-		$this->db->query($query);
-
 		//superusers
 		$query = "DELETE FROM superusers WHERE id = '$id'";
 		$this->db->query($query);
