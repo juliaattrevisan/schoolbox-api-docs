@@ -24,7 +24,8 @@ if (is_array($eventList)) {
 						'TUTORIAL_NAME'			=> scrubText($event['name']),
 						'TUTORIAL_LOCATION'		=> scrubText($event['location']),
 						'TUTORIAL_CANCELLED'	=> $event['cancelled'] == 'true' ? 'cancelled' : '',
-						'ON_OFF'				=> ++$j%2 ? 'dark' : '', 
+						'ON_OFF'				=> ++$j%2 ? '' : 'dark', 
+						
 						);
 		$this->setVar($output);
 		

@@ -11,7 +11,7 @@
 define("HEADING", 'OurSchool');			//This will appear on the window title of each page
 define("SITE_name", "Alaress Pty Ltd");
 
-define("SITE_location", "wenona");				//This defines the location, allows specific code for each location
+define("SITE_location", "demo");				//This defines the location, allows specific code for each location
 define("SITE_root", dirname(__FILE__)."/../..");
 define('SITE_address', 'http://www.alaress.com.au');
 
@@ -166,18 +166,18 @@ define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 define('GROUP_can_change_password', serialize(array(1,2,3,4,5)));
 
 define('HOMEPAGE_colors', serialize(array(
-	'left_head_font' => 'FFFFFF', 
-	'left_head_bg' => '051252', 
+	'left_head_font' => '000000', 
+	'left_head_bg' => 'dbe7f2', 
 	'left_font' => '000000', 
 	'left_bg_primary' => 'FFFFFF', 
-	'left_bg_secondary' => 'ECECEC', 
+	'left_bg_secondary' => 'f5f5f5', 
 	'left_link' => '0033CC', 
 	'left_hover' => '0066CC', 
-	'right_head_font' => 'FFFFFF', 
-	'right_head_bg' => '051252', 
+	'right_head_font' => '000000', 
+	'right_head_bg' => 'dbe7f2', 
 	'right_font' => '000000', 
 	'right_bg_primary' => 'FFFFFF', 
-	'right_bg_secondary' => 'ECECEC', 
+	'right_bg_secondary' => 'f5f5f5', 
 	'right_link' => '0033CC', 
 	'right_hover' => '0066CC', 
 	
