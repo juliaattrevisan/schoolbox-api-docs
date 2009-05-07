@@ -142,7 +142,7 @@ table.ruler { width: 100%; }
 	}
 .left {
 	min-width: 535px;
-	width: 69%;
+	width: 69.5%;
 	float: left;
 	margin-right: 1%;
 	overflow: hidden;
@@ -171,7 +171,7 @@ table.ruler { width: 100%; }
 	}
 .template4 .right {
 	min-width: 535px;
-	width: 69%;
+	width: 69.5%;
 	}
 .template4 .left {
 	min-width: 229px;

@@ -15,7 +15,7 @@ body {
 	padding-bottom: 47px;
 }
 #content {
-	padding: 0 0 0 190px;
+	padding: 0 10px 0 190px;
 	min-height: 434px;
 	background: 0;
 }
@@ -50,7 +50,8 @@ h1 {
 	background: #8aa2b7;
 	padding: 0;
 	line-height: 23px;
-	width: 99.5%;
+	height: 23px;
+	width: auto;
 	font-size: 116%;
 	margin-bottom: 10px;
 	position: relative;
@@ -66,11 +67,11 @@ h1 a.customise {
 h2 {
 	background: #dbe7f2;
 	color: #000;
-	font-size: 116%;
+	font-size: 105%;
 	border: 1px solid #c3cdd7;
 	font-weight: normal;
 	padding: 0;
-	line-height: 23px;
+	line-height: 19px;
 	height: auto;
 	position: static;
 }
@@ -81,7 +82,7 @@ h2 {
 	height: 69px;
 	border-bottom: 1px solid #e4e4e4;
 	background: #f5f5f5;
-	padding-right: 9px;
+	padding-right: 10px;
 	margin-bottom: 10px;
 }
 #logo {
@@ -92,7 +93,7 @@ h2 {
 	left: 14px;
 }
 ul#tabs {
-	right: 9px;
+	right: 10px;
 }
 #tabs li {
 	margin: 0;
@@ -142,7 +143,7 @@ ul#tabs {
 ------------*/
 #nav {
 	top: 70px;
-	padding-top: 9px;
+	padding-top: 10px;
 	background: #fff;
 }
 #nav h3 {
@@ -151,7 +152,7 @@ ul#tabs {
 	background: #8aa2b7;
 	border: 1px solid #557087;
 	font-size: 116%;
-	text-transform: uppercase;
+	text-transform: none;
 	padding: 0 0 0 14px;
 }
 #nav li a {
@@ -228,7 +229,8 @@ ul#tabs {
 	padding: 0;
 	position: absolute;
 	background: 0;
-	top: 4px;
+	top: 3px;
+	font-size: 90%;
 	right: 10px;
 	color: #fff;
 	text-decoration: underline;
