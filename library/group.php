@@ -179,7 +179,7 @@ class Group extends Model {
 		}
 		
 		// allow staff write access to NEWS_SERVICE by default
-		if($this->isStaff($user['group_id']) && $this->_service == NEWS_SERVICE && $permission < WRITE_ACCESS)
+		if($this->isStaff($userID) && $this->_service == NEWS_SERVICE && $permission < WRITE_ACCESS)
 			$permission = WRITE_ACCESS;
 		
 		// check synergy tutor list

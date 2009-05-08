@@ -70,12 +70,12 @@ if (is_array($fileList)) {
 $config['filter'] = is_array($config['filter']) ? $config['filter'] : array($config['filter']);
 $this->setBlock("config", "filter", "filter_block".$componentCount);
 foreach ($default['filterOptions'] as $option) {
-	$output = array('COMPONENT_CONFIG_FILTER_VALUE' 	=> $option,
-					'COMPONENT_CONFIG_FILTER_NAME' 		=> ucwords($option),
-					'COMPONENT_CONFIG_FILTER_SELECTED' 	=> in_array($option, $config['filter']) ? 'checked="checked"' : '',
-					);
-	$this->setVar($output);
-	$this->parse("filter_block".$componentCount, "filter", true);			
+    $output = array('COMPONENT_CONFIG_FILTER_VALUE' 	=> $option,
+                    'COMPONENT_CONFIG_FILTER_NAME' 		=> ucwords($option),
+                    'COMPONENT_CONFIG_FILTER_SELECTED' 	=> in_array($option, $config['filter']) ? 'checked="checked"' : '',
+                    );
+    $this->setVar($output);
+    $this->parse("filter_block".$componentCount, "filter", true);
 }
 
 //setup block for submission button
