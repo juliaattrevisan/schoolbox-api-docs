@@ -428,8 +428,8 @@ class rcube_imap
     if (is_array($a_mboxes))
       return $a_mboxes;
 
-    // retrieve list of folders from IMAP server
-    $a_folders = iil_C_ListSubscribed($this->conn, $this->_mod_mailbox($root), $filter);
+    // retrieve list of folders from IMAP server  //JAMES LECKIE: modified so users do not have to subscribe to see folders
+    $a_folders = iil_C_ListMailboxes($this->conn, $this->_mod_mailbox($root), $filter);
     
     if (!is_array($a_folders) || !sizeof($a_folders))
       $a_folders = array();
