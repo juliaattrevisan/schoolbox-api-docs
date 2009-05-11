@@ -19,7 +19,7 @@ class Enrolment extends Model {
 					  ORDER BY lastname, firstname";
 		} else {
 			$query = "(SELECT n.studentID, u.lastname, u.firstname FROM ".TUTORIAL_db.".enrolment n LEFT JOIN ".PORTAL_db.".user u ON u.id = n.studentID WHERE n.eventID = " . $eventID . " )
-					  UNION ( SELECT s.studentID, a.lastname, s.firstname FROM ".TUTORIAL_db.".attendance a LEFT JOIN ".PORTAL_db.".user s ON s.id = a.studentID WHERE a.eventID = " . $eventID . " )
+					  UNION ( SELECT a.studentID, s.lastname, s.firstname FROM ".TUTORIAL_db.".attendance a LEFT JOIN ".PORTAL_db.".user s ON s.id = a.studentID WHERE a.eventID = " . $eventID . " )
 					  ORDER BY lastname, firstname";
 		}
 		
