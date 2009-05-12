@@ -893,6 +893,13 @@ select.small, input.small {
 	}
 input.timeField { width: 30px; }
 /*--------------------------------------------------------------
+ Drop Box styles 
+--------------------------------------------------------------*/
+.box .listing form.dropBox { text-align: left; padding: 10px; background: #eee; }
+.box .listing form.dropBox fieldset { border-bottom: 1px solid #ccc; padding: 10px; }
+.box .listing form.dropBox fieldset h3 { width: 100px; float: left; }
+.box .listing form.dropBox fieldset input { float: left; }
+/*--------------------------------------------------------------
  Miscellaneous styles 
 --------------------------------------------------------------*/
 .center {text-align:center;}
