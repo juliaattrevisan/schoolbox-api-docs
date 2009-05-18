@@ -201,8 +201,8 @@ else if (empty($mailto))
   $mailto = 'undisclosed-recipients:;';
 
 // get sender name and address
-$from = get_input_value('_from', RCUBE_INPUT_POST);
-$from = $_SESSION['firstname'] .' '.$_SESSION['lastname'].' <'.$_SESSION['username'] . '@' . MAIL_address.'>'; 
+//$from = get_input_value('_from', RCUBE_INPUT_POST);
+$from = $_SESSION['username'] . '@' . MAIL_address;
 
 /*$identity_arr = rcmail_get_identity($from);
 
@@ -211,7 +211,7 @@ if ($identity_arr)
 */
 
 if (empty($identity_arr['string']))
-  $identity_arr['string'] = $from;
+  $identity_arr['string'] = $_SESSION['firstname'] .' '.$_SESSION['lastname'].' <'.$_SESSION['username'] . '@' . MAIL_address.'>';
 
 // compose headers array
 $headers = array('Date' => date('r'),
