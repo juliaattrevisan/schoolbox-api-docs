@@ -8,6 +8,9 @@ $this->setBlock('topic', "news", "news_block");
 	
 $myNews = new News();
 
+$this->setVar("topic_block", "");
+$this->setVar("topic_header_block", "");
+	
 //output headlines
 $topicList = array();
 $headlineList = $myNews->getHeadlines();
@@ -64,7 +67,7 @@ if(is_array($headlineList) )
 }
 else
 {
-	$this->setVar("stories_block", "<li>No news articles available</li>");
+	$this->setVar("topic_block", "<li>No news articles available</li>");
 }
 
 // output tabs

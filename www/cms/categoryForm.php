@@ -61,8 +61,8 @@ elseif (is_numeric($_GET['delete'])) {
 	if(!$category = $categoryHandler->getByID($_GET['delete']))
 		error(2);
 		
-	if ($groupHandler->getPermission($category['cid']) < WRITE_ACCESS)
-		error(6);
+	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS)
+		error(8);
 	
 	$categoryHandler->delete($_GET['delete']);
 	$_SESSION['resourcesID'] = $category['parent'];

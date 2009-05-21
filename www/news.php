@@ -31,7 +31,7 @@ $this->setVar('next_button_block', '');
 $this->setVar('previous_button_block', '');
 $this->setVar('page_number_block', '');
 
-
+$this->setVar('topic_header_block', '');
 
 $groupHandler = new Group(NEWS_SERVICE);
 
