@@ -22,7 +22,7 @@
 
 
 // application constants
-define('RCMAIL_VERSION', '0.2.1');
+define('RCMAIL_VERSION', '0.2.2');
 define('RCMAIL_CHARSET', 'UTF-8');
 define('JS_OBJECT_NAME', 'rcmail');
 
@@ -51,7 +51,7 @@ if (set_include_path($include_path) === false) {
 }
 
 ini_set('error_reporting', E_ALL&~E_NOTICE);
-set_magic_quotes_runtime(0);
+
 
 // increase maximum execution time for php scripts
 // (does not work in safe mode)
@@ -62,11 +62,11 @@ if (!ini_get('safe_mode')) {
 // set internal encoding for mbstring extension
 if(extension_loaded('mbstring'))
   mb_internal_encoding(RCMAIL_CHARSET);
-	      
+
 
 /**
  * Use PHP5 autoload for dynamic class loading
- * 
+ *
  * @todo Make Zend, PEAR etc play with this
  * @todo Make our classes conform to a more straight forward CS.
  */
@@ -109,3 +109,5 @@ require_once 'include/rcube_shared.inc';
 
 // set PEAR error handling (will also load the PEAR main class)
 PEAR::setErrorHandling(PEAR_ERROR_CALLBACK, 'rcube_pear_error');
+
+?>
