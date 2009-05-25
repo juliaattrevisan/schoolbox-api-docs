@@ -42,5 +42,6 @@ if (is_array($pollData)) {
 
 
 header("Content-type: text/xml; charset=\"utf-8\"");
+echo pack ( "C3" , 0xef, 0xbb, 0xbf );
 $page->outputPage(true);
 ?>
