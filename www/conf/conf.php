@@ -11,7 +11,7 @@
 define("HEADING", 'OurSchool');			//This will appear on the window title of each page
 define("SITE_name", "Alaress Pty Ltd");
 
-define("SITE_location", "demo");				//This defines the location, allows specific code for each location
+define("SITE_location", "grimwade");				//This defines the location, allows specific code for each location
 define("SITE_root", dirname(__FILE__)."/../..");
 define('SITE_address', 'http://www.alaress.com.au');
 
