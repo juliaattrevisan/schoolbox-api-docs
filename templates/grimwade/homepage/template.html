@@ -1,0 +1,48 @@
+<!-- BEGIN custom_head -->
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/homepage/rss/{ID}" />
+<!-- BEGIN modify_layout -->
+<script type="text/javascript" src="/javascript/mootools.js"></script>
+<script type="text/javascript"> var categoryID = {ID}; </script>
+<script type="text/javascript" src="/javascript/jquery.ui.js"></script>
+<script type="text/javascript" src="/javascript/jquery.component.js"></script>
+<!-- END modify_layout -->
+<style type="text/css">
+		
+.left h2 { color: #{left_head_font}; background-color: #{left_head_bg};	}
+.left p, .left h3, .left .listing p.small { color: #{left_font}; }
+.left a, .left .listing p.small a { color: #{left_link}; }
+.left .box a.edit { background: #{left_hover} url(/images/grimwade/box-bg.png) repeat-x; }
+.left .box a.edit:hover { color: #fff; background-color: #{left_link}; }
+.left .box a:hover, .left .listing p.small a:hover { color: #{left_hover};  }
+.left .text { background: #{left_bg_primary}; }
+.left .text.listing .dark { background: #{left_bg_secondary}; }
+
+.right h2 { color: #{right_head_font}; background-color: #{right_head_bg};	}
+.right p, .right h3, .right .listing p.small { color: #{right_font}; }
+.right a, .right .listing p.small a { color: #{right_link}; }
+.right .box a.edit { background: #{right_hover} url(/images/grimwade/box-bg.png) repeat-x; }
+.right .box a.edit:hover { color: #fff; background-color: #{right_link}; }
+.right .box a:hover, .right .listing p.small a:hover { color: #{right_hover};  }
+.right .text { background: #{right_bg_primary}; }
+.right .text.listing .dark { background: #{right_bg_secondary}; }
+
+/* wrap mimetypes in classes */
+<!-- BEGIN allowed_files -->
+.{NAME} { background-image: url(/images/mime/{ICON}); }<!-- END allowed_files -->
+
+			
+</style>
+<!-- END custom_head -->
+
+<h1>
+	<span>{HEADING}</span>
+  <!-- BEGIN edit_page -->
+  <a class="customise" href="/homepage/config/{ID}">customise page</a>
+  <!-- END edit_page -->
+</h1>
+
+<div class="{TEMPLATE} homepage">
+<div class="left">{COLUMN1}</div>
+<div class="right">{COLUMN2}</div>
+</div>
+<input type="hidden" id="categoryID" value="{ID}" />

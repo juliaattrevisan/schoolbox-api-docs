@@ -292,7 +292,7 @@ table td { vertical-align: middle; }
 	text-align: right;
 	display: block;
 	float: right;
-	margin: -37px 5px 0 0;
+	margin: -25px 5px 0 0;
 	position: relative;
 	text-transform: capitalize;
 }
@@ -674,6 +674,7 @@ News styles
 .news-item {
 	background: #eee;
 	padding: 10px 10px 1px;
+	margin-bottom: 10px;
 	}
 .modify {
 	text-align: right;
