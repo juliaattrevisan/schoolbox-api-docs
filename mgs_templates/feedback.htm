@@ -3,18 +3,26 @@
 <!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
 <!--  Visit us at www.lektec.com.au -->
 <head>
-<!-- #BeginEditable "doctitle" -->
 <title>{TITLE}</title>
-<meta name="Keywords" content="" />
-<meta name="Description" content="" />
-<!-- #EndEditable -->
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="James Leckie, Lektec Consulting"/>
-<meta name="ROBOTS" content="INDEX, FOLLOW" />
-<!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs-default.css" />
-<!-- InstanceBeginEditable name="scripts" -->
+<meta name="author" content="James Leckie, Lektec Consulting"/> 
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/mgs/screen.css" />
+
+
+<script type="text/javascript" src="/javascript/jquery.js"></script>
+<script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
+<script type='text/javascript'>
+  var $j = jQuery.noConflict();
+	
+	$j(function() {
+    $j('#nav ul').droppy({speed: 0});
+  });
+</script>
+
+<!-- InstanceBeginEditable name="head" -->
 
 <script type="text/javascript">
 function fixEmailAddress( input) {
@@ -26,49 +34,80 @@ function fixEmailAddress( input) {
 <!-- InstanceEndEditable -->
 </head>
 <body>
-<div id="outerWrap">
-	<div id="header"></div>
-	<div id="yellowStripe"></div>
-	<div id="left">
-	</div>
-	<!-- end left -->
-	<div id="content">
-		<div id="content_text"> <!-- #BeginEditable "main" -->
+
+
+<div id="nav">
+	
+</div>
+
+<div id="header">
+    <div id="logo"></div> 
+</div>
+  <div id="yellowstripe"></div>
+<div id="container"> 
+	<ul id="tabs">
+	<li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Main</a></li>
+  <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">News</a></li>
+  <!-- BEGIN webmail_tab -->
+  <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
+  <!-- END webmail_tab -->
+  <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
+  <!-- BEGIN timetable_tab -->
+  <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
+  <!-- END timetable_tab -->
+  <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
+  <!-- BEGIN myfiles_tab -->
+  <li><a class="{TAB_MY_FILES_ON}" href="/cms/portfolio/" title="Access your files">My Files</a></li>
+	<!-- END myfiles_tab -->
+  <li><a href="/logout.php" title="">Logout</a></li>
+</ul>
+  <div class="float-fix"></div>	
+  <div id="content">  
+  <!-- InstanceBeginEditable name="content" -->
 		<h1>Feedback</h1>
       <p>{ERROR}</p>
       {FORM_BEFORE} 
       <p>This form can be used to provide portal-related feedback to the IT department.</p>
-      <form method="post" action="feedback.php">
+       <form class="standardForm" method="post" action="feedback.php">
         <table>
           <tr> 
-            <td> Sending feedback to <font size=-2>portal_support@mgs.vic.edu.au</font> 
+            <td>Sending feedback to portal_support@mgs.vic.edu.au</td>
+          </tr>
+          <tr> 
+            <td> 
+            <h3>Your login name</h3>
+            <em>or email address at which we can get back to you</em>
+            </td>
+            <td>
+            <input type="text" name="username" size="60" onBlur="fixEmailAddress( this)"> 
             </td>
           </tr>
           <tr> 
-            <td> <div align="left">Your login name<br>
-                <font size=-2>(or email address at which we can get back to you)</font></div>
-              <input type="text" name="username" class="field" size="60" onBlur="fixEmailAddress( this)"> 
+            <td>
+            <h3>Feedback</h3>
+            </td>
+            <td>
+            <textarea wrap="virtual" name="body" rows="10" cols="60" class="field"></textarea> 
             </td>
           </tr>
           <tr> 
-            <td> <div align="left">Feedback </div>
-              <textarea wrap="virtual" name="body" rows="10" cols="60" class="field"></textarea> 
+            <td>&nbsp;</td>
+            <td>
+            <input type="submit" name="submit" value="submit feedback">
             </td>
-          </tr>
-          <tr> 
-            <td align="left"> <input type="hidden" name="page" value="{HIDDEN}"> 
-              <input type="submit" name="submit" value="submit feedback"> </td>
           </tr>
         </table>
+        <input type="hidden" name="page" value="{HIDDEN}"> 
       </form>
       <p>{FORM_AFTER} </p>
-		 <!-- #EndEditable --> </div>
-		<div id="footer">
-			<p><strong>2005&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
-			<p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
-			<p><a href="http://www.lektec.com.au">Developed By Lektec Consulting</a></p>
-		</div>
-	</div>
+		 <!-- InstanceEndEditable -->
+  <div class="float-fix"></div>
+  </div>
+</div>
+<div id="footer">
+    <p><strong>{TPL_YEAR}&nbsp;&copy;&nbsp;Copyright <a href="http://www.mgs.vic.edu.au" title="Melbourne Grammar School - Australia">Melbourne Grammar School</a> Australia</strong></p>
+    <p><a href="/policy/mgs.htm">Guidelines of Use and Privacy Policy</a></p>
+    <p><a href="http://www.alaress.com.au">Developed By Alaress</a></p>
 </div>
 </body>
 <!-- InstanceEnd --></html>
