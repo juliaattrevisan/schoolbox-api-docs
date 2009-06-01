@@ -295,6 +295,7 @@ table td { vertical-align: middle; }
 	margin: -25px 5px 0 0;
 	position: relative;
 	text-transform: capitalize;
+	line-height: normal;
 }
 .header_option a:hover {
 	text-decoration: underline;
