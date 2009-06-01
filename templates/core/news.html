@@ -1,5 +1,6 @@
 <!-- BEGIN custom_head -->
 <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed/news.php" />
+<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
 <script type="text/javascript">
 	$j(function() {	
 		
@@ -16,6 +17,7 @@
 			var parent = $j('#a'+ params[1]).parent();
 			$j(parent).show();
 			$j('#category a[title='+parent.attr('id')+']').addClass('selected');
+			$.scrollTo('#a'+ params[1]);
 		
 		} else {
 		
