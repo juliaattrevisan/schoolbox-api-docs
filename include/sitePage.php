@@ -19,35 +19,40 @@ class SitePage extends Page {
 	
 	function loadContent($pageFile, $execute=TRUE) {
 		$this->pageName = $pageFile;
-		
-		//max dir depth is 2 so anything after that must be arguments being passed to the script
+	
+		/* sanitise data */
 		if( !preg_match("/^[a-zA-Z0-9\/\-\_]+/", $pageFile) ) {
-			
 			$this->pageNotFound();
 		}
-
-		$path = explode('/', $pageFile);
-		$page = $pageFile;
-		if(count($path) > 1) { 
-			$page = $path[0];
-			$this->arg = array_slice($path,1);
-			foreach($this->arg as $key => $value) {
-				if($value == '') unset($this->arg[$key]);
-			}
-		}
-		$page = rtrim($page, '/');
 		
-		if (is_file($_SERVER['DOCUMENT_ROOT'].'/'.$page.'/'. $this->arg[0] . '.php') && $execute) {
-			$page2 = array_shift($this->arg);
-			include($_SERVER['DOCUMENT_ROOT'].'/'.$page.'/'. $page2 . '.php');
-		}
-		else if(is_file($_SERVER['DOCUMENT_ROOT'].'/'.$page . '.php') && $execute)
-			include($_SERVER['DOCUMENT_ROOT'].'/'.$page . '.php');
-		else if(is_file($_SERVER['DOCUMENT_ROOT'] . '/../templates/' . $this->getTemplate($page.'.html'))) {
-			$this->setFile(TEMPLATE_content, $page.'.html');
-		} else
-			$this->pageNotFound();
+		$this->arg = array();
+		$path = explode('/', trim($pageFile, '/'));
+		$total = count($path);
 
+		/* iterate backwards through the path */
+		for ($i = 0; $i < $total; $i++) {
+		
+			$filename = rtrim(implode("/", $path), '/');
+			
+			if(is_file($_SERVER['DOCUMENT_ROOT'].'/'.$filename.'.php') && $execute) {
+				include($_SERVER['DOCUMENT_ROOT'].'/'.$filename. '.php');
+				return true;
+			} elseif(is_file($_SERVER['DOCUMENT_ROOT'].'/'.$filename.'/index.php') && $execute) {
+				include($_SERVER['DOCUMENT_ROOT'].'/'.$filename. '/index.php');
+				return true;
+			} else if(is_file($this->templateRoot .'/'. $filename . '.html')) {
+				$this->setFile(TEMPLATE_handler, $filename . '.html');
+				return true;
+			} else if(is_file($this->templateRoot .'/'. $filename . '/index.html')) {
+				$this->setFile(TEMPLATE_handler, $filename . '/index.html');
+				return true;
+			}
+			
+			/* move last element to arguments */
+			array_unshift($this->arg, array_pop($path));
+		}
+		
+		$this->pageNotFound();
 	}
 	
 	

@@ -1,0 +1,105 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/jquery.tooltip.css" />
+<script type="text/javascript" src="/javascript/jquery.dimension.js"></script>
+<script type="text/javascript" src="/javascript/jquery.tooltip.js"></script>
+<script type="text/javascript">
+$j(function () {
+	/* tooltip */
+	$j('#workshop td[title], li[title]').tooltip({
+		track		: true,
+		delay		: 0,
+		opacity		: 1,
+		extraClass 	: 'simple',
+		showBody	: ' %% '
+	});
+	
+	/* highlight cell */
+	$j('#workshop td.open').hover(function () { $j(this).addClass('highlight'); }, function () { $j(this).removeClass('highlight'); });
+	
+	/* make booking */
+	$j('#workshop td.open').click(function () {
+		var title = $j(this).children('h3:first').text();
+		if (confirm('Please confirm your booking for ' + title )) {
+			var workshopID = $j(this).attr('id').substring(9);
+			window.open('/modules/workshop/modifyForm.php?book=' + workshopID, '_self', '');
+		}
+	});
+	
+	/* remove booking */
+	$j('a.remove').click(function () {
+		var title = $j(this).closest('p').prev('h3').text();
+		if (confirm('Please confirm you want to delete your booking for ' + title )) {
+			window.open($j(this).attr('href'), '_self', '');
+		}
+		return false;
+	});
+});
+</script>
+<style type="text/css">
+	#workshop td {
+		vertical-align: top;
+	}
+	#workshop td.open {
+		background-color: #c9f6c7;
+	}
+	#workshop td.closed {
+		background-color: #FFE6DE;
+	}
+	#workshop td.highlight {
+		background-color: #EFEFEF !important;
+		cursor: pointer;
+	}
+	/* errors */
+	div#error {
+		margin: 0 15px 15px 0;
+		padding-top: 10px;
+		list-style: none;
+		}
+	div#error p {
+		padding: 8px 25px;
+		margin-bottom: 10px;
+		border: 1px solid #f16048;
+		color: #df280a;
+		font-weight: bold;
+		background: #faebe7 url(/images/error-icon.gif) no-repeat 4px 50%;
+		}	
+</style>
+<!-- END custom_head -->
+<h1>Workshop Bookings</h1>
+
+<!-- BEGIN error -->
+<div id="error">
+    <p>{ERROR}</p>
+</div>
+<!-- END error -->
+
+<h2>Your Bookings</h2>
+<ul class="text listing">
+  <!-- BEGIN booking -->
+  <li title="{BOOKING_DESCRIPTION}">
+    <h3>{BOOKING_TITLE}</h3>
+    <p class="interact"><a href="/modules/workshop/modifyForm.php?remove={BOOKING_ID}" class="remove">Remove</a></p>
+    <p>{BOOKING_PRESENTER}, {BOOKING_ROOM}</p>
+  </li>
+  <!-- END booking -->
+</ul>
+
+<h2>Available Workshops</h2>
+<p>The workshops highlighted in green are currently available, you may book these workshops. Workshops highlighted in red are full, you can only book these workshops if someone else deletes their booking.</p>
+<table border="1" id="workshop">
+  <tr>
+    <th>&nbsp;</th>
+    <!-- BEGIN room_head -->
+    <th>{ROOM_NAME}</th>
+    <!-- END room_head -->
+  </tr>
+  <!-- BEGIN session -->
+  <tr id="session-{SESSION_ID}">
+    <td class="time">{SESSION_NAME} {SESSION_START} - {SESSION_END}</td>
+    <!-- BEGIN workshop -->
+    <td id="workshop-{WORKSHOP_ID}" rowspan="{WORKSHOP_LENGTH}" title="{WORKSHOP_DESCRIPTION} %% {WORKSHOP_PRESENTER}" class="{AVAILABILITY}">
+      <h3>{WORKSHOP_TITLE}</h3></td>
+    <!-- END workshop -->
+  </tr>
+  <!-- END session -->
+</table>
