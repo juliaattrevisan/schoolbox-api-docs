@@ -10,10 +10,11 @@ $this->setFile(TEMPLATE_content, 'modules/workshop/index.html');
 $this->setTitle('Workshop Bookings');
 
 $this->setBlock(TEMPLATE_content, 'error', 'error_block');
-$this->setBlock(TEMPLATE_content, 'booking', 'booking_block');
-$this->setBlock(TEMPLATE_content, 'room_head', 'room_head_block');
+$this->setBlock(TEMPLATE_content, 'has_bookings', 'has_bookings_block');
+$this->setBlock('has_bookings', 'booking', 'booking_block');
 $this->setBlock(TEMPLATE_content, 'session', 'session_block');
-$this->setBlock('session', 'workshop', 'workshop_block');
+$this->setBlock(TEMPLATE_content, 'room', 'room_block');
+$this->setBlock('room', 'workshop', 'workshop_block');
 
 $this->setVar('error_block', '');
 if ($this->arg[0] == 'unavailable') {
@@ -27,56 +28,72 @@ elseif ($this->arg[0] == 'already-booked') {
 
 
 /* output booking */
-$current = array();
+$bookedSession = array();
+$booked = array();
 $bookingList = $workshopHandler->getBookingList();
 if (is_array($bookingList)) {
 	foreach ($bookingList as $booking) {
 		for ($i = $booking['sessionID']; $i < $booking['sessionID'] + $booking['length']; $i++)
-			$current[$i] = true;
+			$bookedSession[$i] = true;
+			
+		$booked[] = $booking['workshopID'];	
 		
 		$output = array('BOOKING_ID'			=> $booking['workshopID'],
 						'BOOKING_TITLE'			=> scrubText($booking['title']),
 						'BOOKING_ROOM'			=> scrubText($booking['room']),
 						'BOOKING_DESCRIPTION'	=> scrubText($booking['description']),
 						'BOOKING_PRESENTER'		=> scrubText($booking['presenter']),
+						'SESSION_ID'			=> $booking['sessionID'],
+						'BOOKING_START'			=> scrubText($booking['start']),
+						'BOOKING_END'			=> scrubText($booking['end']),
+						'ON_OFF'				=> ++$j % 2 ? 'dark' : '',
 						);
 		$this->setVar($output);
 		$this->parse('booking_block', 'booking', true);
 	}
+	$this->parse('has_bookings_block', 'has_bookings');
 } else
-	$this->setVar('booking_block', '<p>You are not booked for any workshops. Please select a workshops from below.</p>');
+	$this->setVar('has_bookings_block', '<p>You are not booked for any workshops. Please select a workshop from below.</p>');
 
+/* output rooms */
+$roomList = $workshopHandler->getRoomList();
+if (is_array($roomList)) {
+	foreach ($roomList as $room) {
 
-/* output sessions */
-$roomList = array();
-$sessionList = $workshopHandler->getSessionList();
-if (is_array($sessionList)) {
-	foreach ($sessionList as $session) {
-		$output = array('SESSION_ID'	=> $session['sessionID'],
-						'SESSION_NAME'	=> 'Session ' . $session['sessionID'],
-						'SESSION_START'	=> scrubText($session['start']),
-						'SESSION_END'	=> scrubText($session['end']),
+		$output = array('ROOM_NAME'	=> scrubText($room['room']),
 						);
 		$this->setVar($output);
 		
 		/* output workshops */
-		$workshopList = $workshopHandler->getBySession($session['sessionID']);
+		$workshopList = $workshopHandler->getByRoom($room['room']);
 		$this->setVar('workshop_block', '');
 		if (is_array($workshopList)) {
 			
 			foreach ($workshopList as $workshop) {
-
+				
 				if (!in_array($workshop['room'], $roomList)) array_push($roomList, $workshop['room']);
 				
+				$class = array();
+				$availability = '';
 				
-				$availability = false;
-				for ($i = $workshop['sessionID']; $i < $workshop['sessionID'] + $workshop['length']; $i++) {
-					if (isset($current[$i]))
-						$availability = '';
+				if (in_array($workshop['workshopID'], $booked)) {
+					$availability = 'Booked';
+					$class[] = 'booked';
+
+				} elseif ($workshopHandler->sessionOverlap($workshop['sessionID'], $workshop['length'], $bookedSession)) {
+					$availability = '';
+					$class[] = 'used';
+					
+				} elseif ($workshop['booked'] < 20) {
+					$availability = 'Book Now';
+					$class[] = 'available';
+					
+				} else {
+					$availability = 'Full';
+					$class[] = 'full';
 				}
 				
-				if ($availability === false)
-					$availability = $workshop['booking'] < 20 ? 'open' : 'full';
+				
 				
 				$output = array('WORKSHOP_ID'			=> $workshop['workshopID'],
 								'WORKSHOP_TITLE'		=> scrubText($workshop['title']),
@@ -84,24 +101,33 @@ if (is_array($sessionList)) {
 								'WORKSHOP_PRESENTER'	=> scrubText($workshop['presenter']),
 								'WORKSHOP_LENGTH'		=> $workshop['length'],
 								'AVAILABILITY'			=> $availability,
+								'CLASS'					=> implode(' ', $class),
 								);
+								
 								
 				$this->setVar($output);
 				$this->parse('workshop_block', 'workshop', true);
 			}
 		}
 		
-		$this->parse('session_block', 'session', true);
+		$this->parse('room_block', 'room', true);
 	}
 }
 
 /* output room header */
-$this->setVar('room_head_block', '');
-foreach ($roomList as $room) {
-	$output = array('ROOM_NAME'	=> scrubText($room),
-					);
+$this->setVar('session_block', '');
+$sessionList = $workshopHandler->getSessionList();
+
+foreach ($sessionList as $session) {
+
+		$output = array('SESSION_ID'	=> $session['sessionID'],
+						'SESSION_NAME'	=> 'Session ' . $session['sessionID'],
+						'SESSION_START'	=> scrubText($session['start']),
+						'SESSION_END'	=> scrubText($session['end']),
+						);
+
 	$this->setVar($output);
-	$this->parse('room_head_block', 'room_head', true);
+	$this->parse('session_block', 'session', true);
 }
 
 
