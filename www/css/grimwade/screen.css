@@ -100,3 +100,9 @@ h2 {
 #search {
 	margin: 73px 15px 0 0;
 }
+table .header_option {
+	margin-top: 6px;
+}
+#calendar h2 {
+	color: #336F7D;
+}

@@ -13,7 +13,8 @@
 		});
 		
 		var params = window.location.href.split("#");
-		if (params[1] != '') {
+		console.log(params);
+		if (params[1] != '' && params[0] != window.location.href) {
 			var parent = $j('#a'+ params[1]).parent();
 			$j(parent).show();
 			$j('#category a[title='+parent.attr('id')+']').addClass('selected');

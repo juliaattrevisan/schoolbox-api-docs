@@ -76,6 +76,7 @@ h2 {
 	height: auto;
 	position: static;
 }
+#calendar h2 { border: 0; }
 /*------------
 	Banner
 ------------*/
@@ -239,4 +240,7 @@ ul#tabs {
 	background: 0;
 	text-decoration: none;
 	color: #fff;
+}
+table .header_option {
+	margin-top: 6px;
 }
