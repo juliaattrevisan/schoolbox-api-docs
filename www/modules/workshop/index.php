@@ -55,6 +55,15 @@ if (is_array($bookingList)) {
 } else
 	$this->setVar('has_bookings_block', '<p>You are not booked for any workshops. Please select a workshop from below.</p>');
 
+$open = true;
+if (time() < strtotime("June 5 2009, 7am") || time() > strtotime("June 19 2009  4:30pm"))
+	$open = false;
+
+$output = array('OPEN'			=> $open ? 'true' : 'false',
+				'REGISTRATIONS'	=> time() > strtotime("June 19 2009  4:30pm") ? 'Registrations are now closed' : 'Registrations open Friday 5 June and close Friday 12 June at 4.30pm',
+				);
+$this->setVar($output);
+
 /* output rooms */
 $roomList = $workshopHandler->getRoomList();
 if (is_array($roomList)) {
@@ -80,15 +89,15 @@ if (is_array($roomList)) {
 					$availability = 'Booked';
 					$class[] = 'booked';
 
-				} elseif ($workshopHandler->sessionOverlap($workshop['sessionID'], $workshop['length'], $bookedSession)) {
+				} elseif ($open && $workshopHandler->sessionOverlap($workshop['sessionID'], $workshop['length'], $bookedSession)) {
 					$availability = '';
 					$class[] = 'used';
 					
-				} elseif ($workshop['booked'] < 20) {
+				} elseif ($open && $workshop['booked'] < 20) {
 					$availability = 'Book Now';
 					$class[] = 'available';
 					
-				} else {
+				} elseif ($open) {
 					$availability = 'Full';
 					$class[] = 'full';
 				}

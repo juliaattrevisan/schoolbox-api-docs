@@ -53,7 +53,7 @@ if(is_array($items))
 	foreach($items as $article)
 	{
 		$i++;
-
+		
 		if(($permission >= WRITE_ACCESS && $article['item_owner'] == $_SESSION['id']) || $permission >= FULL_ACCESS)
 			$this->setVar("MODIFY", "<a href=\"/news/modify/".$article['item_id']."\">modify</a>");
 		else
@@ -91,6 +91,8 @@ if(is_array($items))
 		} elseif ($total == $i) {
 			/* last rotation */
 			$this->parse("news_block", "news", true);
+			$this->setVar('TOPIC_NAME', scrubText($article['topicName']));
+			$this->setVar('TOPIC_CLEAN', convertToURL($article['topicName']));
 			
 			$this->parse('topic_block', 'topic', true);
 		} else {

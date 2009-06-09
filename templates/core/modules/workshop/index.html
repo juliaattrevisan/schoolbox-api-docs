@@ -14,37 +14,45 @@ $j(function () {
 		showBody	: ' %% '
 	});
 	
-	/* highlight cell */
-	$j('#workshop td.available').hover(function () { $j(this).addClass('highlight'); }, function () { $j(this).removeClass('highlight'); });
+	if ({OPEN}) {
 	
-	/* make booking */
-	$j('#workshop td.available').click(function () {
-		var title = $j(this).find('h3:first').text();
-		if (confirm('Please confirm your booking for ' + title )) {
-			var workshopID = $j(this).attr('id').substring(9);
-			window.open('/modules/workshop/modifyForm.php?book=' + workshopID, '_self', '');
-		}
-	});
+		/* highlight cell */
+		$j('#workshop td.available').hover(function () { $j(this).addClass('highlight'); }, function () { $j(this).removeClass('highlight'); });
+		
+		/* make booking */
+		$j('#workshop td.available').click(function () {
+			var title = $j(this).find('h3:first').text();
+			if (confirm('Please confirm your booking for ' + title )) {
+				var workshopID = $j(this).attr('id').substring(9);
+				window.open('/modules/workshop/modifyForm.php?book=' + workshopID, '_self', '');
+			}
+		});
+		
+		/* remove booking */
+		$j('a.remove').click(function () {
+			var title = $j(this).closest('p').prev('h3').text();
+			if (confirm('Please confirm you wish to REMOVE your booking for ' + title )) {
+				window.open($j(this).attr('href'), '_self', '');
+			}
+			return false;
+		}).css('display', 'inline');
+		
+		$j('#workshop td.booked').click(function () {
+			var title = $j(this).find('h3:first').text();
+			if (confirm("Please confirm you wish to REMOVE your booking for " + title)) {
+				var workshopID = $j(this).attr('id').substring(9);
+				window.open('/modules/workshop/modifyForm.php?remove=' + workshopID, '_self', '');
+			}
+		}).css('cursor', 'pointer');
 	
-	/* remove booking */
-	$j('a.remove').click(function () {
-		var title = $j(this).closest('p').prev('h3').text();
-		if (confirm('Please confirm you wish to REMOVE your booking for ' + title )) {
-			window.open($j(this).attr('href'), '_self', '');
-		}
-		return false;
-	});
-	
-	$j('#workshop td.booked').click(function () {
-		var title = $j(this).find('h3:first').text();
-		if (confirm("Please confirm you wish to REMOVE your booking for " + title)) {
-			var workshopID = $j(this).attr('id').substring(9);
-			window.open('/modules/workshop/modifyForm.php?remove=' + workshopID, '_self', '');
-		}
-	});
+	}
 });
 </script>
 <style type="text/css">
+
+	a.remove {
+		display: none;
+	}
 	
 	#workshop {
 		border-top: 1px solid #666;
@@ -82,7 +90,7 @@ $j(function () {
 	#workshop td.full { background-color: #f6c7c7; }
 	#workshop td.full p { color: #df280a; }
 	
-	#workshop td.booked { background-color: #89c3ff; cursor: pointer; }
+	#workshop td.booked { background-color: #89c3ff; }
 	#workshop td.booked p { color: #0065ce; }
 	
 	#workshop td.highlight {
@@ -135,6 +143,7 @@ $j(function () {
 	#print-button { 
 		margin-top: 10px;
 	}
+	.important {  background-color: #ECECEC; padding: 20px 10px; font-weight: bold; margin: 2em 0; }
 	
 </style>
 <!-- END custom_head -->
@@ -146,6 +155,7 @@ $j(function () {
 </div>
 <!-- END error -->
 
+<p class="important" style="">{REGISTRATIONS}</p>
 
 <div class="box">
 <h2>Your Bookings</h2>

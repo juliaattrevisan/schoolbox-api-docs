@@ -6,7 +6,12 @@ require_once dirname(__FILE__) . '/library/workshop.php';
 $page = new SitePage;
 $workshopHandler = new Workshop;
 
-if (is_numeric($_GET['book'])) {
+/* restrict time bookings can be changed */
+$open = true;
+if (time() < strtotime("June 5 2009, 7am") || time() > strtotime("June 19 2009  4:30pm"))
+	$open = false;
+
+if (is_numeric($_GET['book']) && $open) {
 	
 	
 	$workshop = $workshopHandler->getByID($_GET['book']);
@@ -33,7 +38,7 @@ if (is_numeric($_GET['book'])) {
 	localRedir('/modules/workshop');
 	
 } 
-elseif (is_numeric($_GET['remove'])) {
+elseif (is_numeric($_GET['remove']) && $open) {
 	
 	$workshop = $workshopHandler->getByID($_GET['remove']);
 	if (!isset($workshop['workshopID']))
