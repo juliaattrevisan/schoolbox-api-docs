@@ -30,3 +30,7 @@
 #tooltip.simple div.body {
 	font-style: italic;
 }
+#tooltip.simple div.body p {
+	font-style: normal;
+	font-weight: bold;
+}

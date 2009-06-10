@@ -26,6 +26,7 @@ elseif ($this->arg[0] == 'already-booked') {
 	$this->parse('error_block', 'error');
 }
 
+$sessionList = $workshopHandler->getSessionList();
 
 /* output booking */
 $bookedSession = array();
@@ -38,6 +39,8 @@ if (is_array($bookingList)) {
 			
 		$booked[] = $booking['workshopID'];	
 		
+		$endSession = $booking['sessionID'] + $booking['length'] - 1;
+		
 		$output = array('BOOKING_ID'			=> $booking['workshopID'],
 						'BOOKING_TITLE'			=> scrubText($booking['title']),
 						'BOOKING_ROOM'			=> scrubText($booking['room']),
@@ -45,7 +48,7 @@ if (is_array($bookingList)) {
 						'BOOKING_PRESENTER'		=> scrubText($booking['presenter']),
 						'SESSION_ID'			=> $booking['sessionID'],
 						'BOOKING_START'			=> scrubText($booking['start']),
-						'BOOKING_END'			=> scrubText($booking['end']),
+						'BOOKING_END'			=> scrubText($sessionList[$endSession - 1]['end']),
 						'ON_OFF'				=> ++$j % 2 ? 'dark' : '',
 						);
 		$this->setVar($output);
@@ -102,12 +105,22 @@ if (is_array($roomList)) {
 					$class[] = 'full';
 				}
 				
-				
+				switch ($workshop['length']) {
+					case 1:
+						$length = '30 min workshop';
+						break;
+					case 2:
+						$length = '1 hr workshop';
+						break;
+					default:
+						$length = '2 hr workshop';
+						break;
+				}
 				
 				$output = array('WORKSHOP_ID'			=> $workshop['workshopID'],
 								'WORKSHOP_TITLE'		=> scrubText($workshop['title']),
 								'WORKSHOP_DESCRIPTION'	=> scrubText($workshop['description']),
-								'WORKSHOP_PRESENTER'	=> scrubText($workshop['presenter']),
+								'WORKSHOP_PRESENTER'	=> "&lt;p &gt;" . $length . "&lt;/p&gt;" . scrubText($workshop['presenter']),
 								'WORKSHOP_LENGTH'		=> $workshop['length'],
 								'AVAILABILITY'			=> $availability,
 								'CLASS'					=> implode(' ', $class),
