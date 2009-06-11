@@ -41,13 +41,13 @@ define('TEMPLATE_content', 		'contentTpl');
 define('TPL_directory', 		SITE_root.'/'. SITE_location . "_templates");		//Deprecated option
 
 //CMS options
-define("FILE_directory",		SITE_root.'/files');		//Files uploads
-define("MYFILE_directory",  	SITE_root.'/myFiles');		//Personal file uploads
-define("SUBMISSION_directory", 	SITE_root.'/submissions');	//Student submission files
-define("RETURNS_directory", 	SITE_root.'/returns');		//Returned work files
-define('DROPBOX_directory', 	SITE_root.'/drop');			//Student dropbox files
-define('ZIP_directory', 		SITE_root.'/zip');			//Cache for zip files 
-define("THUMBNAIL_IMAGE_CACHE", SITE_root.'/thumbnails');	//Thumbnail cache 
+define("FILE_directory",		SITE_root.'/data/files');		//Files uploads
+define("MYFILE_directory",  		SITE_root.'/data/myFiles');		//Personal file uploads
+define("SUBMISSION_directory", 		SITE_root.'/data/submissions');	//Student submission files
+define("RETURNS_directory", 		SITE_root.'/data/returns');		//Returned work files
+define('DROPBOX_directory', 		SITE_root.'/data/drop');			//Student dropbox files
+define('ZIP_directory', 		SITE_root.'/data/zip');			//Cache for zip files 
+define("THUMBNAIL_IMAGE_CACHE", 	SITE_root.'/data/thumbnails');	//Thumbnail cache 
 define("THUMBNAIL_size", 		100); 
 define("FILE_max_upload", 		"10");						//Maximum number of files that can be uploaded via bulk uploader
 define("MAX_FILE_SIZE", 		10485760); 					//Maximum filesize in bytes allowed to be uploaded (default 10MB) (also set in php.ini)
@@ -134,26 +134,13 @@ define("WEATHER_CACHE", "7200");  			//cache weather info for 2 hours
 
 
 define("WEATHER_CURRENT_CACHE_LOCATION", "/usr/local/www/portal/files/currentweather.xml");	//File to save weather cache in
-define("WEATHER_FORECAST_CACHE_LOCATION", "/usr/local/www/portal/files/forecastweather.xml");	//File to save weather cache in
-/*
-define("WEATHER_SERVER", "ftp.theweather.com.au");
+define("WEATHER_FORECAST_CACHE_LOCATION", "/usr/local/www/portal/files/forecastweather.xml");	//File to save weather cache indefine("WEATHER_SERVER", "ftp.theweather.com.au");
 define("WEATHER_CURRENT_FILE", "obs_current_aws_vic.xml");
 define("WEATHER_FORECAST_FILE", "d_fcast_city_4day.xml");
 define("WEATHER_USERNAME", "");
 define("WEATHER_PASSWORD", "");
 define("WEATHER_LOCATION", "");
-*/
-
-define("WEATHER_CURRENT_LOCAL_CACHE_LOCATION", "/usr/local/www/portal/files/currentlocalweather.xml");       //File to save weather cache in
-define("WEATHER_CURRENT_AUS_CACHE_LOCATION", "/usr/local/www/portal/files/currentausweather.xml");   //File to save weather cache in
-define("WEATHER_FORECAST_CACHE_LOCATION", "/usr/local/www/portal/files/forecastweather.xml");        //File to save weather cache in
-define("WEATHER_CURRENT_AUS_FILE", "twc_obs_current_aws_vic.xml");
-define("WEATHER_CURRENT_LOCAL_FILE", "twc_obs_current_aws_melbourne_9477.xml");
-define("WEATHER_FORECAST_FILE", "twc_fcast_local_4day_capcity.xml");
-define("WEATHER_SERVER", "ftp.theweather.com.au");
-define("WEATHER_USERNAME", "mgs");
-define("WEATHER_PASSWORD", "wm2xsg");
-define("WEATHER_LOCATION", "9477");
+
 
 define("ALLCAMPUS", 4);					//Value that represents all campuses in the luCampus table
 define("HOMEPAGESERVICE", 1);				//Value that represents the homepage module in the service table

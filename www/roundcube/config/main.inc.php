@@ -18,7 +18,7 @@ $rcmail_config = array();
 require_once("../conf/conf.php");
 
 // system error reporting: 1 = log; 2 = report (not implemented yet), 4 = show, 8 = trace
-$rcmail_config['debug_level'] = 4;
+$rcmail_config['debug_level'] = 1;
 
 // log driver:  'syslog' or 'file'.
 $rcmail_config['log_driver'] = 'file';
