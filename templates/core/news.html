@@ -13,7 +13,6 @@
 		});
 		
 		var params = window.location.href.split("#");
-		console.log(params);
 		if (params[1] != '' && params[0] != window.location.href) {
 			var parent = $j('#a'+ params[1]).parent();
 			$j(parent).show();
