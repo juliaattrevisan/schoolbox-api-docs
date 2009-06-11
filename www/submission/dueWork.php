@@ -564,10 +564,8 @@ class dueWorkPage
 			 
 		$query = "SELECT category.id as cid, category.name, submission_box.description, submission_return.mark, 
 				submission_return.comment, GROUP_CONCAT(co.code) code, 
-				submission_return.id, submission_return.filename, file_type.name as type 
+				submission_return.id, submission_return.filename
 				FROM (submission_return, category, submission_box)
-				LEFT JOIN file ON file.id = submission_box.fid
-				LEFT JOIN file_type ON submission_box.type = file_type.id
 				LEFT JOIN categoryCode co ON co.categoryID = category.id
 				WHERE submission_return.box_id = submission_box.id AND submission_box.category = category.id 
 				AND submission_return.deleted = '0' 
