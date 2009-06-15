@@ -28,7 +28,7 @@ class SitePage extends Page {
 		$this->arg = array();
 		$path = explode('/', trim($pageFile, '/'));
 		$total = count($path);
-
+	
 		/* iterate backwards through the path */
 		for ($i = 0; $i < $total; $i++) {
 		
@@ -40,11 +40,11 @@ class SitePage extends Page {
 			} elseif(is_file($_SERVER['DOCUMENT_ROOT'].'/'.$filename.'/index.php') && $execute) {
 				include($_SERVER['DOCUMENT_ROOT'].'/'.$filename. '/index.php');
 				return true;
-			} else if(is_file($this->templateRoot .'/'. $filename . '.html')) {
-				$this->setFile(TEMPLATE_handler, $filename . '.html');
+			} else if(is_file($this->templateRoot . '/' . $this->getTemplate($filename . '.html'))) {
+				$this->setFile(TEMPLATE_content, $filename . '.html');
 				return true;
 			} else if(is_file($this->templateRoot .'/'. $filename . '/index.html')) {
-				$this->setFile(TEMPLATE_handler, $filename . '/index.html');
+				$this->setFile(TEMPLATE_content, $filename . '/index.html');
 				return true;
 			}
 			
