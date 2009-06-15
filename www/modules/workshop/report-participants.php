@@ -45,6 +45,8 @@ if (is_array($userList)) {
 }
 
 header('Content-type: text/csv');
+header("Pragma: ");
+header("Cache-control: ");	
 header('Content-Disposition: inline; filename="participant-list-all.csv"');
 print $string;
 

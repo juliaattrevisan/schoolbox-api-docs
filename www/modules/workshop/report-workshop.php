@@ -40,6 +40,8 @@ if (is_numeric($_GET['workshopID'])) {
 	}
 
 	header('Content-type: text/csv');
+	header("Pragma: ");
+	header("Cache-control: ");	
 	header('Content-Disposition: inline; filename="participant-list-' . convertToURL($workshop['title']) . '.csv"');
 	print $string;
 
