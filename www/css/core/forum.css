@@ -36,9 +36,6 @@
 #forum-post {
 	width: 100%;
 }
-#forum-post tr {
-	border-bottom: 1px solid #bbb;
-}
 #forum-post td {
 	height: auto;
 	color: #555;
@@ -46,17 +43,45 @@
 	vertical-align: top;
 }
 #forum-post td.user {
+	background: #e5e5e5;
+	text-align: center;
+	padding: 15px;
+}
+#forum-post td.reply {
 	background: #e5e5e5 url(/images/reply-e5e5e5.gif) repeat-x bottom;
 	text-align: center;
-	padding: 5px;
+	vertical-align: bottom;
+	padding: 15px;
+	line-height: 1.5;
+	border-bottom: 1px solid #bbb;
 }
 #forum-post td.post {
 	background: #eeeeee url(/images/reply-eeeeee.gif) repeat-x bottom;
 	color: #000;
 	font-size: 110%;
-	padding: 0.1em, 1em, 0.3em;
+	padding: 15px;
+	border-bottom: 1px solid #bbb;
 }
 #forum-post h3 {
 	font-size: 133%;
 	margin-bottom: 0.3em;
+}
+#forum-post cite {
+	border-bottom: 1px dashed #6bb0f8;
+	color: #1965B4;
+	font-weight: bold;
+	width: 25em;
+	line-height: 1.5;
+	margin-left: 1em;
+	font-style: normal;
+	display: block;
+	margin-bottom: 0.5em;
+}
+#forum-post blockquote {
+	color: #1965B4;
+	line-height: 1.5;
+	margin-left: 1em;
+}
+button {
+	margin: 0.5em 0;
 }
