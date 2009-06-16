@@ -1,44 +1,68 @@
+<!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" href="/css/core/forum.css" />
 <script type="text/javascript">
 	$j(function(){
 	
 		$j('#forum-topic tbody tr:even td').css('background-color', '#f4f4f4');
-	
+		
+		$j('button.reply').click(function () {
+			window.open('/forum/modify/post/{THREAD_ID}', '_self', '');
+			return false;
+		});
 	});
 </script>
+<!-- END custom_head -->
 <div class="breadcrumbs navhelp">
-	<a href="/homepage/{HOMEPAGE_ID}/">{HOMEPAGE}</a> > <a href="/forum/{HOMEPAGE_ID}/">Forum</a> > <a href="{TOPIC_URL}">{TOPIC}</a> > <a href="{TOPIC_URL}">{ACTION} Post</a>
+	<a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a> > <a href="{TOPIC_URL}">{TOPIC}</a> > <a href="{TOPIC_URL}">{ACTION} Post</a>
 </div>
-<table id="forum-topic">
-	<thead>
-  	<tr>
-    	<th width="60%">Forum</th>
-      <th width="20%">Last Post</th>
-      <th width="10%">Replies</th>
-      <th width="10%">Views</th>
-    </tr>
-  </thead>
+<button class="reply">Post Reply</button>
+<table id="forum-post">
   <tbody>
-  	<!-- BEGIN thread -->
+  	<!-- BEGIN post -->
   	<tr>
-    	<td>
-      	<h3><a href="{THREAD_URL}">{THREAD_TITLE}</a></h3>
-        <p>{THREAD_AUTHOR} - {THREAD_TIME}</p>
+    	<td class="user" width="20%">
+        <a name="{POST_ID}"></a>
+      	<h3><a href="/search/user/{POST_USER_ID}">{POST_AUTHOR}</a></h3>
+        {POST_GROUP}
       </td>
-      <td>
-      	<h3><a href="#">{THREAD_LAST_POST}</a></h3>
-        <p>{THREAD_LAST_POST_TIME}</p>
-      </td>
-      <td>
-      	{THREAD_REPLIES}
-      </td>
-      <td>
-      	{THREAD_VIEWS}
+      <td rowspan="2" class="post" width="80%">
+        {POST_BODY}
       </td>
     </tr>
-   <!-- END thread -->
+    <tr>
+    	<td class="reply">
+      	<a href="/forum/modify/post/{THREAD_ID}/0/{POST_ID}">Reply to this post</a><br />
+        Posted {POST_TIME}
+      </td>
+    </tr>
+    <!-- END post -->
+    
+    <tr>
+    	<td class="user" width="20%">
+      	<h3><a href="#">MattCordell</a></h3>
+        Super Dr
+      </td>
+      <td rowspan="2" class="post" width="80%">
+        <cite>MattCordell wrote:</cite>
+        <blockquote>
+        
+        	<p>We are a non-profit organisation and have custom-developed an ISP billing software for a project where we manage internet connections for individual accounts. Whilst the software has worked well so far I am wondering if there is off-the-shelf ISP billing software that is reliable and open source and that has features that we would need to develop, such as:</p>
+        
+        </blockquote>
+       
+        <p>I Agree.</p>
+      </td>
+    </tr>
+    <tr>
+    	<td class="reply">
+      	<a href="#">Reply to this post</a><br />
+        Posted 8 minutes ago
+      </td>
+    </tr>
+   
   </tbody>
 </table>
+<button class="reply">Post Reply</button>
 <div class="pagination navhelp">
 	<a href="#">< Prev</a> <a href="#">1</a> <a href="#">2</a> <a href="#">Next ></a>
 </div>

@@ -64,8 +64,10 @@ function getSelectedText(){
 <!-- END custom_head -->
 
 		<h1>{ACTION} Post</h1>
-		<form id="forumForm" class="standardForm" method="post" enctype="multipart/form-data" action="/form/modifyForm.php" onsubmit="return(verify());">
-		<input type="hidden" name="newsID" value="{NEWS_ID}" />
+		<form id="forumForm" class="standardForm" method="post" enctype="multipart/form-data" action="/forum/modifyForm.php" onsubmit="return(verify());">
+		<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+        <input type="hidden" name="threadID" value="{THREAD_ID}" />
+        <input type="hidden" name="postID" value="{POST_ID}" />
 		<table>
     	<!-- BEGIN title -->
 		  <tr> 
@@ -75,10 +77,10 @@ function getSelectedText(){
       <!-- END title -->
       <!-- BEGIN quote -->
       <tr> 
-        <td><h3>Quote</h3><em>{CITE}'s post.</em></td>
+        <td><h3>Quote</h3><em>{QUOTE_USER}'s post.</em></td>
         <td>
         	<div id="cited">
-        		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum elementum, libero non vestibulum dapibus, turpis tellus pellentesque elit, et vehicula nulla mi id sem. In interdum purus non massa venenatis et consectetur risus sodales. Nulla fringilla luctus quam ut elementum. Fusce vehicula, dui et posuere rhoncus, urna risus egestas leo, quis pulvinar dui dui a magna. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Integer nisl quam, rutrum sed adipiscing eget, consectetur sit amet enim. Fusce nulla enim, mollis eget hendrerit sit amet, porttitor sit amet est. Proin fermentum accumsan varius. Curabitur id pellentesque nisi. Etiam tempor imperdiet commodo. Sed adipiscing nulla vitae libero consectetur fermentum.</p>
+        		<p>{QUOTE_BODY}</p>
         	</div><br />
         	<input type="button" id="quote" value="Quote" />
         </td>
@@ -86,7 +88,7 @@ function getSelectedText(){
       <!-- END quote -->
 		  <tr> 
         <td><h3>Post</h3><em>This is the main portion of your forum post.</em></td>
-        <td><textarea id="body" name="body" style="width:100%;height:350px">{POST}</textarea></td>
+        <td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
 		  </tr>
 		  <tr class="pedantic"> 
 			<td>&nbsp;</td>
