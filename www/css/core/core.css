@@ -142,6 +142,7 @@ table.ruler { width: 100%; }
 	}
 .left {
 	min-width: 535px;
+	min-height: 100px;
 	width: 69.5%;
 	float: left;
 	margin-right: 1%;
@@ -149,6 +150,7 @@ table.ruler { width: 100%; }
 	}
 .right {
 	min-width: 229px;
+	min-height: 100px;
 	width: 29.5%;
 	float: left;
 	overflow: hidden;
@@ -168,6 +170,7 @@ table.ruler { width: 100%; }
 	}
 .template3 .right {
 	display: none;
+	visibility: hidden;
 	}
 .template4 .right {
 	min-width: 535px;
@@ -268,7 +271,7 @@ table td { vertical-align: middle; }
 	border: 1px solid #ccc;
 	position: relative;
 	}
-#category-head, #file-head { margin: 0; }
+#category-head, #file-head { margin: 0; width: 100%; }
 #category-list, #file-list { border: 0; width: 100%; overflow: auto; margin-top:1em; }
 #category-head th, #file-head th { border: 0; font-weight: bold; background:#eee; line-height: 25px; }
 #category-list td, #file-list td { width: auto; }
@@ -462,6 +465,49 @@ h2 span {
 #timetable p {
 	padding: 6px 0  6px 10px;
 	}
+	
+table.timetable td,
+table.timetable th {
+	border-right: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+}
+table.timetable {
+	width:100%;
+	margin:0;
+	background:transparent;
+	}
+
+table.timetable th {
+	padding:3px;
+	background:#666;
+	color:#fff;
+	font-family: Verdana, arial, sans-serif, serif;
+	font-size: 100%;
+	font-weight: bold;
+	line-height: 1.5;
+	text-align:center;
+	}
+
+table.timetable td {
+	background:#efefef;
+	color:#000;
+	font:normal 80% /1em Verdana, arial, sans-serif, serif;
+	cursor:hand;
+	padding:4px;
+	text-align:center;
+	}
+
+.timetable td.current {
+	background:#06c;
+	color:#fff;
+	}
+	
+table.home {
+	position:relative;
+	}
+table.home td {
+	vertical-align:top;
+	}
 /*-----------------------------*/
 .box ul {
 	list-style: disc;
@@ -545,9 +591,9 @@ p.interact a { color: #003e7e; }
 .listing p.small a:hover { text-decoration: underline; }
 .listing a { color: #003e7e; }
 .weather p.float-left { font-size: 90%; margin: 0; padding: 0 0 0 20px; }
-.weather p span { color: #ccc; font-size: 90%; }
-.weather p span a { color: #ccc; }
-.weather img { margin: 0 0 15px 0; }
+.weather p span { color: #999; font-size: 90%; }
+.weather p span a { color: #999; }
+.weather img { margin: 0; }
 .box .thumb {
 	margin: 0 15px 15px 0;
 	display: block;
@@ -796,8 +842,8 @@ ul.tree li.icon a {
 	font-weight: normal;
 	}
 /*--------------------------------------------------------------
- Forum styles 
---------------------------------------------------------------*/
+ Forum styles - upgraded to forum.css
+--------------------------------------------------------------
 table {
 	width: 100%;
 	margin-bottom: 1em;
@@ -827,7 +873,7 @@ div.indent {
 }
 #column-2 table {
 	background: #eee;
-	}
+	}*/
 /*--------------------------------------------------------------
  Form styles 
 --------------------------------------------------------------*/

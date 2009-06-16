@@ -1,0 +1,44 @@
+<link rel="stylesheet" type="text/css" href="/css/core/forum.css" />
+<script type="text/javascript">
+	$j(function(){
+	
+		$j('#forum-topic tbody tr:even td').css('background-color', '#f4f4f4');
+	
+	});
+</script>
+<div class="breadcrumbs navhelp">
+	<a href="/homepage/{HOMEPAGE_ID}/">{HOMEPAGE}</a> > <a href="/forum/{HOMEPAGE_ID}/">Forum</a> > <a href="{TOPIC_URL}">{TOPIC}</a> > <a href="{TOPIC_URL}">{ACTION} Post</a>
+</div>
+<table id="forum-topic">
+	<thead>
+  	<tr>
+    	<th width="60%">Forum</th>
+      <th width="20%">Last Post</th>
+      <th width="10%">Replies</th>
+      <th width="10%">Views</th>
+    </tr>
+  </thead>
+  <tbody>
+  	<!-- BEGIN thread -->
+  	<tr>
+    	<td>
+      	<h3><a href="{THREAD_URL}">{THREAD_TITLE}</a></h3>
+        <p>{THREAD_AUTHOR} - {THREAD_TIME}</p>
+      </td>
+      <td>
+      	<h3><a href="#">{THREAD_LAST_POST}</a></h3>
+        <p>{THREAD_LAST_POST_TIME}</p>
+      </td>
+      <td>
+      	{THREAD_REPLIES}
+      </td>
+      <td>
+      	{THREAD_VIEWS}
+      </td>
+    </tr>
+   <!-- END thread -->
+  </tbody>
+</table>
+<div class="pagination navhelp">
+	<a href="#">< Prev</a> <a href="#">1</a> <a href="#">2</a> <a href="#">Next ></a>
+</div>

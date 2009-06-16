@@ -1,10 +1,40 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Untitled Document</title>
-</head>
-
-<body>
-</body>
-</html>
+<link rel="stylesheet" type="text/css" href="/css/core/forum.css" />
+<script type="text/javascript">
+	$j(function(){
+	
+		$j('#forum-topic tbody tr:even td').css('background-color', '#f4f4f4');
+	
+	});
+</script>
+<div class="breadcrumbs navhelp">
+	<a href="/homepage/{HOMEPAGE_ID}/">{HOMEPAGE}</a> > <a href="/forum/{HOMEPAGE_ID}/">Forum</a> > <a href="{TOPIC_URL}">{TOPIC}</a> > <a href="{TOPIC_URL}">{ACTION} Post</a>
+</div>
+<table id="forum-post">
+  <tbody>
+  	<!-- BEGIN post -->
+  	<tr>
+    	<td class="user" width="20%">
+      	<h3><a href="#">MattCordell</a></h3>
+        Super Dr
+      </td>
+      <td class="post" width="80%">
+        <p>We are a non-profit organisation and have custom-developed an ISP billing software for a project where we manage internet connections for individual accounts. Whilst the software has worked well so far I am wondering if there is off-the-shelf ISP billing software that is reliable and open source and that has features that we would need to develop, such as:</p>
+        <ul>
+          <li>Configuration for multiple account types</li>
+          <li>Automated billing</li>
+          <li>Automated limit notifications – close to/reached limit/shaping</li>
+          <li>Accounts receivable</li>
+          <li>Easy to use GUI</li>
+          <li>Scalable – manage 1000+ accounts.</li>
+          <li>Billing reports</li>
+        </ul>
+        <p>Can anyone provide a recommendation?</p>
+      </td>
+    </tr>
+    <!-- END post -->
+   
+  </tbody>
+</table>
+<div class="pagination navhelp">
+	<a href="#">< Prev</a> <a href="#">1</a> <a href="#">2</a> <a href="#">Next ></a>
+</div>

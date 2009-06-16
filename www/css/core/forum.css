@@ -1,21 +1,62 @@
-#forumNav ul {
-	padding: 1em;
-	margin: 10px 0 0 0;
-	border: 1px solid #CCCCCC;
-	background: #eee;
+/* Forum Topic */
+#forum-topic {
+	width: 100%;
 }
-#forumNav ul ul {
-	border: 0;
-	background: 0;
-	padding: 0;
+#forum-topic th {
+	font-size: 133%;
+	font-weight: bold;
+	height: auto;
+	padding: 0.5em 0;
+	background: #fff;
+	border-right: 2px solid #fff;
+}
+#forum-topic td {
+	padding: 0.7em 10px;
+	height: auto;
+	border-right: 2px solid #fff;
+	background-color: #e9e9e9;
+}
+#forum-topic h3 {
+	font-size: 90%;
+	margin-bottom: 0.2em;
+}
+#forum-topic p {
+	font-size: 90%;
 	margin: 0;
 }
-#forumNav ul li{
-	padding-left: 15px;
+.navhelp, .navhelp a {
+	color: #949494;
+	padding: 1em 0;
 }
-#forumNav ul li a{
-	padding-bottom: 1em;
+.pagination {
+	float: right;
 }
-#content #forumNav {
-	margin-left: 0;
+
+/* Forum Post */
+#forum-post {
+	width: 100%;
+}
+#forum-post tr {
+	border-bottom: 1px solid #bbb;
+}
+#forum-post td {
+	height: auto;
+	color: #555;
+	font-size: 90%;
+	vertical-align: top;
+}
+#forum-post td.user {
+	background: #e5e5e5 url(/images/reply-e5e5e5.gif) repeat-x bottom;
+	text-align: center;
+	padding: 5px;
+}
+#forum-post td.post {
+	background: #eeeeee url(/images/reply-eeeeee.gif) repeat-x bottom;
+	color: #000;
+	font-size: 110%;
+	padding: 0.1em, 1em, 0.3em;
+}
+#forum-post h3 {
+	font-size: 133%;
+	margin-bottom: 0.3em;
 }
