@@ -1,0 +1,96 @@
+<link rel="stylesheet" type="text/css" href="/css/core/forum.css" />
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript">
+tinyMCE.init({
+	mode : "textareas",
+	theme : "advanced",
+	plugins : "table",
+	content_css : "/css/core/tiny.css",
+	theme_advanced_layout_manager : "RowLayout",
+	theme_advanced_containers_default_align : "left",
+	theme_advanced_container_default_class : "mceToolbar",
+	theme_advanced_containers : "row1,row2,mceEditor,mceElementpath",
+	theme_advanced_container_row1_class : "mceToolbarTop",
+	theme_advanced_container_row2_class : "mceToolbarTop",
+	theme_advanced_container_row1 : "bold,italic,underline,separator,bullist,numlist,outdent,indent,separator,sub,sup,separator,link,unlink,image,charmap,hr,separator,undo,redo",
+	theme_advanced_container_row2 : "forecolor,tablecontrols,separator,removeformat,cleanup,code",
+	extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
+});
+</script>
+<script language="JavaScript" type="text/javascript">
+function verify()
+{
+        var msg = ""
+        if(document.getElementById('newsForm').heading.value == ""){
+                msg += "You need to enter a heading\n";
+        }
+        if(msg != ""){
+                alert(msg);
+                return false;
+        }
+        else
+	{
+                return true;
+	}
+}
+function confirmDelete(newsID) {
+	if (confirm('Delete this news item?')) { 
+		window.open('/news/modifyForm.php?delete='+newsID, '_self', '');
+	}
+}
+
+$j(function(){
+        $j('#quote').click(function(){
+                if(getSelectedText()) {
+                        $j('#body').html(getSelectedText());
+												tinyMCE.execCommand('mceInsertContent',false,getSelectedText()); 
+												return false;
+                }
+        });
+});
+function getSelectedText(){
+    if(window.getSelection){
+        return window.getSelection().toString();
+    }
+    else if(document.getSelection){
+        return document.getSelection();
+    }
+    else if(document.selection){
+        return document.selection.createRange().text;
+    }
+} 
+</script>
+<!-- END custom_head -->
+
+		<h1>{ACTION} Post</h1>
+		<form id="forumForm" class="standardForm" method="post" enctype="multipart/form-data" action="/form/modifyForm.php" onsubmit="return(verify());">
+		<input type="hidden" name="newsID" value="{NEWS_ID}" />
+		<table>
+    	<!-- BEGIN title -->
+		  <tr> 
+        <td class="formLabelWidth"><h3>Title</h3><em>The name of this forum thread.</em></td>
+        <td><input type="text" name="heading" size="35" maxlength="50" value="{THREAD_TITLE}" /></td>
+		  </tr>
+      <!-- END title -->
+      <!-- BEGIN quote -->
+      <tr> 
+        <td><h3>Quote</h3><em>{CITE}'s post.</em></td>
+        <td>
+        	<div id="cited">
+        		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum elementum, libero non vestibulum dapibus, turpis tellus pellentesque elit, et vehicula nulla mi id sem. In interdum purus non massa venenatis et consectetur risus sodales. Nulla fringilla luctus quam ut elementum. Fusce vehicula, dui et posuere rhoncus, urna risus egestas leo, quis pulvinar dui dui a magna. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Integer nisl quam, rutrum sed adipiscing eget, consectetur sit amet enim. Fusce nulla enim, mollis eget hendrerit sit amet, porttitor sit amet est. Proin fermentum accumsan varius. Curabitur id pellentesque nisi. Etiam tempor imperdiet commodo. Sed adipiscing nulla vitae libero consectetur fermentum.</p>
+        	</div><br />
+        	<input type="button" id="quote" value="Quote" />
+        </td>
+		  </tr>
+      <!-- END quote -->
+		  <tr> 
+        <td><h3>Post</h3><em>This is the main portion of your forum post.</em></td>
+        <td><textarea id="body" name="body" style="width:100%;height:350px">{POST}</textarea></td>
+		  </tr>
+		  <tr class="pedantic"> 
+			<td>&nbsp;</td>
+			<td><input class="btn" type="submit" name="submit" value="Post" /></td>
+		  </tr>
+		</table>
+		</form>
