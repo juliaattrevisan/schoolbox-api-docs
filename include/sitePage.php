@@ -224,32 +224,41 @@ class SitePage extends Page {
 		// if configuration states mail is available and user has access to local mail account display it
 		$this->setBlock('tabTpl', 'webmail_tab', 'wm_tab');
 		
-		if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && $this->groupHandler->isStaff()) || SITE_location == 'ormond')
+		if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && $this->groupHandler->isStaff()) || SITE_location == 'ormond' || SITE_location == 'shore')
 		{
-			$this->parse('wm_tab','webmail_tab');
 			
 			if(SITE_location == 'mgs')
 			{
 				if($this->groupHandler->isStaff())
-					$this->setVar("WEBMAIL_LOCATION", 'href="https://webmail.mgs.vic.edu.au/exchange/" target="_blank"');
+					$this->setVar("WEBMAIL_LOCATION", 'href="https://webmail.mgs.vic.edu.au/exchange/" rel="external"');
 				else
 					$this->setVar("WEBMAIL_LOCATION", 'href="/mail/"');
 			}
 			else if(SITE_location == 'ormond') 
 			{
 				if($_SESSION['exchange'])
-					$this->setVar("WEBMAIL_LOCATION", 'href="http://owa.ormond.unimelb.edu.au" target="_blank"');
+					$this->setVar("WEBMAIL_LOCATION", 'href="http://owa.ormond.unimelb.edu.au" rel="external"');
 				else
 					$this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
 			}
 			else if(SITE_location == 'wenona') {
 				if($this->groupHandler->isStaff()) {
-					$this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.wenona.nsw.edu.au/owa" target="_blank"');
+					$this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.wenona.nsw.edu.au/owa" rel="external"');
 				}
 				else {
 					$this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
 				}
 			}
+			else if(SITE_location == 'shore') {
+				if($this->groupHandler->isStaff()) {
+					$this->setVar('WEBMAIL_LOCATION', 'href="https://mail.shore.nsw.edu.au/exchange/" rel="external"');
+				}
+				else if($this->groupHandler->isStudent()) {
+					$this->setVar('WEBMAIL_LOCATION', 'href="https://mail.student.shore.nsw.edu.au/exchange/" rel="external"');
+				}
+			}
+
+			$this->parse('wm_tab','webmail_tab');
 		}
 		else
 		{
