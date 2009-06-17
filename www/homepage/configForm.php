@@ -51,11 +51,21 @@ if(is_numeric($_REQUEST['cid']) ) {
 		$homepage->updateComponentConfig($_GET['component'], $config);
 		localRedir("/homepage/".$_GET['cid']);
 	}
-	elseif($_POST['cid'])
+	elseif(is_numeric($_POST['cid']))
 	{
 		//Submission of customise page
 		$homepage->savePageTemplate($_POST['template']);
 		$homepage->updateComponents($_POST['components']);
+		
+		
+		if ($_POST['template'] == 3) {
+			// full column layout, move all components into left column
+			$query = "SELECT MAX(position) FROM homepage_comp_location WHERE cid = " . $_POST['cid'] . " AND `column` = 1";
+			$position = $homepage->db->getOne($query);
+			
+			$query = "UPDATE homepage_comp_location SET position = (position + ".$position."), `column` = 1 WHERE cid = " . $_POST['cid'] . " AND `column` = 2";
+			$homepage->db->query($query);
+		}
 		
 		//strip hash
 		foreach($_POST['colors'] as $key => $value) {
