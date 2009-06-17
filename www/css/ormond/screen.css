@@ -76,6 +76,14 @@ a:hover { color: #C3536F; }
 table .header_option {
 	margin-top: -29px;
 	}
+#footer {
+	margin: 20px 0 0;
+}
+#footer p {
+	font-size: 80%;
+	float: left;
+	margin-right: 30px;
+}
 /*---------------------------------------
 	News Styles
 ----------------------------------------*/
