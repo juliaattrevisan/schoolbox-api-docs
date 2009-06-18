@@ -36,7 +36,7 @@ class Page {
 
 	}
 	
-	
+
 	function pageNotFound() {
 		header("HTTP/1.0 404 Not Found");
 		$this->setFile(TEMPLATE_content, '404.html');

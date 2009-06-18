@@ -29,16 +29,20 @@ function checkBruteForce(&$db)
 
 function authenticateLDAP($username, $password) {
 
-	$ds=@ldap_connect(LDAP_host);
-	@ldap_bind($ds, LDAP_user, LDAP_pass);
-	$result = @ldap_search($ds, LDAP_base,'uid='.$username,array('dn'));
-	$entries = @ldap_get_entries($ds, $result);
-	$dn = $entries[0]['dn'];
-	if($dn)
-		return @ldap_bind($ds, $dn, $password);
-	else
-		return false;
+	$ds=ldap_connect(LDAP_host);
+	ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
+	ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
+	ldap_bind($ds, LDAP_user, LDAP_pass);
+	$searchString = "(SAMAccountName=$username)";
+	$result = ldap_search($ds,LDAP_base, $searchString, array('dn'));
+	if($result) {
+		$entries = ldap_get_entries($ds, $result);
+		$dn = $entries[0]['dn'];
+		if($dn)
+			return @ldap_bind($ds, $dn, $password);
+	}
 
+	return false;
 }
 
 function authenticateSQL(&$db, $username, $password) {
@@ -65,8 +69,8 @@ function authenticate(&$db, $username, $password, $remember = 0)
 		$result = authenticateLDAP($username, $password);
 		
 		//insert password into db to enable automatic login
-		$query = "UPDATE user SET email_pass = '$password' WHERE username = '".trim($username)."'";
-		$db->query($query);
+		//$query = "UPDATE user SET email_pass = '$password' WHERE username = '".trim($username)."'";
+		//$db->query($query);
 	}
 	
 	if(!$result) {

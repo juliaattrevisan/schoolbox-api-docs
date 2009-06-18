@@ -8,7 +8,7 @@ class SitePage extends Page {
 
 	function SitePage($login=TRUE) {
 		parent::Page();
-		$this->site = SITE_location;
+		$this->setSite();
 		$this->db = new dbManager;
 		$this->setTab('main');
 		
@@ -54,7 +54,30 @@ class SitePage extends Page {
 		
 		$this->pageNotFound();
 	}
-	
+
+	function setSite() {
+		if(SITE_detect == 'domain') {
+			//Get site templates via domain name
+			if(preg_match('/([\w]+)\./', $_SERVER['HTTP_HOST'], $match)) {
+				$this->site = $match[1];
+				return true;
+			}
+		}
+		else if(SITE_detect == 'campus') {
+			//Get site template via users campus
+			if(SITE_location == 'mgs') {
+				if($_SESSION['campus'][0] == 3)
+					$this->site = 'grimwade';
+				else
+					$this->site = 'mgs';
+
+				return true;
+			}
+		}
+
+		$this->site = SITE_location;
+
+	}
 	
 	function outputPage($lite=FALSE) {
 		if(!$lite) {
