@@ -17,7 +17,7 @@ if (isset($_POST['date'])) {
 				   'sid'		=> $_POST['group'],
 				   'campusList'	=> !empty($_POST['campus']) ? $_POST['campus'] : array($_SESSION['campus'][0]),
 				   'groupList'	=> $_POST['groupCheck'],
-				   'priority'	=> $_POST['priority'],
+				   'type'		=> $_POST['type'],
 				   'note'		=> $_POST['note'],
 				   'startTime'	=> (($_POST['period'] == 'pm' && $_POST['hour'] != 12 ? 12 : 0) + $_POST['hour']) . ":" . $_POST['minute'] . ":00",
 				   'endTime'	=> (($_POST['toperiod'] == 'pm' && $_POST['tohour'] != 12 ? 12 : 0) + $_POST['tohour']) . ":" . $_POST['tominute'] . ":00",
@@ -106,7 +106,7 @@ if (isset($_POST['date'])) {
 					
 	$page->setVar($output);
 
-	$page->dropDown('priority_drop', $calendarHandler->getPriorityList(), $event['priority']);
+	$page->dropDown('type_drop', $calendarHandler->getTypeList(), $event['type'],TEMPLATE_content, array('eventTypeID'=>'TYPE_NUMBER', 'eventType'=>'TYPE_NAME'));
 	
 	$campusList = $calendarHandler->getCampusList();
 	if (count($campusList) > 1) {
@@ -117,7 +117,7 @@ if (isset($_POST['date'])) {
 	}
 	
 	$groupList = $calendarHandler->getCategoryList();
-	$page->dropDown('group_drop', $groupList, $event['sid']);
+	$page->dropDown('group_drop', $groupList, $event['sid'], TEMPLATE_content, array('id'=>'GROUP_ID','name'=>'GROUP_NAME'));
 	$page->checkList('group_list', $calendarHandler->getGroupList(), $calendarHandler->getEventGroup($event['id']));
 
 	$levelList[] = array('LEVEL_ID'	=> 1, 'LEVEL_NAME'	=> 'Personal');
@@ -158,10 +158,6 @@ if (isset($_POST['date'])) {
 					'TOMIN'			=> '',
 					'AMTO'			=> '',
 					'PMTO'			=> '',
-					'PRIORITY4'		=> '',
-					'PRIORITY3'		=> '',
-					'PRIORITY2'		=> '',
-					'PRIORITY1'		=> '',
 					'LEVEL'			=> '',
 					'GROUP'			=> '',
 					'DESCRIPTION'	=> '',
@@ -170,7 +166,7 @@ if (isset($_POST['date'])) {
 					);
 	$page->setVar($output);
 	
-	$page->dropDown('priority_drop', $calendarHandler->getPriorityList(), '');
+	$page->dropDown('type_drop', $calendarHandler->getTypeList(), '',TEMPLATE_content, array('eventTypeID'=>'TYPE_NUMBER', 'eventType'=>'TYPE_NAME'));
 	
 	$campusList = $calendarHandler->getCampusList();
 	if (count($campusList) > 1) {

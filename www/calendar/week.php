@@ -103,7 +103,7 @@ for($i=0; $i < 7; $i++) {
 	
 			$output = array('TIME'			=> $submission['dueTime'],
 							'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['description'],
-							'PRIORITY'		=> $calendarHandler->displayColour(1),
+							'COLOUR'		=> '#ff0000',
 							'MODIFY'		=> "",
 						  );					  
 			
@@ -121,7 +121,7 @@ for($i=0; $i < 7; $i++) {
 		
 				$output = array('TIME'		=> '',
 								'NOTE'		=> 'Student Birthday - '.$birthday['name'].' in '.$birthday['form'].' turns '.$birthday['age'],
-								'PRIORITY'	=> $calendarHandler->displayColour(3),
+								'COLOUR'	=> $calendarHandler->displayColour(3),
 								'MODIFY'	=> "",
 							  );					  
 				$this->setVar($output);
@@ -141,7 +141,7 @@ for($i=0; $i < 7; $i++) {
 										   	($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
 										   "- "),
 							'NOTE'		=> $event['note'],
-							'PRIORITY'	=> $calendarHandler->displayColour($event['priority']),
+							'COLOUR'	=> $calendarHandler->displayColour($event['type']),
 							'MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "\">Modify</a>" : "",
 						  );	
 			

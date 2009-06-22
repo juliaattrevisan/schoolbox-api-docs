@@ -10,6 +10,7 @@
 //Site Directives
 define("HEADING", 'OurSchool');			//This will appear on the window title of each page
 define("SITE_name", "Alaress Pty Ltd");
+define("SITE_location", "demo");
 
 //define("SITE_location", "shore");				//This defines the location, allows specific code for each location
 define("SITE_detect", "domain");				//Which option to detect site, can be domain or campus
@@ -36,7 +37,7 @@ define('LDAP_base', '');
 // be writable by the apache process
 
 //Template Options
-define('TEMPLATE_dir', 			SITE_location.'/templates');
+define('TEMPLATE_dir', 			SITE_root.'/templates');
 define('TEMPLATE_body', 		'bodyTpl');
 define('TEMPLATE_content', 		'contentTpl');
 define('TPL_directory', 		SITE_root.'/'. SITE_location . "_templates");		//Deprecated option

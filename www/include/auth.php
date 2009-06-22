@@ -265,10 +265,8 @@ function setSynergyInfo(&$mydb)
 					if($mydb->countRows() > 0)
 						$_SESSION['subjects'][] = $subject;
 				}
-			}
-	
-			if(is_array($_SESSION['subjects']))
 				$_SESSION['timetable'] = 1;
+			}
 			else	
 				$_SESSION['timetable']=0;
 		}

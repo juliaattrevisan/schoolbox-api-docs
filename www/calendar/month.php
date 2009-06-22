@@ -86,7 +86,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 	
 			$output = array('TIME'			=> $submission['dueTime'],
 							'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['description'],
-							'PRIORITY'		=> $calendarHandler->displayColour(1),
+							'COLOUR'		=> $calendarHandler->displayColour(1),
 							'MODIFY_START'	=> "",
 							'MODIFY_END'	=> "",
 						  );					  
@@ -105,7 +105,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 		
 				$output = array('TIME'		=> '',
 								'NOTE'		=> 'Student Birthday - '.$birthday['name'].' in '.$birthday['form'].' turns '.$birthday['age'],
-								'PRIORITY'	=> $calendarHandler->displayColour(3),
+								'COLOUR'	=> $calendarHandler->displayColour(3),
 								'MODIFY_START'	=> "",
 								'MODIFY_END'	=> "",
 							  );					  
@@ -125,7 +125,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 										   	($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
 										   "- "),
 							'NOTE'		=> $event['note'],
-							'PRIORITY'	=> $calendarHandler->displayColour($event['priority']),
+							'COLOUR'	=> $calendarHandler->displayColour($event['type']),
 							'MODIFY_START'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">" : "",
 							'MODIFY_END'	=> $calendarHandler->getPerm($event['id']) > 1 ? "</a>" : "",
 						  );	

@@ -16,18 +16,16 @@ class Calendar extends Model {
 	}
 
 	function displayColour($id) {
-		switch ($id) {
-			case 4:
-				return "#000000"; //black
-			case 3:
-				return "#0033FF"; //blue  
-			case 2:
-				return "#009933"; //green
-			case 1:
-				return "#FF0000"; //red
-			default:
-				return "#000000";
+		if(!is_array($this->colourSet) ) {
+			//build cache of colours on first call
+			$query = "SELECT eventTypeID, eventColour FROM luEventType";
+			$result = $this->db->query($query);
+			while($row = $this->db->getNextArray($result) ) {
+				$this->colourSet[$row['eventTypeID']] = '#'.$row['eventColour'];
+			}
 		}
+		return $this->colourSet[$id];
+		
 	}
 
 
@@ -73,20 +71,11 @@ class Calendar extends Model {
 				return 0;
 		}
 	}
-	
-	function getPriorityList() {
-		$priority = array(array('PRIORITY_NUMBER' => 4, 
-								'PRIORITY_NAME'	=> 'Low (Black)'),
-						  array('PRIORITY_NUMBER' => 3, 
-						  		'PRIORITY_NAME'	=> 'Medium (Blue)'),
-						  array('PRIORITY_NUMBER' => 2, 
-						  		'PRIORITY_NAME'	=> 'High (Green)'),
-						  array('PRIORITY_NUMBER' => 1, 
-						  		'PRIORITY_NAME'	=> 'Very High (Red)'),
-						  );
-		return $priority;
-	}
 
+	function getTypeList() {
+		$query = "SELECT eventTypeID, eventType FROM luEventType";
+		return $this->db->getAll($query);
+	}
 
 	function getCampusList($type = 1) {
 		$query = "SELECT id, name FROM luCampus";
@@ -108,15 +97,8 @@ class Calendar extends Model {
 	function getCategoryList($type = 1){
 		//get a list of all groups the user has write access to
 		$query = "SELECT id, name FROM userAccess, category WHERE uid = '".$_SESSION['id']."' AND service = '1' AND type > $type AND sid = id";   
-		$groupList = $this->db->getAll($query);
-		if (is_array($groupList)) {
-			foreach ($groupList as $group) {
-				$data['GROUP_ID'] 	= $group['id'];
-				$data['GROUP_NAME'] = $group['name'];
-				$output[] = $data;
-			}
-		}
-		return $output;
+		return $groupList = $this->db->getAll($query);
+
 	}  
 
 	function getGroupList() {
@@ -133,7 +115,7 @@ class Calendar extends Model {
 	}
 
 	function getByID($eventID) {
-		$query = "SELECT id, owner, access, sid, priority, note, date, 
+		$query = "SELECT id, owner, access, sid, type, note, date,
 						DATE_FORMAT(startTime, '" . CALENDAR_time_format . "') startTime, 
 						DATE_FORMAT(endTime, '" . CALENDAR_time_format . "') endTime
 				  FROM " . $this->_table . "
@@ -152,7 +134,7 @@ class Calendar extends Model {
 		$query = "SELECT id, DATE_FORMAT(date, '%a %D %b') as outputDate,
 						DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
 						TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTimeString, TIME_FORMAT(endTime, 
-		'".CALENDAR_time_format."') as endTimeString,priority, note
+		'".CALENDAR_time_format."') as endTimeString,type, note
 				  FROM event WHERE access = '2' AND sid = '".$categoryID."' AND( date >= CURRENT_DATE() $where) ORDER BY date, startTime";
 		
 		return $this->db->getAll($query);
@@ -203,7 +185,7 @@ class Calendar extends Model {
 		$tempList = $this->getCategoryList();
 		if (is_array($tempList)) {
 			foreach ($tempList as $temp) {
-				$groupList[] = $temp['GROUP_ID'];
+				$groupList[] = $temp['id'];
 			}
 			$groupQuery = "OR (access = '2' AND sid IN (".implode(',', $groupList)."))";
 		}
@@ -223,7 +205,7 @@ class Calendar extends Model {
 							TIME_FORMAT(endTime, '" . CALENDAR_time_format . "') as endTime,
                             TIME_TO_SEC(startTime) as startTimestamp,
                             TIME_TO_SEC(endTime) as endTimestamp,
-							priority, note, access, eventCampus.campusID as sid
+							type, note, access, eventCampus.campusID as sid
 						FROM event 
 						LEFT JOIN eventCampus ON event.id = eventCampus.eventID
 						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
@@ -245,7 +227,7 @@ class Calendar extends Model {
 		$query = "SELECT DISTINCT id, owner,
 							TIME_FORMAT(startTime, '" . CALENDAR_time_format . "') as startTime, 
 							TIME_FORMAT(endTime, '" . CALENDAR_time_format . "') as endTime,
-							priority, note, access, eventCampus.campusID as sid
+							type, note, access, eventCampus.campusID as sid
 						FROM event 
 						LEFT JOIN eventCampus ON event.id = eventCampus.eventID
 						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
