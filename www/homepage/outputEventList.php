@@ -13,7 +13,7 @@ $this->setVar('group_events_block', '');
 if (is_array($eventList)) {
 	foreach ($eventList as $event) {
 
-		$event['colour'] = $calendarHandler->displayColour($event['priority']);
+		$event['colour'] = $calendarHandler->displayColour($event['type']);
 
 		$this->setVar("CAL_DATE", $event['outputDate']);
 		$this->setVar("CAL_ID", $event['id']);

@@ -34,7 +34,7 @@ if (is_array($eventList)) {
 	
 	foreach ($eventList as $event) {
 
-		$event['colour'] = $calendarHandler->displayColour($event['priority']);
+		$event['colour'] = $calendarHandler->displayColour($event['type']);
 
 		$output = array('CAL_DATE'	=> date(DATE_short_no_time, $event['outputDate']),
 						'CAL_ID'	=> $event['id'],

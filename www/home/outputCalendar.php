@@ -48,7 +48,7 @@ else
 		
 		$output = array('NOTE_CATEGORY'		=> '',
 						'NOTE_DESCRIPTION'	=> $event['note'],
-						'NOTE_COLOUR'		=> $calendarHandler->displayColour($event['priority']),
+						'NOTE_COLOUR'		=> $calendarHandler->displayColour($event['type']),
 						);
 		
 		$this->setVar($output);

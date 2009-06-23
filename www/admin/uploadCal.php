@@ -52,7 +52,7 @@ function processCal()
 {
 
 	$db = new dbManager();
-	$calObj = new Calendar();
+	$calendarHandler = new Calendar();
 	$cal = fopen($_FILES['file']['tmp_name'], 'r');
 	if (!$cal) 
 	{
@@ -73,33 +73,29 @@ function processCal()
 	while(!feof($cal))
 	{
 
-		list($date,$stime,$ftime,$comment,$priority) = fgetcsv($cal,4096);
+		list($date,$stime,$ftime,$comment,$type) = fgetcsv($cal,4096);
         
-        	$comment = trim($comment);
+        $comment = trim($comment);
         
-        	# Skip empty comments and no dates
-        	if($comment && $date)
-        	{
-        	    if($priority < 1 && $priority > 4)
-        	        $priority = 4;
-        
-        	    $stime = ($stime) ? "'".$stime."'" : 'NULL';
-        	    $ftime = ($ftime) ? "'".$ftime."'" : 'NULL';
-	
-        	    $sql = "INSERT INTO event (owner, access, priority, note, date, startTime, endTime)
-               		 VALUES ('{$uid}',3, '$priority', '".mysql_escape_string(trim($comment))."', '$date', $stime, $ftime)"; 
-				
-				
-			if($db->query($sql))
-			{
-				$newEventID = $db->dbInsertId();
-				$calObj->addPerms($newEventID, $_POST['userGroup'], $_POST['campus']);
+		# Skip empty comments and no dates
+		if($comment && $date)
+		{
+			$event = array(	'owner'		=> $uid,
+							'access'	=> 3,
+							'type'		=> $type,
+							'note'		=> $comment,
+							'date'		=> $date,
+							'startTime'	=> $stime,
+							'endTime'	=> $ftime,
+							'groupList'	=> $_POST['userGroup'],
+							'campusList'=> $_POST['campus'],
+							);
+
+			if($calendarHandler->create($event) )
 				$output .= "<div style=\"color: #66CC33;\">Successfully added event '$comment'<br /></div>";
-				
-			}
 			else
 				$output .= "<div style=\"color: #CC3300;\">Failed to add event '$comment'<br /></div>";
-					
+
 		}
 	}
 	$this->displayPage($output);
