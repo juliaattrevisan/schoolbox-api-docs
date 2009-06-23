@@ -16,13 +16,18 @@ $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
 
-
+// category exists
 if (is_numeric($this->arg[0]))
 	$category = $categoryHandler->getByID($this->arg[0]);
 
 if (!isset($category['id']))
 	error(2);
-	
+
+// forum exists
+if (!$forumHandler->hasForum($category['id']))
+	localRedir('/homepage/' . $category['id']);
+
+// check permissions
 if ($groupHandler->getPermission($category['id']) < READ_ACCESS)
 	error(19);
 	
@@ -30,7 +35,8 @@ $this->setTitle(scrubText($category['name']) . ' Forum');
 
 
 /* output breadcrumbs */
-$output = array('HOMEPAGE'	=> scrubText($category['name']),
+$output = array('CATEGORY'		=> scrubText($category['name']),
+				'CATEGORY_ID'	=> $category['id'],
 				);
 $this->setVar($output);
 
@@ -42,7 +48,7 @@ $pageNum = $this->arg[1];
 if(!$pageNum)
 	$pageNum = 1;
 	
-$threadPerPage = 9;
+$threadPerPage = FORUM_THREADS_PER_PAGE;
 $totalPages = ceil(count($threadList)/$threadPerPage);
 $threadIndex = $threadPerPage * ($pageNum-1);		
 
@@ -84,7 +90,7 @@ if (is_array($threadList)) {
 					  'firstname'	=> $thread['userFirstname'],
 					  'lastname'	=> $thread['userLastname'],
 					  );
-					  
+			  
 		$output = array('THREAD_ID'					=> $thread['threadID'],
 						'THREAD_TITLE'				=> scrubText($thread['title']),
 						'THREAD_AUTHOR'				=> scrubText(formatName($user)),
@@ -95,12 +101,15 @@ if (is_array($threadList)) {
 						'THREAD_LAST_POST_USER'		=> scrubText($thread['last_post_user']),
 						'THREAD_REPLIES'			=> $thread['replies'],
 						'THREAD_VIEWS'				=> $thread['views'],
+						'THREAD_LAST_PAGE'			=> ceil((($thread['replies'] + 1) / FORUM_POSTS_PER_PAGE)),
+						'THREAD_LOCKED'				=> $thread['locked'] == 'true' ? '(Locked)' : '',
 						);
+
 		$this->setVar($output);
 		
 		/* last post block */
 		$this->setVar('last_post_block', '');
-		if ($thread['userID'] != $thread['last_post_user_id'])
+		if ($thread['replies'] > 0)
 			$this->parse('last_post_block', 'last_post', true);
 
 		$this->parse('thread_block', 'thread', true);

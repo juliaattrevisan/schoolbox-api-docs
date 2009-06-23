@@ -14,30 +14,35 @@
 	if ($continue) {
 		//forum recent posts
 		$this->setBlock($componentHandle, "forum", "forum_block");
+		$this->setBlock('forum', "forum_reply", "forum_reply_block");
 		
-		require_once '../library/forum.php';
+		require_once SITE_root . '/library/forum.php';
 		$forumHandler = new Forum;
 		
-		$threadList = $forumHandler->getThreads($categoryID, $config);
+		$threadList = $forumHandler->getRecentThreadList($categoryID, $config);
 		
 		if (is_array($threadList)) {
 			foreach ($threadList as $thread) {
 
-				$url = "/forum/viewForum.php?msgid=".$thread['id']."&cid=".$categoryID;
+				$user = array('title'		=> $thread['userTitle'],
+							  'firstname'	=> $thread['userFirstname'],
+							  'lastname'	=> $thread['userLastname'],
+							  );
 				
-				$this->setVar('FORUM_ID', $thread['id']);
-				$this->setVar('FORUM_POSTER', formatName($thread));
-				$this->setVar('FORUM_POSTER_ID', $thread['uid']);
-				$this->setVar('FORUM_POSTED_DATE', getRelativeTime($thread['date']));
-				//$this->setVar('FORUM_BRIEF', cutSentence($thread['message'],300));
+				$output = array('THREAD_ID'			=> $thread['threadID'],
+								'THREAD_USER'		=> formatName($user),
+								'THREAD_USER_ID'	=> $thread['userID'],
+								'THREAD_DATE'		=> getRelativeTime($thread['date']),
+								'THREAD_TITLE'		=> scrubTEXT($thread['title']),
+								'ON_OFF'			=> ++$j%2? '' : 'dark',
+								);
 				
-				//set name
-				if($thread['id'] == "")
-					$this->setVar("FORUM_HEAD", scrubTEXT($thread['heading']));
-				else
-					$this->setVar("FORUM_HEAD", "<a href=\"$url\">".scrubTEXT($thread['heading'])."</a>");
+				$this->setVar($output);
 				
-				$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
+				$this->setVar('forum_reply_block', '');
+				if ($thread['locked'] != 'true' || $permission >= FULL_ACCESS)
+					$this->parse('forum_reply_block', 'forum_reply');
+
 				$this->parse("forum_block", "forum", true);				
 				
 			}

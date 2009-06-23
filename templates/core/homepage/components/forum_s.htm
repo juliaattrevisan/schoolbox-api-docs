@@ -21,14 +21,15 @@
   	<ul>
     	<!-- BEGIN forum -->
       <li class="{ON_OFF}">
-      <h4><a href="/forum/viewForum.php?cid={ID}&msgid={FORUM_ID}">{FORUM_HEAD}</a></h4>
-      <p class="interact"><a href="/forum/modpost.php?cid={ID}&parent={FORUM_ID}">Reply</a></p>
+      <h4><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a></h4>
+      <!-- BEGIN forum_reply -->
+      <p class="interact"><a href="/forum/modify/post/{THREAD_ID}">Reply</a></p><!-- END forum_reply -->
       <div class="float-fix"></div>
-      <p class="small summ">Posted by <a href="/search/user/{FORUM_POSTER_ID}">{FORUM_POSTER}</a> {FORUM_POSTED_DATE}</p>
+      <p class="small summ">Posted by <a href="/search/user/{THREAD_USER_ID}">{THREAD_USER}</a> {THREAD_DATE}</p>
       <div class="float-fix"></div>
       </li>
       <!-- END forum -->
     </ul>
   </div>
-  <p class="interact"><a href="/forum/viewForum.php?cid={ID}">Goto Forum</a></p>
+  <p class="interact"><a href="/forum/{ID}">Goto Forum</a></p>
 </div>

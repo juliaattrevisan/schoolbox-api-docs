@@ -45,11 +45,11 @@ class Page {
 	}
 	
 	function setVar($var, $value='') {
-		$this->template->set_var($var, $value);
+		$this->template->setVar($var, $value);
 	}
 
 	function setBlock($parent, $handle, $name) {
-		$this->template->set_block($parent, $handle, $name);
+		$this->template->setBlock($parent, $handle, $name);
 	}
 	
 	function parse($target, $handle, $append = false) {
@@ -57,7 +57,7 @@ class Page {
 	}
 	
 	function setFile($handle, $file) {
-		$this->template->set_file($handle, $file);
+		$this->template->setFile($handle, $file);
 	}
 	
 	function dropDown($handle, $data, $selected='', $template = TEMPLATE_content) {

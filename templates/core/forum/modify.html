@@ -19,52 +19,56 @@ tinyMCE.init({
 });
 </script>
 <script language="JavaScript" type="text/javascript">
-function verify()
-{
-        var msg = ""
-        if(document.getElementById('newsForm').heading.value == ""){
-                msg += "You need to enter a heading\n";
-        }
-        if(msg != ""){
-                alert(msg);
-                return false;
-        }
-        else
-	{
-                return true;
-	}
-}
-function confirmDelete(newsID) {
-	if (confirm('Delete this news item?')) { 
-		window.open('/news/modifyForm.php?delete='+newsID, '_self', '');
-	}
-}
-
 $j(function(){
-        $j('#quote').click(function(){
-                if(getSelectedText()) {
-                        $j('#body').html(getSelectedText());
-												tinyMCE.execCommand('mceInsertContent',false,getSelectedText()); 
-												return false;
-                }
-        });
+
+	$j('#forumForm').submit(function () {
+		
+		tinyMCE.triggerSave();
+
+		if ($j('#forumTitle') && $j('#forumTitle').val() == '') {
+			alert('You need to enter a title');
+			return false;
+		}
+		else if ($j('#forumBody').val() == '') {
+			alert('You need to enter a message');
+			return false;
+		}
+		
+		return true;
+	});
+
+	$j('#quote').click(function(){
+		if(getSelectedText()) {
+			$j('#body').html(getSelectedText());
+			var quote = '', byline = '';
+			if ($j('#byline').attr('checked') == true)
+				byline = '="{QUOTE_USER}"';
+				
+			quote = '[quote'+byline+']'+getSelectedText()+'[/quote]';
+			tinyMCE.execCommand('mceInsertContent',false,quote); 
+			return false;
+		} else
+			alert('Please highlight the passage you wish to quote and try again.');
+	});
+	
+	function getSelectedText(){
+		if(window.getSelection){
+			return window.getSelection().toString();
+		}
+		else if(document.getSelection){
+			return document.getSelection();
+		}
+		else if(document.selection){
+			return document.selection.createRange().text;
+		}
+	} 
+	
 });
-function getSelectedText(){
-    if(window.getSelection){
-        return window.getSelection().toString();
-    }
-    else if(document.getSelection){
-        return document.getSelection();
-    }
-    else if(document.selection){
-        return document.selection.createRange().text;
-    }
-} 
 </script>
 <!-- END custom_head -->
 
-		<h1>{ACTION} Post</h1>
-		<form id="forumForm" class="standardForm" method="post" enctype="multipart/form-data" action="/forum/modifyForm.php" onsubmit="return(verify());">
+		<h1>{ACTION} {THREAD_POST}</h1>
+		<form id="forumForm" class="standardForm" method="post" enctype="multipart/form-data" action="/forum/modifyForm.php">
 		<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
         <input type="hidden" name="threadID" value="{THREAD_ID}" />
         <input type="hidden" name="postID" value="{POST_ID}" />
@@ -72,7 +76,7 @@ function getSelectedText(){
     	<!-- BEGIN title -->
 		  <tr> 
         <td class="formLabelWidth"><h3>Title</h3><em>The name of this forum thread.</em></td>
-        <td><input type="text" name="heading" size="35" maxlength="50" value="{THREAD_TITLE}" /></td>
+        <td><input type="text" name="title" id="forumTitle" size="35" maxlength="50" value="{THREAD_TITLE}" /></td>
 		  </tr>
       <!-- END title -->
       <!-- BEGIN quote -->
@@ -82,13 +86,13 @@ function getSelectedText(){
         	<div id="cited">
         		<p>{QUOTE_BODY}</p>
         	</div><br />
-        	<input type="button" id="quote" value="Quote" />
+        	<input type="button" id="quote" value="Quote" /> <input type="checkbox" value="1" name="byline" id="byline" /> With byline
         </td>
 		  </tr>
       <!-- END quote -->
 		  <tr> 
         <td><h3>Post</h3><em>This is the main portion of your forum post.</em></td>
-        <td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
+        <td><textarea id="forumBody" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
 		  </tr>
 		  <tr class="pedantic"> 
 			<td>&nbsp;</td>

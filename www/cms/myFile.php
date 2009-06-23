@@ -48,7 +48,9 @@ if(is_numeric($this->arg[0])) {
 elseif($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	
 	/* Add new file to system */
-	if (!$parent = $folderHandler->getByID($this->arg[1]))
+	if ($this->arg[1] == 0)
+		$parent = array('id' => 0);
+	elseif (!$parent = $folderHandler->getByID($this->arg[1]))
 		error(13);
 	
 	$this->setFile(TEMPLATE_content, 'cms/myFile.html');

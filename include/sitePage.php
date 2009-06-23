@@ -453,7 +453,7 @@ class SitePage extends Page {
 	}
 	
 	function setFile($handle, $file) {
-		$this->template->set_file($handle, $this->getTemplate($file));
+		$this->template->setFile($handle, $this->getTemplate($file));
 		
 		if($handle == TEMPLATE_content) {
 			$this->templateFile = $file;
@@ -475,7 +475,7 @@ class SitePage extends Page {
 	}
 	
 	function getVar($varname) {
-		return $this->template->get_var($varname);
+		return $this->template->getVar($varname);
 	}
 	
 	function localRedir($file) {

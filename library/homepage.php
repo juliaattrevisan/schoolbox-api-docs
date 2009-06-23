@@ -132,6 +132,7 @@ class Homepage {
 			WHERE cid = '{$this->cid}'
 			ORDER BY `position`";
 		$currentListComp = $this->db->getAll($query);
+		$submitListComp = is_array($submitListComp) ? $submitListComp : array();
 		if (is_array($currentListComp)) {
 			// Remove deleted ones
 			foreach($currentListComp as $key => $comp)

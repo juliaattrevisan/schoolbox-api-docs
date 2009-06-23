@@ -15,66 +15,64 @@ $this->setBlock(TEMPLATE_content, 'quote', 'quote_block');
 $this->setVar('title_block', '');
 $this->setVar('quote_block', '');
 
-/* modify thread */
-if ($this->arg[0] == 'thread' && is_numeric($this->arg[1])) {
+if (is_numeric($this->arg[0])) {
 
-	// check category exists
-	$category = $categoryHandler->getByID($this->arg[1]);
+	// category exists
+	$category = $categoryHandler->getByID($this->arg[0]);
 	if (!isset($category['id']))
 		error(2);
 
-	$this->setTitle(scrubText($category['name'] . ' Forum'));
+	// forum exists
+	if (!$forumHandler->hasForum($category['id']))
+		localRedir('/homepage/' . $category['id']);
 	
 	// check permissions
 	if ($groupHandler->getPermission($category['id']) < READ_ACCESS)
 		error(19);
 
-	if (is_numeric($this->arg[2]))
-		$thread = $forumHandler->getThread($this->arg[2]);
-	
-	if (isset($thread['threadID'])) {
-		/* check user owns thread */
-		if ($thread['userID'] != $_SESSION['id'] && $groupHandler->getPermission($category['id']) < FULL_ACCESS)
-			error(19);
-	}
-	
-	$output = array('ACTION'		=> isset($thread['threadID']) ? 'Modify' : 'Add',
-					'THREAD_ID'		=> $thread['threadID'],
-					'THREAD_TITLE'	=> scrubText($thread['title']),
-					'POST_ID'		=> '',
-					'CATEGORY_ID'	=> $category['id'],
-					'BODY'			=> scrubHTML($thread['body']),
-					);
-	$this->setVar($output);
-	
-	$this->parse('title_block', 'title');
-
-} 
-/* modify post */
-elseif (is_numeric($this->arg[1])) {
-
-	// check thread exists
-	$thread = $forumHandler->getThread($this->arg[1]);
-	if (!isset($thread['threadID']))
-		error(2);
-
-	$category = $categoryHandler->getByID($thread['categoryID']);
 	$this->setTitle(scrubText($category['name'] . ' Forum'));
 
-	// check permissions
-	if ($groupHandler->getPermission($thread['categoryID']) < READ_ACCESS)
-		error(19);
-
-	if (is_numeric($this->arg[2]))
+	if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
 		$post = $forumHandler->getPost($this->arg[2]);
-	
-	if (isset($post['postID'])) {
+		
+		if (!isset($post['postID']))
+			error(2);
+		
 		/* check user owns post */
-		if ($post['userID'] != $_SESSION['id'] && $groupHandler->getPermission($thread['categoryID']) < FULL_ACCESS)
+		if ($post['userID'] != $_SESSION['id'] && $groupHandler->getPermission($category['id']) < FULL_ACCESS)
+			error(19);	
+		
+		$thread = $forumHandler->getThread($post['threadID']);	
+		
+		/* check locked */
+		if ($thread['locked'] == 'true' && $groupHandler->getPermission($category['id']) < FULL_ACCESS)
 			error(19);
 		
-		
+		if ($thread['postID'] == $post['postID'])
+			$this->parse('title_block', 'title');	
 	}
+	elseif (is_numeric($this->arg[1])) {
+		$thread = $forumHandler->getThread($this->arg[1]);
+		
+		if (!isset($thread['threadID']))
+			error(2);
+
+		/* check locked */
+		if ($thread['locked'] == 'true' && $groupHandler->getPermission($category['id']) < FULL_ACCESS)
+			error(19);
+
+	} else
+		$this->parse('title_block', 'title');
+	
+	$output = array('ACTION'		=> isset($post['postID']) ? 'Modify' : 'Add',
+					'THREAD_POST'	=> $thread['postID'] == $post['postID'] || !isset($thread['threadID']) ? 'Thread' : 'Post',
+					'THREAD_ID'		=> $thread['threadID'],
+					'THREAD_TITLE'	=> scrubText($thread['title']),
+					'POST_ID'		=> $post['postID'],
+					'CATEGORY_ID'	=> $category['id'],
+					'BODY'			=> scrubHTML($post['body']),
+					);
+	$this->setVar($output);
 
 	/* output quote */
 	$this->setVar('quote_block', '');
@@ -94,16 +92,6 @@ elseif (is_numeric($this->arg[1])) {
 			$this->parse('quote_block', 'quote', true);
 		}
 	}		
-
-	$output = array('ACTION'		=> isset($post['postID']) ? 'Modify' : 'Add',
-					'POST_ID'		=> $post['postID'],
-					'CATEGORY_ID'	=> $category['id'],
-					'THREAD_ID'		=> $thread['threadID'],
-					'BODY'			=> scrubHTML($post['body']),
-					);
-	$this->setVar($output);
-
-	
 
 
 } else

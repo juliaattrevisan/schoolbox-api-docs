@@ -75,33 +75,14 @@ function bytesToString($size) {
       return round($size,2)." ".$a[$i];
 }
 
-function scrubHTML($html)
-{
-	//cleans html of all nasty stuff
-	//and converts everything into html safe for php and browser output
-	//can be used on input to database or output
+function scrubHTML($html) {
 
-	$search = array('\\\\',			// To protect from \\ backreferences
-			'$',			// Dollars are important else they can cause backreferences
-			'\\\\',			// To protect from \\ backreferences
-			'<script',		// Remove javascript markup
-			'</script>',			
-		);
-	
-	$replace = array('&#92;',
-			'&#36;',
-			'&#92;',
-			'',
-			'',
-		);
-
-	$html = str_replace($search, $replace, $html);
-
-	return $html;
+	require_once dirname(__FILE__) . '/../../include/HTMLPurifier/HTMLPurifier.auto.php';
+	return HTMLPurifier::instance()->purify($html);
 }
 
-function scrubTEXT($text)
-{
+function scrubTEXT($text) {
+ 
 	//cleans plain text of all nasty stuff
 	//can be used on input to database or output
 
@@ -359,7 +340,7 @@ function plural($num) {
 		return "s";
 }
 
-function getRelativeTime($date, $now = 0, $prefix = 'on') {
+function getRelativeTime($date, $now = 0, $prefix = 'on', $suffix = 'ago') {
 	
 	if(!$now) 
 		$now = time();
@@ -370,23 +351,23 @@ function getRelativeTime($date, $now = 0, $prefix = 'on') {
 	$diff = $now - $date;
 	
 	if ($diff<60)
-		return $diff . " second" . plural($diff) . " ago";
+		return $diff . " second" . plural($diff) . " " . $suffix;
 	$diff = round($diff/60);
 	if ($diff<60)
-		return $diff . " minute" . plural($diff) . " ago";
+		return $diff . " minute" . plural($diff) . " " . $suffix;
 	$diff = round($diff/60);
 	if ($diff<24)
-		return $diff . " hour" . plural($diff) . " ago";
+		return $diff . " hour" . plural($diff) . " " . $suffix;
 	$diff = round($diff/24);
 	if ($diff<2)
 		return ' Yesterday';
 	if ($diff<7)
-		return $diff . " days ago";
+		return $diff . " days " . $suffix;
 	$diff = round($diff/7);
 	if ($diff<2)
 		return ' Last week';
 	if ($diff<4)
-		return $diff . " weeks ago";
+		return $diff . " weeks " . $suffix;
 	return $prefix.' '.date(DATE_short_no_time, $date);
 }
 

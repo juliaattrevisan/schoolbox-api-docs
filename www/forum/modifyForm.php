@@ -3,143 +3,162 @@
 require_once dirname(__FILE__) . '/../conf/conf.php';
 require_once SITE_root . '/include/sitePage.php';
 require_once SITE_root . '/library/forum.php';
+require_once SITE_root . '/library/category.php';
 require_once SITE_root . '/library/group.php';
 
 $page = new SitePage;
 $forumHandler = new Forum;
 $groupHandler = new Group;
+$categoryHandler = new Category;
 
-/* create/modify post */
-if (is_numeric($_POST['threadID']) && is_numeric($_POST['categoryID'])) {
-	
-	/* check category permissions */
-	if ($groupHandler->getPermission($_POST['categoryID']) < READ_ACCESS)
+if (is_numeric($_POST['categoryID'])) {
+
+	// category exists
+	$category = $categoryHandler->getByID($_POST['categoryID']);
+	if (!isset($category['id']))
+		error(2);
+
+	// forum exists 
+	if (!$forumHandler->hasForum($category['id']))
+		localRedir('/homepage/' . $category['id']);
+
+	/* check permissions */
+	if (($permission = $groupHandler->getPermission($_POST['categoryID'])) < READ_ACCESS)
 		error(19);
 
-	if (is_numeric($_POST['postID'])) {
-		$current = $forumHandler->getPost($_POST['postID']);
-		
-		/* check user owns post */
-		if ($current['userID'] != $_SESSION['userID'] && $groupHandler->getPermission($_POST['categoryID']) < FULL_ACCESS)
-			error(19);
-	}
-
-	$post = array('threadID'	=> $_POST['threadID'],
-				  'userID'		=> $_SESSION['id'],
+	$post = array('userID'		=> $_SESSION['id'],
 				  'body'		=> $_POST['body'],
 				  );
-				  	
-	if (is_numeric($_POST['postID'])) {
-		$post['postID'] = $_POST['postID'];
-		unset($post['threadID']);
-		$forumHandler->updatePost($post);
-	} else
-		$post['postID'] = $forumHandler->createPost($post);
-	
-	localRedir('/forum/thread/' . $post['threadID'] . '/'.$forumHandler->getPageNumber($post['postID']) .'/#' . $post['postID']);
-	
 
-}
-/* create/modify thread */
-elseif (is_numeric($_POST['categoryID'])) {
-
-	/* check category permissions */
-	if ($groupHandler->getPermission($_POST['categoryID']) < READ_ACCESS)
-		error(19);
-		
+	/* modify post */
 	if (is_numeric($_POST['postID'])) {
 		$current = $forumHandler->getPost($_POST['postID']);
+		if (!isset($current['postID']))
+			error(2);
 		
 		/* check user owns post */
-		if ($current['userID'] != $_SESSION['userID'] && $groupHandler->getPermission($_POST['categoryID']) < FULL_ACCESS)
+		if ($current['userID'] != $_SESSION['id'] && $groupHandler->getPermission($_POST['categoryID']) < FULL_ACCESS)
 			error(19);
 		
-	}
-	
-	/* thread */
-	$thread = array('categoryID'	=> $_POST['categoryID'],
-					'userID'		=> $_SESSION['id'],
-					'title'			=> $_POST['title'],
-					);
-					
-	if (isset($current['threadID'])) {
-		$thread['threadID'] = $current['threadID'];
+		$thread = $forumHandler->getThread($current['threadID']);
+
+		// check locked
+		if ($thread['locked'] == 'true' && $permission < FULL_ACCESS)
+			error(19);		
 		
-		// ensure thread isn't moved
-		unset($thread['categoryID']);
+		/* modify thread */
+		if ($thread['postID'] == $current['postID']) {
+
+			$data = array('threadID'	=> $thread['threadID'],
+						  'title' 		=> $_POST['title'],
+						  );
+			
+			$forumHandler->update($data);
+		}
 		
-		$forumHandler->update($thread);
-	} else
-		$thread['threadID'] = $forumHandler->create($thread);
-		
-		
-	/* post */
-	$post = array('threadID'	=> $thread['threadID'],
-				  'userID'		=> $_SESSION['id'],
-				  'body'		=> $_POST['body'],
-				  );
-				  	
-	if (isset($current['postID'])) {
+		/* modify post */
 		$post['postID'] = $current['postID'];
-		// ensure post isn't moved
-		unset($post['threadID']);
-		$forumHandler->updatePost($post);
-	} else
+		$forumHandler->updatePost($post);	
+		
+	} 
+	else {
+
+		/* create thread */		
+		if (!is_numeric($_POST['threadID'])) {
+			$thread = array('categoryID'	=> $_POST['categoryID'],
+							'userID'		=> $_SESSION['id'],
+							'title'			=> $_POST['title'],
+							);			
+							
+			$thread['threadID'] = $forumHandler->create($thread);
+		
+		} else {
+			$thread = $forumHandler->getThread($_POST['threadID']); 
+
+			// thread exists
+			if (!isset($thread['threadID']))
+				error(2);			
+
+			// check locked
+			if ($thread['locked'] == 'true' && $permission < FULL_ACCESS)
+				error(19);
+		}
+		
+		/* create post */
+		$post['threadID'] = $thread['threadID'];
 		$post['postID'] = $forumHandler->createPost($post);
-	
+		
+	}
 	
 	localRedir('/forum/thread/' . $thread['threadID'] . '/'.$forumHandler->getPageNumber($post['postID']) .'/#' . $post['postID']);
-	
+
 }
-elseif (is_numeric($_GET['lock'])) {
-	$thread = $forumHandler->getThread($_GET['lock']);
-	
+elseif (is_numeric($_GET['toggleLock'])) {
+
+	// thread exists
+	$thread = $forumHandler->getThread($_GET['toggleLock']);
 	if (!isset($thread['threadID']))
 		error(2);
-	
-	/* check category permissions */
+
+	// forum exists
+	if (!$forumHandler->hasForum($thread['categoryID']))
+		localRedir('/homepage/' . $thread['categoryID']);
+
+	/* check permissions */
 	if ($groupHandler->getPermission($thread['categoryID']) < FULL_ACCESS)
 		error(19);	
 
 	$data = array('threadID'	=> $thread['threadID'],
-				  'locked'		=> 'true',
+				  'locked'		=> $thread['locked'] == 'true' ? 'false' : 'true',
 				  );
 	$forumHandler->update($data);		
 	
-	$page->backToTheFuture(2);
+	$page->backToTheFuture(1);
 
-}
-elseif (is_numeric($_GET['unlock'])) {
-	$thread = $forumHandler->getThread($_GET['unlock']);
-	
-	if (!isset($thread['threadID']))
-		error(2);
-	
-	/* check category permissions */
-	if ($groupHandler->getPermission($thread['categoryID']) < FULL_ACCESS)
-		error(19);	
-
-	$data = array('threadID'	=> $thread['threadID'],
-				  'locked'		=> 'false',
-				  );
-	$forumHandler->update($data);		
-	
-	$page->backToTheFuture(2);
 }
 elseif (is_numeric($_GET['deleteThread'])) {
 
+	// thread exists
 	$thread = $forumHandler->getThread($_GET['deleteThread']);
-	
 	if (!isset($thread['threadID']))
 		error(2);
 
-	/* check category permissions */
+	// forum exists
+	if (!$forumHandler->hasForum($thread['categoryID']))
+		localRedir('/homepage/' . $thread['categoryID']);
+
+	/* check permissions */
 	if ($groupHandler->getPermission($thread['categoryID']) < FULL_ACCESS)
 		error(19);	
 
 	$forumHandler->delete($thread['threadID']);		
 	
 	localRedir('/forum/' . $thread['categoryID'] );
+
+}
+elseif (is_numeric($_GET['deletePost'])) {
+
+	// post exists
+	$post = $forumHandler->getPost($_GET['deletePost']);
+	if (!isset($post['postID']))
+		error(2);
+		
+	$thread = $forumHandler->getThread($post['threadID']);
+	
+	/* check locked */
+	if ($thread['locked'] == 'true' && $groupHandler->getPermission($thread['categoryID']) < FULL_ACCESS)
+		error(19);		
+
+	/* check permissions */
+	if ($post['userID'] != $_SESSION['id'] && $groupHandler->getPermission($thread['categoryID']) < FULL_ACCESS)
+		error(19);	
+
+	$pageNumber = $forumHandler->getPageNumber($post['postID']);
+
+	$forumHandler->deletePost($post['postID']);		
+
+	localRedir('/forum/thread/' . $post['threadID'] . '/' . $pageNumber );
+
 
 }
 

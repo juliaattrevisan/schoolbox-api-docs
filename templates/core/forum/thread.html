@@ -6,16 +6,37 @@
 		$j('#forum-topic tbody tr:even td').css('background-color', '#f4f4f4');
 		
 		$j('button.reply').click(function () {
-			window.open('/forum/modify/post/{THREAD_ID}', '_self', '');
+			window.open('/forum/modify/{CATEGORY_ID}/{THREAD_ID}', '_self', '');
 			return false;
 		});
+		
+		$j('button.lock').click(function () {
+			window.open('/forum/modifyForm.php?toggleLock={THREAD_ID}', '_self', '');
+			return false;			
+		});
+
+		$j('button.delete').click(function () {
+			if (confirm('Are you sure you want to delete this thread?'))
+				window.open('/forum/modifyForm.php?deleteThread={THREAD_ID}', '_self', '');
+			return false;			
+		});
+		
+		$j('a.delete').click(function () {
+			if (confirm('Are you sure you want to delete this post?'))
+				window.open($(this).attr('href'), '_self', '');
+			return false;
+		});
+		
 	});
 </script>
 <!-- END custom_head -->
 <div class="breadcrumbs navhelp">
-	<a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a> > <a href="{TOPIC_URL}">{TOPIC}</a> > <a href="{TOPIC_URL}">{ACTION} Post</a>
+	<a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a> > <a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {LOCKED}</a>
 </div>
-<button class="reply">Post Reply</button>
+<!-- BEGIN reply -->
+<button class="reply">Post Reply</button> 
+<!-- END reply -->
+
 <table id="forum-post">
   <tbody>
   	<!-- BEGIN post -->
@@ -31,38 +52,36 @@
     </tr>
     <tr>
     	<td class="reply">
-      	<a href="/forum/modify/post/{THREAD_ID}/0/{POST_ID}">Reply to this post</a><br />
+        <!-- BEGIN reply_post -->
+      	<a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}">Reply to this post</a><br /><!-- END reply_post -->
+        <!-- BEGIN modify -->
+        <a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}">Edit post</a> |
+        <a href="/forum/modifyForm.php?deletePost={POST_ID}" class="delete">Delete post</a><br /> <!-- END modify -->
         Posted {POST_TIME}
+        <!-- BEGIN modified --><br /> edited {POST_MODIFIED} {POST_CENSORED}<!-- END modified -->
       </td>
     </tr>
     <!-- END post -->
     
-    <tr>
-    	<td class="user" width="20%">
-      	<h3><a href="#">MattCordell</a></h3>
-        Super Dr
-      </td>
-      <td rowspan="2" class="post" width="80%">
-        <cite>MattCordell wrote:</cite>
-        <blockquote>
-        
-        	<p>We are a non-profit organisation and have custom-developed an ISP billing software for a project where we manage internet connections for individual accounts. Whilst the software has worked well so far I am wondering if there is off-the-shelf ISP billing software that is reliable and open source and that has features that we would need to develop, such as:</p>
-        
-        </blockquote>
-       
-        <p>I Agree.</p>
-      </td>
-    </tr>
-    <tr>
-    	<td class="reply">
-      	<a href="#">Reply to this post</a><br />
-        Posted 8 minutes ago
-      </td>
-    </tr>
    
   </tbody>
 </table>
-<button class="reply">Post Reply</button>
+<a name="bottom"></a>
+
+{reply_block}
+
+<!-- BEGIN modify_thread -->
+<button class="lock">{LOCK_UNLOCK} Thread</button> <button class="delete">Delete Thread</button>
+<!-- END modify_thread -->
+
 <div class="pagination navhelp">
-	<a href="#">< Prev</a> <a href="#">1</a> <a href="#">2</a> <a href="#">Next ></a>
+	<!-- BEGIN previous_button -->
+    <a href="/forum/thread/{THREAD_ID}/{PREVIOUS_PAGE}">&lt; Prev</a>
+    <!-- END previous_button -->
+    <!-- BEGIN page_number -->
+    <a class="{CURRENT}" href="/forum/thread/{THREAD_ID}/{PAGE_INDEX}">{PAGE_INDEX}</a>
+    <!-- END page_number -->
+    <!-- BEGIN next_button -->
+    <a href="/forum/thread/{THREAD_ID}/{NEXT_PAGE}">Next &gt;</a>
+	<!-- END next_button -->
 </div>

@@ -16,11 +16,14 @@ class Forum extends Model {
 		parent::Model();
 	}
 	
-	function getThreads($categoryID, $config) {
-		$query = "SELECT thread, forum.id, heading, date, message,
-		user.id as uid, user.title, user.firstname, user.lastname 
-		FROM forum LEFT JOIN user ON user.id = owner
-		WHERE cid='".$categoryID."' AND deleted = '0' GROUP BY thread ORDER BY date DESC";
+	function getRecentThreadList($categoryID, $config) {
+		$query = "SELECT t.*, u.title userTitle, u.firstname userFirstname, u.lastname userLastname
+				  FROM forumThread t
+				  LEFT JOIN user u ON u.id = t.userID 
+				  WHERE t.categoryID = $categoryID 
+				  AND t.deleted = 'false' 
+				  ORDER BY t.date DESC ";
+				  
 		if($config['size'] != 0 && $config['size'] != '') 
 			$query .= " LIMIT 0, {$config['size']}";  
 		
@@ -43,7 +46,7 @@ class Forum extends Model {
 	}
 	
 	function getThread ($threadID) {
-		$query = "SELECT t.*, p.body FROM forumThread t, forumPost p 
+		$query = "SELECT t.*, p.postID, p.body FROM forumThread t, forumPost p 
 				  WHERE t.threadID = p.threadID AND t.threadID = $threadID AND t.deleted = 'false'
 				  ORDER BY p.date ASC LIMIT 1";
 		return $this->db->getRow($query);			
@@ -64,14 +67,17 @@ class Forum extends Model {
 		$query = "SELECT p.*, u.title userTitle, u.firstname userFirstname, u.lastname userLastname 
 				  FROM ".$this->_postTable." p 
 				  LEFT JOIN user u ON u.id = p.userID 
-				  WHERE postID = $postID";
+				  WHERE postID = $postID AND p.deleted = 'false'";
 		return $this->db->getRow($query);
 	}
 	
-	function parseBB ($string) {
-		//require_once 'HTML/BBCodeParser.php';
-		//return scrubHTML(HTML_BBCodeParser::staticQparse($string));
-		return $string;
+	function hasForum($categoryID) {
+		$query = "SELECT * FROM homepage_comp_location WHERE cid = $categoryID AND component = 5";
+		$result = $this->db->getRow($query);
+		if (isset($result['cid']))
+			return true;
+		else
+			return false;
 	}
 	
 	function lockThread ($threadID) {
@@ -79,6 +85,17 @@ class Forum extends Model {
 					  'locked'		=> 'true',
 					  );
 		$this->update($data);
+	}
+	
+	function uniqueView ($threadID) {
+		$threads_viewed = explode(",", $_COOKIE['threads_viewed']);
+		if (!is_array($threads_viewed) || !in_array($threadID, $threads_viewed)) {
+			$query = "UPDATE ".$this->_table." SET views = views + 1 WHERE threadID = $threadID";
+			$this->db->query($query);
+			
+			setcookie('threads_viewed', $_COOKIE['threads_viewed'] . ',' . $threadID);
+		}
+		return;		
 	}
 
 	function getPageNumber($postID) {
@@ -99,6 +116,18 @@ class Forum extends Model {
 		}
 		
 		return ceil($postNumber / FORUM_POSTS_PER_PAGE);
+		
+	}
+	
+	function parseBB ($text) {
+		$find 	 = array('%\[quote\](.+)\[/quote\]%',
+						 '%\[quote(="([^"]+)")?\](.+)\[/quote\]%'
+						 );
+		$replace = array('<blockquote><p>$1</p></blockquote>',
+						 '<cite>$2</cite><blockquote><p>$3</p></blockquote>'
+						 );
+
+		return preg_replace($find, $replace, html_entity_decode($text));
 		
 	}
 	
@@ -125,7 +154,8 @@ class Forum extends Model {
 		$userHandler = new User;
 		$user = $userHandler->getByID($_SESSION['id']);
 		
-		$thread = array('last_post_id'		=> $data['postID'],
+		$thread = array('threadID'			=> $data['threadID'],
+						'last_post_id'		=> $data['postID'],
 						'last_post_date'	=> 'NOW()',
 						'last_post_user_id'	=> $_SESSION['id'],
 						'last_post_user'	=> formatName($user),
@@ -136,7 +166,24 @@ class Forum extends Model {
 	}
 	
 	function updatePost ($data) {
+		$data['modified'] = 'NOW()';
+		
+		unset($data['threadID']);
+		unset($data['userID']);
+		
+		$current = $this->getPost($data['postID']);
+		if ($current['userID'] != $_SESSION['id'])
+			$data['censored'] = 'true';
+		
 		return $this->db->update($this->_postTable, 'postID', $data);
+	}
+	
+	function deletePost ($postID) {
+	
+		$data = array('postID'		=> $postID,
+					  'deleted'		=> 'true',
+					  );
+		return $this->updatePost($data);		
 	}
 	
 }

@@ -1,342 +1,811 @@
 <?php
-/*
+/**
+ * This code that was derived from the original PHPLIB Template class
+ * is copyright by Kristian Koehntopp, NetUSE AG and was released
+ * under the LGPL.
  *
- * (C) Copyright 1999-2000 NetUSE GmbH
- *                    Kristian Koehntopp
+ * PHP Versions 4 and 5
  *
- */ 
+ * @category HTML
+ * @package  HTML_Template_PHPLIB
+ * @author   Kristian Koehntopp <kris@koehntopp.de>
+ * @author   Bjoern Schotte <schotte@mayflower.de>
+ * @author   Martin Jansen <mj@php.net>
+ * @license  http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
+ * @version  CVS: $Id: PHPLIB.php,v 1.9 2008/03/03 18:33:54 cweiske Exp $
+ * @link     http://pear.php.net/package/HTML_Template_PHPLIB
+ */
 
-class Template {
-  var $classname = "Template";
+/**
+ * Converted PHPLIB Template class
+ *
+ * For those who want to use PHPLIB's fine template class,
+ * here's a PEAR conforming class with the original PHPLIB
+ * template code from phplib-stable CVS. Original author
+ * was Kristian Koehntopp <kris@koehntopp.de>
+ *
+ * @category HTML
+ * @package  HTML_Template_PHPLIB
+ * @author   Bjoern Schotte <schotte@mayflower.de>
+ * @author   Martin Jansen <mj@php.net>
+ * @license  http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
+ * @link     http://pear.php.net/package/HTML_Template_PHPLIB
+ */
+class HTML_Template_PHPLIB
+{
+    /**
+     * If set, echo assignments
+     * @var bool
+     */
+    var $debug     = false;
 
-  /* if set, echo assignments */
-  var $debug     = false;
+    /**
+     * $file[handle] = 'filename';
+     * @var array
+     */
+    var $file  = array();
 
-  /* $file[handle] = "filename"; */
-  var $file  = array();
+    /**
+     * fallback paths that should be defined in a child class
+     * @var array
+     */
+    var $file_fallbacks = array();
 
-  /* relative filenames are relative to this pathname */
-  var $root   = "";
+    /**
+     * Relative filenames are relative to this pathname
+     * @var string
+     */
+    var $root   = '';
 
-  /* $varkeys[key] = "key"; $varvals[key] = "value"; */
-  var $varkeys = array();
-  var $varvals = array();
+    /*
+     * $_varKeys[key] = 'key'
+     * @var array
+     */
+    var $_varKeys = array();
 
-  /* "remove"  => remove undefined variables
-   * "comment" => replace undefined variables with comments
-   * "keep"    => keep undefined variables
-   */
-  var $unknowns = "remove";
-  
-  /* "yes" => halt, "report" => report error, continue, "no" => ignore error quietly */
-  var $halt_on_error  = "yes";
-  
-  /* last error message is retained here */
-  var $last_error     = "";
+    /**
+     * $_varVals[key] = 'value';
+     * @var array
+     */
+    var $_varVals = array();
+
+    /**
+     * 'remove'  => remove undefined variables
+     * 'comment' => replace undefined variables with comments
+     * 'keep'    => keep undefined variables
+     * @var string
+     */
+    var $unknowns = 'keep';
+
+    /**
+     * 'yes'    => halt,
+     * 'report' => report error, continue, return false
+     * 'return' => return PEAR_Error object,
+     * 'no'     => ignore error quietly, return false from functions
+     * @var string
+     */
+    var $haltOnError  = 'report';
+
+    /**
+     * The last error message is retained here
+     * @var string
+     * @see halt
+     */
+    var $_lastError     = '';
 
 
-  /***************************************************************************/
-  /* public: Constructor.
-   * root:     template directory.
-   * unknowns: how to handle unknown variables.
-   */
-  function Template($root = ".", $unknowns = "remove") {
-    $this->set_root($root);
-    $this->set_unknowns($unknowns);
-  }
-
-  /* public: setroot(pathname $root)
-   * root:   new template directory.
-   */  
-  function set_root($root) {
-    if (!is_dir($root)) {
-      $this->halt("set_root: $root is not a directory.");
-      return false;
-    }
-    
-    $this->root = $root;
-    return true;
-  }
-
-  /* public: set_unknowns(enum $unknowns)
-   * unknowns: "remove", "comment", "keep"
-   *
-   */
-  function set_unknowns($unknowns = "keep") {
-    $this->unknowns = $unknowns;
-  }
-
-  /* public: set_file(array $filelist)
-   * filelist: array of handle, filename pairs.
-   *
-   * public: set_file(string $handle, string $filename)
-   * handle: handle for a filename,
-   * filename: name of template file
-   */
-  function set_file($handle, $filename = "") {
-    if (!is_array($handle)) {
-      if ($filename == "") {
-        $this->halt("set_file: For handle $handle filename is empty.");
-        return false;
-      }
-      $this->file[$handle] = $this->filename($filename);
-    } else {
-	  foreach($handle as $h => $f) {
-        $this->file[$h] = $this->filename($f);
-      }
-    }
-  }
-
-  /* public: set_block(string $parent, string $handle, string $name = "")
-   * extract the template $handle from $parent, 
-   * place variable {$name} instead.
-   */
-  function set_block($parent, $handle, $name = "") {
-    if (!$this->loadfile($parent)) {
-      $this->halt("subst: unable to load $parent.");
-      return false;
-    }
-    if ($name == "")
-      $name = $handle;
-
-    $str = $this->get_var($parent);
-    $reg = "/<!--\s+BEGIN $handle\s+-->(.*)<!--\s+END $handle\s+-->/sm";
-    preg_match_all($reg, $str, $m);
-    $str = preg_replace($reg, "{" . "$name}", $str);
-    $this->set_var($handle, $m[1][0]);
-    $this->set_var($parent, $str);
-  }
-  
-  /* public: set_var(array $values)
-   * values: array of variable name, value pairs.
-   *
-   * public: set_var(string $varname, string $value)
-   * varname: name of a variable that is to be defined
-   * value:   value of that variable
-   */
-  function set_var($varname, $value = "") {
-    if (!is_array($varname)) {
-      if (!empty($varname))
-        if ($this->debug) print "scalar: set *$varname* to *$value*<br>\n";
-        $this->varkeys[$varname] = "/".$this->varname($varname)."/";
-        $this->varvals[$varname] = $value;
-    } else {
-	   foreach($varname as $k => $v){
-        if (!empty($k))
-          if ($this->debug) print "array: set *$k* to *$v*<br>\n";
-          $this->varkeys[$k] = "/".$this->varname($k)."/";
-	  $this->varvals[$k] = $v;
-      }
-    }
-  }
-
-  /* public: subst(string $handle)
-   * handle: handle of template where variables are to be substituted.
-   */
-  function subst($handle) {
-    if (!$this->loadfile($handle)) {
-      $this->halt("subst: unable to load $handle.");
-      return false;
+    /**
+     * Constructor
+     *
+     * @param string $root     Template root directory
+     * @param string $unknowns How to handle unknown variables
+     * @param array  $fallback Fallback paths
+     *
+     * @access public
+     */
+    function HTML_Template_PHPLIB($root = '.', $unknowns = '', $fallback='')
+    {
+        $this->setRoot($root);
+		if ($uknowns !== '') $this->setUnknowns($unknowns);
+        if (is_array($fallback)) $this->file_fallbacks = $fallback;
     }
 
-    $str = $this->get_var($handle);
-    $str = @preg_replace($this->varkeys, $this->varvals, $str);
-    return $str;
-  }
-  
-  /* public: psubst(string $handle)
-   * handle: handle of template where variables are to be substituted.
-   */
-  function psubst($handle) {
-    print $this->subst($handle);
-    
-    return false;
-  }
+    /**
+     * Clears a variable (sets its content to "")
+     *
+     * @param array|string $var Variable name to clear, or array name
+     *
+     * @return void
+     *
+     * @access public
+     */
+    function clearVar($var)
+    {
+        if (is_array($var)) {
+            foreach ($var as $varname) {
+                $this->setVar($varname, '');
+            }
+        } else {
+            $this->setVar($var, '');
+        }
+    }
 
-  /* public: parse(string $target, string $handle, boolean append)
-   * public: parse(string $target, array  $handle, boolean append)
-   * target: handle of variable to generate
-   * handle: handle of template to substitute
-   * append: append to target handle
-   */
-  function parse($target, $handle, $append = false) {
-    if (!is_array($handle)) {
-      $str = $this->subst($handle);
-      if ($append) {
-        if (isset($this->varvals[$target])) {
-          $this->set_var($target, $this->get_var($target) . $str);
-	} else {
-	  $this->set_var($target, $str);
+    /**
+     * Unsets a variable completly
+     *
+     * @param array|string $var Variable name to clear, or array of names
+     *
+     * @return void
+     *
+     * @access public
+     */
+    function unsetVar($var)
+    {
+        if (is_array($var)) {
+            foreach ($var as $varname) {
+                unset($this->_varKeys[$varname]);
+                unset($this->_varVals[$varname]);
+            }
+        } else {
+            unset($this->_varKeys[$var]);
+            unset($this->_varVals[$var]);
+        }
+    }
+
+    /**
+     * Checks if the given variable exists.
+     * When an array is given, it is checked if all
+     * variables exist.
+     *
+     * @param string|array $var Variable to check
+     */
+    function exists($var)
+    {
+        if (is_array($var)) {
+            $isset = true;
+            foreach ($var as $varname) {
+                $isset = $isset & isset($this->_varVals[$varname]);
+            }
+            return $isset > 0;
+        } else {
+            return isset($this->_varVals[$var]);
+        }
+    }
+
+    /**
+     * Sets the template directory
+     *
+     * @param string $root New template directory
+     *
+     * @return bool
+     * @access public
+     */
+    function setRoot($root)
+    {
+        if (!is_dir($root)) {
+            return $this->halt('setRoot: ' . $root . ' is not a directory.');
+        }
+
+        $this->root = $root;
+
+        return true;
+    }
+
+    /**
+     * What to do with unknown variables
+     *
+     * three possible values:
+     *
+     * - 'remove' will remove unknown variables
+     *   (don't use this if you define CSS in your page)
+     * - 'comment' will replace undefined variables with comments
+     * - 'keep' will keep undefined variables as-is
+     *
+     * @param string $unknowns Unknowns
+     *
+     * @return void
+     * @access public
+     */
+    function setUnknowns($unknowns)
+    {
+        $this->unknowns = $unknowns;
 	}
-      } else {
-        $this->set_var($target, $str);
-      }
-    } else {
-		foreach($handle as $i => $h) {
-        $str = $this->subst($h);
-        $this->set_var($target, $str);
-      }
-    }
-    
-    return $str;
-  }
-  
-  function pparse($target, $handle, $append = false) {
-    print $this->parse($target, $handle, $append);
-    return false;
-  }
-  
-  /* public: get_vars()
-   */
-  function get_vars() {
-  	foreach($this->varkeys as $k => $v){
-      $result[$k] = $this->varvals[$k];
-    }
-    
-    return $result;
-  }
-  
-  /* public: get_var(string varname)
-   * varname: name of variable.
-   *
-   * public: get_var(array varname)
-   * varname: array of variable names
-   */
-  function get_var($varname) {
-    if (!is_array($varname)) {
-      return $this->varvals[$varname];
-    } else {
-	  foreach($varname as $k => $v){
-        $result[$k] = $this->varvals[$k];
-      }
-      
-      return $result;
-    }
-  }
-  
-  /* public: get_undefined($handle)
-   * handle: handle of a template.
-   */
-  function get_undefined($handle) {
-    if (!$this->loadfile($handle)) {
-      $this->halt("get_undefined: unable to load $handle.");
-      return false;
-    }
-    
-    preg_match_all("/\{([^}]+)\}/", $this->get_var($handle), $m);
-    $m = $m[1];
-    if (!is_array($m))
-      return false;
 
-	foreach($m as $k => $v){
-      if (!isset($this->varkeys[$v]))
-        $result[$v] = $v;
-    }
-    
-    if (count($result))
-      return $result;
-    else
-      return false;
-  }
+    /**
+     * Set appropriate template files
+     *
+     * With this method you set the template files you want to use.
+     * Either you supply an associative array with key/value pairs
+     * where the key is the handle for the filname and the value
+     * is the filename itself, or you define $handle as the file name
+     * handle and $filename as the filename if you want to define only
+     * one template.
+     *
+     * @param mixed  $handle   Handle for a filename or array with
+     *                          handle/name value pairs
+     * @param string $filename Name of template file
+     *
+     * @return bool True if file could be loaded
+     *
+     * @access public
+     */
+    function setFile($handle, $filename = '')
+    {
+        if (!is_array($handle)) {
 
-  /* public: finish(string $str)
-   * str: string to finish.
-   */
-  function finish($str) {
-    switch ($this->unknowns) {
-      case "keep":
-      break;
-      
-      case "remove":
-        $str = preg_replace('/{[^ \t\r\n}]+}/', "", $str);
-      break;
+            if ($filename == '') {
+                return $this->halt(
+                    'setFile: For handle '
+                    . $handle . ' filename is empty.'
+                );
+            }
 
-      case "comment":
-        $str = preg_replace('/{([^ \t\r\n}]+)}/', "<!-- Template $handle: Variable \\1 undefined -->", $str);
-      break;
-    }
-    
-    return $str;
-  }
+            $file = $this->_filename($filename);
+            if ($this->isError($file)) {
+                $this->file[$handle] = false;
+                return $file;
+            }
+            $this->file[$handle] = $file;
+            return true;
+        } else {
+            reset($handle);
+            $allok = true;
+            while (list($h, $f) = each($handle)) {
+                $file = $this->_filename($f);
+                if ($this->isError($file)) {
+                    $this->file[$h] = false;
+                    $allok = $file;
+                } else {
+                    $this->file[$h] = $file;
+                }
+            }
 
-  /* public: p(string $varname)
-   * varname: name of variable to print.
-   */
-  function p($varname) {
-    print $this->finish($this->get_var($varname));
-  }
-
-  function get($varname) {
-    return $this->finish($this->get_var($varname));
-  }
-    
-  /***************************************************************************/
-  /* private: filename($filename)
-   * filename: name to be completed.
-   */
-  function filename($filename) {
-    if (substr($filename, 0, 1) != "/") {
-      $filename = $this->root."/".$filename;
-    }
-    
-    if (!file_exists($filename))
-      $this->halt("filename: file $filename does not exist.");
-
-    return $filename;
-  }
-  
-  /* private: varname($varname)
-   * varname: name of a replacement variable to be protected.
-   */
-  function varname($varname) {
-    return preg_quote("{".$varname."}");
-  }
-
-  /* private: loadfile(string $handle)
-   * handle:  load file defined by handle, if it is not loaded yet.
-   */
-  function loadfile($handle) {
-    if (isset($this->varkeys[$handle]) and !empty($this->varvals[$handle]))
-      return true;
-
-    if (!isset($this->file[$handle])) {
-      $this->halt("loadfile: $handle is not a valid handle.");
-	  return false;
-    }
-    $filename = $this->file[$handle];
-
-    $str = implode("", @file($filename));
-    if (empty($str)) {
-      $this->halt("loadfile: While loading $handle, $filename does not exist or is empty.");
-      return false;
+            return $allok;
+        }
     }
 
-    $this->set_var($handle, $str);
-    
-    return true;
-  }
+    /**
+     * Set a block in the appropriate template handle
+     *
+     * By setting a block like that:
+     *
+     * &lt;!-- BEGIN blockname --&gt;
+     * html code
+     * &lt;!-- END blockname --&gt;
+     *
+     * you can easily do repeating HTML code, i.e. output
+     * database data nice formatted into a HTML table where
+     * each DB row is placed into a HTML table row which is
+     * defined in this block.
+     * It extracts the template $handle from $parent and places
+     * variable {$name} instead.
+     *
+     * @param string $parent Parent handle
+     * @param string $handle Block name handle
+     * @param string $name   Variable substitution name
+     *
+     * @return mixed True if all went well
+     * @access public
+     */
+    function setBlock($parent, $handle, $name = '')
+    {
+        if ($this->isError($this->_loadFile($parent))) {
+            return $this->halt(
+                'setBlock: unable to load ' . $parent . '.'
+            );
+        }
 
-  /***************************************************************************/
-  /* public: halt(string $msg)
-   * msg:    error message to show.
-   */
-  function halt($msg) {
-    $this->last_error = $msg;
-    
-    if ($this->halt_on_error != "no")
-      $this->haltmsg($msg);
-    
-    if ($this->halt_on_error == "yes")
-      die("<b>Halted.</b>");
-    
-    return false;
-  }
-  
-  /* public, override: haltmsg($msg)
-   * msg: error message to show.
-   */
-  function haltmsg($msg) {
-    printf("<b>Template Error:</b> %s<br>\n", $msg);
-  }
+        if ($name == '') {
+            $name = $handle;
+        }
+
+        $str = $this->getVar($parent);
+        $reg = "/[ \t]*<!--\\s+BEGIN $handle\\s+-->\\s*?\n?(\\s*.*?\n?)"
+             . "\\s*<!--\\s+END $handle\\s+-->\\s*?\n?/sm";
+        $m   = array();
+        preg_match_all($reg, $str, $m);
+        $str = preg_replace($reg, '{' . $name . '}', $str);
+
+        if (isset($m[1][0])) {
+            $this->setVar($handle, $m[1][0]);
+        }
+        $this->setVar($parent, $str);
+
+        return true;
+    }
+
+    /**
+     * Set corresponding substitutions for placeholders
+     *
+     * @param string  $varname Name of a variable that is to be defined
+     *                          or an array of variables with value
+     *                          substitution as key/value pairs
+     * @param string  $value   Value of that variable
+     * @param boolean $append  If true, the value is appended to the
+     *                          variable's existing value
+     *
+     * @return void
+     * @access public
+     */
+    function setVar($varname, $value = '', $append = false)
+    {
+        if (!is_array($varname)) {
+
+            if (!empty($varname)) {
+                if ($this->debug) {
+                    print 'scalar: set *' . $varname . '* to *'
+                         . $value . '*<br>\n';
+                }
+            }
+
+            $this->_varKeys[$varname] = $this->_varname($varname);
+            ($append) ? $this->_varVals[$varname] .= $value
+                      : $this->_varVals[$varname] = $value;
+
+        } else {
+            reset($varname);
+
+            while (list($k, $v) = each($varname)) {
+                if (!empty($k)) {
+                    if ($this->debug) {
+                        print 'array: set *' . $k . '* to *' . $v . '*<br>\n';
+                    }
+                }
+
+                $this->_varKeys[$k] = $this->_varname($k);
+                ($append) ? $this->_varVals[$k] .= $v
+                          : $this->_varVals[$k] = $v;
+            }
+        }
+    }
+
+    /**
+     * Substitute variables in handle $handle
+     *
+     * @param string $handle Name of handle
+     *
+     * @return mixed String substituted content of handle
+     * @access public
+     */
+    function subst($handle)
+    {
+        if ($this->isError($this->_loadFile($handle))) {
+            return $this->halt('subst: unable to load ' . $handle . '.');
+        }
+
+        return @str_replace($this->_varKeys,
+                            $this->_varVals, $this->getVar($handle));
+    }
+
+    /**
+     * Same as subst but printing the result
+     *
+     * @param string $handle Handle of template
+     *
+     * @return bool always false
+     * @access public
+     * @see subst
+     */
+    function pSubst($handle)
+    {
+        print $this->subst($handle);
+        return false;
+    }
+
+    /**
+     * Parse handle into target
+     *
+     * Parses handle $handle into $target, eventually
+     * appending handle at $target if $append is defined
+     * as TRUE.
+     *
+     * @param string  $target Target handle to parse into
+     * @param string  $handle Which handle should be parsed
+     * @param boolean $append Append it to $target or not?
+     *
+     * @return string parsed handle
+     * @access public
+     */
+    function parse($target, $handle, $append = false)
+    {
+        if (!is_array($handle)) {
+            $str = $this->subst($handle);
+
+            ($append) ? $this->setVar($target, $this->getVar($target) . $str)
+                      : $this->setVar($target, $str);
+        } else {
+            reset($handle);
+
+            while (list(, $h) = each($handle)) {
+                $str = $this->subst($h);
+                $this->setVar($target, $str);
+            }
+        }
+
+        return $str;
+    }
+
+    /**
+     * Same as parse, but printing it.
+     *
+     * @param string $target Target to parse into
+     * @param string $handle Handle which should be parsed
+     * @param should $append If $handle shall be appended to $target?
+     *
+     * @return bool
+     * @access public
+     * @see parse
+     */
+    function pParse($target, $handle, $append = false)
+    {
+        print $this->finish($this->parse($target, $handle, $append));
+        return false;
+    }
+
+    /**
+     * Return all defined variables and their values
+     *
+     * @return array with all defined variables and their values
+     * @access public
+     */
+    function getVars()
+    {
+        reset($this->_varKeys);
+
+        while (list($k, ) = each($this->_varKeys)) {
+            $result[$k] = $this->getVar($k);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Return one or more specific variable(s) with their values.
+     *
+     * @param mixed $varname Array with variable names
+     *                       or one variable name as a string
+     *
+     * @return mixed Array of variable names with their values
+     *               or value of one specific variable
+     * @access public
+     */
+    function getVar($varname)
+    {
+        if (!is_array($varname)) {
+            if (isset($this->_varVals[$varname])) {
+                return $this->_varVals[$varname];
+            } else {
+                return '';
+            }
+        } else {
+            reset($varname);
+
+            while (list($k, ) = each($varname)) {
+                $result[$k] = (isset($this->_varVals[$k]))
+                    ? $this->_varVals[$k] : '';
+            }
+
+            return $result;
+        }
+    }
+
+    /**
+     * Get undefined values of a handle
+     *
+     * @param string $handle Handle name
+     *
+     * @return mixed False if an error occured or the array of undefined values
+     * @access public
+     */
+    function getUndefined($handle)
+    {
+        if (!$this->_loadFile($handle)) {
+            return $this->halt('getUndefined: unable to load ' . $handle);
+        }
+
+        preg_match_all("/{([^ \t\r\n}]+)}/", $this->getVar($handle), $m);
+        $m = $m[1];
+        if (!is_array($m)) {
+            return false;
+        }
+
+        reset($m);
+        while (list(, $v) = each($m)) {
+            if (!isset($this->_varKeys[$v])) {
+                $result[$v] = $v;
+            }
+        }
+
+        if (isset($result) && count($result)) {
+            return $result;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Finish string
+     *
+     * @param string $str String to finish
+     *
+     * @return finished, i.e. substituted string
+     * @access public
+     */
+    function finish($str)
+    {
+        switch ($this->unknowns) {
+        case 'remove':
+            $str = preg_replace('/{[^ \t\r\n}]+}/', '', $str);
+            break;
+
+        case 'comment':
+            $str = preg_replace('/{([^ \t\r\n}]+)}/',
+                '<!-- Template variable \\1 undefined -->', $str);
+            break;
+        }
+
+        return $str;
+    }
+
+    /**
+     * Print variable to the browser
+     *
+     * @param string $varname Name of variable to print
+     *
+     * @return void
+     * @access public
+     */
+    function p($varname)
+    {
+        print $this->finish($this->getVar($varname));
+    }
+
+    /**
+     * Get finished variable
+     *
+     * @param string $varname Name of variable to get
+     *
+     * @return string string with finished variable
+     * @access public public
+     */
+    function get($varname)
+    {
+        return $this->finish($this->getVar($varname));
+    }
+
+    /**
+     * Complete filename
+     *
+     * Complete filename, i.e. testing it for slashes
+     *
+     * @param string $filename Filename to be completed
+     *
+     * @access private
+     * @return string completed filename
+     */
+    function _filename($filename)
+    {
+        if (!$this->_isAbsolute($filename)) {
+            $filename = $this->root . '/' . $filename;
+        }
+
+        if (file_exists($filename)) {
+            return $filename;
+        }
+
+        if (is_array($this->file_fallbacks) && count($this->file_fallbacks) > 0) {
+            reset($this->file_fallbacks);
+            while (list(,$v) = each($this->file_fallbacks)) {
+                if (file_exists($v.basename($filename))) {
+                    return $v.basename($filename);
+                }
+            }
+            return $this->halt(sprintf(
+                'filename: file %s does not exist in the fallback paths %s.',
+                $filename,
+                implode(',', $this->file_fallbacks)
+            ));
+        } else {
+            return $this->halt(
+                sprintf('filename: file %s does not exist.', $filename)
+            );
+        }
+    }
+
+
+    /**
+     * Tells you whether a filename is absolute or relative
+     *
+     * @param string $filename Filename to check
+     *
+     * @return boolean true if the filename is absolute
+     */
+    function _isAbsolute($filename)
+    {
+        if (substr($filename, 0, 1) == '/') {
+            //unix
+            return true;
+        } else if (substr($filename, 1, 2) == ':\\') {
+            //windows
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Protect a replacement variable
+     *
+     * @param string $varname name of replacement variable
+     *
+     * @return string replaced variable
+     * @access private
+     */
+    function _varname($varname)
+    {
+        return '{' . $varname . '}';
+    }
+
+    /**
+     * load file defined by handle if it is not loaded yet
+     *
+     * @param string $handle File handle
+     *
+     * @return bool False if error, true if all is ok
+     * @access private
+     */
+    function _loadFile($handle)
+    {
+        if (isset($this->_varKeys[$handle]) and !empty($this->_varVals[$handle])) {
+            return true;
+        }
+
+        if (!isset($this->file[$handle])) {
+            return $this->halt('loadfile: ' . $handle . ' is not a valid handle.');
+        }
+
+        $filename = $this->file[$handle];
+        if (function_exists('file_get_contents')) {
+            $str = file_get_contents($filename);
+        } else {
+            if (!$fp = @fopen($filename, 'r')) {
+                return $this->halt('loadfile: couldn\'t open ' . $filename);
+            }
+
+            $str = fread($fp, filesize($filename));
+            fclose($fp);
+        }
+
+        if ($str == '') {
+            return $this->halt(
+                'loadfile: While loading ' . $handle . ', '
+                . $filename . ' does not exist or is empty.'
+            );
+        }
+
+        $this->setVar($handle, $str);
+
+        return true;
+    }
+
+    /**
+     * Error function. Halt template system with message to show
+     *
+     * @param string $msg message to show
+     *
+     * @return bool
+     * @access public
+     */
+    function halt($msg)
+    {
+        $this->_lastError = $msg;
+
+        switch ($this->haltOnError) {
+            case 'yes':
+                return $this->haltMsg(
+                    $msg, PEAR_ERROR_TRIGGER, E_USER_ERROR
+                );
+
+            case 'report':
+                $this->haltMsg(
+                    $msg, PEAR_ERROR_PRINT
+                );
+                return false;
+
+            case 'return':
+                return $this->haltMsg(
+                    $msg, PEAR_ERROR_RETURN
+                );
+
+            case 'no':
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * printf error message to show
+     *
+     * @param string $msg message to show
+     *
+     * @return object PEAR error object
+     * @access public
+     */
+    function haltMsg($msg, $mode = null, $level = null)
+    {
+        require_once 'PEAR.php';
+        return PEAR::raiseError(
+            '<b>Template Error:</b> ' . $msg . '<br/>'. "\n",
+            null,
+            $mode, $level
+        );
+    }
+
+    /**
+     * Returns the last error message if any
+     *
+     * @return boolean|string Last error message if any, false if none.
+     */
+    function getLastError()
+    {
+        if ($this->_lastError == '') {
+            return false;
+        }
+        return $this->_lastError;
+    }
+
+
+
+    /**
+     * Checks if the given value is an error
+     *
+     * @param mixed $val Some value
+     */
+    function isError($val)
+    {
+        if ($val === false) {
+            return true;
+        } else if ($this->haltOnError == 'return' && is_object($val)) {
+            require_once 'PEAR.php';
+            return PEAR::isError($val);
+        }
+        return false;
+    }//function isError($val)
+
+	
+	/**
+	 * Deprecated Functions
+	 */
+	function set_file($handle, $filename = '') {
+		return $this->setFile($handle, $filename);
+	}
+	
+	function set_block($parent, $handle, $name = '') {
+		return $this->setBlock($parent, $handle, $name);
+	}
+	
+	function set_var($varname, $value = '', $append = false) {
+		return $this->setVar($varname, $value, $append);
+	}
+
+	function get_var($varname) {
+		return $this->getVar($varname);
+	}
+	
+
 }
+
+/**
+ * Backwards-compatibility for HTML_Template_PHPLIB.
+ * Used to have this name here.
+ *
+ * @category HTML
+ * @package  HTML_Template_PHPLIB
+ * @author   Christian Weiske <cweiske@php.net>
+ * @license  http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
+ * @link     http://pear.php.net/package/HTML_Template_PHPLIB
+ */
+class Template extends HTML_Template_PHPLIB
+{
+}
+
 ?>
