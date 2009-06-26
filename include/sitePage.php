@@ -20,8 +20,8 @@ class SitePage extends Page {
 	function loadContent($pageFile, $execute=TRUE) {
 		$this->pageName = $pageFile;
 	
-		/* sanitise data */
-		if( !preg_match("/^[a-zA-Z0-9\/\-\_]+/", $pageFile) ) {
+		/* sanitise data, force all 404s through pageNotFound() */
+		if( !preg_match("/^[a-zA-Z0-9\/\-\_]+/", $pageFile) || $pageFile == 'common/404') {
 			$this->pageNotFound();
 		}
 		
@@ -507,8 +507,11 @@ class SitePage extends Page {
 
 	function pageNotFound() {
 		header("HTTP/1.0 404 Not Found");
-		$this->setFile(TEMPLATE_body, 'common/404.html');
+		$this->setVar(TEMPLATE_content, '');
+		$this->setFile(TEMPLATE_content, 'common/404.html');
 		$this->setTitle('Page Not Found');
+		
+		$this->buildPage(FALSE);
 		$this->outputPage(TRUE);
 		exit;
 	}

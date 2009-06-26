@@ -1,5 +1,6 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
+var date1 = new Date;
 $j(document).ready(function() {
 
 	// define file context menu 
@@ -201,6 +202,11 @@ $j(document).ready(function() {
 	
 	$j("div.loading").hide();
 	$j("#category-window div.scroller").scrollTo($j("#node-{OPEN}"), 200);
+	
+	var date2 = new Date;
+	
+	if (window.location.href.indexOf('debug') != -1)
+		alert((date2.getTime() - date1.getTime()) / 1000);
 	
 });
 </script>
