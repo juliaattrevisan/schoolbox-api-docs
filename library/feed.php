@@ -161,7 +161,7 @@ class Feed {
 	
 	function getWiki($cid, $limit) {
 		$query = "SELECT w.wikiID, heading, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.lastname, u.title, u.id as uid
-					FROM revision r
+					FROM wikiRevision r
 						JOIN wiki w ON w.wikiID = r.wikiID
 						JOIN user u ON u.id = r.userID
 				  	WHERE w.deleted = 'false' AND w.categoryID = $cid 

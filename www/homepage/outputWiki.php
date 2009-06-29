@@ -10,16 +10,16 @@ $wikiList = $wikiHandler->getByCategory($categoryID);
 
 if (is_array($wikiList)) {
 	foreach ($wikiList as $wiki) {
-		$output = array('WIKI_ID'	=> $wiki['wikiID'],
-						'WIKI_HEADING'	=> scrubText($wiki['heading']),
-						'WIKI_AUTHOR'	=> formatName($wiki),
-						'WIKI_AUTHOR_ID'	=> $wiki['userID'],
-						'WIKI_MODIFIED'	=> getRelativeTime($wiki['modified']),
-						'ON_OFF' => ++$j%2? '' : 'dark',
+		$output = array('WIKI_ID'		 => $wiki['wikiID'],
+						'WIKI_HEADING'	 => scrubText($wiki['heading']),
+						'WIKI_AUTHOR'	 => formatName($wiki),
+						'WIKI_AUTHOR_ID' => $wiki['userID'],
+						'WIKI_MODIFIED'	 => getRelativeTime($wiki['modified']),
+						'ON_OFF' 		 => ++$j%2? '' : 'dark',
 						);
 		$this->setVar($output);
 		
-		if($permission >= READ_ACCESS)
+		if(($permission >= READ_ACCESS && $wiki['locked'] == 'false') || $permission >= FULL_ACCESS)
 			$this->parse('modify_wiki_block', 'modify_wiki');
 		else
 			$this->setVar('modify_wiki_block','');

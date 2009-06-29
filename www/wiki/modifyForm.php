@@ -9,20 +9,31 @@ $wikiHandler = new Wiki;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
 if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
+
 	
 	// check permission
-	if ($groupHandler->getPermission($_POST['categoryID']) < READ_ACCESS)
+	if (($permission = $groupHandler->getPermission($_POST['categoryID'])) < READ_ACCESS)
 		error(19);	
 
-	$wiki = array('categoryID'	=> $_POST['categoryID'],
+	$data = array('categoryID'	=> $_POST['categoryID'],
 				  );
 	if (is_numeric($_POST['wikiID'])) {
-		$wiki['wikiID'] = $_POST['wikiID'];
-		$wikiHandler->update($wiki);
-	} else
-		$wiki['wikiID'] = $wikiHandler->create($wiki);
 	
-	$current = $wikiHandler->getByID($wiki['wikiID']);
+		// wiki exists
+		$wiki = $wikiHandler->getByID($_POST['wikiID']);
+		if (!isset($wiki['wikiID']))
+			error(2);
+
+		// check locked
+		if ($wiki['locked'] == 'true' && $permission < FULL_ACCESS)
+			error(19);		
+	
+		$data['wikiID'] = $wiki['wikiID'];
+		$wikiHandler->update($data);
+	} else
+		$data['wikiID'] = $wikiHandler->create($data);
+	
+	$current = $wikiHandler->getByID($data['wikiID']);
 	$revision = array('wikiID'	=> $wiki['wikiID'],
 					  'heading'	=> $_POST['heading'],
 					  'body'	=> $_POST['body'],
@@ -38,7 +49,11 @@ elseif (is_numeric($_GET['revert']) && is_numeric($_GET['wikiID'])) {
 	$wiki = $wikiHandler->getByID($_GET['wikiID']);
 
 	// check permission
-	if ($groupHandler->getPermission($wiki['categoryID']) < WRITE_ACCESS)
+	if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < WRITE_ACCESS)
+		error(19);	
+
+	// check locked
+	if ($wiki['locked'] == 'true' && $permission < FULL_ACCESS)
 		error(19);	
 		
 	$wikiHandler->revert($wiki['wikiID'], $_GET['revert']);
@@ -49,13 +64,36 @@ elseif (is_numeric($_GET['delete'])) {
 	$wiki = $wikiHandler->getByID($_GET['delete']);
 
 	// check permission
-	if ($groupHandler->getPermission($wiki['categoryID']) < WRITE_ACCESS)
+	if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < WRITE_ACCESS)
+		error(19);	
+
+	// check locked
+	if ($wiki['locked'] == 'true' && $permission < FULL_ACCESS)
 		error(19);	
 		
 	$wikiHandler->delete($wiki['wikiID']);
 	
 	localRedir('/homepage/' . $wiki['categoryID']);
+
+}
+elseif (is_numeric($_GET['toggleLock'])) {
+
+	// wiki exists
+	$wiki = $wikiHandler->getByID($_GET['toggleLock']);
+	if (!isset($wiki['wikiID']))
+		error(2);
+
+	/* check permissions */
+	if ($groupHandler->getPermission($wiki['categoryID']) < FULL_ACCESS)
+		error(19);	
+
+	$data = array('wikiID'	=> $wiki['wikiID'],
+				  'locked'	=> $wiki['locked'] == 'true' ? 'false' : 'true',
+				  );
+	$wikiHandler->update($data);		
 	
+	$page->backToTheFuture(1);
+
 } else
 	error(2);
 

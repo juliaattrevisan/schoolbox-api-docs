@@ -16,8 +16,13 @@ if (is_numeric($this->arg[0])) {
 		error(101);
 	
 	// check permission
-	if ($groupHandler->getPermission($wiki['categoryID']) < READ_ACCESS)
+	if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS)
 		error(19);
+
+	// check locked
+	if ($wiki['locked'] == 'true' && $permission < FULL_ACCESS)
+		error(19);	
+		
 	
 	$output = array('ACTION'		=> 'Modify',
 					'WIKI_ID'		=> $wiki['wikiID'],

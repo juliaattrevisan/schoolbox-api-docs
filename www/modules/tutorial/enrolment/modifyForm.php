@@ -23,11 +23,6 @@ if (is_numeric($_POST['userID']) && is_numeric($_POST['eventID'])) {
 	if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($event['tutor1ID'], $event['tutor2ID'])))
 		error(19);
 		
-	// check event isn't too old
-	if ($event['date'] < strtotime("-1 month"))
-		error(19);
-
-
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 	$userHandler = new User;
 	$user = $userHandler->getByID($_POST['userID']);

@@ -10,8 +10,10 @@ $groupHandler = new Group(HOMEPAGE_SERVICE);
 if (is_numeric($this->arg[0])) {
 	
 	$this->setFile(TEMPLATE_content, 'wiki.html');
+	$this->setBlock(TEMPLATE_content, 'modify_link', 'modify_link_block');
 	$this->setBlock(TEMPLATE_content, 'delete_link', 'delete_link_block');
 	$this->setBlock(TEMPLATE_content, 'revert_link', 'revert_link_block');
+	$this->setBlock(TEMPLATE_content, 'lock_link', 'lock_link_block');
 	$this->setBlock(TEMPLATE_content, 'revision_list', 'revision_list_block');
 	
 	$wiki = $wikiHandler->getByID($this->arg[0], $this->arg[1]);
@@ -25,16 +27,18 @@ if (is_numeric($this->arg[0])) {
 		
 	$this->setTitle('Wiki');
 	$this->setTab('resources');
-
+	
 	// output wiki
-	$output = array('WIKI_ID'		=> $wiki['wikiID'],
-					'CATEGORY_ID'	=> $wiki['categoryID'],
-					'HEADING'		=> scrubText($wiki['heading']),
-					'BODY'			=> scrubHTML($wiki['body']),
-					'MODIFIED'		=> outputDate(DATE_long_format, $wiki['modified']),
-					'AUTHOR'		=> formatName($wiki),	
-					'AUTHOR_ID'		=> $wiki['authorID'],
+	$output = array('WIKI_ID'			=> $wiki['wikiID'],
+					'CATEGORY_ID'		=> $wiki['categoryID'],
+					'HEADING'			=> scrubText($wiki['heading']),
+					'BODY'				=> scrubHTML($wiki['body']),
+					'MODIFIED'			=> outputDate(DATE_long_format, $wiki['modified']),
+					'AUTHOR'			=> formatName($wiki),	
+					'AUTHOR_ID'			=> $wiki['authorID'],
 					'CURRENT_REVISION'	=> $wiki['revisionID'],
+					'LOCKED'			=> $wiki['locked'] == 'true' ? '(Locked)' : '',
+					'LOCK_UNLOCK'		=> $wiki['locked'] == 'true' ? 'Unlock' : 'Lock',
 					);
 	$this->setVar($output);
 
@@ -62,12 +66,20 @@ if (is_numeric($this->arg[0])) {
 
 	// output links
 	$this->setVar('revert_link_block', '');
-	if ($permission > READ_ACCESS && $wiki['revisionID'] != $finalRevision)
+	if (($wiki['revisionID'] != $finalRevision && ($permission >= WRITE_ACCESS && $wiki['locked'] == 'false')) || $permission >= FULL_ACCESS)
 		$this->parse('revert_link_block', 'revert_link');
 
 	$this->setVar('delete_link_block', '');
-	if ($permission > READ_ACCESS)
+	if (($permission >= WRITE_ACCESS && $wiki['locked'] == 'false') || $permission >= FULL_ACCESS)
 		$this->parse('delete_link_block', 'delete_link');
+		
+	$this->setVar('lock_link_block', '');
+	if ($permission >= FULL_ACCESS)
+		$this->parse('lock_link_block', 'lock_link');	
+
+	$this->setVar('modify_link_block', '');
+	if (($permission >= READ_ACCESS && $wiki['locked'] == 'false') || $permission >= FULL_ACCESS)
+		$this->parse('modify_link_block', 'modify_link');	
 
 } else
 	error(2);

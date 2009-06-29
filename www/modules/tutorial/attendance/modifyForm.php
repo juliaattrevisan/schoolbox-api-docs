@@ -25,10 +25,6 @@ if (is_array($_POST['reason']) && is_numeric($_POST['eventID'])) {
 	if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($event['tutor1ID'], $event['tutor2ID'])))
 		error(19);
 
-	// check event isn't too old
-	if ($event['date'] < strtotime("-1 month"))
-		error(19);
-	
 	
 	$attendanceHandler->deleteByEvent($_POST['eventID']);
 	

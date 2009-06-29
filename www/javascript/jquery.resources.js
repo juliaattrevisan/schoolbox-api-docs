@@ -14,13 +14,13 @@
 		addSelect(topRow);
 		addOpen(topRow);
 		jQuery(document.createElement("div")).attr("id", "simpleModal").appendTo(document.body);
+		
 		return this.each(function() {
-			$(this).addClass("treeTable").find("tbody tr").each(function() {
-				// Initialize root nodes only whenever possible
-				if(!options.expandable || $(this)[0].className.search("child-of-") == -1) {
-					initialize($(this));
-				}
-			});
+			// Initialize root nodes only whenever possible
+			if(!options.expandable || $(this)[0].className.search("child-of-") == -1) {
+				initialize($(this));
+			}					  
+			
 		});
 	};
   
@@ -64,7 +64,7 @@
 		}
 		
 		childrenOf($(this)).each(function() {
-			initialize($(this));
+			//initialize($(this));
 			
 			if($(this).is(".expanded.parent")) {
 				$(this).expand();
@@ -153,6 +153,7 @@
 	};
 	
 	$.fn.addExpander = function () {
+		console.log($(this));
 		$(this).prepend('<span style="margin-left: -' + 19 + 'px; padding-left: ' + 19 + 'px" class="expander"></span>');
 		$($(this)[0].firstChild).click(function() { $($(this).parents("tr")[0]).toggleBranch(); });		
 	};
@@ -226,9 +227,10 @@
 				});
 				
 				childrenOf(_node).each(function() {
-					initialize($(this));
+					//initialize($(this));
 				});					
 				
+				$(window).triggerHandler('folderLoad');
 				_node.find(".folder").removeClass("loading");
 			},
 			error: function () {  _node.find(".folder").addClass("error"); }
@@ -305,8 +307,10 @@
 						.append(item.modified)
 						.appendTo(myRow);
 						
-						initialize(myRow); 
+						//initialize(myRow); 
 					});
+					
+					$(window).triggerHandler('folderLoad');
 					_node.find(".folder").removeClass("loading");
 				},
 				error: function (XMLHttpRequest, textStatus, errorThrown) { 
@@ -347,68 +351,173 @@
 	};
 
 	function initialize(node) {
+	
+		$(node).addClass("treeTable");
 		
-		if(!node.hasClass("initialized")) {
-			node.addClass("initialized");
+		$(node).find("tbody tr").each(function() {
 			
-			var childNodes = childrenOf(node);
-			
-			if(!node.hasClass("parent") && childNodes.length > 0) {
-				node.addClass("parent");
-			}
-			
-			var span = node.find(".folder, .file");
-			
-			// add extras
-			if (span.hasClass(".folder")) {
-				options.addContext(span);
-				if (node.hasClass('write') || node.hasClass('full')) {
-					addDrag(span);
-					addDrop(span);
+			var row = $(this);
+		
+			if(!row.hasClass("initialized")) {
+				row.addClass("initialized");
+				
+				var childrows = childrenOf(row);
+				
+				if(!row.hasClass("parent") && childrows.length > 0) {
+					row.addClass("parent");
 				}
-				addSelect(node);
-				addOpen(node);
-			}
-			else if (span.hasClass(".file")) {
-				// store category id
-				node.data("category", getCategory(node));
-				options.addContext(span);
-				if (span.hasClass('write') || span.hasClass('full'))
-					addDrag(span);
-				addSelect(node);
-			}
+				
+				if (row.hasClass('parent'))
+					addExpander(row);
+				
+				var span = row.find(".folder, .file");
+				
+				// add extras
+				if (span.hasClass(".folder")) {
+					options.addContext(span);
+					//if (row.hasClass('write') || row.hasClass('full')) {
+						//addDrag(span);
+						//addDrop(span);
+					//}
+					//addSelect(row);
+					//addOpen(row);
+				}
+				else if (span.hasClass(".file")) {
+					// store category id
+					row.data("category", getCategory(row));
+					options.addContext(span);
+					//if (span.hasClass('write') || span.hasClass('full'))
+						//addDrag(span);
+					//addSelect(row);
+				}
+				
+				/* set indent */
+				var parentFirstCell = getParent(row).children("td:first");
+				var padding = parseInt(parentFirstCell.css("padding-left")) + options.indent;
+				//console.log(padding);
+				row.children("td:first").css("padding-left", padding + "px");
+				
+				row.dblclick(function() { row.toggleBranch(); });
+				row.children("span").dblclick(function() { row.trigger("dblclick"); });	 		
+				
+				
+				// Check for a class set explicitly by the user, otherwise set the default class
+				if(!(row.hasClass("expanded") || row.hasClass("collapsed"))) {
+					row.addClass(options.initialState);
+				}
+				
+				if(row.hasClass("collapsed")) {
+					row.collapse();
+				} else if (row.hasClass("expanded")) {
+					row.expand();
+				}
 			
-			if(node.hasClass("parent")) {
 				
-				var cell = $(node.children("td")[options.treeColumn]);
-				var padding = parseInt(cell.css("padding-left"), 10) + options.indent;
-				
-				childNodes.each(function() {
-					$($(this).children("td")[options.treeColumn]).css("padding-left", padding + "px");
-				});
-				
-				if(options.expandable) {
-					cell.addExpander();
-					//cell.prepend('<span style="margin-left: -' + 19 + 'px; padding-left: ' + 19 + 'px" class="expander"></span>');
-					//$(cell[0].firstChild).click(function() { node.toggleBranch(); });
-					
-					node.dblclick(function() { node.toggleBranch(); });
-					node.children("span").dblclick(function() { node.trigger("dblclick"); });	 		
-					
-					
-					// Check for a class set explicitly by the user, otherwise set the default class
-					if(!(node.hasClass("expanded") || node.hasClass("collapsed"))) {
-						node.addClass(options.initialState);
+			}
+		
+		});
+		
+		
+		$(window).bind('folderLoad', function () {
+			
+			console.log('load');
+			
+			$('span.full, span.write').draggable({
+				cursor: 'move',
+				helper: "clone",
+				opacity: .75,
+				revert: "invalid",
+				revertDuration: 300,
+				scroll: true	  
+			});
+			
+			$('tr:has(span.folder.write, span.folder.full)').droppable({
+				accept: ".file, .folder",
+				hoverClass: "accept",
+				over: function(e, ui) {
+					/* auto expand target folder */
+					if(this.id != ui.draggable.parents("tr")[0].id && !$(this).is(".expanded")) {
+						var _row = $(this);
+						$(this).delay(1000, function() {				
+							if (_row.hasClass("accept"))
+								_row.expand();					 
+						}); 
 					}
+				},
+				out: function() {
+					$(this).clearDelay();
+				},
+				drop: function(e, ui) { 
+					var targetID = $(this).attr("id").substring(5);
+					var node = $($(ui.draggable).parents("tr")[0]);
 					
-					if(node.hasClass("collapsed")) {
-						node.collapse();
-					} else if (node.hasClass("expanded")) {
-						node.expand();
+					if ($(ui.draggable).hasClass("file")) {
+						/* files */
+						// ajax move request
+						$(ui.draggable).move(targetID);
+						
+						if ($(this).hasClass("opened") && targetID != node.data("category")) {
+							// move node if target is already loaded
+							node.removeClass("category-"+node.data("category"));
+							node.addClass("category-"+targetID);
+							node.hide();
+							node.removeClass("selected");
+							node.data("category", targetID);
+						} else if (targetID != node.data("category"))
+							// destroy node, target not loaded
+							node.delay(100, function () { node.remove(); });
+					
+					} else {
+						/* folders */
+						
+						// move node and expand target
+						node.appendBranchTo(this);
+						$(this).expand();
+					
+						// ajax move request
+						if (node.hasClass("child-of-node-"+targetID) && node.attr("id").substring(5) != targetID)
+							$(ui.draggable).move(targetID);
 					}
 				}
-			}
-		}
+			});
+		
+		});	
+		
+		$(document).load(function () {
+			$(window).triggerHandler('folderLoad');						  
+		});
+		
+		
+		/* allow rows to be selected */
+		$('table.treeTable tbody tr').live('click', function() {
+			$(this).select();
+		});
+		
+		$('table.treeTable tbody tr span').live('click', function() {
+			$(this).closest('tr').trigger("click");
+		});	 
+		
+		$('table.treeTable tbody tr').live('contextmenu', function () {
+			$(this).select();
+		});
+		
+		$('table.treeTable tbody tr span').live('contextmenu', function () {
+			$(this).closest('tr').select();
+		});			
+
+
+		/* allow folders to be opened */
+		$('table.treeTable tbody tr:has(span.folder)').live('click', function() {
+			console.log($(this));
+			$(this).loadFiles();
+		});
+		$('table.treeTable tbody tr:has(span.folder) span').live('click', function() {
+			$(this).closest("tr").trigger("click");
+		});	 		
+		
+	
+			
+		
 	};
   
 	function move(node, destination) {
@@ -500,6 +609,11 @@
 			});
 		});	  
 	};
+	
+	function getParent(node) {
+		var matches = node.attr('className').match(/node-[\d]+/);
+		return $('#' + $.makeArray(matches)[0]);
+	}
 
 	function addSelect (node) {
 		$(node).each(function () {
@@ -528,6 +642,11 @@
 				$($(this).parents("tr")[0]).trigger("click");
 			});	 		
 		});
+	};
+
+	function addExpander (node) {
+		node.children('td:first').prepend('<span style="margin-left: -' + 19 + 'px; padding-left: ' + 19 + 'px" class="expander"></span>');
+		node.find('span.expander').click(function() { $(this).closest("tr").toggleBranch(); });		
 	};
   
 })(jQuery);
