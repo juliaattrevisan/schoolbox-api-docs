@@ -66,19 +66,19 @@ if (is_numeric($this->arg[0])) {
 
 	// output links
 	$this->setVar('revert_link_block', '');
-	if (($wiki['revisionID'] != $finalRevision && ($permission >= WRITE_ACCESS && $wiki['locked'] == 'false')) || $permission >= FULL_ACCESS)
+	if ($wiki['revisionID'] != $finalRevision && $permission >= WRITE_ACCESS)
 		$this->parse('revert_link_block', 'revert_link');
 
 	$this->setVar('delete_link_block', '');
-	if (($permission >= WRITE_ACCESS && $wiki['locked'] == 'false') || $permission >= FULL_ACCESS)
+	if ($permission >= WRITE_ACCESS)
 		$this->parse('delete_link_block', 'delete_link');
 		
 	$this->setVar('lock_link_block', '');
-	if ($permission >= FULL_ACCESS)
+	if ($permission >= WRITE_ACCESS)
 		$this->parse('lock_link_block', 'lock_link');	
 
 	$this->setVar('modify_link_block', '');
-	if (($permission >= READ_ACCESS && $wiki['locked'] == 'false') || $permission >= FULL_ACCESS)
+	if (($permission >= READ_ACCESS && $wiki['locked'] == 'false') || $permission >= WRITE_ACCESS)
 		$this->parse('modify_link_block', 'modify_link');	
 
 } else

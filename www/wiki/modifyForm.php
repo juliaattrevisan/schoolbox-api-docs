@@ -25,7 +25,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 			error(2);
 
 		// check locked
-		if ($wiki['locked'] == 'true' && $permission < FULL_ACCESS)
+		if ($wiki['locked'] == 'true' && $permission < WRITE_ACCESS)
 			error(19);		
 	
 		$data['wikiID'] = $wiki['wikiID'];
@@ -51,10 +51,6 @@ elseif (is_numeric($_GET['revert']) && is_numeric($_GET['wikiID'])) {
 	// check permission
 	if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < WRITE_ACCESS)
 		error(19);	
-
-	// check locked
-	if ($wiki['locked'] == 'true' && $permission < FULL_ACCESS)
-		error(19);	
 		
 	$wikiHandler->revert($wiki['wikiID'], $_GET['revert']);
 	
@@ -65,10 +61,6 @@ elseif (is_numeric($_GET['delete'])) {
 
 	// check permission
 	if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < WRITE_ACCESS)
-		error(19);	
-
-	// check locked
-	if ($wiki['locked'] == 'true' && $permission < FULL_ACCESS)
 		error(19);	
 		
 	$wikiHandler->delete($wiki['wikiID']);
@@ -84,7 +76,7 @@ elseif (is_numeric($_GET['toggleLock'])) {
 		error(2);
 
 	/* check permissions */
-	if ($groupHandler->getPermission($wiki['categoryID']) < FULL_ACCESS)
+	if ($groupHandler->getPermission($wiki['categoryID']) < WRITE_ACCESS)
 		error(19);	
 
 	$data = array('wikiID'	=> $wiki['wikiID'],

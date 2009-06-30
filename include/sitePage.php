@@ -91,6 +91,11 @@ class SitePage extends Page {
 								'SITE_LOCATION'	=> $this->site,
 							);
 		$this->setVar($templateVar);
+		
+		$title = $this->getVar('TITLE');
+		if (empty($title))
+			$this->setTitle();
+		
 		$this->template->pparse('finaloutput', TEMPLATE_body);
 	}
 	
@@ -463,8 +468,8 @@ class SitePage extends Page {
 
 	}
 	
-	function setTitle($title) {
-		$this->setVar('TITLE', HEADING.' - '.scrubTEXT($title));
+	function setTitle($title = '') {
+		$this->setVar('TITLE', HEADING . (!empty($title) ? ' - '.scrubTEXT($title) : ''));
 	}
 	
 	function getTemplate($template) {

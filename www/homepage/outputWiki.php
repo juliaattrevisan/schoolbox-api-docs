@@ -19,10 +19,10 @@ if (is_array($wikiList)) {
 						);
 		$this->setVar($output);
 		
-		if(($permission >= READ_ACCESS && $wiki['locked'] == 'false') || $permission >= FULL_ACCESS)
+		$this->setVar('modify_wiki_block','');
+		if (($permission >= READ_ACCESS && $wiki['locked'] == 'false') || $permission >= WRITE_ACCESS)
 			$this->parse('modify_wiki_block', 'modify_wiki');
-		else
-			$this->setVar('modify_wiki_block','');
+			
 		
 		$this->parse('wiki_row_block', 'wiki_row', true);
 	}

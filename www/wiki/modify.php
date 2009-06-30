@@ -20,7 +20,7 @@ if (is_numeric($this->arg[0])) {
 		error(19);
 
 	// check locked
-	if ($wiki['locked'] == 'true' && $permission < FULL_ACCESS)
+	if ($wiki['locked'] == 'true' && $permission < WRITE_ACCESS)
 		error(19);	
 		
 	
