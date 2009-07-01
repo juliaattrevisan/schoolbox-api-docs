@@ -36,7 +36,7 @@ while($component = $this->db->getNextArray($result))
 	{
 		if($component['filename'])
 			$this->setFile($component['name'], 'home/'.$component['filename']);
-		
+
 		$funcname = $component['function'];
 		if(is_file($_SERVER['DOCUMENT_ROOT'].'/home/'.$funcname.'.php')) {
 			include($_SERVER['DOCUMENT_ROOT'].'/home/'.$funcname.'.php');
@@ -46,6 +46,6 @@ while($component = $this->db->getNextArray($result))
 	}
 	else 
 		$this->setVar('POS'.$component['position'], '');
-}	
+}
 
 ?>

@@ -8,12 +8,14 @@ class SitePage extends Page {
 
 	function SitePage($login=TRUE) {
 		parent::Page();
-		$this->setSite();
+		
 		$this->db = new dbManager;
 		$this->setTab('main');
 		
 		if($login)
 			$this->initSession();
+
+		$this->setSite();
 	}
 	
 	
@@ -73,10 +75,13 @@ class SitePage extends Page {
 
 				return true;
 			}
+			else {
+				$this->site = SITE_location;
+			}
 		}
 
 		$this->site = SITE_location;
-
+	
 	}
 	
 	function outputPage($lite=FALSE) {
@@ -490,6 +495,7 @@ class SitePage extends Page {
 	}
 	
 	function goLoginPage($error = '', $page = ''){
+		$this->setSite();
 		$this->setFile(TEMPLATE_body, 'common/login.html');
 		$this->setVar('TITLE', HEADING." - Login");
 		
