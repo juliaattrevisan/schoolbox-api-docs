@@ -98,17 +98,9 @@ function displayWeek(&$page, $sid)
 				{
 					if ($_SESSION['campus'][0] == 3 && SITE_location == 'mgs')
 					{
-						//at mgs grimwade if period contains en its a homeroom class
-						$post = strpos($period['code'], "EN");
-						if ($post == 2)
-							$outputPeriod['PERIOD_DESC'] = 'Homeroom';
-						else
-						{
-							$outputPeriod = array(	'PERIOD_DESC' 	=> $period['description'],
-													'PERIOD_ROOM'	=> $period['room'],
-												);
-						}
-						
+						$outputPeriod = array(	'PERIOD_DESC' 	=> $period['description'],
+												'PERIOD_ROOM'	=> $period['room'],
+											);
 					}
 					else 
 					{

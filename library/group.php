@@ -317,7 +317,7 @@ class Group extends Model {
 		if(is_array($subjects)) {
 			foreach($subjects as $subject) {
 				//convert code to id and get name
-				$query = "SELECT name, id, code FROM category WHERE code = '".$subject['code']."'";
+				$query = "SELECT name, id, cc.code FROM category JOIN categoryCode cc ON id = categoryID WHERE cc.code = '".$subject['code']."'";
 				$catList[] = $this->db->getRow($query);
 			}
 		}

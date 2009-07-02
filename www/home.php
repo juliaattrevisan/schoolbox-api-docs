@@ -43,9 +43,18 @@ while($component = $this->db->getNextArray($result))
 		}
 		else 
 			$this->setVar('POS'.$component['position'], '');
+
+		if($component['name'] == 'Timetable')
+			$timetable = true;
 	}
 	else 
 		$this->setVar('POS'.$component['position'], '');
+}
+
+//FIXME: Timetable is hardcoded in, we have to get rid of it if we dont include it in the config
+if($timetable != true) {
+	$this->setBlock(TEMPLATE_content, "timetable", "timetable_block");
+	$this->setVar('timetable_block', '');
 }
 
 ?>

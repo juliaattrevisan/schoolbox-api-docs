@@ -7,7 +7,7 @@ $this->setBlock("timetable", "timetable_period", "timetable_period_block");
 $this->setBlock("timetable", "timetable_header", "timetable_header_block");
 
 //if user has timetable show it on the homepage
-if($_SESSION['timetable'] && SYNERGY_enable) {
+if($_SESSION['timetable'] && SYNERGY_enable ) {
 	$timetableHandler = new SynergeticTimetable;
 	//get current day and period
 	$daynumber = $timetableHandler->getDayNumber($_SESSION['campus'][0]);

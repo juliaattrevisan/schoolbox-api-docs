@@ -9,14 +9,15 @@ $rss->cache_dir = RSS_cache_dir;
 $rss->cache_time = RSS_cache_time; // one hour
 $rss->stripHTML = true;
 $rss->items_count = 10;
+$rss->CDATA = 'strip';
+
 $headlineList = $rss->get($config['url']);
-	
 $this->setVar('RSS_NAME', !empty($headlineList['title']) ? scrubTEXT($headlineList['title']) : 'Please enter a feed URL');
 $this->setVar('RSS_LINK', $headlineList['link']);
 
 //output headlines
 if(is_array($headlineList['items']) ) {
-	for($i = 0; $headlineList['items'][$i]['title'] && $i < $config['size']; $i++ ) {	
+	for($i = 0; $headlineList['items'][$i]['title'] && $i < $config['size']; $i++ ) {
 		$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 		$this->setVar("RSS_TITLE", scrubTEXT($headlineList['items'][$i]['title']));
 		$this->setVar("RSS_URL", scrubHTML($headlineList['items'][$i]['link'])); 
@@ -28,8 +29,6 @@ if(is_array($headlineList['items']) ) {
 		}
 		else
 			$this->setVar('rss_date_block', '');
-		
-		
 		
 		$this->parse("rss_block", "rss_stories", true);
 	}

@@ -19,10 +19,10 @@ if (is_array($submissionList)) {
 						'NOTE_CATEGORY'		=> 'WORK DUE ' . $submission['category'] . (isset($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ',
 						'NOTE_DESCRIPTION'	=> $submission['description'],
 						'NOTE_COLOUR'		=> $calendarHandler->displayColour(1),
+						'ON_OFF'			=>  ++$j%2? '' : 'dark',
 						);
 			
 		$this->setVar($output); 
-		
 		$this->parse("note_listing","note_block", true);
 		$subout = 1;
 	}
@@ -49,10 +49,10 @@ else
 		$output = array('NOTE_CATEGORY'		=> '',
 						'NOTE_DESCRIPTION'	=> $event['note'],
 						'NOTE_COLOUR'		=> $calendarHandler->displayColour($event['type']),
+						'ON_OFF'			=>  ++$j%2? '' : 'dark',
 						);
 		
 		$this->setVar($output);
-		$this->setVar('ON_OFF', ++$j%2? '' : 'dark'); 
 		$this->parse("note_listing","note_block", true);
 
 	}
