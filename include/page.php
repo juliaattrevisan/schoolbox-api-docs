@@ -47,7 +47,11 @@ class Page {
 	function setVar($var, $value='') {
 		$this->template->setVar($var, $value);
 	}
-
+	
+	function setUnknowns($unknowns) {
+		$this->template->setUnknowns($unknowns);
+	}
+	
 	function setBlock($parent, $handle, $name) {
 		$this->template->setBlock($parent, $handle, $name);
 	}
