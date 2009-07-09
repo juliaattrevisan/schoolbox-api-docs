@@ -1,0 +1,128 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/mootools/mootools-1.2.3-core-nc.js"></script>
+<script type="text/javascript">
+window.addEvent('domready', function() {
+	// globals
+	var test_id = {TEST_ID};
+	var attempt_id = {ATTEMPT_ID};
+	
+	// change & submit question
+	var request = new Request.HTML({url: "/test/question",
+		onSuccess: function(question) {
+			// replace question
+			$('question').empty().adopt(question);
+		}
+	});
+
+	// retrieve list of questions
+	new Request.JSON({url: "/test/question", onSuccess: function(questions){
+		this.questions = questions;
+		this.current = 0;
+		
+		// populate question list
+		questions.each(function(question, i) {
+	    	a = new Element('a', {text: question['question']}).addEvent('click', function() {
+	    		this.current = i;
+	    		$('question').adopt(new Element('input', {name: 'action', type: 'hidden', value: 'response'}));
+	    		$('question').adopt(new Element('input', {name: 'next', type: 'hidden', value: this.questions[this.current]['id']}));
+	    		
+	    		request.post($('question'));
+	    	}.bind(this));
+	    	
+	    	if(questions[this.current]['id'] == question['id'])
+	    		class = 'current';
+	    	else
+	    		class = false;
+	    	
+	    	$('list').adopt(new Element('li', {'class': class}).adopt(a));
+	    }, this);
+	    
+	    // get first question
+	    request.post({
+	    	'action': 'response',
+	    	'attempt_id': attempt_id,
+	    	'question_id': questions[this.current]['id'],
+	    	'response': '',
+	    	'next': questions[this.current]['id']
+	    });
+	}.bind(this)}).post({'action': 'question', 'test_id': test_id});
+	
+	// controls (NEEDS OPTIMIZING)
+	$$('#controls-right input').addEvent('click', function() {
+		this.current++;
+		$('question').adopt(new Element('input', {name: 'action', type: 'hidden', value: 'response'}));
+		$('question').adopt(new Element('input', {name: 'next', type: 'hidden', value: this.questions[this.current]['id']}));
+
+		if(this.current + 1 == this.questions.length)
+			$$('#controls-right input').set('value', 'Finish Test');
+		else
+			$$('#controls-right input').set('value', 'Next');
+			
+		if(this.current == 0)
+			$$('#controls-left input').set('disabled', 'disabled');
+		else
+			$$('#controls-left input').set('disabled');
+		
+		request.post($('question'));
+	}.bind(this));
+	
+	$$('#controls-left input').addEvent('click', function() {
+		this.current--;
+		$('question').adopt(new Element('input', {name: 'action', type: 'hidden', value: 'response'}));
+		$('question').adopt(new Element('input', {name: 'next', type: 'hidden', value: this.questions[this.current]['id']}));
+
+		if(this.current + 1 == this.questions.length)
+			$$('#controls-right input').set('value', 'Finish Test');
+		else
+			$$('#controls-right input').set('value', 'Next');
+			
+		if(this.current == 0)
+			$$('#controls-left input').set('disabled', 'disabled');
+		else
+			$$('#controls-left input').set('disabled');
+		
+		request.post($('question'));
+	}.bind(this));
+});
+</script>
+<style type="text/css">
+	#list {
+		display: block;
+		float: left;
+		width: 25%;
+	}
+	
+	#list li {
+		margin: 0 0 10px 0;
+	}
+	
+	#list li.current {
+		font-weight: bold;
+	}
+	
+	#question {
+		width: 70%;
+		float: right;
+		margin: 0 0 30px 0;
+	}
+	
+	#controls-left {
+		float: right;
+		width: 35%;
+	}
+	
+	#controls-right {
+		float: right;
+		width: 35%;
+		text-align: right;
+	}
+</style>
+<!-- END custom_head -->
+
+<h1>{TEST_TITLE}</h1>
+<ul id="list">
+	<li><h2>Questions</h2></li>
+</ul>
+<form id="question"></form>
+<div id="controls-right"><input type="button" value="Next"/></div>
+<div id="controls-left"><input type="button" value="Previous" disabled="disabled"/></div>
