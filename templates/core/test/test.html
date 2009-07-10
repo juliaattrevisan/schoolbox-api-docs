@@ -1,91 +1,86 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/mootools/mootools-1.2.3-core-nc.js"></script>
+<script type="text/javascript" src="/javascript/mootools/carousel.js"></script>
+<script type="text/javascript" src="/javascript/mootools/countdown.js"></script>
 <script type="text/javascript">
 window.addEvent('domready', function() {
-	// globals
-	var test_id = {TEST_ID};
-	var attempt_id = {ATTEMPT_ID};
+	// setup classes
+	var carousel  = new Carousel('questions');
+	var countdown = new CountDown({h: {DURATION_HOURS}, m: {DURATION_MINUTES},
+		onTick: function() {
+			$$('#duration h1').set('text', this.text);
+		},
+		onDone: function() {
+			$('carousel').submit();
+		}
+	});
 	
-	// change & submit question
-	var request = new Request.HTML({url: "/test/question",
-		onSuccess: function(question) {
-			// replace question
-			$('question').empty().adopt(question);
+	// setup list
+	$$('#list li a').each(function(el, i) {
+		el.addEvent('click', function() {
+			carousel.move(i + 1);
+			
+			if(carousel.first)
+				$$('#controls-left input').set('disabled', 'disabled');
+			else
+				$$('#controls-left input').set('disabled');
+				
+			if(carousel.last) {
+				$$('#controls-right input').set('value', 'Finish Test');
+			} else {
+				$$('#controls-right input').set('value', 'Next');
+			}
+		});
+	});
+	
+	
+	// controls
+	$$('#controls-left input').addEvent('click', function(event) {
+		carousel.prev();
+		
+		if(carousel.first)
+			$$('#controls-left input').set('disabled', 'disabled');
+		else
+			$$('#controls-left input').set('disabled');
+			
+		if(carousel.last) {
+			$$('#controls-right input').set('value', 'Finish Test');
+		} else {
+			$$('#controls-right input').set('value', 'Next');
 		}
 	});
 
-	// retrieve list of questions
-	new Request.JSON({url: "/test/question", onSuccess: function(questions){
-		this.questions = questions;
-		this.current = 0;
-		
-		// populate question list
-		questions.each(function(question, i) {
-	    	a = new Element('a', {text: question['question']}).addEvent('click', function() {
-	    		this.current = i;
-	    		$('question').adopt(new Element('input', {name: 'action', type: 'hidden', value: 'response'}));
-	    		$('question').adopt(new Element('input', {name: 'next', type: 'hidden', value: this.questions[this.current]['id']}));
-	    		
-	    		request.post($('question'));
-	    	}.bind(this));
-	    	
-	    	if(questions[this.current]['id'] == question['id'])
-	    		class = 'current';
-	    	else
-	    		class = false;
-	    	
-	    	$('list').adopt(new Element('li', {'class': class}).adopt(a));
-	    }, this);
-	    
-	    // get first question
-	    request.post({
-	    	'action': 'response',
-	    	'attempt_id': attempt_id,
-	    	'question_id': questions[this.current]['id'],
-	    	'response': '',
-	    	'next': questions[this.current]['id']
-	    });
-	}.bind(this)}).post({'action': 'question', 'test_id': test_id});
-	
-	// controls (NEEDS OPTIMIZING)
 	$$('#controls-right input').addEvent('click', function() {
-		this.current++;
-		$('question').adopt(new Element('input', {name: 'action', type: 'hidden', value: 'response'}));
-		$('question').adopt(new Element('input', {name: 'next', type: 'hidden', value: this.questions[this.current]['id']}));
-
-		if(this.current + 1 == this.questions.length)
-			$$('#controls-right input').set('value', 'Finish Test');
-		else
-			$$('#controls-right input').set('value', 'Next');
-			
-		if(this.current == 0)
+		if(carousel.last)
+			$('carousel').submit();
+		
+		carousel.next();
+		
+		if(carousel.first)
 			$$('#controls-left input').set('disabled', 'disabled');
 		else
 			$$('#controls-left input').set('disabled');
-		
-		request.post($('question'));
-	}.bind(this));
-	
-	$$('#controls-left input').addEvent('click', function() {
-		this.current--;
-		$('question').adopt(new Element('input', {name: 'action', type: 'hidden', value: 'response'}));
-		$('question').adopt(new Element('input', {name: 'next', type: 'hidden', value: this.questions[this.current]['id']}));
-
-		if(this.current + 1 == this.questions.length)
-			$$('#controls-right input').set('value', 'Finish Test');
-		else
-			$$('#controls-right input').set('value', 'Next');
 			
-		if(this.current == 0)
-			$$('#controls-left input').set('disabled', 'disabled');
-		else
-			$$('#controls-left input').set('disabled');
-		
-		request.post($('question'));
-	}.bind(this));
+		if(carousel.last) {
+			$$('#controls-right input').set('value', 'Finish Test');
+		} else {
+			$$('#controls-right input').set('value', 'Next');
+		}
+	});
 });
 </script>
 <style type="text/css">
+	#title {
+		float: left;
+		width: 50%;
+	}
+	
+	#duration {
+		float: right;
+		width: 50%;
+		text-align: right;
+	}
+
 	#list {
 		display: block;
 		float: left;
@@ -96,14 +91,24 @@ window.addEvent('domready', function() {
 		margin: 0 0 10px 0;
 	}
 	
-	#list li.current {
-		font-weight: bold;
-	}
-	
-	#question {
+	#carousel {
+		display: block;
+		overflow: hidden;
 		width: 70%;
 		float: right;
 		margin: 0 0 30px 0;
+	}
+	
+	#questions {
+		margin: 0%;
+		padding: 0%;
+	}
+	
+	#questions li {
+		margin: 0%;
+		padding: 0%;
+		float: left;
+		display: inline;
 	}
 	
 	#controls-left {
@@ -119,10 +124,23 @@ window.addEvent('domready', function() {
 </style>
 <!-- END custom_head -->
 
-<h1>{TEST_TITLE}</h1>
+<div id="title"><h1>{TEST_TITLE}</h1></div>
+<div id="duration"><h1></h1></div>
+
 <ul id="list">
 	<li><h2>Questions</h2></li>
+	<!-- BEGIN list -->
+	<li><a>{QUESTION_QUESTION}</a></li>
+	<!-- END list -->
 </ul>
-<form id="question"></form>
+
+<form id="carousel" method="post">
+	<ul id="questions">
+		{QUESTION}
+	</ul>
+	<input type="hidden" name="action" value="finish"/>
+	<input type="hidden" name="attempt_id" value="{ATTEMPT_ID}"/>
+</form>
+
 <div id="controls-right"><input type="button" value="Next"/></div>
 <div id="controls-left"><input type="button" value="Previous" disabled="disabled"/></div>

@@ -23,9 +23,8 @@ class TestResponse extends Model {
 			$data['response'] = serialize($data['response']);
 			
 		$this->data = array_merge($this->data, $data);
-		$this->data['id'] = parent::create($this->data);
 
-		return $this->data['id'];
+		return parent::create($this->data);
 	}
 	
 	// modify questions

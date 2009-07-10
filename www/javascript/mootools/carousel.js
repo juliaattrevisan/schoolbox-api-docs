@@ -4,7 +4,7 @@ Carousel = new Class({
         
         // options
         options: {
-        	duration: 500
+        	duration: 500,
         },
         
         // initialize
@@ -15,6 +15,7 @@ Carousel = new Class({
 	       	// init elements
 	       	this.carousel = $(carousel);
 	       	this.items = $$('#' + this.carousel.id + ' li');
+	       	this.first = true; this.last = false;
 	       	this.current = 1;
 	       	
 	       	// elements styles
@@ -30,6 +31,16 @@ Carousel = new Class({
         	if(1 <= n <= this.items.length) {
         		this.current = n;
         		this.fx.start('margin-left', (n - 1) * -100);
+        		
+        		if(this.current == 1)
+        			this.first = true;
+        		else
+        			this.first = false;
+        			
+        		if(this.current == this.items.length)
+        			this.last = true;
+        		else
+        			this.last = false;
         	}
         },
         

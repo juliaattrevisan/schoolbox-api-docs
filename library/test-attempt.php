@@ -22,6 +22,12 @@ class TestAttempt extends Model {
 	
 	// creating a test attempt
 	function create($data) {
+		// format dates
+		if(!empty($data['start']))
+			$data['start'] = date('Y/m/d H:i:s', strtotime($data['start']));
+		if(!empty($data['finish']))
+			$data['finish'] = date('Y/m/d H:i:s', strtotime($data['finish']));
+
 		$this->data = array_merge($this->data, $data);
 		$this->data['id'] = parent::create($this->data);
 		
@@ -30,6 +36,12 @@ class TestAttempt extends Model {
 	
 	// modify
 	function modify($data) {
+		// format dates
+		if(!empty($data['start']))
+			$data['start'] = date('Y/m/d H:i:s', strtotime($data['start']));
+		if(!empty($data['finish']))
+			$data['finish'] = date('Y/m/d H:i:s', strtotime($data['finish']));
+	
 		$this->data = array_merge($this->data, $data);
 				
 		return parent::update($data);
@@ -40,9 +52,9 @@ class TestAttempt extends Model {
 		$data = parent::getByID($id);
 		
 		// format dates
-		$data['start'] = date('Y/m/d', strtotime($data['start']));
+		$data['start'] = date('d/m/Y', strtotime($data['start']));
 		if(!empty($data['finish']))
-			$data['finish'] = date('Y/m/d', strtotime($data['finish']));
+			$data['finish'] = date('d/m/Y', strtotime($data['finish']));
 		
 		$this->data = $data;
 		
@@ -58,9 +70,9 @@ class TestAttempt extends Model {
 		} else {
 			// format dates
 			foreach($data as $i => $attempt) {
-				$data[$i]['start'] = date('Y/m/d', strtotime($attempt['start']));
+				$data[$i]['start'] = date('d/m/Y', strtotime($attempt['start']));
 				if(!empty($attempt['finish']))
-					$data[$i]['finish'] = date('Y/m/d', strtotime($attempt['finish']));
+					$data[$i]['finish'] = date('d/m/Y', strtotime($attempt['finish']));
 			}	
 		}
 		

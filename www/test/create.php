@@ -6,7 +6,7 @@ require_once("../library/test.php");
 require_once("../library/test-question.php");
 
 // models
-$group    = new Group;
+$group    = new Group();
 $test     = new Test();
 $question = new TestQuestion();
 
@@ -95,7 +95,7 @@ foreach($group->involvedCategoryList($_SESSION['id'], null, WRITE_ACCESS) as $ca
 
 // hours and minutes dropdowns
 $this->setBlock(TEMPLATE_content, 'duration_hours', 'duration_hours_block');
-foreach(range(1, 5) as $hour) {
+foreach(range(0, 5) as $hour) {
 	$this->setVar('HOUR', $hour);
 	
 	if($data['duration']['hours'] == $hour)
