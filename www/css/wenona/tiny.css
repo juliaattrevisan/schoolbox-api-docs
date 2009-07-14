@@ -76,17 +76,11 @@ ul a {font-weight:normal;}
 a {
 	font-weight:bold;
 	text-decoration:none;
+	color: #000066;
 	}
 a:link, a:visited {
 	color:#006;
 	text-decoration:none;
-	}
-a:hover {
-	color:#c00;
-	text-decoration:underline;
-	}
-a:active {
-	color:#03c;
 	}
 a img {
 	border:0;

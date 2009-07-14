@@ -29,7 +29,8 @@ table h2 {
 	}	
 #content .header_option a {
 	color: #1965B4;
-	}	
+	}
+.topic ul { list-style: disc; }
 /*---------------------------------------
 	Nav Styles
 ----------------------------------------*/

@@ -30,7 +30,6 @@ h1 {
 	}
 	
 h2 {
-	margin-left:20px;
 	font-size:110%;
 	border-left:10px solid #06c;
 	border-bottom:4px solid #06c;
@@ -73,14 +72,7 @@ ul a {font-weight:normal;}
 a {
 	font-weight:bold;
 	text-decoration:none;
-	}
-a:link, a:visited {
-	color:#03c;
-	text-decoration:none;
-	}
-a:hover {
-	color:#06c;
-	text-decoration:underline;
+	color: #0033CC;
 	}
 a img {
 	border:0;
