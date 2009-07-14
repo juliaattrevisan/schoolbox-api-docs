@@ -55,54 +55,93 @@ class SynergeticTimetable extends MSSQL{
 
 	//gets current day number
 	function getDayNumber($campus, $date = 0) {
+		
+		if(!$date) {
+			$date = mktime();
+		}
+
 		//get day count
 		if($this->days[$campus] == 5)
-			return date("w");
+			return date("w", $date);
 		else if($this->days[$campus] == 7)
 		{
-			//date format yyyy-dd-mm 00:00:00
-			if(!$date) {
-				$date = mktime();
-				$year = date("Y");
-				$mssqldate = $year."-01-01 00:00:00";
-			}
-			else
-				$mssqldate = date('Y-m-d',$date).' 00:00:00';
-	
-			$nowmssqldate = date('Y-m-d').' 00:00:00';
-			
-			$query = "SELECT CONVERT(CHAR(19),CalendarEvents.CalendarDate) as startDate, CalendarEvents.CalendarType as type
-			FROM SynergyOne.dbo.CalendarEvents CalendarEvents
-			WHERE (CalendarEvents.CalendarType LIKE 'd%') AND CalendarEvents.CalendarDate >= '$mssqldate' 
-			AND CalendarEvents.CalendarDate <= '$nowmssqldate'
-			ORDER BY CalendarEvents.CalendarDate DESC";
-		
-			$day = $this->getRow($query);
-	
-			//cut out d from CalenderType string
-			$startDay = substr($day['type'], 1, 1);
-	
-			//turn mssql date into unix timestamp
-			$startDate = strtotime($day['startDate']);
+			$startDate = $this->getLastSynergeticDay($date);
 		
 			//find number of days between both dates
 			$difference = intval(($date - $startDate) / 86400);
-	
+
 			//find number of weekends between 2 dates
 			$weekends = intval(($difference+date("w", $startDate)) / 7);
-	
-			$currentDay = ($startDay + $difference - 2 * $weekends - 1) % 7 + 1;
-	
+
+			$currentDay = ($this->synergeticDay[$startDate] + $difference - 2 * $weekends - 1) % 7 + 1;
+
 			//make correction for sunday (otherwise we travel back in time)
 			if(date("w", $date) == 0)
 				$currentDay = $currentDay % 7 + 1;
 	
 			return $currentDay;
 		}
+		else if($this->days[$campus] == 10) {
+
+			$startDate = $this->getLastSynergeticDay($date);
+
+			//find number of days between both dates
+			$difference = intval(($date - $startDate) / 86400);
+
+			//find number of weeks between 2 dates
+			$weeks = intval(($difference+date("w", $startDate)) / 7);
+
+			if($weeks % 2 > 0)
+				return date('w',$date) + 7;
+			else
+				return date('w',$date);
+		}
 		else	//unknown day number 
 			return 0;
 	}
 
+
+	function getLastSynergeticDay($date){
+			//This function gets all start of term days entered into synergetic from the date provided backwards.
+			//It caches this info so you can get it later again.
+			//Be careful if you call this function with a date in the past then in the future it may cause an error
+			//TODO:  Make function cache entire year then have better smarts at working out which day to use.
+
+			//date format yyyy-dd-mm 00:00:00
+
+			//Access cache first
+			if(is_array($this->synergeticDay)) {
+				foreach($this->synergeticDay as $tdate => $tday) {
+					if($date > $tdate) {
+						return $tdate;
+					}
+				}
+			}
+
+			$mssqldate = date('Y',$date)."-01-01 00:00:00";
+			$nowmssqldate = date('Y-m-d',$date).' 00:00:00';
+
+			$query = "SELECT CONVERT(CHAR(19),CalendarEvents.CalendarDate) as startDate, CalendarEvents.CalendarType as type
+			FROM SynergyOne.dbo.CalendarEvents CalendarEvents
+			WHERE (CalendarEvents.CalendarType LIKE 'd%') AND CalendarEvents.CalendarDate >= '$mssqldate'
+			AND CalendarEvents.CalendarDate <= '$nowmssqldate'
+			ORDER BY CalendarEvents.CalendarDate DESC";
+
+			$result = $this->query($query);
+			//Cache all date and days into variable
+			while($day = $this->getNextArray($result)) {
+				//cut out d from CalenderType string
+				$this->synergeticDay[strtotime($day['startDate'])] = substr($day['type'], 1, 1);
+			}
+			
+			//yes this is meant to get the first element and return it
+			if(is_array($this->synergeticDay)) {
+				foreach($this->synergeticDay as $date => $day){
+					return $date;
+				}
+			}
+
+	}
 
 	//returns the period number for the current time
 	function getPeriodNumber($campus)
