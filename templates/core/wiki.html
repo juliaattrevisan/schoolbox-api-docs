@@ -1,6 +1,5 @@
 <!-- BEGIN custom_head -->
 <!-- END custom_head -->
-<div class="indent">
   <h1>{HEADING} {LOCKED}</h1>
   
   <span class="header_option">
@@ -13,24 +12,25 @@
   <!-- BEGIN lock_link -->
   <a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}">{LOCK_UNLOCK}</a> | <!-- END lock_link -->
 
-  <a href="/homepage/{CATEGORY_ID}">Return to homepage</a></span>
+  <a href="/homepage/{CATEGORY_ID}">Return to homepage</a>
+  </span>
   <div class="float-fix"></div>
-  <div id="column-2">
-    <h2>Revisions</h2>
-    <table>
-      <tr>
-        <th>Date</th>
-        <th>Author</th>
-      </tr>
-      <!-- BEGIN revision_list -->
-      <tr>
-        <td><a href="/wiki/{WIKI_ID}/{REVISION_ID}">{REVISION_DATE}</a></td>
-        <td>{REVISION_AUTHOR}</td>
-      </tr>
-      <!-- END revision_list -->
-    </table>
-  </div>
-  <div id="column-1"> {BODY}
-    <hr>
-    <span class="element_footer">Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</span></div>
+  
+  <div class="left">{BODY}
+    <span class="element_footer">Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</span>
 	</div>
+  <div class="right">
+      <h2>Revisions</h2>
+      <table>
+        <tr>
+          <th>Date</th>
+          <th>Author</th>
+        </tr>
+        <!-- BEGIN revision_list -->
+        <tr>
+          <td><a href="/wiki/{WIKI_ID}/{REVISION_ID}">{REVISION_DATE}</a></td>
+          <td>{REVISION_AUTHOR}</td>
+        </tr>
+        <!-- END revision_list -->
+      </table>
+    </div>

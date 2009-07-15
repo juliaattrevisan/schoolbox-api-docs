@@ -299,6 +299,9 @@ table td { vertical-align: middle; }
 	text-transform: capitalize;
 	line-height: normal;
 }
+h1 + .header_option {
+	margin-top: -38px;
+}
 .header_option a:hover {
 	text-decoration: underline;
 }

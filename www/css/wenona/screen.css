@@ -117,6 +117,9 @@ h3#news-header {
 .header_option {
 	margin-top: -36px;
 }
+h1 + .header_option {
+	margin-top: -33px;
+}
 /*---------------------------------------
 	Component Styles
 ----------------------------------------*/
