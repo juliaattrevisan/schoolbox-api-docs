@@ -34,6 +34,7 @@ if (is_numeric($_GET['fileID'])) {
 					 'DESCRIPTION'	=> scrubText($file['description']),
 					 'COMMENT'	 => scrubText($file['comment']),
 					 'SIZE'		 => number_format($file['file_size']/1024, 1),
+					 'LINK'		=> '/send.php?id='.$file['id'],
 					 'MIME_TYPE' => $file['mime_type'],
 					 'HIDDEN'	 => $file['hidden'] > 0 ? 'Yes' : 'No',
 					 );
@@ -64,6 +65,7 @@ elseif (is_numeric($_GET['linkID'])) {
 					 'CREATED'	 => date(DATE_short_format, $link['submitted']),
 					 'DESCRIPTION'	=> scrubText($link['description']),
 					 'COMMENT'	 => scrubText($link['comment']),
+					 'LINK'		=> $link['url'],
 					 'HIDDEN'	 => $link['hidden'] > 0 ? 'Yes' : 'No',
 					 );
 					 
