@@ -58,7 +58,18 @@ class Wiki extends Model {
 	
 	function create($data) {
 		$data['created'] = 'NOW()';
-		return parent::create($data);
+
+		$revision = array( 'heading'	=> $data['heading'],
+							'body'		=> $data['body'],
+					  );
+		unset($data['heading'], $data['body']);
+		
+		$wikiID = parent::create($data);
+		if($wikiID) {
+			$revision['wikiID'] = $wikiID;
+			$this->createRevision($revision);
+		}
+		return $wikiID;
 	}
 	
 	function revert($wikiID, $revisionID) {

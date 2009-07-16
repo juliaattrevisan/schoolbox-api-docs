@@ -16,7 +16,10 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 		error(19);	
 
 	$data = array('categoryID'	=> $_POST['categoryID'],
-				  );
+				'heading'		=> $_POST['heading'],
+				'body'			=> $_POST['body'],
+				);
+				
 	if (is_numeric($_POST['wikiID'])) {
 	
 		// wiki exists
@@ -31,17 +34,9 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 		$data['wikiID'] = $wiki['wikiID'];
 		$wikiHandler->update($data);
 	} else
-		$data['wikiID'] = $wikiHandler->create($data);
-	
-	$current = $wikiHandler->getByID($data['wikiID']);
-	$revision = array('wikiID'	=> $wiki['wikiID'],
-					  'heading'	=> $_POST['heading'],
-					  'body'	=> $_POST['body'],
-					  );	
-	
-	if ($current['heading'] != $revision['heading'] || $current['body'] != $revision['body'])
-		$wikiHandler->createRevision($revision);
-	
+		$wiki['wikiID'] = $wikiHandler->create($data);
+
+
 	localRedir("/wiki/" . $wiki['wikiID']);
 }
 elseif (is_numeric($_GET['revert']) && is_numeric($_GET['wikiID'])) {
