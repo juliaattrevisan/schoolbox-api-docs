@@ -64,6 +64,8 @@ if(isStaff($_SESSION['gid']))
 				$this->parse("student_list_block", "student_list", true);		
 			}
 		}
+		else
+			$this->setVar('student_list_block', '');
 	}
 	else 
 		$this->setVar('student_list_block', '');

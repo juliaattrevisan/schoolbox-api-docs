@@ -15,9 +15,8 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 	if (($permission = $groupHandler->getPermission($_POST['categoryID'])) < READ_ACCESS)
 		error(19);	
 
-	$data = array('categoryID'	=> $_POST['categoryID'],
-				'heading'		=> $_POST['heading'],
-				'body'			=> $_POST['body'],
+	$data = array(	'heading'		=> $_POST['heading'],
+					'body'			=> $_POST['body'],
 				);
 				
 	if (is_numeric($_POST['wikiID'])) {
@@ -35,7 +34,6 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 		$wikiHandler->update($data);
 	} else
 		$wiki['wikiID'] = $wikiHandler->create($data);
-
 
 	localRedir("/wiki/" . $wiki['wikiID']);
 }

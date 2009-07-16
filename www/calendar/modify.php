@@ -4,8 +4,11 @@ require_once "../../include/sitePage.php";
 $page = new SitePage;
 
 require_once "../../library/calendar.php";
+require_once "../../library/group.php";
 
 $calendarHandler = new Calendar;
+$groupHandler = new Group;
+
 
 if (isset($_POST['date'])) {
 
@@ -60,6 +63,8 @@ if (isset($_POST['date'])) {
 	$page->backToTheFuture(2);
 	
 } elseif (is_numeric($_GET['eventID'])) {
+
+	
 
 	$page->setFile(TEMPLATE_content, 'calendar/modify.html');
 	$page->setTab("calendar");
@@ -116,8 +121,8 @@ if (isset($_POST['date'])) {
 		$page->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
 	}
 	
-	$groupList = $calendarHandler->getCategoryList();
-	$page->dropDown('group_drop', $groupList, $event['sid'], TEMPLATE_content, array('id'=>'GROUP_ID','name'=>'GROUP_NAME'));
+	$groupList = $calendarHandler->involvedCategoryList($_SESSION['id'], '', WRITE_ACCESS);
+	$page->dropDown('group_drop', $groupList, $event['sid'], TEMPLATE_content, array('id'=>'UGROUP_ID','name'=>'UGROUP_NAME'));
 	$page->checkList('group_list', $calendarHandler->getGroupList(), $calendarHandler->getEventGroup($event['id']));
 
 	$levelList[] = array('LEVEL_ID'	=> 1, 'LEVEL_NAME'	=> 'Personal');
@@ -177,11 +182,11 @@ if (isset($_POST['date'])) {
 	}
 	$page->checkList('group_list', $calendarHandler->getGroupList(), '');
 
-	$groupList = $calendarHandler->getCategoryList();
+	$groupList = $groupHandler->involvedCategoryList($_SESSION['id'], '', WRITE_ACCESS);
 	if($_GET['level'] == 2)
-		$page->dropDown('group_drop', $groupList, $_GET['sid']);
+		$page->dropDown('group_drop', $groupList, $_GET['sid'], TEMPLATE_content, array('id'=>'UGROUP_ID','name'=>'UGROUP_NAME'));
 	else
-		$page->dropDown('group_drop', $groupList);
+		$page->dropDown('group_drop', $groupList, '',TEMPLATE_content, array('id'=>'UGROUP_ID','name'=>'UGROUP_NAME'));
 
 	$levelList[] = array('LEVEL_ID'	=> 1, 'LEVEL_NAME'	=> 'Personal');
 	if (count($groupList) > 0)

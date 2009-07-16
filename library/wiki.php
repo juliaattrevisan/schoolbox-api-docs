@@ -72,6 +72,11 @@ class Wiki extends Model {
 		return $wikiID;
 	}
 	
+	function update($data) {
+		unset($data['categoryID']);
+		$this->createRevision($data);
+	}
+
 	function revert($wikiID, $revisionID) {
 		$wiki = $this->getByID($wikiID, $revisionID);
 		if (!isset($wiki['wikiID']))

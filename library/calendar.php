@@ -93,13 +93,7 @@ class Calendar extends Model {
 		}
 		return $output;
 	}  
-
-	function getCategoryList($type = 1){
-		//get a list of all groups the user has write access to
-		$query = "SELECT id, name FROM userAccess, category WHERE uid = '".$_SESSION['id']."' AND service = '1' AND type > $type AND sid = id";   
-		return $groupList = $this->db->getAll($query);
-
-	}  
+ 
 
 	function getGroupList() {
 		$query = "SELECT * FROM groups";

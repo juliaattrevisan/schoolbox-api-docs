@@ -275,7 +275,7 @@ class News extends Model {
 	}
 	
 	function getAllByGroup($groupList, $campusList) {
-		$query = "SELECT `".$this->_index."`, item_heading, UNIX_TIMESTAMP(item_datetime_posted) item_datetime_posted, UNIX_TIMESTAMP(item_datetime_modified) item_datetime_modified, item_body, newsTopic.name topicName,
+		$query = "SELECT `".$this->_index."`, item_heading, UNIX_TIMESTAMP(item_datetime_posted) item_datetime_posted, UNIX_TIMESTAMP(item_datetime_modified) item_datetime_modified, item_body, newsTopic.name topicName
 				  FROM `".$this->_table."` 
 				  JOIN user ON news_items.item_owner = user.id
 				  JOIN newsCampus ON newsCampus.id = news_items.item_id 

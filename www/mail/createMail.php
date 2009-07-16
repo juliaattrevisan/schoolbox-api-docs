@@ -12,7 +12,7 @@ $page = new SitePage();
 
 $groupHandler = new Group;
 
-if( ((SITE_location == 'mgs' || SITE_location == 'wenona') && !$groupHandler->isStudent($_SESSION['gid'])  || (SITE_location == 'ormond' && $_SESSION['exchange'])) )
+if( ((SITE_location == 'mgs' || SITE_location == 'wenona') && !$groupHandler->isStudent($_SESSION['gid'])  || (SITE_location == 'ormond' && $_SESSION['exchange']) || SITE_location == 'shore') )
 {	 
 	
 	$page->setFile(TEMPLATE_content, 'mail/send.html');

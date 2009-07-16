@@ -310,7 +310,7 @@ class Group extends Model {
 		return false;
 	}
 	
-	function involvedCategoryList($id, $subjects, $accessType=READ_ACCESS) {
+	function involvedCategoryList($id, $subjects = '', $accessType=READ_ACCESS) {
 		//returns a list of categories that the user is involved in
 		//optional accessType specifies read=1 , write=2, ownership=3 access levels
 	

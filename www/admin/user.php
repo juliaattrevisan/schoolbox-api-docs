@@ -161,10 +161,6 @@ class user
 		//delete personal calendar events
 		$query = "DELETE FROM event WHERE access = '1' AND owner = '$id'";
 		$this->db->query($query);
-		$query = "DELETE FROM eventWeekly WHERE access = '1' AND owner = '$id'";
-		$this->db->query($query);
-		$query = "DELETE FROM eventMonthly WHERE access = '1' AND owner = '$id'";
-		$this->db->query($query);
 
 		//delete log entries
 		$query = "DELETE FROM homepage_log WHERE user = '$id'";
