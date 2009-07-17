@@ -172,11 +172,12 @@ class Calendar extends Model {
 		else
 			$campusList = array(1);
 		
-		
+		$groupHandler = new Group;
+
 		// get accessible groups
 		$groupList = array();
 		$groupQuery = '';
-		$tempList = $this->getCategoryList();
+		$tempList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects']);
 		if (is_array($tempList)) {
 			foreach ($tempList as $temp) {
 				$groupList[] = $temp['id'];

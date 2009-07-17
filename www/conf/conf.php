@@ -118,6 +118,10 @@ define("MAIL_increment", 20);					//Amount of emails per page
 define("MAIL_db", "roundcubemail");
 define('ROUNDCUBE_db','mysql://'.SQL_user.':'.SQL_passwd.'@'.SQL_host.'/'.SQL_db);
 
+//PEAR required for mail
+$path = SITE_root.'/include/PEAR';
+set_include_path('.' . PATH_SEPARATOR . $path);
+
 // mailer
 define('MAIL_templates', TEMPLATE_dir);
 define('FROM_address', 'portal@lektec.com.au');

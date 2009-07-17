@@ -151,7 +151,7 @@ else
 // if configuration states mail is available and user has access to local mail account display it
 $this->t_body->set_block('tplBODY', 'webmail_tab', 'wm_tab');
 
-if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && (isStaff($_SESSION['gid']) || isStudent($_SESSION['gid']))) || SITE_location == 'ormond')
+if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && (isStaff($_SESSION['gid']) || isStudent($_SESSION['gid']))) || SITE_location == 'ormond' || SITE_location == 'shore')
 {
 	$this->t_body->parse('wm_tab','webmail_tab');
 	
@@ -160,17 +160,32 @@ if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && (i
 		if(isStaff($_SESSION['gid']))
 			$this->t_body->set_var("WEBMAIL_LOCATION", "href=\"https://webmail.mgs.vic.edu.au/exchange/\" target=\"_blank\"");
 		else
-			$this->t_body->set_var("WEBMAIL_LOCATION", "href=\"/mail.php\"");
+			$this->t_body->set_var("WEBMAIL_LOCATION", 'href="/mail/"');
 	}
 	else if(SITE_location == 'ormond') 
 	{
-		$this->t_body->set_var('WEBMAIL_LOCATION', 'href="/mail.php"');
+		if($_SESSION['exchange'])
+			$this->t_body->setVar("WEBMAIL_LOCATION", 'href="http://owa.ormond.unimelb.edu.au" rel="external"');
+		else
+			$this->t_body->set_var('WEBMAIL_LOCATION', 'href="/mail/"');
 	}
 	else if(SITE_location == 'wenona') {
-		$this->t_body->set_var('WEBMAIL_LOCATION', 'href="https://webmail.wenona.nsw.edu.au/owa" target="_blank"');
-		$this->t_body->set_var('WEBMAIL_TITLE', '<em>W</em>ebmail');
-
+		if(isStaff($_SESSION['gid'])) {
+			$this->t_body->setVar('WEBMAIL_LOCATION', 'href="https://webmail.wenona.nsw.edu.au/owa" rel="external"');
+		}
+		else {
+			$this->t_body->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
+		}
 	}
+	else if(SITE_location == 'shore') {
+		if(isStaff($_SESSION['gid'])) {
+			$this->t_body->setVar('WEBMAIL_LOCATION', 'href="http://shorexch01/exchange" rel="external"');
+		}
+		else if(isStudent($_SESSION['gid'])) {
+			$this->t_body->setVar('WEBMAIL_LOCATION', 'href="https://mail.student.shore.nsw.edu.au/exchange/" rel="external"');
+		}
+	}
+
 }
 else
 {
