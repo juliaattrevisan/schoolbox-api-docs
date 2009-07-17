@@ -122,6 +122,7 @@ define('ROUNDCUBE_db','mysql://'.SQL_user.':'.SQL_passwd.'@'.SQL_host.'/'.SQL_db
 define('MAIL_templates', TEMPLATE_dir);
 define('FROM_address', 'portal@lektec.com.au');
 define('FROM_name', HEADING);
+define('CONTACT_address', 'ryan@lektec.com.au');
 
 //RSS Feed 
 define('RSS_url', 'http://www.abc.net.au/news/indexes/justin/rss.xml');

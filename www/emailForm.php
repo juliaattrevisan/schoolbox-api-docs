@@ -1,0 +1,95 @@
+<?php
+
+session_start();
+
+//This script is a generic email handler which can email the values of a form to an email address
+//Also now supports handling of files which are attached to the email
+//Typically this script would be used for contact forms and enquiry forms on a website
+//It requires the following variables;
+//			template - template filename to be used 			
+//			email - email address of sender
+//The following are optional but recommended variables
+//			subject - subject of email to be sent
+//			name - name of sender
+//			confirmation - location to redirect user to after submission, ie a confirmation page
+
+require_once dirname(__FILE__) . '/conf/conf.php';
+require_once dirname(__FILE__) . '/include/stdfuncs.php';
+require_once SITE_root . '/include/mailer.php';
+require_once SITE_root . '/library/reCaptcha.php';
+
+if(validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template']) 
+	&& (isset($_SESSION['id']) || ReCaptcha::checkResponse($_POST['recaptcha_answer'], $_POST['recaptcha_challenge']))) {
+	
+	$mailHandler = new Mailer($_POST['template'], 'OurSchool Feedback - ' . $_POST['subject'], CONTACT_address);
+	
+	foreach($_POST as $key => $var) {
+		if(!checkSpamHeaders($var))
+			localRedir('/');
+			
+		$key = strtoupper($key);
+		if(is_array($var))
+			$output[$key] = implode(', ',$var);
+		else
+			$output[$key] = $var;
+	}
+	
+	foreach($_FILES as $file) {
+		$mailHandler->addFile($file['tmp_name'], $file['type'], $file['name']);
+	}
+	
+	$mailHandler->setVar($output);
+	$mailHandler->setFrom($_POST['email'], $_POST['name']);
+	$mailHandler->setVar('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
+	$mailHandler->send();
+	
+	if($_POST['receipt']) {
+		$receiptHandler = new Mailer($_POST['receipt'], $_POST['receipt_subject'], $_POST['email']);
+		$receiptHandler->setVar($output);
+		$receiptHandler->setVar('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
+		$receiptHandler->send();
+		
+	}
+	
+}
+
+if(preg_match("/^[a-zA-Z0-9\/\-\_]+/", $_POST['confirmation']) )
+	localRedir($_POST['confirmation']);
+else
+	localRedir('/thank-you');
+
+function checkSpamHeaders($text)
+{
+	//checks for common spammer injected headers
+	if(stristr($text, 'Content-Type:') !== FALSE)
+		return FALSE;
+	if(stristr($text, 'MIME-Version:') !== FALSE)
+		return FALSE;
+	if(stristr($text, 'Bcc:') !== FALSE)
+		return FALSE;
+
+	return TRUE;
+}
+	
+	
+function validateEmailAddress($email)
+{
+	//check from contains valid email
+	if(!preg_match('/^([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}$/', $email))
+		return FALSE;
+
+	//do domain lookup
+	list($alias, $domain) = explode('@', $email);
+
+	//this prevents appending of localhost to lookup
+	$domain = $domain.'.';
+
+	//check for mx records or that it resolves
+	if(getmxrr($domain, $temp))
+		return TRUE;
+	else if(checkdnsrr($domain, 'ANY') )
+		return TRUE;
+	else 
+		return FALSE;
+}
+?>

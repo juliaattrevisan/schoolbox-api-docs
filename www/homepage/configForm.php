@@ -68,11 +68,14 @@ if(is_numeric($_REQUEST['cid']) ) {
 		}
 		
 		//strip hash
-		foreach($_POST['colors'] as $key => $value) {
-			$color[$key] = substr($value,1);
+		if (is_array($_POST['colors'])) {
+			foreach($_POST['colors'] as $key => $value) {
+				$color[$key] = substr($value,1);
+			}
+			
+			$homepage->saveDisplayProperties($color);
 		}
-		$homepage->saveDisplayProperties($color);
-	
+
 		localRedir("/homepage/".$_POST['cid']);
 	}
 }
