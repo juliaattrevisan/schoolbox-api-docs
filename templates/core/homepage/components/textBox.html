@@ -25,7 +25,7 @@
 	elements: "textBoxBody",
 	theme : "advanced",
 	plugins : "table,inlinepopups,assetmanager",
-	content_css : "/css/core/tiny.css",
+	content_css : "/css/{SITE_LOCATION}/tiny.css",
 	theme_advanced_toolbar_location : "top",
 	theme_advanced_toolbar_align : "left",
 	theme_advanced_statusbar_location : "bottom",
@@ -38,11 +38,13 @@
 });
   </script>  
   <div class="text">
-    <form action="/homepage/textBoxForm.php" method="post" id="textBoxForm" class="standardForm">
-     
-      <p><input type="text"  style="width: 99%;" name="textBoxHeading" value="{TEXTBOX_HEADING}" /></p>
+    <form action="/homepage/textBoxForm.php" method="post" id="textBoxForm" class="standardForm">     
       <p>
-      <textarea rows="12" style="width: 100%;" name="textBoxBody" id="textBoxBody">{TEXTBOX_BODY}</textarea></p>
+      <input type="text"  style="width: 99%;" name="textBoxHeading" value="{TEXTBOX_HEADING}" />
+      </p>
+      <p>
+      <textarea rows="12" style="width: 100%;" name="textBoxBody" id="textBoxBody">{TEXTBOX_BODY}</textarea>
+      </p>
       <input type="hidden" name="categoryID" value="{ID}" />
       <input type="hidden" name="textBoxID" value="{TEXTBOX_ID}" />
     </form>
@@ -50,17 +52,17 @@
   <p class="interact"><a href="#" onclick="$j('#textBoxForm').submit(); return false;">Save Document</a></p>
   <!-- END text_editable -->
   
-  <!-- BEGIN text_locked -->
-      
-      <div class="text"> 
-      	{TEXTBOX_BODY}
-      </div>
-      
-      <!-- BEGIN modify_text -->
-      <p class="interact"><a href="/homepage/{ID}/textBoxCreate">Create</a>
-       | <a href="/homepage/{ID}/textBoxModify">Modify</a>
-       | <a href="/homepage/textBoxForm.php?delete={TEXTBOX_ID}" onclick="return confirm('Are you sure you want to delete this text box?');">Delete</a></p>
-      <!-- END modify_text -->
+  <!-- BEGIN text_locked -->      
+  <div class="text"> 
+    {TEXTBOX_BODY}
+    <div class="float-fix"></div>
+  </div>
+  
+  <!-- BEGIN modify_text -->
+  <p class="interact"><a href="/homepage/{ID}/textBoxCreate">Create</a>
+   | <a href="/homepage/{ID}/textBoxModify">Modify</a>
+   | <a href="/homepage/textBoxForm.php?delete={TEXTBOX_ID}" onclick="return confirm('Are you sure you want to delete this text box?');">Delete</a></p>
+  <!-- END modify_text -->
       
   <!-- END text_locked -->
 </div>

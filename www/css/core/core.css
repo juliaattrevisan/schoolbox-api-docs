@@ -97,7 +97,6 @@ h1 {
 	line-height: 2;
 	margin-bottom: 1em;
 	position: relative;
-	text-transform: capitalize;
 	width: 100%;
 }
 h1 a.customise {
@@ -107,6 +106,7 @@ h1 a.customise {
 	line-height:normal;
 	display: block;
 	position:absolute;
+	text-transform: capitalize;
 	right: 0;
 	top: 10px;
 	}
@@ -513,7 +513,7 @@ table.home td {
 /*-----------------------------*/
 .box ul {
 	list-style: disc;
-	margin: 0 0 0 1.1em;
+	margin: 0 0 1em 1.1em;
 	padding: 0;
 	}
 .box li {
@@ -573,8 +573,13 @@ table.home td {
 	}
 .box .listing ul li .col {
 	float: left;
-	width: 50%;
+	display: block;
+	width: 20%;
 	}
+.box .listing ul li .col:first-child {
+	width: 80%;
+	}
+
 .box .listing ul li.dark,
 #content table tr.dark,
 #content table tr.dark td {

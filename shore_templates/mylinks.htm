@@ -30,7 +30,7 @@
 <!-- #BeginEditable "head" --><!-- #EndEditable -->
 
 <div id="nav">
-	<h3>Shore Intranet</h3>
+	<h3>Shore</h3>
   {MCSSMENU}
 	<!-- BEGIN msubject -->
 	<h3>Intranet Menu</h3>
@@ -77,16 +77,17 @@
     <ul id="tabs">
       <li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Home</a></li>
       <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
-      <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">News</a></li>      
+      <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">Announcements</a></li>
+      <!-- BEGIN webmail_tab -->
       <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Email</a></li>
+      <!-- END webmail_tab -->
+      <!-- BEGIN timetable_tab -->
       <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
+      <!-- END timetable_tab -->
       <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
       <li><a href="/logout.php" title="">Logout</a></li>
     </ul>
-    <!-- BEGIN webmail_tab -->
-    <!-- END webmail_tab -->
-    <!-- BEGIN timetable_tab -->
-    <!-- END timetable_tab -->
+    
     <!-- BEGIN myfiles_tab -->
     <!-- END myfiles_tab -->
     <!-- BEGIN portfolio_tab -->
