@@ -13,6 +13,7 @@ $this->setFile(TEMPLATE_content, 'news/archive.html');
 $this->setTitle('News');
 $this->setTab('news');
 
+$this->setBlock(TEMPLATE_content, 'add_news', 'add_news_block');
 $this->setBlock(TEMPLATE_content, 'news', 'news_block');
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
@@ -23,9 +24,9 @@ $groupHandler = new Group(NEWS_SERVICE);
 
 //can see add news link
 if(($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS)
-	$this->setVar("ADD", "<b><a class=\"customise\" href=\"/news/modify\">add news</a></b>");
+	$this->parse('add_news_block', 'add_news');
 else
-	$this->setVar("ADD", "");
+	$this->setVar('add_news_block', '');
 	
 $this->setVar('archive_button_block', '');	
 	
