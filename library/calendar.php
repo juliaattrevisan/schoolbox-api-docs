@@ -136,16 +136,17 @@ class Calendar extends Model {
 
 	function getSubmissionEvents($currentDay) {
 	
-		//get a list of all the possible submission box categories		
+		//get a list of all the possible submission box categories
+		$this->groupHandler->setService(HOMEPAGE_SERVICE);
 		$catList = $this->groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
+		$this->groupHandler->setService(CALENDAR_SERVICE);
 		
 		if(is_array($catList)) {
-			foreach($catList as $cat)
+			foreach($catList as $cat) {
 				$catQuery[] = $cat['id'];
-		} else
-			$catQuery = array('NULL');
-			
-		$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.description, submission_box.owner,
+			}
+
+			$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.description, submission_box.owner,
 					DATE_FORMAT(submission_box.date, '%w') as dayIndex, 
 					DATE_FORMAT(submission_box.date, '" . CALENDAR_time_format . "') as dueTime
 				  FROM (category, submission_box )
@@ -158,8 +159,10 @@ class Calendar extends Model {
 				  GROUP BY submission_box.id, category.id
 				  ORDER BY submission_box.date ";
 				
-		return $this->db->getAll($query);
-
+			return $this->db->getAll($query);
+		}
+		else
+			return false;
 	}
 
 
@@ -171,19 +174,20 @@ class Calendar extends Model {
 			$campusList = $_SESSION['campus'];
 		else
 			$campusList = array(1);
-		
-		$groupHandler = new Group;
+	
 
 		// get accessible groups
 		$groupList = array();
 		$groupQuery = '';
-		$tempList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects']);
+		$this->groupHandler->setService(HOMEPAGE_SERVICE);
+		$tempList = $this->groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects']);
 		if (is_array($tempList)) {
 			foreach ($tempList as $temp) {
 				$groupList[] = $temp['id'];
 			}
 			$groupQuery = "OR (access = '2' AND sid IN (".implode(',', $groupList)."))";
 		}
+		$this->groupHandler->setService(CALENDAR_SERVICE);
 		
 		//give people with userAccess to moderate Calendar Access to view all Camups Posts
 		if(is_array($_SESSION['campus'])) {

@@ -261,8 +261,7 @@ function setSynergyInfo(&$mydb)
 				{
 					//check subject exists.. we cant link to subjects that dont exist its ugly
 					$myquery = "SELECT categoryID FROM categoryCode WHERE code like '".$subject['code']."'";
-					$mydb->query($myquery);
-					if($result=$mydb->getNextRow() ) {
+					if($result=$mydb->getRow($myquery) ) {
 						$subject['id'] = $result['categoryID'];
 						$_SESSION['subjects'][] = $subject;
 					}
@@ -271,7 +270,7 @@ function setSynergyInfo(&$mydb)
 				$_SESSION['timetable'] = 1;
 			}
 			else	
-				$_SESSION['timetable']=0;
+				$_SESSION['timetable'] = 0;
 		}
 	}
 	

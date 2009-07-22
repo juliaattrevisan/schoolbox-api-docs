@@ -60,6 +60,9 @@ class SynergeticTimetable extends MSSQL{
 			$date = mktime();
 		}
 
+		if(date('w', $date) == 0 || date('w', $date) == 6)
+			return false;
+
 		//get day count
 		if($this->days[$campus] == 5)
 			return date("w", $date);
@@ -83,18 +86,19 @@ class SynergeticTimetable extends MSSQL{
 		}
 		else if($this->days[$campus] == 10) {
 
-			$startDate = $this->getLastSynergeticDay($date);
+			/*$startDate = $this->getLastSynergeticDay($date);
 
 			//find number of days between both dates
 			$difference = intval(($date - $startDate) / 86400);
 
 			//find number of weeks between 2 dates
-			$weeks = intval(($difference+date("w", $startDate)) / 7);
+			$weeks = intval(($difference) / 7);
 
-			if($weeks % 2 > 0)
-				return date('w',$date) + 7;
-			else
+			*/
+			if(date('W', $date) % 2 > 0)
 				return date('w',$date);
+			else
+				return date('w',$date) + 5;
 		}
 		else	//unknown day number 
 			return 0;
@@ -121,7 +125,7 @@ class SynergeticTimetable extends MSSQL{
 			$mssqldate = date('Y',$date)."-01-01 00:00:00";
 			$nowmssqldate = date('Y-m-d',$date).' 00:00:00';
 
-			$query = "SELECT CONVERT(CHAR(19),CalendarEvents.CalendarDate) as startDate, CalendarEvents.CalendarType as type
+			$query = "SELECT *, CONVERT(CHAR(19),CalendarEvents.CalendarDate) as startDate, CalendarEvents.CalendarType as type
 			FROM SynergyOne.dbo.CalendarEvents CalendarEvents
 			WHERE (CalendarEvents.CalendarType LIKE 'd%') AND CalendarEvents.CalendarDate >= '$mssqldate'
 			AND CalendarEvents.CalendarDate <= '$nowmssqldate'

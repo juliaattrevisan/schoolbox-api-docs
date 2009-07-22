@@ -111,14 +111,9 @@ class SynergeticUser extends MSSQL{
 		
 		$this->query($sql);
 		while($subject = $this->getNextArray() ) {
-			print_r($subject);
-			//remove study periods and rostered offs
-			if(!preg_match("/ST|RO/",$subject['ClassCode']))
-			{
-				$subjectList[] = array('code'=>$subject['ClassCode'], 'name'=>$subject['name']);
-			}
+			$subjectList[] = array('code'=>$subject['ClassCode'], 'name'=>$subject['name']);
 		}
-		exit;
+
 		if(is_array($subjectList))
 			return $subjectList;
 		else 

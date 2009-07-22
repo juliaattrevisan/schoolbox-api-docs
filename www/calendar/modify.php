@@ -121,7 +121,7 @@ if (isset($_POST['date'])) {
 		$page->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
 	}
 	
-	$groupList = $calendarHandler->involvedCategoryList($_SESSION['id'], '', WRITE_ACCESS);
+	$groupList = $groupHandler->involvedCategoryList($_SESSION['id'], '', WRITE_ACCESS);
 	$page->dropDown('group_drop', $groupList, $event['sid'], TEMPLATE_content, array('id'=>'UGROUP_ID','name'=>'UGROUP_NAME'));
 	$page->checkList('group_list', $calendarHandler->getGroupList(), $calendarHandler->getEventGroup($event['id']));
 

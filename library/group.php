@@ -318,7 +318,8 @@ class Group extends Model {
 			foreach($subjects as $subject) {
 				//convert code to id and get name
 				$query = "SELECT name, id, cc.code FROM category JOIN categoryCode cc ON id = categoryID WHERE cc.code = '".$subject['code']."'";
-				$catList[] = $this->db->getRow($query);
+				if(is_array($catTmp = $this->db->getRow($query)))
+					$catList[] = $catTmp;
 			}
 		}
 
@@ -326,12 +327,12 @@ class Group extends Model {
 		$query = "SELECT category.name, category.id FROM userAccess, category 
 		WHERE userAccess.uid = $id AND userAccess.sid = category.id AND userAccess.service = ".$this->_service."
 		AND userAccess.type >= '$accessType'";
-	
+
 		$this->db->query($query);
 		while($result = $this->db->getNextArray()) {
 			$catList[] = $result;
 		}
-		
+
 		return $catList;
 	}
 	

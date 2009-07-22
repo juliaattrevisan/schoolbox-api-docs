@@ -113,11 +113,7 @@ function getSubjectList($synergyID, $group)
 		{
 			while($subject = @mssql_fetch_assoc($result))
 			{
-					//remove study periods and rostered offs
-        			if(!preg_match("/ST|RO/",$subject['ClassCode']))
-        			{
-						$subjectList[] = array('code'=>$subject['ClassCode'], 'name'=>$subject['name']);
-					}
+					$subjectList[] = array('code'=>$subject['ClassCode'], 'name'=>$subject['name']);
 			}
 			return $subjectList;
 		}
