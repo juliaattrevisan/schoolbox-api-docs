@@ -10,10 +10,6 @@ $groupHandler = new Group(HOMEPAGE_SERVICE);
 
 if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 
-	
-	// check permission
-	if (($permission = $groupHandler->getPermission($_POST['categoryID'])) < READ_ACCESS)
-		error(19);	
 
 	$data = array(	'heading'		=> $_POST['heading'],
 					'body'			=> $_POST['body'],
@@ -26,15 +22,22 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 		if (!isset($wiki['wikiID']))
 			error(2);
 
+		if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS)
+			error(19);
+
 		// check locked
 		if ($wiki['locked'] == 'true' && $permission < WRITE_ACCESS)
 			error(19);		
 	
 		$data['wikiID'] = $wiki['wikiID'];
 		$wikiHandler->update($data);
-	} else
+	} else if($_POST['categoryID']) {
+		// check permission
+		if (($permission = $groupHandler->getPermission($_POST['categoryID'])) < READ_ACCESS)
+			error(19);
+		$data['categoryID'] = $_POST['categoryID'];
 		$wiki['wikiID'] = $wikiHandler->create($data);
-
+	}
 	localRedir("/wiki/" . $wiki['wikiID']);
 }
 elseif (is_numeric($_GET['revert']) && is_numeric($_GET['wikiID'])) {
