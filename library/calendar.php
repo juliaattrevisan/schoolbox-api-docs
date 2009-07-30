@@ -80,7 +80,7 @@ class Calendar extends Model {
 	function getCampusList($type = 1) {
 		$query = "SELECT id, name FROM luCampus";
 		if (!$_SESSION['su']) {
-			$query .=", userAccess WHERE luCampus.id = userAccess.sid AND 
+			$query .=", userAccess WHERE (luCampus.id = userAccess.sid OR userAccess.sid = 0) AND
 				userAccess.service = '2' AND uid = ".$_SESSION['id']." AND type > $type";   
 		}
 		$campusList = $this->db->getAll($query);
