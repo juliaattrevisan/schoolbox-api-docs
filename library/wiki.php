@@ -73,8 +73,24 @@ class Wiki extends Model {
 	}
 	
 	function update($data) {
-		unset($data['categoryID']);
-		$this->createRevision($data);
+
+		$coreFields = array('categoryID', 'locked');
+		foreach($coreFields as $field) {
+			if($data[$field]) {
+				$coreData[$field] = $data[$field];
+				unset($data[$field]);
+			}
+		}
+
+		//Update fields in core table
+		if(is_array($coreData)) {
+			$coreData['wikiID'] = $data['wikiID'];
+			parent::update($coreData);
+		}
+
+		//Otherwise update revisions if more than just the wikiID is left
+		if(count($data) > 1)
+			$this->createRevision($data);
 	}
 
 	function revert($wikiID, $revisionID) {

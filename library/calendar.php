@@ -56,13 +56,16 @@ class Calendar extends Model {
 					$campusList = $event['campusList'];
 				else
 					$campusList = $this->getEventCampus($event['id']);
-						
+
+				//all campuses are represented by 0. if the user has all let them in
+				$campusList[] = 0;
+
 				if(is_array($campusList)) {
 					foreach($campusList as $campus) {
 						$permission = $this->groupHandler->getPermission($campus);
 						if($output < $permission || !$output)
 							$output = $permission;
-					}		
+					}
 				}
 
 				return $output;
