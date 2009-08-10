@@ -121,7 +121,7 @@ if (is_array($postList)) {
 						'POST_GROUP'		=> scrubText($post['userGroup']),
 						'POST_TIME'			=> getRelativeTime($post['date'], 0, ""),
 						'POST_USER_ID'		=> $post['userID'],
-						'POST_BODY'			=> scrubHTML($forumHandler->parseBB($post['body'])),
+						'POST_BODY'			=> scrubHTML($post['body']),
 						'POST_MODIFIED'		=> getRelativeTime($post['date'], strtotime($post['modified']), '', 'later'),
 						'POST_CENSORED'		=> $post['censored'] == 'true' ? '(Administrator)' : '',
 						);

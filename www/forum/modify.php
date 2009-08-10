@@ -32,6 +32,7 @@ if (is_numeric($this->arg[0])) {
 
 	$this->setTitle(scrubText($category['name'] . ' Forum'));
 
+	/* edit post */
 	if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
 		$post = $forumHandler->getPost($this->arg[2]);
 		
@@ -51,6 +52,7 @@ if (is_numeric($this->arg[0])) {
 		if ($thread['postID'] == $post['postID'])
 			$this->parse('title_block', 'title');	
 	}
+	/* add new reply */
 	elseif (is_numeric($this->arg[1])) {
 		$thread = $forumHandler->getThread($this->arg[1]);
 		
@@ -76,8 +78,13 @@ if (is_numeric($this->arg[0])) {
 
 	/* output quote */
 	$this->setVar('quote_block', '');
-	if (is_numeric($this->arg[3])) {
-		$quote = $forumHandler->getPost($this->arg[3]);
+	
+	$quotePostID = $this->arg[3];
+	if (!is_numeric($quotePostID))
+		$quotePostID = $thread['postID'];
+	
+	if (is_numeric($quotePostID) && $quotePostID > 0) {
+		$quote = $forumHandler->getPost($quotePostID);
 		if (isset($quote['postID'])) {
 	
 			$user = array('title'		=> $quote['userTitle'],
