@@ -59,7 +59,6 @@ class Calendar extends Model {
 
 				//all campuses are represented by 0. if the user has all let them in
 				$campusList[] = 0;
-
 				if(is_array($campusList)) {
 					foreach($campusList as $campus) {
 						$permission = $this->groupHandler->getPermission($campus);
@@ -214,8 +213,7 @@ class Calendar extends Model {
 						WHERE date = '" . date("Y-m-d", $currentDay) . "'
 							AND (    (access = '1' AND owner = '".$_SESSION['id']."')
 								  $groupQuery
-								  OR (access = '3' AND eventCampus.campusID IN(" . implode(',', $campusList) . ") $groupChunk )
-								  OR (access = '4')
+								  OR (access = '3' AND eventCampus.campusID IN(" . implode(',', $campusList) . ") $groupChunk OR owner = '".$_SESSION['id']."')
 								)
 						GROUP BY id
 						ORDER BY event.startTime, event.endTime";
@@ -236,7 +234,6 @@ class Calendar extends Model {
 						WHERE date = '" . date("Y-m-d", $currentDay) . "'
 							AND (    
 								  (access = '3' AND eventCampus.campusID IN(" . implode(',', $campusList) . ") AND eventGroup.groupID IN(" . implode(',', $groupList) . ") )
-								  OR (access = '4')
 								)
 						GROUP BY id
 						ORDER BY event.startTime, event.endTime";
