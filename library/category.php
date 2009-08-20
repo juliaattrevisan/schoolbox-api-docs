@@ -295,7 +295,7 @@ class Category extends Model {
 			error(12); 
 		
 		$this->deletePerms($categoryID);
-		$this->db->delete('categoryCode', 'categoryID', $cid);
+		$this->db->delete('categoryCode', 'categoryID', $categoryID);
 		parent::delete($categoryID);
 		
 		require_once dirname(__FILE__) . '/homepage.php';

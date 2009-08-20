@@ -28,7 +28,7 @@ if (is_array($calendarList)) {
 		else
 				$time = $calendar['startTime']." - ".$calendar['endTime'];
 				
-		$output = array('ITEM_TITLE'		=> scrubText($calendar['note']),
+		$output = array('ITEM_TITLE'		=> $calendar['note'],
 						'ITEM_DESCRIPTION'	=> $time,
 						'ITEM_DATE'			=> outputDate('r', $calendar['date']),
 						'ITEM_LINK'			=> SITE_address . '/calendar/week/',
