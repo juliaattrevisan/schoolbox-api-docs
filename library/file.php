@@ -51,7 +51,7 @@ class File extends Model {
 			
 			$query .= " AND ( 1=2 ";
 			if (in_array('document', $config['filter']))
-				$query .= " OR ( f.mime_type LIKE '%pdf' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%' OR f.mime_type LIKE '%document%' OR f.mime_type LIKE '%powerpoint%') ";
+				$query .= " OR ( f.mime_type LIKE '%pdf' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%officedoc%' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%' OR f.mime_type LIKE '%document%' OR f.mime_type LIKE '%powerpoint%') ";
 			
 			if (in_array('image', $config['filter']))
 				$query .= " OR ( f.mime_type LIKE '%image%' ) ";
