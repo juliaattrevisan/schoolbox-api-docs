@@ -145,7 +145,7 @@ class Calendar extends Model {
 		
 		if(is_array($catList)) {
 			foreach($catList as $cat) {
-				$catQuery[] = $cat['id'];
+					$catQuery[] = $cat['id'];
 			}
 
 			$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.description, submission_box.owner,
