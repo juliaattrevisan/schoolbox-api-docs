@@ -111,8 +111,16 @@ class WhatsNew
 						deleted = 0 AND `date` >= '$lastcatvisit'";
 		$result = $this->db->getRow($query);
 		
-		$count['forum'] = $result['forumcount'];				 
+		$count['forum'] = $result['forumcount'];
+
+		//check if any new wiki revisions have been made
+		$query = "SELECT COUNT(*) AS revisioncount
+			FROM wiki INNER JOIN wikiRevision ON wiki.wikiID = wikiRevision.wikiID
+			WHERE wiki.categoryID = $id AND wiki.deleted = 0 AND wikiRevision.created >= '$lastcatvisit'";
+		$result = $this->db->getRow($query);
 	
+		$count['wiki'] = $result['wikicount'];
+
 		return $count;
 	}
 
