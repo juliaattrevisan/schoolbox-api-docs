@@ -76,9 +76,12 @@ function bytesToString($size) {
 }
 
 function scrubHTML($html) {
-
 	require_once dirname(__FILE__) . '/../../include/HTMLPurifier/HTMLPurifier.auto.php';
-	return HTMLPurifier::instance()->purify($html);
+
+	$config = HTMLPurifier_Config::createDefault();
+	$config->set('HTML', 'Trusted', true);
+
+	return HTMLPurifier::instance()->purify($html, $config);
 }
 
 function scrubTEXT($text) {
