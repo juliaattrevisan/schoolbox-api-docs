@@ -19,6 +19,7 @@ $this->setBlock('category_block', "new_news", "new_news_item");
 $this->setBlock("category_block", "new_file", "new_file_item"); 
 $this->setBlock("category_block", "new_url", "new_url_item"); 
 $this->setBlock("category_block", "new_forum", "new_forum_item"); 
+$this->setBlock("category_block", "new_wiki", "new_wiki_item"); 
 $flag = 0;
 
 //check mail status
@@ -118,9 +119,20 @@ if(is_array($catList))
 		}
 		else
 			$this->setVar("new_forum_item", "");
+			
+		if($cat['wiki'])
+		{
+			if($cat['wiki'] > 1)
+				$this->setVar('NEW_PLURAL_WIKI', 's');
+			else
+				$this->setVar('NEW_PLURAL_WIKI', '');
+			$this->setVar("NEW_WIKI", $cat['wiki']);
+			$this->parse("new_wiki_item", "new_wiki");
+		}
+		else
+			$this->setVar("new_wiki_item", "");		
 		
-		
-		if($sub['duework'] || $sub['retwork'] || $sub['subboxes'] || $cat['news'] || $cat['files'] || $cat['links'] || $cat['forum'])
+		if($sub['duework'] || $sub['retwork'] || $sub['subboxes'] || $cat['news'] || $cat['files'] || $cat['links'] || $cat['forum'] || $cat['wiki'])
 		{
 			if($catInfo['code'])
 				$this->setVar("NEW_CATEGORY_NAME", $catInfo['name'].' ('.$catInfo['code'].')');

@@ -80,8 +80,15 @@ class Homepage {
 		$groupHandler = new Group;
 		$groupHandler->disbandGroup($this->cid);
 		
+		$this->emptyHomepage();
+	}
+	
+	function emptyHomepage()
+	{
 		/* Delete components, TODO move this into calling component delete functions */
-		$this->db->delete('forum', 'cid', $this->cid);
+		require_once dirname(__FILE__) . '/forum.php';
+		$forumHandler = new Forum;
+		$forumHandler->homepageClean($this->cid);		
 		
 		require_once dirname(__FILE__) . '/categoryNews.php';
 		$newsHandler = new CategoryNews;
@@ -102,8 +109,6 @@ class Homepage {
 		require_once dirname(__FILE__) . '/submission-box.php';
 		$submissionBoxHandler = new SubmissionBox;
 		$submissionBoxHandler->homepageClean($this->cid);
-		
-		
 	}
 	
 	function deleteComponentPositions()

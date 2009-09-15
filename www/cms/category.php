@@ -1,5 +1,6 @@
 <?php
 require_once '../library/category.php';
+require_once '../library/homepage.php';
 require_once '../library/homepage-template.php';
 require_once '../library/group.php';
 $categoryHandler = new Category;
@@ -120,6 +121,21 @@ if(is_numeric($this->arg[0])) {
 	$this->setVar('indiv_modify_block', '');
 
 	
+} else if($this->arg[0] == 'reset' && is_numeric($this->arg[1])) {
+	if(!($category = $categoryHandler->getByID($this->arg[1])))
+		error(2);
+	
+	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS)
+		error(6);
+	
+	// remove component content
+	$homepage = new Homepage($category['id']);
+	$homepage->emptyHomepage();
+	
+	// remove files and links
+	$categoryHandler->recursiveDelete($category['id'], false);
+	
+	localRedir("/homepage/{$category['id']}");
 }
 
 ?>

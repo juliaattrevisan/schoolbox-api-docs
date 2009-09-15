@@ -186,5 +186,13 @@ class Forum extends Model {
 		return $this->updatePost($data);		
 	}
 	
+	function homepageClean ($cid) {
+		$query = "DELETE {$this->_table}, {$this->_postTable}
+			FROM {$this->_table}, {$this->_postTable}
+			WHERE {$this->_table}.{$this->_index} = {$this->_postTable}.{$this->_index}
+				AND {$this->_table}.categoryID = $cid";
+		
+		return $this->db->query($query);
+	}
 }
 ?>

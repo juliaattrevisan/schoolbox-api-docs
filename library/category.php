@@ -310,7 +310,7 @@ class Category extends Model {
 		$this->logAction($categoryID, 'delete');
 	}
 
-	function recursiveDelete($categoryID) {
+	function recursiveDelete($categoryID, $deleteSelf = true) {
 
 		require_once dirname(__FILE__) . '/file.php';
 		require_once dirname(__FILE__) . '/link.php';
@@ -349,10 +349,8 @@ class Category extends Model {
 		}
 		
 		/* Delete folder */
-		$this->delete($categoryID);
-	
-		
-	
+		if($deleteSelf)
+			$this->delete($categoryID);
 	}
 }
 
