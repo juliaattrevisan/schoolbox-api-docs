@@ -308,5 +308,28 @@ class user
 		return $this->db->getAll($query);
 	}	
 	
+	function getCampusID($name)
+	{
+		if(empty($this->campus)) {
+			$query = "SELECT * FROM luCampus";
+			foreach($this->db->getAll($query) as $curCampus) {
+				$this->campus[$curCampus['name']] = $curCampus['id'];
+			}
+		}
+		
+		return isset($this->campus[$name]) ? $this->campus[$name] : false;
+	}
+	
+	function getGroupID($name)
+	{
+		if(empty($this->groups)) {
+			$query = "SELECT id, name FROM groups";
+			foreach($this->db->getAll($query) as $group) {
+				$this->groups[$group['name']] = $group['id'];
+			}
+		}
+		
+		return isset($this->groups[$name]) ? $this->groups[$name] : false;
+	}
 }
 ?>

@@ -38,6 +38,19 @@ class BulkAdd {
 			while (($user = fgetcsv($handle, 1000, ",")) !== FALSE) {
 				if($user[0] != "" && $user[2] != "" && $user[3] != "")
 				{	
+					// get campus id and group
+					$user[5] = is_numeric($user[5]) ? $user[5] : $userDB->getGroupID($user[5]);
+					if(!$user[5]) {
+						print "User {$user[0]} has <b>not</b> been added. (Unknown Group)";
+						continue;
+					}
+					
+					$user[6] = is_numeric($user[6]) ? $user[6] : $userDB->getCampusID($user[6]);
+					if(!$user[6]) {
+						print "User {$user[0]} has <b>not</b> been added. (Unknown Campus)";
+						continue;
+					}
+				
 					$result = $userDB->addUser($user[0], $user[1], $user[2], $user[3], $user[4], $user[5], $user[6], $user[7], $user[8], $user[9], $user[10]);
 					
 					if(!$result) { 
@@ -76,6 +89,6 @@ if(isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name'])
 else
 {   
         //not enough info submitted fail
-        $page->displayPage();
+        //$page->displayPage();
 }
 ?>
