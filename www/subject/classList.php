@@ -24,8 +24,8 @@ if(isStaff($_SESSION['gid']))
 	$this->setTitle('Class List');
 
 	$code = implode('/', $this->arg);
-	$category = $categoryHandler->getByField("code", urldecode($code));
-
+	$category = $categoryHandler->getByCode(urldecode($code));
+	
 	if(is_array($category)) {
 		$this->setVar("SUBJECTNAME", $category['name'] ." ($code)");	
 	
