@@ -1,0 +1,53 @@
+<div class="box" id="component{COMPONENT_ID}">
+	<h2>Blog</h2>
+	<!-- BEGIN config -->
+	<a class="edit">edit</a>
+	<div class="editPanel hide">
+		<form action="/homepage/configForm.php" method="get">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="type" value="config" />
+			<input type="hidden" name="component" value="{COMPONENT_ID}" />
+			<label for="size">Entries Shown: </label>
+			<select name="size">
+				<!-- BEGIN size -->
+				<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
+				<!-- END size -->
+				</select>
+			<label for="size">Comments Shown: </label>
+			<select name="comments">
+				<!-- BEGIN comments -->
+				<option value="{COMPONENT_CONFIG_COMMENTS_VALUE}"{COMPONENT_CONFIG_COMMENTS_SELECTED}>{COMPONENT_CONFIG_COMMENTS_NAME}</option>
+				<!-- END comments -->
+				</select>
+			<input type="submit" value="Update" />
+		</form>
+	</div>
+	<!-- END config -->
+	<div class="text listing">
+	<ul>
+		<!-- BEGIN blog -->
+		<li class="{BLOG_SHADING}">
+			<h3>{BLOG_HEADING}</h3>
+			<p class="interact">{MODIFY_BLOG}</p>
+			<p>{BLOG_BODY}</p>
+			<p class="small summ">Posted by {BLOG_OWNER} {BLOG_CREATED}</p>
+			<h3>{BLOG_COMMENTS}</h3>
+			<!-- BEGIN comment -->
+			<p>{COMMENT_BODY}</p>
+			<p class="interact">{DELETE_COMMENT}</p>
+			<p class="small summ">{COMMENT_OWNER} {COMMENT_CREATED}</p>
+			<div class="float-fix"></div>
+			<!-- END comment -->
+			<form class="standardForm" method="post" action="/blog/comment/new/{BLOG_ID}">
+				<p><textarea name="body" style="width: 100%;"></textarea></p>
+				<p><input type="submit" name="comment" value="Comment"/></p>
+			</form>
+			<div class="float-fix"></div>
+		</li>
+		<!-- END blog -->
+	</ul>
+	</div>
+	<p class="interact">
+	<!-- BEGIN submit --><a href="/blog/modify/new/{ID}">Post Entry</a><!-- END submit -->
+	</p>
+</div>

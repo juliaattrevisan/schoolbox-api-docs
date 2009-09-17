@@ -2,7 +2,6 @@
 
 class HTMLPurifier_Filter_YouTube extends HTMLPurifier_Filter
 {
-
     public $name = 'YouTube';
 
     public function preFilter($html, $config, $context) {
@@ -32,7 +31,6 @@ class HTMLPurifier_Filter_YouTube extends HTMLPurifier_Filter
             'wmode="transparent" width="425" height="350" />'.
             '<![endif]-->'.
             '</object>';
-
     }
 }
 

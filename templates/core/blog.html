@@ -1,0 +1,15 @@
+<h1>{BLOG_HEADING}</h1>
+<span class="header_option">{MODIFY_BLOG}<a href="/homepage/{BLOG_CID}">Back to Homepage</a></span>
+<div class="float-fix"></div>
+<p>{BLOG_BODY}</p>
+
+<h3>{BLOG_COMMENTS}</h3>
+<!-- BEGIN comment -->
+<p>{COMMENT_BODY}</p>
+<p>{DELETE_COMMENT} {COMMENT_OWNER} {COMMENT_CREATED}</p>
+<!-- END comment -->
+
+<form class="standardForm" method="post" action="/blog/comment/new/{BLOG_ID}">
+	<p><textarea name="body" style="width: 100%;"></textarea></p>
+	<p><input type="submit" name="comment" value="Comment"/></p>
+</form>

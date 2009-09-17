@@ -1,0 +1,32 @@
+<?php
+
+require_once '../library/group.php';
+require_once '../library/blog.php';
+require_once '../library/blog-comment.php';
+
+$groupHandle   = new Group();
+$blogHandle    = new Blog();
+$commentHandle = new Comment();
+
+if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+	$blog = $blogHandle->getByID($this->arg[1]);
+	
+	if($groupHandle->getPermission($blog['cid']) < READ_ACCESS)
+		error(19);
+	
+	if(!empty($blog) && !empty($_POST['body'])) {
+		$commentHandle->create(array(
+			'bid'  => $blog['id'],
+			'body' => $_POST['body']
+		));
+		
+		$this->backToTheFuture(1);
+	} else
+		error(29);
+} elseif($this->arg[0] == 'delete' && is_numeric($this->arg[1])) {
+	$commentHandle->delete($this->arg[1]);
+	
+	$this->backToTheFuture(1);
+}
+
+?>

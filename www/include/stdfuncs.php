@@ -79,7 +79,7 @@ function scrubHTML($html) {
 	require_once dirname(__FILE__) . '/../../include/HTMLPurifier/HTMLPurifier.auto.php';
 
 	$config = HTMLPurifier_Config::createDefault();
-	$config->set('HTML', 'Trusted', true);
+	$config->set('Filter', 'YouTube', true);
 
 	return HTMLPurifier::instance()->purify($html, $config);
 }
