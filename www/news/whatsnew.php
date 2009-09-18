@@ -107,16 +107,17 @@ class WhatsNew
 		$count['links'] = $result['linkcount'];
 		
 		//check if any new forum posts have been made
-		$query = "SELECT COUNT(*) AS forumcount FROM forum WHERE cid = $id AND 
-						deleted = 0 AND `date` >= '$lastcatvisit'";
+		$query = "SELECT COUNT(*) AS forumcount
+			FROM forumThread INNER JOIN forumPost ON forumThread.threadID = forumPost.threadID
+			WHERE forumThread.categoryID = $id AND forumThread.deleted != true AND forumPost.deleted != true AND forumPost.date >= '$lastcatvisit'";
 		$result = $this->db->getRow($query);
 		
 		$count['forum'] = $result['forumcount'];
 
 		//check if any new wiki revisions have been made
-		$query = "SELECT COUNT(*) AS revisioncount
+		$query = "SELECT COUNT(*) AS wikicount
 			FROM wiki INNER JOIN wikiRevision ON wiki.wikiID = wikiRevision.wikiID
-			WHERE wiki.categoryID = $id AND wiki.deleted = 0 AND wikiRevision.created >= '$lastcatvisit'";
+			WHERE wiki.categoryID = $id AND wiki.deleted != true AND wikiRevision.created >= '$lastcatvisit'";
 		$result = $this->db->getRow($query);
 	
 		$count['wiki'] = $result['wikicount'];
