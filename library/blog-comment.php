@@ -19,7 +19,7 @@ class Comment extends Model {
 			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
 			WHERE {$this->_table}.id = $id AND deleted IS NULL
 			ORDER BY {$this->_table}.created DESC";
-		$query = $this->_config['size'] > 0 ? "$query LIMIT 0, {$this->_config['size']}" : $query;
+		$query = $this->_config['comments_size'] > 0 ? "$query LIMIT 0, {$this->_config['comments_size']}" : $query;
 		
 		return $this->db->getRow($query);
 	}
@@ -29,7 +29,7 @@ class Comment extends Model {
 			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
 			WHERE bid = $bid AND deleted IS NULL
 			ORDER BY {$this->_table}.created DESC";
-		$query = $this->_config['size'] > 0 ? "$query LIMIT 0, {$this->_config['size']}" : $query;
+		$query = $this->_config['comments_size'] > 0 ? "$query LIMIT 0, {$this->_config['comments_size']}" : $query;
 		
 		$count = $this->db->getRow("SELECT COUNT(*) AS count FROM {$this->_table} WHERE bid = $bid AND deleted IS NULL");
 		

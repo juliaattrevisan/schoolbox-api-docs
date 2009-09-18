@@ -9,6 +9,14 @@ $blogHandle->config($config);
 $commentHandle = new Comment();
 $commentHandle->config($config);
 
+$this->setBlock("config", "comments_size", "comments_size_block");
+for($i=0; $i<=10; $i++) {
+	$this->setVar('COMPONENT_CONFIG_COMMENTS_SIZE_NAME', $i == 0 ? 'All' : $i);
+	$this->setVar('COMPONENT_CONFIG_COMMENTS_SIZE_VALUE', $i);
+	$this->setVar('COMPONENT_CONFIG_COMMENTS_SIZE_SELECTED', $i == $config['comments_size'] ? ' selected="selected"' : '');
+	$this->parse("comments_size_block", "comments_size", true);
+}
+
 $blogs = $blogHandle->getByCID($categoryID);
 $this->setBlock($componentHandle, 'blog', 'blog_block');
 
