@@ -257,10 +257,10 @@ class SitePage extends Page {
 		// if configuration states mail is available and user has access to local mail account display it
 		$this->setBlock('tabTpl', 'webmail_tab', 'wm_tab');
 		
-		if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && $this->groupHandler->isStaff()) || SITE_location == 'ormond' || SITE_location == 'shore')
+		if((MAIL_enable && $_SESSION['local_email']) || ($this->site == 'wenona' && $this->groupHandler->isStaff()) || $this->site == 'ormond' || $this->site == 'shore')
 		{
 			
-			if(SITE_location == 'mgs')
+			if($this->site == 'mgs')
 			{
 				if($this->groupHandler->isStaff())
 					$this->setVar("WEBMAIL_LOCATION", 'href="https://webmail.mgs.vic.edu.au/exchange/" rel="external"');
@@ -274,7 +274,7 @@ class SitePage extends Page {
 				else
 					$this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
 			}
-			else if(SITE_location == 'wenona') {
+			else if($this->site == 'wenona') {
 				if($this->groupHandler->isStaff()) {
 					$this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.wenona.nsw.edu.au/owa" rel="external"');
 				}
@@ -282,7 +282,7 @@ class SitePage extends Page {
 					$this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
 				}
 			}
-			else if(SITE_location == 'shore') {
+			else if($this->site == 'shore') {
 				if($this->groupHandler->isStaff()) {
 					$this->setVar('WEBMAIL_LOCATION', 'href="http://shorexch01/exchange" rel="external"');
 				}
@@ -299,7 +299,7 @@ class SitePage extends Page {
 		}
 		
 		//custom code for each site is performed here	
-		if(SITE_location == 'wenona')
+		if($this->site == 'wenona')
 		{
 			require_once $_SERVER['DOCUMENT_ROOT'] . '/include/wenona.php';
 			//provide encoded login details for intranet
@@ -320,7 +320,21 @@ class SitePage extends Page {
 				$this->setVar('mf_tab', '');
 			}
 		}
-		
+		if($this->site == 'shore') {
+			$this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
+			if($this->groupHandler->isStaff()) {
+				$this->setVar('MYFILES_LOCATION', 'https://shorexch01/fileway' );
+				$this->parse('mf_tab', 'myfiles_tab');
+			}
+			else if($this->groupHandler->isStudent()) {
+				$this->setVar('MYFILES_LOCATION', 'https://cassandra/fileway' );
+				$this->parse('mf_tab', 'myfiles_tab');
+			}
+			else {
+				$this->setVar('MYFILES_LOCATION', '#');
+				$this->setVar('mf_tab', '');
+			}
+		}
 		// choose tab to highlight
 		$output = array('TAB_MAIN_ON'		=> '',
 						'TAB_NEWS_ON'		=> '',
