@@ -60,17 +60,21 @@ if($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) || 
 }
 else if(is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
 	
+	$result = "success";
 	/* Move link from one category to another, after checking permission on both from and to categories */
 	if(!$link = $linkHandler->getByID($_POST['move']))
-		echo "Failed";
+		$result = "Link not found";
 
 	if ($groupHandler->getPermission($link['cid']) < WRITE_ACCESS)
-		echo "Insufficient permssions";
+		$result = "Insufficient permssions";
 
 	if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS)
-		echo "Insufficient permssions";
+		$result = "Insufficient permssions";
 	
 	$linkHandler->update(array('id'=>$_POST['move'], 'category'=> $_POST['categoryID']));
+
+	header("Content-type: application/json");
+	print json_encode(array('result' => $result));	
 
 }
 else if($_GET['delete']) {

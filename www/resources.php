@@ -11,16 +11,6 @@ $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
 $this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 
-
-$this->setJavascript('/javascript/jquery.ui.js');
-$this->setJavascript('/javascript/jquery.contextmenu.js');
-$this->setJavascript('/javascript/jquery.simplemodal.js');
-$this->setJavascript('/javascript/jquery.resources.js');
-$this->setJavascript('/javascript/jquery.scrollTo.js');
-
-$this->setCss('/css/jquery.contextmenu.css');
-$this->setCss('/css/jquery.resources.css');
-
 $this->setTitle('Resources');
 $this->setTab('resources');
 
@@ -56,6 +46,7 @@ while ($parentID > 0) {
 $output = array('WRITE'	=> $groupHandler->getPermission(0) >= WRITE_ACCESS ? 'write' : '',
 				'FULL'	=> $groupHandler->getPermission(0) >= FULL_ACCESS ? 'full' : '',
 				'OPEN' 	=> $openCategory,
+				'HTTP_HOST'	=> $_SERVER['HTTP_HOST'],
 				);
 $this->setVar($output);
 
@@ -75,32 +66,32 @@ if (is_array($categoryList)) {
 		// check permission
 		if ($permission[$category['id']] >= READ_ACCESS) {
 		
-			$category['children'] = $categoryHandler->hasChildren($category['id']);
-			
 			$class = array();
 			
 			// set parent category
 			$class[] = "child-of-node-{$category['parent']}";
 			
-			// has children
-			$category['children'] > 0 ? $class[] = "parent" : null;
+			/* add plus sign to parent nodes */	
+			if ($category['isParent'] == '1')
+				$class[] = in_array($category['id'], $parentList) ? 'expanded loaded' : 'collapsed';
 			
-			// is currently expanded
-			in_array($category['id'], $parentList) ? $class[] = "expanded populated" : null;
-			
-			// has files showing
-			$category["id"] == $openCategory ? $class[] = "opened selected" : null;
-			
-			// has homepage
-			$category['template'] > 0 ? $class[] = "homepage" : null;
-			
-			// write access
-			$permission[$category['id']] == WRITE_ACCESS ? $class[] = "write" : null;
-			
-			// write access
-			$permission[$category['id']] == FULL_ACCESS ? $class[] = "full" : null;
+			/* select default dir */
+			if ($category['id'] == $openCategory)
+				$class[] = 'selected';
 
-			//append code to name
+			/* mark homepages */
+			if ($category['template'] > 0)
+				$class[] = "homepage";
+			
+			/* mark write access */
+			if ($permission[$category['id']] == WRITE_ACCESS)
+				$class[] = "write";
+			
+			/* mark full access*/
+			if ($permission[$category['id']] == FULL_ACCESS)
+				$class[] = "full";
+
+			/* append code to name */
 			$name = scrubTEXT($category['name']);
 			if($category['code'] != '' && $category['code'] != $category['name'])
 				$name .= ' ('.scrubTEXT($category['code']).')';
@@ -139,6 +130,9 @@ if (is_array($fileList) && count($fileList) > 0) {
 		
 		// icon
 		$class[] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
+		
+		if ($i++%2)
+			$class[] = 'dark';
 	
 		$output = array('FILE_ID' 	 	=> $file['id'],
 						'TYPE'			=> $file['url'] ? 'link' : 'file',

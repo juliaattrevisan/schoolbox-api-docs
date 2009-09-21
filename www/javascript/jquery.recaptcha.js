@@ -90,7 +90,7 @@
 		var object = $(this);
 		
 		$(this).submit(function () {
-			
+			console.log('xx');
 			if (justSubmit)
 				return true;
 			

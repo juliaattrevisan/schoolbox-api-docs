@@ -15,7 +15,11 @@ class Category extends Model {
 	}
 	
 	function getCategoryList ($categoryID, $config = false) {
-		$query = "SELECT id, name, GROUP_CONCAT(co.code) code, cf.template, parent 
+		$query = "SELECT id, name, GROUP_CONCAT(co.code) code, cf.template, parent,
+					(SELECT 1 FROM `".$this->_table."` k 
+					 LEFT JOIN perms p ON p.cid = k.id AND p.gid = '".$_SESSION['gid']."' AND p.type > 0
+					 LEFT JOIN userAccess ua ON ua.uid = '".$_SESSION['id']."' AND ua.service = 1 AND ua.sid = k.id AND ua.type > 0
+					 WHERE k.parent = ca.id AND (p.type IS NOT NULL OR ua.type IS NOT NULL OR 1 = ".(int)$_SESSION['su'].") LIMIT 1) isParent
 				  FROM category ca 
 				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
 				  LEFT JOIN homepage_config cf ON cf.cid = ca.id
@@ -256,8 +260,10 @@ class Category extends Model {
 		
 		/* Redo group permissions */
 		$this->deletePerms($data['id']);
-		foreach($data['group'] as $groupID => $perm) {
-			$this->insertPerm($data['id'], $groupID, $perm);
+		if (is_array($data['group'])) {
+			foreach($data['group'] as $groupID => $perm) {
+				$this->insertPerm($data['id'], $groupID, $perm);
+			}
 		}
 		unset($data['group']);
 	

@@ -22,7 +22,7 @@ if (is_numeric($_GET['fileID'])) {
 	if ($groupHandler->getPermission($file['category']) < READ_ACCESS)
 		error(19);
 		
-	if ($groupHandler->getPermission($link['category']) < WRITE_ACCESS && $file['hidden'] > 0)
+	if ($groupHandler->getPermission($file['category']) < WRITE_ACCESS && $file['hidden'] > 0)
 		error(19);		
 	
 	$output = array ('FILE_ID'	 => $file['id'],

@@ -5,10 +5,15 @@
 $j(function () {
 	$j('#recaptcha').recaptcha();
 
-	var captchaValid = false;
+	var justSubmit = false;
 	
 	$j('#feedbackForm').submit(function () {
-		var message = '', object = $j(this);
+console.log('c');
+		if (justSubmit)
+			return true;
+		console.log('b');
+		
+		var message = '', form = $j(this);
 		if ($j('#name').val() == '')
 			message += 'Please enter your name.\n';
 		
@@ -18,15 +23,19 @@ $j(function () {
 		if ($j('#message').val() == '')
 			message += 'Please enter a message.\n';
 		
+		if (message != '') {
+			alert(message);
+			return false;
 		
-		if ($j('#recaptcha_answer').length > 0 && !captchaValid) {
+		} else if ($j('#recaptcha_answer').length > 0) {
 			
 			$j.get('/ajax/recaptcha.php', 
 				{'recaptcha_answer' : $j('#recaptcha_answer').val(), 'recaptcha_challenge' : $j('#recaptcha_challenge').val()},
 				function (data) {
 					if (data.verified == 'true') {
-						captchaValid = true;
-						object.submit();
+						justSubmit = true;
+						console.log('a');
+						form.triggerHandler('submit');
 					} else {
 						alert('The words you have entered do not match the image, please try again.');
 						$j('#recaptcha_answer').css('background-color', 'pink').focus();
@@ -36,14 +45,11 @@ $j(function () {
 			);
 			return false;
 		}
-		
-		if (message != '') {
-			alert(message);
-			return false;
-		} else {
-			console.log('submit');
-			return true;
-		}
+	
+	});
+	
+	$j('input').change(function () {
+		justSubmit = false;
 	});
 		
 });

@@ -69,6 +69,7 @@ div.loading {
 
 .treeTable span.file {
   background-image: url(/images/mime/textfile.png);
+  cursor: default;
 }
 
 .treeTable span.folder, #top {
@@ -140,7 +141,6 @@ div.loading {
 
 /* Container */
 #properties-container {
-	height:350px; 
 	width:300px; 
 	background-color:#fff; 
 	border:3px solid #ccc;
@@ -156,6 +156,9 @@ div.loading {
 	top:-15px; 
 	right:-18px; 
 	cursor:pointer;
+}
+#properties-container div.simplemodal-wrap {
+	height: auto;
 }
 #properties-container a.modalCloseX,
 #properties-container a.modalCloseX:link,
@@ -173,3 +176,12 @@ table#properties tbody tr td {
 	line-height: 18px;
 }
 
+#properties td {
+	width: 50%;
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
+	padding: 5px;
+}
+#properties td.bold {
+	font-weight: bold;
+}

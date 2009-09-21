@@ -22,7 +22,7 @@ class Forum extends Model {
 				  LEFT JOIN user u ON u.id = t.userID 
 				  WHERE t.categoryID = $categoryID 
 				  AND t.deleted = 'false' 
-				  ORDER BY t.date DESC ";
+				  ORDER BY t.last_post_date DESC ";
 				  
 		if($config['size'] != 0 && $config['size'] != '') 
 			$query .= " LIMIT 0, {$config['size']}";  
@@ -38,7 +38,7 @@ class Forum extends Model {
 				  WHERE t.categoryID = $categoryID 
 				  AND t.deleted = 'false' 
 				  GROUP BY p.threadID
-				  ORDER BY t.date DESC ";
+				  ORDER BY t.last_post_date DESC ";
 		if ($limit)
 			$query .= "LIMIT $index, $limit ";
 		

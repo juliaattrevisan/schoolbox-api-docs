@@ -211,6 +211,20 @@ function cutString($content, $chars) {
 	
 }
 
+function shortenName($name, $length) {
+	/* shorten a string by replacing a portion of it with '...' */
+	$currentLength = strlen($name);
+	if ($currentLength <= $length)
+		return $name;
+	else {
+		$cutOut = $currentLength - $length + 3;
+		$endPoint = $currentLength - ceil(($currentLength - $cutOut) * 0.25);
+		$startPoint = ceil($endPoint - $cutOut);
+		
+		return substr($name, 0, $startPoint) . '...' . substr($name, $endPoint);
+	}
+}
+
 function cutSentence($content, $chars) {
 	/* Cut off a summary at the fullstop within the character limit, alternatively just at the word */
 	if(strlen($content) < $chars)

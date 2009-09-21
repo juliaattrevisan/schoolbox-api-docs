@@ -4,23 +4,7 @@
 <script type="text/javascript" src="/javascript/mooRainbow.js"></script>
 <script type="text/javascript">
 <!-- BEGIN colour_list -->
-var {COLOUR_ARRAY} = [
-	['left_head_font', '#{left_head_font}'],
-	['left_head_bg', '#{left_head_bg}'],
-	['left_font', '#{left_font}'],
-	['left_bg_primary', '#{left_bg_primary}'],
-	['left_bg_secondary', '#{left_bg_secondary}'],
-	['left_link', '#{left_link}'],
-	['left_hover', '#{left_hover}'],
-	
-	['right_head_font', '#{right_head_font}'],
-	['right_head_bg', '#{right_head_bg}'],
-	['right_font', '#{right_font}'],
-	['right_bg_primary', '#{right_bg_primary}'],
-	['right_bg_secondary', '#{right_bg_secondary}'],
-	['right_link', '#{right_link}'],
-	['right_hover', '#{right_hover}']
-];
+
 <!-- END colour_list -->
 
 /*
@@ -47,48 +31,6 @@ $j(document).ready(function () {
 		});	
 	});
 	*/
-
-window.addEvent('domready', function () {
-	for(i = 0; i < pickers.length; i++){
-	
-		
-		pickers[i][2] = new MooRainbow(pickers[i][0] + '_div', pickers[i][0] + '_input', {
-			'id': pickers[i][0] + 'Picker',
-			'imgPath': '/images/mooRainbow/',
-			'onComplete': function(color, object){
-				object.element.setStyle('background-color', color.hex);
-				object.input.value = color.hex;
-			},
-			'onChange': function(color, object){
-				object.element.setStyle('background-color', color.hex);
-				object.input.value = color.hex;
-			}
-		});
-		pickers[i][2].manualSet(pickers[i][1], 'hex');
-		$(pickers[i][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
-		$(pickers[i][0] + '_input').value = pickers[i][2].sets.hex;
-	};
-
-	$("loadDefaults").addEvent('click', function () {
-		for(i = 0; i < pickers.length; i++){
-			pickers[i][2].manualSet(defaults[i][1], 'hex');
-			$(pickers[i][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
-			$(pickers[i][0] + '_input').value = pickers[i][2].sets.hex;		
-		}
-	});
-	
-	$("leftRight").addEvent('click', function () {
-		var half = pickers.length/2;
-		for (i = 0; i < half; i++) {
-			pickers[(i+half)][2].manualSet(pickers[i][1], 'hex');
-			$(pickers[(i+half)][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
-			$(pickers[(i+half)][0] + '_input').value = pickers[i][2].sets.hex;		
-		}
-	});
-	
-});
-	
-
 
 function removeClasses() {
 	var x = $$('.layouts a');
@@ -160,11 +102,13 @@ function templateX(el) {
           <div class="float-fix"></div>
 				</div>
       </div>
-        
+
 						
         <input id="template-choice" type="hidden" name="template" value="{TEMPLATE}" />
         <input type="hidden" name="cid" value="{CID}" />
         <input type="submit" class="float-right" name="Submit" value="Update Page" />
+        
     </form>
+                  
     </div>
  </div>

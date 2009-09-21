@@ -81,10 +81,13 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 				
 		} elseif (!isset($_POST['submission']))
 			error(2);
+
 		
 		/* Redirect to submission page */
 		if($_POST['submission'])
 			localRedir("/submission/createSubmission.php?category=".$_POST['category']."&fileid=".$fileID);
+		elseif(isset($_POST['return']))
+			localRedir($_POST['return'] . '&fileID=' . $fileID );
 		else
 			$page->backToTheFuture(2);
 	}
@@ -116,17 +119,21 @@ else if(is_array($_POST['description']) && is_numeric($_POST['category'])) {
 }
 else if(is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
 	
+	$result = "success";
 	/* Move file from one category to another, after checking permission on both from and to categories */
 	if(!$file = $fileHandler->getByID($_POST['move']))
-		echo "Failed";
+		$result = "File not found";
 
 	if ($groupHandler->getPermission($file['cid']) < WRITE_ACCESS)
-		echo "Insufficient permssions";
+		$result = "Insufficient permssions";
 
 	if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS)
-		echo "Insufficient permssions";
+		$result = "Insufficient permssions";
 	
 	$fileHandler->update(array('id'=>$_POST['move'], 'category'=>$_POST['categoryID']));
+	
+	header("Content-type: application/json");
+	print json_encode(array('result' => $result));
 
 }
 else if(is_numeric($_GET['delete'])) {
@@ -140,6 +147,44 @@ else if(is_numeric($_GET['delete'])) {
 		error(6);
 
 	$fileHandler->delete($_GET['delete']);
+	
+	$page->backToTheFuture(1);
+}
+else if(is_numeric($_GET['deleteList'])) {
+	
+	/* Delete file from system after permission checks */
+	$fileList = explode(',', rtrim($_GET['fileList'], ','));
+	if (is_array($fileList)) {
+		foreach ($fileList as $fileID) {
+			if(is_numeric($fileID)) {
+				if (!$file = $fileHandler->getByID($fileID))
+					error(2);
+				
+				if ($groupHandler->getPermission($file['cid']) < WRITE_ACCESS)
+					error(6);
+				
+				$fileHandler->delete($fileID);
+			}
+		}
+	}
+	
+	require_once SITE_root . '/library/link.php';
+	$linkHandler = new Link;
+
+	$linkList = explode(',', rtrim($_GET['linkList'], ','));
+	if (is_array($linkList)) {
+		foreach ($linkList as $linkID) {
+			if(is_numeric($linkID)) {
+				if (!$link = $linkHandler->getByID($linkID))
+					error(2);
+				
+				if ($groupHandler->getPermission($link['category']) < WRITE_ACCESS)
+					error(6);
+				
+				$linkHandler->delete($linkID);
+			}
+		}
+	}
 	
 	$page->backToTheFuture(1);
 }

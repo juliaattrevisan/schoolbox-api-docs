@@ -1,0 +1,164 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>{#assetmanager.title}</title>
+<link rel="stylesheet" type="text/css" href="css/screen.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="css/tree.css" media="screen" />
+<script type="text/javascript" src="../../tiny_mce_popup.js"></script>
+<script type="text/javascript" src="/javascript/jquery.js"></script>
+<script type="text/javascript" src="/javascript/jquery.tree.js"></script>
+<script type="text/javascript">
+$(function () {
+	/* setup tree */
+	$('#tree').tree({
+		dragDrop 	: false,
+		stripeRows 	: false,
+		sequencing	: false,
+		label		: 'span.file',
+	});
+	
+	/* validate form */
+	$('#upload-form').submit(function (event) {
+		event.stopPropagation();
+			if ($('#description').val() == '') {
+				alert('Please enter a description for the file.');
+				return false;
+			}
+			
+			if ($('#file').val() == '') {
+				alert('Please browse for and select a file to upload.');
+				return false;
+			}
+			
+		return true;
+	});
+	
+	/* select image */
+	$('#file-list li').live('click', function () {
+		var win = tinyMCEPopup.getWindowArg("window"), input = tinyMCEPopup.getWindowArg("input");
+		var src = $(this).find('img').attr('src');
+		
+		var relationID = src.match(/id=[\d]+/);
+		
+		url = '/send.php?' + relationID[0].toString();
+		
+		win.document.getElementById(input).value = url;
+		win.document.getElementById('alt').value = $(this).find('img').attr('alt');
+		
+		if (win.ImageDialog.getImageData) 
+			win.ImageDialog.getImageData();
+
+		if (win.ImageDialog.showPreviewImage)
+			win.ImageDialog.showPreviewImage(url);
+		
+		tinyMCEPopup.close();
+	});
+
+	/* open dir */
+	$('#tree li').live('click', function () {
+		var categoryID = $(this).attr('id').substring(5);
+		$('#tree li.selected').removeClass('selected');
+		$(this).addClass('selected');
+		
+		$.post('/ajax/file.php', {'filter' : 'image', 'categoryID': categoryID}, function (data) {
+			if (data.error)
+				alert(data.error);
+			else {
+				
+				/* clear current images */
+				$('#file-list li:not(.file-template)').remove();
+			
+				/* load in new images */
+				for (i in data) {
+					var row = data[i], clone = $('#file-list li.file-template').clone();
+					clone.removeClass('file-template').attr('id', 'file-' + row.id);
+					clone.find('.taskbar').text(row.description);
+					clone.find('img').attr('alt', row.description)
+					clone.find('img').attr('src', '/cms/image.php?id=' + row.id + '&height=100&width=75&resample=1');
+					clone.appendTo('#file-list').show();
+				}
+				
+				if (data.length == 0)
+					$('<li>No images to display.</li>').appendTo($('#file-list'));
+			}
+		}, 'json');
+	});	
+	
+
+	$('#tree li').bind('loaded', function () {
+		var node = $(this);
+		
+		/* fix left panel width */
+		var scrollerWidth = $('#content div.left').width(), table = $(this).closest('ul');
+		if (table.width() < scrollerWidth)
+			table.width(scrollerWidth);
+		else {
+			var maxWidth = 0, width;
+			table.find('li').each(function () {
+				width = 0;
+				$(this).find('span').each(function () {
+					width += $(this).width();
+				});
+				width += 51 ; // cell padding
+				if (width > maxWidth)
+					maxWidth = width;
+			});
+			if (maxWidth > scrollerWidth)
+				table.width(maxWidth);
+		}
+		
+	});
+	
+	$('#tree li.expanded').triggerHandler('loaded');
+
+});
+$(window).load(function () {
+	/* auto select uploaded image */
+	var matched;
+	if (matched = window.location.href.match(/fileID=([\d]+)/)) {
+		var image = $('#file-' + matched[1].toString());
+		image.click();	
+	}
+});
+</script>
+<base target="_self" />
+</head>
+<body>
+
+<div id="content">
+  <div class="control">
+    <form action="/cms/fileForm.php" method="post" enctype="multipart/form-data" id="upload-form">
+    	
+        File: <input type="file" name="file" id="file" />
+        Description: <input type="text" name="description" id="description" /> 
+        <input type="hidden" name="return" value="{REQUEST_URI}" />
+        <input type="hidden" name="category" value="{FILE_CATEGORY_ID}" />
+        <input type="submit" value="Upload" />
+    </form>
+  </div>
+  <div class="left">
+    <ul id="tree">
+      <li id="node-0" class="server"><span class="root">Portal</span></li>
+      <!-- BEGIN folder_list -->
+      <li id="node-{CATEGORY_ID}" class="{CLASS}"><span class="elbow"></span><span class="file">{TITLE}</span></li>
+      <!-- END folder_list -->
+      <li class="node-template"><span class="elbow"></span><span class="file"></span></li>
+    </ul>
+  </div>
+  
+  <div class="right">
+    <ul id="file-list">
+      <!-- BEGIN file -->
+      <li id="file-{FILE_ID}">
+        <div class="taskbar">{TITLE_SHORT}</div>
+        <div class="image"> <img alt="{DESCRIPTION}" src="/cms/image.php?id={FILE_ID}&height=100&width=75&resample=1" /> </div>
+      </li>
+      <!-- END file -->
+      <li class="node-template">
+        <div class="taskbar"></div>
+        <div class="image"> <img alt="" src="" /></div>
+      </li>      
+    </ul>
+  </div>
+</div>
+</body>
+</html>

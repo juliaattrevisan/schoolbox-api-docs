@@ -9,6 +9,7 @@ $categoryHandler = new Category;
 $groupHandler = new Group;
 
 $this->setFile(TEMPLATE_content, 'forum/modify.html');
+$this->setBlock(TEMPLATE_content, 'thread_link', 'thread_link_block');
 $this->setBlock(TEMPLATE_content, 'title', 'title_block');
 $this->setBlock(TEMPLATE_content, 'quote', 'quote_block');
 
@@ -51,6 +52,8 @@ if (is_numeric($this->arg[0])) {
 		
 		if ($thread['postID'] == $post['postID'])
 			$this->parse('title_block', 'title');	
+		
+		$this->parse('thread_link_block', 'thread_link');
 	}
 	/* add new reply */
 	elseif (is_numeric($this->arg[1])) {
@@ -63,8 +66,12 @@ if (is_numeric($this->arg[0])) {
 		if ($thread['locked'] == 'true' && $groupHandler->getPermission($category['id']) < FULL_ACCESS)
 			error(19);
 
-	} else
+		$this->parse('thread_link_block', 'thread_link');
+		
+	} else {
 		$this->parse('title_block', 'title');
+		$this->setVar('thread_link_block', '');
+	}
 	
 	$output = array('ACTION'		=> isset($post['postID']) ? 'Modify' : 'Add',
 					'THREAD_POST'	=> $thread['postID'] == $post['postID'] || !isset($thread['threadID']) ? 'Thread' : 'Post',
@@ -72,6 +79,7 @@ if (is_numeric($this->arg[0])) {
 					'THREAD_TITLE'	=> scrubText($thread['title']),
 					'POST_ID'		=> $post['postID'],
 					'CATEGORY_ID'	=> $category['id'],
+					'CATEGORY'		=> scrubText($category['name']),
 					'BODY'			=> scrubHTML($post['body']),
 					);
 	$this->setVar($output);
