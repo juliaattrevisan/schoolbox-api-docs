@@ -58,7 +58,15 @@ class Blog extends Model {
 		
 	function permission($id) {
 		$blog = $this->getByID($id);
-		return $blog['owner'] == $_SESSION['id'] || $this->group->getPermission($blog['cid']) >= WRITE_ACCESS || NEWS_teacher_edit_other;
+		if(is_array($blog)) {
+			$permission = $this->group->getPermission($blog['cid']);
+			if($blog['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || (NEWS_teacher_edit_other && $permission >= WRITE_ACCESS))
+				return true;
+			else
+				return false;
+		}
+		else
+			false;
 	}
 	
 	function config($config = null) {

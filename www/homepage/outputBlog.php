@@ -22,7 +22,7 @@ $this->setBlock($componentHandle, 'blog', 'blog_block');
 
 if(!empty($blogs)) {
 	foreach($blogs as $blog) {
-		if($blog['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || NEWS_teacher_edit_other)
+		if($blog['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || (NEWS_teacher_edit_other && $permission >= WRITE_ACCESS))
 			$this->setVar('MODIFY_BLOG', "<a href=\"/blog/modify/{$blog['id']}\">Modify</a>");
 		else
 			$this->setVar('MODIFY_BLOG', '');
@@ -48,7 +48,7 @@ if(!empty($blogs)) {
 			foreach($comments as $comment) {
 				$comment['name'] = formatName($comment);
 				$this->setVar(array(
-					'COMMENT_BODY'    => scrubHTML($comment['body']),
+					'COMMENT_BODY'    => scrubTEXT($comment['body']),
 					'COMMENT_OWNER'   => "<a href=\"/search/user/{$comment['owner']}\">{$comment['name']}</a>",
 					'COMMENT_CREATED' => getRelativeTime($comment['created'])
 				));
