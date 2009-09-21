@@ -17,7 +17,7 @@ if (is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'revision_list', 'revision_list_block');
 	
 	$wiki = $wikiHandler->getByID($this->arg[0], $this->arg[1]);
-	
+
 	if (!isset($wiki['wikiID']))
 		error(101);
 
