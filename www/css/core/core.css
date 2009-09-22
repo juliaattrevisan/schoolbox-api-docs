@@ -110,6 +110,9 @@ h1 a.customise {
 	right: 0;
 	top: 10px;
 	}
+#content h2 a {
+	color:#fff;
+	}
 h3 { font-size: 1em; }
 #news-header { margin-bottom: 1em; }
 /*--------------------------------------------------------------
@@ -568,7 +571,6 @@ table.home td {
 	}
 .box .listing ul li {
 	margin: 0;
-	padding: 0;
 	padding: 5px 10px;
 	}
 .box .listing ul li .col {
@@ -579,7 +581,36 @@ table.home td {
 .box .listing ul li .col:first-child {
 	width: 80%;
 	}
-
+.box .listing ul li li {
+	list-style: disc;
+	padding: 0;
+	}
+.box .blog ul li {
+	padding: 10px 10px;
+	}
+.box .listing ul ul {
+	margin: 0 0 1em 1em;
+	}
+.box .listing.blog p {
+	margin: 0 0 1em 0;
+	}
+.box .listing.blog p.interact {
+	margin: 0;
+	}
+.box .blog p.summ {
+	border-top: 1px dashed #ccc;
+	padding-top: 0.5em;
+	float: none;
+	}
+.box .blog_comments {
+	background: #eee;
+	padding: 20px;
+	margin-top: 10px;
+	border: 1px solid #bbb;
+}
+.box .blog_header {
+	margin-bottom: 1em;
+}
 .box .listing ul li.dark,
 #content table tr.dark,
 #content table tr.dark td {
@@ -769,6 +800,15 @@ div.topic {
 	border-top: 1px solid #ccc;
 	padding: 10px 0 0 0;
 }
+.listing ul.topic ul {
+	margin: 0;
+}
+.listing ul.topic ul li {
+	padding: 5px;
+}
+.box ul.topic li li {
+	list-style: none;
+}
 .box .listing .topic > li {
 	padding: 0;
 	margin: 0;
@@ -777,6 +817,26 @@ div.topic {
 .topic li.hide,
 .topic div.hide {
 	display: none;
+}
+/*--------------------------------------------------------------
+	Blog styles 
+--------------------------------------------------------------*/
+.blog-comments {
+	background: #eee;
+	border: 1px solid #ccc;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+.blog-comments p.interact {
+	border-top: 1px dashed #ccc;
+	padding-top: 0.5em;
+	font-size: 11px;
+}
+.blog-comments h3 {
+	margin-bottom: 1em;
+}
+.blog-detail ul {
+	list-style: disc;
 }
 /*--------------------------------------------------------------
 Tree styles 
