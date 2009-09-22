@@ -3,6 +3,7 @@
 
 .left {
 	width: 30%;
+	height: 465px;
 	float: left;
 	background-color: #FFFFFF;
 	border: 1px solid #CCCCCC;
@@ -12,8 +13,10 @@
 	margin-left: 8px;
 	border: 1px solid #CCCCCC;
 	width: 68%;
+	height: 465px;
 	float: left;
 	background-color: #FFFFFF;
+	overflow: auto;
 }
 /*--------------------------
 	Image Upload Styles
@@ -38,6 +41,12 @@
 	padding-left: 22px;
 	background: url(/img/admin/delete.png) no-repeat;
 }
+.bold {
+	font-weight: bold;
+}
+#file-list li.empty {
+	border: 0;
+}
 #file-list {
 	float: left;
 
@@ -47,7 +56,7 @@
 }
 #file-list li {
 	float: left;
-	margin: 6px 10px 0 0;
+	margin: 6px 8px 0 0;
 	border: 1px solid #CCCCCC;
 	position: relative;
 }
@@ -114,6 +123,11 @@ li .taskbar {
 .image .star.checked {
 	display: block;
 }
-li.file-template {
+li.node-template {
 	display: none;
+}
+/* form */
+#upload-form input.submit {
+	font-weight: bold;
+	text-transform: uppercase;
 }

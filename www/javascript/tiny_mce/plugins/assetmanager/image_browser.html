@@ -6,6 +6,11 @@
 <script type="text/javascript" src="../../tiny_mce_popup.js"></script>
 <script type="text/javascript" src="/javascript/jquery.js"></script>
 <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
+<style type="text/css">
+span.file {
+	white-space: nowrap;
+}
+</style>
 <script type="text/javascript">
 $(function () {
 	/* setup tree */
@@ -14,7 +19,48 @@ $(function () {
 		stripeRows 	: false,
 		sequencing	: false,
 		label		: 'span.file',
+		template	: 'li.dir-template:first'
 	});
+
+	/* triggered after a new branch is loaded */
+	$('#tree').bind('loaded', function () {
+		var table = $(this), scroller = $('div.left');
+		
+		/* fix left panel width */
+		var scrollerWidth = parseInt(scroller.width()) - 1;
+		if (table.height() > scroller.height())
+			scrollerWidth -= 16; // scroller width
+		
+		if (table.width() < scrollerWidth)
+			table.width(scrollerWidth);
+		else {
+			var maxWidth = 0, width;
+			table.find('li').each(function () {
+				var li = $(this);
+				width = 0;
+				$(this).find('span').each(function () {
+					if (li.attr('id') == 'node-35')
+						console.log($(this).width());
+					width += $(this).width();
+				});
+				
+				width += 43 ; // cell padding, highlight border
+				if (width > maxWidth)
+					maxWidth = width;
+			});
+			if (maxWidth > scrollerWidth)
+				table.width(maxWidth);
+		}
+
+	});
+
+	$('#tree').triggerHandler('loaded');
+	
+	/* resize left column on window resize */
+	$(window).resize(function () {
+		$('#tree').triggerHandler('loaded');
+	});
+
 	
 	/* validate form */
 	$('#upload-form').submit(function (event) {
@@ -65,12 +111,13 @@ $(function () {
 			else {
 				
 				/* clear current images */
-				$('#file-list li:not(.file-template)').remove();
+				$('#file-list li:not(.node-template)').remove();
 			
 				/* load in new images */
 				for (i in data) {
-					var row = data[i], clone = $('#file-list li.file-template').clone();
-					clone.removeClass('file-template').attr('id', 'file-' + row.id);
+					var row = data[i], clone = $('#file-list li.node-template').clone();
+					
+					clone.removeClass('node-template').attr('id', 'file-' + row.id);
 					clone.find('.taskbar').text(row.description);
 					clone.find('img').attr('alt', row.description)
 					clone.find('img').attr('src', '/cms/image.php?id=' + row.id + '&height=100&width=75&resample=1');
@@ -78,7 +125,10 @@ $(function () {
 				}
 				
 				if (data.length == 0)
-					$('<li>No images to display.</li>').appendTo($('#file-list'));
+					$('<li class="empty">No images to display.</li>').appendTo($('#file-list'));
+				
+				$('#categoryID').val(categoryID);
+				$('#return').val($('#return').val().replace(/categoryID=[\d]+/, 'categoryID=' + categoryID));
 			}
 		}, 'json');
 	});	
@@ -128,11 +178,11 @@ $(window).load(function () {
   <div class="control">
     <form action="/cms/fileForm.php" method="post" enctype="multipart/form-data" id="upload-form">
     	
-        File: <input type="file" name="file" id="file" />
-        Description: <input type="text" name="description" id="description" /> 
-        <input type="hidden" name="return" value="{REQUEST_URI}" />
-        <input type="hidden" name="category" value="{FILE_CATEGORY_ID}" />
-        <input type="submit" value="Upload" />
+        <span class="bold">UPLOAD NEW FILE:</span> <input type="file" name="file" id="file" />
+        <span class="bold">FILE DESCRIPTION:</span> <input type="text" name="description" id="description" /> 
+        <input type="hidden" name="return" id="return" value="{REQUEST_URI}" />
+        <input type="hidden" name="category" id="categoryID" value="{FILE_CATEGORY_ID}" />
+        <input type="submit" class="submit" value="Upload" />
     </form>
   </div>
   <div class="left">
@@ -141,7 +191,7 @@ $(window).load(function () {
       <!-- BEGIN folder_list -->
       <li id="node-{CATEGORY_ID}" class="{CLASS}"><span class="elbow"></span><span class="file">{TITLE}</span></li>
       <!-- END folder_list -->
-      <li class="node-template"><span class="elbow"></span><span class="file"></span></li>
+      <li class="dir-template"><span class="elbow"></span><span class="file"></span></li>
     </ul>
   </div>
   

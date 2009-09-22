@@ -275,7 +275,7 @@ table td { vertical-align: middle; }
 	}
 #category-head, #file-head { margin: 0; width: 100%; }
 #category-list, #file-list { border: 0; width: 100%; overflow: auto; margin-top:0; }
-#category-head th, #file-head th { border: 0; font-weight: bold; background:#eee; line-height: 25px; }
+#category-head th, #file-head th { border: 0; font-weight: bold; background:#eee; line-height: 25px; padding: 3px 7px; }
 #category-list td, #file-list td { width: auto; }
 #category-list thead {
 	padding: 10px;

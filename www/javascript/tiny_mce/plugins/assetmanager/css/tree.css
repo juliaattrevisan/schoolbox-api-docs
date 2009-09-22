@@ -9,7 +9,7 @@ ul#tree {
 	float: left;
 	clear: both;
 }
-#tree li.node-template {
+#tree li.node-template, #tree li.dir-template {
 	display: none;
 }
 #tree li.selected span.file {
@@ -60,6 +60,7 @@ ul#tree {
 	height: 23px;
 	background: transparent url(/images/tree/page.gif) no-repeat 0 3px;
 	cursor: default;
+	white-space: nowrap;
 }
 #tree li.link span.file {
 	background: transparent url(/images/tree/page-link.gif) no-repeat 0 3px;

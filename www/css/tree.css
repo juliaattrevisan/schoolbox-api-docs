@@ -3,7 +3,7 @@
 	display: none;
 }
 #tree td {
-	padding: 2px 10px 3px 10px;
+	padding: 2px 7px 3px;
 }
 #tree span {
 	margin: 0;
@@ -48,9 +48,10 @@
 	width: auto;
 	line-height: 23px;
 	height: 23px;
-	background: transparent url(/images/mime/folder_blue_full.png) no-repeat 0 3px;
+	background: transparent url(/images/mime/folder_blue_full.png) no-repeat 0 0;
 	cursor: default;
 	white-space: nowrap;
+	-moz-user-select: none;	
 }
 
 #tree tr.loading span.label {
@@ -64,13 +65,18 @@ tr.hidden td {
 	filter:alpha(opacity=50);
 }
 
+
+/* files */
 span.file {
 	cursor: default;
 	-moz-user-select: none;
-	
 }
 span.file.ui-draggable, #tree span.label.ui-draggable {
 	cursor: move;
+}
+
+#file-window #file-list tbody tr.empty td {
+	padding: 10px; 
 }
 
 /* drag + drop */

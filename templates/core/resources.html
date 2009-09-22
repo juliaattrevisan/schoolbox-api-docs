@@ -1,13 +1,12 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/jquery.contextmenu.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
-
+<script type="text/javascript">
+	var date1 = new Date;
+</script>
 <script type="text/javascript" src="/min/index.php?f=javascript/jquery.ui.js,javascript/jquery.contextmenu.js,javascript/jquery.simplemodal.js,javascript/jquery.tree.js,javascript/jquery.scrollTo.js"></script>
 <script type="text/javascript">
 $j(function() {
-	
-	var date1 = new Date;
 	
 	// define file context menu 
 	var fileMenu = [
@@ -181,32 +180,45 @@ $j(function() {
 
 	/* load right panel file list */
 	$j('#tree tr:not(.server)').live('click', function () {
+		
+		/* select folder */
 		$j('#tree .selected').removeClass('selected');
 		$j(this).addClass('selected');
+		
+		/* hide all files */
 		$j('#file-list tbody tr').hide();
 		
 		var relationID = $j(this).attr('id').substring(5);
 		var files = $j('tr.category-' + relationID);
 		
 		if (files.length > 0) {
+			/* files exist, show them */
 			files.show();
 			
+			/* re-apply on off */
 			$j('#file-list tbody tr').removeClass('dark');
 			$j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
 			
+			/* remember tree branch */
 			$j.post('/ajax/tree.php', {resourcesID : relationID});
 				
 		} else {
+		
+			/* ajax load files */
 			$j.post('/ajax/file.php', {categoryID : relationID}, function (data) {
+				
 				if (data.error) {
 					alert(data.error);
 				} else if (data.length == 0) {
+					/* display empty message */
 					$j('<tr class="category-' + relationID + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
+					
 				} else {
 					var template = $j('#file-template');
 					for (i in data) {
 						var row = data[i];
 						
+						/* build new file (row) */
 						var clone = template.clone();
 						clone.attr('id', 'file-' + row.id);
 						clone.find('span.file').text(row.description);
@@ -218,26 +230,30 @@ $j(function() {
 						if (row.url)
 							clone.addClass('link');
 						
+						if (row.hidden == 1)
+							clone.addClass('hidden');
+						
 						clone.appendTo($j('#file-list')).show();
 					}			
 				}
 				
+				/* re-apply on off */
 				$j('#file-list tbody tr').removeClass('dark');
 				$j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
 				
-				$j('#file-list').triggerHandler('newFiles', relationID);
 				
-				
+				initialiseFiles(relationID);
 				
 			}, 'json');
 		}
 	
 	});
 	
-	$j('#file-list').bind('newFiles', function (event, relationID) {
+	var initialiseFiles = function (relationID) {
 		
-		/* file context menus */
-		var newChildren = $j('tr.category-' + relationID + ':not(.empty)');
+		var newChildren = $j('tr.category-' + relationID + ':not(.empty)'), categoryNode = $j('#node-' + relationID);
+		
+		/* apply file context menus */
 		newChildren.contextMenu(fileMenu, {
 			theme: 'vista',
 			beforeShow: function (event) {
@@ -267,7 +283,7 @@ $j(function() {
 			}
 		});
 		
-		/* default action */
+		/* double click files, default action */
 		newChildren.dblclick(function () {
 			if ($j(this).hasClass("link"))
 				window.open("/redir.php?id="+$j(this).attr("id").substring(5),"_blank"); 
@@ -275,7 +291,10 @@ $j(function() {
 				window.open("/send.php?id="+$j(this).attr("id").substring(5),"_blank"); 
 		});	
 		
+		/* select files */
 		newChildren.click(function (event) {
+		
+			/* allow multiple select */
 			if (!event.ctrlKey && !event.shiftKey)
 				$j('#file-list tr.selected').removeClass('selected');
 			
@@ -284,6 +303,7 @@ $j(function() {
 			else
 				$j(this).addClass('selected');
 			
+			/* select range */
 			if (event.shiftKey) {
 				
 				var node1 = $j('#file-list tr').index($j('#file-list tr.current'));
@@ -293,7 +313,6 @@ $j(function() {
 					$j('#file-list tr').slice(node2, node1).addClass('selected');
 				else
 					$j('#file-list tr').slice(node1, node2).addClass('selected');
-
 			}
 			
 			$j('#file-list tr.current').removeClass('current');
@@ -301,9 +320,9 @@ $j(function() {
 			
 		});
 		
-		var categoryNode = $j('#node-' + relationID);
+		/* drag files */
 		if (categoryNode.hasClass('full') || categoryNode.hasClass('write')) {
-			/* drag files */
+			
 			newChildren.find('span.file').draggable({
 				cursor: 'move',
 				cursorAt: {top: 5, left: 5},
@@ -317,21 +336,25 @@ $j(function() {
 				
 			});	
 		}
-	});
+	};
 	
 	
+	/* get resourcesID */
 	var resourcesID = 0, selected = $j('#tree tbody tr.selected');
 	if (selected.length > 0)
 		resourcesID = selected.attr('id').substring(5);
 		
-	$j('#file-list').triggerHandler('newFiles', resourcesID);
+	initialiseFiles(resourcesID);
 	
-	
+	/* triggered after a new branch is loaded */
 	$j('#tree').bind('loaded', function () {
-		var table = $j(this);
+		var table = $j(this), scroller = $j('#category-window div.scroller');
 		
 		/* fix left panel width */
-		var scrollerWidth = $j('#category-window div.scroller').width();
+		var scrollerWidth = parseInt(scroller.width()) - 1;
+		if (table.height() > scroller.height())
+			scrollerWidth -= 16; // scroller width
+		
 		if (table.width() < scrollerWidth)
 			table.width(scrollerWidth);
 		else {
@@ -341,64 +364,60 @@ $j(function() {
 				$j(this).find('span').each(function () {
 					width += $j(this).width();
 				});
-				width += 45 ; // cell padding, highlight border
+				width += 39 ; // cell padding, highlight border
 				if (width > maxWidth)
 					maxWidth = width;
 			});
 			if (maxWidth > scrollerWidth)
 				table.width(maxWidth);
 		}
-
-		/* folder context menus */
-		table.find('tr').each(function () {
-			
-			if ($j(this).data('contextApplied') != 'true') {
+		
+		/* apply folder context menus */
+		var newRows = table.find('tbody tr:not(.context)').addClass('context');
+		newRows.contextMenu(folderMenu, {
+			theme: 'vista',
+			beforeShow: function () {
 				
-				$j(this).data('contextApplied', 'true');
-				$j(this).contextMenu(folderMenu, {
-					theme: 'vista',
-					beforeShow: function () {
-						
-						/* enable all options */
-						$j(this.menu).find('.context-menu-item').removeClass('context-menu-item-disabled');
-						
-						/* homepage */
-						if ($j(this.target).hasClass("homepage") == 0)
-							$j($j(this.menu).find('.context-menu-item')[0]).toggleClass("context-menu-item-disabled", true); 
-			
-						if ($j(this.target).hasClass("write") == 0 && $j(this.target).hasClass("full") == 0) {
-							// disable from modify onwards
-							for (var i = 2; i <= 9; i++)
-								$j($j(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
-						} 
-						
-						if ($j(this.target).hasClass('server')) {
-							// disable from modify / delete
-							for (var i = 0; i <= 7; i++)
-								$j($j(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
-							
-							$j(this.menu).find('.context-menu-item:eq(9)').addClass("context-menu-item-disabled"); 
-						}
-						
-						// disable delete all
-						if ($j(this.target).hasClass("full") == 0)
-							$j(this.menu).find('.context-menu-item:eq(4)').addClass("context-menu-item-disabled"); 
-						
-					}
-				});
+				/* enable all options */
+				$j(this.menu).find('.context-menu-item').removeClass('context-menu-item-disabled');
+				
+				/* homepage */
+				if ($j(this.target).hasClass("homepage") == 0)
+					$j($j(this.menu).find('.context-menu-item')[0]).toggleClass("context-menu-item-disabled", true); 
+	
+				if ($j(this.target).hasClass("write") == 0 && $j(this.target).hasClass("full") == 0) {
+					// disable from modify onwards
+					for (var i = 2; i <= 9; i++)
+						$j($j(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
+				} 
+				
+				if ($j(this.target).hasClass('server')) {
+					// disable from modify / delete
+					for (var i = 0; i <= 7; i++)
+						$j($j(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
+					
+					$j(this.menu).find('.context-menu-item:eq(9)').addClass("context-menu-item-disabled"); 
+				}
+				
+				// disable delete all
+				if ($j(this.target).hasClass("full") == 0)
+					$j(this.menu).find('.context-menu-item:eq(4)').addClass("context-menu-item-disabled"); 
+				
 			}
 		});
+		
 	});
-	
 	
 	$j('#tree').triggerHandler('loaded');
 	
+	/* resize left column on window resize */
 	$j(window).resize(function () {
 		$j('#tree').triggerHandler('loaded');
 	});
 
-
 	$j("div.loading").hide();
+	
+	/* auto scroll to open branch */
 	$j("#category-window div.scroller").scrollTo($j("#node-{OPEN}"), 200);
 	
 	var date2 = new Date;

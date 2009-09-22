@@ -76,18 +76,18 @@
 						
 						clone = template.clone();	
 						clone.attr('id', options.idPrefix + row.id);
+						clone.removeClass('dir-template');
 						clone.addClass(options.childPrefix + node.attr('id'));
 						clone.addClass(row.permission);
 						clone.find(options.label).text(row.name);
 						
 						if (row.isParent == 1) {
-							
 							clone.addClass('collapsed');
 							makeExpandable(clone.find('span.elbow'));
 						
 						}
 						
-						clone.insertAfter(lastNode);
+						clone.insertAfter(lastNode).show();
 						
 						object.indentRow(clone);
 						lastNode = clone;
@@ -118,7 +118,7 @@
 					node.removeClass('loading');
 					
 					/* continue */
-					node.closest('table').triggerHandler('loaded');
+					node.closest(options.type).triggerHandler('loaded');
 				}
 			}, 'json');
 		};
@@ -330,7 +330,7 @@
 			
 			if (parent.attr('id') == 'node-0')
 				return;
-			
+			console.log(parent);
 			/* copy parent spacers */
 			parent.find('span:not(.elbow,' + options.label + ')').each(function (i) {
 				var clone = $(this).clone();
@@ -439,6 +439,7 @@
 			});
 		};
 
+		// todo: move drag + drop functions into their own plugin
 		var makeDroppable = function (node) {
 			
 			var accept = options.label+',span.file';
