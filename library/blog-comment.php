@@ -5,7 +5,7 @@ require_once dirname(__FILE__) . '/../library/group.php';
 
 class Comment extends Model {
 	function Comment () {
-		$this->_table = "blog_comment";
+		$this->_table = "blogComment";
 		$this->_index = "id";
 		$this->_config = array();
 		
