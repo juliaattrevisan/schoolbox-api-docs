@@ -33,7 +33,6 @@
       <p class="interact"><a class="show_comments" href="#">Show comments ({COMMENT})</a></p>
 			<div class="float-fix"></div>
       <div class="blog_comments">
-        <h3 class="blog_header">{BLOG_COMMENTS}</h3>
         <!-- BEGIN comment -->
         <p>{COMMENT_BODY}</p>
         <p class="small summ">{COMMENT_OWNER} {COMMENT_CREATED} {DELETE_COMMENT}</p>
@@ -59,11 +58,13 @@
 		$j('div.blog_comments, div.blog form').hide();
 		
 		$j('a.show_comments').click(function(){
-				$j(this).closest('li').find('div.blog_comments').toggle();																	 
+				$j(this).closest('li').find('div.blog_comments').toggle();
+				return false;
 		});
 		
 		$j('a.post_comment').click(function(){
-				$j(this).closest('li').find('form').toggle();																	 
+				$j(this).closest('li').find('form').toggle();
+				return false;
 		});
 	});
 </script>
