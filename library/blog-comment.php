@@ -24,18 +24,21 @@ class Comment extends Model {
 		return $this->db->getRow($query);
 	}
 
-	function getByBID($bid, &$count = false) {
+	function getByBID($bid) {
 		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname
 			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
 			WHERE bid = $bid AND deleted IS NULL
 			ORDER BY {$this->_table}.created DESC";
 		$query = $this->_config['comments_size'] > 0 ? "$query LIMIT 0, {$this->_config['comments_size']}" : $query;
 		
-		$count = $this->db->getRow("SELECT COUNT(*) AS count FROM {$this->_table} WHERE bid = $bid AND deleted IS NULL");
-		
 		return $this->db->getAll($query);
 	}
-	
+
+	function count($bid) {
+		$query = "SELECT COUNT(*) AS count FROM {$this->_table} WHERE bid = $bid AND deleted IS NULL";
+		return $this->db->getOne($query);
+	}
+
 	function create($comment) {
 		$comment = array_merge(array(
 			'owner'   => $_SESSION['id'],

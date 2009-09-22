@@ -9,7 +9,9 @@ $blogHandle->config($config);
 $commentHandle = new Comment();
 $commentHandle->config($config);
 
-$this->setBlock("config", "comments_size", "comments_size_block");
+$this->setBlock('config', 'comments_size', 'comments_size_block');
+
+
 for($i=0; $i<=10; $i++) {
 	$this->setVar('COMPONENT_CONFIG_COMMENTS_SIZE_NAME', $i == 0 ? 'All' : $i);
 	$this->setVar('COMPONENT_CONFIG_COMMENTS_SIZE_VALUE', $i);
@@ -18,7 +20,12 @@ for($i=0; $i<=10; $i++) {
 }
 
 $blogs = $blogHandle->getByCID($categoryID);
+
 $this->setBlock($componentHandle, 'blog', 'blog_block');
+$this->setBlock('blog', 'comment', 'comment_block');
+$this->setBlock('blog', 'show_all', 'show_all_block');
+$this->setBlock('blog', 'show_comment', 'show_comment_block');
+
 
 if(!empty($blogs)) {
 	foreach($blogs as $blog) {
@@ -39,12 +46,24 @@ if(!empty($blogs)) {
 		));
 		
 		// comments
-		$comments = $commentHandle->getByBID($blog['id'], $count);
-		$this->setBlock('blog', 'comment', 'comment_block');
-		
+		$this->setVar('comment_block','');
+
+		$comments = $commentHandle->getByBID($blog['id']);
+		$totalComments = $commentHandle->count($blog['id']);
+		$showingComments = count($comments);
+			
+		$this->setVar('BLOG_TOTAL_COMMENTS', $totalComments);
+		if($totalComments > $showingComments)
+			$this->parse('show_all_block','show_all');
+		else
+			$this->setVar('show_all_block','');
+
 		if(!empty($comments)) {
-			$this->setVar('BLOG_COMMENTS', "<a href=\"/blog/{$blog['id']}\">" . count($comments) . " of {$count['count']} Comments</a>");
-		
+			
+			$this->setVar('BLOG_COMMENTS', $showingComments);
+			$this->parse('show_comment_block','show_comment' );
+			
+
 			foreach($comments as $comment) {
 				$comment['name'] = formatName($comment);
 				$this->setVar(array(
@@ -60,9 +79,10 @@ if(!empty($blogs)) {
 				
 				$this->parse('comment_block', 'comment', true);
 			}
-		} else
+		} else {
 			$this->setVar('comment_block', '');
-		
+			$this->setVar('show_comment_block', '');
+		}
 		$this->parse('blog_block', 'blog', true);
 	}
 } else

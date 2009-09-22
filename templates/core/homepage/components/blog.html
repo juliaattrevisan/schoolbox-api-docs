@@ -30,7 +30,9 @@
 			<h3>{BLOG_HEADING}</h3>
 			<p class="interact">Posted by {BLOG_OWNER} {BLOG_CREATED} {MODIFY_BLOG}</p>
 			<p>{BLOG_BODY}</p>
-      <p class="interact"><a class="show_comments" href="#">Show comments ({COMMENT})</a></p>
+		<!-- BEGIN show_comment -->
+      <p class="interact"><a class="show_comments" href="javascript:void();">Show {BLOG_COMMENTS} Comments</a></p>
+	  <!-- END show_comment -->
 			<div class="float-fix"></div>
       <div class="blog_comments">
         <!-- BEGIN comment -->
@@ -38,12 +40,18 @@
         <p class="small summ">{COMMENT_OWNER} {COMMENT_CREATED} {DELETE_COMMENT}</p>
         <div class="float-fix"></div>
         <!-- END comment -->
-        <p><a class="post_comment" href="#">Post comment</a></p>
+		<!-- BEGIN show_all -->
+		<p><a class="interact" href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
+		<!-- END show_all -->
+		</div>
+		
+		<p><a class="interact post_comment" href="javascript:void();">Post comment</a></p>
         <form class="standardForm" method="post" action="/blog/comment/new/{BLOG_ID}">
           <p><textarea name="body" style="width: 100%;"></textarea></p>
           <p><input type="submit" name="comment" value="Comment"/></p>
         </form>
-      </div>
+
+      
 			<div class="float-fix"></div>
 		</li>
 		<!-- END blog -->
