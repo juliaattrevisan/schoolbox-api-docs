@@ -52,8 +52,8 @@ class modUser
 		$this->t_body->set_block("tplBODY", "login", "login_section");
 		$this->t_body->set_block("tplBODY", "groups", "group_section");
 		$this->t_body->set_block("tplBODY", "perms", "perm_section");
-		$this->t_body->set_block("tplBODY", "action_log", "action_section");
-		$this->t_body->set_block("tplBODY", "login_log", "login_block");
+		$this->t_body->set_block("perms", "action_log", "action_section");
+		$this->t_body->set_block("perms", "login_log", "login_block");
 		$this->t_body->set_var("login_section","");
 		$this->t_body->set_var("group_section","");
 		$this->t_body->set_var("perm_section","");
@@ -110,6 +110,7 @@ class modUser
 		$this->displayLogin($user['username']);
 		$this->displayActivities($id);
 
+		$this->t_body->parse("perm_section","perms");
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 
@@ -221,7 +222,7 @@ class modUser
 	}				
 
 	function displayActivities($id) {
-		$this->t_body->set_block("tplBODY", "action_log", "action_section");
+		$this->t_body->set_block("perms", "action_log", "action_section");
 		
 		$query = "SELECT object, action, time, c.name as folder, f.description as file, l.description as link 
 				FROM cmsLog 
@@ -249,7 +250,7 @@ class modUser
 	}
 
 	function displayLogin($username) {
-		$this->t_body->set_block("tplBODY", "login_log", "login_block");
+		$this->t_body->set_block("perms", "login_log", "login_block");
 		
 		$query = "SELECT date, ip, login FROM login_log WHERE username like ".$this->db->smartQuote($username)." ORDER BY date DESC LIMIT 0,10";
 				
@@ -305,7 +306,7 @@ class modUser
 		if($i==0)
 			$this->t_body->set_var("perm", "");
 			
-		$this->t_body->parse("perm_section","perms");
+		
 
 	}				
 

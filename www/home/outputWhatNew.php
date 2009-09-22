@@ -20,6 +20,8 @@ $this->setBlock("category_block", "new_file", "new_file_item");
 $this->setBlock("category_block", "new_url", "new_url_item"); 
 $this->setBlock("category_block", "new_forum", "new_forum_item"); 
 $this->setBlock("category_block", "new_wiki", "new_wiki_item"); 
+$this->setBlock("category_block", "new_blog", "new_blog_item"); 
+
 $flag = 0;
 
 //check mail status
@@ -83,6 +85,18 @@ if(is_array($catList))
 		}
 		else
 			$this->setVar("new_news_item", "");
+			
+		if($cat['blog'])
+		{
+			if($cat['blog'] > 1)
+				$this->setVar('NEW_PLURAL_BLOG', 's');
+			else
+				$this->setVar('NEW_PLURAL_BLOG', '');
+			$this->setVar('NEW_BLOG', $cat['blog']);
+			$this->parse('new_blog_item', 'new_blog');
+		}
+		else
+			$this->setVar('new_blog_item', '');
 			
 		if($cat['files'])
 		{

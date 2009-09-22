@@ -92,6 +92,13 @@ class WhatsNew
 			
 		$count['news'] = $result['newscount'];
 
+		//check if any new blogs has been submitted
+		$query = "SELECT COUNT(*) AS blogcount FROM blog WHERE deleted IS NULL AND cid = $id AND
+			created >= '$lastcatvisit'";
+		$result = $this->db->getRow($query);
+			
+		$count['blog'] = $result['blogcount'];
+
 		//check if any new files have been submitted
 		$query = "SELECT COUNT(*) AS filecount FROM file WHERE 
 			deleted = 0 AND category = $id AND submitted >= '$lastcatvisit'";
