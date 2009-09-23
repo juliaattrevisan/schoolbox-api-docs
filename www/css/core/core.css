@@ -581,8 +581,10 @@ table.home td {
 .box .listing ul li .col:first-child {
 	width: 80%;
 	}
-.box .listing ul li li {
+.box .listing ul li ul li {
 	list-style: disc;
+	}
+.box .listing ul li li {
 	padding: 0;
 	}
 .box .blog ul li {
