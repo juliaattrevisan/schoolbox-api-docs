@@ -330,7 +330,7 @@
 			
 			if (parent.attr('id') == 'node-0')
 				return;
-			console.log(parent);
+			
 			/* copy parent spacers */
 			parent.find('span:not(.elbow,' + options.label + ')').each(function (i) {
 				var clone = $(this).clone();

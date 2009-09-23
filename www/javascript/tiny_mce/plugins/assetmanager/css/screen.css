@@ -8,6 +8,7 @@
 	background-color: #FFFFFF;
 	border: 1px solid #CCCCCC;
 	overflow: auto;
+	
 }
 .right {
 	margin-left: 8px;
@@ -59,11 +60,12 @@
 	margin: 6px 8px 0 0;
 	border: 1px solid #CCCCCC;
 	position: relative;
+
 }
 li .taskbar {
 	background: #EEEEEE;
 	overflow: hidden;
-	width: 80px;
+	
 	padding: 5px 5px;
 	border-bottom: 1px solid #CCCCCC;
 	

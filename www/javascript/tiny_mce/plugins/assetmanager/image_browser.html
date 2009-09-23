@@ -39,12 +39,11 @@ $(function () {
 				var li = $(this);
 				width = 0;
 				$(this).find('span').each(function () {
-					if (li.attr('id') == 'node-35')
-						console.log($(this).width());
 					width += $(this).width();
 				});
 				
-				width += 43 ; // cell padding, highlight border
+				width += 51 ; // cell padding, highlight border
+				$(this).width(width);
 				if (width > maxWidth)
 					maxWidth = width;
 			});
@@ -134,32 +133,6 @@ $(function () {
 	});	
 	
 
-	$('#tree li').bind('loaded', function () {
-		var node = $(this);
-		
-		/* fix left panel width */
-		var scrollerWidth = $('#content div.left').width(), table = $(this).closest('ul');
-		if (table.width() < scrollerWidth)
-			table.width(scrollerWidth);
-		else {
-			var maxWidth = 0, width;
-			table.find('li').each(function () {
-				width = 0;
-				$(this).find('span').each(function () {
-					width += $(this).width();
-				});
-				width += 51 ; // cell padding
-				if (width > maxWidth)
-					maxWidth = width;
-			});
-			if (maxWidth > scrollerWidth)
-				table.width(maxWidth);
-		}
-		
-	});
-	
-	$('#tree li.expanded').triggerHandler('loaded');
-
 });
 $(window).load(function () {
 	/* auto select uploaded image */
@@ -179,7 +152,7 @@ $(window).load(function () {
     <form action="/cms/fileForm.php" method="post" enctype="multipart/form-data" id="upload-form">
     	
         <span class="bold">UPLOAD NEW FILE:</span> <input type="file" name="file" id="file" />
-        <span class="bold">FILE DESCRIPTION:</span> <input type="text" name="description" id="description" /> 
+        <span class="bold">DESCRIPTION:</span> <input type="text" name="description" id="description" /> 
         <input type="hidden" name="return" id="return" value="{REQUEST_URI}" />
         <input type="hidden" name="category" id="categoryID" value="{FILE_CATEGORY_ID}" />
         <input type="submit" class="submit" value="Upload" />
@@ -187,7 +160,7 @@ $(window).load(function () {
   </div>
   <div class="left">
     <ul id="tree">
-      <li id="node-0" class="server"><span class="root">Portal</span></li>
+      <li id="node-0" class="server"><span class="root">Resources</span></li>
       <!-- BEGIN folder_list -->
       <li id="node-{CATEGORY_ID}" class="{CLASS}"><span class="elbow"></span><span class="file">{TITLE}</span></li>
       <!-- END folder_list -->
@@ -200,7 +173,7 @@ $(window).load(function () {
       <!-- BEGIN file -->
       <li id="file-{FILE_ID}">
         <div class="taskbar">{TITLE_SHORT}</div>
-        <div class="image"> <img alt="{DESCRIPTION}" src="/cms/image.php?id={FILE_ID}&height=100&width=75&resample=1" /> </div>
+        <div class="image"> <img alt="{DESCRIPTION}" src="/cms/image.php?id={FILE_ID}&height=80&width=75&resample=1" /> </div>
       </li>
       <!-- END file -->
       <li class="node-template">
