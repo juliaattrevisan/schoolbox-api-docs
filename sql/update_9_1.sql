@@ -97,3 +97,15 @@ ALTER TABLE `wiki`
 
 /* Create table in target */
 RENAME TABLE `revision` TO `wikiRevision`;
+
+ALTER TABLE `event`  ADD COLUMN `type` SMALLINT(1) DEFAULT '0' NOT NULL;
+
+/* Create table in target */
+CREATE TABLE `luEventType`(
+	`eventTypeID` int(10) unsigned NOT NULL  auto_increment ,
+	`eventType` varchar(100) COLLATE utf8_general_ci NULL  ,
+	`eventColour` varchar(10) COLLATE utf8_general_ci NULL  ,
+	PRIMARY KEY (`eventTypeID`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+insert  into `luEventType`(`eventTypeID`,`eventType`,`eventColour`) values (1,'Event','000000'),(2,'Excursion','0033FF'),(3,'Report','FF9900'),(4,'Exam','FF0000'),(5,'Meeting','009933');
