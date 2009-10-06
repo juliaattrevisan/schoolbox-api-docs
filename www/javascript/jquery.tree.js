@@ -84,8 +84,10 @@
 						if (row.isParent == 1) {
 							clone.addClass('collapsed');
 							makeExpandable(clone.find('span.elbow'));
-						
 						}
+						
+						if (row.template > 0)
+							clone.addClass('homepage');
 						
 						clone.insertAfter(lastNode).show();
 						
