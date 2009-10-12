@@ -231,6 +231,8 @@ function setSynergyInfo(&$mydb)
 					{
 						$myquery = "SELECT id, group_id FROM user WHERE synergy_id = $child";
 						$portal = $mydb->getRow($myquery);
+						$subjects = array();
+
 						if($portal['id'])
 						{
 							$subjectList = getSubjectList($child, $studentGroup[0]);

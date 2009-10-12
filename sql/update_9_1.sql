@@ -109,3 +109,5 @@ CREATE TABLE `luEventType`(
 ) ENGINE=MyISAM DEFAULT CHARSET='utf8';
 
 insert  into `luEventType`(`eventTypeID`,`eventType`,`eventColour`) values (1,'Event','000000'),(2,'Excursion','0033FF'),(3,'Report','FF9900'),(4,'Exam','FF0000'),(5,'Meeting','009933');
+
+PDATE `homepage_comp` SET `id`='5',`size`='2',`method`='outputForumList',`name`='Forum',`description`='Show recent discussion topics going on in your homepages forum.',`filename`='forum_s.htm',`config`='a:1:{s:4:\"size\";i:0;}',`invisible`='false' WHERE `id`='5';

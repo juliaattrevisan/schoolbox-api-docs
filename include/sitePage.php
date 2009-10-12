@@ -260,7 +260,7 @@ class SitePage extends Page {
 		if((MAIL_enable && $_SESSION['local_email']) || ($this->site == 'wenona' && $this->groupHandler->isStaff()) || $this->site == 'ormond' || $this->site == 'shore')
 		{
 			
-			if($this->site == 'mgs')
+			if($this->site == 'mgs' || $this->site == 'grimwade')
 			{
 				if($this->groupHandler->isStaff())
 					$this->setVar("WEBMAIL_LOCATION", 'href="https://webmail.mgs.vic.edu.au/exchange/" rel="external"');

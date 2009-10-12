@@ -14,7 +14,7 @@ if(is_array($_SESSION['children'])) {
 			$this->setVar("STUDENT_ID", $child['id']);
 			$this->setVar("STUDENT_NAME", formatName($user,'{firstname} {lastname}'));
 			$this->setVar("STUDENT_YEAR", $user['year']);
-			
+		
 			if(is_array($child['subjects']) ) {
 				foreach($child['subjects'] as $subject)
 				{
@@ -25,7 +25,7 @@ if(is_array($_SESSION['children'])) {
 			}
 	
 			$this->parse("student_subjects", "student_block", true);
-			$this->setVar("subject_item", '');
+			$this->setVar('subject_item', '');
 		}
 	
 	}
