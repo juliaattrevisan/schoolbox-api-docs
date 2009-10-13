@@ -1,21 +1,16 @@
 <?php
 
-		$continue = true;
-		//dont show forums to parents if they not a direct member of group
-		if($groupHandler->isParent())
-		{
-			if(!$groupHandler->involvedInGroup($_SESSION['id'], $categoryID))
-			{
-				$this->setVar($name, "");
-				$continue = false;
-			}
-		}
-		
-	if ($continue) {
+
+	//dont show forums to parents if they not a direct member of group
+	if($groupHandler->isParent() && !$groupHandler->involvedInGroup($_SESSION['id'], $categoryID)) {
+			$componentHandle = '';
+	}
+	else {
 		//forum recent posts
-		$this->setBlock($componentHandle, "forum", "forum_block");
-		$this->setBlock('forum', "forum_reply", "forum_reply_block");
-		
+
+			$this->setBlock($componentHandle, 'forum', 'forum_block');
+	$this->setBlock('forum', 'forum_reply', 'forum_reply_block');
+
 		require_once SITE_root . '/library/forum.php';
 		$forumHandler = new Forum;
 		
@@ -47,6 +42,6 @@
 				
 			}
 		} else
-			$this->setVar("forum_block", "");
+			$this->setVar("forum_block", '');
 	}
 ?>

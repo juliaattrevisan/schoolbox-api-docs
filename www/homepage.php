@@ -70,7 +70,9 @@ $this->setBlock(TEMPLATE_content, "edit_page", "edit_page_block");
 $colours = $homepageHandler->getColorList();
 $this->setVar($colours);
 
-$output = array('HEADING'				=> scrubTEXT($category['name']) . (isset($code) ? ' ('.$category['code'].')' : '' ),
+$codeCount = count(explode(',',$category['code']));
+
+$output = array('HEADING'				=> scrubTEXT($category['name']) . (isset($code) && $codeCount < 2 ? ' ('.$category['code'].')' : '' ),
 				'CODE'					=> urlencode(urlencode($category['code'])),
 				'ID'					=> $categoryID,
 				'TEMPLATE'				=> 'template'.$category['template'],
@@ -193,10 +195,11 @@ if (is_array($componentList)) {
 		
 		} else
 			$this->setVar("config_block", "");	
-		
-		$this->parse('COLUMN'.$component['column'], $componentHandle, true);
-		$columnFlag[$component['column']] = true;
-		
+
+		if($componentHandle) {
+			$this->parse('COLUMN'.$component['column'], $componentHandle, true);
+			$columnFlag[$component['column']] = true;
+		}
 	}
 }
 
