@@ -584,6 +584,9 @@ table.home td {
 .box .listing ul li ul li {
 	list-style: disc;
 	}
+.box .listing ul.topic li ul li {
+	list-style: none;
+	}
 .box .listing ul li li {
 	padding: 0;
 	}
