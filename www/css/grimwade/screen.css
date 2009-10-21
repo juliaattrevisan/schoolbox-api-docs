@@ -81,6 +81,7 @@ body {
 .box .elearning { background: url(/images/grimwade/icon-elearning.gif) no-repeat; }
 .box .pe { background: url(/images/grimwade/icon-pe.gif) no-repeat; }
 .box .music { background: url(/images/grimwade/icon-music.gif) no-repeat; }
+.box .music { background: url(/images/grimwade/icon-chinese.gif) no-repeat; }
 .box .item:hover {
 	background-position: 0 -170px;
 }
