@@ -9,7 +9,7 @@ require_once SITE_root . '/library/link.php';
 $page = new SitePage;
 $output = array();
 
-$allowFilter = array('image');
+$allowFilter = array('image', 'video');
 
 if (is_numeric($_POST['categoryID'])) {
 	$fileHandler = new File;
@@ -18,9 +18,12 @@ if (is_numeric($_POST['categoryID'])) {
 
 	
 	$fileList = $fileHandler->getAllInCategory($_POST['categoryID'],  in_array($_POST['filter'], $allowFilter) ? array('filter' => $_POST['filter']) : false);
-	$linkList = $linkHandler->getAllInCategory($_POST['categoryID']);
 	
-	$fileList = $fileHandler->mergeLinks( $fileList, $linkList);
+	if (!in_array($_POST['filter'], $allowFilter)) {
+		
+		$linkList = $linkHandler->getAllInCategory($_POST['categoryID']);
+		$fileList = $fileHandler->mergeLinks( $fileList, $linkList);
+	}
 	if (!is_array($fileList)) {
 		$output = array();
 	} else {

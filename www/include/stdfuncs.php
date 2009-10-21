@@ -80,7 +80,12 @@ function scrubHTML($html) {
 
 	$config = HTMLPurifier_Config::createDefault();
 	$config->set('Filter', 'YouTube', true);
-
+	$config->set('Filter', 'Custom', array(new HTMLPurifier_Filter_Quicktime(), 
+										   new HTMLPurifier_Filter_Shockwave(), 
+										   new HTMLPurifier_Filter_Flash(), 
+										   new HTMLPurifier_Filter_WindowsMedia(),
+										   new HTMLPurifier_Filter_Real()));
+	
 	return HTMLPurifier::instance()->purify($html, $config);
 }
 
@@ -94,7 +99,7 @@ function scrubTEXT($text) {
 	$text = htmlentities($text, ENT_QUOTES, "UTF-8");
 
 	//get rid of any possible bad chars
-	$text = scrubHTML($text);
+	//$text = scrubHTML($text);
 	return $text;
 }
 

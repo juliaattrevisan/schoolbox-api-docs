@@ -54,12 +54,12 @@
 			var ed = tinyMCE.activeEditor, file;
 			
 			if (type.toLowerCase() == 'image')
-				file = '/image_browser.php';
+				file = '/file_browser.php?filter=image';
 			else
-				file = '/fileBrowser.php';
+				file = '/file_browser.php?filter=media';
 			
 			ed.windowManager.open({
-				url : this.url + file + '?categoryID=' + ed.settings['file_browser_category_id'],
+				url : this.url + file + '&categoryID=' + ed.settings['file_browser_category_id'],
 				width: 640 + parseInt(ed.getLang('amadeo_draft.delta_width', 0)),
 				height : 511 + parseInt(ed.getLang('amadeo_draft.delta_height', 0)),
 				movable : true,

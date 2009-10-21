@@ -60,7 +60,7 @@ class File extends Model {
 				$query .= " OR ( f.mime_type LIKE '%audio%' ) ";	
 
 			if (in_array('video', $config['filter']))
-				$query .= " OR ( f.mime_type LIKE '%video%' ) ";	
+				$query .= " OR ( f.mime_type LIKE '%video%' OR f.mime_type LIKE '%flash%' OR f.mime_type LIKE '%realmedia%' ) ";	
 			
 			if (in_array('other', $config['filter']))
 				$query .= " OR ( f.mime_type LIKE 'application%' AND f.mime_type NOT LIKE '%pdf' AND f.mime_type NOT LIKE '%msword' AND f.mime_type NOT LIKE '%rtf' AND f.mime_type NOT LIKE 'text%' AND f.mime_type NOT LIKE '%document%' AND f.mime_type NOT LIKE '%powerpoint%') ";

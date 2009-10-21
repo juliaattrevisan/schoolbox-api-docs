@@ -7,9 +7,9 @@
 
 (function() {
 	// Load plugin specific language pack
-	tinymce.PluginManager.requireLangPack('assetbrowser');
+	tinymce.PluginManager.requireLangPack('assetmanager');
 
-	tinymce.create('tinymce.plugins.AssetBrowser', {
+	tinymce.create('tinymce.plugins.AssetManager', {
 		/**
 		 * Initializes the plugin, this will be executed after the plugin has been created.
 		 * This call is done before the editor instance has finished it's initialization so use the onInit event
@@ -20,28 +20,53 @@
 		 */
 		init : function(ed, url) {
 			// Register the command so that it can be invoked by using tinyMCE.activeEditor.execCommand('mceExample');
-			ed.addCommand('mceAssetBrowser', function() {
+			ed.addCommand('mceAssetManager', function() {
 				ed.windowManager.open({
 					file : url + '/dialog.htm',
-					width : 320 + parseInt(ed.getLang('assetbrowser.delta_width', 0)),
-					height : 120 + parseInt(ed.getLang('assetbrowser.delta_height', 0)),
+					width : 320 + parseInt(ed.getLang('assetmanager.delta_width', 0)),
+					height : 120 + parseInt(ed.getLang('assetmanager.delta_height', 0)),
 					inline : 1
 				}, {
 					plugin_url : url, // Plugin absolute URL
 					some_custom_arg : 'custom arg' // Custom argument
 				});
 			});
+			
+			this.url = url;
 
 			// Register example button
-			ed.addButton('assetbrowser', {
-				title : 'assetbrowser.desc',
-				cmd : 'mceAssetBrowser',
+			ed.addButton('assetmanager', {
+				title : 'assetmanager.desc',
+				cmd : 'mceAssetManager',
 				image : url + '/img/example.gif'
 			});
 
 			// Add a node change handler, selects the button in the UI when a image is selected
 			ed.onNodeChange.add(function(ed, cm, n) {
-				cm.setActive('assetbrowser', n.nodeName == 'IMG');
+				cm.setActive('assetmanager', n.nodeName == 'IMG');
+			});
+		},
+		
+		/**
+		 * open a new browser window
+		 */
+		fileBrowser : function (field_name, url, type, win) {
+			var ed = tinyMCE.activeEditor, file;
+			
+			if (type.toLowerCase() == 'image')
+				file = '/file_browser.php?filter=image';
+			else
+				file = '/file_browser.php?filter=media';
+			
+			ed.windowManager.open({
+				url : this.url + file + '&categoryID=' + ed.settings['file_browser_category_id'],
+				width: 640 + parseInt(ed.getLang('amadeo_draft.delta_width', 0)),
+				height : 511 + parseInt(ed.getLang('amadeo_draft.delta_height', 0)),
+				movable : true,
+				inline : true
+			}, {
+				window	: win,
+				input : field_name
 			});
 		},
 
@@ -67,7 +92,7 @@
 		 */
 		getInfo : function() {
 			return {
-				longname : 'Asset Browser',
+				longname : 'Asset Manager',
 				author : 'Alaress',
 				authorurl : 'http://www.alaress.com.au/',
 				infourl : '',
@@ -77,5 +102,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('assetbrowser', tinymce.plugins.AssetBrowser);
+	tinymce.PluginManager.add('assetmanager', tinymce.plugins.AssetManager);
 })();

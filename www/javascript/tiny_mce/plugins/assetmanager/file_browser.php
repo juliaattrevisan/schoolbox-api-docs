@@ -5,9 +5,11 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 
 $page = new SitePage;
-$page->template->set_file(TEMPLATE_body, dirname(__FILE__) . '/image_browser.html');
+$page->template->set_file(TEMPLATE_body, dirname(__FILE__) . '/file_browser.html');
 $page->setBlock(TEMPLATE_body, 'folder_list', 'folder_list_block');
 $page->setBlock(TEMPLATE_body, 'file', 'file_block');
+$page->setBlock('file', 'thumbnail_image', 'thumbnail_image_block');
+$page->setBlock('file', 'thumbnail_flash', 'thumbnail_flash_block');
 
 if (!is_numeric($_GET['categoryID']))
 	die('Invalid category id');
@@ -75,7 +77,11 @@ if (is_array($categoryList)) {
 
 
 /* output files */
-$fileList = $fileHandler->getAllInCategory($_GET['categoryID'], array('filter' => 'image'));
+$filter = $_GET['filter'] == 'image' ? 'image' : 'video';
+$fileList = $fileHandler->getAllInCategory($_GET['categoryID'], array('filter' => $filter));
+
+$output = array('FILTER'	=> $filter);
+$page->setVar($output);
 
 if (is_array($fileList)) {
 	foreach ($fileList as $file) {
@@ -84,8 +90,17 @@ if (is_array($fileList)) {
 						  'DESCRIPTION'	=> $file['description'],
 						  'TITLE_SHORT' => cutString($file['description'], 10),
 						  'SIZE'  		=> round($file['file_size']/1024),
+						  'FILE_ICON'	=> $file['iconFile'],
 						  );
 		$page->setVar($output);
+
+		$page->setVar('thumbnail_image_block', '');
+		$page->setVar('thumbnail_flash_block', '');
+		if ($filter == 'image')
+			$page->parse('thumbnail_image_block', 'thumbnail_image');
+		else
+			$page->parse('thumbnail_flash_block', 'thumbnail_flash');
+		
 		$page->parse('file_block', 'file', true);
 		
 	}

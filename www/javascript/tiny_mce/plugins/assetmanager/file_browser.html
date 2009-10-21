@@ -87,13 +87,23 @@ $(function () {
 		url = '/send.php?' + relationID[0].toString();
 		
 		win.document.getElementById(input).value = url;
-		win.document.getElementById('alt').value = $(this).find('img').attr('alt');
+		var alt = win.document.getElementById('alt');
+		if (alt)
+			alt.value = $(this).find('img').attr('alt');
+	
+		if (win.ImageDialog) {
 		
-		if (win.ImageDialog.getImageData) 
-			win.ImageDialog.getImageData();
-
-		if (win.ImageDialog.showPreviewImage)
-			win.ImageDialog.showPreviewImage(url);
+			if (win.ImageDialog.getImageData) 
+				win.ImageDialog.getImageData();
+	
+			if (win.ImageDialog.showPreviewImage)
+				win.ImageDialog.showPreviewImage(url);
+		} else {
+			win.document.getElementById('width').value = 425;
+			win.document.getElementById('height').value = 350;
+			win.document.getElementById('constrain').checked = true;
+			win.window.generatePreview();
+		}
 		
 		tinyMCEPopup.close();
 	});
@@ -104,7 +114,7 @@ $(function () {
 		$('#tree li.selected').removeClass('selected');
 		$(this).addClass('selected');
 		
-		$.post('/ajax/file.php', {'filter' : 'image', 'categoryID': categoryID}, function (data) {
+		$.post('/ajax/file.php', {'filter' : '{FILTER}', 'categoryID': categoryID}, function (data) {
 			if (data.error)
 				alert(data.error);
 			else {
@@ -119,12 +129,18 @@ $(function () {
 					clone.removeClass('node-template').attr('id', 'file-' + row.id);
 					clone.find('.taskbar').text(row.description);
 					clone.find('img').attr('alt', row.description)
-					clone.find('img').attr('src', '/cms/image.php?id=' + row.id + '&height=100&width=75&resample=1');
+					
+					if ('{FILTER}' == 'image') {
+						clone.find('img').attr('src', '/cms/image.php?id=' + row.id + '&height=100&width=75&resample=1');
+					} else {
+						clone.find('img').attr('src', '/images/mime/' + row.iconFile + '?id=' + row.id);	
+					}
+					clone.find('.file-url').val();
 					clone.appendTo('#file-list').show();
 				}
 				
 				if (data.length == 0)
-					$('<li class="empty">No images to display.</li>').appendTo($('#file-list'));
+					$('<li class="empty">No files available.</li>').appendTo($('#file-list'));
 				
 				$('#categoryID').val(categoryID);
 				$('#return').val($('#return').val().replace(/categoryID=[\d]+/, 'categoryID=' + categoryID));
@@ -173,7 +189,9 @@ $(window).load(function () {
       <!-- BEGIN file -->
       <li id="file-{FILE_ID}">
         <div class="taskbar">{TITLE_SHORT}</div>
-        <div class="image"> <img alt="{DESCRIPTION}" src="/cms/image.php?id={FILE_ID}&height=80&width=75&resample=1" /> </div>
+        <div class="image"> <!-- BEGIN thumbnail_image --><img alt="{DESCRIPTION}" src="/cms/image.php?id={FILE_ID}&height=80&width=75&resample=1" /> <!-- END thumbnail_image -->
+        <!-- BEGIN thumbnail_flash --><img alt="{DESCRIPTION}" src="/images/mime/{FILE_ICON}?id={FILE_ID}" /> <!-- END thumbnail_flash -->
+        	<input type="hidden" class="hide file-url" value="{URL}" /> </div>
       </li>
       <!-- END file -->
       <li class="node-template">
