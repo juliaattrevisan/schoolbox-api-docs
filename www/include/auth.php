@@ -241,7 +241,7 @@ function setSynergyInfo(&$mydb)
                                 foreach($subjectList as $subject)
                                 {
                                     //check subject exists.. we cant link to subjects that dont exist its ugly
-                                    $myquery = "SELECT id FROM category WHERE code = '".$subject['code']."'";
+                                    $myquery = "SELECT categoryID FROM categoryCode WHERE code = '".$subject['code']."'";
                                     $mydb->query($myquery);
                                     if($mydb->countRows() > 0)
                                         $subjects[] = $subject;

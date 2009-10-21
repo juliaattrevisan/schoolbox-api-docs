@@ -23,8 +23,10 @@ if(isStaff($_SESSION['gid']))
 	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
 	$this->setTitle('Class List');
 
-	$code = implode('/', $this->arg);
-	$category = $categoryHandler->getByCode(urldecode($code));
+	$code = urldecode(implode('/', $this->arg));
+
+	
+	$category = $categoryHandler->getByCode($code);
 	
 	if(is_array($category)) {
 		$this->setVar("SUBJECTNAME", $category['name'] ." ($code)");	
