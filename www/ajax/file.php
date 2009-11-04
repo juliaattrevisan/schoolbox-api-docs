@@ -31,7 +31,7 @@ if (is_numeric($_POST['categoryID'])) {
 			$file['user'] = formatName($file);
 			$file['relative'] = getRelativeTime($file['modified'], 0, '');
 			$file['mimeClass'] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
-			$file['description'] = cutString($file['description'], 9);
+			$file['description'] = cutString($file['description'], 32);
 			$output[] = $file;
 		}
 	}

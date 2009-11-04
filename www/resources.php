@@ -131,12 +131,12 @@ if (is_array($fileList) && count($fileList) > 0) {
 		// icon
 		$class[] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
 		
-		if ($i++%2)
+		if (!($i++%2))
 			$class[] = 'dark';
 	
 		$output = array('FILE_ID' 	 	=> $file['id'],
 						'TYPE'			=> $file['url'] ? 'link' : 'file',
-						'FILE_NAME' 	=> scrubText($file['description']),
+						'FILE_NAME' 	=> cutString(scrubText($file['description']),32),
 						'FILE_MODIFIED'	=> getRelativeTime($file['modified'], 0, ''),
 						'FILE_OWNER'	=> formatName($file),
 						'FILE_SIZE'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
