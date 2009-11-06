@@ -18,6 +18,8 @@ function involvedInSubject($code)
 		
 		foreach($_SESSION['subjects'] as $subject)
 		{
+			if(is_numeric($code) && $code == $subject['id'])
+				return true;
 			if($code == strtoupper($subject['code']))
 				return 1;
 		}
@@ -51,20 +53,14 @@ function involvedCategoryList($id, $subjects, $accessType=1)
 
 	//for each subject involved in
 	$x=0;
-	if(is_array($subjects))
-	{
-		foreach($subjects as $subject)
-		{
-			//convert code to id and get name
-			$query = "SELECT name, id FROM category WHERE code = '".$subject['code']."'";
-			$result = $db->getRow($query);
-
-			$catList[] = array (	'name' 	=>	$result['name'],
-									'id' 	=>	$result['id'],
-									'code' 	=>	$subject['code'],
-								);
+		if(is_array($subjects)) {
+			foreach($subjects as $subject) {
+				//convert code to id and get name
+				$query = "SELECT name, id, cc.code FROM category JOIN categoryCode cc ON id = categoryID WHERE cc.code = '".$subject['code']."'";
+				if(is_array($catTmp = $db->getRow($query)))
+					$catList[] = $catTmp;
+			}
 		}
-	}
 
 	//get list of groups involved in
 	$query = "SELECT category.name, category.id FROM userAccess, category 

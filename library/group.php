@@ -303,6 +303,8 @@ class Group extends Model {
 		if(is_array($_SESSION['subjects'])) {
 			$code = strtoupper($code);
 			foreach($_SESSION['subjects'] as $subject) {
+				if(is_numeric($code) && $code == $subject['id'])
+					return true;
 				if($code == strtoupper($subject['code']))
 					return true;
 			}
