@@ -345,7 +345,7 @@ category.id AND f.deleted = '0'";
 		if($fileDetails['realname'] != "")
 		{
 			//if inline open in new window, if not give user a save dialog box
-			if($fileDetails['inline']== 'true')
+			if($fileDetails['inline']== 'true' && FILE_use_frame)
 				$this->t_body->set_var("FILE_URL", "<a href=\"/sendframe.php?id=".$fileDetails['id']."\" target=\"_blank\">");
 			else
 				$this->t_body->set_var("FILE_URL", "<a href=\"/send.php?id=".$fileDetails['id']."&save=1\">");

@@ -241,7 +241,7 @@ class dueWorkPage
 						$divider = "";
 					} else
 					{
-						if($result['inline'] == 'true')
+						if($result['inline'] == 'true' && FILE_use_frame)
 							$url = "<a href=\"/sendframe.php?id=".$result['fid']."\" target=\"_blank\">View</a>";
 						else
 							$url = "<a href=\"/send.php?id=".$result['fid']."&save=1\">View</a>";

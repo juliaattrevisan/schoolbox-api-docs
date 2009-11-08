@@ -33,7 +33,7 @@ if (is_array($homeworkList)) {
 		//set name
 		if($homework['realname'])
 		{
-			if($homework['inline'] == 'true')
+			if($homework['inline'] == 'true' && FILE_use_frame)
 				$url = "<a href=\"/sendframe.php?id=".$homework['fileID']."\" target=\"_blank\">".scrubTEXT($homework['description'])."</a>";
 			else
 				$url = "<a href=\"/send.php?id=".$homework['fileID']."\">".scrubTEXT($homework['description'])."</a>";

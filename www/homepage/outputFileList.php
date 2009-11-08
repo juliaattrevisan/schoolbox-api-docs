@@ -36,7 +36,7 @@ if (is_array($fileList)) {
 		//set name
 		if($file['realname'] != "") {
 		
-			if($file['inline'] == 'true') {
+			if($file['inline'] == 'true' && FILE_use_frame) {
 				$this->setVar('FILE_URL', '/sendframe.php?id='.$file['id']);
 				$this->setVar('FILE_TARGET', '_blank');
 			}

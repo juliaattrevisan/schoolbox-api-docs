@@ -60,7 +60,7 @@ class Feed {
 		while($row = $this->db->getNextArray()){
 			
 			if($row['realname'] != '') {
-				if($row['inline'] == 'true')
+				if($row['inline'] == 'true' && FILE_use_frame)
 					$url = "<a href=\"/sendframe.php?id=".$row['id']."\" target=\"_blank\">".scrubTEXT($row['name'])."</a>";
 				else
 					$url = '<a href="/send.php?id='.$row['id'].'">'.scrubTEXT($row['name']).'</a>';
