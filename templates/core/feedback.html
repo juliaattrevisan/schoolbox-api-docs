@@ -8,10 +8,9 @@ $j(function () {
 	var justSubmit = false;
 	
 	$j('#feedbackForm').submit(function () {
-console.log('c');
+
 		if (justSubmit)
 			return true;
-		console.log('b');
 		
 		var message = '', form = $j(this);
 		if ($j('#name').val() == '')
@@ -34,7 +33,6 @@ console.log('c');
 				function (data) {
 					if (data.verified == 'true') {
 						justSubmit = true;
-						console.log('a');
 						form.triggerHandler('submit');
 					} else {
 						alert('The words you have entered do not match the image, please try again.');
