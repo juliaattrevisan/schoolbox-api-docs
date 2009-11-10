@@ -19,8 +19,7 @@ class submitWorkPage {
 			error(27);
 			
 		//check if submitted assignment is late
-		$query = "SELECT UNIX_TIMESTAMP(date) AS overdue, UNIX_TIMESTAMP(open_date) AS open, code, category.id FROM submission_box, category,
-
+		$query = "SELECT UNIX_TIMESTAMP(date) AS overdue, UNIX_TIMESTAMP(open_date) AS open, code, category.id FROM submission_box, category
 		WHERE submission_box.id = '$box_id' AND submission_box.category = category.id";
 		$result = $this->db->getRow($query);
 		if(!is_array($result))
