@@ -24,6 +24,10 @@ if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	} else
 		error(29);
 } elseif($this->arg[0] == 'delete' && is_numeric($this->arg[1])) {
+	$comment = $commentHandle->getByID($this->arg[1]);
+	if(isset($comment['id']) && $comment['owner'] != $_SESSION['id'] && $groupHandle->getPermission($comment['cid']) < FULL_ACCESS)
+		error(19);
+		
 	$commentHandle->delete($this->arg[1]);
 	
 	$this->backToTheFuture(1);

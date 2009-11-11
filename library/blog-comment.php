@@ -15,10 +15,11 @@ class Comment extends Model {
 	}
 	
 	function getByID($id) {
-		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname
-			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
-			WHERE {$this->_table}.id = $id AND deleted IS NULL
-			ORDER BY {$this->_table}.created DESC";
+		$query = "SELECT c.*, user.title, user.firstname, user.lastname, b.cid
+			FROM {$this->_table} c LEFT JOIN user ON c.owner = user.id
+			JOIN blog b ON b.id = c.bid
+			WHERE c.id = $id AND c.deleted IS NULL
+			ORDER BY c.created DESC";
 		$query = $this->_config['comments_size'] > 0 ? "$query LIMIT 0, {$this->_config['comments_size']}" : $query;
 		
 		return $this->db->getRow($query);
@@ -54,7 +55,7 @@ class Comment extends Model {
 			'deleted' => 'NOW()'
 		);
 	
-		return $this->permission($comment['id']) ? parent::update($comment) : false;
+		return parent::update($comment);
 	}
 	
 	function permission($id) {
