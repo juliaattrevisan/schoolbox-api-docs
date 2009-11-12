@@ -29,8 +29,10 @@ class HTMLPurifier_Filter_Flash extends HTMLPurifier_Filter
 			'data="'.$url.'">'.
             '<param name="movie" value="'.$url.'"></param>'.
 			'<param name="src" value="'.$url.'"></param>'.
+			'<param name="wmode" value="transparent" />'.
 			'<!--[if !IE]-->'.
 			'<object type="application/x-shockwave-flash" data="'.$url.'" width="'.$width.'" height="'.$height.'">'.
+			'<param name="wmode" value="transparent" />'.
 			'<!--<![endif]-->'.
 			'<a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" /></a>'.
 			'<!--[if !IE]-->'.

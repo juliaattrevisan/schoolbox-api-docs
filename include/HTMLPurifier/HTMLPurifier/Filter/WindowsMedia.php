@@ -29,11 +29,14 @@ class HTMLPurifier_Filter_WindowsMedia extends HTMLPurifier_Filter
         return  '<object classid="clsid:6bf52a52-394a-11d3-b153-00c04f79faa6" '.
 				'width="'.$width.'" height="'.$height.'">'.
 				'<param name="url" value="'.$url.'" />'.
-				'<param name="autostart" value="true" />'.				
+				'<param name="autostart" value="true" />'.
+				'<param name="wmode" value="transparent" />'.
+				'<param name="WindowlessVideo" value="-1" />'.
 				'<!--[if !IE]-->'.
 				'<object type="application/x-ms-wmp" data="'.$url.'" width="'.$width.'" height="'.$height.'" >'.
 				'<param name="src" value="'.$url.'" />'.
 				'<param name="autostart" value="true" />'.
+				'<param name="wmode" value="transparent" />'.
 				'<!--<![endif]-->'.
 				'<a href="http://www.microsoft.com/windows/windowsmedia/player/download/">Download Windows Media Player.</a>'.
 				'<!--[if !IE]-->'.

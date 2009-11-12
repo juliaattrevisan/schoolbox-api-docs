@@ -32,11 +32,13 @@ class HTMLPurifier_Filter_Shockwave extends HTMLPurifier_Filter
 				'<param name="sound" value="true" />'.
 				'<param name="progress" value="true" />'.
 				'<param name="autostart" value="true" />'.
+				'<param name="wmode" value="transparent" />'.
 				'<!--[if !IE]-->'.
 				'<object type="application/x-director" data="'.$url.'" width="'.$width.'" height="'.$height.'">'.
 				'<param name="sound" value="true" />'.
 				'<param name="progress" value="true" />'.
 				'<param name="autostart" value="true" />'.
+				'<param name="wmode" value="transparent" />'.
 				'<!--<![endif]-->'.
 				'<a href="http://www.adobe.com/go/getshockwaveplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_adobe_shockwave_player.png" alt="Get Adobe Shockwave player" /></a>'.
 				'<!--[if !IE]-->'.
