@@ -499,7 +499,8 @@ else
 	}
 	else
 	{
-		$myPage->advancedSearch();
+		error(2);
+		//$myPage->advancedSearch();
 	}
 	
 	$myPage->showPage();

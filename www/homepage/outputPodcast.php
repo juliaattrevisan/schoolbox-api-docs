@@ -28,9 +28,10 @@ if (!empty($config['url']) && $xml = simplexml_load_file( $config['url'])) {
 			$this->parse('podcast_list_block', 'podcast_list', true);
 		}
 	}
-} else
+} else {
+	$this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - Please set URL');
 	$this->setVar('podcast_list_block', '');
-
+}
 
 
 ?>
