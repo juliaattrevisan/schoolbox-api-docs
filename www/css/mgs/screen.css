@@ -4,7 +4,8 @@ body {
 	color: #000;
 	}
 #container {
-	padding: 0 10px 0 160px;
+	padding: 0 10px 0 0;
+	margin-left: 160px;
 	}
 #content {
 	border: 3px solid #00458C;

@@ -10,6 +10,7 @@ body {
 	min-width: 996px;
 	padding: 0;
 	min-height: 100%;
+	margin: 0;
 }
 #wrapper {
 	padding-bottom: 47px;
@@ -247,4 +248,8 @@ table .header_option {
 }
 h1 + .header_option {
 	margin-top: -30px;
+}
+.header_option a {
+	color: #fff;
+	font-size: 90%;
 }

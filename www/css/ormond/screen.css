@@ -10,6 +10,7 @@ a:hover { color: #C3536F; }
 #container {
 	padding: 0;
 	min-width: 996px;
+	margin: 0;
 	}
 #nav { position: absolute; float: left; top: 139px; }
 #header {
@@ -19,7 +20,7 @@ a:hover { color: #C3536F; }
 	}
 #search { width: 243px; margin-top: 75px; }
 #content {
-	padding: 20px 20px 20px 190px;
+	padding: 20px 20px 20px 190px;	
 	}
 #logo {
 	position: absolute;

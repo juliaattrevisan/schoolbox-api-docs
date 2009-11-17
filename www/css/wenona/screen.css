@@ -11,6 +11,7 @@ a:hover { color: #c00; }
 #container {
 	padding: 0;
 	min-width: 996px;
+	margin: 0;
 	}
 #nav { position: absolute; float: left; top: 46px; width: 150px; }
 #header {
@@ -32,6 +33,7 @@ a:hover { color: #c00; }
 #content {
 	padding: 20px 20px 20px 160px;
 	background: 0;
+	margin: 0;
 	}
 #tabs {
 	bottom: 0;

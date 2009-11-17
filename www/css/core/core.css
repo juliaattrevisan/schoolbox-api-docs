@@ -135,7 +135,7 @@ table.ruler { width: 100%; }
  Layout element styles 
 -------------------------------------------------------------*/
 #container {
-	padding-left:180px;
+	margin-left:180px;
 	text-align: left;
 	min-width: 816px;
 	} 
@@ -148,14 +148,13 @@ table.ruler { width: 100%; }
 	min-height: 100px;
 	width: 69.5%;
 	float: left;
-	margin-right: 1%;
 	overflow: hidden;
 	}
 .right {
 	min-width: 229px;
 	min-height: 100px;
 	width: 29.5%;
-	float: left;
+	float: right;
 	overflow: hidden;
 	}
 .template2 .left {
@@ -313,6 +312,9 @@ h1 + .header_option {
 	padding: 0.3em 0;
 	vertical-align: middle;
 	}
+.indent {
+	margin-bottom: 1em;
+}
 /*--------------------------------------------------------------
 Side Nav styles 
 --------------------------------------------------------------*/
