@@ -29,27 +29,63 @@ function checkBruteForce(&$db)
 
 function authenticateLDAP($username, $password) {
 
-	$ds=ldap_connect(LDAP_host);
-	ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-	ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-	ldap_bind($ds, LDAP_user, LDAP_pass);
-	$searchString = "(SAMAccountName=$username)";
-	$result = ldap_search($ds,LDAP_base, $searchString, array('dn'));
-	if($result) {
-		$entries = ldap_get_entries($ds, $result);
-		$dn = $entries[0]['dn'];
-		if($dn)
-			return @ldap_bind($ds, $dn, $password);
-	}
+        $ds=ldap_connect(LDAP_host);
+        ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
+        ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
+        ldap_bind($ds, LDAP_user, LDAP_pass);
+        $searchString = "(SAMAccountName=".ldap_escape($username).")";
+        $result = ldap_search($ds,LDAP_base, $searchString, array('dn'));
+        if($result) {
+                $entries = ldap_get_entries($ds, $result);
+                $dn = $entries[0]['dn'];
+                if($dn)
+                        return @ldap_bind($ds, $dn, $password);
+        }
+        ldap_unbind($ds);
 
-	return false;
+        if(LDAP_host2)  {
+			//Try student server
+			$ds=ldap_connect(LDAP_host2);
+			ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
+			ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
+			ldap_bind($ds, LDAP_user2, LDAP_pass);
+			$result = ldap_search($ds,LDAP_base2, $searchString, array('dn'));
+			if($result) {
+					$entries = ldap_get_entries($ds, $result);
+					$dn = $entries[0]['dn'];
+					if($dn)
+							return @ldap_bind($ds, $dn, $password);
+			}
+        }
+
+        return false;
+
+}
+
+function ldap_escape($str, $for_dn = false)
+{
+
+    // see:
+    // RFC2254
+    // http://msdn.microsoft.com/en-us/library/ms675768(VS.85).aspx
+    // http://www-03.ibm.com/systems/i/software/ldap/underdn.html
+
+    if  ($for_dn)
+        $metaChars = array(',','=', '+', '<','>',';', '\\', '"', '#');
+    else
+        $metaChars = array('*', '(', ')', '\\', chr(0));
+
+    $quotedMetaChars = array();
+    foreach ($metaChars as $key => $value) $quotedMetaChars[$key] = '\\'.str_pad(dechex(ord($value)), 2, '0');
+    $str=str_replace($metaChars,$quotedMetaChars,$str); //replace them
+    return ($str);
 }
 
 function authenticateSQL(&$db, $username, $password) {
 	// Function to check username exists and password is correct
 
-	$query = "SELECT user.id FROM user WHERE username = '". addslashes(trim( $username))."' 
-	AND password = PASSWORD('".addslashes($password)."')";
+	$query = "SELECT user.id FROM user WHERE username = '". mysql_real_escape_string($username)."'
+	AND password = PASSWORD('".mysql_real_escape_string($password)."')";
 	$db->query($query);
 	$result = $db->countRows();
 	//$user = $db->getNextArray();
@@ -61,9 +97,16 @@ function authenticateSQL(&$db, $username, $password) {
 
 function authenticate(&$db, $username, $password, $remember = 0)
 {
-
 	$result = false;
-	
+
+	$username = trim($username);
+	$password = trim($password);
+
+	if (get_magic_quotes_gpc()) {
+       $username = stripslashes($username);
+	   $password = stripslashes($password);
+   }
+
 	// Function to check username exists and password is correct
 	if(LDAP_enable) {
 		$result = authenticateLDAP($username, $password);
@@ -80,14 +123,14 @@ function authenticate(&$db, $username, $password, $remember = 0)
 	if($result == true) {
 
 		$query = "SELECT user.id, title, firstname, lastname, username, group_id, synergy_id, superusers.id AS su, password, email_pass, local_email, mail_handler 
-		FROM user LEFT JOIN superusers ON user.id = superusers.id WHERE username = '". trim( $username)."'";
+		FROM user LEFT JOIN superusers ON user.id = superusers.id WHERE username = '". mysql_real_escape_string( $username)."'";
 		$user = $db->getRow($query);
 	}
 	
 	//log the authentication attempt
 	$ip = getIP(); 
 	$loginlogquery = "INSERT INTO login_log (username, date, ip, login) 
-			VALUES ('".addslashes($username)."', NOW(), '$ip'";
+			VALUES ('".mysql_real_escape_string($username)."', NOW(), '$ip'";
 
 	//check password
 	if( $result == true && is_array($user))

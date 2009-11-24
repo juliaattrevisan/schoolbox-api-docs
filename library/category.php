@@ -279,7 +279,6 @@ class Category extends Model {
 		/* Insert synergetic subject code */
 		$this->db->delete('categoryCode', 'categoryID', $data['id']);
 		$codeList = explode(",", $data['code']);
-		unset($data['code']);
 		if (is_array($codeList)) {
 			$codeList = array_map('trim',$codeList);
 			$codeList = array_unique($codeList);

@@ -4,6 +4,7 @@ require_once 'include/auth.php';
 require_once '../include/sitePage.php';
 session_start();	
 
+
 if( (isset($_POST['username'])) && (isset($_POST['password']) && $_POST['password'] && $_POST['username']) )
 {
 	$db = new dbManager;
