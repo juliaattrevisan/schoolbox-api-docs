@@ -9,6 +9,10 @@ $textBoxHandler = new TextBox;
 
 $textBox = $textBoxHandler->getByID((int)$config['textBoxID']);
 
+/* Dont show deleted items */
+if($textBox['deleted'] == 'true')
+	unset($textBox);
+
 $output = array('TEXTBOX_HEADING'	=> !empty($textBox['heading']) ? scrubText($textBox['heading']) : 'Text Box',
 				'TEXTBOX_BODY'		=> scrubHTML($textBox['body']),
 				'TEXTBOX_ID'		=> $textBox['textBoxID'],
