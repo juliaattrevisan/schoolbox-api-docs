@@ -37,13 +37,13 @@ if (is_numeric($_POST['categoryID'])) {
 			error(2);
 		
 		/* check user owns post */
-		if ($current['userID'] != $_SESSION['id'] && $groupHandler->getPermission($_POST['categoryID']) < FULL_ACCESS)
+		if ($current['userID'] != $_SESSION['id'] && $groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS)
 			error(19);
 		
 		$thread = $forumHandler->getThread($current['threadID']);
 
 		// check locked
-		if ($thread['locked'] == 'true' && $permission < FULL_ACCESS)
+		if ($thread['locked'] == 'true' && $permission < WRITE_ACCESS)
 			error(19);		
 		
 		/* modify thread */
@@ -80,7 +80,7 @@ if (is_numeric($_POST['categoryID'])) {
 				error(2);			
 
 			// check locked
-			if ($thread['locked'] == 'true' && $permission < FULL_ACCESS)
+			if ($thread['locked'] == 'true' && $permission < WRITE_ACCESS)
 				error(19);
 		}
 		
@@ -105,7 +105,7 @@ elseif (is_numeric($_GET['toggleLock'])) {
 		localRedir('/homepage/' . $thread['categoryID']);
 
 	/* check permissions */
-	if ($groupHandler->getPermission($thread['categoryID']) < FULL_ACCESS)
+	if ($groupHandler->getPermission($thread['categoryID']) < WRITE_ACCESS)
 		error(19);	
 
 	$data = array('threadID'	=> $thread['threadID'],
@@ -128,11 +128,28 @@ elseif (is_numeric($_GET['deleteThread'])) {
 		localRedir('/homepage/' . $thread['categoryID']);
 
 	/* check permissions */
-	if ($groupHandler->getPermission($thread['categoryID']) < FULL_ACCESS)
+	if ($groupHandler->getPermission($thread['categoryID']) < WRITE_ACCESS)
 		error(19);	
 
 	$forumHandler->delete($thread['threadID']);		
 	
+	localRedir('/forum/' . $thread['categoryID'] );
+
+}
+elseif (is_array($_POST['deleteThreads'])) {
+
+	foreach($_POST['deleteThreads'] as $threadID) {
+		// thread exists
+		$thread = $forumHandler->getThread($threadID);
+		if (isset($thread['threadID'])) {
+			/* check permissions */
+			if ($groupHandler->getPermission($thread['categoryID']) < WRITE_ACCESS)
+				error(19);
+
+			$forumHandler->delete($thread['threadID']);
+		}
+	}
+
 	localRedir('/forum/' . $thread['categoryID'] );
 
 }
@@ -146,11 +163,11 @@ elseif (is_numeric($_GET['deletePost'])) {
 	$thread = $forumHandler->getThread($post['threadID']);
 	
 	/* check locked */
-	if ($thread['locked'] == 'true' && $groupHandler->getPermission($thread['categoryID']) < FULL_ACCESS)
+	if ($thread['locked'] == 'true' && $groupHandler->getPermission($thread['categoryID']) < WRITE_ACCESS)
 		error(19);		
 
 	/* check permissions */
-	if ($post['userID'] != $_SESSION['id'] && $groupHandler->getPermission($thread['categoryID']) < FULL_ACCESS)
+	if ($post['userID'] != $_SESSION['id'] && $groupHandler->getPermission($thread['categoryID']) < WRITE_ACCESS)
 		error(19);	
 
 	$pageNumber = $forumHandler->getPageNumber($post['postID']);
@@ -162,5 +179,6 @@ elseif (is_numeric($_GET['deletePost'])) {
 
 }
 
+print_r($_POST);
 
 ?>

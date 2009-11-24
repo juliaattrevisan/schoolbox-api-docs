@@ -54,12 +54,12 @@ $output = array('CATEGORY'			=> scrubText($category['name']),
 $this->setVar($output);
 
 $this->setVar('modify_thread_block', '');
-if ($groupHandler->getPermission($category['id']) >= FULL_ACCESS)
+if ($groupHandler->getPermission($category['id']) >= WRITE_ACCESS)
 	$this->parse('modify_thread_block', 'modify_thread');
 
 // hide reply button if locked
 $this->setVar('reply_block', '');
-if (!$threadLocked || $groupHandler->getPermission($category['id']) >= FULL_ACCESS)
+if (!$threadLocked || $groupHandler->getPermission($category['id']) >= WRITE_ACCESS)
 	$this->parse('reply_block', 'reply');
 
 // record view
@@ -129,7 +129,7 @@ if (is_array($postList)) {
 		
 		// edit / delete post
 		$this->setVar('modify_block', '');
-		if ((!$threadLocked && $post['userID'] == $_SESSION['id']) || $groupHandler->getPermission($category['id']) >= FULL_ACCESS)
+		if ((!$threadLocked && $post['userID'] == $_SESSION['id']) || $groupHandler->getPermission($category['id']) >= WRITE_ACCESS)
 			$this->parse('modify_block', 'modify');
 		
 		// edited time
@@ -139,7 +139,7 @@ if (is_array($postList)) {
 		
 		// reply to this post
 		$this->setVar('reply_post_block', '');
-		if (!$threadLocked || $groupHandler->getPermission($category['id']) >= FULL_ACCESS)
+		if (!$threadLocked || $groupHandler->getPermission($category['id']) >= WRITE_ACCESS)
 			$this->parse('reply_post_block', 'reply_post');
 			
 		$this->parse('post_block', 'post', true);

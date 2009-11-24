@@ -11,10 +11,13 @@ $groupHandler = new Group;
 $this->setFile(TEMPLATE_content, 'forum/forum.html');
 $this->setBlock(TEMPLATE_content, 'thread', 'thread_block');
 $this->setBlock('thread', 'last_post', 'last_post_block');
+$this->setBlock('thread', 'modify_thread', 'modify_thread_block');
+$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
+
 
 // category exists
 if (is_numeric($this->arg[0]))
@@ -28,9 +31,11 @@ if (!$forumHandler->hasForum($category['id']))
 	localRedir('/homepage/' . $category['id']);
 
 // check permissions
-if ($groupHandler->getPermission($category['id']) < READ_ACCESS)
+if (($perm = $groupHandler->getPermission($category['id'])) < READ_ACCESS)
 	error(19);
-	
+
+
+
 $this->setTitle(scrubText($category['name']) . ' Forum');
 
 
@@ -40,6 +45,10 @@ $output = array('CATEGORY'		=> scrubText($category['name']),
 				);
 $this->setVar($output);
 
+/*Output delete button */
+$this->setVar('delete_button_block', '');
+if ($perm >= WRITE_ACCESS)
+	$this->parse('delete_button_block', 'delete_button', true);
 
 /* output pagination */
 
@@ -106,7 +115,13 @@ if (is_array($threadList)) {
 						);
 
 		$this->setVar($output);
-		
+
+		/* Delete checkbox */
+		$this->setVar('modify_thread_block', '');
+		if ($perm >= WRITE_ACCESS)
+			$this->parse('modify_thread_block', 'modify_thread', true);
+
+
 		/* last post block */
 		$this->setVar('last_post_block', '');
 		if ($thread['replies'] > 0)

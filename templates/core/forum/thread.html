@@ -36,7 +36,9 @@
 <!-- BEGIN reply -->
 <button class="reply">Post Reply</button> 
 <!-- END reply -->
-
+<!-- BEGIN modify_thread -->
+<button class="lock">{LOCK_UNLOCK} Thread</button> <button class="delete">Delete Thread</button>
+<!-- END modify_thread -->
 <table id="forum-post">
   <tbody>
   	<!-- BEGIN post -->
@@ -69,10 +71,8 @@
 <a name="bottom"></a>
 
 {reply_block}
+{modify_thread_block}
 
-<!-- BEGIN modify_thread -->
-<button class="lock">{LOCK_UNLOCK} Thread</button> <button class="delete">Delete Thread</button>
-<!-- END modify_thread -->
 
 <div class="pagination navhelp">
 	<!-- BEGIN previous_button -->

@@ -7,16 +7,16 @@
 		$j('button.thread').click(function () {
 			window.open('/forum/modify/{CATEGORY_ID}', '_self', '');
 			return false;
-		});
-	
+		});	
 	});
 </script>
 <!-- END custom_head -->
 <div class="breadcrumbs navhelp">
 	<a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a>
 </div>
-<button class="thread">Post Thread</button>
 
+<form action="/forum/modifyForm.php" method="POST" >
+<button class="thread">Post Thread</button>
 <table id="forum-topic">
 	<thead>
   	<tr>
@@ -31,8 +31,10 @@
   	<!-- BEGIN thread -->
   	<tr>
     	<td>
-      	<h3><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a> {THREAD_LOCKED}</h3>
-        <p>{THREAD_AUTHOR} - {THREAD_TIME}</p>
+		<!-- BEGIN modify_thread --><input type="checkbox" name="deleteThreads[]" value="{THREAD_ID}" style="float:left; margin-right:10px"	/><!-- END modify_thread -->
+		<h3><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a> {THREAD_LOCKED}</h3>
+        <p>{THREAD_AUTHOR} - {THREAD_TIME}
+		</p>
       </td>
       <td>
         <!-- BEGIN last_post -->
@@ -51,7 +53,10 @@
   </tbody>
 </table>
 <button class="thread">Post Thread</button>
-
+<!-- BEGIN delete_button -->
+<input type="submit" name="submit" value="Delete Selected" />
+<!-- END delete_button -->
+</form>
 <div class="pagination navhelp">
 	<!-- BEGIN previous_button -->
     <a href="/forum/{CATEGORY_ID}/{PREVIOUS_PAGE}">&lt; Prev</a>
