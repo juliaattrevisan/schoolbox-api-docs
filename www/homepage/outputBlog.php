@@ -72,7 +72,7 @@ if(!empty($blogs)) {
 					'COMMENT_CREATED' => getRelativeTime($comment['created'])
 				));
 				
-				if($comment['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS)
+				if($comment['owner'] == $_SESSION['id'] || $permission >= WRITE_ACCESS)
 					$this->setVar('DELETE_COMMENT', "<a href=\"/blog/comment/delete/{$comment['id']}\">Delete</a>");
 				else
 					$this->setVar('DELETE_COMMENT', '');
