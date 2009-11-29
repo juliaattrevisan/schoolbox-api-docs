@@ -79,6 +79,9 @@ h2 {
 	position: static;
 }
 #calendar h2 { border: 0; }
+#content h2 a {
+	color: #003E7E;
+}
 /*------------
 	Banner
 ------------*/
@@ -235,11 +238,12 @@ ul#tabs {
 	top: 3px;
 	font-size: 90%;
 	right: 10px;
-	color: #fff;
 	text-decoration: underline;
 }
-#content .box .edit:hover {
-	background: 0;
+a.edit {
+	color: #fff;
+}
+a.edit:hover {
 	text-decoration: none;
 	color: #fff;
 }
@@ -252,4 +256,7 @@ h1 + .header_option {
 .header_option a {
 	color: #fff;
 	font-size: 90%;
+}
+#calendar .header_option a {
+	color: #003E7E;
 }
