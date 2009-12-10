@@ -27,7 +27,33 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 			error(6);
 		
 		$file['id'] = $_POST['fileID'];
-		$fileHandler->update($file);
+
+		if(is_numeric($_POST['myfile'])) {
+			/* Make this appear as a file upload */
+			$myFileHandler = new MyFile;
+			if (!$privFile = $myFileHandler->getByID($_POST['myfile']))
+				error(41);
+
+			$_FILES['file'] = array('name' 		=> $privFile['realname'],
+									'type' 		=> $privFile['mime_type'],
+									'tmp_name'	=> MYFILE_directory . '/' . $privFile['id'] . '.dat',
+									);
+
+		}
+
+		if($_FILES['file']['name'])	{
+			/* Submitted file with form, run security checks */
+			$allowedFileHandler = new AllowedFile;
+			if (is_numeric($_POST['myfile']))
+				$allowedFileHandler->checkMime($_FILES['file']);
+			else
+				$allowedFileHandler->fileSecurityCheck($_FILES['file']);
+
+			$fileHandler->update($file,$_FILES['file']);
+		}
+		else
+			$fileHandler->update($file);
+		
 		
 		$page->backToTheFuture(2);
 	}

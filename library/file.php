@@ -131,12 +131,25 @@ class File extends Model {
 		return $fileID;
 	}
 	
-	function update($data) {
+	function update($data, $file = '') {
 	
 		$data['modified'] = 'NOW()';
-		
-		parent::update($data);
-		
+
+		/* If new file is being sent update its meta details and copy it into place */
+		if(is_file($file['tmp_name']) && is_readable($file['tmp_name']) ) {
+			$data['file_size'] = filesize($file['tmp_name']);
+			$data['realname'] = $file['name'];
+			$data['mime_type'] = $file['type']; /* should hook up to allowedFile to get mime type properly */
+			
+			parent::update($data);
+
+			$filename = FILE_directory.'/'.$data['id'].'.dat';
+			@unlink($filename);
+			copy($file['tmp_name'], $filename);
+		}
+		else
+			parent::update($data);
+
 		/* Update log entry */
 		$this->logAction($data[$this->_index], 'modify');
 	}

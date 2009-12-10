@@ -1,6 +1,9 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once '../library/my-folder.php';
+require_once '../library/my-file.php';
+
 $groupHandler = new Group;
 
 if(is_numeric($this->arg[0])) {
@@ -19,14 +22,16 @@ if(is_numeric($this->arg[0])) {
 		error(6);
 
 	$this->setFile(TEMPLATE_content, 'cms/modify-file.html');
-	$this->setBlock(TEMPLATE_content, 'browse', 'browse_block');
+	//$this->setBlock(TEMPLATE_content, 'browse', 'browse_block');
+	$this->setBlock(TEMPLATE_content, 'optgroup', 'optgroup_block');
+	$this->setBlock('optgroup', 'my_files', 'my_files_block');
 	$this->setBlock(TEMPLATE_content, 'submission_box', 'submission_box_block');
 
 	$this->setTitle('Modify File');	
 	$this->setTab('resources');
 	
-	$this->setVar('browse_block', '');
-	
+	//$this->setVar('browse_block', '');
+
 	$output = array('ACTION'			=> 'Modify',
 					'FILE_ID'			=> $file['id'],
 					'DESCRIPTION'		=> scrubText($file['description']),
@@ -40,7 +45,32 @@ if(is_numeric($this->arg[0])) {
 					'DUE_YEAR'			=> '',
 					);
 	$this->setVar($output);
-	
+
+	$myFolderHandler = new MyFolder;
+	$myFileHandler = new MyFile;
+
+	$folderTree = $myFolderHandler->getFolderTree();
+	if (is_array($folderTree)) {
+		foreach ($folderTree as $folder) {
+			$output = array('MYFOLDER_NAME'	=> trim($folder['name']),
+							'MYFOLDER_LEFT'	=> number_format($folder['depth'] * 14, 0),
+							);
+			$this->setVar($output);
+			$fileList = $myFileHandler->getAllInFolder($folder['id']);
+			if (is_array($fileList)) {
+				foreach ($fileList as $file) {
+					$output = array('MYFILE_ID'		=> $file['id'],
+									'MYFILE_NAME'	=> $file['description'],
+									);
+					$this->setVar($output);
+					$this->parse('my_files_block', 'my_files', true);
+				}
+			}
+			$this->parse('optgroup_block', 'optgroup', true);
+			$this->setVar('my_files_block', '');
+		}
+	}
+
 	/* Output different controls for submission boxes */
 	$this->setVar('submission_box_block', '');
 	if ($groupHandler->isStaff()) {
@@ -99,8 +129,7 @@ if(is_numeric($this->arg[0])) {
 
 	$this->setVar($output);
 
-	require_once '../library/my-folder.php';	
-	require_once '../library/my-file.php';	
+
 	$myFolderHandler = new MyFolder;
 	$myFileHandler = new MyFile;
 	
@@ -184,8 +213,6 @@ else if($this->arg[0] == 'multicat') {
 		}
 	}
 
-	require_once '../library/my-folder.php';	
-	require_once '../library/my-file.php';	
 	$myFolderHandler = new MyFolder;
 	$myFileHandler = new MyFile;
 	
