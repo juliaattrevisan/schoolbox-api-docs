@@ -26,6 +26,9 @@ define("REMEMBERSESSION", false);				//Allows server to store session indefinetl
 											//Users will only need to login once (has security implications)
 define("REGISTER_FIRSTIME", false);			//Detects no password and checks password against mail server if correct registers account
 
+// Cache Options
+define('CACHE_xml', SITE_root . '/cache/xml');
+
 //LDAP Authentcation
 define('LDAP_enable', false);
 define('LDAP_host', '');
@@ -57,7 +60,6 @@ define("URLS_use_frame", 		false);						//Open links in frame
 define('FILE_use_frame', 		false);
 define('MIME_magic', 			'/usr/share/file/magic');
 define('NEWS_teacher_edit_other', true);
-
 
 //GROUP options
 define("GROUP_staff_only_owner", true);			//Determines if students can be group owner or not
@@ -130,26 +132,13 @@ define('CONTACT_address', 'ryan@lektec.com.au');
 
 //RSS Feed 
 define('RSS_url', 'http://www.abc.net.au/news/indexes/justin/rss.xml');
-define('RSS_cache_dir', SITE_root.'/files/');
 define('RSS_cache_time', 3000);
 define('RSS_limit', 6);
 
 //Weather options
 
-define("WEATHER_enable", false);				//This will disable the weather module
-define("WEATHER_CACHE", "7200");  			//cache weather info for 2 hours
-
-
-define("WEATHER_CURRENT_CACHE_LOCATION", "/usr/local/www/portal/files/currentweather.xml");	//File to save weather cache in
-define("WEATHER_FORECAST_CACHE_LOCATION", "/usr/local/www/portal/files/forecastweather.xml");	//File to save weather cache in
-define("WEATHER_SERVER", "ftp.theweather.com.au");
-define("WEATHER_CURRENT_FILE", "obs_current_aws_vic.xml");
-define("WEATHER_FORECAST_FILE", "d_fcast_city_4day.xml");
-define("WEATHER_USERNAME", "");
-define("WEATHER_PASSWORD", "");
-define("WEATHER_LOCATION", "");
-
-
+define("WEATHER_enable", true);				//This will disable the weather module
+define("WEATHER_location", "Melbourne, Victoria");      //cache weather info for 2 hours
 
 define("ALLCAMPUS", 4);					//Value that represents all campuses in the luCampus table
 define("HOMEPAGESERVICE", 1);				//Value that represents the homepage module in the service table

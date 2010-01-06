@@ -2,36 +2,30 @@
 
 $this->setJavascript('/javascript/swfobject.js');
 $this->setBlock($componentHandle, 'podcast_list', 'podcast_list_block');
-/*
-$config = array('url'	=> '',
-				'limit' => 0,
-				
-				);
-print serialize($config);
-*/
-if (!empty($config['url']) && $xml = simplexml_load_file( $config['url'])) {
 
-	$this->setVar('PODCAST_COMPONENT_TITLE', scrubText((string)$xml->channel->title));
-	$k = 0;
-	
-	foreach ($xml->channel->item as $item) {
-		if (!$config['size'] || $k < $config['size']) {
-			$k++;
-			$output = array('PODCAST_URL'			=> (string)$item->enclosure['url'],
-							'PODCAST_TITLE'			=> scrubText((string)$item->title),
-							'PODCAST_DESCRIPTION'	=> scrubText((string)$item->description),
-							'ON_OFF'				=> ++$j%2 ? '' : 'dark',
-							'PODCAST_ID'			=> md5((string)$item->title)
-							);
-							
-			$this->setVar($output);
-			$this->parse('podcast_list_block', 'podcast_list', true);
-		}
-	}
+require_once('../library/xml.php');
+$xml = new XML($config['url']);
+
+if(!empty($config['url'])) {
+    $this->setVar('PODCAST_COMPONENT_TITLE', scrubText($xml->channel->title));
+
+    foreach ($xml->channel->item as $item) {
+        $this->setVar(array(
+            'PODCAST_URL'           => scrubText($item->enclosure['url']),
+            'PODCAST_TITLE'         => scrubText($item->title),
+            'PODCAST_DESCRIPTION'   => scrubText($item->description),
+            'ON_OFF'                => ++$j%2 ? '' : 'dark',
+            'PODCAST_ID'            => md5($item->title)
+        ));
+
+        $this->parse('podcast_list_block', 'podcast_list', true);
+
+        if($j == $config['size'] || $config['url'] != 0)
+            break;
+    }
 } else {
-	$this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - Please set URL');
-	$this->setVar('podcast_list_block', '');
+    $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - Please set URL');
+    $this->setVar('podcast_list_block', '');
 }
-
 
 ?>
