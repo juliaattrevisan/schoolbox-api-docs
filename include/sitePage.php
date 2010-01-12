@@ -284,7 +284,10 @@ class SitePage extends Page {
 			}
 			else if($this->site == 'shore') {
 				if($this->groupHandler->isStaff()) {
-					$this->setVar('WEBMAIL_LOCATION', 'href="https://mail.shore.nsw.edu.au/exchange/" rel="external"');
+					if(strpos(getIP(),'192.168.') === FALSE)
+						$this->setVar('WEBMAIL_LOCATION', 'href="https://mail.shore.nsw.edu.au/exchange/" rel="external"');
+					else
+						$this->setVar('WEBMAIL_LOCATION', 'href="http://shorexch01/exchang" rel="external"');
 				}
 				else if($this->groupHandler->isStudent()) {
 					$this->setVar('WEBMAIL_LOCATION', 'href="https://mail.student.shore.nsw.edu.au/exchange/" rel="external"');

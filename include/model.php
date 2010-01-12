@@ -6,8 +6,8 @@
 *                                                           *														   
 ************************************************************/
 
-require_once($_SERVER['DOCUMENT_ROOT'] .'/conf/conf.php');
-require_once($_SERVER['DOCUMENT_ROOT'] .'/../include/db.php');
+require_once(dirname(__FILE__)  .'/../www/conf/conf.php');
+require_once(dirname(__FILE__)  .'/db.php');
 
 class Model {
 

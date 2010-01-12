@@ -2,8 +2,8 @@
 
 /* This script controls homepage layout functions.  It is used for setting up templates and customising homepage */
 
-require_once($_SERVER['DOCUMENT_ROOT'] .'/conf/conf.php');
-require_once($_SERVER['DOCUMENT_ROOT'] .'/../include/db.php');
+require_once(dirname(__FILE__)  .'/../www/conf/conf.php');
+require_once(dirname(__FILE__)  .'/../include/db.php');
 
 class Homepage {
 

@@ -1,8 +1,8 @@
 <?php
 
 /* Template management for homepages */
-require_once($_SERVER['DOCUMENT_ROOT'].'/../include/model.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/../library/homepage.php');
+require_once dirname(__FILE__) . '/../include/model.php';
+require_once dirname(__FILE__) . '/homepage.php';
 
 class HomepageTemplate extends  Model {
 
