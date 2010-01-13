@@ -5,11 +5,11 @@ require_once($_SERVER['DOCUMENT_ROOT'] .'/conf/conf.php');
 class XML {
     public $xml;
 
-    function __construct ($url, $caching = true) {
+    function __construct ($url, $cache_time = 7200) {
         $cache_file = CACHE_xml . '/' . md5($url);
-        $cache_time = is_numeric($caching) ? $caching : 2*60*60;
+        //$cache_time = is_numeric($caching) ? $caching : 2*60*60;
 
-        if($caching && (!file_exists($cache_file) || filectime($cache_file) > time() + $cache_time))   {
+        if(!file_exists($cache_file) || filectime($cache_file) > (time() + $cache_time))   {
             file_put_contents($cache_file, file_get_contents($url));
         }
 
