@@ -1,0 +1,16 @@
+<h2>{TYPE_NAME}</h2>
+<!-- BEGIN file -->
+<div>
+    <img src="/images/mime/{FILE_ICON}" />
+    <h3><a href="/sendframe.php?id={FILE_ID}">{FILE_DESCRIPTION}</a></h3>
+    <p>{FILE_COMMENT}</p>
+    <p>Owner: <a href="/search/user/{FILE_OWNER}">{FILE_OWNER_NAME}</a> Created: {FILE_CREATED}</p>
+    <p>{FILE_BREADCRUMB}</p>
+</div>
+<!-- END file -->
+<div class="pagination">
+    <!-- BEGIN pagination -->
+    <a href="#" class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
+    <!-- END pagination -->
+</div>
+<div>{TYPE_TIME}</div>

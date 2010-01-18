@@ -1,0 +1,60 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
+<script type="text/javascript">
+    $j(function() {
+        $j('#type a[class!=disabled]').click(function() {
+            $j('#type a').removeClass('selected');
+            $j(this).addClass('selected');
+
+            var el = $j(this).attr('title');
+            var paginate = function(){
+                $j('div.' + 'pagination > a').click(function() {
+                    $j('div.results > div[title=' + el + ']').load('/search.php', 'keyword={KEYWORD}&type=' + el + '&page='+this.text, paginate);
+                });
+            }
+
+            if(!$j('div.results > div[title=' + el + ']').hasClass('loaded')) {
+                $j('div.results > div[title=' + el + ']').load('/search.php', 'keyword={KEYWORD}&type=' + el, paginate);
+                $j('div.results > div[title=' + el + ']').addClass('loaded');
+            }
+
+            $j('div.results > div').hide();
+            $j('div.results > div[title=' + el + ']').show();
+        });
+
+        var params = window.location.href.split("#");
+        if (params[1] != '' && params[0] != window.location.href) {
+            var parent = $j('#a'+ params[1]).parent();
+            $j(parent).show();
+            $j('#type a[title='+parent.attr('id')+']').addClass('selected');
+            $j.scrollTo('#a'+ params[1]);
+        } else {
+            $j('#type li:first-child a').addClass('selected');
+            $j('div.results > div:first-child').show();
+        }
+
+    });
+</script>
+<!-- END custom_head -->
+
+<h1>Search Results</h1>
+<ul id="type">
+    <!-- BEGIN type -->
+    <li><a href="#" title="{TYPE_TITLE}" class="{TYPE_CLASS}">{TYPE_NAME} ({TYPE_COUNT})</a></li>
+    <!-- END type -->
+</ul>
+
+<div class="results">
+    <div title="all" class="hide loaded">
+        {RESULT}
+        <div>{ALL_TIME}</div>
+    </div>
+    <div title="user" class="hide"></div>
+    <div title="file" class="hide"></div>
+    <div title="category" class="hide"></div>
+    <div title="link" class="hide"></div>
+    <div title="news" class="hide"></div>
+    <div title="blog" class="hide"></div>
+    <div title="wiki" class="hide"></div>
+    <div title="forum" class="hide"></div>
+</div>

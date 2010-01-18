@@ -1,0 +1,16 @@
+<h2>{TYPE_NAME}</h2>
+<!-- BEGIN news -->
+<div>
+    <img src="/images/mime/{NEWS_ICON}" />
+    <h3><a href="/homepage/newsArchive/{NEWS_CODE}#{NEWS_ID}">{NEWS_HEADING}</a></h3>
+    <p>{NEWS_BODY}</p>
+    <p>Owner: <a href="/search/user/{NEWS_OWNER}">{NEWS_OWNER_NAME}</a> Created: {NEWS_CREATED}</p>
+    <p>{NEWS_BREADCRUMB}</p>
+</div>
+<!-- END news -->
+<div class="pagination">
+    <!-- BEGIN pagination -->
+    <a href="#" class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
+    <!-- END pagination -->
+</div>
+<div>{TYPE_TIME}</div>
