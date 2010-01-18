@@ -12,7 +12,7 @@ class XML {
         $cache_file = CACHE_xml . '/' . md5($url);
         //$cache_time = is_numeric($caching) ? $caching : 2*60*60;
 
-        if(!file_exists($cache_file) || filectime($cache_file) > (time() + $cache_time))   {
+        if(!file_exists($cache_file) || filectime($cache_file) < (time() - $cache_time))   {
             $xml_handle = fopen($url, 'r');
             $cache_handle = fopen($cache_file, 'w');
 
