@@ -798,6 +798,9 @@ News styles
 #category li a.selected {
 	background: #ccc;
 }
+#category li a.disabled {
+	color: #ccc;
+}
 .topic {
 	border: 1px solid #ccc;
 	clear: both;
@@ -886,6 +889,39 @@ ul.tree li.icon a {
 	padding: 0 0 0 28px;
 	line-height: 21px;
 	}
+/*--------------------------------------------------------------
+ Search result specific styles
+--------------------------------------------------------------*/
+#type {
+	list-style: none;
+	margin: 0;
+	float: left;
+}
+#type li {
+	float: left;
+	background: #ececec;
+	border: 1px solid #ccc;
+	border-bottom: 0;
+	padding: 0;
+	margin: 0 2px 0 0;
+}
+#type li a {
+	display: block;
+	padding: 5px 10px;
+}
+#type li a.selected {
+	background: #ccc;
+}
+#type li a.disabled {
+	color: #ccc;
+}
+div.results {
+	border-top: 1px solid #ccc;
+        clear: both;
+        margin: 0;
+	padding: 10px 0 0 0;
+}
+
 /*--------------------------------------------------------------
  Footer specific styles 
 --------------------------------------------------------------*/
@@ -1035,6 +1071,7 @@ input.timeField { width: 30px; }
 	}
 .cancelled { text-decoration: line-through; }
 .file { background-repeat: no-repeat; }
+.bold {font-weight: bold;}
 /*--------------------------------------------------------------
  sIFR Replacements
 --------------------------------------------------------------*/

@@ -357,6 +357,46 @@ class Category extends Model {
 		if($deleteSelf)
 			$this->delete($categoryID);
 	}
+
+        function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+            $keyword = scrubText($keyword);
+
+            $query = "SELECT `category`.*, MATCH(`name`,`code`) AGAINST ('*$keyword*' IN BOOLEAN MODE) AS `score`
+                        FROM `category`
+                        LEFT JOIN `perms` ON `category`.id = `perms`.cid
+                            AND `perms`.gid = {$_SESSION['gid']}
+                            AND `perms`.type > 0
+                        LEFT JOIN `userAccess` ON `category`.id = `userAccess`.sid
+                            AND `userAccess`.service = 1
+                            AND `userAccess`.uid = {$_SESSION['id']}
+                        WHERE (`perms`.cid OR `userAccess`.sid)
+                            AND MATCH(`name`,`code`) AGAINST ('*$keyword*' IN BOOLEAN MODE)
+                        ORDER BY `$sort_by` $sort_dir
+                        LIMIT $offset, $limit;
+            ";
+
+            $count_query = "SELECT COUNT(*)
+                            FROM `category`
+                            LEFT JOIN `perms` ON `category`.id = `perms`.cid
+                                AND `perms`.gid = {$_SESSION['gid']}
+                                AND `perms`.type > 0
+                            LEFT JOIN `userAccess` ON `category`.id = `userAccess`.sid
+                                AND `userAccess`.service = 1
+                                AND `userAccess`.uid = {$_SESSION['id']}
+                            WHERE (`perms`.cid OR `userAccess`.sid)
+                                AND MATCH(`name`,`code`) AGAINST ('*$keyword*' IN BOOLEAN MODE)
+            ";
+
+            $count = $this->db->getOne($count_query);
+
+            return $this->db->getAll($query);
+        }
+
+        function breadcrumb($id) {
+            for(; $id != 0; $category = $this->getByID($id), $id = $category['parent'], $breadcrumb[] = $category);
+            
+            return array_reverse($breadcrumb);
+        }
 }
 
 ?>

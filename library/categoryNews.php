@@ -43,6 +43,45 @@ class CategoryNews extends Model {
 	function delete($id) {
 		$this->update(array('id'=>$id,'deleted'=>1));
 	}
+
+        function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+            $keyword = scrubText($keyword);
+
+            $query = "SELECT `subject_news`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
+                            MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
+                        FROM `subject_news`
+                        LEFT JOIN `user` ON `subject_news`.owner = `user`.id
+                        LEFT JOIN `perms` ON `subject_news`.code = `perms`.cid
+                            AND `perms`.gid = {$_SESSION['gid']}
+                            AND `perms`.type > 0
+                        LEFT JOIN `userAccess` ON `subject_news`.code = `userAccess`.sid
+                            AND `userAccess`.service = 1
+                            AND `userAccess`.uid = {$_SESSION['id']}
+                        WHERE (`perms`.cid OR `userAccess`.sid)
+                            AND MATCH(`heading`,`body`) AGAINST ('$keyword')
+                            AND `deleted` = FALSE
+                        ORDER BY `$sort_by` $sort_dir
+                        LIMIT $offset, $limit;
+            ";
+
+            $count_query = "SELECT COUNT(*)
+                            FROM `subject_news`
+                            LEFT JOIN `user` ON `subject_news`.owner = `user`.id
+                            LEFT JOIN `perms` ON `subject_news`.code = `perms`.cid
+                                AND `perms`.gid = {$_SESSION['gid']}
+                                AND `perms`.type > 0
+                            LEFT JOIN `userAccess` ON `subject_news`.code = `userAccess`.sid
+                                AND `userAccess`.service = 1
+                                AND `userAccess`.uid = {$_SESSION['id']}
+                            WHERE (`perms`.cid OR `userAccess`.sid)
+                                AND MATCH(`heading`,`body`) AGAINST ('$keyword')
+                                AND `deleted` = FALSE
+            ";
+
+            $count = $this->db->getOne($count_query);
+
+            return $this->db->getAll($query);
+        }
 }
 
 ?>

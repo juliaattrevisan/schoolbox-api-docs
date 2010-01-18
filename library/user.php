@@ -51,42 +51,41 @@ class User extends Model {
 	
 	}
 	
-	function searchUser($keyword, $group = 0, $limit = false)
-	{
-		//search for a user based on at least one of the above fields
-		//assumes at least one contains something
-	
-		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, year, local_email, alt_email 
-					FROM user LEFT JOIN groups ON user.group_id = groups.id WHERE ";
+        function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'firstname', $sort_dir = 'asc') {
+            $keyword = scrubText($keyword);
 
-		if($keyword != "")
-		{
-			if( is_numeric( $keyword)) 
-				$query .= "( synergy_id = $keyword OR year = $keyword ) ";
-			else 
-			{
-				if(preg_match('/([[:alpha:]\']+) ([[:alpha:]\']+)/', $keyword, $name)) 
-					$query .= "( firstname like '%{$name[1]}%' and lastname like '%{$name[2]}%' ) ";
-				else 
-					$query .= "( firstname like '%$keyword%' or lastname like '%$keyword%' or username like '%$keyword%' ) ";
-			}
-				
-			if($group)
-				$query .= "AND group_id = $group ";
-		}
-		else if($group)
-			$query .= "group_id = $group ";
-		else
-			error(2);
+            $query = "SELECT *
+                        FROM `user`
+                        LEFT JOIN `groups` ON `user`.group_id = `groups`.id
+                        WHERE `user`.`id` LIKE '%$keyword%'
+                            OR `synergy_id` LIKE '%$keyword%'
+                            OR `groups`.name LIKE '%$keyword%'
+                            OR `username` LIKE '%$keyword%'
+                            OR `title` LIKE '%$keyword%'
+                            OR `firstname` LIKE '%$keyword%'
+                            OR `lastname` LIKE '%$keyword%'
+                            OR `alt_email` LIKE '%$keyword%'
+                        ORDER BY `$sort_by` $sort_dir
+                        LIMIT $offset, $limit;
+            ";
 
-		$query .= "ORDER BY group_id, year, lastname, firstname"; 
-		
-		if (is_numeric($limit))
-			$query .= " LIMIT $limit";
+            $count_query = "SELECT COUNT(*)
+                            FROM `user`
+                            LEFT JOIN `groups` ON `user`.group_id = `groups`.id
+                            WHERE `user`.`id` LIKE '%$keyword%'
+                                OR `synergy_id` LIKE '%$keyword%'
+                                OR `groups`.name LIKE '%$keyword%'
+                                OR `username` LIKE '%$keyword%'
+                                OR `title` LIKE '%$keyword%'
+                                OR `firstname` LIKE '%$keyword%'
+                                OR `lastname` LIKE '%$keyword%'
+                                OR `alt_email` LIKE '%$keyword%'
+            ";
 
-		return $this->db->getAll($query);
+            $count = $this->db->getOne($count_query);
 
-	}
+            return $this->db->getAll($query);
+        }
 
 	function setPassword($userID, $oldPassword, $newPassword) {
 		$oldPassword = mysql_real_escape_string($oldPassword);

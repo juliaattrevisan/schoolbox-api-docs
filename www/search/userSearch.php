@@ -5,7 +5,7 @@ require_once('../../library/user.php');
 
 $userHandler = new User;
 
-$userList = $userHandler->searchUser($_GET['keyword']);
+$userList = $userHandler->search($_GET['keyword']);
 
 $userCount = count($userList);
 

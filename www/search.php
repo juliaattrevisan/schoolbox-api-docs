@@ -1,508 +1,309 @@
 <?php
-/************************************************************
-*                                                           *
-*         Copyright (c) 2002-2003 Lektec Consulting         *
-*                                                           *
-************************************************************/
-//displays results of a search
+/* 
+ * Global search result page
+ */
 
-require_once("include/session.php");
-require_once("include/include.php");
-require_once("include/permission.php");
+// execution time
+$time_start = microtime(true);
 
-class OutPut
-{
-	function OutPut()
-	{
-		$this->t_body = new Template(TPL_directory);
-		$this->db = new dbManager;
-	}
+require_once '../include/sitePage.php';
+require_once '../library/allowed-file.php';
 
-	function searchResult()
-	{
-		$this->t_body->set_file("tplBODY", "search/search_result.htm");
-		$this->t_body->set_var("TITLE", HEADING." - Search Result");
-		
-		//category output
-		$this->t_body->set_block("tplBODY", "cat_listing", "cat_block");
-		
-		//fileoutput
-		$this->t_body->set_block("tplBODY", "file_listing", "files_block");
-		$this->t_body->set_block("file_listing", "file_desc", "file_block");
-		
-		//linkoutput
-		$this->t_body->set_block("tplBODY", "link_listing", "links_block");
-		$this->t_body->set_block("link_listing", "link_desc", "link_block");
-		
-		include("include/page.php");
-	}
-	
-	function advancedSearch()
-	{
-		$this->t_body->set_file("tplBODY", "search/adSearch.htm");
-		$this->t_body->set_var("TITLE", HEADING." - Advanced Search");
-		include("include/page.php");
-	}
-	
+require_once '../library/user.php';
+require_once '../library/file.php';
+require_once '../library/category.php';
+require_once '../library/link.php';
+require_once '../library/categoryNews.php';
+require_once '../library/blog.php';
+require_once '../library/wiki.php';
+require_once '../library/forum.php';
 
-	function showPage()
-	{
-		$this->t_body->pparse("finaloutput", "tplBODY");
-	}
+$page        = new SitePage();
+$allowedFile = new AllowedFile();
 
-	function listSearch($keyword, $type=6, $sort=2)
-	{
-		if(strlen($keyword) > 3) {
-			$tokens = $this->stringTokenise(stripslashes(trim($keyword)));
-			if(count($tokens) > 0)
-			{
-				$this->catSearch($tokens);
-				$this->fileSearch($tokens, $type, $sort);
-				$this->linkSearch($tokens, $type, $sort);
-			}
-			else
-				error(45); //not enough tokens to perform search
-		}
-		else {
-			error(45);
-		}
-	}
+$keyword      = $_GET['keyword'];
+$type         = $_GET['type'];
+$current_page = empty($_GET['page']) ? 1 : $_GET['page'];
 
-	function stringTokenise($str)
-	{
-		$str = preg_replace("/[\{\}\[\]\(\)]/", "", $str);
+$handle = array(
+    'user'     => new User(),
+    'file'     => new File(),
+    'category' => new Category(),
+    'link'     => new Link(),
+    'news'     => new CategoryNews(),
+    'blog'     => new Blog(),
+    //'wiki'     => new Wiki(),
+    'forum'    => new Forum(),
+);
 
-		//toke till we cant toke no more or till we hit 30
-		for($x = 0;$str != "" && $x < 30; $x++ )
-		{
-			$str = trim($str); 
-			$c = substr($str, 0, 1); //get the next char
-			if($c == "\"" || $c == "'")
-            		{	
-				preg_match("/^$c([^$c]*)$c/", $str, $match);
-				$val = preg_quote($match[1]);
-				$str = preg_replace("/^$c$val$c/", "", $str);
-			}
-			else
-			{
-				preg_match("/^([^\s\(\)\"\']+)/", $str, $match);
-				$val = preg_quote($match[1]);
-				$str = preg_replace("/^$val/", "", $str);
-			}
-			//cut out string from search smaller than 2 chars
-			if(strlen($match[1]) > 1)
-			{
-				$token[$x] = $match[1];
-			}
- 		}
-		return $token;
-	}
+$type_list = array(
+    'all'      => 'All',
+    'user'     => 'People',
+    'file'     => 'Files',
+    'category' => 'Folders',
+    'link'     => 'Links',
+    'news'     => 'News',
+    'blog'     => 'Blog',
+    'wiki'     => 'Wiki',
+    'forum'    => 'Forum',
+);
 
-	function tokenToQuery($tokenArray, $column, $op)
-	{
-		//tokenArray is array of search tokens
-		//column is the column the tokens should be compared against
-		//op is the operator AND/OR/+		
-		
-		//first item has no op to begin with
-		$query = "$column LIKE '%".mysql_escape_string(array_shift($tokenArray))."%'";
+if(empty($type)) {
+    // perform search for each handle
+    $page->setFile(TEMPLATE_content, 'search.html');
+    $page->setBlock(TEMPLATE_content, 'type', 'type_block');
+    $page->setVar('KEYWORD', $keyword);
 
-		foreach($tokenArray as $token)
-		{
-			$query .= " $op $column LIKE '%".mysql_escape_string($token)."%'";
-		} 
-		
-		return $query;
+    foreach($handle as $type_name => $type_handle) {
+        $result[$type_name] = $type_handle->search($keyword, 0, 3, $count[$type_name]);
+    }
 
-	}
+    $count['all'] = array_sum($count);
 
-	function catSearch($token)
-	{
-		//this query will get all categories that the user can see
-		$query = "SELECT name, id, template FROM category WHERE ".$this->tokenToQuery($token, 'name', 'OR'). 
-		" OR ".$this->tokenToQuery($token, 'code', 'OR')." ORDER BY name";
+    // type list
+    foreach($type_list as $type_name => $type_desc) {
+        if(!$count[$type_name])
+            continue;
 
-		$result = $this->db->query($query);
+        $page->setVar(array(
+            'TYPE_COUNT' => $count[$type_name],
+            'TYPE_TITLE' => $type_name,
+            'TYPE_CLASS' => $count[$type_name] == 0 ? 'disabled' : '',
+            'TYPE_NAME'  => $type_desc
+        ));
 
-		while($queryArray = $this->db->getNextArray($result) )
-		{
-			//only output if they have access
-			if(perm($queryArray['id'], 1) >= 1)
-			{
-				$this->outputCat($queryArray);
-				$count++;
-			}	
-		}
-
-		//if not categories output just blank out the var
-		if($count == 0){$this->t_body->set_var("cat_block", "");}
-
-
-		$this->db->dbEndQuery;
-	}
-
-	function fileSearch($token, $type, $sort)
-	{
-		//this query will get all files that the user can see
-		$query = "SELECT f.id, f.realname, inline, iconFile, DATE_FORMAT(f.submitted, '".FILE_date_format."') AS submitted, 
-		user.title, user.id as uid, user.firstname, user.lastname, f.description,
-		f.comment, category.name, category.id as cid, category.code, file_size, f.mime_type
-		FROM (file as f, user, category) LEFT JOIN allowedFileTypes ON mime = f.mime_type WHERE f.owner=user.id AND f.category = 
-category.id AND f.deleted = '0'";
-		//do the query based on search type
-		switch ($type)
-		{
-		//description search
-			case 1:
-			$query .= " AND (".$this->tokenToQuery($token, "f.description", "OR").")";
-			break;
-
-			//filename search
-			case 2:
-			$query .= " AND (".$this->tokenToQuery($token, "f.realname", "OR").")";
-			break;
-
-			//comment search
-			case 3:
-			$query .= " AND (".$this->tokenToQuery($token, "f.comment", "OR").")";
-			break;
-
-			//category search
-			case 4:
-			$query .= " AND (".$this->tokenToQuery($token, "category.name", "OR").")";
-			break;
-
-			//author search
-			case 5:
-			$query .= " AND (".$this->tokenToQuery($token, "user.username", "OR").
-				  " OR ".$this->tokenToQuery($token, "fullname", "OR").")";
-			break;
-			//search all
-			default:
-			$query .= " AND (".$this->tokenToQuery($token, "f.description", "OR").
-				" OR ".$this->tokenToQuery($token, "f.realname", "OR").
-				" OR ".$this->tokenToQuery($token, "f.comment", "OR").
-				" OR ".$this->tokenToQuery($token, "user.username", "OR").
-				" OR ".$this->tokenToQuery($token, "CONCAT(user.firstname, ' ', user.lastname)", "OR").")";
-			break;
-		}
-
-		//sort the data by
-		switch($sort)
-		{
-		        //description
-			case 1:
-			$query .= " ORDER BY f.description ";
-			break;
-
-			//submission date
-			case 2:
-			$query .= " ORDER BY f.submitted DESC";
-			break;
-
-			//author name
-			case 3:
-			$query .= " ORDER BY f.owner ";
-			break;
-		}
-		$this->db->query($query);
-
-		$count = 0;
-
-		while($queryArray = $this->db->getNextArray() )
-		{
-			//only output if they have access
-			if(perm($queryArray['cid'], 1) >= 1)
-			{				
-				$this->outputFile($queryArray);
-				$count++;
-			}
-		}
-		if($count < 1){ $this->t_body->set_var("files_block", "");}
-
-		$this->db->dbEndQuery();
-	}
-
-	function linkSearch($token, $type, $sort)
-	{
-		//this query will get all links that the user can see
-		$query = "SELECT link.id, link.url, DATE_FORMAT(link.submitted, '".FILE_date_format."') AS submitted, 
-		user.title, user.id as uid, user.firstname, user.firstname, user.lastname, link.description, link.comment, category.name, category.id as cid, category.code 
-		FROM link, user, category WHERE link.owner = user.id AND link.category = category.id";
-		//do the query based on search type
-		switch ($type)
-		{
-			//description search
-			case 1:
-			$query .= " AND (".$this->tokenToQuery($token, "link.description", "OR").")";
-			break;
-
-			//url search
-			case 2:
-			$query .= " AND (".$this->tokenToQuery($token, "link.url", "OR").")";
-			break;
-
- 			//comment search
-			case 3:
-			$query .= " AND (".$this->tokenToQuery($token, "link.comment", "OR").")";
-			break;
-
-			//category search
-			case 4:
-			$query .= " AND (".$this->tokenToQuery($token, "category.name", "OR").")";
-			break;
-
-			//author search
-			case 5:
-			$query .= " AND (".$this->tokenToQuery($token, "user.username", "OR").
-				" OR ".$this->tokenToQuery($token, "user.firstname", "OR").
-				" OR ".$this->tokenToQuery($token, "user.lastname", "OR").")";
-			break;
-
-			//search all
-			default:
-			$query .= " AND (".$this->tokenToQuery($token, "link.description", "OR").
-				" OR ".$this->tokenToQuery($token, "link.url", "OR").
-				" OR ".$this->tokenToQuery($token, "link.comment", "OR").
-				" OR ".$this->tokenToQuery($token, "user.username", "OR").
-				" OR ".$this->tokenToQuery($token, "user.firstname", "OR").
-				" OR ".$this->tokenToQuery($token, "user.lastname", "OR").")";
-			break;
-		}
-
-		//sort the data by
-		switch($sort)
-		{
-		        //description
-			case 1:
-			$query .= " ORDER BY link.description ";
-			break;
-
-			//submission date
-			case 2:
-			$query .= " ORDER BY link.submitted DESC";
-			break;
-
-			//author name
-			case 3:
-			$query .= " ORDER BY link.owner ";
-			break;
-		}
-
-		$this->db->query($query);
-
-		$count = 0;
-		while($queryArray = $this->db->getNextArray() )
-		{
-			//only output if they have access
-			if(perm($queryArray['cid'], 1) >= 1)
-			{				
-				$this->outputLink($queryArray);
-				$count++;
-			}
-		}
-		if($count < 1){ $this->t_body->set_var("links_block", "");}
-
-		$this->db->dbEndQuery;
-	}
-
-	function outputFile($fileDetails)
-	{
-
-		// correction for empty description
-		if ($fileDetails['comment'] == "") { $fileDetails['comment'] = "No comment available"; }
-
-		// set filename for filesize() call below
-		$filename = FILE_directory . "/" . $fileDetails['id'] . ".dat";
-
-		// set file size
-		if($fileDetails['realname'] != "")
-		{
-			if($fileDetails['file_size'])
-				$filesize = $fileDetails['file_size'];
-			else
-				$filesize = @filesize($filename);
-			
-			if($filesize == FALSE) //if we cannot find the file (something is wrong dont link to it)
-			{
-				$this->t_body->set_var("SIZE", "");
-				$fileDetails['realname'] = "";	
-			}
-			else
-				$this->t_body->set_var("SIZE", '('.bytesToString($filesize).')');
-		}
-		else
-			$this->t_body->set_var("SIZE", "");
-		
-
-		//set image
-		if($fileDetails['iconFile'])
-			$this->t_body->set_var("FILE_IMAGE", "/images/mime/".$fileDetails['iconFile']);
-		else				
-			$this->t_body->set_var("FILE_IMAGE", "/images/mime/application-x-none.png");
-
-		// set url depending on wether it should have one and how it should be opened
-		if($fileDetails['realname'] != "")
-		{
-			//if inline open in new window, if not give user a save dialog box
-			if($fileDetails['inline']== 'true' && FILE_use_frame)
-				$this->t_body->set_var("FILE_URL", "<a href=\"/sendframe.php?id=".$fileDetails['id']."\" target=\"_blank\">");
-			else
-				$this->t_body->set_var("FILE_URL", "<a href=\"/send.php?id=".$fileDetails['id']."&save=1\">");
-				
-			$this->t_body->set_var('FILE_URL_END', '</a>');
-		}
-		else
-		{
-			$this->t_body->set_var('FILE_URL', '');
-			$this->t_body->set_var('FILE_URL_END', '');
-		}
-		
-		$this->t_body->set_var('FILE_DESCRIPTION', scrubTEXT($fileDetails['description']));
-
-		// set comment
-		$this->t_body->set_var("COMMENT", scrubTEXT($fileDetails['comment']));
-	
-		// set owner
-		$fullname = formatName($fileDetails);
-		$owner = "<a href=\"/search/user/{$fileDetails['uid']}\">$fullname</a>";
-		
-		//output owner
-		$this->t_body->set_var("OWNER", $owner);
-	
-		// set date uploaded
-		$this->t_body->set_var("DATETIME", $fileDetails['submitted']);
-
-		//set category
-		if($queryArray['code'])
-			$this->t_body->set_var("CATEGORY_NAME", scrubTEXT($fileDetails['name']).' ('.$fileDetails['code'].')');
-		else
-			$this->t_body->set_var("CATEGORY_NAME", scrubTEXT($fileDetails['name']));
-
-		$this->t_body->set_var("CATEGORY_ID", $fileDetails['cid']);
-
-		//parse the output
-		$this->t_body->parse("file_block", "file_desc");
-		$this->t_body->parse("files_block", "file_listing", true);
-	}
-
-	function outputLink($linkDetails)
-	{
-		if ($linkDetails['comment'] == "") { $linkDetails['comment'] = "No comment available"; }
-
-		// set link
-		if(isLocalURL($linkDetails['url']))
-		{
-			$this->t_body->set_var("LINK_URL", $linkDetails['url']);
-			$this->t_body->set_var("LINK_TARGET", "_self");
-		}
-		else
-		{
-			$this->t_body->set_var("LINK_URL", "/redir.php?url=".urlencode(urlencode($linkDetails['url'])));
-			$this->t_body->set_var("LINK_TARGET", "_blank");
-		}
-		
-		$this->t_body->set_var("LINK_DESCRIPTION", scrubTEXT($linkDetails['description']).'</a>');
-		$this->t_body->set_var("COMMENT", scrubTEXT($linkDetails['comment']));
-		
-		// set owner
-		$fullname = formatName($linkDetails);
-		$owner = "<a href=\"/search/user/{$linkDetails['uid']}\">$fullname</a>";
-
-		$this->t_body->set_var("OWNER", $owner);		
-	
-		// set date uploaded
-		$this->t_body->set_var("DATETIME", $linkDetails['submitted']);
-		
-		//set category category
-		$this->t_body->set_var("CATEGORY_NAME", scrubTEXT($linkDetails['name']));
-		$this->t_body->set_var("CATEGORY_ID", $linkDetails['cid']);
-		
-		//parse the output
-		$this->t_body->parse("link_block", "link_desc");
-		//and again?
-		$this->t_body->parse("links_block", "link_listing", true);
-	}
-
-	function getCatPath($parent)
-	{
-		$path = "";
-
-		while($parent != 0)
-		{
-			$query = "SELECT id, name, parent, code FROM category WHERE id = '".$parent."'";
-			$queryArray = $this->db->getRow($query);
-			
-			if($queryArray['code'])
-				$code = " ({$queryArray['code']})";
-			else
-				$code = '';
-		
-			$parent = $queryArray['parent'];
-			if($parent == 0)
-                       		$path = "<a href=\"/resources/".$queryArray['id']."\">".scrubTEXT($queryArray['name']).$code."</a>".$path;
-			else			 
-				$path = " > <a href=\"/resources/".$queryArray['id']."\">".scrubTEXT($queryArray['name']).$code."</a>".$path;
-		}
-
-		return $path;
-        }
-
-	
-	function outputCat($catDetails)
-	{
-		//set description
-		$this->t_body->set_var("CAT_DESCRIPTION", $this->getCatPath($catDetails['id']));
-		
-		//output homepage link
-		if($catDetails['template'])
-			$this->t_body->set_var("HOMEPAGE", "<a href=\"/homepage/".$catDetails['id']."\">homepage</a>");
-		else
-			$this->t_body->set_var("HOMEPAGE", "&nbsp;");
-		
-		//parse
-		$this->t_body->parse("cat_block", "cat_listing", true);
-	}
-
+        $page->parse('type_block', 'type', true);
+    }
+} elseif(!empty($handle[$type])) {
+    // perform search for individual category (without formatting for ajax call)
+    $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * 15, 15, $count[$type]);
 }
 
-//first check whether a redirect was requested
-if($_GET['where'] == 1 && isset($_GET['keyword']))
-{
-	//redirect to google
-	header("Location: newWindow.php?url=redir.php?url=http://www.google.com/search?q=".$_GET['keyword']);
-	exit;
+// render users
+if(!empty($result['user'])) {
+    $page->setFile('user_t', 'search/user.html');
+    $page->setVar('TYPE_NAME', 'People');
+    $page->setBlock('user_t', 'user', 'user_block');
+
+    foreach($result['user'] as $user) {
+        $page->setVar(array(
+            'USER_ID'         => $user['id'],
+            'USER_SYNERGY_ID' => $user['synergy_id'],
+            'USER_NAME'       => formatName($user),
+            'USER_EMAIL'      => formatEmail($user),
+            'USER_GROUP'      => $user['name']
+        ));
+
+        $page->parse('user_block', 'user', true);
+    }
+
+    $page->parse('RESULT', 'user_t', true);
 }
-else if($_GET['where'] == 2 && isset($_GET['keyword']))
-{
-	//redirect to yahoo
-	header("Location: newWindow.php?url=redir.php?url=http://search.yahoo.com/bin/search?p=".$_GET['keyword']);
-	exit;
+
+// render files
+if(!empty($result['file'])) {
+    $page->setFile('file_t', 'search/file.html');
+    $page->setVar('TYPE_NAME', 'Files');
+    $page->setBlock('file_t', 'file', 'file_block');
+
+    foreach($result['file'] as $file) {
+        foreach($handle['category']->breadcrumb($file['category']) as $i => $breadcrumb)
+            $file['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
+
+        $page->setVar(array(
+            'FILE_ID'          => $file['id'],
+            'FILE_ICON'        => $file['iconFile'],
+            'FILE_DESCRIPTION' => scrubTEXT($file['description']),
+            'FILE_COMMENT'     => cutSentence(scrubTEXT($file['comment']), 200),
+            'FILE_OWNER'       => $file['uid'],
+            'FILE_OWNER_NAME'  => formatName($file),
+            'FILE_CREATED'     => getRelativeTime($file['submitted']),
+            'FILE_BREADCRUMB'  => $file['breadcrumb']
+        ));
+
+        $page->parse('file_block', 'file', true);
+    }
+    
+    $page->parse('RESULT', 'file_t', true);
 }
-else
-{
-	$myPage = new OutPut();
-	if($_REQUEST['keyword'])
-	{ 	
-		//setup search result page
-		$myPage->searchResult();
-		
-		//advanced search
-		if($_GET['type'] && $_GET['sort'])
-		{   
-			$myPage->listSearch($_REQUEST['keyword'], $_GET['type'], $_GET['sort']);
-		}
-		else //simple keyword search
-		{  
-			$myPage->listSearch($_REQUEST['keyword']);
-		}
-	}
-	else
-	{
-		error(2);
-		//$myPage->advancedSearch();
-	}
-	
-	$myPage->showPage();
+
+// render categories
+if(!empty($result['category'])) {
+    $page->setFile('category_t', 'search/category.html');
+    $page->setVar('TYPE_NAME', 'Folders');
+    $page->setBlock('category_t', 'category', 'category_block');
+
+    foreach($result['category'] as $category) {
+        foreach($handle['category']->breadcrumb($category['id']) as $i => $breadcrumb)
+            $category['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
+
+        $page->setVar(array(
+            'CATEGORY_ID' => $category['id'],
+            'CATEGORY_NAME' => scrubTEXT($category['name']),
+            'CATEGORY_CODE' => $category['code'],
+            'CATEGORY_BREADCRUMB' => $category['breadcrumb'],
+        ));
+
+        $page->parse('category_block', 'category', true);
+    }
+
+    $page->parse('RESULT', 'category_t', true);
 }
+
+// render links
+if(!empty($result['link'])) {
+    $page->setFile('link_t', 'search/link.html');
+    $page->setVar('TYPE_NAME', 'Links');
+    $page->setBlock('link_t', 'link', 'link_block');
+
+    foreach($result['link'] as $link) {
+        foreach($handle['category']->breadcrumb($link['id']) as $i => $breadcrumb)
+            $link['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
+
+        $page->setVar(array(
+            'LINK_URL'         => $link['url'],
+            'LINK_ICON'        => $link['iconFile'],
+            'LINK_DESCRIPTION' => scrubTEXT($link['description']),
+            'LINK_COMMENT'     => cutSentence(scrubTEXT($link['comment']), 200),
+            'LINK_OWNER'       => $link['uid'],
+            'LINK_OWNER_NAME'  => formatName($link),
+            'LINK_CREATED'     => getRelativeTime($link['submitted']),
+            'LINK_BREADCRUMB'  => $link['breadcrumb']
+        ));
+
+        $page->parse('link_block', 'link', true);
+    }
+
+    $page->parse('RESULT', 'link_t', true);
+}
+
+// render news
+if(!empty($result['news'])) {
+    $page->setFile('news_t', 'search/news.html');
+    $page->setVar('TYPE_NAME', 'News');
+    $page->setBlock('news_t', 'news', 'news_block');
+
+    foreach($result['news'] as $news) {
+        foreach($handle['category']->breadcrumb($news['code']) as $i => $breadcrumb)
+            $news['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
+
+        $page->setVar(array(
+            'NEWS_ID'         => $news['id'],
+            'NEWS_CODE'       => $news['code'],
+            'NEWS_HEADING'    => scrubTEXT($news['heading']),
+            'NEWS_BODY'       => cutSentence(scrubTEXT(strip_tags($news['body'])), 200),
+            'NEWS_OWNER'      => $news['uid'],
+            'NEWS_OWNER_NAME' => formatName($news),
+            'NEWS_CREATED'    => getRelativeTime($news['datetime_posted']),
+            'NEWS_BREADCRUMB' => $news['breadcrumb']
+        ));
+
+        $page->parse('news_block', 'news', true);
+    }
+
+    $page->parse('RESULT', 'news_t', true);
+}
+
+// render blog
+if(!empty($result['blog'])) {
+    $page->setFile('blog_t', 'search/blog.html');
+    $page->setVar('TYPE_NAME', 'Blog');
+    $page->setBlock('blog_t', 'blog', 'blog_block');
+
+    foreach($result['blog'] as $blog) {
+        foreach($handle['category']->breadcrumb($blog['cid']) as $i => $breadcrumb)
+            $blog['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
+
+        $page->setVar(array(
+            'BLOG_CID'        => $blog['cid'],
+            'BLOG_HEADING'    => scrubTEXT($blog['heading']),
+            'BLOG_BODY'       => cutSentence(scrubTEXT(strip_tags($blog['body'])), 200),
+            'BLOG_OWNER'      => $blog['uid'],
+            'BLOG_OWNER_NAME' => formatName($blog),
+            'BLOG_CREATED'    => getRelativeTime($blog['created']),
+            'BLOG_BREADCRUMB' => $blog['breadcrumb']
+        ));
+
+        $page->parse('blog_block', 'blog', true);
+    }
+
+    $page->parse('RESULT', 'blog_t', true);
+}
+
+// render forum
+if(!empty($result['forum'])) {
+    $page->setFile('forum_t', 'search/forum.html');
+    $page->setVar('TYPE_NAME', 'Forum');
+    $page->setBlock('forum_t', 'forum', 'forum_block');
+
+    foreach($result['forum'] as $forum) {
+        foreach($handle['category']->breadcrumb($forum['categoryID']) as $i => $breadcrumb)
+            $forum['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
+
+        $page->setVar(array(
+            'FORUM_CID'        => $forum['categoryID'],
+            'FORUM_THREADID'   => $forum['threadID'],
+            'FORUM_TITLE'      => scrubTEXT($forum['threadTitle']),
+            'FORUM_BODY'       => cutSentence(scrubTEXT(strip_tags($forum['body'])), 200),
+            'FORUM_OWNER'      => $forum['uid'],
+            'FORUM_OWNER_NAME' => formatName($forum),
+            'FORUM_CREATED'    => getRelativeTime($forum['created']),
+            'FORUM_BREADCRUMB' => $forum['breadcrumb']
+        ));
+
+        $page->parse('forum_block', 'forum', true);
+    }
+
+    $page->parse('RESULT', 'forum_t', true);
+}
+
+if(empty($type)) {
+    // clear pagination
+    $page->setBlock('RESULT', 'pagination', 'pagination_block');
+    $page->setVar('pagination_block');
+
+    // execution time
+    $time = microtime(true) - $time_start;
+    $page->setVar(array(
+        'ALL_TIME'  => round($time, 2),
+        'TYPE_TIME' => '',
+    ));
+
+    // render final output
+    $page->outputPage();
+} else {
+    // render pagination
+    $page->setBlock('RESULT', 'pagination', 'pagination_block');
+
+    $number_pages = ceil($count[$type] / 15);
+    
+    if(($current_page - 5) < 1) {
+        $start_window = 1;
+        $end_window   = $number_pages > 10 ? 10 : $number_pages;
+    } elseif(($current_page + 5) > $number_pages) {
+        $start_window = $number_pages - 10;
+        $end_window   = $number_pages;
+    } else {
+        $start_window = $current_page - 5;
+        $end_window   = $current_page + 5;
+    }
+
+    for($i = $start_window; $i <= $end_window; $i++) {
+        $page->setVar(array(
+            'PAGE_NUMBER' => $i,
+            'PAGE_CLASS'  => $i == $current_page ? 'bold' : '',
+        ));
+        
+        $page->parse('pagination_block', 'pagination', true);
+    }
+
+    // execution time
+    $time = microtime(true) - $time_start;
+    $page->setVar('TYPE_TIME', round($time, 2));
+
+    // render final output
+    $page->parse(TEMPLATE_body, 'RESULT', true);
+    $page->outputPage(true);
+}
+
 ?>

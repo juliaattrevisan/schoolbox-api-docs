@@ -37,11 +37,13 @@ if(is_array($newsList)) {
 		
 		$poster = formatName($news);
 		
-		$output = array("NEWS_HEADING"	=> scrubTEXT($news['heading']),
-						"NEWS_BODY"		=> scrubHTML($news['body']),
-						"EMAIL_CONTACT"	=> "<a href=\"/search/user/{$news['uid']}\">$poster</a>",
-						"POSTED_DATE"	=> outputDate(DATE_short_format, $news['posted']),
-						);
+		$output = array(
+                    "NEWS_ID"           => $news['id'],
+                    "NEWS_HEADING"	=> scrubTEXT($news['heading']),
+                    "NEWS_BODY"		=> scrubHTML($news['body']),
+                    "EMAIL_CONTACT"	=> "<a href=\"/search/user/{$news['uid']}\">$poster</a>",
+                    "POSTED_DATE"	=> outputDate(DATE_short_format, $news['posted']),
+                );
 		$this->setVar($output);
 		
 		$this->parse("news_block", "news", true);

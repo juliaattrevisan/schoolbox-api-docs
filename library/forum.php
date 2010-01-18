@@ -194,5 +194,49 @@ class Forum extends Model {
 		
 		return $this->db->query($query);
 	}
+
+        function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+            $keyword = scrubText($keyword);
+
+            $query = "SELECT `forumThread`.*, `forumPost`.*, `forumThread`.title AS `threadTitle`,
+                            `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
+                            MATCH(`body`) AGAINST ('$keyword') AS `score`
+                        FROM `forumPost`
+                        LEFT JOIN `forumThread` ON `forumPost`.threadID = `forumThread`.threadID
+                        LEFT JOIN `user` ON `forumPost`.userID = `user`.id
+                        LEFT JOIN `perms` ON `forumThread`.categoryID = `perms`.cid
+                            AND `perms`.gid = {$_SESSION['gid']}
+                            AND `perms`.type > 0
+                        LEFT JOIN `userAccess` ON `forumThread`.categoryID = `userAccess`.sid
+                            AND `userAccess`.service = 1
+                            AND `userAccess`.uid = {$_SESSION['id']}
+                        WHERE (`perms`.cid OR `userAccess`.sid)
+                            AND MATCH(`body`) AGAINST ('$keyword')
+                            AND `forumThread`.`deleted` = 'false'
+                            AND `forumPost`.`deleted` = 'false'
+                        ORDER BY `$sort_by` $sort_dir
+                        LIMIT $offset, $limit;
+            ";
+
+            $count_query = "SELECT COUNT(*)
+                        FROM `forumPost`
+                        LEFT JOIN `forumThread` ON `forumPost`.threadID = `forumThread`.threadID
+                        LEFT JOIN `user` ON `forumPost`.userID = `user`.id
+                        LEFT JOIN `perms` ON `forumThread`.categoryID = `perms`.cid
+                            AND `perms`.gid = {$_SESSION['gid']}
+                            AND `perms`.type > 0
+                        LEFT JOIN `userAccess` ON `forumThread`.categoryID = `userAccess`.sid
+                            AND `userAccess`.service = 1
+                            AND `userAccess`.uid = {$_SESSION['id']}
+                        WHERE (`perms`.cid OR `userAccess`.sid)
+                            AND MATCH(`body`) AGAINST ('$keyword')
+                            AND `forumThread`.`deleted` = 'false'
+                            AND `forumPost`.`deleted` = 'false'
+            ";
+
+            $count = $this->db->getOne($count_query);
+
+            return $this->db->getAll($query);
+        }
 }
 ?>
