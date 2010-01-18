@@ -53,7 +53,8 @@ class Wiki extends Model {
 	function createRevision ($data) {
 		$data['created'] = 'NOW()';
 		$data['userID'] = $_SESSION['id'];
-		return $this->db->insert($this->_revisionTable, $data);
+		$this->db->insert($this->_revisionTable, $data);
+		return $this->db->insertID();
 	}
 	
 	function create($data) {
@@ -67,8 +68,11 @@ class Wiki extends Model {
 		$wikiID = parent::create($data);
 		if($wikiID) {
 			$revision['wikiID'] = $wikiID;
-			$this->createRevision($revision);
+			$revisionID = $this->createRevision($revision);
+			parent::update(array('wikiID' => $wikiID, 'latestRevision' => $revisionID));
 		}
+		
+		
 		return $wikiID;
 	}
 	
@@ -89,8 +93,10 @@ class Wiki extends Model {
 		}
 
 		//Otherwise update revisions if more than just the wikiID is left
-		if(count($data) > 1)
-			$this->createRevision($data);
+		if(count($data) > 1) {
+			$revisionID = $this->createRevision($data);
+			parent::update(array('wikiID' => $data['wikiID'], 'latestRevision' => $revisionID));
+		}
 	}
 
 	function revert($wikiID, $revisionID) {
@@ -101,7 +107,11 @@ class Wiki extends Model {
 		$data = array('wikiID'	=> $wiki['wikiID'],
 					  'heading'	=> $wiki['heading'],
 					  'body'	=> $wiki['body']);
-		return $this->createRevision($data);
+		
+		$revisionID =  $this->createRevision($data);
+		parent::update(array('wikiID' => $data['wikiID'], 'latestRevision' => $revisionID));
+		
+		return $revisionID;
 	}
 
 	function delete ($wikiID) {

@@ -430,6 +430,7 @@
 			/* make nodes draggable */
 			node.draggable({
 				cursor: 'move',
+				containment: 'div.scroller',
 				cursorAt: {top: 5, left: 5},
 				helper: function (event) {
 					return $(event.currentTarget).clone().addClass('accept');
