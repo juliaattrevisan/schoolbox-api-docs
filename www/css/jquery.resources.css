@@ -68,12 +68,12 @@ div.loading {
 
 
 .treeTable span.file {
-  background-image: url(/images/mime/textfile.png);
+  background-image: url(/images/mime/22x22/mimetypes/unknown.png);
   cursor: default;
 }
 
 .treeTable span.folder, #top {
-  background-image: url(/images/mime/folder_blue_full.png);
+  background-image: url(/images/mime/22x22/mimetypes/folder_blue_full.png);
   white-space: pre;
 }
 
@@ -90,7 +90,7 @@ div.loading {
 }
 
 .treeTable span.folder.error {
-  background-image: url(/images/mime/folder_blue_error.png);
+  background-image: url(/images/mime/22x22/mimetypes/folder_blue_error.png);
 }
 
 /* jquery.treeTable.collapsible

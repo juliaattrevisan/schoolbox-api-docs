@@ -67,7 +67,7 @@ class allowedFileType
 	function getIconList()
 	{
 		//get a list of filenames from mime
-		$dir = $_SERVER['DOCUMENT_ROOT'].'/images/mime';
+		$dir = $_SERVER['DOCUMENT_ROOT'].'/images/mime/22x22/mimetypes';
 		$path = opendir($dir);
 		while (false !== ($file = readdir($path))) {
 			if($file!="." && $file!="..") {

@@ -729,10 +729,10 @@ a.layout:hover img {
 	padding: 3px 0 3px 30px;
 	display: block;
 	background-repeat: no-repeat;
-	background-image: url(/images/mime/textfile.png);
+	background-image: url(/images/mime/22x22/mimetypes/textfile.png);
 	}
 .folder_blue_full {
-	background-image: url(/images/mime/folder_blue_full.png);
+	background-image: url(/images/mime/22x22/mimetypes/folder_blue_full.png);
 	}
 .house {
 	background: url(/images/famicons/house.png) no-repeat 100% 50%;
