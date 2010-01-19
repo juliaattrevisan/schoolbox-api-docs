@@ -287,7 +287,7 @@ class SitePage extends Page {
 					if(strpos(getIP(),'192.168.') === FALSE)
 						$this->setVar('WEBMAIL_LOCATION', 'href="https://mail.shore.nsw.edu.au/exchange/" rel="external"');
 					else
-						$this->setVar('WEBMAIL_LOCATION', 'href="http://shorexch01/exchang" rel="external"');
+						$this->setVar('WEBMAIL_LOCATION', 'href="http://shorexch01/exchange" rel="external"');
 				}
 				else if($this->groupHandler->isStudent()) {
 					$this->setVar('WEBMAIL_LOCATION', 'href="https://mail.student.shore.nsw.edu.au/exchange/" rel="external"');
@@ -326,11 +326,11 @@ class SitePage extends Page {
 		if($this->site == 'shore') {
 			$this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
 			if($this->groupHandler->isStaff()) {
-				$this->setVar('MYFILES_LOCATION', 'https://shorexch01/fileway' );
+				$this->setVar('MYFILES_LOCATION', 'https://mail.shore.nsw.edu.au/fileway' );
 				$this->parse('mf_tab', 'myfiles_tab');
 			}
 			else if($this->groupHandler->isStudent()) {
-				$this->setVar('MYFILES_LOCATION', 'https://cassandra/fileway' );
+				$this->setVar('MYFILES_LOCATION', 'https://mail.student.shore.nsw.edu.au/fileway' );
 				$this->parse('mf_tab', 'myfiles_tab');
 			}
 			else {
