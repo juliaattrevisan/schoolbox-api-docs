@@ -1,11 +1,21 @@
 <h2>{TYPE_NAME}</h2>
 <!-- BEGIN news -->
-<div>
+<div class="search-item">
     <img src="/images/mime/{NEWS_ICON}" />
+	<div class="search-details">
     <h3><a href="/homepage/newsArchive/{NEWS_CODE}#{NEWS_ID}">{NEWS_HEADING}</a></h3>
     <p>{NEWS_BODY}</p>
     <p>Owner: <a href="/search/user/{NEWS_OWNER}">{NEWS_OWNER_NAME}</a> Created: {NEWS_CREATED}</p>
     <p>{NEWS_BREADCRUMB}</p>
+    </div>
+  	<div class="search-functions">
+        <p><a>Due Work</a></p>
+        <p><a>Timetable</a></p>
+        <p><a>Portfolio</a></p>
+        <p><a>Help Desk</a></p>
+    </div>
+
+<div class="float-fix"></div>
 </div>
 <!-- END news -->
 <div class="pagination">
