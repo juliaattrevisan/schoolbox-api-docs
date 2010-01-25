@@ -15,6 +15,7 @@ if (is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'revert_link', 'revert_link_block');
 	$this->setBlock(TEMPLATE_content, 'lock_link', 'lock_link_block');
 	$this->setBlock(TEMPLATE_content, 'revision_list', 'revision_list_block');
+        $this->setBlock('revision_list', 'revision_comparison', 'revision_comparison_block');
 	
 	$wiki = $wikiHandler->getByID($this->arg[0], $this->arg[1]);
 
@@ -50,12 +51,21 @@ if (is_numeric($this->arg[0])) {
 		foreach ($revisionList as $revision) {
 			$i++;
 				
-			$output = array('REVISION_ID'		=> $revision['revisionID'],
-							'REVISION_DATE'		=> outputDate(DATE_short_no_time, $revision['created']),
-							'REVISION_HEADING'	=> scrubText($revision['heading']),
-							'REVISION_AUTHOR'	=> formatName($revision),
-							);
-			$this->setVar($output);
+			$this->setVar(array(
+                            'WIKI_ID'           => $wiki['wikiID'],
+                            'REVISION_ID'       => $revision['revisionID'],
+                            'REVISION_COMPARE'  => $wiki['revisionID'],
+                            'REVISION_DATE'     => outputDate(DATE_short_no_time, $revision['created']),
+                            'REVISION_HEADING'	=> scrubText($revision['heading']),
+                            'REVISION_AUTHOR'	=> formatName($revision),
+                        ));
+
+                        if ($wiki['revisionID'] == $revision['revisionID']) {
+                            $this->setVar('revision_comparison_block');
+                        } else {
+                            $this->parse('revision_comparison_block', 'revision_comparison');
+                        }
+                        
 			$this->parse('revision_list_block', 'revision_list', true);
 
 			if ($i == 1)

@@ -1,17 +1,24 @@
-<h2>{TYPE_NAME}</h2>
+<h2>Forums <!-- BEGIN count -->({FORUM_DISP_COUNT} / {FORUM_COUNT})<!-- END count --></h2>
 <!-- BEGIN forum -->
-<div>
-    <img src="images/mime/32x32/mimetypes/{FORUM_ICON}" />
+<div class="search-item">
+    <img src="images/mime/60x60/{FORUM_ICON}" />
+    <div class="search-details">
     <h3><a href="/forum/thread/{FORUM_THREADID}">{FORUM_TITLE}</a></h3>
     <p>{FORUM_BODY}</p>
-    <p>Posted by <a href="/search/user/{FORUM_OWNER}">{FORUM_OWNER_NAME}</a> {FORUM_CREATED}</p>
+    <p>Posted by <a href="/search/forum/{FORUM_OWNER}">{FORUM_OWNER_NAME}</a> {FORUM_CREATED}</p>
     <p>{FORUM_BREADCRUMB}</p>
+</div>
+<div class="search-functions">
+    <p><a>Due Work</a></p>
+    <p><a>Timetable</a></p>
+    <p><a>Portfolio</a></p>
+    <p><a>Help Desk</a></p>
+</div>
 <div class="float-fix"></div>
 </div>
 <!-- END forum -->
 <div class="pagination">
     <!-- BEGIN pagination -->
-    <a href="#" class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
+    <a href="javascript:void(0);" class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
     <!-- END pagination -->
 </div>
-<div>{TYPE_TIME}</div>

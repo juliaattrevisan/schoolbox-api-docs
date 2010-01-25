@@ -1,7 +1,7 @@
-<h2>{TYPE_NAME}</h2>
+<h2>News <!-- BEGIN count -->({NEWS_DISP_COUNT} / {NEWS_COUNT})<!-- END count --></h2>
 <!-- BEGIN news -->
 <div class="search-item">
-    <img src="images/mime/32x32/apps/internet-news-reader.png" />
+    <img src="images/icons/60x60/news.png" />
 	<div class="search-details">
     <h3><a href="/homepage/newsArchive/{NEWS_CODE}#{NEWS_ID}">{NEWS_HEADING}</a></h3>
     <p>{NEWS_BODY}</p>
@@ -20,7 +20,7 @@
 <!-- END news -->
 <div class="pagination">
     <!-- BEGIN pagination -->
-    <a href="#" class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
+    <a href=javascript:void(0); class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
     <!-- END pagination -->
 </div>
-<div>{TYPE_TIME}</div>
+

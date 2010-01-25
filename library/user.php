@@ -52,35 +52,36 @@ class User extends Model {
 	}
 	
         function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'firstname', $sort_dir = 'asc') {
-            $keyword = scrubText($keyword);
+            $keyword = explode(' ', scrubText($keyword));
 
-            $query = "SELECT *
-                        FROM `user`
-                        LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-                        WHERE `user`.`id` LIKE '%$keyword%'
-                            OR `synergy_id` LIKE '%$keyword%'
-                            OR `groups`.name LIKE '%$keyword%'
-                            OR `username` LIKE '%$keyword%'
-                            OR `title` LIKE '%$keyword%'
-                            OR `firstname` LIKE '%$keyword%'
-                            OR `lastname` LIKE '%$keyword%'
-                            OR `alt_email` LIKE '%$keyword%'
-                        ORDER BY `$sort_by` $sort_dir
-                        LIMIT $offset, $limit;
-            ";
+            $query = "SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name FROM `user` LEFT JOIN `groups` ON `user`.group_id = `groups`.id LEFT JOIN `luCampus` ON `user`.campus = `luCampus`.id";
+            $count_query = "SELECT COUNT(*) FROM `user` LEFT JOIN `groups` ON `user`.group_id = `groups`.id";
 
-            $count_query = "SELECT COUNT(*)
-                            FROM `user`
-                            LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-                            WHERE `user`.`id` LIKE '%$keyword%'
-                                OR `synergy_id` LIKE '%$keyword%'
-                                OR `groups`.name LIKE '%$keyword%'
-                                OR `username` LIKE '%$keyword%'
-                                OR `title` LIKE '%$keyword%'
-                                OR `firstname` LIKE '%$keyword%'
-                                OR `lastname` LIKE '%$keyword%'
-                                OR `alt_email` LIKE '%$keyword%'
-            ";
+            foreach ($keyword as $i => $word) {
+                $query .= $i > 0 ? ' OR ' : ' WHERE ';
+                $query .= "`user`.`id` LIKE '%$word%'
+                                OR `synergy_id` LIKE '%$word%'
+                                OR `groups`.name LIKE '%$word%'
+                                OR `username` LIKE '%$word%'
+                                OR `title` LIKE '%$word%'
+                                OR `firstname` LIKE '%$word%'
+                                OR `lastname` LIKE '%$word%'
+                                OR `alt_email` LIKE '%$word%'
+                ";
+
+                $count_query .= $i > 0 ? ' OR ' : ' WHERE ';
+                $count_query .= "`user`.`id` LIKE '%$word%'
+                                    OR `synergy_id` LIKE '%$word%'
+                                    OR `groups`.name LIKE '%$word%'
+                                    OR `username` LIKE '%$word%'
+                                    OR `title` LIKE '%$word%'
+                                    OR `firstname` LIKE '%$word%'
+                                    OR `lastname` LIKE '%$word%'
+                                    OR `alt_email` LIKE '%$word%'
+                ";
+            }
+
+            $query .= " ORDER BY `$sort_by` $sort_dir LIMIT $offset, $limit;";
 
             $count = $this->db->getOne($count_query);
 

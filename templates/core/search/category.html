@@ -1,7 +1,7 @@
-<h2>{TYPE_NAME}</h2>
+<h2>Folders <!-- BEGIN count -->({CATEGORY_DISP_COUNT} / {CATEGORY_COUNT})<!-- END count --></h2>
 <!-- BEGIN category -->
 <div class="search-item">
-    <img src="/images/mime/32x32/places/folder.png" />
+    <img src="/images/icons/60x60/folder.png" />
     <div class="search-details">
     <h3><a href="/homepage/{CATEGORY_ID}">{CATEGORY_NAME}</a></h3>
     <p>{CATEGORY_BREADCRUMB}</p>
@@ -18,7 +18,6 @@
 <!-- END category -->
 <div class="pagination">
     <!-- BEGIN pagination -->
-    <a href="#" class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
+    <a href=javascript:void(0); class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
     <!-- END pagination -->
 </div>
-<div>{TYPE_TIME}</div>

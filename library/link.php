@@ -28,7 +28,7 @@ class Link extends Model {
 		require_once dirname(__FILE__) . '/group.php';
 		$groupHandler = new Group;
 		
-		$query = "SELECT l.*, u.firstname, u.lastname, u.title, UNIX_TIMESTAMP(submitted) submitted, 'http-url.png' iconFile 
+		$query = "SELECT l.*, u.firstname, u.lastname, u.title, UNIX_TIMESTAMP(submitted) submitted, 'html_alt1' iconFile
 				  FROM link l
 				  LEFT JOIN user u ON u.id = l.owner
 				  WHERE category = '".$categoryID."'";

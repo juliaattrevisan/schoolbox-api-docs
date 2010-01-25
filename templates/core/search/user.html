@@ -1,11 +1,11 @@
-<h2>{TYPE_NAME}</h2>
+<h2>People <!-- BEGIN count -->({USER_DISP_COUNT} / {USER_COUNT})<!-- END count --></h2>
 <!-- BEGIN user -->
 <div class="search-item">
     <img src="/search/portrait.php?id={USER_SYNERGY_ID}&width=50" alt="{USER_NAME}" />
     <div class="search-details">
     <h3><a href="/search/user/{USER_ID}">{USER_NAME}</a></h3>
+    <p>{USER_DETAIL}</p>
     <p>{USER_EMAIL}</p>
-    <p>{USER_GROUP}</p>
     </div>
     <div class="search-functions">
     <p><a>Due Work</a></p>
@@ -18,7 +18,6 @@
 <!-- END user -->
 <div class="pagination">
     <!-- BEGIN pagination -->
-    <a href="#" class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
+    <a href="javascript:void(0);" class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
     <!-- END pagination -->
 </div>
-<div>{TYPE_TIME}</div>

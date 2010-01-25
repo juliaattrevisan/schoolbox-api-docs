@@ -94,7 +94,7 @@ $allowedList = $allowedFiles->getAll();
 if (is_array($allowedList)) {
 	
 	// append link icon to resutls
-	$allowedList[]['iconFile'] = "http-url.png";
+	$allowedList[]['iconFile'] = "html_alt1.png";
 	$last = '';
 	foreach ($allowedList as $allowed) {
 		if ($last != $allowed["iconFile"]) {

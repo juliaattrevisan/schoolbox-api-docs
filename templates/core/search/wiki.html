@@ -1,0 +1,15 @@
+<h2>Wiki <!-- BEGIN count -->({WIKI_DISP_COUNT} / {WIKI_COUNT})<!-- END count --></h2>
+<!-- BEGIN blog -->
+<div>
+    <img src="images/mime/60x60/60x60/mimetypes/{BLOG_ICON}" />
+    <h3><a href="/homepage/{BLOG_CID}">{BLOG_HEADING}</a></h3>
+    <p>{BLOG_BODY}</p>
+    <p>Owner: <a href="/search/user/{BLOG_OWNER}">{BLOG_OWNER_NAME}</a> Created: {BLOG_CREATED}</p>
+    <p>{BLOG_BREADCRUMB}</p>
+</div>
+<!-- END blog -->
+<div class="pagination">
+    <!-- BEGIN pagination -->
+    <a href=javascript:void(0); class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
+    <!-- END pagination -->
+</div>
