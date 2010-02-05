@@ -79,7 +79,7 @@ class Image {
 				$sampleY = ($origHeight/2) - (($maxHeight * $heightRatio)/2);
 		
 				// true color image, with anti-aliasing 
-				$destImage = imagecreatetruecolor($maxWidth,$maxHeight); 
+				$destImage = imagecreatetruecolor($maxWidth,$maxHeight);
 				
 				if($resample) {
 					imagecopyresampled($destImage, $srcImage, 0, 0, $sampleX, $sampleY,$destWidth+1,$destHeight+1,$origWidth,$origHeight); 

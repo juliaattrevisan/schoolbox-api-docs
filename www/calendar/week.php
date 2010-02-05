@@ -6,8 +6,10 @@
 ************************************************************/
 
 require_once  $_SERVER['DOCUMENT_ROOT'] ."/../library/calendar.php";
+require_once "../library/group.php";
 
 $calendarHandler = new Calendar;
+$groupHandler = new Group;
 
 $this->setFile(TEMPLATE_content, 'calendar/week.html');
 $this->setTab("calendar");
@@ -114,7 +116,7 @@ for($i=0; $i < 7; $i++) {
 	}
 
 
-	if(SITE_location == "mgs" && SYNERGY_enable) {
+	if(SITE_location == "mgs" && SYNERGY_enable && $groupHandler->isStaff($_SESSION['id'])) {
 		$birthdayList = $calendarHandler->getStudentBirthdays($currentDay);
 		if(is_array($birthdayList) && in_array(3, $_SESSION['campus'])) {
 			foreach($birthdayList as $birthday) {

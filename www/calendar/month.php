@@ -6,9 +6,11 @@
 ************************************************************/
 
 require_once "include/permission.php";
+require_once "../library/group.php";
 require_once "../library/calendar.php";
 
 $calendarHandler = new Calendar;
+$groupHandler = new Group;
 
 $this->setFile(TEMPLATE_content, 'calendar/month.html');
 $this->setTab("calendar");
@@ -98,7 +100,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 	}
 
 
-	if(SITE_location == "mgs" && SYNERGY_enable) {
+	if(SITE_location == "mgs" && SYNERGY_enable && $groupHandler->isStaff($_SESSION['id'])) {
 		$birthdayList = $calendarHandler->getStudentBirthdays($currentDay);
 		if(is_array($birthdayList) && in_array(3, $_SESSION['campus'])) {
 			foreach($birthdayList as $birthday) {
