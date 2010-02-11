@@ -286,8 +286,10 @@ function setSynergyInfo(&$mydb)
                                     //check subject exists.. we cant link to subjects that dont exist its ugly
                                     $myquery = "SELECT categoryID FROM categoryCode WHERE code = '".$subject['code']."'";
 									if($result=$mydb->getRow($myquery) ) {
-										$subject['id'] = $result['categoryID'];
-										$subjects[] = $subject;
+										if(  perm($result['categoryID'], HOMEPAGESERVICE) > 0 )  {
+											$subject['id'] = $result['categoryID'];
+											$subjects[] = $subject;
+										}
 									}
                                 }
                             }
@@ -307,9 +309,12 @@ function setSynergyInfo(&$mydb)
 				{
 					//check subject exists.. we cant link to subjects that dont exist its ugly
 					$myquery = "SELECT categoryID FROM categoryCode WHERE code like '".$subject['code']."'";
-					if($result=$mydb->getRow($myquery) ) {
-						$subject['id'] = $result['categoryID'];
-						$_SESSION['subjects'][] = $subject;
+
+					if($result=$mydb->getRow($myquery) )  {
+						if(perm( $result['categoryID'], HOMEPAGESERVICE) > 0 ) {
+							$subject['id'] = $result['categoryID'];
+							$_SESSION['subjects'][] = $subject;
+						}
 					}
 
 				}
