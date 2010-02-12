@@ -24,7 +24,7 @@ class submitWorkPage {
 		$result = $this->db->getRow($query);
 		if(!is_array($result))
 			error(17);
-		
+
 		//check if they are involved in subject (dont allow anyone to submit to box) use involved in 
 		if(!involvedInSubject($result['id']) && !involvedInGroup($result['id']))
 			error(24);
@@ -80,10 +80,9 @@ class submitWorkPage {
 		$result = $this->db->getRow($query);
 		if(!is_array($result))
 			error(2);
-		
-		//check involvement
-		if(!involvedInSubject($result['id']) && !involvedInGroup($result['id']))
-			error(24);
+
+		$late = $this->securityCheck($box_id);
+
 		
 		$this->t_body->set_var("CATEGORY",$result['name']);
 		$this->t_body->set_var("FILE", $result['description']);

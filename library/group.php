@@ -301,11 +301,11 @@ class Group extends Model {
 		//returns true on user being involved in subject (case-insensitive)
 		
 		if(is_array($_SESSION['subjects'])) {
-			$code = strtoupper($code);
+			//$code = strtoupper($code);
 			foreach($_SESSION['subjects'] as $subject) {
 				if(is_numeric($code) && $code == $subject['id'])
 					return true;
-				if($code == strtoupper($subject['code']))
+				if(strtoupper($code) == strtoupper($subject['code']))
 					return true;
 			}
 		}
