@@ -10,6 +10,9 @@ require_once("../include/adminonly.php");
 require_once("../include/permission.php");
 require_once("../../library/calendar.php");
 
+ini_set('auto_detect_line_endings', true);
+
+
 class uploadCal {
 
 function displayPage($response = "")

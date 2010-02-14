@@ -739,38 +739,21 @@ function CreateXMLFromResult ($mysql, $value)
         for ( $i=0; $i < $fieldcount; $i++ ) 
         {
             /* start of a col */
-            echo "<c l=\"$lengths[$i]\">";
-
+            echo "<c l=\"$lengths[$i]\">"; 
             if ( !isset($row[$i]) /*== NULL*/ ) 
             {
                 echo "(NULL)";
             }
             else 
             {
-                if ( yog_mysql_field_type( $value['result'], $i ) == "blob" ) 
-                {
-                    if ( $lengths[$i] == 0 ) 
+                  if ( $lengths[$i] == 0 )
                     {
                         echo "_";
-                        //echo convertxmlchars ( base64_encode ( $row[$i] ) );
                     }
                     else
                     {
                         echo convertxmlchars ( base64_encode ( $row[$i] ) );
                     }
-                }
-                else
-                {
-                    if ( $lengths[$i] == 0 ) 
-                    {
-                        echo "_";
-                        //echo convertxmlchars ( base64_encode ( $row[$i] ) );
-                    }
-                    else
-                    {
-                        echo convertxmlchars($row[$i]); 
-                    }
-                }
             }
 
             /* end of a col */
@@ -1058,18 +1041,24 @@ function startElement ( $parser, $name, $attrs )
     global  $batch;
     global  $query;
     global  $base;
+    global  $libxml2_is_base64;
 
     WriteLog ( "Enter startelement" );
 
     //Done for bug in PHP 5.2.6 and libXML 2.7,2. 
     // Special HTML characters were being dropped. So, now we provide to send always as base 64 encoded data.
-    $base  = (( $attrs['E'] == '1' )?(1):(0)); 
 
+    $base = 0;
+    if(isset($attrs['E']))
+    {
+        $base  = (( $attrs['E'] == '1' )?(1):(0)); 
+    }
+    
     switch ( strtolower ( $name ) ) 
     {
 
     case "host":
-        $xml_state  = XML_HOST;
+        $xml_state  = XML_HOST;        
         break;
     case "db":
         $xml_state  = XML_DB;
@@ -1086,12 +1075,21 @@ function startElement ( $parser, $name, $attrs )
         break;
     case "port":
         $xml_state  = XML_PORT;
+        //This is an assumption that, if port is sent as base64 encoded
+        //the "Always Use Base64 Encoding For Data Stream is checked."
+        if($base == 1)
+        {
+            $libxml2_is_base64 = 1;
+        }
         break;
     case "query":
         $xml_state  = XML_QUERY;
         /* track whether the query(s) has to be processed in batch mode */
         $batch = (( $attrs['B'] == '1' )?(1):(0));
-        break;        
+        break;
+    case "libxml2_test_query":
+        $xml_state  = XML_LIBXML2_TEST_QUERY;
+        break;
     }
     WriteLog ( "Exit startelement" );
 }
@@ -1124,6 +1122,7 @@ function charHandler ( $parser, $data )
     global  $query;
     global  $base;
     global  $charset;
+    global  $libxml2_test_query;
 
     WriteLog ( "Enter charhandler" );
 
@@ -1162,6 +1161,10 @@ function charHandler ( $parser, $data )
     {
         $query      .= $data;        
     }
+    else if ( $xml_state == XML_LIBXML2_TEST_QUERY )
+    {
+        $libxml2_test_query .= $data;        
+    }
 
     WriteLog ( "Exit charhandler" );
 }
@@ -1190,8 +1193,8 @@ function convertxmlchars ( $string,$called_by="" )
 /* Function writes down the correct XML for handling mysql_pconnect() error */
 
 function HandleError ( $errno, $error )
-{  
-
+{
+    
     WriteLog ( "Enter handleerror" );
     
     echo "<result v=\"" . tunnelversion . "\"><e_i><e_n>$errno</e_n><e_d>" . convertxmlchars($error) . "</e_d></e_i></result>";
@@ -1307,6 +1310,7 @@ function AreModulesInstalled ()
     } 
     else 
     {
+        WriteLog ( "Exit aremodulesinstalled" );
         // if correct modules are found - exit IMMEDIATELY        
         return TRUE;
     }
@@ -1315,11 +1319,12 @@ function AreModulesInstalled ()
     {
         echo(tunnelversionstring);
         echo(phpmoduleerror);
+        WriteLog ( "Exit aremodulesinstalled" );
         return FALSE;
     }
 
     // It will come here only when its called from a browser
-    $errmsg   = '<font color="#FF0000"><b>Error:</b> </font>Extension <b>' . $modulenotfound . '</b> was not found compiled and loaded in the PHP interpreter. SQLyog requires '.$thisExtension .'to work properly.';   
+    $errmsg   = '<font color="#FF0000"><b>Error:</b> </font>Extension <b>' . $modulenotfound . '</b> was not found compiled and loaded in the PHP interpreter. SQLyog requires '.$thisExtension .' to work properly.';   
     $errmsg  .= '<p><b>Tunnel version: ' . tunnelversion . '</b>.<p>This PHP page exposes the MySQL API as a set of webservices.<br><br>This page allows SQLyog to manage a MySQL server even if the MySQL port is blocked or remote access to MySQL is not allowed.<br><br>Visit <a href ="http://www.webyog.com">Webyog</a> to get more details about SQLyog.';
 
     echo ( '<html><head><title>SQLyog HTTP Tunneling</title></head><body leftmargin="0" topmargin="0"><div align=center><img src="http://www.webyog.com/images/header.jpg" alt="Webyog"><p>' );
@@ -1327,6 +1332,44 @@ function AreModulesInstalled ()
     echo ( '</body></html>' );
 
     WriteLog ( "Exit aremodulesinstalled" );
+}
+
+
+/**
+ * checks if the XML stream is base 64 encoded
+ *
+ * @return bool If stream is encoded, return true. Else false;
+ *
+ */
+function LibXml2IsBase64Encoded()
+{
+    global $libxml2_is_base64;
+    if ($libxml2_is_base64 == 0){
+        return false;
+    }
+    return true;
+}
+
+/** Detect if the user's PHP/LibXML is affected by the following bug: -
+ *  http://bugs.php.net/bug.php?id=45996 
+*/
+function LibXml2IsBuggy()
+{    
+    global $libxml2_test_query;
+    $libxml2_test_query = '';
+    
+    $testxml = '<xml><libxml2_test_query>select &apos;a&apos;</libxml2_test_query></xml>';
+    
+    GetDetailsFromPostedXML ($testxml);
+    
+    if(strcasecmp($libxml2_test_query, 'select a') == 0)
+    {
+        //This PHP/LibXML is buggy!
+        return true;
+    }
+    
+    //Not buggy!
+    return false;
 }
 
 
@@ -1431,6 +1474,20 @@ function ProcessQuery ()
 
     /* Wrap result in <XML> tag */
     echo "<xml>";
+
+    //If the stream is not base-64 encoded and the PHP has the libxml2 bug display extra error.    
+    if(LibXml2IsBase64Encoded() == false && LibXml2IsBuggy() == true)
+    {
+        $extra_msg =
+            'Your PHP/libxml version is affected by a bug. ' .
+            'Please check "Always Use Base64 Encoding For Data Stream" in "Advanced" section of HTTP tab.'
+        ;
+        HandleError (4, $extra_msg);
+        WriteLog ('libxml2 error');
+        echo "</xml>";
+        return;
+    }    
+
     /* connect to the mysql server */
     WriteLog ( "Trying to connect" );
     $mysql      = yog_mysql_connect ( $host,$port, $username, $pwd );
@@ -1485,13 +1542,14 @@ define ( "XML_PORT", 5 );
 define ( "XML_QUERY", 6 );
 define ( "XML_CHARSET", 7 );
 
+define ( "XML_LIBXML2_TEST_QUERY", 8);
 /* uncomment this line to create a debug log */
 //define ( "DEBUG", 1 );
 
 /* version constant */
 /* You will need to change the version in processquery method too, where it shows: $versionheader = 'TunnelVersion:5.13.1' */
 
-define ( "tunnelversion", '7.15');
+define ( "tunnelversion", '8.05');
 define ( "tunnelversionstring", 'TunnelVersion:' );
 define ( "phpversionerror", 'PHP_VERSION_ERROR' );
 define ( "phpmoduleerror", 'PHP_MODULE_NOT_INSTALLED' );
@@ -1547,6 +1605,8 @@ $charset        = NULL;
 $batch          = 0;
 $base           = 0;
 $query          = NULL;
+$libxml2_test_query  = NULL;
+$libxml2_is_base64 = 0;
 
 
 /* we stop all error reporting as we check for all sort of errors */
@@ -1563,11 +1623,9 @@ set_time_limit ( 0 );
 /* if any of the libraries are not found then we show a warning and exit */
 
 if ( AreModulesInstalled () == TRUE ) 
-{
-    WriteLog ( "Enter AreModulesInstalled" );
+{    
     
     ProcessQuery ();
-
-    WriteLog ( "Exit AreModulesInstalled" );
+    
 }
 ?>
