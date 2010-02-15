@@ -7,7 +7,7 @@
 //timetable object that displays the users timetable
 
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php');
-require_once('../library/weather.php');
+require_once('../library/xml.php');
 require_once('../library/news.php');
 require_once('../library/calendar.php');
 require_once('include/lastRSS.php');
@@ -18,11 +18,35 @@ $page->setFile(TEMPLATE_body, 'summary.html');
 $page->setTitle('Summary');
 $page->setBlock(TEMPLATE_body, "note_block", "note_listing");
 
-$myNews = new news($topic);
-$dNotice = $myNews->getDailyNotice();
-$page->setVar('DAILY_TITLE', scrubText($dNotice[0]['item_heading']));
-$page->setVar('DAILY_BODY',  $dNotice[0]['item_body']);
+if (is_numeric($_GET['campus']))
+	$campus = array($_GET['campus']);
+else
+	$campus = array(1,2,3);
 
+if (is_numeric($_GET['group']))
+	$group = array($_GET['group']);
+else
+	$group = array(1,2,3,4,5,12,13);
+
+$myNews = new news($topic);
+
+if ($_GET['news'] == 'all') {
+	$dNotice = '';
+	$newsList = $myNews->getAllByGroup($group, $campus);
+	if (is_array($newsList)) {
+		foreach ($newsList as $news) {
+			$dNotice .= '<h2>' . scrubText($news['item_heading']). '</h2>';
+			$dNotice .= scrubHTML($news['item_body']) . '<p>&nbsp;</p>';
+		}
+	}
+	$page->setVar('DAILY_TITLE', 'DAILY NOTICES');
+	$page->setVar('DAILY_BODY',  $dNotice);
+	
+} else {
+	$dNotice = $myNews->getDailyNotice(1, $campus);
+	$page->setVar('DAILY_TITLE', scrubText($dNotice[0]['item_heading']));
+	$page->setVar('DAILY_BODY',  $dNotice[0]['item_body']);
+}
 //output calendar	
 $cal = new Calendar;
 
@@ -30,7 +54,9 @@ $currDay = time();
 
 $page->setVar("DATE", date("l jS F"));
 
-$eventList = $cal->getDayByGroup($currDay, unserialize(STUDENTGROUPIDS), array(1,2,3));
+
+
+$eventList = $cal->getDayByGroup($currDay, unserialize(STUDENTGROUPIDS), $campus);
 
 if(!is_array($eventList))
 {
@@ -56,24 +82,21 @@ else
 }
 
 
-$weather = new Weather("All", WEATHER_LOCATION);
+//$weather = new Weather("All", WEATHER_LOCATION);
+$location = empty($_GET['location']) ? WEATHER_location : $_GET['location'];
+$weather = new XML('http://www.google.com/ig/api?weather=' . urlencode("Melbourne, Victoria"), 60*60 );
 
-for($i = 0; $i < 3; $i++)
-{
-	//set days
-	$page->setVar("DAY".($i+1), $weather->forecast[$i]["Day"]);
-
-	//set image
-	$page->setVar("IMAGE".($i+1), $weather->forecast[$i]["Icon"]);
 	
-	//set forecast
-	$page->setVar("PRECIS".($i+1), $weather->forecast[$i]["Precis"]);
+for($i = 1; $i <= 3; $i++) {
+	$forecast_conditions = $weather->weather->forecast_conditions[$i];
+	$output = array("DAY$i"     => $forecast_conditions->day_of_week['data'],
+					"IMAGE$i"   => $forecast_conditions->icon['data'],
+					"PRECIS$i"  => $forecast_conditions->condition['data'],
+					"HIGH$i"    => round(($forecast_conditions->high['data'] - 32) / 1.8),
+					"LOW$i"     => round(($forecast_conditions->low['data'] - 32) / 1.8),
+					);
+	$page->setVar($output);
 
-	//set high
-	$page->setVar("HIGH".($i+1), $weather->forecast[$i]["Max"]);
-
-	//set lows
-	$page->setVar("LOW".($i+1), $weather->forecast[$i]["Min"]);
 }
 
 $page->outputPage(true);
