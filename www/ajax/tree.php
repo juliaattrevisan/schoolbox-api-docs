@@ -26,6 +26,13 @@ if (is_numeric($_POST['relationID'])) {
 				/* mark full access*/
 				if ($permission == FULL_ACCESS)
 					$category['permission'] = "full";
+
+				/* append code to name */
+				$name = scrubTEXT($category['name']);
+				if($category['code'] != '' && $category['code'] != $category['name'])
+					$name .= ' ('.scrubTEXT($category['code']).')';
+				
+				$category['name'] = $name;
 					
 				$output[] = $category;
 			}
