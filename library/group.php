@@ -292,7 +292,7 @@ class Group extends Model {
 	function involvedInGroup($uid, $cid) {
 		//returns true on user being involved in group	
 		$query = "SELECT category.id FROM userAccess, category 
-			WHERE userAccess.service = ".$this->_service." AND userAccess.uid = '$uid' 
+			WHERE userAccess.service = '".$this->_service."' AND userAccess.uid = '$uid'
 			AND userAccess.sid = category.id AND category.id = '$cid'";
 		return $this->db->getOne($query);
 	}
@@ -327,7 +327,7 @@ class Group extends Model {
 
 		//get list of groups involved in
 		$query = "SELECT category.name, category.id FROM userAccess, category 
-		WHERE userAccess.uid = $id AND userAccess.sid = category.id AND userAccess.service = ".$this->_service."
+		WHERE userAccess.uid = '$id' AND userAccess.sid = category.id AND userAccess.service = '".$this->_service."'
 		AND userAccess.type >= '$accessType'";
 
 		$this->db->query($query);
