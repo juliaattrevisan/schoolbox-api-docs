@@ -29,11 +29,11 @@
       	<thead>
       	<tr>
         		<td class="dark">Sunday</td>
-            <td>Monday</td>
+            <td class="dark">Monday</td>
             <td class="dark">Tuesday</td>
-            <td>Wednesday</td>
+            <td class="dark">Wednesday</td>
             <td class="dark">Thursday</td>
-            <td>Friday</td>
+            <td class="dark">Friday</td>
             <td class="dark">Saturday</td>
         </tr>
         </thead>
@@ -41,14 +41,18 @@
         <!-- BEGIN month_week -->
         <tr class="month-week">
         	<!-- BEGIN day_block -->
-        	<td class="day-block{OTHER_MONTH} {ON_OFF}">
-            <p class="header_option">{ADD}</p>
-            <p class="day-num">{DATE}</p>
-            <div class='float-fix'></div> 
-            <!-- BEGIN note_block -->
-            <p style="color:{COLOUR};">{TIME}
-            {MODIFY_START}{NOTE}{MODIFY_END}</p>
-            <!-- END note_block -->
+        	<td class="day-block{OTHER_MONTH}">
+            <div class="dayWrap">
+              <p class="header_option">{ADD}</p>
+              <p class="day-num">{DATE}</p>
+            <div class='float-fix'></div>
+            </div> 
+            <div class="noteWrap">
+              <!-- BEGIN note_block -->
+              <p style="background-color:{COLOUR};">{TIME}
+              {MODIFY_START}{NOTE}{MODIFY_END}</p>
+              <!-- END note_block -->
+            </div>
           </td>
         	<!-- END day_block -->
         </tr>

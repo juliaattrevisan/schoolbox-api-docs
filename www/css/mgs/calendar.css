@@ -84,7 +84,6 @@
 }
 .day-block {
 	width: 14%; 
-	padding: 5px; 
 	border-bottom: 1px dotted #cccccc;
 	border-right: 1px dotted #cccccc;
 	vertical-align: top;

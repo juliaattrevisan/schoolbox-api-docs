@@ -70,12 +70,24 @@
 }
 .day-block {
 	width: 14%; 
-	padding: 5px; 
+	padding: 0; 
 	border-bottom: 1px dotted #cccccc;
 	border-right: 1px dotted #cccccc;
 	vertical-align: top;
 	font: 11px Verdana, Arial, Helvetica, sans-serif;
-
+}
+.dayWrap {
+	background: #CAE4FF;
+	padding: 3px 5px;
+}
+.noteWrap {
+	padding: 5px;
+}
+.noteWrap p {
+	background: #ccc;
+	-moz-border-radius: 5px;
+	padding: 2px;
+	color: #fff;
 }
 .day-block .header_option {
 	float: right;
@@ -87,7 +99,7 @@
 	left: 0;
 	padding: 0;
 	margin: 0 !important;
-	font: bold 12px Verdana, Arial, Helvetica, sans-serif;
+	font: 12px Verdana, Arial, Helvetica, sans-serif;
 }
 
 .otherMonth {
