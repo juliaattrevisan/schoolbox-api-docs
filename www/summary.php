@@ -35,7 +35,7 @@ if ($_GET['news'] == 'all') {
 	$newsList = $myNews->getAllByGroup($group, $campus);
 	if (is_array($newsList)) {
 		foreach ($newsList as $news) {
-			$dNotice .= '<h2>' . scrubText($news['item_heading']). '</h2>';
+			$dNotice .= '<p class="heading">' . scrubText($news['item_heading']). '</p>';
 			$dNotice .= scrubHTML($news['item_body']) . '<p>&nbsp;</p>';
 		}
 	}
