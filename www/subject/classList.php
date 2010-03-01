@@ -25,8 +25,12 @@ if(isStaff($_SESSION['gid']))
 
 	$code = urldecode(implode('/', $this->arg));
 
-	
-	$category = $categoryHandler->getByCode($code);
+	if(stristr($code,',')) {
+		$codeArray = explode(',',$code);
+		$category = $categoryHandler->getByCode($codeArray[0]);
+	}
+	else
+		$category = $categoryHandler->getByCode($code);
 	
 	if(is_array($category)) {
 		$this->setVar("SUBJECTNAME", $category['name'] ." ($code)");	

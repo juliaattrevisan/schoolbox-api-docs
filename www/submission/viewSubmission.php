@@ -56,7 +56,7 @@ class ViewSubmissionPage {
 		
 		if(is_array($studentList)) {
 			foreach($studentList as $student) {
-				
+
 				if($student['uid'])
 					$where = "owner = {$student['uid']}";
 				else if($student['synergy_id'])
@@ -69,10 +69,11 @@ class ViewSubmissionPage {
 					FROM student_submission, user 
 					WHERE $where AND owner = user.id AND box_id = '$box_id'"; 
 				
-				
-				
-				if($line = $this->db->getRow($query)) {
-				
+
+				$line = $this->db->getRow($query);
+
+				if(is_array($line)) {
+					
 					$output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
 										'OWNER_ID' 	=> $line['uid'],
 										'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
@@ -90,9 +91,13 @@ class ViewSubmissionPage {
 									
 				}
 				else {
-				
+					
+					if(!$student['uid'])
+					$query = "SELECT id FROM user WHERE synergy_id = ".$student['synergy_id'];
+					$line = $this->db->getRow($query);
+
 					$output = array(	'OWNER' 	=> formatName($student,'{lastname}, {firstname}'),
-										'OWNER_ID' 	=> $student['uid'],
+										'OWNER_ID' 	=> $line['id'],
 										'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
 										'mark_block' => '<td colspan="6">&nbsp;</td>',
 										'DATE'		=> '',
@@ -100,6 +105,7 @@ class ViewSubmissionPage {
 										'RETURN'	=> '',
 										'ON_OFF'		=> ++$i%2?'':'dark',
 									);
+	
 					$this->t_body->set_var($output);
 					
 				}
@@ -127,8 +133,9 @@ class ViewSubmissionPage {
 									'RETURN'	=> $line['marked']?'':"<a href=\"returnWork.php?box_id=$box_id&sid=".$line['uid']."\">Return</a>",
 									'ON_OFF'		=> ++$i%2?'':'dark',
 									);
-				$this->t_body->parse('mark_block', 'mark', false);
+				
 				$this->t_body->set_var($output);
+				$this->t_body->parse('mark_block', 'mark', false);
 				$this->t_body->parse("submission_listing","submitted_block",true);
 			}
 		}

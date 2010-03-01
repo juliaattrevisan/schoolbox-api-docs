@@ -16,8 +16,20 @@ function getStudents($subCode, $db = 0)
 			error(65);
 		mssql_select_db(MSSQL_db, $db);
 
+		if(stristr($subCode, ',')) {
+				$classQuery = 'StudentClasses.ClassCode IN(';
+				$subCodeArray = explode(',',$subCode);
+				foreach($subCodeArray as $code) {
+					$classQuery .= "'$code',";
+				}
+				$classQuery = substr($classQuery,0,-1) . ')';
+		}
+		else
+			$classQuery = "StudentClasses.ClassCode = '$subCode'";
+
+
         $query = "
-		SELECT  CommunityStudents.Surname as lastname,
+		SELECT DISTINCT CommunityStudents.Surname as lastname,
 			CommunityStudents.Preferred as firstname,
 			StudentSemester.YearLevel as yearlevel,
 			luHouse.Description as house,
@@ -44,7 +56,7 @@ function getStudents($subCode, $db = 0)
 			StudentSemester.Status = lS.Code)
 		WHERE   CommunityStudents.DeceasedFlag = 0
 			AND lS.SynergyMeaning <> 'LEFT'
-			AND StudentClasses.ClassCode = '" . $subCode . "'
+			AND $classQuery
 			AND (SubjectClasses.FileYear='" . $_SESSION['FileYear'] . "')
 			AND (SubjectClasses.FileSemester='" . $_SESSION['FileSemester'] .  "')
 		ORDER BY CommunityStudents.Surname, CommunityStudents.Preferred ";

@@ -15,8 +15,20 @@ class SynergeticClass extends MSSQL{
 	}
 	
 	function getStudents($subCode) {
+
+		if(stristr($subCode, ',')) {
+				$classQuery = 'StudentClasses.ClassCode IN(';
+				$subCodeArray = explode(',',$subCode);
+				foreach($subCodeArray as $code) {
+					$classQuery .= "'$code',";
+				}
+				$classQuery = substr($classQuery,0,-1) . ')';
+		}
+		else
+			$classQuery = "StudentClasses.ClassCode = '$subCode'";
+
         $query = "
-		SELECT  CommunityStudents.Surname as lastname,
+		SELECT  DISTINCT CommunityStudents.Surname as lastname,
 			CommunityStudents.Preferred as firstname,
 			StudentSemester.YearLevel as yearlevel,
 			luHouse.Description as house,
@@ -43,7 +55,7 @@ class SynergeticClass extends MSSQL{
 			StudentSemester.Status = lS.Code)
 		WHERE   CommunityStudents.DeceasedFlag = 0
 			AND lS.SynergyMeaning <> 'LEFT'
-			AND StudentClasses.ClassCode = '" . $subCode . "'
+			AND $classQuery
 			AND (SubjectClasses.FileYear='" . $_SESSION['FileYear'] . "')
 			AND (SubjectClasses.FileSemester='" . $_SESSION['FileSemester'] .  "')
 			AND ( SubjectClasses.FileType != 'A' OR StudentClasses.StartDate <= getdate())
