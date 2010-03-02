@@ -1,23 +1,34 @@
+			<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+      <link rel="stylesheet" type="text/css" href="/css/core/ui/ui.css" />
+			<script type="text/javascript">
+      $j(function () {
+        /* date picker */		 
+        $j('.datepicker').datepicker({ 
+          dateFormat: 'dd-mm-yy',
+          onSelect: function(dateText, inst) {window.open('/calendar/month/'+dateText, "_self")},
+          defaultDate: $j.datepicker.parseDate("dd-mm-yy", "02-03-2010"),
+					showOn: 'button',
+					buttonImage: '/css/core/ui/images/calendar-icon.gif',
+					buttonImageOnly: true,
+					showAnim: 'slideDown'
+        });
+      });
+      </script>
       <link rel="stylesheet" type="text/css" href="/css/core/calendar.css" />
       <link rel="stylesheet" type="text/css" href="/css/{SITE_LOCATION}/calendar.css" />
-      <h1><span>{MONTH} - {YEAR}</span> <a class="customise" href="/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}">Week View</a></h1>
+      <h1><span>Calendar</span> <a class="customise" href="/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}">Goto Week View</a></h1>
        <div class="float-fix"></div>
       <center>
           <table id="month-nav">
             <tr>
               <td><a class="back" href="/calendar/month/{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td>
-              <td colspan="3">
-                <select name="Month" onchange="window.open('/calendar/month/{SELECTED_DAY}-'+this.value+'-{SELECTED_YEAR}', '_self', '');">
+              <td>
+         					<h3>{MONTH} {YEAR}</h3>
+                  <input type="hidden" class="datepicker" />
                   <!-- BEGIN month_drop -->
-                  <option value="{DROP_MONTH_NUMBER}" {DROP_MONTH_NUMBER_SELECTED}>{DROP_MONTH_NAME}</option>
-                  <!-- END month_drop -->
-                </select>
-              </td>
-              <td colspan="2"><select name="Year" onchange="window.open('/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-'+this.value, '_self', '');">
+                  <!-- END month_drop -->              
                   <!-- BEGIN year_drop -->
-                  <option value="{DROP_YEAR_NUMBER}" {DROP_YEAR_NUMBER_SELECTED}>{DROP_YEAR_NUMBER}</option>
                   <!-- END year_drop -->
-                </select>
               </td>
               <td><a class="forward" href="/calendar/month/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
             </tr>
@@ -49,8 +60,7 @@
             </div> 
             <div class="noteWrap">
               <!-- BEGIN note_block -->
-              <p style="background-color:{COLOUR};">{TIME}
-              {MODIFY_START}{NOTE}{MODIFY_END}</p>
+              <p style="background-color:{COLOUR};">{MODIFY_START}{TIME} {NOTE}{MODIFY_END}</p>
               <!-- END note_block -->
             </div>
           </td>

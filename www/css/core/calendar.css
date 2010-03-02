@@ -50,23 +50,28 @@
 #month-view p {
 	margin-bottom: 0.5em;
 }
-#month-view tbody {
-
-}
 #month-view thead {
 	font: bold 16px Verdana, Arial, Helvetica, sans-serif;
 	background-color: #FFFFFF;
-	
 }
 #month-view thead td {
 	padding: 5px;
 	border-bottom: 1px dotted #cccccc;
 	border-right: 1px dotted #cccccc;
-	
 }
 .month-week {
 	height: 100px; 
 	vertical-align: top;	
+}
+#month-nav img {
+	margin-top: 5px;
+}
+#month-nav h3 {
+	font-size: 20px;
+}
+.otherMonth .dayWrap,
+.otherMonth .noteWrap{
+	display: none;
 }
 .day-block {
 	width: 14%; 
@@ -86,7 +91,10 @@
 .noteWrap p {
 	background: #ccc;
 	-moz-border-radius: 5px;
-	padding: 2px;
+	padding: 2px 4px;
+	color: #fff;
+}
+.noteWrap a {
 	color: #fff;
 }
 .day-block .header_option {

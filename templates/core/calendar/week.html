@@ -1,48 +1,32 @@
+      			<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+            <link rel="stylesheet" type="text/css" href="/css/core/ui/ui.css" />
+            <script type="text/javascript">
+            $j(function () {
+              /* date picker */		 
+              $j('#datePick').datepicker({ 
+                dateFormat: 'dd-mm-yy',
+                onSelect: function(dateText, inst) {window.open('/calendar/week/'+dateText, "_self")},
+                defaultDate: $j.datepicker.parseDate("dd-mm-yy", "02-03-2010"),
+                buttonImageOnly: true,
+								changeMonth: true,
+								changeYear: true,
+								showOtherMonths: true
+              });
+            });
+            </script>
       <link rel="stylesheet" type="text/css" href="/css/core/calendar.css" />
       <link rel="stylesheet" type="text/css" href="/css/{SITE_LOCATION}/calendar.css" />
       <div id="calendar">
-      <h1><span>{MONTH} - {YEAR}</span> <a class="customise" href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}">Month View</a></h1>
+      <h1><span>{MONTH} - {YEAR}</span> <a class="customise" href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}">Goto Month View</a></h1>
       <div class="float-fix"></div>
       <center>
-          <table class="calendarTable">
-            <tr>
-              <td><a class="back" href="/calendar/week/{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a></td>
-              <td colspan="3">
-                <select name="Month" onchange="window.open('/calendar/week/{SELECTED_DAY}-'+this.value+'-{SELECTED_YEAR}', '_self', '');">
-                  <!-- BEGIN month_drop -->
-                  <option value="{DROP_MONTH_NUMBER}" {DROP_MONTH_NUMBER_SELECTED}>{DROP_MONTH_NAME}</option>
-                  <!-- END month_drop -->
-                </select>
-              </td>
-              <td colspan="2"><select class="small" name="Year" onchange="window.open('/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-'+this.value, '_self', '');">
-                  <!-- BEGIN year_drop -->
-                  <option value="{DROP_YEAR_NUMBER}" {DROP_YEAR_NUMBER_SELECTED}>{DROP_YEAR_NUMBER}</option>
-                  <!-- END year_drop -->
-                </select>
-              </td>
-              <td><a class="forward" href="/calendar/week/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
-            </tr>
-            <tr>
-              <th>Sun</th>
-              <th>Mon</th>
-              <th>Tue</th>
-              <th>Wed</th>
-              <th>Thu</th>
-              <th>Fri</th>
-              <th>Sat</th>
-            </tr>
+            <!-- BEGIN month_drop -->
+            <!-- END month_drop -->
+            <!-- BEGIN year_drop -->
+            <!-- END year_drop -->
             <!-- BEGIN week_block -->
-            <tr>
-              <td class="{MONTABLE_CSS0}" onclick="location.href='{DAYURL0}';">{DAY0}</td>
-              <td class="{MONTABLE_CSS1}" onclick="location.href='{DAYURL1}';">{DAY1}</td>
-              <td class="{MONTABLE_CSS2}" onclick="location.href='{DAYURL2}';">{DAY2}</td>
-              <td class="{MONTABLE_CSS3}" onclick="location.href='{DAYURL3}';">{DAY3}</td>
-              <td class="{MONTABLE_CSS4}" onclick="location.href='{DAYURL4}';">{DAY4}</td>
-              <td class="{MONTABLE_CSS5}" onclick="location.href='{DAYURL5}';">{DAY5}</td>
-              <td class="{MONTABLE_CSS6}" onclick="location.href='{DAYURL6}';">{DAY6}</td>
-            </tr>
             <!-- END week_block -->
-          </table>
+            <div id="datePick"></div>
       </center>
       <table class="ruler">
         <!-- BEGIN day_block -->
