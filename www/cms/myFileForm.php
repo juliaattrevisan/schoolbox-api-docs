@@ -1,13 +1,22 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
-$page = new SitePage;
-$fileHandler = new MyFile;
+if (WEBDAV_on) {
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
+	$fileHandler = new PortfolioWebDAV(WEBDAV_url, WEBDAV_user, WEBDAV_pass);
+} else {
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
+	$fileHandler = new MyFile;
+}
 
-if (isset($_POST['description'])) {
+
+$page = new SitePage;
+
+
+
+if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 
 	$file = array('parent'		=> $_POST['parent'],
 				  'description'	=> $_POST['description'],

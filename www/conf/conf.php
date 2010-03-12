@@ -61,6 +61,12 @@ define('FILE_use_frame', 		false);
 define('MIME_magic', 			'/usr/share/file/magic');
 define('NEWS_teacher_edit_other', true);
 
+define('WEBDAV_on', 			true);
+define('WEBDAV_url', 			'http://webdav.alaress.com.au');
+define('WEBDAV_user', 			'test');
+define('WEBDAV_pass', 			'test');
+
+
 //GROUP options
 define("GROUP_staff_only_owner", true);			//Determines if students can be group owner or not
 
@@ -122,7 +128,7 @@ define('ROUNDCUBE_db','mysql://'.SQL_user.':'.SQL_passwd.'@'.SQL_host.'/'.SQL_db
 
 //PEAR required for mail
 $path = SITE_root.'/include/PEAR';
-set_include_path('.' . PATH_SEPARATOR . $path);
+set_include_path('.' . PATH_SEPARATOR . get_include_path() . PATH_SEPARATOR . $path);
 
 // mailer
 define('MAIL_templates', TEMPLATE_dir);

@@ -1,49 +1,62 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
+if (WEBDAV_on) {
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
+} else {
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
+}
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
+
+
 $this->setFile(TEMPLATE_content, 'cms/portfolio.html');
-$this->setBlock(TEMPLATE_content, 'folder_list', 'folder_list_block');
+$this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
 $this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
-
-$this->setJavascript('/javascript/jquery.ui.js');
-$this->setJavascript('/javascript/jquery.contextmenu.js');
-$this->setJavascript('/javascript/jquery.simplemodal.js');
-$this->setJavascript('/javascript/jquery.resources.js');
-
-$this->setCss('/css/jquery.contextmenu.css');
-$this->setCss('/css/jquery.resources.css');
 
 $this->setTitle('My Files');
 $this->setTab('myfiles');
 
-$folderHandler = new MyFolder;
-$fileHandler = new MyFile;
 
 $groupHandler = new Group;
 $allowedFiles = new AllowedFile;
 
-if (is_numeric($this->arg[0])) {
+
+if (isset($this->arg[0])) {
 	$_SESSION['portfolioID'] = $this->arg[0];
 	localRedir('/cms/portfolio/');
 } else
-	$openFolder = (int)$_SESSION['portfolioID'];
-
-
-
-// get parentIDs from openFolder to 0
-$parentList[] = $parentID = $openFolder;
-while ($parentID > 0)
-	$parentList[] = $parentID = $folderHandler->getParent($parentID);
+	$openFolder = $_SESSION['portfolioID'];
 	
+	
+
+if (WEBDAV_on) {
+	$folderHandler = new PortfolioWebDAV(WEBDAV_url, WEBDAV_user, WEBDAV_pass);
+	$fileHandler = $folderHandler;
+	
+	$parentID = $openFolder = 0;
+	
+	$parentList = array();
+	
+} else {
+	$folderHandler = new MyFolder;
+	$fileHandler = new MyFile;
+
+	$openFolder = (int)$openFolder;
+
+	// get parentIDs from openFolder to 0
+	$parentList[] = $parentID = $openFolder;
+	while ($parentID > 0)
+		$parentList[] = $parentID = $folderHandler->getParent($parentID);
+}
+
 
 // output folders, column 1
 $folderList = $folderHandler->getFolderNode($openFolder);
+
 if (is_array($folderList)) {
 
 	foreach ($folderList as $folder) {
@@ -57,7 +70,7 @@ if (is_array($folderList)) {
 		$class[] = "child-of-node-{$folder['parent']}";
 		
 		// has children
-		$folder['children'] > 0 ? $class[] = "parent" : null;
+		$folder['children'] > 0 ? $class[] = "collapsed" : null;
 		
 		// is currently expanded
 		in_array($folder['id'], $parentList) ? $class[] = "expanded populated" : null;
@@ -68,15 +81,15 @@ if (is_array($folderList)) {
 		// write access
 		$class[] = "write";
 		
-		$output = array('FOLDER_ID'		=> $folder['id'],
-						'FOLDER_NAME'	=> scrubText($folder['name']),
+		$output = array('CATEGORY_ID'		=> $folder['id'],
+						'CATEGORY_NAME'	=> scrubText($folder['name']),
 						'CLASS'			=> implode(" ", $class),
 						);	
 		$this->setVar($output);
-		$this->parse('folder_list_block', 'folder_list', true);
+		$this->parse('category_list_block', 'category_list', true);
 	}
 } else
-	$this->setVar('folder_list_block', '');
+	$this->setVar('category_list_block', '');
 
 // output files, column 2
 $fileList = $fileHandler->getAllInFolder($openFolder);
@@ -87,7 +100,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 		$class = array();
 		
 		// icon
-		$class[] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
+		$class[] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "txt";
 	
 		$output = array('FILE_ID' 	 	=> $file['id'],
 						'TYPE'			=> 'file',

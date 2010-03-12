@@ -1,10 +1,18 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
-
 $page = new SitePage;
-$folderHandler = new MyFolder;
+
+
+if (WEBDAV_on) {
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
+	$folderHandler = new PortfolioWebDAV(WEBDAV_url, WEBDAV_user, WEBDAV_pass);
+	
+} else {
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
+	$folderHandler = new MyFolder;
+}
+
 
 if (isset($_POST['name'])) {
 
@@ -47,6 +55,9 @@ elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
 		echo "Insufficient permssions";
 	
 	$folderHandler->update(array('id'=>$_POST['move'], 'parent'=>$_POST['categoryID']));
+}
+elseif (is_numeric($_POST['portfolioID'])) {
+	$_SESSION['portfolioID'] = $_POST['portfolioID'];
 }
 
 ?>

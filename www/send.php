@@ -19,17 +19,27 @@ if(is_numeric($_GET['id']))
 	
 	
 	if(isset($_GET['myFile'])) {
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
 		
-		$myFileHandler = new MyFile;
-		$file = $myFileHandler->getByID($_GET['id']);
-		if(!is_array($file))
-			error(41);
+		if (WEBDAV_on) {
+			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
+			$fileHandler = new PortfolioWebDAV(WEBDAV_url, WEBDAV_user, WEBDAV_pass);
+			$filename = $fileHandler->getFile($_GET['id']);
+			$file['realname'] = substr($_SESSION['WebDAVIDCache'][$_GET['id']], strrpos($_SESSION['WebDAVIDCache'][$_GET['id']], '/') + 1);
+		} else {
+			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
 			
-		if($file['owner'] != $_SESSION['id'])
-			error(5);
+			$myFileHandler = new MyFile;
+			$file = $myFileHandler->getByID($_GET['id']);
+			if(!is_array($file))
+				error(41);
+				
+			if($file['owner'] != $_SESSION['id'])
+				error(5);
+			
+			$filename = MYFILE_directory ."/". $file['id'] . ".dat";
+		}
 		
-		$filename = MYFILE_directory ."/". $file['id'] . ".dat";
+		
 	}
 	else {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';

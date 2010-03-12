@@ -20,6 +20,7 @@ function verify()
 
 <h1>{ACTION} File </h1>
 <form method="post" action="/cms/myFileForm.php" enctype="multipart/form-data" id="fileForm" class="standardForm" onSubmit="return(verify());">
+<input type="hidden" name="parent" value="{PARENT_ID}" />
   <table>
     <!-- BEGIN browse_row -->
     <tr>
@@ -29,12 +30,16 @@ function verify()
       </td>
     </tr>
     <!-- END browse_row -->
+    <!-- BEGIN desc -->
     <tr>
       <td class="formLabelWidth"><h2>Description</h2>
         <em>One line description of the file for use as the title</em> </td>
       <td ><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" />
       </td>
     </tr>
+    <!-- END desc -->
+    
+    <!-- BEGIN location -->
     <tr>
       <td><h2>Location</h2>
         <em>Select an appropriate location within the system that reflects the use of the file</em></td>
@@ -44,6 +49,8 @@ function verify()
           <!-- END folder_list -->
         </select></td>
     </tr>
+    <!-- END location -->
+    
     <tr>
       <td>&nbsp;</td>
       <td>

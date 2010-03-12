@@ -153,7 +153,7 @@
 	};
 	
 	$.fn.addExpander = function () {
-		console.log($(this));
+		//console.log($(this));
 		$(this).prepend('<span style="margin-left: -' + 19 + 'px; padding-left: ' + 19 + 'px" class="expander"></span>');
 		$($(this)[0].firstChild).click(function() { $($(this).parents("tr")[0]).toggleBranch(); });		
 	};
@@ -203,7 +203,7 @@
 					.insertAfter("#node-"+parentID);
 					
 					if (item.children > 0)
-						myRow.addClass("parent");
+						myRow.addClass("parent collapsed");
 
 					if (item.write == 'true')
 						myRow.addClass('write');
@@ -420,7 +420,7 @@
 		
 		$(window).bind('folderLoad', function () {
 			
-			console.log('load');
+			//console.log('load');
 			
 			$('span.full, span.write').draggable({
 				cursor: 'move',
@@ -508,7 +508,7 @@
 
 		/* allow folders to be opened */
 		$('table.treeTable tbody tr:has(span.folder)').live('click', function() {
-			console.log($(this));
+			//console.log($(this));
 			$(this).loadFiles();
 		});
 		$('table.treeTable tbody tr:has(span.folder) span').live('click', function() {

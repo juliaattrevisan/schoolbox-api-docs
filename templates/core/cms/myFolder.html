@@ -21,12 +21,14 @@ function verify(){
 
 <h1>{ACTION} Folder</h1>
 <form action="/cms/myFolderForm.php" method="post" class="standardForm" id="folderForm" onSubmit="return(verify());">
+<input type="hidden" name="parent" id="parent" value="{PARENT_ID}" />
   <table>
     <tr>
       <td class="formLabelWidth"><h2>Folder Name</h2></td>
       <td><input type="text" name="name" maxlength="250" size="40" value="{NAME}" />
       </td>
     </tr>
+    <!-- BEGIN location -->
     <tr>
       <td><h2>Folder Parent</h2>
         <em>Location at which this folder should be placed</em></td>
@@ -36,6 +38,7 @@ function verify(){
           <!-- END parent_list -->
         </select></td>
     </tr>
+    <!-- END location --> 
     <tr>
       <td>&nbsp;</td>
       <td> <input type="hidden" name="folderID" value="{FOLDER_ID}" /> 

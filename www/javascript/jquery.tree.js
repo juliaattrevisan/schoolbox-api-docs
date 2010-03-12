@@ -15,6 +15,8 @@
 		/* options */
 		var defaults = {
 			url			 : '/ajax/tree.php',
+			fileAjax	 : '/cms/fileForm.php',
+			categoryAjax : '/cms/categoryForm.php',
 			relationID	 : 'relationID',
 			idPrefix	 : 'node-',
 			childPrefix	 : 'child-of-',
@@ -206,7 +208,7 @@
 					stripeRows($(node).closest('table'));
 				
 				/* ajax move */
-				$.post('/cms/categoryForm.php', {move: node.attr('id').substring(5), categoryID : destination.attr('id').substring(5)}, function (data) {
+				$.post(options.categoryAjax, {move: node.attr('id').substring(5), categoryID : destination.attr('id').substring(5)}, function (data) {
 					if (data.error) {
 						alert('An error occurred during processing. Please reload your browser and try again.\nError: ' + data.error);
 					} else {
@@ -496,7 +498,7 @@
 						if (options.stripeRows) 
 							stripeRows(node.closest('table'));
 						
-						var url = '/cms/fileForm.php';
+						var url = options.fileAjax;
 						if (link)
 							url = '/cms/linkForm.php';
 							

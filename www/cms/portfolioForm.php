@@ -4,12 +4,17 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 
 $page = new SitePage;
 
-if (is_numeric($_POST['folders'])) {
+if (is_numeric($_POST['relationID'])) {
 
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
-	$folderHandler = new MyFolder;
-
-	$folderList = $folderHandler->getFolderList($_POST['folders']);
+	if (WEBDAV_on) {
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
+		$folderHandler = new PortfolioWebDAV(WEBDAV_url, WEBDAV_user, WEBDAV_pass);
+	} else {
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
+		$folderHandler = new MyFolder;
+	}
+	
+	$folderList = $folderHandler->getFolderList($_POST['relationID']);
 	$output = array();
 	if (is_array($folderList)) {
 		foreach ($folderList as $folder) {
@@ -17,25 +22,34 @@ if (is_numeric($_POST['folders'])) {
 			$output[] = array('id'			=> $folder['id'],
 							  'name'		=> scrubText($folder['name']),
 							  'parent'		=> $folder['parent'],
-							  'children'	=> $children,
+							  'isParent'	=> $children ? 1 : 0,
 							  );
 		}
 	}
 	header("Content-type: application/json");
 	print json_encode($output);
 }
-elseif (is_numeric($_POST['files'])) {
+elseif (is_numeric($_POST['categoryID'])) {
 
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 	
-	$fileHandler = new MyFile;
-	$allowedFiles = new AllowedFile;
+
+	if (WEBDAV_on) {
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
+		$fileHandler = new PortfolioWebDAV(WEBDAV_url, WEBDAV_user, WEBDAV_pass);
+	} else {
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
+		$fileHandler = new MyFile;
+		$allowedFiles = new AllowedFile;
+	}
+	
+	
+	
 	
 	// save current view
 	$_SESSION['portfolioID'] = $_POST['files'];
 	
-	$fileList = $fileHandler->getAllInFolder($_POST['files']);
+	$fileList = $fileHandler->getAllInFolder($_POST['categoryID']);
 	
 	$output = array();
 	if (is_array($fileList)) {
@@ -45,7 +59,7 @@ elseif (is_numeric($_POST['files'])) {
 							  'category'	=> $file['category'],
 							  'modified'	=> outputDate(DATE_short_format, $file['submitted']),
 							  'size'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
-							  'icon'		=> !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile",
+							  'icon'		=> !empty($file['iconFile']) && WEBDAV_on ? $allowedFiles->getClass($file["iconFile"]) : "txt",
 							  );
 		}
 	}
