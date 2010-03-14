@@ -1,5 +1,7 @@
 <?php
 
+
+set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . '/../include/PEAR');
 require_once 'HTTP/WebDAV/Client.php';
 
 
@@ -14,6 +16,7 @@ class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
 	 */
     function dir_opendir($path, $options)
     {
+		
         // rewrite the request URL
         if (!$this->_parse_url($path)) return false;
 
@@ -43,6 +46,7 @@ class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
 ');
         $req->sendRequest();
 
+
         switch ($req->getResponseCode()) {
         case 207: // multistatus content
             $this->dirfiles = array();
@@ -69,6 +73,52 @@ class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
             error_log("file not found");
             return false;
         }
+    }
+
+    /**
+     * Helper function for WebDAV OPTIONS detection
+     *
+     * @access private
+     * @return bool    true on success else false
+     */
+    function _check_options() 
+    {
+        // now check OPTIONS reply for WebDAV response headers
+        $req = &new HTTP_Request($this->url);
+        $req->setMethod(HTTP_REQUEST_METHOD_OPTIONS);
+        if (is_string($this->user)) {
+            $req->setBasicAuth($this->user, @$this->pass);          
+        }
+        $req->sendRequest();
+		if ($req->getResponseCode() != 200) {
+            print $req->getResponseBody();
+			die();
+			
+			return false;
+        }
+
+        // get the supported DAV levels and extensions
+        $dav = $req->getResponseHeader("DAV");
+        $this->dav_level = array();
+        foreach (explode(",", $dav) as $level) {
+            $this->dav_level[trim($level)] = true;
+        }
+        if (!isset($this->dav_level["1"])) {
+            // we need at least DAV Level 1 conformance
+            return false;
+        }
+        
+        // get the supported HTTP methods
+        // TODO these are not checked for WebDAV compliance yet
+        $allow = $req->getResponseHeader("Allow");
+        $this->dav_allow = array();
+        foreach (explode(",", $allow) as $method) {
+            $this->dav_allow[trim($method)] = true;
+        }
+
+        // TODO check for required WebDAV methods
+
+        return true;
     }
 	
 }
@@ -103,6 +153,14 @@ class PortfolioWebDAV {
 		if (!isset($_SESSION['WebDAVIDCache']))
 			$_SESSION['WebDAVIDCache'] = array(0 => $this->root);
 		
+	}
+	
+	public function factory() {
+		require_once SITE_root . '/library/group.php';
+		$groupHandler = new Group;
+		
+		$directory = $groupHandler->isStaff() ? 'StaffHome/' : 'StudentHome/';
+		return new self(WEBDAV_url . '/' . $directory , "wgs\\" . $_SESSION['username'], $_SESSION['password']);
 	}
 	
 	private function fixPath ($path) {

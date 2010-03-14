@@ -22,7 +22,7 @@ if(is_numeric($_GET['id']))
 		
 		if (WEBDAV_on) {
 			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
-			$fileHandler = new PortfolioWebDAV(WEBDAV_url, WEBDAV_user, WEBDAV_pass);
+			$fileHandler = PortfolioWebDAV::factory();
 			$filename = $fileHandler->getFile($_GET['id']);
 			$file['realname'] = substr($_SESSION['WebDAVIDCache'][$_GET['id']], strrpos($_SESSION['WebDAVIDCache'][$_GET['id']], '/') + 1);
 		} else {

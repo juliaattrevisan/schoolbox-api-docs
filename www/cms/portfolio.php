@@ -1,5 +1,7 @@
 <?php
 
+ini_set('display_errors', 1);
+
 if (WEBDAV_on) {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 } else {
@@ -34,7 +36,7 @@ if (isset($this->arg[0])) {
 	
 
 if (WEBDAV_on) {
-	$folderHandler = new PortfolioWebDAV(WEBDAV_url, WEBDAV_user, WEBDAV_pass);
+	$folderHandler = PortfolioWebDAV::factory();
 	$fileHandler = $folderHandler;
 	
 	$parentID = $openFolder = 0;

@@ -6,7 +6,7 @@ $page = new SitePage;
 
 if (WEBDAV_on) {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
-	$folderHandler = new PortfolioWebDAV(WEBDAV_url, WEBDAV_user, WEBDAV_pass);
+	$folderHandler = PortfolioWebDAV::factory();
 	
 } else {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';

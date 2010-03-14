@@ -5,7 +5,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
 if (WEBDAV_on) {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
-	$fileHandler = new PortfolioWebDAV(WEBDAV_url, WEBDAV_user, WEBDAV_pass);
+	$fileHandler = PortfolioWebDAV::factory();
 } else {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
 	$fileHandler = new MyFile;

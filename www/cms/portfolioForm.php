@@ -8,7 +8,7 @@ if (is_numeric($_POST['relationID'])) {
 
 	if (WEBDAV_on) {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
-		$folderHandler = new PortfolioWebDAV(WEBDAV_url, WEBDAV_user, WEBDAV_pass);
+		$folderHandler = PortfolioWebDAV::factory();
 	} else {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
 		$folderHandler = new MyFolder;
@@ -35,7 +35,7 @@ elseif (is_numeric($_POST['categoryID'])) {
 
 	if (WEBDAV_on) {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
-		$fileHandler = new PortfolioWebDAV(WEBDAV_url, WEBDAV_user, WEBDAV_pass);
+		$fileHandler = PortfolioWebDAV::factory();
 	} else {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
