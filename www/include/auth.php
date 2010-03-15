@@ -122,7 +122,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 	}
 	if($result == true) {
 
-		$query = "SELECT user.id, title, firstname, lastname, username, group_id, synergy_id, superusers.id AS su, password, email_pass, local_email, mail_handler 
+		$query = "SELECT user.id, title, firstname, lastname, username, group_id, synergy_id, year, superusers.id AS su, password, email_pass, local_email, mail_handler
 		FROM user LEFT JOIN superusers ON user.id = superusers.id WHERE username = '". mysql_real_escape_string( $username)."'";
 		$user = $db->getRow($query);
 	}
@@ -152,6 +152,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 		$_SESSION['id'] = $user['id'];
 		$_SESSION['sid'] = $user['synergy_id'];
 		$_SESSION['gid'] = $user['group_id'];
+		$_SESSION['year'] = $user['year'];
 		$_SESSION['local_email'] = $user['local_email'];
 		$_SESSION['lasttime'] = mktime();
 		$_SESSION['username'] = $user['username'];
