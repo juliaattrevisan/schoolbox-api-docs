@@ -18,7 +18,7 @@ if (is_array($eventList)) {
 	foreach ($eventList as $event) {
 		
 		
-		$start = strtotime($event['date']);
+		$start = strtotime($event['date'] . ' pm');
 		
 		// get class
 		$query = "SELECT * FROM ".TUTORIAL_db.".luClass WHERE `class` = " . $eventHandler->db->smartQuote($event['name']) . " OR `code` = " .  $eventHandler->db->smartQuote($event['code']);
@@ -37,7 +37,7 @@ if (is_array($eventList)) {
 		$surname = implode(" ", $names);
 		$query = "SELECT ID synergy_id, Title title, Given1 firstname, Surname lastname
 					  FROM SynergyOne.dbo.vCommunityAddressesConstit vCommunityAddressesConstit
-					  WHERE ((vCommunityAddressesConstit.ConstitCode='TUTRES2009') OR (vCommunityAddressesConstit.ConstitCode='TUTNONRES2009'))
+					  WHERE ((vCommunityAddressesConstit.ConstitCode='TUTRES2010') OR (vCommunityAddressesConstit.ConstitCode='TUTNONRES2010'))
 					  AND Given1 = ".$eventHandler->db->smartQuote($firstname)." AND Surname = ".$eventHandler->db->smartQuote($surname)."";
 		$tutor = $mssql->getRow($query);
 		
@@ -70,10 +70,10 @@ if (is_array($eventList)) {
 					  );
 		
 		// calculate date sequence
-		$date = strtotime($event['date'], mktime(0,0,0,4,5,2009));
+		$date = strtotime($event['date'], mktime(0,0,0,3,15,2010));
 
 		$dateArray = array();
-		$until = mktime(0,0,0,6,5,2009);						   
+		$until = mktime(0,0,0,6,10,2010);						   
 		$validRepeat = array('weekly' => '+1 week', 'fortnightly' => '+2 weeks', 'monthly' => '+1 month');
 		$repeat = 'weekly';
 		if (isset($validRepeat[$repeat]) && $until) {
@@ -95,14 +95,14 @@ if (is_array($eventList)) {
 		
 			$data['date'] = $dateArray[$i];
 		
-			// check event doesnt exist
+		/*	// check event doesnt exist
 			$query = "SELECT * FROM ".TUTORIAL_db.".`event` WHERE classID = " . $data['classID'] . " AND `date` = '".$data['date']."'";
 			$current = $eventHandler->db->getRow($query);
-			if (!isset($current['eventID'])) {
+			if (!isset($current['eventID'])) {*/
 				$eventID = $eventHandler->create($data);
 				print_r($data);
-			} else
-				print "skipped {$data['code']} - {$data['name']} on {$data['date']}\n";
+			//} else
+			//	print "skipped {$data['code']} - {$data['name']} on {$data['date']}\n";
 		}
 		
 	}

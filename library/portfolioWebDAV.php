@@ -143,7 +143,7 @@ class PortfolioWebDAV {
 		
 		$this->scheme = $url['scheme'];
 		$this->host = $url['host'];
-		$this->root = '/' . trim($url['path'], '/');
+		$this->root = '/' . trim($url['path'], '/') . '/';
 		
 		
 		$this->client = new HTTP_WebDAV_Client_Stream_Extended;
@@ -159,8 +159,8 @@ class PortfolioWebDAV {
 		require_once SITE_root . '/library/group.php';
 		$groupHandler = new Group;
 		
-		$directory = $groupHandler->isStaff() ? 'StaffHome/' : 'StudentHome/';
-		return new self(WEBDAV_url . '/' . $directory , "wgs\\" . $_SESSION['username'], $_SESSION['password']);
+		$directory = $groupHandler->isStaff() ? 'StaffHome/' : 'StudentHome/' . $_SESSION['year'] . '/' . $_SESSION['username'];
+		return new self(WEBDAV_url . '/' . $directory , "wgs/" . $_SESSION['username'], $_SESSION['password']);
 	}
 	
 	private function fixPath ($path) {
@@ -172,8 +172,9 @@ class PortfolioWebDAV {
 		return '/' . trim($path, '/');
 	}
 	
-	public function getList($path = '', $filter = 'all') {
+	public function getList($path = '/', $filter = 'all') {
 		
+		$path = rtrim ($path, '/') . '/';
 	
 		$md5Path = md5($path);
 		
