@@ -51,37 +51,31 @@ class User extends Model {
 	
 	}
 	
-        function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'firstname', $sort_dir = 'asc') {
-            $keyword = explode(' ', scrubText($keyword));
+        function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+            $keyword = scrubText($keyword);
 
-            $query = "SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name FROM `user` LEFT JOIN `groups` ON `user`.group_id = `groups`.id LEFT JOIN `luCampus` ON `user`.campus = `luCampus`.id";
-            $count_query = "SELECT COUNT(*) FROM `user` LEFT JOIN `groups` ON `user`.group_id = `groups`.id";
+            $query = "SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name,
+                            MATCH(`username`,`title`,`firstname`,`lastname`,`alt_email`) AGAINST ('$keyword' IN BOOLEAN MODE) +
+                            MATCH(`groups`.`name`) AGAINST ('$keyword' IN BOOLEAN MODE) +
+                            MATCH(`luCampus`.`name`) AGAINST ('$keyword' IN BOOLEAN MODE) AS `score`
+                        FROM `user`
+                        LEFT JOIN `groups` ON `user`.group_id = `groups`.id
+                        LEFT JOIN `luCampus` ON `user`.campus = `luCampus`.id
+                        WHERE MATCH(`username`,`title`,`firstname`,`lastname`,`alt_email`) AGAINST ('$keyword' IN BOOLEAN MODE) +
+                            MATCH(`groups`.`name`) AGAINST ('$keyword' IN BOOLEAN MODE) +
+                            MATCH(`luCampus`.`name`) AGAINST ('$keyword' IN BOOLEAN MODE)
+                        ORDER BY `$sort_by` $sort_dir
+                        LIMIT $offset, $limit;
+            ";
 
-            foreach ($keyword as $i => $word) {
-                $query .= $i > 0 ? ' OR ' : ' WHERE ';
-                $query .= "`user`.`id` LIKE '%$word%'
-                                OR `synergy_id` LIKE '%$word%'
-                                OR `groups`.name LIKE '%$word%'
-                                OR `username` LIKE '%$word%'
-                                OR `title` LIKE '%$word%'
-                                OR `firstname` LIKE '%$word%'
-                                OR `lastname` LIKE '%$word%'
-                                OR `alt_email` LIKE '%$word%'
-                ";
-
-                $count_query .= $i > 0 ? ' OR ' : ' WHERE ';
-                $count_query .= "`user`.`id` LIKE '%$word%'
-                                    OR `synergy_id` LIKE '%$word%'
-                                    OR `groups`.name LIKE '%$word%'
-                                    OR `username` LIKE '%$word%'
-                                    OR `title` LIKE '%$word%'
-                                    OR `firstname` LIKE '%$word%'
-                                    OR `lastname` LIKE '%$word%'
-                                    OR `alt_email` LIKE '%$word%'
-                ";
-            }
-
-            $query .= " ORDER BY `$sort_by` $sort_dir LIMIT $offset, $limit;";
+            $count_query = "SELECT COUNT(*)
+                        FROM `user`
+                        LEFT JOIN `groups` ON `user`.group_id = `groups`.id
+                        LEFT JOIN `luCampus` ON `user`.campus = `luCampus`.id
+                        WHERE MATCH(`username`,`title`,`firstname`,`lastname`,`alt_email`) AGAINST ('$keyword' IN BOOLEAN MODE) +
+                            MATCH(`groups`.`name`) AGAINST ('$keyword' IN BOOLEAN MODE) +
+                            MATCH(`luCampus`.`name`) AGAINST ('$keyword' IN BOOLEAN MODE)
+            ";
 
             $count = $this->db->getOne($count_query);
 

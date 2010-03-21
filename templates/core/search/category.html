@@ -4,20 +4,19 @@
     <img src="/images/icons/60x60/folder.png" />
     <div class="search-details">
     <h3><a href="/homepage/{CATEGORY_ID}">{CATEGORY_NAME}</a></h3>
-    <p>{CATEGORY_BREADCRUMB}</p>
-	</div>		
-	<div class="search-functions">
-    <p><a>Due Work</a></p>
-    <p><a>Timetable</a></p>
-    <p><a>Portfolio</a></p>
-    <p><a>Help Desk</a></p>
-    </div>
+    <p class="search-sml">{CATEGORY_BREADCRUMB}</p>
+</div>		
+<div class="search-functions">
+    <p><a href="/resources/{CATEGORY_ID}">Resources</a></p>
+    <p><a href="/cms/imageGallery/{CATEGORY_ID}">Image Gallery</a></p>
+    <!-- BEGIN modify --><p><a href="/cms/category/{CATEGORY_ID}">Modify</a></p><!-- END modify -->
+</div>
 
 <div class="float-fix"></div>
 </div>
 <!-- END category -->
 <div class="pagination">
     <!-- BEGIN pagination -->
-    <a href=javascript:void(0); class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
+    <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
     <!-- END pagination -->
 </div>

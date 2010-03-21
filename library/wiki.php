@@ -123,7 +123,7 @@ class Wiki extends Model {
         function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
             $keyword = scrubText($keyword);
 
-            $query = "SELECT `wikiRevision`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
+            $query = "SELECT wiki.*, wikiRevision.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
                         FROM `wikiRevision`
                         LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID
@@ -136,13 +136,13 @@ class Wiki extends Model {
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
-                            AND `wikiRevision`.created = `wiki`.latestRevision
+                            AND `wikiRevision`.revisionID = `wiki`.latestRevision
                             AND deleted = 'false'
                         ORDER BY `$sort_by` $sort_dir
                         LIMIT $offset, $limit;
             ";
 
-            $count_query = "COUNT(*)
+            $count_query = "SELECT COUNT(*)
                         FROM `wikiRevision`
                         LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID
                         LEFT JOIN `user` ON `wikiRevision`.userID = `user`.id
@@ -154,7 +154,7 @@ class Wiki extends Model {
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
-                            AND `created` = latestRevision
+                            AND `wikiRevision`.revisionID = `wiki`.latestRevision
                             AND `deleted` = 'false'
             ";
 

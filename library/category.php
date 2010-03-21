@@ -361,7 +361,8 @@ class Category extends Model {
         function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
             $keyword = scrubText($keyword);
 
-            $query = "SELECT `category`.*, MATCH(`name`,`code`) AGAINST ('*$keyword*' IN BOOLEAN MODE) AS `score`
+            $query = "SELECT `category`.*, MATCH(`name`,`code`) AGAINST ('*$keyword*' IN BOOLEAN MODE) AS `score`,
+                            `perms`.type AS perms_type, `userAccess`.type AS userAccess_type
                         FROM `category`
                         LEFT JOIN `perms` ON `category`.id = `perms`.cid
                             AND `perms`.gid = {$_SESSION['gid']}

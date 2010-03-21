@@ -9,7 +9,6 @@
 //includes
 require_once("../include/session.php");
 require_once("../include/include.php");
-require_once("../include/staffonly.php");
 require_once("../include/image.php");
 
 
@@ -27,7 +26,7 @@ else
 	
 $imageHandler = new Image;
 
-if(isset($_GET['id']) && $_GET['id'] && SYNERGY_enable)
+if(isset($_GET['id']) && $_GET['id'] && SYNERGY_enable && isStaff($_SESSION['gid']))
 {
 	//get file details
 	$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);	

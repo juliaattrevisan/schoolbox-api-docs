@@ -4,20 +4,20 @@
     <img src="/search/portrait.php?id={USER_SYNERGY_ID}&width=50" alt="{USER_NAME}" />
     <div class="search-details">
     <h3><a href="/search/user/{USER_ID}">{USER_NAME}</a></h3>
-    <p>{USER_DETAIL}</p>
+    <p>{USER_YEAR} {USER_CAMPUS} {USER_GROUP}</p>
     <p>{USER_EMAIL}</p>
     </div>
     <div class="search-functions">
-    <p><a>Due Work</a></p>
-    <p><a>Timetable</a></p>
-    <p><a>Portfolio</a></p>
-    <p><a>Help Desk</a></p>
+    <!-- BEGIN due_work --><p><a href="/submission/dueWork.php?id={USER_ID}">Due Work</a></p><!-- END due_work -->
+    <!-- BEGIN timetable --><p><a href="/timetable/{USER_ID}">Timetable</a></p><!-- END timetable -->
+    <!-- BEGIN helpdesk --><p><a href="/modules/helpdesk/index.php?id={USER_ID}">Help Desk</a></p><!-- END helpdesk -->
+    <!-- BEGIN modify --><p><a href="/admin/modUser.php?id={USER_ID}">Modify</a></p><!-- END modify -->
     </div>
 <div class="float-fix"></div>
 </div>
 <!-- END user -->
 <div class="pagination">
     <!-- BEGIN pagination -->
-    <a href="javascript:void(0);" class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
+    <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
     <!-- END pagination -->
 </div>

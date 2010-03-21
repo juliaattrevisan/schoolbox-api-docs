@@ -53,8 +53,8 @@ if (is_numeric($this->arg[0])) {
 				
 			$this->setVar(array(
                             'WIKI_ID'           => $wiki['wikiID'],
-                            'REVISION_ID'       => $revision['revisionID'],
-                            'REVISION_COMPARE'  => $wiki['revisionID'],
+                            'REVISION_ID'       => $wiki['revisionID'],
+                            'REVISION_COMPARE'  => $revision['revisionID'],
                             'REVISION_DATE'     => outputDate(DATE_short_no_time, $revision['created']),
                             'REVISION_HEADING'	=> scrubText($revision['heading']),
                             'REVISION_AUTHOR'	=> formatName($revision),

@@ -1,15 +1,21 @@
-<h2>Wiki <!-- BEGIN count -->({WIKI_DISP_COUNT} / {WIKI_COUNT})<!-- END count --></h2>
-<!-- BEGIN blog -->
-<div>
-    <img src="images/mime/60x60/60x60/mimetypes/{BLOG_ICON}" />
-    <h3><a href="/homepage/{BLOG_CID}">{BLOG_HEADING}</a></h3>
-    <p>{BLOG_BODY}</p>
-    <p>Owner: <a href="/search/user/{BLOG_OWNER}">{BLOG_OWNER_NAME}</a> Created: {BLOG_CREATED}</p>
-    <p>{BLOG_BREADCRUMB}</p>
+<h2>News <!-- BEGIN count -->({WIKI_DISP_COUNT} / {WIKI_COUNT})<!-- END count --></h2>
+<!-- BEGIN wiki -->
+<div class="search-item">
+    <img src="/images/icons/60x60/wiki.png" />
+	<div class="search-details">
+    <h3><a href="/wiki/{WIKI_ID}">{WIKI_HEADING}</a></h3>
+    <p>{WIKI_BODY}</p>
+    <p class="search-sml">Revised by <a href="/search/user/{WIKI_OWNER}">{WIKI_OWNER_NAME}</a> {WIKI_CREATED}</p>
+    <p class="search-sml">{WIKI_BREADCRUMB}</p>
+    </div>
+    <div class="search-functions">
+    </div>
+
+<div class="float-fix"></div>
 </div>
-<!-- END blog -->
+<!-- END wiki -->
 <div class="pagination">
     <!-- BEGIN pagination -->
-    <a href=javascript:void(0); class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
+    <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
     <!-- END pagination -->
 </div>

@@ -45,6 +45,10 @@ define('TEMPLATE_body', 		'bodyTpl');
 define('TEMPLATE_content', 		'contentTpl');
 define('TPL_directory', 		SITE_root.'/'. SITE_location . "_templates");		//Deprecated option
 
+// Search Options
+define('SEARCH_all_limit', 3); // results per type shown on 'All' tab for each type
+define('SEARCH_type_limit', 15); // number of results to display per type
+
 //CMS options
 define("FILE_directory",		SITE_root.'/data/files');		//Files uploads
 define("MYFILE_directory",  		SITE_root.'/data/myFiles');		//Personal file uploads

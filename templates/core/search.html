@@ -9,7 +9,7 @@
             var el = $j(this).attr('title');
             var paginate = function(){
                 $j('div.' + 'pagination > a').click(function() {
-                    $j('div.results > div[title=' + el + ']').load('/search.php', 'keyword={KEYWORD}&type=' + el + '&page='+this.text, paginate);
+                    $j('div.results > div[title=' + el + ']').load('/search.php', 'keyword={KEYWORD}&type=' + el + '&page='+$j(this).attr('title'), paginate);
                 });
             }
 
@@ -45,15 +45,7 @@
 </ul>
 
 <div class="results">
-    <div title="all" class="hide loaded">
-        {RESULT}
-    </div>
-    <div title="user" class="hide"></div>
-    <div title="file" class="hide"></div>
-    <div title="category" class="hide"></div>
-    <div title="link" class="hide"></div>
-    <div title="news" class="hide"></div>
-    <div title="blog" class="hide"></div>
-    <div title="wiki" class="hide"></div>
-    <div title="forum" class="hide"></div>
+    <!-- BEGIN result -->
+    <div title="{RESULT_TITLE}" class="{RESULT_CLASS}">{RESULT}</div>
+    <!-- END result -->
 </div>

@@ -176,6 +176,7 @@ class File extends Model {
             $keyword = scrubText($keyword);
 
             $query = "SELECT `file`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname, `allowedFileTypes`.iconFile,
+                            `perms`.type AS perms_type, `userAccess`.type AS userAccess_type,
                             MATCH(`file`.`realname`,`file`.`description`,`file`.`comment`) AGAINST ('$keyword') AS `score`
                         FROM `file`
                         LEFT JOIN `allowedFileTypes` ON `file`.mime_type = `allowedFileTypes`.mime

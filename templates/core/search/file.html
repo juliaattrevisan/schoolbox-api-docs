@@ -4,15 +4,12 @@
     <img src="images/mime/60x60/{FILE_ICON}" />
     <div class="search-details">
     <h3><a href="/sendframe.php?id={FILE_ID}">{FILE_DESCRIPTION}</a></h3>
-    <p><em>{FILE_COMMENT}</em></p>
-    <p>Created by <a href="/search/user/{FILE_OWNER}">{FILE_OWNER_NAME}</a> {FILE_CREATED}</p>
+    <p><em>{FILE_COMMENT} ({FILE_SIZE})</em></p>
+    <p class="search-sml">Uploaded by <a href="/search/user/{FILE_OWNER}">{FILE_OWNER_NAME}</a> {FILE_CREATED}</p>
     <p class="search-sml">{FILE_BREADCRUMB}</p>
     </div>
     <div class="search-functions">
-    <p><a>Due Work</a></p>
-    <p><a>Timetable</a></p>
-    <p><a>Portfolio</a></p>
-    <p><a>Help Desk</a></p>
+    <!-- BEGIN modify --><p><a href="/cms/file/{FILE_ID}">Modify</a></p><!-- END modify -->
     </div>
 
 <div class="float-fix"></div>
@@ -20,7 +17,7 @@
 <!-- END file -->
 <div class="pagination">
     <!-- BEGIN pagination -->
-    <a href=javascript:void(0); class="{PAGE_CLASS}">{PAGE_NUMBER}</a>
+    <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
     <!-- END pagination -->
 </div>
 
