@@ -1,0 +1,30 @@
+ <h1>{HEADING} {LOCKED} (Comparing Revision {FROM_ID} to {TO_ID})</h1>
+
+<span class="header_option">
+    <a href="/homepage/{CATEGORY_ID}">Return to homepage</a>
+</span>
+
+<div class="float-fix"></div>
+
+<div class="left">
+<div class="box">
+{DIFF}
+</div>
+<p>Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</p>
+</div>
+<div class="right">
+<h2>Revisions</h2>
+<table>
+<tr>
+<th>Date</th>
+<th>Author</th>
+</tr>
+<!-- BEGIN revision_list -->
+<tr>
+<td><a href="/wiki/{WIKI_ID}/{REVISION_COMPARE}">{REVISION_DATE}</a></td>
+<td>{REVISION_AUTHOR}</td>
+<td><!-- BEGIN revision_comparison --><a href="/wiki/diff/{WIKI_ID}/{REVISION_ID}/{REVISION_COMPARE}">compare</a><!-- END revision_comparison --></td>
+</tr>
+<!-- END revision_list -->
+</table>
+</div>
