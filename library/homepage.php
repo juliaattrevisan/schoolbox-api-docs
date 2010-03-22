@@ -106,8 +106,8 @@ class Homepage {
 		$dboxHandler = new Dropbox;
 		$dboxHandler->homepageClean($this->cid);
 		
-		require_once dirname(__FILE__) . '/submission-box.php';
-		$submissionBoxHandler = new SubmissionBox;
+		require_once dirname(__FILE__) . '/submission.php';
+		$submissionBoxHandler = new Submission;
 		$submissionBoxHandler->homepageClean($this->cid);
 	}
 	

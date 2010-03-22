@@ -1,0 +1,69 @@
+<?php
+require_once '../include/model.php';
+require_once dirname(__FILE__) . '/group.php';
+
+class SubmissionStudent extends Model {
+
+	function SubmissionStudent () {
+
+		$this->_table = "student_submission";
+		$this->_index = "id";
+
+		parent::Model();
+	}
+
+
+        function securityCheck($box_id)
+	{
+		//check if already submitted
+		$query = "SELECT id FROM student_submission WHERE box_id = '$box_id' AND owner = '".$_SESSION['id']."'";
+		if(is_array($this->db->getRow($query)))
+			error(27);
+
+		//check if submitted assignment is late
+		$query = "SELECT UNIX_TIMESTAMP(date) AS overdue, UNIX_TIMESTAMP(open_date) AS open, code, category.id FROM submission_box, category
+		WHERE submission_box.id = '$box_id' AND submission_box.category = category.id";
+		$result = $this->db->getRow($query);
+		if(!is_array($result))
+			error(17);
+
+		//check if they are involved in subject (dont allow anyone to submit to box) use involved in
+                $groupHandler = new Group;
+                if(!$groupHandler->involvedInSubject($result['id']) && !$groupHandler->involvedInGroup($_SESSION['id'], $result['id']))
+			error(24);
+
+		$now = date("U");
+
+		//check if its early
+		if($result['open'] > $now)
+			error(36);
+
+		//check if it is late
+		if($result['overdue'] < $now)
+			return true;
+		else
+			return false;
+	}
+
+        function create($boxID, $file)
+	{
+		$late = $this->securityCheck($boxID);
+
+                $studentSub = array ('owner'    => $_SESSION['id'],
+                                    'realname'  => $file['realname'],
+                                    'submitted' => 'NOW()',
+                                    'box_id'    => $boxID,
+                                    'late'      => $late,
+                                    );
+
+                $fileId = $this->db->insert($studentSub);
+
+		//save file using file ID as name
+		$newFileName = $fileId . ".dat";
+		move_uploaded_file($file['tmp_name'], SUBMISSION_directory . "/" . $newFileName);
+
+		return $fileId;
+
+	}
+}
+?>

@@ -11,7 +11,7 @@ if(is_numeric($this->arg[0])) {
 	/* Modify existing file */
 	
 	require_once '../library/file.php';
-	require_once '../library/submission-box.php';
+	require_once '../library/submission.php';
 	$fileHandler = new File;
 	
 	$file = $fileHandler->getByID($this->arg[0]);
@@ -75,7 +75,7 @@ if(is_numeric($this->arg[0])) {
 	$this->setVar('submission_box_block', '');
 	if ($groupHandler->isStaff()) {
 			
-		$subBoxHandler = new SubmissionBox;
+		$subBoxHandler = new Submission;
 		$subBox = $subBoxHandler->getByField('fid', $file['id']);
 		
 		if(is_array($subBox)) {
