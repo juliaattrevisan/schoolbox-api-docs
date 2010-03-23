@@ -54,6 +54,50 @@ class Submission extends Model {
             return $this->db->getAll($query);
     }
 
+    function getAllForUser($userID) {
+
+        $listquery = "SELECT submission_box.id, submission_box.description, category.id as catid, GROUP_CONCAT(co.code) code, category.name,
+                        DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date, DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date,
+                        submission_box.type, file_type.name as type
+                    FROM (category, submission_box )
+                    LEFT JOIN file_type ON submission_box.type = file_type.id
+                    LEFT JOIN categoryCode co ON co.categoryID = category.id
+                    WHERE category.id = submission_box.category
+                            AND submission_box.owner = '".$userID."'
+                            AND submission_box.deleted = '0'
+                    GROUP BY submission_box.id, category.id
+                    ORDER BY category.id, submission_box.date";
+
+        return $this->db->getAll($query);
+    }
+
+    function getBoxCount($box_id) {
+         $totalquery = "SELECT COUNT(*) AS total, SUM(marked) AS marked FROM student_submission WHERE box_id = '".$box_id."'";
+         return $this->db->getRow($query);
+    }
+
+    function logPageView($box_id)
+    {
+            /* TODO: rewrite this code in simpler method probably use mysql insert/update */
+            $testquery = "SELECT datetime FROM submission_log WHERE page = '3'
+            AND user = '".$_SESSION['id']."' AND sid = '$box_id'";
+
+            $this->db->query($testquery);
+
+            if($row = $this->db->getNextArray() )
+            {
+                    $query = "UPDATE submission_log SET datetime = NOW() WHERE page =
+                    '3' AND user = '".$_SESSION['id']."' AND sid = '$box_id'";
+            }
+            else
+            {
+                    $query = "INSERT INTO submission_log (datetime, user, page, sid) VALUES
+                            (NOW(), '".$_SESSION['id']."', '3', '$box_id')";
+            }
+
+            $this->db->query($query);
+    }
+
     function getAssignments($categoryID, $config = false) {
             return $this->getHomework($categoryID, $config, 2);
     }

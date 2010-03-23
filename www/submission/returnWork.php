@@ -1,5 +1,36 @@
 <?php
 
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+
+$this->setFile(TEMPLATE_content, 'submission/returnWork.html');
+$this->setTitle('File Submission');
+
+$subHandler = new Submission;
+$catHandler = new Category;
+$userHandler = new User;
+
+if(is_numeric($_GET['box_id']) && is_numeric($_GET['sid']) ) {
+
+    $subbox = $subHandler->getByID($_GET['box_id']);
+    $category = $catHandler->getByID($subbox['category']);
+    $user = $userHandler->getByID($_GET['sid']);
+
+    $output = array("CATEGORY"  => scrubTEXT($category['name']),
+                    "ASSNAME"   => scrubTEXT($subbox['description']),
+                    "BOX_ID"    => $_GET['box_id'],
+                    'NAME'      => formatName($user),
+                    'SID'       => $_GET['sid'],
+                );
+
+    $this->setVar($output);
+
+}
+
+
+
+/*
 require_once("../include/session.php");
 require_once("../include/include.php");
 
@@ -71,31 +102,7 @@ class returnWorkPage {
 	
         function showPage($box_id, $sid)
         {
-                $this->t_body = new Template(TPL_directory);
-				$this->t_body->set_file("tplBODY", "submission/returnWork.htm");
-		$this->t_body->set_var("TITLE", HEADING." - File Submission");
-		
-		include_once("../include/page.php");
 
-		//get details about the work being returned for user verification
-		$query = "SELECT category.name, file.description FROM category, file, submission_box WHERE 
-		submission_box.category = category.id AND submission_box.fid = file.id 
-		AND submission_box.id = $box_id";
-
-		$this->db->query($query);
-		$result = $this->db->getNextArray();
-		
-		$this->t_body->set_var("CATEGORY",$result['name']);
-		$this->t_body->set_var("ASSNAME", $result['description']);
-		$this->t_body->set_var("BOX_ID", $box_id);
-		
-		//get details of user work being returned to for user verification
-		$query = "SELECT lastname, title, firstname FROM user WHERE id = '$sid'";
-		$this->db->query($query);
-		$result = $this->db->getNextArray();
-		
-		$this->t_body->set_var("NAME", formatName($result));
-		$this->t_body->set_var("SID", $sid);
                 $this->t_body->pparse("finaloutput", "tplBODY");
         }
 }
@@ -139,5 +146,7 @@ else
 {
 	error(17);
 }
+ *
+ */
 
 ?>

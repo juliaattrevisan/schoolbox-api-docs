@@ -1,114 +1,62 @@
 <?php
 
-require_once("../include/session.php");
-require_once("../include/include.php");
-require_once("../include/staffonly.php");
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 
-class ListSubmissionPage {
-	function ListSubmissionPage()
-	{
-		$this->t_body = new Template(TPL_directory);
-		       	$this->t_body->set_file("tplBODY", "submission/listSub.htm");
-		$this->t_body->set_var("TITLE", HEADING." - Submission Boxes");
-		$this->t_body->set_block("tplBODY", "submission_block", "submission_listing");		
-		$this->t_body->set_block("tplBODY", "category_block", "category_listing");
-		
-		include_once("../include/page.php");
-	}
-	
-	function outputSubmission($id, $description, $open_date, $date, $marked=0, $total=0, $type = '')
-	{
-		if($marked=="")
-			$marked = 0;
-		$this->t_body->set_var("ID", $id);
-		$this->t_body->set_var("ASSDESC", $description);
-		$this->t_body->set_var("TYPE", $type);
-		$this->t_body->set_var("JAVAASSDESC", addslashes($description));
-		$this->t_body->set_var("OPENDATE", $open_date);
-		$this->t_body->set_var("DUEDATE", $date);
-		$this->t_body->set_var("MARKED", $marked);
-		//$this->t_body->set_var("UNMARKED", ($total-$marked));
-		$this->t_body->set_var("TOTAL", $total);
-		$this->t_body->set_var('ON_OFF', ++$this->i%2?'':'dark');
-
-		$this->t_body->parse("submission_listing","submission_block",true);
-	}
-
-	function setSubmissions()
-	{
-		$db = new dbManager;
-		$db->dbConnect();
-	
-		$currentCat = "";
-
-		$listquery = "SELECT submission_box.id, submission_box.description, category.id as catid, GROUP_CONCAT(co.code) code, category.name,
-					DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date, DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date, 
-					submission_box.type, file_type.name as type 
-				FROM (category, submission_box )
-				LEFT JOIN file_type ON submission_box.type = file_type.id 
-				LEFT JOIN categoryCode co ON co.categoryID = category.id
-				WHERE category.id = submission_box.category 
-					AND submission_box.owner = '".$_SESSION['id']."' 
-					AND submission_box.deleted = '0' 
-				GROUP BY submission_box.id, category.id 
-				ORDER BY category.id, submission_box.date"; 
-	
-		$result=$db->query($listquery);
-
-		if($db->countRows() > 0)
-		{
-			$line = $db->getNextArray($result);
-			$prevCat = $line;
-
-			do
-			{
-				if($prevCat['catid'] != $line['catid'])
-				{
-
-					if($prevCat['code'] != "")
-						$this->t_body->set_var("CATEGORY", $prevCat['name']." (".$prevCat['code'].")");
-					else
-						$this->t_body->set_var("CATEGORY", $prevCat['name']);
-
-					$this->t_body->parse("category_listing", "category_block", true);
-					$this->t_body->set_var("submission_listing", "");
-					$this->i = 0;
-
-				}
-
-				//for each box we want to make some running totals of whats in them
-				$totalquery = "SELECT COUNT(*) AS total, SUM(marked) AS marked FROM student_submission WHERE box_id = '".$line['id']."'"; 
-				$db->query($totalquery);
-				$totals = $db->getNextArray();
-
-				$this->outputSubmission($line['id'],$line['description'], $line['open_date'], $line['date'], 
-					$totals['marked'], $totals['total'], $line['type']);
-
-				$prevCat = $line;
-
-			}while($line = $db->getNextArray($result) );
+$this->set_file(TEMPLATE_content, 'submission/listSubmission.html');
+$this->setTitle('List of Submission Boxes');
+$this->setBlock(TEMPLATE_content, 'submission_block', 'submission_listing');
+$this->setBlock(TEMPLATE_content, 'category_block', 'category_listing');
 
 
-			if($prevCat['code'] != "")
-				$this->t_body->set_var("CATEGORY", $prevCat['name']." (".$prevCat['code'].")");
-			else
-				$this->t_body->set_var("CATEGORY", $prevCat['name']);
 
-			$this->t_body->parse("category_listing", "category_block", true);
+$submissionHandler = new Submission;
+$subList = $submissionHandler->getAllForUser($_SESSION['id']);
 
-		}
-		else
-			$this->t_body->set_var("category_listing", "<br><b>Currently no active submission boxes under your name</b>");
+if(is_array($subList))
+{
+    foreach($subList as $sub) {
+        if($prevCat['catid'] != $sub['catid'] && $prevCat['catid'] != '') {
+            if($prevCat['code'] != "")
+                    $this->setVar('CATEGORY', $prevCat['name']." (".$prevCat['code'].")");
+            else
+                    $this->setVar('CATEGORY', $prevCat['name']);
 
-	}			
+            $this->parse('category_listing', 'category_block', true);
+            $this->setVar('submission_listing', '');
+            $i = 0;
 
-        function showPage()
-        {
-                $this->t_body->pparse("finaloutput", "tplBODY");
         }
+
+        $totals = $submissionHandler->getBoxCount($sub['id']);
+
+
+        $output = array('ID'        => $sub['id'],
+                        'ASSDESC'   => scrubTEXT($sub['description']),
+                        'TYPE'      => $sub['type'],
+                        'JAVAASSDESC'=> addslashes(scrubTEXT($sub['description'])),
+                        'OPENDATE'  => $sub['open_date'],
+                        'DUEDATE'   => $sub['date'],
+                        'MARKED'    => $totals['marked'],
+                        'UNMARKED'  => ($totals['total']-$totals['marked']),
+                        'TOTAL'     => $totals['total'],
+                        'ON_OFF'    => ++$i%2?'':'dark',
+                        );
+        $this->setVar($output);
+        $this->parse('submission_listing','submission_block',true);
+
+    }
+
+    if($prevCat['code'] != "")
+        $this->setVar("CATEGORY", $prevCat['name']." (".$prevCat['code'].")");
+    else
+        $this->setVar("CATEGORY", $prevCat['name']);
+
+    $this->t_body->parse("category_listing", "category_block", true);
+
 }
 
-$myPage = new ListSubmissionPage();
+
+/*
 
 if(isset($_GET['delete']) && $_GET['delete'])
 {
@@ -129,4 +77,7 @@ else
 	$myPage->setSubmissions();
 	$myPage->showPage();
 }
+ *
+ *
+ */
 ?>
