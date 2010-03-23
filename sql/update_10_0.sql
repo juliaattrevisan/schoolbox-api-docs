@@ -7,3 +7,5 @@ ALTER TABLE `wiki`
 UPDATE wiki w
 SET w.latestRevision = (SELECT r.revisionID FROM wikiRevision r WHERE r.wikiID = w.wikiID ORDER BY created DESC LIMIT 1);
 
+INSERT INTO luServices SET id = 5, name = 'CMS';
+
