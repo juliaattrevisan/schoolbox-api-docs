@@ -1,0 +1,382 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- DW6 -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<title>{TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/screen.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
+<!-- BEGIN header_css -->
+<!-- END header_css -->
+<script type="text/javascript" src="/javascript/jquery.js"></script>
+<script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
+<script type='text/javascript'>
+  var $j = jQuery.noConflict();
+	
+	$j(function() {
+    $j('#nav ul').droppy({speed: 0});
+  });
+</script>
+<!-- BEGIN header_javascript -->
+<script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>
+<!-- END header_javascript -->
+</head>
+<body>
+<script type="text/javascript" src="/javascript/tableruler.js"></script>
+<script type="text/javascript">
+	window.onload=function(){tableruler();} 
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/shore/calendar.css" />
+<h1>Due Work</h1>
+<div class="left">
+  <center>
+  <div id="calendar">
+
+    <div class="due-dates-selection">
+      <div> <a class="back" href="{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a> <span>{Month} {Year}</span> <a class="forward" href="{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a> </div>
+      <div class="float-fix"></div>
+      </div>
+
+  <table class="calendarTable duedates-calendar">
+        <form method="get" action="dueWork.php">
+        <select name="Month" onchange="this.form.submit();">
+          <option value="{DROP_SUBJECTS}" {DROP_YEAR_SELECTED}>{DROP_SUBJECTS}</option>
+        </select>
+      </form>
+          <tr>
+      <th width="14%">Sun</th>
+      <th width="14%">Mon</th>
+      <th width="14%">Tue</th>
+      <th width="14%">Wed</th>
+      <th width="14%">Thu</th>
+      <th width="14%">Fri</th>
+      <th width="14%">Sat</th>
+    </tr>
+    <!-- BEGIN week_block -->
+    <tbody>
+      <tr>
+        <td class="past"><h3>28</h3>
+          <ul>
+            <li id="event-453"><span class="wrapper"><a href="/event/453"><strong>All Day</strong> Prefect leadership camp</a></span></li>
+          </ul></td>
+        <td class="past"><h3>29</h3>
+          <ul>
+          </ul></td>
+        <td class="past"><h3>30</h3>
+          <ul>
+            <li id="event-456"><span class="wrapper"><a href="/event/456"><strong>12:45pm</strong> Bayview sports training</a></span></li>
+            <li id="event-454"><span class="wrapper"><a href="/event/454"><strong>01:30pm</strong> Year 9 speech afternoon</a></span></li>
+            <li id="event-455"><span class="wrapper"><a href="/event/455"><strong>07:00pm</strong> Frogmore Speech Night</a></span></li>
+          </ul></td>
+        <td class=""><h3>1</h3>
+          <ul>
+            <li id="event-457"><span class="wrapper"><a href="/event/457"><strong>12:45pm</strong> Frogmore sports training</a></span></li>
+          </ul></td>
+        <td class="righty"><h3>2</h3>
+          <ul>
+          </ul></td>
+        <td class="righty"><h3>3</h3>
+          <ul>
+            <li id="event-458"><span class="wrapper"><a href="/event/458"><strong>All Day</strong> P&amp;F Christmas luncheon</a></span></li>
+            <li id="event-459"><span class="wrapper"><a href="/event/459"><strong>05:00pm</strong> Bayview Spectacular performance and speech night</a></span></li>
+            <li id="event-460"><span class="wrapper"><a href="/event/460"><strong>08:00pm</strong> Bayview prize giving ceremony</a></span></li>
+          </ul></td>
+        <td class="righty"><h3>4</h3>
+          <ul>
+          </ul></td>
+      </tr>
+      <tr>
+        <td class=""><h3>5</h3>
+          <ul>
+          </ul></td>
+        <td class=""><h3>6</h3>
+          <ul>
+            <li id="event-461"><span class="wrapper"><a href="/event/461"><strong>02:30pm</strong> Year 8 graduation assembly</a></span></li>
+          </ul></td>
+        <td class=""><h3>7</h3>
+          <ul>
+            <li id="event-462"><span class="wrapper"><a href="/event/462"><strong>All Day</strong> End of term 4</a></span></li>
+            <li id="event-463"><span class="wrapper"><a href="/event/463"><strong>07:00pm</strong> Christmas Service of Lessons and Carols</a></span></li>
+          </ul></td>
+        <td class=""><h3>8</h3>
+          <ul>
+          </ul></td>
+        <td class="righty"><h3>9</h3>
+          <ul>
+            <li id="event-464"><span class="wrapper"><a href="/event/464"><strong>All Day</strong> ESPT testing (year 6 and new enrolments 2011)</a></span></li>
+            <li id="event-465"><span class="wrapper"><a href="/event/465"><strong>All Day</strong> Cadet promotions course begins</a></span></li>
+          </ul></td>
+        <td class="righty"><h3>10</h3>
+          <ul>
+            <li id="event-466"><span class="wrapper"><a href="/event/466"><strong>All Day</strong> Cadet promotions course </a></span></li>
+          </ul></td>
+        <td class="righty"><h3>11</h3>
+          <ul>
+          </ul></td>
+      </tr>
+      <tr>
+        <td class=""><h3>12</h3>
+          <ul>
+          </ul></td>
+        <td class=""><h3>13</h3>
+          <ul>
+          </ul></td>
+        <td class=""><h3>14</h3>
+          <ul>
+          </ul></td>
+        <td class=""><h3>15</h3>
+          <ul>
+          </ul></td>
+        <td class="righty"><h3>16</h3>
+          <ul>
+          </ul></td>
+        <td class="righty"><h3>17</h3>
+          <ul>
+          </ul></td>
+        <td class="righty"><h3>18</h3>
+          <ul>
+          </ul></td>
+      </tr>
+      <tr>
+        <td class=""><h3>19</h3>
+          <ul>
+          </ul></td>
+        <td class=""><h3>20</h3>
+          <ul>
+          </ul></td>
+        <td class=""><h3>21</h3>
+          <ul>
+          </ul></td>
+        <td class=""><h3>22</h3>
+          <ul>
+          </ul></td>
+        <td class="righty"><h3>23</h3>
+          <ul>
+            <li id="event-467"><span class="wrapper"><a href="/event/467"><strong>All Day</strong> Reception closes for Christmas break</a></span></li>
+          </ul></td>
+        <td class="righty"><h3>24</h3>
+          <ul>
+          </ul></td>
+        <td class="righty"><h3>25</h3>
+          <ul>
+          </ul></td>
+      </tr>
+      <tr>
+        <td class=""><h3>26</h3>
+          <ul>
+          </ul></td>
+        <td class=""><h3>27</h3>
+          <ul>
+          </ul></td>
+        <td class=""><h3>28</h3>
+          <ul>
+          </ul></td>
+        <td class=""><h3>29</h3>
+          <ul>
+          </ul></td>
+        <td class="righty"><h3>30</h3>
+          <ul>
+          </ul></td>
+        <td class="  active righty"><h3>31</h3>
+          <ul>
+          </ul></td>
+        <td class="past   righty"><h3>1</h3>
+          <ul>
+          </ul></td>
+      </tr>
+    </tbody>
+    <!-- END week_block -->
+  </table>
+</div>
+</center>
+<!-- BEGIN user_block -->
+<div class="indent">
+  <table class="due-dates">
+    <!-- BEGIN day_block -->
+    <thead>
+      <tr>
+        <td colspan="6" class="td-heading"><h2>Upcoming Due Dates</h2></td>
+      <tr>
+        <!-- BEGIN due_heading_block -->
+      <tr>
+        <th>Subject</th>
+        <th>Item</th>
+        <th>Due Date</th>
+        <th>Action</th>
+      </tr>
+      <!-- END due_heading_block -->
+    </thead>
+    <tbody>
+      <!-- BEGIN due_block -->
+      <tr>
+        <td>Maths Methods</td>
+        <td>Quadratics Papers</td>
+        <td>31/03/10</td>
+        <td>Submit</a></td>
+      </tr>
+      <tr>
+        <td>Maths Methods</td>
+        <td>Quadratics Papers</td>
+        <td>31/03/10</td>
+        <td>Submit</a></td>
+      </tr>
+      <tr>
+        <td>Maths Methods</td>
+        <td>Quadratics Papers</td>
+        <td>31/03/10</td>
+        <td>Submit</a></td>
+      </tr>
+      <!-- END due_block -->
+    </tbody>
+    <!-- END day_block -->
+  </table>
+</div>
+<!-- END user_block -->
+<!-- BEGIN user_block -->
+<div class="indent">
+  <table class="due-dates">
+    <!-- BEGIN day_block -->
+    <thead>
+      <tr>
+        <td colspan="6" class="td-heading"><h2>Returned Work</h2></td>
+      <tr>
+        <!-- BEGIN due_heading_block -->
+      <tr>
+        <th>Subject</th>
+        <th>Item</th>
+        <th>Mark</th>
+        <th>Action</th>
+      </tr>
+      <!-- END due_heading_block -->
+    </thead>
+    <tbody>
+      <!-- BEGIN due_block -->
+      <tr>
+        <td>Maths Methods</td>
+        <td>SAC 1</td>
+        <td>31/03/10</td>
+        <td>Submit</a></td>
+      </tr>
+      <tr>
+        <td>Maths Methods</td>
+        <td>Quadratics Papers</td>
+        <td>31/03/10</td>
+        <td>Submit</a></td>
+      </tr>
+      <tr>
+        <td>Maths Methods</td>
+        <td>Quadratics Papers</td>
+        <td>31/03/10</td>
+        <td>Submit</a></td>
+      </tr>
+      <!-- END due_block -->
+    </tbody>
+    <!-- END day_block -->
+  </table>
+</div>
+<!-- END user_block -->
+</div>
+<div class="right">
+  <div id="component" class="box">
+    <h2 style="cursor: move;">Forum</h2>
+    <a class="edit">edit</a>
+    <div class="editPanel hide">
+      <form method="get" action="/homepage/configForm.php">
+        <input type="hidden" value="4" name="cid">
+        <input type="hidden" value="config" name="type">
+        <input type="hidden" value="5" name="component">
+        <label for="size">Item Limit: </label>
+        <select name="size" gtbfieldid="11">
+          <option selected="selected" value="0">All</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+        <input type="submit" value="Update">
+      </form>
+    </div>
+    <div class="text listing">
+      <ul>
+        <li class=""> <a href="/forum/thread/6"><strong>Maths Methods</strong></a> - 4 Items
+          <p>Mr Taranto</p>
+          <div class="float-fix"></div>
+        </li>
+        <li class="dark"> <a href="/forum/thread/6"><strong>Accounting</strong></a> - 4 Items
+          <p>Mr Taranto</p>
+          <div class="float-fix"></div>
+        </li>
+        <li class=""> <a href="/forum/thread/6"><strong>Visual Communication</strong></a> - 4 Items
+          <p>Mr Taranto</p>
+          <div class="float-fix"></div>
+        </li>
+        <li class="dark"> <a href="/forum/thread/6"><strong>Business Management</strong></a> - 4 Items
+          <p>Mr Taranto</p>
+          <div class="float-fix"></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div id="component" class="box">
+    <h2 style="cursor: move;">Activites</h2>
+    <a class="edit">edit</a>
+    <div class="editPanel hide">
+      <form method="get" action="/homepage/configForm.php">
+        <input type="hidden" value="4" name="cid">
+        <input type="hidden" value="config" name="type">
+        <input type="hidden" value="5" name="component">
+        <label for="size">Item Limit: </label>
+        <select name="size" gtbfieldid="11">
+          <option selected="selected" value="0">All</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+        <input type="submit" value="Update">
+      </form>
+    </div>
+    <div class="text listing">
+      <ul>
+        <li class="">
+          <p>Submissions open for <a href="#">Maths Methods</a></p>
+          <div class="float-fix"></div>
+        </li>
+        <li class="dark">
+          <p>New project added to <a href="#">Accounting</a></p>
+          <div class="float-fix"></div>
+        </li>
+        <li class="">
+          <p>Submissions open for <a href="#">Maths Methods</a></p>
+          <div class="float-fix"></div>
+        </li>
+        <li class="dark">
+          <p>New project added to <a href="#">Accounting</a></p>
+          <div class="float-fix"></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<!-- END returned_block -->
+<div class="float-fix"></div>
+</body>
+</html>

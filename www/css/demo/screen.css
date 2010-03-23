@@ -1,3 +1,8 @@
+
+.front-myfriends .signup a:hover {
+color:#ffffff;
+}
+
 /*------------
 	Core
 ------------*/
@@ -260,3 +265,111 @@ h1 + .header_option {
 #calendar .header_option a {
 	color: #003E7E;
 }
+.due-dates {
+	width:100%;
+	border:1px solid #c3cdd7;
+}
+.due-dates td {
+	border-top:1px solid #c3cdd7;
+	padding:6px;
+}
+.due-dates th {
+	padding:6px;
+}
+.due-dates .td-heading {
+	padding:0;
+	border:none;
+}
+.td-heading h2 {
+	border:none;
+	padding:0px;
+}
+.left #calendar table.duedates-calendar {
+	width:100%;
+	margin-bottom:20px;
+	border:none;
+	border-right:1px dotted #cdcdcd;
+	border-bottom:1px dotted #cdcdcd;
+}
+.left #calendar table.duedates-calendar th {
+	background-color:#ececec;	
+	color:#000000;
+	padding:8px;
+}
+.left #calendar table.duedates-calendar td {
+	border-left:1px dotted #cdcdcd;
+	border-top:1px dotted #cdcdcd;
+	background:none repeat scroll 0 0 #FFFFFF;
+	font-weight:normal;
+	height:101px;
+	padding:0;
+	text-align:left;
+	vertical-align:top;
+}
+
+.left #calendar table.duedates-calendar h3 {
+	background:url(/images/cal-plus.gif) no-repeat right 7px 2px;
+	background-color:#8AA2B7;
+	padding:5px;
+	font-size:11px;
+	color:#fff;
+	margin-bottom:2px;
+}
+.left #calendar table.duedates-calendar span.wrapper {
+	background:none repeat scroll 0 0 #717171;
+	color:#FFFFFF;
+	cursor:pointer;
+	display:block;
+	padding:4px;
+}
+.left #calendar table.duedates-calendar li {
+	background:none repeat scroll 0 50% transparent;
+	color:#007DCD;
+	font-size:11px;
+	margin:2px 0 0 0;
+	padding:0 2px;
+	position:relative;
+}
+.left #calendar table.duedates-calendar ul {
+	line-height:1.5;
+	margin:0 0 2px;
+}
+span.wrapper a {
+	color:#FFF;
+}
+.due-dates-selection select {
+	float:right;
+}
+.due-dates-selection a.back {
+	background:url(/images/cal-prev.gif) no-repeat;
+	display:inline-block;
+	width:14px;
+	height:14px;
+	text-indent:-9999px;
+}
+.due-dates-selection form {
+	float:right;
+}
+.due-dates-selection a.forward {
+	background:url(/images/cal-forward.gif) no-repeat;
+	display:inline-block;
+	width:14px;
+	height:14px;
+	text-indent:-9999px;
+}
+.due-dates-selection a.back:hover, .due-dates-selection a.forward:hover {
+	background-position:bottom;
+}
+.due-dates-selection div {
+	float:left;
+	padding:10px 0 10px 0;
+	height:17px;
+}
+.due-dates-selection span {
+	margin:0 10px;
+	padding-left:25px;
+	background:url(/images/cal-icon.gif) no-repeat 3px 1px;
+	color:#557087;
+	font-weight:bold;
+}
+	

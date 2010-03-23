@@ -40,10 +40,10 @@ q:before, q:after {
 
 /* remember to highlight inserts somehow! */
 ins {
-	text-decoration: none;
+	text-decoration: none; color:#090;
 }
-del {
-	text-decoration: line-through;
+del, ul del, li del, del ol, del li    {
+	text-decoration: line-through; color:#F00;
 }
 
 /* tables still need 'cellspacing="0"' in the markup */
