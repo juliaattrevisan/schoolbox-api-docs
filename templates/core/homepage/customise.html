@@ -1,53 +1,72 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" type="text/css" href="/css/mooRainbow.css" />
-<script type="text/javascript" src="/javascript/mootools.js"></script>
-<script type="text/javascript" src="/javascript/mooRainbow.js"></script>
+<link rel="stylesheet" type="text/css" href="/javascript/farbtastic/farbtastic.css" />
+<script type="text/javascript" src="/javascript/farbtastic/farbtastic.js"></script>
 <script type="text/javascript">
 <!-- BEGIN colour_list -->
-var {COLOUR_ARRAY} = [
-	['left_head_font', '#{left_head_font}'],
-	['left_head_bg', '#{left_head_bg}'],
-	['left_font', '#{left_font}'],
-	['left_bg_primary', '#{left_bg_primary}'],
-	['left_bg_secondary', '#{left_bg_secondary}'],
-	['left_link', '#{left_link}'],
-	['left_hover', '#{left_hover}'],
+var {COLOUR_ARRAY} = {
+	'head_font'		: '#{left_head_font}',
+	'head_bg'		: '#{left_head_bg}',
+	'font'			: '#{left_font}',
+	'bg_primary'	: '#{left_bg_primary}',
+	'bg_secondary'	: '#{left_bg_secondary}',
+	'link'			: '#{left_link}',
+	'hover'			: '#{left_hover}',
 	
-	['right_head_font', '#{right_head_font}'],
-	['right_head_bg', '#{right_head_bg}'],
-	['right_font', '#{right_font}'],
-	['right_bg_primary', '#{right_bg_primary}'],
-	['right_bg_secondary', '#{right_bg_secondary}'],
-	['right_link', '#{right_link}'],
-	['right_hover', '#{right_hover}']
-];
+	'head_font_right'	: '#{right_head_font}',
+	'head_bg_right'	: '#{right_head_bg}',
+	'font_right'	: '#{right_font}',
+	'bg_primary_right'	: '#{right_bg_primary}',
+	'bg_secondary_right'	: '#{right_bg_secondary}',
+	'link_right'	: '#{right_link}',
+	'hover_right'	: '#{right_hover}'
+};
 <!-- END colour_list -->
 
-/*
-$j(document).ready(function () {
-	
-	$j('body').click(function () {
-		$j('#picker').hide();
-	});		
-	
-	var p = $j.farbtastic('#picker');
 
-	$j('#left_bg_primary_div, #left_bg_secondary_div').each(function () {
-		$j(this).click(function () {
-			var node = $j(this), left = $j(this).position().left + ($j(this).width()*2), top = $j(this).position().top;
-			
-			$j('#picker').css({top: top, left: left}).show();
-		
-			p.linkTo(function () {
-				node.css("background-color", p.color);
-				$j('#left_bg_primary_input').val(p.color)
-			});
-			
-			p.setColor($j('#left_bg_primary_input').val());	
-		});	
+$j(function () {
+
+	$j('div.colorBox').each(function () {
+		$j(this).css('backgroundColor', pickers[$j(this).attr('id')]);
+		$j(this).next().val(pickers[$j(this).attr('id')]);
 	});
-	*/
+	
 
+	var f = $j.farbtastic('#picker');
+	f.linkTo($j('#bg_primary').next().add($j('#bg_primary')).add($j('#currentColour')));
+	
+
+	$j('div.colorBox').click(function () {
+		$j('.selected').removeClass('selected');
+		f.linkTo($j(this).next().add(this).add($j('#currentColour')));
+		$j(this).next().next().addClass('selected');
+	});
+	
+	$j('div.colours p').click(function () {
+		$j(this).prev().prev().click();
+	});
+
+	$j("#loadDefaults").click(function () {
+		var colour;
+		$j('div.colorBox').each(function () {
+			colour = defaults[$j(this).attr('id')];
+			$j(this).css('backgroundColor', colour);
+			$j(this).next().val(colour);
+		});
+	});
+	
+	$j("#leftRight").click(function () {
+		var rightBox;
+		$j('div.leftColumn div.colorBox').each(function () {
+			rightBox = $j('#' + $j(this).attr('id') + '_right');
+			rightBox.css('backgroundColor', $j(this).css('backgroundColor'));
+			rightBox.next().val($j(this).next().val());
+		});
+		
+	});
+
+});
+
+/*
 window.addEvent('domready', function () {
 	for(i = 0; i < pickers.length; i++){
 	
@@ -88,7 +107,7 @@ window.addEvent('domready', function () {
 	
 });
 	
-
+*/
 
 function removeClasses() {
 	var x = $$('.layouts a');
@@ -105,19 +124,22 @@ function templateX(el) {
 	}
 </script>
 <style type="text/css">
-#picker {
-	background-color: #414141;
-	width: auto;
-	z-index: 10;
-	position: absolute;
-	left: 200px;
-	padding: 4px;
-	display: none;
-}
+
 .colorBox {
 	width: 15px;
 	height: 15px;
 	border: 1px solid #000;
+	cursor: pointer;
+}
+.selected {
+	font-weight: bold;
+}
+#currentColour {
+	text-align: center;
+	width: 200px;
+}
+div.colours p {
+	cursor: pointer;
 }
 </style>
 <!-- END custom_head -->
@@ -165,71 +187,75 @@ function templateX(el) {
 			<h2>Colours</h2>
 				<div class="text">
           
-          <div class="colours">
+          <div class="colours leftColumn">
       			<h3>Left Column</h3>
                       
-						<div id="left_bg_primary_div" class="colorBox"></div>
-						<input id="left_bg_primary_input" name="colors[left_bg_primary]" type="hidden" />
-            <p>Primary Background Color</p>
+						<div id="bg_primary" class="colorBox"></div>
+						<input name="colors[left_bg_primary]" type="hidden" />
+            <p class="selected">Primary Background Color</p>
             
-            <div id="left_bg_secondary_div" class="colorBox"></div>
-						<input id="left_bg_secondary_input" name="colors[left_bg_secondary]" type="hidden" />
+            <div id="bg_secondary" class="colorBox"></div>
+						<input name="colors[left_bg_secondary]" type="hidden" />
             <p>Secondary Background Color</p>
             
-            <div id="left_head_font_div" class="colorBox"></div>
-						<input id="left_head_font_input" name="colors[left_head_font]" type="hidden" />
+            <div id="head_font" class="colorBox"></div>
+						<input name="colors[left_head_font]" type="hidden" />
             <p>Heading Text Colour</p>
             
-            <div id="left_head_bg_div" class="colorBox"></div>
-						<input id="left_head_bg_input" name="colors[left_head_bg]" type="hidden" />
+            <div id="head_bg" class="colorBox"></div>
+						<input name="colors[left_head_bg]" type="hidden" />
             <p>Heading Background Colour</p>
             
-            <div id="left_font_div" class="colorBox"></div>
-						<input id="left_font_input" name="colors[left_font]" type="hidden" />
+            <div id="font" class="colorBox"></div>
+						<input name="colors[left_font]" type="hidden" />
             <p>Text Colour</p>
             
-            <div id="left_link_div" class="colorBox"></div>
-						<input id="left_link_input" name="colors[left_link]" type="hidden" />
+            <div id="link" class="colorBox"></div>
+						<input name="colors[left_link]" type="hidden" />
             <p>Link Colour</p>
             
-            <div id="left_hover_div" class="colorBox"></div>
-						<input id="left_hover_input" name="colors[left_hover]" type="hidden" />
+            <div id="hover" class="colorBox"></div>
+						<input name="colors[left_hover]" type="hidden" />
             <p>Link Hover Colour</p>
         	</div>
           
           <div class="colours">
       			<h3>Right Column</h3>
                       
-						<div id="right_bg_primary_div" class="colorBox"></div>
-						<input id="right_bg_primary_input" name="colors[right_bg_primary]" type="hidden" />
+						<div id="bg_primary_right" class="colorBox"></div>
+						<input name="colors[right_bg_primary]" type="hidden" />
             <p>Primary Background Color</p>
             
-            <div id="right_bg_secondary_div" class="colorBox"></div>
-						<input id="right_bg_secondary_input" name="colors[right_bg_secondary]" type="hidden" />
+            <div id="bg_secondary_right" class="colorBox"></div>
+						<input name="colors[right_bg_secondary]" type="hidden" />
             <p>Secondary Background Color</p>
             
-            <div id="right_head_font_div" class="colorBox"></div>
-						<input id="right_head_font_input" name="colors[right_head_font]" type="hidden" />
+            <div id="head_font_right" class="colorBox"></div>
+						<input name="colors[right_head_font]" type="hidden" />
             <p>Heading Text Colour</p>
             
-            <div id="right_head_bg_div" class="colorBox"></div>
-						<input id="right_head_bg_input" name="colors[right_head_bg]" type="hidden" />
+            <div id="head_bg_right" class="colorBox"></div>
+						<input name="colors[right_head_bg]" type="hidden" />
             <p>Heading Background Colour</p>
             
-            <div id="right_font_div" class="colorBox"></div>
-						<input id="right_font_input" name="colors[right_font]" type="hidden" />
+            <div id="font_right" class="colorBox"></div>
+						<input name="colors[right_font]" type="hidden" />
             <p>Text Colour</p>
             
-            <div id="right_link_div" class="colorBox"></div>
-						<input id="right_link_input" name="colors[right_link]" type="hidden" />
+            <div id="link_right" class="colorBox"></div>
+						<input name="colors[right_link]" type="hidden" />
             <p>Link Colour</p>
             
-            <div id="right_hover_div" class="colorBox"></div>
-						<input id="right_hover_input" name="colors[right_hover]" type="hidden" />
+            <div id="hover_right" class="colorBox"></div>
+						<input name="colors[right_hover]" type="hidden" />
             <p>Link Hover Colour</p>
         	</div>
           
-          <div id="picker"></div>
+          <div class="colours">
+            <div id="picker"></div>
+            <input type="text" id="currentColour" value="#123456" class="input_text" />
+          
+            </div>
           <div class="float-fix"></div>
           
           </div>
