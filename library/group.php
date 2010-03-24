@@ -165,10 +165,17 @@ class Group extends Model {
 	
 		// check individual access
 		
-		$query = "SELECT type FROM userAccess WHERE service IN (".$this->_service.",".CMS_SERVICE.") AND uid = ".$userID." ";
+		$query = "SELECT type FROM userAccess WHERE uid = ".$userID." AND ( ( service = ".$this->_service." ";
+		
 		if (in_array($this->_service, array(HOMEPAGE_SERVICE, CALENDAR_SERVICE)))
-			$query .= "AND sid = ".$relationID." OR ( sid = 0 AND service = ".CMS_SERVICE." ) ";
-		$query .= "ORDER BY `type` DESC LIMIT 1 ";
+			$query .= "AND sid = ".$relationID." ";
+		
+		$query .= " ) ";
+		
+		if ($this->_service == HOMEPAGE_SERVICE)
+			$query .= "OR service = ".CMS_SERVICE." ";
+			
+		$query .= ") ORDER BY `type` DESC LIMIT 1 ";
 		
 		$permission = $this->db->getOne($query);    
 		$permission = (int)$permission;       
