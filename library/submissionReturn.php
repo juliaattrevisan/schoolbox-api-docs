@@ -28,33 +28,21 @@ class SubmissionReturn extends Model {
 
     }
 
-    /* just call submissionStudent directly to update box
-    function workMarked($box_id, $sid)
-    {
-
-
-            $query = "UPDATE student_submission SET marked = '1' WHERE box_id = '$box_id' AND owner = '$sid'";
-            $this->db->query($query);
-    } */
-
-     /* Just call create
-    function returnWork($sid, $box_id, $comment, $mark)
-    {
-            //insert comment and mark
-            $query = "INSERT INTO submission_return (box_id, comment, mark, owner, returned, deleted)
-                            VALUES ('$box_id', '$comment', '$mark', '$sid', NOW(), '0' )";
-            $this->db->query($query);
-    }*/
-
     function create($return, $file = FALSE) {
         $return['filename'] = $file['realname'];
+        $return['returned'] = 'NOW()';
 
         $fileID = parent::create($return);
 
         if(is_array($file)) {
+
             $newFileName = $fileId . ".dat";
             move_uploaded_file($file, RETURNS_directory . "/" . $newFileName);
         }
+
+        //Update student submission to be marked
+        $this->db->update('student_submission', array('box_id','owner'), array('box_id'=>$return['box_id'], 'owner'=>$return['owner'], 'marked'=>'1'));
+
     }
 
 }

@@ -12,6 +12,13 @@ class Submission extends Model {
         parent::Model();
     }
 
+    function getByID($boxID) {
+        $query = "SELECT submission_box.*, category.code, category.name as categoryName
+                  FROM submission_box JOIN category ON submission_box.category = category.id
+                  WHERE submission_box.id = '$boxID'";
+        return $this->db->getRow($query);
+    }
+
     function getAllForCategory($categoryID, $config = false) {
             $query = "SELECT sb.id, sb.category, ft.name as typeName, sb.owner,
                               UNIX_TIMESTAMP(sb.open_date) AS open,
@@ -109,6 +116,8 @@ class Submission extends Model {
     function homepageClean($cid) {
             return $this->db->update($this->_table, 'category', array('category'=>$cid, 'deleted'=>1));
     }
-	
+
+
+
 }
 ?>
