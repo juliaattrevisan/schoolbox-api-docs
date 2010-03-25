@@ -266,7 +266,7 @@ class Event extends Model {
 		if (SYNERGY_enable) {
 			$query = "SELECT ID synergy_id, Title title, Given1 firstname, Surname lastname
 					  FROM SynergyOne.dbo.vCommunityAddressesConstit vCommunityAddressesConstit
-					  WHERE (vCommunityAddressesConstit.ConstitCode='TUTRES2009') OR (vCommunityAddressesConstit.ConstitCode='TUTNONRES2009')
+					  WHERE (vCommunityAddressesConstit.ConstitCode='TUTRES".date('Y')."') OR (vCommunityAddressesConstit.ConstitCode='TUTNONRES".date('Y')."')
 					  ORDER BY Surname, Given1";
 			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/mssql.php';
 			$mssql = new MSSQL;

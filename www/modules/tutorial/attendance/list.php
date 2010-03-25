@@ -31,7 +31,7 @@ if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)
 // pagination
 $week = $_GET['week'];
 if (!is_numeric($week))
-	$week = date("YW") - 1;
+	$week = date("YW");
 
 $output = array('WEEK_END'	=> date(DATE_short_no_time, strtotime("+".substr($week, 4)." week Saturday", strtotime("1st Jan"))),
 				'NEXT_WEEK'	=> $week+1,
