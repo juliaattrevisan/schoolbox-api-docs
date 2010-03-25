@@ -6,6 +6,9 @@ class XML {
     public $xml;
 
     function __construct ($url, $cache_time = 7200) {
+
+		libxml_use_internal_errors(true);
+		
         if(empty($url))
             return false;
 

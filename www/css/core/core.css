@@ -751,10 +751,7 @@ a.layout:hover img {
 	background-image: url(/images/icons/22x22/folder.png);
 	}
 .house {
-	background: url(/images/famicons/house.png) no-repeat 100% 50%;
-	float: right;
-	height: 16px;
-	width: 16px;
+	background-image: url(/images/famicons/house.png);
 	}
 td.small {
 	font-size: 80%;

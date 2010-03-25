@@ -14,14 +14,10 @@ if (is_array($folderList)) {
 			//set name
 			$output = array('FOLDER_ID'		=> $folder['id'],
 							'FOLDER_NAME'	=> scrubTEXT($folder['name']),
+							'FOLDER_ICON'	=> $folder['template']?'house':'folder_blue_full',
 							'ON_OFF'		=> ++$j%2? '' : 'dark',
 							);
 			$this->setVar($output);	
-			
-			if($folder['template'])
-				$this->parse('homepage_folder_block', 'homepage_folder');
-			else
-				$this->setVar('homepage_folder_block', '');
 			
 			if($permission >= WRITE_ACCESS)
 				$this->parse('modify_folder_block', 'modify_folder');
