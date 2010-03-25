@@ -12,11 +12,17 @@ $eventHandler = new Event;
 $userHandler = new User;
 $mssql = new MSSQL;
 
-$query = "SELECT * FROM ".TUTORIAL_db.".tutorialTemp";
+$query = "SELECT * FROM ".TUTORIAL_db.".tutorialTemp ";
 $eventList = $eventHandler->db->getAll($query);
 if (is_array($eventList)) {
 	foreach ($eventList as $event) {
 		
+		$date = strtotime($event['date'], mktime(0,0,0,3,15,2010));
+		
+		if ($date < 86400) {
+			print "{$event['name']} - invalid date\n";
+			continue;
+		}
 		
 		$start = strtotime($event['date'] . ' pm');
 		
@@ -44,19 +50,61 @@ if (is_array($eventList)) {
 		if ($event['tutor'] == 'Dirk Den Hartog')
 			$tutor['synergy_id'] = 20252;
 		elseif ($event['tutor'] == 'David Jones')
-			$tutor['synergy_id'] = 3596;
+			$tutor['synergy_id'] = 1008;
 		elseif ($event['tutor'] == 'Jeremy Rosen')
 			$tutor['synergy_id'] = 20072;	
+		elseif ($event['tutor'] == 'Ben Dowdle')
+			$tutor['synergy_id'] = 10691;	
+		elseif ($event['tutor'] == 'Bei En Zou')
+			$tutor['synergy_id'] = 21191;
+		elseif ($event['tutor'] == 'Ben Bowring')
+			$tutor['synergy_id'] = 19276;
+		elseif ($event['tutor'] == 'Alex Henry')
+			continue; //$tutor['synergy_id'] = 21132;
+		elseif ($event['tutor'] == 'Zac Haines')
+			$tutor['synergy_id'] = 10767;
+		elseif ($event['tutor'] == 'Alex Kline')
+			$tutor['synergy_id'] = 9943;
+		elseif ($event['tutor'] == 'Ed Yencken')
+			$tutor['synergy_id'] = 19565;
+		elseif ($event['tutor'] == 'Chris Wareham')
+			$tutor['synergy_id'] = 21532;
+		elseif ($event['tutor'] == 'Tim McEvoy')
+			$tutor['synergy_id'] = 8274;	
+		elseif ($event['tutor'] == 'Tom Graham')
+			$tutor['synergy_id'] = 9285;
+		elseif ($event['tutor'] == 'Nik Parkin')
+			$tutor['synergy_id'] = 24358;
+		elseif ($event['tutor'] == 'Ghazi Ahamat')
+			continue; //$tutor['synergy_id'] = 19600;
+		elseif ($event['tutor'] == 'Jess Corbett')
+			$tutor['synergy_id'] = 19150;
+		elseif ($event['tutor'] == 'Katie Keene')
+			$tutor['synergy_id'] = 10643;
+		elseif ($event['tutor'] == 'Alan Horsfall')
+			$tutor['synergy_id'] = 7719;
+		elseif ($event['tutor'] == 'Kate York')
+			$tutor['synergy_id'] = 24356;
+		elseif ($event['tutor'] == 'Namrata Jhummon-Mahadnac')
+			$tutor['synergy_id'] = 20596;
+		elseif ($event['tutor'] == 'Tom Milburn')
+			$tutor['synergy_id'] = 20395;
+		elseif ($event['tutor'] == 'Mayucca Pandithage')
+			$tutor['synergy_id'] = 10683;
+		elseif ($event['tutor'] == 'TBA')
+			$tutor['synergy_id'] = 0;
 			
 		if (!isset($tutor['synergy_id'])) {
 			print $event['tutor']."\n"; //die("{$event['tutor']} not in synergy");
 			continue;
 		}
 		
-		$user = $userHandler->getBySynergy($tutor['synergy_id']);
-		if (!isset($user['uid'])) {
-			print "{$event['tutor']} ({$tutor['synergy_id']}) not in user table\n"; //die("{$event['tutor']} ({$tutor['synergy_id']}) not in user table");
-			continue;
+		if ($tutor['synergy_id'] > 0) {
+			$user = $userHandler->getBySynergy($tutor['synergy_id']);
+			if (!isset($user['uid'])) {
+				print "{$event['tutor']} ({$tutor['synergy_id']}) not in user table\n"; //die("{$event['tutor']} ({$tutor['synergy_id']}) not in user table");
+				continue;
+			}
 		}
 		
 		$data = array('typeID'		=> 1,
@@ -70,16 +118,20 @@ if (is_array($eventList)) {
 					  );
 		
 		// calculate date sequence
-		$date = strtotime($event['date'], mktime(0,0,0,3,15,2010));
+		
 
 		$dateArray = array();
-		$until = mktime(0,0,0,6,10,2010);						   
+		$until = mktime(12,0,0,6,10,2010);						   
 		$validRepeat = array('weekly' => '+1 week', 'fortnightly' => '+2 weeks', 'monthly' => '+1 month');
 		$repeat = 'weekly';
 		if (isset($validRepeat[$repeat]) && $until) {
 			$i = 0;
 			for ($date; $date <= $until; $date = strtotime($validRepeat[$repeat], $date)) {
 				if ($i++ > 100) break;
+				
+				/* skip mid semester break */
+				if ($date >= strtotime('2010-04-02 10am') && $date <= strtotime('2010-04-11 2pm'))
+					continue;
 					
 				$dateArray[] = date("Y-m-d", $date);
 			}		
@@ -95,14 +147,14 @@ if (is_array($eventList)) {
 		
 			$data['date'] = $dateArray[$i];
 		
-		/*	// check event doesnt exist
+			// check event doesnt exist
 			$query = "SELECT * FROM ".TUTORIAL_db.".`event` WHERE classID = " . $data['classID'] . " AND `date` = '".$data['date']."'";
 			$current = $eventHandler->db->getRow($query);
-			if (!isset($current['eventID'])) {*/
-				$eventID = $eventHandler->create($data);
+			if (!isset($current['eventID'])) {
+				//$eventID = $eventHandler->create($data);
 				print_r($data);
-			//} else
-			//	print "skipped {$data['code']} - {$data['name']} on {$data['date']}\n";
+			} else
+				print "skipped {$data['code']} - {$data['name']} on {$data['date']}\n";
 		}
 		
 	}
