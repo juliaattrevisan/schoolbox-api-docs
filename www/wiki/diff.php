@@ -70,7 +70,7 @@ if (is_numeric($this->arg[0])) {
 
 			if($revision['revisionID']==$from['revisionID'])
 				$output['REVISION_CURRENT'] = 'revisionCurrent';
-			if($revision['revisionID']==$to['revisionID'])
+			else if($revision['revisionID']==$to['revisionID'])
 				$output['REVISION_CURRENT'] = 'revisionCompare';
 			else
 				$output['REVISION_CURRENT'] = '';
