@@ -424,6 +424,22 @@ h2 {
 h2 span {
 	font-weight: normal;
 	}
+
+/*--------------------------------------------------------------
+ Revision Styles 
+--------------------------------------------------------------*/
+.left .revision-box {
+	border:1px solid #C3CDD7;
+	padding:10px;
+}
+.revisionCompare {
+	background-color:#DBE7F2;
+}
+.revisionCurrent {
+	background-color:#DBE7F2;
+	font-weight:bold;
+}
+	
 /*----------------------------
 	Timetable
 -----------------------------*/
