@@ -25,11 +25,12 @@ $colour = array('#ff0000',
 
 if (is_array($pollData)) {
 	$i = 0;
+	$a = 'A';
 	foreach ($pollData as $data) {
-		$output = array('OPTION'	=> htmlspecialchars($data['option']),
-						'OPTION_SHORT'	=> htmlspecialchars(substr($data['option'], 0, 15)) . " ",
-						'VALUE'		=> htmlspecialchars($data['result']),
-						'COLOUR'	=> $colour[$i],
+		$output = array('OPTION'		=> htmlspecialchars($data['option']),
+						'OPTION_SHORT'	=> $a++,
+						'VALUE'			=> htmlspecialchars($data['result']),
+						'COLOUR'		=> $colour[$i],
 						);
 		$i++;
 		$page->setVar($output);

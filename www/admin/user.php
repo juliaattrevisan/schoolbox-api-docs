@@ -204,7 +204,8 @@ class user
 		{
 			foreach($campusarray as $campus)
 			{
-				$campusquery = "INSERT INTO userCampus (uid, campus) VALUES ('$id', '$campus')";
+				$defaultCampus = $campus == $_POST['defaultCampus'] ? 1 : 0;
+				$campusquery = "INSERT INTO userCampus (uid, campus, defaultCampus) VALUES ('$id', '$campus', '$defaultCampus')";
 				$this->db->query($campusquery);
 			}
 		}
@@ -287,7 +288,7 @@ class user
 	function getUserCampus($id)
 	{
 		//return a list of campuses that the user is involved in
-		$query = "SELECT id, name FROM luCampus, userCampus WHERE userCampus.campus = luCampus.id AND userCampus.uid = '$id'";
+		$query = "SELECT id, name, defaultCampus FROM luCampus, userCampus WHERE userCampus.campus = luCampus.id AND userCampus.uid = '$id' ORDER BY defaultCampus DESC";
 		return $this->db->getAll($query);
 	} 
 

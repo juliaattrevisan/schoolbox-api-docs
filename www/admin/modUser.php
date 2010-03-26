@@ -134,12 +134,14 @@ class modUser
 		$campusListHTML = "";
 		$query = "SELECT * FROM luCampus WHERE id != '".ALLCAMPUS."' ORDER BY name";
 		$this->db->query($query);
+		
 		while($line = $this->db->getNextArray() )
 		{
-			if($this->isInCampus($userCampus, $line['id']))
-				$campusListHTML .= "<input type=\"checkbox\" name=\"campus[]\" value=\"".$line['id']."\" checked> ".$line['name']."<br>";	
-			else
-				$campusListHTML .= "<input type=\"checkbox\" name=\"campus[]\" value=\"".$line['id']."\"> ".$line['name']."<br>";	
+			$checked = $this->isInCampus($userCampus, $line['id']) ? 'checked="checked"' : '';
+			$default = $this->isDefaultCampus($userCampus, $line['id']) ? 'checked="checked"' : '';
+			
+			$campusListHTML .= "<input type=\"radio\" name=\"defaultCampus\" value=\"".$line['id']."\" $default />".
+							   "<input type=\"checkbox\" name=\"campus[]\" value=\"".$line['id']."\" $checked /> ".$line['name']."<br>";	
 		}
 		return $campusListHTML;
 	}
@@ -172,7 +174,20 @@ class modUser
 		}
 		return 0;
 	}
-
+	
+	function isDefaultCampus($userCampus, $campus)
+	{
+		if(is_array($userCampus))
+		{
+			foreach($userCampus as $uCamp)
+			{
+				if($uCamp['id'] == $campus && $uCamp['defaultCampus'] == 1)
+					return 1;
+			}
+		}
+		return 0;
+	}
+	
 	function displayUserGroups($id)
 	{
 		$this->t_body->set_block("tplBODY", "groups", "group_section");

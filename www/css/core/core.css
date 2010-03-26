@@ -741,6 +741,13 @@ a.layout:hover img {
 .text.poll {
 	text-align: center;
 	}
+.text.poll ol {
+	text-align: left;
+}
+.text.poll li {
+	list-style-type: upper-alpha;
+	margin-bottom: 0.5em;
+}
 .icons {
 	padding: 3px 0 3px 30px;
 	display: block;

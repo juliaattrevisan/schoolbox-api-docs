@@ -7,6 +7,7 @@ $this->setBlock($componentHandle, "poll_vote", "poll_vote_block");
 $this->setBlock("poll_vote", "poll_options", "poll_options_block");
 $this->setBlock($componentHandle, "show_results", "show_results_block");
 $this->setBlock($componentHandle, "poll_chart", "poll_chart_block");
+$this->setBlock('poll_chart', "poll_answers", "poll_answers_block");
 $this->setJavascript('/javascript/fusion.js');
 
 require_once '../library/poll.php';
@@ -31,7 +32,24 @@ if ($poll['pollID']) {
 		
 		$this->setVar('POLL_HEIGHT', count($pollData) * 30 + 70);
 		$this->setVar("poll_vote_block", "");
+		
+		if (is_array($pollData)) {
+			$i = 0;
+			foreach ($pollData as $data) {
+			
+				$output = array('POLL_OPTION_INDEX'	=> $i,
+								'POLL_OPTION'		=> scrubText($data['option']),
+								'POLL_ON_OFF'		=> $i % 2 ? 'polloff':'',
+								);
+				$i++;
+				$this->setVar($output);
+				$this->parse("poll_answers_block", "poll_answers", true);
+				
+			}
+		}		
+		
 		$this->parse("poll_chart_block", "poll_chart");
+		
 	}
 	else {
 	
