@@ -63,6 +63,14 @@ $j(function () {
 		});
 		
 	});
+	
+
+	$j('.layouts a').click(function () {
+		$j('#template-choice').val( $j(this).attr('title') );
+		$j('.layouts a.current').removeClass('current');
+		$j(this).addClass('current');		
+		
+	});	
 
 });
 
@@ -109,19 +117,7 @@ window.addEvent('domready', function () {
 	
 */
 
-function removeClasses() {
-	var x = $$('.layouts a');
-	x.each(function(l){
-		l.removeClass('current');
-	});
-	}
 
-function templateX(el) {
-	var temp = $('template-choice');
-	temp.setAttribute('value', el.getAttribute('title'));
-	removeClasses();
-	el.addClass('current');		
-	}
 </script>
 <style type="text/css">
 
@@ -155,10 +151,10 @@ div.colours p {
       <div class="box grey">
         <h2>Layout</h2>
         <div class="text layouts">
-          <a onclick="templateX(this);" class="layout {CURRENT_1}" title="1" href="#"><img src="/images/70-30.gif" />70-30</a>
-          <a onclick="templateX(this);" class="layout {CURRENT_2}" title="2" href="#"><img src="/images/50-50.gif" />50-50</a>         
-          <a onclick="templateX(this);" class="layout {CURRENT_4}" title="4" href="#"><img src="/images/30-70.gif" />30-70</a>
-          <a onclick="templateX(this);" class="layout {CURRENT_3}" title="3" href="#"><img src="/images/100-0.gif" />100-0</a>
+          <a class="layout {CURRENT_1}" title="1" href="#"><img src="/images/70-30.gif" />70-30</a>
+          <a class="layout {CURRENT_2}" title="2" href="#"><img src="/images/50-50.gif" />50-50</a>         
+          <a class="layout {CURRENT_4}" title="4" href="#"><img src="/images/30-70.gif" />30-70</a>
+          <a class="layout {CURRENT_3}" title="3" href="#"><img src="/images/100-0.gif" />100-0</a>
           <div class="float-fix"></div>
         </div>
       </div>

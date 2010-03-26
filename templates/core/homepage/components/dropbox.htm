@@ -2,8 +2,14 @@
   <h2>Drop Box</h2>
   <div class="text listing">
   <!-- BEGIN drop_student -->
+
   <form action="/subject/modDropBox.php" method="post" enctype="multipart/form-data" class="dropBox" >
-   <fieldset>
+    <!-- BEGIN drop_success -->
+    <fieldset>
+    <p class="icons success">File upload completed successfully.</p>
+    </fieldset>
+    <!-- END drop_success -->    
+    <fieldset>
    	<h3>Description</h3>
     <input name="description" type="text" /><input type="hidden" name="category" value="{ID}" />
     </fieldset>

@@ -760,6 +760,10 @@ a.layout:hover img {
 .house {
 	background-image: url(/images/famicons/house.png);
 	}
+.success {
+	background-image: url(/images/famicons/accept.png);
+	background-position: 4px 3px;
+	}
 td.small {
 	font-size: 80%;
 	}

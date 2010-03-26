@@ -1,10 +1,18 @@
 <?php
 //output drop box
 $this->setBlock($componentHandle, "drop_student", "drop_student_block");
+$this->setBlock('drop_student', "drop_success", "drop_success_block");
 $this->setBlock($componentHandle, "drop_staff", "drop_staff_block");
 $this->setBlock('drop_staff', 'drop_file', 'drop_file_block');
 
 if ($permission < WRITE_ACCESS) {
+	
+	$this->setVar('drop_success_block', '');
+	if ($_SESSION['dropSuccess']) {
+		$this->parse('drop_success_block', 'drop_success', true);
+		unset($_SESSION['dropSuccess']);
+	}
+	
 	$this->parse('drop_student_block', 'drop_student');
 	$this->setVar('drop_staff_block', '');
 }
