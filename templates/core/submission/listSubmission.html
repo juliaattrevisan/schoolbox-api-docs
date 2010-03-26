@@ -7,7 +7,6 @@
 
 <h1>Student Submissions Boxes</h1>
 <div class="indent">
-    <p>You currently have the following Submission boxes available.</p>
     <table class="ruler">
         <!-- BEGIN category_block -->
         <thead>
@@ -27,13 +26,13 @@
         <tbody>
             <!-- BEGIN submission_block -->
             <tr>
-                <td><a href="/submission/viewSubmission.php?box_id={ID}">{ASSDESC}</a></td>
+                <td><a href="/submission/viewSubmission/{ID}">{ASSDESC}</a></td>
                 <td>{TYPE}</td>
-                <td><a href="/submission/createSubmission.php?sid={ID}">{OPENDATE}</a></td>
-                <td><a href="/submission/createSubmission.php?sid={ID}">{DUEDATE}</a></td>
+                <td><a href="/submission/createSubmission/modify/{ID}">{OPENDATE}</a></td>
+                <td><a href="/submission/createSubmission/modify/{ID}">{DUEDATE}</a></td>
                 <td class="cntr">{MARKED}</td>
                 <td class="cntr">{TOTAL}</td>
-                <td class="cntr"><a href="/submission/listSubmission.php?delete={ID}" onclick="return(confirm('Remove {JAVAASSDESC}?'));">delete</a></td>
+                <td class="cntr"><a href="/submission/submissionForm.php?deleteBox={ID}" onclick="return(confirm('Remove {JAVAASSDESC}?'));">delete</a></td>
             </tr>
             <!-- END submission_block -->
         </tbody>

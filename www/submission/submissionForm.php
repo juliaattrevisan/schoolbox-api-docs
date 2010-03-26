@@ -2,6 +2,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionStudent.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/include/time.php';
 
 
 $subBoxHandler = new Submission;
@@ -44,7 +45,7 @@ if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['la
     );
     $subBoxHandler->update($subbox);
 
-    localRedir("/submission/listSubmission.php");
+    localRedir("/submission/listSubmission/");
 }
 else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour']) {
     
@@ -105,7 +106,7 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
     );
     $subBoxHandler->create($subbox);
 
-    localRedir("/submission/listSubmission.php");
+    localRedir("/submission/listSubmission/");
 
 }
 else if(isset($_GET['deleteBox']) && is_numeric($_GET['deleteBox'])) {

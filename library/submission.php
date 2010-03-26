@@ -1,6 +1,6 @@
 <?php
 
-require_once '../include/model.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
 
 class Submission extends Model {
 
@@ -63,7 +63,7 @@ class Submission extends Model {
 
     function getAllForUser($userID) {
 
-        $listquery = "SELECT submission_box.id, submission_box.description, category.id as catid, GROUP_CONCAT(co.code) code, category.name,
+        $query = "SELECT submission_box.id, submission_box.description, category.id as catid, GROUP_CONCAT(co.code) code, category.name,
                         DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date, DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date,
                         submission_box.type, file_type.name as type
                     FROM (category, submission_box )
@@ -79,8 +79,14 @@ class Submission extends Model {
     }
 
     function getBoxCount($box_id) {
-         $totalquery = "SELECT COUNT(*) AS total, SUM(marked) AS marked FROM student_submission WHERE box_id = '".$box_id."'";
+         $query = "SELECT COUNT(*) AS total, SUM(marked) AS marked FROM student_submission WHERE box_id = '".$box_id."'";
          return $this->db->getRow($query);
+    }
+
+    function getTypes(){
+        $query = "SELECT * FROM file_type";
+        return $this->db->getAll($query);
+        
     }
 
     function logPageView($box_id)

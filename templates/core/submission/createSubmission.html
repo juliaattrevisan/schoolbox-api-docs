@@ -6,7 +6,7 @@
 <!-- END custom_head -->
 
 <h1>{HEADING} Submission Box</h1>
-<form action="" method="post" name="form" id="form" class="standardForm" enctype="multipart/form-data">
+<form action="/submission/submissionForm.php" method="post" name="form" id="form" class="standardForm" enctype="multipart/form-data">
     <table>
         <tr>
             <td class="formLabelWidth"><h2>Title</h2></td>
@@ -29,13 +29,17 @@
         <tr>
             <td><h2>Type</h2>
                 <em>What is the purpose of this submission box?</em></td>
-            <td>{TYPELIST}</td>
+            <td><select name="type" class="formfield">
+                    <!-- BEGIN type_drop -->
+                    <option value="{TYPE_VALUE}">{TYPE_TEXT}</option>
+                    <!-- END type_drop -->
+                </select></td>
         </tr>
         <tr>
             <td class="formLabelWidth"><h2>Open Date</h2>
                 <em>The date from when the submission box will be available for submission.  To make the box never available but have the date published, set this date to after the due date.</em></td>
             <td><input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20" />
-                <img src="../images/ico_calendar.gif" width="16" height="13" id="open_trigger" style="cursor: pointer;" title="Date selector"/>
+                <img src="/images/ico_calendar.gif" width="16" height="13" id="open_trigger" style="cursor: pointer;" title="Date selector"/>
                 <script type="text/javascript">
                     Calendar.setup({
                         inputField     :    "open_date",
@@ -59,7 +63,7 @@
             <td><h2>Due Date</h2>
                 <em>Actual date the work is due. This is the date that will be published.</em> </td>
             <td><input name="due_date" id="due_date" type="text" value="{DUE_DATE}" size="20" />
-                <img src="../images/ico_calendar.gif" width="16" height="13" id="due_trigger" style="cursor: pointer;" title="Date selector"/>
+                <img src="/images/ico_calendar.gif" width="16" height="13" id="due_trigger" style="cursor: pointer;" title="Date selector"/>
                 <script type="text/javascript">
                     Calendar.setup({
                         inputField     :    "due_date",     // id of the input field
@@ -83,7 +87,7 @@
             <td><h2>Late Date</h2>
                 <em>Students will not be able to submit after this date</em></td>
             <td><input name="late_date" id="late_date" type="text" value="{LATE_DATE}" size="20" />
-                <img src="../images/ico_calendar.gif" width="16" height="13" id="late_trigger" style="cursor: pointer;" title="Date selector"/>
+                <img src="/images/ico_calendar.gif" width="16" height="13" id="late_trigger" style="cursor: pointer;" title="Date selector"/>
                 <script type="text/javascript">
                     Calendar.setup({
                         inputField     :    "late_date",     // id of the input field

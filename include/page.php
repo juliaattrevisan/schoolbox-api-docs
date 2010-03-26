@@ -64,19 +64,25 @@ class Page {
 		$this->template->setFile($handle, $file);
 	}
 	
-	function dropDown($handle, $data, $selected='', $template = TEMPLATE_content) {
-		$this->setBlock($template, $handle, $handle.'_block');
-		
-		foreach($data as $row) {
-			foreach($row as $key => $value) {
-				$this->setVar($key, $value);
-				if($value == $selected)
-					$this->setVar($key.'_SELECTED', 'selected="selected"');
-				else
-					$this->setVar($key.'_SELECTED', '');
+        function dropDown($handle, $data, $selected='', $mapping='', $template=TEMPLATE_content) {
+                $this->setBlock($template, $handle, $handle.'_block');
+		$this->setVar($handle.'_block', '');
+		if(is_array($data)) {
+			foreach($data as $row) {
+				foreach($row as $key => $value) {
+					$mapping[$key]?$key=$mapping[$key]:'';
+					$this->setVar($key, scrubText($value));
+					if($value == $selected)
+						$this->setVar($key.'_SELECTED', 'selected="selected"');
+					else
+						$this->setVar($key.'_SELECTED', '');
+				}
+				$this->parse($handle.'_block', $handle, true);
 			}
-			$this->parse($handle.'_block', $handle, true); 
 		}
+		else
+			$this->setVar($handle.'_block', '');
+
 	}
 
 	function outputPage() {		

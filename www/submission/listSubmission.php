@@ -2,12 +2,10 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 
-$this->set_file(TEMPLATE_content, 'submission/listSubmission.html');
+$this->setFile(TEMPLATE_content, 'submission/listSubmission.html');
 $this->setTitle('List of Submission Boxes');
 $this->setBlock(TEMPLATE_content, 'submission_block', 'submission_listing');
 $this->setBlock(TEMPLATE_content, 'category_block', 'category_listing');
-
-
 
 $submissionHandler = new Submission;
 $subList = $submissionHandler->getAllForUser($_SESSION['id']);
@@ -44,6 +42,8 @@ if(is_array($subList))
         $this->setVar($output);
         $this->parse('submission_listing','submission_block',true);
 
+        $prevCat = $sub;
+
     }
 
     if($prevCat['code'] != "")
@@ -51,9 +51,11 @@ if(is_array($subList))
     else
         $this->setVar("CATEGORY", $prevCat['name']);
 
-    $this->t_body->parse("category_listing", "category_block", true);
+    $this->parse("category_listing", "category_block", true);
 
 }
+else
+    $this->setVar('cateogory_listing','')
 
 
 /*

@@ -1,5 +1,5 @@
 <?php
-require_once '../include/model.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
 require_once dirname(__FILE__) . '/group.php';
 
 class SubmissionStudent extends Model {

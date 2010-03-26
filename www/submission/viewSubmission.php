@@ -4,8 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionStudent.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 
-
-if(isset($_GET['box_id']) && is_numeric($_GET['box_id'])) {
+if(is_numeric($this->arg[0])) {
 
     $this->setFile(TEMPLATE_content, 'submission/viewSubmission.html');
     $this->setTitle('Submission Box');
@@ -15,26 +14,26 @@ if(isset($_GET['box_id']) && is_numeric($_GET['box_id'])) {
     $submissionHandler = new Submission;
     $studentSubHandler = new SubmissionStudent;
 
-    $subBox = $submissionHandler->getByID($_GET['box_id']);
+    $subBox = $submissionHandler->getByID($this->arg[0]);
 
     if($subBox['owner'] != $_SESSION['id'] ) {
         error(17);
     }
 
-    $submissionHandler->logPageView($_GET['box_id']);
+    $submissionHandler->logPageView($this->arg[0]);
 
     $this->setVar('ASSDESC', scrubTEXT($subBox['name'])." - ".scrubTEXT($subBox['description']));
 
     /* Get full student list of class to show those who have not submitted */
     if($subBox['code'] && SYNERGY_enable) {
-        require_once dirname(__FILE__) . '/synergetic-class.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/synergetic-class.php';
         //if synergy code get synergy students
         $synHandler = new SynergeticClass();
         $studentList = $synHandler->getStudents($subBox['code']);
     }
     else {
         //Retrieve student list from group membership
-        require_once dirname(__FILE__) . '/group.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
         $groupHandler = new Group;
         $studentList = $groupHandler->getMemberList($subBox['category']);
     }
@@ -46,9 +45,9 @@ if(isset($_GET['box_id']) && is_numeric($_GET['box_id'])) {
         foreach($studentList as $student) {
 
             if($student['uid'])
-                $studentSub = $studentSubHandler->getByUserID($_GET['box_id'], $student['uid']);
+                $studentSub = $studentSubHandler->getByUserID($this->arg[0], $student['uid']);
             else if($student['synergy_id'])
-                $studentSub = $studentSubHandler->getBySynergyID($_GET['box_id'], $student['synergy_id']);
+                $studentSub = $studentSubHandler->getBySynergyID($this->arg[0], $student['synergy_id']);
             else
                 continue;
 
@@ -94,7 +93,7 @@ if(isset($_GET['box_id']) && is_numeric($_GET['box_id'])) {
     }
     else {
 
-        $submissionList = $studentSubHandler->getByBoxID($_GET['box_id']);
+        $submissionList = $studentSubHandler->getByBoxID($this->arg[0]);
 
         if(is_array($submissionList)) {
             foreach($submissionList as $line) {
