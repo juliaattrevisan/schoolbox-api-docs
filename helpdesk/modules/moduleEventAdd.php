@@ -145,6 +145,23 @@ class ModuleEventAdd extends HelpDeskPage {
 		if( $row[ 'equipmentID'] <> '') {
 			switch($details[ 'eventTypeID']) {
 
+			case DB_ID_EVENT_DEALER_BOOKED : //If booked with dealer, email dealer to notify
+				$r1 = mysql_query( SQL_dealerContacts($row['dealerID']), $link);
+				$dealerContact = mysql_fetch_array( $r1);
+
+				emailResponse($dealerContact['email'],
+							'Notebook booked for service at Melbourne Grammar',
+						"<p>A notebook has been booked for service at Melbourne Grammar<br /><br />.
+						Job ID : {$row['jobID']}<br />
+						Serial No.: {$row['equipmentSerial']}<br />
+						Owner: {$row['equipmentOwnerName']}<br />
+						Campus: {$row['campus']}<br />
+						 Problem : {$row['problem']}<br />
+						 Description : {$row['description']}<br />
+						 Contact :  {$row['assignedUser']}<br /><br />
+						You can view further information on the <a href=\"http://".$_SERVER['HTTP_HOST'] .
+						dirname( $_SERVER['PHP_SELF']) . "/jobDetails.php?jobID=".$row['jobID']."\">MGS Helpdesk Website</a>");
+				
 			case DB_ID_EVENT_REIMAGE :
 				//update the reimaged date field for the equipment
 				$moduleEquipmentEdit = new ModuleEquipmentEdit( $row[ 'equipmentID']);

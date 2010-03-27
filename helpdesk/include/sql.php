@@ -443,6 +443,11 @@ function SQL_dealerList(&$parms)
 	return $sql;
 }
 
+function SQL_dealerContacts($dealerID) {
+	$sql = "SELECT * FROM tblDealerContact WHERE dealerID = '$dealerID'";
+	return $sql;
+}
+
 	# SQL to search on a user, given just one term
 function SQL_userListOneTerm( $searchTerm) 
 {
@@ -543,6 +548,7 @@ function SQL_jobDetails( $jobID) {
 			equipOwner.id equipmentOwnerPortalID,
 			e.userNonSynergy as equipmentUserNonSynergy,
 			e.userID as equipmentUserSynergyID,
+			e.dealerID,
 			job.assignedUserID,
 			concat(assignedUser.firstname, ' ', assignedUser.lastname) as assignedUser,
 			assignedUser.username as assignedUsername,
@@ -768,7 +774,7 @@ function SQL_equipmentUpdate( &$parms) {
 	$sql = substr( $sql, 0, strlen( $sql) - 2);
 
 	$sql.=' where equipmentID=' . sql_escape( $parms[ 'equipmentID']);
-	
+
 	return $sql;
 }
 
