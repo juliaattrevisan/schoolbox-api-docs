@@ -162,19 +162,19 @@ define('GROUP_can_change_password', serialize(array(1,2,3,4,5)));
 
 define('HOMEPAGE_colors', serialize(array(
 	'left_head_font' => 'ffffff', 
-	'left_head_bg' => '3a7e8e', 
+	'left_head_bg' => '245398', 
 	'left_font' => '2c2c2c', 
-	'left_bg_primary' => 'f4f4f4', 
-	'left_bg_secondary' => 'e9e9e9', 
-	'left_link' => '003e7e', 
-	'left_hover' => '988753', 
+	'left_bg_primary' => 'ffffff', 
+	'left_bg_secondary' => 'f1f7fa', 
+	'left_link' => '255297', 
+	'left_hover' => 'ebab00', 
 	'right_head_font' => 'ffffff', 
-	'right_head_bg' => '3a7e8e', 
+	'right_head_bg' => '245398', 
 	'right_font' => '2c2c2c', 
-	'right_bg_primary' => 'f4f4f4', 
-	'right_bg_secondary' => 'e9e9e9', 
-	'right_link' => '003e7e', 
-	'right_hover' => '988753', 
+	'right_bg_primary' => 'ffffff', 
+	'right_bg_secondary' => 'f1f7fa', 
+	'right_link' => '255297', 
+	'right_hover' => 'ebab00', 
 	
 )));
 
