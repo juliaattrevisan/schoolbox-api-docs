@@ -102,7 +102,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 		$class = array();
 		
 		// icon
-		$class[] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "txt";
+		$class[] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
 	
 		$output = array('FILE_ID' 	 	=> $file['id'],
 						'TYPE'			=> 'file',

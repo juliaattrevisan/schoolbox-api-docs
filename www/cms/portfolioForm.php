@@ -59,7 +59,7 @@ elseif (is_numeric($_POST['categoryID'])) {
 							  'category'	=> $file['category'],
 							  'modified'	=> outputDate(DATE_short_format, $file['submitted']),
 							  'size'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
-							  'icon'		=> !empty($file['iconFile']) && WEBDAV_on ? $allowedFiles->getClass($file["iconFile"]) : "txt",
+							  'icon'		=> !empty($file['iconFile']) && WEBDAV_on ? $allowedFiles->getClass($file["iconFile"]) : "textfile",
 							  );
 		}
 	}

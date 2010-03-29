@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 

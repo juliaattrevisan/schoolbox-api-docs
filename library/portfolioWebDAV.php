@@ -4,13 +4,14 @@
 set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . '/../include/PEAR');
 require_once 'HTTP/WebDAV/Client.php';
 
+ini_set('display_errors', 1);
 
 /**
  * Rubbish library is inadequate and requires modifications
  */
 class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
-	
-	/**
+
+    /**
 	 * Overwrite to request all property information on files
 	 * and to remove basename() filter
 	 */
@@ -40,32 +41,41 @@ class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
         $req->addRawPostData('<?xml version="1.0" encoding="utf-8"?>
 <propfind xmlns="DAV:">
  <prop>
-
+  <resourcetype/>
+  <getcontentlength/>
+  <getlastmodified />
+  <creationdate/>
  </prop>
 </propfind>
 ');
         $req->sendRequest();
 
-
-        switch ($req->getResponseCode()) {
+		switch ($req->getResponseCode()) {
         case 207: // multistatus content
             $this->dirfiles = array();
             $this->dirpos = 0;
 
-            // for all returned resource entries
-            foreach (split("\n", $req->getResponseBody()) as $line) {
-                // get the href URL
-                if (ereg("href>([^<]*)", $line, $matches)) {
-                    // skip the directory itself
-                    if ($matches[1] == $this->path) {
-                        continue;
-                    }
-
-                    // remember the path, return them later with readdir()
-                    $this->dirfiles[] = $matches[1]; // basename($matches[1]);
+			if (preg_match_all('/href>([^<]+)/',  $req->getResponseBody(), $matches, PREG_SET_ORDER)) {
+			
+				// for all returned resource entries
+				foreach ($matches as $match) {
+					
+					// get the href URL
+					$url = parse_url($match[1]);
+					
+					// skip the directory itself
+					if ($url['path'] == $this->path) {
+						continue;
+					}
+					
+					// remember the path, return them later with readdir()
+					
+					$this->dirfiles[] = $url['path']; // basename($matches[1]);
+					
+				}	
 				
-                }
-            }
+			}
+			
             return true;
 
         default:
@@ -89,12 +99,10 @@ class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
         if (is_string($this->user)) {
             $req->setBasicAuth($this->user, @$this->pass);          
         }
+		
         $req->sendRequest();
 		if ($req->getResponseCode() != 200) {
-            print $req->getResponseBody();
-			die();
-			
-			return false;
+            return false;
         }
 
         // get the supported DAV levels and extensions
@@ -120,6 +128,71 @@ class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
 
         return true;
     }
+
+    /**
+     * Stream wrapper interface write() method
+     *
+     * @access public
+     * @param  string data to write
+     * @return int    number of bytes actually written
+     */
+    function stream_write($buffer) 
+    {
+        // do some math
+        $start = $this->position;
+        $end   = $this->position + strlen($buffer);
+
+        // create a partial PUT request
+        $req = &new HTTP_Request($this->url);
+        $req->setMethod(HTTP_REQUEST_METHOD_PUT);
+        if (is_string($this->user)) {
+            $req->setBasicAuth($this->user, @$this->pass);          
+        }
+        //$req->addHeader("Content-Range", "bytes $start-$end/*");
+        if ($this->locktoken) {
+            $req->addHeader("If", "(<{$this->locktoken}>)");
+        }
+        $req->addRawPostData($buffer);
+
+        // go! go! go!
+        $req->sendRequest();
+		
+        // check result
+        switch ($req->getResponseCode()) {
+        case 200:
+        case 201:
+        case 204:
+            $this->position += strlen($buffer);
+            return $end - $start;
+            
+        default: 
+            return false;
+        }
+
+        /* 
+         We do not cope with servers that do not support partial PUTs!
+         And we do assume that a server does conform to the following 
+         rule from RFC 2616 Section 9.6:
+
+         "The recipient of the entity MUST NOT ignore any Content-* 
+         (e.g. Content-Range) headers that it does not understand or 
+         implement and MUST return a 501 (Not Implemented) response 
+         in such cases."
+           
+         So the worst case scenario with a compliant server not 
+         implementing partial PUTs should be a failed request. A 
+         server simply ignoring "Content-Range" would replace 
+         file contents with the request body instead of putting
+         the data at the requested place but we can blame it 
+         for not being compliant in this case ;)
+
+         (TODO: maybe we should do a HTTP version check first?)
+ 
+         we *could* emulate partial PUT support by adding local
+         cacheing but for now we don't want to as it adds a lot
+         of complexity and storage overhead to the client ...
+        */
+    }
 	
 }
 
@@ -144,6 +217,7 @@ class PortfolioWebDAV {
 		$this->scheme = $url['scheme'];
 		$this->host = $url['host'];
 		$this->root = '/' . trim($url['path'], '/') . '/';
+		
 		
 		
 		$this->client = new HTTP_WebDAV_Client_Stream_Extended;
@@ -183,6 +257,7 @@ class PortfolioWebDAV {
 		
 		$this->client->dir_opendir($this->scheme . '://' . $this->host . $path , array());
 		
+		
 		$temp = array_flip($_SESSION['WebDAVIDCache']);
 		$parentID = $temp[$path];
 		
@@ -210,12 +285,10 @@ class PortfolioWebDAV {
 				$index = $temp[$filepath];
 			}
 			
-			
-			//var_dump($this->scheme . '://' . $this->host . $path . '/' . $filename, $stat);
 			$temp = array('id'			=> $index,
 						  'parent'		=> $parentID,
 						  'path'		=> $filepath,
-						  'name' 		=> $filename, 
+						  'name' 		=> urldecode($filename), 
 						  'description'	=> $filename, 
 						  'type'		=> $stat['mode'] & 040000 ? 'dir' : 'file',
 						  'mode'		=> $stat['mode'],
@@ -245,7 +318,8 @@ class PortfolioWebDAV {
 	
 	public function getParent($path) {
 		
-		return dirname($path);
+		$parent = dirname($path);
+		return '/' . trim($parent, '/') . '/';
 	}
 	
 	public function getFolderNode($path = '/') {
@@ -342,16 +416,23 @@ class PortfolioWebDAV {
 	public function create ($data, $file = false) {
 		
 		if ($file) {
-			$this->client->stream_open($this->scheme . '://' . $this->host . $_SESSION['WebDAVIDCache'][$data['parent']] . '/' . $file['name'], 'w', array(), $a);
+			
+			$this->client->stream_open($this->scheme . '://' . $this->host . $_SESSION['WebDAVIDCache'][$data['parent']] .  $file['name'], 'w', array(), $a);
 			$length = 1024;
 			$offset = 0;
-			while ($this->client->stream_write(file_get_contents($file['tmp_name'], 0, null, $offset, $length))) {
+			
+			$res = $this->client->stream_write(file_get_contents($file['tmp_name']));
+																	   
+			//while ($res = $this->client->stream_write(file_get_contents($file['tmp_name'], 0, null, $offset, $length))) {
+			  
 			  $offset += $length;
-			}
+			//}
+			
 		} else {
 			
 			$this->client->mkdir($this->scheme . '://' . $this->host . $_SESSION['WebDAVIDCache'][$data['parent']] .  $data['name'] . '/');
 		}
+		//die();
 		
 	}
 	
