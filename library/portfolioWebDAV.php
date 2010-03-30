@@ -4,8 +4,6 @@
 set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . '/../include/PEAR');
 require_once 'HTTP/WebDAV/Client.php';
 
-ini_set('display_errors', 1);
-
 /**
  * Rubbish library is inadequate and requires modifications
  */
@@ -20,7 +18,7 @@ class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
 		
         // rewrite the request URL
         if (!$this->_parse_url($path)) return false;
-
+		
         // query server for WebDAV options
         if (!$this->_check_options())  return false;
 
@@ -49,7 +47,7 @@ class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
 </propfind>
 ');
         $req->sendRequest();
-
+		
 		switch ($req->getResponseCode()) {
         case 207: // multistatus content
             $this->dirfiles = array();
@@ -70,7 +68,7 @@ class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
 					
 					// remember the path, return them later with readdir()
 					
-					$this->dirfiles[] = $url['path']; // basename($matches[1]);
+					$this->dirfiles[] = str_replace(array('http://', 'https://'), array('webdav://', 'webdavs://'), $match[1]); // basename($matches[1]);
 					
 				}	
 				
@@ -80,7 +78,10 @@ class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
 
         default:
             // any other response state indicates an error
-            error_log("file not found");
+			preg_match('/h2>([^<]+)/', $req->getResponseBody(), $match);
+			$this->errorMessage = $match[1];
+            
+			error_log("file not found");
             return false;
         }
     }
@@ -101,8 +102,11 @@ class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
         }
 		
         $req->sendRequest();
+		
 		if ($req->getResponseCode() != 200) {
-            return false;
+            preg_match('/h2>([^<]+)/', $req->getResponseBody(), $match);
+			$this->errorMessage = $match[1];
+			return false;
         }
 
         // get the supported DAV levels and extensions
@@ -208,24 +212,48 @@ class PortfolioWebDAV {
 	
 	protected $root;
 	
-	public function __construct ($url, $username, $password) {
+	public $errorMessage;
+	
+	public function __construct ($pathList, $username, $password) {
 		
-		$url = str_replace(array('http://', 'https://'), array('webdav://', 'webdavs://'), $url);
-				
-		$url = parse_url($url);
+		$md5Path = md5('');
 		
-		$this->scheme = $url['scheme'];
-		$this->host = $url['host'];
-		$this->root = '/' . trim($url['path'], '/') . '/';
+		$_SESSION['WebDAVIDCache'][0] = '';
+		$i = 0;
 		
+		foreach ($pathList as $path) {
+			$path = str_replace(array('http://', 'https://'), array('webdav://', 'webdavs://'), $path);
+						
+			$path = parse_url($path);
+			
+			$temp = $path['scheme'] . '://' . $path['host'] . '/' . trim($path['path'], '/') . '/';
+			$this->rootNodes[] = $temp;
+			
+			$i++;
+			
+			$_SESSION['WebDAVIDCache'][$i] = $temp;
+
+			$filename = basename($temp);
+
+			$cache = array('id'			=> $i,
+						  'parent'		=> 0,
+						  'path'		=> $temp,
+						  'name' 		=> urldecode($filename), 
+						  'description'	=> urldecode($filename), 
+						  'type'		=> 'dir',
+						  );
+			
+			$this->cache[$md5Path]['all'][] = $cache;
+			$this->cache[$md5Path]['dir'][] = $cache;	
+			
+		}
+		
+		$this->cache[$md5Path]['file'][] = true;
 		
 		
 		$this->client = new HTTP_WebDAV_Client_Stream_Extended;
 		$this->client->user = $username;
 		$this->client->pass = $password;
-		
-		if (!isset($_SESSION['WebDAVIDCache']))
-			$_SESSION['WebDAVIDCache'] = array(0 => $this->root);
 		
 	}
 	
@@ -233,31 +261,45 @@ class PortfolioWebDAV {
 		require_once SITE_root . '/library/group.php';
 		$groupHandler = new Group;
 		
-		$directory = $groupHandler->isStaff() ? 'StaffHome/' : 'StudentHome/' . $_SESSION['year'] . '/' . $_SESSION['username'];
-		return new self(WEBDAV_url . '/' . $directory , "wgs/" . $_SESSION['username'], $_SESSION['password']);
+		if ($groupHandler->isStaff()) {
+			$pathList = array( 'http://silver/',
+							   'http://gold/DATA/',
+							  );
+		} else {
+			$pathList = array( 'http://silver/StudentHome/' . $_SESSION['year'] . '/' . $_SESSION['username'] . '/',
+							   'http://silver/StudentCommon/',
+							  );
+		}
+		
+		return new self($pathList , "wgs/" . $_SESSION['username'], $_SESSION['password']);
 	}
 	
 	private function fixPath ($path) {
 		
-		$path = preg_replace("#[\\:*\?\"<>|]#", "", $path);
-		if ($this->root != substr($path, 0, strlen($this->root)))
-			return $this->root;
+		if ($path == '')
+			return $path;
 		
-		return '/' . trim($path, '/');
+		$path = preg_replace("#[\\:*\?\"<>|]#", "", $path);
+		foreach ($this->rootNodes as $root) {
+			if ($root == substr($path, 0, strlen($root))) {
+				return '/' . trim($path, '/');
+			}
+		}
+		
+		return $this->rootNodes[0];
 	}
 	
-	public function getList($path = '/', $filter = 'all') {
+	public function getList($path = '', $filter = 'all') {
 		
-		$path = rtrim ($path, '/') . '/';
-	
 		$md5Path = md5($path);
 		
 		if (isset($this->cache[$md5Path][$filter]))
 			return $this->cache[$md5Path][$filter];
 		
-		$this->client->dir_opendir($this->scheme . '://' . $this->host . $path , array());
-		
-		
+		$this->client->dir_opendir( $path , array());
+		if (!empty($this->client->errorMessage))
+			$this->errorMessage = $this->client->errorMessage;
+
 		$temp = array_flip($_SESSION['WebDAVIDCache']);
 		$parentID = $temp[$path];
 		
@@ -265,7 +307,7 @@ class PortfolioWebDAV {
 			
 			$filename = basename($filepath);
 			
-			$this->client->stream_open($this->scheme . '://' . $this->host . $filepath, 'r', array(), $eh);
+			$this->client->stream_open( $filepath, 'r', array(), $eh);
 			$stat =  $this->client->stream_stat();
 			
 			$type = $stat['mode'] & 040000 ? 'dir' : 'file';
@@ -289,7 +331,7 @@ class PortfolioWebDAV {
 						  'parent'		=> $parentID,
 						  'path'		=> $filepath,
 						  'name' 		=> urldecode($filename), 
-						  'description'	=> $filename, 
+						  'description'	=> urldecode($filename), 
 						  'type'		=> $stat['mode'] & 040000 ? 'dir' : 'file',
 						  'mode'		=> $stat['mode'],
 						  'file_size'	=> $stat['size'],
@@ -318,23 +360,28 @@ class PortfolioWebDAV {
 	
 	public function getParent($path) {
 		
+		if ($path == '')
+			return false;
+		
+		if (in_array($path, $this->rootNodes))
+			return '';
+		
 		$parent = dirname($path);
-		return '/' . trim($parent, '/') . '/';
+		
+		return rtrim($parent, '/') . '/';
 	}
 	
-	public function getFolderNode($path = '/') {
+	public function getFolderNode($id) {
 		
 		$path = $this->fixPath($path);
 		
 		// get folder contents
 		$directoryList = $this->getDirectoryList($path);
 		
-		$structure = explode('/', trim($path, '/'));
-	
 		$parent = $this->getParent($path);
 
 		
-		if (strlen($parent) > strlen($this->root)) {
+		if ($parent && !in_array($parent, $this->rootNodes)) {
 			$siblingList = $this->getFolderNode($parent);
 			// get parent folder contents
 			if (is_array($directoryList)) {
@@ -374,7 +421,7 @@ class PortfolioWebDAV {
 	
 	public function getFile($id) {
 		
-		$this->client->stream_open($this->scheme . '://' . $this->host . $_SESSION['WebDAVIDCache'][$id], 'r', array(), $a);
+		$this->client->stream_open( $_SESSION['WebDAVIDCache'][$id], 'r', array(), $a);
 		
 		
 		while ($data = $this->client->stream_read(1024)) {
@@ -388,7 +435,7 @@ class PortfolioWebDAV {
 	}
 	
 	public function getByID ($id) {
-		$this->client->stream_open($this->scheme . '://' . $this->host . $_SESSION['WebDAVIDCache'][$id], 'r', array(), $a);
+		$this->client->stream_open( $_SESSION['WebDAVIDCache'][$id], 'r', array(), $a);
 		$stat =  $this->client->stream_stat();
 		
 		$temp = array_flip($_SESSION['WebDAVIDCache']);
@@ -413,11 +460,18 @@ class PortfolioWebDAV {
 		return $temp;
 	}
 	
+	public function isRoot($id) {
+		return in_array($_SESSION['WebDAVIDCache'][$id], $this->rootNodes);
+	}
+	
 	public function create ($data, $file = false) {
+		
+		if ($data['parent'] == 0)
+			return false;			
 		
 		if ($file) {
 			
-			$this->client->stream_open($this->scheme . '://' . $this->host . $_SESSION['WebDAVIDCache'][$data['parent']] .  $file['name'], 'w', array(), $a);
+			$this->client->stream_open( $_SESSION['WebDAVIDCache'][$data['parent']] .  $file['name'], 'w', array(), $a);
 			$length = 1024;
 			$offset = 0;
 			
@@ -429,8 +483,9 @@ class PortfolioWebDAV {
 			//}
 			
 		} else {
+	
 			
-			$this->client->mkdir($this->scheme . '://' . $this->host . $_SESSION['WebDAVIDCache'][$data['parent']] .  $data['name'] . '/');
+			$this->client->mkdir( $_SESSION['WebDAVIDCache'][$data['parent']] .  $data['name'] . '/');
 		}
 		//die();
 		
@@ -442,13 +497,17 @@ class PortfolioWebDAV {
 			$data['description'] = $data['name'];
 			
 		if (isset($data['description'])) {
-			$path = dirname($_SESSION['WebDAVIDCache'][$data['id']]);
-			$path = rtrim($path, '/') . '/';
-			$this->client->rename($this->scheme . '://' . $this->host . $_SESSION['WebDAVIDCache'][$data['id']], $this->scheme . '://' . $this->host . $path . $data['description']);
+			$parent = $this->getParent($_SESSION['WebDAVIDCache'][$data['id']]);
+			$this->client->rename( $_SESSION['WebDAVIDCache'][$data['id']], $parent . $data['description']);
 		
 		} else {
-			$destination = '/' . trim($_SESSION['WebDAVIDCache'][$data['parent']], '/') . '/' . basename($_SESSION['WebDAVIDCache'][$data['id']]);
-			$this->client->rename($this->scheme . '://' . $this->host . $_SESSION['WebDAVIDCache'][$data['id']], $this->scheme . '://' . $this->host . $destination);
+			
+					
+			if ($this->isRoot($data['id']) || $data['parent'] == 0)
+				return false;
+			
+			$destination = $_SESSION['WebDAVIDCache'][$data['parent']] . basename($_SESSION['WebDAVIDCache'][$data['id']]);
+			$this->client->rename( $_SESSION['WebDAVIDCache'][$data['id']], $destination);
 		}
 		
 		
@@ -456,8 +515,12 @@ class PortfolioWebDAV {
 	}
 	
 	public function delete($id) {
-		if (!$this->client->unlink($this->scheme . '://' . $this->host . $_SESSION['WebDAVIDCache'][$id]))
-			$this->client->rmdir($this->scheme . '://' . $this->host . $_SESSION['WebDAVIDCache'][$id]);
+
+		if ($this->isRoot($id) || $id == 0)
+			return false;
+				
+		if (!$this->client->unlink( $_SESSION['WebDAVIDCache'][$id]))
+			$this->client->rmdir( $_SESSION['WebDAVIDCache'][$id]);
 		
 		unset($_SESSION['WebDAVIDCache'][$id]);
 	}

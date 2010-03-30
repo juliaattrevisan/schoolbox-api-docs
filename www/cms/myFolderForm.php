@@ -25,6 +25,7 @@ if (isset($_POST['name'])) {
 		$current = $folderHandler->getByID($_POST['folderID']);
 		if ($current['owner'] != $_SESSION['id'])
 			$page->error(47);
+			
 	
 		$folder['id'] = $_POST['folderID'];
 		$folderHandler->update($folder);

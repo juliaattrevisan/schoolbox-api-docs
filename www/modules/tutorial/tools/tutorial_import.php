@@ -60,7 +60,7 @@ if (is_array($eventList)) {
 		elseif ($event['tutor'] == 'Ben Bowring')
 			$tutor['synergy_id'] = 19276;
 		elseif ($event['tutor'] == 'Alex Henry')
-			continue; //$tutor['synergy_id'] = 21132;
+			$tutor['synergy_id'] = 21132;
 		elseif ($event['tutor'] == 'Zac Haines')
 			$tutor['synergy_id'] = 10767;
 		elseif ($event['tutor'] == 'Alex Kline')
@@ -76,7 +76,7 @@ if (is_array($eventList)) {
 		elseif ($event['tutor'] == 'Nik Parkin')
 			$tutor['synergy_id'] = 24358;
 		elseif ($event['tutor'] == 'Ghazi Ahamat')
-			continue; //$tutor['synergy_id'] = 19600;
+			$tutor['synergy_id'] = 19600;
 		elseif ($event['tutor'] == 'Jess Corbett')
 			$tutor['synergy_id'] = 19150;
 		elseif ($event['tutor'] == 'Katie Keene')

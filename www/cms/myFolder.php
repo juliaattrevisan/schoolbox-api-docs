@@ -8,10 +8,14 @@ if (WEBDAV_on) {
 	$folderHandler = new MyFolder;
 }
 
-if(is_numeric($this->arg[0])) {
+if(is_numeric($this->arg[0]) && $this->arg[0] > 0) {
 	
 	if(!($folder = $folderHandler->getByID($this->arg[0])))
 		error(2);
+		
+	if (WEBDAV_on && $folderHandler->isRoot($this->arg[0]))
+		error(2);
+		
 	
 	$this->setFile(TEMPLATE_content, "cms/myFolder.html");
 	$this->setBlock(TEMPLATE_content, 'parent_list', 'parent_list_block');

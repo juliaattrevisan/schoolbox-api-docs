@@ -70,7 +70,7 @@ $j(document).ready(function() {
 	});
 
 	/* load right panel file list */
-	$j('#tree tr').live('click', function () {
+	$j('#tree tr:not(.server)').live('click', function () {
 		
 		/* select folder */
 		$j('#tree .selected').removeClass('selected');
@@ -171,9 +171,9 @@ $j(document).ready(function() {
 		/* double click files, default action */
 		newChildren.dblclick(function () {
 			if ($j(this).hasClass("link"))
-				window.open("/redir.php?id="+$j(this).attr("id").substring(5),"_blank"); 
+				window.open("/redir.php?myFile=1&id="+$j(this).attr("id").substring(5),"_blank"); 
 			else
-				window.open("/send.php?id="+$j(this).attr("id").substring(5),"_blank"); 
+				window.open("/send.php?myFile=1&id="+$j(this).attr("id").substring(5),"_blank"); 
 		});	
 		
 		/* select files */
@@ -257,7 +257,7 @@ $j(document).ready(function() {
 		}
 		
 		/* apply folder context menus */
-		var newRows = table.find('tbody tr:not(.context)').addClass('context');
+		var newRows = table.find('tbody tr:not(.context,.server)').addClass('context');
 		newRows.contextMenu(folderMenu, {
 			theme: 'vista',
 			beforeShow: function () {
@@ -265,7 +265,7 @@ $j(document).ready(function() {
 				/* enable all options */
 				$j(this.menu).find('.context-menu-item').removeClass('context-menu-item-disabled');
 				
-				if ($j(this.target).hasClass('server')) {
+				if ($j(this.target).hasClass('child-of-node-0')) {
 					// disable from modify / delete
 					for (var i = 0; i <= 1; i++)
 						$j($j(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
@@ -330,7 +330,7 @@ $j(document).ready(function() {
       <table id="tree">
         <tbody>
           <tr id="node-0" class="server expanded loaded full write">
-            <td><span class="server label">Top</span></td>
+            <td><span class="server label no-drop">Top</span></td>
           </tr>
           <!-- BEGIN category_list -->
           <tr id="node-{CATEGORY_ID}" class="{CLASS} full write">

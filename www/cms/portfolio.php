@@ -56,6 +56,7 @@ if (WEBDAV_on) {
 }
 
 
+
 // output folders, column 1
 $folderList = $folderHandler->getFolderNode($openFolder);
 
@@ -139,5 +140,9 @@ if (is_array($allowedList)) {
 	}
 } else
 	$this->setVar('allowed_files_block', '');
+
+if (!empty($folderHandler->errorMessage)) {
+	print '<script type="text/javascript">alert("' . $folderHandler->errorMessage . '");</script>';
+}
 
 ?>

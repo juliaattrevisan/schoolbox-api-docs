@@ -386,7 +386,7 @@
 			if (options.dragDrop) {
 				makeDraggable(node.find('tr:not(.site,.server).full ' + options.label + ', ' + 'tr:not(.site,.server).write ' + options.label));
 				makeDroppable(node.find(options.node + ':not(.server).full ' + options.label + ', ' + options.node + ':not(.server).write ' + options.label));
-				makeDroppable($('#node-0 span.server'));
+				makeDroppable($('#node-0 span.server:not(.no-drop)'));
 			}
 
 			if (options.sequencing)
