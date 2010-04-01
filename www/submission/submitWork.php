@@ -3,19 +3,19 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionStudent.php';
 
-if(is_numeric($_GET['box_id'])) {
-    $this->setFile(TEMPLATE_content, 'submission/submitFile.html');
+if(is_numeric($this->arg[0])) {
+    $this->setFile(TEMPLATE_content, 'submission/submitWork.html');
     $this->setTitle('Submit Work');
 
     $subHandler = new Submission;
     $studHandler = new SubmissionStudent;
 
-    $subbox = $subHandler->getByID($_GET['box_id']);
-    $late = $studHandler->securityCheck($_GET['box_id']);
+    $subbox = $subHandler->getByID($this->arg[0]);
+    $late = $studHandler->securityCheck($this->arg[0]);
 
     $output = array('CATEGORY'  => scrubTEXT($subbox['categoryName']),
                     'FILE'      => scrubTEXT($subbox['description']),
-                    'BOX_ID'    => $_GET['box_id'],
+                    'BOX_ID'    => $this->arg[0],
                     );
 
     $this->setVar($output);

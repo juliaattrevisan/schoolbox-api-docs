@@ -7,6 +7,7 @@
 
 <h1>{HEADING} Submission Box</h1>
 <form action="/submission/submissionForm.php" method="post" name="form" id="form" class="standardForm" enctype="multipart/form-data">
+<input type="hidden" name="category" value="{CATEGORY}" />
     <table>
         <tr>
             <td class="formLabelWidth"><h2>Title</h2></td>
@@ -24,7 +25,15 @@
         <tr>
             <td class="formLabelWidth" valign="top"><h2>Location</h2>
                 <em>This submission box will be located in the following folder</em></td>
-            <td>{CATLIST}</td>
+            <td>{CURRENT_CAT}
+            
+            <!-- BEGIN category_select -->
+            <select name="category">
+               <!-- BEGIN category -->
+               <option value="{CATEGORY_ID}" {CATEGORY_ID_SELECTED}>{CATEGORY_NAME}</option><!-- END category -->
+            </select>
+            <!-- END category_select -->
+            </td>
         </tr>
         <tr>
             <td><h2>Type</h2>
@@ -109,7 +118,8 @@
         <tr>
             <td><input type="hidden" name='fileId' value="{FILEID}" />
             </td>
-            <td> {SID}
+            <td> <input type="hidden" name="id" value="{ID}" />
+            	
                 <input type="submit" name="Submit" value="{HEADING}" class="btn" />
             </td>
         </tr>

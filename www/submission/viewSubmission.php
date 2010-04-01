@@ -53,16 +53,16 @@ if(is_numeric($this->arg[0])) {
 
             if(is_array($studentSub)) {
 
-                $output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
-                                        'OWNER_ID' 	=> $line['uid'],
-                                        'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
-                                        'DATE'		=> $line['date'],
-                                        'VIEW'		=> 'viewSubmission.php?view='.$line['id'],
-                                        'SAVE'		=> 'viewSubmission.php?view='.$line['id'].'&save=1',
-                                        'DELETE'	=> 'viewSubmission.php?delete='.$line['id']."&box_id=$box_id",
-                                        'COLOUR'	=> $line['late']?'#ff0000':'#000000',
-                                        'MARKED'	=> $line['marked']?'<img src="/images/greentick.gif" width="13" height="12">':'<img src="/images/emptybox.gif" width="13" height="12">',
-                                        'RETURN'	=> $line['marked']?'':"<a href=\"returnWork.php?box_id=$box_id&sid=".$line['uid']."\">Return</a>",
+                $output = array(	'OWNER' 	=> formatName($student,'{lastname}, {firstname}'),
+                                        'OWNER_ID' 	=> $student['uid'],
+                                        'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
+                                        'DATE'		=> $studentSub['date'],
+                                        'VIEW'		=> '/submission/viewSubmissionForm.php?view='.$studentSub['id'],
+                                        'SAVE'		=> '/submission/viewSubmissionForm.php?view='.$studentSub['id'].'&save=1',
+                                        'DELETE'	=> '/submission/viewSubmissionForm.php?delete='.$studentSub['id']."&box_id=" . $this->arg[0],
+                                        'COLOUR'	=> $studentSub['late']?'#ff0000':'#000000',
+                                        'MARKED'	=> $studentSub['marked']?'<img src="/images/greentick.gif" width="13" height="12">':'<img src="/images/emptybox.gif" width="13" height="12">',
+                                        'RETURN'	=> $studentSub['marked']?'':"<a href=\"/submission/returnWork/".$this->arg[0]."/".$studentSub['uid']."\">Return</a>",
                                         'ON_OFF'	=> ++$i%2?'':'dark',
                 );
                 $this->setVar($output);
@@ -101,12 +101,12 @@ if(is_numeric($this->arg[0])) {
                     'OWNER_ID'      => $line['uid'],
                     'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
                     'DATE'          => $line['date'],
-                    'VIEW'          => 'viewSubmission.php?view='.$line['id'],
-                    'SAVE'          => 'viewSubmission.php?view='.$line['id'].'&save=1',
-                    'DELETE'        => 'viewSubmission.php?delete='.$line['id']."&box_id=$box_id",
+                    'VIEW'          => '/submission/viewSubmissionForm.php?view='.$line['id'],
+                    'SAVE'          => '/submission/viewSubmissionForm.php?view='.$line['id'].'&save=1',
+                    'DELETE'        => '/submission/viewSubmissionForm.php?delete='.$line['id']."&box_id=" . $this->arg[0],
                     'COLOUR'        => $line['late']?'#ff0000':'#000000',
                     'MARKED'        => $line['marked']?'<img src="/images/greentick.gif" width="13" height="12">':'<img src="/images/emptybox.gif" width="13" height="12">',
-                    'RETURN'        => $line['marked']?'':"<a href=\"returnWork.php?box_id=$box_id&sid=".$line['uid']."\">Return</a>",
+                    'RETURN'        => $line['marked']?'':"<a href=\"/submission/returnWork/".$this->arg[0]."/".$line['uid']."\">Return</a>",
                     'ON_OFF'        => ++$i%2?'':'dark',
             );
 

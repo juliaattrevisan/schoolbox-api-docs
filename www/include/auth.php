@@ -200,8 +200,10 @@ function authenticate(&$db, $username, $password, $remember = 0)
 			setSynergyInfo(&$db);
 		else {
 			//testing parent system
-			if($_SESSION['id'] == 6277)
-				$_SESSION['children'][] = array('id'=>2673,'sid'=>48826);
+			if($_SESSION['id'] == 7833) {
+				$_SESSION['children'][] = array('id' => 4, 'sid' => 0, 'name' => 'Student Student');
+				$_SESSION['children'][] = array('id' => 3, 'sid' => 0, 'name' => 'Test User');
+			}
 		}
 		
 		if(LDAP_enable)
@@ -273,7 +275,7 @@ function setSynergyInfo(&$mydb)
 				if(is_array($children)) {
 					foreach($children as $child)
 					{
-						$myquery = "SELECT id, group_id FROM user WHERE synergy_id = $child";
+						$myquery = "SELECT * FROM user WHERE synergy_id = $child";
 						$portal = $mydb->getRow($myquery);
 						$subjects = array();
 
@@ -295,7 +297,7 @@ function setSynergyInfo(&$mydb)
                                 }
                             }
 
-							$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child, 'gid'=>$portal['group_id'], 'subjects'=>$subjects);
+							$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child, 'gid'=>$portal['group_id'], 'name' => formatName($portal), 'subjects'=>$subjects);
 						}
 					}
 				}

@@ -12,6 +12,12 @@ class SubmissionStudent extends Model {
         parent::Model();
     }
 
+	function getByID($id) {
+		$query = "SELECT s.*, u.lastname FROM `".$this->_table."` s, user u 
+				  WHERE s.owner = u.id AND s.".$this->_index." = $id";	
+		return $this->db->getRow($query);
+	}
+
     function getBySynergyID($subBoxID, $synergyID) {
         $query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username, local_email, alt_email,
         DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id
@@ -77,7 +83,7 @@ class SubmissionStudent extends Model {
                 'late'      => $late,
         );
 
-        $fileId = $this->db->insert($studentSub);
+        $fileId = $this->db->insert($this->_table, $studentSub);
 
         //save file using file ID as name
         $newFileName = $fileId . ".dat";
@@ -94,7 +100,7 @@ class SubmissionStudent extends Model {
             //delete from database
             parent::delete($id);
             $filename = SUBMISSION_directory . "/" . $id . ".dat";
-            unlink($filename);
+            @unlink($filename);
         }
         else {
             parent::update(array('deleted' => 'true', 'id' => $id));

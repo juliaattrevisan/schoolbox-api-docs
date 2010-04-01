@@ -9,10 +9,10 @@ $this->setTitle('Return Student Work');
 $subHandler = new Submission;
 $userHandler = new User;
 
-if(is_numeric($_GET['box_id']) && is_numeric($_GET['sid']) ) {
+if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 
-    $subbox = $subHandler->getByID($_GET['box_id']);
-    $user = $userHandler->getByID($_GET['sid']);
+    $subbox = $subHandler->getByID($this->arg[0]);
+    $user = $userHandler->getByID($this->arg[1]);
 
     //Check user owners box they are returning to
     if($subbox['owner'] != $_SESSION['id'])
@@ -20,9 +20,9 @@ if(is_numeric($_GET['box_id']) && is_numeric($_GET['sid']) ) {
     
     $output = array('CATEGORY'  => scrubTEXT($subbox['categoryName']),
                     'ASSNAME'   => scrubTEXT($subbox['description']),
-                    'BOX_ID'    => $_GET['box_id'],
+                    'BOX_ID'    => $this->arg[0],
                     'NAME'      => formatName($user),
-                    'SID'       => $_GET['sid'],
+                    'UID'       => $this->arg[1],
                 );
 
     /* TODO: Add code to output already marked details */

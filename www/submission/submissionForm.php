@@ -1,14 +1,15 @@
 <?php
+
+session_start();
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionStudent.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/include/time.php';
 
-
 $subBoxHandler = new Submission;
 
-
-if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour'] && $_POST['sid']) {
+if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour'] && is_numeric($_POST['id'])) {
     /* Modify existing submission box */
     list($odate,$omonth,$oyear) = explode('/',$_POST['open_date'],3);
     list($date,$month,$year) = explode('/',$_POST['due_date'],3);
@@ -31,19 +32,19 @@ if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['la
     checkTime($_POST['due_hour'],$_POST['due_minute']);
     checkTime($_POST['late_hour'],$_POST['late_minute']);
 
-    $openTime = strtotime($_POST['open_date'].' '.$_POST['open_hour'].':'.$_POST['open_minute'].' '.$_POST['open_period']);
-    $dueTime = strtotime($_POST['due_date'].' '.$_POST['due_hour'].':'.$_POST['due_minute'].' '.$_POST['due_period']);
-    $lateTime = strtotime($_POST['late_date'].' '.$_POST['late_hour'].':'.$_POST['late_minute'].' '.$_POST['late_period']);
+    $openTime = ausDateToUnix($_POST['open_date'].' '.$_POST['open_hour'].':'.$_POST['open_minute'].' '.$_POST['open_period'], true);
+    $dueTime = ausDateToUnix($_POST['due_date'].' '.$_POST['due_hour'].':'.$_POST['due_minute'].' '.$_POST['due_period'], true);
+    $lateTime = ausDateToUnix($_POST['late_date'].' '.$_POST['late_hour'].':'.$_POST['late_minute'].' '.$_POST['late_period'], true);
 
     //modify submission box
-    $subbox = array('id'        => $_POST['sid'],
-            'open_date' => $openTime,
-            'date'      => $dueTime,
-            'late_date' => $lateTime,
+    $subbox = array('id'        => $_POST['id'],
+            'open_date' => outputDate(DATE_database, $openTime),
+            'date'      => outputDate(DATE_database, $dueTime),
+            'late_date' => outputDate(DATE_database, $lateTime),
             'description'=> $_POST['description'],
             'type'     => $_POST['type'],
     );
-    $subBoxHandler->update($subbox);
+	$subBoxHandler->update($subbox);
 
     localRedir("/submission/listSubmission/");
 }
@@ -59,7 +60,7 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
         $fileHandler = new File;
         $data = array(  'description'	=> $_POST['description'],
                 'comment'		=> $_POST['comment'],
-                'category'		=> $_POST['cid'],
+                'category'		=> $_POST['category'],
                 'owner'		=> $_SESSION['id'],
         );
         $fileId = $fileHandler->create($data, $_FILES['file']);
@@ -90,20 +91,22 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
     checkTime($_POST['due_hour'],$_POST['due_minute']);
     checkTime($_POST['late_hour'],$_POST['late_minute']);
 
-    $openTime = strtotime($_POST['open_date'].' '.$_POST['open_hour'].':'.$_POST['open_minute'].' '.$_POST['open_period']);
-    $dueTime = strtotime($_POST['due_date'].' '.$_POST['due_hour'].':'.$_POST['due_minute'].' '.$_POST['due_period']);
-    $lateTime = strtotime($_POST['late_date'].' '.$_POST['late_hour'].':'.$_POST['late_minute'].' '.$_POST['late_period']);
+    $openTime = ausDateToUnix($_POST['open_date'].' '.$_POST['open_hour'].':'.$_POST['open_minute'].' '.$_POST['open_period'], true);
+    $dueTime = ausDateToUnix($_POST['due_date'].' '.$_POST['due_hour'].':'.$_POST['due_minute'].' '.$_POST['due_period'], true);
+    $lateTime = ausDateToUnix($_POST['late_date'].' '.$_POST['late_hour'].':'.$_POST['late_minute'].' '.$_POST['late_period'], true);
 
     //modify submission box
-    $subbox = array('id'        => $_POST['sid'],
-            'open_date' => $openTime,
-            'date'      => $dueTime,
-            'late_date' => $lateTime,
+    $subbox = array('category'        => $_POST['category'],
+            'open_date' => outputDate(DATE_database, $openTime),
+            'date'      => outputDate(DATE_database, $dueTime),
+            'late_date' => outputDate(DATE_database, $lateTime),
             'description'=> $_POST['description'],
-            'type'     => $_POST['type'],
+			'type'     => $_POST['type'],
             'fid'       => $fileId,
             'created'   => 'NOW()',
+			'owner'		=> $_SESSION['id'],
     );
+	
     $subBoxHandler->create($subbox);
 
     localRedir("/submission/listSubmission/");

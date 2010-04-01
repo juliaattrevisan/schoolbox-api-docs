@@ -54,22 +54,28 @@ function involvedCategoryList($id, $subjects, $accessType=1)
 		if(is_array($subjects)) {
 			foreach($subjects as $subject) {
 				//convert code to id and get name
-				$query = "SELECT name, id, cc.code FROM category JOIN categoryCode cc ON id = categoryID WHERE cc.code = '".$subject['code']."'";
+				$query = "SELECT c.name, c.id, GROUP_CONCAT(cc.code) `code` FROM ( category c, categoryCode o )
+						  LEFT JOIN categoryCode cc ON cc.categoryID = c.id
+						  WHERE c.id = o.categoryID AND o.code = '".$subject['code']."'
+						  GROUP BY c.id ";
+						  
 				if(is_array($catTmp = $db->getRow($query)))
 					$catList[] = $catTmp;
 			}
 		}
 
 	//get list of groups involved in
-	$query = "SELECT category.name, category.id FROM userAccess, category 
-	WHERE userAccess.uid = $id AND userAccess.sid = category.id
-	AND userAccess.type >= '$accessType'";
+	$query = "SELECT c.name, c.id, GROUP_CONCAT(cc.code) `code` FROM ( userAccess u, category c )
+			  LEFT JOIN categoryCode cc ON cc.categoryID = c.id
+			  WHERE u.uid = $id AND u.sid = c.id AND u.type >= '$accessType'
+			  GROUP BY c.id";
 
 	$db->query($query);
 	while($result = $db->getNextArray())
 	{
 		$catList[] = array (	'name' 	=>	$result['name'],
 								'id' 	=>	$result['id'],
+								'code'	=>  $result['code']
 							);
 	}
 	
