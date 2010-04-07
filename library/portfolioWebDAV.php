@@ -47,7 +47,7 @@ class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
 </propfind>
 ');
         $req->sendRequest();
-		
+		//print $req->getResponseBody();
 		switch ($req->getResponseCode()) {
         case 207: // multistatus content
             $this->dirfiles = array();
@@ -77,6 +77,7 @@ class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
             return true;
 
         default:
+		
             // any other response state indicates an error
 			preg_match('/h2>([^<]+)/', $req->getResponseBody(), $match);
 			$this->errorMessage = $match[1];
@@ -104,7 +105,7 @@ class HTTP_WebDAV_Client_Stream_Extended extends HTTP_WebDAV_Client_Stream {
         $req->sendRequest();
 		
 		if ($req->getResponseCode() != 200) {
-            preg_match('/h2>([^<]+)/', $req->getResponseBody(), $match);
+			preg_match('/h2>([^<]+)/', $req->getResponseBody(), $match);
 			$this->errorMessage = $match[1];
 			return false;
         }
@@ -262,12 +263,12 @@ class PortfolioWebDAV {
 		$groupHandler = new Group;
 		
 		if ($groupHandler->isStaff()) {
-			$pathList = array( 'http://silver/',
-							   'http://gold/DATA/',
+			$pathList = array( 'http://silver/StaffHome/',
+							   'http://silver/StaffData/',
 							  );
 		} else {
 			$pathList = array( 'http://silver/StudentHome/' . $_SESSION['year'] . '/' . $_SESSION['username'] . '/',
-							   'http://silver/StudentCommon/',
+							   'http://silver/StudentData/',
 							  );
 		}
 		
