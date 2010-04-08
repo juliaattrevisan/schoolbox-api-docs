@@ -196,12 +196,13 @@ if (is_array($workList)) {
 						'BOX_ID'		=> $work['id'],
 						);
 		
+		$this->setVar($output);
+		
 		/* display file download link */
 		$this->setVar('download_block', '');
 		if ($work['file_id'] > 0)
 			$this->parse('download_block', 'download');
-		
-		$this->setVar($output);
+				
 		$this->parse('due_block', 'due', true);
 	}
 	
@@ -221,14 +222,14 @@ if (is_array($returnList)) {
 						'BOX_ID'			=> $return['box_id'],
 						);
 		
+		$this->setVar($output);
+		
 		/* display file download link */
 		$this->setVar('download_rt_block', '');
 		if ($return['fid'] > 0)
 			$this->parse('download_rt_block', 'download_rt');
 		
 		
-		
-		$this->setVar($output);
 		$this->parse('return_block', 'return', true);
 	}
 	

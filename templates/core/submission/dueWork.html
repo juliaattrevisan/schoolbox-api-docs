@@ -1,53 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<!-- DW6 -->
-<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
-<!--  Visit us at www.lektec.com.au -->
-<head>
-<title>{TITLE}</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="James Leckie, Lektec Consulting"/>
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/screen.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
-<!-- BEGIN header_css -->
-<!-- END header_css -->
-<script type="text/javascript" src="/javascript/jquery.js"></script>
-<script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
-<script type='text/javascript'>
-  var $j = jQuery.noConflict();
-	
-	$j(function() {
-    $j('#nav ul').droppy({speed: 0});
-	
-	$j('#subjectFilter').change(function () {
-		$j('li.event').fadeTo(0, 1);
-		
-		var categoryID = $j(this).val();
-		if (categoryID != '') {
-			$j('li.event:not(.category-' + categoryID + ')').fadeTo(0, 0.4);
-		}
-	
-	});
-	
-	$j('#childSelect').change(function () {
-		window.open('/submission/dueWork/{SELECTED_DATE}/' + $j(this).val(), '_self', '');
-		return false;
-	});
-  });
-</script>
-<!-- BEGIN header_javascript -->
-<script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>
-<!-- END header_javascript -->
-</head>
-<body>
-<script type="text/javascript" src="/javascript/tableruler.js"></script>
-<script type="text/javascript">
-	window.onload=function(){tableruler();} 
-</script>
-<link rel="stylesheet" type="text/css" media="screen" href="/css/shore/calendar.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/calendar.css" />
+
 <h1>Due Work</h1>
 <div class="left">
   <center>
@@ -248,5 +200,3 @@
 </div>
 <!-- END returned_block -->
 <div class="float-fix"></div>
-</body>
-</html>
