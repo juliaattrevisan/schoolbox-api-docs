@@ -11,7 +11,7 @@ body {
 	padding-bottom: 45px;
 }
 #header {
-	height: 117px;
+	height: 116px;
 	padding-right: 15px;
 	border: 0;
 	background: url(/images/mggs/bg-header.gif) repeat-x;
@@ -59,13 +59,26 @@ body {
 	font-size: 11px;
 	padding: 5px 9px;
 }
-#nav li a:hover {
-	background: 0;
-	text-decoration: underline;
+#nav li a:hover,
+#nav li li a:hover {
+	background: #1597cb;
+	color: #fff;
+	text-decoration: none;
 }
 #nav .lastChild {
 	border-bottom: 0;
 }
+#nav ul ul { border: 1px solid #dbdbdb; }
+#nav ul ul li { border: 0; border-top: 1px solid #dbdbdb; }
+#nav ul ul li:first-child { border: 0; }
+#nav ul ul a { color: #fff; background: #818181; }
+#nav li li { border: 0; }
+
+#nav li.parent > a span,
+#nav li.parent > a.hover span {
+	background:url(/images/mggs/nav-arrow.gif) no-repeat 100% 2px;
+}
+
 h2 {
 	background: #245398;
 	font-size: 12px;
@@ -185,43 +198,50 @@ li p.interact {
 	margin: 0 0 0 -20px;
 	float: right;
 	position: relative;
+	z-index: 5;
 }
 #tabs li a  {
 	background: 0;
 	color: #024d8d;
 	border: 0;
-	height: 32px;
+	height: 31px;
+	display: block;
+	float: left;
 	padding: 0;
+	cursor: pointer;
 }
 #tabs li a span {
-	background: url(/images/mggs/bg-nav-left.gif) no-repeat 0 -32px;
-	height: 32px;
+	background: url(/images/mggs/bg-nav-left.png) no-repeat 0 -31px;
+	height: 31px;
 	display: block;
 	float: left;
 	padding: 0 7px 0 30px;
 }
 #tabs li a span.end {	
-	height: 32px;
-	width: 23px;
-	float:right;
-	background: url(/images/mggs/bg-nav-right.gif) no-repeat 0 -32px;
+	height: 31px;
+	width: 21px;
+	float:left;
+	background: url(/images/mggs/bg-nav-right.png) no-repeat 0 -31px;
 	padding: 0;
 }
-#header #tabs li a.navthis {
+#header #tabs li.navthis a {
 	background-color: transparent;
 	font-weight: bold;
 	color: #024d8d;
 	z-index: 10;
 }
-#header #tabs li a.navthis span {
+#header #tabs li.navthis a span {
 	background-position: 0 0;
+}
+#header #tabs li.navthis {
+	z-index: 10;
 }
 #tabs li a:hover  {
 	background: 0;
 	color: #fff;
 }
 #tabs li a:hover span  {
-	background-position: 0 -64px;
+	background-position: 0 -62px;
 }
 
 #footer {
@@ -234,7 +254,7 @@ li p.interact {
 #footer ul li {
 	color: #fff;
 	background: url(/images/mggs/header-div.gif) no-repeat 100% 2px;
-	margin-right: 5px;
+	margin-right: 10px;
 	padding-right: 11px;
 }
 #footer ul li a {
