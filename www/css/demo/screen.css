@@ -265,25 +265,6 @@ h1 + .header_option {
 #calendar .header_option a {
 	color: #003E7E;
 }
-.due-dates {
-	width:100%;
-	border:1px solid #c3cdd7;
-}
-.due-dates td {
-	border-top:1px solid #c3cdd7;
-	padding:6px;
-}
-.due-dates th {
-	padding:6px;
-}
-.due-dates .td-heading {
-	padding:0;
-	border:none;
-}
-.td-heading h2 {
-	border:none;
-	padding:0px;
-}
 .left #calendar table.duedates-calendar {
 	width:100%;
 	margin-bottom:20px;

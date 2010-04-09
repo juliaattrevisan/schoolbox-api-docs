@@ -58,38 +58,6 @@
 </div>
 </center>
 
-<!-- BEGIN has_due -->
-<div class="indent">
-  <table class="due-dates">
-    <thead>
-      <tr>
-        <td colspan="6" class="td-heading"><h2>Upcoming Due Work</h2></td>
-      <tr>
-      <tr>
-        <th width="25%">Subject</th>
-        <th width="25%">Item</th>
-        <th width="25%">Due Date</th>
-        <th width="25%">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- BEGIN due -->
-      <tr>
-        <td>{DUE_SUBJECT}</td>
-        <td>{DUE_DESC}</td>
-        <td>{DUE_DATE}</td>
-        <td>
-        <!-- BEGIN download -->
-        <a href="/send.php?id={FILE_ID}&save=1">Download</a> / 
-        <!-- END download -->
-        <a href="/submission/submitWork/{BOX_ID}">Submit</a></td>
-      </tr>
-     
-      <!-- END due -->
-    </tbody>
-  </table>
-</div>
-<!-- END has_due -->
 <!-- BEGIN has_return -->
 <div class="indent">
   <table class="due-dates">
@@ -123,9 +91,41 @@
 <!-- END has_return -->
 </div>
 <div class="right">
-  <div id="component" class="box">
-    <h2 style="cursor: move;">Subjects</h2>
-    <a class="edit">edit</a>
+
+<!-- BEGIN has_due -->
+<div class="box component">
+<h2>Upcoming Due Work</h2>
+  <table class="due-dates">
+    <thead>
+      <tr>
+        <th width="25%">Subject</th>
+        <th width="25%">Item</th>
+        <th width="25%">Due Date</th>
+        <th width="25%">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- BEGIN due -->
+      <tr>
+        <td>{DUE_SUBJECT}</td>
+        <td>{DUE_DESC}</td>
+        <td>{DUE_DATE}</td>
+        <td>
+        <!-- BEGIN download -->
+        <a href="/send.php?id={FILE_ID}&save=1">Download</a> / 
+        <!-- END download -->
+        <a href="/submission/submitWork/{BOX_ID}">Submit</a></td>
+      </tr>
+     
+      <!-- END due -->
+    </tbody>
+  </table>
+</div>
+<!-- END has_due -->
+
+
+  <div class="box component">
+    <h2>Subjects</h2>
     <div class="editPanel hide">
       <form method="get" action="/homepage/configForm.php">
         <input type="hidden" value="4" name="cid">
@@ -160,9 +160,8 @@
        </ul>
     </div>
   </div>
-  <div id="component" class="box">
-    <h2 style="cursor: move;">Activites</h2>
-    <a class="edit">edit</a>
+  <div class="box component">
+    <h2>Activites</h2>
     <div class="editPanel hide">
       <form method="get" action="/homepage/configForm.php">
         <input type="hidden" value="4" name="cid">
