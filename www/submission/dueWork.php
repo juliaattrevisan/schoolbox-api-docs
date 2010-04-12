@@ -218,6 +218,7 @@ if (is_array($returnList)) {
 		$output = array('RETURN_SUBJECT'	=> scrubText($return['categoryName']),
 						'RETURN_DESC'		=> scrubText($return['description']),
 						'RETURN_MARK'		=> scrubText($return['mark']),
+						'RETURN_COMMENT'	=> scrubText($return['comment']),
 						'FILE_ID'			=> $return['fid'],
 						'BOX_ID'			=> $return['box_id'],
 						);

@@ -44,7 +44,9 @@ class SubmissionStudent extends Model {
 
     function securityCheck($box_id) {
         //check if already submitted
-        $query = "SELECT id FROM student_submission WHERE box_id = '$box_id' AND owner = '".$_SESSION['id']."'";
+        $query = "SELECT s.id FROM student_submission s
+				  LEFT JOIN submission_return r ON r.box_id = s.box_id AND r.owner = s.owner
+				  WHERE s.box_id = '$box_id' AND s.owner = '".$_SESSION['id']."' AND r.id IS NULL";
         if(is_array($this->db->getRow($query)))
             error(27);
 
@@ -77,16 +79,19 @@ class SubmissionStudent extends Model {
         $late = $this->securityCheck($boxID);
 
         $studentSub = array ('owner'    => $_SESSION['id'],
-                'realname'  => $file['realname'],
+                'realname'  => $file['name'],
                 'submitted' => 'NOW()',
                 'box_id'    => $boxID,
                 'late'      => $late,
         );
 
-        $fileId = $this->db->insert($this->_table, $studentSub);
-
+		
+        $this->db->insert($this->_table, $studentSub);
+		$fileId = $this->db->insertID();
+		
         //save file using file ID as name
         $newFileName = $fileId . ".dat";
+		
         move_uploaded_file($file['tmp_name'], SUBMISSION_directory . "/" . $newFileName);
 
         return $fileId;
