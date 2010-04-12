@@ -263,8 +263,8 @@ class PortfolioWebDAV {
 		$groupHandler = new Group;
 		
 		if ($groupHandler->isStaff()) {
-			$pathList = array( 'http://silver/StaffHome/',
-							   'http://silver/StaffData/',
+			$pathList = array( 'http://gold/StaffHome/',
+							   'http://gold/StaffData/',
 							  );
 		} else {
 			$pathList = array( 'http://silver/StudentHome/' . $_SESSION['year'] . '/' . $_SESSION['username'] . '/',
