@@ -318,39 +318,9 @@ h1 + .header_option {
 span.wrapper a {
 	color:#FFF;
 }
-.due-dates-selection select {
-	float:right;
-}
-.due-dates-selection a.back {
-	background:url(/images/cal-prev.gif) no-repeat;
-	display:inline-block;
-	width:14px;
-	height:14px;
-	text-indent:-9999px;
-}
-.due-dates-selection form {
-	float:right;
-}
-.due-dates-selection a.forward {
-	background:url(/images/cal-forward.gif) no-repeat;
-	display:inline-block;
-	width:14px;
-	height:14px;
-	text-indent:-9999px;
-}
-.due-dates-selection a.back:hover, .due-dates-selection a.forward:hover {
-	background-position:bottom;
-}
-.due-dates-selection div {
-	float:left;
-	padding:10px 0 10px 0;
-	height:17px;
-}
-.due-dates-selection span {
-	margin:0 10px;
-	padding-left:25px;
-	background:url(/images/cal-icon.gif) no-repeat 3px 1px;
-	color:#557087;
-	font-weight:bold;
+.due-dates {
+	border-style:none solid solid;
+	border-width:0 1px 1px 1px;
+	border-color:#E4E4E4;
 }
 	

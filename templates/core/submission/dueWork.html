@@ -60,39 +60,6 @@
 
 <!-- BEGIN has_return -->
 <div class="indent">
-  <table class="due-dates">
-    <thead>
-      <tr>
-        <td colspan="6" class="td-heading"><h2>Returned Work</h2></td>
-      <tr>
-      <tr>
-        <th width="20%">Subject</th>
-        <th width="20%">Item</th>
-        <th width="25%">Comment</th>
-        <th width="15%">Mark</th>
-        <th width="20%">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- BEGIN return -->
-      <tr>
-        <td>{RETURN_SUBJECT}</td>
-        <td>{RETURN_DESC}</td>
-        <td>{RETURN_COMMENT}</td>
-        <td>{RETURN_MARK}</td>        
-        <td>
-        <!-- BEGIN download_rt -->
-        <a href="/send.php?id={FILE_ID}&save=1">Download</a> / 
-        <!-- END download_rt -->
-        <a href="/submission/submitWork/{BOX_ID}">Submit</a></td>
-      </tr>
-      <!-- END return -->
-    </tbody>
-  </table>
-</div>
-<!-- END has_return -->
-</div>
-<div class="right">
 
 <!-- BEGIN has_due -->
 <div class="box component">
@@ -125,6 +92,36 @@
 </div>
 <!-- END has_due -->
 
+
+<h2>Returned Work</h2>
+  <table class="due-dates">
+    <thead>
+      <tr>
+        <th width="25%">Subject</th>
+        <th width="25%">Item</th>
+        <th width="25%">Mark</th>
+        <th width="25%">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- BEGIN return -->
+      <tr>
+        <td>{RETURN_SUBJECT}</td>
+        <td>{RETURN_DESC}</td>
+        <td>{RETURN_MARK}</td>
+        <td>
+        <!-- BEGIN download_rt -->
+        <a href="/send.php?id={FILE_ID}&save=1">Download</a> / 
+        <!-- END download_rt -->
+        <a href="/submission/submitWork/{BOX_ID}">Submit</a></td>
+      </tr>
+      <!-- END return -->
+    </tbody>
+  </table>
+</div>
+<!-- END has_return -->
+</div>
+<div class="right">
 
   <div class="box component">
     <h2>Subjects</h2>
