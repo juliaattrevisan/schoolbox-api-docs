@@ -67,10 +67,11 @@
   <table class="due-dates">
     <thead>
       <tr>
-        <th width="25%">Subject</th>
-        <th width="25%">Item</th>
-        <th width="25%">Due Date</th>
-        <th width="25%">Action</th>
+        <th width="20%">Subject</th>
+        <th width="20%">Item</th>
+        <th width="20%">Due Date</th>
+        <th width="20%">&nbsp;</th>
+        <th width="20%">Action</th>
       </tr>
     </thead>
     <tbody>
@@ -79,6 +80,7 @@
         <td>{DUE_SUBJECT}</td>
         <td>{DUE_DESC}</td>
         <td>{DUE_DATE}</td>
+        <td>&nbsp;</td>
         <td>
         <!-- BEGIN download -->
         <a href="/send.php?id={FILE_ID}&save=1">Download</a> / 
@@ -97,10 +99,11 @@
   <table class="due-dates">
     <thead>
       <tr>
-        <th width="25%">Subject</th>
-        <th width="25%">Item</th>
-        <th width="25%">Mark</th>
-        <th width="25%">Action</th>
+        <th width="20%">Subject</th>
+        <th width="20%">Description</th>
+        <th width="20%">Mark</th>
+        <th width="20%">Comment</th>
+        <th width="20%">Action</th>
       </tr>
     </thead>
     <tbody>
@@ -109,6 +112,7 @@
         <td>{RETURN_SUBJECT}</td>
         <td>{RETURN_DESC}</td>
         <td>{RETURN_MARK}</td>
+        <td>{RETURN_COMMENT}</td>
         <td>
         <!-- BEGIN download_rt -->
         <a href="/send.php?id={FILE_ID}&save=1">Download</a> / 
