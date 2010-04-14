@@ -289,7 +289,7 @@ foreach ($summary as $categoryID => $category) {
 $j = 0;
 
 // activities feed
-$activityLog = $submissionHandler->getActivityLog($user['uid']);
+$activityLog = $submissionHandler->getActivityLog($user['uid'], 15);
 if (is_array($activityLog)) {
 	foreach ($activityLog as $activity) {
 		
@@ -307,9 +307,10 @@ if (is_array($activityLog)) {
 		} 
 		else {
 			$stringDesc = $categoryName . ' submissions for ' . scrubText($activity['description']) . ' are now closed ';	
-		}	
+		}
 		
 		$output = array('ACTIVITY_DESCRIPTION'	=> $stringDesc,
+						'ACTIVITY_DATE'			=> getRelativeTime($activity['activity_date'], 0 , ''),
 						'DARK'					=> $j++ % 2 ? 'dark' : '',
 						);
 		$this->setVar($output);

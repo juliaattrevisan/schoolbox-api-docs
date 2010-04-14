@@ -138,7 +138,7 @@ $j(function () {
         <td>{RETURN_COMMENT}</td>
         <td>
         <!-- BEGIN download_rt -->
-        <a href="/send.php?id={FILE_ID}&save=1">Download</a> / 
+        <a href="/send.php?id={FILE_ID}&save=1">Download</a> 
         <!-- END download_rt -->
         </td>
       </tr>
@@ -152,28 +152,6 @@ $j(function () {
 
   <div class="box component">
     <h2>Subjects</h2>
-    <div class="editPanel hide">
-      <form method="get" action="/homepage/configForm.php">
-        <input type="hidden" value="4" name="cid">
-        <input type="hidden" value="config" name="type">
-        <input type="hidden" value="5" name="component">
-        <label for="size">Item Limit: </label>
-        <select name="size" gtbfieldid="11">
-          <option selected="selected" value="0">All</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-          <option value="8">8</option>
-          <option value="9">9</option>
-          <option value="10">10</option>
-        </select>
-        <input type="submit" value="Update">
-      </form>
-    </div>
     <div class="text listing">
       <ul>
         <!-- BEGIN summary -->
@@ -188,33 +166,12 @@ $j(function () {
   </div>
   <div class="box component">
     <h2>Activites</h2>
-    <div class="editPanel hide">
-      <form method="get" action="/homepage/configForm.php">
-        <input type="hidden" value="4" name="cid">
-        <input type="hidden" value="config" name="type">
-        <input type="hidden" value="5" name="component">
-        <label for="size">Item Limit: </label>
-        <select name="size" gtbfieldid="11">
-          <option selected="selected" value="0">All</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-          <option value="8">8</option>
-          <option value="9">9</option>
-          <option value="10">10</option>
-        </select>
-        <input type="submit" value="Update">
-      </form>
-    </div>
     <div class="text listing">
       <ul>
         <!-- BEGIN activity --> 
         <li class="{DARK}">
-          <p>{ACTIVITY_DESCRIPTION}</p>
+          <h4>{ACTIVITY_DESCRIPTION}</h4>
+		  <p class="interact">{ACTIVITY_DATE}</p>
           <div class="float-fix"></div>
         </li>
         <!-- END activity -->
