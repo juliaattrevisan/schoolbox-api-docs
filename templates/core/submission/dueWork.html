@@ -1,3 +1,24 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+$j(function () {
+			 
+	$j('#subjectFilter').change(function () {
+		$j('li.event').fadeTo(0, 1);
+		
+		var categoryID = $j(this).val();
+		if (categoryID != '') {
+			$j('li.event:not(.category-' + categoryID + ')').fadeTo(0, 0.4);
+		}
+	
+	});
+	
+	$j('#childSelect').change(function () {
+		window.open('/submission/dueWork/{SELECTED_DATE}/' + $j(this).val(), '_self', '');
+		return false;
+	});
+});
+</script>
+<!-- END custom_head -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/calendar.css" />
 
 <h1>Due Work</h1>
