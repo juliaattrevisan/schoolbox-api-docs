@@ -179,7 +179,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 
 }
 
-
+$j = 0;
 // upcoming due work
 $workList = $submissionHandler->getUpcoming($user['uid'], $categoryList);
 if (is_array($workList)) {
@@ -194,6 +194,7 @@ if (is_array($workList)) {
 						'DUE_DATE'		=> $date,
 						'FILE_ID'		=> $work['file_id'],
 						'BOX_ID'		=> $work['id'],
+						'DARK'			=> $j++ % 2 ? 'dark' : '',
 						);
 		
 		$this->setVar($output);
@@ -209,7 +210,7 @@ if (is_array($workList)) {
 	$this->parse('has_due_block', 'has_due');
 }
 
-
+$j = 0;
 // returned work
 $returnList = $returnHandler->getByUser($user['uid']);
 if (is_array($returnList)) {
@@ -221,6 +222,7 @@ if (is_array($returnList)) {
 						'RETURN_COMMENT'	=> scrubText($return['comment']),
 						'FILE_ID'			=> $return['fid'],
 						'BOX_ID'			=> $return['box_id'],
+						'DARK'				=> $j++ % 2 ? 'dark' : '',
 						);
 		
 		$this->setVar($output);
@@ -237,6 +239,7 @@ if (is_array($returnList)) {
 	$this->parse('has_return_block', 'has_return');
 }
 
+$j = 0;
 
 // subject summary
 foreach ($summary as $categoryID => $category) {
@@ -271,6 +274,7 @@ foreach ($summary as $categoryID => $category) {
 					'SUMMARY_TOTAL'		=> $category['total'],
 					'SUMMARY_DUE'		=> $category['due'],
 					'SUMMARY_TEACHER'	=> SYNERGY_enable ? implode(', ', $teacherOutput) : '',
+					'DARK'				=> $j++ % 2 ? 'dark' : '',
 					);	
 	
 	$this->setVar($output);
@@ -282,6 +286,7 @@ foreach ($summary as $categoryID => $category) {
 	$this->parse('summary_block', 'summary', true);
 }
 
+$j = 0;
 
 // activities feed
 $activityLog = $submissionHandler->getActivityLog($user['uid']);
