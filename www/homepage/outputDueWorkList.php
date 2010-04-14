@@ -18,9 +18,9 @@ if (is_array($submissionList)) {
 
 		if($enroled) {
 			if($groupHandler->isStudent() && !is_numeric($submission['studentWork']) && $submission['late'] > time() && $submission['open'] < time())
-				$dateURL = "/submission/submitWork.php?box_id=" . $submission['id'];
+				$dateURL = "/submission/submitWork/" . $submission['id'];
 			else if($groupHandler->isStaff() && $submission['owner'] == $_SESSION['id'])
-				$dateURL = "/submission/viewSubmission.php?box_id=" . $submission['id'];
+				$dateURL = "/submission/viewSubmission/" . $submission['id'];
 		}
 		
 		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . scrubText($submission['description']) . ($nameURL ? '</a>' : "");

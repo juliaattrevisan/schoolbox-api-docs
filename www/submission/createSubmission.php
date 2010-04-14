@@ -23,8 +23,6 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     else
         $catOutput = "<b>".$subbox['categoryName']."</b>";
 	
- 
-
     /* Output submission type drop down */
     $this->dropdown('type_drop', $subBoxHandler->getTypes(), $subbox['type'], TEMPLATE_content, array('name'=>'TYPE_TEXT','id'=>'TYPE_VALUE'));
 
@@ -103,7 +101,7 @@ else if($this->arg[0] == 'new'  ) {
 		$categoryList[$i]['name'] .= ' ('.$categoryList[$i]['code'].')'; 
 	}
 	
-	$this->dropDown('category', $categoryList, '', 'category_select', array('id' => 'CATEGORY_ID', 'name' => 'CATEGORY_NAME'));
+	$this->dropDown('category', $categoryList, $this->arg[1], 'category_select', array('id' => 'CATEGORY_ID', 'name' => 'CATEGORY_NAME'));
 	$this->parse('category_select_block', 'category_select');
 
     /* Output submission type drop down */

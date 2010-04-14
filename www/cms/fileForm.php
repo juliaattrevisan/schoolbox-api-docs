@@ -111,7 +111,7 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 		
 		/* Redirect to submission page */
 		if($_POST['submission'])
-			localRedir("/submission/createSubmission.php?category=".$_POST['category']."&fileid=".$fileID);
+			localRedir("/submission/createSubmission/new/{$_POST['category']}/$fileID");
 		elseif(isset($_POST['return']))
 			localRedir($_POST['return'] . '&fileID=' . $fileID );
 		else

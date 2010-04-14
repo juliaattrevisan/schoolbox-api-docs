@@ -45,8 +45,7 @@ class SubmissionStudent extends Model {
     function securityCheck($box_id) {
         //check if already submitted
         $query = "SELECT s.id FROM student_submission s
-				  LEFT JOIN submission_return r ON r.box_id = s.box_id AND r.owner = s.owner
-				  WHERE s.box_id = '$box_id' AND s.owner = '".$_SESSION['id']."' AND r.id IS NULL";
+				  WHERE s.box_id = '$box_id' AND s.owner = '".$_SESSION['id']."'";
         if(is_array($this->db->getRow($query)))
             error(27);
 

@@ -187,7 +187,10 @@ class Feed {
 	// TODO: Homepage layout changes
 	
 	// TODO: Submission boxes
-	
+
+	// TODO: blog
+
+	// TODO: text box updates
 	
 	function timecmp($a, $b)
 	{

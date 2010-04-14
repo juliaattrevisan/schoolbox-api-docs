@@ -19,9 +19,9 @@ if (is_array($assignmentList)) {
 		if($enroled)
 		{
 			if($groupHandler->isStudent() && !is_numeric($assignment['studentWork']) && $assignment['late'] > date('U') && $assignment['open'] < date('U')) //student
-				$dueDate = '<a href="/submission/submitWork.php?box_id='.$assignment['id'].'">'.$date.'</a>';
+				$dueDate = '<a href="/submission/submitWork/'.$assignment['id'].'">'.$date.'</a>';
 			else if($groupHandler->isStaff() && $assignment['owner'] == $_SESSION['id']) //if staff owns box provide link
-				$dueDate = '<a href="/submission/viewSubmission.php?box_id='.$assignment['id'].'">'.$date.'</a>';
+				$dueDate = '<a href="/submission/viewSubmission/'.$assignment['id'].'">'.$date.'</a>';
 			else
 				$dueDate = $date;
 		}

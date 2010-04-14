@@ -13,7 +13,7 @@ class Submission extends Model {
     }
 
     function getByID($boxID) {
-        $query = "SELECT submission_box.*, GROUP_CONCAT(cc.code) code, category.name as categoryName
+        $query = "SELECT submission_box.*, GROUP_CONCAT(cc.code) code, category.name as categoryName, category.id as cid
                   FROM submission_box 
 				  JOIN category ON submission_box.category = category.id
 				  LEFT JOIN categoryCode cc ON cc.categoryID = category.id
