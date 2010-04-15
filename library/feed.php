@@ -26,6 +26,8 @@ class Feed {
 		$news = $this->getNews($cid, $limit);
 		$wiki = $this->getWiki($cid, $limit);
 		$forum = $this->getForum($cid, $limit);
+      $blog = $this->getBlog($cid, $limit);
+      $blogComments = $this->getBlogComments($cid, $limit);
 		
 		is_array($files)?0:$files=array();
 		is_array($links)?0:$links=array();
@@ -33,9 +35,11 @@ class Feed {
 		is_array($news)?0:$news=array();
 		is_array($wiki)?0:$wiki=array();
 		is_array($forum)?0:$forum=array();
+      is_array($blog)?0:$blog=array();
+      is_array($blogComments)?0:$blogComments=array();
 		
 		//get each of the areas
-		$feedList = array_merge($files, $links, $folders, $news, $wiki, $forum);
+		$feedList = array_merge($files, $links, $folders, $news, $wiki, $forum, $blog, $blogComments);
 		
 		
 		//sort them
@@ -178,9 +182,57 @@ class Feed {
 		
 		}
 		return $wiki;
-	}	
-	
-	
+	}
+
+   /* getBlog
+    * Get a list of new blog entries to push into the feed.
+    */
+   function getBlog($cid, $limit) {
+      $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, b.id AS blogID, heading, UNIX_TIMESTAMP(b.created) AS submitted
+               FROM user u
+               JOIN blog b
+               ON u.id = b.owner
+               WHERE cid = $cid
+               ORDER BY submitted LIMIT 0, $limit";
+
+      $this->db->query($query);
+
+      while ($row = $this->db->getNextArray()) {
+         $blog[] = array(
+            'date' => $row['submitted'],
+            'type' => 'blog',
+            'message' => formatName($row) . ' updated the blog ' . scrubTEXT($row['heading']),
+            'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . formatName($row) . '</a> updated the blog <a href="/blog/' . $row['blogID'] . '">' . scrubTEXT($row['heading']) . '</a>',
+         );
+      }
+
+      return $blog;
+   }
+
+   /* getBlogComments
+    * Get a list of new blog comments to push into the feed.
+    */
+   function getBlogComments($cid, $limit) {
+      $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, UNIX_TIMESTAMP(bc.created) AS submitted, b.id AS blogID, heading, cid
+               FROM `user` u
+               JOIN blogComment bc ON u.id = bc.owner
+               JOIN blog b ON bc.bid = b.id
+               WHERE cid = $cid
+               ORDER BY submitted LIMIT 0, $limit";
+
+      $this->db->query($query);
+
+      while ($row = $this->db->getNextArray()) {
+         $blogComments[] = array(
+            'date' => $row['submitted'],
+            'type' => 'blog',
+            'message' => formatName($row) . ' updated the blog ' . scrubTEXT($row['heading']),
+            'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . formatName($row) . '</a> commented on the blog <a href="/blog/' . $row['blogID'] . '">' . scrubTEXT($row['heading']) . '</a>',
+         );
+      }
+
+      return $blogComments;
+   }
 	
 	// TODO: Group member changes
 	
