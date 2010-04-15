@@ -28,31 +28,33 @@
 		<!-- BEGIN blog -->
 		<li class="{BLOG_SHADING}">
 			<h3>{BLOG_HEADING}</h3>
-			<p class="interact">Posted by {BLOG_OWNER} {BLOG_CREATED} {MODIFY_BLOG}</p>
+         <p class="interact">{MODIFY_BLOG}</p>
 			<p>{BLOG_BODY}</p>
-		<!-- BEGIN show_comment -->
-      <p class="interact"><a class="show_comments" href="javascript:void();">Show {BLOG_COMMENTS} Comments</a></p>
-	  <!-- END show_comment -->
-			<div class="float-fix"></div>
-      <div class="blog_comments">
-        <!-- BEGIN comment -->
-        <p>{COMMENT_BODY}</p>
-        <p class="small summ">{COMMENT_OWNER} {COMMENT_CREATED} {DELETE_COMMENT}</p>
-        <div class="float-fix"></div>
-        <!-- END comment -->
-		<!-- BEGIN show_all -->
-		<p><a class="interact" href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
-		<!-- END show_all -->
-		</div>
-		
-		<p><a class="interact post_comment" href="javascript:void();">Post comment</a></p>
-        <form class="standardForm" method="post" action="/blog/comment/new/{BLOG_ID}">
-          <p><textarea name="body" style="width: 100%;"></textarea></p>
-          <p><input type="submit" name="comment" value="Comment"/></p>
-        </form>
+         <p class="interact">Posted by {BLOG_OWNER} {BLOG_CREATED}</p>
+         <!-- BEGIN show_comment -->
+         <p><a class="show_comments" href="javascript:void();">Show {BLOG_COMMENTS} Comments</a></p>
+         <!-- END show_comment -->
+         <div class="float-fix"></div>
+         <div class="blog_comments">
+            <!-- BEGIN comment -->
+            <p>{COMMENT_BODY}</p>
+            <p class="small summ">{COMMENT_OWNER} {COMMENT_CREATED} {DELETE_COMMENT}</p>
+            <div class="float-fix"></div>
+            <!-- END comment -->
 
-      
-			<div class="float-fix"></div>
+            <!-- BEGIN show_all -->
+            <p><a class="interact" href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
+            <!-- END show_all -->
+         </div>
+		
+         <p><a class="interact post_comment" href="javascript:void();">Post comment</a></p>
+
+         <form class="standardForm" method="post" action="/blog/comment/new/{BLOG_ID}">
+            <p><textarea name="body" style="width: 100%;"></textarea></p>
+            <p><input type="submit" name="comment" value="Comment"/></p>
+         </form>
+     
+ 			<div class="float-fix"></div>
 		</li>
 		<!-- END blog -->
 	</ul>
