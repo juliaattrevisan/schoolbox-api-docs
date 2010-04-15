@@ -9,6 +9,7 @@ require_once SITE_root . '/library/synergetic-class.php';
 require_once SITE_root . '/www/include/involved.php';
 
 $this->setFile(TEMPLATE_content, 'submission/dueWork.html');
+$this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'week', 'week_block');
 $this->setBlock('week', 'day', 'day_block');
 $this->setBlock('day', 'event', 'event_block');
@@ -194,7 +195,7 @@ if (is_array($workList)) {
 						'DUE_DATE'		=> $date,
 						'FILE_ID'		=> $work['file_id'],
 						'BOX_ID'		=> $work['id'],
-						'DARK'			=> $j++ % 2 ? 'dark' : '',
+						'DARK'			=> $j++ % 2 ? '' : 'dark',
 						);
 		
 		$this->setVar($output);
@@ -220,9 +221,9 @@ if (is_array($returnList)) {
 						'RETURN_DESC'		=> scrubText($return['description']),
 						'RETURN_MARK'		=> scrubText($return['mark']),
 						'RETURN_COMMENT'	=> scrubText($return['comment']),
-						'FILE_ID'			=> $return['fid'],
-						'BOX_ID'			=> $return['box_id'],
-						'DARK'				=> $j++ % 2 ? 'dark' : '',
+						'RETURN_FILE_ID'	=> $return['id'],
+						'RETURN_BOX_ID'		=> $return['box_id'],
+						'DARK'				=> $j++ % 2 ? '' : 'dark',
 						);
 		
 		$this->setVar($output);
@@ -304,7 +305,20 @@ if (is_array($activityLog)) {
 		} 
 		elseif ($activity['new'] == 'overdue') {
 			$stringDesc = '<strong>' . $taskName . ' for ' . $categoryName . ' is overdue</strong> ';
-		} 
+		}
+		else if($activity['new'] == 'submitted') {
+			$stringDesc = 'Work submitted to '.$activity['description'] .' for <a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
+		}
+		else if($activity['new'] == 'returned') {
+			if($activity['typeName'])
+				$stringDesc = 'You received '.$activity['typeName'];
+			else if($activity['fid']) 
+				$stringDesc = '<a href="/submission/send.php?id='.$activity['fid'].'&return=1">Work returned</a>';
+			else
+				$stringDesc = 'Work returned';
+
+			$stringDesc .= ' for '.$activity['description']. ' in <a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
+		}
 		else {
 			$stringDesc = $categoryName . ' submissions for ' . scrubText($activity['description']) . ' are now closed ';	
 		}

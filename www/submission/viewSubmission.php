@@ -58,8 +58,8 @@ if(is_numeric($this->arg[0])) {
                                         'OWNER_ID' 	=> $student['uid'],
                                         'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
                                         'DATE'		=> $studentSub['date'],
-                                        'VIEW'		=> '/submission/viewSubmissionForm.php?view='.$studentSub['id'],
-                                        'SAVE'		=> '/submission/viewSubmissionForm.php?view='.$studentSub['id'].'&save=1',
+                                        'VIEW'		=> '/submission/send.php?id='.$studentSub['id'].'&view=1',
+                                        'SAVE'		=> '/submission/send.php?id='.$studentSub['id'],
                                         'DELETE'	=> '/submission/viewSubmissionForm.php?delete='.$studentSub['id']."&box_id=" . $this->arg[0],
                                         'COLOUR'	=> $studentSub['late']?'#ff0000':'#000000',
                                         'MARKED'	=> $studentSub['marked']?'<img src="/images/greentick.gif" width="13" height="12">':'<img src="/images/emptybox.gif" width="13" height="12">',
@@ -123,89 +123,4 @@ if(is_numeric($this->arg[0])) {
 else
     error(2);
 
-
-
-/*
-
-    function sendWork($view, $save) {
-        //sends students submission to owner of submission box only
-
-        $result = $this->checkPerms($view);
-
-        if($save)
-            $attach = "attachment;";
-        else
-            $attach = "";
-
-        //all checks completed.. continue with file send
-        $filename = SUBMISSION_directory . "/" . $view . ".dat";
-
-        //send headers
-        header ("Content-Type: application/octet-stream");
-        header ("Content-Disposition: $attach filename=\"".$result['lastname']."-".$result['realname']."\"");
-        header ("Content-Length: ".filesize($filename));
-        readfile($filename);
-
-    }
-
-    function deleteWork($id) {
-        //delete a student submission to a box so they can resubmit
-
-        $this->checkPerms($id);
-
-        //delete from database
-        $query = "DELETE FROM student_submission WHERE student_submission.id = '$id'";
-        $this->db->query($query);
-
-        //all checks completed.. continue with file delete
-        $filename = SUBMISSION_directory . "/" . $id . ".dat";
-        unlink($filename);
-
-    }
-
-    function checkPerms($id) {
-        //check user has access to student submission
-
-        //check if user has rights to view file and get file details and username for appending to save
-        $query = "SELECT student_submission.realname, user.lastname, user.title, user.firstname
-			FROM submission_box, student_submission, user 
-			WHERE student_submission.id = '$id' AND student_submission.box_id = submission_box.id 
-			AND submission_box.owner = '".$_SESSION['id']."' AND student_submission.owner = user.id";    	
-
-        $this->db->query($query);
-        if($this->db->countRows() > 0)
-            $result = $this->db->getNextArray();
-        else {
-            error(44);
-        }
-
-        return $result;
-    }
-
-    function showPage($box_id) {
-        $this->t_body = new Template(TPL_directory);
-        $this->t_body->set_file("tplBODY", "submission/viewSub.htm");
-        $this->t_body->set_var("TITLE", HEADING." - Student Submissions");
-        $this->t_body->set_block("tplBODY", "submitted_block", "submission_listing");
-        $this->t_body->set_block("submitted_block", "mark", "mark_block");
-        $this->setSubmissions($box_id);
-
-        include_once("../include/page.php");
-
-        $this->t_body->pparse("finaloutput", "tplBODY");
-    }
-}
-
-$myPage = new ViewSubmissionPage();
-
-if(isset($_GET['delete']) && $_GET['delete']) {
-    $myPage->deleteWork($_GET['delete']);
-}
-
-if(isset($_GET['box_id']) && $_GET['box_id']) {
-    $myPage->showPage($_GET['box_id']);
-}
-else if(isset($_GET['view']) && $_GET['view']) {
-    $myPage->sendWork($_GET['view'], $_GET['save']);
-}*/
 ?>

@@ -252,7 +252,23 @@ class SitePage extends Page {
 			$this->parse('tt_tab','timetable_tab'); 	
 		else
 			$this->setVar('tt_tab', '');
-		
+
+		/* output submission box links */
+		$this->setBlock('tabTpl', 'duework_tab', 'dw_tab');
+		$this->setBlock('tabTpl', 'submission_tab', 'sm_tab');
+		if($this->groupHandler->isStaff() ) {
+				$this->parse('sm_tab','submission_tab');
+				$this->setVar('dw_tab','');
+		}
+		else if($this->groupHandler->isStudent()) {
+				$this->parse('dw_tab','duework_tab');
+				$this->setVar('sm_tab','');
+		}
+		else {
+			$this->setVar('sm_tab','');
+			$this->setVar('dw_tab','');
+		}
+
 		//this section handles the display of the webmail tab
 		// if configuration states mail is available and user has access to local mail account display it
 		$this->setBlock('tabTpl', 'webmail_tab', 'wm_tab');

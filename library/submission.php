@@ -44,11 +44,11 @@ class Submission extends Model {
 	function getUpcoming($userID, $categoryList) {
 		$query = "SELECT s.*, UNIX_TIMESTAMP(s.date) date, ft.name as type, file.realname, file.id file_id, a.inline, c.name categoryName
 				  FROM ( submission_box s, category c )
-				  LEFT JOIN student_submission t ON t.box_id = s.id AND t.owner = $userID
+				  LEFT JOIN student_submission t ON t.box_id = s.id AND t.owner = '$userID'
 				  LEFT JOIN file ON s.fid = file.id
 				  LEFT JOIN allowedFileTypes a ON file.mime_type = a.mime
 			 	  LEFT JOIN file_type ft ON s.type = ft.id
-				  WHERE s.category = c.id AND s.deleted = 0 AND s.late_date > NOW() AND t.id IS NULL AND ( 1=2 ";
+				  WHERE s.category = c.id AND s.deleted = 0 AND s.late_date > NOW() AND s.owner != '$userID' AND t.id IS NULL AND ( 1=2 ";
 				  
 		if (is_array($categoryList)) {
 			foreach ($categoryList as $category) {
@@ -142,8 +142,13 @@ class Submission extends Model {
 					UNION 
 					( SELECT `late_date`, i.name typeName, t.description, t.category, a.name categoryName, t.fid, 'closed' FROM submission_box t, category a, file_type i 
 					  WHERE t.category = a.id AND i.id = t.type AND `late_date` < NOW() )
-					  
-					ORDER BY activity_date DESC LIMIT $limit";	
+					UNION
+					( SELECT g.`submitted` activity_date, g.realname typeName, m.description, m.category, n.name categoryName, m.fid, 'submitted'  FROM  student_submission g, submission_box m, category n
+					  WHERE g.box_id = m.id AND m.category = n.id AND g.owner = $userID )
+					UNION
+				   ( SELECT v.`returned` activity_date, v.mark typeName, w.description, w.category, x.name categoryName, v.id fid, 'returned'  FROM  submission_return v, submission_box w, category x
+					  WHERE v.box_id = w.id AND w.category = x.id AND v.owner = $userID )
+					ORDER BY activity_date DESC LIMIT $limit";
 
 		return $this->db->getAll($query);
 	}
