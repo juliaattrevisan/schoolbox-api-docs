@@ -8,9 +8,9 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/include/stdfuncs.php';
 $wikiHandler = new Wiki;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
-if (isset($_POST['wikiID'])) {
+if (isset($_GET['wikiID'])) {
    // wiki exists
-   $wiki = $wikiHandler->getByID($_POST['wikiID']);
+   $wiki = $wikiHandler->getByID($_GET['wikiID']);
    
    if (!isset($wiki['wikiID'])) {
       error(2);
@@ -29,7 +29,7 @@ if (isset($_POST['wikiID'])) {
       error(19);
    }
 
-   $wikiContents = $wikiHandler->getByID($_POST['wikiID']);
+   $wikiContents = $wikiHandler->getByID($_GET['wikiID']);
 
    $output = array(
       'AUTHOR' => $wikiContents['firstname'] . ' ' . $wikiContents['lastname'],
