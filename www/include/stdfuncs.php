@@ -9,8 +9,7 @@
 ************************************************************/
 
 //returns the connection type (http:// or https://)
-function conType()
-{
+function conType() {
         //detect connection type
         $port = getenv("SERVER_PORT");
         if($port == 80)
@@ -22,8 +21,7 @@ function conType()
 }
         
 //Function for handling error conditions
-function error($ec, $message="")
-{
+function error($ec, $message="") {
 	global $page;
 	if (is_object($page))
 		$page->error($ec, $message);
@@ -37,12 +35,22 @@ function error($ec, $message="")
 }
  
 //Function for redirecting to a specified file
-function localRedir($file)
-{
-        $contype = conType();
-        
+function localRedir($file) {
+        $contype = conType(); 
         header("Location: ".$contype.$_SERVER['HTTP_HOST'].$file);
         exit;
+}
+
+//Function
+function greeting() {
+	if(date("A")=="AM")
+		$greeting =  "Good Morning";
+	else if(date("G") < 17)
+		$greeting =  "Good Afternoon";
+	else
+		$greeting =  "Good Evening";
+
+	return $greeting;
 }
 
 //This function is used when the session is not correct simply redirects

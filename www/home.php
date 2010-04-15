@@ -13,17 +13,6 @@ if (strpos($_SERVER['REQUEST_URI'], 'home.php'))
 $this->setFile(TEMPLATE_content, 'home.html');
 $this->setTitle('Welcome');
 
-if(date("A")=="AM")
-	$greeting =  "Good Morning";
-else if(date("G") < 17)
-	$greeting =  "Good Afternoon";
-else
-	$greeting =  "Good Evening";
-
-//set greeting
-$this->setVar('GREETING', $greeting);
-$this->setVar('NAME', formatName($_SESSION));
-
 //fetch layout for user
 $query = "SELECT position, name, filename, function 
 			FROM welcomeLayout LEFT JOIN welcomeComponent ON componentID = welcomeComponent.id

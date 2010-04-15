@@ -31,23 +31,18 @@
                         {PRECIS3}</td>
                     </tr>
                     <tr> 
-                      <td><span style="color:#f33"><span style="color:#09f">{LOW0}°</span> - {HIGH0}°</span></td>
-                      <td><span style="color:#f33"><span style="color:#09f">{LOW1}°</span> - {HIGH1}°</span></td>
-                      <td><span style="color:#f33"><span style="color:#09f">{LOW2}°</span> - {HIGH2}°</span></td>
-                      <td><span style="color:#f33"><span style="color:#09f">{LOW3}°</span> - {HIGH3}°</span></td>
+                      <td><span style="color:#f33">{HIGH0}° - <span style="color:#09f">{LOW0}°</span></span></td>
+                      <td><span style="color:#f33">{HIGH1}° - <span style="color:#09f">{LOW1}°</span></span></td>
+                      <td><span style="color:#f33">{HIGH2}° - <span style="color:#09f">{LOW2}°</span></span></td>
+                      <td><span style="color:#f33">{HIGH3}° - <span style="color:#09f">{LOW3}°</span></span></td>
                     </tr>
             </table>
 			</div>
             <!-- END forecast -->
-			<table>
-              <tr>
-                <td> Get more weather from around Australia 
-                <select name="location" onchange='window.open("/weather/"+this.value,"_self", "");'>
-                <!-- BEGIN regions -->
-                <option value="{LOCATION_VALUE}" {LOCATION_VALUE_SELECTED}>{LOCATION_NAME}</option>
-                <!-- END regions -->
-                </select>
-                </td>
-                <td><span class="sub_footer"> Weather Supplied By <a href="/redir.php?url=http://www.google.com.au" target="_blank">Google</a></span></td>
-              </tr>
-            </table>
+			<h2>Weather around Australia</h2>
+			<ul>
+				<!-- BEGIN regions -->
+				<li><a href="/weather/{LOCATION_VALUE}">{LOCATION_NAME}</a></li>
+				<!-- END regions -->
+			</ul>
+		<span class="sub_footer"> Weather Supplied By <a href="/redir.php?url=http://www.google.com.au" target="_blank">Google</a></span>

@@ -93,6 +93,8 @@ class SitePage extends Page {
 		$templateVar = array(	'TEMPLATE_YEAR' => date('Y'),
 								'SITE_NAME'		=> SITE_name,
 								'SITE_ADDRESS'	=> SITE_address,
+								'GREETING'		=> greeting(),
+								'NAME'			=> formatName($_SESSION),
 								'SITE_LOCATION'	=> $this->site,
 							);
 		$this->setVar($templateVar);
