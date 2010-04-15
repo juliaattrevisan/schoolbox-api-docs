@@ -1,8 +1,9 @@
 <?php
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/wiki.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/page.php';
-require_once($_SERVER['DOCUMENT_ROOT'].'/include/stdfuncs.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/include/stdfuncs.php';
 
 $wikiHandler = new Wiki;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
@@ -15,13 +16,13 @@ if (isset($_POST['wikiID'])) {
       error(2);
    }
 
-   /* uid is empty?
-    *
+   /* uid is empty unless I use session_start()
+    */
+   session_start();
+
    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
       error(19);
    }
-    * 
-    */
    
    // check locked
    if ($wiki['locked'] == 'true' && $permission < WRITE_ACCESS) {
