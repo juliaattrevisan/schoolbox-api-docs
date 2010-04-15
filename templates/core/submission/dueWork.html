@@ -24,49 +24,37 @@ $j(function () {
 	/* calendar bubble */
 $j(function() {
 	$j('.calendarTable ul li span').click(function(){
-		$('div.bubble').remove();
-		var node = $(this).closest('li'), ev = node.attr("id").substring(6);
-		$.post('/calendar/detail.php', { eventID : ev }, function(data){
-				node.append('<div class="bubble"> \
-													<div class="bubble-top"></div> \
+		$j('div.bubble').remove();
+		var node = $j(this).closest('li'), ev = node.attr("id").substring(6);
+		
+		//$j.post('/calendar/detail.php', { eventID : ev }, function(data){
+					var data ={};
+							node.append('<div class="bubble"> \
 													<div class="bubble-main"> \
 														<a class="bubble-close" href="#"></a> \
-														<h3><a href="/event/'+ev+'">'+data.title+'</a></h3> \
-														<p class="dates"> \
-															<span>'+data.date+'</span><br/> \
-															Location: <span> '+data.location+'</span> \
-														</p> \
-														<p>'+data.teacher+'</p> \
-														<p class="no-marg"><a href="/event/'+ev+'">View Event Details</a></p> \
+														<h3><a href="/event/'+ev+'">Mid-Term Exam</a></h3> \
+														<p class="bubble-name"> \
+															<span>Maths Mathods</span> - <em>Mr.Hughes</em> \
+															</p> \
+														<p class="comment">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Limit text length?</p> \
+														<p class="details"><a href="/event/'+ev+'">View Details</a> | <a href="/event/'+ev+'">Submit</a></p> \
 													</div> \
 													<div class="bubble-bottom"></div> \
 												</div>');
 												closeBubble();
-		}, "json");
+		//}, "json");
 		return false;
 	});
 });
 	
 	function closeBubble(){
-		$('a.bubble-close').click(function(){
-			$(this).closest('div.bubble').remove();
+		$j('a.bubble-close').click(function(){
+			$j(this).closest('div.bubble').remove();
 			return false;
 		});
 	}
 	
 </script>
-<div class="bubble">
-	<div class="bubble-top">
-    </div>
-    <div class="bubble-main">
-    	<a href="#" class="bubble-close"></a>
-        <h3><a href="/event/105">+'data.title'+</a></h3>
-        <p class="dates"><span>Mon, 12 Apr 2010 8:45am</span><br>Location: <span> Mentone</span></p>
-        <p></p>
-        <p class="no-marg"><a href="/event/105">View Event Details</a></p>
-    </div>
-    <div class="bubble-bottom"></div>
-</div>
 <h1>My Work</h1>
 <div class="left">
   <center>

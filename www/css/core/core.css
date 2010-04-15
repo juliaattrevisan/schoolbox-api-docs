@@ -1231,13 +1231,58 @@ span.wrapper a {
 	background:url(/images/cal-icon.gif) no-repeat 3px 1px;
 	font-weight:bold;
 }
-	.bubble  {
+.bubble  {
+	top:-143px;
 	color:#000000;
 	font-size:11px;
-	left:0;
+	left:2;
 	position:absolute;
-	width:359px;
+	width:250px;
 	z-index:100;
+}
+.bubble-main {
+	background-color:#717171;
+	padding:10px;
+}
+.bubble-close  {
+	background:url("/images/calendar-close.gif") no-repeat scroll 0 0 transparent;
+	display:block;
+	height:19px;
+	position:absolute;
+	right:10px;
+	top:10px;
+	width:19px;
+}
+.bubble-close:hover {
+	background-position:bottom;
+}
+.bubble-bottom {
+	background:url(/images/calendar-bottom.gif) no-repeat 20px 0px;
+	height:9px;
+}
+.left #calendar table .bubble .bubble-main h3 {
+	background-color:#717171;
+	padding:0;
+	font-size:12px;
+}
+.left #calendar table .bubble .bubble-main h3 a, .bubble-main p a, .bubble-main p {
+	color:#fff;
+}
+.left #calendar table .bubble p.details {
+	border-top:1px dotted #b8b8b8;
+	padding:4px;
+	margin-bottom:0;
+}
+.left #calendar table .bubble p.comment {
+	margin-bottom:5px;
+}
+p.bubble-name {
+	margin-bottom:5px;
+	padding-bottom:5px;
+	border-bottom:1px dotted #b8b8b8;
+}
+.bubble .comment {
+	color:#000;
 }
 /*--------------------------------------------------------------
  Drop Box styles 
