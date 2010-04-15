@@ -56,31 +56,6 @@ if(is_array($subList))
 
 }
 else
-    $this->setVar('cateogory_listing','')
+    $this->setVar('category_listing','')
 
-
-/*
-
-if(isset($_GET['delete']) && $_GET['delete'])
-{
-	require_once("subbox.php");
-	$subbox = new subBox;
-	$subbox->deleteSubmissionBox($_GET['delete']);
-	localRedir("/submission/listSubmission.php");
-}
-if(isset($_GET['undelete']) && $_GET['undelete'])
-{
-	require_once("subbox.php");
-	$subbox = new subBox;
-	$subbox->undeleteSubmissionBox($_GET['undelete']);
-	localRedir("/submission/listSubmission.php");
-}
-else
-{	
-	$myPage->setSubmissions();
-	$myPage->showPage();
-}
- *
- *
- */
 ?>

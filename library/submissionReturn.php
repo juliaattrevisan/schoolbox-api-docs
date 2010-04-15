@@ -36,15 +36,15 @@ class SubmissionReturn extends Model {
     }
 
     function create($return, $file = FALSE) {
-        $return['filename'] = $file['realname'];
+        $return['filename'] = $file['name'];
         $return['returned'] = 'NOW()';
 
         $fileID = parent::create($return);
 
         if(is_array($file)) {
 
-            $newFileName = $fileId . ".dat";
-            move_uploaded_file($file, RETURNS_directory . "/" . $newFileName);
+            $newFileName = $fileID . ".dat";
+            move_uploaded_file($file['tmp_name'], RETURNS_directory . "/" . $newFileName);
         }
 
         //Update student submission to be marked

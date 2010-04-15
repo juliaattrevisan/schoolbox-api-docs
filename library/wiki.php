@@ -120,13 +120,13 @@ class Wiki extends Model {
 		return parent::update($data);
 	}
 
-        function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
             $keyword = scrubText($keyword);
 
             $query = "SELECT wiki.*, wikiRevision.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
                         FROM `wikiRevision`
-                        LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID
+                        LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID AND `wikiRevision`.revisionID = `wiki`.latestRevision
                         LEFT JOIN `user` ON `wikiRevision`.userID = `user`.id
                         LEFT JOIN `perms` ON `wiki`.categoryID = `perms`.cid
                             AND `perms`.gid = {$_SESSION['gid']}
@@ -136,7 +136,6 @@ class Wiki extends Model {
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
-                            AND `wikiRevision`.revisionID = `wiki`.latestRevision
                             AND deleted = 'false'
                         ORDER BY `$sort_by` $sort_dir
                         LIMIT $offset, $limit;
@@ -144,7 +143,7 @@ class Wiki extends Model {
 
             $count_query = "SELECT COUNT(*)
                         FROM `wikiRevision`
-                        LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID
+                        LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID AND `wikiRevision`.revisionID = `wiki`.latestRevision
                         LEFT JOIN `user` ON `wikiRevision`.userID = `user`.id
                         LEFT JOIN `perms` ON `wiki`.categoryID = `perms`.cid
                             AND `perms`.gid = {$_SESSION['gid']}
@@ -154,7 +153,6 @@ class Wiki extends Model {
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
-                            AND `wikiRevision`.revisionID = `wiki`.latestRevision
                             AND `deleted` = 'false'
             ";
 
