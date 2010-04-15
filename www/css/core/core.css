@@ -1146,6 +1146,7 @@ input.timeField { width: 30px; }
 .due-dates th {
 	padding:8px 1em 0.4em 1em;
 	height:1em;
+	text-align:left;
 }
 .left #calendar table.duedates-calendar {
 	width:100%;
@@ -1230,7 +1231,14 @@ span.wrapper a {
 	background:url(/images/cal-icon.gif) no-repeat 3px 1px;
 	font-weight:bold;
 }
-	
+	.bubble  {
+	color:#000000;
+	font-size:11px;
+	left:0;
+	position:absolute;
+	width:359px;
+	z-index:100;
+}
 /*--------------------------------------------------------------
  Drop Box styles 
 --------------------------------------------------------------*/
