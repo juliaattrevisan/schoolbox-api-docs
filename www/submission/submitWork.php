@@ -6,6 +6,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionStudent.php';
 if(is_numeric($this->arg[0])) {
     $this->setFile(TEMPLATE_content, 'submission/submitWork.html');
     $this->setTitle('Submit Work');
+	$this->setTab('submission');
 
     $subHandler = new Submission;
     $studHandler = new SubmissionStudent;

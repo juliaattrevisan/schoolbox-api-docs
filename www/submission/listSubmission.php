@@ -4,6 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 
 $this->setFile(TEMPLATE_content, 'submission/listSubmission.html');
 $this->setTitle('List of Submission Boxes');
+$this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'submission_block', 'submission_listing');
 $this->setBlock(TEMPLATE_content, 'category_block', 'category_listing');
 

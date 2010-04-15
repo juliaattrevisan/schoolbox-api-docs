@@ -4,6 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/include/involved.php';
 
 $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
+$this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_block');
 $this->setBlock(TEMPLATE_content, 'category_select', 'category_select_block');
 

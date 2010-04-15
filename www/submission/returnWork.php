@@ -5,6 +5,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 
 $this->setFile(TEMPLATE_content, 'submission/returnWork.html');
 $this->setTitle('Return Student Work');
+$this->setTab('submission');
 
 $subHandler = new Submission;
 $userHandler = new User;

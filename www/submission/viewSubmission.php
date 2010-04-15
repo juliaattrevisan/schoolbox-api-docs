@@ -8,6 +8,7 @@ if(is_numeric($this->arg[0])) {
 
     $this->setFile(TEMPLATE_content, 'submission/viewSubmission.html');
     $this->setTitle('Submission Box');
+	$this->setTab('submission');
     $this->setBlock(TEMPLATE_content, 'submitted_block', 'submission_listing');
     $this->setBlock('submitted_block', 'mark', 'mark_block');
 
