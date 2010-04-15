@@ -14,6 +14,7 @@ if (is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'delete_link', 'delete_link_block');
 	$this->setBlock(TEMPLATE_content, 'revert_link', 'revert_link_block');
 	$this->setBlock(TEMPLATE_content, 'lock_link', 'lock_link_block');
+   $this->setBlock(TEMPLATE_content, 'export_link', 'export_link_block');
 	$this->setBlock(TEMPLATE_content, 'revision_list', 'revision_list_block');
 	$this->setBlock('revision_list', 'revision_comparison', 'revision_comparison_block');
 
@@ -40,6 +41,7 @@ if (is_numeric($this->arg[0])) {
 			'CURRENT_REVISION'	=> $wiki['revisionID'],
 			'LOCKED'			=> $wiki['locked'] == 'true' ? '(Locked)' : '',
 			'LOCK_UNLOCK'		=> $wiki['locked'] == 'true' ? 'Unlock' : 'Lock',
+         'EXPORT'          => 'Export',
 	);
 	$this->setVar($output);
 
@@ -91,6 +93,10 @@ if (is_numeric($this->arg[0])) {
 	$this->setVar('modify_link_block', '');
 	if (($permission >= READ_ACCESS && $wiki['locked'] == 'false') || $permission >= WRITE_ACCESS)
 		$this->parse('modify_link_block', 'modify_link');
+
+	$this->setVar('export_link_block', '');
+	if ($permission >= READ_ACCESS)
+		$this->parse('export_link_block', 'export_link');
 
 } else
 	error(2);
