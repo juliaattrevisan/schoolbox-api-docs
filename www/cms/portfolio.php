@@ -20,7 +20,7 @@ $this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 
 $this->setTitle('My Files');
-$this->setTab('myfiles');
+$this->setTab('portfolio');
 
 
 $groupHandler = new Group;
