@@ -42,11 +42,15 @@ class SubmissionStudent extends Model {
          return $this->db->getAll($query);
     }
 
+	function checkSubmitted($box_id, $userID) {
+		$query = "SELECT s.id FROM student_submission s
+				  WHERE s.box_id = '$box_id' AND s.owner = '".$userID."'";
+		return is_array($this->db->getRow($query));
+	}
+
     function securityCheck($box_id) {
         //check if already submitted
-        $query = "SELECT s.id FROM student_submission s
-				  WHERE s.box_id = '$box_id' AND s.owner = '".$_SESSION['id']."'";
-        if(is_array($this->db->getRow($query)))
+        if($this->checkSubmitted($box_id, $_SESSION['id']))
             error(27);
 
         //check if submitted assignment is late

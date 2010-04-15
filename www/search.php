@@ -145,8 +145,12 @@ if (!empty($result['user'])) {
             $page->setVar('helpdesk_block');
         } else {
             $page->parse('timetable_block', 'timetable');
-            $page->parse('helpdesk_block', 'helpdesk');
-        }
+			if(HELPDESK_enable)
+				$page->parse('helpdesk_block', 'helpdesk');
+			else
+				$page->setVar('helpdesk_block');
+
+		}
 
         if(!$_SESSION['su'])
             $page->setVar('modify_block');
@@ -374,7 +378,7 @@ if (!empty($result['forum'])) {
             'FORUM_BODY'       => cutSentence(scrubTEXT(strip_tags($forum['body'])), 150),
             'FORUM_OWNER'      => $forum['uid'],
             'FORUM_OWNER_NAME' => formatName($forum),
-            'FORUM_CREATED'    => getRelativeTime($forum['created']),
+            'FORUM_CREATED'    => getRelativeTime($forum['date']),
             'FORUM_BREADCRUMB' => $forum['breadcrumb'],
         ));
 

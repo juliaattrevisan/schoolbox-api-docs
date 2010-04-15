@@ -13,12 +13,15 @@ class Submission extends Model {
     }
 
     function getByID($boxID) {
-        $query = "SELECT submission_box.*, GROUP_CONCAT(cc.code) code, category.name as categoryName, category.id as cid
-                  FROM submission_box 
-				  JOIN category ON submission_box.category = category.id
+        $query = "SELECT s.*, GROUP_CONCAT(cc.code) code, category.name as categoryName, category.id as cid,
+					file.comment, ft.name as typeName
+                  FROM submission_box  s
+				  JOIN category ON s.category = category.id
 				  LEFT JOIN categoryCode cc ON cc.categoryID = category.id
-                  WHERE submission_box.id = '$boxID'
-				  GROUP BY submission_box.id, category.id";
+				  LEFT JOIN file ON s.fid = file.id
+			 	  LEFT JOIN file_type ft ON s.type = ft.id
+                  WHERE s.id = '$boxID'
+				  GROUP BY s.id, category.id";
         return $this->db->getRow($query);
     }
 
