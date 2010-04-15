@@ -248,6 +248,29 @@ class Group extends Model {
 		else
 			return false;
 	}
+
+   /*
+    * isSuperuser
+    * Find out if the current id belongs to a superuser.
+    */
+   function isSuperuser($userID = 0) {
+
+		// default to current user
+		if ($userID > 0) {
+         require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+         $userHandler = new User;
+         $user = $userHandler->getByID($userID);
+
+         if($user['su']) {
+         	return true;
+         }
+         else {
+            return false;
+         }
+     }
+     else
+        return $_SESSION['su']==1?true:false;
+   }
 	
 	function isStaff($userID = 0) {
 		// checks if user is staff

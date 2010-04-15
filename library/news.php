@@ -153,34 +153,49 @@ class News extends Model {
 	}
 	
 	function getHeadlines() {
+      $userHandler = new Group;
+      $shareResults = array();
+
+      /* Prevent copies of posts appearing if they are posted to another group.
+       */
+      if (!$userHandler->isSuperuser()) {
+         $query = "
+         SELECT `".$this->_index."`, item_heading, item_datetime_posted, item_datetime_modified, newsTopic.name topicName, newsTopicID
+         FROM `".$this->_table."`
+            JOIN newsCampus ON newsCampus.id = news_items.item_id
+               AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).")
+            JOIN newsGroup ON newsGroup.id = news_items.item_id
+               AND newsGroup.gid = '".$_SESSION['gid']."'
+            JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
+         WHERE news_items.item_owner != '".$_SESSION['id']."'
+            AND item_datetime_expires > NOW()
+            AND item_deleted = 0
+         GROUP BY `".$this->_index."`
+         ORDER BY newsTopic.newsTopicID, item_datetime_modified DESC
+         ";
+
+         $shareResults = $this->db->getAll($query);
+      }
+    
 		$query = "
 		SELECT `".$this->_index."`, item_heading, item_datetime_posted, item_datetime_modified, newsTopic.name topicName, newsTopicID
 		FROM `".$this->_table."` 
-			JOIN newsCampus ON newsCampus.id = news_items.item_id 
-				AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).") 
-			JOIN newsGroup ON newsGroup.id = news_items.item_id 
-				AND newsGroup.gid = '".$_SESSION['gid']."'
-			JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
-		WHERE news_items.item_owner != '".$_SESSION['id']."' 
+		JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id";
+
+      /* If the current user is a superuser, do not filter their results.
+       * Otherwise, restrict news post selection by ownership.
+       */
+      if (!$userHandler->isSuperuser()) {
+         $query .= " WHERE item_owner = '".$_SESSION['id']."' ";
+      }
+
+      $query .= "
 			AND item_datetime_expires > NOW() 
 			AND item_deleted = 0 
 		GROUP BY `".$this->_index."`
 		ORDER BY newsTopic.newsTopicID, item_datetime_modified DESC
 		";
-		
-		$shareResults = $this->db->getAll($query);
-		
-		$query = "
-		SELECT `".$this->_index."`, item_heading, item_datetime_posted, item_datetime_modified, newsTopic.name topicName, newsTopicID
-		FROM `".$this->_table."` 
-		JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
-		WHERE item_owner = '".$_SESSION['id']."' 
-			AND item_datetime_expires > NOW() 
-			AND item_deleted = 0 
-		GROUP BY `".$this->_index."`
-		ORDER BY newsTopic.newsTopicID, item_datetime_modified DESC
-		";
-		
+
 		$userResults = $this->db->getAll($query);
 		
 		//merge and sort the headlines based on time
@@ -199,51 +214,63 @@ class News extends Model {
 	}
 	
 	function getNews($id = 0, $archive = false, $index = 0, $limit = 0) {
+      $userHandler = new Group;
+      $shareResults = array();
+
+      /* Prevent copies of posts appearing if they are posted to another group.
+       */
+      if (!$userHandler->isSuperuser()) {
+         $query = "
+         SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body,
+            DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
+            DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
+            user.lastname, user.title, user.id as uid, user.firstname, newsTopic.name topicName, newsTopicID
+         FROM `".$this->_table."`
+         JOIN user ON news_items.item_owner = user.id
+         JOIN newsCampus ON newsCampus.id = news_items.item_id
+            AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).")
+            OR news_items.item_campus='4'
+         JOIN newsGroup ON newsGroup.id = news_items.item_id
+            AND newsGroup.gid = '".$_SESSION['gid']."'
+         JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
+         WHERE news_items.item_owner != '".$_SESSION['id']."' AND news_items.item_deleted = 0";
+
+         if($id)
+            $query .=" AND news_items.item_id = '$id'";
+         else if($archive)
+            $query .=" AND news_items.item_datetime_expires <= NOW() ";
+         else
+            $query .=" AND news_items.item_datetime_expires > NOW() ";
+
+
+         $query .= " GROUP BY news_items.item_id ORDER BY newsTopic.newsTopicID, news_items.item_datetime_modified DESC";
+
+         $shareResults = $this->db->getAll($query);
+      }
+
 		$query = "
-		SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body,
-			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
-			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
-			user.lastname, user.title, user.id as uid, user.firstname, newsTopic.name topicName, newsTopicID
-		FROM `".$this->_table."` 
-		JOIN user ON news_items.item_owner = user.id
-		JOIN newsCampus ON newsCampus.id = news_items.item_id 
-			AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).") 
-			OR news_items.item_campus='4' 
-		JOIN newsGroup ON newsGroup.id = news_items.item_id 
-			AND newsGroup.gid = '".$_SESSION['gid']."'
-		JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
-		WHERE news_items.item_owner != '".$_SESSION['id']."' AND news_items.item_deleted = 0";
-
-		if($id)
-			$query .=" AND news_items.item_id = '$id'";
-		else if($archive)
-			$query .=" AND news_items.item_datetime_expires <= NOW() ";
-		else
-			$query .=" AND news_items.item_datetime_expires > NOW() ";
-				
-
-		$query .= " GROUP BY news_items.item_id ORDER BY newsTopic.newsTopicID, news_items.item_datetime_modified DESC";
-
-		$shareResults = $this->db->getAll($query);
-		
-		$query = "
-		SELECT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body, 
+		SELECT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body,
 			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
 			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
 			user.lastname, user.title, user.firstname, user.id as uid, newsTopic.name topicName, newsTopicID
 		FROM `".$this->_table."`
 		JOIN user ON news_items.item_owner = user.id
 		JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
-		WHERE news_items.item_owner = '".$_SESSION['id']."'
-			AND news_items.item_deleted = 0 
-		"; 
+      WHERE news_items.item_deleted = 0";
+
+      /* If the current user is a superuser, do not filter their results.
+       * Otherwise, restrict news post selection by ownership.
+       */
+      if (!$userHandler->isSuperuser()) {
+         $query .= " AND news_items.item_owner = '".$_SESSION['id']."' ";
+      }
 		
 		if($id)
-			$query .=" AND news_items.item_id = '$id'";
+			$query .= " AND news_items.item_id = '$id'";
 		else if($archive)
-			$query .=" AND news_items.item_datetime_expires <= NOW() ";
+			$query .= " AND news_items.item_datetime_expires <= NOW() ";
 		else
-			$query .=" AND news_items.item_datetime_expires > NOW() ";
+			$query .= " AND news_items.item_datetime_expires > NOW() ";
 			
 		$query .= " ORDER BY newsTopic.newsTopicID, news_items.item_datetime_modified DESC;";
 
