@@ -190,7 +190,22 @@ class Submission extends Model {
             return $this->db->update($this->_table, 'category', array('category'=>$cid, 'deleted'=>1));
     }
 
+    function getBoxOwner($box_id) {
+       $query = "SELECT owner
+                 FROM submission_box
+                 WHERE id = $box_id";
 
+       return $this->db->getRow($query);
+    }
+
+    function getAllForBox($box_id) {
+       $query = "SELECT ss.id, realname, u.firstname, u.lastname
+               FROM student_submission ss
+               JOIN `user` u ON ss.owner = u.id
+               WHERE box_id = $box_id";
+
+       return $this->db->getAll($query);
+    }
 
 }
 ?>

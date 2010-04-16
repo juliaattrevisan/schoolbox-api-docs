@@ -26,7 +26,8 @@ if(is_numeric($this->arg[0])) {
     $submissionHandler->logPageView($this->arg[0]);
 
     $this->setVar('ASSDESC', scrubTEXT($subBox['categoryName'])." - ".scrubTEXT($subBox['description']));
-	$this->setVar('CATEGORY_ID', $subBox['cid']);
+	 $this->setVar('CATEGORY_ID', $subBox['cid']);
+    $this->setVar('BOX_ID', $subBox['id']);
 
     /* Get full student list of class to show those who have not submitted */
     if($subBox['code'] && SYNERGY_enable) {
