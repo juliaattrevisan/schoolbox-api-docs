@@ -17,10 +17,16 @@ class Forum extends Model {
 	}
 	
 	function getRecentThreadList($categoryID, $config) {
+
+      /* Set default sorting to threads, but leave options for other sort fields
+       */
       if ($config['sort'] == 'Posts') {
          $sortField = 't.last_post_date';
       }
       else if ($config['sort'] == 'Threads') {
+         $sortField = 't.date';
+      }
+      else {
          $sortField = 't.date';
       }
 

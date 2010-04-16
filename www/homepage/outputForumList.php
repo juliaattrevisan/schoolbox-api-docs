@@ -13,8 +13,6 @@ else {
    require_once SITE_root . '/library/forum.php';
    $forumHandler = new Forum;
 
-   $threadList = $forumHandler->getRecentThreadList($categoryID, $config);
-
    /* Override default sorting fields with Forum-specific ones
     */
    $sortOptions = array('Threads', 'Posts');
