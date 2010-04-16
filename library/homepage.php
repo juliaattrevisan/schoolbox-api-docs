@@ -125,6 +125,7 @@ class Homepage {
 			"column" => $column,
 			"position" => $position
 		);
+
 		$result = $this->db->update('homepage_comp_location', array('component', 'cid'), $query);
 	}
 		
