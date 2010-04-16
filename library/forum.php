@@ -17,16 +17,23 @@ class Forum extends Model {
 	}
 	
 	function getRecentThreadList($categoryID, $config) {
+      if ($config['sort'] == 'Posts') {
+         $sortField = 't.last_post_date';
+      }
+      else if ($config['sort'] == 'Threads') {
+         $sortField = 't.date';
+      }
+
 		$query = "SELECT t.*, u.title userTitle, u.firstname userFirstname, u.lastname userLastname
 				  FROM forumThread t
 				  LEFT JOIN user u ON u.id = t.userID 
 				  WHERE t.categoryID = $categoryID 
 				  AND t.deleted = 'false' 
-				  ORDER BY t.last_post_date DESC ";
-				  
+				  ORDER BY $sortField DESC ";
+
 		if($config['size'] != 0 && $config['size'] != '') 
-			$query .= " LIMIT 0, {$config['size']}";  
-		
+			$query .= " LIMIT 0, {$config['size']}";
+
 		return $this->db->getAll($query);
 	}
 
