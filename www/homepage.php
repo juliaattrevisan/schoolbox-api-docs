@@ -121,7 +121,14 @@ if (is_array($componentList)) {
 		$componentCount++;
 		$componentHandle = $component['name'] . $componentCount;
 		$j =0;
-		
+
+      /* This array provides default sorting capabilities for each component
+       * in the homepage. They can be overridden in each of the output?.php
+       * homepage component files, to use their own sorting fields.
+       */
+		$sortOptions = array('Name', 'Date');
+
+
 		$this->setFile($componentHandle, 'homepage/components/'.$component['filename']);
 		$this->setBlock($componentHandle, "config", "config_block");
 
@@ -166,7 +173,7 @@ if (is_array($componentList)) {
 						
 					case "sort":		
 						$this->setBlock("config", "sort", "sort_block".$componentCount);
-						$sortOptions = array('Name', 'Date');
+                  
 						foreach ($sortOptions as $sort)
 						{
 							$this->setVar('COMPONENT_CONFIG_SORT_NAME', $sort);

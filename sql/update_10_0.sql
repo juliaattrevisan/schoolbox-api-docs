@@ -9,3 +9,4 @@ SET w.latestRevision = (SELECT r.revisionID FROM wikiRevision r WHERE r.wikiID =
 
 INSERT INTO luServices SET id = 5, name = 'CMS';
 
+UPDATE homepage_comp SET config = 'a:2:{s:4:"sort";s:4:"Date";s:4:"size";i:0;}' WHERE id = 5;
