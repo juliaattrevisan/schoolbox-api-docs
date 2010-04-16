@@ -444,7 +444,7 @@ else if($_POST['username'] && $_POST['lastname'] && $_POST['group'] && $_POST['c
 	
 		if($id = $userDb->addUser($_POST['username'], $_POST['title'], $_POST['firstname'], $_POST['lastname'],
 			 $_POST['synergyid'], $_POST['group'], $_POST['campus'], $_POST['year'], $_POST['password'], 
-			 $_POST['local_email'], $_POST['local_email'], $_POST['alt_email'], $mail_handler))	
+			 $_POST['local_email'], $_POST['local_email'], $_POST['alt_email'], $mail_handler, $_POST['su']))
 		{	
 			localRedir("/admin/modUser.php?id=$id");
 		}

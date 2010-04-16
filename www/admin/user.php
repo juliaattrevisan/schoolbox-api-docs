@@ -226,7 +226,7 @@ class user
 
 	}
 
-	function addUser($username, $title, $firstname, $lastname, $synergyid, $group, $campusarray, $year = '', $password = '', $local_email = '', $alt_email = '', $mail_handler = '')
+	function addUser($username, $title, $firstname, $lastname, $synergyid, $group, $campusarray, $year = '', $password = '', $local_email = '', $alt_email = '', $mail_handler = '', $su = 0)
 	{       
 		//sanity checks
 		//check username doesnt already exist
@@ -271,6 +271,13 @@ class user
 			$campusquery = "INSERT INTO userCampus (uid, campus) VALUES ('$id', '$campusarray')";
 			$this->db->query($campusquery);
 		}
+
+      /* If ticked, add the new user into the Superusers table as well.
+       */
+      if ($su) {
+         $suquery = "INSERT INTO superusers (id) VALUES ('$id')";
+         $this->db->query($suquery);
+      }
 				
 		return $id;
 	}
