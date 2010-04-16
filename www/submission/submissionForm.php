@@ -114,14 +114,9 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
 }
 else if(isset($_GET['deleteBox']) && is_numeric($_GET['deleteBox'])) {
 
-
     $subBoxHandler->delete($_GET['deleteBox']);
+	localRedir("/submission/listSubmission/");
 
-}
-else if(isset($_GET['delete']) && is_numeric($_GET['delete'])) {
-    //Delete student submission
-    $studSubHandler = new SubmissionStudent;
-    $studSubHandler->delete($_GET['delete']);
 }
 
 

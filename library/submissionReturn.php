@@ -12,10 +12,14 @@ class SubmissionReturn extends Model {
         parent::Model();
     }
 
-	function getByUser($user_id) {
+	function getByUser($user_id, $box_id = 0) {
 		$query = "SELECT r.*, c.name categoryName, s.description, s.fid FROM ( `".$this->_table."` r, submission_box s, category c )
 				  WHERE r.deleted = 0 AND s.deleted = 0 AND r.box_id = s.id AND s.deleted = 0 AND s.category = c.id AND r.owner = $user_id";
-		
+	
+		if($box_id)
+				$query .= " AND r.box_id = $box_id";
+
+		$query .= " ORDER BY returned DESC";
 		return $this->db->getAll($query);
 	}
 

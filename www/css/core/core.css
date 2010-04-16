@@ -654,6 +654,22 @@ p.interact a { color: #003e7e; }
 .weather p span { color: #999; font-size: 90%; }
 .weather p span a { color: #999; }
 .weather img { margin: 0; }
+.weatherDay {
+	float: left;
+	border-right: 1px solid #dbdbdb;
+	padding-right: 9px;
+	margin: 0 9px 10px 0;
+}
+.weatherDay.last {
+	border-right: 0;
+	margin-right: 0;
+	padding-right: 0;
+}
+.weatherDay h4 {
+	color: #2c2c2c;
+	margin: 0.2em 0;
+}
+
 .box .thumb {
 	margin: 0 15px 15px 0;
 	display: block;

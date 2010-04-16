@@ -260,26 +260,3 @@ li p.interact {
 #footer ul li a {
 	color: #fff;
 }
-.weatherDay {
-	float: left;
-	border-right: 1px solid #dbdbdb;
-	padding-right: 9px;
-	margin: 0 9px 10px 0;
-}
-.weatherDay.last {
-	border-right: 0;
-	margin-right: 0;
-	padding-right: 0;
-}
-.weatherDay h4 {
-	color: #2c2c2c;
-	margin: 0.2em 0;
-}
-.weather p {
-	color: #dbdbdb;
-	margin: 0;
-}
-.weather a {
-	color: #255297;
-	font-size: 11px;
-}

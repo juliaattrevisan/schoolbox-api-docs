@@ -2,6 +2,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionStudent.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionReturn.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 
 if(is_numeric($this->arg[0])) {
@@ -14,6 +15,7 @@ if(is_numeric($this->arg[0])) {
 
     $submissionHandler = new Submission;
     $studentSubHandler = new SubmissionStudent;
+	$returnHandler = new SubmissionReturn;
 
     $subBox = $submissionHandler->getByID($this->arg[0]);
 
@@ -46,25 +48,35 @@ if(is_numeric($this->arg[0])) {
     if(is_array($studentList)) {
         foreach($studentList as $student) {
 
-            if($student['uid'])
-                $studentSub = $studentSubHandler->getByUserID($this->arg[0], $student['uid']);
-            else if($student['synergy_id'])
+            if($student['uid']) {
+				$user = $userHandler->getByID($student['uid']);
+				$studentSub = $studentSubHandler->getByUserID($this->arg[0], $student['uid']);
+			}
+            else if($student['synergy_id']) {
+				$user = $userHandler->getBySynergy($student['synergy_id']);
                 $studentSub = $studentSubHandler->getBySynergyID($this->arg[0], $student['synergy_id']);
+			}
             else
                 continue;
 
             if(is_array($studentSub)) {
 
-                $output = array(	'OWNER' 	=> formatName($student,'{lastname}, {firstname}'),
-                                        'OWNER_ID' 	=> $student['uid'],
+				/* If already marked display mark, else provide link to return mark */
+				if($studentSub['marked']) {
+					$return = $returnHandler->getByUser($user['uid'], $this->arg[0]);
+					$mark = $return[0]['mark'];
+				}
+				else
+					$mark = "<a href=\"/submission/returnWork/".$this->arg[0]."/".$user['uid']."\">Mark</a>";
+
+                $output = array(		'OWNER' 	=> formatName($user,'{lastname}, {firstname}'),
+                                        'OWNER_ID' 	=> $user['uid'],
+										'SUB_ID'	=> $studentSub['id'],
                                         'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
                                         'DATE'		=> $studentSub['date'],
-                                        'VIEW'		=> '/submission/send.php?id='.$studentSub['id'].'&view=1',
-                                        'SAVE'		=> '/submission/send.php?id='.$studentSub['id'],
                                         'DELETE'	=> '/submission/viewSubmissionForm.php?delete='.$studentSub['id']."&box_id=" . $this->arg[0],
                                         'COLOUR'	=> $studentSub['late']?'#ff0000':'#000000',
-                                        'MARKED'	=> $studentSub['marked']?'<img src="/images/greentick.gif" width="13" height="12">':'<img src="/images/emptybox.gif" width="13" height="12">',
-                                        'RETURN'	=> $studentSub['marked']?'':"<a href=\"/submission/returnWork/".$this->arg[0]."/".$studentSub['uid']."\">Return</a>",
+                                        'RETURN'	=> $mark,
                                         'ON_OFF'	=> ++$i%2?'':'dark',
                 );
                 $this->setVar($output);
@@ -73,15 +85,12 @@ if(is_numeric($this->arg[0])) {
             }
             else {
 
-                if(!$student['uid'])
-                    $user = $userHandler->getBySynergy($student['synergy_id']);
-
-                $output = array(	'OWNER' 	=> formatName($student,'{lastname}, {firstname}'),
-                                        'OWNER_ID' 	=> $user['id'],
+                $output = array(		'OWNER' 	=> formatName($user,'{lastname}, {firstname}'),
+                                        'OWNER_ID' 	=> $user['uid'],
                                         'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
                                         'mark_block'    => '<td colspan="6">&nbsp;</td>',
                                         'DATE'		=> '',
-                                        'MARKED'	=> '',
+										'COLOUR'	=> '',
                                         'RETURN'	=> '',
                                         'ON_OFF'	=> ++$i%2?'':'dark',
                 );
@@ -99,16 +108,22 @@ if(is_numeric($this->arg[0])) {
 
         if(is_array($submissionList)) {
             foreach($submissionList as $line) {
+
+				/* If already marked display mark, else provide link to return mark */
+				if($studentSub['marked']) {
+					$return = $returnHandler->getByUser($line['uid'], $this->arg[0]);
+					$mark = $return['mark'];
+				}
+				else
+					$mark = "<a href=\"/submission/returnWork/".$this->arg[0]."/".$line['uid']."\">Mark</a>";
+
                 $output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
                     'OWNER_ID'      => $line['uid'],
+					'SUB_ID'		=> $line['id'],
                     'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
                     'DATE'          => $line['date'],
-                    'VIEW'          => '/submission/viewSubmissionForm.php?view='.$line['id'],
-                    'SAVE'          => '/submission/viewSubmissionForm.php?view='.$line['id'].'&save=1',
-                    'DELETE'        => '/submission/viewSubmissionForm.php?delete='.$line['id']."&box_id=" . $this->arg[0],
                     'COLOUR'        => $line['late']?'#ff0000':'#000000',
-                    'MARKED'        => $line['marked']?'<img src="/images/greentick.gif" width="13" height="12">':'<img src="/images/emptybox.gif" width="13" height="12">',
-                    'RETURN'        => $line['marked']?'':"<a href=\"/submission/returnWork/".$this->arg[0]."/".$line['uid']."\">Return</a>",
+                    'RETURN'        => $mark,
                     'ON_OFF'        => ++$i%2?'':'dark',
             );
 
