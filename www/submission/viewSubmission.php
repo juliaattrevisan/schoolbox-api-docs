@@ -28,6 +28,7 @@ if(is_numeric($this->arg[0])) {
     $this->setVar('ASSDESC', scrubTEXT($subBox['categoryName'])." - ".scrubTEXT($subBox['description']));
 	 $this->setVar('CATEGORY_ID', $subBox['cid']);
     $this->setVar('BOX_ID', $subBox['id']);
+	$this->setVar('BOX_ID', $this->arg[0]);
 
     /* Get full student list of class to show those who have not submitted */
     if($subBox['code'] && SYNERGY_enable) {
@@ -72,7 +73,6 @@ if(is_numeric($this->arg[0])) {
 
                 $output = array(		'OWNER' 	=> formatName($user,'{lastname}, {firstname}'),
                                         'OWNER_ID' 	=> $user['uid'],
-										'SUB_ID'	=> $studentSub['id'],
                                         'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
                                         'DATE'		=> $studentSub['date'],
                                         'DELETE'	=> '/submission/viewSubmissionForm.php?delete='.$studentSub['id']."&box_id=" . $this->arg[0],
@@ -111,16 +111,15 @@ if(is_numeric($this->arg[0])) {
             foreach($submissionList as $line) {
 
 				/* If already marked display mark, else provide link to return mark */
-				if($studentSub['marked']) {
+				if($line['marked']) {
 					$return = $returnHandler->getByUser($line['uid'], $this->arg[0]);
-					$mark = $return['mark'];
+					$mark = $return[0]['mark'];
 				}
 				else
 					$mark = "<a href=\"/submission/returnWork/".$this->arg[0]."/".$line['uid']."\">Mark</a>";
 
                 $output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
                     'OWNER_ID'      => $line['uid'],
-					'SUB_ID'		=> $line['id'],
                     'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
                     'DATE'          => $line['date'],
                     'COLOUR'        => $line['late']?'#ff0000':'#000000',

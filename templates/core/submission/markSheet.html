@@ -1,0 +1,38 @@
+<h1>{CATEGORY}</h1>
+<span class="header_option">
+	<form method='POST' onSubmit='return columnAdd();'>
+		<input name='do' type='hidden' value='columnAdd' />
+		<input name='studentID' type='hidden' value='{EXAMPLE_STUDENTID}' />
+		<input name='cid' type='hidden' value='{CID}' />
+		<input name='hiddenColName' type='hidden' value='' />
+		<input type='image' src='/images/button_add.jpg' alt='add column' />
+	</form>
+</span>
+<br />
+<table class="markTable" cellspacing="0" cellpadding="0">
+	<tr>
+		<th>Surname</th>
+		<th>Preferred Name</th>
+		<!-- BEGIN sub_head -->
+		<td><a href="/submission/viewSubmission/{BOX_ID}">{SUB_NAME}</a><br />
+			<em>{SUB_TYPE}</em><br />
+			<a href="/submission/submissionForm.php?delete={BOX_ID}" onClick='return confirm("Delete this assessment task?")'>Delete</a></td>
+		<!-- END sub_head -->
+
+	</tr>
+	<!-- BEGIN student_list -->
+	<tr class="{ON_OFF}">
+		<td><a href="/search/user/{UID}">{SURNAME}</a></td>
+		<td><a href="/search/user/{UID}">{FIRSTNAME}</a></td>
+		<!-- BEGIN mark -->
+		<td><form method="post" onSubmit="return false;" action="">
+				<input name="mark" value="{MARK}" class="inputMark" type="text" size="5" maxlength="10" onBlur="submitOnFieldChange(this.form);">
+				<input type="hidden" name="userID" value="{UID}">
+				<input type="hidden" name="box_id" value="{BOX_ID}">
+				<input type="hidden" name="do_" value="markAdd">
+			</form>
+		</td>
+		<!-- END mark -->
+	</tr>
+	<!-- END student_list -->
+</table>

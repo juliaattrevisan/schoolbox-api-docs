@@ -96,7 +96,8 @@ class Group extends Model {
 	function getMemberList($relationID) {
 		$query = "SELECT title, firstname, lastname, uid, type, group_id 
 				  FROM userAccess, user 
-				  WHERE uid = id AND service = ".$this->_service." AND sid = $relationID AND type < ".FULL_ACCESS." AND type > ".DENY_ACCESS;
+				  WHERE uid = id AND service = ".$this->_service." AND sid = $relationID AND type < ".FULL_ACCESS." AND type > ".DENY_ACCESS
+				  ." ORDER BY lastname, firstname";
 		return $this->db->getAll($query);
 	}
 	
