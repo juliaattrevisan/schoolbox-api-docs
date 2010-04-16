@@ -140,8 +140,10 @@ class modUser
 			$checked = $this->isInCampus($userCampus, $line['id']) ? 'checked="checked"' : '';
 			$default = $this->isDefaultCampus($userCampus, $line['id']) ? 'checked="checked"' : '';
 			
-			$campusListHTML .= "<input type=\"radio\" name=\"defaultCampus\" value=\"".$line['id']."\" $default />".
-							   "<input type=\"checkbox\" name=\"campus[]\" value=\"".$line['id']."\" $checked /> ".$line['name']."<br>";	
+			$campusListHTML .= "<tr>" .
+            "<td style='text-align:center;'><input type=\"radio\" name=\"defaultCampus\" value=\"".$line['id']."\" $default /></td>" .
+            "<td><input style='margin-left: 16px;' type=\"checkbox\" name=\"campus[]\" value=\"".$line['id']."\" $checked /> ".$line['name'] . "</td>" .
+            "</tr>";
 		}
 		return $campusListHTML;
 	}

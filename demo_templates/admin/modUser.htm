@@ -11,7 +11,12 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/demo/screen.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
-
+<style type="text/css">
+#campusList tr,
+#campusList td {
+   border: 0px;
+}
+</style>
 <!-- BEGIN header_css --><!-- END header_css -->
 
 <script type="text/javascript" src="/javascript/jquery.js"></script>
@@ -47,6 +52,18 @@ function verify()
 	if(document.getElementById('userForm').group.value == "" || isNaN(document.getElementById('userForm').group.value)){
 		msg += "You need to select a group\n";
 	}
+
+   /* Campus validation: check that a default campus is selected
+    */
+   if (!$j('input[name=defaultCampus]:checked').length) {
+      msg += "You need to select a default campus\n";
+   }
+
+   /* Check also that at least one campus has been chosen
+    */
+   if (!$j('input[name=campus[]]:checked').length) {
+      msg += "You need to select at least one campus for this user\n";
+   }
 
 	if(msg != ""){
 		alert(msg);
@@ -195,7 +212,14 @@ $j(document).ready(function () {
           </tr>
           <tr>
             <td><h2>Campus</h2></td>
-            <td>{CAMPUSLIST}</td>
+            <td>
+               <table id="campusList">
+                  <tr>
+                     <td style="width: 75px;text-align:center;">Set default</td><td></td>
+                  </tr>
+                  {CAMPUSLIST}
+               </table>
+            </td>
             <td><h2>Year</h2></td>
             <td><input name="year" type="text" size="2" maxlength="2" value="{YEAR}" /></td>
           </tr>
