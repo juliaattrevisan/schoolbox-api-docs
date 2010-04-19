@@ -2,7 +2,8 @@
 SQLyog Enterprise - MySQL GUI v8.01 
 MySQL - 5.0.67-0ubuntu6 : Database - portaldemo
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -44,6 +45,36 @@ CREATE TABLE `allowedFileTypes` (
 /*Data for the table `allowedFileTypes` */
 
 insert  into `allowedFileTypes`(`fileTypeID`,`description`,`mime`,`iconFile`,`inline`,`enable`) values (1,'GIF Image','image/gif','image-gif.png','true','true'),(2,'HTML Document','text/html','text-html.png','true','true'),(3,'Plain Text','text/plain','textfile.png','true','true'),(4,'Rich Text','text/richtext','application-rtf.png','true','true'),(5,'CSS','text/css','textfile.png','true','true'),(6,'JPEG Image','image/jpeg','image-jpeg.png','true','true'),(7,'Progressing JPEG Image','image/pjpeg','image-jpeg.png','true','true'),(8,'PNG Image','image/png','image-png.png','true','true'),(9,'Bitmap Image','image/bmp','image-bmp.png','true','true'),(10,'PDF Document','application/pdf','application-pdf.png','true','true'),(11,'Word Document','application/msword','application-msword.png','true','true'),(12,'Powerpoint Presentation','application/vnd.ms-powerpoint','application-vnd.ms-powerpoint.png','true','true'),(13,'Excel Spreadsheet','application/vnd.ms-excel','application-vnd.ms-excel.png','true','true'),(14,'ZIP Archive','application/x-zip-compressed','compressed.png','false','true'),(15,'Postscript','application/postscript','application-postscript.png','true','true'),(16,'Photoshop Image','application/x-photoshop','image-psd.png','false','true'),(17,'OGG Audio','application/ogg','audio-x-wav.png','true','true'),(18,'Geometer\'s Sketchpad','application/x-gsp','application-x-none.png','false','true'),(19,'Shockwave Flash','application/x-shockwave-flash','application-x-none.png','true','true'),(20,'Inspiration','application/x-Inspiration','application-x-none.png','false','true'),(21,'Binary Data (Unknown)','application/octet-stream','application-x-none.png','false','true'),(22,'WAV Audio','audio/wav','audio-x-wav.png','false','true'),(23,'MPEG Audio','audio/mpeg','audio-mpeg.png','false','true'),(24,'Real Audio Stream','audio/x-pn-realaudio','application-vnd.rn-realmedia.png','false','true'),(25,'Real Audio','audio/x-realaudio','audio-x-pn-realaudio.png','false','true'),(26,'MIDI Audio','audio/mid','audio-midi.png','false','true'),(27,'MPEG Video','video/mpeg','video-mpeg.png','false','true'),(28,'Quicktime Video','video/quicktime','video-quicktime.png','false','true'),(29,'WMV Video','video/x-ms-wmv','video-x-msvideo.png','true','true'),(30,'Microsoft Video','video/x-msvideo','video-x-msvideo.png','false','true'),(31,'ZIP Archive','application/zip','compressed.png','true','true');
+
+/*Table structure for table `blog` */
+
+DROP TABLE IF EXISTS `blog`;
+
+CREATE TABLE `blog` (
+  `id` int(6) unsigned NOT NULL auto_increment,
+  `cid` int(6) unsigned NOT NULL,
+  `owner` int(6) unsigned NOT NULL,
+  `created` datetime NOT NULL,
+  `deleted` datetime default NULL,
+  `heading` varchar(50) NOT NULL,
+  `body` mediumtext NOT NULL,
+  PRIMARY KEY  (`id`),
+  FULLTEXT KEY `fulltext` (`heading`,`body`)
+) ENGINE=MyISAM AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
+
+/*Table structure for table `blogComment` */
+
+DROP TABLE IF EXISTS `blogComment`;
+
+CREATE TABLE `blogComment` (
+  `id` int(6) unsigned NOT NULL auto_increment,
+  `bid` int(6) unsigned NOT NULL,
+  `owner` int(6) unsigned NOT NULL,
+  `created` datetime NOT NULL,
+  `deleted` datetime default NULL,
+  `body` mediumtext NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=86 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `bookmarks` */
 
@@ -92,7 +123,8 @@ CREATE TABLE `category` (
   `code` varchar(20) default NULL,
   PRIMARY KEY  (`id`),
   KEY `parent` (`parent`),
-  KEY `alt_code` (`code`)
+  KEY `alt_code` (`code`),
+  FULLTEXT KEY `fulltext` (`name`,`code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
 
 /*Data for the table `category` */
@@ -172,6 +204,7 @@ CREATE TABLE `event` (
   `access` tinyint(1) NOT NULL default '0',
   `sid` int(6) default NULL,
   `priority` smallint(1) NOT NULL default '0',
+  `type` int(10) unsigned default NULL,
   `note` varchar(250) NOT NULL default '',
   `date` date NOT NULL default '0000-00-00',
   `startTime` time default NULL,
@@ -227,7 +260,8 @@ CREATE TABLE `file` (
   `deleted` tinyint(2) unsigned NOT NULL default '0',
   `hidden` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`id`),
-  KEY `category` (`category`)
+  KEY `category` (`category`),
+  FULLTEXT KEY `fulltext` (`realname`,`description`,`comment`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `file` */
@@ -262,12 +296,56 @@ CREATE TABLE `forum` (
   `cid` int(6) NOT NULL default '0',
   `deleted` tinyint(1) unsigned NOT NULL default '0',
   `thread` int(6) unsigned NOT NULL default '0',
+  `last_post_id` int(11) default NULL,
+  `last_post_title` varchar(200) default NULL,
+  `last_post_time` datetime default NULL,
+  `views` int(11) NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `parent` (`parent`),
   KEY `category` (`cid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Data for the table `forum` */
+/*Table structure for table `forumPost` */
+
+DROP TABLE IF EXISTS `forumPost`;
+
+CREATE TABLE `forumPost` (
+  `postID` int(11) NOT NULL auto_increment,
+  `threadID` int(11) default NULL,
+  `userID` int(11) default NULL,
+  `date` datetime default NULL,
+  `body` text,
+  `deleted` enum('true','false') NOT NULL default 'false',
+  `modified` datetime default NULL,
+  `censored` enum('true','false') NOT NULL default 'false',
+  PRIMARY KEY  (`postID`),
+  KEY `threadID` (`threadID`),
+  KEY `userID` (`userID`),
+  FULLTEXT KEY `fulltext` (`body`)
+) ENGINE=MyISAM AUTO_INCREMENT=52 DEFAULT CHARSET=utf8;
+
+/*Table structure for table `forumThread` */
+
+DROP TABLE IF EXISTS `forumThread`;
+
+CREATE TABLE `forumThread` (
+  `threadID` int(11) NOT NULL auto_increment,
+  `categoryID` int(11) default NULL,
+  `userID` int(11) default NULL,
+  `title` varchar(250) default NULL,
+  `date` datetime default NULL,
+  `deleted` enum('true','false') NOT NULL default 'false',
+  `locked` enum('true','false') NOT NULL default 'false',
+  `views` int(11) NOT NULL,
+  `last_post_id` int(11) default NULL,
+  `last_post_date` datetime default NULL,
+  `last_post_user_id` int(11) default NULL,
+  `last_post_user` varchar(250) default NULL,
+  `tempID` int(11) default NULL,
+  PRIMARY KEY  (`threadID`),
+  KEY `categoryID` (`categoryID`),
+  KEY `userID` (`userID`)
+) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `groups` */
 
@@ -277,7 +355,8 @@ CREATE TABLE `groups` (
   `id` int(4) unsigned NOT NULL auto_increment,
   `name` varchar(20) NOT NULL default '',
   `staff` smallint(6) default NULL,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY  (`id`),
+  FULLTEXT KEY `fulltext` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `groups` */
@@ -334,7 +413,7 @@ CREATE TABLE `homepage_comp` (
 
 /*Data for the table `homepage_comp` */
 
-insert  into `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) values (8,1,'outputNews','News','Provides a text area for you to post information, news, blogs and introductions. ','news_n.htm','a:1:{s:4:\"size\";i:0;}','false'),(2,1,'outputLinkList','Links','Provide links to interesting, related and helpful resource on the portal or the WWW.','links_n.htm','a:3:{s:4:\"sort\";s:4:\"Date\";s:7:\"sortdir\";s:4:\"Desc\";s:4:\"size\";s:1:\"0\";}','false'),(3,1,'outputFileList','Files','List general files that have been uploaded to your homepage. The large version shows both titles and comments.','files_n.htm','a:5:{s:6:\"filter\";a:5:{i:0;s:8:\"document\";i:1;s:5:\"audio\";i:2;s:5:\"video\";i:3;s:5:\"image\";i:4;s:5:\"other\";}s:13:\"filterOptions\";a:5:{i:0;s:8:\"document\";i:1;s:5:\"audio\";i:2;s:5:\"video\";i:3;s:5:\"image\";i:4;s:5:\"other\";}s:4:\"sort\";s:4:\"Date\";s:7:\"sortdir\";s:4:\"Desc\";s:4:\"size\";i:0;}','false'),(4,2,'outputMembers','Group Members','Show the group members associated with your homepage.  This also provides an email all group members link.','members_s.htm','','false'),(5,2,'outputForumList','Forum Hot Topics','Show recent discussion topics going on in your homepages forum.','forum_s.htm','a:1:{s:4:\"size\";i:0;}','false'),(6,2,'outputLinkList','Small Links','Provide links to interesting, related and helpful resource on the portal or the WWW.','links_s.htm','a:1:{s:4:\"size\";i:0;}','true'),(7,2,'outputFileList','Small Files','List general files that have been uploaded to your homepage. The small version only shows file titles.','files_s.htm','a:1:{s:4:\"size\";i:0;}','true'),(9,2,'initSubject','Class Management','Provides links to class lists, attendances and the mark sheet. This is only visible to teachers, students cannot see this module.','class_manage.htm','','false'),(10,2,'folderManage','Folder Management','Provides links to browse the files, manage group membership and view homepage statistics.','folder_manage.htm','','false'),(11,2,'outputAssignList','Small Assignment','List submission boxes with the type assignment. It shows the due date and allows students to submit from the homepage.','assign_s.htm','a:1:{s:4:\"size\";i:0;}','true'),(12,2,'outputHomeworkList','Small Homework','List submission boxes with the type homework. It shows the due date and allows students to submit from the homepage.','homework_s.htm','a:1:{s:4:\"size\";i:0;}','true'),(13,2,'outputManagers','Group Managers','Displays a list of group members with write access to the homepage.  Useful in larger groups to show manages of the group.','staff_s.htm','','false'),(14,1,'outputImage','Image Simple','Just displays an image on your page.','image_s.htm','','false'),(15,1,'outputImage','Image Advanced','Completely configurable image display, select the image, control the size and link to another location','image_n.htm','a:3:{s:5:\"pixel\";i:200;s:3:\"url\";s:1:\"#\";s:5:\"image\";s:13:\"Preview Image\";}','false'),(16,1,'outputAssignList','Assignments','List submission boxes with the type assignment. It shows the due date and allows students to submit from the homepage.','assign_n.htm','a:1:{s:4:\"size\";i:0;}','false'),(17,1,'outputHomeworkList','Homework','List submission boxes with the type homework. It shows the due date and allows students to submit from the homepage.','homework_n.htm','a:1:{s:4:\"size\";i:0;}','false'),(20,2,'outputFolderList','Folders','Display a list of subfolders within your homepage.  Also links to the homepages if they are available.','folders_s.htm','a:1:{s:4:\"size\";i:0;}','false'),(21,1,'outputEventList','Calendar','Display upcoming events that are in the calendar for this group.','cal_n.htm','a:1:{s:4:\"size\";i:0;}','false'),(22,2,'outputEventList','Small Calendar','Display upcoming events that are in the calendar for this group.','cal_s.htm','a:1:{s:4:\"size\";i:0;}','true'),(23,1,'outputImageGallery','Image Gallery','Show a grid of image thumbnails sourced from the files uploaded onto this homepage. ','gallery.htm','a:1:{s:4:\"size\";i:0;}','false'),(24,1,'outputRandImage','Random Image','Display a random image selected from the images on this homepage.','image_s.htm','a:1:{s:5:\"pixel\";i:400;}','false'),(25,2,'outputDropBox','File Drop Box','Provides an area for teachers to recieve work via the portal without the need for a submission box.','dropbox.htm','','false'),(28,1,'outputDueWorkList','Due Work','Output all due work for this homepage. This allows students to see due dates and submit via the homepage.','duework_n.htm','a:1:{s:4:\"size\";i:0;}','false'),(27,2,'outputRSS','Small RSS Feed','Display external RSS site headlines and brief description. The RSS feed can be from any site that provides a feed.','rss_s.htm','a:2:{s:3:\"url\";s:0:\"\";s:4:\"size\";i:5;}','true'),(26,1,'outputRSS','RSS Feed','Display external RSS site headlines. The RSS feed can be from any site that provides a feed.','rss_n.htm','a:2:{s:3:\"url\";s:0:\"\";s:4:\"size\";i:5;}','false'),(30,2,'outputTeachers','Class Teachers','Show a list of teachers responsible for this subject if it has a synergetic subject code.','teacher_s.htm','','false'),(29,2,'outputDueWorkList','Small Due Work','Shows a list of all due work and its due date.','duework_s.htm','a:1:{s:4:\"size\";i:0;}','true'),(31,1,'outputCalendarList','Campus Calendar','Show a calendar for the entire campus on your homepage.','cal_n.htm','','false'),(32,0,'outputDuties','Duties',NULL,'duties.htm','','false'),(33,2,'outputPoll','Poll','Create a poll to determine group members opinion on a given subject.','poll.htm','a:1:{s:6:\"pollID\";i:0;}','false'),(34,1,'outputWiki','Wiki','Provides an area for group members to work together on joint documents.','wiki.htm','a:1:{s:4:\"size\";i:0;}','false'),(35,1,'outputFeed','Homepage Feed','Provides a running commentary on recent changes to the homepage','feed.htm','a:1:{s:4:\"size\";i:0;}','false'),(36,1,'outputTextBox','Text Box','Use this space to write introductory message or information relating to the content that is displayed','textBox.html','a:1:{s:9:\"textBoxID\";i:0;}','false'),(37,1,'outputAudio','Audio','Lists audio files and allows them to be played.','audio.html','a:3:{s:4:\"sort\";s:4:\"Name\";s:7:\"sortdir\";s:3:\"Asc\";s:4:\"size\";i:0;}','false'),(38,1,'outputPodcast','Podcast','Subscribe to a podcast ','podcast.html','a:2:{s:3:\"url\";s:0:\"\";s:4:\"size\";i:0;}','false');
+insert  into `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) values (8,1,'outputNews','News','Provides a text area for you to post information, news, blogs and introductions. ','news_n.htm','a:1:{s:4:\"size\";i:0;}','false'),(2,1,'outputLinkList','Links','Provide links to interesting, related and helpful resource on the portal or the WWW.','links_n.htm','a:3:{s:4:\"sort\";s:4:\"Date\";s:7:\"sortdir\";s:4:\"Desc\";s:4:\"size\";s:1:\"0\";}','false'),(3,1,'outputFileList','Files','List general files that have been uploaded to your homepage. The large version shows both titles and comments.','files_n.htm','a:5:{s:6:\"filter\";a:5:{i:0;s:8:\"document\";i:1;s:5:\"audio\";i:2;s:5:\"video\";i:3;s:5:\"image\";i:4;s:5:\"other\";}s:13:\"filterOptions\";a:5:{i:0;s:8:\"document\";i:1;s:5:\"audio\";i:2;s:5:\"video\";i:3;s:5:\"image\";i:4;s:5:\"other\";}s:4:\"sort\";s:4:\"Date\";s:7:\"sortdir\";s:4:\"Desc\";s:4:\"size\";i:0;}','false'),(4,2,'outputMembers','Group Members','Show the group members associated with your homepage.  This also provides an email all group members link.','members_s.htm','','false'),(5,2,'outputForumList','Forum Hot Topics','Show recent discussion topics going on in your homepages forum.','forum_s.htm','a:2:{s:4:"sort";s:4:"Date";s:4:"size";i:0;}','false'),(6,2,'outputLinkList','Small Links','Provide links to interesting, related and helpful resource on the portal or the WWW.','links_s.htm','a:1:{s:4:\"size\";i:0;}','true'),(7,2,'outputFileList','Small Files','List general files that have been uploaded to your homepage. The small version only shows file titles.','files_s.htm','a:1:{s:4:\"size\";i:0;}','true'),(9,2,'initSubject','Class Management','Provides links to class lists, attendances and the mark sheet. This is only visible to teachers, students cannot see this module.','class_manage.htm','','false'),(10,2,'folderManage','Folder Management','Provides links to browse the files, manage group membership and view homepage statistics.','folder_manage.htm','','false'),(11,2,'outputAssignList','Small Assignment','List submission boxes with the type assignment. It shows the due date and allows students to submit from the homepage.','assign_s.htm','a:1:{s:4:\"size\";i:0;}','true'),(12,2,'outputHomeworkList','Small Homework','List submission boxes with the type homework. It shows the due date and allows students to submit from the homepage.','homework_s.htm','a:1:{s:4:\"size\";i:0;}','true'),(13,2,'outputManagers','Group Managers','Displays a list of group members with write access to the homepage.  Useful in larger groups to show manages of the group.','staff_s.htm','','false'),(14,1,'outputImage','Image Simple','Just displays an image on your page.','image_s.htm','','false'),(15,1,'outputImage','Image Advanced','Completely configurable image display, select the image, control the size and link to another location','image_n.htm','a:3:{s:5:\"pixel\";i:200;s:3:\"url\";s:1:\"#\";s:5:\"image\";s:13:\"Preview Image\";}','false'),(16,1,'outputAssignList','Assignments','List submission boxes with the type assignment. It shows the due date and allows students to submit from the homepage.','assign_n.htm','a:1:{s:4:\"size\";i:0;}','false'),(17,1,'outputHomeworkList','Homework','List submission boxes with the type homework. It shows the due date and allows students to submit from the homepage.','homework_n.htm','a:1:{s:4:\"size\";i:0;}','false'),(20,2,'outputFolderList','Folders','Display a list of subfolders within your homepage.  Also links to the homepages if they are available.','folders_s.htm','a:1:{s:4:\"size\";i:0;}','false'),(21,1,'outputEventList','Calendar','Display upcoming events that are in the calendar for this group.','cal_n.htm','a:1:{s:4:\"size\";i:0;}','false'),(22,2,'outputEventList','Small Calendar','Display upcoming events that are in the calendar for this group.','cal_s.htm','a:1:{s:4:\"size\";i:0;}','true'),(23,1,'outputImageGallery','Image Gallery','Show a grid of image thumbnails sourced from the files uploaded onto this homepage. ','gallery.htm','a:1:{s:4:\"size\";i:0;}','false'),(24,1,'outputRandImage','Random Image','Display a random image selected from the images on this homepage.','image_s.htm','a:1:{s:5:\"pixel\";i:400;}','false'),(25,2,'outputDropBox','File Drop Box','Provides an area for teachers to recieve work via the portal without the need for a submission box.','dropbox.htm','','false'),(28,1,'outputDueWorkList','Due Work','Output all due work for this homepage. This allows students to see due dates and submit via the homepage.','duework_n.htm','a:1:{s:4:\"size\";i:0;}','false'),(27,2,'outputRSS','Small RSS Feed','Display external RSS site headlines and brief description. The RSS feed can be from any site that provides a feed.','rss_s.htm','a:2:{s:3:\"url\";s:0:\"\";s:4:\"size\";i:5;}','true'),(26,1,'outputRSS','RSS Feed','Display external RSS site headlines. The RSS feed can be from any site that provides a feed.','rss_n.htm','a:2:{s:3:\"url\";s:0:\"\";s:4:\"size\";i:5;}','false'),(30,2,'outputTeachers','Class Teachers','Show a list of teachers responsible for this subject if it has a synergetic subject code.','teacher_s.htm','','false'),(29,2,'outputDueWorkList','Small Due Work','Shows a list of all due work and its due date.','duework_s.htm','a:1:{s:4:\"size\";i:0;}','true'),(31,1,'outputCalendarList','Campus Calendar','Show a calendar for the entire campus on your homepage.','cal_n.htm','','false'),(32,0,'outputDuties','Duties',NULL,'duties.htm','','false'),(33,2,'outputPoll','Poll','Create a poll to determine group members opinion on a given subject.','poll.htm','a:1:{s:6:\"pollID\";i:0;}','false'),(34,1,'outputWiki','Wiki','Provides an area for group members to work together on joint documents.','wiki.htm','a:1:{s:4:\"size\";i:0;}','false'),(35,1,'outputFeed','Homepage Feed','Provides a running commentary on recent changes to the homepage','feed.htm','a:1:{s:4:\"size\";i:0;}','false'),(36,1,'outputTextBox','Text Box','Use this space to write introductory message or information relating to the content that is displayed','textBox.html','a:1:{s:9:\"textBoxID\";i:0;}','false'),(37,1,'outputAudio','Audio','Lists audio files and allows them to be played.','audio.html','a:3:{s:4:\"sort\";s:4:\"Name\";s:7:\"sortdir\";s:3:\"Asc\";s:4:\"size\";i:0;}','false'),(38,1,'outputPodcast','Podcast','Subscribe to a podcast ','podcast.html','a:2:{s:3:\"url\";s:0:\"\";s:4:\"size\";i:0;}','false');
 
 /*Table structure for table `homepage_comp_location` */
 
@@ -421,7 +500,8 @@ CREATE TABLE `link` (
   `comment` mediumtext,
   `hidden` tinyint(1) NOT NULL,
   PRIMARY KEY  (`id`),
-  KEY `category` (`category`)
+  KEY `category` (`category`),
+  FULLTEXT KEY `fulltext` (`url`,`description`,`comment`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `link` */
@@ -448,12 +528,26 @@ DROP TABLE IF EXISTS `luCampus`;
 CREATE TABLE `luCampus` (
   `name` varchar(255) default NULL,
   `id` tinyint(4) unsigned NOT NULL auto_increment,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY  (`id`),
+  FULLTEXT KEY `fulltext` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `luCampus` */
 
 insert  into `luCampus`(`name`,`id`) values ('Main',1),('Other',2);
+
+/*Table structure for table `luEventType` */
+
+DROP TABLE IF EXISTS `luEventType`;
+
+CREATE TABLE `luEventType` (
+  `eventTypeID` int(10) unsigned NOT NULL auto_increment,
+  `eventType` varchar(100) default NULL,
+  `eventColour` varchar(10) default NULL,
+  PRIMARY KEY  (`eventTypeID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+insert  into `luEventType`(`eventTypeID`,`eventType`,`eventColour`) values (1,'Event','000000'),(2,'Excursion','0033FF'),(3,'Report','FF9900'),(4,'Exam','FF0000'),(5,'Meeting','009933');
 
 /*Table structure for table `luServices` */
 
@@ -467,7 +561,7 @@ CREATE TABLE `luServices` (
 
 /*Data for the table `luServices` */
 
-insert  into `luServices`(`id`,`name`) values (1,'Homepage'),(2,'Calendar'),(3,'News'),(4,'Tutorial');
+insert  into `luServices`(`id`,`name`) values (1,'Homepage'),(2,'Calendar'),(3,'News'),(4,'Tutorial'),(5,'CMS');
 
 /*Table structure for table `luTitle` */
 
@@ -616,7 +710,8 @@ CREATE TABLE `news_items` (
   `item_campus` int(4) default '0',
   `item_group` int(4) unsigned default NULL,
   PRIMARY KEY  (`item_id`),
-  KEY `access` (`item_topic_id`,`item_campus`)
+  KEY `access` (`item_topic_id`,`item_campus`),
+  FULLTEXT KEY `fulltext` (`item_heading`,`item_body`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `news_items` */
@@ -783,7 +878,8 @@ CREATE TABLE `subject_news` (
   `code` int(6) unsigned NOT NULL default '0',
   `owner` int(6) unsigned NOT NULL default '0',
   PRIMARY KEY  (`id`),
-  KEY `category` (`code`)
+  KEY `category` (`code`),
+  FULLTEXT KEY `fulltext` (`heading`,`body`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `subject_news` */
@@ -840,6 +936,7 @@ CREATE TABLE `submission_return` (
   `filename` varchar(80) default NULL,
   `deleted` tinyint(1) unsigned NOT NULL default '0',
   `returned` datetime NOT NULL default '0000-00-00 00:00:00',
+  `submitted` datetime default NULL,
   PRIMARY KEY  (`id`),
   KEY `box` (`box_id`),
   KEY `owner` (`owner`)
@@ -911,10 +1008,12 @@ CREATE TABLE `user` (
   `alt_email` varchar(60) default NULL,
   `mail_handler` tinyint(3) unsigned NOT NULL default '0',
   `hash` varchar(40) default NULL,
+  `key` varchar(40) default NULL,
   PRIMARY KEY  (`id`),
   KEY `synergy` (`synergy_id`),
   KEY `username` (`username`),
-  KEY `groupind` (`group_id`)
+  KEY `groupind` (`group_id`),
+  FULLTEXT KEY `fulltext` (`username`,`title`,`firstname`,`lastname`,`alt_email`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `user` */
@@ -1004,12 +1103,30 @@ DROP TABLE IF EXISTS `wiki`;
 CREATE TABLE `wiki` (
   `wikiID` int(11) NOT NULL auto_increment,
   `categoryID` int(11) default NULL,
+  `latestRevision` int(11) NOT NULL,
   `created` datetime default NULL,
-  `deleted` enum('true','false') default 'false',
+  `deleted` enum('true','false') NOT NULL default 'false',
+  `locked` enum('true','false') NOT NULL default 'false',
   PRIMARY KEY  (`wikiID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `wiki` */
+
+/*Table structure for table `wikiRevision` */
+
+DROP TABLE IF EXISTS `wikiRevision`;
+
+CREATE TABLE `wikiRevision` (
+  `revisionID` int(11) NOT NULL auto_increment,
+  `wikiID` int(11) default NULL,
+  `heading` varchar(200) default NULL,
+  `body` mediumtext,
+  `userID` int(11) default NULL,
+  `created` datetime default NULL,
+  PRIMARY KEY  (`revisionID`),
+  KEY `wikiID` (`wikiID`),
+  FULLTEXT KEY `fulltext` (`heading`,`body`)
+) ENGINE=MyISAM AUTO_INCREMENT=85 DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
