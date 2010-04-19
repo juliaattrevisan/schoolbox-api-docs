@@ -11,14 +11,15 @@
             <!-- END current -->
             <!-- BEGIN forecast -->
             <br />
-            <h2>Forecast</h2>
-			<div class="indent">
-			<table>
+            
+			<div class="left">
+      <h2>Forecast</h2>
+			<table id="forecast">
                     <tr> 
-                      <th>{DAY0}</th>
-                      <th>{DAY1}</th>
-                      <th>{DAY2}</th>
-                      <th>{DAY3}</th>
+                      <th width="25%">{DAY0}</th>
+                      <th width="25%">{DAY1}</th>
+                      <th width="25%">{DAY2}</th>
+                      <th width="25%">{DAY3}</th>
                     </tr>
                     <tr> 
                       <td><img src="https://www.google.com/{IMAGE0}" alt="{PRECIS0}" width="50" height="50" /><br />
@@ -31,18 +32,22 @@
                         {PRECIS3}</td>
                     </tr>
                     <tr> 
-                      <td><span style="color:#f33">{HIGH0}° - <span style="color:#09f">{LOW0}°</span></span></td>
-                      <td><span style="color:#f33">{HIGH1}° - <span style="color:#09f">{LOW1}°</span></span></td>
-                      <td><span style="color:#f33">{HIGH2}° - <span style="color:#09f">{LOW2}°</span></span></td>
-                      <td><span style="color:#f33">{HIGH3}° - <span style="color:#09f">{LOW3}°</span></span></td>
+                      <td><span style="color:#f33">{HIGH0}&deg;</span> | <span style="color:#09f">{LOW0}&deg;</span></td>
+                      <td><span style="color:#f33">{HIGH1}&deg;</span> | <span style="color:#09f">{LOW1}&deg;</span></td>
+                      <td><span style="color:#f33">{HIGH2}&deg;</span> | <span style="color:#09f">{LOW2}&deg;</span></td>
+                      <td><span style="color:#f33">{HIGH3}&deg;</span> | <span style="color:#09f">{LOW3}&deg;</span></td>
                     </tr>
             </table>
 			</div>
             <!-- END forecast -->
+      <div class="right">
 			<h2>Weather around Australia</h2>
-			<ul>
+			<ul style="margin-top: 10px;">
 				<!-- BEGIN regions -->
 				<li><a href="/weather/{LOCATION_VALUE}">{LOCATION_NAME}</a></li>
 				<!-- END regions -->
 			</ul>
-		<span class="sub_footer"> Weather Supplied By <a href="/redir.php?url=http://www.google.com.au" target="_blank">Google</a></span>
+      </div>
+      <div class="float-fix"></div>
+      <p>&nbsp;</p>
+			<span class="sub_footer"> Weather Supplied By <a href="/redir.php?url=http://www.google.com.au" target="_blank">Google</a></span>

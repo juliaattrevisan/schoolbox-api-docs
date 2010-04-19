@@ -260,3 +260,12 @@ li p.interact {
 #footer ul li a {
 	color: #fff;
 }
+
+.newsWrapper {
+	position: relative;
+}
+.newsWrapper h2 {
+	display: block;
+}
+
+

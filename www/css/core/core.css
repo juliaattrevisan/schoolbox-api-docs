@@ -85,6 +85,7 @@ a:hover { text-decoration: underline; }
  Text formatting styles 
 --------------------------------------------------------------*/
 p           { margin: 0 0 1em 0; text-align:left; line-height: 1.3; }
+.weatherDay p { text-align: center; }
 ul, ol      { margin: 0 0 1.5em 1.5em; line-height: 1.3; }
 ol { margin-left: 2.5em; }
 hr { background-color: #d2d2d2; border: 0; height: 1px; }
@@ -651,14 +652,17 @@ p.interact a { color: #003e7e; }
 .listing p.small a:hover { text-decoration: underline; }
 .listing a { color: #003e7e; }
 .weather p.float-left { font-size: 90%; margin: 0; padding: 0 0 0 20px; }
-.weather p span { color: #999; font-size: 90%; }
+.weather p span { color: #999; font-size: 90%; font-family: Arial, Helvetica, sans-serif; }
 .weather p span a { color: #999; }
 .weather img { margin: 0; }
 .weatherDay {
 	float: left;
 	border-right: 1px solid #dbdbdb;
-	padding-right: 9px;
-	margin: 0 9px 10px 0;
+	/*padding-right: 9px;
+	margin: 0 9px 10px 0;*/
+	margin-bottom: 10px;
+	width: 33%;
+	text-align: center;
 }
 .weatherDay.last {
 	border-right: 0;
@@ -867,6 +871,9 @@ div.topic {
 .topic div.hide {
 	display: none;
 }
+.newsWrapper h2 {
+	display: none;
+}
 /*--------------------------------------------------------------
 	Blog styles 
 --------------------------------------------------------------*/
@@ -964,6 +971,7 @@ div.results h2 {
 	font-weight:bold;
 	border:none;
 	background:none;
+	color: #000;
 }
 div.results h2:first-child {
 	margin-top:5px;
@@ -1320,6 +1328,14 @@ p.bubble-name {
 .cancelled { text-decoration: line-through; }
 .file { background-repeat: no-repeat; }
 .bold {font-weight: bold;}
+
+#forecast td {
+	vertical-align: top;
+	line-height: 1.2;
+}
+.box .weather {
+	padding-right: 0;
+}
 /*--------------------------------------------------------------
  sIFR Replacements
 --------------------------------------------------------------*/

@@ -1,11 +1,9 @@
 /*--------------------------------------------------------------
  Calander styles 
 --------------------------------------------------------------*/
-#calendar a { color: #000066; }
 #calendar a:hover { color: #CC0000; }
 #calendar .ruler thead td { background: 0; padding: 0; }
 #calendar .ruler tr { padding-bottom: 1em; }
-#calendar td { padding: 0; }
 #calendar table.calendarTable td.calTableSelected {  background: #fff; }
 #calendar table.calendarTable td.calTableCurrent {  background: #335473; color: #fff; }
 #calendar table {
@@ -14,9 +12,6 @@
 	}
 #calendar table thead td {
 	border-bottom: 0;
-	}
-#calendar table td {
-	padding: 0.5em;
 	}
 #month-view thead td {
 	color: #000;
