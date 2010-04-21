@@ -1018,7 +1018,7 @@ CREATE TABLE `user` (
 
 /*Data for the table `user` */
 
-insert  into `user`(`id`,`username`,`password`,`group_id`,`title`,`firstname`,`lastname`,`email_pass`,`synergy_id`,`campus`,`year`,`house`,`local_email`,`alt_email`,`mail_handler`,`hash`) values (1,'jleckie','*7968DF3FE2AF92916A9D4F5BE24010B7707AC68F',1,NULL,'James','Leckie',NULL,0,0,NULL,NULL,0,NULL,0,NULL));
+insert  into `user`(`id`,`username`,`password`,`group_id`,`title`,`firstname`,`lastname`,`email_pass`,`synergy_id`,`campus`,`year`,`house`,`local_email`,`alt_email`,`mail_handler`,`hash`) values (1,'jleckie','*7968DF3FE2AF92916A9D4F5BE24010B7707AC68F',1,NULL,'James','Leckie',NULL,0,0,NULL,NULL,0,NULL,0,NULL);
 
 /*Table structure for table `userAccess` */
 

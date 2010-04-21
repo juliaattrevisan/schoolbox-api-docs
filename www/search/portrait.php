@@ -7,9 +7,14 @@
 //this script outputs an image of the user
 
 //includes
-require_once("../include/session.php");
-require_once("../include/include.php");
 require_once("../include/image.php");
+require_once("../../include/sitePage.php");
+require_once("../../library/group.php");
+
+$page = new SitePage;
+
+$groupHandler = new Group;
+
 
 
 //no image
@@ -26,7 +31,7 @@ else
 	
 $imageHandler = new Image;
 
-if(isset($_GET['id']) && $_GET['id'] && SYNERGY_enable && isStaff($_SESSION['gid']))
+if(isset($_GET['id']) && $_GET['id'] && SYNERGY_enable && $groupHandler->isStaff())
 {
 	//get file details
 	$db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);	
