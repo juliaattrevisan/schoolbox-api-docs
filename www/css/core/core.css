@@ -1308,6 +1308,34 @@ p.bubble-name {
 	color:#000;
 }
 /*--------------------------------------------------------------
+ Icon Styles
+--------------------------------------------------------------*/
+.delete-btn {
+	padding:2px 0 0 20px;
+	background:url(/images/delete-icon.gif) no-repeat left top;
+	height:14px;
+	font-size:11px;
+	color:#B8575B;
+}
+.add-btn {
+	padding:2px 0 0 20px;
+	background:url(/images/add-icon.gif) no-repeat left top;
+	height:14px;
+	font-size:11px;
+	color:#6F9740;
+}
+.add-sub {
+	vertical-align:bottom;
+}
+.btn {
+	display:block;
+}
+.btn:hover {
+	background-position:bottom left;
+}
+
+
+/*--------------------------------------------------------------
  Drop Box styles 
 --------------------------------------------------------------*/
 .box .listing form.dropBox { text-align: left; padding: 10px; background: #eee; }

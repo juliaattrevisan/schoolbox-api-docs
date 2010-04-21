@@ -1,23 +1,32 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+	$j(function(){
+		$j('a.delete-btn').click(function(){
+			if(confirm("Delete this assessment task?")) {
+			  var workid = $j(this).closest('td').attr('id').substring(5);
+			  $j.post('/submission/submissionForm.php', {'delete':workid}, function(){
+				$j('.column-'+workid).remove();
+				  });
+			}
+			  return false;
+		  });
+	});
+</script>
+<!-- END custom_head -->
+
 <h1>{CATEGORY}</h1>
-<span class="header_option">
-	<form method='POST' onSubmit='return columnAdd();'>
-		<input name='do' type='hidden' value='columnAdd' />
-		<input name='studentID' type='hidden' value='{EXAMPLE_STUDENTID}' />
-		<input name='cid' type='hidden' value='{CID}' />
-		<input name='hiddenColName' type='hidden' value='' />
-		<input type='image' src='/images/button_add.jpg' alt='add column' />
-	</form>
-</span>
-<br />
 <table class="markTable" cellspacing="0" cellpadding="0">
 	<tr>
 		<th>Surname</th>
 		<th>Preferred Name</th>
 		<!-- BEGIN sub_head -->
-		<td><a href="/submission/viewSubmission/{BOX_ID}">{SUB_NAME}</a><br />
-			<em>{SUB_TYPE}</em><br />
-			<a href="/submission/submissionForm.php?delete={BOX_ID}" onClick='return confirm("Delete this assessment task?")'>Delete</a></td>
+		<td id="work-{BOX_ID}" class="column-{BOX_ID}"><a href="/submission/viewSubmission/{BOX_ID}"><strong>{SUB_NAME}</strong></a><br />
+			<em>{SUB_TYPE}</em><br /><br />
+			<a class="delete-btn btn" href="/submission/submissionForm.php?delete={BOX_ID}">Delete</a></td>
 		<!-- END sub_head -->
+            <td class="add-sub">
+            <a class="add-btn btn" href="/submission/submissionForm.php?add={BOX_ID}">Add Submission</a></td>
+</td>
 
 	</tr>
 	<!-- BEGIN student_list -->
@@ -25,7 +34,7 @@
 		<td><a href="/search/user/{UID}">{SURNAME}</a></td>
 		<td><a href="/search/user/{UID}">{FIRSTNAME}</a></td>
 		<!-- BEGIN mark -->
-		<td><form method="post" onSubmit="return false;" action="">
+		<td class="column-{BOX_ID}"><form method="post" onSubmit="return false;" action="">
 				<input name="mark" value="{MARK}" class="inputMark" type="text" size="5" maxlength="10" onBlur="submitOnFieldChange(this.form);">
 				<input type="hidden" name="userID" value="{UID}">
 				<input type="hidden" name="box_id" value="{BOX_ID}">
