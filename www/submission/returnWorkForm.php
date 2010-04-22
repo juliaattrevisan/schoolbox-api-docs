@@ -5,9 +5,25 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionReturn.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
 $page = new SitePage;
+$returnHandler = new SubmissionReturn;
 
-
-if ( (
+if( $_POST['mark'] && is_numeric($_POST['uid']) && is_numeric($_POST['box_id']) && $_POST['markUpdate'] == 'true') {
+	/* Ajax from mark sheet */
+	$returnHandler->securityCheck($_POST['box_id'], $_POST['uid']);
+	
+	$return = array('box_id'    => $_POST['box_id'],
+					'owner'     => $_POST['uid'],
+					'mark'      => $_POST['mark'],
+					);
+	
+	$result = $returnHandler->getByUser($_POST['uid'], $_POST['box_id']);
+	if(is_array($result)) 
+		$returnHandler->update($return);
+	else
+		$returnHandler->create($return);
+	
+}
+else if ( (
 	 
 	  ( isset($_POST['comment']) && $_POST['comment'] ) || 
 	  ( isset($_POST['mark']) && $_POST['mark'] ) || 
@@ -20,7 +36,6 @@ if ( (
   )
 {
 
-        $returnHandler = new SubmissionReturn;
         $returnHandler->securityCheck($_POST['box_id'], $_POST['uid']);
 		
 		
@@ -39,6 +54,7 @@ if ( (
 
         $page->backToTheFuture(2);
 }
+
 else
     error(2);
 

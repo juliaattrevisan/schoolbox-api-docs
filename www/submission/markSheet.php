@@ -22,6 +22,8 @@ if(is_numeric($this->arg[0])) {
 	else
 			$this->setVar('CATEGORY', $category['name']);
 
+	$this->setVar('CID', $category['id']);
+
 	/* Get full student list of class  */
     if($subBox['code'] && SYNERGY_enable) {
         require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/synergetic-class.php';
