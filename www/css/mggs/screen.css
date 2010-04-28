@@ -25,15 +25,19 @@ body {
 }
 #container {
 	margin-left: 176px;
-	min-width: 815px;
+	min-width: 785px;
+	padding: 15px;
 }
 #content {
-	padding: 15px;
+	padding: 0;
+	float: left;
+	width: 100%;
 }
 #nav {
 	width: 161px;
-	top: 131px;
-	margin: 0 0 0 15px;
+	margin: 15px 0 0 15px;
+	float: left;
+	position: static;
 }
 #nav h3 {
 	color: #fff;
