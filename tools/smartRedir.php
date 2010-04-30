@@ -156,9 +156,18 @@ case "infomit-apais":
 	$formArray['password']="423441";
 break;
 
+case "infomit-aei":
+	$form="loginForm";
+	$action="http://search.informit.com.au/search;res%3DAEI";
+	$method="POST";
+	$formArray['username']="sydch";
+	$formArray['password']="423441";
+break;
+
+
 case "worldbook":
 	$form="loginForm";
-	$action="http://www.worldbook.com/wb/products?ed=all";
+	$action="http://www.worldbookonline.com/wb/products?ed=all";
 	$method="POST";
 	$formArray['uid']="shore1";
 	$formArray['pwd']="shore";
@@ -233,6 +242,23 @@ case "britannica":
 	$formArray['target'] = '/';	
 break;
 
+case "onguard":
+	$form="formLogin";
+	$action="http://www.1300acepro.com/OnGuardACEPro/content/doLogin.asp";
+	$method="POST";
+	$formArray['login_username'] = 'dtw';
+	$formArray['login_password'] = 'dave';
+	$formArray['schoolid']		='shore.nsw';
+break;
+
+case "studyskills":
+	$form = "form";
+	$action = "http://www.studyskillshandbook.com.au/admin/users/login.php?ce=0&group=1&url=www.studyskillshandbook.com.au/inside/index.html";
+	$method="POST";
+	$formArray['LoginType'] = 'old';
+	$formArray['username']	= 'forshoreonly';
+	$formArray['password']	= '35results';
+break;
 
 default:
 	echo "Did not recognise the site";

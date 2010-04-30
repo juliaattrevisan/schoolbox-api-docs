@@ -27,7 +27,7 @@ define("REMEMBERSESSION", false);				//Allows server to store session indefinetl
 define("REGISTER_FIRSTIME", false);			//Detects no password and checks password against mail server if correct registers account
 
 // Cache Options
-define('CACHE_xml', SITE_root . '/cache/xml');
+
 
 //LDAP Authentcation
 define('LDAP_enable', false);
@@ -50,13 +50,14 @@ define('SEARCH_all_limit', 3); // results per type shown on 'All' tab for each t
 define('SEARCH_type_limit', 15); // number of results to display per type
 
 //CMS options
-define("FILE_directory",		SITE_root.'/data/files');		//Files uploads
+define("FILE_directory",			SITE_root.'/data/files');		//Files uploads
 define("MYFILE_directory",  		SITE_root.'/data/myFiles');		//Personal file uploads
 define("SUBMISSION_directory", 		SITE_root.'/data/submissions');	//Student submission files
 define("RETURNS_directory", 		SITE_root.'/data/returns');		//Returned work files
 define('DROPBOX_directory', 		SITE_root.'/data/drop');			//Student dropbox files
-define('ZIP_directory', 		SITE_root.'/data/zip');			//Cache for zip files 
-define("THUMBNAIL_IMAGE_CACHE", 	SITE_root.'/data/thumbnails');	//Thumbnail cache 
+define('ZIP_directory',				SITE_root.'/data/zip');			//Cache for zip files
+define("THUMBNAIL_IMAGE_CACHE", 	SITE_root.'/data/thumbnails');	//Thumbnail cache
+define('CACHE_xml',					SITE_root . '/cache/xml');
 define("THUMBNAIL_size", 		100); 
 define("FILE_max_upload", 		"10");						//Maximum number of files that can be uploaded via bulk uploader
 define("MAX_FILE_SIZE", 		10485760); 					//Maximum filesize in bytes allowed to be uploaded (default 10MB) (also set in php.ini)
