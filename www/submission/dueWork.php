@@ -80,14 +80,16 @@ if (is_array($_SESSION['children'])) {
 
 // get category list
 $subjectList = false;
-if (SYNERGY_enable) {
+if (SYNERGY_enable && $user['synergy_id'])  {
 	$synUser = new SynergeticUser;
-	$subjectList = $synUser->getSubjectList($user['synergy_id'], $user['group_id']);
+	$subjectList = $synUser->getSubjectList($user['synergy_id'], $user['uid']);
 }
-$categoryList = involvedCategoryList($user['uid'], $subjectList, 1);
 
+$categoryList = $groupHandler->involvedCategoryList($user['uid'], $subjectList, 1);
 
-
+//Catch if not involved in any categories
+if (count($categoryList) == 0)
+	error(2);
 
 // get selected date
 if (isset($this->arg[0]))
@@ -262,7 +264,7 @@ foreach ($summary as $categoryID => $category) {
 		
 		if (is_array($teacherList)) {
 			foreach ($teacherList as $teacherSynID) {
-				$teacher = $userHandler->getBySynergyID($teacherSynID);
+				$teacher = $userHandler->getBySynergy($teacherSynID);
 				$teacherName = formatName($teacher);	
 				$emailAddress = formatEmail($teacher);
 				$teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";

@@ -1,7 +1,6 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/include/involved.php';
 
 $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
@@ -72,7 +71,9 @@ else if($this->arg[0] == 'new'  ) {
     $this->setTitle('Create Submission Box');
 
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
+	$groupHandler = new Group;
 
     if(is_numeric($this->arg[2])) {
         /* File ID submitted, associate box with file */
@@ -92,10 +93,10 @@ else if($this->arg[0] == 'new'  ) {
 	if (SYNERGY_enable) {
 		require_once SITE_root . '/library/synergetic-user.php';
 		$synUser = new SynergeticUser;
-		$subjectList = $synUser->getSubjectList($_SESSION['sid'], $_SESSION['gid']);
+		$subjectList = $synUser->getSubjectList($_SESSION['sid'], $_SESSION['id']);
 	}
 	
-	$categoryList = involvedCategoryList($_SESSION['id'], $subjectList, 1);
+	$categoryList = $groupHandler->involvedCategoryList($_SESSION['id'], $subjectList, 1);
 	$length = count($categoryList);
 	for ($i = 0; $i < $length; $i++) {
 		if (!empty($categoryList[$i]['code']))

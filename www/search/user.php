@@ -221,8 +221,7 @@ if(is_numeric($this->arg[0])) {
 	}
 }
 else {
-	$this->setFile(TEMPLATE_content, 'user/search.html');
-	$this->setTitle('School Directory');
+	error(2);
 }
 
 ?>

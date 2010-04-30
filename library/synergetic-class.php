@@ -8,6 +8,7 @@
 ************************************************************/
 require_once dirname(__FILE__) .'/mssql.php';
 
+
 class SynergeticClass extends MSSQL{
 
 	function SynergeticClass() {

@@ -6,8 +6,8 @@
 *	This file provides access to synergetic timetable info	*	    
 *                                                           *
 ************************************************************/
-require_once '../library/mssql.php';
-require_once '../library/group.php';
+require_once dirname(__FILE__) .'/mssql.php';
+require_once dirname(__FILE__) .'/group.php';
 
 class SynergeticTimetable extends MSSQL{
 

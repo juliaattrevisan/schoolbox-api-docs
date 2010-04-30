@@ -7,11 +7,13 @@
 *                                                           *
 ************************************************************/
 require_once '../library/mssql.php';
+require_once dirname(__FILE__) .'/group.php';
 
 class SynergeticUser extends MSSQL{
 
 	function SynergeticUser() {
 		parent::MSSQL();
+		$this->groupHandler = new Group;
 	}
 	
 	function getStudent($synID)
@@ -75,9 +77,9 @@ class SynergeticUser extends MSSQL{
 		return $this->getRow($query);
 	}
 	
-	function getSubjectList($synergyID, $group)
+	function getSubjectList($synergyID, $userID)
 	{	
-		if( isStudent($group) )
+		if( $this->groupHandler->isStudent($userID) )
 		{
 			$sql ="SELECT StudentClasses.ClassCode, SubjectClasses.Description as name
 					FROM StudentClasses, SubjectClasses
