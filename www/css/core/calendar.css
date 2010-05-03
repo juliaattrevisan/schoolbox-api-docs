@@ -50,6 +50,9 @@
 #month-view p {
 	margin-bottom: 0.5em;
 }
+.noteWrap p {
+	margin-bottom: 0;
+}
 #month-view thead {
 	font: bold 16px Verdana, Arial, Helvetica, sans-serif;
 	background-color: #FFFFFF;
@@ -88,14 +91,17 @@
 .noteWrap {
 	padding: 5px;
 }
+.week {
+	padding: 0;
+}
 .noteWrap p {
 	background: #ccc;
 	-moz-border-radius: 5px;
 	padding: 2px 4px;
-	color: #fff;
+	color: #000;
 }
 .noteWrap a {
-	color: #fff;
+	color: #000;
 }
 .day-block .header_option {
 	float: right;

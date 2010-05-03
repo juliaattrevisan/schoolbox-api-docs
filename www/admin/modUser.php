@@ -458,7 +458,7 @@ else if($_POST['username'] && $_POST['lastname'] && $_POST['group'] && $_POST['c
 }
 else if(isset($_GET['search']) && $_GET['search'])
 {
-	$users = $myPage->searchUser($_GET['search']);
+	$users = $myPage->ajaxSearch($_GET['search']);
 }
 else if(isset($_GET['id']) && $_GET['id'])		
 {

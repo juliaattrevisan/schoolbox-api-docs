@@ -82,6 +82,43 @@ class User extends Model {
             return $this->db->getAll($query);
         }
 
+	function ajaxSearch($keyword, $group = 0, $limit = false)
+	{
+		//search for a user based on at least one of the above fields
+		//assumes at least one contains something
+
+		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, year, local_email, alt_email
+					FROM user LEFT JOIN groups ON user.group_id = groups.id WHERE ";
+
+		if($keyword != "")
+		{
+			if( is_numeric( $keyword))
+				$query .= "( synergy_id = $keyword OR year = $keyword ) ";
+			else
+			{
+				if(preg_match('/([[:alpha:]\']+) ([[:alpha:]\']+)/', $keyword, $name))
+					$query .= "( firstname like '%{$name[1]}%' and lastname like '%{$name[2]}%' ) ";
+				else
+					$query .= "( firstname like '%$keyword%' or lastname like '%$keyword%' or username like '%$keyword%' ) ";
+			}
+
+			if($group)
+				$query .= "AND group_id = $group ";
+		}
+		else if($group)
+			$query .= "group_id = $group ";
+		else
+			error(2);
+
+		$query .= "ORDER BY group_id, year, lastname, firstname";
+
+		if (is_numeric($limit))
+			$query .= " LIMIT $limit";
+
+		return $this->db->getAll($query);
+
+	}
+
 	function setPassword($userID, $oldPassword, $newPassword) {
 		$oldPassword = mysql_real_escape_string($oldPassword);
 		$newPassword = mysql_real_escape_string($newPassword);
