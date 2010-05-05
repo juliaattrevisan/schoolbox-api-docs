@@ -36,7 +36,7 @@ class BulkAdd {
 		if (is_file($file)){
 			$handle = fopen($file, "r");
 			while (($user = fgetcsv($handle, 1000, ",")) !== FALSE) {
-				if($user[0] != "" && $user[2] != "" && $user[3] != "")
+				if($user[0] != "" && ($user[2] != "" || $user[3] != ""))
 				{	
 					// get campus id and group
 					$user[5] = is_numeric($user[5]) ? $user[5] : $userDB->getGroupID($user[5]);
