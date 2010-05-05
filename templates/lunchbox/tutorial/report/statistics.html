@@ -1,0 +1,40 @@
+<h1>Tutorial Management - Statistics - {SHOW} Events</h1>
+<span class="header_option">
+
+View <a href="/modules/tutorial/report/statistics.php">All</a> | <a href="/modules/tutorial/report/statistics.php?show=week">Week</a> | 
+<a href="/modules/tutorial/report/statistics.php?show=semester">Semester</a> | 
+
+<a href="/modules/tutorial/event/modify.php">Add Tutorial</a>
+</span>
+
+<!-- BEGIN has_events -->
+<h2>{TYPE}</h1>
+<table class="ruler">
+  <thead>
+  <tr>
+  	<th>Tutorial</th>
+    <th>Code</th>
+    <th>Location</th>
+    <th>Classes</th>
+    <th>Attendance %</th>
+    <th>Enrolled</th>
+    <th>Tutors</th>
+  </tr>
+  </thead>
+  <tbody>
+  <!-- BEGIN event_list -->
+  <tr class="{ON_OFF}">
+    <td><a href="/modules/tutorial/enrolment/list.php?eventID={EVENT_ID}">{NAME}</a></td>
+    <td>{CODE}</td>
+    <td>{LOCATION}</td>
+    <td>{COUNT}</td>
+    <td>{ATTENDANCE}</td>
+    <td>{STUDENT_COUNT}</td>
+    <td><!-- BEGIN tutor -->
+    <a href="/search/user/{TUTOR_ID}">{TUTOR_NAME}</a><!-- END tutor --></td>
+  </tr><!-- END event_list -->
+  </tbody>
+</table>
+<!-- END has_events -->
+
+

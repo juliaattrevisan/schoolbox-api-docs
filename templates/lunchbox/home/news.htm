@@ -1,0 +1,21 @@
+<script type="text/javascript">
+	$(function() {
+		$(".tabsUI").tabs();					 
+	});
+</script>
+<div class="componentBox tabsUI">
+	<ul class="tabsNav">
+		<!-- BEGIN topic_header -->
+    <li><a href="#topic-{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
+    <!-- END topic_header -->
+	</ul>
+  <!-- BEGIN topic -->
+  <div id="topic-{TOPIC_CLEAN}" class="contentList">
+  	<ul>
+    	<!-- BEGIN news -->
+    	<li><a href="{NEWS_URL}" title="{NEWS_TITLE}">{NEWS_TITLE}</a><span class="interact">{NEWS_TIME}</span></li>
+      <!-- END news -->
+    </ul>
+  </div>
+  <!-- END topic -->
+</div>

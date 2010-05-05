@@ -10,7 +10,7 @@
 //Site Directives
 define("HEADING", 'OurSchool');			//This will appear on the window title of each page
 define("SITE_name", "Alaress Pty Ltd");
-define("SITE_location", "mggs");
+define("SITE_location", "stjo");
 
 //define("SITE_location", "shore");				//This defines the location, allows specific code for each location
 define("SITE_detect", "domain");				//Which option to detect site, can be domain or campus
@@ -163,19 +163,19 @@ define('GROUP_can_change_password', serialize(array(1,2,3,4,5)));
 
 define('HOMEPAGE_colors', serialize(array(
 	'left_head_font' => 'ffffff', 
-	'left_head_bg' => '245398', 
+	'left_head_bg' => '072f63', 
 	'left_font' => '2c2c2c', 
 	'left_bg_primary' => 'ffffff', 
 	'left_bg_secondary' => 'f1f7fa', 
-	'left_link' => '255297', 
-	'left_hover' => 'ebab00', 
+	'left_link' => '072f63', 
+	'left_hover' => 'bc9e37', 
 	'right_head_font' => 'ffffff', 
-	'right_head_bg' => '245398', 
+	'right_head_bg' => '072f63', 
 	'right_font' => '2c2c2c', 
 	'right_bg_primary' => 'ffffff', 
 	'right_bg_secondary' => 'f1f7fa', 
-	'right_link' => '255297', 
-	'right_hover' => 'ebab00', 
+	'right_link' => '072f63', 
+	'right_hover' => 'bc9e37', 
 	
 )));
 

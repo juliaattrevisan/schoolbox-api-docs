@@ -1,0 +1,73 @@
+<!-- BEGIN custom_head -->
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/feed/news.php" />
+<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
+<script type="text/javascript">
+	$j(function() {	
+		
+		$j('#category a').click(function() {
+			$j('#category a').removeClass('selected');
+			$j(this).addClass('selected');	
+			var el = $j(this).attr('title');
+			$j('div.topic > div').hide();
+			$j('div.topic > div#' + el).show();
+		});
+		
+		var params = window.location.href.split("#");
+		if (params[1] != '' && params[0] != window.location.href) {
+			var parent = $j('#a'+ params[1]).parent();
+			$j(parent).show();
+			$j('#category a[title='+parent.attr('id')+']').addClass('selected');
+			$j.scrollTo('#a'+ params[1]);
+		
+		} else {
+		
+		$j('#category li:first-child a').addClass('selected');
+		$j('div.topic > div:first-child').show();
+		
+		}
+		
+	});
+</script>
+<!-- END custom_head -->
+
+<h1><span>News</span>
+	<!-- BEGIN add_news --><a class="customise" href="/news/modify">Add News</a><!-- END add_news --></h1>
+<div class="float-fix"></div>
+<div class="newsWrapper">
+<h2>&nbsp;</h2>
+<ul id="category">
+  <!-- BEGIN topic_header -->
+  <li><a href="#" title="{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
+  <!-- END topic_header -->
+</ul>
+<div class="topic">
+<!-- BEGIN topic -->
+<div id="{TOPIC_CLEAN}" class="hide">
+    
+  <!-- BEGIN news -->
+  <div id="a{NEWS_ID}" class="news-item">
+    <h3 id="news-header"><a name="{NEWS_ID}"></a>{NEWS_TITLE}</h3>
+    <span class="header_option">{MODIFY}</span>
+    {NEWS_BODY}
+    <hr />
+    <p class="interact">Submitted by {POSTER} on {DATETIME}</p>
+    <div class="float-fix"></div>
+  </div>
+  <!-- END news -->
+</div>
+<!-- END topic -->
+</div>
+</div>
+
+<div class="pagination">
+  <!-- BEGIN previous_button -->
+  <a class="prev" href="/news-archive/{PREVIOUS_PAGE}">&lt;&lt; Prev</a><!-- END previous_button -->
+  <!-- BEGIN page_number -->
+  <a class="number{CURRENT}" href="/news-archive/{PAGE_INDEX}">{PAGE_INDEX}</a><!-- END page_number -->
+  <!-- BEGIN next_button -->
+  <a class="next" href="/news-archive/{NEXT_PAGE}">Next &gt;&gt;</a><!-- END next_button -->
+</div>
+
+<!-- BEGIN archive_button -->
+	<p class="interact"><a href="/news-archive/">View Archived News</a></p>
+<!-- END archive_button -->

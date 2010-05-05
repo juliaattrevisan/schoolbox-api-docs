@@ -1,0 +1,94 @@
+<div class="box" id="component{COMPONENT_ID}">
+  <h2>{POLL_TITLE}</h2>
+  <!-- BEGIN config -->
+  <a class="edit">edit</a>
+  <div class="editPanel hide">
+    <form action="/homepage/configForm.php" method="get">
+      <input type="hidden" name="cid" value="{ID}" />
+      <input type="hidden" name="type" value="config" />
+      <input type="hidden" name="component" value="{COMPONENT_ID}" />
+      <label for="size">Poll: </label>
+      <select name="pollID">
+        <!-- BEGIN select -->
+        <option value="{COMPONENT_CONFIG_SELECT_VALUE}"{COMPONENT_CONFIG_SELECT_SELECTED}>{COMPONENT_CONFIG_SELECT_NAME}</option>
+        <!-- END select -->
+      </select>
+      <input type="submit" value="Update" />
+    </form>
+  </div>
+  <!-- END config -->
+  <!-- BEGIN poll_vote -->
+  <script type="text/javascript">
+    function validatePoll () {
+		var valid = false;
+		$j('input.pollOption').each(function () {
+			if ($j(this).attr('checked'))
+				valid = true;
+			}
+		);
+		if (valid)
+			return valid;
+			
+		alert('Please select an option.');
+		return valid;
+	}
+    </script>
+  <div class="text">
+    <h3>{POLL_QUESTION}</h3>
+    <br />
+    <form class="standardForm" action="/poll/modifyForm.php" method="post" id="pollForm">
+      <input type="hidden" name="pollID" value="{POLL_ID}" />
+      <input type="hidden" name="categoryID" value="{ID}" />
+      <!-- BEGIN poll_options -->
+      <label for="{POLL_OPTION_INDEX}">
+      <input type="radio" name="vote" class="pollOption" id="{POLL_OPTION_INDEX}" value="{POLL_OPTION_INDEX}" />
+      {POLL_OPTION}</label>
+      <!-- END poll_options -->
+      <input type="submit" value="Vote" onclick="return validatePoll();" />
+    </form>
+  </div>
+  <!-- END poll_vote -->
+  <!-- BEGIN poll_chart -->
+  <div class="text poll">
+    <h3>{POLL_QUESTION}</h3>
+    <br />
+    <div id="pollResult{COMPONENT_ID}" style="margin-top: 5px; width: 100%">
+      <noscript>
+      <p>Flash player v9.0 required to view poll.</p>
+      </noscript>
+    </div>
+    <script type="text/javascript" src="/javascript/fusion.js"></script>
+    <script type="text/javascript">
+		// <![CDATA[	
+		$j(document).ready(function () {
+			resetPoll();
+			$j(window).resize(function () { resetPoll(); });
+			$j(document).bind("componentMove", function () { resetPoll(); });
+		});
+		
+		function resetPoll() {
+			var chart = new FusionCharts("/flash/FCF_Column3D.swf", "myChartId", $j("#pollResult{COMPONENT_ID}").width(), "300", "8", "#FFFFFF");
+			chart.setDataURL("/poll/poll-xml.php?pollID={POLL_ID}");
+			chart.addParam("wmode", "transparent");
+			chart.render("pollResult{COMPONENT_ID}");
+		}
+		// ]]>
+    </script>
+    
+    <ol>
+        <!-- BEGIN poll_answers -->
+        <li>{POLL_OPTION}</li>
+        <!-- END poll_answers -->
+    </ol>
+    
+  </div>
+  <!-- END poll_chart -->
+  <p class="interact">
+    <!-- BEGIN modify_poll -->
+    <a href="/poll/modify/new/{ID}">Create</a> | <a href="/poll/modify/{POLL_ID}">Modify</a> | <a href="/poll/modifyForm.php?delete={POLL_ID}" onclick="return confirm('Delete Poll?');">Delete</a> |
+    <!-- END modify_poll -->
+    <!-- BEGIN show_results -->
+    <a href="/homepage/{ID}/pollResults">Show results</a>
+    <!-- END show_results -->
+  </p>
+</div>
