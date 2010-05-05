@@ -259,8 +259,8 @@ class Category extends Model {
 	function update ($data) {
 		
 		/* Redo group permissions */
-		$this->deletePerms($data['id']);
 		if (is_array($data['group'])) {
+			$this->deletePerms($data['id']);
 			foreach($data['group'] as $groupID => $perm) {
 				$this->insertPerm($data['id'], $groupID, $perm);
 			}
