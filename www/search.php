@@ -18,9 +18,14 @@ $group       = new Group();
 $categoryStd = new Category();
 $allowedFile = new AllowedFile();
 
-$keyword      = $_GET['keyword'];
-$type         = $_GET['type'];
-$current_page = empty($_GET['page']) ? 1 : $_GET['page'];
+if($_GET['keyword']) {
+	$keyword      = $_GET['keyword'];
+	$type         = $_GET['type'];
+	$current_page = empty($_GET['page']) ? 1 : $_GET['page'];
+}
+else {
+	error(2);
+}
 
 $handle = array(
     'user'     => 'user',
@@ -66,7 +71,7 @@ if (empty($type)) {
 
     // are there any results?
     if ($count['all'] == 0)
-        error(100);
+        error(45);
 
     // type list
     foreach ($type_list as $type_name => $type_desc) {
