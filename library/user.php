@@ -1,6 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
+require_once dirname(__FILE__) . '/../include/model.php';
 
 class User extends Model {
 

@@ -1,6 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
+require_once dirname(__FILE__) . '/../include/model.php';
 
 define('HOMEPAGE_SERVICE', 	1);
 define('CALENDAR_SERVICE', 	2);
@@ -156,7 +156,7 @@ class Group extends Model {
 			return $this->cache[$this->_service][$relationID][$userID];
 		}
 		
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+		require_once dirname(__FILE__) . '/user.php';
 		$userHandler = new User;
 		$user = $userHandler->getByID($userID);
 		
@@ -234,7 +234,7 @@ class Group extends Model {
 		
 		// default to current user
 		if($userID > 0 ) {
-			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+			require_once dirname(__FILE__) .'/user.php';
 			$userHandler = new User;
 			$user = $userHandler->getByID($userID);
 			$groupID = $user['group_id'];
@@ -258,7 +258,7 @@ class Group extends Model {
 
 		// default to current user
 		if ($userID > 0) {
-         require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+         require_once dirname(__FILE__) .'/user.php';
          $userHandler = new User;
          $user = $userHandler->getByID($userID);
 
@@ -278,7 +278,7 @@ class Group extends Model {
 		
 		// default to current user
 		if ($userID > 0) {
-			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+			require_once dirname(__FILE__)  . '/user.php';
 			$userHandler = new User;
 			$user = $userHandler->getByID($userID);
 			$groupID = $user['group_id'];
@@ -298,7 +298,7 @@ class Group extends Model {
 		
 		// default to current user
 		if ($userID > 0) {
-			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+			require_once dirname(__FILE__) .'/user.php';
 			$userHandler = new User;
 			$user = $userHandler->getByID($userID);
 			$groupID = $user['group_id'];

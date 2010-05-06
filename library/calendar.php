@@ -1,7 +1,7 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once dirname(__FILE__). '/../include/model.php';
+require_once dirname(__FILE__) . '/../library/group.php';
 
 class Calendar extends Model {
 
