@@ -266,5 +266,11 @@ li p.interact {
 .newsWrapper h2 {
 	display: block;
 }
-
-
+.shortcut {
+	width: 170px;
+	float: left;
+	margin-left: 17px;
+}
+.shortcut:first-child {
+	margin: 0;
+}
