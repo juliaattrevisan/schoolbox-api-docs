@@ -40,12 +40,12 @@ if(isset($_GET['id']) && $_GET['id'] && SYNERGY_enable && $groupHandler->isStaff
 	$query = "	SELECT vPhotos.ID, vPhotos.Photo, vPhotos.PhotoType
 				FROM SynergyOne.dbo.vPhotos vPhotos
 				WHERE vPhotos.ID = {$_GET['id']}";
-	$result = mssql_query($query, $db);
-	if(mssql_num_rows($result) == 1)
+	$result = @mssql_query($query, $db);
+	if(@mssql_num_rows($result) == 1)
 	{
 		
 		$image = mssql_fetch_array($result);
-		
+		print_r($image);
 		$tempFile = tempnam(ZIP_directory, 'synport');
 		$handle = fopen($tempFile, "w");
 		fwrite($handle, $image['Photo']);

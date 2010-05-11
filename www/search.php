@@ -140,22 +140,28 @@ if (!empty($result['user'])) {
             'USER_GROUP'      => $user['group_name'],
         ));
 
-        if (!isStudent($user['group_id']) || (!isStaff($_SESSION['gid']) && !isParentOfChild($user['group_id'])))
+        if (!$group->isStudent($user['id']) || (!$group->isStaff() && !$group->isParentOfChild($user['id'])))
             $page->setVar('due_work_block');
         else
             $page->parse('due_work_block', 'due_work');
 
-        if (!isStaff($_SESSION['gid']) && !isParentOfChild($user['group_id'])) {
-            $page->setVar('timetable_block');
+        if($group->isStudent($user['id'])) {
+            if ($group->isStaff() || $group->isParentOfChild($user['id'])) {
+                $page->parse('timetable_block', 'timetable');
+                if(HELPDESK_enable)
+                    $page->parse('helpdesk_block', 'helpdesk');
+                else
+                    $page->setVar('helpdesk_block');
+            }
+            else {
+                $page->setVar('helpdesk_block');
+                $page->setVar('timetable_block');
+            }
+        }
+        else {
             $page->setVar('helpdesk_block');
-        } else {
-            $page->parse('timetable_block', 'timetable');
-			if(HELPDESK_enable)
-				$page->parse('helpdesk_block', 'helpdesk');
-			else
-				$page->setVar('helpdesk_block');
-
-		}
+            $page->setVar('timetable_block');
+        }
 
         if(!$_SESSION['su'])
             $page->setVar('modify_block');

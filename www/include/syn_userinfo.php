@@ -65,7 +65,7 @@ function getCurrentSemester()
 	";
     
 	$result = @mssql_query($query);
-	return @mssql_fetch_array( $result); 
+	return @mssql_fetch_array( $result);
 }
 
 function getSubjectList($synergyID, $group)

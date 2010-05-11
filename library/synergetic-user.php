@@ -15,7 +15,25 @@ class SynergeticUser extends MSSQL{
 		parent::MSSQL();
 		$this->groupHandler = new Group;
 	}
-	
+
+    function getParent($synID) {
+
+        $query = "SELECT    StudentContactLegalFullName, StudentContactEmail, StudentContactMobilePhone,
+                            StudentContactSpouseLegalFullName, StudentContactSpouseMobilePhone, StudentContactSpouseEmail,
+                            StudentContactHomePhone, StudentContactSilentPhoneFlag, Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag, Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
+                            StudentParentsSeparatedFlag
+        		  FROM
+				  	SynergyOne.dbo.vStudentContactAllAddress
+                    JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
+                    JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
+				  WHERE
+				  	StudentContactID = $synID
+					AND FileSemester=".$_SESSION['FileSemester']."
+					AND FileYear=".$_SESSION[ 'FileYear']."
+                    ";
+        return $this->getRow($query);
+    }
+
 	function getStudent($synID)
 	{
 			$query = "

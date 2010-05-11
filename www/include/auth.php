@@ -264,7 +264,7 @@ function setSynergyInfo(&$mydb)
 	$_SESSION[ 'FileYear'] = $semester[ 'FileYear'];
 	$synergy_id = $_SESSION['sid'];
 	
-	if(is_numeric($synergy_id)) {
+	if(is_numeric($synergy_id) && $_SESSION['FileSemester'] && $_SESSION['FileYear']) {
 
 		//if user is parent get information regarding enrolled students
 		if( isParent($_SESSION['gid']))

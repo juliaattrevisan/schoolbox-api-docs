@@ -105,7 +105,8 @@ define("SYNERGY_enable", false);				//Use this to disable synergy modules
 define("MSSQL_host","synergy");
 define("MSSQL_user","intranet");
 define("MSSQL_passwd","Qu4LitY");  
-define("MSSQL_db","SynergyOne");  
+define("MSSQL_db","SynergyOne");
+define("SYNERGY_portal","http://synergy.portal.com");
 
 //Synergy campus code lookup table
 define('SYN_CAMPUS_Codes', serialize(array(
