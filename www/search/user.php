@@ -14,6 +14,8 @@ if(is_numeric($this->arg[0])) {
 
 	$user = $userHandler->getByID($this->arg[0]);
 
+    if(!is_numeric($user['uid']))
+        error(31);
 
     if($groupHandler->isStudent($user['uid'])) {
         $this->setFile(TEMPLATE_content, 'user/student.html');

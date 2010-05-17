@@ -196,12 +196,13 @@ class user
 			$this->db->query($query);
 		//}
 
-		$campusquery = "DELETE FROM userCampus WHERE uid = '$id'";
-		$this->db->query($campusquery);
-	
-		
+
+        
 		if(is_array($campusarray))
 		{
+            $campusquery = "DELETE FROM userCampus WHERE uid = '$id'";
+            $this->db->query($campusquery);
+            
 			foreach($campusarray as $campus)
 			{
 				$defaultCampus = $campus == $_POST['defaultCampus'] ? 1 : 0;
@@ -211,7 +212,8 @@ class user
 		}
 		else
 		{
-			$campusquery = "INSERT INTO userCampus (uid, campus) VALUES ('$id', '$campusarray')";
+            /* Note that this can insert multiple campus if the update only specified a single value like in a bulk load */
+			$campusquery = "INSERT IGNORE INTO userCampus (uid, campus) VALUES ('$id', '$campusarray')";
 			$this->db->query($campusquery);
 		}
 		

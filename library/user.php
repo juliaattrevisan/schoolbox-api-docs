@@ -61,7 +61,8 @@ class User extends Model {
                         FROM `user`
                         LEFT JOIN `groups` ON `user`.group_id = `groups`.id
                         LEFT JOIN `luCampus` ON `user`.campus = `luCampus`.id
-                        WHERE MATCH(`username`,`title`,`firstname`,`lastname`,`alt_email`) AGAINST ('$keyword' IN BOOLEAN MODE) +
+                        WHERE
+                            MATCH(`username`,`title`,`firstname`,`lastname`,`alt_email`) AGAINST ('$keyword' IN BOOLEAN MODE) +
                             MATCH(`groups`.`name`) AGAINST ('$keyword' IN BOOLEAN MODE) +
                             MATCH(`luCampus`.`name`) AGAINST ('$keyword' IN BOOLEAN MODE)
                         ORDER BY `$sort_by` $sort_dir

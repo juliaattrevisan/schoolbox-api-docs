@@ -45,7 +45,6 @@ if(isset($_GET['id']) && $_GET['id'] && SYNERGY_enable && $groupHandler->isStaff
 	{
 		
 		$image = mssql_fetch_array($result);
-		print_r($image);
 		$tempFile = tempnam(ZIP_directory, 'synport');
 		$handle = fopen($tempFile, "w");
 		fwrite($handle, $image['Photo']);
