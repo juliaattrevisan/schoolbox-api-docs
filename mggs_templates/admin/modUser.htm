@@ -205,7 +205,14 @@ $j(document).ready(function () {
           </tr>
           <tr>
             <td><h2>Campus</h2></td>
-            <td>{CAMPUSLIST}</td>
+            <td>
+               <table id="campusList">
+                  <tr>
+                     <td style="width: 75px;text-align:center;">Set default</td><td></td>
+                  </tr>
+                  {CAMPUSLIST}
+               </table>
+            </td>
             <td><h2>Year</h2></td>
             <td><input name="year" type="text" size="2" maxlength="2" value="{YEAR}" /></td>
           </tr>

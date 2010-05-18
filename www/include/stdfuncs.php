@@ -294,11 +294,14 @@ function formatName($userInfo, $format = NULL){
 	}
 	
 	// Replace tags
-	foreach($userInfo as $tagName => $tagValue){
-		$format = str_replace('{' . $tagName . '}', $tagValue, $format);
-	}
-	
-	return $format;
+    if(is_array($userInfo)) {
+        foreach($userInfo as $tagName => $tagValue){
+            $format = str_replace('{' . $tagName . '}', $tagValue, $format);
+        }
+        return $format;
+    }
+    else
+        return false;
 }
 
 function formatEmail($email) {
