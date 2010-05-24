@@ -145,6 +145,7 @@ if (!empty($result['user'])) {
         else
             $page->parse('due_work_block', 'due_work');
 
+        //Show student timetables to staff and parents of child
         if($group->isStudent($user['id'])) {
             if ($group->isStaff() || $group->isParentOfChild($user['id'])) {
                 $page->parse('timetable_block', 'timetable');
@@ -160,7 +161,11 @@ if (!empty($result['user'])) {
         }
         else {
             $page->setVar('helpdesk_block');
-            $page->setVar('timetable_block');
+            //Show staff timetables to other staff
+            if($group->isStaff() && $group->isStaff($user['id']))
+                $page->parse('timetable_block', 'timetable');
+            else
+                $page->setVar('timetable_block');
         }
 
         if(!$_SESSION['su'])
