@@ -71,7 +71,6 @@ class SynergeticClass extends MSSQL{
 			$msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM SubjectClassStaff
 				WHERE ClassCode = '$code' AND FileYear={$_SESSION['FileYear']} AND FileSemester={$_SESSION['FileSemester']}
 				ORDER BY StaffSeq";
-			
 			$this->query($msQuery);
 			while($synrow = $this->getNextArray() ) {
 				$teachers[] = $synrow['StaffID'];

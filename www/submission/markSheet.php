@@ -2,6 +2,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionReturn.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 if(is_numeric($this->arg[0])) {
 	$this->setFile(TEMPLATE_content, 'submission/markSheet.html');
@@ -15,6 +16,11 @@ if(is_numeric($this->arg[0])) {
 	$subHandler = new Submission;
 	$retHandler = new SubmissionReturn();
 	$catHandler = new Category();
+    $groupHandler = new Group;
+
+    if(!$groupHandler->isStaff() )
+            error(19);
+
 	$category = $catHandler->getByID($this->arg[0]);
 
 	if($category['code'] != "")

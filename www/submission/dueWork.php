@@ -87,6 +87,10 @@ if (SYNERGY_enable && $user['synergy_id'])  {
 
 $categoryList = $groupHandler->involvedCategoryList($user['uid'], $subjectList, 1);
 
+foreach($categoryList as $category) {
+    $categoryIDList[] = $category['id'];
+}
+
 //Catch if not involved in any categories
 if (count($categoryList) == 0)
 	error(2);
@@ -147,7 +151,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 
 	$this->setVar($output);
 	
-	$eventList = $submissionHandler->getByDate($currentDay, $user['uid'], $categoryList);
+	$eventList = $submissionHandler->getByDate($currentDay, $user['uid'], $categoryIDList);
 	if (is_array($eventList)) {
 		foreach ($eventList as $event) {
 			
@@ -184,7 +188,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 
 $j = 0;
 // upcoming due work
-$workList = $submissionHandler->getUpcoming($user['uid'], $categoryList);
+$workList = $submissionHandler->getUpcoming($user['uid'], $categoryIDList);
 if (is_array($workList)) {
 	foreach ($workList as $work) {
 		
@@ -257,11 +261,11 @@ foreach ($summary as $categoryID => $category) {
 		$teacherList = array();
 		if (is_array($category['code'])) {
 			foreach ($category['code'] as $code) {
-				$temp = $synClass->getTeacherName($category['code']);
-				$teacherList[] = $temp['StaffID'];
+				$temp = $synClass->getTeacherName($code);
+				$teacherList = array_merge($teacherList, $temp);
 			}
 		}
-		
+
 		if (is_array($teacherList)) {
 			foreach ($teacherList as $teacherSynID) {
 				$teacher = $userHandler->getBySynergy($teacherSynID);
@@ -292,7 +296,7 @@ foreach ($summary as $categoryID => $category) {
 $j = 0;
 
 // activities feed
-$activityLog = $submissionHandler->getActivityLog($user['uid'], 15);
+$activityLog = $submissionHandler->getActivityLog($user['uid'], 15, $categoryIDList);
 if (is_array($activityLog)) {
 	foreach ($activityLog as $activity) {
 		

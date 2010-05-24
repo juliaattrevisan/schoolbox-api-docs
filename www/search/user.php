@@ -219,6 +219,20 @@ if(is_numeric($this->arg[0])) {
             else
                 $this->setVar('medical_block', '');
 		}
+        else {
+            $blank = array ('contact_synergy_block'			=> '',
+                'student_synergy_tutor_block'	=> '',
+                'student_synergy_form_block'	=> '',
+                'medical_block'					=> '',
+                'portrait_block'				=> '',
+                'timetable_link_block'			=> '',
+                'contact_synergy_block'			=> '',
+                'due_work_block'				=> '',
+                'helpdesk_block'				=> '',
+                'school_links_block'			=> '',
+                );
+		$this->setVar($blank);
+        }
 	}
 	else
 	{

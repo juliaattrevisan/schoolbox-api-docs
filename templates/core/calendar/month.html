@@ -6,7 +6,7 @@
         $j('.datepicker').datepicker({ 
           dateFormat: 'dd-mm-yy',
           onSelect: function(dateText, inst) {window.open('/calendar/month/'+dateText, "_self")},
-          defaultDate: $j.datepicker.parseDate("dd-mm-yy", "02-03-2010"),
+          defaultDate: $j.datepicker.parseDate("dd-mm-yy", "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"),
 					showOn: 'button',
 					buttonImage: '/css/core/ui/images/calendar-icon.gif',
 					buttonImageOnly: true,

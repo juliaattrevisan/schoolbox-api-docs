@@ -30,16 +30,9 @@ class Submission extends Model {
 		$query = "SELECT s.*, t.realname, c.name categoryName, GROUP_CONCAT(cc.code) categoryCode FROM ( submission_box s, category c )
 				  LEFT JOIN student_submission t ON t.box_id = s.id AND t.owner = $userID
 				  LEFT JOIN categoryCode cc ON cc.categoryID = c.id
-				  WHERE s.deleted = 0 AND s.category = c.id AND DATE(s.date) = DATE(FROM_UNIXTIME({$date})) ";
-		if (is_array($categoryList)) {
-			$query .= "AND ( 1=2 ";
-			foreach ($categoryList as $category) {
-				$query .= "OR s.category = " . $category['id'] . " ";
-			}
-			$query .= ") ";
-		}
-		
-	  	$query .= "GROUP BY s.id ORDER BY open_date";
+				  WHERE s.deleted = 0 AND s.category = c.id AND DATE(s.date) = DATE(FROM_UNIXTIME({$date}))
+                  AND c.id IN (".implode(',',$categoryList).")
+                  GROUP BY s.id ORDER BY open_date";
 		
 		return $this->db->getAll($query);
 	}
@@ -51,15 +44,8 @@ class Submission extends Model {
 				  LEFT JOIN file ON s.fid = file.id
 				  LEFT JOIN allowedFileTypes a ON file.mime_type = a.mime
 			 	  LEFT JOIN file_type ft ON s.type = ft.id
-				  WHERE s.category = c.id AND s.deleted = 0 AND s.late_date > NOW() AND s.owner != '$userID' AND t.id IS NULL AND ( 1=2 ";
-				  
-		if (is_array($categoryList)) {
-			foreach ($categoryList as $category) {
-				$query .= "OR s.category = " . $category['id'] . " ";
-			}
-		}
-		
-	  	$query .= ") ORDER BY s.date";
+				  WHERE s.category = c.id AND s.deleted = 0 AND s.late_date > NOW() AND s.owner != '$userID' AND t.id IS NULL 
+                    AND c.id IN (".implode(',',$categoryList).") ORDER BY s.date";
 		
 		return $this->db->getAll($query);		
 	}
@@ -135,16 +121,16 @@ class Submission extends Model {
         
     }
 	
-	function getActivityLog($userID, $limit = 5) {
+	function getActivityLog($userID, $limit = 5, $categoryList) {
 		$query = " ( SELECT open_date activity_date, f.name typeName, s.description, s.category, c.name categoryName, s.fid, 'new' FROM submission_box s, category c, file_type f  
-					  WHERE s.category = c.id AND f.id = s.type AND open_date < NOW() )
+					  WHERE s.category = c.id AND f.id = s.type AND open_date < NOW() AND c.id IN (".implode(',',$categoryList).") )
 					UNION 
 				    ( SELECT `date`, l.name typeName, u.description, u.category, e.name categoryName, u.fid, 'overdue' FROM ( submission_box u, category e, file_type l ) 
 					  LEFT JOIN student_submission d ON d.box_id = u.id AND d.owner = $userID  
-					  WHERE d.id IS NOT NULL AND u.category = e.id AND l.id = u.type AND `date` < NOW() )
+					  WHERE d.id IS NOT NULL AND u.category = e.id AND l.id = u.type AND `date` < NOW() AND e.id IN (".implode(',',$categoryList).") )
 					UNION 
 					( SELECT `late_date`, i.name typeName, t.description, t.category, a.name categoryName, t.fid, 'closed' FROM submission_box t, category a, file_type i 
-					  WHERE t.category = a.id AND i.id = t.type AND `late_date` < NOW() )
+					  WHERE t.category = a.id AND i.id = t.type AND `late_date` < NOW() AND a.id IN (".implode(',',$categoryList).") )
 					UNION
 					( SELECT g.`submitted` activity_date, g.realname typeName, m.description, m.category, n.name categoryName, m.fid, 'submitted'  FROM  student_submission g, submission_box m, category n
 					  WHERE g.box_id = m.id AND m.category = n.id AND g.owner = $userID )

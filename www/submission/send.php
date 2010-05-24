@@ -15,7 +15,7 @@ if(is_numeric($_GET['id']))
 {
 	$page = new SitePage;
 
-	if(isset($_GET['return'])) {
+	if(is_numeric($_GET['return'])) {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionReturn.php';
 		$submissionReturn = new SubmissionReturn;
 
@@ -33,18 +33,18 @@ if(is_numeric($_GET['id']))
 	else {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionStudent.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
-
 		$submissionStudent = new SubmissionStudent;
 		$submissionHandler = new Submission;
 		$studentSub = $submissionStudent->getByID($_GET['id']);
 
+
 		if (!isset($studentSub['id']))
-			error(44);
+            error(44);
 
 		$subBox = $submissionHandler->getByID($studentSub['box_id']);
 
 		if ($subBox['owner'] != $_SESSION['id'])
-			error(44);
+            error(44);
 
 		$file = SUBMISSION_directory . '/' . $studentSub['id'] . '.dat';
 		$filename = $studentSub['lastname']."-".$studentSub['realname'];

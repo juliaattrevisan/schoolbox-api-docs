@@ -50,9 +50,7 @@
 #month-view p {
 	margin-bottom: 0.5em;
 }
-.noteWrap p {
-	margin-bottom: 0;
-}
+
 #month-view thead {
 	font: bold 16px Verdana, Arial, Helvetica, sans-serif;
 	background-color: #FFFFFF;
@@ -95,10 +93,10 @@
 	padding: 0;
 }
 .noteWrap p {
-	background: #ccc;
 	-moz-border-radius: 5px;
 	padding: 2px 4px;
 	color: #000;
+    margin-bottom: 0;
 }
 .noteWrap a {
 	color: #000;

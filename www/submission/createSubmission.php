@@ -81,7 +81,11 @@ else if($this->arg[0] == 'new'  ) {
 
         $fileHandler = new File;
         $file = $fileHandler->getByID($this->arg[2]);
-        $this->setVar('browse_block', '');
+        if(is_array($file))
+            $this->setVar('browse_block', '');
+        else
+            $this->parse('browse_block', 'browse_row');
+
     }
     else {
         $this->parse('browse_block', 'browse_row');
@@ -107,7 +111,7 @@ else if($this->arg[0] == 'new'  ) {
 	$this->parse('category_select_block', 'category_select');
 
     /* Output submission type drop down */
-	$this->dropDown('type_drop', $subBoxHandler->getTypes(), '',TEMPLATE_content, array('name'=>'TYPE_TEXT','id'=>'TYPE_VALUE'));
+	$this->dropDown('type_drop', $subBoxHandler->getTypes(), $this->arg[3],TEMPLATE_content, array('name'=>'TYPE_TEXT','id'=>'TYPE_VALUE'));
 
     /* Convert times */
     $open_date = strtotime('now');;

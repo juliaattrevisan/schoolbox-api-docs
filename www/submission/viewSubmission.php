@@ -74,6 +74,7 @@ if(is_numeric($this->arg[0])) {
                 $output = array(		'OWNER' 	=> formatName($user,'{lastname}, {firstname}'),
                                         'OWNER_ID' 	=> $user['uid'],
                                         'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
+                                        'SUB_ID'    => $studentSub['id'],
                                         'DATE'		=> $studentSub['date'],
                                         'DELETE'	=> '/submission/viewSubmissionForm.php?delete='.$studentSub['id']."&box_id=" . $this->arg[0],
                                         'COLOUR'	=> $studentSub['late']?'#ff0000':'#000000',
@@ -120,6 +121,7 @@ if(is_numeric($this->arg[0])) {
 
                 $output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
                     'OWNER_ID'      => $line['uid'],
+                    'SUB_ID'        => $line['id'],
                     'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
                     'DATE'          => $line['date'],
                     'COLOUR'        => $line['late']?'#ff0000':'#000000',
