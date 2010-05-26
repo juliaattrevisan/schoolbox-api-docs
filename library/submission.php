@@ -72,6 +72,20 @@ class Submission extends Model {
             return $this->db->getAll($query);
     }
 
+        function getAllForUserCategory($categoryID, $userID) {
+            $query = "SELECT sb.id, sb.category, ft.name as typeName, sb.owner,
+                              UNIX_TIMESTAMP(sb.open_date) AS open,
+                              UNIX_TIMESTAMP(sb.date) AS date,
+                              UNIX_TIMESTAMP(sb.late_date) AS late,
+                              sb.description, sb.created
+                              FROM submission_box sb
+                              LEFT JOIN file_type ft ON sb.type = ft.id
+                              WHERE sb.category = '".$categoryID."'  AND sb.owner = '".$userID."' AND sb.deleted = '0'
+                              ORDER BY sb.date DESC";
+            return $this->db->getAll($query);
+    }
+
+
     function getHomework($categoryID, $config = false, $type = 3) {
 
             $query = "SELECT sb.id, sb.category, ft.name as typeName, sb.owner,

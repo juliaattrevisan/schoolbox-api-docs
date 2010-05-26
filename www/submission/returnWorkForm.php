@@ -7,20 +7,24 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 $page = new SitePage;
 $returnHandler = new SubmissionReturn;
 
-if( $_POST['mark'] && is_numeric($_POST['uid']) && is_numeric($_POST['box_id']) && $_POST['markUpdate'] == 'true') {
+if( is_numeric($_POST['uid']) && is_numeric($_POST['box_id']) && $_POST['markUpdate'] == 'true') {
 	/* Ajax from mark sheet */
-	$returnHandler->securityCheck($_POST['box_id'], $_POST['uid']);
-	
-	$return = array('box_id'    => $_POST['box_id'],
-					'owner'     => $_POST['uid'],
-					'mark'      => $_POST['mark'],
-					);
-	
-	$result = $returnHandler->getByUser($_POST['uid'], $_POST['box_id']);
-	if(is_array($result)) 
-		$returnHandler->update($return);
-	else
-		$returnHandler->create($return);
+
+    if($_POST['mark']) {
+        $returnHandler->securityCheck($_POST['box_id'], $_POST['uid']);
+
+        $return = array('box_id'    => $_POST['box_id'],
+                        'owner'     => $_POST['uid'],
+                        'mark'      => $_POST['mark'],
+                        );
+
+        $result = $returnHandler->getByUser($_POST['uid'], $_POST['box_id']);
+        print_R($result);
+        if(is_array($result))
+            $returnHandler->update($return);
+        else
+            $returnHandler->create($return);
+    }
 	
 }
 else if ( (

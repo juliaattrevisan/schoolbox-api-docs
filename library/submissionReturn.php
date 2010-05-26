@@ -32,11 +32,13 @@ class SubmissionReturn extends Model {
             error(25);
 
 
-        //check work exist and it isnt already marked
-        $query = "SELECT marked FROM student_submission WHERE box_id = '$box_id' AND owner = '$sid' AND marked = '0'";
+        /* Removed cause you can mark work with out having a student submission and you can also update a mark
+        //check work exist
+        /*
+        $query = "SELECT marked FROM student_submission WHERE box_id = '$box_id' AND owner = '$sid' AND marked = 0";
         if(!is_array($this->db->getRow($query)))
             error(26);
-
+        */
     }
 
     function create($return, $file = FALSE) {

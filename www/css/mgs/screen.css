@@ -222,9 +222,9 @@ h2, .news-item h3, p.heading {
 #calendar table .header_option {
 	margin-top: 0;
 	}
-table .header_option {
+/*table .header_option {
 	margin-top: -17px;
-	}
+	}*/
 .box .edit {
 	height: 18px;
 	line-height: 18px;

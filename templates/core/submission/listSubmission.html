@@ -4,7 +4,9 @@
         <!-- BEGIN category_block -->
         <thead>
             <tr>
-                <td colspan="9"><h2>{CATEGORY} ({STUDENTS} Students)</h2></td>
+                <td colspan="9"><h2>{CATEGORY} ({STUDENTS} Students)</h2>
+                    <span class="header_option"><a href="/submission/markSheet/{CATEGORY_ID}">Class Mark Sheet</a></span>
+                </td>
             <tr>
             <tr>
                 <th>Assignment Title</th>
@@ -32,6 +34,7 @@
                 <td class="center"><a href="/submission/submissionForm.php?deleteBox={ID}" onclick="return(confirm('Remove {JAVAASSDESC}?'));">Delete</a></td>
             </tr>
             <!-- END submission_block -->
+            <tr><td colspan="9">&nbsp;</td></tr>
         </tbody>
         <!-- END category_block -->
     </table>

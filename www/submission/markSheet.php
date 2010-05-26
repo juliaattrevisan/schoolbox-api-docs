@@ -3,8 +3,80 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionReturn.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 
-if(is_numeric($this->arg[0])) {
+$subHandler = new Submission;
+$retHandler = new SubmissionReturn();
+$catHandler = new Category();
+$groupHandler = new Group;
+$userHandler = new User;
+
+if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
+    
+    
+    if(!$groupHandler->isStaff() )
+            error(19);
+    
+    
+	$category = $catHandler->getByID($this->arg[1]);
+    
+	/* Get full student list of class  */
+    if($category['code'] && SYNERGY_enable) {
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/synergetic-class.php';
+        //if synergy code get synergy students
+        $synHandler = new SynergeticClass();
+        $studentList = $synHandler->getStudents($category['code']);
+
+		for($x=0; is_array($studentList[$x]);$x++){
+			$user = $userHandler->getBySynergy($studentList[$x]['synergy_id']);
+			$studentList[$x]['uid'] = $user['uid'];
+		}
+
+    }
+    else {
+        //Retrieve student list from group membership
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+        $groupHandler = new Group;
+        $studentList = $groupHandler->getMemberList($this->arg[1]);
+    }
+
+
+
+	$subList = $subHandler->getAllForUserCategory($this->arg[1], $_SESSION['id']);
+
+	if(is_array($subList)) {
+        $csv = 'ID,Surname,Firstname,';
+		foreach($subList as $sub) {
+            $csv .= scrubTEXT($sub['description']).',';
+		}
+	}
+    $csv .= "\n";
+
+	if(is_array($studentList)) {
+		foreach($studentList as $student) {
+            $csv .= $student['uid'].','.scrubTEXT($student['lastname']).','.scrubTEXT($student['firstname']).',';
+
+			if(is_array($subList)) {
+				foreach($subList as $sub) {
+                    $return = $retHandler->getByUser($student['uid'],$sub['id']);
+                    $csv .= scrubTEXT($return[0]['mark']).',';
+				}
+			}   
+            $csv .="\n";
+		}
+	}
+    
+    $filename = preg_replace('/[^0-9a-zA-Z()_-]/','_', $category['name']);
+
+    header ("Pragma: ");
+    header ("Cache-control: ");
+    header ("Content-Type: text/csv");
+    header ("Content-Disposition: attachment; filename=\"".$filename.".csv\"");
+    echo $csv;
+
+    exit;
+}
+else if(is_numeric($this->arg[0])) {
 	$this->setFile(TEMPLATE_content, 'submission/markSheet.html');
 	$this->setTitle('Class Mark Sheet');
 	$this->setTab('submission');
@@ -13,13 +85,11 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
 	$this->setBlock('student_list', 'mark', 'mark_block');
 
-	$subHandler = new Submission;
-	$retHandler = new SubmissionReturn();
-	$catHandler = new Category();
-    $groupHandler = new Group;
+
 
     if(!$groupHandler->isStaff() )
             error(19);
+
 
 	$category = $catHandler->getByID($this->arg[0]);
 
@@ -31,7 +101,7 @@ if(is_numeric($this->arg[0])) {
 	$this->setVar('CID', $category['id']);
 
 	/* Get full student list of class  */
-    if($subBox['code'] && SYNERGY_enable) {
+    if($category['code'] && SYNERGY_enable) {
         require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/synergetic-class.php';
         //if synergy code get synergy students
         $synHandler = new SynergeticClass();
@@ -52,7 +122,7 @@ if(is_numeric($this->arg[0])) {
 
 
 
-	$subList = $subHandler->getAllForCategory($this->arg[0]);
+	$subList = $subHandler->getAllForUserCategory($this->arg[0], $_SESSION['id']);
 
 	if(is_array($subList)) {
 		foreach($subList as $sub) {

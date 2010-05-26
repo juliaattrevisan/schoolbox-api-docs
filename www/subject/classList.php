@@ -21,6 +21,7 @@ if(isStaff($_SESSION['gid']))
 	
 	$this->setFile(TEMPLATE_content, 'class/classList.htm');
 	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
+    $this->setBlock('student_list', 'medical', 'medical_block');
 	$this->setTitle('Class List');
 
 	$code = urldecode(implode('/', $this->arg));
@@ -62,11 +63,16 @@ if(isStaff($_SESSION['gid']))
 										'SYNERGYID'	=> $student['synergy_id'],
 										'EMAIL'		=> $emailaddr?$emaillink:'',
 										'EMAIL_ADDRESS'=> $emailaddr,
+                                        'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
 										'ON_OFF' => ++$j%2? '' : 'dark',
 										);
 									
 				$this->setVar($studentOutput);
-				  
+				if($student['StudentMedicalAlert'])
+                    $this->parse('medical_block','medical');
+                else
+                    $this->setVar('medical_block','');
+                
 				$this->parse("student_list_block", "student_list", true);		
 			}
 		}

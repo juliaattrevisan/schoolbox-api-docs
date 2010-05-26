@@ -61,15 +61,16 @@ if(is_numeric($this->arg[0])) {
             else
                 continue;
 
+            
+            /* If already marked display mark, else provide link to return mark */
+            $return = $returnHandler->getByUser($user['uid'], $this->arg[0]);
+
             if(is_array($studentSub)) {
 
-				/* If already marked display mark, else provide link to return mark */
-				if($studentSub['marked']) {
-					$return = $returnHandler->getByUser($user['uid'], $this->arg[0]);
-					$mark = $return[0]['mark'];
-				}
-				else
-					$mark = "<a href=\"/submission/returnWork/".$this->arg[0]."/".$user['uid']."\">Mark</a>";
+                if(is_array($return))
+                    $mark = $return[0]['mark'];
+                else
+                    $mark = "<a href=\"/submission/returnWork/".$this->arg[0]."/".$user['uid']."\">Mark</a>";
 
                 $output = array(		'OWNER' 	=> formatName($user,'{lastname}, {firstname}'),
                                         'OWNER_ID' 	=> $user['uid'],
@@ -90,7 +91,7 @@ if(is_numeric($this->arg[0])) {
                 $output = array(		'OWNER' 	=> formatName($user,'{lastname}, {firstname}'),
                                         'OWNER_ID' 	=> $user['uid'],
                                         'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
-                                        'mark_block'    => '<td colspan="6">&nbsp;</td>',
+                                        'mark_block'    => '<td colspan="2">&nbsp;</td><td>'.$return[0]['mark'].'</td><td>&nbsp;</td>',
                                         'DATE'		=> '',
 										'COLOUR'	=> '',
                                         'RETURN'	=> '',
@@ -112,10 +113,9 @@ if(is_numeric($this->arg[0])) {
             foreach($submissionList as $line) {
 
 				/* If already marked display mark, else provide link to return mark */
-				if($line['marked']) {
-					$return = $returnHandler->getByUser($line['uid'], $this->arg[0]);
+                $return = $returnHandler->getByUser($line['uid'], $this->arg[0]);
+				if(is_array($return))
 					$mark = $return[0]['mark'];
-				}
 				else
 					$mark = "<a href=\"/submission/returnWork/".$this->arg[0]."/".$line['uid']."\">Mark</a>";
 

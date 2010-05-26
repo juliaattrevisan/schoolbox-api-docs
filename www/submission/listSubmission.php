@@ -33,9 +33,11 @@ if(is_array($subList))
 			$this->setVar('STUDENTS', count($studentList));
 
 			if($prevCat['code'] != "")
-                    $this->setVar('CATEGORY', $prevCat['name']." (".$prevCat['code'].")");
+                    $this->setVar('CATEGORY', scrubTEXT($prevCat['name'])." (".$prevCat['code'].")");
             else
-                    $this->setVar('CATEGORY', $prevCat['name']);
+                    $this->setVar('CATEGORY', scrubTEXT($prevCat['name']));
+
+            $this->setVar('CATEGORY_ID', $prevCat['catid']);
 
             $this->parse('category_listing', 'category_block', true);
             $this->setVar('submission_listing', '');
@@ -79,10 +81,10 @@ if(is_array($subList))
 	$this->setVar('STUDENTS', count($studentList));
 	
     if($prevCat['code'] != "")
-        $this->setVar("CATEGORY", $prevCat['name']." (".$prevCat['code'].")");
+        $this->setVar("CATEGORY", scrubTEXT($prevCat['name'])." (".$prevCat['code'].")");
     else
-        $this->setVar("CATEGORY", $prevCat['name']);
-
+        $this->setVar("CATEGORY", scrubTEXT($prevCat['name']));
+    $this->setVar('CATEGORY_ID', $prevCat['catid']);
     $this->parse("category_listing", "category_block", true);
 
 }

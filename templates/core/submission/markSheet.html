@@ -11,8 +11,9 @@
 			  return false;
 		  });
 
-		$j('#inputMark').blur(function(){
-			$j.post('/submission/returnWorkForm.php', $j(this).closest('form').serialize());
+		$j('.inputMark').blur(function(){
+            if($j(this).val() != '')
+                $j.post('/submission/returnWorkForm.php', $j(this).closest('form').serialize());
 		});
 	});
 
@@ -21,6 +22,7 @@
 <!-- END custom_head -->
 
 <h1>{CATEGORY}</h1>
+<span class="header_option"><a href="/submission/markSheet/export/{CID}">Download Spreadsheet</a></span>
 <table class="markTable" cellspacing="0" cellpadding="0">
 	<tr>
 		<th>Surname</th>
