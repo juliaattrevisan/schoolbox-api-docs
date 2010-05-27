@@ -2,21 +2,29 @@
 /* Script to automatically login to synergetic portal based on existing login creditials */
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php');
 require_once('../library/user.php');
+require_once('../library/group.php');
 $page = new SitePage;
 $userHandler = new User;
+$groupHandler = new Group;
 
 $user = $userHandler->getByID($_SESSION['id']);
 
-/* Setup form variable */
-$form="Form1";
-$action=SYNERGY_portal.'/login.aspx';
-$method="POST";
+if($this->groupHandler->isParent()) {
+    /* Setup form variable */
+    $form="Form1";
+    $action=SYNERGY_parent_portal.'/login.aspx';
+    $method="POST";
 
-$formArray['__VIEWSTATE'] ="/wEPDwUJNDQ4ODI3NTE3D2QWAgIBD2QWBgIBDxYCHgRUZXh0BUk8dGFibGUgY2xhc3M9J2hkcl90YmxfY29udGFpbmVyJyBjZWxsc3BhY2luZz0nMCcgY2VsbHBhZGRpbmc9JzAnPjwvdGFibGU+ZAIFDw8WAh8AZWRkAh0PDxYCHwBlZGRkpB4p8bXZwfqTt5wApp33zajoNN4=";
-$formArray['__EVENTVALIDATION'] = '/wEWBALN9c/RCgLMyrLrBgLMyvbZDALejM6fD9VrrUoKDYo3oJtoRbUM56XHdURL';
-$formArray['loginButton'] = 'true';
-$formArray['textBox1'] = $user['username'];
-$formArray['textBox2'] = $user['email_pass'];
+    $formArray['__VIEWSTATE'] ="/wEPDwUJNDQ4ODI3NTE3D2QWAgIBD2QWBgIBDxYCHgRUZXh0BUk8dGFibGUgY2xhc3M9J2hkcl90YmxfY29udGFpbmVyJyBjZWxsc3BhY2luZz0nMCcgY2VsbHBhZGRpbmc9JzAnPjwvdGFibGU+ZAIFDw8WAh8AZWRkAh0PDxYCHwBlZGRkpB4p8bXZwfqTt5wApp33zajoNN4=";
+    $formArray['__EVENTVALIDATION'] = '/wEWBALN9c/RCgLMyrLrBgLMyvbZDALejM6fD9VrrUoKDYo3oJtoRbUM56XHdURL';
+    $formArray['loginButton'] = 'true';
+    $formArray['textBox1'] = $user['username'];
+    $formArray['textBox2'] = $user['email_pass'];
+}
+else {
+    exit;
+}
+
 
 ?>
 

@@ -45,6 +45,7 @@ body {
 	line-height: 29px;
 	font-weight: bold;
 	padding-left: 10px;
+    text-transform: none;
 }
 #nav ul {	
 	margin-bottom: 15px;

@@ -1,8 +1,10 @@
 <?php
 
 foreach($_SESSION['subjects'] as $subject) {
-	if(stristr($subject['code'],'HR' ))
+	if(stristr($subject['code'],'HR' ) || stristr($subject['code'],'EN' )) {
 		$homeroom = $subject['code'];
+        break;
+    }
 }
 
 if(empty($homeroom))

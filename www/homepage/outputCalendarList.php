@@ -1,5 +1,5 @@
 <?php
-//event output
+/* Output a campus calendar */
 $this->setBlock($componentHandle, "group_events", "group_events_block");
 $this->setBlock('group_events', "modify", "modify_block");
 
