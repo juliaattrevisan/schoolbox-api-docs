@@ -18,13 +18,13 @@ $group       = new Group();
 $categoryStd = new Category();
 $allowedFile = new AllowedFile();
 
-if($_GET['keyword']) {
+if($_GET['keyword'] &&  strlen($_GET['keyword']) > 2) {
 	$keyword      = $_GET['keyword'];
 	$type         = $_GET['type'];
 	$current_page = empty($_GET['page']) ? 1 : $_GET['page'];
 }
 else {
-	error(2);
+	error(45);
 }
 
 $handle = array(
