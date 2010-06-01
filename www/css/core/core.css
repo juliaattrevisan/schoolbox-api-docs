@@ -988,10 +988,15 @@ div.results h2:first-child {
 	margin-bottom:0px;
 	line-height:15px;
 }
+.search-item .usr-image {
+	display:block;
+	float:left;
+	height:60px;
+	width:60px;
+}
 .search-item img {
 	display:block;
 	float:left;
-	padding-right:20px;
 }
 .search-item {
 	clear:both;
@@ -1005,6 +1010,7 @@ div.results h2:first-child {
 .search-details {
 	width:75%;
 	float:left;
+	padding-left: 20px;
 }
 .search-functions {
 	float:left;
