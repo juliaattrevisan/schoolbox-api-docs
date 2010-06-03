@@ -258,8 +258,13 @@ function setLDAPInfo($username) {
 
 function setSynergyInfo(&$mydb)
 {
+    require_once('../library/synergetic-user.php');
+
+    $synUser = new SynergeticUser;
+
+
 	//setup a users enrolement for the session
-	$semester = getCurrentSemester();
+	$semester = $synUser->getCurrentSemester();
 	$_SESSION[ 'FileSemester'] = $semester[ 'FileSemester'];
 	$_SESSION[ 'FileYear'] = $semester[ 'FileYear'];
 	$synergy_id = $_SESSION['sid'];
@@ -269,19 +274,23 @@ function setSynergyInfo(&$mydb)
 		//if user is parent get information regarding enrolled students
 		if( isParent($_SESSION['gid']))
 		{
+            //Updates parents email from synergetic
+            $email = $synUser->getEmail($synergy_id);
+			$mydb->update('user', 'id', array('id'=>$_SESSION['id'], 'alt_email'=>$email));
+
 			$studentGroup = unserialize(STUDENTGROUPIDS);
 			if($synergy_id) {
-				$children = getEnrolledStudents($synergy_id);
+				$children = $synUser->getEnrolledStudents($synergy_id);
 				if(is_array($children)) {
 					foreach($children as $child)
 					{
-						$myquery = "SELECT * FROM user WHERE synergy_id = $child";
+						$myquery = "SELECT * FROM user WHERE synergy_id = {$child['RelatedID']}";
 						$portal = $mydb->getRow($myquery);
 						$subjects = array();
 
 						if($portal['id'])
 						{
-							$subjectList = getSubjectList($child, $studentGroup[0]);
+							$subjectList = $synUser->getSubjectList($child['RelatedID'], $portal['id']);
                             if( is_array($subjectList))
                             {
                                 foreach($subjectList as $subject)
@@ -297,7 +306,7 @@ function setSynergyInfo(&$mydb)
                                 }
                             }
 
-							$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child, 'gid'=>$portal['group_id'], 'name' => formatName($portal), 'subjects'=>$subjects);
+							$_SESSION['children'][] = array('id'=>$portal['id'], 'sid'=>$child['RelatedID'], 'gid'=>$portal['group_id'], 'name' => formatName($portal), 'subjects'=>$subjects);
 						}
 					}
 				}
@@ -305,7 +314,7 @@ function setSynergyInfo(&$mydb)
 		}
 		else  //user is not parent so get timetable information
 		{
-			$subjectList = getSubjectList($synergy_id, $_SESSION['gid']);
+			$subjectList = $synUser->getSubjectList($synergy_id, $_SESSION['id']);
 			if( is_array($subjectList))
 			{
 				foreach($subjectList as $subject)

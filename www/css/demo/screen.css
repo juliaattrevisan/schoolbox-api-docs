@@ -252,9 +252,6 @@ a.edit:hover {
 	text-decoration: none;
 	color: #fff;
 }
-table .header_option {
-	margin-top: 6px;
-}
 h1 + .header_option {
 	margin-top: -30px;
 }

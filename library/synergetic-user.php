@@ -154,6 +154,13 @@ class SynergeticUser extends MSSQL{
 		
 	}
 
+    function getEmail($id) {
+        $query = "SELECT Email FROM Community WHERE id = $id";
+        return $this->getOne($query);
+    }
+
+
+
 }
 
 
