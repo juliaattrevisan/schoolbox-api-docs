@@ -128,6 +128,8 @@ if (!empty($result['user'])) {
             else
                 $email = "<a href=\"{$_SESSION['mailhandle']}$address\">$address</a>";
         }
+        else
+            $email = '';
 
         $page->setVar(array(
             'USER_ID'         => $user['id'],

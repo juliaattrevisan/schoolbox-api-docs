@@ -332,18 +332,11 @@ class SitePage extends Page {
 			$this->setVar("ENC_LOGIN", urlencode(base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'].' '.$_SESSION['password'].' '.date('Y m d H i')))));
 		
 			$this->setBlock('tabTpl', 'portfolio_tab', 'pf_tab');
-			$this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
-			if($this->groupHandler->isStaff()) {
+			if($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) {
 				$this->parse('pf_tab', 'portfolio_tab');
-				$this->parse('mf_tab', 'myfiles_tab');
-			}
-			else if($this->groupHandler->isStudent()) {
-				$this->parse('mf_tab', 'myfiles_tab');
-				$this->setVar('pf_tab', '');
 			}
 			else {
 				$this->setVar('pf_tab', '');
-				$this->setVar('mf_tab', '');
 			}
 		}
 		if($this->site == 'shore') {
