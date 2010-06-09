@@ -232,7 +232,7 @@ class user
 	{       
 		//sanity checks
 		//check username doesnt already exist
-		$query = "SELECT username FROM user WHERE username = '$username'";
+		$query = "SELECT username FROM user WHERE username = '".mysql_real_escape_string($username)."'";
 		$this->db->query($query);
 		if($this->db->countRows() > 0)
 			return 0;
@@ -256,6 +256,7 @@ class user
 		//if password has been set already set it
 		if($password)
 		{
+            $password = mysql_real_escape_string($password);
 			$query = "UPDATE user SET password = PASSWORD('$password'), email_pass = '$password' WHERE id = '$id'";
 			$this->db->query($query);
 		}

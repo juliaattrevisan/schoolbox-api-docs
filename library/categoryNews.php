@@ -45,7 +45,7 @@ class CategoryNews extends Model {
 	}
 
         function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
-            $keyword = scrubText($keyword);
+            $keyword = mysql_real_escape_string($keyword);
 
             $query = "SELECT `subject_news`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`

@@ -209,7 +209,7 @@ class Forum extends Model {
 	}
 
         function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
-            $keyword = scrubText($keyword);
+            $keyword = mysql_real_escape_string($keyword);
 
             $query = "SELECT `forumThread`.*, `forumPost`.*, `forumThread`.title AS `threadTitle`,
                             `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,

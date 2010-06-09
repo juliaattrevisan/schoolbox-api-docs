@@ -52,7 +52,7 @@ class User extends Model {
 	}
 	
         function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'lastname', $sort_dir = 'desc') {
-            $keyword = scrubText($keyword);
+            $keyword = mysql_real_escape_string($keyword);
 
             $query = "SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
                         FROM `user`
@@ -83,7 +83,8 @@ class User extends Model {
 	{
 		//search for a user based on at least one of the above fields
 		//assumes at least one contains something
-
+        $keyword = mysql_real_escape_string($keyword);
+        
 		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, year, local_email, alt_email
 					FROM user LEFT JOIN groups ON user.group_id = groups.id WHERE ";
 
@@ -100,10 +101,10 @@ class User extends Model {
 			}
 
 			if($group)
-				$query .= "AND group_id = $group ";
+				$query .= "AND group_id = '$group' ";
 		}
 		else if($group)
-			$query .= "group_id = $group ";
+			$query .= "group_id = '$group' ";
 		else
 			error(2);
 

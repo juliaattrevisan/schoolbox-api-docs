@@ -36,6 +36,7 @@ class BulkAdd {
 		if (is_file($file)){
 			$handle = fopen($file, "r");
 			while (($user = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                $user = array_map('trim', $user);
 				if($user[0] != "" && ($user[2] != "" || $user[3] != ""))
 				{	
 					// get campus id and group
@@ -56,18 +57,22 @@ class BulkAdd {
 					if(!$result) { 
 						//adding failed
 						//check username and synergy already exists
-						$query = "SELECT id FROM user WHERE username = '{$user[0]}' AND synergy_id = '{$user[4]}'";
+						$query = "SELECT id FROM user WHERE username = '".mysql_real_escape_string($user[0])."' AND synergy_id = '{$user[4]}'";
 						$updateUser = $userDB->db->getRow($query);
 						if(is_array($updateUser)) {
 						
 							$userDB->updateUser($updateUser['id'], $user[0], $user[1], $user[2], $user[3], $user[4], $user[9], $user[10], $user[5], $user[8], $user[6], 0, $user[7]);
 							print "Updating {$user[0]}<br>";					
 						}
+                        else
+                            print "Username {$user[0]} collision<br>";
 					}
 					else {
 						print "User {$user[0]} has been added<br>";
 					}					
 				}
+                else
+                    print "User not added, insuficient data<br>";
 			}
 		}
 	}

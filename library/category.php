@@ -359,7 +359,7 @@ class Category extends Model {
 	}
 
         function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
-            $keyword = scrubText($keyword);
+            $keyword = mysql_real_escape_string($keyword);
 
             $query = "SELECT `category`.*, MATCH(`name`,`code`) AGAINST ('*$keyword*' IN BOOLEAN MODE) AS `score`,
                             `perms`.type AS perms_type, `userAccess`.type AS userAccess_type

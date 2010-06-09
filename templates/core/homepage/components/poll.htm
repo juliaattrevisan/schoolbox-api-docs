@@ -68,7 +68,7 @@
 		
 		function resetPoll() {
 			var chart = new FusionCharts("/flash/FCF_Column3D.swf", "myChartId", $j("#pollResult{COMPONENT_ID}").width(), "300", "8", "#FFFFFF");
-			chart.setDataURL("/poll/poll-xml.php?pollID={POLL_ID}");
+			chart.setDataURL("/poll/poll-xml.php%3FpollID%3D{POLL_ID}");
 			chart.addParam("wmode", "transparent");
 			chart.render("pollResult{COMPONENT_ID}");
 		}
