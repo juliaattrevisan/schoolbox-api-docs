@@ -16,8 +16,8 @@ class XML {
         //$cache_time = is_numeric($caching) ? $caching : 2*60*60;
 
         if(!file_exists($cache_file) || filectime($cache_file) < (time() - $cache_time))   {
-            $xml_handle = fopen($url, 'r');
-            $cache_handle = fopen($cache_file, 'w');
+            $xml_handle = @fopen($url, 'r');
+            $cache_handle = @fopen($cache_file, 'w');
 
             if(!$xml_handle || !$cache_handle)
                 return false;
