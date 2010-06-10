@@ -1338,6 +1338,8 @@ p.bubble-name {
 }
 .btn {
 	display:block;
+	float: right;
+	margin-left: 10px;
 }
 .btn:hover {
 	background-position:bottom left;
