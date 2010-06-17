@@ -32,6 +32,8 @@ if(is_numeric($this->arg[0])) {
         $this->setBlock('contact_synergy', 'contact_details', 'contact_details_block');
         $this->setBlock(TEMPLATE_content, 'medical', 'medical_block');
 
+  
+
     }
     else if($groupHandler->isParent($user['uid'])) {
         $this->setFile(TEMPLATE_content, 'user/parent.html');
@@ -44,6 +46,23 @@ if(is_numeric($this->arg[0])) {
         $this->setBlock(TEMPLATE_content, "timetable_link", "timetable_link_block");
 
     }
+
+        $blank = array ('contact_synergy_block'			=> '',
+                        'edit_emergency_block'          => '',
+                        'contact_details_block'         => '',
+						'student_synergy_tutor_block'	=> '',
+						'student_synergy_form_block'	=> '',
+						'medical_block'					=> '',
+						'portrait_block'				=> '',
+						'timetable_link_block'			=> '',
+						'contact_synergy_block'			=> '',
+						'due_work_block'				=> '',
+						'helpdesk_block'				=> '',
+						'school_links_block'			=> '',
+                        'parent_synergy_form_block'     => '',
+                        'parent_spouse_block'           => '',
+						);
+		$this->setVar($blank);
 
 	//Format email address link
 	$emailAddress = formatEmail($user);
@@ -200,10 +219,6 @@ if(is_numeric($this->arg[0])) {
                 $this->parse('school_links_block','school_links');
                 $this->parse('edit_emergency_block', 'edit_emergency');
             }
-            else {
-                $this->setVar('school_links_block','');
-                $this->setVar('edit_emergency_block', '');
-            }
 
             if($synInfo['StudentYearLevel'] < 7) {
                 $this->parse('student_synergy_form_block', 'student_synergy_form');
@@ -216,39 +231,11 @@ if(is_numeric($this->arg[0])) {
 
             if(trim($synInfo['StudentMedicalAlert']))
                 $this->parse('medical_block', 'medical');
-            else
-                $this->setVar('medical_block', '');
+
 		}
-        else {
-            $blank = array ('contact_synergy_block'			=> '',
-                'student_synergy_tutor_block'	=> '',
-                'student_synergy_form_block'	=> '',
-                'medical_block'					=> '',
-                'portrait_block'				=> '',
-                'timetable_link_block'			=> '',
-                'contact_synergy_block'			=> '',
-                'due_work_block'				=> '',
-                'helpdesk_block'				=> '',
-                'school_links_block'			=> '',
-                );
-		$this->setVar($blank);
-        }
+       
 	}
-	else
-	{
-		$blank = array ('contact_synergy_block'			=> '',
-						'student_synergy_tutor_block'	=> '',
-						'student_synergy_form_block'	=> '',
-						'medical_block'					=> '',
-						'portrait_block'				=> '',
-						'timetable_link_block'			=> '',
-						'contact_synergy_block'			=> '',
-						'due_work_block'				=> '',
-						'helpdesk_block'				=> '',
-						'school_links_block'			=> '',
-						);
-		$this->setVar($blank);		
-	}
+
 }
 else {
 	error(2);

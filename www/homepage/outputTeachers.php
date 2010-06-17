@@ -1,6 +1,7 @@
 <?php
 // gets teachers involved in subject, outputs links to their addressbook page
 $this->setBlock($componentHandle, "staff_teachers", "staff_teacher_block");
+$this->setVar('staff_teacher_block', '');
 if($code != "" && SYNERGY_enable)
 {	
 	require_once '../library/synergetic-class.php';
@@ -21,6 +22,4 @@ if($code != "" && SYNERGY_enable)
 		}
 	}
 }
-else 
-	$this->setVar('staff_teacher_block', '');	
 ?>

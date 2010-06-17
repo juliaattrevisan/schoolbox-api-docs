@@ -106,13 +106,18 @@ if(is_array($items))
 	}
 		
 	// output tabs
-	foreach ($topicList as $topic => $bin) {
-		$output = array('NEWS_TOPIC'	=> scrubText($topic),
-						'TOPIC_CLEAN'	=> convertToURL($topic),
-					);
-		$this->setVar($output);
-		$this->parse('topic_header_block', 'topic_header', true);
-	}
+    if(is_array($topicList)) {
+        foreach ($topicList as $topic => $bin) {
+            $output = array('NEWS_TOPIC'	=> scrubText($topic),
+                            'TOPIC_CLEAN'	=> convertToURL($topic),
+                        );
+            $this->setVar($output);
+            $this->parse('topic_header_block', 'topic_header', true);
+        }
+    }
+    else {
+        $this->setVar('topic_block','');
+    }
 }
 else
 {
