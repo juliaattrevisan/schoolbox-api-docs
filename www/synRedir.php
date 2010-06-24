@@ -9,14 +9,14 @@ $groupHandler = new Group;
 
 $user = $userHandler->getByID($_SESSION['id']);
 
-if($this->groupHandler->isParent()) {
+if($groupHandler->isParent()) {
     /* Setup form variable */
     $form="Form1";
-    $action=SYNERGY_parent_portal.'/login.aspx';
+    $action=SYNERGY_portal.'/login.aspx';
     $method="POST";
 
-    $formArray['__VIEWSTATE'] ="/wEPDwUJNDQ4ODI3NTE3D2QWAgIBD2QWBgIBDxYCHgRUZXh0BUk8dGFibGUgY2xhc3M9J2hkcl90YmxfY29udGFpbmVyJyBjZWxsc3BhY2luZz0nMCcgY2VsbHBhZGRpbmc9JzAnPjwvdGFibGU+ZAIFDw8WAh8AZWRkAh0PDxYCHwBlZGRkpB4p8bXZwfqTt5wApp33zajoNN4=";
-    $formArray['__EVENTVALIDATION'] = '/wEWBALN9c/RCgLMyrLrBgLMyvbZDALejM6fD9VrrUoKDYo3oJtoRbUM56XHdURL';
+    $formArray['__VIEWSTATE'] ="/wEPDwUJOTY3MTg0MTMzD2QWAgIBD2QWBgIBDxYCHgRUZXh0BUk8dGFibGUgY2xhc3M9J2hkcl90YmxfY29udGFpbmVyJyBjZWxsc3BhY2luZz0nMCcgY2VsbHBhZGRpbmc9JzAnPjwvdGFibGU+ZAIFDw8WAh8AZWRkAgcPZBYCAhcPDxYCHwBlZGRkAjhVtO6thUcdrCoL21boFSC0wXc=";
+    $formArray['__EVENTVALIDATION'] = '/wEWBALNh6ufAwLMyrLrBgLMyvbZDALejM6fDy25GduyqQw2Zx8T7SqSq9sB+VBs';
     $formArray['loginButton'] = 'true';
     $formArray['textBox1'] = $user['username'];
     $formArray['textBox2'] = $user['email_pass'];
