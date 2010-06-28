@@ -13,7 +13,13 @@
   <div id="topic-{TOPIC_CLEAN}" class="contentList">
   	<ul>
     	<!-- BEGIN news -->
-    	<li><a href="{NEWS_URL}" title="{NEWS_TITLE}">{NEWS_TITLE}</a><span class="interact">{NEWS_TIME}</span></li>
+    	<li>
+      	<div>
+        	<h4><a href="{NEWS_URL}" title="{NEWS_TITLE}">{NEWS_TITLE}</a></h4>
+          <small>{NEWS_TIME}</small>
+          <div class="float-fix"></div>
+        </div>
+       </li>
       <!-- END news -->
     </ul>
   </div>

@@ -1,14 +1,16 @@
-<div class="box">
-  <h2>Today's Events <span>- <a href="/calendar/week/">{DATE}</a></span></h2>
-  <div class="text listing">
-  	<ul>
-  	<!-- BEGIN note_block -->
-    <li class="{ON_OFF}">
-    	<p class="interact-left">{TIME}&nbsp;</p>
-      	<h4 style="color:{NOTE_COLOUR}">{NOTE_DESCRIPTION}</h4>
-        <div class="float-fix"></div>
-      </li>
-    <!-- END note_block -->
+<div class="componentBox">
+  <h2>Today's Events - <a href="/calendar/week/">{DATE}</a></h2>
+  	<div class="contentList">
+    <ul>
+      <!-- BEGIN note_block -->
+      <li>
+      	<div>
+        	<p class="time">{TIME}</p>
+        	<h4 style="color:{NOTE_COLOUR}">{NOTE_DESCRIPTION}</h4>
+          <div class="float-fix"></div>
+        </div>
+       </li>
+      <!-- END note_block -->
     </ul>
-  </div>
+    </div>    
 </div>

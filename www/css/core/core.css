@@ -221,6 +221,24 @@ table.ruler { width: 100%; }
 #search-button {
 	float: right;
 	}
+#infoPanel {
+	float: right;
+	margin: 14px 0;
+}
+#infoPanel li {
+	float: left;
+	color: #fff;
+	font-size: 11px;
+	margin-left: 10px;
+	padding-left: 11px;
+	background: url(/images/mggs/header-div.gif) no-repeat 0 50%;
+}
+#infoPanel li.first {
+	background: 0;
+}
+#infoPanel a {
+	color: #fff;
+}
 /*--------------------------------------------------------------
  Top Nav styles 
 --------------------------------------------------------------*/
@@ -408,6 +426,9 @@ Side Nav styles
 .box .text.listing {
 	padding: 0;
 	display: block;
+	}
+.listing table {
+	border-bottom: 1px solid #DBDBDB;
 	}
 .box.imageComp .text {
 	text-align: center;

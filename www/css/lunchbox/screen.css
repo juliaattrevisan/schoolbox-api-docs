@@ -177,13 +177,36 @@ p, ul {	line-height: 1.5;	margin: 0 0 1em 0; }
 .componentBox {
 	margin-bottom: 13px;
 }
+.contentList {
+	border: 1px solid #ccc;
+	border-top: 0;
+}
 .contentList ul {
 	margin: 0;
 }
-.contentList li {
+.contentList div {
 	padding: 3px 10px;
-}	
-.contentList li:nth-child(odd) {
+	line-height: 18px;
+}
+.contentList p.time {
+	float: left;
+	margin: 0;
+	width: 25%;
+}
+.contentList h4 {
+	float: left;
+	margin: 0;
+}
+.contentList h4 a {
+	float: left;
+	margin: 0;
+	color: #000;
+}
+.contentList small {
+	float: right;
+	font-size: 11px;
+}
+.contentList li:nth-child(even) {
 	background: #ccc;
 }	
 span.interact {
@@ -194,11 +217,97 @@ span.interact {
 .ui-tabs .ui-tabs-panel {
 	padding: 0.5em 0 0 0;
 }
+.componentBox h2 {
+	background: #ccc;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+	font-size: 12px;
+	height: 29px;
+	line-height: 29px;
+	text-indent: 10px;
+	color: #fff;
+	margin: 0;
+}
+.componentBox h2 a {
+	color: #fff;
+}
+
+/*--------------------------------------------------------------
+ jQuery UI tabs overwrite styles 
+--------------------------------------------------------------*/
+.ui-tabs-hide {
+	display: none;
+}
+ul.tabsNav {
+	background: #ccc;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+	font-size: 12px;
+	height: 29px;
+	line-height: 29px;
+	color: #fff;
+	margin: 0;
+	padding: 0 0 0 5px;
+}
+ul.tabsNav li {
+	float: left;
+	margin: 5px 2px 0 0;
+}
+ul.tabsNav a {
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+	background: #eee;
+	color: #000;
+	height: 24px;
+	line-height: 24px;
+	padding: 0 15px;
+	display: block;
+}
+ul.tabsNav li.ui-tabs-selected a {
+	background: #fff;
+}
+/*--------------------------------------------------------------
+ Weather styles 
+--------------------------------------------------------------*/
+.weather {
+	padding-top: 10px;
+}
+.weather p.float-left { font-size: 90%; margin: 0; padding: 0 0 0 20px; }
+.weather p span { color: #999; font-size: 90%; font-family: Arial, Helvetica, sans-serif; }
+.weather p span a { color: #999; }
+.weather img { margin: 0; }
+.weatherDay {
+	float: left;
+	border-right: 1px solid #dbdbdb;
+	/*padding-right: 9px;
+	margin: 0 9px 10px 0;*/
+	margin-bottom: 10px;
+	width: 33%;
+	text-align: center;
+}
+.weatherDay.last {
+	border-right: 0;
+	margin-right: 0;
+	padding-right: 0;
+}
+.weatherDay h4 {
+	color: #2c2c2c;
+	margin: 0.2em 0;
+}
+
+.box .thumb {
+	margin: 0 15px 15px 0;
+	display: block;
+	float: left;
+	height: 100px;
+	width: 100px;
+	}
 /*--------------------------------------------------------------
  Misc styles 
 --------------------------------------------------------------*/
-.float-fix {
+body #container .float-fix {
 	height: 0;
 	overflow: hidden;
 	clear: both;
+	padding: 0;
 }

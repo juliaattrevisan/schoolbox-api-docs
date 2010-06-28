@@ -177,24 +177,6 @@ li p.interact {
 #search-field {
 	border: 1px solid #e3e3e3;
 }
-#infoPanel {
-	float: right;
-	margin: 14px 0;
-}
-#infoPanel li {
-	float: left;
-	color: #fff;
-	font-size: 11px;
-	margin-left: 10px;
-	padding-left: 11px;
-	background: url(/images/mggs/header-div.gif) no-repeat 0 50%;
-}
-#infoPanel li.first {
-	background: 0;
-}
-#infoPanel a {
-	color: #fff;
-}
 #tabs {
 	bottom: 0;
 	right: 15px;
