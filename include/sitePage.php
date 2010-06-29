@@ -274,8 +274,12 @@ class SitePage extends Page {
 		//this section handles the display of the webmail tab
 		// if configuration states mail is available and user has access to local mail account display it
 		$this->setBlock('tabTpl', 'webmail_tab', 'wm_tab');
-		
-		if((MAIL_enable && $_SESSION['local_email']) || ($this->site == 'wenona' && $this->groupHandler->isStaff()) || $this->site == 'ormond' || $this->site == 'shore')
+        
+		if((MAIL_enable && $_SESSION['local_email']) || 
+                ($this->site == 'wenona' && $this->groupHandler->isStaff()) ||
+                $this->site == 'ormond' ||
+                $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] ==  7) ||
+                $this->site == 'joeys')
 		{
 			
 			if($this->site == 'mgs' || $this->site == 'grimwade')
@@ -308,14 +312,15 @@ class SitePage extends Page {
 						$this->setVar('WEBMAIL_LOCATION', 'href="http://shorexch01/exchange" rel="external"');
 				}
 				else if($this->groupHandler->isStudent()) {
-                    if($_SESSION['gid'] == 6 || $_SESSION['gid'] ==  7)
-                        $this->setVar('wm_tab', '');
-					else if(strpos(getIP(),'192.168.') === FALSE)
+					if(strpos(getIP(),'192.168.') === FALSE)
 						$this->setVar('WEBMAIL_LOCATION', 'href="https://mail.student.shore.nsw.edu.au/exchange/" rel="external"');
 					else
 						$this->setVar('WEBMAIL_LOCATION', 'href="http://cassandra/exchange" rel="external"');
 				}
 			}
+            else if($this->site == 'joeys') {
+                $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.joeys.org/" rel="external"');
+            }
 
 			$this->parse('wm_tab','webmail_tab');
 		}

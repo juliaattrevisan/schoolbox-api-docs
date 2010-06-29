@@ -200,10 +200,10 @@ function authenticate(&$db, $username, $password, $remember = 0)
 			setSynergyInfo(&$db);
 		else {
 			//testing parent system
-			if($_SESSION['id'] == 7833) {
+			/*if($_SESSION['id'] == 7833) {
 				$_SESSION['children'][] = array('id' => 4, 'sid' => 0, 'name' => 'Student Student');
 				$_SESSION['children'][] = array('id' => 3, 'sid' => 0, 'name' => 'Test User');
-			}
+			}*/
 		}
 		
 		if(LDAP_enable)
@@ -261,7 +261,6 @@ function setSynergyInfo(&$mydb)
     require_once('../library/synergetic-user.php');
 
     $synUser = new SynergeticUser;
-
 
 	//setup a users enrolement for the session
 	$semester = $synUser->getCurrentSemester();

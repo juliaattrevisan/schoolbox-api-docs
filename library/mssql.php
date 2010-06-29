@@ -24,10 +24,10 @@ class MSSQL {
 			$this->dbf = mssql_connect($this->host, $this->user, $this->passwd);
 		
 		if(!isset($this->dbf))
-			error(65);
+			error(22);
 
 		if(!$this->changeDb($this->db))
-			error(65);	
+			error(22);
 	}
 	
 	function changeDB($db) {

@@ -88,7 +88,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 	
 			$output = array('TIME'			=> $submission['dueTime'],
 							'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['description'],
-							'COLOUR'		=> $calendarHandler->displayColour(1),
+							'COLOUR'		=> $calendarHandler->displayColour(4),
 							'MODIFY_START'	=> "",
 							'MODIFY_END'	=> "",
 						  );					  

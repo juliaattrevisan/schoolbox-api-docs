@@ -20,7 +20,7 @@ if( (isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
 	session_destroy();
 
 	session_start();
-	
+
 	if (authenticate(&$db, $_POST['username'], $_POST['password']) )
 	{
 		if(isset($_POST['page']) && $_POST['page'] && $_POST['page'] != '/')
@@ -30,7 +30,7 @@ if( (isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
 		}
 		else
 		{
-			localRedir("/home");
+			localRedir('/home');
 		}
 	}	
 	else

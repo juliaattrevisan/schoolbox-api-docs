@@ -105,7 +105,7 @@ for($i=0; $i < 7; $i++) {
 	
 			$output = array('TIME'			=> $submission['dueTime'],
 							'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['description'],
-							'COLOUR'		=> '#ff0000',
+							'COLOUR'		=> $calendarHandler->displayColour(4),
 							'MODIFY'		=> "",
 						  );					  
 			
@@ -123,7 +123,7 @@ for($i=0; $i < 7; $i++) {
 		
 				$output = array('TIME'		=> '',
 								'NOTE'		=> 'Student Birthday - '.$birthday['name'].' in '.$birthday['form'].' turns '.$birthday['age'],
-								'COLOUR'	=> $calendarHandler->displayColour(3),
+								'COLOUR'	=> $calendarHandler->displayColour(1),
 								'MODIFY'	=> "",
 							  );					  
 				$this->setVar($output);
