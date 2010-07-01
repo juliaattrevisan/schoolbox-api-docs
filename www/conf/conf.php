@@ -36,6 +36,9 @@ define('LDAP_user', '');
 define('LDAP_pass', '');
 define('LDAP_base', '');
 
+//Kerberos Authentication
+define('KERB_enable', true);
+
 // Note that the following directories should exist outside the webroot and 
 // be writable by the apache process
 

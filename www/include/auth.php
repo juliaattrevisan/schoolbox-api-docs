@@ -108,15 +108,25 @@ function authenticate(&$db, $username, $password, $remember = 0)
    }
 
 	// Function to check username exists and password is correct
-	if(LDAP_enable) {
+	if(defined('LDAP_enable') && LDAP_enable) {
 		$result = authenticateLDAP($username, $password);
 		
 		//insert password into db to enable automatic login
 		//$query = "UPDATE user SET email_pass = '$password' WHERE username = '".trim($username)."'";
 		//$db->query($query);
 	}
-	
-	if(!$result) {
+
+    // Check kerberos authentication
+    if (defined('KERB_enable') && KERB_enable ) {
+         if($_SERVER['KRB5CCNAME'] && $_SERVER['REMOTE_USER']  ) {
+             $username = $_SERVER['REMOTE_USER'];
+
+             $result = true;
+         }
+    }
+
+
+    if(!$result) {
 		//fall back on SQL if ldap is not enable or fails
 		$result = authenticateSQL(&$db, $username, $password);
 	}
