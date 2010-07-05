@@ -223,7 +223,7 @@ table.ruler { width: 100%; }
 	}
 #infoPanel {
 	float: right;
-	margin: 14px 0;
+	margin: 22px 15px 0 0;
 }
 #infoPanel li {
 	float: left;
@@ -231,13 +231,14 @@ table.ruler { width: 100%; }
 	font-size: 11px;
 	margin-left: 10px;
 	padding-left: 11px;
-	background: url(/images/mggs/header-div.gif) no-repeat 0 50%;
+	background: url(/images/header-div.gif) no-repeat 0 50%;
+	color: #444;
 }
 #infoPanel li.first {
 	background: 0;
 }
 #infoPanel a {
-	color: #fff;
+	color: #003E7E;
 }
 /*--------------------------------------------------------------
  Top Nav styles 
