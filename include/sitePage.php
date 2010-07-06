@@ -151,6 +151,7 @@ class SitePage extends Page {
 	
 	function initSession() {
 		session_start();
+
 		if ( !isset($_SESSION['id']) )
 			$this->goLoginPage();
 		
@@ -278,7 +279,7 @@ class SitePage extends Page {
 		if((MAIL_enable && $_SESSION['local_email']) || 
                 ($this->site == 'wenona' && $this->groupHandler->isStaff()) ||
                 $this->site == 'ormond' ||
-                $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] ==  7) ||
+                $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] ==  7 || $_SESSION['gid'] == '8' )  ||
                 $this->site == 'joeys')
 		{
 			
