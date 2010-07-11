@@ -40,10 +40,10 @@ $j(function() {
 							
 							winStr += '<p class="details">';
 							
-							if(data.fid)
+							if(data.fid > 0)
 								winStr += '<a href="/send.php?id='+data.fid+'&save=1">Download</a>';
 							
-							if(data.submitted == false)
+							if(data.submitted == 'false')
 								winStr += ' | <a href="/submission/submitWork/'+data.id+'">Submit</a>';
 
 							winStr += '</p></div> \
@@ -123,7 +123,7 @@ $j(function() {
 </div>
 </center>
 
-<!-- BEGIN has_return -->
+
 
 <!-- BEGIN has_due -->
 <div class="box component">
@@ -162,6 +162,7 @@ $j(function() {
 </div>
 <!-- END has_due -->
 
+<!-- BEGIN has_return -->
 <div class="box component">
 <h2>Returned Work</h2>
 	<div class="text listing">
@@ -203,7 +204,7 @@ $j(function() {
     <div class="text listing">
       <ul>
         <!-- BEGIN summary -->
-        <li class=""> <a href="/homepage/{SUMMARY_CAT_ID}"><strong>{SUMMARY_CAT_NAME}</strong></a> - {SUMMARY_TOTAL} Items 
+        <li class=""> <a href="/homepage/{SUMMARY_CAT_ID}"><strong>{SUMMARY_CAT_NAME}</strong></a>
         	<!-- BEGIN summary_due -->( {SUMMARY_DUE} Due )<!-- END summary_due -->
           <p>{SUMMARY_TEACHER}</p>
           <div class="float-fix"></div>

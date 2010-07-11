@@ -158,7 +158,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 			$due = ( !empty($event['realname']) && $event['late_date'] > time() );
 			
 			$output = array('EVENT_ID'		=> $event['id'],
-							'TIME'			=> outputDate('h:ia', $event['date']),
+							'TIME'			=> outputDate('h:ia', strtotime($event['date'])),
 							'EVENT'			=> scrubText($event['description']),
 							'EVENT_PAST' 	=> !$due ? 'fade' : '',
 							'EVENT_CAT_ID'	=> $event['category'],
@@ -191,7 +191,6 @@ $j = 0;
 $workList = $submissionHandler->getUpcoming($user['uid'], $categoryIDList);
 if (is_array($workList)) {
 	foreach ($workList as $work) {
-		
 		/* display date as time if today */
 		$left = $work['date'] - time();
 		$date = $left < 86400 && $left > 0 ? '<strong>' . outputDate('g:i a', $work['date']) . '</strong>' : outputDate(DATE_short_no_time, $work['date']);
@@ -249,9 +248,8 @@ if (is_array($returnList)) {
 $j = 0;
 
 // subject summary
-foreach ($summary as $categoryID => $category) {
-	
-	
+foreach ($categoryList as $category) {
+	$categoryID = $category['id'];
 	/* yes it actually requires THIS MUCH code to get a teachers name. */
 	if (SYNERGY_enable) {
 		
@@ -259,10 +257,11 @@ foreach ($summary as $categoryID => $category) {
 		
 		$teacherOutput = array();
 		$teacherList = array();
-		if (is_array($category['code'])) {
-			foreach ($category['code'] as $code) {
-				$temp = $synClass->getTeacherName($code);
-				$teacherList = array_merge($teacherList, $temp);
+        $codeList = explode(',',$category['code']);
+		if (is_array($codeList)) {
+			foreach ($codeList as $code) {
+				if(is_array($temp = $synClass->getTeacherName($code)))
+                    $teacherList = array_merge($teacherList, $temp);
 			}
 		}
 
@@ -278,8 +277,8 @@ foreach ($summary as $categoryID => $category) {
 	
 	$output = array('SUMMARY_CAT_ID'	=> $categoryID,
 					'SUMMARY_CAT_NAME'	=> scrubText($category['name']),
-					'SUMMARY_TOTAL'		=> $category['total'],
-					'SUMMARY_DUE'		=> $category['due'],
+					'SUMMARY_TOTAL'		=> $summary[$category['id']]['total'],
+					'SUMMARY_DUE'		=> $summary[$category['id']]['due'],
 					'SUMMARY_TEACHER'	=> SYNERGY_enable ? implode(', ', $teacherOutput) : '',
 					'DARK'				=> $j++ % 2 ? 'dark' : '',
 					);	

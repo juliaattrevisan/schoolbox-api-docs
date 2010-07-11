@@ -7,16 +7,17 @@ require_once SITE_root . '/library/group.php';
 
 $page = new SitePage;
 
-if($_POST['id']) {
+if($_REQUEST['id']) {
 
 	$submissionHandler = new Submission;
 	$subStudHandler = new SubmissionStudent;
 	$groupHandler = new Group;
 
-	$subBox = $submissionHandler->getByID($_POST['id']);
+	$subBox = $submissionHandler->getByID($_REQUEST['id']);
 
 	/* Check involved in subject */
 	$groupHandler = new Group;
+
 	if(!$groupHandler->involvedInSubject($subBox['cid']) && !$groupHandler->involvedInGroup($_SESSION['id'], $subBox['cid']))
 		exit();
 
@@ -27,7 +28,8 @@ if($_POST['id']) {
 					'cid'			=> $subBox['cid'],
 					'type'			=> scrubTEXT($subBox['typeName']),
 					'id'			=> $subBox['id'],
-					'submitted'		=> $subStudHandler->checkSubmitted($subBox['id'], $_SESSION['id']));
+					'submitted'		=> $subStudHandler->checkSubmitted($subBox['id'], $_SESSION['id'])?'true':'false',
+        );
 }
 
 header("Content-type: application/json");
