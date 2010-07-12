@@ -10,7 +10,7 @@
 //Site Directives
 define("HEADING", 'OurSchool');			//This will appear on the window title of each page
 define("SITE_name", "Alaress Pty Ltd");
-define("SITE_location", "stjo");
+define("SITE_location", "mggs");
 
 //define("SITE_location", "shore");				//This defines the location, allows specific code for each location
 define("SITE_detect", "domain");				//Which option to detect site, can be domain or campus
