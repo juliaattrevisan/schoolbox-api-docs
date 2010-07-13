@@ -61,7 +61,9 @@ if(is_numeric($this->arg[0])) {
             else
                 continue;
 
-            
+            if(!is_array($user))
+                continue;
+
             /* If already marked display mark, else provide link to return mark */
             $return = $returnHandler->getByUser($user['uid'], $this->arg[0]);
 

@@ -45,7 +45,7 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 	$subList = $subHandler->getAllForUserCategory($this->arg[1], $_SESSION['id']);
 
 	if(is_array($subList)) {
-        $csv = 'ID,Surname,Firstname,';
+        $csv = 'Synergetic ID,Surname,Firstname,';
 		foreach($subList as $sub) {
             $csv .= scrubTEXT($sub['description']).',';
 		}
