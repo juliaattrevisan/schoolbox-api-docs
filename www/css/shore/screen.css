@@ -9,6 +9,10 @@
 #content {
 	padding: 5px 15px 15px;
 	}
+table th,
+table td {
+	text-align: left;
+}
 /*---------------------------------------
 	Component Styles
 ----------------------------------------*/
