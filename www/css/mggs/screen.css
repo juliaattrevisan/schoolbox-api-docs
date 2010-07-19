@@ -253,3 +253,47 @@ li p.interact {
 .newsWrapper h2 {
 	display: block;
 }
+
+/*****************************************
+	LOGIN
+*****************************************/
+.mggs-login {
+	background: #f4f3ef;
+}
+.mggs-login #container {
+	margin: 0;
+	padding: 0;
+}
+.mggs-login #content {
+	background: url(/images/mggs/login-bg.png) no-repeat;
+	height: 437px;
+}
+#evi {
+	margin: 127px 0 0 360px;
+	width: 287px;
+}
+#evi h1 {
+	font-size: 20px;
+	border: 0;
+	margin: 0 0 0.5em 0;
+}
+#evi form {
+	border-top: 1px dashed #d8d8d8;
+	padding-top: 20px;
+	margin-top: 30px;
+}
+#evi #loginForm fieldset input {
+ 	width: 170px;
+}
+#evi .login {
+	float: right;
+}
+#evi .forgotten {
+	float: left;
+	font-size: 11px;
+	line-height: 25px;
+	margin: 0;
+}
+p.important {
+	color: #f00;
+}

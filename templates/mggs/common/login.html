@@ -16,7 +16,7 @@ function init(){
 }
 </script>
 </head>
-<body>
+<body class="mggs-login">
 <div id="wrap">
 	<div id="wrap-inner">
     <div id="header">
@@ -25,7 +25,8 @@ function init(){
     
     <div id="container">
       <div id="content">
-        <h1>Welcome To eVI</h1>
+      	<div id="evi">
+        <h1 style="text-transform:capitalize">Welcome to eVi</h1>
         <p class="error">{ERROR}</p>
         <form id="loginForm" method="post" action="/loginForm.php">
           <fieldset>
@@ -36,14 +37,16 @@ function init(){
             <label for="password">Password:</label>
             <input type="password" name="password" id="password" />
           </fieldset>
-            
             <input type="hidden" name="page" value="{HIDDEN}" />
             <input class="login" type="submit" name="Submit" value="Login" alt="Login" />
+            <p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
         </form> 
+        </div>
         <div class="float-fix"></div>
-        <p class="forgot"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
       </div>
+      <div class="float-fix"></div>
     </div>
+ 
 	</div>
 </div>
 <div id="footer">
