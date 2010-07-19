@@ -8,9 +8,11 @@ $page->setFile(TEMPLATE_body, 'common/forgotten-password.html');
 $page->setTitle('Forgotten Password');
 $page->setBlock(TEMPLATE_body, 'email_sent', 'email_sent_block');
 $page->setBlock(TEMPLATE_body, 'not_found', 'not_found_block');
+$page->setBlock(TEMPLATE_body, 'init', 'init_block');
 
 $page->setVar('email_sent_block', '');
 $page->setVar('not_found_block', '');
+$page->setVar('init_block', '');
 
 if (isset($_POST['email']) && isEmail($_POST['email'])) {
 	
@@ -21,6 +23,8 @@ if (isset($_POST['email']) && isEmail($_POST['email'])) {
 	else
 		$page->parse('not_found_block', 'not_found');
 }
+else
+    $page->parse('init_block','init');
 
 //$page->buildPage(false);
 $page->outputPage(true);

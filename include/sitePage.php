@@ -320,7 +320,7 @@ class SitePage extends Page {
 				}
 			}
             else if($this->site == 'joeys') {
-                $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.joeys.org/" rel="external"');
+                $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail/" rel="external"');
             }
 
 			$this->parse('wm_tab','webmail_tab');

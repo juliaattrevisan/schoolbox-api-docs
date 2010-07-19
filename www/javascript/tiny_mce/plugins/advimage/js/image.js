@@ -369,14 +369,8 @@ var ImageDialog = {
 
 				v = getSelectValue(f, 'align');
 				if (v) {
-					if (v == 'left'){
+					if (v == 'left' || v == 'right')
 						dom.setStyle(img, 'float', v);
-						dom.setStyle(img, 'margin', '0 10px 10px 0');
-					}
-					else if (v == 'right'){
-						dom.setStyle(img, 'float', v);
-						dom.setStyle(img, 'margin', '0 0 10px 10px');
-					}
 					else
 						img.style.verticalAlign = v;
 				}
@@ -420,7 +414,7 @@ var ImageDialog = {
 			}
 
 			// Merge
-			dom.get('style').value = dom.serializeStyle(dom.parseStyle(img.style.cssText));
+			dom.get('style').value = dom.serializeStyle(dom.parseStyle(img.style.cssText), 'img');
 		}
 	},
 
