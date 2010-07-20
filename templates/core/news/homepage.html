@@ -13,11 +13,13 @@ tinyMCE.init({
 	theme_advanced_buttons2 : "forecolor,tablecontrols,separator,pastetext,pasteword,selectall,separator,removeformat,cleanup,code,spellchecker",
 	theme_advanced_buttons3 : "",
     extended_valid_elements : "img[src|border|alt=|title|hspace|vspace|width|height|align|style]",
+    theme_advanced_blockformats : "p,address,pre,h4,h5",
 	file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
-	file_browser_category_id : {CATEGORY_ID},
+	file_browser_category_id : 0,
 	tabfocus_elements : ":prev,:next",
 	convert_urls : false
 });
+</script>
 
 function verify()
 {
