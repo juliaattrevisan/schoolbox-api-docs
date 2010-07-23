@@ -4,8 +4,8 @@ function verify()
 {
 	var msg = ""
 	
-	if ($j('#submission') && !$j('#submission').attr("checked") && $j('#browse').val() == '' && $j('#myfile').val() == '')
-		msg += 'You must select a file to upload.\n';
+	//if ($j('#submission') && !$j('#submission').attr("checked") && $j('#browse').val() == '' && $j('#myfile').val() == '')
+	//	msg += 'You must select a file to upload.\n';
 	//check that description and category have been entered
 	if(document.getElementById('fileForm').description.value == ""){
 		msg += "You need to enter a description\n";
