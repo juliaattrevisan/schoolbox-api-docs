@@ -15,6 +15,7 @@ if(is_numeric($this->arg[0])) {
 	$fileHandler = new File;
 	
 	$file = $fileHandler->getByID($this->arg[0]);
+
 	if(!is_array($file))
 		error(41);
 
@@ -58,9 +59,9 @@ if(is_numeric($this->arg[0])) {
 			$this->setVar($output);
 			$fileList = $myFileHandler->getAllInFolder($folder['id']);
 			if (is_array($fileList)) {
-				foreach ($fileList as $file) {
-					$output = array('MYFILE_ID'		=> $file['id'],
-									'MYFILE_NAME'	=> $file['description'],
+				foreach ($fileList as $fileOut) {
+					$output = array('MYFILE_ID'		=> $fileOut['id'],
+									'MYFILE_NAME'	=> $fileOut['description'],
 									);
 					$this->setVar($output);
 					$this->parse('my_files_block', 'my_files', true);
@@ -77,16 +78,17 @@ if(is_numeric($this->arg[0])) {
 			
 		$subBoxHandler = new Submission;
 		$subBox = $subBoxHandler->getByField('fid', $file['id']);
-		
+
 		if(is_array($subBox)) {
 			if($subBox['deleted'])
-				$this->setVar('SUBBOX', "<a href=\"/submission/listSubmission.php?undelete=".$subBox['id']."\">Undelete Box</a>");
-			else
-				$this->setVar("SUBBOX", "<p><a href=\"/submission/listSubmission.php?delete=".$subBox['id']."\">Delete</a></p>
-					<a href=\"/submission/createSubmission.php?sid=".$subBox['id']."\">Modify</a>");
+			//	$this->setVar('SUBBOX', "<a href=\"/submission/listSubmission.php?undelete=".$subBox['id']."\">Undelete Box</a>");
+                $this->setVar('SUBBOX', '');
+            else
+				$this->setVar("SUBBOX", "<p><a href=\"/submission/submissionForm.php?deleteBox=".$subBox['id']."\">Delete</a></p>
+					<a href=\"/submission/createSubmission/modify/".$subBox['id']."\">Modify</a>");
 		}
 		else {
-			$this->setVar("SUBBOX", "<a href=\"/submission/createSubmission.php?cid=".$file['category']."&fileid=".$file['id']."\">Create</a>");
+			$this->setVar("SUBBOX", "<a href=\"/submission/createSubmission/new/".$file['category']."/".$file['id']."\">Create</a>");
 		}
 		$this->parse('submission_box_block', 'submission_box');
 	}

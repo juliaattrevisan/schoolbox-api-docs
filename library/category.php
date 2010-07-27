@@ -109,7 +109,7 @@ class Category extends Model {
 	
 	}
 	
-	function getImages($categoryID, $config = false) {
+	function getImages($categoryID, $limit) {
 		$query = "SELECT id, file.description 
 				  FROM file 
 				  LEFT JOIN allowedFileTypes ON mime_type = mime 
@@ -117,11 +117,11 @@ class Category extends Model {
 				  AND deleted = '0' AND INSTR(mime_type, 'image/') AND inline = 'true'
 				  ORDER BY submitted";
 				  
-		if ($config['size'] == 0)
-			$lim = "";
+		if ($limit == 0)
+			$query .= "";
 		else
-			$lim = " LIMIT 1, ".IMAGESPERROW * $config['size'];
-			
+			$query .= " LIMIT 1, $limit";
+
 		return $this->db->getAll($query);
 	}
 

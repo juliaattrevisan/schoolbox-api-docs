@@ -1,5 +1,5 @@
 <?php
-define("IMAGESPERROW", 4);
+define('IMAGESPERROW', 4);
 
 
 
@@ -7,10 +7,11 @@ define("IMAGESPERROW", 4);
 $this->setBlock($componentHandle, "thumb_row", "row_block");
 $this->setBlock("thumb_row", "thumb_cell", "cell_block");
 
-if(is_numeric($config['size']))
-$config['size'] = $config['size'] * IMAGESPERROW;
 
-$imageList = $categoryHandler->getImages($categoryID, $config);
+if(is_numeric($config['size']))
+    $limit = $config['size'] * IMAGESPERROW;
+
+$imageList = $categoryHandler->getImages($categoryID, $limit);
 
 $count = 1; 
 if(is_array($imageList) ) {
