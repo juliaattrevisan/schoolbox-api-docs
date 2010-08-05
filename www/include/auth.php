@@ -39,7 +39,7 @@ function authenticateLDAP($username, $password) {
                 $entries = ldap_get_entries($ds, $result);
                 $dn = $entries[0]['dn'];
                 if($dn)
-                        return @ldap_bind($ds, $dn, $password);
+                        return @ldap_bind($ds, $dn, ldap_escape($password));
         }
         ldap_unbind($ds);
 
@@ -54,7 +54,7 @@ function authenticateLDAP($username, $password) {
 					$entries = ldap_get_entries($ds, $result);
 					$dn = $entries[0]['dn'];
 					if($dn)
-							return @ldap_bind($ds, $dn, $password);
+							return @ldap_bind($ds, $dn, ldap_escape($password));
 			}
         }
 

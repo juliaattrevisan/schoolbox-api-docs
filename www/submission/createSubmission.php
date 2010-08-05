@@ -75,7 +75,7 @@ else if($this->arg[0] == 'new'  ) {
 
 	$groupHandler = new Group;
 
-    if(is_numeric($this->arg[2])) {
+    if(is_numeric($this->arg[2]) && $this->arg[2] > 0) {
         /* File ID submitted, associate box with file */
         require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 

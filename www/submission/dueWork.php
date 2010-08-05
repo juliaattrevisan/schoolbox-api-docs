@@ -235,7 +235,8 @@ if (is_array($returnList)) {
 		
 		/* display file download link */
 		$this->setVar('download_rt_block', '');
-		if ($return['fid'] > 0)
+        $file = RETURNS_directory . '/' . $return['id']. '.dat';
+		if (is_readable($file))
 			$this->parse('download_rt_block', 'download_rt');
 		
 		
