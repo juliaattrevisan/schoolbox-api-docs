@@ -66,8 +66,9 @@ class Link extends Model {
 	}
 	
 	function update($data) {
-	
-		$data['url'] = $this->appendHTTP(trim($data['url']));
+
+        if(isset($data['url'])) 
+            $data['url'] = $this->appendHTTP(trim($data['url']));
 		
 		parent::update($data);
 		
