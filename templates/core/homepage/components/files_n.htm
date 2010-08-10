@@ -45,7 +45,7 @@
         <!-- END file_no_url -->
         <p class="interact">
           <!-- BEGIN modify_file -->
-          <a href="/cms/file/{FILE_ID}">Modify</a>
+          <a href="/cms/file/{FILE_ID}">Modify</a> | <a onclick="return confirm('Are you sure you want to delete this item?');" href="/cms/fileForm.php?delete={FILE_ID}">Delete</a>
           <!-- END modify_file -->
         </p>
         <p class="summ">{FILE_COMMENT}</p>
