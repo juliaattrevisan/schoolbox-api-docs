@@ -15,7 +15,7 @@ class Category extends Model {
 	}
 	
 	function getCategoryList ($categoryID, $config = false) {
-		$query = "SELECT id, name, GROUP_CONCAT(co.code) code, cf.template, parent,
+		$query = "SELECT id, name, GROUP_CONCAT(co.code) code, cf.template, parent, hidden,
 					(SELECT 1 FROM `".$this->_table."` k 
 					 LEFT JOIN perms p ON p.cid = k.id AND p.gid = '".$_SESSION['gid']."' AND p.type > 0
 					 LEFT JOIN userAccess ua ON ua.uid = '".$_SESSION['id']."' AND ua.service = 1 AND ua.sid = k.id AND ua.type > 0
@@ -23,9 +23,9 @@ class Category extends Model {
 				  FROM category ca 
 				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
 				  LEFT JOIN homepage_config cf ON cf.cid = ca.id
-				  WHERE parent = $categoryID 
+				  WHERE parent = $categoryID
 				  GROUP BY ca.id";
-		
+
 		$sortFields = array('name' => 'name', 'date' => 'id');
 		$config['sort'] = in_array($config['sort'], $sortFields) ? $config['sort'] : 'name';
 		$config['sortdir'] = strtoupper($config['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
@@ -43,7 +43,7 @@ class Category extends Model {
 				  FROM category c
 				  WHERE parent = $categoryID
 				  LIMIT 1";
-		
+
 		return $this->db->getOne($query);
 	}
 
@@ -60,8 +60,9 @@ class Category extends Model {
 				  LEFT JOIN user u on u.id = a.uid 
 				  LEFT JOIN userGroups g ON g.cid = c.id
 				  LEFT JOIN homepage_config cf ON cf.cid = c.id
-				  WHERE c.id = '$categoryID' 
-				  GROUP BY c.id"; 
+				  WHERE c.id = '$categoryID'
+				  GROUP BY c.id";
+
 		return $this->db->getRow($query);		
 	}
 	

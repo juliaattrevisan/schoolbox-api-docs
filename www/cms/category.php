@@ -35,6 +35,7 @@ if(is_numeric($this->arg[0])) {
 					'CODE'			=> scrubText($category['code']),				
 					'PARENT_ID'		=> $category['parent'],
 					'PARENT_NAME'	=> scrubText($categoryParent['name']),
+                    'HIDDEN_SELECTED' => $category['hidden'] ? 'checked=\'checked\'' : '',
 					);
 	
 	$this->setVar($output);

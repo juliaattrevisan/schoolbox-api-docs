@@ -21,7 +21,7 @@ $fileList = $fileHandler->getAllInCategory($categoryID, $config);
 
 if (is_array($fileList)) {
 	foreach ($fileList as $file) {
-	
+
 		$output = array('FILE_DESCRIPTION'	=> scrubTEXT($file['description']),
 						'FILE_ID'			=> $file['id'],
 						'FILE_MIME_IMAGE'	=> $allowedFiles->getClass($file["iconFile"]),
@@ -30,12 +30,13 @@ if (is_array($fileList)) {
 						'FILE_POSTED_DATE'	=> outputDate(DATE_short_format, $file['submitted']),
 						'FILE_COMMENT'		=> nl2br(scrubTEXT($file['comment'])),
 						'ON_OFF'			=> ++$j%2? '' : 'dark',
+                        'HIDDEN'            => $file['hidden'] ? 'hidden' : '',
 						);
 		$this->setVar($output);
 
 		//set name
 		if($file['realname'] != "") {
-		
+
 			if($file['inline'] == 'true' && FILE_use_frame) {
 				$this->setVar('FILE_URL', '/sendframe.php?id='.$file['id']);
 				$this->setVar('FILE_TARGET', '_blank');
@@ -50,15 +51,15 @@ if (is_array($fileList)) {
 		else {
 			$this->setVar('file_url_block', '');
 			$this->parse('file_no_url_block', 'file_no_url');
-			
+
 		}
 
-		
+
 		if($permission >= WRITE_ACCESS)
 			$this->parse('modify_file_block', 'modify_file');
 		else
 			$this->setVar('modify_file_block','');
-		
+
 		$this->parse('files_block', 'files', true);
 
 	}
@@ -80,9 +81,9 @@ foreach ($default['filterOptions'] as $option) {
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_file", "submit_file_block");
-if ($permission < WRITE_ACCESS)		
+if ($permission < WRITE_ACCESS)
 	$this->setVar("submit_file_block", "");
 else
-	$this->parse("submit_file_block", "submit_file");	
+	$this->parse("submit_file_block", "submit_file");
 
 ?>

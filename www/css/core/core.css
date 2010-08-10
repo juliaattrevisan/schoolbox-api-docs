@@ -1412,3 +1412,8 @@ p.bubble-name {
 .sIFR-active h2 {
 	font-size: 18px;
 	}
+
+.hidden {
+	opacity: 0.5;
+	filter:alpha(opacity=50);
+}
