@@ -163,7 +163,7 @@ class Group extends Model {
 		// if superuser just return highest permission type
 		if($user['su'])
 			return FULL_ACCESS;
-	
+        
 		// check individual access
 		
 		$query = "SELECT type FROM userAccess WHERE uid = ".$userID." AND ( ( service = ".$this->_service." ";
@@ -181,7 +181,6 @@ class Group extends Model {
 		$permission = $this->db->getOne($query);    
 		$permission = (int)$permission;       
 
-		
 		// check group access (HOMEPAGE_SERVICE only)
 		if($permission < WRITE_ACCESS && $this->_service == HOMEPAGE_SERVICE) {                       
 			$query = "SELECT type FROM perms WHERE cid='".$relationID."' AND gid='".$user['group_id']."' ORDER BY type DESC";

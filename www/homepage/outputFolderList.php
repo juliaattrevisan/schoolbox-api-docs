@@ -16,10 +16,9 @@ if (is_array($folderList)) {
 							'FOLDER_NAME'	=> scrubTEXT($folder['name']),
 							'FOLDER_ICON'	=> $folder['template']?'house':'folder_blue_full',
 							'ON_OFF'		=> ++$j%2? '' : 'dark',
-                            'HIDDEN'        => $folder['hidden'] ? 'hidden' : '',
 							);
-			$this->setVar($output);	
-			
+			$this->setVar($output);
+
 			if($permission >= WRITE_ACCESS)
 				$this->parse('modify_folder_block', 'modify_folder');
 			else

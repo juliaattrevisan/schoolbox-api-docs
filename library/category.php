@@ -15,7 +15,7 @@ class Category extends Model {
 	}
 	
 	function getCategoryList ($categoryID, $config = false) {
-		$query = "SELECT id, name, GROUP_CONCAT(co.code) code, cf.template, parent, hidden,
+		$query = "SELECT id, name, GROUP_CONCAT(co.code) code, cf.template, parent,
 					(SELECT 1 FROM `".$this->_table."` k 
 					 LEFT JOIN perms p ON p.cid = k.id AND p.gid = '".$_SESSION['gid']."' AND p.type > 0
 					 LEFT JOIN userAccess ua ON ua.uid = '".$_SESSION['id']."' AND ua.service = 1 AND ua.sid = k.id AND ua.type > 0

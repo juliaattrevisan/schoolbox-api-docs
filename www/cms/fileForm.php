@@ -173,8 +173,13 @@ else if(is_numeric($_GET['delete'])) {
 		error(6);
 
 	$fileHandler->delete($_GET['delete']);
-	
-	$page->backToTheFuture(1);
+
+    if ($_GET['redirect'] == '') {
+        $page->backToTheFuture(1);
+    }
+    else {
+        localRedir($_GET['redirect']);
+    }
 }
 else if(is_numeric($_GET['deleteList'])) {
 	
