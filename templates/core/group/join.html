@@ -1,24 +1,25 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/mootools.js"></script>
 <script type="text/javascript">
-<!--
-window.addEvent('domready', function () {
-	$$('.greenCheck').each(function (el) {
-		el.addEvent('click', function () {
-			if (el.getAttribute('src').indexOf('greentick') != -1) {
-				el.setAttribute('src', '/images/emptybox.gif');
-				//var myRequest = new Ajax('/group/joinForm.php?leave='+el.getAttribute('rel')).request();
-				window.open('/group/joinForm.php?leave='+el.getAttribute('rel'),'_self');
-			} else {
-				el.setAttribute('src', '/images/greentick.gif');
-				//var myRequest = new Ajax('/group/joinForm.php?join='+el.getAttribute('rel')).request();
-				window.open('/group/joinForm.php?join='+el.getAttribute('rel'),'_self');
-			}		
-		});
-		el.setStyle('cursor','pointer');
-	});
+$j(document).ready(function() {
+    $j('.greenCheck').click(function() {
+        if ($j(this).attr('checked')) {
+            var data = {
+                join: $j(this).attr('rel')
+            }
+
+            $j(this).attr('checked', true);
+        }
+        else {
+            var data = {
+                leave: $j(this).attr('rel')
+            }
+
+            $j(this).attr('checked', false);
+        }
+
+        $j.get('/group/joinForm.php', data);
+    });
 });
--->
 </script>
 
 <!-- END custom_head -->
@@ -28,7 +29,9 @@ window.addEvent('domready', function () {
   <p>These groups are free to join. Once you have selected the group you will have access to the content available in the group</p>
   <ul>
     <!-- BEGIN free_list -->
-    <li><img src="/images/{GREEN_CHECK}.gif" width="13" height="12" border="0" class="greenCheck" rel="{GROUP_ID}" alt="Join Group" /> {GROUP_NAME}</li>
+    <li>
+        <input class="greenCheck" type="checkbox" rel="{GROUP_ID}" {GROUP_CHECKED} /> {GROUP_NAME}
+    </li>
     <!-- END free_list -->
   </ul>
 </div>
@@ -37,7 +40,9 @@ window.addEvent('domready', function () {
   <p>These groups are moderated. Once you have selected the group you must wait for the group admin to authorise your application. </p>
   <ul>
     <!-- BEGIN moderated_list -->
-    <li><img src="/images/{GREEN_CHECK}.gif" width="13" height="12" border="0" class="greenCheck" rel="{GROUP_ID}" alt="Request to Join Group" /> {GROUP_NAME} 
+    <li>
+        <input class="greenCheck" type="checkbox" rel="{GROUP_ID}" {GROUP_CHECKED} /> {GROUP_NAME}
+    </li>
     <!-- BEGIN waiting -->
     <em>(Waiting on authorisation)</em><!-- END waiting --></li>
     <!-- END moderated_list -->

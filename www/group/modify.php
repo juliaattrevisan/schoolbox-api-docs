@@ -23,7 +23,7 @@ if (is_numeric($this->arg[0])) {
 	// check access
 	if($groupHandler->getPermission($this->arg[0]) < FULL_ACCESS)
 		error(19);
-	
+
 	$output = array('CATEGORY_NAME'		=> scrubText($category['name']),
 					'CATEGORY_ID'		=> $category['id'],
 					'GROUP_OWNER'		=> formatName($category),
@@ -42,9 +42,9 @@ if (is_numeric($this->arg[0])) {
 			$output = array('USER_NAME'		=> formatName($member),
 							'USER_JAVA'		=> addslashes(formatName($member)),
 							'USER_ID'		=> $member['uid'],
-							'GREEN_CHECK'	=> $member['type'] > 1 ? 'greentick' : 'emptybox',
-							
+                            'GROUP_CHECKED'	=> $member['type'] > 1 ? 'checked=\'checked\'' : ''
 							);
+
 			$this->setVar($output);
 			
 			

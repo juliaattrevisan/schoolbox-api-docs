@@ -18,7 +18,7 @@ if (is_array($freeList)) {
 	foreach ($freeList as $free) {
 		$output = array('GROUP_ID'		=> $free['id'],
 						'GROUP_NAME'	=> scrubText($free['name']),
-						'GREEN_CHECK'	=> is_numeric($free['accessType']) ? 'greentick' : 'emptybox',
+                        'GROUP_CHECKED' => is_numeric($free['accessType']) ? 'checked=\'checked\'' : '',
 						);
 		$this->setVar($output);
 		
@@ -34,7 +34,7 @@ if (is_array($moderatedList)) {
 	foreach ($moderatedList as $moderated) {
 		$output = array('GROUP_ID'		=> $moderated['id'],
 						'GROUP_NAME'	=> scrubText($moderated['name']),
-						'GREEN_CHECK'	=> is_numeric($moderated['accessType']) ? 'greentick' : 'emptybox',
+                        'GROUP_CHECKED' => is_numeric($free['accessType']) ? 'checked=\'checked\'' : '',
 						);
 		$this->setVar($output);
 		
