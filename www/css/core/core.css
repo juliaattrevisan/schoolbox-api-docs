@@ -1417,3 +1417,18 @@ p.bubble-name {
 	opacity: 0.5;
 	filter:alpha(opacity=50);
 }
+
+.highlightedMessage {
+    border: 1px solid #e00;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.highlightedMessage p span {
+    color: #e00;
+    font-weight: bold;
+}
+
+.highlightedMessage div {
+    padding: 20px;
+}

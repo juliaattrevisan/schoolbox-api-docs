@@ -10,28 +10,28 @@ $this->setTab('resources');
 $this->setFile(TEMPLATE_content, 'wiki/modify.html');
 
 if (is_numeric($this->arg[0])) {
-	
+
 	$wiki = $wikiHandler->getByID($this->arg[0]);
 	if (!isset($wiki['wikiID']))
 		error(101);
-	
+
 	// check permission
 	if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS)
 		error(19);
 
 	// check locked
 	if ($wiki['locked'] == 'true' && $permission < WRITE_ACCESS)
-		error(19);	
-		
-	
+		error(19);
+
 	$output = array('ACTION'		=> 'Modify',
 					'WIKI_ID'		=> $wiki['wikiID'],
 					'CATEGORY_ID'	=> $wiki['categoryID'],
 					'HEADING'		=> scrubText($wiki['heading']),
 					'BODY'			=> $wiki['body'],
+                    'REVISION'      => $wiki['latestRevision'],
 					);
 	$this->setVar($output);
-	
+
 
 } elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
@@ -47,7 +47,7 @@ if (is_numeric($this->arg[0])) {
 					);
 	$this->setVar($output);
 
-	
+
 } else
 	error(2);
 

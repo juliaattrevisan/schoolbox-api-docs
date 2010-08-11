@@ -30,14 +30,31 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 			error(19);		
 	
 		$data['wikiID'] = $wiki['wikiID'];
-		$wikiHandler->update($data);
-	} else if($_POST['categoryID']) {
+
+        /* Check if there has been a revision added for this wiki since you
+         * last received a lastRevision id.
+         */
+        $latestRevision = $wikiHandler->getLatestRevision($wiki['wikiID']);
+
+        /* Save your version regardless
+         */
+        $wikiHandler->update($data);
+
+        /* If there was a version between the one you were editing and the one
+         * you just submitted, compare them
+         */
+        if ($_POST['revision'] < $latestRevision['revisionID']) {
+            localRedir("/wiki/merge/$wiki[wikiID]");
+        }
+	}
+    else if($_POST['categoryID']) {
 		// check permission
 		if (($permission = $groupHandler->getPermission($_POST['categoryID'])) < READ_ACCESS)
 			error(19);
 		$data['categoryID'] = $_POST['categoryID'];
 		$wiki['wikiID'] = $wikiHandler->create($data);
 	}
+
 	localRedir("/wiki/" . $wiki['wikiID']);
 }
 elseif (is_numeric($_GET['revert']) && is_numeric($_GET['wikiID'])) {

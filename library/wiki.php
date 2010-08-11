@@ -6,12 +6,46 @@ class Wiki extends Model {
 		$this->_table = 'wiki';
 		$this->_index = 'wikiID';
 		$this->_revisionTable = 'wikiRevision';
+        $this->_openTable = 'wikiOpens';
 		
 		parent::Model();
 	}
+
+    /**
+     * Gets the latest revision record for the specified wiki.
+     *
+     * @param <type> $wikiID
+     * @return <type>
+     */
+    function getLatestRevision($wikiID) {
+        $query = 'SELECT latestRevision FROM ' . $this->_table . " WHERE wikiID = '$wikiID'";
+
+        $latestRevisionID = $this->db->getRow($query);
+
+        return $this->getByID($wikiID, $latestRevisionID);
+    }
+
+    /**
+     * Locates the previous revision without needing to rely on a -1 offset.
+     * 
+     * @param <type> $wikiID
+     * @param <type> $revisionID
+     * @return <type>
+     */
+    function getPreviousRevision($wikiID, $revisionID) {
+        $query = 'SELECT revisionID
+                  FROM ' . $this->_revisionTable . "
+                  WHERE wikiID = '$wikiID'
+                  AND revisionID < '$revisionID'
+                  ORDER BY revisionID DESC";
+
+        $previousRevision = $this->db->getRow($query);
+
+        return $this->getByID($wikiID, $previousRevision['revisionID']);
+    }
 	
 	function getByID($wikiID, $revisionID = 0) {
-		$query = "SELECT r.*, w.categoryID, w.locked, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(r.created) modified, 
+		$query = "SELECT r.*, w.categoryID, w.locked, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(r.created) modified, latestRevision,
 				  u.title, u.firstname, u.lastname, r.userID authorID
 				  FROM ".$this->_revisionTable." r
 				  LEFT JOIN ".$this->_table." w ON w.wikiID = r.wikiID
