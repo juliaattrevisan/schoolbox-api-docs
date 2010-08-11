@@ -35,10 +35,10 @@ if(is_numeric($this->arg[0])) {
 					'CODE'			=> scrubText($category['code']),				
 					'PARENT_ID'		=> $category['parent'],
 					'PARENT_NAME'	=> scrubText($categoryParent['name']),
-                    'HIDDEN_SELECTED' => $category['hidden'] ? 'checked=\'checked\'' : '',
+                    'USER_GROUP' => $_SESSION['gid'],
 					);
-	
-	$this->setVar($output);
+
+    $this->setVar($output);
 
 	$templateList = $homeTemplateHandler->getTemplateListDropDown();
 	array_unshift($templateList, array('TEMPLATE_ID' => 0, 'TEMPLATE_NAME' => 'Keep Existing'));
@@ -76,7 +76,6 @@ if(is_numeric($this->arg[0])) {
 	$this->parse('reset_content_block', 'reset_content');
 	
 } else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-
 	if ($this->arg[1] == 0)
 		$categoryParent = array('id' => 0, 'name' => 'Top');
 	elseif(!($categoryParent = $categoryHandler->getByID($this->arg[1])))
@@ -99,8 +98,11 @@ if(is_numeric($this->arg[0])) {
 					'NAME'			=> '',
 					'CODE'			=> '',
 					'PARENT_ID'		=> $categoryParent['id'],
-					'PARENT_NAME'	=> scrubText($categoryParent['name']),				
+					'PARENT_NAME'	=> scrubText($categoryParent['name']),
+                    'REQUIRED_PERMS' => $_SESSION['gid'],
+                    'GROUP_NAME'    => '',
 					);
+
 	$this->setVar($output);
 	
 	$templateList = $homeTemplateHandler->getTemplateListDropDown();

@@ -19,9 +19,23 @@ function verify(){
 				ok = true;
 		});
 		if (!ok)
-			msg += "You need to assign permissions.";
+			msg += "You need to assign permissions.\n";
 	}
-	
+
+    /* Check that the creator has write access or Individual Permissions set
+     * for their group type.
+     */
+    var hasDefaultPerms = $j('input[name=group[{REQUIRED_PERMS}]][value=2][checked=true]').length;
+    var individualPerms = $j('input[name=groupcheck]').is(':checked');
+
+    if (!hasDefaultPerms && !individualPerms) {
+        if (confirm("Your group currently does not have write access to the folder you are about to create. Do you wish to continue?")) {
+        }
+        else {
+            return false;
+        }
+    }
+    
 	if(msg != "") {
 		alert(msg);
 		return false;
@@ -85,15 +99,6 @@ function verify(){
 						<td><a href="/group/modify/{CATEGORY_ID}">Modify Group</a></td>
 					</tr>
                     <!-- END indiv_modify -->
-                    <tr>
-                        <td>
-                            <h3>Hidden</h3>
-                            <em>Hide this file from anyone with read-only access.</em>
-                        </td>
-                        <td>
-                            <input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} />
-                        </td>
-                    </tr>
                     <!-- BEGIN reset_content -->
 					<tr>
 						<td><h3>Reset Homepage Content</h3>
