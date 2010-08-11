@@ -14,7 +14,6 @@ if ($_POST['name']) {
 					  'template'	=> $_POST['template'],
 					  'code'		=> $_POST['code'],
 					  'group'		=> $_POST['group'],
-                      'hidden'      => $_POST['hidden'],
 					  );
 
 	if (is_numeric($_POST['categoryID'])) {
