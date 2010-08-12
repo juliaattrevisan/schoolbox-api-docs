@@ -12,6 +12,38 @@ class Submission extends Model {
         parent::Model();
     }
 
+    /**
+     * Counts the number of submission boxes this subject owns.
+     *
+     * @param <type> $categoryID
+     * @return <type>
+     */
+    function countSubmissionBoxes($categoryID) {
+        $query = "SELECT COUNT(category) FROM " . $this->_table . " WHERE category = '$categoryID'";
+
+        return $this->db->getOne($query);
+    }
+
+    /**
+     * Gets all the user's submissions for this subject.
+     * 
+     * @param <type> $categoryID
+     * @return <type>
+     */
+    function getSubmissionsForSubject($categoryID) {
+        $query = "SELECT
+                      submission_box.category, submission_box.description,
+                      student_submission.owner, realname
+                  FROM submission_box
+                  LEFT JOIN student_submission
+                  ON submission_box.id = student_submission.box_id
+                  WHERE student_submission.owner = '$_SESSION[id]'
+                  AND category = '$categoryID'
+                  ORDER BY category";
+
+        return $this->db->getAll($query);
+    }
+
     function getByID($boxID) {
         $query = "SELECT s.*, GROUP_CONCAT(cc.code) code, category.name as categoryName, category.id as cid,
 					file.comment, ft.name as typeName

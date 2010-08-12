@@ -248,6 +248,11 @@ if (is_array($returnList)) {
 
 $j = 0;
 
+/* Completed percentages for each subject
+ */
+$percentage = array();
+$categoryIDs = array();
+
 // subject summary
 foreach ($categoryList as $category) {
 	$categoryID = $category['id'];
@@ -275,13 +280,25 @@ foreach ($categoryList as $category) {
 			}
 		}
 	}
-	
+
+    /* Count the number of submission boxes for this Subject, and the percentage
+     * of items submitted
+     */
+    $submissions = $submissionHandler->getSubmissionsForSubject($categoryID);
+    $thisPercentage = round(100*count($submissions)/$submissionHandler->countSubmissionBoxes($categoryID));
+    
+    /* Accumulate into array for Javascript
+     */
+    $percentage[] = $thisPercentage;
+    $categoryIDs[] = $categoryID;
+
 	$output = array('SUMMARY_CAT_ID'	=> $categoryID,
 					'SUMMARY_CAT_NAME'	=> scrubText($category['name']),
 					'SUMMARY_TOTAL'		=> $summary[$category['id']]['total'],
 					'SUMMARY_DUE'		=> $summary[$category['id']]['due'],
 					'SUMMARY_TEACHER'	=> SYNERGY_enable ? implode(', ', $teacherOutput) : '',
 					'DARK'				=> $j++ % 2 ? 'dark' : '',
+                    'PERCENTAGE_COMPLETED' => $thisPercentage,
 					);	
 	
 	$this->setVar($output);
@@ -292,6 +309,13 @@ foreach ($categoryList as $category) {
 	
 	$this->parse('summary_block', 'summary', true);
 }
+
+/* Give jquery ProgressBar values to use
+ */
+$this->setVar(array(
+    'PERCENTAGE_COMPLETED_ARRAY' => implode(',', $percentage),
+    'CATEGORY_IDS' => implode(',', $categoryIDs)
+));
 
 $j = 0;
 

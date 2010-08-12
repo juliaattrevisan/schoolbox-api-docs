@@ -1418,6 +1418,8 @@ p.bubble-name {
 	filter:alpha(opacity=50);
 }
 
+/* Merge wiki versions
+ */
 .highlightedMessage {
     border: 1px solid #e00;
     width: 100%;
@@ -1431,4 +1433,20 @@ p.bubble-name {
 
 .highlightedMessage div {
     padding: 20px;
+}
+
+/* Subject completion graph
+ */
+div.barchart {
+     width: 100%;
+}
+
+div.barchart div {
+    width: 300px;
+    float: left;
+}
+
+div.barchart .value {
+    width: 45px;
+    float: right;
 }
