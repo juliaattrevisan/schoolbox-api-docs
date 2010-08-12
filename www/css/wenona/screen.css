@@ -216,3 +216,10 @@ h2 {
 #footer ul li a {
 	color: #fff;
 	}
+
+/* Literacy Week Countdown
+ */
+div.box.literacy p {
+    text-align: center;
+    margin-top: 20px;
+}
