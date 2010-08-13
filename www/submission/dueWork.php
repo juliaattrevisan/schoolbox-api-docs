@@ -103,7 +103,6 @@ if ($selectedDate <= 0)
 	$selectedDate = time();
 
 
-
 // output general data
 $output = array('CURRENT_DATE'	=> outputDate('F Y', $selectedDate),
 				'NOT_TODAY'		=> date('dmY', $selectedDate) != date('dmY') ? 'not-today' : '',
@@ -111,6 +110,7 @@ $output = array('CURRENT_DATE'	=> outputDate('F Y', $selectedDate),
 				'NEXT_MONTH'	=> date('Y-m-d', strtotime('+1 month', $selectedDate)),
 				'PREV_MONTH'	=> date('Y-m-d', strtotime('-1 month', $selectedDate)),
 				'SELECTED_DATE'	=> outputDate('Y-m-d', $selectedDate),
+                'USER_ID'       => $this->arg[1],
 				);
 $this->setVar($output);
 
