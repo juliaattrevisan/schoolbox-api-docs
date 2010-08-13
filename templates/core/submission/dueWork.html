@@ -72,8 +72,8 @@ $j(function() {
 <script type="text/javascript" src="/javascript/jquery.progressbar.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
-    var values = new Array({PERCENTAGE_COMPLETED_ARRAY});
-    var catIDs = new Array({CATEGORY_IDS});
+    var values = [{PERCENTAGE_COMPLETED_ARRAY}];
+    var catIDs = [{CATEGORY_IDS}];
 
     for (var i=0; i < catIDs.length; i++) {
         $j('#progressbar-' + catIDs[i]).progressbar({value: values[i]});

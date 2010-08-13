@@ -1,7 +1,7 @@
 /* Progressbar
 ----------------------------------*/
 .ui-progressbar { 
-    height:2em;
+    height:1em;
     text-align: left;
     background-image: url('../images/ui/ui-bg_highlight-hard_100_f2f5f7_1x100.png');
     background-position: 50% 50%;

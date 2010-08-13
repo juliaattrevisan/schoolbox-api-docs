@@ -282,10 +282,17 @@ foreach ($categoryList as $category) {
 	}
 
     /* Count the number of submission boxes for this Subject, and the percentage
-     * of items submitted
+     * of items submitted. If there are no submission boxes, just have 100%
      */
     $submissions = $submissionHandler->getSubmissionsForSubject($categoryID);
-    $thisPercentage = round(100*count($submissions)/$submissionHandler->countSubmissionBoxes($categoryID));
+    $numBoxes = $submissionHandler->countSubmissionBoxes($categoryID);
+
+    if ($numBoxes) {
+        $thisPercentage = round(100*count($submissions)/$numBoxes);
+    }
+    else {
+        $thisPercentage = 100;
+    }
     
     /* Accumulate into array for Javascript
      */
