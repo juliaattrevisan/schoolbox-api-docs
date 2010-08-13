@@ -69,10 +69,14 @@ if(is_numeric($this->arg[0])) {
 
             if(is_array($studentSub)) {
 
-                if(is_array($return))
+                if(is_array($return)) {
                     $mark = $return[0]['mark'];
-                else
+                    $remark = "<a href=\"/submission/returnWork/".$this->arg[0]."/".$user['uid']."\">Re-mark</a>";
+                }
+                else {
                     $mark = "<a href=\"/submission/returnWork/".$this->arg[0]."/".$user['uid']."\">Mark</a>";
+                    $remark = '';
+                }
 
                 $output = array(		'OWNER' 	=> formatName($user,'{lastname}, {firstname}'),
                                         'OWNER_ID' 	=> $user['uid'],
@@ -83,6 +87,7 @@ if(is_numeric($this->arg[0])) {
                                         'COLOUR'	=> $studentSub['late']?'#ff0000':'#000000',
                                         'RETURN'	=> $mark,
                                         'ON_OFF'	=> ++$i%2?'':'dark',
+                                        'REMARK'    => $remark,
                 );
                 $this->setVar($output);
                 $this->parse('mark_block', 'mark', false);
