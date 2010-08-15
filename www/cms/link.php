@@ -43,6 +43,8 @@ if(is_numeric($this->arg[0])) {
 	$this->setFile(TEMPLATE_content, 'cms/modify-link.html');
 	$this->setTitle('Add Link');
 	$this->setTab('resources');
+    $this->setBlock(TEMPLATE_content, 'delete_button','delete_button_block');
+    $this->setVar('delete_button_block','');
 	
 	/* Check folder exists */
 	$category = $categoryHandler->getByID($this->arg[1]);

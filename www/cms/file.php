@@ -103,6 +103,8 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'optgroup', 'optgroup_block');
 	$this->setBlock('optgroup', 'my_files', 'my_files_block');
 	$this->setBlock(TEMPLATE_content, 'submission_box', 'submission_box_block');
+    $this->setBlock(TEMPLATE_content, 'delete_button','delete_button_block');
+    $this->setVar('delete_button_block','');
 
 	$this->setTitle('Add File');	
 	$this->setTab('resources');
