@@ -18,6 +18,15 @@ function verify()
 	else
 		return true;
 }
+
+$j(document).ready(function() {
+    $j('#deleteFile').click(function() {
+        if (confirm('Are you sure you want to delete this link?')) {
+            window.location = '/cms/linkForm.php?delete={LINK_ID}&redirect=' + '/';
+        }
+    });
+});
+
 </script>
 <!-- END custom_head -->
 
@@ -56,7 +65,7 @@ function verify()
     <tr>
       <td >&nbsp;</td>
       <td><input type='hidden' name='linkID' value='{LINK_ID}'  />
-        <input type="submit" name="Submit" value="{ACTION} Link" class="btn" />
+        <input type="submit" name="Submit" value="{ACTION} Link" class="btn" /> <input id='deleteFile' type="button" class="btn"  value="Delete File" />
       </td>
     </tr>
   </table>

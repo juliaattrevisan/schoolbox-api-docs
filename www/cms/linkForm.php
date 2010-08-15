@@ -87,7 +87,12 @@ else if($_GET['delete']) {
 
 	$linkHandler->delete($_GET['delete']);
 	
-	$page->backToTheFuture(1);
+    if ($_GET['redirect'] == '') {
+        $page->backToTheFuture(1);
+    }
+    else {
+        localRedir($_GET['redirect']);
+    }
 }
 else {
 	error(2);

@@ -110,7 +110,7 @@ class Category extends Model {
 	
 	}
 	
-	function getImages($categoryID, $limit) {
+	function getImages($categoryID, $limit = 0) {
 		$query = "SELECT id, file.description 
 				  FROM file 
 				  LEFT JOIN allowedFileTypes ON mime_type = mime 
@@ -278,17 +278,19 @@ class Category extends Model {
 			unset($data['template']);
 		
 		/* Insert synergetic subject code */
-		$this->db->delete('categoryCode', 'categoryID', $data['id']);
-		$codeList = explode(",", $data['code']);
-		if (is_array($codeList)) {
-			$codeList = array_map('trim',$codeList);
-			$codeList = array_unique($codeList);
-			foreach ($codeList as $code) {
-				if($code) 
-					$this->db->insert('categoryCode', array('categoryID' => $data['id'], 'code' => $code));
-			}
-		}
-		
+        if(isset($data['code'])) {
+            $this->db->delete('categoryCode', 'categoryID', $data['id']);
+            $codeList = explode(",", $data['code']);
+            if (is_array($codeList)) {
+                $codeList = array_map('trim',$codeList);
+                $codeList = array_unique($codeList);
+                foreach ($codeList as $code) {
+                    if($code)
+                        $this->db->insert('categoryCode', array('categoryID' => $data['id'], 'code' => $code));
+                }
+            }
+        }
+        
 		parent::update($data);
 		
 		$this->logAction($data[$this->_index], 'modify');
