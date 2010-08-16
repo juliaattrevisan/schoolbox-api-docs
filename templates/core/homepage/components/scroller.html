@@ -45,6 +45,20 @@ $j(function(){
 
 <div class="box" id="component{COMPONENT_ID}">
     <h2>Image Scroller</h2>
+    <!-- BEGIN config -->
+    <a class="edit">edit</a>
+        <div class="editPanel hide">
+            <form action="/homepage/configForm.php" method="get">
+                <input type="hidden" name="cid" value="{ID}" />
+                <input type="hidden" name="type" value="config" />
+                <input type="hidden" name="component" value="{COMPONENT_ID}" />
+                <label for="url">Pixels:</label>
+                <input type="text" name="pixel" value="{COMPONENT_CONFIG_PIXEL}" size="4"/>
+                <input type="submit" value="Update" />
+            </form>
+        </div>
+    </a>
+    <!-- END config -->
     <div id="galleryCycle" class="box">
         <!-- BEGIN image -->
         <div><img src="/cms/image.php?id={IMAGE_ID}&height=250&width=250&resample=0" /><span>{IMAGE_NAME}</span></div>

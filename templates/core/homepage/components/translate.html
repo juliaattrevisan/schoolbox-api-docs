@@ -8,10 +8,10 @@ function doTranslate() {
             var translateInto = document.getElementById("translateInto").value;
 
             google.language.translate(text, result.language, translateInto, function(result) {
-                var translated = document.getElementById("translatedText");
-
                 if (result.translation) {
-                    translated.innerHTML = result.translation;
+                    $j('#translatedTextWrapper').css('display', 'block');
+                    $j('#translatedText p').html(result.translation);
+                    $j('#translatedTextWrapper').animate({ 'opacity' : 1 }, 2000);
                 }
             });
         }
@@ -21,6 +21,9 @@ function doTranslate() {
 google.load("language", "1");
 
 $j(document).ready(function() {
+    $j('#translatedTextWrapper').css('opacity', 0);
+    $j('#translatedTextWrapper').css('display', 'none');
+
     $j('#translateTextForm').submit(function() {
         doTranslate();
 
@@ -62,14 +65,14 @@ $j(document).ready(function() {
 }
 
 #translatedTextWrapper {
-    border-bottom: 1px solid #ccc;
+    /* border-bottom: 1px solid #ccc; */
     width: 100%;
     margin-top: 12px;
     margin-bottom: 12px;
 }
 
 #translatedText {
-    border: 1px solid #eee;
+    border: 1px solid #ddd;
     margin-top: 8px;
     margin-bottom: 16px;
     padding: 12px;
@@ -152,10 +155,10 @@ p.small {
     </form>
 
     <div id="translatedTextWrapper">
-        <p class="small">Translated text:</p>
-        <div id="translatedText"></div>
+        <div id="translatedText"><p></p></div>
     </div>
 
+    <!--
     <h3>Translate a web page</h3>
     <form class="translateForm" action="http://translate.google.com/translate">
         <fieldset>
@@ -277,4 +280,5 @@ p.small {
             <input class="submit" value="Translate" type=submit>
         </fieldset>
     </form>
+    -->
 </div>
