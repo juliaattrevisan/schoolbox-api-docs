@@ -15,13 +15,12 @@ $j(function(){
 
 <style type="text/css">
 #galleryCycle img {
-	width: 230px;
-	height: 156px;
 	display: block;
 }
 
 #galleryCycle {
 	border: 1px solid #dbdbdb;
+    margin: 10px auto;
 }
 
 #galleryCycle div {
@@ -45,7 +44,6 @@ $j(function(){
 
 <div class="box" id="component{COMPONENT_ID}">
     <h2>Image Scroller</h2>
-    <!-- BEGIN config -->
     <a class="edit">edit</a>
         <div class="editPanel hide">
             <form action="/homepage/configForm.php" method="get">
@@ -53,15 +51,15 @@ $j(function(){
                 <input type="hidden" name="type" value="config" />
                 <input type="hidden" name="component" value="{COMPONENT_ID}" />
                 <label for="url">Pixels:</label>
-                <input type="text" name="pixel" value="{COMPONENT_CONFIG_PIXEL}" size="4"/>
+                <input type="text" name="pixel" value="{COMPONENT_PIXEL}" size="4"/>
                 <input type="submit" value="Update" />
             </form>
         </div>
     </a>
-    <!-- END config -->
+
     <div id="galleryCycle" class="box">
         <!-- BEGIN image -->
-        <div><img src="/cms/image.php?id={IMAGE_ID}&height=250&width=250&resample=0" /><span>{IMAGE_NAME}</span></div>
+        <div><img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}&resample=0" /><span>{IMAGE_NAME}</span></div>
         <!-- END image -->
     </div>
 </div>
