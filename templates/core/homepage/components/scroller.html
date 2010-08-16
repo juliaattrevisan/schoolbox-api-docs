@@ -1,0 +1,53 @@
+<script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
+<script type="text/javascript">
+$j(function(){
+    $j('#galleryCycle').cycle({
+        cleartype: true,
+        before: function() {
+            $j('#galleryCycle span').slideUp();
+        },
+        after: function() {
+            $j('span', this).slideDown();
+        }
+    });
+});
+</script>
+
+<style type="text/css">
+#galleryCycle img {
+	width: 230px;
+	height: 156px;
+	display: block;
+}
+
+#galleryCycle {
+	border: 1px solid #dbdbdb;
+}
+
+#galleryCycle div {
+	position: relative;
+}
+
+#galleryCycle span {
+	background: #576369;
+	color: #fff;
+	display: none;
+	width: 100%;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	padding: 10px 0;
+	text-decoration: none;
+	opacity: 0.9;
+	text-indent: 10px;
+}
+</style>
+
+<div class="box" id="component{COMPONENT_ID}">
+    <h2>Image Scroller</h2>
+    <div id="galleryCycle" class="box">
+        <!-- BEGIN image -->
+        <div><img src="/cms/image.php?id={IMAGE_ID}&height=250&width=250&resample=0" /><span>{IMAGE_NAME}</span></div>
+        <!-- END image -->
+    </div>
+</div>
