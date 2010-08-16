@@ -1,0 +1,54 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.js"></script>
+<script type="text/javascript" src="/javascript/jquery.tableruler.js"></script>
+
+<!-- END custom_head -->
+
+<h1>{SUBJECTNAME} - Day {DAYNUMBER}, Period {PERNUMBER}, {DATE}</h1>
+<form action="" method="post" name="attendanceForm" class="standardForm" id="attendanceForm">
+    <table class="ruler">
+        <tr>
+            <th>&nbsp;</th>
+            <th>Surname</th>
+            <th>Preferred Name</th>
+            <th>Attend</th>
+            <th>Absence Code</th>
+            <th>Reason</th>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td><input type="submit" name="submit" value="Save" class="btn"/>
+            </td>
+        <!-- BEGIN student_list -->
+        <tr>
+        	<td><img src="/search/portrait.php?id={SYNERGYID}&height=80&width=60" /></td>
+            <td>{SURNAME}</td>
+            <td>{FIRSTNAME}</td>
+            <td><input type="checkbox" name="{ATTENDNAME}" value="1" class="formfield" {ATTENDED} /></td>
+            <td><select name="{ABSCODENAME}" class="formfield">
+                    {ABSCODE}
+              
+                </select></td>
+            <td><input type="text" name="{REASONNAME}" class="formfield" value="{REASON}" />
+                <input type="hidden" name="{STUDNAME}" value="{STUDCODE}" />
+            </td>
+        </tr>
+        <!-- END student_list -->
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <input type="hidden" name="pernum" value="{PERNUMBER}" />
+                <input type="hidden" name="daynum" value="{DAYNUMBER}" />
+                <input type="hidden" name="subcode" value="{SUBCODE}" />
+                <input type="submit" name="submit" value="Save" class="btn"/>
+            </td>
+        </tr>
+    </table>
+</form>

@@ -1,0 +1,50 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+$j(document).ready(function() {
+    $j('.greenCheck').click(function() {
+        if ($j(this).attr('checked')) {
+            var data = {
+                join: $j(this).attr('rel')
+            }
+
+            $j(this).attr('checked', true);
+        }
+        else {
+            var data = {
+                leave: $j(this).attr('rel')
+            }
+
+            $j(this).attr('checked', false);
+        }
+
+        $j.get('/group/joinForm.php', data);
+    });
+});
+</script>
+
+<!-- END custom_head -->
+<h1>Manage Groups</h1>
+<h2>Free Access</h2>
+<div class="indent">
+  <p>These groups are free to join. Once you have selected the group you will have access to the content available in the group</p>
+  <ul>
+    <!-- BEGIN free_list -->
+    <li>
+        <input class="greenCheck" type="checkbox" rel="{GROUP_ID}" {GROUP_CHECKED} /> {GROUP_NAME}
+    </li>
+    <!-- END free_list -->
+  </ul>
+</div>
+<h2>Moderated Access </h2>
+<div class="indent">
+  <p>These groups are moderated. Once you have selected the group you must wait for the group admin to authorise your application. </p>
+  <ul>
+    <!-- BEGIN moderated_list -->
+    <li>
+        <input class="greenCheck" type="checkbox" rel="{GROUP_ID}" {GROUP_CHECKED} /> {GROUP_NAME}
+    </li>
+    <!-- BEGIN waiting -->
+    <em>(Waiting on authorisation)</em><!-- END waiting --></li>
+    <!-- END moderated_list -->
+  </ul>
+</div>

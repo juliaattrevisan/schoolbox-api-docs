@@ -1,0 +1,22 @@
+<h2>News <!-- BEGIN count -->({NEWS_DISP_COUNT} / {NEWS_COUNT})<!-- END count --></h2>
+<!-- BEGIN news -->
+<div class="search-item">
+    <img src="images/icons/60x60/news.png" />
+	<div class="search-details">
+    <h3><a href="/homepage/newsArchive/{NEWS_CODE}#{NEWS_ID}">{NEWS_HEADING}</a></h3>
+    <p>{NEWS_BODY}</p>
+    <p class="search-sml">Written by <a href="/search/user/{NEWS_OWNER}">{NEWS_OWNER_NAME}</a> {NEWS_CREATED}</p>
+    <p class="search-sml">{NEWS_BREADCRUMB}</p>
+    </div>
+  	<div class="search-functions">
+    </div>
+
+<div class="float-fix"></div>
+</div>
+<!-- END news -->
+<div class="pagination">
+    <!-- BEGIN pagination -->
+    <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
+    <!-- END pagination -->
+</div>
+

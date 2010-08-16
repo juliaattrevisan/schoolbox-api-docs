@@ -1,0 +1,40 @@
+<div class="box" id="component{COMPONENT_ID}">
+  <h2>Drop Box</h2>
+  <div class="text listing">
+  <!-- BEGIN drop_student -->
+
+  <form action="/subject/modDropBox.php" method="post" enctype="multipart/form-data" class="dropBox" >
+    <!-- BEGIN drop_success -->
+    <fieldset>
+    <p class="icons success">File upload completed successfully.</p>
+    </fieldset>
+    <!-- END drop_success -->    
+    <fieldset>
+   	<h3>Description</h3>
+    <input name="description" type="text" /><input type="hidden" name="category" value="{ID}" />
+    </fieldset>
+    <fieldset>
+    <h3>File</h3>
+    <input name="file" type="file" />
+    </fieldset>
+    <fieldset class="submit">
+    <input type="submit" name="submit" value="Upload" />
+    </fieldset>
+  </form>
+  <!-- END drop_student -->
+  <!-- BEGIN drop_staff -->
+  <ul>
+    <!-- BEGIN drop_file -->
+    <li class="{ON_OFF}">
+      <h4 class="icons {DROPBOX_MIME_IMAGE}"><a href="/subject/modDropBox.php?id={DROPBOX_ID}">{DROPBOX_DESCRIPTION}</a></h4>
+      <p class="interact"><a href="/subject/modDropBox.php?delete={DROPBOX_ID}">Delete</a></p>
+      <div class="float-fix"></div>
+      <p class="small">By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}</p>
+      <div class="float-fix"></div>
+    </li>
+    <!-- END drop_file -->
+  </ul>
+  <!-- END drop_staff -->
+  <div class="float-fix"></div>
+  </div>
+</div>

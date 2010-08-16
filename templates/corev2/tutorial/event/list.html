@@ -1,0 +1,78 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.tablerow.js"></script>
+<style type="text/css">
+.cancelled td {
+	text-decoration: line-through;
+}
+.passed td {
+	opacity: 0.5;
+}
+#content table th {
+	background: transparent;
+}
+th.over {
+	text-decoration: underline;
+}
+th.desc {
+	text-decoration: underline;
+	background: url(/images/tutorial/down-arrow.gif) no-repeat 100% 60% !important;
+	}
+th.asc {
+	text-decoration: underline;
+	background: url(/images/tutorial/up-arrow.gif) no-repeat 100% 60% !important;
+	}
+</style>
+<!-- END custom_head -->
+
+<h1>Tutorial List {USER_NAME}</h1>
+
+<span class="header_option">
+<a href="/modules/tutorial/export/event.php?{USER_URL}">Export CSV</a>
+<!-- BEGIN add_link --> |
+<a href="/modules/tutorial/event/modify.php">Add Tutorial</a><!-- END add_link -->
+</span>
+
+<h1>{SHOW} Events</h1>
+
+<span class="header_option">
+View <a href="/modules/tutorial/event/list.php?{USER_URL}">Week</a> | <a href="/modules/tutorial/event/list.php?show=semester&amp;{USER_URL}">Semester</a> 
+</span>
+
+<!-- BEGIN has_events -->
+<table class="row_hover">
+  <thead>
+  <tr>
+    <th class="{CLASS_DATE}"><a href="/modules/tutorial/event/list.php?show={SHOW}&amp;order=date&amp;dir={DIR_DATE}&amp;{USER_URL}">Day</a></th>
+    <th class="{CLASS_NAME}"><a href="/modules/tutorial/event/list.php?show={SHOW}&amp;order=name&amp;dir={DIR_NAME}&amp;{USER_URL}">Tutorial</a></th>
+    <th class="{CLASS_START}"><a href="/modules/tutorial/event/list.php?show={SHOW}&amp;order=start&amp;dir={DIR_START}&amp;{USER_URL}">From</a></th>
+    <th class="{CLASS_FINISH}"><a href="/modules/tutorial/event/list.php?show={SHOW}&amp;order=finish&amp;dir={DIR_FINISH}&amp;{USER_URL}">To</a></th>
+    <th class="{CLASS_LOCATION}"><a href="/modules/tutorial/event/list.php?show={SHOW}&amp;order=location&amp;dir={DIR_LOCATION}&amp;{USER_URL}">Location</a></th>
+    <th class="{CLASS_CODE}"><a href="/modules/tutorial/event/list.php?show={SHOW}&amp;order=code&amp;dir={DIR_CODE}&amp;{USER_URL}">Code</a></th>
+    <th class="{CLASS_TYPENAME}"><a href="/modules/tutorial/event/list.php?show={SHOW}&amp;order=typeName&amp;dir={DIR_TYPENAME}&amp;{USER_URL}">Type</a></th>
+    <th class="{CLASS_TUTORNAME1}"><a href="/modules/tutorial/event/list.php?show={SHOW}&amp;order=tutorName1&amp;dir={DIR_TUTORNAME1}&amp;{USER_URL}">Tutors</a></th>
+    <!-- BEGIN modify_title -->
+    <th>Modify</th>
+    <th>Delete</th><!-- END modify_title -->
+  </tr>
+  </thead>
+  <tbody>
+  <!-- BEGIN event_list -->
+  <tr class="{PASSED} {CANCELLED} {ON_OFF}">
+    <td>{DATE}</td>
+    <td>{NAME}</td>
+    <td>{START}</td>
+    <td>{FINISH}</td>
+    <td>{LOCATION}</td>
+    <td>{CODE}</td>
+    <td>{TYPE}</td>
+    <td>{TUTORS}</td>
+    <!-- BEGIN modify_link -->
+    <td><a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}">Modify</a></td>
+    <td><a href="/modules/tutorial/event/modifyForm.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?');">Delete</a></td><!-- END modify_link -->
+    
+  </tr><!-- END event_list -->
+  </tbody>
+</table>
+<!-- END has_events -->
+
+

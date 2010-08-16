@@ -1,0 +1,15 @@
+<div class="box" id="component{COMPONENT_ID}">
+  <h2>Group Managers</h2>
+  <div class="text listing">
+  	<ul>
+    	<!-- BEGIN staff_members -->
+      <li class="{ON_OFF}">{MEMBER_NAME}</li>
+      <!-- END staff_members -->
+    </ul>
+  </div>
+  <form action="/mail/createMail.php" method="post" name="form2">
+      <input type="hidden" name="replyto" value="{HEADING} &lt;{REPLYTO}&gt;" />
+      <input type="hidden" name="bcc" value="{EMAILALL}" />
+      <input class="emailall" type="submit" name="emailall" value="Email all" />
+    </form>
+</div>

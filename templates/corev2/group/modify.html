@@ -1,0 +1,202 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<script type="text/javascript">
+$j(document).ready(function() {
+    $j('.greenCheck').click(function() {
+        if ($j(this).attr('checked')) {
+            var data = {
+                categoryID: '{CATEGORY_ID}',
+                userID: $j(this).attr('rel'),
+                write: 1
+            }
+
+            $j(this).attr('checked', true);
+        }
+        else {
+            var data = {
+                categoryID: '{CATEGORY_ID}',
+                userID: $j(this).attr('rel'),
+                write: 2
+            }
+
+            $j(this).attr('checked', false);
+        }
+
+        $j.get('/group/modifyForm.php', data);
+    });
+});
+</script>
+<script type="text/javascript">
+<!--
+$j(document).ready(function () {
+	$j('#addUser').autocomplete({
+		serviceUrl: '/ajax/user.php?groupID=0',
+		minChars: 2,
+		maxHeight: 400,
+		width: $j('#addUser').width(),
+		onSelect: function (value, data) {
+			$j('#userID').val(data);
+			return false;
+		}
+	});
+	
+	$j('#type_form input').each(function () {
+		$j(this).click(function () {
+			$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', type: $j(this).val()});
+		});
+	});
+
+    /*
+	$j('img.greenCheck').each(function () {
+		$j(this).click(function () {
+			if ($j(this).attr('src').indexOf('greentick') != -1) {
+				$j(this).attr('src', '/images/emptybox.gif');
+				$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', userID: $j(this).attr('rel'), write: 1});
+			} else {
+				$j(this).attr('src', '/images/greentick.gif');
+				$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', userID: $j(this).attr('rel'), write: 2});
+			}		
+		});
+		$j(this).css('cursor','pointer');
+	});
+    */
+	
+	$j('input.checkAll').each(function () {
+		$j(this).mouseup(function () {
+			var node = $j(this);
+			$j("input." + $j(this).attr("id")).each(function () {
+				
+				$j(this).attr("checked",  !(node.attr("checked")));
+			});			
+		});
+	});
+	
+	$j('#deleteButton').click(function () {
+		if (confirm('Delete all selected users?')) 
+			$j('#deleteForm').submit();
+	});
+	
+	
+});
+/*
+window.addEvent('domready', function () {
+	new Autocompleter.Ajax.Json($('addUser'), '/ajax/user.php?groupID=0', {
+		minLength: 2,
+		postVar: 'keyword',
+		width: 400,
+		selectFirst: true,
+		useSelection: false
+	});
+
+
+
+});
+*/
+-->
+</script>
+<style type="text/css">
+.checkAll, .delCheck, .acceptCheck {
+	position: relative;
+	top: 3px;
+}
+</style>
+<!-- END custom_head -->
+<h1>User Group Maintenance - {CATEGORY_NAME} <a class="customise" href="/homepage/{CATEGORY_ID}">Return to Homepage</a></h1>
+
+<div class="standardForm">
+  <table>
+    <tr>
+      <td class="formLabelWidth"><h3>Group Admin</h3></td>
+      <td><a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a><br />
+        </td>
+    </tr>
+    <tr>
+      <td valign="top"><h3>Add users</h3>
+        <em>You may add users individually by typing their name and selecting from the list.  Alternatively you can add many users via a list of synergetic id's or usernames.</em></td>
+      <td><form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" method="post">
+          <p>
+          <input id="addUser" type="text" size="30" />
+          <input type="hidden" name="userID" id="userID" />
+          <input type="submit" value="Add User" class="btn" />
+        	</p>
+        </form>
+        <a href="/group/bulk/{CATEGORY_ID}">Add Bulk Members</a></td>
+    </tr>
+    <tr>
+      <td valign="top"><h3>Access Type</h3>
+        <em>Restricted groups are private and only administrated by the group admin. Users may request access to moderated groups but only be granted by the group admin.  Free groups can be joined and left by anyone.  See the <a href="/group/join">group page</a> for available groups.</em> </td>
+      <td><form action="" method="post" id="type_form">
+          <input name="type" type="radio" value="1" {GROUP_TYPE_1} />
+          Restricted <br />
+          <input name="type" type="radio" value="2" {GROUP_TYPE_2} />
+          Moderated<br />
+          <input name="type" type="radio" value="3" {GROUP_TYPE_3} />
+          Free
+        </form></td>
+    </tr>
+    <tr>
+      <td valign="top"><h3>Members</h3>
+        <em>You can give write access to any member of the group, this will enable them to post resources and moderate the forum.  Only one user may be the group admin and it cannot be a student.  Making another user the group admin will relinquish your control over the group.</em></td>
+      <td><form action="/group/modifyForm.php" method="post" id="deleteForm">
+          <table>
+            <tr>
+              <th style="width: 20px; text-align: center;"><input type="checkbox" class="checkAll" id="delCheck" /></th>
+              <th>Name</th>
+              <th style="text-align: center;">Write</th>
+              <th style="text-align: center;">Delete</th>
+              <th style="text-align: center; white-space: nowrap;">Make Admin </th>
+            </tr>
+            <!-- BEGIN member -->
+            <tr>
+              <td style="text-align: center;"><input class="delCheck" type="checkbox" name="delete[]" value="{USER_ID}"  /></td>
+              <td style="white-space: nowrap;"><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
+              <td style="text-align: center;">
+                    <input class="greenCheck" type="checkbox" rel="{USER_ID}" {GROUP_CHECKED} />
+              </td>
+              <td style="text-align: center;"><a href="/group/modifyForm.php?delete={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Remove {USER_JAVA}?');">Delete</a></td>
+              <td style="text-align: center; white-space: nowrap;"><!-- BEGIN make_owner -->
+                <a href="/group/modifyForm.php?owner={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Promote {USER_JAVA} to group admin?');">Make Admin</a>
+                <!-- END make_owner --></td>
+            </tr>
+            <!-- END member -->
+          </table>
+          <p>
+            <input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
+            <input type="button" id="deleteButton" value="Delete Selected" class="btn" />
+          </p>
+        </form></td>
+    </tr>
+    <!-- BEGIN authorisation -->
+    <tr>
+      <td><h3>Awaiting Authorisation</h3>
+        <em>These users are currently awaiting your authorisation to join this group</em></td>
+      <td><form action="/group/modifyForm.php" method="post" id="acceptForm">
+      <table>
+          <tr>
+            <th style="width: 20px; text-align: center;"><input type="checkbox" class="checkAll" id="acceptCheck" /></th>
+            <th>Name</th>
+            <th style="text-align: center;">Add</th>
+          </tr>
+          <!-- BEGIN waiting -->
+          <tr>
+            <td style="text-align: center;"><input class="acceptCheck" type="checkbox" name="accept[]" value="{WAITING_ID}" /></td>
+            <td><a href="/search/userLookup.php?id={WAITING_ID}">{WAITING_NAME}</a></td>
+            <td style="text-align: center;"><a href="/group/modifyForm.php?accept={WAITING_ID}&categoryID={CATEGORY_ID}">Add</a></td>
+          </tr>
+          <!-- END waiting -->
+        </table>
+          <p>
+            <input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
+            <input type="submit" value="Accept Selected" class="btn" />
+          </p>
+        </form>
+        </td>
+    </tr>
+    <!-- END authorisation -->
+        <tr><td valign="top"><h3>Disband Group</h3>
+    <em>Removes all members of the group including admin, but leaves all content</td>
+    <td><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" onclick="return confirm('Disband this group?');">Disband Now</a></td>
+    </tr>
+  </table>
+</div>
