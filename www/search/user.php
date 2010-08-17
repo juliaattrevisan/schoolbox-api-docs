@@ -69,10 +69,16 @@ if(is_numeric($this->arg[0])) {
 	//Format email address link
 	$emailAddress = formatEmail($user);
 	if($emailAddress) {
-			if(SITE_location == 'wenona')
-				$email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">Send Email</a>";
-			else
-				$email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$emailAddress</a>";
+            //Dont display emails of students to parents
+            if($groupHandler->isStudent($user['uid']) && $groupHandler->isParent()) {
+                $email = '';
+            }
+            else {
+                if(SITE_location == 'wenona')
+                    $email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">Send Email</a>";
+                else
+                    $email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$emailAddress</a>";
+            }
 	}
 	
 	

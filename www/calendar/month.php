@@ -79,6 +79,13 @@ for ($i = 0; $i < $totalDays; $i++) {
 					"ON_OFF"	=> !($day%2) ? 'dark' : '',
 					);
 
+    if(date("d-m-Y", $selectedDate) == date("d-m-Y", $currentDay))
+        $this->setVar("MONTABLE_CSS", "calTableSelected");
+    else if(date("d-m-Y", $currentDay) == date("d-m-Y"))
+        $this->setVar("MONTABLE_CSS", "calTableCurrent");
+    else
+        $this->setVar("MONTABLE_CSS", "calTable");
+
 	$this->setVar($output);
 	
 	

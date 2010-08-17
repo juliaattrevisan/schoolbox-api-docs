@@ -280,9 +280,9 @@ class SitePage extends Page {
                 ($this->site == 'wenona' && $this->groupHandler->isStaff()) ||
                 $this->site == 'ormond' ||
                 $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] ==  7 || $_SESSION['gid'] == '8' )  ||
-                $this->site == 'joeys')
+                $this->site == 'joeys'
+                )
 		{
-			
 			if($this->site == 'mgs' || $this->site == 'grimwade')
 			{
 				if($this->groupHandler->isStaff())
@@ -321,6 +321,9 @@ class SitePage extends Page {
 			}
             else if($this->site == 'joeys') {
                 $this->setVar('WEBMAIL_LOCATION', 'href="http://webmail/" rel="external"');
+            }
+            else if($this->site == 'mggs') {
+                $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.mggs.vic.edu.au" rel="external"');
             }
 
 			$this->parse('wm_tab','webmail_tab');
