@@ -17,20 +17,6 @@
             </script>
 
       <div id="calendar">
-	  	  <center>
-          <table id="month-nav">
-            <tr>
-              <td>
-            <!-- BEGIN month_drop -->
-            <!-- END month_drop -->
-            <!-- BEGIN year_drop -->
-            <!-- END year_drop -->
-            <!-- BEGIN week_block -->
-            <!-- END week_block -->
-              </td>
-            </tr>
-          </table>
-      </center>
 
 	  	<table cellpadding="0" class="{MONTABLE_CSS}" cellspacing="0" width="98%">
 			<tr>
@@ -40,7 +26,7 @@
 					<a class="forward" href="/calendar/week/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a>
 				</td>
 				
-				<td colspan="3"><h3>{WEEK} {MONTH}</h3></td>
+				<td colspan="3"><h3>{MONTH}</h3></td>
 				
 				<td colspan="2"class="cal-right">
 					<a class="customise" href="#">Week</a><a class="customise week" href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}">Month</a>
@@ -52,7 +38,7 @@
 			<tr>
 				<td class="day-block">
 					<div class="dayWrap">
-						<p>{DATE}</p>
+						<p class="day-num">{DATE}</p>
 						<p class="header_option">{ADD}</p>
 					   <div class='float-fix'></div>
 					</div> 
