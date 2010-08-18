@@ -1,0 +1,77 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+$j(document).ready(function () {
+	$j('.lookup').each(function () {
+		var node = $j(this);
+		
+		$j(this).autocomplete({
+			serviceUrl: '/ajax/user.php?groupID=0',
+			minChars: 2,
+			maxHeight: 400,
+			width: node.width(),
+			onSelect: function (value, data) {
+				node.parents("form:first").children("input.userID").val(data);
+				return false;
+			}
+		});
+	});
+
+});
+
+</script>
+<!-- END custom_head -->
+<h1>Class list - {EVENT_NAME}</h1>
+<span class="header_option"><a href="/modules/tutorial/attendance/list.php?week={WEEK}" title="Attendance history">Mark Attendance</a> | 
+<a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}" title="Modify Event">Modify</a> | 
+<a href="/modules/tutorial/event/modify.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?')" title="Delete Event">Delete</a></span>
+<!-- BEGIN has_enrolments -->
+<table class="ruler">
+  <thead>
+    <tr>
+      <th style="width: 60px;">Remove</th>
+      <th>Student</th>
+      <!-- BEGIN date_list -->
+      <th>{DATE}</th><!-- END date_list -->
+      <th style="text-align: right;">Attendance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- BEGIN enrolment_list -->
+    <tr class="{ON_OFF}">
+      <td style="text-align: center;">
+      <!-- BEGIN remove -->
+      <a href="/modules/tutorial/enrolment/modifyForm.php?delete={STUDENT_ID}&eventID={EVENT_ID}" onclick="return confirm('Delete student from classlist?');">
+      <img src="/images/famicons/delete.png" /></a><!-- END remove -->
+      <!-- BEGIN remove_grey -->
+            <img src="/images/tutorial/enrolment-delete-grey.gif" title="You cannot remove attendance" alt="" /><!-- END remove_grey -->
+      </td>
+      <td><a href="/search/user/{STUDENT_ID}">{STUDENT_NAME}</a></td>
+      <!-- BEGIN attendance_list -->
+      <td>
+      	<!-- BEGIN image -->
+        <img src="/images/tutorial/{ATTENDANCE}.gif" title="{REASON}" /><!-- END image --></td><!-- END attendance_list -->
+      <td style="text-align: right;">{PERCENTAGE}</td>
+    </tr>
+    <!-- END enrolment_list -->
+  </tbody>
+</table>
+<!-- END has_enrolments -->
+
+
+<form action="/mail/createMail.php" method="post" class="float-right" style="padding: 10px;">
+  <input type="hidden" name="replyto" value="{EVENT_NAME} &lt;{REPLY_TO}&gt;" />
+  <input type="hidden" name="bcc" value="{EMAIL_ALL}" />
+  <input class="emailall" type="submit" name="emailall" value="Email all" />
+</form>
+
+
+<form action="/modules/tutorial/enrolment/modifyForm.php" method="post" class="standardForm">
+  <input class="lookup" type="text" name="keyword" />
+  <input type="hidden" name="userID" class="userID" />
+  <input type="hidden" name="eventID" value="{EVENT_ID}" />
+  <input type="submit" value="Add Student" class="btn" />
+</form>
+

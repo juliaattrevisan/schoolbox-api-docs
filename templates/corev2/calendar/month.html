@@ -1,0 +1,76 @@
+			<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+      <link rel="stylesheet" type="text/css" href="/css/core/ui/ui.css" />
+			<script type="text/javascript">
+      $j(function () {
+        /* date picker */		 
+        $j('.datepicker').datepicker({ 
+          dateFormat: 'dd-mm-yy',
+          onSelect: function(dateText, inst) {window.open('/calendar/month/'+dateText, "_self")},
+          defaultDate: $j.datepicker.parseDate("dd-mm-yy", "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"),
+					showOn: 'button',
+					buttonImage: '/css/core/ui/images/calendar-icon.gif',
+					buttonImageOnly: true,
+					showAnim: 'slideDown'
+        });
+
+      });
+      </script>
+     <div id="calendar">
+	  <center>
+          <table id="month-nav">
+            <tr>
+              <td>
+                  <!-- BEGIN month_drop -->
+                  <!-- END month_drop -->              
+                  <!-- BEGIN year_drop -->
+                  <!-- END year_drop -->
+              </td>
+            </tr>
+          </table>
+      </center>
+      
+     
+      <table id="month-view" cellpadding="0" cellspacing="0">
+      	<thead>
+		<tr>
+			<td colspan="2" class="cal-left" valign="baseline">
+				<a class="back" href="/calendar/month/{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a>
+				<div class="datepicker-box"><input type="hidden" class="datepicker" /></div>
+				<a class="forward" href="/calendar/month/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a>
+			</td>
+			
+			<td colspan="3"><h3>{MONTH} {YEAR}</h3></td>
+			
+			<td colspan="2" class="cal-right" valign="baseline"><a class="customise week" href="/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}">Week</a><a class="customise" href="#">Month</a></td></tr>
+      	<tr>
+        	<td class="dark border-left">Sun</td>
+            <td class="dark">Mon</td>
+            <td class="dark">Tue</td>
+            <td class="dark">Wed</td>
+            <td class="dark">Thu</td>
+            <td class="dark">Fri</td>
+            <td class="dark">Sat</td>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- BEGIN month_week -->
+        <tr class="month-week">
+        	<!-- BEGIN day_block -->
+        	<td class="day-block {OTHER_MONTH} {MONTABLE_CSS}">
+            <div class="dayWrap">
+              <p class="header_option">{ADD}</p>
+              <p class="day-num">{DATE}</p>
+            <div class='float-fix'></div>
+            </div> 
+            <div class="noteWrap">
+              <!-- BEGIN note_block -->
+              <p style="background-color:{COLOUR};">{MODIFY_START}{TIME} {NOTE}{MODIFY_END}</p>
+              <!-- END note_block -->
+            </div>
+          </td>
+        	<!-- END day_block -->
+        </tr>
+        <!-- END month_week -->
+        </tbody>
+      </table>
+</div>

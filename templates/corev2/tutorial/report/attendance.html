@@ -1,0 +1,61 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
+<script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
+<!-- END custom_head -->
+<h1>Uncompleted Attendance</h1>
+<form action="/modules/tutorial/report/attendance.php" method="get">
+  <table style="width: 600px;">
+    <tr>
+      <td>From:</td>
+      <td><input name="from" id="from" type="text" size="15" maxlength="10" value="{FROM}"/>
+        <img src="/images/ico_calendar.gif" width="16" height="13" id="from_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+        <script type="text/javascript">
+		Calendar.setup({
+			inputField     :    "from",     // id of the input field
+			ifFormat       :    "%d/%m/%Y",      // format of the input field
+			button         :    "from_trigger",  // trigger for the calendar (button ID)
+			align          :    "br",           // alignment (defaults to "Bl")
+			singleClick    :    true
+		});
+		</script></td>
+      <td>To:</td>
+      <td><input name="to" id="to" type="text" size="15" maxlength="10" value="{TO}"/>
+        <img src="/images/ico_calendar.gif" width="16" height="13" id="to_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+        <script type="text/javascript">
+		Calendar.setup({
+			inputField     :    "to",     // id of the input field
+			ifFormat       :    "%d/%m/%Y",      // format of the input field
+			button         :    "to_trigger",  // trigger for the calendar (button ID)
+			align          :    "br",           // alignment (defaults to "Bl")
+			singleClick    :    true
+		});
+		</script></td>
+      <td><input type="submit" name="submit" value="Report" /></td>
+    </tr>
+  </table>
+</form>
+<!-- BEGIN has_events -->
+<hr />
+<table>
+  <tr>
+    <th>Primary</th>
+    <th>Secondary</th>
+    <th>Date</th>
+    <th>Tutorial</th>
+    <th>Code</th>
+  	<th>Type</th>
+  </tr>
+  <!-- BEGIN event_list -->
+  <tr class="{ON_OFF}">
+    <td><a href="/search/user/{TUTOR1_ID}">{TUTOR1}</a></td>
+    <td><a href="/search/user/{TUTOR2_ID}">{TUTOR2}</a></td>
+    <td>{DATE}</td>
+    <td><a href="/modules/tutorial/enrolment/list.php?eventID={EVENT_ID}">{NAME}</a></td>
+    <td>{CODE}</td>
+    <td>{TYPE}</td>
+  </tr>
+  <!-- END event_list -->
+</table>
+<!-- END has_events -->
