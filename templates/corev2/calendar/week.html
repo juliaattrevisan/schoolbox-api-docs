@@ -1,4 +1,5 @@
-      			<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
             <link rel="stylesheet" type="text/css" href="/css/core/ui/ui.css" />
             <script type="text/javascript">
       $j(function () {
@@ -14,7 +15,8 @@
         });
 
       });
-            </script>
+</script>
+<!-- END custom_head -->
 
       <div id="calendar">
 
@@ -33,9 +35,11 @@
 				</td>
 			</tr>
 		</table>
-		<!-- BEGIN day_block -->
+		
 		<table id="week-view" class="{MONTABLE_CSS}" cellpadding="0" cellspacing="0">
-			<tr>
+			
+            <tr>
+                <!-- BEGIN day_header -->
 				<td class="day-block">
 					<div class="dayWrap">
 						<p class="day-num">{DATE}</p>
@@ -43,8 +47,13 @@
 					   <div class='float-fix'></div>
 					</div> 
 				</td>
+                <!-- END day_header -->
 			</tr>
+            
+            
 			<tr>
+
+                <!-- BEGIN day_block -->
 				<td class="noteWrap">
 					<!-- BEGIN note_block -->
 					<!-- BEGIN time -->
@@ -53,7 +62,9 @@
 					<p style="background-color:{COLOUR};">{NOTE}<span class="modify">{MODIFY}</span></p>
 					<!-- END note_block -->
 				</td>
+                <!-- END day_block -->
 			</tr>
+            
 		</table>
-		<!-- END day_block -->
+		
       </div>
