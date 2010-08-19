@@ -1,0 +1,148 @@
+<?php
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
+
+class ePortfolioLink extends Model {
+
+    /**
+     *
+     */
+	function ePortfolioLink() {
+		$this->_table = "eportfolio_link";
+		$this->_index = "id";
+		
+		parent::Model();
+	}
+
+    /**
+     * Gets an eportfolio link record
+     */
+	function getByID($linkID) {
+		$query = "SELECT l.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName,
+						UNIX_TIMESTAMP(l.submitted) submitted
+				  FROM eportfolio_link l
+				  LEFT JOIN user u ON u.id = l.owner
+				  WHERE l.id = $linkID";
+
+		return $this->db->getRow($query);
+	}
+
+    /**
+     * Gets all the links owned by $userID
+     * 
+     * @param <type> $userID
+     * @param <type> $config
+     * @return <type>
+     */
+	function getAllInUser($userID, $config = false) {
+		$query = "SELECT l.*, u.firstname, u.lastname, u.title, UNIX_TIMESTAMP(submitted) submitted, 'html_alt1' iconFile
+				  FROM eportfolio_link l
+				  LEFT JOIN user u ON u.id = l.owner
+				  WHERE owner = '$userID'";
+
+//		if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS)
+//			$query .= " AND l.hidden = 0";
+
+		$sortFields = array('Name' => 'l.description', 'Date' => 'l.submitted');
+		$config['sort'] = isset($sortFields[$config['sort']]) ? $config['sort'] : 'Name';
+		$config['sortdir'] = strtoupper($config['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
+
+		$query .= " ORDER BY " . $sortFields[$config['sort']] . " " . $config['sortdir'];
+		
+		if ($config['size'] > 0) {
+			$query .= " LIMIT 0, " . $config['size'];
+        }
+
+		return $this->db->getAll($query);
+	}
+	
+	function appendHTTP($url) {
+		if( strncasecmp($url,"http://", 7) && strncasecmp($url, "https://", 8) )
+			$url = "http://".$url;
+		return $url;
+	}
+	
+	function logAction ($linkID, $action) {
+		$logEntry = array(	'object'	=> 'link',
+							'objectId'	=> $linkID,
+							'action'	=> $action,
+							'user'		=> $_SESSION['id'],
+							);
+		
+		$this->db->insert('cmsLog', $logEntry);
+	}
+	
+	function update($data) {
+
+        if(isset($data['url'])) 
+            $data['url'] = $this->appendHTTP(trim($data['url']));
+		
+		parent::update($data);
+		
+		/* Update log entry */
+		$this->logAction($data[$this->_index], 'modify');
+	
+	}
+	
+	function create($data) {
+		
+		$data['submitted'] = 'NOW()';
+		$data['url'] = $this->appendHTTP(trim($data['url']));
+		
+		$linkID = parent::create($data);
+		
+		/* Insert log entry */
+		$this->logAction($linkID, 'create');
+		
+		return $linkID;
+	}
+	
+	function delete($id) {
+		
+		parent::delete($id);
+	
+		/* Delete log entry */
+		$this->logAction($id, 'delete');
+	
+	}
+        
+        function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+            $keyword = scrubText($keyword);
+
+            $query = "SELECT `link`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
+                            MATCH(`url`,`description`,`comment`) AGAINST ('$keyword') AS `score`
+                        FROM `link`
+                        LEFT JOIN `user` ON `link`.owner = `user`.id
+                        LEFT JOIN `perms` ON `link`.category = `perms`.cid
+                            AND `perms`.gid = {$_SESSION['gid']}
+                            AND `perms`.type > 0
+                        LEFT JOIN `userAccess` ON `link`.category = `userAccess`.sid
+                            AND `userAccess`.service = 1
+                            AND `userAccess`.uid = {$_SESSION['id']}
+                        WHERE (`perms`.cid OR `userAccess`.sid)
+                            AND MATCH(`url`,`description`,`comment`) AGAINST ('$keyword')
+                            AND `hidden` = FALSE
+                        ORDER BY `$sort_by` $sort_dir
+                        LIMIT $offset, $limit;
+            ";
+
+            $count_query = "SELECT COUNT(*)
+                            FROM `link`
+                            LEFT JOIN `user` ON `link`.owner = `user`.id
+                            LEFT JOIN `perms` ON `link`.category = `perms`.cid
+                                AND `perms`.gid = {$_SESSION['gid']}
+                                AND `perms`.type > 0
+                            LEFT JOIN `userAccess` ON `link`.category = `userAccess`.sid
+                                AND `userAccess`.service = 1
+                                AND `userAccess`.uid = {$_SESSION['id']}
+                            WHERE (`perms`.cid OR `userAccess`.sid)
+                                AND MATCH(`url`,`description`,`comment`) AGAINST ('$keyword')
+                                AND `hidden` = FALSE
+            ";
+
+            $count = $this->db->getOne($count_query);
+
+            return $this->db->getAll($query);
+        }
+}
+?>

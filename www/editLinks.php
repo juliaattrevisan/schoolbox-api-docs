@@ -69,7 +69,25 @@ class EditMyLinks
 		
 		$db->query($query);
 	}
-	
+
+    /**
+     * Share a link in your ePortfolio
+     * 
+     * @param <type> $id
+     */
+    function shareLink($id) {
+		$db = new dbManager;
+		$db->dbConnect();
+
+		$query = "SELECT * FROM bookmarks WHERE id = '$id' AND owner = '".$_SESSION['id']."'";
+
+		$link = $db->getRow($query);
+
+        $query = "INSERT INTO eportfolio_link (owner, url, submitted, description)
+                  VALUES ('$_SESSION[id]', \"$link[url]\", NOW(), \"$link[description]\")";
+
+        $link = $db->query($query);
+    }
 
 	function showPage()
         {
@@ -93,6 +111,9 @@ if(isset($_POST['url']) && $_POST['url'] && isset($_POST['description']) && $_PO
 else if(isset($_GET['delete']) && $_GET['delete'])
 {
 	$page->deleteLink($_GET['delete']);
+}
+else if (isset($_GET['share']) && $_GET['share']) {
+    $page->shareLink($_GET['share']);
 }
 
 $page->showPage();

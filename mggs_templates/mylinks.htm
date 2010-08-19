@@ -112,20 +112,21 @@
 					<th title="e.g. http://www.yahoo.com.au">Hyperlink</th>
 					<th title="e.g. Yahoo Search Directory">Name</th>
 					<th class="cntr">Modify</th>
+                    <th class="cntr">Share on ePortfolio</th>
 				  </tr>
 				  <!-- BEGIN link_block -->
 				  <tr> 
 					<td>{URL}</td>
 					<td>{DESC}</td>
 					<td class="cntr"><a href="/editLinks.php?delete={ID}">delete</a></td>
+                    <td class="cntr"><a href="/editLinks.php?share={ID}">share</a></td>
 				  </tr>
 				  <!-- END link_block -->
 				  <tr> 
-					
 					<td width="38%"><input name="url" type="text" id="url" /></td>
 					<td><input name="description" type="text" id="description" /></td>
-					<td class="cntr"><input type="submit" name="submit" value="Add" class="btn" /></td>
-					
+                    <td></td>
+                    <td class="cntr"><input type="submit" name="submit" value="Add" class="btn" /></td>
 				  </tr>
 				</table>
 				</div>
