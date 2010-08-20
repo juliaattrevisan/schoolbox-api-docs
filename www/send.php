@@ -32,9 +32,20 @@ if(is_numeric($_GET['id']))
 			$file = $myFileHandler->getByID($_GET['id']);
 			if(!is_array($file))
 				error(41);
-				
-			if($file['owner'] != $_SESSION['id'])
-				error(5);
+
+            if ($_GET['published']) {
+                require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio.php');
+
+                $eportfolioHandler = new ePortfolio($file['owner']);
+
+                if (!$eportfolioHandler->canEdit($file['owner'])) {
+                    error(5);
+                }
+            }
+            else {
+                if($file['owner'] != $_SESSION['id'])
+                    error(5);
+            }
 			
 			$filename = MYFILE_directory ."/". $file['id'] . ".dat";
 		}

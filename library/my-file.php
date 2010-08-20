@@ -17,6 +17,19 @@ class MyFile extends Model {
 		parent::Model();
 	}
 
+    /**
+     * Gets all the published files for the specified user.
+     * 
+     * @return <type>
+     */
+    function getAllPublished() {
+        $query = "SELECT f.*, UNIX_TIMESTAMP(f.submitted) submitted, UNIX_TIMESTAMP(f.published) published, af.iconFile FROM ".$this->_table." f
+				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
+				  WHERE owner = " . $this->owner . " AND published IS NOT NULL AND deleted = 0";
+
+        return $this->db->getAll($query);
+    }
+
 	function getAllInFolder($folderID) {
 		$query = "SELECT f.*, UNIX_TIMESTAMP(f.submitted) submitted, af.iconFile FROM ".$this->_table." f
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime

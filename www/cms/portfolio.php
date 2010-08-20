@@ -112,6 +112,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 						'FILE_SIZE'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
 						'FOLDER_ID'		=> $file['parent'],
 						'CLASS'			=> implode(" ", $class),
+                        'PUBISHED'      => $file['published'] != '' ? $file['published'] : '',
 						);
 						
 		$this->setVar($output);

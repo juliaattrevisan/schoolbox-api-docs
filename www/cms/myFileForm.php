@@ -4,6 +4,7 @@ session_start();
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio.php';
 
 if (WEBDAV_on) {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
@@ -65,4 +66,43 @@ elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
 	$fileHandler->update(array('id'=>$_POST['move'], 'parent'=>$_POST['categoryID']));
 }
 
+/* Publish this file to the file owner's ePortfolio
+ */
+else if (is_numeric($_GET['publish'])) {
+   if (!$file = $fileHandler->getByID($_GET['publish'])) {
+       error(2);
+   }
+
+   $eportfolioHandler = new ePortfolio($file['owner']);
+
+   if (!$eportfolioHandler->canEdit($file['owner'])) {
+       error(109);
+   }
+
+   $file['published'] = 'NOW()';
+
+   $fileHandler->update($file);
+
+   localRedir('/cms/portfolio/' . $_POST['parent']);
+}
+
+/* Un-publish this file from the file owner's ePortfolio
+ */
+else if (is_numeric($_GET['unpublish'])) {
+    if (!$file = $fileHandler->getByID($_GET['unpublish'])) {
+        error(2);
+    }
+
+    $eportfolioHandler = new ePortfolio($file['owner']);
+
+    if (!$eportfolioHandler->canEdit($file['owner'])) {
+        error(109);
+    }
+
+    $file['published'] = 'NULL';
+
+    $fileHandler->update($file);
+
+    $page->backToTheFuture(1);
+}
 ?>

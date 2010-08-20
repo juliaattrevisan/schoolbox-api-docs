@@ -10,4 +10,9 @@ INSERT INTO homepage_comp (size, method, NAME, description, filename, config) VA
  */
 INSERT INTO error (id, message) VALUES (106, 'You do not have permission to modify or delete this link.');
 INSERT INTO error (id, message) VALUES (107, 'You do not have permission to modify this blog.');
-INSERT INTO error (id, message) VALUES (108, 'You do not have permission to leave comments on this blog.')
+INSERT INTO error (id, message) VALUES (108, 'You do not have permission to leave comments on this blog.');
+INSERT INTO error (id, message) VALUES (109, 'You do not have permission to publish this file.');
+
+/* Published Files
+ */
+ALTER TABLE myFile ADD COLUMN published DATETIME;

@@ -69,11 +69,12 @@ define('FILE_use_frame', 		false);
 define('MIME_magic', 			'/usr/share/file/magic');
 define('NEWS_teacher_edit_other', true);
 
-define('WEBDAV_on', 			true);
+define('WEBDAV_on', 			false);
 define('WEBDAV_url', 			'http://webdav.alaress.com.au');
 define('WEBDAV_user', 			'test');
 define('WEBDAV_pass', 			'test');
 
+define('PUBLISHED_FILE', 1);
 
 //GROUP options
 define("GROUP_staff_only_owner", true);			//Determines if students can be group owner or not
