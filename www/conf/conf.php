@@ -74,8 +74,6 @@ define('WEBDAV_url', 			'http://webdav.alaress.com.au');
 define('WEBDAV_user', 			'test');
 define('WEBDAV_pass', 			'test');
 
-define('PUBLISHED_FILE', 1);
-
 //GROUP options
 define("GROUP_staff_only_owner", true);			//Determines if students can be group owner or not
 
