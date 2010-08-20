@@ -1,7 +1,7 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
-            <link rel="stylesheet" type="text/css" href="/css/core/ui/ui.css" />
-            <script type="text/javascript">
+ <link rel="stylesheet" type="text/css" href="/css/core/ui/ui.css" />
+<script type="text/javascript">
       $j(function () {
         /* date picker */		 
         $j('.datepicker').datepicker({ 
@@ -13,30 +13,46 @@
 					buttonImageOnly: true,
 					showAnim: 'slideDown'
         });
-
-      });
+		
+		
+	$j('ul.js_happening li').click(function(){
+		if ($j(this).children('.cal-bubble').is(':visible')) {
+			$j('.cal-bubble').hide();	
+		} else {
+			$j('.cal-bubble').hide();
+			$j(this).children('.cal-bubble').show();	
+		}
+	});
+	
+	$j('.close').click(function(){
+		$j(this).hide();
+	});
+		
+	
+		
+	});
 </script>
 <!-- END custom_head -->
 
       <div id="calendar">
 
-	  	<table cellpadding="0" class="{MONTABLE_CSS}" cellspacing="0" width="98%">
+	  	<table cellpadding="0" class="{MONTABLE_CSS}" cellspacing="0" width="100%">
 			<tr>
-				<td colspan="2"class="cal-left">
+				<td colspan="3"class="cal-left">
 					<a class="back" href="/calendar/week/{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a>
 					<div class="datepicker-box"><input type="hidden" class="datepicker" /></div>
 					<a class="forward" href="/calendar/week/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a>
 				</td>
 				
-				<td colspan="3"><h3>{MONTH}</h3></td>
+				<td colspan="3" class="cal-mid"><h3>{MONTH}</h3></td>
 				
-				<td colspan="2"class="cal-right">
+				<td colspan="3"class="cal-right">
 					<a class="customise" href="#">Week</a><a class="customise week" href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}">Month</a>
 				</td>
 			</tr>
 		</table>
 		
-		<table id="week-view" class="{MONTABLE_CSS}" cellpadding="0" cellspacing="0">
+		<table id="week-view" class="{MONTABLE_CSS}" cellpadding="0" cellspacing="0" width="100%">
 			
             <tr>
                 <!-- BEGIN day_header -->
@@ -51,16 +67,30 @@
 			</tr>
             
             
-			<tr>
+			<tr valign="top">
 
                 <!-- BEGIN day_block -->
-				<td class="noteWrap">
+				<td class="day-block">
+					<ul class="js_happening">
 					<!-- BEGIN note_block -->
+					<li>
 					<!-- BEGIN time -->
-					<span class="time">{TIME}</span>
+						<span class="time">{TIME}</span>
 					<!-- END time -->
-					<p style="background-color:{COLOUR};">{NOTE}<span class="modify">{MODIFY}</span></p>
+						<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}</span>
+						<div class="cal-bubble">
+							<div class="top"></div>
+							<div class="middle">
+								<div class="close"></div>
+								<h4><!-- BEGIN time -->{TIME}<!-- END time --> - {NOTE}</h4>
+								<p class="author">{AUTHOR}</p>
+								<p class="event-type">{TYPE]</p>
+								<a href="#">{MODIFY}</a>
+							</div>
+						</div>
+					</li>
 					<!-- END note_block -->
+					</ul>
 				</td>
                 <!-- END day_block -->
 			</tr>
