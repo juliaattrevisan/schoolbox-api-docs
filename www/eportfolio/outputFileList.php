@@ -9,7 +9,8 @@ $this->setBlock('files', 'modify_file', 'modify_file_block');
 $this->setBlock('files', 'unpublish', 'unpublish_block');
 
 $fileHandler = new MyFile($userID);
-$fileList = $fileHandler->getAllPublished();
+$fileList = $fileHandler->getAllPublished($config);
+$sortOptions = array('Description');
 
 if (is_array($fileList)) {
 	foreach ($fileList as $file) {

@@ -150,7 +150,7 @@ class ePortfolio {
 	}
 
     /**
-     * Records where the component is located.
+     * Records component configuration
      * 
      * @param <type> $component
      * @param <type> $config

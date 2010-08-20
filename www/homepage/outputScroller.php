@@ -26,8 +26,6 @@ foreach ($allFiles as $currentFile) {
         'IMAGE_DIMENSION' => $config['pixel']
     ));
 
-    print_r($config);
-
     $this->parse('image_block', 'image', true);
 }
 ?>

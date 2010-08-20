@@ -101,7 +101,7 @@ if ($eportfolioHandler->canEdit($userID)) {
                 include($_SERVER['DOCUMENT_ROOT'] . '/eportfolio/' . $component['method'] . '.php');
             }
 
-            if (is_array($default) && $permission >= WRITE_ACCESS) {
+            if (is_array($default)) {
                 foreach($default as $name => $value) {
                     switch ($name) {
                         case "size":
@@ -119,7 +119,7 @@ if ($eportfolioHandler->canEdit($userID)) {
                         case "image":
                             $this->setBlock("config", "image", "image_block".$componentCount);
 
-                            $imageList = $categoryHandler->getImages($categoryID);
+                            //$imageList = $categoryHandler->getImages($categoryID);
 
                             if(is_array($imageList)){
                                 foreach ($imageList as $image) {

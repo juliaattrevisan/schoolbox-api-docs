@@ -22,10 +22,37 @@ class MyFile extends Model {
      * 
      * @return <type>
      */
-    function getAllPublished() {
+    function getAllPublished($config = false) {
         $query = "SELECT f.*, UNIX_TIMESTAMP(f.submitted) submitted, UNIX_TIMESTAMP(f.published) published, af.iconFile FROM ".$this->_table." f
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
 				  WHERE owner = " . $this->owner . " AND published IS NOT NULL AND deleted = 0";
+
+        if ($config) {
+            if (!empty($config['filter']) && $config['filter'][0] != 'all') {
+
+                $config['filter'] = is_array($config['filter']) ? $config['filter'] : array($config['filter']);
+
+                $query .= " AND ( 1=2 ";
+                if (in_array('document', $config['filter']))
+                    $query .= " OR ( f.mime_type LIKE '%pdf' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%officedoc%' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%' OR f.mime_type LIKE '%document%' OR f.mime_type LIKE '%powerpoint%') ";
+
+                if (in_array('image', $config['filter']))
+                    $query .= " OR ( f.mime_type LIKE '%image%' ) ";
+
+                if (in_array('audio', $config['filter']))
+                    $query .= " OR ( f.mime_type LIKE '%audio%' ) ";
+
+                if (in_array('video', $config['filter']))
+                    $query .= " OR ( f.mime_type LIKE '%video%' OR f.mime_type LIKE '%flash%' OR f.mime_type LIKE '%realmedia%' ) ";
+
+                if (in_array('other', $config['filter']))
+                    $query .= " OR ( f.mime_type LIKE 'application%' AND f.mime_type NOT LIKE '%pdf' AND f.mime_type NOT LIKE '%msword' AND f.mime_type NOT LIKE '%rtf' AND f.mime_type NOT LIKE 'text%' AND f.mime_type NOT LIKE '%document%' AND f.mime_type NOT LIKE '%powerpoint%') ";
+
+                $query .= ") ";
+            }
+            
+            $query .= " ORDER BY $config[sort] $config[sortdir]";
+        }
 
         return $this->db->getAll($query);
     }
