@@ -119,7 +119,7 @@ if ($eportfolioHandler->canEdit($userID)) {
                         case "image":
                             $this->setBlock("config", "image", "image_block".$componentCount);
 
-                            //$imageList = $categoryHandler->getImages($categoryID);
+                            $imageList = $eportfolioHandler->getImages($userID);
 
                             if(is_array($imageList)){
                                 foreach ($imageList as $image) {

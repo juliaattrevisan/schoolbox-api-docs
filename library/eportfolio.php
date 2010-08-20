@@ -13,6 +13,28 @@ class ePortfolio {
 	}
 
     /**
+     * Gets all the images associated with an eportfolio
+     * 
+     * @param <type> $userID
+     * @param <type> $limit
+     * @return <type>
+     */
+	function getImages($userID, $limit = 0) {
+		$query = "SELECT id, myFile.description
+				  FROM myFile
+				  LEFT JOIN allowedFileTypes ON mime_type = mime
+				  WHERE owner = '{$userID}'
+				  AND deleted = '0' AND INSTR(mime_type, 'image/')
+				  ORDER BY submitted";
+
+		if ($limit > 0) {
+			$query .= " LIMIT 1, $limit";
+        }
+
+		return $this->db->getAll($query);
+	}
+
+    /**
      * Logs views of an ePortfolio.
      *
      * @param <type> $userID

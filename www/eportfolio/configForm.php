@@ -20,9 +20,9 @@ if (is_numeric($_REQUEST['uid']) ) {
 	if ($_SESSION['id'] != $_REQUEST['uid']) {
 		error(19);
     }
-	
+
 	$eportfolioHandler = new ePortfolio($_REQUEST['uid']);
-	
+
 	/* AJAX request for drag and drop of components
      * This is found in jquery.eportfoliocomponent.js
      */
@@ -34,7 +34,7 @@ if (is_numeric($_REQUEST['uid']) ) {
              */
 			$key++;
 			$components[$key] = explode(',', $column);
-	
+
 			/* Update the db
              */
 			foreach($components[$key] as $ckey => $component) {
@@ -44,7 +44,7 @@ if (is_numeric($_REQUEST['uid']) ) {
 		}
 	}
 	else if ($_GET['uid'] && $_GET['type'] == 'config' && $_GET['component']) {
-        
+
 		/* Post config options from homepage
          */
 		$config = $_GET;
@@ -54,7 +54,7 @@ if (is_numeric($_REQUEST['uid']) ) {
          */
 		$config = serialize($config);
 		$eportfolioHandler->updateComponentConfig($_GET['component'], $config);
-        
+
 		localRedir('/eportfolio/' . $_GET['uid']);
 	}
 	else if (is_numeric($_POST['uid'])) {
@@ -63,14 +63,14 @@ if (is_numeric($_REQUEST['uid']) ) {
          */
 		$eportfolioHandler->savePageTemplate($_POST['template']);
 		$eportfolioHandler->updateComponents($_POST['components']);
-		
+
 		/* Strip hash
          */
 		if (is_array($_POST['colors'])) {
 			foreach($_POST['colors'] as $key => $value) {
 				$color[$key] = substr($value,1);
 			}
-			
+
 			$eportfolioHandler->saveDisplayProperties($color);
 		}
 

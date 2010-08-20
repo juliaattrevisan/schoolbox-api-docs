@@ -19,28 +19,52 @@ if($_GET['id'] && $_GET['width'] && $_GET['height'])
 {
 	$db = new dbManager;
 	
-	//get file information	
-	$query = "SELECT id, mime_type, category, deleted FROM file WHERE id = {$_GET['id']}";
+	//get file information
+    if (is_numeric($_GET['myFile'])) {
+        $query = "SELECT id, owner, mime_type, deleted FROM myFile WHERE id = {$_GET['id']}";
+        $fileDir = MYFILE_directory;
+    }
+    else {
+        $query = "SELECT id, mime_type, category, deleted FROM file WHERE id = {$_GET['id']}";
+        $fileDir = FILE_directory;
+    }
+    
 	$imageInfo = $db->getRow($query);
 
-	perm($imageInfo['category'], HOMEPAGESERVICE);
+    /* Check permissions on the file to see who can view it. Images can be made
+     * in two contexts - eportfolio or generic files
+     */
+    if (is_numeric($_GET['myFile'])) {
+        require_once($_SERVER['DOCUMENT_ROOT'].'/../library/eportfolio.php');
+        require_once($_SERVER['DOCUMENT_ROOT'].'/../library/group.php');
+
+        $eportfolioHandler = new ePortfolio($imageInfo['owner']);
+
+        if (!$eportfolioHandler->canEdit($imageInfo['owner'])) {
+            error(5);
+        }
+    }
+    else {
+        perm($imageInfo['category'], HOMEPAGESERVICE);
+    }
+
 	//is image exists, the user has permission and its not deleted then output the image
 	if(isset($imageInfo['id']) && !$imageInfo['deleted'])
 	{		
 		if(isset($_GET['resample']) && isset($_GET['quality']))	
-			image_resize(FILE_directory."/".$imageInfo['id'].".dat", $_GET['width'], $_GET['height'], $_GET['resample'], $_GET['quality']);
+			image_resize($fileDir."/".$imageInfo['id'].".dat", $_GET['width'], $_GET['height'], $_GET['resample'], $_GET['quality']);
 		else if(isset($_GET['resample']))
-			image_resize(FILE_directory."/".$imageInfo['id'].".dat", $_GET['width'], $_GET['height'], $_GET['resample']);
+			image_resize($fileDir."/".$imageInfo['id'].".dat", $_GET['width'], $_GET['height'], $_GET['resample']);
 		else if($_GET['quality'])
 		{
 			if($_GET['quality'] < 50 )//if low quality dont bother resampling
-				image_resize(FILE_directory."/".$imageInfo['id'].".dat", $_GET['width'], $_GET['height'], 0, $_GET['quality']);
+				image_resize($fileDir."/".$imageInfo['id'].".dat", $_GET['width'], $_GET['height'], 0, $_GET['quality']);
 			else
-				image_resize(FILE_directory."/".$imageInfo['id'].".dat", $_GET['width'], $_GET['height'], 1, $_GET['quality']);
+				image_resize($fileDir."/".$imageInfo['id'].".dat", $_GET['width'], $_GET['height'], 1, $_GET['quality']);
 	
 		}
 		else	
-			image_resize(FILE_directory."/".$imageInfo['id'].".dat", $_GET['width'], $_GET['height']);
+			image_resize($fileDir."/".$imageInfo['id'].".dat", $_GET['width'], $_GET['height']);
 	}
 }
 
