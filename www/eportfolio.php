@@ -55,6 +55,7 @@ if ($eportfolioHandler->canEdit($userID)) {
         'HEADING' => $pageName,
         'ID' => $userID,
         'TEMPLATE' => 'template'.$template['template'],
+        'SYNERGY_ID' => $user['synergy_id'],
     ));
 
     /* Has elevated privileges, can write to page
@@ -67,6 +68,11 @@ if ($eportfolioHandler->canEdit($userID)) {
         $this->setVar('edit_page_block', '');
         $this->setVar('modify_layout_block', '');
     }
+
+    /* Always include private notes for this eportfolio, which can only be seen
+     * by parents, staff and superusers.
+     */
+    include($_SERVER['DOCUMENT_ROOT'] . '/eportfolio/outputPrivateNotes.php');
 
     /* Output components
      */

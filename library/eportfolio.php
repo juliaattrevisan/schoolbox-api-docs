@@ -280,13 +280,30 @@ class ePortfolio {
     /**
      * Can the current user edit the userID's portfolio contents? This should
      * probably go into the User library
-     * 
+     *
+     * @param <type> $userID
      * @return <type>
      */
     function canEdit($userID) {
         $groupHandler = new Group();
 
 	    if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $groupHandler->isParentOfChild($userID) || ($_SESSION['id'] == $userID)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determines whether the current user can view/edit a eportfolio's private
+     * notes.
+     *
+     * @param <type> $userID
+     */
+    function canEditPrivateNotes($userID) {
+        $groupHandler = new Group();
+
+        if ($groupHandler->isSuperUser() || $groupHandler->isStaff() || $groupHandler->isParentOfChild($userID)) {
             return true;
         }
 
