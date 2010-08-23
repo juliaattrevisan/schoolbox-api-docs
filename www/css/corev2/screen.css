@@ -151,13 +151,13 @@ th { font-weight:bold; }
 	
 	/*TABBED NAV*/
 	#tabs { bottom:-1px;margin:0;padding:0;position:absolute;right:20px;bottom: 0; right: 15px; }
-	#tabs li { margin: 0 0 0 -20px; float: right; position: relative; z-index: 5; }
+	#tabs li { margin: 0 0 0 -20px; float: right; position: relative; }
 	#tabs li a { line-height:31px; background: 0; color: #024d8d; height: 31px; display: block; float: left; padding: 0; cursor: pointer; }
 	#tabs li a span { background: url(/images/mggs/bg-nav-left.png) no-repeat 0 -31px; height: 31px; display: block; float: left; padding: 0 7px 0 30px; }
 	#tabs li a span.end { height: 31px; width: 21px; float:left; background: url(/images/mggs/bg-nav-right.png) no-repeat 0 -31px; padding: 0; }
-	#header #tabs li.navthis a { background-color: transparent; font-weight: bold; color: #024d8d; z-index: 10; }
+	#header #tabs li.navthis a { background-color: transparent; font-weight: bold; color: #024d8d;}
 	#header #tabs li.navthis a span { background-position: 0 0; }
-	#header #tabs li.navthis { z-index: 10; }
+	#header #tabs li.navthis { }
 	#tabs li a:hover {color: #fff; }
 	#tabs li a:hover span { background-position: 0 bottom; }
 
@@ -270,6 +270,12 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #assess td.formLabelWidth{width:195px;}
 #assess .standardForm{background:#fff;}
 
+.mark-test col-1, .mark-test col-2{float:left; margin-right:15px;}
+.mark-test col-1{width:540px;}
+.mark-test col-2{width:235px;}
+
+
+
 /*BLOG*/
 .blog-comments { background: #eee; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
 .blog-comments p.interact { border-top: 1px dashed #ccc; padding-top: 0.5em; font-size: 11px; }
@@ -281,7 +287,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #infoPanel a { color: #fff; }
 
 /*CALENDAR*/
-#calendar table {border-bottom:1px dotted #C3CDD7; position:relative; z-index:1;}
+#calendar table {border-bottom:1px dotted #C3CDD7; position:relative;}
 #calendar h3{font-size:18px; font-weight:bold; line-height:25px;}
 
 #week-view .dayWrap{border-right:1px dotted #C3CDD7;text-align:left}
@@ -315,14 +321,14 @@ td.cal-mid h3{text-align:center;}
 
 td.cal-right a.customise{margin-top:12px;height:24px; line-height:24px; padding:0 8px; color:#000; display:inline-block;text-decoration:none; background:#ececec}
 td.cal-right a.week{background:#cacaca;}
-td.cal-right a.filters{position:relative;background:#1597cb url(/images/corev2/calendar/filters.gif) 8px 7px no-repeat; padding-left:23px; color:#ffffff; margin-right:10px;}
-td.cal-right .link-case{position:relative; height:36px; z-index:5000;}
+td.cal-right a.filters{z-index:5000;position:relative;background:#1597cb url(/images/corev2/calendar/filters.gif) 8px 7px no-repeat; padding-left:23px; color:#ffffff; margin-right:10px;}
+td.cal-right .link-case{position:relative; height:36px; z-index:10;}
 
 td.cal-right .link-case .filter-drop{display:none; position:absolute; top:100%; right:107px;width:450px; z-index:6000; }
 td.cal-right .link-case .filter-drop .filter-list{ background:#fff; border:1px solid #9f9f9f;-moz-border-radius: 5px 0 5px 5px;-webkit-border-radius: 5px 0 5px 5px;border-radius: 5px 0 5px 5px; padding:20px}
 .filter-cat{float:left; width:129px; text-align:center; margin-right:10px}
-.filter-cat span{font-weight:bold; display:block}
-.filter-cat label{text-align:left;display:block;float:left;margin:0; font-weight:normal; width:100%;}
+.filter-cat span{font-weight:bold; height:17px;display:block}
+.filter-cat label{height:15px;text-align:left;display:block;float:left;margin:0; font-weight:normal; width:100%;}
 .filter-cat .checkbox{clear:left;display:block;float:left;margin:1px 6px 0 1px;}
 .filter-cat.last{margin-right:0;}
 
@@ -338,22 +344,22 @@ td.cal-right .link-case .filter-drop .filter-list{ background:#fff; border:1px s
 .header_option a:hover { text-decoration: underline; }
 
 .month-week { height: 100px; vertical-align: top; }
-.day-block { width: 14%; padding: 0; border: 1px dotted #c3cdd7;  border-top:none; border-bottom:none;vertical-align: top; font: 11px Verdana, Arial, Helvetica, sans-serif; }
+.day-block {z-index:10; width: 14%; padding: 0; border: 1px dotted #c3cdd7;  border-top:none; border-bottom:none;vertical-align: top; font: 11px Verdana, Arial, Helvetica, sans-serif; }
 td.border-left{border-left:1px solid #ECECEC; }
 
-.noteWrap {  vertical-align:top; z-index:2;}
+.noteWrap {  vertical-align:top; }
 .week { padding: 0; }
 .noteWrap p { padding: 2px 4px; color: #000; margin-bottom: 0; }
 .noteWrap a { color: #000; }
 
 ul.js_happening li span{display:block; padding:5px; -moz-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px;cursor:pointer;}
 ul.js_happening li span:hover{opacity:0.8;}
-ul.js_happening li{margin-bottom:4px; position:relative; }
+ul.js_happening li{margin-bottom:4px; position:relative; z-index:0;}
 
-ul.js_happening li .cal-bubble {z-index:2000;bottom:90%;color:#000000;font-size:11px;left:-100px;position:absolute;width:350px;display:none;}
+ul.js_happening li .cal-bubble {z-index:20;bottom:90%;color:#000000;font-size:11px;left:-100px;position:absolute;width:350px;display:none;}
 ul.js_happening li .cal-bubble .top{height:8px; border:1px solid #000; border-bottom:0;background:#fff; -moz-border-radius: 5px 5px 0 0; /* FF1+ */ -webkit-border-radius:  5px 5px 0 0; /* Saf3-4 */border-radius: 5px 5px 0 0; /* Opera 10.5, IE 9, Saf5, Chrome */}
 ul.js_happening li .cal-bubble  .middle{padding:10px 19px;position:relative;background:#fff;  border:1px solid #000; border-top:0; border-bottom:0;}
-ul.js_happening li .cal-bubble  .middle .close{position:absolute; right:10px; top:0px; width:15px; height:15px; background:#000; cursor:pointer;z-index:2000;}
+ul.js_happening li .cal-bubble  .middle .close{position:absolute; right:10px; top:0px; width:15px; height:15px; background:#000; cursor:pointer;z-index:90;}
 ul.js_happening li .cal-bubble  .middle h4{line-height:24px;font-size:16px; font-weight:normal; margin:0 0 10px 0;padding-bottom:5px; border-bottom:1px solid #f0f0f0;}
 ul.js_happening li .cal-bubble  .middle h4 span{margin:0 0 5px 0; padding:2px; -moz-border-radius: 5px;  -webkit-border-radius: 5px; border-radius: 5px;}
 ul.js_happening li .cal-bubble  .middle p{font-size:12px; margin: 0 0 16px 0; padding:0;}
