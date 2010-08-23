@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<title>OurSchool - Calendar</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/> 
+
+<link rel="stylesheet" type="text/css" media="print" href="/css/core/print.css" />
+
+<link rel="stylesheet" type="text/css" media="screen" href="/css/corev2/reset.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/corev2/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/corev2/screen.css" />
+
+<link rel="Shortcut Icon" href="/images/corev2/favicon.ico" type="image/x-icon" />
+
+
+<script type="text/javascript" src="/javascript/jquery1.4.2.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
+<script type="text/javascript" src="/javascript/scripts.js"></script>
+<script type='text/javascript'>	
+	$j(function() {
+    $j('#nav ul').droppy({speed: 0});
+  });
+</script>
+ 
+
+</head>
+<body>
+<div id="wrap">
+	<div id="wrap-inner">
+    <div id="header">
+
+        <div id="logo"><a href="/">Melbourne Girls Grammar</a></div>
+<ul id="infoPanel">
+	<li class="first">Good Afternoon  James Leckie</li>
+  <li><a href="/logout.php" title="">Logout</a></li>
+</ul>
+<form id="search" action="/search.php" method="get">
+	<fieldset>
+  	<input id="search-field" type="text" name="keyword" />
+    <input id="search-button" type="submit" value="Search" />
+
+  </fieldset>
+</form>  
+        <ul id="tabs">
+  <!-- BEGIN portfolio_tab -->
+  <!-- <li class=""><a href="/cms/portfolio" title="Access your portfolio area"><span>My Portfolio</span><span class="end"></span></a></li> -->
+  <!-- END portfolio_tab -->
+  <li class="{TAB_SUBMISSION_ON}"><a href="/submission/listSubmission" title="Access your submission boxes"><span>Submissions</span><span class="end"></span></a></li>
+  <li class=""><a href="/resources/" title="Browse resources and homepages"><span>Resources</span><span class="end"></span></a></li>
+  <li class=" navthis"><a href="/calendar/week/" title="School calendar events"><span>Calendar</span><span class="end"></span></a></li>
+
+  <li class=""><a href="/news/" title="Current school news"><span>News</span><span class="end"></span></a></li>
+  <li class=""><a href="/home/" title="Greeting page"><span>Home</span><span class="end"></span></a></li>
+</ul>
+
+<!-- BEGIN myfiles_tab -->
+<!-- END myfiles_tab -->	
+     </div>
+    <script type="text/javascript">
+	$j(function(){
+		$j('#nav li:last-child').addClass('lastChild')					
+	});
+</script>
+<div id="nav">
+	<h3>My eVI</h3>
+
+  <ul>
+<li class="parent"><a href="/home.php"><span>Home</span></a><ul>
+<li><a href="/modules/resource/viewResourceList.php"><span>Book Resource</span></a></li>
+<li class="parent"><a href="/admin/admin.php"><span>Admin</span></a><ul>
+<li><a href="/admin/modSideMenu.php"><span>Modify Side Menu</span></a></li>
+<li><a href="/admin/modUser.php?adduser=1"><span>Add User</span></a></li>
+<li><a href="/admin/modUser.php"><span>Modify User</span></a></li>
+<li><a href="/admin/modFileType.php"><span>Modify File Types</span></a></li>
+</ul>
+
+</li>
+<li class="parent"><a href="/resources"><span>Resources</span></a><ul>
+<li><a href="/cms/file/multicat"><span>File to Multiple Folders</span></a></li>
+<li><a href="/cms/link/multicat"><span>Link to Multiple Folders</span></a></li>
+</ul>
+</li>
+<li><a href="/calendar/week"><span>Calendar</span></a></li>
+<li><a href="/submission/dueWork"><span>Due Work</span></a></li>
+<li class="parent"><a href="/home.php"><span>Main</span></a><ul>
+<li><a href="/editLinks.php"><span>Edit My Links</span></a></li>
+
+<li><a href="/group/join"><span>Manage My Groups</span></a></li>
+</ul>
+</li>
+<li class="parent"><a href="/news"><span>News</span></a><ul>
+<li><a href="/news/modify"><span>Add News</span></a></li>
+<li><a href="/news"><span>View News</span></a></li>
+</ul>
+</li>
+<li class="parent"><a href="/submission/listSubmission"><span>Submissions</span></a><ul>
+<li><a href="/submission/createSubmission/new"><span>Create Submission</span></a></li>
+</ul>
+
+</li>
+<li class="parent"><a href="/mail.php"><span>Webmail</span></a><ul>
+<li><a href="/search/user"><span>Address Book</span></a></li>
+<li><a href="/mail/send.php"><span>Send Mail</span></a></li>
+<li><a href="/mail.php"><span>View Mail</span></a></li>
+</ul>
+</li>
+<li><a href="/account/modify"><span>Change Password</span></a></li>
+<li><a href="/search/user"><span>User Directory</span></a></li>
+<li><a href="/feedback.php"><span>Feedback</span></a></li>
+
+</ul>
+</li>
+<li><a href="#"><span>Staff Services</span></a></li>
+<li><a href="#"><span>Faculties</span></a></li>
+<li><a href="#"><span>Sport</span></a></li>
+<li><a href="#"><span>Houses</span></a></li>
+<li><a href="#"><span>Student Services</span></a></li>
+<li class="parent"><a href="/modules/tutorial/event/list.php"><span>Tutorials</span></a><ul>
+<li class="parent"><a href="#"><span>Reports</span></a><ul>
+<li><a href="/modules/tutorial/report/attendance.php"><span>Uncompleted Attendance</span></a></li>
+
+<li><a href="/modules/tutorial/report/hours.php"><span>Hours Performed</span></a></li>
+<li><a href="/modules/tutorial/report/student.php"><span>Student Attendance</span></a></li>
+</ul>
+</li>
+<li><a href="/modules/tutorial/attendance/list.php"><span>Mark Attendance</span></a></li>
+<li><a href="/modules/tutorial/report/statistics.php"><span>Statistics</span></a></li>
+</ul>
+</li>
+<li><a href="/group/join"><span>Manage Groups</span></a></li>
+<li><a href="/logout.php"><span>Logout</span></a></li>
+</ul>
+
+ 
+  <h3>My Groups</h3>
+  <ul>
+ 
+		<li><a href="/homepage/140/">Submission Test</a></li> 
+		<li><a href="/homepage/141/">Steve&#039;s Assignment</a></li> 
+		<li><a href="/homepage/37/">Test Folder</a></li>  </ul> 
+  <h3>My Links</h3>
+
+  <ul>
+  	<li><a href="/redir.php?url=http%253A%252F%252Fwww.yahoo.com" target="_blank"><span>yahoo</span></a></li>
+  	<li><a href="/redir.php?url=http%253A%252F%252Fwww.google.com.au" target="_blank"><span>google</span></a></li>
+  	<li><a href="/redir.php?url=http%253A%252F%252Fwww.sitescene.com.au" target="_blank"><span>Sitescene</span></a></li>
+  	<li><a href="/redir.php?url=http%253A%252F%252Fintranet.mgs.vic.edu.au%252Fcontent%252FIntranet%252FSport%252FFootball%252FMy%252520Albums%252F1st%252520%2526%2525202nds%252520vs%252520Carey%252Falbum%252Findex.html" target="_blank"><span>test</span></a></li>
+  	<li><a href="/redir.php?url=http%253A%252F%252Fwww.alaress.com.au" target="_blank"><span>glack</span></a></li>
+
+ 
+    <li><a href="/editLinks.php">Add Link</a></li>
+  </ul>	
+</div>
+    
+<div id="container">
+      
+<div id="content">
+
+
+<div id="assess" class="mark-test">
+	<form>
+	<div class="col-1">
+		<h2>Section 1</h2>
+		<div class="question">	
+			<h3>Question 1<span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus nec?</span></h3>
+			
+			<div class="question-body">
+				<ol>
+					<li><a href="#"><span>A)</span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus, non feugiat urna?<span class="mark"></span></a></li>
+					<li><a href="#"><span>B)</span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus, non feugiat urna?<span class="mark"></span></a></li>
+					<li><a href="#" class="correct"><span>C)</span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus, non feugiat urna?<span class="mark"></span></a></li>
+					<li><a href="#" class="last"><span>D)</span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus, non feugiat urna?<span class="mark"></span></a></li>
+				</ol>
+			<div class="textarea-container">
+				<textarea name="comments">Insert Comments here...</textarea>
+			</div>
+			
+			<p>0/5 Marks</p>
+			
+			</div>
+		</div><!--/question-->
+
+		<div class="question">	
+			<h3>Question 2<span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus nec?</span></h3>
+			<div class="question-body">
+				
+				<div class="box">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam fauci
+				bus rhoncus lectus tincidunt tincidunt. Duis <span class="correct">aliquet</span>, ante a consequat semper, orci justo
+				 luctus nisi, vitae consequat justo nisl sit amet magna. Phasellus gravida, urna et rhoncus placerat, tortor dui scelerisque est, 
+				ut dapibus leo lacus id metus. Mauris <span class="incorrect">facilisis</span> sem vitae nisl placerat dapibus.</div>
+				
+				<textarea name="comments">Insert comments here...</textarea>
+				
+				<p>
+					<select>
+						<option value="0">0</option>
+						<option value="1">1</option>				
+						<option value="2">2</option>				
+						<option value="3">3</option>				
+						<option value="4">4</option>
+						<option value="5">5</option>		
+					</select>	
+					/5 Marks
+				</p>
+			</div>
+				
+		</div><!--/question-->
+
+
+		<div class="question">	
+			<h3>Question 3<span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus nec?</span></h3>
+			<div class="question-body">
+				<textarea name="comments">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam fauci
+				bus rhoncus lectus tincidunt tincidunt. Duis <span class="correct">aliquet</span>, ante a consequat semper, orci justo
+				 luctus nisi, vitae consequat justo nisl sit amet magna. Phasellus gravida, urna et rhoncus placerat, tortor dui scelerisque est, 
+				ut dapibus leo lacus id metus. Mauris <span class="incorrect">facilisis</span> sem vitae nisl placerat dapibus. </textarea>
+				
+				<textarea name="comments">Insert comments here...</textarea>
+				
+				<p>
+					<select>
+						<option value="0">0</option>
+						<option value="1">1</option>				
+						<option value="2">2</option>				
+						<option value="3">3</option>				
+						<option value="4">4</option>
+						<option value="5">5</option>		
+					</select>	
+					/5 Marks
+				</p>
+			</div>
+			
+		</div><!--/question-->
+		
+		<div class="question">	 
+			<h3>Question 4<span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus nec?</span></h3>
+			<div class="question-body">
+				<ul>
+					<li><input type="text" value="Statement 2"/><span class="arrow"></span><input type="text" value="Statement 3"/><span class="mark"></span></li>
+					<li class="correct"><input type="text" value="Statement 2"/><span class="arrow"></span><input type="text" value="Statement 3"/><span class="mark"></span></li>
+					<li class="correct"><input type="text" value="Statement 2"/><span class="arrow"></span><input type="text" value="Statement 3"/><span class="mark"></span></li>
+					<li><input type="text" value="Statement 2"/><span class="arrow"></span><input type="text" value="Statement 3"/><span class="mark"></span></li>
+				</ul>
+				<textarea name="comments">Insert comments here...</textarea>
+				<p>0/5 Marks</p>
+			</div>
+		</div><!--/question-->
+
+		<input type="submit" value="Submit Marking" />
+		
+	</div><!--/col-1-->
+	
+	<div class="col-2">
+		<h2>Results</h2>
+		<div class="results">
+			<div class="section">
+				<h3>Section 1<span> - Multiple Choice</span></h3>
+				<p><ins></ins><span>Section Complete</span></p>
+			</div>
+			<div class="section">
+				<h3>Section 1<span> - Multiple Choice</span></h3>
+				<p><ins></ins><span>Section Complete</span></p>
+			</div>
+		</div>
+	</div><!--/col-2-->
+	
+	<div class="float-fix"></div>
+	
+	</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

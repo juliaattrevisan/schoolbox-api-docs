@@ -39,7 +39,8 @@
 
 		});
 		
-		$j('.filter-list input:checked').checked;
+		//make all of the checkboxes checked... darn you firefoxxxxxx
+		$j('.checkbox').attr('checked', true);
 		
 		//run the filter checker to show and hide the items
 		$j('#applyFilters').click(filterChecker);
@@ -89,17 +90,17 @@
 						<div class="filter-list">
 							<form>	
 								<div class="filter-cat">
-								<span>Groups</span>
-								<!-- BEGIN group -->
+									<span>Groups</span>
+									<!-- BEGIN group -->
 									<label title="{GROUP_NAME}">
-										<input type="checkbox" name="campus" id="{GROUP_ID}" value="{GROUP_ID}" checked="checked" class="checkbox"/>{GROUP_NAME}
+										<input type="checkbox" name="campus" id="{GROUP_ID}" value="type{GROUP_ID}" checked="checked" class="checkbox"/>{GROUP_NAME}
 									</label>
 									<div class="float-fix"></div>
 								<!-- END group -->
 								</div>
 								<div class="filter-cat">
-								<span>Campus</span>
-								<!-- BEGIN campus -->
+									<span>Campus</span>
+									<!-- BEGIN campus -->
 									<label title="{CAMPUS_NAME}">
 										<input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="{CAMPUS_ID}" class="checkbox"/>{CAMPUS_NAME}
 									</label>
@@ -107,16 +108,20 @@
 								<!-- END campus -->
 								</div>
 								<div class="filter-cat last">
-								<span>Event</span>
-								<!-- BEGIN event_type -->
-								<label title="{EVENT_TYPE_NAME}">
-									<input type="checkbox" name="campus" id="{EVENT_TYPE_ID}" checked="checked" value="type{EVENT_TYPE_ID}" class="checkbox"/><span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
-								</label>
-								<!-- END event_type -->
-								<div class="float-fix"></div>
-							
+									<span>Event</span>
+									<!-- BEGIN event_type -->
+									<label title="{EVENT_TYPE_NAME}">
+										<input type="checkbox" name="campus" id="{EVENT_TYPE_ID}" checked="checked" value="type{EVENT_TYPE_ID}" class="checkbox"/><span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
+									</label>
+									<!-- END event_type -->
+									<div class="float-fix"></div>
 								</div><!--/filter-list-->
-							<a href="#" id="applyFilters">Apply</a>
+								
+								<div class="float-fix"></div>
+								
+								<hr />
+							
+							<a href="#" id="applyFilters">Apply Filters</a>
 						</form>
 					</div><!--/filter-drop-->
 				</div>
@@ -141,25 +146,25 @@
 					<p class="header_option">{ADD}</p>
 					<p class="day-num">{DATE}</p>
 				<div class='float-fix'></div>
-            </div> 
-            <div class="noteWrap">
-				<ul class="js_happening">
-					<!-- BEGIN note_block -->
-					<li class="{EVENT_TYPE} {EVENT_LEVEL} ">
-						<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{TIME} {NOTE}</span>
-						<div class="cal-bubble">
-							<div class="top"></div>
-							<div class="middle">
-							<h4><!-- BEGIN time --><span style="background-color:{COLOUR}; border:1px solid {COLOUR}">{TIME}</span><!-- END time -->{NOTE}</h4>
-							<p class="event-type">{TYPE}</p>
-							<p class="author">{AUTHOR}</p>
-							{MODIFY}
+				</div> 
+				<div class="noteWrap">
+					<ul class="js_happening">
+						<!-- BEGIN note_block -->
+						<li class="{EVENT_TYPE} {EVENT_LEVEL} ">
+							<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{TIME} {NOTE}</span>
+							<div class="cal-bubble">
+								<div class="top"></div>
+								<div class="middle">
+								<h4><!-- BEGIN time --><span style="background-color:{COLOUR}; border:1px solid {COLOUR}">{TIME}</span><!-- END time -->{NOTE}</h4>
+								<p class="event-type">{TYPE}</p>
+								<p class="author">{AUTHOR}</p>
+								<div class="modify">{MODIFY}</div>
+								</div>
 							</div>
-						</div>
-					</li>
-					<!-- END note_block -->
-				</ul>
-            </div>
+						</li>
+						<!-- END note_block -->
+					</ul>
+				</div>
           </td>
         	<!-- END day_block -->
         </tr>
