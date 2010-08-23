@@ -13,10 +13,10 @@ window.addEvent('domready', function() {
 	// question controls
 	var count = {COUNT};
 	var request = new Request.HTML({url: '/test/create', onComplete: function(response) {
-		$$('.questions').adopt(response);
+		$$j('.questions').adopt(response);
 	}});
 	
-	$$('.create_textual').addEvent('click', function() {	
+	$$j('.create_textual').addEvent('click', function() {	
 		request.post({'ajax': true, 'n': count++, 'type': 'textual'});
 	});
 });

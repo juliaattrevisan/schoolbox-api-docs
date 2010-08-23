@@ -2,34 +2,69 @@
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
  <link rel="stylesheet" type="text/css" href="/css/core/ui/ui.css" />
 <script type="text/javascript">
-      $j(function () {
-        /* date picker */		 
-        $j('.datepicker').datepicker({ 
-          dateFormat: 'dd-mm-yy',
-          onSelect: function(dateText, inst) {window.open('/calendar/week/'+dateText, "_self")},
-          defaultDate: $j.datepicker.parseDate("dd-mm-yy", "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"),
+	$j(function () {
+       
+	    /* date picker */		 
+		$j('.datepicker').datepicker({ 
+		  dateFormat: 'dd-mm-yy',
+		  onSelect: function(dateText, inst) {window.open('/calendar/week/'+dateText, "_self")},
+		  defaultDate: $j.datepicker.parseDate("dd-mm-yy", "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"),
 					showOn: 'button',
 					buttonImage: '/css/core/ui/images/calendar-icon.gif',
 					buttonImageOnly: true,
 					showAnim: 'slideDown'
-        });
+		});
+			
+			
+		$j('ul.js_happening li').click(function(){
+			if ($j(this).children('.cal-bubble').is(':visible')) {
+				$j('.cal-bubble').hide();	
+			} else {
+				$j('.cal-bubble').hide();
+				$j(this).children('.cal-bubble').show();	
+			}
+		});
 		
+		$j('.close').click(function(){
+			$j(this).hide();
+		});
 		
-	$j('ul.js_happening li').click(function(){
-		if ($j(this).children('.cal-bubble').is(':visible')) {
-			$j('.cal-bubble').hide();	
-		} else {
+		//show and hide the filters drop down
+		$j('a.filters').click(function(){
+			
 			$j('.cal-bubble').hide();
-			$j(this).children('.cal-bubble').show();	
+			
+			if ($j('.filter-drop').is(':visible')) {
+				$j('.filter-drop').hide();	
+			} else { 
+				$j('.filter-drop').show();		
+			}
+
+		});
+		
+		//run the filter checker to show and hide the months
+		$j('#applyFilters').click(filterChecker);
+		
+		/*
+		
+		1. check to see when checkboxes are checked
+		2. show/hide all the list IDs that match this	
+			
+		*/
+		
+		function filterChecker() {
+			
+		/* for each checked input, return the ID as an alert*/	
+			$j('input:checked').each(function(){		 		
+				
+				var m = $j(this).attr('id');
+				alert(m); 
+	
+			});
 		}
-	});
-	
-	$j('.close').click(function(){
-		$j(this).hide();
-	});
 		
-	
 		
+
 	});
 </script>
 <!-- END custom_head -->
@@ -47,7 +82,45 @@
 				<td colspan="3" class="cal-mid"><h3>{MONTH}</h3></td>
 				
 				<td colspan="3"class="cal-right">
-					<a class="customise" href="#">Week</a><a class="customise week" href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}">Month</a>
+				<div class="link-case">
+					<a class="customise filters" href="#">Calendar Filters</a><a class="customise" href="#">Week</a><a class="customise week" href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}">Month</a>
+					<div class="filter-drop">
+							<div class="filter-list">
+								<form>	
+									<div class="filter-cat">
+									<span>Groups</span>
+									<!-- BEGIN group -->
+										<label title="{GROUP_NAME}">
+											<input type="checkbox" name="campus" id="{GROUP_ID}" value="{GROUP_ID}" {GROUP_ID_SELECTED} class="checkbox"/>{GROUP_NAME}
+										</label>
+										<div class="float-fix"></div>
+									<!-- END group -->
+									</div>
+									<div class="filter-cat">
+									<span>Campus</span>
+									<!-- BEGIN campus -->
+										<label title="{CAMPUS_NAME}">
+											<input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="{CAMPUS_ID}" class="checkbox"/>{CAMPUS_NAME}
+										</label>
+										<div class="float-fix"></div>
+									<!-- END campus -->
+									</div>
+									<div class="filter-cat last">
+									<span>Event</span>
+									<!-- BEGIN event_type -->
+									<label title="{EVENT_TYPE_NAME}">
+										<input type="checkbox" name="campus" id="{EVENT_TYPE_ID}" {EVENT_ID_SELECTED} value="{EVENT_TYPE_ID}" class="checkbox"/>{EVENT_TYPE_NAME}
+									</label>
+									<!-- END event_type -->
+									<div class="float-fix"></div>
+								
+							</div><!--/filter-list-->
+							<a href="#" id="applyFilters">Apply</a>
+							</form>
+						</div><!--/filter-drop-->
+					</div>
+				
+				
 				</td>
 			</tr>
 		</table>

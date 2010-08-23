@@ -23,65 +23,75 @@
 </script>
 <!-- END custom_head -->
 
-<h1>Create Assessment</h1>
-<form name="create" action="/assess/create/" class="standardForm" method="post">
-    <table>
-        <tr>
-            <td class="formLabelWidth"><h3>Title</h3></td>
-            <td><input name="title" type="text" size="35" maxlength="50" /></td>
-        </tr>
-        <tr>
-            <td><h3>Start</h3></td>
-            <td>
-                <select name="start[hour]">
-                    <option>12</option>
-                </select>
-                <select name="start[minute]">
-                    <option>00</option>
-                </select>
-                <select name="start[meridiem]">
-                    <option selected>am</option>
-                    <option>pm</option>
-                </select>
-                <input name="start[date]" id="start_date" type="text" size="15" maxlength="10" value="{START_DATE}" />
-                <img src="/images/ico_calendar.gif" width="16" height="13" id="start_date_trigger" style="cursor: pointer;" title="Date Selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
-            </td>
-        </tr>
-        <tr>
-            <td><h3>Finish</h3></td>
-            <td>
-                <select name="finish[hour]">
-                    <option>12</option>
-                </select>
-                <select name="finish[minute]">
-                    <option>00</option>
-                </select>
-                <select name="finish[meridiem]">
-                    <option selected>am</option>
-                    <option>pm</option>
-                </select>
-                <input name="finish[date]" id="finish_date" type="text" size="15" maxlength="10" value="{FINISH_DATE}" />
-                <img src="/images/ico_calendar.gif" width="16" height="13" id="finish_date_trigger" style="cursor: pointer;" title="Date Selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
-            </td>
-        </tr>
-        <tr>
-            <td><h3>Duration</h3></td>
-            <td>
-                <select name="duration[hour]">
-                    <option value="0">hh</option>
-                </select>
-                <select name="duration[minute]">
-                    <option value="0">mm</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td><h3>Description</h3></td>
-            <td><textarea name="description" style="width: 100%;height: 250px;"></textarea></td>
-        </tr>
-        <tr>
-            <td>&nbsp;</td>
-            <td><input type="submit" name="create" value="Create Assessment" class="btn"/></td>
-        </tr>
-    </table>
-</form>
+<div id="assess">
+
+	<h1>Create Assessment</h1>
+	<form name="create" action="/assess/create/" class="standardForm" method="post">
+		<table>
+			<thead>
+			<tr><td colspan="2"><h2>Details</h2></td></tr>
+				
+
+				</thead>
+				<tbody>
+					<tr>					
+						<td class="formLabelWidth"><h3>Title</h3><span>Description</span></td>
+						<td><input name="title" type="text" size="35" maxlength="50" /></td>
+					</tr>
+					<tr>
+						<td><h3>Start</h3></td>
+						<td>
+							<select name="start[hour]">
+								<option>12</option>
+							</select>
+							<select name="start[minute]">
+								<option>00</option>
+							</select>
+							<select name="start[meridiem]">
+								<option selected>am</option>
+								<option>pm</option>
+							</select>
+							<input name="start[date]" id="start_date" type="text" size="15" maxlength="10" value="{START_DATE}" />
+							<img src="/images/ico_calendar.gif" width="16" height="13" id="start_date_trigger" style="cursor: pointer;" title="Date Selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+						</td>
+					</tr>
+					<tr>
+						<td><h3>Finish</h3><span>Period available for completion</span></td>
+						<td>
+							<select name="finish[hour]">
+								<option>12</option>
+							</select>
+							<select name="finish[minute]">
+								<option>00</option>
+							</select>
+							<select name="finish[meridiem]">
+								<option selected>am</option>
+								<option>pm</option>
+							</select>
+							<input name="finish[date]" id="finish_date" type="text" size="15" maxlength="10" value="{FINISH_DATE}" />
+							<img src="/images/ico_calendar.gif" width="16" height="13" id="finish_date_trigger" style="cursor: pointer;" title="Date Selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+						</td>
+					</tr>
+					<tr>
+						<td><h3>Duration</h3><span>Test time limit</span></td>
+						<td>
+							<select name="duration[hour]">
+								<option value="0">hh</option>
+							</select>
+							<select name="duration[minute]">
+								<option value="0">mm</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td><h3>Description</h3><span>Any extra information</span></td>
+						<td><textarea name="description" style="width: 100%;height: 250px;"></textarea></td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td><input type="submit" name="create" value="Create Assessment" class="btn"/></td>
+					</tr>
+				</tbody>
+		</table>
+	</form>
+</div>

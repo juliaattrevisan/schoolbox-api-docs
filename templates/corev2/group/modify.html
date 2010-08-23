@@ -23,7 +23,7 @@ $j(document).ready(function() {
             $j(this).attr('checked', false);
         }
 
-        $j.get('/group/modifyForm.php', data);
+        $.get('/group/modifyForm.php', data);
     });
 });
 </script>
@@ -43,7 +43,7 @@ $j(document).ready(function () {
 	
 	$j('#type_form input').each(function () {
 		$j(this).click(function () {
-			$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', type: $j(this).val()});
+			$.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', type: $j(this).val()});
 		});
 	});
 
@@ -52,10 +52,10 @@ $j(document).ready(function () {
 		$j(this).click(function () {
 			if ($j(this).attr('src').indexOf('greentick') != -1) {
 				$j(this).attr('src', '/images/emptybox.gif');
-				$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', userID: $j(this).attr('rel'), write: 1});
+				$.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', userID: $j(this).attr('rel'), write: 1});
 			} else {
 				$j(this).attr('src', '/images/greentick.gif');
-				$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', userID: $j(this).attr('rel'), write: 2});
+				$.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', userID: $j(this).attr('rel'), write: 2});
 			}		
 		});
 		$j(this).css('cursor','pointer');
@@ -81,7 +81,7 @@ $j(document).ready(function () {
 });
 /*
 window.addEvent('domready', function () {
-	new Autocompleter.Ajax.Json($('addUser'), '/ajax/user.php?groupID=0', {
+	new Autocompleter.Ajax.Json($j('addUser'), '/ajax/user.php?groupID=0', {
 		minLength: 2,
 		postVar: 'keyword',
 		width: 400,

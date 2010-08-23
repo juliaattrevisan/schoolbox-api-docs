@@ -33,7 +33,7 @@
         window.onload = new Function('showRow();');
         
         Behaviour.addLoadEvent(function () { 
-            $$('.campusCheck').each(function (o) {
+            $$j('.campusCheck').each(function (o) {
                     o.addEvents({
                         'mouseup' : function (e) {
                                 if (!countSelected(o)) checkNext(o);
@@ -45,7 +45,7 @@
         
         function countSelected (ol) {
             var s = 0;
-            $$('.campusCheck').each(function (o) { 
+            $$j('.campusCheck').each(function (o) { 
                                         if (o != ol && o.checked == true) 
                                             s++;
                                     });
@@ -53,7 +53,7 @@
         }
         
         function checkNext(ol) {
-            $$('.campusCheck').each(function (o) { 
+            $$j('.campusCheck').each(function (o) { 
                                         if (o != ol) 
                                             o.checked = true;
                                             return;
@@ -61,9 +61,9 @@
         }
 		function toggleRepeat(o) {
 			if (o.value == '')
-				$('repeatUntil').style.display = 'none';
+				$j('repeatUntil').style.display = 'none';
 			else
-				$('repeatUntil').style.display = '';
+				$j('repeatUntil').style.display = '';
 		}
 		
 		function confirmDelete(eventID) {

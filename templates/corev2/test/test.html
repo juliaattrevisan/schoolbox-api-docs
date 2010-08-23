@@ -8,63 +8,63 @@ window.addEvent('domready', function() {
 	var carousel  = new Carousel('questions');
 	var countdown = new CountDown({h: {DURATION_HOURS}, m: {DURATION_MINUTES},
 		onTick: function() {
-			$$('#duration h1').set('text', this.text);
+			$$j('#duration h1').set('text', this.text);
 		},
 		onDone: function() {
-			$('carousel').submit();
+			$j('carousel').submit();
 		}
 	});
 	
 	// setup list
-	$$('#list li a').each(function(el, i) {
+	$$j('#list li a').each(function(el, i) {
 		el.addEvent('click', function() {
 			carousel.move(i + 1);
 			
 			if(carousel.first)
-				$$('#controls-left input').set('disabled', 'disabled');
+				$$j('#controls-left input').set('disabled', 'disabled');
 			else
-				$$('#controls-left input').set('disabled');
+				$$j('#controls-left input').set('disabled');
 				
 			if(carousel.last) {
-				$$('#controls-right input').set('value', 'Finish Test');
+				$$j('#controls-right input').set('value', 'Finish Test');
 			} else {
-				$$('#controls-right input').set('value', 'Next');
+				$$j('#controls-right input').set('value', 'Next');
 			}
 		});
 	});
 	
 	
 	// controls
-	$$('#controls-left input').addEvent('click', function(event) {
+	$$j('#controls-left input').addEvent('click', function(event) {
 		carousel.prev();
 		
 		if(carousel.first)
-			$$('#controls-left input').set('disabled', 'disabled');
+			$$j('#controls-left input').set('disabled', 'disabled');
 		else
-			$$('#controls-left input').set('disabled');
+			$$j('#controls-left input').set('disabled');
 			
 		if(carousel.last) {
-			$$('#controls-right input').set('value', 'Finish Test');
+			$$j('#controls-right input').set('value', 'Finish Test');
 		} else {
-			$$('#controls-right input').set('value', 'Next');
+			$$j('#controls-right input').set('value', 'Next');
 		}
 	});
 
-	$$('#controls-right input').addEvent('click', function() {
+	$$j('#controls-right input').addEvent('click', function() {
 		if(carousel.last)
-			$('carousel').submit();
+			$j('carousel').submit();
 		
 		carousel.next();
 		
 		if(carousel.first)
-			$$('#controls-left input').set('disabled', 'disabled');
+			$$j('#controls-left input').set('disabled', 'disabled');
 		else
-			$$('#controls-left input').set('disabled');
+			$$j('#controls-left input').set('disabled');
 			
 		if(carousel.last) {
-			$$('#controls-right input').set('value', 'Finish Test');
+			$$j('#controls-right input').set('value', 'Finish Test');
 		} else {
-			$$('#controls-right input').set('value', 'Next');
+			$$j('#controls-right input').set('value', 'Next');
 		}
 	});
 });

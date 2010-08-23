@@ -27,7 +27,7 @@ $j(function() {
 		$j('div.bubble').remove();
 		var node = $j(this).closest('li'), ev = node.attr("id").substring(6);
 		
-		$j.post('/ajax/submission.php', { id : ev }, function(data){
+		$.post('/ajax/submission.php', { id : ev }, function(data){
 							winStr = '<div class="bubble"> \
 													<div class="bubble-main"> \
 														<a class="bubble-close" href="#"></a> \

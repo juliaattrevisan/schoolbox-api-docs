@@ -4,16 +4,16 @@
 function verify(){
 	var msg = ""
 	//check that description, url, location have been entered
-	if($('name').value == "")
+	if($j('name').value == "")
 		msg += "You need to enter a name.\n";
 
-	if($('parent').value == "" || isNaN($('parent').value))
+	if($j('parent').value == "" || isNaN($j('parent').value))
 		msg += "You need to select a proper location.\n";
 	
-	if ($('groupcheck') && !$('groupcheck').checked) {
+	if ($j('groupcheck') && !$j('groupcheck').checked) {
 		
 		var ok = false;
-		$$('.no_permission').each(function (o) {
+		$$j('.no_permission').each(function (o) {
 		
 			if (!o.checked)
 				ok = true;

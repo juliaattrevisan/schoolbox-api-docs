@@ -7,13 +7,13 @@
 <script language="JavaScript" type="text/javascript">
 function verify () {
 	var msg = ""
-	if($('typeSelect').value == 2 && $('name').value == "")
+	if($j('typeSelect').value == 2 && $j('name').value == "")
 		msg += "Name is a required field\n";
 
-	if($('typeSelect').value == 1 && $('classSelect').value == "")
+	if($j('typeSelect').value == 1 && $j('classSelect').value == "")
 		msg += "Name is a required field\n";
 	
-	if($('cal_date') && $('cal_date').value == "")
+	if($j('cal_date') && $j('cal_date').value == "")
 		msg += "Date is a required field\n";
 	
 	if (!checkTime())
@@ -22,50 +22,50 @@ function verify () {
 	if(msg != ""){
 		alert(msg);
 		return false;
-	} else if ($('actionType').value == 'sequence') {
+	} else if ($j('actionType').value == 'sequence') {
 		return confirm('This will modify all events in the sequence. Press OK to continue.');
 	} else
 		return true;
 }
 function toggleRepeat(o) {
 	if (o.value == '')
-		$('repeatUntil').style.display = 'none';
+		$j('repeatUntil').style.display = 'none';
 	else
-		$('repeatUntil').style.display = '';
+		$j('repeatUntil').style.display = '';
 
 }
 function checkTime() {
-	if ($('tohour').value == '')
+	if ($j('tohour').value == '')
 		return true;
-	else if ($('period').value == $('toperiod').value) {
-		if (parseInt($('hour').value) > parseInt($('tohour').value) && parseInt($('hour').value) != 12)
+	else if ($j('period').value == $j('toperiod').value) {
+		if (parseInt($j('hour').value) > parseInt($j('tohour').value) && parseInt($j('hour').value) != 12)
 			return false;
-		else if ($('hour').value == $('tohour').value) {
-			if (parseInt($('minute').value) > parseInt($('tominute').value))
+		else if ($j('hour').value == $j('tohour').value) {
+			if (parseInt($j('minute').value) > parseInt($j('tominute').value))
 				return false;
 			else
 				return true;
 		} else
 			return true;
 		
-	} else if ($('toperiod').value == 'am')
+	} else if ($j('toperiod').value == 'am')
 		return false;
 	else
 		return true;
 }
 
 window.addEvent('domready', function () {
-	$('typeSelect').addEvent('change', function () {
-		if ($(this).value == 1) {
-			$('nameRow').setStyle('display', 'none');
-			$('classRow').setStyle('display', '');
+	$j('typeSelect').addEvent('change', function () {
+		if ($j(this).value == 1) {
+			$j('nameRow').setStyle('display', 'none');
+			$j('classRow').setStyle('display', '');
 		} else {
-			$('nameRow').setStyle('display', '');
-			$('classRow').setStyle('display', 'none');
+			$j('nameRow').setStyle('display', '');
+			$j('classRow').setStyle('display', 'none');
 		}
 	});
-	if ($('deleteSequence')) {
-		$('deleteSequence').addEvent('click', function () {
+	if ($j('deleteSequence')) {
+		$j('deleteSequence').addEvent('click', function () {
 			if (confirm('Are you sure you want to delete all {TOTAL_EVENTS} events in this sequence?'))
 				window.open('/modules/tutorial/event/modifyForm.php?deleteSequence={EVENT_ID}','_self','');
 		});

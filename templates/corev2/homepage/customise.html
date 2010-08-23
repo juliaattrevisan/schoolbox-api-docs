@@ -31,7 +31,7 @@ $j(function () {
 	});
 	
 
-	var f = $j.farbtastic('#picker');
+	var f = $.farbtastic('#picker');
 	f.linkTo($j('#bg_primary').next().add($j('#bg_primary')).add($j('#currentColour')));
 	
 
@@ -92,24 +92,24 @@ window.addEvent('domready', function () {
 			}
 		});
 		pickers[i][2].manualSet(pickers[i][1], 'hex');
-		$(pickers[i][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
-		$(pickers[i][0] + '_input').value = pickers[i][2].sets.hex;
+		$j(pickers[i][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
+		$j(pickers[i][0] + '_input').value = pickers[i][2].sets.hex;
 	};
 
-	$("loadDefaults").addEvent('click', function () {
+	$j("loadDefaults").addEvent('click', function () {
 		for(i = 0; i < pickers.length; i++){
 			pickers[i][2].manualSet(defaults[i][1], 'hex');
-			$(pickers[i][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
-			$(pickers[i][0] + '_input').value = pickers[i][2].sets.hex;		
+			$j(pickers[i][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
+			$j(pickers[i][0] + '_input').value = pickers[i][2].sets.hex;		
 		}
 	});
 	
-	$("leftRight").addEvent('click', function () {
+	$j("leftRight").addEvent('click', function () {
 		var half = pickers.length/2;
 		for (i = 0; i < half; i++) {
 			pickers[(i+half)][2].manualSet(pickers[i][1], 'hex');
-			$(pickers[(i+half)][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
-			$(pickers[(i+half)][0] + '_input').value = pickers[i][2].sets.hex;		
+			$j(pickers[(i+half)][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
+			$j(pickers[(i+half)][0] + '_input').value = pickers[i][2].sets.hex;		
 		}
 	});
 	

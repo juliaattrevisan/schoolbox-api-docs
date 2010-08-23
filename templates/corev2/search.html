@@ -27,7 +27,7 @@
             var parent = $j('#a'+ params[1]).parent();
             $j(parent).show();
             $j('#type a[title='+parent.attr('id')+']').addClass('selected');
-            $j.scrollTo('#a'+ params[1]);
+            $.scrollTo('#a'+ params[1]);
         } else {
             $j('#type li:first-child a').addClass('selected');
             $j('div.results > div:first-child').show();

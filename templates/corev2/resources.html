@@ -23,7 +23,7 @@ $j(function() {
 			onclick: function () { window.open("/send.php?save=1&id="+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/disk.png'
 		}},
-		$j.contextMenu.separator,
+		$.contextMenu.separator,
 		{"Modify": {
 			onclick: function () {
 				if ($j(this).hasClass("link"))
@@ -66,7 +66,7 @@ $j(function() {
 			icon: '/images/famicons/page_delete.png'
 			
 		}},
-		$j.contextMenu.separator,
+		$.contextMenu.separator,
 		{"New File": {
 			onclick: function () { 
 				var categoryID = $j(this)[0].className.match(/category-([\d]+)/)[1].toString();
@@ -86,7 +86,7 @@ $j(function() {
 			onclick: function () { window.open("/cms/category/new/"+$j(this).data("category"),"_self"); },
 			icon: '/images/famicons/folder_add.png'
 		}},
-		$j.contextMenu.separator,
+		$.contextMenu.separator,
 		{"Properties": function () { 
 			var ajaxURL;
 			if ($j(this).hasClass("link"))
@@ -94,7 +94,7 @@ $j(function() {
 			else
 				ajaxURL = "/cms/properties.php?fileID="+$j(this).attr("id").substring(5);
 			
-			$j.get(ajaxURL, function (data) {
+			$.get(ajaxURL, function (data) {
 				
 				$j(data).modal({
 					position: ["15%"],
@@ -111,7 +111,7 @@ $j(function() {
 					onClose: function (dialog) { 
 						dialog.container.fadeOut(200, function () { 
 							dialog.overlay.fadeOut(200, function () { 
-									$j.modal.close(); 
+									$.modal.close(); 
 							});  
 						}); 
 					}					
@@ -130,7 +130,7 @@ $j(function() {
 			onclick: function () { window.open("/cms/imageGallery/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/images.png'
 		}},
-		$j.contextMenu.separator,
+		$.contextMenu.separator,
 		{"Modify": { 
 			onclick: function () { window.open("/cms/category/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/folder_edit.png'
@@ -149,7 +149,7 @@ $j(function() {
 			}
 			
 		}},
-		$j.contextMenu.separator,
+		$.contextMenu.separator,
 		{"New File": {
 			onclick: function () { window.open("/cms/file/new/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/page_add.png'
@@ -163,7 +163,7 @@ $j(function() {
 			onclick: function () { window.open("/cms/category/new/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/folder_add.png'
 		}},
-		$j.contextMenu.separator,
+		$.contextMenu.separator,
 		{"Download": {
 			onclick: function () { window.open("/cms/fetchFolder.php?folder="+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/page_white_compressed.png'
@@ -200,12 +200,12 @@ $j(function() {
 			$j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
 			
 			/* remember tree branch */
-			$j.post('/ajax/tree.php', {resourcesID : relationID});
+			$.post('/ajax/tree.php', {resourcesID : relationID});
 				
 		} else {
 		
 			/* ajax load files */
-			$j.post('/ajax/file.php', {categoryID : relationID}, function (data) {
+			$.post('/ajax/file.php', {categoryID : relationID}, function (data) {
 				
 				if (data.error) {
 					alert(data.error);

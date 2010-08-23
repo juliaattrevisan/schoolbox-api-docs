@@ -123,7 +123,7 @@ th { font-weight:bold; }
 
 #search { float: right; width: 266px; margin-top: 0; clear:right; }
 #search-field { border: 1px solid #b8b8b8; width: 175px; padding: 3px 5px; float: left; }
-#search-button { border:none; float: right; height:20px; padding:4px 0 0; text-align:center; width:75px; background:#f0f0f0; }
+#search-button { border:none; float: right; height:24px; margin:0;text-align:center; width:75px; background:#f0f0f0; }
 #search-button:hover { background:#ccc; }
 #infoPanel { float: right; margin: 22px 15px 0 0; }
 #infoPanel li { float: left; color: #fff; font-size: 11px; margin-left: 10px; padding-left: 11px; background: url(/images/header-div.gif) no-repeat 0 50%; color: #444; }
@@ -260,6 +260,16 @@ p.forgot a { font-size: 90%; }
 Module Specific Styles (ALPHABETICAL SECTIONS)
 --------------------------------------------------------------*/
 
+/*ASSESS*/
+#assess table{width:790px; background:#fff;}
+#assess table td span{font-size:10px;}
+#assess .standardForm, #assess .standardForm td, #assess .standardForm tr, #assess .standardForm thead{ border: 0}
+#assess .standardForm thead td, #assess .standardForm{padding:0;}
+#assess .standardForm tbody{border: 1px solid #ccc; border-collapse:collapse;}
+#assess .standardForm h2{text-indent:10px; background:#245398;}
+#assess td.formLabelWidth{width:195px;}
+#assess .standardForm{background:#fff;}
+
 /*BLOG*/
 .blog-comments { background: #eee; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
 .blog-comments p.interact { border-top: 1px dashed #ccc; padding-top: 0.5em; font-size: 11px; }
@@ -271,7 +281,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #infoPanel a { color: #fff; }
 
 /*CALENDAR*/
-#calendar table {border-bottom:1px dotted #C3CDD7;}
+#calendar table {border-bottom:1px dotted #C3CDD7; position:relative; z-index:1;}
 #calendar h3{font-size:18px; font-weight:bold; line-height:25px;}
 
 #week-view .dayWrap{border-right:1px dotted #C3CDD7;text-align:left}
@@ -280,7 +290,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #week-view .noteWrap .modify a{text-align:left;display:block;margin:10px 0 3px;padding:2px 5px; font-size:11px;background-color: #bebebe;background-image: -moz-linear-gradient(top, #d8d8d8, #bebebe); /* FF3.6 */background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #d8d8d8),color-stop(1, #bebebe)); /* Saf4+, Chrome */ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#d8d8d8', EndColorStr='#bebebe'); /* IE6,IE7 */-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#d8d8d8', EndColorStr='#bebebe')"; /* IE8 */text-shadow: 1px 1px 1px #f0f0f0; /* FF3.5+, Opera 9+, Saf1+, Chrome */}
 #week-view .noteWrap .modify a:hover{background-color: #e2e2e2;background-image: -moz-linear-gradient(top, #e2e2e2, #c7c7c7); /* FF3.6 */background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #e2e2e2),color-stop(1, #c7c7c7)); /* Saf4+, Chrome */ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#e2e2e2', EndColorStr='#c7c7c7'); /* IE6,IE7 */-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#e2e2e2', EndColorStr='#c7c7c7')"; /* IE8 */text-shadow: 1px 1px 1px #f0f0f0; /* FF3.5+, Opera 9+, Saf1+, Chrome */}
 .day-block span.time{display:block; background:#fff; border:1px #ccc solid; border-bottom:0; padding:3px; margin: 5px 10px 0 5px;  -moz-border-radius:5px 5px 0 0; /* FF1+ */-webkit-border-radius: 5px 5px 0 0; /* Saf3-4 */border-radius: 5px 5px 0 0; /* Opera 10.5, IE 9, Saf5, Chrome */}
-.day-block ul {margin:5px; z-index:500;}
+.day-block ul {margin:5px; }
 #month-view thead td { color: #000000; }
 #month-view td.dark { background: #eee; }
 #month-view {  width: 100%; }
@@ -306,13 +316,13 @@ td.cal-mid h3{text-align:center;}
 td.cal-right a.customise{margin-top:12px;height:24px; line-height:24px; padding:0 8px; color:#000; display:inline-block;text-decoration:none; background:#ececec}
 td.cal-right a.week{background:#cacaca;}
 td.cal-right a.filters{position:relative;background:#1597cb url(/images/corev2/calendar/filters.gif) 8px 7px no-repeat; padding-left:23px; color:#ffffff; margin-right:10px;}
-td.cal-right .link-case{position:relative; height:36px;}
+td.cal-right .link-case{position:relative; height:36px; z-index:5000;}
 
-td.cal-right .link-case .filter-drop{display:none; position:absolute; top:100%; right:107px;width:450px; z-index:4000; }
+td.cal-right .link-case .filter-drop{display:none; position:absolute; top:100%; right:107px;width:450px; z-index:6000; }
 td.cal-right .link-case .filter-drop .filter-list{ background:#fff; border:1px solid #9f9f9f;-moz-border-radius: 5px 0 5px 5px;-webkit-border-radius: 5px 0 5px 5px;border-radius: 5px 0 5px 5px; padding:20px}
 .filter-cat{float:left; width:129px; text-align:center; margin-right:10px}
 .filter-cat span{font-weight:bold; display:block}
-.filter-cat label{text-align:left;display:block;float:left;padding-top:5px;margin:0; font-weight:normal}
+.filter-cat label{text-align:left;display:block;float:left;margin:0; font-weight:normal; width:100%;}
 .filter-cat .checkbox{clear:left;display:block;float:left;margin:1px 6px 0 1px;}
 .filter-cat.last{margin-right:0;}
 
@@ -338,18 +348,16 @@ td.border-left{border-left:1px solid #ECECEC; }
 
 ul.js_happening li span{display:block; padding:5px; -moz-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px;cursor:pointer;}
 ul.js_happening li span:hover{opacity:0.8;}
-ul.js_happening li{margin-bottom:4px; position:relative;}
+ul.js_happening li{margin-bottom:4px; position:relative; }
 
-.cal-bubble {z-index:2000;bottom:90%;color:#000000;font-size:11px;left:-100px;position:absolute;width:350px;z-index:100;display:none;}
-.cal-bubble .top{height:8px; border:1px solid #000; border-bottom:0;background:#fff; -moz-border-radius: 5px 5px 0 0; /* FF1+ */ -webkit-border-radius:  5px 5px 0 0; /* Saf3-4 */border-radius: 5px 5px 0 0; /* Opera 10.5, IE 9, Saf5, Chrome */}
-.cal-bubble  .middle{padding:10px 19px;position:relative;background:#fff;  border:1px solid #000; border-top:0; border-bottom:0;}
-.cal-bubble  .middle .close{position:absolute; right:10px; top:0px; width:15px; height:15px; background:#000; cursor:pointer;z-index:2000;}
-.cal-bubble  .middle h4{line-height:24px;font-size:16px; font-weight:normal; margin:0 0 20px 0;padding-bottom:5px; border-bottom:1px solid #f0f0f0;}
-.cal-bubble  .middle h4 span{margin:0 0 5px 0; padding:2px; -moz-border-radius: 5px;  -webkit-border-radius: 5px; border-radius: 5px;}
-.cal-bubble  .middle p{font-size:12px; margin: 0 0 16px 0; padding:0;}
-.cal-bubble  .middle span.time{border:0; padding:0; margin:0;}
-
-
+ul.js_happening li .cal-bubble {z-index:2000;bottom:90%;color:#000000;font-size:11px;left:-100px;position:absolute;width:350px;display:none;}
+ul.js_happening li .cal-bubble .top{height:8px; border:1px solid #000; border-bottom:0;background:#fff; -moz-border-radius: 5px 5px 0 0; /* FF1+ */ -webkit-border-radius:  5px 5px 0 0; /* Saf3-4 */border-radius: 5px 5px 0 0; /* Opera 10.5, IE 9, Saf5, Chrome */}
+ul.js_happening li .cal-bubble  .middle{padding:10px 19px;position:relative;background:#fff;  border:1px solid #000; border-top:0; border-bottom:0;}
+ul.js_happening li .cal-bubble  .middle .close{position:absolute; right:10px; top:0px; width:15px; height:15px; background:#000; cursor:pointer;z-index:2000;}
+ul.js_happening li .cal-bubble  .middle h4{line-height:24px;font-size:16px; font-weight:normal; margin:0 0 10px 0;padding-bottom:5px; border-bottom:1px solid #f0f0f0;}
+ul.js_happening li .cal-bubble  .middle h4 span{margin:0 0 5px 0; padding:2px; -moz-border-radius: 5px;  -webkit-border-radius: 5px; border-radius: 5px;}
+ul.js_happening li .cal-bubble  .middle p{font-size:12px; margin: 0 0 16px 0; padding:0;}
+ul.js_happening li .cal-bubble  .middle span.time{border:0; padding:0; margin:0;}
 
 .day-block .header_option { float: right; margin: 0 !important; padding: 0; }
 .day-num {   float: left; left: 0; padding: 0; margin: 0 !important; font: 11px Arial, Verdana, Helvetica, sans-serif; }
@@ -358,7 +366,7 @@ ul.js_happening li{margin-bottom:4px; position:relative;}
 .otherMonth .dayWrap p, .otherMonth .dayWrap a{color:#1597cb;}
 .otherMonth .day-num { font-weight: normal; }
 .otherMonth ul li span{opacity:.3}
-select { width: 160px; }
+.otherMonth select { width: 160px; }
 
 .ui-datepicker-trigger{padding:4px 7px 0 8px; cursor:pointer;display:block;}
 

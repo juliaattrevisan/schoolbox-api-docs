@@ -15,7 +15,9 @@
 					showAnim: 'slideDown'
         });
 			
+		//show or hide bubbles
 		$j('ul.js_happening li').click(function(){
+			$j('.filter-drop').hide();	
 			if ($j(this).children('.cal-bubble').is(':visible')) {
 				$j('.cal-bubble').hide();	
 			} else {
@@ -24,19 +26,45 @@
 			}
 		});
 		
+		//show and hide the filters drop down
 		$j('a.filters').click(function(){
+			
+			$j('.cal-bubble').hide();
+			
 			if ($j('.filter-drop').is(':visible')) {
 				$j('.filter-drop').hide();	
 			} else { 
-				$j('.filter-drop').show();	
+				$j('.filter-drop').show();		
 			}
 
 		});
+		
+		$j('.filter-list input:checked').checked;
+		
+		//run the filter checker to show and hide the items
+		$j('#applyFilters').click(filterChecker);
+		
+		function filterChecker() {
+			
+			$j('.filter-list input:checked').each(function(){		 		
+				var m = $j(this).attr('value');
+				if ($j('ul.js_happening .' + m).is(':hidden')) {
+				  $j('ul.js_happening .' + m).show();
+				}
+			});
+			
+			$j('.filter-list input:not(:checked)').each(function(){
+				var n = $j(this).attr('value');
+				if ($j('ul.js_happening .' + n).is('::visible')) {
+				  $j('ul.js_happening .' + n).hide();
+				}
+			});
+				
+		}//end of filterchecker
 });
 
 </script>
      <div id="calendar">
-     
      
       <table id="month-view" cellpadding="0" cellspacing="0">
       	<thead>
@@ -59,7 +87,7 @@
 								<span>Groups</span>
 								<!-- BEGIN group -->
 									<label title="{GROUP_NAME}">
-										<input type="checkbox" name="campus" id="{GROUP_ID}" value="{GROUP_ID}" {GROUP_ID_SELECTED} class="checkbox"/>{GROUP_NAME}
+										<input type="checkbox" name="campus" id="{GROUP_ID}" value="{GROUP_ID}" checked="checked" class="checkbox"/>{GROUP_NAME}
 									</label>
 									<div class="float-fix"></div>
 								<!-- END group -->
@@ -74,16 +102,17 @@
 								<!-- END campus -->
 								</div>
 								<div class="filter-cat last">
-								<span>Campus</span>
+								<span>Event</span>
 								<!-- BEGIN event_type -->
-								<label title="{EVENT_NAME}">
-									<input type="checkbox" name="campus" id="{EVENT_ID}" {EVENT_ID_SELECTED} value="{EVENT_ID}" class="checkbox"/>{EVENT_NAME}
+								<label title="{EVENT_TYPE_NAME}">
+									<input type="checkbox" name="campus" id="{EVENT_TYPE_ID}" checked="checked" value="type{EVENT_TYPE_ID}" class="checkbox"/><span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
 								</label>
-								<div class="float-fix"></div>
 								<!-- END event_type -->
 								<div class="float-fix"></div>
-							</form>
-						</div><!--/filter-list-->
+							
+								</div><!--/filter-list-->
+							<a href="#" id="applyFilters">Apply</a>
+						</form>
 					</div><!--/filter-drop-->
 				</div>
 			</td>
@@ -111,17 +140,16 @@
             <div class="noteWrap">
 				<ul class="js_happening">
 					<!-- BEGIN note_block -->
-					<li>
+					<li class="{EVENT_TYPE} {EVENT_LEVEL} ">
 						<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{TIME} {NOTE}</span>
 						<div class="cal-bubble">
 							<div class="top"></div>
 							<div class="middle">
 							<h4><!-- BEGIN time --><span style="background-color:{COLOUR}; border:1px solid {COLOUR}">{TIME}</span><!-- END time -->{NOTE}</h4>
+							<p class="event-type">{TYPE}</p>
 							<p class="author">{AUTHOR}</p>
-							<p class="event-type">Campus</p>
-							  {MODIFY}
-							
-							{MODIFY}</div>
+							{MODIFY}
+							</div>
 						</div>
 					</li>
 					<!-- END note_block -->

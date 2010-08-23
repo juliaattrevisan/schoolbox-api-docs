@@ -17,7 +17,7 @@ $j(document).ready(function() {
 			onclick: function () { window.open("/send.php?myFile=1&save=1&id="+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/disk.png'
 		}},
-		$j.contextMenu.separator,
+		$.contextMenu.separator,
 		{"Modify": {
 			onclick: function () {
 				window.open("/cms/myFile/"+$j(this).attr("id").substring(5),"_self"); 
@@ -47,7 +47,7 @@ $j(document).ready(function() {
 				if (confirm("Are you sure you want to delete "+_name+"?")) window.open("/cms/myFolderForm.php?delete="+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/folder_delete.png'
 		}},
-		$j.contextMenu.separator,
+		$.contextMenu.separator,
 		{"New File": {
 			onclick: function () { window.open("/cms/myFile/new/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/page_add.png'
@@ -92,12 +92,12 @@ $j(document).ready(function() {
 			$j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
 			
 			/* remember tree branch */
-			$j.post('/cms/myFolderForm.php', {portfolioID : relationID});
+			$.post('/cms/myFolderForm.php', {portfolioID : relationID});
 				
 		} else {
 		
 			/* ajax load files */
-			$j.post('/cms/portfolioForm.php', {categoryID : relationID}, function (data) {
+			$.post('/cms/portfolioForm.php', {categoryID : relationID}, function (data) {
 				
 				if (data.error) {
 					alert(data.error);

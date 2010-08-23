@@ -28,7 +28,7 @@ $j(function () {
 		
 		} else if ($j('#recaptcha_answer').length > 0) {
 			
-			$j.get('/ajax/recaptcha.php', 
+			$.get('/ajax/recaptcha.php', 
 				{'recaptcha_answer' : $j('#recaptcha_answer').val(), 'recaptcha_challenge' : $j('#recaptcha_challenge').val()},
 				function (data) {
 					if (data.verified == 'true') {
