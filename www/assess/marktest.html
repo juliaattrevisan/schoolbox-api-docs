@@ -16,7 +16,6 @@
 
 <link rel="Shortcut Icon" href="/images/corev2/favicon.ico" type="image/x-icon" />
 
-
 <script type="text/javascript" src="/javascript/jquery1.4.2.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
 <script type="text/javascript" src="/javascript/scripts.js"></script>
@@ -162,6 +161,7 @@
 
 
 <div id="assess" class="mark-test">
+	<h1>Mark Test</h1>
 	<form>
 	<div class="col-1">
 		<h2>Section 1</h2>
@@ -193,7 +193,9 @@
 				 luctus nisi, vitae consequat justo nisl sit amet magna. Phasellus gravida, urna et rhoncus placerat, tortor dui scelerisque est, 
 				ut dapibus leo lacus id metus. Mauris <span class="incorrect">facilisis</span> sem vitae nisl placerat dapibus.</div>
 				
-				<textarea name="comments">Insert comments here...</textarea>
+				<div class="textarea-container">
+					<textarea name="comments">Insert comments here...</textarea>
+				</div>
 				
 				<p>
 					<select>
@@ -214,12 +216,17 @@
 		<div class="question">	
 			<h3>Question 3<span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus nec?</span></h3>
 			<div class="question-body">
-				<textarea name="comments">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam fauci
-				bus rhoncus lectus tincidunt tincidunt. Duis <span class="correct">aliquet</span>, ante a consequat semper, orci justo
-				 luctus nisi, vitae consequat justo nisl sit amet magna. Phasellus gravida, urna et rhoncus placerat, tortor dui scelerisque est, 
-				ut dapibus leo lacus id metus. Mauris <span class="incorrect">facilisis</span> sem vitae nisl placerat dapibus. </textarea>
 				
-				<textarea name="comments">Insert comments here...</textarea>
+				<div class="textarea-container">
+					<textarea name="comments">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam fauci
+					bus rhoncus lectus tincidunt tincidunt. Duis <span class="correct">aliquet</span>, ante a consequat semper, orci justo
+					 luctus nisi, vitae consequat justo nisl sit amet magna. Phasellus gravida, urna et rhoncus placerat, tortor dui scelerisque est, 
+					ut dapibus leo lacus id metus. Mauris <span class="incorrect">facilisis</span> sem vitae nisl placerat dapibus.</textarea>
+				</div>
+				
+				<div class="textarea-container">
+					<textarea name="comments">Insert comments here...</textarea>
+				</div>
 				
 				<p>
 					<select>
@@ -240,23 +247,61 @@
 			<h3>Question 4<span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus nec?</span></h3>
 			<div class="question-body">
 				<ul>
-					<li><input type="text" value="Statement 2"/><span class="arrow"></span><input type="text" value="Statement 3"/><span class="mark"></span></li>
-					<li class="correct"><input type="text" value="Statement 2"/><span class="arrow"></span><input type="text" value="Statement 3"/><span class="mark"></span></li>
-					<li class="correct"><input type="text" value="Statement 2"/><span class="arrow"></span><input type="text" value="Statement 3"/><span class="mark"></span></li>
-					<li><input type="text" value="Statement 2"/><span class="arrow"></span><input type="text" value="Statement 3"/><span class="mark"></span></li>
+					<li>
+						<div class="drag-drop-wrapper">
+							<input type="text" value="Statement 2" class="statement-left"/>
+							<div class="arrow"><span></span></div>
+							<input type="text" value="Statement 3" class="statement-right"/>
+							<div class="mark"><span></span></div>
+							<div class="float-fix"></div>
+						</div>
+					</li>	
+					<li>
+						<div class="drag-drop-wrapper">
+							<input type="text" value="Statement 2" class="statement-left"/>
+							<div class="arrow"><span></span></div>
+							<input type="text" value="Statement 3" class="statement-right"/>
+							<div class="mark"><span></span></div>
+							<div class="float-fix"></div>
+						</div>
+					</li>						
+					<li>
+						<div class="drag-drop-wrapper">
+							<input type="text" value="Statement 2" class="statement-left"/>
+							<div class="arrow"><span></span></div>
+							<input type="text" value="Statement 3" class="statement-right"/>
+							<div class="mark"><span></span></div>
+							<div class="float-fix"></div>
+						</div>
+					</li>					
+					<li class="correct">
+						<div class="drag-drop-wrapper">
+							<input type="text" value="Statement 2"  class="statement-left"/>
+							<div class="arrow"><span></span></div>
+							<input type="text" value="Statement 3" class="statement-right"/>
+							<div class="mark"><span></span></div>
+							<div class="float-fix"></div>
+						</div>
+					</li>								
 				</ul>
-				<textarea name="comments">Insert comments here...</textarea>
+				
+				<div class="textarea-container">
+					<textarea name="comments">Insert comments here...</textarea>
+				</div>
+				
 				<p>0/5 Marks</p>
 			</div>
+			
 		</div><!--/question-->
 
-		<input type="submit" value="Submit Marking" />
+		<input type="submit" value="Submit Marking" class="submit"/>
+		<div class="float-fix"></div>
 		
 	</div><!--/col-1-->
 	
 	<div class="col-2">
 		<h2>Results</h2>
-		<div class="results">
+		<div class="additional-details">
 			<div class="section">
 				<h3>Section 1<span> - Multiple Choice</span></h3>
 				<p><ins></ins><span>Section Complete</span></p>
