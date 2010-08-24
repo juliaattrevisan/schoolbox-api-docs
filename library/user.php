@@ -160,8 +160,20 @@ class User extends Model {
 			return false;	
 	}
 
-	
-	
-}
+    /**
+     * Gets the profile information for the user.
+     * 
+     * @param <type> $userID
+     * @return <type> 
+     */
+    function getProfile($userID) {
+        $query = "SELECT `year`, luCampus.name AS campus, house.house
+                  FROM `user`
+                  LEFT JOIN house ON user.house = house.id
+                  LEFT JOIN luCampus ON user.campus = luCampus.id
+                  WHERE user.id = '$userID'";
 
+        return $this->db->getRow($query);
+	}
+}
 ?>

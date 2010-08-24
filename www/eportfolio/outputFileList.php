@@ -1,4 +1,5 @@
 <?php
+define('PUBLISHED_FILE', 1);
 
 require_once '../library/my-file.php';
 
@@ -30,18 +31,18 @@ if (is_array($fileList)) {
             $this->parse('unpublish_block', 'unpublish');
         }
         else {
-            $this->parse('unpublish_block' ,'');
+            $this->parse('unpublish_block', '');
         }
 
 		/* Set name
          */
 		if ($file['realname'] != "") {
 			if ($file['inline'] == 'true' && FILE_use_frame) {
-				$this->setVar('FILE_URL', '/sendframe.php?myFile=1&published=' . PUBLISHED_FILE .'&id='.$file['id']);
+				$this->setVar('FILE_URL', '/sendframe.php?myFile=1&published=' . PUBLISHED_FILE . '&id=' . $file['id']);
 				$this->setVar('FILE_TARGET', '_blank');
 			}
 			else {
-				$this->setVar('FILE_URL', '/send.php?myFile=1&published=' . PUBLISHED_FILE .'&id='.$file['id']);
+				$this->setVar('FILE_URL', '/send.php?myFile=1&published=' . PUBLISHED_FILE . '&id=' . $file['id']);
 				$this->setVar('FILE_TARGET', '_blank');
 			}
 
@@ -52,13 +53,6 @@ if (is_array($fileList)) {
 			$this->setVar('file_url_block', '');
 			$this->parse('file_no_url_block', 'file_no_url');
 		}
-
-		if ($permission >= WRITE_ACCESS) {
-			$this->parse('modify_file_block', 'modify_file');
-        }
-		else {
-			$this->setVar('modify_file_block','');
-        }
 
 		$this->parse('files_block', 'files', true);
 	}

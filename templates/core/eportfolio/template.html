@@ -40,6 +40,16 @@
     float: left;
 }
 
+.privateBlock .left img {
+    float: left;
+    display: block;
+}
+
+.privateBlock .left p {
+    padding: 10px;
+    float: left;
+}
+
 .privateBlock .right {
     width: 50%;
     float: right;
@@ -60,22 +70,26 @@
     <!-- END edit_page -->
 </h1>
 
-<!-- BEGIN privateNotes -->
 <div class="privateBlock">
     <div class="left">
+        <h2>My Profile</h2>
+        <img src="/search/portrait.php?id={SYNERGY_ID}&width=150&height=150" alt="{PERSON_NAME}" title="{PERSON_NAME}" />
+        <p>
+            <strong>{PERSON_NAME}</strong><br />
+            House: {HOUSE}<br />
+            Campus: {CAMPUS}<br />
+            Year: {YEAR_LEVEL}
+        </p>
+    </div>
+    <!-- BEGIN privateNotes -->
+    <div class="right">
         <h2>Private Notes</h2>
         <p>{PRIVATE_NOTES}</p>
         <!-- BEGIN modify_link --><p class="interact"><a href="/eportfolio_privateNotes/modify/{ID}">Modify</a></p><!-- END modify_link -->
     </div>
-    <div class="right">
-        <h2>Portrait</h2>
-        <p>Synergy ID: {SYNERGY_ID} image</p>
-        <p>Other details about this person</p>
-    </div>
+    <!-- END privateNotes -->
     <div class="float-fix"></div>
 </div>
-<!-- END privateNotes -->
-
 <div class="{TEMPLATE} homepage">
     <div class="left">{COLUMN1}</div>
     <div class="right">{COLUMN2}</div>
