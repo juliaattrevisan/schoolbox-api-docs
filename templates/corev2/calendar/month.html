@@ -14,16 +14,34 @@
 					buttonImageOnly: true,
 					showAnim: 'slideDown'
         });
+		
+		$j(window).resize(function() {
+
+			if ($j('.cal-bubble').is(':visible')) {	
+				$j('.cal-bubble').hide();	
+			}
 			
+		});
+
 		//show or hide bubbles
 		$j('ul.js_happening li').click(function(){
-			$j('.filter-drop').hide();	
+			
+			var position = $j(this).position();
+			var stupid = $j(this).children('p.fish').html();
+			
+			$j('.cal-bubble .middle').children('p.stuffhole').html(stupid);
+
+			$j('.cal-bubble').css("left", position.left);
+			$j('.cal-bubble').css("top", position.top);	
+			$j('.cal-bubble').show();	
+
+			/*$j('.filter-drop').hide();	
 			if ($j(this).children('.cal-bubble').is(':visible')) {
 				$j('.cal-bubble').hide();	
 			} else {
 				$j('.cal-bubble').hide();				
 				$j(this).children('.cal-bubble').show();	
-			}
+			}*/
 		});
 		
 		//show and hide the filters drop down
@@ -47,13 +65,6 @@
 		
 		function filterChecker() {
 			
-			$j('.filter-list input:checked').each(function(){		 		
-				var m = $j(this).attr('value');
-				if ($j('ul.js_happening .' + m).is(':hidden')) {
-				  $j('ul.js_happening .' + m).show();
-				}
-			});
-			
 			$j('.filter-list input:not(:checked)').each(function(){
 				var n = $j(this).attr('value');
 				if ($j('ul.js_happening .' + n).is('::visible')) {
@@ -61,11 +72,32 @@
 				}
 			});
 			
-			$j('.filter-drop').hide();	
+			$j('.filter-list input:checked').each(function(){		 		
+				var m = $j(this).attr('value');
+				if ($j('ul.js_happening .' + m).is(':hidden')) {
+				  $j('ul.js_happening .' + m).show();
+				}
+			});
 			
-				
+
+			
+			$j('.filter-list.groups input:not(:checked)').each(function(){
+				var m = $j(this).attr('name');
+			});
+			
+			$j('.filter-list.campus input:not(:checked)').each(function(){
+				var m = $j(this).attr('name');
+			});
+			
+			
+			$j('.filter-drop').hide();	
 		}//end of filterchecker
+
+	function callBubble(opts) {
 		
+		
+	
+	}
 });
 
 </script>
@@ -89,25 +121,25 @@
 					<div class="filter-drop">
 						<div class="filter-list">
 							<form>	
-								<div class="filter-cat">
+								<div class="filter-cat groups">
 									<span>Groups</span>
 									<!-- BEGIN group -->
 									<label title="{GROUP_NAME}">
-										<input type="checkbox" name="campus" id="{GROUP_ID}" value="type{GROUP_ID}" checked="checked" class="checkbox"/>{GROUP_NAME}
+										<input type="checkbox" name="campus" id="{GROUP_ID}" value="group{GROUP_ID}" checked="checked" class="checkbox"/>{GROUP_NAME}
 									</label>
 									<div class="float-fix"></div>
 								<!-- END group -->
 								</div>
-								<div class="filter-cat">
+								<div class="filter-cat campus">
 									<span>Campus</span>
 									<!-- BEGIN campus -->
 									<label title="{CAMPUS_NAME}">
-										<input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="{CAMPUS_ID}" class="checkbox"/>{CAMPUS_NAME}
+										<input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox"/>{CAMPUS_NAME}
 									</label>
 									<div class="float-fix"></div>
 								<!-- END campus -->
 								</div>
-								<div class="filter-cat last">
+								<div class="filter-cat events last">
 									<span>Event</span>
 									<!-- BEGIN event_type -->
 									<label title="{EVENT_TYPE_NAME}">
@@ -151,16 +183,9 @@
 					<ul class="js_happening">
 						<!-- BEGIN note_block -->
 						<li class="{EVENT_TYPE} {EVENT_LEVEL} ">
-							<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{TIME} {NOTE}</span>
-							<div class="cal-bubble">
-								<div class="top"></div>
-								<div class="middle">
-								<h4><!-- BEGIN time --><span style="background-color:{COLOUR}; border:1px solid {COLOUR}">{TIME}</span><!-- END time -->{NOTE}</h4>
-								<p class="event-type">{TYPE}</p>
-								<p class="author">{AUTHOR}</p>
-								<div class="modify">{MODIFY}</div>
-								</div>
-							</div>
+							<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}<br /></span>
+							<!-- BEGIN time --><span style="background-color:{COLOUR}; border:1px solid {COLOUR}">{TIME}</span><!-- END time -->
+							<p class="fish">{TYPE}{AUTHOR}{MODIFY}</p>
 						</li>
 						<!-- END note_block -->
 					</ul>
@@ -171,4 +196,28 @@
         <!-- END month_week -->
         </tbody>
       </table>
+	  
+	<div class="cal-bubble">
+		<div class="top"></div>
+		<div class="middle">
+			<h4>{NOTE}</h4>
+			<p class="event-type">Event Type: </p>
+			<p class="stuffhole"></p>
+		</div>
+		<div class="bottom"></div>
+	</div>
+	
+	
+	<!--	<div class="cal-bubble">
+		<div class="top"></div>
+		<div class="middle">
+			<h4>{NOTE}</h4>
+			<p class="event-type">Event Type: </p>
+			<p class="author">Author: {AUTHOR}</p>
+			<div class="modify">{MODIFY}</div>
+		</div>
+		<div class="bottom"></div>
+	</div>
+	-->
+
 </div>

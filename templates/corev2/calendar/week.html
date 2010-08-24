@@ -151,16 +151,6 @@
 						<span class="time">{TIME}</span>
 					<!-- END time -->
 						<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}</span>
-						<div class="cal-bubble">
-							<div class="top"></div>
-							<div class="middle">
-								<div class="close"></div>
-								<h4><!-- BEGIN time -->{TIME}<!-- END time --> - {NOTE}</h4>
-								<p class="author">{AUTHOR}</p>
-								<p class="event-type">{TYPE]</p>
-								<a href="#">{MODIFY}</a>
-							</div>
-						</div>
 					</li>
 					<!-- END note_block -->
 					</ul>
@@ -170,4 +160,15 @@
             
 		</table>
 		
-      </div>
+	<div class="cal-bubble">
+		<div class="top"></div>
+		<div class="middle">
+			<div class="close"></div>
+			<h4><!-- BEGIN time -->{TIME}<!-- END time -->{NOTE}</h4>
+			<p class="author">{AUTHOR}</p>
+			<p class="event-type">{TYPE]</p>
+			{MODIFY}
+		</div>
+		<div class="bottom"></div>
+	</div>
+</div>
