@@ -153,5 +153,4 @@ for($i=0; $i < 7; $i++) {
 	$this->parse("day_listing", "day_block", true);
 	$this->setVar("note_listing","");
 }
-
 ?>
