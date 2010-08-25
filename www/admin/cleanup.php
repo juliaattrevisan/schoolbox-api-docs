@@ -34,6 +34,11 @@ class clean {
 		print "Submission system last visit records cleaned<br>";
 	}
 
+    function cleanCalendar() {
+        $query = "DELETE FROM calendar WHERE level = 3";
+        $this->db->query($query);
+    }
+
 	function cleanSubmissionBoxes()
 	{
 		//unlink all student submissions
@@ -197,6 +202,8 @@ $clean = new clean;
 
 if($_GET['news'] == 1)
 	$clean->cleanNews();
+if($_GET['calendar'] == 1)
+	$clean->cleanCalendar();
 if($_GET['subnews'] == 1)
 	$clean->cleanSubNews();
 if($_GET['file'] == 1)

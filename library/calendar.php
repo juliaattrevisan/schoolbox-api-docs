@@ -75,7 +75,7 @@ class Calendar extends Model {
 	}
 
 	function getTypeList() {
-		$query = "SELECT eventTypeID, eventType FROM luEventType";
+		$query = "SELECT eventTypeID, eventType, eventColour FROM luEventType";
 		return $this->db->getAll($query);
 	}
 
@@ -201,13 +201,17 @@ class Calendar extends Model {
 		}
 			
 		//get single events for the day
-		$query = "SELECT DISTINCT id, owner,
+		$query = "SELECT DISTINCT event.id, owner,
 							TIME_FORMAT(startTime, '" . CALENDAR_time_format . "') as startTime, 
 							TIME_FORMAT(endTime, '" . CALENDAR_time_format . "') as endTime,
                             TIME_TO_SEC(startTime) as startTimestamp,
                             TIME_TO_SEC(endTime) as endTimestamp,
-							type, note, access, eventCampus.campusID as sid
-						FROM event 
+							type, note, access, sid,
+                            user.id as uid, title, firstname, lastname,
+                            eventType, eventColour
+						FROM event
+                        LEFT JOIN user ON owner = user.id
+                        LEFT JOIN luEventType ON type = eventTypeID
 						LEFT JOIN eventCampus ON event.id = eventCampus.eventID
 						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 						WHERE date = '" . date("Y-m-d", $currentDay) . "'

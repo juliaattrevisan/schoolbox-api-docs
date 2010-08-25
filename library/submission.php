@@ -188,10 +188,13 @@ class Submission extends Model {
 		return $this->db->getAll($query);
 	}
 
-    function logPageView($box_id)
+    function logPageView($page, $box_id = 0)
     {
+            //Page 1=due work page, 2 = returned work page (deprecated), 3 = submission page
+
+
             /* TODO: rewrite this code in simpler method probably use mysql insert/update */
-            $testquery = "SELECT datetime FROM submission_log WHERE page = '3'
+            $testquery = "SELECT datetime FROM submission_log WHERE page = '$page'
             AND user = '".$_SESSION['id']."' AND sid = '$box_id'";
 
             $this->db->query($testquery);
@@ -199,12 +202,12 @@ class Submission extends Model {
             if($row = $this->db->getNextArray() )
             {
                     $query = "UPDATE submission_log SET datetime = NOW() WHERE page =
-                    '3' AND user = '".$_SESSION['id']."' AND sid = '$box_id'";
+                    '$page' AND user = '".$_SESSION['id']."' AND sid = '$box_id'";
             }
             else
             {
                     $query = "INSERT INTO submission_log (datetime, user, page, sid) VALUES
-                            (NOW(), '".$_SESSION['id']."', '3', '$box_id')";
+                            (NOW(), '".$_SESSION['id']."', '$page', '$box_id')";
             }
 
             $this->db->query($query);

@@ -263,7 +263,7 @@ if (!empty($result['link'])) {
 
 
     foreach ($result['link'] as $link) {
-        foreach ($categoryStd->breadcrumb($link['id']) as $i => $breadcrumb)
+        foreach ($categoryStd->breadcrumb($link['category']) as $i => $breadcrumb)
             $link['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
 
         $page->setVar(array(

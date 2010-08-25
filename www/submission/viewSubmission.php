@@ -23,7 +23,7 @@ if(is_numeric($this->arg[0])) {
         error(17);
     }
 
-    $submissionHandler->logPageView($this->arg[0]);
+    $submissionHandler->logPageView(3, $this->arg[0]);
 
     $this->setVar('ASSDESC', scrubTEXT($subBox['categoryName'])." - ".scrubTEXT($subBox['description']));
 	 $this->setVar('CATEGORY_ID', $subBox['cid']);

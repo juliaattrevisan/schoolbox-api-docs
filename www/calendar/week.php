@@ -5,8 +5,8 @@
 *                                                           *
 ************************************************************/
 
-require_once  $_SERVER['DOCUMENT_ROOT'] ."/../library/calendar.php";
-require_once "../library/group.php";
+require_once '../library/calendar.php';
+require_once '../library/group.php';
 
 $calendarHandler = new Calendar;
 $groupHandler = new Group;
@@ -35,6 +35,9 @@ $this->setVar('SELECTED_YEAR', $selectedYear);
 
 
 // setup movement buttons
+$this->checkList('group', $groupHandler->involvedCategoryList($_SESSION['id']),$groupHandler->involvedCategoryList($_SESSION['id']), TEMPLATE_content, array('name'=>'GROUP_NAME','id'=>'GROUP_ID'));
+$this->checkList('campus', $calendarHandler->getCampusList(),$_SESSION['campus']);
+$this->checkList('event_type', $calendarHandler->getTypeList(), '', TEMPLATE_content, array('eventType'=>'EVENT_TYPE_NAME','eventTypeID'=>'EVENT_TYPE_ID', 'eventColour'=>'EVENT_TYPE_COLOUR') );
 $this->setVar('BACK', 	 date("j-n-Y", strtotime("-1 week", $selectedDate)));
 $this->setVar('FORWARD', date("j-n-Y", strtotime("+1 week", $selectedDate)));
 
@@ -69,8 +72,18 @@ for($i=0; $i < 7; $i++) {
 }
 
 for($i=0; $i < 7; $i++) {
+
 	// output submission events
     $currentDay = strtotime("+$i day", $startOfWeek);
+
+    //output selected classes
+    if(date("d-m-Y", $selectedDate) == date("d-m-Y", $currentDay))
+        $this->setVar("MONTABLE_CSS", "calTableSelected");
+    else if(date("d-m-Y", $currentDay) == date("d-m-Y"))
+        $this->setVar("MONTABLE_CSS", "calTableCurrent");
+    else
+        $this->setVar("MONTABLE_CSS", "calTable");
+
 	$submissionList = $calendarHandler->getSubmissionEvents($currentDay);
 	if (is_array($submissionList)) {
 		foreach ($submissionList as $submission) {	

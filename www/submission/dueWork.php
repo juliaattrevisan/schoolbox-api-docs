@@ -57,7 +57,15 @@ if (is_array($_SESSION['children'])) {
 }
 
 // get selected user
-$userID = is_array($_SESSION['children']) ? $_SESSION['children'][0]['id'] : $_SESSION['id'];
+if(is_array($_SESSION['children']))
+    $userID = $_SESSION['children'][0]['id'];
+else {
+    //displaying users on due work, so log this as the last time they viewed due work
+    $submissionHandler->logPageView(1);
+    $submissionHandler->logPageView(2);
+    $userID = $_SESSION['id'];
+}
+
 if (is_numeric($this->arg[1]) && in_array($this->arg[1], $childList))
 	$userID = $this->arg[1];
 elseif (is_numeric($this->arg[1]) && $groupHandler->isStaff())
