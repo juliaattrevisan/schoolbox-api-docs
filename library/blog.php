@@ -23,9 +23,15 @@ class Blog extends Model {
 		
 		return $this->db->getRow($query);
 	}
-	
+
+    /**
+     * Get all the blogs for a category.
+     * 
+     * @param <type> $cid
+     * @return <type>
+     */
 	function getByCID($cid) {
-		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname
+		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname, created, UNIX_TIMESTAMP(created) AS createdTimestamp
 			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
 			WHERE cid = $cid AND deleted IS NULL
 			ORDER BY {$this->_table}.created DESC";
@@ -33,6 +39,38 @@ class Blog extends Model {
 			
 		return $this->db->getAll($query);
 	}
+
+    /**
+     * Get all the blogs for a category in a particular year.
+     *
+     * @param <type> $cid
+     * @return <type>
+     */
+	function getByCIDAndYear($cid, $year) {
+		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname, created, UNIX_TIMESTAMP(created) AS createdTimestamp
+			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
+			WHERE cid = $cid
+            AND deleted IS NULL
+            AND created LIKE '$year%'
+			ORDER BY {$this->_table}.created DESC";
+		$query = $this->_config['size'] > 0 ? "$query LIMIT 0, {$this->_config['size']}" : $query;
+
+		return $this->db->getAll($query);
+	}
+
+    /**
+     * Gets the years in which blog posts were made.
+     * 
+     * @param <type> $cid
+     */
+    function postYears($cid) {
+        $query = "SELECT LEFT(created,4) AS year
+                  FROM blog
+                  WHERE cid = '$cid'
+                  GROUP BY year DESC";
+
+        return $this->db->getAll($query);
+    }
 	
 	function create($blog) {
 		$blog = array_merge(array(

@@ -13,6 +13,7 @@ INSERT INTO error (id, message) VALUES (107, 'You do not have permission to modi
 INSERT INTO error (id, message) VALUES (108, 'You do not have permission to leave comments on this blog.');
 INSERT INTO error (id, message) VALUES (109, 'You do not have permission to publish this file.');
 INSERT INTO error (id, message) VALUES (110, 'You do not have permission to modify these notes.');
+INSERT INTO error (id, message) VALUES ('111', 'There are no blogs in this archive.');
 
 /* Published Files
  */
