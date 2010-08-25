@@ -362,7 +362,8 @@ class Group extends Model {
 		//get list of groups involved in
 		$query = "SELECT category.name, category.id FROM userAccess, category 
 		WHERE userAccess.uid = '$id' AND userAccess.sid = category.id AND userAccess.service = '".$this->_service."'
-		AND userAccess.type >= '$accessType'";
+		AND userAccess.type >= '$accessType'
+        ORDER BY category.name";
 
 		$this->db->query($query);
 		while($result = $this->db->getNextArray()) {

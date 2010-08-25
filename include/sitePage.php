@@ -397,6 +397,7 @@ class SitePage extends Page {
 				  AND userAccess.sid = category.id 
 				  AND userAccess.type > 0	
 				  AND category.template <> 0
+                  ORDER BY category.name
 			";
 		$this->db->query($query);
 		if($this->db->countRows() > 0)
