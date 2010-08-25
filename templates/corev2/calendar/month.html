@@ -26,35 +26,32 @@
 		//show or hide bubbles
 		$j('ul.js_happening li').click(function(){
 			
-			var position = $j(this).position();
-			var stupid = $j(this).children('p.fish').html();
+			$j('.filter-drop').hide();	
+			$j('.cal-bubble').hide();
+
+			var dynamicHTML = $j(this).children('.hidden-fields').html();
+			$j('.cal-bubble .middle').children('.js-data').html(dynamicHTML);
+			var position = $j(this).offset();
+			$j('.cal-bubble').show();
+			var annoyingHeight = ($j('.cal-bubble .middle').height() + ($j('.cal-bubble .top').height()) + ($j('.cal-bubble .bottom').height())) 			
+			$j('.cal-bubble').css("left", (position.left - 237));
+			$j('.cal-bubble').css("top", (position.top - annoyingHeight));	
 			
-			$j('.cal-bubble .middle').children('p.stuffhole').html(stupid);
+			if($j('.cal-bubble').css("left") < '0px') {
+					$j('.cal-bubble').css("left", '0px');
+			}
 
-			$j('.cal-bubble').css("left", position.left);
-			$j('.cal-bubble').css("top", position.top);	
-			$j('.cal-bubble').show();	
-
-			/*$j('.filter-drop').hide();	
-			if ($j(this).children('.cal-bubble').is(':visible')) {
-				$j('.cal-bubble').hide();	
-			} else {
-				$j('.cal-bubble').hide();				
-				$j(this).children('.cal-bubble').show();	
-			}*/
 		});
 		
+
 		//show and hide the filters drop down
 		$j('a.filters').click(function(){
-			
 			$j('.cal-bubble').hide();
-			
 			if ($j('.filter-drop').is(':visible')) {
 				$j('.filter-drop').hide();	
 			} else { 
 				$j('.filter-drop').show();		
 			}
-
 		});
 		
 		//make all of the checkboxes checked... darn you firefoxxxxxx
@@ -64,40 +61,30 @@
 		$j('#applyFilters').click(filterChecker);
 		
 		function filterChecker() {
+			//specify filter hierarchy
+
+			filterLoop('events');	
+			filterLoop('groups');
+			filterLoop('campus');
+
+			$j('.filter-drop').hide();	
 			
-			$j('.filter-list input:not(:checked)').each(function(){
+		}//end of filterchecker
+		
+		function filterLoop(element) {
+			//for each unchecked element
+			$j('.filter-list .' + element + ' input:not(:checked)').each(function(){
 				var n = $j(this).attr('value');
-				if ($j('ul.js_happening .' + n).is('::visible')) {
+				if ($j('ul.js_happening .' + n).is(':visible')) {
 				  $j('ul.js_happening .' + n).hide();
 				}
 			});
 			
-			$j('.filter-list input:checked').each(function(){		 		
-				var m = $j(this).attr('value');
-				if ($j('ul.js_happening .' + m).is(':hidden')) {
-				  $j('ul.js_happening .' + m).show();
-				}
+			$j('.filter-list .' + element + ' input:checked').each(function(){
+				var n = $j(this).attr('value');
+				 $j('ul.js_happening .' + n).show();
 			});
-			
-
-			
-			$j('.filter-list.groups input:not(:checked)').each(function(){
-				var m = $j(this).attr('name');
-			});
-			
-			$j('.filter-list.campus input:not(:checked)').each(function(){
-				var m = $j(this).attr('name');
-			});
-			
-			
-			$j('.filter-drop').hide();	
-		}//end of filterchecker
-
-	function callBubble(opts) {
-		
-		
-	
-	}
+		}
 });
 
 </script>
@@ -125,7 +112,7 @@
 									<span>Groups</span>
 									<!-- BEGIN group -->
 									<label title="{GROUP_NAME}">
-										<input type="checkbox" name="campus" id="{GROUP_ID}" value="group{GROUP_ID}" checked="checked" class="checkbox"/>{GROUP_NAME}
+										<input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" checked="checked" class="checkbox"/>{GROUP_NAME}
 									</label>
 									<div class="float-fix"></div>
 								<!-- END group -->
@@ -143,7 +130,7 @@
 									<span>Event</span>
 									<!-- BEGIN event_type -->
 									<label title="{EVENT_TYPE_NAME}">
-										<input type="checkbox" name="campus" id="{EVENT_TYPE_ID}" checked="checked" value="type{EVENT_TYPE_ID}" class="checkbox"/><span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
+										<input type="checkbox" name="events" id="{EVENT_TYPE_ID}" checked="checked" value="type{EVENT_TYPE_ID}" class="checkbox"/><span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
 									</label>
 									<!-- END event_type -->
 									<div class="float-fix"></div>
@@ -183,9 +170,13 @@
 					<ul class="js_happening">
 						<!-- BEGIN note_block -->
 						<li class="{EVENT_TYPE} {EVENT_LEVEL} ">
-							<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}<br /></span>
-							<!-- BEGIN time --><span style="background-color:{COLOUR}; border:1px solid {COLOUR}">{TIME}</span><!-- END time -->
-							<p class="fish">{TYPE}{AUTHOR}{MODIFY}</p>
+							<span style="background-color:{COLOUR}; border:1px solid {COLOUR};"><!-- BEGIN time --><div class="time">{TIME}</div><!-- END time -->{NOTE}<br /></span>
+							<div class="hidden-fields">
+							<!-- BEGIN time --><div class="time">{TIME}</div><!-- END time -->
+								<h4>{NOTE}</h4>
+								<p class="meta">Event Type: {TYPE} | Author:{AUTHOR}</p>
+								<div class="modify">{MODIFY}</div>
+							</div>
 						</li>
 						<!-- END note_block -->
 					</ul>
@@ -196,28 +187,14 @@
         <!-- END month_week -->
         </tbody>
       </table>
-	  
+	  	
 	<div class="cal-bubble">
 		<div class="top"></div>
 		<div class="middle">
-			<h4>{NOTE}</h4>
-			<p class="event-type">Event Type: </p>
-			<p class="stuffhole"></p>
+			<div class="js-data"></div>
 		</div>
 		<div class="bottom"></div>
 	</div>
-	
-	
-	<!--	<div class="cal-bubble">
-		<div class="top"></div>
-		<div class="middle">
-			<h4>{NOTE}</h4>
-			<p class="event-type">Event Type: </p>
-			<p class="author">Author: {AUTHOR}</p>
-			<div class="modify">{MODIFY}</div>
-		</div>
-		<div class="bottom"></div>
-	</div>
-	-->
 
 </div>
+<div class="float-fix"></div>

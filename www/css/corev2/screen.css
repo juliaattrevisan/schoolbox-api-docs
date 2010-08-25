@@ -109,7 +109,10 @@ th { font-weight:bold; }
 --------------------------------------------------------------*/
 
 /*BODY*/
-#wrap { min-height: 100%; }
+#wrap { min-height: 100%; height: auto !important;
+	height: 100%;
+
+}
 #wrap-inner { padding-bottom: 45px; }
 #container { margin-left: 176px; min-width: 785px; padding: 15px; }
 #content { padding: 0; float: left; width: 100%; }
@@ -117,8 +120,8 @@ th { font-weight:bold; }
 
 
 /*HEADER*/
-#header { border-bottom:1px solid #B8B8B8;position:relative;height: 116px; padding-right: 15px; border: 0; background: url(/images/mggs/bg-header.gif) repeat-x; }
-#logo, #logo a { text-indent:-9999em; font-size:1px; position:absolute; background: url(/images/mggs/mggs-logo.gif) no-repeat; height: 67px; width: 280px; top: 22px; left: 21px; }
+#header { border-bottom:1px solid #B8B8B8;position:relative;height: 116px; padding-right: 15px; border: 0; background: url(/images/corev2/header-background.gif) repeat-x; }
+#logo, #logo a { text-indent:-9999em; font-size:1px; position:absolute; background: url(/images/corev2/core-v2-logo.jpg) no-repeat; height: 116px; width: 400px; top: 0px; left: 0px; }
 #logo a{left:0; top:0;}
 
 #search { float: right; width: 266px; margin-top: 0; clear:right; }
@@ -133,7 +136,7 @@ th { font-weight:bold; }
 /*NAVIGATION*/
 	
 	/*MAIN NAV*/
-	#nav { top:0; text-align:left; left:0;width: 161px; margin: 15px 0 0 15px; float: left; position: static; z-index:1; }
+	#nav { top:117px; text-align:left; left:0;width: 161px; margin: 15px 0 0 15px; position: absolute; z-index:1; }
 	#nav * {z-index:99;}
 	#nav h3 {clear:left;padding:0 0 0 16px; margin:0;color: #fff; background: url(/images/mggs/bg-h3nav.gif) no-repeat; line-height: 29px; font-weight: bold; padding-left: 10px; text-transform: none; }
 	#nav ul { margin-bottom: 15px; background: #ededed url(/images/mggs/bg-nav-bottom.gif) no-repeat 0 100%; padding-bottom: 2px; }
@@ -356,6 +359,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #infoPanel a { color: #fff; }
 
 /*CALENDAR*/
+#calendar{overflow:hidden}
 #calendar table{border-bottom:1px dotted #C3CDD7; position:relative;}
 #calendar h3{font-size:18px; font-weight:bold; line-height:25px;}
 
@@ -374,7 +378,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 .day-block span.time{display:block; background:#fff; border:1px #ccc solid; border-bottom:0; padding:3px; margin: 5px 10px 0 5px;  -moz-border-radius:5px 5px 0 0; /* FF1+ */-webkit-border-radius: 5px 5px 0 0; /* Saf3-4 */border-radius: 5px 5px 0 0; /* Opera 10.5, IE 9, Saf5, Chrome */}
 .day-block ul {margin:5px; }
 
-td.cal-right, td.cal-left {text-align:right; padding:0; position:relative;}
+td.cal-right, td.cal-left {text-align:right; padding:0; position:relative; }
 td.cal-left{text-align:left;}
 td.cal-left a{display:block;float:left;height:24px; line-height:24px; padding:0 8px; color:#000000; font-weight:normal;}
 td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box{margin-top:12px; width:26px; height:24px; text-indent:-9999em; font-size:1px; padding:0;}
@@ -385,20 +389,20 @@ td.cal-left a:hover{background-position:0 bottom;}
 td.cal-left .datepicker-box{float:left;  text-align:center; background: url(/images/corev2/calendar/dropdown-calendar.gif) no-repeat 3px 0;}
 
 td.cal-mid h3{text-align:center;}
-
+td.cal-right{z-index:1000;}
 td.cal-right a.customise{margin-top:12px;height:24px; line-height:24px; padding:0 8px; color:#000; display:inline-block;text-decoration:none; background:#ececec}
 td.cal-right a.week{background:#cacaca;}
 td.cal-right a.filters{z-index:5000;position:relative;background:#1597cb url(/images/corev2/calendar/filters.gif) 8px 7px no-repeat; padding-left:23px; color:#ffffff; margin-right:10px;}
 td.cal-right .link-case{position:relative; height:36px; z-index:10;}
 
-td.cal-right .link-case .filter-drop{display:none; position:absolute; top:100%; right:107px;width:450px; z-index:6000; }
+td.cal-right .link-case .filter-drop{display:none; position:absolute; top:100%; right:107px;width:450px; }
 td.cal-right .link-case .filter-drop .filter-list{ border:1px solid #8e8f8f; background:#fff;-moz-border-radius: 5px 0 5px 5px;-webkit-border-radius: 5px 0 5px 5px;border-radius: 5px 0 5px 5px; padding:20px 20px 0 20px}
 td.cal-right .link-case .filter-drop hr{height:0px; width:100%; border-bottom:1px solid #8e8f8f; margin:15px 0 0 0;}
 td.cal-right .link-case .filter-drop a#applyFilters{display:block; color:#41a200; text-align:right;padding:10px 0;}
 .filter-cat{float:left; width:129px; text-align:center; margin-right:10px}
 .filter-cat span{font-weight:bold; height:17px;display:block}
 .filter-cat label{height:15px;text-align:left;display:block;float:left;margin:0; font-weight:normal; width:100%;}
-.filter-cat .checkbox{clear:left;display:block;float:left;margin:2px 6px 0 1px;}
+.filter-cat .checkbox{clear:left;display:block;float:left;margin:0 5px 0 0;}
 .filter-cat.last{margin-right:0;}
 
 .dayWrap {height:20px; background-color: #999999; background-image: -moz-linear-gradient(top, #999999, #878787); background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #999999),color-stop(1, #878787)); /* Saf4+, Chrome */ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#999999', EndColorStr='#878787'); /* IE6,IE7 */-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#999999', EndColorStr='#878787')"; /* IE8 */ padding: 3px 5px; }
@@ -425,17 +429,21 @@ ul.js_happening li span{display:block; padding:5px; -moz-border-radius: 5px;-web
 ul.js_happening li span:hover{opacity:0.8;}
 ul.js_happening li{margin-bottom:4px; position:relative; }
 
-.cal-bubble {z-index:200;bottom:90%;color:#000000;font-size:11px;left:-100px;position:absolute;width:350px;display:none;}
-.cal-bubble .top{height:8px; border:1px solid #000; border-bottom:0;background:#fff; -moz-border-radius: 5px 5px 0 0; /* FF1+ */ -webkit-border-radius:  5px 5px 0 0; /* Saf3-4 */border-radius: 5px 5px 0 0; /* Opera 10.5, IE 9, Saf5, Chrome */}
+.cal-bubble {z-index:200;bottom:90%;color:#000000;font-size:12px;left:-100px;position:absolute;width:350px;display:none;}
+.cal-bubble .top{height:8px;background: url(/images/corev2/calendar/bubble-top.png) 0 0 no-repeat; -moz-border-radius: 5px 5px 0 0; /* FF1+ */ -webkit-border-radius:  5px 5px 0 0; /* Saf3-4 */border-radius: 5px 5px 0 0; /* Opera 10.5, IE 9, Saf5, Chrome */}
 .cal-bubble  .middle{padding:10px 19px;position:relative;background:#fff;  border:1px solid #000; border-top:0; border-bottom:0;}
 .cal-bubble  .middle .close{position:absolute; right:10px; top:0px; width:15px; height:15px; background:#000; cursor:pointer;z-index:90;}
-.cal-bubble  .middle h4{line-height:24px;font-size:16px; font-weight:normal; margin:0 0 10px 0;padding-bottom:5px; border-bottom:1px solid #f0f0f0;}
+.cal-bubble  .middle h4{line-height:20px;font-size:16px; font-weight:normal; margin:0 0 10px 0;padding-bottom:5px; border-bottom:1px solid #f0f0f0;}
 .cal-bubble  .middle h4 span{margin:0 0 5px 0; padding:2px; -moz-border-radius: 5px;  -webkit-border-radius: 5px; border-radius: 5px;}
 .cal-bubble  .middle p{font-size:12px; margin: 0 0 16px 0; padding:0;}
 .cal-bubble  .middle span.time{border:0; padding:0; margin:0;}
 .cal-bubble .bottom{background: url(/images/corev2/calendar/bubble-bottom.png) 0 0 no-repeat; height:34px; width:100%;}
-.cal-bubble .modify a{text-align:left;display:block;margin:10px 0 3px;padding:2px 5px; font-size:11px;background-color: #bebebe;background-image: -moz-linear-gradient(top, #d8d8d8, #bebebe); /* FF3.6 */background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #d8d8d8),color-stop(1, #bebebe)); /* Saf4+, Chrome */ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#d8d8d8', EndColorStr='#bebebe'); /* IE6,IE7 */-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#d8d8d8', EndColorStr='#bebebe')"; /* IE8 */text-shadow: 1px 1px 1px #f0f0f0; /* FF3.5+, Opera 9+, Saf1+, Chrome */}
+.cal-bubble .modify a{color:#000000;text-align:left;display:block;margin:10px 0 3px;padding:2px 5px; font-size:11px;background-color: #bebebe;background-image: -moz-linear-gradient(top, #d8d8d8, #bebebe); /* FF3.6 */background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #d8d8d8),color-stop(1, #bebebe)); /* Saf4+, Chrome */ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#d8d8d8', EndColorStr='#bebebe'); /* IE6,IE7 */-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#d8d8d8', EndColorStr='#bebebe')"; /* IE8 */text-shadow: 1px 1px 1px #f0f0f0; /* FF3.5+, Opera 9+, Saf1+, Chrome */}
 .cal-bubble .modify a:hover{background-color: #e2e2e2;background-image: -moz-linear-gradient(top, #e2e2e2, #c7c7c7); /* FF3.6 */background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #e2e2e2),color-stop(1, #c7c7c7)); /* Saf4+, Chrome */ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#e2e2e2', EndColorStr='#c7c7c7'); /* IE6,IE7 */-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#e2e2e2', EndColorStr='#c7c7c7')"; /* IE8 */text-shadow: 1px 1px 1px #f0f0f0; /* FF3.5+, Opera 9+, Saf1+, Chrome */}
+.cal-bubble .time{margin-bottom:5px;}
+
+
+.hidden-fields{display:none;}
 
 .cal-bubble p.author{}
 .cal-bubble p.event-type{}
@@ -536,7 +544,7 @@ p.bubble-name { margin-bottom:5px; padding-bottom:5px; }
 
 #category { padding:0;list-style: none; margin: 0; float: left; }
 .listing #category { list-style: none; margin-top: 10px; float: left; }
-#category li { float: left; background: #ececec; border: 1px solid #ccc; border-bottom: 0; padding: 0; margin: 0 2px 0 0; }
+#category li { float: left; background: #ececec; border: 1px solid #ccc; border-bottom: 0; padding: 0; margin:0; }
 #category li a { display: block; padding: 5px 10px; }
 #category li a.selected { background: #ccc; }
 #category li a.disabled { color: #ccc; }
@@ -627,7 +635,7 @@ ul.tree li.icon a { background: url(/images/file-icon.gif) no-repeat; padding: 0
 /*--------------------------------------------------------------
  Footer specific styles 
 --------------------------------------------------------------*/
-#footer { padding: 10px 0; text-align: left; margin-left: 180px; padding-left: 10px; border-top: 1px solid #b7b7b7; }
+#footer { padding: 10px 0; text-align: left; margin-left: 180px; padding-left: 10px; border-top: 1px solid #b7b7b7; 	margin-bottom:-100px;}
 #footer ul { margin: 0; padding: 0; }
 #footer ul li { display: inline; color: #888; background: url(/images/footer-div.gif) no-repeat 100% 2px; margin-right: 16px; padding-right: 17px; }
 #footer ul li.last { margin: 0; padding: 0; background: 0; }

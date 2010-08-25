@@ -578,12 +578,13 @@ class SitePage extends Page {
 		exit;
 	}
 
-	function checkList($handle, $data, $selected = array()) {
-		$this->setBlock(TEMPLATE_content, $handle, $handle.'_block');
+	function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping='') {
+		$this->setBlock($template, $handle, $handle.'_block');
 		$selected = is_array($selected) ? $selected : array();
 		if (is_array($data)) {
 			foreach($data as $row) {
 				foreach($row as $key => $value) {
+                    $mapping[$key]?$key=$mapping[$key]:'';
 					$this->setVar($key, $value);
 					if(in_array($value, $selected))
 						$this->setVar($key.'_SELECTED', 'checked="checked"');
