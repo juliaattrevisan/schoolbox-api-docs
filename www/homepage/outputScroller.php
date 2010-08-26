@@ -18,14 +18,18 @@ $this->parse('config_block', 'config', true);
 $fileHandler = new File;
 
 $allFiles = $fileHandler->getAllInCategory($this->arg[0], array('filter' => array('image')));
+if(is_array($allFiles)) {
+    foreach ($allFiles as $currentFile) {
+        $this->setVar(array(
+            'IMAGE_ID' => $currentFile['id'],
+            'IMAGE_NAME' => $currentFile['description'],
+            'IMAGE_DIMENSION' => $config['pixel']
+        ));
 
-foreach ($allFiles as $currentFile) {
-    $this->setVar(array(
-        'IMAGE_ID' => $currentFile['id'],
-        'IMAGE_NAME' => $currentFile['description'],
-        'IMAGE_DIMENSION' => $config['pixel']
-    ));
-
-    $this->parse('image_block', 'image', true);
+        $this->parse('image_block', 'image', true);
+    }
+}
+else {
+    $this->setVar('image_block','');
 }
 ?>

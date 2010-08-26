@@ -148,12 +148,14 @@ class Calendar extends Model {
 					$catQuery[] = $cat['id'];
 			}
 
-			$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.description, submission_box.owner,
+			$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.description, 
+                    submission_box.owner, user.firstname, user.lastname, user.title,
 					DATE_FORMAT(submission_box.date, '%w') as dayIndex, 
 					DATE_FORMAT(submission_box.date, '" . CALENDAR_time_format . "') as dueTime
 				  FROM (category, submission_box )
 				  LEFT JOIN `file` f ON f.id = submission_box.fid 
 				  LEFT JOIN categoryCode co ON co.categoryID = category.id
+                  LEFT JOIN user ON user.id = submission_box.owner
 				  WHERE category.id = submission_box.category 
 					AND submission_box.category IN (".implode(',', $catQuery).")
 					AND submission_box.deleted = 0 
@@ -202,6 +204,7 @@ class Calendar extends Model {
 			
 		//get single events for the day
 		$query = "SELECT DISTINCT event.id, owner,
+                            GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
 							TIME_FORMAT(startTime, '" . CALENDAR_time_format . "') as startTime, 
 							TIME_FORMAT(endTime, '" . CALENDAR_time_format . "') as endTime,
                             TIME_TO_SEC(startTime) as startTimestamp,

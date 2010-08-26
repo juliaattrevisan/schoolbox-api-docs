@@ -98,8 +98,12 @@ for ($i = 0; $i < $totalDays; $i++) {
 			$output = array('TIME'			=> $submission['dueTime'],
 							'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['description'],
 							'COLOUR'		=> $calendarHandler->displayColour(4),
-							'MODIFY_START'	=> "",
-							'MODIFY_END'	=> "",
+							'MODIFY'		=> '',
+                            'EVENT_TYPE'    => 'submission',
+                            'TYPE'          => 'Due Work',
+                            'AUTHOR'        => formatName($submission),
+                            'AUTHOR_ID'     => $submission['owner'],
+                            'EVENT_LEVEL'   => '',
 						  );					  
 			
 			$this->setVar($output);
@@ -118,9 +122,10 @@ for ($i = 0; $i < $totalDays; $i++) {
 				$output = array('TIME'		=> '',
 								'NOTE'		=> 'Student Birthday - '.$birthday['name'].' in '.$birthday['form'].' turns '.$birthday['age'],
 								'COLOUR'	=> $calendarHandler->displayColour(3),
-								'MODIFY_START'	=> "",
-								'MODIFY_END'	=> "",
-							  );					  
+								'MODIFY'	=> '',
+                                'TYPE'      => 'Birthday',
+                                'AUTHOR'    => '',
+                    );
 				$this->setVar($output);
                 $this->setVar('time_block','');
 				$this->parse("note_listing", "note_block", true);
@@ -140,14 +145,21 @@ for ($i = 0; $i < $totalDays; $i++) {
 										   "- "),
 							'NOTE'		=> $event['note'],
 							'COLOUR'	=> '#'.$event['eventColour'],
-							'MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">Modify</a>" : "",
+							'MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">Modify</a>" : '',
                             'EVENT_TYPE'    => 'type'.$event['type'],
                             'TYPE'          => $event['eventType'],
                             'AUTHOR'        => formatName($event),
 						  );	
 			
-            if($event['access'] == 3 )
-                $output['EVENT_LEVEL'] = 'campus'.$event['sid'];
+            if($event['access'] == 3 ) {
+                if(stristr($event['campusList'], ',' )) {
+                    foreach(explode(',',$event['campusList']) as $campus) {
+                        $output['EVENT_LEVEL'] .= ' campus'.$campus;
+                    }
+                }
+                else
+                    $output['EVENT_LEVEL'] .= ' campus'.$event['campusList'];
+            }
             else if($event['access'] == 2)
                 $output['EVENT_LEVEL'] = 'group'.$event['sid'];
             else
@@ -173,5 +185,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 		$this->setVar('day_listing', '');
 	}
 }
+
+
 
 ?>
