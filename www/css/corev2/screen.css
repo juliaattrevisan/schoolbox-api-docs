@@ -291,7 +291,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #assess .section p ins{height:20px; display:block; background:#ff0; margin-bottom:10px;}
 #assess .section p span{display:block; font-weight:normal; text-align:left;}
 
-#assess .col-1, #assess .col-2{float:left; }
+#assess .col-1, #assess .col-2{float:left;  zoom: 1;}
 #assess .col-1{width:70%; margin-right:1%;}
 #assess .col-2{width:29%;}
 #assess .question .question-body{margin:0;}
@@ -333,7 +333,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	height:24px; line-height:24px;}
 	
 	#assess li.inputs .drag-me{padding:0 5px;}
-	#assess li.inputs .answer-value{width:78%; height:100%; background:#fff; padding:0 5px;}
+	#assess li.inputs .answer-value{border:1px solid #dbdbdb; width:78%; height:100%; background:#fff; padding:0 5px;}
 	#assess .keywords{ height:100%; background:#fff; padding:5px 5px; border: 1px solid #dbdbdb;}
 	#assess .keywords .text-box{font-size:12px;}
 	#assess li.inputs .list-item{width:3%; font-weight:bold; text-align:center;}
@@ -350,7 +350,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess .defaultSkin table.mceLayout,#assess .defaultSkin table.mceLayout tr.mceFirst td{border:0 none;}
 	#assess .defaultSkin td.mceCenter table{margin:0;}
 	.create-test .section-box {margin:10px;}
-	#assess.create-test .section-box h3{background:#1597cb; padding:5px; margin:0; font-size:12px; color:#fff;}
+	#assess.create-test .section-box h3{background:#1597cb; padding:5px; margin:0; font-size:11px; color:#fff;}
 	#assess .section-box ul{margin:0; width:auto;  border:1px solid #dbdbdb; border-top:0;}
 	
 	.create-test .section-box ul li{margin:0;font-size:11px;line-height:16px;background:#f1f7fa; border-bottom:1px solid #dbdbdb;}
@@ -366,7 +366,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess .add-statement,
 	#assess .add-answer,
 	#assess .make-blank
-	{height:25px;border:none; text-indent:-9999em;}
+	{height:25px;border:none; text-indent:-9999em; display:block;}
 	#assess .add-statement:hover,
 	#assess .add-answer:hover,
 	#assess .make-blank:hover

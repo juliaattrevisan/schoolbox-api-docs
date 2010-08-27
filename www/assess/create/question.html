@@ -23,8 +23,10 @@
 <script type="text/javascript" src="/javascript/scripts.js"></script>
 <script type='text/javascript'>	
 	$j(function() {
-    $j('#nav ul').droppy({speed: 0});
-
+    
+	$j('#nav ul').droppy({speed: 0});
+	
+	$j('.section-box h3 a ul').droppy({speed: 0});
 
 	tinyMCE.init({
 		mode : "exact",
@@ -38,25 +40,54 @@
 		setup : function(ed) {
 			ed.addButton('customtag', {
 				title : 'wraps selected text with custom tag',
-				class: 'make-blank',
+				class : 'make-blank',
 				image : 'img/icons.gif',
-				onclick : function() {
+				onclick : (function() {
 					var sel = ed.selection.getContent();
-					if (sel != '') {
-               		 	ed.selection.setContent('<span>' + sel + '</span>');
-					} 
-           		 }
+					if (sel !== '') {
+               		 	ed.selection.setContent('<span>'+sel+'</span>');
+					}
+           		 })
 			});
-		}
-			
+		}	
 	});
   
-  $j(".section-box ul").sortable({
-			revert: true,
-			cursor: "pointer"
-		});
+  	//sorting the draggy droppy thaaang
+	$j(".section-box ul").sortable({
+		revert: 200,
+		cursor: "pointer"
+	});
+	
+	//change the checkboxes so you can see which ones are marked as correct and which aren't
+	$j('.checkbox').click(function() {
+		if ($j(this).is(':checked')) {
+			$j(this).parent().css("background-color", "#e0f2df");
+		} else {
+			$j(this).parent().css("background-color", "#EDEDED");
+		}
+	});
+	
+	//add an answer row
+	$j('.add-answer').click(function() {
+		$j('.multiple-choice ul').append('<li class="inputs"><div class="list-item">D)</div><input type="checkbox" value="Enter Val Here" name="" class="checkbox"/><div class="answer-value"><input type="text" value="Enter Val Here" name="" class="text-box"></div><div class="delete"></div><div class="float-fix"></div></li>');
+	
+	});
+	
+	
+	/*
+	
+	
+	http://stackoverflow.com/questions/1937247/renumbering-a-list-using-jquery
+	
+	
+	$('li > span.number').each(function() {
+   var $this = $(this); 
+   $this.text($this.parent('li').prevAll().length + 1);
+});
+<strong></strong>
+	
+	*/
 
-	$j("ul, li").disableSelection();
 
   });
 </script>
@@ -197,7 +228,7 @@
 <div id="content">
 
 <div id="assess" class="create-test">
-<form id="question-submit">
+<form id="question-submit" action="#" method="get">
 	<h1>Create Question</h1>
 
 	<div class="col-1">
@@ -209,10 +240,10 @@
 				
 				<fieldset>
 					<select>
-						<option value="Multiple Choice" name="questionType">Multiple Choice</option>	
-						<option value="Multiple Choice" name="questionType">Short Answer</option>	
-						<option value="Multiple Choice" name="questionType">Word Correction</option>							
-						<option value="Multiple Choice" name="questionType">Drag 'n Drop</option>	
+						<option value="Multiple Choice" >Multiple Choice</option>	
+						<option value="Multiple Choice" >Short Answer</option>	
+						<option value="Multiple Choice" >Word Correction</option>							
+						<option value="Multiple Choice" >Drag 'n Drop</option>	
 					</select>				
 				</fieldset>
 				
@@ -221,7 +252,6 @@
 					<strong>Marks Available</strong><br />
 					<input type="text" value="marks" />
 				</div>
-				</form>
 			</div>
 		</div>
 		
@@ -231,7 +261,7 @@
 				<div class="assess-body">
 				
 					<div class="textarea-container">
-						<textarea>Slam the question in here ham!</textarea>
+						<textarea rows="10" cols="1">Slam the question in here ham!</textarea>
 					</div>
 				
 				</div>
@@ -274,7 +304,7 @@
 				<div class="assess-body">
 				
 					<div class="textarea-container">
-						<textarea>Slam the question in here ham!</textarea>
+						<textarea rows="10" cols="1">Slam the question in here ham!</textarea>
 					</div>
 				
 				</div>
@@ -291,7 +321,7 @@
 							<div class="delete"></div>
 							<div class="float-fix"></div>
 						</li>	
-						<li class="inputs">
+						<li class="inputs correct">
 							<div class="list-item">B)</div>
 							<input type="checkbox" value="Enter Val Here" name="" class="checkbox"/>
 							<div class="answer-value"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
@@ -314,7 +344,7 @@
 						</li>	
 					</ul>
 					
-					<input type="submit" value="Add Answer" class="add-answer" />
+					<div class="add-answer">Add Answer</div>
 					
 				</div>
 			</div>	
@@ -327,7 +357,7 @@
 				<div class="assess-body">
 				
 					<div class="textarea-container">
-						<textarea>Slam the question in here ham!</textarea>
+						<textarea rows="10" cols="1">Slam the question in here ham!</textarea>
 					</div>
 				
 				</div>
@@ -337,7 +367,7 @@
 				<h2>3. Answers</h2>
 				<div class="assess-body">
 					<div class="textarea-container">
-						<textarea>Slam the question in here ham!</textarea>
+						<textarea rows="10" cols="1">Slam the question in here ham!</textarea>
 					</div>
 				</div>
 			</div>	
@@ -357,7 +387,7 @@
 				<div class="assess-body">
 				
 					<div class="textarea-container">
-						<textarea>Slam the question in here ham!</textarea>
+						<textarea rows="10" cols="1">Slam the question in here ham!</textarea>
 					</div>
 				
 				</div>
@@ -367,7 +397,7 @@
 				<h2>3. Statement</h2>
 				<div class="assess-body">
 					<div class="textarea-container grey-highlight">
-						<textarea id="grey-highlight" value="periphery"></textarea>
+						<textarea rows="10" cols="1" id="grey-highlight" value="periphery"></textarea>
 					</div>
 				</div>
 				
