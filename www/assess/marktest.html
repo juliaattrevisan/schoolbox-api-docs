@@ -165,10 +165,10 @@
 	<form>
 	<div class="col-1">
 		<h2>Section 1</h2>
-		<div class="question">	
+		<div class="assess-header">	
 			<h3>Question 1<span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus nec?</span></h3>
 			
-			<div class="question-body">
+			<div class="assess-body">
 				<ol>
 					<li><a href="#"><span>A)</span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus, non feugiat urna?<span class="mark"></span></a></li>
 					<li><a href="#"><span>B)</span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus, non feugiat urna?<span class="mark"></span></a></li>
@@ -184,9 +184,9 @@
 			</div>
 		</div><!--/question-->
 
-		<div class="question">	
+		<div class="assess-header">	
 			<h3>Question 2<span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus nec?</span></h3>
-			<div class="question-body">
+			<div class="assess-body">
 				
 				<div class="box">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam fauci
 				bus rhoncus lectus tincidunt tincidunt. Duis <span class="correct">aliquet</span>, ante a consequat semper, orci justo
@@ -213,16 +213,19 @@
 		</div><!--/question-->
 
 
-		<div class="question">	
+		<div class="assess-header">	
 			<h3>Question 3<span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus nec?</span></h3>
-			<div class="question-body">
+			<div class="assess-body">
 				
-				<div class="textarea-container">
-					<textarea name="comments">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam fauci
-					bus rhoncus lectus tincidunt tincidunt. Duis <span class="correct">aliquet</span>, ante a consequat semper, orci justo
-					 luctus nisi, vitae consequat justo nisl sit amet magna. Phasellus gravida, urna et rhoncus placerat, tortor dui scelerisque est, 
-					ut dapibus leo lacus id metus. Mauris <span class="incorrect">facilisis</span> sem vitae nisl placerat dapibus.</textarea>
-				</div>
+				<div class="box">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam fauci
+				bus rhoncus lectus tincidunt tincidunt. Duis , ante a consequat semper, orci justo
+				 luctus nisi, vitae consequat justo nisl sit amet magna. Phasellus gravida, urna et rhoncus placerat, tortor dui scelerisque est, 
+				ut dapibus leo lacus id metus. Mauris sem vitae nisl placerat dapibus.incidunt. Duis , ante a consequat semper, orci justo
+				 luctus nisi, vitae consequat justo nisl sit amet magna. Phasellus gravida, urna et rhoncus placerat, tortor dui scelerisque est, 
+				ut dapibus leo lacus id metus. Mauris sem vitae nisl placerat dapibus Phasellus gravida, urna et rhoncus placerat, tortor dui scelerisque est, 
+				ut dapibus leo lacus id metus. Mauris sem vitae nisl placerat dapibus.incidunt. Duis , ante a consequat semper, orci justo
+				 luctus nisi, vitae consequat justo nisl sit amet magna. Phasellus gravida, urna et rhoncus placerat, tortor dui scelerisque est, 
+				ut dapibus leo lacus id metus. Mauris sem vitae nisl placerat dapibus..</div>
 				
 				<div class="textarea-container">
 					<textarea name="comments">Insert comments here...</textarea>
@@ -243,46 +246,24 @@
 			
 		</div><!--/question-->
 		
-		<div class="question">	 
+		<div class="assess-header">	 
 			<h3>Question 4<span>Nunc rhoncus egestas interdum. Proin viverra bibendum risus nec?</span></h3>
-			<div class="question-body">
+			<div class="assess-body">
 				<ul>
 					<li>
-						<div class="drag-drop-wrapper">
-							<input type="text" value="Statement 2" class="statement-left"/>
-							<div class="arrow"><span></span></div>
-							<input type="text" value="Statement 3" class="statement-right"/>
-							<div class="mark"><span></span></div>
-							<div class="float-fix"></div>
-						</div>
+						<div class="drag-me left-option">Statement 2</div>
+						<div class="arrow"><span></span></div>
+						<div class="drag-me right-option">Statement 43</div>
+						<div class="mark"><span></span></div>
+						<div class="float-fix"></div>
 					</li>	
 					<li>
-						<div class="drag-drop-wrapper">
-							<input type="text" value="Statement 2" class="statement-left"/>
-							<div class="arrow"><span></span></div>
-							<input type="text" value="Statement 3" class="statement-right"/>
-							<div class="mark"><span></span></div>
-							<div class="float-fix"></div>
-						</div>
-					</li>						
-					<li>
-						<div class="drag-drop-wrapper">
-							<input type="text" value="Statement 2" class="statement-left"/>
-							<div class="arrow"><span></span></div>
-							<input type="text" value="Statement 3" class="statement-right"/>
-							<div class="mark"><span></span></div>
-							<div class="float-fix"></div>
-						</div>
-					</li>					
-					<li class="correct">
-						<div class="drag-drop-wrapper">
-							<input type="text" value="Statement 2"  class="statement-left"/>
-							<div class="arrow"><span></span></div>
-							<input type="text" value="Statement 3" class="statement-right"/>
-							<div class="mark"><span></span></div>
-							<div class="float-fix"></div>
-						</div>
-					</li>								
+						<div class="drag-me left-option">Statement 2</div>
+						<div class="arrow"><span></span></div>
+						<div class="drag-me right-option">Statement 43</div>
+						<div class="mark"><span></span></div>
+						<div class="float-fix"></div>
+					</li>		
 				</ul>
 				
 				<div class="textarea-container">
@@ -302,14 +283,17 @@
 	<div class="col-2">
 		<h2>Results</h2>
 		<div class="additional-details">
+		
 			<div class="section">
 				<h3>Section 1<span> - Multiple Choice</span></h3>
 				<p><ins></ins><span>Section Complete</span></p>
 			</div>
+			
 			<div class="section">
 				<h3>Section 1<span> - Multiple Choice</span></h3>
 				<p><ins></ins><span>Section Complete</span></p>
 			</div>
+			
 		</div>
 	</div><!--/col-2-->
 	

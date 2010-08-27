@@ -29,7 +29,7 @@
 		$j('a.filters').click(function(){
 			
 			$j('.cal-bubble').hide();
-			
+				
 			if ($j('.filter-drop').is(':visible')) {
 				$j('.filter-drop').hide();	
 			} else { 

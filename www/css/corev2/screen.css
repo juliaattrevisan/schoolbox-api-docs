@@ -83,7 +83,7 @@ CSS commands
 h1, h2, h3, h4, h5, h6 { font-weight:normal; position:relative; }
 h1 span, h2 span, h3 span, h4 span { font-weight:bold }
 h1 { border-bottom:1px dashed #7F7F7F; font-size:1.33em; font-weight:bold; line-height:2; margin-bottom:1em; }
-h2 { -moz-border-radius-topleft:5px; -moz-border-radius-topright:5px; background:none repeat scroll 0 0 #245398; font-size:12px; height:29px; line-height:29px; text-indent:10px; }
+h2 { -moz-border-radius-topleft:5px; -moz-border-radius-topright:5px; background:#333 url(/images/corev2/body/heading-cover.png) repeat-x;; font-size:12px; height:29px; line-height:29px; text-indent:10px; }
 h3 { font-size:1em; line-height:1; }
 h4 {font-weight:normal; line-height:1.4; }
 h5 { font-size:1em; font-weight:bold; margin-bottom:1.5em; }
@@ -136,14 +136,20 @@ th { font-weight:bold; }
 /*NAVIGATION*/
 	
 	/*MAIN NAV*/
-	#nav { top:117px; text-align:left; left:0;width: 161px; margin: 15px 0 0 15px; position: absolute; z-index:1; }
+	#nav { top:117px; text-align:left; left:0; width: 161px; margin: 15px 0 0 15px; position: absolute; z-index:20; }
 	#nav * {z-index:99;}
-	#nav h3 {clear:left;padding:0 0 0 16px; margin:0;color: #fff; background: url(/images/mggs/bg-h3nav.gif) no-repeat; line-height: 29px; font-weight: bold; padding-left: 10px; text-transform: none; }
-	#nav ul { margin-bottom: 15px; background: #ededed url(/images/mggs/bg-nav-bottom.gif) no-repeat 0 100%; padding-bottom: 2px; }
-	#nav li { border: 1px solid #dbdbdb; border-top: 0; }
+	#nav h3{ color: #fff;clear:left;padding:0 0 0 16px; margin:0; line-height: 29px; height: 29px;font-weight: bold; padding-left: 10px; text-transform: none; 
+	background: #333 url(/images/corev2/body/heading-cover.png) repeat-x; border:1px solid #333; border-bottom:0px; -moz-border-radius: 5px 5px 0 0 ;
+  -webkit-border-radius: 5px 5px 0 0;
+          border-radius: 5px 5px 0 0;
+	}
+	#nav ul { margin-bottom: 15px; background: #ededed; border:1px solid #ebebeb; border-top:0;-moz-border-radius: 0 0 5px 5px;
+  -webkit-border-radius: 0 0 5px 5px;
+          border-radius: 0 0 5px 5px;  }
+	#nav li {border-bottom:1px solid #dbdbdb;}
 	#nav li a { width: 141px; padding: 0; background: 0; color: #2c2c2c; font-size: 11px; padding: 7px 9px; }
 	#nav li a:hover, #nav li li a:hover { background: #1597cb; color: #fff; text-decoration: none; }
-	#nav .lastChild { border-bottom: 0; }
+	#nav .lastChild{border-bottom:0;}
 	#nav ul ul { border: 1px solid #dbdbdb; }
 	#nav ul ul li { border: 0; border-top: 1px solid #dbdbdb; }
 	#nav ul ul li:first-child { border: 0; }
@@ -154,13 +160,13 @@ th { font-weight:bold; }
 	
 	/*TABBED NAV*/
 	#tabs { bottom:-1px;margin:0;padding:0;position:absolute;right:20px;bottom: 0; right: 15px; }
-	#tabs li { margin: 0 0 0 -20px; float: right; position: relative; }
+	#tabs li {z-index:1; margin: 0 0 0 -20px; float: right; position: relative; }
 	#tabs li a { line-height:31px; background: 0; color: #024d8d; height: 31px; display: block; float: left; padding: 0; cursor: pointer; }
 	#tabs li a span { background: url(/images/mggs/bg-nav-left.png) no-repeat 0 -31px; height: 31px; display: block; float: left; padding: 0 7px 0 30px; }
 	#tabs li a span.end { height: 31px; width: 21px; float:left; background: url(/images/mggs/bg-nav-right.png) no-repeat 0 -31px; padding: 0; }
 	#header #tabs li.navthis a { background-color: transparent; font-weight: bold; color: #024d8d;}
 	#header #tabs li.navthis a span { background-position: 0 0; }
-	#header #tabs li.navthis { }
+	#header #tabs li.navthis { z-index:2;}
 	#tabs li a:hover {color: #fff; }
 	#tabs li a:hover span { background-position: 0 bottom; }
 
@@ -175,7 +181,7 @@ th { font-weight:bold; }
 .template4 .left { min-width: 229px; width: 29.5%; }
 .template1 .right .summ, .template4 .left .summ { display: none; }
 
-h1 a.customise {display:block;font-size:80%;font-weight:normal;line-height:normal;position:absolute;right:0;text-align:right;text-transform:capitalize;top:10px;}
+h1 a.customise {display:block;font-size:80%;font-weight:normal;position:absolute;right:0;text-align:right;text-transform:capitalize;top:5px;}
 
 /*BOXES*/
 .marker { border: 2px dashed #ccc; margin-bottom: 16px; }
@@ -187,15 +193,17 @@ h1 a.customise {display:block;font-size:80%;font-weight:normal;line-height:norma
 .box.imageComp .text { text-align: center; display: block; }
 .box ul { list-style: disc; margin: 0 0 1em 1.1em; padding: 0; }
 .box li { padding-left: 5px; }
-.box .edit { padding: 0 17px; color: #fff; cursor: pointer; background: #002b58; display: block; height: 29px; line-height: 29px; float: left; position: absolute; top: 0; right: 0; text-transform: capitalize; }
-.box .edit:hover { background: #0065ce; }
+.box .edit { padding: 0 17px; color: #fff; cursor: pointer; background: #333; background: #333 url(/images/corev2/body/heading-edit.png) repeat-x; 
+border:1px solid #333; border-left:-; border-bottom:0;display: block; height: 28px; line-height: 28px; float: left; position: absolute; top: 0; right: 0; text-transform: capitalize;
+-moz-border-radius: 0px 5px 0 0 ;-webkit-border-radius:  0px 5px 0 0;border-radius:  0px 5px 0 0 ; }
+.box .edit:hover { background: #666 url(/images/corev2/body/heading-edit.png) repeat-x;; }
 .box .editPanel.hide { display: none; }
 .box .editPanel { clear: both; padding: 5px 10px; background: #c0c0c0; text-align: right; }
 .box .editPanel label, .box .editPanel option, .box .editPanel input, .box .editPanel a { font-size: 90%; color: #000; }
 .box form { text-align: right; }
 .box .listing form { text-align: right; margin: 0; }
 .box .listing ul { list-style: none; margin: 0; padding: 0; display: block; }
-.box .listing ul li { margin: 0; padding: 5px 10px; }
+.box .listing ul li { margin: 0; padding: 10px; }
 .box .listing ul li .col { float: left; display: block; width: 20%; }
 .box .listing ul li .col:first-child { width: 80%; }
 .box .listing ul li ul li { list-style: disc; }
@@ -223,12 +231,12 @@ p.interact a { color: #003e7e; display:inline; }
 .box .thumb { margin: 0 15px 15px 0; display: block; float: left; height: 100px; width: 100px; }
 
 /*FORMS*/
-.standardForm { border: 1px solid #CCCCCC; background: #eee; padding: 10px; margin:0 auto 20px; width:790px; }
+#form h2{color:#000000;}
+.standardForm { border: 1px solid #CCCCCC; background: #eee; padding: 10px; margin:0 0  20px 0; width:790px; }
 .standardForm .formLabelWidth { width: 40%; }
 .standardForm table { width: 100%; }
 .standardForm .checkAll, .standardForm .delCheck, .standardForm .acceptCheck { top: 0; }
-.standardForm h2 { color: #000; background: 0; text-indent: 0; border: 0; padding: 0; margin: 0; }
-.standardForm h3 { margin-bottom: 0.5em; }
+
 .standardForm td { vertical-align: top; padding: 10px; }
 .standardForm td td { padding: 0; }
 #deleteForm td { padding: 0.3em; vertical-align: middle; }
@@ -264,16 +272,20 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 --------------------------------------------------------------*/
 
 /*ASSESS*/
-#assess table{width:790px; background:#fff;}
+#assess table{background:#fff;}
 #assess table td span{font-size:10px;}
 #assess .standardForm, #assess .standardForm td, #assess .standardForm tr, #assess .standardForm thead{ border: 0}
 #assess .standardForm thead td, #assess .standardForm{padding:0;}
 #assess .standardForm tbody{border: 1px solid #ccc; border-collapse:collapse;}
-#assess .standardForm h2{text-indent:10px; background:#245398;}
 #assess td.formLabelWidth{width:195px;}
 #assess .standardForm{background:#fff;}
 
-#assess .additional-details, #assess .question .question-body{padding:10px;border:1px solid #dbdbdb; margin-bottom:20px; -moz-border-radius: 0 0 3px 3px; -webkit-border-radius:0 0 3px 3px; border-radius:0 0 3px 3px;}
+#assess .assess-header{margin-bottom:20px;}
+#assess .additional-details, #assess .assess-header .assess-body{padding:10px;border:1px solid #dbdbdb;  -moz-border-radius: 0 0 3px 3px; -webkit-border-radius:0 0 3px 3px; border-radius:0 0 3px 3px;}
+
+
+#assess .assess-body hr {height:0px; border-top:1px solid #DBDBDB; width:100%; margin:10px 0;}
+
 #assess .additional-details span.time{color:#F00;}
 #assess .section h3{background:#1597cb; color:#fff; font-size:11px;padding:7px; border:none;}
 #assess .section h3 span{display:inline; }
@@ -289,25 +301,60 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #assess h3{font-size:13px; font-weight:bold; padding:10px; line-height:16px;}
 #assess h3 span{display:block; font-weight:normal;}
 
-	/*individual collation*/
-	.take-test ul, .mark-test ul{margin:0;}
-	.take-test ul li, .mark-test ul li
-	{height:20px; position:relative; padding:5px;background:#ededed; border:1px solid #dbdbdb; margin-bottom:10px;}
-	.take-test ul li .drag-drop-wrapper, .take-test ul,
-	.mark-test ul li .drag-drop-wrapper, .mark-test ul{height:100%; width:100%;}
-	.mark-test ul li input, .take-test ul li .left-option,.take-test ul li .right-option
-	{ font-size:11px; width:40%; }
-	.take-test ul li .arrow, .take-test ul li .mark, 
-	.mark-test ul li .mark, .mark-test ul li input, .mark-test ul li .arrow,
-	.take-test ul li, .take-test ul li .left-option, .take-test ul li .right-option,
-	.take-test ul li .arrow
+	#assess .textarea-container{ background:#fff;padding:10px;border:1px solid #dbdbdb; margin-bottom:10px;}
+	#assess textarea{width:100%; font-size:12px; font-family:Arial, Helvetica, sans-serif; border:0;}
+
+	#assess ul{margin:0;}
+	#assess ul li{min-width: 0;position:relative; padding:5px;background:#ededed; border:1px solid #dbdbdb; margin-bottom:10px; }
+	#assess ul{height:100%; width:100%;}
+	#assess .drag-me{width:38%; font-size:11px; background:#fff; padding:10px 5px; line-height:14px; border: 1px solid #dbdbdb;}
+
+	#assess ul li .mark,
+	#assess ul li .arrow, 
+	#assess ul li input, 
+	#assess .left-option, 
+	#assess .right-option,
+	#assess .inputs .delete,
+	#assess .inputs checkbox,
+	#assess li.inputs .answer-value,
+	#assess li.inputs .list-item
 	{float:left;}
-	.take-test ul li .arrow, .take-test ul li .mark,
-	.mark-test ul li .arrow, .mark-test ul li .mark
-	{height:100%; width:10%; position:relative;}
-	.take-test ul li .arrow span, .take-test ul li .mark span,
-	.mark-test ul li .arrow span, .mark-test ul li .mark span{position:absolute; top:10%; width:16px; height:15px; left:40%; background:url(/images/corev2/assess/correct-incorrect-grey.gif) 0 -15px no-repeat; }
-	.take-test ul li .arrow span, .mark-test ul li .arrow span{background:url(/images/corev2/assess/arrows-correct-incorrect.gif) no-repeat;width:14px; height:8px; top:30%;}
+	#assess ul li .arrow, 
+	#assess ul li .mark,
+	#assess .inputs .delete
+	{height:37px; width:9%; position:relative; display:block;}
+	#assess ul li .mark span, 
+	#assess ul li .arrow span
+	{position:absolute; top:30%; width:16px; height:15px; left:40%; 
+	background:url(/images/corev2/assess/correct-incorrect-grey.gif) 0 -15px no-repeat; }
+	#assess ul li .arrow span{background:url(/images/corev2/assess/arrows-correct-incorrect.gif) no-repeat;width:14px; height:8px; top:39%;}
+	
+	#assess li.inputs .answer-value,
+	#assess li.inputs .list-item,
+	#assess li.inputs .checkbox,
+	#assess .text-box{
+	height:24px; line-height:24px;}
+	
+	#assess li.inputs .drag-me{padding:0 5px;}
+	#assess li.inputs .answer-value{width:78%; height:100%; background:#fff; padding:0 5px;}
+	#assess .keywords{ height:100%; background:#fff; padding:5px 5px; border: 1px solid #dbdbdb;}
+	#assess .keywords .text-box{font-size:12px;}
+	#assess li.inputs .list-item{width:3%; font-weight:bold; text-align:center;}
+	#assess li.inputs .checkbox{width:6%; margin:0;}
+    #assess .text-box {margin:0; border:0 none;  width:100%; font-size:11px;}
+	#assess .text-box.text-border{border: 1px solid #dbdbdb;}
+	#assess li.inputs .delete{background:url(/images/corev2/assess/delete.gif) 50% 50% no-repeat; height:27px;}
+	#assess li.inputs .arrow{height:27px;}
+	
+	
+	
+	/*OH MY GOD!!!!!! IT'S GONE!!!!!!!!!!! OH MY GOD!!! */
+	
+	#assess .question-type.short-answer{display:block;}
+
+	
+
+	
 	.mark-test form .submit, .take-test form .next-section{width:127px; height:29px; border:0;  background: url(/images/corev2/assess/submit.gif) no-repeat; padding:0; margin:20px 0; color:#fff; font-weight:bold; font-size:11px; float:right;}
 	.mark-test form .submit:hover, .take-test form .next-section:hover{background-position:left bottom; cursor:pointer}
 
@@ -315,9 +362,8 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	.take-test h3{background:#ededed;}
 	.take-test ul li, .take-test ul li .option{height:40px; background:#fff; }
 	.take-test ul li .arrow span{background-image:url(/images/corev2/assess/arrow.gif); top:35%; left:35%;}
-	.take-test ul li{padding:0;border:none; width:100%;}
 	.take-test ul li .arrow{width:6%;}
-	.take-test ul li .option{border:1px solid #ccc; padding:15px 5px 10px; width:44%; height:15px; float:left;}
+	.take-test ul li .option{border:1px solid #ccc; padding:15px 5px 10px; width:43%; height:15px; float:left;}
 	.take-test ul li .input-wrap.drop-right, .take-test ul li .input-wrap.drop-right input{background-color:#f2f8fa;}
 	.take-test form .next-section{width:111px; height:29px; background: url(/images/corev2/assess/next-step.gif) no-repeat;}
 
@@ -343,7 +389,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	.mark-test {padding:10px;}
 	.mark-test p{margin:0;padding:10px 0; font-weight:bold; text-align:right; font-size:11px;}
 	
-	.mark-test .question .box{border:1px solid #dbdbdb; padding:10px; margin-bottom:10px; line-height:22px;}
+	.mark-test .box{border:1px solid #dbdbdb; padding:10px; margin-bottom:10px; line-height:22px;}
 	.mark-test .box span{padding:1px 5px; border:1px solid #dbdbdb;}
 	.mark-test .box span.incorrect{background:#f5cfcf;}
 	
@@ -429,7 +475,7 @@ ul.js_happening li span{display:block; padding:5px; -moz-border-radius: 5px;-web
 ul.js_happening li span:hover{opacity:0.8;}
 ul.js_happening li{margin-bottom:4px; position:relative; }
 
-.cal-bubble {z-index:200;bottom:90%;color:#000000;font-size:12px;left:-100px;position:absolute;width:350px;display:none;}
+.cal-bubble {z-index:200000;bottom:90%;color:#000000;font-size:12px;left:-100px;position:absolute;width:350px;display:none;}
 .cal-bubble .top{height:8px;background: url(/images/corev2/calendar/bubble-top.png) 0 0 no-repeat; -moz-border-radius: 5px 5px 0 0; /* FF1+ */ -webkit-border-radius:  5px 5px 0 0; /* Saf3-4 */border-radius: 5px 5px 0 0; /* Opera 10.5, IE 9, Saf5, Chrome */}
 .cal-bubble  .middle{padding:10px 19px;position:relative;background:#fff;  border:1px solid #000; border-top:0; border-bottom:0;}
 .cal-bubble  .middle .close{position:absolute; right:10px; top:0px; width:15px; height:15px; background:#000; cursor:pointer;z-index:90;}
@@ -442,13 +488,7 @@ ul.js_happening li{margin-bottom:4px; position:relative; }
 .cal-bubble .modify a:hover{background-color: #e2e2e2;background-image: -moz-linear-gradient(top, #e2e2e2, #c7c7c7); /* FF3.6 */background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #e2e2e2),color-stop(1, #c7c7c7)); /* Saf4+, Chrome */ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#e2e2e2', EndColorStr='#c7c7c7'); /* IE6,IE7 */-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#e2e2e2', EndColorStr='#c7c7c7')"; /* IE8 */text-shadow: 1px 1px 1px #f0f0f0; /* FF3.5+, Opera 9+, Saf1+, Chrome */}
 .cal-bubble .time{margin-bottom:5px;}
 
-
 .hidden-fields{display:none;}
-
-.cal-bubble p.author{}
-.cal-bubble p.event-type{}
-
-
 
 .day-block .header_option { float: right; margin: 0 !important; padding: 0; }
 .day-num {   float: left; left: 0; padding: 0; margin: 0 !important; font: 11px Arial, Verdana, Helvetica, sans-serif; }
@@ -472,7 +512,7 @@ ul.js_happening li{margin-bottom:4px; position:relative; }
 #file-window #file-list tbody tr td { padding: 0.3em 3em 0.3em 0.6em; }
 #file-window #file-list tbody tr td span {background-repeat:no-repeat; line-height: 22px; display: block; padding: 0 0 0 28px; }
 .treeTable tr.selected td { background: #3875D7; color: #fff; }
-.header_option { text-align: right; display: block; float: right; margin: -25px 5px 0 0; position: relative; text-transform: capitalize; line-height: normal; }
+.header_option { text-align: right; display: block; float: right; margin: -22px 8px 0 0; position: relative; text-transform: capitalize; line-height: normal; }
 h1 + .header_option { margin-top: -38px; }
 .header_option a:hover { text-decoration: underline; }
 .standardForm table table td { padding: 0.3em 0; vertical-align: middle; }
@@ -527,6 +567,8 @@ span.wrapper a { color:#FFF; }
 p.bubble-name { margin-bottom:5px; padding-bottom:5px; }
 .bubble .comment { color:#000; }
 
+/* LOGIN Styling */
+
 /* MERGING WIKI VERSIONS */
 .highlightedMessage { border: 1px solid #e00; width: 100%; margin-bottom: 10px; }
 .highlightedMessage p span { color: #e00; font-weight: bold; }
@@ -536,15 +578,15 @@ p.bubble-name { margin-bottom:5px; padding-bottom:5px; }
 .news-item { background: #eee; padding: 10px; margin-bottom:0; position:relative}
 .news-item .header_option{position:absolute; z-index:2; top:40px; right:20px;}
 .news-item .header_option a{color:#ffffff;}
-.news-item h3{font-size:14px; margin-bottom:14px; padding:0 0 3px 0; border-bottom:1px dotted #ddd;}
-.news-archive{margin-bottom:10px;}
+#news-header{font-size:14px;  padding:10px;  background:#f1f1f1; }
+.news-archive{margin:0 5px 10px 5px; -moz-box-shadow: 1px 2px 2px #f7f7f7;-webkit-box-shadow: 1px 2px 2px #f7f7f7; box-shadow: 1px 2px 2px #f7f7f7; }
 .news-archive img{padding:10px;}
 
 .modify { text-align: right; font-size: 80%; }
 
-#category { padding:0;list-style: none; margin: 0; float: left; }
+#category { padding:5px 5px 0 5px;list-style: none; margin: 0; float: left; }
 .listing #category { list-style: none; margin-top: 10px; float: left; }
-#category li { float: left; background: #ececec; border: 1px solid #ccc; border-bottom: 0; padding: 0; margin:0; }
+#category li { float: left; background: #ececec; border: 2px solid #ccc; border-bottom: 0; padding: 0; margin:0; -moz-border-radius: 5px 5px 0 0;}
 #category li a { display: block; padding: 5px 10px; }
 #category li a.selected { background: #ccc; }
 #category li a.disabled { color: #ccc; }
@@ -573,7 +615,8 @@ p.bubble-name { margin-bottom:5px; padding-bottom:5px; }
 /* SEARCH*/
 #search-results td { padding: 0.5em; }
 #search-results thead th { border-bottom: 1px dotted #000; }
-table.ruler { width: 790px; margin:0 auto; }
+table.ruler {width:100%;}
+table.ruler thead td{padding:0;}
 #type { list-style: none; margin: 0; float: left; }
 #type li { float: left; background: #ececec; border: 1px solid #ccc; border-bottom: 0; padding: 0; margin: 0 2px 0 0; }
 #type li a { display: block; padding: 5px 10px; }
@@ -597,8 +640,12 @@ p.search-sml { font-size:11px; }
 
 /* SUBJECT COMPLETION GRAPH*/
 div.barchart { width: 100%; }
-div.barchart div { width: 300px; float: left; }
-div.barchart .value { width: 45px; float: right; }
+div.barchart div { width: 90%; float: left; }
+div.barchart .value { width: 10%; float: right; }
+
+li.bars  a{font-weight:bold;}
+li.bars p{margin-bottom:5px;}
+li.bars {display:block; }
 
 /*TIMETABLE*/
 #timetable { width: 100%; background: #ececec; border-spacing: 5px; border-collapse: separate; }
