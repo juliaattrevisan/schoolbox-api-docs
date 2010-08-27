@@ -48,7 +48,7 @@ You have to add an extra calculation here because of IE, so that all users may r
    
 body { font-size: 75%; }   /* IE */
 html > body { font-size: 12px; }  /* Other browsers */
-body { background: #fff; color:#000000; font-family: Arial, Helvetica, sans-serif; text-align: left; position: relative; }
+body { background: #fff; color:#000000; font-family: Arial, Helvetica, sans-serif; text-align: left; position: relative; margin:0;}
 /*--------------------------------------------------------------
  Main Link Styles 
 --------------------------------------------------------------*/
@@ -273,19 +273,16 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 
 /*ASSESS*/
 #assess table{background:#fff;}
+#assess table.mceLayout{border:0;}
 #assess table td span{font-size:10px;}
 #assess .standardForm, #assess .standardForm td, #assess .standardForm tr, #assess .standardForm thead{ border: 0}
 #assess .standardForm thead td, #assess .standardForm{padding:0;}
 #assess .standardForm tbody{border: 1px solid #ccc; border-collapse:collapse;}
 #assess td.formLabelWidth{width:195px;}
 #assess .standardForm{background:#fff;}
-
 #assess .assess-header{margin-bottom:20px;}
 #assess .additional-details, #assess .assess-header .assess-body{padding:10px;border:1px solid #dbdbdb;  -moz-border-radius: 0 0 3px 3px; -webkit-border-radius:0 0 3px 3px; border-radius:0 0 3px 3px;}
-
-
 #assess .assess-body hr {height:0px; border-top:1px solid #DBDBDB; width:100%; margin:10px 0;}
-
 #assess .additional-details span.time{color:#F00;}
 #assess .section h3{background:#1597cb; color:#fff; font-size:11px;padding:7px; border:none;}
 #assess .section h3 span{display:inline; }
@@ -302,10 +299,10 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #assess h3 span{display:block; font-weight:normal;}
 
 	#assess .textarea-container{ background:#fff;padding:10px;border:1px solid #dbdbdb; margin-bottom:10px;}
-	#assess textarea{width:100%; font-size:12px; font-family:Arial, Helvetica, sans-serif; border:0;}
+	#assess textarea{width:100%; font-size:12px; font-family:Arial, Helvetica, sans-serif; border:0; min-height:75px;}
 
 	#assess ul{margin:0;}
-	#assess ul li{min-width: 0;position:relative; padding:5px;background:#ededed; border:1px solid #dbdbdb; margin-bottom:10px; }
+	#assess .col-1 ul li{min-width: 0;position:relative; padding:5px;background:#ededed; border:1px solid #dbdbdb; margin-bottom:10px; }
 	#assess ul{height:100%; width:100%;}
 	#assess .drag-me{width:38%; font-size:11px; background:#fff; padding:10px 5px; line-height:14px; border: 1px solid #dbdbdb;}
 
@@ -346,21 +343,50 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess li.inputs .delete{background:url(/images/corev2/assess/delete.gif) 50% 50% no-repeat; height:27px;}
 	#assess li.inputs .arrow{height:27px;}
 	
+	#assess .grey-highlight{line-height:16px;}
 	
+	.mceContentBody p span{padding:1px 2px; background:#f0f0f0; border: 1px solid #dbdbdb;}
+	#assess table.mceLayout tr.mceFirst td,#assess table.mceLayout tr.mceLast td,#assess table.mceLayout tr.mceFirst td, .defaultSkin .mceIframeContainer  {border:0;}
+	#assess .defaultSkin table.mceLayout,#assess .defaultSkin table.mceLayout tr.mceFirst td{border:0 none;}
+	#assess .defaultSkin td.mceCenter table{margin:0;}
+	.create-test .section-box {margin:10px;}
+	#assess.create-test .section-box h3{background:#1597cb; padding:5px; margin:0; font-size:12px; color:#fff;}
+	#assess .section-box ul{margin:0; width:auto;  border:1px solid #dbdbdb; border-top:0;}
+	
+	.create-test .section-box ul li{margin:0;font-size:11px;line-height:16px;background:#f1f7fa; border-bottom:1px solid #dbdbdb;}
+	.create-test .section-box ul li.last{border-bottom:0;}
+	.create-test .section-box ul li p{padding:10px; margin:0;}
+	.create-test .section-box ul li span{font-weight:bold;}
+	.create-test .section-box ul li a{color: #255297; padding:0 0 10px 10px; font-size:10px; display:inline-block;}
+	.create-test .section-box ul li a.delete{ padding:0 0 10px 0; }
+	.create-test .section-box h3 a{width:13px; height:13px; float:right; text-indent:-9999em; font-size:1px; background: url(/images/corev2/assess/section-dropd-down.gif)  no-repeat;}
+	.create-test .section-box h3 a:hover{background-position:bottom;}
+	
+	/*all them submit buttons*/
+	#assess .add-statement,
+	#assess .add-answer,
+	#assess .make-blank
+	{height:25px;border:none; text-indent:-9999em;}
+	#assess .add-statement:hover,
+	#assess .add-answer:hover,
+	#assess .make-blank:hover
+	{background-position:bottom; cursor:pointer}
+	
+	#assess .add-statement{ width:112px; background:url(/images/corev2/assess/add-statement-btn.gif) no-repeat;}
+	#assess .add-answer{width:103px; background:url(/images/corev2/assess/add-answer-btn.gif) no-repeat;}
+	#assess .make-blank{ margin-right:10px;width:95px;background:url(/images/corev2/assess/make-blank-btn.gif) no-repeat;}
+	#assess .add-question{ width:115px; height:29px;background:url(/images/corev2/assess/add-question-btn.gif) no-repeat;}
 	
 	/*OH MY GOD!!!!!! IT'S GONE!!!!!!!!!!! OH MY GOD!!! */
-	
-	#assess .question-type.short-answer{display:block;}
+	#assess .question-type{}
 
-	
 
-	
 	.mark-test form .submit, .take-test form .next-section{width:127px; height:29px; border:0;  background: url(/images/corev2/assess/submit.gif) no-repeat; padding:0; margin:20px 0; color:#fff; font-weight:bold; font-size:11px; float:right;}
 	.mark-test form .submit:hover, .take-test form .next-section:hover{background-position:left bottom; cursor:pointer}
 
 	/*take test*/
 	.take-test h3{background:#ededed;}
-	.take-test ul li, .take-test ul li .option{height:40px; background:#fff; }
+	.take-test ul li, .take-test ul li .option{background:#fff; }
 	.take-test ul li .arrow span{background-image:url(/images/corev2/assess/arrow.gif); top:35%; left:35%;}
 	.take-test ul li .arrow{width:6%;}
 	.take-test ul li .option{border:1px solid #ccc; padding:15px 5px 10px; width:43%; height:15px; float:left;}

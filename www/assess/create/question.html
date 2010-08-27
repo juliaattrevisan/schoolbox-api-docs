@@ -17,14 +17,49 @@
 <link rel="Shortcut Icon" href="/images/corev2/favicon.ico" type="image/x-icon" />
 
 <script type="text/javascript" src="/javascript/jquery1.4.2.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.ui.js"></script>
 <script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/scripts.js"></script>
 <script type='text/javascript'>	
 	$j(function() {
     $j('#nav ul').droppy({speed: 0});
+
+
+	tinyMCE.init({
+		mode : "exact",
+		theme : "advanced",
+		theme_advanced_buttons1 : "customtag,undo",
+        theme_advanced_buttons2 : '',
+		theme_advanced_buttons3 : "",
+		elements: "grey-highlight",
+		content_css : "/css/corev2/screen.css",
+		width : "100%",
+		setup : function(ed) {
+			ed.addButton('customtag', {
+				title : 'wraps selected text with custom tag',
+				class: 'make-blank',
+				image : 'img/icons.gif',
+				onclick : function() {
+					var sel = ed.selection.getContent();
+					if (sel != '') {
+               		 	ed.selection.setContent('<span>' + sel + '</span>');
+					} 
+           		 }
+			});
+		}
+			
+	});
+  
+  $j(".section-box ul").sortable({
+			revert: true,
+			cursor: "pointer"
+		});
+
+	$j("ul, li").disableSelection();
+
   });
 </script>
- 
 
 </head>
 <body>
@@ -59,10 +94,12 @@
 <!-- BEGIN myfiles_tab -->
 <!-- END myfiles_tab -->	
      </div>
-    <script type="text/javascript">
+ <script type="text/javascript">
+	
 	$j(function(){
-		$j('#nav li:last-child').addClass('lastChild')					
-	});
+		$j('#nav li:last-child').addClass('lastChild');				
+	})
+	
 </script>
 <div id="nav">
 	<h3>My eVI</h3>
@@ -159,15 +196,17 @@
       
 <div id="content">
 
-<div id="assess">
+<div id="assess" class="create-test">
+<form id="question-submit">
 	<h1>Create Question</h1>
 
 	<div class="col-1">
+	
 		<div class="assess-header">
 			<h2>1. Question Details</h2>
 			<div class="assess-body">
 				<strong>Question Type</strong>
-				<form>
+				
 				<fieldset>
 					<select>
 						<option value="Multiple Choice" name="questionType">Multiple Choice</option>	
@@ -223,6 +262,7 @@
 						</li>	
 								
 					</ul>
+					<input type="submit" value="Add Statement" class="add-statement" />
 				</div>
 			</div>	
 		
@@ -273,6 +313,9 @@
 							<div class="float-fix"></div>
 						</li>	
 					</ul>
+					
+					<input type="submit" value="Add Answer" class="add-answer" />
+					
 				</div>
 			</div>	
 		
@@ -300,7 +343,7 @@
 			</div>	
 			
 			<div class="assess-header">
-				<h2>3. Answers</h2>
+				<h2>4. Keywords</h2>
 				<div class="assess-body">
 					<div class="keywords"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
 				</div>
@@ -308,11 +351,68 @@
 		
 		</div><!--/a question type-->
 		
-		
+		<div class="question-type fill-in-blanks">
+			<div class="assess-header">
+				<h2>2. Question</h2>
+				<div class="assess-body">
+				
+					<div class="textarea-container">
+						<textarea>Slam the question in here ham!</textarea>
+					</div>
+				
+				</div>
+			</div>			
+				
+			<div class="assess-header">
+				<h2>3. Statement</h2>
+				<div class="assess-body">
+					<div class="textarea-container grey-highlight">
+						<textarea id="grey-highlight" value="periphery"></textarea>
+					</div>
+				</div>
+				
+			</div>	
+			
+		</div><!--/a question type-->		
+		</form>
 	</div><!--/col-1-->
 	
 	<div class="col-2">
 		<h2>Test</h2>
+		<div class="section-box">
+			<h3>Periphery <a href="#">Drop Down</a></h3>
+			<ul>
+				<li class="ui-state-default">
+					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
+					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
+				</li>
+				<li class="ui-state-default">
+					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
+					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
+				</li>
+				<li class="last">
+					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
+					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
+				</li>
+			</ul>
+		</div>
+		<div class="section-box">
+			<h3>Periphery<a href="#">Drop Down</a></h3>
+			<ul>
+				<li class="ui-state-default">
+					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
+					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
+				</li>
+				<li class="ui-state-default">
+					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
+					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
+				</li>
+				<li class="last ui-state-default">
+					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
+					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
+				</li>
+			</ul>
+		</div>
 
 	</div><!--/col-2-->
 	
