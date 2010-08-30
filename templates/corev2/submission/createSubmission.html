@@ -10,12 +10,12 @@
 <input type="hidden" name="category" value="{CATEGORY}" />
     <table>
         <tr>
-            <td class="formLabelWidth"><h2>Title</h2></td>
+            <td class="formLabelWidth"><h3>Title</h3></td>
             <td><input name="description" type="text" value="{DESC}" size="30" /></td>
         </tr>
         <!-- BEGIN browse_row -->
         <tr>
-            <td class="formLabelWidth"><h2>File</h2>
+            <td class="formLabelWidth"><h3>File</h3>
                 <em>This is an optional file that will be related with the submission box and made available for download</em></td>
             <td><input type="file" name="file" />
                 <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
@@ -23,7 +23,7 @@
         </tr>
         <!-- END browse_row -->
         <tr>
-            <td class="formLabelWidth" valign="top"><h2>Location</h2>
+            <td class="formLabelWidth" valign="top"><h3>Location</h3>
                 <em>This submission box will be located in the following folder</em></td>
             <td>{CURRENT_CAT}
             
@@ -36,7 +36,7 @@
             </td>
         </tr>
         <tr>
-            <td><h2>Type</h2>
+            <td><h3>Type</h3>
                 <em>What is the purpose of this submission box?</em></td>
             <td><select name="type" class="formfield">
                     <!-- BEGIN type_drop -->
@@ -45,7 +45,7 @@
                 </select></td>
         </tr>
         <tr>
-            <td class="formLabelWidth"><h2>Open Date</h2>
+            <td class="formLabelWidth"><h3>Open Date</h3>
                 <em>The date from when the submission box will be available for submission.  To make the box never available but have the date published, set this date to after the due date.</em></td>
             <td><input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20" />
                 <img src="/images/ico_calendar.gif" width="16" height="13" id="open_trigger" style="cursor: pointer;" title="Date selector"/>
@@ -69,7 +69,7 @@
             </td>
         </tr>
         <tr>
-            <td><h2>Due Date</h2>
+            <td><h3>Due Date</h3>
                 <em>Actual date the work is due. This is the date that will be published.</em> </td>
             <td><input name="due_date" id="due_date" type="text" value="{DUE_DATE}" size="20" />
                 <img src="/images/ico_calendar.gif" width="16" height="13" id="due_trigger" style="cursor: pointer;" title="Date selector"/>
@@ -93,7 +93,7 @@
             </td>
         </tr>
         <tr>
-            <td><h2>Late Date</h2>
+            <td><h3>Late Date</h3>
                 <em>Students will not be able to submit after this date</em></td>
             <td><input name="late_date" id="late_date" type="text" value="{LATE_DATE}" size="20" />
                 <img src="/images/ico_calendar.gif" width="16" height="13" id="late_trigger" style="cursor: pointer;" title="Date selector"/>

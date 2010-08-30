@@ -40,13 +40,13 @@
 		setup : function(ed) {
 			ed.addButton('customtag', {
 				title : 'wraps selected text with custom tag',
-				class : 'make-blank',
 				image : 'img/icons.gif',
+				'class' : "make-blank",
 				onclick : (function() {
 					var sel = ed.selection.getContent();
 					if (sel !== '') {
                		 	ed.selection.setContent('<span>'+sel+'</span>');
-					}
+					};
            		 })
 			});
 		}	
@@ -55,7 +55,6 @@
 	var numberStart = 1;
 	
 	$j('.section-box ul li p span').each(function() {	
-			
 			$j(this).html(numberStart + '.');
 			
 			$j(this).parent().parent().addClass('question-no-' + numberStart);
@@ -100,10 +99,12 @@
 	
 	});
 	
+	//add a statement answer row
 	$j('.add-statement').live('click', function() {
 		$j('.align ul').append('<li class="inputs"><div class="drag-me left-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div><div class="arrow"><span></span></div><div class="drag-me right-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div><div class="delete"></div><div class="float-fix"></div></li>');
 	});
 	
+	//delet the specific row ;)
 	$j('.delete').live('click', function() {
 		$j(this).parent().remove();	
 		refreshList();
@@ -183,323 +184,325 @@
 	})
 	
 </script>
-<div id="nav">
-	<h3>My eVI</h3>
 
-  <ul>
-<li class="parent"><a href="/home.php"><span>Home</span></a><ul>
-<li><a href="/modules/resource/viewResourceList.php"><span>Book Resource</span></a></li>
-<li class="parent"><a href="/admin/admin.php"><span>Admin</span></a><ul>
-<li><a href="/admin/modSideMenu.php"><span>Modify Side Menu</span></a></li>
-<li><a href="/admin/modUser.php?adduser=1"><span>Add User</span></a></li>
-<li><a href="/admin/modUser.php"><span>Modify User</span></a></li>
-<li><a href="/admin/modFileType.php"><span>Modify File Types</span></a></li>
-</ul>
-
-</li>
-<li class="parent"><a href="/resources"><span>Resources</span></a><ul>
-<li><a href="/cms/file/multicat"><span>File to Multiple Folders</span></a></li>
-<li><a href="/cms/link/multicat"><span>Link to Multiple Folders</span></a></li>
-</ul>
-</li>
-<li><a href="/calendar/week"><span>Calendar</span></a></li>
-<li><a href="/submission/dueWork"><span>Due Work</span></a></li>
-<li class="parent"><a href="/home.php"><span>Main</span></a><ul>
-<li><a href="/editLinks.php"><span>Edit My Links</span></a></li>
-
-<li><a href="/group/join"><span>Manage My Groups</span></a></li>
-</ul>
-</li>
-<li class="parent"><a href="/news"><span>News</span></a><ul>
-<li><a href="/news/modify"><span>Add News</span></a></li>
-<li><a href="/news"><span>View News</span></a></li>
-</ul>
-</li>
-<li class="parent"><a href="/submission/listSubmission"><span>Submissions</span></a><ul>
-<li><a href="/submission/createSubmission/new"><span>Create Submission</span></a></li>
-</ul>
-
-</li>
-<li class="parent"><a href="/mail.php"><span>Webmail</span></a><ul>
-<li><a href="/search/user"><span>Address Book</span></a></li>
-<li><a href="/mail/send.php"><span>Send Mail</span></a></li>
-<li><a href="/mail.php"><span>View Mail</span></a></li>
-</ul>
-</li>
-<li><a href="/account/modify"><span>Change Password</span></a></li>
-<li><a href="/search/user"><span>User Directory</span></a></li>
-<li><a href="/feedback.php"><span>Feedback</span></a></li>
-
-</ul>
-</li>
-<li><a href="#"><span>Staff Services</span></a></li>
-<li><a href="#"><span>Faculties</span></a></li>
-<li><a href="#"><span>Sport</span></a></li>
-<li><a href="#"><span>Houses</span></a></li>
-<li><a href="#"><span>Student Services</span></a></li>
-<li class="parent"><a href="/modules/tutorial/event/list.php"><span>Tutorials</span></a><ul>
-<li class="parent"><a href="#"><span>Reports</span></a><ul>
-<li><a href="/modules/tutorial/report/attendance.php"><span>Uncompleted Attendance</span></a></li>
-
-<li><a href="/modules/tutorial/report/hours.php"><span>Hours Performed</span></a></li>
-<li><a href="/modules/tutorial/report/student.php"><span>Student Attendance</span></a></li>
-</ul>
-</li>
-<li><a href="/modules/tutorial/attendance/list.php"><span>Mark Attendance</span></a></li>
-<li><a href="/modules/tutorial/report/statistics.php"><span>Statistics</span></a></li>
-</ul>
-</li>
-<li><a href="/group/join"><span>Manage Groups</span></a></li>
-<li><a href="/logout.php"><span>Logout</span></a></li>
-</ul>
-
- 
-  <h3>My Groups</h3>
-  <ul>
- 
-		<li><a href="/homepage/140/">Submission Test</a></li> 
-		<li><a href="/homepage/141/">Steve&#039;s Assignment</a></li> 
-		<li><a href="/homepage/37/">Test Folder</a></li>  </ul> 
-  <h3>My Links</h3>
-
-  <ul>
-  	<li><a href="/redir.php?url=http%253A%252F%252Fwww.yahoo.com" target="_blank"><span>yahoo</span></a></li>
-  	<li><a href="/redir.php?url=http%253A%252F%252Fwww.google.com.au" target="_blank"><span>google</span></a></li>
-  	<li><a href="/redir.php?url=http%253A%252F%252Fwww.sitescene.com.au" target="_blank"><span>Sitescene</span></a></li>
-  	<li><a href="/redir.php?url=http%253A%252F%252Fintranet.mgs.vic.edu.au%252Fcontent%252FIntranet%252FSport%252FFootball%252FMy%252520Albums%252F1st%252520%2526%2525202nds%252520vs%252520Carey%252Falbum%252Findex.html" target="_blank"><span>test</span></a></li>
-  	<li><a href="/redir.php?url=http%253A%252F%252Fwww.alaress.com.au" target="_blank"><span>glack</span></a></li>
-
- 
-    <li><a href="/editLinks.php">Add Link</a></li>
-  </ul>	
-</div>
-    
-<div id="container">
-      
-<div id="content">
-
-<div id="assess" class="create-test">
-<form id="question-submit" action="#" method="get">
-	<h1>Create Question</h1>
-
-	<div class="col-1">
+	<div id="nav">
+		<h3>My eVI</h3>
 	
-		<div class="assess-header">
-			<h2>1. Question Details</h2>
-			<div class="assess-body">
-				<strong>Question Type</strong>
+	  <ul>
+	<li class="parent"><a href="/home.php"><span>Home</span></a><ul>
+	<li><a href="/modules/resource/viewResourceList.php"><span>Book Resource</span></a></li>
+	<li class="parent"><a href="/admin/admin.php"><span>Admin</span></a><ul>
+	<li><a href="/admin/modSideMenu.php"><span>Modify Side Menu</span></a></li>
+	<li><a href="/admin/modUser.php?adduser=1"><span>Add User</span></a></li>
+	<li><a href="/admin/modUser.php"><span>Modify User</span></a></li>
+	<li><a href="/admin/modFileType.php"><span>Modify File Types</span></a></li>
+	</ul>
+	
+	</li>
+	<li class="parent"><a href="/resources"><span>Resources</span></a><ul>
+	<li><a href="/cms/file/multicat"><span>File to Multiple Folders</span></a></li>
+	<li><a href="/cms/link/multicat"><span>Link to Multiple Folders</span></a></li>
+	</ul>
+	</li>
+	<li><a href="/calendar/week"><span>Calendar</span></a></li>
+	<li><a href="/submission/dueWork"><span>Due Work</span></a></li>
+	<li class="parent"><a href="/home.php"><span>Main</span></a><ul>
+	<li><a href="/editLinks.php"><span>Edit My Links</span></a></li>
+	
+	<li><a href="/group/join"><span>Manage My Groups</span></a></li>
+	</ul>
+	</li>
+	<li class="parent"><a href="/news"><span>News</span></a><ul>
+	<li><a href="/news/modify"><span>Add News</span></a></li>
+	<li><a href="/news"><span>View News</span></a></li>
+	</ul>
+	</li>
+	<li class="parent"><a href="/submission/listSubmission"><span>Submissions</span></a><ul>
+	<li><a href="/submission/createSubmission/new"><span>Create Submission</span></a></li>
+	</ul>
+	
+	</li>
+	<li class="parent"><a href="/mail.php"><span>Webmail</span></a><ul>
+	<li><a href="/search/user"><span>Address Book</span></a></li>
+	<li><a href="/mail/send.php"><span>Send Mail</span></a></li>
+	<li><a href="/mail.php"><span>View Mail</span></a></li>
+	</ul>
+	</li>
+	<li><a href="/account/modify"><span>Change Password</span></a></li>
+	<li><a href="/search/user"><span>User Directory</span></a></li>
+	<li><a href="/feedback.php"><span>Feedback</span></a></li>
+	
+	</ul>
+	</li>
+	<li><a href="#"><span>Staff Services</span></a></li>
+	<li><a href="#"><span>Faculties</span></a></li>
+	<li><a href="#"><span>Sport</span></a></li>
+	<li><a href="#"><span>Houses</span></a></li>
+	<li><a href="#"><span>Student Services</span></a></li>
+	<li class="parent"><a href="/modules/tutorial/event/list.php"><span>Tutorials</span></a><ul>
+	<li class="parent"><a href="#"><span>Reports</span></a><ul>
+	<li><a href="/modules/tutorial/report/attendance.php"><span>Uncompleted Attendance</span></a></li>
+	
+	<li><a href="/modules/tutorial/report/hours.php"><span>Hours Performed</span></a></li>
+	<li><a href="/modules/tutorial/report/student.php"><span>Student Attendance</span></a></li>
+	</ul>
+	</li>
+	<li><a href="/modules/tutorial/attendance/list.php"><span>Mark Attendance</span></a></li>
+	<li><a href="/modules/tutorial/report/statistics.php"><span>Statistics</span></a></li>
+	</ul>
+	</li>
+	<li><a href="/group/join"><span>Manage Groups</span></a></li>
+	<li><a href="/logout.php"><span>Logout</span></a></li>
+	</ul>
+	
+	 
+	  <h3>My Groups</h3>
+	  <ul>
+	 
+			<li><a href="/homepage/140/">Submission Test</a></li> 
+			<li><a href="/homepage/141/">Steve&#039;s Assignment</a></li> 
+			<li><a href="/homepage/37/">Test Folder</a></li>  </ul> 
+	  <h3>My Links</h3>
+	
+	  <ul>
+		<li><a href="/redir.php?url=http%253A%252F%252Fwww.yahoo.com" target="_blank"><span>yahoo</span></a></li>
+		<li><a href="/redir.php?url=http%253A%252F%252Fwww.google.com.au" target="_blank"><span>google</span></a></li>
+		<li><a href="/redir.php?url=http%253A%252F%252Fwww.sitescene.com.au" target="_blank"><span>Sitescene</span></a></li>
+		<li><a href="/redir.php?url=http%253A%252F%252Fintranet.mgs.vic.edu.au%252Fcontent%252FIntranet%252FSport%252FFootball%252FMy%252520Albums%252F1st%252520%2526%2525202nds%252520vs%252520Carey%252Falbum%252Findex.html" target="_blank"><span>test</span></a></li>
+		<li><a href="/redir.php?url=http%253A%252F%252Fwww.alaress.com.au" target="_blank"><span>glack</span></a></li>
+	
+	 
+		<li><a href="/editLinks.php">Add Link</a></li>
+	  </ul>	
+	</div>
+		
+	<div id="container">
+		  
+		<div id="content">
+		
+			<div id="assess" class="create-test">
 				
-				<fieldset>
-					<select>
-						<option value="Multiple Choice" >Multiple Choice</option>	
-						<option value="Multiple Choice" >Short Answer</option>	
-						<option value="Multiple Choice" >Word Correction</option>							
-						<option value="Multiple Choice" >Drag 'n Drop</option>	
-					</select>				
-				</fieldset>
+					<h1>Create Question</h1>
+			
+					<div class="col-1">
+						<form id="question-submit" action="#" method="get">
+						<div class="assess-header">
+						<h2>1. Question Details</h2>
+						<div class="assess-body">
+							<strong>Question Type</strong>
+							
+							<fieldset>
+								<select>
+									<option value="Multiple Choice" >Multiple Choice</option>	
+									<option value="Multiple Choice" >Short Answer</option>	
+									<option value="Multiple Choice" >Word Correction</option>							
+									<option value="Multiple Choice" >Drag 'n Drop</option>	
+								</select>				
+							</fieldset>
+							
+							<div class="mark-box">
+								<hr />
+								<strong>Marks Available</strong><br />
+								<input type="text" value="marks" />
+							</div>
+						</div>
+					</div>
+					
+					<div class="question-type align">
+						<div class="assess-header">
+							<h2>2. Question</h2>
+							<div class="assess-body">
+							
+								<div class="textarea-container">
+									<textarea rows="5" cols="1">Slam the question in here ham!</textarea>
+								</div>
+							
+							</div>
+						</div>			
+							
+						<div class="assess-header">
+							<h2>3. Answers</h2>
+							<div class="assess-body">
+								<ul>
+									<li class="inputs">
+											<div class="drag-me left-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
+											<div class="arrow"><span></span></div>
+											<div class="drag-me right-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
+											<div class="delete"></div>
+											<div class="float-fix"></div>
+			
+									</li>
+									<li class="inputs">
+											<div class="drag-me left-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
+											<div class="arrow"><span></span></div>
+											<div class="drag-me right-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
+											<div class="delete"></div>
+											<div class="float-fix"></div>
+									</li>	
+											
+								</ul>
+								<div class="add-statement">Add Statement</div>
+							</div>
+						</div>	
+					
+					</div><!--/a question type-->
+					
+					<div class="question-type multiple-choice">
+						<div class="assess-header">
+							<h2>2. Question</h2>
+							<div class="assess-body">
+							
+								<div class="textarea-container">
+									<textarea rows="5" cols="1">Slam the question in here ham!</textarea>
+								</div>
+							
+							</div>
+						</div>			
+							
+						<div class="assess-header">
+							<h2>3. Answers</h2>
+							<div class="assess-body">
+								<ul>
+									<li class="inputs">
+										<div class="list-item">A)</div>
+										<input type="checkbox" value="Enter Val Here" name="" class="checkbox"/>
+										<div class="answer-value"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
+										<div class="delete"></div>
+										<div class="float-fix"></div>
+									</li>	
+									<li class="inputs correct">
+										<div class="list-item">B)</div>
+										<input type="checkbox" value="Enter Val Here" name="" class="checkbox"/>
+										<div class="answer-value"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
+										<div class="delete"></div>
+										<div class="float-fix"></div>
+									</li>	
+									<li class="inputs">
+										<div class="list-item">C)</div>
+										<input type="checkbox" value="Enter Val Here" name="" class="checkbox"/>
+										<div class="answer-value"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
+										<div class="delete"></div>
+										<div class="float-fix"></div>
+									</li>	
+									<li class="inputs">
+										<div class="list-item">D)</div>
+										<input type="checkbox" value="Enter Val Here" name="" class="checkbox"/>
+										<div class="answer-value"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
+										<div class="delete"></div>
+										<div class="float-fix"></div>
+									</li>	
+								</ul>
+								
+								<div class="add-answer">Add Answer</div>
+								
+							</div>
+						</div>	
+					
+					</div><!--/a question type-->
+					
+					<div class="question-type short-answer">
+						<div class="assess-header">
+							<h2>2. Question</h2>
+							<div class="assess-body">
+							
+								<div class="textarea-container">
+									<textarea rows="5" cols="1">Slam the question in here ham!</textarea>
+								</div>
+							
+							</div>
+						</div>			
+							
+						<div class="assess-header">
+							<h2>3. Answers</h2>
+							<div class="assess-body">
+								<div class="textarea-container">
+									<textarea rows="5" cols="1">Slam the question in here ham!</textarea>
+								</div>
+							</div>
+						</div>	
+						
+						<div class="assess-header">
+							<h2>4. Keywords</h2>
+							<div class="assess-body">
+								<div class="keywords"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
+							</div>
+						</div>	
+					
+					</div><!--/a question type-->
+					
+					<div class="question-type fill-in-blanks">
+						<div class="assess-header">
+							<h2>2. Question</h2>
+							<div class="assess-body">
+							
+								<div class="textarea-container">
+									<textarea rows="5" cols="1">Slam the question in here ham!</textarea>
+								</div>
+							
+							</div>
+						</div>			
+							
+						<div class="assess-header">
+							<h2>3. Statement</h2>
+							<div class="assess-body">
+								<div class="textarea-container grey-highlight">
+									<textarea rows="5" cols="1" id="grey-highlight" value="periphery"></textarea>
+								</div>
+							</div>
+							
+						</div>	
+						
+					</div><!--/a question type-->		
+					</form>	
+						
+					</div><!--/col-1-->
+					
+					<div class="col-2">
+						<h2>Test</h2>
+						<div class="section-box">
+							<h3>Periphery</h3>
+							<ul>
+								<li class="">
+									<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
+									<p class="links"><a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a></p>
+								</li>
+								<li class="">
+									<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
+									<p class="links"><a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a></p>
+								</li>
+								<li class="">
+									<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
+									<p class="links"><a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a></p>
+								</li>
+							</ul>
+						</div>
+						<div class="section-box">
+							<h3>Periphery</h3>
+							
+							<ul>
+								<li class="">
+									<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
+									<p class="links"><a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a></p>
+								</li>
+								<li class="">
+									<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
+									<p class="links"><a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a></p>
+								</li>
+								<li class="">
+									<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
+									<p class="links"><a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a></p>
+								</li>
+							</ul>
+						</div>
 				
-				<div class="mark-box">
-					<hr />
-					<strong>Marks Available</strong><br />
-					<input type="text" value="marks" />
-				</div>
+					</div><!--/col-2-->
+					
+					<div class="float-fix"></div>
 			</div>
 		</div>
-		
-		<div class="question-type align">
-			<div class="assess-header">
-				<h2>2. Question</h2>
-				<div class="assess-body">
-				
-					<div class="textarea-container">
-						<textarea rows="10" cols="1">Slam the question in here ham!</textarea>
-					</div>
-				
-				</div>
-			</div>			
-				
-			<div class="assess-header">
-				<h2>3. Answers</h2>
-				<div class="assess-body">
-					<ul>
-						<li class="inputs">
-								<div class="drag-me left-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
-								<div class="arrow"><span></span></div>
-								<div class="drag-me right-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
-								<div class="delete"></div>
-								<div class="float-fix"></div>
+	</div>
+	</div>
+	</div>
 
-						</li>
-						<li class="inputs">
-								<div class="drag-me left-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
-								<div class="arrow"><span></span></div>
-								<div class="drag-me right-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
-								<div class="delete"></div>
-								<div class="float-fix"></div>
-						</li>	
-								
-					</ul>
-					<div class="add-statement">Add Statement</div>
-				</div>
-			</div>	
-		
-		</div><!--/a question type-->
-		
-		<div class="question-type multiple-choice">
-			<div class="assess-header">
-				<h2>2. Question</h2>
-				<div class="assess-body">
-				
-					<div class="textarea-container">
-						<textarea rows="10" cols="1">Slam the question in here ham!</textarea>
-					</div>
-				
-				</div>
-			</div>			
-				
-			<div class="assess-header">
-				<h2>3. Answers</h2>
-				<div class="assess-body">
-					<ul>
-						<li class="inputs">
-							<div class="list-item">A)</div>
-							<input type="checkbox" value="Enter Val Here" name="" class="checkbox"/>
-							<div class="answer-value"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
-							<div class="delete"></div>
-							<div class="float-fix"></div>
-						</li>	
-						<li class="inputs correct">
-							<div class="list-item">B)</div>
-							<input type="checkbox" value="Enter Val Here" name="" class="checkbox"/>
-							<div class="answer-value"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
-							<div class="delete"></div>
-							<div class="float-fix"></div>
-						</li>	
-						<li class="inputs">
-							<div class="list-item">C)</div>
-							<input type="checkbox" value="Enter Val Here" name="" class="checkbox"/>
-							<div class="answer-value"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
-							<div class="delete"></div>
-							<div class="float-fix"></div>
-						</li>	
-						<li class="inputs">
-							<div class="list-item">D)</div>
-							<input type="checkbox" value="Enter Val Here" name="" class="checkbox"/>
-							<div class="answer-value"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
-							<div class="delete"></div>
-							<div class="float-fix"></div>
-						</li>	
-					</ul>
-					
-					<div class="add-answer">Add Answer</div>
-					
-				</div>
-			</div>	
-		
-		</div><!--/a question type-->
-		
-		<div class="question-type short-answer">
-			<div class="assess-header">
-				<h2>2. Question</h2>
-				<div class="assess-body">
-				
-					<div class="textarea-container">
-						<textarea rows="10" cols="1">Slam the question in here ham!</textarea>
-					</div>
-				
-				</div>
-			</div>			
-				
-			<div class="assess-header">
-				<h2>3. Answers</h2>
-				<div class="assess-body">
-					<div class="textarea-container">
-						<textarea rows="10" cols="1">Slam the question in here ham!</textarea>
-					</div>
-				</div>
-			</div>	
-			
-			<div class="assess-header">
-				<h2>4. Keywords</h2>
-				<div class="assess-body">
-					<div class="keywords"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
-				</div>
-			</div>	
-		
-		</div><!--/a question type-->
-		
-		<div class="question-type fill-in-blanks">
-			<div class="assess-header">
-				<h2>2. Question</h2>
-				<div class="assess-body">
-				
-					<div class="textarea-container">
-						<textarea rows="10" cols="1">Slam the question in here ham!</textarea>
-					</div>
-				
-				</div>
-			</div>			
-				
-			<div class="assess-header">
-				<h2>3. Statement</h2>
-				<div class="assess-body">
-					<div class="textarea-container grey-highlight">
-						<textarea rows="10" cols="1" id="grey-highlight" value="periphery"></textarea>
-					</div>
-				</div>
-				
-			</div>	
-			
-		</div><!--/a question type-->		
-		</form>
-	</div><!--/col-1-->
-	
-	<div class="col-2">
-		<h2>Test</h2>
-		<div class="section-box">
-			<h3>Periphery <a href="#">Drop Down</a></h3>
-			<ul>
-				<li class="">
-					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
-					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
-				</li>
-				<li class="">
-					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
-					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
-				</li>
-				<li class="">
-					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
-					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
-				</li>
-			</ul>
-		</div>
-		<div class="section-box">
-			<h3>Periphery<a href="#">Drop Down</a></h3>
-			<ul>
-				<li class="">
-					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
-					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
-				</li>
-				<li class="">
-					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
-					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
-				</li>
-				<li class="">
-					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
-					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
-				</li>
-			</ul>
-		</div>
-
-	</div><!--/col-2-->
-	
-	<div class="float-fix"></div>
-
-
-</div>
-</div>
-</div>
-</div>
-</div>
 </body>
 </html>

@@ -66,7 +66,7 @@
 			
 			$j('.filter-list .' + element + ' input:checked').each(function(){
 				var n = $j(this).attr('value');
-				 $j('ul.js_happening .' + n).show();
+				 $j('ul.js_happening li.' + n).show();
 			});
 		}
 	});
