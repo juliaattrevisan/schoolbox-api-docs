@@ -51,15 +51,41 @@
 			});
 		}	
 	});
+  	
+	var numberStart = 1;
+	
+	$j('.section-box ul li p span').each(function() {	
+			
+			$j(this).html(numberStart + '.');
+			
+			$j(this).parent().parent().addClass('question-no-' + numberStart);
+			numberStart = numberStart + 1;
+			// $this.text($this.parent('li').prevAll().length + 1);
+	});		
   
   	//sorting the draggy droppy thaaang
 	$j(".section-box ul").sortable({
 		revert: 200,
-		cursor: "pointer"
+		cursor: "pointer",
+		deactivate: function(event, ui) {
+
+			var numberStart = 1;
+			
+			$j('ul.ui-sortable li > p span').each(function() {	
+				var $this = $j(this); 
+				$this.html(numberStart + '.');
+				$j(this).parent().parent().attr('class', ('question-no-' + numberStart));
+				numberStart = numberStart + 1;
+				
+				// $this.text($this.parent('li').prevAll().length + 1);
+			});		
+		}
+			
+
 	});
 	
 	//change the checkboxes so you can see which ones are marked as correct and which aren't
-	$j('.checkbox').click(function() {
+	$j('.checkbox').live('click', function() {
 		if ($j(this).is(':checked')) {
 			$j(this).parent().css("background-color", "#e0f2df");
 		} else {
@@ -68,32 +94,57 @@
 	});
 	
 	//add an answer row
-	$j('.add-answer').click(function() {
+	$j('.add-answer').live('click', function() {
 		$j('.multiple-choice ul').append('<li class="inputs"><div class="list-item">D)</div><input type="checkbox" value="Enter Val Here" name="" class="checkbox"/><div class="answer-value"><input type="text" value="Enter Val Here" name="" class="text-box"></div><div class="delete"></div><div class="float-fix"></div></li>');
+	refreshList();
 	
 	});
 	
+	$j('.add-statement').live('click', function() {
+		$j('.align ul').append('<li class="inputs"><div class="drag-me left-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div><div class="arrow"><span></span></div><div class="drag-me right-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div><div class="delete"></div><div class="float-fix"></div></li>');
+	});
+	
+	$j('.delete').live('click', function() {
+		$j(this).parent().remove();	
+		refreshList();
+	});
+	
+	
+	function refreshList() {
+		var alphabetStart = 65;
+		
+		$j('li.inputs > div.list-item').each(function() {	
+		   var $this = $j(this); 
+		   $this.html('&#' + alphabetStart + ';&#41;');
+		  alphabetStart = alphabetStart + 1;
+		  // $this.text($this.parent('li').prevAll().length + 1);
+		});
+	}
 	
 	/*
 	
+	&#65;
+	
+	<div class="list-item">D)</div>
+							<input type="checkbox" value="Enter Val Here" name="" class="checkbox"/>
+							<div class="answer-value"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
+							<div class="delete"></div>
+							<div class="float-fix"></div>
 	
 	http://stackoverflow.com/questions/1937247/renumbering-a-list-using-jquery
-	
-	
-	$('li > span.number').each(function() {
-   var $this = $(this); 
-   $this.text($this.parent('li').prevAll().length + 1);
-});
-<strong></strong>
-	
 	*/
+	
+	
+
+	
+	
 
 
   });
 </script>
 
 </head>
-<body>
+<body> 
 <div id="wrap">
 	<div id="wrap-inner">
     <div id="header">
@@ -272,7 +323,6 @@
 				<div class="assess-body">
 					<ul>
 						<li class="inputs">
-	
 								<div class="drag-me left-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
 								<div class="arrow"><span></span></div>
 								<div class="drag-me right-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
@@ -280,19 +330,16 @@
 								<div class="float-fix"></div>
 
 						</li>
-						
 						<li class="inputs">
-
 								<div class="drag-me left-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
 								<div class="arrow"><span></span></div>
 								<div class="drag-me right-option"><input type="text" value="Enter Val Here" name="" class="text-box"></div>
 								<div class="delete"></div>
 								<div class="float-fix"></div>
-
 						</li>	
 								
 					</ul>
-					<input type="submit" value="Add Statement" class="add-statement" />
+					<div class="add-statement">Add Statement</div>
 				</div>
 			</div>	
 		
@@ -412,15 +459,15 @@
 		<div class="section-box">
 			<h3>Periphery <a href="#">Drop Down</a></h3>
 			<ul>
-				<li class="ui-state-default">
+				<li class="">
 					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
 					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
 				</li>
-				<li class="ui-state-default">
+				<li class="">
 					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
 					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
 				</li>
-				<li class="last">
+				<li class="">
 					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
 					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
 				</li>
@@ -429,15 +476,15 @@
 		<div class="section-box">
 			<h3>Periphery<a href="#">Drop Down</a></h3>
 			<ul>
-				<li class="ui-state-default">
+				<li class="">
 					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
 					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
 				</li>
-				<li class="ui-state-default">
+				<li class="">
 					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
 					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
 				</li>
-				<li class="last ui-state-default">
+				<li class="">
 					<p><span>1.</span> What is the abbreviation for a Chicken Vindaloo, garlic naan and coke at the 'Tan doori Den' ?</p>
 					<a href="#" title="Edit">Edit</a> | <a href="#" class="delete" title="Delete">Delete</a>
 				</li>

@@ -351,7 +351,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess .defaultSkin td.mceCenter table{margin:0;}
 	.create-test .section-box {margin:10px;}
 	#assess.create-test .section-box h3{background:#1597cb; padding:5px; margin:0; font-size:11px; color:#fff;}
-	#assess .section-box ul{margin:0; width:auto;  border:1px solid #dbdbdb; border-top:0;}
+	#assess .section-box ul{margin:0; width:auto;  border:1px solid #dbdbdb; border-top:0; border-bottom:0;}
 	
 	.create-test .section-box ul li{margin:0;font-size:11px;line-height:16px;background:#f1f7fa; border-bottom:1px solid #dbdbdb;}
 	.create-test .section-box ul li.last{border-bottom:0;}
