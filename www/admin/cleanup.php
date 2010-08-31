@@ -35,7 +35,7 @@ class clean {
 	}
 
     function cleanCalendar() {
-        $query = "DELETE FROM calendar WHERE level = 3";
+        $query = "DELETE FROM event WHERE access = 3";
         $this->db->query($query);
     }
 

@@ -280,7 +280,8 @@ class SitePage extends Page {
                 ($this->site == 'wenona' && $this->groupHandler->isStaff()) ||
                 $this->site == 'ormond' ||
                 $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] ==  7 || $_SESSION['gid'] == '8' )  ||
-                $this->site == 'joeys'
+                $this->site == 'joeys' ||
+                $this->site == 'mggs' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent() )
                 )
 		{
 			if($this->site == 'mgs' || $this->site == 'grimwade')

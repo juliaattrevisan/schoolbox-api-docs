@@ -72,7 +72,7 @@ class uploadCal {
             $campus = $_SESSION['campus'][0];
         else
             $campus = $_POST['campus'];
-        $output	= "";
+        $output	= "Processing CSV file<br>";
         while(!feof($cal))
         {
 
@@ -106,7 +106,8 @@ class uploadCal {
 
     function processVCal() {
 
-        require_once dirname(__FILE__) .'/../www/include/iCalcreator.class.php';
+        
+        require_once dirname(__FILE__) .'/../include/iCalcreator.class.php';
 
         if($_POST['userid'] == "")
             $uid = $_SESSION['id'];
@@ -126,15 +127,15 @@ class uploadCal {
         date_default_timezone_set('Australia/Melbourne');
 
         /* start parse of local file */
-        $v->setConfig( 'directory', 'calendar' );
+        //$v->setConfig( 'directory', 'calendar' );
         // set directory
-        $v->setConfig( 'filename', $_FILES['file']['tmp_name'] );
+        //$v->setConfig( 'filename', $_FILES['file']['tmp_name'] );
         // set file name
-        $v->parse();
+        $v->parse($_FILES['file']['tmp_name']);
 
         $eventArray = $v->selectComponents(date('Y'), 01, 01, date('Y')+1,12,31);
         //print_r($eventArray);
-
+        $output = "Processing VCAL files<br>";
         foreach( $eventArray as $year => $yearArray) {
             foreach( $yearArray as $month => $monthArray ) {
                 foreach( $monthArray as $day => $dailyEventsArray ) {
@@ -167,11 +168,17 @@ class uploadCal {
                                        'endTime'	=> isset($dtend['hour'])?date('H:i:s', $etime):'',
                                        'date'       => date('Y-m-d', $stime),
                                       );
-                      $cal->create($event);
+
+                        if($cal->create($event) )
+                            $output .= "<div style=\"color: #66CC33;\">Successfully added event '$summary'<br /></div>";
+                        else
+                            $output .= "<div style=\"color: #CC3300;\">Failed to add event '$summary'<br /></div>";
                     }
                 }
             }
         }
+
+         $this->displayPage($output);
     }
 }
 
@@ -179,8 +186,8 @@ $page = new uploadCal;
 
 if ($_FILES['file']['tmp_name'])
 {
-    if(stristr(file_get_contents($_FILES['file']['tmp_name'],NULL, NULL, 20, 14),'BEGIN:VCALENDAR'))
-            $page->processVCal();
+    if(stristr(file_get_contents($_FILES['file']['tmp_name'],NULL, NULL, 0, 20),'BEGIN:VCALENDAR'))
+        $page->processVCal();
     else
         $page->processCal();
 }else
