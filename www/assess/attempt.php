@@ -27,11 +27,14 @@ $this->setTitle('Assessment: ' . $assess['title']);
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the Assessment.
  */
+$attemptStartTime = strtotime($attempt['start']);
+
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => $assess['title'],
-    'ATTEMPT_START' => $attempt['start'],
-    'ATTEMPT_END' => date('Y-m-d H:i:s', (strtotime($attempt['start']) + $assess['duration'])),
+    'ASSESS_DURATION' => $assess['duration'] - (time() - $attemptStartTime),
+    'ATTEMPT_START' => date('jS F Y, g:i:sa', $attemptStartTime),
+    'ATTEMPT_END' => date('jS F Y, g:i:sa', ($attemptStartTime + $assess['duration'])),
     'SECTION_TITLE' => $section['title'],
 ));
 
@@ -68,7 +71,7 @@ foreach($allQuestions as $currentQuestion) {
 $nextSection = $sectionHandler->getAfter($this->arg[0], $section['sequence']);
 
 if (!is_numeric($nextSection['section_id'])) {
-    $this->parse('continueAssess_block', '');
+    $this->setVar('continueAssess_block', '');
     $this->parse('endAssess_block', 'endAssess');
 }
 else {
@@ -77,7 +80,7 @@ else {
     ));
 
     $this->parse('continueAssess_block', 'continueAssess');
-    $this->parse('endAssess_block', '');
+    $this->setVar('endAssess_block', '');
 }
 
 /* Set the start time if not already done

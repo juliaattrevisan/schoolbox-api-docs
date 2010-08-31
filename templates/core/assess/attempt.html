@@ -9,10 +9,28 @@
    margin-bottom: 20px;
 }
 
-.countdownSummary div {
+.countdownSummary .countdownSummaryInner {
     padding: 20px;
 }
+
+.countdownSummary dl dt,
+.countdownSummary dl dd {
+    width: 220px;
+    margin-bottom: 10px;
+    float: left;
+}
+
+.countdownSummary dl dt {
+    clear: left;
+}
+
+#countdown {
+    width: 150px;
+    padding: 0px;
+}
 </style>
+<link rel="stylesheet" href="/css/jquery.countdown.css" media="screen" />
+<script type="text/javascript" src="/javascript/jquery.countdown.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
     $j('.question form').submit(function() {
@@ -32,18 +50,31 @@ $j(document).ready(function() {
 
         return false;
     });
+
+    $j('#countdown').countdown({
+        until: '+{ASSESS_DURATION}',
+        alwaysExpire: true,
+        onExpiry: function() {
+            window.location = '/assess/end/{ASSESS_ASSESS_ID}';
+        }
+    });
 });
 </script>
 
 <div class="countdownSummary">
-    <div>
-        <h1>{ASSESS_TITLE}</h1>
-        <p>
-            You started this assessment at {ATTEMPT_START}
-        </p>
-        <p>
-            You must finish by: {ATTEMPT_END}
-        </p>
+    <div class='countdownSummaryInner'>
+        <h1>Assessment: {ASSESS_TITLE}</h1>
+        <dl>
+            <dt>You started this assessment on</dt>
+            <dd>{ATTEMPT_START}</dd>
+
+            <dt>You must finish this assessment by:</dt>
+            <dd>{ATTEMPT_END}</dd>
+
+            <dt>Time remaining</dt>
+            <dd><div id="countdown"></div></dd>
+        </dl>
+        <div class="float-fix"><!-- --></div>
     </div>
 </div>
 
