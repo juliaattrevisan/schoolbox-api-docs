@@ -58,5 +58,20 @@ class AssessAttempt extends Model {
             return false;
         }
     }
+
+    /**
+     * Check if the current user has already completed this assessment.
+     *
+     * @param <type> $assess_id
+     */
+    function isComplete($assess_id) {
+        $query = "SELECT COUNT(*) AS completed
+                  FROM {$this->_table}
+                  WHERE assess_id = '$assess_id'
+                  AND user_id = '$_SESSION[id]'
+                  AND finish != '0000-00-00 00:00:00'";
+
+        return $this->db->getOne($query);
+    }
 }
 ?>

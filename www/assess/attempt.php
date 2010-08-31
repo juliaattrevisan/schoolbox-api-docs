@@ -16,6 +16,13 @@ $attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
 /* TODO: Error checking for handlers
  */
 
+/* Check if this test has already expired; if so, redirect to end screen
+ */
+if ($attemptHandler->isComplete($this->arg[0])) {
+    header('Location: ' . '/assess/end/' . $this->arg[0]);
+    exit();
+}
+
 /* Set up template
  */
 $this->setFile(TEMPLATE_content, 'assess/attempt.html');
