@@ -1,0 +1,44 @@
+<!-- BEGIN custom_head -->
+<style type="text/css">
+label {
+    width: 100px;
+    font-weight: bold;
+    margin: 8px 0px;
+    display: block;
+    float: left;
+    clear: left;
+}
+</style>
+<!-- END custom_head -->
+<h1>Create Section</h1>
+<form name="create" action="/assess/section/create" class="standardForm" method="post">
+    <fieldset>
+        <input name="assess_id" type="hidden" value="{ASSESS_ID}" />
+        <input name="section_id" type="hidden" value="{SECTION_ID}" />
+        <input name="sequence" type="hidden" value="{SEQUENCE}" />
+    </fieldset>
+
+    <fieldset>
+        <label>Section Title</label>
+        <input name="title" type="text" size="35" />
+    </fieldset>
+
+    <fieldset>
+        <label>Random</label>
+        <input name="random" type="checkbox" value="1"/> Questions should be selected randomly
+    </fieldset>
+
+    <fieldset>
+        <label>Pool</label>
+        <input name="pool" type="text" /> Maximum number of questions to show
+    </fieldset>
+
+    <fieldset>
+        <label>Description</label>
+        <textarea name="description"></textarea>
+    </fieldset>
+
+    <fieldset>
+        <input type="submit" id="create" value="Create Section" class="btn"/>
+    </fieldset>
+</form>

@@ -1,0 +1,82 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+$j(document).ready(function() {
+    var section_id = '{SECTION_ID}';
+
+    $j('#type_id').change(function() {
+        var url = '/assess/question/create/' + section_id + '/' + $j('#type_id').val();
+        window.location = url;
+    });
+});
+</script>
+<style type="text/css">
+label {
+    width: 100px;
+    font-weight: bold;
+    margin: 8px 0px;
+    display: block;
+    float: left;
+    clear: left;
+}
+
+.allQuestions li span {
+    font-weight: bold;
+}
+
+</style>
+<!-- END custom_head -->
+<h1>Create Question in Section {SECTION_TITLE}</h1>
+<form name="create" action="/assess/question/create" class="standardForm" method="post">
+    <fieldset>
+        <input name="section_id" type="hidden" value="{SECTION_ID}" />
+        <input name="sequence" type="hidden" value="{SEQUENCE}" />
+    </fieldset>
+
+    <fieldset>
+        <label>Type</label>
+        <select name="type_id" id="type_id">
+            <option disabled {DISABLED_SELECTED}>-- Select Type --</option>
+            <!-- BEGIN questionType -->
+            <option value="{QUESTIONTYPE_TYPE_ID}" {QUESTIONTYPE_SELECTED}>{QUESTIONTYPE_DESCRIPTION}</option>
+            <!-- END questionType -->
+        </select>
+    </fieldset>
+
+    <fieldset>
+        <label>Question</label>
+        <input name="question" type="text" size="35" value="{QUESTION}" />
+    </fieldset>
+
+    <fieldset>
+        <label>Marks</label>
+        <input name="marks" type="text" size="3" value="{MARKS}"/>
+    </fieldset>
+
+    <div id="answer">
+        {ANSWER_INPUTS}
+    </div>
+
+    <fieldset>
+        <input type="submit" name="create" id="create" value="Create Question" class="btn"/>
+    </fieldset>
+</form>
+
+<h2>Questions</h2>
+<div class="allQuestions">
+    <!-- BEGIN section -->
+    <div>
+        <h3><a href="/assess/section/modify/{SECTION_SECTION_ID}"> Section {SECTION_SEQUENCE}: {SECTION_TITLE}</a></h3>
+        <ul>
+            <!-- BEGIN question -->
+            <li>
+                <p>
+                    <span>Q{QUESTION_SEQUENCE})</span>
+                    {QUESTION_QUESTION}<br />
+                    <a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a>
+                </p>
+            </li>
+            <!-- END question -->
+        </ul>
+    </div>
+    <!-- END section -->
+</div>

@@ -18,9 +18,11 @@ $assess_model   = new Assess();
 $section_model  = new AssessSection();
 
 if(!empty($_POST)) {
-    /* Format date, time */
-    $start = ausDateToUnix($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['hour'].' '.$_POST['start']['meridiem'], true);
-    $finish = ausDateToUnix($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['hour'].' '.$_POST['finish']['meridiem'], true);
+
+    /* Format date, time
+     */
+    $start = ausDateToUnix($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['minute'].' '.$_POST['start']['meridiem'], true);
+    $finish = ausDateToUnix($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem'], true);
 
     $assess_id = $assess_model->create(array(
         'user_id'     => $_SESSION['uid'],
@@ -28,26 +30,18 @@ if(!empty($_POST)) {
         'description' => $_POST['description'],
         'start'       => date(DATE_database, $start),
         'finish'      => date(DATE_database, $finish),
-        'duration'    => $_POST['duration']['hour'] * 60 + $_POST['duration']['minute']
+        'duration'    => ($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60,
     ));
 
-    if(!$assess_id) {
+    if (!$assess_id) {
         error();
     }
 
-    /* Default section */
-    $section_id = $section_model->create(array(
-        'assess_id' => $assess_id,
-        'title'     => 'Untitled Section'
-    ));
-
-    if(!$section_id) {
-        error();
-    }
-
-    localRedir("/assess/create/question/$section_id");
-} else {
-    /* Render create page */
+    localRedir('/assess/section/create/' . $assess_id);
+}
+else {
+    /* Render create page 
+     */
     $this->setFile(TEMPLATE_content, 'assess/create.html');
     $this->setTitle('Create Assessment');
 

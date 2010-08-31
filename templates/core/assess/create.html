@@ -4,22 +4,22 @@
 <script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
 <script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
 <script type="text/javascript">
-    $j(document).ready(function() {
-        Calendar.setup({
-            inputField:  "start_date",     // id of the input field
-            ifFormat:    "%d/%m/%Y",      // format of the input field
-            button:      "start_date_trigger",  // trigger for the calendar (button ID)
-            align:       "br",           // alignment (defaults to "Bl")
-            singleClick: true
-        });
-        Calendar.setup({
-            inputField:  "finish_date",     // id of the input field
-            ifFormat:    "%d/%m/%Y",      // format of the input field
-            button:      "finish_date_trigger",  // trigger for the calendar (button ID)
-            align:       "br",           // alignment (defaults to "Bl")
-            singleClick: true
-        });
+$j(document).ready(function() {
+    Calendar.setup({
+        inputField:  "start_date",     // id of the input field
+        ifFormat:    "%d/%m/%Y",      // format of the input field
+        button:      "start_date_trigger",  // trigger for the calendar (button ID)
+        align:       "br",           // alignment (defaults to "Bl")
+        singleClick: true
     });
+    Calendar.setup({
+        inputField:  "finish_date",     // id of the input field
+        ifFormat:    "%d/%m/%Y",      // format of the input field
+        button:      "finish_date_trigger",  // trigger for the calendar (button ID)
+        align:       "br",           // alignment (defaults to "Bl")
+        singleClick: true
+    });
+});
 </script>
 <!-- END custom_head -->
 
@@ -31,13 +31,26 @@
             <td><input name="title" type="text" size="35" maxlength="50" /></td>
         </tr>
         <tr>
+            <!-- Available from this time -->
             <td><h3>Start</h3></td>
             <td>
                 <select name="start[hour]">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+                    <option>10</option>
+                    <option>11</option>
                     <option>12</option>
                 </select>
                 <select name="start[minute]">
                     <option>00</option>
+                    <option>30</option>
                 </select>
                 <select name="start[meridiem]">
                     <option selected>am</option>
@@ -48,13 +61,26 @@
             </td>
         </tr>
         <tr>
+            <!-- Available until this time -->
             <td><h3>Finish</h3></td>
             <td>
                 <select name="finish[hour]">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+                    <option>10</option>
+                    <option>11</option>
                     <option>12</option>
                 </select>
                 <select name="finish[minute]">
                     <option>00</option>
+                    <option>30</option>
                 </select>
                 <select name="finish[meridiem]">
                     <option selected>am</option>
@@ -68,11 +94,17 @@
             <td><h3>Duration</h3></td>
             <td>
                 <select name="duration[hour]">
-                    <option value="0">hh</option>
-                </select>
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>hr 
                 <select name="duration[minute]">
-                    <option value="0">mm</option>
-                </select>
+                    <option value="0">0</option>
+                    <option value="30">30</option>
+                </select>min
             </td>
         </tr>
         <tr>

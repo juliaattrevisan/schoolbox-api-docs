@@ -1,0 +1,69 @@
+<style type="text/css">
+.question {
+    margin-bottom: 30px;
+}
+
+.countdownSummary {
+   border: 1px solid #ddd;
+   background-color: #fafafa;
+   margin-bottom: 20px;
+}
+
+.countdownSummary div {
+    padding: 20px;
+}
+</style>
+<script type="text/javascript">
+$j(document).ready(function() {
+    $j('.question form').submit(function() {
+        $j.post($j(this).attr('action'), $j(this).serialize(), function(responseText) {
+            var dataFunction = new Function('return ' + responseText);
+            var result = dataFunction();
+
+            /* Save successful, so hide form and disable submit butan
+             */
+            if (result.response_id != '') {
+                $j('#question_status_' + result.question_id).html('Response saved. This message should probably fade away into nothingness...');
+            }
+            else {
+                alert ('An error occurred while saving your answer.');
+            }
+        });
+
+        return false;
+    });
+});
+</script>
+
+<div class="countdownSummary">
+    <div>
+        <h1>{ASSESS_TITLE}</h1>
+        <p>
+            You started this assessment at {ATTEMPT_START}
+        </p>
+        <p>
+            You must finish by: {ATTEMPT_END}
+        </p>
+    </div>
+</div>
+
+<h2>{SECTION_TITLE}</h2>
+
+<!-- BEGIN question -->
+<div class='question'>
+    <form action="/assess/saveAnswer/{QUESTION_QUESTION_ID}" method="post">
+        <h3>Q{QUESTION_SEQUENCE}) {QUESTION_QUESTION}</h3>
+        {ANSWER_TEMPLATE}
+        <input type="submit" value="Save Answer" />
+    </form>
+    <div id="question_status_{QUESTION_QUESTION_ID}"></div>
+</div>
+<!-- END question -->
+
+<!-- BEGIN continueAssess -->
+<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}">Continue</a>
+<!-- END continueAssess -->
+
+<!-- BEGIN endAssess -->
+<a href="/assess/end/{ASSESS_ASSESS_ID}">Finish</a>
+<!-- END endAssess -->
