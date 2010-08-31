@@ -249,6 +249,9 @@ li p.interact {
 	background-position: 0 -62px;
 }
 
+table.ruler span.header_option a{color:#fff; font-weight:bold; }
+table.ruler span.header_option{margin:-32px 12px 0 0;}
+
 #footer {
 	margin: 0;
 	background: #c4c4c4;
