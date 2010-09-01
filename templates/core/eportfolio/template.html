@@ -53,8 +53,10 @@ $j(function(){
     <!-- END edit_page -->
 </h1>
 
-<div class="privateBlock template2">
-    <div class="left profile">
+<div class="{TEMPLATE} privateBlock">
+    <div class="left">
+
+            <div class="left profile">
 		<h2>My Profile</h2>
 		<div class="box">
 			<div class="pad-it">
@@ -68,19 +70,20 @@ $j(function(){
 			</div>
 		</div>
     </div>
+        <div class="float-fix"></div>
     <!-- BEGIN privateNotes -->
-    <div class="right private-notes">
+    <div class="left private-notes">
         <h2>Private Notes</h2>
 		<div class="pad-it">
 			{PRIVATE_NOTES}
 			<!-- BEGIN modify_link --><p class="interact"><a href="/eportfolio_privateNotes/modify/{ID}">Modify</a></p><!-- END modify_link -->
 		</div>
     </div>
-    <!-- END privateNotes -->
     <div class="float-fix"></div>
-</div>
-<div class="{TEMPLATE} privateBlock">
-    <div class="left">{COLUMN1}</div>
+    <!-- END privateNotes -->
+    
+    
+        {COLUMN1}</div>
     <div class="right">{COLUMN2}</div>
 	<div class="float-fix"></div>
 </div>
