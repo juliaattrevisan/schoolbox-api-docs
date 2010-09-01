@@ -1,0 +1,103 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
+<script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
+<script type="text/javascript">
+$j(document).ready(function() {
+    Calendar.setup({
+        inputField:  "start_date",     // id of the input field
+        ifFormat:    "%d/%m/%Y",      // format of the input field
+        button:      "start_date_trigger",  // trigger for the calendar (button ID)
+        align:       "br",           // alignment (defaults to "Bl")
+        singleClick: true
+    });
+    Calendar.setup({
+        inputField:  "finish_date",     // id of the input field
+        ifFormat:    "%d/%m/%Y",      // format of the input field
+        button:      "finish_date_trigger",  // trigger for the calendar (button ID)
+        align:       "br",           // alignment (defaults to "Bl")
+        singleClick: true
+    });
+});
+</script>
+<!-- END custom_head -->
+
+<h1>Manage Assessment {ASSESS_TITLE}</h1>
+<form name="create" action="/assess/{ACTION}/{ASSESS_ASSESS_ID}" class="standardForm" method="post">
+    <table>
+        <tr>
+            <td class="formLabelWidth"><h3>Title</h3></td>
+            <td><input name="title" type="text" size="35" maxlength="50" value="{ASSESS_TITLE}" /></td>
+        </tr>
+        <tr>
+            <!-- Available from this time -->
+            <td><h3>Start</h3></td>
+            <td>
+                <select name="start[hour]">
+                    <!-- BEGIN startHour -->
+                    <option value="{START_HOUR_VALUE}" {START_HOUR_SELECTED}>{START_HOUR_VALUE}</option>
+                    <!-- END startHour -->
+                </select>
+                <select name="start[minute]">
+                    <!-- BEGIN startMinute -->
+                    <option value="{START_MINUTE_VALUE}" {START_MINUTE_SELECTED}>{START_MINUTE_VALUE}</option>
+                    <!-- END startMinute -->
+                </select>
+                <select name="start[meridiem]">
+                    <!-- BEGIN startMeridiem -->
+                    <option value="{START_MERIDIEM_VALUE}" {START_MERIDIEM_SELECTED}>{START_MERIDIEM_VALUE}</option>
+                    <!-- END startMeridiem -->
+                </select>
+                <input name="start[date]" id="start_date" type="text" size="15" maxlength="10" value="{ASSESS_START_DATE}" />
+                <img src="/images/ico_calendar.gif" width="16" height="13" id="start_date_trigger" style="cursor: pointer;" title="Date Selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+            </td>
+        </tr>
+        <tr>
+            <!-- Available until this time -->
+            <td><h3>Finish</h3></td>
+            <td>
+                <select name="finish[hour]">
+                    <!-- BEGIN finishHour -->
+                    <option value="{FINISH_HOUR_VALUE}" {FINISH_HOUR_SELECTED}>{FINISH_HOUR_VALUE}</option>
+                    <!-- END finishHour -->
+                </select>
+                <select name="finish[minute]">
+                    <!-- BEGIN finishMinute -->
+                    <option value="{FINISH_MINUTE_VALUE}" {FINISH_MINUTE_SELECTED}>{FINISH_MINUTE_VALUE}</option>
+                    <!-- END finishMinute -->
+                </select>
+                <select name="finish[meridiem]">
+                    <!-- BEGIN finishMeridiem -->
+                    <option value="{FINISH_MERIDIEM_VALUE}" {FINISH_MERIDIEM_SELECTED}>{FINISH_MERIDIEM_VALUE}</option>
+                    <!-- END finishMeridiem -->
+                </select>
+                <input name="finish[date]" id="finish_date" type="text" size="15" maxlength="10" value="{ASSESS_FINISH_DATE}" />
+                <img src="/images/ico_calendar.gif" width="16" height="13" id="finish_date_trigger" style="cursor: pointer;" title="Date Selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+            </td>
+        </tr>
+        <tr>
+            <td><h3>Duration</h3></td>
+            <td>
+                <select name="duration[hour]">
+                    <!-- BEGIN durationHour -->
+                    <option value="{DURATION_HOUR_VALUE}" {DURATION_HOUR_SELECTED}>{DURATION_HOUR_VALUE}</option>
+                    <!-- END durationHour -->
+                </select> hr
+                <select name="duration[minute]">
+                    <!-- BEGIN durationMinute -->
+                    <option value="{DURATION_MINUTE_VALUE}" {DURATION_MINUTE_SELECTED}>{DURATION_MINUTE_VALUE}</option>
+                    <!-- END durationMinute -->
+                </select> min
+            </td>
+        </tr>
+        <tr>
+            <td><h3>Description</h3></td>
+            <td><textarea name="description" style="width: 100%;height: 250px;">{ASSESS_DESCRIPTION}</textarea></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td><input type="submit" value="Save" /></td>
+        </tr>
+    </table>
+</form>

@@ -134,5 +134,67 @@ class Assess extends Model {
         $this->db->query("DELETE FROM assess_response");
         $this->db->query("DELETE FROM assess_section");
     }
+
+    /**
+     * Display seconds as hours, minutes and seconds. Yoinked from
+     * http://www.laughing-buddha.net/php/lib/sec2hms/
+     *
+     * but slightly modified for formatting.
+     *
+     * @param <type> $sec
+     * @param <type> $padHours
+     * @return <type>
+     */
+    function sec2hms($sec, $padHours = false)  {
+        // start with a blank string
+        $hms = "";
+
+        // do the hours first: there are 3600 seconds in an hour, so if we divide
+        // the total number of seconds by 3600 and throw away the remainder, we're
+        // left with the number of hours in those seconds
+        $hours = intval(intval($sec) / 3600);
+
+        // add hours to $hms (with a leading 0 if asked for)
+        $hms .= ($padHours)
+              ? str_pad($hours, 2, "0", STR_PAD_LEFT). ":"
+              : $hours. "hrs ";
+
+        // dividing the total seconds by 60 will give us the number of minutes
+        // in total, but we're interested in *minutes past the hour* and to get
+        // this, we have to divide by 60 again and then use the remainder
+        $minutes = intval(($sec / 60) % 60);
+
+        // add minutes to $hms (with a leading 0 if needed)
+        $hms .= str_pad($minutes, 2, "0", STR_PAD_LEFT). "min ";
+
+        // seconds past the minute are found by dividing the total number of seconds
+        // by 60 and using the remainder
+        $seconds = intval($sec % 60);
+
+        // add seconds to $hms (with a leading 0 if needed)
+        $hms .= str_pad($seconds, 2, "0", STR_PAD_LEFT);
+
+        $hms .= 'sec';
+
+        // done!
+        return $hms;
+    }
+
+    /**
+     * Extract hours, minutes and seconds from a sec2hms value. Used to evaluate
+     * duration of assessments, converting from duration entirely in seconds.
+     *
+     * @param <type> $val
+     * @return <type>
+     */
+    function parse_sec2hms($val) {
+        preg_match('/(\d+)hrs\ (\d+)min (\d+)sec/', $val, $matches);
+
+        $formatted['hours'] = $matches[1];
+        $formatted['minutes'] = $matches[2];
+        $formatted['seconds'] = $matches[3];
+
+        return $formatted;
+    }
 }
 ?>

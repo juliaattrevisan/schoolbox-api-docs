@@ -1,0 +1,56 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" media="screen" href="/css/core/assess.css" />
+<!-- END custom_head -->
+
+<h1>Modify Section {TITLE} in {ASSESS_TITLE}</h1>
+<form name="create" action="/assess/section/modify" class="standardForm" method="post">
+    <fieldset>
+        <input name="assess_id" type="hidden" value="{ASSESS_ID}" />
+        <input name="section_id" type="hidden" value="{SECTION_ID}" />
+        <input name="sequence" type="hidden" value="{SEQUENCE}" />
+    </fieldset>
+
+    <fieldset>
+        <label>Section Title</label>
+        <input name="title" type="text" size="35" value="{TITLE}" />
+    </fieldset>
+
+    <fieldset>
+        <label>Random</label>
+        <input name="random" type="checkbox" value="1" {RANDOM_SELECTED} /> Questions should be selected randomly
+    </fieldset>
+
+    <fieldset>
+        <label>Pool</label>
+        <input name="pool" type="text" value="{POOL}"/> Maximum number of questions to show
+    </fieldset>
+
+    <fieldset>
+        <label>Description</label>
+        <textarea name="description">{DESCRIPTION}</textarea>
+    </fieldset>
+
+    <fieldset>
+        <input type="submit" id="create" value="Modify Section" class="btn"/>
+    </fieldset>
+</form>
+
+<h2>Questions</h2>
+<div class="allQuestions">
+    <!-- BEGIN section -->
+    <div>
+        <h3><a href="/assess/section/modify/{SECTION_SECTION_ID}"> Section {SECTION_SEQUENCE}: {SECTION_TITLE}</a></h3>
+        <ul>
+            <!-- BEGIN question -->
+            <li>
+                <p>
+                    <span>Q{QUESTION_SEQUENCE})</span>
+                    {QUESTION_QUESTION}<br />
+                    <a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a>
+                </p>
+            </li>
+            <!-- END question -->
+        </ul>
+    </div>
+    <!-- END section -->
+</div>

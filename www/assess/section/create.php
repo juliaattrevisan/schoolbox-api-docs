@@ -3,24 +3,16 @@ require_once '../library/assess/assess.php';
 require_once '../library/assess/assess-question.php';
 require_once '../library/assess/assess-section.php';
 
-if(!empty($_POST)) {
-
-    /* Modify existing Section
-     */
-    if (is_numeric($_POST['section_id'])) {
-        
-    }
+if (!empty($_POST)) {
 
     /* Create new Section
      */
-    else {
-        $section = new AssessSection();
-        $section_id = $section->create($_POST);
+    $section = new AssessSection();
+    $section_id = $section->create($_POST);
 
-        /* Redirect to question creation for this section
-         */
-        localRedir('/assess/question/create/' . $section_id);
-    }
+    /* Redirect to question creation for this section
+     */
+    localRedir('/assess/question/create/' . $section_id);
 }
 else {
     /* Render create page
