@@ -2,9 +2,22 @@
 <link rel="alternate" type="application/rss+xml" title="RSS" href="/homepage/rss/{ID}" />
 <!-- BEGIN modify_layout -->
 <script type="text/javascript" src="/javascript/mootools.js"></script>
-<script type="text/javascript"> var userID = {ID}; </script>
 <script type="text/javascript" src="/javascript/jquery.ui.js"></script>
 <script type="text/javascript" src="/javascript/jquery.eportfoliocomponent.js"></script>
+
+<script type="text/javascript">
+
+$j(function(){ 
+
+	if ($j('.private-notes').length == 0) {
+		$j('div.profile').css("width", "100%");
+	}
+	
+});
+
+</script>
+
+
 <!-- END modify_layout -->
 <style type="text/css">
 		
@@ -41,7 +54,7 @@
 </h1>
 
 <div class="privateBlock template2">
-    <div class="left">
+    <div class="left profile">
 		<h2>My Profile</h2>
 		<div class="box">
 			<div class="pad-it">
@@ -56,7 +69,7 @@
 		</div>
     </div>
     <!-- BEGIN privateNotes -->
-    <div class="right fix-lists">
+    <div class="right private-notes">
         <h2>Private Notes</h2>
 		<div class="pad-it">
 			{PRIVATE_NOTES}
