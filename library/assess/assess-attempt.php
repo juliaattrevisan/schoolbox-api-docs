@@ -69,6 +69,7 @@ class AssessAttempt extends Model {
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
                   AND user_id = '$_SESSION[id]'
+                  AND attempt_id = '$_SESSION[attempt_id]'
                   AND finish != '0000-00-00 00:00:00'";
 
         return $this->db->getOne($query);

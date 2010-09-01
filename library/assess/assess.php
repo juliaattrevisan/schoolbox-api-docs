@@ -10,6 +10,12 @@ class Assess extends Model {
     var $_table = 'assess';
     var $_index = 'assess_id';
 
+    /**
+     * Get an introduction to an Assess.
+     * 
+     * @param <type> $assess_id
+     * @return <type>
+     */
     function getIntro($assess_id) {
         $query = "SELECT *
                   FROM {$this->_table}
@@ -115,6 +121,18 @@ class Assess extends Model {
                   ORDER BY sectionSequence, questionSequence";
 
         return $this->db->getAll($query);
+    }
+
+    /**
+     * Clears the db.
+     */
+    function reset() {
+        $this->db->query("DELETE FROM assess");
+        $this->db->query("DELETE FROM assess_answer");
+        $this->db->query("DELETE FROM assess_attempt");
+        $this->db->query("DELETE FROM assess_question");
+        $this->db->query("DELETE FROM assess_response");
+        $this->db->query("DELETE FROM assess_section");
     }
 }
 ?>

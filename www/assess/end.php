@@ -36,5 +36,6 @@ else {
     $this->parse('alreadyEnded_block', 'alreadyEnded');
     $this->setVar('endAssess_block', '');
 }
+
 ?>
 

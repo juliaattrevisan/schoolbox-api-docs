@@ -9,17 +9,31 @@ $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();
 $sectionHandler = new AssessSection();
 
-$assess = $assessHandler->getByID($this->arg[0]);
-$section = $sectionHandler->getByID($this->arg[1]);
-$attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
-
 /* TODO: Error checking for handlers
  */
 
-/* Check if this test has already expired; if so, redirect to end screen
+$assess = $assessHandler->getByID($this->arg[0]);
+$section = $sectionHandler->getByID($this->arg[1]);
+
+/* Set the start time if not already done
  */
-if ($attemptHandler->isComplete($this->arg[0])) {
-    header('Location: ' . '/assess/end/' . $this->arg[0]);
+if ($_SESSION['attempt_id'] == '') {
+    $_SESSION['attempt_id'] = $attemptHandler->start($_SESSION['id'], $this->arg[0]);
+}
+
+/* Set up Attempt vars
+ */
+$attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
+$attemptStartTime = strtotime($attempt['start']);
+$attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
+$attemptEndTime = $attemptStartTime + $assess['duration'];
+
+/* Check if you have previously completed this test, and also check if this test
+ * has already expired; if either is the case, redirect to end screen and force
+ * test completion.
+ */
+if ($attemptHandler->isComplete($this->arg[0]) || ($attemptTimeRemaining <= 0)) {
+    localRedir('/assess/end/' . $this->arg[0]);
     exit();
 }
 
@@ -34,14 +48,12 @@ $this->setTitle('Assessment: ' . $assess['title']);
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the Assessment.
  */
-$attemptStartTime = strtotime($attempt['start']);
-
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => $assess['title'],
-    'ASSESS_DURATION' => $assess['duration'] - (time() - $attemptStartTime),
+    'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
     'ATTEMPT_START' => date('jS F Y, g:i:sa', $attemptStartTime),
-    'ATTEMPT_END' => date('jS F Y, g:i:sa', ($attemptStartTime + $assess['duration'])),
+    'ATTEMPT_END' => date('jS F Y, g:i:sa', $attemptEndTime),
     'SECTION_TITLE' => $section['title'],
 ));
 
@@ -90,9 +102,4 @@ else {
     $this->setVar('endAssess_block', '');
 }
 
-/* Set the start time if not already done
- */
-if (!is_numeric($_SESSION['attempt_id'])) {
-    $_SESSION['attempt_id'] = $attemptHandler->start($_SESSION['id'], $this->arg[0]);
-}
 ?>

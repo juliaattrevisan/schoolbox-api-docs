@@ -81,4 +81,5 @@ foreach($allSummary as $currentSummary) {
     $this->parse('section_block', 'section', 'true');
 }
 
+$_SESSION['attempt_id'] = '';
 ?>

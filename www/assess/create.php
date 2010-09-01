@@ -13,18 +13,21 @@ require_once '../library/assess/assess-question.php';
 /* Include helpers */
 require_once 'include/time.php';
 
-$group_model    = new Group();
-$assess_model   = new Assess();
-$section_model  = new AssessSection();
+$groupHandler = new Group();
+$assessHandler = new Assess();
+$sectionHandler = new AssessSection();
 
-if(!empty($_POST)) {
+if ($_GET['reset'] == 'executeReset') {
+    $assessHandler->reset();
+}
+else if (!empty($_POST)) {
 
     /* Format date, time
      */
     $start = ausDateToUnix($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['minute'].' '.$_POST['start']['meridiem'], true);
     $finish = ausDateToUnix($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem'], true);
 
-    $assess_id = $assess_model->create(array(
+    $assess_id = $assessHandler->create(array(
         'user_id'     => $_SESSION['uid'],
         'title'       => $_POST['title'],
         'description' => $_POST['description'],

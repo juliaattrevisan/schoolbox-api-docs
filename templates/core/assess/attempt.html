@@ -52,7 +52,7 @@ $j(document).ready(function() {
     });
 
     $j('#countdown').countdown({
-        until: '+{ASSESS_DURATION}',
+        until: '+{ASSESS_TIME_REMAINING}',
         alwaysExpire: true,
         onExpiry: function() {
             window.location = '/assess/end/{ASSESS_ASSESS_ID}';
