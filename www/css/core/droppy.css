@@ -11,5 +11,5 @@
     
 /* Essentials - configure this */
 
-#nav ul ul { width: 180px; left: 180px; top: -2px; }
-#nav ul ul ul { left: 180px; top: -2px; }
+#nav ul ul {  left: 160px; top: -2px; }
+#nav ul ul ul { left: 160px; top: -2px; }

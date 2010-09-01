@@ -41,16 +41,17 @@
         <h4><a class="icons {HIDDEN} {FILE_MIME_IMAGE}" href="{FILE_URL}" target="{FILE_TARGET}" >{FILE_DESCRIPTION}</a></h4>
         <!-- END file_url -->
         <!-- BEGIN file_no_url -->
-        <h4>{FILE_DESCRIPTION}</h4>
+        {FILE_DESCRIPTION}
         <!-- END file_no_url -->
-        <p class="interact">
-            <!-- BEGIN unpublish -->
-            <a href="/cms/myFileForm.php?unpublish={FILE_ID}" onclick="return confirm('Do you want to unpublish this file?');">Unpublish</a>
-            <!-- END unpublish -->
-        </p>
-        <p class="summ">{FILE_COMMENT}</p>
-        <p class="small summ">Published on {FILE_PUBLISHED_DATE}</p>
-
+		<div class="small-right">
+			<p class="interact">
+				<!-- BEGIN unpublish -->
+				<a href="/cms/myFileForm.php?unpublish={FILE_ID}" onclick="return confirm('Do you want to unpublish this file?');">Unpublish</a>
+				<!-- END unpublish -->
+			</p>
+			<p class="summ">{FILE_COMMENT}</p>
+			<p class="small summ">Published on {FILE_PUBLISHED_DATE}</p>
+		</div>
         <div class="float-fix"></div>
       </li>
       <!-- END files -->

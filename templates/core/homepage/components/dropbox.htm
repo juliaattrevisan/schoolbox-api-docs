@@ -26,10 +26,13 @@
   <ul>
     <!-- BEGIN drop_file -->
     <li class="{ON_OFF}">
-      <h4 class="icons {DROPBOX_MIME_IMAGE}"><a href="/subject/modDropBox.php?id={DROPBOX_ID}">{DROPBOX_DESCRIPTION}</a></h4>
-      <p class="interact"><a href="/subject/modDropBox.php?delete={DROPBOX_ID}">Delete</a></p>
-      <div class="float-fix"></div>
-      <p class="small">By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}</p>
+      <h4 class="icons"><a class="{DROPBOX_MIME_IMAGE}"href="/subject/modDropBox.php?id={DROPBOX_ID}">{DROPBOX_DESCRIPTION}</a></h4>
+      
+	  <div class="small-right">
+		  <p><a href="/subject/modDropBox.php?delete={DROPBOX_ID}">Delete</a></p>
+		  <p>By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}</p>  
+	  </div>
+	  
       <div class="float-fix"></div>
     </li>
     <!-- END drop_file -->

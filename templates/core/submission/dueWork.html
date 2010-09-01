@@ -27,7 +27,7 @@ $j(function() {
 		$j('div.bubble').remove();
 		var node = $j(this).closest('li'), ev = node.attr("id").substring(6);
 		
-		$j.post('/ajax/submission.php', { id : ev }, function(data){
+		$.post('/ajax/submission.php', { id : ev }, function(data){
 							winStr = '<div class="bubble"> \
 													<div class="bubble-main"> \
 														<a class="bubble-close" href="#"></a> \
@@ -91,7 +91,7 @@ $j(document).ready(function() {
       <div class="float-fix"></div>
       </div>
 
-  <table class="calendarTable duedates-calendar">
+  <table class="month-view duedates-calendar">
       
     <select name="subject" id="subjectFilter">
       <option value="">Show All</option>
@@ -219,7 +219,7 @@ $j(document).ready(function() {
     <div class="text listing">
       <ul>
         <!-- BEGIN summary -->
-        <li class=""> <a href="/homepage/{SUMMARY_CAT_ID}"><strong>{SUMMARY_CAT_NAME}</strong></a>
+        <li class="bars {DARK}"> <a href="/homepage/{SUMMARY_CAT_ID}">{SUMMARY_CAT_NAME}</a>
         	<!-- BEGIN summary_due -->( {SUMMARY_DUE} Due )<!-- END summary_due -->
             <p>{SUMMARY_TEACHER}</p>
             <div class="barchart">
@@ -228,15 +228,16 @@ $j(document).ready(function() {
                 </div>
                 <div class="value">{PERCENTAGE_COMPLETED}%</div>
             </div>
-            <p>{SUMMARY_TOTAL}</p>
+			<div class="float-fix"></div>
         </li>
+		<div class="float-fix"></div>
         <!-- END summary -->
        </ul>
     </div>
   </div>
 
   <div class="box component">
-    <h2>Activites</h2>
+    <h2>Activities</h2>
     <div class="text listing">
       <ul>
         <!-- BEGIN activity --> 

@@ -30,36 +30,6 @@
 <!-- BEGIN allowed_files -->
 .{NAME} { background-image: url(/images/mime/22x22/{ICON}); }<!-- END allowed_files -->
 
-.privateBlock {
-    width: 100%;
-    padding-bottom: 20px;
-}
-
-.privateBlock .left {
-    width: 50%;
-    float: left;
-}
-
-.privateBlock .left img {
-    float: left;
-    display: block;
-}
-
-.privateBlock .left p {
-    padding: 10px;
-    float: left;
-}
-
-.privateBlock .right {
-    width: 50%;
-    float: right;
-}
-
-.privateBlock textarea {
-    width: 99%;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 12px;
-}
 </style>
 <!-- END custom_head -->
 
@@ -70,28 +40,35 @@
     <!-- END edit_page -->
 </h1>
 
-<div class="privateBlock">
+<div class="privateBlock template2">
     <div class="left">
-        <h2>My Profile</h2>
-        <img src="/search/portrait.php?id={SYNERGY_ID}&width=150&height=150" alt="{PERSON_NAME}" title="{PERSON_NAME}" />
-        <p>
-            <strong>{PERSON_NAME}</strong><br />
-            House: {HOUSE}<br />
-            Campus: {CAMPUS}<br />
-            Year: {YEAR_LEVEL}
-        </p>
+		<h2>My Profile</h2>
+		<div class="box">
+			<div class="pad-it">
+				<img src="/search/portrait.php?id={SYNERGY_ID}&width=150&height=150" alt="{PERSON_NAME}" title="{PERSON_NAME}" />
+				<p>
+					<strong>{PERSON_NAME}</strong><br />
+					House: {HOUSE}<br />
+					Campus: {CAMPUS}<br />
+					Year: {YEAR_LEVEL}
+				</p>
+			</div>
+		</div>
     </div>
     <!-- BEGIN privateNotes -->
-    <div class="right">
+    <div class="right fix-lists">
         <h2>Private Notes</h2>
-        <p>{PRIVATE_NOTES}</p>
-        <!-- BEGIN modify_link --><p class="interact"><a href="/eportfolio_privateNotes/modify/{ID}">Modify</a></p><!-- END modify_link -->
+		<div class="pad-it">
+			{PRIVATE_NOTES}
+			<!-- BEGIN modify_link --><p class="interact"><a href="/eportfolio_privateNotes/modify/{ID}">Modify</a></p><!-- END modify_link -->
+		</div>
     </div>
     <!-- END privateNotes -->
     <div class="float-fix"></div>
 </div>
-<div class="{TEMPLATE} homepage">
+<div class="{TEMPLATE} privateBlock">
     <div class="left">{COLUMN1}</div>
     <div class="right">{COLUMN2}</div>
+	<div class="float-fix"></div>
 </div>
 <input type="hidden" id="userID" value="{ID}" />

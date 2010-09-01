@@ -4,7 +4,7 @@
 		$j('a.delete-btn').click(function(){
 			if(confirm("Delete this assessment task?")) {
 			  var workid = $j(this).closest('td').attr('id').substring(5);
-			  $j.post('/submission/submissionForm.php', {'delete':workid}, function(){
+			  $.post('/submission/submissionForm.php', {'delete':workid}, function(){
 				$j('.column-'+workid).remove();
 				  });
 			}
@@ -13,7 +13,7 @@
 
 		$j('.inputMark').blur(function(){
             if($j(this).val() != '')
-                $j.post('/submission/returnWorkForm.php', $j(this).closest('form').serialize());
+                $.post('/submission/returnWorkForm.php', $j(this).closest('form').serialize());
 		});
 	});
 

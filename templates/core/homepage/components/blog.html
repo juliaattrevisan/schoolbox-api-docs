@@ -24,45 +24,54 @@
 	</div>
 	<!-- END config -->
 	<div class="text listing blog">
-	<ul>
-		<!-- BEGIN blog -->
-		<li class="{BLOG_SHADING}">
-			<h3>{BLOG_HEADING}</h3>
-         <p class="interact">{MODIFY_BLOG}</p>
-			<p>{BLOG_BODY}</p>
-         <p class="interact">Posted by {BLOG_OWNER} {BLOG_CREATED}</p>
-         <!-- BEGIN show_comment -->
-         <p><a class="show_comments" href="javascript:void();">Show {BLOG_COMMENTS} Comments</a></p>
-         <!-- END show_comment -->
-         <div class="float-fix"></div>
-         <div class="blog_comments">
-            <!-- BEGIN comment -->
-            <p>{COMMENT_BODY}</p>
-            <p class="small summ">{COMMENT_OWNER} {COMMENT_CREATED} {DELETE_COMMENT}</p>
-            <div class="float-fix"></div>
-            <!-- END comment -->
-
-            <!-- BEGIN show_all -->
-            <p><a class="interact" href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
-            <!-- END show_all -->
-         </div>
+		<ul>
+			<!-- BEGIN blog -->
+			<li class="{BLOG_SHADING}">
+				<h4><em>{BLOG_HEADING}</em>
+					<p>{BLOG_BODY}</p>
+					<div class="blog_comments">
+					<!-- BEGIN comment -->
+					<p class="blog_title">{COMMENT_BODY}</p>
+					<p class="small summ separate">{COMMENT_OWNER}<br /> {COMMENT_CREATED} <br />{DELETE_COMMENT}</p>
+					<div class="float-fix"></div>
+					<!-- END comment -->
 		
-         <p><a class="interact post_comment" href="javascript:void();">Post comment</a></p>
+					<!-- BEGIN show_all -->
+					<p  class="interact"><a href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
+					<!-- END show_all -->
+				 </div>
+				
+				 <p><a class="interact post_comment" href="javascript:void();">Post comment</a></p>
+	
+				 <form class="standardForm" method="post" action="/blog/comment/new/{BLOG_ID}">
+					<p><textarea name="body" style="width: 100%;"></textarea></p>
+					<p><input type="submit" name="comment" value="Comment"/></p>
+				 </form>
 
-         <form class="standardForm" method="post" action="/blog/comment/new/{BLOG_ID}">
-            <p><textarea name="body" style="width: 100%;"></textarea></p>
-            <p><input type="submit" name="comment" value="Comment"/></p>
-         </form>
-     
- 			<div class="float-fix"></div>
-		</li>
-		<!-- END blog -->
-	</ul>
+				</h4>
+				
+				<div class="small-right">
+					<p class="interact">{MODIFY_BLOG}</p>
+					<p class="interact">Posted by {BLOG_OWNER}
+					<p class="interact">{BLOG_CREATED}</p>
+					<!-- BEGIN show_comment -->
+					<p class="interact"><a class="show_comments" href="javascript:void();">Show {BLOG_COMMENTS} Comments</a></p>
+					<!-- END show_comment -->
+				</div>
+
+		 	<div class="float-fix"></div>
+			</li>
+		<div class="float-fix"></div>
+			<!-- END blog -->
+		</ul>
 	</div>
+	<div class="float-fix"></div>
 	<p class="interact">
         <a href="/homepage/blogArchive/{ID}">Blog Archive</a> 
-	<!-- BEGIN submit --> | <a href="/blog/modify/new/{ID}">Post Entry</a><!-- END submit -->
-	</p>
+		 <!-- BEGIN submit --> 
+		 | <a href="/blog/modify/new/{ID}">Post Entry</a>
+		 <!-- END submit -->
+ 	</p>
 </div>
 <script type="text/javascript">
 	$j(function(){

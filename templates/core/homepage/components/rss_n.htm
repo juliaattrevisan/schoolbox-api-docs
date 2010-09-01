@@ -24,11 +24,13 @@
     	<!-- BEGIN rss_stories -->
     	<li class="{ON_OFF}">
       	<h4><a href="/redir.php?url={RSS_URL}">{RSS_TITLE}</a></h4>
-        <p class="summ">{RSS_BRIEF}</p>
-        <!-- BEGIN rss_date -->
-        <p class="small summ">Posted {RSS_POSTED_DATE}</p>
-        <!-- END rss_date -->
+        <div class="small-right">
+			<!-- BEGIN rss_date -->
+			<p class="small summ">Posted {RSS_POSTED_DATE}</p>
+			<!-- END rss_date -->
+		</div>
         <div class="float-fix"></div>
+		<p class="summ">{RSS_BRIEF}</p>
       </li>
       <!-- END rss_stories -->
     </ul>

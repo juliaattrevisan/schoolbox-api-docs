@@ -38,18 +38,21 @@
       <!-- BEGIN files -->
       <li class="{ON_OFF}">
         <!-- BEGIN file_url -->
-        <h4><a class="icons {HIDDEN} {FILE_MIME_IMAGE}" href="{FILE_URL}" target="{FILE_TARGET}" >{FILE_DESCRIPTION}</a></h4>
+        <h4 class="icons"><a class="{HIDDEN} {FILE_MIME_IMAGE}" href="{FILE_URL}" target="{FILE_TARGET}" >{FILE_DESCRIPTION}</a></h4>
         <!-- END file_url -->
         <!-- BEGIN file_no_url -->
         <h4>{FILE_DESCRIPTION}</h4>
         <!-- END file_no_url -->
-        <p class="interact">
+        <div class="small-right">
+		  <p class="interact">
           <!-- BEGIN modify_file -->
           <a href="/cms/file/{FILE_ID}">Modify</a>
           <!-- END modify_file -->
-        </p>
         <p class="summ">{FILE_COMMENT}</p>
         <p class="small summ">Posted by <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a> on {FILE_POSTED_DATE}</p>
+		</p>
+        
+		</div>
         <div class="float-fix"></div>
       </li>
       <!-- END files -->
