@@ -1,34 +1,5 @@
-<style type="text/css">
-.question {
-    margin-bottom: 30px;
-}
-
-.countdownSummary {
-   border: 1px solid #ddd;
-   background-color: #fafafa;
-   margin-bottom: 20px;
-}
-
-.countdownSummary .countdownSummaryInner {
-    padding: 20px;
-}
-
-.countdownSummary dl dt,
-.countdownSummary dl dd {
-    width: 220px;
-    margin-bottom: 10px;
-    float: left;
-}
-
-.countdownSummary dl dt {
-    clear: left;
-}
-
-#countdown {
-    width: 150px;
-    padding: 0px;
-}
-</style>
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" media="screen" href="/css/core/assess.css" />
 <link rel="stylesheet" href="/css/jquery.countdown.css" media="screen" />
 <script type="text/javascript" src="/javascript/jquery.countdown.js"></script>
 <script type="text/javascript">
@@ -60,6 +31,7 @@ $j(document).ready(function() {
     });
 });
 </script>
+<!-- END custom_head -->
 
 <div class="countdownSummary">
     <div class='countdownSummaryInner'>
@@ -79,6 +51,7 @@ $j(document).ready(function() {
 </div>
 
 <h2>{SECTION_TITLE}</h2>
+<p>{SECTION_DESCRIPTION}</p>
 
 <!-- BEGIN question -->
 <div class='question'>

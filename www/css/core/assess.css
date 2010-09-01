@@ -1,0 +1,50 @@
+/* Create Assess
+ */
+label {
+    width: 100px;
+    font-weight: bold;
+    margin: 8px 0px;
+    display: block;
+    float: left;
+    clear: left;
+}
+
+.allQuestions li span {
+    font-weight: bold;
+}
+
+/* Attempt
+ */
+.question {
+    margin-bottom: 30px;
+}
+
+.question label {
+    display: none;
+}
+
+.countdownSummary {
+   border: 1px solid #ddd;
+   background-color: #fafafa;
+   margin-bottom: 20px;
+}
+
+.countdownSummary .countdownSummaryInner {
+    padding: 20px;
+}
+
+.countdownSummary dl dt,
+.countdownSummary dl dd {
+    width: 220px;
+    margin-bottom: 10px;
+    float: left;
+}
+
+.countdownSummary dl dt {
+    clear: left;
+}
+
+#countdown {
+    width: 150px;
+    padding: 0px;
+}

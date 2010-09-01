@@ -26,6 +26,8 @@ else {
     /* Render create page
      */
     $this->setFile(TEMPLATE_content, 'assess/section/create.html');
+    $this->setBlock(TEMPLATE_content, 'section', 'section_block');
+    $this->setBlock('section', 'question', 'question_block');
     $this->setTitle('Create Section');
 
     if (empty($this->arg[0])) {
@@ -35,8 +37,8 @@ else {
     /* Find out whether the test exists to which you are attempting to add a
      * new Section
      */
-    $assess = new Assess();
-    $assess = $assess->getByID($this->arg[0]);
+    $assessHandler = new Assess();
+    $assess = $assessHandler->getByID($this->arg[0]);
 
     if (empty($assess)) {
         error();
@@ -46,9 +48,12 @@ else {
 
     $this->setVar(array(
         'ASSESS_ID' => $this->arg[0],
+        'ASSESS_TITLE' => $assess['title'],
         'SECTION_ID' => '',
         'SEQUENCE' => $section->getNextSequence($this->arg[0])
     ));
+
+    $assessHandler->renderAssessContents($assess['assess_id'], $this);
 }
 
 ?>

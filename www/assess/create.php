@@ -17,7 +17,8 @@ $groupHandler = new Group();
 $assessHandler = new Assess();
 $sectionHandler = new AssessSection();
 
-if ($_GET['reset'] == 'executeReset') {
+if ($this->arg[0] == 'executeReset') {
+    echo "RESETTING";
     $assessHandler->reset();
 }
 else if (!empty($_POST)) {
@@ -49,8 +50,8 @@ else {
     $this->setTitle('Create Assessment');
 
     $this->setVar(array(
-        'START_DATE'  => date('m/d/Y'),
-        'FINISH_DATE' => date('m/d/Y', time() + 604800)
+        'START_DATE'  => date('d/m/Y'),
+        'FINISH_DATE' => date('d/m/Y', time() + 604800)
     ));
 }
 

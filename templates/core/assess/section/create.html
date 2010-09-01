@@ -1,16 +1,8 @@
 <!-- BEGIN custom_head -->
-<style type="text/css">
-label {
-    width: 100px;
-    font-weight: bold;
-    margin: 8px 0px;
-    display: block;
-    float: left;
-    clear: left;
-}
-</style>
+<link rel="stylesheet" media="screen" href="/css/core/assess.css" />
 <!-- END custom_head -->
-<h1>Create Section</h1>
+
+<h1>Create Section in {ASSESS_TITLE}</h1>
 <form name="create" action="/assess/section/create" class="standardForm" method="post">
     <fieldset>
         <input name="assess_id" type="hidden" value="{ASSESS_ID}" />
@@ -42,3 +34,23 @@ label {
         <input type="submit" id="create" value="Create Section" class="btn"/>
     </fieldset>
 </form>
+
+<h2>Questions</h2>
+<div class="allQuestions">
+    <!-- BEGIN section -->
+    <div>
+        <h3><a href="/assess/section/modify/{SECTION_SECTION_ID}"> Section {SECTION_SEQUENCE}: {SECTION_TITLE}</a></h3>
+        <ul>
+            <!-- BEGIN question -->
+            <li>
+                <p>
+                    <span>Q{QUESTION_SEQUENCE})</span>
+                    {QUESTION_QUESTION}<br />
+                    <a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a>
+                </p>
+            </li>
+            <!-- END question -->
+        </ul>
+    </div>
+    <!-- END section -->
+</div>

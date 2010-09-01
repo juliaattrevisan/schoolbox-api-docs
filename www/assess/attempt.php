@@ -55,6 +55,7 @@ $this->setVar(array(
     'ATTEMPT_START' => date('jS F Y, g:i:sa', $attemptStartTime),
     'ATTEMPT_END' => date('jS F Y, g:i:sa', $attemptEndTime),
     'SECTION_TITLE' => $section['title'],
+    'SECTION_DESCRIPTION' => $section['description'],
 ));
 
 /* Load all the questions for this section
