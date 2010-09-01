@@ -39,7 +39,7 @@ else {
     $assess = $assessHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
-        'ASSESS_ID' => $section['assess_id'],
+        'ASSESS_ASSESS_ID' => $section['assess_id'],
         'ASSESS_TITLE' => $assess['title'],
         'SECTION_ID' => $section['section_id'],
         'TITLE' => $section['title'],

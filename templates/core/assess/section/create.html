@@ -5,7 +5,7 @@
 <h1>Create Section in {ASSESS_TITLE}</h1>
 <form name="create" action="/assess/section/create" class="standardForm" method="post">
     <fieldset>
-        <input name="assess_id" type="hidden" value="{ASSESS_ID}" />
+        <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
         <input name="section_id" type="hidden" value="{SECTION_ID}" />
         <input name="sequence" type="hidden" value="{SEQUENCE}" />
     </fieldset>
@@ -51,6 +51,10 @@
             </li>
             <!-- END question -->
         </ul>
+
+        <a href="/assess/question/create/{SECTION_SECTION_ID}">Add questions to this section</a>
     </div>
     <!-- END section -->
+
+    <a href="/assess/section/create/{ASSESS_ASSESS_ID}">Add sections to this assessment</a>
 </div>

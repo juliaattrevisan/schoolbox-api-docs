@@ -39,7 +39,7 @@ else {
     $section = new AssessSection();
 
     $this->setVar(array(
-        'ASSESS_ID' => $this->arg[0],
+        'ASSESS_ASSESS_ID' => $this->arg[0],
         'ASSESS_TITLE' => $assess['title'],
         'SECTION_ID' => '',
         'SEQUENCE' => $section->getNextSequence($this->arg[0])

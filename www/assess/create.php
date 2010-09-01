@@ -42,7 +42,7 @@ else {
     $this->setBlock(TEMPLATE_content, 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
     $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
-    $this->setTitle('Create Assessment');
+    $this->setTitle('Manage Assessment');
 
     $this->setVar(array(
         'ACTION' => 'create',

@@ -1,8 +1,8 @@
 <?php
-require_once '../library/assess/assess.php';
-require_once '../library/assess/assess-factory.php';
-require_once '../library/assess/assess-section.php';
-require_once '../library/assess/assess-attempt.php';
+require_once('../library/assess/assess.php');
+require_once('../library/assess/assess-factory.php');
+require_once('../library/assess/assess-section.php');
+require_once('../library/assess/assess-attempt.php');
 
 $factory = new AssessFactory();
 $assessHandler = new Assess();

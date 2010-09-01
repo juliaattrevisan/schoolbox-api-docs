@@ -35,7 +35,7 @@ else {
 
     $questionHandler = new AssessQuestion();
     $question = $questionHandler->getByID($this->arg[0]);
-    
+
     $answerHandler = $factory->createAnswerModel($question['type_id']);
 
     /* Show question type options. For the Modify, preselect whichever it was
@@ -66,15 +66,6 @@ else {
         }
     }
 
-    $this->setVar(array(
-        'SECTION_ID' => $question['section_id'],
-        'SEQUENCE' => $question['sequence'],
-        'QUESTION_ID' => $question['question_id'],
-        'QUESTION' => $question['question'],
-        'MARKS' => $question['marks'],
-        'DISABLED_SELECTED' => '',
-    ));
-
     /* Render contents of this Assess
      */
     $sectionHandler = new AssessSection();
@@ -83,6 +74,16 @@ else {
     if (empty($section)) {
         error(51);
     }
+
+    $this->setVar(array(
+        'ASSESS_ASSESS_ID' => $section['assess_id'],
+        'SECTION_ID' => $question['section_id'],
+        'SEQUENCE' => $question['sequence'],
+        'QUESTION_ID' => $question['question_id'],
+        'QUESTION' => $question['question'],
+        'MARKS' => $question['marks'],
+        'DISABLED_SELECTED' => '',
+    ));
 
     $assess = new Assess();
     $assess->renderAssessContents($section['assess_id'], $this);

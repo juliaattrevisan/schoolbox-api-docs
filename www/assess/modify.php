@@ -35,7 +35,9 @@ else {
     $this->setBlock(TEMPLATE_content, 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
     $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
-    $this->setTitle('Modify Assessment');
+    $this->setBlock(TEMPLATE_content, 'section', 'section_block');
+    $this->setBlock('section', 'question', 'question_block');
+    $this->setTitle('Manage Assessment');
 
     $assess = $assessHandler->getByID($this->arg[0]);
     $assessStartTime = strtotime($assess['start']);
@@ -129,6 +131,10 @@ else {
 
         $this->parse('durationMinute_block', 'durationMinute', true);
     }
+
+    /* Question contents
+     */
+    $assessHandler->renderAssessContents($this->arg[0], $this);
 }
 
 ?>

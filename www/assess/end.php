@@ -1,6 +1,6 @@
 <?php
-require_once '../library/assess/assess.php';
-require_once '../library/assess/assess-attempt.php';
+require_once('../library/assess/assess.php');
+require_once('../library/assess/assess-attempt.php');
 
 $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();

@@ -101,3 +101,27 @@ $j(document).ready(function() {
         </tr>
     </table>
 </form>
+
+<h2>Questions</h2>
+<div class="allQuestions">
+    <!-- BEGIN section -->
+    <div>
+        <h3><a href="/assess/section/modify/{SECTION_SECTION_ID}"> Section {SECTION_SEQUENCE}: {SECTION_TITLE}</a></h3>
+        <ul>
+            <!-- BEGIN question -->
+            <li>
+                <p>
+                    <span>Q{QUESTION_SEQUENCE})</span>
+                    {QUESTION_QUESTION}<br />
+                    <a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a>
+                </p>
+            </li>
+            <!-- END question -->
+        </ul>
+
+        <a href="/assess/question/create/{SECTION_SECTION_ID}">Add questions to this section</a>
+    </div>
+    <!-- END section -->
+
+    <a href="/assess/section/create/{ASSESS_ASSESS_ID}">Add sections to this assessment</a>
+</div>

@@ -1,6 +1,6 @@
 <?php
-require_once '../library/assess/assess.php';
-require_once '../library/assess/assess-factory.php';
+require_once('../library/assess/assess.php');
+require_once('../library/assess/assess-factory.php');
 
 $questionHandler = new AssessQuestion();
 $question = $questionHandler->getByID($this->arg[0]);
