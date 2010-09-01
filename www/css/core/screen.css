@@ -594,6 +594,7 @@ p.bubble-name { margin-bottom:5px; padding-bottom:5px; }
 .privateBlock {width: 100%;padding-bottom: 20px;}
 .privateBlock .box {float: left; width:100%;}
 .privateBlock  .pad-it{padding:10px;}
+.privateBlock  .private-notes ul li{list-style-type:circle;}
 .privateBlock textarea {width: 99%;font-family: Arial, Helvetica, sans-serif;font-size: 12px;}
 .privateBlock .box p{margin:0;}
 .privateBlock .box{margin:0;}
@@ -601,7 +602,6 @@ p.bubble-name { margin-bottom:5px; padding-bottom:5px; }
 .privateBlock h4 a{padding: 2px 0 10px 40px;}
 .privateBlock .blog p{padding:0;}
 
-#privateNotes_container table.mceLayout {font-family:Arial, Helvetica, sans-serif; font-size:40px;}
 
 /* LOGIN Styling */
 p.forgotten{margin:10px 0;}
