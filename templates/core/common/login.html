@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="James Leckie, Lektec Consulting"/>
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
+
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/screen.css" />
 <script type="text/javascript">
 window.onload = init;
@@ -20,7 +20,7 @@ function init(){
   <div id="header">
     	<div id="logo"><a href="/">Schoolbox Home</a></div>
   </div>
-<div id="container">
+<div id="container" class=" login">
 
   <div id="content">
     <h1 style="text-transform:capitalize">{SITE_LOCATION} Portal</h1>
@@ -37,11 +37,12 @@ function init(){
         <input type="hidden" name="page" value="{HIDDEN}" />
         <input class="login" type="submit" name="Submit" value="Login" alt="Login" />
     </form> 
+	 <p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
   	<div class="float-fix"></div>
   </div>
 </div>
 
-<div id="footer">
+<div id="footer" class="login">
 	<ul>
   	<li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SITE_ADDRESS}">{SITE_NAME}</a></li>
     <li><a href="/policy/{SITE_LOCATION}.htm">Guidelines of Use and Privacy Policy</a></li>

@@ -1,12 +1,13 @@
 		<h1>Weather Forecast for {LOCATION}</h1>
             <!-- BEGIN current -->
 			<h2>Currently</h2>
-			<ul>
-				<li><strong>Temperature :</strong> {TEMP}&deg;</li>
-				<li><strong>Wind : </strong>{WIND}</li>
-				<li><strong>Humidity : </strong>{HUMIDITY}</li>
-				<li>Weather issued {PERIOD}</li>
-			</ul>
+
+					<ul class="pad-it">
+						<li><strong>Temperature :</strong> {TEMP}&deg;</li>
+						<li><strong>Wind : </strong>{WIND}</li>
+						<li><strong>Humidity : </strong>{HUMIDITY}</li>
+						<li>Weather issued {PERIOD}</li>
+					</ul>
 
             <!-- END current -->
             <!-- BEGIN forecast -->
@@ -42,7 +43,7 @@
             <!-- END forecast -->
       <div class="right">
 			<h2>Weather around Australia</h2>
-			<ul style="margin-top: 10px;">
+			<ul style="margin-top: 10px;" class="pad-it">
 				<!-- BEGIN regions -->
 				<li><a href="/weather/{LOCATION_VALUE}">{LOCATION_NAME}</a></li>
 				<!-- END regions -->

@@ -7,6 +7,13 @@
 			
 		});
 		
+		$j('.close').click(function(){
+			$j('.cal-bubble').hide();		
+			
+		});
+		
+		
+		
 		//show or hide bubbles
 		$j('ul.js_happening li').click(function(){
 
@@ -24,6 +31,8 @@
 			}
 
 		});
+		
+
 		
 		//show and hide the filters drop down
 		$j('a.filters').click(function(){

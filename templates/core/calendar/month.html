@@ -3,7 +3,7 @@
 <script type="text/javascript" src="/javascript/calendar/jquery.custom.calendar.js"></script>
 
 <link rel="stylesheet" type="text/css" href="/css/core/ui/ui.css" />
-<link rel="stylesheet" type="text/css" href="/css/corev2/forms.css" />
+
 <script type="text/javascript">
       $j(function () {
  
@@ -91,9 +91,9 @@
         </thead>
         <tbody>
         <!-- BEGIN month_week -->
-        <tr class="month-week">
+        <tr class="month-week {OTHER_MONTH} {MONTABLE_CSS}">
         	<!-- BEGIN day_block -->
-        	<td class="day-block {OTHER_MONTH} {MONTABLE_CSS}">
+        	<td class="day-block ">
 				<div class="dayWrap">
 					<p class="header_option">{ADD}</p>
 					<p class="day-num">{DATE}</p>
@@ -105,9 +105,9 @@
 						<li class="{EVENT_TYPE} {EVENT_LEVEL} ">
 							<span style="background-color:{COLOUR}; border:1px solid {COLOUR};"><!-- BEGIN time --><div class="time">{TIME}</div><!-- END time -->{NOTE}<br /></span>
 							<div class="hidden-fields">
-							<!-- BEGIN time --><div class="time">{TIME}</div><!-- END time -->
-								<h4>{NOTE}</h4>
-								<p class="meta">Event Type: {TYPE} | Author:{AUTHOR}</p>
+								<div class="author"><a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></div>
+								<h4><!-- BEGIN time --><span class="time">{TIME}</span><!-- END time -->{NOTE}</h4>
+								<p class="meta">Event Type: {TYPE}</p>
 								<div class="modify">{MODIFY}</div>
 							</div>
 						</li>
@@ -124,6 +124,7 @@
 	<div class="cal-bubble">
 		<div class="top"></div>
 		<div class="middle">
+			<div class="close">x</div>
 			<div class="js-data"></div>
 		</div>
 		<div class="bottom"></div>

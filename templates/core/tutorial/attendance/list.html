@@ -50,74 +50,74 @@ $j(document).ready(function () {
 <form action="/modules/tutorial/attendance/modifyForm.php" method="post" class="{DISABLED}">
  
 <h2>{EVENT_NAME} - {EVENT_DATE} ({EVENT_START} - {EVENT_FINISH})</h2>
-        <span class="header_option"><a href="/modules/tutorial/enrolment/list.php?eventID={EVENT_ID}" title="Attendance history">Attendance history</a> | 
+        <span class="header_option  on-header"><a href="/modules/tutorial/enrolment/list.php?eventID={EVENT_ID}" title="Attendance history">Attendance history</a> | 
         <a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}" title="Modify Event">Modify</a> | 
         <a href="/modules/tutorial/event/modifyForm.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?')" title="Delete Event">Delete</a></span>
-  
-  <!-- BEGIN has_students -->
-  <table class="ruler">
-  	<col width="60" />
-    <col />
-    <col width="120" />
-    <col width="60" />
-    <thead>
-      <tr>
-        <th >Remove</th>
-        <th>Student</th>
-        <th>Reason</th>
-        <th>Present</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- BEGIN student -->
-      <tr style="vertical-align: middle;" class="{ON_OFF}">
-        <td style="text-align: center;">
-        	<!-- BEGIN remove -->
-            <a href="/modules/tutorial/enrolment/modifyForm.php?delete={STUDENT_ID}&eventID={EVENT_ID}" 
-            	onclick="return confirm('{STUDENT_NAME_ESCAPED} will be removed from this class. Press OK to continue.');" title="Remove student from class.">
-             	<img src="/images/tutorial/enrolment-delete.gif" alt="Remove enrolment" /></a><!-- END remove -->
-            <!-- BEGIN remove_grey -->
-            <img src="/images/tutorial/enrolment-delete-grey.gif" title="You cannot remove attendance" alt="" /><!-- END remove_grey -->
-        </td>
-        <td><a href="/search/user/{STUDENT_ID}">{STUDENT_NAME}</a></td>
-        <td><select name="reason[{STUDENT_ID}]" class="reason_select">
-            <option value="">N/A</option>
-            <!-- BEGIN reason_select -->
-            <option value="{REASON_NAME}" {REASON_SELECTED}>{REASON_NAME}</option>
-            <!-- END reason_select -->
-          </select></td>
-        <td style="text-align: center;"><input class="present_check" type="checkbox" name="present[{STUDENT_ID}]" value="1" {ATTENDANCE_SELECTED} /></td>
-      </tr>
-      <!-- END student -->
-    </tbody>
-  </table>
-  <!-- END has_students -->
-  
-  <p class="float-right" style="padding: 10px; ">
-  <input type="hidden" name="eventID" value="{EVENT_ID}" />
-  <input type="hidden" name="week" value="{WEEK}" />
-  <input type="submit" value="{ACTION} Attendance" class="btn" /></p>
-  </form>
+  <div class="pad-it">
+	  <!-- BEGIN has_students -->
+	  <table class="ruler">
+		<col width="60" />
+		<col />
+		<col width="120" />
+		<col width="60" />
+		<thead>
+		  <tr>
+			<th >Remove</th>
+			<th>Student</th>
+			<th>Reason</th>
+			<th>Present</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <!-- BEGIN student -->
+		  <tr style="vertical-align: middle;" class="{ON_OFF}">
+			<td style="text-align: center;">
+				<!-- BEGIN remove -->
+				<a href="/modules/tutorial/enrolment/modifyForm.php?delete={STUDENT_ID}&eventID={EVENT_ID}" 
+					onclick="return confirm('{STUDENT_NAME_ESCAPED} will be removed from this class. Press OK to continue.');" title="Remove student from class.">
+					<img src="/images/tutorial/enrolment-delete.gif" alt="Remove enrolment" /></a><!-- END remove -->
+				<!-- BEGIN remove_grey -->
+				<img src="/images/tutorial/enrolment-delete-grey.gif" title="You cannot remove attendance" alt="" /><!-- END remove_grey -->
+			</td>
+			<td><a href="/search/user/{STUDENT_ID}">{STUDENT_NAME}</a></td>
+			<td><select name="reason[{STUDENT_ID}]" class="reason_select">
+				<option value="">N/A</option>
+				<!-- BEGIN reason_select -->
+				<option value="{REASON_NAME}" {REASON_SELECTED}>{REASON_NAME}</option>
+				<!-- END reason_select -->
+			  </select></td>
+			<td style="text-align: center;"><input class="present_check" type="checkbox" name="present[{STUDENT_ID}]" value="1" {ATTENDANCE_SELECTED} /></td>
+		  </tr>
+		  <!-- END student -->
+		</tbody>
+	  </table>
+	  <!-- END has_students -->
 
-  <!-- BEGIN add_student -->
-  <form action="/modules/tutorial/enrolment/modifyForm.php" method="post" class="standardForm {DISABLED}" onsubmit="return this.userID.value != ''; ">
-    <input class="lookup" type="text" name="keyword" />
-    <input type="hidden" name="userID" class="userID" />
-    <input type="hidden" name="eventID" value="{EVENT_ID}" />
-    <input type="submit" value="Add Student" class="btn" />
-   </form>
-  <!-- END add_student -->
-<div class="float-fix"></div>  
-<!-- END event -->
-
-<p>
-<!-- BEGIN previous_link -->
-<a href="/modules/tutorial/attendance/list.php?week={PREVIOUS_WEEK}">&lt; Previous Week</a> | <!-- END previous_link -->
-<a href="/modules/tutorial/attendance/list.php">This Week</a>
-<!-- BEGIN next_link -->  |
-<a href="/modules/tutorial/attendance/list.php?week={NEXT_WEEK}">Next Week &gt;</a> <!-- END next_link --> 
-
-</p>
-</div>
+	  <input type="hidden" name="eventID" value="{EVENT_ID}" />
+	  <input type="hidden" name="week" value="{WEEK}" />
+	  <input type="submit" value="{ACTION} Attendance" class="btn" />
+	  </form>
+	
+	  <!-- BEGIN add_student -->
+	  <form action="/modules/tutorial/enrolment/modifyForm.php" method="post" class="standardForm {DISABLED}" onsubmit="return this.userID.value != ''; ">
+		<input class="lookup" type="text" name="keyword" />
+		<input type="hidden" name="userID" class="userID" />
+		<input type="hidden" name="eventID" value="{EVENT_ID}" />
+		<input type="submit" value="Add Student" class="btn" />
+	   </form>
+	  <!-- END add_student -->
+	<div class="float-fix"></div>  
+	<!-- END event -->
+	
+	<p>
+	<!-- BEGIN previous_link -->
+	<a href="/modules/tutorial/attendance/list.php?week={PREVIOUS_WEEK}">&lt; Previous Week</a> | <!-- END previous_link -->
+	<a href="/modules/tutorial/attendance/list.php">This Week</a>
+	<!-- BEGIN next_link -->  |
+	<a href="/modules/tutorial/attendance/list.php?week={NEXT_WEEK}">Next Week &gt;</a> <!-- END next_link --> 
+	
+	</p>
+	</div>
+	</div>
 
 

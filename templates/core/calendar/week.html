@@ -21,7 +21,7 @@
       <div id="calendar">
 
 		
-		<table id="week-view" class="{MONTABLE_CSS}" cellpadding="0" cellspacing="0" width="100%">
+		<table id="week-view"  cellpadding="0" cellspacing="0" width="100%">
 			<tr>
 				<td colspan="2"class="cal-left">
 					<a class="back" href="/calendar/week/{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a>
@@ -68,9 +68,8 @@
 								<div class="float-fix"></div>
 								
 								<hr />
-							
-							<a href="#" id="applyFilters">Apply Filters</a>
 						</form>
+						<a href="#" id="applyFilters">Apply Filters</a>
 					</div><!--/filter-drop-->
 					</div>
 				
@@ -93,7 +92,7 @@
 			</tr>
             
             
-			<tr valign="top">
+			<tr valign="top" class="month-week {OTHER_MONTH} {MONTABLE_CSS}">
 
                 <!-- BEGIN day_block -->
 				<td class="day-block">
@@ -103,10 +102,9 @@
 						<!-- BEGIN time --><span class="time">{TIME}</span><!-- END time -->
 							<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}</span>
 							<div class="hidden-fields">
-								<!-- BEGIN time --><div class="time">{TIME}</div><!-- END time -->
-								Author:{AUTHOR}
-								<h4>{NOTE}</h4>
-								<p class="meta">Event Type: {TYPE} |</p>
+								<div class="author"><a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></div>
+								<h4><!-- BEGIN time --><div class="time">{TIME}</div><!-- END time -->{NOTE}</h4>
+								<p class="meta">Event Type: {TYPE}</p>
 								<div class="modify">{MODIFY}</div>
 							</div>
 						</li>
@@ -121,6 +119,7 @@
 	<div class="cal-bubble">
 		<div class="top"></div>
 		<div class="middle">
+			<div class="close">x</div>
 			<div class="js-data"></div>
 		</div>
 		<div class="bottom"></div>
