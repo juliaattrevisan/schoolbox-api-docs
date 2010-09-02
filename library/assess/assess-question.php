@@ -1,22 +1,48 @@
 <?php
 require_once '../include/model.php';
 
-/**
- * Description of AssessQuestion class
- *
- * @author aetworowsky
- */
 class AssessQuestion extends Model {
     public $_table = 'assess_question';
     public $_index = 'question_id';
 
+    private $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question');
+
+    /**
+     * Creates a Question.
+     *
+     * @param <type> $object
+     * @return <type>
+     */
+    function create($object) {
+        $question = array_intersect_key($object, array_flip($this->allowedFields));
+
+        $question_id = parent::create($question);
+
+        if (!$question_id) {
+            return false;
+        }
+
+        return $question_id;
+    }
+
+    /**
+     * Updates a question's details.
+     *
+     * @param <type> $object
+     */
+    function update($object) {
+        $question = array_intersect_key($object, array_flip($this->allowedFields));
+
+        parent::update($question);
+    }
+
     /**
      * Gets the last question entered into a particular section.
-     * 
+     *
      * @param integer $section_id
      * @return array
      */
-    public function getLast($section_id) {
+    function getLast($section_id) {
         $query = "SELECT *
             FROM `$this->_table`
             WHERE `section_id` = $section_id
@@ -46,15 +72,29 @@ class AssessQuestion extends Model {
 
     /**
      * Get all available question types.
-     * 
+     *
      * @return <type>
      */
-    function getQuestionTypes() {
+    function getAllQuestionTypes() {
         $query = "SELECT *
                   FROM assess_luQuestionType
                   ORDER BY type_id";
 
         return $this->db->getAll($query);
+    }
+
+    /**
+     * Get a specific question type
+     * 
+     * @param <type> $type_id
+     * @return <type>
+     */
+    function getQuestionType($type_id) {
+        $query = "SELECT *
+                  FROM assess_luQuestionType
+                  WHERE type_id = '$type_id'";
+
+        return $this->db->getRow($query);
     }
 }
 ?>

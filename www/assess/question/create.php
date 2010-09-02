@@ -14,7 +14,13 @@ if (!empty($_POST)) {
     $question_id = $questionHandler->create($_POST);
     $answer_id = $answerHandler->create($_POST, $question_id);
 
-    if (!$question_id || !$answer_id) {
+    if (!$question_id) {
+        echo "Question could not be saved";
+        error();
+    }
+    
+    if (!$answer_id) {
+        echo "Answer could not be saved";
         error();
     }
 
@@ -67,7 +73,7 @@ else {
 
     /* Show question type options
      */
-    $questionTypes = $questionHandler->getQuestionTypes();
+    $questionTypes = $questionHandler->getAllQuestionTypes();
 
     foreach($questionTypes as $currentQuestionType) {
         if (is_numeric($this->arg[1]) && ($this->arg[1] == $currentQuestionType['type_id'])) {

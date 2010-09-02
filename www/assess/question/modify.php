@@ -10,6 +10,11 @@ $factory = new AssessFactory();
 if (!empty($_POST)) {
     $factory = new AssessFactory();
 
+    if (!is_numeric($_POST['type_id'])) {
+        echo "Type not specified";
+        error();
+    }
+
     $questionHandler = $factory->createQuestionModel($_POST['type_id']);
     $answerHandler = $factory->createAnswerModel($_POST['type_id']);
 
@@ -22,11 +27,12 @@ else {
     /* Render modify page
      */
     $this->setFile(TEMPLATE_content, 'assess/question/modify.html');
+    $this->setTitle('Modify Question');
+    $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setBlock(TEMPLATE_content, 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
-    $this->setTitle('Modify Question');
-
+    
     /* Set question ID
      */
     if (empty($this->arg[0])) {
@@ -40,31 +46,22 @@ else {
 
     /* Show question type options. For the Modify, preselect whichever it was
      */
-    $questionTypes = $questionHandler->getQuestionTypes();
+    $currentQuestionType = $questionHandler->getQuestionType($question['type_id']);
 
-    foreach($questionTypes as $currentQuestionType) {
-        if ($currentQuestionType['type_id'] == $question['type_id']) {
+    /* Load answer template into answerOption block
+     */
+    $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($question['type_id']) . '/modify.html');
+    $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
+    
+    $answerHandler->renderAnswers($this, $question['question_id']);
 
-            /* Load answer template
-             */
-            $type = $factory->getQuestionType($question['type_id']);
-            $answerTemplate = file_get_contents("../templates/core/assess/answer/$type/create.html");
+    $this->parse('answerInputs_block', 'answerFormFragment', true);
 
-            $this->setVar(array(
-                'ANSWER_INPUTS' => $answerTemplate
-            ));
-
-            /* Render answers that exist for this question
-             */
-            $answerHandler->renderAnswers($this, $question['question_id']);
-
-            $this->setVar(array(
-                'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
-                'QUESTIONTYPE_DESCRIPTION' => $currentQuestionType['description'],
-                'QUESTIONTYPE_SELECTED' => $selected,
-            ));
-        }
-    }
+    $this->setVar(array(
+        'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
+        'QUESTIONTYPE_DESCRIPTION' => $currentQuestionType['description'],
+        'QUESTIONTYPE_SELECTED' => $selected,
+    ));
 
     /* Render contents of this Assess
      */

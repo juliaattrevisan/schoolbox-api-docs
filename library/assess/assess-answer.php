@@ -10,6 +10,8 @@ class AssessAnswer extends Model {
     public $_table = 'assess_answer';
     public $_index = 'answer_id';
 
+    protected $allowedFields = array('answer_id', 'sequence', 'answer');
+
     /**
      * Gets the Answer record for a particular Question.
      *

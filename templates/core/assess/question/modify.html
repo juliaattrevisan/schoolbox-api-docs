@@ -3,7 +3,7 @@
 <!-- END custom_head -->
 
 <h1>Modify Question</h1>
-<form name="create" action="/assess/question/modify" class="standardForm" method="post">
+<form id="createQuestionForm" action="/assess/question/modify" class="standardForm" method="post">
     <fieldset>
         <input name="section_id" type="hidden" value="{SECTION_ID}" />
         <input name="question_id" type="hidden" value="{QUESTION_ID}" />
@@ -27,7 +27,9 @@
     </fieldset>
 
     <div id="answer">
-        {ANSWER_INPUTS}
+        <!-- BEGIN answerInputs -->
+        
+        <!-- END answerInputs -->
     </div>
 
     <fieldset>

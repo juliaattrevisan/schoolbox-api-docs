@@ -6,7 +6,6 @@ require_once('../library/assess/assess-response.php');
  * Handler for Short Answer questions.
  */
 class AssessAnswerShort extends AssessAnswer {
-    private $allowedFields = array('answer_id', 'sequence', 'answer');
 
     /**
      * Creates an Answer. This is used when creating Questions and Answers in
@@ -34,6 +33,17 @@ class AssessAnswerShort extends AssessAnswer {
     }
 
     /**
+     * Updates an existing Answer.
+     *
+     * @param <type> $object
+     */
+    function update($object) {
+        $answer = array_intersect_key($object, array_flip($this->allowedFields));
+
+        parent::update($answer);
+    }
+
+    /**
      * Renders answers when editing a Question. If a question_id was provided,
      * load its existing answers and populate fields; otherwise empty them or
      * set to other default values.
@@ -57,17 +67,6 @@ class AssessAnswerShort extends AssessAnswer {
                 'ANSWER' => '',
             ));
         }
-    }
-
-    /**
-     * Updates an existing Answer.
-     *
-     * @param <type> $object
-     */
-    function update($object) {
-        $answer = array_intersect_key($object, array_flip($this->allowedFields));
-
-        parent::update($answer);
     }
 
     /**

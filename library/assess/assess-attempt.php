@@ -74,5 +74,21 @@ class AssessAttempt extends Model {
 
         return $this->db->getOne($query);
     }
+
+    /**
+     * Get a list of attempts that have been made, along with their authors
+     */
+    function getList($assess_id) {
+        $query = "SELECT
+                      assess_attempt.user_id, firstname, lastname,
+                      assess_attempt.start, assess_attempt.finish,
+                      ROUND(assess_attempt.finish - assess_attempt.start) AS timeTaken
+                  FROM assess_attempt
+                  LEFT JOIN `user` ON assess_attempt.user_id = user.id
+                  LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
+                  WHERE assess.assess_id = '$assess_id'";
+
+        return $this->db->getAll($query);
+    }
 }
 ?>

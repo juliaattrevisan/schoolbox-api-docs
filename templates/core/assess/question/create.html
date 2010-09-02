@@ -13,7 +13,7 @@ $j(document).ready(function() {
 
 <!-- END custom_head -->
 <h1>Create Question in Section {SECTION_TITLE} <a href="/assess/section/create/{ASSESS_ASSESS_ID}">Add a new section</a></h1>
-<form name="create" action="/assess/question/create" class="standardForm" method="post">
+<form id="createQuestionForm" action="/assess/question/create" class="standardForm" method="post">
     <fieldset>
         <input name="section_id" type="hidden" value="{SECTION_ID}" />
         <input name="sequence" type="hidden" value="{SEQUENCE}" />

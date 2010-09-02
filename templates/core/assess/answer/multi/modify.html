@@ -1,0 +1,53 @@
+<script type="text/javascript" src="/javascript/jquery.json2.js"></script>
+<script type="text/javascript">
+$j(document).ready(function() {
+    var theForm = $j('#createQuestionForm');
+
+    theForm.submit(function() {
+        var answerCollection = new Array();
+
+        /* Collate possible answers and their correctness status
+         */
+        $j.each($j('#answerCollection').find('li'), function(index, element) {
+            var elem = $j(element);
+
+            answerCollection.push({
+                description: elem.find('span').html(),
+                value: elem.find('input').attr('value'),
+                correct: elem.find('input').attr('checked')
+            });
+        });
+
+        /* Collate the usual fields containing ids.
+         * Collate the checkboxes too but append all the possibilities as well!
+         */
+        var data = {
+            section_id: theForm.find('input[name=section_id]').val(),
+            question_id: theForm.find('input[name=question_id]').val(),
+            sequence: theForm.find('input[name=sequence]').val(),
+            type_id: theForm.find('input[name=type_id]').val(),
+            question: theForm.find('input[name=question]').val(),
+            marks: theForm.find('input[name=marks]').val(),
+            allAnswers: JSON.stringify(answerCollection)
+        }
+
+        /* Submit via POST and redirect to question creation screen upon done
+         */
+        $j.post(theForm.attr('action'), data, function(responseText) {
+            window.location = window.location;
+        });
+
+        return false;
+    });
+});
+</script>
+<fieldset>
+    <label>Answer</label>
+    <div style="float:left;width:200px;">
+        <ul id="answerCollection" >
+            <!-- BEGIN answerOption -->
+            <li><input name="answer[]" type="checkbox" value="{ANSWER_VALUE}" {ANSWER_CHECKED} /> <span>{ANSWER_DESCRIPTION}</span></li>
+            <!-- END answerOption -->
+        </ul>
+    </div>
+</fieldset>
