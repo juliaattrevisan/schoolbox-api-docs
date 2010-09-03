@@ -1,7 +1,7 @@
 <?php
-require_once '../library/assess/assess.php';
-require_once '../library/assess/assess-section.php';
-require_once '../library/assess/assess-factory.php';
+require_once('../library/assess/assess.php');
+require_once('../library/assess/assess-section.php');
+require_once('../library/assess/assess-factory.php');
 
 $factory = new AssessFactory();
 
@@ -107,8 +107,12 @@ else {
 
     /* Show this Assess' contents
      */
+    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
+
     $assess = new Assess();
     $assess->renderAssessContents($section['assess_id'], $this);
+
+    $this->parse('allQuestions_block', 'allQuestions');
 }
 
 ?>

@@ -49,7 +49,11 @@ else {
         'POOL' => $section['pool'],
     ));
 
+    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
+
     $assessHandler->renderAssessContents($assess['assess_id'], $this);
+
+    $this->parse('allQuestions_block', 'allQuestions');
 }
 
 ?>

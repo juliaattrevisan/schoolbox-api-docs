@@ -134,7 +134,11 @@ else {
 
     /* Question contents
      */
+    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
+
     $assessHandler->renderAssessContents($this->arg[0], $this);
+
+    $this->parse('allQuestions_block', 'allQuestions');
 }
 
 ?>

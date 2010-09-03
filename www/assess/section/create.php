@@ -45,7 +45,13 @@ else {
         'SEQUENCE' => $section->getNextSequence($this->arg[0])
     ));
 
+    /* Question contents
+     */
+    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
+
     $assessHandler->renderAssessContents($assess['assess_id'], $this);
+
+    $this->parse('allQuestions_block', 'allQuestions');
 }
 
 ?>

@@ -82,7 +82,11 @@ else {
         'DISABLED_SELECTED' => '',
     ));
 
+    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
+
     $assess = new Assess();
     $assess->renderAssessContents($section['assess_id'], $this);
+
+    $this->parse('allQuestions_block', 'allQuestions');
 }
 ?>

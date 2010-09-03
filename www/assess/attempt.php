@@ -74,14 +74,7 @@ foreach($allQuestions as $currentQuestion) {
 
     /* Load individual answers
      */
-    $allAnswers = $answerHandler->getByQuestionID($currentQuestion['question_id']);
-
-    foreach($allAnswers as $currentAnswer) {
-        $this->setVar(array(
-            'ANSWER_ID' => $currentAnswer['answer_id'],
-            'ANSWER' => '',
-        ));
-    }
+    $answerHandler->prepareResponse($this, $currentQuestion['question_id']);
 
     $this->parse('question_block', 'question', true);
 }

@@ -91,13 +91,18 @@ class Assess extends Model {
             $page->setVar('question_block', '');
         }
 
-        $page->setVar(array(
-            'SECTION_TITLE' => $currentQuestion['title'],
-            'SECTION_SEQUENCE' => $currentQuestion['sectionSequence'],
-            'SECTION_SECTION_ID' => $currentQuestion['section_id'],
-        ));
+        if (is_numeric($currentQuestion['section_id'])) {
+            $page->setVar(array(
+                'SECTION_TITLE' => $currentQuestion['title'],
+                'SECTION_SEQUENCE' => $currentQuestion['sectionSequence'],
+                'SECTION_SECTION_ID' => $currentQuestion['section_id'],
+            ));
 
-        $page->parse('section_block', 'section', true);
+            $page->parse('section_block', 'section', true);
+        }
+        else {
+            $page->setVar('section_block', '');
+        }
     }
 
     /**

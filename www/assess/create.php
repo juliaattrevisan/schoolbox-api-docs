@@ -130,6 +130,11 @@ else {
 
         $this->parse('durationMinute_block', 'durationMinute', true);
     }
+
+    /* Don't display questions contents, which appears in Modify
+     */
+    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
+    $this->setVar('allQuestions_block', '');
 }
 
 ?>

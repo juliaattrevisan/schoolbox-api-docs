@@ -70,19 +70,21 @@ class AssessAnswerShort extends AssessAnswer {
     }
 
     /**
-     * Gets an answer(s) for a particular Question. This is used when attempting
-     * the test and might be customised for each Answer type.
-     * 
+     * Resets answer tokens so a user can fill them in while actually taking
+     * the test.
+     *
+     * @param <type> $page
      * @param <type> $question_id
-     * @return <type>
      */
-    function getByQuestionID($question_id) {
-        $query = "SELECT *
-                  FROM {$this->_table}
-                  WHERE question_id = '$question_id'
-                  ORDER BY sequence";
+    function prepareResponse($page, $question_id) {
+        $allAnswers = $this->getByQuestionID($question_id);
 
-        return $this->db->getAll($query);
+        foreach($allAnswers as $currentAnswer) {
+            $page->setVar(array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => '',
+            ));
+        }
     }
 
     /**
@@ -94,22 +96,7 @@ class AssessAnswerShort extends AssessAnswer {
     function saveResponse($data, $question_id) {
         $processedResponse = $data['answer'];
 
-        $response = array(
-            'attempt_id' => $_SESSION['attempt_id'],
-            'question_id' => $question_id,
-            'response' => $processedResponse
-        );
-
-        $responseHandler = new AssessResponse();
-
-        $result['question_id'] = $question_id;
-        $result['response_id'] = $responseHandler->create($response);
-        
-        echo json_encode($result);
-
-        /* Prevent rendering of template
-         */
-        exit();
+        parent::saveResponse($question_id, $processedResponse);
     }
 }
 ?>
