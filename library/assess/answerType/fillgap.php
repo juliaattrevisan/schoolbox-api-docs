@@ -117,7 +117,7 @@ class AssessAnswerFillgap extends AssessAnswer {
              * %%token%% tokens with inputs.
              */
             $pattern = '#<span>([^<]+)</span>#ms';
-            $replace = "<input name='fillgap_{$question_id}[]' type='text' value='' />";
+            $replace = " <input name='fillgap_{$question_id}[]' type='text' value='' /> ";
 
             $page->setVar(array(
                 'ANSWER_ID' => $currentAnswer['answer_id'],

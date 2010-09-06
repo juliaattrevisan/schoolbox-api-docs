@@ -46,6 +46,27 @@ $j(document).ready(function() {
 
         return false;
     });
+
+    /* Add a new answer option
+     */
+    $j('#makeNewAnswer').click(function() {
+        var clone = $j('.answerTemplate').clone();
+        clone.removeClass('answerTemplate');
+
+        /* Remove an answer option
+         */
+        clone.find('.removeAnswer').click(function() {
+            $j(this).closest('li').remove();
+        });
+
+        $j('#answerCollection').append(clone);
+    });
+
+    /* Add remove option for existing answers
+     */
+    $j('.removeAnswer').click(function() {
+        $j(this).closest('li').remove();
+    });
 });
 </script>
 <fieldset>
@@ -54,12 +75,14 @@ $j(document).ready(function() {
         <ul id="answerCollection" >
             <!-- BEGIN answerOption -->
             <li>
-                <input name="answer[]" type="checkbox" value="{ANSWER_VALUE}" {ANSWER_CHECKED} />
+                <input name="answer[]" class="answerCorrect" type="checkbox" value="{ANSWER_VALUE}" {ANSWER_CHECKED} />
                 <input name="answerCode[]" class="answerCode" type="text" value="{ANSWER_VALUE}" />
                 <input name="answerDescription[]" class="answerDescription" type="text" value="{ANSWER_DESCRIPTION}" />
+                <a class="removeAnswer">Remove</a>
             </li>
             <!-- END answerOption -->
         </ul>
+        <p><a id="makeNewAnswer">Add answer option</p>
     </div>
     <div style="display:none">
         <ul>
@@ -67,7 +90,7 @@ $j(document).ready(function() {
                 <input name="answer[]" class="answerCorrect" type="checkbox" value="" />
                 <input name="answerCode[]" class="answerCode" type="text" value="" />
                 <input name="answerDescription[]" class="answerDescription" type="text" value="" />
-                <a id="removeAnswer">Remove</a>
+                <a class="removeAnswer">Remove</a>
             </li>
         </ul>
     </div>

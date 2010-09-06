@@ -15,7 +15,7 @@ $j(document).ready(function() {
 
             var description = elem.find('.answerDescription').val();
             var code = elem.find('.answerCode').attr('value');
-            
+
             /* Ignore empty answers that weren't removed
              */
             if (($j.trim(description) != '') && ($j.trim(code) != '')) {
@@ -54,6 +54,12 @@ $j(document).ready(function() {
         var clone = $j('.answerTemplate').clone();
         clone.removeClass('answerTemplate');
 
+        /* Remove an answer option
+         */
+        clone.find('.removeAnswer').click(function() {
+            $j(this).closest('li').remove();
+        });
+
         $j('#answerCollection').append(clone);
     });
 });
@@ -72,7 +78,7 @@ $j(document).ready(function() {
                 <input name="answer[]" class="answerCorrect" type="checkbox" value="" />
                 <input name="answerCode[]" class="answerCode" type="text" value="" />
                 <input name="answerDescription[]" class="answerDescription" type="text" value="" />
-                <a id="removeAnswer">Remove</a>
+                <a class="removeAnswer">Remove</a>
             </li>
         </ul>
     </div>
