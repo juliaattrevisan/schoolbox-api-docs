@@ -10,7 +10,7 @@ class AssessAnswer extends Model {
     public $_table = 'assess_answer';
     public $_index = 'answer_id';
 
-    protected $allowedFields = array('answer_id', 'sequence', 'answer');
+    protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer');
 
     private $templatePath = '../templates/core/assess/answer';
 
@@ -77,10 +77,28 @@ class AssessAnswer extends Model {
             'response' => $processedResponse
         );
 
+        /* If they have already responded to this question in this attempt,
+         * then update existing row; otherwise create a new one
+         */
         $responseHandler = new AssessResponse();
 
+        $response_id = $responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+
+        if (is_numeric($response_id)) {
+            $response['response_id'] = $response_id;
+            
+            if ($responseHandler->update($response)) {
+                $result['response_id'] = $response_id;
+            }
+        }
+        else {
+            $result['response_id'] = $responseHandler->create($response);
+        }
+
+        /* Compile resultant object: contains the question_id which was just
+         * saved, and the response_id for its answer
+         */
         $result['question_id'] = $question_id;
-        $result['response_id'] = $responseHandler->create($response);
 
         echo json_encode($result);
 
