@@ -58,7 +58,7 @@ class Assess extends Model {
             if (is_numeric($currentQuestion['question_id'])) {
                 $numQuestions++;
             }
-
+            
             /* Parse out the previous Section's info if we're entering a new Section
              */
             if ($currentQuestion['title'] != $sectionTitle) {
@@ -72,20 +72,26 @@ class Assess extends Model {
                 $page->setVar('question_block', '');
             }
 
-            /* Put the current Question into a new Section and parse it out
+            /* Put the current Question into a new Section and parse it out. If
+             * it's empty, just hide it
              */
-            $page->setVar(array(
-                'QUESTION_SEQUENCE' => $currentQuestion['questionSequence'],
-                'QUESTION_QUESTION' => $currentQuestion['question'],
-                'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-            ));
+            if (is_numeric($currentQuestion['question_id'])) {
+                $page->setVar(array(
+                    'QUESTION_SEQUENCE' => $currentQuestion['questionSequence'],
+                    'QUESTION_QUESTION' => $currentQuestion['question'],
+                    'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+                ));
 
-            $page->parse('question_block', 'question', true);
+                $page->parse('question_block', 'question', true);
+            }
+            else {
+                $page->setVar('question_block', '', true);
+            }
         }
 
         /* Finally, parse out this Section's info
          *
-         * Dont' render question template for empty sections
+         * Don't render question template for empty sections
          */
         if (!$numQuestions) {
             $page->setVar('question_block', '');

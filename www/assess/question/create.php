@@ -53,7 +53,7 @@ else {
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
         'SECTION_ID' => $this->arg[0],
-        'SECTION_TITLE' => $section['title'],
+        'CURRENT_SECTION_TITLE' => $section['title'],
         'SEQUENCE' => $questionHandler->getNextSequence($section['section_id']),
         'QUESTION' => '',
         'MARKS' => '',

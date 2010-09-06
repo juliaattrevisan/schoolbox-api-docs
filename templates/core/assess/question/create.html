@@ -12,7 +12,7 @@ $j(document).ready(function() {
 </script>
 
 <!-- END custom_head -->
-<h1>Create Question in Section {SECTION_TITLE} <a href="/assess/section/create/{ASSESS_ASSESS_ID}">Add a new section</a></h1>
+<h1>Create Question in Section {CURRENT_SECTION_TITLE}</h1>
 <form id="createQuestionForm" action="/assess/question/create" class="standardForm" method="post">
     <fieldset>
         <input name="section_id" type="hidden" value="{SECTION_ID}" />
