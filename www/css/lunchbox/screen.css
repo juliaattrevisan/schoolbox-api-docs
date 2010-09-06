@@ -177,7 +177,8 @@ p, ul {	line-height: 1.5;	margin: 0 0 1em 0; }
 .componentBox {
 	margin-bottom: 13px;
 }
-.contentList {
+.contentList,
+.weather {
 	border: 1px solid #ccc;
 	border-top: 0;
 }

@@ -3,6 +3,7 @@ html { height: 100%; }
 body {
 	background: url(/images/stjo/bg-header-span.jpg) repeat-x;
 	height: 100%;
+	min-width: 991px;
 }
 #wrap {
 	min-height: 100%;
