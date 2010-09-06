@@ -85,6 +85,8 @@ class AssessAnswerShort extends AssessAnswer {
                 'ANSWER' => '',
             ));
         }
+
+        $page->parse('answerOption_block', 'answerOption', true);
     }
 
     /**

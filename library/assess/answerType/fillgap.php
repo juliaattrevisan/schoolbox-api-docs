@@ -123,6 +123,8 @@ class AssessAnswerFillgap extends AssessAnswer {
                 'ANSWER_ID' => $currentAnswer['answer_id'],
                 'ANSWER' => preg_replace($pattern, $replace, $currentAnswer['answer']),
             ));
+
+            $page->parse('answerOption_block', 'answerOption', true);
         }
     }
 

@@ -40,6 +40,7 @@ if ($attemptHandler->isComplete($this->arg[0]) || ($attemptTimeRemaining <= 0)) 
 /* Set up template
  */
 $this->setFile(TEMPLATE_content, 'assess/attempt.html');
+$this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'question', 'question_block');
 $this->setBlock(TEMPLATE_content, 'continueAssess', 'continueAssess_block');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
@@ -65,18 +66,30 @@ $allQuestions = $sectionHandler->getContents($this->arg[0], $this->arg[1]);
 foreach($allQuestions as $currentQuestion) {
     $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
+    /* Load answer template into answerOption block
+     */
+    $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/answer.html');
+    $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
+
+    /* Reset answer options from previous iteration
+     */
+    $this->setVar('answerOption_block', '');
+
     $this->setVar(array(
         'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
         'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
         'QUESTION_QUESTION' => $currentQuestion['question'],
-        'ANSWER_TEMPLATE' => $answerHandler->loadTemplate($factory->getQuestionType($currentQuestion['type_id'])),
     ));
 
     /* Load individual answers
      */
     $answerHandler->prepareResponse($this, $currentQuestion['question_id']);
-
+    
+    $this->parse('answerInputs_block', 'answerFormFragment', true);
     $this->parse('question_block', 'question', true);
+    
+    $this->setVar('answerFormFragment', '');
+    $this->setVar('answerInputs_block', '');
 }
 
 /* Render Continue/Finish buttons where appropriate

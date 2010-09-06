@@ -1,0 +1,97 @@
+<script type="text/javascript">
+$j(document).ready(function() {
+    var theForm = $j('#createQuestionForm');
+
+    /* Form preprocessing
+     */
+    theForm.submit(function() {
+        var answerCollection = new Array();
+
+        /* Collate possible answers and their correctness status
+         */
+        $j.each($j('#answerCollection').find('li'), function(index, element) {
+            var elem = $j(element);
+
+            var answerLeft = elem.find('.answerLeft').val();
+            var answerRight = elem.find('.answerRight').val();
+
+            /* Ignore empty answers that weren't removed
+             */
+            if (($j.trim(answerLeft) != '') && ($j.trim(answerRight) != '')) {
+                answerCollection.push({
+                    answerLeft: answerLeft,
+                    answerRight: answerRight
+                });
+            }
+        });
+
+        /* Collate the usual fields containing ids.
+         * Collate the checkboxes too but append all the possibilities as well!
+         */
+        var data = {
+            section_id: theForm.find('input[name=section_id]').val(),
+            question_id: theForm.find('input[name=question_id]').val(),
+            sequence: theForm.find('input[name=sequence]').val(),
+            type_id: theForm.find('input[name=type_id]').val(),
+            question: theForm.find('input[name=question]').val(),
+            marks: theForm.find('input[name=marks]').val(),
+            allAnswers: JSON.stringify(answerCollection)
+        }
+
+        /* Submit via POST and redirect to question creation screen upon done
+         */
+        $j.post(theForm.attr('action'), data, function(responseText) {
+            window.location = window.location;
+        });
+
+        return false;
+    });
+
+    /* Add a new answer option
+     */
+    $j('#makeNewAnswer').click(function() {
+        var clone = $j('.answerTemplate').clone();
+        clone.removeClass('answerTemplate');
+
+        /* Remove an answer option
+         */
+        clone.find('.removeAnswer').click(function() {
+            $j(this).closest('li').remove();
+        });
+
+        $j('#answerCollection').append(clone);
+    });
+
+    /* Add remove option for existing answers
+     */
+    $j('.removeAnswer').click(function() {
+        $j(this).closest('li').remove();
+    });
+});
+</script>
+<fieldset>
+    <label>Answer</label>
+    <div class="answerCollection">
+        <ul id="answerCollection">
+            <!-- BEGIN answerOption -->
+            <li>
+                <input name="answerLeft[]" class="answerLeft" type="text" value="{ANSWER_LEFT_VALUE}" />
+                matches
+                <input name="answerRight[]" class="answerRight" type="text" value="{ANSWER_RIGHT_VALUE}" />
+                <a class="removeAnswer">Remove</a>
+            </li>
+            <!-- END answerOption -->
+        </ul>
+        <p><a id="makeNewAnswer">Add answer option</a></p>
+    </div>
+    <div style="display:none">
+        <ul>
+            <li class="answerTemplate">
+                <input name="answerLeft[]" class="answerLeft" type="text" value="" />
+                matches
+                <input name="answerRight[]" class="answerRight" type="text" value="" />
+                <a class="removeAnswer">Remove</a>
+            </li>
+        </ul>
+    </div>
+</fieldset>

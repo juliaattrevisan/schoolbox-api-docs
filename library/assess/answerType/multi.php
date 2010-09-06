@@ -67,16 +67,21 @@ class AssessAnswerMulti extends AssessAnswer {
         if (is_numeric($question_id)) {
             $allAnswers = parent::getForQuestion($question_id);
 
-            foreach($allAnswers as $currentAnswer) {
-                $thisAnswer = unserialize($currentAnswer['answer']);
+            if ($allAnswers) {
+                foreach($allAnswers as $currentAnswer) {
+                    $thisAnswer = unserialize($currentAnswer['answer']);
 
-                $page->setVar(array(
-                    'ANSWER_VALUE' => $thisAnswer->value,
-                    'ANSWER_DESCRIPTION' => $thisAnswer->description,
-                    'ANSWER_CHECKED' => $thisAnswer->correct != '' ? 'checked=\'checked\'' : ''
-                ));
+                    $page->setVar(array(
+                        'ANSWER_VALUE' => $thisAnswer->value,
+                        'ANSWER_DESCRIPTION' => $thisAnswer->description,
+                        'ANSWER_CHECKED' => $thisAnswer->correct != '' ? 'checked=\'checked\'' : ''
+                    ));
 
-                $page->parse('answerOption_block', 'answerOption', true);
+                    $page->parse('answerOption_block', 'answerOption', true);
+                }
+            }
+            else {
+                $page->setVar('answerOption_block', '');
             }
         }
     }
@@ -92,10 +97,15 @@ class AssessAnswerMulti extends AssessAnswer {
         $allAnswers = $this->getByQuestionID($question_id);
 
         foreach($allAnswers as $currentAnswer) {
+            $thisAnswer = unserialize($currentAnswer['answer']);
+
             $page->setVar(array(
                 'ANSWER_ID' => $currentAnswer['answer_id'],
-                'ANSWER' => '',
+                'ANSWER_VALUE' => $thisAnswer->value,
+                'ANSWER_DESCRIPTION' => $thisAnswer->description,
             ));
+
+            $page->parse('answerOption_block', 'answerOption', true);
         }
     }
 

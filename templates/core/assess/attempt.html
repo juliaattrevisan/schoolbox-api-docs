@@ -57,7 +57,9 @@ $j(document).ready(function() {
 <div class='question'>
     <form action="/assess/saveAnswer/{QUESTION_QUESTION_ID}" method="post">
         <h3>Q{QUESTION_SEQUENCE}) {QUESTION_QUESTION}</h3>
-        {ANSWER_TEMPLATE}
+        <!-- BEGIN answerInputs -->
+
+        <!-- END answerInputs -->
         <input type="submit" value="Save Answer" />
     </form>
     <div id="question_status_{QUESTION_QUESTION_ID}"></div>
