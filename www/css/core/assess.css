@@ -48,3 +48,42 @@ label {
     width: 150px;
     padding: 0px;
 }
+
+/* Edit multiple choice answers
+ */
+div.answerCollection {
+    width: 400px;
+    float: left;
+}
+
+#answerCollection input.answerCode {
+    width: 30px;
+}
+
+#answerCollection input.answerDescription {
+    width: 250px;
+}
+
+/* Edit Fillgap answers
+ */
+div.answerList {
+    width: 500px;
+    display: block;
+    float: left;
+}
+
+#answerBox_addSpans.make-blank,
+#answerBox_addSpans.make-blank:hover {
+    border:none;
+    width:95px;
+    height:25px;
+    text-indent:-9999em;
+    display:block;
+    margin-right:10px;
+    background: url(/images/corev2/assess/make-blank-btn.gif) no-repeat;
+    cursor:pointer;
+}
+
+#answerBox_addSpans.make-blank:hover {
+    background-position:bottom;
+}

@@ -91,6 +91,9 @@ class AssessAnswerFillgap extends AssessAnswer {
             }
         }
         else {
+            $page->setBlock('answerFormFragment', 'answer_list_items', 'answer_list_items_block');
+            $page->setVar('answer_list_items_block', '');
+
             $page->setVar(array(
                 'ANSWER_ID' => '',
                 'ANSWER' => '',

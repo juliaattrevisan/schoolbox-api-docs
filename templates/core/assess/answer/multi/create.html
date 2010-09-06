@@ -1,10 +1,10 @@
 <script type="text/javascript" src="/javascript/jquery.json2.js"></script>
-
 <script type="text/javascript">
-
 $j(document).ready(function() {
     var theForm = $j('#createQuestionForm');
 
+    /* Form preprocessing
+     */
     theForm.submit(function() {
         var answerCollection = new Array();
 
@@ -13,11 +13,18 @@ $j(document).ready(function() {
         $j.each($j('#answerCollection').find('li'), function(index, element) {
             var elem = $j(element);
 
-            answerCollection.push({
-                description: elem.find('span').html(),
-                value: elem.find('input').attr('value'),
-                correct: elem.find('input').attr('checked')
-            });
+            var description = elem.find('.answerDescription').val();
+            var code = elem.find('.answerCode').attr('value');
+            
+            /* Ignore empty answers that weren't removed
+             */
+            if (($j.trim(description) != '') && ($j.trim(code) != '')) {
+                answerCollection.push({
+                    description: description,
+                    value: code,
+                    correct: elem.find('.answerCorrect').attr('checked')
+                });
+            }
         });
 
         /* Collate the usual fields containing ids.
@@ -40,17 +47,33 @@ $j(document).ready(function() {
 
         return false;
     });
+
+    /* Add a new answer option
+     */
+    $j('#makeNewAnswer').click(function() {
+        var clone = $j('.answerTemplate').clone();
+        clone.removeClass('answerTemplate');
+
+        $j('#answerCollection').append(clone);
+    });
 });
 </script>
+
 <fieldset>
     <label>Answer</label>
-    <div style="float:left;width:200px;">
+    <div class="answerCollection">
         <ul id="answerCollection" >
-            <li><input name="answer[]" type="checkbox" value="a" /> <span>Alpha</span></li>
-            <li><input name="answer[]" type="checkbox" value="b" /> <span>Bravo</span></li>
-            <li><input name="answer[]" type="checkbox" value="c" /> <span>Charlie</span></li>
-            <li><input name="answer[]" type="checkbox" value="d" /> <span>Delta</span></li>
-            <li><input name="answer[]" type="checkbox" value="e" /> <span>Echo</span></li>
+        </ul>
+        <p><a id="makeNewAnswer">Add answer option</p>
+    </div>
+    <div style="display:none">
+        <ul>
+            <li class="answerTemplate">
+                <input name="answer[]" class="answerCorrect" type="checkbox" value="" />
+                <input name="answerCode[]" class="answerCode" type="text" value="" />
+                <input name="answerDescription[]" class="answerDescription" type="text" value="" />
+                <a id="removeAnswer">Remove</a>
+            </li>
         </ul>
     </div>
 </fieldset>

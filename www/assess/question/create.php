@@ -30,6 +30,7 @@ else {
     /* Render create page 
      */
     $this->setFile(TEMPLATE_content, 'assess/question/create.html');
+    $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setBlock(TEMPLATE_content, 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
@@ -73,24 +74,28 @@ else {
 
     /* Show question type options
      */
+    $setTemplate = false;
+    
     $questionTypes = $questionHandler->getAllQuestionTypes();
 
     foreach($questionTypes as $currentQuestionType) {
         if (is_numeric($this->arg[1]) && ($this->arg[1] == $currentQuestionType['type_id'])) {
             $selected = 'selected=\'selected\'';
 
-            /* Load answer template
+            /* Load answer template into answerOption block
              */
-            $type = $factory->getQuestionType($this->arg[1]);
-            $answerTemplate = file_get_contents("../templates/core/assess/answer/$type/create.html");
-
-            $this->setVar(array(
-                'ANSWER_INPUTS' => $answerTemplate
-            ));
+            $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($this->arg[1]) . '/create.html');
+            $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
             /* Render existing answers, or clear if none
              */
             $answerHandler->renderAnswers($this);
+
+            $this->parse('answerInputs_block', 'answerFormFragment', true);
+            
+            /* We've set the template, so remember this
+             */
+            $setTemplate = true;
         }
         else {
             $selected = '';
@@ -103,6 +108,13 @@ else {
         ));
         
         $this->parse('questionType_block', 'questionType', true);
+    }
+
+    /* If the answer template wasn't set, then we haven't chosen an answer type
+     * so hide the block that would normally contain the answer type's form.
+     */
+    if (!$setTemplate) {
+        $this->setVar('answerInputs_block', '');
     }
 
     /* Show this Assess' contents
