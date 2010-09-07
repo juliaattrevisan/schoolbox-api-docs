@@ -9,10 +9,19 @@ $j(document).ready(function() {
             var dataFunction = new Function('return ' + responseText);
             var result = dataFunction();
 
-            /* Save successful, so hide form and disable submit butan
+            /* Save successful, so hide form and disable submit butan.
+             * Update section completion value
              */
             if (result.response_id != '') {
                 $j('#question_status_' + result.question_id).html('Response saved. This message should probably fade away into nothingness...');
+
+                for (var i=0; i < result.percentageComplete.length; i++) {
+                    var sectionSelector = $j('#sectionPercentageComplete_' + result.percentageComplete[i].section_id);
+                    var percentage = result.percentageComplete[i].percentageComplete;
+
+                    sectionSelector.find('span').html(percentage);
+                    sectionSelector.css('width', percentage + '%');
+                }
             }
             else {
                 alert ('An error occurred while saving your answer.');
@@ -73,3 +82,9 @@ $j(document).ready(function() {
 <!-- BEGIN endAssess -->
 <a href="/assess/end/{ASSESS_ASSESS_ID}">Finish</a>
 <!-- END endAssess -->
+
+<!-- BEGIN sectionPercentageComplete -->
+<div id="sectionPercentageComplete_{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}" style="width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}">
+    {SECTION_PERCENTAGE_COMPLETE_TITLE} <span>{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}</span>%
+</div>
+<!-- END sectionPercentageComplete -->

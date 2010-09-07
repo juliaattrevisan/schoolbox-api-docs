@@ -12,8 +12,8 @@ class AssessSection extends Model {
 
     /**
      * Creates a new section.
-     * 
-     * @param <type> $section 
+     *
+     * @param <type> $section
      */
     function create($section) {
         return parent::create($section);
@@ -74,7 +74,7 @@ class AssessSection extends Model {
 
     /**
      * Get a list of Sections for an Assess.
-     * 
+     *
      * @param <type> $assess_id
      * @return <type>
      */
@@ -96,6 +96,45 @@ class AssessSection extends Model {
         $allSections = $this->getList($assess_id);
 
         return $allSections[count($allSections)-1];
+    }
+
+    /**
+     * Find out how much of a section was completed.
+     *
+     * @param <type> $section_id
+     * @return <type>
+     */
+    function sectionPercentageComplete($section_id) {
+        $section = $this->getByID($section_id);
+        $sectionList = $this->getList($section['assess_id']);
+
+        foreach ($sectionList as $currentSection) {
+            $numResponses = "SELECT
+                                 COUNT(response_id) AS num
+                             FROM assess_response
+                             LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
+                             WHERE attempt_id = '$_SESSION[attempt_id]'
+                             AND assess_question.section_id = '$currentSection[section_id]'";
+
+            $numQuestions = "SELECT
+                                 COUNT(question_id) AS num
+                             FROM assess_question
+                             WHERE assess_question.section_id = '$currentSection[section_id]'";
+
+            $currentSection['numResponses'] = $this->db->getOne($numResponses);
+            $currentSection['numQuestions'] = $this->db->getOne($numQuestions);
+
+            if ($currentSection['numQuestions'] > 0) {
+                $currentSection['percentageComplete'] = round(100 * $currentSection['numResponses'] / $currentSection['numQuestions']);
+            }
+            else {
+                $currentSection['percentageComplete'] = 0;
+            }
+            
+            $completion[] = $currentSection;
+        }
+
+        return $completion;
     }
 }
 ?>

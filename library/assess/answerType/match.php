@@ -92,15 +92,31 @@ class AssessAnswerMatch extends AssessAnswer {
      * @param <type> $question_id
      */
     function prepareResponse($page, $question_id) {
-        $allAnswers = $this->getByQuestionID($question_id);
+        $left = array();
+        $right = array();
 
+        $allAnswers = $this->getByQuestionID($question_id);
+        
         if ($allAnswers) {
+            $answerCount = 0;
+
             foreach ($allAnswers as $currentAnswer) {
                 $thisAnswer = unserialize($currentAnswer['answer']);
 
+                $left[] = $thisAnswer->answerLeft;
+                $right[] = $thisAnswer->answerRight;
+
+                $answerCount++;
+            }
+
+            /* Randomize right-side
+             */
+            shuffle(&$right);
+
+            for ($i=0; $i<$answerCount; $i++) {
                 $page->setVar(array(
-                    'ANSWER_LEFT_VALUE' => $thisAnswer->answerLeft,
-                    'ANSWER_RIGHT_VALUE' => $thisAnswer->answerRight
+                    'ANSWER_LEFT_VALUE' => $left[$i],
+                    'ANSWER_RIGHT_VALUE' => $right[$i],
                 ));
 
                 $page->parse('answerOption_block', 'answerOption', true);
@@ -115,9 +131,9 @@ class AssessAnswerMatch extends AssessAnswer {
      * @param <type> $response
      */
     function saveResponse($data, $question_id) {
-        $processedResponse = $data['answer'];
+        $processedResponse = serialize($data['answerRight']);
 
-        parent::saveResponse($question_id, $processedResponse);
+        return parent::saveResponse($question_id, $processedResponse);
     }
 }
 ?>

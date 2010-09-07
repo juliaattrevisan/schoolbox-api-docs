@@ -98,7 +98,7 @@ class AssessAnswerShort extends AssessAnswer {
     function saveResponse($data, $question_id) {
         $processedResponse = $data['answer'];
 
-        parent::saveResponse($question_id, $processedResponse);
+        return parent::saveResponse($question_id, $processedResponse);
     }
 }
 ?>

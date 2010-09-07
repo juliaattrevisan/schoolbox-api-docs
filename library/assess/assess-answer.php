@@ -100,11 +100,7 @@ class AssessAnswer extends Model {
          */
         $result['question_id'] = $question_id;
 
-        echo json_encode($result);
-
-        /* Prevent rendering of template
-         */
-        exit();
+        return $result;
     }
 }
 ?>

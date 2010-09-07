@@ -7,6 +7,7 @@ require_once('../library/assess/assess-attempt.php');
 $factory = new AssessFactory();
 $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();
+$responseHandler = new AssessResponse();
 $sectionHandler = new AssessSection();
 
 /* TODO: Error checking for handlers
@@ -91,6 +92,23 @@ foreach($allQuestions as $currentQuestion) {
     $this->setVar('answerFormFragment', '');
     $this->setVar('answerInputs_block', '');
 }
+
+/* Find out how many questions were completed in this section already
+ */
+$this->setBlock(TEMPLATE_content, 'sectionPercentageComplete', 'sectionPercentageComplete_block');
+
+$allPercentageComplete = $sectionHandler->sectionPercentageComplete($this->arg[1]);
+
+foreach ($allPercentageComplete as $currentPercentageComplete) {
+    $this->setVar(array(
+        'SECTION_PERCENTAGE_COMPLETE_TITLE' => $currentPercentageComplete['title'],
+        'SECTION_PERCENTAGE_COMPLETE_SECTION_ID' => $currentPercentageComplete['section_id'],
+        'SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE' => $currentPercentageComplete['percentageComplete'],
+    ));
+
+    $this->parse('sectionPercentageComplete_block', 'sectionPercentageComplete', true);
+}
+
 
 /* Render Continue/Finish buttons where appropriate
  */
