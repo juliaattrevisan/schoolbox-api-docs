@@ -77,16 +77,26 @@ class AssessAnswerShort extends AssessAnswer {
      * @param <type> $question_id
      */
     function prepareResponse($page, $question_id) {
+        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+        
         $allAnswers = $this->getByQuestionID($question_id);
 
         foreach($allAnswers as $currentAnswer) {
-            $page->setVar(array(
-                'ANSWER_ID' => $currentAnswer['answer_id'],
-                'ANSWER' => '',
-            ));
-        }
+            if ($existing) {
+                $page->setVar(array(
+                    'ANSWER_ID' => $currentAnswer['answer_id'],
+                    'ANSWER' => $existing['response'],
+                ));
+            }
+            else {
+                $page->setVar(array(
+                    'ANSWER_ID' => $currentAnswer['answer_id'],
+                    'ANSWER' => '',
+                ));
+            }
 
-        $page->parse('answerOption_block', 'answerOption', true);
+            $page->parse('answerOption_block', 'answerOption', true);
+        }
     }
 
     /**

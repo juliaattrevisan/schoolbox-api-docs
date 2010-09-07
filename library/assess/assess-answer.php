@@ -1,5 +1,6 @@
 <?php
 require_once '../include/model.php';
+require_once('assess-response.php');
 
 /**
  * Description of AssessQuestion class
@@ -9,11 +10,19 @@ require_once '../include/model.php';
 class AssessAnswer extends Model {
     public $_table = 'assess_answer';
     public $_index = 'answer_id';
+    public $responseHandler;
 
     protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer');
 
     private $templatePath = '../templates/core/assess/answer';
 
+    function AssessAnswer() {
+        parent::Model();
+
+        $this->responseHandler = new AssessResponse();
+    }
+
+    
     /**
      * Gets the Answer record for a particular Question.
      *
@@ -82,7 +91,8 @@ class AssessAnswer extends Model {
          */
         $responseHandler = new AssessResponse();
 
-        $response_id = $responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $r = $responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $response_id = $r['response_id'];
 
         if (is_numeric($response_id)) {
             $response['response_id'] = $response_id;

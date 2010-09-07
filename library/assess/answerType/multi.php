@@ -94,6 +94,8 @@ class AssessAnswerMulti extends AssessAnswer {
      * @param <type> $question_id
      */
     function prepareResponse($page, $question_id) {
+        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+
         $allAnswers = $this->getByQuestionID($question_id);
 
         foreach($allAnswers as $currentAnswer) {
@@ -104,6 +106,21 @@ class AssessAnswerMulti extends AssessAnswer {
                 'ANSWER_VALUE' => $thisAnswer->value,
                 'ANSWER_DESCRIPTION' => $thisAnswer->description,
             ));
+
+            if ($existing) {
+                $existingAnswer = unserialize($existing['response']);
+
+                if (in_array($thisAnswer->value, $existingAnswer)) {
+                    $page->setVar(array(
+                        'ANSWER_CHECKED' => 'checked=\'checked\'',
+                    ));
+                }
+                else {
+                    $page->setVar(array(
+                        'ANSWER_CHECKED' => '',
+                    ));
+                }
+            }
 
             $page->parse('answerOption_block', 'answerOption', true);
         }

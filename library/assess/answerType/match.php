@@ -88,6 +88,9 @@ class AssessAnswerMatch extends AssessAnswer {
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
      *
+     * TODO: If a response for the current user and attempt already exists,
+     * prefill it.
+     *
      * @param <type> $page
      * @param <type> $question_id
      */

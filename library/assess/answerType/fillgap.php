@@ -109,20 +109,44 @@ class AssessAnswerFillgap extends AssessAnswer {
      * @param <type> $question_id
      */
     function prepareResponse($page, $question_id) {
+        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+        
         $allAnswers = $this->getByQuestionID($question_id);
 
         foreach($allAnswers as $currentAnswer) {
+            if ($existing) {
+                $existingAnswer = unserialize($existing['response']);
 
-            /* Prepare a special way to show Fillgap answers. This replaces
-             * %%token%% tokens with inputs.
-             */
-            $pattern = '#<span>([^<]+)</span>#ms';
-            $replace = " <input name='fillgap_{$question_id}[]' type='text' value='' /> ";
+                /* Prepare a special way to show Fillgap answers. This replaces
+                 * %%token%% tokens with inputs and the already-submitted values
+                 */
 
-            $page->setVar(array(
-                'ANSWER_ID' => $currentAnswer['answer_id'],
-                'ANSWER' => preg_replace($pattern, $replace, $currentAnswer['answer']),
-            ));
+                $ans = $currentAnswer['answer'];
+
+                foreach($existingAnswer as $val) {
+                    $pattern = '#<span>([^<]+)</span>#ms';
+                    $replace = " <input name='fillgap_{$question_id}[]' type='text' value=\"$val\" /> ";
+
+                    $ans = preg_replace($pattern, $replace, $ans, 1, $x);
+                }
+
+                $page->setVar(array(
+                    'ANSWER_ID' => $currentAnswer['answer_id'],
+                    'ANSWER' => $ans,
+                ));
+            }
+            else {
+                /* Prepare a special way to show Fillgap answers. This replaces
+                 * %%token%% tokens with inputs.
+                 */
+                $pattern = '#<span>([^<]+)</span>#ms';
+                $replace = " <input name='fillgap_{$question_id}[]' type='text' value='' /> ";
+
+                $page->setVar(array(
+                    'ANSWER_ID' => $currentAnswer['answer_id'],
+                    'ANSWER' => preg_replace($pattern, $replace, $currentAnswer['answer']),
+                ));
+            }
 
             $page->parse('answerOption_block', 'answerOption', true);
         }

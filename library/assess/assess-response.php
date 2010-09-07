@@ -19,12 +19,12 @@ class AssessResponse extends Model {
      * @return <type>
      */
     function isResponseExists($attempt_id, $question_id) {
-        $query = "SELECT response_id
+        $query = "SELECT *
                   FROM {$this->_table}
                   WHERE attempt_id = '$attempt_id'
                   AND question_id = '$question_id'";
 
-        return $this->db->getOne($query);
+        return $this->db->getRow($query);
     }
 }
 ?>
