@@ -95,6 +95,8 @@ class AssessAnswerMatch extends AssessAnswer {
      * @param <type> $question_id
      */
     function prepareResponse($page, $question_id) {
+        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+        
         $left = array();
         $right = array();
 
@@ -112,9 +114,15 @@ class AssessAnswerMatch extends AssessAnswer {
                 $answerCount++;
             }
 
-            /* Randomize right-side
-             */
-            shuffle(&$right);
+            if ($existing) {
+                $right = unserialize($existing['response']);
+            }
+            else {
+
+                /* Randomize right-side
+                 */
+                shuffle(&$right);
+            }
 
             for ($i=0; $i<$answerCount; $i++) {
                 $page->setVar(array(

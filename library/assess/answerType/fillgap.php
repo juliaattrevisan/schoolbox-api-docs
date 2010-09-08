@@ -120,7 +120,6 @@ class AssessAnswerFillgap extends AssessAnswer {
                 /* Prepare a special way to show Fillgap answers. This replaces
                  * %%token%% tokens with inputs and the already-submitted values
                  */
-
                 $ans = $currentAnswer['answer'];
 
                 foreach($existingAnswer as $val) {
