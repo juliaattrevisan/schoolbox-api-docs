@@ -82,6 +82,7 @@ if ($allQuestions) {
             'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
             'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
             'QUESTION_QUESTION' => $currentQuestion['question'],
+            'QUESTION_MARKS' => $currentQuestion['marks'],
         ));
 
         /* Load individual answers

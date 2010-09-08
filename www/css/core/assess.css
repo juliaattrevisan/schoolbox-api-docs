@@ -49,7 +49,7 @@ label {
     padding: 0px;
 }
 
-/* Edit multiple choice answers
+/* Edit Multiple Choice answers
  */
 div.answerCollection {
     width: 400px;
@@ -86,4 +86,21 @@ div.answerList {
 
 #answerBox_addSpans.make-blank:hover {
     background-position:bottom;
+}
+
+/* Respond to Matching Pairs
+ */
+ul.matchPairs {
+    width: 200px;
+    margin-top: 10px;
+    float: left;
+}
+
+ul.matchPairs li {
+    padding: 4px;
+    cursor: move;
+}
+
+ul.matchPairs li:hover {
+    background-color: #eee;
 }

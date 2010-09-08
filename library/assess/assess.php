@@ -70,6 +70,8 @@ class Assess extends Model {
 
                 $page->parse('section_block', 'section', true);
                 $page->setVar('question_block', '');
+
+                $sectionTitle = $currentQuestion['title'];
             }
 
             /* Put the current Question into a new Section and parse it out. If

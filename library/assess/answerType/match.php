@@ -97,6 +97,12 @@ class AssessAnswerMatch extends AssessAnswer {
     function prepareResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
         
+        /* Define special blocks to handle this special answerOptions scenario,
+         * because we have two columns to parse per iteration.
+         */
+        $page->setBlock('answerFormFragment', 'answerOptionLeft', 'answerOptionLeft_block');
+        $page->setBlock('answerFormFragment', 'answerOptionRight', 'answerOptionRight_block');
+        
         $left = array();
         $right = array();
 
@@ -119,8 +125,11 @@ class AssessAnswerMatch extends AssessAnswer {
             }
             else {
 
-                /* Randomize right-side
+                /* Randomize right-side. Do this multiple times because it's not
+                 * very random after one shuffle for some reason
                  */
+                shuffle(&$right);
+                shuffle(&$right);
                 shuffle(&$right);
             }
 
@@ -130,9 +139,16 @@ class AssessAnswerMatch extends AssessAnswer {
                     'ANSWER_RIGHT_VALUE' => $right[$i],
                 ));
 
-                $page->parse('answerOption_block', 'answerOption', true);
+                $page->parse('answerOptionLeft_block', 'answerOptionLeft', true);
+                $page->parse('answerOptionRight_block', 'answerOptionRight', true);
             }
         }
+
+        /* Parse question number, so you can have multiple sortable instances
+         */
+        $page->setVar(array(
+            'MATCHPAIRS_QUESTION_ID' => $question_id
+        ));
     }
 
     /**

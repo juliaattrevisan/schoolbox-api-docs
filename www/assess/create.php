@@ -4,11 +4,7 @@ require_once('include/time.php');
 
 $assessHandler = new Assess();
 
-if ($this->arg[0] == 'executeReset') {
-    echo "RESETTING";
-    $assessHandler->reset();
-}
-else if (!empty($_POST)) {
+if (!empty($_POST)) {
 
     /* Format date, time
      */

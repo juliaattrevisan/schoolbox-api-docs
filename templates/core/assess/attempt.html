@@ -17,10 +17,11 @@ $j(document).ready(function() {
 
                 for (var i=0; i < result.percentageComplete.length; i++) {
                     var sectionSelector = $j('#sectionPercentageComplete_' + result.percentageComplete[i].section_id);
-                    var percentage = result.percentageComplete[i].percentageComplete;
+                    var percentage = result.percentageComplete[i].percentageComplete.toString();
 
-                    sectionSelector.find('span').html(percentage);
-                    sectionSelector.css('width', percentage + '%');
+                    sectionSelector.find('span').text(percentage);
+
+                    sectionSelector.find('div').css('width', percentage + '%');
                 }
             }
             else {
@@ -65,10 +66,12 @@ $j(document).ready(function() {
 <!-- BEGIN question -->
 <div class='question'>
     <form action="/assess/saveAnswer/{QUESTION_QUESTION_ID}" method="post">
-        <h3>Q{QUESTION_SEQUENCE}) {QUESTION_QUESTION}</h3>
-        <!-- BEGIN answerInputs -->
+        <h3>Q{QUESTION_SEQUENCE}) {QUESTION_QUESTION} </h3>
+        ({QUESTION_MARKS} marks)
 
+        <!-- BEGIN answerInputs -->
         <!-- END answerInputs -->
+
         <input type="submit" value="Save Answer" />
     </form>
     <div id="question_status_{QUESTION_QUESTION_ID}"></div>
@@ -76,11 +79,11 @@ $j(document).ready(function() {
 <!-- END question -->
 
 <!-- BEGIN prevSection -->
-<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}">Previous Section</a>
+<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}">Previous Section</a> | 
 <!-- END prevSection -->
 
 <!-- BEGIN nextSection -->
-<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}">Next Section</a>
+<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}">Next Section</a> |
 <!-- END nextSection -->
 
 <!-- BEGIN endAssess -->
@@ -88,7 +91,8 @@ $j(document).ready(function() {
 <!-- END endAssess -->
 
 <!-- BEGIN sectionPercentageComplete -->
-<div id="sectionPercentageComplete_{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}" style="width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}">
+<div id="sectionPercentageComplete_{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}">
+    <div style="border:1px solid #f00;height:10px;clear:both;width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}"></div>
     {SECTION_PERCENTAGE_COMPLETE_TITLE} <span>{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}</span>%
 </div>
 <!-- END sectionPercentageComplete -->

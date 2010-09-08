@@ -1,13 +1,29 @@
+<script type="text/javascript" src="/javascript/jquery.ui.js"></script>
+<script type="text/javascript">
+$j(document).ready(function() {
+    $j("#matchPairs_{MATCHPAIRS_QUESTION_ID}").sortable();
+    $j("#matchPairs_{MATCHPAIRS_QUESTION_ID}").disableSelection();
+});
+</script>
+
+<!-- BEGIN answerInputs -->
 <fieldset>
     <label>Answer</label>
     <div>
-        <ul>
-            <!-- BEGIN answerOption -->
+        <ul class="matchPairs">
+            <!-- BEGIN answerOptionLeft -->
+            <li><strong>{ANSWER_LEFT_VALUE}</strong></li>
+            <!-- END answerOptionLeft -->
+        </ul>
+
+        <ul id="matchPairs_{MATCHPAIRS_QUESTION_ID}" class="matchPairs">
+            <!-- BEGIN answerOptionRight -->
             <li>
-                <strong>{ANSWER_LEFT_VALUE}</strong> matches
-                <input name="answerRight[]" class="answerRight" type="text" readonly="readonly" value="{ANSWER_RIGHT_VALUE}" />
+                <input name="answerRight[]" class="answerRight" type="hidden" readonly="readonly" value="{ANSWER_RIGHT_VALUE}" />
+                {ANSWER_RIGHT_VALUE}
             </li>
-            <!-- END answerOption -->
+            <!-- END answerOptionRight -->
         </ul>
     </div>
 </fieldset>
+<!-- END answerInputs -->
