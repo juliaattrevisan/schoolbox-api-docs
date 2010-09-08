@@ -22,7 +22,6 @@ class AssessAnswer extends Model {
         $this->responseHandler = new AssessResponse();
     }
 
-    
     /**
      * Gets the Answer record for a particular Question.
      *
@@ -32,10 +31,9 @@ class AssessAnswer extends Model {
     function getForQuestion($question_id) {
         $query = "SELECT *
                  FROM {$this->_table}
-                 WHERE question_id = '$question_id'
-                 ORDER BY sequence";
+                 WHERE question_id = '$question_id'";
 
-        return $this->db->getAll($query);
+        return $this->db->getRow($query);
     }
 
     /**
@@ -66,10 +64,9 @@ class AssessAnswer extends Model {
     function getByQuestionID($question_id) {
         $query = "SELECT *
                   FROM {$this->_table}
-                  WHERE question_id = '$question_id'
-                  ORDER BY sequence";
+                  WHERE question_id = '$question_id'";
 
-        return $this->db->getAll($query);
+        return $this->db->getRow($query);
     }
 
     /**

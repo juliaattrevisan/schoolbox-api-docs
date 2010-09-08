@@ -52,14 +52,12 @@ class AssessAnswerShort extends AssessAnswer {
      */
     function renderAnswers($page, $question_id = '') {
         if (is_numeric($question_id)) {
-            $allAnswers = parent::getForQuestion($question_id);
+            $currentAnswer = parent::getForQuestion($question_id);
 
-            foreach($allAnswers as $currentAnswer) {
-                $page->setVar(array(
-                    'ANSWER_ID' => $currentAnswer['answer_id'],
-                    'ANSWER' => $currentAnswer['answer'],
-                ));
-            }
+            $page->setVar(array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => $currentAnswer['answer'],
+            ));
         }
         else {
             $page->setVar(array(
@@ -79,24 +77,22 @@ class AssessAnswerShort extends AssessAnswer {
     function prepareResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
         
-        $allAnswers = $this->getByQuestionID($question_id);
+        $currentAnswer = $this->getByQuestionID($question_id);
 
-        foreach($allAnswers as $currentAnswer) {
-            if ($existing) {
-                $page->setVar(array(
-                    'ANSWER_ID' => $currentAnswer['answer_id'],
-                    'ANSWER' => $existing['response'],
-                ));
-            }
-            else {
-                $page->setVar(array(
-                    'ANSWER_ID' => $currentAnswer['answer_id'],
-                    'ANSWER' => '',
-                ));
-            }
-
-            $page->parse('answerOption_block', 'answerOption', true);
+        if ($existing) {
+            $page->setVar(array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => $existing['response'],
+            ));
         }
+        else {
+            $page->setVar(array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => '',
+            ));
+        }
+
+        $page->parse('answerOption_block', 'answerOption', true);
     }
 
     /**

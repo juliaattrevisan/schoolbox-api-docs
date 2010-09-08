@@ -22,23 +22,19 @@ class AssessAnswerMatch extends AssessAnswer {
         $numItems = 0;
 
         foreach(json_decode($_POST['allAnswers']) as $currentAnswer) {
-            $answer['answer'] = serialize($currentAnswer);
-
-            $answer_ids[] = parent::create($answer);
-
+            $answer['answer'][] = $currentAnswer;
             $answer['sequence']++;
-
-            $numItems++;
         }
 
-        /* Check that the number of saved items is the same as the number of
-         * submitted items
-         */
-        if (count($answer_ids) != $numItems) {
+        $answer['answer'] = serialize($answer['answer']);
+
+        $answer_id = parent::create($answer);
+
+        if (!$answer_id) {
             return false;
         }
 
-        return $answer_ids;
+        return $answer_id;
     }
 
     /**
@@ -64,15 +60,15 @@ class AssessAnswerMatch extends AssessAnswer {
      */
     function renderAnswers($page, $question_id = '') {
         if (is_numeric($question_id)) {
-            $allAnswers = parent::getForQuestion($question_id);
+            $answerGroup = parent::getForQuestion($question_id);
 
-            if ($allAnswers) {
+            if ($answerGroup) {
+                $allAnswers = unserialize($answerGroup['answer']);
+
                 foreach($allAnswers as $currentAnswer) {
-                    $thisAnswer = unserialize($currentAnswer['answer']);
-
                     $page->setVar(array(
-                        'ANSWER_LEFT_VALUE' => $thisAnswer->answerLeft,
-                        'ANSWER_RIGHT_VALUE' => $thisAnswer->answerRight,
+                        'ANSWER_LEFT_VALUE' => $currentAnswer->answerLeft,
+                        'ANSWER_RIGHT_VALUE' => $currentAnswer->answerRight,
                     ));
 
                     $page->parse('answerOption_block', 'answerOption', true);
@@ -106,16 +102,15 @@ class AssessAnswerMatch extends AssessAnswer {
         $left = array();
         $right = array();
 
-        $allAnswers = $this->getByQuestionID($question_id);
+        $answerGroup = $this->getByQuestionID($question_id);
         
-        if ($allAnswers) {
+        if ($answerGroup) {
             $answerCount = 0;
+            $allAnswers = unserialize($answerGroup['answer']);
 
             foreach ($allAnswers as $currentAnswer) {
-                $thisAnswer = unserialize($currentAnswer['answer']);
-
-                $left[] = $thisAnswer->answerLeft;
-                $right[] = $thisAnswer->answerRight;
+                $left[] = $currentAnswer->answerLeft;
+                $right[] = $currentAnswer->answerRight;
 
                 $answerCount++;
             }

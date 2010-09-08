@@ -20,10 +20,24 @@ $this->setVar(array(
 $allAttempts = $attemptHandler->getList($this->arg[0]);
 
 foreach($allAttempts as $currentAttempt) {
+
+    /* Finish time
+     */
+    if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
+        $finish = date('jS F Y, g:i:sa', strtotime($currentAttempt['finish']));
+        $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
+    }
+    else {
+        $finish = '';
+        $timeTaken = '';
+    }
+
     $this->setVar(array(
+        'ASSESS_ASSESS_ID' => $this->arg[0],
+        'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
         'ATTEMPT_NAME' => $currentAttempt['lastname'] . ', ' . $currentAttempt['firstname'],
-        'ATTEMPT_FINISH' => date('jS F Y, g:i:sa', strtotime($currentAttempt['finish'])),
-        'ATTEMPT_TIMETAKEN' => $assessHandler->sec2hms($currentAttempt['timeTaken']),
+        'ATTEMPT_FINISH' => $finish,
+        'ATTEMPT_TIMETAKEN' => $timeTaken,
     ));
 
     $this->parse('attempt_block', 'attempt', true);

@@ -19,31 +19,25 @@ class AssessAnswerMulti extends AssessAnswer {
         $answer['question_id'] = $question_id;
         $answer['sequence'] = 1;
 
-        $numItems = 0;
-
         foreach(json_decode($_POST['allAnswers']) as $currentAnswer) {
-            $answer['answer'] = serialize($currentAnswer);
-
-            $answer_ids[] = parent::create($answer);
-
+            $answer['answer'][] = $currentAnswer;
             $answer['sequence']++;
-
-            $numItems++;
         }
 
-        /* Check that the number of saved items is the same as the number of
-         * submitted items
-         */
-        if (count($answer_ids) != $numItems) {
+        $answer['answer'] = serialize($answer['answer']);
+
+        $answer_id = parent::create($answer);
+
+        if (!$answer_id) {
             return false;
         }
 
-        return $answer_ids;
+        return $answer_id;
     }
 
     /**
      * Updates an existing Answer. In this particular case, delete previous
-     * options and recreate new ones
+     * options and recreate new ones due to preprocessing requirement
      *
      * @param <type> $object
      */
@@ -65,20 +59,24 @@ class AssessAnswerMulti extends AssessAnswer {
      */
     function renderAnswers($page, $question_id = '') {
         if (is_numeric($question_id)) {
-            $allAnswers = parent::getForQuestion($question_id);
+            $answerGroup = parent::getForQuestion($question_id);
 
-            if ($allAnswers) {
+            if ($answerGroup) {
+                $allAnswers = unserialize($answerGroup['answer']);
+
                 foreach($allAnswers as $currentAnswer) {
-                    $thisAnswer = unserialize($currentAnswer['answer']);
-
                     $page->setVar(array(
-                        'ANSWER_VALUE' => $thisAnswer->value,
-                        'ANSWER_DESCRIPTION' => $thisAnswer->description,
-                        'ANSWER_CHECKED' => $thisAnswer->correct != '' ? 'checked=\'checked\'' : ''
+                        'ANSWER_VALUE' => $currentAnswer->value,
+                        'ANSWER_DESCRIPTION' => $currentAnswer->description,
+                        'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
                     ));
 
                     $page->parse('answerOption_block', 'answerOption', true);
                 }
+
+                $page->setVar(array(
+                    'ANSWER_ID' => $answerGroup['answer_id']
+                ));
             }
             else {
                 $page->setVar('answerOption_block', '');
@@ -96,33 +94,38 @@ class AssessAnswerMulti extends AssessAnswer {
     function prepareResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
-        $allAnswers = $this->getByQuestionID($question_id);
+        $answerGroup = $this->getByQuestionID($question_id);
 
-        foreach($allAnswers as $currentAnswer) {
-            $thisAnswer = unserialize($currentAnswer['answer']);
+        if ($answerGroup) {
+            $allAnswers = unserialize($answerGroup['answer']);
 
-            $page->setVar(array(
-                'ANSWER_ID' => $currentAnswer['answer_id'],
-                'ANSWER_VALUE' => $thisAnswer->value,
-                'ANSWER_DESCRIPTION' => $thisAnswer->description,
-            ));
+            foreach($allAnswers as $currentAnswer) {
+                $page->setVar(array(
+                    'ANSWER_ID' => $answerGroup['answer_id'],
+                    'ANSWER_VALUE' => $currentAnswer->value,
+                    'ANSWER_DESCRIPTION' => $currentAnswer->description,
+                ));
 
-            if ($existing) {
-                $existingAnswer = unserialize($existing['response']);
+                if ($existing) {
+                    $existingAnswer = unserialize($existing['response']);
 
-                if (in_array($thisAnswer->value, $existingAnswer)) {
-                    $page->setVar(array(
-                        'ANSWER_CHECKED' => 'checked=\'checked\'',
-                    ));
+                    if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
+                        $page->setVar(array(
+                            'ANSWER_CHECKED' => 'checked=\'checked\'',
+                        ));
+                    }
+                    else {
+                        $page->setVar(array(
+                            'ANSWER_CHECKED' => '',
+                        ));
+                    }
                 }
-                else {
-                    $page->setVar(array(
-                        'ANSWER_CHECKED' => '',
-                    ));
-                }
+
+                $page->parse('answerOption_block', 'answerOption', true);
             }
-
-            $page->parse('answerOption_block', 'answerOption', true);
+        }
+        else {
+            $page->setVar('answerOption_block', '');
         }
     }
 

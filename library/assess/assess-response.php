@@ -26,5 +26,28 @@ class AssessResponse extends Model {
 
         return $this->db->getRow($query);
     }
+
+    /**
+     * Gets all the responses to a particular assessment and attempt which can
+     * be marked automatically.
+     * 
+     * @param <type> $assess_id
+     * @param <type> $attempt_id
+     * @return <type>
+     */
+    function getAutomarkableResponses($assess_id, $attempt_id) {
+        $query = "SELECT
+                      user_id, assess_id, response_id, assess_attempt.attempt_id, section_id, assess_response.question_id,
+                      automated_marking, marks, response, answer
+                  FROM {$this->_table}
+                  LEFT JOIN assess_attempt ON {$this->_table}.attempt_id = assess_attempt.attempt_id
+                  LEFT JOIN assess_question ON assess_question.question_id = {$this->_table}.question_id
+                  LEFT JOIN assess_luQuestionType ON assess_luQuestionType.type_id = assess_question.type_id
+                  LEFT JOIN assess_answer ON assess_answer.question_id = assess_question.question_id
+                  WHERE assess_attempt.attempt_id = '$attempt_id'
+                  AND automated_marking = 'true'";
+
+        return $this->db->getAll($query);
+    }
 }
 ?>

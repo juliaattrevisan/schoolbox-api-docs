@@ -79,6 +79,7 @@ class AssessAttempt extends Model {
      */
     function getList($assess_id) {
         $query = "SELECT
+                      assess_attempt.attempt_id,
                       assess_attempt.user_id, firstname, lastname,
                       assess_attempt.start, assess_attempt.finish,
                       ROUND(assess_attempt.finish - assess_attempt.start) AS timeTaken
