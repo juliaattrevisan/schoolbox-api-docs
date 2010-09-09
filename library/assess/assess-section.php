@@ -106,6 +106,7 @@ class AssessSection extends Model {
         $query = "SELECT *
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
+                  AND deleted_at IS NULL
                   ORDER BY sequence";
 
         return $this->db->getAll($query);
@@ -159,6 +160,31 @@ class AssessSection extends Model {
         }
 
         return $completion;
+    }
+
+    /**
+     * Resequences sections after one has been deleted.
+     *
+     * @param <type> $assess_id
+     */
+    function resequenceSectionsAfterDelete($assess_id) {
+        $sectionList = $this->getList($assess_id);
+
+        if (is_array($sectionList) && count($sectionList)) {
+            $newSequence = 1;
+
+            foreach($sectionList as $currentSection) {
+                $updatedSection = array(
+                    'section_id' => $currentSection['section_id'],
+                    'sequence' => $newSequence,
+                );
+
+                parent::update($updatedSection);
+
+                $newSequence++;
+            }
+        }
+
     }
 }
 ?>

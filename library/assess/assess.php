@@ -131,6 +131,8 @@ class Assess extends Model {
                   FROM assess_section
                   LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
                   WHERE assess_id = '$assess_id'
+                  AND assess_section.deleted_at IS NULL
+                  AND assess_question.deleted_at IS NULL
                   ORDER BY sectionSequence, questionSequence";
 
         return $this->db->getAll($query);

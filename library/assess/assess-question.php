@@ -5,7 +5,7 @@ class AssessQuestion extends Model {
     public $_table = 'assess_question';
     public $_index = 'question_id';
 
-    private $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question');
+    private $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question', 'deleted_at');
 
     /**
      * Creates a Question.
@@ -46,6 +46,7 @@ class AssessQuestion extends Model {
         $query = "SELECT *
             FROM `$this->_table`
             WHERE `section_id` = $section_id
+            AND deleted_at IS NULL
             ORDER BY `order`
             DESC LIMIT 1";
 
@@ -59,7 +60,8 @@ class AssessQuestion extends Model {
     function getNextSequence($section_id) {
         $query = "SELECT MAX(sequence)+1 AS num
                   FROM {$this->_table}
-                  WHERE section_id = '$section_id'";
+                  WHERE section_id = '$section_id'
+                  AND deleted_at IS NULL";
 
         $sequence = $this->db->getOne($query);
 
@@ -95,6 +97,52 @@ class AssessQuestion extends Model {
                   WHERE type_id = '$type_id'";
 
         return $this->db->getRow($query);
+    }
+
+    /**
+     * Get a list of questions in a section
+     * 
+     * @param <type> $section_id
+     * @return <type>
+     */
+    function getList($section_id) {
+        $query = "SELECT *
+                  FROM {$this->_table}
+                  WHERE section_id = '$section_id'
+                  AND deleted_at IS NULL
+                  ORDER BY sequence";
+
+        return $this->db->getAll($query);
+    }
+
+    /**
+     * Reorders a section's questions when a question has been deleted.
+     *
+     * @param <type> $section_id
+     */
+    function resequenceQuestionsAfterDelete($assess_id, $section_id) {
+        $sectionHandler = new AssessSection();
+
+        $allQuestions = $sectionHandler->getContents($assess_id, $section_id, true);
+
+        if(is_array($allQuestions) && count($allQuestions)) {
+            $newSequence = 1;
+
+            /* Resequence non-deleted questions
+             */
+            foreach($allQuestions as $currentQuestion) {
+                if ($currentQuestion['deleted_at'] == null) {
+                    $updatedQuestion = array(
+                        'question_id' => $currentQuestion['question_id'],
+                        'sequence' => $newSequence,
+                    );
+
+                    parent::update($updatedQuestion);
+
+                    $newSequence++;
+                }
+            }
+        }
     }
 }
 ?>

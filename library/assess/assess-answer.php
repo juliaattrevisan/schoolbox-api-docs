@@ -12,7 +12,7 @@ class AssessAnswer extends Model {
     public $_index = 'answer_id';
     public $responseHandler;
 
-    protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer');
+    protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer', 'deleted_at');
 
     private $templatePath = '../templates/core/assess/answer';
 
