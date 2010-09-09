@@ -9,7 +9,7 @@ require_once '../include/model.php';
 class AssessAttempt extends Model {
     var $_table = 'assess_attempt';
     var $_index = 'attempt_id';
-    
+
     /**
      * Creates an attempt and marks the start time
      *
@@ -82,11 +82,14 @@ class AssessAttempt extends Model {
                       assess_attempt.attempt_id,
                       assess_attempt.user_id, firstname, lastname,
                       assess_attempt.start, assess_attempt.finish,
-                      ROUND(assess_attempt.finish - assess_attempt.start) AS timeTaken
+                      ROUND(assess_attempt.finish - assess_attempt.start) AS timeTaken,
+                      SUM(assess_response.mark) AS totalMarks
                   FROM assess_attempt
                   LEFT JOIN `user` ON assess_attempt.user_id = user.id
                   LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
-                  WHERE assess.assess_id = '$assess_id'";
+                  LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
+                  WHERE assess.assess_id = '$assess_id'
+                  GROUP BY assess_attempt.attempt_id";
 
         return $this->db->getAll($query);
     }

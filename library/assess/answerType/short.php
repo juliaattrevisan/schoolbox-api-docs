@@ -106,5 +106,11 @@ class AssessAnswerShort extends AssessAnswer {
 
         return parent::saveResponse($question_id, $processedResponse);
     }
+
+    /**
+     * Marks a response.
+     */
+    function mark() {
+    }
 }
 ?>

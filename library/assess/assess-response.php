@@ -1,11 +1,6 @@
 <?php
 require_once '../include/model.php';
 
-/**
- * Description of AssessResponse
- *
- * @author aetworowsky
- */
 class AssessResponse extends Model {
     public $_table = 'assess_response';
     public $_index = 'response_id';
@@ -29,7 +24,8 @@ class AssessResponse extends Model {
 
     /**
      * Gets all the responses to a particular assessment and attempt which can
-     * be marked automatically.
+     * be marked automatically. The marking is performed by the answerType's
+     * handler.
      * 
      * @param <type> $assess_id
      * @param <type> $attempt_id
@@ -37,7 +33,10 @@ class AssessResponse extends Model {
      */
     function getAutomarkableResponses($assess_id, $attempt_id) {
         $query = "SELECT
-                      user_id, assess_id, response_id, assess_attempt.attempt_id, section_id, assess_response.question_id,
+                      assess_id, response_id,
+                      assess_attempt.attempt_id,
+                      {$this->_table}.question_id,
+                      assess_luQuestionType.type_id,
                       automated_marking, marks, response, answer
                   FROM {$this->_table}
                   LEFT JOIN assess_attempt ON {$this->_table}.attempt_id = assess_attempt.attempt_id
@@ -45,9 +44,28 @@ class AssessResponse extends Model {
                   LEFT JOIN assess_luQuestionType ON assess_luQuestionType.type_id = assess_question.type_id
                   LEFT JOIN assess_answer ON assess_answer.question_id = assess_question.question_id
                   WHERE assess_attempt.attempt_id = '$attempt_id'
-                  AND automated_marking = 'true'";
+                  AND automated_marking = 'true'
+                  AND automarked_already = 'false'";
 
         return $this->db->getAll($query);
+    }
+
+    /**
+     * Remember which responses have been marked automatically, so we don't keep
+     * refetching them every time the results page loads.
+     * 
+     * @param <type> $markedResponseIDs
+     */
+    function updatedAutomatedMarks($markedResponseIDs) {
+        if (count($markedResponseIDs)) {
+            $ids = implode(',', $markedResponseIDs);
+
+            $query = "UPDATE {$this->_table}
+                      SET automarked_already = 'true'
+                      WHERE response_id IN ($ids)";
+
+            $this->db->query($query);
+        }
     }
 }
 ?>

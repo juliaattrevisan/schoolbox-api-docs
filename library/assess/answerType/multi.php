@@ -140,5 +140,46 @@ class AssessAnswerMulti extends AssessAnswer {
 
         return parent::saveResponse($question_id, $processedResponse);
     }
+
+    /**
+     * Marks a response. Customised to be applicable to the way in which the
+     * response is actually stored.
+     */
+    function mark($currentResponse) {
+        $response = unserialize($currentResponse['response']);
+        $answer = unserialize($currentResponse['answer']);
+
+        $marksPerAnswer = 0;
+
+        /* Find out how much each correct answer is worth
+         */
+        $i = 0;
+
+        foreach($answer as $currentAnswer) {
+            if ($currentAnswer->correct) {
+
+                /* If the user responded with a correct answer, accumulate
+                 */
+                if (in_array($currentAnswer->value, $response)) {
+                    $numCorrect++;
+                }
+
+                $i++;
+            }
+        }
+
+        if ($i) {
+            $marksPerAnswer = $currentResponse['marks']/$i;
+        }
+
+        /* Total marks for this question
+         */
+        $marks = array(
+            'response_id' => $currentResponse['response_id'],
+            'mark' => $marksPerAnswer * $numCorrect,
+        );
+
+        $this->responseHandler->update($marks);
+    }
 }
 ?>

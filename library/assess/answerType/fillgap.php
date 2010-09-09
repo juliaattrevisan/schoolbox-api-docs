@@ -158,5 +158,42 @@ class AssessAnswerFillgap extends AssessAnswer {
 
         return parent::saveResponse($question_id, $processedResponse);
     }
+
+    /**
+     * Marks a response. Customised to be applicable to the way in which the
+     * response is actually stored.
+     */
+    function mark($currentResponse) {
+        $response = unserialize($currentResponse['response']);
+        $answer = $currentResponse['answer'];
+
+        /* Pattern match spans to find answers
+         */
+        $matches = array();
+        $pattern = '#<span>([^<]+)</span>#ms';
+
+        preg_match_all($pattern, $answer, $matches);
+
+        $actualAnswers = $matches[1];
+        
+        /* Find out how much each phrase is worth
+         */
+        $marksPerAnswer = $currentResponse['marks'] / count($actualAnswers);
+
+        for ($i=0, $totalMarks=0; $i < count($actualAnswers); $i++) {
+            if (trim($actualAnswers[$i]) == trim($response[$i])) {
+                $totalMarks += $marksPerAnswer;
+            }
+        }
+
+        /* Total marks for this question
+         */
+        $marks = array(
+            'response_id' => $currentResponse['response_id'],
+            'mark' => $totalMarks,
+        );
+
+        $this->responseHandler->update($marks);
+    }
 }
 ?>

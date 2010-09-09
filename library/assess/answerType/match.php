@@ -157,5 +157,34 @@ class AssessAnswerMatch extends AssessAnswer {
 
         return parent::saveResponse($question_id, $processedResponse);
     }
+    
+    /**
+     * Marks a response. Customised to be applicable to the way in which the
+     * response is actually stored.
+     */
+    function mark($currentResponse) {
+        $response = unserialize($currentResponse['response']);
+        $answer = unserialize($currentResponse['answer']);
+
+        $marksPerAnswer = $currentResponse['marks'] / count($answer);
+        
+        /* Find out how much each correct answer is worth
+         */
+        for ($i=0, $numCorrect=0, $totalMarks=0; $i < count($answer); $i++) {
+            if ($answer[$i]->answerRight == $response[$i]) {
+                $totalMarks += $marksPerAnswer;
+                $numCorrect++;
+            }
+        }
+
+        /* Total marks for this question
+         */
+        $marks = array(
+            'response_id' => $currentResponse['response_id'],
+            'mark' => $totalMarks,
+        );
+
+        $this->responseHandler->update($marks);
+    }
 }
 ?>
