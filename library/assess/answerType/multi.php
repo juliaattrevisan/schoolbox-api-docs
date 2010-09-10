@@ -152,8 +152,12 @@ class AssessAnswerMulti extends AssessAnswer {
         $marksPerAnswer = 0;
 
         /* Find out how much each correct answer is worth
+         *
+         * i: the actual number of correct responses for the question
+         * numCorrect: the number of correct responses submitted
          */
         $i = 0;
+        $numCorrect = 0;
 
         foreach($answer as $currentAnswer) {
             if ($currentAnswer->correct) {
@@ -168,15 +172,25 @@ class AssessAnswerMulti extends AssessAnswer {
             }
         }
 
-        if ($i) {
-            $marksPerAnswer = $currentResponse['marks']/$i;
+        /* If the student selects exactly the correct responses then give them
+         * the marks, otherwise penalise them. The teacher can review and
+         * adjust the mark accordingly
+         */
+        if ($numCorrect == count($response)) {
+            if ($i) {
+                $marksPerAnswer = $currentResponse['marks']/$i;
+                $total = $marksPerAnswer * $numCorrect;
+            }
+        }
+        else {
+            $total = 0;
         }
 
         /* Total marks for this question
          */
         $marks = array(
             'response_id' => $currentResponse['response_id'],
-            'mark' => $marksPerAnswer * $numCorrect,
+            'mark' => $total,
         );
 
         $this->responseHandler->update($marks);

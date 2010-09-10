@@ -69,7 +69,7 @@ foreach($allAttempts as $currentAttempt) {
         'ATTEMPT_NAME' => $currentAttempt['lastname'] . ', ' . $currentAttempt['firstname'],
         'ATTEMPT_FINISH' => $finish,
         'ATTEMPT_TIMETAKEN' => $timeTaken,
-        'ATTEMPT_TOTALMARKS' => $currentAttempt['totalMarks'],
+        'ATTEMPT_TOTALMARKS' => number_format($currentAttempt['totalMarks'], 2),
     ));
 
     $this->parse('attempt_block', 'attempt', true);

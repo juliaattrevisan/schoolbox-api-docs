@@ -60,16 +60,16 @@ class AssessAnswerFillgap extends AssessAnswer {
         if (is_numeric($question_id)) {
             $currentAnswer = parent::getForQuestion($question_id);
 
-            $page->setVar(array(
-                'ANSWER_ID' => $currentAnswer['answer_id'],
-                'ANSWER' => $currentAnswer['answer']
-            ));
-
             /* Show what words/phrases were detected. Preserve the original
              * answer text block in the db; this is a convenience for the user
              * so they can double-check their selections.
              */
             $page->setBlock('answerFormFragment', 'answer_list_items', 'answer_list_items_block');
+
+            $page->setVar(array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => $currentAnswer['answer']
+            ));
 
             $allMatches = array();
 
