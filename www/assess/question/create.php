@@ -89,7 +89,7 @@ else {
 
             /* Render existing answers, or clear if none
              */
-            $answerHandler->renderAnswers($this);
+            $answerHandler->modify($this);
 
             $this->parse('answerInputs_block', 'answerFormFragment', true);
             

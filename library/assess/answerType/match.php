@@ -58,7 +58,7 @@ class AssessAnswerMatch extends AssessAnswer {
      *
      * @param <type> $page
      */
-    function renderAnswers($page, $question_id = '') {
+    function modify($page, $question_id = '') {
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
 
@@ -185,6 +185,9 @@ class AssessAnswerMatch extends AssessAnswer {
         );
 
         $this->responseHandler->update($marks);
+    }
+
+    function reviewResponse($page, $question_id) {
     }
 }
 ?>

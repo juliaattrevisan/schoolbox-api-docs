@@ -124,6 +124,17 @@ class AssessSection extends Model {
     }
 
     /**
+     * Gets the first Section in this Assess.
+     *
+     * @param <type> $assess_id
+     */
+    function getFirst($assess_id) {
+        $allSections = $this->getList($assess_id);
+
+        return $allSections[0];
+    }
+
+    /**
      * Find out how much of a section was completed.
      *
      * @param <type> $section_id

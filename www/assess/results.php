@@ -3,11 +3,13 @@ require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-factory.php');
 require_once('../library/assess/assess-attempt.php');
 require_once('../library/assess/assess-response.php');
+require_once('../library/assess/assess-section.php');
 
 $factory = new AssessFactory();
 $responseHandler = new AssessResponse();
 $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();
+$sectionHandler = new AssessSection();
 
 /* Perform automated marking on responses which support this feature. Only
  * mark responses which haven't been automarked previously, which allows
@@ -51,7 +53,8 @@ $this->setVar(array(
 $allAttempts = $attemptHandler->getList($this->arg[0]);
 
 foreach($allAttempts as $currentAttempt) {
-
+    $firstSection = $sectionHandler->getFirst($this->arg[0]);
+    
     /* Finish time
      */
     if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
@@ -65,6 +68,7 @@ foreach($allAttempts as $currentAttempt) {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $this->arg[0],
+        'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
         'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
         'ATTEMPT_NAME' => $currentAttempt['lastname'] . ', ' . $currentAttempt['firstname'],
         'ATTEMPT_FINISH' => $finish,

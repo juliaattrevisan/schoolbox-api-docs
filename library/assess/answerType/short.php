@@ -50,7 +50,7 @@ class AssessAnswerShort extends AssessAnswer {
      *
      * @param <type> $page
      */
-    function renderAnswers($page, $question_id = '') {
+    function modify($page, $question_id = '') {
         if (is_numeric($question_id)) {
             $currentAnswer = parent::getForQuestion($question_id);
 
@@ -111,6 +111,62 @@ class AssessAnswerShort extends AssessAnswer {
      * Marks a response.
      */
     function mark() {
+    }
+
+    /**
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     * 
+     * @param <type> $page
+     * @param <type> $question_id
+     */
+    function reviewResponse($page, $question_id) {
+        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+
+        $currentAnswer = $this->getByQuestionID($question_id);
+
+        if ($existing) {
+            $page->setVar(array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => $existing['response'],
+                'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_MARKS' => $existing['mark'],
+            ));
+        }
+        else {
+            $page->setVar(array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => '',
+                'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_MARKS' => 0,
+            ));
+        }
+
+        /* Show correct answer
+         */
+        $page->setVar(array(
+            'CORRECT_ANSWER' => $currentAnswer['answer']
+        ));
+
+        $page->parse('answerOption_block', 'answerOption', true);
+    }
+
+    /**
+     * Save the reviewed mark
+     * 
+     * @param <type> $data
+     */
+    function saveReviewedResponse($data, $response_id) {
+        $reviewedResponse = array(
+            'response_id' => $response_id,
+            'mark' => $data['reviewedMarks'],
+        );
+
+        if ($this->responseHandler->update($reviewedResponse)) {
+            return $reviewedResponse;
+        }
+
+        return array();
     }
 }
 ?>

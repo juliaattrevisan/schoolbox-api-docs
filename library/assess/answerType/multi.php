@@ -57,7 +57,7 @@ class AssessAnswerMulti extends AssessAnswer {
      *
      * @param <type> $page
      */
-    function renderAnswers($page, $question_id = '') {
+    function modify($page, $question_id = '') {
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
 
@@ -194,6 +194,88 @@ class AssessAnswerMulti extends AssessAnswer {
         );
 
         $this->responseHandler->update($marks);
+    }
+
+    function reviewResponse($page, $question_id) {
+        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+
+        if ($existing) {
+            $existingAnswer = unserialize($existing['response']);
+        }
+
+        $answerGroup = $this->getByQuestionID($question_id);
+
+        if ($answerGroup) {
+            $allAnswers = unserialize($answerGroup['answer']);
+
+            $page->setVar(array(
+                'ANSWER_ID' => $answerGroup['answer_id'],
+                'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_MARKS' => $existing['mark'],
+            ));
+
+            foreach($allAnswers as $currentAnswer) {
+                $page->setVar(array(
+                    'ANSWER_VALUE' => $currentAnswer->value,
+                    'ANSWER_DESCRIPTION' => $currentAnswer->description,
+                ));
+
+                if ($existing) {
+                    if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
+                        $page->setVar(array(
+                            'ANSWER_CHECKED' => 'checked=\'checked\'',
+                        ));
+                    }
+                    else {
+                        $page->setVar(array(
+                            'ANSWER_CHECKED' => '',
+                        ));
+                    }
+
+                    /* Was this a correctly-selected response? If so apply a
+                     * special class to it
+                     */
+                    if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
+                        $page->setVar(array(
+                            'CORRECT' => 'multiCorrect'
+                        ));
+                    }
+                    else if (in_array($currentAnswer->value, $existingAnswer)) {
+                        $page->setVar(array(
+                            'CORRECT' => 'multiIncorrect'
+                        ));
+                    }
+                    else {
+                        $page->setVar(array(
+                            'CORRECT' => ''
+                        ));
+                    }
+                }
+
+                $page->parse('answerOption_block', 'answerOption', true);
+            }
+        }
+        else {
+            $page->setVar('answerOption_block', '');
+        }
+    }
+
+    /**
+     * Save the reviewed mark
+     *
+     * @param <type> $data
+     */
+    function saveReviewedResponse($data, $response_id) {
+        $reviewedResponse = array(
+            'response_id' => $response_id,
+            'mark' => $data['reviewedMarks'],
+        );
+
+        if ($this->responseHandler->update($reviewedResponse)) {
+            return $reviewedResponse;
+        }
+
+        return array();
     }
 }
 ?>

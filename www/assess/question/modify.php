@@ -53,7 +53,7 @@ else {
     $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($question['type_id']) . '/modify.html');
     $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
     
-    $answerHandler->renderAnswers($this, $question['question_id']);
+    $answerHandler->modify($this, $question['question_id']);
 
     $this->parse('answerInputs_block', 'answerFormFragment', true);
 

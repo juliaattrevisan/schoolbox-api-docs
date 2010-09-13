@@ -56,7 +56,7 @@ class AssessAnswerFillgap extends AssessAnswer {
      *
      * @param <type> $page
      */
-    function renderAnswers($page, $question_id = '') {
+    function modify($page, $question_id = '') {
         if (is_numeric($question_id)) {
             $currentAnswer = parent::getForQuestion($question_id);
 
@@ -194,6 +194,109 @@ class AssessAnswerFillgap extends AssessAnswer {
         );
 
         $this->responseHandler->update($marks);
+    }
+
+    /**
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     *
+     * @param <type> $page
+     * @param <type> $question_id
+     */
+    function reviewResponse($page, $question_id) {
+        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+
+        $currentAnswer = $this->getByQuestionID($question_id);
+
+        /* Pattern match spans to find answers
+         */
+        $matches = array();
+        $pattern = '#<span>([^<]+)</span>#ms';
+
+        preg_match_all($pattern, $currentAnswer['answer'], $matches);
+
+        $actualAnswers = $matches[1];
+
+        /* Remember where the answers were, so we can compare between the
+         * student's reponse and the actual answer
+         */
+        $replace = " <span class='fillgapCorrect'>$1</span> ";
+        $correctResponse = preg_replace($pattern, $replace, $currentAnswer['answer']);
+
+        if ($existing) {
+            $existingAnswer = unserialize($existing['response']);
+
+            /* Prepare a special way to show Fillgap answers. This replaces
+             * %%token%% tokens with inputs and the already-submitted values
+             */
+            $ans = $currentAnswer['answer'];
+
+            $i = 0;
+
+            foreach($existingAnswer as $val) {
+                $pattern = '#<span>([^<]+)</span>#ms';
+
+                /* Indicate matching/non-matching responses to answers
+                 */
+                if (trim($actualAnswers[$i]) == trim($existingAnswer[$i])) {
+                    $replace = " <span class='fillgapCorrect'>$val</span> ";
+                }
+                else {
+                    $replace = " <span class='fillgapIncorrect'>$val</span> ";
+                }
+
+                $ans = preg_replace($pattern, $replace, $ans, 1, $x);
+
+                $i++;
+            }
+
+            $page->setVar(array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => $ans,
+                'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_MARKS' => $existing['mark'],
+            ));
+        }
+        else {
+            /* Prepare a special way to show Fillgap answers. This replaces
+             * %%token%% tokens with inputs.
+             */
+            $pattern = '#<span>([^<]+)</span>#ms';
+            $replace = " <span class='fillgapIncorrect'>&nbsp;</span> ";
+
+            $page->setVar(array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => preg_replace($pattern, $replace, $currentAnswer['answer']),
+                'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_MARKS' => 0,
+            ));
+        }
+
+        /* Show correct answer
+         */
+        $page->setVar(array(
+            'CORRECT_ANSWER' => $correctResponse
+        ));
+
+        $page->parse('answerOption_block', 'answerOption', true);
+    }
+
+    /**
+     * Save the reviewed mark
+     *
+     * @param <type> $data
+     */
+    function saveReviewedResponse($data, $response_id) {
+        $reviewedResponse = array(
+            'response_id' => $response_id,
+            'mark' => $data['reviewedMarks'],
+        );
+
+        if ($this->responseHandler->update($reviewedResponse)) {
+            return $reviewedResponse;
+        }
+
+        return array();
     }
 }
 ?>

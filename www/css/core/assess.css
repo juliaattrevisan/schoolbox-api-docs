@@ -104,3 +104,23 @@ ul.matchPairs li {
 ul.matchPairs li:hover {
     background-color: #eee;
 }
+
+/* Review Fillgap
+ */
+span.fillgapCorrect {
+    color: #0f0;
+}
+
+span.fillgapIncorrect {
+    color: #f00;
+}
+
+/* Review Multichoice
+ */
+li.multiCorrect {
+   background-color: #0a0;
+}
+
+li.multiIncorrect {
+    background-color: #a00;
+}
