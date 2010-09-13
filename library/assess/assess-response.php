@@ -67,5 +67,19 @@ class AssessResponse extends Model {
             $this->db->query($query);
         }
     }
+
+    /**
+     * Find the number of questions attempted in $attempt_id
+     *
+     * @param <type> $attempt_id
+     * @return <type>
+     */
+    function numResponses($attempt_id) {
+        $query = "SELECT COUNT(*) AS numQuestionsAttempted
+                  FROM {$this->_table}
+                  WHERE attempt_id = '$attempt_id'";
+
+        return $this->db->getOne($query);
+    }
 }
 ?>
