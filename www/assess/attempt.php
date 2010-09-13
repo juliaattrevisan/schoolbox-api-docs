@@ -62,9 +62,31 @@ $this->setVar(array(
 ));
 
 /* Load all the questions for this section.
- */
-$allQuestions = $sectionHandler->getContents($this->arg[0], $this->arg[1], AssessSection::SECTION_EXCLUDE);
+ *
+if ($section->random) {
+    if (!$section->hasThisAttempt()) {
+        $sectionHandler->generateRandomSelection($attempt_id);
+    }
 
+    $allQuestions = $sectionHandler->getRandomContents($this->arg[0], $this->arg[1], AssessSection::SECTION_EXCLUDE);
+}
+else {
+    $allQuestions = $sectionHandler->getContents($this->arg[0], $this->arg[1], AssessSection::SECTION_EXCLUDE);
+}
+ */
+if ($section['random'] == 1) {
+    if (!is_array($sectionHandler->definedRandomQuestions($_SESSION['attempt_id'], $section['section_id']))) {
+        $sectionHandler->assignRandomQuestions($_SESSION['attempt_id'], $section['section_id'], $section['pool']);
+    }
+
+    $allQuestions = $sectionHandler->getRandomContents($this->arg[0], $this->arg[1], $_SESSION['attempt_id'], AssessSection::SECTION_EXCLUDE);
+}
+else {
+    $allQuestions = $sectionHandler->getContents($this->arg[0], $this->arg[1], AssessSection::SECTION_EXCLUDE);
+}
+
+/* Process questions now that we've got a list of 'em
+ */
 if ($allQuestions) {
     foreach($allQuestions as $currentQuestion) {
         $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);

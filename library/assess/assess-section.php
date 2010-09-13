@@ -97,6 +97,42 @@ class AssessSection extends Model {
     }
 
     /**
+     * Gets a list of Sections and Questions that exist in a particular Assess.
+     * Optionally exclude Sections when just getting Questions for a section,
+     * rather than a full index.
+     *
+     * This modified version of getContents() allows for random selections
+     * 
+     * @param <type> $section_id
+     * @return <type>
+     */
+    function getRandomContents($assess_id, $section_id, $attempt_id, $sectionExclusion = false) {
+        $query = "SELECT assess_id,
+                         assess_section.section_id,
+                         assess_section.title,
+                         assess_section.sequence AS sectionSequence,
+                         assess_question.*
+                  FROM {$this->_table}
+                  LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
+                  WHERE assess_id = '$assess_id'
+                  AND {$this->_table}.{$this->_index} = '$section_id'
+                  AND question_id IN (
+                      SELECT question_id
+                      FROM assess_section_random_question
+                      WHERE attempt_id = '$attempt_id'
+                      AND section_id = '$section_id'
+                  )";
+
+        if ($sectionExclusion) {
+            $query .= " AND question_id IS NOT NULL";
+        }
+
+        $query .= " ORDER BY sectionSequence, assess_question.sequence";
+
+        return $this->db->getAll($query);
+    }
+
+    /**
      * Get a list of Sections for an Assess.
      *
      * @param <type> $assess_id
@@ -195,7 +231,59 @@ class AssessSection extends Model {
                 $newSequence++;
             }
         }
+    }
 
+    /**
+     * Find all the random questions in a section and attempt
+     *
+     * @param <type> $attempt_id
+     * @param <type> $section_id
+     * @return <type>
+     */
+    function definedRandomQuestions($attempt_id, $section_id) {
+        $query = "SELECT *
+                  FROM assess_section_random_question
+                  WHERE attempt_id = '$attempt_id'
+                  AND section_id = '$section_id'";
+
+        return $this->db->getAll($query);
+    }
+
+    /**
+     * Assign random questions to a section, so we can remember them and
+     * navigate back and forth without losing questions during an attempt
+     *
+     * @param <type> $attempt_id
+     * @param <type> $section_id
+     * @param <type> $limit
+     */
+    function assignRandomQuestions($attempt_id, $section_id, $limit) {
+        $query = "SELECT question_id
+                  FROM assess_question
+                  WHERE section_id = '$section_id'";
+
+        $allQuestions = $this->db->getAll($query);
+
+        /* Randomise
+         */
+        shuffle($allQuestions);
+        shuffle($allQuestions);
+
+        /* Insert selected questions for this attempt
+         */
+        for ($i=0; $i < count($allQuestions); $i++) {
+            $new = array(
+                'attempt_id' => $attempt_id,
+                'section_id' => $section_id,
+                'question_id' => $allQuestions[$i]['question_id'],
+            );
+
+            if ((($limit > 0) && ($i < $limit)) || ($limit == 0)) {
+                $this->db->insert('assess_section_random_question', $new);
+
+                $ids[] = $this->db->insertID();
+            }
+        }
     }
 }
 ?>
