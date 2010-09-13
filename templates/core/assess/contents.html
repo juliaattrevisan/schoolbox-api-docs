@@ -1,0 +1,26 @@
+<h2>Questions XX</h2>
+<div class="allQuestions">
+    <!-- BEGIN section -->
+    <div style="border-top:1px solid #aaa;padding:20px 0px;">
+        <h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}</h3>
+        <a href="/assess/section/modify/{SECTION_SECTION_ID}">Edit</a> |
+        <a href="/assess/section/delete/{SECTION_SECTION_ID}">Delete</a>
+        <ul>
+            <!-- BEGIN question -->
+            <li>
+                <p>
+                    <span>Q{QUESTION_SEQUENCE})</span>
+                    {QUESTION_QUESTION}<br />
+                    <a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
+                    <a href="/assess/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
+                </p>
+            </li>
+            <!-- END question -->
+        </ul>
+
+        <a href="/assess/question/create/{SECTION_SECTION_ID}">Add questions to this section</a>
+    </div>
+    <!-- END section -->
+
+    <a href="/assess/section/create/{ASSESS_ASSESS_ID}">Add sections to this assessment</a>
+</div>
