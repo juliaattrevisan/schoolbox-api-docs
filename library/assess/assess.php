@@ -211,21 +211,5 @@ class Assess extends Model {
 
         return $formatted;
     }
-
-    /**
-     * Find the number of questions in this assess
-     *
-     * @param <type> $attempt_id
-     */
-    function numQuestions($attempt_id) {
-        $query = "SELECT COUNT(*) AS numQuestions
-                  FROM assess
-                  LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
-                  LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
-                  WHERE assess_question.deleted_at IS NULL
-                  AND assess.assess_id = '$attempt_id'";
-
-        return $this->db->getOne($query);
-    }
 }
 ?>

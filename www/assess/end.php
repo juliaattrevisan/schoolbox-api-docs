@@ -1,10 +1,12 @@
 <?php
 require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-attempt.php');
+require_once('../library/assess/assess-question.php');
 require_once('../library/assess/assess-response.php');
 
 $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();
+$questionHandler = new AssessQuestion();
 $responseHandler = new AssessResponse();
 
 $assess = $assessHandler->getByID($this->arg[0]);
@@ -17,7 +19,7 @@ $this->setTitle('Assessment: ' . $assess['title']);
 
 /* Check that all questions are answered
  */
-if ($responseHandler->numResponses($_SESSION['attempt_id']) != $assessHandler->numQuestions($this->arg[0])) {
+if ($responseHandler->numResponses($_SESSION['attempt_id']) != $questionHandler->numQuestions($this->arg[0])) {
     echo "You haven't answered all questions yet";
     error();
 }
