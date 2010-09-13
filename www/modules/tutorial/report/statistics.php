@@ -75,11 +75,11 @@ if (is_array($eventList)) {
 	
 		$output = array('EVENT_ID'		=> $event['eventID'],
 						'NAME'			=> scrubText($event['name']),
-						'CODE'			=> 'N/A',
+						'CODE'			=> $event['code'],
 						'TYPE'			=> 'Consultation',
-						'COUNT'			=> 1,
+						'COUNT'			=> $event['classes'],
 						'LOCATION'		=> scrubText($event['location']),
-						'STUDENT_COUNT'	=> $eventHandler->getStudentCount($event['code'], $event['eventID']),
+						'STUDENT_COUNT'	=> $event['students'],
 						'ATTENDANCE' 	=> $event['expected'] > 0 ? number_format(($event['attended'] / $event['expected'])*100, 2) : 'N/A',
 						'ON_OFF' 		=>  ++$i%2? 'dark' : '',
 						);

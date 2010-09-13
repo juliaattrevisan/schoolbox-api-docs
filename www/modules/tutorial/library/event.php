@@ -114,7 +114,7 @@ class Event extends Model {
 	}
 
 	function getConsultationStatistics ($filter = '') {
-		$query = "SELECT e.*, COUNT( a.studentID) expected, COUNT(IF(a.present='true',1,NULL)) attended FROM ".TUTORIAL_db.".event e 
+		$query = "SELECT e.*, COUNT( a.studentID) expected, COUNT(IF(a.present='true',1,NULL)) attended, COUNT(DISTINCT e.eventID) classes, COUNT(DISTINCT a.studentID) students  FROM ".TUTORIAL_db.".event e 
 				  LEFT JOIN ".TUTORIAL_db.".attendance a ON a.eventID = e.eventID
 				  WHERE e.typeID = 2  ";
 				  
@@ -130,7 +130,7 @@ class Event extends Model {
 		if ($this->permission < FULL_ACCESS)
 			$query .= "AND (e.tutor1ID = ".$_SESSION['id']." OR e.tutor2ID = ".$_SESSION['id'].")";
 		
-		$query .= " GROUP BY e.eventID ORDER BY e.name, date";
+		$query .= " GROUP BY e.code, e.eventID ORDER BY e.name, date";
 		
 		return $this->db->getAll($query);
 	}
@@ -215,7 +215,7 @@ class Event extends Model {
 		if ($to > 0)
 			$query .= "AND DATE(e.date) <= DATE('".outputDate("Y-m-d",$to)."')";
 			
-		$query .= "GROUP BY a.eventID ORDER BY e.code, e.date";
+		$query .= "GROUP BY a.eventID ORDER BY e.typeID DESC, e.code, e.date";
 		
 		return $this->db->getAll($query);				 
 	}

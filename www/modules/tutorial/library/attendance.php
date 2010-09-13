@@ -17,7 +17,7 @@ class Attendance extends Model {
 		// who might have attended
 		$query = "(SELECT e.eventID, n.studentID, a.present, a.reason, u.lastname ,u.firstname, u.title
 				  FROM ".TUTORIAL_db.".event e
-				  LEFT JOIN ".TUTORIAL_db.".enrolment n ON ((n.code = e.code AND n.code != '') OR n.eventID = e.eventID) AND n.from <= e.date 
+				  LEFT JOIN ".TUTORIAL_db.".enrolment n ON ((n.code = e.code AND n.code != '' AND e.typeID = 1) OR n.eventID = e.eventID) AND n.from <= e.date 
 				  LEFT JOIN ".TUTORIAL_db.".attendance a ON a.eventID = e.eventID AND a.studentID = n.studentID
 				  LEFT JOIN ".PORTAL_db.".user u ON u.id = n.studentID			  
 				  WHERE e.eventID = $eventID 

@@ -21,6 +21,8 @@ $page->setBlock('student', 'remove_grey', 'remove_grey_block');
 $page->setBlock('student', 'reason_select', 'reason_select_block');
 $page->setBlock(TEMPLATE_content, 'previous_link', 'previous_link_block');
 $page->setBlock(TEMPLATE_content, 'next_link', 'next_link_block');
+$page->setBlock('event', 'list_add', 'list_add_block');
+$page->setBlock('list_add', 'adduser', 'adduser_block');
 
 $page->setTitle('Tutorial Management');
 
@@ -71,11 +73,13 @@ if (is_array($eventList)) {
 		$attendanceList = $attendanceHandler->getAllByEvent($event['eventID']);
 		
 		// output each student
+		$enrolled = array();
 		if (is_array($attendanceList)) {
 			$j = 0;
 			$page->setVar('student_block', '');
 			$page->setVar('has_students_block', '');
 			foreach ($attendanceList as $attendance) {
+			    $enrolled[] = $attendance['studentID'];
 				$output = array('STUDENT_ID'			=> $attendance['studentID'],
 								'STUDENT_NAME'			=> formatName($attendance),
 								'STUDENT_NAME_ESCAPED' 	=> addslashes(scrubText(formatName($attendance))),
@@ -112,6 +116,26 @@ if (is_array($eventList)) {
 			$page->parse('has_students_block', 'has_students');
 		} else
 			$page->setVar('has_students_block', '<p>There are no students enrolled for this event.</p>');
+
+		$page->setVar('list_add_block', '');	
+		if ($event['typeID'] == 2 && !empty($event['code'])) {
+		    $students = $enrolmentHandler->getAllByEvent($event['code']);
+		    $i = 0;
+		    if (is_array($students)) {
+		        foreach ($students as $student) {
+		            if (!in_array($student['studentID'], $enrolled)) {
+		                $i++;
+    		            $page->setVar(array(
+    		              'ADDUSER_NAME'   => formatName($student),
+    		              'ADDUSER_ID'    => $student['studentID'],
+    		            ));
+    		            $page->parse('adduser_block', 'adduser', true);
+		            }
+		        }
+		        if ($i > 0)
+		          $page->parse('list_add_block', 'list_add');
+		    }
+		}
 			
 		$page->parse('event_block', 'event', true);
 	}

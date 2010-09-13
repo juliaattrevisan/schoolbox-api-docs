@@ -58,9 +58,11 @@ window.addEvent('domready', function () {
 	$('typeSelect').addEvent('change', function () {
 		if ($(this).value == 1) {
 			$('nameRow').setStyle('display', 'none');
+			$('codeRow').setStyle('display', 'none');
 			$('classRow').setStyle('display', '');
 		} else {
 			$('nameRow').setStyle('display', '');
+			$('codeRow').setStyle('display', '');
 			$('classRow').setStyle('display', 'none');
 		}
 	});
@@ -95,6 +97,10 @@ window.addEvent('domready', function () {
     <tr id="nameRow" style="display: {NAME_ENABLED};">
       <td><h3>Name</h3><em>Required field.</em></td>
       <td><input type="text" name="name" id="name" size="50" maxlength="50" value="{NAME}" /></td>
+    </tr>
+	<tr id="codeRow" style="display: {NAME_ENABLED};">
+      <td><h3>Code</h3></td>
+      <td><input type="text" name="code" id="code" size="15" maxlength="50" value="{CODE}" /></td>
     </tr>
     <tr>
       <td class="formLabelWidth"><h3>Room</h3></td>

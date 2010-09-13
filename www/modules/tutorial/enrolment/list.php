@@ -47,7 +47,8 @@ if (is_numeric($_GET['eventID'])) {
 					);
 	$page->setVar($output);
 	
-	$enrolmentList = $enrolmentHandler->getAllByEvent($event['code'], $event['eventID']);
+	$code = $event['typeID'] == 1 ? $event['code'] : '';
+	$enrolmentList = $enrolmentHandler->getAllByEvent($code, $event['eventID']);
 	if (is_array($enrolmentList)) {
 		$i = 0;
 		foreach ($enrolmentList as $enrolment) {

@@ -98,14 +98,24 @@ $j(document).ready(function () {
 	  <input type="submit" value="{ACTION} Attendance" class="btn" />
 	  </form>
 	
-	  <!-- BEGIN add_student -->
-	  <form action="/modules/tutorial/enrolment/modifyForm.php" method="post" class="standardForm {DISABLED}" onsubmit="return this.userID.value != ''; ">
+	  
+	  <form action="/modules/tutorial/enrolment/modifyForm.php" method="post" class="standardForm {DISABLED}" onsubmit="return this.userID.value != '' || this.userIDSelect.value != ''; ">
 		<input class="lookup" type="text" name="keyword" />
 		<input type="hidden" name="userID" class="userID" />
 		<input type="hidden" name="eventID" value="{EVENT_ID}" />
 		<input type="submit" value="Add Student" class="btn" />
+		<!-- BEGIN list_add -->
+		<span class="bold">&nbsp;&nbsp;or&nbsp;&nbsp;</span>
+		<select name="userIDSelect">
+			<option>Please Select..</option>
+			<!-- BEGIN adduser -->
+			<option value="{ADDUSER_ID}">{ADDUSER_NAME}</option><!-- END adduser -->
+		</select>
+		<input type="submit" value="Add Student" class="btn" />
+		<!-- END list_add -->
+		
 	   </form>
-	  <!-- END add_student -->
+	  
 	<div class="float-fix"></div>  
 	<!-- END event -->
 	
