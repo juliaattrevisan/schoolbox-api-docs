@@ -6,6 +6,8 @@ require_once('../library/assess/assess-response.php');
  * Handler for Short Answer questions.
  */
 class AssessAnswerMulti extends AssessAnswer {
+    const CORRECT_CLASS = 'multiCorrect';
+    const INCORRECT_CLASS = 'multiIncorrect';
 
     /**
      * Creates an Answer. This is used when creating Questions and Answers in
@@ -233,16 +235,20 @@ class AssessAnswerMulti extends AssessAnswer {
                     }
 
                     /* Was this a correctly-selected response? If so apply a
-                     * special class to it
+                     * special class to it. The three cases are:
+                     *
+                     * Correct response, selected
+                     * Incorrect response, selected
+                     * Unselected
                      */
                     if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
                         $page->setVar(array(
-                            'CORRECT' => 'multiCorrect'
+                            'CORRECT' => self::CORRECT_CLASS,
                         ));
                     }
                     else if (in_array($currentAnswer->value, $existingAnswer)) {
                         $page->setVar(array(
-                            'CORRECT' => 'multiIncorrect'
+                            'CORRECT' => self::INCORRECT_CLASS,
                         ));
                     }
                     else {
@@ -251,6 +257,11 @@ class AssessAnswerMulti extends AssessAnswer {
                         ));
                     }
                 }
+                else {
+                    $page->setVar(array(
+                        'CORRECT' => ''
+                    ));
+                }
 
                 $page->parse('answerOption_block', 'answerOption', true);
             }
@@ -258,24 +269,6 @@ class AssessAnswerMulti extends AssessAnswer {
         else {
             $page->setVar('answerOption_block', '');
         }
-    }
-
-    /**
-     * Save the reviewed mark
-     *
-     * @param <type> $data
-     */
-    function saveReviewedResponse($data, $response_id) {
-        $reviewedResponse = array(
-            'response_id' => $response_id,
-            'mark' => $data['reviewedMarks'],
-        );
-
-        if ($this->responseHandler->update($reviewedResponse)) {
-            return $reviewedResponse;
-        }
-
-        return array();
     }
 }
 ?>

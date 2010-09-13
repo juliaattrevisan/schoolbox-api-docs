@@ -6,6 +6,8 @@ require_once('../library/assess/assess-response.php');
  * Handler for Short Answer questions.
  */
 class AssessAnswerMatch extends AssessAnswer {
+    const CORRECT_CLASS = 'matchCorrect';
+    const INCORRECT_CLASS = 'matchIncorrect';
 
     /**
      * Creates an Answer. This is used when creating Questions and Answers in
@@ -188,6 +190,55 @@ class AssessAnswerMatch extends AssessAnswer {
     }
 
     function reviewResponse($page, $question_id) {
+        $left = array();
+        $right = array();
+
+        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+
+        if ($existing) {
+            $right = unserialize($existing['response']);
+        }
+
+        /* Define special blocks to handle this special answerOptions scenario,
+         * because we have three columns to parse per iteration.
+         */
+        $page->setBlock('answerFormFragment', 'answerOptionLeft', 'answerOptionLeft_block');
+        $page->setBlock('answerFormFragment', 'answerOptionRight', 'answerOptionRight_block');
+        $page->setBlock('answerFormFragment', 'answerOptionCorrectResponse', 'answerOptionCorrectResponse_block');
+
+        $answerGroup = $this->getByQuestionID($question_id);
+
+        if ($answerGroup) {
+            $page->setVar(array(
+                'ANSWER_ID' => $answerGroup['answer_id'],
+                'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_MARKS' => $existing['mark'],
+            ));
+            
+            $allAnswers = unserialize($answerGroup['answer']);
+
+            for($i=0; $i<count($allAnswers); $i++) {
+                $currentAnswer = $allAnswers[$i];
+
+                if ($right[$i] == $currentAnswer->answerRight) {
+                    $correct = self::CORRECT_CLASS;
+                }
+                else {
+                    $correct = self::INCORRECT_CLASS;
+                }
+
+                $page->setVar(array(
+                    'ANSWER_LEFT_VALUE' => $currentAnswer->answerLeft,
+                    'ANSWER_RIGHT_VALUE' => $right[$i],
+                    'ANSWER_CORRECT_RESPONSE_VALUE' => $currentAnswer->answerRight,
+                    'CORRECT' => $correct,
+                ));
+
+                $page->parse('answerOptionLeft_block', 'answerOptionLeft', true);
+                $page->parse('answerOptionRight_block', 'answerOptionRight', true);
+                $page->parse('answerOptionCorrectResponse_block', 'answerOptionCorrectResponse', true);
+            }
+        }
     }
 }
 ?>

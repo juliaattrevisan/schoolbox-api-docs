@@ -1,12 +1,3 @@
-<script type="text/javascript" src="/javascript/jquery.ui.js"></script>
-<script type="text/javascript">
-$j(document).ready(function() {
-    $j("#matchPairs_{MATCHPAIRS_QUESTION_ID}").sortable();
-    $j("#matchPairs_{MATCHPAIRS_QUESTION_ID}").disableSelection();
-});
-</script>
-
-<!-- BEGIN answerInputs -->
 <fieldset>
     <label>Answer</label>
     <div>
@@ -16,14 +7,23 @@ $j(document).ready(function() {
             <!-- END answerOptionLeft -->
         </ul>
 
-        <ul id="matchPairs_{MATCHPAIRS_QUESTION_ID}" class="matchPairs">
+        <ul class="matchPairs">
             <!-- BEGIN answerOptionRight -->
-            <li>
-                <input name="answerRight[]" class="answerRight" type="hidden" readonly="readonly" value="{ANSWER_RIGHT_VALUE}" />
+            <li class="{CORRECT}">
                 {ANSWER_RIGHT_VALUE}
             </li>
             <!-- END answerOptionRight -->
         </ul>
+
+        <ul class="matchPairs">
+            <!-- BEGIN answerOptionCorrectResponse -->
+            <li>
+                {ANSWER_CORRECT_RESPONSE_VALUE}
+            </li>
+            <!-- END answerOptionCorrectResponse -->
+        </ul>
     </div>
 </fieldset>
-<!-- END answerInputs -->
+<fieldset>
+    <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" /> / {QUESTION_MARKS}
+</fieldset>

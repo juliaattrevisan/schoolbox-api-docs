@@ -150,23 +150,5 @@ class AssessAnswerShort extends AssessAnswer {
 
         $page->parse('answerOption_block', 'answerOption', true);
     }
-
-    /**
-     * Save the reviewed mark
-     * 
-     * @param <type> $data
-     */
-    function saveReviewedResponse($data, $response_id) {
-        $reviewedResponse = array(
-            'response_id' => $response_id,
-            'mark' => $data['reviewedMarks'],
-        );
-
-        if ($this->responseHandler->update($reviewedResponse)) {
-            return $reviewedResponse;
-        }
-
-        return array();
-    }
 }
 ?>

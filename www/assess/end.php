@@ -13,6 +13,9 @@ $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
+/* TODO: Check that all questions are answered
+ */
+
 if ($attempt['finish'] == '0000-00-00 00:00:00') {
     $attemptHandler->update(array(
         'attempt_id' => $_SESSION['attempt_id'],

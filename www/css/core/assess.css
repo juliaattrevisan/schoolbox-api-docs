@@ -124,3 +124,13 @@ li.multiCorrect {
 li.multiIncorrect {
     background-color: #a00;
 }
+
+/* Review Matching Pairs
+ */
+li.matchCorrect {
+   background-color: #aa0;
+}
+
+li.matchIncorrect {
+    background-color: #a0a;
+}
