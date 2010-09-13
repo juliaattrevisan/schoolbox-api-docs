@@ -30,8 +30,7 @@ else {
     $this->setTitle('Modify Question');
     $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
-    $this->setBlock(TEMPLATE_content, 'section', 'section_block');
-    $this->setBlock('section', 'question', 'question_block');
+    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     
     /* Set question ID
      */
@@ -82,11 +81,15 @@ else {
         'DISABLED_SELECTED' => '',
     ));
 
-    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
+    /* Show this Assess' contents
+     */
+    $this->setFile('assessContentsFragment', 'assess/contents.html');
+    $this->setBlock('assessContentsFragment', 'section', 'section_block');
+    $this->setBlock('section', 'question', 'question_block');
 
     $assess = new Assess();
     $assess->renderAssessContents($section['assess_id'], $this);
 
-    $this->parse('allQuestions_block', 'allQuestions');
+    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 }
 ?>

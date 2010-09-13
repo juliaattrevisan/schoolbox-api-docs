@@ -24,8 +24,7 @@ else {
     /* Render modify page
      */
     $this->setFile(TEMPLATE_content, 'assess/section/modify.html');
-    $this->setBlock(TEMPLATE_content, 'section', 'section_block');
-    $this->setBlock('section', 'question', 'question_block');
+    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setTitle('Create Section');
 
     if (empty($this->arg[0])) {
@@ -49,11 +48,16 @@ else {
         'POOL' => $section['pool'],
     ));
 
-    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
+    /* Show this Assess' contents
+     */
+    $this->setFile('assessContentsFragment', 'assess/contents.html');
+    $this->setBlock('assessContentsFragment', 'section', 'section_block');
+    $this->setBlock('section', 'question', 'question_block');
 
+    $assessHandler = new Assess();
     $assessHandler->renderAssessContents($assess['assess_id'], $this);
 
-    $this->parse('allQuestions_block', 'allQuestions');
+    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 }
 
 ?>

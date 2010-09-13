@@ -18,7 +18,7 @@ if (!empty($_POST)) {
         echo "Question could not be saved";
         error();
     }
-    
+
     if (!$answer_id) {
         echo "Answer could not be saved";
         error();
@@ -27,13 +27,12 @@ if (!empty($_POST)) {
     localRedir('/assess/question/create/' . $_POST['section_id']);
 }
 else {
-    /* Render create page 
+    /* Render create page
      */
     $this->setFile(TEMPLATE_content, 'assess/question/create.html');
     $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
+    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
-    $this->setBlock(TEMPLATE_content, 'section', 'section_block');
-    $this->setBlock('section', 'question', 'question_block');
     $this->setTitle('Create Question');
 
     /* Set section ID
@@ -44,7 +43,7 @@ else {
 
     $sectionHandler = new AssessSection();
     $section = $sectionHandler->getByID($this->arg[0]);
-    
+
     if (empty($section)) {
         error(51);
     }
@@ -75,7 +74,7 @@ else {
     /* Show question type options
      */
     $setTemplate = false;
-    
+
     $questionTypes = $questionHandler->getAllQuestionTypes();
 
     foreach($questionTypes as $currentQuestionType) {
@@ -92,7 +91,7 @@ else {
             $answerHandler->modify($this);
 
             $this->parse('answerInputs_block', 'answerFormFragment', true);
-            
+
             /* We've set the template, so remember this
              */
             $setTemplate = true;
@@ -106,7 +105,7 @@ else {
             'QUESTIONTYPE_DESCRIPTION' => $currentQuestionType['description'],
             'QUESTIONTYPE_SELECTED' => $selected,
         ));
-        
+
         $this->parse('questionType_block', 'questionType', true);
     }
 
@@ -119,12 +118,13 @@ else {
 
     /* Show this Assess' contents
      */
-    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
+    $this->setFile('assessContentsFragment', 'assess/contents.html');
+    $this->setBlock('assessContentsFragment', 'section', 'section_block');
+    $this->setBlock('section', 'question', 'question_block');
 
     $assess = new Assess();
     $assess->renderAssessContents($section['assess_id'], $this);
 
-    $this->parse('allQuestions_block', 'allQuestions');
+    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 }
-
 ?>
