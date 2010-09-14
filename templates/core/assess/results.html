@@ -6,6 +6,7 @@
             <th>Submitted on</th>
             <th>Time taken</th>
             <th>Mark</th>
+            <th>Percentage</th>
             <th>Review</th>
         </tr>
     </thead>
@@ -14,8 +15,9 @@
         <tr>
             <td>{ATTEMPT_NAME}</td>
             <td>{ATTEMPT_FINISH}</td>
-            <td>{ATTEMPT_TIMETAKEN}</td>
-            <td>{ATTEMPT_TOTALMARKS}</td>
+            <td>{ATTEMPT_TIME_TAKEN}</td>
+            <td>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</td>
+            <td>{ATTEMPT_PERCENTAGE}%</td>
             <td><a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Review</td>
         </tr>
         <!-- END attempt -->

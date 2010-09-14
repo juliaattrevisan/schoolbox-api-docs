@@ -66,14 +66,20 @@ foreach($allAttempts as $currentAttempt) {
         $timeTaken = '';
     }
 
+    /* The total available marks for this attempt
+     */
+    $totalAvailableMarks = $attemptHandler->getTotalMarks($this->arg[0], $currentAttempt['attempt_id']);
+
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $this->arg[0],
         'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
         'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
         'ATTEMPT_NAME' => $currentAttempt['lastname'] . ', ' . $currentAttempt['firstname'],
         'ATTEMPT_FINISH' => $finish,
-        'ATTEMPT_TIMETAKEN' => $timeTaken,
-        'ATTEMPT_TOTALMARKS' => number_format($currentAttempt['totalMarks'], 2),
+        'ATTEMPT_TIME_TAKEN' => $timeTaken,
+        'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
+        'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
+        'ATTEMPT_PERCENTAGE' => round(100 * $currentAttempt['totalMarks'] / $totalAvailableMarks),
     ));
 
     $this->parse('attempt_block', 'attempt', true);

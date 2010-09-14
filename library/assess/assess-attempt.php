@@ -93,5 +93,22 @@ class AssessAttempt extends Model {
 
         return $this->db->getAll($query);
     }
+
+    /**
+     * Find the total marks available for an attempt (noting that an attempt
+     * can have varying total available marks, depending on randomness of
+     * questions which themselves have different available marks from other
+     * candidates which could be selected)
+     */
+    function getTotalMarks($assess_id, $attempt_id) {
+        $query = "SELECT SUM(marks) AS totalMarks
+                  FROM assess_attempt
+                  LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
+                  LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
+                  WHERE assess_attempt.assess_id = '$assess_id'
+                  AND assess_attempt.attempt_id = '$attempt_id'";
+
+        return $this->db->getOne($query);
+    }
 }
 ?>
