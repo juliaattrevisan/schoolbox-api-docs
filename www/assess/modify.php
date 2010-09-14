@@ -19,6 +19,7 @@ if (!empty($_POST)) {
         'start'       => date(DATE_database, $start),
         'finish'      => date(DATE_database, $finish),
         'duration'    => ($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60,
+        'allow_resit' => $_POST['allow_resit'],
     ));
 
     localRedir('/assess/modify/' . $this->arg[0]);
@@ -48,7 +49,8 @@ else {
         'ASSESS_TITLE' => $assess['title'],
         'ASSESS_DESCRIPTION' => $assess['description'],
         'ASSESS_START_DATE'  => date('d/m/Y', $assessStartTime),
-        'ASSESS_FINISH_DATE' => date('d/m/Y', $assessFinishTime)
+        'ASSESS_FINISH_DATE' => date('d/m/Y', $assessFinishTime),
+        'ALLOW_RESIT_CHECKED' => $assess['allow_resit'] == 'true' ? 'checked=\'checked\'' : '',
     ));
 
     /* Render starting times

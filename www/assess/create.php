@@ -18,6 +18,7 @@ if (!empty($_POST)) {
         'start'       => date(DATE_database, $start),
         'finish'      => date(DATE_database, $finish),
         'duration'    => ($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60,
+        'allow_resit' => $_POST['allow_resit'],
     ));
 
     if (!$assess_id) {
