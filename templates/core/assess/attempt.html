@@ -42,57 +42,64 @@ $j(document).ready(function() {
 });
 </script>
 <!-- END custom_head -->
+<div id="assess">
+	<div class="col-1">
+		<h2>{SECTION_TITLE}</h2>
+		<p>{SECTION_DESCRIPTION}</p>
+		
+		<!-- BEGIN question -->
+		<div class='question'>
+			<form action="/assess/saveResponse/{QUESTION_QUESTION_ID}" method="post">
+				<h3>Q{QUESTION_SEQUENCE}) {QUESTION_QUESTION} </h3>
+				({QUESTION_MARKS} marks)
+		
+				<!-- BEGIN answerInputs -->
+				<!-- END answerInputs -->
+		
+				<input type="submit" value="Save Answer" />
+			</form>
+			<div id="question_status_{QUESTION_QUESTION_ID}"></div>
+		</div>
+		<!-- END question -->
+		
+		<!-- BEGIN prevSection -->
+		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}">Previous Section</a> | 
+		<!-- END prevSection -->
+		
+		<!-- BEGIN nextSection -->
+		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}">Next Section</a> |
+		<!-- END nextSection -->
+		
+		<!-- BEGIN endAssess -->
+		<a href="/assess/end/{ASSESS_ASSESS_ID}">Finish</a>
+		<!-- END endAssess -->
+		
 
-<div class="countdownSummary">
-    <div class='countdownSummaryInner'>
-        <h1>Assessment: {ASSESS_TITLE}</h1>
-        <dl>
-            <dt>You started this assessment on</dt>
-            <dd>{ATTEMPT_START}</dd>
+	</div>
 
-            <dt>You must finish this assessment by:</dt>
-            <dd>{ATTEMPT_END}</dd>
-
-            <dt>Time remaining</dt>
-            <dd><div id="countdown"></div></dd>
-        </dl>
-        <div class="float-fix"><!-- --></div>
-    </div>
+	<div class="col-2">
+		
+		<h2>Assessment Name: {ASSESS_TITLE}</h2>
+		<div class="assess-body">
+			<dl>
+				<dt>You started this assessment on</dt>
+				<dd>{ATTEMPT_START}</dd>
+	
+				<dt>You must finish this assessment by:</dt>
+				<dd>{ATTEMPT_END}</dd>
+	
+				<dt>Time remaining</dt>
+				<dd><div id="countdown"></div></dd>
+				<div class="float-fix"></div>
+			</dl>
+			<div class="float-fix"></div>
+			<!-- BEGIN sectionPercentageComplete -->
+			<div id="sectionPercentageComplete_{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}">
+				<div style="border:1px solid #f00;height:10px;clear:both;width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}"></div>
+				{SECTION_PERCENTAGE_COMPLETE_TITLE} <span>{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}</span>%
+			</div>
+			<!-- END sectionPercentageComplete -->
+		</div>
+	</div>
+	
 </div>
-
-<h2>{SECTION_TITLE}</h2>
-<p>{SECTION_DESCRIPTION}</p>
-
-<!-- BEGIN question -->
-<div class='question'>
-    <form action="/assess/saveResponse/{QUESTION_QUESTION_ID}" method="post">
-        <h3>Q{QUESTION_SEQUENCE}) {QUESTION_QUESTION} </h3>
-        ({QUESTION_MARKS} marks)
-
-        <!-- BEGIN answerInputs -->
-        <!-- END answerInputs -->
-
-        <input type="submit" value="Save Answer" />
-    </form>
-    <div id="question_status_{QUESTION_QUESTION_ID}"></div>
-</div>
-<!-- END question -->
-
-<!-- BEGIN prevSection -->
-<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}">Previous Section</a> | 
-<!-- END prevSection -->
-
-<!-- BEGIN nextSection -->
-<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}">Next Section</a> |
-<!-- END nextSection -->
-
-<!-- BEGIN endAssess -->
-<a href="/assess/end/{ASSESS_ASSESS_ID}">Finish</a>
-<!-- END endAssess -->
-
-<!-- BEGIN sectionPercentageComplete -->
-<div id="sectionPercentageComplete_{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}">
-    <div style="border:1px solid #f00;height:10px;clear:both;width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}"></div>
-    {SECTION_PERCENTAGE_COMPLETE_TITLE} <span>{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}</span>%
-</div>
-<!-- END sectionPercentageComplete -->
