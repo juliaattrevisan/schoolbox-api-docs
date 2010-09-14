@@ -1,20 +1,26 @@
-<h2>{ASSESS_TITLE}</h2>
-
-<div>
-    <p><strong>Introduction</strong><br />
-        {ASSESS_DESCRIPTION}
-    </p>
-    <p>
-        Time allowed: {DURATION}
-    </p>
-
-    <ul>
-        <!-- BEGIN section -->
-        <li>Section {SECTION_SEQUENCE}: {SECTION_TITLE} ({SECTION_NUMQUESTIONS} questions)</li>
-        <!-- END section -->
-    </ul>
-</div>
-
-<div>
-    <a href="/assess/attempt/{ASSESS_ASSESS_ID}/{FIRST_SECTION}">Begin test</a>
+<div id="assess">
+	<div class="assess-header">
+		<h2>{ASSESS_TITLE}</h2>
+		<div class="assess-body">
+			<div>
+				<p><strong>Introduction</strong><br />
+					{ASSESS_DESCRIPTION}
+				</p>
+				<p>
+					<strong>Time allowed: </strong><br />
+					{DURATION}
+				</p>
+			
+				<ul><li><strong>Sections:</strong></li>
+					<!-- BEGIN section -->
+					<li>Section {SECTION_SEQUENCE}: {SECTION_TITLE} ({SECTION_NUMQUESTIONS} questions)</li>
+					<!-- END section -->
+				</ul>
+			</div>
+			
+			<div>
+				<a class="green-go" href="/assess/attempt/{ASSESS_ASSESS_ID}/{FIRST_SECTION}">Begin test</a>
+			</div>
+		</div>
+	</div>
 </div>

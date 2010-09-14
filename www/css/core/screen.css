@@ -360,26 +360,40 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess .grey-highlight{line-height:16px;}
 	#assess .hidden-clone{display:none;}
 	
+	#assess .col-1 .answerList li span{position:absolute; top:4px; left:5px; height:15px; width:16px;background: #E0F2DF url("/images/core/assess/correct-incorrect.gif") no-repeat;}
+	#assess .col-1 .answerList li {background:#E0F2DF;  float:left;margin:0 10px 10px 0;}
+	
 	/*tiny mce*/
-	.mceContentBody p span{padding:1px 2px; background:#f0f0f0; border: 1px solid #dbdbdb;}
+	.mceContentBody p span{padding:1px 2px; background:#E0F2DF; border: 1px solid #dbdbdb;}
 	#assess table.mceLayout tr.mceFirst td,#assess table.mceLayout tr.mceLast td,#assess table.mceLayout tr.mceFirst td, .defaultSkin .mceIframeContainer  {border:0;}
 	#assess .defaultSkin table.mceLayout,#assess .defaultSkin table.mceLayout tr.mceFirst td{border:0 none;}
 	#assess .defaultSkin td.mceCenter table{margin:0; width:100px;}
 	#assess .defaultSkin td.mceCenter table td{}
+	
+	.section-box{margin-bottom:10px;}
 	#assess .section-box h3{background:#1597cb; padding:5px; margin:0; font-size:11px; color:#fff;}
 	.section-box ul{margin:0; border:1px solid #dbdbdb; border-top:0; border-bottom:0;}
-	.section-box ul.section-options{width:auto; position:absolute; right:6px; top:6px; border:0;}
-	#assess .section-box ul.section-options ul{ height:auto;border-top:1px solid #ccc; display:none; position:absolute; top:13px; right:0; width:100px;}
-	.section-box{margin-bottom:10px;}
-	.section-box ul.section-options ul li{background:#fff;}
-	.section-box ul.section-options ul a{display:block; padding:5px; backgrond:#fff; color:#255297}
+	.section-box ul.section-options{width:13px; position:absolute; right:6px; top:6px; border:0;}
+	#assess .section-box ul.section-options ul{border-top:1px solid #CCCCCC;
+display:none;
+height:auto;
+min-height:10px;
+position:absolute;
+right:0;
+top:13px;
+width:100px;}
+	.section-box ul.section-options ul a{display:block;padding:5px; backgrond:#fff; color:#255297}
+	.section-box ul.section-options ul li{background:#fff; width:100px;}
+	.section-box ul.section-options ul li.parent{line-height:normal; border:0; }
+	.section-box ul.section-options a.drop-arrow{ 
+	background:  url(/images/core/assess/section-dropd-down.gif) no-repeat;width:13px; height:13px;display:block;padding:0; margin:0;}
+	.section-box ul.section-options a.drop-arrow:hover{background-position:bottom; cursor:pointer;}
 	.section-box ul li{margin:0;font-size:11px;line-height:16px;background:#f1f7fa; border-bottom:1px solid #dbdbdb;}
 	.section-box ul li p{padding:10px; margin:0;}
 	.section-box ul li p.links{padding:0 10px 10px 10px;}
 	.section-box ul li span{font-weight:bold;}
-	.section-box ul li a{color: #255297; padding:0; font-size:10px; display:inline-block;}
-	.section-box h3 span{width:13px; height:13px; float:right; text-indent:-9999em; font-size:1px; background: url(/images/core/assess/section-dropd-down.gif)  no-repeat;}
-	#assess .add-section{background:url(/images/core/assess/add-section.gif) no-repeat 6px 50%; display:block; background-color:#ededed; font-size:10px; padding:9px 0 8px 28px; display:block; font-size:10px; }
+	.section-box ul li a{color: #255297; padding:0; font-size:10px; }
+	#assess .add-section{background: #ebebeb url(/images/core/assess/add-section.gif) no-repeat 6px 50%; display:block;font-size:10px; padding:9px 0 8px 28px; display:block; font-size:10px; }
 	
 	.section-box h3 span:hover{background-position:bottom; cursor:pointer;}
 	
