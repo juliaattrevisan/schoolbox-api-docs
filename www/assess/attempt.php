@@ -61,29 +61,26 @@ $this->setVar(array(
     'SECTION_DESCRIPTION' => $section['description'],
 ));
 
-/* Load all the questions for this section.
- *
-if ($section->random) {
-    if (!$section->hasThisAttempt()) {
-        $sectionHandler->generateRandomSelection($attempt_id);
-    }
-
-    $allQuestions = $sectionHandler->getRandomContents($this->arg[0], $this->arg[1], AssessSection::SECTION_EXCLUDE);
-}
-else {
-    $allQuestions = $sectionHandler->getContents($this->arg[0], $this->arg[1], AssessSection::SECTION_EXCLUDE);
-}
+/* Load all the questions for this section. This saves stubs for each response
+ * and also the questions that were attempted, allowing an overview of which
+ * questions were available during the attempt, even the randomly selected ones
  */
-if ($section['random'] == 1) {
-    if (!is_array($sectionHandler->definedRandomQuestions($_SESSION['attempt_id'], $section['section_id']))) {
-        $sectionHandler->assignRandomQuestions($_SESSION['attempt_id'], $section['section_id'], $section['pool']);
+if (!$responseHandler->numResponsesInSection($_SESSION['attempt_id'], $section['section_id'])) {
+    if ($section['random'] == 1) {
+        $pool = $section['pool'];
+        $randomise = AssessResponse::RANDOMISE_QUESTIONS;
+    }
+    else {
+        $pool = 0;
+        $randomise = AssessResponse::ORDERED_QUESTIONS;
     }
 
-    $allQuestions = $sectionHandler->getRandomContents($this->arg[0], $this->arg[1], $_SESSION['attempt_id'], AssessSection::SECTION_EXCLUDE);
+    $responseHandler->assignQuestions($_SESSION['attempt_id'], $section['section_id'], $pool, $randomise);
 }
-else {
-    $allQuestions = $sectionHandler->getContents($this->arg[0], $this->arg[1], AssessSection::SECTION_EXCLUDE);
-}
+
+/* Load questions
+ */
+$allQuestions = $sectionHandler->getQuestions($_SESSION['attempt_id'], $section['section_id']);
 
 /* Process questions now that we've got a list of 'em
  */

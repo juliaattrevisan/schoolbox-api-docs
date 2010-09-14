@@ -76,9 +76,10 @@ class AssessAnswer extends Model {
      *
      * @param <type> $response
      */
-    function saveResponse($question_id, $processedResponse) {
+    function saveResponse($section_id, $question_id, $processedResponse) {
         $response = array(
             'attempt_id' => $_SESSION['attempt_id'],
+            'section_id' => $section_id,
             'question_id' => $question_id,
             'response' => $processedResponse
         );

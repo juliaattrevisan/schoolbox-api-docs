@@ -154,15 +154,15 @@ class AssessAnswerMatch extends AssessAnswer {
      *
      * @param <type> $response
      */
-    function saveResponse($data, $question_id) {
+    function saveResponse($data) {
         $processedResponse = serialize($data['answerRight']);
 
-        return parent::saveResponse($question_id, $processedResponse);
+        return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
     }
     
     /**
-     * Marks a response. Customised to be applicable to the way in which the
-     * response is actually stored.
+     * Automatically marks a response. Customised to be applicable to the way in
+     * which the response is actually stored.
      */
     function mark($currentResponse) {
         $response = unserialize($currentResponse['response']);

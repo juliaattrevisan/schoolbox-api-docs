@@ -9,7 +9,11 @@ $question = $questionHandler->getByID($this->arg[0]);
 $factory = new AssessFactory();
 $answerHandler = $factory->createAnswerModel($question['type_id']);
 
-$result = $answerHandler->saveResponse($_POST, $this->arg[0]);
+$data = $_POST;
+$data['section_id'] = $question['section_id'];
+$data['question_id'] = $this->arg[0];
+
+$result = $answerHandler->saveResponse($data);
 
 /* Find out how many questions were completed in this section already
  */

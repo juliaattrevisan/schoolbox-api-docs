@@ -76,7 +76,7 @@ class AssessAnswerShort extends AssessAnswer {
      */
     function prepareResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
-        
+
         $currentAnswer = $this->getByQuestionID($question_id);
 
         if ($existing) {
@@ -101,14 +101,15 @@ class AssessAnswerShort extends AssessAnswer {
      *
      * @param <type> $response
      */
-    function saveResponse($data, $question_id) {
+    function saveResponse($data) {
         $processedResponse = $data['answer'];
 
-        return parent::saveResponse($question_id, $processedResponse);
+        return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
     }
 
     /**
-     * Marks a response.
+     * Automatically marks a response. Customised to be applicable to the way in
+     * which the response is actually stored.
      */
     function mark() {
     }
@@ -116,7 +117,7 @@ class AssessAnswerShort extends AssessAnswer {
     /**
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
-     * 
+     *
      * @param <type> $page
      * @param <type> $question_id
      */
