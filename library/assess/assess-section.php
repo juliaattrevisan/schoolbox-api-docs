@@ -103,7 +103,7 @@ class AssessSection extends Model {
      * @param <type> $section_id
      */
     function getQuestions($attempt_id, $section_id) {
-        $query = "SELECT 
+        $query = "SELECT
                       assess_response.question_id,
                       assess_question.type_id,
                       assess_question.sequence,
@@ -116,42 +116,6 @@ class AssessSection extends Model {
 
         return $this->db->getAll($query);
     }
-
-//    /**
-//     * Gets a list of Sections and Questions that exist in a particular Assess.
-//     * Optionally exclude Sections when just getting Questions for a section,
-//     * rather than a full index.
-//     *
-//     * This modified version of getContents() allows for random selections
-//     *
-//     * @param <type> $section_id
-//     * @return <type>
-//     */
-//    function getRandomContents($assess_id, $section_id, $attempt_id, $sectionExclusion = false) {
-//        $query = "SELECT assess_id,
-//                         assess_section.section_id,
-//                         assess_section.title,
-//                         assess_section.sequence AS sectionSequence,
-//                         assess_question.*
-//                  FROM {$this->_table}
-//                  LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
-//                  WHERE assess_id = '$assess_id'
-//                  AND {$this->_table}.{$this->_index} = '$section_id'
-//                  AND question_id IN (
-//                      SELECT question_id
-//                      FROM assess_section_random_question
-//                      WHERE attempt_id = '$attempt_id'
-//                      AND section_id = '$section_id'
-//                  )";
-//
-//        if ($sectionExclusion) {
-//            $query .= " AND question_id IS NOT NULL";
-//        }
-//
-//        $query .= " ORDER BY sectionSequence, assess_question.sequence";
-//
-//        return $this->db->getAll($query);
-//    }
 
     /**
      * Get a list of Sections for an Assess.
@@ -202,20 +166,16 @@ class AssessSection extends Model {
         $sectionList = $this->getList($section['assess_id']);
 
         foreach ($sectionList as $currentSection) {
-            $numResponses = "SELECT
-                                 COUNT(response_id) AS num
-                             FROM assess_response
-                             LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
-                             WHERE attempt_id = '$_SESSION[attempt_id]'
-                             AND assess_question.section_id = '$currentSection[section_id]'";
-
             $numQuestions = "SELECT
                                  COUNT(question_id) AS num
-                             FROM assess_question
-                             WHERE assess_question.section_id = '$currentSection[section_id]'";
+                             FROM assess_response
+                             WHERE attempt_id = '$_SESSION[attempt_id]'
+                             AND assess_response.section_id = '$currentSection[section_id]'";
 
-            $currentSection['numResponses'] = $this->db->getOne($numResponses);
+            $numResponses = $numQuestions .= " AND response IS NOT NULL";
+
             $currentSection['numQuestions'] = $this->db->getOne($numQuestions);
+            $currentSection['numResponses'] = $this->db->getOne($numResponses);
 
             if ($currentSection['numQuestions'] > 0) {
                 $currentSection['percentageComplete'] = round(100 * $currentSection['numResponses'] / $currentSection['numQuestions']);
@@ -223,7 +183,7 @@ class AssessSection extends Model {
             else {
                 $currentSection['percentageComplete'] = 0;
             }
-            
+
             $completion[] = $currentSection;
         }
 

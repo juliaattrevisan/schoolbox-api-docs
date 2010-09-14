@@ -117,7 +117,7 @@ class AssessAnswerMatch extends AssessAnswer {
                 $answerCount++;
             }
 
-            if ($existing) {
+            if ($existing['response']) {
                 $right = unserialize($existing['response']);
             }
             else {
@@ -195,7 +195,7 @@ class AssessAnswerMatch extends AssessAnswer {
 
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
-        if ($existing) {
+        if ($existing['response']) {
             $right = unserialize($existing['response']);
         }
 

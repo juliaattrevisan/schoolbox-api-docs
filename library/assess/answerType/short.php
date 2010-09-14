@@ -79,7 +79,7 @@ class AssessAnswerShort extends AssessAnswer {
 
         $currentAnswer = $this->getByQuestionID($question_id);
 
-        if ($existing) {
+        if ($existing['response']) {
             $page->setVar(array(
                 'ANSWER_ID' => $currentAnswer['answer_id'],
                 'ANSWER' => $existing['response'],
@@ -126,7 +126,7 @@ class AssessAnswerShort extends AssessAnswer {
 
         $currentAnswer = $this->getByQuestionID($question_id);
 
-        if ($existing) {
+        if ($existing['response']) {
             $page->setVar(array(
                 'ANSWER_ID' => $currentAnswer['answer_id'],
                 'ANSWER' => $existing['response'],

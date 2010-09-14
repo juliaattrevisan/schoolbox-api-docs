@@ -108,7 +108,7 @@ class AssessAnswerMulti extends AssessAnswer {
                     'ANSWER_DESCRIPTION' => $currentAnswer->description,
                 ));
 
-                if ($existing) {
+                if ($existing['response']) {
                     $existingAnswer = unserialize($existing['response']);
 
                     if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {

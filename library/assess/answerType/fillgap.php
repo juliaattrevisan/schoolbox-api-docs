@@ -111,7 +111,7 @@ class AssessAnswerFillgap extends AssessAnswer {
         
         $currentAnswer = $this->getByQuestionID($question_id);
 
-        if ($existing) {
+        if ($existing['response']) {
             $existingAnswer = unserialize($existing['response']);
 
             /* Prepare a special way to show Fillgap answers. This replaces
@@ -223,7 +223,7 @@ class AssessAnswerFillgap extends AssessAnswer {
         $replace = " <span class='fillgapCorrect'>$1</span> ";
         $correctResponse = preg_replace($pattern, $replace, $currentAnswer['answer']);
 
-        if ($existing) {
+        if ($existing['response']) {
             $existingAnswer = unserialize($existing['response']);
 
             /* Prepare a special way to show Fillgap answers. This replaces
