@@ -227,35 +227,37 @@ class AssessAnswerMulti extends AssessAnswer {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => 'checked=\'checked\'',
                         ));
+
+                        /* Was this a correctly-selected response? If so apply a
+                         * special class to it. The three cases are:
+                         *
+                         * Correct response, selected
+                         * Incorrect response, selected
+                         * Unselected
+                         */
+                        if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
+                            $page->setVar(array(
+                                'CORRECT' => self::CORRECT_CLASS,
+                            ));
+                        }
+                        else if (in_array($currentAnswer->value, $existingAnswer)) {
+                            $page->setVar(array(
+                                'CORRECT' => self::INCORRECT_CLASS,
+                            ));
+                        }
+                        else {
+                            $page->setVar(array(
+                                'CORRECT' => ''
+                            ));
+                        }
                     }
                     else {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => '',
-                        ));
-                    }
-
-                    /* Was this a correctly-selected response? If so apply a
-                     * special class to it. The three cases are:
-                     *
-                     * Correct response, selected
-                     * Incorrect response, selected
-                     * Unselected
-                     */
-                    if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
-                        $page->setVar(array(
-                            'CORRECT' => self::CORRECT_CLASS,
-                        ));
-                    }
-                    else if (in_array($currentAnswer->value, $existingAnswer)) {
-                        $page->setVar(array(
-                            'CORRECT' => self::INCORRECT_CLASS,
-                        ));
-                    }
-                    else {
-                        $page->setVar(array(
                             'CORRECT' => ''
                         ));
                     }
+
                 }
                 else {
                     $page->setVar(array(

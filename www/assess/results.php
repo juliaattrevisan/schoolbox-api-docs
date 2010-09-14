@@ -70,6 +70,13 @@ foreach($allAttempts as $currentAttempt) {
      */
     $totalAvailableMarks = $attemptHandler->getTotalMarks($this->arg[0], $currentAttempt['attempt_id']);
 
+    if ($totalAvailableMarks > 0) {
+        $percentage = round(100 * $currentAttempt['totalMarks'] / $totalAvailableMarks);
+    }
+    else {
+        $percentage = 0;
+    }
+
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $this->arg[0],
         'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
@@ -79,7 +86,7 @@ foreach($allAttempts as $currentAttempt) {
         'ATTEMPT_TIME_TAKEN' => $timeTaken,
         'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
         'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
-        'ATTEMPT_PERCENTAGE' => round(100 * $currentAttempt['totalMarks'] / $totalAvailableMarks),
+        'ATTEMPT_PERCENTAGE' => $percentage,
     ));
 
     $this->parse('attempt_block', 'attempt', true);

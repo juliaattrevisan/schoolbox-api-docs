@@ -112,7 +112,8 @@ class AssessSection extends Model {
                   FROM assess_response
                   LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
                   WHERE assess_response.attempt_id = '$attempt_id'
-                  AND assess_response.section_id = '$section_id'";
+                  AND assess_response.section_id = '$section_id'
+                  ORDER BY assess_question.sequence";
 
         return $this->db->getAll($query);
     }
