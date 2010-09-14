@@ -222,7 +222,7 @@ class AssessAnswerMulti extends AssessAnswer {
                     'ANSWER_DESCRIPTION' => $currentAnswer->description,
                 ));
 
-                if ($existing) {
+                if ($existing['response']) {
                     if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => 'checked=\'checked\'',

@@ -126,22 +126,18 @@ class AssessAnswerShort extends AssessAnswer {
 
         $currentAnswer = $this->getByQuestionID($question_id);
 
-        if ($existing['response']) {
-            $page->setVar(array(
-                'ANSWER_ID' => $currentAnswer['answer_id'],
-                'ANSWER' => $existing['response'],
-                'RESPONSE_ID' => $existing['response_id'],
-                'REVIEWED_MARKS' => $existing['mark'],
-            ));
-        }
-        else {
-            $page->setVar(array(
-                'ANSWER_ID' => $currentAnswer['answer_id'],
-                'ANSWER' => '',
-                'RESPONSE_ID' => $existing['response_id'],
-                'REVIEWED_MARKS' => 0,
-            ));
-        }
+        /* Removed this check because it was wrongly matching a blank saved
+         * response with no response at all, preventing reviewed marks from
+         * displaying properly.
+         *
+         * if ($existing['response'] != null) { ... } else { ... }
+         */
+        $page->setVar(array(
+            'ANSWER_ID' => $currentAnswer['answer_id'],
+            'ANSWER' => $existing['response'],
+            'RESPONSE_ID' => $existing['response_id'],
+            'REVIEWED_MARKS' => $existing['mark'],
+        ));
 
         /* Show correct answer
          */
