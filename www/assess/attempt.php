@@ -33,7 +33,7 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  * has already expired; if either is the case, redirect to end screen and force
  * test completion.
  */
-if ($attemptHandler->isComplete($this->arg[0]) || ($attemptTimeRemaining <= 0)) {
+if (($attemptHandler->isComplete($this->arg[0]) && ($assess['allow_resit'] == 'false')) || ($attemptTimeRemaining <= 0)) {
     localRedir('/assess/end/' . $this->arg[0]);
     exit();
 }
@@ -65,7 +65,7 @@ $this->setVar(array(
  * and also the questions that were attempted, allowing an overview of which
  * questions were available during the attempt, even the randomly selected ones
  */
-if (!$responseHandler->numResponsesInSection($_SESSION['attempt_id'], $section['section_id'])) {
+if (!$responseHandler->numStubResponsesInSection($_SESSION['attempt_id'], $section['section_id'])) {
     if ($section['random'] == 1) {
         $pool = $section['pool'];
         $randomise = AssessResponse::RANDOMISE_QUESTIONS;

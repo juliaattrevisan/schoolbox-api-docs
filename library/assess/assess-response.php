@@ -82,19 +82,21 @@ class AssessResponse extends Model {
     function numResponses($attempt_id) {
         $query = "SELECT COUNT(*) AS numQuestionsAttempted
                   FROM {$this->_table}
-                  WHERE attempt_id = '$attempt_id'";
+                  WHERE attempt_id = '$attempt_id'
+                  AND response IS NOT NULL";
 
         return $this->db->getOne($query);
     }
 
     /**
-     * Find the number of responses in $attempt_id and $section_id
+     * Find the number of STUB RESPONSES that have been set up in $attempt_id
+     * and $section_id
      *
      * @param <type> $attempt_id
      * @param <type> $section_id
      * @return <type>
      */
-    function numResponsesInSection($attempt_id, $section_id) {
+    function numStubResponsesInSection($attempt_id, $section_id) {
         $query = "SELECT COUNT(*) AS num
                   FROM {$this->_table}
                   WHERE attempt_id = '$attempt_id'
