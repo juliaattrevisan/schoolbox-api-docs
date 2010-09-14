@@ -172,7 +172,8 @@ class AssessSection extends Model {
                              WHERE attempt_id = '$_SESSION[attempt_id]'
                              AND assess_response.section_id = '$currentSection[section_id]'";
 
-            $numResponses = $numQuestions .= " AND response IS NOT NULL";
+            $numResponses = $numQuestions;
+            $numResponses .= " AND response IS NOT NULL";
 
             $currentSection['numQuestions'] = $this->db->getOne($numQuestions);
             $currentSection['numResponses'] = $this->db->getOne($numResponses);
