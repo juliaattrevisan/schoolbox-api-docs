@@ -1,40 +1,53 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" media="screen" href="/css/core/assess.css" />
 <!-- END custom_head -->
-
+<div id="assess">
 <h1>Create Section in {ASSESS_TITLE}</h1>
-<form name="create" action="/assess/section/create" class="standardForm" method="post">
-    <fieldset>
-        <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
-        <input name="section_id" type="hidden" value="{SECTION_ID}" />
-        <input name="sequence" type="hidden" value="{SEQUENCE}" />
-    </fieldset>
+<div class="col-1">
 
-    <fieldset>
-        <label>Section Title</label>
-        <input name="title" type="text" size="35" />
-    </fieldset>
-
-    <fieldset>
-        <label>Random</label>
-        <input name="random" type="checkbox" value="1"/> Questions should be selected randomly
-    </fieldset>
-
-    <fieldset>
-        <label>Pool</label>
-        <input name="pool" type="text" /> Maximum number of questions to show
-    </fieldset>
-
-    <fieldset>
-        <label>Description</label>
-        <textarea name="description"></textarea>
-    </fieldset>
-
-    <fieldset>
-        <input type="submit" id="create" value="Create Section" class="btn"/>
-    </fieldset>
-</form>
+	<div class="assess-header">
+		<h2>Section Details</h2>
+		<div class="assess-body">
+		
+			<form name="create" action="/assess/section/create" class="standardForm" method="post">
+		<fieldset class="hidden">
+			<input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
+			<input name="section_id" type="hidden" value="{SECTION_ID}" />
+			<input name="sequence" type="hidden" value="{SEQUENCE}" />
+		</fieldset>
+			<fieldset>
+				<label>Section Title</label>
+				<input name="title" type="text" size="35" />
+			</fieldset>
+			<hr />
+			<fieldset>
+				<label>Random</label>
+				<input name="random" type="checkbox" value="1"/> Questions should be selected randomly
+			</fieldset>
+			<hr />
+			<fieldset>
+				<label>Pool</label>
+				<input name="pool" type="text" /> Maximum number of questions to show
+			</fieldset>
+			<hr />
+			<fieldset>
+				<label>Description</label>
+				<div class="textarea-container">
+				<textarea name="description"></textarea>
+				</div>
+			</fieldset>
+			
+					<fieldset>
+			<input type="submit" id="create" value="Create Section" class="next-step"/>
+		</fieldset>
+	</form>
+		</div>
+		</div>
+		</div>
+<div class="col-2">
 
 <!-- BEGIN allQuestions -->
 
 <!-- END allQuestions -->
+</div>
+</div>

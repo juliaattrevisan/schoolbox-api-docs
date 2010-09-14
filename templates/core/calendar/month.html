@@ -91,9 +91,9 @@
         </thead>
         <tbody>
         <!-- BEGIN month_week -->
-        <tr class="month-week {OTHER_MONTH} {MONTABLE_CSS}">
+        <tr class="month-week ">
         	<!-- BEGIN day_block -->
-        	<td class="day-block ">
+        	<td class="day-block {OTHER_MONTH} {MONTABLE_CSS}">
 				<div class="dayWrap">
 					<p class="header_option">{ADD}</p>
 					<p class="day-num">{DATE}</p>
@@ -106,7 +106,7 @@
 							<span style="background-color:{COLOUR}; border:1px solid {COLOUR};"><!-- BEGIN time --><div class="time">{TIME}</div><!-- END time -->{NOTE}<br /></span>
 							<div class="hidden-fields">
 								<div class="author"><a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></div>
-								<h4><!-- BEGIN time --><span class="time">{TIME}</span><!-- END time -->{NOTE}</h4>
+								<h4><strong>{time_block}</strong>{NOTE}</h4>
 								<p class="meta">Event Type: {TYPE}</p>
 								<div class="modify">{MODIFY}</div>
 							</div>

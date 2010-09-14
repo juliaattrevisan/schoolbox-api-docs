@@ -1,136 +1,40 @@
 /* Create Assess
  */
-label {
-    width: 100px;
-    font-weight: bold;
-    margin: 8px 0px;
-    display: block;
-    float: left;
-    clear: left;
-}
 
-.allQuestions li span {
-    font-weight: bold;
-}
-
+.allQuestions li span { font-weight: bold; }
 /* Attempt
  */
-.question {
-    margin-bottom: 30px;
-}
-
-.question label {
-    display: none;
-}
-
-.countdownSummary {
-   border: 1px solid #ddd;
-   background-color: #fafafa;
-   margin-bottom: 20px;
-}
-
-.countdownSummary .countdownSummaryInner {
-    padding: 20px;
-}
-
-.countdownSummary dl dt,
-.countdownSummary dl dd {
-    width: 220px;
-    margin-bottom: 10px;
-    float: left;
-}
-
-.countdownSummary dl dt {
-    clear: left;
-}
-
-#countdown {
-    width: 150px;
-    padding: 0px;
-}
-
+.question { margin-bottom: 30px; }
+.question label { display: none; }
+.countdownSummary { border: 1px solid #ddd; background-color: #fafafa; margin-bottom: 20px; }
+.countdownSummary .countdownSummaryInner { padding: 20px; }
+.countdownSummary dl dt, .countdownSummary dl dd { width: 220px; margin-bottom: 10px; float: left; }
+.countdownSummary dl dt { clear: left; }
+#countdown { width: 150px; padding: 0px; }
 /* Edit Multiple Choice answers
  */
-div.answerCollection {
-    width: 400px;
-    float: left;
-}
 
-#answerCollection input.answerCode {
-    width: 30px;
-}
-
-#answerCollection input.answerDescription {
-    width: 250px;
-}
-
+#answerCollection input.answerCode { width: 30px; }
+#answerCollection input.answerDescription { width: 250px; }
 /* Edit Fillgap answers
  */
-div.answerList {
-    width: 500px;
-    display: block;
-    float: left;
-}
-
-#answerBox_addSpans.make-blank,
-#answerBox_addSpans.make-blank:hover {
-    border:none;
-    width:95px;
-    height:25px;
-    text-indent:-9999em;
-    display:block;
-    margin-right:10px;
-    background: url(/images/corev2/assess/make-blank-btn.gif) no-repeat;
-    cursor:pointer;
-}
-
-#answerBox_addSpans.make-blank:hover {
-    background-position:bottom;
-}
-
+div.answerList { width: 500px; display: block; float: left; }
+#answerBox_addSpans.make-blank, #answerBox_addSpans.make-blank:hover { border:none; width:95px; height:25px; text-indent:-9999em; display:block; margin-right:10px; background: url(/images/corev2/assess/make-blank-btn.gif) no-repeat; cursor:pointer; }
+#answerBox_addSpans.make-blank:hover { background-position:bottom; }
 /* Respond to Matching Pairs
  */
-ul.matchPairs {
-    width: 200px;
-    margin-top: 10px;
-    float: left;
-}
-
-ul.matchPairs li {
-    padding: 4px;
-    cursor: move;
-}
-
-ul.matchPairs li:hover {
-    background-color: #eee;
-}
-
+ul.matchPairs { width: 200px; margin-top: 10px; float: left; }
+ul.matchPairs li { padding: 4px; cursor: move; }
+ul.matchPairs li:hover { background-color: #eee; }
 /* Review Fillgap
  */
-span.fillgapCorrect {
-    color: #0f0;
-}
-
-span.fillgapIncorrect {
-    color: #f00;
-}
-
+span.fillgapCorrect { color: #0f0; }
+span.fillgapIncorrect { color: #f00; }
 /* Review Multichoice
  */
-li.multiCorrect {
-   background-color: #0a0;
-}
-
-li.multiIncorrect {
-    background-color: #a00;
-}
-
+li.multiCorrect { background-color: #0a0; }
+li.multiIncorrect { background-color: #a00; }
 /* Review Matching Pairs
  */
-li.matchCorrect {
-   background-color: #aa0;
-}
-
-li.matchIncorrect {
-    background-color: #a0a;
-}
+li.matchCorrect { background-color: #aa0; }
+li.matchIncorrect { background-color: #a0a; }

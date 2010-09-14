@@ -23,16 +23,19 @@ $j(document).ready(function() {
 </script>
 <!-- END custom_head -->
 
+<div id="assess">
 <h1>Manage Assessment {ASSESS_TITLE}</h1>
+<div class="col-1">
+<h2>Details</h2>
 <form name="create" action="/assess/{ACTION}/{ASSESS_ASSESS_ID}" class="standardForm" method="post">
     <table>
         <tr>
-            <td class="formLabelWidth"><h3>Title</h3></td>
+            <td class="formLabelWidth"><h3>Title</h3><h4>The name of the test</h4></td>
             <td><input name="title" type="text" size="35" maxlength="50" value="{ASSESS_TITLE}" /></td>
         </tr>
         <tr>
             <!-- Available from this time -->
-            <td><h3>Start</h3></td>
+            <td><h3>Start</h3><h4>Test opens at this time</h4></td>
             <td>
                 <select name="start[hour]">
                     <!-- BEGIN startHour -->
@@ -55,7 +58,8 @@ $j(document).ready(function() {
         </tr>
         <tr>
             <!-- Available until this time -->
-            <td><h3>Finish</h3></td>
+            <td><h3>Finish</h3>
+            <h4>Test closes at this time</h4></td>
             <td>
                 <select name="finish[hour]">
                     <!-- BEGIN finishHour -->
@@ -77,7 +81,7 @@ $j(document).ready(function() {
             </td>
         </tr>
         <tr>
-            <td><h3>Duration</h3></td>
+            <td><h3>Duration</h3><h4>Time available for completion</h4></td>
             <td>
                 <select name="duration[hour]">
                     <!-- BEGIN durationHour -->
@@ -93,15 +97,17 @@ $j(document).ready(function() {
         </tr>
         <tr>
             <td><h3>Description</h3></td>
-            <td><textarea name="description" style="width: 100%;height: 250px;">{ASSESS_DESCRIPTION}</textarea></td>
+            <td><div class="textarea-container"><textarea name="description" style="width: 100%;height: 250px;">{ASSESS_DESCRIPTION}</textarea></div></td>
         </tr>
         <tr>
             <td>&nbsp;</td>
-            <td><input type="submit" value="Save" /></td>
+            <td><input type="submit" value="Continue" class="next-step" /></td>
         </tr>
     </table>
 </form>
-
+</div>
+</div>
+<div class="clear"></div>
 <!-- BEGIN allQuestions -->
 
 <!-- END allQuestions -->

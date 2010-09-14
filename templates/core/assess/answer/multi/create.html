@@ -50,18 +50,32 @@ $j(document).ready(function() {
 
     /* Add a new answer option
      */
-    $j('#makeNewAnswer').click(function() {
-        var clone = $j('.answerTemplate').clone();
-        clone.removeClass('answerTemplate');
-
-        /* Remove an answer option
-         */
-        clone.find('.removeAnswer').click(function() {
-            $j(this).closest('li').remove();
-        });
-
-        $j('#answerCollection').append(clone);
+    $j('#makeNewAnswer').live('click', function() {
+		var thing = $j('.hidden-clone ul:first-child').clone();
+		$j('ul#answerCollection').append(thing);
+		refreshList()
     });
+	
+	/* Remove an answer option
+	 */
+	$j('.delete').live('click', function(){
+		if (($j('.inputs').length) !== 1) {
+			$j(this).parent().remove();
+			refreshList()
+		}	
+    });
+	
+	function refreshList() {
+		var alphabetStart = 65;
+		$j('li.inputs > div.list-item').each(function() {	
+		  var $this = $j(this);
+		  $this.children('span').html('&#' + alphabetStart + ';)'); 
+		  var convert = String.fromCharCode(alphabetStart);
+		  $this.children('input').val(convert);
+		  alphabetStart++;
+		});
+	}
+	
 });
 </script>
 
@@ -69,17 +83,28 @@ $j(document).ready(function() {
     <label>Answer</label>
     <div class="answerCollection">
         <ul id="answerCollection" >
+			<li class="inputs">
+				<div class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></div>
+				<input name="answer[]" class="answerCorrect checkbox" checkbox="checkbox" type="checkbox" value="" />
+				<div class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></div>
+				<div class="delete"></div>
+				<div class="float-fix"></div>
+			</li>		
         </ul>
-        <p><a id="makeNewAnswer">Add answer option</a></p>
+        <a class="add-answer" id="makeNewAnswer">Add answer option</a>
     </div>
-    <div style="display:none">
+	
+	<div class="hidden-clone">
         <ul>
-            <li class="answerTemplate">
-                <input name="answer[]" class="answerCorrect" type="checkbox" value="" />
-                <input name="answerCode[]" class="answerCode" type="text" value="" />
-                <input name="answerDescription[]" class="answerDescription" type="text" value="" />
-                <a class="removeAnswer">Remove</a>
-            </li>
+			<li class="inputs">
+				<div class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></div>
+				<input name="answer[]" class="answerCorrect checkbox" checkbox="checkbox" type="checkbox" value="" />
+				<div class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></div>
+				<div class="delete"></div>
+				<div class="float-fix"></div>
+			</li>		
         </ul>
+        <a class="add-answer" id="makeNewAnswer">Add answer option</a>
     </div>
+
 </fieldset>

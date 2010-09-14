@@ -48,35 +48,48 @@ $j(document).ready(function() {
 
     /* Add a new answer option
      */
-    $j('#makeNewAnswer').click(function() {
-        var clone = $j('.answerTemplate').clone();
-        clone.removeClass('answerTemplate');
-
-        /* Remove an answer option
-         */
-        clone.find('.removeAnswer').click(function() {
-            $j(this).closest('li').remove();
-        });
-
-        $j('#answerCollection').append(clone);
+	$j('#makeNewAnswer').live('click', function() {
+		var thing = $j('.hidden-clone ul:first-child').clone();
+		$j('ul#answerCollection').append(thing);
+		refreshList()
     });
+	
+	/* Remove an answer option
+	 */
+	$j('.delete').live('click', function(){
+		if (($j('.inputs').length) !== 1) {
+			$j(this).parent().remove();
+			refreshList()
+		}	
+    });
+		
 });
 </script>
 <fieldset>
     <label>Answer</label>
     <div class="answerCollection">
-        <ul id="answerCollection" >
-        </ul>
-        <p><a id="makeNewAnswer">Add answer option</a></p>
+        <ul id="answerCollection">			
+			<li class="answerTemplate inputs">
+				<div class="drag-me left-option"><input name="answerLeft[]" class="answerLeft text-box" type="text" value="" /></div>
+				<div class="arrow"><span></span></div>
+				<div class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="" /></div>
+				<div class="delete"></div>
+				<div class="float-fix"></div>
+			</li>
+		</ul>
     </div>
-    <div style="display:none">
-        <ul>
-            <li class="answerTemplate">
-                <input name="answerLeft[]" class="answerLeft" type="text" value="" />
-                matches
-                <input name="answerRight[]" class="answerRight" type="text" value="" />
-                <a class="removeAnswer">Remove</a>
-            </li>
-        </ul>
-    </div>
+	<p><a class="add-answer" id="makeNewAnswer">Add answer option</a></p>
+	
+	<div class="hidden-clone">
+	    <ul>			
+			<li class="answerTemplate inputs">
+				<div class="drag-me left-option"><input name="answerLeft[]" class="answerLeft text-box" type="text" value="" /></div>
+				<div class="arrow"><span></span></div>
+				<div class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="" /></div>
+				<div class="delete"></div>
+				<div class="float-fix"></div>
+			</li>
+		</ul>
+	</div>
+	
 </fieldset>

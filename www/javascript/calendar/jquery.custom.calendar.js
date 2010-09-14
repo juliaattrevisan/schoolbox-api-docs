@@ -56,9 +56,10 @@
 		function filterChecker() {
 			//specify filter hierarchy
 
-			filterLoop('events');	
+				
 			filterLoop('groups');
 			filterLoop('campus');
+			filterLoop('events');
 
 			$j('.filter-drop').hide();	
 			

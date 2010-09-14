@@ -89,8 +89,8 @@ CSS commands
 --------------------------------------------------------------*/
 h1, h2, h3, h4, h5, h6 { font-weight:normal; position:relative; margin:0;}
 h1 span, h2 span, h3 span, h4 span { font-weight:bold }
-h1 {background:url(/images/core/body/h1-backing.jpg) 0 100% repeat-x;margin:0; border:0; font-size:1.33em; font-weight:bold; line-height:2; margin-bottom:1em; margin-left:-5px; padding:0 0 0 5px;}
-h2 {margin:0; -moz-border-radius:5px 5px 0 0; border-radius:5px 5px 0 0; -webkit-border-radius:5px 5px 0 0; background:#0066b0 url(/images/core/body/heading-cover.png) repeat-x;; font-size:12px; height:29px; line-height:29px; text-indent:10px; }
+h1{background:url(/images/core/body/h1-backing.jpg) 0 100% repeat-x;margin:0; border:0; font-size:1.33em; font-weight:bold; line-height:2; margin-bottom:1em; margin-left:-5px; padding:0 0 0 5px;}
+h2, .homepage h2 {margin:0; -moz-border-radius:5px 5px 0 0; border-radius:5px 5px 0 0; -webkit-border-radius:5px 5px 0 0; background:#0066b0 url(/images/core/body/heading-cover.png) repeat-x;; font-size:12px; height:29px; line-height:29px; text-indent:10px; }
 h3 { font-size:1em; line-height:1; }
 h4 {font-weight:normal; line-height:1.4; margin:0; font-size:12px;}
 h5 { font-size:1em; font-weight:bold; margin-bottom:1.5em; }
@@ -121,7 +121,6 @@ th { font-weight:bold; }
 #container { margin-left: 176px; min-width: 785px; padding: 15px; }
 #content { padding: 0;  width: 100%; min-width:800px;}
 #content h2,#content h2 span a, #content h2 a{color: #ffffff;}
-
 
 /*HEADER*/
 #header { border-bottom:1px solid #B8B8B8;position:relative;height: 116px; padding-right: 15px; border: 0; background: url(/images/core/header-background.gif) repeat-x; }
@@ -159,7 +158,7 @@ th { font-weight:bold; }
 	/*TABBED NAV*/
 	#tabs { bottom:-1px;margin:0;padding:0;position:absolute;right:20px;bottom: 0; right: 15px; }
 	#tabs li {z-index:1;  float: right; position: relative; }
-	#tabs li a { background:#f3f3f3; margin: 0 5px 0 0 ;line-height:31px; -moz-border-radius: 10px 10px 0 0; -webkit-border-radius: 10px 10px 0 0; border-radius:10px 10px 0 0; color: #024d8d; height: 31px; display: block; float: left; padding: 0; cursor: pointer; }
+	#tabs li a {border:0; background:#f3f3f3; margin: 0 5px 0 0 ;line-height:31px; -moz-border-radius: 10px 10px 0 0; -webkit-border-radius: 10px 10px 0 0; border-radius:10px 10px 0 0; color: #024d8d; height: 31px; display: block; float: left; padding: 0; cursor: pointer; }
 	#tabs li a span {  height: 31px; display: block; float: left; padding: 0 7px 0 30px; }
 	#tabs li a span.end { height: 31px; width: 21px; float:left; padding: 0; }
 	#header #tabs li.navthis a { background:#fff; font-weight: bold; color: #024d8d;}
@@ -252,6 +251,13 @@ tr.obsessive, .obsessive td { padding: 0; }
 .standardForm em { font-size: 80%; font-style: normal; }
 select.small, input.small { width: 100px; }
 input.timeField { width: 30px; }
+.standardForm h2{-moz-border-radius:5px 5px 0 0;
+background:url("/images/core/body/heading-cover.png") repeat-x scroll 0 0 #0066B0;
+font-size:12px;
+height:29px;
+line-height:29px;
+margin:0;
+text-indent:10px;}
 
 /*ICONS*/
 .btn { display:block; float: right; margin-left: 10px; }
@@ -282,9 +288,9 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #assess .standardForm thead td, #assess .standardForm{padding:0;}
 #assess .standardForm tbody{border: 1px solid #ccc; border-collapse:collapse;}
 #assess td.formLabelWidth{width:195px;}
-#assess .standardForm{background:#fff;}
+#assess .standardForm{background:#fff; width:100%;}
 #assess .assess-header{margin-bottom:20px;}
-#assess .additional-details, #assess .assess-header .assess-body{padding:10px;border:1px solid #dbdbdb;  -moz-border-radius: 0 0 3px 3px; -webkit-border-radius:0 0 3px 3px; border-radius:0 0 3px 3px;}
+#assess .additional-details, #assess  .assess-body{padding:10px;border:1px solid #dbdbdb;  -moz-border-radius: 0 0 3px 3px; -webkit-border-radius:0 0 3px 3px; border-radius:0 0 3px 3px;}
 #assess .assess-body hr {height:0px; border-top:1px solid #DBDBDB; width:100%; margin:10px 0;}
 #assess .additional-details span.time{color:#F00;}
 #assess .section h3{background:#1597cb; color:#fff; font-size:11px;padding:7px; border:none;}
@@ -295,18 +301,23 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #assess .section p span{display:block; font-weight:normal; text-align:left;}
 
 #assess .col-1, #assess .col-2{float:left; }
+#assess .col-1 h4{font-size:10px; padding:10px; padding-top:0px;}
 #assess .col-1{width:70%; margin-right:1%; min-width:500px;}
 #assess .col-2{width:29%; min-width:225px;}
 #assess .question .question-body{margin:0;}
-#assess h3{font-size:13px; font-weight:bold; padding:10px; line-height:16px;}
+#assess h3{font-size:13px; font-weight:bold; padding:10px; padding-bottom:0; line-height:16px;}
 #assess h3 span{display:block; font-weight:normal;}
 
+#assess fieldset{margin-bottom:10px;}
+#assess fieldset.hidden{margin:0;}
+#assess fieldset label{font-weight:bold; width:100px; display:block; margin-bottom:5px;}
+	
 	#assess .textarea-container{ background:#fff;padding:10px;border:1px solid #dbdbdb; margin-bottom:10px;}
 	#assess textarea{width:100%; font-size:12px; font-family:Arial, Helvetica, sans-serif; border:0; min-height:75px;}
-
+	#assess input{}
 	#assess ul{margin:0;}
 	#assess .col-1 ul li{min-width: 0;position:relative; padding:5px;background:#ededed; border:1px solid #dbdbdb; margin-bottom:10px; }
-	#assess ul{height:100%; width:100%;}
+	#assess ul{height:100%; }
 	#assess .drag-me{width:38%; font-size:11px; background:#fff; padding:10px 5px; line-height:14px; border: 1px solid #dbdbdb;}
 
 	#assess ul li .mark,
@@ -347,6 +358,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess li.inputs .arrow{height:27px;}
 	
 	#assess .grey-highlight{line-height:16px;}
+	#assess .hidden-clone{display:none;}
 	
 	/*tiny mce*/
 	.mceContentBody p span{padding:1px 2px; background:#f0f0f0; border: 1px solid #dbdbdb;}
@@ -354,18 +366,22 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess .defaultSkin table.mceLayout,#assess .defaultSkin table.mceLayout tr.mceFirst td{border:0 none;}
 	#assess .defaultSkin td.mceCenter table{margin:0; width:100px;}
 	#assess .defaultSkin td.mceCenter table td{}
-	.create-test .section-box {margin:10px;}
-	#assess.create-test .section-box h3{background:#1597cb; padding:5px; margin:0; font-size:11px; color:#fff;}
-	#assess .section-box ul{margin:0; width:auto;  border:1px solid #dbdbdb; border-top:0; border-bottom:0;}
+	#assess .section-box h3{background:#1597cb; padding:5px; margin:0; font-size:11px; color:#fff;}
+	.section-box ul{margin:0; border:1px solid #dbdbdb; border-top:0; border-bottom:0;}
+	.section-box ul.section-options{width:auto; position:absolute; right:6px; top:6px; border:0;}
+	#assess .section-box ul.section-options ul{ height:auto;border-top:1px solid #ccc; display:none; position:absolute; top:13px; right:0; width:100px;}
+	.section-box{margin-bottom:10px;}
+	.section-box ul.section-options ul li{background:#fff;}
+	.section-box ul.section-options ul a{display:block; padding:5px; backgrond:#fff; color:#255297}
+	.section-box ul li{margin:0;font-size:11px;line-height:16px;background:#f1f7fa; border-bottom:1px solid #dbdbdb;}
+	.section-box ul li p{padding:10px; margin:0;}
+	.section-box ul li p.links{padding:0 10px 10px 10px;}
+	.section-box ul li span{font-weight:bold;}
+	.section-box ul li a{color: #255297; padding:0; font-size:10px; display:inline-block;}
+	.section-box h3 span{width:13px; height:13px; float:right; text-indent:-9999em; font-size:1px; background: url(/images/core/assess/section-dropd-down.gif)  no-repeat;}
+	#assess .add-section{background:url(/images/core/assess/add-section.gif) no-repeat 6px 50%; display:block; background-color:#ededed; font-size:10px; padding:9px 0 8px 28px; display:block; font-size:10px; }
 	
-	.create-test .section-box ul li{margin:0;font-size:11px;line-height:16px;background:#f1f7fa; border-bottom:1px solid #dbdbdb;}
-	.create-test .section-box ul li p{padding:10px; margin:0;}
-	.create-test .section-box ul li p.links{padding:0 10px 10px 10px;}
-	.create-test .section-box ul li span{font-weight:bold;}
-	.create-test .section-box ul li a{color: #255297; padding:0; font-size:10px; display:inline-block;}
-
-	.create-test .section-box h3 a{width:13px; height:13px; float:right; text-indent:-9999em; font-size:1px; background: url(/images/core/assess/section-dropd-down.gif)  no-repeat;}
-	.create-test .section-box h3 a:hover{background-position:bottom;}
+	.section-box h3 span:hover{background-position:bottom; cursor:pointer;}
 	
 	/*all them submit buttons*/
 	#assess .add-statement,
@@ -374,7 +390,8 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	{height:25px;border:none; text-indent:-9999em; display:block;}
 	#assess .add-statement:hover,
 	#assess .add-answer:hover,
-	#assess .make-blank:hover
+	#assess .make-blank:hover,
+	#assess .add-question:hover
 	{background-position:bottom; cursor:pointer}
 	
 	#assess .make-blank img.mceIcon{display:none;}
@@ -382,7 +399,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess .add-statement{ width:112px; background:url(/images/core/assess/add-statement-btn.gif) no-repeat;}
 	#assess .add-answer{width:103px; background:url(/images/core/assess/add-answer-btn.gif) no-repeat;}
 	#assess .make-blank{ margin-right:10px;width:95px;background:url(/images/core/assess/make-blank-btn.gif) no-repeat;}
-	#assess .add-question{ width:115px; height:29px;background:url(/images/core/assess/add-question-btn.gif) no-repeat;}
+	#assess .add-question{ border:0;float:right;color:#fff; font-weight:bold; width:115px; height:29px;background:url(/images/core/assess/add-question-btn.gif) no-repeat;}
 	
 
 	.mark-test form .submit, .take-test form .next-section{width:127px; height:29px; border:0;  background: url(/images/core/assess/submit.gif) no-repeat; padding:0; margin:20px 0; color:#fff; font-weight:bold; font-size:11px; float:right;}
@@ -395,8 +412,8 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	.take-test ul li .arrow{width:6%;}
 	.take-test ul li .option{border:1px solid #ccc; padding:15px 5px 10px; width:43%; height:15px; float:left;}
 	.take-test ul li .input-wrap.drop-right, .take-test ul li .input-wrap.drop-right input{background-color:#f2f8fa;}
-	.take-test form .next-section{width:111px; height:29px; background: url(/images/core/assess/next-step.gif) no-repeat;}
-
+	#assess .next-step{ color:#fff; font-weight:bold; border:0;width:111px; float:right; height:29px; background: url(/images/core/assess/next-step.gif) no-repeat;}
+#assess .next-step:hover{background-position:bottom; cursor:pointer; }
 	/*mark test*/
 	.mark-test h3{background:#ccc; }
 	.mark-test form .submit{width:127px; height:29px; border:0;  background: url(/images/core/assess/submit.gif) no-repeat; padding:0; margin:20px 0; color:#fff; font-weight:bold; font-size:11px; float:right;}
@@ -494,7 +511,7 @@ td.cal-right .link-case .filter-drop a#applyFilters{display:block; color:#41a200
 #calendar .header_option a{color:#ffffff;}
 #calendar .header_option a:hover { text-decoration: underline; }
 
-.month-week { height: 150px; vertical-align: top; }
+.month-week { height: 250px; vertical-align: top; }
 .day-block {width: 14%; padding: 0; border: 1px dotted #c3cdd7;  border-top:none; border-bottom:none;vertical-align: top; font: 11px Verdana, Arial, Helvetica, sans-serif; }
 
 ul.js_happening li span{display:block; padding:5px; -moz-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px;cursor:pointer;}
@@ -508,7 +525,7 @@ ul.js_happening li{margin-bottom:4px; position:relative; }
 .cal-bubble  .middle h4{line-height:20px;font-size:16px; font-weight:normal; margin:0 0 10px 0;padding-bottom:5px;border-bottom:1px solid #f0f0f0;}
 .cal-bubble  .middle h4 span{margin:0 0 5px 0; padding:2px; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px;}
 .cal-bubble  .middle p{font-size:12px; margin: 0 0 16px 0; padding:0;}
-.cal-bubble  .middle span.time{border:0; padding:0; margin:0;}
+.cal-bubble  .middle span.time{display:block;border:0; padding:0; margin:0;}
 .cal-bubble .bottom{background: url(/images/core/calendar/bubble-bottom.png) 0 0 no-repeat; height:34px; width:100%;}
 .cal-bubble .modify a{-moz-border-radius:4px; -webkit-border-radius:4px; border-radius:4px;color:#fff;text-align:left;margin:10px 0 3px;padding:5px; font-size:11px;background-color: #9c9c9c;background-image: -moz-linear-gradient(top, #c2c2c2, #9c9c9c); /* FF3.6 */background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #c2c2c2),color-stop(1, #9c9c9c)); /* Saf4+, Chrome */ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#d8d8d8', EndColorStr='#bebebe'); /* IE6,IE7 */-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#d8d8d8', EndColorStr='#bebebe')"; /* IE8 */text-shadow: 1px 1px 1px #ccc; /* FF3.5+, Opera 9+, Saf1+, Chrome */}
 .cal-bubble .modify a:hover{background-color: #e2e2e2;background-image: -moz-linear-gradient(top, #e2e2e2, #c7c7c7); /* FF3.6 */background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #e2e2e2),color-stop(1, #c7c7c7)); /* Saf4+, Chrome */ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#e2e2e2', EndColorStr='#c7c7c7'); /* IE6,IE7 */-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#e2e2e2', EndColorStr='#c7c7c7')"; /* IE8 */ /* FF3.5+, Opera 9+, Saf1+, Chrome */}
@@ -527,8 +544,6 @@ ul.js_happening li{margin-bottom:4px; position:relative; }
 .otherMonth .day-num { font-weight: normal; }
 .otherMonth ul li span{opacity:.3}
 .otherMonth select { width: 160px; }
-
-
 
 /*CATEGORY WINDOW*/
 #category-window, #file-window { height: 420px; margin: 0; border: 1px solid #ccc; position: relative; }
@@ -636,7 +651,7 @@ p.forgotten{margin:10px 0;}
 
 #category { padding:5px 5px 0 5px;list-style: none; margin: 0; float: left; }
 .listing #category { list-style: none; margin-top: 10px; float: left; }
-#category li {  float: left; padding: 0; margin-right:2px;}
+#category li {  float: left; padding: 0; margin-right:2px; border:0;}
 #category li a {border:1px solid #ccc; border-bottom:0; display: block; padding: 5px 10px; background: #ccc; -moz-border-radius: 5px 5px 0 0; -webkit-border-radius:5px 5px 0 0; border-radius:5px 5px 0 0;}
 #category li a.selected {  background:#f0f0f0; border-color:#f0f0f0;}
 #category li a.disabled { color: #ccc; }

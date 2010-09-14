@@ -92,18 +92,18 @@
 			</tr>
             
             
-			<tr valign="top" class="month-week {OTHER_MONTH} {MONTABLE_CSS}">
+			<tr valign="top" class="month-week">
 
                 <!-- BEGIN day_block -->
-				<td class="day-block">
+				<td class="day-block {MONTABLE_CSS}">
 					<ul class="js_happening">
 					<!-- BEGIN note_block -->
 						<li class="{EVENT_TYPE} {EVENT_LEVEL} ">
-						<!-- BEGIN time --><span class="time">{TIME}</span><!-- END time -->
+						<!-- BEGIN time --><span class="time">{TIME}&nbsp;</span><!-- END time -->
 							<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}</span>
 							<div class="hidden-fields">
 								<div class="author"><a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></div>
-								<h4><!-- BEGIN time --><div class="time">{TIME}</div><!-- END time -->{NOTE}</h4>
+								<h4><strong>{time_block}</strong>{NOTE}</h4>
 								<p class="meta">Event Type: {TYPE}</p>
 								<div class="modify">{MODIFY}</div>
 							</div>

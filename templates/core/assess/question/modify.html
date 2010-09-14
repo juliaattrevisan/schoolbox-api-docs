@@ -1,43 +1,53 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" media="screen" href="/css/core/assess.css" />
 <!-- END custom_head -->
-
-<h1>Modify Question</h1>
-<form id="createQuestionForm" action="/assess/question/modify" class="standardForm" method="post">
-    <fieldset>
-        <input name="section_id" type="hidden" value="{SECTION_ID}" />
-        <input name="question_id" type="hidden" value="{QUESTION_ID}" />
-        <input name="answer_id" type="hidden" value="{ANSWER_ID}" />
-        <input name="sequence" type="hidden" value="{SEQUENCE}" />
-    </fieldset>
-
-    <fieldset>
-        <label>Type</label>
-        <input type="hidden" name="type_id" value="{QUESTIONTYPE_TYPE_ID}" />
-        <input type="text" readonly="readonly" value="{QUESTIONTYPE_DESCRIPTION}" />
-    </fieldset>
-
-    <fieldset>
-        <label>Question</label>
-        <input name="question" type="text" size="35" value="{QUESTION}" />
-    </fieldset>
-
-    <fieldset>
-        <label>Marks</label>
-        <input name="marks" type="text" size="3" value="{MARKS}"/>
-    </fieldset>
-
-    <div id="answer">
-        <!-- BEGIN answerInputs -->
-        
-        <!-- END answerInputs -->
-    </div>
-
-    <fieldset>
-        <input type="submit" name="create" id="create" value="Modify Question" class="btn"/>
-    </fieldset>
-</form>
-
-<!-- BEGIN allQuestions -->
-
-<!-- END allQuestions -->
+<div id="assess">
+	<h1>Modify Question</h1>
+	<div class="col-1">
+	<div class="assess-header">
+		<h2>Question Details</h2>
+		<div class="assess-body">
+			<form id="createQuestionForm" action="/assess/question/modify" class="standardForm" method="post">
+				
+				<fieldset class="hidden">
+					<input name="section_id" type="hidden" value="{SECTION_ID}" />
+					<input name="question_id" type="hidden" value="{QUESTION_ID}" />
+					<input name="answer_id" type="hidden" value="{ANSWER_ID}" />
+					<input name="sequence" type="hidden" value="{SEQUENCE}" />
+				</fieldset>
+			
+				<fieldset>
+					<label>Type</label>
+					<input type="hidden" name="type_id" value="{QUESTIONTYPE_TYPE_ID}" />
+					<input type="text" readonly="readonly" value="{QUESTIONTYPE_DESCRIPTION}" />
+				</fieldset>
+			
+				<fieldset>
+					<label>Question</label>
+					<input name="question" type="text" size="35" value="{QUESTION}" />
+				</fieldset>
+			
+				<fieldset>
+					<label>Marks</label>
+					<input name="marks" type="text" size="3" value="{MARKS}"/>
+				</fieldset>
+			
+				<div id="answer">
+					<!-- BEGIN answerInputs -->
+					
+					<!-- END answerInputs -->
+				</div>
+			
+				<fieldset>
+					<input type="submit" name="create" id="create" value="Modify" class="next-step"/>
+				</fieldset>
+			</form>
+		</div>
+		</div>
+	</div>
+	<div class="col-2">
+	<!-- BEGIN allQuestions -->
+	
+	<!-- END allQuestions -->
+	</div>
+</div>
