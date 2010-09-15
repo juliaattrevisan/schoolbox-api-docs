@@ -12,14 +12,17 @@ $user = $userHandler->getByID($_SESSION['id']);
 if($groupHandler->isParent()) {
     /* Setup form variable */
     $form="Form1";
-    $action=SYNERGY_portal.'/login.aspx';
+    $action=SYNERGY_portal.'login.aspx';
     $method="POST";
 
-    $formArray['__VIEWSTATE'] ="/wEPDwUJOTY3MTg0MTMzD2QWAgIBD2QWBgIBDxYCHgRUZXh0BUk8dGFibGUgY2xhc3M9J2hkcl90YmxfY29udGFpbmVyJyBjZWxsc3BhY2luZz0nMCcgY2VsbHBhZGRpbmc9JzAnPjwvdGFibGU+ZAIFDw8WAh8AZWRkAgcPZBYCAhcPDxYCHwBlZGRkAjhVtO6thUcdrCoL21boFSC0wXc=";
-    $formArray['__EVENTVALIDATION'] = '/wEWBALNh6ufAwLMyrLrBgLMyvbZDALejM6fDy25GduyqQw2Zx8T7SqSq9sB+VBs';
-    $formArray['loginButton'] = 'true';
-    $formArray['textBox1'] = $user['username'];
-    $formArray['textBox2'] = $user['email_pass'];
+    $formArray['__VIEWSTATE'] ="/wEPDwUKMTg3NzM1MTc4NQ9kFgJmD2QWAgIDD2QWBgIBDxYCHgdWaXNpYmxlaGQCAw8WAh8AaGQCBQ9kFgICAQ9kFgQCAw8PFgIeBFRleHRlZGQCBQ9kFgICFw8PFgIfAWVkZGQRTaP46MtESfYUfqxQrRkv5ADi9g==";
+    $formArray['__EVENTVALIDATION'] = '/wEWBALyk7P0CwLLuNPhBAKwz7XMCgKO0+OzAvC6Tnply1JVZvuxB983AhxejoYz';
+    $formArray['__EVENTARGUMENT'] = '';
+    $formArray['__EVENTTARGET'] = '';
+    $formArray['__LASTFOCUS'] = '';
+    $formArray['ctl00$masterPageContentPlaceHolder$loginButton'] = 'Login';
+    $formArray['ctl00$masterPageContentPlaceHolder$textBox1'] = $user['username'];
+    $formArray['ctl00$masterPageContentPlaceHolder$textBox2'] = $user['email_pass'];
 }
 else {
     exit;

@@ -1,9 +1,11 @@
 <?php
 
-foreach($_SESSION['subjects'] as $subject) {
-	if(stristr($subject['code'],'HR' ) || stristr($subject['code'],'EN' )) {
-		$homeroom = $subject['code'];
-        break;
+if(is_array($_SESSION['subjects'])) {
+    foreach($_SESSION['subjects'] as $subject) {
+        if(stristr($subject['code'],'HR' ) || stristr($subject['code'],'EN' )) {
+            $homeroom = $subject['code'];
+            break;
+        }
     }
 }
 
