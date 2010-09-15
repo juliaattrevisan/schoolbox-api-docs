@@ -89,7 +89,7 @@ CSS commands
 --------------------------------------------------------------*/
 h1, h2, h3, h4, h5, h6 { font-weight:normal; position:relative; margin:0;}
 h1 span, h2 span, h3 span, h4 span { font-weight:bold }
-h1{background:url(/images/core/body/h1-backing.jpg) 0 100% repeat-x;margin:0; border:0; font-size:1.33em; font-weight:bold; line-height:2; margin-bottom:1em; margin-left:-5px; padding:0 0 0 5px;}
+h1{margin:0; border:0; font-size:1.33em; font-weight:bold; line-height:2; margin-bottom:4px; }
 h2, .homepage h2 {margin:0; -moz-border-radius:5px 5px 0 0; border-radius:5px 5px 0 0; -webkit-border-radius:5px 5px 0 0; background:#0066b0 url(/images/core/body/heading-cover.png) repeat-x;; font-size:12px; height:29px; line-height:29px; text-indent:10px; }
 h3 { font-size:1em; line-height:1; }
 h4 {font-weight:normal; line-height:1.4; margin:0; font-size:12px;}
@@ -319,26 +319,25 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess .col-1 ul li{min-width: 0;position:relative; padding:5px;background:#ededed; border:1px solid #dbdbdb; margin-bottom:10px; }
 	#assess ul{height:100%; }
 	#assess .drag-me{width:38%; font-size:11px; background:#fff; padding:10px 5px; line-height:14px; border: 1px solid #dbdbdb;}
+	#assess .mceLayout tbody{border:0;}
+	#assess .mceLayout .mceToolbar{width:100px; float:left; }
 
-	#assess ul li .mark,
-	#assess ul li .arrow, 
-	#assess ul li input, 
+	#assess ul li .mark, 
 	#assess .left-option, 
 	#assess .right-option,
 	#assess .inputs .delete,
-	#assess .inputs checkbox,
 	#assess li.inputs .answer-value,
 	#assess li.inputs .list-item
-	{float:left;}
-	#assess ul li .arrow, 
+	{float:left;} 
 	#assess ul li .mark,
 	#assess .inputs .delete
 	{height:37px; width:9%; position:relative; display:block;}
 	#assess ul li .mark span, 
-	#assess ul li .arrow span
-	{position:absolute; top:30%; width:16px; height:15px; left:40%; 
-	background:url(/images/core/assess/correct-incorrect-grey.gif) 0 -15px no-repeat; }
-	#assess ul li .arrow span{background:url(/images/core/assess/arrows-correct-incorrect.gif) no-repeat;width:14px; height:8px; top:39%;}
+	#assess .arrow span
+	{float:right; height:10px;
+	background:url(/images/core/assess/arrows-correct-incorrect.gif) 50% 2px no-repeat; width:100%; }
+	#assess .arrow{float:left; width:10%; position:relative;}
+	#assess .arrow span{position:absolute;top:8px; left:0;}
 	
 	#assess li.inputs .answer-value,
 	#assess li.inputs .list-item,
@@ -351,7 +350,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess .keywords{ height:100%; background:#fff; padding:5px 5px; border: 1px solid #dbdbdb;}
 	#assess .keywords .text-box{font-size:12px;}
 	#assess li.inputs .list-item{width:3%; font-weight:bold; text-align:center;}
-	#assess li.inputs .checkbox{width:6%; margin:0;}
+	#assess li.inputs .checkbox{width:6%; margin:0; float:left;}
     #assess .text-box {margin:0; border:0 none;  width:100%; font-size:11px;}
 	#assess .text-box.text-border{border: 1px solid #dbdbdb;}
 	#assess li.inputs .delete{background:url(/images/core/assess/delete.gif) 50% 50% no-repeat; height:27px;}
@@ -374,14 +373,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess .section-box h3{background:#1597cb; padding:5px; margin:0; font-size:11px; color:#fff;}
 	.section-box ul{margin:0; border:1px solid #dbdbdb; border-top:0; border-bottom:0;}
 	.section-box ul.section-options{width:13px; position:absolute; right:6px; top:6px; border:0;}
-	#assess .section-box ul.section-options ul{border-top:1px solid #CCCCCC;
-display:none;
-height:auto;
-min-height:10px;
-position:absolute;
-right:0;
-top:13px;
-width:100px;}
+	#assess .section-box ul.section-options ul{border-top:1px solid #CCCCCC;display:none;height:auto;min-height:10px;position:absolute;right:0;top:13px;width:100px;}
 	.section-box ul.section-options ul a{display:block;padding:5px; backgrond:#fff; color:#255297}
 	.section-box ul.section-options ul li{background:#fff; width:100px;}
 	.section-box ul.section-options ul li.parent{line-height:normal; border:0; }
@@ -422,14 +414,36 @@ width:100px;}
 	.mark-test form .submit:hover, .take-test form .next-section:hover{background-position:left bottom; cursor:pointer}
 
 	/*take test*/
-	.take-test h3{background:#ededed;}
-	.take-test ul li, .take-test ul li .option{background:#fff; }
-	.take-test ul li .arrow span{background-image:url(/images/core/assess/arrow.gif); top:35%; left:35%;}
+	#assess.take-test h3{background:#ededed; padding:10px;}
+	#assess.take-test .col-1 ul li{background:#EDEDED;}
+	#assess.take-test .col-1 ul li.left-answer{border-right:0;}
+	#assess.take-test .col-1 ul li.right-answer{border-left:0;}
+	#assess.take-test .percentage-complete{padding:10px; background:#f6fff6;}
+	#assess.take-test .all-good{background:#E0F2DF; padding:10px; display:none;}
+	#assess.take-test .percentage-complete span{ display:none; }
+	#assess.take-test .percentage-text{padding:5px; background:#fff;font-size:16px;} 
+	#assess.take-test .percentage-text em{font-style:normal;}
+	#assess.take-test .percentage-bar{margin-bottom:10px; border:1px solid #638961;height:20px;clear:both; background:url(/images/core/assess/progress-bar.jpg) repeat-x;}
+	#assess.take-test dl {margin-bottom:10px;}
+	#assess.take-test dl dt, #assess.take-test dl dd{margin-bottom:5px; line-height:16px;}
+	#assess.take-test .col-1 ul li.right-answer:hover{cursor:move;}
+	#assess.take-test .col-1 ul li.left-answer strong{padding:15px 5px 10px; display:block; border:1px solid #ccc; width:67%; background:#fff;}
+	#assess.take-test .col-1 ul li.left-answer .arrow{width:28%; position:absolute; float:none; top:0; right:0; height:100%;}
+	#assess.take-test .col-1 ul li.left-answer .arrow span{top:21px;}
+	#assess.take-test .col-1 ul li.right-answer strong{border:1px solid #ccc;display:block;font-weight:normal; background:#fff;padding:15px 5px 10px;}
 	.take-test ul li .arrow{width:6%;}
+	.take-test .option{width:49%; float:left;}
 	.take-test ul li .option{border:1px solid #ccc; padding:15px 5px 10px; width:43%; height:15px; float:left;}
-	.take-test ul li .input-wrap.drop-right, .take-test ul li .input-wrap.drop-right input{background-color:#f2f8fa;}
+	
+	#assess.take-test .col-1 .multiple-choice li {padding:15px 40px 15px 10px; background:#fff;}
+	#assess.take-test .col-1 .multiple-choice li span{font-weight:bold;}
+	
 	#assess .next-step{ color:#fff; font-weight:bold; border:0;width:111px; float:right; height:29px; background: url(/images/core/assess/next-step.gif) no-repeat;}
-#assess .next-step:hover{background-position:bottom; cursor:pointer; }
+	#assess .next-step:hover{background-position:bottom; cursor:pointer; }
+	
+	
+	
+	
 	/*mark test*/
 	.mark-test h3{background:#ccc; }
 	
@@ -646,7 +660,7 @@ p.forgotten{margin:10px 0;}
 #loginForm{margin:0 0 20px 0}
 #loginForm label{display:block;float:left;font-weight:bold;line-height:22px;width:110px;}
 #loginForm fieldset{border:0; margin:0; padding:0 0 10px 0;}
-
+#loginForm input[type="text"], #loginForm input[type="password"]{width:150px;}
 
 /* MERGING WIKI VERSIONS */
 .highlightedMessage { border: 1px solid #e00; width: 100%; margin-bottom: 10px; }

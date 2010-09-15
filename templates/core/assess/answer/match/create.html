@@ -32,7 +32,7 @@ $j(document).ready(function() {
             section_id: theForm.find('input[name=section_id]').val(),
             sequence: theForm.find('input[name=sequence]').val(),
             type_id: theForm.find('select[name=type_id]').val(),
-            question: theForm.find('input[name=question]').val(),
+            question: theForm.find('textarea[name=question]').val(),
             marks: theForm.find('input[name=marks]').val(),
             allAnswers: JSON.stringify(answerCollection)
         }
@@ -57,7 +57,7 @@ $j(document).ready(function() {
 	/* Remove an answer option
 	 */
 	$j('.delete').live('click', function(){
-		if (($j('.inputs').length) !== 1) {
+		if (($j('.inputs').length) !== 2) {
 			$j(this).parent().remove();
 			refreshList()
 		}	

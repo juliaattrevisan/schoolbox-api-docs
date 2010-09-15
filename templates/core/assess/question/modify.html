@@ -1,5 +1,19 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" media="screen" href="/css/core/assess.css" />
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript">
+tinyMCE.init({
+		mode : "exact",
+		elements: "question",
+		theme : "simple",
+		content_css : "/css/core/screen.css",
+		editor_selector : "mceSimple",
+		width : "100%"
+	});
+	
+	
+
+</script>
 <!-- END custom_head -->
 <div id="assess">
 	<h1>Modify Question</h1>
@@ -19,12 +33,12 @@
 				<fieldset>
 					<label>Type</label>
 					<input type="hidden" name="type_id" value="{QUESTIONTYPE_TYPE_ID}" />
-					<input type="text" readonly="readonly" value="{QUESTIONTYPE_DESCRIPTION}" />
+					<span>{QUESTIONTYPE_DESCRIPTION}</span>
 				</fieldset>
 			
 				<fieldset>
 					<label>Question</label>
-					<input name="question" type="text" size="35" value="{QUESTION}" />
+					<div class="textarea-container"><textarea name="question" class="mceSimple" id="question" />{QUESTION}</textarea></div>
 				</fieldset>
 			
 				<fieldset>

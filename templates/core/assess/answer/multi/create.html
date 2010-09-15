@@ -59,11 +59,20 @@ $j(document).ready(function() {
 	/* Remove an answer option
 	 */
 	$j('.delete').live('click', function(){
-		if (($j('.inputs').length) !== 1) {
+		if (($j('.inputs').length) !== 2) {
 			$j(this).parent().remove();
 			refreshList()
 		}	
     });
+	
+	$j('.checkbox').live('click', function() {
+		if ($j(this).is(':checked')) {
+			$j(this).parent().css("background-color", "#e0f2df");
+		} else {
+			$j(this).parent().css("background-color", "#EDEDED");
+		}
+	});
+	
 	
 	function refreshList() {
 		var alphabetStart = 65;

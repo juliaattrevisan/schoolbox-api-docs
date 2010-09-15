@@ -8,20 +8,22 @@ $j(document).ready(function() {
 
 <fieldset>
     <label>Answer</label>
-    <div>
-        <ul class="matchPairs">
+        <ul class="left-answer option">
             <!-- BEGIN answerOptionLeft -->
-            <li><strong>{ANSWER_LEFT_VALUE}</strong></li>
+            <li class="left-answer"><strong>{ANSWER_LEFT_VALUE}</strong><div class="arrow"><span></span></div></li>
             <!-- END answerOptionLeft -->
         </ul>
+		
+		
 
-        <ul id="matchPairs_{MATCHPAIRS_QUESTION_ID}" class="matchPairs">
+        <ul id="matchPairs_{MATCHPAIRS_QUESTION_ID}" class=" option">
             <!-- BEGIN answerOptionRight -->
-            <li>
-                <input name="answerRight[]" class="answerRight" type="hidden" readonly="readonly" value="{ANSWER_RIGHT_VALUE}" />
+            <li class="right-answer">
+               <strong> <input name="answerRight[]" class="answerRight" type="hidden" readonly="readonly" value="{ANSWER_RIGHT_VALUE}" />
                 {ANSWER_RIGHT_VALUE}
+				</strong>
             </li>
+			<div class="float-fix"></div>
             <!-- END answerOptionRight -->
         </ul>
-    </div>
 </fieldset>

@@ -1,9 +1,22 @@
+<script type="text/javascript">
+$j(function() {
+	$j('.checkbox').live('click', function() {
+		if ($j(this).is(':checked')) {
+			$j(this).parent().css("background-color", "#e0f2df");
+		} else {
+			$j(this).parent().css("background-color", "#fff");
+		}
+	});
+});
+
+</script>
 <fieldset>
     <div>
-        <ul>
+        <ul class="multiple-choice">
             <!-- BEGIN answerOption -->
             <li>
-                <input name="answer[]" class="answerCorrect" type="checkbox" value="{ANSWER_VALUE}" {ANSWER_CHECKED}/> {ANSWER_DESCRIPTION}
+				<span>{ANSWER_VALUE})</span>
+                <input name="answer[]" class="answerCorrect checkbox" type="checkbox"value="{ANSWER_VALUE}" {ANSWER_CHECKED}/>{ANSWER_DESCRIPTION}
             </li>
             <!-- END answerOption -->
         </ul>

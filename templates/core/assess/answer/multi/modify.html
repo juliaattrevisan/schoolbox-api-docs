@@ -55,6 +55,23 @@ $j(document).ready(function() {
 		refreshList()
     });
 	
+	$j('.checkbox').each(function(){
+		
+		if ($j(this).is(':checked')) {
+			$j(this).parent().css("background-color", "#E0F2DF");
+		}
+			
+	});
+	
+	$j('.checkbox').live('click', function() {
+		if ($j(this).is(':checked')) {
+			$j(this).parent().css("background-color", "#e0f2df");
+		} else {
+			$j(this).parent().css("background-color", "#EDEDED");
+		}
+	});
+	
+	
 	/* Remove an answer option
 	 */
 	$j('.delete').live('click', function(){

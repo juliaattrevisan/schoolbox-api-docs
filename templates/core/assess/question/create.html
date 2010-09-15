@@ -1,5 +1,6 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" media="screen" href="/css/core/assess.css" />
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
     var section_id = '{SECTION_ID}';
@@ -8,6 +9,29 @@ $j(document).ready(function() {
         var url = '/assess/question/create/' + section_id + '/' + $j('#type_id').val();
         window.location = url;
     });
+	
+	if (($j('.question-type-select :selected').text()) == "-- Select Type --") {
+	$j('.add-question').hide();
+	}
+	
+	
+	
+	$j('.question-type-select').change(function() {
+		$j('.add-question').show();
+	});
+	
+
+tinyMCE.init({
+		mode : "exact",
+		elements: "question",
+		theme : "simple",
+		content_css : "/css/core/screen.css",
+		editor_selector : "mceSimple",
+		width : "100%"
+	});
+
+
+	
 });
 </script>
 
@@ -27,7 +51,7 @@ $j(document).ready(function() {
 		
 			<fieldset>
 				<label>Type</label>
-				<select name="type_id" id="type_id">
+				<select name="type_id" id="type_id" class="question-type-select">
 					<option disabled {DISABLED_SELECTED}>-- Select Type --</option>
 					<!-- BEGIN questionType -->
 					<option value="{QUESTIONTYPE_TYPE_ID}" {QUESTIONTYPE_SELECTED}>{QUESTIONTYPE_DESCRIPTION}</option>
@@ -37,7 +61,7 @@ $j(document).ready(function() {
 		
 			<fieldset>
 				<label>Question</label>
-				<input name="question" type="text" size="35" value="{QUESTION}" />
+				<div class="textarea-container"><input name="question" class="mceSimple" id="question" type="text" size="35" value="{QUESTION}" /></div>
 			</fieldset>
 		
 			<fieldset>

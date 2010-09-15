@@ -4,7 +4,11 @@
 <script type="text/javascript" src="/javascript/jquery.countdown.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
-    $j('.question form').submit(function() {
+	
+	$j('.checkbox').removeAttr('checked');
+	
+	
+    $j('.assess-header form').submit(function() {
         $j.post($j(this).attr('action'), $j(this).serialize(), function(responseText) {
             var dataFunction = new Function('return ' + responseText);
             var result = dataFunction();
@@ -13,15 +17,17 @@ $j(document).ready(function() {
              * Update section completion value
              */
             if (result.response_id != '') {
-                $j('#question_status_' + result.question_id).html('Response saved. This message should probably fade away into nothingness...');
+				$j('#question_status_' + result.question_id).show();
+				$j('#question_status_' + result.question_id).animate({ opacity: 1 }, 1)
+                $j('#question_status_' + result.question_id).html('Response saved.').delay(3000).animate({ opacity: 0.25 }, 1000);
 
                 for (var i=0; i < result.percentageComplete.length; i++) {
                     var sectionSelector = $j('#sectionPercentageComplete_' + result.percentageComplete[i].section_id);
                     var percentage = result.percentageComplete[i].percentageComplete.toString();
 
-                    sectionSelector.find('span').text(percentage);
-
-                    sectionSelector.find('div').css('width', percentage + '%');
+                    sectionSelector.find('.percentage-text em').text(percentage);
+                    sectionSelector.find('.percentage-bar').css('width', percentage + '%');
+					
                 }
             }
             else {
@@ -31,6 +37,8 @@ $j(document).ready(function() {
 
         return false;
     });
+	
+	
 
     $j('#countdown').countdown({
         until: '+{ASSESS_TIME_REMAINING}',
@@ -42,23 +50,28 @@ $j(document).ready(function() {
 });
 </script>
 <!-- END custom_head -->
-<div id="assess">
+<div id="assess" class="take-test">
 	<div class="col-1">
 		<h2>{SECTION_TITLE}</h2>
 		<p>{SECTION_DESCRIPTION}</p>
 		
 		<!-- BEGIN question -->
-		<div class='question'>
+		<div class='assess-header'>
 			<form action="/assess/saveResponse/{QUESTION_QUESTION_ID}" method="post">
-				<h3>Q{QUESTION_SEQUENCE}) {QUESTION_QUESTION} </h3>
-				({QUESTION_MARKS} marks)
+				<h3>Q{QUESTION_SEQUENCE}) {QUESTION_QUESTION} <span>({QUESTION_MARKS} marks)</span></h3>
+				<div class="assess-body">
 		
 				<!-- BEGIN answerInputs -->
 				<!-- END answerInputs -->
+				
+				<input type="submit" value="Save Answer" class="next-step" />
+				<div class="float-fix"></div>
+				
+				</div>
 		
-				<input type="submit" value="Save Answer" />
+				
 			</form>
-			<div id="question_status_{QUESTION_QUESTION_ID}"></div>
+			<div id="question_status_{QUESTION_QUESTION_ID}" class="all-good"></div>
 		</div>
 		<!-- END question -->
 		
@@ -71,7 +84,7 @@ $j(document).ready(function() {
 		<!-- END nextSection -->
 		
 		<!-- BEGIN endAssess -->
-		<a href="/assess/end/{ASSESS_ASSESS_ID}">Finish</a>
+		<a href="/assess/end/{ASSESS_ASSESS_ID}" class="green-go">Finish</a>
 		<!-- END endAssess -->
 		
 
@@ -82,11 +95,9 @@ $j(document).ready(function() {
 		<h2>Assessment Name: {ASSESS_TITLE}</h2>
 		<div class="assess-body">
 			<dl>
-				<dt>You started this assessment on</dt>
-				<dd>{ATTEMPT_START}</dd>
+				<dt>You began at: {ATTEMPT_START}</dt>
 	
-				<dt>You must finish this assessment by:</dt>
-				<dd>{ATTEMPT_END}</dd>
+				<dt>You must finish this assessment by: {ATTEMPT_END}</dt>
 	
 				<dt>Time remaining</dt>
 				<dd><div id="countdown"></div></dd>
@@ -94,9 +105,9 @@ $j(document).ready(function() {
 			</dl>
 			<div class="float-fix"></div>
 			<!-- BEGIN sectionPercentageComplete -->
-			<div id="sectionPercentageComplete_{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}">
-				<div style="border:1px solid #f00;height:10px;clear:both;width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}"></div>
-				{SECTION_PERCENTAGE_COMPLETE_TITLE} <span>{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}</span>%
+			<div id="sectionPercentageComplete_{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}" class="percentage-complete">
+				<div class="percentage-bar" style="width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}%"></div>
+				<div class="percentage-text"><em>{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}</em>% Complete<span>{SECTION_PERCENTAGE_COMPLETE_TITLE} </span></div>
 			</div>
 			<!-- END sectionPercentageComplete -->
 		</div>
