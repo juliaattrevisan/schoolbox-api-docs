@@ -12,6 +12,7 @@ if (!empty($_POST)) {
     $finish = ausDateToUnix($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem'], true);
 
     $assess_id = $assessHandler->create(array(
+        'category_id' => $_POST['category_id'],
         'user_id'     => $_SESSION['id'],
         'title'       => $_POST['title'],
         'description' => $_POST['description'],
@@ -44,6 +45,7 @@ else {
     $this->setVar(array(
         'ACTION' => 'create',
         'ASSESS_ASSESS_ID' => '',
+        'ASSESS_CATEGORY_ID' => '',
         'ASSESS_TITLE' => '',
         'ASSESS_DESCRIPTION' => '',
         'ASSESS_START_DATE'  => date('d/m/Y'),

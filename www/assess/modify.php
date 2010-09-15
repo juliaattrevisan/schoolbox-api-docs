@@ -13,6 +13,7 @@ if (!empty($_POST)) {
 
     $assessHandler->update(array(
         'assess_id'   => $this->arg[0],
+        'category_id' => $_POST['category_id'],
         'user_id'     => $_SESSION['id'],
         'title'       => $_POST['title'],
         'description' => $_POST['description'],
@@ -46,6 +47,7 @@ else {
     $this->setVar(array(
         'ACTION' => 'modify',
         'ASSESS_ASSESS_ID' => $assess['assess_id'],
+        'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'ASSESS_TITLE' => $assess['title'],
         'ASSESS_DESCRIPTION' => $assess['description'],
         'ASSESS_START_DATE'  => date('d/m/Y', $assessStartTime),
