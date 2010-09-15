@@ -18,6 +18,7 @@ $this->setVar(array(
 
 $this->setFile(TEMPLATE_content, 'assess/intro.html');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
+$this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
 $this->setVar(array(
@@ -26,14 +27,22 @@ $this->setVar(array(
 
 /* Section list and question count
  */
-foreach($allSummary as $currentSummary) {
-    $this->setVar(array(
-        'SECTION_SEQUENCE' => $currentSummary['sequence'],
-        'SECTION_TITLE' => $currentSummary['title'],
-        'SECTION_NUMQUESTIONS' => $currentSummary['numQuestions'],
-    ));
+if (is_array($allSummary) && count($allSummary)) {
+    foreach($allSummary as $currentSummary) {
+        $this->setVar(array(
+            'SECTION_SEQUENCE' => $currentSummary['sequence'],
+            'SECTION_TITLE' => $currentSummary['title'],
+            'SECTION_NUMQUESTIONS' => $currentSummary['numQuestions'],
+        ));
 
-    $this->parse('section_block', 'section', 'true');
+        $this->parse('section_block', 'section', 'true');
+    }
+
+    $this->parse('startTest_block', 'startTest');
+}
+else {
+    $this->setVar('section_block', '');
+    $this->setVar('startTest_block', '');
 }
 
 $_SESSION['attempt_id'] = '';

@@ -6,12 +6,13 @@
             <tr>
                 <th>Title</th>
                 <th>Due Date</th>
-                <!-- BEGIN modifyHeader -->
+                <!-- BEGIN teacherHeader -->
                 <th>Edit</th>
-                <!-- END modifyHeader -->
-                <!-- BEGIN takeTestHeader -->
+                <th>View Results</th>
+                <!-- END teacherHeader -->
+                <!-- BEGIN studentHeader -->
                 <th>Take test</th>
-                <!-- END takeTestHeader -->
+                <!-- END studentHeader -->
             </tr>
         </thead>
         <tbody>
@@ -19,12 +20,13 @@
             <tr>
                 <td>{ASSESS_TITLE}</td>
                 <td>{ASSESS_FINISH_DATE}</td>
-                <!-- BEGIN modifyLink -->
+                <!-- BEGIN teacherLink -->
                 <td><a href="/assess/modify/{ASSESS_ASSESS_ID}">Edit</a></td>
-                <!-- END modifyLink -->
-                <!-- BEGIN takeTestLink -->
+                <td><a href="/assess/results/{ASSESS_ASSESS_ID}">View Results</a></td>
+                <!-- END teacherLink -->
+                <!-- BEGIN studentLink -->
                 <td><a href="/assess/intro/{ASSESS_ASSESS_ID}">Take test</a></td>
-                <!-- END takeTestLink -->
+                <!-- END studentLink -->
             </tr>
             <!-- END assess -->
         </tbody>
