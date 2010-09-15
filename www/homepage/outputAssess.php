@@ -8,17 +8,18 @@ $this->setBlock('assess', 'modifyLink', 'modifyLink_block');
 
 $assessHandler = new Assess();
 $allAssess = $assessHandler->getList($this->arg[0]);
-$isTeacher = true;
 
-if ($isTeacher) {
+if ($groupHandler->isStaff()) {
     $this->setVar(array(
         'ASSESS_CATEGORY_ID' => $this->arg[0],
     ));
-    
-    $this->parse('modifyHeader_block', 'modifyHeader', true);
+
+    $this->setVar('takeTestLink_block', '');
+    $this->parse('modifyHeader_block', 'modifyHeader');
     $this->parse('createAssessment_block', 'createAssessment');
 }
 else {
+    $this->parse('takeTestLink_block', 'takeTestLink');
     $this->setVar('modifyHeader_block', '');
     $this->setVar('createAssessment_block', '');
 }
@@ -27,11 +28,11 @@ foreach($allAssess as $currentAssess) {
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
         'ASSESS_TITLE' => $currentAssess['title'],
-        'ASSESS_FINISH_DATE' => $currentAssess['finish'],
+        'ASSESS_FINISH_DATE' => date('jS F Y, g:i:sa', strtotime($currentAssess['finish'])),
     ));
 
-    if ($isTeacher) {
-        $this->parse('modifyLink_block', 'modifyLink', true);
+    if ($groupHandler->isStaff()) {
+        $this->parse('modifyLink_block', 'modifyLink');
     }
     else {
         $this->setVar('modifyLink_block', '');

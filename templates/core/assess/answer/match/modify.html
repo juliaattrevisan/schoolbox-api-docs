@@ -33,7 +33,7 @@ $j(document).ready(function() {
             question_id: theForm.find('input[name=question_id]').val(),
             sequence: theForm.find('input[name=sequence]').val(),
             type_id: theForm.find('input[name=type_id]').val(),
-            question: tinyMCE.activeEditor.getContent('question'),
+            question: tinyMCE.get('question').getContent(),
             marks: theForm.find('input[name=marks]').val(),
             allAnswers: JSON.stringify(answerCollection)
         }
@@ -41,7 +41,7 @@ $j(document).ready(function() {
         /* Submit via POST and redirect to question creation screen upon done
          */
         $j.post(theForm.attr('action'), data, function(responseText) {
-           // window.location = window.location;
+            window.location = window.location;
         });
 
         return false;
@@ -52,7 +52,6 @@ $j(document).ready(function() {
 	$j('#makeNewAnswer').live('click', function() {
 		var thing = $j('.hidden-clone ul:first-child').clone();
 		$j('ul#answerCollection').append(thing);
-		refreshList()
     });
 	
 	/* Remove an answer option
@@ -60,19 +59,8 @@ $j(document).ready(function() {
 	$j('.delete').live('click', function(){
 		if (($j('.inputs').length) !== 2) {
 			$j(this).parent().remove();
-			refreshList()
 		}	
     });
-
-	function refreshList() {
-		var alphabetStart = 1
-		
-		$j('li.inputs').each(function() {	
-		   var $this = $j(this);
-		   $this.addClass('&#' + alphabetStart + ';&#41;');
-		   alphabetStart++;
-		});
-	}
 });
 </script>
 <fieldset>

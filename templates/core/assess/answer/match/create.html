@@ -32,7 +32,7 @@ $j(document).ready(function() {
             section_id: theForm.find('input[name=section_id]').val(),
             sequence: theForm.find('input[name=sequence]').val(),
             type_id: theForm.find('select[name=type_id]').val(),
-            question: theForm.find('textarea[name=question]').val(),
+            question: tinyMCE.get('question').getContent(),
             marks: theForm.find('input[name=marks]').val(),
             allAnswers: JSON.stringify(answerCollection)
         }

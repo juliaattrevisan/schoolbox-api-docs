@@ -22,8 +22,8 @@ class AssessAnswerMatch extends AssessAnswer {
         $answer['sequence'] = 1;
 
         $numItems = 0;
-
-        foreach(json_decode($_POST['allAnswers']) as $currentAnswer) {
+print_r($object);
+        foreach(json_decode($object['allAnswers']) as $currentAnswer) {
             $answer['answer'][] = $currentAnswer;
             $answer['sequence']++;
         }
@@ -46,11 +46,11 @@ class AssessAnswerMatch extends AssessAnswer {
      */
     function update($object) {
         $query = "DELETE FROM {$this->_table}
-                  WHERE question_id = '$_POST[question_id]'";
+                  WHERE question_id = '$object[question_id]'";
 
         $this->db->query($query);
 
-        $this->create($object, $_POST['question_id']);
+        $this->create($object, $object['question_id']);
     }
 
     /**
@@ -63,6 +63,10 @@ class AssessAnswerMatch extends AssessAnswer {
     function modify($page, $question_id = '') {
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
+            
+            $page->setVar(array(
+                'ANSWER_ID' => $answerGroup['answer_id']
+            ));
 
             if ($answerGroup) {
                 $allAnswers = unserialize($answerGroup['answer']);
