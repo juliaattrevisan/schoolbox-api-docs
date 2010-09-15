@@ -1,0 +1,26 @@
+<div class="box" id="component{COMPONENT_ID}">
+    <h2>Online Assessments</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Due Date</th>
+                <!-- BEGIN modifyHeader -->
+                <th>Edit</th>
+                <!-- END modifyHeader -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- BEGIN assess -->
+            <tr>
+                <td>{ASSESS_TITLE}</td>
+                <td>{ASSESS_FINISH_DATE}</td>
+                <!-- BEGIN modifyLink -->
+                <td><a href="/assess/modify/{ASSESS_ASSESS_ID}">Edit</a></td>
+                <!-- END modifyLink -->
+            </tr>
+            <!-- END assess -->
+        </tbody>
+    </table>
+</div>

@@ -11,6 +11,20 @@ class Assess extends Model {
     var $_index = 'assess_id';
 
     /**
+     * A list of assessments available for a category
+     * 
+     * @param <type> $category_id 
+     */
+    function getList($category_id) {
+        $query = "SELECT *
+                  FROM {$this->_table}
+                  WHERE category_id = '$category_id'
+                  AND deleted_at IS NULL";
+
+        return $this->db->getAll($query);
+    }
+
+    /**
      * Get an introduction to an Assess.
      * 
      * @param <type> $assess_id

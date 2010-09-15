@@ -154,7 +154,7 @@ class AssessAnswerFillgap extends AssessAnswer {
      * @param <type> $response
      */
     function saveResponse($data) {
-        $processedResponse = serialize($data[$this->prefix . $question_id]);
+        $processedResponse = serialize($data[$this->prefix . $data['question_id']]);
 
         return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
     }

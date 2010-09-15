@@ -26,3 +26,8 @@ CREATE TABLE eportfolio_privateNotes (
     privateNotes TEXT
 )
 
+/* Assess
+ * NB: Include schema of all tables with assess prefix.
+ */
+INSERT INTO homepage_comp (size, method, `name`, description, filename, config, invisible) VALUES (1, 'outputAssess', 'Online Assessment', 'Online tests and quizzes.', 'assess.html', '', 'false')
+
