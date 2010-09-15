@@ -45,7 +45,7 @@ else {
     $this->setVar(array(
         'ACTION' => 'create',
         'ASSESS_ASSESS_ID' => '',
-        'ASSESS_CATEGORY_ID' => '',
+        'ASSESS_CATEGORY_ID' => $this->arg[0],
         'ASSESS_TITLE' => '',
         'ASSESS_DESCRIPTION' => '',
         'ASSESS_START_DATE'  => date('d/m/Y'),
