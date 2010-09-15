@@ -1,4 +1,38 @@
 
+<script type="text/javascript">
+$j(function() {
+	
+	var validator = $j(".standardForm").submit(function() {
+		 // update underlying textarea before submit validation
+		 tinyMCE.triggerSave();
+	 }).validate({
+		rules: { 
+			question: {
+				required: true,
+				minlength: 2
+			},
+			marks: {
+				required: true,
+				minlength: 1
+			},
+			answer: {
+				required: true,
+				minlength: 1
+			}
+		},
+		
+		messages: {
+			question: "Please enter a question.",
+			marks: "Please allocate some marks to the question.",
+			answer: "Please fill out an answer."
+		} 
+	
+	});
+	
+	
+});
+</script>
+
 <fieldset>
     <label>Answer</label>
     <div class="textarea-container"><textarea id="answer" name="answer">{ANSWER}</textarea></div>

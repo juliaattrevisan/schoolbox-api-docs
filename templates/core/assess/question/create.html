@@ -27,10 +27,20 @@ tinyMCE.init({
 		theme : "simple",
 		content_css : "/css/core/screen.css",
 		editor_selector : "mceSimple",
-		width : "100%"
+		width : "100%",
+		forced_root_block : "",
+		force_p_newlines : false,
+		// update validation status on change
+		 onchange_callback: function(editor) {
+			 tinyMCE.triggerSave();
+			 $j("#" + editor.id).valid();
+		 } 
 	});
 
-
+	$j(".standardForm").submit(function() {
+		 // update underlying textarea before submit validation
+		 tinyMCE.triggerSave();
+	 });
 	
 });
 </script>

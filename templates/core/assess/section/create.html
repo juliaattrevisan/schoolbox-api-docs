@@ -1,5 +1,52 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" media="screen" href="/css/core/assess.css" />
+<script type="text/javascript">
+
+$j(function() {
+	
+	jQuery.validator.addMethod("combo", function(value, element) 
+		{
+		if ($j('.checkbox').is(':checked'))
+		{
+		  return false;
+		}
+		else return true;
+	  },
+	  "You've selected random selection of questions. Please enter the amount of questions to put in the pool."
+	);	
+	
+	$j('.standardForm').validate({
+		rules: {
+			title: {
+				required: true,
+				minlength: 2
+			},
+			description: {
+				required: true,
+				minlength: 2
+			},
+			pool: {
+				combo: true
+			}
+		},
+		
+		messages: {
+			title: "Please enter a title",
+			description: "Please enter a description"
+		},
+		errorElement: "div",
+        wrapper: "div",  // a wrapper around the error message
+        errorPlacement: function(error, element) {
+            offset = element.offset();
+            error.insertBefore(element)
+            error.addClass('message');  // add a class to the wrapper
+            error.css('position', 'absolute');
+            error.css('left', offset.left);
+            error.css('top',  offset.top + element.outerHeight() +5);
+        }
+	});
+});
+</script>
 <!-- END custom_head -->
 <div id="assess">
 <h1>Create Section in {ASSESS_TITLE}</h1>
@@ -9,7 +56,7 @@
 		<h2>Section Details</h2>
 		<div class="assess-body">
 		
-			<form name="create" action="/assess/section/create" class="standardForm" method="post">
+		<form name="create" action="/assess/section/create" class="standardForm" method="post">
 		<fieldset class="hidden">
 			<input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
 			<input name="section_id" type="hidden" value="{SECTION_ID}" />
@@ -17,17 +64,17 @@
 		</fieldset>
 			<fieldset>
 				<label>Section Title</label>
-				<input name="title" type="text" size="35" />
+				<input name="title" type="text" size="35" class="required"/>
 			</fieldset>
 			<hr />
 			<fieldset>
 				<label>Random</label>
-				<input name="random" type="checkbox" value="1"/> Questions should be selected randomly
+				<input name="random" type="checkbox" value="1" class="checkbox"/> Questions should be selected randomly
 			</fieldset>
 			<hr />
 			<fieldset>
 				<label>Pool</label>
-				<input name="pool" type="text" /> Maximum number of questions to show
+				<input name="pool" type="text" class="pool" /> Maximum number of questions to show
 			</fieldset>
 			<hr />
 			<fieldset>

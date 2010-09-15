@@ -1,5 +1,43 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" media="screen" href="/css/core/assess.css" />
+<script type="text/javascript">
+
+$j(function() {
+	
+	jQuery.validator.addMethod(
+	  "combo",
+	  function(value, element) {
+		if ($j('.checkbox').is(':checked'))
+		{
+		  return false;
+		}
+		else return true;
+	  },
+	  "You've selected random selection of questions. Please enter the amount of questions to put in the pool."
+	);	
+	
+	$j('.standardForm').validate({
+		rules: {
+			title: {
+				required: true,
+				minlength: 2
+			},
+			description: {
+				required: true,
+				minlength: 2
+			},
+			pool: {
+				combo: true
+			}
+		},
+		
+		messages: {
+			title: "Please enter a title",
+			description: "Please enter a description"
+		}
+	});
+});
+</script>
 <!-- END custom_head -->
 
 <div id="assess">
@@ -22,12 +60,12 @@
 				
 					<fieldset>
 						<label>Random</label>
-						<input name="random" type="checkbox" value="1" {RANDOM_SELECTED} /> Questions should be selected randomly
+						<input name="random" type="checkbox" class="checkbox" value="1" {RANDOM_SELECTED} /> Questions should be selected randomly
 					</fieldset>
 				
 					<fieldset>
 						<label>Pool</label>
-						<input name="pool" type="text" value="{POOL}"/> Maximum number of questions to show
+						<input name="pool" type="text" class="pool" value="{POOL}"/> Maximum number of questions to show
 					</fieldset>
 				
 					<fieldset>

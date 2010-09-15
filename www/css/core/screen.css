@@ -239,6 +239,9 @@ fieldset{border:0; padding:0; margin:0;}
 .standardForm .formLabelWidth { width: 40%; }
 .standardForm table { width: 100%; }
 .standardForm .checkAll, .standardForm .delCheck, .standardForm .acceptCheck { top: 0; }
+.message .error{background: #fff99a; padding: 5px;}
+.message{background:url(/images/core/assess/validate-arrow.jpg) 5px 0 no-repeat; padding-top:6px;}
+
 
 .standardForm td { vertical-align: top; padding: 10px; }
 .standardForm td td { padding: 0; }

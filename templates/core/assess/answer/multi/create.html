@@ -6,8 +6,9 @@ $j(document).ready(function() {
     /* Form preprocessing
      */
     theForm.submit(function() {
+		
         var answerCollection = new Array();
-
+		tinyMCE.triggerSave();
         /* Collate possible answers and their correctness status
          */
         $j.each($j('#answerCollection').find('li'), function(index, element) {
@@ -46,7 +47,8 @@ $j(document).ready(function() {
         });
 
         return false;
-    });
+	
+	});
 
     /* Add a new answer option
      */
@@ -85,6 +87,8 @@ $j(document).ready(function() {
 		});
 	}
 	
+	$j('ul#answerCollection')
+	
 });
 </script>
 
@@ -94,7 +98,7 @@ $j(document).ready(function() {
         <ul id="answerCollection" >
 			<li class="inputs">
 				<div class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></div>
-				<input name="answer[]" class="answerCorrect checkbox" checkbox="checkbox" type="checkbox" value="" />
+				<input name="answer[]" class="answerCorrect checkbox  required" checkbox="checkbox" type="checkbox" value="" />
 				<div class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></div>
 				<div class="delete"></div>
 				<div class="float-fix"></div>
@@ -107,7 +111,7 @@ $j(document).ready(function() {
         <ul>
 			<li class="inputs">
 				<div class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></div>
-				<input name="answer[]" class="answerCorrect checkbox" checkbox="checkbox" type="checkbox" value="" />
+				<input name="answer[]" class="answerCorrect checkbox  required" checkbox="checkbox" type="checkbox" value="" />
 				<div class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></div>
 				<div class="delete"></div>
 				<div class="float-fix"></div>
