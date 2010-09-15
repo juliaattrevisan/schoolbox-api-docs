@@ -1,11 +1,6 @@
 <?php
 require_once '../include/model.php';
 
-/**
- * Description of Assess
- *
- * @author aetworowsky
- */
 class Assess extends Model {
     var $_table = 'assess';
     var $_index = 'assess_id';
@@ -19,7 +14,8 @@ class Assess extends Model {
         $query = "SELECT *
                   FROM {$this->_table}
                   WHERE category_id = '$category_id'
-                  AND deleted_at IS NULL";
+                  AND deleted_at IS NULL
+                  ORDER BY finish";
 
         return $this->db->getAll($query);
     }
