@@ -1,4 +1,4 @@
-<?
+<?php
 /* Script to automatically login to synergetic portal based on existing login creditials */
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php');
 require_once('../library/user.php');
@@ -9,22 +9,31 @@ $groupHandler = new Group;
 
 $user = $userHandler->getByID($_SESSION['id']);
 
-if($groupHandler->isParent()) {
+if($groupHandler->isParent() || 1) {
     /* Setup form variable */
     $form="Form1";
     $action=SYNERGY_portal.'login.aspx';
     $method="POST";
 
-    $formArray['__VIEWSTATE'] ="/wEPDwUKMTg3NzM1MTc4NQ9kFgJmD2QWAgIDD2QWBgIBDxYCHgdWaXNpYmxlaGQCAw8WAh8AaGQCBQ9kFgICAQ9kFgQCAw8PFgIeBFRleHRlZGQCBQ9kFgICFw8PFgIfAWVkZGQRTaP46MtESfYUfqxQrRkv5ADi9g==";
-    $formArray['__EVENTVALIDATION'] = '/wEWBALyk7P0CwLLuNPhBAKwz7XMCgKO0+OzAvC6Tnply1JVZvuxB983AhxejoYz';
+    $login = file_get_contents($action);
+ 
+    preg_match('/id="__VIEWSTATE" value="(.*?)"/', $login, $viewState);
+    preg_match('/id="__EVENTVALIDATION" value="(.*?)"/', $login, $eventValidation);
+    	
+    $formArray['__VIEWSTATE'] = $viewState[1];
+    $formArray['__EVENTVALIDATION'] = $eventValidation[1];
     $formArray['__EVENTARGUMENT'] = '';
     $formArray['__EVENTTARGET'] = '';
     $formArray['__LASTFOCUS'] = '';
     $formArray['ctl00$masterPageContentPlaceHolder$loginButton'] = 'Login';
     $formArray['ctl00$masterPageContentPlaceHolder$textBox1'] = $user['username'];
     $formArray['ctl00$masterPageContentPlaceHolder$textBox2'] = $user['email_pass'];
+    $formArray['loginButton'] = 'Login';
+    $formArray['textBox1'] = $user['username'];
+    $formArray['textBox2'] = $user['email_pass'];
 }
 else {
+	echo "<html><body><h1>Error</h1><p>Must be a parent to access this service</p></body></html>";
     exit;
 }
 
@@ -33,11 +42,11 @@ else {
 
 <html>
 <head>
-<title>Redirecting to <? echo $to ?></title>
+<title>Redirecting to <?php echo $to ?></title>
 
 </head>
 
-<?
+<?php
 echo "<body>";
 
 echo"<form method='{$method}' name='{$form}' action='{$action}'>";
@@ -57,9 +66,9 @@ if(is_array($formArray)) {
 ?>
 </form>
 <script>
-<?
+<?php
 if (!($nojs))
-	echo "document.{$form}.submit();";
+	//echo "document.{$form}.submit();";
 ?>
 </script>
 </body>
