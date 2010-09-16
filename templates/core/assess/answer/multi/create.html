@@ -89,9 +89,11 @@ $j(document).ready(function() {
 			}
 			
 			if (element.hasClass("answerDescription")) {
-				var pos = element.parent().position();
-				error.css('left', pos.left);
-           		error.css('top',  pos.top);
+				error.addClass("list-items");
+				var pos = $j('ul#answerCollection').height();
+				var lefty = element.position();
+				$j('.list-items').css('left', lefty.left);
+           		$j('.list-items').css('top',  pos);
 			}
 		}
 	});
@@ -110,12 +112,15 @@ $j(document).ready(function() {
             if ($j.trim(description) == '') {
                 fieldsAreFilled = false;
             }
+			
+			
         });
 
         /* Reposition bubble here somewhere
          */
-
+		 
         return fieldsAreFilled;
+		
     }, 'Please sell my wife');
 
     /* Add a new answer option
@@ -123,6 +128,14 @@ $j(document).ready(function() {
     $j('#makeNewAnswer').live('click', function() {
 		var thing = $j('.hidden-clone ul:first-child').clone();
 		$j('ul#answerCollection').append(thing);
+		
+				var pos = $j('ul#answerCollection').height();
+				
+				$j('.list-items').css('left', 120);
+           		$j('.list-items').css('top',  pos);
+		
+		
+		
 		refreshList();
     });
 	
