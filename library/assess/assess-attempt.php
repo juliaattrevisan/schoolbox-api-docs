@@ -11,6 +11,51 @@ class AssessAttempt extends Model {
     var $_index = 'attempt_id';
 
     /**
+     * Mark an attempt as having been reviewed.
+     *
+     * @param <type> $attempt_id
+     */
+    function reviewed($attempt_id) {
+        $data = array(
+            'attempt_id' => $attempt_id,
+            'reviewed_at' => 'NOW()'
+        );
+
+        parent::update($data);
+    }
+
+    /**
+     * The number of attempts that have been reviewed for an assess
+     * 
+     * @param <type> $assess_id
+     * @return <type>
+     */
+    function numReviewed($assess_id) {
+        $query = "SELECT COUNT(*)
+                  FROM {$this->_table}
+                  WHERE assess_id = '$assess_id'
+                  AND reviewed_at IS NOT NULL";
+
+        return $this->db->getOne($query);
+    }
+
+    /**
+     * The number of attempts made for an assess. Group them by user id to
+     * cater for multiple attempts.
+     * 
+     * @param <type> $assess_id
+     * @return <type>
+     */
+    function numAttempted($assess_id) {
+        $query = "SELECT COUNT(*)
+                  FROM {$this->_table}
+                  WHERE assess_id = '$assess_id'
+                  GROUP BY user_id";
+
+        return $this->db->getOne($query);
+    }
+
+    /**
      * Creates an attempt and marks the start time
      *
      * @param integer $user_id

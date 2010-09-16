@@ -1,38 +1,37 @@
 <div class="box" id="component{COMPONENT_ID}">
     <h2>Online Assessments</h2>
+	<div>
+		<ul>
+			<!-- BEGIN assess -->
+			<li>
+				<h4><em>{ASSESS_TITLE}</em></h4>
+                <p>Due by {ASSESS_FINISH_DATE}</p>
+                <p>{ASSESS_DESCRIPTION}</p>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Due Date</th>
-                <!-- BEGIN teacherHeader -->
-                <th>Edit</th>
-                <th>View Results</th>
-                <!-- END teacherHeader -->
-                <!-- BEGIN studentHeader -->
-                <th>Take test</th>
-                <!-- END studentHeader -->
-            </tr>
-        </thead>
-        <tbody>
-            <!-- BEGIN assess -->
-            <tr>
-                <td>{ASSESS_TITLE}</td>
-                <td>{ASSESS_FINISH_DATE}</td>
-                <!-- BEGIN teacherLink -->
-                <td><a href="/assess/modify/{ASSESS_ASSESS_ID}">Edit</a></td>
-                <td><a href="/assess/results/{ASSESS_ASSESS_ID}">View Results</a></td>
-                <!-- END teacherLink -->
-                <!-- BEGIN studentLink -->
-                <td><a href="/assess/intro/{ASSESS_ASSESS_ID}">Take test</a></td>
-                <!-- END studentLink -->
-            </tr>
-            <!-- END assess -->
-        </tbody>
-    </table>
+				<div class="small-right">
+                    <!-- BEGIN teacherLink -->
+                    <p class="interact">
+                        <a href="/assess/modify/{ASSESS_ASSESS_ID}">Modify</a> |
+                        <a href="/assess/results/{ASSESS_ASSESS_ID}">View Results</a>
+                    </p>
+                    <!-- END teacherLink -->
 
-    <!-- BEGIN createAssessment -->
-    <a href="/assess/create/{ASSESS_CATEGORY_ID}">Create Assessment</a>
-    <!-- END createAssessment -->
+                    <!-- BEGIN studentLink -->
+                    <p class="interact">
+                        <a href="/assess/intro/{ASSESS_ASSESS_ID}">Take test</a>
+                    </p>
+                    <!-- END studentLink -->
+				</div>
+
+                <div class="float-fix"></div>
+			</li>
+			<!-- END assess -->
+		</ul>
+
+        <!-- BEGIN createAssessment -->
+        <p class="interact">
+            <a href="/assess/create/{ASSESS_CATEGORY_ID}">Create Assessment</a>
+        </p>
+        <!-- END createAssessment -->
+	</div>
 </div>

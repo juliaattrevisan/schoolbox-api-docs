@@ -21,6 +21,10 @@ $section = $sectionHandler->getByID($this->arg[1]);
 if (is_numeric($this->arg[2])) {
     $_SESSION['attempt_id'] = $this->arg[2];
 }
+else {
+    error();
+    //error: no attempt_id selected
+}
 
 /* Set up template
  */

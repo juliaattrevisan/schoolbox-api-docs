@@ -1,7 +1,7 @@
 <h1>Submission Boxes</h1>
 <div class="indent">
     <table class="ruler">
-        <!-- BEGIN category_block -->
+        <!-- BEGIN category_listing -->
         <thead>
             <tr>
                 <td colspan="9"><h2>{CATEGORY} ({STUDENTS} Students)</h2>
@@ -21,8 +21,9 @@
             </tr>
         </thead>
         <tbody>
-            <!-- BEGIN submission_block -->
+            <!-- BEGIN submission_listing -->
             <tr class="{ON_OFF}">
+                <!-- BEGIN normalSubmission -->
                 <td><a href="/submission/viewSubmission/{ID}">{ASSDESC}</a></td>
                 <td>{TYPE}</td>
                 <td><a href="/submission/createSubmission/modify/{ID}">{OPENDATE}</a></td>
@@ -31,11 +32,23 @@
                 <td class="center">{MARKED}</td>
 				<td class="center"><a href="/submission/viewSubmission/{ID}">View</a></td>
 				<td class="center"><a href="/submission/createSubmission/modify/{ID}">Edit</a></td>
-                <td class="center"><a href="/submission/submissionForm.php?deleteBox={ID}" onclick="return(confirm('Remove {JAVAASSDESC}?'));">Delete</a></td>
+                <td class="center"><a href="/submission/submissionForm.php?deleteBox={ID}" onclick='return(confirm("Remove {JAVAASSDESC}?"));'>Delete</a></td>
+                <!-- END normalSubmission -->
+                <!-- BEGIN onlineAssessment -->
+                <td><a href="/assess/intro/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></td>
+                <td>{ASSESS_TYPE}</td>
+                <td><a href="/assess/modify/{ASSESS_ASSESS_ID}">{ASSESS_START}</a></td>
+                <td><a href="/assess/modify/{ASSESS_ASSESS_ID}">{ASSESS_FINISH}</a></td>
+                <td class="center">{ASSESS_ATTEMPTS}</td>
+                <td class="center">{ASSESS_REVIEWED}</td>
+				<td class="center"><a href="/assess/intro/{ASSESS_ASSESS_ID}">View</a></td>
+				<td class="center"><a href="/assess/modify/{ASSESS_ASSESS_ID}">Edit</a></td>
+                <td class="center"><a href="/assess/delete/{ASSESS_ASSESS_ID}{ID}" onclick='return(confirm("Remove {JAVAASSDESC}?"));'>Delete</a></td>
+                <!-- END onlineAssessment -->
             </tr>
-            <!-- END submission_block -->
+            <!-- END submission_listing -->
             <tr><td colspan="9">&nbsp;</td></tr>
         </tbody>
-        <!-- END category_block -->
+        <!-- END category_listing -->
     </table>
 </div>

@@ -21,6 +21,27 @@ class Assess extends Model {
     }
 
     /**
+     * Get a list of assessments to display on the listSubmission page at
+     * /submission/listSubmission
+     * 
+     * @param <type> $category_id
+     * @return <type>
+     */
+    function getSubmissionList($category_id) {
+        $query = "SELECT
+                      assess_id, title, category_id,
+                      DATE_FORMAT(start, '%a, %D %b %l:%i%p') AS start,
+                      DATE_FORMAT(finish, '%a, %D %b %l:%i%p') AS finish,
+                      file_type.name AS type
+                  FROM assess
+                  LEFT JOIN file_type ON assess.type = file_type.id
+                  WHERE category_id = '$category_id'
+                  AND deleted_at IS NULL";
+
+        return $this->db->getAll($query);
+    }
+
+    /**
      * Get an introduction to an Assess.
      * 
      * @param <type> $assess_id
