@@ -24,6 +24,8 @@ body {
 	top: 22px;
 	left: 21px;
 }
+#logo a{background:none; height:67px;}
+
 #container {
 	margin-left: 176px;
 	min-width: 785px;
@@ -65,11 +67,17 @@ body {
 	font-weight: bold;
 	padding-left: 10px;
     text-transform: none;
+	border-color:#e79d00;
+}
+#search-button{
+	width:auto; border:0 none; height:auto;	
+	
 }
 #nav ul {	
 	margin-bottom: 15px;
 	background: #ededed url(/images/mggs/bg-nav-bottom.gif) no-repeat 0 100%;
 	padding-bottom: 2px;
+	border:0 none;
 }
 #nav li {
 	border: 1px solid #dbdbdb;
@@ -158,11 +166,12 @@ li p.interact {
 	border: 0;
 }
 #category {
-	margin: 0;
-	position: absolute;
-	top: 5px;
-	left: 5px;
-	height: 24px;
+height:24px;
+left:5px;
+margin:0;
+position:absolute;
+top:4px;
+padding:0;
 }
 #category li {
 	border: 0;
@@ -285,6 +294,7 @@ table.ruler span.header_option{margin:-32px 12px 0 0;}
 .mggs-login #container {
 	margin: 0;
 	padding: 0;
+	background:#F4F3EF;
 }
 .mggs-login #content {
 	background: url(/images/mggs/login-bg.png) no-repeat;

@@ -13,7 +13,8 @@ $j(function() {
 			},
 			marks: {
 				required: true,
-				minlength: 1
+				minlength: 1,
+				number:true
 			},
 			answer: {
 				required: true,
@@ -23,35 +24,29 @@ $j(function() {
 		
 		messages: {
 			question: "Please enter a question.",
-			marks: "Please allocate some marks to the question.",
 			answer: "Please fill out an answer."
 		},
-		errorPlacement: function(label, element) {
-			// position error label after generated textarea
-			if (element.is("textarea")) {
-				label.insertAfter(element.next());
-			} else {
-				label.insertAfter(element)
+		
+		errorElement: "div",
+        wrapper: "div",  // a wrapper around the error message
+        errorPlacement: function(error, element) {
+            offset = element.offset();
+            error.insertAfter(element)
+            error.addClass('message');  // add a class to the wrapper
+            error.css('position', 'absolute');
+            error.css('left', offset.left);
+            error.css('top',  offset.top + element.outerHeight() +5);
+
+			if (element.hasClass("tinyValidate")) {
+				var pos = element.siblings('#question_container').position();
+				error.css('left', pos.left);
+           		error.css('top',  pos.top + element.siblings('#question_container').outerHeight() +5);
 			}
-		} 
+		}
 	
 	});
 	
-	validator.focusInvalid = function() {
-		// put focus on tinymce on submit validation
-		if( this.settings.focusInvalid ) {
-		try {
-			var toFocus = $j(this.findLastActive() || this.errorList.length && this.errorList[0].element || []);
-		if (toFocus.is("textarea")) {
-			tinyMCE.get(toFocus.attr("id")).focus();
-		} else {
-			toFocus.filter(":visible").focus();
-		}
-	} catch(e) {
-		// ignore IE throwing errors when focusing hidden elements
-	}
-	}
-	} 
+
 	
 	
 	

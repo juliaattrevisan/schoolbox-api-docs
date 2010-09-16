@@ -30,11 +30,74 @@ $j(document).ready(function() {
 			});
 		}
 	});
+	
+
+	var validator = $j("#createQuestionForm").submit(function() {
+		 // update underlying textarea before submit validation
+		 tinyMCE.triggerSave();
+	 }).validate({
+		rules: { 
+			question: {
+				required: true,
+				minlength: 2
+			},
+			marks: {
+				required: true,
+				minlength: 1,
+				number:true
+			},
+			question : {
+				required:true,
+				minlength: 1
+				
+				
+			},
+			answer: {
+				required: true,
+				minlength: 1
+			}
+		},
+		
+		messages: {
+			question: "Please enter a question.",
+			
+			answer: "Please fill out an answer."
+		},
+		
+		errorElement: "div",
+        wrapper: "div",  // a wrapper around the error message
+        errorPlacement: function(error, element) {
+            offset = element.offset();
+            error.insertAfter(element)
+            error.addClass('message');  // add a class to the wrapper
+            error.css('position', 'absolute');
+            error.css('left', offset.left);
+            error.css('top',  offset.top + element.outerHeight() +5);
+
+			if (element.hasClass("tinyValidate")) {
+				var pos = element.siblings('#question_container').position();
+				error.css('left', pos.left);
+           		error.css('top',  pos.top + element.siblings('#question_container').outerHeight() +5);
+			};
+			
+			if (element.hasClass("tinyValidate2")) {
+				var pos2 = element.siblings('#answerBox_parent').position();
+				error.css('left', pos2.left);
+           		error.css('top',  pos2.top + element.siblings('#answerBox_parent').outerHeight() +5);
+			};
+		}
+	
+	});	
+	
+	
+	
+
+	
 });
 </script>
 <fieldset>
     <label>Answer</label>
-    <div class="textarea-container"><textarea id="answerBox" name="answer" style="width: 100%;height: 250px;">{ANSWER}</textarea></div>
+    <div class="textarea-container"><textarea id="answerBox" name="answer" class="tinyValidate2">{ANSWER}</textarea></div>
 </fieldset>
 
 <fieldset>

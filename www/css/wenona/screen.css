@@ -12,8 +12,11 @@ a:hover { color: #c00; }
 	padding: 0;
 	min-width: 996px;
 	margin: 0;
+	background:none;
 	}
-#nav { position: absolute; float: left; top: 46px; width: 150px; }
+#nav { position: absolute; float: left; top: 46px; width: 150px; margin:0;}
+#nav ul{border:0 none; -moz-border-radius:0; -webkit-border-radius:0; border-radius:0;}
+#nav h3{ -moz-border-radius:0; -webkit-border-radius:0; border-radius:0; border:0;}
 #header {
 	height: 70px;
 	background: #003366 url(/images/wenona/headerv3.gif) scroll 150px 0;
@@ -34,14 +37,17 @@ a:hover { color: #c00; }
 	padding: 20px 20px 20px 160px;
 	background: 0;
 	margin: 0;
+	width:auto;
 	}
+	
+#content .box h2{color:#fff;}
 #tabs {
 	bottom: 0;
 	right: 0;
 	left: 151px;
 	}
 #tabs li {
-	margin: 0 15px 0 0;
+	margin: 0 15px 0 0; float:left;
 	}
 #tabs li a {
 	color: #fff;
@@ -52,7 +58,10 @@ a:hover { color: #c00; }
 	display: block;
 	line-height: 24px;
 	font-size: 90%;
+	height:auto;
+	margin:0;
 	}
+#search-button{width:auto; height:auto; border:0;}
 #tabs li a:hover {
 	background: 0;
 	}
@@ -145,12 +154,14 @@ h2 {
 	background: 0;
 	text-indent: 4px;
 	}
-#content h2 a {
+#content h2 a ,#content .box h2{
 	color: #000;
 	}	
+#content .template4 h2{color:#fff;}
 .homepage h2 {
 	background-position: 0 -4px;
 	}
+
 /*---------------------------------------
 	Nav Styles
 ----------------------------------------*/
@@ -204,6 +215,7 @@ h2 {
 	}
 #footer ul {
 	margin-top: 20px;
+	background:none;
 }
 #footer ul li {
 	display: block;

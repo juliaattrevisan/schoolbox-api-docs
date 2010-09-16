@@ -43,8 +43,8 @@ $j(document).ready(function() {
 				minlength: 2
 			},
 			'duration[minute]': {
-        		selectNone: true,
-				errorPlacement:true
+        		selectNone: true
+
       		}
 		},
 		
@@ -134,21 +134,21 @@ $j(document).ready(function() {
 			<tr>
 				<td><h3>Duration</h3><h4>Time available for completion</h4></td>
 				<td>
-					 hr<select name="duration[hour]" id="minHours">
+					 <select name="duration[hour]" id="minHours">
 						<!-- BEGIN durationHour -->
 						<option value="{DURATION_HOUR_VALUE}" {DURATION_HOUR_SELECTED}>{DURATION_HOUR_VALUE}</option>
 						<!-- END durationHour -->
-					</select>
-					min<select name="duration[minute]" id="minDuration">
+					</select>hr
+					<select name="duration[minute]" id="minDuration">
 						<!-- BEGIN durationMinute -->
 						<option value="{DURATION_MINUTE_VALUE}" {DURATION_MINUTE_SELECTED}>{DURATION_MINUTE_VALUE}</option>
 						<!-- END durationMinute -->
-					</select> 
+					</select> min
 				</td>
 			</tr>
 			<tr>
 				<td><h3>Description</h3></td>
-				<td><div class="textarea-container"><textarea name="description" style="width: 100%;height: 250px;">{ASSESS_DESCRIPTION}</textarea></div></td>
+				<td><div class="textarea-container"><textarea name="description">{ASSESS_DESCRIPTION}</textarea></div></td>
 			</tr>
 			<tr>
 				<td><h3>Allow Re-sit</h3><h4>Allow students to take this test multiple times</h4></td>

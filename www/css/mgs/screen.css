@@ -4,16 +4,17 @@ body {
 	color: #000;
 	}
 #container {
-	padding: 0 10px 0 0;
 	margin-left: 160px;
+		background:#fff;
 	}
 #content {
-	border: 3px solid #00458C;
-	padding: 10px;
+	/*border: 3px solid #00458C;*/
+
 	}
+#content h2{color:#000;}
 .box a, a { color: #0033CC; }
 a:hover { color: #0066CC; }
-
+#content .box h2{color:#fff;}
 .box ul {
 	list-style: none;
 	}
@@ -45,6 +46,7 @@ a:hover { color: #0066CC; }
 	background: #1f2482;
 	padding: 0;
 	margin-left: 11%;
+	
 	}
 #yellowstripe {
 	border-bottom: 8px solid #FFFFA4;
@@ -58,10 +60,13 @@ a:hover { color: #0066CC; }
 	top: 80px;
 	left: 10px;
 	width: 140px;
+		margin:0;
 	}
 #nav ul {
+
 	margin-bottom: 1em;
 	border-left: 5px solid #0065ce;
+	
 	}
 #nav h3 {
 	color: #fff;
@@ -72,6 +77,9 @@ a:hover { color: #0066CC; }
 	width: 119px;
 	padding: 3px 0 3px 6px;
 	line-height: normal;
+	height:auto; 
+	font-weight:normal;
+
 	}
 #nav li a {
 	width: 135px;
@@ -129,6 +137,9 @@ a:hover { color: #0066CC; }
 	padding: 10px;
 	width: 115px;
 	}
+#search-button{
+	width:auto; height:auto; border:0;	
+}
 /*---------------------------------------
 	Tab Styles
 ----------------------------------------*/
@@ -139,15 +150,18 @@ a:hover { color: #0066CC; }
 	float: left;
 	border: 3px solid #00458a;
 	border-bottom: 0;
+	margin-bottom:7px;
 	}
 #tabs li {
 	margin: 0;
-	border-right: 1px solid #00458a;
+	float:left;
+
 	}
 #tabs li:last-child {
 	border-right: 0;
 	}
 #tabs li a {
+	height:auto;
 	background: #caf2ff;
 	color: #333333;
 	font-weight: bold;
@@ -155,6 +169,7 @@ a:hover { color: #0066CC; }
 	padding: 5px 15px;
 	line-height: normal;
 	font-size: 90%;
+	-moz-border-radius:0;
 	}
 #container #tabs li a.navthis {
 	background: #00458a;
@@ -204,8 +219,7 @@ h2, .news-item h3, p.heading {
 	color: #000;
 	}
 #calendar table thead td {
-	border-bottom: 4px solid #0066CC;
-	border-left: 10px solid #0066CC;
+
 	padding: 0;
 	}	
 .box.grey {
@@ -217,24 +231,23 @@ h2, .news-item h3, p.heading {
 	}
 .header_option {
 	font-size: 100%;
-	margin-top: -35px;
+	margin-top: -23px;
 	}
+.header_option a, table.ruler span.header_option a {color:#000;}
 #calendar table .header_option {
 	margin-top: 0;
 	}
 /*table .header_option {
 	margin-top: -17px;
 	}*/
-.box .edit {
-	height: 18px;
-	line-height: 18px;
-	}
+
 a.edit {
 	background: #fff;
 	color: #002B58;
 	font-size: 80%;
 	}
 p.interact a { color: #03c; }
+.template4 .left, .template4 .right {background:#fff;}
 /*---------------------------------------
 	Footer Styles
 ----------------------------------------*/

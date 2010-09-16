@@ -11,11 +11,7 @@ tinyMCE.init({
 		width : "100%",
 		forced_root_block : "",
 		force_p_newlines : false,
-		// update validation status on change
-		 onchange_callback: function(editor) {
-			 tinyMCE.triggerSave();
-			 $j("#" + editor.id).valid();
-		 } 
+
 	});
 	
 	
@@ -45,7 +41,7 @@ tinyMCE.init({
 			
 				<fieldset>
 					<label>Question</label>
-					<div class="textarea-container"><textarea name="question" class="mceSimple" id="question" />{QUESTION}</textarea></div>
+					<div class="textarea-container"><textarea name="question" class="mceSimple tinyValidate" id="question" />{QUESTION}</textarea></div>
 				</fieldset>
 			
 				<fieldset>

@@ -13,15 +13,13 @@ $j(document).ready(function() {
 	if (($j('.question-type-select :selected').text()) == "-- Select Type --") {
 	$j('.add-question').hide();
 	}
-	
-	
-	
+
 	$j('.question-type-select').change(function() {
 		$j('.add-question').show();
 	});
 	
 
-tinyMCE.init({
+	tinyMCE.init({
 		mode : "exact",
 		elements: "question",
 		theme : "simple",
@@ -30,17 +28,8 @@ tinyMCE.init({
 		width : "100%",
 		forced_root_block : "",
 		force_p_newlines : false,
-		// update validation status on change
-		 onchange_callback: function(editor) {
-			 tinyMCE.triggerSave();
-			 $j("#" + editor.id).valid();
-		 } 
-	});
 
-	$j(".standardForm").submit(function() {
-		 // update underlying textarea before submit validation
-		 tinyMCE.triggerSave();
-	 });
+	});
 	
 });
 </script>
@@ -71,7 +60,7 @@ tinyMCE.init({
 		
 			<fieldset>
 				<label>Question</label>
-				<div class="textarea-container"><input name="question" class="mceSimple" id="question" type="text" size="35" value="{QUESTION}" /></div>
+				<div class="textarea-container"><input name="question" class="mceSimple tinyValidate" id="question" type="text" size="35" value="{QUESTION}" /></div>
 			</fieldset>
 		
 			<fieldset>

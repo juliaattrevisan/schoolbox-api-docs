@@ -13,7 +13,8 @@ $j(function() {
 			},
 			marks: {
 				required: true,
-				minlength: 1
+				minlength: 1,
+				number:true
 			},
 			answer: {
 				required: true,
@@ -23,9 +24,26 @@ $j(function() {
 		
 		messages: {
 			question: "Please enter a question.",
-			marks: "Please allocate some marks to the question.",
+			
 			answer: "Please fill out an answer."
-		} 
+		},
+		
+		errorElement: "div",
+        wrapper: "div",  // a wrapper around the error message
+        errorPlacement: function(error, element) {
+            offset = element.offset();
+            error.insertAfter(element)
+            error.addClass('message');  // add a class to the wrapper
+            error.css('position', 'absolute');
+            error.css('left', offset.left);
+            error.css('top',  offset.top + element.outerHeight() +5);
+
+			if (element.hasClass("tinyValidate")) {
+				var pos = element.siblings('#question_container').position();
+				error.css('left', pos.left);
+           		error.css('top',  pos.top + element.siblings('#question_container').outerHeight() +5);
+			}
+		}
 	
 	});
 	
@@ -35,5 +53,5 @@ $j(function() {
 
 <fieldset>
     <label>Answer</label>
-    <div class="textarea-container"><textarea id="answer" name="answer">{ANSWER}</textarea></div>
+    <div class="textarea-container"><textarea id="answer"  name="answer">{ANSWER}</textarea></div>
 </fieldset>

@@ -4,15 +4,18 @@
 #logo {
 	width: 298px;
 	height: 71px;
+	left:20px; top:20px;
 	background: url(/images/shore/shore-logo.gif) no-repeat;
 	}
-#content {
-	padding: 5px 15px 15px;
-	}
+#logo a{background:none;}
+#content {}
+#header{ margin-left:180px;}
 table th,
 table td {
 	text-align: left;
 }
+body{background:#E4E4E4;}
+
 /*---------------------------------------
 	Component Styles
 ----------------------------------------*/
@@ -22,7 +25,7 @@ h1 a.customise {
 h2 {
 	background: #003e7e url(/images/shore/box-bg.png) repeat-x;
 	}
-table h2 {
+table h2, #content table.ruler h2 {
 	background: 0;
 	border-bottom: 1px dashed #7F7F7F;
 	color: #000;
@@ -32,17 +35,36 @@ table h2 {
 	color: #fff;
 	}	
 #content .header_option a {
-	color: #1965B4;
+	/*color: #1965B4;*/
 	}
+	
+#logo a{height:80px;}
 .topic ul { list-style: disc; }
+#tabs li a{
+	padding:0 20px;	
+	background:none repeat scroll 0 0 #CAE4FF;
+	border-color:#9ACCFF #9ACCFF #B8B8B8;
+	border-style:solid;
+	border-width:1px;
+	color:#003E7E;
+	display:block;
+	line-height:31px; margin:0;
+}
+
+#tabs li{float:left; margin:0 0 0 1px;}
+
+#tabs li a:hover{background-color:#e1f0ff;}
+#tabs li a.navthis{background-color:#fff; border-bottom-color:#fff;}
+
 /*---------------------------------------
 	Nav Styles
 ----------------------------------------*/
+#nav{width:180px;}
 #nav h3 {
 	border-top: 1px solid #003d7b;
 	border-bottom: 1px solid #001c3a;
 	background: #002349 url(/images/shore/nav-title-bg.gif) repeat-x;
-	text-transform: uppercase;
+	text-transform: uppercase;-moz-border-radius:0; -webkit-border-radius:0; border-radius:0;
 	}
 #nav h3.pink {
 	border-top: 1px solid #da68b3;
@@ -59,6 +81,11 @@ table h2 {
 	}
 #nav li a {
 	background: #00376f url(/images/shore/nav-link-bg.gif) repeat-x;
+	width:162px;
+	}
+#nav ul ul, #nav ul ul ul {
+left:180px;
+width:180px;
 	}
 #nav li a:hover {
 	background-color: #1965b4;
@@ -66,6 +93,9 @@ table h2 {
 #tabs {
 	right: 15px;
 	}
+#nav ul{border:0 none; -moz-border-radius:0; -webkit-border-radius:0; border-radius:0;}
+#nav ul li a{color:#fff;}
+#nav{top:0; margin:0;}
 /*---------------------------------------
 	Header Styles
 ----------------------------------------*/
@@ -91,3 +121,6 @@ p.interact {
 p.interact a {
 	color: #1965B4;
 	}
+#search{margin-top:18px}
+#search-button{width:auto; height:auto; border:0 none;}
+#infoPanel{margin:22px 15px 0 0;}

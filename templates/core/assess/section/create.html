@@ -3,16 +3,17 @@
 <script type="text/javascript">
 
 $j(function() {
+
 	
 	jQuery.validator.addMethod("combo", function(value, element) 
 		{
-		if ($j('.checkbox').is(':checked'))
+		if (($j('.checkbox').is(':checked')) && ($j('.pool').val() == ""))
 		{
 		  return false;
 		}
 		else return true;
 	  },
-	  "You've selected random selection of questions. Please enter the amount of questions to put in the pool."
+	  "You've selected random selection of questions. Please enter the number of questions to put in the pool."
 	);	
 	
 	$j('.standardForm').validate({
@@ -26,7 +27,8 @@ $j(function() {
 				minlength: 2
 			},
 			pool: {
-				combo: true
+				combo: true,
+				number: true
 			}
 		},
 		
