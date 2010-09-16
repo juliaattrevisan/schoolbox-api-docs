@@ -57,8 +57,8 @@ $j(document).ready(function() {
 
 		rules: { 
 			question: {
-				required: true,
-				minlength: 2
+				//required: true,
+				//minlength: 2
 			},
 			marks: {
 				required: true,
@@ -66,9 +66,9 @@ $j(document).ready(function() {
 				number:true
 			},
 			'answerDescription[]': {
-				required:true,
-				minlength:2,
-				emptyInputs: false
+				//required:true,
+				//minlength:2,
+				emptyInputs: true
 			}
 		},
 		
@@ -96,31 +96,27 @@ $j(document).ready(function() {
 		}
 	});
 
-        fieldsAreEmpty = false;
+    jQuery.validator.addMethod('emptyInputs', function(value, element) {
+        var fieldsAreFilled = true;
 
-        jQuery.validator.addMethod('emptyInputs', function(value, element) {
-			$j.each($j('#answerCollection').find('li'), function(index, element) {
-				var elem = $j(element);
-	
-				var description = elem.find('.answerDescription').val();
-				var code = elem.find('.answerCode').attr('value');
-	
-				/* Ignore empty answers that weren't removed
-				 */
-				if (($j.trim(description) == '') && ($j.trim(code) == '')) {
-					fieldsAreEmpty = true;
-				}
-			});
-            /*
-			$j('input[name=answerDescription[]]').val() == '') {
-                return false;
-    	    }
-			*/
+        $j.each($j('#answerCollection').find('li'), function(index, element) {
+            var elem = $j(element);
 
-			return fieldsAreEmpty;
-	    }, 'Please sell my wife');
+            var description = elem.find('.answerDescription').val();
+            var code = elem.find('.answerCode').attr('value');
 
+            /* Ignore empty answers that weren't removed
+             */
+            if ($j.trim(description) == '') {
+                fieldsAreFilled = false;
+            }
+        });
 
+        /* Reposition bubble here somewhere
+         */
+
+        return fieldsAreFilled;
+    }, 'Please sell my wife');
 
     /* Add a new answer option
      */
