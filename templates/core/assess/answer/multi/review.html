@@ -1,14 +1,18 @@
+
+
 <fieldset>
     <div>
-        <ul>
+        <ul class="multiple-choice-mark">
             <!-- BEGIN answerOption -->
-            <li class="{CORRECT}">
-                <input type="checkbox" {ANSWER_CHECKED}/> {ANSWER_DESCRIPTION}
+            <li class="{CORRECT} ">
+			
+                <input disabled="disabled" type="checkbox" {ANSWER_CHECKED} class="hide"/> {ANSWER_DESCRIPTION}
+				<span class="tick-cross"></span>
             </li>
             <!-- END answerOption -->
         </ul>
     </div>
 </fieldset>
-<fieldset>
+<p class="marks-amount">
     <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" /> / {QUESTION_MARKS}
-</fieldset>
+</p>

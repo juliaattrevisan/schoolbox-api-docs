@@ -9,6 +9,7 @@ $j(function() {
 <h2>Assessment Content</h2>
 <div class="allQuestions">
 	<div class="assess-body">
+	<a class="add-section" href="/assess/section/create/{ASSESS_ASSESS_ID}">Add sections to this assessment</a>
     <!-- BEGIN section -->
 		<div class="section-box">
 			<h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}
@@ -18,7 +19,7 @@ $j(function() {
 					<ul>
 						<li><a href="/assess/section/modify/{SECTION_SECTION_ID}">Edit</a></li>
 						<li><a href="/assess/section/delete/{SECTION_SECTION_ID}">Delete</a></li>
-						<li><a href="/assess/question/create/{SECTION_SECTION_ID}">Add questions</a></li>
+						
 					</ul>
 				</li>
 			</ul>
@@ -33,12 +34,13 @@ $j(function() {
 				<!-- END question -->
 			</ul>
 	
+		<a class="add-questions" href="/assess/question/create/{SECTION_SECTION_ID}"><span>Add a Question</span></a>
 			
 		</div>
 	
     <!-- END section -->
 
-    <a class="add-section" href="/assess/section/create/{ASSESS_ASSESS_ID}">Add sections to this assessment</a>
+    
 	
 	</div>
 	</div>

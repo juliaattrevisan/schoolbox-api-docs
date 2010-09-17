@@ -1,26 +1,25 @@
 <div class="box" id="component{COMPONENT_ID}">
     <h2>Online Assessments</h2>
-	<div>
+	<div class="text listing">
 		<ul>
 			<!-- BEGIN assess -->
-			<li>
-				<h4><em>{ASSESS_TITLE}</em></h4>
-                <p>Due by {ASSESS_FINISH_DATE}</p>
-                <p>{ASSESS_DESCRIPTION}</p>
+			<li class="{ON_OFF}">
+				<h4><em>{ASSESS_TITLE}</em>
+				<p>Due by {ASSESS_FINISH_DATE}</p>
+                <p>{ASSESS_DESCRIPTION}</p></h4>
+                
 
 				<div class="small-right">
+				    <p class="interact">
                     <!-- BEGIN teacherLink -->
-                    <p class="interact">
                         <a href="/assess/modify/{ASSESS_ASSESS_ID}">Modify</a> |
                         <a href="/assess/results/{ASSESS_ASSESS_ID}">View Results</a>
-                    </p>
                     <!-- END teacherLink -->
 
                     <!-- BEGIN studentLink -->
-                    <p class="interact">
-                        <a href="/assess/intro/{ASSESS_ASSESS_ID}">Take test</a>
-                    </p>
+                        <a href="/assess/intro/{ASSESS_ASSESS_ID}" class="take-test-btn">Take test</a>
                     <!-- END studentLink -->
+					</p>
 				</div>
 
                 <div class="float-fix"></div>

@@ -1,21 +1,25 @@
 <fieldset>
     <label>Answer</label>
     <div>
-        <ul class="matchPairs">
+        <ul class="matchPairs match-left">
             <!-- BEGIN answerOptionLeft -->
-            <li><strong>{ANSWER_LEFT_VALUE}</strong></li>
+            <li class="left-columns {CORRECT}"><strong>{ANSWER_LEFT_VALUE}</strong><div class="arrow"><span></span></div>
+			<div class="float-fix"></div>
+			</li>
             <!-- END answerOptionLeft -->
         </ul>
 
-        <ul class="matchPairs">
+        <ul class="matchPairs match-right">
             <!-- BEGIN answerOptionRight -->
-            <li class="{CORRECT}">
-                {ANSWER_RIGHT_VALUE}
+            <li class="right-columns {CORRECT}">
+                <strong>{ANSWER_RIGHT_VALUE}</strong>
+				<div class="mark"><span></span></div>
+				<div class="float-fix"></div>
             </li>
             <!-- END answerOptionRight -->
         </ul>
 
-        <ul class="matchPairs">
+        <ul>
             <!-- BEGIN answerOptionCorrectResponse -->
             <li>
                 {ANSWER_CORRECT_RESPONSE_VALUE}

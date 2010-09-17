@@ -12,11 +12,15 @@ $j(document).ready(function() {
     });
 	
 	if (($j('.question-type-select :selected').text()) == "-- Select Type --") {
-	$j('.add-question').hide();
+	$j('.next-step').hide();
+	$j('.question-holder').hide();
+	$j('.marks-holder').hide();
 	}
 
 	$j('.question-type-select').change(function() {
-		$j('.add-question').show();
+		$j('.next-step').show();
+		$j('.question-holder').show();
+		$j('.marks-holder').show();
 	});
 	
 
@@ -36,7 +40,7 @@ $j(document).ready(function() {
 </script>
 
 <!-- END custom_head -->
-<div id="assess">
+<div id="assess" class="create-test">
 <h1>Create Question in Section {CURRENT_SECTION_TITLE}</h1>
 
 <div class="col-1">
@@ -59,12 +63,12 @@ $j(document).ready(function() {
 				</select>
 			</fieldset>
 		
-			<fieldset>
+			<fieldset class="question-holder">
 				<label>Question</label>
 				<div class="textarea-container"><input name="question" class="mceSimple tinyValidate" id="question" type="text" size="35" value="{QUESTION}" /></div>
 			</fieldset>
 		
-			<fieldset>
+			<fieldset class="marks-holder">
 				<label>Marks</label>
 				<input name="marks" type="text" size="3" value="{MARKS}"/>
 			</fieldset>
@@ -76,7 +80,7 @@ $j(document).ready(function() {
 			</div>
 		
 			<fieldset>
-				<input type="submit" name="create" id="create" value="Add Question" class="add-question"/>
+				<input type="submit" name="create" id="create" value="Add Question" class="next-step"/>
 			</fieldset>
 		</form>
 		</div>

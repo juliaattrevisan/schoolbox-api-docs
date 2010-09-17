@@ -83,6 +83,7 @@ CSS commands
 .background-no-repeat { background-repeat: no-repeat; }
 .bold { font-weight: bold; }
 .pad-it{padding:10px;}
+.margin-bottom-10{margin-bottom:10px;}
 
 /*--------------------------------------------------------------
  Heading Styles 
@@ -142,7 +143,7 @@ th { font-weight:bold; }
 	#nav {top:117px; text-align:left; left:0; width: 161px; margin: 15px 0 0 15px; position: absolute; z-index:20; }
 	#nav * {z-index:99;}
 	#nav h3{ color: #fff;clear:left;padding:0 0 0 16px; margin:0; line-height: 29px; height: 29px;font-weight: bold; padding-left: 10px; text-transform: none; background: #013b65 url(/images/core/body/heading-cover.png) repeat-x; border:1px solid #333; border-bottom:0px; -moz-border-radius: 5px 5px 0 0 ;-webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;}
-	#nav ul { margin-bottom: 15px; background: #ededed; border:1px solid #013b65; border-top:0;-moz-border-radius: 0 0 5px 5px;-webkit-border-radius: 0 0 5px 5px;border-radius: 0 0 5px 5px;  }
+	#nav ul { margin-bottom: 15px !important; background: #ededed; border:1px solid #013b65; border-top:0;-moz-border-radius: 0 0 5px 5px;-webkit-border-radius: 0 0 5px 5px;border-radius: 0 0 5px 5px;  }
 	#nav li {border-bottom:1px solid #dbdbdb;}
 	#nav li a { width: 141px; padding: 0; background: 0; color: #2c2c2c; font-size: 11px; padding: 7px 9px; }
 	#nav li a:hover, #nav li li a:hover { background: #1597cb; color: #fff; text-decoration: none; }
@@ -320,6 +321,8 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess input{}
 	#assess ul{margin:0;}
 	#assess .col-1 ul li{min-width: 0;position:relative; padding:5px;background:#ededed; border:1px solid #dbdbdb; margin-bottom:10px; }
+	#assess .col-1 ul li.highlight, #assess.take-test .col-1 ul li.highlight{background-color:#e0f2df;}
+
 	#assess ul{height:100%; }
 	#assess .drag-me{width:38%; font-size:11px; background:#fff; padding:10px 5px; line-height:14px; border: 1px solid #dbdbdb;}
 	#assess .mceLayout tbody{border:0;}
@@ -337,16 +340,18 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	{height:37px; width:9%; position:relative; display:block;}
 	#assess ul li .mark span, 
 	#assess .arrow span
-	{float:right; height:10px;
-	background:url(/images/core/assess/arrows-correct-incorrect.gif) 50% 2px no-repeat; width:100%; }
-	#assess .arrow{float:left; width:10%; position:relative;}
-	#assess .arrow span{position:absolute;top:8px; left:0;}
+	{float:right; text-align:center; height:10px;
+	width:100%; }
+	#assess.mark-test .arrow{float:left; width:11%; position:relative;}
+	#assess.mark-test .arrow span{position:absolute;top:8px; left:50%; background:url(/images/core/assess/arrow.gif) no-repeat; height:20px; height:15px;}
 	
 	#assess li.inputs .answer-value,
 	#assess li.inputs .list-item,
 	#assess li.inputs .checkbox,
 	#assess .text-box{
 	height:24px; line-height:24px;}
+	
+	#assess li.inputs .answer-value .message{line-height:normal;}
 	
 	#assess li.inputs .drag-me{padding:0 5px;}
 	#assess li.inputs .answer-value{border:1px solid #dbdbdb; width:78%; height:100%; background:#fff; padding:0 5px;}
@@ -358,7 +363,8 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess .text-box.text-border{border: 1px solid #dbdbdb;}
 	#assess li.inputs .delete{background:url(/images/core/assess/delete.gif) 50% 50% no-repeat; height:27px;}
 	#assess li.inputs .arrow{height:27px;}
-	
+	#assess.create-test li.inputs .arrow{height:27px; width:11%; float:left; }
+	#assess.create-test li.inputs .arrow span{padding-top:5px;}
 	#assess .grey-highlight{line-height:16px;}
 	#assess .hidden-clone{display:none;}
 	
@@ -366,14 +372,18 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess .col-1 .answerList li {background:#E0F2DF;  float:left;margin:0 10px 10px 0;}
 	
 	/*tiny mce*/
-	.mceContentBody p span{padding:1px 2px; background:#E0F2DF; border: 1px solid #dbdbdb;}
+	.mceContentBody p span, .mceContentBody span{padding:1px 2px; background:#E0F2DF; border: 1px solid #dbdbdb;}
 	#assess table.mceLayout tr.mceFirst td,#assess table.mceLayout tr.mceLast td,#assess table.mceLayout tr.mceFirst td, .defaultSkin .mceIframeContainer  {border:0;}
 	#assess .defaultSkin table.mceLayout,#assess .defaultSkin table.mceLayout tr.mceFirst td{border:0 none;}
 	#assess .defaultSkin td.mceCenter table{margin:0; width:100px;}
 	#assess .defaultSkin td.mceCenter table td{}
 	
 	.section-box{margin-bottom:10px;}
-	#assess .section-box h3{background:#1597cb; padding:5px; margin:0; font-size:11px; color:#fff;}
+	.section-box .add-questions{display:block; padding:10px; text-align:center;background:#ececec;  color:#000 }
+	.section-box .add-questions:hover{text-decoration:none; background:#f0f0f0;}
+	.section-box .add-questions span{background: url(/images/core/assess/plus-icon.gif) no-repeat 0 0; padding-left:20px}
+
+	#assess .section-box h3, #assess.take-test .percentage-complete h3{background:#1597cb; padding:5px; margin:0; font-size:11px; color:#fff;}
 	.section-box ul{margin:0; border:1px solid #dbdbdb; border-top:0; border-bottom:0;}
 	.section-box ul.section-options{width:13px; position:absolute; right:6px; top:6px; border:0;}
 	#assess .section-box ul.section-options ul{border-top:1px solid #CCCCCC;display:none;height:auto;min-height:10px;position:absolute;right:0;top:13px;width:100px;}
@@ -388,7 +398,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	.section-box ul li p.links{padding:0 10px 10px 10px;}
 	.section-box ul li span{font-weight:bold;}
 	.section-box ul li a{color: #255297; padding:0; font-size:10px; }
-	#assess .add-section{background: #ebebeb url(/images/core/assess/add-section.gif) no-repeat 6px 50%; display:block;font-size:10px; padding:9px 0 8px 28px; display:block; font-size:10px; }
+	#assess .add-section{background: #ebebeb url(/images/core/assess/add-section.gif) no-repeat 6px 50%; display:block;font-size:10px; padding:9px 0 8px 28px; display:block; font-size:10px; margin-bottom:10px; }
 	
 	.section-box h3 span:hover{background-position:bottom; cursor:pointer;}
 	
@@ -396,82 +406,98 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	#assess .add-statement,
 	#assess .add-answer,
 	#assess .make-blank,
-	#assess .green-go
+	#assess .green-go,
+	#assess .save-answer,
+	p.interact a.take-test-btn
 	{height:25px;border:none; text-indent:-9999em; display:block;}
 	#assess .add-statement:hover,
 	#assess .add-answer:hover,
 	#assess .make-blank:hover,
-	#assess .add-question:hover,
-	#assess .green-go:hover
-	{background-position:bottom; cursor:pointer}
+	#assess .green-go:hover,
+	#assess .save-answer:hover,
+	p.interact a.take-test-btn:hover
+	{background-position:left bottom; cursor:pointer}
 	
 	#assess .make-blank img.mceIcon{display:none;}
 	
 	#assess .add-statement{ width:112px; background:url(/images/core/assess/add-statement-btn.gif) no-repeat;}
 	#assess .add-answer{width:103px; background:url(/images/core/assess/add-answer-btn.gif) no-repeat;}
 	#assess .make-blank{ margin-right:10px;width:95px;background:url(/images/core/assess/make-blank-btn.gif) no-repeat;}
-	#assess .add-question{ border:0;float:right;color:#fff; font-weight:bold; width:115px; height:29px;background:url(/images/core/assess/add-question-btn.gif) no-repeat;}
-	#assess .green-go{width:127px; font-weight:bold; text-align:center; line-height:29px; color:#fff; margin:20px 0 0 0 ; height:29px;background: url(/images/core/assess/submit.gif) no-repeat; text-indent:0;}
+	#assess .green-go{ float:right;width:127px; font-weight:bold; text-align:center; line-height:29px; color:#fff; height:29px;background: url(/images/core/assess/submit.gif) no-repeat; text-indent:0;}
+	#assess .save-answer{width:106px; background:url(/images/core/assess/save-btn.gif) no-repeat;float:right;}
+	p.interact a.take-test-btn{ text-align:left;display:block;width:86px; background:url(/images/core/assess/take-test-btn.gif) no-repeat;}
 
 	.mark-test form .submit, .take-test form .next-section{width:127px; height:29px; border:0;  background: url(/images/core/assess/submit.gif) no-repeat; padding:0; margin:20px 0; color:#fff; font-weight:bold; font-size:11px; float:right;}
 	.mark-test form .submit:hover, .take-test form .next-section:hover{background-position:left bottom; cursor:pointer}
 
 	/*take test*/
 	#assess.take-test h3{background:#ededed; padding:10px;}
+	#assess.take-test h3.test-details{background:#f8f8f8;}
 	#assess.take-test .col-1 ul li{background:#EDEDED;}
-	#assess.take-test .col-1 ul li.left-answer{border-right:0;}
-	#assess.take-test .col-1 ul li.right-answer{border-left:0;}
-	#assess.take-test .percentage-complete{padding:10px; background:#f6fff6;}
-	#assess.take-test .all-good{background:#E0F2DF; padding:10px; display:none;}
-	#assess.take-test .percentage-complete span{ display:none; }
-	#assess.take-test .percentage-text{padding:5px; background:#fff;font-size:16px;} 
+	#assess.take-test .col-1 ul li.left-answer, #assess.take-test .col-1 ul li.right-answer{
+		border-right:0;background:#fff; padding:0; border:0;}
+	#assess.take-test .col-1 ul li.right-answer{background:#e3f2fa;}
+	#assess.take-test .all-good{background:#eff9ff; padding:10px; display:none;}
+	
+	#assess.take-test .percentage-complete{background:#f1f7fa; margin-bottom:15px;}
+	#assess.take-test .percentage-complete span{ display:inline; }
+	#assess.take-test .percentage-text{font-size:11px;} 
 	#assess.take-test .percentage-text em{font-style:normal;}
-	#assess.take-test .percentage-bar{margin-bottom:10px; border:1px solid #638961;height:20px;clear:both; background:url(/images/core/assess/progress-bar.jpg) repeat-x;}
-	#assess.take-test dl {margin-bottom:10px;}
-	#assess.take-test dl dt, #assess.take-test dl dd{margin-bottom:5px; line-height:16px;}
+	#assess.take-test .percentage-bar{margin-bottom:10px; border:1px solid #638961;height:20px;clear:both; background:url(/images/core/assess/progress-bar.jpg);}
+	
+	#assess.take-test dl {margin-bottom:10px; margin-top:0;}
+	#assess.take-test dl dt, #assess.take-test dl dd{margin-left:0;margin-bottom:5px; line-height:16px;}
 	#assess.take-test .col-1 ul li.right-answer:hover{cursor:move;}
-	#assess.take-test .col-1 ul li.left-answer strong{padding:15px 5px 10px; display:block; border:1px solid #ccc; width:67%; background:#fff;}
-	#assess.take-test .col-1 ul li.left-answer .arrow{width:28%; position:absolute; float:none; top:0; right:0; height:100%;}
-	#assess.take-test .col-1 ul li.left-answer .arrow span{top:21px;}
-	#assess.take-test .col-1 ul li.right-answer strong{border:1px solid #ccc;display:block;font-weight:normal; background:#fff;padding:15px 5px 10px;}
+	#assess.take-test .col-1 ul li.left-answer strong{padding:15px 5px 10px; font-weight:normal; display:block; border:1px solid #ccc; width:67%; background:#fff;}
+	#assess.take-test .col-1 ul li.left-answer .arrow{ text-transform:uppercase; font-weight:bold;width:28%; position:absolute; float:none; top:0; right:0; height:100%;}
+	#assess.take-test .col-1 ul li.left-answer .arrow span{top:14px;}
+	#assess.take-test .col-1 ul li.right-answer strong{border:2px solid #dfdfdf;display:block;font-weight:normal; background:#e3f2fa url(/images/core/assess/drag-drop.gif)100% 50% no-repeat;padding:15px 5px 10px;}
 	.take-test ul li .arrow{width:6%;}
 	.take-test .option{width:49%; float:left;}
 	.take-test ul li .option{border:1px solid #ccc; padding:15px 5px 10px; width:43%; height:15px; float:left;}
 	
-	#assess.take-test .col-1 .multiple-choice li {padding:15px 40px 15px 10px; background:#fff;}
+	#assess.take-test .col-1 .multiple-choice li {padding:15px 40px 15px 10px; background:#fff; }
 	#assess.take-test .col-1 .multiple-choice li span{font-weight:bold;}
 	
 	#assess .next-step{ color:#fff; font-weight:bold; border:0;width:111px; float:right; height:29px; background: url(/images/core/assess/next-step.gif) no-repeat;}
-	#assess .next-step:hover{background-position:bottom; cursor:pointer; }
-	
-	
-	
-	
+	#assess .next-step:hover{background-position:bottom; cursor:pointer; text-decoration:none;}
+	#assess .step-nav{float:left; margin-right:20px; text-align:center; line-height:29px; }
+
 	/*mark test*/
+	#assess.mark-test h3{padding:10px;}
 	.mark-test h3{background:#ccc; }
+	.mark-test .hide{display:none;}
+	.mark-test ul.multiple-choice-mark li.multiCorrect { background-color: #E0F2DF; }
+	.tick-cross{float:right; height:15px; width:15px; background: url(/images/core/assess/correct-incorrect.gif) 0 -60px no-repeat;}
+	.mark-test ul.multiple-choice-mark li.multiIncorrect{background-color: #fff;}
+	.mark-test ul.multiple-choice-mark li.multiCorrect .tick-cross{background: url(/images/core/assess/correct-incorrect.gif) 0 0 no-repeat;}
+	.mark-test ul.multiple-choice-mark li.multiIncorrect .tick-cross{background: url(/images/core/assess/correct-incorrect.gif) 0 -15px no-repeat;}
 	
-	.mark-test ol{list-style-type:none; border:1px solid #dbdbdb; margin:0 0 20px 0 }
-	.mark-test ol li a{color:#000000; font-size:11px;position:relative;padding:15px 40px 15px 10px; display:block; background:#ffffff;border-bottom:1px solid #dbdbdb;}
-	.mark-test ol li a span{ float:left;font-weight:bold; padding-right:20px;}
-	.mark-test ol li a span.mark{width:16px; height:15px; position:absolute; right:0px; top:15px; background: url(/images/core/assess/correct-incorrect.gif) 0 -15px no-repeat;}
-	.mark-test ol li a.correct{background:#e0f2df;}
-	.mark-test ol li a.correct span.mark{background: url(/images/core/assess/correct-incorrect.gif) 0 0 no-repeat;}
-	.mark-test ol li a.last{border:none;}
-	
-	.mark-test ul li .mark{width:8%;}
-	.mark-test ul li.correct, .mark-test .box span.correct{background:#e0f2df;}
-	.mark-test ul li.correct span{background-position:top;}
-	
-	.mark-test .textarea-container{ padding:10px;border:1px solid #dbdbdb; margin-bottom:10px;}
-	.mark-test textarea{width:100%; font-size:12px; font-family:Arial, Helvetica, sans-serif; border:0;}
-	.mark-test {padding:10px;}
-	.mark-test p{margin:0;padding:10px 0; font-weight:bold; text-align:right; font-size:11px;}
-	
+	.mark-test ul.multiple-choice-mark li{ background-color:#ededed;border:1px solid #CCCCCC;margin-bottom:10px;padding:10px;}
+	.mark-test p.marks-amount{font-size:11px;font-weight:bold;margin:0;padding:10px 0;text-align:right;}
+	.mark-test li.matchCorrect{background-color: #E0F2DF}
+	.mark-test .matchPairs{float:left;}
+	.mark-test .match-left{width:49%}
+	.mark-test .match-right{width:51%}
+	.mark-test .matchPairs li{font-size:11px; margin-bottom:10px; background:#EDEDED; border: 1px solid #DBDBDB; padding:5px;}
+	.mark-test .matchPairs li.left-columns{border-right:0;}
+	.mark-test .matchPairs li.right-columns{border-left:0;}
+	.mark-test .matchPairs strong{font-weight:normal;background:#fff; width:86%; float:left;padding:10px 5px;; }
+	.mark-test .matchPairs li.right-columns strong{width:80%;}
 	.mark-test .box{border:1px solid #dbdbdb; padding:10px; margin-bottom:10px; line-height:22px;}
 	.mark-test .box span{padding:1px 5px; border:1px solid #dbdbdb;}
-	.mark-test .box span.incorrect{background:#f5cfcf;}
-	
+	.mark-test .box span.fillgapIncorrect{background:#F5CFCF;}
+	.mark-test .box span.fillgapCorrect{background:#E0F2DF;}
+	#assess.mark-test .right-columns .mark{height:20px; width:15%; padding-top:9px;}
+	#assess.mark-test .right-columns .mark span{ height:15px;background:url("/images/corev2/assess/correct-incorrect-grey.gif") no-repeat 50% -15px }
 
+	#assess.mark-test li.matchCorrect .mark span{background:url("/images/corev2/assess/correct-incorrect-grey.gif") no-repeat 50% 0}
+	#assess.mark-test li.matchIncorrect .mark span{background:url("/images/corev2/assess/correct-incorrect-grey.gif") no-repeat 50% -15px}
+	.mark-test li.matchCorrect{background-color: #E0F2DF}
+	.mark-test li.matchIncorrect{background-color: #F5CFCF}
+	
+	.row-switcher{background-color:#ededed;}
+	
 /*BLOG*/
 .blog-comments { background: #eee; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
 .blog-comments p.interact { border-top: 1px dashed #ccc; padding-top: 0.5em; font-size: 11px; }

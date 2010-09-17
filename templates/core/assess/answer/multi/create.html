@@ -3,7 +3,17 @@
 <script type="text/javascript">
 $j(document).ready(function() {
 
-	$j('#createQuestionForm').validate({
+
+	//add in one clone to start with
+		var thing = $j('.hidden-clone ul:first-child').clone();
+		$j('ul#answerCollection').append(thing);
+		refreshList();
+
+	var validator = $j("#createQuestionForm").submit(function() {
+		 // update underlying textarea before submit validation
+		 tinyMCE.triggerSave();
+	 
+	 }).validate({
 
 		submitHandler: function() {
    		    var theForm = $j('#createQuestionForm');
@@ -39,7 +49,7 @@ $j(document).ready(function() {
 				section_id: theForm.find('input[name=section_id]').val(),
 				sequence: theForm.find('input[name=sequence]').val(),
 				type_id: theForm.find('select[name=type_id]').val(),
-				question: theForm.find('input[name=question]').val(),
+				question: tinyMCE.get('question').getContent(),
 				marks: theForm.find('input[name=marks]').val(),
 				allAnswers: JSON.stringify(answerCollection)
 			};
@@ -57,8 +67,8 @@ $j(document).ready(function() {
 
 		rules: { 
 			question: {
-				//required: true,
-				//minlength: 2
+				required: true,
+				minlength: 2
 			},
 			marks: {
 				required: true,
@@ -66,9 +76,10 @@ $j(document).ready(function() {
 				number:true
 			},
 			'answerDescription[]': {
-				//required:true,
-				//minlength:2,
 				emptyInputs: true
+			},
+			'answer[]':{
+				nothingChecked:true	
 			}
 		},
 		
@@ -95,6 +106,21 @@ $j(document).ready(function() {
 				$j('.list-items').css('left', lefty.left);
            		$j('.list-items').css('top',  pos);
 			}
+			
+			if (element.hasClass("answerCorrect")) {
+				error.addClass("wrong-checkbox");
+				var pos = $j('ul#answerCollection').height();
+				var lefty = element.position();
+				$j('.wrong-checkbox').css('left', lefty.left + 75);
+           		$j('.wrong-checkbox').css('top',  pos + element.height() + 8);
+
+			}
+			
+			
+
+			
+			
+			
 		}
 	});
 
@@ -121,7 +147,36 @@ $j(document).ready(function() {
 		 
         return fieldsAreFilled;
 		
-    }, 'Please sell my wife');
+    }, 'Please make sure all the answers are filled out');
+	
+	 jQuery.validator.addMethod('nothingChecked', function(value, element) {
+        var countDracula = 0;
+	   
+	    var oneFieldChecked = true;
+
+        $j.each($j('#answerCollection').find('li'), function(index, element) {
+            var elem = $j(element);
+
+            var checkit = elem.find('.checkbox').is(':checked');
+
+			/*if the element isn't checked add to the count*/
+            if (checkit == true) {
+                countDracula++
+            }
+			
+        });
+
+		if (countDracula == 0) {
+			oneFieldChecked = false;
+		}
+		 
+		return oneFieldChecked;
+		
+		
+		
+		
+    }, 'Tick at least one checkbox to highlight the correct answer');
+
 
     /* Add a new answer option
      */
@@ -129,12 +184,13 @@ $j(document).ready(function() {
 		var thing = $j('.hidden-clone ul:first-child').clone();
 		$j('ul#answerCollection').append(thing);
 		
-				var pos = $j('ul#answerCollection').height();
-				
-				$j('.list-items').css('left', 120);
-           		$j('.list-items').css('top',  pos);
+		var pos = $j('ul#answerCollection').height();
 		
+		$j('.list-items').css('left', 120);
+		$j('.list-items').css('top',  pos);
 		
+		$j('.wrong-checkbox').css('left', 120);
+		$j('.wrong-checkbox').css('top',  pos + 30);
 		
 		refreshList();
     });
@@ -142,20 +198,15 @@ $j(document).ready(function() {
 	/* Remove an answer option
 	 */
 	$j('.delete').live('click', function(){
-		if (($j('.inputs').length) !== 2) {
+		if (($j('.inputs').length) !== 3) {
 			$j(this).parent().remove();
 			refreshList()
 		}	
     });	
 	
 	$j('.checkbox').live('click', function() {
-		if ($j(this).is(':checked')) {
-			$j(this).parent().css("background-color", "#e0f2df");
-		} else {
-			$j(this).parent().css("background-color", "#EDEDED");
-		}
+		$j(this).parent().toggleClass("highlight");
 	});
-	
 	
 	function refreshList() {
 		var alphabetStart = 65;

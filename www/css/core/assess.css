@@ -14,8 +14,7 @@
 /* Edit Multiple Choice answers
  */
 
-#answerCollection input.answerCode { width: 30px; }
-#answerCollection input.answerDescription { width: 250px; }
+
 /* Edit Fillgap answers
  */
 div.answerList { width: 500px; display: block; float: left; }
