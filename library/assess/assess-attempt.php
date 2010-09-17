@@ -155,5 +155,34 @@ class AssessAttempt extends Model {
 
         return $this->db->getOne($query);
     }
+
+    /**
+     * Out of multiple attempts at the same assess, get a user's most recent one
+     * 
+     * @param <type> $assess_id
+     * @param <type> $user_id
+     * @return <type>
+     */
+    function getLatestForUser($assess_id, $user_id) {
+        $query = "SELECT *
+                  FROM {$this->_table}
+                  WHERE assess_id = '$assess_id'
+                  AND user_id = '$user_id'
+                  ORDER BY start DESC";
+
+        return $this->db->getRow($query);
+    }
+
+    function getMarksForAttempt($attempt_id) {
+        $query = "SELECT
+                      SUM(assess_response.mark) AS totalMarks
+                  FROM assess_attempt
+                  LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
+                  WHERE assess_attempt.attempt_id = '$attempt_id'
+                  GROUP BY assess_attempt.attempt_id";
+
+        return $this->db->getOne($query);
+    }
+
 }
 ?>

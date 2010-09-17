@@ -20,6 +20,7 @@ if (!empty($_POST)) {
         'finish'      => date(DATE_database, $finish),
         'duration'    => ($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60,
         'allow_resit' => $_POST['allow_resit'],
+        'created_at'  => 'NOW()',
     ));
 
     if (!$assess_id) {
@@ -29,6 +30,10 @@ if (!empty($_POST)) {
     localRedir('/assess/section/create/' . $assess_id);
 }
 else {
+    if (!is_numeric($this->arg[0])) {
+        echo "Please provide a category id";
+        error();
+    }
     /* Render create page 
      */
     $this->setFile(TEMPLATE_content, 'assess/modify.html');

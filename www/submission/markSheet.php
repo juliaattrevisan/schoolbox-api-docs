@@ -5,18 +5,27 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionReturn.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess-attempt.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess-section.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess-response.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess-factory.php');
+
 $subHandler = new Submission;
 $retHandler = new SubmissionReturn();
 $catHandler = new Category();
 $groupHandler = new Group;
 $userHandler = new User;
 
+$factory = new AssessFactory();
+$assessHandler = new Assess();
+$attemptHandler = new AssessAttempt();
+$sectionHandler = new AssessSection();
+$responseHandler = new AssessResponse();
+
 if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
-    
-    
     if(!$groupHandler->isStaff() )
             error(19);
-    
     
 	$category = $catHandler->getByID($this->arg[1]);
     
@@ -31,7 +40,6 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 			$user = $userHandler->getBySynergy($studentList[$x]['synergy_id']);
 			$studentList[$x]['uid'] = $user['uid'];
 		}
-
     }
     else {
         //Retrieve student list from group membership
@@ -39,8 +47,6 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
         $groupHandler = new Group;
         $studentList = $groupHandler->getMemberList($this->arg[1]);
     }
-
-
 
 	$subList = $subHandler->getAllForUserCategory($this->arg[1], $_SESSION['id']);
 
@@ -50,6 +56,7 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
             $csv .= scrubTEXT($sub['description']).',';
 		}
 	}
+
     $csv .= "\n";
 
 	if(is_array($studentList)) {
@@ -84,14 +91,12 @@ else if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'sub_head', 'sub_head_block');
 	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
 	$this->setBlock('student_list', 'mark', 'mark_block');
-
-
+    $this->setBlock('student_list', 'onlineAssessmentMark', 'onlineAssessmentMark_block');
 
     if(!$groupHandler->isStaff() )
             error(19);
 
-
-	$category = $catHandler->getByID($this->arg[0]);
+    $category = $catHandler->getByID($this->arg[0]);
 
 	if($category['code'] != "")
 			$this->setVar('CATEGORY', $category['name'].' ('.$category['code'].')');
@@ -111,7 +116,6 @@ else if(is_numeric($this->arg[0])) {
 			$user = $userHandler->getBySynergy($studentList[$x]['synergy_id']);
 			$studentList[$x]['uid'] = $user['uid'];
 		}
-
     }
     else {
         //Retrieve student list from group membership
@@ -120,17 +124,45 @@ else if(is_numeric($this->arg[0])) {
         $studentList = $groupHandler->getMemberList($this->arg[0]);
     }
 
-
-
 	$subList = $subHandler->getAllForUserCategory($this->arg[0], $_SESSION['id']);
 
-	if(is_array($subList)) {
+	if (is_array($subList)) {
 		foreach($subList as $sub) {
-			$output = array( 'BOX_ID'	=> $sub['id'],
-							'SUB_NAME'	=> scrubTEXT($sub['description']),
-							'SUB_TYPE'	=> scrubTEXT($sub['typeName']));
-			$this->setVar($output);
-			$this->parse('sub_head_block','sub_head',true);
+            $this->setVar(array(
+                'BOX_ID'	=> $sub['id'],
+                'SUB_NAME'	=> scrubTEXT($sub['description']),
+                'SUB_TYPE'	=> scrubTEXT($sub['typeName'])
+            ));
+
+            $this->parse('sub_head_block','sub_head',true);
+
+            if ($sub['type_id'] == 11) {
+
+                /* Perform automated marking on responses which support this feature. Only
+                 * mark responses which haven't been automarked previously, which allows
+                 * teachers to customise response marks without being overwritten again.
+                 *
+                 * Once automated marking has been performed, remember which responses were
+                 * affected so we don't refetch them the next time the page loads.
+                 */
+                $allAttempts = $attemptHandler->getList($sub['id']);
+
+                foreach($allAttempts as $currentAttempt) {
+                    $allResponses = $responseHandler->getAutomarkableResponses($sub['id'], $currentAttempt['attempt_id']);
+
+                    if (is_array($allResponses)) {
+                        foreach ($allResponses as $currentResponse) {
+                            $answerHandler = $factory->createAnswerModel($currentResponse['type_id']);
+
+                            $answerHandler->mark($currentResponse);
+
+                            $markedResponseIDs[] = $currentResponse['response_id'];
+                        }
+                    }
+                }
+
+                $responseHandler->updatedAutomatedMarks($markedResponseIDs);
+            }
 		}
 	}
 	else {
@@ -147,28 +179,49 @@ else if(is_numeric($this->arg[0])) {
 			$this->setVar($output);
 
 			$this->setVar('mark_block','');
+            $this->setVar('onlineAssessmentMark_block','');
 
 			if(is_array($subList)) {
 				foreach($subList as $sub) {
-					$return = $retHandler->getByUser($student['uid'],$sub['id']);
-					$output = array('MARK'		=> scrubTEXT($return[0]['mark']),
-									'BOX_ID'	=> $sub['id'],
-							);
-					$this->setVar($output);
-					$this->parse('mark_block','mark',true);
+                    if ($sub['type_id'] == 11) {
+                        $firstSection = $sectionHandler->getFirst($sub['id']);
+                        $mostRecentAttempt = $attemptHandler->getLatestForUser($sub['id'], $student['uid']);
+                        $marks = $attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
+                        $total = $attemptHandler->getTotalMarks($sub['id'], $mostRecentAttempt['attempt_id']);
+
+                        $this->setVar(array(
+                            'ASSESS_ASSESS_ID' => $sub['id'],
+                            'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
+                            'ATTEMPT_ID' => $mostRecentAttempt['attempt_id'],
+                            'MARK' => ($marks && $total) ? $marks . '/' . $total : '',
+                            'BOX_ID' => ''
+                        ));
+
+                        $this->parse('onlineAssessmentMark_block', 'onlineAssessmentMark', true);
+                    }
+                    else {
+                        $return = $retHandler->getByUser($student['uid'],$sub['id']);
+
+                        $this->setVar(array(
+                            'MARK'		=> scrubTEXT($return[0]['mark']),
+                            'BOX_ID'	=> $sub['id'],
+                        ));
+
+                        $this->parse('mark_block','mark',true);
+                    }
 				}
 			}
 			else {
 				$this->setVar('mark_block','');
+                $this->setVar('onlineAssessmentMark_block', '');
 			}
 
 			$this->parse('student_list_block', 'student_list',true);
 		}
 	}
-	else
+	else {
 		$this->setVar('student_list_block', '');
-
-
+    }
 }
 else
 	error(2);
