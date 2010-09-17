@@ -5,6 +5,8 @@ class Assess extends Model {
     var $_table = 'assess';
     var $_index = 'assess_id';
 
+    const ONLINE_ASSESSMENT_TYPE_ID = 11;
+
     /**
      * A list of assessments available for a category
      * 

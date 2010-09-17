@@ -136,7 +136,7 @@ else if(is_numeric($this->arg[0])) {
 
             $this->parse('sub_head_block','sub_head',true);
 
-            if ($sub['type_id'] == 11) {
+            if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
 
                 /* Perform automated marking on responses which support this feature. Only
                  * mark responses which haven't been automarked previously, which allows
@@ -183,7 +183,7 @@ else if(is_numeric($this->arg[0])) {
 
 			if(is_array($subList)) {
 				foreach($subList as $sub) {
-                    if ($sub['type_id'] == 11) {
+                    if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
                         $firstSection = $sectionHandler->getFirst($sub['id']);
                         $mostRecentAttempt = $attemptHandler->getLatestForUser($sub['id'], $student['uid']);
                         $marks = $attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
@@ -193,7 +193,7 @@ else if(is_numeric($this->arg[0])) {
                             'ASSESS_ASSESS_ID' => $sub['id'],
                             'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
                             'ATTEMPT_ID' => $mostRecentAttempt['attempt_id'],
-                            'MARK' => ($marks && $total) ? $marks . '/' . $total : '',
+                            'MARK' => ($marks && $total) ? number_format($marks, 2) . ' / ' . number_format($total, 2)  : '',
                             'BOX_ID' => ''
                         ));
 

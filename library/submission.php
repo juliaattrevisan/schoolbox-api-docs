@@ -164,21 +164,6 @@ class Submission extends Model {
     }
 
     function getAllForUser($userID) {
-
-//        $query = "SELECT submission_box.id, submission_box.description, category.id as catid, GROUP_CONCAT(co.code) code, category.name,
-//                        DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date, DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date,
-//                        submission_box.type, file_type.name as type
-//                    FROM (category, submission_box )
-//                    LEFT JOIN file_type ON submission_box.type = file_type.id
-//                    LEFT JOIN categoryCode co ON co.categoryID = category.id
-//                    WHERE category.id = submission_box.category
-//                            AND submission_box.owner = '".$userID."'
-//                            AND submission_box.deleted = '0'
-//                    GROUP BY submission_box.id, category.id
-//                    ORDER BY category.id, submission_box.date";
-
-        /* Also include a union with Assess records
-         */
         $query = "(SELECT
                         submission_box.id,
                         submission_box.description,
@@ -201,8 +186,8 @@ class Submission extends Model {
                         assess.assess_id,
                         assess.title,
                         assess.category_id AS catid,
-                        -1 AS code,
-                        '' AS name,
+                        '' AS code,
+                        category.name AS name,
                         DATE_FORMAT(assess.finish, '%a, %D %b %l:%i%p') AS date,
                         DATE_FORMAT(assess.start, '%a, %D %b %l:%i%p') AS open_date,
                         file_type.id AS type_id,

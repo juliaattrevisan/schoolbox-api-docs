@@ -130,6 +130,7 @@ foreach ($allPercentageComplete as $currentPercentageComplete) {
         'SECTION_PERCENTAGE_COMPLETE_TITLE' => $currentPercentageComplete['title'],
         'SECTION_PERCENTAGE_COMPLETE_SECTION_ID' => $currentPercentageComplete['section_id'],
         'SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE' => $currentPercentageComplete['percentageComplete'],
+        'SECTION_SEQUENCE' => $currentPercentageComplete['sequence'],
     ));
 
     $this->parse('sectionPercentageComplete_block', 'sectionPercentageComplete', true);

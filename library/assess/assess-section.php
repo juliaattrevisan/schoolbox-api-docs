@@ -186,6 +186,8 @@ class AssessSection extends Model {
                 $currentSection['percentageComplete'] = 0;
             }
 
+            $currentSection['sequence'] = $currentSection['sequence'];
+
             $completion[] = $currentSection;
         }
 
