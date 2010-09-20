@@ -244,5 +244,18 @@ class Assess extends Model {
 
         return $formatted;
     }
+
+    /**
+     * Find out if an assessment can be re-sat.
+     *
+     * @param <type> $assess_id
+     */
+    function allowResit($assess_id) {
+        $query = "SELECT allow_resit
+                  FROM {$this->_table}
+                  WHERE assess_id = '$assess_id'";
+
+        return $this->db->getOne($query);
+    }
 }
 ?>

@@ -184,5 +184,20 @@ class AssessAttempt extends Model {
         return $this->db->getOne($query);
     }
 
+    /**
+     * Find out if the current user has already made an attempt on this test
+     * 
+     * @param <type> $assess_id
+     * @param <type> $user_id
+     * @return <type>
+     */
+    function userHasAttempted($assess_id, $user_id) {
+        $query = "SELECT COUNT(*)
+                  FROM {$this->_table}
+                  WHERE assess_id = '$assess_id'
+                  AND user_id = '$user_id'";
+
+        return $this->db->getOne($query);
+    }
 }
 ?>

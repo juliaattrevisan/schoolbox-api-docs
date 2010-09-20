@@ -1,9 +1,11 @@
 <?php
 require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-section.php');
+require_once('../library/assess/assess-attempt.php');
 
 $assessHandler = new Assess();
 $sectionHandler = new AssessSection();
+$attemptHandler = new AssessAttempt();
 
 $assess = $assessHandler->getIntro($this->arg[0]);
 $allSummary = $assessHandler->getIntroSummary($this->arg[0]);
@@ -45,5 +47,12 @@ else {
     $this->setVar('startTest_block', '');
 }
 
-$_SESSION['attempt_id'] = '';
+/* If you have made an attempt on this test, or are in the process of attempting,
+ * don't reset the attempt id if you aren't allowed to resit. This prevents
+ * people from resetting the timer by revisiting the intro screen repeatedly.
+ */
+if (!$attemptHandler->userHasAttempted($this->arg[0], $_SESSION['id']) || $assessHandler->allowResit($this->arg[0])) {
+    $_SESSION['attempt_id'] = '';
+}
+
 ?>
