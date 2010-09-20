@@ -1,4 +1,12 @@
 <?php
+/**
+ * AssessResponse class. Responses are managed here
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once '../include/model.php';
 
 class AssessResponse extends Model {
@@ -9,11 +17,11 @@ class AssessResponse extends Model {
      */
     const RANDOMISE_QUESTIONS = 1;
     const ORDERED_QUESTIONS = 2;
-    
+
     /**
      * Finds out whether a response exists for a particular question during an
      * attempt.
-     * 
+     *
      * @param <type> $attempt_id
      * @param <type> $question_id
      * @return <type>
@@ -31,7 +39,7 @@ class AssessResponse extends Model {
      * Gets all the responses to a particular assessment and attempt which can
      * be marked automatically. The marking is performed by the answerType's
      * handler.
-     * 
+     *
      * @param <type> $assess_id
      * @param <type> $attempt_id
      * @return <type>
@@ -58,7 +66,7 @@ class AssessResponse extends Model {
     /**
      * Remember which responses have been marked automatically, so we don't keep
      * refetching them every time the results page loads.
-     * 
+     *
      * @param <type> $markedResponseIDs
      */
     function updatedAutomatedMarks($markedResponseIDs) {
@@ -127,7 +135,7 @@ class AssessResponse extends Model {
             shuffle($allQuestions);
             shuffle($allQuestions);
         }
-        
+
         /* Insert selected questions for this attempt
          */
         for ($i=0; $i < count($allQuestions); $i++) {

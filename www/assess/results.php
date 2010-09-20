@@ -1,4 +1,16 @@
 <?php
+/**
+ * Results page. This provides a list of Attempts that were made for a
+ * particular Assessment, and the total marks obtained by the student.
+ * Automatic marking of tests is handled here, where possible; otherwise, a
+ * manual review is required to evaluate marks for certain questions which
+ * cannot be automatically marked, e.g. short/long answer question types.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-factory.php');
 require_once('../library/assess/assess-attempt.php');

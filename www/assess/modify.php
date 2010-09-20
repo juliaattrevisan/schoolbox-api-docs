@@ -1,4 +1,12 @@
 <?php
+/**
+ * Assessment modification.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once('../library/assess/assess.php');
 require_once('include/time.php');
 
@@ -41,6 +49,11 @@ else {
     $this->setTitle('Manage Assessment');
 
     $assess = $assessHandler->getByID($this->arg[0]);
+
+    if (!$assess) {
+        error(112);
+    }
+
     $assessStartTime = strtotime($assess['start']);
     $assessFinishTime = strtotime($assess['finish']);
 
@@ -116,7 +129,7 @@ else {
     /* Render duration
      */
     $duration = $assessHandler->parse_sec2hms($assessHandler->sec2hms($assess['duration']));
-    
+
     for ($i=0; $i<=3; $i++) {
         $this->setVar(array(
             'DURATION_HOUR_VALUE' => $i,

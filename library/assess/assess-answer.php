@@ -1,4 +1,12 @@
 <?php
+/**
+ * AssessAnswer class. All AnswerTypes inherit from this class.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once '../include/model.php';
 require_once('assess-response.php');
 

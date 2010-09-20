@@ -1,4 +1,13 @@
 <?php
+/**
+ * Attempt creation. When someone makes an Attempt at an Assessment, record the
+ * various details. This is loaded for each Section in the Assessment.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-factory.php');
 require_once('../library/assess/assess-section.php');
@@ -10,11 +19,16 @@ $attemptHandler = new AssessAttempt();
 $responseHandler = new AssessResponse();
 $sectionHandler = new AssessSection();
 
-/* TODO: Error checking for handlers
- */
-
 $assess = $assessHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
+
+if (!$assess) {
+    error(112);
+}
+
+if (!$section) {
+    error(115);
+}
 
 /* Set the start time if not already done
  */

@@ -1,4 +1,13 @@
 <?php
+/**
+ * Assessment deletion. Sections, Questions and Answers are all softdeleted if
+ * the assessment is softdeleted.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-factory.php');
 require_once('../library/assess/assess-section.php');
@@ -9,6 +18,12 @@ $assessHandler = new Assess();
 $questionHandler = new AssessQuestion();
 $answerHandler = new AssessAnswer();
 $sectionHandler = new AssessSection();
+
+$section = $sectionHandler->getbyID($this->arg[0]);
+
+if (!$section) {
+    error(115);
+}
 
 $sectionList = $sectionHandler->getList($this->arg[0]);
 

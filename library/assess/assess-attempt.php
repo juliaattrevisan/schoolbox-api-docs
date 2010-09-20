@@ -1,11 +1,15 @@
 <?php
+/**
+ * AssessAttempt class. Assessment Attempts are managed through this class.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once '../include/model.php';
 
-/**
- * Description of AssessAttempt
- *
- * @author aetworowsky
- */
+
 class AssessAttempt extends Model {
     var $_table = 'assess_attempt';
     var $_index = 'attempt_id';

@@ -1,4 +1,13 @@
 <?php
+/**
+ * Question deletion and Answer deletion. All deletions are soft and any
+ * questions that get soft-deleted also have their answers soft-deleted.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once '../library/assess/assess-factory.php';
 require_once '../library/assess/assess-section.php';
 

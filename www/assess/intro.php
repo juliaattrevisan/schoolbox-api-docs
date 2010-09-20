@@ -1,4 +1,14 @@
 <?php
+/**
+ * Assessment commencement. If the Assessment allows people to re-sit the test,
+ * then clear the current attempt_id. Otherwise, remember it so people can't
+ * reset the assessment timer by repeatedly refreshing the intro page.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-section.php');
 require_once('../library/assess/assess-attempt.php');

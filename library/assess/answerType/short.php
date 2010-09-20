@@ -1,10 +1,15 @@
 <?php
+/**
+ * Handler for Short Answer questions.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once '../include/model.php';
 require_once('../library/assess/assess-response.php');
 
-/**
- * Handler for Short Answer questions.
- */
 class AssessAnswerShort extends AssessAnswer {
 
     /**

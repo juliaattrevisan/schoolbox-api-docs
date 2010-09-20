@@ -37,3 +37,7 @@ INSERT INTO error (id, message) VALUES (112, 'This assessment no longer exists.'
 INSERT INTO error (id, message) VALUES (113, 'You have not answered all questions; please go back and submit them.');
 INSERT INTO error (id, message) VALUES (114, 'You have not selected an attempt to review.');
 INSERT INTO error (id, message) VALUES (115, 'This section no longer exists.');
+INSERT INTO error (id, message) VALUES (116, 'Unspecified question type.');
+INSERT INTO error (id, message) VALUES (117, 'Please choose a group for this assessment.');
+INSERT INTO error (id, message) VALUES (118, 'This attempt no longer exists.');
+INSERT INTO error (id, message) VALUES (119, 'This question no longer exists.');

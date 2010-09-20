@@ -1,4 +1,13 @@
 <?php
+/**
+ * Section deletion. Any Questions contained within the section, along with
+ * those Questions' Answers, are softdeleted when the section is softdeleted.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-factory.php');
 require_once('../library/assess/assess-section.php');

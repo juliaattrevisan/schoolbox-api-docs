@@ -1,4 +1,12 @@
 <?php
+/**
+ * Assessment creation. Assessments must always belong in a Category.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once('../library/assess/assess.php');
 require_once('include/time.php');
 
@@ -24,15 +32,14 @@ if (!empty($_POST)) {
     ));
 
     if (!$assess_id) {
-        error();
+        error(112);
     }
 
     localRedir('/assess/section/create/' . $assess_id);
 }
 else {
     if (!is_numeric($this->arg[0])) {
-        echo "Please provide a category id";
-        error();
+        error(117);
     }
     /* Render create page 
      */

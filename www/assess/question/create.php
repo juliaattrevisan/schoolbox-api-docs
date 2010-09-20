@@ -1,4 +1,17 @@
 <?php
+/**
+ * Question creation and Answer creation. When a QuestionType is selected such
+ * as multiple choice, fill gaps etc. the related AnswerType handler is loaded;
+ * actual Answer creation is delegated to the AnswerType handler.
+ *
+ * The forms used to input data to create an Answer are also loaded and inserted
+ * dynamically by the templating.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-section.php');
 require_once('../library/assess/assess-factory.php');

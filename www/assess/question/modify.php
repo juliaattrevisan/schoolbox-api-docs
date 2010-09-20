@@ -1,4 +1,12 @@
 <?php
+/**
+ * Question modification and Answer modification.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once '../library/assess/assess.php';
 require_once '../library/assess/assess-section.php';
 require_once '../library/assess/assess-factory.php';
@@ -11,8 +19,7 @@ if (!empty($_POST)) {
     $factory = new AssessFactory();
 
     if (!is_numeric($_POST['type_id'])) {
-        echo "Type not specified";
-        error();
+        error(116);
     }
 
     $questionHandler = $factory->createQuestionModel($_POST['type_id']);
@@ -35,7 +42,7 @@ else {
     /* Set question ID
      */
     if (empty($this->arg[0])) {
-        error(51);
+        error(115);
     }
 
     $questionHandler = new AssessQuestion();

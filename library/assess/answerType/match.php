@@ -1,10 +1,15 @@
 <?php
+/**
+ * Handler for Matching Pairs questions.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once '../include/model.php';
 require_once('../library/assess/assess-response.php');
 
-/**
- * Handler for Short Answer questions.
- */
 class AssessAnswerMatch extends AssessAnswer {
     const CORRECT_CLASS = 'matchCorrect';
     const INCORRECT_CLASS = 'matchIncorrect';
@@ -63,7 +68,7 @@ print_r($object);
     function modify($page, $question_id = '') {
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
-            
+
             $page->setVar(array(
                 'ANSWER_ID' => $answerGroup['answer_id']
             ));
@@ -98,18 +103,18 @@ print_r($object);
      */
     function prepareResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
-        
+
         /* Define special blocks to handle this special answerOptions scenario,
          * because we have two columns to parse per iteration.
          */
         $page->setBlock('answerFormFragment', 'answerOptionLeft', 'answerOptionLeft_block');
         $page->setBlock('answerFormFragment', 'answerOptionRight', 'answerOptionRight_block');
-        
+
         $left = array();
         $right = array();
 
         $answerGroup = $this->getByQuestionID($question_id);
-        
+
         if ($answerGroup) {
             $answerCount = 0;
             $allAnswers = unserialize($answerGroup['answer']);
@@ -163,7 +168,7 @@ print_r($object);
 
         return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
     }
-    
+
     /**
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.
@@ -173,7 +178,7 @@ print_r($object);
         $answer = unserialize($currentResponse['answer']);
 
         $marksPerAnswer = $currentResponse['marks'] / count($answer);
-        
+
         /* Find out how much each correct answer is worth
          */
         for ($i=0, $numCorrect=0, $totalMarks=0; $i < count($answer); $i++) {
@@ -218,7 +223,7 @@ print_r($object);
                 'RESPONSE_ID' => $existing['response_id'],
                 'REVIEWED_MARKS' => $existing['mark'],
             ));
-            
+
             $allAnswers = unserialize($answerGroup['answer']);
 
             for($i=0; $i<count($allAnswers); $i++) {

@@ -1,10 +1,22 @@
 <?php
+/**
+ * Saves a Response to a Question.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
 require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-factory.php');
 require_once('../library/assess/assess-section.php');
 
 $questionHandler = new AssessQuestion();
 $question = $questionHandler->getByID($this->arg[0]);
+
+if (!$question) {
+    error(119);
+}
 
 $factory = new AssessFactory();
 $answerHandler = $factory->createAnswerModel($question['type_id']);
