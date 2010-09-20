@@ -32,3 +32,8 @@ CREATE TABLE eportfolio_privateNotes (
 INSERT INTO homepage_comp (size, method, `name`, description, filename, config, invisible) VALUES (1, 'outputAssess', 'Online Assessment', 'Online tests and quizzes.', 'assess.html', '', 'false')
 
 INSERT INTO file_type (id, name) VALUES (11, 'Online Assessment');
+
+INSERT INTO error (id, message) VALUES (112, 'This assessment no longer exists.');
+INSERT INTO error (id, message) VALUES (113, 'You have not answered all questions; please go back and submit them.');
+INSERT INTO error (id, message) VALUES (114, 'You have not selected an attempt to review.');
+INSERT INTO error (id, message) VALUES (115, 'This section no longer exists.');

@@ -18,10 +18,13 @@ $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
 /* Check that all questions are answered
- */
 if ($responseHandler->numResponses($_SESSION['attempt_id']) != $questionHandler->numQuestions($this->arg[0])) {
-    echo "You haven't answered all questions yet";
-    error();
+    error(113);
+}
+ */
+
+if (!$assess) {
+    error(112);
 }
 
 if ($attempt['finish'] == '0000-00-00 00:00:00') {
@@ -47,6 +50,4 @@ else {
     $this->parse('alreadyEnded_block', 'alreadyEnded');
     $this->setVar('endAssess_block', '');
 }
-
 ?>
-

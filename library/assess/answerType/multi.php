@@ -166,7 +166,7 @@ class AssessAnswerMulti extends AssessAnswer {
 
                 /* If the user responded with a correct answer, accumulate
                  */
-                if (in_array($currentAnswer->value, $response)) {
+                if (is_array($response) && in_array($currentAnswer->value, $response)) {
                     $numCorrect++;
                 }
 

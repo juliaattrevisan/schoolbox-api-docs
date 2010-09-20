@@ -11,6 +11,12 @@ $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();
 $sectionHandler = new AssessSection();
 
+$assess = $assessHandler->getByID($this->arg[0]);
+
+if (!$assess) {
+    error(112);
+}
+
 /* Perform automated marking on responses which support this feature. Only
  * mark responses which haven't been automarked previously, which allows
  * teachers to customise response marks without being overwritten again.
@@ -35,8 +41,6 @@ foreach($allAttempts as $currentAttempt) {
 }
 
 $responseHandler->updatedAutomatedMarks($markedResponseIDs);
-
-$assess = $assessHandler->getByID($this->arg[0]);
 
 /* Set up template
  */

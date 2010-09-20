@@ -24,22 +24,31 @@ else {
     $this->setVar('createAssessment_block', '');
 }
 
-foreach($allAssess as $currentAssess) {
-    $this->setVar(array(
-        'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
-        'ASSESS_TITLE' => $currentAssess['title'],
-        'ASSESS_FINISH_DATE' => date('jS F Y, g:i:sa', strtotime($currentAssess['finish'])),
-        'ASSESS_DESCRIPTION' => $currentAssess['description'],
-    ));
+if (is_array($allAssess)) {
+    $i=0;
 
-    if ($groupHandler->isStaff()) {
-        $this->parse('teacherLink_block', 'teacherLink');
-    }
-    else {
-        $this->setVar('teacherLink_block', '');
-    }
+    foreach($allAssess as $currentAssess) {
+        $this->setVar(array(
+            'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
+            'ASSESS_TITLE' => $currentAssess['title'],
+            'ASSESS_FINISH_DATE' => date('jS F Y, g:i:sa', strtotime($currentAssess['finish'])),
+            'ASSESS_DESCRIPTION' => $currentAssess['description'],
+            'ON_OFF' => $i%2 ? 'dark' : '',
+        ));
 
-    $this->parse('assess_block', 'assess', true);
+        if ($groupHandler->isStaff()) {
+            $this->parse('teacherLink_block', 'teacherLink');
+        }
+        else {
+            $this->setVar('teacherLink_block', '');
+        }
+
+        $this->parse('assess_block', 'assess', true);
+
+        $i++;
+    }
 }
-
+else {
+    $this->setVar('assess_block', '');
+}
 ?>

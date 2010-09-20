@@ -10,11 +10,16 @@ $attemptHandler = new AssessAttempt();
 $responseHandler = new AssessResponse();
 $sectionHandler = new AssessSection();
 
-/* TODO: Error checking for handlers
- */
-
 $assess = $assessHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
+
+if (!$assess) {
+    error(112);
+}
+
+if (!$section) {
+    error(115);
+}
 
 /* Find out which attempt was made
  */
@@ -22,8 +27,7 @@ if (is_numeric($this->arg[2])) {
     $_SESSION['attempt_id'] = $this->arg[2];
 }
 else {
-    error();
-    //error: no attempt_id selected
+    error(114);
 }
 
 /* Set up template
