@@ -446,7 +446,7 @@ class SitePage extends Page {
 		if($this->db->countRows() > 0){
 			while($link = $this->db->getNextArray()){
 				if(isLocalURL($link['url'])){
-					$this->setVar("MLINK", "<a href=\"".$link['url']."\"><span>".scrubTEXT($link['description'])."</span></a>");	
+					$this->setVar("MLINK", "<a href=\"".relativeURL($link['url'])."\"><span>".scrubTEXT($link['description'])."</span></a>");
 				}else{
 					$this->setVar("MLINK", "<a href=\"/redir.php?url=".urlencode(urlencode($link['url']))."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
 				}

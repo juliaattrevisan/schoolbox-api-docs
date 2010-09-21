@@ -277,7 +277,7 @@ class user
 
       /* If ticked, add the new user into the Superusers table as well.
        */
-      if ($su) {
+      if ($su == 1) {
          $suquery = "INSERT INTO superusers (id) VALUES ('$id')";
          $this->db->query($suquery);
       }

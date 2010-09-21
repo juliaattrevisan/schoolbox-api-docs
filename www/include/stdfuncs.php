@@ -280,11 +280,26 @@ function delfile($str)
 function isLocalURL($url)
 {	
 	//returns true if the url is for a local page
+    list($hostname, $domain) = explode('.',$_SERVER['HTTP_HOST'],2);
 	if( strncasecmp($url, "http://".$_SERVER['HTTP_HOST'], 7+strlen($_SERVER['HTTP_HOST'])) && 
-	strncasecmp($url, "https://".$_SERVER['HTTP_HOST'], 8+strlen($_SERVER['HTTP_HOST'])) )
+        strncasecmp($url, "https://".$_SERVER['HTTP_HOST'], 8+strlen($_SERVER['HTTP_HOST'])) &&
+        strncasecmp($url, "http://".$hostname, 7+strlen($hostname)) &&
+        strncasecmp($url, "https://".$hostname, 8+strlen($hostname))    
+      )
 		return false;
 	else
 		return true;
+}
+
+function relativeURL($url) {
+    list($hostname, $domain) = explode('.',$_SERVER['HTTP_HOST'],2);
+    $hosts = array('http://'.$_SERVER['HTTP_HOST'], 
+                    'https://'.$_SERVER['HTTP_HOST'],
+                    'http://'.$hostname,
+                    'https://'.$hostname
+    );
+
+    return str_replace($hosts, '', $url);
 }
 
 function formatName($userInfo, $format = NULL){

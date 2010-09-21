@@ -13,7 +13,7 @@ if (is_array($linkList)) {
 		$output = array(
 				'LINK_ID'			=> $link['id'],
 				'LINK_NAME'			=> scrubTEXT($link['description']),
-				'LINK_URL'			=> isLocalURL($link['url']) ? $link['url'] : '/redir.php?url='.urlencode(urlencode($link['url'])),
+				'LINK_URL'			=> isLocalURL($link['url']) ? relativeURL($link['url']) : '/redir.php?url='.urlencode(urlencode($link['url'])),
 				'LINK_POSTED_BY'	=> formatName($link),
 				'LINK_POSTED_BY_ID'	=> $link['owner'],
 				'LINK_POSTED_DATE'	=> outputDate(DATE_short_format, $link['submitted']),
