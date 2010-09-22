@@ -48,11 +48,8 @@ if (is_array($allAssess)) {
 
         $i++;
     }
-
-    $this->setVar('noAssessments_block', '');
 }
 else {
     $this->setVar('assess_block', '');
-    $this->parse('noAssessments_block', 'noAssessments');
 }
 ?>
