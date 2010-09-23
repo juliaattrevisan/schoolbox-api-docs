@@ -115,6 +115,7 @@ class Assess extends Model {
                     'QUESTION_SEQUENCE' => $currentQuestion['questionSequence'],
                     'QUESTION_QUESTION' => $currentQuestion['question'],
                     'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+                    'QUESTION_MARKS' => $currentQuestion['marks'],
                 ));
 
                 $page->parse('question_block', 'question', true);
@@ -160,6 +161,7 @@ class Assess extends Model {
                          assess_section.sequence AS sectionSequence,
                          question_id,
                          question,
+                         marks,
                          assess_question.sequence AS questionSequence
                   FROM assess_section
                   LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
