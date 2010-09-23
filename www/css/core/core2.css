@@ -241,7 +241,7 @@ fieldset{border:0; padding:0; margin:0;}
 .standardForm table { width: 100%; }
 .standardForm .checkAll, .standardForm .delCheck, .standardForm .acceptCheck { top: 0; }
 .message .error{background: #fff99a; padding: 5px;}
-.message{background:url(/images/core/assess/validate-arrow.jpg) 5px 0 no-repeat; padding-top:6px;}
+.message{background:url(/images/core/assess/validate-arrow.jpg) 5px 0 no-repeat; padding-top:6px; display:block;}
 
 
 .standardForm td { vertical-align: top; padding: 10px; }
@@ -292,9 +292,10 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #assess .standardForm thead td, #assess .standardForm{padding:0;}
 #assess .standardForm tbody{border: 1px solid #ccc; border-collapse:collapse;}
 #assess td.formLabelWidth{width:195px;}
-#assess .standardForm{width:100%;}
+#assess .standardForm{width:100%; background:#fff;}
+#assess .standardGrey{background:#f1f1f1;}
 #assess .assess-header{margin-bottom:20px;}
-#assess .additional-details, #assess  .assess-body{padding:10px;border:1px solid #dbdbdb;  -moz-border-radius: 0 0 3px 3px; -webkit-border-radius:0 0 3px 3px; border-radius:0 0 3px 3px; background:#F1F1F1;}
+#assess .additional-details, #assess  .assess-body{padding:10px;border:1px solid #dbdbdb;  -moz-border-radius: 0 0 3px 3px; -webkit-border-radius:0 0 3px 3px; border-radius:0 0 3px 3px; }
 #assess .assess-body hr {height:0px; border-top:1px solid #DBDBDB; width:100%; margin:10px 0;}
 #assess .additional-details span.time{color:#F00;}
 #assess .section h3{background:#1597cb; color:#fff; font-size:11px;padding:7px; border:none;}
@@ -393,6 +394,9 @@ height:24px; line-height:24px;}
 .section-box ul.section-options ul li.parent{line-height:normal; border:0; }
 .section-box ul.section-options a.drop-arrow{ 
 background:  url(/images/core/assess/section-dropd-down.gif) no-repeat;width:13px; height:13px;display:block;padding:0; margin:0;}
+.section-box .section-question ul,.section-box .section-question ol {padding:0 0 10px 10px; }
+.section-box .section-question ul{list-style:disc;padding:10px 10px 10px 20px;}
+.section-box .section-question ul li ul li{border:0;}
 .section-box ul.section-options a.drop-arrow:hover{background-position:bottom; cursor:pointer;}
 .section-box ul li{margin:0;font-size:11px;line-height:16px;background:#f1f7fa; border-bottom:1px solid #dbdbdb;}
 .section-box ul li p{padding:10px; margin:0;}
