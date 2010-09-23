@@ -41,7 +41,7 @@ else {
     if (!is_numeric($this->arg[0])) {
         error(117);
     }
-    /* Render create page 
+    /* Render create page
      */
     $this->setFile(TEMPLATE_content, 'assess/modify.html');
     $this->setBlock(TEMPLATE_content, 'startHour', 'startHour_block');
@@ -61,15 +61,30 @@ else {
         'ASSESS_TITLE' => '',
         'ASSESS_DESCRIPTION' => '',
         'ASSESS_START_DATE'  => date('d/m/Y'),
-        'ASSESS_FINISH_DATE' => date('d/m/Y', time() + 604800)
+        'ASSESS_FINISH_DATE' => date('d/m/Y')
     ));
+
+    /* Select default settings
+     */
+    $startHour = date('g', time()+3600);
+    $startMeridiem = date('a', time()+3600);
+
+    $finishHour = date('g', time()+2*3600);
+    $finishMeridiem = date('a', time()+2*3600);
 
     /* Render starting times
      */
     for ($i=1; $i<=12; $i++) {
+        if ($i == $startHour) {
+            $selected = 'selected=\'selected\'';
+        }
+        else {
+            $selected = '';
+        }
+
         $this->setVar(array(
             'START_HOUR_VALUE' => $i,
-            'START_HOUR_SELECTED' => ''
+            'START_HOUR_SELECTED' => $selected
         ));
 
         $this->parse('startHour_block', 'startHour', true);
@@ -85,9 +100,16 @@ else {
     }
 
     foreach (array('am', 'pm') as $meridiem) {
+        if ($meridiem == $startMeridiem) {
+            $selected = 'selected=\'selected\'';
+        }
+        else {
+            $selected = '';
+        }
+
         $this->setVar(array(
             'START_MERIDIEM_VALUE' => $meridiem,
-            'START_MERIDIEM_SELECTED' => ''
+            'START_MERIDIEM_SELECTED' => $selected
         ));
 
         $this->parse('startMeridiem_block', 'startMeridiem', true);
@@ -96,9 +118,16 @@ else {
     /* Render finish times
      */
     for ($i=1; $i<=12; $i++) {
+        if ($i == $finishHour) {
+            $selected = 'selected=\'selected\'';
+        }
+        else {
+            $selected = '';
+        }
+
         $this->setVar(array(
             'FINISH_HOUR_VALUE' => $i,
-            'FINISH_HOUR_SELECTED' => ''
+            'FINISH_HOUR_SELECTED' => $selected
         ));
 
         $this->parse('finishHour_block', 'finishHour', true);
@@ -114,9 +143,16 @@ else {
     }
 
     foreach (array('am', 'pm') as $meridiem) {
+        if ($meridiem == $finishMeridiem) {
+            $selected = 'selected=\'selected\'';
+        }
+        else {
+            $selected = '';
+        }
+
         $this->setVar(array(
             'FINISH_MERIDIEM_VALUE' => $meridiem,
-            'FINISH_MERIDIEM_SELECTED' => ''
+            'FINISH_MERIDIEM_SELECTED' => $selected
         ));
 
         $this->parse('finishMeridiem_block', 'finishMeridiem', true);
