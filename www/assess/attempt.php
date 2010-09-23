@@ -43,11 +43,15 @@ $attemptStartTime = strtotime($attempt['start']);
 $attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
 $attemptEndTime = $attemptStartTime + $assess['duration'];
 
-/* Check if you have previously completed this test, and also check if this test
- * has already expired; if either is the case, redirect to end screen and force
- * test completion.
+/* Redirect to the end if any of the following criteria are met:
+ *
+ * 1. The current attempt has already ended (by visiting the end page) AND when re-sits are not allowed
+ * 2. The current attempt has expired due to a positive time limit reaching zero AND when assess[duration] is not zero
  */
-if (($attemptHandler->isComplete($this->arg[0]) && $assess['allow_resit'] == 0) || ($attemptTimeRemaining <= 0)) {
+$cannotContinueAttempt = $attemptHandler->isComplete($this->arg[0]) && ($assess['allow_resit'] == 0);
+$durationInvalid = ($attemptTimeRemaining < 0) && ($assess['duration'] != 0);
+
+if ($cannotContinueAttempt || $durationInvalid) {
     localRedir('/assess/end/' . $this->arg[0]);
     exit();
 }
