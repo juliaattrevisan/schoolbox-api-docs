@@ -38,16 +38,18 @@ if (!$assess) {
  */
 $allAttempts = $attemptHandler->getList($this->arg[0]);
 
-foreach($allAttempts as $currentAttempt) {
-    $allResponses = $responseHandler->getAutomarkableResponses($this->arg[0], $currentAttempt['attempt_id']);
+if ($allAttempts) {
+    foreach($allAttempts as $currentAttempt) {
+        $allResponses = $responseHandler->getAutomarkableResponses($this->arg[0], $currentAttempt['attempt_id']);
 
-    if (is_array($allResponses)) {
-        foreach ($allResponses as $currentResponse) {
-            $answerHandler = $factory->createAnswerModel($currentResponse['type_id']);
+        if (is_array($allResponses)) {
+            foreach ($allResponses as $currentResponse) {
+                $answerHandler = $factory->createAnswerModel($currentResponse['type_id']);
 
-            $answerHandler->mark($currentResponse);
+                $answerHandler->mark($currentResponse);
 
-            $markedResponseIDs[] = $currentResponse['response_id'];
+                $markedResponseIDs[] = $currentResponse['response_id'];
+            }
         }
     }
 }
@@ -68,43 +70,48 @@ $this->setVar(array(
  */
 $allAttempts = $attemptHandler->getList($this->arg[0]);
 
-foreach($allAttempts as $currentAttempt) {
-    $firstSection = $sectionHandler->getFirst($this->arg[0]);
-    
-    /* Finish time
-     */
-    if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
-        $finish = date('jS F Y, g:i:sa', strtotime($currentAttempt['finish']));
-        $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
-    }
-    else {
-        $finish = '';
-        $timeTaken = '';
-    }
+if ($allAttempts) {
+    foreach($allAttempts as $currentAttempt) {
+        $firstSection = $sectionHandler->getFirst($this->arg[0]);
 
-    /* The total available marks for this attempt
-     */
-    $totalAvailableMarks = $attemptHandler->getTotalMarks($this->arg[0], $currentAttempt['attempt_id']);
+        /* Finish time
+         */
+        if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
+            $finish = date('jS F Y, g:i:sa', strtotime($currentAttempt['finish']));
+            $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
+        }
+        else {
+            $finish = '';
+            $timeTaken = '';
+        }
 
-    if ($totalAvailableMarks > 0) {
-        $percentage = round(100 * $currentAttempt['totalMarks'] / $totalAvailableMarks);
+        /* The total available marks for this attempt
+         */
+        $totalAvailableMarks = $attemptHandler->getTotalMarks($this->arg[0], $currentAttempt['attempt_id']);
+
+        if ($totalAvailableMarks > 0) {
+            $percentage = round(100 * $currentAttempt['totalMarks'] / $totalAvailableMarks);
+        }
+        else {
+            $percentage = 0;
+        }
+
+        $this->setVar(array(
+            'ASSESS_ASSESS_ID' => $this->arg[0],
+            'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
+            'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
+            'ATTEMPT_NAME' => $currentAttempt['lastname'] . ', ' . $currentAttempt['firstname'],
+            'ATTEMPT_FINISH' => $finish,
+            'ATTEMPT_TIME_TAKEN' => $timeTaken,
+            'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
+            'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
+            'ATTEMPT_PERCENTAGE' => $percentage,
+        ));
+
+        $this->parse('attempt_block', 'attempt', true);
     }
-    else {
-        $percentage = 0;
-    }
-
-    $this->setVar(array(
-        'ASSESS_ASSESS_ID' => $this->arg[0],
-        'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
-        'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
-        'ATTEMPT_NAME' => $currentAttempt['lastname'] . ', ' . $currentAttempt['firstname'],
-        'ATTEMPT_FINISH' => $finish,
-        'ATTEMPT_TIME_TAKEN' => $timeTaken,
-        'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
-        'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
-        'ATTEMPT_PERCENTAGE' => $percentage,
-    ));
-
-    $this->parse('attempt_block', 'attempt', true);
+}
+else {
+    $this->setVar('attempt_block', '');
 }
 ?>
