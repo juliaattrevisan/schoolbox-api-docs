@@ -4,9 +4,11 @@
 <script type="text/javascript" src="/javascript/jquery.ui.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
-	
+
+    /* What was this for?
 	$j('.checkbox').removeAttr('checked');
-	
+     */
+
     $j('.assess-header form').submit(function() {
         $j.post($j(this).attr('action'), $j(this).serialize(), function(responseText) {
             var dataFunction = new Function('return ' + responseText);
@@ -46,15 +48,17 @@ $j(document).ready(function() {
 
     /* Set up countdown
      */
-    $j('#countdown').countdown({
-        until: '+{ASSESS_TIME_REMAINING}',
-		layout: '{hn} : {mn} : {sn}',
-        alwaysExpire: true,
-        onExpiry: function() {
-            window.location = '/assess/end/{ASSESS_ASSESS_ID}';
-        }
-    });
-	
+    if ({ASSESS_TIME_REMAINING} >= 0) {
+        $j('#countdown').countdown({
+            until: '+{ASSESS_TIME_REMAINING}',
+            layout: '{hn} : {mn} : {sn}',
+            alwaysExpire: true,
+            onExpiry: function() {
+                window.location = '/assess/end/{ASSESS_ASSESS_ID}';
+            }
+        });
+	}
+
     $j(".match-it").sortable();
     $j(".match-it").disableSelection();
 });
@@ -67,25 +71,25 @@ $j(document).ready(function() {
 		<h3 class="test-details">Test Details:</h3>
 		<p class="pad-it">{SECTION_DESCRIPTION}</p>
 		</div>
-		
+
 		<!-- BEGIN question -->
 		<div class='assess-header'>
 			<form action="/assess/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
 				<h3>Q{QUESTION_SEQUENCE}) {QUESTION_QUESTION} <span>({QUESTION_MARKS} marks)</span></h3>
 				<div class="assess-body">
-		
+
 				<!-- BEGIN answerInputs -->
 				<!-- END answerInputs -->
-				
+
 				<input type="submit" value="Save Answer" class="save-answer" />
 				<div class="float-fix"></div>
-				
-				</div>	
+
+				</div>
 			</form>
 			<div id="question_status_{QUESTION_QUESTION_ID}" class="all-good"></div>
 		</div>
 		<!-- END question -->
-		
+
 		<!-- BEGIN endAssess -->
 		<a href="/assess/end/{ASSESS_ASSESS_ID}" class="green-go">Finish</a>
 		<!-- END endAssess -->
@@ -93,7 +97,7 @@ $j(document).ready(function() {
 		<!-- BEGIN prevSection -->
 		<a class="next-step step-nav" href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}">Previous Section</a>
 		<!-- END prevSection -->
-		
+
 		<!-- BEGIN nextSection -->
 		<a class="next-step step-nav" href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}">Next Section</a>
 		<!-- END nextSection -->
@@ -105,7 +109,7 @@ $j(document).ready(function() {
 			<div id="countdown"></div>
 			You began at: {ATTEMPT_START}<br />
 			You must finish this assessment by: {ATTEMPT_END}
-	
+
 			<hr />
 			<div class="float-fix"></div>
 			<!-- BEGIN sectionPercentageComplete -->

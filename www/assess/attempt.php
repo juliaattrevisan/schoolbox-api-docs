@@ -30,7 +30,11 @@ if (!$section) {
     error(115);
 }
 
-/* Set the start time if not already done
+/* Set the start time if not already done.
+ *
+ * TODO: Check if this user has attempted this assess in the past, the attempt
+ * hasn't expired, and allowResit is false; if these conditions are met, then
+ * load the existing attempt, otherwise create a new one.
  */
 if ($_SESSION['attempt_id'] == '') {
     $_SESSION['attempt_id'] = $attemptHandler->start($_SESSION['id'], $this->arg[0]);
@@ -49,7 +53,7 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  * 2. The current attempt has expired due to a positive time limit reaching zero AND when assess[duration] is not zero
  */
 $cannotContinueAttempt = $attemptHandler->isComplete($this->arg[0]) && ($assess['allow_resit'] == 0);
-$durationInvalid = ($attemptTimeRemaining < 0) && ($assess['duration'] != 0);
+$durationInvalid = ($attemptTimeRemaining < 0) && ($assess['duration'] != Assess::UNLIMITED_DURATION);
 
 if ($cannotContinueAttempt || $durationInvalid) {
     localRedir('/assess/end/' . $this->arg[0]);
@@ -74,7 +78,7 @@ $this->setVar(array(
     'ASSESS_TITLE' => $assess['title'],
     'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
     'ATTEMPT_START' => date('jS F Y, g:i:sa', $attemptStartTime),
-    'ATTEMPT_END' => date('jS F Y, g:i:sa', $attemptEndTime),
+    'ATTEMPT_END' => $assess['duration'] == Assess::UNLIMITED_DURATION ? 'No particular time' : date('jS F Y, g:i:sa', $attemptEndTime),
     'SECTION_TITLE' => $section['title'],
     'SECTION_DESCRIPTION' => $section['description'],
 ));

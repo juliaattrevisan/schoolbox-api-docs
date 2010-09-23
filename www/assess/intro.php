@@ -34,7 +34,7 @@ $this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
 $this->setVar(array(
-    'DURATION' => $assessHandler->sec2hms($assess['duration'])
+    'DURATION' => $assess['duration'] == 0 ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 
 /* Section list and question count

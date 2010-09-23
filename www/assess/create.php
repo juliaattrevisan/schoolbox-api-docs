@@ -19,6 +19,15 @@ if (!empty($_POST)) {
     $start = ausDateToUnix($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['minute'].' '.$_POST['start']['meridiem'], true);
     $finish = ausDateToUnix($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem'], true);
 
+    /* Cater for unlimited duration tests. Can't use zero because of countdown
+     * timer, so we use -1
+     */
+    $duration = ($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60;
+
+    if ($duration == 0) {
+        $duration = Assess::UNLIMITED_DURATION;
+    }
+
     $assess_id = $assessHandler->create(array(
         'category_id' => scrubTEXT($_POST['category_id']),
         'user_id'     => $_SESSION['id'],
@@ -26,7 +35,7 @@ if (!empty($_POST)) {
         'description' => scrubTEXT($_POST['description']),
         'start'       => date(DATE_database, $start),
         'finish'      => date(DATE_database, $finish),
-        'duration'    => scrubTEXT(($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60),
+        'duration'    => scrubTEXT($duration),
         'allow_resit' => scrubTEXT($_POST['allow_resit']),
         'created_at'  => 'NOW()',
     ));

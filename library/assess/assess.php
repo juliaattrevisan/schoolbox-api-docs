@@ -9,6 +9,7 @@ class Assess extends Model {
     var $_index = 'assess_id';
 
     const ONLINE_ASSESSMENT_TYPE_ID = 11;
+    const UNLIMITED_DURATION = -1;
 
     /**
      * A list of assessments available for a category
