@@ -3,13 +3,13 @@
 $j(function() {
 	$j('ul.section-options').droppy({speed: 0});
 	
-	$j('a.delete-question').click(function(event) {
+	$j('a.delete-question').click(function() {
 		location.href = $j(this).attr('href');
 	}).confirm({
 		buttons: {
 			wrapper:'<button></button>',
 			separator:'  '
-  		}  
+  		}
 	});
 });
 </script>
@@ -25,7 +25,7 @@ $j(function() {
 					<a class="drop-arrow" href="#"></a>
 					<ul>
 						<li><a href="/assess/section/modify/{SECTION_SECTION_ID}">Edit</a></li>
-						<li><a onclick="if (! confirm('Are you sure you want to delete the section?')) return false;" href="/assess/section/delete/{SECTION_SECTION_ID}">Delete</a></li>
+						<li><a onclick="return confirm('Are you sure you want to delete the section?');" href="/assess/section/delete/{SECTION_SECTION_ID}">Delete</a></li>
 					</ul>
 				</li>
 			</ul>
