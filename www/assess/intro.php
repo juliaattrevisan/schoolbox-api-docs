@@ -31,10 +31,11 @@ $this->setVar(array(
 $this->setFile(TEMPLATE_content, 'assess/intro.html');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
+$this->setBlock(TEMPLATE_content, 'alreadyAttempted', 'alreadyAttempted_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
 $this->setVar(array(
-    'DURATION' => $assess['duration'] == 0 ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
+    'DURATION' => $assess['duration'] == Assess::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 
 /* Section list and question count
@@ -63,6 +64,12 @@ else {
  */
 if (!$attemptHandler->userHasAttempted($this->arg[0], $_SESSION['id']) || $assessHandler->allowResit($this->arg[0])) {
     $_SESSION['attempt_id'] = '';
+
+    $this->setVar('alreadyAttempted_block', '');
+}
+else {
+    $this->setVar('startTest_block', '');
+    $this->parse('alreadyAttempted_block', 'alreadyAttempted');
 }
 
 ?>
