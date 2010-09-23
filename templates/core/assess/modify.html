@@ -22,33 +22,13 @@ $j(document).ready(function() {
         singleClick: true
     });
 
+	jQuery.validator.addMethod('selectElephant', function(value, element) {
+        if ($j('input[name=assessmentDuration]').val() == 0) {
+            return false;
+        }
 
-	/*jQuery.validator.addMethod(
-	    "selectNone",
-	    function(value, element) {
-		    if (($j('#minHours').val() == "0") && ($j('#minDuration').val() == "00")) {
-		        return false;
-			}
-			else return true;
-	  	},
-	  	"Please select at least 15 minutes"
-	); */
-
-	jQuery.validator.addMethod('groupedSelect', function(value, element) { 
-
-	    if ($j('.minHours').length || $j('.minDuration').length) return true;
-		
-		return false;
-		
-//		return !(($j('#minHours').val() == "0") && ($j('#minDuration').val() == "00"));
-	});		
-	
-	jQuery.validator.messages.groupedSelect = 'Please fill out at least one of these fields.';
-
-	jQuery.validator.addClassRules('groupedSelect', {
-		'groupedSelect' : true
-	});
-	
+        return true;
+    }, "Please select at least 15 minutes");
 
 	$j('.standardForm').validate({
 		rules: {
@@ -59,7 +39,10 @@ $j(document).ready(function() {
 			description: {
 				required: true,
 				minlength: 2
-			}
+			},
+            'duration[minute]': {
+                selectElephant: true
+            }
 		},
 		
 		messages: {
@@ -78,6 +61,19 @@ $j(document).ready(function() {
             error.css('top',  offset.top + element.outerHeight() + 5);
 		}
     });
+
+    $j('#minHours, #minDuration').change(function() {
+        var hours = $j('#minHours').val() * 60 * 60;
+        var minutes = $j('#minDuration').val();
+
+        if (minutes == '00') {
+            minutes = 0;
+        }
+
+        var test_duration_in_seconds = parseInt(hours) + parseInt(minutes);
+
+        $j('input[name=assessmentDuration]').val(test_duration_in_seconds);
+    });
 });
 </script>
 <!-- END custom_head -->
@@ -88,6 +84,7 @@ $j(document).ready(function() {
 	<form name="create" action="/assess/{ACTION}/{ASSESS_ASSESS_ID}" class="standardForm standardGrey" method="post">
 		<div>
 			<input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
+            <input name="assessmentDuration" value="" />
 		</div>
 		<table>
 			<tr>
