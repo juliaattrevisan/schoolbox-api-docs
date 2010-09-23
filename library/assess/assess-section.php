@@ -34,7 +34,8 @@ class AssessSection extends Model {
     function getNextSequence($assess_id) {
         $query = "SELECT MAX(sequence)+1 AS num
                   FROM {$this->_table}
-                  WHERE assess_id = $assess_id";
+                  WHERE assess_id = $assess_id
+                  AND deleted_at IS NULL";
 
         $sequence = $this->db->getOne($query);
 
@@ -55,6 +56,7 @@ class AssessSection extends Model {
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
                   AND sequence > $sequence
+                  AND deleted_at IS NULL
                   ORDER BY sequence
                   LIMIT 1";
 
@@ -71,6 +73,7 @@ class AssessSection extends Model {
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
                   AND sequence < $sequence
+                  AND deleted_at IS NULL
                   ORDER BY sequence DESC
                   LIMIT 1";
 
@@ -94,6 +97,7 @@ class AssessSection extends Model {
                   FROM {$this->_table}
                   LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
                   WHERE assess_id = '$assess_id'
+                  AND assess_section.deleted_at IS NULL
                   AND {$this->_table}.{$this->_index} = '$section_id'";
 
         if ($sectionExclusion) {
