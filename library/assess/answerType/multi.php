@@ -26,7 +26,7 @@ class AssessAnswerMulti extends AssessAnswer {
         $answer['question_id'] = $question_id;
         $answer['sequence'] = 1;
 
-        foreach(json_decode($_POST['allAnswers']) as $currentAnswer) {
+        foreach(json_decode($object['allAnswers']) as $currentAnswer) {
             $answer['answer'][] = $currentAnswer;
             $answer['sequence']++;
         }
