@@ -1,28 +1,38 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" media="screen" href="/css/core/assess.css" />
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.json2.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
     var section_id = '{SECTION_ID}';
 
-    $j('#type_id').change(function() {
-        var url = '/assess/question/create/' + section_id + '/' + $j('#type_id').val();
-        window.location = url;
-    });
-	
 	if (($j('.question-type-select :selected').text()) == "-- Select Type --") {
-	$j('.next-step').hide();
-	$j('.question-holder').hide();
-	$j('.marks-holder').hide();
+		$j('.next-step').hide();
+		$j('.question-holder').hide();
+		$j('.marks-holder').hide();
 	}
 
-	$j('.question-type-select').change(function() {
-		$j('.next-step').show();
-		$j('.question-holder').show();
-		$j('.marks-holder').show();
-	});
-	
+	if (($j('.question-type-select :selected').text()) !== "-- Select Type --") {
+		$j('#type_id').change(function() {
+			var answer = confirm ("If you change the section any text you've entered will be lost. Proceed?")
+			if (answer) {
+				var url = '/assess/question/create/' + section_id + '/' + $j('#type_id').val();
+				window.location = url;			
+				$j('.next-step').show();
+				$j('.question-holder').show();
+				$j('.marks-holder').show();
+			} 
+		});
+	} else {
+		$j('#type_id').change(function() {
+			var url = '/assess/question/create/' + section_id + '/' + $j('#type_id').val();
+			window.location = url;			
+			$j('.next-step').show();
+			$j('.question-holder').show();
+			$j('.marks-holder').show();
+
+		});	
+	}
 
 	tinyMCE.init({
 		mode : "exact",
@@ -32,8 +42,7 @@ $j(document).ready(function() {
 		editor_selector : "mceSimple",
 		width : "100%",
 		forced_root_block : "",
-		force_p_newlines : false,
-
+		force_p_newlines : false
 	});
 	
 });
@@ -47,6 +56,11 @@ $j(document).ready(function() {
 	<div class="assess-header">
 		<h2>Question Details</h2>
 		<div class="assess-body">
+		
+		<p class="help">
+		Now that you've created a section for the test, use the drop down below to select a question type.
+		</p>
+		
 		<form id="createQuestionForm" action="/assess/question/create" class="standardForm" method="post">
 			<fieldset class="hidden">
 				<input name="section_id" type="hidden" value="{SECTION_ID}" />

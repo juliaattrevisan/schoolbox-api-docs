@@ -1,6 +1,7 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/css/jquery.countdown.css" media="screen" />
 <script type="text/javascript" src="/javascript/jquery.countdown.js"></script>
+<script type="text/javascript" src="/javascript/jquery.ui.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
 	
@@ -40,11 +41,19 @@ $j(document).ready(function() {
 
     $j('#countdown').countdown({
         until: '+{ASSESS_TIME_REMAINING}',
+		layout: '{hn} : {mn} : {sn}',
         alwaysExpire: true,
         onExpiry: function() {
             window.location = '/assess/end/{ASSESS_ASSESS_ID}';
         }
     });
+	
+
+
+    $j(".match-it").sortable();
+    $j(".match-it").disableSelection();
+
+
 });
 </script>
 <!-- END custom_head -->
@@ -68,9 +77,7 @@ $j(document).ready(function() {
 				<input type="submit" value="Save Answer" class="save-answer" />
 				<div class="float-fix"></div>
 				
-				</div>
-		
-				
+				</div>	
 			</form>
 			<div id="question_status_{QUESTION_QUESTION_ID}" class="all-good"></div>
 		</div>
@@ -87,11 +94,6 @@ $j(document).ready(function() {
 		<!-- BEGIN nextSection -->
 		<a class="next-step step-nav" href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}">Next Section</a>
 		<!-- END nextSection -->
-		
-
-		
-
-		
 
 	</div>
 
@@ -99,15 +101,12 @@ $j(document).ready(function() {
 		
 		<h2>Assessment Name: {ASSESS_TITLE}</h2>
 		<div class="assess-body">
-			<dl>
-				<dt>You began at: {ATTEMPT_START}</dt>
+			<strong>Time remaining</strong>
+			<div id="countdown"></div>
+			You began at: {ATTEMPT_START}<br />
+			You must finish this assessment by: {ATTEMPT_END}
 	
-				<dt>You must finish this assessment by: {ATTEMPT_END}</dt>
-	
-				<dt>Time remaining</dt>
-				<dd><div id="countdown"></div></dd>
-				<div class="float-fix"></div>
-			</dl>
+			<hr />
 			<div class="float-fix"></div>
 			<!-- BEGIN sectionPercentageComplete -->
 			<div id="sectionPercentageComplete_{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}" class="percentage-complete">

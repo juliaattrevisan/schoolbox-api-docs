@@ -1,4 +1,3 @@
-<script type="text/javascript" src="/javascript/jquery.json2.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
    	var validator = $j("#createQuestionForm").submit(function() {
@@ -33,26 +32,27 @@ $j(document).ready(function() {
 					});
 				}
 			});
-	
+				
 			/* Collate the usual fields containing ids.
 			 * Collate the checkboxes too but append all the possibilities as well!
 			 */
 			var data = {
 				section_id: theForm.find('input[name=section_id]').val(),
+				question_id: theForm.find('input[name=question_id]').val(),
 				sequence: theForm.find('input[name=sequence]').val(),
-				type_id: theForm.find('select[name=type_id]').val(),
+				type_id: theForm.find('input[name=type_id]').val(),
 				question: tinyMCE.get('question').getContent(),
 				marks: theForm.find('input[name=marks]').val(),
 				allAnswers: JSON.stringify(answerCollection)
 			};
-	
+
 			/* Submit via POST and redirect to question creation screen upon done
 			 */
 			$j.post(theForm.attr('action'), data, function(responseText) {
-				window.location = '/assess/question/create/' + data.section_id;
+				window.location = '/assess/question/modify/' + data.question_id;
 			});
-			
-			tinyMCE.triggerSave();
+				
+			//tinyMCE.triggerSave();
 
 			return false; 
 		},
@@ -95,7 +95,7 @@ $j(document).ready(function() {
 				error.addClass("list-items");
 				var pos = $j('ul#answerCollection').height();
 				var lefty = element.position();
-				$j('.list-items').css('left', lefty.left);
+				$j('.list-items').css('left', 115);
            		$j('.list-items').css('top',  pos);
 			}
 			
@@ -103,15 +103,10 @@ $j(document).ready(function() {
 				error.addClass("wrong-checkbox");
 				var pos = $j('ul#answerCollection').height();
 				var lefty = element.position();
-				$j('.wrong-checkbox').css('left', lefty.left + 75);
+				$j('.wrong-checkbox').css('left', 115);
            		$j('.wrong-checkbox').css('top',  pos + element.height() + 8);
 
 			}
-			
-			
-
-			
-			
 			
 		}
 	});
@@ -130,15 +125,11 @@ $j(document).ready(function() {
             if ($j.trim(description) == '') {
                 fieldsAreFilled = false;
             }
-			
-			
-        });
+	    });
 
         /* Reposition bubble here somewhere
          */
-		 
         return fieldsAreFilled;
-		
     }, 'Please make sure all the answers are filled out');
 	
 	 jQuery.validator.addMethod('nothingChecked', function(value, element) {
@@ -178,10 +169,10 @@ $j(document).ready(function() {
 		
 		var pos = $j('ul#answerCollection').height();
 		
-		$j('.list-items').css('left', 120);
+		$j('.list-items').css('left', 115);
 		$j('.list-items').css('top',  pos);
 		
-		$j('.wrong-checkbox').css('left', 110);
+		$j('.wrong-checkbox').css('left', 115);
 		$j('.wrong-checkbox').css('top',  pos + 30);
 		
 		refreshList();
@@ -190,13 +181,13 @@ $j(document).ready(function() {
 	$j('.checkbox').each(function(){
 		
 		if ($j(this).is(':checked')) {
-			$j(this).parent().addClass("highlight");
+			$j(this).parent().parent().addClass("highlight");
 		}
 			
 	});
 	
 	$j('.checkbox').live('click', function() {
-		$j(this).parent().toggleClass("highlight");
+		$j(this).parent().parent().toggleClass("highlight");
 	});
 	
 	/* Remove an answer option
@@ -204,6 +195,15 @@ $j(document).ready(function() {
 	$j('.delete').live('click', function(){
 		if (($j('.inputs').length) !== 1) {
 			$j(this).parent().remove();
+			var pos = $j('ul#answerCollection').height();
+		
+			$j('.list-items').css('left', 115);
+			$j('.list-items').css('top',  pos);
+			
+			$j('.wrong-checkbox').css('left', 115);
+			$j('.wrong-checkbox').css('top',  pos + 30);
+				
+			
 			refreshList()
 		}	
     });
@@ -231,7 +231,7 @@ $j(document).ready(function() {
 					<input name="answerCode[]" class="answerCode text-box" type="hidden" value="{ANSWER_VALUE}" />
 					<span>{ANSWER_VALUE})</span>
 				</div>
-				<input name="answer[]" class="answerCorrect checkbox" value="{ANSWER_VALUE}" {ANSWER_CHECKED} type="checkbox" />
+				<div class="check-it"><input name="answer[]" class="answerCorrect checkbox" value="{ANSWER_VALUE}" {ANSWER_CHECKED} type="checkbox" /></div>
 				<div class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="{ANSWER_DESCRIPTION}" /></div>
 				<div class="delete"></div>
 				<div class="float-fix"></div>
@@ -248,7 +248,7 @@ $j(document).ready(function() {
 					<input name="answerCode[]" class="answerCode text-box" type="hidden" value="" />
 					<span>{ANSWER_VALUE})</span>
 				</div>
-				<input name="answer[]" class="answerCorrect checkbox" value="" type="checkbox" />
+				<div class="check-it"><input name="answer[]" class="answerCorrect checkbox" value="" type="checkbox" /></div>
 				<div class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></div>
 				<div class="delete"></div>
 				<div class="float-fix"></div>

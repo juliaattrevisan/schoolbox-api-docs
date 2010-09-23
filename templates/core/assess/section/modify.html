@@ -3,6 +3,17 @@
 <script type="text/javascript">
 
 $j(function() {
+		
+	$j('.checkbox').click(function() {	
+		if ($j('.hide-this').css("display") == "block") {
+			$j('.hide-this').hide();
+			$j('.hide-this :input').attr('disabled', 'true');
+		} else {
+			$j('.hide-this').show();
+			$j('.hide-this :input').removeAttr('disabled');	
+		}
+		
+	});
 	
 	jQuery.validator.addMethod(
 	  "combo",
@@ -59,13 +70,13 @@ $j(function() {
 					</fieldset>
 				
 					<fieldset>
-						<label>Random</label>
+						<label>Shuffle Questions</label>
 						<input name="random" type="checkbox" class="checkbox" value="1" {RANDOM_SELECTED} /> Questions should be selected randomly
 					</fieldset>
 				
 					<fieldset>
-						<label>Pool</label>
-						<input name="pool" type="text" class="pool" value="{POOL}"/> Maximum number of questions to show
+						<label>Total Questions Displayed</label>
+						<input name="pool" type="text" disabled="disabled" class="pool" value="{POOL}"/> Maximum number of questions to show
 					</fieldset>
 				
 					<fieldset>

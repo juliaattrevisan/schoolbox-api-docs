@@ -1,3 +1,5 @@
+<p class="help"> A green row indicates a correctly matched answer, the red indicates an incorrectly matched one.</p>
+
 <fieldset>
     <label>Answer</label>
     <div>
@@ -18,16 +20,17 @@
             </li>
             <!-- END answerOptionRight -->
         </ul>
-
-        <ul>
-            <!-- BEGIN answerOptionCorrectResponse -->
+ <!-- BEGIN answerOptionCorrectResponse -->
+       <!-- <ul>
+           
             <li>
                 {ANSWER_CORRECT_RESPONSE_VALUE}
             </li>
-            <!-- END answerOptionCorrectResponse -->
-        </ul>
+            
+        </ul>-->
+		<!-- END answerOptionCorrectResponse -->
     </div>
 </fieldset>
-<fieldset>
+<p class="marks-amount">
     <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" /> / {QUESTION_MARKS}
-</fieldset>
+</p>

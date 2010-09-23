@@ -1,15 +1,17 @@
 <fieldset>
-    <label>Answer</label>
-    <div>
+    <label>Answer given:</label>
+    <div class="box">
         <!-- BEGIN answerOption -->
         {ANSWER}
         <!-- END answerOption -->
     </div>
 </fieldset>
+
+<strong>The correct answer was: </strong>
 <div class="box">
         {CORRECT_ANSWER}
 </div>
 
-<fieldset>
+<p class="marks-amount">
     <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" /> / {QUESTION_MARKS}
-</fieldset>
+</p>

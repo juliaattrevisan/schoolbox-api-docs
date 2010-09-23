@@ -6,7 +6,7 @@
    	<!-- END mail_block -->
     <ul class="tree">
     <!-- BEGIN category_block -->
-    <li class="plus"><a onclick="swap(this);">{NEW_CATEGORY_NAME}</a>
+    <li class="home-icon-plus"><a class="home-icon" onclick="swap(this);">{NEW_CATEGORY_NAME}</a><a class="go-to-home" href="/homepage/{NEW_CATEGORY_ID}/">View Homepage</a><div class="float-fix"></div>
         <ul>
         <!-- BEGIN due_work -->
         <li class="icon"><a href="/submission/dueWork">New work due</a></li>
@@ -36,6 +36,7 @@
         <li class="icon"><a href="/homepage/{NEW_CATEGORY_ID}/">{NEW_WIKI} Wiki Revision{NEW_PLURAL_WIKI}</a></li>
         <!-- END new_wiki -->
         </ul>
+
     </li>
     <!-- END category_block -->      
     </ul>

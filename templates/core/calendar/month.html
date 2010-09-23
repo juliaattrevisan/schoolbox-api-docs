@@ -103,10 +103,10 @@
 					<ul class="js_happening">
 						<!-- BEGIN note_block -->
 						<li class="{EVENT_TYPE} {EVENT_LEVEL} ">
-							<span style="background-color:{COLOUR}; border:1px solid {COLOUR};"><!-- BEGIN time --><div class="time">{TIME}</div><!-- END time -->{NOTE}<br /></span>
+							<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}<br /></span>
 							<div class="hidden-fields">
 								<div class="author"><a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></div>
-								<h4><strong>{time_block}</strong>{NOTE}</h4>
+								<h4><!-- BEGIN time --><div class="time"><strong>{TIME}</strong></div><!-- END time -->{NOTE}</h4>
 								<p class="meta">Event Type: {TYPE}</p>
 								<div class="modify">{MODIFY}</div>
 							</div>

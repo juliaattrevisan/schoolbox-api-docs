@@ -59,7 +59,7 @@ table h2, #content table.ruler h2 {
 /*---------------------------------------
 	Nav Styles
 ----------------------------------------*/
-#nav{width:180px;}
+#nav{width:176px;}
 #nav h3 {
 	border-top: 1px solid #003d7b;
 	border-bottom: 1px solid #001c3a;
@@ -81,11 +81,11 @@ table h2, #content table.ruler h2 {
 	}
 #nav li a {
 	background: #00376f url(/images/shore/nav-link-bg.gif) repeat-x;
-	width:162px;
+	width:158px;
 	}
 #nav ul ul, #nav ul ul ul {
-left:180px;
-width:180px;
+left:176px;
+width:176px;
 	}
 #nav li a:hover {
 	background-color: #1965b4;
@@ -93,7 +93,7 @@ width:180px;
 #tabs {
 	right: 15px;
 	}
-#nav ul{border:0 none; -moz-border-radius:0; -webkit-border-radius:0; border-radius:0;}
+#nav ul{border:0 none; -moz-border-radius:0; -webkit-border-radius:0; border-radius:0; margin:0 !important;}
 #nav ul li a{color:#fff;}
 #nav{top:0; margin:0;}
 /*---------------------------------------

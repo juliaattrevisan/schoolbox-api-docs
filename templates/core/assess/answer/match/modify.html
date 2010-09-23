@@ -34,6 +34,7 @@ var validator = $j("#createQuestionForm").submit(function() {
 				 */
 				var data = {
 					section_id: theForm.find('input[name=section_id]').val(),
+					question_id: theForm.find('input[name=question_id]').val(),
 					sequence: theForm.find('input[name=sequence]').val(),
 					type_id: theForm.find('select[name=type_id]').val(),
 					question: tinyMCE.get('question').getContent(),
@@ -44,7 +45,7 @@ var validator = $j("#createQuestionForm").submit(function() {
 				/* Submit via POST and redirect to question creation screen upon done
 				 */
 				$j.post(theForm.attr('action'), data, function(responseText) {
-					window.location = '/assess/question/create/' + data.section_id;
+					window.location = '/assess/question/modify/' + data.question_id;
 				});
 		
 				return false;
@@ -179,7 +180,7 @@ var validator = $j("#createQuestionForm").submit(function() {
 		<!-- BEGIN answerOption -->
 			<li class="answerTemplate inputs">
 				<div class="drag-me left-option"><input name="answerLeft[]" class="answerLeft text-box" type="text" value="{ANSWER_LEFT_VALUE}" /></div>
-				<div class="arrow"><span></span></div>
+				<div class="arrow"><span>MATCHES</span></div>
 				<div class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="{ANSWER_RIGHT_VALUE}" /></div>
 				<div class="delete"></div>
 				<div class="float-fix"></div>
@@ -193,7 +194,7 @@ var validator = $j("#createQuestionForm").submit(function() {
 	    <ul>			
 			<li class="answerTemplate inputs">
 				<div class="drag-me left-option"><input name="answerLeft[]" class="answerLeft text-box" type="text" value="" /></div>
-				<div class="arrow"><span></span></div>
+				<div class="arrow"><span>MATCHES</span></div>
 				<div class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="" /></div>
 				<div class="delete"></div>
 				<div class="float-fix"></div>

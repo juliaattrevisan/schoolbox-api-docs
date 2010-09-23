@@ -5,6 +5,16 @@
 
 $j(function() {
 
+	$j('.checkbox').click(function() {	
+		if ($j('.hide-this').css("display") == "block") {
+			$j('.hide-this').hide();
+			$j('.hide-this :input').attr('disabled', 'true');
+		} else {
+			$j('.hide-this').show();
+			$j('.hide-this :input').removeAttr('disabled');	
+		}
+		
+	});
 	
 	jQuery.validator.addMethod("combo", function(value, element) 
 		{
@@ -28,8 +38,8 @@ $j(function() {
 				minlength: 2
 			},
 			pool: {
-				combo: true,
-				number: true
+				number:true,
+				combo: true
 			}
 		},
 		
@@ -71,15 +81,16 @@ $j(function() {
 			</fieldset>
 			<hr />
 			<fieldset>
-				<label>Random</label>
+				<label>Shuffle Questions</label>
 				<input name="random" type="checkbox" value="1" class="checkbox"/> Questions should be selected randomly
 			</fieldset>
 			<hr />
-			<fieldset>
-				<label>Pool</label>
-				<input name="pool" type="text" class="pool" /> Maximum number of questions to show
-			</fieldset>
+			<fieldset class="hide-this">
+				<label>Total Questions Displayed</label>
+				<input name="pool" disabled="disabled" type="text" class="pool" /> Maximum number of questions to show
 			<hr />
+			</fieldset>
+
 			<fieldset>
 				<label>Description</label>
 				<div class="textarea-container">
