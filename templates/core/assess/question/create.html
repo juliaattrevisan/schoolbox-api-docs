@@ -14,7 +14,7 @@ $j(document).ready(function() {
 
 	if (($j('.question-type-select :selected').text()) !== "-- Select Type --") {
 		$j('#type_id').change(function() {
-			var answer = confirm ("If you change the section any text you've entered will be lost. Proceed?")
+			var answer = confirm ("If you change the question type any text you've entered will be lost. Proceed?")
 			if (answer) {
 				var url = '/assess/question/create/' + section_id + '/' + $j('#type_id').val();
 				window.location = url;			

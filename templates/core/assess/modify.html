@@ -53,6 +53,23 @@ $j(document).ready(function() {
     });
     */
 
+	
+	$j('.show-duration').click(function() {
+		if ($j('.hide-it').is(':visible')) {
+			$j('.hide-it').hide();
+			$j('#minHours').val('0');
+			$j('#minDuration').val('00');
+		} else {
+			$j('.hide-it').show();
+			$j('#minDuration').val('15');
+		}
+	});
+	
+		
+	if ($j('.show-duration').is(':checked')) {
+			$j('.hide-it').show();
+	}
+
 	$j('.standardForm').validate({
 		rules: {
 			title: {
@@ -145,18 +162,26 @@ $j(document).ready(function() {
 				</td>
 			</tr>
 			<tr>
-				<td><h3>Duration</h3><h4>Time available for completion</h4></td>
+				<td><h3>Duration</h3><h4>To set a test duration, tick the box and fill out a time.</h4></td>
 				<td>
-					 <select name="duration[hour]" id="minHours" class="groupedSelect min-hours">
-						<!-- BEGIN durationHour -->
-						<option value="{DURATION_HOUR_VALUE}" {DURATION_HOUR_SELECTED}>{DURATION_HOUR_VALUE}</option>
-						<!-- END durationHour -->
-					</select>hr
-					<select name="duration[minute]" id="minDuration" class="groupedSelect min-minutes">
-						<!-- BEGIN durationMinute -->
-						<option value="{DURATION_MINUTE_VALUE}" {DURATION_MINUTE_SELECTED}>{DURATION_MINUTE_VALUE}</option>
-						<!-- END durationMinute -->
-					</select> min
+				
+					<label class="float-left">
+						<input type="checkbox" class="float-left show-duration" {ASSESS_DURATION_CHECKED}/>
+					</label>
+					<fieldset class="hide-it float-left">
+						 <select name="duration[hour]" id="minHours" class="groupedSelect min-hours">
+							<!-- BEGIN durationHour -->
+							<option value="{DURATION_HOUR_VALUE}" {DURATION_HOUR_SELECTED}>{DURATION_HOUR_VALUE}</option>
+							<!-- END durationHour -->
+						</select>hr
+						<select name="duration[minute]" id="minDuration" class="groupedSelect min-minutes">
+							<!-- BEGIN durationMinute -->
+							<option value="{DURATION_MINUTE_VALUE}" {DURATION_MINUTE_SELECTED}>{DURATION_MINUTE_VALUE}</option>
+							<!-- END durationMinute -->
+						</select> min
+					</fieldset>
+					<div class="float-fix"></div>
+					</div>
 				</td>
 			</tr>
 			<tr>
