@@ -384,6 +384,7 @@ height:24px; line-height:24px;}
 .section-box .add-questions{display:block; padding:10px; text-align:center;background:#ececec;  color:#000 }
 .section-box .add-questions:hover{text-decoration:none; background:#f0f0f0;}
 .section-box .add-questions span{background: url(/images/core/assess/plus-icon.gif) no-repeat 0 0; padding-left:20px}
+.section-box .bug-pad{width:10px; height:10px;}
 
 #assess .section-box h3, #assess.take-test .percentage-complete h3{background:#1597cb; padding:5px; margin:0; font-size:11px; color:#fff;}
 .section-box ul{margin:0; border:1px solid #dbdbdb; border-top:0; border-bottom:0;}
@@ -396,10 +397,13 @@ height:24px; line-height:24px;}
 background:  url(/images/core/assess/section-dropd-down.gif) no-repeat;width:13px; height:13px;display:block;padding:0; margin:0;}
 .section-box .section-question ul,.section-box .section-question ol {padding:0 0 10px 10px; }
 .section-box .section-question ul{list-style:disc;padding:10px 10px 10px 20px;}
-.section-box .section-question ul li ul li{border:0;}
+.section-box ul.section-question  ul, 
+.section-box ul.section-question  ul li,
+.section-box ul.section-question  ol li
+ {border:0;}
 .section-box ul.section-options a.drop-arrow:hover{background-position:bottom; cursor:pointer;}
-.section-box ul li{margin:0;font-size:11px;line-height:16px;background:#f1f7fa; border-bottom:1px solid #dbdbdb;}
-.section-box ul li p{padding:10px; margin:0;}
+.section-box ul li{margin:0; min-height:1px;font-size:11px;line-height:16px;background:#f1f7fa; border-bottom:1px solid #dbdbdb;}
+.section-box ul li p{padding:10px 0; margin:0;}
 .section-box ul li p.links{padding:0 10px 10px 10px;}
 .section-box ul li span{font-weight:bold;}
 .section-box ul li a{color: #255297; padding:0; font-size:10px; }
