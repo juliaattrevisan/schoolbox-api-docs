@@ -66,6 +66,7 @@ else {
         'ASSESS_START_DATE'  => date('d/m/Y', $assessStartTime),
         'ASSESS_FINISH_DATE' => date('d/m/Y', $assessFinishTime),
         'ALLOW_RESIT_CHECKED' => $assess['allow_resit'] == 'true' ? 'checked=\'checked\'' : '',
+        'ASSESS_DURATION_CHECKED' => $assess['duration'] != 0 ? 'checked=\'checked\'' : '',
     ));
 
     /* Render starting times
