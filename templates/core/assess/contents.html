@@ -1,6 +1,5 @@
 <script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
 <script type="text/javascript">
-
 $j(function() {
 	$j('ul.section-options').droppy({speed: 0});
 	
@@ -12,11 +11,8 @@ $j(function() {
 			separator:'  '
   		}  
 	});
-
 });
-
 </script>
-
 <h2>Assessment Content</h2>
 <div class="allQuestions">
 	<div class="assess-body">
@@ -37,10 +33,9 @@ $j(function() {
 			<ul>
 				<!-- BEGIN question -->
 				<li>
-
-						<p><span>Q{QUESTION_SEQUENCE})</span> {QUESTION_QUESTION}</p>
-						<p><a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
-						<a class="delete-question" href="/assess/question/delete/{QUESTION_QUESTION_ID}"Delete</a></p>
+                    <p><span>Q{QUESTION_SEQUENCE})</span> {QUESTION_QUESTION} ({QUESTION_MARKS} marks)</p>
+                    <p><a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
+                    <a class="delete-question" href="/assess/question/delete/{QUESTION_QUESTION_ID}"Delete</a></p>
 				</li>
 				<!-- END question -->
 			</ul>
