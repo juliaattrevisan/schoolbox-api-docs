@@ -47,7 +47,7 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  * has already expired; if either is the case, redirect to end screen and force
  * test completion.
  */
-if (($attemptHandler->isComplete($this->arg[0]) && ($assess['allow_resit'] == 'false')) || ($attemptTimeRemaining <= 0)) {
+if (($attemptHandler->isComplete($this->arg[0]) && $assess['allow_resit'] == 0) || ($attemptTimeRemaining <= 0)) {
     localRedir('/assess/end/' . $this->arg[0]);
     exit();
 }

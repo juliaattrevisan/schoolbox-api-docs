@@ -3,7 +3,7 @@
 <script type="text/javascript" src="/javascript/jquery.countdown.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
-    $j('.question form').submit(function() {
+    $j('.assess-header form').submit(function() {
         $j.post($j(this).attr('action'), $j(this).serialize(), function(responseText) {
             var dataFunction = new Function('return ' + responseText);
             var result = dataFunction();
