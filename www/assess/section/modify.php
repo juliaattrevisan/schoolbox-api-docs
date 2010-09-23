@@ -15,18 +15,18 @@ if (!empty($_POST)) {
     $sectionHandler = new AssessSection();
 
     $sectionHandler->update(array(
-        'assess_id' => $_POST['assess_id'],
-        'section_id' => $_POST['section_id'],
-        'sequence' => $_POST['sequence'],
-        'title' => $_POST['title'],
-        'random' => $_POST['random'],
-        'pool' => $_POST['pool'],
-        'description' => $_POST['description']
+        'assess_id' => scrubTEXT($_POST['assess_id']),
+        'section_id' => scrubTEXT($_POST['section_id']),
+        'sequence' => scrubTEXT($_POST['sequence']),
+        'title' => scrubTEXT($_POST['title']),
+        'random' => scrubTEXT($_POST['random']),
+        'pool' => scrubTEXT($_POST['pool']),
+        'description' => scrubTEXT($_POST['description']),
     ));
 
     /* Redirect to Section modify
      */
-    localRedir('/assess/section/modify/' . $_POST['section_id']);
+    localRedir('/assess/section/modify/' . scrubTEXT($_POST['section_id']));
 }
 else {
     /* Render modify page

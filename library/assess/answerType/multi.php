@@ -49,12 +49,14 @@ class AssessAnswerMulti extends AssessAnswer {
      * @param <type> $object
      */
     function update($object) {
+        $question_id = scrubTEXT($_POST['question_id']);
+
         $query = "DELETE FROM {$this->_table}
-                  WHERE question_id = '$_POST[question_id]'";
+                  WHERE question_id = '$question_id'";
 
         $this->db->query($query);
 
-        $this->create($object, $_POST['question_id']);
+        $this->create($object, $question_id);
     }
 
     /**
@@ -262,7 +264,6 @@ class AssessAnswerMulti extends AssessAnswer {
                             'CORRECT' => ''
                         ));
                     }
-
                 }
                 else {
                     $page->setVar(array(

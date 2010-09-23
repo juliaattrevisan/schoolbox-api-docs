@@ -27,7 +27,7 @@ class AssessAnswerMatch extends AssessAnswer {
         $answer['sequence'] = 1;
 
         $numItems = 0;
-print_r($object);
+
         foreach(json_decode($object['allAnswers']) as $currentAnswer) {
             $answer['answer'][] = $currentAnswer;
             $answer['sequence']++;

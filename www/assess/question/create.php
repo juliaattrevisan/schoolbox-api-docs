@@ -21,8 +21,8 @@ $factory = new AssessFactory();
 /* If a question was submitted
  */
 if (!empty($_POST)) {
-    $questionHandler = $factory->createQuestionModel($_POST['type_id']);
-    $answerHandler = $factory->createAnswerModel($_POST['type_id']);
+    $questionHandler = $factory->createQuestionModel(scrubTEXT($_POST['type_id']));
+    $answerHandler = $factory->createAnswerModel(scrubTEXT($_POST['type_id']));
 
     $question_id = $questionHandler->create($_POST);
     $answer_id = $answerHandler->create($_POST, $question_id);
@@ -37,7 +37,7 @@ if (!empty($_POST)) {
         error();
     }
 
-    localRedir('/assess/question/create/' . $_POST['section_id']);
+    localRedir('/assess/question/create/' . scrubTEXT($_POST['section_id']));
 }
 else {
     /* Render create page

@@ -20,14 +20,14 @@ if (!empty($_POST)) {
     $finish = ausDateToUnix($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem'], true);
 
     $assess_id = $assessHandler->create(array(
-        'category_id' => $_POST['category_id'],
+        'category_id' => scrubTEXT($_POST['category_id']),
         'user_id'     => $_SESSION['id'],
-        'title'       => $_POST['title'],
-        'description' => $_POST['description'],
+        'title'       => scrubTEXT($_POST['title']),
+        'description' => scrubTEXT($_POST['description']),
         'start'       => date(DATE_database, $start),
         'finish'      => date(DATE_database, $finish),
-        'duration'    => ($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60,
-        'allow_resit' => $_POST['allow_resit'],
+        'duration'    => scrubTEXT(($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60),
+        'allow_resit' => scrubTEXT($_POST['allow_resit']),
         'created_at'  => 'NOW()',
     ));
 

@@ -22,13 +22,13 @@ if (!empty($_POST)) {
         error(116);
     }
 
-    $questionHandler = $factory->createQuestionModel($_POST['type_id']);
-    $answerHandler = $factory->createAnswerModel($_POST['type_id']);
+    $questionHandler = $factory->createQuestionModel(scrubTEXT($_POST['type_id']));
+    $answerHandler = $factory->createAnswerModel(scrubTEXT($_POST['type_id']));
 
     $questionHandler->update($_POST);
     $answerHandler->update($_POST);
 
-    localRedir('/assess/question/modify/' . $_POST['question_id']);
+    localRedir('/assess/question/modify/' . scrubTEXT($_POST['question_id']));
 }
 else {
     /* Render modify page

@@ -21,14 +21,14 @@ if (!empty($_POST)) {
 
     $assessHandler->update(array(
         'assess_id'   => $this->arg[0],
-        'category_id' => $_POST['category_id'],
+        'category_id' => scrubTEXT($_POST['category_id']),
         'user_id'     => $_SESSION['id'],
-        'title'       => $_POST['title'],
-        'description' => $_POST['description'],
+        'title'       => scrubTEXT($_POST['title']),
+        'description' => scrubTEXT($_POST['description']),
         'start'       => date(DATE_database, $start),
         'finish'      => date(DATE_database, $finish),
-        'duration'    => ($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60,
-        'allow_resit' => $_POST['allow_resit'],
+        'duration'    => scrubTEXT(($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60),
+        'allow_resit' => scrubTEXT($_POST['allow_resit']),
     ));
 
     localRedir('/assess/modify/' . $this->arg[0]);
