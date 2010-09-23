@@ -1,4 +1,7 @@
 <?php
+/**
+ * Assess class
+ */
 require_once '../include/model.php';
 
 class Assess extends Model {
@@ -9,8 +12,8 @@ class Assess extends Model {
 
     /**
      * A list of assessments available for a category
-     * 
-     * @param <type> $category_id 
+     *
+     * @param <type> $category_id
      */
     function getList($category_id) {
         $query = "SELECT *
@@ -25,7 +28,7 @@ class Assess extends Model {
     /**
      * Get a list of assessments to display on the listSubmission page at
      * /submission/listSubmission
-     * 
+     *
      * @param <type> $category_id
      * @return <type>
      */
@@ -45,7 +48,7 @@ class Assess extends Model {
 
     /**
      * Get an introduction to an Assess.
-     * 
+     *
      * @param <type> $assess_id
      * @return <type>
      */
@@ -56,7 +59,7 @@ class Assess extends Model {
 
         return $this->db->getRow($query);
     }
-    
+
     /**
      * Loads the summary for the test
      *
@@ -92,7 +95,7 @@ class Assess extends Model {
             if (is_numeric($currentQuestion['question_id'])) {
                 $numQuestions++;
             }
-            
+
             /* Parse out the previous Section's info if we're entering a new Section
              */
             if ($currentQuestion['title'] != $sectionTitle) {
