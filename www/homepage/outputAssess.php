@@ -5,7 +5,6 @@ $this->setBlock($componentHandle, 'assess', 'assess_block');
 $this->setBlock($componentHandle, 'createAssessment', 'createAssessment_block');
 $this->setBlock('assess', 'teacherLink', 'teacherLink_block');
 $this->setBlock('assess', 'studentLink', 'studentLink_block');
-$this->setBlock($componentHandle, 'noAssessments', 'noAssessments_block');
 
 $assessHandler = new Assess();
 $allAssess = $assessHandler->getList($this->arg[0]);
@@ -48,8 +47,6 @@ if (is_array($allAssess)) {
 
         $i++;
     }
-
-    $this->setVar('noAssessments_block', '');
 }
 else {
     $this->setVar('assess_block', '');
