@@ -6,7 +6,7 @@
 		$('div.right:hidden').remove();
 		
 		/* add drag/drop */
-		$('div.homepage').sortable({
+		$('.privateBlock').sortable({
 			cursor: 'move',
 			distance: 0,
 			dropOnEmpty: true,

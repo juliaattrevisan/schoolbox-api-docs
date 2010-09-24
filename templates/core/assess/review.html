@@ -21,6 +21,14 @@ $j(document).ready(function() {
 
         return false;
     });
+	
+	$j('.textarea-container textarea').blur(function() {
+		if ($j(this).val() !== '') {
+			$j(this).parents('.assess-header form').submit();
+		}
+	});
+	
+	
 });
 </script>
 <!-- END custom_head -->
@@ -33,7 +41,7 @@ $j(document).ready(function() {
 	<!-- BEGIN question -->
 	<div class='assess-header'>
 		<form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" method="post">
-			<h3>Q{QUESTION_SEQUENCE}) {QUESTION_QUESTION}<span>({QUESTION_MARKS} marks)</span></h3>
+			<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}<span> - ({QUESTION_MARKS} marks)</span></h3>
 			<div class="assess-body">
 
 				<!-- BEGIN answerInputs -->

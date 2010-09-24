@@ -6,18 +6,20 @@
         <!-- END answerOption -->
     </div>
 </fieldset>
+<fieldset>
+	<label>Answer given:</label>
 
-<strong>The correct answer was: </strong>
 <div class="box">
     {CORRECT_ANSWER}
 </div>
+</fieldset>
 
-<div>
-    <p>Teacher's Comments:</p>
+<fieldset>
+    <label>Enter your comments:</label>
     <div class="textarea-container">
         <textarea name="comment">{REVIEWED_COMMENT}</textarea>
     </div>
     <p class="marks-amount">
         <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" /> / {QUESTION_MARKS}
     </p>
-</div>
+</fieldset>

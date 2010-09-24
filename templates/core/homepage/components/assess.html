@@ -12,15 +12,21 @@
                 <p>{ASSESS_DESCRIPTION}</p></h4>
 
 				<div class="small-right">
-				    <p class="interact">
-                        <!-- BEGIN teacherLink -->
-                        <a href="/assess/modify/{ASSESS_ASSESS_ID}">Modify</a> |
-                        <a href="/assess/results/{ASSESS_ASSESS_ID}">View Results</a>
-                        <!-- END teacherLink -->
-
-                        <!-- BEGIN studentLink -->
+					<!-- BEGIN studentLink --> 
+					<p class="interact">
                         <a href="/assess/intro/{ASSESS_ASSESS_ID}" class="take-test-btn">Take test</a>
-                        <!-- END studentLink -->
+						<div class="float-fix"></div>
+					</p>
+
+					<!-- END studentLink -->
+					<!-- BEGIN teacherLink -->
+					<p class="interact">
+						<a href="/assess/modify/{ASSESS_ASSESS_ID}">Modify</a> |
+						<a href="/assess/results/{ASSESS_ASSESS_ID}">View Results</a>
+					</p>
+					<!-- END teacherLink -->
+
+                        
 					</p>
 				</div>
 

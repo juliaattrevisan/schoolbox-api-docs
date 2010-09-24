@@ -229,7 +229,7 @@ border:1px solid #333; border-left:-; border-bottom:0;display: block; height: 28
 .listing .small-right p { margin: 0; clear:both; font-size: 90%; text-align: right; color: #989898; float:right; display:block }
 .listing a { color: #003e7e; }
 h4.eventListing { width:70%; padding:5px 10px; -webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px;}
-p.interact { font-size: 90%; margin: 0 0 0 15px; float: right; height:16px; }
+p.interact { font-size: 90%; margin: 0 0 0 15px; float: right;  }
 p.interact-left { font-size: 90%; float: left; clear: none; white-space: nowrap; width: 120px; }
 p.interact a { color: #003e7e; display:inline; }
 .box .thumb { margin: 0 15px 15px 0; display: block; float: left; width: 100px; }
@@ -441,7 +441,7 @@ p.interact a.take-test-btn:hover
 #assess .green-go{ float:right;width:127px; font-weight:bold; text-align:center; line-height:29px; color:#fff; height:29px;background: url(/images/core/assess/submit.gif) no-repeat; text-indent:0;}
 #assess .save-answer{width:106px; height:25px; display:block; line-height:0; border:0;text-indent:-9999em; font-size:1px; background:url(/images/core/assess/save-btn.gif) no-repeat;float:right;}
 #assess .save-answer:hover{cursor:pointer;}
-p.interact a.take-test-btn{ text-align:left;display:block;width:86px; background:url(/images/core/assess/take-test-btn.gif) no-repeat;}
+p.interact a.take-test-btn{ margin-bottom:10px;text-align:left;display:block;width:86px; background:url(/images/core/assess/take-test-btn.gif) no-repeat;}
 
 .mark-test form .submit, .take-test form .next-section{width:127px; height:29px; border:0;  background: url(/images/core/assess/submit.gif) no-repeat; padding:0; margin:20px 0; color:#fff; font-weight:bold; font-size:11px; float:right;}
 .mark-test form .submit:hover, .take-test form .next-section:hover{background-position:left bottom; cursor:pointer}
@@ -489,7 +489,7 @@ border-right:0;background:#fff; padding:0; border:0;}
 #assess.mark-test h3{padding:10px;}
 .mark-test h3{background:#ccc; }
 .mark-test .hide{display:none;}
-.mark-test ul.multiple-choice-mark li.multiCorrect { background-color: #E0F2DF; }
+.mark-test ul.multiple-choice-mark li.correct-answer { background-color: #E0F2DF; }
 .tick-cross{float:right; height:15px; width:15px; background: url(/images/core/assess/correct-incorrect.gif) 0 -60px no-repeat;}
 .mark-test ul.multiple-choice-mark li.multiIncorrect{background-color: #fff;}
 .mark-test ul.multiple-choice-mark li.multiCorrect .tick-cross{background: url(/images/core/assess/correct-incorrect.gif) 0 0 no-repeat;}
@@ -708,6 +708,7 @@ p.bubble-name { margin-bottom:5px; padding-bottom:5px; }
 /* ePortfolio */
 .privateBlock {width: 100%;padding-bottom: 20px;}
 .privateBlock .box {float: left; width:100%;}
+.privateBlock  .private-notes ul{margin:10px;}
 .privateBlock  .private-notes ul li{list-style-type:circle;}
 .privateBlock textarea {width: 99%;font-family: Arial, Helvetica, sans-serif;font-size: 12px;}
 .privateBlock .box p{margin:0;}
