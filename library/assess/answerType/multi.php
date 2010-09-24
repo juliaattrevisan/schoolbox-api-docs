@@ -234,7 +234,7 @@ class AssessAnswerMulti extends AssessAnswer {
             foreach($allAnswers as $currentAnswer) {
                 if ($currentAnswer->correct) {
                     $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => 'correct-response'
+                        'ACTUAL_CORRECT_VALUE' => 'correct-answer'
                     ));
                 }
                 else {
