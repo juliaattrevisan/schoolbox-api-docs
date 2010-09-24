@@ -259,6 +259,7 @@ class AssessAnswerFillgap extends AssessAnswer {
                 'ANSWER_ID' => $currentAnswer['answer_id'],
                 'ANSWER' => $ans,
                 'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_COMMENT' => $existing['comment'],
                 'REVIEWED_MARKS' => $existing['mark'],
             ));
         }

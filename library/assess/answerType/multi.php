@@ -205,6 +205,13 @@ class AssessAnswerMulti extends AssessAnswer {
         $this->responseHandler->update($marks);
     }
 
+    /**
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     *
+     * @param <type> $page
+     * @param <type> $question_id
+     */
     function reviewResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
@@ -220,6 +227,7 @@ class AssessAnswerMulti extends AssessAnswer {
             $page->setVar(array(
                 'ANSWER_ID' => $answerGroup['answer_id'],
                 'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_COMMENT' => $existing['comment'],
                 'REVIEWED_MARKS' => $existing['mark'],
             ));
 

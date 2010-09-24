@@ -198,6 +198,13 @@ class AssessAnswerMatch extends AssessAnswer {
         $this->responseHandler->update($marks);
     }
 
+    /**
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     *
+     * @param <type> $page
+     * @param <type> $question_id
+     */
     function reviewResponse($page, $question_id) {
         $left = array();
         $right = array();
@@ -221,6 +228,7 @@ class AssessAnswerMatch extends AssessAnswer {
             $page->setVar(array(
                 'ANSWER_ID' => $answerGroup['answer_id'],
                 'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_COMMENT' => $existing['comment'],
                 'REVIEWED_MARKS' => $existing['mark'],
             ));
 

@@ -127,7 +127,8 @@ class AssessAnswer extends Model {
     function saveReviewedResponse($data, $response_id) {
         $reviewedResponse = array(
             'response_id' => $response_id,
-            'mark' => $data['reviewedMarks'],
+            'comment' => scrubTEXT($data['comment']),
+            'mark' => scrubTEXT($data['reviewedMarks']),
         );
 
         if ($this->responseHandler->update($reviewedResponse)) {

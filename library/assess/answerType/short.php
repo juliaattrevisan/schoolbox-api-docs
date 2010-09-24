@@ -141,6 +141,7 @@ class AssessAnswerShort extends AssessAnswer {
             'ANSWER_ID' => $currentAnswer['answer_id'],
             'ANSWER' => $existing['response'],
             'RESPONSE_ID' => $existing['response_id'],
+            'REVIEWED_COMMENT' => $existing['comment'],
             'REVIEWED_MARKS' => $existing['mark'],
         ));
 

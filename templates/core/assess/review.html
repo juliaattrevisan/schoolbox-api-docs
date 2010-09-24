@@ -35,28 +35,27 @@ $j(document).ready(function() {
 		<form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" method="post">
 			<h3>Q{QUESTION_SEQUENCE}) {QUESTION_QUESTION}<span>({QUESTION_MARKS} marks)</span></h3>
 			<div class="assess-body">
-		
+
 				<!-- BEGIN answerInputs -->
 				<!-- END answerInputs -->
-			
-	
-			<input type="submit" value="Update Marks" class="next-step"/>
-					<div class="float-fix"></div>
+
+                <input type="submit" value="Update Marks" class="next-step"/>
+                <div class="float-fix"></div>
 			</div>
 		</form>
 		<div id="question_status_{RESPONSE_ID}"></div>
 
 	</div>
 	<!-- END question -->
-	
+
 	<!-- BEGIN prevSection -->
 	<a class="next-step step-nav" href="/assess/review/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Previous Section</a>
 	<!-- END prevSection -->
-	
+
 	<!-- BEGIN nextSection -->
 	<a class="next-step step-nav" href="/assess/review/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Next Section</a>
 	<!-- END nextSection -->
-	
+
 	<!-- BEGIN endAssess -->
 	<a class="green-go" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Finish</a>
 	<!-- END endAssess -->

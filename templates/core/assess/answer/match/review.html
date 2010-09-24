@@ -20,8 +20,8 @@
             </li>
             <!-- END answerOptionRight -->
         </ul>
- <!-- BEGIN answerOptionCorrectResponse -->
-       <!-- <ul>
+        <!-- BEGIN answerOptionCorrectResponse -->
+        <!-- <ul>
            
             <li>
                 {ANSWER_CORRECT_RESPONSE_VALUE}
@@ -31,6 +31,12 @@
 		<!-- END answerOptionCorrectResponse -->
     </div>
 </fieldset>
-<p class="marks-amount">
-    <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" /> / {QUESTION_MARKS}
-</p>
+<div>
+    <p>Teacher's Comments:</p>
+    <div class="textarea-container">
+        <textarea name="comment">{REVIEWED_COMMENT}</textarea>
+    </div>
+    <p class="marks-amount">
+        <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" /> / {QUESTION_MARKS}
+    </p>
+</div>

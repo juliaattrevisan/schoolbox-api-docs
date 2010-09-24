@@ -1,5 +1,3 @@
-
-
 <fieldset>
     <div>
         <ul class="multiple-choice-mark">
@@ -13,6 +11,12 @@
         </ul>
     </div>
 </fieldset>
-<p class="marks-amount">
-    <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" /> / {QUESTION_MARKS}
-</p>
+<div>
+    <p>Teacher's Comments:</p>
+    <div class="textarea-container">
+        <textarea name="comment">{REVIEWED_COMMENT}</textarea>
+    </div>
+    <p class="marks-amount">
+        <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" /> / {QUESTION_MARKS}
+    </p>
+</div>
