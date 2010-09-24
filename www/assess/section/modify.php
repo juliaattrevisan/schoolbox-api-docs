@@ -24,9 +24,9 @@ if (!empty($_POST)) {
         'description' => scrubTEXT($_POST['description']),
     ));
 
-    /* Redirect to Section modify
+    /* Redirect to summary
      */
-    localRedir('/assess/section/modify/' . scrubTEXT($_POST['section_id']));
+    localRedir('/assess/summary/' . scrubTEXT($_POST['assess_id']));
 }
 else {
     /* Render modify page

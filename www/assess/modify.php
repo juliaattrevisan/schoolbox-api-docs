@@ -28,7 +28,7 @@ if (!empty($_POST)) {
         $duration = Assess::UNLIMITED_DURATION;
     }
 
-    echo $assessHandler->update(array(
+    $assessHandler->update(array(
         'assess_id'   => $this->arg[0],
         'category_id' => scrubTEXT($_POST['category_id']),
         'user_id'     => $_SESSION['id'],
@@ -40,8 +40,7 @@ if (!empty($_POST)) {
         'allow_resit' => scrubTEXT($_POST['allow_resit']),
     ));
 
-    die();
-    //localRedir('/assess/modify/' . $this->arg[0]);
+    localRedir('/assess/summary/' . $this->arg[0]);
 }
 else {
 

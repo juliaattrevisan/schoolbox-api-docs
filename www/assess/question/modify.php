@@ -28,7 +28,12 @@ if (!empty($_POST)) {
     $questionHandler->update($_POST);
     $answerHandler->update($_POST);
 
-    localRedir('/assess/question/modify/' . scrubTEXT($_POST['question_id']));
+    /* Find the assess summary page
+     */
+    $sectionHandler = new AssessSection();
+    $section = $sectionHandler->getByID(scrubTEXT($_POST['section_id']));
+
+    localRedir('/assess/summary/' . $section['assess_id']);
 }
 else {
     /* Render modify page
