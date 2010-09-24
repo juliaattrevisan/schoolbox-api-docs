@@ -28,7 +28,7 @@ if (!empty($_POST)) {
         $duration = Assess::UNLIMITED_DURATION;
     }
 
-    $assessHandler->update(array(
+    echo $assessHandler->update(array(
         'assess_id'   => $this->arg[0],
         'category_id' => scrubTEXT($_POST['category_id']),
         'user_id'     => $_SESSION['id'],
@@ -40,9 +40,11 @@ if (!empty($_POST)) {
         'allow_resit' => scrubTEXT($_POST['allow_resit']),
     ));
 
-    localRedir('/assess/modify/' . $this->arg[0]);
+    die();
+    //localRedir('/assess/modify/' . $this->arg[0]);
 }
 else {
+
     /* Render modify page
      */
     $this->setFile(TEMPLATE_content, 'assess/modify.html');
@@ -74,7 +76,7 @@ else {
         'ASSESS_DESCRIPTION' => $assess['description'],
         'ASSESS_START_DATE'  => date('d/m/Y', $assessStartTime),
         'ASSESS_FINISH_DATE' => date('d/m/Y', $assessFinishTime),
-        'ALLOW_RESIT_CHECKED' => $assess['allow_resit'] == 'true' ? 'checked=\'checked\'' : '',
+        'ALLOW_RESIT_CHECKED' => $assess['allow_resit'] == 1 ? 'checked=\'checked\'' : '',
         'ASSESS_DURATION_CHECKED' => $assess['duration'] >= 0 ? 'checked=\'checked\'' : '',
     ));
 

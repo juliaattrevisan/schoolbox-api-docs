@@ -47,17 +47,23 @@ $attemptStartTime = strtotime($attempt['start']);
 $attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
 $attemptEndTime = $attemptStartTime + $assess['duration'];
 
-/* Redirect to the end if any of the following criteria are met:
+/* Tests can be undertaken if:
  *
- * 1. The current attempt has already ended (by visiting the end page) AND when re-sits are not allowed
- * 2. The current attempt has expired due to a positive time limit reaching zero AND when assess[duration] is not zero
+ * 1. The assessment allows resit and the assessment hasn't expired
+ * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
  */
-$cannotContinueAttempt = $attemptHandler->isComplete($this->arg[0]) && ($assess['allow_resit'] == 0);
-$durationInvalid = ($attemptTimeRemaining < 0) && ($assess['duration'] != Assess::UNLIMITED_DURATION);
-
-if ($cannotContinueAttempt || $durationInvalid) {
-    localRedir('/assess/end/' . $this->arg[0]);
-    exit();
+if ($assess['allow_resit'] == 1) {
+    if (!(($assess['duration'] == Assess::UNLIMITED_DURATION) || (strtotime($assess['finish']) > time()))) {
+        error(120);
+    }
+}
+else {
+    if ($attemptHandler->isComplete($assess['assess_id'])) {
+        error(121);
+    }
+    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0)) {
+        error(122);
+    }
 }
 
 /* Set up template

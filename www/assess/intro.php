@@ -60,33 +60,96 @@ else {
     $this->setVar('startTest_block', '');
 }
 
-/* Check if this assess expired
+/* Check if you have completed an assessment already
+ *
+ * Set up Attempt vars
  */
-if (strtotime($assess['finish']) < time()) {
-    $this->setVar(array(
-        'ERROR_STRING' => 'This test has expired.'
-    ));
+$attempt = $attemptHandler->getLatestForUser($assess['assess_id'], $_SESSION['id']);
+$attemptStartTime = strtotime($attempt['start']);
+$attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
+$attemptEndTime = $attemptStartTime + $assess['duration'];
 
-    $this->setVar('startTest_block', '');
-    $this->parse('error_block', 'error');
-}
-/* If you have made an attempt on this test, or are in the process of attempting,
- * don't reset the attempt id if you aren't allowed to resit. This prevents
- * people from resetting the timer by revisiting the intro screen repeatedly.
+/* Tests can be undertaken if:
+ *
+ * 1. The assessment allows resit and the assessment hasn't expired
+ * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
  */
-else {
-    if (!$attemptHandler->userHasAttempted($this->arg[0], $_SESSION['id']) || $assessHandler->allowResit($this->arg[0])) {
-        $_SESSION['attempt_id'] = '';
-
-        $this->setVar('error_block', '');
-    }
-    else {
+if ($assessHandler->allowResit($this->arg[0])) {
+    if (!(($assess['duration'] == Assess::UNLIMITED_DURATION) || (strtotime($assess['finish']) > time()))) {
         $this->setVar(array(
-            'ERROR_STRING' => 'You have already attempted this test and cannot re-sit it.'
+            'ERROR_STRING' => 'This online assessment has expired.'
         ));
 
         $this->setVar('startTest_block', '');
         $this->parse('error_block', 'error');
     }
+    else {
+        $_SESSION['attempt_id'] = '';
+
+        $this->setVar('error_block', '');
+    }
 }
+else {
+    if ($attemptHandler->isComplete($assess['assess_id'])) {
+        $this->setVar(array(
+            'ERROR_STRING' => 'You have already attempted this online assessment and cannot re-sit it.'
+        ));
+
+        $this->setVar('startTest_block', '');
+        $this->parse('error_block', 'error');
+    }
+    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0)) {
+        $this->setVar(array(
+            'ERROR_STRING' => 'You have run out of time to complete this online assessment and cannot re-sit it.'
+        ));
+
+        $this->setVar('startTest_block', '');
+        $this->parse('error_block', 'error');
+    }
+    else if ($attemptHandler->userHasAttempted($this->arg[0], $_SESSION['id'])) {
+
+        /* Load attempt id so the user can resume
+         */
+        $latest = $attemptHandler->getLatestForUser($this->arg[0], $_SESSION['id']);
+
+        $_SESSION['attempt_id'] = $latest['attempt_id'];
+
+        $this->setVar('error_block', '');
+    }
+    else {
+        $_SESSION['attempt_id'] = '';
+
+        $this->setVar('error_block', '');
+    }
+}
+
+///* Check if this assess expired
+// */
+//if (strtotime($assess['finish']) < time()) {
+//    $this->setVar(array(
+//        'ERROR_STRING' => 'This online assessment has expired.'
+//    ));
+//
+//    $this->setVar('startTest_block', '');
+//    $this->parse('error_block', 'error');
+//}
+///* If you have made an attempt on this test, or are in the process of attempting,
+// * don't reset the attempt id if you aren't allowed to resit. This prevents
+// * people from resetting the timer by revisiting the intro screen repeatedly.
+// */
+//else {
+//    if (!$attemptHandler->userHasAttempted($this->arg[0], $_SESSION['id']) || $assessHandler->allowResit($this->arg[0])) {
+//        $_SESSION['attempt_id'] = '';
+//
+//        $this->setVar('error_block', '');
+//    }
+//    else {
+//        $this->setVar(array(
+//            'ERROR_STRING' => 'You have already attempted this online assessment and cannot re-sit it.'
+//        ));
+//
+//        $this->setVar('startTest_block', '');
+//        $this->parse('error_block', 'error');
+//    }
+//}
 ?>

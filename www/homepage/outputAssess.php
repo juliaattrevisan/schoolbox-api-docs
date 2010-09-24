@@ -30,6 +30,14 @@ if (is_array($allAssess)) {
     $i=0;
 
     foreach($allAssess as $currentAssess) {
+        $this->setVar(array(
+            'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
+            'ASSESS_TITLE' => $currentAssess['title'],
+            'ASSESS_FINISH_DATE' => date('jS F Y, g:i:sa', strtotime($currentAssess['finish'])),
+            'ASSESS_DESCRIPTION' => $currentAssess['description'],
+            'ON_OFF' => $i%2 ? 'dark' : '',
+        ));
+
         /* Check if you have completed an assessment already
          *
          * Set up Attempt vars
@@ -39,27 +47,29 @@ if (is_array($allAssess)) {
         $attemptTimeRemaining = $attemptStartTime + $currentAssess['duration'] - time();
         $attemptEndTime = $attemptStartTime + $currentAssess['duration'];
 
-        /* Redirect to the end if any of the following criteria are met:
+        /* Tests can be undertaken if:
          *
-         * 1. The current attempt has already ended (by visiting the end page) AND when re-sits are not allowed
-         * 2. The current attempt has expired due to a positive time limit reaching zero AND when assess[duration] is not zero
+         * 1. The assessment allows resit and the assessment hasn't expired
+         * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
          */
-        $cannotContinueAttempt = $attemptHandler->isComplete($attempt['attempt_id']) && ($currentAssess['allow_resit'] == 0);
-        $durationInvalid = ($attemptTimeRemaining < 0) && ($currentAssess['duration'] != Assess::UNLIMITED_DURATION);
-
-        if ($cannotContinueAttempt || $durationInvalid) {
-            $this->setVar('studentLink_block', '');
+        if ($currentAssess['allow_resit'] == 1) {
+            if (($currentAssess['duration'] == Assess::UNLIMITED_DURATION) || (strtotime($currentAssess['finish']) > time())) {
+                $this->parse('studentLink_block', 'studentLink');
+            }
+            else {
+                $this->setVar('studentLink_block', '');
+            }
         }
         else {
-            $this->setVar(array(
-                'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
-                'ASSESS_TITLE' => $currentAssess['title'],
-                'ASSESS_FINISH_DATE' => date('jS F Y, g:i:sa', strtotime($currentAssess['finish'])),
-                'ASSESS_DESCRIPTION' => $currentAssess['description'],
-                'ON_OFF' => $i%2 ? 'dark' : '',
-            ));
-
-            $this->parse('studentLink_block', 'studentLink');
+            if ($attemptHandler->isComplete($currentAssess['assess_id'])) {
+                $this->setVar('studentLink_block', '');
+            }
+            else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0)) {
+                $this->setVar('studentLink_block', '');
+            }
+            else {
+                $this->parse('studentLink_block', 'studentLink');
+            }
         }
 
         if ($groupHandler->isStaff()) {

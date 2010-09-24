@@ -41,3 +41,6 @@ INSERT INTO error (id, message) VALUES (116, 'Unspecified question type.');
 INSERT INTO error (id, message) VALUES (117, 'Please choose a group for this assessment.');
 INSERT INTO error (id, message) VALUES (118, 'This attempt no longer exists.');
 INSERT INTO error (id, message) VALUES (119, 'This question no longer exists.');
+INSERT INTO error (id, message) VALUES (120, 'This online assessment has expired.');
+INSERT INTO error (id, message) VALUES (121, 'You have already attempted this online assessment and cannot re-sit it.');
+INSERT INTO error (id, message) VALUES (122, 'You have run out of time to complete this online assessment and cannot re-sit it.');
