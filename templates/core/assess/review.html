@@ -10,13 +10,13 @@ $j(document).ready(function() {
 
             /* Save successful, so hide form and disable submit butan.
              * Update section completion value
-             */
+             
             if (result.response_id != '') {
                 $j('#question_status_' + result.response_id).html('Response saved. This message should probably fade away into nothingness...');
             }
             else {
                 alert ('An error occurred while saving your answer.');
-            }
+            }*/
         });
 
         return false;
@@ -43,7 +43,6 @@ $j(document).ready(function() {
                 <div class="float-fix"></div>
 			</div>
 		</form>
-		<div id="question_status_{RESPONSE_ID}"></div>
 
 	</div>
 	<!-- END question -->

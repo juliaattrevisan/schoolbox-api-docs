@@ -36,7 +36,7 @@ var validator = $j("#createQuestionForm").submit(function() {
 					section_id: theForm.find('input[name=section_id]').val(),
 					question_id: theForm.find('input[name=question_id]').val(),
 					sequence: theForm.find('input[name=sequence]').val(),
-					type_id: theForm.find('select[name=type_id]').val(),
+					type_id: theForm.find('input[name=type_id]').val(),
 					question: tinyMCE.get('question').getContent(),
 					marks: theForm.find('input[name=marks]').val(),
 					allAnswers: JSON.stringify(answerCollection)

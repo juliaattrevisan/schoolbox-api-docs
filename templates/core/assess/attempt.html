@@ -5,10 +5,6 @@
 <script type="text/javascript">
 $j(document).ready(function() {
 
-    /* What was this for?
-	$j('.checkbox').removeAttr('checked');
-     */
-
     $j('.assess-header form').submit(function() {
         $j.post($j(this).attr('action'), $j(this).serialize(), function(responseText) {
             var dataFunction = new Function('return ' + responseText);
@@ -18,9 +14,6 @@ $j(document).ready(function() {
              * Update section completion value
              */
             if (result.response_id != '') {
-				$j('#question_status_' + result.question_id).show();
-				$j('#question_status_' + result.question_id).animate({ opacity: 1 }, 1)
-                $j('#question_status_' + result.question_id).html('Response saved.').delay(3000).animate({ opacity: 0.25 }, 1000);
 
                 for (var i=0; i < result.percentageComplete.length; i++) {
                     var sectionSelector = $j('#sectionPercentageComplete_' + result.percentageComplete[i].section_id);
@@ -41,13 +34,33 @@ $j(document).ready(function() {
     /* Submit all the questions before switching between sections
      */
     $j('.step-nav, .green-go').click(function() {
-        $j('.assess-header form').each(function(elem, value) {
-            $j(this).submit();
-        });
+		$j('.assess-header form').each(function(elem, value) {
+			$j(this).submit();
+		});
+	});
+	
+	$j('.checkbox').click(function() {
+		$j(this).parents('.assess-header form').submit();
 	});
 
+	$j('.textarea-container textarea').blur(function() {
+		if ($j(this).val() !== '') {
+			$j(this).parents('.assess-header form').submit();
+		}
+	});
+	
+	$j('.assess-body input').blur(function() {
+		$j(this).parents('.assess-header form').submit();
+	});
+	
     /* Set up countdown
      */
+	 
+	 if ($j('#countdown').html() == '') {
+		 $j('#countdown').parent().hide();
+	 }
+	 
+	 
     if ({ASSESS_TIME_REMAINING} >= 0) {
         $j('#countdown').countdown({
             until: '+{ASSESS_TIME_REMAINING}',
@@ -59,7 +72,11 @@ $j(document).ready(function() {
         });
 	}
 
-    $j(".match-it").sortable();
+    $j(".match-it").sortable({
+		stop: function() {
+			$j('.match-it').parents('.assess-header form').submit();
+		}
+	});
     $j(".match-it").disableSelection();
 });
 </script>
@@ -75,18 +92,17 @@ $j(document).ready(function() {
 		<!-- BEGIN question -->
 		<div class='assess-header'>
 			<form action="/assess/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
-				<h3>Q{QUESTION_SEQUENCE}) {QUESTION_QUESTION} <span>({QUESTION_MARKS} marks)</span></h3>
+				<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION} <span>({QUESTION_MARKS} marks)</span></h3>
 				<div class="assess-body">
 
 				<!-- BEGIN answerInputs -->
 				<!-- END answerInputs -->
 
-				<input type="submit" value="Save Answer" class="save-answer" />
+				<!--<input type="submit" value="Save Answer" class="save-answer" />-->
 				<div class="float-fix"></div>
 
 				</div>
 			</form>
-			<div id="question_status_{QUESTION_QUESTION_ID}" class="all-good"></div>
 		</div>
 		<!-- END question -->
 
@@ -105,8 +121,10 @@ $j(document).ready(function() {
 	<div class="col-2">
 		<h2>Assessment Name: {ASSESS_TITLE}</h2>
 		<div class="assess-body">
-			<strong>Time remaining</strong>
-			<div id="countdown"></div>
+			<div class="time-holder">
+				<strong>Time remaining</strong>
+				<div id="countdown"></div>
+			</div>
 			You began at: {ATTEMPT_START}<br />
 			You must finish this assessment by: {ATTEMPT_END}
 

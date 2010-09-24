@@ -326,7 +326,9 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #assess input{}
 #assess ul{margin:0;}
 #assess .col-1 .assess-body ul li{min-width: 0;position:relative; padding:5px;background:#ededed; border:1px solid #dbdbdb; margin-bottom:10px; }
-#assess .col-1 ul li.highlight, #assess.take-test .col-1 ul li.highlight {background-color:#e0f2df;}
+#assess .col-1 ul li.highlight, 
+#assess.take-test .col-1 ul li.highlight,
+#assess .col-1 .assess-body ul li.correct {background-color:#e0f2df;}
 
 #assess ul{height:100%; }
 #assess .drag-me{width:36%; font-size:11px; background:#fff; padding:10px 5px; line-height:14px; border: 1px solid #dbdbdb;}
@@ -401,11 +403,12 @@ height:24px; line-height:24px;}
 background:  url(/images/core/assess/section-dropd-down.gif) no-repeat;width:13px; height:13px;display:block;padding:0; margin:0;}
 .section-box .section-question ul,.section-box .section-question ol {padding:0 0 10px 10px; }
 .section-box .section-question ul{list-style:disc;padding:10px 10px 10px 20px;}
+#assess .section-box ul.section-question li ul{margin-bottom:10px;}
 .section-box ul.section-question  ul, 
 .section-box ul.section-question  ul li,
 .section-box ul.section-question  ol li
  {border:0; padding:0;}
- .section-box ul.section-question  ul li{padding:0 0 0 10px;}
+ .section-box ul.section-question  ul li{margin-left:25px;}
 .section-box ul.section-options a.drop-arrow:hover{background-position:bottom; cursor:pointer;}
 .section-box ul li{margin:0; padding:10px;font-size:11px;line-height:16px;background:#f1f7fa; border-bottom:1px solid #dbdbdb;}
 .section-box ul li p{padding:0 0 10px 0; margin:0;}
@@ -444,11 +447,17 @@ p.interact a.take-test-btn{ text-align:left;display:block;width:86px; background
 .mark-test form .submit:hover, .take-test form .next-section:hover{background-position:left bottom; cursor:pointer}
 
 /*take test*/
-#assess.take-test h3{background:#ededed; padding:10px;}
+#assess.take-test h3, #assess.mark-test h3{font-weight:normal;background:#ededed; padding:10px;}
 #assess.take-test h3.test-details{background:#f8f8f8;}
-#assess.take-test .col-1 ul li{background:#fff;}
-#assess.take-test .col-1 ul li.left-answer, #assess.take-test .col-1 ul li.right-answer{
-	border-right:0;background:#fff; padding:0; border:0;}
+#assess.take-test h3 ul, #assess.take-test h3 ol, #assess.mark-test h3 ul, #assess.mark-test h3 ol{margin:10px 10px 10px 33px;}
+#assess.take-test h3 ul li, #assess.mark-test h3 ul li{list-style-type:disc;}
+
+#assess.take-test .col-1 .assess-body ul li{background:#fff;}
+#assess.take-test 
+.col-1 ul li.left-answer, 
+#assess.take-test 
+.col-1 ul li.right-answer{
+border-right:0;background:#fff; padding:0; border:0;}
 #assess.take-test .col-1 ul li.right-answer{background:#e3f2fa;}
 #assess.take-test .all-good{background:#eff9ff; padding:10px; display:none;}
 
@@ -486,7 +495,7 @@ p.interact a.take-test-btn{ text-align:left;display:block;width:86px; background
 .mark-test ul.multiple-choice-mark li.multiCorrect .tick-cross{background: url(/images/core/assess/correct-incorrect.gif) 0 0 no-repeat;}
 .mark-test ul.multiple-choice-mark li.multiIncorrect .tick-cross{background: url(/images/core/assess/correct-incorrect.gif) 0 -15px no-repeat;}
 
-.mark-test ul.multiple-choice-mark li{ background-color:#ededed;border:1px solid #CCCCCC;margin-bottom:10px;padding:10px;}
+.mark-test ul.multiple-choice-mark li{border:1px solid #CCCCCC;margin-bottom:10px;padding:10px;}
 .mark-test p.marks-amount{font-size:11px;font-weight:bold;margin:0;padding:10px 0;text-align:right;}
 .mark-test li.matchCorrect{background-color: #E0F2DF}
 .mark-test .matchPairs{float:left;}
@@ -699,7 +708,6 @@ p.bubble-name { margin-bottom:5px; padding-bottom:5px; }
 /* ePortfolio */
 .privateBlock {width: 100%;padding-bottom: 20px;}
 .privateBlock .box {float: left; width:100%;}
-.privateBlock  .pad-it{padding:10px;}
 .privateBlock  .private-notes ul li{list-style-type:circle;}
 .privateBlock textarea {width: 99%;font-family: Arial, Helvetica, sans-serif;font-size: 12px;}
 .privateBlock .box p{margin:0;}
@@ -827,17 +835,14 @@ p.small {font-size: 10px;}
 #translateTextForm .righty{width:30%; float:left;}
 #translateTextForm em{float:left; width:22%; line-height:24px; text-align:center;}
 
-/*TREE*/
-ul.tree, ul.tree ul { list-style: none; margin: 0; padding: 0; }
-#content ul.tree li { background: 0; padding-left: 5px;position:relative; }
-ul.tree li a { background: url(/images/core/home-plus.gif) no-repeat; line-height: 18px; padding: 0 0 11px 46px; display: inline-block; cursor: pointer; }
-ul.tree ul { display: none; }
-ul.tree li.minus ul { display: block; }
-ul.tree li.minus a { background: url(/images/core/home-minus.gif) no-repeat; }
-#content ul.tree ul li { background: 0; padding-left: 0; margin-bottom: 7px; padding-left: 56px; }
-ul.tree li.icon a { background: url(/images/file-icon.gif) no-repeat; padding: 0 0 0 28px; line-height: 21px; }
-
-ul.tree li a.go-to-home{ padding:2px ; position:absolute; right:0; top:0;clear:both; margin-top:-4px;margin-left:10px; background:none; background:#fff; }
+/*TREE -- now utilising the expandable plugin :0*/
+ul.tree, ul.tree ul { list-style: none; margin:0;}
+#content ul.tree li { background: 0; padding-left: 5px; line-height:26px;}
+#content ul.tree ul li {padding-left: 56px;}
+ul.tree li.icon a { background: url(/images/file-icon.gif) no-repeat; padding:3px 0 3px 28px; line-height:21px;}
+ul.tree li a.go-to-home{ padding:2px ;margin-top:-4px;margin-left:10px; background:none; background:#fff; }
+ul.tree .expandable .hitarea, ul.tree .collapsable .hitarea{background: url(/images/core/home-plus.gif) no-repeat;float:left;height:16px;width:46px;cursor:pointer;}
+ul.tree .collapsable .hitarea{background: url(/images/core/home-minus.gif) no-repeat;}
 
 /*TUTORIAL*/
 .header_option.on-header a{color:#fff;	}
