@@ -17,6 +17,10 @@ $attemptHandler = new AssessAttempt();
 $questionHandler = new AssessQuestion();
 $responseHandler = new AssessResponse();
 
+if (!is_numeric($_SESSION['attempt_id'])) {
+    localRedir('/assess/intro/' . $this->arg[0]);
+}
+
 $assess = $assessHandler->getByID($this->arg[0]);
 $attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
 
@@ -24,12 +28,6 @@ $this->setFile(TEMPLATE_content, 'assess/end.html');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
 $this->setTitle('Assessment: ' . $assess['title']);
-
-/* Check that all questions are answered
-if ($responseHandler->numResponses($_SESSION['attempt_id']) != $questionHandler->numQuestions($this->arg[0])) {
-    error(113);
-}
- */
 
 if (!$assess) {
     error(112);
