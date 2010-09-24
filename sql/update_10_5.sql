@@ -45,3 +45,4 @@ INSERT INTO error (id, message) VALUES (120, 'This online assessment has expired
 INSERT INTO error (id, message) VALUES (121, 'You have already attempted this online assessment and cannot re-sit it.');
 INSERT INTO error (id, message) VALUES (122, 'You have run out of time to complete this online assessment and cannot re-sit it.');
 INSERT INTO error (id, message) VALUES (123, 'This attempt has not been recorded.');
+INSERT INTO error (id, message) VALUES (124, 'You are the owner of this test and therefore cannot attempt it.');

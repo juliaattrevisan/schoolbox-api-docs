@@ -38,6 +38,10 @@ if (!$section) {
     error(115);
 }
 
+if ($assessHandler->isOwner($this->arg[0], $_SESSION['id'])) {
+    error(124);
+}
+
 /* Set the start time if not already done.
  *
  * TODO: Check if this user has attempted this assess in the past, the attempt
