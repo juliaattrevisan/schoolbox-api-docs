@@ -232,6 +232,17 @@ class AssessAnswerMulti extends AssessAnswer {
             ));
 
             foreach($allAnswers as $currentAnswer) {
+                if ($currentAnswer->correct) {
+                    $page->setVar(array(
+                        'ACTUAL_CORRECT_VALUE' => 'correct-response'
+                    ));
+                }
+                else {
+                    $page->setVar(array(
+                        'ACTUAL_CORRECT_VALUE' => ''
+                    ));
+                }
+
                 $page->setVar(array(
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => $currentAnswer->description,
