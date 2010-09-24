@@ -8,7 +8,15 @@
 				</p>
 				<p>
 					<strong>Time allowed: </strong><br />
-					{DURATION}
+					{ASSESS_DURATION}
+				</p>
+				<p>
+					<strong>Open Date: </strong><br />
+					{ASSESS_START}
+				</p>
+				<p>
+					<strong>Close Date: </strong><br />
+					{ASSESS_FINISH}
 				</p>
 			
 				<ul><li><strong>Sections:</strong></li>
@@ -24,13 +32,13 @@
 			</div>
             <!-- END startTest -->
 
-            <!-- BEGIN alreadyAttempted -->
+            <!-- BEGIN error -->
             <div style="margin-top:20px;">
                 <p>
-                    You have already attempted this test and cannot re-sit it.
+                    {ERROR_STRING}
                 </p>
             </div>
-            <!-- END alreadyAttempted -->
+            <!-- END error -->
 
 			<div class="float-fix"></div>
 		</div>
