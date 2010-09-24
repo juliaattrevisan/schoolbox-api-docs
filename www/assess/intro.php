@@ -17,6 +17,10 @@ $assessHandler = new Assess();
 $sectionHandler = new AssessSection();
 $attemptHandler = new AssessAttempt();
 
+if (!is_numeric($this->arg[0])) {
+    error(112);
+}
+
 $assess = $assessHandler->getIntro($this->arg[0]);
 $allSummary = $assessHandler->getIntroSummary($this->arg[0]);
 $allSections = $sectionHandler->getList($assess['assess_id']);

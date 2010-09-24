@@ -19,6 +19,14 @@ $attemptHandler = new AssessAttempt();
 $responseHandler = new AssessResponse();
 $sectionHandler = new AssessSection();
 
+if (!is_numeric($this->arg[0])) {
+    error(112);
+}
+
+if (!is_numeric($this->arg[1])) {
+    error(115);
+}
+
 $assess = $assessHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
 
