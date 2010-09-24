@@ -14,10 +14,19 @@ $j(function() {
 
 });
 </script>
-<h2>Assessment Content</h2>
+<h2>Assessment Content
+	<ul class="section-options">
+		<li class="parent">	
+			<a class="drop-arrow" href="#"></a>
+			<ul>
+				<li><a href="/assess/modify/{ASSESS_ASSESS_ID}">Modify</a></li>
+				<li><a href="#">Export</a></li>
+			</ul>
+		</li>
+	</ul>
+</h2>
 <div class="allQuestions">
 	<div class="assess-body">
-	<a class="add-section" href="/assess/modify/{ASSESS_ASSESS_ID}">Modify assessment details</a>
 	<a class="add-section" href="/assess/section/create/{ASSESS_ASSESS_ID}">Add sections to this assessment</a>
         <!-- BEGIN section -->
 		<div class="section-box">

@@ -306,7 +306,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #assess .section p ins{height:20px; display:block; background:#ff0; margin-bottom:10px;}
 #assess .section p span{display:block; font-weight:normal; text-align:left;}
 #assess #countdown{ text-align:center; font-size:14px; padding:9px; background:#ededed; margin:8px 0;}
-
+#assess .save-success{display:none; background:#e0f2df;border:1px solid #ccc; padding:10px; margin:0 0 10px 0;}
 
 #assess .col-1, #assess .col-2{float:left; }
 #assess .col-1 h4{font-size:10px; padding:10px; padding-top:0px;}
@@ -371,14 +371,13 @@ height:24px; line-height:24px;}
 #assess.create-test li.inputs .arrow span{padding-top:5px;}
 #assess .grey-highlight{line-height:16px;}
 #assess .hidden-clone, #assess .hide-this{display:none;}
-
-
 #assess .col-1 .answerList li span{position:absolute; top:4px; left:5px; height:15px; width:16px;background: #E0F2DF url("/images/core/assess/correct-incorrect.gif") no-repeat;}
 #assess .col-1 .answerList li {background:#E0F2DF;  float:left;margin:0 10px 10px 0;}
 
 /*tiny mce*/
 .mceContentBody p span, .mceContentBody span{padding:1px 2px; background:#E0F2DF; border: 1px solid #dbdbdb;}
 #assess table.mceLayout tr.mceFirst td,#assess table.mceLayout tr.mceLast td,#assess table.mceLayout tr.mceFirst td, .defaultSkin .mceIframeContainer  {border:0;}
+
 #assess .defaultSkin table.mceLayout,#assess .defaultSkin table.mceLayout tr.mceFirst td{border:0 none;}
 #assess .defaultSkin td.mceCenter table{margin:0; width:100px;}
 #assess .defaultSkin td.mceCenter table td{}
@@ -388,19 +387,16 @@ height:24px; line-height:24px;}
 .section-box .add-questions:hover{text-decoration:none; background:#f0f0f0;}
 .section-box .add-questions span{background: url(/images/core/assess/plus-icon.gif) no-repeat 0 0; padding-left:20px}
 .section-box .bug-pad{width:10px; height:20px; }
-
 #assess .section-box h3, #assess.take-test .percentage-complete h3{background:#1597cb; padding:5px; margin:0; font-size:11px; color:#fff;}
-.section-box ul{margin:0; border:1px solid #dbdbdb; border-top:0; border-bottom:0;}
-.section-box ul.section-options{width:13px; position:absolute; right:6px; top:6px; border:0;}
 
-.section-box ul.section-options li{ padding:0;}
+#assess ul.section-options{width:13px; position:absolute; right:6px; top:6px; border:0;}
+#assess ul.section-options li{ padding:0;}
+#assess  ul.section-options ul{border-top:1px solid #CCCCCC;display:none;height:auto;min-height:10px;position:absolute;right:0;top:13px;width:100px;}
+#assess ul.section-options ul a{display:block;padding:5px; backgrond:#fff; color:#255297}
+ul.section-options ul li{background:#fff; width:100px; text-indent:0; font-weight:bold; font-size:10px;}
+#assess ul.section-options ul li.parent{line-height:normal; border:0;}
+ul.section-options a.drop-arrow{background: url(/images/core/assess/section-dropd-down.gif) no-repeat;width:13px; height:13px;display:block;padding:0; margin:0;}
 
-#assess .section-box ul.section-options ul{border-top:1px solid #CCCCCC;display:none;height:auto;min-height:10px;position:absolute;right:0;top:13px;width:100px;}
-.section-box ul.section-options ul a{display:block;padding:5px; backgrond:#fff; color:#255297}
-.section-box ul.section-options ul li{background:#fff; width:100px; }
-.section-box ul.section-options ul li.parent{line-height:normal; border:0;}
-.section-box ul.section-options a.drop-arrow{ 
-background:  url(/images/core/assess/section-dropd-down.gif) no-repeat;width:13px; height:13px;display:block;padding:0; margin:0;}
 .section-box .section-question ul,.section-box .section-question ol {padding:0 0 10px 10px; }
 .section-box .section-question ul{list-style:disc;padding:10px 10px 10px 20px;}
 #assess .section-box ul.section-question li ul{margin-bottom:10px;}
@@ -410,7 +406,7 @@ background:  url(/images/core/assess/section-dropd-down.gif) no-repeat;width:13p
  {border:0; padding:0;}
  .section-box ul.section-question  ul li{margin-left:25px;}
 .section-box ul.section-options a.drop-arrow:hover{background-position:bottom; cursor:pointer;}
-.section-box ul li{margin:0; padding:10px;font-size:11px;line-height:16px;background:#f1f7fa; border-bottom:1px solid #dbdbdb;}
+.section-box ul li, ul.section-options  li{margin:0; padding:10px;font-size:11px;line-height:16px;background:#f1f7fa; border-bottom:1px solid #dbdbdb;}
 .section-box ul li p{padding:0 0 10px 0; margin:0;}
 .section-box ul li p.links{padding:0 10px 10px 10px;}
 .section-box ul li span{font-weight:bold;}

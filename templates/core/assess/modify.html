@@ -51,9 +51,8 @@ $j(document).ready(function() {
 
         $j('input[name=assessmentDuration]').val(test_duration_in_seconds);
     });
-    */
+	 */
 
-	
 	$j('.show-duration').click(function() {
 		if ($j('.hide-it').is(':visible')) {
 			$j('.hide-it').hide();
@@ -70,7 +69,19 @@ $j(document).ready(function() {
 			$j('.hide-it').show();
 	}
 
+	var actionPlace = '{ACTION}';
+
 	$j('.standardForm').validate({
+		
+		submitHandler: function() {
+			if (actionPlace == "modify") {
+				$j.post($j('.standardForm').attr('action'), $j('.standardForm').serializeArray(), function(responseText) {
+					$j('.save-success').show().delay(4000).slideUp();
+				});
+			} else {
+				$j('.standardForm').submit();
+			}
+		},
 		rules: {
 			title: {
 				required: true,
@@ -104,11 +115,11 @@ $j(document).ready(function() {
 
 <div id="assess">
 <h1>Manage Assessment {ASSESS_TITLE}</h1>
+
 <div class="col-1">
+
 	<form name="create" action="/assess/{ACTION}/{ASSESS_ASSESS_ID}" class="standardForm standardGrey" method="post">
-		<div>
-			<input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
-		</div>
+		<input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
 		<table>
 			<tr>
 				<td class="formLabelWidth"><h3>Title</h3><h4>The name of the test</h4></td>
@@ -164,7 +175,6 @@ $j(document).ready(function() {
 			<tr>
 				<td><h3>Duration</h3><h4>To set a test duration, tick the box and fill out a time.</h4></td>
 				<td>
-				
 					<label class="float-left">
 						<input type="checkbox" class="float-left show-duration" {ASSESS_DURATION_CHECKED}/>
 					</label>
@@ -181,7 +191,6 @@ $j(document).ready(function() {
 						</select> min
 					</fieldset>
 					<div class="float-fix"></div>
-					</div>
 				</td>
 			</tr>
 			<tr>
@@ -194,16 +203,17 @@ $j(document).ready(function() {
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
-				<td><input type="submit" value="Continue" class="next-step" /></td>
+				<td><div class="save-success">Successfully updated</div>
+				<input type="submit" value="Continue" class="next-step" /></td>
 			</tr>
 		</table>
 	</form>
-	</div>
+</div>
 
 <div class="col-2">
 <!-- BEGIN allQuestions -->
 
 <!-- END allQuestions -->
 </div>
-</div>
+
 <div class="float-fix"></div>
