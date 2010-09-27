@@ -97,7 +97,7 @@ if (is_array($fileList)) {
     // add homepage "file"
     if ($category['template'] > 0) {
         $homepage = array('id'          => $category['id'],
-                          'description' => 'HOMEPAGE',
+                          'description' => 'Homepage',
                           'size'        => 1,
                           'iconFile'    => 'vcard_fiquet.png',
                           );

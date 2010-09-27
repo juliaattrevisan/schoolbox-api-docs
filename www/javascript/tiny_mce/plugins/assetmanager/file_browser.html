@@ -87,8 +87,8 @@ $(function () {
 		var alt = win.document.getElementById('alt'), altValue = $(this).find('img').attr('alt');
         if (alt) 
             alt.value = altValue;
-	    console.log(altValue);
-		if (altValue == 'HOMEPAGE')
+	    
+		if (altValue == 'Homepage')
             url = '/homepage/'+relationID[1].toString();
 		else
 		    url = '/send.php?' + relationID[0].toString();

@@ -34,7 +34,7 @@ if (is_numeric($_POST['categoryID'])) {
             
             if ($category['template'] > 0) {
                 $homepage = array('id'          => $category['id'],
-                                  'description' => 'HOMEPAGE',
+                                  'description' => 'Homepage',
                                   'size'        => 1,
                                   'iconFile'    => 'vcard_fiquet.png',
                                   );
