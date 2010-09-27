@@ -11,6 +11,13 @@
 require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-factory.php');
 require_once('../library/assess/assess-section.php');
+require_once '../library/group.php';
+
+$groupHandler = new Group();
+
+if (!$groupHandler->isStaff()) {
+    error(130);
+}
 
 /* Get a list of questions and answers to softdelete
  */

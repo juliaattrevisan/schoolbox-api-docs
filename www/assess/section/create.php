@@ -10,8 +10,19 @@
 require_once '../library/assess/assess.php';
 require_once '../library/assess/assess-question.php';
 require_once '../library/assess/assess-section.php';
+require_once '../library/group.php';
+
+$assessHandler = new Assess();
+$groupHandler = new Group();
+
+if (!$groupHandler->isStaff()) {
+    error(130);
+}
 
 if (!empty($_POST)) {
+    if (!$assessHandler->isOwner(scrubTEXT($_POST['assess_id']))) {
+        error(130);
+    }
 
     /* Create new Section
      */
@@ -23,14 +34,12 @@ if (!empty($_POST)) {
     localRedir('/assess/question/create/' . $section_id);
 }
 else {
-    /* Render create page
-     */
-    $this->setFile(TEMPLATE_content, 'assess/section/create.html');
-    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
-    $this->setTitle('Create Section');
-
     if (empty($this->arg[0])) {
         error(51);
+    }
+
+    if (!$assessHandler->isOwner($this->arg[0])) {
+        error(130);
     }
 
     /* Find out whether the test exists to which you are attempting to add a
@@ -40,8 +49,14 @@ else {
     $assess = $assessHandler->getByID($this->arg[0]);
 
     if (empty($assess)) {
-        error();
+        error(112);
     }
+
+    /* Render create page
+     */
+    $this->setFile(TEMPLATE_content, 'assess/section/create.html');
+    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
+    $this->setTitle('Create Section');
 
     $section = new AssessSection();
 

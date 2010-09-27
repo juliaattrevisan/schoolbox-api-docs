@@ -8,16 +8,30 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+require_once '../library/assess/assess.php';
 require_once '../library/assess/assess-factory.php';
 require_once '../library/assess/assess-section.php';
+require_once('../library/group.php');
+
+$assessHandler = new Assess();
+$questionHandler = new AssessQuestion();
+$answerHandler = new AssessAnswer();
+$sectionHandler = new AssessSection();
+$groupHandler = new Group();
+
+if (!$groupHandler->isStaff()) {
+    error(130);
+}
 
 /* Soft delete the question
  */
-$questionHandler = new AssessQuestion();
-$answerHandler = new AssessAnswer();
-
 $question = $questionHandler->getByID($this->arg[0]);
 $answer = $answerHandler->getForQuestion($question['question_id']);
+$section = $sectionHandler->getByID($question['section_id']);
+
+if (!$assessHandler->isOwner($section['assess_id'])) {
+    error(130);
+}
 
 /* Perform soft delete
  */

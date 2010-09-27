@@ -51,3 +51,6 @@ INSERT INTO error (id, message) VALUES (126, 'Only teachers can create and modif
 INSERT INTO error (id, message) VALUES (127, 'Only the test owner can review this test.');
 INSERT INTO error (id, message) VALUES (128, 'This attempt no longer exists.');
 INSERT INTO error (id, message) VALUES (129, 'You are not allowed to view this student\s test.');
+INSERT INTO error (id, message) VALUES (130, 'Only teachers can create and modify their test contents.');
+INSERT INTO error (id, message) VALUES (131, 'Question could not be saved.');
+INSERT INTO error (id, message) VALUES (132, 'Answer could not be saved.');

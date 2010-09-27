@@ -10,8 +10,16 @@
 require_once '../library/assess/assess.php';
 require_once '../library/assess/assess-section.php';
 require_once '../library/assess/assess-factory.php';
+require_once('../library/group.php');
 
 $factory = new AssessFactory();
+$assessHandler = new Assess();
+$sectionHandler = new AssessSection();
+$groupHandler = new Group();
+
+if (!$groupHandler->isStaff()) {
+    error(130);
+}
 
 /* If a question was submitted
  */
@@ -22,6 +30,12 @@ if (!empty($_POST)) {
         error(116);
     }
 
+    $section = $sectionHandler->getByID(scrubTEXT($_POST['section_id']));
+
+    if (!$assessHandler->isOwner($section['assess_id'])) {
+        error(130);
+    }
+
     $questionHandler = $factory->createQuestionModel(scrubTEXT($_POST['type_id']));
     $answerHandler = $factory->createAnswerModel(scrubTEXT($_POST['type_id']));
 
@@ -30,12 +44,13 @@ if (!empty($_POST)) {
 
     /* Find the assess summary page
      */
-    $sectionHandler = new AssessSection();
-    $section = $sectionHandler->getByID(scrubTEXT($_POST['section_id']));
-
     localRedir('/assess/summary/' . $section['assess_id']);
 }
 else {
+    if (!is_numeric($this->arg[0])) {
+        error(115);
+    }
+
     /* Render modify page
      */
     $this->setFile(TEMPLATE_content, 'assess/question/modify.html');
@@ -44,14 +59,13 @@ else {
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     
-    /* Set question ID
-     */
-    if (empty($this->arg[0])) {
-        error(115);
-    }
-
     $questionHandler = new AssessQuestion();
     $question = $questionHandler->getByID($this->arg[0]);
+    $section = $sectionHandler->getByID($question['section_id']);
+
+    if (!$assessHandler->isOwner($section['assess_id'])) {
+        error(130);
+    }
 
     $answerHandler = $factory->createAnswerModel($question['type_id']);
 
@@ -76,9 +90,6 @@ else {
 
     /* Render contents of this Assess
      */
-    $sectionHandler = new AssessSection();
-    $section = $sectionHandler->getByID($question['section_id']);
-
     if (empty($section)) {
         error(51);
     }

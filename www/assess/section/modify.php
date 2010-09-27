@@ -10,8 +10,20 @@
 require_once '../library/assess/assess.php';
 require_once '../library/assess/assess-question.php';
 require_once '../library/assess/assess-section.php';
+require_once '../library/group.php';
+
+$assessHandler = new Assess();
+$groupHandler = new Group();
+
+if (!$groupHandler->isStaff()) {
+    error(130);
+}
 
 if (!empty($_POST)) {
+    if (!$assessHandler->isOwner(scrubTEXT($_POST['assess_id']))) {
+        error(130);
+    }
+
     $sectionHandler = new AssessSection();
 
     $sectionHandler->update(array(
@@ -29,20 +41,25 @@ if (!empty($_POST)) {
     localRedir('/assess/summary/' . scrubTEXT($_POST['assess_id']));
 }
 else {
+    if (!is_numeric($this->arg[0])) {
+        error(112);
+    }
+
+    $sectionHandler = new AssessSection();
+    $section = $sectionHandler->getByID($this->arg[0]);
+
+    if (!$assessHandler->isOwner($section['assess_id'])) {
+        error(130);
+    }
+
     /* Render modify page
      */
     $this->setFile(TEMPLATE_content, 'assess/section/modify.html');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setTitle('Create Section');
 
-    if (empty($this->arg[0])) {
-        error();
-    }
 
-    $sectionHandler = new AssessSection();
-    $section = $sectionHandler->getByID($this->arg[0]);
 
-    $assessHandler = new Assess();
     $assess = $assessHandler->getByID($section['assess_id']);
 
     $this->setVar(array(

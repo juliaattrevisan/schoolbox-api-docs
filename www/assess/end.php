@@ -24,14 +24,18 @@ if (!is_numeric($_SESSION['attempt_id'])) {
 $assess = $assessHandler->getByID($this->arg[0]);
 $attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
 
+if (!$assess) {
+    error(112);
+}
+
+if ($assessHandler->isOwner($this->arg[0])) {
+    error(124);
+}
+
 $this->setFile(TEMPLATE_content, 'assess/end.html');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
 $this->setTitle('Assessment: ' . $assess['title']);
-
-if (!$assess) {
-    error(112);
-}
 
 if ($attempt['finish'] == '0000-00-00 00:00:00') {
     $attemptHandler->update(array(

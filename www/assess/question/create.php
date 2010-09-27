@@ -15,12 +15,26 @@
 require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-section.php');
 require_once('../library/assess/assess-factory.php');
+require_once('../library/group.php');
 
 $factory = new AssessFactory();
+$assessHandler = new Assess();
+$sectionHandler = new AssessSection();
+$groupHandler = new Group();
+
+if (!$groupHandler->isStaff()) {
+    error(130);
+}
 
 /* If a question was submitted
  */
 if (!empty($_POST)) {
+    $section = $sectionHandler->getByID($_POST['section_id']);
+
+    if (!$assessHandler->isOwner(scrubTEXT($section['assess_id']))) {
+        error(130);
+    }
+
     $questionHandler = $factory->createQuestionModel(scrubTEXT($_POST['type_id']));
     $answerHandler = $factory->createAnswerModel(scrubTEXT($_POST['type_id']));
 
@@ -28,18 +42,26 @@ if (!empty($_POST)) {
     $answer_id = $answerHandler->create($_POST, $question_id);
 
     if (!$question_id) {
-        echo "Question could not be saved";
-        error();
+        error(131);
     }
 
     if (!$answer_id) {
-        echo "Answer could not be saved";
-        error();
+        error(132);
     }
 
     localRedir('/assess/question/create/' . scrubTEXT($_POST['section_id']));
 }
 else {
+    if (!is_numeric($this->arg[0])) {
+        error(51);
+    }
+
+    $section = $sectionHandler->getByID($this->arg[0]);
+
+    if (!$assessHandler->isOwner($section['assess_id'])) {
+        error(130);
+    }
+
     /* Render create page
      */
     $this->setFile(TEMPLATE_content, 'assess/question/create.html');
@@ -47,19 +69,6 @@ else {
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setTitle('Create Question');
-
-    /* Set section ID
-     */
-    if (empty($this->arg[0])) {
-        error(51);
-    }
-
-    $sectionHandler = new AssessSection();
-    $section = $sectionHandler->getByID($this->arg[0]);
-
-    if (empty($section)) {
-        error(51);
-    }
 
     $questionHandler = new AssessQuestion();
 
