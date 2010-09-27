@@ -16,6 +16,7 @@ require_once('../library/assess/assess-factory.php');
 require_once('../library/assess/assess-attempt.php');
 require_once('../library/assess/assess-response.php');
 require_once('../library/assess/assess-section.php');
+require_once('../library/group.php');
 
 $factory = new AssessFactory();
 $responseHandler = new AssessResponse();
@@ -27,6 +28,10 @@ $assess = $assessHandler->getByID($this->arg[0]);
 
 if (!$assess) {
     error(112);
+}
+
+if (!$assessHandler->isOwner($this->arg[0], $_SESSION['id'])) {
+    error(125);
 }
 
 /* Perform automated marking on responses which support this feature. Only

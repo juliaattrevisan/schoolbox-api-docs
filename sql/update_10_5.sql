@@ -46,3 +46,4 @@ INSERT INTO error (id, message) VALUES (121, 'You have already attempted this on
 INSERT INTO error (id, message) VALUES (122, 'You have run out of time to complete this online assessment and cannot re-sit it.');
 INSERT INTO error (id, message) VALUES (123, 'This attempt has not been recorded.');
 INSERT INTO error (id, message) VALUES (124, 'You are the owner of this test and therefore cannot attempt it.');
+INSERT INTO error (id, message) VALUES (125, 'Only the test owner can view this page.');

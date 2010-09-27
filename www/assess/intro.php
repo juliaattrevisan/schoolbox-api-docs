@@ -22,6 +22,11 @@ if (!is_numeric($this->arg[0])) {
 }
 
 $assess = $assessHandler->getIntro($this->arg[0]);
+
+if (!$assess) {
+    error(112);
+}
+
 $allSummary = $assessHandler->getIntroSummary($this->arg[0]);
 $allSections = $sectionHandler->getList($assess['assess_id']);
 
