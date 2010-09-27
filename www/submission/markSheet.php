@@ -53,7 +53,7 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 	if(is_array($subList)) {
         $csv = 'Synergetic ID,Surname,Firstname,';
 		foreach($subList as $sub) {
-            $csv .= scrubTEXT($sub['description']).',';
+            $csv .= scrubTEXT(str_replace(',', ' ', $sub['description'])).',';
 		}
 	}
 
@@ -65,8 +65,25 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 
 			if(is_array($subList)) {
 				foreach($subList as $sub) {
-                    $return = $retHandler->getByUser($student['uid'],$sub['id']);
-                    $csv .= scrubTEXT($return[0]['mark']).',';
+                    if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
+                        $firstSection = $sectionHandler->getFirst($sub['id']);
+                        $mostRecentAttempt = $attemptHandler->getLatestForUser($sub['id'], $student['uid']);
+                        $marks = $attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
+                        $total = $attemptHandler->getTotalMarks($sub['id'], $mostRecentAttempt['attempt_id']);
+
+                        if ($marks && $total) {
+                            $val = $marks . ' / ' . $total;
+                        }
+                        else {
+                            $val = '';
+                        }
+
+                        $csv .= scrubTEXT($val).',';
+                    }
+                    else {
+                        $return = $retHandler->getByUser($student['uid'],$sub['id']);
+                        $csv .= scrubTEXT($return[0]['mark']).',';
+                    }
 				}
 			}   
             $csv .="\n";
