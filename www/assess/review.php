@@ -32,8 +32,13 @@ if (!is_numeric($this->arg[1])) {
     error(115);
 }
 
+if (!is_numeric($this->arg[2])) {
+    error(128);
+}
+
 $assess = $assessHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
+$attempt = $attemptHandler->getByID($this->arg[2]);
 
 if (!$assess) {
     error(112);
@@ -41,6 +46,14 @@ if (!$assess) {
 
 if (!$section) {
     error(115);
+}
+
+if (!$attempt) {
+    error(128);
+}
+
+if (!$assessHandler->isOwner($this->arg[0], $_SESSION['id'])) {
+    error(127);
 }
 
 /* Find out which attempt was made

@@ -47,3 +47,6 @@ INSERT INTO error (id, message) VALUES (122, 'You have run out of time to comple
 INSERT INTO error (id, message) VALUES (123, 'This attempt has not been recorded.');
 INSERT INTO error (id, message) VALUES (124, 'You are the owner of this test and therefore cannot attempt it.');
 INSERT INTO error (id, message) VALUES (125, 'Only the test owner can view this page.');
+INSERT INTO error (id, message) VALUES (126, 'Only teachers can create and modify tests.');
+INSERT INTO error (id, message) VALUES (127, 'Only the test owner can review this test.');
+INSERT INTO error (id, message) VALUES (128, 'This attempt no longer exists.');

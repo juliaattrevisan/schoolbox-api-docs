@@ -8,7 +8,14 @@
  * @version     SVN: $Id$
  */
 require_once('../library/assess/assess.php');
+require_once('../library/group.php');
 require_once('include/time.php');
+
+$groupHandler = new Group();
+
+if (!$groupHandler->isStaff()) {
+    error(126);
+}
 
 $assessHandler = new Assess();
 
