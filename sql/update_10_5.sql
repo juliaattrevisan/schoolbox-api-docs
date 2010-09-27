@@ -54,3 +54,4 @@ INSERT INTO error (id, message) VALUES (129, 'You are not allowed to view this s
 INSERT INTO error (id, message) VALUES (130, 'Only teachers can create and modify their test contents.');
 INSERT INTO error (id, message) VALUES (131, 'Question could not be saved.');
 INSERT INTO error (id, message) VALUES (132, 'Answer could not be saved.');
+INSERT INTO error (id, message) VALUES (133, 'Could not load question: unknown type.');

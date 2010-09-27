@@ -130,6 +130,10 @@ $allQuestions = $sectionHandler->getQuestions($_SESSION['attempt_id'], $section[
  */
 if ($allQuestions) {
     foreach($allQuestions as $currentQuestion) {
+        if (!is_numeric($currentQuestion['type_id'])) {
+            error(133);
+        }
+        
         $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
         /* Load answer template into answerOption block

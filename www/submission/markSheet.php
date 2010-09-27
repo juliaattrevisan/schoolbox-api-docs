@@ -147,21 +147,23 @@ else if(is_numeric($this->arg[0])) {
                  */
                 $allAttempts = $attemptHandler->getList($sub['id']);
 
-                foreach($allAttempts as $currentAttempt) {
-                    $allResponses = $responseHandler->getAutomarkableResponses($sub['id'], $currentAttempt['attempt_id']);
+                if (is_array($allAttempts)) {
+                    foreach($allAttempts as $currentAttempt) {
+                        $allResponses = $responseHandler->getAutomarkableResponses($sub['id'], $currentAttempt['attempt_id']);
 
-                    if (is_array($allResponses)) {
-                        foreach ($allResponses as $currentResponse) {
-                            $answerHandler = $factory->createAnswerModel($currentResponse['type_id']);
+                        if (is_array($allResponses)) {
+                            foreach ($allResponses as $currentResponse) {
+                                $answerHandler = $factory->createAnswerModel($currentResponse['type_id']);
 
-                            $answerHandler->mark($currentResponse);
+                                $answerHandler->mark($currentResponse);
 
-                            $markedResponseIDs[] = $currentResponse['response_id'];
+                                $markedResponseIDs[] = $currentResponse['response_id'];
+                            }
                         }
                     }
+                    
+                    $responseHandler->updatedAutomatedMarks($markedResponseIDs);
                 }
-
-                $responseHandler->updatedAutomatedMarks($markedResponseIDs);
             }
 		}
 	}
