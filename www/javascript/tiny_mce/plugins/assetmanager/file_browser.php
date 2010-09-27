@@ -37,7 +37,7 @@ $categoryList = $categoryHandler->getCategoryNode($_GET['categoryID']);
 $page->setVar('folder_list_block', '');
 if (is_array($categoryList)) {
 	
-	foreach ($categoryList as $category) {
+    foreach ($categoryList as $category) {
 		
 		$permission[$category['id']] = $groupHandler->getPermission($category['id']);
 		if ($permission[$category['id']] >= READ_ACCESS) {
@@ -76,14 +76,36 @@ if (is_array($categoryList)) {
 	
 
 
-/* output files */
-$filter = $_GET['filter'] == 'image' ? 'image' : 'video';
-$fileList = $fileHandler->getAllInCategory($_GET['categoryID'], array('filter' => $filter));
+$category = $categoryHandler->getByID($_GET['categoryID']);
 
-$output = array('FILTER'	=> $filter);
+/* output files */
+if (in_array($_GET['filter'], array('image', 'video'))) {
+    $filter = array('filter' => $_GET['filter']);
+    $output = array('FILTER'    => $_GET['filter']);
+} else {
+    $filter = null;
+    $output = array('FILTER'    => '');
+}
+
+$fileList = $fileHandler->getAllInCategory($_GET['categoryID'], $filter);
+
+
 $page->setVar($output);
 
 if (is_array($fileList)) {
+    
+    // add homepage "file"
+    if ($category['template'] > 0) {
+        $homepage = array('id'          => $category['id'],
+                          'description' => 'HOMEPAGE',
+                          'size'        => 1,
+                          'iconFile'    => 'vcard_fiquet.png',
+                          );
+        
+        array_unshift($fileList, $homepage);
+    
+    }
+    
 	foreach ($fileList as $file) {
 		
 		$output = array ( 'FILE_ID' 	=> $file['id'],

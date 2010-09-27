@@ -55,8 +55,10 @@
 			
 			if (type.toLowerCase() == 'image')
 				file = '/file_browser.php?filter=image';
-			else
-				file = '/file_browser.php?filter=media';
+			else if (type.toLowerCase() == 'video')
+                file = '/file_browser.php?filter=video';
+         	else
+				file = '/file_browser.php?filter=none';
 			
 			ed.windowManager.open({
 				url : this.url + file + '&categoryID=' + ed.settings['file_browser_category_id'],

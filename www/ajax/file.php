@@ -23,7 +23,27 @@ if (is_numeric($_POST['categoryID'])) {
 		
 		$linkList = $linkHandler->getAllInCategory($_POST['categoryID']);
 		$fileList = $fileHandler->mergeLinks( $fileList, $linkList);
+    	
+    	
+    	// add homepage "file"
+    	if (isset($_POST['homelink'])) {
+    	    
+    	    require_once SITE_root . '/library/category.php';
+    	    $categoryHandler = new Category;
+            $category = $categoryHandler->getByID($_POST['categoryID']);
+            
+            if ($category['template'] > 0) {
+                $homepage = array('id'          => $category['id'],
+                                  'description' => 'HOMEPAGE',
+                                  'size'        => 1,
+                                  'iconFile'    => 'vcard_fiquet.png',
+                                  );
+                
+                array_unshift($fileList, $homepage);
+            }
+        }
 	}
+	
 	if (!is_array($fileList)) {
 		$output = array();
 	} else {
