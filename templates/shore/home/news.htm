@@ -4,11 +4,13 @@
 		$j('ul.topic li:first-child').show();
 		
 		$j('#category a').click(function() {
-			$j('#category a').removeClass('selected');
-			$j(this).addClass('selected');	
-			var el = $j(this).attr('title');
-			$j('ul.topic > li').hide();
-			$j('ul.topic > li.' + el).show();
+			if (!$j(this).hasClass("selected")) {
+				$j('#category a').removeClass('selected');
+				$j(this).addClass('selected');	
+				var el = $j(this).attr('title');
+				$j('ul.topic > li').hide();
+				$j('ul.topic > li.' + el).show();
+			}
 			return false;
 		});
 	});

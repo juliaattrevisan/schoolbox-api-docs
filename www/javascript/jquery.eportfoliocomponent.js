@@ -6,14 +6,15 @@
 		$('div.right:hidden').remove();
 		
 		/* add drag/drop */
-		$('.privateBlock').sortable({
+		$('#content').sortable({
 			cursor: 'move',
 			distance: 0,
 			dropOnEmpty: true,
 			forcePlaceholderSize: true,
 			handle: 'h2',
 			helper: 'clone',
-			items: 'div.box',
+			items: '.box',
+			cancel: '.permanent',
 			placeholder: 'marker',
 			tolerance: 'pointer',
 			

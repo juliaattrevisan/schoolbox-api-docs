@@ -1,9 +1,10 @@
 <!-- BEGIN custom_head -->
 <link rel="alternate" type="application/rss+xml" title="RSS" href="/homepage/rss/{ID}" />
-<!-- BEGIN modify_layout -->
 <script type="text/javascript" src="/javascript/mootools.js"></script>
 <script type="text/javascript" src="/javascript/jquery.ui.js"></script>
 <script type="text/javascript" src="/javascript/jquery.eportfoliocomponent.js"></script>
+<!-- BEGIN modify_layout -->
+
 
 <!-- END modify_layout -->
 <style type="text/css">
@@ -42,8 +43,9 @@
 
 <div class="{TEMPLATE} privateBlock">
     <div class="left">
-		<h2>My Profile</h2>
-		<div class="box">
+
+		<div class="box permanent">
+			<h2>My Profile</h2>
 			<div class="pad-it">
 				<img src="/search/portrait.php?id={SYNERGY_ID}&width=150&height=150" alt="{PERSON_NAME}" title="{PERSON_NAME}" />
 				<p>
@@ -55,20 +57,21 @@
 				<div class="float-fix"></div>
 			</div>
     </div>
-        <div class="float-fix"></div>
     <!-- BEGIN privateNotes -->
-    <div class="private-notes">
+    <div class="private-notes box">
         <h2>Private Notes</h2>
 		<div class="pad-it">
 			{PRIVATE_NOTES}
-			<!-- BEGIN modify_link --><p class="interact"><a href="/eportfolio_privateNotes/modify/{ID}">Modify</a></p><!-- END modify_link -->
+			<!-- BEGIN modify_link -->
+			<p class="interact">
+				<a href="/eportfolio_privateNotes/modify/{ID}">Modify</a>
+			</p>
+			<!-- END modify_link -->
 		</div>
     </div>
     <div class="float-fix"></div>
     <!-- END privateNotes -->
-    
-    
-        {COLUMN1}</div>
+    {COLUMN1}</div>
     <div class="right">{COLUMN2}</div>
 	<div class="float-fix"></div>
 </div>

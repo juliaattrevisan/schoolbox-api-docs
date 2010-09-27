@@ -1,3 +1,4 @@
+<script type="text/javascript" src="/javascript/jquery.treeview.min.js"></script>
 <div class="box">
   <h2>What's New</h2>
   <div class="text">
@@ -6,7 +7,8 @@
    	<!-- END mail_block -->
     <ul class="tree">
     <!-- BEGIN category_block -->
-    <li class="plus"><a onclick="swap(this);">{NEW_CATEGORY_NAME}</a>
+    <li class="plus expandable"><a class="home-icon">{NEW_CATEGORY_NAME}</a>
+	<a class="go-to-home" href="/homepage/{NEW_CATEGORY_ID}/">View Homepage</a>
         <ul>
         <!-- BEGIN due_work -->
         <li class="icon"><a href="/submission/dueWork">New work due</a></li>

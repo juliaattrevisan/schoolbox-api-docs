@@ -3,29 +3,46 @@
 <script type="text/javascript" src="/javascript/jquery.countdown.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
-    $j('.assess-header form').submit(function() {
-        $j.post($j(this).attr('action'), $j(this).serialize(), function(responseText) {
-            var dataFunction = new Function('return ' + responseText);
-            var result = dataFunction();
+   var currentForm = '';
+	$j('.assess-header form').each(function(index, formElement) {
+   		 $j(formElement).validate({
+			submitHandler: function() {
+				$j.post($j(formElement).attr('action'), $j(formElement).serialize(), function(responseText) {
+					var dataFunction = new Function('return ' + responseText);
+					var result = dataFunction();
+				});
+				return false;
+			},
+			rules: {
+				reviewedMarks: { 
+					number:true
+				}	
+			},
+			messages: {
+				reviewedMarks: "Please enter a decimal number"
+			}
 
-            /* Save successful, so hide form and disable submit butan.
-             * Update section completion value
-             
-            if (result.response_id != '') {
-                $j('#question_status_' + result.response_id).html('Response saved. This message should probably fade away into nothingness...');
-            }
-            else {
-                alert ('An error occurred while saving your answer.');
-            }*/
-        });
-
-        return false;
-    });
-	
+   		});
+	});  	   
+		
 	$j('.textarea-container textarea').blur(function() {
 		if ($j(this).val() !== '') {
-			$j(this).parents('.assess-header form').submit();
+			$j.post($j(this).parents('.assess-header form').attr('action'), $j(this).parents('.assess-header form').serialize(), function(responseText) {
+				var dataFunction = new Function('return ' + responseText);
+				var result = dataFunction();
+			});
+			return false;			
 		}
+	});
+	
+	$j('.marks-amount input').blur(function() {
+		
+		$j.post($j(this).parents('.assess-header form').attr('action'), $j(this).parents('.assess-header form').serialize(), function(responseText) {
+				var dataFunction = new Function('return ' + responseText);
+				var result = dataFunction();
+			});
+			return false;	
+
 	});
 	
 	
@@ -40,7 +57,7 @@ $j(document).ready(function() {
 	</div>
 	<!-- BEGIN question -->
 	<div class='assess-header'>
-		<form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" method="post">
+		<form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='validation_{RESPONSE_ID}' method="post">
 			<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}<span> - ({QUESTION_MARKS} marks)</span></h3>
 			<div class="assess-body">
 

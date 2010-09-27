@@ -5,11 +5,13 @@
 	$j(function() {	
 		
 		$j('#category a').click(function() {
-			$j('#category a').removeClass('selected');
-			$j(this).addClass('selected');	
-			var el = $j(this).attr('title');
-			$j('div.topic > div').hide();
-			$j('div.topic > div#' + el).show();
+			if (!$j(this).hasClass("selected")) {
+				$j('#category a').removeClass('selected');
+				$j(this).addClass('selected');	
+				var el = $j(this).attr('title');
+				$j('ul.topic > li').hide();
+				$j('ul.topic > li.' + el).show();
+			}
 		});
 		
 		var params = window.location.href.split("#");

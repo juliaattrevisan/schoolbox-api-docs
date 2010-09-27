@@ -190,7 +190,7 @@ h1 a.customise {display:block;font-size:80%;font-weight:normal;position:absolute
 .box .text.listing { padding: 0; display: block; }
 .box.imageComp .text { text-align: center; display: block; }
 .box ul { list-style: disc; margin: 0 0 1em 1.1em; padding: 0; }
-.box li { padding-left: 5px; min-height:16px; }
+.box li { padding-left: 5px; min-height:1px; }
 .box .edit { padding: 0 17px; color: #fff; cursor: pointer; background: #333; background: #333 url(/images/core/body/heading-edit.png) repeat-x; 
 border:1px solid #333; border-left:-; border-bottom:0;display: block; height: 28px; line-height: 28px; float: left; position: absolute; top: 0; right: 0; text-transform: capitalize;
 -moz-border-radius: 0px 5px 0 0 ;-webkit-border-radius:  0px 5px 0 0;border-radius:  0px 5px 0 0 ; }
@@ -493,6 +493,7 @@ border-right:0;background:#fff; padding:0; border:0;}
 
 .mark-test ul.multiple-choice-mark li{border:1px solid #CCCCCC;margin-bottom:10px;padding:10px;}
 .mark-test p.marks-amount{font-size:11px;font-weight:bold;margin:0;padding:10px 0;text-align:right;}
+.mark-test p.marks-amount label.error{width:auto !important; background: #fff99a; padding:5px; width:150px; float:right;}
 .mark-test li.matchCorrect{background-color: #E0F2DF}
 .mark-test .matchPairs{float:left;}
 .mark-test .match-left{width:49%}
@@ -708,12 +709,13 @@ p.bubble-name { margin-bottom:5px; padding-bottom:5px; }
 .privateBlock  .private-notes ul li{list-style-type:circle;}
 .privateBlock textarea {width: 99%;font-family: Arial, Helvetica, sans-serif;font-size: 12px;}
 .privateBlock .box p{margin:0;}
-.privateBlock .box{margin:0;}
+.privateBlock .box{margin-bottom:10px;}
 .privateBlock .box img{padding:5px; margin:0 10px 0 0 ;background:#f0f0f0; float: left; display:block}
 .privateBlock h4 a{padding: 2px 0 10px 40px;}
 .privateBlock .blog p{padding:0;}
 .privateBlock .links h4 a{padding: 2px 0 10px 0;}
 .privateBlock .feat-image img{float:none;}
+.permanent h2{cursor:auto !important;}
 
 /* LOGIN Styling */
 #container.login,#footer.login, #header.login {margin:0;}
