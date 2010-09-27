@@ -17,11 +17,22 @@ class Assess extends Model {
      * @param <type> $category_id
      */
     function getList($category_id) {
-        $query = "SELECT *
-                  FROM {$this->_table}
-                  WHERE category_id = '$category_id'
-                  AND deleted_at IS NULL
-                  ORDER BY finish";
+        if (is_array($category_id)) {
+            $categoryIDList = implode(',', $category_id);
+
+            $query = "SELECT *
+                      FROM {$this->_table}
+                      WHERE category_id IN ($categoryIDList)
+                      AND deleted_at IS NULL
+                      ORDER BY finish";
+        }
+        else {
+            $query = "SELECT *
+                      FROM {$this->_table}
+                      WHERE category_id = '$category_id'
+                      AND deleted_at IS NULL
+                      ORDER BY finish";
+        }
 
         return $this->db->getAll($query);
     }

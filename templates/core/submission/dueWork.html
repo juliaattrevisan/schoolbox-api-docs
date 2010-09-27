@@ -212,6 +212,44 @@ $j(document).ready(function() {
 </div>
 <!-- END has_return -->
 
+
+<!-- BEGIN allAssess -->
+<div class="box component">
+<h2>Online Assessments</h2>
+    <div class="text listing">
+        <table class="due-dates">
+            <thead>
+                <tr>
+                    <th width="20%">Subject</th>
+                    <th width="20%">Description</th>
+                    <th width="20%">Finish Date</th>
+                    <th width="20%">Mark</th>
+                    <th width="20%">Action</th>
+                </tr>
+            </thead>
+        <tbody>
+            <!-- BEGIN attempt -->
+            <tr class="{DARK}">
+                <td>{ASSESS_CATEGORY}</td>
+                <td>{ASSESS_TITLE}</td>
+                <td>{ASSESS_FINISH}</td>
+                <td>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS} ({ATTEMPT_PERCENTAGE}%)</td>
+                <td>
+                    <!-- BEGIN viewMarks -->
+                    <a href="/assess/studentReview/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">View Results</a>
+                    <!-- END viewMarks -->
+                    <!-- BEGIN takeTest -->
+                    <a href="/assess/intro/{ASSESS_ASSESS_ID}">Take Test</a>
+                    <!-- END takeTest -->
+                </td>
+            </tr>
+            <!-- END attempt -->
+        </tbody>
+        </table>
+    </div>
+</div>
+<!-- END allAssess -->
+
 </div>
 <div class="right">
   <div class="box component">

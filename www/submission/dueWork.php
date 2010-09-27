@@ -382,4 +382,101 @@ if (is_array($activityLog)) {
 // subject drop down
 $this->dropDown('subject', $categoryList, '', TEMPLATE_content, array('id' => 'SUBJECT_ID', 'name' => 'SUBJECT_NAME'));
 
+
+/* Online Assessments
+ */
+require_once(SITE_root . '/library/assess/assess.php');
+require_once(SITE_root . '/library/assess/assess-attempt.php');
+require_once(SITE_root . '/library/assess/assess-section.php');
+
+$this->setBlock(TEMPLATE_content, 'allAssess', 'allAssess_block');
+$this->setBlock('allAssess', 'attempt', 'attempt_block');
+$this->setBlock('attempt', 'viewMarks', 'viewMarks_block');
+$this->setBlock('attempt', 'takeTest', 'takeTest_block');
+
+$assessHandler = new Assess();
+$attemptHandler = new AssessAttempt();
+$sectionHandler = new AssessSection();
+
+/* Store a lookup so you don't need to make new queries all day
+ */
+foreach($categoryList as $key => $value) {
+    $categoryLookup[$value['id']] = $value['name'];
+}
+
+/* Make a list of assessments
+ */
+$allAssessments = $assessHandler->getList($categoryIDList);
+
+if ($allAssessments) {
+    foreach($allAssessments as $currentAssessment) {
+        $currentAttempt = $attemptHandler->getLatestForUser($currentAssessment['assess_id'], $_SESSION['id']);
+
+        $firstSection = $sectionHandler->getFirst($currentAssessment['assess_id']);
+        
+        if (!$currentAttempt) {
+            $this->setVar(array(
+                'ASSESS_CATEGORY' => $categoryLookup[$currentAssessment['category_id']],
+                'ASSESS_ASSESS_ID' => $currentAssessment['assess_id'],
+                'ASSESS_TITLE' => $currentAssessment['title'],
+                'ASSESS_FINISH' => '',
+                'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
+                'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
+                'ATTEMPT_TOTAL_MARKS' => number_format(0, 2),
+                'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
+                'ATTEMPT_PERCENTAGE' => $percentage,
+            ));
+
+            $this->setVar('viewMarks_block', '');
+            $this->parse('takeTest_block', 'takeTest');
+        }
+        else {
+            /* Finish time
+             */
+            if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
+                $finish = date('jS F Y, g:i:sa', strtotime($currentAttempt['finish']));
+                $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
+            }
+            else {
+                $finish = '';
+                $timeTaken = '';
+            }
+
+            /* The total available marks for this attempt
+             */
+            $totalAvailableMarks = $attemptHandler->getTotalMarks($currentAssessment['assess_id'], $currentAttempt['attempt_id']);
+
+            if ($totalAvailableMarks > 0) {
+                $marks = $attemptHandler->getMarksForAttempt($currentAttempt['attempt_id']);
+
+                $percentage = round(100 * $marks / $totalAvailableMarks);
+            }
+            else {
+                $percentage = 0;
+            }
+
+            $this->setVar(array(
+                'ASSESS_CATEGORY' => $categoryLookup[$currentAssessment['category_id']],
+                'ASSESS_ASSESS_ID' => $currentAssessment['assess_id'],
+                'ASSESS_TITLE' => $currentAssessment['title'],
+                'ASSESS_FINISH' => date('jS F Y, g:i:sa', strtotime($currentAttempt['finish'])),
+                'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
+                'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
+                'ATTEMPT_TOTAL_MARKS' => number_format($marks, 2),
+                'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
+                'ATTEMPT_PERCENTAGE' => $percentage,
+            ));
+
+            $this->setVar('takeTest_block', '');
+            $this->parse('viewMarks_block', 'viewMarks');
+        }
+
+        $this->parse('attempt_block', 'attempt', true);
+    }
+
+    $this->parse('allAssess_block', 'allAssess');
+}
+else {
+    $this->setVar('allAssess_block', '');
+}
 ?>
