@@ -1,8 +1,6 @@
 <?php
 /**
- * Assessment commencement. If the Assessment allows people to re-sit the test,
- * then clear the current attempt_id. Otherwise, remember it so people can't
- * reset the assessment timer by repeatedly refreshing the intro page.
+ * A Summary page for assessment creation methods to return to.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
@@ -20,6 +18,14 @@ $attemptHandler = new AssessAttempt();
 $assess = $assessHandler->getIntro($this->arg[0]);
 $allSummary = $assessHandler->getIntroSummary($this->arg[0]);
 $allSections = $sectionHandler->getList($assess['assess_id']);
+
+if (!$assess) {
+    error(112);
+}
+
+if (!$assessHandler->isOwner($this->arg[0])) {
+    error(125);
+}
 
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $this->arg[0],

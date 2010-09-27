@@ -19,6 +19,10 @@ $questionHandler = new AssessQuestion();
 $answerHandler = new AssessAnswer();
 $sectionHandler = new AssessSection();
 
+if (!$assessHandler->isOwner($this->arg[0])) {
+    error(126);
+}
+
 $section = $sectionHandler->getbyID($this->arg[0]);
 
 if (!$section) {
