@@ -203,5 +203,28 @@ class AssessAttempt extends Model {
 
         return $this->db->getOne($query);
     }
+
+    /**
+     * Finds out if the specified user owns the assessment attempt.
+     *
+     * @param <type> $attempt_id
+     * @param <type> $user_id
+     * @return <type>
+     */
+    function isOwner($attempt_id, $user_id = '') {
+        if (!is_numeric($user_id)) {
+            $uid = $_SESSION['id'];
+        }
+        else {
+            $uid = $user_id;
+        }
+
+        $query = "SELECT COUNT(*)
+                  FROM {$this->_table}
+                  WHERE attempt_id = '$attempt_id'
+                  AND user_id = '$uid'";
+
+        return $this->db->getOne($query);
+    }
 }
 ?>

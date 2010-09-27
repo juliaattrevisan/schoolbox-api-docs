@@ -272,11 +272,18 @@ class Assess extends Model {
      * @param <type> $user_id
      * @return <type>
      */
-    function isOwner($assess_id, $user_id) {
+    function isOwner($assess_id, $user_id = '') {
+        if (!is_numeric($user_id)) {
+            $uid = $_SESSION['id'];
+        }
+        else {
+            $uid = $user_id;
+        }
+
         $query = "SELECT COUNT(*)
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
-                  AND user_id = '$user_id'";
+                  AND user_id = '$uid'";
 
         return $this->db->getOne($query);
     }

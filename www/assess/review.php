@@ -52,7 +52,7 @@ if (!$attempt) {
     error(128);
 }
 
-if (!$assessHandler->isOwner($this->arg[0], $_SESSION['id'])) {
+if (!$assessHandler->isOwner($this->arg[0])) {
     error(127);
 }
 

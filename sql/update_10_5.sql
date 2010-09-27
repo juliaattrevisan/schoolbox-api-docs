@@ -50,3 +50,4 @@ INSERT INTO error (id, message) VALUES (125, 'Only the test owner can view this 
 INSERT INTO error (id, message) VALUES (126, 'Only teachers can create and modify tests.');
 INSERT INTO error (id, message) VALUES (127, 'Only the test owner can review this test.');
 INSERT INTO error (id, message) VALUES (128, 'This attempt no longer exists.');
+INSERT INTO error (id, message) VALUES (129, 'You are not allowed to view this student\s test.');

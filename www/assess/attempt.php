@@ -38,7 +38,7 @@ if (!$section) {
     error(115);
 }
 
-if ($assessHandler->isOwner($this->arg[0], $_SESSION['id'])) {
+if ($assessHandler->isOwner($this->arg[0])) {
     error(124);
 }
 
