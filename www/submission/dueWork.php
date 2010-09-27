@@ -78,9 +78,9 @@ if (!isset($user['uid']))
 
 
 if (is_array($_SESSION['children'])) {
-	
+
 	$this->dropDown('child', $_SESSION['children'], $user['uid'], 'is_parent', array('id' => 'CHILD_ID', 'name' => 'CHILD_NAME'));
-	
+
 	$this->parse('is_parent_block', 'is_parent');
 }
 
@@ -107,7 +107,7 @@ if (count($categoryList) == 0)
 if (isset($this->arg[0]))
 	$selectedDate = strtotime($this->arg[0]);
 
-if ($selectedDate <= 0) 
+if ($selectedDate <= 0)
 	$selectedDate = time();
 
 
@@ -141,11 +141,11 @@ $startDay = mktime(12, 0, 0, $selectedMonth, 1, $selectedYear) - strtotime("+$fi
 // output calendar
 $summary = array();
 for ($i = 0; $i < $totalDays; $i++) {
-	
+
 	$currentDay = strtotime("+$i day", $startDay);
-	
-	$day = $i % 7;	
-	
+
+	$day = $i % 7;
+
 	if($i >= $firstDay && $i < $numDaysinMonth+$firstDay)
 		$this->setVar('OTHER_MONTH', '');
 
@@ -158,35 +158,36 @@ for ($i = 0; $i < $totalDays; $i++) {
 					);
 
 	$this->setVar($output);
-	
+
 	$eventList = $submissionHandler->getByDate($currentDay, $user['uid'], $categoryIDList);
+
 	if (is_array($eventList)) {
 		foreach ($eventList as $event) {
-			
+
 			$due = ( !empty($event['realname']) && $event['late_date'] > time() );
-			
+
 			$output = array('EVENT_ID'		=> $event['id'],
 							'TIME'			=> outputDate('h:ia', strtotime($event['date'])),
 							'EVENT'			=> scrubText($event['description']),
 							'EVENT_PAST' 	=> !$due ? 'fade' : '',
 							'EVENT_CAT_ID'	=> $event['category'],
 							);
-			
+
 			$this->setVar($output);
 			$this->parse('event_block', 'event', true);
-			
+
 			/* record overview for summary box */
-			$summary[$event['category']] = array('name' 	=> $event['categoryName'], 
+			$summary[$event['category']] = array('name' 	=> $event['categoryName'],
 												 'total' 	=> ++$summary[$event['category']]['total'],
 												 'due'		=> $due ? ++$summary[$event['category']]['due'] : $summary[$event['category']]['due'],
 												 'code'		=> explode(',', $event['categoryCode']),
 												 );
 		}
 	}
-	
+
 	$this->parse('day_block', 'day', true);
 	$this->setVar('event_block', '');
-	
+
 	if ($day == 6 && $i) {
 		$this->parse('week_block', 'week', true);
 		$this->setVar('day_block', '');
@@ -197,12 +198,13 @@ for ($i = 0; $i < $totalDays; $i++) {
 $j = 0;
 // upcoming due work
 $workList = $submissionHandler->getUpcoming($user['uid'], $categoryIDList);
+
 if (is_array($workList)) {
 	foreach ($workList as $work) {
 		/* display date as time if today */
 		$left = $work['date'] - time();
 		$date = $left < 86400 && $left > 0 ? '<strong>' . outputDate('g:i a', $work['date']) . '</strong>' : outputDate(DATE_short_no_time, $work['date']);
-		
+
 		$output = array('DUE_SUBJECT'	=> scrubText($work['categoryName']),
 						'DUE_DESC'		=> scrubText($work['description']),
 						'DUE_DATE'		=> $date,
@@ -210,17 +212,17 @@ if (is_array($workList)) {
 						'BOX_ID'		=> $work['id'],
 						'DARK'			=> $j++ % 2 ? '' : 'dark',
 						);
-		
+
 		$this->setVar($output);
-		
+
 		/* display file download link */
 		$this->setVar('download_block', '');
 		if ($work['file_id'] > 0)
 			$this->parse('download_block', 'download');
-				
+
 		$this->parse('due_block', 'due', true);
 	}
-	
+
 	$this->parse('has_due_block', 'has_due');
 }
 
@@ -229,7 +231,7 @@ $j = 0;
 $returnList = $returnHandler->getByUser($user['uid']);
 if (is_array($returnList)) {
 	foreach ($returnList as $return) {
-		
+
 		$output = array('RETURN_SUBJECT'	=> scrubText($return['categoryName']),
 						'RETURN_DESC'		=> scrubText($return['description']),
 						'RETURN_MARK'		=> scrubText($return['mark']),
@@ -238,19 +240,19 @@ if (is_array($returnList)) {
 						'RETURN_BOX_ID'		=> $return['box_id'],
 						'DARK'				=> $j++ % 2 ? '' : 'dark',
 						);
-		
+
 		$this->setVar($output);
-		
+
 		/* display file download link */
 		$this->setVar('download_rt_block', '');
         $file = RETURNS_directory . '/' . $return['id']. '.dat';
 		if (is_readable($file))
 			$this->parse('download_rt_block', 'download_rt');
-		
-		
+
+
 		$this->parse('return_block', 'return', true);
 	}
-	
+
 	$this->parse('has_return_block', 'has_return');
 }
 
@@ -266,9 +268,9 @@ foreach ($categoryList as $category) {
 	$categoryID = $category['id'];
 	/* yes it actually requires THIS MUCH code to get a teachers name. */
 	if (SYNERGY_enable) {
-		
+
 		$synClass = new SynergeticClass;
-		
+
 		$teacherOutput = array();
 		$teacherList = array();
         $codeList = explode(',',$category['code']);
@@ -282,7 +284,7 @@ foreach ($categoryList as $category) {
 		if (is_array($teacherList)) {
 			foreach ($teacherList as $teacherSynID) {
 				$teacher = $userHandler->getBySynergy($teacherSynID);
-				$teacherName = formatName($teacher);	
+				$teacherName = formatName($teacher);
 				$emailAddress = formatEmail($teacher);
 				$teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
 			}
@@ -301,7 +303,7 @@ foreach ($categoryList as $category) {
     else {
         $thisPercentage = 100;
     }
-    
+
     /* Accumulate into array for Javascript
      */
     $percentage[] = $thisPercentage;
@@ -314,14 +316,14 @@ foreach ($categoryList as $category) {
 					'SUMMARY_TEACHER'	=> SYNERGY_enable ? implode(', ', $teacherOutput) : '',
 					'DARK'				=> $j++ % 2 ? 'dark' : '',
                     'PERCENTAGE_COMPLETED' => $thisPercentage,
-					);	
-	
+					);
+
 	$this->setVar($output);
-	
+
 	$this->setVar('summary_due_block', '');
 	if ($category['due'] > 0)
 		$this->parse('summary_due_block', 'summary_due');
-	
+
 	$this->parse('summary_block', 'summary', true);
 }
 
@@ -338,16 +340,16 @@ $j = 0;
 $activityLog = $submissionHandler->getActivityLog($user['uid'], 15, $categoryIDList);
 if (is_array($activityLog)) {
 	foreach ($activityLog as $activity) {
-		
+
 		$taskName = $activity['description'];
 		if ($activity['fid'])
 				$taskName = '<a href="/send.php?id=' . $activity['fid'] . '&save=1">' . $activity['description'] . '</a>';
-		
+
 		$categoryName = '<a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
-		
+
 		if ($activity['new'] == 'new') {
-			$stringDesc = 'New ' . $activity['typeName'] . ' ' . $taskName . ' added for ' . $categoryName;	
-		} 
+			$stringDesc = 'New ' . $activity['typeName'] . ' ' . $taskName . ' added for ' . $categoryName;
+		}
 		elseif ($activity['new'] == 'overdue') {
 			$stringDesc = '<strong>' . $taskName . ' for ' . $categoryName . ' is overdue</strong> ';
 		}
@@ -357,7 +359,7 @@ if (is_array($activityLog)) {
 		else if($activity['new'] == 'returned') {
 			if($activity['typeName'])
 				$stringDesc = 'You received '.$activity['typeName'];
-			else if($activity['fid']) 
+			else if($activity['fid'])
 				$stringDesc = '<a href="/submission/send.php?id='.$activity['fid'].'&return=1">Work returned</a>';
 			else
 				$stringDesc = 'Work returned';
@@ -365,9 +367,9 @@ if (is_array($activityLog)) {
 			$stringDesc .= ' for '.$activity['description']. ' in <a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
 		}
 		else {
-			$stringDesc = $categoryName . ' submissions for ' . scrubText($activity['description']) . ' are now closed ';	
+			$stringDesc = $categoryName . ' submissions for ' . scrubText($activity['description']) . ' are now closed ';
 		}
-		
+
 		$output = array('ACTIVITY_DESCRIPTION'	=> $stringDesc,
 						'ACTIVITY_DATE'			=> getRelativeTime($activity['activity_date'], 0 , ''),
 						'DARK'					=> $j++ % 2 ? 'dark' : '',

@@ -57,15 +57,61 @@ class Submission extends Model {
         return $this->db->getRow($query);
     }
 
+    /**
+     * Collate a list of events to appear on the My Work screen. Amended to
+     * include online assessments as well.
+     * 
+     * @param <type> $date
+     * @param <type> $userID
+     * @param <type> $categoryList
+     * @return <type>
+     */
 	function getByDate($date, $userID, $categoryList) {
-		
-		$query = "SELECT s.*, t.realname, c.name categoryName, GROUP_CONCAT(cc.code) categoryCode FROM ( submission_box s, category c )
-				  LEFT JOIN student_submission t ON t.box_id = s.id AND t.owner = $userID
-				  LEFT JOIN categoryCode cc ON cc.categoryID = c.id
-				  WHERE s.deleted = 0 AND s.category = c.id AND DATE(s.date) = DATE(FROM_UNIXTIME({$date}))
-                  AND c.id IN (".implode(',',$categoryList).")
-                  GROUP BY s.id ORDER BY open_date";
-		
+        $query = "(SELECT
+                    s.*,
+                    t.realname,
+                    c.name categoryName,
+                    GROUP_CONCAT(cc.code) categoryCode
+                    FROM ( submission_box s, category c )
+                    LEFT JOIN student_submission t ON t.box_id = s.id
+                    AND t.owner = $userID
+                    LEFT JOIN categoryCode cc ON cc.categoryID = c.id
+                    WHERE s.deleted = 0
+                    AND s.category = c.id
+                    AND DATE(s.date) = DATE(FROM_UNIXTIME({$date}))
+                    AND c.id IN (".implode(',',$categoryList).")
+                    GROUP BY s.id
+                    )
+                    UNION
+                    (SELECT
+                        assess.assess_id as id,
+                        assess.category_id as category,
+                        11 as type,
+                        assess.user_id as `owner`,
+                        assess.start as open_date,
+                        assess.finish as `date`,
+                        assess.finish as late_date,
+                        -1 as fid,
+                        assess.deleted_at as deleted,
+                        assess.title as description,
+                        assess.created_at as created,
+                        '' as realname,
+                        category.name as categoryName,
+                        categoryCode.code as categoryCode
+                    FROM assess
+                    LEFT JOIN category ON category.id = assess.category_id
+                    LEFT JOIN categoryCode ON categoryCode.categoryID = assess.category_id
+                    WHERE assess.deleted_at IS NULL
+                    AND DATE(assess.finish) = DATE(FROM_UNIXTIME({$date}))
+                    AND category.id IN (".implode(',',$categoryList).")
+                    GROUP BY id
+                    )
+                    ORDER BY date";
+//
+//                    echo date('Y-m-d H:i:s', $date);
+//                    echo ' | ';
+//                    echo $date;
+//                    echo "\n";
 		return $this->db->getAll($query);
 	}
 	

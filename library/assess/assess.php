@@ -296,29 +296,17 @@ class Assess extends Model {
      */
     function canDoAssessment($assess_id) {
         $groupHandler = new Group();
-        $assessHandler = new Assess();
+        $assess = $this->getByID($assess_id);
 
-        $subjectList = false;
-
-        if (SYNERGY_enable) {
-            require_once SITE_root . '/library/synergetic-user.php';
-            $synUser = new SynergeticUser;
-            $subjectList = $synUser->getSubjectList($_SESSION['sid'], $_SESSION['id']);
-        }
-
-        $categoryList = $groupHandler->involvedCategoryList($_SESSION['id'], $subjectList, 1);
-
-        $inCategory = false;
+        $categoryList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
 
         foreach ($categoryList as $key => $value) {
-            $assess = $assessHandler->getByID($assess_id);
-
             if ($value['id'] == $assess['category_id']) {
-                $inCategory = true;
+                return true;
             }
         }
 
-        return $inCategory;
+        return false;
     }
 }
 ?>
