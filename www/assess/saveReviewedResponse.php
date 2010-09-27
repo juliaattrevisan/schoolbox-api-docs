@@ -12,8 +12,16 @@ require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-factory.php');
 require_once('../library/assess/assess-section.php');
 
+$assessHandler = new Assess();
 $questionHandler = new AssessQuestion();
+$sectionHandler = new AssessSection();
+
 $question = $questionHandler->getByID($this->arg[0]);
+$section = $sectionHandler->getByID($question['section_id']);
+
+if (!$assessHandler->isOwner($section['assess_id'])) {
+    error(127);
+}
 
 if (!$question) {
     error(119);

@@ -155,7 +155,8 @@ class AssessAttempt extends Model {
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
                   LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
                   WHERE assess_attempt.assess_id = '$assess_id'
-                  AND assess_attempt.attempt_id = '$attempt_id'";
+                  AND assess_attempt.attempt_id = '$attempt_id'
+                  AND assess_question.deleted_at IS NULL";
 
         return $this->db->getOne($query);
     }

@@ -98,6 +98,7 @@ class AssessSection extends Model {
                   LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
                   WHERE assess_id = '$assess_id'
                   AND assess_section.deleted_at IS NULL
+                  AND assess_question.deleted_at IS NULL
                   AND {$this->_table}.{$this->_index} = '$section_id'";
 
         if ($sectionExclusion) {
@@ -126,6 +127,7 @@ class AssessSection extends Model {
                   LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
                   WHERE assess_response.attempt_id = '$attempt_id'
                   AND assess_response.section_id = '$section_id'
+                  AND assess_question.deleted_at IS NULL
                   ORDER BY assess_question.sequence";
 
         return $this->db->getAll($query);

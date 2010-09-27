@@ -73,7 +73,7 @@ else {
     if ($attemptHandler->isComplete($assess['assess_id'])) {
         error(121);
     }
-    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0)) {
+    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess::UNLIMITED_DURATION)) {
         error(122);
     }
 }

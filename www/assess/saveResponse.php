@@ -11,8 +11,19 @@ require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-factory.php');
 require_once('../library/assess/assess-section.php');
 
+$assessHandler = new Assess();
 $questionHandler = new AssessQuestion();
+$sectionHandler = new AssessSection();
+
 $question = $questionHandler->getByID($this->arg[0]);
+$section = $sectionHandler->getByID($question['section_id']);
+
+/* TODO: Check if this test is for your category
+ */
+
+if ($assessHandler->isOwner($section['assess_id'])) {
+    error(124);
+}
 
 if (!$question) {
     error(119);
@@ -29,7 +40,7 @@ $result = $answerHandler->saveResponse($data);
 
 /* Find out how many questions were completed in this section already
  */
-$sectionHandler = new AssessSection();
+
 $result['percentageComplete'] = $sectionHandler->sectionPercentageComplete($question['section_id']);
 
 echo json_encode($result);
