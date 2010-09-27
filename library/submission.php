@@ -107,12 +107,8 @@ class Submission extends Model {
                     GROUP BY id
                     )
                     ORDER BY date";
-//
-//                    echo date('Y-m-d H:i:s', $date);
-//                    echo ' | ';
-//                    echo $date;
-//                    echo "\n";
-		return $this->db->getAll($query);
+
+        return $this->db->getAll($query);
 	}
 	
 	function getUpcoming($userID, $categoryList) {
@@ -260,6 +256,8 @@ class Submission extends Model {
     }
 	
 	function getActivityLog($userID, $limit = 5, $categoryList) {
+        $implodedCategoryList = implode(',',$categoryList);
+
 		$query = " ( SELECT open_date activity_date, f.name typeName, s.description, s.category, c.name categoryName, s.fid, 'new' FROM submission_box s, category c, file_type f  
 					  WHERE s.category = c.id AND f.id = s.type AND open_date < NOW() AND c.id IN (".implode(',',$categoryList).") )
 					UNION 
@@ -275,6 +273,33 @@ class Submission extends Model {
 					UNION
 				   ( SELECT v.`returned` activity_date, v.mark typeName, w.description, w.category, x.name categoryName, v.id fid, 'returned'  FROM  submission_return v, submission_box w, category x
 					  WHERE v.box_id = w.id AND w.category = x.id AND v.owner = $userID )
+                    UNION
+				   (SELECT start AS activity_date,
+                        file_type.name AS typeName,
+                        assess.title AS description,
+                        assess.category_id,
+                        category.name AS categoryName,
+                        '' AS fid,
+                        'new'
+                     FROM assess
+                     LEFT JOIN file_type ON file_type.id = assess.type
+                     LEFT JOIN category ON category.id = assess.category_id
+                     WHERE start < NOW()
+                     AND assess.category_id IN ($implodedCategoryList)
+                    )
+                    UNION
+                   (SELECT finish AS activity_date,
+                        file_type.name AS typeName,
+                        assess.title AS description,
+                        assess.category_id,
+                        category.name AS categoryName,
+                        '' AS fid,
+                        'closed'
+                     FROM assess
+                     LEFT JOIN file_type ON file_type.id = assess.type
+                     LEFT JOIN category ON category.id = assess.category_id
+                     WHERE finish < NOW()
+                     AND assess.category_id IN ($implodedCategoryList))
 					ORDER BY activity_date DESC LIMIT $limit";
 
 		return $this->db->getAll($query);
