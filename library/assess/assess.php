@@ -287,5 +287,38 @@ class Assess extends Model {
 
         return $this->db->getOne($query);
     }
+
+    /**
+     * Determines whether the current user can take a test by checking which
+     * categories the current user belongs to.
+     *
+     * @return <type>
+     */
+    function canDoAssessment($assess_id) {
+        $groupHandler = new Group();
+        $assessHandler = new Assess();
+
+        $subjectList = false;
+
+        if (SYNERGY_enable) {
+            require_once SITE_root . '/library/synergetic-user.php';
+            $synUser = new SynergeticUser;
+            $subjectList = $synUser->getSubjectList($_SESSION['sid'], $_SESSION['id']);
+        }
+
+        $categoryList = $groupHandler->involvedCategoryList($_SESSION['id'], $subjectList, 1);
+
+        $inCategory = false;
+
+        foreach ($categoryList as $key => $value) {
+            $assess = $assessHandler->getByID($assess_id);
+
+            if ($value['id'] == $assess['category_id']) {
+                $inCategory = true;
+            }
+        }
+
+        return $inCategory;
+    }
 }
 ?>

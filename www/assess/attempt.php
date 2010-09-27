@@ -42,6 +42,10 @@ if ($assessHandler->isOwner($this->arg[0])) {
     error(124);
 }
 
+if (!$assessHandler->canDoAssessment($this->arg[0])) {
+    error(19);
+}
+
 /* Set the start time if not already done.
  *
  * TODO: Check if this user has attempted this assess in the past, the attempt

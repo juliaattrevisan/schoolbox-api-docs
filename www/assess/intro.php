@@ -12,19 +12,30 @@
 require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-section.php');
 require_once('../library/assess/assess-attempt.php');
+require_once('../library/group.php');
 
 $assessHandler = new Assess();
 $sectionHandler = new AssessSection();
 $attemptHandler = new AssessAttempt();
+$groupHandler = new Group();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
 }
 
+/* Get intro summary for the assessment
+ */
 $assess = $assessHandler->getIntro($this->arg[0]);
 
 if (!$assess) {
     error(112);
+}
+
+/* Check if you are in this category, so you can't submit other category's
+ * online assessments unless you are a part of that category.
+ */
+if (!$assessHandler->canDoAssessment($this->arg[0])) {
+    error(19);
 }
 
 $allSummary = $assessHandler->getIntroSummary($this->arg[0]);
