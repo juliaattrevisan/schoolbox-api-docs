@@ -452,9 +452,9 @@ p.interact a.take-test-btn{ margin-bottom:10px;text-align:left;display:block;wid
 #assess.take-test 
 .col-1 ul li.left-answer, 
 #assess.take-test 
-.col-1 ul li.right-answer{
-border-right:0;background:#fff; padding:0; border:0;}
-#assess.take-test .col-1 ul li.right-answer{background:#e3f2fa;}
+.col-1 ul li.right-answer{border-right:0;background:#fff; padding:0; border:0;}
+#assess.take-test .col-1 ul li.right-answer{background:#e3f2fa;height:41px}
+#assess.take-test .col-1 ul li.right-answer.drophover strong{background:#a1daf9;}
 #assess.take-test .all-good{background:#eff9ff; padding:10px; display:none;}
 
 #assess.take-test .percentage-complete{background:#f1f7fa; margin-bottom:15px;}
@@ -486,13 +486,13 @@ border-right:0;background:#fff; padding:0; border:0;}
 .mark-test h3{background:#ccc; }
 .mark-test .hide{display:none;}
 .mark-test ul.multiple-choice-mark li.correct-answer { background-color: #E0F2DF; }
-.tick-cross{float:right; height:15px; width:15px; background: url(/images/core/assess/correct-incorrect.gif) 0 -60px no-repeat;}
+.tick-cross{position:absolute; top:10px; right:6px; height:15px; width:15px; background: url(/images/core/assess/correct-incorrect.gif) 0 -60px no-repeat;}
 .mark-test ul.multiple-choice-mark li.multiIncorrect{background-color: #fff;}
-.mark-test ul.multiple-choice-mark li.multiCorrect .tick-cross{background: url(/images/core/assess/correct-incorrect.gif) 0 0 no-repeat;}
+.mark-test ul.multiple-choice-mark li.multiCorrect .tick-cross{clear:both; background: url(/images/core/assess/correct-incorrect.gif) 0 0 no-repeat;}
 .mark-test ul.multiple-choice-mark li.multiIncorrect .tick-cross{background: url(/images/core/assess/correct-incorrect.gif) 0 -15px no-repeat;}
 
-.mark-test ul.multiple-choice-mark li{border:1px solid #CCCCCC;margin-bottom:10px;padding:10px;}
-.mark-test p.marks-amount{font-size:11px;font-weight:bold;margin:0;padding:10px 0;text-align:right;}
+.mark-test ul.multiple-choice-mark li{position:relative;border:1px solid #CCCCCC;margin-bottom:10px;padding:10px; }
+.mark-test p.marks-amount{font-weight:bold;margin:0;padding:10px 0;text-align:right;}
 .mark-test p.marks-amount label.error{width:auto !important; background: #fff99a; padding:5px; width:150px; float:right;}
 .mark-test li.matchCorrect{background-color: #E0F2DF}
 .mark-test .matchPairs{float:left;}
@@ -512,17 +512,26 @@ border-right:0;background:#fff; padding:0; border:0;}
 
 #assess.mark-test li.matchCorrect .mark span{background:url("/images/core/assess/tick-cross.png") no-repeat 50% -15px}
 #assess.mark-test li.matchIncorrect .mark span{background:url("/images/core/assess/tick-cross.png") no-repeat 50% 0}
-.mark-test li.matchCorrect{background-color: #E0F2DF}
-.mark-test li.matchIncorrect{background-color: #F5CFCF}
+.mark-test li.matchCorrect{background-color: #E0F2DF; min-height:10px;}
+.mark-test li.matchIncorrect{background-color: #F5CFCF; min-height:10px;}
 
 .row-switcher{background-color:#ededed;}
+
+/*review test */
+.student-review p.marks-amount{font-size:24px;}
+#assess.mark-test .student-review .arrow{width:9%; height:32px;} 
+.mark-test .matchPairs.correct-thing li{border-left:1px solid #ccc;}
+.mark-test .student-review .correct-thing{width:96%;}
+.match-student-left{width:70%;}
+.match-student-right{width:28%;}
+.mark-test .matchPairs.correct-thing li strong{width:95%;}
+.mark-test .match-student-right{padding:0 0 0 10px;}
 
 /*BLOG*/
 .blog-comments { background: #eee; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
 .blog-comments p.interact { border-top: 1px dashed #ccc; padding-top: 0.5em; font-size: 11px; }
 .blog-comments h3 { margin-bottom: 1em; }
 .blog-comments .box{background:#fff; padding:10px;
-
      -moz-box-shadow: 0px 0px 2px #000; /* FF3.5+ */
   -webkit-box-shadow: 0px 0px 2px #000; /* Saf3.0+, Chrome */
           box-shadow: 0px 0px 2px #000; /* Opera 10.5, IE 9.0 */
@@ -582,7 +591,7 @@ td.cal-right .link-case .filter-drop a#applyFilters{display:block; color:#41a200
 .filter-cat.last{margin-right:0;}
 
 /*day specific styles*/
-.dayWrap {height:20px; background-color: #999999; background-image: -moz-linear-gradient(top, #999999, #878787); background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #999999),color-stop(1, #878787)); /* Saf4+, Chrome */ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#999999', EndColorStr='#878787'); /* IE6,IE7 */-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#999999', EndColorStr='#878787')"; /* IE8 */ padding: 3px 5px; }
+.dayWrap {color:#fff; text-align:left;height:20px; background-color: #999999; background-image: -moz-linear-gradient(top, #999999, #878787); background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #999999),color-stop(1, #878787)); /* Saf4+, Chrome */ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#999999', EndColorStr='#878787'); /* IE6,IE7 */-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#999999', EndColorStr='#878787')"; /* IE8 */ padding: 3px 5px; }
 .dayWrap p{line-height:20px; height:20px;color:#fff;}
 .calTableSelected {font-weight: bold; background:#ececec }
 .calTableCurrent { font-weight: bold; background:#ececec}
@@ -621,7 +630,7 @@ ul.js_happening li{margin-bottom:4px; position:relative; }
 .day-block .header_option { float: right; margin: 0 !important; padding: 0; }
 .day-num {   float: left; left: 0; padding: 0; margin: 0 !important; font: 11px Arial, Verdana, Helvetica, sans-serif; }
 .otherMonth { font-weight: normal; }
-.otherMonth .dayWrap{background-color: #d5d5d5;background-image: -moz-linear-gradient(top, #d5d5d5, #bcbcbc); /* FF3.6 */background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #d5d5d5),color-stop(1, #bcbcbc)); /* Saf4+, Chrome */ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#d5d5d5', EndColorStr='#bcbcbc'); /* IE6,IE7 */ -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#d5d5d5', EndColorStr='#bcbcbc')"; /* IE8 */}
+.otherMonth .dayWrap, .past .dayWrap{background-color: #d5d5d5;background-image: -moz-linear-gradient(top, #d5d5d5, #bcbcbc); /* FF3.6 */background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #d5d5d5),color-stop(1, #bcbcbc)); /* Saf4+, Chrome */ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#d5d5d5', EndColorStr='#bcbcbc'); /* IE6,IE7 */ -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#d5d5d5', EndColorStr='#bcbcbc')"; /* IE8 */}
 .otherMonth .dayWrap p, .otherMonth .dayWrap a{color:#1597cb;}
 .otherMonth .day-num { font-weight: normal; }
 .otherMonth ul li span{opacity:.3}
@@ -671,17 +680,20 @@ a.layout:hover img { background: #999; }
 .dropBox .drop-left input{width:90%;}
 .dropBox .drop-submit{float:left; clear:both; margin:10px 0 0 0;}
 .dropBox .pad{padding:5px 0 0 30px ;}
+
 /*DUE DATES*/
 .due-dates { width:100%; }
 .due-dates .td-heading { padding:0; }
 .due-dates th { padding:8px 1em 0.4em 1em; height:1em; text-align:left; }
-.left #calendar table.duedates-calendar { width:100%; margin-bottom:20px; border:none; border-right:1px dotted #cdcdcd; border-bottom:1px dotted #cdcdcd; }
-.left #calendar table.duedates-calendar th { padding:8px; }
-.left #calendar table.duedates-calendar td { border-left:1px dotted #cdcdcd; border-top:1px dotted #cdcdcd; background:none repeat scroll 0 0 #FFFFFF; font-weight:normal; height:101px; padding:0; text-align:left; vertical-align:top; }
+#calendar table th.dark{background:#ececec; border:0;}
+.left #calendar table.duedates-calendar{ width:100%; margin-bottom:20px; border:none; border-right:1px dotted #cdcdcd;height:101px; border-bottom:1px dotted #cdcdcd; }
+.left #calendar table.duedates-calendar thead td{height:auto; border:none;}
+.left #calendar table.duedates-calendar td { height:101px;border-left:1px dotted #cdcdcd; border-top:1px dotted #cdcdcd; background:none repeat scroll 0 0 #FFFFFF; font-weight:normal;  padding:0; text-align:left; vertical-align:top; }
 .left #calendar table.duedates-calendar h3 { background:url(/images/cal-plus.gif) no-repeat right 7px 2px; padding:5px; font-size:11px; margin-bottom:2px; }
 .left #calendar table.duedates-calendar span.wrapper { border:1px solid #717171; -moz-border-radius: 4px;-webkit-border-radius:4px; border-radius:4px;background:none repeat scroll 0 0 #717171; color:#FFFFFF; cursor:pointer; display:block; padding:4px; }
 .left #calendar table.duedates-calendar li { background:none repeat scroll 0 50% transparent; color:#007DCD; font-size:11px; margin:2px 0 0 0; padding:0 2px; position:relative; }
 .left #calendar table.duedates-calendar ul { line-height:1.5; margin:0 0 2px; }
+.current-date{line-height:42px; padding:0 10px; height:30px; float:left;}
 span.wrapper a { color:#FFF; }
 .due-dates-selection select { float:right; }
 .due-dates-selection a.back { background:url(/images/cal-prev.gif) no-repeat; display:inline-block; width:14px; height:14px; text-indent:-9999px; }
@@ -733,6 +745,8 @@ p.forgotten{margin:10px 0;}
 
 /*NEWS*/
 .news-item {padding: 10px; margin-bottom:0; position:relative}
+#content .news-item h2{background:none; font-size:24px; color:#000; text-indent:0}
+.news-item ul li{list-style-type:circle;}
 .news-item .header_option{position:absolute; z-index:2; top:40px; right:20px;}
 .news-item .header_option a{color:#000;}
 #news-header{font-size:14px;  padding:10px;  background:#f1f1f1; margin-bottom:10px;}

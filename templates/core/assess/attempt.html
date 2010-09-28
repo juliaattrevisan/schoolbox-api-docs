@@ -72,12 +72,17 @@ $j(document).ready(function() {
         });
 	}
 
-    $j(".match-it").sortable({
+	$j(".match-it").swappable({
+		items: '.right-answer', 
+		cursorAt: {top:-1},
 		stop: function() {
-			$j('.match-it').parents('.assess-header form').submit();
+			$j(this).parents('.assess-header form').submit();
 		}
 	});
-    $j(".match-it").disableSelection();
+	
+	$j( ".right-answer" ).droppable({ hoverClass: 'drophover' });
+	
+	$j(".match-it").disableSelection();
 });
 </script>
 <!-- END custom_head -->

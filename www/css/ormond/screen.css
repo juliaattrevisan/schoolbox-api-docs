@@ -18,7 +18,7 @@ a:hover { color: #C3536F; }
 	background: #C90033 url(/images/ormond/header-back.gif) repeat-x;
 	border: 0;
 	}
-#search { width: 243px; margin-top: 75px; }
+#infoPanel li, #infoPanel li a{color:#fff;}
 #content {
 	padding: 20px 20px 20px 190px;	
 	}
@@ -29,6 +29,7 @@ a:hover { color: #C3536F; }
 	background: url(/images/ormond/ormond_logo.jpg) no-repeat;
 	width: 782px;
 	height: 119px;
+	text-indent:-9999em;
 	}
 #tabs {
 	bottom: 0;

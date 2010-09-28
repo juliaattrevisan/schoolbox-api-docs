@@ -86,44 +86,48 @@ $j(document).ready(function() {
   <center>
   <div id="calendar">
 
-    <div class="due-dates-selection">
-      <div> <a class="back" href="/submission/dueWork/{PREV_MONTH}/{USER_ID}" title="Back one month"><strong>&lt;&lt;</strong></a> <span>{CURRENT_DATE}</span> <a class="forward" href="/submission/dueWork/{NEXT_MONTH}/{USER_ID}" title="Forward one month"><strong>&gt;&gt;</strong></a> </div>
-      <div class="float-fix"></div>
-      </div>
-
   <table class="month-view duedates-calendar calendarTable">
-      
-    <select name="subject" id="subjectFilter">
-      <option value="">Show All</option>
-      <!-- BEGIN subject -->
-      <option value="{SUBJECT_ID}">{SUBJECT_NAME}</option>
-      <!-- END subject -->
-    </select>
-
-	<!-- BEGIN is_parent -->
-    <select name="child" id="childSelect">
-      <!-- BEGIN child -->
-      <option value="{CHILD_ID}" {CHILD_ID_SELECTED}>{CHILD_NAME}</option>
-      <!-- END child -->
-    </select>
-    <!-- END is_parent -->
-      
-          <tr>
-      <th width="14%">Sun</th>
-      <th width="14%">Mon</th>
-      <th width="14%">Tue</th>
-      <th width="14%">Wed</th>
-      <th width="14%">Thu</th>
-      <th width="14%">Fri</th>
-      <th width="14%">Sat</th>
+      <thead>
+	  	<td class="cal-left" colspan="3">
+		<a class="back" href="/submission/dueWork/{PREV_MONTH}/{USER_ID}" title="Back one month"><strong>&lt;&lt;</strong></a>
+		<div class="current-date">{CURRENT_DATE}</div>
+		<a class="forward" href="/submission/dueWork/{NEXT_MONTH}/{USER_ID}" title="Forward one month"><strong>&gt;&gt;</strong></a>
+		</td>
+		<td></td>
+		<td colspan="3">
+			<select name="subject" id="subjectFilter">
+				<option value="">Show All</option>
+				<!-- BEGIN subject -->
+				<option value="{SUBJECT_ID}">{SUBJECT_NAME}</option>
+				<!-- END subject -->
+			</select>
+			
+			<!-- BEGIN is_parent -->
+			<select name="child" id="childSelect">
+				<!-- BEGIN child -->
+				<option value="{CHILD_ID}" {CHILD_ID_SELECTED}>{CHILD_NAME}</option>
+				<!-- END child -->
+			</select>
+			<!-- END is_parent -->
+		</td>
+	</thead>
+	<tbody>
+     <tr>
+      <th width="14%" class="dark">Sun</th>
+      <th width="14%" class="dark">Mon</th>
+      <th width="14%" class="dark">Tue</th>
+      <th width="14%" class="dark">Wed</th>
+      <th width="14%" class="dark">Thu</th>
+      <th width="14%" class="dark">Fri</th>
+      <th width="14%" class="dark">Sat</th>
     </tr>
     
-    <tbody>
+
      <!-- BEGIN week -->
       <tr>
         <!-- BEGIN day -->
           <td class="{PAST} {TODAY} {ACTIVE} {RIGHTY}">
-            <h3>{DATE}</h3>
+            <div class="dayWrap">{DATE}</div>
             <ul>
               <!-- BEGIN event -->
               <li id="event-{EVENT_ID}" class="event category-{EVENT_CAT_ID}"><span class="wrapper"><strong>{TIME}</strong> {EVENT}</span></li>
@@ -134,7 +138,6 @@ $j(document).ready(function() {
       </tr>
     <!-- END week --> 
     </tbody>
-    
   </table>
 </div>
 </center>

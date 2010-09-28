@@ -46,15 +46,17 @@
     
   <!-- BEGIN news -->
   <div id="a{NEWS_ID}" class="news-item">
-    <h3 id="news-header"><a name="{NEWS_ID}"></a>{NEWS_TITLE}</h3>
-    <span class="header_option">{MODIFY}</span>
-    <div class="wysiwyg">
-    {NEWS_BODY}
+
+		<h3 id="news-header"><a name="{NEWS_ID}"></a>{NEWS_TITLE}</h3>
+		<span class="header_option">{MODIFY}</span>
+		<div class="wysiwyg">
+		{NEWS_BODY}
+		<div class="float-fix"></div>
+		</div>
+		<hr />
+		<p class="interact">Submitted by {POSTER} on {DATETIME}</p>
+
 	<div class="float-fix"></div>
-    </div>
-    <hr />
-    <p class="interact">Submitted by {POSTER} on {DATETIME}</p>
-    <div class="float-fix"></div>
   </div>
   <!-- END news -->
 </div>

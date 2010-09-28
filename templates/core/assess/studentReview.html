@@ -1,4 +1,15 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript">
+
+$j(function() {
+	$j('.teacher-comments').each(function() {
+		if ($j(this).children('.textarea-container').html() == "") {
+				$j(this).remove();
+		}
+	});
+});
+
+</script>
 <!-- END custom_head -->
 <div id="assess" class="mark-test">
 	<h1>View your results</h1>
@@ -9,12 +20,11 @@
 	<!-- BEGIN question -->
 	<div class='assess-header'>
         <h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}<span> - ({QUESTION_MARKS} marks)</span></h3>
-        <div class="assess-body">
+        <div class="assess-body student-review">
 
             <!-- BEGIN answerInputs -->
             <!-- END answerInputs -->
 
-            <div class="float-fix"></div>
         </div>
 	</div>
 	<!-- END question -->
