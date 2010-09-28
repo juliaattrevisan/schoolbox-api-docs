@@ -12,12 +12,15 @@ require_once('../library/group.php');
 require_once('include/time.php');
 
 $groupHandler = new Group();
+$assessHandler = new Assess();
 
 if (!$groupHandler->isStaff()) {
     error(126);
 }
 
-$assessHandler = new Assess();
+if (!$assessHandler->isOwner($this->arg[0])) {
+    error(125);
+}
 
 if (!empty($_POST)) {
 
