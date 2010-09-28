@@ -25,7 +25,7 @@ if ($assessHandler->isOwner($section['assess_id'])) {
     error(124);
 }
 
-if ($assessHandler->isExpired($this->arg[0])) {
+if ($assessHandler->isExpired($section['assess_id'])) {
     error(120);
 }
 
