@@ -22,37 +22,6 @@ $j(document).ready(function() {
         singleClick: true
     });
 
-    /* Slightly unusual way to overcome select dropdown validation. To use it,
-     * add an input field with the name 'assessmentDuration'
-     * just add this as a rule:
-     *
-        'duration[minute]': {
-            selectElephant: true
-        }
-     */
-    /*
-	jQuery.validator.addMethod('selectElephant', function(value, element) {
-        if ($j('input[name=assessmentDuration]').val() == 0) {
-            return false;
-        }
-
-        return true;
-    }, "Please select at least 15 minutes");
-
-    $j('#minHours, #minDuration').change(function() {
-        var hours = $j('#minHours').val() * 60 * 60;
-        var minutes = $j('#minDuration').val();
-
-        if (minutes == '00') {
-            minutes = 0;
-        }
-
-        var test_duration_in_seconds = parseInt(hours) + parseInt(minutes);
-
-        $j('input[name=assessmentDuration]').val(test_duration_in_seconds);
-    });
-	 */
-
 	$j('.show-duration').click(function() {
 		if ($j('.hide-it').is(':visible')) {
 			$j('.hide-it').hide();
@@ -64,24 +33,13 @@ $j(document).ready(function() {
 		}
 	});
 	
-		
 	if ($j('.show-duration').is(':checked')) {
-			$j('.hide-it').show();
+        $j('.hide-it').show();
 	}
 
 	var actionPlace = '{ACTION}';
 
 	$j('.standardForm').validate({
-		
-		submitHandler: function() {
-			if (actionPlace == "modify") {
-				$j.post($j('.standardForm').attr('action'), $j('.standardForm').serializeArray(), function(responseText) {
-					$j('.save-success').show().delay(4000).slideUp();
-				});
-			} else {
-				$j('.standardForm').submit();
-			}
-		},
 		rules: {
 			title: {
 				required: true,
@@ -92,7 +50,6 @@ $j(document).ready(function() {
 				minlength: 2
 			}
 		},
-		
 		messages: {
 			title: "Please enter a title",
 			description: "Please enter a description"
