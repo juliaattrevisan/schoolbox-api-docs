@@ -20,6 +20,10 @@ $j(document).ready(function() {
 			},
 			messages: {
 				reviewedMarks: "Please enter a decimal number"
+			},
+			errorPlacement: function(error, element) {
+          	  offset = element.offset();
+            	error.insertBefore(element)
 			}
 
    		});
@@ -63,7 +67,6 @@ $j(document).ready(function() {
 
 				<!-- BEGIN answerInputs -->
 				<!-- END answerInputs -->
-
                 <input type="submit" value="Update Marks" class="next-step"/>
                 <div class="float-fix"></div>
 			</div>

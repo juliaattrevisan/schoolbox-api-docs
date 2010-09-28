@@ -4,6 +4,12 @@
 
 $j(function() {
 		
+	if ($j('.checkbox').attr("checked")) {
+		$j('.hide-this').show();
+		$j('.hide-this :input').removeAttr('disabled');	
+	}
+		
+	
 	$j('.checkbox').click(function() {	
 		if ($j('.hide-this').css("display") == "block") {
 			$j('.hide-this').hide();

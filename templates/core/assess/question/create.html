@@ -57,47 +57,51 @@ $j(document).ready(function() {
 		<h2>Question Details</h2>
 		<div class="assess-body">
 		
-		<p class="help">
-		Now that you've created a section for the test, use the drop down below to select a question type.
-		</p>
+			<p class="help">
+			Now that you've created a section for the test, use the drop down below to select a question type.
+			</p>
+			
+			<form id="createQuestionForm" action="/assess/question/create" class="standardForm" method="post">
+				<fieldset class="hidden">
+					<input name="section_id" type="hidden" value="{SECTION_ID}" />
+					<input name="sequence" type="hidden" value="{SEQUENCE}" />
+				</fieldset>
+			
+				<fieldset>
+					<label>Type</label>
+					<select name="type_id" id="type_id" class="question-type-select">
+						<option disabled {DISABLED_SELECTED}>-- Select Type --</option>
+						<!-- BEGIN questionType -->
+						<option value="{QUESTIONTYPE_TYPE_ID}" {QUESTIONTYPE_SELECTED}>{QUESTIONTYPE_DESCRIPTION}</option>
+						<!-- END questionType -->
+					</select>
+				</fieldset>
+			
+				<fieldset class="question-holder">
+					<label>Question</label>
+					<div class="textarea-container">
+						<input name="question" class="mceSimple tinyValidate" id="question" type="text" size="35" value="{QUESTION}" />
+					</div>
+				</fieldset>
+			
+				<fieldset class="marks-holder">
+					<label>Marks</label>
+					<input name="marks" type="text" size="3" value="{MARKS}"/>
+				</fieldset>
+			
+				<div id="answer">
+					<!-- BEGIN answerInputs -->
+			
+					<!-- END answerInputs -->
+				</div>
+			
+				<fieldset>
+					<input type="submit" name="create" id="create" value="Add Question" class="next-step"/>
+				</fieldset>
 		
-		<form id="createQuestionForm" action="/assess/question/create" class="standardForm" method="post">
-			<fieldset class="hidden">
-				<input name="section_id" type="hidden" value="{SECTION_ID}" />
-				<input name="sequence" type="hidden" value="{SEQUENCE}" />
-			</fieldset>
-		
-			<fieldset>
-				<label>Type</label>
-				<select name="type_id" id="type_id" class="question-type-select">
-					<option disabled {DISABLED_SELECTED}>-- Select Type --</option>
-					<!-- BEGIN questionType -->
-					<option value="{QUESTIONTYPE_TYPE_ID}" {QUESTIONTYPE_SELECTED}>{QUESTIONTYPE_DESCRIPTION}</option>
-					<!-- END questionType -->
-				</select>
-			</fieldset>
-		
-			<fieldset class="question-holder">
-				<label>Question</label>
-				<div class="textarea-container"><input name="question" class="mceSimple tinyValidate" id="question" type="text" size="35" value="{QUESTION}" /></div>
-			</fieldset>
-		
-			<fieldset class="marks-holder">
-				<label>Marks</label>
-				<input name="marks" type="text" size="3" value="{MARKS}"/>
-			</fieldset>
-		
-			<div id="answer">
-				<!-- BEGIN answerInputs -->
-		
-				<!-- END answerInputs -->
-			</div>
-		
-			<fieldset>
-				<input type="submit" name="create" id="create" value="Add Question" class="next-step"/>
-			</fieldset>
-		</form>
+					</form>
 		</div>
+
 	</div>
 </div>
 <div class="col-2">

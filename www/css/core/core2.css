@@ -308,9 +308,14 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #assess #countdown{ text-align:center; font-size:14px; padding:9px; background:#ededed; margin:8px 0;}
 #assess .save-success{display:none;;border:1px solid #ccc; padding:10px; margin:0 0 10px 0;}
 
-#assess .duration{float:right; font-size:28px; text-align:center; font-weight:bold; clear:both}
-#assess .duration p{padding:10px; text-align:center;}
-#assess a.edit-assess{float:right; background:#245398; padding:0 15px 0 6px;}
+#assess .duration{width:198px;float:right; font-size:18px; text-align:center; font-weight:bold; background:#EDEDED;}
+#assess .duration h2 span{width:18px; height:14px; display:inline-block; background:url(/images/icons/time.png) no-repeat;}
+#assess .duration h2 {text-align:left;}
+#assess .duration p{padding:10px; text-align:center; margin-bottom:2px;}
+#assess a.edit-assess{float:right; background:#245398; padding:0 15px 0 6px;  
+-moz-border-radius: 0px 6px 0 0; /* FF1+ */
+  -webkit-border-radius: 0px 6px 0 0; /* Saf3-4 */
+          border-radius: 0px 6px 0 0; /* Opera 10.5, IE 9, Saf5, Chrome */}
 #assess a.summary.name{font-size:16px; margin-bottom:10px; display:block; font-weight:bold;background:none; border:none;}
 #assess a.summary.time span{background-image:url(/images/icons/time.png);}
 #assess a.summary.date span{background-image:url(/images/icons/calendar.png);}
@@ -321,11 +326,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
           border-radius: 4px; /* Opera 10.5, IE 9, Saf5, Chrome */
  display:block; color:#222222;line-height:20px;padding:5px 0 5px 5px;}
 #assess a.summary:hover{text-decoration:none; background:#e6effb;}
-#assess a.summary span{float:right;
-     -moz-border-radius: 7px; /* FF1+ */
-  -webkit-border-radius: 7px; /* Saf3-4 */
-          border-radius: 7px; /* Opera 10.5, IE 9, Saf5, Chrome */
- border:1px solid #fff;font-weight:normal;background: #f3fdf2 url(/images/icons/folder_edit.png) 4px 50% no-repeat;font-size:14px; text-transform:lowercase; margin-right:5px; padding:0 5px 0 25px; }
+
 #assess a.summary em{font-style:normal;}
 #assess .edit-assess-arrow{ background:url(/images/core/assess/green-arrow.png) no-repeat 50% 0; display:inline-block; height:10px; width:30px;}
 
@@ -499,7 +500,7 @@ p.interact a.take-test-btn{ margin-bottom:10px;text-align:left;display:block;wid
 #assess.take-test .col-1 .multiple-choice li {padding:15px 40px 15px 10px; background:#fff; }
 #assess.take-test .col-1 .multiple-choice li span{font-weight:bold;}
 
-#assess .next-step{ color:#fff; font-weight:bold; border:0;width:111px; float:right; height:29px; background: url(/images/core/assess/next-step.gif) no-repeat;}
+#assess .next-step{font-size:12px;color:#fff; border:0;width:111px; float:right; height:29px; background: url(/images/core/assess/next-step.gif) no-repeat;}
 #assess .next-step:hover{background-position:bottom; cursor:pointer; text-decoration:none;}
 #assess .step-nav{float:left; margin-right:20px; text-align:center; line-height:29px; }
 
@@ -548,6 +549,7 @@ p.interact a.take-test-btn{ margin-bottom:10px;text-align:left;display:block;wid
 .match-student-right{width:28%;}
 .mark-test .matchPairs.correct-thing li strong{width:95%;}
 .mark-test .match-student-right{padding:0 0 0 10px;}
+.updated-marks{padding:5px 5px; text-align:right; background:#e0f2df; border:1px solid #ededed; display:none;}
 
 /*BLOG*/
 .blog-comments { background: #eee; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }

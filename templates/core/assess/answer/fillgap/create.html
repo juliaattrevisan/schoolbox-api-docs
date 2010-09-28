@@ -68,7 +68,7 @@ $j(document).ready(function() {
         wrapper: "div",  // a wrapper around the error message
         errorPlacement: function(error, element) {
             offset = element.offset();
-            error.insertAfter(element)
+            error.insertBefore(element);
             error.addClass('message');  // add a class to the wrapper
             error.css('position', 'absolute');
             error.css('left', offset.left);
