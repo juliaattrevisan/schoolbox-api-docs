@@ -79,6 +79,7 @@ class Assess extends Model {
      */
     function getIntroSummary($assess_id) {
         $query = "SELECT
+                     assess_section.section_id,
                      assess_section.title,
                      assess_section.sequence,
                      COUNT(assess_section.section_id) AS numQuestions

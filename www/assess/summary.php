@@ -49,6 +49,7 @@ $this->setVar(array(
 if (is_array($allSummary) && count($allSummary)) {
     foreach($allSummary as $currentSummary) {
         $this->setVar(array(
+            'SECTION_SECTION_ID' => $currentSummary['section_id'],
             'SECTION_SEQUENCE' => $currentSummary['sequence'],
             'SECTION_TITLE' => $currentSummary['title'],
             'SECTION_NUMQUESTIONS' => $currentSummary['numQuestions'],

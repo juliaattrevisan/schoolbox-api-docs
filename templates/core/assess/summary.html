@@ -18,10 +18,12 @@
 					<strong>Close Date: </strong><br />
 					{ASSESS_FINISH}
 				</p>
+
+                <p><a href="/modify/{ASSESS_ASSESS_ID}">Edit Assessment</a></p>
 			
 				<ul><li><strong>Sections:</strong></li>
 					<!-- BEGIN section -->
-					<li>Section {SECTION_SEQUENCE}: {SECTION_TITLE} ({SECTION_NUMQUESTIONS} questions)</li>
+					<li>Section {SECTION_SEQUENCE}: {SECTION_TITLE} ({SECTION_NUMQUESTIONS} questions) <a href="/assess/section/modify/{SECTION_SECTION_ID}">Edit</a></li>
 					<!-- END section -->
 				</ul>
 			</div>

@@ -186,7 +186,7 @@ class AssessAnswerFillgap extends AssessAnswer {
         $marksPerAnswer = $currentResponse['marks'] / count($actualAnswers);
 
         for ($i=0, $totalMarks=0; $i < count($actualAnswers); $i++) {
-            if (trim($actualAnswers[$i]) == trim($response[$i])) {
+            if (strtolower(trim($actualAnswers[$i])) == strtolower(trim($response[$i]))) {
                 $totalMarks += $marksPerAnswer;
             }
         }
@@ -243,7 +243,7 @@ class AssessAnswerFillgap extends AssessAnswer {
 
                 /* Indicate matching/non-matching responses to answers
                  */
-                if (trim($actualAnswers[$i]) == trim($existingAnswer[$i])) {
+                if (strtolower(trim($actualAnswers[$i])) == strtolower(trim($existingAnswer[$i]))) {
                     $replace = " <span class='fillgapCorrect'>$val</span> ";
                 }
                 else {
