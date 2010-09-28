@@ -19,6 +19,7 @@ if (is_array($linkList)) {
 				'LINK_POSTED_DATE'	=> outputDate(DATE_short_format, $link['submitted']),
 				'LINK_COMMENT'		=> nl2br(scrubTEXT($link['comment'])),
 				'ON_OFF'			=> ++$j%2? '' : 'dark',
+                'HIDDEN'            => $link['hidden'] ? 'hidden' : '',
 				);
 		$this->setVar($output);
 		
