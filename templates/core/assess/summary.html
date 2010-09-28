@@ -1,34 +1,34 @@
 <div id="assess">
 	<div class="assess-header">
-		<h2>{ASSESS_TITLE}</h2>
+		<h2>{ASSESS_TITLE}<a class="edit-assess" href="/assess/modify/{ASSESS_ASSESS_ID}">Edit</a></h2>
 		<div class="assess-body">
-			<div>
-				<p><strong>Introduction</strong><br />
-					{ASSESS_DESCRIPTION}
-				</p>
+				<div class="duration">
+					<h2>Duration</h2>
+					<p>{ASSESS_DURATION}</p>
+				</div>
+
+				<p>{ASSESS_DESCRIPTION}</p>
+
 				<p>
-					<strong>Time allowed: </strong><br />
-					{ASSESS_DURATION}
-				</p>
-				<p>
-					<strong>Open Date: </strong><br />
+					<strong>Test open:</strong><br />
 					{ASSESS_START}
-				</p>
-				<p>
-					<strong>Close Date: </strong><br />
+					<span class="edit-assess-arrow"></span>
 					{ASSESS_FINISH}
 				</p>
-
-                <p><a href="/assess/modify/{ASSESS_ASSESS_ID}">Edit Assessment</a></p>
-			
-				<ul><li><strong>Sections:</strong></li>
+				<div class="float-fix"></div>
+				<hr />
+				<ul>
 					<!-- BEGIN section -->
-					<li>Section {SECTION_SEQUENCE}: {SECTION_TITLE} ({SECTION_NUMQUESTIONS} questions) <a href="/assess/section/modify/{SECTION_SECTION_ID}">Edit</a></li>
+					<li>
+						<a class="summary" href="/assess/section/modify/{SECTION_SECTION_ID}">
+							<strong>Section {SECTION_SEQUENCE}: {SECTION_TITLE}</strong> ({SECTION_NUMQUESTIONS} questions)
+						</a>
+					</li>
 					<!-- END section -->
 				</ul>
-			</div>
-
-			<div class="float-fix"></div>
 		</div>
+
+		<div class="float-fix"></div>
+
 	</div>
 </div>

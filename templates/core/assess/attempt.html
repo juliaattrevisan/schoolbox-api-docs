@@ -1,7 +1,7 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/css/jquery.countdown.css" media="screen" />
-<script type="text/javascript" src="/javascript/jquery.countdown.js"></script>
 <script type="text/javascript" src="/javascript/jquery.ui.js"></script>
+<script type="text/javascript" src="/javascript/jquery.countdown.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
 
@@ -56,12 +56,8 @@ $j(document).ready(function() {
     /* Set up countdown
      */
 	 
-	 if ($j('#countdown').html() == '') {
-		 $j('#countdown').parent().hide();
-	 }
-	 
-	 
-    if ({ASSESS_TIME_REMAINING} >= 0) {
+	 var timeLeft = '{ASSESS_TIME_REMAINING}'
+	 if ((timeLeft) > 0) {
         $j('#countdown').countdown({
             until: '+{ASSESS_TIME_REMAINING}',
             layout: '{hn} : {mn} : {sn}',
@@ -70,7 +66,12 @@ $j(document).ready(function() {
                 window.location = '/assess/end/{ASSESS_ASSESS_ID}';
             }
         });
-	}
+	 }
+
+
+	 if ($j('#countdown').html() == '') {
+		 $j('#countdown').parent().hide();
+	 }
 
 	$j(".match-it").swappable({
 		items: '.right-answer', 

@@ -306,7 +306,29 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #assess .section p ins{height:20px; display:block; background:#ff0; margin-bottom:10px;}
 #assess .section p span{display:block; font-weight:normal; text-align:left;}
 #assess #countdown{ text-align:center; font-size:14px; padding:9px; background:#ededed; margin:8px 0;}
-#assess .save-success{display:none; background:#e0f2df;border:1px solid #ccc; padding:10px; margin:0 0 10px 0;}
+#assess .save-success{display:none;;border:1px solid #ccc; padding:10px; margin:0 0 10px 0;}
+
+#assess .duration{float:right; font-size:28px; text-align:center; font-weight:bold; clear:both}
+#assess .duration p{padding:10px; text-align:center;}
+#assess a.edit-assess{float:right; background:#245398; padding:0 15px 0 6px;}
+#assess a.summary.name{font-size:16px; margin-bottom:10px; display:block; font-weight:bold;background:none; border:none;}
+#assess a.summary.time span{background-image:url(/images/icons/time.png);}
+#assess a.summary.date span{background-image:url(/images/icons/calendar.png);}
+#assess a.summary{ background: #ededed; font-size:11px; border:1px solid #dbdbdb; margin-bottom:5px;
+
+     -moz-border-radius: 4px; /* FF1+ */
+  -webkit-border-radius: 4px; /* Saf3-4 */
+          border-radius: 4px; /* Opera 10.5, IE 9, Saf5, Chrome */
+ display:block; color:#222222;line-height:20px;padding:5px 0 5px 5px;}
+#assess a.summary:hover{text-decoration:none; background:#e6effb;}
+#assess a.summary span{float:right;
+     -moz-border-radius: 7px; /* FF1+ */
+  -webkit-border-radius: 7px; /* Saf3-4 */
+          border-radius: 7px; /* Opera 10.5, IE 9, Saf5, Chrome */
+ border:1px solid #fff;font-weight:normal;background: #f3fdf2 url(/images/icons/folder_edit.png) 4px 50% no-repeat;font-size:14px; text-transform:lowercase; margin-right:5px; padding:0 5px 0 25px; }
+#assess a.summary em{font-style:normal;}
+#assess .edit-assess-arrow{ background:url(/images/core/assess/green-arrow.png) no-repeat 50% 0; display:inline-block; height:10px; width:30px;}
+
 
 #assess .col-1, #assess .col-2{float:left; }
 #assess .col-1 h4{font-size:10px; padding:10px; padding-top:0px;}
