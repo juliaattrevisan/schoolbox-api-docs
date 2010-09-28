@@ -79,15 +79,25 @@ if ($allAttempts) {
     foreach($allAttempts as $currentAttempt) {
         $firstSection = $sectionHandler->getFirst($this->arg[0]);
 
-        /* Finish time
+        /* Finish time. Show the datetime when the person clicked Finish.
+         * Otherwise, show the last time their responses were updated, or that
+         * they never even attempted the test.
          */
         if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
             $finish = date('jS F Y, g:i:sa', strtotime($currentAttempt['finish']));
             $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
         }
         else {
-            $finish = '';
-            $timeTaken = '';
+            $finish = $responseHandler->getLastSave($currentAttempt['attempt_id']);
+
+            if (empty($finish)) {
+                $finish = 'Never attempted';
+            }
+            else {
+                $finish = date('jS F Y, g:i:sa', strtotime($finish));
+            }
+
+            $timeTaken = 'Incomplete';
         }
 
         /* The total available marks for this attempt
@@ -101,6 +111,15 @@ if ($allAttempts) {
             $percentage = 0;
         }
 
+        /* Check when the test was reviewed
+         */
+        if ($currentAttempt['reviewed_at'] != '') {
+            $reviewedAt = 'Reviewed on ' . date('jS F Y, g:i:sa', strtotime($currentAttempt['reviewed_at']));
+        }
+        else {
+            $reviewedAt = '';
+        }
+
         $this->setVar(array(
             'ASSESS_ASSESS_ID' => $this->arg[0],
             'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
@@ -111,6 +130,7 @@ if ($allAttempts) {
             'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
             'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
             'ATTEMPT_PERCENTAGE' => $percentage,
+            'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
         ));
 
         $this->parse('attempt_block', 'attempt', true);

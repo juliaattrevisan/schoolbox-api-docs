@@ -89,7 +89,8 @@ class AssessAnswer extends Model {
             'attempt_id' => $_SESSION['attempt_id'],
             'section_id' => $section_id,
             'question_id' => $question_id,
-            'response' => $processedResponse
+            'response' => $processedResponse,
+            'updated_at' => 'NOW()',
         );
 
         /* If they have already responded to this question in this attempt,

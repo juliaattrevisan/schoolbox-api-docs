@@ -150,5 +150,21 @@ class AssessResponse extends Model {
             }
         }
     }
+
+    /**
+     * Find out when an attempt's responses were last updated, so we can see
+     * when the student last saved data.
+     * 
+     * @param <type> $attempt_id
+     * @return <type>
+     */
+    function getLastSave($attempt_id) {
+        $query = "SELECT updated_at
+                  FROM assess_response
+                  WHERE attempt_id = '$attempt_id'
+                  ORDER BY updated_at DESC";
+
+        return $this->db->getOne($query);
+    }
 }
 ?>
