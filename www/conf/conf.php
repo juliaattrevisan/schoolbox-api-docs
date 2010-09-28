@@ -57,7 +57,7 @@ define("FILE_directory",			SITE_root.'/data/files');		//Files uploads
 define("MYFILE_directory",  		SITE_root.'/data/myFiles');		//Personal file uploads
 define("SUBMISSION_directory", 		SITE_root.'/data/submissions');	//Student submission files
 define("RETURNS_directory", 		SITE_root.'/data/returns');		//Returned work files
-define('DROPBOX_directory', 		SITE_root.'/data/drop');			//Student dropbox files
+define('DROPBOX_directory', 		SITE_root.'/data/dropbox');			//Student dropbox files
 define('ZIP_directory',				SITE_root.'/data/zip');			//Cache for zip files
 define("THUMBNAIL_IMAGE_CACHE", 	SITE_root.'/data/thumbnails');	//Thumbnail cache
 define('CACHE_xml',					SITE_root . '/cache/xml');

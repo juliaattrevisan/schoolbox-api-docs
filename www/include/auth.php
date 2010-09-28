@@ -32,7 +32,7 @@ function authenticateLDAP($username, $password) {
         $ds=ldap_connect(LDAP_host);
         ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
         ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-        ldap_bind($ds, LDAP_user, LDAP_pass);
+        ldap_bind($ds, ldap_escape(LDAP_user), ldap_escape(LDAP_pass));
         $searchString = "(SAMAccountName=".ldap_escape($username).")";
         $result = ldap_search($ds,LDAP_base, $searchString, array('dn'));
         if($result) {
@@ -43,7 +43,7 @@ function authenticateLDAP($username, $password) {
         }
         ldap_unbind($ds);
 
-        if(LDAP_host2)  {
+        if(defined(LDAP_host2))  {
 			//Try student server
 			$ds=ldap_connect(LDAP_host2);
 			ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
@@ -324,17 +324,20 @@ function setSynergyInfo(&$mydb)
 		else  //user is not parent so get timetable information
 		{
 			$subjectList = $synUser->getSubjectList($synergy_id, $_SESSION['id']);
+            $catList = array();
 			if( is_array($subjectList))
 			{
 				foreach($subjectList as $subject)
 				{
 					//check subject exists.. we cant link to subjects that dont exist its ugly
-					$myquery = "SELECT categoryID FROM categoryCode WHERE code like '".$subject['code']."'";
-
+					$myquery = "SELECT categoryID, c.name FROM categoryCode cc JOIN category c ON c.id = cc.categoryID WHERE cc.code like '".$subject['code']."'";
 					if($result=$mydb->getRow($myquery) )  {
-						if(perm( $result['categoryID'], HOMEPAGESERVICE) > 0 ) {
+						if(!in_array($result['categoryID'], $catList) && perm( $result['categoryID'], HOMEPAGESERVICE) > 0 ) {
 							$subject['id'] = $result['categoryID'];
+                            $subject['name'] = $result['name'];
+
 							$_SESSION['subjects'][] = $subject;
+                            $catList[] = $result['categoryID']; //check for dupes
 						}
 					}
 
