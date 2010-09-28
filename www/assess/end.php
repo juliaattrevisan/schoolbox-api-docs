@@ -32,6 +32,10 @@ if ($assessHandler->isOwner($this->arg[0])) {
     error(124);
 }
 
+if ($assessHandler->isExpired($this->arg[0])) {
+    error(120);
+}
+
 $this->setFile(TEMPLATE_content, 'assess/end.html');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');

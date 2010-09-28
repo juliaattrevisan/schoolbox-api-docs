@@ -38,6 +38,12 @@ if (!$assessHandler->canDoAssessment($this->arg[0])) {
     error(19);
 }
 
+/* Check if this assessment can be started
+ */
+if ($assessHandler->isExpired($this->arg[0])) {
+    error(120);
+}
+
 $allSummary = $assessHandler->getIntroSummary($this->arg[0]);
 $allSections = $sectionHandler->getList($assess['assess_id']);
 

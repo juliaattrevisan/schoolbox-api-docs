@@ -25,6 +25,10 @@ if ($assessHandler->isOwner($section['assess_id'])) {
     error(124);
 }
 
+if ($assessHandler->isExpired($this->arg[0])) {
+    error(120);
+}
+
 if (!$question) {
     error(119);
 }

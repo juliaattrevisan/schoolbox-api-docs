@@ -319,5 +319,26 @@ class Assess extends Model {
 
         return false;
     }
+
+    /**
+     * Find out whether this assessment has expired.
+     * 
+     * @param <type> $assess_id
+     * @return <type>
+     */
+    function isExpired($assess_id) {
+        $query = "SELECT COUNT(assess_id)
+                  FROM assess
+                  WHERE assess_id = '$assess_id'
+                  AND finish > NOW()";
+
+        $result = $this->db->getOne($query);
+
+        if (!$result) {
+            return true;
+        }
+
+        return false;
+    }
 }
 ?>
