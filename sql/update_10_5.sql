@@ -13,7 +13,7 @@ INSERT INTO error (id, message) VALUES (107, 'You do not have permission to modi
 INSERT INTO error (id, message) VALUES (108, 'You do not have permission to leave comments on this blog.');
 INSERT INTO error (id, message) VALUES (109, 'You do not have permission to publish this file.');
 INSERT INTO error (id, message) VALUES (110, 'You do not have permission to modify these notes.');
-INSERT INTO error (id, message) VALUES ('111', 'There are no blogs in this archive.');
+INSERT INTO error (id, message) VALUES (111, 'There are no blogs in this archive.');
 
 /* Published Files
  */
@@ -55,3 +55,8 @@ INSERT INTO error (id, message) VALUES (130, 'Only teachers can create and modif
 INSERT INTO error (id, message) VALUES (131, 'Question could not be saved.');
 INSERT INTO error (id, message) VALUES (132, 'Answer could not be saved.');
 INSERT INTO error (id, message) VALUES (133, 'Could not load question: unknown type.');
+
+
+ALTER TABLE submission_return CHANGE comment comment TEXT NULL ;
+
+
