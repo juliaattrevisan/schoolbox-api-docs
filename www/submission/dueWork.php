@@ -424,7 +424,7 @@ if ($allAssessments) {
                 'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
                 'ATTEMPT_TOTAL_MARKS' => number_format(0, 2),
                 'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
-                'ATTEMPT_PERCENTAGE' => $percentage,
+                'ATTEMPT_PERCENTAGE' => 0,
             ));
 
             $this->setVar('viewMarks_block', '');
