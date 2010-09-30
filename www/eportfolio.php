@@ -40,7 +40,7 @@ if ($eportfolioHandler->canEdit($userID)) {
 
     $this->setFile(TEMPLATE_content, 'eportfolio/template.html');
     $this->setTitle($pageName);
-    $this->setTab('resources');
+    $this->setTab('eportfolio');
 
     $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
     $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');

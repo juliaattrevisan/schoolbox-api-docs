@@ -4,7 +4,7 @@
 *         Copyright (c) 2003-2004 Lektec Consulting         *
 *                                                           *
 *	Collection of functions used during login				*
-*   $Id: auth.php,v 1.16 2004/04/27 05:16:48 jleckie Exp $						    
+*   $Id: auth.php,v 1.16 2004/04/27 05:16:48 jleckie Exp $
 *                                                           *
 ************************************************************/
 require_once('permission.php');
@@ -17,15 +17,15 @@ function checkBruteForce(&$db)
         // Returns true if too many logins false if ok
 	$ip = getenv('REMOTE_ADDR');
 	$graceperiod = time() - LOGINGRACE;
-        
+
 	$query = "SELECT id FROM login_log WHERE ip = '$ip' AND login = '0' AND date > FROM_UNIXTIME($graceperiod)";
 	$db->query($query);
-	
+
 	if($db->countRows() < LOGINALLOWED)
 		return 0;
 	else
 		return 1;
-} 
+}
 
 function authenticateLDAP($username, $password) {
 
@@ -110,7 +110,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 	// Function to check username exists and password is correct
 	if(defined('LDAP_enable') && LDAP_enable) {
 		$result = authenticateLDAP($username, $password);
-		
+
 		//insert password into db to enable automatic login
 		//$query = "UPDATE user SET email_pass = '$password' WHERE username = '".trim($username)."'";
 		//$db->query($query);
@@ -132,14 +132,14 @@ function authenticate(&$db, $username, $password, $remember = 0)
 	}
 	if($result == true) {
 
-		$query = "SELECT user.id, title, firstname, lastname, username, group_id, synergy_id, year, superusers.id AS su, password, email_pass, local_email, mail_handler
+		$query = "SELECT user.id, title, firstname, lastname, username, group_id, synergy_id, year, superusers.id AS su, password, email_pass, local_email, mail_handler, eportfolio_enabled
 		FROM user LEFT JOIN superusers ON user.id = superusers.id WHERE username = '". mysql_real_escape_string( $username)."'";
 		$user = $db->getRow($query);
 	}
-	
+
 	//log the authentication attempt
-	$ip = getIP(); 
-	$loginlogquery = "INSERT INTO login_log (username, date, ip, login) 
+	$ip = getIP();
+	$loginlogquery = "INSERT INTO login_log (username, date, ip, login)
 			VALUES ('".mysql_real_escape_string($username)."', NOW(), '$ip'";
 
 	//check password
@@ -151,7 +151,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 			{
 				//firstime user lets register there details
 				if(!firsttime(&$db, $username, $password))
-					return false;		
+					return false;
 			}
 		}*/
 
@@ -167,35 +167,36 @@ function authenticate(&$db, $username, $password, $remember = 0)
 		$_SESSION['lasttime'] = mktime();
 		$_SESSION['username'] = $user['username'];
 		$_SESSION['password'] = $user['email_pass'];
+        $_SESSION['eportfolio_enabled'] = $user['eportfolio_enabled'];
 
 		//remember users session (i.e. never let it expire)
 		if(REMEMBERSESSION && $remember)
 			$_SESSION['remember'] = 1;
 		else
-			$_SESSION['remember'] = 0;			
-		
+			$_SESSION['remember'] = 0;
+
 		//if no webmail enabled or user has elected to use external client set mailhandle to mailto:
 		if(MAIL_enable == 0 || $user['mail_handler'] || (isParent($user['group_id']) && !$user['local_email']))
 			$_SESSION['mailhandle'] = "mailto:";
 		else
 			$_SESSION['mailhandle'] = "/mail/createMail.php?replyto=";
 
-		
-			
+
+
 		//superuser value, used to bypass most security checks
 		if($user['su'] != "")
 			$_SESSION['su'] = 1;
 
 		//register there ip
-		$_SESSION['ip'] = getIP(); 
+		$_SESSION['ip'] = getIP();
 
 		//campus
-		$campusquery = "SELECT campus 
-				FROM userCampus 
+		$campusquery = "SELECT campus
+				FROM userCampus
 				WHERE uid = '".$user['id']."'
 				ORDER BY defaultCampus DESC
 				";
-		
+
 		$db->query($campusquery);
 		if($db->countRows() > 0) {
 			while($campus = $db->getNextArray() ) {
@@ -215,7 +216,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 				$_SESSION['children'][] = array('id' => 3, 'sid' => 0, 'name' => 'Test User');
 			}*/
 		}
-		
+
 		if(LDAP_enable)
 			setLDAPInfo($username);
 
@@ -228,11 +229,11 @@ function authenticate(&$db, $username, $password, $remember = 0)
 	{
 		$loginlogquery .= ", '0')";
 		$db->query($loginlogquery);
-		return false;		
+		return false;
 	}
-	
+
 	return false;
-}	
+}
 
 function firsttime(&$db, $username, $password)
 {
@@ -245,12 +246,12 @@ function firsttime(&$db, $username, $password)
         $inbox = @imap_open ($server, $username, $password);
         if(!$inbox)
         {
-      		//failed to check password against mailserver 
+      		//failed to check password against mailserver
 	  	return 0;
 	}
 
         //submit email password to database
-        $query = "UPDATE user SET password = PASSWORD('".$password."'), email_pass = '".$password."' 
+        $query = "UPDATE user SET password = PASSWORD('".$password."'), email_pass = '".$password."'
 		WHERE username = '".$username."'";
         $db->query($query);
 
@@ -277,7 +278,7 @@ function setSynergyInfo(&$mydb)
 	$_SESSION[ 'FileSemester'] = $semester[ 'FileSemester'];
 	$_SESSION[ 'FileYear'] = $semester[ 'FileYear'];
 	$synergy_id = $_SESSION['sid'];
-	
+
 	if(is_numeric($synergy_id) && $_SESSION['FileSemester'] && $_SESSION['FileYear']) {
 
 		//if user is parent get information regarding enrolled students
@@ -344,11 +345,11 @@ function setSynergyInfo(&$mydb)
 				}
 				$_SESSION['timetable'] = 1;
 			}
-			else	
+			else
 				$_SESSION['timetable'] = 0;
 		}
 	}
-	
+
 }
 
 ?>

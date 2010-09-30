@@ -171,7 +171,7 @@ class user
 	}
 
 	function updateUser($id, $username, $title, $firstname, $lastname, $synergyid, $local_email, $alt_email, 
-				$group, $password, $campusarray, $su, $year)
+				$group, $password, $campusarray, $su, $year, $eportfolio_enabled)
 	{
 		//insert information into database
 		$user  = array('id'			=> $id,
@@ -185,6 +185,7 @@ class user
 						'local_email' => $local_email,
 						'alt_email' => $alt_email,
 						'mail_handler'=> $mail_handler,
+                        'eportfolio_enabled' => $eportfolio_enabled,
 					);
 
 		$this->db->update('user', 'id', $user);
@@ -289,7 +290,7 @@ class user
 	{
 		//return an array of user info
 		$query = "SELECT username, title, firstname, lastname, email_pass, group_id, synergy_id, 
-			superusers.id AS su, year, local_email, alt_email
+			superusers.id AS su, year, local_email, alt_email, eportfolio_enabled
 			FROM user LEFT JOIN superusers ON user.id = superusers.id WHERE user.id = '$id'";
 		
 		return $this->db->getRow($query);

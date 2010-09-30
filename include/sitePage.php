@@ -8,34 +8,34 @@ class SitePage extends Page {
 
 	function SitePage($login=TRUE) {
 		parent::Page();
-		
+
 		$this->db = new dbManager;
 		$this->setTab('main');
-		
+
 		if($login)
 			$this->initSession();
 
 		$this->setSite();
 	}
-	
-	
+
+
 	function loadContent($pageFile, $execute=TRUE) {
 		$this->pageName = $pageFile;
-	
+
 		/* sanitise data, force all 404s through pageNotFound() */
 		if( !preg_match("/^[a-zA-Z0-9\/\-\_]+/", $pageFile) || $pageFile == 'common/404') {
 			$this->pageNotFound();
 		}
-		
+
 		$this->arg = array();
 		$path = explode('/', trim($pageFile, '/'));
 		$total = count($path);
-	
+
 		/* iterate backwards through the path */
 		for ($i = 0; $i < $total; $i++) {
-		
+
 			$filename = rtrim(implode("/", $path), '/');
-			
+
 			if(is_file($_SERVER['DOCUMENT_ROOT'].'/'.$filename.'.php') && $execute) {
 				include($_SERVER['DOCUMENT_ROOT'].'/'.$filename. '.php');
 				return true;
@@ -49,11 +49,11 @@ class SitePage extends Page {
 				$this->setFile(TEMPLATE_content, $filename . '/index.html');
 				return true;
 			}
-			
+
 			/* move last element to arguments */
 			array_unshift($this->arg, array_pop($path));
 		}
-		
+
 		$this->pageNotFound();
 	}
 
@@ -81,15 +81,15 @@ class SitePage extends Page {
 		}
 
 		$this->site = SITE_location;
-	
+
 	}
-	
+
 	function outputPage($lite=FALSE) {
 		if(!$lite) {
 			$this->buildPage();
 			$this->saveHistory();
 		}
-		
+
 		$templateVar = array(	'TEMPLATE_YEAR' => date('Y'),
 								'SITE_NAME'		=> SITE_name,
 								'SITE_ADDRESS'	=> SITE_address,
@@ -98,25 +98,25 @@ class SitePage extends Page {
 								'SITE_LOCATION'	=> $this->site,
 							);
 		$this->setVar($templateVar);
-		
+
 		$title = $this->getVar('TITLE');
 		if (empty($title))
 			$this->setTitle();
-		
+
 		$this->template->pparse('finaloutput', TEMPLATE_body);
 	}
-	
+
 	function buildPage($customHead = true) {
-	
+
 		$this->groupHandler = new Group;
-		
+
 		$this->setFile(TEMPLATE_body, 'include/body.html' );
 		$this->setFile('headerTpl', 'include/header.html' );
 		$this->setFile('footerTpl', 'include/footer.html' );
 		$this->setFile('bannerTpl', 'include/banner.html' );
 		$this->setFile('navTpl', 'include/nav.html' );
 		$this->setFile('tabTpl', 'include/tab.html' );
-		
+
 		$this->renderScriptIncludes();
 		$this->renderSideNav();
 		$this->renderTabBar();
@@ -124,11 +124,11 @@ class SitePage extends Page {
 		$this->renderSubjectList();
 		$this->renderLinkList();
 		$this->renderStudents();
-		
+
 		$this->parse('MAIN_HEADER_REGION', 'headerTpl');
 		$this->parse('MAIN_FOOTER_REGION', 'footerTpl');
 		$this->parse('MAIN_BANNER_REGION', 'bannerTpl');
-		
+
 		if ($_SESSION['id']) {
 			$this->parse('MAIN_NAV_REGION', 'navTpl');
 			$this->parse('MAIN_TAB_REGION', 'tabTpl');
@@ -136,93 +136,93 @@ class SitePage extends Page {
 			$this->setVar('MAIN_NAV_REGION', '');
 			$this->setVar('MAIN_TAB_REGION', '');
 		}
-		
+
 		$this->parse('MAIN_CONTENT_REGION', TEMPLATE_content);
-		
+
 		if ($this->getVar('custom_head') && $customHead)
 			$this->parse('CUSTOM_HEADER_REGION', 'custom_head');
 		else
-			$this->setVar('CUSTOM_HEADER_REGION', '');	
+			$this->setVar('CUSTOM_HEADER_REGION', '');
 	}
-	
+
 	function setTab($tab) {
 		$this->currentTab = $tab;
 	}
-	
+
 	function initSession() {
 		session_start();
 
 		if ( !isset($_SESSION['id']) )
 			$this->goLoginPage();
-		
+
 		//if ip tracking enabled ensure user has same ip as when they logged in
 		if(TRACKIP && $_SESSION['ip'] != getIP())
 			$this->goLoginPage();
-		
+
 		//if session remember is disabled and check session has not expired
 		if(!$_SESSION['remember'] && (($_SESSION['lasttime'] + SESSIONLENGTH) < mktime()))
 			$this->goLoginPage();
-		
+
 		//reset session timer
 		$_SESSION['lasttime'] = mktime();
 	}
-	
+
 	function saveHistory() {
 		/* Function saves user page history in session so we can go back to where they came from */
 		if(!is_array($_SESSION['history']))
 			$_SESSION['history'] = array();
-		
+
 		/* Dont handle duplicates (page refreshes) */
 		if($_SESSION['history'][0] != $_SERVER['REQUEST_URI']) {
-		
+
 			array_unshift($_SESSION['history'], $_SERVER['REQUEST_URI']);
-			
+
 			if(count($_SESSION['history']) > 3)
 				array_pop($_SESSION['history']);
 		}
 	}
-	
+
 	function backToTheFuture($page) {
 		/* In Dans honour, time is ours */
 		if(is_array($_SESSION['history']) ) {
 			if(count($_SESSION['history']) >= $page)
 				localRedir($_SESSION['history'][$page-1]);
-			else 
+			else
 				localRedir($_SESSION['history'][(count($_SESSION['history'])-1)]);
 		}
 		else /* Lost in space and time, just go home */
 			localRedir('/');
-		
+
 	}
 
 	function error($ec, $message = "") {
-		
+
 		require_once($_SERVER['DOCUMENT_ROOT'].'/../include/db.php');
-		
+
 		$db = new dbManager(SQL_db, 1);
-	
+
 		$query = "SELECT message FROM error WHERE id = '$ec'";
 		$error = $db->getRow($query);
-	
+
 		$output = str_replace("%MESSAGE%", $message, $error['message']);
-		
+
 		header("HTTP/1.0 400 Bad Request");
 		$this->setVar(TEMPLATE_content, '');
-		
+
 		$this->setFile(TEMPLATE_content, 'common/error.html');
 		$this->setTitle('Error Encountered');
 		$this->setVar("OUTPUT", $output);
 		$this->buildPage(false);
 		$this->outputPage(true);
 		exit;
-	
+
 	}
-	
+
 	function renderSideNav() {
 		//this section handles the drop down menu
 		if($_SESSION['su'])
 			$query = "SELECT sideMenu.id, parent, txt, url, target FROM sideMenu ORDER BY parent, sequence, txt";
-		else if(is_array($_SESSION['campus'])) 
+		else if(is_array($_SESSION['campus']))
 			$query = "	SELECT DISTINCT(sideMenu.id), parent, txt, url, target FROM sideMenu, sideMenuCampus, sideMenuGroup
           				WHERE (sideMenu.id = sideMenuCampus.id AND sideMenuCampus.campus IN (".implode(',',$_SESSION['campus']).") )
             				AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '".$_SESSION['gid']."')
@@ -245,14 +245,14 @@ class SitePage extends Page {
 		//output tree with html
 		$this->setVar("MCSSMENU", $this->__outputMenu($list[0]['children'], 1));
 	}
-	
+
 	function renderTabBar() {
-		
+
 		//this section hanldes the display of the timetable tab
 		$this->setBlock('tabTpl', 'timetable_tab', 'tt_tab');
 		//if the have a timetable or their children have a timetable
 		if($_SESSION['timetable'] || is_array($_SESSION['children'][0]['subjects']))
-			$this->parse('tt_tab','timetable_tab'); 	
+			$this->parse('tt_tab','timetable_tab');
 		else
 			$this->setVar('tt_tab', '');
 
@@ -275,8 +275,8 @@ class SitePage extends Page {
 		//this section handles the display of the webmail tab
 		// if configuration states mail is available and user has access to local mail account display it
 		$this->setBlock('tabTpl', 'webmail_tab', 'wm_tab');
-        
-		if((MAIL_enable && $_SESSION['local_email']) || 
+
+		if((MAIL_enable && $_SESSION['local_email']) ||
                 ($this->site == 'wenona' && $this->groupHandler->isStaff()) ||
                 $this->site == 'ormond' ||
                 $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] ==  7 || $_SESSION['gid'] == '8' )  ||
@@ -291,7 +291,7 @@ class SitePage extends Page {
 				else
 					$this->setVar("WEBMAIL_LOCATION", 'href="/mail/"');
 			}
-			else if(SITE_location == 'ormond') 
+			else if(SITE_location == 'ormond')
 			{
 				if($_SESSION['exchange'])
 					$this->setVar("WEBMAIL_LOCATION", 'href="http://owa.ormond.unimelb.edu.au" rel="external"');
@@ -333,14 +333,14 @@ class SitePage extends Page {
 		{
 			$this->setVar('wm_tab', '');
 		}
-		
-		//custom code for each site is performed here	
+
+		//custom code for each site is performed here
 		if($this->site == 'wenona')
 		{
 			require_once $_SERVER['DOCUMENT_ROOT'] . '/include/wenona.php';
 			//provide encoded login details for intranet
 			$this->setVar("ENC_LOGIN", urlencode(base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'].' '.$_SESSION['password'].' '.date('Y m d H i')))));
-		
+
 			$this->setBlock('tabTpl', 'portfolio_tab', 'pf_tab');
 			if($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) {
 				$this->parse('pf_tab', 'portfolio_tab');
@@ -372,6 +372,19 @@ class SitePage extends Page {
 				$this->setVar('mf_tab', '');
 			}
 		}
+
+        /* Check if eportfolio tab should be enabled
+         */
+        $this->setBlock('tabTpl', 'eportfolio_tab', 'ep_tab');
+
+        if ($_SESSION['eportfolio_enabled']) {
+            $this->parse('ep_tab', 'eportfolio_tab');
+            $this->setVar('EPORTFOLIO_USER_ID', $_SESSION['id']);
+        }
+        else {
+            $this->setVar('ep_tab', '');
+        }
+
 		// choose tab to highlight
 		$output = array('TAB_MAIN_ON'		=> '',
 						'TAB_NEWS_ON'		=> '',
@@ -381,33 +394,34 @@ class SitePage extends Page {
 						'TAB_RESOURCES_ON'	=> '',
 						'TAB_MYFILES_ON'	=> '',
 						'TAB_PORTFOLIO_ON'	=> '',
+                        'TAB_EPORTFOLIO_ON'	=> '',
 						'TAB_' . strtoupper($this->currentTab) . '_ON'	=> ' navthis',
 						);
-						
+
 		$this->setVar($output);
 	}
-	
+
 	function renderGroupList() {
-		//this section handle mygroups section in the template	
+		//this section handle mygroups section in the template
 		$this->setBlock("navTpl", "mgroup", "mgroup_section");
 		$this->setBlock("mgroup", "mgroup_block", "my_groups");
-		
-		$query = "SELECT category.name, userAccess.sid, userAccess.type 
-				  FROM userAccess, category 
-				  WHERE userAccess.uid = '".$_SESSION['id']."' 
-				  AND userAccess.sid = category.id 
-				  AND userAccess.type > 0	
+
+		$query = "SELECT category.name, userAccess.sid, userAccess.type
+				  FROM userAccess, category
+				  WHERE userAccess.uid = '".$_SESSION['id']."'
+				  AND userAccess.sid = category.id
+				  AND userAccess.type > 0
 				  AND category.template <> 0
                   ORDER BY category.name
 			";
 		$this->db->query($query);
 		if($this->db->countRows() > 0)
 		{
-		
+
 			while($group = $this->db->getNextArray())
 			{
 					$this->setVar("MGNAME", scrubTEXT($group['name']));
-					$this->setVar("MGID", $group['sid']);	
+					$this->setVar("MGID", $group['sid']);
 					$this->parse("my_groups", "mgroup_block", true);
 			}
 			$this->parse("mgroup_section", "mgroup");
@@ -415,30 +429,30 @@ class SitePage extends Page {
 		else
 			$this->setVar("mgroup_section", "");
 	}
-	
+
 	function renderSubjectList() {
-		//this section handles the mysubjects section in the template 
+		//this section handles the mysubjects section in the template
 		$this->setBlock("navTpl", "msubject", "msubject_section");
 		$this->setBlock("msubject", "msubject_block", "my_subjects");
-		
+
 		if(is_array($_SESSION['subjects']))
 		{
 			foreach($_SESSION['subjects'] as $subject)
 			{
 				if($this->groupHandler->isStaff())
 					$this->setVar("MSUBJECT", $subject['name']." (".$subject['code'].")");
-				else		
+				else
 					$this->setVar("MSUBJECT", $subject['name']);
-		
+
 				$this->setVar("MSUBCODE", urlencode(urlencode($subject['code'])));
-				$this->parse("my_subjects","msubject_block",true); 
+				$this->parse("my_subjects","msubject_block",true);
 			}
 			$this->parse("msubject_section","msubject");
 		}
 		else
 			$this->setVar("msubject_section", "");
 	}
-	
+
 	function renderLinkList() {
 		$this->setBlock("navTpl", "mlink_block", "my_links");
 		$query = "SELECT url, description FROM bookmarks WHERE owner = '".$_SESSION['id']."'";
@@ -456,12 +470,12 @@ class SitePage extends Page {
 		else
 			$this->setVar("my_links", "");
 	}
-	
+
 	function renderStudents() {
 		//my students section
 		$this->setBlock('navTpl', 'mstudent', 'mstudent_section');
 		$this->setBlock('mstudent', 'mstudent_block', 'my_students');
-		
+
 		if(is_array($_SESSION['children']))
 		{
 			foreach($_SESSION['children'] as $child)
@@ -471,20 +485,20 @@ class SitePage extends Page {
 				$this->setVar("MSTUDENT_ID", $child['id']);
 				$this->setVar("MSTUDENT_NAME", formatName($user,'{firstname}'));
 				$this->setVar("MSTUDENT_YEAR", $user['year']);
-		
+
 				$this->parse("my_students", "mstudent_block", true);
-			
+
 			}
 			$this->parse("mstudent_section", "mstudent");
 		}
 		else
 			$this->setVar("mstudent_section", "");
 	}
-	
+
 	function renderScriptIncludes() {
 		$this->setBlock('headerTpl', 'header_javascript', 'header_javascript_block');
 		$this->setBlock('headerTpl', 'header_css', 'header_css_block');
-		
+
 		if(is_array($this->jscript)) {
 			foreach($this->jscript as $scriptOutput) {
 				$this->setVar($scriptOutput);
@@ -493,7 +507,7 @@ class SitePage extends Page {
 		}
 		else
 			$this->setVar('header_javascript_block', '');
-		
+
 		if(is_array($this->css)) {
 			foreach($this->css as $cssOutput) {
 				$this->setVar($cssOutput);
@@ -502,21 +516,21 @@ class SitePage extends Page {
 		}
 		else
 			$this->setVar('header_css_block', '');
-		
+
 	}
-	
-	
+
+
 	function setJavascript($file) {
 		$this->jscript[] = array('HEADER_SCRIPT_LOCATION'=>$file);
 	}
-	
+
 	function setCSS($file, $type='screen') {
 		$this->css[] = array('HEADER_CSS_TYPE'=>$type,'HEADER_CSS_LOCATION'=>$file);
 	}
-	
+
 	function setFile($handle, $file) {
 		$this->template->setFile($handle, $this->getTemplate($file));
-		
+
 		if($handle == TEMPLATE_content) {
 			$this->templateFile = $file;
 			$this->setBlock($handle, "custom_head", "custom_head_block");
@@ -524,46 +538,46 @@ class SitePage extends Page {
 		}
 
 	}
-	
+
 	function setTitle($title = '') {
 		$this->setVar('TITLE', HEADING . (!empty($title) ? ' - '.scrubTEXT($title) : ''));
 	}
-	
+
 	function getTemplate($template) {
 		if(is_file($this->templateRoot.'/'.$this->site.'/'.$template))
 			return $this->site.'/'.$template;
 		else
 			return 'core/'.$template;
 	}
-	
+
 	function getVar($varname) {
 		return $this->template->getVar($varname);
 	}
-	
+
 	function localRedir($file) {
 			$contype = conType();
 			header("Location: ".$contype.$_SERVER['HTTP_HOST'].$file);
 			exit;
 	}
-	
+
 	function goLoginPage($error = '', $page = ''){
 		$this->setSite();
 		$this->setFile(TEMPLATE_body, 'common/login.html');
 		$this->setVar('TITLE', HEADING." - Login");
-		
+
 		if($page)
 			$this->setVar('HIDDEN',rawurldecode($page));
 		else
 			$this->setVar('HIDDEN',$_SERVER['REQUEST_URI']);
-		
+
 		if($error)
 			$this->setVar('ERROR', $error);
 		else if(!$page && $_SERVER['REQUEST_URI'] != '/login/' && $_SERVER['REQUEST_URI'] != '/' )
 			$this->setVar('ERROR', 'You are currently not logged in.  Your session has either expired or you are beginning a new session.  Please log in below to continue browsing the portal.');
 		else
 			$this->setVar('ERROR', 'To begin a new session please login with your username and password.');
-			
-		
+
+
 		$this->outputPage(TRUE);
 		exit;
 	}
@@ -573,7 +587,7 @@ class SitePage extends Page {
 		$this->setVar(TEMPLATE_content, '');
 		$this->setFile(TEMPLATE_content, 'common/404.html');
 		$this->setTitle('Page Not Found');
-		
+
 		$this->buildPage(FALSE);
 		$this->outputPage(TRUE);
 		exit;
@@ -592,7 +606,7 @@ class SitePage extends Page {
 					else
 						$this->setVar($key.'_SELECTED', '');
 				}
-				$this->parse($handle.'_block', $handle, true); 
+				$this->parse($handle.'_block', $handle, true);
 			}
 		} else
 			$this->setVar($handle.'_block', '');
@@ -611,12 +625,12 @@ class SitePage extends Page {
 					else
 						$this->setVar($key.'_SELECTED', '');
 				}
-				
-				$this->parse($handle.'_block', $handle, true); 
+
+				$this->parse($handle.'_block', $handle, true);
 			}
 		} else
 			$this->setVar($handle.'_block', '');
-	}	
+	}
 
 	function canRead($perm) {
 		return $perm >= 1 ? true : false;
@@ -625,10 +639,10 @@ class SitePage extends Page {
 	function canWrite($perm) {
 		return $perm >= 2 ? true : false;
 	}
-	
+
 	//Private Functions
-	
-	
+
+
 	//function used to create data structure for drop down menu
 	function __insertChild($list, $element)
 	{
@@ -640,7 +654,7 @@ class SitePage extends Page {
 				$list[$i]['children'][] = $element;
 				return $list;
 			}
-			
+
 			if(is_array($list[$i]['children']))
 			{
 				$sublist = $this->__insertChild($list[$i]['children'], $element);
@@ -654,26 +668,26 @@ class SitePage extends Page {
 	{
 
 		$text = "<ul>\n";
-		
+
 		for($i=0; $list[$i]; $i++)
 		{
 			if($list[$i]['target'])
 				$target = " target={$list[$i]['target']}";
 			else $target = '';
-			
+
 			if(is_array($list[$i]['children'])) {
 				$text .= '<li class="parent"><a href="'.$list[$i]['url'].'"'.$target.'><span>'.$list[$i]['txt'].'</span></a>';
 				$text .= $this->__outputMenu($list[$i]['children'], ($level + 1));
 			}
-			else 
+			else
 				$text .= '<li><a href="'.$list[$i]['url'].'"'.$target.'><span>'.$list[$i]['txt'].'</span></a>';
-				
+
 			$text .= "</li>\n";
 		}
 		$text .= "</ul>\n";
 		return $text;
 	}
-	
+
 
 }
 

@@ -14,6 +14,7 @@ INSERT INTO error (id, message) VALUES (108, 'You do not have permission to leav
 INSERT INTO error (id, message) VALUES (109, 'You do not have permission to publish this file.');
 INSERT INTO error (id, message) VALUES (110, 'You do not have permission to modify these notes.');
 INSERT INTO error (id, message) VALUES (111, 'There are no blogs in this archive.');
+ALTER TABLE `user` ADD COLUMN eportfolio_enabled INT(8) NOT NULL DEFAULT 0;
 
 /* Published Files
  */

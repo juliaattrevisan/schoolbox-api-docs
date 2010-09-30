@@ -44,6 +44,7 @@ class modUser
 		$this->t_body->set_var("SUPERUSER", '');
 		$this->t_body->set_var("CAMPUSLIST", $this->campusList(0));
 		$this->t_body->set_var("GROUPLIST", $this->groupList(0));
+        $this->t_body->set_var("EPORTFOLIOENABLED", '');
 		
 		$this->t_body->set_block("tplBODY", "delete_button", "delete_button_block");
 		$this->t_body->set_var("delete_button_block", "");
@@ -98,6 +99,15 @@ class modUser
 			$this->t_body->set_var("SUPERUSER", "checked");
 		else
 			$this->t_body->set_var("SUPERUSER", "");
+
+        /* Eportfolio enabled
+         */
+        if ($user['eportfolio_enabled']) {
+            $this->t_body->set_var('EPORTFOLIO_ENABLED', 'checked=\'checked\'');
+        }
+        else {
+            $this->t_body->set_var('EPORTFOLIO_ENABLED', '');
+        }
 
 		$this->t_body->set_var("GROUPLIST", $this->groupList($user['group_id']));
 		$this->t_body->set_var("CAMPUSLIST", $this->campusList($userCampus));
@@ -434,7 +444,7 @@ else if($_POST['username'] && $_POST['lastname'] && $_POST['group'] && $_POST['c
 	{
 		$userDb->updateUser($_POST['id'], $_POST['username'], $_POST['title'], $_POST['firstname'], $_POST['lastname'], $_POST['synergyid'], 
 			$_POST['local_email'], $_POST['alt_email'], $_POST['group'], $_POST['password'], $_POST['campus'], 
-			$_POST['su'], $_POST['year']);
+			$_POST['su'], $_POST['year'], $_POST['eportfolioEnabled']);
 		$myPage->displayUser($_POST['id']);
 	}
 	else
