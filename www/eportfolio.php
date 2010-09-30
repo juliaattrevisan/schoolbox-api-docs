@@ -27,6 +27,10 @@ if (!$userID) {
 	error(31);
 }
 
+if (!$eportfolioHandler->isEnabled()) {
+    error(100);
+}
+
 /* Check permissions - only superuser, staff, the eportfolio owner and their
  * parents can view it.
  */

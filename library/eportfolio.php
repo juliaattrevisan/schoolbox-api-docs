@@ -12,6 +12,21 @@ class ePortfolio {
 		$this->uid = $uid;
 	}
 
+    function isEnabled($userID = '') {
+        if (!is_numeric($userID)) {
+            $uid = $_SESSION['id'];
+        }
+        else {
+            $uid = $userID;
+        }
+
+        $query = "SELECT eportfolio_enabled
+                  FROM user
+                  WHERE id = '$uid'";
+
+        return $this->db->getOne($query);
+    }
+
     /**
      * Gets all the images associated with an eportfolio
      * 
