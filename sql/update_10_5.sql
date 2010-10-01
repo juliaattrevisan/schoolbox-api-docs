@@ -17,16 +17,6 @@ INSERT INTO error (id, message) VALUES (110, 'You do not have permission to modi
 INSERT INTO error (id, message) VALUES (111, 'There are no blogs in this archive.');
 ALTER TABLE `user` ADD COLUMN eportfolio_enabled INT(8) NOT NULL DEFAULT 0;
 
-/* Published Files
- */
-ALTER TABLE myFile ADD COLUMN published DATETIME;
-
-/* Private Notes
- */
-CREATE TABLE eportfolio_privateNotes (
-    uid INT(8),
-    privateNotes TEXT
-)
 
 /* Assess
  * NB: Include schema of all tables with assess prefix.
@@ -62,3 +52,241 @@ INSERT INTO error (id, message) VALUES (133, 'Could not load question: unknown t
 ALTER TABLE submission_return CHANGE comment comment TEXT NULL ;
 
 
+
+/* Create table in target */
+CREATE TABLE `assess`(
+	`assess_id` int(11) NOT NULL  auto_increment ,
+	`category_id` int(11) NULL  ,
+	`user_id` int(11) NOT NULL  ,
+	`type` int(11) NULL  DEFAULT '11' ,
+	`title` varchar(50) COLLATE utf8_general_ci NOT NULL  ,
+	`description` text COLLATE utf8_general_ci NOT NULL  ,
+	`start` datetime NOT NULL  ,
+	`finish` datetime NOT NULL  ,
+	`duration` int(11) NOT NULL  DEFAULT '0' COMMENT 'in minutes' ,
+	`allow_resit` int(1) NOT NULL  DEFAULT '0' ,
+	`created_at` datetime NULL  ,
+	`deleted_at` datetime NULL  ,
+	PRIMARY KEY (`assess_id`) ,
+	UNIQUE KEY `id`(`assess_id`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `assess_answer`(
+	`answer_id` int(11) NOT NULL  auto_increment ,
+	`question_id` int(11) NOT NULL  ,
+	`sequence` int(11) NULL  ,
+	`answer` text COLLATE utf8_general_ci NULL  ,
+	`deleted_at` datetime NULL  ,
+	PRIMARY KEY (`answer_id`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `assess_attempt`(
+	`attempt_id` int(11) NOT NULL  auto_increment ,
+	`assess_id` int(11) NOT NULL  ,
+	`user_id` int(11) NOT NULL  ,
+	`start` datetime NOT NULL  ,
+	`finish` datetime NOT NULL  ,
+	`reviewed_at` datetime NULL  ,
+	PRIMARY KEY (`attempt_id`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `assess_luQuestionType`(
+	`type_id` int(8) NOT NULL  ,
+	`filename` varchar(255) COLLATE utf8_general_ci NULL  ,
+	`description` varchar(255) COLLATE utf8_general_ci NULL  ,
+	`automated_marking` enum('true','false') COLLATE utf8_general_ci NOT NULL  ,
+	PRIMARY KEY (`type_id`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `assess_question`(
+	`question_id` int(11) NOT NULL  auto_increment ,
+	`section_id` int(11) NOT NULL  ,
+	`sequence` int(11) NOT NULL  ,
+	`type_id` int(11) NOT NULL  ,
+	`marks` int(11) NULL  ,
+	`question` text COLLATE utf8_general_ci NOT NULL  ,
+	`deleted_at` datetime NULL  ,
+	PRIMARY KEY (`question_id`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `assess_response`(
+	`response_id` int(11) NOT NULL  auto_increment ,
+	`attempt_id` int(11) NOT NULL  ,
+	`section_id` int(11) NULL  ,
+	`question_id` int(11) NOT NULL  ,
+	`response` text COLLATE utf8_general_ci NULL  ,
+	`comment` text COLLATE utf8_general_ci NOT NULL  ,
+	`mark` float NULL  DEFAULT '0' ,
+	`automarked_already` enum('true','false') COLLATE utf8_general_ci NULL  DEFAULT 'false' ,
+	`updated_at` datetime NULL  ,
+	PRIMARY KEY (`response_id`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `assess_section`(
+	`section_id` int(11) NOT NULL  auto_increment ,
+	`assess_id` int(11) NOT NULL  ,
+	`sequence` int(11) NOT NULL  DEFAULT '0' ,
+	`title` varchar(50) COLLATE utf8_general_ci NOT NULL  ,
+	`description` text COLLATE utf8_general_ci NOT NULL  ,
+	`random` int(11) NOT NULL  DEFAULT '0' ,
+	`pool` int(11) NOT NULL  DEFAULT '0' ,
+	`deleted_at` datetime NULL  ,
+	PRIMARY KEY (`section_id`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `eportfolio_blog`(
+	`id` int(6) unsigned NOT NULL  auto_increment ,
+	`owner` int(6) unsigned NOT NULL  ,
+	`created` datetime NOT NULL  ,
+	`deleted` datetime NULL  ,
+	`heading` varchar(50) COLLATE utf8_general_ci NOT NULL  ,
+	`body` mediumtext COLLATE utf8_general_ci NOT NULL  ,
+	PRIMARY KEY (`id`) ,
+	FULLTEXT KEY `fulltext`(`heading`,`body`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `eportfolio_blogComment`(
+	`id` int(6) unsigned NOT NULL  auto_increment ,
+	`bid` int(6) unsigned NOT NULL  ,
+	`owner` int(6) unsigned NOT NULL  ,
+	`created` datetime NOT NULL  ,
+	`deleted` datetime NULL  ,
+	`body` mediumtext COLLATE utf8_general_ci NOT NULL  ,
+	PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `eportfolio_comp`(
+	`id` int(11) unsigned NOT NULL  auto_increment ,
+	`size` tinyint(3) unsigned NOT NULL  DEFAULT '0' ,
+	`method` varchar(18) COLLATE utf8_general_ci NULL  ,
+	`name` varchar(20) COLLATE utf8_general_ci NULL  ,
+	`description` mediumtext COLLATE utf8_general_ci NULL  ,
+	`filename` varchar(22) COLLATE utf8_general_ci NULL  ,
+	`config` mediumtext COLLATE utf8_general_ci NOT NULL  ,
+	`invisible` enum('true','false') COLLATE utf8_general_ci NOT NULL  DEFAULT 'false' ,
+	PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `eportfolio_comp_location`(
+	`uid` int(6) unsigned NOT NULL  DEFAULT '0' ,
+	`position` tinyint(1) unsigned NOT NULL  DEFAULT '0' ,
+	`column` tinyint(3) unsigned NOT NULL  DEFAULT '1' ,
+	`component` int(11) unsigned NOT NULL  DEFAULT '0' ,
+	`config` mediumtext COLLATE utf8_general_ci NOT NULL  ,
+	KEY `cid`(`uid`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `eportfolio_config`(
+	`uid` int(6) unsigned NOT NULL  DEFAULT '0' ,
+	`template` tinyint(1) unsigned NOT NULL  DEFAULT '0' ,
+	`left_head_font` char(7) COLLATE utf8_general_ci NULL  ,
+	`left_head_bg` char(7) COLLATE utf8_general_ci NULL  ,
+	`left_font` char(7) COLLATE utf8_general_ci NULL  ,
+	`left_bg_primary` char(7) COLLATE utf8_general_ci NULL  ,
+	`left_bg_secondary` char(7) COLLATE utf8_general_ci NULL  ,
+	`left_link` char(7) COLLATE utf8_general_ci NULL  ,
+	`left_hover` char(7) COLLATE utf8_general_ci NULL  ,
+	`right_head_font` char(7) COLLATE utf8_general_ci NULL  ,
+	`right_head_bg` char(7) COLLATE utf8_general_ci NULL  ,
+	`right_font` char(7) COLLATE utf8_general_ci NULL  ,
+	`right_bg_primary` char(6) COLLATE utf8_general_ci NULL  ,
+	`right_bg_secondary` char(7) COLLATE utf8_general_ci NULL  ,
+	`right_link` char(7) COLLATE utf8_general_ci NULL  ,
+	`right_hover` char(7) COLLATE utf8_general_ci NULL  ,
+	PRIMARY KEY (`uid`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `eportfolio_link`(
+	`id` int(5) unsigned NOT NULL  auto_increment ,
+	`owner` int(5) unsigned NOT NULL  DEFAULT '0' ,
+	`url` varchar(255) COLLATE utf8_general_ci NOT NULL  DEFAULT '' ,
+	`submitted` datetime NOT NULL  DEFAULT '0000-00-00 00:00:00' ,
+	`modified` datetime NULL  ,
+	`description` varchar(255) COLLATE utf8_general_ci NULL  ,
+	`comment` mediumtext COLLATE utf8_general_ci NULL  ,
+	`hidden` tinyint(1) NOT NULL  ,
+	PRIMARY KEY (`id`) ,
+	FULLTEXT KEY `fulltext`(`url`,`description`,`comment`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `eportfolio_log`(
+	`datetime` datetime NOT NULL  DEFAULT '0000-00-00 00:00:00' ,
+	`user` int(6) NOT NULL  DEFAULT '0' ,
+	`uid` int(6) NOT NULL  DEFAULT '0' ,
+	`hitcount` int(10) unsigned NULL  DEFAULT '0' ,
+	PRIMARY KEY (`user`,`uid`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `eportfolio_privateNotes`(
+	`uid` int(8) NULL  ,
+	`privateNotes` text COLLATE utf8_general_ci NULL
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `eportfolio_textBox`(
+	`textBoxID` int(11) NOT NULL  auto_increment ,
+	`userID` int(11) NULL  ,
+	`heading` varchar(100) COLLATE utf8_general_ci NULL  ,
+	`body` text COLLATE utf8_general_ci NULL  ,
+	`deleted` enum('true','false') COLLATE utf8_general_ci NOT NULL  DEFAULT 'false' ,
+	PRIMARY KEY (`textBoxID`) ,
+	KEY `categoryID`(`userID`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Create table in target */
+CREATE TABLE `eportfolioTemplateLayout`(
+	`templateID` int(11) NULL  ,
+	`componentId` int(11) NULL  ,
+	`column` smallint(6) NULL  ,
+	`position` smallint(6) NULL  ,
+	UNIQUE KEY `table`(`templateID`,`componentId`,`column`,`position`) ,
+	KEY `homepageID`(`templateID`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+
+/* Alter table in target */
+ALTER TABLE `myFile`
+	ADD COLUMN `published` datetime   NULL after `deleted`, COMMENT='';
+
+/* Alter table in target */
+ALTER TABLE `user`
+	ADD COLUMN `eportfolio_enabled` int(8)   NOT NULL DEFAULT '0' after `key`, COMMENT='';
+
+/* Create table in target */
+CREATE TABLE `wikiOpens`(
+	`openID` int(8) NOT NULL  auto_increment ,
+	`wikiID` int(8) NULL  ,
+	`userID` int(8) NULL  ,
+	`lastopened` datetime NULL  ,
+	PRIMARY KEY (`openID`)
+) ENGINE=MyISAM DEFAULT CHARSET='utf8';
