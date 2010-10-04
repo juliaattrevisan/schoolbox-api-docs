@@ -104,6 +104,11 @@ CREATE TABLE `assess_luQuestionType`(
 ) ENGINE=MyISAM DEFAULT CHARSET='utf8';
 
 
+insert  into `assess_luQuestionType`(`type_id`,`filename`,`description`,`automated_marking`) values (1,'short','Short Answer','false');
+insert  into `assess_luQuestionType`(`type_id`,`filename`,`description`,`automated_marking`) values (2,'multi','Multiple Choice','true');
+insert  into `assess_luQuestionType`(`type_id`,`filename`,`description`,`automated_marking`) values (3,'fillgap','Cloze Exercise','true');
+insert  into `assess_luQuestionType`(`type_id`,`filename`,`description`,`automated_marking`) values (4,'match','Matching Pairs','true');
+
 /* Create table in target */
 CREATE TABLE `assess_question`(
 	`question_id` int(11) NOT NULL  auto_increment ,
