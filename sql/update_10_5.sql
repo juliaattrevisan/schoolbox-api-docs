@@ -15,13 +15,12 @@ INSERT INTO error (id, message) VALUES (108, 'You do not have permission to leav
 INSERT INTO error (id, message) VALUES (109, 'You do not have permission to publish this file.');
 INSERT INTO error (id, message) VALUES (110, 'You do not have permission to modify these notes.');
 INSERT INTO error (id, message) VALUES (111, 'There are no blogs in this archive.');
-ALTER TABLE `user` ADD COLUMN eportfolio_enabled INT(8) NOT NULL DEFAULT 0;
 
 
 /* Assess
  * NB: Include schema of all tables with assess prefix.
  */
-INSERT INTO homepage_comp (size, method, `name`, description, filename, config, invisible) VALUES (1, 'outputAssess', 'Online Assessment', 'Online tests and quizzes.', 'assess.html', '', 'false')
+INSERT INTO homepage_comp (size, method, `name`, description, filename, config, invisible) VALUES (1, 'outputAssess', 'Online Assessment', 'Online tests and quizzes.', 'assess.html', '', 'false');
 
 INSERT INTO file_type (id, name) VALUES (11, 'Online Assessment');
 
