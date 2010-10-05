@@ -9,8 +9,8 @@
 				$j('#category a').removeClass('selected');
 				$j(this).addClass('selected');	
 				var el = $j(this).attr('title');
-				$j('ul.topic > li').hide();
-				$j('ul.topic > li.' + el).show();
+				$j('.topic').children().hide();
+				$j('#' + el).show();
 			}
 		});
 		
@@ -24,8 +24,7 @@
 		} else {
 		
 		$j('#category li:first-child a').addClass('selected');
-		$j('div.topic > div:first-child').show();
-		
+			$j('div.topic > div:first-child').show();
 		}
 		
 	});
@@ -46,12 +45,16 @@
     
   <!-- BEGIN news -->
   <div id="a{NEWS_ID}" class="news-item">
-    <h3 id="news-header"><a name="{NEWS_ID}"></a>{NEWS_TITLE}</h3>
+    <h3 id="news-header"><a name="{NEWS_ID}"></a><span>{NEWS_TITLE}</span></h3>
+	
     <span class="header_option">{MODIFY}</span>
-    {NEWS_BODY}
+	<div class="float-fix"></div>
+   	<div class="pad-it"> {NEWS_BODY}
     <hr />
     <p class="interact">Submitted by {POSTER} on {DATETIME}</p>
-    <div class="float-fix"></div>
+	   <div class="float-fix"></div>
+	</div>
+ 
   </div>
   <!-- END news -->
 </div>

@@ -14,7 +14,9 @@ table th,
 table td {
 	text-align: left;
 }
-body{background:#E4E4E4;}
+body{background:#E4E4E4 url(/images/bg.gif) repeat-y scroll;}
+#container, #container.login, #header.login, #footer.login{margin-left:180px;}
+
 
 /*---------------------------------------
 	Component Styles
@@ -59,7 +61,7 @@ table h2, #content table.ruler h2 {
 /*---------------------------------------
 	Nav Styles
 ----------------------------------------*/
-#nav{width:176px;}
+#nav{width:180px;}
 #nav h3 {
 	border-top: 1px solid #003d7b;
 	border-bottom: 1px solid #001c3a;
@@ -81,11 +83,15 @@ table h2, #content table.ruler h2 {
 	}
 #nav li a {
 	background: #00376f url(/images/shore/nav-link-bg.gif) repeat-x;
-	width:158px;
+	width:162px;
 	}
 #nav ul ul, #nav ul ul ul {
-left:176px;
-width:176px;
+left:180px;
+width:180px;
+
+	}
+	#nav ul ul a{
+	background:#1965B3;	
 	}
 #nav li a:hover {
 	background-color: #1965b4;
@@ -110,8 +116,12 @@ table .header_option {
 	margin-top: -25px;
 	}
 .news-item .header_option {
-	margin-top: -23px;
+	margin-top: -31px;
 	}
+	
+.news-item{border:1px solid #ebebeb; margin-bottom:10px; padding:0;}
+#news-header{background:#e1f0ff; width:100%; padding:10px 0; font-weight:bold;}
+#news-header span{padding:0 10px;}
 p.interact {
 	font-size: 100%;
 	}

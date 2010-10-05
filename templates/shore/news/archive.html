@@ -2,10 +2,18 @@
 <!-- BEGIN add_news --> <a class="customise" href="/news/modify">Add Announcements</a><!-- END add_news --></h1>
 <!-- BEGIN news -->
 <div class="news-item">
-	<h3 id="news-header">{NEWS_TITLE}</h3>
-  {NEWS_BODY}
-  <hr />
-  <p class="interact">Submitted by {POSTER} on {DATETIME} | {MODIFY}</p>
+	<h3 id="news-header">
+	
+	<span style="padding:0 10px;">{NEWS_TITLE}</span>
+	
+	</h3>
+	<div class="float-fix"></div>
+  <div class="pad-it">
+	{NEWS_BODY}
+	<p class="interact">Submitted by {POSTER} on {DATETIME} | {MODIFY}</p>
+	<div class="float-fix"></div>
+  </div>
+
 </div>  
 <!-- END news -->
 

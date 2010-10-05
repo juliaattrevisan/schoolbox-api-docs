@@ -267,10 +267,9 @@ text-indent:10px;}
 /*ICONS*/
 .btn { display:block; float: right; margin-left: 10px; }
 .btn:hover { background-position:bottom left; }
-.icons { padding:0; display: block; background:none; background-position:0 50%;background-repeat:no-repeat; }
-.icons a { display: block; padding: 6px 0 6px 30px; background-repeat: no-repeat; background-position: 0 50%; background-image: url(/images/mime/22x22/txt.png); }
-.folder_blue_full {padding:0 0 0 30px; background-image: url(/images/icons/22x22/folder.png); }
-.house { background-image: url(/images/famicons/house.png); }
+a.icons { display: block; padding: 6px 0 6px 30px; background-repeat: no-repeat; background-position: 0 50%; background-image: url(/images/mime/22x22/txt.png); }
+a.folder_blue_full {padding:0 0 0 30px; background-image: url(/images/icons/22x22/folder.png); }
+a.house { background-image: url(/images/famicons/house.png); }
 .success { background-image: url(/images/famicons/accept.png); background-position: 4px 3px; }
 .delete-btn { padding:2px 0 0 20px; background:url(/images/delete-icon.gif) no-repeat left top; height:14px; font-size:11px; color:#B8575B; }
 .add-btn { padding:2px 0 0 20px; background:url(/images/add-icon.gif) no-repeat left top; height:14px; font-size:11px; color:#6F9740; }
@@ -609,8 +608,8 @@ td.cal-right .link-case .filter-drop .filter-list{ border:1px solid #8e8f8f; bac
 td.cal-right .link-case .filter-drop hr{height:0px; width:100%; border-bottom:1px solid #8e8f8f; margin:15px 0 0 0;}
 td.cal-right .link-case .filter-drop a#applyFilters{display:block; color:#41a200; text-align:right;padding:10px 0;}
 .filter-cat{float:left; width:129px; text-align:center; margin-right:10px}
-.filter-cat span{font-weight:bold; height:17px;display:block}
-.filter-cat label{height:20px;text-align:left;display:block;float:left;margin:0; font-weight:normal; width:100%;}
+.filter-cat span{font-weight:bold; display:block; min-height:17px;}
+.filter-cat label{text-align:left;display:block;float:left;margin-bottom:2px; min-height:20px; font-weight:normal; width:100%;}
 .filter-cat .checkbox{clear:left;display:block;float:left;margin:0 5px 0 0;}
 .filter-cat.last{margin-right:0;}
 
@@ -768,12 +767,12 @@ p.forgotten{margin:10px 0;}
 .highlightedMessage div { padding: 20px; }
 
 /*NEWS*/
-.news-item {padding: 10px; margin-bottom:0; position:relative}
+.news-item {margin: 5px; padding:10px; margin-bottom:0; position:relative; border:1px solid #ebebeb;}
 #content .news-item h2{background:none; font-size:24px; color:#000; text-indent:0}
 .news-item ul li{list-style-type:circle;}
 .news-item .header_option{position:absolute; z-index:2; top:40px; right:20px;}
 .news-item .header_option a{color:#000;}
-#news-header{font-size:14px;  padding:10px;  background:#f1f1f1; margin-bottom:10px;}
+#news-header{font-weight:bold;font-size:14px; margin-bottom:10px; }
 .news-archive{margin:0 5px 10px 5px; -moz-box-shadow: 1px 2px 2px #f7f7f7;-webkit-box-shadow: 1px 2px 2px #f7f7f7; box-shadow: 1px 2px 2px #f7f7f7; }
 .news-archive img{padding:10px;}
 
