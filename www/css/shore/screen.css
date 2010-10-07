@@ -4,12 +4,12 @@
 #logo {
 	width: 298px;
 	height: 71px;
-	left:20px; top:20px;
+	left:20px; top:10px;
 	background: url(/images/shore/shore-logo.gif) no-repeat;
 	}
 #logo a{background:none;}
 #content {}
-#header{ margin-left:180px;}
+#header{ margin-left:180px; height:90px;}
 table th,
 table td {
 	text-align: left;
@@ -28,10 +28,10 @@ h2 {
 	background: #003e7e url(/images/shore/box-bg.png) repeat-x;
 	}
 table h2, #content table.ruler h2 {
-	background: 0;
+
 	border-bottom: 1px dashed #7F7F7F;
 	color: #000;
-	text-indent: 0;
+
 	}
 #content h2 a {
 	color: #fff;

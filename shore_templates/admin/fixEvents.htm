@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="James Leckie, Lektec Consulting"/> 
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core2.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/shore/screen.css" />
 
@@ -26,7 +26,7 @@
 <!-- END header_javascript -->
 
 </head>
-<body>
+<body id="admin-old"> 
 <!-- #BeginEditable "head" --><!-- #EndEditable -->
 
 <div id="nav">
@@ -64,42 +64,49 @@
     <li><a href="/editLinks.php">Add Link</a></li>
   </ul>	
 </div>
-
-<div id="container">
-  <div id="header">
-    <div id="logo"></div>
-    <form id="search" action="/search.php" method="post">
-      <fieldset>
-        <input id="search-field" type="text" />
-        <input id="search-button" type="image" src="/images/shore/search-button.gif" value="Search" />
-      </fieldset>
-    </form>  
-    <ul id="tabs">
-      <li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Home</a></li>
-      <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
-      <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">Announcements</a></li>
-      <!-- BEGIN webmail_tab -->
-      <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Email</a></li>
-      <!-- END webmail_tab -->
-      <!-- BEGIN timetable_tab -->
-      <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
-      <!-- END timetable_tab -->
-      <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
-      <li><a href="/logout.php" title="">Logout</a></li>
-    </ul>
-    
-    <!-- BEGIN myfiles_tab -->
-    <!-- END myfiles_tab -->
-    <!-- BEGIN portfolio_tab -->
-    <!-- END portfolio_tab -->
-  </div>
-  <div id="content">
-  <!-- #BeginEditable "content" -->
+<div id="wrap">
+	<div id="wrap-inner">
+	  <div id="header">
+	   <div id="logo"><a href="/" title="Lampada">Lampada</a></div>
+		<form id="search" action="/search.php" method="get">
+			<fieldset>
+			<input id="search-field" type="text" name="keyword" />
+			<input type="image" value="Search" src="/images/shore/search-button.gif" id="search-button">
+		  </fieldset>
+		</form>
+		<ul id="infoPanel">
+		  <li><a href="/logout.php" title="">Logout</a></li>
+		</ul>
+		<ul id="tabs">
+		  <li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Home</a></li>
+		  <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
+		  <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">Announcements</a></li>
+		  <!-- BEGIN webmail_tab -->
+		  <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Email</a></li>
+		  <!-- END webmail_tab -->
+		  <!-- BEGIN timetable_tab -->
+		  <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
+		  <!-- END timetable_tab -->
+		  <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
+		  <li><a href="/logout.php" title="">Logout</a></li>
+		</ul>
+		
+		<!-- BEGIN myfiles_tab -->
+		<!-- END myfiles_tab -->
+		<!-- BEGIN portfolio_tab -->
+		<!-- END portfolio_tab -->
+	  </div>
+	  <div id="container">
+		  <div id="content">
+		  <!-- #BeginEditable "content" -->
 			{RESULT}
 			<!-- #EndEditable -->
-  <div class="float-fix"></div>
-  </div>
+		  <div class="float-fix"></div>
+		  </div>
+		</div>
+	</div>
 </div>
+
 <div id="footer">
 	<ul>
   	<li>{YEAR} &copy; Copyright Shore</li>

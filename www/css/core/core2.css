@@ -71,6 +71,7 @@ ol { list-style-type:decimal; }
 ol { margin-left: 2.5em; }
 hr { background-color: #cccccc; border: 0; height: 1px; }
 .wysiwyg img { padding:20px; }
+img{border:0;}
 
 /*--------------------------------------------------------------
 CSS commands
@@ -116,7 +117,17 @@ th { font-weight:bold; }
 /*--------------------------------------------------------------
  Structural Styles
 --------------------------------------------------------------*/
+/* Ugly, ugly old admin system */
+#admin-old .standardForm h2{
+	background:none;
+	font-weight:bold;
+	font-size:14px;
+	color:#000;
+	text-indent:0;
+	border-bottom:0;
+}
 
+#admin-old .ruler{background:#F1F1F1; border:1px solid #ccc;}
 /*BODY*/
 #wrap { min-height: 100%; height: auto !important;height: 100%;}
 #wrap-inner { padding-bottom: 45px; }
@@ -767,7 +778,7 @@ p.forgotten{margin:10px 0;}
 .highlightedMessage div { padding: 20px; }
 
 /*NEWS*/
-.news-item {margin: 5px; padding:10px; margin-bottom:0; position:relative; border:1px solid #ebebeb;}
+.news-item {margin:0 5px 5px 5px; padding:10px;  position:relative; border:1px solid #ebebeb;}
 #content .news-item h2{background:none; font-size:24px; color:#000; text-indent:0}
 .news-item ul li{list-style-type:circle;}
 .news-item .header_option{position:absolute; z-index:2; top:40px; right:20px;}
@@ -784,7 +795,7 @@ p.forgotten{margin:10px 0;}
 #category li a {border:1px solid #ccc; border-bottom:0; display: block; padding: 5px 10px; background: #ccc; -moz-border-radius: 5px 5px 0 0; -webkit-border-radius:5px 5px 0 0; border-radius:5px 5px 0 0;}
 #category li a.selected {  background:#f0f0f0; border-color:#f0f0f0;}
 #category li a.disabled { color: #ccc; }
-.topic { border: 1px solid #ccc; clear: both; margin: 0; padding: 0; }
+.topic { border: 1px solid #ccc; clear: both; margin: 0; padding-top: 5px; }
 .listing ul.topic ul { margin: 0; }
 .listing ul.topic ul li { padding: 5px; }
 .box ul.topic li li { list-style: none; }
