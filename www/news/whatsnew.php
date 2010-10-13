@@ -20,8 +20,10 @@ class WhatsNew
 		//check for any new work
 		$count['duework'] = $this->newDueWork($id);
 		$count['retwork'] = $this->newReturnedWork($id);
+        $count['onlineAssessments'] = $this->newOnlineAssessments($id);
+        $count['reviewedOnlineAssessments'] = $this->newReviewedOnlineAssessments($id);
 
-		//check for new submissions in category submission boxes
+        //check for new submissions in category submission boxes
 		$subboxes = $this->newSubmission($id);
 
 		$count['subboxes'] = $subboxes;
@@ -132,10 +134,54 @@ class WhatsNew
 		return $count;
 	}
 
+    /**
+     * Get a count of how many new online assessments have been created after
+     * the last time the user visited the homepage.
+     * 
+     * @param <type> $category_id
+     * @return <type>
+     */
+	function newOnlineAssessments($category_id) {
+		$lastvisit = $this->lastDueWorkVisit();
+
+		$query = "SELECT COUNT(assess_id) AS onlineAssessments
+                  FROM assess
+                  WHERE category_id = '$category_id'
+                  AND created_at > '$lastvisit'
+                  AND user_id != '".$_SESSION['id']."'
+                  AND deleted_at IS NULL";
+
+		$result = $this->db->getRow($query);
+
+		return $result['onlineAssessments'];
+	}
+
+    /**
+     * Find out which assessments have been reviewed since you last checked.
+     * 
+     * @param <type> $category_id
+     * @return <type>
+     */
+	function newReviewedOnlineAssessments($category_id) {
+		$lastvisit = $this->lastDueWorkVisit();
+
+		$query = "SELECT COUNT(attempt_id) AS reviewedOnlineAssessments
+                  FROM assess
+                  LEFT JOIN assess_attempt ON assess.assess_id = assess_attempt.assess_id
+                  WHERE assess.category_id = '$category_id'
+                  AND assess_attempt.reviewed_at IS NOT NULL
+                  AND assess_attempt.reviewed_at > '$lastvisit'
+                  AND assess_attempt.user_id = '".$_SESSION['id']."'";
+
+		$result = $this->db->getRow($query);
+
+		return $result['reviewedOnlineAssessments'];
+	}
+
 	function newDueWork($id)
 	{
 		$lastvisit = $this->lastDueWorkVisit();
-		
+        
 		//check for due work (* currently does not check if work has been returned *)
 		$query = "SELECT COUNT(id) AS duework FROM submission_box WHERE category = '$id' AND created > '$lastvisit' AND owner != '".$_SESSION['id']."' AND deleted = 0"; 
 		$result = $this->db->getRow($query);

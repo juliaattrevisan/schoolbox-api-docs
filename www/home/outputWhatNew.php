@@ -12,6 +12,8 @@ $catList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subje
 
 $this->setBlock($component['name'], 'category_block', 'new_category');
 $this->setBlock($component['name'], 'mail_block', 'new_mail_block');
+$this->setBlock('category_block', 'new_online_assessment', 'online_assessment_block');
+$this->setBlock('category_block', 'reviewed_online_assessment', 'reviewed_block');
 $this->setBlock('category_block', 'due_work', 'due_block');
 $this->setBlock('category_block', 'ret_work', 'ret_block');
 $this->setBlock('category_block', 'sub_work', 'sub_block');
@@ -47,6 +49,23 @@ if(is_array($catList))
 		$this->setVar("NEW_CATEGORY_ID", $catInfo['id']);
 		
 		$sub = $whatnew->submissionDetails($catInfo['id']);
+
+        /* What's New for Online Assessments
+         */
+        if ($sub['onlineAssessments']) {
+			$this->parse('online_assessment_block', 'new_online_assessment');
+        }
+		else {
+			$this->setVar('online_assessment_block', '');
+        }
+
+        if ($sub['reviewedOnlineAssessments']) {
+			$this->parse('reviewed_block', 'reviewed_online_assessment');
+        }
+		else {
+			$this->setVar('reviewed_block', '');
+        }
+
 		if($sub['duework'])
 			$this->parse('due_block', 'due_work');
 		else
