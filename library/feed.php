@@ -38,7 +38,7 @@ class Feed {
 		is_array($forum)?0:$forum=array();
         is_array($blog)?0:$blog=array();
         is_array($blogComments)?0:$blogComments=array();
-        is_array($onlineAssessments)?0:$onlineAssesssments=array();
+        is_array($onlineAssessments)?0:$onlineAssessments=array();
 		
 		//get each of the areas
 		$feedList = array_merge($files, $links, $folders, $news, $wiki, $forum, $blog, $blogComments, $onlineAssessments);
