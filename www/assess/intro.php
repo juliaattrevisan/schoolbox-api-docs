@@ -13,11 +13,13 @@ require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-section.php');
 require_once('../library/assess/assess-attempt.php');
 require_once('../library/group.php');
+require_once('../library/user.php');
 
 $assessHandler = new Assess();
 $sectionHandler = new AssessSection();
 $attemptHandler = new AssessAttempt();
 $groupHandler = new Group();
+$userHandler = new User();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -44,6 +46,8 @@ if ($assessHandler->isExpired($this->arg[0])) {
     error(120);
 }
 
+$author = $userHandler->getByID($assess['user_id']);
+
 $allSummary = $assessHandler->getIntroSummary($this->arg[0]);
 $allSections = $sectionHandler->getList($assess['assess_id']);
 
@@ -54,6 +58,7 @@ $this->setVar(array(
     'ASSESS_START' => date('jS F Y, g:i:sa', strtotime($assess['start'])),
     'ASSESS_FINISH' => date('jS F Y, g:i:sa', strtotime($assess['finish'])),
     'FIRST_SECTION' => $allSections[0]['section_id'],
+    'ASSESS_AUTHOR' => $author['firstname'] . ' ' . $author['lastname'],
 ));
 
 $this->setFile(TEMPLATE_content, 'assess/intro.html');
@@ -127,6 +132,14 @@ else {
     else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess::UNLIMITED_DURATION)) {
         $this->setVar(array(
             'ERROR_STRING' => 'You have run out of time to complete this online assessment and cannot re-sit it.'
+        ));
+
+        $this->setVar('startTest_block', '');
+        $this->parse('error_block', 'error');
+    }
+    else if ($assessHandler->isExpired($this->arg[0])) {
+        $this->setVar(array(
+            'ERROR_STRING' => 'This online assessment has expired.'
         ));
 
         $this->setVar('startTest_block', '');

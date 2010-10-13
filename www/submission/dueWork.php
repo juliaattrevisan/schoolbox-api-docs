@@ -413,7 +413,7 @@ if ($allAssessments) {
         $currentAttempt = $attemptHandler->getLatestForUser($currentAssessment['assess_id'], $_SESSION['id']);
 
         $firstSection = $sectionHandler->getFirst($currentAssessment['assess_id']);
-        
+
         if (!$currentAttempt) {
             $this->setVar(array(
                 'ASSESS_CATEGORY' => $categoryLookup[$currentAssessment['category_id']],
@@ -468,7 +468,16 @@ if ($allAssessments) {
             ));
 
             $this->setVar('takeTest_block', '');
-            $this->parse('viewMarks_block', 'viewMarks');
+
+            /* Find out if this test has been marked; if it has, allow the
+             * student to see the feedback, otherwise remove link altogether
+             */
+            if ($currentAttempt['reviewed_at']) {
+                $this->parse('viewMarks_block', 'viewMarks');
+            }
+            else {
+                $this->setVar('viewMarks_block', '');
+            }
         }
 
         $this->parse('attempt_block', 'attempt', true);

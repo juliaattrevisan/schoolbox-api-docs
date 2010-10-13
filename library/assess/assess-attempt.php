@@ -44,17 +44,20 @@ class AssessAttempt extends Model {
     }
 
     /**
-     * The number of attempts made for an assess. Group them by user id to
-     * cater for multiple attempts.
+     * The number of attempts made for an assess. Optionally group them by
+     * user id to cater for multiple attempts.
      * 
      * @param <type> $assess_id
      * @return <type>
      */
-    function numAttempted($assess_id) {
+    function numAttempted($assess_id, $groupById = false) {
         $query = "SELECT COUNT(*)
                   FROM {$this->_table}
-                  WHERE assess_id = '$assess_id'
-                  GROUP BY user_id";
+                  WHERE assess_id = '$assess_id'";
+
+        if ($groupById) {
+            $query .= " GROUP BY user_id";
+        }
 
         return $this->db->getOne($query);
     }

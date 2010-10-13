@@ -50,6 +50,7 @@ if(is_array($subList)) {
         }
 
         $totals = $submissionHandler->getBoxCount($sub['id']);
+
         if ($sub['type_id'] == 11) {
             $this->setVar(array(
                 'ASSESS_ASSESS_ID' => $sub['id'],

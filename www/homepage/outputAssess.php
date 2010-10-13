@@ -67,12 +67,17 @@ if (is_array($allAssess)) {
             else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0)) {
                 $this->setVar('studentLink_block', '');
             }
+            else if ($assessHandler->isExpired($currentAssess['assess_id'])) {
+                $this->setVar('studentLink_block', '');
+            }
             else {
                 $this->parse('studentLink_block', 'studentLink');
             }
         }
 
-        if ($groupHandler->isStaff()) {
+        /* Modified this check so that only the owner can get these links
+         */
+        if ($assessHandler->isOwner($currentAssess['assess_id'])) {
             $this->parse('teacherLink_block', 'teacherLink');
         }
         else {
