@@ -26,8 +26,9 @@ class Feed {
 		$news = $this->getNews($cid, $limit);
 		$wiki = $this->getWiki($cid, $limit);
 		$forum = $this->getForum($cid, $limit);
-      $blog = $this->getBlog($cid, $limit);
-      $blogComments = $this->getBlogComments($cid, $limit);
+        $blog = $this->getBlog($cid, $limit);
+        $blogComments = $this->getBlogComments($cid, $limit);
+        $onlineAssessments = $this->getOnlineAssessments($cid, $limit);
 		
 		is_array($files)?0:$files=array();
 		is_array($links)?0:$links=array();
@@ -35,11 +36,12 @@ class Feed {
 		is_array($news)?0:$news=array();
 		is_array($wiki)?0:$wiki=array();
 		is_array($forum)?0:$forum=array();
-      is_array($blog)?0:$blog=array();
-      is_array($blogComments)?0:$blogComments=array();
+        is_array($blog)?0:$blog=array();
+        is_array($blogComments)?0:$blogComments=array();
+        is_array($onlineAssessments)?0:$onlineAssesssments=array();
 		
 		//get each of the areas
-		$feedList = array_merge($files, $links, $folders, $news, $wiki, $forum, $blog, $blogComments);
+		$feedList = array_merge($files, $links, $folders, $news, $wiki, $forum, $blog, $blogComments, $onlineAssessments);
 		
 		
 		//sort them
@@ -101,6 +103,37 @@ class Feed {
 		}
 		return $link;
 	}
+
+    /**
+     * Get a list of online assessments that were created.
+     * 
+     * @param <type> $cid
+     * @param <type> $limit
+     */
+    function getOnlineAssessments($cid, $limit) {
+        $query = "SELECT
+                      assess.assess_id, assess.title AS heading, assess.created_at,
+                      user.title, user.firstname, user.lastname,
+                      user.id AS uid
+                  FROM assess
+                  LEFT JOIN user ON assess.user_id = user.id
+                  WHERE assess.category_id = '$cid'
+                  AND assess.deleted_at IS NULL
+                  ORDER BY assess.created_at DESC LIMIT 0, $limit";
+
+        $this->db->query($query);
+
+        while ($row = $this->db->getNextArray()) {
+            $onlineAssessments[] = array(
+                'date' => $row['created_at'],
+                'type' => 'onlineassessment',
+                'message' => formatName($row) . ' posted the online assessment ' . scrubTEXT($row['heading']),
+                'messageHTML' => '<a href="/search/user/'.$row['uid'].'">' . formatName($row) . '</a> posted the online assessment <a href="/assess/intro/' . $row['assess_id'] . '">' . scrubTEXT($row['heading']) . '</a>',
+            );
+        }
+
+        return $onlineAssessments;
+    }
 	
 	function getNews($cid, $limit) {
 		$query = "SELECT sn.id, heading, UNIX_TIMESTAMP(datetime_posted) submitted, u.firstname, u.lastname, u.title, u.id as uid
