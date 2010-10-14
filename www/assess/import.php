@@ -12,18 +12,27 @@ require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-factory.php');
 require_once('../library/assess/assess-section.php');
 
+if (!is_numeric($this->arg[0])) {
+    error(18);
+}
+
+if ($_FILES['importXML']['tmp_name']) {
+    $data = file_get_contents($_FILES['importXML']['tmp_name']);
+}
+else {
+    error(134);
+}
+
 $factory = new AssessFactory();
 $assessHandler = new Assess();
 $sectionHandler = new AssessSection();
-
-$data = file_get_contents('assess/testxml');
 
 $xml = simplexml_load_string($data);
 
 /* Set up assess
  */
 $assess_id = $assessHandler->create(array(
-    'category_id' => scrubTEXT(37),
+    'category_id' => scrubTEXT($this->arg[0]),
     'user_id'     => $_SESSION['id'],
     'title'       => scrubTEXT($xml->title),
     'description' => scrubTEXT($xml->description),
@@ -76,5 +85,5 @@ for ($i=0; $i < count($xml->section); $i++) {
     }
 }
 
-die();
+localRedir('/assess/modify/' . $assess_id);
 ?>

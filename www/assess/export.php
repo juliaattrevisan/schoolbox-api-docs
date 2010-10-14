@@ -57,33 +57,39 @@ foreach($allSections as $currentSection) {
 
     if ($allQuestions) {
         foreach($allQuestions as $currentQuestion) {
-            $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
-            /* Load answer template into answerOption block
+            /* This if() clause allows for sections containing no questions.
+             * because they come out with getContents()
              */
-            $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/exportToMoodle.html');
-            $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
+            if ($currentQuestion['type_id']) {
+                $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
-            /* Reset answer options from previous iteration
-             */
-            $this->setVar('answerOption_block', '');
+                /* Load answer template into answerOption block
+                 */
+                $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/exportToMoodle.html');
+                $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
-            $this->setVar(array(
-                'QUESTION_QUESTION' => $currentQuestion['question'],
-                'QUESTION_MARKS' => $currentQuestion['marks'],
-                'QUESTION_TYPE_ID' => $currentQuestion['type_id'],
-                'QUESTION_TYPE_MOODLE' => $factory->getMoodleQuestionType($currentQuestion['type_id']),
-            ));
+                /* Reset answer options from previous iteration
+                 */
+                $this->setVar('answerOption_block', '');
 
-            /* Load individual answers
-             */
-            $answerHandler->exportMoodleAnswer($this, $currentQuestion['question_id']);
+                $this->setVar(array(
+                    'QUESTION_QUESTION' => $currentQuestion['question'],
+                    'QUESTION_MARKS' => $currentQuestion['marks'],
+                    'QUESTION_TYPE_ID' => $currentQuestion['type_id'],
+                    'QUESTION_TYPE_MOODLE' => $factory->getMoodleQuestionType($currentQuestion['type_id']),
+                ));
 
-            $this->parse('answerInputs_block', 'answerFormFragment', true);
-            $this->parse('question_block', 'question', true);
+                /* Load individual answers
+                 */
+                $answerHandler->exportMoodleAnswer($this, $currentQuestion['question_id']);
 
-            $this->setVar('answerFormFragment', '');
-            $this->setVar('answerInputs_block', '');
+                $this->parse('answerInputs_block', 'answerFormFragment', true);
+                $this->parse('question_block', 'question', true);
+
+                $this->setVar('answerFormFragment', '');
+                $this->setVar('answerInputs_block', '');
+            }
         }
     }
     else {
@@ -93,6 +99,13 @@ foreach($allSections as $currentSection) {
     $this->parse('section_block', 'section', true);
     $this->setVar('question_block', '');
 }
+
+/* Create a filename
+ */
+$filename = preg_replace('/[^a-zA-Z0-9\-\_]/', '_', $assess['title']) . '-' . date('YmdHis') . '.xml';
+
+header('Content-type: text/xml');
+header('Content-Disposition: attachment; filename="' . $filename . '"');
 
 $this->template->pparse('finaloutput', 'xml');
 

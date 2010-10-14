@@ -73,6 +73,13 @@ $j(document).ready(function() {
 <div id="assess">
 <h1>Manage Assessment {ASSESS_TITLE}</h1>
 
+<!-- BEGIN importXML -->
+<form action="/assess/import/{ASSESS_CATEGORY_ID}" method="post" enctype="multipart/form-data">
+    <input name="importXML" type="file" />
+    <input type="submit" value="Import from XML file" />
+</form>
+<!-- END importXML -->
+
 <div class="col-1">
 
 	<form name="create" action="/assess/{ACTION}/{ASSESS_ASSESS_ID}" class="standardForm standardGrey" method="post">

@@ -68,6 +68,7 @@ else {
     $this->setBlock(TEMPLATE_content, 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
     $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
+    $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
     $this->setTitle('Manage Assessment');
 
     $this->setVar(array(
@@ -198,6 +199,7 @@ else {
      */
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setVar('allQuestions_block', '');
+    $this->parse('importXML_block', 'importXML');
 }
 
 ?>
