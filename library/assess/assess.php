@@ -169,6 +169,8 @@ class Assess extends Model {
      * Gets a list of Questions that exist in a particular Assess. This is used
      * on the create question screens as a table of contents.
      *
+     * TODO: Sections disappear when their questions are all deleted?
+     * 
      * @param <type> $section_id
      * @return <type>
      */

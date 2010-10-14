@@ -330,5 +330,40 @@ class AssessAnswerMulti extends AssessAnswer {
             }
         }
     }
+
+    /**
+     * Imports form a Moodle XML object. This is largely an alias of create()
+     * but we create the array specially because of the naming conventions and
+     * structure of the original xml export.
+     *
+     * @param <type> $obj
+     */
+    function importMoodleAnswer($xmlObj, $question_id) {
+        foreach($xmlObj->answer as $currentAnswer) {
+
+            /* Set up data object in accordance with $this->create();
+             */
+            $answer['description'] = trim((string) $currentAnswer->text);
+            $answer['value'] = trim((string) $currentAnswer->value);
+            $answer['correct'] = 0;
+
+            /* Indicate this is a correct answer
+             */
+            if ($currentAnswer->attributes()->fraction > 0) {
+                $answer['correct'] = 1;
+            }
+
+            $allAnswers[] = $answer;
+        }
+
+        $object = array(
+            'answer_id' => '',
+            'question_id' => $question_id,
+            'sequence' => 1,
+            'allAnswers' => json_encode($allAnswers),
+        );
+
+        return $this->create($object, $question_id);
+    }
 }
 ?>

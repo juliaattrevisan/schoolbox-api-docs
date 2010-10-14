@@ -282,5 +282,33 @@ class AssessAnswerMatch extends AssessAnswer {
             }
         }
     }
+
+    /**
+     * Imports form a Moodle XML object. This is largely an alias of create()
+     * but we create the array specially because of the naming conventions and
+     * structure of the original xml export.
+     *
+     * @param <type> $obj
+     */
+    function importMoodleAnswer($xmlObj, $question_id) {
+        foreach($xmlObj->subquestion as $currentAnswer) {
+
+            /* Set up data object in accordance with $this->create();
+             */
+            $answer['answerLeft'] = trim((string) $currentAnswer->text);
+            $answer['answerRight'] = trim((string) $currentAnswer->answer);
+
+            $allAnswers[] = $answer;
+        }
+
+        $object = array(
+            'answer_id' => '',
+            'question_id' => $question_id,
+            'sequence' => 1,
+            'allAnswers' => json_encode($allAnswers),
+        );
+
+        return $this->create($object, $question_id);
+    }
 }
 ?>

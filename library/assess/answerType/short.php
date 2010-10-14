@@ -170,5 +170,23 @@ class AssessAnswerShort extends AssessAnswer {
 
         $page->parse('answerOption_block', 'answerOption', true);
     }
+
+    /**
+     * Imports form a Moodle XML object. This is largely an alias of create()
+     * but we create the array specially because of the naming conventions and
+     * structure of the original xml export.
+     *
+     * @param <type> $obj
+     */
+    function importMoodleAnswer($xmlObj, $question_id) {
+        $object = array(
+            'answer_id' => '',
+            'question_id' => $question_id,
+            'sequence' => 1,
+            'answer' => trim((string) $xmlObj->answer->text),
+        );
+
+        return $this->create($object, $question_id);
+    }
 }
 ?>

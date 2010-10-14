@@ -48,6 +48,7 @@ foreach($allSections as $currentSection) {
     $this->setVar(array(
         'SECTION_SECTION_ID' => $currentSection['section_id'],
         'SECTION_TITLE' => $currentSection['title'],
+        'SECTION_DESCRIPTION' => $currentSection['description'],
         'SECTION_RANDOM' => $currentSection['random'],
         'SECTION_POOL' => $currentSection['pool'],
     ));
@@ -70,7 +71,8 @@ foreach($allSections as $currentSection) {
             $this->setVar(array(
                 'QUESTION_QUESTION' => $currentQuestion['question'],
                 'QUESTION_MARKS' => $currentQuestion['marks'],
-                'QUESTION_TYPE_ID' => $factory->getMoodleQuestionType($currentQuestion['type_id']),
+                'QUESTION_TYPE_ID' => $currentQuestion['type_id'],
+                'QUESTION_TYPE_MOODLE' => $factory->getMoodleQuestionType($currentQuestion['type_id']),
             ));
 
             /* Load individual answers
@@ -89,6 +91,7 @@ foreach($allSections as $currentSection) {
     }
 
     $this->parse('section_block', 'section', true);
+    $this->setVar('question_block', '');
 }
 
 $this->template->pparse('finaloutput', 'xml');
