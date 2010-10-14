@@ -19,6 +19,9 @@ php_value upload_max_filesize 40M
 RewriteCond  %{REQUEST_URI} login.php$
 RewriteRule ^(.*)$ http://%{HTTP_HOST}/ [R,L]
 
+# Assess XML export to moodle
+RewriteRule ^assess/export/(\d+)\.xml$ /assess/export/$1
+
 # apply ssl
 #RewriteCond %{SERVER_PORT} !^443$
 #RewriteCond %{REQUEST_URI} ^/$

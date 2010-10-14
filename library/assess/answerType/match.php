@@ -7,8 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../include/model.php';
-require_once('../library/assess/assess-response.php');
 
 class AssessAnswerMatch extends AssessAnswer {
     const CORRECT_CLASS = 'matchCorrect';
@@ -206,7 +204,6 @@ class AssessAnswerMatch extends AssessAnswer {
      * @param <type> $question_id
      */
     function reviewResponse($page, $question_id) {
-        $left = array();
         $right = array();
 
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
@@ -254,6 +251,34 @@ class AssessAnswerMatch extends AssessAnswer {
                 $page->parse('answerOptionLeft_block', 'answerOptionLeft', true);
                 $page->parse('answerOptionRight_block', 'answerOptionRight', true);
                 $page->parse('answerOptionCorrectResponse_block', 'answerOptionCorrectResponse', true);
+            }
+        }
+    }
+
+    /**
+     * Exports the answer to Moodle XML format. This is a modified version of
+     * $this->reviewResponse()
+     *
+     * @param <type> $page
+     * @param <type> $question_id
+     */
+    function exportMoodleAnswer($page, $question_id) {
+        $page->setBlock('answerFormFragment', 'answerCorrect', 'answerCorrect_block');
+
+        $answerGroup = $this->getByQuestionID($question_id);
+
+        if ($answerGroup) {
+            $allAnswers = unserialize($answerGroup['answer']);
+
+            for($i=0; $i<count($allAnswers); $i++) {
+                $currentAnswer = $allAnswers[$i];
+
+                $page->setVar(array(
+                    'ANSWER_LEFT_VALUE' => $currentAnswer->answerLeft,
+                    'ANSWER_RIGHT_VALUE' => $currentAnswer->answerRight,
+                ));
+
+                $page->parse('answerCorrect_block', 'answerCorrect', true);
             }
         }
     }

@@ -7,8 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../include/model.php';
-require_once('../library/assess/assess-response.php');
 
 class AssessAnswerMulti extends AssessAnswer {
     const CORRECT_CLASS = 'multiCorrect';
@@ -295,6 +293,41 @@ class AssessAnswerMulti extends AssessAnswer {
         }
         else {
             $page->setVar('answerOption_block', '');
+        }
+    }
+
+    /**
+     * Exports the answer to Moodle XML format. This is a modified version of
+     * $this->reviewResponse()
+     *
+     * @param <type> $page
+     * @param <type> $question_id
+     */
+    function exportMoodleAnswer($page, $question_id) {
+        $answerGroup = $this->getByQuestionID($question_id);
+
+        if ($answerGroup) {
+            $allAnswers = unserialize($answerGroup['answer']);
+
+            foreach($allAnswers as $currentAnswer) {
+                if ($currentAnswer->correct) {
+                    $page->setVar(array(
+                        'ACTUAL_CORRECT_VALUE' => '100'
+                    ));
+                }
+                else {
+                    $page->setVar(array(
+                        'ACTUAL_CORRECT_VALUE' => '0'
+                    ));
+                }
+
+                $page->setVar(array(
+                    'ANSWER_VALUE' => $currentAnswer->value,
+                    'ANSWER_DESCRIPTION' => $currentAnswer->description,
+                ));
+                
+                $page->parse('answerOption_block', 'answerOption', true);
+            }
         }
     }
 }

@@ -83,5 +83,16 @@ class AssessFactory extends Model {
 
         return $this->db->getOne($query);
     }
+
+    /**
+     * Find out the moodle name
+     */
+    function getMoodleQuestionType($type_id) {
+        $query = "SELECT moodle
+                  FROM assess_luQuestionType
+                  WHERE type_id = '$type_id'";
+
+        return $this->db->getOne($query);
+    }
 }
 ?>

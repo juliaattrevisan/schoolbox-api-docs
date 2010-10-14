@@ -95,6 +95,7 @@ class Assess extends Model {
 
     /**
      * Get a list of Sections and their Questions for a particular Assess.
+     *
      * @param <type> $assess_id
      */
     function renderAssessContents($assess_id, $page) {
@@ -178,6 +179,7 @@ class Assess extends Model {
                          assess_section.sequence AS sectionSequence,
                          question_id,
                          question,
+                         type_id,
                          marks,
                          assess_question.sequence AS questionSequence
                   FROM assess_section

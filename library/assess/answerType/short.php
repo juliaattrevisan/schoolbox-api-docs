@@ -7,8 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../include/model.php';
-require_once('../library/assess/assess-response.php');
 
 class AssessAnswerShort extends AssessAnswer {
 
@@ -144,6 +142,25 @@ class AssessAnswerShort extends AssessAnswer {
             'REVIEWED_COMMENT' => $existing['comment'],
             'REVIEWED_MARKS' => $existing['mark'],
         ));
+
+        /* Show correct answer
+         */
+        $page->setVar(array(
+            'CORRECT_ANSWER' => $currentAnswer['answer']
+        ));
+
+        $page->parse('answerOption_block', 'answerOption', true);
+    }
+
+    /**
+     * Exports the answer to Moodle XML format. This is a modified version of
+     * $this->reviewResponse()
+     * 
+     * @param <type> $page
+     * @param <type> $question_id
+     */
+    function exportMoodleAnswer($page, $question_id) {
+        $currentAnswer = $this->getByQuestionID($question_id);
 
         /* Show correct answer
          */
