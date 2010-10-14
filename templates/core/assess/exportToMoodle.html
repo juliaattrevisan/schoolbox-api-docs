@@ -1,17 +1,31 @@
 <?xml version="1.0" ?>
-<quiz><!-- BEGIN question -->
-    <question type="{QUESTION_TYPE_ID}">
-        <name>
-            <text>{QUESTION_MARKS} marks</text>
-        </name>
-        <questiontext format="html">
-            <text><![CDATA[
-                {QUESTION_QUESTION}
-                ]]>
-            </text>
-        </questiontext>
-        <!-- BEGIN answerInputs -->
-        <!-- END answerInputs -->
-    </question>
-    <!-- END question -->
+<quiz>
+    <title>{ASSESS_TITLE}</title>
+    <description>{ASSESS_DESCRIPTION}</description>
+    <start>{ASSESS_START}</start>
+    <finish>{ASSESS_FINISH}</finish>
+    <duration>{ASSESS_DURATION}</duration>
+    <allowresit>{ASSESS_ALLOW_RESIT}</allowresit><!-- BEGIN section -->
+    <section>
+        <id>{SECTION_SECTION_ID}</id>
+        <title>{SECTION_TITLE}</title>
+        <random>{SECTION_RANDOM}</random>
+        <pool>{SECTION_POOL}</pool><!-- BEGIN question -->
+        <question type="{QUESTION_TYPE_ID}">
+            <name>
+                <text>{QUESTION_MARKS} marks</text>
+            </name>
+            <questiontext format="html">
+                <text><![CDATA[
+                    {QUESTION_QUESTION}
+                    ]]>
+                </text>
+            </questiontext>
+            <penalty>1</penalty>
+            <!-- BEGIN answerInputs -->
+            <!-- END answerInputs -->
+        </question>
+        <!-- END question -->
+    </section>
+    <!-- END section -->
 </quiz>
