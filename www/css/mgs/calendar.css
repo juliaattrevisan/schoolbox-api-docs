@@ -25,7 +25,7 @@
 #calendar table.calendarTable a  {
 	color: #00458C;
 	}
-#calendar table.calendarTable td { width: 40px; padding: 0; }
+#calendar table.calendarTable td { width: 14%; padding: 0; }
 #calendar table.calendarTable td,
 #calendar table.calendarTable th {
 	border-top: 2px solid #fff;

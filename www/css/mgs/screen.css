@@ -12,9 +12,10 @@ body {
 
 	}
 #content h2{color:#000;}
+#content h2 span a{color:#000;}
 .box a, a { color: #0033CC; }
 a:hover { color: #0066CC; }
-#content .box h2{color:#000;}
+#content .box h2{color:#000; -moz-border-radius:0;}
 .box ul {
 	list-style: none;
 	}
@@ -29,6 +30,7 @@ a:hover { color: #0066CC; }
 #loginForm .login {
 	margin-left: 210px;
 	}
+	
 /*---------------------------------------
 	Header Styles
 ----------------------------------------*/
@@ -78,7 +80,7 @@ a:hover { color: #0066CC; }
 	padding: 3px 0 3px 6px;
 	line-height: normal;
 	height:auto; 
-	font-weight:normal;
+	
 
 	}
 #nav li a {
@@ -150,7 +152,7 @@ a:hover { color: #0066CC; }
 	float: left;
 	border: 3px solid #00458a;
 	border-bottom: 0;
-	margin-bottom:7px;
+	margin-left:160px;
 	}
 #tabs li {
 	margin: 0;
@@ -165,13 +167,14 @@ a:hover { color: #0066CC; }
 	background: #caf2ff;
 	color: #333333;
 	font-weight: bold;
-	border: 0;
 	padding: 5px 15px;
 	line-height: normal;
 	font-size: 90%;
 	-moz-border-radius:0;
+	margin-right:0;
+	border:1px solid #00458a;
 	}
-#container #tabs li a.navthis {
+#tabs li a.navthis {
 	background: #00458a;
 	color: #fff;
 	}
