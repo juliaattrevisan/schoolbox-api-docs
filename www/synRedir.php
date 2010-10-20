@@ -68,7 +68,7 @@ if(is_array($formArray)) {
 <script>
 <?php
 if (!($nojs))
-	//echo "document.{$form}.submit();";
+	echo "document.{$form}.submit();";
 ?>
 </script>
 </body>
