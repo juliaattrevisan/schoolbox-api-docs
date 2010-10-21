@@ -39,7 +39,9 @@ a:hover { color: #c00; }
 	margin: 0;
 	width:auto;
 	}
-	
+.news-item .header_option {right:0;}
+.standardForm h3{font-weight:bold;}
+label{font-weight:bold;}
 #content .box h2{color:#fff;}
 #tabs {
 	bottom: 0;
@@ -60,6 +62,9 @@ a:hover { color: #c00; }
 	font-size: 90%;
 	height:auto;
 	margin:0;
+	-moz-border-radius:0;
+	-webkit-border-radius:0;
+	border-radius:0;
 	}
 #search-button{width:auto; height:auto; border:0;}
 #tabs li a:hover {

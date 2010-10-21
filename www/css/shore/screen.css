@@ -21,11 +21,19 @@ body{background:#E4E4E4 url(/images/bg.gif) repeat-y scroll;}
 /*---------------------------------------
 	Component Styles
 ----------------------------------------*/
+
+h1{border-bottom:1px dashed #7F7F7F;margin-bottom:1em;}
+
 h1 a.customise {
 	font-size: 12px;
 	}
-h2 {
+h2, .homepage h2 {
 	background: #003e7e url(/images/shore/box-bg.png) repeat-x;
+	font-weight:bold;
+	-moz-border-radius:0;
+	-webkit-border-radius:0;
+	border-radius:0;
+	font-size:116%;
 	}
 table h2, #content table.ruler h2 {
 
@@ -51,6 +59,9 @@ table h2, #content table.ruler h2 {
 	color:#003E7E;
 	display:block;
 	line-height:31px; margin:0;
+	-moz-border-radius:0;
+	-webkit-border-radius:0;
+	border-radius:0;
 }
 
 #tabs li{float:left; margin:0 0 0 1px;}
@@ -120,8 +131,8 @@ table .header_option {
 	}
 	
 .news-item{border:1px solid #ebebeb; margin-bottom:10px; padding:0;}
-#news-header{background:#e1f0ff; width:100%; padding:10px 0; font-weight:bold;}
-#news-header span{padding:0 10px;}
+#news-header{position:relative;background:#e1f0ff; width:100%; padding:10px 0; font-weight:bold; text-indent:10px;}
+
 p.interact {
 	font-size: 100%;
 	}

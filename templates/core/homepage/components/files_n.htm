@@ -44,15 +44,18 @@
         <h4>{FILE_DESCRIPTION}</h4>
         <!-- END file_no_url -->
         <div class="small-right">
-		  <p class="interact">
           <!-- BEGIN modify_file -->
-          <a href="/cms/file/{FILE_ID}">Modify</a>
+          <p class="interact">
+		  <a href="/cms/file/{FILE_ID}">Modify</a>
+		  </p>
           <!-- END modify_file -->
-        <p class="summ">{FILE_COMMENT}</p>
-        <p class="small summ">Posted by <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a> on {FILE_POSTED_DATE}</p>
-		</p>
+		 </div>
+		 <div class="float-fix"></div>
+        {FILE_COMMENT}
+        <p class="interact">Posted by <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a> on {FILE_POSTED_DATE}</p>
+		
         
-		</div>
+		
         <div class="float-fix"></div>
       </li>
       <!-- END files -->

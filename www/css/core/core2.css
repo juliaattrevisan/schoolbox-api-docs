@@ -92,7 +92,7 @@ CSS commands
 --------------------------------------------------------------*/
 h1, h2, h3, h4, h5, h6 { font-weight:normal; position:relative; margin:0;}
 h1 span, h2 span, h3 span, h4 span { font-weight:bold }
-h1{margin:0; border:0; font-size:1.33em; font-weight:bold; line-height:2; margin-bottom:4px; }
+h1{margin:0; border:0; font-size:1.33em; font-weight:bold; line-height:2; border-bottom:1px dashed #7F7F7F;margin-bottom:1em; }
 h2, .homepage h2 {margin:0; -moz-border-radius:5px 5px 0 0; border-radius:5px 5px 0 0; -webkit-border-radius:5px 5px 0 0; background:#0066b0 url(/images/core/body/heading-cover.png) repeat-x;; font-size:12px; height:29px; line-height:29px; text-indent:10px; }
 h3 { font-size:1em; line-height:1; }
 h4 {font-weight:normal; line-height:1.4; margin:0; font-size:12px;}
@@ -222,7 +222,8 @@ border:1px solid #333; border-left:-; border-bottom:0;display: block; height: 28
 .box .blog ul li { padding: 10px 10px; }
 
 .box h4 em{font-style:normal; font-weight:bold;}
-
+p.links-house{padding-top:10px;}
+a.link{background-repeat:no-repeat;}
 .box .listing ul ul { margin: 0 0 1em 1em; }
 .box .listing.blog p {margin:0; }
 .box .listing.blog p.interact { margin: 0; }
@@ -242,6 +243,7 @@ border:1px solid #333; border-left:-; border-bottom:0;display: block; height: 28
 h4.eventListing { width:70%; padding:5px 10px; -webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px;}
 p.interact { font-size: 90%; margin: 0 0 0 15px; float: right;  }
 p.interact-left { font-size: 90%; float: left; clear: none; white-space: nowrap; width: 120px; }
+p.interact-left.home-calendar{width:24%; }
 p.interact a { color: #003e7e; display:inline; }
 .box .thumb { margin: 0 15px 15px 0; display: block; float: left; width: 100px; }
 
@@ -778,12 +780,13 @@ p.forgotten{margin:10px 0;}
 .highlightedMessage div { padding: 20px; }
 
 /*NEWS*/
-.news-item {margin:0 5px 5px 5px; padding:10px;  position:relative; border:1px solid #ebebeb;}
+.news-item {margin:0 5px 5px 5px;  position:relative; border:1px solid #ebebeb;}
 #content .news-item h2{background:none; font-size:24px; color:#000; text-indent:0}
 .news-item ul li{list-style-type:circle;}
-.news-item .header_option{position:absolute; z-index:2; top:40px; right:20px;}
+.news-item .header_option{position:absolute; z-index:2; top:9px; right:0px; margin:0;}
 .news-item .header_option a{color:#000;}
-#news-header{font-weight:bold;font-size:14px; margin-bottom:10px; }
+#news-header{font-weight:bold;font-size:14px; margin-bottom:10px; background:#f8f8f8; padding:10px 0; text-indent:10px;}
+#news-header span a{padding:0 10px; position:absolute; right:0; top:30%; font-size:12px;}
 .news-archive{margin:0 5px 10px 5px; -moz-box-shadow: 1px 2px 2px #f7f7f7;-webkit-box-shadow: 1px 2px 2px #f7f7f7; box-shadow: 1px 2px 2px #f7f7f7; }
 .news-archive img{padding:10px;}
 
@@ -802,7 +805,8 @@ p.forgotten{margin:10px 0;}
 .box .listing .topic > li { padding: 0; margin: 0; height: 1%; }
 .topic li.hide, .topic .hide { display: none; border: 0; }
 .newsWrapper h2 { display: none; }
-
+.wysiwyg{padding:10px;}
+.submitted-by{margin-bottom:0; font-size:11px; text-align:right;}
 /*POLLING*/
 #pollForm { text-align: left; }
 #pollForm h3 { margin-bottom: 1em; }

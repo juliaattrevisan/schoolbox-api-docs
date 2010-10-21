@@ -27,39 +27,41 @@
 		<ul>
 			<!-- BEGIN blog -->
 			<li class="{BLOG_SHADING}">
-				<h4><em>{BLOG_HEADING}</em>
-					<p>{BLOG_BODY}</p>
-					<div class="blog_comments">
-					<!-- BEGIN comment -->
-					<p class="blog_title">{COMMENT_BODY}</p>
-					<p class="small summ separate">{COMMENT_OWNER}<br /> {COMMENT_CREATED} <br />{DELETE_COMMENT}</p>
-					<div class="float-fix"></div>
-					<!-- END comment -->
-		
-					<!-- BEGIN show_all -->
-					<p  class="interact"><a href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
-					<!-- END show_all -->
-				 </div>
+				<h4><em>{BLOG_HEADING}</em></h4>
 				
-				 <p><a class="interact post_comment" href="javascript:void();">Post comment</a></p>
+				<div class="small-right">
+					<p class="interact">{MODIFY_BLOG}</p>
+					
+				</div>
+
+		 	<div class="float-fix"></div>
+			
+				<p>{BLOG_BODY}</p>
+					<div class="blog_comments">
+						<!-- BEGIN comment -->
+						<p class="blog_title">{COMMENT_BODY}</p>
+						<p class="small summ separate">{COMMENT_OWNER}<br /> {COMMENT_CREATED} <br />{DELETE_COMMENT}</p>
+						<div class="float-fix"></div>
+						<!-- END comment -->
+			
+						<!-- BEGIN show_all -->
+						<p  class="interact"><a href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
+						<!-- END show_all -->
+					 </div>
+				<p class="links-house">
+				 <!-- BEGIN show_comment -->
+				<a class="show_comments" href="javascript:void();">Show {BLOG_COMMENTS} Comments</a> -
+				<!-- END show_comment -->
+				 <a class="interact post_comment" href="javascript:void();">Post comment</a>
+				</p>
 	
 				 <form class="standardForm" method="post" action="/blog/comment/new/{BLOG_ID}">
 					<p><textarea name="body" style="width: 100%;"></textarea></p>
 					<p><input type="submit" name="comment" value="Comment"/></p>
 				 </form>
-
-				</h4>
-				
-				<div class="small-right">
-					<p class="interact">{MODIFY_BLOG}</p>
-					<p class="interact">Posted by {BLOG_OWNER}
-					<p class="interact">{BLOG_CREATED}</p>
-					<!-- BEGIN show_comment -->
-					<p class="interact"><a class="show_comments" href="javascript:void();">Show {BLOG_COMMENTS} Comments</a></p>
-					<!-- END show_comment -->
-				</div>
-
-		 	<div class="float-fix"></div>
+				 
+				<p class="interact">Posted by {BLOG_OWNER} {BLOG_CREATED}</p>
+				<div class="float-fix"></div>
 			</li>
 		<div class="float-fix"></div>
 			<!-- END blog -->

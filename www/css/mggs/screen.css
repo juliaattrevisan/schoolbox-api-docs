@@ -71,8 +71,10 @@ body {
 }
 #search-button{
 	width:auto; border:0 none; height:auto;	
-	
 }
+
+#search-field{margin-left:35px;}
+
 #nav ul {	
 	margin-bottom: 15px;
 	background: #ededed url(/images/mggs/bg-nav-bottom.gif) no-repeat 0 100%;

@@ -32,13 +32,14 @@
   	<ul>
     	<!-- BEGIN link -->
     	<li class="{ON_OFF}">
-      	<h4 class="icons"><a class="{CLASS_HIDDEN} link" href="{LINK_URL}">{LINK_NAME}</a></h4>
+      	<h4><a class="icons link" href="{LINK_URL}">{LINK_NAME}</a></h4>
         <div class="small-right">
 			<!-- BEGIN modify_link --><p class="interact"><a href="/cms/link/{LINK_ID}">Modify</a></p><!-- END modify_link -->
-			<p class="summ">{LINK_COMMENT}</p>
-			<p class="small summ">Posted by <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a> on {LINK_POSTED_DATE}</p>
 		</div>
         <div class="float-fix"></div>
+		<p>{LINK_COMMENT}</p>
+		<p class="interact">Posted by <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a> on {LINK_POSTED_DATE}</p>
+		<div class="float-fix"></div>
       </li>
     	<!-- END link -->
     </ul>
@@ -46,5 +47,6 @@
   </div>
   <!-- BEGIN submit_link -->
     <p class="interact"><a href="/cms/link/new/{ID}">Post Link</a></p>
+	
     <!-- END submit_link -->
 </div>
