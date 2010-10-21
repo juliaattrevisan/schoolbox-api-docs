@@ -191,6 +191,14 @@ CREATE TABLE `eportfolio_comp`(
 	PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET='utf8';
 
+INSERT  INTO `eportfolio_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (1,1,'outputLinkList','Links','Web addresses.','links_n.htm','','false');
+INSERT  INTO `eportfolio_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (2,1,'outputTextBox','Text Box','Text box\r\n','textBox.html','','false');
+INSERT  INTO `eportfolio_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (3,1,'outputBlog','Blog','Personal blog.','blog.html','\r\n','false');
+INSERT  INTO `eportfolio_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (4,1,'outputFileList','Published Files','Files that you have published to your ePortfolio.','files_n.htm','a:5:{s:6:\"filter\";a:5:{i:0;s:8:\"document\";i:1;s:5:\"audio\";i:2;s:5:\"video\";i:3;s:5:\"image\";i:4;s:5:\"other\";}s:13:\"filterOptions\";a:5:{i:0;s:8:\"document\";i:1;s:5:\"audio\";i:2;s:5:\"video\";i:3;s:5:\"image\";i:4;s:5:\"other\";}s:4:\"sort\";s:11:\"Description\";s:7:\"sortdir\";s:3:\"Asc\";s:4:\"size\";i:0;}','false');
+INSERT  INTO `eportfolio_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (5,1,'outputImage','Image Advanced','Completely configurable image display, select the image, control the size and link to another location','image_n.htm','a:3:{s:5:\"pixel\";i:200;s:3:\"url\";s:1:\"#\";s:5:\"image\";s:13:\"Preview Image\";}','false');
+INSERT  INTO `eportfolio_comp`(`id`,`size`,`method`,`name`,`description`,`filename`,`config`,`invisible`) VALUES (6,1,'outputImageGallery','Image Gallery','Show a grid of image thumbnails sourced from the files uploaded onto this ePortfolio','gallery.htm','','false');
+
+
 
 /* Create table in target */
 CREATE TABLE `eportfolio_comp_location`(
