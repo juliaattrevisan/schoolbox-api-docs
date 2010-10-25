@@ -113,6 +113,7 @@ if (!empty($result['user'])) {
     $page->setBlock('user', 'due_work', 'due_work_block');
     $page->setBlock('user', 'timetable', 'timetable_block');
     $page->setBlock('user', 'helpdesk', 'helpdesk_block');
+    $page->setBlock('user', 'eportfolio', 'eportfolio_block');
     $page->setBlock('user', 'modify', 'modify_block');
     $page->setVar(array(
         'USER_DISP_COUNT' => count($result['user']),
@@ -142,6 +143,10 @@ if (!empty($result['user'])) {
             'USER_GROUP'      => $user['group_name'],
         ));
 
+        $page->setVar('helpdesk_block');
+        $page->setVar('timetable_block');
+        $page->setVar('eportfolio_block');
+
         if (!$group->isStudent($user['id']) || (!$group->isStaff() && !$group->isParentOfChild($user['id'])))
             $page->setVar('due_work_block');
         else
@@ -153,12 +158,11 @@ if (!empty($result['user'])) {
                 $page->parse('timetable_block', 'timetable');
                 if(HELPDESK_enable)
                     $page->parse('helpdesk_block', 'helpdesk');
-                else
-                    $page->setVar('helpdesk_block');
-            }
-            else {
-                $page->setVar('helpdesk_block');
-                $page->setVar('timetable_block');
+
+                //Show link to users eportfolio
+                if($user['eportfolio_enabled'])
+                    $page->parse('eportfolio_block', 'eportfolio');
+
             }
         }
         else {
@@ -166,8 +170,6 @@ if (!empty($result['user'])) {
             //Show staff timetables to other staff
             if($group->isStaff() && $group->isStaff($user['id']))
                 $page->parse('timetable_block', 'timetable');
-            else
-                $page->setVar('timetable_block');
         }
 
         if(!$_SESSION['su'])

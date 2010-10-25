@@ -29,12 +29,13 @@ class SynergeticClass extends MSSQL{
 			$classQuery = "StudentClasses.ClassCode = '$subCode'";
 
         $query = "
-		SELECT  DISTINCT CommunityStudents.Surname as lastname,
+		SELECT DISTINCT  CommunityStudents.Surname as lastname,
 			CommunityStudents.Preferred as firstname,
 			StudentSemester.YearLevel as yearlevel,
 			luHouse.Description as house,
 			CommunityStudents.ID as synergy_id,
-            vStudents.StudentMedicalAlert
+            vStudents.StudentMedicalAlert,
+            vStudents.StudentSpecialNeedsFlag
 		FROM    SynergyOne.dbo.Community CommunityStudents
 		INNER JOIN SynergyOne.dbo.StudentSemester StudentSemester ON CommunityStudents.ID = StudentSemester.ID
 		LEFT JOIN SynergyOne.dbo.StudentClasses StudentClasses ON (

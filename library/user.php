@@ -28,7 +28,7 @@ class User extends Model {
 	
 	function getByID($id) {
 	
-		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id,
+		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, eportfolio_enabled,
 						synergy_id, local_email, alt_email, email_pass, userCampus.campus, IF(superusers.id, 1, 0) as su
 				FROM user 
 					LEFT JOIN groups ON user.group_id = groups.id
@@ -42,7 +42,7 @@ class User extends Model {
 	function getBySynergy($sid) {
 	
 		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id,
-						synergy_id, local_email, alt_email, userCampus.campus, year
+						synergy_id, local_email, alt_email, userCampus.campus, year, eportfolio_enabled
 				FROM user 
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid

@@ -22,6 +22,8 @@ if(isStaff($_SESSION['gid']))
 	$this->setFile(TEMPLATE_content, 'class/classList.htm');
 	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
     $this->setBlock('student_list', 'medical', 'medical_block');
+    $this->setBlock('student_list', 'special', 'special_block');
+    $this->setBlock('student_list', 'eportfolio', 'eportfolio_block');
 	$this->setTitle('Class List');
 
 	$code = urldecode(implode('/', $this->arg));
@@ -72,7 +74,17 @@ if(isStaff($_SESSION['gid']))
                     $this->parse('medical_block','medical');
                 else
                     $this->setVar('medical_block','');
-                
+
+                if($student['StudentSpecialNeedsFlag'])
+                    $this->parse('special_block','special');
+                else
+                    $this->setVar('special_block','');
+
+                if($user['eportfolio_enabled'])
+                    $this->parse('eportfolio_block','eportfolio');
+                else
+                    $this->setVar('eportfolio_block','');
+
 				$this->parse("student_list_block", "student_list", true);		
 			}
 		}

@@ -31,8 +31,16 @@
     </tr>
     <tr class="{ON_OFF}">
         
-        <td><a href="/timetable/{SYNERGYID}">Timetable</a></td><td><a href="/submission/dueWork/{SYNERGYID}">Due Work</a></td>
-        <td colspan="5"><!-- BEGIN medical --><img src="/images/famicons/exclamation.png" title="important"/>{MEDICAL_ALERT}<!-- END medical --></td></tr>
+        <td><a href="/timetable/{SYNERGYID}">Timetable</a><br />
+            <!-- BEGIN eportfolio --><a href="/eportfolio/{ID}">ePortfolio</a><!-- END eportfolio -->
+        </td>
+        <td><a href="/submission/dueWork/{SYNERGYID}">Due Work</a><br/></td>
+        <td colspan="5">
+            <!-- BEGIN special --><img src="/images/famicons/bell.png" title="Special Needs"/><!-- END special -->
+            <!-- BEGIN medical --><img src="/images/famicons/exclamation.png" title="Medical Alert"/>{MEDICAL_ALERT}<!-- END medical -->
+            
+        </td>
+    </tr>
     <!-- END student_list -->
   </tbody>
   <thead>

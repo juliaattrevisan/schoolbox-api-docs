@@ -43,7 +43,7 @@ function authenticateLDAP($username, $password) {
         }
         ldap_unbind($ds);
 
-        if(defined(LDAP_host2))  {
+        if(defined('LDAP_host2'))  {
 			//Try student server
 			$ds=ldap_connect(LDAP_host2);
 			ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
