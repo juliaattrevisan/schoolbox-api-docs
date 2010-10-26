@@ -136,7 +136,7 @@ th { font-weight:bold; }
 #content h2,#content h2 span a, #content h2 a{color: #ffffff;}
 
 /*HEADER*/
-#header { border-bottom:1px solid #B8B8B8;position:relative;height: 116px; padding-right: 15px; border: 0; background: url(/images/core/header-background.gif) repeat-x; }
+#header { border-bottom:1px solid #B8B8B8;position:relative;height: 116px; padding-right: 15px;  background: url(/images/core/header-background.gif) repeat-x; }
 #logo, #logo a { text-indent:-9999em; font-size:1px; position:absolute; background: url(/images/core/core-v2-logo.jpg) no-repeat; height: 116px; width: 400px; top: 0px; left: 0px; }
 #logo a{left:0; top:0;}
 
@@ -161,7 +161,7 @@ th { font-weight:bold; }
 	#nav li a:hover, #nav li li a:hover { background: #1597cb; color: #fff; text-decoration: none; }
 	#nav .lastChild{border-bottom:0;}
 	#nav ul ul { border: 1px solid #dbdbdb; }
-	#nav ul ul li { border: 0; border-top: 1px solid #dbdbdb; }
+	#nav ul ul li { border: 0;  }
 	#nav ul ul li:first-child { border: 0; }
 	#nav ul ul a { color: #fff; background: #818181; }
 	#nav li li { border: 0; }

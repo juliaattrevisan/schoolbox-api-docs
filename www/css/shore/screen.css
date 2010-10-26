@@ -89,7 +89,7 @@ table h2, #content table.ruler h2 {
 	border-bottom: 1px solid #002c59;
 	}
 #nav li li {
-	border-bottom: 1px solid #0451a3;
+	border-bottom: 1px solid #0451a3 !important;
 	border-top: 0;
 	}
 #nav li a {
