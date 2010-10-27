@@ -33,6 +33,7 @@ if (is_array($allAssess)) {
         $this->setVar(array(
             'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
             'ASSESS_TITLE' => $currentAssess['title'],
+            'ASSESS_START_DATE' => date('jS F Y, g:i:sa', strtotime($currentAssess['start'])),
             'ASSESS_FINISH_DATE' => date('jS F Y, g:i:sa', strtotime($currentAssess['finish'])),
             'ASSESS_DESCRIPTION' => $currentAssess['description'],
             'ON_OFF' => $i%2 ? 'dark' : '',
@@ -51,6 +52,7 @@ if (is_array($allAssess)) {
          *
          * 1. The assessment allows resit and the assessment hasn't expired
          * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
+         * 3. The current time has passed the test's starting time
          */
         if ($currentAssess['allow_resit'] == 1) {
             if (($currentAssess['duration'] == Assess::UNLIMITED_DURATION) || (strtotime($currentAssess['finish']) > time())) {
@@ -68,6 +70,9 @@ if (is_array($allAssess)) {
                 $this->setVar('studentLink_block', '');
             }
             else if ($assessHandler->isExpired($currentAssess['assess_id'])) {
+                $this->setVar('studentLink_block', '');
+            }
+            else if (((int)time() - (int)strtotime($currentAssess['start'])) < 0) {
                 $this->setVar('studentLink_block', '');
             }
             else {

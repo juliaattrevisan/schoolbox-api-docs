@@ -58,4 +58,7 @@ if (is_array($allSummary) && count($allSummary)) {
         $this->parse('section_block', 'section', 'true');
     }
 }
+else {
+    $this->setVar('section_block', '');
+}
 ?>
