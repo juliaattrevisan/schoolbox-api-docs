@@ -17,6 +17,7 @@ $j(function() {
 				<th>Time taken</th>
 				<th>Mark</th>
 				<th>Percentage</th>
+                <th>Unmarked Questions</th>
 				<th>Review Test</th>
                 <th>Review Status</th>
 			</tr>
@@ -29,6 +30,7 @@ $j(function() {
 				<td>{ATTEMPT_TIME_TAKEN}</td>
 				<td>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</td>
 				<td>{ATTEMPT_PERCENTAGE}%</td>
+                <td>{ATTEMPT_UNMARKED_RESPONSES}</td>
 				<td><a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Review</td>
                 <td>{ATTEMPT_REVIEW_STATUS}</td>
 			</tr>

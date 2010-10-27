@@ -160,9 +160,27 @@ class AssessResponse extends Model {
      */
     function getLastSave($attempt_id) {
         $query = "SELECT updated_at
-                  FROM assess_response
+                  FROM {$this->_table}
                   WHERE attempt_id = '$attempt_id'
                   ORDER BY updated_at DESC";
+
+        return $this->db->getOne($query);
+    }
+
+    /**
+     * Count the number of questions that were not automarked AND not reviewed.
+     * This indicates questions that remain to be reviewed manually.
+     *
+     * @param <type> $attempt_id
+     * @return <type>
+     */
+    function numNotAutomarked($attempt_id) {
+        $query = "SELECT COUNT(*)
+                  FROM {$this->_table}
+                  LEFT JOIN assess_attempt ON assess_attempt.attempt_id = {$this->_table}.attempt_id
+                  WHERE {$this->_table}.attempt_id = '$attempt_id'
+                  AND assess_attempt.reviewed_at IS NULL
+                  AND automarked_already = 'false'";
 
         return $this->db->getOne($query);
     }

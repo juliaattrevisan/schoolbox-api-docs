@@ -117,8 +117,12 @@ if ($allAttempts) {
             $reviewedAt = 'Reviewed on ' . date('jS F Y, g:i:sa', strtotime($currentAttempt['reviewed_at']));
         }
         else {
-            $reviewedAt = '';
+            $reviewedAt = 'Not reviewed';
         }
+
+        /* Count how many responses haven't been automarked
+         */
+        $numNotAutomarked = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
 
         $this->setVar(array(
             'ASSESS_ASSESS_ID' => $this->arg[0],
@@ -131,6 +135,7 @@ if ($allAttempts) {
             'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
             'ATTEMPT_PERCENTAGE' => $percentage,
             'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
+            'ATTEMPT_UNMARKED_RESPONSES' => $numNotAutomarked,
         ));
 
         $this->parse('attempt_block', 'attempt', true);
