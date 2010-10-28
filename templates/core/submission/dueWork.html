@@ -1,17 +1,17 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
 $j(function () {
-			 
+
 	$j('#subjectFilter').change(function () {
 		$j('li.event').fadeTo(0, 1);
-		
+
 		var categoryID = $j(this).val();
 		if (categoryID != '') {
 			$j('li.event:not(.category-' + categoryID + ')').fadeTo(0, 0.4);
 		}
-	
+
 	});
-	
+
 	$j('#childSelect').change(function () {
 		window.open('/submission/dueWork/{SELECTED_DATE}/' + $j(this).val(), '_self', '');
 		return false;
@@ -26,7 +26,7 @@ $j(function() {
 	$j('.calendarTable ul li span').click(function(){
 		$j('div.bubble').remove();
 		var node = $j(this).closest('li'), ev = node.attr("id").substring(6);
-		
+
 		$j.post('/ajax/submission.php', { id : ev }, function(data){
 							winStr = '<div class="bubble"> \
 													<div class="bubble-main"> \
@@ -37,12 +37,12 @@ $j(function() {
 															</p>';
 							if(data.comment != '')
 								winStr += '<p class="comment">'+data.comment+'</p>';
-							
+
 							winStr += '<p class="details">';
-							
+
 							if(data.fid > 0)
 								winStr += '<a href="/send.php?id='+data.fid+'&save=1">Download</a>';
-							
+
 							if(data.submitted == 'false')
 								winStr += ' | <a href="/submission/submitWork/'+data.id+'">Submit</a>';
 
@@ -56,14 +56,14 @@ $j(function() {
 		return false;
 	});
 });
-	
+
 	function closeBubble(){
 		$j('a.bubble-close').click(function(){
 			$j(this).closest('div.bubble').remove();
 			return false;
 		});
 	}
-	
+
 </script>
 
 <!-- Completion graph -->
@@ -101,7 +101,7 @@ $j(document).ready(function() {
 				<option value="{SUBJECT_ID}">{SUBJECT_NAME}</option>
 				<!-- END subject -->
 			</select>
-			
+
 			<!-- BEGIN is_parent -->
 			<select name="child" id="childSelect">
 				<!-- BEGIN child -->
@@ -121,7 +121,7 @@ $j(document).ready(function() {
       <th width="14%" class="dark">Fri</th>
       <th width="14%" class="dark">Sat</th>
     </tr>
-    
+
 
      <!-- BEGIN week -->
       <tr>
@@ -137,9 +137,9 @@ $j(document).ready(function() {
               <!-- END event -->
             </ul>
           </td>
-          <!-- END day -->        
+          <!-- END day -->
       </tr>
-    <!-- END week --> 
+    <!-- END week -->
     </tbody>
   </table>
 </div>
@@ -170,13 +170,13 @@ $j(document).ready(function() {
         <td>&nbsp;</td>
         <td>
         <!-- BEGIN download -->
-        <a href="/send.php?id={FILE_ID}&save=1">Download</a> / 
+        <a href="/send.php?id={FILE_ID}&save=1">Download</a> /
         <!-- END download -->
 		<!-- BEGIN submit -->
         <a href="/submission/submitWork/{BOX_ID}">Submit</a></td>
 		<!-- END submit -->
       </tr>
-     
+
       <!-- END due -->
     </tbody>
   </table>
@@ -218,12 +218,20 @@ $j(document).ready(function() {
 </div>
 <!-- END has_return -->
 
+<style type="text/css">
+table.onlineAssessments td {
+    vertical-align: top;
+}
 
+p.unmarkedResponses {
+   margin-top: 8px;
+}
+</style>
 <!-- BEGIN allAssess -->
 <div class="box component">
 <h2>Online Assessments</h2>
     <div class="text listing">
-        <table class="due-dates">
+        <table class="due-dates onlineAssessments">
             <thead>
                 <tr>
                     <th width="20%">Subject</th>
@@ -233,24 +241,32 @@ $j(document).ready(function() {
                     <th width="20%">Action</th>
                 </tr>
             </thead>
-        <tbody>
-            <!-- BEGIN attempt -->
-            <tr class="{DARK}">
-                <td>{ASSESS_CATEGORY}</td>
-                <td>{ASSESS_TITLE}</td>
-                <td>{ASSESS_FINISH}</td>
-                <td>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS} ({ATTEMPT_PERCENTAGE}%)</td>
-                <td>
-                    <!-- BEGIN viewMarks -->
-                    <a href="/assess/studentReview/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">View Results</a>
-                    <!-- END viewMarks -->
-                    <!-- BEGIN takeTest -->
-                    <a href="/assess/intro/{ASSESS_ASSESS_ID}">Take Test</a>
-                    <!-- END takeTest -->
-                </td>
-            </tr>
-            <!-- END attempt -->
-        </tbody>
+            <tbody>
+                <!-- BEGIN attempt -->
+                <tr class="{DARK}">
+                    <td>{ASSESS_CATEGORY}</td>
+                    <td>{ASSESS_TITLE}</td>
+                    <td>{ASSESS_FINISH}</td>
+                    <td>
+                        {ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS} ({ATTEMPT_PERCENTAGE}%)
+                        <!-- BEGIN unmarked -->
+                        <p class="unmarkedResponses">
+                            <strong>Unconfirmed mark.</strong><br />
+                            {ATTEMPT_UNMARKED_RESPONSES} questions not yet marked
+                        </p>
+                        <!-- END unmarked -->
+                    </td>
+                    <td>
+                        <!-- BEGIN viewMarks -->
+                        <a href="/assess/studentReview/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">View Results</a>
+                        <!-- END viewMarks -->
+                        <!-- BEGIN takeTest -->
+                        <a href="/assess/intro/{ASSESS_ASSESS_ID}">Take Test</a>
+                        <!-- END takeTest -->
+                    </td>
+                </tr>
+                <!-- END attempt -->
+            </tbody>
         </table>
     </div>
 </div>
@@ -284,14 +300,14 @@ $j(document).ready(function() {
     <h2>Activities</h2>
     <div class="text listing">
       <ul>
-        <!-- BEGIN activity --> 
+        <!-- BEGIN activity -->
         <li class="{DARK}">
           <h4>{ACTIVITY_DESCRIPTION}</h4>
 		  <p class="interact">{ACTIVITY_DATE}</p>
           <div class="float-fix"></div>
         </li>
         <!-- END activity -->
-       
+
       </ul>
     </div>
   </div>

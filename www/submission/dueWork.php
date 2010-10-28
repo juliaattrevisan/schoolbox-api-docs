@@ -387,15 +387,18 @@ $this->dropDown('subject', $categoryList, '', TEMPLATE_content, array('id' => 'S
  */
 require_once(SITE_root . '/library/assess/assess.php');
 require_once(SITE_root . '/library/assess/assess-attempt.php');
+require_once(SITE_root . '/library/assess/assess-response.php');
 require_once(SITE_root . '/library/assess/assess-section.php');
 
 $this->setBlock(TEMPLATE_content, 'allAssess', 'allAssess_block');
 $this->setBlock('allAssess', 'attempt', 'attempt_block');
 $this->setBlock('attempt', 'viewMarks', 'viewMarks_block');
 $this->setBlock('attempt', 'takeTest', 'takeTest_block');
+$this->setBlock('attempt', 'unmarked', 'unmarked_block');
 
 $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();
+$responseHandler = new AssessResponse();
 $sectionHandler = new AssessSection();
 
 /* Store a lookup so you don't need to make new queries all day
@@ -453,6 +456,21 @@ if ($allAssessments) {
             }
             else {
                 $percentage = 0;
+            }
+
+            /* Count how many responses haven't been automarked
+             */
+            $numNotAutomarked = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
+
+            if ($numNotAutomarked) {
+                $this->setVar(array(
+                    'ATTEMPT_UNMARKED_RESPONSES' => $numNotAutomarked
+                ));
+
+                $this->parse('unmarked_block', 'unmarked');
+            }
+            else {
+                $this->setVar('unmarked_block', '');
             }
 
             $this->setVar(array(
