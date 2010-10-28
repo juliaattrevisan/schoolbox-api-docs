@@ -134,7 +134,15 @@ if(is_numeric($this->arg[0])) {
         else if(($_SESSION['id'] == $user['uid']) || $groupHandler->isStudent($user['uid']) && ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['uid']))) {
             ////only allow staff to see student information or parent
 			$this->parse("portrait_block", "portrait");
-			$this->parse("timetable_link_block", "timetable_link");
+
+            /* Timetable shouldn't appear if synergy is disabled in the conf
+             */
+            if (SYNERGY_enable) {
+                $this->parse("timetable_link_block", "timetable_link");
+            }
+            else {
+                $this->setVar('timetable_link_block', '');
+            }
 
             $this->parse("due_work_block", "due_work");
 

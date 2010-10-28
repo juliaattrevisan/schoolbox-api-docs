@@ -155,7 +155,16 @@ if (!empty($result['user'])) {
         //Show student timetables to staff and parents of child
         if($group->isStudent($user['id'])) {
             if ($group->isStaff() || $group->isParentOfChild($user['id'])) {
-                $page->parse('timetable_block', 'timetable');
+                
+                /* Timetable shouldn't appear if synergy is disabled in the conf
+                 */
+                if (SYNERGY_enable) {
+                    $page->parse('timetable_block', 'timetable');
+                }
+                else {
+                    $page->setVar('timetable_block', '');
+                }
+                
                 if(HELPDESK_enable)
                     $page->parse('helpdesk_block', 'helpdesk');
 
