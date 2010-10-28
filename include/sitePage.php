@@ -96,6 +96,7 @@ class SitePage extends Page {
 								'SITE_GREETING' => greeting(),
 								'SITE_LOGINNAME'=> formatName($_SESSION),
 								'SITE_LOCATION'	=> $this->site,
+                                'USER_ID'       => $_SESSION['id'],
 							);
 		$this->setVar($templateVar);
 
