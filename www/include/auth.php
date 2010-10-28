@@ -132,9 +132,15 @@ function authenticate(&$db, $username, $password, $remember = 0)
 	}
 	if($result == true) {
 
-		$query = "SELECT user.id, title, firstname, lastname, username, group_id, synergy_id, year, superusers.id AS su, password, email_pass, local_email, mail_handler, eportfolio_enabled
+		$query = "SELECT user.id, title, firstname, lastname, username, group_id, synergy_id, year, superusers.id AS su, password, email_pass, local_email, alt_email, mail_handler, eportfolio_enabled
 		FROM user LEFT JOIN superusers ON user.id = superusers.id WHERE username = '". mysql_real_escape_string( $username)."'";
 		$user = $db->getRow($query);
+
+        if($user == false) {
+            print "Unable to find ".$username;
+            exit;
+            return false;
+        }
 	}
 
 	//log the authentication attempt
@@ -164,6 +170,7 @@ function authenticate(&$db, $username, $password, $remember = 0)
 		$_SESSION['gid'] = $user['group_id'];
 		$_SESSION['year'] = $user['year'];
 		$_SESSION['local_email'] = $user['local_email'];
+        $_SESSION['alt_email'] = $user['alt_email'];
 		$_SESSION['lasttime'] = mktime();
 		$_SESSION['username'] = $user['username'];
 		$_SESSION['password'] = $user['email_pass'];

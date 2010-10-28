@@ -153,9 +153,10 @@ class SitePage extends Page {
 	function initSession() {
 		session_start();
 
-		if ( !isset($_SESSION['id']) )
-			$this->goLoginPage();
-
+		if ( !isset($_SESSION['id']) ) {
+            if($_SERVER[''])
+            $this->goLoginPage();
+        }
 		//if ip tracking enabled ensure user has same ip as when they logged in
 		if(TRACKIP && $_SESSION['ip'] != getIP())
 			$this->goLoginPage();
