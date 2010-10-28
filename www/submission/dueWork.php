@@ -432,6 +432,7 @@ if ($allAssessments) {
 
             $this->setVar('viewMarks_block', '');
             $this->parse('takeTest_block', 'takeTest');
+            $this->setVar('unmarked_block', '');
         }
         else {
             /* Finish time
@@ -462,7 +463,7 @@ if ($allAssessments) {
              */
             $numNotAutomarked = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
 
-            if ($numNotAutomarked) {
+            if ($numNotAutomarked == 0) {
                 $this->setVar(array(
                     'ATTEMPT_UNMARKED_RESPONSES' => $numNotAutomarked
                 ));

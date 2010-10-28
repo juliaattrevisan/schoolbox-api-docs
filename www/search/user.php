@@ -131,7 +131,7 @@ if(is_numeric($this->arg[0])) {
                $this->setVar('parent_synergy_form_block');
            }
         }
-        else if($groupHandler->isStudent($user['uid']) && ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['uid']))) {
+        else if(($_SESSION['id'] == $user['uid']) || $groupHandler->isStudent($user['uid']) && ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['uid']))) {
             ////only allow staff to see student information or parent
 			$this->parse("portrait_block", "portrait");
 			$this->parse("timetable_link_block", "timetable_link");
@@ -254,6 +254,14 @@ if(is_numeric($this->arg[0])) {
     }
     else {
         $this->setVar('eportfolio_block', '');
+    }
+
+    /* Allow students, staff and parents of the student to see information about
+     * due work. Also allow the current user if they view themselves in the
+     * search results.
+     */
+    if (($_SESSION['id'] == $user['uid']) || $groupHandler->isStudent($user['uid']) && ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['uid']))) {
+        $this->parse("due_work_block", "due_work");
     }
 }
 else {
