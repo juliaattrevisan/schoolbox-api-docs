@@ -27,7 +27,7 @@ if (!$userID) {
 	error(31);
 }
 
-if (!$eportfolioHandler->isEnabled()) {
+if (!$eportfolioHandler->isEnabled($userID)) {
     error(100);
 }
 

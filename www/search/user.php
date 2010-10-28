@@ -9,7 +9,7 @@ if(is_numeric($this->arg[0])) {
 	$this->setTitle('Address Book');
 
 	$userHandler = new User;
-	
+
     $groupHandler = new Group;
 
 	$user = $userHandler->getByID($this->arg[0]);
@@ -25,6 +25,7 @@ if(is_numeric($this->arg[0])) {
         $this->setBlock(TEMPLATE_content, "timetable_link", "timetable_link_block");
         $this->setBlock(TEMPLATE_content, "due_work", "due_work_block");
         $this->setBlock(TEMPLATE_content, "helpdesk", "helpdesk_block");
+        $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
         $this->setBlock(TEMPLATE_content, "student_synergy_form", "student_synergy_form_block");
         $this->setBlock(TEMPLATE_content, "student_synergy_tutor", "student_synergy_tutor_block");
         $this->setBlock(TEMPLATE_content, 'contact_synergy', 'contact_synergy_block');
@@ -33,7 +34,7 @@ if(is_numeric($this->arg[0])) {
         $this->setBlock('contact_synergy', 'contact_details', 'contact_details_block');
         $this->setBlock(TEMPLATE_content, 'medical', 'medical_block');
 
-  
+
 
     }
     else if($groupHandler->isParent($user['uid'])) {
@@ -57,6 +58,7 @@ if(is_numeric($this->arg[0])) {
 						'medical_block'					=> '',
 						'portrait_block'				=> '',
 						'timetable_link_block'			=> '',
+                        'eportfolio_block'              => '',
 						'contact_synergy_block'			=> '',
 						'due_work_block'				=> '',
 						'helpdesk_block'				=> '',
@@ -80,8 +82,8 @@ if(is_numeric($this->arg[0])) {
                     $email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$emailAddress</a>";
             }
 	}
-	
-	
+
+
 	$outputUser = array('NAME' 			=> formatName($user),
 						'ID'			=> $this->arg[0],
 						'CAMPUS_ID'		=> $user['campus'],
@@ -91,10 +93,10 @@ if(is_numeric($this->arg[0])) {
 						'HOMEPAGE'		=> '',
 						'SYNERGY_ID'	=> $user['synergy_id'],
 						);
-						
-		
+
+
 	$this->setVar($outputUser);
-		
+
 	//advanced synergetic information
 	if(SYNERGY_enable)
 	{
@@ -131,9 +133,9 @@ if(is_numeric($this->arg[0])) {
         }
         else if($groupHandler->isStudent($user['uid']) && ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['uid']))) {
             ////only allow staff to see student information or parent
-			$this->parse("portrait_block", "portrait");		
+			$this->parse("portrait_block", "portrait");
 			$this->parse("timetable_link_block", "timetable_link");
-			
+
             $this->parse("due_work_block", "due_work");
 
             if(is_dir(HELPDESK_location))
@@ -242,9 +244,17 @@ if(is_numeric($this->arg[0])) {
                 $this->parse('medical_block', 'medical');
 
 		}
-       
+
 	}
 
+    /* Display eportfolio link only if it's enabled
+     */
+    if ($user['eportfolio_enabled']) {
+        $this->parse('eportfolio_block', 'eportfolio');
+    }
+    else {
+        $this->setVar('eportfolio_block', '');
+    }
 }
 else {
 	error(2);
