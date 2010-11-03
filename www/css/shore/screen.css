@@ -35,12 +35,7 @@ h2, .homepage h2 {
 	border-radius:0;
 	font-size:116%;
 	}
-table h2, #content table.ruler h2 {
 
-	border-bottom: 1px dashed #7F7F7F;
-	color: #000;
-
-	}
 #content h2 a {
 	color: #fff;
 	}	
