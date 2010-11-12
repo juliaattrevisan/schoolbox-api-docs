@@ -10,7 +10,7 @@
 //Site Directives
 define("HEADING", 'OurSchool');			//This will appear on the window title of each page
 define("SITE_name", "Alaress Pty Ltd");
-define("SITE_location", "mggs");
+define("SITE_location", "demo");
 
 //define("SITE_location", "shore");				//This defines the location, allows specific code for each location
 define("SITE_detect", "domain");				//Which option to detect site, can be domain or campus
@@ -98,9 +98,9 @@ define('NAME_format', '{title} {firstname} {lastname}'); 	// Format for output o
 
 //MySQL config options
 define("SQL_host", "localhost");
-define("SQL_user", "portal");
+define("SQL_user", "jleckie");
 define("SQL_passwd", "tnp879");
-define("SQL_db", "portal");
+define("SQL_db", "portaldemo");
 
 
 //Synergy options

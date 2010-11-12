@@ -1,4 +1,4 @@
-<?php
+<?php 
 require_once('../include/sitePage.php');
 
 if(isset($_GET['page'])) {

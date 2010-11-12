@@ -12,15 +12,20 @@ require("../../include/include.php");
 require("conf.php");
 require("resource.php");
 
-class page
+/* Renamed class from page to page2 to avoid conflict
+ */
+class page2
 {
-	function page()
+	function page2()
 	{
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "modules/resource/resourceList.htm");
-		include("../../include/page.php");
+        
+		/* Not sure why this is included here
+		 */
+		//include("../../include/page.php");
 		$this->t_body->set_var("TITLE", HEADING." - Resource Booking System");
-		
+
 		$resdb = new Resource;
 		
 		if($_SESSION['resourcebooking']['start'])
@@ -55,7 +60,7 @@ class page
 			
 			$resLast = $res;
 		}
-		
+	
 		$this->t_body->set_var("EQUIPMENT_LIST", $equipList);
 		$this->t_body->set_var("ROOM_LIST", $roomList);
 		
@@ -66,11 +71,10 @@ class page
 		else
 			$this->t_body->set_var("add_resource_block", "");
 			
-		
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 }
 
-$page = new page;
-
+$page = new page2;
+		
 ?>
