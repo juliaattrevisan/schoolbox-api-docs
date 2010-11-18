@@ -1,0 +1,18 @@
+<h1>Add Bulk Members - {CATEGORY_NAME}</h1>
+<form action="/group/modifyForm.php" method="post" id="form" class="standardForm">
+  <table>
+    <tr>
+      <td class="formLabelWidth"><h2>User List</h2>
+        <em>To add multiple users to this group place a list of synergetic IDs or portal usernames in the following space then press submit.<br /><br />
+        You can use the synergetic application to extract a csv of all the users you want then copy them into this box.</em></td>
+      <td><textarea name="bulkAdd" cols="30" rows="20"></textarea></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>
+      	<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+        <input type="submit" name="Submit" value="Submit" class="btn" />
+      </td>
+    </tr>
+  </table>
+</form>

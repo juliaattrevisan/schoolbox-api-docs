@@ -1,0 +1,75 @@
+<!-- BEGIN custom_head -->
+<script language="JavaScript" type="text/javascript">
+function verify()
+{
+	var msg = ""
+	//check that description, url, location have been entered
+	if(document.getElementById('urlForm').description.value == ""){
+		msg += "You need to enter a description\n";
+	}
+	if(document.getElementById('urlForm').url.value == ""){
+		msg += "You need to enter a URL\n";
+	}
+	
+	if(msg != ""){
+		alert(msg);
+		return false;
+	}
+	else
+		return true;
+}
+
+$j(document).ready(function() {
+    $j('#deleteLink').click(function() {
+        if (confirm('Are you sure you want to delete this link?')) {
+            window.location = '/cms/linkForm.php?delete={LINK_ID}&redirect=/homepage/{CATEGORY_ID}';
+        }
+    });
+});
+
+</script>
+<!-- END custom_head -->
+
+<h1>{ACTION} Link</h1>
+<form method="post" id="urlForm" class="standardForm" onSubmit="return(verify());" action="/cms/linkForm.php">
+  <table>
+    <tr>
+      <td class="formLabelWidth"><h3>URL</h3>
+     <em>The internet address for the website, eg. http://www.google.com</em></td>
+      <td><input type="text" name="url" size="40" maxlength="250" value="{URL}" />
+      </td>
+    </tr>
+    <tr>
+      <td><h3>Description</h3>
+        <em>One line description of the URL for the title </em> </td>
+      <td ><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" />
+      </td>
+    </tr>
+    <tr>
+      <td><h3>Comments</h3>
+        <em>Any further details you wish to make about the URL, useful for enhancing search results</em> </td>
+      <td><textarea name="comment" cols="40" rows="4">{COMMENT}</textarea>
+      </td>
+    </tr>
+    <tr>
+      <td><h3>Location</h3>
+        <em>The link will be located in this folder. You can <a href="/cms/link/multicat/">upload a link to multiple locations</a> here.</em></td>
+      <td>{CATEGORY_NAME}
+      <input name="category" value="{CATEGORY_ID}" type="hidden" /></td>
+    </tr>
+    <tr>
+      <td><h3>Hidden</h3>
+        <em>Hide this URL from anyone with read-only access.</em></td>
+      <td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
+    </tr>
+    <tr>
+      <td >&nbsp;</td>
+      <td><input type='hidden' name='linkID' value='{LINK_ID}'  />
+        <input type="submit" name="Submit" value="{ACTION} Link" class="btn" /> 
+        <!-- BEGIN delete_button -->
+        <input id='deleteLink' type="button" class="btn"  value="Delete Link" />
+        <!-- END delete_button -->
+      </td>
+    </tr>
+  </table>
+</form>

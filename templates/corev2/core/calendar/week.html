@@ -1,0 +1,128 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/core/ui/ui.css" />
+<script type="text/javascript" src="/javascript/calendar/jquery.custom.calendar.js"></script>
+<script type="text/javascript">
+	$j(function () {
+	    /* date picker */		 
+		$j('.datepicker').datepicker({ 
+		  dateFormat: 'dd-mm-yy',
+		  onSelect: function(dateText, inst) {window.open('/calendar/week/'+dateText, "_self")},
+		  defaultDate: $j.datepicker.parseDate("dd-mm-yy", "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"),
+					showOn: 'button',
+					buttonImage: '/css/core/ui/images/calendar-icon.gif',
+					buttonImageOnly: true,
+					showAnim: 'slideDown'
+		});
+	});
+</script>
+<!-- END custom_head -->
+
+      <div id="calendar">
+
+		
+		<table id="week-view"  cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+				<td colspan="2"class="cal-left">
+					<a class="back" href="/calendar/week/{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a>
+					<div class="datepicker-box"><input type="hidden" class="datepicker" /></div>
+					<a class="forward" href="/calendar/week/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a>
+				</td>
+				
+				<td colspan="2" class="cal-mid"><h3>{MONTH}</h3></td>
+				
+				<td colspan="3"class="cal-right">
+				<div class="link-case">
+					<a class="customise filters" href="#">Calendar Filters</a><a class="customise" href="#">Week</a><a class="customise week" href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}">Month</a>
+					<div class="filter-drop">
+						<div class="filter-list">
+							<form>	
+								<div class="filter-cat groups">
+									<span>Groups</span>
+									<!-- BEGIN group -->
+									<label title="{GROUP_NAME}">
+										<input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" checked="checked" class="checkbox"/>{GROUP_NAME}
+									</label>
+									<div class="float-fix"></div>
+								<!-- END group -->
+								</div>
+								<div class="filter-cat campus">
+									<span>Campus</span>
+									<!-- BEGIN campus -->
+									<label title="{CAMPUS_NAME}">
+										<input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox"/>{CAMPUS_NAME}
+									</label>
+									<div class="float-fix"></div>
+								<!-- END campus -->
+								</div>
+								<div class="filter-cat events last">
+									<span>Event</span>
+									<!-- BEGIN event_type -->
+									<label title="{EVENT_TYPE_NAME}">
+										<input type="checkbox" name="events" id="{EVENT_TYPE_ID}" checked="checked" value="type{EVENT_TYPE_ID}" class="checkbox"/><span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
+									</label>
+									<!-- END event_type -->
+									<div class="float-fix"></div>
+								</div><!--/filter-list-->
+								
+								<div class="float-fix"></div>
+								
+								<hr />
+						</form>
+						<a href="#" id="applyFilters">Apply Filters</a>
+					</div><!--/filter-drop-->
+					</div>
+				
+				
+				</td>
+			</tr>
+			
+			
+			
+            <tr>
+                <!-- BEGIN day_header -->
+				<td class="day-block">
+					<div class="dayWrap">
+						<p class="day-num">{DATE}</p>
+						<p class="header_option">{ADD}</p>
+					   <div class='float-fix'></div>
+					</div> 
+				</td>
+                <!-- END day_header -->
+			</tr>
+            
+            
+			<tr valign="top" class="month-week">
+
+                <!-- BEGIN day_block -->
+				<td class="day-block {MONTABLE_CSS}">
+					<ul class="js_happening">
+					<!-- BEGIN note_block -->
+						<li class="{EVENT_TYPE} {EVENT_LEVEL} ">
+						<!-- BEGIN time --><span class="time">{TIME}&nbsp;</span><!-- END time -->
+							<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}</span>
+							<div class="hidden-fields">
+								<div class="author"><a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></div>
+								<h4><strong>{time_block}</strong>{NOTE}</h4>
+								<p class="meta">Event Type: {TYPE}</p>
+								<div class="modify">{MODIFY}</div>
+							</div>
+						</li>
+					<!-- END note_block -->
+					</ul>
+				</td>
+                <!-- END day_block -->
+			</tr>
+            
+		</table>
+		
+	<div class="cal-bubble">
+		<div class="top"></div>
+		<div class="middle">
+			<div class="close">x</div>
+			<div class="js-data"></div>
+		</div>
+		<div class="bottom"></div>
+	</div>
+	
+</div>
