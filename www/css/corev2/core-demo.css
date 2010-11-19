@@ -162,21 +162,7 @@ select.small, input.small { width: 100px; }
 input.timeField { width: 30px; }
 
 
-.btn { border:1px solid #eeeeee; color:#808080;display:block; float: right; text-shadow: 0 1px 0px #fff; 
-  background-color: #fbfbfb;
-  background-image: -moz-linear-gradient(top, #fbfbfb, #f7f7f7); /* FF3.6 */
-  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fbfbfb),color-stop(1, #f7f7f7)); /* Saf4+, Chrome */
-            filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7'); /* IE6,IE7 */
-        -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')"; /* IE8 */
-
-     -moz-border-radius: 3px; 
-  -webkit-border-radius: 3px; 
-          border-radius: 3px; 
-		  height:22px; line-height:22px;
-		  margin-left:3px;
-		  padding:0 16px 0 30px ;
-		  position:relative;
-}
+.btn { border:1px solid #eeeeee; color:#808080;display:block; float: right; text-shadow: 0 1px 0px #fff; background-color: #fbfbfb;background-image: -moz-linear-gradient(top, #fbfbfb, #f7f7f7); background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fbfbfb),color-stop(1, #f7f7f7)); filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7'); -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')"; -moz-border-radius: 3px; -webkit-border-radius: 3px;  border-radius: 3px;  height:22px; line-height:22px;margin-left:3px; padding:0 16px 0 30px;position:relative;}
 .btn span{position:absolute; top:4px; left:8px; width:14px; height:14px; background:url(/images/corev2/icons/btn-icons.png) no-repeat;}
 .btn:hover { background-position:bottom left; cursor:pointer;color:#ff5a00; text-decoration:none;}
 .btn:hover span{background-position:0 -14px;}
@@ -196,8 +182,8 @@ p.forgot a { font-size: 90%; }
 .play-button a { display: block; height: 22px; width: 22px; background: url(/images/play-button.png) no-repeat; }
 .play-button a:hover { background-position: 0 -22px; cursor: pointer; }
 
-
-
+.customise{color:#e9e3d6;background: url(/images/corev2/icons/configuration.png) no-repeat 100% 0; position:absolute; top:0; right:0; display:block; height:31px; text-align:right;min-width:129px; padding-right:40px;font-size:12px; font-weight:normal; line-height:31px;}
+.customise:hover {background-position:right bottom; color:#ff5a00;}
 /*--------------------------------------------------------------
 Module Specific Styles (ALPHABETICAL SECTIONS)
 --------------------------------------------------------------*/
@@ -591,7 +577,7 @@ h1 + .header_option { margin-top: -38px; }
 .colours div { float: left; margin-right: 10px; }
 .colorBox { width: 20px; height: 20px; }
 
-/*COMPONENT
+/*COMPONENT*/
 #component-list { list-style: none; margin: 0; }
 #component-list li { padding: 0; float: left; width: 46%; margin-right: 25px; min-height: 80px; background: 0; }
 #component-list li input { float: left; }
@@ -611,7 +597,7 @@ a.layout:hover img { background: #999; }
 .dropBox .drop-left input, .dropBox .drop-right input[type=file]{float:left;}
 .dropBox .drop-left input{width:90%;}
 .dropBox .drop-submit{float:left; clear:both; margin:10px 0 0 0;}
-.dropBox .pad{padding:5px 0 0 30px ;}*/
+.dropBox .pad{padding:5px 0 0 30px ;}
 
 /*DUE DATES*/
 .due-dates { width:100%; }
@@ -746,7 +732,6 @@ p.search-sml { font-size:11px; }
 .barchart { width: 100%; }
 .barchart div { width: 90%; float: left; }
 .barchart .value { width: 10%; float: right; }
-
 li.bars  a{font-weight:bold;}
 li.bars p{margin-bottom:5px;}
 li.bars {display:block; }
@@ -756,13 +741,13 @@ li.bars {display:block; }
 #timetable td { background: #fff; padding: 0; font-size: 80%; width: 10%; vertical-align: top; }
 #timetable th { background: #6b6b6b; color: #fff; padding: 6px 10px; }
 #timetable p { padding: 6px 0 6px 10px; }
-table.timetable td, table.timetable th { border-right: 1px solid #fff; border-bottom: 1px solid #fff; }
-table.timetable { width:100%; margin:0; background:transparent; }
-table.timetable th { padding:3px; background:#666; color:#fff; font-family: Verdana, arial, sans-serif, serif; font-size: 100%; font-weight: bold; line-height: 1.5; text-align:center; }
-table.timetable td { background:#efefef; color:#000; font:normal 80% /1em Verdana, arial, sans-serif, serif; cursor:hand; padding:4px; text-align:center; }
+.timetable td, .timetable th { border-right: 1px solid #fff; border-bottom: 1px solid #fff; }
+.timetable { width:100%; margin:0; background:transparent; }
+.timetable th { padding:3px; background:#666; color:#fff; font-family: Verdana, arial, sans-serif, serif; font-size: 100%; font-weight: bold; line-height: 1.5; text-align:center; }
+.timetable td { background:#efefef; color:#000; font:normal 80% /1em Verdana, arial, sans-serif, serif; cursor:hand; padding:4px; text-align:center; }
 .timetable td.current { background:#06c; color:#fff; }
-table.home { position:relative; }
-table.home td { vertical-align:top; }
+.home { position:relative; }
+.home td { vertical-align:top; }
 
 /*TRANSLATE*/
 
@@ -773,7 +758,6 @@ table.home td { vertical-align:top; }
 .translateForm input.submit {width: auto;padding: 0px; margin:10px 0;}
 #translatedTextWrapper {width: 100%;margin-top: 12px;margin-bottom: 12px;}
 #translatedText {border: 1px solid #ddd;margin-top: 8px; margin-bottom: 16px;padding: 12px;}
-p.small {font-size: 10px;}
 #translatedText p{margin:0;}
 #translateTextForm .lefty{width:68%; float:left; margin-right:1%;}
 #translateTextForm .righty{width:30%; float:left;}
