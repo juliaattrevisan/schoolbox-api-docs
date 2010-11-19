@@ -1,9 +1,7 @@
-
+<link rel="stylesheet" type="text/css" media="print" href="/css/core/reset.css" />
 <link rel="stylesheet" type="text/css" media="print" href="/css/core/print.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core2.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/droppy.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/screen.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/core-demo.css" />
 
 <link rel="Shortcut Icon" href="/images/{SITE_LOCATION}/favicon.ico" type="image/x-icon" />
 
@@ -12,15 +10,33 @@
 <!-- END header_css -->
 
 <script type="text/javascript" src="/javascript/jquery1.4.2.min.js"></script>
+
 <script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
 <script type="text/javascript" src="/javascript/scripts.js"></script>
 <script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+
+<script type="text/javascript" src="/javascript/corev2/scripts.js"></script>
+
+
 
 <script type='text/javascript'>	
-	$j(function() {
+$j(function() {
     $j('#nav ul').droppy({speed: 0});
+	$j('#nav li.parent > a span').each(function() {
+		$j(this).append('<strong>&rsaquo;</strong>');
+	});
+	$j('#search-field').focus(function() {
+		$j(this).attr('value', "");
+	});
+	$j('#search-field').blur(function() {
+		if($j(this).attr('value') == "") {
+			$j(this).attr('value', "search");
+		}
+	});
+	
 
-  });
+});
 </script>
 <!-- BEGIN header_javascript -->
 <script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>
