@@ -7,20 +7,27 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="James Leckie, Lektec Consulting"/> 
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/screen.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/core-demo.css" /> 
 
 <!-- BEGIN header_css --><!-- END header_css -->
+
+<link rel="Shortcut Icon" href="/images/demo/favicon.ico" type="image/x-icon" />
 
 <script type="text/javascript" src="/javascript/jquery.js"></script>
 <script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
 <script type='text/javascript'>
-  var $j = jQuery.noConflict();
+  var $j = jQuery.noConflict(); 
 	
 	$j(function() {
     $j('#nav ul').droppy({speed: 0});
+	
+		$j('#nav li.parent > a span').each(function() {
+			$j(this).append('<strong>&rsaquo;</strong>');
+		});
+		
+		$j('.standardForm tr:last td').css("border", "0"); 
+	
   });
 </script>
 <!-- BEGIN header_javascript -->
@@ -31,41 +38,47 @@
 <!-- InstanceBeginEditable name="head" -->
 
 <!-- InstanceEndEditable -->
-
-<div id="container">
-	<div id="wrapper">
   <div id="header">
-    <div id="logo">
-    	<img alt="" src="/images/demo/demo-logo.gif"/>
-    </div>
+    	<a href="/" class="logo"><img src="/images/demo/schoolbox-logo.png" width="273" height="52" alt="Schoolbox" /></a>
+<ul id="infoPanel">
+	<li class="first">{SITE_GREETING} <a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">{SITE_LOGINNAME}</a>|</li>
+    <li><a href="/logout.php" alt="Logout" title="Logout">Logout</a></li>
+</ul>
     <form id="search" action="/search.php" method="get">
       <fieldset>
         <input id="search-field" type="text" name="keyword" />
         <input id="search-button" type="submit" value="Search" />
       </fieldset>
     </form>  
-    <ul id="tabs">
-      <li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Main</a></li>
-      <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">News</a></li>
-      <!-- BEGIN webmail_tab -->
-      <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
-      <!-- END webmail_tab -->
-      <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
-      <!-- BEGIN timetable_tab -->
-      <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
-      <!-- END timetable_tab -->
-      <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
-      <!-- BEGIN portfolio_tab -->
-      <li><a class="{TAB_PORTFOLIO_ON}" href="/cms/portfolio" title="Access your portfolio area">My Portfolio</a></li>
-      <!-- END portfolio_tab -->
-      <li><a href="/logout.php" title="">Logout</a></li>
-    </ul>
+<ul id="tabs">
+	<li class="{TAB_MAIN_ON}"><a href="/home/" title="Greeting page">Home</a></li>
+	<li class="{TAB_NEWS_ON}"><a href="/news/" title="Current school news">News</a></li>
+	<!-- BEGIN webmail_tab -->
+	<li class="{TAB_WEBMAIL_ON}"><a {WEBMAIL_LOCATION} title="Access your messages here">Webmail</span></a></li> 
+	<!-- END webmail_tab -->
+	<li class="{TAB_CALENDAR_ON}"><a href="/calendar/week/" title="School calendar events">Calendar</a></li>
+	<!-- BEGIN timetable_tab -->
+	<li class="{TAB_TIMETABLE_ON}"><a href="/timetable/" title="View your school timetable">Timetable</a></li>
+	<!-- END timetable_tab -->
+	<li class="{TAB_RESOURCES_ON}"><a href="/resources/" title="Browse resources and homepages">Resources</a></li>
+	<!-- BEGIN submission_tab -->
+	<li class="{TAB_SUBMISSION_ON}"><a href="/submission/listSubmission" title="Access your submission boxes">Submissions</a></li>
+	<!-- END submission_tab --> 
+	<!-- BEGIN eportfolio_tab -->
+	<li class="{TAB_EPORTFOLIO_ON}"><a href="/eportfolio/{EPORTFOLIO_USER_ID}" title="Access your eportfolio area">My ePortfolio</a></li>
+	<!-- END eportfolio_tab -->
+</ul>
 
-<!-- BEGIN myfiles_tab -->
+<!-- BEGIN myfiles_tab --> 
 <!-- END myfiles_tab -->
+
+
   </div>
+<div id="container">
+
+
   <div id="nav">
-    <h3>Demo Intranet</h3>
+    <h3>My Schoolbox</h3>
     {MCSSMENU}
     <!-- BEGIN msubject -->
     <h3>My Subjects</h3>
@@ -103,7 +116,7 @@
   <div id="content">
 	<!-- InstanceBeginEditable name="content" -->
 		<h1>Manage Allowed File Types</h1>
-		<span class="header_option"><a href="modFileType.php?add=1">add item</a></span>
+		<span class="header_option"><a href="modFileType.php?add=1" class="btn add"><span></span>add item</a></span>
 		<table class="ruler">
 			<tr>
 				<th width="20">Icon</th>
@@ -124,11 +137,12 @@
 		</table> 
 		<!-- InstanceEndEditable -->
     <div class="float-fix"></div>
+
   </div>
-  <div class="float-fix"></div>
+
+
 </div>
-</div>
-<div id="footer">
+	<div id="footer">
 <ul>
   <li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SITE_ADDRESS}">{SITE_NAME}</a></li>
   <li><a href="/policy/{SITE_LOCATION}.htm">Guidelines of Use and Privacy Policy</a></li>
