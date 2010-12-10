@@ -22,7 +22,7 @@ body{background:#E4E4E4 url(/images/bg.gif) repeat-y scroll;}
 	Component Styles
 ----------------------------------------*/
 
-h1{border-bottom:1px dashed #7F7F7F;margin-bottom:1em;}
+h1{border-bottom:1px dashed #7F7F7F;margin-bottom:1em; margin-top:-10px;}
 
 h1 a.customise {
 	font-size: 12px;
@@ -42,7 +42,18 @@ h2, .homepage h2 {
 #content .header_option a {
 	/*color: #1965B4;*/
 	}
-	
+#loginForm input[type="text"], #loginForm input[type="password"] {
+  width: 225px;
+}
+#loginForm #usrname {
+  width: 320px;
+}
+p.important {
+	font-weight: bold;
+}
+.grn { color: #090; }
+.red { color: #C00; }
+
 #logo a{height:80px;}
 .topic ul { list-style: disc; }
 #tabs li a{
