@@ -1,0 +1,75 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/demo/jquery-ui.css" />
+<script type="text/javascript">
+	
+		$j('#cal_date').datepicker({ 
+			dateFormat: 'dd/mm/yy',
+			showOn: 'both',
+			buttonImage: '/images/demo/calendar/calendar-click.png',
+			buttonImageOnly: true
+		});
+
+</script>
+<!-- END custom_head -->
+
+<h1>{ACTION} Poll</h1>
+<form class="standardForm" action="/poll/modifyForm.php" method="post">
+	<table>
+		<tr>
+			<td class="formLabelWidth"><h4>Title</h4>
+				<input type="text" name="title" value="{POLL_TITLE}" size="50" /></td>
+		</tr>
+		<tr>
+			<td><h4>Question</h4>
+				<em>What is the poll for</em>
+				<input type="text" name="question" value="{QUESTION}" size="50" /></td>
+		</tr>
+		<tr>
+			<td><h4>Options</h4>
+				<em>You can have a maximum of 
+				ten options<br />
+				to vote on. You must fill in at least two.</em>
+				<input type="text" name="option_0" value="{OPTION_0}" />
+				<br />
+				<input type="text" name="option_1" value="{OPTION_1}" />
+				<br />
+				<input type="text" name="option_2" value="{OPTION_2}" />
+				<br />
+				<input type="text" name="option_3" value="{OPTION_3}" />
+				<br />
+				<input type="text" name="option_4" value="{OPTION_4}" />
+				<br />
+				<input type="text" name="option_5" value="{OPTION_5}" />
+				<br />
+				<input type="text" name="option_6" value="{OPTION_6}" />
+				<br />
+				<input type="text" name="option_7" value="{OPTION_7}" />
+				<br />
+				<input type="text" name="option_8" value="{OPTION_8}" />
+				<br />
+				<input type="text" name="option_9" value="{OPTION_9}" />
+				<br /></td>
+		</tr>
+		<tr>
+			<td><h4>Close Date</h4>
+				<em>No votes can be cast after this date.</em>
+				<input name="close" id="cal_date" type="text" size="15" maxlength="10" value="{CLOSE}"/>
+				</td>
+		</tr>
+		<tr>
+			<td><h4>Voting Frequency</h4>
+				<em>Selected how often users can place a new vote.</em>
+				<select name="frequency">
+					<option value="once" {FREQUENCY_ONCE_SELECTED}>Once</option>
+					<option value="hourly" {FREQUENCY_HOURLY_SELECTED}>Hourly</option>
+					<option value="daily" {FREQUENCY_DAILY_SELECTED}>Daily</option>
+				</select></td>
+		</tr>
+		<tr>
+			<td><input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+				<input type="hidden" name="pollID" value="{POLL_ID}" />
+				<input type="submit" value="Save" /></td>
+		</tr>
+	</table>
+</form>

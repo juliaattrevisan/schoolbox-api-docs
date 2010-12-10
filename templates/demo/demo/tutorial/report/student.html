@@ -1,0 +1,83 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/demo/jquery-ui.css" />
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+$j(document).ready(function () {
+	$j('.lookup').each(function () {
+		var node = $j(this);
+		$j(this).autocomplete({
+			serviceUrl: '/ajax/user.php?groupID=0',
+			minChars: 2,
+			maxHeight: 400,
+			width: node.width(),
+			onSelect: function (value, data) {
+				$j("#userID").val(data);
+				return false;
+			}
+		});
+	});
+	
+	$j('#from, #to').datepicker({ 
+		dateFormat: 'dd/mm/yy',
+		showOn:'both',
+		buttonImage: '/images/demo/calendar/calendar-click.png',
+		buttonImageOnly: true
+	});
+	
+	
+});
+
+</script>
+<!-- END custom_head -->
+<h1>Student Report - {STUDENT}</h1>
+<span class="header_option"> <a href="/search/user/{STUDENT_ID}" class="btn"><span></span>View</a> </span>
+<form action="/modules/tutorial/report/student.php" method="get">
+  <table style="width: 650px;">
+    <tr>
+      <td>Student</td>
+      <td><input class="lookup" type="text" name="keyword" value="{STUDENT}" /></td>
+      <td>From:</td>
+      <td style="white-space: nowrap;"><input name="from" id="from" type="text" size="15" maxlength="10" value="{FROM}"/>
+        </td>
+      <td>To:</td>
+      <td style="white-space: nowrap;"><input name="to" id="to" type="text" size="15" maxlength="10" value="{TO}"/>
+        </td>
+      <td><input class="userID" type="hidden" name="userID" id="userID" value="{STUDENT_ID}" />
+        <input type="submit" name="submit" class="submit-btn-plain" value="Report" /></td>
+    </tr>
+  </table>
+</form>
+<!-- BEGIN has_events -->
+<table cellspacing="0" class="ruler">
+  <!-- BEGIN class_list -->
+  <tr class="obsessive">
+    <td colspan="7"><h2>{TUTORIAL} - {CODE} - {TYPE} - {ATTENDANCE}%</h2>
+      <span class="header_option"> <a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}" class="btn modify"><span></span>Modify</a> </span> </td>
+  </tr>
+  <tr>
+    <th style="width: 20%;">Date</th>
+    <th style="width: 20%;">Start</th>
+    <th style="width: 20%;">Finish</th>
+    <th style="width: 20%; text-align: right;">Hours Missed</th>
+    <th style="width: 20%; text-align: right;">Hours Attended</th>
+  </tr>
+  <!-- BEGIN event_list -->
+  <tr class="{ON_OFF}">
+    <td>{DATE}</td>
+    <td>{START}</td>
+    <td>{FINISH}</td>
+    <td style="text-align: right;">{HOURS_MISSED}</td>
+    <td style="text-align: right;">{HOURS_ATTENDED}</td>
+  </tr>
+  <!-- END event_list -->
+  <tr style="margin-bottom: 10px;">
+    <td colspan="3" style="font-weight: bold;">Total</td>
+    <td class="bold" style="text-align: right;">{TOTAL_MISSED}</td>
+    <td class="bold" style="text-align: right;">{TOTAL_ATTENDED}</td>
+  </tr>
+  <!-- END class_list -->
+</table>
+<!-- END has_events -->

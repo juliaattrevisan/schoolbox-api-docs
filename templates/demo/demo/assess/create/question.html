@@ -1,0 +1,47 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+    $j(document).ready(function() {
+        $j('#type').change(function() {
+            $j('#answer').load("/assess/create/render_answer/"+$j('#type').val());
+        });
+    });
+</script>
+<!-- END custom_head -->
+<h1>Create Question</h1>
+<form name="create" action="/assess/create/question/" class="standardForm" method="post">
+    <table>
+        <tr>
+            <td class="formLabelWidth"><h3>Question</h3></td>
+            <td><input name="question" type="text" size="35" /></td>
+        </tr>
+        <tr>
+            <td><h3>Type</h3></td>
+            <td>
+                <select name="type" id="type">
+                    <option disabled selected>-- Select Type --</option>
+                    <option value="text">Short Answer</option>
+                    <option value="choice">Mutiple Choice</option>
+                    <option value="match">Match Pairs</option>
+                    <option value="order">Order List</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><h3>Mark</h3></td>
+            <td>
+                <input name="weight" type="text" size="3" />
+            </td>
+        </tr>
+        <tr>
+            <td id="answer" rowspan="2"></td>
+        </tr>
+        <tr>
+            <td>
+                <input name="section_id" type="hidden" value="{SECTION_ID}" />
+                <input name="order" type="hidden" value="{ORDER}" />
+            </td>
+        </tr>
+    </table>
+	<input type="submit" name="create" id="create" value="Create Question" class="submit-btn-plain"/>
+	<div class="float-fix"></div>
+</form>

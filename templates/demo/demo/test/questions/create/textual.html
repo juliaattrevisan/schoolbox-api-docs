@@ -1,0 +1,25 @@
+<table id="question{N}">
+	<tr>
+		<td class="formLabelWidth">
+			<h3>Question</h3>
+			<input type="hidden" name="questions[{N}][id]" value="{QUESTION_ID}"/>
+			<input type="hidden" name="questions[{N}][type]" value="{TYPE}"/>
+		</td>
+		<td colspan="2"><input name="questions[{N}][question]" type="text" size="60" value="{QUESTION}"/></td>
+		<td style="text-align: right">
+			<select name="questions[{N}][mark]">
+				<!-- BEGIN mark -->
+				<option value="{MARK}" {MARK_SELECTED}>{MARK} marks</option>
+				<!-- END mark -->
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td><h3>Answer</h3><em>When correcting students' tests, this will appear as an example to assist you in correction.</em></td>
+		<td colspan="3"><textarea name="questions[{N}][answer][text]" cols="70">{ANSWER_TEXT}</textarea></td>
+	</tr>
+	<tr>
+		<td><h3>Keywords</h3><em>During correction keywords will be highlighted in student responses.</em></td>
+		<td colspan="3"><input name="questions[{N}][answer][keywords]" type="text" size="80" value="{ANSWER_KEYWORDS}"/></td>
+	</tr>
+</table>

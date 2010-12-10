@@ -1,0 +1,68 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.json2.js"></script>
+<script type="text/javascript">
+tinyMCE.init({
+		mode : "exact",
+		elements: "question",
+		theme : "simple",
+		content_css : "/css/core/screen.css",
+		editor_selector : "mceSimple",
+		width : "100%",
+		forced_root_block : "",
+		force_p_newlines : false
+
+	});
+</script>
+<!-- END custom_head -->
+<div id="assess" class="create-test">
+	<h1>Modify Question</h1>
+	<div class="col-1">
+	<div class="assess-header">
+		<h2>Question Details</h2>
+		<div class="assess-body">
+			<form id="createQuestionForm" action="/assess/question/modify" class="standardForm" method="post">
+				
+				<fieldset class="hidden">
+					<input name="section_id" type="hidden" value="{SECTION_ID}" />
+					<input name="question_id" type="hidden" value="{QUESTION_ID}" />
+					<input name="answer_id" type="hidden" value="{ANSWER_ID}" />
+					<input name="sequence" type="hidden" value="{SEQUENCE}" />
+				</fieldset>
+			
+				<fieldset>
+					<label>Type</label>
+					<input type="hidden" name="type_id" value="{QUESTIONTYPE_TYPE_ID}" />
+					<span>{QUESTIONTYPE_DESCRIPTION}</span>
+				</fieldset>
+			
+				<fieldset>
+					<label>Question</label>
+					<div class="textarea-container"><textarea name="question" class="mceSimple tinyValidate" id="question" />{QUESTION}</textarea></div>
+				</fieldset>
+			
+				<fieldset>
+					<label>Marks</label>
+					<input name="marks" type="text" size="3" value="{MARKS}"/>
+				</fieldset>
+			
+				<div id="answer">
+					<!-- BEGIN answerInputs -->
+					
+					<!-- END answerInputs -->
+				</div>
+			
+				<fieldset>
+					<input type="submit" name="create" id="create" value="Modify" class="next-step"/>
+				</fieldset>
+			</form>
+		</div>
+		</div>
+	</div>
+	<div class="col-2">
+	<!-- BEGIN allQuestions -->
+	
+	<!-- END allQuestions -->
+	</div>
+</div>

@@ -1,0 +1,58 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/demo/jquery-ui.css" />
+
+<script type="text/javascript">
+
+$j(function() {
+	
+	$j('#from, #to').datepicker({ 
+		dateFormat: 'dd/mm/yy',
+		showOn:'both',
+		buttonImage: '/images/demo/calendar/calendar-click.png',
+		buttonImageOnly: true
+	});
+	
+	
+});
+
+</script>
+
+<!-- END custom_head -->
+<h1>Uncompleted Attendance</h1>
+<form action="/modules/tutorial/report/attendance.php" method="get">
+  <table>
+    <tr>
+      <td>From:</td>
+      <td><input name="from" id="from" type="text" size="15" maxlength="10" value="{FROM}"/>
+		</td>
+      <td>To:</td>
+      <td><input name="to" id="to" type="text" size="15" maxlength="10" value="{TO}"/>
+        </td>
+      <td><input type="submit"  class="submit-btn-plain float-remove" name="submit" value="Report" /></td>
+    </tr>
+  </table>
+</form>
+<!-- BEGIN has_events -->
+
+<table>
+  <tr>
+    <th>Primary</th>
+    <th>Secondary</th>
+    <th>Date</th>
+    <th>Tutorial</th>
+    <th>Code</th>
+  	<th>Type</th>
+  </tr>
+  <!-- BEGIN event_list -->
+  <tr class="{ON_OFF}">
+    <td><a href="/search/user/{TUTOR1_ID}">{TUTOR1}</a></td>
+    <td><a href="/search/user/{TUTOR2_ID}">{TUTOR2}</a></td>
+    <td>{DATE}</td>
+    <td><a href="/modules/tutorial/enrolment/list.php?eventID={EVENT_ID}">{NAME}</a></td>
+    <td>{CODE}</td>
+    <td>{TYPE}</td>
+  </tr>
+  <!-- END event_list -->
+</table>
+<!-- END has_events -->

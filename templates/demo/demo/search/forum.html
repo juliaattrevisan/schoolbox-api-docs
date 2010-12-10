@@ -1,0 +1,20 @@
+<h2>Forums <!-- BEGIN count -->({FORUM_DISP_COUNT} / {FORUM_COUNT})<!-- END count --></h2>
+<!-- BEGIN forum -->
+<div class="search-item">
+    <img src="images/mime/60x60/forum.png" />
+    <div class="search-details">
+    <h3><a href="/forum/thread/{FORUM_THREADID}">{FORUM_TITLE}</a></h3>
+    <p>{FORUM_BODY}</p>
+    <p class="search-sml">Posted by <a href="/search/user/{FORUM_OWNER}">{FORUM_OWNER_NAME}</a> {FORUM_CREATED}</p>
+    <p class="search-sml">{FORUM_BREADCRUMB}</p>
+</div>
+<div class="search-functions">
+</div>
+<div class="float-fix"></div>
+</div>
+<!-- END forum -->
+<div class="pagination">
+    <!-- BEGIN pagination -->
+    <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
+    <!-- END pagination -->
+</div>

@@ -1,0 +1,177 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/mootools.js"></script>
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/demo/jquery-ui.css" />
+    <script type="text/javascript" src="/javascript/behaviour.js"></script>
+    <script type="text/javascript">
+        function showRow () {
+            var selecLevel = document.getElementById('eventForm').level.options[document.getElementById('eventForm').level.selectedIndex].value;
+            
+            var groupDrop = document.getElementById('groupDrop');
+            var campusList = document.getElementById('campusList');
+            var groupList = document.getElementById('groupList');
+        
+            if( selecLevel == 1 || selecLevel == 4){
+                groupDrop.style.display 	= "none";
+                campusList.style.display 	= "none";
+                groupList.style.display 	= "none";
+            }
+            else if( selecLevel == 2 ){
+                groupDrop.style.display 	= "";
+                campusList.style.display 	= "none";
+                groupList.style.display 	= "none";
+            }
+            else if( selecLevel == 3 ){
+                groupDrop.style.display 	= "none";
+                campusList.style.display 	= "";
+                groupList.style.display 	= "";
+            }
+        }
+        window.onload = new Function('showRow();');
+        
+        Behaviour.addLoadEvent(function () { 
+            $$('.campusCheck').each(function (o) {
+                    o.addEvents({
+                        'mouseup' : function (e) {
+                                if (!countSelected(o)) checkNext(o);
+                        
+                        }
+                    });
+            });
+        });
+        
+        function countSelected (ol) {
+            var s = 0;
+            $$('.campusCheck').each(function (o) { 
+                                        if (o != ol && o.checked == true) 
+                                            s++;
+                                    });
+            return s;
+        }
+        
+        function checkNext(ol) {
+            $$('.campusCheck').each(function (o) { 
+                                        if (o != ol) 
+                                            o.checked = true;
+                                            return;
+                                    });
+        }
+		function toggleRepeat(o) {
+			if (o.value == '')
+				$('repeatUntil').style.display = 'none';
+			else
+				$('repeatUntil').style.display = '';
+		}
+		
+		function confirmDelete(eventID) {
+			if (confirm('Delete this event?')) {
+				window.open('/calendar/modify.php?delete=' + eventID + '&return={RETURN_TO}', '_self', '');
+				
+			}
+		}
+		
+		$j(function() {
+			$j('#cal_date, #repeat_until').datepicker({ 
+				dateFormat: 'dd/mm/yy',
+				showOn: 'both',
+				buttonImage: '/images/demo/calendar/calendar-click.png',
+				buttonImageOnly: true
+			});
+		});
+	
+    </script>
+    <!-- END custom_head -->
+
+		<h1><span>{FUNCTION} Event</span></h1>
+    <div class="float-fix"></div>
+            <form  method="post" action="/calendar/modify.php" id="eventForm">
+                    <table class="standardForm">
+                      <tr> 
+                        <td class="formLabelWidth" valign="top"><h4>Date</h4>
+                        	<em>The date on which the event will occur. The date should be formatted like this dd/mm/yyyy. </em>
+							<br />
+							<input name="date" id="cal_date" type="text" size="15" maxlength="10" value="{DATE}"/>
+							</td>
+
+                      </tr>
+                      <!-- BEGIN recurring_dates -->
+                      <tr>
+                       <td class="formLabelWidth" valign="top"><h4>Repeat</h4>
+                       <em>The frequency that this event recurs if at all.</em><br />
+					   <select name="repeat" onchange="toggleRepeat(this);">
+                       	   <option value="">Single Event</option>
+                       	   <option value="daily">Daily</option>
+                           <option value="weekly">Weekly</option>
+                           <option value="fortnightly">Fortnightly</option>
+                           <option value="monthly">Monthly</option>
+                           </select></td>
+                      </tr>
+                      <tr id="repeatUntil" style="display: none;">
+                      <td class="formLabelWidth" valign="top"><h3>Repeat Until</h3>
+                      <em>The date at which recurrence should cease.</em></td>
+                      <td><input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="10" value=""/>
+						</td>
+                      </tr>
+                      <!-- END recurring_dates -->
+                      <tr> 
+                        <td><h4>Time</h4><em>Both time slots are optional.</em><input name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />
+                          : 
+                          <input name="minute" type="text" maxlength="2" value="{MIN}" class="timeField" /> 
+                          <select name="period">
+                            <option value="am" {AM} >AM</option>
+                            <option value="pm" {PM} >PM</option>
+                          </select> to
+                          <input name="tohour" type="text" maxlength="2" value="{TOHOUR}" class="timeField" />
+                          : 
+                          <input name="tominute" type="text" maxlength="2" value="{TOMIN}" class="timeField" /> 
+                          <select name="toperiod">
+                            <option value="am" {AMTO}>AM</option>
+                            <option value="pm" {PMTO}>PM</option>
+                          </select></td>
+                      </tr>
+                      <tr> 
+                        <td><h4>Type</h4>
+                        	<em>Select the type of event, this will be represented via different colours</em>                        <select name="type">
+                             <!-- BEGIN type_drop -->
+                              <option value="{TYPE_NUMBER}" {TYPE_NUMBER_SELECTED}>{TYPE_NAME}</option>
+                             <!-- END type_drop -->
+                          </select></td>
+                      </tr>
+                      <tr> 
+                        <td><h4>Level</h4><em>Select who you would like to be able to see this event</em>
+						<select name="level" id="level" onChange="showRow()">
+                       		 <!-- BEGIN level_drop -->
+                              <option value="{LEVEL_ID}" {LEVEL_ID_SELECTED}>{LEVEL_NAME}</option>
+                             <!-- END level_drop -->
+                        </select></td>
+                      </tr>
+                      <tr id="groupDrop" style="display:none;"> 
+                        <td><h4>Group</h4><em>Select the group which will be able to view this event</em><select name="group">
+                            <!-- BEGIN group_drop -->
+                            <option value="{UGROUP_ID}" {UGROUP_ID_SELECTED} />{UGROUP_NAME}</option>
+                            <!-- END group_drop -->                        
+                        </select></td>
+                      </tr>                      
+                      <tr id="campusList" style="display:none;"> 
+                        <td><h4>Campus</h4><em>Select the campus' which will be able to view this event</em>
+						<!-- BEGIN campus_list -->
+							<label><input type="checkbox" class="campusCheck" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}</label><br />
+						<!-- END campus_list --></td>
+                      </tr>
+                      <tr id="groupList" style="display:none;"> 
+                        <td><h4>Group</h4><em>Select the group which will be able to view this event</em>
+						<!-- BEGIN group_list -->
+							<label><input type="checkbox" name="groupCheck[]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />{GROUP_NAME}</label><br />
+						<!-- END group_list -->  </td>
+                      </tr>
+                      <tr> 
+                        <td><h4>Description</h4><textarea name="note" cols="50" rows="3">{DESCRIPTION}</textarea>
+						<input type="hidden" name="id" value="{EVENT_ID}" />
+                        	<input type="hidden" name="return" value="{RETURN_TO}" /></td>
+                      </tr>
+                    </table>
+					
+					<input type="submit" name="Submit" value="{FUNCTION} Event" class="submit-btn-plain">
+						  <!-- BEGIN delete_button --><input type="button" name="delete" value="Delete Event" class="submit-btn-plain" onclick="confirmDelete({EVENT_ID});" /><!-- END delete_button -->
+						  <div class="float-fix"></div>
+            </form>	
