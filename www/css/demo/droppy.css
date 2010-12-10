@@ -1,6 +1,6 @@
 /* Basic code - don't modify */
  #nav ul { display: block; margin: 0; padding: 0; position: relative; float: left; }
-#nav ul li, .section-options ul li { display: block; list-style: none; margin: 0; padding: 0; float: left; position: relative; }
+#nav ul li, .section-options ul li { display: block; list-style: none; margin: 0; padding: 0; float: left; position: relative; min-height:1px;}
 #nav ul a, .section-options ul a { display: block; }
 #nav ul ul, .section-options ul ul { display: none; position: absolute; left: 0; margin: 0; padding: 0; }
 * html #nav ul ul, * html .section-options ul ul { line-height: 0; } /* IE6 "fix" */

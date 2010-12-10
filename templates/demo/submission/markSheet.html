@@ -22,7 +22,7 @@
 <!-- END custom_head -->
 
 <h1>{CATEGORY}</h1>
-<span class="header_option"><a href="/submission/markSheet/export/{CID}">Download Spreadsheet</a></span>
+<span class="header_option"><a href="/submission/markSheet/export/{CID}" class="btn download" ><span></span>Download Spreadsheet</a></span>
 <table class="markTable" cellspacing="0" cellpadding="0">
 	<tr>
 		<th>Surname</th>
@@ -30,10 +30,10 @@
 		<!-- BEGIN sub_head -->
 		<td id="work-{BOX_ID}" class="column-{BOX_ID}"><a href="/submission/viewSubmission/{BOX_ID}"><strong>{SUB_NAME}</strong></a><br />
 			<em>{SUB_TYPE}</em><br /><br />
-			<a class="delete-btn btn" href="/submission/submissionForm.php?delete={BOX_ID}">Delete</a></td>
+			<a class="btn delete" href="/submission/submissionForm.php?delete={BOX_ID}"><span></span>Delete</a></td>
 		<!-- END sub_head -->
             <td class="add-sub">
-            <a class="add-btn btn" href="/submission/createSubmission/new/{CID}/">Add Submission</a></td>
+            <a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Add Submission</a></td>
 </td>
 
 	</tr>

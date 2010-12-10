@@ -24,7 +24,7 @@
       	<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
       	<!-- END size -->
       </select>
-      <input type="submit" value="Update" />
+      <input type="submit" value="Update" class="submit-btn update"/>
     </form>
   </div>
 <!-- END config -->
@@ -32,7 +32,7 @@
   	<ul>
     	<!-- BEGIN link -->
     	<li class="{ON_OFF}">
-      	<h4><a class="icons html" href="{LINK_URL}">{LINK_NAME}</a></h4>
+      	<h4><a class="icons link" href="{LINK_URL}">{LINK_NAME}</a></h4>
         <div class="small-right">
 			<!-- BEGIN modify_link --><p class="interact"><a href="/cms/link/{LINK_ID}" >Modify</a></p><!-- END modify_link -->
 		</div>
@@ -46,7 +46,7 @@
     <div class="float-fix"></div>
   </div>
   <!-- BEGIN submit_link -->
-    <p class="interact"><a href="/cms/link/new/{ID}">Post Link</a></p>
+    <p class="interact"><a href="/cms/link/new/{ID}" class="btn up-arrow">Post Link</a></p>
 	
     <!-- END submit_link -->
 </div>

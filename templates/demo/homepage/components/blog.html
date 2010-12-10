@@ -1,4 +1,18 @@
-
+<script type="text/javascript">
+	$j(function(){
+		$j('div.blog-comments, div.blog form').hide();
+		
+		$j('a.show_comments').click(function(){
+				$j(this).closest('li').find('div.blog-comments').toggle();
+				return false;
+		});
+		
+		$j('a.post_comment').click(function(){
+				$j(this).closest('li').find('form').toggle();
+				return false;
+		});
+	});
+</script>
 
 <div class="box" id="component{COMPONENT_ID}">
 	<h2>Blog</h2>
@@ -29,7 +43,7 @@
 		<ul>
 			<!-- BEGIN blog -->
 			<li class="{BLOG_SHADING}">
-				<h4><em>{BLOG_HEADING}</em></h4>
+				<h4><strong>{BLOG_HEADING}</strong></h4>
 				
 				<div class="small-right">
 					<p class="interact">{MODIFY_BLOG}</p>
@@ -39,10 +53,13 @@
 		 	<div class="float-fix"></div>
 			
 				<p>{BLOG_BODY}</p>
-					<div class="blog_comments">
+					<div class="blog-comments">
 						<!-- BEGIN comment -->
-						<p class="blog_title">{COMMENT_BODY}</p>
-						<p class="small summ separate">{COMMENT_OWNER}<br /> {COMMENT_CREATED} <br />{DELETE_COMMENT}</p>
+						<div class="box">
+						
+						{COMMENT_BODY}
+						
+						<p class="interact">{COMMENT_OWNER} | {COMMENT_CREATED} | {DELETE_COMMENT}</p></div>
 						<div class="float-fix"></div>
 						<!-- END comment -->
 			
@@ -59,7 +76,7 @@
 	
 				 <form class="standardForm" method="post" action="/blog/comment/new/{BLOG_ID}">
 					<p><textarea name="body" style="width: 100%;"></textarea></p>
-					<p><input type="submit" name="comment" value="Comment"/></p>
+					<p><input type="submit" class="submit-btn-plain" name="comment" value="Comment"/></p>
 				 </form>
 				 
 				<p class="interact">Posted by {BLOG_OWNER} {BLOG_CREATED}</p>
@@ -78,18 +95,3 @@
 
  	</p>
 </div>
-<script type="text/javascript">
-	$j(function(){
-		$j('div.blog_comments, div.blog form').hide();
-		
-		$j('a.show_comments').click(function(){
-				$j(this).closest('li').find('div.blog_comments').toggle();
-				return false;
-		});
-		
-		$j('a.post_comment').click(function(){
-				$j(this).closest('li').find('form').toggle();
-				return false;
-		});
-	});
-</script>

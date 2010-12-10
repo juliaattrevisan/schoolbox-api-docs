@@ -47,8 +47,8 @@ function verify(){
 <!-- END custom_head -->
 
 <h1>{ACTION} Folder</h1>
-<form action="/cms/categoryForm.php" method="post" class="standardForm" id="folderForm" onsubmit="return(verify());">
-	<table>
+<form action="/cms/categoryForm.php" method="post" id="folderForm" onsubmit="return(verify());">
+	<table class="standardForm" >
 		<tr>
 			<td class="formLabelWidth"><h4>Folder Name</h4>
 				<input type="text" id="name" name="name" maxlength="250" size="40" value="{NAME}" /></td>
