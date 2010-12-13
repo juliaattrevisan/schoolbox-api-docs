@@ -32,13 +32,15 @@ function verify(){
 <input type="hidden" name="parent" id="parent" value="{PARENT_ID}" />
   <table class="standardForm">
     <tr>
-      <td class="formLabelWidth"><h4>Folder Name</h4><input type="text" name="name" maxlength="250" size="40" value="{NAME}" /></td>
+      <td class="formLabelWidth"><h4>Folder Name</h4></td>
+	  <td><input type="text" name="name" maxlength="250" size="40" value="{NAME}" /></td>
     </tr>
     <!-- BEGIN location -->
     <tr>
       <td><h4>Folder Parent</h4>
         <em>Location at which this folder should be placed</em>
-		<select name="parent">
+		</td>
+		<td><select name="parent">
           <!-- BEGIN parent_list -->
           <option value="{PARENT_ID}" {PARENT_SELECTED}>{PARENT_INDENT}&gt; {PARENT_NAME}</option>
           <!-- END parent_list -->

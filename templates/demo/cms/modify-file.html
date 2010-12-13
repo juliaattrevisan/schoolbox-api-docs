@@ -44,12 +44,14 @@ $j(document).ready(function() {
     <!-- BEGIN browse -->
     <tr>
       <td class="formLabelWidth"><h4>File</h4>
-        <em>Browse your local disk for a file or upload from your 'my files'. You can <a href="/cms/file/multi/{CATEGORY_ID}">upload multiple files</a> here.</em><input type="file" name="file" id="browse" onchange="clearBrowse(this, 'myfile');" />
+        <em>Browse your local disk for a file or upload from your 'my files'. You can <a href="/cms/file/multi/{CATEGORY_ID}">upload multiple files</a> here.</em></td>
+		<td><input type="file" name="file" id="browse" onchange="clearBrowse(this, 'myfile');" />
         <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" /></td>
     </tr>
     <tr>
       <td><em>or</em>
-	  <select name='myfile' id="myfile" onchange="clearBrowse(this, 'browse');">
+	 </td>
+	 <td> <select name='myfile' id="myfile" onchange="clearBrowse(this, 'browse');">
           <option value=''></option>
           <!-- BEGIN optgroup -->
           <optgroup label="&gt; {MYFOLDER_NAME}"  style="padding-left: {MYFOLDER_LEFT}px;">
@@ -63,27 +65,32 @@ $j(document).ready(function() {
     <!-- END browse -->
     <tr>
       <td><h4>Description</h4>
-        <em>One line description of the file for use as the title</em><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" /></td>
+        <em>One line description of the file for use as the title</em></td>
+		<td><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" /></td>
 
     </tr>
     <tr>
       <td><h4>Comments</h4>
-        <em>Any further details you wish to make about the file, useful for enhancing search results</em><textarea name="comment" cols="40" rows="4">{COMMENT}</textarea></td>
+        <em>Any further details you wish to make about the file, useful for enhancing search results</em></td>
+		<td><textarea name="comment" cols="40" rows="4">{COMMENT}</textarea></td>
 
     </tr>
     <tr>
       <td><h4>Location</h4>
         <em>The file will be located in this folder. You can <a href="/cms/file/multicat/">upload a file to multiple locations</a> here.</em>{CATEGORY_NAME}
-        <input name="category" value="{CATEGORY_ID}" type="hidden" /></td>
+       </td>
+	   <td><input name="category" value="{CATEGORY_ID}" type="hidden" /></td>
     </tr>
     <tr>
       <td><h4>Hidden</h4>
-        <em>Hide this file from anyone with read-only access.</em><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
+        <em>Hide this file from anyone with read-only access.</em></td>
+		<td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
     </tr>
     <!-- BEGIN submission_box -->
     <tr>
       <td><h4>Submission box</h4>
-        <em>Would you like students to submit responses to this file electronically</em>{SUBBOX}</td>
+        <em>Would you like students to submit responses to this file electronically</em></td>
+		<td>{SUBBOX}</td>
     </tr>
     <!-- END submission_box -->
 

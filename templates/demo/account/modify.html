@@ -35,19 +35,24 @@ $j(document).ready(function () {
 <form id="accountForm"  method="post" action="/account/modifyForm.php">
   <table class="standardForm">
     <tr>
-      <td><h4>Current Password</h4>
-        <em></em><br />
-		<input type="password" name="current_password" id="current_password" size="35" maxlength="50" /></td>
+      <td class="formLabelWidth"><h4>Current Password</h4>
+        <em></em>
+		</td>
+	<td>
+	<input type="password" name="current_password" id="current_password" size="35" maxlength="50" />
+	</td>
     </tr>
     <tr>
       <td><h4>New Password</h4>
         <em>Your new password must be at least 6 characters in length.</em><br />
-		<input type="password" name="new_password" id="new_password" size="35" maxlength="50" /></td>
+		</td>
+	<td><input type="password" name="new_password" id="new_password" size="35" maxlength="50" /></td>
     </tr>
     <tr>
       <td><h4>Confirm New Password</h4>
         <em>Enter your new password again to confirm you typed it correctly.</em><br />
-		<input type="password" name="confirm_password" id="confirm_password" size="35" maxlength="50" /></td>
+		</td>
+	<td><input type="password" name="confirm_password" id="confirm_password" size="35" maxlength="50" /></td>
     </tr>
 
   </table>

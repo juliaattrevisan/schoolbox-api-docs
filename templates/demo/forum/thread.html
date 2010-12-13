@@ -45,33 +45,36 @@
 <!-- END modify_thread -->
 <div class="float-fix"></div>
 <div class="forum">
+	<table cellpadding="0" cellspacing="0" border="0" width="100%">
+	
   	<!-- BEGIN post -->
-	<div class="post">
-    	<div class="post-left">
-		<div class="post-content">
-			<a name="{POST_ID}"></a>
-      		<p><a href="/search/user/{POST_USER_ID}">{POST_AUTHOR}</a><br />
-        	{POST_GROUP}</p>
-		
-		
-			 <p><!-- BEGIN reply_post -->
-			<a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}">Reply to this post</a><br />
-			<!-- END reply_post -->
-			<!-- BEGIN modify -->
-			<a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}">Edit post</a> |
-			<a href="/forum/modifyForm.php?deletePost={POST_ID}" class="delete">Delete post</a><br /> <!-- END modify -->
-			Posted {POST_TIME}
-			<!-- BEGIN modified --><br /> edited {POST_MODIFIED} {POST_CENSORED}<!-- END modified --></p>
-		</div>
-		</div>
-		<div class="post-right">
+	<tr class="post">
+    	<td class="post-left" valign="top">
+			<div class="post-content">
+				<a name="{POST_ID}"></a>
+				<p><a href="/search/user/{POST_USER_ID}">{POST_AUTHOR}</a><br />
+				{POST_GROUP}</p>
+			
+			
+				 <p><!-- BEGIN reply_post -->
+				<a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}">Reply to this post</a><br />
+				<!-- END reply_post -->
+				<!-- BEGIN modify -->
+				<a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}">Edit post</a> |
+				<a href="/forum/modifyForm.php?deletePost={POST_ID}" class="delete">Delete post</a><br /> <!-- END modify -->
+				Posted {POST_TIME}
+				<!-- BEGIN modified --><br /> edited {POST_MODIFIED} {POST_CENSORED}<!-- END modified --></p>
+			</div>
+		</td>
+		<td class="post-right" valign="top">
 			<div class="post-content">
        		 {POST_BODY}
 			</div>
-		</div>
-		<div class="float-fix"></div>
-		 </div> 
+		</td>
+		</tr>
+	
     <!-- END post -->
+	</table>
  </div>
 <p><a name="bottom"></a>
 {reply_block}

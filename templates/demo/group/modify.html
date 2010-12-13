@@ -103,24 +103,26 @@ window.addEvent('domready', function () {
 <div class="">
 	<table class="standardForm" cellpadding="0" cellspacing="0">
 		<tr>
-			<td class="formLabelWidth"><h4>Group Admin</h4>
-				<a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a></td>
+			<td class="formLabelWidth"><h4>Group Admin</h4></td>
+			<td><a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a></td>
 		</tr>
 		<tr>
 			<td valign="top"><h4>Add users</h4>
 				<em>You may add users individually by typing their name and selecting from the list.  Alternatively you can add many users via a list of synergetic id's or usernames.</em>
-				<form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" method="post">
-						<input id="addUser" type="text" size="30" />
-						<input type="hidden" name="userID" id="userID" />
-						<input type="submit" value="Add User" class="submit-btn-plain" />
-						<div class="float-fix"></div>
+				</td>
+			<td><form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" method="post">
+					<input id="addUser" type="text" size="30" />
+					<input type="hidden" name="userID" id="userID" />
+					<input type="submit" value="Add User" class="submit-btn-plain" />
+					<div class="float-fix"></div>
 				</form>
 				<a href="/group/bulk/{CATEGORY_ID}" class="btn add">Add Bulk Members</a></td>
 		</tr>
 		<tr>
 			<td valign="top"><h4>Access Type</h4>
 				<em>Restricted groups are private and only administrated by the group admin. Users may request access to moderated groups but only be granted by the group admin.  Free groups can be joined and left by anyone.  See the <a href="/group/join">group page</a> for available groups.</em>
-				<form action="" method="post" id="type_form">
+				</td>
+				<td><form action="" method="post" id="type_form">
 					<input name="type" type="radio" value="1" {GROUP_TYPE_1} />
 					Restricted <br />
 					<input name="type" type="radio" value="2" {GROUP_TYPE_2} />
@@ -132,6 +134,8 @@ window.addEvent('domready', function () {
 		<tr>
 			<td valign="top"><h4>Members</h4>
 				<em>You can give write access to any member of the group, this will enable them to post resources and moderate the forum.  Only one user may be the group admin and it cannot be a student.  Making another user the group admin will relinquish your control over the group.</em>
+				</td>
+				<td>
 				<form action="/group/modifyForm.php" method="post" id="deleteForm">
 					<table>
 						<tr>
@@ -156,15 +160,17 @@ window.addEvent('domready', function () {
 					<p>
 						<input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
 						<input type="button" id="deleteButton" value="Delete Selected" class="submit-btn-plain" />
-						<div class="float-fix"></div>
+					<div class="float-fix"></div>
 					</p>
-				</form></td>
+				</form>
+				</td>
 		</tr>
 		<!-- BEGIN authorisation -->
 		<tr>
 			<td><h4>Awaiting Authorisation</h4>
 				<em>These users are currently awaiting your authorisation to join this group</em>
-				<form action="/group/modifyForm.php" method="post" id="acceptForm">
+				</td>
+				<td><form action="/group/modifyForm.php" method="post" id="acceptForm">
 					<table>
 						<tr>
 							<th style="width: 20px; text-align: center;"><input type="checkbox" class="checkAll" id="acceptCheck" /></th>
@@ -179,15 +185,15 @@ window.addEvent('domready', function () {
 						</tr>
 						<!-- END waiting -->
 					</table>
-						<input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
-						<input type="submit" value="Accept Selected" class="submit-btn-plain" />
-
+					<input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
+					<input type="submit" value="Accept Selected" class="submit-btn-plain" />
 				</form></td>
 		</tr>
 		<!-- END authorisation -->
 		<tr>
 			<td valign="top"><h4>Disband Group</h4>
-				<em>Removes all members of the group including admin, but leaves all content</em><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" onclick="return confirm('Disband this group?');">Disband Now</a></td>
+				<em>Removes all members of the group including admin, but leaves all content</em></td>
+				<td><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" onclick="return confirm('Disband this group?');">Disband Now</a></td>
 		</tr>
 	</table>
 </div>

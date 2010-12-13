@@ -45,25 +45,29 @@ window.addEvent('domready', function() {
 <form method="post">
 <table class="standardForm">
 	<tr>
-		<td class="formLabelWidth"><h4>Title</h4><input type="text" name="title" size="30" maxlength="30" value="{TEST_TITLE}"></td>
+		<td class="formLabelWidth"><h4>Title</h4></td>
+		<td><input type="text" name="title" size="30" maxlength="30" value="{TEST_TITLE}"></td>
 	</tr>
 	<tr>
-		<td><h4>Location</h4><em>The people associated with this group or subject will be able to take the test.</em><select name="category_id">
+		<td><h4>Location</h4><em>The people associated with this group or subject will be able to take the test.</em></td>
+		<td><select name="category_id">
 				<!-- BEGIN category -->
 				<option value="{CATEGORY_ID}" {CATEGORY_ID_SELECTED}>{CATEGORY_NAME}</option>
 				<!-- END category -->
 			</select></td>
 	</tr>
 	<tr> 
-		<td><h4>Dates</h4><em>The dates in which the test will be available to be taken.</em><input type="text" size="10" maxlength="10" id="date_start" name="date[start]" value="{DATE_START}">
+		<td><h4>Dates</h4><em>The dates in which the test will be available to be taken.</em>
+		</td>
+		<td><input type="text" size="10" maxlength="10" id="date_start" name="date[start]" value="{DATE_START}">
 			
 			 to 
-			<input type="text" size="10" maxlength="10" id="date_finish" name="date[finish]" value="{DATE_FINISH}">
-		</td>
+			<input type="text" size="10" maxlength="10" id="date_finish" name="date[finish]" value="{DATE_FINISH}"></td>
 	</tr>
 	<tr> 
-		<td><h4>Duration</h4><em>Time alloted for the test to completed.</em>
-		<select name="duration[hours]">
+		<td><h4>Duration</h4><em>Time allotted for the test to completed.</em>
+		</td>
+		<td><select name="duration[hours]">
 				<!-- BEGIN duration_hours -->
 				<option value="{HOUR}" {HOUR_SELECTED}>{HOUR} hours</option>
 				<!-- END duration_hours -->
@@ -75,7 +79,8 @@ window.addEvent('domready', function() {
 			</select></td>
 	</tr>
 	<tr> 
-		<td><h4>Description</h4><em>Any additional information which describes the test</em><textarea name="description" cols="50">{DESCRIPTION}</textarea></td>
+		<td><h4>Description</h4><em>Any additional information which describes the test</em></td>
+		<td><textarea name="description" cols="50">{DESCRIPTION}</textarea></td>
 	</tr>
 </table>
 

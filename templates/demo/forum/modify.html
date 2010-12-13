@@ -81,22 +81,23 @@ $j(function(){
     	<!-- BEGIN title -->
 		  <tr> 
         <td class="formLabelWidth"><h4>Title</h4><em>The name of this forum thread.</em>
-		<input type="text" name="title" id="forumTitle" size="35" maxlength="50" value="{THREAD_TITLE}" /></td>
+		</td>
+		<td><input type="text" name="title" id="forumTitle" size="35" maxlength="50" value="{THREAD_TITLE}" /></td>
 
 		  </tr>
       <!-- END title -->
       <!-- BEGIN quote -->
       <tr> 
-        <td><h4>Quote</h4><em>{QUOTE_USER}'s post.</em>
-        	<div class="cite-it"><span>&ldquo;</span>{QUOTE_BODY}</div>
+        <td><h4>Quote</h4><em>{QUOTE_USER}'s post.</em></td>
+		<td><div class="cite-it"><span>&ldquo;</span>{QUOTE_BODY}</div>
         	<input type="button" id="quote" class="submit-btn-plain" value="Quote" /> 
-			<input type="checkbox" value="1" name="byline" id="byline" /> With byline
-        </td>
+			<input type="checkbox" value="1" name="byline" id="byline" /> With byline</td>
 		  </tr>
       <!-- END quote -->
 		  <tr> 
         <td><h4>Post</h4><em>This is the main portion of your forum post.</em>
-        <textarea id="forumBody" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
+      </td>
+	  <td><textarea id="forumBody" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
 		  </tr>
 
 		</table>

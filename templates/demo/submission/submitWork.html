@@ -2,11 +2,13 @@
 <form method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data" >
     <table class="standardForm">
         <tr>
-            <td class="formLabelWidth"><h4>Submission Box Title</h4><b>{CATEGORY} - {FILE}</b></td>
+            <td class="formLabelWidth"><h4>Submission Box Title</h4></td>
+			<td>{CATEGORY} - {FILE}</td>
         </tr>
         <tr>
             <td><h4>File</h4>
-                <em>You must attach your work by locating the file on your drive. Make sure the file is saved and closed before submitting the form. </em><input type="file" name="file"/>
+                <em>You must attach your work by locating the file on your drive. Make sure the file is saved and closed before submitting the form. </em></td>
+			<td><input type="file" name="file"/>
                 <input type="hidden" name="box_id" value="{BOX_ID}" /></td>
         </tr>
 

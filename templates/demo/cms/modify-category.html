@@ -50,19 +50,21 @@ function verify(){
 <form action="/cms/categoryForm.php" method="post" id="folderForm" onsubmit="return(verify());">
 	<table class="standardForm" >
 		<tr>
-			<td class="formLabelWidth"><h4>Folder Name</h4>
-				<input type="text" id="name" name="name" maxlength="250" size="40" value="{NAME}" /></td>
+			<td class="formLabelWidth"><h4>Folder Name</h4></td>
+			<td><input type="text" id="name" name="name" maxlength="250" size="40" value="{NAME}" /></td>
 		</tr>
 		<tr>
 			<td><h4>Folder Parent</h4>
 				<em>Location at which this folder will be located</em>
-				<input type="hidden" id="parent" name="parent" value="{PARENT_ID}" />
+				</td>
+				<td><input type="hidden" id="parent" name="parent" value="{PARENT_ID}" />
 				{PARENT_NAME}</td>
 		</tr>
 		<tr>
 			<td><h4>Homepage</h4>
 				<em>If you would like a homepage associated with this folder select a basic layout.</em>
-				<select name="template">
+				</td>
+				<td><select name="template">
 					<!-- BEGIN template_list -->
 					<option value="{TEMPLATE_ID}" {TEMPLATE_ID_SELECTED}>{TEMPLATE_NAME}</option>
 					<!-- END template_list -->
@@ -71,7 +73,8 @@ function verify(){
 		<tr>
 			<td><h4>Group Permissions</h4>
 				<em>Allow predefined groups of users access to this folder. </em>
-				<table>
+				</td>
+				<td><table>
 					<tr>
 						<th><b>Group</b></th>
 						<th><b>None</b></th>
@@ -91,25 +94,29 @@ function verify(){
 		<!-- BEGIN indiv_perms -->
 		<tr>
 			<td><h4>Individual Permissions</h4>
-				<em>Manage individual user access to this folder. You will automatically be assigned administration rights.</em><input type="checkbox" id="groupcheck" name="groupcheck" value="1" /></td>
+				<em>Manage individual user access to this folder. You will automatically be assigned administration rights.</em></td>
+			<td><input type="checkbox" id="groupcheck" name="groupcheck" value="1" /></td>
 		</tr>
 		<!-- END indiv_perms --> 
 		<!-- BEGIN indiv_modify -->
 		<tr>
 			<td><h4>Individual Permissions</h4>
-				<em>Manage individual user access to this folder.</em><a href="/group/modify/{CATEGORY_ID}">Modify Group</a></td>
+				<em>Manage individual user access to this folder.</em></td>
+			<td><a href="/group/modify/{CATEGORY_ID}">Modify Group</a></td>
 		</tr>
 		<!-- END indiv_modify --> 
 		<!-- BEGIN reset_content -->
 		<tr>
 			<td><h4>Reset Homepage Content</h4>
-				<em>Removes all content from modules and clears the folder contents and all its sub-folders, returning the homepage to an empty space</em><a href="/cms/category/reset/{CATEGORY_ID}" onclick="return(confirm('Are you sure you wish to delete all resources from this homepage. This includes; sub-folders, files, links, news and forum posts'));">Reset Content</a></td>
+				<em>Removes all content from modules and clears the folder contents and all its sub-folders, returning the homepage to an empty space</em></td>
+				<td><a href="/cms/category/reset/{CATEGORY_ID}" onclick="return(confirm('Are you sure you wish to delete all resources from this homepage. This includes; sub-folders, files, links, news and forum posts'));">Reset Content</a></td>
 		</tr>
 		<!-- END reset_content --> 
 		<!-- BEGIN synergy_input -->
 		<tr>
 			<td><h4>Synergy Subject Codes</h4>
-				<em>If you want this category to be a subject enter its code here. You may enter multiple codes by seperating them with a comma.</em><input type="text" name="code" size="40" value="{CODE}" /></td>
+				<em>If you want this category to be a subject enter its code here. You may enter multiple codes by seperating them with a comma.</em></td>
+			<td><input type="text" name="code" size="40" value="{CODE}" /></td>
 		</tr>
 		<!-- END synergy_input -->
 	</table>

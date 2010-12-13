@@ -18,7 +18,7 @@ if(is_numeric($this->arg[0])) {
 		error(29);
 	
 	if($blog['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || NEWS_teacher_edit_other)
-		$this->setVar('MODIFY_BLOG', "<a href=\"/blog/modify/{$blog['id']}\">Modify</a> | ");
+		$this->setVar('MODIFY_BLOG', "<a href=\"/blog/modify/{$blog['id']}\">Modify</a>");
 	else
 		$this->setVar('MODIFY_BLOG', '');
 	

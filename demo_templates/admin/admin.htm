@@ -113,12 +113,12 @@
 
   <div id="content">
 	<!-- #BeginEditable "content" -->
-			<h1>Portal Administration</h1>
+			<h1>Schoolbox Administration</h1>
 			<h2>User Administration </h2>
 			<div class="indent">
-			<table>
+			<table class="standardForm" border="0" cellpadding="0" cellspacing="0">
 				<tr>
-					<td> <h4>Add User</h4></td>
+					<td class="formLabelWidth"> <h4>Add User</h4></td>
 					<td><a href="/admin/modUser.php?adduser=1">Click Here</a></td>
 				</tr>
 				<tr>
@@ -141,13 +141,13 @@
 				<tr>
 					<td> <h4>Remove Bulk User List</h4>
 					<em>Provide a list of either usernames or synergetic id each on a new line.</em><br />
-					<form action="/admin/bulkRemove.php" method="post" enctype="multipart/form-data" name="form1" id="form1">
+					</td>
+					<td><form action="/admin/bulkRemove.php" method="post" enctype="multipart/form-data" name="form1" id="form1">
 							<input name="bulkremove" type="file" />
 							<div class="float-fix"></div>
 							<br />
 							<input name="Submit" type="submit" class="submit-btn-plain" value="Submit" />
 						</form></td>
-					<td></td>
 				</tr>
 				<tr>
 					<td><h4>Upload Calendar  </h4><br />
@@ -177,9 +177,9 @@
                   </table> -->
 			<h2>Rollover Administration </h2>
 			<div class="indent">
-			<table>
+			<table class="standardForm" cellpadding="0" cellspacing="0">
 				<tr>
-					<td> <h4>Remove Deleted/Expired Content</h4></td>
+					<td class="formLabelWidth"> <h4>Remove Deleted/Expired Content</h4></td>
 					<td><a href="cleanup.php?news=1&amp;subnews=1&amp;file=1" onclick="return(confirm('This will clean the database of all content no longer visible to users'));">Click Here</a></td>
 				</tr>
                 <tr>

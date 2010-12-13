@@ -35,19 +35,23 @@ $j(document).ready(function() {
   <table class="standardForm">
     <tr>
       <td class="formLabelWidth"><h4>URL</h4>
-     <em>The internet address for the website, eg. http://www.google.com</em><input type="text" name="url" size="40" maxlength="250" value="{URL}" /></td>
+     <em>The internet address for the website, eg. http://www.google.com</em></td>
+	 <td><input type="text" name="url" size="40" maxlength="250" value="{URL}" /></td>
     </tr>
     <tr>
       <td><h4>Description</h4>
-        <em>One line description of the URL for the title </em><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" /></td>
+        <em>One line description of the URL for the title </em></td>
+		<td><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" /></td>
     </tr>
     <tr>
       <td><h4>Comments</h4>
-        <em>Any further details you wish to make about the URL, useful for enhancing search results</em><textarea name="comment" cols="40" rows="4">{COMMENT}</textarea></td>
+        <em>Any further details you wish to make about the URL, useful for enhancing search results</em></td>
+		<td><textarea name="comment" cols="40" rows="4">{COMMENT}</textarea></td>
     </tr>
     <tr>
       <td><h4>Hidden</h4>
-        <em>Hide this URL from anyone with read-only access.</em><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
+        <em>Hide this URL from anyone with read-only access.</em></td>
+		<td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
     </tr>
   </table>
   <input type='hidden' name='linkID' value='{LINK_ID}'  />

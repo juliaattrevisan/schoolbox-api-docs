@@ -21,10 +21,10 @@ hr { background-color: #cccccc; border: 0; height: 1px; }
 img{border:0;}
 
 
-/*************** skin colours ******/
+/*************** skin colours *****
+#nav h3{color:#F4F1EA}
 
-
-
+*/
 /*********** skin ****/
 
 /*--------------------------------------------------------------
@@ -51,7 +51,7 @@ h2 a{color:#013a63;}
 
 /*pesky header_option divs. ugggly.*/
 .header_option {  display: block; float: right; margin: -43px 0 0 0; position: relative;line-height: normal;color:#013A63 }
-.header_option.in-h2{margin:-28px 5px 0 0;}
+.header_option.in-h2{margin:-32px 5px 0 0;}
 #week-view .dayWrap span.header_option{margin:0;}
 #calendar .header_option a{ margin-top: 4px; }
 .day-block .header_option { float: right; margin: 0 !important; padding: 0; }
@@ -134,8 +134,6 @@ nd:#F1F1F1; border:1px solid #ccc;}
 .box form { text-align: right; }
 .box .listing{margin:8px 0;}
 
-
-
 .dark {  background: #faf9f5; position:relative;}
 .listing h3 { float: left; line-height: 1.3; width: 70%; }
 .listing h4{ float:left; width:70%; }.
@@ -149,6 +147,7 @@ p.interact-left.home-calendar{width:23%; margin:0; margin-top:2px;}
 .box .thumb { margin: 0 15px 15px 0; display: block; float: left;vi width: 100px; }
 
 /*FORMS*/
+.formLabelWidth{width:250px;}
 textarea{font-family:Arial, Helvetica, sans-serif; font-size:12px;}
 fieldset{border:0; padding:0; margin:0;}
 .standardForm { background: #faf9f5; margin:0 0 16px 0; width:100%; }
@@ -159,7 +158,7 @@ fieldset{border:0; padding:0; margin:0;}
 
 .standardForm td { vertical-align: top; padding: 16px; }
 .standardForm td h4{font-size:18px; margin-bottom:16px; color:#013a63; font-weight:bold;}
-.standardForm td em{display:block; margin-bottom:16px;font-style: normal;}
+.standardForm td em{display:block; font-style: normal; line-height:16px;}
 #deleteForm td { padding: 0.3em; vertical-align: middle;}
 #deleteForm td input { vertical-align: middle;}
 .standardForm td {border-bottom:3px solid #e9e3d6;}
@@ -167,7 +166,7 @@ fieldset{border:0; padding:0; margin:0;}
 select.small, input.small { width: 100px; }
 input.timeField { width: 30px; }
 
-.btn, .submit-btn-plain { border:1px solid #eeeeee; color:#808080 !important;display:block; float: right; text-shadow: 0 1px 0px #fff; background-color: #fbfbfb;background-image: -moz-linear-gradient(top, #fbfbfb, #f7f7f7); background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fbfbfb),color-stop(1, #f7f7f7)); filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7'); -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')"; -moz-border-radius: 3px; -webkit-border-radius: 3px;  border-radius: 3px;  height:22px; line-height:22px;margin-left:3px; padding:0 16px 0 30px;position:relative; font-size:12px; font-weight:normal; width:auto !important; overflow: visible; }
+.btn, .submit-btn-plain { border:1px solid #eeeeee; color:#808080 !important;display:block; float: right; text-shadow: 0 1px 0px #fff; background-color: #fbfbfb;background-image: -moz-linear-gradient(top, #fbfbfb, #f7f7f7); background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fbfbfb),color-stop(1, #f7f7f7)); filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7'); -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')"; -moz-border-radius: 3px; -webkit-border-radius: 3px;  border-radius: 3px;  height:22px; line-height:22px;margin-left:3px; padding:0 16px 0 30px;position:relative; font-size:12px; font-weight:normal; width:auto !important; overflow: visible; margin-top:4px; }
 
 
 .submit-btn-plain{border-color:#0aa9c7;
@@ -279,12 +278,12 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 /*ASSESS*/
 #assess table.mceLayout{border:0;}
 #assess table td span{font-size:10px;}
-#assess .standardForm{background:#ffffff; margin-bottom:0;}
+#assess .standardForm{background: #FAF9F5; margin-bottom:0;}
 #assess .standardForm td{width:100%;}
 #assess .standardForm thead td, #assess .standardForm{padding:0;}
 #assess .standardForm tbody{border-collapse:collapse;}
 #assess .assess-header{margin-bottom:20px;}
-#assess .additional-details, #assess  .assess-body{padding:10px;border:1px solid #dbdbdb;  -moz-border-radius: 0 0 3px 3px; -webkit-border-radius:0 0 3px 3px; border-radius:0 0 3px 3px;background: #ffffff}
+#assess .additional-details, #assess  .assess-body{padding:10px;border:1px solid #dbdbdb;  -moz-border-radius: 0 0 3px 3px; -webkit-border-radius:0 0 3px 3px; border-radius:0 0 3px 3px;background:  #FAF9F5}
 #assess .assess-body hr {height:0px; border-top:1px solid #DBDBDB; width:100%; margin:10px 0;}
 #assess .additional-details span.time{color:#F00;}
 #assess .section h3{background:#1597cb; color:#fff; font-size:11px;padding:7px; border:none;}
@@ -651,7 +650,8 @@ ul.js_happening li{margin-bottom:4px; position:relative; }
 #file-window #file-list tbody tr td span {background-repeat:no-repeat; line-height: 22px; display: block; padding: 0 0 0 28px; }
 .treeTable tr.selected td { background: #3875D7; color: #fff; }
 
-.scroller {min-height:1px; zoom:1;}
+.scroller {min-height:1px; zoom:1; }
+.scroller table{width:100% !important;}
 
 
 
@@ -721,10 +721,13 @@ p.bubble-name { margin-bottom:5px; padding-bottom:5px; }
 /* FORUM */
 .forum{margin-bottom:16px;}
 .post{border-bottom:3px solid #E9E3D6;}
-.post-left, .post-right{width:20%; float:left; }
+.post-left{width:20%; }
 .post .post-content{padding:16px;}
-.post-left{background-color:#FAF9F5;}
-.post-right{width:80%; }
+.post-content blockquote{ background:#fffde9; padding:8px; margin-bottom:16px; margin-left:16px;}
+.post-content blockquote p{margin:0;}
+.post-content cite{  font-style:none; margin:0 0 4px 16px; display:block; }
+.post-left{background-color:#FAF9F5; padding:0; vertical-align:top}
+.post-right{width:80%; padding:0; vertical-align:top}
 
 .cite-it{position:relative;  padding:16px 16px 0 32px; border:1px solid #E9E3D6; margin-bottom:16px;}
 .cite-it span{font-family:Georgia, "Times New Roman", Times, serif;position:absolute; font-size:52px; color:#E9E3D6; top:2px; left:5px; width:20px; height:20px;}
@@ -866,6 +869,15 @@ li.bars {display:block; }
 #translateTextForm .lefty{width:68%; float:left; margin-right:1%;}
 #translateTextForm .righty{width:30%; float:left;}
 #translateTextForm em{float:left; width:22%; line-height:24px; text-align:center;}
+
+/* TUTORIAL */
+
+.cancelled td {text-decoration: line-through;}
+.passed td {opacity: 0.5;}
+th.over {text-decoration: underline;}
+th.desc {text-decoration: underline;background: url(/images/tutorial/down-arrow.gif) no-repeat 100% 60% !important;}
+th.asc {text-decoration: underline;background: url(/images/tutorial/up-arrow.gif) no-repeat 100% 60% !important;}
+
 
 /*TREE -- now utilising the expandable plugin :0*/
 ul.tree, ul.tree ul { list-style: none; margin:0;}

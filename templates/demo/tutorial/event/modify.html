@@ -89,7 +89,8 @@ window.addEvent('domready', function () {
 	<table class="standardForm">
 		<tr>
 			<td class="formLabelWidth"><h4>Type</h4>
-				<select name="typeID" id="typeSelect">
+				</td>
+			<td><select name="typeID" id="typeSelect">
 					<!-- BEGIN type_list -->
 					<option value="{TYPE_ID}" {TYPE_ID_SELECTED}>{TYPE_NAME}</option>
 					<!-- END type_list -->
@@ -98,47 +99,51 @@ window.addEvent('domready', function () {
 		<tr id="classRow" style="display: {CLASS_ENABLED};">
 			<td><h4>Name</h4>
 				<em>Required field.</em>
-				<select name="classID" id="classSelect">
+				</td>
+			<td><select name="classID" id="classSelect">
 					<option value=''></option>
 					<!-- BEGIN class_list -->
 					<option value="{CLASS_ID}" {CLASS_ID_SELECTED}>{CLASS_NAME} ({CLASS_CODE})</option>
 					<!-- END class_list -->
 				</select></td>
-			<td>
 		</tr>
 		<tr id="nameRow" style="display: {NAME_ENABLED};">
 			<td><h4>Name</h4>
 				<em>Required field.</em>
-				<input type="text" name="name" id="name" size="50" maxlength="50" value="{NAME}" /></td>
+				</td>
+			<td><input type="text" name="name" id="name" size="50" maxlength="50" value="{NAME}" /></td>
 		</tr>
 		<tr id="codeRow" style="display: {NAME_ENABLED};">
 			<td><h4>Code</h4>
-				<input type="text" name="code" id="code" size="15" maxlength="50" value="{CODE}" /></td>
+				</td>
+			<td><input type="text" name="code" id="code" size="15" maxlength="50" value="{CODE}" /></td>
 		</tr>
 		<tr>
 			<td class="formLabelWidth"><h4>Room</h4>
-				<input type="text" name="location" size="40" maxlength="50" value="{LOCATION}" /></td>
+				</td>
+			<td><input type="text" name="location" size="40" maxlength="50" value="{LOCATION}" /></td>
 		</tr>
 		<!-- BEGIN date -->
 		<tr>
 			<td class="formLabelWidth" valign="top"><h4>Date</h4>
 				<em>Required field. Dates should be in dd/mm/yyyy format. </em>
-				<input name="date" id="cal_date" type="text" size="15" maxlength="10" value="{DATE}"/>
-				
-    </script></td>
+			</td>
+			<td><input name="date" id="cal_date" type="text" size="15" maxlength="10" value="{DATE}"/></td>
 		</tr>
 		<!-- END date --> 
 		<!-- BEGIN date_sequence -->
 		<tr>
 			<td><h4>Date Sequence</h4>
-				<strong>{TOTAL_EVENTS} events, from {START_DATE} to {END_DATE}</strong></td>
+				</td>
+			<td><strong>{TOTAL_EVENTS} events, from {START_DATE} to {END_DATE}</strong></td>
 		</tr>
 		<!-- END date_sequence --> 
 		<!-- BEGIN recurring_dates -->
 		<tr>
 			<td class="formLabelWidth" valign="top"><h4>Repeat</h4>
 				<em>The frequency that this tutorial recurs if at all.</em>
-				<select name="repeat" onchange="toggleRepeat(this);">
+				</td>
+			<td><select name="repeat" onchange="toggleRepeat(this);">
 					<option value="">Single Meeting</option>
 					<option value="weekly">Weekly</option>
 					<option value="fortnightly">Fortnightly</option>
@@ -148,13 +153,13 @@ window.addEvent('domready', function () {
 		<tr id="repeatUntil" style="display: none;">
 			<td class="formLabelWidth" valign="top"><h4>Repeat Until</h4>
 				<em>The date at which recurrence should cease.</em>
-				<input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="10" value=""/>
 				</td>
+			<td><input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="10" value=""/></td>
 		</tr>
 		<!-- END recurring_dates -->
 		<tr>
-			<td><h4>Time</h4>
-				<input id="hour" name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />
+			<td><h4>Time</h4></td>
+			<td><input id="hour" name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />
 				:
 				<input id="minute" name="minute" type="text" maxlength="2" value="{MIN}" class="timeField" />
 				<select id="period" name="period">
@@ -168,13 +173,12 @@ window.addEvent('domready', function () {
 				<select id="toperiod" name="toperiod">
 					<option value="am" {AMTO}>AM</option>
 					<option value="pm" {PMTO}>PM</option>
-				</select>
-
-			</td>
+				</select></td>
 		</tr>
 		<tr>
 			<td><h4>Tutor</h4>
-			<table cellspacing="0" cellpadding="0">
+			</td>
+			<td><table cellspacing="0" cellpadding="0">
 					<tr>
 						<td><h4>Primary</h4><select id="tutor1ID" name="tutor1ID">
 								<option value="">N/A</option>
@@ -194,7 +198,8 @@ window.addEvent('domready', function () {
 				</table></td>
 		</tr>
 		<tr>
-			<td><h4>Cancelled</h4><input type="checkbox" value="1" name="cancelled" {CANCELLED_SELECTED} /></td>
+			<td><h4>Cancelled</h4></td>
+			<td><input type="checkbox" value="1" name="cancelled" {CANCELLED_SELECTED} /></td>
 		</tr>
 	</table>
 	<input class="submit-btn-plain" type="submit" name="submit" value="{ACTION}" />	

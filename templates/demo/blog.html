@@ -1,5 +1,14 @@
+<script type="text/javascript">
+$j(function() {
+	$j('.header_option a:first-child').addClass('btn modify');
+	$j('.header_option a:first-child').html('<span></span>Modify');
+});
+
+
+</script>
+
 <h1>{BLOG_HEADING}</h1>
-<span class="header_option">{MODIFY_BLOG}<a href="/homepage/{BLOG_CID}">Back to Homepage</a></span>
+<span class="header_option">{MODIFY_BLOG}<a href="/homepage/{BLOG_CID}" class="btn go-back"><span></span>Back to Homepage</a></span>
 <div class="float-fix"></div>
 <div class="blog-detail">
 	<p>{BLOG_BODY}</p>

@@ -1,42 +1,20 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.tablerow.js"></script>
-<style type="text/css">
-.cancelled td {
-	text-decoration: line-through;
-}
-.passed td {
-	opacity: 0.5;
-}
-#content table th {
-	background: transparent;
-}
-th.over {
-	text-decoration: underline;
-}
-th.desc {
-	text-decoration: underline;
-	background: url(/images/tutorial/down-arrow.gif) no-repeat 100% 60% !important;
-	}
-th.asc {
-	text-decoration: underline;
-	background: url(/images/tutorial/up-arrow.gif) no-repeat 100% 60% !important;
-	}
-</style>
+
 <!-- END custom_head -->
 
 <h1>Tutorial List {USER_NAME}</h1>
 
 <span class="header_option">
-<a href="/modules/tutorial/export/event.php?{USER_URL}">Export CSV</a>
-<!-- BEGIN add_link --> |
+<a href="/modules/tutorial/export/event.php?{USER_URL}" class="btn download"><span></span>Export CSV</a>
+<!-- BEGIN add_link -->
 <a href="/modules/tutorial/event/modify.php" class="btn add"><span></span>Add Tutorial</a><!-- END add_link -->
 </span>
 
-<h1>{SHOW} Events</h1>
+<h2>{SHOW} Events</h2>
 
-<span class="header_option">
-View <a href="/modules/tutorial/event/list.php?{USER_URL}">Week</a> | <a href="/modules/tutorial/event/list.php?show=semester&amp;{USER_URL}">Semester</a> 
-</span>
+<p style="padding:8px 0; margin:0;">View <a href="/modules/tutorial/event/list.php?{USER_URL}">Week</a> | <a href="/modules/tutorial/event/list.php?show=semester&amp;{USER_URL}">Semester</a> 
+</p>
 
 <!-- BEGIN has_events -->
 <table class="row_hover">

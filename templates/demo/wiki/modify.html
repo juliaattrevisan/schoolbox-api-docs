@@ -24,21 +24,24 @@ tinyMCE.init({
 </script>
 <!-- END custom_head -->
 <h1>{ACTION} Wiki</h1>
-<span class="header_option"><a href="/homepage/{CATEGORY_ID}">Return to Homepage</a></span>
+<span class="header_option"><a href="/homepage/{CATEGORY_ID}" class="btn go-back"><span></span>Return to Homepage</a></span>
 <form  action="/wiki/modifyForm.php" method="post">
     <input type="hidden" name="wikiID" value="{WIKI_ID}" />
     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
     
   <table width="100%" class="standardForm">
     <tr>
-      <td><h4>Heading</h4><input type="text" name="heading" size="60" value="{HEADING}" /></td>
+      <td class="formLabelWidth"><h4>Heading</h4></td>
+	  <td><input type="text" name="heading" size="60" value="{HEADING}" /></td>
     </tr>
     <tr>
-      <td><h4>Body</h4><textarea name="body" style="width:100%;height:350px" >{BODY}</textarea></td>
+      <td><h4>Body</h4></td>
+	  <td><textarea name="body" style="width:100%;height:350px" >{BODY}</textarea></td>
     </tr>
 	
 	<tr>
-      <td><h4>Revision</h4><input type="text" name="revision" value="{REVISION}" /></td>
+      <td><h4>Revision</h4></td>
+	  <td><input type="text" name="revision" value="{REVISION}" /></td>
     </tr>
 
   </table>

@@ -14,6 +14,7 @@
 <script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
 <script type="text/javascript" src="/javascript/scripts.js"></script>
 <script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.autoclear.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 
 <script type="text/javascript" src="/javascript/corev2/scripts.js"></script>
@@ -24,14 +25,8 @@
 $j(function() {
     $j('#nav ul').droppy({speed: 0});
  
-	$j('#search-field').focus(function() {
-		$j(this).attr('value', "");
-	});
-	$j('#search-field').blur(function() {
-		if($j(this).attr('value') == "") {
-			$j(this).attr('value', "search");
-		}
-	});
+	$j('#search-field').autoclear();
+
 	$j('#nav li.parent > a span').each(function() {
 		$j(this).append('<strong>&rsaquo;</strong>');
 	});

@@ -18,19 +18,22 @@
 	<table>
 		<tr>
 			<td class="formLabelWidth"><h4>Title</h4>
-				<input type="text" name="title" value="{POLL_TITLE}" size="50" /></td>
+				</td>
+			<td><input type="text" name="title" value="{POLL_TITLE}" size="50" /></td>
 		</tr>
 		<tr>
 			<td><h4>Question</h4>
 				<em>What is the poll for</em>
-				<input type="text" name="question" value="{QUESTION}" size="50" /></td>
+				</td>
+			<td><input type="text" name="question" value="{QUESTION}" size="50" /></td>
 		</tr>
 		<tr>
 			<td><h4>Options</h4>
 				<em>You can have a maximum of 
 				ten options<br />
 				to vote on. You must fill in at least two.</em>
-				<input type="text" name="option_0" value="{OPTION_0}" />
+				</td>
+			<td><input type="text" name="option_0" value="{OPTION_0}" />
 				<br />
 				<input type="text" name="option_1" value="{OPTION_1}" />
 				<br />
@@ -54,22 +57,21 @@
 		<tr>
 			<td><h4>Close Date</h4>
 				<em>No votes can be cast after this date.</em>
-				<input name="close" id="cal_date" type="text" size="15" maxlength="10" value="{CLOSE}"/>
 				</td>
+			<td><input name="close" id="cal_date" type="text" size="15" maxlength="10" value="{CLOSE}"/></td>
 		</tr>
 		<tr>
 			<td><h4>Voting Frequency</h4>
 				<em>Selected how often users can place a new vote.</em>
-				<select name="frequency">
+				</td>
+				<td><select name="frequency">
 					<option value="once" {FREQUENCY_ONCE_SELECTED}>Once</option>
 					<option value="hourly" {FREQUENCY_HOURLY_SELECTED}>Hourly</option>
 					<option value="daily" {FREQUENCY_DAILY_SELECTED}>Daily</option>
-				</select></td>
+				</select><input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+				<input type="hidden" name="pollID" value="{POLL_ID}" /></td>
 		</tr>
-		<tr>
-			<td><input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-				<input type="hidden" name="pollID" value="{POLL_ID}" />
-				<input type="submit" value="Save" /></td>
-		</tr>
+
 	</table>
+	<input type="submit" class="submit-btn-plain" value="Save" />
 </form>
