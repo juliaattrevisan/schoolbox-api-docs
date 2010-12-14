@@ -103,9 +103,12 @@ function authenticate(&$db, $username, $password, $remember = 0)
 	$password = trim($password);
 
 	if (get_magic_quotes_gpc()) {
-       $username = stripslashes($username);
-	   $password = stripslashes($password);
-   }
+		$username = stripslashes($username);
+		$password = stripslashes($password);
+	}
+	
+	if(empty($username) || empty($password) )
+		return false;
 
 	// Function to check username exists and password is correct
 	if(defined('LDAP_enable') && LDAP_enable) {
@@ -291,9 +294,11 @@ function setSynergyInfo(&$mydb)
 		//if user is parent get information regarding enrolled students
 		if( isParent($_SESSION['gid']))
 		{
-            //Updates parents email from synergetic
-            $email = $synUser->getEmail($synergy_id);
-			$mydb->update('user', 'id', array('id'=>$_SESSION['id'], 'alt_email'=>$email));
+   			if(defined('SYNERGY_sync_email') && SYNERGY_sync_email) {
+	            		//Updates parents email from synergetic
+		    		$email = $synUser->getEmail($synergy_id);
+				$mydb->update('user', 'id', array('id'=>$_SESSION['id'], 'alt_email'=>$email));
+			}
 
 			$studentGroup = unserialize(STUDENTGROUPIDS);
 			if($synergy_id) {
