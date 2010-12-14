@@ -132,7 +132,7 @@ h2 {
 li p.interact {
 	margin-top: 2px;
 }
-.box .edit {
+/*.box .edit {
 	width: 15px;
 	height: 15px;
 	text-indent: -9999px;
@@ -142,7 +142,7 @@ li p.interact {
 }
 .box .edit:hover {
 	background: url(/images/mggs/edit.png) no-repeat 0 -15px;
-}
+}*/
 .box .text {
 	border: 1px solid #dbdbdb;
 	border-top: 0;
@@ -262,7 +262,7 @@ padding:0;
 }
 
 table.ruler span.header_option a{color:#fff; font-weight:bold; }
-table.ruler span.header_option{margin:-32px 12px 0 0;}
+table.ruler span.header_option{margin:-22px 12px 0 0;}
 
 #footer {
 	margin: 0;

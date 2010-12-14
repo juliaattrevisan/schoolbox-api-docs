@@ -673,15 +673,16 @@ ul.js_happening li{margin-bottom:4px; position:relative; }
 .otherMonth select { width: 160px; }
 
 /*CATEGORY WINDOW*/
-#category-window, #file-window { height: 420px; margin: 0; border: 1px solid #ccc; position: relative; }
+#category-window, #file-window { margin: 0; border: 1px solid #ccc; position: relative; }
 #category-head, #file-head { margin: 0; width: 100%; }
 #category-list, #file-list { border: 0; width: 100%; overflow: auto; margin-top:0; }
 #category-head th, #file-head th { border: 0; font-weight: bold; background:#eee; line-height: 25px; padding: 3px 7px; }
 #category-list td, #file-list td { width: auto; }
 #category-list thead { padding: 10px; }
 
- .scroller{ width:100%;height:385px; overflow:scroll; position:relative; min-height:1px; zoom:1;}
-.scroller table{overflow:hidden;}
+.scroller {min-height:1px; zoom:1; }
+.scroller table{width:100% !important;}
+
 
 /*.scroller{ height:385px; overflow:auto;}*/
 
