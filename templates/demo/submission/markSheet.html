@@ -13,8 +13,10 @@
 
 		$j('.inputMark').blur(function(){
             if($j(this).val() != '')
-                $.post('/submission/returnWorkForm.php', $j(this).closest('form').serialize());
+                $j.post('/submission/returnWorkForm.php', $j(this).closest('form').serialize());
 		});
+		
+		$j('#container').css('width', $j('.markTable').outerWidth());
 	});
 
 
@@ -23,17 +25,21 @@
 
 <h1>{CATEGORY}</h1>
 <span class="header_option"><a href="/submission/markSheet/export/{CID}" class="btn download" ><span></span>Download Spreadsheet</a></span>
-<table class="markTable" cellspacing="0" cellpadding="0">
+<table class="markTable" cellspacing="0" cellpadding="0" width="100%">
 	<tr>
 		<th>Surname</th>
 		<th>Preferred Name</th>
+		
 		<!-- BEGIN sub_head -->
 		<td id="work-{BOX_ID}" class="column-{BOX_ID}"><a href="/submission/viewSubmission/{BOX_ID}"><strong>{SUB_NAME}</strong></a><br />
 			<em>{SUB_TYPE}</em><br /><br />
-			<a class="btn delete" href="/submission/submissionForm.php?delete={BOX_ID}"><span></span>Delete</a></td>
+			<a class="btn delete float-left" href="/submission/submissionForm.php?delete={BOX_ID}"><span></span>Delete</a>
+		</td>
 		<!-- END sub_head -->
-            <td class="add-sub">
-            <a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Add Submission</a></td>
+		
+        <td class="add-sub">
+            <a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Add Submission</a>
+		</td>
 </td>
 
 	</tr>

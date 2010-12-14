@@ -36,7 +36,8 @@ CSS commands
 .float-fix { overflow:hidden; clear:both; height:0; font-size:0; }
 .cancelled { text-decoration: line-through; }
 .bold { font-weight: bold; }
-.pad-it{padding:16px;}
+.pad-it{padding:16px; line-height:16px;}
+ul.pad-it{list-style:disc;}
 .hide-it, .hide{display:none;}
 
 /*--------------------------------------------------------------
@@ -55,13 +56,13 @@ h2 a{color:#013a63;}
 #week-view .dayWrap span.header_option{margin:0;}
 #calendar .header_option a{ margin-top: 4px; }
 .day-block .header_option { float: right; margin: 0 !important; padding: 0; }
-.news-item .header_option{position:absolute; z-index:2; top:4px; right:4px; margin:0;}
+.news-item .header_option{position:absolute; z-index:2; top:0px; right:4px; margin:0;}
 
 /*--------------------------------------------------------------
  Table Styles 
 --------------------------------------------------------------*/
 table { border: 0; }
-th, td { height: 1em; padding:7px 16px; border: 0; vertical-align: middle; }
+th, td { height: 1em; padding:7px 16px; border: 0; vertical-align: middle; line-height:16px;}
 th { font-weight:bold; }
 
 /*--------------------------------------------------------------
@@ -111,6 +112,13 @@ nd:#F1F1F1; border:1px solid #ccc;}
 /*COLUMNS*/
 .left { min-width: 535px; min-height: 100px; width: 69.5%; float: left; }
 .right { min-width: 229px; min-height: 100px; width: 29.5%; float: right; overflow: hidden; }
+.template2 .left { min-width: 382px; width: 49.5%; }
+.template2 .right { min-width: 382px; width: 49.5%; }
+.template3 .left { min-width: 764px; width: 100%; margin-right: 0; }
+.template3 .right { display: none; visibility: hidden; }
+.template4 .right { min-width: 535px; width: 69.5%; }
+.template4 .left { min-width: 229px; width: 29.5%; }
+.template1 .right .summ, .template4 .left .summ { display: none; }
 
 /*BOXES*/
 .marker { border: 2px dashed #E9E3D6; margin-bottom: 16px; }
@@ -167,7 +175,6 @@ select.small, input.small { width: 100px; }
 input.timeField { width: 30px; }
 
 .btn, .submit-btn-plain { border:1px solid #eeeeee; color:#808080 !important;display:block; float: right; text-shadow: 0 1px 0px #fff; background-color: #fbfbfb;background-image: -moz-linear-gradient(top, #fbfbfb, #f7f7f7); background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fbfbfb),color-stop(1, #f7f7f7)); filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7'); -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')"; -moz-border-radius: 3px; -webkit-border-radius: 3px;  border-radius: 3px;  height:22px; line-height:22px;margin-left:3px; padding:0 16px 0 30px;position:relative; font-size:12px; font-weight:normal; width:auto !important; overflow: visible; margin-top:4px; }
-
 
 .submit-btn-plain{border-color:#0aa9c7;
 text-shadow: 0 1px 0px #d6f0f6; color:#000000 !important;background-color: #d6f0f6;background-image: -moz-linear-gradient(top, #d6f0f6, #8dd7e5); background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #d6f0f6),color-stop(1, #8dd7e5));  filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#d6f0f6', EndColorStr='#8dd7e5');  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#d6f0f6', EndColorStr='#8dd7e5')";}
@@ -271,6 +278,10 @@ p.forgot a { font-size: 90%; }
 .customise{color:#797979;background: url(/images/demo/icons/configuration.png) no-repeat 100% 0; position:absolute; top:0; right:0; display:block; height:31px; text-align:right;min-width:129px; padding-right:40px;font-size:12px;  line-height:31px;}
 .customise span{font-weight:normal;}
 .customise:hover {background-position:right bottom; color:#ff5a00;}
+
+.lookup{float:left; margin-right:16px; margin-top:5px;}
+.markTable th{vertical-align:bottom;}
+
 /*--------------------------------------------------------------
 Module Specific Styles (ALPHABETICAL SECTIONS)
 --------------------------------------------------------------*/
@@ -785,7 +796,7 @@ adding:0 10px; position:absolute; right:0; top:30%; font-size:12px;}
 #category li a.disabled { color: #ccc; }
 
 
-.topic {margin: 0;float:left; display:inline-block;  width:77%;}
+.topic {margin: 0;float:left; display:inline-block;  width:77%; position:relative;}
 .listing ul.topic ul { margin: 0; }
 .box ul.topic li li { list-style: none; }
 .box .listing .topic > li { padding: 0; margin: 0; height: 1%; }

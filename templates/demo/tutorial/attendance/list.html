@@ -41,18 +41,21 @@ $j(document).ready(function () {
 
 <!-- END custom_head -->
 <h1>Tutorial Management - Attendance Week Ending {WEEK_END}
-<a href="/modules/tutorial/event/modify.php" class="btn add"><span></span>Add Tutorial</a>
+
 </h1>
+<a href="/modules/tutorial/event/modify.php" class="btn add"><span></span>Add Tutorial</a>
 
 
-<div class="indent">
 <!-- BEGIN event -->
 <form action="/modules/tutorial/attendance/modifyForm.php" method="post" class="{DISABLED}">
  
 <h2>{EVENT_NAME} - {EVENT_DATE} ({EVENT_START} - {EVENT_FINISH})</h2>
-        <span class="header_option  on-header"><a href="/modules/tutorial/enrolment/list.php?eventID={EVENT_ID}" title="Attendance history">Attendance history</a> | 
-        <a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}" title="Modify Event">Modify</a> | 
-        <a href="/modules/tutorial/event/modifyForm.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?')" title="Delete Event">Delete</a></span>
+        <span class="header_option in-h2">
+		<a href="/modules/tutorial/event/modifyForm.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?')" title="Delete Event" class="btn delete"><span></span>Delete</a>
+		
+        <a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}" title="Modify Event" class="btn modify"><span></span>Modify</a>
+		<a href="/modules/tutorial/enrolment/list.php?eventID={EVENT_ID}" title="Attendance history" class="btn due-work"><span></span>Attendance history</a>
+        </span>
 	  <!-- BEGIN has_students -->
 	  <table class="ruler">
 		<col width="60" />
@@ -85,7 +88,9 @@ $j(document).ready(function () {
 				<option value="{REASON_NAME}" {REASON_SELECTED}>{REASON_NAME}</option>
 				<!-- END reason_select -->
 			  </select></td>
-			<td style="text-align: center;"><input class="present_check" type="checkbox" name="present[{STUDENT_ID}]" value="1" {ATTENDANCE_SELECTED} /></td>
+			<td>
+			<input class="present_check" type="checkbox" name="present[{STUDENT_ID}]" value="1" {ATTENDANCE_SELECTED} />
+			</td>
 		  </tr>
 		  <!-- END student -->
 		</tbody>
@@ -99,7 +104,7 @@ $j(document).ready(function () {
 	  </form>
 	
 	  
-	  <form action="/modules/tutorial/enrolment/modifyForm.php" method="post" class="standardForm {DISABLED}" onsubmit="return this.userID.value != '' || this.userIDSelect.value != ''; ">
+	  <form action="/modules/tutorial/enrolment/modifyForm.php" method="post" class="{DISABLED}" onsubmit="return this.userID.value != '' || this.userIDSelect.value != ''; ">
 		<input class="lookup" type="text" name="keyword" />
 		<input type="hidden" name="userID" class="userID" />
 		<input type="hidden" name="eventID" value="{EVENT_ID}" />
@@ -127,9 +132,5 @@ $j(document).ready(function () {
 	<a href="/modules/tutorial/attendance/list.php">This Week</a>
 	<!-- BEGIN next_link -->  |
 	<a href="/modules/tutorial/attendance/list.php?week={NEXT_WEEK}">Next Week &gt;</a> <!-- END next_link --> 
-	
 	</p>
 	</div>
-	</div>
-
-

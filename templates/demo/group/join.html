@@ -24,27 +24,43 @@ $j(document).ready(function() {
 
 <!-- END custom_head -->
 <h1>Manage Groups</h1>
-<h2>Free Access</h2>
-<div class="indent pad-it">
-  <p>These groups are free to join. Once you have selected the group you will have access to the content available in the group</p>
-  <ul>
-    <!-- BEGIN free_list -->
-    <li>
-        <input class="greenCheck" type="checkbox" rel="{GROUP_ID}" {GROUP_CHECKED} /> {GROUP_NAME}
-    </li>
-    <!-- END free_list -->
-  </ul>
-</div>
-<h2>Moderated Access </h2>
-<div class="indent pad-it">
-  <p>These groups are moderated. Once you have selected the group you must wait for the group admin to authorise your application. </p>
-  <ul>
-    <!-- BEGIN moderated_list -->
-    <li>
-        <input class="greenCheck" type="checkbox" rel="{GROUP_ID}" {GROUP_CHECKED} /> {GROUP_NAME}
-    </li>
-    <!-- BEGIN waiting -->
-    <em>(Waiting on authorisation)</em><!-- END waiting --></li>
-    <!-- END moderated_list -->
-  </ul>
-</div>
+<table class="standardForm">
+	<tr>
+		<td class="formLabelWidth">
+		<h4>Free Access</h4>
+		</td>
+		<td>
+		  <p>These groups are free to join. Once you have selected the group you will have access to the content available in the group</p>
+		  <ul>
+			<!-- BEGIN free_list -->
+			<li>
+				<label>
+				<input class="greenCheck" type="checkbox" rel="{GROUP_ID}" {GROUP_CHECKED} /> {GROUP_NAME}
+				</label>
+			</li>
+			<!-- END free_list -->
+		  </ul>
+		</td>
+	</tr>
+	<tr>
+	<td class="formLabelWidth">
+	<h4>Moderated Access </h4>
+	</td>
+	<td>
+
+	  <p>These groups are moderated. Once you have selected the group you must wait for the group admin to authorise your application. </p>
+	  <ul>
+		<!-- BEGIN moderated_list -->
+		<li>
+		<label>
+			<input class="greenCheck" type="checkbox" rel="{GROUP_ID}" {GROUP_CHECKED} /> {GROUP_NAME}
+		</label>
+		</li>
+		<!-- BEGIN waiting -->
+		<em>(Waiting on authorisation)</em><!-- END waiting --></li>
+		<!-- END moderated_list -->
+	  </ul>
+	 </td>
+	 </tr>
+	 </table>
+	 
