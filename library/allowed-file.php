@@ -41,14 +41,6 @@ class AllowedFile extends Model {
 		if(!$mime = $this->getMime($file['tmp_name']))
 			$mime = strtolower($file['type']);
 
-        /* Extension column doesn't exist anymore?
-         *
-		$query = "SELECT t.fileTypeID FROM allowedFileTypes t 
-				LEFT JOIN allowedFileExtension e on t.fileTypeID = e.fileTypeID 
-				WHERE mime = '$mime' AND extension = '$ext' AND enable = 'true'";
-         *
-         */
-
         /* Mime types now have some kind of metadata, so trim it out.
          * Mime types now include stuff like 'charset=us-ascii' and may not
          * match when using the original query
@@ -56,11 +48,9 @@ class AllowedFile extends Model {
         $mime = explode(';', $mime);
         $mime = $mime[0];
 
-        /* New query
-         */
-		$query = "SELECT t.fileTypeID FROM allowedFileTypes t
-				LEFT JOIN allowedFileExtension e on t.fileTypeID = e.fileTypeID
-				WHERE mime = '$mime' AND enable = 'true'";
+		$query = "SELECT t.fileTypeID FROM allowedFileTypes t 
+				LEFT JOIN allowedFileExtension e on t.fileTypeID = e.fileTypeID 
+				WHERE mime = '$mime' AND extension = '$ext' AND enable = 'true'";
 
 		if(!$this->db->getOne($query))
 			error(11, "Your file, ".$file['name']." with the extension '$ext' and type of '$mime'");

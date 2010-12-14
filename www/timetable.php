@@ -22,7 +22,6 @@ $this->setTab('timetable');
 $this->setBlock(TEMPLATE_content, "timetable", "timetable_listing");
 $this->setBlock("timetable", "period", "period_listing");
 $this->setBlock("period", "day", "day_listing");
-$this->setBlock("day", "timetable_links", "tt_links");
 $this->setBlock("timetable", "day_header", "day_header_listing");
 
 if($groupHandler->isParent())
@@ -31,13 +30,10 @@ if($groupHandler->isParent())
 	{
 		displayWeek(&$this, $child['sid']);
 	}
-	if($this->site == 'shore') {
-    $this->setVar('tt_links', '');
-	}
 }
 else
 {
-	$this->parse('tt_links', 'timetable_links');
+	
 
 	if(is_numeric($this->arg[0]))
 	{
@@ -56,8 +52,11 @@ function displayWeek(&$page, $sid)
 {
  	$userHandler = new User;
 	$timetableHandler = new SynergeticTimetable;
-	
+	$categoryHandler = new Category;
+
+
 	$user = $userHandler->getBySynergy($sid);
+
      
 	$outputUser = array('PERSON'	=> formatName($user),
 						'YEAR'		=> $user['year']?', Year '.$user['year']:'',
@@ -113,8 +112,18 @@ function displayWeek(&$page, $sid)
 						$outputPeriod = array(	'PERIOD_DESC' 	=> $period['description'],
 												'PERIOD_CODE'	=> '('.$period['code'].')',
 												'PERIOD_ROOM'	=> $period['room'],
-												'PERIOD_ONCLICK'=> 'onClick="window.location=\'/homepage.php?code='.urlencode($period['code']).'\'"',
+                                                'PERIOD_ONCLICK' => '',
 												);
+
+                        /* Lookup subject code and check permissions, if read access provide a link to the user */
+                        if(!isset($catCache[$period['code']])) {
+                            $cat = $categoryHandler->getByCode($period['code']);
+                            $catCache[$period['code']] = $cat['id'];
+                        }
+
+                        if($groupHandler->getPermission($catCache[$period['code']]) > READ_ACCESS);
+                            $outputPeriod['PERIOD_ONCLICK'] = 'onClick="window.location=\'/homepage.php?code='.urlencode($period['code']).'\'"';
+
 					}
 				}	
 

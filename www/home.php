@@ -50,11 +50,11 @@ if($timetable != true) {
  */
 $this->setBlock(TEMPLATE_content, 'greeting_name', 'greeting_name_block');
 
-if (!$groupHandler->isParent()) {
-    $this->parse('greeting_name_block', 'greeting_name');
+if ($groupHandler->isParent() && SITE_location == 'shore') {
+    $this->setVar('greeting_name_block', '');
 }
 else {
-    $this->setVar('greeting_name_block', '');
+    $this->parse('greeting_name_block', 'greeting_name');
 }
 
 ?>

@@ -105,11 +105,7 @@ if(is_numeric($this->arg[0])) {
 
 		$synUserHandler = new SynergeticUser;
 		
-				/* Remove Due Work link if logged in within parent group
-         */
-        if ($groupHandler->isParent()) {
-            $this->setVar('due_work_block', '');
-        }
+
 		
         if($groupHandler->isParent($user['uid']) && !$groupHandler->isStudent()) {
             $parent = $synUserHandler->getParent($user['synergy_id']);
@@ -152,7 +148,13 @@ if(is_numeric($this->arg[0])) {
                 $this->setVar('timetable_link_block', '');
             }
 
-            $this->parse("due_work_block", "due_work");
+            /* Remove Due Work link if logged in within parent group
+             */
+            if ($groupHandler->isParent() && SITE_location == 'shore') {
+                $this->setVar('due_work_block', '');
+            } else {
+                $this->parse("due_work_block", "due_work");
+            }
 
             if(is_dir(HELPDESK_location))
                 $this->parse("helpdesk_block", "helpdesk");

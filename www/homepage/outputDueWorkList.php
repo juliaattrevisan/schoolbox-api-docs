@@ -13,14 +13,18 @@ if (is_array($submissionList)) {
 
 		$nameURL = $submission['realname'] != '' ? "/send" . ($submission['inline'] == 'true' ? 'frame' : '') . ".php?id=" . $submission['fileID'] : false;
 
-		$date = outputDate("jS M", $submission['date']);
+		$dateHTML = outputDate("jS M", $submission['date']);
 		$dateURL = false;
 
 		if($enroled) {
-			if($groupHandler->isStudent() && !is_numeric($submission['studentWork']) && $submission['late'] > time() && $submission['open'] < time())
+			if($groupHandler->isStudent() && !is_numeric($submission['studentWork']) && $submission['late'] > time() && $submission['open'] < time()) {
 				$dateURL = "/submission/submitWork/" . $submission['id'];
-			else if($groupHandler->isStaff() && $submission['owner'] == $_SESSION['id'])
+                $dateHTML .= ' | ' . '<a href="' . $dateURL . '">Submit Work</a>';
+            }
+			else if($groupHandler->isStaff() && $submission['owner'] == $_SESSION['id']) {
 				$dateURL = "/submission/viewSubmission/" . $submission['id'];
+                $dateHTML .= ' | ' . '<a href="' . $dateURL . '">View Work</a>';
+            }
 		}
 
 		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . scrubText($submission['description']) . ($nameURL ? '</a>' : "");
@@ -30,11 +34,7 @@ if (is_array($submissionList)) {
          *
         $dateHTML = ($dateURL ? '<a href="'.$dateURL.'">' : "") . outputDate("jS M", $submission['date']) . ($dateURL ? '</a>' : "");
          */
-        $dateHTML = 'Due ' . outputDate('jS M', $submission['date']);
-
-        if ($dateURL) {
-            $dateHTML .= ' | ' . '<a href="' . $dateURL . '">Submit Work</a>';
-        }
+        
 
 		$output = array(
 			'DUE_NAME'	=> $nameHTML,
