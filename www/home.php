@@ -46,4 +46,15 @@ if($timetable != true) {
 	$this->setVar('timetable_block', '');
 }
 
+/* Parent greeting customisation
+ */
+$this->setBlock(TEMPLATE_content, 'greeting_name', 'greeting_name_block');
+
+if (!$groupHandler->isParent()) {
+    $this->parse('greeting_name_block', 'greeting_name');
+}
+else {
+    $this->setVar('greeting_name_block', '');
+}
+
 ?>

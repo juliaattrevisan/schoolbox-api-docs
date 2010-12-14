@@ -373,13 +373,23 @@ class SitePage extends Page {
 				$this->setVar('MYFILES_LOCATION', '#');
 				$this->setVar('mf_tab', '');
 			}
-
-            /* Disable Webmail and Resources for parents of Shore students
+			
+			
+			/* Remove these links if parent logged in:
+             * Webmail, Resources
              */
             if ($this->groupHandler->isParent()) {
-                $this->setBlock('tabTpl', 'resources_tab', 'resources');
-                $this->setVar('resources', '');
+                $this->setVar('wm_tab', '');
+
+                $this->setBlock('tabTpl', 'resource_tab', 'res_tab');
+                $this->setVar('res_tab', '');
+								
+                $this->setBlock('bannerTpl', 'user_name', 'usr_name');
+                $this->setVar('usr_name', '');
+								
             }
+			
+			
 		}
 
         /* Check if eportfolio tab should be enabled

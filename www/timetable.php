@@ -22,6 +22,7 @@ $this->setTab('timetable');
 $this->setBlock(TEMPLATE_content, "timetable", "timetable_listing");
 $this->setBlock("timetable", "period", "period_listing");
 $this->setBlock("period", "day", "day_listing");
+$this->setBlock("day", "timetable_links", "tt_links");
 $this->setBlock("timetable", "day_header", "day_header_listing");
 
 if($groupHandler->isParent())
@@ -30,9 +31,14 @@ if($groupHandler->isParent())
 	{
 		displayWeek(&$this, $child['sid']);
 	}
+	if($this->site == 'shore') {
+    $this->setVar('tt_links', '');
+	}
 }
 else
 {
+	$this->parse('tt_links', 'timetable_links');
+
 	if(is_numeric($this->arg[0]))
 	{
 		if($groupHandler->isStaff())

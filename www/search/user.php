@@ -104,6 +104,13 @@ if(is_numeric($this->arg[0])) {
 		require_once '../library/synergetic-user.php';
 
 		$synUserHandler = new SynergeticUser;
+		
+				/* Remove Due Work link if logged in within parent group
+         */
+        if ($groupHandler->isParent()) {
+            $this->setVar('due_work_block', '');
+        }
+		
         if($groupHandler->isParent($user['uid']) && !$groupHandler->isStudent()) {
             $parent = $synUserHandler->getParent($user['synergy_id']);
 
