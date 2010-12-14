@@ -373,6 +373,13 @@ class SitePage extends Page {
 				$this->setVar('MYFILES_LOCATION', '#');
 				$this->setVar('mf_tab', '');
 			}
+
+            /* Disable Webmail and Resources for parents of Shore students
+             */
+            if ($this->groupHandler->isParent()) {
+                $this->setBlock('tabTpl', 'resources_tab', 'resources');
+                $this->setVar('resources', '');
+            }
 		}
 
         /* Check if eportfolio tab should be enabled
@@ -463,9 +470,13 @@ class SitePage extends Page {
 			while($link = $this->db->getNextArray()){
 				if(isLocalURL($link['url'])){
 					$this->setVar("MLINK", "<a href=\"".relativeURL($link['url'])."\"><span>".scrubTEXT($link['description'])."</span></a>");
-				}else{
-					$this->setVar("MLINK", "<a href=\"/redir.php?url=".urlencode(urlencode($link['url']))."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
 				}
+				else {
+                    /* Why did this double-urlencode? Removed.
+                     */
+					$this->setVar("MLINK", "<a href=\"/redir.php?url=".urlencode($link['url'])."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
+				}
+
 				$this->parse("my_links", "mlink_block", true);
 			}
 		}

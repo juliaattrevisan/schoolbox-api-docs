@@ -46,7 +46,8 @@ if(is_numeric($this->arg[0])) {
         $this->setFile(TEMPLATE_content, 'user/staff.html');
         $this->setBlock(TEMPLATE_content, "portrait", "portrait_block");
         $this->setBlock(TEMPLATE_content, "timetable_link", "timetable_link_block");
-
+        $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
+        $this->setBlock(TEMPLATE_content, "due_work", "due_work_block");
     }
 
         $blank = array ('contact_synergy_block'			=> '',

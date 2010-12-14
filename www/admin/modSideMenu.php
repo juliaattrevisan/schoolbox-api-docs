@@ -24,19 +24,30 @@ class modSideMenu
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "admin/modMenuItem.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Modify Menu Item");
-		include_once("../include/page.php");	
-	
+
+        /* Header variables
+         */
+        $this->t_body->set_var('SITE_GREETING', greeting());
+        $this->t_body->set_var('SITE_LOGINNAME', formatName($_SESSION));
+
+        /* Footer variables
+         */
+        $this->t_body->set_var('TEMPLATE_YEAR', date('Y'));
+        $this->t_body->set_var('SITE_NAME', SITE_name);
+
+		include_once("../include/page.php");
+
 		$this->t_body->set_var("ACTION", "Update");
 
 		$menu = new sideMenu();
-		
+
 		$item = $menu->getMenuItem($id);
 
 		$this->createMenuTree(0, "&nbsp; &nbsp;|&nbsp;");
 		$this->t_body->set_var("MENUITEMLIST", $this->createMenuItemSelect($this->itemList, $item['parent']));
 
 		$this->t_body->set_var("TEXT", htmlspecialchars($item['txt']));
-		$this->t_body->set_var("URL", $item['url']);		
+		$this->t_body->set_var("URL", $item['url']);
 		$this->t_body->set_var("TARGETLIST", $this->createTargetList($item['target']));
 
 		$campusList = $menu->getMenuItemCampusList($id);
@@ -45,7 +56,7 @@ class modSideMenu
 		$this->t_body->set_var("CAMPUSLIST", $this->createCampusList($campusList));
 		$this->t_body->set_var("GROUPLIST", $this->createGroupList($groupList));
 
-		$this->t_body->set_var("IDFIELD", "<input type=\"hidden\" name=\"id\" value=\"".$item['id']."\">");		
+		$this->t_body->set_var("IDFIELD", "<input type=\"hidden\" name=\"id\" value=\"".$item['id']."\">");
 
 		$this->t_body->pparse("finaloutput", "tplBODY");
 
@@ -56,20 +67,31 @@ class modSideMenu
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "admin/modMenuItem.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Add Menu Item");
-		include_once("../include/page.php");	
+
+        /* Header variables
+         */
+        $this->t_body->set_var('SITE_GREETING', greeting());
+        $this->t_body->set_var('SITE_LOGINNAME', formatName($_SESSION));
+
+        /* Footer variables
+         */
+        $this->t_body->set_var('TEMPLATE_YEAR', date('Y'));
+        $this->t_body->set_var('SITE_NAME', SITE_name);
+
+		include_once("../include/page.php");
 		$this->t_body->set_var("ACTION", "Create");
 		$this->createMenuTree(0, "&nbsp; &nbsp;|&nbsp;");
 		$this->t_body->set_var("MENUITEMLIST", $this->createMenuItemSelect($this->itemList, $parent));
 
 		$this->t_body->set_var("TEXT", "");
-		$this->t_body->set_var("URL", "");		
+		$this->t_body->set_var("URL", "");
 		$this->t_body->set_var("TARGETLIST", $this->createTargetList());
 
 		$this->t_body->set_var("CAMPUSLIST", $this->createCampusList());
 		$this->t_body->set_var("GROUPLIST", $this->createGroupList());
 
-		$this->t_body->set_var("IDFIELD", "");		
-		
+		$this->t_body->set_var("IDFIELD", "");
+
 		$this->t_body->pparse("finaloutput", "tplBODY");
 
 	}
@@ -79,12 +101,22 @@ class modSideMenu
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "admin/manageMenuItems.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Manage Menu Items");
-		
+
 		$this->t_body->set_block("tplBODY", "up_button", "up_button_block");
 		$this->t_body->set_block("tplBODY", "down_button", "down_button_block");
 		$this->t_body->set_block("tplBODY", "menu_item", "menu_item_block");
 		$this->t_body->set_block("tplBODY", "menu_item_list", "menu_item_list_block");
-		
+
+        /* Header variables
+         */
+        $this->t_body->set_var('SITE_GREETING', greeting());
+        $this->t_body->set_var('SITE_LOGINNAME', formatName($_SESSION));
+
+        /* Footer variables
+         */
+        $this->t_body->set_var('TEMPLATE_YEAR', date('Y'));
+        $this->t_body->set_var('SITE_NAME', SITE_name);
+
 		include_once("../include/page.php");
 
 		$this->createMenuTree(0, "");
@@ -111,17 +143,17 @@ class modSideMenu
 						//mark the first item
 						if($line['sequence'] == 0)
 							$thisRow['first'] = 1;
-							
+
 						$this->itemList[] = $thisRow;
 						unset($thisRow);
 						$this->createMenuTree($line['id'], $indent."&nbsp; &nbsp;|&nbsp;");
 				}
-			
+
 			//mark the last item
 			$lastRow = array_pop($this->itemList);
 			$lastRow['last'] = 1;
 			array_push($this->itemList, $lastRow);
-				
+
 		}
 		$this->db->dbEndQuery($result);
 	}
@@ -156,23 +188,23 @@ class modSideMenu
 				$this->t_body->set_var("ITEM_TXT", $item['txt']);
 				$this->t_body->set_var("ITEM_ID", $item['id']);
 				$this->t_body->set_var("ON_OFF", ++$i%2 ? 'dark' : '');
-				
+
 				if($item['first'])
 					$this->t_body->set_var("up_button_block", "");
 				else
 					$this->t_body->parse("up_button_block", "up_button");
-				
+
 				if($item['last'])
 					$this->t_body->set_var("down_button_block", "");
 				else
 					$this->t_body->parse("down_button_block", "down_button");
-				
+
 				$this->t_body->parse("menu_item_block", "menu_item", true);
 			}
 		}
 		else
 			$this->t_body->set_var("menu_item_list", "");
-	}	
+	}
 
 	function createTargetList($selected = 0)
 	{
@@ -190,18 +222,18 @@ class modSideMenu
 
 
 	function createCampusList($selected = 0)
-	{	
+	{
 		$campusListHTML = "";
 		$query = "SELECT * FROM luCampus WHERE id != '".ALLCAMPUS."' ORDER BY name";
 		$this->db->query($query);
 		while($line = $this->db->getNextArray() )
 		{
 			if($this->isInHashArray($selected, $line['id'], "campus") )
-				$campusListHTML .= "<input type=\"checkbox\" name=\"campus[]\" value=\"".$line['id']."\" checked> ".$line['name']."<br>";	
+				$campusListHTML .= "<input type=\"checkbox\" name=\"campus[]\" value=\"".$line['id']."\" checked> ".$line['name']."<br>";
 			else
-				$campusListHTML .= "<input type=\"checkbox\" name=\"campus[]\" value=\"".$line['id']."\"> ".$line['name']."<br>";	
+				$campusListHTML .= "<input type=\"checkbox\" name=\"campus[]\" value=\"".$line['id']."\"> ".$line['name']."<br>";
 		}
-	
+
 		return $campusListHTML;
 
 	}
@@ -214,12 +246,12 @@ class modSideMenu
 		$this->db->query($query);
 		while( $line = $this->db->getNextArray() )
 		{
-			if($this->isInHashArray($selected, $line['id'], "gid") )	
-				$groupListHTML .= "<input type=\"checkbox\" name=\"group[]\" value=\"".$line['id']."\" checked> ".$line['name']."<br>";	
+			if($this->isInHashArray($selected, $line['id'], "gid") )
+				$groupListHTML .= "<input type=\"checkbox\" name=\"group[]\" value=\"".$line['id']."\" checked> ".$line['name']."<br>";
 			else
-				$groupListHTML .= "<input type=\"checkbox\" name=\"group[]\" value=\"".$line['id']."\"> ".$line['name']."<br>";	
+				$groupListHTML .= "<input type=\"checkbox\" name=\"group[]\" value=\"".$line['id']."\"> ".$line['name']."<br>";
 		}
-	
+
 		return $groupListHTML;
 
 	}
@@ -239,8 +271,8 @@ class modSideMenu
 		return 0;
 	}
 
-		
-		
+
+
 }
 
 $sideMenu = new sideMenu;
@@ -274,7 +306,7 @@ else if($_POST['text'] && $_POST['url'] && is_numeric($_POST['parent']))
 	$myPage->displayMenuItemList();
 }
 
-else if(is_numeric($_GET['id']))		
+else if(is_numeric($_GET['id']))
 {
 	$myPage->displaySideMenuItem($_GET['id']);
 }

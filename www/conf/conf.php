@@ -16,6 +16,8 @@ define("SITE_location", "demo");
 define("SITE_detect", "domain");				//Which option to detect site, can be domain or campus
 define("SITE_root", dirname(__FILE__)."/../..");
 define('SITE_address', 'http://www.alaress.com.au');
+define('SITE_hostname', 'joeys');
+define('SITE_domain', 'portal.alaress-dev.com.au');
 
 //Security options
 define("LOGINGRACE", "60");				//Time measured between logins (secs)

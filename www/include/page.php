@@ -6,7 +6,7 @@
 *	This page fills out the content on the standard portal	*
 *	template.  Tabs, drop down menu, groups, subjects are	*
 *	all populated from this code. 							*
-*   $Id: page.php,v 1.19 2004/04/27 05:16:48 jleckie Exp $						    
+*   $Id: page.php,v 1.19 2004/04/27 05:16:48 jleckie Exp $
 *                                                           *
 ************************************************************/
 
@@ -23,7 +23,7 @@ else if(!isset($db))
 }
 
 $this->t_body->set_var('TEMPLATE_FILE', $this->templateFile);
-$this->t_body->set_var('YEAR', date('Y')); 
+$this->t_body->set_var('YEAR', date('Y'));
 
 //this section handles the drop down menu
 if($_SESSION['su'])
@@ -48,8 +48,8 @@ while($menuitem = $db->dbGetNextArray() )
 //output tree with html
 $this->t_body->set_var("MCSSMENU", outputMenu($list[0]['children'], 1));
 
-//this section handles the mylinks section in the template 
-	
+//this section handles the mylinks section in the template
+
 //setup block
 $this->t_body->set_block("tplBODY", "mlink_block", "my_links");
 $query = "SELECT url, description FROM bookmarks WHERE owner = '".$_SESSION['id']."'";
@@ -57,25 +57,29 @@ $db->dbDoQuery($query);
 if($db->dbCountRows() > 0){
 	while($link = $db->dbGetNextArray()){
 		if(isLocalURL($link['url'])){
-			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\"><span>".scrubTEXT($link['description'])."</span></a>");	
-		}else{
-			$this->t_body->set_var("MLINK", "<a href=\"/redir.php?url=".urlencode(urlencode($link['url']))."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
+			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\"><span>".scrubTEXT($link['description'])."</span></a>");
 		}
+		else {
+            /* Why did this double-urlencode? Removed.
+             */
+			$this->t_body->set_var("MLINK", "<a href=\"/redir.php?url=".urlencode($link['url'])."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
+		}
+
 		$this->t_body->parse("my_links", "mlink_block", true);
 	}
 }
 else
 	$this->t_body->set_var("my_links", "");
 
-//this section handle mygroups section in the template	
+//this section handle mygroups section in the template
 $this->t_body->set_block("tplBODY", "mgroup", "mgroup_section");
 $this->t_body->set_block("mgroup", "mgroup_block", "my_groups");
 
-$query = "SELECT category.name, userAccess.sid, userAccess.type 
-		  FROM userAccess, category 
-		  WHERE userAccess.uid = '".$_SESSION['id']."' 
-		  AND userAccess.sid = category.id 
-		  AND userAccess.type > 0	
+$query = "SELECT category.name, userAccess.sid, userAccess.type
+		  FROM userAccess, category
+		  WHERE userAccess.uid = '".$_SESSION['id']."'
+		  AND userAccess.sid = category.id
+		  AND userAccess.type > 0
 		  AND category.template <> 0
 	";
 $db->dbDoQuery($query);
@@ -85,7 +89,7 @@ if($db->dbCountRows() > 0)
 	while($group = $db->dbGetNextArray())
 	{
 			$this->t_body->set_var("MGNAME", scrubTEXT($group['name']));
-			$this->t_body->set_var("MGID", $group['sid']);	
+			$this->t_body->set_var("MGID", $group['sid']);
 			$this->t_body->parse("my_groups", "mgroup_block", true);
 	}
 	$this->t_body->parse("mgroup_section", "mgroup");
@@ -94,7 +98,7 @@ else
 	$this->t_body->set_var("mgroup_section", "");
 
 
-//this section handles the mysubjects section in the template 
+//this section handles the mysubjects section in the template
 $this->t_body->set_block("tplBODY", "msubject", "msubject_section");
 $this->t_body->set_block("msubject", "msubject_block", "my_subjects");
 
@@ -104,11 +108,11 @@ if(is_array($_SESSION['subjects']))
 	{
 		if(isStaff($_SESSION['gid']))
 			$this->t_body->set_var("MSUBJECT", $subject['name']." (".$subject['code'].")");
-		else		
+		else
 			$this->t_body->set_var("MSUBJECT", $subject['name']);
 
 		$this->t_body->set_var("MSUBCODE", urlencode($subject['code']));
-		$this->t_body->parse("my_subjects","msubject_block",true); 
+		$this->t_body->parse("my_subjects","msubject_block",true);
 	}
 	$this->t_body->parse("msubject_section","msubject");
 }
@@ -131,7 +135,7 @@ if(is_array($_SESSION['children']))
 		$this->t_body->set_var("MSTUDENT_YEAR", $user['year']);
 
 		$this->t_body->parse("my_students", "mstudent_block", true);
-	
+
 	}
 	$this->t_body->parse("mstudent_section", "mstudent");
 }
@@ -143,7 +147,7 @@ else
 $this->t_body->set_block('tplBODY', 'timetable_tab', 'tt_tab');
 //if the have a timetable or their children have a timetable
 if($_SESSION['timetable'] || is_array($_SESSION['children'][0]['subjects']))
-	$this->t_body->parse('tt_tab','timetable_tab'); 	
+	$this->t_body->parse('tt_tab','timetable_tab');
 else
 	$this->t_body->set_var('tt_tab', '');
 
@@ -154,7 +158,7 @@ $this->t_body->set_block('tplBODY', 'webmail_tab', 'wm_tab');
 if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && (isStaff($_SESSION['gid']) || isStudent($_SESSION['gid']))) || SITE_location == 'ormond' || SITE_location == 'shore')
 {
 	$this->t_body->parse('wm_tab','webmail_tab');
-	
+
 	if(SITE_location == 'mgs')
 	{
 		if(isStaff($_SESSION['gid']))
@@ -162,7 +166,7 @@ if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && (i
 		else
 			$this->t_body->set_var("WEBMAIL_LOCATION", 'href="/mail/"');
 	}
-	else if(SITE_location == 'ormond') 
+	else if(SITE_location == 'ormond')
 	{
 		if($_SESSION['exchange'])
 			$this->t_body->setVar("WEBMAIL_LOCATION", 'href="http://owa.ormond.unimelb.edu.au" rel="external"');
@@ -192,7 +196,7 @@ else
 	$this->t_body->set_var('wm_tab', '');
 }
 
-//custom code for each site is performed here	
+//custom code for each site is performed here
 if(SITE_location == 'wenona')
 {
 	//provide encoded login details for intranet
@@ -227,7 +231,7 @@ function insertChild($list, $element)
 			$list[$i]['children'][] = $element;
 			return $list;
 		}
-		
+
 		if(is_array($list[$i]['children']))
 		{
 			$sublist = insertChild($list[$i]['children'], $element);
@@ -240,24 +244,24 @@ function insertChild($list, $element)
 function outputMenu($list, $level)
 {
 		$text = "<ul>\n";
-		
+
 		for($i=0; $list[$i]; $i++)
 		{
 			if($list[$i]['target'])
 				$target = " target={$list[$i]['target']}";
 			else $target = '';
-			
+
 			if(is_array($list[$i]['children'])) {
 				$text .= '<li class="parent"><a href="'.$list[$i]['url'].'"'.$target.'><span>'.$list[$i]['txt'].'</span></a>';
 				$text .= outputMenu($list[$i]['children'], ($level + 1));
 			}
-			else 
+			else
 				$text .= '<li><a href="'.$list[$i]['url'].'"'.$target.'><span>'.$list[$i]['txt'].'</span></a>';
-				
+
 			$text .= "</li>\n";
 		}
 		$text .= "</ul>\n";
 		return $text;
 }
-		
+
 ?>

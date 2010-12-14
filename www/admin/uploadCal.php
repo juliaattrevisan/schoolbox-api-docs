@@ -26,6 +26,16 @@ class uploadCal {
         $this->t_body->set_block("tplBODY", "user_group_check_list", "user_group_chck_lst");
         $this->t_body->set_block("tplBODY", "campus_check_list", "campus_chck_lst");
 
+        /* Header variables
+         */
+        $this->t_body->set_var('SITE_GREETING', greeting());
+        $this->t_body->set_var('SITE_LOGINNAME', formatName($_SESSION));
+
+        /* Footer variables
+         */
+        $this->t_body->set_var('TEMPLATE_YEAR', date('Y'));
+        $this->t_body->set_var('SITE_NAME', SITE_name);
+
         $db = new dbManager();
         $query = "SELECT * FROM luCampus ORDER BY name";
         $db->query($query);
@@ -106,7 +116,7 @@ class uploadCal {
 
     function processVCal() {
 
-        
+
         require_once dirname(__FILE__) .'/../include/iCalcreator.class.php';
 
         if($_POST['userid'] == "")
@@ -150,7 +160,7 @@ class uploadCal {
                         // dtstart required, one occurence, (orig. start date)
                         $summary = $vevent->getProperty( 'summary' );
                         $description = $vevent->getProperty( 'description' );
-                        
+
                         $hour = $dtstart['hour']?$dtstart['hour']:'00';
                         $min = $dtstart['min']?$dtstart['min']:'00';
                         $stime = strtotime($dtstart['year'].$dtstart['month'].$dtstart['day'].'T'.$hour.$min.'00Z');

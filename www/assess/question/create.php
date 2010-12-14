@@ -49,6 +49,8 @@ if (!empty($_POST)) {
         error(132);
     }
 
+    /* Need to keep this so non-ajaxed questions still redirect
+     */
     localRedir('/assess/question/create/' . scrubTEXT($_POST['section_id']));
 }
 else {

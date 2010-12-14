@@ -22,6 +22,17 @@ class listModules
 				}
 			}
 		}
+
+        /* Header variables
+         */
+        $this->t_body->set_var('SITE_GREETING', greeting());
+        $this->t_body->set_var('SITE_LOGINNAME', formatName($_SESSION));
+
+        /* Footer variables
+         */
+        $this->t_body->set_var('TEMPLATE_YEAR', date('Y'));
+        $this->t_body->set_var('SITE_NAME', SITE_name);
+
 		$this->t_body->set_var("RESULT",$message);
 		$this->t_body->set_var("TITLE","List Modules");
 		include_once("../include/page.php");

@@ -293,10 +293,17 @@ function isLocalURL($url)
 
 function relativeURL($url) {
     list($hostname, $domain) = explode('.',$_SERVER['HTTP_HOST'],2);
-    $hosts = array('http://'.$_SERVER['HTTP_HOST'], 
-                    'https://'.$_SERVER['HTTP_HOST'],
-                    'http://'.$hostname,
-                    'https://'.$hostname
+
+	/* Takes into account subdomain name e.g. ilearn/ and ilearn.joeys
+	 * (that originally caused the issue with links not being correct)
+	 */
+    $hosts = array(
+        'http://' . SITE_hostname. '.' . SITE_domain,
+        'https://' . SITE_hostname. '.' . SITE_domain,
+        'http://' . $_SERVER['HTTP_HOST'],
+        'https://' . $_SERVER['HTTP_HOST'],
+        'http://' . SITE_hostname,
+        'https://' . SITE_hostname,
     );
 
     return str_replace($hosts, '', $url);

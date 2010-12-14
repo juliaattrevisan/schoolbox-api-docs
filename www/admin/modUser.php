@@ -25,9 +25,20 @@ class modUser
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "admin/modUser.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Add User");
-		include_once("../include/page.php");	
+
+        /* Header variables
+         */
+        $this->t_body->set_var('SITE_GREETING', greeting());
+        $this->t_body->set_var('SITE_LOGINNAME', formatName($_SESSION));
+
+        /* Footer variables
+         */
+        $this->t_body->set_var('TEMPLATE_YEAR', date('Y'));
+        $this->t_body->set_var('SITE_NAME', SITE_name);
+
+		include_once("../include/page.php");
 		$this->t_body->set_var('ACTION', 'Create');
-		
+
 		//blank all fields
 		$this->t_body->set_var("TITLELIST", $this->titleList(0));
 		$this->t_body->set_var("FIRSTNAME", '');
@@ -38,17 +49,17 @@ class modUser
 		$this->t_body->set_var("PASSWORD", '');
 		$this->t_body->set_var("SYNERGYID", '');
 		$this->t_body->set_var("LOCAL_EMAIL", '');
-		$this->t_body->set_var("ALT_EMAIL", '');		
+		$this->t_body->set_var("ALT_EMAIL", '');
 		$this->t_body->set_var("YEAR", '');
 		$this->t_body->set_var("ID", '');
 		$this->t_body->set_var("SUPERUSER", '');
 		$this->t_body->set_var("CAMPUSLIST", $this->campusList(0));
 		$this->t_body->set_var("GROUPLIST", $this->groupList(0));
         $this->t_body->set_var("EPORTFOLIOENABLED", '');
-		
+
 		$this->t_body->set_block("tplBODY", "delete_button", "delete_button_block");
 		$this->t_body->set_var("delete_button_block", "");
-		
+
 		//do not display group and permission management
 		$this->t_body->set_block("tplBODY", "login", "login_section");
 		$this->t_body->set_block("tplBODY", "groups", "group_section");
@@ -60,10 +71,10 @@ class modUser
 		$this->t_body->set_var("perm_section","");
 		$this->t_body->set_var("action_log","");
 		$this->t_body->set_var("login_log","");
-		
-		
+
+
 		$this->t_body->pparse("finaloutput", "tplBODY");
-		
+
 	}
 
 	function displayUser($id)
@@ -72,14 +83,25 @@ class modUser
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "admin/modUser.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Modify User");
-		include_once("../include/page.php");	
+
+        /* Header variables
+         */
+        $this->t_body->set_var('SITE_GREETING', greeting());
+        $this->t_body->set_var('SITE_LOGINNAME', formatName($_SESSION));
+
+        /* Footer variables
+         */
+        $this->t_body->set_var('TEMPLATE_YEAR', date('Y'));
+        $this->t_body->set_var('SITE_NAME', SITE_name);
+
+		include_once("../include/page.php");
 		$this->t_body->set_var('ACTION', 'Update');
 
 		//fill out all fields
 		global $userDb;
 		$user = $userDb->getUserInfo($id);
 		$userCampus = $userDb->getUserCampus($id);
-		
+
 		$this->t_body->set_var("TITLELIST", $this->titleList($user['title']));
 		$this->t_body->set_var("FIRSTNAME", $user['firstname']);
 		$this->t_body->set_var("LASTNAME", $user['lastname']);
@@ -92,7 +114,7 @@ class modUser
 			$this->t_body->set_var("LOCAL_EMAIL", "checked");
 		else
 			$this->t_body->set_var("LOCAL_EMAIL", "");
-		$this->t_body->set_var("ALT_EMAIL", $user['alt_email']);		
+		$this->t_body->set_var("ALT_EMAIL", $user['alt_email']);
 		$this->t_body->set_var("YEAR", $user['year']);
 		$this->t_body->set_var("ID", $id);
 		if($user['su'] != "")
@@ -130,7 +152,7 @@ class modUser
 		$query = "SELECT * FROM luTitle ORDER BY titleName";
 		$this->db->query($query);
 		while($line = $this->db->getNextArray() )
-		{		
+		{
 			if($line['titleName'] == $titleName)
 				$titleListHTML .= "<option value=\"".$line['titleName']."\" selected>".$line['titleName']."</option>";
 			else
@@ -138,18 +160,18 @@ class modUser
 		}
 		return $titleListHTML;
 	}
-	
+
 	function campusList($userCampus)
 	{
 		$campusListHTML = "";
 		$query = "SELECT * FROM luCampus WHERE id != '".ALLCAMPUS."' ORDER BY name";
 		$this->db->query($query);
-		
+
 		while($line = $this->db->getNextArray() )
 		{
 			$checked = $this->isInCampus($userCampus, $line['id']) ? 'checked="checked"' : '';
 			$default = $this->isDefaultCampus($userCampus, $line['id']) ? 'checked="checked"' : '';
-			
+
 			$campusListHTML .= "<tr>" .
             "<td style='text-align:center;'><input type=\"radio\" name=\"defaultCampus\" value=\"".$line['id']."\" $default /></td>" .
             "<td><input style='margin-left: 16px;' type=\"checkbox\" name=\"campus[]\" value=\"".$line['id']."\" $checked /> ".$line['name'] . "</td>" .
@@ -164,7 +186,7 @@ class modUser
 		$query = "SELECT * FROM groups ORDER BY name";
 		$this->db->query($query);
 		while($line = $this->db->getNextArray() )
-		{		
+		{
 			if($line['id'] == $groupID)
 				$groupListHTML .= "<option value=\"".$line['id']."\" selected>".$line['name']."</option>";
 			else
@@ -186,7 +208,7 @@ class modUser
 		}
 		return 0;
 	}
-	
+
 	function isDefaultCampus($userCampus, $campus)
 	{
 		if(is_array($userCampus))
@@ -199,25 +221,25 @@ class modUser
 		}
 		return 0;
 	}
-	
+
 	function displayUserGroups($id)
 	{
 		$this->t_body->set_block("tplBODY", "groups", "group_section");
 		$this->t_body->set_block("groups", "group_block", "group");
-		
+
 		global $userDb;
                 $group = $userDb->getUserGroups($id);
 
 		for($i=0;$group[$i]['id'];$i++)
 		{
 			$this->t_body->set_var("GROUP_NAME", $group[$i]['name']);
-			
+
 			//setup tick box
 			if($group[$i]['type'] == 1)
-				$this->t_body->set_var("BOX", 
+				$this->t_body->set_var("BOX",
 				"<img class=\"greenCheck\" src=\"/images/emptybox.gif\" border=\"0\" rel=\"{$group[$i]['id']}\"></a>");
 			else if($group[$i]['type'] == 2)
-				$this->t_body->set_var("BOX", 
+				$this->t_body->set_var("BOX",
 				"<img class=\"greenCheck\" src=\"/images/greentick.gif\" border=\"0\" rel=\"{$group[$i]['id']}\"></a>");
 			else
 				$this->t_body->set_var("BOX", "");
@@ -226,40 +248,40 @@ class modUser
 			if($group[$i]['type'] == 3)
 				$this->t_body->set_var("OWNER", "owner");
 			else
-				$this->t_body->set_var("OWNER", 
+				$this->t_body->set_var("OWNER",
 				"<a href=\"/group/modifyForm.php?owner=$id&categoryID=".$group[$i]['id']."\">
 				make owner</a>");
 
-			$this->t_body->set_var("REMOVE", 
+			$this->t_body->set_var("REMOVE",
 				"<a href=\"/group/modifyForm.php?delete=$id&categoryID=".$group[$i]['id']."\">
 				remove</a>");
-		
+
 			$this->t_body->parse("group", "group_block", true);
 		}
-		
+
 		//if user in no groups just display nothing
 		if($i==0)
 			$this->t_body->set_var("group", "");
 
 		//ouput group list
 		$this->t_body->set_var("GROUP_DROP_DOWN", $this->getHTMLgroupList());
-		
+
 		$this->t_body->parse("group_section","groups");
 
-	}				
+	}
 
 	function displayActivities($id) {
 		$this->t_body->set_block("perms", "action_log", "action_section");
-		
-		$query = "SELECT object, action, time, c.name as folder, f.description as file, l.description as link 
-				FROM cmsLog 
-				LEFT JOIN category c ON c.id = objectId 
+
+		$query = "SELECT object, action, time, c.name as folder, f.description as file, l.description as link
+				FROM cmsLog
+				LEFT JOIN category c ON c.id = objectId
 				LEFT JOIN file f ON f.id = objectId
-				LEFT JOIN link l ON l.id = objectId 
+				LEFT JOIN link l ON l.id = objectId
 				WHERE user = $id
 				ORDER BY time DESC
 				LIMIT 0,10";
-				
+
 		$this->db->query($query);
 		if($this->db->countRows() > 0) {
 			while($result = $this->db->getNextArray()) {
@@ -270,7 +292,7 @@ class modUser
 								);
 				$this->t_body->set_var($output);
 				$this->t_body->parse('action_section', 'action_log', true);
-			}		
+			}
 		}
 		else
 			$this->t_body->set_var('action_section', '');
@@ -278,9 +300,9 @@ class modUser
 
 	function displayLogin($username) {
 		$this->t_body->set_block("perms", "login_log", "login_block");
-		
+
 		$query = "SELECT date, ip, login FROM login_log WHERE username like ".$this->db->smartQuote($username)." ORDER BY date DESC LIMIT 0,10";
-				
+
 		$this->db->query($query);
 		if($this->db->countRows() > 0) {
 			while($result = $this->db->getNextArray()) {
@@ -291,7 +313,7 @@ class modUser
 				$this->t_body->set_var($output);
 				$this->t_body->parse('login_block', 'login_log', true);
 			}
-		}		
+		}
 		else
 			$this->t_body->set_var('login_block', '');
 	}
@@ -300,7 +322,7 @@ class modUser
 	{
 		$this->t_body->set_block("tplBODY", "perms", "perm_section");
 		$this->t_body->set_block("perms", "perm_block", "perm");
-		
+
 		global $userDb;
                 $perm = $userDb->getUserPermissions($id);
 
@@ -310,32 +332,32 @@ class modUser
 			$this->t_body->set_var("SERVICE_ID", $perm[$i]['sid']);
 			$this->t_body->set_var("SERVICE_TYPE", $perm[$i]['type']);
 
-			$this->t_body->set_var("SERVICE_REMOVE", 
+			$this->t_body->set_var("SERVICE_REMOVE",
 				"<a href=\"/group/modifyForm.php?delete=$id&service=".$perm[$i]['service']."&categoryID=".$perm[$i]['sid']."\">remove</a>");
-		
+
 			$this->t_body->parse("perm", "perm_block", true);
 		}
-		
+
 		$query = "SELECT * FROM luServices";
 		$this->db->query($query);
 		$serviceHTML = "<select name=\"service\" class=\"formfield\">";
-		$serviceHTML .= "<option value=\"0\"><- Please Select a Service -></option>"; 
+		$serviceHTML .= "<option value=\"0\"><- Please Select a Service -></option>";
 
 		while($line = $this->db->getNextArray() )
 		{
 			$serviceHTML .= "<option value=\"".$line['id']."\">".$line['name']."</option>";
 		}
-		
+
 		$this->t_body->set_var("SERVICE_DROP_DOWN", $serviceHTML);
-		
-		
+
+
 		//if user in no groups just display nothing
 		if($i==0)
 			$this->t_body->set_var("perm", "");
-			
-		
 
-	}				
+
+
+	}
 
 	function getHTMLgroupList()
 	{
@@ -345,13 +367,13 @@ class modUser
 		$this->db->query($query);
 
 		$groupHTML = "<select name=\"sid\" class=\"formfield\">";
-		$groupHTML .= "<option value=\"0\"><- Please Select a Group -></option>"; 
+		$groupHTML .= "<option value=\"0\"><- Please Select a Group -></option>";
 
 		while($line = $this->db->getNextArray() )
 		{
 			$groupHTML .= "<option value=\"".$line['id']."\">".$line['name']."</option>";
 		}
-	
+
 		$groupHTML .= "</select>";
 
 		return $groupHTML;
@@ -364,6 +386,17 @@ class modUser
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "admin/findUser.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Find User");
+
+        /* Header variables
+         */
+        $this->t_body->set_var('SITE_GREETING', greeting());
+        $this->t_body->set_var('SITE_LOGINNAME', formatName($_SESSION));
+
+        /* Footer variables
+         */
+        $this->t_body->set_var('TEMPLATE_YEAR', date('Y'));
+        $this->t_body->set_var('SITE_NAME', SITE_name);
+
 		include_once("../include/page.php");
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
@@ -373,7 +406,18 @@ class modUser
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "admin/listUser.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Find User");
-		include_once("../include/page.php");	
+
+        /* Header variables
+         */
+        $this->t_body->set_var('SITE_GREETING', greeting());
+        $this->t_body->set_var('SITE_LOGINNAME', formatName($_SESSION));
+
+        /* Footer variables
+         */
+        $this->t_body->set_var('TEMPLATE_YEAR', date('Y'));
+        $this->t_body->set_var('SITE_NAME', SITE_name);
+
+		include_once("../include/page.php");
 		$this->t_body->set_block("tplBODY", "userlist", "user_block");
 		//we assume that the connection is setup and ready to go.. yeah messy but optimized.
 
@@ -392,7 +436,7 @@ class modUser
 
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
-		
+
 	function searchUser($keyword)
 	{
 		trim($keyword);
@@ -400,7 +444,7 @@ class modUser
 		if(is_numeric($keyword)) //synergy id search
 			$query = "SELECT user.id, firstname, lastname, username, groups.name as `group`, synergy_id FROM user LEFT JOIN groups ON user.group_id = groups.id WHERE synergy_id = '$keyword'";
 		else
-			$query = "SELECT user.id, firstname, lastname, username, groups.name as `group`, synergy_id FROM user LEFT JOIN groups ON user.group_id = groups.id WHERE lastname LIKE '%".$keyword."%' || 
+			$query = "SELECT user.id, firstname, lastname, username, groups.name as `group`, synergy_id FROM user LEFT JOIN groups ON user.group_id = groups.id WHERE lastname LIKE '%".$keyword."%' ||
 				username LIKE '%".$keyword."%' || firstname LIKE '%".$keyword."%'";
 
 		$this->db->query($query);
@@ -416,10 +460,10 @@ class modUser
 		}
 		else
 			error(31);  //no users match search
-		
+
 	}
 
-		
+
 }
 
 $userDb = new user;
@@ -442,8 +486,8 @@ else if($_POST['username'] && $_POST['lastname'] && $_POST['group'] && $_POST['c
 {
 	if($_POST['id'])
 	{
-		$userDb->updateUser($_POST['id'], $_POST['username'], $_POST['title'], $_POST['firstname'], $_POST['lastname'], $_POST['synergyid'], 
-			$_POST['local_email'], $_POST['alt_email'], $_POST['group'], $_POST['password'], $_POST['campus'], 
+		$userDb->updateUser($_POST['id'], $_POST['username'], $_POST['title'], $_POST['firstname'], $_POST['lastname'], $_POST['synergyid'],
+			$_POST['local_email'], $_POST['alt_email'], $_POST['group'], $_POST['password'], $_POST['campus'],
 			$_POST['su'], $_POST['year'], $_POST['eportfolioEnabled']);
 		$myPage->displayUser($_POST['id']);
 	}
@@ -453,15 +497,15 @@ else if($_POST['username'] && $_POST['lastname'] && $_POST['group'] && $_POST['c
 			$mail_handler = 1;
 		else
 			$mail_handler = 0;
-	
+
 		if($id = $userDb->addUser($_POST['username'], $_POST['title'], $_POST['firstname'], $_POST['lastname'],
-			 $_POST['synergyid'], $_POST['group'], $_POST['campus'], $_POST['year'], $_POST['password'], 
+			 $_POST['synergyid'], $_POST['group'], $_POST['campus'], $_POST['year'], $_POST['password'],
 			 $_POST['local_email'], $_POST['local_email'], $_POST['alt_email'], $mail_handler, $_POST['su']))
-		{	
+		{
 			localRedir("/admin/modUser.php?id=$id");
 		}
 		else
-		{	
+		{
 			error(0);
 		}
 	}
@@ -470,7 +514,7 @@ else if(isset($_GET['search']) && $_GET['search'])
 {
 	$users = $myPage->searchUser($_GET['search']);
 }
-else if(isset($_GET['id']) && $_GET['id'])		
+else if(isset($_GET['id']) && $_GET['id'])
 {
 	$myPage->displayUser($_GET['id']);
 }

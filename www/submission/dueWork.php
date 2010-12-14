@@ -95,13 +95,15 @@ if (SYNERGY_enable && $user['synergy_id'])  {
 
 $categoryList = $groupHandler->involvedCategoryList($user['uid'], $subjectList, 1);
 
-foreach($categoryList as $category) {
-    $categoryIDList[] = $category['id'];
+if (is_array($categoryList)) {
+	foreach($categoryList as $category) {
+		$categoryIDList[] = $category['id'];
+	}
 }
 
 //Catch if not involved in any categories
 if (count($categoryList) == 0)
-	error(2);
+	error(135);
 
 // get selected date
 if (isset($this->arg[0]))

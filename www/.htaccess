@@ -16,6 +16,10 @@ php_value docref_ext 0
 php_value upload_max_filesize 40M
 php_value upload_max_filesize 40M
 
+# Assess uses JSON arrays to transfer data in multi-choice/matching pairs
+# JSON arrays don't like being escaped!!
+php_flag magic_quotes_gpc Off
+
 RewriteCond  %{REQUEST_URI} login.php$
 RewriteRule ^(.*)$ http://%{HTTP_HOST}/ [R,L]
 

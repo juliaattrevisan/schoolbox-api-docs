@@ -23,17 +23,28 @@ class modFileType
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "admin/modFileType.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Modify File Type");
-		include_once("../include/page.php");	
-	
+
+        /* Header variables
+         */
+        $this->t_body->set_var('SITE_GREETING', greeting());
+        $this->t_body->set_var('SITE_LOGINNAME', formatName($_SESSION));
+
+        /* Footer variables
+         */
+        $this->t_body->set_var('TEMPLATE_YEAR', date('Y'));
+        $this->t_body->set_var('SITE_NAME', SITE_name);
+
+		include_once("../include/page.php");
+
 		$this->t_body->set_var("ACTION", "Update");
 
 		$fileType = new allowedFileType();
-		
+
 		$item = $fileType->getFileType($id);
 
 
 		$this->t_body->set_var("DESCRIPTION", scrubTEXT($item['description']));
-		$this->t_body->set_var("MIME", scrubTEXT($item['mime']));		
+		$this->t_body->set_var("MIME", scrubTEXT($item['mime']));
 		$this->t_body->set_var("ICONLIST", $this->createIconList($fileType->getIconList(), $item['iconFile']));
 
 		if($item['inline'] == 'true') {
@@ -44,7 +55,7 @@ class modFileType
 			$this->t_body->set_var('INLINE_FALSE', 'checked="checked"');
 			$this->t_body->set_var('INLINE_TRUE', '');
 		}
-		
+
 		if($item['enable'] == 'true') {
 			$this->t_body->set_var('ENABLE_TRUE', 'checked="checked"');
 			$this->t_body->set_var('ENABLE_FALSE', '');
@@ -53,10 +64,10 @@ class modFileType
 			$this->t_body->set_var('ENABLE_FALSE', 'checked="checked"');
 			$this->t_body->set_var('ENABLE_TRUE', '');
 		}
-		
+
 		$this->t_body->set_var('EXTENSIONS', implode(',',$item['extensions']));
 
-		$this->t_body->set_var("IDFIELD", "<input type=\"hidden\" name=\"id\" value=\"".$item['fileTypeID']."\">");		
+		$this->t_body->set_var("IDFIELD", "<input type=\"hidden\" name=\"id\" value=\"".$item['fileTypeID']."\">");
 
 		$this->t_body->pparse("finaloutput", "tplBODY");
 
@@ -67,24 +78,35 @@ class modFileType
 		$this->t_body = new Template(TPL_directory);
 		$this->t_body->set_file("tplBODY", "admin/modFileType.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Add File Type");
-		include_once("../include/page.php");	
+
+        /* Header variables
+         */
+        $this->t_body->set_var('SITE_GREETING', greeting());
+        $this->t_body->set_var('SITE_LOGINNAME', formatName($_SESSION));
+
+        /* Footer variables
+         */
+        $this->t_body->set_var('TEMPLATE_YEAR', date('Y'));
+        $this->t_body->set_var('SITE_NAME', SITE_name);
+
+		include_once("../include/page.php");
 		$this->t_body->set_var("ACTION", "Create");
-		
+
 		$fileType = new allowedFileType();
 
 		$this->t_body->set_var('DESCRIPTION', '');
-		$this->t_body->set_var('MIME', '');		
+		$this->t_body->set_var('MIME', '');
 		$this->t_body->set_var('ICONLIST', $this->createIconList($fileType->getIconList()));
 		$this->t_body->set_var('EXTENSIONS', '');
-		
+
 		$this->t_body->set_var('INLINE_TRUE', '');
 		$this->t_body->set_var('INLINE_FALSE', '');
 		$this->t_body->set_var('ENABLE_FALSE', '');
 		$this->t_body->set_var('ENABLE_TRUE', '');
-		
 
-		$this->t_body->set_var('IDFIELD', '');		
-		
+
+		$this->t_body->set_var('IDFIELD', '');
+
 		$this->t_body->pparse("finaloutput", "tplBODY");
 
 	}
@@ -95,28 +117,38 @@ class modFileType
 		$this->t_body->set_file("tplBODY", "admin/fileTypes.htm");
 		$this->t_body->set_var("TITLE", HEADING." - Manage File Types");
 		$fileType = new allowedFileType();
-		
+
+        /* Header variables
+         */
+        $this->t_body->set_var('SITE_GREETING', greeting());
+        $this->t_body->set_var('SITE_LOGINNAME', formatName($_SESSION));
+
+        /* Footer variables
+         */
+        $this->t_body->set_var('TEMPLATE_YEAR', date('Y'));
+        $this->t_body->set_var('SITE_NAME', SITE_name);
+
 		include_once("../include/page.php");
 		$this->t_body->set_block('tplBODY', 'file_type', 'file_type_block');
 
 		$fileTypeList = $fileType->getFileTypeList();
-		
+
 		foreach($fileTypeList as $fileType) {
-			
+
 			$this->t_body->set_var('DESCRIPTION', $fileType['description']);
 			$this->t_body->set_var('MIME', $fileType['mime']);
 			$this->t_body->set_var('ICON', $fileType['iconFile']);
 			$this->t_body->set_var('FILETYPE_ID', $fileType['fileTypeID']);
 			$this->t_body->set_var('ON_OFF', ++$x%2 ? 'dark':'');
-			
+
 			if($fileType['enable'] == 'true')
 				$this->t_body->set_var('STATUS', 'Enabled');
 			else
 				$this->t_body->set_var('STATUS', 'Disabled');
-	
+
 			$this->t_body->parse('file_type_block', 'file_type', true);
 		}
-		
+
 
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
@@ -124,19 +156,19 @@ class modFileType
 	function createIconList($iconList, $selected = 0)
 	{
 		//creates the drop down for displaying the menu item target
-		
+
 		$html = "<select name=\"icon\">";
 		foreach($iconList as $icon){
 			if($selected == $icon)
 				$html .= "<option value=\"$icon\" selected=\"selected\">$icon</option>";
         	else
 				$html .= "<option value=\"$icon\">$icon</option>";
-		}		
+		}
 		$html .= "</select>";
 		return $html;
 	}
-	
-		
+
+
 }
 
 $fileType = new allowedFileType;
@@ -160,7 +192,7 @@ else if($_POST['description'] && $_POST['mime'])
 	$myPage->displayFileTypeList();
 }
 
-else if(is_numeric($_GET['id']))		
+else if(is_numeric($_GET['id']))
 {
 	$myPage->displayFileTypeItem($_GET['id']);
 }
