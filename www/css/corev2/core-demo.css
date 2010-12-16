@@ -93,9 +93,15 @@ th { font-weight:bold; }
 #tabs li a:hover { }
 
 /*COLUMNS*/
-.left { min-width: 535px; min-height: 100px; width: 69.5%; float: left; }
-.right { min-width: 229px; min-height: 100px; width: 29.5%; float: right; overflow: hidden; }
-
+.left { min-width: 535px; min-height: 100px; width: 69.5%; float: left; position:relative;}
+.right { min-width: 229px; min-height: 100px; width: 29.5%; float: right; overflow: hidden; position:relative; }
+.template2 .left { min-width: 382px; width: 49.5%; }
+.template2 .right { min-width: 382px; width: 49.5%; }
+.template3 .left { min-width: 764px; width: 100%; margin-right: 0; }
+.template3 .right { display: none; visibility: hidden; }
+.template4 .right { min-width: 535px; width: 69.5%; }
+.template4 .left { min-width: 229px; width: 29.5%; }
+.template1 .right .summ, .template4 .left .summ { display: none; }
 /*BOXES*/
 .marker { border: 2px dashed #ccc; margin-bottom: 16px; }
 .box { margin-bottom: 10px; position: relative; overflow: hidden; }

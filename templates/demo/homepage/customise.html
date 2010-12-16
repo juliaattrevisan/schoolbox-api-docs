@@ -120,150 +120,104 @@ window.addEvent('domready', function () {
 
 </script>
 <style type="text/css">
-
-.colorBox {
-	width: 15px;
-	height: 15px;
-	border: 1px solid #000;
-	cursor: pointer;
-}
-.selected {
-	font-weight: bold;
-}
-#currentColour {
-	text-align: center;
-	width: 200px;
-}
-div.colours p {
-	cursor: pointer;
-}
+.colorBox { width: 15px; height: 15px; border: 1px solid #000; cursor: pointer; }
+.selected { font-weight: bold; }
+#currentColour { text-align: center; width: 200px; }
+div.colours p { cursor: pointer; }
 </style>
 <!-- END custom_head -->
 <div class="template3">
-			<h1>
-      Homepage Customisation
-      <a class="customise" href="/homepage/{CID}">Return to Homepage</a>
-      </h1>
-            
-      <div class="left">
-			<form method="post" name="customiseForm" id="customiseForm" class="indent" action="/homepage/configForm.php">
-			
-      <div class="box grey">
-        <h2>Layout</h2>
-        <div class="text layouts">
-          <a class="layout {CURRENT_1}" title="1" href="#"><img src="/images/70-30.gif" />70-30</a>
-          <a class="layout {CURRENT_2}" title="2" href="#"><img src="/images/50-50.gif" />50-50</a>         
-          <a class="layout {CURRENT_4}" title="4" href="#"><img src="/images/30-70.gif" />30-70</a>
-          <a class="layout {CURRENT_3}" title="3" href="#"><img src="/images/100-0.gif" />100-0</a>
-          <div class="float-fix"></div>
-        </div>
-      </div>
-      
-      <div class="box grey">
-				<h2>Components</h2>
-      	<div class="text">
-        	<ul id="component-list">
-					<!-- BEGIN componentGroup -->
-						<!-- BEGIN componentRow -->
-							<!-- BEGIN componentCol -->
-              <li>
-								<input type="checkbox" name="components[]" value="{componentID}" {componentChecked} />
-                <p><strong>{componentName}</strong></p>
-                <p><small>{componentDescription}</small></p>
-              </li>
-							<!-- END componentCol -->
-						<!-- END componentRow -->
-					<!-- END componentGroup -->
-        	</ul>
-          <div class="float-fix"></div>
+	<h1> Homepage Customisation <a class="customise" href="/homepage/{CID}">Return to Homepage</a> </h1>
+	<div class="left">
+		<form method="post" name="customiseForm" id="customiseForm" class="indent" action="/homepage/configForm.php">
+			<div class="box grey">
+				<h2>Layout</h2>
+				<div class="text layouts"> <a class="layout {CURRENT_1}" title="1" href="#"><img src="/images/70-30.gif" />70-30</a> <a class="layout {CURRENT_2}" title="2" href="#"><img src="/images/50-50.gif" />50-50</a> <a class="layout {CURRENT_4}" title="4" href="#"><img src="/images/30-70.gif" />30-70</a> <a class="layout {CURRENT_3}" title="3" href="#"><img src="/images/100-0.gif" />100-0</a>
+					<div class="float-fix"></div>
 				</div>
-      </div>
-        
-      <div class="box grey">
-			<h2>Colours</h2>
+			</div>
+			<div class="box grey">
+				<h2>Components</h2>
 				<div class="text">
-          
-          <div class="colours leftColumn">
-      			<h3>Left Column</h3>
-                      
+					<ul id="component-list">
+						<!-- BEGIN componentGroup --> 
+						<!-- BEGIN componentRow --> 
+						<!-- BEGIN componentCol -->
+						<li>
+							<input type="checkbox" name="components[]" value="{componentID}" {componentChecked} />
+							<p><strong>{componentName}</strong></p>
+							<p><small>{componentDescription}</small></p>
+						</li>
+						<!-- END componentCol --> 
+						<!-- END componentRow --> 
+						<!-- END componentGroup -->
+					</ul>
+					<div class="float-fix"></div>
+				</div>
+			</div>
+			<div class="box grey">
+				<h2>Colours</h2>
+				<div class="text">
+					<div class="colours leftColumn">
+						<h3>Left Column</h3>
 						<div id="bg_primary" class="colorBox"></div>
 						<input name="colors[left_bg_primary]" type="hidden" />
-            <p class="selected">Primary Background Color</p>
-            
-            <div id="bg_secondary" class="colorBox"></div>
+						<p class="selected">Primary Background Color</p>
+						<div id="bg_secondary" class="colorBox"></div>
 						<input name="colors[left_bg_secondary]" type="hidden" />
-            <p>Secondary Background Color</p>
-            
-            <div id="head_font" class="colorBox"></div>
+						<p>Secondary Background Color</p>
+						<div id="head_font" class="colorBox"></div>
 						<input name="colors[left_head_font]" type="hidden" />
-            <p>Heading Text Colour</p>
-            
-            <div id="head_bg" class="colorBox"></div>
+						<p>Heading Text Colour</p>
+						<div id="head_bg" class="colorBox"></div>
 						<input name="colors[left_head_bg]" type="hidden" />
-            <p>Heading Background Colour</p>
-            
-            <div id="font" class="colorBox"></div>
+						<p>Heading Background Colour</p>
+						<div id="font" class="colorBox"></div>
 						<input name="colors[left_font]" type="hidden" />
-            <p>Text Colour</p>
-            
-            <div id="link" class="colorBox"></div>
+						<p>Text Colour</p>
+						<div id="link" class="colorBox"></div>
 						<input name="colors[left_link]" type="hidden" />
-            <p>Link Colour</p>
-            
-            <div id="hover" class="colorBox"></div>
+						<p>Link Colour</p>
+						<div id="hover" class="colorBox"></div>
 						<input name="colors[left_hover]" type="hidden" />
-            <p>Link Hover Colour</p>
-        	</div>
-          
-          <div class="colours">
-      			<h3>Right Column</h3>
-                      
+						<p>Link Hover Colour</p>
+					</div>
+					<div class="colours">
+						<h3>Right Column</h3>
 						<div id="bg_primary_right" class="colorBox"></div>
 						<input name="colors[right_bg_primary]" type="hidden" />
-            <p>Primary Background Color</p>
-            
-            <div id="bg_secondary_right" class="colorBox"></div>
+						<p>Primary Background Color</p>
+						<div id="bg_secondary_right" class="colorBox"></div>
 						<input name="colors[right_bg_secondary]" type="hidden" />
-            <p>Secondary Background Color</p>
-            
-            <div id="head_font_right" class="colorBox"></div>
+						<p>Secondary Background Color</p>
+						<div id="head_font_right" class="colorBox"></div>
 						<input name="colors[right_head_font]" type="hidden" />
-            <p>Heading Text Colour</p>
-            
-            <div id="head_bg_right" class="colorBox"></div>
+						<p>Heading Text Colour</p>
+						<div id="head_bg_right" class="colorBox"></div>
 						<input name="colors[right_head_bg]" type="hidden" />
-            <p>Heading Background Colour</p>
-            
-            <div id="font_right" class="colorBox"></div>
+						<p>Heading Background Colour</p>
+						<div id="font_right" class="colorBox"></div>
 						<input name="colors[right_font]" type="hidden" />
-            <p>Text Colour</p>
-            
-            <div id="link_right" class="colorBox"></div>
+						<p>Text Colour</p>
+						<div id="link_right" class="colorBox"></div>
 						<input name="colors[right_link]" type="hidden" />
-            <p>Link Colour</p>
-            
-            <div id="hover_right" class="colorBox"></div>
+						<p>Link Colour</p>
+						<div id="hover_right" class="colorBox"></div>
 						<input name="colors[right_hover]" type="hidden" />
-            <p>Link Hover Colour</p>
-        	</div>
-          
-          <div class="colours">
-            <div id="picker"></div>
-            <input type="text" id="currentColour" value="#123456" class="input_text" />
-          
-            </div>
-          <div class="float-fix"></div>
-          
-          </div>
-      </div>	
-						
-        <input id="template-choice" type="hidden" name="template" value="{TEMPLATE}" />
-        <input type="hidden" name="cid" value="{CID}" />
-        <input type="submit" class="float-right" name="Submit" value="Update Page" />
-        
-        <input type="button" id="loadDefaults" value="Load Defaults" />
-        <input type="button" id="leftRight" value="Copy Left &gt; Right" />
-    </form>
-                  
-    </div>
- </div>
+						<p>Link Hover Colour</p>
+					</div>
+					<div class="colours">
+						<div id="picker"></div>
+						<input type="text" id="currentColour" value="#123456" class="input_text" />
+					</div>
+					<div class="float-fix"></div>
+				</div>
+			</div>
+			<input id="template-choice" type="hidden" name="template" value="{TEMPLATE}" />
+			<input type="hidden" name="cid" value="{CID}" />
+			<input type="submit" class="submit-btn-plain float-right" name="Submit" value="Update Page" />
+			<input type="button" class="submit-btn-plain" id="loadDefaults" value="Load Defaults" />
+			<input type="button" class="submit-btn-plain" id="leftRight" value="Copy Left &gt; Right" />
+		</form>
+	</div>
+</div>

@@ -51,13 +51,13 @@
 		/* show/hide text based components */
 		$(document).keydown(function (event) {
 			if (event.shiftKey) {
-				$('div.manage h2').each(function () {
+				$('.manage h2').each(function () {
 					$(this).css('display', 'block');
 				});
 			}
 		});
 		$(document).keyup(function (event) {
-			$('div.manage h2').each(function () {
+			$('.manage h2').each(function () {
 				$(this).css('display', 'none');
 			});
 		});
