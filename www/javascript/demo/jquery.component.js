@@ -199,8 +199,6 @@ $j(function() {
 		function ajaxRequest() {}
 	});
 
-
-	
 	/* now the colour nonsense :| */
 	
 	var pickers = {
@@ -239,68 +237,102 @@ $j(function() {
 	};
 
 	
-	
 	$j('div.colorBox').each(function () {
-		$j(this).css('backgroundColor', pickers[$j(this).attr('id')]);
-		$j(this).next().val(pickers[$j(this).attr('id')]);
+		$j(this).css('backgroundColor', defaults[$j(this).attr('id')]);
+		//$j(this).next().val(pickers[$j(this).attr('id')]);
 	});
-	
 
 	var f = $j.farbtastic('#picker');
 	f.setColor("#b6b6ff"); //set initial color
+	$j('#currentColour').css('background-color',"#b6b6ff");
 
+	
 	f.linkTo(onColorChange);
-	//f.linkTo($j('#bg_primary').next().add($j('#bg_primary')).add($j('#currentColour')));
+	//f.linkTo(onColorChange);
+	//f.linkTo($j('#bg_primary').next());
+	
+	$j('#currentColour').keyup(function() {	
+		f.setColor($j(this).val());	
+	});
+	
+	function h2d(h) {return parseInt(h,16);} 
+
+	function rgbConvert(str) {
+		str = str.replace(/rgb\(|\)/g, "").split(",");
+		str[0] = parseInt(str[0], 10).toString(16).toLowerCase();
+		str[1] = parseInt(str[1], 10).toString(16).toLowerCase();
+		str[2] = parseInt(str[2], 10).toString(16).toLowerCase();
+		str[0] = (str[0].length == 1) ? '0' + str[0] : str[0];
+		str[1] = (str[1].length == 1) ? '0' + str[1] : str[1];
+		str[2] = (str[2].length == 1) ? '0' + str[2] : str[2];
+		return ('#' + str.join(""));
+	}
+	
+	
+	function checkTextColour() {
+		var currentColour = $j('#currentColour').val().substr(1);
+			if (h2d(currentColour) < 4473924) {
+			$j('#currentColour').css('color', '#ffffff');
+		} else {
+			$j('#currentColour').css('color', '#000000');
+		};	
+	};
 	
 	function onColorChange(color) {
-
-		var current = $j('.selected');
+		checkTextColour();
 		
+		var current = $j('div.selected');
+		
+		current.css('background-color', color);
+		
+		$j('#currentColour').val(color);
+		$j('#currentColour').css('background-color', color);
+
 		switch (current.attr('ID')) {
 			case 'bg_primary':
-				$j('.left .box').css('background-color', color);
+				return $j('.left .text').css('background-color', color);
 			break;
 			case 'bg_secondary':
-				$j('.left .dark').css('background-color', color);
+				return $j('.left .dark').css('background-color', color);
 			break;
 			case 'head_font':
-				$j('.left h2').css('color', color);
+				return $j('.left h2').css('color', color);
 			break;
 			case 'head_bg':
-				$j('.left h2').css('background-color', color);
+				return $j('.left h2').css('background-color', color)
 			break;
 			case 'font':
-				$j('.left').css('color', color);
+				return $j('.left, .left p').css('color', color)
 			break;	
 			case 'link':
-				$j('.left a').css('color', color);
+				return $j('.left a').css('color', color);
 			break;	
 			case 'hover':
-				$j('.left a:hover').css('color', color);
+				return $j('.right a:hover').css('color', color);
 			break;	
 			case 'bg_primary_right':
-				$j('.right .box').css('background-color', color);
+				return $j('.right .text').css('background-color', color);
 			break;
 			case 'bg_secondary_right':
-				$j('.right .dark').css('background-color', color);
+				return $j('.right .dark').css('background-color', color);
 			break;
 			case 'head_font_right':
-				$j('.right h2').css('color', color);
+				return $j('.right h2').css('color', color);
 			break;
 			case 'head_bg_right':
-				$j('.right h2').css('background-color', color);
+				return $j('.right h2').css('background-color', color);
 			break;
 			case 'font_right':
-				$j('.right').css('color', color);
+				return $j('.right, .right p').css('color', color);
 			break;	
 			case 'link_right':
-				$j('.right a').css('color', color);
+				return $j('.right a').css('color', color);
 			break;	
 			case 'hover_right':
-				$j('.right a:hover').css('color', color);
+				return $j('.right a:hover').css('color', color);
 			break;	
 			default:
-				console.log('shut up right')
+				return $j('.left .text').css('background-color', color);
 			break;
 		}
 	}
@@ -308,11 +340,71 @@ $j(function() {
 	$j('div.colorBox').click(function () {
 		$j('.selected').removeClass('selected');
 		$j(this).addClass('selected');
+		$j(this).next().next('p').addClass('selected');
+		f.setColor(rgbConvert($j(this).css('background-color')));
+		checkTextColour()
 	});
 	
 	$j('div.colours p').click(function () {
 		$j(this).prev().prev().click();
 	});
 	
+	
+	$j('.layouts a').click(function () {
+		
+		var templateChoice = $j(this).attr('title');
+		var newChoice = "";
+		
+		switch (templateChoice) {
+			case '1':
+				newChoice = 'template1';
+			break;
+			case '2':
+				newChoice = 'template2';
+			break;
+			case '3':
+				newChoice = 'template3';
+			break;
+			case '4':
+				newChoice = 'template4';
+			break;
+			default:
+				newChoice = 'template1';
+			break;
+			
+		}
+		
+	$j('.homepage').removeClass().addClass(newChoice + ' homepage ui-sortable');
+		$j('.layouts a.current').removeClass('current');
+		$j(this).addClass('current');		
+		
+	});	
+	
+	
+	$j("#leftRight").click(function () {
+		
+		var rightBox;
+		
+		$j('div.leftColumn div.colorBox').each(function () {
+			rightBox = $j('#' + $j(this).attr('id') + '_right');
+			rightBox.css('backgroundColor', $j(this).css('backgroundColor'));
+			rightBox.next().val($j(this).next().val());
+		});
+
+		$j('.right .text').css('background-color', $j('.left .text').css('background-color'));
+		$j('.right .dark').css('background-color', $j('.left .dark').css('background-color'));
+		$j('.right, .right p').css('color', $j('.left').css('color'));
+		$j('.right h2').css('background-color', $j('.left h2').css('background-color'));
+		$j('.right, .right p').css('color', $j('.left, .left p').css('color'));
+		$j('.right a').css('color', $j('.left a').css('color'));
+
+	});
+	
+	$j('#cancel').click(function() {
+		$j('.colorBox').each(function () {
+			$j(this).css('background-color', defaults[$j(this).attr('id')]);
+			$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
+		});
+	});
 
 });

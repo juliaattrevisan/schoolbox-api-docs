@@ -689,11 +689,11 @@ ul.js_happening li{margin-bottom:4px; position:relative; }
 #component-list li p { padding: 0 0 0 30px; margin: 0; }
 a.layout { margin: 0 25px 0 0; padding: 5px; display: block; float: left; text-align: center; }
 a.layout img { display: block; padding: 3px; margin-bottom: 5px; }
-.text a.layout.current img { background: #414141; }
+a.layout.current img { background: #414141; }
 a.layout:hover { text-decoration: none; }
 a.layout:hover img { background: #999; }
 
-#tabs-homepage{display:none;}
+/*#tabs-homepage{display:none;}*/
 #tabs-homepage .ui-tabs-hide{display:none;}
 #tabs-homepage .ui-tabs-nav{float:right;}
 #tabs-homepage .ui-tabs-nav li{float:left; }
@@ -701,6 +701,7 @@ a.layout:hover img { background: #999; }
 #tabs-homepage li.ui-state-default a{background: #F4F1EA;}
 #tabs-homepage li.ui-tabs-selected a{background:#FFFDE9;}
 
+#tabs-homepage{display:none;}
 #tabs-sub .ui-tabs-nav{float:left;}
 #tabs-sub .ui-tabs-nav li a{padding:8px 16px;display:block; -moz-border-radius: 0; -webkit-border-radius:0; border-radius:0; margin-left:8px; border-right:1px solid #0f0 }
 #tabs-sub  li.ui-state-default a{background: #fff;}
@@ -726,7 +727,10 @@ background:#797979; color:#fff; width:80px; height:40px;}
 .dropBox .drop-left input, .dropBox .drop-right input[type=file]{float:left;}
 .dropBox .drop-left input{width:90%;}
 .dropBox .drop-submit{float:left; clear:both; margin:10px 0 0 0;}
-.dropBox .pad{padding:5px 0 0 30px ;}
+.dropBox .pad{padding:5px 0 0 30px;}
+.colours p, .colorBox{cursor:pointer;}
+.colours .selected{font-weight:bold;}
+#currentColour{text-align:center;}
 
 /*DUE DATES*/
 .due-dates { width:100%; }
