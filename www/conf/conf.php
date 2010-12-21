@@ -8,16 +8,16 @@
 
 
 //Site Directives
-define("HEADING", 'OurSchool');			//This will appear on the window title of each page
+define("HEADING", 'Schoolbox');			//This will appear on the window title of each page
 define("SITE_name", "Alaress Pty Ltd");
 define("SITE_location", "demo");
+define('SITE_hostname', 'joeys');
+define('SITE_domain', 'portal.alaress-dev.com.au');
 
 //define("SITE_location", "shore");				//This defines the location, allows specific code for each location
 define("SITE_detect", "domain");				//Which option to detect site, can be domain or campus
 define("SITE_root", dirname(__FILE__)."/../..");
 define('SITE_address', 'http://www.alaress.com.au');
-define('SITE_hostname', 'joeys');
-define('SITE_domain', 'portal.alaress-dev.com.au');
 
 //Security options
 define("LOGINGRACE", "60");				//Time measured between logins (secs)
@@ -100,9 +100,14 @@ define('NAME_format', '{title} {firstname} {lastname}'); 	// Format for output o
 
 //MySQL config options
 define("SQL_host", "localhost");
-define("SQL_user", "jleckie");
+define("SQL_user", "portal");
 define("SQL_passwd", "tnp879");
-define("SQL_db", "portaldemo");
+define("SQL_db", "portal");
+
+//define("SQL_host", "localhost");
+//define("SQL_user", "portaldemo");
+//define("SQL_passwd", "Maja4QjZ8Hc1");
+//define("SQL_db", "portaldemo");
 
 
 //Synergy options
@@ -168,25 +173,25 @@ define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 define('GROUP_can_change_password', serialize(array(1,2,3,4,5)));
 
 define('HOMEPAGE_colors', serialize(array(
-	'left_head_font' => 'ffffff', 
-	'left_head_bg' => '072f63', 
-	'left_font' => '2c2c2c', 
-	'left_bg_primary' => 'ffffff', 
-	'left_bg_secondary' => 'f1f7fa', 
-	'left_link' => '072f63', 
-	'left_hover' => 'bc9e37', 
-	'right_head_font' => 'ffffff', 
-	'right_head_bg' => '072f63', 
-	'right_font' => '2c2c2c', 
-	'right_bg_primary' => 'ffffff', 
-	'right_bg_secondary' => 'f1f7fa', 
-	'right_link' => '072f63', 
-	'right_hover' => 'bc9e37', 
+ 'left_head_font' => '013a63',
+ 'left_head_bg' => 'cae9b9',
+ 'left_font' => '000000',
+ 'left_bg_primary' => 'ffffff',
+ 'left_bg_secondary' => 'faf9f5',
+ 'left_link' => '1d9ffc',
+ 'left_hover' => 'ff5a00',
+ 'right_head_font' => '013a63',
+ 'right_head_bg' => 'cae9b9',
+ 'right_font' => '000000',
+ 'right_bg_primary' => 'ffffff',
+ 'right_bg_secondary' => 'faf9f5',
+ 'right_link' => '1d9ffc',
+ 'right_hover' => 'ff5a00',
 	
 )));
 
 //module config options
 define('HELPDESK_enable', true);
-define('HELPDESK_location', '/usr/local/www/helpdesk');
+define('HELPDESK_location', '/var/www/helpdesk');
 define('HELPDESK_db', 'helpdesk');
 ?>

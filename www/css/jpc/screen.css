@@ -1,0 +1,37 @@
+@charset "utf-8";
+/* CSS Document */
+
+body{background:#E6E4F2 url(/images/jpc/background-repeater.jpg) repeat-x;}
+h2, h2 a, .header_option, .standardForm td h4, .cal-bubble .time{background-color: #EDE4A6; color:#000000;}
+.header_option{background:none;}
+a{color:#2C4350}
+a:hover{color:#176D76;}
+.jpcnet{color:#ffd; position:absolute; top:0; left:256px; font-size:36px;}
+
+h3, #infoPanel li, #nav h3, .customise, td.cal-right a.filter-change,
+td.cal-right a.filters, .dayWrap p, .cal-bubble  .middle .close, .add-component .notification{color: #ffffff;}
+
+#header .logo{height: 221px;padding-top: 0;width: 224px;}
+#nav{top:239px;}
+#nav h3.my-links{}
+#nav ul.my-links{}
+
+#tabs li a{color:#579DCF;}
+
+#nav li a:hover, #nav li li a:hover, #category li a.selected{background-color:#efc437;}
+
+#nav ul, .dark, .standardForm, #assess .standardForm, #assess .additional-details, 
+#assess  .assess-body, .blog-comments .box, td.cal-left a.back, td.cal-left a.forward, 
+td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, 
+td.cal-right a.filter-change, .day-block, 
+.post-left, #category, .search-item:nth-child(even)  
+{background-color:#FFF4C2; }
+
+#nav h3, #tooltip, #month-view td.dark, #week-view td.dark, td.cal-left a:hover, td.cal-left .datepicker-box:hover,
+td.cal-right a.filter-change.current,td.cal-right a.filter-change:hover,
+#tabs-homepage li.ui-state-default a{background-color: #222478;}
+
+#nav ul ul, .blog-comments p.interact {border-color:#FDEDA7;}
+#search-field, #search-button{background-color:#FFFDE9}
+
+td.cal-right .link-case .filter-drop .filter-list{background:#E6F6F9;}
