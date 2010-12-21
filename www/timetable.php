@@ -8,6 +8,7 @@
 require_once '../library/synergetic-timetable.php';
 require_once '../library/user.php';
 require_once '../library/group.php';
+require_once '../library/category.php';
 
 //synergy not enabled do not display page
 if(!SYNERGY_enable)
@@ -53,6 +54,7 @@ function displayWeek(&$page, $sid)
  	$userHandler = new User;
 	$timetableHandler = new SynergeticTimetable;
 	$categoryHandler = new Category;
+    $groupHandler = new Group;
 
 
 	$user = $userHandler->getBySynergy($sid);
@@ -121,7 +123,7 @@ function displayWeek(&$page, $sid)
                             $catCache[$period['code']] = $cat['id'];
                         }
 
-                        if($groupHandler->getPermission($catCache[$period['code']]) > READ_ACCESS);
+                        if($groupHandler->getPermission($catCache[$period['code']]) >= READ_ACCESS)
                             $outputPeriod['PERIOD_ONCLICK'] = 'onClick="window.location=\'/homepage.php?code='.urlencode($period['code']).'\'"';
 
 					}

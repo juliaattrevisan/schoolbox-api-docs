@@ -152,13 +152,13 @@ $j(function() {
 
 	$j('.delete-accept').click(function(event) {
 		event.preventDefault();
-		$j(this).parent().parent().animate({opacity:0}, 300,
+		$j(this).parent().parent().parent().animate({opacity:0}, 300,
 			function() {
 				$j(this).slideUp(200, function() {
 					$j(this).remove();	
 					
 					//update with an ajax call here.
-					
+					$j.post('/homepage/configForm.php', $j(this).closest('form').serialize());
 				});
 		});
 	});
@@ -198,44 +198,6 @@ $j(function() {
 		
 		function ajaxRequest() {}
 	});
-
-	/* now the colour nonsense :| */
-	
-	var pickers = {
-		'head_font'		: '#013A63',
-		'head_bg'		: '#CAE9B9',
-		'font'			: '#013A63',
-		'bg_primary'	: '#ffffff',
-		'bg_secondary'	: '#FAF9F5',
-		'link'			: '#1d9ffc',
-		'hover'			: '#ff5a00',
-		
-		'head_font_right'	: '#013A63',
-		'head_bg_right'	: '#CAE9B9',
-		'font_right'	: '#013A63',
-		'bg_primary_right'	: '#ffffff',
-		'bg_secondary_right'	: '#FAF9F5',
-		'link_right'	: '#1d9ffc',
-		'hover_right'	: '#ff5a00'
-	};
-	var defaults = {
-		'head_font'		: '#013a63',
-		'head_bg'		: '#cae9b9',
-		'font'			: '#000000',
-		'bg_primary'	: '#ffffff',
-		'bg_secondary'	: '#faf9f5',
-		'link'			: '#1d9ffc',
-		'hover'			: '#ff5a00',
-		
-		'head_font_right'	: '#013a63',
-		'head_bg_right'	: '#cae9b9',
-		'font_right'	: '#000000',
-		'bg_primary_right'	: '#ffffff',
-		'bg_secondary_right'	: '#faf9f5',
-		'link_right'	: '#1d9ffc',
-		'hover_right'	: '#ff5a00'
-	};
-
 	
 	$j('div.colorBox').each(function () {
 		$j(this).css('backgroundColor', defaults[$j(this).attr('id')]);

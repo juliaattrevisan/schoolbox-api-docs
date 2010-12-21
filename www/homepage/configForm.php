@@ -41,6 +41,10 @@ if(is_numeric($_REQUEST['cid']) ) {
 			}
 		}
 	}
+    elseif($_POST['cid'] && $_POST['delete']) {
+        //AJAX request to delete component from homepage
+
+    }
 	elseif($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component'])
 	{	
 		//Post config options from homepage

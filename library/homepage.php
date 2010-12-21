@@ -21,14 +21,19 @@ class Homepage {
 	
 	function getComponentList()
 	{
-		$query = "SELECT id, name, component, description FROM homepage_comp c
-				  LEFT JOIN homepage_comp_location l ON l.component = c.id AND cid = {$this->cid} 
-				  WHERE ( invisible = 'false' OR l.component IS NOT NULL ) ORDER BY name";
+		$query = "SELECT t.homepageComponentCategoryID AS categoryID, t.name as categoryName, id, c.name, component, description, allowMultiple,
+                    (SELECT COUNT(*) FROM homepage_comp_location hcl WHERE hcl.component = c.id AND hcl.cid = 148) as componentCount
+                    FROM homepage_comp c
+                    JOIN homepageComponentCategory t ON t.homepageComponentCategoryID = homepageCategoryID
+                    LEFT JOIN homepage_comp_location l ON l.component = c.id AND cid = {$this->cid}
+				  
+                  WHERE ( invisible = 'false' OR l.component IS NOT NULL ) ORDER BY homepageCategoryID, c.name";
 
 		
 		return $this->db->getAll($query); 
 	}
-	
+
+
 	function getColorList()
 	{
 		$query = "SELECT left_head_font, left_head_bg, left_font, left_bg_primary, left_bg_secondary, left_link, left_hover, 

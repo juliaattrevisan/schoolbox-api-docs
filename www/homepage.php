@@ -65,7 +65,8 @@ $this->setTab('resources');
 
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
-$this->setBlock(TEMPLATE_content, "edit_page", "edit_page_block");
+$this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
+$this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 
 
 $colours = $homepageHandler->getColorList();
@@ -82,12 +83,104 @@ $output = array('HEADING'				=> scrubTEXT($category['name']) . (isset($code) && 
 $this->setVar($output);
 
 if($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
-	$this->parse("edit_page_block", "edit_page");
+	$this->setBlock('customise_page', 'homepage_component_tab', 'homepage_component_tab_block');
+    $this->setBlock('customise_page', 'homepage_component_page', 'homepage_component_page_block');
+    $this->setBlock('homepage_component_page', 'homepage_component', 'homepage_component_block');
+    $this->setBlock('homepage_component', 'homepage_component_add', 'homepage_component_add_block');
+
+    $this->parse('edit_page_block', 'edit_page');
 	$this->parse('modify_layout_block', 'modify_layout');
+    $this->parse('customise_page_block', 'customise_page');
+
+
+
+
+    /* Output components and component tabs */
+    $componentList = $homepageHandler->getComponentList();
+
+    if(is_array($componentList)) {
+        $total = count($componentList);
+        $i = 0;
+        foreach($componentList as $component) {
+            $i++;
+
+            if($component['allowMultiple'] == 'false' && $componentCount > 0)
+                $class = 'disabled';
+            else if($component['allowMultiple'] == 'false') {
+                $class = 'one-only';
+            }
+            else
+                $class = '';
+            $output = array('HOMEPAGE_COMPONENT_NAME'   => scrubTEXT($component['name']),
+                            'HOMEPAGE_COMPONENT_COUNT'  => $component['componentCount'],
+                            'HOMEPAGE_COMPONENT_DESCRIPTION'    => scrubTEXT($component['description']),
+                            'HOMEPAGE_COMPONENT_CLASS'  => $class,
+                            'HOMEPAGE_COMPONENT_CATEGORY_ID' => $previous['categoryID']);
+            $this->setVar($output);
+
+            if($component['componentCount'] < 1 || $component['allowMultiple'] == 'true'){
+                $this->parse('homepage_component_add_block','homepage_component_add');
+            }
+            else
+                $this->setVar('homepage_component_add_block','');
+
+            if($component['categoryName'] != $previous['categoryName'] && $i > 1) {
+
+                $this->parse('homepage_component_page_block', 'homepage_component_page', true);
+
+                $this->setVar('homepage_component_block', '');
+                $this->parse('homepage_component_block', 'homepage_component', true);
+
+            	/* last rotation */
+                if ($total == $i) {
+                    $this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component['categoryID']);
+                    $this->parse('homepage_component_page_block', 'homepage_component_page', true);
+                }
+
+            } elseif ($total == $i) {
+                /* last rotation */
+                $this->parse('homepage_component_block', 'homepage_component', true);
+                $this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component['categoryID']);
+                $this->parse('homepage_component_page_block', 'homepage_component_page', true);
+            } else {
+                $this->parse('homepage_component_block', 'homepage_component', true);
+            }
+
+            $previous = $component;
+
+            $tabList[$component['categoryID']]['name'] = $component['categoryName'];
+            $tabList[$component['categoryID']]['count']++;
+
+        }
+    }
+
+    foreach($tabList as $id => $tab) {
+        $output = array('COMPONENT_CATEGORY_ID' => $id,
+                        'COMPONENT_CATEGORY_NAME' => $tab['name'],
+                        'COMPONENT_CATEGORY_COUNT' => $tab['count']);
+        $this->setVar($output);
+        $this->parse('homepage_component_tab_block', 'homepage_component_tab', true);
+    }
+
+    $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
+	// Colors
+	$listColor = $homepageHandler->getColorList();
+	$this->setVar('COLOUR_ARRAY', 'pickers');
+	$this->setVar($listColor);
+	$this->parse('colour_list_block', 'colour_list', true);
+
+	// defaults
+	$defaultColour = unserialize(HOMEPAGE_colors);
+	$this->setVar('COLOUR_ARRAY', 'defaults');
+	$this->setVar($defaultColour);
+	$this->parse('colour_list_block', 'colour_list', true);
+
+
 }	
 else {
-	$this->setVar("edit_page_block", "");
+	$this->setVar('edit_page_block', '');
 	$this->setVar('modify_layout_block', '');
+    $this->setVar('customise_page_block', '');
 }
 
 // output mime classes
@@ -141,66 +234,67 @@ if (is_array($componentList)) {
 		if(is_file($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php'))
 			include($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php');
 
+        if($permission >= WRITE_ACCESS) {
+            if(is_array($default)) {
 
-		if(is_array($default) && $permission >= WRITE_ACCESS) {	
+                foreach($default as $name => $value) {
 
-			foreach($default as $name => $value) {
-			
-				switch ($name) {
+                    switch ($name) {
 
-					case "size":
-						$this->setBlock("config", "size", "size_block".$componentCount);
-						for($i=0; $i<=10; $i++) {
-							$this->setVar('COMPONENT_CONFIG_SIZE_NAME', $i == 0 ? 'All' : $i);
-							$this->setVar('COMPONENT_CONFIG_SIZE_VALUE', $i);
-							$this->setVar('COMPONENT_CONFIG_SIZE_SELECTED', $i == $config[$name] ? ' selected="selected"' : '');
-							$this->parse("size_block".$componentCount, "size", true);
-						}
-						break;
-						
-					case "image":
-						$this->setBlock("config", "image", "image_block".$componentCount);
-						
-						$imageList = $categoryHandler->getImages($categoryID);
-						if(is_array($imageList)){
-							foreach ($imageList as $image) {
-							
-								$this->setVar('COMPONENT_CONFIG_IMAGE', $image['description']);
-								$this->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', $image['description'] == $config[$name] ? ' selected="selected"' : '');
-								$this->parse("image_block".$componentCount, "image", true);
-							}
-						}
-						break;
-						
-					case "sort":		
-						$this->setBlock("config", "sort", "sort_block".$componentCount);
-                  
-						foreach ($sortOptions as $sort)
-						{
-							$this->setVar('COMPONENT_CONFIG_SORT_NAME', $sort);
-							$this->setVar('COMPONENT_CONFIG_SORT_VALUE', $sort);
-							$this->setVar('COMPONENT_CONFIG_SORT_SELECTED', $sort == $config[$name] ? ' selected="selected"' : '');
-							$this->parse("sort_block".$componentCount, "sort", true);
-						}
-						break;
-						
-					case "sortdir":
-						$this->setBlock("config", "sortdir", "sortdir_block".$componentCount);
-						$sortOptions = array('Asc', 'Desc');
-						foreach ($sortOptions as $sort)
-						{
-							$this->setVar('COMPONENT_CONFIG_SORTDIR_NAME', $sort);
-							$this->setVar('COMPONENT_CONFIG_SORTDIR_VALUE', $sort);
-							$this->setVar('COMPONENT_CONFIG_SORTDIR_SELECTED', $sort == $config[$name] ? ' selected="selected"' : '');
-							$this->parse("sortdir_block".$componentCount, "sortdir", true);
-						}
-						break;
-					default:
-						$this->setVar('COMPONENT_CONFIG_' . strtoupper($name), $config[$name]);
-				}
-			}
-			$this->parse("config_block", "config");	
-		
+                        case "size":
+                            $this->setBlock("config", "size", "size_block".$componentCount);
+                            for($i=0; $i<=10; $i++) {
+                                $this->setVar('COMPONENT_CONFIG_SIZE_NAME', $i == 0 ? 'All' : $i);
+                                $this->setVar('COMPONENT_CONFIG_SIZE_VALUE', $i);
+                                $this->setVar('COMPONENT_CONFIG_SIZE_SELECTED', $i == $config[$name] ? ' selected="selected"' : '');
+                                $this->parse("size_block".$componentCount, "size", true);
+                            }
+                            break;
+
+                        case "image":
+                            $this->setBlock("config", "image", "image_block".$componentCount);
+
+                            $imageList = $categoryHandler->getImages($categoryID);
+                            if(is_array($imageList)){
+                                foreach ($imageList as $image) {
+
+                                    $this->setVar('COMPONENT_CONFIG_IMAGE', $image['description']);
+                                    $this->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', $image['description'] == $config[$name] ? ' selected="selected"' : '');
+                                    $this->parse("image_block".$componentCount, "image", true);
+                                }
+                            }
+                            break;
+
+                        case "sort":
+                            $this->setBlock("config", "sort", "sort_block".$componentCount);
+
+                            foreach ($sortOptions as $sort)
+                            {
+                                $this->setVar('COMPONENT_CONFIG_SORT_NAME', $sort);
+                                $this->setVar('COMPONENT_CONFIG_SORT_VALUE', $sort);
+                                $this->setVar('COMPONENT_CONFIG_SORT_SELECTED', $sort == $config[$name] ? ' selected="selected"' : '');
+                                $this->parse("sort_block".$componentCount, "sort", true);
+                            }
+                            break;
+
+                        case "sortdir":
+                            $this->setBlock("config", "sortdir", "sortdir_block".$componentCount);
+                            $sortOptions = array('Asc', 'Desc');
+                            foreach ($sortOptions as $sort)
+                            {
+                                $this->setVar('COMPONENT_CONFIG_SORTDIR_NAME', $sort);
+                                $this->setVar('COMPONENT_CONFIG_SORTDIR_VALUE', $sort);
+                                $this->setVar('COMPONENT_CONFIG_SORTDIR_SELECTED', $sort == $config[$name] ? ' selected="selected"' : '');
+                                $this->parse("sortdir_block".$componentCount, "sortdir", true);
+                            }
+                            break;
+                        default:
+                            $this->setVar('COMPONENT_CONFIG_' . strtoupper($name), $config[$name]);
+                    }
+                }
+                
+            }
+             $this->parse("config_block", "config");
 		} else
 			$this->setVar("config_block", "");	
 

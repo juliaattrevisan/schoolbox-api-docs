@@ -10,6 +10,7 @@
 
 
 <!-- END modify_layout -->
+
 <style type="text/css">
 		
 .left h2 { color: #{left_head_font}; background-color: #{left_head_bg};	}
@@ -33,6 +34,27 @@ a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
 
 			
 </style>
+<script type="text/javascript">
+<!-- BEGIN colour_list -->
+var {COLOUR_ARRAY} = {
+	'head_font'		: '#{left_head_font}',
+	'head_bg'		: '#{left_head_bg}',
+	'font'			: '#{left_font}',
+	'bg_primary'	: '#{left_bg_primary}',
+	'bg_secondary'	: '#{left_bg_secondary}',
+	'link'			: '#{left_link}',
+	'hover'			: '#{left_hover}',
+
+	'head_font_right'	: '#{right_head_font}',
+	'head_bg_right'	: '#{right_head_bg}',
+	'font_right'	: '#{right_font}',
+	'bg_primary_right'	: '#{right_bg_primary}',
+	'bg_secondary_right'	: '#{right_bg_secondary}',
+	'link_right'	: '#{right_link}',
+	'hover_right'	: '#{right_hover}'
+};
+<!-- END colour_list -->
+</script>
 <!-- END custom_head -->
 
 <h1>
@@ -42,7 +64,7 @@ a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
   <!--old customise link: /homepage/config/{ID}-->
   <!-- END edit_page -->
 </h1>
-
+<!-- BEGIN customise_page -->
 <div id="tabs-homepage">
 	<ul>
 		<li><a href="#tabs-1">Components</a></li>
@@ -53,42 +75,26 @@ a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
 	<div id="tabs-1" class="customise-components">
 			<div id="tabs-sub">
 				<ul>
-					<li><a href="#tabs-sub-1">Nunc tincidunt</a></li>
-					<li><a href="#tabs-sub-2">Proin dolor</a></li>
+                    <!-- BEGIN homepage_component_tab -->
+					<li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
+                    <!-- END homepage_component_tab -->
 				</ul>
 				<div class="float-fix"></div>
-				<div id="tabs-sub-1">
-					<div class="add-component enabled">
-						<h4>Assignments</h4>
-						<p>List submission boxes with the type assignment. It shows the due date and allows students to submit from the homepage.</p>
-						<strong></strong>
-						<span class="notification">Successfully Added!</span>
-						<a href="#" class="btn add"><span></span>Add</a>
+                <!-- BEGIN homepage_component_page -->
+				<div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
+                    <!-- BEGIN homepage_component -->
+					<div class="add-component {HOMEPAGE_COMPONENT_CLASS}">
+						<h4>{HOMEPAGE_COMPONENT_NAME} <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong></h4>
+						<p>{HOMEPAGE_COMPONENT_DESCRIPTION}</p>
+						<span class="notification"></span>
+						<!-- BEGIN homepage_component_add --> 
+                            <a href="#" class="btn add"><span></span>Add</a>
+                        <!-- END homepage_component_add -->
 						<div class="float-fix"></div>
 					</div>
-				
-					<div class="add-component disabled">
-						<h4>Assignments<strong>(<em>20</em>)</strong></h4>
-						<p>List submission boxes with the type assignment. It shows the due date and allows students to submit from the homepage.</p>
-						<div class="how-many"></div>
-						<span class="notification">Successfully Added!</span>
-						<a href="#" class="btn add"><span></span>Add</a>
-						<div class="float-fix"></div>
-					</div>
-				
-					<div class="add-component disabled">
-						<h4>Assignments<strong>(<em>20</em>)</strong></h4>
-						<p>List submission boxes with the type assignment. It shows the due date and allows students to submit from the homepage.</p>
-						<span class="notification">Successfully Added!</span>
-						<a href="#" class="btn add"><span></span>Add</a>
-						<div class="float-fix"></div>
-					</div>
-					<div class="float-fix"></div>
-				</div><!--tabs-sub-1"-->
-				<div id="tabs-sub-2">
-					<p>Morbi tincidunt, dui sit amet facilisis feugiat, odio metus gravida ante, ut pharetra massa metus id nunc. Duis scelerisque molestie turpis. Sed fringilla, massa eget luctus malesuada, metus eros molestie lectus, ut tempus eros massa ut dolor. Aenean aliquet fringilla sem. Suspendisse sed ligula in ligula suscipit aliquam. Praesent in eros vestibulum mi adipiscing adipiscing. Morbi facilisis. Curabitur ornare consequat nunc. Aenean vel metus. Ut posuere viverra nulla. Aliquam erat volutpat. Pellentesque convallis. Maecenas feugiat, tellus pellentesque pretium posuere, felis lorem euismod felis, eu ornare leo nisi vel felis. Mauris consectetur tortor et purus.</p>
+                    <!-- END homepage_component -->
 				</div>
-
+                <!-- END homepage_component_page -->
 			</div>
 	</div><!--/tabs-1-->
 	<div id="tabs-2" class="customise-components">
@@ -163,7 +169,7 @@ a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
 		<div class="float-fix"></div>
 	</div><!--/tabs-3-->
 </div>
-
+<!-- END customise_page -->
 
 <div class="{TEMPLATE} homepage">
 	<div class="left">{COLUMN1}</div>
