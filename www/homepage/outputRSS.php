@@ -7,6 +7,7 @@ $rss = new XML($config['url'], RSS_cache_time);
 
 $this->setVar('RSS_NAME', !empty($rss->channel->title) ? scrubTEXT($rss->channel->title) : 'Please enter a feed URL');
 $this->setVar('RSS_LINK', $rss->channel->link);
+$this->setVar("rss_block", '');
 
 if($rss->channel) {
     foreach($rss->channel->item as $i => $item) {
@@ -29,8 +30,6 @@ if($rss->channel) {
         if($j == $config['size'] && $config['size'] != 0)
             break;
     }
-
-    $this->parse("rss_block", "rss_stories", true);
 } else {
     $this->setVar("rss_block", '');
 }

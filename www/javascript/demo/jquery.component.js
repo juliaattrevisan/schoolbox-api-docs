@@ -63,7 +63,7 @@ $j(function() {
 	
 	/* from here down I've changed the component functions!!!!*/
 	
-	$j('#tabs-homepage').tabs({selected:1});
+	$j('#tabs-homepage').tabs({selected:0});
 	$j('#tabs-sub').tabs({selected:0});
 	
 	$j('.add-component strong').qtip({
@@ -152,15 +152,16 @@ $j(function() {
 
 	$j('.delete-accept').click(function(event) {
 		event.preventDefault();
-		$j(this).parent().parent().parent().animate({opacity:0}, 300,
+        //update with an ajax call here.
+		$j.post('/homepage/configForm.php', $j(this).closest('form').serialize());
+		
+        $j(this).closest('.box').animate({opacity:0}, 300,
 			function() {
 				$j(this).slideUp(200, function() {
 					$j(this).remove();	
-					
-					//update with an ajax call here.
-					$j.post('/homepage/configForm.php', $j(this).closest('form').serialize());
 				});
 		});
+
 	});
 
 
@@ -173,7 +174,8 @@ $j(function() {
 	$j(".add-component a").live('click', function(event) {
 		event.preventDefault();
 		var $this = $j(this);
-		
+		$j.post('/homepage/configForm.php', {add : $j(this).attr('rel'), cid : cid } );
+        
 		if($this.parent().hasClass('one-only')) {
 			$this.siblings('.notification').fadeIn(200, function() {
 				$j(this).delay(4000).fadeOut();
@@ -194,9 +196,7 @@ $j(function() {
 			$j(this).delay(4000).fadeOut();
 		});
 		
-		ajaxRequest();
 		
-		function ajaxRequest() {}
 	});
 	
 	$j('div.colorBox').each(function () {

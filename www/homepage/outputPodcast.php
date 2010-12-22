@@ -2,6 +2,7 @@
 
 $this->setJavascript('/javascript/swfobject.js');
 $this->setBlock($componentHandle, 'podcast_list', 'podcast_list_block');
+$this->setVar("podcast_list_block", '');
 
 require_once('../library/xml.php');
 

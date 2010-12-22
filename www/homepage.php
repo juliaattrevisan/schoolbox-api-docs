@@ -111,7 +111,8 @@ if($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
             }
             else
                 $class = '';
-            $output = array('HOMEPAGE_COMPONENT_NAME'   => scrubTEXT($component['name']),
+            $output = array('HOMEPAGE_COMPONENT_ID'   => scrubTEXT($component['id']),
+                            'HOMEPAGE_COMPONENT_NAME'   => scrubTEXT($component['name']),
                             'HOMEPAGE_COMPONENT_COUNT'  => $component['componentCount'],
                             'HOMEPAGE_COMPONENT_DESCRIPTION'    => scrubTEXT($component['description']),
                             'HOMEPAGE_COMPONENT_CLASS'  => $class,
@@ -226,7 +227,7 @@ if (is_array($componentList)) {
 		$this->setFile($componentHandle, 'homepage/components/'.$component['filename']);
 		$this->setBlock($componentHandle, "config", "config_block");
 
-		$this->setVar('COMPONENT_ID', $component['component']);
+		$this->setVar('COMPONENT_ID', $component['homepageComponentLocationID']);
 		
 		$default = unserialize($component['dfconfig']);
 		$config = unserialize($component['config']);

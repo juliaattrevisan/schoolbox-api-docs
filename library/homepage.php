@@ -22,17 +22,16 @@ class Homepage {
 	function getComponentList()
 	{
 		$query = "SELECT t.homepageComponentCategoryID AS categoryID, t.name as categoryName, id, c.name, component, description, allowMultiple,
-                    (SELECT COUNT(*) FROM homepage_comp_location hcl WHERE hcl.component = c.id AND hcl.cid = 148) as componentCount
+                    (SELECT COUNT(*) FROM homepage_comp_location hcl WHERE hcl.component = c.id AND hcl.cid = {$this->cid}) as componentCount
                     FROM homepage_comp c
                     JOIN homepageComponentCategory t ON t.homepageComponentCategoryID = homepageCategoryID
                     LEFT JOIN homepage_comp_location l ON l.component = c.id AND cid = {$this->cid}
-				  
-                  WHERE ( invisible = 'false' OR l.component IS NOT NULL ) ORDER BY homepageCategoryID, c.name";
 
-		
-		return $this->db->getAll($query); 
+                  WHERE ( invisible = 'false' OR l.component IS NOT NULL ) GROUP BY id ORDER BY homepageCategoryID, c.name";
+
+
+		return $this->db->getAll($query);
 	}
-
 
 	function getColorList()
 	{
@@ -115,33 +114,48 @@ class Homepage {
 		$submissionBoxHandler = new Submission;
 		$submissionBoxHandler->homepageClean($this->cid);
 	}
-	
+
+    function addComponent($component) {
+        $query = "SELECT config FROM homepage_comp WHERE id = '$component'";
+		$componentSetup = $this->db->getRow($query);
+
+        $query = "SELECT COUNT(*) FROM homepage_comp_location WHERE cid = 13 AND `column` = 1";
+        $position = $this->db->getOne($query);
+        $postion++;
+        $this->saveComponentPosition($component, 1, $position, $newComp['config']);
+
+    }
+
 	function deleteComponentPositions()
 	{
 		$this->db->delete('homepage_comp_location', 'cid', $this->cid);
 	}
-	
+
+    function deleteComponent($component)
+	{
+        $query = "DELETE FROM homepage_comp_location WHERE cid = '$this->cid' AND homepageComponentLocationID = '$component'";
+        $this->db->query($query);
+	}
+
 		
 	function updateComponentPosition($component, $column, $position)
 	{
 		$query = array(
-			"component" => $component,
-			"cid" => $this->cid,
+			"homepageComponentLocationID" => $component,
 			"column" => $column,
 			"position" => $position
 		);
 
-		$result = $this->db->update('homepage_comp_location', array('component', 'cid'), $query);
+		$result = $this->db->update('homepage_comp_location', 'homepageComponentLocationID', $query);
 	}
 		
 	function updateComponentConfig($component, $config)
 	{
 		$query = array(
-			"component" => $component,
-			"cid" => $this->cid,
+			"homepageComponentLocationID" => $component,
 			"config" => $config
 		);
-		$this->db->update('homepage_comp_location', array('component', 'cid'), $query);
+		$this->db->update('homepage_comp_location', 'homepageComponentLocationID', $query);
 	}
 		
 	// For updating available components

@@ -101,7 +101,8 @@ class Category extends Model {
 	
 	function getComponents($categoryID) {
 
-		$query = "SELECT position, `column`, component, homepage_comp.config dfconfig, homepage_comp_location.config, name, method, filename 
+		$query = "SELECT homepageComponentLocationID, position, `column`, component, homepage_comp.config dfconfig,
+                        homepage_comp_location.config, name, method, filename
 				  FROM homepage_comp_location, homepage_comp 
 				  WHERE component = id AND cid = '" . $categoryID . "'
 				  ORDER BY position";

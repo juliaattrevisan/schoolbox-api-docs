@@ -41,8 +41,15 @@ if(is_numeric($_REQUEST['cid']) ) {
 			}
 		}
 	}
-    elseif($_POST['cid'] && $_POST['delete']) {
+    elseif($_POST['cid'] && is_numeric($_POST['delete'])) {
         //AJAX request to delete component from homepage
+        $homepage->deleteComponent($_POST['delete']);
+    }
+    else if($_POST['cid'] && is_numeric($_POST['add'])) {
+        //Add component to page and output render of component
+        $homepage->addComponent($_POST['add']);
+
+        //Output component HTML
 
     }
 	elseif($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component'])
@@ -55,6 +62,7 @@ if(is_numeric($_REQUEST['cid']) ) {
 		$homepage->updateComponentConfig($_GET['component'], $config);
 		localRedir("/homepage/".$_GET['cid']);
 	}
+    /*
 	elseif(is_numeric($_POST['cid']))
 	{
 		//Submission of customise page
@@ -72,6 +80,8 @@ if(is_numeric($_REQUEST['cid']) ) {
 
 		localRedir("/homepage/".$_POST['cid']);
 	}
+     * 
+     */
 }
 else
 	error(2);

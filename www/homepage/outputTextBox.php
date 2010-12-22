@@ -24,9 +24,9 @@ $this->setVar('text_editable_block', '');
 $this->setVar('modify_text_block', '');
 $this->setVar('text_locked_block', '');
 
-if ($permission >= WRITE_ACCESS && $this->arg[1] == 'textBoxModify')
+if ($permission >= WRITE_ACCESS && $this->arg[1] == 'textBoxModify' && $this->arg[2] == $component['homepageComponentLocationID'])
 	$this->parse('text_editable_block', 'text_editable');
-elseif ($permission >= WRITE_ACCESS && $this->arg[1] == 'textBoxCreate' ) {
+elseif ($permission >= WRITE_ACCESS && $this->arg[1] == 'textBoxCreate' && $this->arg[2] == $component['homepageComponentLocationID']) {
 
 	$output = array('TEXTBOX_HEADING'	=> '',
 					'TEXTBOX_BODY'		=> '',

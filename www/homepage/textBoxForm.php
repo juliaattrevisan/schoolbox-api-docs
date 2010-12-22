@@ -29,7 +29,7 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 	/* select this textBox */
 	$homepageHandler = new Homepage($_POST['categoryID']);
 	$config = serialize(array('textBoxID' => $textBox['textBoxID']));
-	$homepageHandler->updateComponentConfig(36, $config);
+	$homepageHandler->updateComponentConfig($_POST['componentID'], $config);
 	
 	localRedir('/homepage/' . $_POST['categoryID']);
 	
@@ -48,7 +48,7 @@ elseif (is_numeric($_GET['delete'])) {
 	$current = $textBoxHandler->getCurrent($textBox['categoryID']);
 	$homepageHandler = new Homepage($textBox['categoryID']);
 	$config = serialize(array('textBoxID' => $current['textBoxID']));
-	$homepageHandler->updateComponentConfig(36, $config);
+	$homepageHandler->updateComponentConfig($_POST['componentID'], $config);
 
 	localRedir('/homepage/' . $textBox['categoryID']);
 		
