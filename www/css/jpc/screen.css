@@ -2,36 +2,73 @@
 /* CSS Document */
 
 body{background:#E6E4F2 url(/images/jpc/background-repeater.jpg) repeat-x;}
-h2, h2 a, .header_option, .standardForm td h4, .cal-bubble .time{background-color: #EDE4A6; color:#000000;}
+h2, h2 a, .header_option{background-color: #EDE4A6; color:#000000;}
+.cal-bubble .time{background:none;}
 .header_option{background:none;}
 a{color:#2C4350}
 a:hover{color:#176D76;}
 .jpcnet{color:#ffd; position:absolute; top:0; left:256px; font-size:36px;}
 
-h3, #infoPanel li, #nav h3, .customise, td.cal-right a.filter-change,
-td.cal-right a.filters, .dayWrap p, .cal-bubble  .middle .close, .add-component .notification{color: #ffffff;}
-
+h3, #infoPanel li, #nav h3, .add-component .notification{color: #ffffff;}
+#infoPanel a{color:#fff;}
 #header .logo{height: 221px;padding-top: 0;width: 224px;}
 #nav{top:239px;}
-#nav h3.my-links{}
-#nav ul.my-links{}
+#nav h3.my-links{background-color:#bcbdd6;}
+#nav ul.my-links{background-color:#f8f8fc;}
 
-#tabs li a{color:#579DCF;}
+#tabs li a{color:#ffffff;}
 
-#nav li a:hover, #nav li li a:hover, #category li a.selected{background-color:#efc437;}
-
+#nav li a:hover, #nav li li a:hover, #category li a.selected{background-color:#faedc3; color:#000;}
+#category li a:hover{background:#faedc3;}
+.login #header {
+    height: 236px;
+}
 #nav ul, .dark, .standardForm, #assess .standardForm, #assess .additional-details, 
-#assess  .assess-body, .blog-comments .box, td.cal-left a.back, td.cal-left a.forward, 
-td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, 
-td.cal-right a.filter-change, .day-block, 
+#assess  .assess-body, .blog-comments .box, 
 .post-left, #category, .search-item:nth-child(even)  
-{background-color:#FFF4C2; }
+{background-color:#f4f4f8; }
 
-#nav h3, #tooltip, #month-view td.dark, #week-view td.dark, td.cal-left a:hover, td.cal-left .datepicker-box:hover,
-td.cal-right a.filter-change.current,td.cal-right a.filter-change:hover,
-#tabs-homepage li.ui-state-default a{background-color: #222478;}
 
-#nav ul ul, .blog-comments p.interact {border-color:#FDEDA7;}
+.dayWrap p {color: #000;}
+.otherMonth .dayWrap p, .otherMonth .dayWrap a {color: #797979;}
+td.cal-left a.back, td.cal-left a.forward, 
+td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, 
+td.cal-right a.filter-change, .day-block{background-color:#f4f4f8}
+
+td.cal-left a:hover, td.cal-left .datepicker-box:hover,
+td.cal-right a.filter-change.current,td.cal-right a.filter-change:hover{background-color:#d3d3e4;}
+
+.dayWrap{background-color:#eceae7;}
+.otherMonth .dayWrap, .past .dayWrap {background-color:#d9d6d0;}
+
+#month-view td.dark, #week-view td.dark{background-color:#bcbdd6;}
+
+#nav h3, #tooltip, #tabs-homepage li.ui-state-default a{background-color: #222478;}
+
+#header #tabs li.navthis a{color: #222478;}
+
+#nav ul ul, .blog-comments p.interact {border-color:#faedc3; background-color:#fefcf5;}
 #search-field, #search-button{background-color:#FFFDE9}
 
-td.cal-right .link-case .filter-drop .filter-list{background:#E6F6F9;}
+td.cal-right .link-case .filter-drop .filter-list{background:#faedc3;}
+
+.submit-btn-plain{border-color:#bcbdd6;
+text-shadow: 0 1px 0px #d6f0f6; color:#222478 !important;
+  background-color: #f0f1f6;
+  background-image: -moz-linear-gradient(top, #f0f1f6, #e0e2ec); 
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #f0f1f6),color-stop(1, #e0e2ec)); 
+            filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#f0f1f6', EndColorStr='#e0e2ec'); 
+        -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#f0f1f6', EndColorStr='#e0e2ec')"; 
+}
+
+.submit-btn-plain:hover{color:#ff5a00 !important; border-color:#f0c437; text-shadow: 0;
+  background-color: #fdf7e5;
+  background-image: -moz-linear-gradient(top, #fdf7e5, #fbefca); 
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fdf7e5),color-stop(1, #fbefca)); 
+            filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#fdf7e5', EndColorStr='#fbefca'); 
+        -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fdf7e5', EndColorStr='#fbefca')"; 
+
+cursor:pointer;
+ }
+ 
+ .standardForm td{border-color:#9091bb;}

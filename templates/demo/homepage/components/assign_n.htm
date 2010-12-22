@@ -1,8 +1,6 @@
 <div class="box" id="component{COMPONENT_ID}">
   <h2>Assignment</h2>
 <!-- BEGIN config -->
-  <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
-<a class="close-delete" href="#"><span>X</span></a>
   <div class="editPanel settings hide">
     <form action="/homepage/configForm.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
@@ -16,12 +14,17 @@
       </select>      <input type="submit" value="Update" class="submit-btn update" />
     </form>
   </div>
-<div class="editPanel delete-it hide">
-<p>Are you sure you want to delete?</p>
-<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
-<a href="#" class="delete-reject btn go-to"><span></span>No</a>
-<div class="float-fix"></div>
-</div>
+    <a class="close-delete" href="#"><span>X</span></a>
+	<div class="editPanel delete-it hide">
+	<p>Are you sure you want to delete?</p>
+		<form action="#" method="post">
+		  <input type="hidden" name="cid" value="{ID}" />
+		  <input type="hidden" name="delete" value="{COMPONENT_ID}" />
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
+			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
+		</form>
+		<div class="float-fix"></div>
+	</div>
 <!-- END config -->
 	<div class="text listing">
   	<ul>
