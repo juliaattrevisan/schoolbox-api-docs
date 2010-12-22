@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<title>{TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/> 
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core2.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/screen.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
+
+<!-- BEGIN header_css --><!-- END header_css -->
+
+<script type="text/javascript" src="/javascript/jquery.js"></script>
+<script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
+<script type='text/javascript'>
+  var $j = jQuery.noConflict();
+	
+	$j(function() {
+    $j('#nav ul').droppy({speed: 0});
+  });
+</script>
+<!-- BEGIN header_javascript -->
+<script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>
+<!-- END header_javascript -->
+</head>
+<body>
+<!-- TemplateBeginEditable name="head" --><!-- TemplateEndEditable -->
+
+<div id="container">
+	<div id="wrapper">
+  <div id="header">
+    <div id="logo">
+    	<img alt="" src="/images/demo/demo-logo.gif"/>
+    </div>
+    <form id="search" action="/search.php" method="get">
+      <fieldset>
+        <input id="search-field" type="text" name="keyword" />
+        <input id="search-button" type="submit" value="Search" />
+      </fieldset>
+    </form>  
+    <ul id="tabs">
+      <li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Main</a></li>
+      <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">News</a></li>
+      <!-- BEGIN webmail_tab -->
+      <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
+      <!-- END webmail_tab -->
+      <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
+      <!-- BEGIN timetable_tab -->
+      <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
+      <!-- END timetable_tab -->
+      <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
+      <!-- BEGIN portfolio_tab -->
+      <li><a class="{TAB_PORTFOLIO_ON}" href="/cms/portfolio" title="Access your portfolio area">My Portfolio</a></li>
+      <!-- END portfolio_tab -->
+      <li><a href="/logout.php" title="">Logout</a></li>
+    </ul>
+
+<!-- BEGIN myfiles_tab -->
+<!-- END myfiles_tab -->
+  </div>
+  <div id="nav">
+   
+  </div>
+
+  <div id="content">
+	<!-- TemplateBeginEditable name="content" -->content<!-- TemplateEndEditable -->
+    <div class="float-fix"></div>
+  </div>
+  <div class="float-fix"></div>
+</div>
+</div>
+<div id="footer">
+<ul>
+  <li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SITE_ADDRESS}">{SITE_NAME}</a></li>
+  <li><a href="/policy/{SITE_LOCATION}.htm">Guidelines of Use and Privacy Policy</a></li>
+  <li class="last"><a href="http://www.alaress.com.au">Developed By Alaress</a></li>
+</ul>
+<div class="float-fix"></div>
+</div>
+</body>
+</html>
