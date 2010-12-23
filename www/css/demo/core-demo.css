@@ -702,30 +702,46 @@ a.layout:hover img { background: #999; }
 
 /*#tabs-homepage{display:none;}*/
 #tabs-homepage .ui-tabs-hide{display:none;}
-#tabs-homepage .ui-tabs-nav{float:right;}
+#tabs-homepage .ui-tabs-nav{float:left;}
 #tabs-homepage .ui-tabs-nav li{float:left; }
-#tabs-homepage .ui-tabs-nav li a{padding:8px 16px;display:block; -moz-border-radius: 7px 7px 0 0 ; -webkit-border-radius: 7px 7px 0 0 ; border-radius: 7px 7px 0 0 ; margin-left:8px;		  }
-#tabs-homepage li.ui-state-default a{background: #F4F1EA;}
-#tabs-homepage li.ui-tabs-selected a{background:#FFFDE9;}
+#tabs-homepage .ui-tabs-nav li a{padding:16px 20px;display:block; -moz-border-radius: 7px 7px 0 0 ; -webkit-border-radius: 7px 7px 0 0 ; border-radius: 7px 7px 0 0 ; margin-right:7px;font-weight:bold; font-size:16px;		  }
+#tabs-homepage li.ui-state-default a{background: #f5f5f5; color:#579dcf;}
+#tabs-homepage li.ui-tabs-selected a{background:#faf9f5;color:#0066b0;}
 
-#tabs-homepage{display:none;}
-#tabs-sub .ui-tabs-nav{float:left;}
-#tabs-sub .ui-tabs-nav li a{padding:8px 16px;display:block; -moz-border-radius: 0; -webkit-border-radius:0; border-radius:0; margin-left:8px; border-right:1px solid #0f0 }
-#tabs-sub  li.ui-state-default a{background: #fff;}
-#tabs-sub  li.ui-tabs-selected a{background:#f0f0f0;}
+#tabs-homepage{/*display:none;*/}
+#tabs-sub .ui-tabs-nav{float:left; width:128px;}
+#tabs-sub .components{float:left;}
+#tabs-sub .ui-tabs-nav li a{margin:0;font-weight:normal;padding:8px 0px 8px 16px; text-align:left;display:block; -moz-border-radius: 0; -webkit-border-radius:0; border-radius:0; font-size:12px; color:#000; width:96px;  display:block;}
+#tabs-sub  li.ui-state-default a{background: none;
+     -moz-border-radius: 4px; 
+  -webkit-border-radius: 4px; 
+          border-radius: 4px; 
+}
+#tabs-sub td{vertical-align:top; padding:0; height:auto;}
+#tabs-sub .ui-tabs-nav li a:hover{background:#ffffff;}
+#tabs-sub  li.ui-tabs-selected a{background:#e9e3d6;}
 
 /*CUSTOMISE COMPONENT*/
-.customise-components{ padding:8px; margin-bottom:16px; background:#fffde9;}
+.customise-components{ padding:16px; margin-bottom:16px; background:#faf9f5;}
 .customise-components .centre-it{margin:0 auto;}
-.add-component{position:relative; float:left; background:#d6f0f6; width:160px; padding:8px; margin: 8px;}
-.add-component h4{font-size:16px; font-weight:bold; margin-bottom:8px;}
+.add-component{position:relative; float:left; background:#b0ddfe; width:158px; padding:16px; margin: 0 16px 16px 0; border:1px solid #1d9ffc; -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; min-height:140px; }
+.add-component h4{font-size:12px; font-weight:bold; margin-bottom:16px;}
+.add-component p{max-height:80px; overflow:hidden;}
 .add-component .how-many{}
-.add-component strong{font-size:14px; border-bottom:1px dotted #000; }
+.add-component strong{ border-bottom:1px dotted #000; }
 .add-component strong em{font-style:normal;}
 .add-component strong:hover{cursor:help;}
-.add-component .notification{display:none; position:absolute;  top:50px; left:50px; 
-background:#797979; color:#fff; width:80px; height:40px;}
-.qtip-content{line-height:16px;}
+.add-component .notification{font-size:14px; font-weight:bold; display:none; position:absolute;  top:50px; left:50px; 
+background:#cae9b9; color:#fff; width:62px; height:34px; line-height:34px; padding-left:28px; -moz-border-radius: 4px; 
+  -webkit-border-radius: 4px; 
+          border-radius: 4px; color:#000; font-weight:bold; border:3px solid #aad791;-moz-box-shadow: 10px 10px 0px rgba(0,0,0,0.04); -webkit-box-shadow: 10px 10px 0px rgba(0,0,0,0.04); z-index:120;box-shadow: 10px 10px 0px rgba(0,0,0,0.04);}
+.add-component .notification strong{position:absolute; left:6px; top:11px; background:url(/images/demo/icons/black-tick.png) no-repeat; height:12px; width:14px; border:0;}
+.qtip-content{line-height:16px;padding:16px !important; }
+.qtip{-moz-box-shadow: 10px 10px 0px rgba(0,0,0,0.04); -webkit-box-shadow: 10px 10px 0px rgba(0,0,0,0.04); z-index:120;box-shadow: 10px 10px 0px rgba(0,0,0,0.04);}
+.add-component.disabled{background:#e6f6f9; border-color:#a9e1eb; color:#797979;}
+
+
+
 
 .dropBox{width:auto;padding:10px;}
 .dropBox .drop-left, .dropBox .drop-right{ width:100%;}

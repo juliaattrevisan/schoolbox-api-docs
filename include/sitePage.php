@@ -570,7 +570,8 @@ class SitePage extends Page {
 		if(is_file($this->templateRoot.'/'.$this->site.'/'.$template))
 			return $this->site.'/'.$template;
 		else
-			return 'core/'.$template;
+			//change this back to "core" for the rest of the releases.
+			return 'demo/'.$template;
 	}
 
 	function getVar($varname) {

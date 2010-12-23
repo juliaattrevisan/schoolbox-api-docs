@@ -66,6 +66,8 @@ $j(function() {
 	$j('#tabs-homepage').tabs({selected:0});
 	$j('#tabs-sub').tabs({selected:0});
 	
+	
+	
 	$j('.add-component strong').qtip({
 		content: 'How many instances of the module currently active',
 		show: 'mouseover',
@@ -77,12 +79,12 @@ $j(function() {
 			}
 		},
 		style: { 
-			background: '#CAE9B9',
+			background: '#fffde9',
 			color: 'black',
 			border: {
-				width: 6,
+				width: 3,
 				radius: 4,
-				color: '#fbfbfb'
+				color: '#fff9bf'
 			},
 			
 			name: 'green' // Inherit from preset style
