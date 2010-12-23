@@ -104,13 +104,14 @@ if($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
         foreach($componentList as $component) {
             $i++;
 
-            if($component['allowMultiple'] == 'false' && $componentCount > 0)
+            if($component['allowMultiple'] == 'false' && $component['componentCount'] > 0)
                 $class = 'disabled';
             else if($component['allowMultiple'] == 'false') {
                 $class = 'one-only';
             }
             else
                 $class = '';
+
             $output = array('HOMEPAGE_COMPONENT_ID'   => scrubTEXT($component['id']),
                             'HOMEPAGE_COMPONENT_NAME'   => scrubTEXT($component['name']),
                             'HOMEPAGE_COMPONENT_COUNT'  => $component['componentCount'],

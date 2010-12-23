@@ -31,8 +31,9 @@ if ($poll['pollID']) {
 	if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']) || $this->arg[1] == 'pollResults') {
 		
 		$this->setVar('POLL_HEIGHT', count($pollData) * 30 + 70);
-		$this->setVar("poll_vote_block", "");
-		
+		$this->setVar('poll_vote_block', '');
+
+        $this->setVar('poll_answers_block', '');
 		if (is_array($pollData)) {
 			$i = 0;
 			foreach ($pollData as $data) {
@@ -48,12 +49,12 @@ if ($poll['pollID']) {
 			}
 		}		
 		
-		$this->parse("poll_chart_block", "poll_chart");
+		$this->parse('poll_chart_block', 'poll_chart');
 		
 	}
 	else {
 	
-		
+		$this->setVar('poll_options_block', '');
 		if (is_array($pollData)) {
 			$i = 0;
 			foreach ($pollData as $data) {
@@ -64,13 +65,13 @@ if ($poll['pollID']) {
 								);
 				$i++;
 				$this->setVar($output);
-				$this->parse("poll_options_block", "poll_options", true);
+				$this->parse('poll_options_block', 'poll_options', true);
 				
 			}
 		}
 		
-		$this->setVar("poll_chart_block", "");
-		$this->parse("poll_vote_block", "poll_vote");
+		$this->setVar('poll_chart_block', '');
+		$this->parse('poll_vote_block', 'poll_vote');
 	}
 	
 	

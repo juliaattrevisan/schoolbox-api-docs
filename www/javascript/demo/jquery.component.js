@@ -350,6 +350,9 @@ $j(function() {
         $j.post('/homepage/configForm.php', $j(this).closest('form').serialize());
     });
 
+    $j('#saveColour').click(function () {
+       $j.post('/homepage/configForm.php', {colors: pickers});
+    });
 	$j("#leftRight").click(function () {
 		
 		var rightBox;
