@@ -24,7 +24,7 @@ $j(function() {
 			$j('div.right').children('div.box').each(function () {
 				right += $j(this).attr('id').substring(9) + ',';
 			});
-			$j.post('/homepage/configForm.php', {cid: $j('#categoryID').val(), type: 'components', column1: left, column2: right});
+			$j.post('/homepage/configForm.php', {cid : cid, type: 'components', column1: left, column2: right});
 			
 		},			
 		sort: function (event, ui) {
@@ -336,13 +336,18 @@ $j(function() {
 			
 		}
 		
-	$j('.homepage').removeClass().addClass(newChoice + ' homepage ui-sortable');
+        $j('.homepage').removeClass().addClass(newChoice + ' homepage ui-sortable');
 		$j('.layouts a.current').removeClass('current');
-		$j(this).addClass('current');		
+		$j(this).addClass('current');
+
+        $j('#templateVal').val(templateChoice);
 		
 	});	
 	
-	
+	$j('#saveTemplate').click(function () {
+        $j.post('/homepage/configForm.php', $j(this).closest('form').serialize());
+    });
+
 	$j("#leftRight").click(function () {
 		
 		var rightBox;
@@ -368,5 +373,7 @@ $j(function() {
 			$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
 		});
 	});
+
+    $j('')
 
 });

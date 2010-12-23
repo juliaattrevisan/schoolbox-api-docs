@@ -176,6 +176,14 @@ if($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
 	$this->setVar($defaultColour);
 	$this->parse('colour_list_block', 'colour_list', true);
 
+    //Template control
+	$template = $homepageHandler->getTemplate();
+	for($x = 1; $x <= 4; $x++) {
+		$output = array("CURRENT_TEMPLATE_$x"	=> $template == $x ? 'current' : '',
+						);
+		$this->setVar($output);
+	}
+
 
 }	
 else {

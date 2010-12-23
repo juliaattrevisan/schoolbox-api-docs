@@ -166,13 +166,14 @@ var cid = {ID};
 	</div><!--/tabs-2-->
 	<div id="tabs-3" class="customise-components layouts">
         <form action="post">
-        <a class="layout {CURRENT_1}" title="1" href="#">
-		<img src="/images/70-30.gif" />70-30</a> <a class="layout {CURRENT_2}" title="2" href="#">
-		<img src="/images/50-50.gif" />50-50</a> <a class="layout {CURRENT_4}" title="4" href="#">
-		<img src="/images/30-70.gif" />30-70</a> <a class="layout {CURRENT_3}" title="3" href="#">
-		<img src="/images/100-0.gif" />100-0</a>
-        <input type="submit" class="submit-btn-plain" value="Save layout"/>
-        <button class="submit-btn-plain" type="button" id="cancel" >Cancel</button>
+            <a class="layout {CURRENT_TEMPLATE_1}" title="1" href="#"><img src="/images/70-30.gif" />70-30</a>
+            <a class="layout {CURRENT_TEMPLATE_2}" title="2" href="#"><img src="/images/50-50.gif" />50-50</a> 
+            <a class="layout {CURRENT_TEMPLATE_4}" title="4" href="#"><img src="/images/30-70.gif" />30-70</a>
+            <a class="layout {CURRENT_TEMPLATE_3}" title="3" href="#"><img src="/images/100-0.gif" />100-0</a>
+        <input type="hidden" name="template" id="templateVal" value="" />
+        <input type="hidden" name="cid" value="{ID}" />
+        <input type="submit" class="submit-btn-plain" id="saveTemplate" value="Save layout"/>
+        <button class="submit-btn-plain" type="button" id="cancelTemplate" >Cancel</button>
         </form>
 
 		<div class="float-fix"></div>

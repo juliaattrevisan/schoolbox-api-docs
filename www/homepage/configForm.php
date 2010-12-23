@@ -52,6 +52,21 @@ if(is_numeric($_REQUEST['cid']) ) {
         //Output component HTML
 
     }
+    elseif($_POST['cid'] && is_array($_POST['colors'])) {
+        /* AJAX Save homepage colours */
+        //strip hash
+        foreach($_POST['colors'] as $key => $value) {
+            $color[$key] = substr($value,1);
+        }
+
+        $homepage->saveDisplayProperties($color);
+
+    }
+    elseif($_POST['cid'] && is_array($_POST['template'])) {
+        /* AJAX Save homepage template */
+       $homepage->savePageTemplate($_POST['template']);
+
+    }
 	elseif($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component'])
 	{	
 		//Post config options from homepage
@@ -62,7 +77,7 @@ if(is_numeric($_REQUEST['cid']) ) {
 		$homepage->updateComponentConfig($_GET['component'], $config);
 		localRedir("/homepage/".$_GET['cid']);
 	}
-    /*
+      /*
 	elseif(is_numeric($_POST['cid']))
 	{
 		//Submission of customise page
