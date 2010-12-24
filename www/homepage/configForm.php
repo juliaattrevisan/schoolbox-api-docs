@@ -62,8 +62,9 @@ if(is_numeric($_REQUEST['cid']) ) {
         $homepage->saveDisplayProperties($color);
 
     }
-    elseif($_POST['cid'] && is_array($_POST['template'])) {
+    elseif($_POST['cid'] && is_numeric($_POST['template'])) {
         /* AJAX Save homepage template */
+        print $_POST['template'];
        $homepage->savePageTemplate($_POST['template']);
 
     }

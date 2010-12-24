@@ -223,7 +223,7 @@ $j(function() {
 	});
 	
 	$j('div.colorBox').each(function () {
-		$j(this).css('backgroundColor', defaults[$j(this).attr('id')]);
+		$j(this).css('backgroundColor', pickers[$j(this).attr('id')]);
 		//$j(this).next().val(pickers[$j(this).attr('id')]);
 	});
 
@@ -271,6 +271,7 @@ $j(function() {
 		current.css('background-color', color);
 		$j('#currentColour').val(color);
 		$j('#currentColour').css('background-color', color);
+        pickers[current.attr['ID']] = color;
 
 		switch (current.attr('ID')) {
 			case 'bg_primary':
