@@ -63,34 +63,52 @@ $j(function() {
 	
 	/* from here down I've changed the component functions!!!!*/
 	
-	$j('#tabs-homepage').tabs({selected:0});
+	$j('#tabs-homepage').tabs({selected:1});
 	$j('#tabs-sub').tabs({selected:0});
 	
 	
-	
-	$j('.add-component strong').qtip({
-		content: 'How many instances of the module currently active',
-		show: 'mouseover',
-		hide: 'mouseout',
-		position: {
-			corner: {
-			tooltip: 'bottomLeft',
-			target: 'topright'
-			}
-		},
-		style: { 
-			background: '#fffde9',
-			color: 'black',
-			border: {
-				width: 3,
-				radius: 4,
-				color: '#fff9bf'
+	$j('.add-component strong').each(function() {
+		
+		var howManyInstances = $j(this).children('em').html();
+		if (howManyInstances == 0) {
+			howManyInstances = '<strong>no</strong> instances '
+		} else if (howManyInstances == 1)  {
+			howManyInstances = '<strong>1</strong> instance '
+		} else {
+			howManyInstances = '<strong>' + howManyInstances + '</strong> instances '
+		}
+		
+		$j(this).qtip({
+			content: 'You have '+ howManyInstances +'of this component currently active',
+			show: 'mouseover',
+			hide: 'mouseout',
+			position: {
+				corner: {
+				tooltip: 'bottomLeft',
+				target: 'topright'
+				}
 			},
-			
-			name: 'green' // Inherit from preset style
-	   }
+			api: {
+					// Retrieve the content when tooltip is first rendered
+					 onRender: function()
+					 {
+						var self = this
+						console.log()
+					 }
+				 },
+			style: { 
+				background: '#fffde9',
+				color: 'black',
+				border: {
+					width: 3,
+					radius: 4,
+					color: '#fff9bf'
+				},
+				name: 'green' // Inherit from preset style
+		   }
+		});
 	});
-	
+		
 	$j(".box h2").mousemove(function(e){
         $j("#tooltip").show();
         $j("#tooltip").css({
@@ -107,6 +125,9 @@ $j(function() {
 		event.preventDefault();
 		$j('#tabs-homepage').slideToggle();
 		$j(this).children('span').toggle();
+		$j('.manage h2').each(function () {
+			$j(this).toggle();
+		});
 	});
 
 	$j("a.edit").hover(function() {
@@ -169,7 +190,7 @@ $j(function() {
 
 	$j('.delete-reject').click(function(event) {
 		event.preventDefault();
-		$j(this).parent().slideUp();
+		$j(this).closest('.delete-it').slideUp();
 		
 	});
 
@@ -208,12 +229,14 @@ $j(function() {
 
 	var f = $j.farbtastic('#picker');
 	f.setColor("#b6b6ff"); //set initial color
-	$j('#currentColour').css('background-color',"#b6b6ff");
-
 	
+	$j('#head_font').parent().addClass('active-box');
+	var initialColour = rgbConvert($j('#head_font').css('background-color'));
+	checkTextColour();
+	$j('#currentColour').css('background-color',initialColour);
+	$j('#currentColour').val(initialColour);
+
 	f.linkTo(onColorChange);
-	//f.linkTo(onColorChange);
-	//f.linkTo($j('#bg_primary').next());
 	
 	$j('#currentColour').keyup(function() {	
 		f.setColor($j(this).val());	
@@ -244,11 +267,8 @@ $j(function() {
 	
 	function onColorChange(color) {
 		checkTextColour();
-		
-		var current = $j('div.selected');
-		
+		var current = $j('.selected');
 		current.css('background-color', color);
-		
 		$j('#currentColour').val(color);
 		$j('#currentColour').css('background-color', color);
 
@@ -301,19 +321,16 @@ $j(function() {
 		}
 	}
 
-	$j('div.colorBox').click(function () {
+	$j('div.colour').click(function () {
 		$j('.selected').removeClass('selected');
-		$j(this).addClass('selected');
+		$j('.active-box').removeClass('active-box');
+		$j(this).addClass('active-box');
+		$j(this).children('.colorBox').addClass('selected');
 		$j(this).next().next('p').addClass('selected');
-		f.setColor(rgbConvert($j(this).css('background-color')));
+		f.setColor(rgbConvert($j(this).children('.colorBox').css('background-color')));
 		checkTextColour()
 	});
-	
-	$j('div.colours p').click(function () {
-		$j(this).prev().prev().click();
-	});
-	
-	
+
 	$j('.layouts a').click(function () {
 		
 		var templateChoice = $j(this).attr('title');

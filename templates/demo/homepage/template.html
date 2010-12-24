@@ -8,11 +8,9 @@
 <link rel="stylesheet" type="text/css" href="/javascript/farbtastic/farbtastic.css" />
 <script type="text/javascript" src="/javascript/farbtastic/farbtastic.js"></script>
 
-
 <!-- END modify_layout -->
 
 <style type="text/css">
-		
 .left h2 { color: #{left_head_font}; background-color: #{left_head_bg};	}
 .left p, .left h3, .left .listing p.small { color: #{left_font}; }
 .left a, .left .listing p.small a { color: #{left_link}; }
@@ -28,11 +26,10 @@
 .right .text.listing .dark { background: #{right_bg_secondary}; }
 
 /* wrap mimetypes in classes */
-<!-- BEGIN allowed_files -->
-a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
-<!-- END allowed_files -->
 
-			
+<!--BEGIN allowed_files-->
+a.NAME{background-image: url(/images/mime/22x22/{ICON});}
+<!--END allowed_files-->
 </style>
 <script type="text/javascript">
 <!-- BEGIN colour_list -->
@@ -60,12 +57,11 @@ var cid = {ID};
 </script>
 <!-- END custom_head -->
 
-<h1>
-	<span>{HEADING}</span>
-  <!-- BEGIN edit_page -->
-  <a class="customise" href="#"><span>Customise Page</span><span style="display:none">Close Customisation</span></a>
-  <!--old customise link: /homepage/config/{ID}-->
-  <!-- END edit_page -->
+<h1> <span>{HEADING}</span> 
+	<!-- BEGIN edit_page --> 
+	<a class="customise" href="#"><span>Customise Page</span><span style="display:none">Close Customisation</span></a> 
+	<!--old customise link: /homepage/config/{ID}--> 
+	<!-- END edit_page --> 
 </h1>
 <!-- BEGIN customise_page -->
 <div id="tabs-homepage">
@@ -76,92 +72,139 @@ var cid = {ID};
 	</ul>
 	<div class="float-fix"></div>
 	<div id="tabs-1" class="customise-components">
-			<div id="tabs-sub">
+		<div id="tabs-sub">
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
-				<td valign="top">
-					<ul>
-						<!-- BEGIN homepage_component_tab -->
-						<li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
-						<!-- END homepage_component_tab -->
-					</ul>
-				</td>
-				
-				<td>
-				
-				<div class="components">
-					<!-- BEGIN homepage_component_page -->
-					<div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
-						<!-- BEGIN homepage_component -->
-						<div class="add-component {HOMEPAGE_COMPONENT_CLASS}">
-							<h4>{HOMEPAGE_COMPONENT_NAME} <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong></h4>
-							<p>{HOMEPAGE_COMPONENT_DESCRIPTION}</p>
-							<span class="notification"><strong></strong>Added</span>
-							<!-- BEGIN homepage_component_add --> 
-								<a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="btn add"><span></span>Add</a>
-							<!-- END homepage_component_add -->
-							<div class="float-fix"></div>
+					<td valign="top"><ul>
+							<!-- BEGIN homepage_component_tab -->
+							<li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
+							<!-- END homepage_component_tab -->
+						</ul></td>
+					<td><div class="components"> 
+							<!-- BEGIN homepage_component_page -->
+							<div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}"> 
+								<!-- BEGIN homepage_component -->
+								<div class="add-component {HOMEPAGE_COMPONENT_CLASS}">
+									<h4>{HOMEPAGE_COMPONENT_NAME} <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong></h4>
+									<p>{HOMEPAGE_COMPONENT_DESCRIPTION}</p>
+									<span class="notification"><strong></strong>Added</span> 
+									<!-- BEGIN homepage_component_add --> 
+									<a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="btn add"><span></span>Add</a> 
+									<!-- END homepage_component_add -->
+									<div class="float-fix"></div>
+								</div>
+								<!-- END homepage_component --> 
+							</div>
+							<!-- END homepage_component_page --> 
 						</div>
-						<!-- END homepage_component -->
-					</div>
-					<!-- END homepage_component_page -->
-				</div>
-
-				
-				<div class="float-fix"></div>
-				</td>
+						<div class="float-fix"></div></td>
 				</tr>
-				</table>
-			</div>
-	</div><!--/tabs-1-->
+			</table>
+		</div>
+	</div>
+	<!--/tabs-1-->
 	<div id="tabs-2" class="customise-components">
 		<div class="colours leftColumn">
 			<h3>Left Column</h3>
-			<div id="bg_primary" class="colorBox selected"></div>
-			<input name="colors[left_bg_primary]" type="hidden" />
-			<p class="selected">Primary Background Color</p>
-			<div id="bg_secondary" class="colorBox"></div>
-			<input name="colors[left_bg_secondary]" type="hidden" />
-			<p>Secondary Background Color</p>
-			<div id="head_font" class="colorBox"></div>
-			<input name="colors[left_head_font]" type="hidden" />
-			<p>Heading Text Colour</p>
-			<div id="head_bg" class="colorBox"></div>
-			<input name="colors[left_head_bg]" type="hidden" />
-			<p>Heading Background Colour</p>
-			<div id="font" class="colorBox"></div>
-			<input name="colors[left_font]" type="hidden" />
-			<p>Text Colour</p>
-			<div id="link" class="colorBox"></div>
-			<input name="colors[left_link]" type="hidden" />
-			<p>Link Colour</p>
-			<div id="hover" class="colorBox"></div>
-			<input name="colors[left_hover]" type="hidden" />
-			<p>Link Hover Colour</p>
+			<div class="colours-split">
+				<h3>Heading</h3>
+				<div class="colour">
+					<div id="head_font" class="colorBox  selected"></div>
+					<input name="colors[left_head_font]" type="hidden" />
+					<p>Text</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="head_bg" class="colorBox"></div>
+					<input name="colors[left_head_bg]" type="hidden" />
+					<p>Background</p>
+					<div class="float-fix"></div>
+				</div>
+			</div>
+			<div class="colours-split">
+				<h3>Content</h3>
+				<div class="colour">
+					<div id="bg_primary" class="colorBox"></div>
+					<input name="colors[left_bg_primary]" type="hidden" />
+					<p>Primary Background</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="bg_secondary" class="colorBox"></div>
+					<input name="colors[left_bg_secondary]" type="hidden" />
+					<p>Secondary Background</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="font" class="colorBox"></div>
+					<input name="colors[left_font]" type="hidden" />
+					<p>Text</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="link" class="colorBox"></div>
+					<input name="colors[left_link]" type="hidden" />
+					<p>Link</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="hover" class="colorBox"></div>
+					<input name="colors[left_hover]" type="hidden" />
+					<p>Link Hover</p>
+					<div class="float-fix"></div>
+				</div>
+			</div>
 		</div>
 		<div class="colours">
 			<h3>Right Column</h3>
-			<div id="bg_primary_right" class="colorBox"></div>
-			<input name="colors[right_bg_primary]" type="hidden" />
-			<p>Primary Background Color</p>
-			<div id="bg_secondary_right" class="colorBox"></div>
-			<input name="colors[right_bg_secondary]" type="hidden" />
-			<p>Secondary Background Color</p>
-			<div id="head_font_right" class="colorBox"></div>
-			<input name="colors[right_head_font]" type="hidden" />
-			<p>Heading Text Colour</p>
-			<div id="head_bg_right" class="colorBox"></div>
-			<input name="colors[right_head_bg]" type="hidden" />
-			<p>Heading Background Colour</p>
-			<div id="font_right" class="colorBox"></div>
-			<input name="colors[right_font]" type="hidden" />
-			<p>Text Colour</p>
-			<div id="link_right" class="colorBox"></div>
-			<input name="colors[right_link]" type="hidden" />
-			<p>Link Colour</p>
-			<div id="hover_right" class="colorBox"></div>
-			<input name="colors[right_hover]" type="hidden" />
-			<p>Link Hover Colour</p>
+			<div class="colours-split">
+				<h3>Heading</h3>
+				<div class="colour">
+					<div id="head_font_right" class="colorBox"></div>
+					<input name="colors[right_head_font]" type="hidden" />
+					<p>Text</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="head_bg_right" class="colorBox"></div>
+					<input name="colors[right_head_bg]" type="hidden" />
+					<p>Background</p>
+					<div class="float-fix"></div>
+				</div>
+			</div>
+			<div class="colours-split">
+				<h3>Heading</h3>
+				<div class="colour">
+					<div id="bg_primary_right" class="colorBox"></div>
+					<input name="colors[right_bg_primary]" type="hidden" />
+					<p>Primary Background</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="bg_secondary_right" class="colorBox"></div>
+					<input name="colors[right_bg_secondary]" type="hidden" />
+					<p>Secondary Background</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="font_right" class="colorBox"></div>
+					<input name="colors[right_font]" type="hidden" />
+					<p>Text</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="link_right" class="colorBox"></div>
+					<input name="colors[right_link]" type="hidden" />
+					<p>Link</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="hover_right" class="colorBox"></div>
+					<input name="colors[right_hover]" type="hidden" />
+					<p>Link Hover</p>
+					<div class="float-fix"></div>
+				</div>
+			</div>
 		</div>
 		<div class="colours">
 			<div id="picker"></div>
@@ -169,29 +212,29 @@ var cid = {ID};
 		</div>
 		<div class="float-fix"></div>
 		
-		<form action="POST" name="saveColours">
-			<input type="submit" class="submit-btn-plain" id="saveColour" value="Save colour set"/>
-			<button class="submit-btn-plain" type="button" id="leftRight" >Copy colours left > right</button>
-            <button class="submit-btn-plain" type="button" id="restore" >Restore Defaults</button>
-			<button class="submit-btn-plain" type="button" id="cancel" >Cancel</button>
+		<div class="colours-buttons">
+			<form action="POST" name="saveColours">
+				
+				<button class="submit-btn-plain" type="button" id="leftRight" >Copy colours left > right</button>
+				<button class="submit-btn-plain" type="button" id="restore" >Restore Defaults</button>
+				<button class="submit-btn-plain" type="button" id="cancel" >Cancel</button>
+				<input type="submit" class="submit-btn-plain save-colours" value="Save colour set"/>
+			</form>
+			<div class="float-fix"></div>
+		</div>
+	</div>
+	<!--/tabs-2-->
+	<div id="tabs-3" class="customise-components layouts">
+		<form action="post">
+			<a class="layout {CURRENT_TEMPLATE_1}" title="1" href="#"><img src="/images/70-30.gif" />70-30</a> <a class="layout {CURRENT_TEMPLATE_2}" title="2" href="#"><img src="/images/50-50.gif" />50-50</a> <a class="layout {CURRENT_TEMPLATE_4}" title="4" href="#"><img src="/images/30-70.gif" />30-70</a> <a class="layout {CURRENT_TEMPLATE_3}" title="3" href="#"><img src="/images/100-0.gif" />100-0</a>
+			<input type="hidden" name="template" id="templateVal" value="" />
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="submit" class="submit-btn-plain" id="saveTemplate" value="Save layout"/>
+			<button class="submit-btn-plain" type="button" id="cancelTemplate" >Cancel</button>
 		</form>
 		<div class="float-fix"></div>
-		
-	</div><!--/tabs-2-->
-	<div id="tabs-3" class="customise-components layouts">
-        <form action="post">
-            <a class="layout {CURRENT_TEMPLATE_1}" title="1" href="#"><img src="/images/70-30.gif" />70-30</a>
-            <a class="layout {CURRENT_TEMPLATE_2}" title="2" href="#"><img src="/images/50-50.gif" />50-50</a> 
-            <a class="layout {CURRENT_TEMPLATE_4}" title="4" href="#"><img src="/images/30-70.gif" />30-70</a>
-            <a class="layout {CURRENT_TEMPLATE_3}" title="3" href="#"><img src="/images/100-0.gif" />100-0</a>
-        <input type="hidden" name="template" id="templateVal" value="" />
-        <input type="hidden" name="cid" value="{ID}" />
-        <input type="submit" class="submit-btn-plain" id="saveTemplate" value="Save layout"/>
-        <button class="submit-btn-plain" type="button" id="cancelTemplate" >Cancel</button>
-        </form>
-
-		<div class="float-fix"></div>
-	</div><!--/tabs-3-->
+	</div>
+	<!--/tabs-3--> 
 </div>
 <!-- END customise_page -->
 
@@ -199,5 +242,4 @@ var cid = {ID};
 	<div class="left">{COLUMN1}</div>
 	<div class="right">{COLUMN2}</div>
 </div>
-
 <input type="hidden" id="categoryID" value="{ID}" />
