@@ -63,7 +63,7 @@ $j(function() {
 	
 	/* from here down I've changed the component functions!!!!*/
 	
-	$j('#tabs-homepage').tabs({selected:1});
+	$j('#tabs-homepage').tabs({selected:0});
 	$j('#tabs-sub').tabs({selected:0});
 	
 	

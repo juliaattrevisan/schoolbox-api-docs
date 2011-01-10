@@ -713,7 +713,7 @@ a.layout.current img { background: #414141; }
 a.layout:hover { text-decoration: none; }
 a.layout:hover img { background: #999; }
 
-#tabs-homepage{/*display:none;*/}
+#tabs-homepage{display:none;}
 #tabs-homepage .ui-tabs-hide{display:none;}
 #tabs-homepage .ui-tabs-nav{float:left;}
 #tabs-homepage .ui-tabs-nav li{float:left; }
