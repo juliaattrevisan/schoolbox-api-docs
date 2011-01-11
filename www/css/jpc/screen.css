@@ -10,13 +10,20 @@ a:hover{color:#176D76;}
 .jpcnet{color:#ffd; position:absolute; top:0; left:256px; font-size:36px;}
 
 h3, #infoPanel li, #nav h3, .add-component .notification{color: #ffffff;}
+.customise-components h3{color:#000;}
 #infoPanel a{color:#fff;}
 #header .logo{height: 221px;padding-top: 0;width: 224px;}
 #nav{top:239px;}
-#nav h3.my-links{background-color:#bcbdd6;}
-#nav ul.my-links{background-color:#f8f8fc;}
-
+#nav h3.my-links, .colours-buttons{background-color:#bcbdd6;}
+#nav ul.my-links, .customise-components{background-color:#F8F8FC;  color:#000;}
+#tabs-homepage li.ui-state-default a {background-color:#BCBDD6; color:#fff; }
+#tabs-homepage li.ui-tabs-selected a{background-color:#f8f8fc; color:#0066B0;}
 #tabs li a{color:#ffffff;}
+
+
+#tabs-sub li.ui-state-default a{background-color:#f8f8fc; color:#000;}
+#tabs-sub li.ui-tabs-selected a, .active-box, #tabs-sub .ui-tabs-nav li a:hover {background-color:#FAEDC3; color:#000}
+
 
 #nav li a:hover, #nav li li a:hover, #category li a.selected{background-color:#faedc3; color:#000;}
 #category li a:hover{background:#faedc3;}
@@ -43,9 +50,9 @@ td.cal-right a.filter-change.current,td.cal-right a.filter-change:hover{backgrou
 
 #month-view td.dark, #week-view td.dark{background-color:#bcbdd6;}
 
-#nav h3, #tooltip, #tabs-homepage li.ui-state-default a{background-color: #222478;}
-
-#header #tabs li.navthis a{color: #222478;}
+#nav h3, #tooltip{background-color: #222478;}
+.top-split{border-color:#222478;}
+#header #tabs li.navthis a {color: #222478;}
 
 #nav ul ul, .blog-comments p.interact {border-color:#faedc3; background-color:#fefcf5;}
 #search-field, #search-button{background-color:#FFFDE9}
