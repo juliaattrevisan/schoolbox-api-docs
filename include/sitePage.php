@@ -151,22 +151,28 @@ class SitePage extends Page {
 	}
 
 	function initSession() {
-		session_start();
+            session_start();
 
-		if ( !isset($_SESSION['id']) ) {
-            if($_SERVER[''])
-            $this->goLoginPage();
-        }
-		//if ip tracking enabled ensure user has same ip as when they logged in
-		if(TRACKIP && $_SESSION['ip'] != getIP())
-			$this->goLoginPage();
+            if ( !isset($_SESSION['id']) ) {
+                    //Catch already logged in users via kerberos or other means
+                    if($_SERVER['REMOTE_USER']) {
+                        print_r($_SERVER);
+                    }
+                    else {
+                        $this->goLoginPage();
+                    }
+            }
 
-		//if session remember is disabled and check session has not expired
-		if(!$_SESSION['remember'] && (($_SESSION['lasttime'] + SESSIONLENGTH) < mktime()))
-			$this->goLoginPage();
+            //if ip tracking enabled ensure user has same ip as when they logged in
+            if(TRACKIP && $_SESSION['ip'] != getIP())
+                    $this->goLoginPage();
 
-		//reset session timer
-		$_SESSION['lasttime'] = mktime();
+            //if session remember is disabled and check session has not expired
+            if(!$_SESSION['remember'] && (($_SESSION['lasttime'] + SESSIONLENGTH) < mktime()))
+                    $this->goLoginPage();
+
+            //reset session timer
+            $_SESSION['lasttime'] = mktime();
 	}
 
 	function saveHistory() {

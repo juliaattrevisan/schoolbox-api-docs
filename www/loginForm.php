@@ -1,28 +1,27 @@
 <?php
 
-require_once 'include/auth.php';
+//require_once 'include/auth.php';
 require_once '../include/sitePage.php';
+require_once '../include/session.php';
 session_start();	
 
 
 if( (isset($_POST['username'])) && (isset($_POST['password']) && $_POST['password'] && $_POST['username']) )
 {
-	$db = new dbManager;
+	$sessionHandler = new Session;
 
 	//first check for brute force attempt
-	if( checkBruteForce(&$db) )
+	if( $sessionHandler->checkBruteForce() )
 	{
 		$page = new SitePage(FALSE);
 		$page->goLoginPage('You have attempted more than '.LOGINALLOWED.' logins in '.LOGINGRACE.' seconds.<br>
 			Please try again in a short while.');
 	}		
 
-	session_destroy();
-
-	session_start();
-
-	if (authenticate(&$db, $_POST['username'], $_POST['password']) )
+	if ($sessionHandler->authenticate($_POST['username'], $_POST['password']) )
 	{
+                $sessionHandler->create($_POST['username']);
+
 		if(isset($_POST['page']) && $_POST['page'] && $_POST['page'] != '/')
 		{ 
 			$page = rawurldecode($_POST['page']);
@@ -36,7 +35,7 @@ if( (isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
 	else
 	{
 		//get rid of session started earlier to stop it conflicting with next login
-		session_destroy();
+		$sessionHandler->destory();
 		$page = new SitePage(FALSE);
 		$page->goLoginPage('The username or password you typed is incorrect please try again', $_POST['page']);
 		

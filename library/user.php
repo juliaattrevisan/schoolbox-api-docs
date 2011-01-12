@@ -38,6 +38,39 @@ class User extends Model {
 		return $this->db->getRow($query);
 	
 	}
+
+        function getByUsername($username) {
+
+		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, eportfolio_enabled,
+						synergy_id, local_email, alt_email, email_pass, userCampus.campus, IF(superusers.id, 1, 0) as su
+				FROM user
+					LEFT JOIN groups ON user.group_id = groups.id
+					LEFT JOIN userCampus ON user.id = userCampus.uid
+					LEFT JOIN superusers ON user.id = superusers.id
+				WHERE user.username = ".$this->db->smartQuote($username);
+		return $this->db->getRow($query);
+
+	}
+
+        function getUserCampus($id) {
+
+            $campusquery = "SELECT campus FROM userCampus WHERE uid = '$id' ORDER BY defaultCampus DESC";
+
+            $this->db->query($campusquery);
+            if($this->db->countRows() > 0) {
+                while($campus = $this->db->getNextArray() ) {
+                    if($campus['campus'])
+                        $campus[] = $campus['campus'];
+                }
+            }
+            else {
+                //Place user in campus 1 by default in not assigned
+                $campus[] = 1;
+            }
+
+            return $campus;
+        }
+
 	
 	function getBySynergy($sid) {
 	

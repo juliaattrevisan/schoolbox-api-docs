@@ -6,7 +6,6 @@ require_once SITE_root . '/library/submissionReturn.php';
 require_once SITE_root . '/library/group.php';
 require_once SITE_root . '/library/user.php';
 require_once SITE_root . '/library/synergetic-class.php';
-require_once SITE_root . '/www/include/involved.php';
 
 $this->setFile(TEMPLATE_content, 'submission/dueWork.html');
 $this->setTab('submission');
