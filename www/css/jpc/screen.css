@@ -34,7 +34,7 @@ h3, #infoPanel li, #nav h3, .add-component .notification{color: #ffffff;}
 #assess  .assess-body, .blog-comments .box, 
 .post-left, #category, .search-item:nth-child(even)  
 {background:#f4f4f8; }
-
+.dark td {  background: #faf9f5; zoom:1; min-height:1px; }
 
 .dayWrap p {color: #000;}
 .otherMonth .dayWrap p, .otherMonth .dayWrap a {color: #797979;}

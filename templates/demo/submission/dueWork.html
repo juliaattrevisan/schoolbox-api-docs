@@ -184,49 +184,6 @@ $j(document).ready(function() {
 </div>
 <!-- END has_due -->
 
-<!-- BEGIN has_return -->
-<div class="box component">
-<h2>Returned Work</h2>
-	<div class="text listing">
-  <table class="due-dates">
-    <thead>
-      <tr>
-        <th width="20%">Subject</th>
-        <th width="20%">Description</th>
-        <th width="20%">Mark</th>
-        <th width="20%">Comment</th>
-        <th width="20%">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- BEGIN return -->
-      <tr class="{DARK}">
-        <td>{RETURN_SUBJECT}</td>
-        <td>{RETURN_DESC}</td>
-        <td>{RETURN_MARK}</td>
-        <td>{RETURN_COMMENT}</td>
-        <td>
-        <!-- BEGIN download_rt -->
-        <a href="/submission/send.php?id={RETURN_FILE_ID}&return=1">Download</a>
-        <!-- END download_rt -->
-        </td>
-      </tr>
-      <!-- END return -->
-    </tbody>
-  </table>
-  </div>
-</div>
-<!-- END has_return -->
-
-<style type="text/css">
-table.onlineAssessments td {
-    vertical-align: top;
-}
-
-p.unmarkedResponses {
-   margin-top: 8px;
-}
-</style>
 <!-- BEGIN allAssess -->
 <div class="box component">
 <h2>Online Assessments</h2>
@@ -271,6 +228,51 @@ p.unmarkedResponses {
     </div>
 </div>
 <!-- END allAssess -->
+
+
+<!-- BEGIN has_return -->
+<div class="box component">
+<h2>Returned Work</h2>
+	<div class="text listing">
+  <table class="due-dates">
+    <thead>
+      <tr>
+        <th width="20%">Subject</th>
+        <th width="20%">Description</th>
+        <th width="20%">Mark</th>
+        <th width="20%">Comment</th>
+        <th width="20%">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- BEGIN return -->
+      <tr class="{DARK}">
+        <td>{RETURN_SUBJECT}</td>
+        <td>{RETURN_DESC}</td>
+        <td>{RETURN_MARK}</td>
+        <td>{RETURN_COMMENT}</td>
+        <td>
+        <!-- BEGIN download_rt -->
+        <a href="/submission/send.php?id={RETURN_FILE_ID}&return=1">Download</a>
+        <!-- END download_rt -->
+        </td>
+      </tr>
+      <!-- END return -->
+    </tbody>
+  </table>
+  </div>
+</div>
+<!-- END has_return -->
+
+<style type="text/css">
+table.onlineAssessments td {
+    vertical-align: top;
+}
+
+p.unmarkedResponses {
+   margin-top: 8px;
+}
+</style>
 
 </div>
 <div class="right">
