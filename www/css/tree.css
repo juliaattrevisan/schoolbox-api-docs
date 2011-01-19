@@ -4,6 +4,7 @@
 }
 #tree td {
 	padding: 2px 7px 3px;
+	zoom:1;
 }
 #tree span {
 	margin: 0;
@@ -11,7 +12,7 @@
 	float: left;
 	line-height: 23px;
 	width: 23px;
-	height: 23px;
+	min-height: 23px;
 	background: transparent url(/images/tree/indent.gif) repeat 0 0px;
 }
 #tree span.blank {
@@ -47,10 +48,9 @@
 	margin: 0;
 	width: auto;
 	line-height: 23px;
-	height: 23px;
+	/*height: 23px;*/
 	background: transparent url(/images/icons/22x22/folder.png) no-repeat 0 0;
 	cursor: default;
-	white-space: nowrap;
 	-moz-user-select: none;	
 }
 

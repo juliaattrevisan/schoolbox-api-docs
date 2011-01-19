@@ -30,10 +30,10 @@ h3, #infoPanel li, #nav h3, .add-component .notification{color: #ffffff;}
 .login #header {
     height: 236px;
 }
-#nav ul, .dark, .standardForm, #assess .standardForm, #assess .additional-details, 
+#nav ul, .dark, .dark td, #tree .dark , .standardForm, #assess .standardForm, #assess .additional-details, 
 #assess  .assess-body, .blog-comments .box, 
 .post-left, #category, .search-item:nth-child(even)  
-{background-color:#f4f4f8; }
+{background:#f4f4f8; }
 
 
 .dayWrap p {color: #000;}
