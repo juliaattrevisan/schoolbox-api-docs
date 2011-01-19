@@ -639,6 +639,10 @@ ul.js_happening li span:hover{opacity:0.8;}
 ul.js_happening li{margin-bottom:4px; position:relative; }
 
 .cal-bubble {z-index:200000;bottom:90%;color:#000000;font-size:12px;left:-100px;position:absolute;width:400px;display:none; }
+
+
+
+
 .cal-bubble  .middle{min-height:20px;padding:0 24px 0 16px;position:relative;background:url(/images/demo/calendar/bubble-middle.png) repeat-y; line-height:16px;}
 .cal-bubble  .middle .close{font-weight:bold;z-index:50000;-moz-border-radius:4px; -webkit-border-radius:3px; border-radius:3px;line-height:16px;position:absolute; right:24px; top:0px; width:19px; height:19px; background:#e9e3d6; color:#797979; text-align:center; cursor:pointer; font-size:16px;}
 .cal-bubble  .middle h4{font-size:12px; margin:0 0 16px 0; }
@@ -783,11 +787,17 @@ span.wrapper a { color:#FFF; }
 .due-dates-selection a.back:hover, .due-dates-selection a.forward:hover { background-position:bottom; }
 .due-dates-selection div { float:left; padding:10px 0 10px 0; height:17px; }
 .due-dates-selection span { margin:0 10px; padding-left:25px; background:url(/images/cal-icon.gif) no-repeat 3px 1px; font-weight:bold; }
+
 .bubble { top:-100px; color:#000000; font-size:11px; left:2; position:absolute; width:250px; z-index:100; }
 .bubble-main { background-color:#717171; padding:10px; }
 .bubble-close { background:url("/images/calendar-close.gif") no-repeat scroll 0 0 transparent; display:block; height:19px; position:absolute; right:10px; top:10px; width:19px; }
 .bubble-close:hover { background-position:bottom; }
 .bubble-bottom { background:url(/images/calendar-bottom.gif) no-repeat 20px 0px; height:9px; }
+
+.duedates-calendar .cal-bubble{ top:-140px; color:#000000; font-size:11px; left:-300px; position:absolute; z-index:10000; display:block;}
+.duedates-calendar .cal-bubble .middle p{margin:0; padding-bottom:16px;}
+.left #calendar table.duedates-calendar .cal-bubble  h3{font-size:12px; padding:0;}
+
 .left #calendar table .bubble .bubble-main h3 { background-color:#717171; color: #fff; padding:0; font-size:12px; }
 .left #calendar table .bubble .bubble-main h3 a, .bubble-main p a, .bubble-main p { color:#fff; }
 .left #calendar table .bubble p.details { border-top:1px dotted #b8b8b8; padding:4px; margin-bottom:0; }
