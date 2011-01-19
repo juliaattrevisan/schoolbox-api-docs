@@ -794,9 +794,9 @@ span.wrapper a { color:#FFF; }
 .bubble-close:hover { background-position:bottom; }
 .bubble-bottom { background:url(/images/calendar-bottom.gif) no-repeat 20px 0px; height:9px; }
 
-.duedates-calendar .cal-bubble{ top:-140px; color:#000000; font-size:11px; left:-300px; position:absolute; z-index:10000; display:block;}
-.duedates-calendar .cal-bubble .middle p{margin:0; padding-bottom:16px;}
-.left #calendar table.duedates-calendar .cal-bubble  h3{font-size:12px; padding:0;}
+.duework-popup.cal-bubble{ top:-140px; color:#000000; font-size:11px; left:-300px; position:absolute; z-index:10000; display:block;}
+.duework-popup.cal-bubble .middle p{margin:0; padding-bottom:16px;}
+.duework-popup.cal-bubble  h3{font-size:12px; padding:0; margin-bottom:8px;}
 
 .left #calendar table .bubble .bubble-main h3 { background-color:#717171; color: #fff; padding:0; font-size:12px; }
 .left #calendar table .bubble .bubble-main h3 a, .bubble-main p a, .bubble-main p { color:#fff; }
