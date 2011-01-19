@@ -116,9 +116,9 @@
 	<!-- #BeginEditable "content" --> 
             <h1>Upload Calendar Infomation</h1></span></td>
                   <form action="" method="post" enctype="multipart/form-data" name="form" id="form" class="standardForm">
-                    <table>
+                    <table class="standardForm" cellpadding="0" cellspacing="0">
                       <tr> 
-                      <td><strong>Campus</strong><br />Select the campus' which will be able to view these events</td>
+                      <td><h4>Campus</h4><em>Select the campus' which will be able to view these events</em></td>
                         <td>
 						<!-- BEGIN campus_check_list -->
 							<label><input type="checkbox" name="campus[]" value="{CAMPUSID}" />{CAMPUSNAME}</label><br />
@@ -127,7 +127,7 @@
 						</td>
                       </tr>
                       <tr> 
-                        <td><strong>Group</strong><br />Select the Groups which will be able to view these events</td>
+                        <td><h4>Group</h4><em>Select the Groups which will be able to view these events</em></td>
                         <td>
 						<!-- BEGIN user_group_check_list -->
 							<label><input type="checkbox" name="userGroup[]" value="{USERGROUPID}" />{USERGROUPNAME}</label><br />
@@ -135,14 +135,14 @@
 						</td>
                         </tr>
                       <tr>
-                      	<td><strong>Portal ID of Owner</strong><br />The field is optional.  If left the current users ID will be used</td>
+                      	<td><h4>Portal ID of Owner</h4><em>The field is optional.  If left the current users ID will be used</em></td>
                       	<td>
                           <input name="userid" type="text" id="userid" size="6" maxlength="6" /></td>
                       	</tr>
                       <tr>
-                      	<td><strong>File</strong><br />
+                      	<td><h4>File</h4><em>
 						The File that contains the Calendar Infomation must be a Comma Seperated Text File, containing the following:<br />
-                          Date, Start Time, Finish Time, Comment,Priority ie. (2004-12-21,15:30,18:30,This is a Calendar Note,4)</td>
+                          Date, Start Time, Finish Time, Comment,Priority ie. (2004-12-21,15:30,18:30,This is a Calendar Note,4)</em></td>
                       	<td><input type="file" name="file" /></td>
                       	</tr>
                       <tr> 
