@@ -32,4 +32,11 @@ if(is_array($allFiles)) {
 else {
     $this->setVar('image_block','');
 }
+
+//setup block for submission button
+$this->setBlock($componentHandle, 'submit_image', 'submit_image_block');
+if ($permission < WRITE_ACCESS)
+	$this->setVar('submit_image_block', '');
+else
+	$this->parse('submit_image_block', 'submit_image');
 ?>
