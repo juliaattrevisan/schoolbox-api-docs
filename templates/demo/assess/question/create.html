@@ -58,7 +58,7 @@ $j(document).ready(function() {
 		<div class="assess-body">
 		
 			<p class="help">
-			Now that you've created a section for the test, use the drop down below to select a question type.
+				Now that you've created a section for the test, use the drop down below to select a question type.
 			</p>
 			
 			<form id="createQuestionForm" action="/assess/question/create" class="standardForm" method="post">
@@ -94,14 +94,29 @@ $j(document).ready(function() {
 			
 					<!-- END answerInputs -->
 				</div>
-			
-
-					<input type="submit" name="create" id="create" value="Add Question" class="submit-btn-plain"/>
-					<div class="float-fix"></div>
-		
-					</form>
+				<input type="submit" name="create" id="create" value="Add Question" class="submit-btn-plain"/>
+				<div class="float-fix"></div>
+			</form>
 		</div>
 
+		<br><br>
+
+		<h2>Import a question and answer from an XML file</h2>
+		<div class="assess-body">
+			<p class="help">
+				Select an Assess Question XML file to import.
+			</p>
+
+			<form action="/assess/question/import/{SECTION_ID}" method="post" class="standardForm" enctype="multipart/form-data">
+				<fieldset>
+					<label>File</label>
+					<input name="importXML" type="file" />
+				</fieldset>
+
+				<input type="submit" value="Import from XML file"  class="submit-btn-plain float-none"/>
+				<div class="float-fix"></div>
+			</form>
+		</div>
 	</div>
 </div>
 <div class="col-2">
