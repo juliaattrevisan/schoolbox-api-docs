@@ -92,7 +92,7 @@ $j(function() {
 					// Retrieve the content when tooltip is first rendered
 					 onRender: function()
 					 {
-						var self = this
+						var self = this;
 						console.log()
 					 }
 				 },
@@ -322,7 +322,8 @@ $j(function() {
 		}
 	}
 
-	$j('div.colour').click(function () {
+	$j('.colour').click(function(event) {
+		event.preventDefault();
 		$j('.selected').removeClass('selected');
 		$j('.active-box').removeClass('active-box');
 		$j(this).addClass('active-box');
@@ -332,7 +333,8 @@ $j(function() {
 		checkTextColour()
 	});
 
-	$j('.layouts a').click(function () {
+	$j('.layouts a').click(function(event) {
+		event.preventDefault();
 		
 		var templateChoice = $j(this).attr('title');
 		var newChoice = "";
@@ -357,7 +359,7 @@ $j(function() {
 		}
 		
         $j('.homepage').removeClass().addClass(newChoice + ' homepage ui-sortable');
-		$j('.layouts a.current').removeClass('current');
+		$j('.current').removeClass('current');
 		$j(this).addClass('current');
 
         $j('#templateVal').val(templateChoice);
@@ -371,8 +373,8 @@ $j(function() {
     $j('#saveColour').click(function () {
        $j.post('/homepage/configForm.php', {colors: pickers});
     });
-	$j("#leftRight").click(function () {
-		
+	
+	$j("#leftRight").click(function () {	
 		var rightBox;
 		
 		$j('div.leftColumn div.colorBox').each(function () {
