@@ -3076,6 +3076,7 @@ class rcube_header_sorter
  * @param boolean  True if spaces should be converted into =20
  * @return string Encoded string
  */
+ if (!function_exists('quoted_printable_encode')) {
 function quoted_printable_encode($input, $line_max=76, $space_conv=false)
   {
   $hex = array('0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F');
@@ -3131,6 +3132,7 @@ function quoted_printable_encode($input, $line_max=76, $space_conv=false)
     } // end of while
 
   return trim($output);
+  }
   }
 
 
