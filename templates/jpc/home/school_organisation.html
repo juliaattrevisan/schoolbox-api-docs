@@ -1,17 +1,24 @@
-<div class="box" id="component{COMPONENT_ID}">
-	<h2>School Organisation</h2>
-	<!-- BEGIN config --> 
-	<a class="close-delete" href="#"><span>X</span></a>
-	<div class="editPanel delete-it hide">
-		<p>Are you sure you want to delete?</p>
-		<form action="#" method="post">
-			<input type="hidden" name="cid" value="{ID}" />
-			<input type="hidden" name="delete" value="{COMPONENT_ID}" />
-			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> 
-			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
-		</form>
-		<div class="float-fix"></div>
-	</div>
-	<!-- END config -->
-	<div class="text listing"> </div>
+<div class="box school-organisation">
+  <h2>College Organisation</h2>
+  <div class="text listing">
+      <h4>Daily</h4>
+      <div class="float-fix"</div>
+      <ul>
+          <li><a href="/resources/526">Daily Notices</a><em>Activities & Notices</em></li>
+          <!-- BEGIN extras_staff -->
+          <li><a href="/resources/870">Daily Extras</a><em>Changes to Classes</em></li>
+          <!-- END extras_staff -->
+      </ul>
+   </div>
+  <div class="text listing">
+      <h4>Fortnightly</h4>
+      <div class="float-fix"</div>
+      <ul>
+          <!-- BEGIN bulletin_staff -->
+          <li><a href="/resources/871">Staff Bulletin</a><em>Staff Communication</em></li>
+          <!-- END bulletin_staff -->
+          <li><a href="/resources/872">School Newsletter</a><em>Community Communication</em></li>
+      </ul>
+  </div>
 </div>
+

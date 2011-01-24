@@ -34,7 +34,7 @@ class Session {
             $_SESSION['alt_email']  = $user['alt_email'];
             $_SESSION['lasttime']   = mktime();
             $_SESSION['username']   = $user['username'];
-            $_SESSION['password']   = $user['email_pass'];
+            $_SESSION['password']   = $password;
             $_SESSION['eportfolio_enabled'] = $user['eportfolio_enabled'];
 
             //if no webmail enabled or user has elected to use external client set mailhandle to mailto:

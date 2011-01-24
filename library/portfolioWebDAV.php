@@ -261,18 +261,32 @@ class PortfolioWebDAV {
 	public function factory() {
 		require_once SITE_root . '/library/group.php';
 		$groupHandler = new Group;
+
+                if(SITE_location == 'wenona') {
+                    if ($groupHandler->isStaff()) {
+                            $pathList = array( 'http://gold/StaffHome/',
+                                                               'http://gold/StaffData/',
+                                                              );
+                    } else {
+                            $pathList = array( 'http://silver/StudentHome/' . (11 - $_SESSION['year'] + 11 ) . '/' . $_SESSION['username'] . '/',
+                                                               'http://silver/StudentData/',
+                                                              );
+                    }
+                    return new self($pathList , "wgs/" . $_SESSION['username'], $_SESSION['password']);
+                }
+                 else if(SITE_location == 'jpc') {
+                   if ($groupHandler->isStaff()) {
+                            $pathList = array( 'http://kazon/Staff/'.$_SESSION['username'].'/',
+                                                               'http://gold/doclib/',
+                                                              );
+                    } else {
+                            $pathList = array( 'http://kazon/Student/' . (date('Y') - ($_SESSION['year'] - 7) ) . '/' . $_SESSION['username'] . '/',
+                                                              );
+                    }
+                    return new self($pathList , "jpc/".$_SESSION['username'], $_SESSION['password']);
+                 }
 		
-		if ($groupHandler->isStaff()) {
-			$pathList = array( 'http://gold/StaffHome/',
-							   'http://gold/StaffData/',
-							  );
-		} else {
-			$pathList = array( 'http://silver/StudentHome/' . (11 - $_SESSION['year'] + 11 ) . '/' . $_SESSION['username'] . '/',
-							   'http://silver/StudentData/',
-							  );
-		}
 		
-		return new self($pathList , "wgs/" . $_SESSION['username'], $_SESSION['password']);
 	}
 	
 	private function fixPath ($path) {
