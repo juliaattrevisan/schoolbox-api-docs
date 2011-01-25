@@ -67,6 +67,12 @@ if (is_array($fileList)) {
 	$this->setVar('files_block', '');
 
 
+/* Set up component name
+ */
+$this->setvar(array(
+	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Files'
+));
+
 /* filter config */
 $config['filter'] = is_array($config['filter']) ? $config['filter'] : array($config['filter']);
 $this->setBlock("config", "filter", "filter_block".$componentCount);

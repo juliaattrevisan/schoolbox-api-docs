@@ -1,6 +1,6 @@
 <div class="box" id="component{COMPONENT_ID}">
-	<h2>Files</h2>
-	<!-- BEGIN config --> 
+	<h2>{COMPONENT_NAME}</h2>
+	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
 <a class="close-delete" href="#"><span>X</span></a>
 	<div class="editPanel settings hide">
@@ -8,11 +8,15 @@
 			<input type="hidden" name="cid" value="{ID}" />
 			<input type="hidden" name="type" value="config" />
 			<input type="hidden" name="component" value="{COMPONENT_ID}" />
+
+			<label for="componentname">Name: </label>
+			<input type="text" name="componentname" value="{COMPONENT_NAME}" />
+
 			<!-- BEGIN filter -->
 			<label for="{COMPONENT_CONFIG_FILTER_VALUE}">
 				<input type="checkbox" name="filter[]" value="{COMPONENT_CONFIG_FILTER_VALUE}" {COMPONENT_CONFIG_FILTER_SELECTED} />
-				{COMPONENT_CONFIG_FILTER_NAME}</label>
-			
+				{COMPONENT_CONFIG_FILTER_NAME}
+			</label>
 			<!-- END filter -->
 			<label for="sort">Sort: </label>
 			<select name="sort">
@@ -47,17 +51,17 @@
 	<div class="text listing">
 		<ul>
 			<!-- BEGIN files -->
-			<li class="{ON_OFF}"> 
+			<li class="{ON_OFF}">
 				<!-- BEGIN file_url -->
 				<h4><a class="icons {HIDDEN} {FILE_MIME_IMAGE}" href="{FILE_URL}" target="{FILE_TARGET}" >{FILE_DESCRIPTION}</a></h4>
-				<!-- END file_url --> 
+				<!-- END file_url -->
 				<!-- BEGIN file_no_url -->
 				<h4>{FILE_DESCRIPTION}</h4>
 				<!-- END file_no_url -->
-				<div class="small-right"> 
+				<div class="small-right">
 					<!-- BEGIN modify_file -->
 					<p class="interact"> <a href="/cms/file/{FILE_ID}">Modify File</a> </p>
-					<!-- END modify_file --> 
+					<!-- END modify_file -->
 				</div>
 				<div class="float-fix"></div>
 				{FILE_COMMENT}
@@ -70,5 +74,5 @@
 	</div>
 	<!-- BEGIN submit_file -->
 	<p class="interact"><a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post File</a></p>
-	<!-- END submit_file --> 
+	<!-- END submit_file -->
 </div>
