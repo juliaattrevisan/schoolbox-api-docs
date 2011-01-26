@@ -277,7 +277,7 @@ class PortfolioWebDAV {
                  else if(SITE_location == 'jpc') {
                    if ($groupHandler->isStaff()) {
                             $pathList = array( 'http://kazon/Staff/'.$_SESSION['username'].'/',
-                                                               'http://gold/doclib/',
+                                                               'http://kazon/doclib/',
                                                               );
                     } else {
                             $pathList = array( 'http://kazon/Student/' . (date('Y') - ($_SESSION['year'] - 7) ) . '/' . $_SESSION['username'] . '/',

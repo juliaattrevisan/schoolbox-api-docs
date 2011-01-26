@@ -17,7 +17,7 @@ if (is_array($submissionList)) {
 	
 		$output = array('TIME'				=> $submission['dueTime'],
 						'NOTE_CATEGORY'		=> 'WORK DUE ' . $submission['category'] . (isset($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ',
-						'NOTE_DESCRIPTION'	=> $submission['description'],
+						'NOTE_DESCRIPTION'	=> scrubTEXT($submission['description']),
 						'NOTE_COLOUR'		=> $calendarHandler->displayColour(1),
 						'ON_OFF'			=>  ++$j%2? '' : 'dark',
 						);
@@ -47,7 +47,7 @@ else
 				$this->setVar("TIME", $event['startTime']." - ".$event['endTime']);
 		
 		$output = array('NOTE_CATEGORY'		=> '',
-						'NOTE_DESCRIPTION'	=> $event['note'],
+						'NOTE_DESCRIPTION'	=> scrubTEXT($event['note']),
 						'NOTE_COLOUR'		=> $calendarHandler->displayColour($event['type']),
 						'ON_OFF'			=>  ++$j%2? '' : 'dark',
 						);

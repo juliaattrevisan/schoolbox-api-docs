@@ -71,7 +71,7 @@ class File extends Model {
 		$sortFields = array('Name' => 'f.description', 'Date' => 'f.submitted');
 		
 		$config['sort'] = isset($sortFields[$config['sort']]) ? $config['sort'] : 'Name';
-		$config['sortdir'] = strtoupper($config['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
+		$config['sortdir'] = strtoupper($config['DESC']) == 'DESC' ? 'DESC' : 'ASC';
 
 		$query .= " ORDER BY " . $sortFields[$config['sort']] . " " . $config['sortdir'];
 		

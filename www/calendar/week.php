@@ -142,7 +142,7 @@ for($i=0; $i < 7; $i++) {
 											($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
 										   	($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
 										   "- "),
-							'NOTE'		=> $event['note'],
+							'NOTE'		=> scrubTEXT($event['note']),
 							'COLOUR'	=> $calendarHandler->displayColour($event['type']),
 							'MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "\">Modify</a>" : "",
 				            'EVENT_TYPE'    => 'type'.$event['type'],

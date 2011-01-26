@@ -11,7 +11,7 @@
     </tr> 
     <!-- BEGIN period --> 
     <tr> 
-        <th style="white-space:nowrap;width:5%;">{PERIOD_NAME}<div style="font-size:0.8em">{PERIOD_START}-{PERIOD_END}</div></th> 
+        <th style="white-space:nowrap;width:5%;">{PERIOD_NAME}<!-- <div style="font-size:0.8em">{PERIOD_START}-{PERIOD_END}</div> --></th>
         <!-- BEGIN day --> 
         <td class="{TIMETABLE_CLASS}" {PERIOD_ONCLICK}>{PERIOD_DESC}<br />{PERIOD_CODE}<br />{PERIOD_ROOM}</td> 
         <!-- END day --> 
@@ -19,4 +19,3 @@
     <!-- END period --> 
 </table>
 <!-- END timetable -->
-<p style="font-weight:bold;">Please note that Tuesdays and Thursdays have different bell times to Mondays, Wednesdays and Fridays.</p>

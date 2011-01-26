@@ -148,18 +148,22 @@ if(is_numeric($this->arg[0])) {
                 $this->setVar('timetable_link_block', '');
             }
 
-            /* Remove Due Work link if logged in within parent group
+            /* Allow students, staff and parents of the student to see information about
+             * due work. Also allow the current user if they view themselves in the
+             * search results.
              */
             if ($groupHandler->isParent() && SITE_location == 'shore') {
                 $this->setVar('due_work_block', '');
-            } else {
-                $this->parse("due_work_block", "due_work");
             }
+            else {
+                $this->parse('due_work_block', 'due_work');
+            }
+ 
 
-            if(is_dir(HELPDESK_location))
-                $this->parse("helpdesk_block", "helpdesk");
+            if(HELPDESK_enable == true)
+                $this->parse('helpdesk_block', 'helpdesk');
             else
-                $this->setVar("helpdesk_block", "");
+                $this->setVar('helpdesk_block', '');
 
             $synInfo = $synUserHandler->getStudent($user['synergy_id']);
 
@@ -274,13 +278,7 @@ if(is_numeric($this->arg[0])) {
         $this->setVar('eportfolio_block', '');
     }
 
-    /* Allow students, staff and parents of the student to see information about
-     * due work. Also allow the current user if they view themselves in the
-     * search results.
-     */
-    if (($_SESSION['id'] == $user['uid']) || $groupHandler->isStudent($user['uid']) && ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['uid']))) {
-        $this->parse("due_work_block", "due_work");
-    }
+
 }
 else {
 	error(2);
