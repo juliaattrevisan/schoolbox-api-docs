@@ -32,7 +32,6 @@ if(is_numeric($this->arg[0])) {
 	$this->setTab('resources');
 	
 	//$this->setVar('browse_block', '');
-
 	$output = array('ACTION'			=> 'Modify',
 					'FILE_ID'			=> $file['id'],
 					'DESCRIPTION'		=> scrubText($file['description']),
@@ -184,6 +183,8 @@ else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 	$output = array('CATEGORY_NAME'		=> scrubTEXT($category['name']),
 					'CATEGORY_ID'		=> $category['id'],
 					'FILE_max_upload'	=> FILE_max_upload,
+					'SESSION_NAME'		=> session_name(),
+					'SESSION_ID'		=> session_id(),
 					);
 	$this->setVar($output);
 }

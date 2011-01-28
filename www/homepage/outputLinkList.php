@@ -35,6 +35,12 @@ if (is_array($linkList)) {
 } else
 	$this->setVar("link_block", "");
 
+/* Set up component name
+ */
+$this->setvar(array(
+	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Links'
+));
+
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_link", "submit_link_block");
 if ($permission < WRITE_ACCESS)		

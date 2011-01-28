@@ -75,7 +75,12 @@ var MultiSelector = function(){
 		this.deleter.multi_selector = this;
 			
 		// What to do when a file is selected or description entered
-		this.file.onchange = this.description.onchange = function(){				
+		this.file.onchange = this.description.onchange = function(){
+
+			/* Temporary fix for JPC by Steve
+			 */
+			this.multi_selector.description.value = this.multi_selector.file.value.substring(0, this.multi_selector.file.value.lastIndexOf("."));
+
 			// Make sure both fields are entered
 			if(this.multi_selector.file.value != "" && this.multi_selector.description.value != ""){
 				// Now unlock the delete button

@@ -1,5 +1,5 @@
 <div class="box" id="component{COMPONENT_ID}">
-  <h2>Links</h2>
+  <h2>{COMPONENT_NAME}</h2>
 <!-- BEGIN config -->
   <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
 <a class="close-delete" href="#"><span>X</span></a>
@@ -8,6 +8,10 @@
       <input type="hidden" name="cid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
       <input type="hidden" name="component" value="{COMPONENT_ID}" />
+
+		<label for="componentname">Name: </label>
+		<input type="text" name="componentname" value="{COMPONENT_NAME}" />
+
       <label for="sort">Sort: </label>
       <select name="sort">
       	<!-- BEGIN sort -->

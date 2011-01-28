@@ -1,17 +1,28 @@
 <?php
 
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
+/* Force session usage due to flash uploader
+ * http://www.uploadify.com/forums/discussion/43/using-sessions-tricking-basic-authentication/p1
+ */
+if (isset($_POST[session_name()])) {
+	session_id($_POST[session_name()]);
+}
+
+if (isset($_GET[session_name()])) {
+	session_id($_GET[session_name()]);
+}
+
 $page = new SitePage;
 $fileHandler = new File;
 $groupHandler = new Group;
 
 if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_array($_POST['category']) ) ) {
-
 	$file = array(	'description'	=> $_POST['description'],
 					'comment'		=> $_POST['comment'],
 					'hidden'		=> $_POST['hidden'],
@@ -93,7 +104,7 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 					$fileHandler->create($file, $_FILES['file']);
 					
 				}
-				
+
 				// redirect to first category
 				localRedir('/resources/' . $_POST['category'][0]);
 			}
@@ -108,6 +119,12 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 		} elseif (!isset($_POST['submission']))
 			error(2);
 
+		/* For some reason this is necessary for upload indication to reach
+		 * Completed status.
+		 */
+		if ($_POST['uploadifydie'] == true) {
+			exit(true);
+		}
 		
 		/* Redirect to submission page */
 		if($_POST['submission'])

@@ -26,18 +26,24 @@ if (is_array($folderList)) {
 
 			$this->parse('folders_block', 'folders', true);
 			$flag = 1;
-	
+
 		}
 	}
 	if(!$flag) { $this->setVar('folders_block', '');}
 } else
 	$this->setVar('folders_block', '');
 
+/* Set up component name
+ */
+$this->setvar(array(
+	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Folders'
+));
+
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_folder", "submit_folder_block");
-if ($permission < WRITE_ACCESS)		
+if ($permission < WRITE_ACCESS)
 	$this->setVar("submit_folder_block", "");
 else
-	$this->parse("submit_folder_block", "submit_folder");	
-	
+	$this->parse("submit_folder_block", "submit_folder");
+
 ?>

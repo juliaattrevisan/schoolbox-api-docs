@@ -1,44 +1,136 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/multifilecms.js"></script>
+<script type="text/javascript" src="/javascript/uploadify/swfobject.js"></script>
+<script type="text/javascript" src="/javascript/uploadify/jquery.uploadify.v2.1.4.js"></script>
 <script type="text/javascript">
-	multi_selector = new MultiSelector();
+$j(function() {
+	var uploadQueue = new Array();
+
+	$j('#custom_file_upload').uploadify({
+		'uploader'       : '/javascript/uploadify/uploadify.swf',
+		'script'         : '/cms/fileForm.php?{SESSION_NAME}={SESSION_ID}',
+		'cancelImg'      : '/javascript/uploadify/cancel.png',
+		'fileDataName'   : 'file',
+		'multi'          : true,
+		'auto'           : false,
+		'queueSizeLimit' : 50,
+		'removeCompleted': false,
+		'onSelect'		 : function(event, queueID, fileObj) {
+			uploadQueue.push(queueID);
+		}
+	});
+
+	/* Check for errors with custom file starter
+	 */
+	$j('#startUpload').click(function() {
+		var errors = 0;
+		var prefill = true;
+
+		$j.each(uploadQueue, function(k, v) {
+			var elem = $j('input[name=description_custom_file_upload_' + v + ']');
+
+			/* Prefill file names for mass upload
+			 */
+			if (prefill) {
+				var filename = $j('input[name=fullname_' + v + ']').val();
+				elem.val(filename);
+			}
+
+			if (elem.val() == '') {
+				errors++;
+			}
+		});
+
+		if (errors > 0) {
+			alert('Please enter a description for each file.');
+		}
+		else {
+			$j.each(uploadQueue, function(k, v) {
+				var elem = $j('input[name=description_custom_file_upload_' + v + ']');
+				var hidden = 0;
+
+				if ($j('input[name=hidden]').attr('checked')) {
+					hidden = 1;
+				}
+
+				var data = {
+					'category': '{CATEGORY_ID}',
+					'uploadifydie': true,
+					'description': elem.val(),
+					'hidden': hidden
+				}
+
+				$j('#custom_file_upload').uploadifySettings('scriptData', data);
+
+				$j('#custom_file_upload').uploadifyUpload(v);
+			});
+		}
+	});
+});
 </script>
+
+<style type="text/css">
+.uploadifyQueueItem {
+	border-top: 1px solid #dedede;
+	padding-top: 20px;
+	margin-top: 20px;
+}
+
+.uploadifyFileName {
+	width: 50%;
+	float: left;
+}
+
+.uploadifyDescription {
+	width: 50%;
+	float: right;
+}
+
+.uploadifyFileDescription input {
+	width: 30%;
+}
+
+.uploadifyProgress {
+	background-color: #E5E5E5;
+	width: 40%;
+}
+
+.uploadifyProgressBar {
+	background-color: #0099FF;
+	height: 10px;
+	width: 1px;
+}
+
+#startUpload {
+	width: 100px;
+	margin-top: 40px;
+	display: block;
+}
+</style>
 <!-- END custom_head -->
 
 <h1>Upload Multiple Files</h1>
-<form method="post" enctype="multipart/form-data" id="fileForm"  onsubmit="return multi_selector.check();" action="/cms/fileForm.php">
-	<table class="standardForm">
-		<tr>
-			<td class="formLabelWidth"><h4>Location</h4> <em>These files will be located in this folder</em>{CATEGORY_NAME}
-				</td>
-				<td><input name="category" value="{CATEGORY_ID}" type="hidden" /></td>
-		</tr>
-		<tr>
-			<td><h4>Hidden</h4>
-				<em>Hide these files from students.</em>
-				</td>
-			<td><input type='checkbox' name='hidden' value='1' /></td>
-		</tr>
-		<tr>
-			<td><h4>Files</h4>
-				<em>Each file must have a description and location, a new row will appear when these requirements are met</em>
-				</td>
-			<td><table>
-					<thead>
-						<tr>
-							<td><h3>Description</h3></td>
-							<td><h3>Location</h3></td>
-							<td></td>
-						</tr>
-					</thead>
-					<tbody id="files_list">
-					</tbody>
-				</table>
-				<script type="text/javascript">
-                multi_selector.init(document.getElementById('files_list'), {FILE_max_upload});
-            </script></td>
-		</tr>
-	</table>
-	<input type="submit" name="Submit" value="Upload Files" class="submit-btn-plain" />
-	<div class="float-fix"></div>
-</form>
+<table class="standardForm">
+	<tr>
+		<td class="formLabelWidth"><h4>Location</h4> <em>These files will be located in this folder</em>{CATEGORY_NAME}</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>
+			<h4>Hidden</h4>
+			<em>Hide these files from students.</em>
+		</td>
+		<td><input type='checkbox' name='hidden' value='1' /></td>
+	</tr>
+	<tr>
+		<td>
+			<h4>Files</h4>
+			<em>Each file must have a description and location, a new row will appear when these requirements are met</em>
+		</td>
+		<td>
+			<input id="custom_file_upload" name="custom_file_upload" type="file" />
+			<div id="fileQueue"></div>
+			<a id="startUpload">Upload files</a>
+		</td>
+	</tr>
+</table>
+<div class="float-fix"></div>
