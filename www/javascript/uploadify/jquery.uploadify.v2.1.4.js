@@ -137,6 +137,7 @@ if(jQuery)(
 									\
 								</div>\
 								<input name="fullname_' + ID + '" type="hidden" value="' + fileObj.name + '" />\
+								<input name="uploaded_' + ID + '" type="hidden" value="0" />\
 								<div class="uploadifyFileName"><span class="fileName">' + fileName + ' (' + byteSize + suffix + ')</span><span class="percentage"></span></div>\
 								<div class="uploadifyFileDescription"><input name="description_' + jQuery(this).attr('id') + '_' + ID + '" type="text" value=""></div>\
 								<div class="uploadifyProgress">\

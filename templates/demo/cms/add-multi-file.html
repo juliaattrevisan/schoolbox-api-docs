@@ -14,7 +14,7 @@ $j(function() {
 		'auto'           : false,
 		'queueSizeLimit' : 50,
 		'removeCompleted': false,
-		'onSelect'		 : function(event, queueID, fileObj) {
+		'onSelect'       : function(event, queueID, fileObj) {
 			uploadQueue.push(queueID);
 		}
 	});
@@ -25,45 +25,71 @@ $j(function() {
 		var errors = 0;
 		var prefill = true;
 
+		/* Since this is a custom upload method, we need to detect whether
+		 * there are any previously uploaded files as they become inaccessible
+		 * after being uploaded
+		 */
 		$j.each(uploadQueue, function(k, v) {
-			var elem = $j('input[name=description_custom_file_upload_' + v + ']');
+			if ($j('input[name=uploaded_' + v + ']').val() == 0) {
+				var elem = $j('input[name=description_custom_file_upload_' + v + ']');
 
-			/* Prefill file names for mass upload
-			 */
-			if (prefill) {
-				var filename = $j('input[name=fullname_' + v + ']').val();
-				elem.val(filename);
-			}
+				/* Prefill file names for mass upload
+				 */
+				if (prefill) {
+					var filename = $j('input[name=fullname_' + v + ']').val();
 
-			if (elem.val() == '') {
-				errors++;
+					/* If there is no description, try to put the filename in.
+					 * Otherwise leave it as entered
+					 */
+					if ((filename != undefined) || (filename != '')) {
+						if (elem.val() == '') {
+							elem.val(filename.substring(0, filename.lastIndexOf(".")));
+						}
+					}
+				}
+
+				/* If the resultant filename is still empty, force one to be
+				 * manually entered - could be a result of trying to upload
+				 * files starting with a dot.
+				 */
+				if ((elem.val().length == 0) || (elem.val() == '')) {
+					errors++;
+				}
 			}
 		});
 
-		if (errors > 0) {
+		if ((errors > 0)) {
 			alert('Please enter a description for each file.');
 		}
 		else {
 			$j.each(uploadQueue, function(k, v) {
-				var elem = $j('input[name=description_custom_file_upload_' + v + ']');
-				var hidden = 0;
+				if ($j('input[name=uploaded_' + v + ']').val() == 0) {
+					var elem = $j('input[name=description_custom_file_upload_' + v + ']');
+					var hidden = 0;
 
-				if ($j('input[name=hidden]').attr('checked')) {
-					hidden = 1;
+					if ($j('input[name=hidden]').attr('checked')) {
+						hidden = 1;
+					}
+
+					var data = {
+						'category': '{CATEGORY_ID}',
+						'uploadifydie': true,
+						'description': elem.val(),
+						'hidden': hidden
+					}
+
+					$j('#custom_file_upload').uploadifySettings('scriptData', data);
+
+					$j('#custom_file_upload').uploadifyUpload(v);
+
+					/* Mark as uploaded
+					 */
+					$j('input[name=uploaded_' + v + ']').val(1) ;
 				}
-
-				var data = {
-					'category': '{CATEGORY_ID}',
-					'uploadifydie': true,
-					'description': elem.val(),
-					'hidden': hidden
-				}
-
-				$j('#custom_file_upload').uploadifySettings('scriptData', data);
-
-				$j('#custom_file_upload').uploadifyUpload(v);
 			});
 		}
+
+//		$j('#custom_file_upload').uploadifyClearQueue();
 	});
 });
 </script>
