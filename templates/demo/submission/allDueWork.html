@@ -7,11 +7,13 @@ table.subjectList th,
 table.subjectList td {
 	width: 20%;
 }
+
+
 </style>
 <!-- END custom_head -->
 
 <h1>My Work</h1>
-<div class="left">
+<div class="">
 	<div class="box component">
 		<!-- BEGIN subject -->
 		<h2>{WORK_CATEGORYNAME}</h2>
@@ -28,40 +30,46 @@ table.subjectList td {
 			<tbody>
 				<!-- BEGIN work -->
 				<tr class="{ROW_COLOR}">
-					<td>{WORK_DESCRIPTION}</td>
+					<td valign="top">{WORK_DESCRIPTION}</td>
 					<td>{WORK_DUEDATE}</td>
 
 					<!-- BEGIN status_due -->
-					<td>Work due</td>
+					<td valign="top">Work due</td>
 					<!-- END status_due -->
 
 					<!-- BEGIN status_awaiting_review -->
-					<td>Awaiting review</td>
+					<td valign="top">Awaiting review</td>
 					<!-- END status_awaiting_review -->
 
 					<!-- BEGIN status_graded -->
-					<td>Graded</td>
+					<td valign="top">Graded</td>
 					<!-- END status_graded -->
 
-					<td>{WORK_MARK}</td>
+					<td valign="top">{WORK_MARK}</td>
+					
 					<td>
+					
 						<!-- BEGIN download -->
-						<a href="/send.php?id={WORK_FILE_ID}&save=1">Download</a><br />
+						<a href="/send.php?id={WORK_FILE_ID}&save=1" class="btn download float-left"><span></span>Download</a>
 						<!-- END download -->
 
 						<!-- BEGIN action_submit -->
-						<a href="/submission/submitWork/{WORK_BOX_ID}">Submit Work</a><br />
+						<a href="/submission/submitWork/{WORK_BOX_ID}" class="btn create float-left"><span></span>Submit Work</a>
 						<!-- END action_submit -->
 						
 						<!-- BEGIN action_view_submitted -->
-						<a href="/submission/send.php?id={WORK_SUBMIT_FILE_ID}">View Submitted Work</a><br />
+						<a href="/submission/send.php?id={WORK_SUBMIT_FILE_ID}" class="btn float-left"><span></span>View Submitted Work</a>
 						<!-- END action_view_submitted -->
 						
 						<!-- BEGIN action_view_returned -->
-						<a href="/submission/send.php?id={WORK_RETURN_FILE_ID}&return=1">View Returned Work</a>
+						<a href="/submission/send.php?id={WORK_RETURN_FILE_ID}&return=1" class="btn float-left"><span></span>View Returned Work</a>
 						<!-- END action_view_returned -->
+						<div class="float-fix"></div>
+						
 					</td>
+					
 				</tr>
+
 				<!-- END work -->
 			</tbody>
 		</table>
@@ -84,7 +92,7 @@ table.subjectList td {
 				</thead>
 				<tbody>
 					<!-- BEGIN attempt -->
-					<tr class="{DARK}">
+					<tr>
 						<td>{ASSESS_CATEGORY}</td>
 						<td>{ASSESS_TITLE}</td>
 						<td>{ASSESS_FINISH}</td>
