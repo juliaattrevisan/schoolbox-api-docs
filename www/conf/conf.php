@@ -194,4 +194,12 @@ define('HOMEPAGE_colors', serialize(array(
 define('HELPDESK_enable', true);
 define('HELPDESK_location', '/var/www/helpdesk');
 define('HELPDESK_db', 'helpdesk');
+
+// Due Work
+define('UPCOMING_WORK_TYPE', 1);
+define('RETURNED_WORK_TYPE', 2);
+
+// Due Work: Recent work. The number per type; so the total number of rows will
+// be 2 * recent_work_limit
+define('RECENT_WORK_LIMIT', 3);
 ?>

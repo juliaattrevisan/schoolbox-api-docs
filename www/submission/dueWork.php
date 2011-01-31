@@ -7,45 +7,44 @@ require_once SITE_root . '/library/group.php';
 require_once SITE_root . '/library/user.php';
 require_once SITE_root . '/library/synergetic-class.php';
 
+/**
+ * Order by date descending.
+ *
+ * @param <type> $a
+ * @param <type> $b
+ * @return <type>
+ */
+function cmp($a, $b) {
+	if ($a['date'] == $b['date']) {
+		return 0;
+	}
+	else if ($a['date'] < $b['date']) {
+		return 1;
+	}
+
+	return -1;
+}
+
 $this->setFile(TEMPLATE_content, 'submission/dueWork.html');
 $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'week', 'week_block');
 $this->setBlock('week', 'day', 'day_block');
 $this->setBlock('day', 'event', 'event_block');
 
-$this->setBlock(TEMPLATE_content, 'has_due', 'has_due_block');
-$this->setBlock('has_due', 'due', 'due_block');
-$this->setBlock('due', 'download', 'download_block');
-
-$this->setBlock(TEMPLATE_content, 'has_return', 'has_return_block');
-$this->setBlock('has_return', 'return', 'return_block');
-$this->setBlock('return', 'download_rt', 'download_rt_block');
-
 $this->setBlock(TEMPLATE_content, 'summary', 'summary_block');
 $this->setBlock('summary', 'summary_due', 'summary_due_block');
 
 $this->setBlock(TEMPLATE_content, 'activity', 'activity_block');
-
 $this->setBlock(TEMPLATE_content, 'is_parent', 'is_parent_block');
 
-$this->setVar('has_due_block', '');
-$this->setVar('has_return_block', '');
 $this->setVar('summary_block', '');
 $this->setVar('activity_block', '');
 $this->setVar('is_parent_block', '');
 
-
-
 $groupHandler = new Group;
-
 $userHandler = new User;
-
 $returnHandler = new SubmissionReturn;
-
 $submissionHandler = new Submission;
-
-
-
 
 /* ideally session children would use the id as the array key as this is ridiculous */
 $childList = array();
@@ -75,15 +74,10 @@ $user = $userHandler->getByID($userID);
 if (!isset($user['uid']))
 	error(2);
 
-
 if (is_array($_SESSION['children'])) {
-
 	$this->dropDown('child', $_SESSION['children'], $user['uid'], 'is_parent', array('id' => 'CHILD_ID', 'name' => 'CHILD_NAME'));
-
 	$this->parse('is_parent_block', 'is_parent');
 }
-
-
 
 // get category list
 $subjectList = false;
@@ -111,7 +105,6 @@ if (isset($this->arg[0]))
 if ($selectedDate <= 0)
 	$selectedDate = time();
 
-
 // output general data
 $output = array('CURRENT_DATE'	=> outputDate('F Y', $selectedDate),
 				'NOT_TODAY'		=> date('dmY', $selectedDate) != date('dmY') ? 'not-today' : '',
@@ -121,10 +114,8 @@ $output = array('CURRENT_DATE'	=> outputDate('F Y', $selectedDate),
 				'SELECTED_DATE'	=> outputDate('Y-m-d', $selectedDate),
                 'USER_ID'       => $this->arg[1],
 				);
+
 $this->setVar($output);
-
-
-
 
 $selectedMonth 	= date("n", $selectedDate);
 $selectedYear 	= date("Y", $selectedDate);
@@ -137,8 +128,6 @@ $totalDays 		= $numWeeksMonth * 7 + (6 - $firstDay);
 
 $startDay = mktime(12, 0, 0, $selectedMonth, 1, $selectedYear) - strtotime("+$firstDay day", 0);
 
-
-
 // output calendar
 $summary = array();
 for ($i = 0; $i < $totalDays; $i++) {
@@ -149,7 +138,6 @@ for ($i = 0; $i < $totalDays; $i++) {
 
 	if($i >= $firstDay && $i < $numDaysinMonth+$firstDay)
 		$this->setVar('OTHER_MONTH', '');
-
 
 	$output = array('DATE'		=> date("j", $currentDay),
 					'PAST'		=> $i >= $firstDay && $i < $numDaysinMonth+$firstDay ? '' : 'past',
@@ -193,69 +181,102 @@ for ($i = 0; $i < $totalDays; $i++) {
 		$this->parse('week_block', 'week', true);
 		$this->setVar('day_block', '');
 	}
-
 }
 
+/** UPCOMING WORK **/
+
+/* Upcoming and Returned work segments are now combined. Returned from the
+ * submissionHandler as key/value pair. Limits are in the context of "limits
+ * per work type (either upcoming or returned)"
+ */
+$allUpcomingWork = $submissionHandler->getRecentWork($categoryIDList, UPCOMING_WORK_TYPE);
+$allReturnedWork = $submissionHandler->getRecentWork($categoryIDList, RETURNED_WORK_TYPE);
+
+/* Try to get the $limit. If it can't get even amounts of one type, try to fill
+ * it out with remainders from the other type, balancing the numbers.
+ */
+$x = count($allUpcomingWork);
+$y = count($allReturnedWork);
+
+if ($x < RECENT_WORK_LIMIT) {
+	$upcomingWorkLimit = $x;
+	$returnedWorkLimit = 2*RECENT_WORK_LIMIT - $upcomingWorkLimit;
+}
+else if ($y < RECENT_WORK_LIMIT) {
+	$returnedWorkLimit = $y;
+	$upcomingWorkLimit = 2*RECENT_WORK_LIMIT - $returnedWorkLimit;
+}
+else {
+	$upcomingWorkLimit = RECENT_WORK_LIMIT;
+	$returnedWorkLimit = RECENT_WORK_LIMIT;
+}
+
+/* Use PHP to sort the data before output.
+ */
+for ($i=0; $i < $upcomingWorkLimit; $i++) {
+	$allWork[] = $allUpcomingWork[$i];
+}
+
+for ($i=0; $i < $returnedWorkLimit; $i++) {
+	$allWork[] = $allReturnedWork[$i];
+}
+
+usort($allWork, 'cmp');
+
+$this->setBlock(TEMPLATE_content, 'work', 'work_block');
+$this->setBlock('work', 'action_submit', 'action_submit_block');
+$this->setBlock('work', 'action_view_history', 'action_view_history_block');
+
+/* Alternating row color index
+ */
 $j = 0;
-// upcoming due work
-$workList = $submissionHandler->getUpcoming($user['uid'], $categoryIDList);
 
-if (is_array($workList)) {
-	foreach ($workList as $work) {
-		/* display date as time if today */
-		$left = $work['date'] - time();
-		$date = $left < 86400 && $left > 0 ? '<strong>' . outputDate('g:i a', $work['date']) . '</strong>' : outputDate(DATE_short_no_time, $work['date']);
+foreach($allWork as $currentWork) {
+	$this->setVar(array(
+		'WORK_SUBJECT' => $currentWork['categoryName'],
+		'WORK_DESCRIPTION' => $currentWork['description'],
+		'WORK_MARK' => $currentWork['mark'],
+		'WORK_COMMENT' => $currentWork['comment'],
+		'WORK_DATE' => date(DATE_short_format, $currentWork['date']),
+		'WORK_BOX_ID' => $currentWork['bid'],
+		'WORK_FILE_ID' => $currentWork['fid'],
+	));
 
-		$output = array('DUE_SUBJECT'	=> scrubText($work['categoryName']),
-						'DUE_DESC'		=> scrubText($work['description']),
-						'DUE_DATE'		=> $date,
-						'FILE_ID'		=> $work['file_id'],
-						'BOX_ID'		=> $work['id'],
-						'DARK'			=> $j++ % 2 ? '' : 'dark',
-						);
+	/* Available actions
+	 */
+	if ($currentWork['submitted'] != null) {
+		$this->setVar('action_submit_block', '');
 
-		$this->setVar($output);
+		if ($currentWork['returned'] != null) {
+			$this->parse('action_view_history_block', 'action_view_history');
+			$this->setVar('action_submit_block', '');
 
-		/* display file download link */
-		$this->setVar('download_block', '');
-		if ($work['file_id'] > 0)
-			$this->parse('download_block', 'download');
-
-		$this->parse('due_block', 'due', true);
+		}
+		else {
+			$this->setVar('action_view_history_block', '');
+			$this->parse('action_submit_block', 'action_submit_block');
+		}
+	}
+	else {
+		$this->parse('action_submit_block', 'action_submit');
+		$this->setVar('action_view_history_block', '');
 	}
 
-	$this->parse('has_due_block', 'has_due');
+	/* Alternating row color
+	 */
+	$this->setVar(array(
+		'ROW_COLOR' => !($j%2) ? 'dark' : ''
+	));
+
+	$this->parse('work_block', 'work', true);
+
+	$this->setVar('action_submit_block', '');
+	$this->setVar('action_view_history_block', '');
+
+	$j++;
 }
 
-$j = 0;
-// returned work
-$returnList = $returnHandler->getByUser($user['uid'], false, 10);
-if (is_array($returnList)) {
-	foreach ($returnList as $return) {
 
-		$output = array('RETURN_SUBJECT'	=> scrubText($return['categoryName']),
-						'RETURN_DESC'		=> scrubText($return['description']),
-						'RETURN_MARK'		=> scrubText($return['mark']),
-						'RETURN_COMMENT'	=> scrubText($return['comment']),
-						'RETURN_FILE_ID'	=> $return['id'],
-						'RETURN_BOX_ID'		=> $return['box_id'],
-						'DARK'				=> $j++ % 2 ? '' : 'dark',
-						);
-
-		$this->setVar($output);
-
-		/* display file download link */
-		$this->setVar('download_rt_block', '');
-        $file = RETURNS_directory . '/' . $return['id']. '.dat';
-		if (is_readable($file))
-			$this->parse('download_rt_block', 'download_rt');
-
-
-		$this->parse('return_block', 'return', true);
-	}
-
-	$this->parse('has_return_block', 'has_return');
-}
 
 $j = 0;
 

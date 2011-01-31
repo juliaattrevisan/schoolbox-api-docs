@@ -16,9 +16,6 @@ $this->setBlock('work', 'download', 'download_block');
 $this->setBlock('work', 'status_due', 'status_due_block');
 $this->setBlock('work', 'status_awaiting_review', 'status_awaiting_review_block');
 $this->setBlock('work', 'status_graded', 'status_graded_block');
-$this->setBlock('work', 'action_submit', 'action_submit_block');
-$this->setBlock('work', 'action_view_submitted', 'action_view_submitted_block');
-$this->setBlock('work', 'action_view_returned', 'action_view_returned_block');
 
 $userHandler = new User;
 $groupHandler = new Group;
@@ -116,43 +113,22 @@ if (is_array($allWork)) {
 			'WORK_RETURN_FILE_ID' => $currentWork['rid'],
 		));
 
-		/* Is there an assignment sheet that can be downloaded?
-		 */
-		if (is_numeric($currentWork['fid'])) {
-			$this->parse('download_block', 'download');
-		}
-		else {
-			$this->setVar('download_block', '');
-		}
-
 		if ($currentWork['submitted'] != null) {
-			if ($currentWork['returned'] == null) {
-				$this->setVar('status_due_block', '');
-				$this->parse('status_awaiting_review_block', 'status_awaiting_review');
-				$this->setVar('status_graded_block', '');
-
-				$this->setVar('action_submit_block', '');
-				$this->parse('action_view_submitted_block', 'action_view_submitted');
-				$this->setVar('action_view_returned_block', '');
-			}
-			else {
+			if ($currentWork['returned'] != null) {
 				$this->setVar('status_due_block', '');
 				$this->setVar('status_awaiting_review_block', '');
 				$this->parse('status_graded_block', 'status_graded');
-
-				$this->setVar('action_submit_block', '');
-				$this->parse('action_view_submitted_block', 'action_view_submitted');
-				$this->parse('action_view_returned_block', 'action_view_returned');
+			}
+			else {
+				$this->setVar('status_due_block', '');
+				$this->parse('status_awaiting_review_block', 'status_awaiting_review');
+				$this->setVar('status_graded_block', '');
 			}
 		}
 		else {
 			$this->parse('status_due_block', 'status_due');
 			$this->setVar('status_awaiting_review_block', '');
 			$this->setVar('status_graded_block', '');
-
-			$this->parse('action_submit_block', 'action_submit');
-			$this->setVar('action_view_submitted_block', '');
-			$this->setVar('action_view_returned_block', '');
 		}
 
 		/* Alternating row color
@@ -166,10 +142,6 @@ if (is_array($allWork)) {
 		$this->setVar('status_due_block', '');
 		$this->setVar('status_awaiting_review_block', '');
 		$this->setVar('status_graded_block', '');
-
-		$this->setVar('action_submit_block', '');
-		$this->setVar('action_view_submitted_block', '');
-		$this->setVar('action_view_returned_block', '');
 
 		$first = false;
 		$j++;

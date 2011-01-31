@@ -18,23 +18,32 @@ $j(function () {
 	});
 });
 </script>
+<style type="text/css">
+table.onlineAssessments td {
+    vertical-align: top;
+}
+
+p.unmarkedResponses {
+   margin-top: 8px;
+}
+</style>
 <!-- END custom_head -->
 
 <script>
 	/* calendar bubble */
 $j(function() {
 	$j('.close').live("click", function() {
-		
+
 		$j('.cal-bubble').remove();
-		
+
 	});
-	
-	
+
+
 	$j('.calendarTable ul li span').live("click", function(){
 		$j('.cal-bubble').remove();
-		
+
 		var position = $j(this).parent().offset();
-		
+
 		var node = $j(this).closest('li'), ev = node.attr("id").substring(6);
 
 		$j.post('/ajax/submission.php', { id : ev }, function(data){
@@ -64,37 +73,37 @@ $j(function() {
 					</div>';
 
 			$j('body').append(winStr);
-			
+
 			movePopup(position);
-			
+
 		}, "json");
 
-		
-		
+
+
 		return false;
-		
-		
-		
+
+
+
 	});
-	
+
 	function movePopup(location) {
-	
-	
-		var annoyingHeight = ($j('duework-popup.cal-bubble .middle').height() + ($j('duework-popup.cal-bubble .top').height()) + ($j('duework-popup.cal-bubble .bottom').height())) 			
-		
+
+
+		var annoyingHeight = ($j('duework-popup.cal-bubble .middle').height() + ($j('duework-popup.cal-bubble .top').height()) + ($j('duework-popup.cal-bubble .bottom').height()))
+
 		$j('.duework-popup.cal-bubble').css("left", (location.left - 300));
-		
-		$j('.duework-popup.cal-bubble').css("top", (location.top - annoyingHeight - 130));	
-							
+
+		$j('.duework-popup.cal-bubble').css("top", (location.top - annoyingHeight - 130));
+
 		if (($j('.duework-popup.cal-bubble').css("left")) < '0px') {
 			$j('.duework-popup.cal-bubble').css("left", '0');
 		}
-		
+
 		closeBubble();
 
 	}
-	
-	
+
+
 });
 
 
@@ -155,199 +164,150 @@ $j(document).ready(function() {
 
 <h1>My Work</h1>
 <div class="left">
-  <center>
-  <div id="calendar">
+	<div id="calendar">
 
-  <table class="month-view duedates-calendar calendarTable">
-      <thead>
-	  	<td class="cal-left" colspan="3">
-		<a class="back" href="/submission/dueWork/{PREV_MONTH}/{USER_ID}" title="Back one month"><strong>&lt;&lt;</strong></a>
-		<div class="current-date">{CURRENT_DATE}</div>
-		<a class="forward" href="/submission/dueWork/{NEXT_MONTH}/{USER_ID}" title="Forward one month"><strong>&gt;&gt;</strong></a>
-		</td>
-		<td></td>
-		<td colspan="3">
-			<select name="subject" id="subjectFilter">
-				<option value="">Show All</option>
-				<!-- BEGIN subject -->
-				<option value="{SUBJECT_ID}">{SUBJECT_NAME}</option>
-				<!-- END subject -->
-			</select>
+	<table class="month-view duedates-calendar calendarTable">
+		<thead>
+			<td class="cal-left" colspan="3">
+				<a class="back" href="/submission/dueWork/{PREV_MONTH}/{USER_ID}" title="Back one month"><strong>&lt;&lt;</strong></a>
+				<div class="current-date">{CURRENT_DATE}</div>
+				<a class="forward" href="/submission/dueWork/{NEXT_MONTH}/{USER_ID}" title="Forward one month"><strong>&gt;&gt;</strong></a>
+			</td>
+			<td></td>
+			<td colspan="3">
+				<select name="subject" id="subjectFilter">
+					<option value="">Show All</option>
+					<!-- BEGIN subject -->
+					<option value="{SUBJECT_ID}">{SUBJECT_NAME}</option>
+					<!-- END subject -->
+				</select>
 
-			<!-- BEGIN is_parent -->
-			<select name="child" id="childSelect">
-				<!-- BEGIN child -->
-				<option value="{CHILD_ID}" {CHILD_ID_SELECTED}>{CHILD_NAME}</option>
-				<!-- END child -->
-			</select>
-			<!-- END is_parent -->
-		</td>
-	</thead>
-	<tbody>
-     <tr>
-      <th width="14%" class="dark">Sun</th>
-      <th width="14%" class="dark">Mon</th>
-      <th width="14%" class="dark">Tue</th>
-      <th width="14%" class="dark">Wed</th>
-      <th width="14%" class="dark">Thu</th>
-      <th width="14%" class="dark">Fri</th>
-      <th width="14%" class="dark">Sat</th>
-    </tr>
+				<!-- BEGIN is_parent -->
+				<select name="child" id="childSelect">
+					<!-- BEGIN child -->
+					<option value="{CHILD_ID}" {CHILD_ID_SELECTED}>{CHILD_NAME}</option>
+					<!-- END child -->
+				</select>
+				<!-- END is_parent -->
+			</td>
+		</thead>
+		<tbody>
+			<tr>
+				<th width="14%" class="dark">Sun</th>
+				<th width="14%" class="dark">Mon</th>
+				<th width="14%" class="dark">Tue</th>
+				<th width="14%" class="dark">Wed</th>
+				<th width="14%" class="dark">Thu</th>
+				<th width="14%" class="dark">Fri</th>
+				<th width="14%" class="dark">Sat</th>
+			</tr>
+			<!-- BEGIN week -->
+			<tr>
+				<!-- BEGIN day -->
+				<td class="{PAST} {TODAY} {ACTIVE} {RIGHTY}">
+					<div class="dayWrap"><p>{DATE}</p></div>
+					<ul>
+						<!-- BEGIN event -->
+						<li id="event-{EVENT_ID}" class="event category-{EVENT_CAT_ID}">
+							<span class="wrapper">
+							<strong>{TIME}</strong> {EVENT}</span>
+						</li>
+						<!-- END event -->
+					</ul>
+				</td>
+				<!-- END day -->
+			</tr>
+			<!-- END week -->
+		</tbody>
+	  </table>
+	</div>
 
+	<div class="box component">
+	<h2>Recent Work Activity <a href="/submission/allDueWork">View all work</a></h2>
+		<div class="text listing">
+			<table class="due-dates">
+				<thead>
+					<tr>
+						<th width="20%">Date</th>
+						<th width="20%">Subject</th>
+						<th width="18%">Description</th>
+						<th width="15%">Mark</th>
+						<th width="15%">Download</th>
+						<th width="12%">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<!-- BEGIN work -->
+					<tr class="{ROW_COLOR}">
+						<td>{WORK_DATE}</td>
+						<td>{WORK_SUBJECT}</td>
+						<td>{WORK_DESCRIPTION}</td>
+						<td>{WORK_MARK}</td>
+						<td>
+							<!-- BEGIN download -->
+							<a href="/send.php?id={WORK_FILE_ID}&save=1">Download</a>
+							<!-- END download -->
+						</td>
+						<td>
+							<!-- BEGIN action_submit -->
+							<a href="/submission/submitWork/{WORK_BOX_ID}">Submit Work</a>
+							<!-- END action_submit -->
 
-     <!-- BEGIN week -->
-      <tr>
-        <!-- BEGIN day -->
-          <td class="{PAST} {TODAY} {ACTIVE} {RIGHTY}">
-            <div class="dayWrap"><p>{DATE}</p></div>
-            <ul>
-              <!-- BEGIN event -->
-              <li id="event-{EVENT_ID}" class="event category-{EVENT_CAT_ID}">
-			  <span class="wrapper">
-					<strong>{TIME}</strong> {EVENT}</span>
-			  </li>
-              <!-- END event -->
-            </ul>
-          </td>
-          <!-- END day -->
-      </tr>
-    <!-- END week -->
-    </tbody>
-  </table>
-</div>
-</center>
+							<!-- BEGIN action_view_history -->
+							<a href="/">View History</a>
+							<!-- END action_view_history -->
+						</td>
+					</tr>
+					<!-- END work -->
+				</tbody>
+			</table>
+		</div>
+	</div>
 
-<div class="box component">
-	<a href="/submission/allDueWork">View all work</a>
-</div>
-
-<!-- BEGIN has_due -->
-<div class="box component">
-<h2>Upcoming Due Work</h2>
-<div class="text listing">
-  <table class="due-dates">
-    <thead>
-      <tr>
-        <th width="20%">Subject</th>
-        <th width="20%">Item</th>
-        <th width="20%">Due Date</th>
-        <th width="20%">&nbsp;</th>
-        <th width="20%">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- BEGIN due -->
-      <tr class="{DARK}">
-        <td>{DUE_SUBJECT}</td>
-        <td>{DUE_DESC}</td>
-        <td>{DUE_DATE}</td>
-        <td>&nbsp;</td>
-        <td>
-        <!-- BEGIN download -->
-        <a href="/send.php?id={FILE_ID}&save=1">Download</a> /
-        <!-- END download -->
-		<!-- BEGIN submit -->
-        <a href="/submission/submitWork/{BOX_ID}">Submit</a></td>
-		<!-- END submit -->
-      </tr>
-
-      <!-- END due -->
-    </tbody>
-  </table>
-  </div>
-</div>
-<!-- END has_due -->
-
-<!-- BEGIN allAssess -->
-<div class="box component">
-<h2>Online Assessments</h2>
-    <div class="text listing">
-        <table class="due-dates onlineAssessments">
-            <thead>
-                <tr>
-                    <th width="20%">Subject</th>
-                    <th width="20%">Description</th>
-                    <th width="20%">Finish Date</th>
-                    <th width="20%">Mark</th>
-                    <th width="20%">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- BEGIN attempt -->
-                <tr class="{DARK}">
-                    <td>{ASSESS_CATEGORY}</td>
-                    <td>{ASSESS_TITLE}</td>
-                    <td>{ASSESS_FINISH}</td>
-                    <td>
-                        {ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS} ({ATTEMPT_PERCENTAGE}%)
-                        <!-- BEGIN unmarked -->
-                        <p class="unmarkedResponses">
-                            <strong>Unconfirmed mark.</strong><br />
-                            {ATTEMPT_UNMARKED_RESPONSES} questions not yet marked
-                        </p>
-                        <!-- END unmarked -->
-                    </td>
-                    <td>
-                        <!-- BEGIN viewMarks -->
-                        <a href="/assess/studentReview/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">View Results</a>
-                        <!-- END viewMarks -->
-                        <!-- BEGIN takeTest -->
-                        <a href="/assess/intro/{ASSESS_ASSESS_ID}">Take Test</a>
-                        <!-- END takeTest -->
-                    </td>
-                </tr>
-                <!-- END attempt -->
-            </tbody>
-        </table>
-    </div>
-</div>
-<!-- END allAssess -->
-
-
-<!-- BEGIN has_return -->
-<div class="box component">
-<h2>Returned Work</h2>
-	<div class="text listing">
-  <table class="due-dates">
-    <thead>
-      <tr>
-        <th width="20%">Subject</th>
-        <th width="20%">Description</th>
-        <th width="20%">Mark</th>
-        <th width="20%">Comment</th>
-        <th width="20%">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- BEGIN return -->
-      <tr class="{DARK}">
-        <td>{RETURN_SUBJECT}</td>
-        <td>{RETURN_DESC}</td>
-        <td>{RETURN_MARK}</td>
-        <td>{RETURN_COMMENT}</td>
-        <td>
-        <!-- BEGIN download_rt -->
-        <a href="/submission/send.php?id={RETURN_FILE_ID}&return=1">Download</a>
-        <!-- END download_rt -->
-        </td>
-      </tr>
-      <!-- END return -->
-    </tbody>
-  </table>
-  </div>
-</div>
-<!-- END has_return -->
-
-<style type="text/css">
-table.onlineAssessments td {
-    vertical-align: top;
-}
-
-p.unmarkedResponses {
-   margin-top: 8px;
-}
-</style>
-
+	<!-- BEGIN allAssess -->
+	<div class="box component">
+	<h2>Online Assessments</h2>
+		<div class="text listing">
+			<table class="due-dates onlineAssessments">
+				<thead>
+					<tr>
+						<th width="20%">Subject</th>
+						<th width="20%">Description</th>
+						<th width="20%">Finish Date</th>
+						<th width="20%">Mark</th>
+						<th width="20%">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<!-- BEGIN attempt -->
+					<tr class="{DARK}">
+						<td>{ASSESS_CATEGORY}</td>
+						<td>{ASSESS_TITLE}</td>
+						<td>{ASSESS_FINISH}</td>
+						<td>
+							{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS} ({ATTEMPT_PERCENTAGE}%)
+							<!-- BEGIN unmarked -->
+							<p class="unmarkedResponses">
+								<strong>Unconfirmed mark.</strong><br />
+								{ATTEMPT_UNMARKED_RESPONSES} questions not yet marked
+							</p>
+							<!-- END unmarked -->
+						</td>
+						<td>
+							<!-- BEGIN viewMarks -->
+							<a href="/assess/studentReview/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">View Results</a>
+							<!-- END viewMarks -->
+							<!-- BEGIN takeTest -->
+							<a href="/assess/intro/{ASSESS_ASSESS_ID}">Take Test</a>
+							<!-- END takeTest -->
+						</td>
+					</tr>
+					<!-- END attempt -->
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<!-- END allAssess -->
 </div>
 <div class="right">
   <div class="box component">

@@ -7,8 +7,6 @@ table.subjectList th,
 table.subjectList td {
 	width: 20%;
 }
-
-
 </style>
 <!-- END custom_head -->
 
@@ -47,27 +45,7 @@ table.subjectList td {
 
 					<td valign="top">{WORK_MARK}</td>
 					
-					<td>
-					
-						<!-- BEGIN download -->
-						<a href="/send.php?id={WORK_FILE_ID}&save=1" class="btn download float-left"><span></span>Download</a>
-						<!-- END download -->
-
-						<!-- BEGIN action_submit -->
-						<a href="/submission/submitWork/{WORK_BOX_ID}" class="btn create float-left"><span></span>Submit Work</a>
-						<!-- END action_submit -->
-						
-						<!-- BEGIN action_view_submitted -->
-						<a href="/submission/send.php?id={WORK_SUBMIT_FILE_ID}" class="btn float-left"><span></span>View Submitted Work</a>
-						<!-- END action_view_submitted -->
-						
-						<!-- BEGIN action_view_returned -->
-						<a href="/submission/send.php?id={WORK_RETURN_FILE_ID}&return=1" class="btn float-left"><span></span>View Returned Work</a>
-						<!-- END action_view_returned -->
-						<div class="float-fix"></div>
-						
-					</td>
-					
+					<td><a href="/submission/submissionHistory/{WORK_BOX_ID}" class="btn download float-left"><span></span>View History</a></td>
 				</tr>
 
 				<!-- END work -->

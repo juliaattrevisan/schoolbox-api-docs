@@ -1,0 +1,61 @@
+<!-- BEGIN custom_head -->
+<style type="text/css">
+table.subjectList {
+	width: 100%;
+}
+table.subjectList th,
+table.subjectList td {
+	width: 20%;
+}
+</style>
+<!-- END custom_head -->
+
+<h1>{WORK_CATEGORYNAME}</h1>
+<h2>Submission History for {WORK_DESCRIPTION}</h2>
+
+<!-- BEGIN download -->
+<a href="/send.php?id={WORK_FILE_ID}&save=1" class="btn download float-left">Download</a>
+<!-- END download -->
+
+<!-- BEGIN action_submit -->
+<a href="/submission/submitWork/{WORK_BOX_ID}" class="btn download float-left">Submit Work</a>
+<!-- END action_submit -->
+
+<div class="float-fix"></div>
+
+<div>
+	<div class="box component">
+		<!-- BEGIN subject -->
+		<table class="subjectList">
+			<thead>
+				<tr>
+					<th>Date</th>
+					<th>Mark</th>
+					<th>Comment</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- BEGIN work -->
+				<tr class="{ROW_COLOR}">
+					<td>{WORK_DATE}</td>
+					<td>{WORK_COMMENT}</td>
+					<td>{WORK_MARK}</td>
+					<td>
+						<!-- BEGIN action_view_submitted -->
+						<a href="/submission/send.php?id={WORK_SUBMIT_FILE_ID}" class="btn download float-left">View Submitted Work</a><br />
+						<!-- END action_view_submitted -->
+						
+						<!-- BEGIN action_view_returned -->
+						<a href="/submission/send.php?id={WORK_RETURN_FILE_ID}&return=1" class="btn download float-left">View Returned Work</a>
+						<!-- END action_view_returned -->
+					</td>
+				</tr>
+				<!-- END work -->
+			</tbody>
+		</table>
+		<!-- END subject -->
+	</div>
+</div>
+
+<div class="float-fix"></div>

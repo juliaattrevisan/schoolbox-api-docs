@@ -155,16 +155,34 @@ class Submission extends Model {
 		return $this->db->getAll($query);
 	}
 
-	function getRecentWork($categoryIDList, $limit = false) {
+	/**
+	 * The most recent activity regarding work submissions and returns.
+	 * 
+	 * @param <type> $categoryIDList
+	 * @param <type> $limit
+	 * @return <type>
+	 */
+	function getRecentWork($categoryIDList, $type) {
 		$query = "SELECT
 			b.id AS bid,
 			s.id AS sid,
 			r.id AS rid,
-			f.id AS fid,
-			UNIX_TIMESTAMP(b.date) AS dueDate,
+			f.id AS fid,";
+
+		if ($type == UPCOMING_WORK_TYPE) {
+			$query .= ' UNIX_TIMESTAMP(b.date) AS date, ';
+			$orderBy = 'UNIX_TIMESTAMP(b.date)';
+		}
+		else if ($type == RETURNED_WORK_TYPE) {
+			$query .= ' UNIX_TIMESTAMP(r.returned) AS date, ';
+			$orderBy = 'UNIX_TIMESTAMP(r.returned)';
+		}
+
+		$query .= "
 			c.name AS categoryName,
 			b.description,
 			b.created, s.submitted, r.returned,
+			r.comment,
 			r.mark
 			FROM submission_box b
 			LEFT JOIN category c ON c.id = b.category
@@ -174,29 +192,67 @@ class Submission extends Model {
 			WHERE b.deleted = 0
 			AND (s.owner = '$_SESSION[id]' OR s.owner IS NULL)
 			AND b.category IN (" . implode(',', $categoryIDList) . ")
-			AND dueDate IS NOT NULL";
+			AND $orderBy IS NOT NULL";
 
 		/* For items that have been submitted but not returned
 		 */
-		$upcomingQuery = $query;
-		$upcomingQuery .= " AND s.submitted IS NULL
-							AND r.returned IS NULL
-							ORDER BY dueDate DESC";
-
-		$returnedQuery = $query;
-		$returnedQuery .= " AND s.submitted IS NOT NULL
-							AND r.returned IS NOT NULL
-							ORDER BY r.returned DESC";
-
-		if (is_numeric($limit)) {
-			$upcomingQuery .= " LIMIT $limit";
-			$returnedQuery .= " LIMIT $limit";
+		if ($type == UPCOMING_WORK_TYPE) {
+			$query .= " AND s.submitted IS NULL
+						AND r.returned IS NULL
+						ORDER BY $orderBy DESC";
+		}
+		else if ($type == RETURNED_WORK_TYPE) {
+			$query .= " AND s.submitted IS NOT NULL
+						AND r.returned IS NOT NULL
+						ORDER BY $orderBy DESC";
 		}
 
-		return array(
-			'upcoming' => $this->db->getAll($upcomingQuery),
-			'returned' => $this->db->getAll($returnedQuery),
-		);
+		return $this->db->getAll($query);
+	}
+
+	/**
+	 * Gets all the due/submitted/returned work via Submission Boxes.
+	 * Unions Submissions and Returns, orders by the date they occurred
+	 *
+	 * @param <type> $categoryIDList
+	 * @param <type> $limit
+	 * @return <type>
+	 */
+	function getSubmissionHistory($boxID) {
+		$query = "(SELECT
+			b.id AS bid,
+			s.id AS sid,
+		    NULL AS rid,
+			f.id AS fid,
+			UNIX_TIMESTAMP(s.submitted) AS date,
+			NULL AS comment,
+			NULL AS mark
+			FROM submission_box b
+			LEFT JOIN student_submission s ON s.box_id = b.id
+			LEFT JOIN file f ON b.fid = f.id
+			WHERE b.deleted = 0
+			AND s.owner = '$_SESSION[id]'
+			AND b.id = '$boxID'
+			AND s.submitted IS NOT NULL)
+		UNION (SELECT
+			b.id AS bid,
+			s.id AS sid,
+		    r.id AS rid,
+			f.id AS fid,
+			UNIX_TIMESTAMP(r.returned) AS date,
+			r.comment,
+			r.mark
+			FROM submission_box b
+			LEFT JOIN student_submission s ON s.box_id = b.id
+			LEFT JOIN submission_return r ON r.box_id = b.id
+			LEFT JOIN file f ON b.fid = f.id
+			WHERE b.deleted = 0
+			AND s.owner = '$_SESSION[id]'
+			AND b.id = '$boxID'
+			AND r.returned IS NOT NULL)
+		ORDER BY date DESC";
+
+		return $this->db->getAll($query);
 	}
 
     function getAllForCategory($categoryID, $config = false) {
