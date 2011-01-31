@@ -124,6 +124,80 @@ class Submission extends Model {
 		return $this->db->getAll($query);		
 	}
 
+	/**
+	 * Gets all the due/submitted/returned work via Submission Boxes.
+	 * 
+	 * @param <type> $categoryIDList
+	 * @param <type> $limit
+	 * @return <type>
+	 */
+	function getAllDueWork($categoryIDList) {
+		$query = "SELECT
+			b.id AS bid,
+			s.id AS sid,
+			r.id AS rid,
+			f.id AS fid,
+			UNIX_TIMESTAMP(b.date) AS dueDate,
+			c.name AS categoryName,
+			b.description,
+			b.created, s.submitted, r.returned,
+			r.mark
+			FROM submission_box b
+			LEFT JOIN category c ON c.id = b.category
+			LEFT JOIN student_submission s ON s.box_id = b.id
+			LEFT JOIN submission_return r ON r.box_id = b.id
+			LEFT JOIN file f ON b.fid = f.id
+			WHERE b.deleted = 0
+			AND (s.owner = '$_SESSION[id]' OR s.owner IS NULL)
+			AND b.category IN (" . implode(',', $categoryIDList) . ")
+			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC";
+
+		return $this->db->getAll($query);
+	}
+
+	function getRecentWork($categoryIDList, $limit = false) {
+		$query = "SELECT
+			b.id AS bid,
+			s.id AS sid,
+			r.id AS rid,
+			f.id AS fid,
+			UNIX_TIMESTAMP(b.date) AS dueDate,
+			c.name AS categoryName,
+			b.description,
+			b.created, s.submitted, r.returned,
+			r.mark
+			FROM submission_box b
+			LEFT JOIN category c ON c.id = b.category
+			LEFT JOIN student_submission s ON s.box_id = b.id
+			LEFT JOIN submission_return r ON r.box_id = b.id
+			LEFT JOIN file f ON b.fid = f.id
+			WHERE b.deleted = 0
+			AND (s.owner = '$_SESSION[id]' OR s.owner IS NULL)
+			AND b.category IN (" . implode(',', $categoryIDList) . ")
+			AND dueDate IS NOT NULL";
+
+		/* For items that have been submitted but not returned
+		 */
+		$upcomingQuery = $query;
+		$upcomingQuery .= " AND s.submitted IS NULL
+							AND r.returned IS NULL
+							ORDER BY dueDate DESC";
+
+		$returnedQuery = $query;
+		$returnedQuery .= " AND s.submitted IS NOT NULL
+							AND r.returned IS NOT NULL
+							ORDER BY r.returned DESC";
+
+		if (is_numeric($limit)) {
+			$upcomingQuery .= " LIMIT $limit";
+			$returnedQuery .= " LIMIT $limit";
+		}
+
+		return array(
+			'upcoming' => $this->db->getAll($upcomingQuery),
+			'returned' => $this->db->getAll($returnedQuery),
+		);
+	}
 
     function getAllForCategory($categoryID, $config = false) {
             $query = "SELECT sb.id, sb.category, ft.name as typeName, sb.owner,

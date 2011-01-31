@@ -229,7 +229,7 @@ if (is_array($workList)) {
 
 $j = 0;
 // returned work
-$returnList = $returnHandler->getByUser($user['uid']);
+$returnList = $returnHandler->getByUser($user['uid'], false, 10);
 if (is_array($returnList)) {
 	foreach ($returnList as $return) {
 
@@ -410,7 +410,7 @@ foreach($categoryList as $key => $value) {
 
 /* Make a list of assessments
  */
-$allAssessments = $assessHandler->getList($categoryIDList);
+$allAssessments = $assessHandler->getList($categoryIDList, 10);
 
 if ($allAssessments) {
     foreach($allAssessments as $currentAssessment) {

@@ -23,14 +23,52 @@ class SubmissionReturn extends Model {
 		return $this->db->getRow($query);
 	}
 
-	function getByUser($user_id, $box_id = 0) {
+	function getByUser($user_id, $box_id = 0, $limit = false) {
 		$query = "SELECT r.*, c.name categoryName, s.description, s.fid FROM ( `".$this->_table."` r, submission_box s, category c )
 				  WHERE r.deleted = 0 AND r.box_id = s.id AND s.category = c.id AND r.owner = $user_id";
 	
-		if($box_id)
-				$query .= " AND r.box_id = $box_id";
+		if ($box_id) {
+			$query .= " AND r.box_id = $box_id";
+		}
 
 		$query .= " ORDER BY returned DESC";
+
+		if (is_numeric($limit)) {
+			$query .= " LIMIT $limit";
+		}
+
+		return $this->db->getAll($query);
+	}
+
+	/**
+	 * Gets all returned work
+	 *
+	 * @param <type> $user_id
+	 * @param <type> $box_id
+	 * @param <type> $limit
+	 * @return <type>
+	 */
+	function getAllByUser($user_id, $box_id = 0, $limit = false) {
+		$query = "	SELECT
+					r.*,
+					c.name categoryName,
+					s.description, s.fid
+					FROM ( `".$this->_table."` r, submission_box s, category c)
+					WHERE r.deleted = 0
+					AND r.box_id = s.id
+					AND s.category = c.id
+					AND r.owner = $user_id";
+
+		if ($box_id) {
+			$query .= " AND r.box_id = $box_id";
+		}
+
+		$query .= " ORDER BY returned DESC";
+
+		if (is_numeric($limit)) {
+			$query .= " LIMIT $limit";
+		}
+
 		return $this->db->getAll($query);
 	}
 

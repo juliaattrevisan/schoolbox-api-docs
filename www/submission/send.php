@@ -43,8 +43,12 @@ if(is_numeric($_GET['id']))
 
 		$subBox = $submissionHandler->getByID($studentSub['box_id']);
 
-		if ($subBox['owner'] != $_SESSION['id'])
-            error(44);
+		/* Allow students to view their own submitted work
+		 * Allow submission box owners to view submissions
+		 */
+		if (($studentSub['owner'] != $_SESSION['id']) && ($subBox['owner'] != $_SESSION['id'])) {
+			error(44);
+		}
 
 		$file = SUBMISSION_directory . '/' . $studentSub['id'] . '.dat';
 		$filename = $studentSub['lastname']."-".$studentSub['realname'];

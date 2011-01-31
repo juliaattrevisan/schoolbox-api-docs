@@ -1,0 +1,117 @@
+<!-- BEGIN custom_head -->
+<style type="text/css">
+table.subjectList {
+	width: 100%;
+}
+table.subjectList th,
+table.subjectList td {
+	width: 20%;
+}
+</style>
+<!-- END custom_head -->
+
+<h1>My Work</h1>
+<div class="left">
+	<div class="box component">
+		<!-- BEGIN subject -->
+		<h2>{WORK_CATEGORYNAME}</h2>
+		<table class="subjectList">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Due Date</th>
+					<th>Status</th>
+					<th>Mark</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- BEGIN work -->
+				<tr class="{ROW_COLOR}">
+					<td>{WORK_DESCRIPTION}</td>
+					<td>{WORK_DUEDATE}</td>
+
+					<!-- BEGIN status_due -->
+					<td>Work due</td>
+					<!-- END status_due -->
+
+					<!-- BEGIN status_awaiting_review -->
+					<td>Awaiting review</td>
+					<!-- END status_awaiting_review -->
+
+					<!-- BEGIN status_graded -->
+					<td>Graded</td>
+					<!-- END status_graded -->
+
+					<td>{WORK_MARK}</td>
+					<td>
+						<!-- BEGIN download -->
+						<a href="/send.php?id={WORK_FILE_ID}&save=1">Download</a><br />
+						<!-- END download -->
+
+						<!-- BEGIN action_submit -->
+						<a href="/submission/submitWork/{WORK_BOX_ID}">Submit Work</a><br />
+						<!-- END action_submit -->
+						
+						<!-- BEGIN action_view_submitted -->
+						<a href="/submission/send.php?id={WORK_SUBMIT_FILE_ID}">View Submitted Work</a><br />
+						<!-- END action_view_submitted -->
+						
+						<!-- BEGIN action_view_returned -->
+						<a href="/submission/send.php?id={WORK_RETURN_FILE_ID}&return=1">View Returned Work</a>
+						<!-- END action_view_returned -->
+					</td>
+				</tr>
+				<!-- END work -->
+			</tbody>
+		</table>
+		<!-- END subject -->
+	</div>
+
+	<!-- BEGIN allAssess -->
+	<div class="box component">
+	<h2>Online Assessments</h2>
+		<div class="text listing">
+			<table class="due-dates onlineAssessments">
+				<thead>
+					<tr>
+						<th width="20%">Subject</th>
+						<th width="20%">Description</th>
+						<th width="20%">Finish Date</th>
+						<th width="20%">Mark</th>
+						<th width="20%">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<!-- BEGIN attempt -->
+					<tr class="{DARK}">
+						<td>{ASSESS_CATEGORY}</td>
+						<td>{ASSESS_TITLE}</td>
+						<td>{ASSESS_FINISH}</td>
+						<td>
+							{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS} ({ATTEMPT_PERCENTAGE}%)
+							<!-- BEGIN unmarked -->
+							<p class="unmarkedResponses">
+								<strong>Unconfirmed mark.</strong><br />
+								{ATTEMPT_UNMARKED_RESPONSES} questions not yet marked
+							</p>
+							<!-- END unmarked -->
+						</td>
+						<td>
+							<!-- BEGIN viewMarks -->
+							<a href="/assess/studentReview/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">View Results</a>
+							<!-- END viewMarks -->
+							<!-- BEGIN takeTest -->
+							<a href="/assess/intro/{ASSESS_ASSESS_ID}">Take Test</a>
+							<!-- END takeTest -->
+						</td>
+					</tr>
+					<!-- END attempt -->
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<!-- END allAssess -->
+</div>
+
+<div class="float-fix"></div>
