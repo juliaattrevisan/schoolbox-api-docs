@@ -6,7 +6,7 @@ $this->setBlock($componentHandle, 'audio_list', 'audio_list_block');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 $fileHandler = new File;
 
-$config['filter'] = 'audio';
+$config['filter'] = array('audio/mpeg', 'audio/mpa', 'audio/aac', 'audio/mp4', 'audio/wav', 'audio/wave', 'audio/x-wav');
 
 $fileList = $fileHandler->getAllInCategory($categoryID, $config);
 if (is_array($fileList)) {

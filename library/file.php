@@ -48,24 +48,26 @@ class File extends Model {
 		if (!empty($config['filter']) && $config['filter'][0] != 'all') {
 		
 			$config['filter'] = is_array($config['filter']) ? $config['filter'] : array($config['filter']);
-			
-			$query .= " AND ( 1=2 ";
-			if (in_array('document', $config['filter']))
-				$query .= " OR ( f.mime_type LIKE '%pdf' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%officedoc%' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%' OR f.mime_type LIKE '%document%' OR f.mime_type LIKE '%powerpoint%') ";
-			
-			if (in_array('image', $config['filter']))
-				$query .= " OR ( f.mime_type LIKE '%image%' ) ";
-				
-			if (in_array('audio', $config['filter']))
-				$query .= " OR ( f.mime_type LIKE '%audio%' ) ";	
 
-			if (in_array('video', $config['filter']))
-				$query .= " OR ( f.mime_type LIKE '%video%' OR f.mime_type LIKE '%flash%' OR f.mime_type LIKE '%realmedia%' ) ";	
-			
-			if (in_array('other', $config['filter']))
-				$query .= " OR ( f.mime_type LIKE 'application%' AND f.mime_type NOT LIKE '%pdf' AND f.mime_type NOT LIKE '%msword' AND f.mime_type NOT LIKE '%rtf' AND f.mime_type NOT LIKE 'text%' AND f.mime_type NOT LIKE '%document%' AND f.mime_type NOT LIKE '%powerpoint%') ";
+            $query .= " AND ( 1=2 ";
 
-			$query .= ") ";
+            $filter_sql = array(
+                'document' => " OR ( f.mime_type LIKE '%pdf' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%officedoc%' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%' OR f.mime_type LIKE '%document%' OR f.mime_type LIKE '%powerpoint%') ",
+                'image'    => " OR ( f.mime_type LIKE '%image%' ) ",
+                'audio'    => " OR ( f.mime_type LIKE '%audio%' ) ",
+                'video'    => " OR ( f.mime_type LIKE '%video%' OR f.mime_type LIKE '%flash%' OR f.mime_type LIKE '%realmedia%' ) ",
+                'other'    => " OR ( f.mime_type LIKE 'application%' AND f.mime_type NOT LIKE '%pdf' AND f.mime_type NOT LIKE '%msword' AND f.mime_type NOT LIKE '%rtf' AND f.mime_type NOT LIKE 'text%' AND f.mime_type NOT LIKE '%document%' AND f.mime_type NOT LIKE '%powerpoint%') "
+            );
+
+            foreach($config['filter'] as $filter) {
+                if(key_exists($filter, $filter_sql)) {
+                    $query .= $filter_sql[$filter];
+                } else {
+                    $query .= " OR ( f.mime_type = '$filter ' ) ";
+                }
+            }
+
+			$query .= ") "; 
 		}
 		
 		$sortFields = array('Name' => 'f.description', 'Date' => 'f.submitted');
