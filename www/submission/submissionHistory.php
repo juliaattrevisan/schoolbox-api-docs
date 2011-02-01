@@ -90,6 +90,12 @@ if (count($categoryList) == 0) {
 $submissionBox = $submissionHandler->getByID($this->arg[0]);
 $owner = $userHandler->getByID($submissionBox['owner']);
 
+/* If you aren't in the category, deny access
+ */
+if (!in_array($submissionBox['category'], $categoryIDList)) {
+	error(17);
+}
+
 $this->setVar(array(
 	'BOX_CATEGORYNAME' => $submissionBox['categoryName'],
 	'BOX_DESCRIPTION' => $submissionBox['description'],

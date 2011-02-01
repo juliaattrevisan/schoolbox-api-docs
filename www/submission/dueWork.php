@@ -190,41 +190,39 @@ for ($i = 0; $i < $totalDays; $i++) {
  * per work type (either upcoming or returned)"
  */
 $allUpcomingWork = $submissionHandler->getRecentWork($categoryIDList, UPCOMING_WORK_TYPE);
+$allAwaitingWork = $submissionHandler->getRecentWork($categoryIDList, AWAITING_WORK_TYPE);
 $allReturnedWork = $submissionHandler->getRecentWork($categoryIDList, RETURNED_WORK_TYPE);
 
 /* Try to get the $limit. If it can't get even amounts of one type, try to fill
- * it out with remainders from the other type, balancing the numbers.
+ * it out with remainders from the other type, balancing the numbers. It works
+ * unidirectionally, so balancing occurs between the current type and the next,
+ * rather than looking at the limits of all three and dividing up meaningfully.
  */
-$x = count($allUpcomingWork);
-$y = count($allReturnedWork);
+$max = RECENT_WORK_LIMIT/3;
 
-if ($x < RECENT_WORK_LIMIT) {
-	$upcomingWorkLimit = $x;
-	$returnedWorkLimit = 2*RECENT_WORK_LIMIT - $upcomingWorkLimit;
-}
-else if ($y < RECENT_WORK_LIMIT) {
-	$returnedWorkLimit = $y;
-	$upcomingWorkLimit = 2*RECENT_WORK_LIMIT - $returnedWorkLimit;
-}
-else {
-	$upcomingWorkLimit = RECENT_WORK_LIMIT;
-	$returnedWorkLimit = RECENT_WORK_LIMIT;
-}
+$limit = $max;
+$allWork = array();
 
-/* Use PHP to sort the data before output.
- */
-for ($i=0; $i < $upcomingWorkLimit; $i++) {
-	$allWork[] = $allUpcomingWork[$i];
-}
+foreach(array($allUpcomingWork, $allAwaitingWork, $allReturnedWork) as $current) {
+	for ($i=0; ($i < count($current)) && ($i < $limit); $i++) {
+		$allWork[] = $current[$i];
+	}
 
-for ($i=0; $i < $returnedWorkLimit; $i++) {
-	$allWork[] = $allReturnedWork[$i];
+	/* Recalculate how much can be displayed of the next type, if the current type
+	 * doesn't have enough items
+	 */
+	if ($i < ($limit-1)) {
+		$limit = ($limit - $i) + $max;
+	}
 }
 
 usort($allWork, 'cmp');
 
 $this->setBlock(TEMPLATE_content, 'work', 'work_block');
 $this->setBlock('work', 'action_submit', 'action_submit_block');
+$this->setBlock('work', 'status_due', 'status_due_block');
+$this->setBlock('work', 'status_awaiting_review', 'status_awaiting_review_block');
+$this->setBlock('work', 'status_marked', 'status_marked_block');
 
 /* Alternating row color index
  */
@@ -234,155 +232,47 @@ foreach($allWork as $currentWork) {
 	$this->setVar(array(
 		'WORK_SUBJECT' => $currentWork['categoryName'],
 		'WORK_DESCRIPTION' => $currentWork['description'],
-		'WORK_MARK' => $currentWork['mark'],
-		'WORK_COMMENT' => $currentWork['comment'],
+		'WORK_STATUS' => $status,
 		'WORK_DATE' => date(DATE_short_format, $currentWork['date']),
 		'WORK_BOX_ID' => $currentWork['bid'],
 		'WORK_FILE_ID' => $currentWork['fid'],
-	));
-
-	/* Alternating row color
-	 */
-	$this->setVar(array(
 		'ROW_COLOR' => !($j%2) ? 'dark' : ''
 	));
+
+	/* Determine action link IDs and statuses
+	 */
+	if ($currentWork['submitted'] != '') {
+		if ($currentWork['returned'] != '') {
+			$this->setVar(array(
+				'MARK' => $currentWork['mark']
+			));
+
+			$this->setVar('status_due_block', '');
+			$this->setVar('status_awaiting_review_block', '');
+			$this->parse('status_marked_block', 'status_marked');
+		}
+		else {
+			$this->setVar('status_due_block', '');
+			$this->parse('status_awaiting_review_block', 'status_awaiting_review');
+			$this->setVar('status_marked_block', '');
+		}
+	}
+	else {
+		$this->parse('status_due_block', 'status_due');
+		$this->setVar('status_awaiting_review_block', '');
+		$this->setVar('status_marked_block', '');
+	}
 
 	$this->parse('work_block', 'work', true);
 
 	$this->setVar('action_submit_block', '');
 	$this->setVar('action_view_history_block', '');
-
+	$this->setVar('status_due_block', '');
+	$this->setVar('status_awaiting_review_block', '');
+	$this->setVar('status_marked_block', '');
+	
 	$j++;
 }
-
-
-
-$j = 0;
-
-/* Completed percentages for each subject
- */
-$percentage = array();
-$categoryIDs = array();
-
-// subject summary
-foreach ($categoryList as $category) {
-	$categoryID = $category['id'];
-	/* yes it actually requires THIS MUCH code to get a teachers name. */
-	if (SYNERGY_enable) {
-
-		$synClass = new SynergeticClass;
-
-		$teacherOutput = array();
-		$teacherList = array();
-        $codeList = explode(',',$category['code']);
-		if (is_array($codeList)) {
-			foreach ($codeList as $code) {
-				if(is_array($temp = $synClass->getTeacherName($code)))
-                    $teacherList = array_merge($teacherList, $temp);
-			}
-		}
-
-		if (is_array($teacherList)) {
-			foreach ($teacherList as $teacherSynID) {
-				$teacher = $userHandler->getBySynergy($teacherSynID);
-				$teacherName = formatName($teacher);
-				$emailAddress = formatEmail($teacher);
-				$teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
-			}
-		}
-	}
-
-    /* Count the number of submission boxes for this Subject, and the percentage
-     * of items submitted. If there are no submission boxes, just have 100%
-     */
-    $submissions = $submissionHandler->getSubmissionsForSubject($categoryID);
-    $numBoxes = $submissionHandler->countSubmissionBoxes($categoryID);
-
-    if ($numBoxes) {
-        $thisPercentage = round(100*count($submissions)/$numBoxes);
-    }
-    else {
-        $thisPercentage = 100;
-    }
-
-    /* Accumulate into array for Javascript
-     */
-    $percentage[] = $thisPercentage;
-    $categoryIDs[] = $categoryID;
-
-	$output = array('SUMMARY_CAT_ID'	=> $categoryID,
-					'SUMMARY_CAT_NAME'	=> scrubText($category['name']),
-					'SUMMARY_TOTAL'		=> $summary[$category['id']]['total'],
-					'SUMMARY_DUE'		=> $summary[$category['id']]['due'],
-					'SUMMARY_TEACHER'	=> SYNERGY_enable ? implode(', ', $teacherOutput) : '',
-					'DARK'				=> $j++ % 2 ? 'dark' : '',
-                    'PERCENTAGE_COMPLETED' => $thisPercentage,
-					);
-
-	$this->setVar($output);
-
-	$this->setVar('summary_due_block', '');
-	if ($category['due'] > 0)
-		$this->parse('summary_due_block', 'summary_due');
-
-	$this->parse('summary_block', 'summary', true);
-}
-
-/* Give jquery ProgressBar values to use
- */
-$this->setVar(array(
-    'PERCENTAGE_COMPLETED_ARRAY' => implode(',', $percentage),
-    'CATEGORY_IDS' => implode(',', $categoryIDs)
-));
-
-$j = 0;
-
-// activities feed
-$activityLog = $submissionHandler->getActivityLog($user['uid'], 15, $categoryIDList);
-if (is_array($activityLog)) {
-	foreach ($activityLog as $activity) {
-
-		$taskName = $activity['description'];
-		if ($activity['fid'])
-				$taskName = '<a href="/send.php?id=' . $activity['fid'] . '&save=1">' . $activity['description'] . '</a>';
-
-		$categoryName = '<a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
-
-		if ($activity['new'] == 'new') {
-			$stringDesc = 'New ' . $activity['typeName'] . ' ' . $taskName . ' added for ' . $categoryName;
-		}
-		elseif ($activity['new'] == 'overdue') {
-			$stringDesc = '<strong>' . $taskName . ' for ' . $categoryName . ' is overdue</strong> ';
-		}
-		else if($activity['new'] == 'submitted') {
-			$stringDesc = 'Work submitted to '.$activity['description'] .' for <a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
-		}
-		else if($activity['new'] == 'returned') {
-			if($activity['typeName'])
-				$stringDesc = 'You received '.$activity['typeName'];
-			else if($activity['fid'])
-				$stringDesc = '<a href="/submission/send.php?id='.$activity['fid'].'&return=1">Work returned</a>';
-			else
-				$stringDesc = 'Work returned';
-
-			$stringDesc .= ' for '.$activity['description']. ' in <a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
-		}
-		else {
-			$stringDesc = $categoryName . ' submissions for ' . scrubText($activity['description']) . ' are now closed ';
-		}
-
-		$output = array('ACTIVITY_DESCRIPTION'	=> $stringDesc,
-						'ACTIVITY_DATE'			=> getRelativeTime($activity['activity_date'], 0 , ''),
-						'DARK'					=> $j++ % 2 ? 'dark' : '',
-						);
-		$this->setVar($output);
-		$this->parse('activity_block', 'activity', true);
-	}
-}
-
-// subject drop down
-$this->dropDown('subject', $categoryList, '', TEMPLATE_content, array('id' => 'SUBJECT_ID', 'name' => 'SUBJECT_NAME'));
-
 
 /* Online Assessments
  */
@@ -508,4 +398,132 @@ if ($allAssessments) {
 else {
     $this->setVar('allAssess_block', '');
 }
+
+/* Completed percentages for each subject
+ */
+$percentage = array();
+$categoryIDs = array();
+$j = 0;
+
+// subject summary
+foreach ($categoryList as $category) {
+	$categoryID = $category['id'];
+	/* yes it actually requires THIS MUCH code to get a teachers name. */
+	if (SYNERGY_enable) {
+
+		$synClass = new SynergeticClass;
+
+		$teacherOutput = array();
+		$teacherList = array();
+        $codeList = explode(',',$category['code']);
+		if (is_array($codeList)) {
+			foreach ($codeList as $code) {
+				if(is_array($temp = $synClass->getTeacherName($code)))
+                    $teacherList = array_merge($teacherList, $temp);
+			}
+		}
+
+		if (is_array($teacherList)) {
+			foreach ($teacherList as $teacherSynID) {
+				$teacher = $userHandler->getBySynergy($teacherSynID);
+				$teacherName = formatName($teacher);
+				$emailAddress = formatEmail($teacher);
+				$teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
+			}
+		}
+	}
+
+    /* Count the number of submission boxes for this Subject, and the percentage
+     * of items submitted. If there are no submission boxes, just have 100%
+     */
+    $submissions = $submissionHandler->getSubmissionsForSubject($categoryID);
+    $numBoxes = $submissionHandler->countSubmissionBoxes($categoryID);
+
+    if ($numBoxes) {
+        $thisPercentage = round(100*count($submissions)/$numBoxes);
+    }
+    else {
+        $thisPercentage = 100;
+    }
+
+    /* Accumulate into array for Javascript
+     */
+    $percentage[] = $thisPercentage;
+    $categoryIDs[] = $categoryID;
+
+	$output = array('SUMMARY_CAT_ID'	=> $categoryID,
+					'SUMMARY_CAT_NAME'	=> scrubText($category['name']),
+					'SUMMARY_TOTAL'		=> $summary[$category['id']]['total'],
+					'SUMMARY_DUE'		=> $summary[$category['id']]['due'],
+					'SUMMARY_TEACHER'	=> SYNERGY_enable ? implode(', ', $teacherOutput) : '',
+					'DARK'				=> $j++ % 2 ? 'dark' : '',
+                    'PERCENTAGE_COMPLETED' => $thisPercentage,
+					);
+
+	$this->setVar($output);
+
+	$this->setVar('summary_due_block', '');
+	if ($category['due'] > 0)
+		$this->parse('summary_due_block', 'summary_due');
+
+	$this->parse('summary_block', 'summary', true);
+}
+
+/* Give jquery ProgressBar values to use
+ */
+$this->setVar(array(
+    'PERCENTAGE_COMPLETED_ARRAY' => implode(',', $percentage),
+    'CATEGORY_IDS' => implode(',', $categoryIDs)
+));
+
+$j = 0;
+
+// activities feed
+$activityLog = $submissionHandler->getActivityLog($user['uid'], 15, $categoryIDList);
+if (is_array($activityLog)) {
+	foreach ($activityLog as $activity) {
+
+		$taskName = $activity['description'];
+		if ($activity['fid'])
+				$taskName = '<a href="/send.php?id=' . $activity['fid'] . '&save=1">' . $activity['description'] . '</a>';
+
+		$categoryName = '<a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
+
+		if ($activity['new'] == 'new') {
+			$stringDesc = 'New ' . $activity['typeName'] . ' ' . $taskName . ' added for ' . $categoryName;
+		}
+		elseif ($activity['new'] == 'overdue') {
+			$stringDesc = '<strong>' . $taskName . ' for ' . $categoryName . ' is overdue</strong> ';
+		}
+		else if($activity['new'] == 'submitted') {
+			$stringDesc = 'Work submitted to '.$activity['description'] .' for <a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
+		}
+		else if($activity['new'] == 'returned') {
+			if($activity['typeName'])
+				$stringDesc = 'You received '.$activity['typeName'];
+			else if($activity['fid'])
+				$stringDesc = '<a href="/submission/send.php?id='.$activity['fid'].'&return=1">Work returned</a>';
+			else
+				$stringDesc = 'Work returned';
+
+			$stringDesc .= ' for '.$activity['description']. ' in <a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
+		}
+		else {
+			$stringDesc = $categoryName . ' submissions for ' . scrubText($activity['description']) . ' are now closed ';
+		}
+
+		$output = array('ACTIVITY_DESCRIPTION'	=> $stringDesc,
+						'ACTIVITY_DATE'			=> getRelativeTime($activity['activity_date'], 0 , ''),
+						'DARK'					=> $j++ % 2 ? 'dark' : '',
+						);
+		$this->setVar($output);
+		$this->parse('activity_block', 'activity', true);
+	}
+}
+
+// subject drop down
+$this->dropDown('subject', $categoryList, '', TEMPLATE_content, array('id' => 'SUBJECT_ID', 'name' => 'SUBJECT_NAME'));
+
+
+
 ?>

@@ -16,7 +16,7 @@ class Assess extends Model {
      *
      * @param <type> $category_id
      */
-    function getList($category_id) {
+    function getList($category_id, $limit = false) {
         if (is_array($category_id)) {
             $categoryIDList = implode(',', $category_id);
 
@@ -33,6 +33,10 @@ class Assess extends Model {
                       AND deleted_at IS NULL
                       ORDER BY finish";
         }
+
+		if (is_numeric($limit)) {
+			$query .= " LIMIT $limit";
+		}
 
         return $this->db->getAll($query);
     }

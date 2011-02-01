@@ -15,7 +15,7 @@ $this->setBlock('subject', 'work', 'work_block');
 $this->setBlock('work', 'download', 'download_block');
 $this->setBlock('work', 'status_due', 'status_due_block');
 $this->setBlock('work', 'status_awaiting_review', 'status_awaiting_review_block');
-$this->setBlock('work', 'status_graded', 'status_graded_block');
+$this->setBlock('work', 'status_marked', 'status_marked_block');
 
 $userHandler = new User;
 $groupHandler = new Group;
@@ -117,18 +117,18 @@ if (is_array($allWork)) {
 			if ($currentWork['returned'] != null) {
 				$this->setVar('status_due_block', '');
 				$this->setVar('status_awaiting_review_block', '');
-				$this->parse('status_graded_block', 'status_graded');
+				$this->parse('status_marked_block', 'status_marked');
 			}
 			else {
 				$this->setVar('status_due_block', '');
 				$this->parse('status_awaiting_review_block', 'status_awaiting_review');
-				$this->setVar('status_graded_block', '');
+				$this->setVar('status_marked_block', '');
 			}
 		}
 		else {
 			$this->parse('status_due_block', 'status_due');
 			$this->setVar('status_awaiting_review_block', '');
-			$this->setVar('status_graded_block', '');
+			$this->setVar('status_marked_block', '');
 		}
 
 		/* Alternating row color
@@ -141,7 +141,7 @@ if (is_array($allWork)) {
 
 		$this->setVar('status_due_block', '');
 		$this->setVar('status_awaiting_review_block', '');
-		$this->setVar('status_graded_block', '');
+		$this->setVar('status_marked_block', '');
 
 		$first = false;
 		$j++;

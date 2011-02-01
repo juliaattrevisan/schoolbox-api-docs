@@ -231,7 +231,7 @@ $j(document).ready(function() {
 						<th width="20%">Date</th>
 						<th width="20%">Subject</th>
 						<th width="20%">Description</th>
-						<th width="20%">Mark</th>
+						<th width="20%">Status</th>
 						<th width="20%">Action</th>
 					</tr>
 				</thead>
@@ -241,8 +241,21 @@ $j(document).ready(function() {
 						<td>{WORK_DATE}</td>
 						<td>{WORK_SUBJECT}</td>
 						<td>{WORK_DESCRIPTION}</td>
-						<td>{WORK_MARK}</td>
-						<td><a href="/submission/submissionHistory/{WORK_BOX_ID}">View Details</a></td>
+
+						<!-- BEGIN status_due -->
+						<td valign="top">Submission Due</td>
+						<td><a href="/submission/submissionHistory/{WORK_BOX_ID}" class="btn up-arrow"><span></span>Submit Work</a></td>
+						<!-- END status_due -->
+
+						<!-- BEGIN status_awaiting_review -->
+						<td valign="top">Awaiting mark</td>
+						<td><a href="/submission/submissionHistory/{WORK_BOX_ID}" class="btn"><span></span>View Details</a></td>
+						<!-- END status_awaiting_review -->
+
+						<!-- BEGIN status_marked -->
+						<td valign="top">Marked ({MARK})</td>
+						<td><a href="/submission/submissionHistory/{WORK_BOX_ID}" class="btn"><span></span>View Details</a></td>
+						<!-- END status_marked -->
 					</tr>
 					<!-- END work -->
 				</tbody>
