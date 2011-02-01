@@ -3,7 +3,7 @@
 		//output managers
 		$this->setBlock($componentHandle, "staff_members", "staff_member_block");
 
-		require_once '../library/user.php';
+		require_once SITE_root.'/library/user.php';
 		$userHandler = new User;
 		$managerList = $userHandler->getManagers($categoryID);
 

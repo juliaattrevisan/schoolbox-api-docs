@@ -49,7 +49,11 @@ if(is_numeric($_REQUEST['cid']) ) {
         //Add component to page and output render of component
         $homepage->addComponent($_POST['add']);
 
-        //Output component HTML
+        //Output component HTML, we do this by loading sitepage and loading a specially designed harness to produce the homepage component on its own
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+        $page = new SitePage;
+        $page->loadContent('/ajax/homepageComponent');
+        $page->template->pparse('finaloutput', TEMPLATE_content);
 
     }
     elseif($_POST['cid'] && is_array($_POST['colors'])) {

@@ -3,7 +3,7 @@
 $this->setJavascript('/javascript/swfobject.js');
 $this->setBlock($componentHandle, 'audio_list', 'audio_list_block');
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
+require_once SITE_root. '/library/file.php';
 $fileHandler = new File;
 
 $config['filter'] = array('audio/mpeg', 'audio/mpa', 'audio/aac', 'audio/mp4', 'audio/wav', 'audio/wave', 'audio/x-wav');

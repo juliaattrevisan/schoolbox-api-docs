@@ -3,7 +3,7 @@
 		//output users of group
 		$this->setBlock($componentHandle, "members", "members_block");
 		
-		require_once '../library/user.php';
+		require_once SITE_root.'/library/user.php';
 		$userHandler = new User;
 		$userList = $userHandler->getAllInCategory($categoryID);
 		

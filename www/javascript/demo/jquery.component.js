@@ -200,12 +200,9 @@ $j(function() {
 	
 		event.preventDefault();
 		var $this = $j(this);
-		$j.post('/homepage/configForm.php', {add : $j(this).attr('rel'), cid : cid } );		
-		$j.get("/ajax/loader.php", {page:"homepageComponent", categoryID: cid, componentID:  $j(this).attr('rel')}, function(data) {
-			$j('.left').prepend(data);
-			
-			//here's the problem
-		});
+		$j.post('/homepage/configForm.php', {add : $j(this).attr('rel'), cid : cid }, function(data){
+                     $j('.left').prepend(data);
+                } );		
 
 		if($this.parent().hasClass('one-only')) {
 			$this.siblings('.notification').fadeIn(200, function() {

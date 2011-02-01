@@ -7,7 +7,6 @@
 <script type="text/javascript" src="/javascript/demo/jquery.component.js"></script>
 <link rel="stylesheet" type="text/css" href="/javascript/farbtastic/farbtastic.css" />
 <script type="text/javascript" src="/javascript/farbtastic/farbtastic.js"></script>
-
 <!-- END modify_layout -->
 
 <style type="text/css">
@@ -26,32 +25,27 @@
 .right .text.listing .dark { background: #{right_bg_secondary}; }
 
 /* wrap mimetypes in classes */
-
 <!-- BEGIN allowed_files -->
-
-a.NAME{background-image: url(/images/mime/22x22/{ICON});}
-
-<!-- END allowed_files -->
+a.NAME{background-image: url(/images/mime/22x22/{ICON});}<!-- END allowed_files -->
 
 </style>
 <script type="text/javascript">
 <!-- BEGIN colour_list -->
 var {COLOUR_ARRAY} = {
-	'left_head_font'		: '#{left_head_font}',
+	'left_head_font'	: '#{left_head_font}',
 	'left_head_bg'		: '#{left_head_bg}',
-	'left_font'			: '#{left_font}',
+	'left_font'		: '#{left_font}',
 	'left_bg_primary'	: '#{left_bg_primary}',
 	'left_bg_secondary'	: '#{left_bg_secondary}',
-	'left_link'			: '#{left_link}',
-	'left_hover'			: '#{left_hover}',
-
-	'right_head'	: '#{right_head_font}',
-	'right_head_bg'	: '#{right_head_bg}',
-	'right_font'	: '#{right_font}',
+	'left_link'		: '#{left_link}',
+	'left_hover'		: '#{left_hover}',
+	'right_head_font'	: '#{right_head_font}',
+	'right_head_bg'         : '#{right_head_bg}',
+	'right_font'            : '#{right_font}',
 	'right_bg_primary'	: '#{right_bg_primary}',
 	'right_bg_secondary'	: '#{right_bg_secondary}',
-	'right_link'	: '#{right_link}',
-	'right_hover'	: '#{right_hover}'
+	'right_link'            : '#{right_link}',
+	'right_hover'           : '#{right_hover}'
 };
 <!-- END colour_list -->
 
@@ -217,7 +211,7 @@ var cid = {ID};
 		
 		<div class="colours-buttons">
 			<form method="POST" action="" name="saveColours">
-				
+				<input type="hidden" name="cid" value="{ID}" />
 				<button class="submit-btn-plain save-colours" type="button" id="saveColour">Save colour set</button>
 				
 				<button class="submit-btn-plain" type="button" id="leftRight" >Copy colours left > right</button>

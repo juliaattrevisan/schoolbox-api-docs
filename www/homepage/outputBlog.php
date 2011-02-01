@@ -1,7 +1,7 @@
 <?php
 
-require_once '../library/blog.php';
-require_once '../library/blog-comment.php';
+require_once SITE_root.'/library/blog.php';
+require_once SITE_root.'/library/blog-comment.php';
 
 $blogHandle = new Blog();
 $blogHandle->config($config);

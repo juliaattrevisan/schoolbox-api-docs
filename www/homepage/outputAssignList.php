@@ -1,6 +1,6 @@
 <?php
 
-require_once '../library/submission.php';
+require_once SITE_root.'/library/submission.php';
 
 $submissionHandler = new Submission;
 $assignmentList = $submissionHandler->getAssignments($categoryID, $config);

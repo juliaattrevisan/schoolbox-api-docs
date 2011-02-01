@@ -14,7 +14,7 @@ $c = array('filter'	=> array('document','audio','video','image','other'),
 print serialize($c);
 */
 
-require_once '../library/file.php';
+require_once SITE_root.'/library/file.php';
 $fileHandler = new File;
 
 $fileList = $fileHandler->getAllInCategory($categoryID, $config);
@@ -75,14 +75,14 @@ $this->setvar(array(
 
 /* filter config */
 $config['filter'] = is_array($config['filter']) ? $config['filter'] : array($config['filter']);
-$this->setBlock("config", "filter", "filter_block".$componentCount);
+$this->setBlock("config", "filter", "filter_block".$component['homepageComponentLocationID']);
 foreach ($default['filterOptions'] as $option) {
     $output = array('COMPONENT_CONFIG_FILTER_VALUE' 	=> $option,
                     'COMPONENT_CONFIG_FILTER_NAME' 		=> ucwords($option),
                     'COMPONENT_CONFIG_FILTER_SELECTED' 	=> in_array($option, $config['filter']) ? 'checked="checked"' : '',
                     );
     $this->setVar($output);
-    $this->parse("filter_block".$componentCount, "filter", true);
+    $this->parse("filter_block".$component['homepageComponentLocationID'], "filter", true);
 }
 
 //setup block for submission button

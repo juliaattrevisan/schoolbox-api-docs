@@ -219,12 +219,9 @@ if (is_array($allowedList)) {
 $componentList = $categoryHandler->getComponents($categoryID);
 if (is_array($componentList)) {
 	
-	$componentCount = 0;
 	foreach ($componentList as $component) {
 		
-		$componentCount++;
-		$componentHandle = $component['name'] . $componentCount;
-		$j =0;
+		$componentHandle = $component['name'] . $component['homepageComponentLocationID'];
 
       /* This array provides default sorting capabilities for each component
        * in the homepage. They can be overridden in each of the output?.php
@@ -252,17 +249,17 @@ if (is_array($componentList)) {
                     switch ($name) {
 
                         case "size":
-                            $this->setBlock("config", "size", "size_block".$componentCount);
+                            $this->setBlock("config", "size", "size_block".$component['homepageComponentLocationID']);
                             for($i=0; $i<=10; $i++) {
                                 $this->setVar('COMPONENT_CONFIG_SIZE_NAME', $i == 0 ? 'All' : $i);
                                 $this->setVar('COMPONENT_CONFIG_SIZE_VALUE', $i);
                                 $this->setVar('COMPONENT_CONFIG_SIZE_SELECTED', $i == $config[$name] ? ' selected="selected"' : '');
-                                $this->parse("size_block".$componentCount, "size", true);
+                                $this->parse("size_block".$component['homepageComponentLocationID'], "size", true);
                             }
                             break;
 
                         case "image":
-                            $this->setBlock("config", "image", "image_block".$componentCount);
+                            $this->setBlock("config", "image", "image_block".$component['homepageComponentLocationID']);
 
                             $imageList = $categoryHandler->getImages($categoryID);
                             if(is_array($imageList)){
@@ -270,32 +267,32 @@ if (is_array($componentList)) {
 
                                     $this->setVar('COMPONENT_CONFIG_IMAGE', $image['description']);
                                     $this->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', $image['description'] == $config[$name] ? ' selected="selected"' : '');
-                                    $this->parse("image_block".$componentCount, "image", true);
+                                    $this->parse("image_block".$component['homepageComponentLocationID'], "image", true);
                                 }
                             }
                             break;
 
                         case "sort":
-                            $this->setBlock("config", "sort", "sort_block".$componentCount);
+                            $this->setBlock("config", "sort", "sort_block".$component['homepageComponentLocationID']);
 
                             foreach ($sortOptions as $sort)
                             {
                                 $this->setVar('COMPONENT_CONFIG_SORT_NAME', $sort);
                                 $this->setVar('COMPONENT_CONFIG_SORT_VALUE', $sort);
                                 $this->setVar('COMPONENT_CONFIG_SORT_SELECTED', $sort == $config[$name] ? ' selected="selected"' : '');
-                                $this->parse("sort_block".$componentCount, "sort", true);
+                                $this->parse("sort_block".$component['homepageComponentLocationID'], "sort", true);
                             }
                             break;
 
                         case "sortdir":
-                            $this->setBlock("config", "sortdir", "sortdir_block".$componentCount);
+                            $this->setBlock("config", "sortdir", "sortdir_block".$component['homepageComponentLocationID']);
                             $sortOptions = array('Asc', 'Desc');
                             foreach ($sortOptions as $sort)
                             {
                                 $this->setVar('COMPONENT_CONFIG_SORTDIR_NAME', $sort);
                                 $this->setVar('COMPONENT_CONFIG_SORTDIR_VALUE', $sort);
                                 $this->setVar('COMPONENT_CONFIG_SORTDIR_SELECTED', $sort == $config[$name] ? ' selected="selected"' : '');
-                                $this->parse("sortdir_block".$componentCount, "sortdir", true);
+                                $this->parse("sortdir_block".$component['homepageComponentLocationID'], "sortdir", true);
                             }
                             break;
                         default:

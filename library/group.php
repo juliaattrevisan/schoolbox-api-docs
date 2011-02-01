@@ -148,9 +148,13 @@ class Group extends Model {
 		// returns NO_ACCESS, READ_ACCESS, WRITE_ACCESS or FULL_ACCESS
 		
 		// default to current user
-		if ($userID == 0)
+		if ($userID == 0) {
+                    if($_SESSION['id'])
 			$userID = $_SESSION['id'];
-		
+                
+                    else 
+                        return false;
+                }
 		/* Cached results */
 		if(isset($this->cache[$this->_service][$relationID][$userID])) {
 			return $this->cache[$this->_service][$relationID][$userID];

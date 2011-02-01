@@ -117,12 +117,13 @@ class Homepage {
 
     function addComponent($component) {
         $query = "SELECT config FROM homepage_comp WHERE id = '$component'";
-		$componentSetup = $this->db->getRow($query);
+	$componentSetup = $this->db->getRow($query);
 
-        $query = "SELECT COUNT(*) FROM homepage_comp_location WHERE cid = 13 AND `column` = 1";
-        $position = $this->db->getOne($query);
-        $postion++;
-        $this->saveComponentPosition($component, 1, $position, $newComp['config']);
+         /* We are inserting component at the top of the left column so we move all the existing components down */
+        $query = "UPDATE homepage_comp_location SET position = position+1 WHERE cid = ".$this->cid." AND `column` = 1";
+        $this->db->query($query);
+
+        $this->saveComponentPosition($component, 1, 1, $newComp['config']);
 
     }
 

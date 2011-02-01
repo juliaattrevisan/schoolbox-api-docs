@@ -3,7 +3,7 @@
 $this->setBlock($componentHandle, "group_events", "group_events_block");
 $this->setBlock('group_events', "modify", "modify_block");
 
-require_once '../library/calendar.php';
+require_once SITE_root.'/library/calendar.php';
 $calendarHandler = new Calendar;
 
 $eventList = $calendarHandler->getAllInCategory($categoryID, $config);

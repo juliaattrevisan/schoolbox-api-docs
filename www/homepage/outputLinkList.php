@@ -3,7 +3,7 @@
 $this->setBlock($componentHandle, 'link', 'link_block');
 $this->setBlock('link', 'modify_link', 'modify_link_block');
 
-require_once '../library/link.php';
+require_once SITE_root.'/library/link.php';
 $linkHandler = new Link;
 $linkList = $linkHandler->getAllInCategory($categoryID, $config);
 

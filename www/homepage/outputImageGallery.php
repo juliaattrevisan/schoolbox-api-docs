@@ -1,8 +1,6 @@
 <?php
 define('IMAGESPERROW', 4);
 
-
-
 //output thumbnails
 $this->setBlock($componentHandle, "thumb_row", "row_block");
 $this->setBlock("thumb_row", "thumb_cell", "cell_block");

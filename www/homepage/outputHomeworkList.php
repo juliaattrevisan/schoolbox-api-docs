@@ -2,7 +2,7 @@
 //homework output
 $this->setBlock($componentHandle, "homework", "homework_block");
 
-require_once '../library/submission.php';
+require_once SITE_root.'/library/submission.php';
 $submissionHandler = new Submission;
 $homeworkList = $submissionHandler->getHomework($categoryID, $config);
 

@@ -4,8 +4,8 @@ $this->setBlock($componentHandle, "staff_teachers", "staff_teacher_block");
 $this->setVar('staff_teacher_block', '');
 if($code != "" && SYNERGY_enable)
 {	
-	require_once '../library/synergetic-class.php';
-	require_once '../library/user.php';
+	require_once SITE_root.'/library/synergetic-class.php';
+	require_once SITE_root.'/library/user.php';
 	$synergeticClass = new SynergeticClass;
 	$userHandler = new User;
 	

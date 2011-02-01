@@ -26,7 +26,6 @@ class SitePage extends Page {
 		if( !preg_match("/^[a-zA-Z0-9\/\-\_]+/", $pageFile) || $pageFile == 'common/404') {
 			$this->pageNotFound();
 		}
-
 		$this->arg = array();
 		$path = explode('/', trim($pageFile, '/'));
 		$total = count($path);

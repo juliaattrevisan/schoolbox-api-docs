@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
+require_once SITE_root.'/library/file.php';
 
 $this->setBlock($componentHandle, 'image', 'image_block');
 

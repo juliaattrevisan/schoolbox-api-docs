@@ -19,7 +19,7 @@ if ($permission < WRITE_ACCESS) {
 else {
 	
 	$this->setVar('drop_student_block', '');
-	require_once '../library/dropbox.php';
+	require_once SITE_root.'/library/dropbox.php';
 	$dropbox = new Dropbox;
 	$fileList = $dropbox->getFileList($categoryID);
 	if(is_array($fileList)) {

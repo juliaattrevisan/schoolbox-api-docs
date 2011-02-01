@@ -2,7 +2,7 @@
 //output feed
 $this->setBlock($componentHandle, 'feed', 'feed_block');
 
-require_once '../library/feed.php';
+require_once SITE_root.'/library/feed.php';
 $feedHandler = new Feed;
 
 $feedList = $feedHandler->getFeed($categoryID, $config['size']);

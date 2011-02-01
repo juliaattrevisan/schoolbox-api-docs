@@ -1,7 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/feed.php';
+require_once SITE_root.'/library/feed.php';
 
 $categoryHandler = new Category;
 $feedHandler = new Feed;

@@ -1,6 +1,6 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess-attempt.php';
+require_once SITE_root.'/library/assess/assess.php';
+require_once SITE_root.'/library/assess/assess-attempt.php';
 
 $this->setBlock($componentHandle, 'assess', 'assess_block');
 $this->setBlock($componentHandle, 'createAssessment', 'createAssessment_block');

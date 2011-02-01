@@ -89,7 +89,7 @@ if ($poll['pollID']) {
 $current = $poll;
 
 /* poll selection */
-$this->setBlock("config", "select", "select_block".$componentCount);
+$this->setBlock("config", "select", "select_block".$component['homepageComponentLocationID']);
 $pollList = $pollHandler->getAllByCategory($categoryID);
 if (is_array($pollList)) {
 	foreach ($pollList as $poll) {
@@ -98,7 +98,7 @@ if (is_array($pollList)) {
 						'COMPONENT_CONFIG_SELECT_SELECTED'	=> $poll['pollID'] == $current['pollID'] ? 'selected="selected"' : '',
 						);
 		$this->setVar($output);
-		$this->parse("select_block".$componentCount, "select", true);
+		$this->parse("select_block".$component['homepageComponentLocationID'], "select", true);
 	}
 }
 

@@ -2,7 +2,7 @@
 
 $this->setBlock($componentHandle, "duties", "d_block");
 
-require_once '../library/duty.php';
+require_once SITE_root.'/library/duty.php';
 $dutyHandler = new Duty;
 
 $dutyList = $dutyHandler->getAllInCategory($categoryID);

@@ -3,7 +3,7 @@
 $this->setBlock($componentHandle, 'wiki_row', 'wiki_row_block');
 $this->setBlock('wiki_row', 'modify_wiki', 'modify_wiki_block');
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/wiki.php';
+require_once SITE_root.'/library/wiki.php';
 $wikiHandler = new Wiki; 
 
 $wikiList = $wikiHandler->getByCategory($categoryID);

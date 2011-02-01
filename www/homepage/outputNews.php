@@ -2,7 +2,7 @@
 //news output
 $this->setBlock($componentHandle, 'news', 'news_block');
 
-require_once '../library/categoryNews.php';
+require_once SITE_root.'/library/categoryNews.php';
 $newsHandler = new CategoryNews;
 
 $newsList = $newsHandler->getAllForCategory($categoryID, $config);

@@ -4,7 +4,7 @@ $this->setBlock($componentHandle, 'text_editable', 'text_editable_block');
 $this->setBlock($componentHandle, 'text_locked', 'text_locked_block');
 $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/textBox.php';
+require_once SITE_root.'/library/textBox.php';
 $textBoxHandler = new TextBox; 
 
 $textBox = $textBoxHandler->getByID((int)$config['textBoxID']);
@@ -49,7 +49,7 @@ else {
 $current = $textBox;
 
 /* textbox selection */
-$this->setBlock("config", "select", "select_block".$componentCount);
+$this->setBlock("config", "select", "select_block".$component['homepageComponentLocationID']);
 $textBoxList = $textBoxHandler->getAllByCategory($categoryID);
 if (is_array($textBoxList)) {
 	foreach ($textBoxList as $textBox) {
@@ -58,7 +58,7 @@ if (is_array($textBoxList)) {
 						'COMPONENT_CONFIG_SELECT_SELECTED'	=> $textBox['textBoxID'] == $current['textBoxID'] ? 'selected="selected"' : '',
 						);
 		$this->setVar($output);
-		$this->parse("select_block".$componentCount, "select", true);
+		$this->parse("select_block".$component['homepageComponentLocationID'], "select", true);
 	}
 }
 

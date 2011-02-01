@@ -3,7 +3,7 @@
 $this->setBlock($componentHandle, "duework", "duework_block");
 
 
-require_once '../library/submission.php';
+require_once SITE_root.'/library/submission.php';
 $submissionHandler = new Submission;
 $submissionList = $submissionHandler->getAllForCategory($categoryID, $config);
 
@@ -17,14 +17,14 @@ if (is_array($submissionList)) {
 		$dateURL = false;
 
 		if($enroled) {
-			if($groupHandler->isStudent() && !is_numeric($submission['studentWork']) && $submission['late'] > time() && $submission['open'] < time()) {
-				$dateURL = "/submission/submitWork/" . $submission['id'];
-                $dateHTML .= ' | ' . '<a href="' . $dateURL . '">Submit Work</a>';
-            }
-			else if($groupHandler->isStaff() && $submission['owner'] == $_SESSION['id']) {
-				$dateURL = "/submission/viewSubmission/" . $submission['id'];
-                $dateHTML .= ' | ' . '<a href="' . $dateURL . '">View Work</a>';
-            }
+                    if($groupHandler->isStaff() && $submission['owner'] == $_SESSION['id']) {
+			$dateURL = "/submission/viewSubmission/" . $submission['id'];
+                        $dateHTML .= ' | ' . '<a href="' . $dateURL . '">View Work</a>';
+                    }
+                    else if(!is_numeric($submission['studentWork']) && $submission['late'] > time() && $submission['open'] < time()) {
+			$dateURL = "/submission/submitWork/" . $submission['id'];
+                        $dateHTML .= ' | ' . '<a href="' . $dateURL . '">Submit Work</a>';
+                    }
 		}
 
 		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . scrubText($submission['description']) . ($nameURL ? '</a>' : "");
