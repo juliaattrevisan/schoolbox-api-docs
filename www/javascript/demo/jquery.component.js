@@ -273,7 +273,7 @@ $j(function() {
 		current.css('background-color', color);
 		$j('#currentColour').val(color);
 		$j('#currentColour').css('background-color', color);
-        pickers[current.attr['ID']] = color;
+        pickers[current.attr('ID')] = color;
 
 		switch (current.attr('ID')) {
 			case 'bg_primary':
@@ -394,7 +394,7 @@ $j(function() {
 
 	});
 	
-	$j('#cancel').click(function() {
+	$j('#restore').click(function() {
 		$j('.colorBox').each(function () {
 			$j(this).css('background-color', defaults[$j(this).attr('id')]);
 			$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
