@@ -81,12 +81,17 @@ $j(function () {
         <div class="float-fix"></div>
         <input type="hidden" name="recaptcha_challenge" id="recaptcha_challenge" value="{RECAPTCHA_CHALLENGE}" />
         <input type="text" name="recaptcha_answer" id="recaptcha_answer" size="35" autocomplete="off" />
-        <a href="#" id="recaptcha_reload" title="Get new words">Get new words</a></td>
+        <a href="#" id="recaptcha_reload" title="Get new words">Get new words</a>
+		<div class="float-fix"></div>
+		
+		
+		</td>
     </tr>
     <!-- END recaptcha -->
     <tr class="pedantic">
       <td><input type="hidden" name="template" value="feedback.html" />
         <input type="hidden" name="confirmation" value="/thank-you.php" />
+		<input type="submit" class="submit-btn-plain" value="Submit Feedback"/>
         </td>
     </tr>
   </table>

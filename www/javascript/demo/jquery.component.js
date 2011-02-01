@@ -42,6 +42,8 @@ $j(function() {
 
 			} 
 			
+			$j('.cal-bubble').hide();
+			
 		}
 	});
 	

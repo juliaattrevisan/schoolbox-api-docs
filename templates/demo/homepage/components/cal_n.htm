@@ -1,3 +1,39 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/calendar/jquery.custom.calendar.js"></script>
+<script type="text/javascript">
+	$j(function() {	
+		
+		$j('ul.js_happening li').live("click",function(){
+
+			var dynamicHTML = $j(this).children('.hidden-fields').html();
+
+			$j(' .cal-bubble .middle').children('.js-data').html(dynamicHTML);
+			var position = $j(this).offset();
+			$j('.cal-bubble').show();
+			var annoyingHeight = ($j('.cal-bubble .middle').height() + ($j('.cal-bubble .top').height()) + ($j('.cal-bubble .bottom').height())) 			
+			$j('.cal-bubble').css("left", (position.left - 550));
+			$j('.cal-bubble').css("top", (position.top - annoyingHeight - 150));	
+			
+			if (($j('.cal-bubble').css("left")) < '0px') {
+					$j('.cal-bubble').css("left", '0');
+			}
+
+		});
+		
+		$( ".cal-bubble" ).bind( "sortchange", function(event, ui) {
+			$(this).hide();
+		});
+
+});
+		
+		
+	});
+
+</script>
+
+<!-- END custom_head -->
+
+
 <div class="box" id="component{COMPONENT_ID}">
   <h2>{CALENDAR_TITLE}</h2>
   <!-- BEGIN config -->
@@ -18,9 +54,13 @@
   </div>
 <div class="editPanel delete-it hide">
 <p>Are you sure you want to delete?</p>
-<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
-<a href="#" class="delete-reject btn go-to"><span></span>No</a>
-<div class="float-fix"></div>
+		<form action="#" method="post">
+		  <input type="hidden" name="cid" value="{ID}" />
+		  <input type="hidden" name="delete" value="{COMPONENT_ID}" />
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
+			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
+		</form>
+		<div class="float-fix"></div>
 </div>
 <!-- END config -->
 	<div class="text listing">
@@ -36,14 +76,16 @@
                 <div class="float-fix"></div>
                 <div class="hidden-fields">
                     <h4><!-- BEGIN time -->
-                        <div class="time"><strong>{CAL_TIME}</strong></div>
+                        <span class="time"><strong>{CAL_TIME}</strong></span>
                         <!-- END time -->{CAL_NOTE}
                     </h4>
                     <p class="meta">Event Type: {CAL_TYPE}<br/>
                         Created by: <a href="/search/user/{CAL_AUTHOR_ID}">{CAL_AUTHOR}</a><br/>
                         {CAL_LOCATION} {CAL_DETAIL}</p>
-                    <div class="modify">{CAL_MODIFY}</div>
+                    <span class="modify">{CAL_MODIFY}</span>
+					<div class="float-fix"></div>
                 </div>
+				<div class="float-fix"></div>
             </li>
             <!-- END group_events -->
         </ul>
@@ -54,11 +96,3 @@
   <!-- END submit_event -->
 </div>
 
-<div class="cal-bubble">
-    <div class="top"></div>
-    <div class="middle">
-        <div class="close">x</div>
-        <div class="js-data"></div>
-    </div>
-    <div class="bottom"></div>
-</div>
