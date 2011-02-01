@@ -12,7 +12,7 @@ a:hover { color: #C3536F; }
 	min-width: 996px;
 	margin: 0;
 	}
-#nav { position: absolute; float: left; top: 139px; }
+
 #header {
 	height: 119px;
 	background: #C90033 url(/images/ormond/header-back.gif) repeat-x;
@@ -133,14 +133,25 @@ h2, .homepage h2 {
 /*---------------------------------------
 	Nav Styles
 ----------------------------------------*/
-#nav { width: 170px; }
+#nav { width: 170px;  position: absolute; top: 139px; left:0; margin:0;}
 #nav h3 {
 	border-bottom: 1px solid #fff;
 	background: #CF0034;
 	color: #fff;
 	text-transform: uppercase;
+	 -moz-border-radius: 0px; /* FF1+ */
+  -webkit-border-radius: 0px; /* Saf3-4 */
+          border-radius: 0px; /* Opera 10.5, IE9, Saf5, Chrome */ height:auto; font-size:12px;
 	}
-#nav ul ul { border: 1px solid #ddbdc5; }
+#nav ul{width:auto;}
+#nav ul ul { border: 1px solid #ddbdc5;  -moz-border-radius: 0px; /* FF1+ */
+  -webkit-border-radius: 0px; /* Saf3-4 */
+          border-radius: 0px; /* Opera 10.5, IE9, Saf5, Chrome */padding:0;
+		  
+     -moz-box-shadow:none; /* FF3.5+ */
+  -webkit-box-shadow: none ; /* Saf3.0+, Chrome */
+          box-shadow: none; /* Opera 10.5, IE9 */
+}
 #nav li li a {
 	background: #eeeee7;
 	}
@@ -154,12 +165,16 @@ h2, .homepage h2 {
 	background: #EEEEE7;
 	color: #222223;
 	width: 140px;
+	margin:0; line-height: normal;
 	}
 #nav li li a:hover,
 #nav li a:hover {
 	background: #DEDEDE;
 	color: #f00;
 	text-decoration: none;
+	-moz-border-radius: 0px; /* FF1+ */
+  -webkit-border-radius: 0px; /* Saf3-4 */
+          border-radius: 0px; /* Opera 10.5, IE9, Saf5, Chrome */
 	}
 #nav li.parent > a.hover span, #nav li.parent > a span, #nav li.parent > a:hover span {
 	background: url(/images/ormond/nav-arrow.gif) no-repeat 100% 4px;
@@ -167,3 +182,5 @@ h2, .homepage h2 {
 	}
 #nav ul ul { width: 170px; left: 170px; top: -2px; }
 #nav ul ul ul { left: 170px; top: -2px; }
+
+
