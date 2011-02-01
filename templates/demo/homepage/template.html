@@ -37,21 +37,21 @@ a.NAME{background-image: url(/images/mime/22x22/{ICON});}
 <script type="text/javascript">
 <!-- BEGIN colour_list -->
 var {COLOUR_ARRAY} = {
-	'head_font'		: '#{left_head_font}',
-	'head_bg'		: '#{left_head_bg}',
-	'font'			: '#{left_font}',
-	'bg_primary'	: '#{left_bg_primary}',
-	'bg_secondary'	: '#{left_bg_secondary}',
-	'link'			: '#{left_link}',
-	'hover'			: '#{left_hover}',
+	'left_head_font'		: '#{left_head_font}',
+	'left_head_bg'		: '#{left_head_bg}',
+	'left_font'			: '#{left_font}',
+	'left_bg_primary'	: '#{left_bg_primary}',
+	'left_bg_secondary'	: '#{left_bg_secondary}',
+	'left_link'			: '#{left_link}',
+	'left_hover'			: '#{left_hover}',
 
-	'head_font_right'	: '#{right_head_font}',
-	'head_bg_right'	: '#{right_head_bg}',
-	'font_right'	: '#{right_font}',
-	'bg_primary_right'	: '#{right_bg_primary}',
-	'bg_secondary_right'	: '#{right_bg_secondary}',
-	'link_right'	: '#{right_link}',
-	'hover_right'	: '#{right_hover}'
+	'right_head'	: '#{right_head_font}',
+	'right_head_bg'	: '#{right_head_bg}',
+	'right_font'	: '#{right_font}',
+	'right_bg_primary'	: '#{right_bg_primary}',
+	'right_bg_secondary'	: '#{right_bg_secondary}',
+	'right_link'	: '#{right_link}',
+	'right_hover'	: '#{right_hover}'
 };
 <!-- END colour_list -->
 
@@ -112,13 +112,13 @@ var cid = {ID};
 			<div class="colours-split top-split">
 				<h3>Heading</h3>
 				<div class="colour">
-					<div id="head_font" class="colorBox  selected"></div>
+					<div id="left_head_font" class="colorBox  selected"></div>
 					<input name="colors[left_head_font]" type="hidden" />
 					<p>Text</p>
 					<div class="float-fix"></div>
 				</div>
 				<div class="colour">
-					<div id="head_bg" class="colorBox"></div>
+					<div id="left_head_bg" class="colorBox"></div>
 					<input name="colors[left_head_bg]" type="hidden" />
 					<p>Background</p>
 					<div class="float-fix"></div>
@@ -127,31 +127,31 @@ var cid = {ID};
 			<div class="colours-split ">
 				<h3>Content</h3>
 				<div class="colour">
-					<div id="bg_primary" class="colorBox"></div>
+					<div id="left_bg_primary" class="colorBox"></div>
 					<input name="colors[left_bg_primary]" type="hidden" />
 					<p>Primary Background</p>
 					<div class="float-fix"></div>
 				</div>
 				<div class="colour">
-					<div id="bg_secondary" class="colorBox"></div>
+					<div id="left_bg_secondary" class="colorBox"></div>
 					<input name="colors[left_bg_secondary]" type="hidden" />
 					<p>Secondary Background</p>
 					<div class="float-fix"></div>
 				</div>
 				<div class="colour">
-					<div id="font" class="colorBox"></div>
+					<div id="left_font" class="colorBox"></div>
 					<input name="colors[left_font]" type="hidden" />
 					<p>Text</p>
 					<div class="float-fix"></div>
 				</div>
 				<div class="colour">
-					<div id="link" class="colorBox"></div>
+					<div id="left_link" class="colorBox"></div>
 					<input name="colors[left_link]" type="hidden" />
 					<p>Link</p>
 					<div class="float-fix"></div>
 				</div>
 				<div class="colour">
-					<div id="hover" class="colorBox"></div>
+					<div id="left_hover" class="colorBox"></div>
 					<input name="colors[left_hover]" type="hidden" />
 					<p>Link Hover</p>
 					<div class="float-fix"></div>
@@ -163,13 +163,13 @@ var cid = {ID};
 			<div class="colours-split top-split">
 				<h3>Heading</h3>
 				<div class="colour">
-					<div id="head_font_right" class="colorBox"></div>
+					<div id="right_head_font" class="colorBox"></div>
 					<input name="colors[right_head_font]" type="hidden" />
 					<p>Text</p>
 					<div class="float-fix"></div>
 				</div>
 				<div class="colour">
-					<div id="head_bg_right" class="colorBox"></div>
+					<div id="right_head_bg_right" class="colorBox"></div>
 					<input name="colors[right_head_bg]" type="hidden" />
 					<p>Background</p>
 					<div class="float-fix"></div>
@@ -178,31 +178,31 @@ var cid = {ID};
 			<div class="colours-split">
 				<h3>Heading</h3>
 				<div class="colour">
-					<div id="bg_primary_right" class="colorBox"></div>
+					<div id="right_bg_primary" class="colorBox"></div>
 					<input name="colors[right_bg_primary]" type="hidden" />
 					<p>Primary Background</p>
 					<div class="float-fix"></div>
 				</div>
 				<div class="colour">
-					<div id="bg_secondary_right" class="colorBox"></div>
+					<div id="right_bg_secondary" class="colorBox"></div>
 					<input name="colors[right_bg_secondary]" type="hidden" />
 					<p>Secondary Background</p>
 					<div class="float-fix"></div>
 				</div>
 				<div class="colour">
-					<div id="font_right" class="colorBox"></div>
+					<div id="right_font" class="colorBox"></div>
 					<input name="colors[right_font]" type="hidden" />
 					<p>Text</p>
 					<div class="float-fix"></div>
 				</div>
 				<div class="colour">
-					<div id="link_right" class="colorBox"></div>
+					<div id="right_link" class="colorBox"></div>
 					<input name="colors[right_link]" type="hidden" />
 					<p>Link</p>
 					<div class="float-fix"></div>
 				</div>
 				<div class="colour">
-					<div id="hover_right" class="colorBox"></div>
+					<div id="right_hover" class="colorBox"></div>
 					<input name="colors[right_hover]" type="hidden" />
 					<p>Link Hover</p>
 					<div class="float-fix"></div>

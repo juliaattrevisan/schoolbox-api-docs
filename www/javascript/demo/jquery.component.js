@@ -239,7 +239,7 @@ $j(function() {
 	f.setColor("#b6b6ff"); //set initial color
 	
 	$j('#head_font').parent().addClass('active-box');
-	var initialColour = rgbConvert($j('#head_font').css('background-color'));
+	var initialColour = rgbConvert($j('#left_head_font').css('background-color'));
 	checkTextColour();
 	$j('#currentColour').css('background-color',initialColour);
 	$j('#currentColour').val(initialColour);
@@ -282,46 +282,46 @@ $j(function() {
         pickers[current.attr('ID')] = color;
 
 		switch (current.attr('ID')) {
-			case 'bg_primary':
+			case 'left_bg_primary':
 				return $j('.left .text').css('background-color', color);
 			break;
-			case 'bg_secondary':
+			case 'left_bg_secondary':
 				return $j('.left .dark').css('background-color', color);
 			break;
-			case 'head_font':
+			case 'left_head_font':
 				return $j('.left h2').css('color', color);
 			break;
-			case 'head_bg':
+			case 'left_head_bg':
 				return $j('.left h2').css('background-color', color)
 			break;
-			case 'font':
+			case 'left_font':
 				return $j('.left, .left p').css('color', color)
 			break;	
-			case 'link':
+			case 'left_link':
 				return $j('.left a').css('color', color);
 			break;	
-			case 'hover':
+			case 'left_hover':
 				return $j('.right a:hover').css('color', color);
 			break;	
-			case 'bg_primary_right':
+			case 'right_bg_primary':
 				return $j('.right .text').css('background-color', color);
 			break;
-			case 'bg_secondary_right':
+			case 'right_bg_secondary':
 				return $j('.right .dark').css('background-color', color);
 			break;
-			case 'head_font_right':
+			case 'right_head_font':
 				return $j('.right h2').css('color', color);
 			break;
-			case 'head_bg_right':
+			case 'right_head_bg':
 				return $j('.right h2').css('background-color', color);
 			break;
-			case 'font_right':
+			case 'right_font':
 				return $j('.right, .right p').css('color', color);
 			break;	
-			case 'link_right':
+			case 'right_link':
 				return $j('.right a').css('color', color);
 			break;	
-			case 'hover_right':
+			case 'right_hover':
 				return $j('.right a:hover').css('color', color);
 			break;	
 			default:

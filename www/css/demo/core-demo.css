@@ -612,6 +612,7 @@ td.cal-right a.filters:hover{background:#e6f6f9 url(/images/demo/calendar/filter
 td.cal-right a.filters.active{background-color:#e6f6f9;}
 td.cal-right .link-case{position:relative; height:36px; z-index:10;}
 td.cal-left .ui-datepicker-trigger{ cursor:pointer;display:block; margin:0 auto; padding:4px 16px 0 16px;}
+.ui-datepicker{display:none;}
 .ui-datepicker-trigger{padding:0 16px;}
 .ui-datepicker-trigger:hover{cursor:pointer;}
 /*filter dropdown*/
