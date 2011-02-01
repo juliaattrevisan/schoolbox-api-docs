@@ -13,6 +13,9 @@ $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'subject', 'subject_block');
 $this->setBlock(TEMPLATE_content, 'download', 'download_block');
 $this->setBlock(TEMPLATE_content, 'action_submit', 'action_submit_block');
+$this->setBlock(TEMPLATE_content, 'recent_submission', 'recent_submission_block');
+$this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
+$this->setBlock('recent_submission', 'overdue', 'overdue_block');
 $this->setBlock('subject', 'work', 'work_block');
 $this->setBlock('work', 'action_view_submitted', 'action_view_submitted_block');
 $this->setBlock('work', 'action_view_returned', 'action_view_returned_block');
@@ -85,12 +88,17 @@ if (count($categoryList) == 0) {
 /* Submission Box Details
  */
 $submissionBox = $submissionHandler->getByID($this->arg[0]);
+$owner = $userHandler->getByID($submissionBox['owner']);
 
 $this->setVar(array(
-	'WORK_CATEGORYNAME' => $submissionBox['categoryName'],
-	'WORK_DESCRIPTION' => $submissionBox['description']
+	'BOX_CATEGORYNAME' => $submissionBox['categoryName'],
+	'BOX_DESCRIPTION' => $submissionBox['description'],
+	'BOX_OWNER' => $owner['firstname'] . ' ' . $owner['lastname'],
+	'BOX_DUEDATE' => date(DATE_short_format, strtotime($submissionBox['date'])),
 ));
 
+/* Check whether a file is associated with the work
+ */
 if (is_numeric($submissionBox['fid'])) {
 	$this->setVar(array(
 		'WORK_FILE_ID' => $submissionBox['fid']
@@ -126,9 +134,23 @@ if (is_array($allWork) && count($allWork)) {
 		if ($currentWork['sid'] != null) {
 			$this->setVar('action_submit_block', '');
 			
+			/* Remember most recent submission
+			 */
+			$recentSubmission['sid'] = $currentWork['sid'];
+			$recentSubmission['date'] = $currentWork['date'];
+
 			if ($currentWork['rid'] != null) {
 				$this->setVar('action_view_submitted_block', '');
 				$this->parse('action_view_returned_block', 'action_view_returned');
+
+				/* Remember the most recent returned work, because we need it
+				 * later on
+				 */
+				if (!is_numeric($rid)) {
+					$returnedWork['fileID'] = $currentWork['rid'];
+					$returnedWork['comment'] = $currentWork['comment'];
+					$returnedWork['mark'] = $currentWork['mark'];
+				}
 			}
 			else {
 				$this->parse('action_view_submitted_block', 'action_view_submitted');
@@ -157,14 +179,63 @@ if (is_array($allWork) && count($allWork)) {
 	}
 
 	$this->parse('subject_block', 'subject');
+
+	/* Show most recent submisison
+	 * Hide Submit form
+	 * Find out whether the latest submission was overdue
+	 */
+
+	if ($recentSubmission['date'] > date('U', strtotime($submissionBox['date']))) {
+		$this->setVar(array(
+			'OVERDUE' => 'overdue',
+		));
+
+		$this->parse('overdue_block', 'overdue');
+	}
+	else {
+		$this->setVar(array(
+			'OVERDUE' => '',
+		));
+
+		$this->setVar('overdue_block', '');
+	}
+	
+	$this->setVar(array(
+		'MOST_RECENT_SUBMISSION_DATE' => outputDate(DATE_long_format, $recentSubmission['date']),
+		'MOST_RECENT_SUBMISSION_FILE_ID' => $recentSubmission['sid'],
+	));
+
+	$this->parse('recent_submission_block', 'recent_submission');
 }
 else {
+
+	/* Hide most recent submission
+	 * Show Submit form
+	 */
 	$this->setVar(array(
 		'WORK_BOX_ID' => $submissionBox['id']
 	));
 
 	$this->parse('action_submit_block', 'action_submit');
+	$this->setVar('recent_submission_block', '');
+
 	$this->setVar('subject_block', '');
 }
+
+/* Detect returned work
+ */
+if (is_numeric($returnedWork['fileID'])) {
+	$this->setVar(array(
+		'RETURNED_WORK_COMMENT' => $returnedWork['comment'],
+		'RETURNED_WORK_MARK' => $returnedWork['mark'],
+		'RETURNED_WORK_FILE_ID' => $returnedWork['fileID'],
+	));
+
+	$this->parse('returned_work_block', 'returned_work');
+}
+else {
+	$this->setVar('returned_work_block', '');
+}
+
 
 ?>

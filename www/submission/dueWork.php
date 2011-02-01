@@ -225,7 +225,6 @@ usort($allWork, 'cmp');
 
 $this->setBlock(TEMPLATE_content, 'work', 'work_block');
 $this->setBlock('work', 'action_submit', 'action_submit_block');
-$this->setBlock('work', 'action_view_history', 'action_view_history_block');
 
 /* Alternating row color index
  */
@@ -241,26 +240,6 @@ foreach($allWork as $currentWork) {
 		'WORK_BOX_ID' => $currentWork['bid'],
 		'WORK_FILE_ID' => $currentWork['fid'],
 	));
-
-	/* Available actions
-	 */
-	if ($currentWork['submitted'] != null) {
-		$this->setVar('action_submit_block', '');
-
-		if ($currentWork['returned'] != null) {
-			$this->parse('action_view_history_block', 'action_view_history');
-			$this->setVar('action_submit_block', '');
-
-		}
-		else {
-			$this->setVar('action_view_history_block', '');
-			$this->parse('action_submit_block', 'action_submit_block');
-		}
-	}
-	else {
-		$this->parse('action_submit_block', 'action_submit');
-		$this->setVar('action_view_history_block', '');
-	}
 
 	/* Alternating row color
 	 */

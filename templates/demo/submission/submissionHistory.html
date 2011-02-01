@@ -7,19 +7,103 @@ table.subjectList th,
 table.subjectList td {
 	width: 20%;
 }
+dt {
+	width: 100px;
+	font-weight: bold;
+	float: left;
+	clear: left;
+}
+dd {
+	width: 300px;
+	margin-bottom: 12px;
+	float: left;
+}
+.overdue {
+	color: #e00;
+}
 </style>
 <!-- END custom_head -->
 
-<h1>{WORK_CATEGORYNAME}</h1>
-<h2>Submission History for {WORK_DESCRIPTION}</h2>
+<h1>Submission Box Details</h1>
 
-<!-- BEGIN download -->
-<a href="/send.php?id={WORK_FILE_ID}&save=1" class="btn download float-left">Download</a>
-<!-- END download -->
+<div style="width:400px;display:block;margin-right:20px;float:left;">
+	<h3>Submission Details</h3>
+	<dl>
+		<dt>Name</dt>
+		<dd>{BOX_DESCRIPTION}</dd>
 
-<!-- BEGIN action_submit -->
-<a href="/submission/submitWork/{WORK_BOX_ID}" class="btn download float-left">Submit Work</a>
-<!-- END action_submit -->
+		<dt>Due Date</dt>
+		<dd>{BOX_DUEDATE}</dd>
+
+		<dt>Subject</dt>
+		<dd>{BOX_CATEGORYNAME}</dd>
+
+		<dt>Teacher</dt>
+		<dd>{BOX_OWNER}</dd>
+
+		<!-- BEGIN download -->
+		<dt>Download</dt>
+		<dd><a href="/send.php?id={WORK_FILE_ID}&save=1" class="btn download float-left"><span></span>Download</a></dd>
+		<!-- END download -->
+	</dl>
+</div>
+<div style="width:50%;float:left;">
+	
+	<!-- BEGIN recent_submission -->
+	<div style="border: 1px solid #f00">
+		<h3>Recent Submission</h3>
+		
+		<p class="{OVERDUE}">{MOST_RECENT_SUBMISSION_DATE}</p>
+		<!-- BEGIN overdue -->
+		(Overdue)
+		<!-- END overdue -->
+
+		<a href="/submission/send.php?id={MOST_RECENT_SUBMISSION_FILE_ID}" class="btn float-left"><span></span>View Submitted Work</a>
+		<div class="float-fix"></div>
+	</div>
+	<!-- END recent_submission -->
+
+	<!-- BEGIN action_submit -->
+	<div style="border:1px solid #0f0;">
+		<h3>Submit Work</h3>
+		<form method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data" >
+			<table class="standardForm">
+				<tr>
+					<td>
+						<em>
+							You must attach your work by locating the file on your drive.
+							Make sure the file is saved and closed before submitting the form.
+						</em>
+					</td>
+					<td>
+						<input type="file" name="file"/>
+						<input type="hidden" name="box_id" value="{WORK_BOX_ID}" />
+					</td>
+				</tr>
+			</table>
+			<input type="submit" name="Submit2" value="Submit" class="submit-btn-plain" />
+			<div class="float-fix"></div>
+		</form>
+	</div>
+	<!-- END action_submit -->
+
+	<!-- BEGIN returned_work -->
+	<div style="border:1px solid #00f;">
+		<h3>Returned Work</h3>
+		<dl>
+			<dt>Comment</dt>
+			<dd>{RETURNED_WORK_COMMENT}</dd>
+
+			<dt>Mark</dt>
+			<dd>{RETURNED_WORK_MARK}</dd>
+
+			<dt>Download</dt>
+			<dd><a href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1" class="btn float-left"><span></span>View Returned Work</a></dd>
+		</dl>
+		<div class="float-fix"></div>
+	</div>
+	<!-- END returned_work -->
+</div>
 
 <div class="float-fix"></div>
 
@@ -43,11 +127,11 @@ table.subjectList td {
 					<td>{WORK_MARK}</td>
 					<td>
 						<!-- BEGIN action_view_submitted -->
-						<a href="/submission/send.php?id={WORK_SUBMIT_FILE_ID}" class="btn download float-left">View Submitted Work</a><br />
+						<a href="/submission/send.php?id={WORK_SUBMIT_FILE_ID}" class="btn float-left"><span></span>View Submitted Work</a><br />
 						<!-- END action_view_submitted -->
 						
 						<!-- BEGIN action_view_returned -->
-						<a href="/submission/send.php?id={WORK_RETURN_FILE_ID}&return=1" class="btn download float-left">View Returned Work</a>
+						<a href="/submission/send.php?id={WORK_RETURN_FILE_ID}&return=1" class="btn float-left"><span></span>View Returned Work</a>
 						<!-- END action_view_returned -->
 					</td>
 				</tr>

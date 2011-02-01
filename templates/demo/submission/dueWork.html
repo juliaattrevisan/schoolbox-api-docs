@@ -230,10 +230,9 @@ $j(document).ready(function() {
 					<tr>
 						<th width="20%">Date</th>
 						<th width="20%">Subject</th>
-						<th width="18%">Description</th>
-						<th width="15%">Mark</th>
-						<th width="15%">Download</th>
-						<th width="12%">Action</th>
+						<th width="20%">Description</th>
+						<th width="20%">Mark</th>
+						<th width="20%">Action</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -243,20 +242,7 @@ $j(document).ready(function() {
 						<td>{WORK_SUBJECT}</td>
 						<td>{WORK_DESCRIPTION}</td>
 						<td>{WORK_MARK}</td>
-						<td>
-							<!-- BEGIN download -->
-							<a href="/send.php?id={WORK_FILE_ID}&save=1">Download</a>
-							<!-- END download -->
-						</td>
-						<td>
-							<!-- BEGIN action_submit -->
-							<a href="/submission/submitWork/{WORK_BOX_ID}">Submit Work</a>
-							<!-- END action_submit -->
-
-							<!-- BEGIN action_view_history -->
-							<a href="/">View History</a>
-							<!-- END action_view_history -->
-						</td>
+						<td><a href="/submission/submissionHistory/{WORK_BOX_ID}">View Details</a></td>
 					</tr>
 					<!-- END work -->
 				</tbody>
