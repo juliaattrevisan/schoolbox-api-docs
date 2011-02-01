@@ -16,7 +16,7 @@ $this->setVar('CALENDAR_TITLE', 'Campus Calendar');
 
 $query = "SELECT id, UNIX_TIMESTAMP(date) as outputDate,
 			TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTimeString, TIME_FORMAT(endTime, 
-			'".CALENDAR_time_format."') as endTimeString,priority, note
+			'".CALENDAR_time_format."') as endTimeString,priority, note, location, detail
 		FROM event
 			JOIN eventCampus ON event.id = eventCampus.eventID
 			JOIN eventGroup ON event.id = eventGroup.eventID
@@ -34,14 +34,32 @@ if (is_array($eventList)) {
 	
 	foreach ($eventList as $event) {
 
-		$event['colour'] = $calendarHandler->displayColour($event['type']);
+        if($event['startTime'] == "0:00" || strtolower($event['startTime']) == "12:00am" || strtolower($event['startTime']) == "12:00 am" || $event['startTime'] == '')
+                $this->setVar("TIME", "");
+        else if($event['endTime'] == "0:00" || strtolower($event['endTime']) == "12:00am" || strtolower($event['endTime']) == "12:00 am" || $event['endTime'] == '')
+                $this->setVar("TIME", $event['startTime']);
+        else
+                $this->setVar("TIME", $event['startTime']." - ".$event['endTime']);        
 
-		$output = array('CAL_DATE'	=> date(DATE_short_no_time, $event['outputDate']),
-						'CAL_ID'	=> $event['id'],
-						'CAL_COLOUR'=> $event['colour'],
-						'CAL_NOTE'	=> nl2br(scrubTEXT($event['note'])),
-						'ON_OFF'	=> ++$j%2? '' : 'dark',
-						);
+		$event['colour'] = $calendarHandler->displayColour($event['type']);
+        
+        $output = array('CAL_TIME'		=> rtrim(
+                                        ($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
+                                           ($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
+                                       "- "),
+                        'CAL_DATE'	    => date(DATE_short_no_time, $event['outputDate']),
+                        'CAL_ID'	    => $event['id'],
+                        'CAL_NOTE'		=> scrubTEXT($event['note']),
+                        'CAL_LOCATION'	=> scrubTEXT($event['location']),
+                        'CAL_DETAIL'	=> scrubTEXT($event['detail']),
+                        'CAL_COLOUR'	=> $event['colour'],
+                        'CAL_MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">Modify</a>" : '',
+                        'CAL_TYPE'      => $event['eventType'],
+                        'CAL_AUTHOR'    => formatName($event),
+                        'CAL_ID'	    => $event['id'],
+                        'ON_OFF'	    => ++$j%2? '' : 'dark',
+                      );
+
 		
 		$this->setVar($output);
 	

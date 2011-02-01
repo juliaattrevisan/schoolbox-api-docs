@@ -24,6 +24,8 @@ if (isset($_POST['date'])) {
 				   'note'		=> $_POST['note'],
 				   'startTime'	=> (($_POST['period'] == 'pm' && $_POST['hour'] != 12 ? 12 : 0) + $_POST['hour']) . ":" . $_POST['minute'] . ":00",
 				   'endTime'	=> (($_POST['toperiod'] == 'pm' && $_POST['tohour'] != 12 ? 12 : 0) + $_POST['tohour']) . ":" . $_POST['tominute'] . ":00",
+                   'location'   => $_POST['location'],
+                   'detail'     => $_POST['detail']
 				  );
 
 	$validRepeat = array('daily' => '+1 day', 'weekly' => '+1 week', 'fortnightly' => '+2 weeks', 'monthly' => '+1 month');
@@ -106,6 +108,8 @@ if (isset($_POST['date'])) {
 					'LEVEL'			=> '',
 					'GROUP'			=> '',
 					'DESCRIPTION' 	=> $event['note'],
+                    'LOCATION'      => $event['location'],
+                    'DETAIL'        => $event['detail'],
 					'RETURN_TO'		=> scrubText($_GET['returnTo']),
 					);
 					
@@ -165,7 +169,9 @@ if (isset($_POST['date'])) {
 					'PMTO'			=> '',
 					'LEVEL'			=> '',
 					'GROUP'			=> '',
-					'DESCRIPTION'	=> '',
+                    'DESCRIPTION'	=> '',
+                    'LOCATION'    	=> '',
+                    'DETAIL'	    => '',
 					'RETURN_TO'		=> scrubText($_GET['returnTo'])
 					
 					);

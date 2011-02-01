@@ -15,12 +15,18 @@ $submissionList = $calendarHandler->getSubmissionEvents($currDay);
 if (is_array($submissionList)) {
 	foreach ($submissionList as $submission) {
 	
-		$output = array('TIME'				=> $submission['dueTime'],
-						'NOTE_CATEGORY'		=> 'WORK DUE ' . $submission['category'] . (isset($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ',
-						'NOTE_DESCRIPTION'	=> scrubTEXT($submission['description']),
-						'NOTE_COLOUR'		=> $calendarHandler->displayColour(1),
-						'ON_OFF'			=>  ++$j%2? '' : 'dark',
-						);
+        $output = array('TIME'			=> $submission['dueTime'],
+                        'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['description'],
+                        'COLOUR'		=> $calendarHandler->displayColour(4),
+                        'MODIFY'		=> '',
+                        'LOCATION'		=> '',
+                        'DETAIL'        => '',
+                        'EVENT_TYPE'    => 'submission',
+                        'TYPE'          => 'Due Work',
+                        'AUTHOR'        => formatName($submission),
+                        'AUTHOR_ID'     => $submission['owner'],
+                        'EVENT_LEVEL'   => '',
+                      );
 			
 		$this->setVar($output); 
 		$this->parse("note_listing","note_block", true);
@@ -46,11 +52,19 @@ else
 		else
 				$this->setVar("TIME", $event['startTime']." - ".$event['endTime']);
 		
-		$output = array('NOTE_CATEGORY'		=> '',
-						'NOTE_DESCRIPTION'	=> scrubTEXT($event['note']),
-						'NOTE_COLOUR'		=> $calendarHandler->displayColour($event['type']),
-						'ON_OFF'			=>  ++$j%2? '' : 'dark',
-						);
+        $output = array('TIME'		=> rtrim(
+                                        ($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
+                                           ($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
+                                       "- "),
+                        'NOTE'		=> scrubTEXT($event['note']),
+                        'LOCATION'	=> scrubTEXT($event['location']),
+                        'DETAIL'	=> scrubTEXT($event['detail']),
+                        'COLOUR'	=> '#'.$event['eventColour'],
+                        'MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">Modify</a>" : '',
+                        'EVENT_TYPE'    => 'type'.$event['type'],
+                        'TYPE'          => $event['eventType'],
+                        'AUTHOR'        => formatName($event),
+                      );
 		
 		$this->setVar($output);
 		$this->parse("note_listing","note_block", true);
