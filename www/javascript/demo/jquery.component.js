@@ -197,10 +197,16 @@ $j(function() {
 	});
 
 	$j(".add-component a").live('click', function(event) {
+	
 		event.preventDefault();
 		var $this = $j(this);
-		$j.post('/homepage/configForm.php', {add : $j(this).attr('rel'), cid : cid } );
-        
+		$j.post('/homepage/configForm.php', {add : $j(this).attr('rel'), cid : cid } );		
+		$j.get("/ajax/loader.php", {page:"homepageComponent", categoryID: cid, componentID:  $j(this).attr('rel')}, function(data) {
+			$j('.left').prepend(data);
+			
+			//here's the problem
+		});
+
 		if($this.parent().hasClass('one-only')) {
 			$this.siblings('.notification').fadeIn(200, function() {
 				$j(this).delay(4000).fadeOut();
@@ -373,7 +379,7 @@ $j(function() {
     });
 
     $j('#saveColour').click(function () {
-       $j.post('/homepage/configForm.php', {colors: pickers});
+       $j.post('/homepage/configForm.php', {colors: pickers, cid: cid});
     });
 	
 	$j("#leftRight").click(function () {	
