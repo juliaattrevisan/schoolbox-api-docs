@@ -1,0 +1,40 @@
+<!-- BEGIN custom_head -->
+<!-- END custom_head -->
+
+<h2>Manage My Links</h2>
+
+<form id="form" method="post" action="/cms/myLinksForm.php" class="standardForm">
+	<table>
+		<thead>
+			<tr>
+				<th width="38%" title="e.g. http://www.yahoo.com.au">Hyperlink</th>
+				<th width="38%"title="e.g. Yahoo Search Directory">Name</th>
+				<th width="24%">Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- BEGIN myLink -->
+			<tr>
+				<td>{MYLINK_URL}</td>
+				<td>{MYLINK_DESCRIPTION}</td>
+				<td>
+					<a href="/cms/myLinksForm.php?delete={MYLINK_ID}" class="btn delete float-left"><span></span>Delete</a>
+					
+					<!-- BEGIN myLink_exists -->
+					Shared
+					<!-- END myLink_exists -->
+
+					<!-- BEGIN myLink_share -->
+					<a href="/cms/myLinksForm.php?share={MYLINK_ID}" class="btn eportfolio float-left"><span></span>Share in ePortfolio</a>
+					<!-- END myLink_share -->
+				</td>
+			</tr>
+			<!-- END myLink -->
+			<tr>
+				<td><input name="url" type="text" /></td>
+				<td><input name="description" type="text" /></td>
+				<td><input name="submit" type="submit" value="Add" class="submit-btn-plain" /></td>
+			</tr>
+		</tbody>
+	</table>
+</form>

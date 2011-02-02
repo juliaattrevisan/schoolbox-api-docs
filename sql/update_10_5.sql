@@ -304,3 +304,8 @@ CREATE TABLE `wikiOpens`(
 	`lastopened` datetime NULL  ,
 	PRIMARY KEY (`openID`)
 ) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+/* My links conversion
+ */
+INSERT INTO error(id, message) VALUES (50, "You do not have permission to delete this user's file.");
+INSERT INTO error(id, message) VALUES (52, "This link is already shared in your ePortfolio.");

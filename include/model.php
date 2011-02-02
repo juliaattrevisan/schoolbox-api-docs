@@ -72,7 +72,31 @@ class Model {
 		$row = $this->db->getRow($query);
 		return $row[$this->_index];
 	}
-	
+
+
+	/**
+	 * Get all the rows matching multiple key/value pairs
+	 *
+	 * @param <type> $fields
+	 * @return <type>
+	 */
+	function getAllByFields($fields, $type = 'AND') {
+		if (is_array($fields)) {
+			$query = "SELECT *
+					  FROM {$this->_table}
+					  WHERE ";
+
+			foreach($fields as $key => $value) {
+				$subquery[] = "$key = \"$value\" ";
+			}
+
+			$query .= implode(" $type ", $subquery);
+
+			return $this->db->getAll($query);
+		}
+
+		return false;
+	}
 
 	function update($object) {
 		return $this->db->update($this->_table, $this->_index, $object);
@@ -86,6 +110,5 @@ class Model {
 		$this->db->insert($this->_table, $object);
 		return $this->db->insertID();
 	}
-	
 }
 ?>
