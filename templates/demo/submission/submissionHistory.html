@@ -27,7 +27,7 @@ dd {
 <h1>Submission Box Details</h1>
 
 <div style="width:400px;display:block;margin-right:20px;float:left;">
-	<h3>Submission Details</h3>
+	
 	<dl>
 		<dt>Name</dt>
 		<dd>{BOX_DESCRIPTION}</dd>
@@ -41,11 +41,14 @@ dd {
 		<dt>Teacher</dt>
 		<dd>{BOX_OWNER}</dd>
 
-		<!-- BEGIN download -->
-		<dt>Download</dt>
-		<dd><a href="/send.php?id={WORK_FILE_ID}&save=1" class="btn download float-left"><span></span>Download</a></dd>
-		<!-- END download -->
+		
+		<dd></dd>
+		
 	</dl>
+	<!-- BEGIN download -->
+	<a href="/send.php?id={WORK_FILE_ID}&save=1" class="btn download float-left"><span></span>Download</a>
+	<!-- END download -->
+	<div class="float-fix"></div>
 </div>
 <div style="width:50%;float:left;">
 	
@@ -67,22 +70,16 @@ dd {
 	<div style="border:1px solid #0f0;">
 		<h3>Submit Work</h3>
 		<form method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data" >
-			<table class="standardForm">
-				<tr>
-					<td>
-						<em>
-							You must attach your work by locating the file on your drive.
-							Make sure the file is saved and closed before submitting the form.
-						</em>
-					</td>
-					<td>
-						<input type="file" name="file"/>
-						<input type="hidden" name="box_id" value="{WORK_BOX_ID}" />
-					</td>
-				</tr>
-			</table>
-			<input type="submit" name="Submit2" value="Submit" class="submit-btn-plain" />
-			<div class="float-fix"></div>
+
+		<em>
+			You must attach your work by locating the file on your drive.
+			Make sure the file is saved and closed before submitting the form.
+		</em>
+		<input type="file" name="file"/>
+		<input type="hidden" name="box_id" value="{WORK_BOX_ID}" />
+
+		<input type="submit" name="Submit2" value="Submit" class="submit-btn-plain" />
+		<div class="float-fix"></div>
 		</form>
 	</div>
 	<!-- END action_submit -->

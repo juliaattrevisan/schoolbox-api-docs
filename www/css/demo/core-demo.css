@@ -289,7 +289,7 @@ cursor:pointer;
 a.icons { display: block; padding: 6px 0 6px 30px; background-repeat: no-repeat; background-position: 0 50%; background-image: url(/images/mime/22x22/txt.png); }
 a.folder_blue_full {padding:0 0 0 30px; background-image: url(/images/icons/22x22/folder.png); }
 a.house { background-image: url(/images/famicons/house.png); }
-.success { background-image: url(/images/famicons/accept.png); background-position: 4px 3px; }
+.success { background-image: url(/images/famicons/accept.png); background-repeat:no-repeat; background-position: 4px 3px; }
 
 
 .add-sub { vertical-align:bottom; }
@@ -844,6 +844,11 @@ p.bubble-name { margin-bottom:5px; padding-bottom:5px; }
 .privateBlock .blog p{padding:0;}
 .privateBlock .feat-image img{float:none;}
 .permanent h2{cursor:auto !important;}
+
+/* LINKS */
+.shared-success{ float:left;
+color:#fff; padding:0 8px 0 28px; background:#cae9b9 url(/images/demo/icons/black-tick.png) 8px 50% no-repeat;height:23px; line-height:23px; margin-top:4px;-moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; color:#000; z-index:120;}
+
 
 /* LOGIN Styling */
 .login #container,.login #footer,.login #header {margin:0;}

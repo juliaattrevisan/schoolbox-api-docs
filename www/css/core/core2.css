@@ -282,9 +282,9 @@ text-indent:10px;}
 .btn { display:block; float: right; margin-left: 10px; }
 .btn:hover { background-position:bottom left; }
 a.icons { display: block; padding: 6px 0 6px 30px; background-repeat: no-repeat; background-position: 0 50%; background-image: url(/images/mime/22x22/txt.png); }
-a.folder_blue_full {padding:0 0 0 30px; background-image: url(/images/icons/22x22/folder.png); }
-a.house { background-image: url(/images/famicons/house.png); }
-.success { background-image: url(/images/famicons/accept.png); background-position: 4px 3px; }
+a.folder_blue_full {padding:0 0 0 30px; background-image: url(/images/icons/22x22/folder.png);background-repeat:no-repeat; }
+a.house { background-image: url(/images/famicons/house.png);background-repeat:no-repeat; }
+.success { background-image: url(/images/famicons/accept.png); background-repeat:no-repeat;background-position: 4px 3px; }
 .delete-btn { padding:2px 0 0 20px; background:url(/images/delete-icon.gif) no-repeat left top; height:14px; font-size:11px; color:#B8575B; }
 .add-btn { padding:2px 0 0 20px; background:url(/images/add-icon.gif) no-repeat left top; height:14px; font-size:11px; color:#6F9740; }
 .add-sub { vertical-align:bottom; }
