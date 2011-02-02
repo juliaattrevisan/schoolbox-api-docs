@@ -101,6 +101,18 @@ th { font-weight:bold; }
 #nav li a span strong{position:absolute; right:16px;top:3px;}
 #nav ul ul{border:3px solid #efecde; padding:5px 0; -moz-box-shadow: 10px 10px 0px rgba(0,0,0,0.04); -webkit-box-shadow: 10px 10px 0px rgba(0,0,0,0.04); z-index:120;box-shadow: 10px 10px 0px rgba(0,0,0,0.04); -moz-border-radius: 3px ;-webkit-border-radius: 3px ; border-radius: 3px}
 #nav h3.my-links{background-color:#e8f5ff;}
+#nav h3.my-links a{    
+	background: #FFFFFF;
+	height: 19px;
+	line-height: 19px;
+	position: absolute;
+	right: 16px;
+	text-align: center;
+	top: 14px;
+	width: 39px;
+	z-index: 200;
+	font-size:12px;
+	-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;}
 #nav ul.my-links{background-color:#f3faff;}
 
 /*TABBED NAV*/

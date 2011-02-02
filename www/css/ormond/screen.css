@@ -283,7 +283,18 @@ h2, .homepage h2 {
 }
 
 #nav h3.my-links { background:#CF0034 }
-
+#nav h3.my-links a{	
+	background: #FFFFFF;
+	height: 19px;
+	line-height: 19px;
+	position: absolute;
+	right: 5px;
+	text-align: center;
+	top: 5px;
+	width: 39px;
+	z-index: 200;
+	font-size:12px;
+	}
 #nav ul {
 	width:auto;
 	list-style: none outside none;

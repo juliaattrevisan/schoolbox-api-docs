@@ -175,7 +175,7 @@ $j(function() {
 	});
 
 
-	$j('.delete-accept').click(function(event) {
+	$j('.delete-accept').live('click',function(event) {
 		event.preventDefault();
         //update with an ajax call here.
 		$j.post('/homepage/configForm.php', $j(this).closest('form').serialize());
@@ -186,11 +186,13 @@ $j(function() {
 					$j(this).remove();	
 				});
 		});
+		
+		console.log($(this).siblings($("input[name=first_name]").val()));
 
 	});
 
 
-	$j('.delete-reject').click(function(event) {
+	$j('.delete-reject').live('click',function(event) {
 		event.preventDefault();
 		$j(this).closest('.delete-it').slideUp();
 		
@@ -201,8 +203,8 @@ $j(function() {
 		event.preventDefault();
 		var $this = $j(this);
 		$j.post('/homepage/configForm.php', {add : $j(this).attr('rel'), cid : cid }, function(data){
-                     $j('.left').prepend(data);
-                } );		
+            $j(data).hide().prependTo('.left').slideDown(400);
+        });		
 
 		if($this.parent().hasClass('one-only')) {
 			$this.siblings('.notification').fadeIn(200, function() {
