@@ -24,7 +24,8 @@ a:hover {
     position: absolute;
     top: 0;
 }
-#tabs{width:824px}
+
+#tabs{min-width:924px;}
 
 h3, #infoPanel li, #nav h3, .add-component .notification {
     color: #FFFFFF;

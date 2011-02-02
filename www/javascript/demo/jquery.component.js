@@ -161,10 +161,11 @@ $j(function() {
 		$this.siblings('.editPanel.delete-it.hide').slideToggle("fast");
 	});
 
-
 	$j('.delete-accept').live('click',function(event) {
+		
 		event.preventDefault();
-        //update with an ajax call here.
+       
+	    //update with an ajax call here.
 		$j.post('/homepage/configForm.php', $j(this).closest('form').serialize());
 		
         $j(this).closest('.box').animate({opacity:0}, 300,
@@ -174,7 +175,11 @@ $j(function() {
 				});
 		});
 		
-		console.log($(this).siblings($("input[name=first_name]").val()));
+		var componentToDelete = Number($j(this).siblings("input[name=component]").val());
+		var currentAmount = Number($j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html());
+		currentAmount--;
+		$j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html(currentAmount);
+	
 
 	});
 
@@ -190,14 +195,14 @@ $j(function() {
 		event.preventDefault();
 		var $this = $j(this);
 		$j.post('/homepage/configForm.php', {add : $j(this).attr('rel'), cid : cid }, function(data){
-            $j(data).hide().prependTo('.left').slideDown(400);
+            
+			$j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
+				$j(this).animate({opacity:1}, 300);
+			});
+			
         });		
 
-		if($this.parent().hasClass('one-only')) {
-			
-
-			
-			$this.remove();
+		if($this.parent().hasClass('.one-only')) {
 			$this.parent().addClass('.disabled');
 		} else if ($j('.how-many').html() == '') {
 			//if there are no modules but you can add one
@@ -211,10 +216,13 @@ $j(function() {
 		
 		if (!$this.siblings('.notification').is(':visible')) {
 			$this.siblings('.notification').fadeIn(200, function() {
-				$j(this).delay(4000).fadeOut();
+				$j(this).delay(2000).fadeOut();
 			});
 		}
 		
+		var currentAmount = Number($this.siblings('h4').children('strong').children('em').html());
+		currentAmount++;
+		$this.siblings('h4').children('strong').children('em').html(currentAmount);
 		
 	});
 	
