@@ -1,44 +1,83 @@
+
 /*---------------------------------------
 	Layout Styles
 ----------------------------------------*/
 body {
 	background: 0;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	}
+}
+
 a { color: #CF0034; }
+
 a:hover { color: #C3536F; }
+
 #container {
-	padding: 0;
-	min-width: 996px;
-	margin: 0;
-	}
+	min-width: 787px;
+ margin-left: 172px;
+    margin-right: 16px;
+}
 
 #header {
 	height: 119px;
 	background: #C90033 url(/images/ormond/header-back.gif) repeat-x;
 	border: 0;
-	}
-#infoPanel li, #infoPanel li a{color:#fff;}
-#content {
-	padding: 20px 20px 20px 190px;	
-	}
-#logo {
+}
+
+#infoPanel{position:relative; z-index:2;}
+#infoPanel li, #infoPanel li a { color:#fff; }
+
+
+#header .logo {
+	display: block;
+	height: 119px;
+	left: 0px;
+	padding-top: 0px;
 	position: absolute;
 	top: 0;
-	left: 0;
-	background: url(/images/ormond/ormond_logo.jpg) no-repeat;
 	width: 782px;
-	height: 119px;
-	text-indent:-9999em;
-	}
+	z-index:1;
+}
+
+#search {
+	-moz-border-radius: 0;
+	background: none;
+	border: 0;
+	clear: right;
+	float: right;
+	margin: 0;
+	float: right;
+	margin: 18px 13px 0 0;
+	width: 266px;
+	position:relative;
+	z-index:2;
+}
+
+#search-button-ormond { float:right; }
+
+#search-field {
+	border: 1px solid #B8B8B8;
+	float: left;
+	padding: 3px 5px;
+	width: 175px;
+	background: #ffffff;
+	-moz-border-radius: 0px; /* FF1+ */
+	-webkit-border-radius: 0px; /* Saf3-4 */
+	line-height:normal;
+	color:#000;
+	font-weight:normal;
+	border-radius: 0px; /* Opera 10.5, IE9, Saf5, Chrome */
+	font-size:12px;
+	height:auto;
+}
+
 #tabs {
 	bottom: 0;
 	right: 0;
 	left: 189px;
-	}
-#tabs li {
-	margin-left: -1px;
-	}
+}
+
+#tabs li { margin-left: -1px; }
+
 #tabs li a {
 	color: #fff;
 	font-weight: bold;
@@ -47,48 +86,85 @@ a:hover { color: #C3536F; }
 	padding: 0 10px;
 	display: block;
 	line-height: 27px;
-	}
-#tabs li a:hover {
-	background: #3f4042;
-	}
+	float:none;
+	font-size:12px;
+	height:auto;
+	-moz-border-radius: 0px; /* FF1+ */
+	-webkit-border-radius: 0px; /* Saf3-4 */
+	border-radius: 0px; /* Opera 10.5, IE9, Saf5, Chrome */
+}
+
+#header #tabs li.navthis a {
+	-moz-border-radius: 0px; /* FF1+ */
+	-webkit-border-radius: 0px; /* Saf3-4 */
+	border-radius: 0px; /* Opera 10.5, IE9, Saf5, Chrome */
+}
+
+#tabs li a:hover { background: #3f4042; }
+
 #tabs li a.navthis {
 	color: #3f4042;
 	background: #fff;
-	}
-.box.grey { background: 0; }
-.box a { color: #CF0034; }
-.box a:hover { color: #C3536F; }
-.box a.edit { color: #000; background: 0; }
-#content .box a.edit:hover { color: #fff; background: #CF0034; }
+}
 
-.box ul {
-	list-style: none;
-	}
+#tabs li a span em {
+	text-decoration:underline;
+	font-style:normal;
+}
+
+.box.grey { background: 0; }
+
+.box a { color: #CF0034; }
+
+.box a:hover { color: #C3536F; }
+
+.box a.edit {
+	color: #000;
+	background: 0;
+}
+
+.box a.edit em.show-it{color:#fff;}
+
+#content .box a.edit:hover {
+	color: #fff;
+}
+
+#content .box a.edit:hover em { color:#fff; }
+
+.box ul { list-style: none; }
+
 .box ul li, .news-item ul li {
 	list-style: none;
 	background: url(/images/ormond/bullet.gif) no-repeat 0 4px;
-	padding-left: 20px;
-	} 
-.box .listing ul li {
-	background: 0;
-	}
+}
+
+.box .listing ul li { background: 0; }
+
+.header_option { margin-top: -33px; }
+
+table .header_option { margin-top: -29px; }
+
 .header_option {
-	margin-top: -33px;
-	}
-table .header_option {
-	margin-top: -29px;
-	}
-h1 + .header_option {
-	margin-top: -30px;
+	color: #013A63;
+	display: block;
+	float: right;
+	line-height: normal;
+	margin: -45px 5px 0;
+	position: relative;
 }
-#footer {
-	margin: 20px 0 0;
-}
+
+#footer { margin-left: 187px; }
+
 #footer p {
 	font-size: 80%;
 	float: left;
 	margin-right: 30px;
 }
+.standardForm td h4 {
+    color: #CF0034;
+	font-size:14px;
+}
+
 /*---------------------------------------
 	News Styles
 ----------------------------------------*/
@@ -100,18 +176,20 @@ h3#news-header {
 	border-bottom: 1px dotted #1C1713;
 	font-weight: bold;
 	color: #000;
-	}
+}
+
 .news-item {
 	padding: 0;
 	background: 0;
-	}
+}
+
 /*---------------------------------------
 	Component Styles
 ----------------------------------------*/
 h1 {
 	background: #f9f8f1 url(/images/ormond/heading-back.png) repeat-x;
 	font-size: 1.33em;
-	font-weight: bold; 
+	font-weight: bold;
 	border-bottom: 1px dotted #1C1713;
 	line-height: normal;
 	margin-bottom: 10px;
@@ -119,68 +197,129 @@ h1 {
 	text-indent: 3px;
 	position: relative;
 	text-transform: capitalize;
-	}
-h1 a.customise { color: #CF0034; top: 5px; }
+	line-height:32px;
+	height:32px;
+	text-indent:8px;
+}
+
+h1 a.customise {
+	color: #CF0034;
+	top: 5px;
+}
+
 h2, .homepage h2 {
 	background: #f9f8f1 url(/images/ormond/heading-back.png) repeat-x;
 	border-bottom: 1px dotted #1C1713;
 	font-weight: bold;
 	color: #000;
-	}
-#content h2 a {
-	color: #000;
-	}
+	font-size: 116%;
+	margin-bottom:0px;
+	padding: 0;
+	position: relative;
+	text-indent: 16px;
+	-moz-border-radius: 0px; /* FF1+ */
+	-webkit-border-radius: 0px; /* Saf3-4 */
+	border-radius: 0px; /* Opera 10.5, IE9, Saf5, Chrome */
+}
+
+#content h2 a { color: #000; }
+
+.dayWrap{background:url("/images/ormond/heading-back.png") repeat-x scroll 0 0 #F9F8F1}
+
 /*---------------------------------------
 	Nav Styles
 ----------------------------------------*/
-#nav { width: 170px;  position: absolute; top: 139px; left:0; margin:0;}
+#nav {
+	width: 170px;
+	position: absolute;
+	top: 139px;
+	left:0;
+	margin:0;
+}
+
 #nav h3 {
 	border-bottom: 1px solid #fff;
 	background: #CF0034;
 	color: #fff;
 	text-transform: uppercase;
-	 -moz-border-radius: 0px; /* FF1+ */
-  -webkit-border-radius: 0px; /* Saf3-4 */
-          border-radius: 0px; /* Opera 10.5, IE9, Saf5, Chrome */ height:auto; font-size:12px;
-	}
-#nav ul{width:auto;}
-#nav ul ul { border: 1px solid #ddbdc5;  -moz-border-radius: 0px; /* FF1+ */
-  -webkit-border-radius: 0px; /* Saf3-4 */
-          border-radius: 0px; /* Opera 10.5, IE9, Saf5, Chrome */padding:0;
-		  
-     -moz-box-shadow:none; /* FF3.5+ */
-  -webkit-box-shadow: none ; /* Saf3.0+, Chrome */
-          box-shadow: none; /* Opera 10.5, IE9 */
+	-moz-border-radius: 0px; /* FF1+ */
+	-webkit-border-radius: 0px; /* Saf3-4 */
+	border-radius: 0px; /* Opera 10.5, IE9, Saf5, Chrome */
+	height:auto;
+	font-size:12px;
+	clear: left;
+	color: #FFFFFF;
+	line-height: 28px;
+	height: 28px;
+	padding: 0 0 0 16px;
 }
-#nav li li a {
-	background: #eeeee7;
-	}
-#nav li {
-	border-bottom: 1px solid #fff;
-	}
-#nav li li {
-	border-bottom: 1px solid #fff;
-	}
+
+#nav h3.my-links { background:#CF0034 }
+
+#nav ul {
+	width:auto;
+	list-style: none outside none;
+	margin: 0;
+	padding: 0;
+}
+
+#nav ul ul {
+	border: 1px solid #ddbdc5;
+	-moz-border-radius: 0px; /* FF1+ */
+	-webkit-border-radius: 0px; /* Saf3-4 */
+	border-radius: 0px; /* Opera 10.5, IE9, Saf5, Chrome */
+	padding:0;
+	-moz-box-shadow:none; /* FF3.5+ */
+	-webkit-box-shadow: none; /* Saf3.0+, Chrome */
+	box-shadow: none; /* Opera 10.5, IE9 */
+	
+}
+
+#nav li li a { background: #eeeee7; }
+
+#nav li { border-bottom: 1px solid #fff; }
+
+#nav li li { border-bottom: 1px solid #fff; }
+
 #nav li a {
 	background: #EEEEE7;
 	color: #222223;
 	width: 140px;
-	margin:0; line-height: normal;
-	}
-#nav li li a:hover,
-#nav li a:hover {
+	margin:0;
+	line-height: normal;
+	padding: 6px 14px 6px 16px;
+}
+
+#nav li li a:hover, #nav li a:hover {
 	background: #DEDEDE;
 	color: #f00;
 	text-decoration: none;
 	-moz-border-radius: 0px; /* FF1+ */
-  -webkit-border-radius: 0px; /* Saf3-4 */
-          border-radius: 0px; /* Opera 10.5, IE9, Saf5, Chrome */
-	}
+	-webkit-border-radius: 0px; /* Saf3-4 */
+	border-radius: 0px; /* Opera 10.5, IE9, Saf5, Chrome */
+}
+
+#nav li.parent > a span { background: url("/images/nav-arrow.gif") no-repeat scroll 100% 3px transparent; }
+
+#nav li a span {
+	display: block;
+	width: 100%;
+}
+
+#nav * { z-index: 99; }
+
 #nav li.parent > a.hover span, #nav li.parent > a span, #nav li.parent > a:hover span {
 	background: url(/images/ormond/nav-arrow.gif) no-repeat 100% 4px;
 	cursor: pointer;
-	}
-#nav ul ul { width: 170px; left: 170px; top: -2px; }
-#nav ul ul ul { left: 170px; top: -2px; }
+}
 
+#nav ul ul {
+	width: 170px;
+	left: 170px;
+	top: -2px;
+}
 
+#nav ul ul ul {
+	left: 170px;
+	top: -2px;
+}

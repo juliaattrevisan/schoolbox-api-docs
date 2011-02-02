@@ -67,7 +67,7 @@ $j(function() {
 				
 			}
 			}, function() {
-			if(!$(this).children('em').data('pinned')) {
+			if(!$j(this).children('em').data('pinned')) {
 				$j(this).children('em').removeClass('show-it');
 			}
 			}

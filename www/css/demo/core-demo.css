@@ -70,8 +70,7 @@ th { font-weight:bold; }
 --------------------------------------------------------------*/
 /* Ugly, ugly old admin system */
 #admin-old .standardForm h2{background:none;font-weight:bold;font-size:14px;color:#000;text-indent:0;border-bottom:0;}
-#admin-old .ruler{backgrou
-nd:#F1F1F1; border:1px solid #ccc;}
+#admin-old .ruler{background:#F1F1F1; border:1px solid #ccc;}
 
 /*BODY*/
 #wrap { min-height: 100%; height: auto !important;height: 100%;}

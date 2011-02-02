@@ -23,7 +23,7 @@
 			var position = $j(this).offset();
 			$j('.cal-bubble').show();
 			var annoyingHeight = ($j('.cal-bubble .middle').height() + ($j('.cal-bubble .top').height()) + ($j('.cal-bubble .bottom').height())) 			
-			$j('.cal-bubble').css("left", (position.left - 550));
+			$j('.cal-bubble').css("left", (position.left - 300));
 			$j('.cal-bubble').css("top", (position.top - annoyingHeight - 150));	
 			
 			if (($j('.cal-bubble').css("left")) < '0px') {
