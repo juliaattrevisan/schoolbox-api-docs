@@ -317,7 +317,7 @@ insert  into `newsTopic`(`newsTopicID`,`name`) values (4,'Academic');
 
 insert  into `sideMenu`(`id`,`parent`,`txt`,`url`,`target`,`sequence`) values (1,0,'Home','/home.php','',0);
 insert  into `sideMenu`(`id`,`parent`,`txt`,`url`,`target`,`sequence`) values (9,1,'Main','/home.php','',5);
-insert  into `sideMenu`(`id`,`parent`,`txt`,`url`,`target`,`sequence`) values (93,9,'Edit My Links','/editLinks.php','',0);
+insert  into `sideMenu`(`id`,`parent`,`txt`,`url`,`target`,`sequence`) values (93,9,'Edit My Links','/cms/myLinks','',0);
 insert  into `sideMenu`(`id`,`parent`,`txt`,`url`,`target`,`sequence`) values (94,9,'Manage My Groups','/group/join','',1);
 insert  into `sideMenu`(`id`,`parent`,`txt`,`url`,`target`,`sequence`) values (220,0,'Tutorials','/modules/tutorial/event/list.php','',6);
 insert  into `sideMenu`(`id`,`parent`,`txt`,`url`,`target`,`sequence`) values (10,1,'News','/news','',6);
