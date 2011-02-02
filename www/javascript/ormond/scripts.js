@@ -1,5 +1,4 @@
 $j(function() {
-
 	$j('ul.js_happening li').click(function(){
 
 		var dynamicHTML = $j(this).children('.hidden-fields').html();

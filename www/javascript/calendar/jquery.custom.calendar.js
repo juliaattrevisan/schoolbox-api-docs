@@ -12,10 +12,20 @@
 			
 		});
 		
-		
+		$j('a.filters').click(function(){
+			
+			alert('poo');
+			
+			//$j('.cal-bubble').hide();
+				
+			$j('.filter-drop').toggle();
 
+		});
+		
+		
 		//position the bubbles, depending on where you are in the portal.
-		$j('ul.js_happening li').click(function(){ 
+		
+		/*$j('ul.js_happening li').click(function(){ 
 			var dynamicHTML = $j(this).children('.hidden-fields').html();
 			$j('.cal-bubble .middle').children('.js-data').html(dynamicHTML);
 			
@@ -45,26 +55,18 @@
 			}	
 			
 			
-		});
+		});*/
 		
 		//show and hide the filters drop down
-		$j('a.filters').click(function(){
-			
-			$j('.cal-bubble').hide();
-				
-			if ($j('.filter-drop').is(':visible')) {
-				$j('.filter-drop').hide();	
-			} else { 
-				$j('.filter-drop').show();		
-			}
 
-		});
 		
 		//make all of the checkboxes checked... darn you firefoxxxxxx
 		$j('.checkbox').attr('checked', true);
 		
 				//run the filter checker to show and hide the items
-		$j('#applyFilters').click(filterChecker);
+		$j('#applyFilters').click(function() {
+			filterChecker()
+		});
 		
 		function filterChecker() {
 			//specify filter hierarchy

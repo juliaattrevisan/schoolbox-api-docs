@@ -181,32 +181,24 @@ $j(function() {
 		$j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html(currentAmount);
 		
 		if ($j('a[rel='+componentToDelete+']').parent().hasClass('disabled')) {
-			
 			$j('a[rel='+componentToDelete+']').parent().removeClass('disabled')
-				
-			
 		}
-	
-
+		
 	});
 
 
 	$j('.delete-reject').live('click',function(event) {
 		event.preventDefault();
 		$j(this).closest('.delete-it').slideUp();
-		
 	});
 
 	$j(".add-component a").live('click', function(event) {
-	
 		event.preventDefault();
 		var $this = $j(this);
 		$j.post('/homepage/configForm.php', {add : $j(this).attr('rel'), cid : cid }, function(data){
-            
 			$j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
 				$j(this).animate({opacity:1}, 300);
 			});
-			
         });		
 
 		if($this.parent().hasClass('one-only')) {
@@ -366,15 +358,12 @@ $j(function() {
 			default:
 				newChoice = 'template1';
 			break;
-			
 		}
 		
         $j('.homepage').removeClass().addClass(newChoice + ' homepage ui-sortable');
 		$j('.current').removeClass('current');
 		$j(this).addClass('current');
-
         $j('#templateVal').val(templateChoice);
-		
 	});	
 	
 	$j('#saveTemplate').click(function () {
