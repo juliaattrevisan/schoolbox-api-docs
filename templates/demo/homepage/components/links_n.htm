@@ -1,4 +1,4 @@
-<div class="box" id="component{COMPONENT_ID}">
+<div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
   <h2>{COMPONENT_NAME}</h2>
 <!-- BEGIN config -->
   <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
@@ -7,7 +7,7 @@
     <form action="/homepage/configForm.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
-      <input type="hidden" name="component" value="{COMPONENT_ID}" />
+      <input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
 
 		<label for="componentname">Name: </label>
 		<input type="text" name="componentname" value="{COMPONENT_NAME}" />
@@ -35,7 +35,8 @@
 		<p>Are you sure you want to delete?</p>
 		<form action="#" method="post">
 		  <input type="hidden" name="cid" value="{ID}" />
-		  <input type="hidden" name="delete" value="{COMPONENT_ID}" />
+		  <input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+                  <input type="hidden" name="component" value="{COMPONENT_ID}" />
 			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
 			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>

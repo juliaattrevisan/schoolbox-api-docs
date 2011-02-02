@@ -1,4 +1,4 @@
-<div class="box" id="component{COMPONENT_ID}">
+<div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
   <h2>{POLL_TITLE}</h2>
   <!-- BEGIN config -->
   <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
@@ -7,7 +7,7 @@
     <form action="/homepage/configForm.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
-      <input type="hidden" name="component" value="{COMPONENT_ID}" />
+      <input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
       <label for="size">Poll: </label>
       <select name="pollID">
         <!-- BEGIN select -->
@@ -20,7 +20,8 @@
 		<p>Are you sure you want to delete?</p>
 		<form action="#" method="post">
 		  <input type="hidden" name="cid" value="{ID}" />
-		  <input type="hidden" name="delete" value="{COMPONENT_ID}" />
+		  <input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+                  <input type="hidden" name="component" value="{COMPONENT_ID}" />
 			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
 			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
@@ -62,7 +63,7 @@
   <div class="text poll">
     <h3>{POLL_QUESTION}</h3>
     <br />
-    <div id="pollResult{COMPONENT_ID}" style="margin-top: 5px; width: 100%">
+    <div id="pollResult{COMPONENT_HOMEPAGE_ID}" style="margin-top: 5px; width: 100%">
       <noscript>
       <p>Flash player v9.0 required to view poll.</p>
       </noscript>
@@ -77,10 +78,10 @@
 		});
 		
 		function resetPoll() {
-			var chart = new FusionCharts("/flash/FCF_Column3D.swf", "myChartId", $j("#pollResult{COMPONENT_ID}").width(), "300", "8", "#FFFFFF");
+			var chart = new FusionCharts("/flash/FCF_Column3D.swf", "myChartId", $j("#pollResult{COMPONENT_HOMEPAGE_ID}").width(), "300", "8", "#FFFFFF");
 			chart.setDataURL("/poll/poll-xml.php%3FpollID%3D{POLL_ID}");
 			chart.addParam("wmode", "transparent");
-			chart.render("pollResult{COMPONENT_ID}");
+			chart.render("pollResult{COMPONENT_HOMEPAGE_ID}");
 		}
 		// ]]>
     </script>

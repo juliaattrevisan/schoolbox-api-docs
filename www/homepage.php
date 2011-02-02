@@ -233,7 +233,8 @@ if (is_array($componentList)) {
 		$this->setFile($componentHandle, 'homepage/components/'.$component['filename']);
 		$this->setBlock($componentHandle, "config", "config_block");
 
-		$this->setVar('COMPONENT_ID', $component['homepageComponentLocationID']);
+		$this->setVar('COMPONENT_HOMEPAGE_ID', $component['homepageComponentLocationID']);
+                $this->setVar('COMPONENT_ID', $component['component']);
 		
 		$default = unserialize($component['dfconfig']);
 		$config = unserialize($component['config']);
