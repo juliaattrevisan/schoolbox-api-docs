@@ -9,7 +9,7 @@
 <meta name="author" content="James Leckie, Lektec Consulting"/>
 <meta name="ROBOTS" content="INDEX, FOLLOW" />
 <!-- <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" /> -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/core-demo.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/screen.css" />
 
 
@@ -21,12 +21,11 @@ function init(){
 </script>
 </head>
 <body>
-<div id="container">
-  <div id="header">
-    <div id="logo"></div>	
+  <div id="header" class="login">
+   <a href="/" class="logo"><img src="/images/ormond/ormond_logo.jpg" width="782" height="119" alt="Ormond College" /></a>
   </div>
   <div id="nav"></div>
-  <div id="content">
+  <div id="content" class="login">
     <h1>Ormond Portal</h1>
 		<p class="error">{ERROR}</p>
 		<form id="loginForm" method="post" action="/loginForm.php">
@@ -49,9 +48,9 @@ function init(){
         <p>{TEMPLATE_YEAR}&nbsp;&copy;&nbsp;Copyright <a href="http://ormond.unimelb.edu.au" title="Ormond College">Ormond College</a>, <a href="http://www.unimelb.edu.au" title="University of Melbourne">The University of Melbourne</a>, Australia</p>
         <p><a href="/policy/ormond.htm">Guidelines of Use and Privacy Policy</a></p>
         <p><a href="http://www.alaress.com.au" title="Web Designers">Web Design</a> by Alaress</p>
-		<li class="last"><a href="/feedback.php" title="Web Designers">Feedback and Support</li>
+		<li class="last"><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
     	</div>
-  </div>
+
 </div>
 </body>
 </html>

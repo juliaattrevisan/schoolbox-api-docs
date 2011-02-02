@@ -54,8 +54,8 @@ $j(document).ready(function() {
             error.insertBefore(element)
             error.addClass('message ' + element.attr("ID"));  // add a class to the wrapper
             error.css('position', 'absolute');
-            error.css('left', offset.left);
-            error.css('top',  offset.top + element.outerHeight() + 5);
+            error.css('left', "16px");
+            error.css('top',  offset.top + element.outerHeight() -150);
 		}
     });
 });
@@ -72,7 +72,7 @@ $j(document).ready(function() {
 		<input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
 		<table class="standardForm" width="100%">
 			<tr>
-				<td class="formLabelWidth"><h4>Title</h4><em>The name of the test</em><input name="title" type="text" size="35" maxlength="50" value="{ASSESS_TITLE}"/></td>
+				<td class="formLabelWidth"><h4>Title</h4><em>The name of the test</em><input name="title" type="text" size="35" maxlength="50" value="{ASSESS_TITLE}" id="title"/></td>
 
 			</tr>
 			<tr>

@@ -1,6 +1,6 @@
 
 body { font-size: 75%; }   /* IE */
-html > body { font-size: 12px; -}  /* Other browsers */
+html > body { font-size: 12px; }  /* Other browsers */
 
 body {background: #d9effe;font-size:12px; color:#000000; font-family: Arial, Helvetica, sans-serif; text-align: left; margin:0;}
 /*--------------------------------------------------------------
@@ -104,7 +104,7 @@ th { font-weight:bold; }
 #nav ul.my-links{background-color:#f3faff;}
 
 /*TABBED NAV*/
-#tabs {position:absolute;right:20px;bottom: 0; left: 256px; min-width:730px}
+#tabs {position:absolute;right:20px;bottom: 0; left: 256px; min-width:730px;z-index:50;}
 #tabs li {z-index:1;  float: left; position: relative; }
 #tabs li a {font-weight:bold;font-size:16px;line-height:48px;color: #579dcf; height: 48px; display: block; float: left; padding: 0 18px; }
 #header #tabs li.navthis a {  -moz-border-radius: 7px 7px 0 0; -webkit-border-radius: 7px 7px 0 0; border-radius:7px 7px 0 0; background:#fff; font-weight: bold; color: #0066b0;}
@@ -170,7 +170,7 @@ fieldset{border:0; padding:0; margin:0;}
 .standardForm table { width: 100%; }
 .standardForm .checkAll, .standardForm .delCheck, .standardForm .acceptCheck { top: 0; }
 .message .error{background: #fff99a; padding: 5px;}
-.message{background:url(/images/core/assess/validate-arrow.jpg) 5px 0 no-repeat; padding-top:6px; display:block;}
+.message{background:url(/images/core/assess/validate-arrow.jpg) 5px 0 no-repeat; padding-top:6px; display:block;z-index:50}
 
 .standardForm td { vertical-align: top; padding: 16px; }
 .standardForm td h4{font-size:18px; margin-bottom:16px; color:#013a63; font-weight:bold;}
@@ -302,7 +302,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 #assess table.mceLayout{border:0;}
 #assess table td span{font-size:10px;}
 #assess .standardForm{background: #FAF9F5; margin-bottom:0;}
-#assess .standardForm td{width:100%;}
+#assess .standardForm td{width:100%; position:relative}
 #assess .standardForm thead td, #assess .standardForm{padding:0;}
 #assess .standardForm tbody{border-collapse:collapse;}
 #assess .assess-header{margin-bottom:20px;}

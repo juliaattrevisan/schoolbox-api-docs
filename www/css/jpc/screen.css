@@ -98,6 +98,8 @@ td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-l
 td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-change.current, td.cal-right a.filter-change:hover {
     background-color: #D3D3E4;
 }
+#assess h3{color:#000;}
+
 .dayWrap {
     background-color: #ECEAE7;
 }

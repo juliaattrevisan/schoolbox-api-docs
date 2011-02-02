@@ -13,26 +13,39 @@
 		});
 		
 		
-		
-		//show or hide bubbles
-		$j('ul.js_happening li').click(function(){
 
+		//position the bubbles, depending on where you are in the portal.
+		$j('ul.js_happening li').click(function(){ 
 			var dynamicHTML = $j(this).children('.hidden-fields').html();
-
 			$j('.cal-bubble .middle').children('.js-data').html(dynamicHTML);
+			
 			var position = $j(this).offset();
 			$j('.cal-bubble').show();
 			var annoyingHeight = ($j('.cal-bubble .middle').height() + ($j('.cal-bubble .top').height()) + ($j('.cal-bubble .bottom').height())) 			
-			$j('.cal-bubble').css("left", (position.left - 300));
+			$j('.cal-bubble').css("left", (position.left - 550));
 			$j('.cal-bubble').css("top", (position.top - annoyingHeight - 150));	
 			
 			if (($j('.cal-bubble').css("left")) < '0px') {
 					$j('.cal-bubble').css("left", '0');
-			}
-
+			}	
 		});
 		
-
+		$j('.text ul.js_happening li').click(function(){
+			var dynamicHTML = $j(this).children('.hidden-fields').html();
+			$j('.cal-bubble .middle').children('.js-data').html(dynamicHTML);
+			
+			var position = $j(this).offset();
+			$j('.cal-bubble').show();
+			var annoyingHeight = ($j('.cal-bubble .middle').height() + ($j('.cal-bubble .top').height()) + ($j('.cal-bubble .bottom').height())) 			
+			$j('.cal-bubble').css("left", (position.left - 550));
+			$j('.cal-bubble').css("top", (position.top - annoyingHeight - 200));	
+			
+			if (($j('.cal-bubble').css("left")) < '0px') {
+					$j('.cal-bubble').css("left", '0');
+			}	
+			
+			
+		});
 		
 		//show and hide the filters drop down
 		$j('a.filters').click(function(){
