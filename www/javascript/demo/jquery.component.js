@@ -49,19 +49,6 @@ $j(function() {
 	
 	$j('div.box h2').css('cursor', 'move');
 	
-	/* show/hide text based components */
-	$j(document).keydown(function (event) {
-		if (event.shiftKey) {
-			$j('div.manage h2').each(function () {
-				$j(this).css('display', 'block');
-			});
-		}
-	});
-	$j(document).keyup(function (event) {
-		$j('div.manage h2').each(function () {
-			$j(this).css('display', 'none');
-		});
-	});
 	
 	/* from here down I've changed the component functions!!!!*/
 	
@@ -207,9 +194,9 @@ $j(function() {
         });		
 
 		if($this.parent().hasClass('one-only')) {
-			$this.siblings('.notification').fadeIn(200, function() {
-				$j(this).delay(4000).fadeOut();
-			});
+			
+
+			
 			$this.remove();
 			$this.parent().addClass('.disabled');
 		} else if ($j('.how-many').html() == '') {
@@ -222,9 +209,11 @@ $j(function() {
 			$this.siblings('strong em').html(currentCount);
 		}
 		
-		$this.siblings('.notification').fadeIn(200, function() {
-			$j(this).delay(4000).fadeOut();
-		});
+		if (!$this.siblings('.notification').is(':visible')) {
+			$this.siblings('.notification').fadeIn(200, function() {
+				$j(this).delay(4000).fadeOut();
+			});
+		}
 		
 		
 	});
