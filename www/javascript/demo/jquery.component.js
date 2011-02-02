@@ -179,6 +179,13 @@ $j(function() {
 		var currentAmount = Number($j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html());
 		currentAmount--;
 		$j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html(currentAmount);
+		
+		if ($j('a[rel='+componentToDelete+']').parent().hasClass('disabled')) {
+			
+			$j('a[rel='+componentToDelete+']').parent().removeClass('disabled')
+				
+			
+		}
 	
 
 	});
@@ -202,8 +209,8 @@ $j(function() {
 			
         });		
 
-		if($this.parent().hasClass('.one-only')) {
-			$this.parent().addClass('.disabled');
+		if($this.parent().hasClass('one-only')) {
+			$this.parent().addClass('disabled');
 		} else if ($j('.how-many').html() == '') {
 			//if there are no modules but you can add one
 			$this.siblings('.how-many').append('You already have <em>1</em>');
