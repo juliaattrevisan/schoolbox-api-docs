@@ -1,3 +1,4 @@
+<!-- BEGIN custom_head -->
 <script type="text/javascript">
     $j(document).ready(function () {
         var chat_send_data = {};
@@ -18,24 +19,23 @@
                 data: chat_send_data,                
                 dataType: 'json',
                 success: function (data) {
-                    chat_recv_data = data;
+                    if (data.config.state == 'on') {
+                        chat_recv_data = data;
 
-                    if (chat_recv_data != null) {
-                        chat_recv(chat_recv_data);
-                        chat_recv_data = {};
+                        if (chat_recv_data != null) {
+                            chat_recv(chat_recv_data);
+                            chat_recv_data = {};
+                        }
+
+                        chat_send_data = {};
+                    } else {
+                        chat_close();
                     }
-
-                    chat_send_data = {};
                 }
             });
         }, 3000);
 
         var chat_recv = function (data) {
-            // deactivate chat
-            if (data.config.state == 'off') {
-                window.clearInterval(chat_interval);
-            }
-
             for (var i = 0; i < data.messages.length; i++) {
                 var message = data.messages[i];
                 
@@ -73,8 +73,12 @@
             return $j('<li></li>').text(message.sender + ' [' + message.timestamp + ']: ' + message.message);
         }
 
+        var chat_close = function () {
+            window.clearInterval(chat_interval);
+        }
+
         $j('#component{COMPONENT_HOMEPAGE_ID} form.chat-send a').click(chat_send);
-        $j('#component{COMPONENT_HOMEPAGE_ID} form.chat-send input[name="message"]').keydown(function (event) {
+        $j('#component{COMPONENT_HOMEPAGE_ID} input[name="message"]').keydown(function (event) {
             if (event.keyCode == 13) {
                 chat_send();
 
@@ -83,6 +87,7 @@
         });
     });
 </script>
+<!-- END custom_head -->
 
 <div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
     <h2>Chat</h2>
@@ -116,7 +121,7 @@
 <div class="float-fix"></div>
 </div>
 	<!-- END config -->
-    <div class="">
+    <div class="chat-box">
         <ul class="chat-users">
             <!-- BEGIN chat_user -->
             <li>{CHAT_NAME}</li>
@@ -128,8 +133,9 @@
             <!-- END chat_message -->
         </ul>
         <form action="#" method="post" class="chat-send">
-            <p class="interact"><input name="message" type="text"/><a href="#"
+            <p class="interact"><input name="message" type="text" /><a href="#"
                                                                       class="btn up-arrow"><span></span>Send</a></p>
         </form>
     </div>
+    <div class="chat-error hide"></div>
 </div>

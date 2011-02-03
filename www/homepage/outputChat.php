@@ -17,7 +17,7 @@ foreach (array('on', 'off') as $state) {
     $this->parse("chat_state_block", "chat_state", true);    
 }
 
-if ($config['state'] == 'on') {
+if ($config['state'] == 'on' || true) {
     $this->setVar('CHAT_INIT_NAME', formatName($_SESSION));
 
     $users = $chat->poll($categoryID, $_SESSION['id'], '-10 seconds');
@@ -38,6 +38,7 @@ if ($config['state'] == 'on') {
             $timestamp = new DateTime($message['timestamp']);
 
             $this->setVar(array(
+                'CHAT_CLASS'     => $_SESSION['id'] == $message['user_id'] ? 'sender' : '',
                 'CHAT_SENDER'    => formatName($message),
                 'CHAT_TIMESTAMP' => $timestamp->format('H:i:s'),
                 'CHAT_MESSAGE'   => scrubText($message['message'])

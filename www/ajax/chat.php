@@ -39,6 +39,8 @@ if (!empty($messages)) {
 
 $users = $chat->poll($_POST['category_id'], $_SESSION['id'], '-10 seconds');
 
+$config = array('state' => 'off');
+
 if (!empty($users)) {
     foreach ($users as &$user) {
         if ($group->getPermission($_POST['category_id'], $_SESSION['id']) > WRITE_ACCESS) {
@@ -47,18 +49,6 @@ if (!empty($users)) {
 
         $user['name'] = formatName($user);
     }
-}
-
-if ($config['state'] != 'on') {
-    $config['state'] = 'off';
-
-    $timestamp = new DateTime();
-
-    array_push($messages, array(
-        'sender'    => 'System',
-        'timestamp' => $timestamp->format('H:i:s'),
-        'message'   => '**** Chat is unavailable. ****'
-    ));
 }
 
 $data = array(
