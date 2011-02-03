@@ -1,0 +1,135 @@
+<script type="text/javascript">
+    $j(document).ready(function () {
+        var chat_send_data = {};
+        var chat_recv_data = {};
+
+        var timestamp = '{CHAT_INIT_TIMESTAMP}'; 
+        var sender = '{CHAT_INIT_NAME}';
+        
+        var chat_interval = window.setInterval(function () {
+            $j.extend(chat_send_data, {
+                category_id: '{ID}',
+                timestamp: timestamp
+            })
+
+            $j.ajax({
+                type: 'POST',
+                url: '/ajax/chat.php',
+                data: chat_send_data,                
+                dataType: 'json',
+                success: function (data) {
+                    chat_recv_data = data;
+
+                    if (chat_recv_data != null) {
+                        chat_recv(chat_recv_data);
+                        chat_recv_data = {};
+                    }
+
+                    chat_send_data = {};
+                }
+            });
+        }, 3000);
+
+        var chat_recv = function (data) {
+            // deactivate chat
+            if (data.config.state == 'off') {
+                window.clearInterval(chat_interval);
+            }
+
+            for (var i = 0; i < data.messages.length; i++) {
+                var message = data.messages[i];
+                
+                $j('#component{COMPONENT_HOMEPAGE_ID} ul.chat-messages').append(chat_msg(message));
+            }
+
+            $j('#component{COMPONENT_HOMEPAGE_ID} ul.chat-users').empty();
+
+            for (var i = 0; i < data.users.length; i++) {
+                var user = data.users[i];
+
+                $j('#component{COMPONENT_HOMEPAGE_ID} ul.chat-users').append($j('<li></li>').text(user.name));
+            }
+
+            timestamp = data.timestamp;
+        }
+
+        var chat_send = function () {
+            var message = $j('#component{COMPONENT_HOMEPAGE_ID} input[name="message"]');
+
+            if (message.val() != '') {
+                chat_send_data = {
+                    sender: sender,
+                    message: message.val()
+                };
+
+                $j('#component{COMPONENT_HOMEPAGE_ID} ul.chat-messages').append(chat_msg(chat_send_data));
+                message.val('')
+            }
+
+            return false;
+        }
+
+        var chat_msg = function (message) {
+            return $j('<li></li>').text(message.sender + ' [' + message.timestamp + ']: ' + message.message);
+        }
+
+        $j('#component{COMPONENT_HOMEPAGE_ID} form.chat-send a').click(chat_send);
+        $j('#component{COMPONENT_HOMEPAGE_ID} form.chat-send input[name="message"]').keydown(function (event) {
+            if (event.keyCode == 13) {
+                chat_send();
+
+                return false;
+            }
+        });
+    });
+</script>
+
+<div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
+    <h2>Chat</h2>
+	<!-- BEGIN config -->
+	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
+<a class="close-delete" href="#"><span>X</span></a>
+	<div class="editPanel settings hide">
+		<form action="/homepage/configForm.php" method="get">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="type" value="config" />
+            <input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+            <input type="hidden" name="state" value="{COMPONENT_CONFIG_STATE}" />
+            <select name="state">
+                <!-- BEGIN chat_state -->
+                <option value="{COMPONENT_CONFIG_CHAT_STATE}"{COMPONENT_CONFIG_CHAT_STATE_SELECTED}>{COMPONENT_CONFIG_CHAT_STATE}</option>
+                <!-- END chat_state -->
+            </select>
+            <input type="hidden" name="teacher_timestamp" value="{COMPONENT_CONFIG_TEACHER_TIMESTAMP}" />
+            <input type="submit" value="Update" class="submit-btn update" />
+    </form>
+  </div>
+<div class="editPanel delete-it hide">
+<p>Are you sure you want to delete?</p>
+<form action="#" method="post">
+  <input type="hidden" name="cid" value="{ID}" />
+  <input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+    <input type="hidden" name="component" value="{COMPONENT_ID}" />
+    <a href="#" class="delete-accept btn delete"><span></span>Yes</a>
+    <a href="#" class="delete-reject btn go-to"><span></span>No</a>
+</form>
+<div class="float-fix"></div>
+</div>
+	<!-- END config -->
+    <div class="">
+        <ul class="chat-users">
+            <!-- BEGIN chat_user -->
+            <li>{CHAT_NAME}</li>
+            <!-- END chat_user -->
+        </ul>
+        <ul class="chat-messages">
+            <!-- BEGIN chat_message -->
+            <li>{CHAT_SENDER} [{CHAT_TIMESTAMP}]: {CHAT_MESSAGE}</li>
+            <!-- END chat_message -->
+        </ul>
+        <form action="#" method="post" class="chat-send">
+            <p class="interact"><input name="message" type="text"/><a href="#"
+                                                                      class="btn up-arrow"><span></span>Send</a></p>
+        </form>
+    </div>
+</div>
