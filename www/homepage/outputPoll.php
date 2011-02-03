@@ -10,7 +10,7 @@ $this->setBlock($componentHandle, "poll_chart", "poll_chart_block");
 $this->setBlock('poll_chart', "poll_answers", "poll_answers_block");
 $this->setJavascript('/javascript/fusion.js');
 
-require_once '../library/poll.php';
+require_once SITE_root.'/library/poll.php';
 $pollHandler = new Poll;
 
 if (!empty($config['pollID']) && is_numeric($config['pollID']))

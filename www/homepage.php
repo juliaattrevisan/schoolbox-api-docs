@@ -86,7 +86,6 @@ if($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
 	$this->setBlock('customise_page', 'homepage_component_tab', 'homepage_component_tab_block');
     $this->setBlock('customise_page', 'homepage_component_page', 'homepage_component_page_block');
     $this->setBlock('homepage_component_page', 'homepage_component', 'homepage_component_block');
-    $this->setBlock('homepage_component', 'homepage_component_add', 'homepage_component_add_block');
 
     $this->parse('edit_page_block', 'edit_page');
 	$this->parse('modify_layout_block', 'modify_layout');
@@ -103,11 +102,11 @@ if($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
         $i = 0;
         foreach($componentList as $component) {
             $i++;
-
+                $class ='';
             if($component['allowMultiple'] == 'false' && $component['componentCount'] > 0)
-                $class = 'disabled';
-            else if($component['allowMultiple'] == 'false') {
-                $class = 'one-only';
+                $class = 'disabled ';
+            if($component['allowMultiple'] == 'false') {
+                $class .= 'one-only';
             }
             else
                 $class = '';
@@ -119,12 +118,6 @@ if($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
                             'HOMEPAGE_COMPONENT_CLASS'  => $class,
                             'HOMEPAGE_COMPONENT_CATEGORY_ID' => $previous['categoryID']);
             $this->setVar($output);
-
-            if($component['componentCount'] < 1 || $component['allowMultiple'] == 'true'){
-                $this->parse('homepage_component_add_block','homepage_component_add');
-            }
-            else
-                $this->setVar('homepage_component_add_block','');
 
             if($component['categoryName'] != $previous['categoryName'] && $i > 1) {
 
