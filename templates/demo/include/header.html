@@ -1,7 +1,8 @@
 <link rel="stylesheet" type="text/css" media="all" href="/css/demo/reset.css" />
 <link rel="stylesheet" type="text/css" media="print" href="/css/core/print.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/droppy.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/core-demo.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/core-demo.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/screen.css" />
 
 <link rel="Shortcut Icon" href="/images/{SITE_LOCATION}/favicon.ico" type="image/x-icon" />
 
@@ -15,21 +16,15 @@
 <script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
 <script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.autoclear.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/javascript/calendar/jquery.custom.calendar.js"></script>
 <script type="text/javascript" src="/javascript/{SITE_LOCATION}/scripts.js"></script>
-
 <script type='text/javascript'>	
 $j(function() {
-    $j('#nav ul').droppy({speed: 0});
- 
-	$j('#search-field').autoclear();
 
-	$j('#nav li.parent > a span').each(function() {
-		$j(this).append('<strong>&rsaquo;</strong>');
-	});
+    $j('#nav ul').droppy({speed: 0});
+	$j('#search-field').autoclear();
 	$j('.standardForm tr:last td').css("border", "0") 
-	
 
 });
 </script>

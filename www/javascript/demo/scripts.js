@@ -31,4 +31,11 @@ $j(function() {
 			
 			
 		});	
+		
+		
+
+	$j('#nav li.parent > a span').each(function() {
+		$j(this).append('<strong>&rsaquo;</strong>');
+	});
+	
 });

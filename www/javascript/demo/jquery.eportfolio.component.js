@@ -62,7 +62,7 @@ $j(function() {
 		});
 		
 		$j("a.edit").hover(function() {
-			if(!$(this).children('em').data('pinned')) {
+			if(!$j(this).children('em').data('pinned')) {
 				$j(this).children('em').addClass('show-it');
 				
 			}

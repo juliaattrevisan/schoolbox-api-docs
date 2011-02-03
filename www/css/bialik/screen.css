@@ -1,0 +1,247 @@
+body {
+    background:  #002c55;
+}
+
+a {
+    color: #2C4350;
+}
+a:hover {
+    color: #176D76;
+}
+
+h2, h2 a, .header_option {
+    background-color: #fff0b0;
+}
+h2{	
+	background-image:url(/images/bialik/content/h2-background.png);
+	background-repeat:repeat-x;
+}
+
+h1, h2, h2 a {
+	color:#0053a0;
+}
+
+
+.cal-bubble .time {
+    background: none repeat scroll 0 0 transparent;
+}
+.header_option {
+    background: none repeat scroll 0 0 transparent;
+}
+
+#tabs{min-width:924px; top:106px; left:256px; height:32px;}
+
+h3, #nav h3, .add-component .notification {
+    color: #FFFFFF;
+}
+
+.customise-components h3 {
+    color: #000000;
+}
+
+#infoPanel li{
+	color:#797979;
+}
+
+#infoPanel a {
+    color: #007eff;
+}
+
+
+#header{height:138px; background:url(/images/bialik/header/header-strip.png) repeat-x;}
+#header .header-overlay{height:104px; background:url(/images/bialik/header/header-overlay.jpg) no-repeat 100% 0;}
+#header .logo {height: 88px; padding-top: 0;width: 538px;left:0;}
+
+#nav {
+    top: 104px;
+}
+.colours-buttons {
+    background-color: #3375b3;
+}
+
+.customise-components {
+    background-color: #F8F8FC;
+    color: #000000;
+}
+
+
+
+#nav li a{color:#fff;}
+#tabs-homepage li.ui-state-default a {
+    background-color: #0053A0;
+    color: #FFFFFF;
+}
+#tabs-homepage li.ui-tabs-selected a {
+    background-color: #F8F8FC;
+    color: #0066B0;
+}
+#tabs li a {
+    color: #FFFFFF;
+}
+
+
+#tabs li a{height:32px; font-size:16px; padding:0 24px; line-height:32px;}
+#tabs li.navthis a {
+    color: #0053a0;
+	background:#fff url(/images/bialik/nav/current.jpg) repeat-x;
+	
+     -moz-border-radius: 8px 8px 0 0 ; 
+  -webkit-border-radius: 8px 8px 0 0 ; 
+          border-radius: 8px 8px 0 0 ; 
+
+}
+
+#tabs-sub li.ui-state-default a {
+    background-color: #F8F8FC;
+    color: #000000;
+}
+#tabs-sub li.ui-tabs-selected a, .active-box, #tabs-sub .ui-tabs-nav li a:hover {
+    background-color: #FAEDC3;
+    color: #000000;
+}
+
+.box .editPanel{
+	background:#fff8d9;
+	border:1px solid #ffd51d;
+}
+
+.box a.edit.active{
+	background:#fff8d9;
+	border:1px solid #ffd51d;
+	border-bottom:0;
+}
+
+.box a.edit.active span, .box a.edit.active .show-it {
+	color:#3da200 !important;
+}
+
+.box a.edit span, .box a.close-delete {
+	color:#fff !important;
+	height:22px;
+	width:22px;	
+	background:transparent url(/images/bialik/content/component-drop-arrow.png) no-repeat;
+}
+
+.box a.edit:hover span,  .box a.close-delete:hover{
+	
+	background:transparent url(/images/bialik/content/component-drop-arrow.png) no-repeat 0 100%;
+}
+
+#nav li a:hover, #nav li li a:hover, #category li a.selected {
+    background-color: #3375b3;
+    color: #ffffff;
+}
+#nav h3.my-links a{color: #000000;
+    right: 8px;
+    top: 6px;}
+
+
+#category li a:hover {
+    background: none repeat scroll 0 0 #3375b3;
+	color:#fff;
+}
+.login #header {
+    height: 104px;
+}
+
+.login #container{
+	
+
+     -moz-border-radius: 0px; 
+  -webkit-border-radius: 0px; 
+          border-radius: 0px; 
+
+	
+	}
+.dark, .dark td, #tree .dark, .standardForm, #assess .standardForm, #assess .additional-details, #assess .assess-body, .blog-comments .box, .post-left, #category, .search-item:nth-child(2n) {
+    background: none repeat scroll 0 0 #f2f6fa;
+}
+
+#nav ul,#nav ul.my-links{background:#0053a0}
+.dark td {
+    min-height: 1px;
+}
+.dayWrap p {
+    color: #000000;
+}
+.otherMonth .dayWrap p, .otherMonth .dayWrap a {
+    color: #797979;
+}
+td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, td.cal-right a.filter-change, .day-block {
+    background-color: #f2f6fa;
+}
+td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-change.current, td.cal-right a.filter-change:hover {
+    background-color: #D3D3E4;
+}
+#assess h3{color:#000;}
+
+.dayWrap {
+    background-color: #A6C3DE;
+}
+.calTableCurrent .dayWrap{
+	background-color:#ffffff;	
+	
+}
+
+.otherMonth .dayWrap, .past .dayWrap {
+    background-color: #b6d6f4;
+}
+#month-view td.dark, #week-view td.dark {
+    background-color:  #3375b3;
+	color:#fff;
+}
+#month-view h3, #week-view h3{color:#000;}
+
+#tooltip {
+    background-color: #222478;
+}
+
+#nav h3 {
+	height:32px; 
+	line-height:32px;
+  background-color: #005aa8;
+  background-image: -moz-linear-gradient(top, #005aa8, #00438d); 
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #005aa8),color-stop(1, #00438d)); 
+  background-image: linear-gradient(top, #005aa8, #00438d);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#005aa8', EndColorStr='#00438d'); 
+
+	
+	
+	}
+.top-split {
+    border-color: #222478;
+}
+
+#nav ul ul, .blog-comments p.interact {
+    background-color: #5c91c2;
+    border-color: #a6c3de;
+}
+#search{background:url(/images/bialik/header/search.png) no-repeat; width:289px; height:35px;}
+
+#search-field {
+    background: none;
+}
+td.cal-right .link-case .filter-drop .filter-list {
+    background: none repeat scroll 0 0 #FAEDC3;
+}
+.submit-btn-plain {
+    background-color: #F0F1F6;
+    background-image: -moz-linear-gradient(center top , #F0F1F6, #E0E2EC);
+    border-color: #BCBDD6;
+    color: #222478 !important;
+    text-shadow: 0 1px 0 #D6F0F6;
+}
+.submit-btn-plain:hover {
+    background-color: #FDF7E5;
+    background-image: -moz-linear-gradient(center top , #FDF7E5, #FBEFCA);
+    border-color: #F0C437;
+    color: #FF5A00 !important;
+    cursor: pointer;
+}
+.standardForm td {
+    border-color: #3375b3;
+}
+#footer ul li,#footer ul li a{
+	
+	color: #a6c3de;	
+}

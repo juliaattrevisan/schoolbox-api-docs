@@ -73,8 +73,8 @@ $j(function() {
 			hide: 'mouseout',
 			position: {
 				corner: {
-				tooltip: 'bottomLeft',
-				target: 'topright'
+					tooltip: 'bottomLeft',
+					target: 'topright'
 				}
 			},
 			api: {
@@ -82,7 +82,6 @@ $j(function() {
 					 onRender: function()
 					 {
 						var self = this;
-						console.log()
 					 }
 				 },
 			style: { 
