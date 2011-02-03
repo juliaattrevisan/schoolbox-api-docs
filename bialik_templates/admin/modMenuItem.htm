@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<title>{TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/> 
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/core-demo.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/bialik/screen.css" />
+
+<!-- BEGIN header_css --><!-- END header_css -->
+
+<link rel="Shortcut Icon" href="/images/demo/favicon.ico" type="image/x-icon" />
+
+<script type="text/javascript" src="/javascript/jquery1.4.2.min.js"></script>
+ 
+
+<script type='text/javascript'>
+  var $j = jQuery.noConflict(); 
+	
+	$j(function() {
+	$j('#nav ul').droppy({speed: 0});
+	$j('.standardForm tr:last td').css("border", "0"); 
+	
+	$j('#nav li.parent > a span').each(function() {
+		$j(this).append('<strong>&rsaquo;</strong>');
+	}); 
+  });
+</script>
+<script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
+<!-- BEGIN header_javascript -->
+<script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>
+<!-- END header_javascript -->
+</head>
+<body>
+<!-- #BeginEditable "head" -->
+<script language="JavaScript" type="text/javascript">
+
+function verify()
+{
+	var msg = ""
+	//check that description, url, location have been entered
+	if(document.form.text.value == ""){
+		msg += "You need to enter some text\n";
+	}
+	if(document.form.url.value == ""){
+		msg += "You need to enter a URL\n";
+	}
+	
+	if(msg != ""){
+		alert(msg);
+		return false;
+	}
+	else
+		return true;
+}
+	
+</script>
+<!-- #EndEditable -->
+  <div id="header">
+	<div class="header-overlay">
+		<ul id="infoPanel">
+			<li class="first">{SITE_GREETING} <a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">{SITE_LOGINNAME}</a>|</li>
+			<li><a href="/logout.php" alt="Logout" title="Logout">Logout</a></li>
+		</ul>
+		<form id="search" action="/search.php" method="get">
+			<fieldset>
+			<input id="search-field" type="text" name="keyword" value="search"/>
+			<input id="search-button" type="submit" value="Search" />
+		  </fieldset>
+		</form>
+		<a href="/" class="logo"><img src="/images/bialik/header/bialik-logo.png" width="538" height="88" alt="Bialik" /></a>
+	</div>
+</div>
+
+ 
+	
+	
+	
+	<div id="nav">
+    <h3>My Schoolbox</h3>
+    {MCSSMENU}
+    <!-- BEGIN msubject -->
+    <h3>My Subjects</h3>
+    <ul>
+      <!-- BEGIN msubject_block --> 
+      <li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li> 
+      <!-- END msubject_block -->
+    </ul>
+    <!-- END msubject -->
+    <!-- BEGIN mstudent -->
+    <h3>My Students</h3>
+    <ul>
+      <!-- BEGIN mstudent_block --> 
+      <li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
+      <!-- END mstudent_block -->
+    </ul>
+    <!-- END mstudent -->
+    <!-- BEGIN mgroup --> 
+    <h3>My Groups</h3>
+    <ul>
+      <!-- BEGIN mgroup_block --> 
+      <li><a href="/homepage/{MGID}/">{MGNAME}</a></li>
+      <!-- END mgroup_block -->
+    </ul>	
+    <!-- END mgroup --> 
+    <h3 class="my-links">My Links<a href="/cms/myLinks">Edit</a></h3>
+    <ul>
+      <!-- BEGIN mlink_block -->
+      <li>{MLINK}</li>
+      <!-- END mlink_block --> 
+      <li><a href="/cms/myLinks">Add Link</a></li>
+    </ul>	
+  </div>
+
+	<ul id="tabs">
+		<li class="{TAB_MAIN_ON}"><a href="/home/" title="Greeting page">Home</a></li>
+		<li class="{TAB_NEWS_ON}"><a href="/news/" title="Current school news">News</a></li>
+		<!-- BEGIN webmail_tab -->
+		<li class="{TAB_WEBMAIL_ON}"><a {WEBMAIL_LOCATION} title="Access your messages here">Webmail</span></a></li> 
+		<!-- END webmail_tab -->
+		<li class="{TAB_CALENDAR_ON}"><a href="/calendar/week/" title="School calendar events">Calendar</a></li>
+		<!-- BEGIN timetable_tab -->
+		<li class="{TAB_TIMETABLE_ON}"><a href="/timetable/" title="View your school timetable">Timetable</a></li>
+		<!-- END timetable_tab -->
+		<li class="{TAB_RESOURCES_ON}"><a href="/resources/" title="Browse resources and homepages">Resources</a></li>
+		<!-- BEGIN submission_tab -->
+		<li class="{TAB_SUBMISSION_ON}"><a href="/submission/listSubmission" title="Access your submission boxes">Submissions</a></li>
+		<!-- END submission_tab --> 
+		<!-- BEGIN eportfolio_tab -->
+		<li class="{TAB_EPORTFOLIO_ON}"><a href="/eportfolio/{EPORTFOLIO_USER_ID}" title="Access your eportfolio area">My ePortfolio</a></li>
+		<!-- END eportfolio_tab -->
+	</ul>
+	
+	<!-- BEGIN myfiles_tab --> 
+	<!-- END myfiles_tab -->
+
+<div id="container">
+
+
+  <div id="content">
+	<!-- #BeginEditable "content" --> 
+            <h1>{ACTION} Menu Item</h1>
+            <form action="" method="post" name="form" id="form" class="standardForm" onsubmit="return(verify());">
+                    <table>
+                      <tr> 
+                        <td class="formLabelWidth"><h4>Parent</h4>
+						<em>Select where in the menu you would like this item located.</em> <br />
+						{MENUITEMLIST}
+                        </td>
+                        </tr>
+                      <tr> 
+                        <td><h4>Name</h4>
+                          <em>This is the text that will be displayed on the menu</em><br />
+						  <input type="text" name="text" maxlength="250" size="40" value="{TEXT}" /> </td>
+                        </tr>
+                      <tr> 
+                        <td><h4>URL</h4>
+                          <em>The location at which the item should point. If 
+                          it is local url remember to use a reference relative 
+                          to the root.</em><br />
+						  <input type="text" name="url" size="40" maxlength="250" value="{URL}" /> </td>
+                        </tr>
+                      <tr> 
+                        <td><h4>Target</h4>
+               	          <em>Select wether you would like this link to open in a new window</em><br />
+						  {TARGETLIST}</td>
+                        </tr>
+                      <tr> 
+                        <td><h4>Campus Access</h4>
+                                <em>Select the campuses that should be able to view 
+                          this link. Note that this link will only be viewable 
+                          by people in both the campuses and groups selected</em> <br />
+						  {CAMPUSLIST}
+                        </td>
+                        </tr>
+                      <tr> 
+                        <td> <h4>Group Access</h4>{GROUPLIST}</td>
+                        </tr>
+                      <tr> 
+                        <td>&nbsp;</td>
+                        <td>{IDFIELD} 
+                          <input type="submit" name="Submit" value="{ACTION}" class="btn" /> 
+                        </td>
+                        </tr>
+                    </table>
+            </form>
+            <!-- #EndEditable -->
+    <div class="float-fix"></div>
+
+  </div>
+
+
+</div>
+	<div id="footer">
+<ul>
+  <li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SITE_ADDRESS}">{SITE_NAME}</a></li>
+  <li><a href="/policy/{SITE_LOCATION}.htm">Guidelines of Use and Privacy Policy</a></li>
+  <li class="last"><a href="http://www.alaress.com.au">Developed By Alaress</a></li>
+</ul>
+<div class="float-fix"></div>
+</div>
+</body>
+<!-- #EndTemplate --></html>

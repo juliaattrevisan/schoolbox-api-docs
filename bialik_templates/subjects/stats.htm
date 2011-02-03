@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- #BeginTemplate "/Templates/main.dwt" --><!-- DW6 -->
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<title>{TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/> 
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/core-demo.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/bialik/screen.css" />
+
+<!-- BEGIN header_css --><!-- END header_css -->
+
+<link rel="Shortcut Icon" href="/images/demo/favicon.ico" type="image/x-icon" />
+
+<script type="text/javascript" src="/javascript/jquery1.4.2.min.js"></script>
+ 
+
+<script type='text/javascript'>
+  var $j = jQuery.noConflict(); 
+	
+	$j(function() {
+	$j('#nav ul').droppy({speed: 0});
+	$j('.standardForm tr:last td').css("border", "0"); 
+	
+	$j('#nav li.parent > a span').each(function() {
+		$j(this).append('<strong>&rsaquo;</strong>');
+	}); 
+  });
+</script>
+<script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
+<!-- BEGIN header_javascript -->
+<script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>
+<!-- END header_javascript -->
+</head>
+<body>
+<!-- #BeginEditable "head" --><!-- #EndEditable -->
+  <div id="header">
+	<div class="header-overlay">
+		<ul id="infoPanel">
+			<li class="first">{SITE_GREETING} <a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">{SITE_LOGINNAME}</a>|</li>
+			<li><a href="/logout.php" alt="Logout" title="Logout">Logout</a></li>
+		</ul>
+		<form id="search" action="/search.php" method="get">
+			<fieldset>
+			<input id="search-field" type="text" name="keyword" value="search"/>
+			<input id="search-button" type="submit" value="Search" />
+		  </fieldset>
+		</form>
+		<a href="/" class="logo"><img src="/images/bialik/header/bialik-logo.png" width="538" height="88" alt="Bialik" /></a>
+	</div>
+</div>
+
+ 
+	
+	
+	
+	<div id="nav">
+    <h3>My Schoolbox</h3>
+    {MCSSMENU}
+    <!-- BEGIN msubject -->
+    <h3>My Subjects</h3>
+    <ul>
+      <!-- BEGIN msubject_block --> 
+      <li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li> 
+      <!-- END msubject_block -->
+    </ul>
+    <!-- END msubject -->
+    <!-- BEGIN mstudent -->
+    <h3>My Students</h3>
+    <ul>
+      <!-- BEGIN mstudent_block --> 
+      <li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
+      <!-- END mstudent_block -->
+    </ul>
+    <!-- END mstudent -->
+    <!-- BEGIN mgroup --> 
+    <h3>My Groups</h3>
+    <ul>
+      <!-- BEGIN mgroup_block --> 
+      <li><a href="/homepage/{MGID}/">{MGNAME}</a></li>
+      <!-- END mgroup_block -->
+    </ul>	
+    <!-- END mgroup --> 
+    <h3 class="my-links">My Links<a href="/cms/myLinks">Edit</a></h3>
+    <ul>
+      <!-- BEGIN mlink_block -->
+      <li>{MLINK}</li>
+      <!-- END mlink_block --> 
+      <li><a href="/cms/myLinks">Add Link</a></li>
+    </ul>	
+  </div>
+
+	<ul id="tabs">
+		<li class="{TAB_MAIN_ON}"><a href="/home/" title="Greeting page">Home</a></li>
+		<li class="{TAB_NEWS_ON}"><a href="/news/" title="Current school news">News</a></li>
+		<!-- BEGIN webmail_tab -->
+		<li class="{TAB_WEBMAIL_ON}"><a {WEBMAIL_LOCATION} title="Access your messages here">Webmail</span></a></li> 
+		<!-- END webmail_tab -->
+		<li class="{TAB_CALENDAR_ON}"><a href="/calendar/week/" title="School calendar events">Calendar</a></li>
+		<!-- BEGIN timetable_tab -->
+		<li class="{TAB_TIMETABLE_ON}"><a href="/timetable/" title="View your school timetable">Timetable</a></li>
+		<!-- END timetable_tab -->
+		<li class="{TAB_RESOURCES_ON}"><a href="/resources/" title="Browse resources and homepages">Resources</a></li>
+		<!-- BEGIN submission_tab -->
+		<li class="{TAB_SUBMISSION_ON}"><a href="/submission/listSubmission" title="Access your submission boxes">Submissions</a></li>
+		<!-- END submission_tab --> 
+		<!-- BEGIN eportfolio_tab -->
+		<li class="{TAB_EPORTFOLIO_ON}"><a href="/eportfolio/{EPORTFOLIO_USER_ID}" title="Access your eportfolio area">My ePortfolio</a></li>
+		<!-- END eportfolio_tab -->
+	</ul>
+	
+	<!-- BEGIN myfiles_tab --> 
+	<!-- END myfiles_tab -->
+
+<div id="container">
+
+
+  <div id="content">
+	<!-- #BeginEditable "content" -->
+			<h1>Homepage Statistics - {CATEGORY}</h1>
+			<!-- BEGIN menu -->
+			<ul>
+				<li><a href="stats.php?cid={ID}&code={CODE}">General Statistics</a></li>
+				<li><a href="stats.php?cid={ID}&code={CODE}&flag=1">Top Ten Recent Visits</a></li>
+				<li><a href="stats.php?cid={ID}&code={CODE}&flag=2">Top Ten Frequent Visits</a></li>
+				<li><a href="stats.php?cid={ID}&code={CODE}&flag=3">All Members</a></li>
+			</ul>
+			<!-- END menu -->
+			<!-- BEGIN stats_main -->
+			<!-- BEGIN tt_recent -->
+			<h2>{LISTREC}</h2>
+			<span class="header_option"><a href="stats.php?cid={ID}&amp;code={CODE}&amp;flag=4">{DISPLAY}</a></span>
+			<p>** These statistics have been taken from the {FIRSTDATE} **</p>
+			<table>
+				<tr>
+					<th>Lastname</th>
+					<th>Firstname</th>
+					<th>Hit Count</th>
+					<th>Last Accessed</th>
+				</tr>
+				<!-- BEGIN tt_recent_listing -->
+				<tr>
+					<td>{LNAME}</td>
+					<td>{FNAME}</td>
+					<td>{COUNT}</td>
+					<td>{DATE}</td>
+				</tr>
+				<!-- END tt_recent_listing -->
+			</table>
+			<!-- END tt_recent -->
+			<!-- BEGIN tt_freq -->
+			<h2>{LISTREC}</h2>
+			<span class="header_option"><a href="stats.php?cid={ID}&amp;code={CODE}&amp;flag=5">{DISPLAY}</a></span>
+			<p>** These statistics have been taken from the {FIRSTDATE} **</p>
+			<table>
+				<tr>
+					<th>Lastname</th>
+					<th>Firstname</th>
+					<th>Hit Count</th>
+					<th>Last Accessed</th>
+				</tr>
+				<!-- BEGIN tt_freq_listing -->
+				<tr>
+					<td>{LNAME}</td>
+					<td>{FNAME}</td>
+					<td>{COUNT}</td>
+					<td>{DATE}</td>
+				</tr>
+				<!-- END tt_freq_listing -->
+			</table>
+			<!-- END tt_freq -->
+			<!-- BEGIN all -->
+			<h2>{LISTREC}</h2>
+			<p>** These statistics have been taken from the {FIRSTDATE} **</p>
+			<table>
+				<tr>
+					<th>Lastname</th>
+					<th>Firstname</th>
+					<th>Hit Count</th>
+					<th>Last Accessed</th>
+				</tr>
+				<!-- BEGIN all_listing -->
+				<tr>
+					<td>{LNAME}</td>
+					<td>{FNAME}</td>
+					<td>{COUNT}</td>
+					<td>{DATE}</td>
+				</tr>
+				<!-- END all_listing -->
+			</table>
+			<!-- END all -->
+			<!-- BEGIN general -->
+			<h2>Hit Summary</h2>
+			<table>
+				<tr>
+					<th>&nbsp;</th>
+					<th>This Page</th>
+					<th>Entire Portal</th>
+				</tr>
+				<tr>
+					<td>All Hits</td>
+					<td>{ALL}</td>
+					<td>{PORTALALL}</td>
+				</tr>
+				<tr>
+					<td>Member Hits</td>
+					<td>{MEMBER}</td>
+					<td>{PORTALMEM}</td>
+				</tr>
+			</table>
+			<h2>Most Popular Pages</h2>
+			<table>
+				<tr>
+					<th>Type</th>
+					<th>Name</th>
+					<th>Hits</th>
+				</tr>
+				<!-- BEGIN spotstats -->
+				<tr>
+					<td>{TEMPLATE}</td>
+					<td><a href="/homepage.php?category={CID}">{HOMEPAGE}</a></td>
+					<td>{HITS}</td>
+				</tr>
+				<!-- END spotstats -->
+			</table>
+			<!-- END general -->
+			<!-- END stats_main -->
+			<!-- #EndEditable -->
+    <div class="float-fix"></div>
+
+  </div>
+
+
+</div>
+	<div id="footer">
+<ul>
+  <li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SITE_ADDRESS}">{SITE_NAME}</a></li>
+  <li><a href="/policy/{SITE_LOCATION}.htm">Guidelines of Use and Privacy Policy</a></li>
+  <li class="last"><a href="http://www.alaress.com.au">Developed By Alaress</a></li>
+</ul>
+<div class="float-fix"></div>
+</div>
+</body>
+<!-- #EndTemplate --></html>

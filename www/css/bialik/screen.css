@@ -3,10 +3,10 @@ body {
 }
 
 a {
-    color: #2C4350;
+    color: #007eff;
 }
 a:hover {
-    color: #176D76;
+    color: #0053a0;
 }
 
 h2, h2 a, .header_option {
@@ -127,31 +127,30 @@ h3, #nav h3, .add-component .notification {
 	background:transparent url(/images/bialik/content/component-drop-arrow.png) no-repeat 0 100%;
 }
 
-#nav li a:hover, #nav li li a:hover, #category li a.selected {
-    background-color: #3375b3;
+#nav li a:hover, #nav li li a:hover {
+    background-color: #7da7ce;
     color: #ffffff;
 }
+
+#category li a.selected {background:#d4e2ef; color:#0053a0;}
+
 #nav h3.my-links a{color: #000000;
     right: 8px;
     top: 6px;}
 
 
 #category li a:hover {
-    background: none repeat scroll 0 0 #3375b3;
-	color:#fff;
+    background: none repeat scroll 0 0 #fff0b0;
+	color:#0053a0;
 }
 .login #header {
     height: 104px;
 }
 
 .login #container{
-	
-
      -moz-border-radius: 0px; 
   -webkit-border-radius: 0px; 
           border-radius: 0px; 
-
-	
 	}
 .dark, .dark td, #tree .dark, .standardForm, #assess .standardForm, #assess .additional-details, #assess .assess-body, .blog-comments .box, .post-left, #category, .search-item:nth-child(2n) {
     background: none repeat scroll 0 0 #f2f6fa;
@@ -225,18 +224,28 @@ td.cal-right .link-case .filter-drop .filter-list {
     background: none repeat scroll 0 0 #FAEDC3;
 }
 .submit-btn-plain {
-    background-color: #F0F1F6;
-    background-image: -moz-linear-gradient(center top , #F0F1F6, #E0E2EC);
-    border-color: #BCBDD6;
-    color: #222478 !important;
-    text-shadow: 0 1px 0 #D6F0F6;
+	background-color: #e1ffe9;
+	background-image: -moz-linear-gradient(top, #e1ffe9, #bcffd0); 
+	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #e1ffe9),color-stop(1, #bcffd0)); 
+	background-image: linear-gradient(top, #e1ffe9, #bcffd0);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e1ffe9', EndColorStr='#bcffd0'); 
+	border-color: #79ad87;
+	color: #000000 !important;
+	text-shadow: 0 1px 0 #ffffff;
+	font-family:Arial, Helvetica, sans-serif;
+	font-weight:bold;
 }
 .submit-btn-plain:hover {
-    background-color: #FDF7E5;
-    background-image: -moz-linear-gradient(center top , #FDF7E5, #FBEFCA);
-    border-color: #F0C437;
-    color: #FF5A00 !important;
-    cursor: pointer;
+	background-color: #fffbe7;
+	background-image: -moz-linear-gradient(top, #fffbe7, #fff6cb); 
+	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fffbe7),color-stop(1, #fff6cb)); 
+	background-image: linear-gradient(top, #fffbe7, #fff6cb);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fffbe7', EndColorStr='#fff6cb'); 
+	border-color: #bdbdbd;
+	color: #000000 !important;
+	cursor: pointer;
+	font-family:Arial, Helvetica, sans-serif;
+	font-weight:bold;
 }
 .standardForm td {
     border-color: #3375b3;
