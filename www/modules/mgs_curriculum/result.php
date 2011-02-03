@@ -11,8 +11,8 @@ if($_GET['keyword']){
     $results = $synCurric->search($_GET['keyword']);
     //print_r($results);
     foreach($results as $subject) {
-        $output = array('SEARCH_RESULT_NAME' => $subject['SubjectAssessmentsCode'],
-                        'SEARCH_RESULT_CODE'    => $subject['SubjectAssessmentsCode']);
+        $output = array('SEARCH_RESULT_NAME' => $subject['Heading'].' - '.$subject['UnitName'].' ('.$subject['YearLevel'].')',
+                        'SEARCH_RESULT_CODE'    => $subject['SubjectAssessmentsCode'].'/'.$subject['computed']);
         $page->setVar($output);
         $page->parse('result_block','result',true);
     }
