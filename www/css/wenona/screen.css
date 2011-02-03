@@ -159,7 +159,7 @@ h2 {
 	background: 0;
 	text-indent: 4px;
 	}
-#content h2 a ,#content .box h2{
+#content h2 a ,#content .box h2, #content h2, #content h2 span a{
 	color: #000;
 	}	
 #content .homepage h2{color:#fff;}
