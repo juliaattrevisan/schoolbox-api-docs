@@ -4,6 +4,7 @@
         var chat_send_data = {};
         var chat_recv_data = {};
 
+        /* timestamp hold the timestamp for the last message sent */
         var timestamp = '{CHAT_INIT_TIMESTAMP}'; 
         var sender = '{CHAT_INIT_NAME}';
         
@@ -59,6 +60,7 @@
             if (message.val() != '') {
                 chat_send_data = {
                     sender: sender,
+                    timestamp: $j.datepicker.formatDate('Y-m-d H:i:s', new Date()),
                     message: message.val()
                 };
 
@@ -70,6 +72,9 @@
         }
 
         var chat_msg = function (message) {
+            message.timestamp = new Date();
+            message.timestamp = message.timestamp.getHours() + ':' + message.timestamp.getMinutes() + ':' + message.timestamp.getSeconds();
+
             return $j('<li></li>').text(message.sender + ' [' + message.timestamp + ']: ' + message.message);
         }
 

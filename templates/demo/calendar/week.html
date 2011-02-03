@@ -95,13 +95,14 @@
 					<li class="{EVENT_TYPE} {EVENT_LEVEL} "> 
 						<!-- BEGIN time --><span class="time">{TIME}&nbsp;</span><!-- END time --> 
 						<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}</span>
-							<div class="hidden-fields">
-								<h4><!-- BEGIN time --><div class="time"><strong>{TIME}</strong></div><!-- END time -->{NOTE}</h4>
-								<p class="meta">Event Type: {TYPE}<br />
-								Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></p>
-								<div class="modify">{MODIFY}</div>
-								<div class="float-fix"></div>
-							</div>
+                        <div class="hidden-fields">
+                            <h4><!-- BEGIN time --><div class="time"><strong>{TIME}</strong></div><!-- END time -->{NOTE}</h4>
+                            <p class="meta">Event Type: {TYPE}<br />
+                            Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br />
+                            {LOCATION} {DETAIL}</p>
+                            <div class="modify">{MODIFY}</div>
+                            <div class="float-fix"></div>
+                        </div>
 					</li>
 					<!-- END note_block -->
 				</ul></td>
