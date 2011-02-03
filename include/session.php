@@ -120,8 +120,8 @@ class Session {
         $ds=ldap_connect(LDAP_host);
         ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
         ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-        ldap_bind($ds, ldap_escape(LDAP_user), ldap_escape(LDAP_pass));
-        $searchString = "(SAMAccountName=".ldap_escape($username).")";
+        ldap_bind($ds, $this->ldap_escape(LDAP_user), $this->ldap_escape(LDAP_pass));
+        $searchString = "(SAMAccountName=".$this->ldap_escape($username).")";
         $result = ldap_search($ds,LDAP_base, $searchString, array('dn'));
         if($result) {
                 $entries = ldap_get_entries($ds, $result);
