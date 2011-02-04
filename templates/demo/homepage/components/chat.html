@@ -5,12 +5,13 @@
         var chat_recv_data = {};
 
         /* timestamp hold the timestamp for the last message sent */
-        var timestamp = '{CHAT_INIT_TIMESTAMP}'; 
+        var timestamp;
         var sender = '{CHAT_INIT_NAME}';
-        
-        var chat_interval = window.setInterval(function () {
+
+        var chat_interval = function () {
             $j.extend(chat_send_data, {
                 category_id: '{ID}',
+                component_id: '{CHAT_COMPONENT_ID}',
                 timestamp: timestamp
             })
 
@@ -20,21 +21,25 @@
                 data: chat_send_data,                
                 dataType: 'json',
                 success: function (data) {
+                    chat_recv_data = data;
+
+                    if (chat_recv_data != null) {
+                        chat_recv(chat_recv_data);
+                        chat_recv_data = {};
+                    }
+
+                    chat_send_data = {};
+
                     if (data.config.state == 'on') {
-                        chat_recv_data = data;
-
-                        if (chat_recv_data != null) {
-                            chat_recv(chat_recv_data);
-                            chat_recv_data = {};
-                        }
-
-                        chat_send_data = {};
+                        setTimeout(chat_interval, 2000);
                     } else {
                         chat_close();
                     }
                 }
             });
-        }, 3000);
+        }
+
+        chat_interval();
 
         var chat_recv = function (data) {
             for (var i = 0; i < data.messages.length; i++) {
@@ -57,10 +62,13 @@
         var chat_send = function () {
             var message = $j('#component{COMPONENT_HOMEPAGE_ID} input[name="message"]');
 
+            message.timestamp = new Date();
+            message.timestamp = message.timestamp.getHours() + ':' + message.timestamp.getMinutes() + ':' + message.timestamp.getSeconds();            
+
             if (message.val() != '') {
                 chat_send_data = {
                     sender: sender,
-                    timestamp: $j.datepicker.formatDate('Y-m-d H:i:s', new Date()),
+                    timestamp: message.timestamp,
                     message: message.val()
                 };
 
@@ -72,14 +80,10 @@
         }
 
         var chat_msg = function (message) {
-            message.timestamp = new Date();
-            message.timestamp = message.timestamp.getHours() + ':' + message.timestamp.getMinutes() + ':' + message.timestamp.getSeconds();
-
             return $j('<li></li>').text(message.sender + ' [' + message.timestamp + ']: ' + message.message);
         }
 
         var chat_close = function () {
-            window.clearInterval(chat_interval);
         }
 
         $j('#component{COMPONENT_HOMEPAGE_ID} form.chat-send a').click(chat_send);
@@ -128,18 +132,11 @@
 	<!-- END config -->
     <div class="chat-box">
         <ul class="chat-users">
-            <!-- BEGIN chat_user -->
-            <li>{CHAT_NAME}</li>
-            <!-- END chat_user -->
         </ul>
         <ul class="chat-messages">
-            <!-- BEGIN chat_message -->
-            <li class="{CHAT_CLASS}">{CHAT_SENDER} [{CHAT_TIMESTAMP}]: {CHAT_MESSAGE}</li>
-            <!-- END chat_message -->
         </ul>
         <form action="#" method="post" class="chat-send">
-            <p class="interact"><input name="message" type="text" /><a href="#"
-                                                                      class="btn up-arrow"><span></span>Send</a></p>
+            <p class="interact"><input name="message" type="text"/><a href="#" class="btn up-arrow"><span></span>Send</a></p>
         </form>
     </div>
     <div class="chat-error hide"></div>

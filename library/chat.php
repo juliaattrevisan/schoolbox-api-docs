@@ -39,6 +39,8 @@ class Chat extends Model {
             $timestamp->modify($timestamp_modify);
 
             $query .= " AND `timestamp` > '" . $timestamp->format('Y-m-d H:i:s') . "'";
+        } elseif (is_object($timestamp_modify)) {
+            $query .= " AND `timestamp` > '" . $timestamp_modify->format('Y-m-d H:i:s') . "'";
         }
 
         $query .= " ORDER BY timestamp ASC";

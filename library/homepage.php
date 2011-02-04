@@ -231,6 +231,23 @@ class Homepage {
 		);
 		$this->db->insert('homepage_comp_location', $query);
 	}
+
+    function setComponentConfig($homepageComponentLocationID, $config) {
+        $result =  $this->db->update('homepage_comp_location', 'homepageComponentLocationID', array(
+            'homepageComponentLocationID' => $homepageComponentLocationID,
+            'config' => serialize($config)
+        ));
+
+        return $result;
+    }
+
+    function getComponentConfig($homepageComponentLocationID) {
+        $query = "SELECT config FROM homepage_comp_location WHERE homepageComponentLocationID = $homepageComponentLocationID";
+
+        $config = unserialize($this->db->getOne($query));
+
+        return $config;
+    }
 	
 	function saveDisplayProperties($listColor)
 	{
