@@ -397,8 +397,39 @@ $j(function() {
 	$j('#restore').click(function() {
 		$j('.colorBox').each(function () {
 			$j(this).css('background-color', defaults[$j(this).attr('id')]);
-			$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
+			//$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
 		});
+		
+		$j('.left h2').css({
+			"color": defaults['left_head_font'],
+			"background-color":defaults['left_head_bg']
+		});
+		$j('.left p, .left h3, .left .listing p.small').css("color", defaults['left_font']);
+		$j('.left a, .left .listing p.small a').css('color', defaults['left_link']);
+		$j('.left .box a:hover, .left .listing p.small a:hover').css('color', defaults['left_hover']);
+		$j('.left .text').css('background',defaults['left_bg_primary']);
+		$j('.left .text.listing .dark ').css('background',defaults['left_bg_secondary']);
+		
+		$j('.right h2').css({
+			"color": defaults['right_head_font'],
+			"background-color":defaults['right_head_bg']
+		});
+		$j('.right p, .right h3, .right .listing p.small').css("color", defaults['right_font']);
+		$j('.right a, .right .listing p.small a').css('color', defaults['right_link']);
+		$j('.right .box a:hover, .right .listing p.small a:hover').css('color', defaults['right_hover']);
+		$j('.right .text').css('background',defaults['right_bg_primary']);
+		$j('.right .text.listing .dark ').css('background',defaults['right_bg_secondary']);
 	});
+	
+	$j('#cancel').click(function() {
+		$j('.colorBox').each(function () {
+			$j(this).css('background-color', original[$j(this).attr('id')]);
+		});
+		
+		$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
+		
+	});
+	
+
 
 });

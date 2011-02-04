@@ -362,3 +362,48 @@ table.ruler span.header_option{margin:-22px 12px 0 0;}
 p.important {
 	color: #f00;
 }
+
+/*************************
+
+Library
+
+**************************/
+.library-boxes{width:100%; border-collapse:collapse;}
+.library-boxes .resources{background:#f2e9f3 url(/images/mggs/library/nina-laptop.jpg) no-repeat;}
+.library-boxes .reading{background:#ebf7d9 url(/images/mggs/library/nina-book.jpg) no-repeat;}
+.library-boxes .updates{background:none;}
+.library-boxes .quick-facts{background:#deeef6 url(/images/mggs/library/nina-search.jpg) no-repeat;}
+.library-boxes .in-the-news{background:#f4f2db url(/images/mggs/library/nina-news.jpg) no-repeat;}
+.library-boxes .research-tools{background:#e5f3f0 url(/images/mggs/library/nina-config.jpg) no-repeat;}
+.library-boxes .click-view{background:#f6ebd0 url(/images/mggs/library/nina-play.jpg) no-repeat;}
+.library-boxes  td{padding:0; vertical-align:top;}
+.library-boxes .library-box {margin:0 16px 16px 0; min-height:134px; padding:16px;}
+.library-box ul li{ line-height:22px;}
+.library-box a{color:#3e8dfe; font-weight:bold;}
+
+.library-box h3, .updates h3{font-size:22px; font-weight:bold; background:none; margin-bottom:10px;}
+.updates h3{margin-top:16px;}
+.library-header ul{margin-left:137px;}
+.library-header ul li{float:left; display:block;}
+.library-header ul li a{line-height:30px; color:#fff; padding:0 11px; display:block; height:30px;}
+.library-header ul li a:hover{background:#9aae4a;      -moz-border-radius: 4px; 
+  -webkit-border-radius: 4px; 
+          border-radius: 4px; 
+		  text-decoration:none;
+		  
+}
+.library-header{background:#798e39 url(/images/mggs/library/nina-painting.jpg) no-repeat;
+     -moz-border-radius: 8px; 
+  -webkit-border-radius: 8px; 
+          border-radius: 8px; 
+		  height:103px;
+		  margin-bottom:15px;
+		  position:relative;
+}
+.library-header h1{padding:20px 0 0 144px; margin-bottom:20px;color:#fff; font-size:33px}
+.library-header h1 span{font-size:22px;}
+#library-search {position:absolute; right:16px; top:16px; background:#ffffff;-webkit-border-radius:4px; -moz-border-radius:4px; border-radius:4px; float: right; width: 288px; clear:right; border:0; height:32px; z-index:500}
+#library-search-field { font-weight:bold; color:#959595; font-size:16px;width: 232px; padding: 0 12px;height:32px; line-height:32px; border:0; background:#ffffff;-webkit-border-radius:3px; -moz-border-radius:3px; border-radius:3px; font-family:Arial, Helvetica, sans-serif }
+#library-search-button { -webkit-border-radius:4px; text-indent:-999999em; border:0;-moz-border-radius:4px; border-radius:4px; float:right; margin:0;text-align:center; line-height:32px; height:32px;width:32px; position:absolute; top:0; right:0; background:url("/images/demo/icons/search.png") no-repeat 50% 50%; padding:0;}
+#library-search-button:hover {  cursor:pointer;}
+

@@ -1,0 +1,90 @@
+<script type="text/javascript">
+	
+	$j(function() {
+		//in order for the boxes to complete their height adjustments effectively.
+		$j('tr td:first-child').each(function() {
+			var oneHeight = $j(this).height();
+			$j(this).children('.library-box').height(oneHeight - 48);
+			$j(this).next().children('.library-box').height(oneHeight - 48);
+		});
+		
+		//autoclear the catalogue search
+		$j('#library-search-field').autoclear();
+			
+	});
+
+</script>
+
+<div class="library-header">
+	<h1>Nina Crone <span>Library</span></h1>
+	<form id="library-search" action="/search.php" method="get">
+		<fieldset>
+			<input id="library-search-field" type="text" title="Catalogue Search" name="keyword" />
+			<input id="library-search-button" type="submit" value="Search" />
+		</fieldset>
+	</form>
+	<ul>
+		<li><a href="#">Home</a></li>
+		<li><a href="#">Catalogue</a></li>
+		<li><a href="#">Online Resources</a></li>
+		<li><a href="#">Remarkable Reading</a></li>
+		<li><a href="#">Research Tools</a></li>
+		<li><a href="#">Morris Hill Library</a></li>
+	</ul>
+	<div class="float-fix"></div>
+</div>
+<table class="library-boxes" >
+	<tr>
+		<td width="33%"><div class="library-box resources">
+				<h3>Online Resources</h3>
+				<ul>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+					<li>&rsaquo; <a href="#">Databases</a></li>
+				</ul>
+				
+			</div></td>
+		<td width="33%"><div class="library-box reading">
+				<h3>Remarkable Reading</h3>
+				<p></p>
+			</div></td>
+		<td rowspan="3" width="33%"><div class="updates">
+				<h3>New Books</h3>
+			</div></td>
+	</tr>
+	<tr>
+		<td><div class="library-box quick-facts">
+				<h3>Quick Facts</h3>
+			</div></td>
+		<td><div class="library-box in-the-news">
+				<h3>In The News</h3>
+					<ul>
+					<li>&rsaquo;<a href="#">Databases</a></li>
+					<li>&rsaquo;<a href="#">Databases</a></li>
+				</ul>
+			</div></td>
+	</tr>
+	<tr>
+		<td><div class="library-box research-tools">
+				<h3>Research Tools</h3>
+			</div></td>
+		<td><div class="library-box click-view">
+				<h3>Click View</h3>
+			</div></td>
+	</tr>
+</table>

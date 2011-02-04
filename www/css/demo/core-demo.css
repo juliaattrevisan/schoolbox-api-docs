@@ -902,9 +902,9 @@ adding:0 10px; position:absolute; right:0; top:30%; font-size:12px;}
 #pollForm h3 { margin-bottom: 1em; }
 #pollForm label { display: block; margin-bottom: 0.5em; }
 #pollForm label input { margin-right: 10px; }
-.text.poll { text-align: center; }
-.text.poll ol { text-align: left; }
-.text.poll li { list-style-type: upper-alpha; margin-bottom: 0.5em; }
+.poll { text-align: center; }
+.poll ol { text-align: left; margin-left:48px;list-style:upper-alpha;}
+.poll ol li {  margin-bottom: 0.5em;  display:list-item; vertical-alignment:top;}
 
 /*REVISIONS*/
 .left .revision-box { border:1px solid #C3CDD7; padding:10px; }
