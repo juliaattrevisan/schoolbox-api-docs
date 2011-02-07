@@ -903,7 +903,7 @@ adding:0 10px; position:absolute; right:0; top:30%; font-size:12px;}
 #pollForm label { display: block; margin-bottom: 0.5em; }
 #pollForm label input { margin-right: 10px; }
 .poll { text-align: center; }
-.poll ol { text-align: left; margin-left:48px;list-style:upper-alpha;}
+.poll ol { text-align: left; margin-left:16px;list-style:upper-alpha;}
 .poll ol li {  margin-bottom: 0.5em;  display:list-item; vertical-alignment:top;}
 
 /*REVISIONS*/

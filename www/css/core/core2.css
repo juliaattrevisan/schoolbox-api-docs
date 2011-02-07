@@ -820,8 +820,8 @@ p.forgotten{margin:10px 0;}
 #pollForm label { display: block; margin-bottom: 0.5em; }
 #pollForm label input { margin-right: 10px; }
 .text.poll { text-align: center; }
-.text.poll ol { text-align: left; }
-.text.poll li { list-style-type: upper-alpha; margin-bottom: 0.5em; }
+.poll ol { text-align: left;list-style:upper-alpha;}
+.poll ol li {  margin-bottom: 0.5em;  display:list-item; vertical-alignment:top;}
 
 /*REVISIONS*/
 .left .revision-box { border:1px solid #C3CDD7; padding:10px; }
