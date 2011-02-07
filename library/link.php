@@ -100,7 +100,7 @@ class Link extends Model {
 	}
         
         function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
-            $keyword = scrubText($keyword);
+            $keyword = mysql_real_escape_string($keyword);
 
             $query = "SELECT `link`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
                             MATCH(`url`,`description`,`comment`) AGAINST ('$keyword') AS `score`
