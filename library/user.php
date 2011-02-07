@@ -87,25 +87,44 @@ class User extends Model {
         function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'lastname', $sort_dir = 'desc') {
             $keyword = mysql_real_escape_string($keyword);
 
+            // retreive results
             $query = "SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
                         FROM `user`
                         LEFT JOIN `groups` ON `user`.group_id = `groups`.id
                         LEFT JOIN `luCampus` ON `user`.campus = `luCampus`.id
-                        WHERE
-                            username like '%$keyword%' OR firstname like '%$keyword%' OR
-                            lastname like '%$keyword%' OR alt_email like '%$keyword%'
-                        ORDER BY `$sort_by` $sort_dir
-                        LIMIT $offset, $limit;
-            ";
+                        WHERE";
 
+           foreach(explode(' ', $keyword) as $keyword_part) {
+               if(empty($query_or)) {
+                   $query_or = true;
+               } else {
+                   $query .= " OR ";
+               }
+
+                $query .= " username like '%$keyword_part%' OR firstname like '%$keyword_part%' OR
+                            lastname like '%$keyword_part%' OR alt_email like '%$keyword_part%'";
+            }
+
+            $query .= " ORDER BY `$sort_by` $sort_dir
+                        LIMIT $offset, $limit;";
+
+            // retreive count
             $count_query = "SELECT COUNT(*)
-                        FROM `user`
-                        LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-                        LEFT JOIN `luCampus` ON `user`.campus = `luCampus`.id
-                        WHERE
-                         username like '%$keyword%' OR firstname like '%$keyword%' OR
-                         lastname like '%$keyword%' OR alt_email like '%$keyword%'
-            ";
+                                FROM `user`
+                                LEFT JOIN `groups` ON `user`.group_id = `groups`.id
+                                LEFT JOIN `luCampus` ON `user`.campus = `luCampus`.id
+                                WHERE";
+
+           foreach(explode(' ', $keyword) as $keyword_part) {
+               if(empty($count_query_or)) {
+                   $count_query_or = true;
+               } else {
+                   $count_query .= " OR ";
+               }
+
+                $count_query .= " username like '%$keyword_part%' OR firstname like '%$keyword_part%' OR
+                                  lastname like '%$keyword_part%' OR alt_email like '%$keyword_part%'";
+            }
 
             $count = $this->db->getOne($count_query);
 
