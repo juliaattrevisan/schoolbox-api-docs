@@ -148,8 +148,8 @@ class Calendar extends Model {
 					$catQuery[] = $cat['id'];
 			}
 
-			$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.description, 
-                    submission_box.owner, user.firstname, user.lastname, user.title,
+			$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.description,
+                    submission_box.owner, submission_box.id, user.firstname, user.lastname, user.title,
 					DATE_FORMAT(submission_box.date, '%w') as dayIndex, 
 					DATE_FORMAT(submission_box.date, '" . CALENDAR_time_format . "') as dueTime
 				  FROM (category, submission_box )

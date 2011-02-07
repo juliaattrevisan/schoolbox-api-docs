@@ -95,20 +95,21 @@ for ($i = 0; $i < $totalDays; $i++) {
 	if (is_array($submissionList)) {
 		foreach ($submissionList as $submission) {	
 	
-			$output = array('TIME'			=> $submission['dueTime'],
-							'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['description'],
-							'COLOUR'		=> $calendarHandler->displayColour(4),
-                            'MODIFY'		=> '',
-                            'LOCATION'		=> '',
-                            'DETAIL'        => '',
-                            'EVENT_TYPE'    => 'submission',
-                            'TYPE'          => 'Due Work',
-                            'AUTHOR'        => formatName($submission),
-                            'AUTHOR_ID'     => $submission['owner'],
-                            'EVENT_LEVEL'   => '',
-						  );					  
-			
-			$this->setVar($output);
+			$output = array(
+                            'TIME'        => $submission['dueTime'],
+                            'NOTE'        => 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' (' . $submission['synergyCode'] . ')' : '') . ' - ' . $submission['description'],
+                            'COLOUR'      => $calendarHandler->displayColour(4),
+                            'MODIFY'      => '<a class="btn go-to float-left" href="/submission/submitWork/' . $submission['id'] . '"><span></span>Submit</a>',
+                            'LOCATION'    => '',
+                            'DETAIL'      => '',
+                            'EVENT_TYPE'  => 'submission',
+                            'TYPE'        => 'Due Work',
+                            'AUTHOR'      => formatName($submission),
+                            'AUTHOR_ID'   => $submission['owner'],
+                            'EVENT_LEVEL' => '',
+                        );
+
+            $this->setVar($output);
             $this->parse('time_block','time');
 			$this->parse("note_listing", "note_block", true);
 			$subout = 1;
@@ -143,20 +144,20 @@ for ($i = 0; $i < $totalDays; $i++) {
 	if(is_array($eventList)) {
 		foreach($eventList as $event) {
 
-			$output = array('TIME'		=> rtrim(
-											($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
-										   	($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
-										   "- "),
-                            'NOTE'		=> scrubTEXT($event['note']),
-                            'LOCATION'	=> scrubTEXT($event['location']),
-                            'DETAIL'	=> scrubTEXT($event['detail']),
-							'COLOUR'	=> '#'.$event['eventColour'],
-							'MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">Modify</a>" : '',
-                            'EVENT_TYPE'    => 'type'.$event['type'],
-                            'TYPE'          => $event['eventType'],
-                            'AUTHOR'        => formatName($event),
-						  );	
-			
+			$output = array('TIME' => rtrim(
+                                    ($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
+                                    ($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
+                                    "- "),
+                            'NOTE' => scrubTEXT($event['note']),
+                            'LOCATION' => scrubTEXT($event['location']),
+                            'DETAIL' => scrubTEXT($event['detail']),
+                            'COLOUR' => '#' . $event['eventColour'],
+                            'MODIFY'      => $calendarHandler->getPerm($event['id']) > 1 ? '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $event['id'] . '&returnTo=month"><span></span>Modify</a>' : '',
+                            'EVENT_TYPE' => 'type' . $event['type'],
+                            'TYPE' => $event['eventType'],
+                            'AUTHOR' => formatName($event),
+                        );
+
             if($event['access'] == 3 ) {
                 if(stristr($event['campusList'], ',' )) {
                     foreach(explode(',',$event['campusList']) as $campus) {

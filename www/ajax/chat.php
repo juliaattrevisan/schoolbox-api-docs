@@ -36,7 +36,9 @@ if ($config['state'] == 'on') {
         $timestamp = new DateTime($_POST['timestamp']);
         $messages = $chat->receive($_POST['category_id'], $timestamp, $_SESSION['id']);
     } else {
-        $messages = $chat->receive($_POST['category_id'], '-15 minutes');
+        $timestamp = new DateTime();
+        $timestamp->modify('-15 minutes');
+        $messages = $chat->receive($_POST['category_id'], $timestamp);
     }
 
     if (!empty($messages)) {
@@ -61,20 +63,20 @@ if ($config['state'] == 'on') {
 
             $user['name'] = formatName($user);
         }
+    } else {
+        $users = array();
     }
 
     $config['state'] = $write_user ? 'on' : 'off';
     $homepage->setComponentConfig($_POST['component_id'], $config);
 
-    $data = array(
+    header("Content-type: application/json");
+    echo json_encode(array(
         'config' => $config,
         'timestamp' => $timestamp->format('Y-m-d H:i:s'),
         'messages' => $messages,
         'users' => $users
-    );
+    ));
 }
-
-header("Content-type: application/json");
-echo json_encode($data);
 
 ?>
