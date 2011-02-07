@@ -320,11 +320,21 @@ class Assess extends Model {
 
         $categoryList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
 
+		/* See if you're in the Category first
+		 */
         foreach ($categoryList as $key => $value) {
             if ($value['id'] == $assess['category_id']) {
                 return true;
             }
         }
+
+		/* See if Groups have access
+		 */
+		if (!count($categoryList)) {
+			if ($groupHandler->getPermission($assess['category_id'], $_SESSION['id'])) {
+				return true;
+			}
+		}
 
         return false;
     }

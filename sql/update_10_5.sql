@@ -309,3 +309,6 @@ CREATE TABLE `wikiOpens`(
  */
 INSERT INTO error(id, message) VALUES (50, "You do not have permission to delete this user's file.");
 INSERT INTO error(id, message) VALUES (52, "This link is already shared in your ePortfolio.");
+
+INSERT INTO luEventType(eventTypeID, eventType, eventColour) VALUES (6, 'Online Assessment', 'fff3b2');
+INSERT INTO file_type(id, `name`) VALUES (11, 'Online Assessment');
