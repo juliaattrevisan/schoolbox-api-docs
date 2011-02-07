@@ -8,7 +8,9 @@ class Session {
 
     public function create($username) {
         require_once(dirname(__FILE__)  .'/../library/user.php');
+        require_once(dirname(__FILE__)  .'/../library/group.php');
         $userHandler = new User;
+        $groupHandler = new Group;
 
         //Clear all remenants of past sessions
         $this->destroy();
@@ -38,7 +40,7 @@ class Session {
             $_SESSION['eportfolio_enabled'] = $user['eportfolio_enabled'];
 
             //if no webmail enabled or user has elected to use external client set mailhandle to mailto:
-            if(MAIL_enable == 0 || $user['mail_handler'] || (isParent($user['group_id']) && !$user['local_email']))
+            if(MAIL_enable == 0 || $user['mail_handler'] || ($groupHandler->isParent($user['group_id']) && !$user['local_email']))
                 $_SESSION['mailhandle'] = "mailto:";
             else
                 $_SESSION['mailhandle'] = "/mail/createMail.php?replyto=";
@@ -210,9 +212,9 @@ class Session {
     }
 
     function setSynergyInfo($userHandler) {
-        require_once dirname(__FILE__) .'../library/synergetic-user.php';
-        require_once dirname(__FILE__) .'../library/group.php';
-        require_once dirname(__FILE__) .'../library/category.php';
+        require_once dirname(__FILE__) .'/../library/synergetic-user.php';
+        require_once dirname(__FILE__) .'/../library/group.php';
+        require_once dirname(__FILE__) .'/../library/category.php';
         $synUser = new SynergeticUser;
         $groupHandler = new Group;
         $catHandler = new Category;
@@ -226,7 +228,7 @@ class Session {
         if (is_numeric($synergy_id) && $_SESSION['FileSemester'] && $_SESSION['FileYear']) {
 
             //if user is parent get information regarding enrolled students
-            if (isParent($_SESSION['gid'])) {
+            if ($groupHandler->isParent($_SESSION['gid'])) {
                 if (defined('SYNERGY_sync_email') && SYNERGY_sync_email) {
                     //Updates parents email from synergetic
                     $email = $synUser->getEmail($synergy_id);

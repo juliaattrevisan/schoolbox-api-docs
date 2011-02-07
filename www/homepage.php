@@ -69,9 +69,6 @@ $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 
 
-$colours = $homepageHandler->getColorList();
-$this->setVar($colours);
-
 $codeCount = count(explode(',',$category['code']));
 
 $output = array('HEADING'				=> scrubTEXT($category['name']) . (isset($code) && $codeCount < 2 ? ' ('.$category['code'].')' : '' ),
@@ -158,11 +155,17 @@ if($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
     }
 
     $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
-	// Colors
+        // Colors
 	$listColor = $homepageHandler->getColorList();
+	$this->setVar('COLOUR_ARRAY', 'original');
+	$this->setVar($listColor);
+	$this->parse('colour_list_block', 'colour_list', true);
+
+        // Colors
 	$this->setVar('COLOUR_ARRAY', 'pickers');
 	$this->setVar($listColor);
 	$this->parse('colour_list_block', 'colour_list', true);
+
 
 	// defaults
 	$defaultColour = unserialize(HOMEPAGE_colors);
@@ -185,6 +188,10 @@ else {
 	$this->setVar('modify_layout_block', '');
     $this->setVar('customise_page_block', '');
 }
+
+
+$colours = $homepageHandler->getColorList();
+$this->setVar($colours);
 
 // output mime classes
 $allowedList = $allowedFiles->getAll();

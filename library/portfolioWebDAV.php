@@ -237,11 +237,11 @@ class PortfolioWebDAV {
 			$filename = basename($temp);
 
 			$cache = array('id'			=> $i,
-						  'parent'		=> 0,
-						  'path'		=> $temp,
-						  'name' 		=> urldecode($filename), 
-						  'description'	=> urldecode($filename), 
-						  'type'		=> 'dir',
+                                      'parent'		=> 0,
+                                      'path'		=> $temp,
+                                      'name' 		=> urldecode($filename),
+                                      'description'	=> urldecode($filename),
+                                      'type'		=> 'dir',
 						  );
 			
 			$this->cache[$md5Path]['all'][] = $cache;
