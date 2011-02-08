@@ -946,6 +946,46 @@ li.bars  a{font-weight:bold;}
 li.bars p{margin-bottom:5px;}
 li.bars {display:block; }
 
+/* SUBMISSION */
+.submission-history{float:left; margin-right:2%; width:26%; padding:16px; margin-bottom:16px;}
+.submission-history p{ margin-top:8px; margin-bottom:8px;}
+
+.background{background-color:#FAF9F5; 
+     -moz-border-radius: 0 0 4px 4px; 
+  -webkit-border-radius: 0 0 4px 4px; 
+          border-radius: 0 0 4px 4px; 
+}
+.submission-history h4{font-size:14px; color:#797979; font-weight:bold; margin-bottom:8px;}
+
+.mark-box, .mark-comment{float:left; margin-bottom:8px;}
+.mark-box{width:30%; margin-right:5%;background:#fff;}
+.mark-comment{width:65%;}
+
+.mark-box .mark-content{padding:4px; border:1px solid #000; text-align:center;-moz-border-radius: 4px; 
+  -webkit-border-radius: 4px; 
+          border-radius: 4px; }
+.mark-box .actual-mark{font-weight:bold; font-size:14px; display:block; padding-top:4px;
+     
+}
+table.subjectList {
+	width: 100%;
+}
+
+dt {
+	width: 100px;
+	font-weight: bold;
+	float: left;
+	clear: left;
+}
+dd {
+	margin-bottom: 12px;
+	float: left;
+}
+.overdue {
+	color: #e00;
+}
+
+
 /*TIMETABLE*/
 #timetable { width: 100%; background: #ececec; border-spacing: 5px; bord er-collapse: separate; }
 #timetable td { background: #fff; padding: 0; font-size: 80%; width: 10%; vertical-align: top; }
