@@ -7,26 +7,32 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="James Leckie, Lektec Consulting"/> 
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core2.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/shore/screen.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/core-demo.css" /> 
+<link rel="stylesheet" type="text/css" media="screen" href="/css/shore/screen.css" /> 
 
+<!-- BEGIN header_css --><!-- END header_css -->
+
+<link rel="Shortcut Icon" href="/images/demo/favicon.ico" type="image/x-icon" />
 
 <script type="text/javascript" src="/javascript/jquery.js"></script>
 <script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
 <script type='text/javascript'>
-  var $j = jQuery.noConflict();
+  var $j = jQuery.noConflict(); 
 	
 	$j(function() {
     $j('#nav ul').droppy({speed: 0});
+	
+		$j('.standardForm tr:last td').css("border", "0"); 
+	
   });
 </script>
 <!-- BEGIN header_javascript -->
 <script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>
 <!-- END header_javascript -->
-
 </head>
-<body id="admin-old"> 
+
+<body>
 <!-- #BeginEditable "head" -->
 <script type="text/javascript">
 function verify()
@@ -46,6 +52,18 @@ function verify()
 	if(document.getElementById('userForm').group.value == "" || isNaN(document.getElementById('userForm').group.value)){
 		msg += "You need to select a group\n";
 	}
+
+   /* Campus validation: check that a default campus is selected
+    */
+   if (!$j('input[name=defaultCampus]:checked').length) {
+      msg += "You need to select a default campus\n";
+   }
+
+   /* Check also that at least one campus has been chosen
+    */
+   if (!$j('input[name=campus[]]:checked').length) {
+      msg += "You need to select at least one campus for this user\n";
+   }
 
 	if(msg != ""){
 		alert(msg);
@@ -76,176 +94,172 @@ $j(document).ready(function () {
 	
 </script>
 <!-- #EndEditable -->
+  <div id="header">
+  <a class="logo" href="/"><img src="/images/shore/shore-logo.gif"  /></a>
 
-<div id="nav">
-	<h3>Shore</h3>
-  {MCSSMENU}
-	<!-- BEGIN msubject -->
-	<h3>My Classes</h3>
-  <ul>
-    <!-- BEGIN msubject_block --> 
-    <li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li> 
-    <!-- END msubject_block -->
-  </ul>
-  <!-- END msubject -->
-  <!-- BEGIN mstudent -->
-	<h3>My Students</h3>
-  <ul>
-    <!-- BEGIN mstudent_block --> 
-    <li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
-    <!-- END mstudent_block -->
-  </ul>
-  <!-- END mstudent -->
-  <!-- BEGIN mgroup --> 
-  <h3>My Groups</h3>
-  <ul>
-  	<!-- BEGIN mgroup_block --> 
-		<li><a href="/homepage/{MGID}/">{MGNAME}</a></li> 
-		<!-- END mgroup_block -->
-  </ul>	
-  <!-- END mgroup --> 
-  <h3>My Links</h3>
-  <ul>
-  	<!-- BEGIN mlink_block -->
-  	<li>{MLINK}</li>
-    <!-- END mlink_block --> 
-    <li><a href="/cms/myLinks">Add Link</a></li>
-  </ul>	
-</div>
-<div id="wrap">
-	<div id="wrap-inner">
-	  <div id="header">
-	   <div id="logo"><a href="/" title="Lampada">Lampada</a></div>
-		<form id="search" action="/search.php" method="get">
-			<fieldset>
-			<input id="search-field" type="text" name="keyword" />
-			<input type="image" value="Search" src="/images/shore/search-button.gif" id="search-button">
-		  </fieldset>
-		</form>
-		<ul id="infoPanel">
-		  <li><a href="/logout.php" title="">Logout</a></li>
-		</ul>
-		<ul id="tabs">
-		  <li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Home</a></li>
-		  <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
-		  <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">Announcements</a></li>
-		  <!-- BEGIN webmail_tab -->
-		  <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Email</a></li>
-		  <!-- END webmail_tab -->
-		  <!-- BEGIN timetable_tab -->
-		  <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
-		  <!-- END timetable_tab -->
-		  <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
-		  <li><a href="/logout.php" title="">Logout</a></li>
-		</ul>
-		
-		<!-- BEGIN myfiles_tab -->
-		<!-- END myfiles_tab -->
-		<!-- BEGIN portfolio_tab -->
-		<!-- END portfolio_tab -->
-	  </div>
-	  <div id="container">
-		  <div id="content">
-		  <!-- #BeginEditable "content" -->
+<form id="search" action="/search.php" method="get">
+	<fieldset>
+  	<input id="search-field" type="text" name="keyword" />
+    <input id="search-button" type="image" src="/images/shore/search-button.gif" value="Search" />
+  </fieldset>
+</form>
+
+<ul id="infoPanel">
+	<li class="first">{SITE_GREETING} <a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">{SITE_LOGINNAME}</a>|</li>
+    <li><a href="/logout.php" alt="Logout" title="Logout">Logout</a></li>
+</ul>	
+	
+<ul id="tabs">
+	<li class="{TAB_MAIN_ON}"><a href="/home/" title="Greeting page">Home</a></li>
+	<li class="{TAB_NEWS_ON}"><a href="/news/" title="Current school news">News</a></li>
+	<!-- BEGIN webmail_tab -->
+	<li class="{TAB_WEBMAIL_ON}"><a {WEBMAIL_LOCATION} title="Access your messages here">Webmail</span></a></li> 
+	<!-- END webmail_tab -->
+	<li class="{TAB_CALENDAR_ON}"><a href="/calendar/week/" title="School calendar events">Calendar</a></li>
+	<!-- BEGIN timetable_tab -->
+	<li class="{TAB_TIMETABLE_ON}"><a href="/timetable/" title="View your school timetable">Timetable</a></li>
+	<!-- END timetable_tab -->
+	<li class="{TAB_RESOURCES_ON}"><a href="/resources/" title="Browse resources and homepages">Resources</a></li>
+	<!-- BEGIN submission_tab -->
+	<li class="{TAB_SUBMISSION_ON}"><a href="/submission/listSubmission" title="Access your submission boxes">Submissions</a></li>
+	<!-- END submission_tab --> 
+	<!-- BEGIN eportfolio_tab -->
+	<li class="{TAB_EPORTFOLIO_ON}"><a href="/eportfolio/{EPORTFOLIO_USER_ID}" title="Access your eportfolio area">My ePortfolio</a></li>
+	<!-- END eportfolio_tab -->
+</ul>
+
+<!-- BEGIN myfiles_tab --> 
+<!-- END myfiles_tab -->
+
+
+  </div>
+<div id="container">
+
+
+  <div id="nav">
+    <h3>My Schoolbox</h3>
+    {MCSSMENU}
+    <!-- BEGIN msubject -->
+    <h3>My Subjects</h3>
+    <ul>
+      <!-- BEGIN msubject_block --> 
+      <li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li> 
+      <!-- END msubject_block -->
+    </ul>
+    <!-- END msubject -->
+    <!-- BEGIN mstudent -->
+    <h3>My Students</h3>
+    <ul>
+      <!-- BEGIN mstudent_block --> 
+      <li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
+      <!-- END mstudent_block -->
+    </ul>
+    <!-- END mstudent -->
+    <!-- BEGIN mgroup --> 
+    <h3>My Groups</h3>
+    <ul>
+      <!-- BEGIN mgroup_block --> 
+      <li><a href="/homepage/{MGID}/">{MGNAME}</a></li>
+      <!-- END mgroup_block -->
+    </ul>	
+    <!-- END mgroup --> 
+    <h3>My Links</h3>
+    <ul>
+      <!-- BEGIN mlink_block -->
+      <li>{MLINK}</li>
+      <!-- END mlink_block --> 
+      <li><a href="/cms/myLinks">Add Link</a></li>
+    </ul>	
+  </div>
+
+  <div id="content">
+	<!-- #BeginEditable "content" -->
       <h1>User Details</h1>
-      <form action="" method="post" id="userForm" class="standardForm" autocomplete="off" onsubmit="return(verify());">
-        <table>
+      <form action="" method="post" id="userForm"  autocomplete="off" onsubmit="return(verify());">
+        <table cellpadding="0" cellspacing="0" class="standardForm">
           <tr>
-            <td><h2>Preferred</h2></td>
-            <td><select name="title">
-                
-								{TITLELIST}
-							
+            <td><h4>Preferred</h4>
+			<select name="title">
+				{TITLELIST}				
               </select>
-              <input type="text" name="firstname" value="{FIRSTNAME}" />
-            </td>
-            <td><h2>Surname</h2></td>
-            <td><input type="text" name="lastname" value="{LASTNAME}" />
-            </td>
+              <input type="text" name="firstname" value="{FIRSTNAME}" /></td>
+            <td><h4>Surname</h4>
+			<input type="text" name="lastname" value="{LASTNAME}" /></td>
           </tr>
           <tr>
-            <td><h2>Username</h2></td>
-            <td><input type="text" name="username" value="{USERNAME}" />
-            </td>
-            <td><h2>Password</h2></td>
-            <td><input type="password" name="password" value="{PASSWORD}" />
-            </td>
+            <td><h4>Username</h4>
+			<input type="text" name="username" value="{USERNAME}" /></td>
+
+            <td><h4>Password</h4>
+			<input type="password" name="password" value="{PASSWORD}" />&nbsp;&nbsp;&nbsp;&nbsp;<span onmouseover="this.innerHTML='{PASSWORD}';" onmouseout="this.innerHTML='Reveal Password';">Reveal Password</span></td>
           </tr>
           <tr>
-            <td><h2>Synergy ID</h2></td>
-            <td><input type="text" name="synergyid" value="{SYNERGYID}" />
-            </td>
-            <td>&nbsp;</td>
-            <td><span onmouseover="this.innerHTML='{PASSWORD}';" onmouseout="this.innerHTML='Reveal Password';">Reveal Password</span></td>
+            <td colspan="2"><h4>Synergy ID</h4>
+			<input type="text" name="synergyid" value="{SYNERGYID}" /></td>
           </tr>
           <tr>
-            <td><h2>Local Email</h2></td>
-            <td><input type="checkbox" name="local_email" value="1" {LOCAL_EMAIL} /></td>
-            <td><h2>Alternate Email</h2></td>
-            <td><input type="text" name="alt_email" value="{ALT_EMAIL}" /></td>
+            <td><h4>Local Email</h4>
+			<input type="checkbox" name="local_email" value="1" {LOCAL_EMAIL} /></td>
+
+            <td><h4>Alternate Email</h4>
+			<input type="text" name="alt_email" value="{ALT_EMAIL}" /></td>
+
           </tr>
           <tr>
-            <td><h2>Superuser</h2></td>
-            <td><input type="checkbox" name="su" value="1" {SUPERUSER} onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME} superuser status?'));" />
-            </td>
-            <td><h2>Group</h2></td>
-            <td><select name="group">{GROUPLIST}</select>
-            </td>
+            <td><h4>Superuser</h4>
+			<input type="checkbox" name="su" value="1" {SUPERUSER} onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME} superuser status?'));" /></td>
+
+            <td><h4>Group</h4>
+			<select name="group">{GROUPLIST}</select></td>
+
           </tr>
           <tr>
-            <td><h2>Campus</h2></td>
-            <td>
-               <table id="campusList">
+            <td><h4>Campus</h4>
+			
+			<table id="campusList" cellpadding="0" cellspacing="0">
                   <tr>
                      <td style="width: 75px;text-align:center;">Set default</td><td></td>
                   </tr>
                   {CAMPUSLIST}
                </table>
-            </td>
-            <td><h2>Year</h2></td>
-            <td><input name="year" type="text" size="2" maxlength="2" value="{YEAR}" /></td>
+			
+			</td>
+
+            <td><h4>Year</h4>
+			<input name="year" type="text" size="2" maxlength="2" value="{YEAR}" /><input type="hidden" name="id" value="{ID}" /></td>
           </tr>
-            <tr>
-                <td>
-                    <h2>E-Portfolio</h2>
+		   <tr>
+                <td colspan="2">
+                    <h4>E-Portfolio</h4>
+					 <input name="eportfolioEnabled" type="checkbox" value="1" {EPORTFOLIO_ENABLED} />
                 </td>
-                <td>
-                    <input name="eportfolioEnabled" type="checkbox" value="1" {EPORTFOLIO_ENABLED} />
-                </td>
-                <td></td>
-                <td></td>
+
+
             </tr>
-          <tr>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td><input type="hidden" name="id" value="{ID}" />
-              <input type="submit" name="submit" value="{ACTION}" class="btn" />
-              <!-- BEGIN delete_button -->
-              <input type="submit" name="delete" value="Delete" class="btn" onclick="return(confirm('Are you sure you want to delete {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME}'));" />
-              <!-- END delete_button -->
-            </td>
-          </tr>
+
         </table>
+		<input type="submit" name="submit" value="{ACTION}" class="submit-btn-plain" />
+		  <!-- BEGIN delete_button -->
+		  <input type="submit" name="delete" value="Delete" class="submit-btn-plain" onclick="return(confirm('Are you sure you want to delete {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME}'));" />
+		  <!-- END delete_button -->
+		  <div class="float-fix"></div>
       </form>
       <!-- BEGIN login -->
-      <form action="/loginForm.php" method="post" id="loginForm" class="standardForm">
-        <table>
-          <tr>
-            <td><h2>Click here to transfer session to this user</h2></td>
-            <td><input type="hidden" name="username" value="{USERNAME}" />
-              <input type="hidden" name="password" value="{PASSWORD}" />
-              <input type="submit" class="btn" name="loginSubmit" value="Login" /></td>
-          </tr>
-        </table>
+	  <br /><br />
+      <form action="/loginForm.php" method="post" id="loginForm" >
+		  <h3 style="float:left; margin-right:20px;">Click "login" below to transfer session to this user</h3>
+ 		  <input type="hidden" name="username" value="{USERNAME}" />
+		  <input type="hidden" name="password" value="{PASSWORD}" />
+		  <input type="submit" class="submit-btn-plain" name="loginSubmit" value="Login" />
+		<div class="float-fix"></div>
       </form>
       <!-- END login -->
       <!-- BEGIN groups -->
       <h1>Groups</h1>
       <form action="" method="post" id="groupForm" class="standardForm">
-        <table>
+        <table  cellpadding="0" cellspacing="0">
           <tr>
-            <th>Group Name</th>
+            <th width="50%">Group Name</th>
             <th>Access</th>
             <th>Make Owner</th>
             <th>Remove</th>
@@ -262,7 +276,7 @@ $j(document).ready(function () {
             <td>{GROUP_DROP_DOWN}</td>
             <td><input type="hidden" name="uid" value="{ID}" />
               <input type="hidden" name="service" value="1" /></td>
-            <td><input type="submit" name="groupSubmit" value="Add" class="btn"/></td>
+            <td><input class="submit-btn-plain" type="submit" name="groupSubmit" value="Add" /></td>
             <td>&nbsp;</td>
           </tr>
         </table>
@@ -271,9 +285,9 @@ $j(document).ready(function () {
       <!-- BEGIN perms -->
       <h1>Permissions</h1>
       <form action="" method="post" id="permForms" class="standardForm">
-        <table>
+        <table  cellpadding="0" cellspacing="0">
           <tr>
-            <th>Name</th>
+            <th width="50%">Name</th>
             <th>ID</th>
             <th>Type</th>
             <th>Remove</th>
@@ -291,13 +305,13 @@ $j(document).ready(function () {
             <td><input name="sid" type="text" size="4" maxlength="6" /></td>
             <td><input name="type" type="text" size="4" maxlength="6"  /></td>
             <td><input type="hidden" name="uid" value="{ID}" />
-              <input type="submit" name="permSubmit" value="Add" class="btn"/></td>
+              <input type="submit" name="permSubmit" value="Add" class="submit-btn-plain"/></td>
           </tr>
         </table>
       </form>
       
  <h1>Recent Login Log</h1>
-      <table class="ruler">
+      <table class="standardForm"  cellpadding="0" cellspacing="0">
         <tr>
           <th>Date</th>
           <th>IP</th>
@@ -312,7 +326,7 @@ $j(document).ready(function () {
         <!-- END login_log -->
       </table>
       <h1>Recent Action Log</h1>
-      <table class="ruler">
+      <table class="standardForm" cellpadding="0" cellspacing="0">
         <tr>
           <th>Date</th>
           <th>Action</th>
@@ -330,18 +344,18 @@ $j(document).ready(function () {
       </table>
 	  <!-- END perms -->
       <!-- #EndEditable -->
-		  <div class="float-fix"></div>
-		  </div>
-		</div>
-	</div>
-</div>
+    <div class="float-fix"></div>
+  </div>
 
-<div id="footer">
-	<ul>
-  	<li>{YEAR} &copy; Copyright Shore</li>
-    <li><a href="#">Guidelines of Use and Privacy Policy</a></li>
-    <li class="last"><a href="http://www.alaress.com.au">Developed By Alaress</a></li>
-  </ul>
+
+</div>
+	<div id="footer">
+<ul>
+  <li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SITE_ADDRESS}">{SITE_NAME}</a></li>
+  <li><a href="/policy/{SITE_LOCATION}.htm">Guidelines of Use and Privacy Policy</a></li>
+  <li class="last"><a href="http://www.alaress.com.au">Developed By Alaress</a></li>
+</ul>
+<div class="float-fix"></div>
 </div>
 </body>
 <!-- #EndTemplate --></html>

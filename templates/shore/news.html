@@ -27,12 +27,15 @@
 			$j('div.topic > div:first-child').show();
 		}
 		
+		$j('.header_option a').addClass("btn modify");
+		$j('.header_option a').html("<span></span>Modify");
+		
 	});
 </script>
 <!-- END custom_head -->
 
 <h1><span>Announcements</span> 
-<!-- BEGIN add_news --> <a class="customise" href="/news/modify">Add Announcements</a><!-- END add_news --></h1>
+<!-- BEGIN add_news --> <a class="btn add" href="/news/modify"><span></span>Add Announcements</a><!-- END add_news --></h1>
 <div class="float-fix"></div>
 <ul id="category">
   <!-- BEGIN topic_header -->
@@ -45,9 +48,9 @@
     
   <!-- BEGIN news -->
   <div id="a{NEWS_ID}" class="news-item">
-    <h3 id="news-header"><a name="{NEWS_ID}"></a><span>{NEWS_TITLE}</span></h3>
+    <h3 id="news-header"><a name="{NEWS_ID}"></a><span>{NEWS_TITLE}</span><span class="header_option">{MODIFY}</span></h3>
 	
-    <span class="header_option">{MODIFY}</span>
+    
 	<div class="float-fix"></div>
    	<div class="pad-it"> {NEWS_BODY}
     <hr />
@@ -71,5 +74,5 @@
 </div>
 
 <!-- BEGIN archive_button -->
-	<p class="interact"><a href="/news-archive/">View Archived Announcements</a></p>
+	<p class="interact"><a href="/news-archive/" class="btn"><span></span>View Archived Announcements</a></p>
 <!-- END archive_button -->

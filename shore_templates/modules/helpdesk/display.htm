@@ -7,102 +7,117 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="James Leckie, Lektec Consulting"/> 
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core2.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/shore/screen.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/core-demo.css" /> 
+<link rel="stylesheet" type="text/css" media="screen" href="/css/shore/screen.css" /> 
 
+<!-- BEGIN header_css --><!-- END header_css -->
+
+<link rel="Shortcut Icon" href="/images/demo/favicon.ico" type="image/x-icon" />
 
 <script type="text/javascript" src="/javascript/jquery.js"></script>
 <script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
 <script type='text/javascript'>
-  var $j = jQuery.noConflict();
+  var $j = jQuery.noConflict(); 
 	
 	$j(function() {
     $j('#nav ul').droppy({speed: 0});
+	
+		$j('.standardForm tr:last td').css("border", "0"); 
+	
   });
 </script>
 <!-- BEGIN header_javascript -->
 <script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>
 <!-- END header_javascript -->
-
 </head>
-<body id="admin-old"> 
-<!-- #BeginEditable "head" --><!-- #EndEditable -->
 
-<div id="nav">
-	<h3>Shore</h3>
-  {MCSSMENU}
-	<!-- BEGIN msubject -->
-	<h3>My Classes</h3>
-  <ul>
-    <!-- BEGIN msubject_block --> 
-    <li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li> 
-    <!-- END msubject_block -->
-  </ul>
-  <!-- END msubject -->
-  <!-- BEGIN mstudent -->
-	<h3>My Students</h3>
-  <ul>
-    <!-- BEGIN mstudent_block --> 
-    <li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
-    <!-- END mstudent_block -->
-  </ul>
-  <!-- END mstudent -->
-  <!-- BEGIN mgroup --> 
-  <h3>My Groups</h3>
-  <ul>
-  	<!-- BEGIN mgroup_block --> 
-		<li><a href="/homepage/{MGID}/">{MGNAME}</a></li> 
-		<!-- END mgroup_block -->
-  </ul>	
-  <!-- END mgroup --> 
-  <h3>My Links</h3>
-  <ul>
-  	<!-- BEGIN mlink_block -->
-  	<li>{MLINK}</li>
-    <!-- END mlink_block --> 
-    <li><a href="/cms/myLinks">Add Link</a></li>
-  </ul>	
-</div>
-<div id="wrap">
-	<div id="wrap-inner">
-	  <div id="header">
-	   <div id="logo"><a href="/" title="Lampada">Lampada</a></div>
-		<form id="search" action="/search.php" method="get">
-			<fieldset>
-			<input id="search-field" type="text" name="keyword" />
-			<input type="image" value="Search" src="/images/shore/search-button.gif" id="search-button">
-		  </fieldset>
-		</form>
-		<ul id="infoPanel">
-		  <li><a href="/logout.php" title="">Logout</a></li>
-		</ul>
-		<ul id="tabs">
-		  <li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Home</a></li>
-		  <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
-		  <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">Announcements</a></li>
-		  <!-- BEGIN webmail_tab -->
-		  <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Email</a></li>
-		  <!-- END webmail_tab -->
-		  <!-- BEGIN timetable_tab -->
-		  <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
-		  <!-- END timetable_tab -->
-		  <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
-		  <li><a href="/logout.php" title="">Logout</a></li>
-		</ul>
-		
-		<!-- BEGIN myfiles_tab -->
-		<!-- END myfiles_tab -->
-		<!-- BEGIN portfolio_tab -->
-		<!-- END portfolio_tab -->
-	  </div>
-	  <div id="container">
-		  <div id="content">
-		  <!-- #BeginEditable "content" -->
+<body>
+<!-- #BeginEditable "head" --><!-- #EndEditable -->
+  <div id="header">
+  <a class="logo" href="/"><img src="/images/shore/shore-logo.gif"  /></a>
+
+<form id="search" action="/search.php" method="get">
+	<fieldset>
+  	<input id="search-field" type="text" name="keyword" />
+    <input id="search-button" type="image" src="/images/shore/search-button.gif" value="Search" />
+  </fieldset>
+</form>
+
+<ul id="infoPanel">
+	<li class="first">{SITE_GREETING} <a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">{SITE_LOGINNAME}</a>|</li>
+    <li><a href="/logout.php" alt="Logout" title="Logout">Logout</a></li>
+</ul>	
+	
+<ul id="tabs">
+	<li class="{TAB_MAIN_ON}"><a href="/home/" title="Greeting page">Home</a></li>
+	<li class="{TAB_NEWS_ON}"><a href="/news/" title="Current school news">News</a></li>
+	<!-- BEGIN webmail_tab -->
+	<li class="{TAB_WEBMAIL_ON}"><a {WEBMAIL_LOCATION} title="Access your messages here">Webmail</span></a></li> 
+	<!-- END webmail_tab -->
+	<li class="{TAB_CALENDAR_ON}"><a href="/calendar/week/" title="School calendar events">Calendar</a></li>
+	<!-- BEGIN timetable_tab -->
+	<li class="{TAB_TIMETABLE_ON}"><a href="/timetable/" title="View your school timetable">Timetable</a></li>
+	<!-- END timetable_tab -->
+	<li class="{TAB_RESOURCES_ON}"><a href="/resources/" title="Browse resources and homepages">Resources</a></li>
+	<!-- BEGIN submission_tab -->
+	<li class="{TAB_SUBMISSION_ON}"><a href="/submission/listSubmission" title="Access your submission boxes">Submissions</a></li>
+	<!-- END submission_tab --> 
+	<!-- BEGIN eportfolio_tab -->
+	<li class="{TAB_EPORTFOLIO_ON}"><a href="/eportfolio/{EPORTFOLIO_USER_ID}" title="Access your eportfolio area">My ePortfolio</a></li>
+	<!-- END eportfolio_tab -->
+</ul>
+
+<!-- BEGIN myfiles_tab --> 
+<!-- END myfiles_tab -->
+
+
+  </div>
+<div id="container">
+
+
+  <div id="nav">
+    <h3>My Schoolbox</h3>
+    {MCSSMENU}
+    <!-- BEGIN msubject -->
+    <h3>My Subjects</h3>
+    <ul>
+      <!-- BEGIN msubject_block --> 
+      <li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li> 
+      <!-- END msubject_block -->
+    </ul>
+    <!-- END msubject -->
+    <!-- BEGIN mstudent -->
+    <h3>My Students</h3>
+    <ul>
+      <!-- BEGIN mstudent_block --> 
+      <li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
+      <!-- END mstudent_block -->
+    </ul>
+    <!-- END mstudent -->
+    <!-- BEGIN mgroup --> 
+    <h3>My Groups</h3>
+    <ul>
+      <!-- BEGIN mgroup_block --> 
+      <li><a href="/homepage/{MGID}/">{MGNAME}</a></li>
+      <!-- END mgroup_block -->
+    </ul>	
+    <!-- END mgroup --> 
+    <h3>My Links</h3>
+    <ul>
+      <!-- BEGIN mlink_block -->
+      <li>{MLINK}</li>
+      <!-- END mlink_block --> 
+      <li><a href="/cms/myLinks">Add Link</a></li>
+    </ul>	
+  </div>
+
+  <div id="content">
+	<!-- #BeginEditable "content" -->
       <!-- BEGIN user -->
       <h1>Helpdesk Information for {USER_CURR}</h1>
       <h2>Job List</h2>
-      <table class="indent ruler">
+      <table class="standardForm">
         <thead>
           <tr>
             <th>Created</th>
@@ -124,7 +139,7 @@
       </table>
       <br />
       <h2>Equipment List</h2>
-      <table class="ruler indent">
+      <table class="standardForm">
         <thead>
           <tr>
             <th>Type</th>
@@ -146,18 +161,18 @@
       </table>
       <!-- END user -->
       <!-- #EndEditable -->
-		  <div class="float-fix"></div>
-		  </div>
-		</div>
-	</div>
-</div>
+    <div class="float-fix"></div>
+  </div>
 
-<div id="footer">
-	<ul>
-  	<li>{YEAR} &copy; Copyright Shore</li>
-    <li><a href="#">Guidelines of Use and Privacy Policy</a></li>
-    <li class="last"><a href="http://www.alaress.com.au">Developed By Alaress</a></li>
-  </ul>
+
+</div>
+	<div id="footer">
+<ul>
+  <li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SITE_ADDRESS}">{SITE_NAME}</a></li>
+  <li><a href="/policy/{SITE_LOCATION}.htm">Guidelines of Use and Privacy Policy</a></li>
+  <li class="last"><a href="http://www.alaress.com.au">Developed By Alaress</a></li>
+</ul>
+<div class="float-fix"></div>
 </div>
 </body>
 <!-- #EndTemplate --></html>

@@ -1,13 +1,12 @@
 /*---------------------------------------
 	Layout Styles
 ----------------------------------------*/
-#logo {
+#header .logo {
 	width: 298px;
 	height: 71px;
 	left:20px; top:10px;
-	background: url(/images/shore/shore-logo.gif) no-repeat;
+	padding:0;
 	}
-#logo a{background:none;}
 #content {}
 #header{ margin-left:180px; height:90px;}
 table th,
@@ -16,13 +15,21 @@ table td {
 }
 body{background:#E4E4E4 url(/images/bg.gif) repeat-y scroll;}
 #container, #container.login, #header.login, #footer.login{margin-left:180px;}
-
+a{color:#1965B4}
 
 /*---------------------------------------
 	Component Styles
 ----------------------------------------*/
 
-h1{border-bottom:1px dashed #7F7F7F;margin-bottom:1em; margin-top:-10px;}
+h1{
+	border-bottom:1px dashed #7F7F7F;margin-bottom:1em; margin-top:-10px;
+    border-color: -moz-use-text-color -moz-use-text-color #7F7F7F;
+    border-style: none none dashed;
+    border-width: 0 0 1px;
+    font-size: 1.33em;
+    font-weight: bold;
+    line-height: 2;
+    margin: 0 0 1em;}
 
 h1 a.customise {
 	font-size: 12px;
@@ -34,6 +41,7 @@ h2, .homepage h2 {
 	-webkit-border-radius:0;
 	border-radius:0;
 	font-size:116%;
+	color:#fff;
 	}
 
 #content h2 a {
@@ -75,6 +83,29 @@ p.important {
 #tabs li a:hover{background-color:#e1f0ff;}
 #tabs li a.navthis{background-color:#fff; border-bottom-color:#fff;}
 
+#month-view td.dark, #week-view td.dark {
+    background-color: #003E7E;
+	color:#fff;
+}
+.dayWrap {
+    background-color:  #CAE4FF
+}
+.dayWrap p{color:#000;}
+
+.otherMonth .dayWrap, .past .dayWrap {
+    background-color: #f7fbff;
+}
+
+.day-block {background-color:#fff; border-color:#e4e4e4;}
+td.cal-right a.filter-change {
+    background-color: #e4e4e4;
+	color:#000;
+}
+
+td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box {
+	background-color:#e4e4e4;	
+	
+}
 /*---------------------------------------
 	Nav Styles
 ----------------------------------------*/
@@ -115,10 +146,56 @@ width:180px;
 	}
 #tabs {
 	right: 15px;
+	left:auto;
 	}
-#nav ul{border:0 none; -moz-border-radius:0; -webkit-border-radius:0; border-radius:0; margin:0 !important;}
-#nav ul li a{color:#fff;}
-#nav{top:0; margin:0;}
+#tabs li a{height: 31px; font-size:12px;padding: 0 20px; font-weight:normal;}
+#nav ul{border:0 none; padding:0; margin:0 !important; background:none; width:auto;}
+#nav li a, #nav li a:hover{width:162px;-moz-border-radius:0; -webkit-border-radius:0; border-radius:0;padding: 7px 9px;font-size: 11px;}
+#nav li.parent > a span, #nav li.parent > a.hover span {
+    background: url("/images/mggs/nav-arrow.gif") no-repeat scroll 100% 2px transparent;
+	line-height:12px;
+}
+
+#nav li a span {display: block; width: 100%;}
+
+#nav ul li a{color:#fff; margin-left:0;}
+#nav{top:-1px; margin:0;}
+#nav ul ul li{border:1px solid #dbdbdb;}
+#nav ul ul, #nav ul ul ul{top:0; width:182px;}
+#nav ul ul ul ul{left:180px;}
+#nav ul ul li a:hover{background:#1597cb;}
+#nav ul ul{-moz-border-radius:0; -webkit-border-radius:0; border-radius:0; padding:0;border:0;-moz-box-shadow:none; -webkit-box-shadow: none;box-shadow: none;}
+#nav li a:hover, #nav li li a:hover { color: #fff; text-decoration: none; background: #1965B3;  -moz-border-radius: 0px ;-webkit-border-radius: 0px ; border-radius: 0px;}
+#nav * {
+    z-index: 99;
+}
+#nav h3 {
+    border-color: #333333 ;
+    border-style: solid solid none;
+    border-width: 1px 1px 0;
+    clear: left;
+    color: #FFFFFF;
+    font-weight: bold;
+    height: 29px;
+    line-height: 29px;
+    margin: 0;
+    padding: 0 0 0 10px;
+    text-transform: none;
+}
+
+#nav h3 {
+    -moz-border-radius: 0 0 0 0;
+    background: url("/images/shore/nav-title-bg.gif") repeat-x scroll 0 0 #002349;
+    border-bottom: 1px solid #001C3A;
+    border-top: 1px solid #003D7B;
+    text-transform: uppercase;
+	font-size:12px;
+}
+
+.customise-components{background:#e4e4e4;}
+#tabs-homepage li.ui-tabs-selected a {background:#e4e4e4;}
+#tabs-sub li.ui-tabs-selected a {background:#fff;}
+
 /*---------------------------------------
 	Header Styles
 ----------------------------------------*/
@@ -132,9 +209,7 @@ width:180px;
 table .header_option {
 	margin-top: -25px;
 	}
-.news-item .header_option {
-	margin-top: -31px;
-	}
+
 	
 .news-item{border:1px solid #ebebeb; margin-bottom:10px; padding:0;}
 #news-header{position:relative;background:#e1f0ff; width:100%; padding:10px 0; font-weight:bold; text-indent:10px;}
@@ -148,6 +223,69 @@ p.interact {
 p.interact a {
 	color: #1965B4;
 	}
-#search{margin-top:18px}
+#search{margin-top:18px; background:none; margin-right:0;}
 #search-button{width:auto; height:auto; border:0 none;}
+#search-field {
+    border: 1px solid #B8B8B8;
+    float: left;
+    padding: 3px 5px;
+    width: 175px;
+	background:#fff;
+	height:auto;
+	font-size:12px;
+	color:#000;
+	font-weight:normal;
+	line-height:normal;
+}
 #infoPanel{margin:22px 15px 0 0;}
+#infoPanel li{
+    color: #444444;
+    float: left;
+    font-size: 11px;
+
+    padding-left: 11px;
+}
+
+.dark, .dark td, #tree .dark, .standardForm, #assess .standardForm, #assess .additional-details, #assess .assess-body, .blog-comments .box, .post-left, #category, .search-item:nth-child(2n) {
+    background: none repeat scroll 0 0 #e4e4e4;
+}
+#category li a.selected {
+    background-color:#003E7E;
+    color: #fff;
+}
+
+#category {
+    -moz-border-radius: 6px 6px 6px 6px;
+    background: #e4e4e4
+}
+
+.submit-btn-plain {
+
+  background-color: #cae4ff;
+  background-image: -moz-linear-gradient(top, #cae4ff, #9accff); 
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #cae4ff),color-stop(1, #9accff)); 
+  background-image: linear-gradient(top, #cae4ff, #9accff);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#cae4ff', EndColorStr='#9accff'); 
+
+    border-color: #003E7E;
+    color: #000 !important;
+    text-shadow: 0 1px 0 #9accff;
+}
+.submit-btn-plain:hover {
+
+  background-color: #e1f0ff;
+  background-image: -moz-linear-gradient(top, #e1f0ff, #9accff); 
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #e1f0ff),color-stop(1, #9accff)); 
+  background-image: linear-gradient(top, #e1f0ff, #9accff);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e1f0ff', EndColorStr='#9accff'); 
+
+    border-color: #003E7E;
+    color: #000 !important;
+    cursor: pointer;
+}
+
+.standardForm td {
+    border-color: #003E7E
+}
+
+#footer{margin-left:182px;}

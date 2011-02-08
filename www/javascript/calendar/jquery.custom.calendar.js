@@ -14,8 +14,6 @@
 		
 		$j('a.filters').click(function(){
 			
-			alert('poo');
-			
 			//$j('.cal-bubble').hide();
 				
 			$j('.filter-drop').toggle();

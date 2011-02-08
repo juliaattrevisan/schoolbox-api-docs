@@ -49,7 +49,7 @@ function confirmDelete(newsID) {
 		<input type="hidden" name="newsID" value="{NEWS_ID}" />
 		<table>
 		  <tr> 
-			<td class="formLabelWidth"><h3>Groups</h3><em>This announcement will only be visible to the groups you select. You can select multiple by holding down 'crtl' while selecting.</em></td>
+			<td class="formLabelWidth"><h4>Groups</h4><em>This announcement will only be visible to the groups you select. You can select multiple by holding down 'crtl' while selecting.</em></td>
 			<td> <select name="group[]" size="{GROUP_TOTAL}" multiple>
 			<!-- BEGIN group_selection -->
 				<option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{GROUP_NAME}</option>
@@ -58,7 +58,7 @@ function confirmDelete(newsID) {
 		  </tr>
 		  <!-- BEGIN campus_row -->
 		  <tr>
-			<td><h3>Campus</h3><em>This announcement will only be visible to users that are within this campus. You can select multple by holding down 'crtl'.</em></td>
+			<td><h4>Campus</h4><em>This announcement will only be visible to users that are within this campus. You can select multple by holding down 'crtl'.</em></td>
 			<td><select name="campus[]" size="{CAMPUS_TOTAL}" multiple>           
 				<!-- BEGIN campus_selection -->
 				<option value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}>{CAMPUS_NAME}</option>
@@ -66,11 +66,11 @@ function confirmDelete(newsID) {
 			  </select></td>
 		  </tr><!-- END campus_row -->
 		  <tr> 
-			<td><h3>Heading</h3></td>
+			<td><h4>Heading</h4></td>
 			<td><input type="text" name="heading" size="35" maxlength="50" value="{HEADING}" /></td>
 		  </tr>
 		  <tr> 
-			<td><h3>Topic</h3></td>
+			<td><h4>Topic</h4></td>
 			<td><select name="item_topic_id">
             <!-- BEGIN topic_list -->
             <option value="{TOPIC_ID}" {TOPIC_ID_SELECTED}>{TOPIC_NAME}</option>
@@ -78,7 +78,7 @@ function confirmDelete(newsID) {
             </select></td>
 		  </tr>          
 		  <tr> 
-			<td><h3>Expires</h3>
+			<td><h4>Expires</h4>
 			<em>Select a period for which the announcement will remain available.</em></td>
 			<td><select name="expires">
 				{LEAVE_OPTION}
@@ -97,7 +97,7 @@ function confirmDelete(newsID) {
 			  </select></td>
 		  </tr>
 		  <tr> 
-			<td><h3>Announcement Body</h3><em>This is the main portion of your announcement.</em></td>
+			<td><h4>Announcement Body</h4><em>This is the main portion of your announcement.</em></td>
 			<td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
 		  </tr>
 		  <tr> 
