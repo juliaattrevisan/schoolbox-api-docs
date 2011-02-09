@@ -37,6 +37,7 @@ define('LDAP_host', '');
 define('LDAP_user', '');
 define('LDAP_pass', '');
 define('LDAP_base', '');
+define('LDAP_search', 'SAMAccountName');
 
 //Kerberos Authentication
 define('KERB_enable', true);

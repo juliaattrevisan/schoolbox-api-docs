@@ -46,7 +46,7 @@ class Session {
                 $_SESSION['mailhandle'] = "/mail/createMail.php?replyto=";
 
             //superuser value, used to bypass most security checks
-            if($user['su'] != "")
+            if($user['su'] == 1)
                 $_SESSION['su'] = 1;
 
             //register there ip
@@ -123,7 +123,7 @@ class Session {
         ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
         ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
         ldap_bind($ds, $this->ldap_escape(LDAP_user), $this->ldap_escape(LDAP_pass));
-        $searchString = "(SAMAccountName=".$this->ldap_escape($username).")";
+        $searchString = "(".LDAP_search."=".$this->ldap_escape($username).")";
         $result = ldap_search($ds,LDAP_base, $searchString, array('dn'));
         if($result) {
                 $entries = ldap_get_entries($ds, $result);
