@@ -9,11 +9,11 @@ $this->setBlock('assess', 'studentLink', 'studentLink_block');
 
 $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();
-$allAssess = $assessHandler->getList($this->arg[0]);
+$allAssess = $assessHandler->getList($categoryID);
 
 if ($groupHandler->isStaff()) {
     $this->setVar(array(
-        'ASSESS_CATEGORY_ID' => $this->arg[0],
+        'ASSESS_CATEGORY_ID' => $categoryID,
     ));
 
     $this->setVar('studentLink_block', '');

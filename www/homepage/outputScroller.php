@@ -17,7 +17,7 @@ $this->parse('config_block', 'config', true);
 
 $fileHandler = new File;
 
-$allFiles = $fileHandler->getAllInCategory($this->arg[0], array('filter' => array('image')));
+$allFiles = $fileHandler->getAllInCategory($categoryID, array('filter' => array('image')));
 if(is_array($allFiles)) {
     foreach ($allFiles as $currentFile) {
         $this->setVar(array(

@@ -36,7 +36,7 @@ class SynergeticUser extends MSSQL{
 
 	function getStudent($synID)
 	{
-			$query = "
+			/*$query = "
 			SELECT	vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname, vStudents.StudentBirthDate, 
 					vStudents.StudentTutorName, vStudents.StudentHeadOfHouse, vStudents.StudentFormStaffName, vStudents.StudentTutorDescription,
 					luForm.ID as TeacherFormID, vStudents.StudentForm, luTutor.ID as TeacherTutorID, vStudents.StudentTutor, luForm.Description as FormDescription,
@@ -47,19 +47,19 @@ class SynergeticUser extends MSSQL{
 					contactDetails.StudentContactPhoneActual, contactDetails.StudentContactMobilePhone, contactDetails.StudentContactOccupPhone,
 					contactDetails.StudentContactSpouseTitle, contactDetails.StudentContactSpousePreferred, contactDetails.StudentContactSpouseSurname,
 					contactDetails.StudentContactSpouseMobilePhone, contactDetails.StudentContactSpouseOccupPhone,contactDetails.StudentContactSpouseDefaultEmail
-					
-			FROM 
-					SynergyOne.dbo.vStudentContactAllAddress contactDetails, 
-					SynergyOne.dbo.vStudents vStudents,
-					SynergyOne.dbo.luForm,
-					SynergyOne.dbo.luTutor
-			WHERE 	vStudents.FileSemester = contactDetails.FileSemester 
-				AND vStudents.FileYear = contactDetails.FileYear 
-				AND vStudents.StudentID = contactDetails.ID
-				AND vStudents.StudentForm=luForm.Code
-				AND vStudents.StudentTutor=luTutor.Code
-				AND (contactDetails.StudentContactDescription='Contact 1' OR contactDetails.StudentContactDescription='Primary Contacts')
-				AND vStudents.StudentID = $synID
+			*/
+                        $query = "SELECT *
+                         FROM
+
+					SynergyOne.dbo.vStudents vStudents
+                                        LEFT JOIN SynergyOne.dbo.vStudentContactAllAddress contactDetails ON
+                                            vStudents.FileSemester = contactDetails.FileSemester
+                                            AND vStudents.FileYear = contactDetails.FileYear
+                                            AND vStudents.StudentID = contactDetails.ID
+					LEFT JOIN SynergyOne.dbo.luForm ON vStudents.StudentForm=luForm.Code
+					LEFT JOIN SynergyOne.dbo.luTutor ON vStudents.StudentTutor=luTutor.Code
+			WHERE 	
+				vStudents.StudentID = $synID
 				AND vStudents.FileSemester=".$_SESSION['FileSemester']."
 				AND vStudents.FileYear=".$_SESSION[ 'FileYear']."
 				"; 

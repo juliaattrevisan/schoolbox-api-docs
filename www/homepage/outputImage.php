@@ -11,7 +11,7 @@ if(empty($config['image'])) {
 $continue = true;
 
 //get image id
-$query = "SELECT id, description, comment FROM file WHERE category = '".$categoryID."' AND deleted = '0' AND description LIKE '{$config['image']}'";
+$query = "SELECT id, description, comment FROM file WHERE category = '".$categoryID."' AND deleted = '0' AND description LIKE ".$this->db->smartQuote($config['image']);
 $image = $this->db->getRow($query);
 if(!is_array($image)) {
     //try to find another image if we cant find the configured one

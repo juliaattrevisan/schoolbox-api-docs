@@ -13,7 +13,7 @@ if(is_array($_SESSION['children'])) {
 			$user = $this->db->getRow($query);
 			$this->setVar("STUDENT_ID", $child['id']);
 			$this->setVar("STUDENT_NAME", formatName($user,'{firstname} {lastname}'));
-			$this->setVar("STUDENT_YEAR", $user['year']);
+			$this->setVar("STUDENT_YEAR", $user['year']==0?'K':$user['year']);
 		
 			if(is_array($child['subjects']) ) {
 				foreach($child['subjects'] as $subject)
