@@ -20,12 +20,12 @@ foreach (array('on', 'off') as $state) {
     $this->parse("chat_state_block", "chat_state", true);    
 }
 
-$timestamp = new DateTime();
-$timestamp->modify('-15 minutes');
-
 $this->setVar(array(
-    'CHAT_INIT_NAME' => formatName($_SESSION),
-    'CHAT_COMPONENT_ID' => $component['homepageComponentLocationID']
+    'CHAT_COMPONENT_ID' => $component['homepageComponentLocationID'],
+    'CHAT_USER_ID' => $_SESSION['id'],
+    'CHAT_NAME_TITLE' => $_SESSION['title'],
+    'CHAT_NAME_FIRSTNAME' => $_SESSION['firstname'],
+    'CHAT_NAME_LASTNAME' => $_SESSION['lastname'],
 ));
 
 ?>

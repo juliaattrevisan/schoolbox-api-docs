@@ -1,100 +1,94 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/stdfuncs.js"></script>
+<script type="text/javascript" src="/javascript/chat.js"></script>
 <script type="text/javascript">
-    $j(document).ready(function () {
-        var chat_send_data = {};
-        var chat_recv_data = {};
+$j(document).ready(function () {
+    $j('#component{COMPONENT_HOMEPAGE_ID} form.chat-send a').click(function (event) {
+        send_event(chat_obj);
+    });
 
-        /* timestamp hold the timestamp for the last message sent */
-        var timestamp;
-        var sender = '{CHAT_INIT_NAME}';
-
-        var chat_interval = function () {
-            $j.extend(chat_send_data, {
-                category_id: '{ID}',
-                component_id: '{CHAT_COMPONENT_ID}',
-                timestamp: timestamp
-            })
-
-            $j.ajax({
-                type: 'POST',
-                url: '/ajax/chat.php',
-                data: chat_send_data,                
-                dataType: 'json',
-                success: function (data) {
-                    chat_recv_data = data;
-
-                    if (chat_recv_data != null) {
-                        chat_recv(chat_recv_data);
-                        chat_recv_data = {};
-                    }
-
-                    chat_send_data = {};
-
-                    if (data.config.state == 'on') {
-                        setTimeout(chat_interval, 2000);
-                    } else {
-                        chat_close();
-                    }
-                }
-            });
-        }
-
-        chat_interval();
-
-        var chat_recv = function (data) {
-            for (var i = 0; i < data.messages.length; i++) {
-                var message = data.messages[i];
-                
-                $j('#component{COMPONENT_HOMEPAGE_ID} ul.chat-messages').append(chat_msg(message));
-            }
-
-            $j('#component{COMPONENT_HOMEPAGE_ID} ul.chat-users').empty();
-
-            for (var i = 0; i < data.users.length; i++) {
-                var user = data.users[i];
-
-                $j('#component{COMPONENT_HOMEPAGE_ID} ul.chat-users').append($j('<li></li>').text(user.name));
-            }
-
-            timestamp = data.timestamp;
-        }
-
-        var chat_send = function () {
-            var message = $j('#component{COMPONENT_HOMEPAGE_ID} input[name="message"]');
-
-            message.timestamp = new Date();
-            message.timestamp = message.timestamp.getHours() + ':' + message.timestamp.getMinutes() + ':' + message.timestamp.getSeconds();            
-
-            if (message.val() != '') {
-                chat_send_data = {
-                    sender: sender,
-                    timestamp: message.timestamp,
-                    message: message.val()
-                };
-
-                $j('#component{COMPONENT_HOMEPAGE_ID} ul.chat-messages').append(chat_msg(chat_send_data));
-                message.val('')
-            }
+    $j('#component{COMPONENT_HOMEPAGE_ID} input[name="message"]').keydown(function (event) {
+        if (event.keyCode == 13) {
+            send_event(chat_obj);
 
             return false;
         }
-
-        var chat_msg = function (message) {
-            return $j('<li></li>').text(message.sender + ' [' + message.timestamp + ']: ' + message.message);
-        }
-
-        var chat_close = function () {
-        }
-
-        $j('#component{COMPONENT_HOMEPAGE_ID} form.chat-send a').click(chat_send);
-        $j('#component{COMPONENT_HOMEPAGE_ID} input[name="message"]').keydown(function (event) {
-            if (event.keyCode == 13) {
-                chat_send();
-
-                return false;
-            }
-        });
     });
+
+    var config = {
+        category_id: '{ID}',
+        component_id: '{CHAT_COMPONENT_ID}',
+        user_id: '{CHAT_USER_ID}',
+        name: {
+            title: '{CHAT_NAME_TITLE}',
+            firstname: '{CHAT_NAME_FIRSTNAME}',
+            lastname: '{CHAT_NAME_LASTNAME}',
+        },
+        last_time: null
+    }
+
+    var render_messages = function (messages) {
+        var messages_el = $j('#component{COMPONENT_HOMEPAGE_ID} ul.chat-messages');
+
+        for (var i in messages) {
+            var message_el = $j('<li></li>')
+
+            messages[i].time = (new Date(messages[i].time)).toLocaleTimeString();
+
+            if (messages[i].type == 'user') {
+                messages[i].name = formatName(messages[i]);
+                message_el.text(messages[i].name + ' [' + messages[i].time + ']: ' + messages[i].body);
+            } else {
+                message_el.text(messages[i].body);
+            }
+
+            console.log(this);
+
+            message_el.addClass('chat-message-' + messages[i].type);
+            messages_el.append(message_el);
+        }
+    }
+
+    var render_users = function (users) {
+        var chat_users_el = $j('#component{COMPONENT_HOMEPAGE_ID} ul.chat-users');
+
+        chat_users_el.empty();
+
+        for (var i = 0; i < users['active'].length; i++) {
+            user_el = $j('<li></li>').text(formatName(users['active'][i]));
+
+            if (users['mute'][i]) {
+                user_el.addClass('chat-mute');
+            }
+
+            chat_users_el.append(user_el);
+        }
+    }
+
+    var chat_obj = new Chat(config, render_messages, render_users);
+});
+
+function send_event (chat_obj) {
+    var message = $j('#component{COMPONENT_HOMEPAGE_ID} input[name="message"]');
+
+    var data = {
+        messages: {
+            0: {
+                title: chat_obj.config.name.title,
+                firstname: chat_obj.config.name.firstname,
+                lastname: chat_obj.config.name.lastname,
+                type: 'user',
+                time: (new Date()).toString(),
+                body: message.val()
+            }
+        }
+    }
+
+    chat_obj.send(data);
+    message.val('');
+
+    return false;
+}
 </script>
 <!-- END custom_head -->
 

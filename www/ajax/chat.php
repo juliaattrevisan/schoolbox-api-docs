@@ -5,78 +5,48 @@ require_once SITE_root . '/library/chat.php';
 require_once SITE_root . '/library/group.php';
 require_once SITE_root . '/library/homepage.php';
 
-$homepage = new Homepage($_POST['category_id']);
-$config = $homepage->getComponentConfig($_POST['component_id']);
+$data_recv = array();
+$data_send = $_POST['send'];
 
-$chat = new Chat($config);
+$chat = new Chat($data_send['config']);
 $group = new Group();
 $page = new SitePage;
 
-if ($group->getPermission($_POST['category_id'], $_SESSION['id']) > WRITE_ACCESS) {
-    $config['state'] = 'on';
+$homepage = new Homepage($data_send['config']['category_id']);
+
+/* Check in */
+$chat->poll($data_send['config']['category_id'], $_SESSION['id']);
+
+/* Receive */
+$data_recv = array(
+    'users'    => $chat->users($data_send['config']['category_id']),
+    'config'   => $data_send['config'],/*, $homepage->getComponentConfig($data_send['config']['component_id'])*/ // replace client's config
+    'messages' => $chat->receive($data_send['config']['category_id']) // must be last
+);
+
+if (!empty($data_recv['users']['inactive'])) {
+    $chat->users_remove($data_recv['users']['inactive']);
 }
 
-if ($config['state'] == 'on') {
-    /* Send */
-    if (!empty($_POST['message'])) {
-        $timestamp = new DateTime();
-
-        $data = array(
-            'category_id' => $_POST['category_id'],
-            'user_id' => $_SESSION['id'],
-            'timestamp' => $timestamp->format('Y-m-d H:i:s'),
-            'message' => scrubText($_POST['message'])
+/* Send */
+if (!empty($data_send['messages'])) {
+    foreach ($data_send['messages'] as $message) {
+        $message = array(
+            'category_id' => $data_send['config']['category_id'],
+            'user_id'     => $_SESSION['id'],
+            'type'        => 'user',
+            'time'        => $message['time'],
+            'body'        => $message['body']
         );
 
-        $chat->send($data);
+        $chat->send($message);
     }
-
-    /* Receive */
-    if (!empty($_POST['timestamp'])) {
-        $timestamp = new DateTime($_POST['timestamp']);
-        $messages = $chat->receive($_POST['category_id'], $timestamp, $_SESSION['id']);
-    } else {
-        $timestamp = new DateTime();
-        $timestamp->modify('-15 minutes');
-        $messages = $chat->receive($_POST['category_id'], $timestamp);
-    }
-
-    if (!empty($messages)) {
-        foreach ($messages as &$message) {
-            $timestamp = new DateTime($message['timestamp']);
-
-            $message['sender'] = formatName($message);
-            $message['timestamp'] = $timestamp->format('H:i:s');
-        }
-    } else {
-        $messages = array();
-    }
-
-    $users = $chat->poll($_POST['category_id'], $_SESSION['id'], '-10 seconds');
-
-    if (!empty($users)) {
-        foreach ($users as &$user) {
-            // is there an active user with write permission
-            if ($group->getPermission($_POST['category_id'], $user['user_id']) > WRITE_ACCESS) {
-                $write_user = true;
-            }
-
-            $user['name'] = formatName($user);
-        }
-    } else {
-        $users = array();
-    }
-
-    $config['state'] = $write_user ? 'on' : 'off';
-    $homepage->setComponentConfig($_POST['component_id'], $config);
-
-    header("Content-type: application/json");
-    echo json_encode(array(
-        'config' => $config,
-        'timestamp' => $timestamp->format('Y-m-d H:i:s'),
-        'messages' => $messages,
-        'users' => $users
-    ));
 }
+
+/* Set Last Time */
+$data_recv['config']['last_time'] = $chat->_config['last_time']->format('Y-m-d H:i:s');
+
+header("Content-type: application/json");
+echo json_encode($data_recv);
 
 ?>
