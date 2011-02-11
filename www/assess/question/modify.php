@@ -32,9 +32,17 @@ if (!empty($_POST)) {
 
     $section = $sectionHandler->getByID(scrubTEXT($_POST['section_id']));
 
+	if ($assessHandler->isDeleted($section['assess_id'])) {
+		error(112);
+	}
+
     if (!$assessHandler->isOwner($section['assess_id'])) {
         error(130);
     }
+
+	if ($sectionHandler->isDeleted($section['section_id'])) {
+		error(115);
+	}
 
     $questionHandler = $factory->createQuestionModel(scrubTEXT($_POST['type_id']));
     $answerHandler = $factory->createAnswerModel(scrubTEXT($_POST['type_id']));
@@ -63,9 +71,17 @@ else {
     $question = $questionHandler->getByID($this->arg[0]);
     $section = $sectionHandler->getByID($question['section_id']);
 
+	if ($assessHandler->isDeleted($section['assess_id'])) {
+		error(112);
+	}
+
     if (!$assessHandler->isOwner($section['assess_id'])) {
         error(130);
     }
+
+	if ($sectionHandler->isDeleted($section['section_id'])) {
+		error(115);
+	}
 
     $answerHandler = $factory->createAnswerModel($question['type_id']);
 

@@ -29,8 +29,16 @@ $question = $questionHandler->getByID($this->arg[0]);
 $answer = $answerHandler->getForQuestion($question['question_id']);
 $section = $sectionHandler->getByID($question['section_id']);
 
+if ($assessHandler->isDeleted($section['assess_id'])) {
+	error(112);
+}
+
 if (!$assessHandler->isOwner($section['assess_id'])) {
     error(130);
+}
+
+if ($sectionHandler->isDeleted($section['section_id'])) {
+	error(115);
 }
 
 /* Perform soft delete

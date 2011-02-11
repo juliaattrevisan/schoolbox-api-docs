@@ -23,10 +23,8 @@ if (!$assessHandler->isOwner($this->arg[0])) {
     error(126);
 }
 
-$section = $sectionHandler->getbyID($this->arg[0]);
-
-if (!$section) {
-    error(115);
+if ($assessHandler->isDeleted($this->arg[0])) {
+	error(112);
 }
 
 $sectionList = $sectionHandler->getList($this->arg[0]);

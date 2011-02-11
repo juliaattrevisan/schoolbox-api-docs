@@ -236,5 +236,26 @@ class AssessSection extends Model {
             }
         }
     }
+
+    /**
+     * Find out whether this assessment has been deleted.
+     *
+     * @param <type> $assess_id
+     * @return <type>
+     */
+    function isDeleted($section_id) {
+        $query = "SELECT COUNT(section_id)
+                  FROM assess_section
+                  WHERE section_id = '$section_id'
+                  AND deleted_at IS NULL";
+
+        $result = $this->db->getOne($query);
+
+        if (!$result) {
+            return true;
+        }
+
+        return false;
+    }
 }
 ?>

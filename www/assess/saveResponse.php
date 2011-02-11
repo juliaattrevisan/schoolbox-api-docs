@@ -29,6 +29,11 @@ if ($assessHandler->isExpired($section['assess_id'])) {
     error(120);
 }
 
+if ($assessHandler->isDeleted($section['assess_id'])) {
+	error(112);
+}
+
+
 if (!$question) {
     error(119);
 }

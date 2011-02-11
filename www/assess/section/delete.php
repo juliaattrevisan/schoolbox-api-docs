@@ -21,10 +21,17 @@ if (!$groupHandler->isStaff()) {
 
 /* Get a list of questions and answers to softdelete
  */
+$assessHandler = new Assess();
+$sectionHandler = new AssessSection();
 $questionHandler = new AssessQuestion();
 $answerHandler = new AssessAnswer();
 
 $questionList = $questionHandler->getList($this->arg[0]);
+$section = $sectionHandler->getByID($this->arg[0]);
+
+if ($assessHandler->isDeleted($section['assess_id'])) {
+	error(112);
+}
 
 if ($questionList) {
     foreach($questionList as $currentQuestion) {
@@ -47,9 +54,6 @@ if ($questionList) {
 
 /* Reorder sections because sequence corresponds to section number
  */
-$sectionHandler = new AssessSection();
-
-$section = $sectionHandler->getByID($this->arg[0]);
 $section['deleted_at'] = 'NOW()';
 $sectionHandler->update($section);
 

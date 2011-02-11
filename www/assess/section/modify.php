@@ -20,6 +20,10 @@ if (!$groupHandler->isStaff()) {
 }
 
 if (!empty($_POST)) {
+	if ($assessHandler->isDeleted($_POST['assess_id'])) {
+		error(112);
+	}
+
     if (!$assessHandler->isOwner(scrubTEXT($_POST['assess_id']))) {
         error(130);
     }
@@ -51,6 +55,10 @@ else {
     if (!$assessHandler->isOwner($section['assess_id'])) {
         error(130);
     }
+
+	if ($assessHandler->isDeleted($section['assess_id'])) {
+		error(112);
+	}
 
     /* Render modify page
      */

@@ -132,9 +132,9 @@ class AssessAnswerMatch extends AssessAnswer {
                 /* Randomize right-side. Do this multiple times because it's not
                  * very random after one shuffle for some reason
                  */
-                shuffle(&$right);
-                shuffle(&$right);
-                shuffle(&$right);
+                shuffle($right);
+                shuffle($right);
+                shuffle($right);
             }
 
             for ($i=0; $i<$answerCount; $i++) {

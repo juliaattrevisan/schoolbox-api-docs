@@ -33,6 +33,10 @@ if (!$assess) {
     error(112);
 }
 
+if ($assessHandler->isDeleted($this->arg[0])) {
+	error(112);
+}
+
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */

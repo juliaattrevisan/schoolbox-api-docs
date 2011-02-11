@@ -18,6 +18,10 @@ if (!$groupHandler->isStaff()) {
     error(126);
 }
 
+if ($assessHandler->isDeleted($this->arg[0])) {
+	error(112);
+}
+
 if (!$assessHandler->isOwner($this->arg[0])) {
     error(125);
 }

@@ -32,6 +32,10 @@ if (!$currentSection) {
 	error(115);
 }
 
+if ($sectionHandler->isDeleted($this->arg[0])) {
+	error(115);
+}
+
 $xml = simplexml_load_string($data);
 
 $questionHandler = $factory->createQuestionModel(scrubTEXT($xml->typeid));

@@ -359,5 +359,26 @@ class Assess extends Model {
 
         return false;
     }
+
+    /**
+     * Find out whether this assessment has been deleted.
+     *
+     * @param <type> $assess_id
+     * @return <type>
+     */
+    function isDeleted($assess_id) {
+        $query = "SELECT COUNT(assess_id)
+                  FROM assess
+                  WHERE assess_id = '$assess_id'
+                  AND deleted_at IS NULL";
+
+        $result = $this->db->getOne($query);
+
+        if (!$result) {
+            return true;
+        }
+
+        return false;
+    }
 }
 ?>

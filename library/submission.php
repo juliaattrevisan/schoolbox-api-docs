@@ -377,6 +377,7 @@ class Submission extends Model {
                     LEFT JOIN file_type ON file_type.id = assess.type
                     LEFT JOIN category ON assess.category_id = category.id
                     WHERE category.id = assess.category_id
+					AND assess.deleted_at IS NULL
                     AND assess.user_id = '$userID')
                     ORDER BY catid, date";
 
