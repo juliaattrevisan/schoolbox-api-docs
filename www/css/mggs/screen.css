@@ -221,7 +221,7 @@ li p.interact {
 	-webkit-border-top-right-radius: 5px;
 	background: #fff;
 	padding: 0 15px;
-	height: 24px;
+	min-height: 24px;
 	line-height: 24px;
 }
 #category li a.selected {
