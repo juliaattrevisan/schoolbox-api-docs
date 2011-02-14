@@ -95,7 +95,7 @@ class SynergeticTimetable extends MSSQL{
 			$weeks = intval(($difference) / 7);
 
 			*/
-			if((date('W', $date) % 2) == 0)
+			if((date('W', $date) % 2) == 1)
 				return date('w',$date);
 			else
 				return date('w',$date) + 5;

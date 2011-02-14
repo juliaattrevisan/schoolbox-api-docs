@@ -67,9 +67,8 @@ class Category extends Model {
 	}
 	
 	function getByCode($code) {
-		$query = "SELECT categoryID FROM categoryCode WHERE code = ".$this->db->smartQuote($code)." ";
-		$categoryID = $this->db->getOne($query);
-		return $this->getByID($categoryID);
+		$query = "SELECT category.* FROM categoryCode RIGHT JOIN category ON id = categoryID WHERE categoryCode.code = ".$this->db->smartQuote($code)." ";
+		return $this->db->getRow($query);
 	}
 	
 	function logPageView($categoryID) {

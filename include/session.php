@@ -52,7 +52,7 @@ class Session {
             //register there ip
             $_SESSION['ip'] = getIP();
 
-            $_SESSION['campus'] = $userHandler->getUserCampus($user['id']);
+            $_SESSION['campus'] = $userHandler->getUserCampus($user['uid']);
 
             if(SYNERGY_enable)
                 $this->setSynergyInfo($userHandler);
@@ -220,37 +220,36 @@ class Session {
         $catHandler = new Category;
 
         //setup a users enrolement for the session
+
         $semester = $synUser->getCurrentSemester();
         $_SESSION['FileSemester'] = $semester['FileSemester'];
         $_SESSION['FileYear'] = $semester['FileYear'];
         $synergy_id = $_SESSION['sid'];
-
-        if (is_numeric($synergy_id) && $_SESSION['FileSemester'] && $_SESSION['FileYear']) {
+        if ($synergy_id && $_SESSION['FileSemester'] && $_SESSION['FileYear']) {
 
             //if user is parent get information regarding enrolled students
-            if ($groupHandler->isParent($_SESSION['gid'])) {
+            if ($groupHandler->isParent()) {
                 if (defined('SYNERGY_sync_email') && SYNERGY_sync_email) {
                     //Updates parents email from synergetic
                     $email = $synUser->getEmail($synergy_id);
                     $mydb->update('user', 'id', array('id' => $_SESSION['id'], 'alt_email' => $email));
                 }
-
+ 
                 $studentGroup = unserialize(STUDENTGROUPIDS);
                 if ($synergy_id) {
                     $children = $synUser->getEnrolledStudents($synergy_id);
                     if (is_array($children)) {
                         foreach ($children as $child) {
-                            $portal = $userHandler->getBySynergy($child['ReleatedID']);
+                            $portal = $userHandler->getBySynergy($child['RelatedID']);
                             $subjects = array();
-
-                            if ($portal['id']) {
-                                $subjectList = $synUser->getSubjectList($child['RelatedID'], $portal['id']);
+                            if ($portal['uid']) {
+                                $subjectList = $synUser->getSubjectList($child['RelatedID'], $portal['uid']);
                                 if (is_array($subjectList)) {
                                     foreach ($subjectList as $subject) {
                                         //check subject exists.. we cant link to subjects that dont exist its ugly
                                         $cat = $catHandler->getByCode($subject['code']);
-                                        if(is_array($cat)) {
-                                            if ($groupHandler->getPermission($cat['categoryID']) >= READ_ACCESS) {
+                                        if(is_array($cat) && is_numeric($cat['id'])) {
+                                            if ($groupHandler->getPermission($cat['id']) >= READ_ACCESS) {
                                                 $subject['id'] = $cat['categoryID'];
                                                 $subjects[] = $subject;
                                             }
@@ -259,24 +258,25 @@ class Session {
                                 }
                            }
 
-                           $_SESSION['children'][] = array('id' => $portal['id'], 'sid' => $child['RelatedID'], 'gid' => $portal['group_id'], 'name' => formatName($portal), 'subjects' => $subjects);
+                           $_SESSION['children'][] = array('id' => $portal['uid'], 'sid' => $child['RelatedID'], 'gid' => $portal['group_id'], 'name' => formatName($portal), 'subjects' => $subjects);
                        }
                    }
                }
             } else { //user is not parent so get timetable information
                 $subjectList = $synUser->getSubjectList($synergy_id, $_SESSION['id']);
+
                 $catList = array();
                 if (is_array($subjectList)) {
                     foreach ($subjectList as $subject) {
                         //check subject exists.. we cant link to subjects that dont exist its ugly
                         $result = $catHandler->getByCode($subject['code']);
-                        if (is_array($result)) {
-                            if (!in_array($result['categoryID'], $catList) && $groupHandler->getPermission($result['categoryID']) >= READ_ACCESS) {
-                                $subject['id'] = $result['categoryID'];
+                        if (is_array($result) && is_numeric($result['id'])) {
+                            if (!in_array($result['id'], $catList) && $groupHandler->getPermission($result['id']) >= READ_ACCESS) {
+                                $subject['id'] = $result['id'];
                                 $subject['name'] = $result['name'];
 
                                 $_SESSION['subjects'][] = $subject;
-                                $catList[] = $result['categoryID']; //check for dupes
+                                $catList[] = $result['id']; //check for dupes
                             }
                         }
                     }
@@ -284,7 +284,9 @@ class Session {
                 }
                 else
                     $_SESSION['timetable'] = 0;
+
             }
+
       }
    }
 }

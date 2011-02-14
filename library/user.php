@@ -60,15 +60,15 @@ class User extends Model {
             if($this->db->countRows() > 0) {
                 while($campus = $this->db->getNextArray() ) {
                     if($campus['campus'])
-                        $campus[] = $campus['campus'];
+                        $campusList[] = $campus['campus'];
                 }
             }
             else {
                 //Place user in campus 1 by default in not assigned
-                $campus[] = 1;
+                $campusList[] = 1;
             }
 
-            return $campus;
+            return $campusList;
         }
 
 	

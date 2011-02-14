@@ -201,8 +201,8 @@ class user
         
 		if(is_array($campusarray))
 		{
-            $campusquery = "DELETE FROM userCampus WHERE uid = '$id'";
-            $this->db->query($campusquery);
+                        $campusquery = "DELETE FROM userCampus WHERE uid = '$id'";
+                        $this->db->query($campusquery);
             
 			foreach($campusarray as $campus)
 			{

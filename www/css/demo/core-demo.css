@@ -187,11 +187,11 @@ fieldset{border:0; padding:0; margin:0;}
 .message{background:url(/images/core/assess/validate-arrow.jpg) 5px 0 no-repeat; padding-top:6px; display:block;z-index:50}
 
 .standardForm td { vertical-align: top; padding: 16px; }
-.standardForm td h4{font-size:18px; margin-bottom:16px; color:#013a63; font-weight:bold;}
+.standardForm td h4{font-size:16px; margin-bottom:16px; color:#013a63; font-weight:bold;}
 .standardForm td em{display:block; font-style: normal; line-height:16px;}
 #deleteForm td { padding: 0.3em; vertical-align: middle;}
 #deleteForm td input { vertical-align: middle;}
-.standardForm td {border-bottom:3px solid #e9e3d6;}
+.standardForm td {border-bottom:1px solid #e9e3d6;}
 .standardForm tr.dark, .standardForm tr.dark td { background: #eee; }
 select.small, input.small { width: 100px; }
 input.timeField { width: 30px; }
