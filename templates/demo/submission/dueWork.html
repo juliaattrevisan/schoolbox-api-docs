@@ -38,6 +38,8 @@ $j(function() {
 		var node = $j(this).closest('li'), ev = node.attr("id").substring(6);
 		$j.post('/ajax/submission.php', { id : ev }, function(data){
 			
+			if (data !== null) {
+			
 			winStr = '<div class="duework-popup cal-bubble"> \
 						<div class="top"></div> \
 						<div class="middle"> \
@@ -71,6 +73,7 @@ $j(function() {
 			$j('body').append(winStr);
 
 			movePopup(position);
+			}
 
 		}, "json");
 		return false;
