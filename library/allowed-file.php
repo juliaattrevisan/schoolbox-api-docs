@@ -35,11 +35,18 @@ class AllowedFile extends Model {
 	}
 	
 	function checkMime($file) {
-		
 		$ext = substr(strrchr($file['name'], "."), 1);
-		
-		if(!$mime = $this->getMime($file['tmp_name']))
-			$mime = strtolower($file['type']);
+
+		/* Flash uploads submit as application/octet-stream and thus can get
+		 * rejected by FileSecurityCheck(). Check that mime magic is installed,
+		 * and fileinfo as well
+		 */
+		if ($file['type'] == 'application/octet-stream' || $file['type'] == '') {
+				$mime = $this->getMime($file['tmp_name']);
+		}
+		else {
+				$mime = strtolower($file['type']);
+		}
 
         /* Mime types now have some kind of metadata, so trim it out.
          * Mime types now include stuff like 'charset=us-ascii' and may not
