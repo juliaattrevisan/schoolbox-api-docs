@@ -20,7 +20,7 @@ ol { margin-left: 2.5em; }
 hr { background-color: #cccccc; border: 0; height: 1px; }
 img{border:0;}
 
-.manage h2{display:none;}
+
 /*************** skin colours *****
 #nav h3{color:#F4F1EA}
 
@@ -810,7 +810,7 @@ span.wrapper a { color:#FFF; }
 
 .duework-popup.cal-bubble{ top:-140px; color:#000000; font-size:11px; left:-300px; position:absolute; z-index:10000; display:block;}
 .duework-popup.cal-bubble .middle p{margin:0; padding-bottom:16px;}
-.duework-popup.cal-bubble  h3{font-size:12px; padding:0; margin-bottom:8px;}
+.duework-popup.cal-bubble  h3{font-size:16px; padding:0; font-weight:bold; margin-bottom:8px; color:#000;}
 
 h2 .btn{position:absolute; right:8px; float:none; top:0;}
 
@@ -833,7 +833,7 @@ p.bubble-name { margin-bottom:5px; padding-bottom:5px; }
 .post-right{width:80%; padding:0; vertical-align:top}
 
 .cite-it{position:relative;  padding:16px 16px 0 32px; border:1px solid #E9E3D6; margin-bottom:16px;}
-.cite-it span{font-family:Georgia, "Times New Roman", Times, serif;position:absolute; font-size:52px; color:#E9E3D6; top:2px; left:5px; width:20px; height:20px;}
+
 
 /* ePortfolio */
 .privateBlock {width: 100%;padding-bottom: 20px;}

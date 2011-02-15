@@ -52,6 +52,10 @@ $j(function() {
 	
 	/* from here down I've changed the component functions!!!!*/
 	
+	$j('.manage h2, a.folder-manage').each(function () {
+		$j(this).hide();
+	});
+	
 	$j('#tabs-homepage').tabs();
 	$j('#tabs-sub').tabs();
 	
@@ -109,11 +113,13 @@ $j(function() {
         $j("#tooltip").hide();
     });
 	
+
+	
 	$j('.customise').click(function(event) {
 		event.preventDefault();
 		$j('#tabs-homepage').slideToggle();
 		$j(this).children('span').toggle();
-		$j('.manage h2').each(function () {
+		$j('.manage h2, a.folder-manage').each(function () {
 			$j(this).toggle();
 		});
 	});
