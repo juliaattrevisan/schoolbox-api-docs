@@ -1,0 +1,287 @@
+/***** RoundCube|Mail settings task styles *****/
+
+
+#tabsbar
+{
+  position: absolute;
+  top: 50px;
+  left: 220px;
+  right: 20px;
+  height: 22px;
+  border-bottom: 1px solid #999999;
+  white-space: nowrap;
+  /* css hack for IE */
+  width: expression((parseInt(document.documentElement.clientWidth)-240)+'px');
+}
+
+span.tablink,
+span.tablink-selected
+{
+  float: left;
+  width: 100px;
+  height: 24px !important;
+  height: 22px;
+  background: url('images/tab_pas.gif') top left no-repeat;
+}
+
+span.tablink-selected
+{
+  background: url('images/tab_act.gif') top left no-repeat;
+}
+
+span.tablink a,
+span.tablink-selected a
+{
+  display: block;
+  padding-left: 10px;
+  padding-top: 5px;
+  color: #555555;
+  text-decoration: none;
+}
+
+span.tablink-selected a
+{
+  color: #000000;
+}
+
+#userprefs-box
+{
+  position: absolute;
+  top: 95px;
+  left: 20px;
+  bottom: 60px;
+  right: 20px;
+  overflow: auto;
+  border: 1px solid #999999;
+  /* css hack for IE */
+  height: expression((parseInt(document.documentElement.clientHeight)-155)+'px');
+  width: expression((parseInt(document.documentElement.clientWidth)-40)+'px');
+}
+
+#userprefs-box table td.title
+{
+  color: #666666;
+  padding-right: 10px;
+  white-space: nowrap;
+}
+
+#userprefs-box table tr.advanced
+{
+  display: none;
+}
+
+.userprefs-block
+{
+  float: left;
+  margin-right: 14px;
+  width: 520px;
+}
+
+#identities-list,
+#folder-manager
+{
+  position: absolute;
+  top: 95px;
+  left: 20px;
+  overflow: auto;
+}
+
+#folder-manager
+{
+  width: 600px;
+  bottom: 140px;
+  overflow: auto;
+  border: 1px solid #999999;
+  /* css hack for IE */
+  height: expression((parseInt(document.documentElement.clientHeight)-235)+'px');
+}
+
+#folder-manager.droptarget
+{
+  border: 1px solid #CC3333;
+  background-color: #FFFFA6;
+}
+
+#identities-list
+{
+  bottom: 60px;
+  width: 420px;
+  border: 1px solid #999999;
+  /* css hack for IE */
+  height: expression((parseInt(document.documentElement.clientHeight)-155)+'px');
+}
+
+#listbuttons
+{
+  position: absolute;
+  left: 20px;
+  bottom: 18px;
+}
+
+#identities-table
+{
+  width: 420px;
+  table-layout: fixed;
+  background-color: #F9F9F9;
+}
+
+#identities-table tbody td
+{
+  cursor: default;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#identities-table thead td.name
+{
+  width: 55%;
+}
+
+#identities-table thead td.email
+{
+  width: 45%;
+}
+
+#identity-frame
+{
+  position: relative;
+  margin-top: 20px;
+  border: 1px solid #999999;
+}
+
+#identity-details
+{
+  position: absolute;
+  top: 95px;
+  left: 450px;
+  right: 20px;
+  bottom: 60px;
+  border: 1px solid #999999;
+  overflow: auto;
+  /* css hack for IE */
+  width: expression((parseInt(document.documentElement.clientWidth)-470)+'px');
+  height: expression((parseInt(document.documentElement.clientHeight)-155)+'px');
+}
+
+#identity-details table td.title
+{
+  color: #666666;
+  font-weight: bold;
+  text-align: right;
+  padding-right: 10px;
+}
+
+input.disabled
+{
+  color: #999999;
+}
+
+#bottomboxes
+{
+  position: absolute;
+  width: 600px;
+  height: 120px;
+  left: 20px;
+  bottom: 20px;
+}
+
+#userprefs-title,
+#identity-title,
+div.boxtitle,
+#subscription-table thead td
+{
+  height: 12px !important;
+  padding: 4px 20px 3px 6px;
+  border-bottom: 1px solid #999999;
+  color: #333333;
+  font-size: 11px;
+  font-weight: bold;
+  background-color: #EBEBEB;
+  background-image: url(images/listheader_aqua.gif); 
+}
+
+div.settingsbox
+{
+  width: 600px;
+  margin-top: 20px;
+  border: 1px solid #999999;
+}
+
+div.settingspart
+{
+  display: block;
+  padding: 10px;
+}
+
+#subscription-table
+{
+  width: 100%;
+  /* css hack for IE */ 
+  width: expression('auto');
+}
+
+#subscription-table tbody td
+{
+  height: 20px;
+  padding-left: 6px;
+  padding-right: 10px;
+  white-space: nowrap;
+  border-bottom: 1px solid #EBEBEB;
+  background-color: #F9F9F9;
+  cursor: default;
+}
+
+#subscription-table tr.virtual td
+{
+  color: #666;
+}
+
+#subscription-table tr.selected td,
+#subscription-table tr.selected td a
+{
+  color: #FFFFFF;
+  background-color: #CC3333;
+}
+
+#subscription-table tr.droptarget td,
+#subscription-table tr.droptarget td a
+{
+  background-color: #FFFFA6;
+}
+
+#subscription-table thead td.name
+{
+  width: 250px;
+}
+
+#subscription-table thead td.msgcount
+{
+  width: 90px;
+}
+
+#subscription-table thead td.subscribed
+{
+  width: 90px;
+}
+
+fieldset 
+{
+  margin-bottom: 0.5em;
+  border: 1px solid #999999;
+  padding: 4px 8px 9px 8px; 
+}
+
+legend
+{
+  color: #999999;
+}
+
+div.advswitch
+{
+  white-space: nowrap;
+  text-align: right;
+  position: absolute;
+  bottom: 35px;
+  right: 20px;
+  width: 460px;
+}
