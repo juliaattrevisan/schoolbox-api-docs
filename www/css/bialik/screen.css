@@ -156,7 +156,9 @@ h3, #nav h3, .add-component .notification {
     background: none repeat scroll 0 0 #f2f6fa;
 }
 
-#nav ul,#nav ul.my-links{background:#0053a0}
+#nav .nav-wrapper{background:#0053a0;}
+
+#nav .nav-wrapper.my-links{background:#0053a0}
 .dark td {
     min-height: 1px;
 }

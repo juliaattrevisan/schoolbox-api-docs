@@ -158,8 +158,8 @@ width:180px;
 #nav ul{border:0 none; padding:0; margin:0 !important; background:none; width:auto;}
 #nav li a, #nav li a:hover{width:162px;-moz-border-radius:0; -webkit-border-radius:0; border-radius:0;padding: 7px 9px;font-size: 11px;}
 #nav li{float:left !important;}
-#nav li.parent > a span, #nav li.parent > a.hover span {background: url("/images/mggs/nav-arrow.gif") no-repeat scroll 100% 0 transparent;}
-#nav li a span {display: block; width: 100%;}
+#nav li.parent > a span, #nav li.parent > a.hover span {background: url("/images/mggs/nav-arrow.gif") no-repeat scroll 100% 0 transparent; }
+#nav li a span {display: block; width: 100%;cursor:pointer;}
 #nav ul li a{color:#fff; margin-left:0; }
 #nav ul ul li a:hover{background:#1597cb;}
 #nav{top:0; margin:0;}

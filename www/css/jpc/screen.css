@@ -80,9 +80,12 @@ h3, #infoPanel li, #nav h3, .add-component .notification {
 .login #header {
     height: 236px;
 }
-#nav ul, .dark, .dark td, #tree .dark, .standardForm, #assess .standardForm, #assess .additional-details, #assess .assess-body, .blog-comments .box, .post-left, #category, .search-item:nth-child(2n) {
+.dark, .dark td, #tree .dark, .standardForm, #assess .standardForm, #assess .additional-details, #assess .assess-body, .blog-comments .box, .post-left, #category, .search-item:nth-child(2n) {
     background: none repeat scroll 0 0 #F4F4F8;
 }
+.nav-wrapper{background:none;}
+
+
 .dark td {
     background: none repeat scroll 0 0 #FAF9F5;
     min-height: 1px;
