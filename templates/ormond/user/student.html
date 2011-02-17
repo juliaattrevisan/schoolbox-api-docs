@@ -1,0 +1,130 @@
+<h1>School Directory</h1>
+<table id="directory">
+  <tr>
+    <td colspan="6"><h2>Personal Information</h2></td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><strong>Name</strong></td>
+    <td colspan="2">{NAME}</td>
+    <td colspan="1"><strong>Email</strong></td>
+    <td colspan="2">{EMAIL}</td>
+    <td rowspan="12" style="vertical-align:top; text-align:center;"><!-- BEGIN portrait -->
+      <img src="/search/portrait.php?id={SYNERGY_ID}" />
+      <!-- END portrait -->
+    </td>
+  </tr>
+  <!-- BEGIN student_synergy_form -->
+
+
+  <tr>
+    <td><strong>Date of Birth</strong></td>
+    <td colspan="2">{BIRTHDATE}</td>
+    <td><strong>Year Level</strong></td>
+    <td colspan="2">{YEAR_LEVEL}</td>
+  </tr>
+  <tr>
+    <td><strong>House</strong></td>
+    <td colspan="2">{HOUSE}</td>
+    <td><strong>Class</strong></td>
+    <td colspan="2">{FORM}</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td colspan="2">&nbsp;</td>
+    <td><strong>Class Teacher</strong></td>
+    <td colspan="2">{FORM_STAFF}</td>
+  </tr>
+  <tr>
+    <!-- END student_synergy_form -->
+    <!-- BEGIN student_synergy_tutor -->
+    <tr>
+    <td><strong>Room/Phone</strong></td>
+    <td colspan="2">{FORM_DESCRIPTION}</td>
+    <td><strong>Study/Phone</strong></td>
+    <td colspan="2">{LOCKER}</td>
+  </tr>
+  <tr>
+    <td><strong>Ormond Year</strong></td>
+    <td colspan="2">{HOUSE}</td>
+    <td><strong>Uni Year</strong></td>
+    <td colspan="2">{YEAR_LEVEL}</td>
+  </tr>
+  <tr>
+    <td><strong>Birthdate</strong></td>
+    <td colspan="5">{BIRTHDATE}</td>
+  </tr>
+  <!-- END student_synergy_tutor -->
+  <!-- BEGIN medical -->
+
+  <!-- END medical -->
+  <tr>
+    <td colspan="6"><h2>School Information</h2></td>
+  </tr>
+    <tr>
+        <td colspan="6"><!-- BEGIN school_links --><!-- END school_links -->
+             <ul>
+              <!-- BEGIN timetable_link -->
+              <!-- END timetable_link -->
+              <!-- BEGIN due_work -->
+              <li><a href="/submission/dueWork/0/{ID}" class="btn due-work"><span></span>Due Work</a></li>
+              <!-- END due_work -->
+              <!-- BEGIN helpdesk -->
+              <li><a href="/modules/helpdesk/index.php?id={ID}" class="btn help"><span></span>Helpdesk Jobs</a></li>
+              <!-- END helpdesk -->
+              <!-- BEGIN eportfolio -->
+              <li><a href="/eportfolio/{ID}" class="btn eportfolio"><span></span>ePortfolio</a></li>
+              <!-- END eportfolio -->
+            </ul>
+        </td>
+    </tr>
+  <!-- BEGIN contact_synergy -->
+
+    <td colspan="6"><h2>Contact Information</h2>
+      <!-- BEGIN edit_emergency -->
+      <!-- END edit_emergency -->
+    </td>
+  </tr>
+  <!-- BEGIN contact_details -->
+  <tr>
+    <td><strong>Name</strong></td>
+    <td>{CONTACT_NAME_EMAIL}</td>
+    <td><strong>Mobile</strong></td>
+    <td>{CONTACT_MOBILE_PHONE}</td>
+    <td><strong>Work</strong></td>
+    <td>{CONTACT_OCCUP_PHONE}</td>
+  </tr>
+  <tr>
+    <td><strong>Name</strong></td>
+    <td>{SPOUSE_NAME_EMAIL}</td>
+    <td><strong>Mobile</strong></td>
+    <td>{SPOUSE_MOBILE_PHONE}</td>
+    <td><strong>Work</strong></td>
+    <td>{SPOUSE_OCCUP_PHONE}</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>Address</strong></td>
+    <td valign="top">{CONTACT_ADDRESS}</td>
+    <td valign="top"><strong>Home Phone </strong></td>
+    <td valign="top">{CONTACT_HOME_PHONE}</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+    <tr>
+    <td colspan="6"><h2>Emergency Contact</h2>
+      <!-- BEGIN edit_emergency -->
+      <!-- END edit_emergency -->
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Name</strong></td>
+    <td>{EMERGENCY_NAME}</td>
+    <td><strong>Phone </strong></td>
+    <td>{EMERGENCY_PHONE}</td>
+    <td><strong>Alt. Phone </strong></td>
+    <td>{EMERGENCY_ALT_PHONE}</td>
+  </tr>
+  <tr>
+ <!-- END contact_details -->
+  <!-- END contact_synergy -->
+</table>
