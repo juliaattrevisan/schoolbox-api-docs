@@ -116,7 +116,7 @@ else {
 	$this->setVar('download_block', '');
 }
 
-$allWork = $submissionHandler->getSubmissionHistory($this->arg[0]);
+$allWork = $submissionHandler->getSubmissionHistory($userID, $this->arg[0]);
 
 if (is_array($allWork) && count($allWork)) {
 	$j = 0;

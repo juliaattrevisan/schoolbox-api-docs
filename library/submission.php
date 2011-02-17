@@ -131,7 +131,7 @@ class Submission extends Model {
 	 * @param <type> $limit
 	 * @return <type>
 	 */
-	function getAllDueWork($categoryIDList) {
+	function getAllDueWork($userID, $categoryIDList) {
 		$query = "SELECT
 			b.id AS bid,
 			s.id AS sid,
@@ -145,13 +145,12 @@ class Submission extends Model {
 			FROM submission_box b
 			LEFT JOIN category c ON c.id = b.category
 			LEFT JOIN student_submission s ON s.box_id = b.id
-			LEFT JOIN submission_return r ON r.box_id = b.id
+			LEFT JOIN submission_return r ON r.box_id = b.id AND s.owner = r.owner
 			LEFT JOIN file f ON b.fid = f.id
 			WHERE b.deleted = 0
-			AND (s.owner = '$_SESSION[id]' OR s.owner IS NULL)
+			AND (s.owner = '$userID' OR s.owner IS NULL)
 			AND b.category IN (" . implode(',', $categoryIDList) . ")
 			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC";
-
 		return $this->db->getAll($query);
 	}
 
@@ -162,7 +161,7 @@ class Submission extends Model {
 	 * @param <type> $limit
 	 * @return <type>
 	 */
-	function getRecentWork($categoryIDList, $type) {
+	function getRecentWork($userID, $categoryIDList, $type) {
 		$query = "SELECT
 			b.id AS bid,
 			s.id AS sid,
@@ -191,10 +190,10 @@ class Submission extends Model {
 			FROM submission_box b
 			LEFT JOIN category c ON c.id = b.category
 			LEFT JOIN student_submission s ON s.box_id = b.id
-			LEFT JOIN submission_return r ON r.box_id = b.id
+			LEFT JOIN submission_return r ON r.box_id = b.id AND s.owner = r.owner
 			LEFT JOIN file f ON b.fid = f.id
 			WHERE b.deleted = 0
-			AND (s.owner = '$_SESSION[id]' OR s.owner IS NULL)
+			AND (s.owner = '$userID' OR s.owner IS NULL)
 			AND b.category IN (" . implode(',', $categoryIDList) . ")
 			AND $orderBy IS NOT NULL";
 
@@ -227,7 +226,7 @@ class Submission extends Model {
 	 * @param <type> $limit
 	 * @return <type>
 	 */
-	function getSubmissionHistory($boxID) {
+	function getSubmissionHistory($userID, $boxID) {
 		$query = "(SELECT
 			b.id AS bid,
 			s.id AS sid,
@@ -240,7 +239,7 @@ class Submission extends Model {
 			LEFT JOIN student_submission s ON s.box_id = b.id
 			LEFT JOIN file f ON b.fid = f.id
 			WHERE b.deleted = 0
-			AND s.owner = '$_SESSION[id]'
+			AND s.owner = '$userID'
 			AND b.id = '$boxID'
 			AND s.submitted IS NOT NULL)
 		UNION (SELECT
@@ -253,10 +252,10 @@ class Submission extends Model {
 			r.mark
 			FROM submission_box b
 			LEFT JOIN student_submission s ON s.box_id = b.id
-			LEFT JOIN submission_return r ON r.box_id = b.id
+			LEFT JOIN submission_return r ON r.box_id = b.id AND s.owner = r.owner
 			LEFT JOIN file f ON b.fid = f.id
 			WHERE b.deleted = 0
-			AND s.owner = '$_SESSION[id]'
+			AND s.owner = '$userID'
 			AND b.id = '$boxID'
 			AND r.returned IS NOT NULL)
 		ORDER BY date DESC";

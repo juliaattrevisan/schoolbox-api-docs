@@ -189,22 +189,24 @@ for ($i = 0; $i < $totalDays; $i++) {
  * submissionHandler as key/value pair. Limits are in the context of "limits
  * per work type (either upcoming or returned)"
  */
-$allUpcomingWork = $submissionHandler->getRecentWork($categoryIDList, UPCOMING_WORK_TYPE);
-$allAwaitingWork = $submissionHandler->getRecentWork($categoryIDList, AWAITING_WORK_TYPE);
-$allReturnedWork = $submissionHandler->getRecentWork($categoryIDList, RETURNED_WORK_TYPE);
-
+$allUpcomingWork = $submissionHandler->getRecentWork($userID, $categoryIDList, UPCOMING_WORK_TYPE);
+$allAwaitingWork = $submissionHandler->getRecentWork($userID, $categoryIDList, AWAITING_WORK_TYPE);
+$allReturnedWork = $submissionHandler->getRecentWork($userID, $categoryIDList, RETURNED_WORK_TYPE);
 /* Try to get the $limit. If it can't get even amounts of one type, try to fill
  * it out with remainders from the other type, balancing the numbers. It works
  * unidirectionally, so balancing occurs between the current type and the next,
  * rather than looking at the limits of all three and dividing up meaningfully.
  */
-$max = RECENT_WORK_LIMIT/3;
+
+
+$max = 12/3;
 
 $limit = $max;
 $allWork = array();
 
 foreach(array($allUpcomingWork, $allAwaitingWork, $allReturnedWork) as $current) {
-	for ($i=0; ($i < count($current)) && ($i < $limit); $i++) {
+
+        for ($i=0; (is_array($current) && $i < count($current)) && ($i < $limit); $i++) {
 		$allWork[] = $current[$i];
 	}
 
@@ -228,7 +230,8 @@ $this->setBlock('work', 'status_marked', 'status_marked_block');
  */
 $j = 0;
 
-foreach($allWork as $currentWork) {
+if(count($allWork)>0) {
+    foreach($allWork as $currentWork) {
 	$this->setVar(array(
 		'WORK_SUBJECT' => $currentWork['categoryName'],
 		'WORK_DESCRIPTION' => $currentWork['description'],
@@ -272,7 +275,12 @@ foreach($allWork as $currentWork) {
 	$this->setVar('status_marked_block', '');
 	
 	$j++;
+    }
 }
+else {
+    $this->setVar('work_block','');
+}
+
 
 /* Online Assessments
  */

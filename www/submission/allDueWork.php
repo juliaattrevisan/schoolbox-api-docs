@@ -83,7 +83,7 @@ if (count($categoryList) == 0) {
 }
 
 
-$allWork = $submissionHandler->getAllDueWork($categoryIDList);
+$allWork = $submissionHandler->getAllDueWork($userID, $categoryIDList);
 
 if (is_array($allWork)) {
 	$prevSubject = false;
@@ -146,6 +146,13 @@ if (is_array($allWork)) {
 		$first = false;
 		$j++;
 	}
+}
+
+if (is_array($allWork) ) {
+    $this->parse('subject_block', 'subject', true);
+}
+else {
+    $this->setVar('subject_block','');
 }
 
 /* Online Assessments

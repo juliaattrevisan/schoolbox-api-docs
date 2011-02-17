@@ -29,7 +29,7 @@ class SynergeticTimetable extends MSSQL{
 					TimetableDefinition.FileSemester='{$_SESSION['FileSemester']}' AND
 					TimetableDefinition.TimetableGroup='{$this->campusCode[$campus]}' AND
 					TimetableDefinition.DayNumber = 0
-				ORDER BY TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
+				ORDER BY TimetableDefinition.TimeFrom, TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
 				";
 	$this->query($query);
 	
@@ -95,7 +95,7 @@ class SynergeticTimetable extends MSSQL{
 			$weeks = intval(($difference) / 7);
 
 			*/
-			if((date('W', $date) % 2) == 1)
+			if((date('W', $date) % 2) == 0)
 				return date('w',$date);
 			else
 				return date('w',$date) + 5;
