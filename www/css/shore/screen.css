@@ -150,13 +150,13 @@ width:180px;
 #tabs {
 	right: 15px;
 	left:auto;
-	min-width:675px;
+	width:800px;
 	}
 #tabs li a{height: 31px; font-size:12px;padding: 0 20px; font-weight:normal;}
 
 #nav * {z-index: 99;}
 #nav ul{border:0 none; padding:0; margin:0 !important; background:none; width:auto;}
-#nav li a, #nav li a:hover{width:162px;-moz-border-radius:0; -webkit-border-radius:0; border-radius:0;padding: 7px 9px;font-size: 11px;}
+#nav li a, #nav li a:hover{width:162px;-moz-border-radius:0; -webkit-border-radius:0; border-radius:0;padding: 7px 9px;font-size: 100%;}
 #nav li{float:left !important;}
 #nav li.parent > a span, #nav li.parent > a.hover span {background: url("/images/mggs/nav-arrow.gif") no-repeat scroll 100% 0 transparent; }
 #nav li a span {display: block; width: 100%;cursor:pointer;}
@@ -193,6 +193,10 @@ width:180px;
 	font-size:12px;
 }
 
+.topic{width:74%;}
+
+/* hiding the colour tab from the customisation screen*/
+#tabs-2.customise-components{display:none;}
 .customise-components{background:#e4e4e4;}
 .colours-buttons{background:#ccc;}
 #tabs-homepage li.ui-tabs-selected a {background:#e4e4e4;}
@@ -248,9 +252,10 @@ p.interact a {
     padding-left: 11px;
 }
 
-.dark, .dark td, #tree .dark, .standardForm, #assess .standardForm, #assess .additional-details, #assess .assess-body, .blog-comments .box, .post-left, #category, .search-item:nth-child(2n) {
-    background: none repeat scroll 0 0 #e4e4e4;
-}
+.search-item:nth-child(2n),.dark, .dark td, #tree .dark, .standardForm, #assess .standardForm, #assess .additional-details, #assess .assess-body, .blog-comments .box, .post-left, #category {background: #e4e4e4;}
+.dark{background: #e4e4e4;}
+
+#category li{margin:7px 0;}
 #category li a.selected {
     background-color:#003E7E;
     color: #fff;
@@ -258,8 +263,11 @@ p.interact a {
 
 #category {
     -moz-border-radius: 6px 6px 6px 6px;
-    background: #e4e4e4
+    background: #e4e4e4;
+	margin-left:8px;
 }
+
+.box{padding-bottom:8px; border:1px solid #e4e4e4;}
 
 .submit-btn-plain {
 

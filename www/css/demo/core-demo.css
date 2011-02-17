@@ -1049,12 +1049,12 @@ th.asc {text-decoration: underline;background: url(/images/tutorial/up-arrow.gif
 /*TREE -- now utilising the expandable plugin :0*/
 ul.tree, ul.tree ul { list-style: none; margin:0;}
 #content ul.tree li { background: 0; padding-left: 5px; line-height:26px;}
-#content ul.tree ul li {padding-left: 56px;}
+#content ul.tree ul li {padding-left: 48px;}
 ul.tree li.icon a { background: url(/images/file-icon.gif) no-repeat; padding:3px 0 3px 28px; line-height:21px;}
 /*ul.tree li a.go-to-home{ padding:2px ;margin-top:-4px;margin-left:10px; background:none; background:#fff; }*/
-ul.tree .expandable .hitarea, ul.tree .collapsable .hitarea{background: url(/images/core/home-plus.gif) no-repeat;float:left;height:16px;width:46px;cursor:pointer;}
-ul.tree .collapsable .hitarea{background: url(/images/core/home-minus.gif) no-repeat;}
-
+ul.tree .expandable .hitarea, ul.tree .collapsable .hitarea{background: url(/images/demo/home-plus.gif) no-repeat;float:left;height:19px;width:19px;cursor:pointer;}
+ul.tree .collapsable .hitarea{background: url(/images/demo/home-minus.gif) no-repeat;}
+.home-icon{padding-left:30px; background:url(/images/demo/home.gif) no-repeat 6px 0; border-left:1px solid #ccc; margin-left:4px;}
 
 /*WEATHER*/
 .weather p.float-left { font-size: 90%; margin: 0; padding: 0 0 0 16px; }
