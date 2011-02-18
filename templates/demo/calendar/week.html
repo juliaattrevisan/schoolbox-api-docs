@@ -95,11 +95,11 @@
 					<!-- BEGIN note_block -->
 					<li class="{EVENT_TYPE} {EVENT_LEVEL} "> 
 						<!-- BEGIN time --><span class="time">{TIME}&nbsp;</span><!-- END time --> 
-						<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}</span>
+						<span class="note" style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}</span>
                         <div class="hidden-fields">
                             <h4><!-- BEGIN time --><div class="time"><strong>{TIME}</strong></div><!-- END time -->{NOTE}</h4>
                             <p class="meta">Event Type: {TYPE}<br />
-                            Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br />
+                            <span class="created">Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br /></span>
                             {LOCATION} {DETAIL}</p>
                             <div>{MODIFY}</div>
                             <div class="float-fix"></div>

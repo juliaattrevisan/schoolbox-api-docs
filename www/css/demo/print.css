@@ -4,7 +4,7 @@
 @page {size:landscape}
 body{font-family:Arial, Helvetica, sans-serif}
 table {display: inline-table; height:100%;}
-#nav, #tabs, #header, #footer, .link-case, .datepicker-box, .header_option, .back, .forward, .dates, .hidden-fields{display:none;}
+#nav, #tabs, #header, #footer, .link-case, .datepicker-box, .header_option, .back, .forward, .dates, .note, .btn, .created{display:none;}
 .cal-mid h3{font-size:16px; font-weight:bold; margin-bottom:16px;}
 #week-view{font-size:12px;}
 .cal-bubble{display:none;}
@@ -13,4 +13,7 @@ table {display: inline-table; height:100%;}
 .day-block ul.js_happening li{margin-bottom:8px !important; background:#0f0; display:block; border-bottom:1px solid #000; padding-bottom:4px;}
 .day-block li span{border:0 !important; line-height:16px}
 .calTable, .calTableSelected, .calTableCurrent{ padding:8px;}
-.time{display:block; font-weight:bold; }
+.time{ font-weight:bold;display:none }
+.hidden-fields{display:block;}
+.hidden-fields .time{display:block;}
+.hidden-fields{line-height:14px;}
