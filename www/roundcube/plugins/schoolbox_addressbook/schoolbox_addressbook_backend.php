@@ -1,0 +1,121 @@
+<?php
+
+require_once '../include/stdfuncs.php';
+require_once '../../library/user.php';
+
+class schoolbox_addressbook_backend extends rcube_addressbook {
+
+    public $primary_key = 'ID';
+    public $readonly = true;
+    public $groups = false;
+    private $filter;
+    private $result;
+
+    public function __construct() {
+        $this->ready = true;
+        $this->user = new User();
+    }
+
+    public function set_search_set($filter) {
+        $this->filter = $filter;
+    }
+
+    public function get_search_set() {
+        return $this->filter;
+    }
+
+    public function reset() {
+        $this->result = null;
+        $this->filter = null;
+    }
+
+    public function count() {
+        return new rcube_result_set($this->user_count, ($this->list_page - 1) * $this->page_size);
+    }
+
+    public function get_result() {
+        return $this->result;
+    }
+
+    public function list_records($cols=null, $subset=0) {
+        $users = $this->user->search('', ($this->list_page - 1) * $this->page_size, $this->list_page * $this->page_size, $count);
+
+        $this->user_count = $count;
+        $this->result = $this->count();
+
+        foreach ($users as $user) {
+            $this->result->add(array(
+                'ID'        => $user['id'],
+                'name'      => formatName($user),
+                'firstname' => $user['firstname'],
+                'surname'   => $user['lastname'],
+                'email'     => formatEmail($user)
+            ));
+        }
+
+        return $this->result;
+    }
+
+    public function search($fields, $value, $strict=false, $select=true, $nocount=false, $required=array()) {
+        $users = $this->user->search($value, 0, 20, $count);
+
+        $this->user_count = $count;
+        $this->result = $this->count();
+        
+        foreach ($users as $user) {
+            $this->result->add(array(
+                'ID'        => $user['id'],
+                'name'      => formatName($user),
+                'firstname' => $user['firstname'],
+                'surname'   => $user['lastname'],
+                'email'     => formatEmail($user)
+            ));
+        }
+
+        return $this->result;
+    }
+
+    public function get_record($id, $assoc=false) {
+        $users = $this->user->getAllByField('id', $id); // really just one user
+
+        $this->user_count = $count;
+        $this->result = $this->count();
+
+        foreach ($users as $user) {
+            $this->result->add(array(
+                'ID'        => $user['id'],
+                'name'      => formatName($user),
+                'firstname' => $user['firstname'],
+                'surname'   => $user['lastname'],
+                'email'     => formatEmail($user)
+            ));
+        }
+
+        return $assoc && $users ? $users : $this->result;
+    }
+
+    function list_groups($search = null) {
+        return false;
+    }
+
+    function create_group($name) {
+        return false;
+    }
+
+    function delete_group($gid) {
+        return false;
+    }
+
+    function rename_group($gid, $newname) {
+        return false;
+    }
+
+    function add_to_group($group_id, $ids) {
+        return false;
+    }
+
+    function remove_from_group($group_id, $ids) {
+        return false;
+    }
+
+}
