@@ -72,7 +72,8 @@ span.file {
 	-moz-user-select: none;
 }
 span.file.ui-draggable, #tree span.label.ui-draggable {
-	cursor: move;
+	cursor: move;overflow: hidden;
+    width: 150px;
 }
 
 #file-window #file-list tbody tr.empty td {
