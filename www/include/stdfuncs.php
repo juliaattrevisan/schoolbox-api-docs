@@ -318,7 +318,9 @@ function formatName($userInfo, $format = NULL){
 	// Replace tags
     if(is_array($userInfo)) {
         foreach($userInfo as $tagName => $tagValue){
-            $format = str_replace('{' . $tagName . '}', $tagValue, $format);
+            if (is_string($tagName)) {
+                $format = str_replace('{' . $tagName . '}', $tagValue, $format);
+            }
         }
         return $format;
     }

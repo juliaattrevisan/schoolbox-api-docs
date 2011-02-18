@@ -131,17 +131,15 @@ define('TIMETABLE_day_count',serialize(array(1=>7,7,5)));
 
 
 //Webmail
-define("MAIL_enable", false);				//This will disable webmail module
+define("MAIL_enable", true);				//This will disable webmail module
 define("MAIL_interface", "roundcube");		// Options are roundcube or simple
 define("MAIL_retrieval", "imap");			//Options are pop or imap (imap has extra state information)
-define("MAIL_host", "alderaan.mgs.vic.edu.au");
-define("MAIL_port", 143);
-define("MAIL_smtp_server", "mail.mgs.vic.edu.au");
-define("MAIL_smtp_port", 25);
-define("MAIL_address", "mgs.vic.edu.au");
+define("MAIL_host", "ssl://mail.alaress.com.au");
+define("MAIL_port", 993);
+define("MAIL_smtp_server", "ssl://mail.alaress.com.au");
+define("MAIL_smtp_port", 465);
+define("MAIL_address", "alaress.com.au");
 define("MAIL_increment", 20);					//Amount of emails per page
-define("MAIL_db", "roundcubemail");
-define('ROUNDCUBE_db','mysql://'.SQL_user.':'.SQL_passwd.'@'.SQL_host.'/'.SQL_db);
 
 //PEAR required for mail
 $path = SITE_root.'/include/PEAR';
