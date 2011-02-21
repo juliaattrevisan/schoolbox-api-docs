@@ -35,7 +35,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 		$fileHandler->update($file);
 	} else {
 		$allowedFileHandler = new AllowedFile;
-		$allowedFileHandler->fileSecurityCheck($_FILES['file']);
+		$allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 		
 		$fileHandler->create($file, $_FILES['file']);
 	}

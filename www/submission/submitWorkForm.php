@@ -11,7 +11,7 @@ if( isset($_FILES['file']['name']) && $_FILES['file']['name'] && is_numeric($_PO
 {
 
         $allowedFileHandler = new AllowedFile;
-        $allowedFileHandler->fileSecurityCheck($_FILES['file']);
+        $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
         $studHandler = new SubmissionStudent;
         $studHandler->create($_POST['box_id'], $_FILES['file']);

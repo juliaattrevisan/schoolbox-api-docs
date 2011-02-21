@@ -55,7 +55,7 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
         require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 
         $allowedFileHandler = new AllowedFile;
-        $allowedFileHandler->fileSecurityCheck($_FILES['file']);
+        $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
         $fileHandler = new File;
         $data = array(  'description'	=> $_POST['description'],

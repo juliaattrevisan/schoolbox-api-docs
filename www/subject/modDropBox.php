@@ -17,7 +17,7 @@ else if(is_numeric($_GET['id'])) {
 else if(is_numeric($_POST['category']) && $_POST['description'] && $_FILES['file']['tmp_name']) {
 	
 	$allowedFileHandler = new AllowedFile;
-	$allowedFileHandler->fileSecurityCheck($_FILES['file']);
+	$allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 	
 	if ($fileId = $dropbox->addFile($_FILES['file']['name'], $_FILES['file']['type'], $_FILES['file']['tmp_name'], $_POST['description'], $_POST['category']))
 		$_SESSION['dropSuccess'] = 1;

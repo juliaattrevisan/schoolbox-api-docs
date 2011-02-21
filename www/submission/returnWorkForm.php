@@ -45,7 +45,7 @@ else if ( (
 		
         if($_FILES['file']['name']) {
             $allowedFileHandler = new AllowedFile;
-            $allowedFileHandler->fileSecurityCheck($_FILES['file']);
+            $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
         }
 
         $return = array('box_id'    => $_POST['box_id'],

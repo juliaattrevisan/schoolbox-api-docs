@@ -56,9 +56,9 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 			/* Submitted file with form, run security checks */
 			$allowedFileHandler = new AllowedFile;
 			if (is_numeric($_POST['myfile']))
-				$allowedFileHandler->checkMime($_FILES['file']);
+				$allowedFileHandler->handleError($allowedFileHandler->checkMime($_FILES['file']));
 			else
-				$allowedFileHandler->fileSecurityCheck($_FILES['file']);
+				$allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
 			$fileHandler->update($file,$_FILES['file']);
 		}
@@ -89,9 +89,9 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 		if($_FILES['file']['name'])	{
 			/* Submitted file with form, run security checks */	
 			if (is_numeric($_POST['myfile']))
-				$allowedFileHandler->checkMime($_FILES['file']);
+				$allowedFileHandler->handleError($allowedFileHandler->checkMime($_FILES['file']));
 			else
-				$allowedFileHandler->fileSecurityCheck($_FILES['file']);
+				$allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 			
 			/* Add to multiple locations */
 			if(is_array($_POST['category']) ){
