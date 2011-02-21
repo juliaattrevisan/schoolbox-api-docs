@@ -126,6 +126,7 @@ class ZipFileUpload extends Model {
 					$this->traverse($currentPath);
 				}
 				else {
+					$allowedFileHandler = new AllowedFile();
 
 					/* For the File table
 					 */
@@ -146,10 +147,9 @@ class ZipFileUpload extends Model {
 					$pseudoFileArray = array(
 						'name' => $obj,
 						'tmp_name' => $currentPath,
-						'size' => filesize($currentPath)
+						'size' => filesize($currentPath),
+						'type' => $allowedFileHandler->getMime($currentPath),
 					);
-
-					$allowedFileHandler = new AllowedFile();
 
 					/* Erorr checking. If something couldn't be processed,
 					 * remember it, and print it out later

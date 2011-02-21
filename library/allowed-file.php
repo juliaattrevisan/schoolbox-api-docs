@@ -71,7 +71,10 @@ class AllowedFile extends Model {
 		if(is_readable(MIME_magic) && function_exists('finfo_open') ) {
 			//update to check against magic mime file on server rather than trust browser interpretation
 			$handle = finfo_open(FILEINFO_MIME, MIME_magic);
-			return finfo_file($handle,$file);
+
+			$mime = explode(';', finfo_file($handle,$file));
+
+			return $mime[0];
 		}
 	}
 	
