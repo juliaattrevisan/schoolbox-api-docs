@@ -22,7 +22,7 @@ $categoryHandler = new Category;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 $allowedFiles = new AllowedFile;
 
-if(is_numeric($this->arg[0])) {
+if(is_numeric($this->arg[0]) && $this->arg[0][0] != '0') {
 	$category = $categoryHandler->getByID($this->arg[0]);
 }
 if(!is_array($category)) {

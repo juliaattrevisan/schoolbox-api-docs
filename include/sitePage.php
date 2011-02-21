@@ -293,10 +293,16 @@ class SitePage extends Page {
 		{
 			if($this->site == 'mgs' || $this->site == 'grimwade')
 			{
-				if($this->groupHandler->isStaff())
-					$this->setVar("WEBMAIL_LOCATION", 'href="https://webmail.mgs.vic.edu.au/exchange/" rel="external"');
+				
+                                if($this->groupHandler->isStaff()) {
+                                    if($this->site == 'grimwade')
+                                        $this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgsvic.edu.au/owa" rel="external"');
+                                    else
+                                        $this->setVar("WEBMAIL_LOCATION", 'href="https://webmail.mgs.vic.edu.au/exchange/" rel="external"');
+                                }
 				else
 					$this->setVar("WEBMAIL_LOCATION", 'href="/mail/"');
+
 			}
 			else if(SITE_location == 'ormond')
 			{
@@ -576,7 +582,7 @@ class SitePage extends Page {
 			return $this->site.'/'.$template;
 		else
 			//change this back to "core" for the rest of the releases.
-			return 'demo/'.$template;
+			return 'core/'.$template;
 	}
 
 	function getVar($varname) {
