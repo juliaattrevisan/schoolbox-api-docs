@@ -1,13 +1,10 @@
-function Chat (config, render_messages, render_users) {
+function Chat (config) {
     this.send_data = {
         config: {},
         messages: {}
     };
 
     this.config = config;
-    this.render_messages = render_messages;
-    this.render_users = render_users;
-
     this.interval();
 }
 
@@ -41,12 +38,88 @@ Chat.prototype = {
     recv: function (data) {
         this.config = data.config;
 
-        this.render_messages(data.messages);
         this.render_users(data.users);
+        this.render_messages(data.messages);
     },
 
-    send: function (data) {
+    send: function () {
+        var message = $j('#component'+this.config.component_id+' input[name="message"]');
+
+        var data = {
+            messages: {
+                0: {
+                    title: chat_obj.config.name.title,
+                    firstname: chat_obj.config.name.firstname,
+                    lastname: chat_obj.config.name.lastname,
+                    type: 'user',
+                    time: (new Date()).toString(),
+                    body: message.val()
+                }
+            }
+        }
+
+        message.val('');
+
         this.render_messages(data.messages);
         $j.extend(this.send_data, data);
+
+        return false;
+    },
+
+    mute: function (user_id) {
+        
+    },
+
+    render_messages: function (messages) {
+        var messages_el = $j('#component'+this.config.component_id+' ul.chat-messages');
+
+        for (var i in messages) {
+            current_message = messages[i];
+
+            message_el = $j('<li></li>')
+
+            current_message.time = (new Date(current_message.time)).toLocaleTimeString();
+
+            if (current_message.type == 'user') {
+                current_message.name = formatName(current_message);
+                message_el.text(current_message.name + ' [' + current_message.time + ']: ' + current_message.body);
+            } else {
+                message_el.text(current_message.body);
+            }
+
+            message_el.addClass('chat-message-' + current_message.type);
+            messages_el.append(message_el);
+        }
+    },
+
+    render_users: function (users) {
+        chat_users_el = $j('#component'+this.config.component_id+' ul.chat-users');
+        chat_users_el.empty();
+
+        for (var i = 0; i < users['active'].length; i++) {
+            current_user = users['active'][i];
+
+            user_el = $j('<li></li>')
+                .text(formatName(current_user))
+                .data('user_id', current_user.user_id);
+
+            if (this.config.muted_users == undefined || this.config.muted_users[current_user.user_id] != true) {
+                user_el.removeClass('chat-user-muted');
+                user_mute_el = $j('<a href="#">mute</a>');
+            } else {
+                user_el.addClass('chat-user-muted');
+                user_mute_el = $j('<a href="#">unmute</a>');
+            }
+
+            var self = this;
+
+            user_mute_el.click(function () {
+                user_id = $j(this).parent().data('user_id');
+
+                self.mute(user_id);
+            }).appendTo(user_el);
+
+            chat_users_el.append(user_el);
+        }
     }
 }

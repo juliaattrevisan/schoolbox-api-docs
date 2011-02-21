@@ -2,19 +2,7 @@
 <script type="text/javascript" src="/javascript/stdfuncs.js"></script>
 <script type="text/javascript" src="/javascript/chat.js"></script>
 <script type="text/javascript">
-$j(document).ready(function () {
-    $j('#component{COMPONENT_HOMEPAGE_ID} form.chat-send a').click(function (event) {
-        send_event(chat_obj);
-    });
-
-    $j('#component{COMPONENT_HOMEPAGE_ID} input[name="message"]').keydown(function (event) {
-        if (event.keyCode == 13) {
-            send_event(chat_obj);
-
-            return false;
-        }
-    });
-
+$j(function () {
     var config = {
         category_id: '{ID}',
         component_id: '{CHAT_COMPONENT_ID}',
@@ -27,68 +15,20 @@ $j(document).ready(function () {
         last_time: null
     }
 
-    var render_messages = function (messages) {
-        var messages_el = $j('#component{COMPONENT_HOMEPAGE_ID} ul.chat-messages');
+    window.chat_obj = new Chat(config);
 
-        for (var i in messages) {
-            var message_el = $j('<li></li>')
+    $j('#component{COMPONENT_HOMEPAGE_ID} form.chat-send a').click(function (event) {
+        window.chat_obj.send();
+    });
 
-            messages[i].time = (new Date(messages[i].time)).toLocaleTimeString();
+    $j('#component{COMPONENT_HOMEPAGE_ID} input[name="message"]').keydown(function (event) {
+        if (event.keyCode == 13) {
+            window.chat_obj.send();
 
-            if (messages[i].type == 'user') {
-                messages[i].name = formatName(messages[i]);
-                message_el.text(messages[i].name + ' [' + messages[i].time + ']: ' + messages[i].body);
-            } else {
-                message_el.text(messages[i].body);
-            }
-
-            console.log(this);
-
-            message_el.addClass('chat-message-' + messages[i].type);
-            messages_el.append(message_el);
+            return false;
         }
-    }
-
-    var render_users = function (users) {
-        var chat_users_el = $j('#component{COMPONENT_HOMEPAGE_ID} ul.chat-users');
-
-        chat_users_el.empty();
-
-        for (var i = 0; i < users['active'].length; i++) {
-            user_el = $j('<li></li>').text(formatName(users['active'][i]));
-
-            if (users['mute'][i]) {
-                user_el.addClass('chat-mute');
-            }
-
-            chat_users_el.append(user_el);
-        }
-    }
-
-    var chat_obj = new Chat(config, render_messages, render_users);
+    });
 });
-
-function send_event (chat_obj) {
-    var message = $j('#component{COMPONENT_HOMEPAGE_ID} input[name="message"]');
-
-    var data = {
-        messages: {
-            0: {
-                title: chat_obj.config.name.title,
-                firstname: chat_obj.config.name.firstname,
-                lastname: chat_obj.config.name.lastname,
-                type: 'user',
-                time: (new Date()).toString(),
-                body: message.val()
-            }
-        }
-    }
-
-    chat_obj.send(data);
-    message.val('');
-
-    return false;
-}
 </script>
 <!-- END custom_head -->
 

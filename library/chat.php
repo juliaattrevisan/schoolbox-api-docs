@@ -36,12 +36,12 @@ class Chat extends Model {
         return $this->create($data);
     }
 
-    function system_send ($category_id, $type, $time = null, $body = null) {
-        if (empty($time)) {
+    function system_send ($category_id, $type, $body = null, $time = null) {
+        if ($time == null) {
             $time = new DateTime();
         }
 
-        return $this->send(array(
+        return $this->create(array(
             'category_id' => $category_id,
             'user_id'     => 0,
             'type'        => $type,
@@ -77,8 +77,8 @@ class Chat extends Model {
 
     function poll ($category_id, $user_id = null) {
         if (is_numeric($user_id)) {
-            $query = "INSERT INTO chat_poll (user_id, category_id, time, active)
-                VALUES ($user_id, $category_id, NOW(), true)
+            $query = "INSERT INTO chat_poll (user_id, category_id, time)
+                VALUES ($user_id, $category_id, NOW())
                 ON DUPLICATE KEY UPDATE time = NOW()";
         }
 
@@ -93,7 +93,6 @@ class Chat extends Model {
             WHERE `category_id` = $category_id";
 
         $users_all = $this->db->getAll($query);
-        $users = array();
 
         foreach ($users_all as $user) {
             $user['time'] = new DateTime($user['time']);
@@ -101,17 +100,13 @@ class Chat extends Model {
             if ($user['time'] > $last_time_limit) {
                 $users['active'][] = $user;
             } else {
-                $this->system_send($user['category_id'], 'disconnect', null, formatName($user) . ' Muted');
-
                 $users['inactive'][] = $user;
+
+                //$this->system_send($user['category_id'], 'disconnect', formatName($user) . ' disconnected.', $user['time']);
             }
 
-            $users['mute'] = array();
-
-            if ($user['mute']) {
-                //$this->system_send($user['category_id'], 'mute', null, formatName($user) . ' Muted');
-
-                $users['mute'][] = $user;
+            if ($this->group->getPermission($this->_config['category_id'], $user['id']) >= WRITE_ACCESS) {
+                $users['admin'][] = $user;
             }
         }
 
