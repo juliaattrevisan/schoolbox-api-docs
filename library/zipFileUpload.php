@@ -92,7 +92,7 @@ class ZipFileUpload {
 				if (is_dir($currentPath)) {
 					$subid = rand(1,10000);
 
-					echo "Creating folder $subid containing <strong>$obj</strong> in {$this->dirMap[$dir]}<br>";
+					echo "Creating folder $subid containing <strong>$obj</strong> in parent {$this->dirMap[$dir]}<br>";
 
 					$this->traverse($currentPath);
 				}

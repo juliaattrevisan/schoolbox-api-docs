@@ -81,6 +81,14 @@ var MultiSelector = function(){
 			 */
 			this.multi_selector.description.value = this.multi_selector.file.value.substring(0, this.multi_selector.file.value.lastIndexOf("."));
 
+			/* Fix for IE because it keeps the trailing slash
+			 */
+			var lastSlash = this.multi_selector.file.value.lastIndexOf('\\');
+
+			if (lastSlash > 0) {
+				this.multi_selector.description.value = this.multi_selector.description.value.substring(lastSlash+1, this.multi_selector.description.value.length);
+			}
+
 			// Make sure both fields are entered
 			if(this.multi_selector.file.value != "" && this.multi_selector.description.value != ""){
 				// Now unlock the delete button
