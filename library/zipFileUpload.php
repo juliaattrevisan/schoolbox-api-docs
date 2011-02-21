@@ -71,17 +71,21 @@ class ZipFileUpload {
 
 		while (false !== ($obj = readdir($dh))) {
 			if (($obj != '.') && ($obj != '..')) {
-
 				$currentPath = $dir . '/' . $obj;
 
-				if (empty($this->dirMap[$dir])) {
-					$category = new Category();
+				if (is_dir($currentPath)) {
+					$categoryHandler = new Category();
 
-					$id = rand(1,10000);
+//					$id = $categoryHandler->create(array(
+//						'name' => $obj,
+//						'parent' => $this->dirMap[$dir],
+//					));
 
-					$this->dirMap[$dir] = $id;
+					$id = rand(100,1000);
 
-					echo "Creating folder $id corresponding to {$dir}<br>";
+					$this->dirMap[$currentPath] = $id;
+
+					echo "Creating $currentPath with $id, corresponding to $obj, with parent {$this->dirMap[$dir]}<br>";
 				}
 
 				/* If it's a directory, create a Category for it and remember
@@ -90,14 +94,18 @@ class ZipFileUpload {
 				 * Otherwise, it's a file, and we add it to the parent Category
 				 */
 				if (is_dir($currentPath)) {
-					$subid = rand(1,10000);
+//					$subid = $categoryHandler->create(array(
+//						'name' => $obj,
+//						'parent' => $this->dirMap[$dir],
+//					));
+					$subid = rand(10000,100000);
 
-					echo "Creating folder $subid containing <strong>$obj</strong> in parent {$this->dirMap[$dir]}<br>";
+//					echo "Creating folder $subid containing <strong>$obj</strong> in parent {$this->dirMap[$dir]}<br>";
 
 					$this->traverse($currentPath);
 				}
 				else {
-					echo "Creating <strong>$obj</strong> \t\t in {$this->dirMap[$dir]}<br>";
+//					echo "Creating <strong>$obj</strong> \t\t in {$this->dirMap[$dir]}<br>";
 				}
 			}
 		}
