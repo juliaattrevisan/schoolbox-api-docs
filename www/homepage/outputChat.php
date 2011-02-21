@@ -11,7 +11,7 @@ if (empty($config['state'])) {
 
 $this->setBlock('config', 'chat_state', 'chat_state_block');
 
-foreach (array('on', 'off') as $state) {
+foreach (array('Active', 'Inactive') as $state) {
     $this->setVar(array(
         'COMPONENT_CONFIG_CHAT_STATE' => $state,
         'COMPONENT_CONFIG_CHAT_STATE_SELECTED' => $state == $config['state']? ' selected="selected"' : ''

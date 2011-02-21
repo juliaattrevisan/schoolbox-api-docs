@@ -82,13 +82,14 @@ Chat.prototype = {
 
             if (current_message.type == 'user') {
                 current_message.name = formatName(current_message);
-                message_el.text(current_message.name + ' [' + current_message.time + ']: ' + current_message.body);
+                message_el.html('<span class="chat-user"><span class="triangulate"></span><span class="chat-username">'+current_message.name + '</span><span class="chat-time">' + current_message.time + '</span></span><span class="chat-message">'+current_message.body+'</span>');
             } else {
-                message_el.text(current_message.body);
+                message_el.html('<span class="chat-triangle"></span><span class="chat-message">'+current_message.body+'</span>');
             }
 
             message_el.addClass('chat-message-' + current_message.type);
             messages_el.append(message_el);
+			
         }
     },
 
@@ -98,9 +99,15 @@ Chat.prototype = {
 
         for (var i = 0; i < users['active'].length; i++) {
             current_user = users['active'][i];
-
-            user_el = $j('<li></li>')
-                .text(formatName(current_user))
+			
+			//every two add in the dark class chimchim
+			if (i%2 == 0)  {
+           		user_el = $j('<li></li>')
+			} else {
+				user_el = $j('<li class="dark"></li>')
+			}
+			
+               user_el.text(formatName(current_user))
                 .data('user_id', current_user.user_id);
 
             if (this.config.muted_users == undefined || this.config.muted_users[current_user.user_id] != true) {

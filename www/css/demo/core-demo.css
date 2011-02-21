@@ -392,7 +392,7 @@ th { font-weight:bold; }
 	position: absolute;
 	right: 16px;
 	text-align: center;
-	top: 14px;
+	top: 7px;
 	width: 39px;
 	z-index: 200;
 	font-size:12px;
@@ -2370,7 +2370,100 @@ ul.js_happening li {
 
 .indent { margin-bottom: 1em; }
 
-/*COLOUR ADJUSTMENT BOX*/
+/********************************************
+CHAT
+*********************************************/
+
+.chat h2 .light {
+	display:block;
+	position:absolute;
+	height:20px;
+	width:20px;
+	top:6px;
+	left:68px;
+	background:url(/images/demo/icons/chat-light.png) no-repeat;
+	z-index:5
+}
+
+.chat .chat-users {
+	display:none;
+	background:#f3fbef;
+}
+
+.chat .show-users {
+	background:#ddefd3;
+	-moz-border-radius: 0 0 4px 4px;
+	-webkit-border-radius: 0 0 4px 4px;
+	border-radius: 0 0 4px 4px;
+	display:block;
+	height:16px;
+	text-align:center;
+	line-height:16px;
+	color:#000;
+	font-weight:bold;
+}
+
+.chat .show-users:hover {
+	text-decoration:none;
+	color:#000;
+	background:#ddefd3;
+}
+
+.box.chat .listing { margin:0; }
+
+.chat .chat-messages { position:relative; }
+
+.chat .chat-time, .chat .chat-user .triangulate {
+	position:absolute;
+	display:block;
+	z-index:5;
+}
+
+.chat .chat-user {
+	width:100%;
+	position:relative;
+	display:block;
+}
+
+.chat .chat-username {
+	display:block;
+	width:60%;
+	padding-left:16px;
+	padding-bottom:4px;
+}
+
+.chat .chat-time {
+	right:0;
+	top:0;
+	color:#797979
+}
+
+.chat .chat-user .triangulate {
+	background:url(/images/demo/icons/chat-me-triangle.png) no-repeat 100% 100%;
+	bottom:-1px;
+	left:60%;
+	height:12px;
+	width:11px;
+	z-index:5;
+}
+
+.chat .chat-message {
+	display:block;
+	padding:6px 16px;
+	color:#000;
+	background:#faf9f5;
+	border:1px solid #e9e3d6;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.chat .chat-message-user { padding:2px 0; }
+
+/********************************************
+COLOUR ADJUSTMENT BOX
+*********************************************/
+
 .colours {
 	float: left;
 	height:350px;
@@ -3167,6 +3260,51 @@ p adding:0 10px;
 	margin-bottom: 0.5em;
 	display:list-item;
 	vertical-alignment:top;
+}
+
+/*RESOURCES MULTI - UPLOAD*/
+
+
+.uploadifyQueue .cancel {
+	float:left;
+	margin-right:8px;
+}
+
+.uploadifyQueueItem {
+	border-top: 1px solid #dedede;
+	padding-top: 20px;
+	margin-top: 20px;
+}
+
+.uploadifyFileName {
+	width: 50%;
+	float: left;
+}
+
+.uploadifyDescription {
+	width: 50%;
+	float: right;
+}
+
+.uploadifyFileDescription input {
+	width: 30%;
+}
+
+.uploadifyProgress {
+	background-color: #E5E5E5;
+	width: 40%;
+}
+
+.uploadifyProgressBar {
+	background-color: #0099FF;
+	height: 10px;
+	width: 1px;
+}
+
+#startUpload {
+	width: 100px;
+	margin-top: 40px;
+	display: block;
 }
 
 /*REVISIONS*/

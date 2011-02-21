@@ -21,7 +21,8 @@ $j(function() {
 
 	/* Check for errors with custom file starter
 	 */
-	$j('#startUpload').click(function() {
+	$j('#startUpload').click(function(event) {
+		event.preventDefault();
 		var errors = 0;
 		var prefill = true;
 
@@ -94,44 +95,6 @@ $j(function() {
 });
 </script>
 
-<style type="text/css">
-.uploadifyQueueItem {
-	border-top: 1px solid #dedede;
-	padding-top: 20px;
-	margin-top: 20px;
-}
-
-.uploadifyFileName {
-	width: 50%;
-	float: left;
-}
-
-.uploadifyDescription {
-	width: 50%;
-	float: right;
-}
-
-.uploadifyFileDescription input {
-	width: 30%;
-}
-
-.uploadifyProgress {
-	background-color: #E5E5E5;
-	width: 40%;
-}
-
-.uploadifyProgressBar {
-	background-color: #0099FF;
-	height: 10px;
-	width: 1px;
-}
-
-#startUpload {
-	width: 100px;
-	margin-top: 40px;
-	display: block;
-}
-</style>
 <!-- END custom_head -->
 
 <h1>Upload Multiple Files</h1>
@@ -155,7 +118,8 @@ $j(function() {
 		<td>
 			<input id="custom_file_upload" name="custom_file_upload" type="file" />
 			<div id="fileQueue"></div>
-			<a id="startUpload">Upload files</a>
+			<a href="#" id="startUpload" class="btn create float-left"><span></span>Upload files</a>
+			<div class="float-fix"></div>
 		</td>
 	</tr>
 </table>
