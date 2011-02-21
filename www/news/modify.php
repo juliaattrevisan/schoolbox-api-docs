@@ -40,8 +40,8 @@ if (is_numeric($this->arg[0])) {
 	$groupList = $newsHandler->getGroupList();
 	$campusList = $newsHandler->getCampusList();
 	
-	$this->dropDown("group_selection", $groupList, $news['groupList']);
-	$this->dropDown("campus_selection", $campusList, $news['campusList'], "campus_row");
+	$this->checkList("group_selection", $groupList, $news['groupList']);
+	$this->checkList("campus_selection", $campusList, $news['campusList'], "campus_row");
 	
 	$this->dropDown("topic_list", $newsHandler->getTopicList(), $news['item_topic_id'], TEMPLATE_content, array('newsTopicID' => 'TOPIC_ID', 'name' => 'TOPIC_NAME'));
 	

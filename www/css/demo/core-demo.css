@@ -89,6 +89,8 @@ ul.pad-it { list-style:disc; }
 
 .hide-it, .hide { display:none; }
 
+.clear{clear:both;}
+
 /*--------------------------------------------------------------
  Heading Styles 
 --------------------------------------------------------------*/
@@ -3143,6 +3145,15 @@ p.forgotten { margin:10px 0; }
 
 .news-item.archive { margin-bottom:16px; }
 
+#newsForm .active-checkbox{
+		-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	background:#CAE9B9;
+	padding:0 2px;
+	
+}
+
 #news-header {
 	font-weight:bold;
 	font-size:14px;
@@ -3178,6 +3189,7 @@ p adding:0 10px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
 }
+
 
 #category li {
 	display:block;
