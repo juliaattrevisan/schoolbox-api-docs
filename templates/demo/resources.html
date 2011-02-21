@@ -142,13 +142,14 @@ $j(function() {
 			},
 			icon: '/images/famicons/folder_delete.png'
 		}},
+		<!-- BEGIN delete_all -->
 		{"Delete All": {
 			onclick: function () { 
 				var _name = $j(this).find(".folder").text();
 				if (confirm("Are you sure you want to delete "+_name+" and all its contents?")) window.open("/cms/categoryForm.php?deleteAll="+$j(this).attr("id").substring(5),"_self"); 
 			}
-			
 		}},
+		<!-- END delete_all -->
 		$j.contextMenu.separator,
 		{"New File": {
 			onclick: function () { window.open("/cms/file/new/"+$j(this).attr("id").substring(5),"_self"); },
@@ -163,6 +164,14 @@ $j(function() {
 			onclick: function () { window.open("/cms/category/new/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/folder_add.png'
 		}},
+		<!-- BEGIN zip_file_upload -->
+		{'Upload zip file': {
+			onclick: function() {
+				window.open('/cms/zipFile', '_self');
+			},
+			icon: '/images/famicons/page_white_compressed.png'
+		}},
+		<!-- END zip_file_upload -->
 		$j.contextMenu.separator,
 		{"Download": {
 			onclick: function () { window.open("/cms/fetchFolder.php?folder="+$j(this).attr("id").substring(5),"_self"); },
@@ -447,7 +456,6 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
 <![endif]-->
 <!-- END custom_head -->
 <div class="template2">
-
   <div class="left">
     <div id="category-window">
     <div class="loading"></div>
