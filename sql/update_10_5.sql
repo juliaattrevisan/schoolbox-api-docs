@@ -312,3 +312,7 @@ INSERT INTO error(id, message) VALUES (52, "This link is already shared in your 
 
 INSERT INTO luEventType(eventTypeID, eventType, eventColour) VALUES (6, 'Online Assessment', 'fff3b2');
 INSERT INTO file_type(id, `name`) VALUES (11, 'Online Assessment');
+
+/* Zip upload
+ */
+INSERT INTO error (id, message) VALUES (136, 'Could not extract files from zip archive.');

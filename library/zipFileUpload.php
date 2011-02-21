@@ -187,7 +187,7 @@ class ZipFileUpload extends Model {
 	/**
 	 * Remove temp folder that was extracted. Or you can feed in a list of
 	 * folders to remove. It will prefix this list with the extractTo value for
-	 * a bit of safety
+	 * a bit of safety.
 	 */
 	public function cleanup($existing = false) {
 		if (is_array($existing)) {
