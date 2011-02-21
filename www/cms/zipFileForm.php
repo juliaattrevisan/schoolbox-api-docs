@@ -25,11 +25,34 @@ if (isset($_GET[session_name()])) {
 /* Extract files
  */
 $archive = new PclZip($_FILES['file']['tmp_name']);
-echo "<pre>";
+
 $zipFileUploadHandler = new ZipFileUpload();
 $zipFileUploadHandler->extract($archive);
 $zipFileUploadHandler->traverse($zipFileUploadHandler->getPath());
 $zipFileUploadHandler->cleanup();
 
-print_r($zipFileUploadHandler->lastDir);
+/* Error handling
+ */
+$allErrors = $zipFileUploadHandler->getErrors();
+
+if (count($allErrors)) {
+	$page->setFile(TEMPLATE_content, 'cms/zipFileError.html');
+	$page->setBlock(TEMPLATE_content, 'error', 'error_block');
+
+	foreach($allErrors as $currentError) {
+		$page->setVar(array(
+			'FILENAME' => $currentError['file'],
+			'MESSAGE' => $currentError['message'],
+		));
+
+		$page->parse('error_block', 'error', true);
+	}
+
+	$page->outputPage();
+}
+else {
+	localRedir('/resources');
+}
+
+
 ?>

@@ -12,21 +12,35 @@
  * Creates Categorys as required (synonymous with folders)
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 
-class ZipFileUpload {
+class ZipFileUpload extends Model {
 	private $extractTo = '/tmp';
 	private $prefix = 'portal_zip_upload_';
 	private $path = '';
 
-	/* Map directory paths to category ids, because folders aren't always read
-	 * in the nicest order.
+	/* Show what is being read and processed
 	 */
-	public $dirMap = array();
+	private $verbose = false;
+
+	/* Map directory paths to category ids, because folders are sometimes read
+	 * out of order (use $this->verbose = true to see how your stuff is being
+	 * read)
+	 */
+	private $dirMap = array();
+
+	/* A list of files which didn't get added due to errors
+	 * 	 */
+	private $errorFiles = array();
 
 	/**
+	 * Constructor
 	 * Set up paths and clean up any existing junk
 	 */
 	public function __construct() {
+		parent::Model();
+
 		$this->path = $this->extractTo . '/' . $this->prefix . uniqid();
 
 		/* Prepare folder: if folder already exists, unlink all the stuff in it
@@ -42,6 +56,13 @@ class ZipFileUpload {
 	 */
 	public function getPath() {
 		return $this->path;
+	}
+
+	/**
+	 * Use verbose mode
+	 */
+	public function setVerbose() {
+		$this->verbose = true;
 	}
 
 	/**
@@ -62,50 +83,98 @@ class ZipFileUpload {
 	}
 
 	/**
-	 * Traverse directory structure
+	 * Traverse directory structure. Create Categorys and Files accordingly,
+	 * with the permissions specified
 	 */
 	public function traverse($dir) {
 		if (!$dh = @opendir($dir)) {
 			return;
 		}
 
+		/* Begin traversal
+		 */
 		while (false !== ($obj = readdir($dh))) {
 			if (($obj != '.') && ($obj != '..')) {
 				$currentPath = $dir . '/' . $obj;
 
+				/* Create category for the current folder, with POSTed
+				 * permissions
+				 */
 				if (is_dir($currentPath)) {
 					$categoryHandler = new Category();
 
-//					$id = $categoryHandler->create(array(
-//						'name' => $obj,
-//						'parent' => $this->dirMap[$dir],
-//					));
-
-					$id = rand(100,1000);
+					$id = $categoryHandler->create(array(
+						'name' => $obj,
+						'parent' => $this->dirMap[$dir],
+						'group'	=> $_POST['group'],
+					));
 
 					$this->dirMap[$currentPath] = $id;
 
-					echo "Creating $currentPath with $id, corresponding to $obj, with parent {$this->dirMap[$dir]}<br>";
+					if ($this->verbose) {
+						echo "Creating $currentPath with $id, corresponding to $obj, with parent {$this->dirMap[$dir]}<br>";
+					}
 				}
 
 				/* If it's a directory, create a Category for it and remember
-				 * the new id corresponding to the path.
+				 * the new id corresponding to the path. Enter it and deal with
+				 * any stuff inside
 				 *
 				 * Otherwise, it's a file, and we add it to the parent Category
 				 */
 				if (is_dir($currentPath)) {
-//					$subid = $categoryHandler->create(array(
-//						'name' => $obj,
-//						'parent' => $this->dirMap[$dir],
-//					));
-					$subid = rand(10000,100000);
-
-//					echo "Creating folder $subid containing <strong>$obj</strong> in parent {$this->dirMap[$dir]}<br>";
-
 					$this->traverse($currentPath);
 				}
 				else {
-//					echo "Creating <strong>$obj</strong> \t\t in {$this->dirMap[$dir]}<br>";
+
+					/* For the File table
+					 */
+					$data = array(
+						'category' => $this->dirMap[$dir],
+						'owner' => $_SESSION['id'],
+						'realname' => $obj,
+						'description' => $obj,
+					);
+
+					/* Since we've already uploaded the file and extracted it,
+					 * create a pseudo-$_FILES array containing the tmp_name
+					 * which is simply where the file ended up after extraction
+					 *
+					 * Allows us to use the fileHandler->create() method without
+					 * modifying it.
+					 */
+					$pseudoFileArray = array(
+						'name' => $obj,
+						'tmp_name' => $currentPath,
+						'size' => filesize($currentPath)
+					);
+
+					$allowedFileHandler = new AllowedFile();
+
+					/* Erorr checking. If something couldn't be processed,
+					 * remember it, and print it out later
+					 */
+					$result = $allowedFileHandler->fileSecurityCheck($pseudoFileArray);
+
+					if (is_array($result)) {
+						$this->errorFiles[] = array(
+							'file' => $obj,
+							'code' => $result['code'],
+							'message' => $result['message']
+						);
+
+						if ($this->verbose) {
+							echo "Error: could not make <strong>$obj</strong> in {$this->dirMap[$dir]}<br>";
+						}
+					}
+					else {
+						$fileHandler = new File();
+						$fileHandler->create($data, $pseudoFileArray);
+
+						if ($this->verbose) {
+							echo "Creating <strong>$obj</strong> in {$this->dirMap[$dir]}<br>";
+						}
+					}
 				}
 			}
 		}
@@ -163,6 +232,28 @@ class ZipFileUpload {
 		}
 
 		return;
+	}
+
+	/**
+	 * Get error data for files which couldn't be uploaded
+	 */
+	public function getErrors() {
+		$errorMessages = array();
+
+		if (count($this->errorFiles)) {
+			foreach($this->errorFiles as $currentFile) {
+				$query = 'SELECT message FROM error WHERE id = ' . $currentFile['code'];
+
+				$error = $this->db->getRow($query);
+
+				$errorMessages[] = array(
+					'file' => $currentFile['file'],
+					'message' => str_replace('%MESSAGE%', $currentFile['message'], $error['message']),
+				);
+			}
+		}
+
+		return $errorMessages;
 	}
 }
 ?>
