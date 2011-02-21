@@ -27,6 +27,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
+$assess = $assessHandler->getByID($this->arg[0]);
 $sectionList = $sectionHandler->getList($this->arg[0]);
 
 if (is_array($sectionList) && count($sectionList)) {
@@ -63,5 +64,5 @@ $assessHandler->update(array(
     'deleted_at' => 'NOW()'
 ));
 
-localRedir('/assess/create');
+localRedir('/homepage/' . $assess['category_id']);
 ?>

@@ -1,0 +1,37 @@
+<h2>Zip Upload</h2>
+<p>
+	You can create a zip file on your computer and uploading it here will
+	decompress it whilst maintaining folder structure.
+</p>
+
+<form action="/cms/zipFileForm.php" method="post" enctype="multipart/form-data">
+	<input name="file" type="file" />
+	<table>
+		<tr>
+			<td>
+				<h4>Group Permissions</h4>
+				<em>Allow predefined groups of users access to this folder. </em>
+			</td>
+			<td>
+				<table>
+					<tr>
+						<th><b>Group</b></th>
+						<th><b>None</b></th>
+						<th><b>Read</b></th>
+						<th><b>Write</b></th>
+					</tr>
+					<!-- BEGIN perm_table -->
+					<tr>
+						<td>{GROUP_NAME}</td>
+						<td><input type="radio" class="no_permission" name="group[{GROUP_ID}]" value="0" {PERM_0_SELECTED} /></td>
+						<td><input type="radio" name="group[{GROUP_ID}]" value="1" {PERM_1_SELECTED} /></td>
+						<td><input type="radio" name="group[{GROUP_ID}]" value="2" {PERM_2_SELECTED} /></td>
+					</tr>
+					<!-- END perm_table -->
+				</table>
+			</td>
+		</tr>
+	</table>
+	<input type="submit" value="upload" />
+</form>
+
