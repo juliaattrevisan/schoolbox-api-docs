@@ -64,7 +64,14 @@ img { border:0; }
 CSS commands
 --------------------------------------------------------------*/
 .center { text-align:center; }
-
+ .active-checkbox{
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	background:#CAE9B9;
+	padding:0 2px;
+	
+}
 .float-right { float:right; }
 
 .float-left { float:left; }
@@ -697,6 +704,15 @@ fieldset {
 	background: #fff99a;
 	padding: 5px;
 }
+
+dl.errors {padding:7px 8px; border:1px solid #ebe58e; background: #fffaa8; margin-bottom:16px}
+dl.errors dt{
+    padding-top: 67px;
+    text-align: center;
+    width: 100px;background:url(/images/demo/icons/error-icon.png) no-repeat 50% 8px; width:15%}
+	
+dl.errors dt span{display:block; margin:0 auto; width:91px; overflow:hidden;}	
+dl.errors dd{width:85%;}
 
 .message {
 	background:url(/images/core/assess/validate-arrow.jpg) 5px 0 no-repeat;
@@ -2469,8 +2485,9 @@ CHAT
 
 .chat .chat-message-container{border:1px solid #ccc;padding:4px; margin:8px 0;}
 .chat .chat-message-box{width:100%; margin:0; border:0; padding:0; }
-
-.chat-users a{display:block; position:absolute; top;0; right:8px; background:url(/images/demo/icons/chat-box.png) no-repeat;}
+.chat-users li{position:relative;}
+.chat-users a{display:block; position:absolute; top:7px; right:8px; width:18px; height:18px; background:url(/images/demo/icons/chat-box.png) no-repeat; text-indent:-99999em; font-size:1px;}
+.chat-users a:hover{background-position:0 -18px}
 /********************************************
 COLOUR ADJUSTMENT BOX
 *********************************************/
@@ -3154,14 +3171,7 @@ p.forgotten { margin:10px 0; }
 
 .news-item.archive { margin-bottom:16px; }
 
-#newsForm .active-checkbox{
-		-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	background:#CAE9B9;
-	padding:0 2px;
-	
-}
+
 
 #news-header {
 	font-weight:bold;

@@ -1,14 +1,23 @@
-<h2>Zip Upload</h2>
-<p>
-	You can create a zip file on your computer and uploading it here will
-	decompress it whilst maintaining folder structure.
-</p>
+<h1>Zip Upload</h1>
 
-<form action="/cms/zipFileForm.php" method="post" enctype="multipart/form-data">
-	<input name="file" type="file" />
+<form action="/cms/zipFileForm.php" method="post" class="standardForm" enctype="multipart/form-data">
+	
 	<table>
-		<tr>
+	
+	<tr>
+			<td class="formLabelWidth">
+				<h4>Upload</h4>
+				<em>You can create a zip file on your computer and uploading it here will decompress it whilst maintaining folder structure. </em>
+			</td>
 			<td>
+				<input name="file" type="file" />
+			</td>
+		</tr>
+	
+	
+	
+		<tr>
+			<td class="formLabelWidth">
 				<h4>Group Permissions</h4>
 				<em>Allow predefined groups of users access to this folder. </em>
 			</td>
@@ -32,6 +41,6 @@
 			</td>
 		</tr>
 	</table>
-	<input type="submit" value="upload" />
+	<input type="submit" class="submit-btn-plain" value="Upload" />
 </form>
 
