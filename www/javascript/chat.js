@@ -5,6 +5,7 @@ function Chat (config) {
     };
 
     this.config = config;
+    this.update();
     this.interval();
 }
 
@@ -14,7 +15,7 @@ Chat.prototype = {
 
         this.interval_ref = setInterval(function () {
             self.update();
-        }, 2000);
+        }, 5000);
     },
 
     update: function () {
@@ -37,98 +38,134 @@ Chat.prototype = {
 
     recv: function (data) {
         this.config = data.config;
+        this.users = data.users;
 
         this.render_users(data.users);
         this.render_messages(data.messages);
     },
 
     send: function () {
+        var self = this;
         var message = $j('#component'+this.config.component_id+' textarea[name="message"]');
 
-
-			var data = {
-				messages: {
-					0: {
-						title: chat_obj.config.name.title,
-						firstname: chat_obj.config.name.firstname,
-						lastname: chat_obj.config.name.lastname,
-						type: 'user',
-						time: (new Date()).toString(),
-						body: message.val()
-					}
-				}
-			}
+        var data = {
+            messages: {
+                0: {
+                    title: self.config.name.title,
+                    firstname: self.config.name.firstname,
+                    lastname: self.config.name.lastname,
+                    user_id: self.config.user_id,
+                    type: 'user',
+                    time: (new Date()).toString(),
+                    body: message.val(),
+                }
+            }
+        }
 	
-			message.val('');
+        message.val('');
 	
-			this.render_messages(data.messages);
-			$j.extend(this.send_data, data);
-		
-
-        return false;
+        this.render_messages(data.messages);
+        $j.extend(this.send_data, data);
     },
 
     mute: function (user_id) {
+        var self = this;
         
+        if (self.config.muted_users[user_id] != 'true') {
+            self.config.muted_users[user_id] = 'true';
+        } else {
+            delete self.config.muted_users[user_id];
+        }
+
+        this.render_users(self.users);
     },
 
     render_messages: function (messages) {
+        var self = this;
+
         var messages_el = $j('#component'+this.config.component_id+' ul.chat-messages');
 
         for (var i in messages) {
-            current_message = messages[i];
+            message = messages[i];
 
-            message_el = $j('<li></li>')
+            message.time = (new Date(message.time)).toLocaleTimeString();
+            message.name = formatName(message);
 
-            current_message.time = (new Date(current_message.time)).toLocaleTimeString();
+            message_el = $j('<li></li>').addClass('chat-message-' + message.type);
 
-            if (current_message.type == 'user') {
-                current_message.name = formatName(current_message);
-                message_el.html('<span class="chat-user"><span class="triangulate"></span><span class="chat-username">'+current_message.name + '</span><span class="chat-time">' + current_message.time + '</span></span><span class="chat-message">'+current_message.body+'</span>');
-            } else {
-                message_el.html('<span class="chat-user"><span class="triangulate"></span></span><span class="chat-message">'+current_message.body+'</span>');
+            if (message.user_id == self.config.user_id) {
+                message_el.addClass('chat-message-user-me');
             }
 
-            message_el.addClass('chat-message-' + current_message.type);
+            if (self.users.admin[message.user_id] != undefined) {
+                message_el.addClass('chat-message-user-admin');
+            }
+
+            if (message.type == 'user') {
+                message_el.html('<span class="chat-user"><span class="triangulate"></span><span class="chat-username">'+message.name+'</span><span class="chat-time">'+message.time+'</span></span><span class="chat-message">'+message.body+'</span>');
+            } else {
+                message_el.html('<span class="chat-user"><span class="triangulate"></span></span><span class="chat-message">'+message.body+'</span>');
+            }
+
             messages_el.append(message_el);
-			
         }
     },
 
     render_users: function (users) {
+        var self = this;
+
         chat_users_el = $j('#component'+this.config.component_id+' ul.chat-users');
         chat_users_el.empty();
 
-        for (var i = 0; i < users['active'].length; i++) {
-            current_user = users['active'][i];
+        for (var i in users.active) {
+            user = users.active[i];
 			
-			//every two add in the dark class chimchim
-			if (i%2 == 0)  {
-           		user_el = $j('<li></li>')
-			} else {
-				user_el = $j('<li class="dark"></li>')
-			}
-			
-               user_el.text(formatName(current_user))
-                .data('user_id', current_user.user_id);
-
-            if (this.config.muted_users == undefined || this.config.muted_users[current_user.user_id] != true) {
-                user_el.removeClass('chat-user-muted');
-                user_mute_el = $j('<a href="#">mute</a>');
+            //every two add in the dark class chimchim
+            if (i%2 == 0) {
+                user_el = $j('<li></li>')
             } else {
-                user_el.addClass('chat-user-muted');
-                user_mute_el = $j('<a href="#">unmute</a>');
+                user_el = $j('<li class="dark"></li>')
             }
 
-            var self = this;
+           user_el.text(formatName(user))
+            .data('user_id', user.user_id);
 
-            user_mute_el.click(function () {
-                user_id = $j(this).parent().data('user_id');
+            // mute logic
+            if (this.config.muted_users == undefined) {
+                this.config.muted_users = {};
+            }
 
-                self.mute(user_id);
-            }).appendTo(user_el);
+            if (this.config.muted_users[user.user_id] == 'true') {
+                user_el.addClass('chat-user-muted');
+            }
+
+            if (this.is_admin()) {
+                if (this.config.muted_users[user.user_id] != 'true') {
+                    user_mute_el = $j('<a href="#">mute</a>');
+                } else {
+                    user_mute_el = $j('<a href="#">unmute</a>');
+                }
+
+                user_mute_el.click(function () {
+                    user_id = $j(this).parent().data('user_id');
+
+                    self.mute(user_id);
+                }).appendTo(user_el);
+            }
 
             chat_users_el.append(user_el);
         }
+    },
+
+    is_admin: function (user_id) {
+        if (user_id == undefined) {
+            user_id = this.config.user_id;
+        }
+
+        if (this.users.admin[user_id] != undefined) {
+            return true;
+        }
+
+        return false;
     }
 }

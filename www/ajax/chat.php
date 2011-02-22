@@ -31,6 +31,10 @@ $data_recv = array(
 
 if (!empty($data_recv['users']['inactive'])) {
     $chat->users_remove($data_recv['users']['inactive']);
+
+    foreach ($data_recv['users']['inactive'] as $user) {
+        $chat->system_send($user['category_id'], 'disconnect', formatName($user) . ' disconnected.', $user['time']);
+    }
 }
 
 /* Send */

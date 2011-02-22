@@ -13,44 +13,51 @@ $j(function () {
             firstname: '{CHAT_NAME_FIRSTNAME}',
             lastname: '{CHAT_NAME_LASTNAME}',
         },
-        last_time: null
+        last_time: null,
     }
 
     window.chat_obj = new Chat(config);
 
     $j('#component{COMPONENT_HOMEPAGE_ID} form.chat-send a').click(function (event) {
-		event.preventDefault();
-        window.chat_obj.send();
+        event.preventDefault();
+        message_box = $j('#component{COMPONENT_HOMEPAGE_ID} textarea[name="message"]');
+
+        if (!message_box.val().length) {
+                message_box.animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
+                message_box.parent().animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
+        } else {
+                window.chat_obj.send();
+        }
     });
 
-    $j('#component{COMPONENT_HOMEPAGE_ID} textarea[name="message"]').keydown(function (event) {
+    $j('#component{COMPONENT_HOMEPAGE_ID} textarea[name="message"]').keypress(function (event) {
         if (event.keyCode == 13) {
-			//this way the actual message is validated.. if it's empty a pretty thing happens.
-			event.preventDefault();
-			if (!$j(this).val().length) {
-				$j(this).animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100); 
-				$j(this).parent().animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100); 
-			} else {
-				window.chat_obj.send();
-			}
-		}
+            //this way the actual message is validated.. if it's empty a pretty thing happens.
+            event.preventDefault();
+            if (!$j(this).val().length) {
+                $j(this).animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
+                $j(this).parent().animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
+            } else {
+                window.chat_obj.send();
+            }
+        }
     });
-	
-	var chatStatus = $j('#chat-status').val();
-	if (chatStatus == "Active") {
-		$j('.light').css('background-position', "bottom");
-		
-	}
-	
-	$j('.show-users').click(function(event) {
-		event.preventDefault();
-		$j('.chat-users').slideToggle();
-		$j(this).toggleClass('active')
-	});
-	
-	
-	
-	//{left_bg_primary}
+
+    var chatStatus = $j('#chat-status').val();
+    if (chatStatus == "Active") {
+        $j('.light').css('background-position', "bottom");
+
+    }
+
+    $j('.show-users').click(function(event) {
+        event.preventDefault();
+        $j('.chat-users').slideToggle();
+        $j(this).toggleClass('active')
+    });
+
+
+
+    //{left_bg_primary}
 	
 });
 </script>

@@ -98,15 +98,13 @@ class Chat extends Model {
             $user['time'] = new DateTime($user['time']);
 
             if ($user['time'] > $last_time_limit) {
-                $users['active'][] = $user;
+                $users['active'][$user['user_id']] = $user;
             } else {
-                $users['inactive'][] = $user;
-
-                //$this->system_send($user['category_id'], 'disconnect', formatName($user) . ' disconnected.', $user['time']);
+                $users['inactive'][$user['user_id']] = $user;
             }
 
             if ($this->group->getPermission($this->_config['category_id'], $user['id']) >= WRITE_ACCESS) {
-                $users['admin'][] = $user;
+                $users['admin'][$user['user_id']] = $user;
             }
         }
 
