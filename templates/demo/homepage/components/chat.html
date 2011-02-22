@@ -1,5 +1,6 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/stdfuncs.js"></script>
+<script type="text/javascript" src="/javascript/jquery.color.js"></script>
 <script type="text/javascript" src="/javascript/chat.js"></script>
 <script type="text/javascript">
 $j(function () {
@@ -22,12 +23,17 @@ $j(function () {
         window.chat_obj.send();
     });
 
-    $j('#component{COMPONENT_HOMEPAGE_ID} input[name="message"]').keydown(function (event) {
+    $j('#component{COMPONENT_HOMEPAGE_ID} textarea[name="message"]').keydown(function (event) {
         if (event.keyCode == 13) {
-            window.chat_obj.send();
-
-            return false;
-        }
+			//this way the actual message is validated.. if it's empty a pretty thing happens.
+			event.preventDefault();
+			if (!$j(this).val().length) {
+				$j(this).animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100); 
+				$j(this).parent().animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100); 
+			} else {
+				window.chat_obj.send();
+			}
+		}
     });
 	
 	var chatStatus = $j('#chat-status').val();
@@ -39,6 +45,7 @@ $j(function () {
 	$j('.show-users').click(function(event) {
 		event.preventDefault();
 		$j('.chat-users').slideToggle();
+		$j(this).toggleClass('active')
 	});
 	
 	
@@ -53,7 +60,7 @@ $j(function () {
     <h2>Chat<span class="light"></span></h2>
 	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
-<a class="close-delete" href="#"><span>X</span></a>
+	<a class="close-delete" href="#"><span>X</span></a>
 	<div class="editPanel settings hide">
 		<form action="/homepage/configForm.php" method="get">
 			<input type="hidden" name="cid" value="{ID}" />
@@ -85,11 +92,14 @@ $j(function () {
         <ul class="text listing chat-users">
         </ul>
 		
-		<a href="#" class="show-users">^</a>
+		<a href="#" class="show-users"></a>
         <ul class="chat-messages">
         </ul>
         <form action="#" method="post" class="chat-send">
-            <p class="interact"><input name="message" type="text"/><a href="#" class="btn up-arrow"><span></span>Send</a></p>
+            
+			<div class="chat-message-container"><textarea name="message" class="chat-message-box"></textarea></div>
+			
+			<a href="#" class="btn chat flo"><span></span>Send</a>
         </form>
     </div>
     <div class="chat-error hide"></div>

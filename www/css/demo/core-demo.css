@@ -457,7 +457,6 @@ th { font-weight:bold; }
 	min-height: 100px;
 	width: 29.5%;
 	float: right;
-	overflow: hidden;
 	position:relative;
 }
 
@@ -897,6 +896,10 @@ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff4ee', End
 .btn.download span { background-position:0 -560px; }
 
 .btn.download:hover span { background-position:0 -574px; }
+
+.btn.chat span { background-position:0 -588px; }
+
+.btn.chat:hover span { background-position:0 -602px; }
 
 /*submit button*/
 .submit-btn {
@@ -2393,7 +2396,7 @@ CHAT
 }
 
 .chat .show-users {
-	background:#ddefd3;
+	background:#ddefd3 url(/images/demo/icons/chat-down.png) no-repeat 50% 50%;
 	-moz-border-radius: 0 0 4px 4px;
 	-webkit-border-radius: 0 0 4px 4px;
 	border-radius: 0 0 4px 4px;
@@ -2405,10 +2408,12 @@ CHAT
 	font-weight:bold;
 }
 
+.chat .show-users.active{background:#ddefd3 url(/images/demo/icons/chat-up.png) no-repeat 50% 50%;}
+
 .chat .show-users:hover {
 	text-decoration:none;
 	color:#000;
-	background:#ddefd3;
+	background-color:#ddefd3;
 }
 
 .box.chat .listing { margin:0; }
@@ -2462,6 +2467,10 @@ CHAT
 
 .chat .chat-message-user { padding:2px 0; }
 
+.chat .chat-message-container{border:1px solid #ccc;padding:4px; margin:8px 0;}
+.chat .chat-message-box{width:100%; margin:0; border:0; padding:0; }
+
+.chat-users a{display:block; position:absolute; top;0; right:8px; background:url(/images/demo/icons/chat-box.png) no-repeat;}
 /********************************************
 COLOUR ADJUSTMENT BOX
 *********************************************/

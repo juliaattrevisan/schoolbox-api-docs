@@ -12,9 +12,10 @@ $j(function() {
 		forcePlaceholderSize: true,
 		handle: 'h2',
 		helper: 'clone',
-		items: 'div.box',
+		items: '.box',
 		placeholder: 'marker',
 		tolerance: 'pointer',
+		zIndex: 2000,
 		
 		update: function () {
 			var left = '', right = '';
@@ -48,7 +49,6 @@ $j(function() {
 	});
 	
 	$j('div.box h2').css('cursor', 'move');
-	
 	
 	/* from here down I've changed the component functions!!!!*/
 	

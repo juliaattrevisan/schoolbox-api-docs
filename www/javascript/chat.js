@@ -43,25 +43,27 @@ Chat.prototype = {
     },
 
     send: function () {
-        var message = $j('#component'+this.config.component_id+' input[name="message"]');
+        var message = $j('#component'+this.config.component_id+' textarea[name="message"]');
 
-        var data = {
-            messages: {
-                0: {
-                    title: chat_obj.config.name.title,
-                    firstname: chat_obj.config.name.firstname,
-                    lastname: chat_obj.config.name.lastname,
-                    type: 'user',
-                    time: (new Date()).toString(),
-                    body: message.val()
-                }
-            }
-        }
 
-        message.val('');
-
-        this.render_messages(data.messages);
-        $j.extend(this.send_data, data);
+			var data = {
+				messages: {
+					0: {
+						title: chat_obj.config.name.title,
+						firstname: chat_obj.config.name.firstname,
+						lastname: chat_obj.config.name.lastname,
+						type: 'user',
+						time: (new Date()).toString(),
+						body: message.val()
+					}
+				}
+			}
+	
+			message.val('');
+	
+			this.render_messages(data.messages);
+			$j.extend(this.send_data, data);
+		
 
         return false;
     },
@@ -84,7 +86,7 @@ Chat.prototype = {
                 current_message.name = formatName(current_message);
                 message_el.html('<span class="chat-user"><span class="triangulate"></span><span class="chat-username">'+current_message.name + '</span><span class="chat-time">' + current_message.time + '</span></span><span class="chat-message">'+current_message.body+'</span>');
             } else {
-                message_el.html('<span class="chat-triangle"></span><span class="chat-message">'+current_message.body+'</span>');
+                message_el.html('<span class="chat-user"><span class="triangulate"></span></span><span class="chat-message">'+current_message.body+'</span>');
             }
 
             message_el.addClass('chat-message-' + current_message.type);
