@@ -8,24 +8,37 @@ $page = new SitePage;
 $returnHandler = new SubmissionReturn;
 
 if( is_numeric($_POST['uid']) && is_numeric($_POST['box_id']) && $_POST['markUpdate'] == 'true') {
-	/* Ajax from mark sheet */
 
-    if($_POST['mark']) {
+	/* Ajax from mark sheet
+	 */
+    if ($_POST['mark']) {
         $returnHandler->securityCheck($_POST['box_id'], $_POST['uid']);
 
-        $return = array('box_id'    => $_POST['box_id'],
-                        'owner'     => $_POST['uid'],
-                        'mark'      => $_POST['mark'],
-                        );
+		/* If there isn't a piece of returned work, create it and give it the
+		 * updated mark filled in on the markSheet
+		 *
+		 * Otherwise, just use the first record and update its value. The first
+		 * record is the most recent return.
+		 */
+        $result = $returnHandler->getByUser($_POST['uid'], $_POST['box_id'], 1);
 
-        $result = $returnHandler->getByUser($_POST['uid'], $_POST['box_id']);
-        print_R($result);
-        if(is_array($result))
-            $returnHandler->update($return);
-        else
+		/* Set up common values for the return
+		 */
+        $return = array(
+			'box_id'    => $_POST['box_id'],
+			'owner'     => $_POST['uid'],
+			'mark'      => $_POST['mark'],
+		);
+
+        if (is_array($result)) {
+			$return['id'] = $result[0]['id'];
+			
+			$returnHandler->update($return);
+		}
+        else {
             $returnHandler->create($return);
+		}
     }
-	
 }
 else if ( (
 	 
