@@ -51,7 +51,7 @@ if(is_array($subList)) {
 
         $totals = $submissionHandler->getBoxCount($sub['id']);
 
-        if ($sub['type_id'] == 11) {
+        if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
             $this->setVar(array(
                 'ASSESS_ASSESS_ID' => $sub['id'],
                 'ASSESS_TITLE' => scrubTEXT($sub['description']),

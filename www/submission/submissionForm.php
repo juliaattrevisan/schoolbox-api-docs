@@ -6,6 +6,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionStudent.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/include/time.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess.php';
 
 $subBoxHandler = new Submission;
 
@@ -95,32 +96,46 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
     $dueTime = ausDateToUnix($_POST['due_date'].' '.$_POST['due_hour'].':'.$_POST['due_minute'].' '.$_POST['due_period'], true);
     $lateTime = ausDateToUnix($_POST['late_date'].' '.$_POST['late_hour'].':'.$_POST['late_minute'].' '.$_POST['late_period'], true);
 
-    //modify submission box
-    $subbox = array('category'        => $_POST['category'],
-            'open_date' => outputDate(DATE_database, $openTime),
-            'date'      => outputDate(DATE_database, $dueTime),
-            'late_date' => outputDate(DATE_database, $lateTime),
-            'description'=> $_POST['description'],
-			'type'     => $_POST['type'],
-            'fid'       => $fileId,
-            'created'   => 'NOW()',
-			'owner'		=> $_SESSION['id'],
-    );
-	
-    $subBoxHandler->create($subbox);
+	/* Special action for Online Assessments
+	 */
+	if ($_POST['type'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
+		$assess = array(
+			'category_id' => scrubTEXT($_POST['category']),
+			'user_id' => $_SESSION['id'],
+			'type' => Assess::ONLINE_ASSESSMENT_TYPE_ID,
+			'title' => scrubTEXT($_POST['description']),
+			'description' => scrubTEXT($_POST['description']),
+			'start' => date('Y-m-d H:i:s', $openTime),
+			'finish' => date('Y-m-d H:i:s', $dueTime),
+			'duration' => -1,
+			'allow_resit' => 0
+		);
+
+		$assessHandler = new Assess();
+		$assessHandler->create($assess);
+	}
+	else {
+
+		//modify submission box
+		$subbox = array('category'        => $_POST['category'],
+				'open_date' => outputDate(DATE_database, $openTime),
+				'date'      => outputDate(DATE_database, $dueTime),
+				'late_date' => outputDate(DATE_database, $lateTime),
+				'description'=> $_POST['description'],
+				'type'     => $_POST['type'],
+				'fid'       => $fileId,
+				'created'   => 'NOW()',
+				'owner'		=> $_SESSION['id'],
+		);
+
+		$subBoxHandler->create($subbox);
+	}
 
     localRedir("/submission/listSubmission/");
-
 }
 else if(isset($_GET['deleteBox']) && is_numeric($_GET['deleteBox'])) {
-
     $subBoxHandler->delete($_GET['deleteBox']);
+
 	localRedir("/submission/listSubmission/");
-
 }
-
-
-
-
-
 ?>

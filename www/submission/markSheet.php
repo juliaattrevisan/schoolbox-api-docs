@@ -107,8 +107,9 @@ else if(is_numeric($this->arg[0])) {
 	
 	$this->setBlock(TEMPLATE_content, 'sub_head', 'sub_head_block');
 	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
-	$this->setBlock('student_list', 'mark', 'mark_block');
-    $this->setBlock('student_list', 'onlineAssessmentMark', 'onlineAssessmentMark_block');
+	$this->setBlock('student_list', 'markItem', 'markItem_block');
+	$this->setBlock('markItem', 'mark', 'mark_block');
+    $this->setBlock('markItem', 'onlineAssessmentMark', 'onlineAssessmentMark_block');
 
     if(!$groupHandler->isStaff() )
             error(19);
@@ -216,7 +217,8 @@ else if(is_numeric($this->arg[0])) {
                             'BOX_ID' => ''
                         ));
 
-                        $this->parse('onlineAssessmentMark_block', 'onlineAssessmentMark', true);
+						$this->setVar('mark_block','');
+                        $this->parse('onlineAssessmentMark_block', 'onlineAssessmentMark');
                     }
                     else {
                         $return = $retHandler->getByUser($student['uid'],$sub['id']);
@@ -226,8 +228,13 @@ else if(is_numeric($this->arg[0])) {
                             'BOX_ID'	=> $sub['id'],
                         ));
 
-                        $this->parse('mark_block','mark',true);
+                        $this->parse('mark_block','mark');
+						$this->setVar('onlineAssessmentMark_block', '');
                     }
+
+					$this->parse('markItem_block', 'markItem', true);
+					$this->setVar('mark_block', '');
+					$this->setVar('onlineAssessmentMark_block', '');
 				}
 			}
 			else {
@@ -235,7 +242,8 @@ else if(is_numeric($this->arg[0])) {
                 $this->setVar('onlineAssessmentMark_block', '');
 			}
 
-			$this->parse('student_list_block', 'student_list',true);
+			$this->parse('student_list_block', 'student_list', true);
+			$this->setVar('markItem_block', '');
 		}
 	}
 	else {

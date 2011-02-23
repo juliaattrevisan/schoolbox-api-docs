@@ -47,6 +47,7 @@
 	<tr class="{ON_OFF}">
 		<td><a href="/search/user/{UID}">{SURNAME}</a></td>
 		<td><a href="/search/user/{UID}">{FIRSTNAME}</a></td>
+		<!-- BEGIN markItem -->
 		<!-- BEGIN mark -->
 		<td class="column-{BOX_ID}">
 			<form method="post" onSubmit="return false;" action="" class="markForm">
@@ -59,9 +60,10 @@
 		<!-- END mark -->
 		<!-- BEGIN onlineAssessmentMark -->
 		<td class="column-assess-{ASSESS_ASSESS_ID}">
-            <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ID}">{MARK}</a>
+			<a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ID}">{MARK}</a>
 		</td>
 		<!-- END onlineAssessmentMark -->
+		<!-- END markItem -->
 	</tr>
 	<!-- END student_list -->
 </table>
