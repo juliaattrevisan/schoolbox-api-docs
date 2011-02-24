@@ -64,14 +64,15 @@ img { border:0; }
 CSS commands
 --------------------------------------------------------------*/
 .center { text-align:center; }
- .active-checkbox{
+
+.active-checkbox {
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
 	background:#CAE9B9;
 	padding:0 2px;
-	
 }
+
 .float-right { float:right; }
 
 .float-left { float:left; }
@@ -96,7 +97,7 @@ ul.pad-it { list-style:disc; }
 
 .hide-it, .hide { display:none; }
 
-.clear{clear:both;}
+.clear { clear:both; }
 
 /*--------------------------------------------------------------
  Heading Styles 
@@ -561,6 +562,7 @@ th { font-weight:bold; }
 	position:absolute;
 	top:0;
 	right:0;
+	color:#bebebe;
 }
 
 .box a.edit:hover span {
@@ -585,6 +587,8 @@ th { font-weight:bold; }
 	-webkit-border-radius: 3px;
 	border-radius: 3px
 }
+
+.box a.close-delete span { color:#bebebe; }
 
 .box a.close-delete:hover {
 	text-decoration:none;
@@ -705,14 +709,29 @@ fieldset {
 	padding: 5px;
 }
 
-dl.errors {padding:7px 8px; border:1px solid #ebe58e; background: #fffaa8; margin-bottom:16px}
-dl.errors dt{
-    padding-top: 67px;
-    text-align: center;
-    width: 100px;background:url(/images/demo/icons/error-icon.png) no-repeat 50% 8px; width:15%}
-	
-dl.errors dt span{display:block; margin:0 auto; width:91px; overflow:hidden;}	
-dl.errors dd{width:85%;}
+dl.errors {
+	padding:7px 8px;
+	border:1px solid #ebe58e;
+	background: #fffaa8;
+	margin-bottom:16px
+}
+
+dl.errors dt {
+	padding-top: 67px;
+	text-align: center;
+	width: 100px;
+	background:url(/images/demo/icons/error-icon.png) no-repeat 50% 8px;
+	width:15%
+}
+
+dl.errors dt span {
+	display:block;
+	margin:0 auto;
+	width:91px;
+	overflow:hidden;
+}
+
+dl.errors dd { width:85%; }
 
 .message {
 	background:url(/images/core/assess/validate-arrow.jpg) 5px 0 no-repeat;
@@ -748,6 +767,21 @@ dl.errors dd{width:85%;}
 
 .standardForm td { border-bottom:1px solid #e9e3d6; }
 
+.standardForm tr.advanced { display:none; }
+
+.standardForm tr.advanced td {
+	background:#E9E3D6;
+	position:relative;
+}
+
+.color-to-fade {
+	background:#E9E3D6;
+	position:absolute;
+	width:100%;
+	height:100%;
+	z-index:1;
+}
+
 .standardForm tr.dark, .standardForm tr.dark td { background: #eee; }
 
 select.small, input.small { width: 100px; }
@@ -763,7 +797,7 @@ input.timeField { width: 30px; }
 	background-color: #fbfbfb;
 	background-image: -moz-linear-gradient(top, #fbfbfb, #f7f7f7);
 	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fbfbfb), color-stop(1, #f7f7f7));
-filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7');
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7');
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
@@ -778,19 +812,21 @@ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', End
 	width:auto !important;
 	overflow: visible;
 	margin-top:4px;
+	font-family:Arial, Helvetica, sans-serif;
 }
 
+
 .submit-btn-plain {
-	border-color:#0aa9c7;
-	text-shadow: 0 1px 0px #d6f0f6;
+	border-color:#09bda9;
+	text-shadow: 0 1px 0px #ffffff;
 	color:#000000 !important;
 	background-color: #d6f0f6;
 	background-image:
- -moz-linear-gradient(top, #d6f0f6, #8dd7e5);
+	-moz-linear-gradient(top, #e4f5f9, #c9ebf3);
 	background-image: 
- -webkit-gradient(linear, left top, left bottom, color-stop(0, #d6f0f6), color-stop(1, #8dd7e5));
- filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#d6f0f6', EndColorStr='#8dd7e5');
-	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#d6f0f6', EndColorStr='#8dd7e5')";
+ -webkit-gradient(linear, left top, left bottom, color-stop(0, #e4f5f9), color-stop(1, #c9ebf3));
+ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f5f9', EndColorStr='#c9ebf3');
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f5f9', EndColorStr='#c9ebf3')";
 }
 
 .submit-btn-plain:hover {
@@ -2424,7 +2460,7 @@ CHAT
 	font-weight:bold;
 }
 
-.chat .show-users.active{background:#ddefd3 url(/images/demo/icons/chat-up.png) no-repeat 50% 50%;}
+.chat .show-users.active { background:#ddefd3 url(/images/demo/icons/chat-up.png) no-repeat 50% 50%; }
 
 .chat .show-users:hover {
 	text-decoration:none;
@@ -2436,33 +2472,35 @@ CHAT
 
 .chat .chat-messages { position:relative; }
 
-.chat .chat-time, .chat .chat-user .triangulate {
+.chat-message-user { padding:2px 0; }
+
+.chat-message-user .chat-time, .chat-message-user .chat-user .triangulate {
 	position:absolute;
 	display:block;
 	z-index:5;
 }
 
-.chat .chat-user {
+.chat-message-user .chat-user {
 	width:100%;
 	position:relative;
 	display:block;
 }
 
-.chat .chat-username {
+.chat-message-user .chat-username {
 	display:block;
 	width:60%;
 	padding-left:16px;
 	padding-bottom:4px;
 }
 
-.chat .chat-time {
+.chat-message-user .chat-time {
 	right:0;
 	top:0;
 	color:#797979
 }
 
-.chat .chat-user .triangulate {
-	background:url(/images/demo/icons/chat-me-triangle.png) no-repeat 100% 100%;
+.chat-message-user .chat-user .triangulate {
+	background:url(/images/demo/icons/chat-me-triangle.png) no-repeat;
 	bottom:-1px;
 	left:60%;
 	height:12px;
@@ -2470,7 +2508,7 @@ CHAT
 	z-index:5;
 }
 
-.chat .chat-message {
+.chat-message-user .chat-message {
 	display:block;
 	padding:6px 16px;
 	color:#000;
@@ -2481,13 +2519,63 @@ CHAT
 	border-radius: 4px;
 }
 
-.chat .chat-message-user { padding:2px 0; }
+.chat-message-user-me .chat-message {
+	background:#fffde9;
+	border-color:#f5f0bb;
+}
 
-.chat .chat-message-container{border:1px solid #ccc;padding:4px; margin:8px 0;}
-.chat .chat-message-box{width:100%; margin:0; border:0; padding:0; }
-.chat-users li{position:relative;}
-.chat-users a{display:block; position:absolute; top:7px; right:8px; width:18px; height:18px; background:url(/images/demo/icons/chat-box.png) no-repeat; text-indent:-99999em; font-size:1px;}
-.chat-users a:hover{background-position:0 -18px}
+.chat-message-user-me .chat-user .triangulate { background-position:0 -24px; }
+
+.chat-message-user-admin .chat-message {
+	background:#e8f5ff;
+	border-color: #b0ddfe;
+}
+
+.chat-message-user-admin .chat-user {
+	font-weight:bold;
+	color:#1d9ffc;
+}
+
+.chat-message-user-admin .chat-user .time { font-weight:bold; }
+
+.chat-message-user-admin .chat-user .triangulate { background-position:0 -12px; }
+
+.chat .chat-message-container {
+	border:1px solid #ccc;
+	padding:4px;
+	margin:8px 0;
+}
+
+.chat .chat-message-box {
+	width:100%;
+	margin:0;
+	border:0;
+	padding:0;
+}
+
+.chat-users li { position:relative; }
+
+.chat-users a {
+	display:block;
+	position:absolute;
+	top:7px;
+	right:8px;
+	width:18px;
+	height:18px;
+	background:url(/images/demo/icons/chat-box.png) no-repeat;
+	text-indent:-99999em;
+	font-size:1px;
+}
+
+.chat-users a:hover { background-position:0 -18px }
+
+.chat-users .chat-user-muted a { background-position:bottom; }
+
+.chat-users .chat-user-admin {
+	font-weight:bold;
+	color:#1d9ffc;
+}
+
 /********************************************
 COLOUR ADJUSTMENT BOX
 *********************************************/
@@ -3171,8 +3259,6 @@ p.forgotten { margin:10px 0; }
 
 .news-item.archive { margin-bottom:16px; }
 
-
-
 #news-header {
 	font-weight:bold;
 	font-size:14px;
@@ -3208,7 +3294,6 @@ p adding:0 10px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
 }
-
 
 #category li {
 	display:block;
@@ -3317,9 +3402,7 @@ p adding:0 10px;
 	float: right;
 }
 
-.uploadifyFileDescription input {
-	width: 30%;
-}
+.uploadifyFileDescription input { width: 30%; }
 
 .uploadifyProgress {
 	background-color: #E5E5E5;
@@ -3638,7 +3721,6 @@ bord er-collapse: separate;
 
 .translateForm input {
 	width: 94%;
-	padding: 4px 0 4px 4px;
 	margin-bottom: 12px;
 	float:left;
 }

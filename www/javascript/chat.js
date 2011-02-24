@@ -84,7 +84,7 @@ Chat.prototype = {
         var self = this;
 
         var messages_el = $j('#component'+this.config.component_id+' ul.chat-messages');
-
+		
         for (var i in messages) {
             message = messages[i];
 

@@ -10,7 +10,6 @@ $j(document).ready(function() {
                 userID: $j(this).attr('rel'),
                 write: 2
             }
-
             $j(this).attr('checked', true);
         }
         else {
@@ -47,26 +46,11 @@ $j(document).ready(function () {
 		});
 	});
 
-    /*
-	$j('img.greenCheck').each(function () {
-		$j(this).click(function () {
-			if ($j(this).attr('src').indexOf('greentick') != -1) {
-				$j(this).attr('src', '/images/emptybox.gif');
-				$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', userID: $j(this).attr('rel'), write: 1});
-			} else {
-				$j(this).attr('src', '/images/greentick.gif');
-				$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', userID: $j(this).attr('rel'), write: 2});
-			}		
-		});
-		$j(this).css('cursor','pointer');
-	});
-    */
 	
 	$j('input.checkAll').each(function () {
 		$j(this).mouseup(function () {
 			var node = $j(this);
 			$j("input." + $j(this).attr("id")).each(function () {
-				
 				$j(this).attr("checked",  !(node.attr("checked")));
 			});			
 		});
@@ -79,21 +63,7 @@ $j(document).ready(function () {
 	
 	
 });
-/*
-window.addEvent('domready', function () {
-	new Autocompleter.Ajax.Json($('addUser'), '/ajax/user.php?groupID=0', {
-		minLength: 2,
-		postVar: 'keyword',
-		width: 400,
-		selectFirst: true,
-		useSelection: false
-	});
 
-
-
-});
-*/
--->
 </script>
 <style type="text/css">
 .checkAll, .delCheck, .acceptCheck { position: relative; top: 3px; }
@@ -116,7 +86,7 @@ window.addEvent('domready', function () {
 					<input type="submit" value="Add User" class="submit-btn-plain" />
 					<div class="float-fix"></div>
 				</form>
-				<a href="/group/bulk/{CATEGORY_ID}" class="btn add">Add Bulk Members</a></td>
+				<a href="/group/bulk/{CATEGORY_ID}" class="btn add float-left"><span></span>Add Bulk Members</a><div class="float-fix"></div></td>
 		</tr>
 		<tr>
 			<td valign="top"><h4>Access Type</h4>
