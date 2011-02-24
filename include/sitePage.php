@@ -288,20 +288,18 @@ class SitePage extends Page {
                 $this->site == 'ormond' ||
                 $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] ==  7 || $_SESSION['gid'] == '8' )  ||
                 $this->site == 'joeys' ||
-                $this->site == 'mggs' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent() )
+                $this->site == 'mggs' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent() )||
+                $this->site == 'bialik' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent() )
                 )
 		{
 			if($this->site == 'mgs' || $this->site == 'grimwade')
 			{
 				
                                 if($this->groupHandler->isStaff()) {
-                                    if($this->site == 'grimwade')
-                                        $this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgsvic.edu.au/owa" rel="external"');
-                                    else
-                                        $this->setVar("WEBMAIL_LOCATION", 'href="https://webmail.mgs.vic.edu.au/exchange/" rel="external"');
+                                    $this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/owa" rel="external"');
                                 }
 				else
-					$this->setVar("WEBMAIL_LOCATION", 'href="/mail/"');
+                                    $this->setVar("WEBMAIL_LOCATION", 'href="/mail/"');
 
 			}
 			else if(SITE_location == 'ormond')
@@ -338,6 +336,9 @@ class SitePage extends Page {
             }
             else if($this->site == 'mggs') {
                 $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.mggs.vic.edu.au" rel="external"');
+            }
+            else if($this->site == 'bialik') {
+                $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.bialik.vic.edu.au/exchange" rel="external"');
             }
 
 			$this->parse('wm_tab','webmail_tab');
@@ -582,7 +583,7 @@ class SitePage extends Page {
 			return $this->site.'/'.$template;
 		else
 			//change this back to "core" for the rest of the releases.
-			return 'core/'.$template;
+			return 'demo/'.$template;
 	}
 
 	function getVar($varname) {

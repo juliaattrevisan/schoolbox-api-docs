@@ -30,7 +30,7 @@ if ($groupHandler->isSuperuser()) {
 
 	$zipFileUploadHandler = new ZipFileUpload();
 	$zipFileUploadHandler->extract($archive);
-	$zipFileUploadHandler->traverse($zipFileUploadHandler->getPath());
+	$zipFileUploadHandler->traverse($zipFileUploadHandler->getPath(), $_POST['category']);
 	$zipFileUploadHandler->cleanup();
 
 	/* Error handling

@@ -13,6 +13,15 @@
 				<input name="file" type="file" />
 			</td>
 		</tr>
+                <tr>
+			<td class="formLabelWidth">
+				<h4>Destination</h4>
+				<em>Folder in which the zip file will decompress</em>
+			</td>
+			<td>
+				{CATEGORY_NAME}
+			</td>
+		</tr>
 	
 	
 	
@@ -41,6 +50,7 @@
 			</td>
 		</tr>
 	</table>
+    <input type="hidden" name="category" value="{CID}" />
 	<input type="submit" class="submit-btn-plain" value="Upload" />
 </form>
 

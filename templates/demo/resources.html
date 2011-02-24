@@ -167,7 +167,7 @@ $j(function() {
 		<!-- BEGIN zip_file_upload -->
 		{'Upload zip file': {
 			onclick: function() {
-				window.open('/cms/zipFile', '_self');
+				window.open('/cms/zipFile/'+$j(this).attr("id").substring(5), '_self');
 			},
 			icon: '/images/famicons/page_white_compressed.png'
 		}},

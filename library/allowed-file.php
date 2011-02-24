@@ -33,49 +33,28 @@ class AllowedFile extends Model {
 				break;
 		}
 	}
-	
-	function checkMime($file) {
-		$ext = substr(strrchr($file['name'], "."), 1);
 
-		/* Flash uploads submit as application/octet-stream and thus can get
-		 * rejected by FileSecurityCheck(). Check that mime magic is installed,
-		 * and fileinfo as well
-		 */
-		if ($file['type'] == 'application/octet-stream' || $file['type'] == '') {
-				$mime = $this->getMime($file['tmp_name']);
-		}
-		else {
-				$mime = strtolower($file['type']);
-		}
+        function getExtension($filename) {
+            return substr(strrchr($filename, "."), 1);
+        }
 
-        /* Mime types now have some kind of metadata, so trim it out.
-         * Mime types now include stuff like 'charset=us-ascii' and may not
-         * match when using the original query
-         */
-        $mime = explode(';', $mime);
-        $mime = $mime[0];
+        function isAllowed($filename) {
 
-		$query = "SELECT t.fileTypeID FROM allowedFileTypes t 
-				LEFT JOIN allowedFileExtension e on t.fileTypeID = e.fileTypeID 
-				WHERE mime = '$mime' AND extension = '$ext' AND enable = 'true'";
+            $extension = $this->getExtension($filename);
 
-		if(!$this->db->getOne($query)) {
-			return array('code' => 11, 'message' => "Your file, ".$file['name']." with the extension '$ext' and type of '$mime'");
-		}
-	}
-	
+            $query = "SELECT mime FROM allowedFileExtension afe
+                        JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
+                        WHERE extension = '$extension' AND enable = 'true'";
+            if(!$this->db->getOne($query)) {
+		return array('code' => 11, 'message' => "Your file, ".$file['name']." with the extension '$extension'");
+            }
+        }
 
-	
-	function getMime($file) {
-		//make sure we can read the magic file and fileinfo functions are defined
-		if(is_readable(MIME_magic) && function_exists('finfo_open') ) {
-			//update to check against magic mime file on server rather than trust browser interpretation
-			$handle = finfo_open(FILEINFO_MIME, MIME_magic);
+	function getMime($extension) {
 
-			$mime = explode(';', finfo_file($handle,$file));
-
-			return $mime[0];
-		}
+                $query = "SELECT mime FROM allowedFileExtension afe JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID WHERE extension = '$extension'";
+                $mime = $this->db->getOne($query);
+                return $mime;
 	}
 	
 	
@@ -95,7 +74,7 @@ class AllowedFile extends Model {
 		}
 		
 		if ($typeCheck) {
-			return $this->checkMime($file);
+			return $this->isAllowed($file['name']);
 		}
 	}
 
@@ -114,12 +93,7 @@ class AllowedFile extends Model {
 		/* Show error associated with error code, and optional message
 		 */
 		if (!empty($errorArray['code'])) {
-			if (empty($errorArray['message'])) {
-				error($errorArray['code']);
-			}
-			else {
-				error($errorArray['code'], $errorArray['message']);
-			}
+			error($errorArray['code'], $errorArray['message']);
 		}
 
 		/* No error - do nothing

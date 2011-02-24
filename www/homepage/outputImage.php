@@ -36,7 +36,7 @@ if ($continue) {
     $this->setVar("PREVIEW_IMAGE_URL", $imageurl);
     $this->setVar("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));
     if (isUrl($config['url'])) {
-        $this->setVar("CONTENT_URL_START", "<a href=\"/redir.php?url=".urlencode(urlencode($config['url']))."\" target=\"_blank\">");
+        $this->setVar("CONTENT_URL_START", "<a href=\"/redir.php?url=".base64_encode($config['url'])."\" target=\"_blank\">");
         $this->setVar("CONTENT_URL_END", "</a>");
     } else {
         $this->setVar("CONTENT_URL_START", "");

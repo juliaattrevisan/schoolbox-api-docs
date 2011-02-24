@@ -257,9 +257,8 @@ class Session {
                                         }
                                     }
                                 }
-                           }
-
-                           $_SESSION['children'][] = array('id' => $portal['uid'], 'sid' => $child['RelatedID'], 'gid' => $portal['group_id'], 'name' => formatName($portal), 'subjects' => $subjects);
+                                $_SESSION['children'][] = array('id' => $portal['uid'], 'sid' => $child['RelatedID'], 'gid' => $portal['group_id'], 'name' => formatName($portal), 'subjects' => $subjects);
+                            }
                        }
                    }
                }

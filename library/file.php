@@ -108,14 +108,17 @@ class File extends Model {
 	}
 	
 	function create($data, $file = '') {
-				
+                require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
+
+                $allowedFileHandler = new AllowedFile();
+
 		$data['submitted'] = 'NOW()';		
 		$data['modified'] = 'NOW()';	
 
 		if(is_file($file['tmp_name']) && is_readable($file['tmp_name']) ) {
 			$data['file_size'] = filesize($file['tmp_name']);
 			$data['realname'] = $file['name'];
-			$data['mime_type'] = $file['type']; /* should hook up to allowedFile to get mime type properly */
+			$data['mime_type'] = $allowedFileHandler->getMime($allowedFileHandler->getExtension($file['name']));
 			
 			if($fileID = parent::create($data)) {
 				$filename = FILE_directory.'/'.$fileID.'.dat';

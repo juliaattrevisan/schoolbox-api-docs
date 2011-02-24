@@ -24,12 +24,6 @@ class ZipFileUpload extends Model {
 	 */
 	private $verbose = false;
 
-	/* Map directory paths to category ids, because folders are sometimes read
-	 * out of order (use $this->verbose = true to see how your stuff is being
-	 * read)
-	 */
-	private $dirMap = array();
-
 	/* A list of files which didn't get added due to errors
 	 * 	 */
 	private $errorFiles = array();
@@ -42,6 +36,8 @@ class ZipFileUpload extends Model {
 		parent::Model();
 
 		$this->path = $this->extractTo . '/' . $this->prefix . uniqid();
+                $this->allowedFileHandler = new AllowedFile();
+
 
 		/* Prepare folder: if folder already exists, unlink all the stuff in it
 		 * and start it again
@@ -86,7 +82,7 @@ class ZipFileUpload extends Model {
 	 * Traverse directory structure. Create Categorys and Files accordingly,
 	 * with the permissions specified
 	 */
-	public function traverse($dir) {
+	public function traverse($dir, $parentID) {
 		if (!$dh = @opendir($dir)) {
 			return;
 		}
@@ -105,11 +101,9 @@ class ZipFileUpload extends Model {
 
 					$id = $categoryHandler->create(array(
 						'name' => $obj,
-						'parent' => $this->dirMap[$dir],
+						'parent' => $parentID,
 						'group'	=> $_POST['group'],
 					));
-
-					$this->dirMap[$currentPath] = $id;
 
 					if ($this->verbose) {
 						echo "Creating $currentPath with $id, corresponding to $obj, with parent {$this->dirMap[$dir]}<br>";
@@ -123,15 +117,15 @@ class ZipFileUpload extends Model {
 				 * Otherwise, it's a file, and we add it to the parent Category
 				 */
 				if (is_dir($currentPath)) {
-					$this->traverse($currentPath);
+					$this->traverse($currentPath, $id);
 				}
 				else {
-					$allowedFileHandler = new AllowedFile();
+					
 
 					/* For the File table
 					 */
 					$data = array(
-						'category' => $this->dirMap[$dir],
+						'category' => $parentID,
 						'owner' => $_SESSION['id'],
 						'realname' => $obj,
 						'description' => $obj,
@@ -147,14 +141,12 @@ class ZipFileUpload extends Model {
 					$pseudoFileArray = array(
 						'name' => $obj,
 						'tmp_name' => $currentPath,
-						'size' => filesize($currentPath),
-						'type' => $allowedFileHandler->getMime($currentPath),
 					);
 
 					/* Erorr checking. If something couldn't be processed,
 					 * remember it, and print it out later
 					 */
-					$result = $allowedFileHandler->fileSecurityCheck($pseudoFileArray);
+					$result = $this->allowedFileHandler->isAllowed($obj);
 
 					if (is_array($result)) {
 						$this->errorFiles[] = array(
@@ -164,7 +156,7 @@ class ZipFileUpload extends Model {
 						);
 
 						if ($this->verbose) {
-							echo "Error: could not make <strong>$obj</strong> in {$this->dirMap[$dir]}<br>";
+							echo "Error: could not make <strong>$obj</strong> in $parentID<br>";
 						}
 					}
 					else {
@@ -172,7 +164,7 @@ class ZipFileUpload extends Model {
 						$fileHandler->create($data, $pseudoFileArray);
 
 						if ($this->verbose) {
-							echo "Creating <strong>$obj</strong> in {$this->dirMap[$dir]}<br>";
+							echo "Creating <strong>$obj</strong> in $parentID<br>";
 						}
 					}
 				}

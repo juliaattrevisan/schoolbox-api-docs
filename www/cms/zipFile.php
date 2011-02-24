@@ -5,10 +5,16 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 $groupHandler = new Group();
 $categoryHandler = new Category();
 
-if ($groupHandler->isSuperuser()) {
+if ($groupHandler->isSuperuser() && is_numeric($this->arg[0])) {
 	$this->setFile(TEMPLATE_content, 'cms/zipFile.html');
 	$this->setBlock(TEMPLATE_content, 'perm_table', 'perm_table_block');
 
+        $cat = $categoryHandler->getByID($this->arg[0]);
+
+
+        $this->setVar('CATEGORY_NAME', scrubTEXT($cat['name']));
+        $this->setVar('CID', $cat['id']);
+        
 	/* Set up permissions options
 	 */
 	$groupPermList = $categoryHandler->getGroupPerms(0);

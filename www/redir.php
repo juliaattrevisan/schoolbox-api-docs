@@ -15,7 +15,7 @@
 	}
 	
 	if (!empty($url)) {
-		$url = urldecode($url);	
+		$url = base64_decode($url);
 	
 		if(!URLS_use_frame)
 		{

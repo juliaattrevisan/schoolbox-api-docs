@@ -56,7 +56,7 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 			/* Submitted file with form, run security checks */
 			$allowedFileHandler = new AllowedFile;
 			if (is_numeric($_POST['myfile']))
-				$allowedFileHandler->handleError($allowedFileHandler->checkMime($_FILES['file']));
+				$allowedFileHandler->handleError($allowedFileHandler->isAllowed($_FILES['file']['name']));
 			else
 				$allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
@@ -89,7 +89,7 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 		if($_FILES['file']['name'])	{
 			/* Submitted file with form, run security checks */	
 			if (is_numeric($_POST['myfile']))
-				$allowedFileHandler->handleError($allowedFileHandler->checkMime($_FILES['file']));
+				$allowedFileHandler->handleError($allowedFileHandler->isAllowed($_FILES['file']['name']));
 			else
 				$allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 			
@@ -239,7 +239,4 @@ else if(is_numeric($_GET['deleteList'])) {
 else {
 	error(2);
 }
-
-
-
 ?>
