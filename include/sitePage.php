@@ -494,9 +494,7 @@ class SitePage extends Page {
 					$this->setVar("MLINK", "<a href=\"".relativeURL($link['url'])."\"><span>".scrubTEXT($link['description'])."</span></a>");
 				}
 				else {
-                    /* Why did this double-urlencode? Removed.
-                     */
-					$this->setVar("MLINK", "<a href=\"/redir.php?url=".urlencode($link['url'])."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
+                                    $this->setVar("MLINK", "<a href=\"/redir.php?url=".base64_encode($link['url'])."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
 				}
 
 				$this->parse("my_links", "mlink_block", true);

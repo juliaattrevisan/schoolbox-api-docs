@@ -36,26 +36,15 @@ class SynergeticUser extends MSSQL{
 
 	function getStudent($synID)
 	{
-			/*$query = "
+			$query = "
 			SELECT	vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname, vStudents.StudentBirthDate, 
 					vStudents.StudentTutorName, vStudents.StudentHeadOfHouse, vStudents.StudentFormStaffName, vStudents.StudentTutorDescription,
 					luForm.ID as TeacherFormID, vStudents.StudentForm, luTutor.ID as TeacherTutorID, vStudents.StudentTutor, luForm.Description as FormDescription,
 					vStudents.StudentHouseDescription, vStudents.StudentHouse, vStudents.StudentYearLevel, vStudents.StudentLockerBook,
-					vStudents.StudentEmergencyName, vStudents.StudentEmergencyPhone, vStudents.StudentEmergencyPhoneAlt, vStudents.StudentMedicalAlert,vStudents.StudentSpecialNeedsFlag
-					contactDetails.StudentContactID, contactDetails.StudentContactTitle, contactDetails.StudentContactPreferred, contactDetails.StudentContactSurname, contactDetails.StudentContactDefaultEmail,
-					contactDetails.StudentContactAddress1, contactDetails.StudentContactSuburb, contactDetails.StudentContactPostCode, contactDetails.StudentContactState,
-					contactDetails.StudentContactPhoneActual, contactDetails.StudentContactMobilePhone, contactDetails.StudentContactOccupPhone,
-					contactDetails.StudentContactSpouseTitle, contactDetails.StudentContactSpousePreferred, contactDetails.StudentContactSpouseSurname,
-					contactDetails.StudentContactSpouseMobilePhone, contactDetails.StudentContactSpouseOccupPhone,contactDetails.StudentContactSpouseDefaultEmail
-			*/
-                        $query = "SELECT *
+					vStudents.StudentEmergencyName, vStudents.StudentEmergencyPhone, vStudents.StudentEmergencyPhoneAlt, vStudents.StudentMedicalAlert,vStudents.StudentSpecialNeedsFlag, AlertMessage
                          FROM
-
 					SynergyOne.dbo.vStudents vStudents
-                                        LEFT JOIN SynergyOne.dbo.vStudentContactAllAddress contactDetails ON
-                                            vStudents.FileSemester = contactDetails.FileSemester
-                                            AND vStudents.FileYear = contactDetails.FileYear
-                                            AND vStudents.StudentID = contactDetails.ID
+                                        LEFT JOIN CommunityAlerts ON CommunityAlerts.ID = StudentID
 					LEFT JOIN SynergyOne.dbo.luForm ON vStudents.StudentForm=luForm.Code
 					LEFT JOIN SynergyOne.dbo.luTutor ON vStudents.StudentTutor=luTutor.Code
 			WHERE 	
@@ -65,7 +54,7 @@ class SynergeticUser extends MSSQL{
 				"; 
 				
 		$student = $this->getRow($query);
-		//print_r($student);
+
 		preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches);
 		$student['StudentBirthDate'] = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
 		return $student;
@@ -80,12 +69,15 @@ class SynergeticUser extends MSSQL{
 					StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType
 				  FROM 
 				  	SynergyOne.dbo.vStudentContactAllAddress
+                                        
 				  WHERE
 				  	(StudentContactType = 'SC1' OR StudentContactType = 'SC2') AND StudentID = $synID
 					AND FileSemester=".$_SESSION['FileSemester']."
 					AND FileYear=".$_SESSION[ 'FileYear']."
 				  ";
-		return $this->getAll($query);
+
+		$parent = $this->getAll($query);
+                return $parent;
 	}
 
 	function getCurrentSemester()

@@ -32,6 +32,8 @@ if(is_numeric($this->arg[0])) {
         $this->setBlock('contact_synergy', 'edit_emergency', 'edit_emergency_block');
         $this->setBlock('contact_synergy', 'edit_contact', 'edit_contact_block');
         $this->setBlock('contact_synergy', 'contact_details', 'contact_details_block');
+        $this->setBlock('contact_synergy', 'contact_alert', 'contact_alert_block');
+        $this->setBlock('contact_details', 'spouse_details', 'spouse_details_block');
         $this->setBlock(TEMPLATE_content, 'medical', 'medical_block');
 
 
@@ -57,6 +59,8 @@ if(is_numeric($this->arg[0])) {
 						'student_synergy_tutor_block'	=> '',
 						'student_synergy_form_block'	=> '',
 						'medical_block'					=> '',
+                                                'contact_alert_block'					=> '',
+                                                'spouse_details_block'                                => '',
 						'portrait_block'				=> '',
 						'timetable_link_block'			=> '',
                         'eportfolio_block'              => '',
@@ -135,18 +139,14 @@ if(is_numeric($this->arg[0])) {
                $this->setVar('parent_synergy_form_block');
            }
         }
-        else if(($_SESSION['id'] == $user['uid']) || $groupHandler->isStudent($user['uid']) && ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['uid']))) {
+        else if( $groupHandler->isStudent($user['uid']) && ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['uid']) || $_SESSION['id'] == $user['uid'] )) {
             ////only allow staff to see student information or parent
-			$this->parse("portrait_block", "portrait");
+            $this->parse("portrait_block", "portrait");
 
             /* Timetable shouldn't appear if synergy is disabled in the conf
              */
-            if (SYNERGY_enable) {
+            if (SYNERGY_enable)
                 $this->parse("timetable_link_block", "timetable_link");
-            }
-            else {
-                $this->setVar('timetable_link_block', '');
-            }
 
             /* Allow students, staff and parents of the student to see information about
              * due work. Also allow the current user if they view themselves in the
@@ -197,6 +197,7 @@ if(is_numeric($this->arg[0])) {
                             'EMERGENCY_PHONE'		=> scrubTEXT($synInfo['StudentEmergencyPhone']),
                             'EMERGENCY_ALT_PHONE'	=>scrubTEXT($synInfo['StudentEmergencyPhoneAlt']),
                             'MEDICAL_NOTE'			=> scrubTEXT($synInfo['StudentMedicalAlert']),
+                            'CONTACT_ALERT'             => scrubTEXT($synInfo['AlertMessage']),
                             );
             $this->setVar($output);
 
@@ -236,6 +237,11 @@ if(is_numeric($this->arg[0])) {
 
                                         );
                         $this->setVar($output);
+
+
+                        if(trim($studentContact['StudentContactSpouseTitle']))
+                            $this->parse('spouse_details_block', 'spouse_details');
+
                         $this->parse('contact_details_block', 'contact_details', true);
 
                     }
@@ -253,7 +259,7 @@ if(is_numeric($this->arg[0])) {
 
             $this->parse('contact_synergy_block', 'contact_synergy');
 
-            if($synInfo['StudentYearLevel'] < 7) {
+            if(trim($synInfo['StudentForm'])) {
                 $this->parse('student_synergy_form_block', 'student_synergy_form');
                 $this->setVar('student_synergy_tutor_block','');
             }
@@ -265,9 +271,19 @@ if(is_numeric($this->arg[0])) {
             if(trim($synInfo['StudentMedicalAlert']))
                 $this->parse('medical_block', 'medical');
 
-		}
+           if(trim($synInfo['AlertMessage']))
+                $this->parse('contact_alert_block', 'contact_alert');
 
-	}
+       }
+       else if($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
+
+            if (SYNERGY_enable)
+                $this->parse("timetable_link_block", "timetable_link");
+
+            $this->parse("portrait_block", "portrait");
+       }
+
+    }
 
     /* Display eportfolio link only if it's enabled
      */

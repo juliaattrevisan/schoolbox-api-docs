@@ -71,4 +71,4 @@ CREATE TABLE `homepageComponentCategory`(
 
 insert  into `homepageComponentCategory`(`homepageComponentCategoryID`,`name`) values (1,'Information'),(2,'Collaboration'),(3,'Learning'),(4,'Images'),(5,'Resources'),(6,'Feeds');
 
-ALTER TABLE `portal`.`file`     CHANGE `mime_type` `mime_type` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL ;
+ALTER TABLE `file`     CHANGE `mime_type` `mime_type` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL ;
