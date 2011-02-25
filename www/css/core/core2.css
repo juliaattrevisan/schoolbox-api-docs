@@ -588,7 +588,7 @@ p.interact a.take-test-btn{ margin-bottom:10px;text-align:left;display:block;wid
 #month-view td.dark { background: #eee; }
 #month-view {  width: 100%; background:#fff;}
 #month-view p{ margin-bottom: 0.5em; }
-#month-view thead, .dayWrap, .cal-right a{ font: bold 11px Arial, Verdana Helvetica, sans-serif; text-align:center;}
+#month-view thead, .dayWrap, .cal-right a{ padding:7px 12px; line-height:16px;font: bold 11px Arial, Verdana Helvetica, sans-serif; text-align:center;}
 #month-nav img { margin-top: 5px; }
 #month-nav h3 { font-size: 20px; }
 #month-nav td { text-align: center; }
