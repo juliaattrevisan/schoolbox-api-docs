@@ -79,7 +79,7 @@
 			}
 		});
 		
-		//$j('') while dog == fat { eat bone } rof rofrof 
+		/*$j('') while dog == fat { eat bone } rof rofrof 
 		
 		$j('.customise').click(function(event) {
 			event.preventDefault();
@@ -91,13 +91,15 @@
 				 $j('.advanced').queue('fx', []);	
 			}
 			});
+			
+			*/
 
 	});
 	
 </script>
 <!-- END custom_head -->
 
-<h1><span>{ACTION} News</span><a class="customise" href="#"><span>Show Advanced Options</span><span style="display:none">Close Advanced Options</span></a> </h1>
+<h1><span>{ACTION} News</span><!--<a class="customise" href="#"><span>Show Advanced Options</span><span style="display:none">Close Advanced Options</span></a>--></h1>
 <form id="newsForm"  method="post" enctype="multipart/form-data" action="/news/modifyForm.php" onsubmit="return(verify());">
 <input type="hidden" name="newsID" value="{NEWS_ID}" />
 <table class="standardForm">
@@ -117,7 +119,7 @@
 		<div class="color-to-fade"></div>
 		<h4>Add users</h4>
 		<em>You may add users individually by typing their name and selecting from the list.  Alternatively you can add many users via a list of synergetic id's or usernames.</em></td>
-	<td>
+	<!--<td>
 		<div class="color-to-fade"></div>
 		<form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" method="post">
 			<input id="addUser" type="text" size="30" />
@@ -127,7 +129,7 @@
 		</form>
 		<a href="/group/bulk/{CATEGORY_ID}" class="btn add float-left"><span></span>Add Bulk Members</a>
 		<div class="float-fix"></div>
-	</td>
+	</td>-->
 </tr>
 
 <!-- BEGIN campus_row -->
