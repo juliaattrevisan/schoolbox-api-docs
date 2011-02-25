@@ -11,6 +11,7 @@
 require_once('../library/assess/assess.php');
 require_once('../library/assess/assess-factory.php');
 require_once('../library/assess/assess-section.php');
+require_once('../library/group.php');
 
 /* Get a list of questions and answers to softdelete
  */
@@ -18,9 +19,12 @@ $assessHandler = new Assess();
 $questionHandler = new AssessQuestion();
 $answerHandler = new AssessAnswer();
 $sectionHandler = new AssessSection();
+$groupHandler = new Group();
 
-if (!$assessHandler->isOwner($this->arg[0])) {
-    error(126);
+if (!$groupHandler->isSuperuser()) {
+	if (!$assessHandler->isOwner($this->arg[0])) {
+		error(126);
+	}
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {
@@ -64,5 +68,5 @@ $assessHandler->update(array(
     'deleted_at' => 'NOW()'
 ));
 
-localRedir('/homepage/' . $assess['category_id']);
+SitePage::backToTheFuture(1);
 ?>

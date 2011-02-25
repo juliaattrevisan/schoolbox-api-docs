@@ -316,6 +316,7 @@ class Submission extends Model {
                         FROM assess
                         LEFT JOIN file_type ON file_type.id = assess.type
                         WHERE category_id = '$categoryID'
+						AND assess.deleted_at IS NULL
                         AND assess.user_id = '$userID')";
 
             return $this->db->getAll($query);

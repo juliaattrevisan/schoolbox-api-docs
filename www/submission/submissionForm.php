@@ -134,8 +134,19 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
     localRedir("/submission/listSubmission/");
 }
 else if(isset($_GET['deleteBox']) && is_numeric($_GET['deleteBox'])) {
-    $subBoxHandler->delete($_GET['deleteBox']);
+	$subBoxHandler->delete($_GET['deleteBox']);
 
 	localRedir("/submission/listSubmission/");
+}
+else if(isset($_GET['deleteAssess']) && is_numeric($_GET['deleteAssess'])) {
+	$assessHandler = new Assess();
+	$assess = $assessHandler->getByID($_GET['deleteAssess']);
+
+	if ($assess) {
+		localRedir('/assess/delete/' . $_GET['deleteAssess']);
+	}
+	else {
+		error(112);
+	}
 }
 ?>

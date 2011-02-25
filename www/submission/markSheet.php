@@ -106,6 +106,7 @@ else if(is_numeric($this->arg[0])) {
 	$this->setTab('submission');
 	
 	$this->setBlock(TEMPLATE_content, 'sub_head', 'sub_head_block');
+	$this->setBlock(TEMPLATE_content, 'assess_head', 'assess_head_block');
 	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
 	$this->setBlock('student_list', 'markItem', 'markItem_block');
 	$this->setBlock('markItem', 'mark', 'mark_block');
@@ -144,6 +145,9 @@ else if(is_numeric($this->arg[0])) {
 
 	$subList = $subHandler->getAllForUserCategory($this->arg[0], $_SESSION['id']);
 
+	$this->setVar('sub_head_block', '');
+	$this->setVar('assess_head_block', '');
+
 	if (is_array($subList)) {
 		foreach($subList as $sub) {
             $this->setVar(array(
@@ -151,8 +155,6 @@ else if(is_numeric($this->arg[0])) {
                 'SUB_NAME'	=> scrubTEXT($sub['description']),
                 'SUB_TYPE'	=> scrubTEXT($sub['typeName'])
             ));
-
-            $this->parse('sub_head_block','sub_head',true);
 
             if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
 
@@ -182,7 +184,12 @@ else if(is_numeric($this->arg[0])) {
                     
                     $responseHandler->updatedAutomatedMarks($markedResponseIDs);
                 }
+
+				$this->parse('assess_head_block','assess_head',true);
             }
+			else {
+				$this->parse('sub_head_block','sub_head',true);
+			}
 		}
 	}
 	else {
