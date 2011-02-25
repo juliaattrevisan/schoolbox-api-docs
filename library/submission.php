@@ -392,7 +392,23 @@ class Submission extends Model {
     function getTypes(){
         $query = "SELECT * FROM file_type";
         return $this->db->getAll($query);
+    }
 
+	/**
+	 * Get all the types except the id's mentioned in $vals. Used to exclude
+	 * Online Assessments from selection on createSubmission/
+	 * 
+	 * @param <type> $vals
+	 * @return <type>
+	 */
+    function getTypesExcept($vals){
+        $query = "SELECT * FROM file_type";
+
+		if (is_array($vals) && count($vals)) {
+			$query .= " WHERE id NOT IN (" . implode(',', $vals) . ")";
+		}
+
+        return $this->db->getAll($query);
     }
 
 	function getActivityLog($userID, $limit = 5, $categoryList) {

@@ -22,7 +22,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         $catOutput = "<b>".$subbox['categoryName']." (".$subbox['code'].")</b>";
     else
         $catOutput = "<b>".$subbox['categoryName']."</b>";
-	
+
     /* Output submission type drop down */
     $this->dropdown('type_drop', $subBoxHandler->getTypes(), $subbox['type'], TEMPLATE_content, array('name'=>'TYPE_TEXT','id'=>'TYPE_VALUE'));
 
@@ -57,8 +57,8 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
                     'LATE_MIN'  => $late_min,
                     'LATE_PM'   => date('a', $late_date) == 'pm'?'selected':'',
                     );
-						
-	
+
+
     $this->setVar($output);
 
 
@@ -99,19 +99,26 @@ else if($this->arg[0] == 'new'  ) {
 		$synUser = new SynergeticUser;
 		$subjectList = $synUser->getSubjectList($_SESSION['sid'], $_SESSION['id']);
 	}
-	
+
 	$categoryList = $groupHandler->involvedCategoryList($_SESSION['id'], $subjectList, 1);
 	$length = count($categoryList);
 	for ($i = 0; $i < $length; $i++) {
 		if (!empty($categoryList[$i]['code']))
-		$categoryList[$i]['name'] .= ' ('.$categoryList[$i]['code'].')'; 
+		$categoryList[$i]['name'] .= ' ('.$categoryList[$i]['code'].')';
 	}
-	
+
 	$this->dropDown('category', $categoryList, $this->arg[1], 'category_select', array('id' => 'CATEGORY_ID', 'name' => 'CATEGORY_NAME'));
 	$this->parse('category_select_block', 'category_select');
 
     /* Output submission type drop down */
-	$this->dropDown('type_drop', $subBoxHandler->getTypes(), $this->arg[3],TEMPLATE_content, array('name'=>'TYPE_TEXT','id'=>'TYPE_VALUE'));
+
+	/* Exclude online assessment type
+	 */
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess.php';
+
+	$types = $subBoxHandler->getTypesExcept(array(Assess::ONLINE_ASSESSMENT_TYPE_ID));
+
+	$this->dropDown('type_drop', $types, $this->arg[3],TEMPLATE_content, array('name'=>'TYPE_TEXT','id'=>'TYPE_VALUE'));
 
     /* Convert times */
     $open_date = strtotime('now');;

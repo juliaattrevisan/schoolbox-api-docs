@@ -39,12 +39,13 @@
 		<!-- BEGIN assess_head -->
 		<td id="work-{BOX_ID}" class="column-{BOX_ID}"><a href="/assess/results/{BOX_ID}"><strong>{SUB_NAME}</strong></a><br />
 			<em>{SUB_TYPE}</em><br /><br />
-			<a class="btn delete float-left" href="/submission/submissionForm.php?deleteAssess={BOX_ID}"><span></span>Delete</a>
+			<a class="btn delete float-left" href="/assess/delete/{BOX_ID}"><span></span>Delete</a>
 		</td>
 		<!-- END assess_head -->
 
         <td class="add-sub">
-            <a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Add Submission</a>
+            <a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Add Submission</a><br />
+			<a class="btn add" href="/assess/create/{CID}/"><span></span>Add Online Assessment</a>
 		</td>
 </td>
 
