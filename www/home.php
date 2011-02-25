@@ -6,6 +6,9 @@
 ************************************************************/
 
 require_once 'include/stdfuncs.php';
+require_once '../library/group.php';
+$groupHandler = new Group;
+
 if (strpos($_SERVER['REQUEST_URI'], 'home.php'))
 	localRedir('/home');
 
