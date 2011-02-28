@@ -61,6 +61,17 @@ class SynergeticUser extends MSSQL{
 		
 	}
 
+       function getStaff($synID)
+	{
+            $query = " SELECT SchoolStaffCode, StaffBuilding, StaffRoom, StaffExtension, StaffMobilePhone
+                FROM SynergyOne.dbo.vStaff vStaff
+                WHERE vStaff.StaffID = $synID ";
+
+            $staff = $this->getRow($query);
+            return $staff;
+
+	}
+
 	function getStudentContactList ($synID) {
 		$query = "SELECT StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
 					StudentContactAddress1, StudentContactSuburb, StudentContactPostCode, StudentContactState,

@@ -174,11 +174,16 @@ class Calendar extends Model {
 	function getDayEvents($currentDay) {
 		// return all events occuring on the date specified
 
-		if(is_array($_SESSION['campus']))
+		if(is_array($_SESSION['campus'])) {
 			$campusList = $_SESSION['campus'];
-		else
+
+                        $campusQuery = "eventCampus.campusID IN(" . implode(',', $campusList) . ")";
+                }
+		else {
 			$campusList = array(1);
-	
+                
+                        $campusQuery = '1 = 1';
+                }
 
 		// get accessible groups
 		$groupList = array();
@@ -220,7 +225,7 @@ class Calendar extends Model {
 						WHERE date = '" . date("Y-m-d", $currentDay) . "'
 							AND (    (access = '1' AND owner = '".$_SESSION['id']."')
 								  $groupQuery
-								  OR (access = '3' AND eventCampus.campusID IN(" . implode(',', $campusList) . ") $groupChunk OR owner = '".$_SESSION['id']."')
+								  OR (access = '3' AND $campusQuery $groupChunk OR owner = '".$_SESSION['id']."')
 								)
 						GROUP BY id
 						ORDER BY event.startTime, event.endTime";

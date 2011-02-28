@@ -50,26 +50,28 @@ if(is_numeric($this->arg[0])) {
         $this->setBlock(TEMPLATE_content, "timetable_link", "timetable_link_block");
         $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
         $this->setBlock(TEMPLATE_content, "due_work", "due_work_block");
+        $this->setBlock(TEMPLATE_content, "staff_synergy", "staff_synergy_block");
     }
 
         $blank = array ('contact_synergy_block'			=> '',
                         'edit_emergency_block'          => '',
                         'edit_contact_block'          => '',
                         'contact_details_block'         => '',
-						'student_synergy_tutor_block'	=> '',
-						'student_synergy_form_block'	=> '',
-						'medical_block'					=> '',
-                                                'contact_alert_block'					=> '',
-                                                'spouse_details_block'                                => '',
-						'portrait_block'				=> '',
-						'timetable_link_block'			=> '',
+			'student_synergy_tutor_block'	=> '',
+			'student_synergy_form_block'	=> '',
+			'medical_block'					=> '',
+                        'contact_alert_block'					=> '',
+                        'spouse_details_block'                                => '',
+			'portrait_block'				=> '',
+			'timetable_link_block'			=> '',
                         'eportfolio_block'              => '',
-						'contact_synergy_block'			=> '',
-						'due_work_block'				=> '',
-						'helpdesk_block'				=> '',
-						'school_links_block'			=> '',
+			'contact_synergy_block'			=> '',
+			'due_work_block'				=> '',
+			'helpdesk_block'				=> '',
+			'school_links_block'			=> '',
                         'parent_synergy_form_block'     => '',
                         'parent_spouse_block'           => '',
+                        'staff_synergy_block'           => '',
 						);
 		$this->setVar($blank);
 
@@ -143,10 +145,8 @@ if(is_numeric($this->arg[0])) {
             ////only allow staff to see student information or parent
             $this->parse("portrait_block", "portrait");
 
-            /* Timetable shouldn't appear if synergy is disabled in the conf
-             */
-            if (SYNERGY_enable)
-                $this->parse("timetable_link_block", "timetable_link");
+
+            $this->parse("timetable_link_block", "timetable_link");
 
             /* Allow students, staff and parents of the student to see information about
              * due work. Also allow the current user if they view themselves in the
@@ -277,10 +277,16 @@ if(is_numeric($this->arg[0])) {
        }
        else if($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
 
-            if (SYNERGY_enable)
-                $this->parse("timetable_link_block", "timetable_link");
+            $this->parse("timetable_link_block", "timetable_link");
 
             $this->parse("portrait_block", "portrait");
+
+             $synInfo = $synUserHandler->getStaff($user['synergy_id']);
+
+             $this->setVar('EXTENSION', $synInfo['StaffExtension']);
+             $this->setVar('MOBILE', $synInfo['StaffMobilePhone']);
+
+             $this->parse('staff_synergy_block','staff_synergy');
        }
 
     }
