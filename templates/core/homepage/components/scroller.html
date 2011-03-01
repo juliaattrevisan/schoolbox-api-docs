@@ -44,7 +44,9 @@ $j(function(){
 
 <div class="box" id="component{COMPONENT_ID}">
     <h2>Image Scroller</h2>
-    <a class="edit">edit</a>
+      <!-- BEGIN config -->
+	  <a class="edit">edit</a>
+	 
         <div class="editPanel hide">
             <form action="/homepage/configForm.php" method="get">
                 <input type="hidden" name="cid" value="{ID}" />
@@ -55,7 +57,7 @@ $j(function(){
                 <input type="submit" value="Update" />
             </form>
         </div>
-    </a>
+	 <!-- END config -->
 
     <div id="galleryCycle" class="box">
         <!-- BEGIN image -->
