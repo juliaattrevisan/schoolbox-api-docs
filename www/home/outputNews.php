@@ -10,7 +10,7 @@ $myNews = new News();
 
 $this->setVar("topic_block", "");
 $this->setVar("topic_header_block", "");
-	
+
 //output headlines
 $topicList = array();
 $headlineList = $myNews->getHeadlines();

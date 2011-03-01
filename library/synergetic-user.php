@@ -11,10 +11,10 @@ require_once dirname(__FILE__) .'/group.php';
 
 class SynergeticUser extends MSSQL{
 
-	function SynergeticUser() {
-		parent::MSSQL();
-		$this->groupHandler = new Group;
-	}
+    function SynergeticUser() {
+            parent::MSSQL();
+            $this->groupHandler = new Group;
+    }
 
     function getParent($synID) {
 
@@ -74,18 +74,18 @@ class SynergeticUser extends MSSQL{
 
 	function getStudentContactList ($synID) {
 		$query = "SELECT StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
-					StudentContactAddress1, StudentContactSuburb, StudentContactPostCode, StudentContactState,
-					StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
-					StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
-					StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType
-				  FROM 
-				  	SynergyOne.dbo.vStudentContactAllAddress
-                                        
-				  WHERE
-				  	(StudentContactType = 'SC1' OR StudentContactType = 'SC2') AND StudentID = $synID
-					AND FileSemester=".$_SESSION['FileSemester']."
-					AND FileYear=".$_SESSION[ 'FileYear']."
-				  ";
+                                StudentContactAddress1, StudentContactSuburb, StudentContactPostCode, StudentContactState,
+                                StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
+                                StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
+                                StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType
+                          FROM
+                                SynergyOne.dbo.vStudentContactAllAddress
+
+                          WHERE
+                                (StudentContactType = 'SC1' OR StudentContactType = 'SC2') AND StudentID = $synID
+                                AND FileSemester=".$_SESSION['FileSemester']."
+                                AND FileYear=".$_SESSION[ 'FileYear']."
+                          ";
 
 		$parent = $this->getAll($query);
                 return $parent;

@@ -29,7 +29,7 @@ class SynergeticClass extends MSSQL{
 			$classQuery = "StudentClasses.ClassCode = '$subCode'";
 
         $query = "
-		SELECT StudentSurname as lastname, StudentPreferred as firstname,
+		SELECT DISTINCT StudentSurname as lastname, StudentPreferred as firstname,
                         StudentYearLevelDescription as yearlevel, StudentHouseDescription as house,
                         StudentMedicalAlert, StudentSpecialNeedsFlag,
                         StudentID as synergy_id
@@ -49,16 +49,27 @@ class SynergeticClass extends MSSQL{
 		return $this->getAll($query);
 	}
 	
-	function getTeacherName($code) {
-			
-			$msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM SubjectClassStaff
-				WHERE ClassCode = '$code' AND FileYear={$_SESSION['FileYear']} AND FileSemester={$_SESSION['FileSemester']}
-				ORDER BY StaffSeq";
-			$this->query($msQuery);
-			while($synrow = $this->getNextArray() ) {
-				$teachers[] = $synrow['StaffID'];
-			}
-			return $teachers;
+	function getTeacherName($subCode) {
+
+            if(stristr($subCode, ',')) {
+                $classQuery = 'ClassCode IN(';
+                $subCodeArray = explode(',',$subCode);
+                foreach($subCodeArray as $code) {
+                        $classQuery .= "'$code',";
+                }
+                $classQuery = substr($classQuery,0,-1) . ')';
+            }
+            else
+                $classQuery = "ClassCode = '$subCode'";
+
+            $msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM SubjectClassStaff
+                    WHERE $classQuery AND FileYear={$_SESSION['FileYear']} AND FileSemester={$_SESSION['FileSemester']}
+                    ORDER BY StaffSeq";
+            $this->query($msQuery);
+            while($synrow = $this->getNextArray() ) {
+                    $teachers[] = $synrow['StaffID'];
+            }
+            return $teachers;
 	}
 }
 

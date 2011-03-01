@@ -39,6 +39,8 @@ class Session {
             $_SESSION['username']   = $user['username'];
             $_SESSION['password']   = $password;
             $_SESSION['eportfolio_enabled'] = $user['eportfolio_enabled'];
+            $_SESSION['ip'] = getIP();
+            $_SESSION['campus'] = $userHandler->getUserCampus($user['uid']);
 
             //if no webmail enabled or user has elected to use external client set mailhandle to mailto:
             if(MAIL_enable == 0 || $user['mail_handler'] || ($groupHandler->isParent($user['group_id']) && !$user['local_email']))
@@ -51,9 +53,8 @@ class Session {
                 $_SESSION['su'] = 1;
 
             //register there ip
-            $_SESSION['ip'] = getIP();
 
-            $_SESSION['campus'] = $userHandler->getUserCampus($user['uid']);
+            
 
             if(SYNERGY_enable)
                 $this->setSynergyInfo($userHandler);

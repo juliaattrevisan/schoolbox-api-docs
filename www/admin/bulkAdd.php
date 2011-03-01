@@ -46,13 +46,25 @@ class BulkAdd {
 						continue;
 					}
 					
-					$user[6] = is_numeric($user[6]) ? $user[6] : $userDB->getCampusID($user[6]);
-					if(!$user[6]) {
-						print "User {$user[0]} has <b>not</b> been added. (Unknown Campus)";
-						continue;
-					}
+	                                $userCampus = array();
+                                        if($user[6]) {
+                                            $campus = $userDB->getCampusID($user[6]);
+                                            if(is_numeric($campus))
+                                                $userCampus[] = $campus;
+                                        }
+
+                                        if($user[7]) {
+                                            $campus = $userDB->getCampusID($user[7]);
+                                            if(is_numeric($campus))
+                                                $userCampus[] = $campus;
+                                        }
+                                        if($user[8]) {
+                                            $campus = $userDB->getCampusID($user[8]);
+                                            if(is_numeric($campus))
+                                                $userCampus[] = $campus;
+                                        }
 				
-					$result = $userDB->addUser($user[0], $user[1], $user[2], $user[3], $user[4], $user[5], $user[6], $user[7], $user[8], $user[9], $user[10]);
+					$result = $userDB->addUser($user[0], $user[1], $user[2], $user[3], $user[4], $user[5], $userCampus, $user[9], $user[10], $user[11], $user[12]);
 					
 					if(!$result) { 
 						//adding failed
@@ -60,17 +72,16 @@ class BulkAdd {
 						$query = "SELECT id FROM user WHERE username = '".mysql_real_escape_string($user[0])."' AND synergy_id = '{$user[4]}'";
 						$updateUser = $userDB->db->getRow($query);
 						if(is_array($updateUser)) {
-						
-							$userDB->updateUser($updateUser['id'], $user[0], $user[1], $user[2], $user[3], $user[4], $user[9], $user[10], $user[5], $user[8], $user[6], 0, $user[7],$user[8]);
+							$userDB->updateUser($updateUser['id'], $user[0], $user[1], $user[2], $user[3], $user[4], $user[11], $user[12], $user[5], $user[10], $userCampus, 0, $user[9],$user[10]);
 							print "Updating {$user[0]}<br>";					
 						}
-                        else
-                            print "Username {$user[0]} collision<br>";
-					}
-					else {
-						print "User {$user[0]} has been added<br>";
-					}					
-				}
+                                                else
+                                                    print "Username {$user[0]} collision<br>";
+                                                }
+                                                else {
+                                                        print "User {$user[0]} has been added<br>";
+                                                }
+                                        }
                 else
                     print "User not added, insuficient data<br>";
 			}
