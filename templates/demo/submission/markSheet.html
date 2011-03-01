@@ -24,7 +24,9 @@
 <!-- END custom_head -->
 
 <h1>{CATEGORY}</h1>
-<span class="header_option"><a href="/submission/markSheet/export/{CID}" class="btn download" ><span></span>Download Spreadsheet</a></span>
+<span class="header_option"><a href="/submission/markSheet/export/{CID}" class="btn download" ><span></span>Download Spreadsheet</a>
+<a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Add Submission</a>
+			<a class="btn add" href="/assess/create/{CID}/"><span></span>Add Online Assessment</a></span>
 <table class="markTable" cellspacing="0" cellpadding="0" width="100%">
 	<tr>
 		<th>Surname</th>
@@ -43,11 +45,7 @@
 		</td>
 		<!-- END assess_head -->
 
-        <td class="add-sub">
-            <a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Add Submission</a><br />
-			<a class="btn add" href="/assess/create/{CID}/"><span></span>Add Online Assessment</a>
-		</td>
-</td>
+
 
 	</tr>
 	<!-- BEGIN student_list -->
