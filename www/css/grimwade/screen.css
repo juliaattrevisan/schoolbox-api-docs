@@ -135,8 +135,6 @@ h2 {
 	margin-left:0;
 }
 
-#nav ul ul li a:hover { background:#1597cb; }
-
 #nav ul ul li {
 	border:1px solid #dbdbdb;
 	border-width: 1px 0 0;
@@ -215,6 +213,11 @@ h2 {
 #nav li.parent > a span { background: url(/images/grimwade/nav-arrow.gif) no-repeat 100% 3px; }
 
 #nav li.parent > a.hover span { background: url(/images/grimwade/nav-arrow-over.gif) no-repeat 100% 3px; }
+
+#category li a.selected {
+    background-color:#3A7E8E;
+    color: #fff;
+}
 
 #header {
 	height: 145px;
