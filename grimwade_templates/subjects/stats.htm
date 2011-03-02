@@ -6,15 +6,14 @@
 <title>{TITLE}</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="James Leckie, Lektec Consulting"/> 
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/core-demo.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/grimwade/screen.css" />
 
 <!-- BEGIN header_css -->
 <link rel="stylesheet" type="text/css" media="{HEADER_CSS_TYPE}" href="{HEADER_CSS_LOCATION}" />
 <!-- END header_css -->
-
 
 <script type="text/javascript" src="/javascript/jquery.js"></script>
 <script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
@@ -31,76 +30,73 @@
 </head>
 <body>
 <!-- #BeginEditable "head" --><!-- #EndEditable -->
+<div id="wrap">
+	<div id="wrap-inner">
+		<div id="header"> 
+				<ul id="tabs">
+			<li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Main</a></li>
+			<li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">News</a></li>
+			<!-- BEGIN webmail_tab -->
+			<li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
+			<!-- END webmail_tab -->
+			<li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
+			<!-- BEGIN timetable_tab -->
+			<li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
+			<!-- END timetable_tab -->
+			<li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
+			<!-- BEGIN portfolio_tab -->
+			<li><a class="{TAB_PORTFOLIO_ON}" href="/cms/portfolio" title="Access your portfolio area">My Portfolio</a></li>
+			<!-- END portfolio_tab -->
+			<li><a href="/logout.php" title="">Logout</a></li>
+		</ul>
+			<div id="banner-wrap">
+				<form id="search" action="/search.php" method="get">
+					<fieldset>
+						<input id="search-field" type="text" name="keyword" />
+						<input id="search-button" type="image" src="/images/grimwade/search-button.gif" value="Search" />
+					</fieldset>
+				</form>
+			</div>
+			
+		</div>
 
-<div id="nav">
-	<div id="logo"></div>
-	<h3>Grimwade Intranet</h3>
-  {MCSSMENU}
-	<!-- BEGIN msubject -->
-	<h3>My Subjects</h3>
-  <ul>
-    <!-- BEGIN msubject_block --> 
-    <li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li> 
-    <!-- END msubject_block -->
-  </ul>
-  <!-- END msubject -->
-  <!-- BEGIN mstudent -->
-	<h3>My Students</h3>
-  <ul>
-    <!-- BEGIN mstudent_block --> 
-    <li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
-    <!-- END mstudent_block -->
-  </ul>
-  <!-- END mstudent -->
-  <!-- BEGIN mgroup --> 
-  <h3>My Groups</h3>
-  <ul>
-  	<!-- BEGIN mgroup_block --> 
-		<li><a href="/homepage/{MGID}/">{MGNAME}</a></li> 
-		<!-- END mgroup_block -->
-  </ul>	
-  <!-- END mgroup --> 
-  <h3>My Links</h3>
-  <ul>
-  	<!-- BEGIN mlink_block -->
-  	<li>{MLINK}</li>
-    <!-- END mlink_block --> 
-    <li><a href="/cms/myLinks">Add Link</a></li>
-  </ul>	
-</div>
-
-<div id="container">
-  <div id="header">
-    <div id="banner-wrap">
-<form id="search" action="/search.php" method="get">
-	<fieldset>
-  	<input id="search-field" type="text" name="keyword" />
-    <input id="search-button" type="image" src="/images/grimwade/search-button.gif" value="Search" />
-  </fieldset>
-</form>
-</div>  
- <ul id="tabs">
-	<li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Main</a></li>
-  <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">News</a></li>
-  <!-- BEGIN webmail_tab -->
-  <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
-  <!-- END webmail_tab -->
-  <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
-  <!-- BEGIN timetable_tab -->
-  <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
-  <!-- END timetable_tab -->
-  <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
-  <!-- BEGIN portfolio_tab -->
-  <li><a class="{TAB_PORTFOLIO_ON}" href="/cms/portfolio" title="Access your portfolio area">My Portfolio</a></li>
-  <!-- END portfolio_tab -->
-  <li><a href="/logout.php" title="">Logout</a></li>
-</ul>
-
-<!-- BEGIN myfiles_tab -->
-<!-- END myfiles_tab -->	
-  </div>
-  <div id="content">
-  <!-- #BeginEditable "content" -->
+		<div id="nav"> <a class="logo" href="/" title="Melbourne Grammar School"><img src="/images/grimwade/logo.gif" /></a>
+				<h3>Grimwade Intranet</h3>
+				{MCSSMENU} 
+				<!-- BEGIN msubject -->
+				<h3>My Subjects</h3>
+				<ul>
+					<!-- BEGIN msubject_block -->
+					<li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li>
+					<!-- END msubject_block -->
+				</ul>
+				<!-- END msubject --> 
+				<!-- BEGIN mstudent -->
+				<h3>My Students</h3>
+				<ul>
+					<!-- BEGIN mstudent_block -->
+					<li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li>
+					<!-- END mstudent_block -->
+				</ul>
+				<!-- END mstudent --> 
+				<!-- BEGIN mgroup -->
+				<h3>My Groups</h3>
+				<ul>
+					<!-- BEGIN mgroup_block -->
+					<li><a href="/homepage/{MGID}/">{MGNAME}</a></li>
+					<!-- END mgroup_block -->
+				</ul>
+				<!-- END mgroup -->
+				<h3>My Links</h3>
+				<ul>
+					<!-- BEGIN mlink_block -->
+					<li>{MLINK}</li>
+					<!-- END mlink_block -->
+					<li><a href="/cms/myLinks">Add Link</a></li> 
+				</ul>
+			</div>
+		<div id="container">
+			<div id="content"> <!-- #BeginEditable "content" -->
 			<h1>Homepage Statistics - {CATEGORY}</h1>
 			<!-- BEGIN menu -->
 			<ul>
@@ -210,16 +206,19 @@
 			<!-- END general -->
 			<!-- END stats_main -->
 			<!-- #EndEditable -->
-  <div class="float-fix"></div>
-  </div>
+				<div class="float-fix"></div>
+			</div>
+			<div class="float-fix"></div>
+		</div>
+	</div>
 </div>
 <div id="footer">
 	<ul>
-  	<li>2009 &copy; Copyright <a href="http://www.alaress.com.au">Alaress</a></li>
-    <li><a href="/policy/grimwade.htm">Guidelines of Use and Privacy Policy</a></li>
-    <li class="last"><a href="http://www.alaress.com.au">Developed By Alaress</a></li>
-  </ul>
-  <div class="float-fix"></div>
+		<li>2009 &copy; Copyright <a href="http://www.alaress.com.au">Alaress</a></li>
+		<li><a href="/policy/grimwade.htm">Guidelines of Use and Privacy Policy</a></li>
+		<li class="last"><a href="http://www.alaress.com.au">Developed By Alaress</a></li>
+	</ul>
+	<div class="float-fix"></div>
 </div>
 </body>
 <!-- #EndTemplate --></html>

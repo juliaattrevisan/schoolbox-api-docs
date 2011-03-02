@@ -6,15 +6,14 @@
 <title>{TITLE}</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="James Leckie, Lektec Consulting"/> 
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/core-demo.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/grimwade/screen.css" />
 
 <!-- BEGIN header_css -->
 <link rel="stylesheet" type="text/css" media="{HEADER_CSS_TYPE}" href="{HEADER_CSS_LOCATION}" />
 <!-- END header_css -->
-
 
 <script type="text/javascript" src="/javascript/jquery.js"></script>
 <script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
@@ -54,115 +53,109 @@ function verify()
 	
 </script>
 <!-- #EndEditable -->
+<div id="wrap">
+	<div id="wrap-inner">
+		<div id="header"> 
+				<ul id="tabs">
+			<li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Main</a></li>
+			<li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">News</a></li>
+			<!-- BEGIN webmail_tab -->
+			<li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
+			<!-- END webmail_tab -->
+			<li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
+			<!-- BEGIN timetable_tab -->
+			<li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
+			<!-- END timetable_tab -->
+			<li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
+			<!-- BEGIN portfolio_tab -->
+			<li><a class="{TAB_PORTFOLIO_ON}" href="/cms/portfolio" title="Access your portfolio area">My Portfolio</a></li>
+			<!-- END portfolio_tab -->
+			<li><a href="/logout.php" title="">Logout</a></li>
+		</ul>
+			<div id="banner-wrap">
+				<form id="search" action="/search.php" method="get">
+					<fieldset>
+						<input id="search-field" type="text" name="keyword" />
+						<input id="search-button" type="image" src="/images/grimwade/search-button.gif" value="Search" />
+					</fieldset>
+				</form>
+			</div>
+			
+		</div>
 
-<div id="nav">
-	<div id="logo"></div>
-	<h3>Grimwade Intranet</h3>
-  {MCSSMENU}
-	<!-- BEGIN msubject -->
-	<h3>My Subjects</h3>
-  <ul>
-    <!-- BEGIN msubject_block --> 
-    <li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li> 
-    <!-- END msubject_block -->
-  </ul>
-  <!-- END msubject -->
-  <!-- BEGIN mstudent -->
-	<h3>My Students</h3>
-  <ul>
-    <!-- BEGIN mstudent_block --> 
-    <li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
-    <!-- END mstudent_block -->
-  </ul>
-  <!-- END mstudent -->
-  <!-- BEGIN mgroup --> 
-  <h3>My Groups</h3>
-  <ul>
-  	<!-- BEGIN mgroup_block --> 
-		<li><a href="/homepage/{MGID}/">{MGNAME}</a></li> 
-		<!-- END mgroup_block -->
-  </ul>	
-  <!-- END mgroup --> 
-  <h3>My Links</h3>
-  <ul>
-  	<!-- BEGIN mlink_block -->
-  	<li>{MLINK}</li>
-    <!-- END mlink_block --> 
-    <li><a href="/cms/myLinks">Add Link</a></li>
-  </ul>	
-</div>
-
-<div id="container">
-  <div id="header">
-    <div id="banner-wrap">
-<form id="search" action="/search.php" method="get">
-	<fieldset>
-  	<input id="search-field" type="text" name="keyword" />
-    <input id="search-button" type="image" src="/images/grimwade/search-button.gif" value="Search" />
-  </fieldset>
-</form>
-</div>  
- <ul id="tabs">
-	<li><a class="{TAB_MAIN_ON}" href="/home/" title="Greeting page">Main</a></li>
-  <li><a class="{TAB_NEWS_ON}" href="/news/" title="Current school news">News</a></li>
-  <!-- BEGIN webmail_tab -->
-  <li><a class="{TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
-  <!-- END webmail_tab -->
-  <li><a class="{TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events">Calendar</a></li>
-  <!-- BEGIN timetable_tab -->
-  <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
-  <!-- END timetable_tab -->
-  <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
-  <!-- BEGIN portfolio_tab -->
-  <li><a class="{TAB_PORTFOLIO_ON}" href="/cms/portfolio" title="Access your portfolio area">My Portfolio</a></li>
-  <!-- END portfolio_tab -->
-  <li><a href="/logout.php" title="">Logout</a></li>
-</ul>
-
-<!-- BEGIN myfiles_tab -->
-<!-- END myfiles_tab -->	
-  </div>
-  <div id="content">
-  <!-- #BeginEditable "content" --> 
+		<div id="nav"> <a class="logo" href="/" title="Melbourne Grammar School"><img src="/images/grimwade/logo.gif" /></a>
+				<h3>Grimwade Intranet</h3>
+				{MCSSMENU} 
+				<!-- BEGIN msubject -->
+				<h3>My Subjects</h3>
+				<ul>
+					<!-- BEGIN msubject_block -->
+					<li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li>
+					<!-- END msubject_block -->
+				</ul>
+				<!-- END msubject --> 
+				<!-- BEGIN mstudent -->
+				<h3>My Students</h3>
+				<ul>
+					<!-- BEGIN mstudent_block -->
+					<li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li>
+					<!-- END mstudent_block -->
+				</ul>
+				<!-- END mstudent --> 
+				<!-- BEGIN mgroup -->
+				<h3>My Groups</h3>
+				<ul>
+					<!-- BEGIN mgroup_block -->
+					<li><a href="/homepage/{MGID}/">{MGNAME}</a></li>
+					<!-- END mgroup_block -->
+				</ul>
+				<!-- END mgroup -->
+				<h3>My Links</h3>
+				<ul>
+					<!-- BEGIN mlink_block -->
+					<li>{MLINK}</li>
+					<!-- END mlink_block -->
+					<li><a href="/cms/myLinks">Add Link</a></li> 
+				</ul>
+			</div>
+		<div id="container">
+			<div id="content"> <!-- #BeginEditable "content" --> 
             <h1>{ACTION} Menu Item</h1>
             <form action="" method="post" name="form" id="form" class="standardForm" onsubmit="return(verify());">
                     <table>
                       <tr> 
-                        <td class="formLabelWidth"><h2>Parent</h2>
-						<em>Select where in the menu you would like this item located.</em> 
-                        </td>
-                        <td>{MENUITEMLIST}</td>
-                        </tr>
-                      <tr> 
-                        <td><h2>Name</h2>
-                          <em>This is the text that will be displayed on the menu</em></td>
-                        <td><input type="text" name="text" maxlength="250" size="40" value="{TEXT}" /> 
+                        <td class="formLabelWidth"><h4>Parent</h4>
+						<em>Select where in the menu you would like this item located.</em> <br />
+						{MENUITEMLIST}
                         </td>
                         </tr>
                       <tr> 
-                        <td><h2>URL</h2>
+                        <td><h4>Name</h4>
+                          <em>This is the text that will be displayed on the menu</em><br />
+						  <input type="text" name="text" maxlength="250" size="40" value="{TEXT}" /> </td>
+                        </tr>
+                      <tr> 
+                        <td><h4>URL</h4>
                           <em>The location at which the item should point. If 
                           it is local url remember to use a reference relative 
-                          to the root.</em></td>
-                        <td> <input type="text" name="url" size="40" maxlength="250" value="{URL}" /> 
-                        </td>
+                          to the root.</em><br />
+						  <input type="text" name="url" size="40" maxlength="250" value="{URL}" /> </td>
                         </tr>
                       <tr> 
-                        <td><h2>Target</h2>
-               	          <em>Select wether you would like this link to open in a new window</em></td>
-                        <td>{TARGETLIST}</td>
+                        <td><h4>Target</h4>
+               	          <em>Select wether you would like this link to open in a new window</em><br />
+						  {TARGETLIST}</td>
                         </tr>
                       <tr> 
-                        <td><h2>Campus Access</h2>
+                        <td><h4>Campus Access</h4>
                                 <em>Select the campuses that should be able to view 
                           this link. Note that this link will only be viewable 
-                          by people in both the campuses and groups selected</em> 
+                          by people in both the campuses and groups selected</em> <br />
+						  {CAMPUSLIST}
                         </td>
-                        <td>{CAMPUSLIST}</td>
                         </tr>
                       <tr> 
-                        <td> <h2>Group Access</h2></td>
-                        <td> {GROUPLIST}</td>
+                        <td> <h4>Group Access</h4>{GROUPLIST}</td>
                         </tr>
                       <tr> 
                         <td>&nbsp;</td>
@@ -173,16 +166,19 @@ function verify()
                     </table>
             </form>
             <!-- #EndEditable -->
-  <div class="float-fix"></div>
-  </div>
+				<div class="float-fix"></div>
+			</div>
+			<div class="float-fix"></div>
+		</div>
+	</div>
 </div>
 <div id="footer">
 	<ul>
-  	<li>2009 &copy; Copyright <a href="http://www.alaress.com.au">Alaress</a></li>
-    <li><a href="/policy/grimwade.htm">Guidelines of Use and Privacy Policy</a></li>
-    <li class="last"><a href="http://www.alaress.com.au">Developed By Alaress</a></li>
-  </ul>
-  <div class="float-fix"></div>
+		<li>2009 &copy; Copyright <a href="http://www.alaress.com.au">Alaress</a></li>
+		<li><a href="/policy/grimwade.htm">Guidelines of Use and Privacy Policy</a></li>
+		<li class="last"><a href="http://www.alaress.com.au">Developed By Alaress</a></li>
+	</ul>
+	<div class="float-fix"></div>
 </div>
 </body>
 <!-- #EndTemplate --></html>
