@@ -14,7 +14,7 @@ if($rss->channel) {
         $this->setVar(array(
             'ON_OFF'    => ++$j%2 ? '' : 'dark',
             'RSS_TITLE' => scrubTEXT($item->title),
-            'RSS_URL'   => scrubHTML($item->link),
+            'RSS_URL'   => base64_encode($item->link),
             'RSS_BRIEF' => scrubHTML($item->description)
         ));
 

@@ -152,7 +152,9 @@ class User extends Model {
 					$query .= "( firstname like '%$keyword%' or lastname like '%$keyword%' or username like '%$keyword%' ) ";
 			}
 
-			if($group)
+			if(is_array($group) )
+				$query .= "AND group_id IN (".implode(',',$group).") ";
+			else if(is_numeric($group))
 				$query .= "AND group_id = '$group' ";
 		}
 		else if($group)

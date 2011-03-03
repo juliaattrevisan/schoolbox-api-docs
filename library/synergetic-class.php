@@ -38,14 +38,13 @@ class SynergeticClass extends MSSQL{
 			vStudents.FileYear = StudentClasses.FileYear AND
 			vStudents.FileSemester = StudentClasses.FileSemester AND
 			vStudents.ID = StudentClasses.ID)
-		WHERE   StudentStatus = 'NOR'
+		WHERE   (StudentStatus = 'N' OR StudentStatus = 'NOR')
 			AND $classQuery
 			AND (StudentClasses.FileYear='" . $_SESSION['FileYear'] . "')
 			AND (StudentClasses.FileSemester='" . $_SESSION['FileSemester'] .  "')
-			AND ( StudentClasses.FileType != 'A' OR StudentClasses.StartDate <= getdate())
+			AND (StudentClasses.FileType != 'A' OR StudentClasses.StartDate <= getdate())
 			AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
 		ORDER BY StudentSurname, StudentPreferred";
-
 		return $this->getAll($query);
 	}
 	

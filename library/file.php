@@ -52,7 +52,7 @@ class File extends Model {
             $query .= " AND ( 1=2 ";
 
             $filter_sql = array(
-                'document' => " OR ( f.mime_type LIKE '%pdf' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%officedoc%' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%' OR f.mime_type LIKE '%document%' OR f.mime_type LIKE '%powerpoint%') ",
+                'document' => " OR ( f.mime_type LIKE '%pdf%' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%officedoc%' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%' OR f.mime_type LIKE '%document%' OR f.mime_type LIKE '%powerpoint%') ",
                 'image'    => " OR ( f.mime_type LIKE '%image%' ) ",
                 'audio'    => " OR ( f.mime_type LIKE '%audio%' ) ",
                 'video'    => " OR ( f.mime_type LIKE '%video%' OR f.mime_type LIKE '%flash%' OR f.mime_type LIKE '%realmedia%' ) ",
@@ -73,8 +73,7 @@ class File extends Model {
 		$sortFields = array('Name' => 'f.description', 'Date' => 'f.submitted');
 		
 		$config['sort'] = isset($sortFields[$config['sort']]) ? $config['sort'] : 'Name';
-		$config['sortdir'] = strtoupper($config['DESC']) == 'DESC' ? 'DESC' : 'ASC';
-
+		$config['sortdir'] = strtoupper($config['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
 		$query .= " ORDER BY " . $sortFields[$config['sort']] . " " . $config['sortdir'];
 		
 		if($config['size'] > 0) 

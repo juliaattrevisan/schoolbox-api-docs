@@ -183,20 +183,20 @@ if(is_numeric($this->arg[0])) {
                     $tutorTeacher = scrubTEXT($synInfo['StudentTutorName']);
             }
 
-            $output = array('TUTOR_GROUP' 			=> scrubTEXT($synInfo['StudentTutorDescription']),
-                            'TUTOR'					=> $tutorTeacher,
-                            'YEAR_LEVEL'			=> scrubTEXT($synInfo['StudentYearLevel']),
-                            'HOUSE'					=> scrubTEXT($synInfo['StudentHouseDescription']),
-                            'HOH'					=> scrubTEXT($synInfo['StudentHeadOfHouse']),
-                            'FORM'					=> scrubTEXT($synInfo['StudentForm']),
+            $output = array('TUTOR_GROUP' 		=> scrubTEXT($synInfo['StudentTutorDescription']),
+                            'TUTOR'			=> $tutorTeacher,
+                            'YEAR_LEVEL'		=> scrubTEXT($synInfo['StudentYearLevel']),
+                            'HOUSE'			=> scrubTEXT($synInfo['StudentHouseDescription']),
+                            'HOH'			=> scrubTEXT($synInfo['StudentHeadOfHouse']),
+                            'FORM'			=> scrubTEXT($synInfo['StudentForm']),
                             'FORM_DESCRIPTION'		=> scrubTEXT($synInfo['FormDescription']),
-                            'FORM_STAFF'			=> $formTeacher,
-                            'LOCKER'				=> scrubTEXT($synInfo['StudentLockerBook']),
-                            'BIRTHDATE'				=> date('jS \o\f F, Y', $synInfo['StudentBirthDate']),
+                            'FORM_STAFF'		=> $formTeacher,
+                            'LOCKER'			=> scrubTEXT($synInfo['StudentLockerBook']),
+                            'BIRTHDATE'			=> date('jS \o\f F, Y', $synInfo['StudentBirthDate']),
                             'EMERGENCY_NAME'		=> scrubTEXT($synInfo['StudentEmergencyName']),
                             'EMERGENCY_PHONE'		=> scrubTEXT($synInfo['StudentEmergencyPhone']),
                             'EMERGENCY_ALT_PHONE'	=>scrubTEXT($synInfo['StudentEmergencyPhoneAlt']),
-                            'MEDICAL_NOTE'			=> scrubTEXT($synInfo['StudentMedicalAlert']),
+                            'MEDICAL_NOTE'		=> scrubTEXT($synInfo['StudentMedicalAlert']),
                             'CONTACT_ALERT'             => scrubTEXT($synInfo['AlertMessage']),
                             );
             $this->setVar($output);
