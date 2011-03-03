@@ -38,7 +38,7 @@ class SynergeticClass extends MSSQL{
 			vStudents.FileYear = StudentClasses.FileYear AND
 			vStudents.FileSemester = StudentClasses.FileSemester AND
 			vStudents.ID = StudentClasses.ID)
-		WHERE   (StudentStatus = 'N' OR StudentStatus = 'NOR')
+		WHERE   (StudentStatus = 'N' OR StudentStatus = 'NOR' OR StudentStatus = 'NEW')
 			AND $classQuery
 			AND (StudentClasses.FileYear='" . $_SESSION['FileYear'] . "')
 			AND (StudentClasses.FileSemester='" . $_SESSION['FileSemester'] .  "')

@@ -12,9 +12,6 @@ $attemptHandler = new AssessAttempt();
 $allAssess = $assessHandler->getList($categoryID);
 
 if ($groupHandler->isStaff()) {
-    $this->setVar(array(
-        'ASSESS_CATEGORY_ID' => $categoryID,
-    ));
 
     $this->setVar('studentLink_block', '');
     $this->parse('teacherLink_block', 'teacherLink');

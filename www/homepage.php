@@ -32,7 +32,7 @@ if(!is_array($category)) {
 }
 
 
-$categoryID =& $category['id'];
+$categoryID = $category['id'];
 if (!$categoryID) {
 	error(18);
 }

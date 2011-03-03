@@ -95,16 +95,11 @@ class User extends Model {
                         WHERE";
 
            foreach(explode(' ', $keyword) as $keyword_part) {
-               if(empty($query_or)) {
-                   $query_or = true;
-               } else {
-                   $query .= " OR ";
-               }
-
-                $query .= " username like '%$keyword_part%' OR firstname like '%$keyword_part%' OR
+                $queryArgs .= " username like '%$keyword_part%' OR firstname like '%$keyword_part%' OR
                             lastname like '%$keyword_part%' OR alt_email like '%$keyword_part%'";
             }
 
+            $query = $query.$queryArgs;
             $query .= " ORDER BY `$sort_by` $sort_dir
                         LIMIT $offset, $limit;";
 
@@ -113,19 +108,9 @@ class User extends Model {
                                 FROM `user`
                                 LEFT JOIN `groups` ON `user`.group_id = `groups`.id
                                 LEFT JOIN `luCampus` ON `user`.campus = `luCampus`.id
-                                WHERE";
+                                WHERE ";
 
-           foreach(explode(' ', $keyword) as $keyword_part) {
-               if(empty($count_query_or)) {
-                   $count_query_or = true;
-               } else {
-                   $count_query .= " OR ";
-               }
-
-                $count_query .= " username like '%$keyword_part%' OR firstname like '%$keyword_part%' OR
-                                  lastname like '%$keyword_part%' OR alt_email like '%$keyword_part%'";
-            }
-
+            $count_query = $count_query.$queryArgs;
             $count = $this->db->getOne($count_query);
 
             return $this->db->getAll($query);

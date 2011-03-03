@@ -29,7 +29,7 @@ class SynergeticTimetable extends MSSQL{
 					TimetableDefinition.FileSemester='{$_SESSION['FileSemester']}' AND
 					TimetableDefinition.TimetableGroup='{$this->campusCode[$campus]}' AND
 					TimetableDefinition.DayNumber = 0
-				ORDER BY TimetableDefinition.TimeFrom, TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
+				ORDER BY TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
 				";
 	$this->query($query);
 	
@@ -46,7 +46,7 @@ class SynergeticTimetable extends MSSQL{
 		$timetableDef['sequence'][] = $period['PeriodNumberSeq'];
 		$periodCount++;
 	}
-
+	
 	$timetableDef['periodCount'] = $periodCount;
 	$timetableDef['dayCount'] = $this->days[$campus];
 	return $timetableDef;
@@ -95,7 +95,7 @@ class SynergeticTimetable extends MSSQL{
 			$weeks = intval(($difference) / 7);
 
 			*/
-			if((date('W', $date) % 2) == 1)
+			if((date('W', $date) % 2) == 0)
 				return date('w',$date);
 			else
 				return date('w',$date) + 5;
@@ -260,11 +260,11 @@ class SynergeticTimetable extends MSSQL{
 						$desc = $this->getNextArray(); 
 			}
 		}
-	
+		usort($timetable, array($this, 'sortTimetable'));
 		return $timetable;
 	
 	}
-
+	
 	function getFullTimetable($synergy_id, $userID, $campus)
 	{	
 		$timetabledef = $this->getTimetableDefinition($campus);
@@ -312,11 +312,12 @@ class SynergeticTimetable extends MSSQL{
 				AND DayNumber > 0 AND DayNumber <= ".$timetabledef['dayCount']." AND PeriodNumber <= ".$timetabledef['periodCount']." 
 				ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
 		}
-
+		
 		$periodCount = $timetabledef['periodCount'];
 		$dayCount = $timetabledef['dayCount'];
 
 		$result = $this->query($query);
+
 		//get first period
 		if ($result != 1)
 			$desc = $this->getNextArray();
@@ -356,7 +357,16 @@ class SynergeticTimetable extends MSSQL{
 				
 			}
 		}
+		usort($timetable, array($this, 'sortTimetable'));
 		return $timetable;
+	}
+
+	function sortTimetable($a, $b) {
+		$aTime = strtotime($a['periodStart']);
+		$bTime = strtotime($b['periodStart']);
+		if($aTime == $bTime)
+			return 0;
+		return ($aTime > $bTime) ? +1: -1;
 	}
 	
 	function getDaySubjects($synergy_id, $daynum) {
