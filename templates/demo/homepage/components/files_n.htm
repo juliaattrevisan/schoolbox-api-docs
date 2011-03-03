@@ -57,7 +57,7 @@
 				<h4><a class="icons {HIDDEN} {FILE_MIME_IMAGE}" href="{FILE_URL}" target="{FILE_TARGET}" >{FILE_DESCRIPTION}</a></h4>
 				<!-- END file_url -->
 				<!-- BEGIN file_no_url -->
-				<h4>{FILE_DESCRIPTION}</h4>
+				<h4 class="hide-on-small">{FILE_DESCRIPTION}</h4>
 				<!-- END file_no_url -->
 				<div class="small-right">
 					<!-- BEGIN modify_file -->
@@ -65,8 +65,8 @@
 					<!-- END modify_file -->
 				</div>
 				<div class="float-fix"></div>
-				{FILE_COMMENT}
-				<p class="interact">Posted by <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a> on {FILE_POSTED_DATE}</p>
+				<span class="hide-on-small">{FILE_COMMENT}</span>
+				<p class="interact hide-on-small">Posted by <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a> on {FILE_POSTED_DATE}</p>
 				<div class="float-fix"></div>
 			</li>
 			<!-- END files -->

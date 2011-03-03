@@ -483,10 +483,8 @@ th { font-weight:bold; }
 }
 
 .template4 .right { width: 69.5%; }
-
 .template4 .left { width: 29.5%; }
-
-.template1 .right .summ, .template4 .left .summ { display: none; }
+.template1 .right .hide-on-small, .template4 .left .hide-on-small { display: none; }
 
 /*BOXES*/
 .marker {
@@ -628,8 +626,9 @@ th { font-weight:bold; }
 .listing h4 {
 	float:left;
 	width:70%;
+	overflow:hidden;
 }
-. .listing h4 a {
+.listing h4 a {
 font-weight:normal;
 }
 
@@ -3267,11 +3266,12 @@ p.forgotten { margin:10px 0; }
 }
 
 #news-header span a {
-p adding:0 10px;
+padding:0 10px;
 	position:absolute;
 	right:0;
 	top:30%;
 	font-size:12px;
+	font-weight:normal
 }
 
 .news-archive {
