@@ -24,12 +24,9 @@ $j(document).ready(function() {
 
         $j.get('/group/modifyForm.php', data);
     });
-});
-</script>
-<script type="text/javascript">
-<!--
-$j(document).ready(function () {
-	$j('#addUser').autocomplete({
+	
+	
+		$j('#addUser').autocomplete({
 		serviceUrl: '/ajax/user.php?groupID=0',
 		minChars: 2,
 		maxHeight: 400,
@@ -63,8 +60,10 @@ $j(document).ready(function () {
 	
 	
 });
-
 </script>
+
+
+
 <style type="text/css">
 .checkAll, .delCheck, .acceptCheck { position: relative; top: 3px; }
 </style>
