@@ -52,7 +52,7 @@
       <!-- BEGIN timetable_tab -->
       <li><a class="{TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable">Timetable</a></li>
       <!-- END timetable_tab -->
-      <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Resources</a></li>
+      <li><a class="{TAB_RESOURCES_ON}" href="/resources/" title="Browse resources and homepages">Folders</a></li>
       <!-- BEGIN portfolio_tab -->
       <li><a class="{TAB_PORTFOLIO_ON}" href="/cms/portfolio" title="Access your portfolio area">My Portfolio</a></li>
       <!-- END portfolio_tab -->
