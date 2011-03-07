@@ -1,5 +1,9 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+$groupHandler = new Group;
 
-$this->setFile(TEMPLATE_content, 'modules/mgs_curriculum/search.html');
-
+if($groupHandler->isStaff() )
+   $this->setFile(TEMPLATE_content, 'modules/mgs_curriculum/search.html');
+else
+   error(19);
 ?>

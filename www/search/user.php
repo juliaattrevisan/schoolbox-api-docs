@@ -183,6 +183,7 @@ if(is_numeric($this->arg[0])) {
                     $tutorTeacher = scrubTEXT($synInfo['StudentTutorName']);
             }
 
+
             $output = array('TUTOR_GROUP' 		=> scrubTEXT($synInfo['StudentTutorDescription']),
                             'TUTOR'			=> $tutorTeacher,
                             'YEAR_LEVEL'		=> scrubTEXT($synInfo['StudentYearLevel']),
@@ -268,12 +269,13 @@ if(is_numeric($this->arg[0])) {
                 $this->setVar('student_synergy_form_block','');
             }
 
-            if(trim($synInfo['StudentMedicalAlert']))
-                $this->parse('medical_block', 'medical');
+            if($groupHandler->isStaff() ) {
+                if(trim($synInfo['StudentMedicalAlert']))
+                    $this->parse('medical_block', 'medical');
 
-           if(trim($synInfo['AlertMessage']))
-                $this->parse('contact_alert_block', 'contact_alert');
-
+               if(trim($synInfo['AlertMessage']) )
+                    $this->parse('contact_alert_block', 'contact_alert');
+            }
        }
        else if($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
 

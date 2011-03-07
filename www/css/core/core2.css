@@ -190,6 +190,7 @@ th { font-weight:bold; }
 .template4 .right { min-width: 535px; width: 69.5%; }
 .template4 .left { min-width: 229px; width: 29.5%; }
 .template1 .right .summ, .template4 .left .summ { display: none; }
+.template1 .right .hide-on-small, .template4 .left .hide-on-small { display: none; }
 
 h1 a.customise {display:block;font-size:80%;font-weight:normal;position:absolute;right:0;text-align:right;text-transform:capitalize;top:5px;}
 

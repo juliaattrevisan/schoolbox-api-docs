@@ -19,7 +19,7 @@ table, caption, tbody, tfoot, thead, tr, th, td {
 	background: transparent;
 }
 body {
-	line-height: 1;
+	line-height: 1;t
 }
 ul {
 	list-style: none;
@@ -192,6 +192,8 @@ table.ruler { width: 100%; }
 .template4 .left .summ {
 	display: none;
 	}
+        
+
 /*--------------------------------------------------------------
  Header styles 
 -------------------------------------------------------------*/

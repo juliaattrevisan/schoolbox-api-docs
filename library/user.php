@@ -182,16 +182,16 @@ class User extends Model {
 	
 	
 	
-	function sendPassword($email) {
+	/*function sendPassword($email) {
 				if (empty($email))
 					return 0;
 					
 					/* Only parents can make this work. Look up their username because
 					 * alt_email is an optional field, and username is their email address
 					 */
-					$groupHandler = new Group();
+					/*$groupHandler = new Group();
 					
-					$user = $this->getByField('username', $email);	
+					$user = $this->getByField('alt_email', $email);
 
 					if (isset($user['id'])) {
 							if ($groupHandler->isParent($user['id'])) {
@@ -209,12 +209,12 @@ class User extends Model {
 					else {
 						return 0;
 					}
-    }
+    }*/
 		
 		
 		
 		
-		/*function sendPassword($email) {
+    function sendPassword($email) {
 		if (empty($email))
 			return false;
 			
@@ -222,7 +222,7 @@ class User extends Model {
 		if (isset($user['id'])) {
 		
 			require_once SITE_root . '/include/mailer.php';
-			$mailHandler = new Mailer('new-password.html', HEADING . ' Login Details', $user['alt_email']);
+			$mailHandler = new Mailer('new-password.html', HEADING . ' Password Reminder', $user['alt_email']);
 			$mailHandler->setVar('NAME', $user['firstname']);
 			$mailHandler->setVar('USERNAME', $user['username']);
 			$mailHandler->setVar('PASSWORD', $user['email_pass']);
@@ -231,7 +231,7 @@ class User extends Model {
 			return true;
 		} else
 			return false;	
-	}*/
+	}
 	
 
     /**
