@@ -243,6 +243,7 @@ th { font-weight:bold; }
 #header {
 	height: 136px;
 	position:relative;
+	min-width:765px;
 }
 
 #header .logo {
@@ -353,6 +354,7 @@ th { font-weight:bold; }
 	-moz-border-radius: 0 0 3px 3px;
 	-webkit-border-radius: 0 0 3px 3px;
 	border-radius: 0 0 3px 3px;
+	background:#fff;
 }
 
 #nav li li { float:left; }

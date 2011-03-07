@@ -35,7 +35,26 @@
 <!-- END header_javascript -->
 </head>
 <body>
-<!-- #BeginEditable "head" --><!-- #EndEditable -->
+<!-- #BeginEditable "head" -->
+
+
+
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<script type="text/javascript">
+
+$j(function() {
+	$j('#findUserForm').autocomplete("/admin/modUser.php", {
+		width: 260,
+		selectFirst: false
+	});
+
+	
+});
+
+</script>
+
+
+<!-- #EndEditable -->
   <div id="header">
     	<a href="/" class="logo"><img src="/images/demo/schoolbox-logo.png" width="273" height="52" alt="Schoolbox" /></a>
 <ul id="infoPanel">
