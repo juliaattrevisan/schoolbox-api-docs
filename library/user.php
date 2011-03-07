@@ -139,7 +139,7 @@ class User extends Model {
 
 			if(is_array($group) )
 				$query .= "AND group_id IN (".implode(',',$group).") ";
-			else if(is_numeric($group))
+			else if(is_numeric($group) && $group > 0)
 				$query .= "AND group_id = '$group' ";
 		}
 		else if($group)

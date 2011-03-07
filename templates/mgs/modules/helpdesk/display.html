@@ -1,0 +1,46 @@
+  <!-- BEGIN user -->
+      <h1>Helpdesk Information for {USER_CURR}</h1>
+      <h2>Job List</h2>
+      <table class="indent ruler">
+        <thead>
+          <tr>
+            <th>Created</th>
+			<th>Status</th>
+            <th>Description</th>
+            <th>Assigned To</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- BEGIN job -->
+          <tr>
+            <td>{date}</td>
+			<td>{status}</td>
+            <td>{description}</td>
+            <td>{assignedUserName}</td>
+          </tr>
+          <!-- END job -->
+        </tbody>
+      </table>
+      <br />
+      <h2>Equipment List</h2>
+      <table class="ruler indent">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Location</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- BEGIN equip -->
+          <tr>
+            <td>{TYPE}</td>
+            <td>{BRAND}</td>
+            <td>{MODEL}</td>
+            <td>{LOCATION}</td>
+          </tr>
+          <!-- END equip -->
+        </tbody>
+      </table>
+      <!-- END user -->

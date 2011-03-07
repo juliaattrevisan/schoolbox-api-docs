@@ -35,6 +35,7 @@ if (is_numeric($_GET['fileID'])) {
 					 'COMMENT'	 => scrubText($file['comment']),
 					 'SIZE'		 => number_format($file['file_size']/1024, 1),
 					 'LINK'		=> '/send.php?id='.$file['id'],
+                                         'HOST'         => conType().$_SERVER['HTTP_HOST'],
 					 'MIME_TYPE' => $file['mime_type'],
 					 'HIDDEN'	 => $file['hidden'] > 0 ? 'Yes' : 'No',
 					 );

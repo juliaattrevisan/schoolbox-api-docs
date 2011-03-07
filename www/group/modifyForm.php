@@ -100,7 +100,7 @@ elseif (isset($_POST['bulkAdd'])) {
 	$string = preg_replace("(\r\n|\n|\r)", ",", $_POST['bulkAdd']);
 	
 	//split the list into an array
-	$list = split('[,; ]', $string);
+	$list = preg_split('[,; ]', $string);
 	
 	foreach($list as $key) {
 		trim($key);
