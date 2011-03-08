@@ -1,32 +1,15 @@
-<script type="text/javascript">
-	$j(function() {
-		$j('#category li:first-child a').addClass('selected');
-		$j('ul.topic li:first-child').show();
-		
-		$j('#category a').click(function() {
-			if (!$j(this).hasClass("selected")) {
-				$j('#category a').removeClass('selected');
-				$j(this).addClass('selected');	
-				var el = $j(this).attr('title');
-				$j('ul.topic > li').hide();
-				$j('ul.topic > li.' + el).show();
-			}
-			return false;
-		});
-	});
-</script>
 
 <div class="box">
   <h2>Announcements</h2>
   <div class="text listing">
-  	<ul id="category">
+
       <!-- BEGIN topic_header -->
-      <li><a href="#" title="{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
+      
       <!-- END topic_header -->
-    </ul>
+
     <ul class="topic">
     <!-- BEGIN topic -->
-    	<li class="hide {TOPIC_CLEAN}">
+    <li class="{TOPIC_CLEAN}">
     	<ul>
       <!-- BEGIN news -->
       <li class="{ON_OFF}">
