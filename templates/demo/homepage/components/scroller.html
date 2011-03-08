@@ -1,7 +1,7 @@
 <script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
 <script type="text/javascript">
-$j(function(){
-    $j('#galleryCycle').cycle({
+$j(window).load(function(){
+		$j('#galleryCycle').cycle({
         cleartype: true,
         before: function() {
             $j('#galleryCycle span').slideUp();
@@ -25,6 +25,8 @@ $j(function(){
 
 #galleryCycle div {
 	position: relative;
+		display:none;
+	
 }
 
 #galleryCycle span {
