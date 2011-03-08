@@ -8,7 +8,7 @@
 	padding:0;
 	}
 #content {}
-#header{ margin-left:180px; height:90px;}
+#header{ margin-left:180px; height:90px;min-width:717px;}
 table th,
 table td {
 	text-align: left;
@@ -155,7 +155,7 @@ width:180px;
 #tabs {
 left:auto;
 right:15px;
-min-width:663px;
+min-width:568px;
 	}
 
 
@@ -198,7 +198,7 @@ min-width:663px;
 	font-size:12px;
 }
 
-.topic{width:74%;}
+.topic{width:100%;}
 
 /* hiding the colour tab from the customisation screen*/
 
@@ -305,3 +305,5 @@ p.interact a {
 }
 
 #footer{margin-left:182px;}
+
+#timetable td {border-right:1px solid #ccc;}

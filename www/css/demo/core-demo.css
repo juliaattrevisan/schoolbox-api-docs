@@ -354,7 +354,7 @@ th { font-weight:bold; }
 	-moz-border-radius: 0 0 3px 3px;
 	-webkit-border-radius: 0 0 3px 3px;
 	border-radius: 0 0 3px 3px;
-	background:#fff;
+
 }
 
 #nav li li { float:left; }
@@ -415,7 +415,11 @@ th { font-weight:bold; }
 
 #nav .nav-wrapper.my-links { background-color:#f3faff; }
 
-#nav .nav-wrapper { background: #faf9f5; }
+#nav .nav-wrapper { background: #faf9f5;
+     -moz-border-radius: 0 0 3px 3px; 
+  -webkit-border-radius: 0 0 3px 3px; 
+          border-radius: 0 0 3px 3px; 
+ }
 
 /*TABBED NAV*/
 #tabs {

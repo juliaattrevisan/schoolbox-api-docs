@@ -10,7 +10,7 @@
 //Site Directives
 define("HEADING", 'Schoolbox');			//This will appear on the window title of each page
 define("SITE_name", "Alaress Pty Ltd");
-define("SITE_location", "grimwade");
+define("SITE_location", "cathedral");
 define('SITE_hostname', 'joeys');
 define('SITE_domain', 'portal.alaress-dev.com.au');
 
