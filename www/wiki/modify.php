@@ -39,12 +39,13 @@ if (is_numeric($this->arg[0])) {
 	if ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS)
 		error(19);
 
-	$output = array('ACTION'		=> 'Add',
-					'WIKI_ID'		=> '',
-					'CATEGORY_ID'	=> $this->arg[1],
-					'HEADING'		=> scrubText($wiki['heading']),
-					'BODY'			=> $wiki['body']
-					);
+	$output = array('ACTION'                        => 'Add',
+                        'WIKI_ID'	=> '',
+                        'CATEGORY_ID'	=> $this->arg[1],
+                        'HEADING'	=> scrubText($wiki['heading']),
+                        'BODY'		=> $wiki['body'],
+                        'REVISION'      => '',
+                        );
 	$this->setVar($output);
 
 
