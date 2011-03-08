@@ -27,14 +27,7 @@ if (is_array($submissionList)) {
                     }
 		}
 
-		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . scrubText($submission['description']) . ($nameURL ? '</a>' : "");
-
-        /* Made this a bit easier to understand and modify :P
-         * The date, as a link, is not an obvious way to submit work
-         *
-        $dateHTML = ($dateURL ? '<a href="'.$dateURL.'">' : "") . outputDate("jS M", $submission['date']) . ($dateURL ? '</a>' : "");
-         */
-        
+		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . scrubText($submission['description']) . ($nameURL ? '</a>' : "");        
 
 		$output = array(
 			'DUE_NAME'	=> $nameHTML,
@@ -42,7 +35,6 @@ if (is_array($submissionList)) {
 			'DUE_DATE'	=> $dateHTML,
 			'DUE_COMMENT' => nl2br(scrubTEXT($submission['comment'])),
 			'ON_OFF' => ++$j%2? '' : 'dark',
-			'SUBMIT_URL' => $dateURL,
 		);
 
 		$this->setVar($output);

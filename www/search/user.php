@@ -198,7 +198,7 @@ if(is_numeric($this->arg[0])) {
                             'EMERGENCY_PHONE'		=> scrubTEXT($synInfo['StudentEmergencyPhone']),
                             'EMERGENCY_ALT_PHONE'	=>scrubTEXT($synInfo['StudentEmergencyPhoneAlt']),
                             'MEDICAL_NOTE'		=> scrubTEXT($synInfo['StudentMedicalAlert']),
-                            'CONTACT_ALERT'             => scrubTEXT($synInfo['AlertMessage']),
+                            'CONTACT_ALERT_MESSAGE'     => scrubTEXT($synInfo['AlertMessage']),
                             );
             $this->setVar($output);
 
@@ -249,6 +249,15 @@ if(is_numeric($this->arg[0])) {
                 }
             }
 
+            if($groupHandler->isStaff() ) {
+                if(trim($synInfo['StudentMedicalAlert']))
+                    $this->parse('medical_block', 'medical');
+
+               if(trim($synInfo['AlertMessage']) )
+                    $this->parse('contact_alert_block', 'contact_alert');
+            }
+
+
             if (!$j)
                 $this->setVar('contact_details_block', '');
 
@@ -268,14 +277,8 @@ if(is_numeric($this->arg[0])) {
                 $this->parse('student_synergy_tutor_block','student_synergy_tutor');
                 $this->setVar('student_synergy_form_block','');
             }
+            
 
-            if($groupHandler->isStaff() ) {
-                if(trim($synInfo['StudentMedicalAlert']))
-                    $this->parse('medical_block', 'medical');
-
-               if(trim($synInfo['AlertMessage']) )
-                    $this->parse('contact_alert_block', 'contact_alert');
-            }
        }
        else if($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
 

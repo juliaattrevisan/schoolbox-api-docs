@@ -335,7 +335,7 @@ class Submission extends Model {
                               LEFT JOIN allowedFileTypes af ON f.mime_type = mime
                               LEFT JOIN student_submission ss ON ss.box_id = sb.id AND ss.owner = '" . $_SESSION['id'] . "'
                               LEFT JOIN file_type ft ON sb.type = ft.id
-                              WHERE sb.category = '".$categoryID."' AND sb.deleted = '0' AND sb.type = '".$type."' AND sb.late_date > NOW()
+                              WHERE sb.category = '".$categoryID."' AND sb.deleted = '0' AND sb.type = '".$type."'
                               ORDER BY sb.date DESC";
 
             if($config['size'] > 0)
