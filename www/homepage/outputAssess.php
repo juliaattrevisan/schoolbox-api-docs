@@ -50,10 +50,14 @@ if (is_array($allAssess)) {
          * 1. The assessment allows resit and the assessment hasn't expired
          * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
          * 3. The current time has passed the test's starting time
+		 * 4. You aren't the owner of the test
          */
         if ($currentAssess['allow_resit'] == 1) {
-            if (($currentAssess['duration'] == Assess::UNLIMITED_DURATION) || (strtotime($currentAssess['finish']) > time())) {
-                $this->parse('studentLink_block', 'studentLink');
+			if ($assessHandler->isOwner($currentAssess['assess_id'])) {
+				$this->setVar('studentLink_block', '');
+			}
+            else if (($currentAssess['duration'] == Assess::UNLIMITED_DURATION) || (strtotime($currentAssess['finish']) > time())) {
+				$this->parse('studentLink_block', 'studentLink');
             }
             else {
                 $this->setVar('studentLink_block', '');
@@ -72,6 +76,9 @@ if (is_array($allAssess)) {
             else if (((int)time() - (int)strtotime($currentAssess['start'])) < 0) {
                 $this->setVar('studentLink_block', '');
             }
+			else if ($assessHandler->isOwner($currentAssess['assess_id'])) {
+				$this->setVar('studentLink_block', '');
+			}
             else {
                 $this->parse('studentLink_block', 'studentLink');
             }
