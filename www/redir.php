@@ -5,7 +5,7 @@
 	$url = '';
 	
 	if($_GET['url'])
-		$url = $_GET['url'];		
+		$url = base64_decode($_GET['url']);
 	elseif (is_numeric($_GET['id'])) {
 		// lookup link if id given
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/link.php';
@@ -15,8 +15,7 @@
 	}
 	
 	if (!empty($url)) {
-		$url = base64_decode($url);
-	
+
 		if(!URLS_use_frame)
 		{
 			header('Location: '.$url);

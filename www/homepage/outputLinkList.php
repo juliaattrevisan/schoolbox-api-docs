@@ -14,6 +14,7 @@ if (is_array($linkList)) {
 				'LINK_ID'		=> $link['id'],
 				'LINK_NAME'		=> scrubTEXT($link['description']),
 				'LINK_URL'		=> isLocalURL($link['url']) ? relativeURL($link['url']) : '/redir.php?url='.base64_encode($link['url']),
+                                'LINK_TARGET'           => isLocalURL($link['url']) ? '': 'external',
 				'LINK_POSTED_BY'	=> formatName($link),
 				'LINK_POSTED_BY_ID'	=> $link['owner'],
 				'LINK_POSTED_DATE'	=> outputDate(DATE_short_format, $link['submitted']),

@@ -10,7 +10,7 @@ if(!empty($config['url'])) {
     $xml = new XML($config['url']);
     if( $xml->channel) {
         $this->setVar('PODCAST_COMPONENT_TITLE', scrubText($xml->channel->title));
-
+        $j = 0;
         foreach ($xml->channel->item as $item) {
             $this->setVar(array(
                 'PODCAST_URL'           => scrubText($item->enclosure['url']),
