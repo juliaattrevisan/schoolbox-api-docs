@@ -7,8 +7,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="James Leckie, Lektec Consulting"/> 
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/core-demo.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/wenona/screen.css" />
 
 <!-- BEGIN header_css -->
@@ -22,6 +22,9 @@
 	
 	$j(function() {
     $j('#nav ul').droppy({speed: 0});
+	
+	$j('#nav li.parent > a span').each(function(){$j(this).append('<strong>&rsaquo;</strong>');})
+	
   });
 </script>
 <!-- BEGIN header_javascript -->
@@ -74,11 +77,6 @@
     <form id="search" action="/search.php" method="get"> 
     	<fieldset>
 				<input id="search-field" type="text" name="keyword" /> 
-				<select class="short" name="where"> 
-					<option value="0" selected="selected">portal</option> 
-					<option value="1">google</option> 
-					<option value="2">yahoo</option> 
-				</select> 
 				<input id="search-button" type="image" src="/images/wenona/search-button.gif" value="Search" />
        </fieldset>
 		</form>  
@@ -111,7 +109,7 @@
                   <form action="" method="post" enctype="multipart/form-data" name="form" id="form" class="standardForm">
                     <table>
                       <tr> 
-                        <td><h2>Campus</h2><em>Select the campus' which will be able to view these events</em></td>
+                        <td><h4>Campus</h4><em>Select the campus' which will be able to view these events</em></td>
                         <td>
 						<!-- BEGIN campus_check_list -->
 							<label><input type="checkbox" name="campus[]" value="{CAMPUSID}" />{CAMPUSNAME}</label><br />
@@ -120,7 +118,7 @@
 						</td>
                       </tr>
                       <tr> 
-                        <td><h2>Group</h2><em>Select the Groups which will be able to view these events</em></td>
+                        <td><h4>Group</h4><em>Select the Groups which will be able to view these events</em></td>
                         <td>
 						<!-- BEGIN user_group_check_list -->
 							<label><input type="checkbox" name="userGroup[]" value="{USERGROUPID}" />{USERGROUPNAME}</label><br />
@@ -128,12 +126,12 @@
 						</td>
                         </tr>
                       <tr>
-                      	<td><h2>Portal ID of Owner</h2><em>The field is optional.  If left the current users ID will be used</em></td>
+                      	<td><h4>Portal ID of Owner</h4><em>The field is optional.  If left the current users ID will be used</em></td>
                       	<td>
                           <input name="userid" type="text" id="userid" size="6" maxlength="6" /></td>
                       	</tr>
                       <tr>
-                      	<td><h2>File</h2>
+                      	<td><h4>File</h4>
 						<em>The File that contains the Calendar Infomation must be a Comma Seperated Text File, containing the following:<br />
                           Date, Start Time, Finish Time, Comment,Priority ie. (2004-12-21,15:30,18:30,This is a Calendar Note,4)</em></td>
                       	<td><input type="file" name="file" /></td>

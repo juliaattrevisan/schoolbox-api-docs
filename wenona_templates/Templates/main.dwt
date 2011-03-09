@@ -7,8 +7,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="James Leckie, Lektec Consulting"/> 
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/core-demo.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/wenona/screen.css" />
 
 <!-- BEGIN header_css -->
@@ -22,6 +22,9 @@
 	
 	$j(function() {
     $j('#nav ul').droppy({speed: 0});
+	
+	$j('#nav li.parent > a span').each(function(){$j(this).append('<strong>&rsaquo;</strong>');})
+	
   });
 </script>
 <!-- BEGIN header_javascript -->
@@ -74,11 +77,6 @@
     <form id="search" action="/search.php" method="get"> 
     	<fieldset>
 				<input id="search-field" type="text" name="keyword" /> 
-				<select class="short" name="where"> 
-					<option value="0" selected="selected">portal</option> 
-					<option value="1">google</option> 
-					<option value="2">yahoo</option> 
-				</select> 
 				<input id="search-button" type="image" src="/images/wenona/search-button.gif" value="Search" />
        </fieldset>
 		</form>  

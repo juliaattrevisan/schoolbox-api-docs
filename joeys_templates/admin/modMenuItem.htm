@@ -7,11 +7,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="James Leckie, Lektec Consulting"/> 
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
-<link rel="stylesheet" type="text/css" media="print" href="/css/core/print.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/stjo/droppy.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/stjo/screen.css" />
-<link rel="Shortcut Icon" href="/images/stjo/favicon.ico" type="image/x-icon" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/core-demo.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/demo/print.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/joeys/screen.css" />
+<link rel="Shortcut Icon" href="/images/mggs/favicon.ico" type="image/x-icon" />
 
 <script type="text/javascript" src="/javascript/jquery.js"></script>
 <script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
@@ -53,22 +53,19 @@ function verify()
 <div id="wrap">
 	<div id="wrap-inner">
     <div id="header">
-        <div id="logo"></div>
+       <a title="" href="/" class="logo"></a>
         <ul id="infoPanel">
           <li class="first"><a href="/logout.php" title="">Logout</a></li>
         </ul>
         <form id="search" action="/search.php" method="get">
           <fieldset>
             <input id="search-field" type="text" name="keyword" />
-            <input id="search-button" type="image" src="/images/stjo/search-button.gif" value="Search" />
+            <input id="search-button" type="image" src="/images/mggs/search-button.gif" value="Search" />
           </fieldset>
         </form>  
         <ul id="tabs">
-          <!-- BEGIN portfolio_tab -->
-          <li class="{TAB_PORTFOLIO_ON}"><a href="/cms/portfolio" title="Access your portfolio area"><span>My Portfolio</span><span class="end"></span></a></li>
-          <!-- END portfolio_tab -->
           <!-- BEGIN duework_tab -->
-          <li class="{TAB_SUBMISSION_ON}"><a href="/submission/dueWork" title="Access your due work"><span>My Work</span><span class="end"></span></a></li>
+          <li class="{TAB_DUEWORK_ON}"><a href="/submission/dueWork" title="Access your due work"><span>My Work</span><span class="end"></span></a></li>
           <!-- END duework_tab -->
           <!-- BEGIN submission_tab -->
           <li class="{TAB_SUBMISSION_ON}"><a href="/submission/listSubmission" title="Access your submission boxes"><span>Submissions</span><span class="end"></span></a></li>
@@ -84,9 +81,6 @@ function verify()
           <li class="{TAB_NEWS_ON}"><a href="/news/" title="Current school news"><span>News</span><span class="end"></span></a></li>
           <li class="{TAB_MAIN_ON}"><a href="/home/" title="Greeting page"><span>Main</span><span class="end"></span></a></li>
         </ul>
-
-        <!-- BEGIN myfiles_tab -->
-        <!-- END myfiles_tab -->	
      </div>
     <script type="text/javascript">
 			$j(function(){
@@ -94,7 +88,7 @@ function verify()
 			});
 		</script>
 		<div id="nav">
-			<h3>St. Joey's Intranet</h3>
+			<h3>MGGS Intranet</h3>
 			{MCSSMENU}
 			<!-- BEGIN msubject -->
 			<h3>My Subjects</h3>
@@ -137,19 +131,19 @@ function verify()
             <form action="" method="post" name="form" id="form" class="standardForm" onsubmit="return(verify());">
                     <table>
                       <tr> 
-                        <td class="formLabelWidth"><h2>Parent</h2>
+                        <td class="formLabelWidth"><h4>Parent</h4>
 						<em>Select where in the menu you would like this item located.</em> 
                         </td>
                         <td>{MENUITEMLIST}</td>
                         </tr>
                       <tr> 
-                        <td><h2>Name</h2>
+                        <td><h4>Name</h4>
                           <em>This is the text that will be displayed on the menu</em></td>
                         <td><input type="text" name="text" maxlength="250" size="40" value="{TEXT}" /> 
                         </td>
                         </tr>
                       <tr> 
-                        <td><h2>URL</h2>
+                        <td><h4>URL</h4>
                           <em>The location at which the item should point. If 
                           it is local url remember to use a reference relative 
                           to the root.</em></td>
@@ -157,12 +151,12 @@ function verify()
                         </td>
                         </tr>
                       <tr> 
-                        <td><h2>Target</h2>
+                        <td><h4>Target</h4>
                	          <em>Select wether you would like this link to open in a new window</em></td>
                         <td>{TARGETLIST}</td>
                         </tr>
                       <tr> 
-                        <td><h2>Campus Access</h2>
+                        <td><h4>Campus Access</h4>
                                 <em>Select the campuses that should be able to view 
                           this link. Note that this link will only be viewable 
                           by people in both the campuses and groups selected</em> 
@@ -170,7 +164,7 @@ function verify()
                         <td>{CAMPUSLIST}</td>
                         </tr>
                       <tr> 
-                        <td> <h2>Group Access</h2></td>
+                        <td> <h4>Group Access</h4></td>
                         <td> {GROUPLIST}</td>
                         </tr>
                       <tr> 

@@ -243,7 +243,7 @@ th { font-weight:bold; }
 #header {
 	height: 136px;
 	position:relative;
-	min-width:765px;
+	min-width:985px;
 }
 
 #header .logo {
@@ -2736,14 +2736,14 @@ a.layout:hover img { background: #999; }
 	color:#0066b0;
 }
 
-#tabs-sub .ui-tabs-nav {
+#tabs-homepage #tabs-sub .ui-tabs-nav {
 	float:left;
 	width:128px;
 }
 
-#tabs-sub .components { float:left; }
+#tabs-homepage #tabs-sub .components { float:left; }
 
-#tabs-sub .ui-tabs-nav li a {
+#tabs-homepage #tabs-sub .ui-tabs-nav li a {
 	margin:0;
 	font-weight:normal;
 	padding:8px 0px 8px 16px;
@@ -2758,7 +2758,7 @@ a.layout:hover img { background: #999; }
 	display:block;
 }
 
-#tabs-sub li.ui-state-default a {
+#tabs-homepage #tabs-sub li.ui-state-default a {
 	background: none;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
@@ -2771,9 +2771,9 @@ a.layout:hover img { background: #999; }
 	height:auto;
 }
 
-#tabs-sub .ui-tabs-nav li a:hover { background:#ffffff; }
+#tabs-homepage #tabs-sub .ui-tabs-nav li a:hover { background:#ffffff; }
 
-#tabs-sub li.ui-tabs-selected a { background:#e9e3d6; }
+#tabs-homepage #tabs-sub li.ui-tabs-selected a { background:#e9e3d6; }
 
 /*CUSTOMISE COMPONENT*/
 .customise-components {

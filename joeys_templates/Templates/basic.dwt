@@ -11,7 +11,7 @@
 <meta name="author" content="James Leckie, Lektec Consulting"/> 
 <link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/stjo/screen.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/shore/screen.css" />
 
 
 <script type="text/javascript" src="/javascript/jquery.js"></script>
@@ -41,7 +41,7 @@
     <form id="search" action="" method="post">
       <fieldset>
         <input id="search-field" type="text" />
-        <input id="search-button" type="image" src="/images/stjo/search-button.gif" value="Search" />
+        <input id="search-button" type="image" src="/images/shore/search-button.gif" value="Search" />
       </fieldset>
     </form>  
     <ul id="tabs">
@@ -69,7 +69,7 @@
 </div>
 <div id="footer">
 	<ul>
-  	<li>{YEAR} &copy; Copyright stjo</li>
+  	<li>{YEAR} &copy; Copyright Shore</li>
     <li><a href="#">Guidelines of Use and Privacy Policy</a></li>
     <li class="last"><a href="http://www.alaress.com.au">Developed By Alaress</a></li>
   </ul>

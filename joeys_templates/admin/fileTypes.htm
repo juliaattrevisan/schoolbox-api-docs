@@ -7,11 +7,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="James Leckie, Lektec Consulting"/> 
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
-<link rel="stylesheet" type="text/css" media="print" href="/css/core/print.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/stjo/droppy.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/stjo/screen.css" />
-<link rel="Shortcut Icon" href="/images/stjo/favicon.ico" type="image/x-icon" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/core-demo.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/demo/print.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/joeys/screen.css" />
+<link rel="Shortcut Icon" href="/images/mggs/favicon.ico" type="image/x-icon" />
 
 <script type="text/javascript" src="/javascript/jquery.js"></script>
 <script type="text/javascript" src="/javascript/jquery.droppy.js"></script>
@@ -32,22 +32,19 @@
 <div id="wrap">
 	<div id="wrap-inner">
     <div id="header">
-        <div id="logo"></div>
+       <a title="" href="/" class="logo"></a>
         <ul id="infoPanel">
           <li class="first"><a href="/logout.php" title="">Logout</a></li>
         </ul>
         <form id="search" action="/search.php" method="get">
           <fieldset>
             <input id="search-field" type="text" name="keyword" />
-            <input id="search-button" type="image" src="/images/stjo/search-button.gif" value="Search" />
+            <input id="search-button" type="image" src="/images/mggs/search-button.gif" value="Search" />
           </fieldset>
         </form>  
         <ul id="tabs">
-          <!-- BEGIN portfolio_tab -->
-          <li class="{TAB_PORTFOLIO_ON}"><a href="/cms/portfolio" title="Access your portfolio area"><span>My Portfolio</span><span class="end"></span></a></li>
-          <!-- END portfolio_tab -->
           <!-- BEGIN duework_tab -->
-          <li class="{TAB_SUBMISSION_ON}"><a href="/submission/dueWork" title="Access your due work"><span>My Work</span><span class="end"></span></a></li>
+          <li class="{TAB_DUEWORK_ON}"><a href="/submission/dueWork" title="Access your due work"><span>My Work</span><span class="end"></span></a></li>
           <!-- END duework_tab -->
           <!-- BEGIN submission_tab -->
           <li class="{TAB_SUBMISSION_ON}"><a href="/submission/listSubmission" title="Access your submission boxes"><span>Submissions</span><span class="end"></span></a></li>
@@ -63,9 +60,6 @@
           <li class="{TAB_NEWS_ON}"><a href="/news/" title="Current school news"><span>News</span><span class="end"></span></a></li>
           <li class="{TAB_MAIN_ON}"><a href="/home/" title="Greeting page"><span>Main</span><span class="end"></span></a></li>
         </ul>
-
-        <!-- BEGIN myfiles_tab -->
-        <!-- END myfiles_tab -->	
      </div>
     <script type="text/javascript">
 			$j(function(){
@@ -73,7 +67,7 @@
 			});
 		</script>
 		<div id="nav">
-			<h3>St. Joey's Intranet</h3>
+			<h3>MGGS Intranet</h3>
 			{MCSSMENU}
 			<!-- BEGIN msubject -->
 			<h3>My Subjects</h3>

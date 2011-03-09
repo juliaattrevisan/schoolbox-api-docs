@@ -7,8 +7,8 @@ $j(function() {
 		var position = $j(this).offset();
 		$j('.cal-bubble').show();
 		var annoyingHeight = ($j('.cal-bubble .middle').height() + ($j('.cal-bubble .top').height()) + ($j('.cal-bubble .bottom').height())) 			
-		$j('.cal-bubble').css("left", (position.left - 250));
-		$j('.cal-bubble').css("top", (position.top - annoyingHeight));	
+		$j('.cal-bubble').css("left", (position.left - 450));
+		$j('.cal-bubble').css("top", (position.top - annoyingHeight - 120));	
 		
 		if (($j('.cal-bubble').css("left")) < '0px') {
 				$j('.cal-bubble').css("left", '0');

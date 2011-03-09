@@ -7,8 +7,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="James Leckie, Lektec Consulting"/> 
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/droppy.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/core-demo.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/demo/droppy.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/wenona/screen.css" />
 
 <!-- BEGIN header_css -->
@@ -22,6 +22,9 @@
 	
 	$j(function() {
     $j('#nav ul').droppy({speed: 0});
+	
+	$j('#nav li.parent > a span').each(function(){$j(this).append('<strong>&rsaquo;</strong>');})
+	
   });
 </script>
 <!-- BEGIN header_javascript -->
@@ -76,11 +79,6 @@
     <form id="search" action="/search.php" method="get"> 
     	<fieldset>
 				<input id="search-field" type="text" name="keyword" /> 
-				<select class="short" name="where"> 
-					<option value="0" selected="selected">portal</option> 
-					<option value="1">google</option> 
-					<option value="2">yahoo</option> 
-				</select> 
 				<input id="search-button" type="image" src="/images/wenona/search-button.gif" value="Search" />
        </fieldset>
 		</form>  
@@ -113,24 +111,24 @@
 		 <form action="" method="post" name="form" id="form" class="standardForm" onsubmit="return(verify());">
  <table>
           <tr>
-            <td><h2>Description</h2>
+            <td><h4>Description</h4>
               <em>A short description to describe the file type. </em></td>
             <td><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" />
             </td>
           </tr>
           <tr>
-            <td><h2>Mime</h2>
+            <td><h4>Mime</h4>
               <em>This is the mime string that identifies the file.  It can be found on the error message when uploading a file.  It should look something like image/gif</em></td>
             <td><input type="text" name="mime" size="40" maxlength="250" value="{MIME}" />
             </td>
           </tr>
           <tr>
-            <td><h2>Icon</h2>
+            <td><h4>Icon</h4>
               <em>Select the icon you wish to represent this file type when browsing</em></td>
             <td>{ICONLIST}</td>
           </tr>
           <tr>
-            <td><h2>Inline</h2>
+            <td><h4>Inline</h4>
               <em>Enabling this option will cause this file type to be opened in the users browser rather that in a seperate application if appropriate.</em> </td>
             <td><input type="radio" name="inline" value="true" {INLINE_TRUE}/>
             Inline
@@ -139,7 +137,7 @@
 			External</td>
           </tr>
           <tr>
-            <td><h2>Active</h2>
+            <td><h4>Active</h4>
               <em>Set wether this definition is active.  If disabled users will not be able to upload files of this type</em> </td>
             <td><input type="radio" name="enable" value="true" {ENABLE_TRUE}/>
 Active <br />
@@ -147,7 +145,7 @@ Active <br />
 Disabled</td>
           </tr>
           <tr>
-            <td><h2>Extensions</h2>
+            <td><h4>Extensions</h4>
 			<em>A comma seperated list of possible extensions.  This is everything after the '.' in the filename. Example 'htm,html'. </em>
 			</td>
             <td><input type="text" name="extensions" maxlength="250" size="40" value="{EXTENSIONS}" /></td>
