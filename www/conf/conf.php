@@ -10,12 +10,12 @@
 //Site Directives
 define("HEADING", 'Schoolbox');			//This will appear on the window title of each page
 define("SITE_name", "Alaress Pty Ltd");
-define("SITE_location", "cathedral");
-define('SITE_hostname', 'joeys');
+define("SITE_location", "demo");
+define('SITE_hostname', 'demo');
 define('SITE_domain', 'portal.alaress-dev.com.au');
 
 //define("SITE_location", "shore");				//This defines the location, allows specific code for each location
-define("SITE_detect", "domain");				//Which option to detect site, can be domain or campus
+define("SITE_detect", "campus");				//Which option to detect site, can be domain or campus
 define("SITE_root", dirname(__FILE__)."/../..");
 define('SITE_address', 'http://www.alaress.com.au');
 
