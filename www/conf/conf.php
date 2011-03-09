@@ -63,7 +63,7 @@ define("RETURNS_directory", 		SITE_root.'/data/returns');		//Returned work files
 define('DROPBOX_directory', 		SITE_root.'/data/dropbox');			//Student dropbox files
 define('ZIP_directory',				SITE_root.'/data/zip');			//Cache for zip files
 define("THUMBNAIL_IMAGE_CACHE", 	SITE_root.'/data/thumbnails');	//Thumbnail cache
-define('CACHE_xml',					SITE_root . '/cache/xml');
+define('CACHE_xml',					SITE_root . '/data/cache/xml');
 define("THUMBNAIL_size", 		100); 
 define("FILE_max_upload", 		"10");						//Maximum number of files that can be uploaded via bulk uploader
 define("MAX_FILE_SIZE", 		10485760); 					//Maximum filesize in bytes allowed to be uploaded (default 10MB) (also set in php.ini)
