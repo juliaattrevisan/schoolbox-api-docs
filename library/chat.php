@@ -75,6 +75,12 @@ class Chat extends Model {
         return $messages;
     }
 
+    function clear ($category_id) {
+        $query = "DELETE FROM chat WHERE category_id = $category_id";
+
+        return $this->db->query($query);
+    }
+
     function poll ($category_id, $user_id = null) {
         if (is_numeric($user_id)) {
             $query = "INSERT INTO chat_poll (user_id, category_id, time)
@@ -103,7 +109,7 @@ class Chat extends Model {
                 $users['inactive'][$user['user_id']] = $user;
             }
 
-            if ($this->group->getPermission($this->_config['category_id'], $user['id']) >= WRITE_ACCESS) {
+            if ($this->group->getPermission($this->_config['category_id'], $user['user_id']) >= WRITE_ACCESS) {
                 $users['admin'][$user['user_id']] = $user;
             }
         }

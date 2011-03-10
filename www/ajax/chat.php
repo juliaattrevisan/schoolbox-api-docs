@@ -29,11 +29,26 @@ $data_recv = array(
     'messages' => $chat->receive($category_id, $data_send['config']['last_time']) // must be last
 );
 
+// clear all?
+if ($data_recv['config']['clear']) {
+    $chat->clear($category_id);
+
+    unset($data_recv['config']['clear']);
+}
+
+// clear inactive users
 if (!empty($data_recv['users']['inactive'])) {
     $chat->users_remove($data_recv['users']['inactive']);
 
     foreach ($data_recv['users']['inactive'] as $user) {
         $chat->system_send($user['category_id'], 'disconnect', formatName($user) . ' disconnected.', $user['time']);
+    }
+}
+
+// santize messages
+if (!empty($data_recv['messages'])) {
+    foreach ($data_recv['messages'] as $i => $message) {
+        $data_recv['messages'][$i]['body'] = scrubTEXT($message['body']);
     }
 }
 
@@ -57,7 +72,7 @@ $component_config = $homepage->getComponentConfig($component_id);
 $permission = $group->getPermission($category_id, $_SESSION['id']);
 
 if (empty($data_recv['users']['admin'])) {
-    $component_config['state'] = 'off';
+    $component_config['state'] = 'Inactive';
 }
 
 if ($permission >= WRITE_ACCESS) {

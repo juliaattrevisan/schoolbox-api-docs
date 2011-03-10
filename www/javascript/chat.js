@@ -15,7 +15,7 @@ Chat.prototype = {
 
         this.interval_ref = setInterval(function () {
             self.update();
-        }, 5000);
+        }, 1000);
     },
 
     update: function () {
@@ -40,8 +40,14 @@ Chat.prototype = {
         this.config = data.config;
         this.users = data.users;
 
-        this.render_users(data.users);
-        this.render_messages(data.messages);
+        this.render_config(data.config);
+
+        if (this.config.state == 'Active' || this.is_admin()) {
+            this.render_users(data.users);
+            this.render_messages(data.messages);
+        } else {
+            this.render_inactive(data.messages);
+        }
     },
 
     send: function () {
@@ -80,6 +86,10 @@ Chat.prototype = {
         this.render_users(self.users);
     },
 
+    clear: function () {
+        this.config.clear = true;
+    },
+
     render_messages: function (messages) {
         var self = this;
 
@@ -93,12 +103,10 @@ Chat.prototype = {
 
             message_el = $j('<li></li>').addClass('chat-message-' + message.type);
 
-            if (message.user_id == self.config.user_id) {
-                message_el.addClass('chat-message-user-me');
-            }
-
             if (self.users.admin[message.user_id] != undefined) {
                 message_el.addClass('chat-message-user-admin');
+            } else if (message.user_id == self.config.user_id) {
+                message_el.addClass('chat-message-user-me');
             }
 
             if (message.type == 'user') {
@@ -117,17 +125,25 @@ Chat.prototype = {
         chat_users_el = $j('#component'+this.config.component_id+' ul.chat-users');
         chat_users_el.empty();
 
+        var x = 0;
+
         for (var i in users.active) {
             user = users.active[i];
 			
             //every two add in the dark class chimchim
-            if (i%2 == 0) {
+            if (x%2 == 0) {
                 user_el = $j('<li></li>')
             } else {
                 user_el = $j('<li class="dark"></li>')
             }
 
-           user_el.text(formatName(user))
+            if (self.users.admin[user.user_id] != undefined) {
+                user_el.addClass('chat-user-admin');
+            } else if (user.user_id == self.config.user_id) {
+                user_el.addClass('chat-user-me');
+            }
+
+            user_el.text(formatName(user))
             .data('user_id', user.user_id);
 
             // mute logic
@@ -139,7 +155,7 @@ Chat.prototype = {
                 user_el.addClass('chat-user-muted');
             }
 
-            if (this.is_admin()) {
+            if (this.is_admin() && user.user_id != self.config.user_id) {
                 if (this.config.muted_users[user.user_id] != 'true') {
                     user_mute_el = $j('<a href="#">mute</a>');
                 } else {
@@ -154,6 +170,22 @@ Chat.prototype = {
             }
 
             chat_users_el.append(user_el);
+
+            x++;
+        }
+    },
+
+    render_config: function (config) {
+        if (config.state == 'Active') {
+            $j('.light').css('background-position', "bottom");
+        } else {
+            this.render_users({});
+            
+            $j('.light').css('background-position', "top");
+
+            if(!this.is_admin()) {
+                $j('textarea.chat-message-box').attr('disabled', 'true');
+            }
         }
     },
 

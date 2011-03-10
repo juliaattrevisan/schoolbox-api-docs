@@ -43,12 +43,6 @@ $j(function () {
         }
     });
 
-    var chatStatus = $j('#chat-status').val();
-    if (chatStatus == "Active") {
-        $j('.light').css('background-position', "bottom");
-
-    }
-
     $j('.show-users').click(function(event) {
         event.preventDefault();
         $j('.chat-users').slideToggle();
