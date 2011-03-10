@@ -375,6 +375,7 @@ $j(function() {
     });
 
     $j('#saveColour').click(function () {
+
        $j.post('/homepage/configForm.php', {colors: pickers, cid: cid});
     });
 	
@@ -424,6 +425,11 @@ $j(function() {
 		$j('.right .box a:hover, .right .listing p.small a:hover').css('color', defaults['right_hover']);
 		$j('.right .text').css('background',defaults['right_bg_primary']);
 		$j('.right .text.listing .dark ').css('background',defaults['right_bg_secondary']);
+		
+		console.log(pickers);
+		console.log(defaults);
+		
+	 pickers = defaults;
 	});
 	
 	$j('#cancel').click(function() {
