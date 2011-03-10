@@ -27,9 +27,15 @@ if (!$groupHandler->isSuperuser()) {
 	}
 }
 
+/* Proceed regardless of whether the section has been previously erased or not
+ *
+
 if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
+
+ *
+ */
 
 $assess = $assessHandler->getByID($this->arg[0]);
 $sectionList = $sectionHandler->getList($this->arg[0]);
