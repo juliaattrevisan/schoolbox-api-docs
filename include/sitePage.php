@@ -288,6 +288,7 @@ class SitePage extends Page {
                 $this->site == 'ormond' ||
                 $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] ==  7 || $_SESSION['gid'] == '8' )  ||
                 $this->site == 'joeys' ||
+				$this->site == 'jpc' ||
                 $this->site == 'mggs' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent() )||
                 $this->site == 'bialik' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent() )
                 )
@@ -339,6 +340,9 @@ class SitePage extends Page {
             }
             else if($this->site == 'bialik') {
                 $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.bialik.vic.edu.au/exchange" rel="external"');
+            }
+			else if($this->site == 'jpc') {
+                $this->setVar('WEBMAIL_LOCATION', 'href="http://jpcmail.jpcvictoria.catholic.edu.au/owa"');
             }
 
 			$this->parse('wm_tab','webmail_tab');
