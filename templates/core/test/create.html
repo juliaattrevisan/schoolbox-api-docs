@@ -1,15 +1,22 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
 <script type="text/javascript" src="/javascript/mootools/mootools-1.2.3-core-nc.js"></script>
-<script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
-<script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
-<script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
 window.addEvent('domready', function() {
 	// setup calendars
-	Calendar.setup({inputField: "date_start", ifFormat: "%d/%m/%Y", button: "date_start_trigger"});
-	Calendar.setup({inputField: "date_finish", ifFormat: "%d/%m/%Y", button: "date_finish_trigger"});
-	
+		$j('#date_start').datepicker({ 
+			dateFormat: 'dd/mm/yy',
+			showOn: 'button',
+			buttonImage: '/images/demo/calendar/calendar-click.png',
+			buttonImageOnly: true
+		});
+		$j('#date_finish').datepicker({ 
+			dateFormat: 'dd/mm/yy',
+			showOn: 'button',
+			buttonImage: '/images/demo/calendar/calendar-click.png',
+			buttonImageOnly: true
+		});
 	// question controls
 	var count = {COUNT};
 	var request = new Request.HTML({url: '/test/create', onComplete: function(response) {
@@ -35,36 +42,31 @@ window.addEvent('domready', function() {
 
 <h1>{ACTION}</h1>
 <form method="post">
-<div class="standardForm">
-<table>
+<table class="standardForm">
 	<tr>
-		<td class="formLabelWidth"><h3>Title</h3></td>
+		<td class="formLabelWidth"><h4>Title</h4></td>
 		<td><input type="text" name="title" size="30" maxlength="30" value="{TEST_TITLE}"></td>
 	</tr>
 	<tr>
-		<td><h3>Location</h3><em>The people associated with this group or subject will be able to take the test.</em></td>
-		<td>
-			<select name="category_id">
+		<td><h4>Location</h4><em>The people associated with this group or subject will be able to take the test.</em></td>
+		<td><select name="category_id">
 				<!-- BEGIN category -->
 				<option value="{CATEGORY_ID}" {CATEGORY_ID_SELECTED}>{CATEGORY_NAME}</option>
 				<!-- END category -->
-			</select>
-		</td>
+			</select></td>
 	</tr>
 	<tr> 
-		<td><h3>Dates</h3><em>The dates in which the test will be available to be taken.</em></td>
-		<td>
-			<input type="text" size="10" maxlength="10" id="date_start" name="date[start]" value="{DATE_START}">
-			<img src="/images/ico_calendar.gif" width="16" height="13" id="date_start_trigger" style="cursor: pointer;" />
+		<td><h4>Dates</h4><em>The dates in which the test will be available to be taken.</em>
+		</td>
+		<td><input type="text" size="10" maxlength="10" id="date_start" name="date[start]" value="{DATE_START}">
+			
 			 to 
-			<input type="text" size="10" maxlength="10" id="date_finish" name="date[finish]" value="{DATE_FINISH}">
-			<img src="/images/ico_calendar.gif" width="16" height="13" id="date_finish_trigger" style="cursor: pointer;" />
-		</td>
+			<input type="text" size="10" maxlength="10" id="date_finish" name="date[finish]" value="{DATE_FINISH}"></td>
 	</tr>
 	<tr> 
-		<td><h3>Duration</h3><em>Time alloted for the test to completed.</em></td>
-		<td>
-			<select name="duration[hours]">
+		<td><h4>Duration</h4><em>Time allotted for the test to completed.</em>
+		</td>
+		<td><select name="duration[hours]">
 				<!-- BEGIN duration_hours -->
 				<option value="{HOUR}" {HOUR_SELECTED}>{HOUR} hours</option>
 				<!-- END duration_hours -->
@@ -73,15 +75,13 @@ window.addEvent('domready', function() {
 				<!-- BEGIN duration_minutes -->
 				<option value="{MINUTE}" {MINUTE_SELECTED}>{MINUTE} minutes</option>
 				<!-- END duration_minutes -->
-			</select>
-		</td>
+			</select></td>
 	</tr>
 	<tr> 
-		<td><h3>Description</h3><em>Any additional information which describes the test</em></td>
+		<td><h4>Description</h4><em>Any additional information which describes the test</em></td>
 		<td><textarea name="description" cols="50">{DESCRIPTION}</textarea></td>
 	</tr>
 </table>
-</div>
 
 <div class="standardForm">
 	<div class="questions">

@@ -28,30 +28,27 @@ function verify(){
 <!-- END custom_head -->
 
 <h1>{ACTION} Folder</h1>
-<form action="/cms/myFolderForm.php" method="post" class="standardForm" id="folderForm" onSubmit="return(verify());">
+<form action="/cms/myFolderForm.php" method="post"  id="folderForm" onSubmit="return(verify());">
 <input type="hidden" name="parent" id="parent" value="{PARENT_ID}" />
-  <table>
+  <table class="standardForm">
     <tr>
-      <td class="formLabelWidth"><h2>Folder Name</h2></td>
-      <td><input type="text" name="name" maxlength="250" size="40" value="{NAME}" />
-      </td>
+      <td class="formLabelWidth"><h4>Folder Name</h4></td>
+	  <td><input type="text" name="name" maxlength="250" size="40" value="{NAME}" /></td>
     </tr>
     <!-- BEGIN location -->
     <tr>
-      <td><h2>Folder Parent</h2>
-        <em>Location at which this folder should be placed</em></td>
-      <td><select name="parent">
+      <td><h4>Folder Parent</h4>
+        <em>Location at which this folder should be placed</em>
+		</td>
+		<td><select name="parent">
           <!-- BEGIN parent_list -->
           <option value="{PARENT_ID}" {PARENT_SELECTED}>{PARENT_INDENT}&gt; {PARENT_NAME}</option>
           <!-- END parent_list -->
         </select></td>
     </tr>
     <!-- END location --> 
-    <tr>
-      <td>&nbsp;</td>
-      <td> <input type="hidden" name="folderID" value="{FOLDER_ID}" /> 
-        <input type="submit" label="Submit" name="submit" value="{ACTION} Folder" class="btn"/>
-      </td>
-    </tr>
   </table>
+  <input type="hidden" name="folderID" value="{FOLDER_ID}" /> 
+  <input type="submit" label="Submit" name="submit" value="{ACTION} Folder" class="submit-btn-plain"/>
+  <div class="float-fix"></div>
 </form>

@@ -1,70 +1,77 @@
-    <!-- BEGIN custom_head -->
-    <link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
-    <script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
-    <script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
-    <script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+<script type="text/javascript">
+	
+		$j('#cal_date').datepicker({ 
+			dateFormat: 'dd/mm/yy',
+			showOn: 'both',
+			buttonImage: '/images/demo/calendar/calendar-click.png',
+			buttonImageOnly: true
+		});
 
-    <!-- END custom_head -->
-
+</script>
+<!-- END custom_head -->
 
 <h1>{ACTION} Poll</h1>
-
 <form class="standardForm" action="/poll/modifyForm.php" method="post">
-<table>
-    <tr>
-        <td class="formLabelWidth"><h3>Title</h3></td>
-		<td><input type="text" name="title" value="{POLL_TITLE}" size="50" /></td>
-    </tr>
-    <tr>
-        <td><h3>Question</h3>
-        	<em>What is the poll for</em></td>
-		<td><input type="text" name="question" value="{QUESTION}" size="50" /></td>
-    </tr>
-    <tr>
-        <td><h3>Options</h3>
-        <em>You can have a maximum of 
-        ten options<br /> to vote on. You must fill in at least two.</em></td>
-		<td><input type="text" name="option_0" value="{OPTION_0}" /><br />
-        	<input type="text" name="option_1" value="{OPTION_1}" /><br />
-            <input type="text" name="option_2" value="{OPTION_2}" /><br />
-            <input type="text" name="option_3" value="{OPTION_3}" /><br />
-            <input type="text" name="option_4" value="{OPTION_4}" /><br />
-            <input type="text" name="option_5" value="{OPTION_5}" /><br />
-            <input type="text" name="option_6" value="{OPTION_6}" /><br />
-            <input type="text" name="option_7" value="{OPTION_7}" /><br />
-            <input type="text" name="option_8" value="{OPTION_8}" /><br />
-            <input type="text" name="option_9" value="{OPTION_9}" /><br /></td>
-    </tr>    
-    <tr>
-        <td><h3>Close Date</h3>
-        <em>No votes can be cast after this date.</em></td>
-		<td><input name="close" id="cal_date" type="text" size="15" maxlength="10" value="{CLOSE}"/>
-						<img src="/images/ico_calendar.gif" width="16" height="13" id="cal_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
-	 				 	<script type="text/javascript">
-						Calendar.setup({
-							inputField     :    "cal_date",     // id of the input field
-							ifFormat       :    "%d/%m/%Y",      // format of the input field
-							button         :    "cal_trigger",  // trigger for the calendar (button ID)
-							align          :    "br",           // alignment (defaults to "Bl")
-							singleClick    :    true
-						});
-						</script></td>
-    </tr> 
-    <tr>
-      <td><h3>Voting Frequency</h3>
-      	  <em>Selected how often users can place a new vote.</em></td>
-      <td><select name="frequency">
-              <option value="once" {FREQUENCY_ONCE_SELECTED}>Once</option>
-              <option value="hourly" {FREQUENCY_HOURLY_SELECTED}>Hourly</option>
-              <option value="daily" {FREQUENCY_DAILY_SELECTED}>Daily</option>
-          </select></td>
-    </tr> 
-    <tr>
-	    <td></td>
-    	<td>
-        <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-        <input type="hidden" name="pollID" value="{POLL_ID}" />
-        <input type="submit" value="Save" /></td>
-    </tr>    
-</table>
+	<table>
+		<tr>
+			<td class="formLabelWidth"><h4>Title</h4>
+				</td>
+			<td><input type="text" name="title" value="{POLL_TITLE}" size="50" /></td>
+		</tr>
+		<tr>
+			<td><h4>Question</h4>
+				<em>What is the poll for</em>
+				</td>
+			<td><input type="text" name="question" value="{QUESTION}" size="50" /></td>
+		</tr>
+		<tr>
+			<td><h4>Options</h4>
+				<em>You can have a maximum of 
+				ten options<br />
+				to vote on. You must fill in at least two.</em>
+				</td>
+			<td><input type="text" name="option_0" value="{OPTION_0}" />
+				<br />
+				<input type="text" name="option_1" value="{OPTION_1}" />
+				<br />
+				<input type="text" name="option_2" value="{OPTION_2}" />
+				<br />
+				<input type="text" name="option_3" value="{OPTION_3}" />
+				<br />
+				<input type="text" name="option_4" value="{OPTION_4}" />
+				<br />
+				<input type="text" name="option_5" value="{OPTION_5}" />
+				<br />
+				<input type="text" name="option_6" value="{OPTION_6}" />
+				<br />
+				<input type="text" name="option_7" value="{OPTION_7}" />
+				<br />
+				<input type="text" name="option_8" value="{OPTION_8}" />
+				<br />
+				<input type="text" name="option_9" value="{OPTION_9}" />
+				<br /></td>
+		</tr>
+		<tr>
+			<td><h4>Close Date</h4>
+				<em>No votes can be cast after this date.</em>
+				</td>
+			<td><input name="close" id="cal_date" type="text" size="15" maxlength="10" value="{CLOSE}"/></td>
+		</tr>
+		<tr>
+			<td><h4>Voting Frequency</h4>
+				<em>Selected how often users can place a new vote.</em>
+				</td>
+				<td><select name="frequency">
+					<option value="once" {FREQUENCY_ONCE_SELECTED}>Once</option>
+					<option value="hourly" {FREQUENCY_HOURLY_SELECTED}>Hourly</option>
+					<option value="daily" {FREQUENCY_DAILY_SELECTED}>Daily</option>
+				</select><input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+				<input type="hidden" name="pollID" value="{POLL_ID}" /></td>
+		</tr>
+
+	</table>
+	<input type="submit" class="submit-btn-plain" value="Save" />
 </form>

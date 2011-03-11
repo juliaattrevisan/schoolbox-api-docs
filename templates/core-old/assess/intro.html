@@ -1,0 +1,49 @@
+<div id="assess">
+	<div class="assess-header">
+		<h2>{ASSESS_TITLE}</h2>
+		<div class="assess-body">
+			<div>
+				<p><strong>Introduction</strong><br />
+					{ASSESS_DESCRIPTION}
+				</p>
+				<p><strong>Created by</strong><br />
+					{ASSESS_AUTHOR}
+				</p>
+				<p>
+					<strong>Time allowed: </strong><br />
+					{ASSESS_DURATION}
+				</p>
+				<p>
+					<strong>Open Date: </strong><br />
+					{ASSESS_START}
+				</p>
+				<p>
+					<strong>Close Date: </strong><br />
+					{ASSESS_FINISH}
+				</p>
+			
+				<ul><li><strong>Sections:</strong></li>
+					<!-- BEGIN section -->
+					<li>Section {SECTION_SEQUENCE}: {SECTION_TITLE} ({SECTION_NUMQUESTIONS} questions)</li>
+					<!-- END section -->
+				</ul>
+			</div>
+
+            <!-- BEGIN startTest -->
+			<div class="float-left" style="margin:20px 0 0 0; width:127px;">
+				<a class="green-go float-left" href="/assess/attempt/{ASSESS_ASSESS_ID}/{FIRST_SECTION}">Begin test</a>
+			</div>
+            <!-- END startTest -->
+
+            <!-- BEGIN error -->
+            <div style="margin-top:20px;">
+                <p>
+                    {ERROR_STRING}
+                </p>
+            </div>
+            <!-- END error -->
+
+			<div class="float-fix"></div>
+		</div>
+	</div>
+</div>

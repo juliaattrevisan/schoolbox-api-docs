@@ -19,44 +19,39 @@ function verify()
 <!-- END custom_head -->
 
 <h1>{ACTION} File </h1>
-<form method="post" action="/cms/myFileForm.php" enctype="multipart/form-data" id="fileForm" class="standardForm" onSubmit="return(verify());">
+<form method="post" action="/cms/myFileForm.php" enctype="multipart/form-data" id="fileForm"  onSubmit="return(verify());">
 <input type="hidden" name="parent" value="{PARENT_ID}" />
-  <table>
+  <table class="standardForm">
     <!-- BEGIN browse_row -->
     <tr>
-      <td><h2>File</h2></td>
-      <td><input type="file" name="file" />
-        <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
-      </td>
+      <td><h4>File</h4>
+	  </td>
+	  <td><input type="file" name="file" />
+      <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" /></td>
     </tr>
     <!-- END browse_row -->
     <!-- BEGIN desc -->
     <tr>
-      <td class="formLabelWidth"><h2>Description</h2>
-        <em>One line description of the file for use as the title</em> </td>
-      <td ><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" />
-      </td>
+      <td class="formLabelWidth"><h4>Description</h4>
+        <em>One line description of the file for use as the title</em></td>
+		<td><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" /></td>
     </tr>
     <!-- END desc -->
     
     <!-- BEGIN location -->
     <tr>
-      <td><h2>Location</h2>
+      <td><h4>Location</h4>
         <em>Select an appropriate location within the system that reflects the use of the file</em></td>
-      <td><select name="parent">
+		<td><select name="parent">
           <!-- BEGIN folder_list -->
           <option value="{FOLDER_ID}" {FOLDER_SELECTED}>{FOLDER_INDENT}&gt; {FOLDER_NAME}</option>
           <!-- END folder_list -->
         </select></td>
     </tr>
     <!-- END location -->
-    
-    <tr>
-      <td>&nbsp;</td>
-      <td>
-      <input type="hidden" name="fileID" value="{FILE_ID}" />
-      <input type="submit" name="Submit" value="{ACTION} File" class="btn" />
-      </td>
-    </tr>
+
   </table>
+  <input type="hidden" name="fileID" value="{FILE_ID}" />
+  <input type="submit" name="Submit" value="{ACTION} File" class="submit-btn-plain" />
+  <div class="float-fix"></div>
 </form>

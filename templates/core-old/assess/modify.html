@@ -1,0 +1,207 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
+<script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
+<script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.json2.js"></script>
+<script type="text/javascript">
+$j(document).ready(function() {
+    Calendar.setup({
+        inputField:  "start_date",     // id of the input field
+        ifFormat:    "%d/%m/%Y",      // format of the input field
+        button:      "start_date_trigger",  // trigger for the calendar (button ID)
+        align:       "br",           // alignment (defaults to "Bl")
+        singleClick: true
+    });
+    Calendar.setup({
+        inputField:  "finish_date",     // id of the input field
+        ifFormat:    "%d/%m/%Y",      // format of the input field
+        button:      "finish_date_trigger",  // trigger for the calendar (button ID)
+        align:       "br",           // alignment (defaults to "Bl")
+        singleClick: true
+    });
+
+	$j('.show-duration').click(function() {
+		if ($j('.hide-it').is(':visible')) {
+			$j('.hide-it').hide();
+			$j('#minHours').val('0');
+			$j('#minDuration').val('00');
+		} else {
+			$j('.hide-it').show();
+			$j('#minDuration').val('15');
+		}
+	});
+	
+	if ($j('.show-duration').is(':checked')) {
+        $j('.hide-it').show();
+	}
+
+	var actionPlace = '{ACTION}';
+
+	$j('.standardForm').validate({
+		rules: {
+			title: {
+				required: true,
+				minlength: 2
+			},
+			description: {
+				required: true,
+				minlength: 2
+			}
+		},
+		messages: {
+			title: "Please enter a title",
+			description: "Please enter a description"
+		},
+		
+		errorElement: "div",
+        wrapper: "div",  // a wrapper around the error message
+        errorPlacement: function(error, element) {
+			offset = element.offset();
+            error.insertBefore(element)
+            error.addClass('message ' + element.attr("ID"));  // add a class to the wrapper
+            error.css('position', 'absolute');
+            error.css('left', offset.left);
+            error.css('top',  offset.top + element.outerHeight() + 5);
+		}
+    });
+});
+</script>
+<!-- END custom_head -->
+
+<div id="assess">
+<h1>Manage Assessment {ASSESS_TITLE}</h1>
+
+
+<div class="col-1">
+	<h2>Create and modify your assessment</h2>
+	<form name="create" action="/assess/{ACTION}/{ASSESS_ASSESS_ID}" class="standardForm standardGrey" method="post">
+		<input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
+		<table>
+			<tr>
+				<td class="formLabelWidth"><h3>Title</h3><h4>The name of the test</h4></td>
+				<td><input name="title" type="text" size="35" maxlength="50" value="{ASSESS_TITLE}"/></td>
+			</tr>
+			<tr>
+				<!-- Available from this time -->
+				<td><h3>Start</h3><h4>Test opens at this time</h4></td>
+				<td>
+					<select name="start[hour]">
+						<!-- BEGIN startHour -->
+						<option value="{START_HOUR_VALUE}" {START_HOUR_SELECTED}>{START_HOUR_VALUE}</option>
+						<!-- END startHour -->
+					</select>
+					<select name="start[minute]">
+						<!-- BEGIN startMinute -->
+						<option value="{START_MINUTE_VALUE}" {START_MINUTE_SELECTED}>{START_MINUTE_VALUE}</option>
+						<!-- END startMinute -->
+					</select>
+					<select name="start[meridiem]">
+						<!-- BEGIN startMeridiem -->
+						<option value="{START_MERIDIEM_VALUE}" {START_MERIDIEM_SELECTED}>{START_MERIDIEM_VALUE}</option>
+						<!-- END startMeridiem -->
+					</select>
+					<input name="start[date]" id="start_date" type="text" size="15" maxlength="10" value="{ASSESS_START_DATE}" />
+					<img src="/images/ico_calendar.gif" width="16" height="13" id="start_date_trigger" style="cursor: pointer;" title="Date Selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+				</td>
+			</tr>
+			<tr>
+				<!-- Available until this time -->
+				<td><h3>Finish</h3>
+				<h4>Test closes at this time</h4></td>
+				<td>
+					<select name="finish[hour]">
+						<!-- BEGIN finishHour -->
+						<option value="{FINISH_HOUR_VALUE}" {FINISH_HOUR_SELECTED}>{FINISH_HOUR_VALUE}</option>
+						<!-- END finishHour -->
+					</select>
+					<select name="finish[minute]" >
+						<!-- BEGIN finishMinute -->
+						<option value="{FINISH_MINUTE_VALUE}" {FINISH_MINUTE_SELECTED} class="required">{FINISH_MINUTE_VALUE}</option>
+						<!-- END finishMinute -->
+					</select>
+					<select name="finish[meridiem]">
+						<!-- BEGIN finishMeridiem -->
+						<option value="{FINISH_MERIDIEM_VALUE}" {FINISH_MERIDIEM_SELECTED}>{FINISH_MERIDIEM_VALUE}</option>
+						<!-- END finishMeridiem -->
+					</select>
+					<input name="finish[date]" id="finish_date" type="text" size="15" maxlength="10" value="{ASSESS_FINISH_DATE}" />
+					<img src="/images/ico_calendar.gif" width="16" height="13" id="finish_date_trigger" style="cursor: pointer;" title="Date Selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+				</td>
+			</tr>
+			<tr>
+				<td><h3>Duration</h3><h4>To set a test duration, tick the box and fill out a time.</h4></td>
+				<td>
+					<label class="float-left">
+						<input type="checkbox" class="float-left show-duration" {ASSESS_DURATION_CHECKED}/>
+					</label>
+					<fieldset class="hide-it float-left">
+						 <select name="duration[hour]" id="minHours" class="groupedSelect min-hours">
+							<!-- BEGIN durationHour -->
+							<option value="{DURATION_HOUR_VALUE}" {DURATION_HOUR_SELECTED}>{DURATION_HOUR_VALUE}</option>
+							<!-- END durationHour -->
+						</select>hr
+						<select name="duration[minute]" id="minDuration" class="groupedSelect min-minutes">
+							<!-- BEGIN durationMinute -->
+							<option value="{DURATION_MINUTE_VALUE}" {DURATION_MINUTE_SELECTED}>{DURATION_MINUTE_VALUE}</option>
+							<!-- END durationMinute -->
+						</select> min
+					</fieldset>
+					<div class="float-fix"></div>
+				</td>
+			</tr>
+            <!-- BEGIN importXML -->
+            <tr><td><h3>Import Questions</h3></td>
+                <td>
+<!-- <form action="/assess/import/3654" method="post" enctype="multipart/form-data"> -->
+
+    <input name="importXML" type="file" />
+<!-- </form> -->
+                </td>
+            </tr>
+            <!-- END importXML -->
+
+			<tr>
+				<td><h3>Description</h3></td>
+				<td><div class="textarea-container"><textarea name="description">{ASSESS_DESCRIPTION}</textarea></div></td>
+			</tr>
+			<tr>
+				<td><h3>Allow Re-sit</h3><h4>Allow students to take this test multiple times</h4></td>
+				<td><input name="allow_resit" type="checkbox" value="1" {ALLOW_RESIT_CHECKED}/></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td><div class="save-success">Successfully updated</div>
+				<input type="submit" value="Continue" class="next-step" /></td>
+			</tr>
+		</table>
+	</form>
+	<!-- BEGIN importXML -->
+	<h2>Import an assessment from an XML file</h2>
+	<form class="standardForm" action="/assess/import/{ASSESS_CATEGORY_ID}" method="post" enctype="multipart/form-data">
+	<table>
+		<tr>
+			<td>
+				
+					<input name="importXML" type="file" />
+					<input type="submit" value="Import from XML file" />
+				
+			</td>
+		</tr>
+	</table>
+</form>	
+	<!-- END importXML -->
+	
+	
+	
+	
+</div>
+
+<div class="col-2">
+<!-- BEGIN allQuestions -->
+
+<!-- END allQuestions -->
+</div>
+
+<div class="float-fix"></div>

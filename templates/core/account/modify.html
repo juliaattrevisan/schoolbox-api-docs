@@ -32,26 +32,30 @@ $j(document).ready(function () {
 <p>Your password was changed successfully</p>
 <!-- END success -->
 
-<form id="accountForm" class="standardForm" method="post" action="/account/modifyForm.php">
-  <table>
+<form id="accountForm"  method="post" action="/account/modifyForm.php">
+  <table class="standardForm">
     <tr>
-      <td><h3>Current Password</h3>
-        <em></em></td>
-      <td><input type="password" name="current_password" id="current_password" size="35" maxlength="50" /></td>
-    </tr>
-    <tr>
-      <td><h3>New Password</h3>
-        <em>Your new password must be at least 6 characters in length.</em></td>
-      <td><input type="password" name="new_password" id="new_password" size="35" maxlength="50" /></td>
+      <td class="formLabelWidth"><h4>Current Password</h4>
+        <em></em>
+		</td>
+	<td>
+	<input type="password" name="current_password" id="current_password" size="35" maxlength="50" />
+	</td>
     </tr>
     <tr>
-      <td><h3>Confirm New Password</h3>
-        <em>Enter your new password again to confirm you typed it correctly.</em></td>
-      <td><input type="password" name="confirm_password" id="confirm_password" size="35" maxlength="50" /></td>
+      <td><h4>New Password</h4>
+        <em>Your new password must be at least 6 characters in length.</em><br />
+		</td>
+	<td><input type="password" name="new_password" id="new_password" size="35" maxlength="50" /></td>
     </tr>
-    <tr class="pedantic">
-      <td>&nbsp;</td>
-      <td><input class="btn" type="submit" name="submit" value="Modify" /></td>
+    <tr>
+      <td><h4>Confirm New Password</h4>
+        <em>Enter your new password again to confirm you typed it correctly.</em><br />
+		</td>
+	<td><input type="password" name="confirm_password" id="confirm_password" size="35" maxlength="50" /></td>
     </tr>
+
   </table>
+  <input class="submit-btn-plain" type="submit" name="submit" value="Modify" />
+  <div class="float-fix"></div>
 </form>

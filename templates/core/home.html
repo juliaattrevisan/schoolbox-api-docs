@@ -2,14 +2,17 @@
 $j(function(){
 	$j('#timetable th:odd').addClass('colour');
 	$j('#timetable td:odd').addClass('colour');
+	$j('#container').css('width', $j('.timetable').outerWidth());
 });
 </script>
 <!-- BEGIN custom_head -->
 <!-- END custom_head -->
-<!-- BEGIN greeting_name -->
-    <h1><span>{SITE_GREETING} <strong>{SITE_LOGINNAME}</strong></span></h1>
-<!-- BEGIN greeting_name -->
-  <div class="float-fix"></div>
+
+  
+  
+    <!-- BEGIN greeting_name -->
+  <h1><span>{SITE_GREETING} <strong>{SITE_LOGINNAME}</strong></span></h1>
+  <!-- END greeting_name -->
   
   <!-- BEGIN timetable -->
   <div class="box tt">

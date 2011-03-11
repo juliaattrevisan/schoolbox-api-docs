@@ -18,36 +18,36 @@
 <!-- END custom_head -->
 
 <h1>Return Work </h1>
-<form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" name="returnWorkForm" id="returnWorkForm" class="standardForm" onsubmit="return(verify());">
-    <table>
+<form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" name="returnWorkForm" id="returnWorkForm"  onsubmit="return(verify());">
+<input name="box_id" type="hidden" id="box_id" value="{BOX_ID}" />
+<input name="uid" type="hidden" id="uid" value="{UID}" />
+    <table class="standardForm">
         <tr>
-            <td class="formLabelWidth"><h2>Returning Work To</h2>
+            <td class="formLabelWidth"><h4>Returning Work To</h4>
                 <em>You may return the work with any one or more of the following options; file, comment mark.</em></td>
-            <td>{NAME}<br />
-							{CATEGORY} - {ASSNAME} </td>
+			<td>{NAME}<br />{CATEGORY} - {ASSNAME} </td>
         </tr>
         <tr>
-            <td><h2>File</h2>
+            <td><h4>File</h4>
                 <em>Browse for the students work that you have marked. Make sure the file is saved and closed before submitting the form. This field is optional.</em></td>
-            <td><input type="file" name="file" />
-            </td>
+			<td><input type="file" name="file" /></td>
         </tr>
         <tr>
-            <td><h2>Comment</h2>
+            <td><h4>Comment</h4>
                 <em>You may write a short comment here (20 words) regarding the work.</em></td>
-            <td><textarea name="comment" cols="50" rows="3" id="comment">{COMMENT}</textarea></td>
+			<td><textarea name="comment" cols="50" rows="3" id="comment">{COMMENT}</textarea></td>
         </tr>
         <tr>
-            <td><h2>Mark</h2>
+            <td><h4>Mark</h4>
                 <em>Can be letter (A), score (15/20) or percentage (88%). This field is optional</em></td>
-            <td><input name="mark" type="text" id="mark" size="10" maxlength="15" value="{MARK}"/></td>
+			<td><input name="mark" type="text" id="mark" size="10" maxlength="15" value="{MARK}"/></td>
         </tr>
         <tr>
-            <td>&nbsp;</td>
-            <td><input name="box_id" type="hidden" id="box_id" value="{BOX_ID}" />
-                <input name="uid" type="hidden" id="uid" value="{UID}" />
-                <input name="Submit" type="submit" id="Submit" value="Submit" class="btn" />
+            <td>
+
             </td>
         </tr>
     </table>
+	 <input name="Submit" type="submit" id="Submit" value="Submit" class="submit-btn-plain" />
+	 <div class="float-fix"></div>
 </form>

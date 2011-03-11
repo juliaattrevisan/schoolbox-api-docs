@@ -1,4 +1,3 @@
-<link rel="stylesheet" type="text/css" href="/css/core/forum.css" />
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
@@ -15,7 +14,7 @@ tinyMCE.init({
     extended_valid_elements : "img[src|border|alt=|title|hspace|vspace|width|height|align|style]",
     tabfocus_elements : ":prev,:next",
 	file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
-	file_browser_category_id : {CATEGORY_ID},
+	file_browser_category_id : '{CATEGORY_ID}',
 	convert_urls : false
 });
 </script>
@@ -69,40 +68,39 @@ $j(function(){
 <!-- END custom_head -->
 
 		<div class="breadcrumbs navhelp">
-            <a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a> 
-            <!-- BEGIN thread_link --> &gt; <a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a> <!-- END thread_link -->
+            <p><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a> 
+            <!-- BEGIN thread_link --> &gt; <a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a> <!-- END thread_link --></p>
         </div>
         
 		<h1>{ACTION} {THREAD_POST}</h1>
-		<form id="forumForm" class="standardForm" method="post" enctype="multipart/form-data" action="/forum/modifyForm.php">
+		<form id="forumForm"  method="post" enctype="multipart/form-data" action="/forum/modifyForm.php">
 		<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
         <input type="hidden" name="threadID" value="{THREAD_ID}" />
         <input type="hidden" name="postID" value="{POST_ID}" />
-		<table>
+		<table class="standardForm">
     	<!-- BEGIN title -->
 		  <tr> 
-        <td class="formLabelWidth"><h3>Title</h3><em>The name of this forum thread.</em></td>
-        <td><input type="text" name="title" id="forumTitle" size="35" maxlength="50" value="{THREAD_TITLE}" /></td>
+        <td class="formLabelWidth"><h4>Title</h4><em>The name of this forum thread.</em>
+		</td>
+		<td><input type="text" name="title" id="forumTitle" size="35" maxlength="50" value="{THREAD_TITLE}" /></td>
+
 		  </tr>
       <!-- END title -->
       <!-- BEGIN quote -->
       <tr> 
-        <td><h3>Quote</h3><em>{QUOTE_USER}'s post.</em></td>
-        <td>
-        	<div id="cited">
-        		<p>{QUOTE_BODY}</p>
-        	</div><br />
-        	<input type="button" id="quote" value="Quote" /> <input type="checkbox" value="1" name="byline" id="byline" /> With byline
-        </td>
+        <td><h4>Quote</h4><em>{QUOTE_USER}'s post.</em></td>
+		<td><div class="cite-it">{QUOTE_BODY}</div>
+        	<input type="button" id="quote" class="submit-btn-plain" value="Quote" /> 
+			<input type="checkbox" value="1" name="byline" id="byline" /> With byline</td>
 		  </tr>
       <!-- END quote -->
 		  <tr> 
-        <td><h3>Post</h3><em>This is the main portion of your forum post.</em></td>
-        <td><textarea id="forumBody" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
+        <td><h4>Post</h4><em>This is the main portion of your forum post.</em>
+      </td>
+	  <td><textarea id="forumBody" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
 		  </tr>
-		  <tr class="pedantic"> 
-			<td>&nbsp;</td>
-			<td><input class="btn" type="submit" name="submit" value="Post" /></td>
-		  </tr>
+
 		</table>
+		<input class="submit-btn-plain" type="submit" name="submit" value="Post" />
+		<div class="float-fix"></div>
 		</form>

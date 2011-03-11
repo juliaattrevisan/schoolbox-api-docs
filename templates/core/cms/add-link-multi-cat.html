@@ -33,42 +33,35 @@ function verify()
 <form method="post" id="urlForm" class="standardForm" onSubmit="return(verify());" action="/cms/linkForm.php">
   <table>
     <tr>
-      <td class="formLabelWidth"><h3>URL</h3>
-       <em>The internet address for the website, eg. http://www.google.com</em></td>
-      <td><input type="text" name="url" size="40" maxlength="250" value="" />
-      </td>
+      <td class="formLabelWidth"><h4>URL</h4>
+       <em>The internet address for the website, eg. http://www.google.com</em>
+	  </td>
+	  <td> <input type="text" name="url" size="40" maxlength="250" value="" /></td>
     </tr>
     <tr>
-      <td><h3>Description</h3>
-        <em>One line description of the URL for the title </em> </td>
-      <td ><input type="text" name="description" maxlength="250" size="40" value="" />
-      </td>
+      <td><h4>Description</h4>
+        <em>One line description of the URL for the title </em></td>
+		<td><input type="text" name="description" maxlength="250" size="40" value="" /></td>
     </tr>
     <tr>
-      <td><h3>Comments</h3>
-        <em>Any further details you wish to make about the URL, useful for enhancing search results</em> </td>
-      <td><textarea name="comment" cols="40" rows="4"></textarea>
-      </td>
+      <td><h4>Comments</h4>
+        <em>Any further details you wish to make about the URL, useful for enhancing search results</em></td>
+		<td><textarea name="comment" cols="40" rows="4"></textarea></td>
     </tr>
     <tr>
-      <td><h3>Hidden</h3>
+      <td><h4>Hidden</h4>
         <em>Hide this URL from students.</em></td>
-      <td><input type='checkbox' name='hidden' value='1' /></td>
+		<td><input type='checkbox' name='hidden' value='1' /></td>
     </tr>
        <tr>
-      <td><h3>Location</h3>
+      <td><h4>Location</h4>
         <em>Select the locations where this file should be placed</em></td>
-      <td><!-- BEGIN category_list -->
+		<td><!-- BEGIN category_list -->
         <input type="checkbox" class="category" name="category[]" value="{CATEGORY_ID}">
         {CATEGORY_NAME}<br />
-        <!-- END category_list -->
-      </td>
-    </tr>
-    <tr>
-      <td >&nbsp;</td>
-      <td>
-        <input type="submit" name="Submit" value="Upload Link" class="btn" />
-      </td>
+        <!-- END category_list --></td>
     </tr>
   </table>
+  <input type="submit" name="Submit" value="Upload Link" class="submit-btn-plain" />
+  <div class="float-fix"></div>
 </form>

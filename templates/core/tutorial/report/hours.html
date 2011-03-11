@@ -1,8 +1,6 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
-<script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
-<script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
-<script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
 var $j = jQuery.noConflict();
 $j(document).ready(function () {
@@ -13,6 +11,15 @@ $j(document).ready(function () {
 		});
 		
 	});
+	
+	$j('#from, #to').datepicker({ 
+		dateFormat: 'dd/mm/yy',
+		showOn:'both',
+		buttonImage: '/images/demo/calendar/calendar-click.png',
+		buttonImageOnly: true
+	});
+	
+	
 });
 </script>
 <style type="text/css">
@@ -32,28 +39,10 @@ $j(document).ready(function () {
     <tr class="pedantic">
       <td>From:</td>
       <td><input name="from" id="from" type="text" size="15" maxlength="10" value="{FROM}"/>
-        <img src="/images/ico_calendar.gif" width="16" height="13" id="from_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
-        <script type="text/javascript">
-		Calendar.setup({
-			inputField     :    "from",     // id of the input field
-			ifFormat       :    "%d/%m/%Y",      // format of the input field
-			button         :    "from_trigger",  // trigger for the calendar (button ID)
-			align          :    "br",           // alignment (defaults to "Bl")
-			singleClick    :    true
-		});
-		</script></td>
+       </td>
       <td>To:</td>
       <td><input name="to" id="to" type="text" size="15" maxlength="10" value="{TO}"/>
-        <img src="/images/ico_calendar.gif" width="16" height="13" id="to_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
-        <script type="text/javascript">
-		Calendar.setup({
-			inputField     :    "to",     // id of the input field
-			ifFormat       :    "%d/%m/%Y",      // format of the input field
-			button         :    "to_trigger",  // trigger for the calendar (button ID)
-			align          :    "br",           // alignment (defaults to "Bl")
-			singleClick    :    true
-		});
-		</script></td>
+        </td>
         <td><input type="radio" name="filter" value="unprocessed" {FILTER_UNPROCESSED_SELECTED} /></td>
         <td>Unprocessed</td>
         <td><input type="radio" name="filter" value="processed" {FILTER_PROCESSED_SELECTED} /></td> 

@@ -1,12 +1,13 @@
-<div class="box" id="component{COMPONENT_ID}">
+<div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
   <h2>Audio</h2>
   <!-- BEGIN config -->
-  <a class="edit">edit</a>
-  <div class="editPanel hide">
+  <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
+<a class="close-delete" href="#"><span>X</span></a>
+  <div class="editPanel settings hide">
     <form action="/homepage/configForm.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
-      <input type="hidden" name="component" value="{COMPONENT_ID}" />
+      <input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
       <label for="sort">Sort: </label>
       <select name="sort">
         <!-- BEGIN sort -->
@@ -23,10 +24,20 @@
         <!-- BEGIN size -->
         <option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
         <!-- END size -->
-      </select>
-      <input type="submit" value="Update" />
+      </select>      <input type="submit" value="Update" class="submit-btn update" />
     </form>
-  </div>  <!-- END config -->
+  </div>
+<div class="editPanel delete-it hide">
+<p>Are you sure you want to delete?</p>
+<form action="#" method="post">
+  <input type="hidden" name="cid" value="{ID}" />
+  <input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+  <input type="hidden" name="component" value="{COMPONENT_ID}" />
+    <a href="#" class="delete-accept btn delete"><span></span>Yes</a>
+    <a href="#" class="delete-reject btn go-to"><span></span>No</a>
+</form>
+<div class="float-fix"></div>
+</div>  <!-- END config -->
   <div class="text listing" >
     <script type="text/javascript">
 
@@ -52,7 +63,7 @@
               <div id="audio-player-{AUDIO_ID}"><a onclick="loadSWF({AUDIO_ID}, '{AUDIO_URL}'); return false;"></a></div>
               </div>
         </p>
-        <p class="summ">{AUDIO_COMMENT}</p>
+        <p class="hide-on-small">{AUDIO_COMMENT}</p>
         <div class="float-fix"></div>
       </li>
       <!-- END audio_list -->
@@ -60,6 +71,6 @@
     <div class="float-fix"></div>
   </div>
   <!-- BEGIN submit_file -->
-  <p class="interact"><a href="/cms/file/new/{ID}">Post File</a></p>
+  <p class="interact"><a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post File</a></p>
   <!-- END submit_file -->
 </div>

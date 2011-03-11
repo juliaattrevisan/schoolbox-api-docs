@@ -1,10 +1,5 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.js"></script>
-<script type="text/javascript" src="/javascript/jquery.tableruler.js"></script>
-<!-- END custom_head -->
-
 <h1>{SUBJECTNAME}</h1>
-<table class="ruler">
+<table>
   <thead>
     <tr>
       <th>Photo</th>
@@ -31,11 +26,13 @@
     </tr>
     <tr class="{ON_OFF}">
         
-        <td><a href="/timetable/{SYNERGYID}">Timetable</a><br />
-            <!-- BEGIN eportfolio --><a href="/eportfolio/{ID}">ePortfolio</a><!-- END eportfolio -->
+        <td width="150" valign="top" style="vertical-align:top;">
+		<a href="/timetable/{SYNERGYID}"  class="btn report float-left" style="width:60px !important;"><span></span>Timetable</a><br />
+       <!-- BEGIN eportfolio --> <a href="/eportfolio/{ID}" class="btn eportfolio float-left" style="width:60px !important;"><span></span>ePortfolio</a><!-- END eportfolio -->
+		<a  href="/submission/dueWork/{SYNERGYID}" class="btn due-work float-left" style="width:60px !important;"><span></span>Due Work</a>
+		<div class="float-fix"></div>
         </td>
-        <td><a href="/submission/dueWork/{SYNERGYID}">Due Work</a><br/></td>
-        <td colspan="5">
+        <td colspan="6" valign="top" style="vertical-align:top;">
             <!-- BEGIN special --><img src="/images/famicons/bell.png" title="Special Needs"/><!-- END special -->
             <!-- BEGIN medical --><img src="/images/famicons/exclamation.png" title="Medical Alert"/>{MEDICAL_ALERT}<!-- END medical -->
             
@@ -54,7 +51,8 @@
         <form action="/mail/createMail.php" method="post">
           <input type="hidden" name="replyto" value="{SUBJECTNAME} &lt;{REPLYTO}&gt;" />
           <input type="hidden" name="bcc" value="{CLASSEMAIL}" />
-          <input class="btn" type="submit" name="emailall" value="Email Class" />
+          <input class="submit-btn-plain" type="submit" name="emailall" value="Email Class" />
+		  <div class="float-fix"></div>
         </form></td>
       <td>&nbsp;</td>
     </tr>

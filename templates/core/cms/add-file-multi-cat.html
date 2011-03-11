@@ -33,19 +33,18 @@ function clearBrowse(obj, id) {
 <!-- END custom_head -->
 
 <h1>Upload a File to Multiple Locations</h1>
-<form method="post" enctype="multipart/form-data" id="fileForm" class="standardForm" onsubmit="return(verify());" action="/cms/fileForm.php">
-  <table>
+<form method="post" enctype="multipart/form-data" id="fileForm"  onsubmit="return(verify());" action="/cms/fileForm.php">
+  <table class="standardForm">
     <!-- BEGIN browse -->
     <tr>
-      <td class="formLabelWidth"><h3>File</h3>
+      <td class="formLabelWidth"><h4>File</h4>
         <em>Browse your local disk for a file or upload from your 'my files'.</em></td>
-      <td><input type="file" name="file"  id="browse" onchange="clearBrowse(this, 'myfile');" />
-        <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
-      </td>
+		<td><input type="file" name="file"  id="browse" onchange="clearBrowse(this, 'myfile');" />
+        <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" /></td>
     </tr>
     <tr>
       <td><strong>or</strong></td>
-      <td><select name='myfile' id="myfile" onchange="clearBrowse(this, 'browse');">
+	  <td><select name='myfile' id="myfile" onchange="clearBrowse(this, 'browse');">
           <option value=''></option>
           <!-- BEGIN optgroup -->
           <optgroup label="&gt; {MYFOLDER_NAME}"  style="padding-left: {MYFOLDER_LEFT}px;">
@@ -58,35 +57,30 @@ function clearBrowse(obj, id) {
     </tr>
     <!-- END browse -->
     <tr>
-      <td><h3>Description</h3>
-        <em>One line description of the file for use as the title</em> </td>
-      <td ><input type="text" name="description" maxlength="250" size="40" value="" />
-      </td>
+      <td><h4>Description</h4>
+        <em>One line description of the file for use as the title</em></td>
+		<td><input type="text" name="description" maxlength="250" size="40" value="" /></td>
+
     </tr>
     <tr>
-      <td><h3>Comments</h3>
+      <td><h4>Comments</h4>
         <em>Any further details you wish to make about the file, useful for enhancing search results</em></td>
-      <td><textarea name="comment" cols="40" rows="4"></textarea>
-      </td>
+		<td><textarea name="comment" cols="40" rows="4"></textarea></td>
     </tr>
     <tr>
-      <td><h3>Hidden</h3>
+      <td><h4>Hidden</h4>
         <em>Hide this file from students.</em></td>
-      <td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
+		<td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
     </tr>
     <tr>
-      <td><h3>Location</h3>
+      <td><h4>Location</h4>
         <em>Select the locations where this file should be placed</em></td>
-      <td><!-- BEGIN category_list -->
+		<td><!-- BEGIN category_list -->
         <input type="checkbox" class="category" name="category[]" value="{CATEGORY_ID}">
         {CATEGORY_NAME}<br />
-        <!-- END category_list -->
-      </td>
-    </tr>
-    <tr>
-      <td>&nbsp;</td>
-      </td>
-      <td><input type="submit" name="Submit" value="Add File" class="btn" /></td>
+        <!-- END category_list --></td>
     </tr>
   </table>
+  <input type="submit" name="Submit" value="Add File" class="submit-btn-plain" />
+  <div class="float-fix"></div>
 </form>

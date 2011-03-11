@@ -33,7 +33,7 @@ $j(function() {
 	  "You've selected random selection of questions. Please enter the amount of questions to put in the pool."
 	);	
 	
-	$j('.standardForm').validate({
+	$j('#modifySection').validate({
 		rules: {
 			title: {
 				required: true,
@@ -63,7 +63,7 @@ $j(function() {
 		<div class="assess-header">
 			<h2>Section Details</h2>
 			<div class="assess-body">
-				<form name="create" action="/assess/section/modify" class="standardForm" method="post">
+				<form name="create" action="/assess/section/modify" class="standardForm" id="modifySection" method="post">
 					<fieldset class="hidden">
 						<input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
 						<input name="section_id" type="hidden" value="{SECTION_ID}" />
@@ -91,7 +91,7 @@ $j(function() {
 					</fieldset>
 				
 					<fieldset>
-						<input type="submit" id="create" value="Modify" class="next-step">
+						<input type="submit" id="create" value="Modify" class="submit-btn-plain">
 					</fieldset>
 				</form>
 			</div>

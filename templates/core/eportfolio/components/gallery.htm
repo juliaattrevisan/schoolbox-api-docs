@@ -4,7 +4,7 @@
 <div class="box" id="component{COMPONENT_ID}">
   <h2>Image Gallery</h2>
     <!-- BEGIN config -->
-  <a class="edit">edit</a>
+ <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
   <div class="editPanel hide">
     <form action="/eportfolio/configForm.php" method="get">
       <input type="hidden" name="uid" value="{ID}" />
@@ -29,6 +29,6 @@
     <div class="float-fix"></div>
   </div>
     <p class="interact">
-        <a href="/cms/eportfolioImageGallery/{ID}">Full Gallery</a>
+        <a href="/cms/eportfolioImageGallery/{ID}" class="btn"><span></span>Full Gallery</a>
     </p>
 </div>

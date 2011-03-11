@@ -1,5 +1,4 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" type="text/css" href="/css/core/forum.css" />
 <script type="text/javascript">
 	$j(function(){
 	
@@ -27,52 +26,60 @@
 			return false;
 		});
 		
+		if ($j('.post').length !== 1) {
+			$j('.post:last').css("border", "0")
+		}
+		
 	});
 </script>
 <!-- END custom_head -->
 <div class="breadcrumbs navhelp">
-	<a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a> > {THREAD_TITLE} {LOCKED}
+	<p><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a> > {THREAD_TITLE} {LOCKED}</p>
 </div>
 <!-- BEGIN reply -->
-<button class="reply">Post Reply</button> 
+<button class="reply submit-btn-plain">Post Reply</button> 
 <!-- END reply -->
 <!-- BEGIN modify_thread -->
-<button class="lock">{LOCK_UNLOCK} Thread</button> <button class="delete">Delete Thread</button>
+<button class="lock submit-btn-plain">{LOCK_UNLOCK} Thread</button>
+<button class="delete submit-btn-plain">Delete Thread</button>
 <!-- END modify_thread -->
-<table id="forum-post">
-  <tbody>
+<div class="float-fix"></div>
+<div class="forum">
+	<table cellpadding="0" cellspacing="0" border="0" width="100%">
+	
   	<!-- BEGIN post -->
-  	<tr>
-    	<td class="user" width="20%">
-        <a name="{POST_ID}"></a>
-      	<h3><a href="/search/user/{POST_USER_ID}">{POST_AUTHOR}</a></h3>
-        {POST_GROUP}
-      </td>
-      <td rowspan="2" class="post" width="80%">
-        {POST_BODY}
-      </td>
-    </tr>
-    <tr>
-    	<td class="reply">
-        <!-- BEGIN reply_post -->
-      	<a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}">Reply to this post</a><br /><!-- END reply_post -->
-        <!-- BEGIN modify -->
-        <a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}">Edit post</a> |
-        <a href="/forum/modifyForm.php?deletePost={POST_ID}" class="delete">Delete post</a><br /> <!-- END modify -->
-        Posted {POST_TIME}
-        <!-- BEGIN modified --><br /> edited {POST_MODIFIED} {POST_CENSORED}<!-- END modified -->
-      </td>
-    </tr>
+	<tr class="post">
+    	<td class="post-left" valign="top">
+			<div class="post-content">
+				<a name="{POST_ID}"></a>
+				<p><a href="/search/user/{POST_USER_ID}">{POST_AUTHOR}</a><br />
+				{POST_GROUP}</p>
+			
+			
+				 <p><!-- BEGIN reply_post -->
+				<a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}">Reply to this post</a><br />
+				<!-- END reply_post -->
+				<!-- BEGIN modify -->
+				<a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}">Edit post</a> |
+				<a href="/forum/modifyForm.php?deletePost={POST_ID}" class="delete">Delete post</a><br /> <!-- END modify -->
+				Posted {POST_TIME}
+				<!-- BEGIN modified --><br /> edited {POST_MODIFIED} {POST_CENSORED}<!-- END modified --></p>
+			</div>
+		</td>
+		<td class="post-right" valign="top">
+			<div class="post-content">
+       		 {POST_BODY}
+			</div>
+		</td>
+		</tr>
+	
     <!-- END post -->
-    
-   
-  </tbody>
-</table>
-<a name="bottom"></a>
-
+	</table>
+ </div>
+<p><a name="bottom"></a>
 {reply_block}
 {modify_thread_block}
-
+</p>
 
 <div class="pagination navhelp">
 	<!-- BEGIN previous_button -->

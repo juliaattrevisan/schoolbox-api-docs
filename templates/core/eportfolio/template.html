@@ -1,35 +1,72 @@
 <!-- BEGIN custom_head -->
 <link rel="alternate" type="application/rss+xml" title="RSS" href="/homepage/rss/{ID}" />
-<script type="text/javascript" src="/javascript/mootools.js"></script>
-<script type="text/javascript" src="/javascript/jquery.ui.js"></script>
-<script type="text/javascript" src="/javascript/jquery.eportfoliocomponent.js"></script>
 <!-- BEGIN modify_layout -->
 
+<script type="text/javascript" src="/javascript/jquery.ui.js"></script>
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<script type="text/javascript" src="/javascript/demo/jquery.eportfolio.component.js"></script>
+<link rel="stylesheet" type="text/css" href="/javascript/farbtastic/farbtastic.css" />
+<script type="text/javascript" src="/javascript/farbtastic/farbtastic.js"></script>
 
 <!-- END modify_layout -->
+<script type="text/javascript">
+var pickers = {
+	'head_font'		: '#013A63',
+	'head_bg'		: '#CAE9B9',
+	'font'			: '#013A63',
+	'bg_primary'	: '#ffffff',
+	'bg_secondary'	: '#FAF9F5',
+	'link'			: '#1d9ffc',
+	'hover'			: '#ff5a00',
+
+	'head_font_right'	: '#013A63',
+	'head_bg_right'	: '#CAE9B9',
+	'font_right'	: '#013A63',
+	'bg_primary_right'	: '#ffffff',
+	'bg_secondary_right'	: '#FAF9F5',
+	'link_right'	: '#1d9ffc',
+	'hover_right'	: '#ff5a00'
+};
+var defaults = {
+	'head_font'		: '#013a63',
+	'head_bg'		: '#cae9b9',
+	'font'			: '#000000',
+	'bg_primary'	: '#ffffff',
+	'bg_secondary'	: '#faf9f5',
+	'link'			: '#1d9ffc',
+	'hover'			: '#ff5a00',
+
+	'head_font_right'	: '#013a63',
+	'head_bg_right'	: '#cae9b9',
+	'font_right'	: '#000000',
+	'bg_primary_right'	: '#ffffff',
+	'bg_secondary_right'	: '#faf9f5',
+	'link_right'	: '#1d9ffc',
+	'hover_right'	: '#ff5a00'
+};
+
+</script>
+
 <style type="text/css">
 	#content h2{border:0;}	
-#content .left h2 { color: #{left_head_font}; background-color: #{left_head_bg};	}
+
 .left p, .left h3, .left .listing p.small { color: #{left_font}; }
 .left a, .left .listing p.small a { color: #{left_link}; }
-.left a.edit { background-color: #{left_link}; }
-.left .box a.edit:hover { color: #fff; background-color: #{left_hover}; }
-.left .box a:hover, .left .listing p.small a:hover { color: #{left_hover};  }
+
 .left .text { background: #{left_bg_primary}; }
 .left .text.listing .dark { background: #{left_bg_secondary}; }
 
-#content .right h2 { color: #{right_head_font}; background-color: #{right_head_bg};	}
+
 .right p, .right h3, .right .listing p.small { color: #{right_font}; }
 .right a, .right .listing p.small a { color: #{right_link}; }
-.right a.edit { background-color: #{right_link}; }
-.right .box a.edit:hover { color: #fff; background-color: #{right_hover}; }
-.right .box a:hover, .right .listing p.small a:hover { color: #{right_hover};  }
+
 .right .text { background: #{right_bg_primary}; }
 .right .text.listing .dark { background: #{right_bg_secondary}; }
 
 /* wrap mimetypes in classes */
 <!-- BEGIN allowed_files -->
-.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }<!-- END allowed_files -->
+a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
+<!-- END allowed_files -->
 
 </style>
 <!-- END custom_head -->
@@ -37,9 +74,186 @@
 <h1>
 	<span>{HEADING}</span>
     <!-- BEGIN edit_page -->
-    <a class="customise" href="/eportfolio/config/{ID}">customise page</a>
+    <a class="customise" href="#">customise page</a>
     <!-- END edit_page -->
+
 </h1>
+
+
+<div id="tabs-homepage">
+	<ul>
+		<li><a href="#tabs-1">Components</a></li>
+		<li><a href="#tabs-2">Colours</a></li>
+		<li><a href="#tabs-3">Column Layout</a></li>
+	</ul>
+	<div class="float-fix"></div>
+	<div id="tabs-1" class="customise-components">
+		<div id="tabs-sub">
+			<table border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td valign="top"><ul>
+							<!-- BEGIN homepage_component_tab -->
+							<li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
+							<!-- END homepage_component_tab -->
+						</ul></td>
+					<td><div class="components"> 
+							<!-- BEGIN homepage_component_page -->
+							<div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}"> 
+								<!-- BEGIN homepage_component -->
+								<div class="add-component {HOMEPAGE_COMPONENT_CLASS}">
+									<h4>{HOMEPAGE_COMPONENT_NAME} <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong></h4>
+									<p>{HOMEPAGE_COMPONENT_DESCRIPTION}</p>
+									<span class="notification"><strong></strong>Added</span> 
+									<!-- BEGIN homepage_component_add --> 
+									<a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="btn add"><span></span>Add</a> 
+									<!-- END homepage_component_add -->
+									<div class="float-fix"></div>
+								</div>
+								<!-- END homepage_component --> 
+							</div>
+							<!-- END homepage_component_page --> 
+						</div>
+						<div class="float-fix"></div></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<!--/tabs-1-->
+	<div id="tabs-2" class="customise-components">
+		<div class="colours leftColumn">
+			<h3>Left Column</h3>
+			<div class="colours-split top-split">
+				<h3>Heading</h3>
+				<div class="colour">
+					<div id="head_font" class="colorBox  selected"></div>
+					<input name="colors[left_head_font]" type="hidden" />
+					<p>Text</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="head_bg" class="colorBox"></div>
+					<input name="colors[left_head_bg]" type="hidden" />
+					<p>Background</p>
+					<div class="float-fix"></div>
+				</div>
+			</div>
+			<div class="colours-split ">
+				<h3>Content</h3>
+				<div class="colour">
+					<div id="bg_primary" class="colorBox"></div>
+					<input name="colors[left_bg_primary]" type="hidden" />
+					<p>Primary Background</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="bg_secondary" class="colorBox"></div>
+					<input name="colors[left_bg_secondary]" type="hidden" />
+					<p>Secondary Background</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="font" class="colorBox"></div>
+					<input name="colors[left_font]" type="hidden" />
+					<p>Text</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="link" class="colorBox"></div>
+					<input name="colors[left_link]" type="hidden" />
+					<p>Link</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="hover" class="colorBox"></div>
+					<input name="colors[left_hover]" type="hidden" />
+					<p>Link Hover</p>
+					<div class="float-fix"></div>
+				</div>
+			</div>
+		</div>
+		<div class="colours">
+			<h3>Right Column</h3>
+			<div class="colours-split top-split">
+				<h3>Heading</h3>
+				<div class="colour">
+					<div id="head_font_right" class="colorBox"></div>
+					<input name="colors[right_head_font]" type="hidden" />
+					<p>Text</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="head_bg_right" class="colorBox"></div>
+					<input name="colors[right_head_bg]" type="hidden" />
+					<p>Background</p>
+					<div class="float-fix"></div>
+				</div>
+			</div>
+			<div class="colours-split">
+				<h3>Heading</h3>
+				<div class="colour">
+					<div id="bg_primary_right" class="colorBox"></div>
+					<input name="colors[right_bg_primary]" type="hidden" />
+					<p>Primary Background</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="bg_secondary_right" class="colorBox"></div>
+					<input name="colors[right_bg_secondary]" type="hidden" />
+					<p>Secondary Background</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="font_right" class="colorBox"></div>
+					<input name="colors[right_font]" type="hidden" />
+					<p>Text</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="link_right" class="colorBox"></div>
+					<input name="colors[right_link]" type="hidden" />
+					<p>Link</p>
+					<div class="float-fix"></div>
+				</div>
+				<div class="colour">
+					<div id="hover_right" class="colorBox"></div>
+					<input name="colors[right_hover]" type="hidden" />
+					<p>Link Hover</p>
+					<div class="float-fix"></div>
+				</div>
+			</div>
+		</div>
+		<div class="colours">
+			<div id="picker"></div>
+			<input type="text" id="currentColour" value="#123456" maxlength="7" class="input_text" />
+		</div>
+		<div class="float-fix"></div>
+		
+		<div class="colours-buttons">
+			<form method="POST" action="" name="saveColours">
+				
+				<button class="submit-btn-plain" type="button" id="leftRight" >Copy colours left > right</button>
+				<button class="submit-btn-plain" type="button" id="restore" >Restore Defaults</button>
+				<button class="submit-btn-plain" type="button" id="cancel" >Cancel</button>
+                <button class="submit-btn-plain save-colours" type="button" >Save colour set</button>
+			</form>
+			<div class="float-fix"></div>
+		</div>
+	</div>
+	<!--/tabs-2-->
+	<div id="tabs-3" class="customise-components layouts">
+		<form method="POST" action="">
+			<a class="layout {CURRENT_TEMPLATE_1}" title="1" href="#"><img src="/images/70-30.gif" />70-30</a> <a class="layout {CURRENT_TEMPLATE_2}" title="2" href="#"><img src="/images/50-50.gif" />50-50</a> <a class="layout {CURRENT_TEMPLATE_4}" title="4" href="#"><img src="/images/30-70.gif" />30-70</a> <a class="layout {CURRENT_TEMPLATE_3}" title="3" href="#"><img src="/images/100-0.gif" />100-0</a>
+			<input type="hidden" name="template" id="templateVal" value="" />
+			<input type="hidden" name="cid" value="{ID}" />
+            <button class="submit-btn-plain" type="button" id="saveTemplate" >Save layout</button>
+			<button class="submit-btn-plain" type="button" id="cancelTemplate" >Cancel</button>
+		</form>
+		<div class="float-fix"></div>
+	</div>
+	<!--/tabs-3--> 
+</div>
+
+
 
 <div class="{TEMPLATE} privateBlock">
     <div class="left">
@@ -64,7 +278,7 @@
 			{PRIVATE_NOTES}
 			<!-- BEGIN modify_link -->
 			<p class="interact">
-				<a href="/eportfolio_privateNotes/modify/{ID}">Modify</a>
+				<a href="/eportfolio_privateNotes/modify/{ID}" class="btn modify"><span></span>Modify</a>
 			</p>
 			<!-- END modify_link -->
 		</div>

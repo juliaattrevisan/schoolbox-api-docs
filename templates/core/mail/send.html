@@ -69,30 +69,30 @@ function verify()
 <form class="standardForm" action="send.php" method="post" enctype="multipart/form-data" name="mailForm" id="mailForm">
   <table>
     <tr>
-      <td><h3>To:</h3></td>
-      <td><input type="text" name="to" id="to" size="90" value="{REPLYTO}" />
+      <td class="formLabelWidth"><h4>To:</h4></td>
+	  <td><input type="text" name="to" id="to" size="90" value="{REPLYTO}" /></td>
     </tr>
     <tr>
-      <td><h3>CC:</h3></td>
-      <td><input type="text" name="cc" id="cc" size="90" />
-      </td>
+      <td><h4>CC:</h4></td>
+	  <td><input type="text" name="cc" id="cc" size="90" /></td>
     </tr>
     <tr>
-      <td><h3>BCC:</h3></td>
-      <td><input type="text" name="bcc" id="bcc" size="90" value="{BCC}" />
-      </td>
+      <td><h4>BCC:</h4>
+	  </td>
+	  <td><input type="text" name="bcc" id="bcc" size="90" value="{BCC}" /></td>
     </tr>
     <tr>
-      <td><h3>Subject:</h3></td>
-      <td><input type="text" name="subject" size="90" value="{SUBJECT}" /></td>
+      <td><h4>Subject:</h4>
+	  </td>
+	  <td><input type="text" name="subject" size="90" value="{SUBJECT}" /></td>
     </tr>
     <tr>
-      <td>&nbsp;</td>
-      <td><textarea name="message" style="width:100%;height:350px">{BODY}</textarea></td>
+      <td colspan="2"><textarea name="message" style="width:100%;height:350px">{BODY}</textarea></td>
     </tr>
     <tr>
-      <td><h3>Attachments:</h3></td>
-      <td><input id="attachment" type="file" name="file[]" />
+      <td><h4>Attachments:</h4>
+	 </td>
+	 <td> <input id="attachment" type="file" name="file[]" />
         <div id="files_list"></div>
         <script type="text/javascript">
 						<!-- Create an instance of the multiSelector class, pass it the output target and the max number of files -->
@@ -102,8 +102,8 @@ function verify()
 						</script></td>
     </tr>
     <tr>
-      <td>&nbsp;</td>
-      <td><input type="submit" name="submit" value="Send" /></td>
+      <td></td>
     </tr>
   </table>
+  <input type="submit" name="submit" class="submit-btn-plain" value="Send" />
 </form>

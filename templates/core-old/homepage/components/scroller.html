@@ -1,0 +1,70 @@
+<script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
+<script type="text/javascript">
+$j(function(){
+    $j('#galleryCycle').cycle({
+        cleartype: true,
+        before: function() {
+            $j('#galleryCycle span').slideUp();
+        },
+        after: function() {
+            $j('span', this).slideDown();
+        }
+    });
+});
+</script>
+
+<style type="text/css">
+#galleryCycle img {
+	display: block;
+}
+
+#galleryCycle {
+	border: 1px solid #dbdbdb;
+    margin: 10px auto;
+}
+
+#galleryCycle div {
+	position: relative;
+}
+
+#galleryCycle span {
+	background: #576369;
+	color: #fff;
+	display: none;
+	width: 100%;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	padding: 10px 0;
+	text-decoration: none;
+	opacity: 0.9;
+	text-indent: 10px;
+}
+</style>
+
+<div class="box" id="component{COMPONENT_ID}">
+    <h2>Image Scroller</h2>
+      <!-- BEGIN config -->
+	  <a class="edit">edit</a>
+	 
+        <div class="editPanel hide">
+            <form action="/homepage/configForm.php" method="get">
+                <input type="hidden" name="cid" value="{ID}" />
+                <input type="hidden" name="type" value="config" />
+                <input type="hidden" name="component" value="{COMPONENT_ID}" />
+                <label for="url">Pixels:</label>
+                <input type="text" name="pixel" value="{COMPONENT_PIXEL}" size="4"/>
+                <input type="submit" value="Update" />
+            </form>
+        </div>
+	 <!-- END config -->
+
+    <div id="galleryCycle" class="box">
+        <!-- BEGIN image -->
+        <div><img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" /><span>{IMAGE_NAME}</span></div>
+        <!-- END image -->
+    </div>
+      <!-- BEGIN submit_image -->
+  <p class="interact"><a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post Image</a></p>
+  <!-- END submit_image -->
+</div>

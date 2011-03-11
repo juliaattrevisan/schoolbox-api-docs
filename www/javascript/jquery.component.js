@@ -426,10 +426,8 @@ $j(function() {
 		$j('.right .text').css('background',defaults['right_bg_primary']);
 		$j('.right .text.listing .dark ').css('background',defaults['right_bg_secondary']);
 		
-		console.log(pickers);
-		console.log(defaults);
+		pickers = defaults;
 		
-	 pickers = defaults;
 	});
 	
 	$j('#cancel').click(function() {
@@ -440,7 +438,6 @@ $j(function() {
 		$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
 		
 	});
-	
 
 
 });

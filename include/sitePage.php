@@ -585,7 +585,7 @@ class SitePage extends Page {
 			return $this->site.'/'.$template;
 		else
 			//change this back to "core" for the rest of the releases.
-			return 'demo/'.$template;
+			return 'core/'.$template;
 	}
 
 	function getVar($varname) {

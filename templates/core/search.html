@@ -9,12 +9,12 @@
             var el = $j(this).attr('title');
             var paginate = function(){
                 $j('div.' + 'pagination > a').click(function() {
-                    $j('div.results > div[title=' + el + ']').load('/search.php', 'keyword={KEYWORD}&type=' + el + '&page='+$j(this).attr('title'), paginate);
+                    $j('div.results > div[title=' + el + ']').load('/search.php', "keyword={KEYWORD}&type=" + el + "&page="+$j(this).attr('title'), paginate);
                 });
             }
 
             if(!$j('div.results > div[title=' + el + ']').hasClass('loaded')) {
-                $j('div.results > div[title=' + el + ']').load('/search.php', 'keyword={KEYWORD}&type=' + el, paginate);
+                $j('div.results > div[title=' + el + ']').load('/search.php', "keyword={KEYWORD}&type=" + el, paginate);
                 $j('div.results > div[title=' + el + ']').addClass('loaded');
             }
 

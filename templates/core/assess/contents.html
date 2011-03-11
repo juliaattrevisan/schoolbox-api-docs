@@ -19,8 +19,9 @@ $j(function() {
 		<li class="parent">	
 			<a class="drop-arrow" href="#"></a>
 			<ul>
-				<li><a href="/assess/modify/{ASSESS_ASSESS_ID}">Modify</a></li>
+				<li><a href="/assess/modify/{ASSESS_ASSESS_ID}" >Modify</a></li>
 				<li><a href="/assess/export/{ASSESS_ASSESS_ID}.xml">Export</a></li>
+				<li><a href="/assess/delete/{ASSESS_ASSESS_ID}" onclick="return confirm('Are you sure you want to delete this assessment?');">Delete</a></li>
 			</ul>
 		</li>
 	</ul>
@@ -45,7 +46,8 @@ $j(function() {
 				<!-- BEGIN question -->
 				<li>
 						<p><span>Q{QUESTION_SEQUENCE})</span> {QUESTION_QUESTION} - ({QUESTION_MARKS} marks)</p>
-						<p class="pad-it"><a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
+						<p class="pad-it"><a href="/assess/question/export/{QUESTION_QUESTION_ID}">Export</a> |
+						<a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
 						<a class="delete-question" href="/assess/question/delete/{QUESTION_QUESTION_ID}">Delete</a></p>
 				</li>
 				<!-- END question -->

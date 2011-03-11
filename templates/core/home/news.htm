@@ -3,7 +3,8 @@
 		$j('#category li:first-child a').addClass('selected');
 		$j('ul.topic li:first-child').show();
 		
-		$j('#category a').click(function() {
+		$j('#category a').click(function(event) {
+			event.preventDefault();
 			if (!$j(this).hasClass("selected")) {
 				$j('#category a').removeClass('selected');
 				$j(this).addClass('selected');	
@@ -19,12 +20,11 @@
 <div class="box">
   <h2>News Headlines</h2>
   <div class="text listing">
-  	<ul id="category">
+  	<ul id="category" class=" news-headlines">
       <!-- BEGIN topic_header -->
       <li><a href="#" title="{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
       <!-- END topic_header -->
     </ul>
-	<div class="float-fix"></div>
     <ul class="topic">
     <!-- BEGIN topic -->
     	<li class="hide {TOPIC_CLEAN}">
@@ -40,5 +40,7 @@
     </li>
     <!-- END topic -->
     </ul> 
+	<div class="float-fix"></div>
   </div>      
+  
 </div>

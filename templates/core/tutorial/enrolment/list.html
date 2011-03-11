@@ -24,11 +24,11 @@ $j(document).ready(function () {
 </script>
 <!-- END custom_head -->
 <h1>Class list - {EVENT_NAME}</h1>
-<span class="header_option"><a href="/modules/tutorial/attendance/list.php?week={WEEK}" title="Attendance history">Mark Attendance</a> | 
-<a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}" title="Modify Event">Modify</a> | 
-<a href="/modules/tutorial/event/modify.php?delete={EVENT_ID}" onclick="return confirm('Delete this tutorial?')" title="Delete Event">Delete</a></span>
+<span class="header_option"><a href="/modules/tutorial/attendance/list.php?week={WEEK}" title="Attendance history" class="btn reports"><span></span>Mark Attendance</a>
+<a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}" title="Modify Event" class="btn modify"><span></span>Modify</a>
+<a href="/modules/tutorial/event/modify.php?delete={EVENT_ID}" class="btn delete" onclick="return confirm('Delete this tutorial?')" title="Delete Event"><span></span>Delete</a></span>
 <!-- BEGIN has_enrolments -->
-<table class="ruler">
+<table >
   <thead>
     <tr>
       <th style="width: 60px;">Remove</th>
@@ -61,17 +61,20 @@ $j(document).ready(function () {
 <!-- END has_enrolments -->
 
 
-<form action="/mail/createMail.php" method="post" class="float-right" style="padding: 10px;">
+<form action="/mail/createMail.php" method="post" style="padding: 10px;">
   <input type="hidden" name="replyto" value="{EVENT_NAME} &lt;{REPLY_TO}&gt;" />
   <input type="hidden" name="bcc" value="{EMAIL_ALL}" />
-  <input class="emailall" type="submit" name="emailall" value="Email all" />
+  <input  class="submit-btn-plain"type="submit" name="emailall" value="Email all" />
+  <div class="float-fix"></div>
 </form>
-
-
-<form action="/modules/tutorial/enrolment/modifyForm.php" method="post" class="standardForm">
-  <input class="lookup" type="text" name="keyword" />
+  <div class="float-fix"></div>
+<hr />
+<form action="/modules/tutorial/enrolment/modifyForm.php" method="post" >
+  <input class="lookup" type="text" name="keyword" style="float:left;"/>
   <input type="hidden" name="userID" class="userID" />
   <input type="hidden" name="eventID" value="{EVENT_ID}" />
-  <input type="submit" value="Add Student" class="btn" />
+ 
+  <input type="submit" value="Add Student" class="submit-btn-plain" />
+   <div class="float-fix"></div>
 </form>
 

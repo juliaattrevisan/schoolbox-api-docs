@@ -1,0 +1,55 @@
+<div class="box" id="component{COMPONENT_ID}">
+  <h2>{PODCAST_COMPONENT_TITLE}</h2>
+  <!-- BEGIN config -->
+  <a class="edit">edit</a>
+  <div class="editPanel hide">
+    <form action="/homepage/configForm.php" method="get">
+      <input type="hidden" name="cid" value="{ID}" />
+      <input type="hidden" name="type" value="config" />
+      <input type="hidden" name="component" value="{COMPONENT_ID}" />
+      <label for="url">URL: </label>
+      	<input type="text" name="url" value="{COMPONENT_CONFIG_URL}" />
+      <label for="size">Item Limit: </label>
+      <select name="size">
+        <!-- BEGIN size -->
+        <option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
+        <!-- END size -->
+      </select>
+      <input type="submit" value="Update" />
+    </form>
+  </div>  <!-- END config -->
+  <div class="text listing" >
+    <script type="text/javascript">
+
+		function loadPodcastSWF(audioID, url){
+			var flashvars = {
+				filename: url
+			};
+			var params = {
+				movie: "/flash/player_mp3.swf",
+				wmode: "transparent"
+			};
+			
+			swfobject.embedSWF("/flash/mp3small.swf", "podcast-player-"+audioID, "22", "22", "9.0.0", "/flash/expressInstall.swf", flashvars, params);
+		}
+		
+	</script>
+    <ul>
+      <!-- BEGIN podcast_list -->
+      <li class="{ON_OFF}">
+        <h4><a class="icons audio-mpeg" href="{PODCAST_URL}">{PODCAST_TITLE}</a></h4>
+		<div class="small-right">
+			<p class="interact">
+				  <div class="play-button">
+				  <div id="podcast-player-{PODCAST_ID}"><a onclick="loadPodcastSWF('{PODCAST_ID}', '{PODCAST_URL}'); return false;"></a></div>
+				  </div>
+			</p>
+		</div>
+		<div class="float-fix"></div>
+        <p class="summ">{PODCAST_DESCRIPTION}</p>
+      </li>
+      <!-- END podcast_list -->
+    </ul>
+    <div class="float-fix"></div>
+  </div>
+</div>

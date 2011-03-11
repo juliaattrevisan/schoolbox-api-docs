@@ -1,15 +1,17 @@
 <h2>Folders <!-- BEGIN count -->({CATEGORY_DISP_COUNT} / {CATEGORY_COUNT})<!-- END count --></h2>
 <!-- BEGIN category -->
 <div class="search-item">
-    <img src="/images/icons/60x60/folder.png" />
+   
     <div class="search-details">
+	 <img src="/images/icons/60x60/folder.png" />
     <h3><a href="/homepage/{CATEGORY_ID}">{CATEGORY_NAME}</a></h3>
     <p class="search-sml">{CATEGORY_BREADCRUMB}</p>
 </div>		
 <div class="search-functions">
-    <p><a href="/resources/{CATEGORY_ID}">Resources</a></p>
-    <p><a href="/cms/imageGallery/{CATEGORY_ID}">Image Gallery</a></p>
-    <!-- BEGIN modify --><p><a href="/cms/category/{CATEGORY_ID}">Modify</a></p><!-- END modify -->
+    <a class="btn report" href="/resources/{CATEGORY_ID}"><span></span>Resources</a></p>
+    <a class="btn resources" href="/cms/imageGallery/{CATEGORY_ID}"><span></span>Image Gallery</a>
+    <!-- BEGIN modify --><a href="/cms/category/{CATEGORY_ID}" class="btn modify"><span></span>Modify</a><!-- END modify -->
+	<div class="float-fix"></div>
 </div>
 
 <div class="float-fix"></div>

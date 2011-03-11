@@ -1,3 +1,9 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+$j(function(){
+	$j('#container').css('width', $j('.ruler').outerWidth());
+});
+</script>
 <h1>Submission Boxes</h1>
 <div class="indent">
     <table class="ruler">
@@ -5,7 +11,7 @@
         <thead>
             <tr>
                 <td colspan="9"><h2>{CATEGORY} ({STUDENTS} Students)</h2>
-                    <span class="header_option"><a href="/submission/markSheet/{CATEGORY_ID}">Class Mark Sheet</a></span>
+                    <span class="header_option in-h2"><a href="/submission/markSheet/{CATEGORY_ID}" class="btn modify"><span></span>Class Mark Sheet</a></span>
                 </td>
             <tr>
             <tr>

@@ -1,0 +1,219 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
+<script type="text/javascript" src="/javascript/mootools.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
+<script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
+<script language="JavaScript" type="text/javascript">
+function verify () {
+	var msg = ""
+	if($('typeSelect').value == 2 && $('name').value == "")
+		msg += "Name is a required field\n";
+
+	if($('typeSelect').value == 1 && $('classSelect').value == "")
+		msg += "Name is a required field\n";
+	
+	if($('cal_date') && $('cal_date').value == "")
+		msg += "Date is a required field\n";
+	
+	if (!checkTime())
+		msg += "Start time cannot be after the finish time\n";
+
+	if(msg != ""){
+		alert(msg);
+		return false;
+	} else if ($('actionType').value == 'sequence') {
+		return confirm('This will modify all events in the sequence. Press OK to continue.');
+	} else
+		return true;
+}
+function toggleRepeat(o) {
+	if (o.value == '')
+		$('repeatUntil').style.display = 'none';
+	else
+		$('repeatUntil').style.display = '';
+
+}
+function checkTime() {
+	if ($('tohour').value == '')
+		return true;
+	else if ($('period').value == $('toperiod').value) {
+		if (parseInt($('hour').value) > parseInt($('tohour').value) && parseInt($('hour').value) != 12)
+			return false;
+		else if ($('hour').value == $('tohour').value) {
+			if (parseInt($('minute').value) > parseInt($('tominute').value))
+				return false;
+			else
+				return true;
+		} else
+			return true;
+		
+	} else if ($('toperiod').value == 'am')
+		return false;
+	else
+		return true;
+}
+
+window.addEvent('domready', function () {
+	$('typeSelect').addEvent('change', function () {
+		if ($(this).value == 1) {
+			$('nameRow').setStyle('display', 'none');
+			$('codeRow').setStyle('display', 'none');
+			$('classRow').setStyle('display', '');
+		} else {
+			$('nameRow').setStyle('display', '');
+			$('codeRow').setStyle('display', '');
+			$('classRow').setStyle('display', 'none');
+		}
+	});
+	if ($('deleteSequence')) {
+		$('deleteSequence').addEvent('click', function () {
+			if (confirm('Are you sure you want to delete all {TOTAL_EVENTS} events in this sequence?'))
+				window.open('/modules/tutorial/event/modifyForm.php?deleteSequence={EVENT_ID}','_self','');
+		});
+	}
+});
+</script>
+<!-- END custom_head -->
+<h1>{HEADING}</h1>
+<span class="header_option"><!-- BEGIN sequence_link --><a href="modify.php?eventID={EVENT_ID}&sequence=1">Modify Sequence</a><!-- END sequence_link --></span>
+<form id="eventForm" class="standardForm" method="post" action="modifyForm.php" onsubmit="return verify();">
+  <table>
+    <tr>
+     <td class="formLabelWidth"><h3>Type</h3></td>
+     <td><select name="typeID" id="typeSelect">
+     <!-- BEGIN type_list -->
+     <option value="{TYPE_ID}" {TYPE_ID_SELECTED}>{TYPE_NAME}</option><!-- END type_list -->
+     </select></td>
+    </tr>
+    <tr id="classRow" style="display: {CLASS_ENABLED};">
+      <td><h3>Name</h3><em>Required field.</em></td>
+      <td><select name="classID" id="classSelect">
+      	  <option value=''></option>
+          <!-- BEGIN class_list -->
+      	  <option value="{CLASS_ID}" {CLASS_ID_SELECTED}>{CLASS_NAME} ({CLASS_CODE})</option><!-- END class_list -->
+          </select>
+    </tr>
+    <tr id="nameRow" style="display: {NAME_ENABLED};">
+      <td><h3>Name</h3><em>Required field.</em></td>
+      <td><input type="text" name="name" id="name" size="50" maxlength="50" value="{NAME}" /></td>
+    </tr>
+	<tr id="codeRow" style="display: {NAME_ENABLED};">
+      <td><h3>Code</h3></td>
+      <td><input type="text" name="code" id="code" size="15" maxlength="50" value="{CODE}" /></td>
+    </tr>
+    <tr>
+      <td class="formLabelWidth"><h3>Room</h3></td>
+      <td><input type="text" name="location" size="40" maxlength="50" value="{LOCATION}" /></td>
+    </tr> 
+    <!-- BEGIN date -->
+    <tr>
+      <td class="formLabelWidth" valign="top"><h3>Date</h3>
+        <em>Required field. Dates should be in dd/mm/yyyy format. </em></td>
+      <td><input name="date" id="cal_date" type="text" size="15" maxlength="10" value="{DATE}"/>
+        <img src="/images/ico_calendar.gif" width="16" height="13" id="cal_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+        <script type="text/javascript">
+    Calendar.setup({
+        inputField     :    "cal_date",     // id of the input field
+        ifFormat       :    "%d/%m/%Y",      // format of the input field
+        button         :    "cal_trigger",  // trigger for the calendar (button ID)
+        align          :    "br",           // alignment (defaults to "Bl")
+        singleClick    :    true
+    });
+    </script>
+      </td>
+    </tr>
+    <!-- END date -->
+    <!-- BEGIN date_sequence -->
+    <tr>
+    <td><h3>Date Sequence</h3></td>
+    <td class="bold">{TOTAL_EVENTS} events, from {START_DATE} to {END_DATE}</td>
+    </tr>
+    <!-- END date_sequence -->
+    <!-- BEGIN recurring_dates -->
+    <tr>
+      <td class="formLabelWidth" valign="top"><h3>Repeat</h3>
+        <em>The frequency that this tutorial recurs if at all.</em></td>
+      <td><select name="repeat" onchange="toggleRepeat(this);">
+          <option value="">Single Meeting</option>
+          <option value="weekly">Weekly</option>
+          <option value="fortnightly">Fortnightly</option>
+          <option value="monthly">Monthly</option>
+        </select></td>
+    </tr>
+    <tr id="repeatUntil" style="display: none;">
+      <td class="formLabelWidth" valign="top"><h3>Repeat Until</h3>
+        <em>The date at which recurrence should cease.</em></td>
+      <td><input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="10" value=""/>
+        <img src="/images/ico_calendar.gif" width="16" height="13" id="repeat_until_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
+        <script type="text/javascript">
+						Calendar.setup({
+							inputField     :    "repeat_until",     // id of the input field
+							ifFormat       :    "%d/%m/%Y",      // format of the input field
+							button         :    "repeat_until_trigger",  // trigger for the calendar (button ID)
+							align          :    "br",           // alignment (defaults to "Bl")
+							singleClick    :    true
+						});
+						</script></td>
+    </tr>
+    <!-- END recurring_dates -->
+  <tr> 
+    <td><h3>Time</h3></td>
+    <td> <input id="hour" name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />
+      : 
+      <input id="minute" name="minute" type="text" maxlength="2" value="{MIN}" class="timeField" /> 
+      <select id="period" name="period">
+        <option value="am" {AM} >AM</option>
+        <option value="pm" {PM} >PM</option>
+      </select>
+      to 
+      <input name="tohour" id="tohour" type="text" maxlength="2" value="{TOHOUR}" class="timeField" />
+      : 
+      <input name="tominute" id="tominute" type="text" maxlength="2" value="{TOMIN}" class="timeField" /> 
+      <select id="toperiod" name="toperiod">
+        <option value="am" {AMTO}>AM</option>
+        <option value="pm" {PMTO}>PM</option>
+      </select></td>
+  </tr>
+
+    <tr>
+      <td><h3>Tutor</h3></td>
+      <td><table cellspacing="0">
+          <tr>
+            <td style="width: 100px;"><strong>Primary</strong></td>
+            <td><select id="tutor1ID" name="tutor1ID">
+                <option value="">N/A</option>
+                <!-- BEGIN tutor_list_1 -->
+                <option value="{TUTOR_ID}" {TUTOR_ID_SELECTED}>{TUTOR_NAME}</option>
+                <!-- END tutor_list_1 -->
+              </select>
+            </td>
+          </tr>
+          <tr class="pedantic">
+            <td><strong>Seconday</strong></td>
+            <td><select id="tutor2ID" name="tutor2ID">
+            	<option value="">N/A</option>
+                <!-- BEGIN tutor_list_2 -->
+                <option value="{TUTOR_ID}" {TUTOR_ID_SELECTED}>{TUTOR_NAME}</option>
+                <!-- END tutor_list_2 -->
+              </select></td>
+          </tr>
+        </table></td>
+    </tr>
+    <tr>
+        <td><h3>Cancelled</h3></td>
+        <td><input type="checkbox" value="1" name="cancelled" {CANCELLED_SELECTED} /></td>
+    </tr>
+
+    <tr class="pedantic">
+      <td>&nbsp;</td>
+      <td>
+        <input type="hidden" name="actionType" id="actionType" value="{ACTION_TYPE}" />
+        <input type="hidden" name="eventID" value="{EVENT_ID}" />
+        <input class="btn" type="submit" name="submit" value="{ACTION}" />
+        <!-- BEGIN delete_sequence -->
+        <input class="btn" type="button" name="delete" id="deleteSequence" value="Delete Sequence" /><!-- END delete_sequence -->
+      </td>
+    </tr>
+  </table>
+</form>

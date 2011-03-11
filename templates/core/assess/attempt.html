@@ -1,6 +1,6 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/css/jquery.countdown.css" media="screen" />
-<script type="text/javascript" src="/javascript/jquery.ui.js"></script>
+<script type="text/javascript" src="/javascript/jquery.swappable.js"></script>
 <script type="text/javascript" src="/javascript/jquery.countdown.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
@@ -113,15 +113,15 @@ $j(document).ready(function() {
 		<!-- END question -->
 
 		<!-- BEGIN endAssess -->
-		<a href="/assess/end/{ASSESS_ASSESS_ID}" class="green-go">Finish</a>
+		<a href="/assess/end/{ASSESS_ASSESS_ID}" class="btn tick"><span></span>Finish</a>
 		<!-- END endAssess -->
 
 		<!-- BEGIN prevSection -->
-		<a class="next-step step-nav" href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}">Previous Section</a>
+		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="btn go-back float-left"><span></span>Previous Section</a>
 		<!-- END prevSection -->
 
 		<!-- BEGIN nextSection -->
-		<a class="next-step step-nav" href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}">Next Section</a>
+		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="btn go-to"><span></span>Next Section</a>
 		<!-- END nextSection -->
 	</div>
 	<div class="col-2">

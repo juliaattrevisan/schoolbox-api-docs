@@ -1,12 +1,13 @@
-<div class="box imageComp" id="component{COMPONENT_ID}">
+<div class="box imageComp" id="component{COMPONENT_HOMEPAGE_ID}">
   <h2>{IMAGE_TITLE}</h2>
   <!-- BEGIN config -->
-    <a class="edit">edit</a>
-    <div class="editPanel hide">
+    <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
+<a class="close-delete" href="#"><span>X</span></a>
+    <div class="editPanel settings hide">
       <form action="/homepage/configForm.php" method="get">
         <input type="hidden" name="cid" value="{ID}" />
         <input type="hidden" name="type" value="config" />
-        <input type="hidden" name="component" value="{COMPONENT_ID}" />
+        <input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
         <label for="url">URL:</label>
         <input type="text" name="url" value="{COMPONENT_CONFIG_URL}" size="25"/>
         <label for="image">Image: </label>
@@ -16,10 +17,20 @@
           <!-- END image -->
         </select>
         <label for="url">Pixels:</label>
-      	<input type="text" name="pixel" value="{COMPONENT_CONFIG_PIXEL}" size="4"/>
-        <input type="submit" value="Update" />
-      </form>
-    </div>
+      	<input type="text" name="pixel" value="{COMPONENT_CONFIG_PIXEL}" size="4"/>      <input type="submit" value="Update" class="submit-btn update" />
+    </form>
+  </div>
+	<div class="editPanel delete-it hide">
+		<p>Are you sure you want to delete?</p>
+		<form action="#" method="post">
+		  <input type="hidden" name="cid" value="{ID}" />
+		  <input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+                  <input type="hidden" name="component" value="{COMPONENT_ID}" />
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
+			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
+		</form>
+		<div class="float-fix"></div>
+	</div>
   <!-- END config -->
   <!-- BEGIN previewimage -->
   <div class="text">
@@ -27,6 +38,6 @@
   </div>
   <!-- END previewimage -->
   <!-- BEGIN submit_image -->
-  <p class="interact"><a href="/cms/file/new/{ID}">Post Image</a></p>
+  <p class="interact"><a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post Image</a></p>
   <!-- END submit_image -->
 </div>

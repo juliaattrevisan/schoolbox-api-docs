@@ -3,7 +3,7 @@
 	
 	
 	<!-- BEGIN config -->
-	<a class="edit">edit</a>
+	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
 	<div class="editPanel hide">
 		<form action="/eportfolio/configForm.php" method="get">
 			<input type="hidden" name="uid" value="{ID}" />
@@ -21,7 +21,7 @@
 				<option value="{COMPONENT_CONFIG_COMMENTS_SIZE_VALUE}"{COMPONENT_CONFIG_COMMENTS_SIZE_SELECTED}>{COMPONENT_CONFIG_COMMENTS_SIZE_NAME}</option>
 				<!-- END comments_size -->
 				</select>
-			<input type="submit" value="Update" />
+			<input type="submit" value="Update"  class="submit-btn-plain" />
 		</form>
 	</div>
 	<!-- END config -->
@@ -45,7 +45,7 @@
          <div class="blog_comments">
             <!-- BEGIN comment -->
             <p class="blog_title">{COMMENT_BODY}</p>
-            <p class="small summ separate">{COMMENT_OWNER} <br />{COMMENT_CREATED}<br /> {DELETE_COMMENT}</p>
+            <p class="small hide-on-small separate">{COMMENT_OWNER} <br />{COMMENT_CREATED}<br /> {DELETE_COMMENT}</p>
             <div class="float-fix"></div>
             <!-- END comment -->
 
@@ -54,9 +54,9 @@
             <!-- END show_all -->
          </div>
 		
-         <p><a class="interact post_comment" href="javascript:void();">Post comment</a></p>
+         <p><a class="interact post_comment" href="javascript:void();" >Post comment</a></p>
 
-         <form class="standardForm" method="post" action="/eportfolio_blog/comment/new/{BLOG_ID}">
+         <form  method="post" action="/eportfolio_blog/comment/new/{BLOG_ID}">
             <p><textarea name="body" style="width: 100%;"></textarea></p>
             <p><input type="submit" name="comment" value="Comment"/></p>
          </form>
@@ -66,7 +66,7 @@
 		<!-- END blog -->
 	</ul>
 		<p class="interact pad-it">
-	<!-- BEGIN submit --><a href="/eportfolio_blog/modify/new/{ID}">Post Entry</a><!-- END submit -->
+	<!-- BEGIN submit --><a href="/eportfolio_blog/modify/new/{ID}" class="btn up-arrow"><span></span>Post Entry</a><!-- END submit -->
 	</p>
 	</div>
 

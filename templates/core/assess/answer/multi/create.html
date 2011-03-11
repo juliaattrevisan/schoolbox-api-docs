@@ -3,7 +3,6 @@
 <script type="text/javascript">
 $j(document).ready(function() {
 
-
 	//add in one clone to start with
 		var thing = $j('.hidden-clone ul:first-child').clone();
 		$j('ul#answerCollection').append(thing);
@@ -53,7 +52,7 @@ $j(document).ready(function() {
 				marks: theForm.find('input[name=marks]').val(),
 				allAnswers: JSON.stringify(answerCollection)
 			};
-	
+
 			/* Submit via POST and redirect to question creation screen upon done
 			 */
 			$j.post(theForm.attr('action'), data, function(responseText) {

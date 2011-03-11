@@ -1,15 +1,13 @@
 <h1>Find User</h1>
-<form action="/search/userSearch.php" method="get" name="form" id="form" class="standardForm">
-  <table>
+<form action="/search/userSearch.php" method="get" name="form" id="form" >
+  <table class="standardForm">
     <tr>
-      <td class="formLabelWidth"><h3>Search String</h3>
-        <em>You may search on the following fields; synergy id, year level, firstname, surname or both.</em></td>
-      <td><input name="keyword" type="text" id="keyword" /></td>
-    </tr>
-    <tr>
-      <td>&nbsp;</td>
-      <td><input type="submit" label="Submit" name="submit" value="Find" class="btn"/>
-      </td>
+      <td class="formLabelWidth"><h4>Search String</h4>
+        <em>You may search on the following fields; synergy id, year level, firstname, surname or both.</em>
+		</td>
+	<td><input name="keyword" type="text" id="keyword" /></td>
     </tr>
   </table>
+  <input type="submit" label="Submit" name="submit" value="Find" class="submit-btn-plain"/>
+  <div class="float-fix"></div>
 </form>

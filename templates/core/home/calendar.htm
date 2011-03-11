@@ -1,14 +1,35 @@
 <div class="box">
-  <h2>Today's Events <span>- <a href="/calendar/week/">{DATE}</a></span></h2>
-  <div class="text listing">
-  	<ul>
-  	<!-- BEGIN note_block -->
-    <li class="{ON_OFF}">
-    	<p class="interact-left home-calendar">{TIME}&nbsp;</p>
-      	<h4 class="eventListing" style="background-color:{NOTE_COLOUR}">{NOTE_DESCRIPTION}</h4>
-        <div class="float-fix"></div>
-      </li>
-    <!-- END note_block -->
-    </ul>
-  </div>
+    <h2>Today's Events <span>- <a href="/calendar/week/">{DATE}</a></span></h2>
+
+    <div class="text listing">
+        <ul class="js_happening">
+            <!-- BEGIN note_block -->
+            <li class="{ON_OFF}">
+                <p class="interact-left home-calendar">{TIME}&nbsp;</p>
+                <h4 class="eventListing" style="background-color:{COLOUR}">{NOTE}</h4>
+                <div class="hidden-fields">
+                    <h4><!-- BEGIN time -->
+                        <span class="time"><strong>{TIME}</strong></span>
+                        <!-- END time -->{NOTE}
+                    </h4>
+                    <p class="meta">Event Type: {TYPE}<br/>
+                        Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br/>
+                        {LOCATION} {DETAIL}</p>
+                    <div class="modify">{MODIFY}</div>
+                    <div class="float-fix"></div>
+                </div>
+				<div class="float-fix"></div>
+            </li>
+            <!-- END note_block -->
+        </ul>
+    </div>
+</div>
+
+<div class="cal-bubble">
+    <div class="top"></div>
+    <div class="middle">
+        <div class="close">x</div>
+        <div class="js-data"></div>
+    </div>
+    <div class="bottom"></div>
 </div>

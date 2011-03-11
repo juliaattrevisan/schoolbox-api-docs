@@ -1,9 +1,7 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" type="text/css" media="screen" href="/javascript/jscalendar/calendar-blue2.css" />
-<script type="text/javascript" src="/javascript/jscalendar/calendar.js"></script>
-<script type="text/javascript" src="/javascript/jscalendar/lang/calendar-en.js"></script>
-<script type="text/javascript" src="/javascript/jscalendar/calendar-setup_stripped.js"></script>
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript">
 var $j = jQuery.noConflict();
@@ -21,12 +19,21 @@ $j(document).ready(function () {
 			}
 		});
 	});
+	
+	$j('#from, #to').datepicker({ 
+		dateFormat: 'dd/mm/yy',
+		showOn:'both',
+		buttonImage: '/images/demo/calendar/calendar-click.png',
+		buttonImageOnly: true
+	});
+	
+	
 });
 
 </script>
 <!-- END custom_head -->
 <h1>Student Report - {STUDENT}</h1>
-<span class="header_option"> <a href="/search/user/{STUDENT_ID}">View</a> </span>
+<span class="header_option"> <a href="/search/user/{STUDENT_ID}" class="btn"><span></span>View Student Details</a> </span>
 <form action="/modules/tutorial/report/student.php" method="get">
   <table style="width: 650px;">
     <tr>
@@ -34,30 +41,12 @@ $j(document).ready(function () {
       <td><input class="lookup" type="text" name="keyword" value="{STUDENT}" /></td>
       <td>From:</td>
       <td style="white-space: nowrap;"><input name="from" id="from" type="text" size="15" maxlength="10" value="{FROM}"/>
-        <img src="/images/ico_calendar.gif" width="16" height="13" id="from_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
-        <script type="text/javascript">
-		Calendar.setup({
-			inputField     :    "from",     // id of the input field
-			ifFormat       :    "%d/%m/%Y",      // format of the input field
-			button         :    "from_trigger",  // trigger for the calendar (button ID)
-			align          :    "br",           // alignment (defaults to "Bl")
-			singleClick    :    true
-		});
-		</script></td>
+        </td>
       <td>To:</td>
       <td style="white-space: nowrap;"><input name="to" id="to" type="text" size="15" maxlength="10" value="{TO}"/>
-        <img src="/images/ico_calendar.gif" width="16" height="13" id="to_trigger" style="cursor: pointer;" title="Date selector" onMouseOver="this.style.background='red';" onMouseOut="this.style.background=''"/>
-        <script type="text/javascript">
-		Calendar.setup({
-			inputField     :    "to",     // id of the input field
-			ifFormat       :    "%d/%m/%Y",      // format of the input field
-			button         :    "to_trigger",  // trigger for the calendar (button ID)
-			align          :    "br",           // alignment (defaults to "Bl")
-			singleClick    :    true
-		});
-		</script></td>
+        </td>
       <td><input class="userID" type="hidden" name="userID" id="userID" value="{STUDENT_ID}" />
-        <input type="submit" name="submit" value="Report" /></td>
+        <input type="submit" name="submit" class="submit-btn-plain" value="Report" /></td>
     </tr>
   </table>
 </form>
@@ -66,7 +55,7 @@ $j(document).ready(function () {
   <!-- BEGIN class_list -->
   <tr class="obsessive">
     <td colspan="7"><h2>{TUTORIAL} - {CODE} - {TYPE} - {ATTENDANCE}%</h2>
-      <span class="header_option"> <a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}">Modify</a> </span> </td>
+      <span class="header_option"> <a href="/modules/tutorial/event/modify.php?eventID={EVENT_ID}" class="btn modify"><span></span>Modify</a> </span> </td>
   </tr>
   <tr>
     <th style="width: 20%;">Date</th>

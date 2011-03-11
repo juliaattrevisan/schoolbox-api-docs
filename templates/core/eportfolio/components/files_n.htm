@@ -1,7 +1,7 @@
 <div class="box" id="component{COMPONENT_ID}">
   <h2>Files</h2>
   <!-- BEGIN config -->
-  <a class="edit">edit</a>
+  <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
   <div class="editPanel hide">
     <form action="/eportfolio/configForm.php" method="get">
       <input type="hidden" name="uid" value="{ID}" />
@@ -29,7 +29,7 @@
         <option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
         <!-- END size -->
       </select>
-      <input type="submit" value="Update" />
+      <input type="submit" value="Update"  class="submit-btn update" />
     </form>
   </div>
   <!-- END config -->
@@ -49,8 +49,8 @@
 				<a href="/cms/myFileForm.php?unpublish={FILE_ID}" onclick="return confirm('Do you want to unpublish this file?');">Unpublish</a>
 				<!-- END unpublish -->
 			</p>
-			<p class="summ">{FILE_COMMENT}</p>
-			<p class="small summ">Published on {FILE_PUBLISHED_DATE}</p>
+			<p class="hide-on-small">{FILE_COMMENT}</p>
+			<p class="small hide-on-small">Published on {FILE_PUBLISHED_DATE}</p>
 		</div>
         <div class="float-fix"></div>
       </li>
@@ -58,7 +58,7 @@
     </ul>
     <div class="float-fix"></div>
     <p class="interact">
-        <a href="/cms/portfolio">Add file</a>
+        <a href="/cms/portfolio" class="btn add"><span></span>Add file</a>
     </p>
   </div>
 </div>

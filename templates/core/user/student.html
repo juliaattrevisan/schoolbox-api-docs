@@ -68,16 +68,16 @@
         <td colspan="6"><!-- BEGIN school_links --><!-- END school_links -->
              <ul>
               <!-- BEGIN timetable_link -->
-              <li><a href="/timetable/{SYNERGY_ID}">Timetable</a></li>
+              <li><a href="/timetable/{SYNERGY_ID}" class="btn report"><span></span>Timetable</a></li>
               <!-- END timetable_link -->
               <!-- BEGIN due_work -->
-              <li><a href="/submission/dueWork/0/{ID}">Due Work</a></li>
+              <li><a href="/submission/dueWork/0/{ID}" class="btn due-work"><span></span>Due Work</a></li>
               <!-- END due_work -->
               <!-- BEGIN helpdesk -->
-              <li><a href="/modules/helpdesk/index.php?id={ID}">Helpdesk Jobs</a></li>
+              <li><a href="/modules/helpdesk/index.php?id={ID}" class="btn help"><span></span>Helpdesk Jobs</a></li>
               <!-- END helpdesk -->
               <!-- BEGIN eportfolio -->
-              <li><a href="/eportfolio/{ID}">ePortfolio</a></li>
+              <li><a href="/eportfolio/{ID}" class="btn eportfolio"><span></span>ePortfolio</a></li>
               <!-- END eportfolio -->
             </ul>
         </td>
@@ -91,7 +91,7 @@
     </td>
   </tr>
     <!-- BEGIN contact_alert -->
-  <tr><td colspan="6"><strong>{CONTACT_ALERT}</strong</td></tr>
+  <tr><td colspan="6"><img src="/images/famicons/exclamation.png" title="important"/><span style="color:red; font-weight:bold;">{CONTACT_ALERT_MESSAGE}</span></td></tr>
   <!-- END contact_alert -->
   <!-- BEGIN contact_details -->
   <tr>

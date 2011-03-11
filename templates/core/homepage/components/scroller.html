@@ -1,7 +1,7 @@
 <script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
 <script type="text/javascript">
-$j(function(){
-    $j('#galleryCycle').cycle({
+$j(window).load(function(){
+		$j('#galleryCycle').cycle({
         cleartype: true,
         before: function() {
             $j('#galleryCycle span').slideUp();
@@ -25,6 +25,8 @@ $j(function(){
 
 #galleryCycle div {
 	position: relative;
+		display:none;
+	
 }
 
 #galleryCycle span {
@@ -42,29 +44,40 @@ $j(function(){
 }
 </style>
 
-<div class="box" id="component{COMPONENT_ID}">
+<div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
     <h2>Image Scroller</h2>
-      <!-- BEGIN config -->
-	  <a class="edit">edit</a>
-	 
-        <div class="editPanel hide">
+    <!-- BEGIN config -->
+    <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
+<a class="close-delete" href="#"><span>X</span></a>
+        <div class="editPanel settings hide">
             <form action="/homepage/configForm.php" method="get">
                 <input type="hidden" name="cid" value="{ID}" />
                 <input type="hidden" name="type" value="config" />
-                <input type="hidden" name="component" value="{COMPONENT_ID}" />
+                <input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
                 <label for="url">Pixels:</label>
-                <input type="text" name="pixel" value="{COMPONENT_PIXEL}" size="4"/>
-                <input type="submit" value="Update" />
-            </form>
-        </div>
-	 <!-- END config -->
-
+                <input type="text" name="pixel" value="{COMPONENT_PIXEL}" size="4"/>      <input type="submit" value="Update" class="submit-btn update" />
+    </form>
+  </div>
+	<div class="editPanel delete-it hide">
+		<p>Are you sure you want to delete?</p>
+		<form action="#" method="post">
+		  <input type="hidden" name="cid" value="{ID}" />
+		  <input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+                  <input type="hidden" name="component" value="{COMPONENT_ID}" />
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
+			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
+		</form>
+		<div class="float-fix"></div>
+	</div>
+    </a>
+    <!-- END config -->
     <div id="galleryCycle" class="box">
         <!-- BEGIN image -->
         <div><img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" /><span>{IMAGE_NAME}</span></div>
         <!-- END image -->
     </div>
-      <!-- BEGIN submit_image -->
-  <p class="interact"><a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post Image</a></p>
+
+  <!-- BEGIN submit_image -->
+  <p class="interact"><a href="/cms/file/multi/{ID}" class="btn up-arrow"><span></span>Post Images</a></p>
   <!-- END submit_image -->
 </div>

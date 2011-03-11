@@ -1,7 +1,7 @@
 <div class="box" id="component{COMPONENT_ID}">
   <h2>Links</h2>
 <!-- BEGIN config -->
-  <a class="edit">edit</a>
+  <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
   <div class="editPanel hide">
     <form action="/eportfolio/configForm.php" method="get">
       <input type="hidden" name="uid" value="{ID}" />
@@ -24,28 +24,29 @@
       	<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
       	<!-- END size -->
       </select>
-      <input type="submit" value="Update" />
+      <input type="submit" value="Update" class="submit-btn update"/>
     </form>
   </div>
 <!-- END config -->
-	<div class="text listing links">
+<div class="text listing">
   	<ul>
     	<!-- BEGIN link -->
     	<li class="{ON_OFF}">
-      	<h4><a class="icons httpurl" href="{LINK_URL}">{LINK_NAME}</a></h4>
-       	<div class="small-right">
-	    <!-- BEGIN modify_link --><p class="interact"><a href="/cms/eportfolioLink/{LINK_ID}">Modify</a></p><!-- END modify_link -->
-        <p class="summ">{LINK_COMMENT}</p>
-        <p class="small summ">Posted by <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a> on {LINK_POSTED_DATE}</p>
-        </div>
+      	<h4><a class="icons link" href="{LINK_URL}">{LINK_NAME}</a></h4>
+        <div class="small-right">
+			<!-- BEGIN modify_link --><p class="interact"><a href="/cms/link/{LINK_ID}" >Modify</a></p><!-- END modify_link -->
+		</div>
+        <div class="float-fix"></div>
+		<p>{LINK_COMMENT}</p>
+		<p class="interact">Posted by <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a> on {LINK_POSTED_DATE}</p>
 		<div class="float-fix"></div>
       </li>
     	<!-- END link -->
     </ul>
     <div class="float-fix"></div>
   </div>
-    <p class="interact"><a href="/cms/myLinks">Post Link</a></p>
   <!-- BEGIN submit_link -->
-    
+    <p class="interact"><a href="/cms/link/new/{ID}" class="btn up-arrow"><span></span>Post Link</a></p>
+	
     <!-- END submit_link -->
 </div>

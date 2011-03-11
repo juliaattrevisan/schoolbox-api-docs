@@ -1,0 +1,58 @@
+<script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
+<script type="text/javascript">
+$j(function() {
+	$j('ul.section-options').droppy({speed: 0});
+	
+	$j('a.delete-question').click(function() {
+		location.href = $j(this).attr('href');
+	}).confirm({
+		buttons: {
+			wrapper:'<button></button>',
+			separator:'  '
+  		}
+	});
+
+});
+</script>
+<h2>Assessment Content
+	<ul class="section-options">
+		<li class="parent">	
+			<a class="drop-arrow" href="#"></a>
+			<ul>
+				<li><a href="/assess/modify/{ASSESS_ASSESS_ID}">Modify</a></li>
+				<li><a href="/assess/export/{ASSESS_ASSESS_ID}.xml">Export</a></li>
+			</ul>
+		</li>
+	</ul>
+</h2>
+<div class="allQuestions">
+	<div class="assess-body">
+	<a class="add-section" href="/assess/section/create/{ASSESS_ASSESS_ID}">Add sections to this assessment</a>
+        <!-- BEGIN section -->
+		<div class="section-box">
+			<h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}
+			<ul class="section-options">
+				<li class="parent">	
+					<a class="drop-arrow" href="#"></a>
+					<ul>
+						<li><a href="/assess/section/modify/{SECTION_SECTION_ID}">Edit</a></li>
+						<li><a onclick="return confirm('Are you sure you want to delete the section?');" href="/assess/section/delete/{SECTION_SECTION_ID}">Delete</a></li>
+					</ul>
+				</li>
+			</ul>
+			</h3>
+			<ul class="section-question">
+				<!-- BEGIN question -->
+				<li>
+						<p><span>Q{QUESTION_SEQUENCE})</span> {QUESTION_QUESTION} - ({QUESTION_MARKS} marks)</p>
+						<p class="pad-it"><a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
+						<a class="delete-question" href="/assess/question/delete/{QUESTION_QUESTION_ID}">Delete</a></p>
+				</li>
+				<!-- END question -->
+			</ul>
+	
+            <a class="add-questions" href="/assess/question/create/{SECTION_SECTION_ID}"><span>Add a Question</span></a>
+		</div>
+        <!-- END section -->
+	</div>
+</div>

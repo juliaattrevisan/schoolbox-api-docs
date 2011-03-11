@@ -1,21 +1,18 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
-<script type="text/javascript" src="/javascript/calendar/jquery.custom.calendar.js"></script>
-
-<link rel="stylesheet" type="text/css" href="/css/core/ui/ui.css" />
-
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
       $j(function () {
  
         /* date picker */		 
         $j('.datepicker').datepicker({ 
-          dateFormat: 'dd-mm-yy',
-          onSelect: function(dateText, inst) {window.open('/calendar/month/'+dateText, "_self")},
-          defaultDate: $j.datepicker.parseDate("dd-mm-yy", "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"),
-					showOn: 'button',
-					buttonImage: '/css/core/ui/images/calendar-icon.gif',
-					buttonImageOnly: true,
-					showAnim: 'slideDown'
+			dateFormat: 'dd-mm-yy',
+			onSelect: function(dateText, inst) {window.open('/calendar/month/'+dateText, "_self")},
+			defaultDate: $j.datepicker.parseDate("dd-mm-yy", "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"),
+			showOn: 'button',
+			buttonImage: '/images/core/calendar/calendar-click.png',
+			buttonImageOnly: true,
+			showAnim: 'slideDown'
         });
 
 });
@@ -37,8 +34,14 @@
 			
 			<td colspan="3" class="cal-right" valign="baseline">
 				<div class="link-case">
-					<a class="customise filters" href="#">Calendar Filters</a><a class="customise week" href="/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}">Week</a><a class="customise" href="#">Month</a>
+					<a class="filter-change filters" href="#"><span></span>Filters</a>
+				<a class="filter-change week " href="/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"><span></span>Week</a>
+				<a class="filter-change month current" href="#"><span></span>Month</a>
 					<div class="filter-drop">
+					
+					
+					
+					
 						<div class="filter-list">
 							<form>	
 								<div class="filter-cat groups">
@@ -70,12 +73,12 @@
 								</div><!--/filter-list-->
 								
 								<div class="float-fix"></div>
-								
-								<hr />
 							
-							<a href="#" id="applyFilters">Apply Filters</a>
+							<a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a>
+							<div class="float-fix"></div>
 						</form>
 					</div><!--/filter-drop-->
+				</div>
 				</div>
 			</td>
 		</tr>
@@ -102,16 +105,18 @@
 				<div class="noteWrap">
 					<ul class="js_happening">
 						<!-- BEGIN note_block -->
-						<li class="{EVENT_TYPE} {EVENT_LEVEL} ">
-							<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}<br /></span>
-							<div class="hidden-fields">
-								<div class="author"><a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></div>
-								<h4><!-- BEGIN time --><div class="time"><strong>{TIME}</strong></div><!-- END time -->{NOTE}</h4>
-								<p class="meta">Event Type: {TYPE}</p>
-								<div class="modify">{MODIFY}<div class="float-fix"></div></div>
-								<div class="float-fix"></div>
-							</div>
-						</li>
+                                                <li class="{EVENT_TYPE} {EVENT_LEVEL} ">
+                                                    <span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}<br /></span>
+                                                    <div class="hidden-fields">
+
+                                                        <h4><!-- BEGIN time --><div class="time"><strong>{TIME}</strong></div><!-- END time -->{NOTE}</h4>
+                                                        <p class="meta">Event Type: {TYPE}<br />
+								Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br />
+                                                            {LOCATION} {DETAIL}</p>
+                                                        <div>{MODIFY}</div>
+                                                        <div class="float-fix"></div>
+                                                    </div>
+                                                </li>
 						<!-- END note_block -->
 					</ul>
 				</div>

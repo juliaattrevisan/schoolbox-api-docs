@@ -1,21 +1,32 @@
-<div class="box" id="component{COMPONENT_ID}">
+<div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
   <h2>News</h2>
     <!-- BEGIN config -->
-  <a class="edit">edit</a>
-  <div class="editPanel hide">
+  <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
+<a class="close-delete" href="#"><span>X</span></a>
+  <div class="editPanel settings hide">
     <form action="/homepage/configForm.php" method="get">
       <input type="hidden" name="cid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
-      <input type="hidden" name="component" value="{COMPONENT_ID}" />
+      <input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
       <label for="size">Item Limit: </label>
       <select name="size">
       	<!-- BEGIN size -->
       	<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
       	<!-- END size -->
-      </select>
-      <input type="submit" value="Update" />
+      </select>      <input type="submit" value="Update" class="submit-btn update" />
     </form>
   </div>
+	<div class="editPanel delete-it hide">
+		<p>Are you sure you want to delete?</p>
+		<form action="#" method="post">
+		  <input type="hidden" name="cid" value="{ID}" />
+		  <input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+                  <input type="hidden" name="component" value="{COMPONENT_ID}" />
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
+			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
+		</form>
+		<div class="float-fix"></div>
+	</div>
 <!-- END config -->
 	<div class="text listing">
   	<ul>
@@ -23,10 +34,10 @@
     	<li class="{ON_OFF}">
 			<h5 id="news-header">{NEWS_HEADING}<span>{MOD_NEWS}</span></h5>
 			<div class="float-fix"></div>
-				<div class="pad-it">
+
 					{NEWS_BODY}
-					<p class="interact">Posted by {EMAIL_CONTACT} {POSTED_DATE}</p>
-				</div>
+					<p class="interact hide-on-small">Posted by {EMAIL_CONTACT} {POSTED_DATE}</p>
+
 			<div class="float-fix"></div>
       	</li>
       <!-- END news -->
@@ -34,7 +45,7 @@
   	
   </div>
   <p class="interact">
-    <a href="/homepage/newsArchive/{ID}">News Archive</a>  
-    <!-- BEGIN submit_news --> | <a href="/news/homepage/new/{ID}">Post News</a><!-- END submit_news -->
+    <a href="/homepage/newsArchive/{ID}" class="btn"><span></span>News Archive</a>  
+    <!-- BEGIN submit_news --> <a href="/news/homepage/new/{ID}" class="btn up-arrow"><span></span>Post News</a><!-- END submit_news -->
   </p>
 </div>

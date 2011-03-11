@@ -24,24 +24,22 @@ tinyMCE.init({
 </script>
 <!-- END custom_head -->
 <h1>{ACTION} Wiki</h1>
-<span class="header_option"><a href="/homepage/{CATEGORY_ID}">Return to Homepage</a></span>
-<form class="standardForm" action="/wiki/modifyForm.php" method="post">
-  <table width="100%">
-    <tr>
-      <td class="formLabelWidth"><h3>Heading</h3></td>
-      <td><input type="text" name="heading" size="60" value="{HEADING}" /></td>
-    </tr>
-    <tr>
-      <td><h3>Body</h3></td>
-      <td><textarea name="body" style="width:100%;height:350px" >{BODY}</textarea></td>
-    </tr>
-    <tr>
-    <td>&nbsp;</td>
-    <td>
+<span class="header_option"><a href="/homepage/{CATEGORY_ID}" class="btn go-back"><span></span>Return to Homepage</a></span>
+<form  action="/wiki/modifyForm.php" method="post">
     <input type="hidden" name="wikiID" value="{WIKI_ID}" />
     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-    <input type="text" name="revision" value="{REVISION}" />
-    <input type="submit" class="btn" value="Save" /></td>
+    
+  <table width="100%" class="standardForm">
+    <tr>
+      <td class="formLabelWidth"><h4>Heading</h4></td>
+	  <td><input type="text" name="heading" size="60" value="{HEADING}" /></td>
+    </tr>
+    <tr>
+      <td><h4>Body</h4></td>
+	  <td><textarea name="body" style="width:100%;height:350px" >{BODY}</textarea></td>
     </tr>
   </table>
+    <input type="hidden" name="revision" value="{REVISION}" />
+  <input type="submit" class="submit-btn-plain" value="Save" />
+  <div class="float-fix"></div>
 </form>
