@@ -145,6 +145,17 @@ class Assess extends Model {
         for ($i=0, $numQuestions=0; $i < count($allQuestions); $i++) {
             $currentQuestion = $allQuestions[$i];
 
+			/* If section contains a deleted question, $allQuestions query is
+			 * empty. So we actually need to include the deleted questions to
+			 * get all the sections contained deleted questions.
+			 *
+			 * This if() checks whether the question is deleted, and if it has
+			 * just continue with everyone else
+			 */
+			if (!empty($currentQuestion['questionDeletedAt'])) {
+				continue;
+			}
+
             if (is_numeric($currentQuestion['question_id'])) {
                 $numQuestions++;
             }
@@ -222,12 +233,12 @@ class Assess extends Model {
                          question,
                          type_id,
                          marks,
-                         assess_question.sequence AS questionSequence
+                         assess_question.sequence AS questionSequence,
+						 assess_question.deleted_at AS questionDeletedAt
                   FROM assess_section
                   LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
                   WHERE assess_id = '$assess_id'
                   AND assess_section.deleted_at IS NULL
-                  AND assess_question.deleted_at IS NULL
                   ORDER BY sectionSequence, questionSequence";
 
         return $this->db->getAll($query);
