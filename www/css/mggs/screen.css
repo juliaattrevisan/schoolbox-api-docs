@@ -110,9 +110,10 @@ h2, h2 span a, h2 a {
 #nav ul {	
 	margin:0 0  15px 0;
 	background: #ededed url(/images/mggs/bg-nav-bottom.gif) no-repeat 0 100%;
-	padding-bottom: 2px;
+	padding:0 0 2px 0;
 	border:0 none;
 	width:161px;
+
 }
 
 #nav li {
@@ -146,11 +147,21 @@ h2, h2 span a, h2 a {
 #nav .lastChild {
 	border-bottom: 0;
 }
-#nav ul ul { border: 1px solid #dbdbdb; 
-     -moz-box-shadow: 0px 0px 0px #ffffff; 
-  -webkit-box-shadow: 0px 0px 0px #ffffff; 
-          box-shadow: 0px 0px 0px #ffffff; 
+#nav ul ul, #nav ul ul ul {
+	border: 1px solid #dbdbdb; 
+	-moz-box-shadow: 0px 0px 0px #ffffff; 
+	-webkit-box-shadow: 0px 0px 0px #ffffff; 
+	box-shadow: 0px 0px 0px #ffffff; 
+	left:159px;
+	padding:0;
+	background:none;
+	-moz-border-radius: 0px; 
+	-webkit-border-radius: 0px; 
+	border-radius: 0px; 
+	top:0;
+	width:159px;
 }
+
 #nav ul ul li { border: 0; border-top: 1px solid #dbdbdb; }
 #nav ul ul li:first-child { border: 0; }
 #nav ul ul a { color: #fff; background: #818181; }
