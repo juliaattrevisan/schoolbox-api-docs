@@ -18,6 +18,7 @@ $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();
 $responseHandler = new AssessResponse();
 $sectionHandler = new AssessSection();
+$questionHandler = new AssessQuestion();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -52,6 +53,10 @@ if ($assessHandler->isExpired($this->arg[0])) {
 
 if (!$assessHandler->canDoAssessment($this->arg[0])) {
     error(19);
+}
+
+if (!$questionHandler->numQuestions($this->arg[0])) {
+	error(137);
 }
 
 /* Set the start time if not already done.

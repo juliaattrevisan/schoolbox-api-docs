@@ -47,7 +47,7 @@ INSERT INTO error (id, message) VALUES (131, 'Question could not be saved.');
 INSERT INTO error (id, message) VALUES (132, 'Answer could not be saved.');
 INSERT INTO error (id, message) VALUES (133, 'Could not load question: unknown type.');
 INSERT INTO error (id, message) VALUES (134, 'No import file found.');
-
+INSERT INTO error (id, message) VALUES (137, 'There are no questions to attempt in this assessment.');
 
 
 ALTER TABLE submission_return CHANGE comment comment TEXT NULL ;
