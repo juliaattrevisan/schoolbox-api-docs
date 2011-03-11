@@ -397,6 +397,15 @@ $j(function() {
 		$j('.right h2').css('background-color', $j('.left h2').css('background-color'));
 		$j('.right, .right p').css('color', $j('.left, .left p').css('color'));
 		$j('.right a').css('color', $j('.left a').css('color'));
+		
+		//send off the pickers correctly.
+		pickers.right_head_font = pickers.left_head_font;
+		pickers.right_head_bg = pickers.left_head_bg;
+		pickers.right_font = pickers.left_font;
+		pickers.right_bg_primary = pickers.left_bg_primary;
+		pickers.right_bg_secondary = pickers.left_bg_secondary;
+		pickers.right_link = pickers.left_link;
+		pickers.right_hover = pickers.left_hover;
 
 	});
 	
