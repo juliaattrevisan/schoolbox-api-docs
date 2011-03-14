@@ -199,7 +199,7 @@ class News extends Model {
          GROUP BY `".$this->_index."`
          ORDER BY newsTopic.newsTopicID, item_datetime_modified DESC
          ";
-
+         
          $shareResults = $this->db->getAll($query);
       }
     
@@ -213,7 +213,7 @@ class News extends Model {
        * Otherwise, restrict news post selection by ownership.
        */
       if (!$userHandler->isSuperuser()) {
-         $query .= " WHERE item_owner = '".$_SESSION['id']."' OR newsUser.userID = '".$_SESSION['id']."' ";
+         $query .= " WHERE (item_owner = '".$_SESSION['id']."' OR newsUser.userID = '".$_SESSION['id']."') ";
       }
 
       $query .= "
@@ -290,7 +290,7 @@ class News extends Model {
        * Otherwise, restrict news post selection by ownership.
        */
       if (!$userHandler->isSuperuser()) {
-         $query .= " AND news_items.item_owner = '".$_SESSION['id']."' OR newsUser.userID = '".$_SESSION['id']."' ";
+         $query .= " AND (news_items.item_owner = '".$_SESSION['id']."' OR newsUser.userID = '".$_SESSION['id']."') ";
       }
 		
 		if($id)
@@ -301,7 +301,6 @@ class News extends Model {
 			$query .= " AND news_items.item_datetime_expires > NOW() ";
 			
 		$query .= " ORDER BY newsTopic.newsTopicID, news_items.item_datetime_modified DESC;";
-                print $query;
 		$userResults = $this->db->getAll($query);
 	
 		//merge and sort the headlines based on time
