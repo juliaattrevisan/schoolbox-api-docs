@@ -1,7 +1,8 @@
 <!-- BEGIN custom_head -->
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.color.js"></script>
-
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript">
 	tinyMCE.init({
 		mode : "textareas",
@@ -44,23 +45,26 @@
 	}
 	
 	$j(function() {
-		/*
 		$j('#addUser').autocomplete({
-			serviceUrl: '/ajax/user.php?groupID=0',
-			minChars: 2,
-			maxHeight: 400,
-			width: $j('#addUser').width(),
-			onSelect: function (value, data) {
-				$j('#userID').val(data);
-				return false;
-			}
+                    serviceUrl: '/ajax/user.php?groupID=0',
+                    delimiter: /(,|;)\s*/, // regex or character
+                    minChars: 2,
+                    maxHeight: 400,
+                    width: 200,
+                    onSelect: function (value, data) {
+                            if($j('#userList').val())
+                                $j('#userList').val($j('#userList').val()+','+data);
+                            else
+                               $j('#userList').val(data);
+                            return false;
+                    }
 		});
 		
 		$j('#type_form input').each(function () {
 			$j(this).click(function () {
 				$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', type: $j(this).val()});
 			});
-		});*/
+		});
 	
 	
 		//greenerising the checkboxes if they're ticked.
@@ -79,27 +83,25 @@
 			}
 		});
 		
-		/*$j('') while dog == fat { eat bone } rof rofrof 
+		/*$j('') while dog == fat { eat bone } rof rofrof */
 		
 		$j('.customise').click(function(event) {
 			event.preventDefault();
 			$j(this).children('span').toggle();
 			$j('.advanced').toggle()
 			if ($j('.advanced').is(':visible')) {
-				$j('.advanced').children('td').delay(1000).animate({opacity:'0'});
+				$j('.advanced').children('td').delay(1000).animate({opacity:'1'});
 			} else {
 				 $j('.advanced').queue('fx', []);	
 			}
 			});
-			
-			*/
 
 	});
 	
 </script>
 <!-- END custom_head -->
 
-<h1><span>{ACTION} News</span><!--<a class="customise" href="#"><span>Show Advanced Options</span><span style="display:none">Close Advanced Options</span></a>--></h1>
+<h1><span>{ACTION} News</span><a class="customise" href="#"><span>Show Advanced Options</span><span style="display:none">Close Advanced Options</span></a></h1>
 <form id="newsForm"  method="post" enctype="multipart/form-data" action="/news/modifyForm.php" onsubmit="return(verify());">
 <input type="hidden" name="newsID" value="{NEWS_ID}" />
 <table class="standardForm">
@@ -116,20 +118,17 @@
 </tr>
 <tr class="advanced">
 	<td valign="top">
-		<div class="color-to-fade"></div>
+		<!-- <div class="color-to-fade"></div> -->
 		<h4>Add users</h4>
 		<em>You may add users individually by typing their name and selecting from the list.  Alternatively you can add many users via a list of synergetic id's or usernames.</em></td>
-	<!--<td>
-		<div class="color-to-fade"></div>
-		<form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" method="post">
+	<td>
+		<!-- <div class="color-to-fade"></div> -->
 			<input id="addUser" type="text" size="30" />
-			<input type="hidden" name="userID" id="userID" />
+			<input type="hidden" name="userList" id="userList" />
 			<input type="submit" value="Add User" class="submit-btn-plain" />
 			<div class="float-fix"></div>
-		</form>
-		<a href="/group/bulk/{CATEGORY_ID}" class="btn add float-left"><span></span>Add Bulk Members</a>
 		<div class="float-fix"></div>
-	</td>-->
+	</td>
 </tr>
 
 <!-- BEGIN campus_row -->

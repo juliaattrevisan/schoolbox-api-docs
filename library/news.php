@@ -33,7 +33,13 @@ class News extends Model {
 				foreach ($campusList as $campus) {
 					$news['campusList'][] = $campus['campus'];
 				}
-			}			
+			}
+
+                        $query = "SELECT id, username, title, firstname, lastname
+                                    FROM newsUser JOIN user ON user.id = newsUser.userID
+                                    WHERE newsID = {$news[$this->_index]}";
+                        $news['userList'] = $this->db->getAll($query);
+
 		}
 		return $news;
 	}
@@ -77,9 +83,12 @@ class News extends Model {
 	function create($news) {
 		$groupList = $news['groupList'];
 		$campusList = $news['campusList'];
+                $userList = $news['userList'];
 		
 		unset($news['groupList']);
 		unset($news['campusList']);
+                unset($news['userList']);
+
 		
 		$news['item_datetime_posted'] = 'NOW()';
 		$news['item_datetime_modified'] = 'NOW()';
@@ -102,7 +111,14 @@ class News extends Model {
 		}
 		else if(is_numeric($campusList))
 			$this->db->insert('newsCampus', array('id' => $newsID, 'campus' => $campusList));
-		else
+
+
+                if (is_array($userList)) {
+			foreach ($userList as $user) {
+				$this->db->insert('newsUser', array('newsID' => $newsID, 'userID' => $user));
+			}
+		}
+ 		else
 			$this->db->insert('newsCampus', array('id' => $newsID, 'campus' => 1));
 		
 		return $newsID;
@@ -115,16 +131,19 @@ class News extends Model {
 	
 		$groupList = $news['groupList'];
 		$campusList = $news['campusList'];
+                $userList = $news['userList'];
 		
 		$news['item_datetime_modified'] = 'NOW()';
 		
 		unset($news['groupList']);
-		unset($news['campusList']);	
+		unset($news['campusList']);
+                unset($news['userList']);
 
 		parent::update($news);
 		
 		$this->db->delete('newsGroup', 'id', $news['item_id']);
 		$this->db->delete('newsCampus', 'id', $news['item_id']);
+                $this->db->delete('newsUser', 'newsID', $news['item_id']);
 		
 		if (is_array($groupList)) {
 			foreach ($groupList as $group) {
@@ -138,8 +157,15 @@ class News extends Model {
 		}	
 		else if(is_numeric($campusList))
 			$this->db->insert('newsCampus', array('id' => $news['item_id'], 'campus' => $campusList));
-		else
-			$this->db->insert('newsCampus', array('id' => $news['item_id'], 'campus' => 1));	
+
+
+                if (is_array($userList)) {
+			foreach ($userList as $user) {
+				$this->db->insert('newsUser', array('newsID' =>  $news['item_id'], 'userID' => $user));
+			}
+		}
+                else
+                    $this->db->insert('newsCampus', array('id' => $news['item_id'], 'campus' => 1));
 	}
 	
 	function delete($newsID) {
@@ -179,14 +205,15 @@ class News extends Model {
     
 		$query = "
 		SELECT `".$this->_index."`, item_heading, item_datetime_posted, item_datetime_modified, newsTopic.name topicName, newsTopicID
-		FROM `".$this->_table."` 
+		FROM `".$this->_table."`
+                LEFT JOIN newsUser ON newsUser.newsID = news_items.item_id
 		JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id";
 
       /* If the current user is a superuser, do not filter their results.
        * Otherwise, restrict news post selection by ownership.
        */
       if (!$userHandler->isSuperuser()) {
-         $query .= " WHERE item_owner = '".$_SESSION['id']."' ";
+         $query .= " WHERE item_owner = '".$_SESSION['id']."' OR newsUser.userID = '".$_SESSION['id']."' ";
       }
 
       $query .= "
@@ -255,6 +282,7 @@ class News extends Model {
 			user.lastname, user.title, user.firstname, user.id as uid, newsTopic.name topicName, newsTopicID
 		FROM `".$this->_table."`
 		JOIN user ON news_items.item_owner = user.id
+                LEFT JOIN newsUser ON newsUser.newsID = news_items.item_id
 		JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
       WHERE news_items.item_deleted = 0";
 
@@ -262,7 +290,7 @@ class News extends Model {
        * Otherwise, restrict news post selection by ownership.
        */
       if (!$userHandler->isSuperuser()) {
-         $query .= " AND news_items.item_owner = '".$_SESSION['id']."' ";
+         $query .= " AND news_items.item_owner = '".$_SESSION['id']."' OR newsUser.userID = '".$_SESSION['id']."' ";
       }
 		
 		if($id)
@@ -273,7 +301,7 @@ class News extends Model {
 			$query .= " AND news_items.item_datetime_expires > NOW() ";
 			
 		$query .= " ORDER BY newsTopic.newsTopicID, news_items.item_datetime_modified DESC;";
-
+                print $query;
 		$userResults = $this->db->getAll($query);
 	
 		//merge and sort the headlines based on time

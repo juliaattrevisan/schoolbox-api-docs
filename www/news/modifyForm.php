@@ -16,6 +16,7 @@ if ($_POST['heading']) {
 				  'item_body'		=> $_POST['body'],
 				  'groupList'		=> $_POST['group'],
 				  'campusList'		=> $_POST['campus'],
+                                  'userList'            => explode(',',$_POST['userList']),
 				  'item_topic_id' 	=> $_POST['item_topic_id'],
 				  );
 	

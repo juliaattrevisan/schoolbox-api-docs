@@ -28,12 +28,12 @@ if (is_numeric($this->arg[0])) {
 		error(23);
 	
 	$output = array('ACTION'		=> 'Modify',
-					'NEWS_ID'		=> $news['item_id'],
-					'HEADING'		=> $news['item_heading'],
-					'BODY'			=> $news['item_body'],
-					'LEAVE_OPTION'	=> '<option>Keep Existing</option>',
-					'DEFAULT_TIME_SELECTED' => '',
-					);
+                        'NEWS_ID'		=> $news['item_id'],
+                        'HEADING'		=> $news['item_heading'],
+                        'BODY'			=> $news['item_body'],
+                        'LEAVE_OPTION'          => '<option>Keep Existing</option>',
+                        'DEFAULT_TIME_SELECTED' => '',
+                        );
 					
 	$this->setVar($output);
 	
@@ -75,8 +75,8 @@ else {
 	$groupList = $newsHandler->getGroupList();
 	$campusList = $newsHandler->getCampusList();
 
-	$this->dropDown("group_selection", $groupList);
-	$this->dropDown("campus_selection", $campusList, array(), "campus_row");
+	$this->checkList("group_selection", $groupList);
+	$this->checkList("campus_selection", $campusList, array(), "campus_row");
 
 	$this->dropDown("topic_list", $newsHandler->getTopicList(), '', TEMPLATE_content, array('newsTopicID' => 'TOPIC_ID', 'name' => 'TOPIC_NAME'));
 

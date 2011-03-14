@@ -32,6 +32,8 @@ class SynergeticUser extends MSSQL{
 					AND FileYear=".$_SESSION[ 'FileYear']."
                     ";
         return $this->getRow($query);
+        
+
     }
 
 	function getStudent($synID)
