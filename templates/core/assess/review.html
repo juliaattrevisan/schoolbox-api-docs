@@ -1,6 +1,7 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/css/jquery.countdown.css" media="screen" />
 <script type="text/javascript" src="/javascript/jquery.countdown.js"></script>
+<script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
    var currentForm = '';
@@ -22,8 +23,8 @@ $j(document).ready(function() {
 				reviewedMarks: "Please enter a decimal number"
 			},
 			errorPlacement: function(error, element) {
-          	  offset = element.offset();
-            	error.insertBefore(element)
+                            offset = element.offset();
+                            error.insertBefore(element)
 			}
 
    		});
