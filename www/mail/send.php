@@ -51,7 +51,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 	//check if its got no to address but has either cc or bcc
 	//put the users email in the to field
-	if( !isEmail($to) && ( $bcc || $cc) )
+	if( !stristr($to,'@') && ( $bcc || $cc) )
 	{
 		$to = '"'.$to.'" <'.$user['username'].'@'.MAIL_address.'>';
 	}
