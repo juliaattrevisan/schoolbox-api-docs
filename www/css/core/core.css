@@ -1154,7 +1154,6 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 
 #assess .save-success {
 	display:none;
-	;
 	border:1px solid #ccc;
 	padding:10px;
 	margin:0 0 10px 0;
@@ -2647,14 +2646,12 @@ COLOUR ADJUSTMENT BOX
 
 .colours-buttons {
 	background:#f4f1ea;
-	height:56px;
-	padding-left:8px;
+	padding:16px;
+	padding-bottom:8px;
 }
 
 .colours-buttons .submit-btn-plain {
-	margin-top:16px;
-	margin-left:8px;
-	margin-right:0;
+	margin-bottom:8px;
 }
 
 .colours-buttons .save-colours, .colours-buttons .save-layout { margin-right:32px; }
@@ -2781,6 +2778,22 @@ a.layout:hover img { background: #999; }
 	padding:16px;
 	margin-bottom:16px;
 	background:#faf9f5;
+}
+
+.saved-colours {
+	color:#fff;
+	padding:0 8px 0 28px;
+	background:#cae9b9 url(/images/core/icons/black-tick.png) 8px 50% no-repeat;
+	height:23px;
+	line-height:23px;
+	margin-bottom:8px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	color:#000;
+	z-index:120;
+	display:none;
+	
 }
 
 .customise-components .centre-it { margin:0 auto; }

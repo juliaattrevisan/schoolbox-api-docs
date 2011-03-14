@@ -375,8 +375,10 @@ $j(function() {
     });
 
     $j('#saveColour').click(function () {
-
-       $j.post('/homepage/configForm.php', {colors: pickers, cid: cid});
+       $j.post('/homepage/configForm.php', {colors: pickers, cid: cid},
+	   function() {
+			$j('.saved-colours').slideDown(150).delay(2000).slideUp(150);
+	   });
     });
 	
 	$j("#leftRight").click(function () {	
