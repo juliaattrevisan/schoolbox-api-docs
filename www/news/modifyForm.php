@@ -13,12 +13,12 @@ if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)
 
 if ($_POST['heading']) {
 	$news = array('item_heading' 	=> $_POST['heading'],
-				  'item_body'		=> $_POST['body'],
-				  'groupList'		=> $_POST['group'],
-				  'campusList'		=> $_POST['campus'],
-                                  'userList'            => explode(',',$_POST['userList']),
-				  'item_topic_id' 	=> $_POST['item_topic_id'],
-				  );
+                      'item_body'	=> $_POST['body'],
+                      'groupList'	=> $_POST['group'],
+                      'campusList'	=> $_POST['campus'],
+                      'userList'        => $_POST['userList'],
+                      'item_topic_id' 	=> $_POST['item_topic_id'],
+                    );
 	
 	if ((int)$_POST['expires'] > 0)
 		$news['item_datetime_expires'] = outputDate(DATE_database, strtotime("+" . $_POST['expires'] . " hours"));

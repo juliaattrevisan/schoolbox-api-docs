@@ -47,7 +47,6 @@
 	$j(function() {
 		$j('#addUser').autocomplete({
 			serviceUrl: '/ajax/user.php?groupID=0',
-			delimiter: /(,|;)\s*/, // regex or character
 			minChars: 2,
 			maxHeight: 400,
 			width: 200,
@@ -112,12 +111,11 @@
 	<td><!-- BEGIN group_selection -->
 		
 		<label class="float-left clear">
-			<input type="checkbox" value="{GROUP_ID}" name="group[]" {group_id_selected}/>
+			<input type="checkbox" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED}/>
 			{GROUP_NAME} </label>
 		
 		<!-- END group_selection --></td>
 </tr>
-
 <!-- BEGIN campus_row -->
 <tr>
 	<td><h4>Campus</h4>
@@ -125,7 +123,7 @@
 	<td><!-- BEGIN campus_selection -->
 		
 		<label class="float-left clear">
-			<input type="checkbox" value="{CAMPUS_ID}" name="campus[]" {campus_id_selected} />
+			<input type="checkbox" value="{CAMPUS_ID}" name="campus[]" {CAMPUS_ID_SELECTED} />
 			{CAMPUS_NAME} </label>
 		
 		<!-- END campus_selection --></td>
@@ -135,11 +133,11 @@
 	<td valign="top">
 	
 		<h4>Add users</h4>
-		<em>You may add users individually by typing their name and selecting from the list.  Alternatively you can add many users via a list of synergetic id's or usernames.</em></td>
+		<em>You may add users individually by typing their name and selecting from the list. Use the delete button to remove users</em></td>
 	<td>
 			<input id="addUser" type="text" size="30" />
 			<ul class="visible-users">
-				<!-- BEGIN cuurent_users -->
+				<!-- BEGIN current_users -->
 				<li>
 					<input type="hidden" value="{USER_ID}" name="userList[]">
 					<span>{USER_NAME}</span>
@@ -151,24 +149,14 @@
 		<div class="float-fix"></div>
 	</td>
 </tr>
-
-<tr>
-	<td><h4>Headline</h4></td>
-	<td><input type="text" name="heading" size="35" maxlength="50" value="{HEADING}" /></td>
-</tr>
 <tr>
 	<td><h4>Topic</h4></td>
 	<td><select name="item_topic_id">
 			<!-- BEGIN topic_list -->
-			<option value="{TOPIC_ID}" {topic_id_selected}>{TOPIC_NAME}</option>
+			<option value="{TOPIC_ID}" {TOPIC_ID_SELECTED}>{TOPIC_NAME}</option>
 			<!-- END topic_list -->
 		</select></td>
 </tr>
-
-
-
-
-
 <tr>
 	<td><h4>Expires</h4>
 		<em>Select a period for which the news item will remain available.</em>
@@ -183,13 +171,17 @@
 			<option value="36">In 36 hours</option>
 			<option value="48">In 2 days</option>
                         <option value="72">In 3 days</option>
-			<option value="120" {default_time_selected}>In 5 days</option>
+			<option value="120" {DEFAULT_TIME_SELECTED}>In 5 days</option>
 			<option value="168">In 1 week</option>
 			<option value="336">In 2 weeks</option>
 			<option value="672">In 1 month</option>
                         <option value="4380">In 6 months</option>
 			<option value="8760">In 1 year</option>
 		</select></td>
+</tr>
+<tr>
+	<td><h4>Headline</h4></td>
+	<td><input type="text" name="heading" size="35" maxlength="50" value="{HEADING}" /></td>
 </tr>
 <tr>
 	<td><h4>Article</h4>

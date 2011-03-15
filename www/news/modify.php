@@ -12,12 +12,13 @@ if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)
 
 if (is_numeric($this->arg[0])) {
 	
-	$this->setFile(TEMPLATE_content, "news/modify.html");
-	$this->setBlock(TEMPLATE_content, "campus_row", "campus_row_block");
-	$this->setBlock(TEMPLATE_content, "delete_button", "delete_button_block");
+	$this->setFile(TEMPLATE_content, 'news/modify.html');
+	$this->setBlock(TEMPLATE_content, 'campus_row', 'campus_row_block');
+        $this->setBlock(TEMPLATE_content, 'current_users', 'current_users_block');
+	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 	
-	$this->setTitle("Modify News");
-	$this->setTab("news");
+	$this->setTitle('Modify News');
+	$this->setTab('news');
 	
 	$news = $newsHandler->getByID($this->arg[0]);
 	if (!isset($news['item_id']))
@@ -40,26 +41,40 @@ if (is_numeric($this->arg[0])) {
 	$groupList = $newsHandler->getGroupList();
 	$campusList = $newsHandler->getCampusList();
 	
-	$this->checkList("group_selection", $groupList, $news['groupList']);
-	$this->checkList("campus_selection", $campusList, $news['campusList'], "campus_row");
-	
-	$this->dropDown("topic_list", $newsHandler->getTopicList(), $news['item_topic_id'], TEMPLATE_content, array('newsTopicID' => 'TOPIC_ID', 'name' => 'TOPIC_NAME'));
+	$this->checkList('group_selection', $groupList, $news['groupList']);
+	$this->checkList('campus_selection', $campusList, $news['campusList'], 'campus_row');
+
+        $userList = $newsHandler->getUserList($news['item_id']);
+        if(is_array($userList)) {
+            foreach($userList as $user){
+                $userOut = array(  'USER_ID'    => $user['id'],
+                                    'USER_NAME' => formatName($user),
+                                );
+                $this->setVar($userOut);
+                $this->parse('current_users_block', 'current_users', true);
+            }
+        }
+        else
+            $this->setVar('current_users_block', '');
+
+	$this->dropDown('topic_list', $newsHandler->getTopicList(), $news['item_topic_id'], TEMPLATE_content, array('newsTopicID' => 'TOPIC_ID', 'name' => 'TOPIC_NAME'));
 	
 	if (count($campusList) > 1)
-		$this->parse("campus_row_block", "campus_row");
+		$this->parse('campus_row_block', 'campus_row');
 	else
-		$this->setVar("campus_row_block", "");
+		$this->setVar('campus_row_block', '');
 		
 	$this->parse("delete_button_block", "delete_button");
 
 }
 else {
-	$this->setFile(TEMPLATE_content, "news/modify.html");
-	$this->setBlock(TEMPLATE_content, "campus_row", "campus_row_block");
-	$this->setBlock(TEMPLATE_content, "delete_button", "delete_button_block");
+	$this->setFile(TEMPLATE_content, 'news/modify.html');
+	$this->setBlock(TEMPLATE_content, 'campus_row', 'campus_row_block');
+        $this->setBlock(TEMPLATE_content, 'current_users', 'current_users_block');
+	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
-	$this->setTitle("Add News");
-	$this->setTab("news");
+	$this->setTitle('Add News');
+	$this->setTab('news');
 
 	$output = array('ACTION'	=> 'Add',
 					'NEWS_ID'	=> '',
@@ -67,28 +82,25 @@ else {
 					'BODY'		=> '',
 					'LEAVE_OPTION'	=> '',
 					'DEFAULT_TIME_SELECTED' => 'selected="selected"',
+                                        'current_users_block'   => '',
+                                        'delete_button_block'   => '',
 					);
 
 	$this->setVar($output);
 
-
 	$groupList = $newsHandler->getGroupList();
 	$campusList = $newsHandler->getCampusList();
 
-	$this->checkList("group_selection", $groupList);
-	$this->checkList("campus_selection", $campusList, array(), "campus_row");
+	$this->checkList('group_selection', $groupList);
+	$this->checkList('campus_selection', $campusList, array(), 'campus_row');
 
 	$this->dropDown("topic_list", $newsHandler->getTopicList(), '', TEMPLATE_content, array('newsTopicID' => 'TOPIC_ID', 'name' => 'TOPIC_NAME'));
 
 
 	if (count($campusList) > 1)
-		$this->parse("campus_row_block", "campus_row");
+		$this->parse('campus_row_block', 'campus_row');
 	else
-		$this->setVar("campus_row_block", "");
-	
-	$this->setVar("delete_button_block", "");
-
-	
+		$this->setVar('campus_row_block', '');
+		
 } 
-
 ?>

@@ -69,6 +69,11 @@ class News extends Model {
 		}
 		return $output;
 	}
+
+        function getUserList($newsID) {
+            $query = "SELECT id, title, firstname, lastname FROM newsUser JOIN user ON userID = id WHERE newsID = $newsID";
+            return $this->db->getAll($query);
+        }
 	
 	function hasWrite($newsID) {
 		$groupHandler = new Group(NEWS_SERVICE);
@@ -197,14 +202,14 @@ class News extends Model {
             AND item_datetime_expires > NOW()
             AND item_deleted = 0
          GROUP BY `".$this->_index."`
-         ORDER BY newsTopic.newsTopicID, item_datetime_modified DESC
+         ORDER BY newsTopic.newsTopicID, item_datetime_posted DESC
          ";
          
          $shareResults = $this->db->getAll($query);
       }
     
 		$query = "
-		SELECT `".$this->_index."`, item_heading, item_datetime_posted, item_datetime_modified, newsTopic.name topicName, newsTopicID
+		SELECT DISTINCT `".$this->_index."`, item_heading, item_datetime_posted, item_datetime_modified, newsTopic.name topicName, newsTopicID
 		FROM `".$this->_table."`
                 LEFT JOIN newsUser ON newsUser.newsID = news_items.item_id
 		JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id";
@@ -220,7 +225,7 @@ class News extends Model {
 			AND item_datetime_expires > NOW() 
 			AND item_deleted = 0 
 		GROUP BY `".$this->_index."`
-		ORDER BY newsTopic.newsTopicID, item_datetime_modified DESC
+		ORDER BY newsTopic.newsTopicID, item_datetime_posted DESC
 		";
 
 		$userResults = $this->db->getAll($query);
@@ -270,13 +275,13 @@ class News extends Model {
             $query .=" AND news_items.item_datetime_expires > NOW() ";
 
 
-         $query .= " GROUP BY news_items.item_id ORDER BY newsTopic.newsTopicID, news_items.item_datetime_modified DESC";
+         $query .= " GROUP BY news_items.item_id ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC";
 
          $shareResults = $this->db->getAll($query);
       }
 
 		$query = "
-		SELECT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body,
+		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body,
 			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
 			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
 			user.lastname, user.title, user.firstname, user.id as uid, newsTopic.name topicName, newsTopicID
@@ -300,7 +305,7 @@ class News extends Model {
 		else
 			$query .= " AND news_items.item_datetime_expires > NOW() ";
 			
-		$query .= " ORDER BY newsTopic.newsTopicID, news_items.item_datetime_modified DESC;";
+		$query .= " ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC;";
 		$userResults = $this->db->getAll($query);
 	
 		//merge and sort the headlines based on time
