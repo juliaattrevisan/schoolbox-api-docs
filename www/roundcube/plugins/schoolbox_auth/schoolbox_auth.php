@@ -15,7 +15,7 @@ class schoolbox_auth extends rcube_plugin
 
         $this->add_hook('startup', array($this, 'startup'));
         $this->add_hook('authenticate', array($this, 'authenticate'));
-        $this->add_hook('identity_create', array($this, 'identity_create'));
+        $this->add_hook('user_create', array($this, 'user_create'));
     }
 
     function startup($args)
@@ -40,11 +40,10 @@ class schoolbox_auth extends rcube_plugin
         return $args;
     }
 
-    function identity_create($args)
-    {
-        $args['name'] = formatName($_SESSION);
-
+    function user_create($args) {
+        $args['user_name'] = formatName($_SESSION);
         return $args;
     }
+
 }
 ?>

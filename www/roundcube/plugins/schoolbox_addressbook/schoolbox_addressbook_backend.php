@@ -42,35 +42,39 @@ class schoolbox_addressbook_backend extends rcube_addressbook {
 
         $this->user_count = $count;
         $this->result = $this->count();
-
-        foreach ($users as $user) {
-            $this->result->add(array(
-                'ID'        => $user['id'],
-                'name'      => formatName($user),
-                'firstname' => $user['firstname'],
-                'surname'   => $user['lastname'],
-                'email'     => formatEmail($user)
-            ));
-        }
+	if(is_array($users)) {
+        	foreach ($users as $user) {
+        	    $this->result->add(array(
+        	        'ID'        => $user['id'],
+        	        'name'      => formatName($user),
+        	        'firstname' => $user['firstname'],
+        	        'surname'   => $user['lastname'],
+        	        'email'     => formatEmail($user)
+        	    ));
+        	}
+	}
 
         return $this->result;
     }
 
     public function search($fields, $value, $strict=false, $select=true, $nocount=false, $required=array()) {
-        $users = $this->user->search($value, 0, 20, $count);
+	$groups = array_merge(unserialize(STUDENTGROUPIDS),unserialize(STAFFGROUPIDS));
+        $users = $this->user->ajaxSearch($value, $groups, 20);
 
         $this->user_count = $count;
         $this->result = $this->count();
         
-        foreach ($users as $user) {
-            $this->result->add(array(
-                'ID'        => $user['id'],
-                'name'      => formatName($user),
-                'firstname' => $user['firstname'],
-                'surname'   => $user['lastname'],
-                'email'     => formatEmail($user)
-            ));
-        }
+	if(is_array($users) ) {
+        	foreach ($users as $user) {
+        	    $this->result->add(array(
+        	        'ID'        => $user['id'],
+        	        'name'      => formatName($user),
+        	        'firstname' => $user['firstname'],
+        	        'surname'   => $user['lastname'],
+        	        'email'     => formatEmail($user)
+        	    ));
+        	}
+	}
 
         return $this->result;
     }
