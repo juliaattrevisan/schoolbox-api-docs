@@ -371,7 +371,10 @@ $j(function() {
 	});	
 	
 	$j('#saveTemplate').click(function () {
-        $j.post('/homepage/configForm.php', $j(this).closest('form').serialize());
+        $j.post('/homepage/configForm.php', $j(this).closest('form').serialize(),
+	   function() {
+			$j('.saved-layout').slideDown(150).delay(2000).slideUp(150);
+	   });
     });
 
     $j('#saveColour').click(function () {

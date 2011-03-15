@@ -2780,7 +2780,7 @@ a.layout:hover img { background: #999; }
 	background:#faf9f5;
 }
 
-.saved-colours {
+.saved-colours, .saved-layout {
 	color:#fff;
 	padding:0 8px 0 28px;
 	background:#cae9b9 url(/images/core/icons/black-tick.png) 8px 50% no-repeat;
@@ -3371,6 +3371,11 @@ padding:0 10px;
 	margin-bottom:0;
 	text-align:right;
 }
+
+.visible-users {margin-top:8px;}
+.visible-users li{clear:both;}
+.visible-users li span{float:left; display:block;background:#fff; padding:4px; margin-bottom:4px; width:250px; position:relative;}
+.visible-users li a{float:left; display:block; padding:4px;}
 
 /*POLLING*/
 #pollForm { text-align: left; }

@@ -23,6 +23,8 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && is_n
             else {
                 $suggestions[] = scrubText($user['firstname']." ".$user['lastname']);
                 $data[] = $user['uid'];
+
+				
             }
 		}
 	}
