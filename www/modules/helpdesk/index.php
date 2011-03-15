@@ -21,8 +21,9 @@ $this->setBlock(TEMPLATE_content, "user", "userlist");
 $this->setBlock("user", "job", "joblist");
 $this->setBlock("user", "equip", "equiplist");
 
-if(is_numeric($_GET['id']) && $_GET['id'] > 0  && ($groupHandler->isStaff() || $groupHandler->isParentOfChild($_GET['id'])))
-    $userList[] = $_GET['id'];
+if(is_numeric($this->arg[0]) && $this->arg[0] > 0 && ($groupHandler->isStaff() || $groupHandler->isParentOfChild($this->arg[0])) ) {
+    $userList[] = $this->arg[0];
+}
 else if($groupHandler->isParent($_SESSION['gid']) && is_array($_SESSION['children'])) {
     foreach($_SESSION['children'] as $child) {
         $userList[] = $child['id'];
@@ -61,7 +62,7 @@ foreach($userList as $userID) {
             $this->setVar('joblist', '');
 
     /* Output equipment list */
-    $params = array('portalUserID'	=> $userid,
+    $params = array('portalUserID'	=> $userID,
                     'active'		=> 1
                                     );
     $db->dbChangedb(HELPDESK_db);
@@ -83,8 +84,8 @@ foreach($userList as $userID) {
 
     $this->parse('userlist', 'user', true);
 
-    $db->dbChangedb(SQL_db);
+   
 }
 
-$this->outputPage();
+$db->dbChangedb(SQL_db);
 ?>

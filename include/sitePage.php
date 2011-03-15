@@ -299,6 +299,9 @@ class SitePage extends Page {
                                 if($this->groupHandler->isStaff()) {
                                     $this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/owa" rel="external"');
                                 }
+                                else if(in_array($_SESSION['year'], array('7'))) {
+                                    $this->setVar('WEBMAIL_LOCATION', 'href="https://owa.mgs.vic.edu.au/owa" rel="external"');
+                                }
 				else
                                     $this->setVar("WEBMAIL_LOCATION", 'href="/mail/"');
 
@@ -521,7 +524,7 @@ class SitePage extends Page {
 				$user = $this->db->getRow($query);
 				$this->setVar("MSTUDENT_ID", $child['id']);
 				$this->setVar("MSTUDENT_NAME", formatName($user,'{firstname}'));
-				$this->setVar("MSTUDENT_YEAR", $user['year']);
+				$this->setVar("MSTUDENT_YEAR", $user['year']==0?'K':$user['year']);
 
 				$this->parse("my_students", "mstudent_block", true);
 
