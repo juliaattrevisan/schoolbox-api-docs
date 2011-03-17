@@ -10,6 +10,7 @@ $j(document).ready(function() {
 		$j('.next-step').hide();
 		$j('.question-holder').hide();
 		$j('.marks-holder').hide();
+		$j('#create').hide();
 	}
 
 	if (($j('.question-type-select :selected').text()) !== "-- Select Type --") {
@@ -38,12 +39,15 @@ $j(document).ready(function() {
 		mode : "exact",
 		elements: "question",
 		theme : "simple",
-		content_css : "/css/core/screen.css",
+		content_css : "/css/core/core.css",
 		editor_selector : "mceSimple",
 		width : "100%",
 		forced_root_block : "",
 		force_p_newlines : false
 	});
+	
+
+	
 	
 });
 </script>

@@ -12,6 +12,10 @@ body {
 	margin:0;
 }
 
+body#tinymce{
+	background:#fff;	
+}
+
 /*--------------------------------------------------------------
  Main Link Styles 
 --------------------------------------------------------------*/
@@ -1263,7 +1267,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	font-weight:normal;
 }
 
-#assess fieldset { margin-bottom:15px; }
+#assess fieldset { margin-bottom:15px; position:relative; }
 
 #assess fieldset.hidden { margin:0; }
 
@@ -3374,7 +3378,11 @@ padding:0 10px;
 
 .visible-users {margin-top:8px;}
 .visible-users li{clear:both;}
-.visible-users li span{float:left; display:block;background:#fff; padding:4px; margin-bottom:4px; width:250px; position:relative;}
+.visible-users li span{
+     -moz-border-radius: 4px; 
+  -webkit-border-radius: 4px; 
+          border-radius: 4px; 
+float:left; display:block;background:#fff; padding:4px; margin-bottom:4px; width:250px; position:relative;}
 .visible-users li a{float:left; display:block; padding:4px;}
 
 /*POLLING*/

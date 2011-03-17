@@ -82,8 +82,8 @@ $j(document).ready(function() {
             error.insertAfter(element)
             error.addClass('message');  // add a class to the wrapper
             error.css('position', 'absolute');
-            error.css('left', offset.left);
-            error.css('top',  offset.top + element.outerHeight() );
+            error.css('left', 0);
+            error.css('top',  element.parent().outerHeight() );
 
 			if (element.hasClass("tinyValidate")) {
 				var pos = element.siblings('#question_container').position();
@@ -142,6 +142,7 @@ $j(document).ready(function() {
 
             var checkit = elem.find('.checkbox').is(':checked');
 
+			console.log('chimp')
 			/*if the element isn't checked add to the count*/
             if (checkit == true) {
                 countDracula++
@@ -154,12 +155,8 @@ $j(document).ready(function() {
 		}
 		 
 		return oneFieldChecked;
-		
-		
-		
-		
-    }, 'Tick at least one checkbox to highlight the correct answer');
 
+    }, 'Tick at least one checkbox to highlight the correct answer');
 
     /* Add a new answer option
      */

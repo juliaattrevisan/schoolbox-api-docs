@@ -6,14 +6,12 @@
 $j(function() {
 
 	$j('.checkbox').click(function() {	
-		if ($j('.hide-this').css("display") == "block") {
-			$j('.hide-this').hide();
+		if ($j('.hide-this').is(":visible")) {
 			$j('.hide-this :input').attr('disabled', 'true');
 		} else {
-			$j('.hide-this').show();
 			$j('.hide-this :input').removeAttr('disabled');	
 		}
-		
+		$j('.hide-this').toggle();
 	});
 	
 	jQuery.validator.addMethod("combo", function(value, element) 
@@ -51,11 +49,12 @@ $j(function() {
         wrapper: "div",  // a wrapper around the error message
         errorPlacement: function(error, element) {
             offset = element.offset();
-            error.insertBefore(element)
+			console.log(offset);
+            error.insertBefore(element);
             error.addClass('message');  // add a class to the wrapper
             error.css('position', 'absolute');
-            error.css('left', offset.left);
-            error.css('top',  offset.top + element.outerHeight() +5);
+            error.css('left', 0);
+            error.css('top',  element.parent().outerHeight());
         }
 	});
 });

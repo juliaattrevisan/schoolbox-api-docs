@@ -31,8 +31,8 @@ $j(function() {
             error.insertAfter(element)
             error.addClass('message');  // add a class to the wrapper
             error.css('position', 'absolute');
-            error.css('left', offset.left);
-            error.css('top',  offset.top + element.outerHeight() +5);
+            error.css('left', 0);
+            error.css('top',  element.parent().outerHeight() +5);
 
 			if (element.hasClass("tinyValidate")) {
 				var pos = element.siblings('#question_container').position();

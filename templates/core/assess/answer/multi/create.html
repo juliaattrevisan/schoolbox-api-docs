@@ -4,6 +4,7 @@
 $j(document).ready(function() {
 
 	//add in one clone to start with
+	$j('.answerCorrect').attr('checked', false);
 		var thing = $j('.hidden-clone ul:first-child').clone();
 		$j('ul#answerCollection').append(thing);
 		refreshList();
@@ -76,6 +77,9 @@ $j(document).ready(function() {
 			},
 			'answerDescription[]': {
 				emptyInputs: true
+			},
+			'answer[]':{
+				nothingChecked:true	
 			}
 		},
 		
@@ -86,8 +90,8 @@ $j(document).ready(function() {
             error.insertAfter(element)
             error.addClass('message');  // add a class to the wrapper
             error.css('position', 'absolute');
-            error.css('left', offset.left);
-            error.css('top',  offset.top + element.outerHeight() );
+             error.css('left', 0);
+            error.css('top',  element.parent().outerHeight() );
 
 			if (element.hasClass("tinyValidate")) {
 				var pos = element.siblings('#question_container').position();
@@ -128,19 +132,38 @@ $j(document).ready(function() {
              */
             if ($j.trim(description) == '') {
                 fieldsAreFilled = false;
-            }
-			
-			
+            }	
         });
 
-        /* Reposition bubble here somewhere
-         */
-		 
         return fieldsAreFilled;
 		
     }, 'Please make sure all the answers are filled out');
-	
 
+jQuery.validator.addMethod('nothingChecked', function(value, element) {
+        var countDracula = 0;
+	   
+	    var oneFieldChecked = true;
+
+        $j.each($j('#answerCollection').find('li'), function(index, element) {
+            var elem = $j(element);
+
+            var checkit = elem.find('.checkbox').is(':checked');
+
+			console.log('chimp')
+			/*if the element isn't checked add to the count*/
+            if (checkit == true) {
+                countDracula++
+            }
+			
+        });
+
+		if (countDracula == 0) {
+			oneFieldChecked = false;
+		}
+		 
+		return oneFieldChecked;
+
+    }, 'Tick at least one checkbox to highlight the correct answer');
 
     /* Add a new answer option
      */
