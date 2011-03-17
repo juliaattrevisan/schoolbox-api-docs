@@ -155,7 +155,12 @@ class SitePage extends Page {
             if ( !isset($_SESSION['id']) ) {
                     //Catch already logged in users via kerberos or other means
                     if($_SERVER['REMOTE_USER']) {
-                        print_r($_SERVER);
+                        require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/session.php';
+                        $sessionHandler = new Session;
+                        list($username, $domain) = explode('@',$_SERVER['REMOTE_USER']);
+                        if(!$sessionHandler->create($username))
+                                $this->goLoginPage();
+
                     }
                     else {
                         $this->goLoginPage();
