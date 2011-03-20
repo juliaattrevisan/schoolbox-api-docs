@@ -104,3 +104,14 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 
 #footer ul li {color:#4c81b3}
 #footer ul li a{color:#a6c0d9;}
+
+/**************
+Home page icons
+**************/
+.custom-boxes .box a{display:block; height:72px;}
+.custom-boxes .box a.my-classes{background:url(/images/cathedral/home-icons/home-classes.png) no-repeat 50% 0;}
+.custom-boxes .box a.my-groups{background:url(/images/cathedral/home-icons/home-groups.png) no-repeat 50% 0;}
+.custom-boxes .box a.my-files{background:url(/images/cathedral/home-icons/home-files.png) no-repeat 50% 0;}
+.custom-boxes .box a.google{background:url(/images/cathedral/home-icons/home-google.png) no-repeat 50% 0;}
+.custom-boxes .box a.kiosk{background:url(/images/cathedral/home-icons/home-kiosk.png) no-repeat 50% 0;}
+.custom-boxes .box a.tass{background:url(/images/cathedral/home-icons/home-tass.png) no-repeat 50% 0;}
