@@ -108,10 +108,12 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 /**************
 Home page icons
 **************/
-.custom-boxes .box a{display:block; height:72px;}
-.custom-boxes .box a.my-classes{background:url(/images/cathedral/home-icons/home-classes.png) no-repeat 50% 0;}
-.custom-boxes .box a.my-groups{background:url(/images/cathedral/home-icons/home-groups.png) no-repeat 50% 0;}
-.custom-boxes .box a.my-files{background:url(/images/cathedral/home-icons/home-files.png) no-repeat 50% 0;}
-.custom-boxes .box a.google{background:url(/images/cathedral/home-icons/home-google.png) no-repeat 50% 0;}
-.custom-boxes .box a.kiosk{background:url(/images/cathedral/home-icons/home-kiosk.png) no-repeat 50% 0;}
-.custom-boxes .box a.tass{background:url(/images/cathedral/home-icons/home-tass.png) no-repeat 50% 0;}
+.custom-boxes .box a{display:block; height:72px; background:#f9f6e5; -moz-border-radius: 0 0 3px 3px; -webkit-border-radius: 0 0 3px 3px; border-radius: 0 0 3px 3px; background-repeat:no-repeat; background-position:50% 0; background-color:#f9f6e5;
+}
+.custom-boxes .box .listing{margin:0;}
+.custom-boxes .box a.my-classes{background-image: url(/images/cathedral/home-icons/home-classes.png)}
+.custom-boxes .box a.my-groups{background-image:url(/images/cathedral/home-icons/home-groups.png)}
+.custom-boxes .box a.my-files{background-image: url(/images/cathedral/home-icons/home-files.png)}
+.custom-boxes .box a.google{background-image:url(/images/cathedral/home-icons/home-google.png)}
+.custom-boxes .box a.kiosk{background-image: url(/images/cathedral/home-icons/home-kiosk.png)}
+.custom-boxes .box a.tass{background-image: url(/images/cathedral/home-icons/home-tass.png)}
