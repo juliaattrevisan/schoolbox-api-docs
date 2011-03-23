@@ -5,7 +5,7 @@
 *                                                           *
 ************************************************************/
 //timetable object that displays the users timetable
-require_once '../library/synergetic-timetable.php';
+require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalTimetable.php';
 require_once '../library/user.php';
 require_once '../library/group.php';
 require_once '../library/category.php';
@@ -16,7 +16,7 @@ if(!SYNERGY_enable)
 
 $groupHandler = new Group;
 $userHandler = new User;
-$timetableHandler = new SynergeticTimetable;
+$timetableHandler = new ExternalTimetable;
 $categoryHandler = new Category;
 
 $this->setFile(TEMPLATE_content, 'class/timetable.html');
@@ -44,7 +44,7 @@ else {
 			error(19);
 	}
 	else
-		$outputList[] = $_SESSION['id'];
+		$outputList[] = $_SESSION['sid'];
 }
 
 

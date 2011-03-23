@@ -4,9 +4,9 @@ $this->setBlock($componentHandle, "staff_teachers", "staff_teacher_block");
 $this->setVar('staff_teacher_block', '');
 if($code != "" && SYNERGY_enable)
 {	
-	require_once SITE_root.'/library/synergetic-class.php';
+	require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalClass.php';
 	require_once SITE_root.'/library/user.php';
-	$synergeticClass = new SynergeticClass;
+	$synergeticClass = new ExternalClass;
 	$userHandler = new User;
 	
 	$listSyns = $synergeticClass->getTeacherName($code);

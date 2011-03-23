@@ -17,10 +17,12 @@ CSV fields
 	4. synergetic 
 	5. group
 	6. campus
-	7. year
-	8. password
-	9. webmail
-	10 alt. email
+        7. campus 2
+        8. campus 3
+	9. year
+	10. password
+	11. webmail
+	12 alt. email
 */
 
 require_once("../include/include.php");
@@ -63,6 +65,7 @@ class BulkAdd {
                                             if(is_numeric($campus))
                                                 $userCampus[] = $campus;
                                         }
+                                        print_r($userCampus);
 				
 					$result = $userDB->addUser($user[0], $user[1], $user[2], $user[3], $user[4], $user[5], $userCampus, $user[9], $user[10], $user[11], $user[12]);
 					

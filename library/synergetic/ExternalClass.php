@@ -6,12 +6,12 @@
 *	This file provides access to synergetic class info		*	    
 *                                                           *
 ************************************************************/
-require_once dirname(__FILE__) .'/mssql.php';
+require_once dirname(__FILE__) .'/../mssql.php';
 
 
-class SynergeticClass extends MSSQL{
+class ExternalClass extends MSSQL{
 
-	function SynergeticClass() {
+	function __construct() {
 		parent::MSSQL();
 	}
 	

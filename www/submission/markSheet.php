@@ -31,9 +31,9 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
     
 	/* Get full student list of class  */
     if($category['code'] && SYNERGY_enable) {
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/synergetic-class.php';
+        require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalClass.php';
         //if synergy code get synergy students
-        $synHandler = new SynergeticClass();
+        $synHandler = new ExternalClass();
         $studentList = $synHandler->getStudents($category['code']);
 
 		for($x=0; is_array($studentList[$x]);$x++){
@@ -126,9 +126,9 @@ else if(is_numeric($this->arg[0])) {
 
 	/* Get full student list of class  */
     if($category['code'] && SYNERGY_enable) {
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/synergetic-class.php';
+        require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalClass.php';
         //if synergy code get synergy students
-        $synHandler = new SynergeticClass();
+        $synHandler = new ExternalClass();
         $studentList = $synHandler->getStudents($category['code']);
 
 		for($x=0; is_array($studentList[$x]);$x++){

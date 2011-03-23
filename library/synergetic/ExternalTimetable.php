@@ -6,12 +6,12 @@
 *	This file provides access to synergetic timetable info	*	    
 *                                                           *
 ************************************************************/
-require_once dirname(__FILE__) .'/mssql.php';
-require_once dirname(__FILE__) .'/group.php';
+require_once dirname(__FILE__) .'/../mssql.php';
+require_once dirname(__FILE__) .'/../group.php';
 
-class SynergeticTimetable extends MSSQL{
+class ExternalTimetable extends MSSQL{
 
-	function SynergeticTimetable() {
+	function __construct() {
 		parent::MSSQL();
 		
 		$this->campusCode = unserialize(SYN_CAMPUS_Codes);
@@ -36,8 +36,8 @@ class SynergeticTimetable extends MSSQL{
 	$periodCount = 0;
 	
 	while($period = $this->getNextArray()) {	
-		preg_match('/Dec 30 1899 ([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeTo'], $TimeToMatches);
-		preg_match('/Dec 30 1899 ([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeFrom'], $TimeFromMatches);
+		preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeTo'], $TimeToMatches);
+		preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeFrom'], $TimeFromMatches);
 	
 		$timetableDef['desc'][] = $period['Description'];
 		$timetableDef['start'][] = (int)$TimeFromMatches[1].':'.$TimeFromMatches[2].strtolower($TimeFromMatches[3]);

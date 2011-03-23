@@ -80,7 +80,7 @@ h3, #nav h3, .add-component .notification {
 }
 
 
-#tabs li a{height:32px; font-size:16px; padding:0 24px; line-height:32px;}
+#tabs li a{height:32px; font-size:16px; padding:0 20px; line-height:32px;}
 #tabs li.navthis a {
     color: #0053a0;
 	background:#fff url(/images/bialik/nav/current.jpg) repeat-x;

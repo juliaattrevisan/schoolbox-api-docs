@@ -93,14 +93,8 @@ else if($this->arg[0] == 'new'  ) {
 
     /* Output category information */
 	$this->setVar('CURRENT_CAT', '');
-	$subjectList = false;
-	if (SYNERGY_enable) {
-		require_once SITE_root . '/library/synergetic-user.php';
-		$synUser = new SynergeticUser;
-		$subjectList = $synUser->getSubjectList($_SESSION['sid'], $_SESSION['id']);
-	}
 
-	$categoryList = $groupHandler->involvedCategoryList($_SESSION['id'], $subjectList, 1);
+	$categoryList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
 	$length = count($categoryList);
 	for ($i = 0; $i < $length; $i++) {
 		if (!empty($categoryList[$i]['code']))

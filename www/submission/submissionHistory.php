@@ -1,11 +1,9 @@
 <?php
 
-require_once SITE_root . '/library/synergetic-user.php';
 require_once SITE_root . '/library/submission.php';
 require_once SITE_root . '/library/submissionReturn.php';
 require_once SITE_root . '/library/group.php';
 require_once SITE_root . '/library/user.php';
-require_once SITE_root . '/library/synergetic-class.php';
 
 $this->setFile(TEMPLATE_content, 'submission/submissionHistory.html');
 $this->setTab('submission');
@@ -68,9 +66,11 @@ if (is_array($_SESSION['children'])) {
 $subjectList = false;
 
 if (SYNERGY_enable && $user['synergy_id'])  {
-	$synUser = new SynergeticUser;
+        require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalUser.php';
+	$synUser = new ExternalUser;
 	$subjectList = $synUser->getSubjectList($user['synergy_id'], $user['uid']);
 }
+
 
 $categoryList = $groupHandler->involvedCategoryList($user['uid'], $subjectList, 1);
 

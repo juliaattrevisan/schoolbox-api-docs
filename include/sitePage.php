@@ -23,12 +23,14 @@ class SitePage extends Page {
 		$this->pageName = $pageFile;
 
 		/* sanitise data, force all 404s through pageNotFound() */
-		if( !preg_match("/^[a-zA-Z0-9\/\-\_]+/", $pageFile) || $pageFile == 'common/404') {
+		if( !preg_match("/^[a-zA-Z0-9\/\-\_\.]+/", $pageFile) || $pageFile == 'common/404') {
 			$this->pageNotFound();
 		}
+
 		$this->arg = array();
 		$path = explode('/', trim($pageFile, '/'));
-		$total = count($path);
+
+                $total = count($path);
 
 		/* iterate backwards through the path */
 		for ($i = 0; $i < $total; $i++) {

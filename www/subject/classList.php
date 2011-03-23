@@ -8,7 +8,7 @@
 
 require_once 'include/permission.php';
 require_once '../library/category.php';
-require_once '../library/synergetic-class.php';
+require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalClass.php';
 require_once '../library/user.php';
 
 
@@ -16,7 +16,7 @@ if(isStaff($_SESSION['gid']))
 {
 	$userHandler = new User;
 	$categoryHandler = new Category;
-	$synergeticClass = new SynergeticClass;
+	$synergeticClass = new ExternalClass;
 
 	
 	$this->setFile(TEMPLATE_content, 'class/classList.htm');

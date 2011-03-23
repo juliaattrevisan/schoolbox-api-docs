@@ -6,12 +6,12 @@
 *	This file provides access to synergetic user info		*	    
 *                                                           *
 ************************************************************/
-require_once '../library/mssql.php';
-require_once dirname(__FILE__) .'/group.php';
+require_once dirname(__FILE__) .'/../mssql.php';
+require_once dirname(__FILE__) .'/../group.php';
 
-class SynergeticUser extends MSSQL{
+class ExternalUser extends MSSQL{
 
-    function SynergeticUser() {
+    function __construct() {
             parent::MSSQL();
             $this->groupHandler = new Group;
     }
@@ -97,7 +97,10 @@ class SynergeticUser extends MSSQL{
 	{		
 		#Get current FileSemester and FileYear
 		$query = "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag=1";
-		return $this->getRow($query);
+                $semester = $this->getRow($query);
+                $_SESSION['FileSemester'] = $semester['FileSemester'];
+                $_SESSION['FileYear'] = $semester['FileYear'];
+		return true;
 	}
 	
 	function getSubjectList($synergyID, $userID)

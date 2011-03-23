@@ -32,9 +32,9 @@ if(is_numeric($this->arg[0])) {
 
     /* Get full student list of class to show those who have not submitted */
     if($subBox['code'] && SYNERGY_enable) {
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/synergetic-class.php';
+        require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalClass.php';
         //if synergy code get synergy students
-        $synHandler = new SynergeticClass();
+        $synHandler = new ExternalClass();
         $studentList = $synHandler->getStudents($subBox['code']);
     }
     else {

@@ -36,7 +36,7 @@ RewriteRule ^assess/export/(\d+)\.xml$ /assess/export/$1
 # remove ssl
 #RewriteCond %{SERVER_PORT} ^443$
 #RewriteCond %{REQUEST_URI} !^/$
-#RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}
+#RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
 #RewriteRule ^(.*)$ http://%{HTTP_HOST}/$1 [R,L]
 
 RewriteCond %{SCRIPT_FILENAME}/ -d
@@ -44,5 +44,5 @@ RewriteRule [^/]$ %{REQUEST_URI}/ [R=301,L]
 
 RewriteCond %{REQUEST_URI} !/admin/.*
 RewriteCond %{REQUEST_URI} !/roundcube/.*
-RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}
+RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
 RewriteRule ^([^.]+) /index.php?page=$1 [L]

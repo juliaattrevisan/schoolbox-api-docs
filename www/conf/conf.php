@@ -113,6 +113,7 @@ define("SQL_db", "portal");
 
 //Synergy options
 define("SYNERGY_enable", false);				//Use this to disable synergy modules
+define("EXTERNAL_db", 'tass');				//Defines what module to use 'synergetic' / 'tass'
 define("MSSQL_host","synergy");
 define("MSSQL_user","intranet");
 define("MSSQL_passwd","Qu4LitY");  

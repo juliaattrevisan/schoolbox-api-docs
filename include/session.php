@@ -39,7 +39,7 @@ class Session {
             $_SESSION['username']   = $user['username'];
             $_SESSION['password']   = $password;
             $_SESSION['eportfolio_enabled'] = $user['eportfolio_enabled'];
-            $_SESSION['ip'] = getIP();
+            $_SESSION['ip'] = $ip;
             $_SESSION['campus'] = $userHandler->getUserCampus($user['uid']);
 
             //if no webmail enabled or user has elected to use external client set mailhandle to mailto:
@@ -51,9 +51,6 @@ class Session {
             //superuser value, used to bypass most security checks
             if($user['su'] == 1)
                 $_SESSION['su'] = 1;
-
-            //register there ip
-
             
 
             if(SYNERGY_enable)
@@ -214,18 +211,17 @@ class Session {
     }
 
     function setSynergyInfo($userHandler) {
-        require_once dirname(__FILE__) .'/../library/synergetic-user.php';
+        require_once dirname(__FILE__) .'/../library/'.EXTERNAL_db.'/ExternalUser.php';
         require_once dirname(__FILE__) .'/../library/group.php';
         require_once dirname(__FILE__) .'/../library/category.php';
-        $synUser = new SynergeticUser;
+        $synUser = new ExternalUser;
         $groupHandler = new Group;
         $catHandler = new Category;
 
         //setup a users enrolement for the session
 
         $semester = $synUser->getCurrentSemester();
-        $_SESSION['FileSemester'] = $semester['FileSemester'];
-        $_SESSION['FileYear'] = $semester['FileYear'];
+
         $synergy_id = $_SESSION['sid'];
         if ($synergy_id && $_SESSION['FileSemester'] && $_SESSION['FileYear']) {
 
@@ -271,6 +267,7 @@ class Session {
                     foreach ($subjectList as $subject) {
                         //check subject exists.. we cant link to subjects that dont exist its ugly
                         $result = $catHandler->getByCode($subject['code']);
+                        print_r($result);
                         if (is_array($result) && is_numeric($result['id'])) {
                             if (!in_array($result['id'], $catList) && $groupHandler->getPermission($result['id']) >= READ_ACCESS) {
                                 $subject['id'] = $result['id'];

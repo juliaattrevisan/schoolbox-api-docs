@@ -34,9 +34,6 @@ if($this->arg[0]) {
 	$this->setVar($pageVar);
 	
 	
-	$attendanceHandler-
-	
-	
 }
 else {
 	//output teachers class list

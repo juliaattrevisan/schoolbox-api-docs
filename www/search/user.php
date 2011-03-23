@@ -105,11 +105,11 @@ if(is_numeric($this->arg[0])) {
 	$this->setVar($outputUser);
 
 	//advanced synergetic information
-	if(SYNERGY_enable)
+	if(SYNERGY_enable && $user['synergy_id'])
 	{
-		require_once '../library/synergetic-user.php';
+		require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalUser.php';
 
-		$synUserHandler = new SynergeticUser;
+		$synUserHandler = new ExternalUser;
 		
 
 		

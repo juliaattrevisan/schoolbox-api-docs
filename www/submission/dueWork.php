@@ -1,11 +1,9 @@
 <?php
-
-require_once SITE_root . '/library/synergetic-user.php';
 require_once SITE_root . '/library/submission.php';
 require_once SITE_root . '/library/submissionReturn.php';
 require_once SITE_root . '/library/group.php';
 require_once SITE_root . '/library/user.php';
-require_once SITE_root . '/library/synergetic-class.php';
+
 
 /**
  * Order by date descending.
@@ -82,9 +80,11 @@ if (is_array($_SESSION['children'])) {
 // get category list
 $subjectList = false;
 if (SYNERGY_enable && $user['synergy_id'])  {
-	$synUser = new SynergeticUser;
+        require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalUser.php';
+	$synUser = new ExternalUser;
 	$subjectList = $synUser->getSubjectList($user['synergy_id'], $user['uid']);
 }
+
 
 $categoryList = $groupHandler->involvedCategoryList($user['uid'], $subjectList, 1);
 
@@ -418,12 +418,12 @@ foreach ($categoryList as $category) {
 	$categoryID = $category['id'];
 	/* yes it actually requires THIS MUCH code to get a teachers name. */
 	if (SYNERGY_enable) {
-
-		$synClass = new SynergeticClass;
+                require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalClass.php';
+		$synClass = new ExternalClass;
 
 		$teacherOutput = array();
 		$teacherList = array();
-        $codeList = explode(',',$category['code']);
+                $codeList = explode(',',$category['code']);
 		if (is_array($codeList)) {
 			foreach ($codeList as $code) {
 				if(is_array($temp = $synClass->getTeacherName($code)))

@@ -1,6 +1,6 @@
 <?php
 
-require_once '../library/synergetic-timetable.php';
+require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalTimetable.php';
 	
 $this->setBlock(TEMPLATE_content, "timetable", "timetable_block");	
 $this->setBlock("timetable", "timetable_period", "timetable_period_block");
@@ -8,7 +8,7 @@ $this->setBlock("timetable", "timetable_header", "timetable_header_block");
 
 //if user has timetable show it on the homepage
 if($_SESSION['timetable'] && SYNERGY_enable ) {
-	$timetableHandler = new SynergeticTimetable;
+	$timetableHandler = new ExternalTimetable;
 	//get current day and period
 	$daynumber = $timetableHandler->getDayNumber($_SESSION['campus'][0]);
 	$period = $timetableHandler->getPeriodNumber($_SESSION['campus'][0]);
