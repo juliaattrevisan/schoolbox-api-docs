@@ -26,15 +26,11 @@ $j(document).ready(function() {
     });
 	
 	
-		$j('#addUser').autocomplete({
+	$j('#addUser').autocomplete({
 		serviceUrl: '/ajax/user.php?groupID=0',
 		minChars: 2,
 		maxHeight: 400,
 		width: $j('#addUser').width(),
-		onSelect: function (value, data) {
-			$j('#userID').val(data);
-			return false;
-		}
 	});
 	
 	$j('#type_form input').each(function () {
