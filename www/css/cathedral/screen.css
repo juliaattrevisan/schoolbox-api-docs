@@ -108,8 +108,13 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 /**************
 Home page icons
 **************/
-.custom-boxes .box a{display:block; height:72px; background:#f9f6e5; -moz-border-radius: 0 0 3px 3px; -webkit-border-radius: 0 0 3px 3px; border-radius: 0 0 3px 3px; background-repeat:no-repeat; background-position:50% 0; background-color:#f9f6e5; text-indent:-99999em;
+.custom-boxes .box a{display:block; height:72px; background:#f9f6e5;  -moz-border-radius: 0 0 3px 3px; -webkit-border-radius: 0 0 3px 3px; border-radius: 0 0 3px 3px; background-repeat:no-repeat; background-position:50% 0; background-color:#f9f6e5; text-indent:-9999em;
 }
+
+.custom-boxes .box h2{font-size:12px; padding:0 8px;}
+.custom-boxes .split-icons{width:49%; margin-right:2%; float:left;}
+.custom-boxes .split-icons.last{margin:0;}
+
 .custom-boxes .box .listing{margin:0;}
 .custom-boxes .box a.my-classes{background-image: url(/images/cathedral/home-icons/home-classes.png)}
 .custom-boxes .box a.my-groups{background-image:url(/images/cathedral/home-icons/home-groups.png)}

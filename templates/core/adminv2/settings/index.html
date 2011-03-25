@@ -1,0 +1,144 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.autoresize.js"></script>
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+
+
+<script type="text/javascript">
+
+$j(function() {
+		
+	$j.fn.qtip.defaults.position.corner = {
+		target: 'topLeft',
+		tooltip: 'bottomLeft'
+	}
+	
+	$j.fn.qtip.defaults.style = {
+		tip: 'bottomLeft',
+		name: 'green'
+	}
+		
+	$j('label span').each(function() {
+		activeContent = $j(this).siblings('em').html();
+		$j(this).qtip({
+			content: activeContent,
+			api: {
+					// Retrieve the content when tooltip is first rendered
+					 onRender: function()
+					 {
+						var self = this;
+					 }
+				 }
+		});
+	});
+	
+	/* date picker */		 
+	$j('.datepicker').datepicker({ 
+		dateFormat: 'dd-mm-yy',
+		showOn: 'button',
+		buttonImage: '/images/core/calendar/calendar-click.png',
+		buttonImageOnly: true,
+		showAnim: 'slideDown'
+	});
+	
+});
+
+</script>
+
+<!-- END custom_head-->
+
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+	<li><a href="/adminv2/index">Home</a></li>
+	<li><a href="/adminv2/users/index" >Users</a></li>
+	<li><a href="/adminv2/side-menu/index">Side Menu</a></li>
+	<li><a href="/adminv2/allowed-files/index">Allowed Files</a></li>
+	<li><a href="/adminv2/settings/index"  class="current">Settings</a></li>
+	<li><a href="/adminv2/calendar/index">Calendar</a></li>
+	<li><a href="/adminv2/lists/index">Lists</a></li>
+	<li><a href="/adminv2/rollover/index">Rollover</a></li>
+</ul>
+<div class="admin-contents">
+	<h2>Settings</h2>
+	
+	<div class="level green hide-it">	
+		You've successfully updated your settings.
+		<div class="float-fix"></div>
+	</div>
+	
+	<div class="settings-nav-holder">
+		<ul class="settings-nav">
+			<li><a href="#" class="current">Site Settings<span></span></a></li>
+			<li><a href="#">File Locations<span></span></a></li>
+			<li><a href="#">Email<span></span></a></li>
+			<li><a href="#">Authentication<span></span></a></li>
+			<li><a href="#">School DB<span></span></a></li>
+		</ul>
+	</div>
+	<div class="settings">
+		<div class="split-container">
+			<form id="settings" class="admin-form level" action="get">
+				<label for="title">Site Title<span>?</span> <em>Definitely the description of the thing that is the thing</em>
+					<input type="text" />
+				</label>
+				<label for="name">Site Name<span>?</span> <em>Definitely the hat is the thing</em>
+					<input type="text" />
+				</label>
+				<label for="hostname">Use Frame<span>?</span> <em>f the thing that is the thing</em><br />
+					<input type="checkbox" />
+				</label>
+				<label for="datehorse">Datepicker<span>?</span> <em>EEEEG</em>
+					<input type="text" class="datepicker"/>
+				</label>
+				<label for="detect">Site Detect<span>?</span> <em>Definitely the descrip</em><br />
+					<select name="detect">
+						<option value="campus">Campus</option>
+						<option value="domain">Domain</option>
+					</select>
+				</label>
+				<label for="radio">
+				Radio Fun<span>?</span> <em>Definitely the descrip</em>
+					<fieldset>
+						<label>
+							<input type="radio" name="radio" value="one" />
+							One </label>
+						<label>
+							<input type="radio" name="radio" value="two" />
+							Two </label>
+						<label>
+							<input type="radio" name="radio" value="three" />
+							Three </label>
+						<label>
+							<input type="radio" name="radio" value="four" />
+							Four </label>
+						<label>
+							<input type="radio" name="radio" value="five" />
+							Five </label>
+					</fieldset>
+				</label>
+				<label for="checkboxes">
+				Checkbox Fun<span>?</span> <em>Definitely the descrip</em>
+					<fieldset>
+						<label>
+							<input type="checkbox" name="check[]" value="one" />
+							One </label>
+						<label>
+							<input type="checkbox" name="check[]" value="two" />
+							Two </label>
+						<label>
+							<input type="checkbox" name="check[]" value="three" />
+							Three </label>
+						<label>
+							<input type="checkbox" name="check[]" value="four" />
+							Four </label>
+						<label>
+							<input type="checkbox" name="check[]" value="five" />
+							Five </label>
+					</fieldset>
+				</label>
+				<div class="float-fix"></div>
+			</form>
+		</div>
+	</div>
+	<div class="float-fix"></div>
+</div>

@@ -1,0 +1,124 @@
+<!-- BEGIN custom_head -->
+
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<script type="text/javascript">
+
+$j(function() {
+
+	$j('h3 span').qtip({
+		content: 'Edit the user\'s details.',
+		show: 'mouseover',
+		hide: 'mouseout',
+		style: {
+			 tip: 'bottomLeft',
+			name: 'green'
+		},
+		position: {
+		  corner: {
+			 target: 'topRight',
+			 tooltip: 'bottomLeft'
+		  }
+  		}
+	})
+	
+})
+
+</script>
+
+<!-- END custom_head-->
+
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+	<li><a href="/adminv2/index">Home</a></li>
+	<li><a href="/adminv2/users/index" class="current">Users</a></li>
+	<li><a href="/adminv2/side-menu/index">Side Menu</a></li>
+	<li><a href="/adminv2/allowed-files/index">Allowed Files</a></li>
+	<li><a href="/adminv2/settings/index">Settings</a></li>
+	<li><a href="/adminv2/calendar/index">Calendar</a></li>
+	<li><a href="/adminv2/lists/index">Lists</a></li>
+	<li><a href="/adminv2/rollover/index">Rollover</a></li>
+</ul>
+<div class="admin-contents">
+	<h2><span><a href="../">&laquo; Back to users</a></span>Modify user</h2>
+	<div class="level last">
+		<h3>User Details<span class="question">?</span></h3>
+		<form class="admin-form">
+			<div class="split-container">
+				<div class="split">
+					<label for ="preferred" class="preferred">
+					Preferred
+					<fieldset>
+						<label>
+							<select>
+								<option value="Mr">Mr</option>
+								<option value="Hon Dr"></option>
+							</select>
+							<input type="text" />
+						</label>
+
+					</fieldset>
+					</label>
+					<label for ="username" class="width2">Username
+						<input type="text" />
+					</label>
+					<label for ="synergetic" class="">Synergetic ID
+						<input type="text" />
+					</label>
+					<label for ="preferred" class="width2 ">Superuser
+						<input type="checkbox" />
+					</label>
+					<div class="float-fix"></div>
+					<table cellpadding="0" width="50%">
+						<colgroup>
+						<col width="33%" />
+						<col width="33%" />
+						<col width="33%" />
+						</colgroup>
+						<thead>
+							<tr>
+								<td>Campus</td>
+								<td>Set default</td>
+								<td>Enabled</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Main</td>
+								<td><input type="radio" /></td>
+								<td><input type="checkbox" /></td>
+							</tr>
+							<tr>
+								<td>Other</td>
+								<td><input type="radio" /></td>
+								<td><input type="checkbox" /></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="split-container">
+				<div class="split last">
+					<label for="surname">Surname
+						<input type="text" />
+					</label>
+					<label for="password">Password
+						<input type="text" />
+					</label>
+					<label for="e-portfolio">E-Portfolio
+						<input type="checkbox" />
+					</label>
+					<label for="group">Group
+						<select>
+							<option value="Mr">Mr</option>
+							<option value="Hon Dr"></option>
+						</select>
+					</label>
+					<label for="year">Year
+						<input type="text" />
+					</label>
+				</div>
+			</div>
+		</form>
+		<div class="float-fix"></div>
+	</div>
+</div>
