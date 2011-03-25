@@ -14,6 +14,9 @@
 class dbManager
 {
 
+
+static private $instance = false;
+
 /* Constuctor sets up variables and connects to database */
 function dbManager($db = SQL_db, $debug = 1)
 {
@@ -23,6 +26,13 @@ function dbManager($db = SQL_db, $debug = 1)
 	$this->debug = $debug;
 	$this->db = $db;
 	$this->connect();
+}
+
+static public function getInstance() {
+        if (!self::$instance) {
+                self::$instance = new self();
+        }
+        return self::$instance;
 }
 
 /* Estabilishes a connection to the database */

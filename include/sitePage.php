@@ -59,16 +59,16 @@ class SitePage extends Page {
 	}
 
 	function setSite() {
-		if(SITE_detect == 'domain') {
+		if(Cfg::get('site_detect') == 'domain') {
 			//Get site templates via domain name
 			if(preg_match('/([\w]+)\./', $_SERVER['HTTP_HOST'], $match)) {
 				$this->site = $match[1];
 				return true;
 			}
 		}
-		else if(SITE_detect == 'campus') {
+		else if(Cfg::get('site_detect') == 'campus') {
 			//Get site template via users campus
-			if(SITE_location == 'mgs') {
+			if(Cfg::get('site_location') == 'mgs') {
 				if($_SESSION['campus'][0] == 3)
 					$this->site = 'grimwade';
 				else
@@ -77,11 +77,11 @@ class SitePage extends Page {
 				return true;
 			}
 			else {
-				$this->site = SITE_location;
+				$this->site = Cfg::get('site_location');
 			}
 		}
 
-		$this->site = SITE_location;
+		$this->site = Cfg::get('site_location');
 
 	}
 
@@ -92,14 +92,14 @@ class SitePage extends Page {
 		}
 
 		$templateVar = array(	'TEMPLATE_YEAR' => date('Y'),
-								'SITE_NAME'		=> SITE_name,
-								'SITE_ADDRESS'	=> SITE_address,
-								'SITE_GREETING' => greeting(),
-								'SITE_LOGINNAME'=> formatName($_SESSION),
-								'SITE_LOCATION'	=> $this->site,
-                                'USER_ID'       => $_SESSION['id'],
-							);
-		$this->setVar($templateVar);
+					'SITE_NAME'     => Cfg::get('site_name'),
+					'SITE_ADDRESS'	=> Cfg::get('site_address'),
+					'SITE_GREETING' => greeting(),
+					'SITE_LOGINNAME'=> formatName($_SESSION),
+					'SITE_LOCATION'	=> $this->site,
+                                        'USER_ID'       => $_SESSION['id'],
+				);
+                $this->setVar($templateVar);
 
 		$title = $this->getVar('TITLE');
 		if (empty($title))
@@ -156,7 +156,7 @@ class SitePage extends Page {
 
             if ( !isset($_SESSION['id']) ) {
                     //Catch already logged in users via kerberos or other means
-                    if($_SERVER['REMOTE_USER']) {
+                    if(Cfg::get('kerb_enable') && $_SERVER['REMOTE_USER'] ) {
                         require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/session.php';
                         $sessionHandler = new Session;
                         list($username, $domain) = explode('@',$_SERVER['REMOTE_USER']);
@@ -313,7 +313,7 @@ class SitePage extends Page {
                                     $this->setVar("WEBMAIL_LOCATION", 'href="/mail/"');
 
 			}
-			else if(SITE_location == 'ormond')
+			else if($this->site == 'ormond')
 			{
 				if($_SESSION['exchange'])
 					$this->setVar("WEBMAIL_LOCATION", 'href="http://owa.ormond.unimelb.edu.au" rel="external"');
@@ -352,7 +352,7 @@ class SitePage extends Page {
                 $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.bialik.vic.edu.au/exchange" rel="external"');
             }
             else if($this->site == 'jpc') {
-                $this->setVar('WEBMAIL_LOCATION', 'href="http://jpcmail.jpcvictoria.catholic.edu.au/owa"');
+                $this->setVar('WEBMAIL_LOCATION', 'href="http://jpcmail.jpcvictoria.catholic.edu.au/owa" rel="external"');
             }
 
 		$this->parse('wm_tab','webmail_tab');
@@ -587,7 +587,7 @@ class SitePage extends Page {
 	}
 
 	function setTitle($title = '') {
-		$this->setVar('TITLE', HEADING . (!empty($title) ? ' - '.scrubTEXT($title) : ''));
+		$this->setVar('TITLE', Cfg::get('title') . (!empty($title) ? ' - '.scrubTEXT($title) : ''));
 	}
 
 	function getTemplate($template) {
@@ -611,7 +611,7 @@ class SitePage extends Page {
 	function goLoginPage($error = '', $page = ''){
 		$this->setSite();
 		$this->setFile(TEMPLATE_body, 'common/login.html');
-		$this->setVar('TITLE', HEADING." - Login");
+		$this->setVar('TITLE', Cfg::get('title')." - Login");
 
 		if($page)
 			$this->setVar('HIDDEN',rawurldecode($page));

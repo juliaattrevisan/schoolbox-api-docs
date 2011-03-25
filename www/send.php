@@ -47,7 +47,7 @@ if(is_numeric($_GET['id']))
                     error(5);
             }
 			
-			$filename = MYFILE_directory ."/". $file['id'] . ".dat";
+			$filename = Cfg::get('myfile_dir') ."/". $file['id'] . ".dat";
 		}
 		
 		
@@ -71,7 +71,7 @@ if(is_numeric($_GET['id']))
             if(!is_array($file))
                 error(41);
 
-            $filename = FILE_directory ."/". $file['id'] . ".dat";
+            $filename = Cfg::get('file_dir') ."/". $file['id'] . ".dat";
         }
 	else {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
@@ -84,7 +84,7 @@ if(is_numeric($_GET['id']))
 		if($groupHandler->getPermission($file['category']) < READ_ACCESS) 
 			error(5);
 		
-		$filename = FILE_directory ."/". $_GET['id'] . ".dat";
+		$filename = Cfg::get('file_dir') ."/". $_GET['id'] . ".dat";
 	
 	}
 	

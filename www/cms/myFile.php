@@ -31,7 +31,7 @@ if(is_numeric($this->arg[0])) {
 	$output = array('ACTION'			=> 'Modify',
 					'FILE_ID'			=> $file['id'],
 					'DESCRIPTION'		=> scrubText($file['description']),
-					'MAX_FILE_SIZE'		=> MAX_FILE_SIZE,
+					'MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
 					'PARENT_ID'			=> $file['parent'],
 					);
 	$this->setVar($output);
@@ -75,7 +75,7 @@ elseif($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	$output = array('ACTION'			=> 'Add',
 					'FILE_ID'			=> '',
 					'DESCRIPTION'		=> '',
-					'MAX_FILE_SIZE'		=> MAX_FILE_SIZE,
+					'MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
 					'PARENT_ID'			=> $parent['id'],
 				);
 

@@ -95,7 +95,7 @@ class SubmissionStudent extends Model {
         //save file using file ID as name
         $newFileName = $fileId . ".dat";
 		
-        move_uploaded_file($file['tmp_name'], SUBMISSION_directory . "/" . $newFileName);
+        move_uploaded_file($file['tmp_name'], Cfg::get('submission_dir') . "/" . $newFileName);
 
         return $fileId;
 
@@ -107,7 +107,7 @@ class SubmissionStudent extends Model {
         if($clean) {
             //delete from database
             parent::delete($id);
-            $filename = SUBMISSION_directory . "/" . $id . ".dat";
+            $filename = Cfg::get('submission_dir') . "/" . $id . ".dat";
             @unlink($filename);
         }
         else {

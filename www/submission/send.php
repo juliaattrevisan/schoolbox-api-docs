@@ -27,7 +27,7 @@ if(is_numeric($_GET['id']))
 		if($return['owner'] != $_SESSION['id'])
 			error(44);
 
-		$file = RETURNS_directory . '/' . $return['id']. '.dat';
+		$file = Cfg::get('returns_dir') . '/' . $return['id']. '.dat';
 		$filename = $return['filename'];
 	}
 	else {
@@ -50,7 +50,7 @@ if(is_numeric($_GET['id']))
 			error(44);
 		}
 
-		$file = SUBMISSION_directory . '/' . $studentSub['id'] . '.dat';
+		$file = Cfg::get('submission_dir') . '/' . $studentSub['id'] . '.dat';
 		$filename = $studentSub['lastname']."-".$studentSub['realname'];
 	}
 

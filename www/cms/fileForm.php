@@ -47,7 +47,7 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 
 			$_FILES['file'] = array('name' 		=> $privFile['realname'],
 									'type' 		=> $privFile['mime_type'],
-									'tmp_name'	=> MYFILE_directory . '/' . $privFile['id'] . '.dat',
+									'tmp_name'	=> Cfg::get('myfile_dir') . '/' . $privFile['id'] . '.dat',
 									);
 
 		}
@@ -81,7 +81,7 @@ if(is_string($_POST['description']) && (is_numeric($_POST['category']) || is_arr
 			
 			$_FILES['file'] = array('name' 		=> $privFile['realname'],
 									'type' 		=> $privFile['mime_type'],
-									'tmp_name'	=> MYFILE_directory . '/' . $privFile['id'] . '.dat',
+									'tmp_name'	=> Cfg::get('myfile_dir') . '/' . $privFile['id'] . '.dat',
 									);
 
 		}

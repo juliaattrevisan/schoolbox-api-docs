@@ -262,7 +262,7 @@ class PortfolioWebDAV {
 		require_once SITE_root . '/library/group.php';
 		$groupHandler = new Group;
 
-                if(SITE_location == 'wenona') {
+                if(Cfg::get('site_location') == 'wenona') {
                     if ($groupHandler->isStaff()) {
                             $pathList = array( 'http://gold/StaffHome/',
                                                                'http://gold/StaffData/',
@@ -274,7 +274,7 @@ class PortfolioWebDAV {
                     }
                     return new self($pathList , "wgs/" . $_SESSION['username'], $_SESSION['password']);
                 }
-                 else if(SITE_location == 'jpc') {
+                 else if(Cfg::get('site_location') == 'jpc') {
                    if ($groupHandler->isStaff()) {
                             $pathList = array( 'http://kazon/Staff/'.$_SESSION['username'].'/',
                                                                'http://kazon/doclib/',

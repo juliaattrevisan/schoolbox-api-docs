@@ -8,14 +8,16 @@
 
 require_once('Mail.php');
 require_once('Mail/mime.php');
-require_once('../include/template.php');
+require_once('Mail/mime.php');
+require_once(dirname(__FILE__).'/template.php');
+require_once(dirname(__FILE__).'/config.php');
 
 class Mailer {
 function Mailer($template, $subject = "", $to="") {
 	
 	//setup header
 	$this->headers = '';
-	$this->setFrom(FROM_address, FROM_name);
+	$this->setFrom(Cfg::get('mail_from_address'), Cfg::get('mail_from_name'));
 	$this->headers['MessageID'] = '<'.md5(mktime()).'@lektecmailer>';
 	
 	$this->setTo($to);
@@ -82,8 +84,8 @@ function loadTemplate($file) {
 }
 
 function getTemplate($template) {
-	if(is_file(MAIL_templates.'/'.SITE_location.'/email/'.$template))
-		return SITE_location.'/email/'.$template;
+	if(is_file(MAIL_templates.'/'.Cfg::get('site_location').'/email/'.$template))
+		return Cfg::get('site_location').'/email/'.$template;
 	else
 		return 'core/email/'.$template;
 }

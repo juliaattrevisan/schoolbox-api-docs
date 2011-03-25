@@ -8,7 +8,7 @@ $page = new SitePage;
 
 class ZipFolder {
    function ZipFolder($folder, $fileList) {
-      $this->tmpName = tempnam(ZIP_directory, 'zip');
+      $this->tmpName = tempnam(Cfg::get('zip_dir'), 'zip');
       $this->tmpZip = $this->tmpName.'.zip';
       $this->tmpFolder = $this->tmpName.'dir';
       $this->folder = $folder;
@@ -34,14 +34,14 @@ class ZipFolder {
          foreach($fileList as $file) {
             $dataFile = "{$file[id]}.dat";
 
-            $fileLocation = SUBMISSION_directory . '/' . $dataFile;
+            $fileLocation = Cfg::get('submission_dir') . '/' . $dataFile;
 
             if(is_file($fileLocation)) {
                $this->size = $this->size + filesize($fileLocation);
                $fileName = $currentDir . '/' . $file['lastname'] . '-' . $file['realname'];
                $fileName = $this->uniqueFileName($fileName); //ensure filename is unique else puts numbers in filename
 
-               copy(SUBMISSION_directory .'/'.$dataFile, $fileName);
+               copy(Cfg::get('submission_dir') .'/'.$dataFile, $fileName);
             }
          }
       }

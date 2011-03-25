@@ -2,6 +2,14 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
 
+/* Due Work: Recent work. Should be a multiple of 3 because there are three
+* types: Due, Awaiting and Marked.
+*/
+define('UPCOMING_WORK_TYPE', 1);
+define('AWAITING_WORK_TYPE', 2);
+define('RETURNED_WORK_TYPE', 3);
+define('RECENT_WORK_LIMIT', 12);
+
 class Submission extends Model {
 
     function Submission () {

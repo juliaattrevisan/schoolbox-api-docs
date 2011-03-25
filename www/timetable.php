@@ -96,19 +96,19 @@ if(is_array($outputList)) {
 
                                 if($period['description'])
                                 {
-                                        if ($_SESSION['campus'][0] == 3 && SITE_location == 'mgs')
+                                        if ($_SESSION['campus'][0] == 3 && Cfg::get('site_location') == 'mgs')
                                         {
                                                 $outputPeriod = array(	'PERIOD_DESC' 	=> $period['description'],
-                                                                                                'PERIOD_ROOM'	=> $period['room'],
-                                                                                        );
+                                                                        'PERIOD_ROOM'	=> $period['room'],
+                                                                     );
                                         }
                                         else
                                         {
                                                 $outputPeriod = array(	'PERIOD_DESC' 	=> $period['description'],
-                                                                                                'PERIOD_CODE'	=> '('.$period['code'].')',
-                                                                                                'PERIOD_ROOM'	=> $period['room'],
-                                                'PERIOD_ONCLICK' => '',
-                                                                                                );
+                                                                        'PERIOD_CODE'	=> '('.$period['code'].')',
+                                                                        'PERIOD_ROOM'	=> $period['room'],
+                                                                        'PERIOD_ONCLICK' => '',
+                                                                        );
 
                         /* Lookup subject code and check permissions, if read access provide a link to the user */
                         if(!isset($catCache[$period['code']])) {

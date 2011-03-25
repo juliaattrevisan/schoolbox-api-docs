@@ -52,7 +52,7 @@ if(is_numeric($_GET['id']) && SYNERGY_enable)
         {
 
             $image = mssql_fetch_array($result);
-            $tempFile = tempnam(ZIP_directory, 'synport');
+            $tempFile = tempnam(Cfg::get('zip_dir'), 'synport');
             $handle = fopen($tempFile, "w");
             fwrite($handle, $image['Photo']);
             fclose($handle);

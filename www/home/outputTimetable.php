@@ -35,7 +35,7 @@ if($_SESSION['timetable'] && SYNERGY_enable ) {
 				if($period['description'])
 				{
 					//custom stuff for grimwade
-					if ($_SESSION['campus'][0] == 3 && SITE_location == 'mgs')
+					if ($_SESSION['campus'][0] == 3 && Cfg::get('site_location') == 'mgs')
 					{
 						$post = strpos($period['code'], "EN");
 							
@@ -54,7 +54,7 @@ if($_SESSION['timetable'] && SYNERGY_enable ) {
 						
 						$this->setVar('PERIOD_ABSENTEES','');
 					}
-					else if($_SESSION['campus'][0] == 2 && SITE_location == 'wenona')
+					else if($_SESSION['campus'][0] == 2 && Cfg::get('site_location') == 'wenona')
 					{
 							$this->setVar('PERIOD_DESC', $period['description']);
 							$this->setVar('PERIOD_CODE','');

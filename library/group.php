@@ -194,7 +194,7 @@ class Group extends Model {
 		}
 		
 		// allow staff write access to NEWS_SERVICE by default except at shore...
-		if(($this->isStaff($userID) && SITE_location != 'shore') && $this->_service == NEWS_SERVICE && $permission < WRITE_ACCESS)
+		if(($this->isStaff($userID) && Cfg::get('site_location') != 'shore') && $this->_service == NEWS_SERVICE && $permission < WRITE_ACCESS)
 			$permission = WRITE_ACCESS;
 		
 		// check synergy tutor list

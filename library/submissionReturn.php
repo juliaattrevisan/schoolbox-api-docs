@@ -99,7 +99,7 @@ class SubmissionReturn extends Model {
         if(is_array($file)) {
 
             $newFileName = $fileID . ".dat";
-            move_uploaded_file($file['tmp_name'], RETURNS_directory . "/" . $newFileName);
+            move_uploaded_file($file['tmp_name'], Cfg::get('returns_dir') . "/" . $newFileName);
         }
 
         //Update student submission to be marked

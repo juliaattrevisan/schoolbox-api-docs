@@ -23,7 +23,7 @@ class ZipFolder {
 function ZipFolder($folder) {
 	$this->db = new dbManager;
 	$this->folder = $folder;
-	$this->tmpName = tempnam(ZIP_directory, 'zip');
+	$this->tmpName = tempnam(Cfg::get('zip_dir'), 'zip');
 	$this->tmpFolder = $this->tmpName.'dir';
 	$this->tmpZip = $this->tmpName.'.zip';
 	$this->allowedChars = "[^0-9a-zA-Z()_-]";
@@ -98,12 +98,12 @@ function createDirectory($currentDir, $folderID, $depth=0) {
 	
 	if(is_array($fileList)) {
 		foreach($fileList as $file) {
-			$fileLocation = FILE_directory .'/'.$file['id'].'.dat';
+			$fileLocation = Cfg::get('file_dir') .'/'.$file['id'].'.dat';
 			if(is_file($fileLocation)) {
 				$this->size = $this->size + $file['file_size'];
 				$fileName = $currentDir.'/'.$file['realname'];
 				$fileName = $this->uniqueFileName($fileName); //ensure filename is unique else puts numbers in filename
-				copy(FILE_directory .'/'.$file['id'].'.dat', $currentDir.'/'.$file['realname']);
+				copy(Cfg::get('file_dir') .'/'.$file['id'].'.dat', $currentDir.'/'.$file['realname']);
 			}
 		}
 	}

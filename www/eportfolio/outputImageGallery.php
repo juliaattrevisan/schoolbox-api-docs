@@ -18,7 +18,7 @@ if (is_array($imageList) ) {
 	foreach ($imageList as $thumbnail) {
 		$this->setVar('THUMBNAIL', "
 			<a class=\"thumb\" href=\"/cms/image.php?myFile=1&id={$thumbnail['id']}&height=600&width=800\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
-			<img src=\"/cms/image.php?myFile=1&id={$thumbnail['id']}&height=".THUMBNAIL_size."&width=".THUMBNAIL_size."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\">
+			<img src=\"/cms/image.php?myFile=1&id={$thumbnail['id']}&height=".Cfg::get('thumbnail_size')."&width=".Cfg::get('thumbnail_size')."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\">
 			</a>");
 	
 		$this->parse('cell_block', 'thumb_cell', true);

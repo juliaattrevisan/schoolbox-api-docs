@@ -160,7 +160,7 @@ class MyFile extends Model {
 			$data['mime_type'] = $file['type']; /* should hook up to allowedFile to get mime type properly */
 			
 			if($fileID = parent::create($data)) {
-				$filename = MYFILE_directory.'/'.$fileID.'.dat';
+				$filename = Cfg::get('myfile_dir').'/'.$fileID.'.dat';
 				@unlink($filename);
 				rename($file['tmp_name'], $filename);
 			}

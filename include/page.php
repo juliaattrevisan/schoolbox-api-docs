@@ -1,13 +1,13 @@
 <?php
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/conf/conf.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/../include/template.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/include/stdfuncs.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/../include/config.php');
 
 class Page {
 		
 	function Page($error = false) {
-		$this->templateRoot = TEMPLATE_dir;
+		$this->templateRoot = Cfg::get('template_dir');
 		$this->template = new Template($this->templateRoot);
 	}
 

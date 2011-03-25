@@ -7,7 +7,7 @@ class Image {
 	/*
 	function imageCache( )
 	{
-		$filename = THUMBNAIL_IMAGE_CACHE."/".$_GET['id']."-".$maxHeight."x".$maxWidth.".jpg";
+		$filename = Cfg::get('thumbnail_dir')."/".$_GET['id']."-".$maxHeight."x".$maxWidth.".jpg";
 		if(file_exists($filename))
 		{
 			outputImageFile($filename);

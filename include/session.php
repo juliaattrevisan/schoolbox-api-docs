@@ -43,7 +43,7 @@ class Session {
             $_SESSION['campus'] = $userHandler->getUserCampus($user['uid']);
 
             //if no webmail enabled or user has elected to use external client set mailhandle to mailto:
-            if(MAIL_enable == 0 || $user['mail_handler'] || ($groupHandler->isParent($user['group_id']) && !$user['local_email']))
+            if(Cfg::get('mail_enable') == 0 || $user['mail_handler'] || ($groupHandler->isParent($user['group_id']) && !$user['local_email']))
                 $_SESSION['mailhandle'] = "mailto:";
             else
                 $_SESSION['mailhandle'] = "/mail/createMail.php?replyto=";
@@ -53,12 +53,13 @@ class Session {
                 $_SESSION['su'] = 1;
             
 
-            if(SYNERGY_enable)
+            if(Cfg::get('external_enable'))
                 $this->setSynergyInfo($userHandler);
 
-            if(LDAP_enable)
+           /* Old ormond code for extracting data from ldap
+            * if(Cfg::get('ldap_enable'))
                 $this->setLDAPInfo($username);
-
+            */
 
             /* Log successful */
             $loginlogquery = "INSERT INTO login_log (username, date, ip, login)
@@ -99,7 +100,7 @@ class Session {
                return false;
 
         // Function to check username exists and password is correct
-        if(defined('LDAP_enable') && LDAP_enable) {
+        if(Cfg::get('ldap_enable')) {
             $result = $this->authenticateLDAP($username, $password);
 
             //insert password into db to enable automatic login
@@ -118,12 +119,12 @@ class Session {
 
     private function authenticateLDAP($username, $password) {
 
-        $ds=ldap_connect(LDAP_host);
+        $ds=ldap_connect(Cfg::get('ldap_host'));
         ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
         ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-        ldap_bind($ds, $this->ldap_escape(LDAP_user), $this->ldap_escape(LDAP_pass));
-        $searchString = "(".LDAP_search."=".$this->ldap_escape($username).")";
-        $result = ldap_search($ds,LDAP_base, $searchString, array('dn'));
+        ldap_bind($ds, $this->ldap_escape(Cfg::get('ldap_user')), $this->ldap_escape(Cfg::get('ldap_pass')));
+        $searchString = "(".Cfg::get('ldap_username')."=".$this->ldap_escape($username).")";
+        $result = ldap_search($ds,Cfg::get('ldap_base'), $searchString, array('dn'));
         if($result) {
                 $entries = ldap_get_entries($ds, $result);
                 $dn = $entries[0]['dn'];
@@ -132,13 +133,13 @@ class Session {
         }
         ldap_unbind($ds);
 
-        if(defined('LDAP_host2'))  {
+        if(Cfg::get('ldap_host_alt'))  {
             //Try student server
-            $ds=ldap_connect(LDAP_host2);
+            $ds=ldap_connect(Cfg::get('ldap_host_alt'));
             ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
             ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-            ldap_bind($ds, LDAP_user2, LDAP_pass);
-            $result = ldap_search($ds,LDAP_base2, $searchString, array('dn'));
+            ldap_bind($ds, $this->ldap_escape(Cfg::get('ldap_user_alt')), $this->ldap_escape(Cfg::get('ldap_pass')));
+            $result = ldap_search($ds,Cfg::get('ldap_base_alt'), $searchString, array('dn'));
             if($result) {
                 $entries = ldap_get_entries($ds, $result);
                 $dn = $entries[0]['dn'];
@@ -189,12 +190,12 @@ class Session {
         // Function to check that host isnt brute forceing the login
         // Returns true if too many logins false if ok
         $ip = getIP();
-        $graceperiod = time() - LOGINGRACE;
+        $graceperiod = time() - Cfg::get('login_grace');
 
         $query = "SELECT id FROM login_log WHERE ip = '$ip' AND login = '0' AND date > FROM_UNIXTIME($graceperiod)";
         $this->db->query($query);
 
-        if($this->db->countRows() < LOGINALLOWED)
+        if($this->db->countRows() < Cfg::get('login_allowed'))
                 return false;
         else
                 return true;
@@ -211,7 +212,7 @@ class Session {
     }
 
     function setSynergyInfo($userHandler) {
-        require_once dirname(__FILE__) .'/../library/'.EXTERNAL_db.'/ExternalUser.php';
+        require_once dirname(__FILE__) .'/../library/'.Cfg::get('external_type').'/ExternalUser.php';
         require_once dirname(__FILE__) .'/../library/group.php';
         require_once dirname(__FILE__) .'/../library/category.php';
         $synUser = new ExternalUser;
@@ -227,13 +228,12 @@ class Session {
 
             //if user is parent get information regarding enrolled students
             if ($groupHandler->isParent()) {
-                if (defined('SYNERGY_sync_email') && SYNERGY_sync_email) {
+                if (Cfg::get('external_sync_data') ) {
                     //Updates parents email from synergetic
                     $email = $synUser->getEmail($synergy_id);
                     $mydb->update('user', 'id', array('id' => $_SESSION['id'], 'alt_email' => $email));
                 }
  
-                $studentGroup = unserialize(STUDENTGROUPIDS);
                 if ($synergy_id) {
                     $children = $synUser->getEnrolledStudents($synergy_id);
                     if (is_array($children)) {
@@ -267,7 +267,6 @@ class Session {
                     foreach ($subjectList as $subject) {
                         //check subject exists.. we cant link to subjects that dont exist its ugly
                         $result = $catHandler->getByCode($subject['code']);
-                        print_r($result);
                         if (is_array($result) && is_numeric($result['id'])) {
                             if (!in_array($result['id'], $catList) && $groupHandler->getPermission($result['id']) >= READ_ACCESS) {
                                 $subject['id'] = $result['id'];

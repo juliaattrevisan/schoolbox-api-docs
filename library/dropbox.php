@@ -68,7 +68,7 @@ class Dropbox
 		{
 				//save file using file ID as name
 				$newFileName = $fileId . ".dat";
-				copy($file_loc, DROPBOX_directory ."/". $newFileName);
+				copy($file_loc, Cfg::get('dropbox_dir') ."/". $newFileName);
 		}
 	
 		return $fileId;
@@ -91,7 +91,7 @@ class Dropbox
 
 		//now delete file by updating it as deleted
 		$this->db->dbDeleteRow('dropbox', 'id',$id);
-		@unlink(DROPBOX_directory ."/" . $id.'.dat');
+		@unlink(Cfg::get('dropbox_dir') ."/" . $id.'.dat');
 	
 		return $fileInfo['category'];
 	}
@@ -131,7 +131,7 @@ class Dropbox
 			$attach = "";
 
 		//all checks completed.. continue with file send
-		$filename = DROPBOX_directory . "/" . $id . ".dat";
+		$filename = Cfg::get('dropbox_dir') . "/" . $id . ".dat";
 		
 		//send headers
 		header ("Content-Type: {$result['mime_type']}"); 

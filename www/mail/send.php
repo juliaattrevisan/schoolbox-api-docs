@@ -27,8 +27,8 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 	if($user['alt_email'])
 		$from_email = $name.'<'.$user['alt_email'].'>';
-	else if($user['local_email'] || SITE_location == 'wenona')
-		$from_email = $name.'<'.$user['username']."@".MAIL_address.'>';
+	else if($user['local_email'] || Cfg::get('site_location') == 'wenona')
+		$from_email = $name.'<'.$user['username']."@".Cfg::get('mail_address').'>';
 	else 
 		error(42);
 
@@ -39,8 +39,8 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 		if($toemail['alt_email'])
 			$to = $toemail['alt_email'];
-		else if($user['local_email'] || SITE_location == 'wenona')
-			$to = $toemail['username']."@".MAIL_address;
+		else if($user['local_email'] || Cfg::get('site_location') == 'wenona')
+			$to = $toemail['username']."@".Cfg::get('mail_address');
 		else 
 			error(43);
 	}

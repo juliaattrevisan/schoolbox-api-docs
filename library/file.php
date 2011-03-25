@@ -120,7 +120,7 @@ class File extends Model {
 			$data['mime_type'] = $allowedFileHandler->getMime($allowedFileHandler->getExtension($file['name']));
 			
 			if($fileID = parent::create($data)) {
-				$filename = FILE_directory.'/'.$fileID.'.dat';
+				$filename = Cfg::get('file_dir').'/'.$fileID.'.dat';
 				@unlink($filename);
 				copy($file['tmp_name'], $filename);
 			}
@@ -147,7 +147,7 @@ class File extends Model {
 			
 			parent::update($data);
 
-			$filename = FILE_directory.'/'.$data['id'].'.dat';
+			$filename = Cfg::get('file_dir').'/'.$data['id'].'.dat';
 			@unlink($filename);
 			copy($file['tmp_name'], $filename);
 		}
@@ -162,7 +162,7 @@ class File extends Model {
 		
 		if($clean) {
 			parent::delete($id);
-			$filename = FILE_directory.'/'.$id.'.dat';
+			$filename = Cfg::get('file_dir').'/'.$id.'.dat';
 			@unlink($filename);
 		}
 		else {

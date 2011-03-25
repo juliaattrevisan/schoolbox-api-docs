@@ -27,7 +27,7 @@ $this->setBlock("category_block", "new_blog", "new_blog_item");
 $flag = 0;
 
 //check mail status
-if(MAIL_enable && !(SITE_location == 'mgs' && $groupHandler->isStaff()) ) {
+if(MAIL_enable && !(Cfg::get('site_location') == 'mgs' && $groupHandler->isStaff()) ) {
 
 	$mailbox = $whatnew->newEmail();
 	if($mailbox->unseen > 0) {

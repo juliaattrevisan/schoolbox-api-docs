@@ -37,7 +37,7 @@ if(is_numeric($this->arg[0])) {
 					'DESCRIPTION'		=> scrubText($file['description']),
 					'COMMENT'			=> scrubText($file['comment']),	
 					'HIDDEN_SELECTED'	=> 	$file['hidden'] > 0 ? 'checked="checked"' : '',
-					'MAX_FILE_SIZE'		=> MAX_FILE_SIZE,
+					'MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
 					'CATEGORY_ID'		=> $file['cid'],
 					'CATEGORY_NAME'		=> scrubText($file['categoryName']),
 					'DUE_DAY'			=> '',
@@ -121,7 +121,7 @@ if(is_numeric($this->arg[0])) {
 					'DESCRIPTION'		=> '',
 					'COMMENT'			=> '',	
 					'HIDDEN_SELECTED'	=> '',
-					'MAX_FILE_SIZE'		=> MAX_FILE_SIZE,
+					'MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
 					'SUBBOX'			=> '<input type="checkbox" name="submission" id="submission" value="1" >',
 					'CATEGORY_NAME'		=> scrubTEXT($category['name']),
 					'CATEGORY_ID'		=> $category['id'],
@@ -182,7 +182,7 @@ else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 		
 	$output = array('CATEGORY_NAME'		=> scrubTEXT($category['name']),
 					'CATEGORY_ID'		=> $category['id'],
-					'FILE_max_upload'	=> FILE_max_upload,
+					'FILE_max_upload'	=> Cfg::get('file_upload_count'),
 					'SESSION_NAME'		=> session_name(),
 					'SESSION_ID'		=> session_id(),
 					);
@@ -200,7 +200,7 @@ else if($this->arg[0] == 'multicat') {
 	$this->setTitle('Upload a File to Multiple Locations');	
 	$this->setTab('resources');
 	
-	$output = array('MAX_FILE_SIZE'		=> MAX_FILE_SIZE,
+	$output = array('MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
 					);
 	$this->setVar($output);
 	

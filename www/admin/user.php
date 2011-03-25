@@ -114,8 +114,8 @@ class user
 			//for each student submission delete from hdd
 			while($studsub = $this->db->getNextArray() )
 			{
-				if(!@unlink(SUBMISSION_directory."/".$studsub['id'].".dat"))
-					print "Failed to delete: ".SUBMISSION_directory."/".$studsub['id'].".dat";
+				if(!@unlink(Cfg::get('submission_dir')."/".$studsub['id'].".dat"))
+					print "Failed to delete: ".Cfg::get('submission_dir')."/".$studsub['id'].".dat";
 			}
 	
 			//delete all student submissions from db
@@ -136,8 +136,8 @@ class user
 
 		while($ret = $this->db->getNextArray() )
 		{
-			if(!@unlink(RETURNS_directory."/".$ret['id'].".dat"))
-				print "Failed to delete: ".RETURNS_directory."/".$ret['id'].".dat";
+			if(!@unlink(Cfg::get('returns_dir')."/".$ret['id'].".dat"))
+				print "Failed to delete: ".Cfg::get('returns_dir')."/".$ret['id'].".dat";
 		} 
 
 		$query = "DELETE FROM submission_return WHERE owner = '$id'";

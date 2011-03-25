@@ -18,8 +18,8 @@ $this->setTitle('Welcome');
 
 //fetch layout for user
 $query = "SELECT position, name, filename, function 
-			FROM welcomeLayout LEFT JOIN welcomeComponent ON componentID = welcomeComponent.id
-			WHERE gid = {$_SESSION['gid']}";
+            FROM welcomeLayout LEFT JOIN welcomeComponent ON componentID = welcomeComponent.id
+            WHERE gid = {$_SESSION['gid']}";
 $result = $this->db->query($query);
 while($component = $this->db->getNextArray($result))
 {
@@ -53,7 +53,7 @@ if($timetable != true) {
  */
 $this->setBlock(TEMPLATE_content, 'greeting_name', 'greeting_name_block');
 
-if ($groupHandler->isParent() && SITE_location == 'shore') {
+if ($groupHandler->isParent() && Cfg::get('site_location') == 'shore') {
     $this->setVar('greeting_name_block', '');
 }
 else {

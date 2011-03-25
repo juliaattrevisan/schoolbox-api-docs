@@ -79,15 +79,12 @@ if(is_numeric($this->arg[0])) {
 	$emailAddress = formatEmail($user);
 	if($emailAddress) {
             //Dont display emails of students to parents
-            if($groupHandler->isStudent($user['uid']) && $groupHandler->isParent()) {
+            if(Cfg::get('site_location') == 'wenona')
+                $email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">Send Email</a>";
+            else if($groupHandler->isStudent($user['uid']) && $groupHandler->isParent())
                 $email = '';
-            }
-            else {
-                if(SITE_location == 'wenona')
-                    $email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">Send Email</a>";
-                else
-                    $email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$emailAddress</a>";
-            }
+            else
+                $email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$emailAddress</a>";
 	}
 
 
@@ -152,7 +149,7 @@ if(is_numeric($this->arg[0])) {
              * due work. Also allow the current user if they view themselves in the
              * search results.
              */
-            if ($groupHandler->isParent() && SITE_location == 'shore') {
+            if ($groupHandler->isParent() && Cfg::get('site_location') == 'shore') {
                 $this->setVar('due_work_block', '');
             }
             else {
@@ -261,7 +258,7 @@ if(is_numeric($this->arg[0])) {
             if (!$j)
                 $this->setVar('contact_details_block', '');
 
-            if(SITE_location == 'wenona') {
+            if(Cfg::get('site_location') == 'wenona') {
                 $this->parse('school_links_block','school_links');
                 $this->parse('edit_emergency_block', 'edit_emergency');
                 $this->parse('edit_contact_block', 'edit_contact');

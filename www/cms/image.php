@@ -22,11 +22,11 @@ if($_GET['id'] && $_GET['width'] && $_GET['height'])
 	//get file information
     if (is_numeric($_GET['myFile'])) {
         $query = "SELECT id, owner, mime_type, deleted FROM myFile WHERE id = {$_GET['id']}";
-        $fileDir = MYFILE_directory;
+        $fileDir = Cfg::get('myfile_dir');
     }
     else {
         $query = "SELECT id, mime_type, category, deleted FROM file WHERE id = {$_GET['id']}";
-        $fileDir = FILE_directory;
+        $fileDir = Cfg::get('file_dir');
     }
     
 	$imageInfo = $db->getRow($query);
@@ -74,7 +74,7 @@ function image_resize($src, $maxWidth,$maxHeight,$resample=1, $quality=75)
 	//note that we ignore other values like resample and quality when retrieving cache images
 	//we assume these things will mainly stay the same (cache will need to be rebuilt if they change)
 
-	$filename = THUMBNAIL_IMAGE_CACHE."/".$_GET['id']."-".$maxHeight."x".$maxWidth.".jpg";
+	$filename = Cfg::get('thumbnail_dir')."/".$_GET['id']."-".$maxHeight."x".$maxWidth.".jpg";
 	if(file_exists($filename))
 	{
 		

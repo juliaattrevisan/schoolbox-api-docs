@@ -6,6 +6,23 @@
 * scripts.					*
 *************************************************/
 
+define("SITE_root", dirname(__FILE__)."/../..");
+define('TEMPLATE_body', 		'bodyTpl');
+define('TEMPLATE_content', 		'contentTpl');
+
+//PEAR required for mail
+$path = SITE_root.'/include/PEAR';
+set_include_path('.' . PATH_SEPARATOR . get_include_path() . PATH_SEPARATOR . $path);
+
+//MySQL config options
+define("SQL_host", "localhost");
+define("SQL_user", "portal");
+define("SQL_passwd", "tnp879");
+define("SQL_db", "portal");
+
+
+
+
 
 //Site Directives
 define("HEADING", 'Schoolbox');			//This will appear on the window title of each page
@@ -16,7 +33,7 @@ define('SITE_domain', 'portal.alaress-dev.com.au');
 
 //define("SITE_location", "shore");				//This defines the location, allows specific code for each location
 define("SITE_detect", "campus");				//Which option to detect site, can be domain or campus
-define("SITE_root", dirname(__FILE__)."/../..");
+
 define('SITE_address', 'http://www.alaress.com.au');
 
 //Security options
@@ -24,9 +41,9 @@ define("LOGINGRACE", "60");				//Time measured between logins (secs)
 define("LOGINALLOWED", "3");				//Logins allowed in grace time
 define("TRACKIP", false);					//Ensure user session does not change ip (can cause issues)
 define("SESSIONLENGTH", "1800");			//Automatically logout users who have been idle for this amount of time (secs)
-define("REMEMBERSESSION", false);				//Allows server to store session indefinetly. Overrides above setting. 
+//define("REMEMBERSESSION", false);				//Allows server to store session indefinetly. Overrides above setting.
 											//Users will only need to login once (has security implications)
-define("REGISTER_FIRSTIME", false);			//Detects no password and checks password against mail server if correct registers account
+//define("REGISTER_FIRSTIME", false);			//Detects no password and checks password against mail server if correct registers account
 
 // Cache Options
 
@@ -47,8 +64,8 @@ define('KERB_enable', true);
 
 //Template Options
 define('TEMPLATE_dir', 			SITE_root.'/templates');
-define('TEMPLATE_body', 		'bodyTpl');
-define('TEMPLATE_content', 		'contentTpl');
+define('MAIL_templates', TEMPLATE_dir);  // Should be removed and replace with template dir...
+
 define('TPL_directory', 		SITE_root.'/'. SITE_location . "_templates");		//Deprecated option
 
 // Search Options
@@ -67,9 +84,9 @@ define('CACHE_xml',					SITE_root . '/data/cache/xml');
 define("THUMBNAIL_size", 		100); 
 define("FILE_max_upload", 		"10");						//Maximum number of files that can be uploaded via bulk uploader
 define("MAX_FILE_SIZE", 		10485760); 					//Maximum filesize in bytes allowed to be uploaded (default 10MB) (also set in php.ini)
-define("URLS_use_frame", 		false);						//Open links in frame
-define('FILE_use_frame', 		false);
-define('MIME_magic', 			'/usr/share/file/magic');
+//define("URLS_use_frame", 		false);						//Open links in frame
+//define('FILE_use_frame', 		false);
+//define('MIME_magic', 			'/usr/share/file/magic');
 define('NEWS_teacher_edit_other', true);
 define('WELCOME_image_folder', 140);
 
@@ -82,11 +99,11 @@ define('WEBDAV_pass', 			'test');
 define("GROUP_staff_only_owner", true);			//Determines if students can be group owner or not
 
 //FORUM options
-define("FORUM_default_view", 'thread'); 		//Default forum style (flat or thread)
-define("FORUM_increment", 10);					//Amount of thread or posts per page
+//define("FORUM_default_view", 'thread'); 		//Default forum style (flat or thread)
+//define("FORUM_increment", 10);					//Amount of thread or posts per page
 
 //CALENDAR options
-define("CALENDAR_default_view", 'week');		//Default view style for calendar (week or month)
+//define("CALENDAR_default_view", 'week');		//Default view style for calendar (week or month)
 define("CALENDAR_time_format", '%l:%i%p');		//Time output style 24 hour = '%k:%i', 12 hour = '%l:%i %p'
 
 define('DATE_long_format', 'l F jS Y g:ia');
@@ -96,14 +113,10 @@ define('DATE_short_no_time','jS M Y');
 
 
 //SEARCH & BROWSE Display options
-define('FILE_date_format', '%W %M %e %Y @ %l:%i%p');		//Time output style 24 hour = '%k:%i', 12 hour = '%l:%i %p'
+//define('FILE_date_format', '%W %M %e %Y @ %l:%i%p');		//Time output style 24 hour = '%k:%i', 12 hour = '%l:%i %p'
 define('NAME_format', '{title} {firstname} {lastname}'); 	// Format for output of name
 
-//MySQL config options
-define("SQL_host", "localhost");
-define("SQL_user", "portal");
-define("SQL_passwd", "tnp879");
-define("SQL_db", "portal");
+
 
 //define("SQL_host", "localhost");
 //define("SQL_user", "portaldemo");
@@ -140,37 +153,41 @@ define("MAIL_port", 993);
 define("MAIL_smtp_server", "ssl://mail.alaress.com.au");
 define("MAIL_smtp_port", 465);
 define("MAIL_address", "alaress.com.au");
-define("MAIL_increment", 20);					//Amount of emails per page
+//define("MAIL_increment", 20);					//Amount of emails per page
 
-//PEAR required for mail
-$path = SITE_root.'/include/PEAR';
-set_include_path('.' . PATH_SEPARATOR . get_include_path() . PATH_SEPARATOR . $path);
+
 
 // mailer
-define('MAIL_templates', TEMPLATE_dir);
+
 define('FROM_address', 'portal@lektec.com.au');
 define('FROM_name', HEADING);
 define('CONTACT_address', 'ryan@lektec.com.au');
 
 //RSS Feed 
 define('RSS_url', 'http://www.abc.net.au/news/indexes/justin/rss.xml');
-define('RSS_cache_time', 3000);
 define('RSS_limit', 6);
+
+
 
 //Weather options
 
 define("WEATHER_enable", true);				//This will disable the weather module
 define("WEATHER_location", "Melbourne, Victoria");      //cache weather info for 2 hours
 
+/* Retire these or define them in object */
 define("ALLCAMPUS", 4);					//Value that represents all campuses in the luCampus table
 define("HOMEPAGESERVICE", 1);				//Value that represents the homepage module in the service table
 define("FORUM_COMPONENT", 5);
 
+/* Retire these, move them into group table */
 define("STUDENTGROUPIDS", serialize(array(3,5)));	//List of id numbers representing student groups
 define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
 define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 
+/* Move into group table */
 define('GROUP_can_change_password', serialize(array(1,2,3,4,5)));
+
+
 
 define('HOMEPAGE_colors', serialize(array(
  'left_head_font' => '013a63',
@@ -195,11 +212,5 @@ define('HELPDESK_enable', true);
 define('HELPDESK_location', '/var/www/helpdesk');
 define('HELPDESK_db', 'helpdesk');
 
-/* Due Work: Recent work. Should be a multiple of 3 because there are three
- * types: Due, Awaiting and Marked.
- */
-define('UPCOMING_WORK_TYPE', 1);
-define('AWAITING_WORK_TYPE', 2);
-define('RETURNED_WORK_TYPE', 3);
-define('RECENT_WORK_LIMIT', 12);
+
 ?>

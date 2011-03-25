@@ -12,7 +12,7 @@ $j(function() {
 		'fileDataName'   : 'file',
 		'multi'          : true,
 		'auto'           : false,
-		'queueSizeLimit' : 50,
+		'queueSizeLimit' : {FILE_max_upload},
 		'removeCompleted': false,
 		'onSelect'       : function(event, queueID, fileObj) {
 			uploadQueue.push(queueID);

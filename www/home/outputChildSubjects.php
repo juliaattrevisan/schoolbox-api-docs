@@ -7,7 +7,7 @@ if(is_array($_SESSION['children'])) {
 	$i = 0;
 	foreach($_SESSION['children'] as $child)
 	{
-		if (!(SITE_location == 'wenona' && $child['gid'] == 3)) {
+		if (!(Cfg::get('site_location') == 'wenona' && $child['gid'] == 3)) {
 			$i++;
 			$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
 			$user = $this->db->getRow($query);

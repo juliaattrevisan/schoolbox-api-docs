@@ -124,7 +124,7 @@ if (!empty($result['user'])) {
         // format email address
         $address = formatEmail($user);
         if ($address) {
-            if (SITE_location == 'wenona')
+            if (Cfg::get('site_location') == 'wenona')
                 $email = "<a href=\"{$_SESSION['mailhandle']}$address\">Send Email</a>";
             else
                 $email = "<a href=\"{$_SESSION['mailhandle']}$address\">$address</a>";

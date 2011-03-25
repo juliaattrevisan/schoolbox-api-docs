@@ -2,6 +2,8 @@
 
 require_once($_SERVER['DOCUMENT_ROOT'] .'/conf/conf.php');
 
+define('RSS_cache_time', 3000);
+
 class XML {
     public $xml;
 
@@ -12,7 +14,7 @@ class XML {
         if(empty($url))
             return false;
 
-        $cache_file = CACHE_xml . '/' . md5($url);
+        $cache_file = Cfg::get('xml_dir') . '/' . md5($url);
         //$cache_time = is_numeric($caching) ? $caching : 2*60*60;
 
         if(!file_exists($cache_file) || filectime($cache_file) < (time() - $cache_time))   {

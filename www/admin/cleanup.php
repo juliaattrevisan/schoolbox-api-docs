@@ -47,8 +47,8 @@ class clean {
 	
 		while( $sub = $this->db->getNextArray() )
 		{
-			if(!@unlink(SUBMISSION_directory."/".$sub['id'].".dat"))					
-				print "Failed to delete ".SUBMISSION_directory."/".$sub['id'].".dat<br>";					
+			if(!@unlink(Cfg::get('submission_dir')."/".$sub['id'].".dat"))					
+				print "Failed to delete ".Cfg::get('submission_dir')."/".$sub['id'].".dat<br>";					
 		}
 
 		$query = "DELETE FROM student_submission";
@@ -68,8 +68,8 @@ class clean {
 	
 		while( $ret = $this->db->getNextArray() )
 		{
-			if(!@unlink(RETURNS_directory."/".$ret['id'].".dat"))
-				print "Failed to delete ".RETURNS_directory."/".$ret['id'].".dat<br>";					
+			if(!@unlink(Cfg::get('returns_dir')."/".$ret['id'].".dat"))
+				print "Failed to delete ".Cfg::get('returns_dir')."/".$ret['id'].".dat<br>";					
 		}
 
 		$query = "DELETE FROM submission_return";
@@ -103,8 +103,8 @@ class clean {
 		$this->db->query($query);
 		
 		while($file = $this->db->getNextArray()) {
-			if(!@unlink(FILE_directory."/".$file['id'].".dat"))
-			print "Failed to delete ".FILE_directory."/".$file['id'].".dat<br>";		
+			if(!@unlink(Cfg::get('file_dir')."/".$file['id'].".dat"))
+			print "Failed to delete ".Cfg::get('file_dir')."/".$file['id'].".dat<br>";		
 		}
 		
 		$query = "DELETE FROM file WHERE deleted = '1'";
@@ -116,7 +116,7 @@ class clean {
 		//delete all files from the filesystem that do no have a corresponding record in the database
 		
 		//normal files
-		foreach(glob(FILE_directory.'/*.dat') as $file) {
+		foreach(glob(Cfg::get('file_dir').'/*.dat') as $file) {
 			preg_match('/.*\/([0-9]+).dat/', $file, $matches);
 			if($matches[1]) {
 				$query = "SELECT id FROM file WHERE id = '{$matches[1]}'";
@@ -130,7 +130,7 @@ class clean {
 		}
 
 		//thumbnails
-		foreach(glob(THUMBNAIL_IMAGE_CACHE.'/*.jpg') as $file) {
+		foreach(glob(Cfg::get('thumbnail_dir').'/*.jpg') as $file) {
 			preg_match('/.*\/([0-9]+)-.*\.jpg/', $file, $matches);
 			
 			if($matches[1]) {
@@ -148,7 +148,7 @@ class clean {
 
 		
 		//student submissions
-		foreach(glob(SUBMISSION_directory.'/*.dat') as $file) {
+		foreach(glob(Cfg::get('submission_dir').'/*.dat') as $file) {
 		print $file;
 		continue;
 			preg_match('/.*\/([0-9]+).dat/', $file, $matches);
@@ -164,7 +164,7 @@ class clean {
 		}
 		
 		//returns
-		foreach(glob(RETURNS_directory.'/*.dat') as $file) {
+		foreach(glob(Cfg::get('returns_dir').'/*.dat') as $file) {
 			preg_match('/.*\/([0-9]+).dat/', $file, $matches);
 			if($matches[1]) {
 				$query = "SELECT id FROM submission_return WHERE id = '{$matches[1]}'";
@@ -189,7 +189,7 @@ class clean {
 	
 	function cleanThumbnails() {
 		
-		foreach(glob(THUMBNAIL_IMAGE_CACHE.'/*.jpg') as $file) {
+		foreach(glob(Cfg::get('thumbnail_dir').'/*.jpg') as $file) {
 					print "Deleting $file<br>";
 					if(!@unlink($file))
 						print "Failed to delete $file<br>";
