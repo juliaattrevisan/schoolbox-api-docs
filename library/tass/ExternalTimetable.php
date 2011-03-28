@@ -224,7 +224,12 @@ class ExternalTimetable extends MSSQL{
 					$timetable[$x]['day'][$y]['code'] = trim($desc['year_grp'].'-'.$desc['sub_code'].'-'.$desc['class']);
 					$timetable[$x]['day'][$y]['room'] = $desc['room_code'];
 					$desc = $this->getNextArray();
-				
+
+                                        //bad data in synergetic.. why..??
+                                        while($desc['day_code'] == $y && $desc['prd_code'] == $timetable[$x]['periodNumber']) {
+                                                $desc = $this->getNextArray();
+                                        }
+
 				}
 				else
 				{	
