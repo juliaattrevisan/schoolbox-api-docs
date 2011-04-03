@@ -1,0 +1,94 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.autoresize.js"></script>
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+
+
+<script type="text/javascript">
+
+$j(function() {
+		
+	$j.fn.qtip.defaults.position.corner = {
+		target: 'topLeft',
+		tooltip: 'bottomLeft'
+	}
+	
+	$j.fn.qtip.defaults.style = {
+		tip: 'bottomLeft',
+		name: 'green'
+	}
+		
+	$j('label span').each(function() {
+		activeContent = $j(this).siblings('em').html();
+		$j(this).qtip({
+			content: activeContent,
+			api: {
+					// Retrieve the content when tooltip is first rendered
+					 onRender: function()
+					 {
+						var self = this;
+					 }
+				 }
+		});
+	});
+	
+});
+
+</script>
+
+<!-- END custom_head -->
+
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+	<li><a href="/adminv2/index">Home</a></li>
+	<li><a href="/adminv2/users/index" >Users</a></li>
+	<li><a href="/adminv2/side-menu/index">Side Menu</a></li>
+	<li><a href="/adminv2/allowed-files/index">Allowed Files</a></li>
+	<li><a href="/adminv2/setting"  >Settings</a></li>
+	<li><a href="/adminv2/calendar/index">Calendar</a></li>
+	<li><a href="/adminv2/list" class="current">Lists</a></li>
+	<li><a href="/adminv2/rollover/index">Rollover</a></li>
+</ul>
+<div class="admin-contents">
+	<h2>Lists</h2>
+	
+	<div class="level green hide-it">	
+		You've successfully updated your settings.
+		<div class="float-fix"></div>
+	</div>
+	
+	<div class="settings-nav-holder">
+		<ul class="settings-nav">
+            <!-- BEGIN table_tab -->
+			<li><a href="/adminv2/list/{TABLE_NAME}" class="current">{TABLE_TITLE}<span></span></a></li>
+            <!-- END table_tab -->
+		</ul>
+	</div>
+	<div class="settings">
+		<div class="split-container">
+			<form id="settings" class="admin-form level" action="get">
+                <table>
+                    <thead>
+                    <tr>
+                        <!-- BEGIN table_heading -->
+                        <td>{TABLE_HEAD}</td>
+                        <!-- END table_heading -->
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- BEGIN table_row -->
+                    <tr>
+                        <!-- BEGIN table_cell -->
+                        <td>{TABLE_DATA}</td>
+                        <!-- END table_cell -->
+                    </tr>
+                    <!-- END table_row -->
+                    </tbody>
+                </table>
+
+				<div class="float-fix"></div>
+			</form>
+		</div>
+	</div>
+	<div class="float-fix"></div>
+</div>
