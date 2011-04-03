@@ -117,7 +117,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 	}
 
 
-	if(Cfg::get('site_location') == 'mgs' && SYNERGY_enable && $groupHandler->isStaff($_SESSION['id'])) {
+	if(Cfg::get('site_location') == 'mgs' && Cfg::get('external_enable') && $groupHandler->isStaff($_SESSION['id'])) {
 		$birthdayList = $calendarHandler->getStudentBirthdays($currentDay);
 		if(is_array($birthdayList) && in_array(3, $_SESSION['campus'])) {
 			foreach($birthdayList as $birthday) {

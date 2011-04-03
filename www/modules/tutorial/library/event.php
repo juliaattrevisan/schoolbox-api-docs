@@ -263,7 +263,7 @@ class Event extends Model {
 	
 	function getTutorList () {
 		
-		if (SYNERGY_enable) {
+		if (Cfg::get('external_enable')) {
 			$query = "SELECT ID synergy_id, Title title, Given1 firstname, Surname lastname
 					  FROM SynergyOne.dbo.vCommunityAddressesConstit vCommunityAddressesConstit
 					  WHERE (vCommunityAddressesConstit.ConstitCode='TUTRES".date('Y')."') OR (vCommunityAddressesConstit.ConstitCode='TUTNONRES".date('Y')."')

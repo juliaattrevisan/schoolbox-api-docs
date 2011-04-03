@@ -21,7 +21,7 @@ require_once SITE_root . '/library/reCaptcha.php';
 if(validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template']) 
 	&& (isset($_SESSION['id']) || ReCaptcha::checkResponse($_POST['recaptcha_answer'], $_POST['recaptcha_challenge']))) {
 	
-	$mailHandler = new Mailer($_POST['template'], 'OurSchool Feedback - ' . $_POST['subject'], CONTACT_address);
+	$mailHandler = new Mailer($_POST['template'], 'OurSchool Feedback - ' . $_POST['subject'], Cfg::get('mail_support_address'));
 	
 	foreach($_POST as $key => $var) {
 		if(!checkSpamHeaders($var))

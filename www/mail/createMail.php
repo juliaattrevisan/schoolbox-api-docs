@@ -13,9 +13,9 @@ $page = new SitePage();
 $groupHandler = new Group;
 
 
-if(defined(MAIL_enable) && MAIL_enable == true) {
+if(defined(Cfg::get('mail_enable')) && Cfg::get('mail_enable') == true) {
 
-    if(MAIL_interface == 'roundcube' && ($groupHandler->isStudent($_SESSION['gid']) || !$_SESSION['exchange']))
+    if(Cfg::get('mail_type') == 'roundcube' && ($groupHandler->isStudent($_SESSION['gid']) || !$_SESSION['exchange']))
     {
 	$page->setFile(TEMPLATE_content, 'mail/roundcube.html');
 	$page->setTitle('Webmail');

@@ -13,7 +13,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] .'/../include/sitePage.php';
 
-if(MAIL_enable)
+if(Cfg::get('mail_enable'))
 {
 	$page = new SitePage(); 
 	

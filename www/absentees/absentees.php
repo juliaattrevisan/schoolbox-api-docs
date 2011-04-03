@@ -26,7 +26,7 @@ class Absentee
 		$this->campus = 'G';
 		$this->period = $absperiod;
 		
-		$this->msdb = @mssql_connect(MSSQL_host, MSSQL_user, MSSQL_passwd);
+		$this->msdb = @mssql_connect(Cfg::get('external_db_host'), Cfg::get('external_db_user'), Cfg::get('external_db_passwd'));
 	}
 
 	function displayStudentList($subCode)
@@ -142,7 +142,7 @@ class Absentee
                 include_once("../include/page.php");
 
                 //setup database
-                $this->msdb = @mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
+                $this->msdb = @mssql_connect(Cfg::get('external_db_host'),Cfg::get('external_db_user'),Cfg::get('external_db_passwd'));
 
                 $synergy_id = $_SESSION['sid'];
 

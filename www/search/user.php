@@ -102,9 +102,9 @@ if(is_numeric($this->arg[0])) {
 	$this->setVar($outputUser);
 
 	//advanced synergetic information
-	if(SYNERGY_enable && $user['synergy_id'])
+	if(Cfg::get('external_enable') && $user['synergy_id'])
 	{
-		require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalUser.php';
+		require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalUser.php';
 
 		$synUserHandler = new ExternalUser;
 		

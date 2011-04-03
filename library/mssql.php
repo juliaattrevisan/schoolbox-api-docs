@@ -10,12 +10,12 @@
 ************************************************************/
 class MSSQL {
 
-	function MSSQL($db = MSSQL_db) {
-		$this->host = MSSQL_host;
-		$this->user = MSSQL_user;
-		$this->passwd = MSSQL_passwd;
+	function MSSQL($db = false) {
+		$this->host = Cfg::get('external_db_host');
+		$this->user = Cfg::get('external_db_user');
+		$this->passwd = Cfg::get('external_db_passwd');
 		$this->debug = 0;
-		$this->db = $db;
+        $this->db = $db?$db:Cfg::get('external_db_db');
 		$this->connect();
 	}
 

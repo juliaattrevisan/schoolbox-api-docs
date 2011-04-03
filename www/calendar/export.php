@@ -17,7 +17,7 @@ $page = new SitePage(false);
 $v = new vcalendar();
 $cal = new Calendar;
 
-$v->setConfig('unique_id', MAIL_address ); 
+$v->setConfig('unique_id', Cfg::get('mail_address') );
 
 $v->setProperty('calscale', 'GREGORIAN');
 $v->setProperty('method', 'PUBLISH');

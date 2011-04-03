@@ -79,8 +79,8 @@ if (is_array($_SESSION['children'])) {
 
 // get category list
 $subjectList = false;
-if (SYNERGY_enable && $user['synergy_id'])  {
-        require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalUser.php';
+if (Cfg::get('external_enable') && $user['synergy_id'])  {
+        require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalUser.php';
 	$synUser = new ExternalUser;
 	$subjectList = $synUser->getSubjectList($user['synergy_id'], $user['uid']);
 }
@@ -417,8 +417,8 @@ $j = 0;
 foreach ($categoryList as $category) {
 	$categoryID = $category['id'];
 	/* yes it actually requires THIS MUCH code to get a teachers name. */
-	if (SYNERGY_enable) {
-                require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalClass.php';
+	if (Cfg::get('external_enable')) {
+                require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalClass.php';
 		$synClass = new ExternalClass;
 
 		$teacherOutput = array();
@@ -463,7 +463,7 @@ foreach ($categoryList as $category) {
 					'SUMMARY_CAT_NAME'	=> scrubText($category['name']),
 					'SUMMARY_TOTAL'		=> $summary[$category['id']]['total'],
 					'SUMMARY_DUE'		=> $summary[$category['id']]['due'],
-					'SUMMARY_TEACHER'	=> SYNERGY_enable ? implode(', ', $teacherOutput) : '',
+					'SUMMARY_TEACHER'	=> Cfg::get('external_enable') ? implode(', ', $teacherOutput) : '',
 					'DARK'				=> $j++ % 2 ? 'dark' : '',
                     'PERCENTAGE_COMPLETED' => $thisPercentage,
 					);

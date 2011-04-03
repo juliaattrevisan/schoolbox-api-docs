@@ -12,7 +12,7 @@ $user = $userHandler->getByID($_SESSION['id']);
 if($groupHandler->isParent() || 1) {
     /* Setup form variable */
     $form="Form1";
-    $action=SYNERGY_portal.'login.aspx';
+    $action=Cfg::get('external_portal').'login.aspx';
     $method="POST";
 
     $login = file_get_contents($action);

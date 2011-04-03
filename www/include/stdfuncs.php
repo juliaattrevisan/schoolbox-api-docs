@@ -330,7 +330,7 @@ function formatName($userInfo, $format = NULL){
 
 function formatEmail($email) {
 	if($email['local_email']) {
-			return $email['username']."@".MAIL_address;
+			return $email['username']."@".Cfg::get('mail_address');
 	}
 	else if($email['alt_email'])
 		return $email['alt_email'];

@@ -2,9 +2,9 @@
 // gets teachers involved in subject, outputs links to their addressbook page
 $this->setBlock($componentHandle, "staff_teachers", "staff_teacher_block");
 $this->setVar('staff_teacher_block', '');
-if($code != "" && SYNERGY_enable)
+if($code != "" && Cfg::get('external_enable'))
 {	
-	require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalClass.php';
+	require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalClass.php';
 	require_once SITE_root.'/library/user.php';
 	$synergeticClass = new ExternalClass;
 	$userHandler = new User;

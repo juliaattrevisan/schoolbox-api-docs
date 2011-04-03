@@ -1,13 +1,13 @@
 <?php
 
-require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalTimetable.php';
+require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalTimetable.php';
 	
 $this->setBlock(TEMPLATE_content, "timetable", "timetable_block");	
 $this->setBlock("timetable", "timetable_period", "timetable_period_block");
 $this->setBlock("timetable", "timetable_header", "timetable_header_block");
 
 //if user has timetable show it on the homepage
-if($_SESSION['timetable'] && SYNERGY_enable ) {
+if($_SESSION['timetable'] && Cfg::get('external_enable') ) {
 	$timetableHandler = new ExternalTimetable;
 	//get current day and period
 	$daynumber = $timetableHandler->getDayNumber($_SESSION['campus'][0]);

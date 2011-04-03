@@ -8,7 +8,7 @@
 
 require_once 'include/permission.php';
 require_once '../library/category.php';
-require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalClass.php';
+require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalClass.php';
 require_once '../library/user.php';
 
 

@@ -53,7 +53,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	//put the users email in the to field
 	if( !stristr($to,'@') && ( $bcc || $cc) )
 	{
-		$to = '"'.$to.'" <'.$user['username'].'@'.MAIL_address.'>';
+		$to = '"'.$to.'" <'.$user['username'].'@'.Cfg::get('mail_address').'>';
 	}
 
 	//fix qoute escapes
@@ -98,8 +98,8 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 	$body = $mime->get();
 	
-	if(MAIL_smtp_server)
-		$params['host'] = MAIL_smtp_server;
+	if(Cfg::get('mail_smtp_host'))
+		$params['host'] = Cfg::get('mail_smtp_host');
 	
 	$mail =& Mail::factory('smtp', $params);
 	
@@ -112,7 +112,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 
 //if form has been submitted
-if(isset($_POST['to']) && $_POST['to'] && MAIL_enable)
+if(isset($_POST['to']) && $_POST['to'] && Cfg::get('mail_enable'))
 {
 	sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message']);
 	

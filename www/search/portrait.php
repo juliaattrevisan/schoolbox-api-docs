@@ -33,7 +33,7 @@ else
 	
 $imageHandler = new Image;
 
-if(is_numeric($_GET['id']) && SYNERGY_enable)
+if(is_numeric($_GET['id']) && Cfg::get('external_enable'))
 {
 
     $user = $userHandler->getBySynergy($_GET['id']);
@@ -41,7 +41,7 @@ if(is_numeric($_GET['id']) && SYNERGY_enable)
     if( $groupHandler->isStaff() || $groupHandler->isParentOfChild($user['uid'])) {
 
         //get file details
-        $db = mssql_connect(MSSQL_host,MSSQL_user,MSSQL_passwd);
+        $db = mssql_connect(Cfg::get('external_db_host'),Cfg::get('external_db_user'),Cfg::get('external_db_passwd'));
 
         //needs to check file permissions otherwise we have security problem
         $query = "	SELECT vPhotos.ID, vPhotos.Photo, vPhotos.PhotoType

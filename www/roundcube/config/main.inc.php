@@ -12,7 +12,7 @@
 
 */
 
-require_once('../conf/conf.php');
+require_once('../../include/config.php');
 
 $rcmail_config = array();
 
@@ -67,10 +67,10 @@ $rcmail_config['smtp_debug'] = false;
 // %n - http hostname ($_SERVER['SERVER_NAME'])
 // %d - domain (http hostname without the first part)
 // For example %n = mail.domain.tld, %d = domain.tld
-$rcmail_config['default_host'] = MAIL_host;
+$rcmail_config['default_host'] = Cfg::get('mail_host');
 
 // TCP port used for IMAP connections
-$rcmail_config['default_port'] = MAIL_port;
+$rcmail_config['default_port'] = Cfg::get('mail_host_port');
 
 // IMAP AUTH type (DIGEST-MD5, CRAM-MD5, LOGIN, PLAIN or empty to use
 // best server supported one)
@@ -123,10 +123,10 @@ $rcmail_config['imap_auth_pw'] = null;
 // %d - domain (http hostname without the first part)
 // %z - IMAP domain (IMAP hostname without the first part)
 // For example %n = mail.domain.tld, %d = domain.tld
-$rcmail_config['smtp_server'] = MAIL_smtp_server;
+$rcmail_config['smtp_server'] = Cfg::get('mail_smtp_host');
 
 // SMTP port (default is 25; 465 for SSL)
-$rcmail_config['smtp_port'] = MAIL_smtp_port;
+$rcmail_config['smtp_port'] = Cfg::get('mail_smtp_port');
 
 // SMTP username (if required) if you use %u as the username Roundcube
 // will use the current username for login
@@ -232,7 +232,7 @@ $rcmail_config['des_key'] = 'rcmail-!24ByteDESkey*Str';
 // %d - domain (http hostname without the first part)
 // %z - IMAP domain (IMAP hostname without the first part)
 // For example %n = mail.domain.tld, %d = domain.tld
-$rcmail_config['username_domain'] = MAIL_address;
+$rcmail_config['username_domain'] = Cfg::get('mail_address');
 
 // This domain will be used to form e-mail addresses of new users
 // Specify an array with 'host' => 'domain' values to support multiple hosts
@@ -242,7 +242,7 @@ $rcmail_config['username_domain'] = MAIL_address;
 // %d - domain (http hostname without the first part)
 // %z - IMAP domain (IMAP hostname without the first part)
 // For example %n = mail.domain.tld, %d = domain.tld
-$rcmail_config['mail_domain'] = MAIL_address;
+$rcmail_config['mail_domain'] = Cfg::get('mail_address');
 
 // Password charset.
 // Use it if your authentication backend doesn't support UTF-8.

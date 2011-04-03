@@ -9,7 +9,7 @@ function Mailer($template, $subject = "", $to="") {
 	
 	//setup header
 	$this->headers = '';
-	$this->setFrom(FROM_address, FROM_name);
+	$this->setFrom(Cfg::get('mail_from_address'), Cfg::get('mail_from_name'));
 	$this->headers['MessageID'] = '<'.md5(mktime()).'@lektecmailer>';
 	
 	$this->setTo($to);

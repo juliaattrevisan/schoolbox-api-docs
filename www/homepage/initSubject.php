@@ -4,7 +4,7 @@
             $this->setBlock($componentHandle, "class_list", "class_list_block");
             $this->setBlock($componentHandle, "class_mark", "class_mark_block");
 
-            if(SYNERGY_enable == false || $permission < WRITE_ACCESS || $category['code'] == '' )
+            if(Cfg::get('external_enable') == false || $permission < WRITE_ACCESS || $category['code'] == '' )
                 $this->setVar("class_list_block", "");
             else
                 $this->parse("class_list_block", "class_list");

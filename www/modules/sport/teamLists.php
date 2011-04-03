@@ -174,7 +174,7 @@ class initTeamLists
 	
 	function displayStudSearch($sid, $name, $other = "", $future = "")
 	{
-		$db = mssql_connect(MSSQL_host, MSSQL_user, MSSQL_passwd);
+		$db = mssql_connect(Cfg::get('external_db_host'), Cfg::get('external_db_user'), Cfg::get('external_db_passwd'));
 		//set year level based on campus, if future var is set, grimwade uses year 4 and 5
 		//whereas senior school adn waddy will use following file year
 		if ($_SESSION['campus'][0] == 1)

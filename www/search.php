@@ -158,7 +158,7 @@ if (!empty($result['user'])) {
                 
                 /* Timetable shouldn't appear if synergy is disabled in the conf
                  */
-                if (SYNERGY_enable) {
+                if (Cfg::get('external_enable')) {
                     $page->parse('timetable_block', 'timetable');
                 }
                 else {

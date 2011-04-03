@@ -5,13 +5,13 @@
 *                                                           *
 ************************************************************/
 //timetable object that displays the users timetable
-require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalTimetable.php';
+require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalTimetable.php';
 require_once '../library/user.php';
 require_once '../library/group.php';
 require_once '../library/category.php';
 
 //synergy not enabled do not display page
-if(!SYNERGY_enable)
+if(!Cfg::get('external_enable'))
 	error(19);
 
 $groupHandler = new Group;

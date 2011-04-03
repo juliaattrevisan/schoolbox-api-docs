@@ -61,8 +61,8 @@ if (is_array($_SESSION['children'])) {
 // get category list
 $subjectList = false;
 
-if (SYNERGY_enable && $user['synergy_id'])  {
-        require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalUser.php';
+if (Cfg::get('external_enable') && $user['synergy_id'])  {
+        require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalUser.php';
 	$synUser = new ExternalUser;
 	$subjectList = $synUser->getSubjectList($user['synergy_id'], $user['uid']);
 }

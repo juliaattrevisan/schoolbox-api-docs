@@ -22,8 +22,8 @@ $subList = $submissionHandler->getAllForUser($_SESSION['id']);
 $attemptHandler = new AssessAttempt();
 $groupHandler = new Group;
 
-if(SYNERGY_enable) {
-    require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalClass.php';
+if(Cfg::get('external_enable')) {
+    require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalClass.php';
     $synHandler = new ExternalClass();
 }
 
@@ -32,7 +32,7 @@ if(is_array($subList)) {
         if($prevCat['catid'] != $sub['catid'] && $prevCat['catid'] != '') {
 
 			 /* Get full student list of class to show those who have not submitted */
-			if($prevCat['code'] && SYNERGY_enable) {
+			if($prevCat['code'] && Cfg::get('external_enable')) {
 				//if synergy code get synergy students
 				$studentList = $synHandler->getStudents($prevCat['code']);
 			}
@@ -96,7 +96,7 @@ if(is_array($subList)) {
     }
 
 	/* Get full student list of class to show those who have not submitted */
-	if($prevCat['code'] && SYNERGY_enable) {
+	if($prevCat['code'] && Cfg::get('external_enable')) {
 		//if synergy code get synergy students
 		$studentList = $synHandler->getStudents($prevCat['code']);
 	}

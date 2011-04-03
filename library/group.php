@@ -198,7 +198,7 @@ class Group extends Model {
 			$permission = WRITE_ACCESS;
 		
 		// check synergy tutor list
-		if ($permission < WRITE_ACCESS && $this->_service == TUTORIAL_SERVICE && SYNERGY_enable) {
+		if ($permission < WRITE_ACCESS && $this->_service == TUTORIAL_SERVICE && Cfg::get('external_enable')) {
 			$tutorialPermission = $this->getTutorialPermission($userID);
 			if ($tutorialPermission)
 				$permission = $tutorialPermission;

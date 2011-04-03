@@ -92,9 +92,9 @@ class Notify
 		$mail->setVar("DETSTAFFNAME", $this->det['detStaffFirstname'].' '.$this->det['detStaffLastname']);
 		$mail->setVar("BLURB2", "");
 		if(NOTIFY_DEBUG)
-			$this->debugEmail($this->det['studentUsername'].'@'.MAIL_address, $mail->composeHTML());
+			$this->debugEmail($this->det['studentUsername'].'@'.Cfg::get('mail_address'), $mail->composeHTML());
 		else
-			$mail->send($this->det['studentUsername'].MAIL_address);
+			$mail->send($this->det['studentUsername'].Cfg::get('mail_address'));
 	}
 	
 	function emailIssuer($message)
@@ -119,9 +119,9 @@ class Notify
 		
 		
 		if(NOTIFY_DEBUG)
-			$this->debugEmail($this->det['giverUsername'].'@'.MAIL_address, $mail->composeHTML());
+			$this->debugEmail($this->det['giverUsername'].'@'.Cfg::get('mail_address'), $mail->composeHTML());
 		else
-			$mail->send($this->det['giverUsername'].MAIL_address);
+			$mail->send($this->det['giverUsername'].Cfg::get('mail_address'));
 		
 	}
 	
@@ -148,7 +148,7 @@ class Notify
 		if(NOTIFY_DEBUG)
 			$this->debugEmail("", $mail->composeHTML());
 		else
-			$mail->send($this->det['studentUsername'].MAIL_address);
+			$mail->send($this->det['studentUsername'].Cfg::get('mail_address'));
 		
 	}
 	

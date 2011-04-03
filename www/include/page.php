@@ -155,7 +155,7 @@ else
 // if configuration states mail is available and user has access to local mail account display it
 $this->t_body->set_block('tplBODY', 'webmail_tab', 'wm_tab');
 
-if((MAIL_enable && $_SESSION['local_email']) || (SITE_location == 'wenona' && (isStaff($_SESSION['gid']) || isStudent($_SESSION['gid']))) || SITE_location == 'ormond' || SITE_location == 'shore')
+if((Cfg::get('mail_enable') && $_SESSION['local_email']) || (SITE_location == 'wenona' && (isStaff($_SESSION['gid']) || isStudent($_SESSION['gid']))) || SITE_location == 'ormond' || SITE_location == 'shore')
 {
 	$this->t_body->parse('wm_tab','webmail_tab');
 

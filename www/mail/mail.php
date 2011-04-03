@@ -30,7 +30,7 @@ class Mail
 		else
 		{       //get all the info out
 				$this->user = $info["username"];
-				$this->mail_host = MAIL_host;
+				$this->mail_host = Cfg::get('mail_host');
 				$this->password = $info["email_pass"];
 				return true;
 		} 

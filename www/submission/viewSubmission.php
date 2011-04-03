@@ -31,8 +31,8 @@ if(is_numeric($this->arg[0])) {
 	$this->setVar('BOX_ID', $this->arg[0]);
 
     /* Get full student list of class to show those who have not submitted */
-    if($subBox['code'] && SYNERGY_enable) {
-        require_once SITE_root . '/library/'.EXTERNAL_db.'/ExternalClass.php';
+    if($subBox['code'] && Cfg::get('external_enable')) {
+        require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalClass.php';
         //if synergy code get synergy students
         $synHandler = new ExternalClass();
         $studentList = $synHandler->getStudents($subBox['code']);
