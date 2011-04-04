@@ -6,6 +6,8 @@
 
 $j(function() {
 		
+	$j('.row-holder:nth-child(2n)').css("background-color", "#ffffff");	
+		
 	$j.fn.qtip.defaults.position.corner = {
 		target: 'topLeft',
 		tooltip: 'bottomLeft'
@@ -31,89 +33,34 @@ $j(function() {
 	$j('.allowed-files tr:first td:nth-child(5)').qtip({
 		content: 'inliney kk <3'});
 		
-	var target;
-	var checkedEdit ;
-	var descriptionEdit;
-	var mimeEdit;
-	var extensionsEdit;
-	var inlineEdit;
-	var clone;
 
-	function editTheRow(target) {
-		
-		checkedEdit = target.children('td:first').children('span').text();
-			if (checkedEdit == "Yes") {checkedEdit = true;} else {checkedEdit = false;}
-		descriptionEdit = target.children('td:nth-child(2)').text();
-		mimeEdit = target.children('td:nth-child(3)').text();
-		extensionsEdit = target.children('td:nth-child(4)').text();
-		inlineEdit = target.children('td:nth-child(5)').children('em').text();
-		
-		clone =	
-			'<tr class="hidden-clone"> \
-						<td><input type="checkbox" name="enabled" '
-				
-			if 	(checkedEdit == true) {
-				clone+= 'checked="checked'	
-			}
-				
-		clone+=	'/><button class="float-right" id="icon-choice"></button></td> \
-				<td><textarea class="text-input textarea" name="description">'+descriptionEdit+'</textarea></td> \
-				<td><textarea class="text-input textarea" name="mime" >'+mimeEdit+'</textarea></td> \
-				<td><input type="text" class="text-input" name="extensions" value="'+extensionsEdit+'" /></td> \
-				<td><select name="inline" id="inline">'	
-				
-		if (inlineEdit == "Inline") {
-			clone+=	'<option value="Inline" selected="selected">Inline</option><option value="External">External</option>'
-		} else {
-			clone+=	'<option value="Inline" >Inline</option><option value="External" selected="selected">External</option>'
-		}
-		
-			clone += '</select> \
-				<a href="#" class="btn delete no-marg"><span></span>Delete</a> \
-				<a href="#" class="btn tick submit no-marg"><span></span>Save</a> \
-				</td> \
-			</tr> \ '
-
-		target.hide().after(clone); 	
-		
-	}
 
 	$j('.modify').live('click',function() {
+		var trigger = 0;
 		
-		local = $j(this).parent().parent();
-
-		if ($j('tbody').children('.hidden-clone').size() < 1) {			
-			
-			editTheRow(local);
+		level = $j(this).parent().parent()
 		
-		} else {
-			
-			var activeClone = $j('tbody').children('.hidden-clone');
-			
-			if (activeClone.find('input[type=checkbox]').is(":checked")) { checked = "Yes" } else { checked = "No" } 
-			
-			var description = activeClone.find('textarea[name=description]').html(description);
-			var mime = activeClone.find('textarea[name=mime]').html();
-			var extensions = activeClone.find('input[name=extensions]').val();
-			var inline = activeClone.find('#inline').val();
-
-			activeClone.replaceWith($j('tfoot').children('.replacement').clone()); 	
-			
-			var activeReplacement = $j('tbody').children('.replacement');
+		$j('.form-holder').each(function() {
+			if ($j(this).is(':visible')) {
+				
+				level.slideUp(function() {
+					level.siblings('.form-holder').slideDown();
+				});		
+				
+				$j(this).siblings().slideDown();
+				$j(this).slideUp();
+				trigger = 1;
+				
+			}
 		
-			activeReplacement.children('td:nth-child(1)').children('span').html(checked);
-			activeReplacement.children('td:nth-child(2)').html(description);
-			activeReplacement.children('td:nth-child(3)').html(mime);
-			activeReplacement.children('td:nth-child(4)').html(extensions);
-			activeReplacement.children('td:nth-child(5)').children('em').html(inline);
-
-			$j('tbody').children('.replacement').removeClass('replacement');
-			
-			editTheRow(local);
+		})
+		
+		if (trigger == 0) {
+				level.slideUp(function() {
+				level.siblings('.form-holder').slideDown();
+			});
 		}
 		
-		$j('tbody').children(":nth-child(2n)").addClass('dark');
-			 
 		return false;
 	});
 	
@@ -139,11 +86,11 @@ $j(function() {
 
 	<table cellpadding="0" cellspacing="0" class="allowed-files"> 
 		<colgroup>
-			<col width="10%" />
-			<col width="17%" />
-			<col width="17%" />
-			<col width="17%" />
-			<col width="39%" />
+			<col width="14%" />
+			<col width="19%" />
+			<col width="20%" />
+			<col width="20%" />
+			<col width="26%" />
 		</colgroup>
 		<thead>
 			<tr>
@@ -152,7 +99,6 @@ $j(function() {
 				<td><h3>Mime<span>?</span></h3></td>
 				<td><h3>Extensions<span>?</span></h3></td>
 				<td><h3>Inline<span>?</span></h3></td>
-	
 			</tr>
 			<tr class="add-new">
 				<td><input type="checkbox" /><button class="float-right" id="icon-choice"></button></td>
@@ -169,31 +115,266 @@ $j(function() {
 	
 	<div class="allowed-files">
 		
-		<div class="row">
-			<div class="enabled"><p>No</p></div>
-			<div class="description"><p>CSS</p></div>
-			<div class="mime"><p>text/html</p></div>
-			<div class="extensions"><p>html/htm</p></div>
-			<div class="inline"><p>Inline
-				<a href="#" class="btn delete no-marg"><span></span>Delete</a>
-				<a href="#" class="btn modify no-marg"><span></span>Modify</a>
-				</p>
+		<div class="row-holder">
+			<div class="row ">
+				<div class="enabled"><p>No</p></div>
+				<div class="description"><p>CSS</p></div>
+				<div class="mime"><p>text/html</p></div>
+				<div class="extensions"><p>html/htm</p></div>
+				<div class="inline"><p>Inline</p>
+					<a href="#" class="btn delete no-marg"><span></span>Delete</a>
+					<a href="#" class="btn modify no-marg"><span></span>Modify</a>
+					<div class="float-fix"></div>
+				</div>
 				<div class="float-fix"></div>
 			</div>
-
+			<div class="float-fix"></div>
+		
+			<div class="row form-holder">
+				<form id="allowed-file1">
+					<label class="enabled">
+						<fieldset>
+							<input type="checkbox" name="enabled" />
+							<button class="float-right" id="icon-choice"></button>
+						</fieldset>
+					</label>
+					<label class="description">
+						<fieldset>
+							<textarea class="text-input textarea"  name="description" ></textarea>
+						</fieldset>
+					</label>
+					<label class="mime">
+						<fieldset>
+							<textarea class="text-input textarea"  name="mime" ></textarea>
+						</fieldset>
+					</label>
+					<label class="extensions">
+						<fieldset>
+							<input type="text" class="text-input"  name="extensions" />
+						</fieldset>
+					</label>
+					<label class="inline">
+						<fieldset>
+							<select name="inline" id="inline">
+								<option value="Inline">Inline</option>
+								<option value="External">External</option>
+							</select>
+							<a href="#" class="btn delete no-marg"><span></span>Delete</a>
+							<a href="#" class="btn tick submit no-marg"><span></span>Save</a>
+						</fieldset>
+					</label>
+					<div class="float-fix"></div>
+				</form>
+			</div>
 		</div>
-		<!--<div class="row hidden-form">
-		<form id="allowed-file1">
-			<label class="enabled"><input type="checkbox" name="enabled" /><button class="float-right" id="icon-choice"></button></label>
-			<label class="description"><textarea class="text-input textarea"  name="description" ></textarea></label>
-			<label class="mime"><textarea class="text-input textarea"  name="mime" ></textarea></label>
-			<label class="extensions"><input type="text" class="text-input"  name="extensions" /></label>
-			<label class="inline">
-				<select name="inline" id="inline"><option value="Inline">Inline</option><option value="External">External</option></select>
-				<a href="#" class="btn delete no-marg"><span></span>Delete</a>
-				<a href="#" class="btn tick submit no-marg"><span></span>Save</a>
-			</label>
-		</form>-->
+		
+		
+		
+		
+		<div class="row-holder">
+			<div class="row">
+				<div class="enabled"><p>No</p></div>
+				<div class="description"><p>CSS</p></div>
+				<div class="mime"><p>text/html</p></div>
+				<div class="extensions"><p>html/htm</p></div>
+				<div class="inline"><p>Inline</p>
+					<a href="#" class="btn delete no-marg"><span></span>Delete</a>
+					<a href="#" class="btn modify no-marg"><span></span>Modify</a>
+					<div class="float-fix"></div>
+				</div>
+				<div class="float-fix"></div>
+			</div>
+		
+			<div class="row form-holder">
+				<form id="allowed-file1">
+					<label class="enabled">
+						<fieldset>
+							<input type="checkbox" name="enabled" />
+							<button class="float-right" id="icon-choice"></button>
+						</fieldset>
+					</label>
+					<label class="description">
+						<fieldset>
+							<textarea class="text-input textarea"  name="description" ></textarea>
+						</fieldset>
+					</label>
+					<label class="mime">
+						<fieldset>
+							<textarea class="text-input textarea"  name="mime" ></textarea>
+						</fieldset>
+					</label>
+					<label class="extensions">
+						<fieldset>
+							<input type="text" class="text-input"  name="extensions" />
+						</fieldset>
+					</label>
+					<label class="inline">
+						<fieldset>
+							<select name="inline" id="inline">
+								<option value="Inline">Inline</option>
+								<option value="External">External</option>
+							</select>
+							<a href="#" class="btn delete no-marg"><span></span>Delete</a>
+							<a href="#" class="btn tick submit no-marg"><span></span>Save</a>
+						</fieldset>
+					</label>
+					<div class="float-fix"></div>
+				</form>
+			</div>
+		</div>
+		<div class="row-holder">
+			<div class="row">
+				<div class="enabled"><p>No</p></div>
+				<div class="description"><p>CSS</p></div>
+				<div class="mime"><p>text/html</p></div>
+				<div class="extensions"><p>html/htm</p></div>
+				<div class="inline"><p>Inline</p>
+					<a href="#" class="btn delete no-marg"><span></span>Delete</a>
+					<a href="#" class="btn modify no-marg"><span></span>Modify</a>
+					<div class="float-fix"></div>
+				</div>
+				<div class="float-fix"></div>
+			</div>
+		
+			<div class="row form-holder">
+				<form id="allowed-file1">
+					<label class="enabled">
+						<fieldset>
+							<input type="checkbox" name="enabled" />
+							<button class="float-right" id="icon-choice"></button>
+						</fieldset>
+					</label>
+					<label class="description">
+						<fieldset>
+							<textarea class="text-input textarea"  name="description" ></textarea>
+						</fieldset>
+					</label>
+					<label class="mime">
+						<fieldset>
+							<textarea class="text-input textarea"  name="mime" ></textarea>
+						</fieldset>
+					</label>
+					<label class="extensions">
+						<fieldset>
+							<input type="text" class="text-input"  name="extensions" />
+						</fieldset>
+					</label>
+					<label class="inline">
+						<fieldset>
+							<select name="inline" id="inline">
+								<option value="Inline">Inline</option>
+								<option value="External">External</option>
+							</select>
+							<a href="#" class="btn delete no-marg"><span></span>Delete</a>
+							<a href="#" class="btn tick submit no-marg"><span></span>Save</a>
+						</fieldset>
+					</label>
+					<div class="float-fix"></div>
+				</form>
+			</div>
+		</div>
+		<div class="row-holder">
+			<div class="row">
+				<div class="enabled"><p>No</p></div>
+				<div class="description"><p>CSS</p></div>
+				<div class="mime"><p>text/html</p></div>
+				<div class="extensions"><p>html/htm</p></div>
+				<div class="inline"><p>Inline</p>
+					<a href="#" class="btn delete no-marg"><span></span>Delete</a>
+					<a href="#" class="btn modify no-marg"><span></span>Modify</a>
+					<div class="float-fix"></div>
+				</div>
+				<div class="float-fix"></div>
+			</div>
+		
+			<div class="row form-holder">
+				<form id="allowed-file1">
+					<label class="enabled">
+						<fieldset>
+							<input type="checkbox" name="enabled" />
+							<button class="float-right" id="icon-choice"></button>
+						</fieldset>
+					</label>
+					<label class="description">
+						<fieldset>
+							<textarea class="text-input textarea"  name="description" ></textarea>
+						</fieldset>
+					</label>
+					<label class="mime">
+						<fieldset>
+							<textarea class="text-input textarea"  name="mime" ></textarea>
+						</fieldset>
+					</label>
+					<label class="extensions">
+						<fieldset>
+							<input type="text" class="text-input"  name="extensions" />
+						</fieldset>
+					</label>
+					<label class="inline">
+						<fieldset>
+							<select name="inline" id="inline">
+								<option value="Inline">Inline</option>
+								<option value="External">External</option>
+							</select>
+							<a href="#" class="btn delete no-marg"><span></span>Delete</a>
+							<a href="#" class="btn tick submit no-marg"><span></span>Save</a>
+						</fieldset>
+					</label>
+					<div class="float-fix"></div>
+				</form>
+			</div>
+		</div>
+		<div class="row-holder">
+			<div class="row">
+				<div class="enabled"><p>No</p></div>
+				<div class="description"><p>CSS</p></div>
+				<div class="mime"><p>text/html</p></div>
+				<div class="extensions"><p>html/htm</p></div>
+				<div class="inline"><p>Inline</p>
+					<a href="#" class="btn delete no-marg"><span></span>Delete</a>
+					<a href="#" class="btn modify no-marg"><span></span>Modify</a>
+					<div class="float-fix"></div>
+				</div>
+				<div class="float-fix"></div>
+			</div>
+		
+			<div class="row form-holder">
+				<form id="allowed-file1">
+					<label class="enabled">
+						<fieldset>
+							<input type="checkbox" name="enabled" />
+							<input type="hidden" name="icon" />
+							<button class="float-right" id="icon-choice"></button>
+						</fieldset>
+					</label>
+					<label class="description">
+						<fieldset>
+							<textarea class="text-input textarea"  name="description" ></textarea>
+						</fieldset>
+					</label>
+					<label class="mime">
+						<fieldset>
+							<textarea class="text-input textarea"  name="mime" ></textarea>
+						</fieldset>
+					</label>
+					<label class="extensions">
+						<fieldset>
+							<input type="text" class="text-input"  name="extensions" />
+						</fieldset>
+					</label>
+					<label class="inline">
+						<fieldset>
+							<select name="inline" id="inline">
+								<option value="Inline">Inline</option>
+								<option value="External">External</option>
+							</select>
+							<a href="#" class="btn delete no-marg"><span></span>Delete</a>
+							<a href="#" class="btn tick submit no-marg"><span></span>Save</a>
+						</fieldset>
+					</label>
+					<div class="float-fix"></div>
+				</form>
+			</div>
 		</div>
 
 	<div class="float-fix"></div>

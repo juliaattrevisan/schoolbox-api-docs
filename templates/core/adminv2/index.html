@@ -4,7 +4,8 @@
 <script type="text/javascript">
 
 $j(function() {
-	
+		
+	$j('table tr:nth-child(2n)').addClass('dark')
 	//remove the notifications
 	$j('.notifications a.remove').live('click', function() {
 		$j(this).parent().animate({opacity: 0},200, function() {

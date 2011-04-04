@@ -60,12 +60,12 @@ $j(function() {
 	<div class="settings-nav-holder">
 		<ul class="settings-nav">
             <!-- BEGIN table_tab -->
-			<li><a href="/adminv2/list/{TABLE_NAME}" class="current">{TABLE_TITLE}<span></span></a></li>
+			<li><a href="/adminv2/list/{TABLE_NAME}" class="{CURRENT}">{TABLE_TITLE}<span></span></a></li>
             <!-- END table_tab -->
 		</ul>
 	</div>
 	<div class="settings">
-		<div class="split-container">
+
 			<form id="settings" class="admin-form level" action="get">
                 <table>
                     <thead>
@@ -78,17 +78,23 @@ $j(function() {
                     <tbody>
                     <!-- BEGIN table_row -->
                     <tr>
-                        <!-- BEGIN table_cell -->
+					 <!-- BEGIN table_cell_static -->
                         <td>{TABLE_DATA}</td>
+                        <!-- END table_cell_static-->
+                        <!-- BEGIN table_cell -->
+                        <td><input type="text" value="{TABLE_DATA}" /></td>
                         <!-- END table_cell -->
+						
                     </tr>
                     <!-- END table_row -->
                     </tbody>
                 </table>
 
 				<div class="float-fix"></div>
+				<input type="submit" class="submit-btn-plain" value="Save"/>
+				<div class="float-fix"></div>
 			</form>
-		</div>
+
 	</div>
 	<div class="float-fix"></div>
 </div>

@@ -140,7 +140,7 @@ $j(document).ready(function() {
         $j.each($j('#answerCollection').find('li'), function(index, element) {
             var elem = $j(element);
 
-            var checkit = elem.find('.checkbox').is(':checked');
+            var checkit = elem.find('.answerCorrect').is(':checked');
 
 			console.log('chimp')
 			/*if the element isn't checked add to the count*/
@@ -175,15 +175,13 @@ $j(document).ready(function() {
 		refreshList();
     });
 	
-	$j('.checkbox').each(function(){
-		
+	$j('.answerCorrect').each(function(){
 		if ($j(this).is(':checked')) {
 			$j(this).parent().parent().addClass("highlight");
 		}
-			
 	});
 	
-	$j('.checkbox').live('click', function() {
+	$j('.answerCorrect').live('click', function() {
 		$j(this).parent().parent().toggleClass("highlight");
 	});
 	
@@ -199,13 +197,13 @@ $j(document).ready(function() {
 			
 			$j('.wrong-checkbox').css('left', 115);
 			$j('.wrong-checkbox').css('top',  pos + 30);
-				
 			
 			refreshList()
 		}	
     });
 	
 	function refreshList() {
+		
 		var alphabetStart = 65;
 		$j('li.inputs > div.list-item').each(function() {	
 		  var $this = $j(this);
@@ -219,6 +217,7 @@ $j(document).ready(function() {
 });
 </script>
 <fieldset>
+		
     <label>Answer</label>
 	<div class="answerCollection">
 		<ul id="answerCollection" >
@@ -226,9 +225,10 @@ $j(document).ready(function() {
 			<li class="inputs">
 				<div class="list-item">
 					<input name="answerCode[]" class="answerCode text-box" type="hidden" value="{ANSWER_VALUE}" />
+					
 					<span>{ANSWER_VALUE})</span>
 				</div>
-				<div class="check-it"><input name="answer[]" class="answerCorrect checkbox" value="{ANSWER_VALUE}" {ANSWER_CHECKED} type="checkbox" /></div>
+				<div class="check-it"><input name="answer[]" {ANSWER_CHECKED} class="answerCorrect" type="checkbox" /></div>
 				<div class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="{ANSWER_DESCRIPTION}" /></div>
 				<div class="delete"></div>
 				<div class="float-fix"></div>
@@ -236,6 +236,7 @@ $j(document).ready(function() {
 			 <!-- END answerOption -->	
 		</ul>
 		<a class="add-answer" id="makeNewAnswer">Add answer option</a>
+
 	</div>
 	
 	<div class="hidden-clone">
@@ -245,7 +246,7 @@ $j(document).ready(function() {
 					<input name="answerCode[]" class="answerCode text-box" type="hidden" value="" />
 					<span>{ANSWER_VALUE})</span>
 				</div>
-				<div class="check-it"><input name="answer[]" class="answerCorrect checkbox" value="" type="checkbox" /></div>
+				<div class="check-it"><input name="answer[]" class="answerCorrect"  type="checkbox" /></div>
 				<div class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></div>
 				<div class="delete"></div>
 				<div class="float-fix"></div>

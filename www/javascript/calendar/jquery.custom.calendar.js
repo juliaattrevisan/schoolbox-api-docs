@@ -59,7 +59,7 @@
 
 		
 		//make all of the checkboxes checked... darn you firefoxxxxxx
-		$j('.checkbox').attr('checked', true);
+		$j('.filter-list .checkbox').attr('checked', true);
 		
 				//run the filter checker to show and hide the items
 		$j('#applyFilters').click(function() {
