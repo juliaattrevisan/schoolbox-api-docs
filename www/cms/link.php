@@ -82,8 +82,8 @@ else if($this->arg[0] == 'multicat') {
 
 	if(is_array($categoryList)) {
 		foreach($categoryList as $category) {
-			$output = array('CATEGORY_NAME'		=> scrubTEXT($category['name']),
-							'CATEGORY_ID'		=> $category['id'],
+			$output = array('CATEGORY_NAME'	=> scrubTEXT($category['name']) . $category['code']?' ('.$category['code'].')':'',
+					'CATEGORY_ID'   => $category['id'],
 					);
 			$this->setVar($output);
 			$this->parse('category_list_block', 'category_list', true);

@@ -93,15 +93,15 @@ if(is_numeric($this->arg[0])) {
 	$this->setTitle('Add Category');
 	$this->setTab('resources');	
 
-	$output = array('ACTION'		=> 'Add',
-					'CATEGORY_ID'	=> '',
-					'NAME'			=> '',
-					'CODE'			=> '',
-					'PARENT_ID'		=> $categoryParent['id'],
-					'PARENT_NAME'	=> scrubText($categoryParent['name']),
-                    'REQUIRED_PERMS' => $_SESSION['gid'],
-                    'GROUP_NAME'    => '',
-					);
+	$output = array('ACTION'        => 'Add',
+                        'CATEGORY_ID'	=> '',
+                        'NAME'		=> '',
+                        'CODE'		=> '',
+                        'PARENT_ID'	=> $categoryParent['id'],
+                        'PARENT_NAME'	=> scrubText($categoryParent['name']),
+                        'REQUIRED_PERMS'=> $_SESSION['gid'],
+                        'GROUP_NAME'    => '',
+                        );
 
 	$this->setVar($output);
 	

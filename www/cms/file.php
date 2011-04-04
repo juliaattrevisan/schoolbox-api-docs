@@ -32,18 +32,18 @@ if(is_numeric($this->arg[0])) {
 	$this->setTab('resources');
 	
 	//$this->setVar('browse_block', '');
-	$output = array('ACTION'			=> 'Modify',
-					'FILE_ID'			=> $file['id'],
-					'DESCRIPTION'		=> scrubText($file['description']),
-					'COMMENT'			=> scrubText($file['comment']),	
-					'HIDDEN_SELECTED'	=> 	$file['hidden'] > 0 ? 'checked="checked"' : '',
-					'MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
-					'CATEGORY_ID'		=> $file['cid'],
-					'CATEGORY_NAME'		=> scrubText($file['categoryName']),
-					'DUE_DAY'			=> '',
-					'DUE_MONTH'			=> '',
-					'DUE_YEAR'			=> '',
-					);
+	$output = array('ACTION'		=> 'Modify',
+                        'FILE_ID'		=> $file['id'],
+                        'DESCRIPTION'		=> scrubText($file['description']),
+                        'COMMENT'		=> scrubText($file['comment']),
+                        'HIDDEN_SELECTED'	=> $file['hidden'] > 0 ? 'checked="checked"' : '',
+                        'MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
+                        'CATEGORY_ID'		=> $file['cid'],
+                        'CATEGORY_NAME'		=> scrubText($file['categoryName']),
+                        'DUE_DAY'		=> '',
+                        'DUE_MONTH'		=> '',
+                        'DUE_YEAR'		=> '',
+                        );
 	$this->setVar($output);
 
 	$myFolderHandler = new MyFolder;
@@ -53,8 +53,8 @@ if(is_numeric($this->arg[0])) {
 	if (is_array($folderTree)) {
 		foreach ($folderTree as $folder) {
 			$output = array('MYFOLDER_NAME'	=> trim($folder['name']),
-							'MYFOLDER_LEFT'	=> number_format($folder['depth'] * 14, 0),
-							);
+					'MYFOLDER_LEFT'	=> number_format($folder['depth'] * 14, 0),
+					);
 			$this->setVar($output);
 			$fileList = $myFileHandler->getAllInFolder($folder['id']);
 			if (is_array($fileList)) {
@@ -116,18 +116,18 @@ if(is_numeric($this->arg[0])) {
 	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS)
 		error(6);
 
-	$output = array('ACTION'			=> 'Add',
-					'FILE_ID'			=> '',
-					'DESCRIPTION'		=> '',
-					'COMMENT'			=> '',	
-					'HIDDEN_SELECTED'	=> '',
-					'MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
-					'SUBBOX'			=> '<input type="checkbox" name="submission" id="submission" value="1" >',
-					'CATEGORY_NAME'		=> scrubTEXT($category['name']),
-					'CATEGORY_ID'		=> $category['id'],
-					'DUE_DAY'			=> is_numeric($this->arg[2])?$this->arg[2]:'',
-					'DUE_MONTH'			=> is_numeric($this->arg[3])?$this->arg[3]:'',
-					'DUE_YEAR'			=> is_numeric($this->arg[4])?$this->arg[4]:'',
+	$output = array('ACTION'		=> 'Add',
+                        'FILE_ID'		=> '',
+                        'DESCRIPTION'		=> '',
+                        'COMMENT'		=> '',
+                        'HIDDEN_SELECTED'	=> '',
+                        'MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
+                        'SUBBOX'			=> '<input type="checkbox" name="submission" id="submission" value="1" >',
+                        'CATEGORY_NAME'		=> scrubTEXT($category['name']),
+                        'CATEGORY_ID'		=> $category['id'],
+                        'DUE_DAY'		=> is_numeric($this->arg[2])?$this->arg[2]:'',
+                        'DUE_MONTH'		=> is_numeric($this->arg[3])?$this->arg[3]:'',
+                        'DUE_YEAR'		=> is_numeric($this->arg[4])?$this->arg[4]:'',
 				);
 
 	$this->setVar($output);
@@ -200,8 +200,8 @@ else if($this->arg[0] == 'multicat') {
 	$this->setTitle('Upload a File to Multiple Locations');	
 	$this->setTab('resources');
 	
-	$output = array('MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
-					);
+	$output = array('MAX_FILE_SIZE'	=> Cfg::get('max_file_size'),
+			);
 	$this->setVar($output);
 	
 	$groupHandler = new Group;
@@ -210,8 +210,8 @@ else if($this->arg[0] == 'multicat') {
 	if(is_array($categoryList)) {
 		foreach($categoryList as $category) {
 
-			$output = array('CATEGORY_NAME'		=> scrubTEXT($category['name']),
-							'CATEGORY_ID'		=> $category['id'],
+			$output = array('CATEGORY_NAME'		=>scrubTEXT($category['name']) . $category['code']?' ('.$category['code'].')':'',
+					'CATEGORY_ID'		=> $category['id'],
 					);
 			$this->setVar($output);
 			$this->parse('category_list_block', 'category_list', true);

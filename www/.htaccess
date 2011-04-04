@@ -14,8 +14,8 @@ php_value error_reporting 6135
 php_flag auto_detect_line_endings On
 php_value docref_root 0
 php_value docref_ext 0
-php_value upload_max_filesize 40M
-php_value upload_max_filesize 40M
+php_value upload_max_filesize 100M
+php_value post_max_size 100M
 php_flag session.use_trans_sid on
 
 # Assess uses JSON arrays to transfer data in multi-choice/matching pairs
