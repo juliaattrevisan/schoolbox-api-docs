@@ -1,0 +1,60 @@
+<h1>{SUBJECTNAME}</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Photo</th>
+      <th>Surname</th>
+      <th>Preferred Name </th>
+      <th>Student ID</th>
+      <th>Year Level </th>
+      <th>House</th>
+      <th>Email</th>
+      <th>Last Visited</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- BEGIN student_list -->
+    <tr class="{ON_OFF}">
+      <td rowspan="2"><img src="/search/portrait.php?id={SYNERGYID}&height=80&width=60" /></td>
+      <td><a href="/search/user/{ID}">{SURNAME}</a></td>
+      <td><a href="/search/user/{ID}">{FIRSTNAME}</a></td>
+      <td>{SYNERGYID}</td>
+      <td>{YEARLEVEL}</td>
+      <td>{HOUSE}</td>
+      <td>{EMAIL}</td>
+      <td nowrap="nowrap">{LASTVISIT}</td>
+    </tr>
+    <tr class="{ON_OFF}">
+        
+        <td width="150" valign="top" style="vertical-align:top;">
+		<a href="/timetable/{SYNERGYID}"  class="btn report float-left" style="width:60px !important;"><span></span>Timetable</a><br />
+       <!-- BEGIN eportfolio --> <a href="/eportfolio/{ID}" class="btn eportfolio float-left" style="width:60px !important;"><span></span>ePortfolio</a><!-- END eportfolio -->
+		<a  href="/submission/dueWork/0/{ID}" class="btn due-work float-left" style="width:60px !important;"><span></span>Due Work</a>
+		<div class="float-fix"></div>
+        </td>
+        <td colspan="6" valign="top" style="vertical-align:top;">
+            <!-- BEGIN special --><img src="/images/famicons/bell.png" title="Special Needs"/><!-- END special -->
+            <!-- BEGIN medical -->    <!-- END medical -->
+            
+        </td>
+    </tr>
+    <!-- END student_list -->
+  </tbody>
+  <thead>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><br />
+        <form action="/mail/createMail.php" method="post">
+          <input type="hidden" name="replyto" value="{SUBJECTNAME} &lt;{REPLYTO}&gt;" />
+          <input type="hidden" name="bcc" value="{CLASSEMAIL}" />
+          <input class="submit-btn-plain" type="submit" name="emailall" value="Email Class" />
+		  <div class="float-fix"></div>
+        </form></td>
+      <td>&nbsp;</td>
+    </tr>
+  </thead>
+</table>
