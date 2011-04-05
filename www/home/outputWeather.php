@@ -1,11 +1,11 @@
 <?php
-//dont output weather if not enabled
+//dont output weather if not enabled or you could just say output weather if enabled
 if(WEATHER_enable)
 {
 	require_once('../library/xml.php');
 	$weather = new XML('http://www.google.com/ig/api?weather=' . urlencode(WEATHER_location));
 	
-	$imageLocation = conType().'www.google.com';
+	$imageLocation = conType().'demo.portal.alaress-dev.com.au/weather/image.php?path=';
 
 	for($i = 0; $i < 3; $i++) {
 		$forecast_conditions = $weather->weather->forecast_conditions[$i];
