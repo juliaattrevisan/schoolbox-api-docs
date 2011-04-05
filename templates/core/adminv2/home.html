@@ -56,17 +56,18 @@ $j(function() {
 
 <h1>Schoolbox Administration</h1>
 <ul class="admin-nav">
-	<li><a href="/adminv2/index" class="current">Home</a></li>
-	<li><a href="/adminv2/users/index" >Users</a></li>
-	<li><a href="/adminv2/side-menu/index">Side Menu</a></li>
-	<li><a href="/adminv2/allowed-files/index">Allowed Files</a></li>
-	<li><a href="/adminv2/settings/index">Settings</a></li>
-	<li><a href="/adminv2/calendar/index">Calendar</a></li>
-	<li><a href="/adminv2/lists/index">Lists</a></li>
-	<li><a href="/adminv2/rollover/index">Rollover</a></li>
+	<li><a href="/adminv2/home" class="current">Home</a></li>
+	<li><a href="/adminv2/user" >Users</a></li>
+	<li><a href="/adminv2/side-menu">Side Menu</a></li>
+	<li><a href="/adminv2/allowed-file">Allowed Files</a></li>
+	<li><a href="/adminv2/setting">Settings</a></li>
+	<li><a href="/adminv2/calendar">Calendar</a></li>
+	<li><a href="/adminv2/list">Lists</a></li>
+	<li><a href="/adminv2/rollover">Rollover</a></li>
 </ul>
 <div class="admin-contents">
 	<h2>Home</h2>
+        <!--
 	<div class="level green"> <a href="#" class="dismiss">Dismiss all</a>
 		<h3 class="iconify exclamation">Notifications</h3>
 		<ul class="notifications">
@@ -81,34 +82,34 @@ $j(function() {
 				<a href="#" class="remove"></a></li>
 		</ul>
 		<div class="float-fix"></div>
-	</div>
+	</div> -->
 	<div class="one-third">
 		<div class="level">
 			<h3 class="iconify stats">Server stats</h3>
-			<h4>Storage <span>500GB/1.5TB</span></h4>
+			<h4>Storage <span>{DISK_USED}/{DISK_TOTAL}</span></h4>
 		
 			<div class="bar-holder">
 				<div class="bar">
-					<span style="width:20%"><span class="style"></span></span>
+					<span style="width:{DISK_PERC}%"><span class="style"></span></span>
 				</div>
 			</div>
-			<span class="number">50%</span>
+			<span class="number">{DISK_PERC}%</span>
 			<div class="float-fix"></div>
 			
-			<h4>Memory <span>4.44GB/8GB</span></h4>
+			<h4>Memory <span>{MEMORY_USED}/{MEMORY_TOTAL}</span></h4>
 			<div class="bar-holder">
 				<div class="bar">
-					<span style="width:95%"><span class="style"></span></span>
+					<span style="width:{MEMORY_PERC}%"><span class="style"></span></span>
 				</div>
 			</div>
-			<span class="number">91%</span>
+			<span class="number">{MEMORY_PERC}%</span>
 			<div class="float-fix"></div>
 			
 			<ul class="server-statuses">
-				<li><strong>Synergetic Status</strong><em><span></span></em><span>Offline</span></li>
-				<li><strong>Email Status</strong><em><span></span></em><span>Offline</span></li>
-				<li class="on"><strong>Ldap status</strong><em><span></span></em><span>Online</span></li>
-				<li><strong>WWW Access</strong><em><span></span></em><span>Offline</span></li>
+				<li class="{EXTERNAL_DB_LIGHT}"><strong>{EXTERNAL_DB} Status</strong><em><span></span></em><span>{EXTERNAL_DB_STATUS}</span></li>
+				<li class="{EMAIL_LIGHT}"><strong>Email Status</strong><em><span></span></em><span>{EMAIL_STATUS}</span></li>
+				<li class="{LDAP_LIGHT}"><strong>LDAP status</strong><em><span></span></em><span>{LDAP_STATUS}</span></li>
+				<li class="{WWW_LIGHT}"><strong>WWW Access</strong><em><span></span></em><span>{WWW_STATUS}</span></li>
 			</ul>
 			
 			<table cellpadding="0" cellspacing="0" class="logged-in">
@@ -125,27 +126,13 @@ $j(function() {
 					</tr>
 				</thead>
 				<tbody>
+                                    <!-- BEGIN group_summary -->
 					<tr>
-						<td>Administrators</td>
-						<td>6</td>
-						<td>1</td>
+						<td>{GROUP_NAME}</td>
+						<td>{GROUP_USER}</td>
+						<td>{GROUP_LOGGED_IN}</td>
 					</tr>
-					<tr>
-						<td>Students</td>
-						<td>1877</td>
-						<td>500</td>
-					</tr>
-					<tr>
-						<td>Teachers</td>
-						<td>110</td>
-						<td>20</td>
-					</tr>
-					<tr>
-						<td>Parents</td>
-						<td>90</td>
-						<td>10</td>
-					</tr>
-				
+                                        <!-- END group_summary -->
 				</tbody>
 			</table>
 
@@ -168,27 +155,13 @@ $j(function() {
 					</tr>
 				</thead>
 				<tbody>
+                                    <!-- BEGIN recent_log -->
 					<tr>
-						<td>11/3/2011</td>
-						<td>Logged in</td>
-						<td>James Leckie</td>
+						<td>{LOG_DATE}</td>
+						<td>{LOG_ACTION}</td>
+						<td>{LOG_NAME}</td>
 					</tr>
-					<tr>
-						<td>11/3/2011</td>
-						<td>Logged out</td>
-						<td>Pro Matthew Sambell</td>
-					</tr>
-					<tr>
-						<td>11/3/2011</td>
-						<td>Added User</td>
-						<td>Alex Tworovsky</td>
-					</tr>
-					<tr>
-						<td>11/3/2011</td>
-						<td>Deleted User</td>
-						<td>Pro Matthew Sambel</td>
-					</tr>
-				
+                                        <!-- END recent_log -->
 				</tbody>
 			</table>
 		</div>

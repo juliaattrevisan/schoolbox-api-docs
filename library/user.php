@@ -52,6 +52,12 @@ class User extends Model {
 
 	}
 
+        function getSuperusers(){
+            $query = "SELECT user.id uid, title, firstname, lastname, username, local_email, alt_email
+                FROM superusers JOIN user ON superusers.id = user.id";
+            return $this->db->getAll($query);
+        }
+
         function getUserCampus($id) {
 
             $campusquery = "SELECT campus FROM userCampus WHERE uid = '$id' ORDER BY defaultCampus DESC";

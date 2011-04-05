@@ -40,14 +40,14 @@ $j(function() {
 
 <h1>Schoolbox Administration</h1>
 <ul class="admin-nav">
-	<li><a href="/adminv2/index">Home</a></li>
-	<li><a href="/adminv2/users/index" >Users</a></li>
-	<li><a href="/adminv2/side-menu/index">Side Menu</a></li>
-	<li><a href="/adminv2/allowed-files/index">Allowed Files</a></li>
+	<li><a href="/adminv2/home">Home</a></li>
+	<li><a href="/adminv2/user" >Users</a></li>
+	<li><a href="/adminv2/side-menu">Side Menu</a></li>
+	<li><a href="/adminv2/allowed-file">Allowed Files</a></li>
 	<li><a href="/adminv2/setting"  class="current">Settings</a></li>
-	<li><a href="/adminv2/calendar/index">Calendar</a></li>
+	<li><a href="/adminv2/calendar">Calendar</a></li>
 	<li><a href="/adminv2/list">Lists</a></li>
-	<li><a href="/adminv2/rollover/index">Rollover</a></li>
+	<li><a href="/adminv2/rollover">Rollover</a></li>
 </ul>
 <div class="admin-contents">
 	<h2>Settings</h2>
@@ -60,7 +60,7 @@ $j(function() {
 	<div class="settings-nav-holder">
 		<ul class="settings-nav">
             <!-- BEGIN setting_tab -->
-			<li><a href="#" class="{CURRENT}">{SETTING_TAB_NAME}<span></span></a></li>
+			<li><a href="/adminv2/setting/{SETTING_TAB_URL}" class="{SETTING_TAB_CURRENT}">{SETTING_TAB_NAME}<span></span></a></li>
             <!-- END setting_tab -->
 		</ul>
 	</div>

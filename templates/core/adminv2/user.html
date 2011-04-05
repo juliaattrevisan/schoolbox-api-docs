@@ -1,0 +1,133 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<script type="text/javascript">
+
+$j(function() {
+	$j('#modify').autocomplete({
+		serviceUrl: '/ajax/user.php?groupID=0',
+		minChars: 2,
+		maxHeight: 400,
+		width: $j('#modify').width(),
+		onSelect: function (value, data) {
+			//$j('#modify').val(data);
+                        window.open('/adminv2/modify-user/'+data, '_self');
+			return false;
+		}
+	});
+	
+	$j('h3 span').qtip({
+		content: 'If you are wanting to deal with large lists at once, use this section.',
+		show: 'mouseover',
+		hide: 'mouseout',
+		style: {
+			 tip: 'bottomLeft',
+			name: 'green'
+		},
+		position: {
+		  corner: {
+			 target: 'topRight',
+			 tooltip: 'bottomLeft'
+		  }
+  		}
+	})
+	
+
+	
+})
+
+</script>
+
+<!-- END custom_head-->
+
+<h1>Schoolbox Administration</h1>
+
+<ul class="admin-nav">
+	<li><a href="/adminv2/home" >Home</a></li>
+	<li><a href="/adminv2/user" class="current">Users</a></li>
+	<li><a href="/adminv2/side-menu">Side Menu</a></li>
+	<li><a href="/adminv2/allowed-file">Allowed Files</a></li>
+	<li><a href="/adminv2/setting">Settings</a></li>
+	<li><a href="/adminv2/calendar">Calendar</a></li>
+	<li><a href="/adminv2/list">Lists</a></li>
+	<li><a href="/adminv2/rollover">Rollover</a></li>
+</ul>
+
+<div class="admin-contents">
+	<h2>Users</h2>
+        <div class="one-third">
+            <div class="level green">
+
+                   
+                          
+                                    <h4>Modify User</h4>
+                                    <form id="modify-user" action="" method="post">
+                                            <input type="text" id="modify">
+                                            <a class="btn modify float-left next-to-input" href="#"><span></span>Modify</a>
+                                    </form>
+
+                                     <a class="btn add center-it" href="#"><span></span>Add User</a>
+                                    <div class="float-fix"></div>
+                          
+                    </div>
+            </div>
+	<div class="two-thirds">
+		<div class="level">
+			<h4>Superusers</h4>
+			<table cellpadding="0" cellspacing="0" class="logged-in">
+				<colgroup>
+					<col width="40%" />
+					<col width="40%" />
+                                        <col width="20%" />
+				</colgroup>
+				<thead>
+					<tr>
+						<td>Name</td>
+						<td>Last Login</td>
+                                                <td>Modify</td>
+					</tr>
+				</thead>
+				<tbody>
+                                    <!-- BEGIN superusers -->
+					<tr>
+						<td>{SUPERUSER_NAME}</td>
+						<td>{SUPERUSER_LOGIN}</td>
+                                                <td><a href="/adminv2/modify-user/{SUPERUSER_ID}">Modify</a></td>
+					</tr>
+                                        <!-- END superusers -->
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="float-fix"></div>
+	<div class="level last">
+		<h3>Bulk Options<span class="question">?</span></h3>
+		<div class="split-container">
+			<div class="split">
+				<h4>Add Users</h4>
+				<p>Provide a file containing a list of users in the following CSV format. (username, title, firstname, lastname, synergetic, group, campus, year, password, webmail, alt. email) </p>
+				<form id="add-users" action="" method="post">
+					<input type ="file" >
+					<div class="float-fix"></div>
+					<a class="btn add float-left submit" href="#"><span></span>Add users</a>
+					<div class="float-fix"></div>
+				</form>
+				<div class="float-fix"></div>
+			</div>
+		</div>
+		<div class="split-container">
+			<div class="split last">
+				<h4>Remove Users</h4>
+				<p>Provide a file containing a list of users in the following CSV format. (username, title, firstname, lastname, synergetic, group, campus, year, password, webmail, alt. email) </p>
+				<form id="add-users" action="" method="post">
+					<input type ="file" >
+					<div class="float-fix"></div>
+					<a class="btn delete float-left submit" href="#"><span></span>Remove Users</a>
+					<div class="float-fix"></div>
+				</form>
+			</div>
+		</div>
+		<div class="float-fix"></div>
+	</div>
+</div>

@@ -1,0 +1,180 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.autoresize.js"></script>
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+
+<script type="text/javascript">
+
+$j(function() {
+		
+	$j('.row-holder:nth-child(2n)').css("background-color", "#ffffff");	
+		
+	$j.fn.qtip.defaults.position.corner = {
+		target: 'topLeft',
+		tooltip: 'bottomLeft'
+	}
+	
+	$j.fn.qtip.defaults.style = {
+		tip: 'bottomLeft',
+		name: 'green'
+	}
+
+	$j('.allowed-files tr:first td:first').qtip({
+		content: 'Controls if files of this type can be uploaded'});
+		
+	$j('.allowed-files tr:first td:nth-child(2)').qtip({
+		content: 'A simple name for the type of file'});
+		
+	$j('.allowed-files tr:first td:nth-child(3)').qtip({
+		content: 'The mime type for a file can be found by searching google'});
+	
+	$j('.allowed-files tr:first td:nth-child(4)').qtip({
+		content: 'The file extension, everything after the dot. Comma seperate multiple extensions'});
+	
+	$j('.allowed-files tr:first td:nth-child(5)').qtip({
+		content: 'Determines if file will be opened in the browser or by a third party application'});
+		
+
+
+	$j('.modify').live('click',function() {
+		var trigger = 0;
+		
+		level = $j(this).parent().parent()
+		
+		$j('.form-holder').each(function() {
+			if ($j(this).is(':visible')) {
+				
+				level.slideUp(function() {
+					level.siblings('.form-holder').slideDown();
+				});		
+				
+				$j(this).siblings().slideDown();
+				$j(this).slideUp();
+				trigger = 1;
+				
+			}
+		
+		})
+		
+		if (trigger == 0) {
+				level.slideUp(function() {
+				level.siblings('.form-holder').slideDown();
+			});
+		}
+		
+		return false;
+	});
+	
+});
+
+</script>
+ 
+<!-- END custom_head-->
+
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+	<li><a href="/adminv2/home">Home</a></li>
+	<li><a href="/adminv2/user" >Users</a></li>
+	<li><a href="/adminv2/side-menu">Side Menu</a></li>
+	<li><a href="/adminv2/allowed-file" class="current">Allowed Files</a></li>
+	<li><a href="/adminv2/setting">Settings</a></li>
+	<li><a href="/adminv2/calendar">Calendar</a></li>
+	<li><a href="/adminv2/list">Lists</a></li>
+	<li><a href="/adminv2/rollover">Rollover</a></li>
+</ul>
+<div class="admin-contents"> 
+	<h2>Allowed Files</h2>
+
+	<table cellpadding="0" cellspacing="0" class="allowed-files"> 
+		<colgroup>
+			<col width="14%" />
+			<col width="19%" />
+			<col width="20%" />
+			<col width="20%" />
+			<col width="26%" />
+		</colgroup>
+		<thead>
+			<tr>
+				<td><h3>Enabled<span>?</span></h3></td>
+				<td><h3>Description<span>?</span></h3></td>
+				<td><h3>Mime<span>?</span></h3></td>
+				<td><h3>Extensions<span>?</span></h3></td>
+				<td><h3>Inline<span>?</span></h3></td>
+			</tr>
+			<tr class="add-new">
+				<td><input type="checkbox" /><button class="float-right" id="icon-choice"></button></td>
+				<td><textarea class="text-input textarea"  name="description">CSS</textarea></td>
+				<td><textarea class="text-input textarea" name="mime">text/html</textarea></td>
+				<td><input type="text" class="text-input" value="html,htm" /></td>
+				<td><select name="inline" ><option value="Inline">Inline</option><option value="External">External</option></select>
+				<a href="#" class="btn add submit no-marg"><span></span>Add new file type</a>
+				
+				</td>
+			</tr>
+		</thead>
+	</table>
+	
+	<div class="allowed-files">
+		<!-- BEGIN file -->
+		<div class="row-holder">     
+			<div class="row ">
+				<div class="enabled"><p>{FILE_ENABLED}</p></div>
+                                <div class="image"><img src="/images/mime/22x22/{FILE_ICON}" /></div>
+				<div class="description"><p>{FILE_DESC}</p></div>
+				<div class="mime"><p>{FILE_MIME}</p></div>
+				<div class="extensions"><p>{FILE_EXTENSION}</p></div>
+				<div class="inline"><p>{FILE_INLINE}</p>
+					<a href="#" class="btn delete no-marg"><span></span>Delete</a>
+					<a href="#" class="btn modify no-marg"><span></span>Modify</a>
+					<div class="float-fix"></div>
+				</div>
+				<div class="float-fix"></div>
+			</div>
+			<div class="float-fix"></div>
+		
+			<div class="row form-holder">
+				<form id="allowed-file{FILE_ID}">
+                                        <input type="hidden" name="fileTypeID" value="{FILE_ID}" />
+					<label class="enabled">
+						<fieldset>
+							<input type="checkbox" name="enabled" {FILE_ENABLED_CHECK} />
+							<button class="float-right" id="icon-choice"></button>
+						</fieldset>
+					</label>
+					<label class="description">
+						<fieldset>
+							<textarea class="text-input textarea"  name="description" >{FILE_DESC}</textarea>
+						</fieldset>
+					</label>
+					<label class="mime">
+						<fieldset>
+							<textarea class="text-input textarea"  name="mime" >{FILE_MIME}</textarea>
+						</fieldset>
+					</label>
+					<label class="extensions">
+						<fieldset>
+							<input type="text" class="text-input"  name="extensions" value="{FILE_EXTENSION}"/>
+						</fieldset>
+					</label>
+					<label class="inline">
+						<fieldset>
+							<select name="inline" id="inline">
+								<option value="Inline">Inline</option>
+								<option value="External">External</option>
+							</select>
+							<a href="#" class="btn delete no-marg"><span></span>Delete</a>
+							<a href="#" class="btn tick submit no-marg"><span></span>Save</a>
+						</fieldset>
+					</label>
+					<div class="float-fix"></div>
+				</form>
+			</div>
+		</div>
+		<!-- END file -->
+        </div>
+</div>
+
+<div>
+    <!-- BEGIN image -->
+    <img src="/images/mime/22x22/{IMAGE_FILE}" alt="{IMAGE_FILE}"/>
+    <!-- END image -->
+</div>

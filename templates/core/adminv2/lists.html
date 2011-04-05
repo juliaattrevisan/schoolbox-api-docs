@@ -40,14 +40,14 @@ $j(function() {
 
 <h1>Schoolbox Administration</h1>
 <ul class="admin-nav">
-	<li><a href="/adminv2/index">Home</a></li>
-	<li><a href="/adminv2/users/index" >Users</a></li>
-	<li><a href="/adminv2/side-menu/index">Side Menu</a></li>
-	<li><a href="/adminv2/allowed-files/index">Allowed Files</a></li>
+	<li><a href="/adminv2/home">Home</a></li>
+	<li><a href="/adminv2/user" >Users</a></li>
+	<li><a href="/adminv2/side-menu">Side Menu</a></li>
+	<li><a href="/adminv2/allowed-file">Allowed Files</a></li>
 	<li><a href="/adminv2/setting"  >Settings</a></li>
-	<li><a href="/adminv2/calendar/index">Calendar</a></li>
+	<li><a href="/adminv2/calendar">Calendar</a></li>
 	<li><a href="/adminv2/list" class="current">Lists</a></li>
-	<li><a href="/adminv2/rollover/index">Rollover</a></li>
+	<li><a href="/adminv2/rollover">Rollover</a></li>
 </ul>
 <div class="admin-contents">
 	<h2>Lists</h2>
@@ -60,7 +60,7 @@ $j(function() {
 	<div class="settings-nav-holder">
 		<ul class="settings-nav">
             <!-- BEGIN table_tab -->
-			<li><a href="/adminv2/list/{TABLE_NAME}" class="{CURRENT}">{TABLE_TITLE}<span></span></a></li>
+			<li><a href="/adminv2/list/{TABLE_NAME}" class="{TABLE_CURRENT}">{TABLE_TITLE}<span></span></a></li>
             <!-- END table_tab -->
 		</ul>
 	</div>
@@ -78,9 +78,9 @@ $j(function() {
                     <tbody>
                     <!-- BEGIN table_row -->
                     <tr>
-					 <!-- BEGIN table_cell_static -->
+			<!-- BEGIN table_cell_static -->
                         <td>{TABLE_DATA}</td>
-                        <!-- END table_cell_static-->
+                        <!-- END table_cell_static -->
                         <!-- BEGIN table_cell -->
                         <td><input type="text" value="{TABLE_DATA}" /></td>
                         <!-- END table_cell -->

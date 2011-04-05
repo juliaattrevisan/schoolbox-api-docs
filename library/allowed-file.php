@@ -99,6 +99,33 @@ class AllowedFile extends Model {
 		/* No error - do nothing
 		 */
 	}
+
+        function getAll($order = '') {
+		$query = "SELECT *, GROUP_CONCAT(extension SEPARATOR ',') as extension FROM `".$this->_table."` a JOIN allowedFileExtension b ON a.fileTypeID=b.fileTypeID GROUP BY a.fileTypeID";
+		if($order)
+			$query .= " ORDER BY `$order`";
+
+		return  $this->db->getAll($query);
+        }
+
+	function getIconList() {
+		//get a list of filenames from mime
+		$dir = $_SERVER['DOCUMENT_ROOT'].'/images/mime/22x22';
+		$path = opendir($dir);
+		while (false !== ($file = readdir($path))) {
+			if($file!="." && $file!="..") {
+				if(is_file($dir."/".$file))
+					$files[]=$file;
+			}
+		}
+
+		if($files) {
+			natcasesort($files);
+		}
+		closedir($path);
+
+		return $files;
+	}
 }
 
 ?>
