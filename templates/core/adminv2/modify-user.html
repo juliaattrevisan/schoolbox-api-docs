@@ -72,7 +72,7 @@ $j(function() {
 					<label>
 						<select>
                                                     <!-- BEGIN title -->
-							<option value="{NAME_TITLE}" {TITLE_SELECTED}>{NAME_TITLE}</option>
+							<option value="{NAME_TITLE}" {NAME_TITLE_SELECTED}>{NAME_TITLE}</option>
                                                     <!-- END title -->
 						</select>
 						<input type="text" name="firstname" value="{FIRSTNAME}" />
@@ -85,9 +85,7 @@ $j(function() {
 				<label for ="database" class="">{DATABASE_TYPE} ID
 					<input type="text" name="database_id" value="{DATABASE_ID}"/>
 				</label>
-				<label for ="superuser" class="width2 ">Superuser
-					<input type="checkbox" name="superusers" {SUPERUSER_CHECKED} />
-				</label>
+
 				<div class="float-fix"></div>
 				<table cellpadding="0" width="50%">
 					<colgroup>
@@ -106,8 +104,8 @@ $j(function() {
                                             <!-- BEGIN campus -->
 						<tr>
 							<td>{CAMPUS_NAME}</td>
-							<td><input type="radio" name="defaultCampus" value="{CAMPUS_ID}" {DEFAULT_CAMPUS_CHECKED} /></td>
-							<td><input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_CHECKED} /></td>
+							<td><input type="radio" name="defaultCampus" value="{CAMPUS_ID}" {CAMPUS_DEFAULT_CHECKED} /></td>
+							<td><input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_CHECKED} /></td>
 						</tr>
                                            <!-- END campus -->
 					</tbody>
@@ -122,14 +120,17 @@ $j(function() {
 				<label for="password">Password
 					<input type="text" />
 				</label>
+                            	<label for ="superuser" class="width2 ">Superuser
+					<input type="checkbox" name="superusers" {SUPERUSER_CHECKED} />
+				</label>
 				<label for="e-portfolio">E-Portfolio
 					<input type="checkbox" name="eportfolio" {EPORTFOLIO_CHECKED} />
 				</label>
 				<label for="group">Group
 					<select>
-                                            <!-- BEGIN group -->
-						<option value="{GROUP_ID}" {GROUP_SELECTED}>{GROUP_NAME}</option>
-                                            <!-- END group -->
+                                            <!-- BEGIN system_group -->
+						<option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
+                                            <!-- END system_group -->
 					</select>
 				</label>
 				<label for="year">Year
@@ -137,6 +138,7 @@ $j(function() {
 				</label>
 			</div>
 		</div>
+            <input type="submit" name="submit" value="Update User" />
 	</form>
 	<div class="float-fix"></div>
 </div>
@@ -150,55 +152,26 @@ $j(function() {
 			<col width="20%" />
 		
 		</colgroup>
-		<tbody>
+		<thead>
+                  
 			<tr>
 				<th>Group Name</th>
 				<th>Access</th>
 				<th>Make Owner</th>
 				<th>Remove</th>
 			</tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN user_group -->
 			<tr>
-				<td>Test Group</td>
+				<td>{USER_GROUP_NAME}</td>
 				<td><input type="checkbox" name="access[]" /></td>
 				<td><a href="/group/modifyForm.php?owner=1&amp;categoryID=17"> make owner</a></td>
 				<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=17"> remove</a></td>
 			</tr>
-			<tr>
-				<td>My new group</td>
-				<td></td>
-				<td>owner</td>
-				<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=158"> remove</a></td>
-			</tr>
-			<tr>
-				<td>Submission Test</td>
-				<td></td>
-				<td>owner</td>
-				<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=140"> remove</a></td>
-			</tr>
-			<tr>
-				<td>Test Class</td>
-				<td></td>
-				<td>owner</td>
-				<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=156"> remove</a></td>
-			</tr>
-			<tr>
-				<td>Alex Tworowsky</td>
-				<td></td>
-				<td>owner</td>
-				<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=162"> remove</a></td>
-			</tr>
-			<tr>
-				<td>Test Folder</td>
-				<td><input type="checkbox" name="access[]" /></td>
-				<td><a href="/group/modifyForm.php?owner=1&amp;categoryID=37"> make owner</a></td>
-				<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=37"> remove</a></td>
-			</tr>
-			<tr>
-				<td>My Class</td>
-				<td><input type="checkbox" name="access[]" /></td>
-				<td><a href="/group/modifyForm.php?owner=1&amp;categoryID=148"> make owner</a></td>
-				<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=148"> remove</a></td>
-			</tr>
+                        <!-- END user_group -->
+
+			
 			<tr>
 				<td colspan="4" class="colours-buttons"><select class="formfield float-left" name="sid">
 						<option value="0">&lt;- Please Select a Group -&gt;</option>
@@ -244,56 +217,13 @@ $j(function() {
 						<th>IP</th>
 						<th>Result</th>
 					</tr>
+                                        <!-- BEGIN login_log -->
 					<tr>
-						<td>29/03/2011 14:47</td>
-						<td>203.206.182.125</td>
-						<td>Success</td>
+						<td>{LOGIN_DATE}</td>
+						<td>{LOGIN_IP}</td>
+						<td>{LOGIN_RESULT}</td>
 					</tr>
-					<tr>
-						<td>29/03/2011 14:40</td>
-						<td>192.168.1.163</td>
-						<td>Success</td>
-					</tr>
-					<tr>
-						<td>29/03/2011 9:51</td>
-						<td>192.168.1.163</td>
-						<td>Success</td>
-					</tr>
-					<tr>
-						<td>28/03/2011 15:42</td>
-						<td>203.206.182.125</td>
-						<td>Success</td>
-					</tr>
-					<tr>
-						<td>28/03/2011 12:21</td>
-						<td>203.206.182.125</td>
-						<td>Success</td>
-					</tr>
-					<tr>
-						<td>28/03/2011 11:40</td>
-						<td>203.206.182.125</td>
-						<td>Success</td>
-					</tr>
-					<tr>
-						<td>25/03/2011 19:37</td>
-						<td>220.235.32.190</td>
-						<td>Success</td>
-					</tr>
-					<tr>
-						<td>25/03/2011 16:21</td>
-						<td>203.206.182.125</td>
-						<td>Success</td>
-					</tr>
-					<tr>
-						<td>25/03/2011 15:36</td>
-						<td>203.206.182.125</td>
-						<td>Success</td>
-					</tr>
-					<tr>
-						<td>25/03/2011 15:16</td>
-						<td>203.206.182.125</td>
-						<td>Success</td>
-					</tr>
+                                        <!-- END login_log -->
 				</tbody>
 			</table>
 		</div>
@@ -306,69 +236,13 @@ $j(function() {
 					<tr>
 						<th>Date</th>
 						<th>Action</th>
-						<th>Object</th>
-						<th>Name</th>
 					</tr>
+                                        <!-- BEGIN action_log -->
 					<tr>
-						<td>24/03/2011 12:00</td>
-						<td>modify</td>
-						<td>file</td>
-						<td>Alaress Logo</td>
+						<td nowrap="nowrap">{ACTION_DATE}</td>
+						<td>{ACTION_ACTION}</td>
 					</tr>
-					<tr>
-						<td>24/03/2011 12:00</td>
-						<td>modify</td>
-						<td>folder</td>
-						<td>From the Director of Leadership - (Main) From the Director of Leadership - (Main)</td>
-					</tr>
-					<tr>
-						<td>24/03/2011 12:00</td>
-						<td>modify</td>
-						<td>folder</td>
-						<td>Demo Class</td>
-					</tr>
-					<tr>
-						<td>17/03/2011 10:53</td>
-						<td>modify</td>
-						<td>folder</td>
-						<td>Alex Tworowsky</td>
-					</tr>
-					<tr>
-						<td>16/03/2011 13:53</td>
-						<td>modify</td>
-						<td>folder</td>
-						<td>Alex Tworowsky</td>
-					</tr>
-					<tr>
-						<td>15/03/2011 9:25</td>
-						<td>create</td>
-						<td>link</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td>08/03/2011 18:00</td>
-						<td>modify</td>
-						<td>link</td>
-						<td>post new link</td>
-					</tr>
-					<tr>
-						<td>08/03/2011 16:04</td>
-						<td>create</td>
-						<td>file</td>
-						<td>Trish-devito-medium</td>
-					</tr>
-					<tr>
-						<td>08/03/2011 16:04</td>
-						<td>create</td>
-						<td>file</td>
-						<td>body-shop</td>
-					</tr>
-					<tr>
-						<td>08/03/2011 16:04</td>
-						<td>create</td>
-						<td>file</td>
-						<td>cotton-on</td>
-					</tr>
+                                        <!-- END action_log -->
 				</tbody>
 			</table>
 		</div>

@@ -9,9 +9,5 @@ class GenericTable extends Model {
         $this->_index = $index;
         parent::Model();
     }
-
-    function getTable() {
-        return $this->db->getAll('SELECT * FROM '.$this->_table);
-    }
 }
 ?>

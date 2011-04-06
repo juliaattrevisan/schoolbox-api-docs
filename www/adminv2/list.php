@@ -47,7 +47,7 @@ foreach($tableList as $table) {
 
 $genericHandler = new GenericTable($selectedTable['name'],$selectedTable['index']);
 
-$table = $genericHandler->getTable();
+$table = $genericHandler->getAll();
 
 foreach($table as $row) {
     foreach($row as $keys => $data) {

@@ -250,5 +250,40 @@ class User extends Model {
 
         return $this->db->getRow($query);
 	}
+
+
+    function getCampusList() {
+        $query = "SELECT * FROM luCampus";
+        return $this->db->getAll($query);
+    }
+
+    function getGroupList() {
+        $query = "SELECT * FROM groups";
+        return $this->db->getAll($query);
+    }
+
+    function getTitleList() {
+        $query = "SELECT * FROM luTitle";
+        return $this->db->getAll($query);
+    }
+
+    function getUserActivity($uid, $limit = 10) {
+            $query = "SELECT object, action, time, c.name as folder, f.description as file, l.description as link
+                    FROM cmsLog
+                    LEFT JOIN category c ON c.id = objectId
+                    LEFT JOIN file f ON f.id = objectId
+                    LEFT JOIN link l ON l.id = objectId
+                    WHERE user = $uid
+                    ORDER BY time DESC
+                    LIMIT 0,$limit";
+            return $this->db->getAll($query);
+
+    }
+
+    function getUserLogins($username, $limit = 10) {
+        $query = "SELECT date, ip, login FROM login_log WHERE username like ".$this->db->smartQuote($username)." ORDER BY date DESC LIMIT 0,$limit";
+        return $this->db->getAll($query);
+
+    }
 }
 ?>
