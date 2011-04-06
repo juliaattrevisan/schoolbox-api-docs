@@ -74,7 +74,15 @@ window.addEvent('domready', function () {
 		dateFormat: 'dd/mm/yy',
 		showOn: 'both',
 		buttonImage: '/images/demo/calendar/calendar-click.png',
-		buttonImageOnly: true
+		buttonImageOnly: true,
+        constrainInput: false,
+        onClose: function (string) {
+            var input = $j(this);
+
+            $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                input.val(data.time);
+            })
+        }
 	});
 	
 });
@@ -127,7 +135,7 @@ window.addEvent('domready', function () {
 			<td class="formLabelWidth" valign="top"><h4>Date</h4>
 				<em>Required field. Dates should be in dd/mm/yyyy format. </em>
 			</td>
-			<td><input name="date" id="cal_date" type="text" size="15" maxlength="10" value="{DATE}"/></td>
+			<td><input name="date" id="cal_date" type="text" size="15" maxlength="30" value="{DATE}"/></td>
 		</tr>
 		<!-- END date --> 
 		<!-- BEGIN date_sequence -->

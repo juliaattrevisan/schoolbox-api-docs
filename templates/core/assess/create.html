@@ -11,6 +11,14 @@
 			showOn: 'button',
 			buttonImage: '/images/demo/calendar/calendar-click.png',
 			buttonImageOnly: true,
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $j(this);
+
+                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
 		});
 		
 	
@@ -19,6 +27,14 @@
 			showOn: 'button',
 			buttonImage: '/images/demo/calendar/calendar-click.png',
 			buttonImageOnly: true,
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $j(this);
+
+                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
 		});
     });
 </script>
@@ -41,7 +57,7 @@
                     <option selected>am</option>
                     <option>pm</option>
                 </select>
-                <input name="start[date]" id="start_date" type="text" size="15" maxlength="10" value="{START_DATE}" />
+                <input name="start[date]" id="start_date" type="text" size="15" maxlength="30" value="{START_DATE}" />
                 </td>
 
         </tr>
@@ -56,7 +72,7 @@
                     <option selected>am</option>
                     <option>pm</option>
                 </select>
-                <input name="finish[date]" id="finish_date" type="text" size="15" maxlength="10" value="{FINISH_DATE}" />
+                <input name="finish[date]" id="finish_date" type="text" size="15" maxlength="30" value="{FINISH_DATE}" />
                 </td>
         </tr>
         <tr>

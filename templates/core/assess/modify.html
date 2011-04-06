@@ -10,7 +10,15 @@ $j(document).ready(function() {
 			dateFormat: 'dd/mm/yy',
 			showOn: 'both',
 			buttonImage: '/images/demo/calendar/calendar-click.png',
-			buttonImageOnly: true
+			buttonImageOnly: true,
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $j(this);
+
+                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
 		});
 		/* date picker */		 
 
@@ -92,7 +100,7 @@ $j(document).ready(function() {
 						<option value="{START_MERIDIEM_VALUE}" {START_MERIDIEM_SELECTED}>{START_MERIDIEM_VALUE}</option>
 						<!-- END startMeridiem -->
 					</select>
-					<input name="start[date]" id="start_date" type="text" size="15" maxlength="10" value="{ASSESS_START_DATE}" />
+					<input name="start[date]" id="start_date" type="text" size="15" maxlength="30" value="{ASSESS_START_DATE}" />
 					</td>
 			</tr>
 			<tr>
@@ -113,7 +121,7 @@ $j(document).ready(function() {
 						<option value="{FINISH_MERIDIEM_VALUE}" {FINISH_MERIDIEM_SELECTED}>{FINISH_MERIDIEM_VALUE}</option>
 						<!-- END finishMeridiem -->
 					</select>
-					<input name="finish[date]" id="finish_date" type="text" size="15" maxlength="10" value="{ASSESS_FINISH_DATE}" />
+					<input name="finish[date]" id="finish_date" type="text" size="15" maxlength="30" value="{ASSESS_FINISH_DATE}" />
 					</td>
 
 			</tr>

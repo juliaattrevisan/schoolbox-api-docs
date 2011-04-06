@@ -76,7 +76,15 @@
 				dateFormat: 'dd/mm/yy',
 				showOn: 'both',
 				buttonImage: '/images/demo/calendar/calendar-click.png',
-				buttonImageOnly: true
+				buttonImageOnly: true,
+                constrainInput: false,
+                onClose: function (string) {
+                    var input = $j(this);
+
+                    $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                        input.val(data.time);
+                    })
+                }
 			});
 			
 			//greenerising the checkboxes if they're ticked.
@@ -84,7 +92,7 @@
 				if ($j(this).is(':checked')) {
 					$j(this).parent().addClass('active-checkbox');
 				}			 
-			})
+			});
 			
 			$j(':checkbox').click(function() {
 				if ($j(this).parent().hasClass('active-checkbox')) {
@@ -111,7 +119,7 @@
                         <td class="formLabelWidth" valign="top"><h4>Date</h4>
                         	<em>The date on which the event will occur. The date should be formatted like this dd/mm/yyyy. </em>
 							</td>
-						<td><input name="date" id="cal_date" type="text" size="15" maxlength="10" value="{DATE}"/></td>
+						<td><input name="date" id="cal_date" type="text" size="15" maxlength="30" value="{DATE}"/></td>
 
                       </tr>
                       <!-- BEGIN recurring_dates -->
@@ -130,7 +138,7 @@
                       <tr id="repeatUntil" style="display: none;">
                       <td class="formLabelWidth" valign="top"><h3>Repeat Until</h3>
                       <em>The date at which recurrence should cease.</em></td>
-                      <td><input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="10" value=""/>
+                      <td><input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/>
 						</td>
                       </tr>
                       <!-- END recurring_dates -->

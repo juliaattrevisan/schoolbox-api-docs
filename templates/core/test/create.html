@@ -9,13 +9,29 @@ window.addEvent('domready', function() {
 			dateFormat: 'dd/mm/yy',
 			showOn: 'button',
 			buttonImage: '/images/demo/calendar/calendar-click.png',
-			buttonImageOnly: true
+			buttonImageOnly: true,
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $j(this);
+
+                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
 		});
 		$j('#date_finish').datepicker({ 
 			dateFormat: 'dd/mm/yy',
 			showOn: 'button',
 			buttonImage: '/images/demo/calendar/calendar-click.png',
-			buttonImageOnly: true
+			buttonImageOnly: true,
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $j(this);
+
+                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
 		});
 	// question controls
 	var count = {COUNT};
@@ -58,10 +74,10 @@ window.addEvent('domready', function() {
 	<tr> 
 		<td><h4>Dates</h4><em>The dates in which the test will be available to be taken.</em>
 		</td>
-		<td><input type="text" size="10" maxlength="10" id="date_start" name="date[start]" value="{DATE_START}">
+		<td><input type="text" size="10" maxlength="30" id="date_start" name="date[start]" value="{DATE_START}">
 			
 			 to 
-			<input type="text" size="10" maxlength="10" id="date_finish" name="date[finish]" value="{DATE_FINISH}"></td>
+			<input type="text" size="10" maxlength="30" id="date_finish" name="date[finish]" value="{DATE_FINISH}"></td>
 	</tr>
 	<tr> 
 		<td><h4>Duration</h4><em>Time allotted for the test to completed.</em>

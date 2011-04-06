@@ -6,6 +6,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 class SitePage extends Page {
 
+    private $ajax;
+
 	function SitePage($login=TRUE) {
 		parent::Page();
 
@@ -85,7 +87,15 @@ class SitePage extends Page {
 
 	}
 
+    function setAjax ($state = true) {
+        $this->ajax = $state;
+    }
+
 	function outputPage($lite=FALSE) {
+        if ($this->ajax) {
+            return true;
+        }
+
 		if(!$lite) {
 			$this->buildPage();
 			$this->saveHistory();

@@ -6,7 +6,15 @@
 			dateFormat: 'dd/mm/yy',
 			showOn: 'both',
 			buttonImage: '/images/demo/calendar/calendar-click.png',
-			buttonImageOnly: true
+			buttonImageOnly: true,
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $j(this);
+
+                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
 		});
 
 	});
