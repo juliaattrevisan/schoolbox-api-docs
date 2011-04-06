@@ -16,20 +16,40 @@ if (is_array($submissionList)) {
 		$dateHTML = outputDate("jS M", $submission['date']);
 		$dateURL = false;
 
-		if($enroled) {
-                    if($groupHandler->isStaff() && $submission['owner'] == $_SESSION['id']) {
-			$dateURL = "/submission/viewSubmission/" . $submission['id'];
-                        $dateHTML .= ' | ' . '<a href="' . $dateURL . '">View Work</a>';
-                    }
-                    else if(!is_numeric($submission['studentWork']) && $submission['late'] > time() && $submission['open'] < time()) {
-			$dateURL = "/submission/submitWork/" . $submission['id'];
-                        $dateHTML .= ' | ' . '<a href="' . $dateURL . '">Submit Work</a>';
-                    }
-		}
-
 		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . scrubText($submission['description']) . ($nameURL ? '</a>' : "");        
 
+        /* Actions Block */
+        $this->setBlock('duework', 'duework_actions', 'duework_actions_block');
+
+        if($groupHandler->isStudent()) {
+            $this->setVar('DUE_ACTION', '/submission/submissionHistory/' . $submission['id']);
+
+            if (!empty($submission['submitted'])) {
+                if (!empty($submission['returned'])) {
+                    $this->setVar('DUE_ACTION_NAME', 'View Mark');
+                } else {
+                    $this->setVar('DUE_ACTION_NAME', 'Awaiting Mark');
+                }
+            } else {
+                if (time() > $submission['open'] && time() < $submission['late']) {
+                    $this->setVar('DUE_ACTION_NAME', 'Submit Work');
+                } else {
+                    $this->setVar('DUE_ACTION_NAME', 'View Details');
+                }
+            }
+
+            $this->parse('duework_actions_block', 'duework_actions');
+        } elseif ($groupHandler->isStaff() && $submission['owner'] == $_SESSION['id']) {
+            $this->setVar('DUE_ACTION', '/submission/viewSubmission/' . $submission['id']);
+            $this->setVar('DUE_ACTION_NAME', 'View Work');
+
+            $this->parse('duework_actions_block', 'duework_actions');            
+        } else {
+            $this->setVar('duework_actions_block', '');
+        }
+
 		$output = array(
+            'DUE_ID'    => $submission['id'],
 			'DUE_NAME'	=> $nameHTML,
 			'DUE_TYPE'	=> scrubTEXT($submission['typeName']),
 			'DUE_DATE'	=> $dateHTML,
