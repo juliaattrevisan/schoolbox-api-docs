@@ -1220,6 +1220,13 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	margin-right:1%;
 }
 
+.admin-contents .half{
+	width:49%;
+	float:left;
+	margin-right:2%;
+}
+.admin-contents .half.last{margin:0;}
+
 .admin-contents .two-thirds {
 	width:63%;
 	float:left;
@@ -1423,6 +1430,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 .row .enabled, .row .description, .row .mime, .row .extensions, .row .inline {
 	float:left;
 	position:relative;
+	word-wrap:break-word
 
 }
 .row p, .row fieldset {
@@ -1440,7 +1448,9 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 .row .btn { margin-top:3px; }
 
 .enabled { width:14%;}
-
+.enabled img{position:absolute; top:4px; right:0;}
+.enabled button img{position:relative; top:0;}
+.enabled button img{position:relative; top:0;}
 .description { width:19%; }
 
 .mime { width:20%; }
@@ -1570,6 +1580,35 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	top:16px;
 	right:16px;
 	z-index:200
+}
+#dialog{display:none;}
+.new-button{
+	margin:4px; 
+	background:#ccc; 
+	border:1px solid #797979; 
+	background:#F4F1EA;
+     -moz-border-radius: 4px; 
+  -webkit-border-radius: 4px; 
+          border-radius: 4px; 
+  background-color: #F4F1EA;
+  background-image: -moz-linear-gradient(top, #F4F1EA, #eae7e0); 
+  background-image: -o-linear-gradient(top, #F4F1EA, #eae7e0); 
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #F4F1EA),color-stop(1, #eae7e0)); 
+  background-image: -webkit-linear-gradient(#F4F1EA, #eae7e0); 
+  background-image: linear-gradient(top, #F4F1EA, #eae7e0);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#F4F1EA', EndColorStr='#eae7e0'); 
+			padding:4px 4px 0 4px;
+}
+
+.new-button:hover{
+	cursor:pointer;
+	background-color: #edeae3;
+	background-image: -moz-linear-gradient(top, #edeae3, #e0ddd7); 
+	background-image: -o-linear-gradient(top, #edeae3, #e0ddd7); 
+	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #edeae3),color-stop(1, #e0ddd7)); 
+	background-image: -webkit-linear-gradient(#edeae3, #e0ddd7); 
+	background-image: linear-gradient(top, #edeae3, #e0ddd7);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#edeae3', EndColorStr='#e0ddd7'); 
 }
 
 /*****************************

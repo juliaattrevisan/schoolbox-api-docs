@@ -1,6 +1,8 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.autoresize.js"></script>
 <script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+
 
 <script type="text/javascript">
 
@@ -64,6 +66,36 @@ $j(function() {
 		return false;
 	});
 	
+	$j('#dialog').dialog({
+		
+		width: 650,
+		 autoOpen: false
+		
+	});
+	
+	$j('.open-dialog').click(function() {
+		$j('#dialog').dialog('open');
+		$j('#dialog').children('.store-here').html($j(this).siblings('.chosen-one').attr('ID'));
+		// /images/mime/22x22/
+		
+		
+		return false;
+	});
+	
+	$j('.new-button').click(function() {
+		
+		var currentID = '#'+$j(this).siblings('.store-here').html();
+		
+		$j(currentID).val($j(this).children('img').attr('alt'));
+		$j(currentID).siblings('.open-dialog').children('img').attr('src', $j(this).children('img').attr('src')); 
+
+		$j('#dialog').dialog('close');
+				
+	});
+		
+		
+	
+	
 });
 
 </script>
@@ -83,7 +115,7 @@ $j(function() {
 </ul>
 <div class="admin-contents"> 
 	<h2>Allowed Files</h2>
-
+	<form id="newAllowedFile">
 	<table cellpadding="0" cellspacing="0" class="allowed-files"> 
 		<colgroup>
 			<col width="14%" />
@@ -101,7 +133,12 @@ $j(function() {
 				<td><h3>Inline<span>?</span></h3></td>
 			</tr>
 			<tr class="add-new">
-				<td><input type="checkbox" /><button class="float-right" id="icon-choice"></button></td>
+				<td><input type="checkbox" name="enabled"/><button class="float-right open-dialog" id="icon-choice"><img src="/images/mime/22x22/txt.png"></button>
+				<input type="hidden" name="iconFile" id="button{FILE_ID}" class="chosen-one" value="{FILE_ICON}" />
+				
+				
+				
+				</td>
 				<td><textarea class="text-input textarea"  name="description">CSS</textarea></td>
 				<td><textarea class="text-input textarea" name="mime">text/html</textarea></td>
 				<td><input type="text" class="text-input" value="html,htm" /></td>
@@ -112,13 +149,12 @@ $j(function() {
 			</tr>
 		</thead>
 	</table>
-	
+	</form>
 	<div class="allowed-files">
 		<!-- BEGIN file -->
 		<div class="row-holder">     
 			<div class="row ">
-				<div class="enabled"><p>{FILE_ENABLED}</p></div>
-                                <div class="image"><img src="/images/mime/22x22/{FILE_ICON}" /></div>
+				<div class="enabled"><p>{FILE_ENABLED}<img src="/images/mime/22x22/{FILE_ICON}" /></p></div>
 				<div class="description"><p>{FILE_DESC}</p></div>
 				<div class="mime"><p>{FILE_MIME}</p></div>
 				<div class="extensions"><p>{FILE_EXTENSION}</p></div>
@@ -133,11 +169,12 @@ $j(function() {
 		
 			<div class="row form-holder">
 				<form id="allowed-file{FILE_ID}">
-                                        <input type="hidden" name="fileTypeID" value="{FILE_ID}" />
+                     <input type="hidden" name="fileTypeID" value="{FILE_ID}" />
 					<label class="enabled">
 						<fieldset>
 							<input type="checkbox" name="enabled" {FILE_ENABLED_CHECK} />
-							<button class="float-right" id="icon-choice"></button>
+							<button class="float-right open-dialog" id="icon-choice"><img src="/images/mime/22x22/{FILE_ICON}" /></button>
+							<input type="hidden" name="iconFile" id="button{FILE_ID}" class="chosen-one" value="{FILE_ICON}" />
 						</fieldset>
 					</label>
 					<label class="description">
@@ -173,8 +210,9 @@ $j(function() {
         </div>
 </div>
 
-<div>
+<div id="dialog" title="Select an Icon">
+	<div class="hide store-here"></div>
     <!-- BEGIN image -->
-    <img src="/images/mime/22x22/{IMAGE_FILE}" alt="{IMAGE_FILE}"/>
+    <button class="new-button"><img src="/images/mime/22x22/{IMAGE_FILE}" alt="{IMAGE_FILE}"/></button>
     <!-- END image -->
 </div>

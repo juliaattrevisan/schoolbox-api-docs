@@ -11,8 +11,7 @@ $j(function() {
 		maxHeight: 400,
 		width: $j('#modify').width(),
 		onSelect: function (value, data) {
-			//$j('#modify').val(data);
-                        window.open('/adminv2/modify-user/'+data, '_self');
+            window.open('/adminv2/modify-user/'+data, '_self');
 			return false;
 		}
 	});
@@ -32,9 +31,6 @@ $j(function() {
 		  }
   		}
 	})
-	
-
-	
 })
 
 </script>
@@ -42,7 +38,6 @@ $j(function() {
 <!-- END custom_head-->
 
 <h1>Schoolbox Administration</h1>
-
 <ul class="admin-nav">
 	<li><a href="/adminv2/home" >Home</a></li>
 	<li><a href="/adminv2/user" class="current">Users</a></li>
@@ -53,49 +48,43 @@ $j(function() {
 	<li><a href="/adminv2/list">Lists</a></li>
 	<li><a href="/adminv2/rollover">Rollover</a></li>
 </ul>
-
 <div class="admin-contents">
 	<h2>Users</h2>
-        <div class="one-third">
-            <div class="level green">
-
-                   
-                          
-                                    <h4>Modify User</h4>
-                                    <form id="modify-user" action="" method="post">
-                                            <input type="text" id="modify">
-                                            <a class="btn modify float-left next-to-input" href="#"><span></span>Modify</a>
-                                    </form>
-
-                                     <a class="btn add center-it" href="#"><span></span>Add User</a>
-                                    <div class="float-fix"></div>
-                          
-                    </div>
-            </div>
-	<div class="two-thirds">
+	<div class="half">
+		<div class="level green">
+			<h4>Modify User</h4>
+			<form id="modify-user" action="" method="post">
+				<input type="text" id="modify">
+				<a class="btn modify float-left next-to-input" href="#"><span></span>Modify</a>
+			</form>
+			<a class="btn add center-it" href="#"><span></span>Add User</a>
+			<div class="float-fix"></div>
+		</div>
+	</div>
+	<div class="half">
 		<div class="level">
 			<h4>Superusers</h4>
 			<table cellpadding="0" cellspacing="0" class="logged-in">
 				<colgroup>
-					<col width="40%" />
-					<col width="40%" />
-                                        <col width="20%" />
+				<col width="40%" />
+				<col width="40%" />
+				<col width="20%" />
 				</colgroup>
 				<thead>
 					<tr>
 						<td>Name</td>
 						<td>Last Login</td>
-                                                <td>Modify</td>
+						<td>Modify</td>
 					</tr>
 				</thead>
 				<tbody>
-                                    <!-- BEGIN superusers -->
+					<!-- BEGIN superusers -->
 					<tr>
 						<td>{SUPERUSER_NAME}</td>
 						<td>{SUPERUSER_LOGIN}</td>
-                                                <td><a href="/adminv2/modify-user/{SUPERUSER_ID}">Modify</a></td>
+						<td><a href="/adminv2/modify-user/{SUPERUSER_ID}">Modify</a></td>
 					</tr>
-                                        <!-- END superusers -->
+					<!-- END superusers -->
 				</tbody>
 			</table>
 		</div>
