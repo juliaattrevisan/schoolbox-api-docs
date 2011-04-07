@@ -67,7 +67,13 @@ $j(function() {
 	<div class="settings">
         <!-- BEGIN setting_group -->
 		<div class="split-container">
-			<form id="settings" class="admin-form level" action="get">
+			<form id="settings" class="admin-form level" method="post" action="/adminv2/settingForm.php">
+				<!-- BEGIN setting_type_noneditable -->
+				<label for="{SETTING_NAME}">{SETTING_TITLE}<span>?</span> <em>{SETTING_DESC}</em>
+					<p>{SETTING_VALUE}</p>
+				</label>
+				<!-- END setting_type_noneditable -->
+
                 <!-- BEGIN setting_type_input -->
 				<label for="{SETTING_NAME}">{SETTING_TITLE}<span>?</span> <em>{SETTING_DESC}</em>
 					<input type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
@@ -80,7 +86,8 @@ $j(function() {
                 <!-- END setting_type_textarea -->
                 <!-- BEGIN setting_type_boolean -->
 				<label for="{SETTING_NAME}">{SETTING_TITLE}<span>?</span> <em>{SETTING_DESC}</em><br />
-					<input name="{SETTING_NAME}" type="checkbox" {SETTING_VALUE} />
+					<input name="{SETTING_NAME}" type="checkbox" value="{SETTING_VALUE}" {SETTING_CHECKED} />
+					<input name="{SETTING_NAME}" type="hidden" value="{SETTING_VALUE}" />
 				</label>
                 <!-- END setting_type_boolean -->
 
@@ -106,9 +113,30 @@ $j(function() {
 				</label>
                 <!-- END setting_type_check -->
 				<div class="float-fix"></div>
+				<input type="submit" class="submit-btn-plain" value="Save"/>
+				<div class="float-fix"></div>
 			</form>
 		</div>
         <!-- END setting_group -->
 	</div>
 	<div class="float-fix"></div>
 </div>
+
+<script type="text/javascript">
+	$j(function() {
+
+		/* Force submission of checkboxes regardless of whether they are ticked
+		 * or not.
+		 */
+		$j('input[type=checkbox]').change(function() {
+			var name = 'input[name=' + $j(this).attr('name') + ']';
+
+			if ($j(this).attr('checked')) {
+				$j(name).val(1);
+			}
+			else {
+				$j(name).val(0);
+			}
+		});
+	});
+</script>

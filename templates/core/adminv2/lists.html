@@ -66,35 +66,61 @@ $j(function() {
 	</div>
 	<div class="settings">
 
-			<form id="settings" class="admin-form level" action="get">
-                <table>
-                    <thead>
-                    <tr>
-                        <!-- BEGIN table_heading -->
-                        <td>{TABLE_HEAD}</td>
-                        <!-- END table_heading -->
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- BEGIN table_row -->
-                    <tr>
-			<!-- BEGIN table_cell_static -->
-                        <td>{TABLE_DATA}</td>
-                        <!-- END table_cell_static -->
-                        <!-- BEGIN table_cell -->
-                        <td><input type="text" value="{TABLE_DATA}" /></td>
-                        <!-- END table_cell -->
-						
-                    </tr>
-                    <!-- END table_row -->
-                    </tbody>
-                </table>
+		<form id="settings" class="admin-form level" method="post" action="/adminv2/listForm.php">
+			<!-- BEGIN table_schema -->
+			<input name="tableName" type="hidden" value="{TABLE_CURRENT_NAME}" />
+			<input name="tableIndex" type="hidden" value="{TABLE_CURRENT_INDEX}" />
+			<!-- END table_schema -->
+			<table id="tableData">
+				<thead>
+					<tr>
+						<!-- BEGIN table_heading -->
+						<td>{TABLE_HEAD}</td>
+						<!-- END table_heading -->
+					</tr>
+				</thead>
+				<tbody>
+					<!-- BEGIN table_row -->
+					<tr>
+						<!-- BEGIN table_cell_static -->
+						<td>
+							{TABLE_DATA}
+							<input name="{TABLE_COLUMN}[]" type="hidden" value="{TABLE_DATA}" />
+						</td>
+						<!-- END table_cell_static -->
+						<!-- BEGIN table_cell -->
+						<td><input name="{TABLE_COLUMN}[]" type="text" value="{TABLE_DATA}" /></td>
+						<!-- END table_cell -->
+					</tr>
+					<!-- END table_row -->
+				</tbody>
+			</table>
 
-				<div class="float-fix"></div>
-				<input type="submit" class="submit-btn-plain" value="Save"/>
-				<div class="float-fix"></div>
-			</form>
+			<div class="float-fix"></div>
+			<input type="submit" class="submit-btn-plain" value="Save"/>
+			<div class="float-fix"></div>
+			<a id="addNewRow">New row</a>
+		</form>
 
 	</div>
 	<div class="float-fix"></div>
 </div>
+
+<table id="newData" class="hide-it">
+	<tbody>
+		<tr>
+			<!-- BEGIN newData -->
+			<td><input name="{TABLE_COLUMN}[]" type="{TYPE}" {READONLY} value="" /></td>
+			<!-- END newData -->
+		</tr>
+	</tbody>
+</table>
+
+<script type="text/javascript">
+$j(function() {
+	$j('#addNewRow').click(function() {
+		var newRow = $j('#newData').find('tr').clone();
+		$j('#tableData').find('tbody').append(newRow);
+	});
+});
+</script>

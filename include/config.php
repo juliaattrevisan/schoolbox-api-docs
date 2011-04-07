@@ -68,8 +68,12 @@ class Config extends Model {
         }
 
         public function getTypeList() {
-                $query = "SELECT DISTINCT `type` FROM `".$this->_table."` WHERE `editable` = 'true' ORDER BY type";
-                return $this->db->getAll($query);
+             /* Show non-editable field data as just plain text
+			  * $query = "SELECT DISTINCT `type` FROM `".$this->_table."` WHERE `editable` = 'true' ORDER BY type";
+			  */
+			$query = "SELECT DISTINCT `type` FROM `".$this->_table."` ORDER BY type";
+
+			return $this->db->getAll($query);
         }
 
         public function getAvailableOptions() {
@@ -85,13 +89,21 @@ class Config extends Model {
         }
 
         public function getAll($orderBy = '', $type = '') {
-                $query = "SELECT * FROM `".$this->_table."` WHERE `editable` = 'true' ";
-                if (!empty($type))
-                        $query .= "AND `type` = '$type' ";
-                if (!empty($orderBy))
-                        $query .= "ORDER BY `$orderBy`";
 
-                return $this->db->getAll($query);
+			/* Show non-editable field data as just plain text
+			 * $query = "SELECT * FROM `".$this->_table."` WHERE `editable` = 'true' ";
+			 */
+			$query = "SELECT * FROM `".$this->_table."` WHERE 1=1 ";
+
+			if (!empty($type)) {
+				$query .= "AND `type` = '$type' ";
+			}
+
+			if (!empty($orderBy)) {
+				$query .= "ORDER BY `$orderBy`";
+			}
+
+			return $this->db->getAll($query);
         }
 
         public function updateArray($configList) {
