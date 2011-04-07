@@ -280,7 +280,7 @@ class PortfolioWebDAV {
                                                                'http://kazon/doclib/',
                                                               );
                     } else {
-                            $pathList = array( 'http://kazon/Student/' . (date('Y') - ($_SESSION['year'] - 7) ) . '/' . $_SESSION['username'] . '/',
+                            $pathList = array( 'http://kazon/Students/' . (date('Y') - ($_SESSION['year'] - 7) ) . '/' . $_SESSION['username'] . '/',
                                                               );
                     }
                     return new self($pathList , "jpc/".$_SESSION['username'], $_SESSION['password']);
