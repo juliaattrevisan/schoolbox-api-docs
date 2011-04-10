@@ -1,16 +1,25 @@
 <?php
-$this->setFile(TEMPLATE_content, 'adminv2/modify-user.html');
+
 
 require_once SITE_root . '/library/user.php';
 require_once SITE_root . '/library/group.php';
 $userHandler = new User;
 $groupHandler = new Group;
 
+/* Superusers only */
+if(!$groupHandler->isSuperuser())
+    error(19);
+
 if(is_numeric($this->arg[0])) {
+
+    $this->setFile(TEMPLATE_content, 'adminv2/modify-user.html');
+
+    /* Modify existing user */
     $user = $userHandler->getByID($this->arg[0]);
 
     if(is_array($user)) {
-        $output = array('FIRSTNAME'         => $user['firstname'],
+        $output = array('USERID'            => $user['uid'],
+                        'FIRSTNAME'         => $user['firstname'],
                         'USERNAME'          => $user['username'],
                         'FULLNAME'          => formatName($user),
                         'DATABASE_ID'       => $user['synergy_id'],
@@ -110,6 +119,28 @@ if(is_numeric($this->arg[0])) {
     }
 }
 else {
-    error(2);
+    $this->setFile(TEMPLATE_content, 'adminv2/new-user.html');
+
+    $this->setVar('DATABASE_TYPE', ucfirst(Cfg::get('external_type')));
+
+    /* Output title list */
+    $this->dropDown('title', $userHandler->getTitleList(),'', TEMPLATE_content, array('titleName'=>'NAME_TITLE'));
+
+    /* Output group list */
+     $this->dropDown('system_group', $userHandler->getGroupList(), '', TEMPLATE_content, array('id'=>'GROUP_ID','name'=>'SYSTEM_GROUP_NAME'));
+
+    /* Output campus list */
+     $this->setBlock(TEMPLATE_content, 'campus','campus_block');
+     $campusList = $userHandler->getCampusList();
+     foreach($campusList as $campus ) {
+
+         $outcampus = array('CAMPUS_ID'         => $campus['id'],
+                        'CAMPUS_NAME'           => $campus['name'],
+                        'CAMPUS_ID_CHECKED'     => '',
+                        'CAMPUS_DEFAULT_CHECKED'    => '',);
+
+         $this->setVar($outcampus);
+         $this->parse('campus_block','campus',true);
+     }
 }
 ?>

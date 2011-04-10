@@ -285,5 +285,227 @@ class User extends Model {
         return $this->db->getAll($query);
 
     }
+
+    function delete($id, $trans)
+	{
+
+		//first transfer ownership of date to another user
+		$this->transferOwnership($id, $trans);
+
+		//remove all submission boxes owned by user
+		$this->cleanSubmissionBoxes($id);
+
+		//remove all work returned to user
+		$this->cleanReturnedWork($id);
+
+		//remove all remaining traces of user
+		$this->cleanUserFromSystem($id);
+
+		//remove user from database
+        parent::delete($id);
+
+	}
+
+
+	function transferOwnership($curr, $new)
+	{
+
+		//update all files
+		$query = "UPDATE file SET owner = '$new' WHERE owner = '$curr'";
+		$this->db->query($query);
+
+		//update all links
+		$query = "UPDATE link SET owner = '$new' WHERE owner = '$curr'";
+		$this->db->query($query);
+
+		//update all news
+		$query = "UPDATE news_items SET item_owner = '$new' WHERE item_owner = '$curr'";
+		$this->db->query($query);
+
+		$query = "UPDATE subject_news SET owner = '$new' WHERE owner = '$curr'";
+		$this->db->query($query);
+
+		//update all forums
+		$query = "UPDATE forum SET owner = '$new' WHERE owner = '$curr'";
+		$this->db->query($query);
+
+	}
+
+	function cleanSubmissionBoxes($id)
+	{
+		//first select all users submission boxes
+		$query = "SELECT id FROM submission_box WHERE owner = '$id'";
+		$result = $this->db->query($query);
+
+		//foreach submission box delete all student submissions
+		while($box = $this->db->getNextArray($result))
+		{
+			//select all student submissions
+			$query = "SELECT id FROM student_submission WHERE box_id = '".$box['id']."'";
+			$this->db->query($query);
+			//for each student submission delete from hdd
+			while($studsub = $this->db->getNextArray() )
+			{
+				if(!@unlink(Cfg::get('submission_dir')."/".$studsub['id'].".dat"))
+					print "Failed to delete: ".Cfg::get('submission_dir')."/".$studsub['id'].".dat";
+			}
+
+			//delete all student submissions from db
+			$query = "DELETE FROM student_submission WHERE box_id = '".$box['id']."'";
+			$this->db->query($query);
+
+		}
+
+		//delete all submission boxes from db
+		$query = "DELETE FROM submission_box WHERE owner = '$id'";
+		$this->db->query($query);
+	}
+
+	function cleanReturnedWork($id)
+	{
+		$query = "SELECT id FROM submission_return WHERE owner = '$id'";
+		$this->db->query($query);
+
+		while($ret = $this->db->getNextArray() )
+		{
+			if(!@unlink(Cfg::get('returns_dir')."/".$ret['id'].".dat"))
+				print "Failed to delete: ".Cfg::get('returns_dir')."/".$ret['id'].".dat";
+		}
+
+		$query = "DELETE FROM submission_return WHERE owner = '$id'";
+		$this->db->query($query);
+	}
+
+	function cleanUserFromSystem($id)
+	{
+		//remove users bookmarks
+		$query = "DELETE FROM bookmarks WHERE owner = '$id'";
+		$this->db->query($query);
+
+		//superusers
+		$query = "DELETE FROM superusers WHERE id = '$id'";
+		$this->db->query($query);
+
+		//user access
+		$query = "DELETE FROM userAccess WHERE uid = '$id'";
+		$this->db->query($query);
+
+		//delete personal calendar events
+		$query = "DELETE FROM event WHERE access = '1' AND owner = '$id'";
+		$this->db->query($query);
+
+		//delete log entries
+		$query = "DELETE FROM homepage_log WHERE user = '$id'";
+		$this->db->query($query);
+		$query = "DELETE FROM submission_log WHERE user = '$id'";
+		$this->db->query($query);
+
+	}
+
+	function update($user)
+	{
+
+        $campusArray = $user['campus'];
+        $defaultCampus = $user['defaultCampus'];
+        $su = $user['su'];
+
+        unset($user['campus']);
+        unset($user['defaultCampus']);
+        unset($user['su']);
+
+        $user['password'] = 'PASSWORD("'.$user['password'].'")';
+
+        parent::update($user);
+
+		if(is_array($campusArray)) {
+         
+            $this->db->delete('userCampus','uid', $user['id']);
+
+			foreach($campusArray as $campus)
+			{
+                $insertCampus = array('uid' => $user['id'], 'campus'=>$campus, 'defaultCampus'=>$campus == $defaultCampus ? 1 : 0);
+                $this->db->insert('userCampus', $insertCampus);
+			}
+		}
+		else
+		{
+            /* Note that this can insert multiple campus if the update only specified a single value like in a bulk load */
+			$campusquery = "INSERT IGNORE INTO userCampus (uid, campus) VALUES ('$id', '$campusarray')";
+			$this->db->query($campusquery);
+		}
+
+        $this->db->delete('superusers', 'id', $user['id']);
+
+		if($su) {
+			$this->db->insert('superusers', array('id'=>$user['id']));
+		}
+
+	}
+
+	function addUser($username, $title, $firstname, $lastname, $synergyid, $group, $campusarray, $year = '', $password = '', $local_email = '', $alt_email = '', $mail_handler = '', $su = 0)
+	{
+		//sanity checks
+		//check username doesnt already exist
+		$query = "SELECT username FROM user WHERE username = '".mysql_real_escape_string($username)."'";
+		$this->db->query($query);
+		if($this->db->countRows() > 0)
+			return 0;
+
+		//insert information into database
+		$user  = array('username'	=> $username,
+						'title'		=> $title,
+						'firstname'	=> $firstname,
+						'lastname'	=> $lastname,
+						'synergy_id' => $synergyid,
+						'group_id'	=> $group,
+						'year'		=> $year,
+						'local_email' => $local_email,
+						'alt_email' => $alt_email,
+						'mail_handler'=> $mail_handler,
+					);
+		$this->db->insert('user', $user);
+
+		$id = $this->db->insertID();
+
+		//if password has been set already set it
+		if($password)
+		{
+            $password = mysql_real_escape_string($password);
+			$query = "UPDATE user SET password = PASSWORD('$password'), email_pass = '$password' WHERE id = '$id'";
+			$this->db->query($query);
+		}
+
+		if(is_array($campusarray) && $id)
+		{
+			foreach($campusarray as $campus)
+			{
+				$campusquery = "INSERT INTO userCampus (uid, campus) VALUES ('$id', '$campus')";
+				$this->db->query($campusquery);
+			}
+		}
+		else if($id && $campusarray)
+		{
+			$campusquery = "INSERT INTO userCampus (uid, campus) VALUES ('$id', '$campusarray')";
+			$this->db->query($campusquery);
+		}
+
+      /* If ticked, add the new user into the Superusers table as well.
+       */
+      if ($su == 1) {
+         $suquery = "INSERT INTO superusers (id) VALUES ('$id')";
+         $this->db->query($suquery);
+      }
+
+		return $id;
+	}
+
+
+    function update($user) {
+
+    }
+
+    function create($user) {
+
+    }
 }
 ?>

@@ -70,7 +70,7 @@ $j(function() {
 				Preferred
 				<fieldset>
 					<label>
-						<select>
+						<select name="title">
                                                     <!-- BEGIN title -->
 							<option value="{NAME_TITLE}" {NAME_TITLE_SELECTED}>{NAME_TITLE}</option>
                                                     <!-- END title -->
@@ -118,19 +118,19 @@ $j(function() {
 					<input type="text" name="lastname" value="{LASTNAME}"/>
 				</label>
 				<label for="password">Password
-					<input type="text" />
-				</label>
-                            	<label for ="superuser" class="width2 ">Superuser
-					<input type="checkbox" name="superusers" {SUPERUSER_CHECKED} />
+					<input type="text" name="password" value="" />
 				</label>
 				<label for="e-portfolio">E-Portfolio
-					<input type="checkbox" name="eportfolio" {EPORTFOLIO_CHECKED} />
+					<input type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
+				</label>
+                <label for ="superuser" class="width2 ">Superuser
+					<input type="checkbox" name="superuser" value="1" {SUPERUSER_CHECKED} />
 				</label>
 				<label for="group">Group
-					<select>
-                                            <!-- BEGIN system_group -->
+					<select name="group">
+                        <!-- BEGIN system_group -->
 						<option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
-                                            <!-- END system_group -->
+                        <!-- END system_group -->
 					</select>
 				</label>
 				<label for="year">Year
@@ -138,6 +138,7 @@ $j(function() {
 				</label>
 			</div>
 		</div>
+            <input type="hidden" name="userID" value="{USERID}" />
             <input type="submit" name="submit" value="Update User" />
 	</form>
 	<div class="float-fix"></div>

@@ -6,6 +6,11 @@ $this->setFile(TEMPLATE_content, 'adminv2/home.html');
 $this->setBlock(TEMPLATE_content, 'group_summary', 'group_summary_block');
 $this->setBlock(TEMPLATE_content, 'recent_log', 'recent_log_block');
 
+$groupHandler = new Group;
+
+if(!$groupHandler->isSuperuser())
+    error(19);
+
 /* Disk space */
 $total = disk_total_space(Cfg::get('file_dir'));
 $free = disk_free_space(Cfg::get('file_dir'));
@@ -100,7 +105,6 @@ $this->setVar($www);
 
 
 /* Group summary */
-$groupHandler = new Group;
 $summary = $groupHandler->userSummary();
 
 foreach($summary as $group) {

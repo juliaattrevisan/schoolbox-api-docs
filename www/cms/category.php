@@ -25,6 +25,7 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'indiv_perms', 'indiv_perms_block');
 	$this->setBlock(TEMPLATE_content, 'indiv_modify', 'indiv_modify_block');
 	$this->setBlock(TEMPLATE_content, 'reset_content', 'reset_content_block');
+    $this->setBlock(TEMPLATE_content, 'synergy_input', 'synergy_input_block');
 
 	$this->setTitle('Modify Category');	
 	$this->setTab('resources');
@@ -36,6 +37,7 @@ if(is_numeric($this->arg[0])) {
 					'PARENT_ID'		=> $category['parent'],
 					'PARENT_NAME'	=> scrubText($categoryParent['name']),
                     'USER_GROUP' => $_SESSION['gid'],
+                    'DATABASE_TYPE' => ucfirst(Cfg::get('external_type')),
 					);
 
     $this->setVar($output);
@@ -74,6 +76,13 @@ if(is_numeric($this->arg[0])) {
 	}
 
 	$this->parse('reset_content_block', 'reset_content');
+
+    if($groupHandler->isSuperuser()) {
+        $this->parse('synergy_input_block','synergy_input');
+    }
+    else {
+        $this->setVar('synergy_input_block','');
+    }
 	
 } else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	if ($this->arg[1] == 0)
@@ -89,6 +98,8 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'indiv_perms', 'indiv_perms_block');
 	$this->setBlock(TEMPLATE_content, 'indiv_modify', 'indiv_modify_block');
 	$this->setBlock(TEMPLATE_content, 'reset_content', 'reset_content_block');
+    $this->setBlock(TEMPLATE_content, 'synergy_input', 'synergy_input_block');
+
 
 	$this->setTitle('Add Category');
 	$this->setTab('resources');	
@@ -101,6 +112,7 @@ if(is_numeric($this->arg[0])) {
                         'PARENT_NAME'	=> scrubText($categoryParent['name']),
                         'REQUIRED_PERMS'=> $_SESSION['gid'],
                         'GROUP_NAME'    => '',
+                        'DATABASE_TYPE' => ucfirst(Cfg::get('database_type')),
                         );
 
 	$this->setVar($output);
@@ -127,6 +139,13 @@ if(is_numeric($this->arg[0])) {
 	$this->parse('indiv_perms_block', 'indiv_perms');
 	$this->setVar('indiv_modify_block', '');
 	$this->setVar('reset_content_block','');
+
+    if($groupHandler->isSuperuser()) {
+        $this->parse('synergy_input_block','synergy_input');
+    }
+    else {
+        $this->setVar('synergy_input_block','');
+    }
 
 	
 } else if($this->arg[0] == 'reset' && is_numeric($this->arg[1])) {

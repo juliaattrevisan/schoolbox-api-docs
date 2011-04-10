@@ -70,23 +70,20 @@ $j(function() {
 					Preferred
 					<fieldset>
 						<label>
-							<select>
+							<select name="title">
 														<!-- BEGIN title -->
 								<option value="{NAME_TITLE}" {TITLE_SELECTED}>{NAME_TITLE}</option>
 														<!-- END title -->
 							</select>
-							<input type="text" name="firstname" value="{FIRSTNAME}" />
+							<input type="text" name="firstname" value="" />
 						</label>
 					</fieldset>
 					</label>
 					<label for ="username" class="width2">Username
-						<input type="text" name="username" value="{USERNAME}" />
+						<input type="text" name="username" value="" />
 					</label>
 					<label for ="database" class="">{DATABASE_TYPE} ID
-						<input type="text" name="database_id" value="{DATABASE_ID}"/>
-					</label>
-					<label for ="superuser" class="width2 ">Superuser
-						<input type="checkbox" name="superusers" {SUPERUSER_CHECKED} />
+						<input type="text" name="database_id" value=""/>
 					</label>
 					<div class="float-fix"></div>
 					<table cellpadding="0" width="50%">
@@ -117,119 +114,30 @@ $j(function() {
 			<div class="split-container">
 				<div class="split last">
 					<label for="surname">Surname
-						<input type="text" name="lastname" value="{LASTNAME}"/>
+						<input type="text" name="lastname" value=""/>
 					</label>
 					<label for="password">Password
-						<input type="text" />
+						<input type="text" name="password"/>
 					</label>
 					<label for="e-portfolio">E-Portfolio
-						<input type="checkbox" name="eportfolio" {EPORTFOLIO_CHECKED} />
+						<input type="checkbox" name="eportfolio" value="1" />
 					</label>
-					<label for="group">Group
-						<select>
-												<!-- BEGIN group -->
-							<option value="{GROUP_ID}" {GROUP_SELECTED}>{GROUP_NAME}</option>
-												<!-- END group -->
-						</select>
+                    <label for ="superuser" class="width2 ">Superuser
+						<input type="checkbox" name="superuser" value="1" />
 					</label>
+                    <label for="group">Group
+                        <select name="group">
+                                                <!-- BEGIN system_group -->
+                            <option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
+                                                <!-- END system_group -->
+                        </select>
+                    </label>
 					<label for="year">Year
-						<input type="text" name="year" value="{YEAR}" />
+						<input type="text" name="year" value="" />
 					</label>
 				</div>
 			</div>
 		</form>
 		<div class="float-fix"></div>
-	</div>
-	<div class="level">
-		<h3>Groups</h3>
-		<table>
-			<colgroup>
-				<col width="40%" />
-				<col width="20%" />
-				<col width="20%" />
-				<col width="20%" />
-			
-			</colgroup>
-			<tbody>
-				<tr>
-					<th>Group Name</th>
-					<th>Access</th>
-					<th>Make Owner</th>
-					<th>Remove</th>
-				</tr>
-				<tr>
-					<td>Test Group</td>
-					<td><input type="checkbox" name="access[]" /></td>
-					<td><a href="/group/modifyForm.php?owner=1&amp;categoryID=17"> make owner</a></td>
-					<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=17"> remove</a></td>
-				</tr>
-				<tr>
-					<td>My new group</td>
-					<td></td>
-					<td>owner</td>
-					<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=158"> remove</a></td>
-				</tr>
-				<tr>
-					<td>Submission Test</td>
-					<td></td>
-					<td>owner</td>
-					<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=140"> remove</a></td>
-				</tr>
-				<tr>
-					<td>Test Class</td>
-					<td></td>
-					<td>owner</td>
-					<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=156"> remove</a></td>
-				</tr>
-				<tr>
-					<td>Alex Tworowsky</td>
-					<td></td>
-					<td>owner</td>
-					<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=162"> remove</a></td>
-				</tr>
-				<tr>
-					<td>Test Folder</td>
-					<td><input type="checkbox" name="access[]" /></td>
-					<td><a href="/group/modifyForm.php?owner=1&amp;categoryID=37"> make owner</a></td>
-					<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=37"> remove</a></td>
-				</tr>
-				<tr>
-					<td>My Class</td>
-					<td><input type="checkbox" name="access[]" /></td>
-					<td><a href="/group/modifyForm.php?owner=1&amp;categoryID=148"> make owner</a></td>
-					<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=148"> remove</a></td>
-				</tr>
-				<tr>
-					<td colspan="4" class="colours-buttons"><select class="formfield float-left" name="sid">
-							<option value="0">&lt;- Please Select a Group -&gt;</option>
-							<option value="162">Alex Tworowsky</option>
-							<option value="165">Demo Class</option>
-							<option value="1">First Test Folder</option>
-							<option value="81">Holiday Workshops</option>
-							<option value="148">My Class</option>
-							<option value="158">My new group</option>
-							<option value="141">Steve's Assignment</option>
-							<option value="140">Submission Test</option>
-							<option value="136">Super Awesome Adventure Club</option>
-							<option value="30">tesdtgs</option>
-							<option value="156">Test Class</option>
-							<option value="18">Test Class 2</option>
-							<option value="37">Test Folder</option>
-							<option value="4">Test Group</option>
-							<option value="17">Test Group</option>
-							<option value="11">Test Group 2</option>
-							<option value="7">Test Image Gallery</option>
-							<option value="34">The Chaplain Writes - (Main)</option>
-						</select>
-						<input type="hidden" value="1" name="uid">
-						<input type="hidden" value="1" name="service">
-						<input type="submit" class="submit-btn-plain" value="Add" name="groupSubmit"></td>
-	
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<div class="level">
-		<h3>Permissions</h3>
 	</div>
 </div>
