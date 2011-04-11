@@ -5,7 +5,7 @@ if(WEATHER_enable)
 	require_once('../library/xml.php');
 	$weather = new XML('http://www.google.com/ig/api?weather=' . urlencode(WEATHER_location));
 	
-	$imageLocation = conType().'demo.portal.alaress-dev.com.au/weather/image.php?path=';
+	$imageLocation = '/weather/image.php?path=';
 
 	for($i = 0; $i < 3; $i++) {
 		$forecast_conditions = $weather->weather->forecast_conditions[$i];

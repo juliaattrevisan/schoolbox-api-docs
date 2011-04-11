@@ -17,6 +17,8 @@ $this->setTitle('Weather Forecast');
 $this->setBlock(TEMPLATE_content, "current", "current_block");
 $this->setBlock(TEMPLATE_content, "forecast", "forecast_block");
 
+$imageLocation = '/weather/image.php?path=';
+
 //set current weather
 $this->setVar(array(
         'LOCATION'  => $weather->weather->forecast_information->city['data'],
@@ -30,7 +32,7 @@ for($i = 0; $i < 4; $i++) {
     $forecast_conditions = $weather->weather->forecast_conditions[$i];
     $this->setVar(array(
         "DAY$i"     => $forecast_conditions->day_of_week['data'],
-        "IMAGE$i"   => $forecast_conditions->icon['data'],
+        "IMAGE$i"   => $imageLocation.$forecast_conditions->icon['data'],
         "PRECIS$i"  => $forecast_conditions->condition['data'],
         "HIGH$i"    => round(($forecast_conditions->high['data'] - 32) / 1.8),
         "LOW$i"     => round(($forecast_conditions->low['data'] - 32) / 1.8)
