@@ -67,7 +67,8 @@ if(is_numeric($this->arg[0])) {
          $groupList = $groupHandler->involvedCategoryList($user['uid']);
          if(is_array($groupList)) {
              foreach($groupList as $group) {
-                 $outputGroup = array('USER_GROUP_NAME'  => $group['name'],
+                 $outputGroup = array(  'USER_GROUP_ID'     => $group['id'],
+                                        'USER_GROUP_NAME'  => $group['name'],
                                       );
 
                  $this->setVar($outputGroup);
@@ -77,6 +78,9 @@ if(is_numeric($this->arg[0])) {
          else {
              $this->setVar('user_group_block','');
          }
+
+         /* Output entire group list TODO make this an ajax search */
+         $this->dropDown('all_group', $groupHandler->groupList(), '', TEMPLATE_content, array('id' => 'ALL_GROUP_ID' , 'name'=>'ALL_GROUP_NAME'));
 
          /* Output permissions */
         $this->setBlock(TEMPLATE_content, 'login_log', 'login_log_block');

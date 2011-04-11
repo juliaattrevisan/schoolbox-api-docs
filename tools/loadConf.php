@@ -73,7 +73,7 @@ $config[] =  array('name' => 'search_type_limit', 'value' => SEARCH_type_limit, 
 $config[] =  array('name' => 'welcome_image_folder', 'value' => WELCOME_image_folder, 'title' => 'Image Rotation Folder ID', 'description'=>'The welcome page image scroller utilises this to find images', 'field'=> 'input', 'type'=>'Welcome','editable'=>'true','hidden'=>'false');
 $config[] =  array('name' => 'welcome_rss_url', 'value' => RSS_url, 'title' => 'URL for RSS', 'description'=>'The URL for the RSS feed displayed on the welcome page', 'field'=> 'input', 'type'=>'Welcome','editable'=>'true','hidden'=>'false');
 $config[] =  array('name' => 'welcome_rss_limit', 'value' => RSS_limit, 'title' => 'RSS Item Limit', 'description'=>'The amount of items displayed from the RSS feed on the welcome page', 'field'=> 'input', 'type'=>'Welcome','editable'=>'true','hidden'=>'false');
-$config[] =  array('name' => 'weather_enable', 'value' => WEATHER_enable?'1':'0', 'title' => 'Enable Weather', 'description'=>'Reguarily fetches weather data from Google weather feeds', 'field'=> 'input', 'type'=>'Welcome','editable'=>'true','hidden'=>'false');
+$config[] =  array('name' => 'weather_enable', 'value' => WEATHER_enable?'1':'0', 'title' => 'Enable Weather', 'description'=>'Reguarily fetches weather data from Google weather feeds', 'field'=> 'boolean', 'type'=>'Welcome','editable'=>'true','hidden'=>'false');
 $config[] =  array('name' => 'weather_location', 'value' => WEATHER_location, 'title' => 'Weather Location', 'description'=>'By default display weather at this location', 'field'=> 'input', 'type'=>'Welcome','editable'=>'true','hidden'=>'false');
 
 

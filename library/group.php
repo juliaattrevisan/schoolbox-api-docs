@@ -48,6 +48,11 @@ class Group extends Model {
             return false;
     }
 
+    function groupList() {
+        $query = "SELECT name, id FROM category, userGroups WHERE cid = id ORDER BY name";
+        return $this->db->getAll($query);
+    }
+
     function createGroup($relationID, $type = 1) {
         $data = array('cid' => $relationID,
             'type' => $type

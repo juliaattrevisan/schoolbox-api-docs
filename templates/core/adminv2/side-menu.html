@@ -1,0 +1,48 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tree/jquery.jstree.js"></script>
+<script type="text/javascript">
+
+$j(function() {
+		$j('ul.sortable').nestedSortable({
+			disableNesting: 'no-nest',
+			forcePlaceholderSize: true,
+			handle: 'div',
+			helper:	'clone',
+			items: 'li',
+			opacity: .6,
+			placeholder: 'placeholder',
+			tabSize: 32,
+			tolerance: 'pointer',
+			toleranceElement: '> div',
+			listType: 'ul',
+			drop: function(event, ui) {
+				//runs when the thing is dropped.
+					
+			}
+		});
+	
+
+});
+
+</script>
+ 
+<!-- END custom_head-->
+
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+	<li><a href="/adminv2/home">Home</a></li>
+	<li><a href="/adminv2/user">Users</a></li>
+	<li><a href="/adminv2/side-menu" class="current">Side Menu</a></li>
+	<li><a href="/adminv2/allowed-file">Allowed Files</a></li>
+	<li><a href="/adminv2/setting">Settings</a></li>
+	<li><a href="/adminv2/calendar">Calendar</a></li>
+	<li><a href="/adminv2/list">Lists</a></li>
+	<li><a href="/adminv2/rollover">Rollover</a></li>
+</ul>
+<div class="admin-contents">
+	<h2>Side Menu</h2>
+        {MENU_TREE}
+
+	
+	<div class="float-fix"></div>
+</div>

@@ -127,8 +127,7 @@ $j(function() {
 					<input type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
 				</label>
                 <label for ="superuser" class="width2 ">Superuser
-					<input type="checkbox" name="superuser" value="1" {SUPERUSER_CHECKED} />
-				</label>
+					<input type="checkbox" name="superuser" value="1" onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME} superuser status?'));" {SUPERUSER_CHECKED} />				</label>
 				<label for="group">Group
 					<select name="group">
                         <!-- BEGIN system_group -->
@@ -142,6 +141,7 @@ $j(function() {
 			</div>
 		</div>
             <input type="hidden" name="userID" value="{USERID}" />
+            <input type="submit" name="delete" value="Delete User" onclick="return(confirm('Are you sure you want to delete {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME}'));" />
             <input type="submit" name="submit" value="Update User" />
 	</form>
 	<div class="float-fix"></div>
@@ -168,7 +168,7 @@ $j(function() {
                 <tbody>
                     <!-- BEGIN user_group -->
 			<tr>
-				<td>{USER_GROUP_NAME}</td>
+				<td><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></td>
 				<td><input type="checkbox" name="access[]" /></td>
 				<td><a href="/group/modifyForm.php?owner=1&amp;categoryID=17"> make owner</a></td>
 				<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=17"> remove</a></td>
@@ -177,30 +177,20 @@ $j(function() {
 
 			
 			<tr>
-				<td colspan="4" class="colours-buttons"><select class="formfield float-left" name="sid">
+
+				<td colspan="4" class="colours-buttons">
+                                    <form action="/adminv2/userForm.php" method="post" >
+                                    <select class="formfield float-left" name="sid">
 						<option value="0">&lt;- Please Select a Group -&gt;</option>
-						<option value="162">Alex Tworowsky</option>
-						<option value="165">Demo Class</option>
-						<option value="1">First Test Folder</option>
-						<option value="81">Holiday Workshops</option>
-						<option value="148">My Class</option>
-						<option value="158">My new group</option>
-						<option value="141">Steve's Assignment</option>
-						<option value="140">Submission Test</option>
-						<option value="136">Super Awesome Adventure Club</option>
-						<option value="30">tesdtgs</option>
-						<option value="156">Test Class</option>
-						<option value="18">Test Class 2</option>
-						<option value="37">Test Folder</option>
-						<option value="4">Test Group</option>
-						<option value="17">Test Group</option>
-						<option value="11">Test Group 2</option>
-						<option value="7">Test Image Gallery</option>
-						<option value="34">The Chaplain Writes - (Main)</option>
+                                                <!-- BEGIN all_group -->
+						<option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
+                                                <!-- END all_group -->
 					</select>
 					<input type="hidden" value="1" name="uid">
 					<input type="hidden" value="1" name="service">
-					<input type="submit" class="submit-btn-plain" value="Add" name="groupSubmit"></td>
+					<input type="submit" class="submit-btn-plain" value="Add" name="groupSubmit">
+                                    </form>
+                                </td>
 
 			</tr>
 		</tbody>
