@@ -1,7 +1,7 @@
 <?php
 //small script to logout users
 
-include("include/include.php");
+include('include/stdfuncs.php');
 
 session_start();
 session_destroy();

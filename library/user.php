@@ -421,6 +421,7 @@ class User extends Model {
         unset($user['su']);
 
         $user['password'] = 'PASSWORD("' . $user['password'] . '")';
+        $user['key'] = substr(md5(uniqid() . time()), 0, 25);
 
         $id = parent::create($user);
 

@@ -17,7 +17,7 @@ if ($groupHandler->isSuperuser()) {
 	$tableName = scrubTEXT($_POST['tableName']);
 
 	$genericHandler = new GenericTable($tableName, $tableIndex);
-	$table = $genericHandler->getTable();
+	$table = $genericHandler->getAll();
 
 	$allColumns = array_diff(array_keys($_POST), $exclusion);
 
