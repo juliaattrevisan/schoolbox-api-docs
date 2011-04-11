@@ -105,6 +105,7 @@ class Submission extends Model {
                         assess.title as description,
                         assess.created_at as created,
                         '' as realname,
+                        0 as accept_submission,
                         category.name as categoryName,
                         categoryCode.code as categoryCode
                     FROM assess

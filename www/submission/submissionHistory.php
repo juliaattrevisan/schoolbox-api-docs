@@ -23,18 +23,9 @@ $groupHandler = new Group;
 $submissionHandler = new Submission;
 $returnHandler = new SubmissionReturn;
 
-/* ideally session children would use the id as the array key as this is ridiculous */
-$childList = array();
 
-if (is_array($_SESSION['children'])) {
-	foreach ($_SESSION['children'] as $child) {
-		$childList[] = $child['id'];
-	}
-}
-
-// get selected user
-if (is_array($_SESSION['children'])) {
-    $userID = $_SESSION['children'][0]['id'];
+if (is_numeric($this->arg[1]) && ($groupHandler->isParentOfChile($this->arg[1]) || $groupHandler->isStaff() || $_SESSION['id'] == $this->arg[1])) {
+	$userID = $this->arg[1];
 }
 else {
     //displaying users on due work, so log this as the last time they viewed due work
@@ -43,23 +34,11 @@ else {
     $userID = $_SESSION['id'];
 }
 
-if (is_numeric($this->arg[1]) && in_array($this->arg[1], $childList)) {
-	$userID = $this->arg[1];
-}
-else if (is_numeric($this->arg[1]) && $groupHandler->isStaff()) {
-	$userID = $this->arg[1];
-}
 
 $user = $userHandler->getByID($userID);
 
 if (!isset($user['uid'])) {
 	error(2);
-}
-
-if (is_array($_SESSION['children'])) {
-	$this->dropDown('child', $_SESSION['children'], $user['uid'], 'is_parent', array('id' => 'CHILD_ID', 'name' => 'CHILD_NAME'));
-
-	$this->parse('is_parent_block', 'is_parent');
 }
 
 // get category list
@@ -70,7 +49,6 @@ if (Cfg::get('external_enable') && $user['synergy_id'])  {
 	$synUser = new ExternalUser;
 	$subjectList = $synUser->getSubjectList($user['synergy_id'], $user['uid']);
 }
-
 
 $categoryList = $groupHandler->involvedCategoryList($user['uid'], $subjectList, 1);
 
@@ -92,20 +70,22 @@ $owner = $userHandler->getByID($submissionBox['owner']);
 
 /* If you aren't in the category, deny access
  */
+
 if (!in_array($submissionBox['category'], $categoryIDList)) {
 	error(17);
 }
 
 $this->setVar(array(
 	'BOX_CATEGORYNAME' => $submissionBox['categoryName'],
+    'BOX_CATEGORYID'    => $submissionBox['cid'],
 	'BOX_DESCRIPTION' => $submissionBox['description'],
-	'BOX_OWNER' => $owner['firstname'] . ' ' . $owner['lastname'],
+	'BOX_OWNER' => '<a href="'.$_SESSION['mailhandle'].formatEmail($owner).'">'.formatName($owner).'</a>',
 	'BOX_DUEDATE' => date(DATE_short_format, strtotime($submissionBox['date'])),
 ));
 
 /* Check whether a file is associated with the work
  */
-if (is_numeric($submissionBox['fid'])) {
+if ($submissionBox['fid'] && is_numeric($submissionBox['fid'])) {
 	$this->setVar(array(
 		'WORK_FILE_ID' => $submissionBox['fid']
 	));
@@ -222,7 +202,11 @@ else {
 		'WORK_BOX_ID' => $submissionBox['id']
 	));
 
-	$this->parse('action_submit_block', 'action_submit');
+    if(mktime() > strtotime($submissionBox['open_date']) && mktime() < strtotime($submissionBox['late_date']) && $submissionBox['accept_submission'])
+	    $this->parse('action_submit_block', 'action_submit');
+    else
+        $this->setVar('action_submit_block','');
+
 	$this->setVar('recent_submission_block', '');
 
 	$this->setVar('subject_block', '');

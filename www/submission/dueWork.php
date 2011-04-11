@@ -156,7 +156,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 	if (is_array($eventList)) {
 		foreach ($eventList as $event) {
 
-			$due = ( !empty($event['realname']) && $event['late_date'] > time() );
+			$due = ( $event['realname'] && $event['open_date'] < time() && $event['late_date'] > time() && $event['accept_submission'] );
 
 			$output = array('EVENT_ID'		=> $event['id'],
 							'TIME'			=> outputDate('h:ia', strtotime($event['date'])),
