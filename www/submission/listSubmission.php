@@ -79,7 +79,7 @@ if(is_array($subList)) {
                 'ASSDESC'     => scrubTEXT($sub['description']),
                 'TYPE'        => $sub['type'],
                 'JAVAASSDESC' => addslashes(scrubTEXT($sub['description'])),
-                'OPENDATE'    => $sub['open_date'],
+                'OPENDATE'    => $sub['accept_submission'] ? $sub['open_date'] : '',
                 'DUEDATE'     => $sub['date'],
                 'MARKED'      => (int) $totals['marked'],
                 'TOTAL'       => $totals['total'],

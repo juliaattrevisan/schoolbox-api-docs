@@ -45,7 +45,7 @@ class Submission extends Model {
                   FROM submission_box
                   LEFT JOIN student_submission
                   ON submission_box.id = student_submission.box_id
-                  WHERE student_submission.owner = '$_SESSION[id]'
+                  WHERE student_submission.owner = '{$_SESSION['id']}'
                   AND category = '$categoryID'
                   ORDER BY category";
 
@@ -93,6 +93,7 @@ class Submission extends Model {
                     UNION
                     (SELECT
                         assess.assess_id as id,
+                        true AS accept_submission,
                         assess.category_id as category,
                         11 as type,
                         assess.user_id as `owner`,
@@ -159,6 +160,7 @@ class Submission extends Model {
 			AND (s.owner = '$userID' OR s.owner IS NULL)
 			AND b.category IN (" . implode(',', $categoryIDList) . ")
 			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC";
+        
 		return $this->db->getAll($query);
 	}
 
@@ -186,13 +188,13 @@ class Submission extends Model {
 		}
 		else if ($type == RETURNED_WORK_TYPE) {
 			$query .= ' UNIX_TIMESTAMP(r.returned) AS date, ';
-			$orderBy = 'UNIX_TIMESTAMP(r.returned)';
+			$orderBy = 'UNIX_TIMESTAMP(r.returned)'; 
 		}
 
 		$query .= "
 			c.name AS categoryName,
 			b.description,
-			b.created, s.submitted, r.returned,
+			b.open_date, b.date, b.late_date, b.created, s.submitted, r.returned,
 			r.comment,
 			r.mark
 			FROM submission_box b
@@ -223,7 +225,30 @@ class Submission extends Model {
 						ORDER BY $orderBy DESC";
 		}
 
-		return $this->db->getAll($query);
+		$result = $this->db->getAll($query);
+
+        /* Convert date fields and set status */
+        $date_fields = array('open_date', 'date', 'due_date', 'late_date', 'submitted', 'returned');
+
+        foreach ($result as &$work) {
+            foreach ($date_fields as $field_name) {
+                if (!empty($work[$field_name])) {
+                    $work[$field_name] = new DateTime($work[$field_name]);
+                }
+            }
+
+            if ($type == UPCOMING_WORK_TYPE) {
+                $work['relevant_date'] = $work['date'];
+            } else if ($type == AWAITING_WORK_TYPE) {
+                $work['relevant_date'] = $work['submitted'];
+            } else if ($type == RETURNED_WORK_TYPE) {
+                $work['relevant_date'] = $work['returned'];
+            }
+
+            $work['status'] = $type;
+        }
+
+        return $result;
 	}
 
 	/**
@@ -357,6 +382,7 @@ class Submission extends Model {
         $query = "(SELECT
                         submission_box.id,
                         submission_box.description,
+                        submission_box.accept_submission,
                         category.id AS catid,
                         GROUP_CONCAT(co.code) code,
                         category.name,
@@ -375,6 +401,7 @@ class Submission extends Model {
                     (SELECT
                         assess.assess_id,
                         assess.title,
+                        true AS accept_submission,
                         assess.category_id AS catid,
                         '' AS code,
                         category.name AS name,

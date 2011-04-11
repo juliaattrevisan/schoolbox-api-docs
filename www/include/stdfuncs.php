@@ -87,13 +87,14 @@ function scrubHTML($html) {
 	require_once dirname(__FILE__) . '/../../include/HTMLPurifier/HTMLPurifier.auto.php';
 
 	$config = HTMLPurifier_Config::createDefault();
-	$config->set('Filter', 'YouTube', true);
-	$config->set('Filter', 'Custom', array(new HTMLPurifier_Filter_Quicktime(), 
+    $config->set('Filter', 'YouTube', true);
+	$config->set('Filter', 'Custom', array(new HTMLPurifier_Filter_Quicktime(),
 										   new HTMLPurifier_Filter_Shockwave(), 
 										   new HTMLPurifier_Filter_Flash(), 
 										   new HTMLPurifier_Filter_WindowsMedia(),
 										   new HTMLPurifier_Filter_Real()));
-	
+    $config->set('Attr', 'AllowedFrameTargets', array('_blank', '_self', '_parent', '_top'));
+
 	return HTMLPurifier::instance()->purify($html, $config);
 }
 

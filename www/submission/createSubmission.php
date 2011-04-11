@@ -38,25 +38,27 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $late_hour = date('g',$late_date);
     $late_min = date('i',$late_date);
 
-    $output = array('HEADING'   => 'Modify',
-                    'ID'       => $subbox['id'],
-					'CATEGORY'	=> $subbox['category'],
-                    'CURRENT_CAT'   => $catOutput,
-                    'DESC'      => $subbox['description'],
-                    'FILEID'    => '',
-                    'OPEN_DATE' => date('d/m/Y', $open_date),
-                    'OPEN_HOUR' => $open_hour,
-                    'OPEN_MIN'  => $open_min,
-                    'OPEN_PM'   => date('a', $open_date) == 'pm'?'selected':'',
-                    'DUE_DATE' => date('d/m/Y', $due_date),
-                    'DUE_HOUR' => $due_hour,
-                    'DUE_MIN'  => $due_min,
-                    'DUE_PM'   => date('a', $due_date) == 'pm'?'selected':'',
-                    'LATE_DATE' => date('d/m/Y', $late_date),
-                    'LATE_HOUR' => $late_hour,
-                    'LATE_MIN'  => $late_min,
-                    'LATE_PM'   => date('a', $late_date) == 'pm'?'selected':'',
-                    );
+    $output = array(
+        'HEADING'       => 'Modify',
+        'ID'            => $subbox['id'],
+        'CATEGORY'      => $subbox['category'],
+        'CURRENT_CAT'   => $catOutput,
+        'DESC'          => $subbox['description'],
+        'FILEID'        => '',
+        'ACCEPT_SUBMISSION' => $subbox['accept_submission'] ? 'checked="checked"' : '',
+        'OPEN_DATE'     => date('d/m/Y', $open_date),
+        'OPEN_HOUR'     => $open_hour,
+        'OPEN_MIN'      => $open_min,
+        'OPEN_PM'       => date('a', $open_date) == 'pm' ? 'selected' : '',
+        'DUE_DATE'      => date('d/m/Y', $due_date),
+        'DUE_HOUR'      => $due_hour,
+        'DUE_MIN'       => $due_min,
+        'DUE_PM'        => date('a', $due_date) == 'pm' ? 'selected' : '',
+        'LATE_DATE'     => date('d/m/Y', $late_date),
+        'LATE_HOUR'     => $late_hour,
+        'LATE_MIN'      => $late_min,
+        'LATE_PM'       => date('a', $late_date) == 'pm' ? 'selected' : '',
+    );
 
 
     $this->setVar($output);
@@ -66,7 +68,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
 
 }
-else if($this->arg[0] == 'new'  ) {
+else if($this->arg[0] == 'new') {
     //Create submission box
     $this->setTitle('Create Submission Box');
 
@@ -129,6 +131,7 @@ else if($this->arg[0] == 'new'  ) {
                     'DESC'      => $file['description'],
                     'FILEID'    => $file['id'],
                     'CATLIST'   => $catOutput,
+                    'ACCEPT_SUBMISSION' => 'checked="checked"',
                     'OPEN_DATE' => date('d/m/Y', $open_date),
                     'OPEN_HOUR' => $open_hour,
                     'OPEN_MIN'  => '00',

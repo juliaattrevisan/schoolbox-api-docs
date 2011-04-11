@@ -8,44 +8,48 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionStudent.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/include/time.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess.php';
 
-$subBoxHandler = new Submission;
+$submission_box_handler = new Submission;
 
-if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour'] && is_numeric($_POST['id'])) {
+if(is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour']) {
+
     /* Modify existing submission box */
-    list($odate,$omonth,$oyear) = explode('/',$_POST['open_date'],3);
-    list($date,$month,$year) = explode('/',$_POST['due_date'],3);
-    list($ldate,$lmonth,$lyear) = explode('/',$_POST['late_date'],3);
-    
-    if(!checkdate($omonth,$odate,$oyear) )
-        error(15);//open date is wrong
-    
-    if(!checkdate($month,$date,$year) )
-        error(15);//due date is wrong
-    
-    if(!checkdate($lmonth,$ldate,$lyear) )
-        error(15);//late date is wrong
-    
-    if(mktime(0,0,0,$month,$date,$year) > mktime(0,0,0,$lmonth,$ldate,$lyear))
-        error(15);//late date is greater than due date
-    
-    //validate time
-    checkTime($_POST['open_hour'],$_POST['open_minute']);
-    checkTime($_POST['due_hour'],$_POST['due_minute']);
-    checkTime($_POST['late_hour'],$_POST['late_minute']);
+    $open_date = DateTime::createFromFormat('d/m/Y', $_POST['open_date'])->setTime($open_hour, $_POST['open_minute']);
+    $due_date  = DateTime::createFromFormat('d/m/Y', $_POST['due_date'])->setTime($open_hour, $_POST['due_minute']);
+    $late_date = DateTime::createFromFormat('d/m/Y', $_POST['late_date'])->setTime($open_hour, $_POST['late_minute']);
 
-    $openTime = ausDateToUnix($_POST['open_date'].' '.$_POST['open_hour'].':'.$_POST['open_minute'].' '.$_POST['open_period'], true);
-    $dueTime = ausDateToUnix($_POST['due_date'].' '.$_POST['due_hour'].':'.$_POST['due_minute'].' '.$_POST['due_period'], true);
-    $lateTime = ausDateToUnix($_POST['late_date'].' '.$_POST['late_hour'].':'.$_POST['late_minute'].' '.$_POST['late_period'], true);
+    if (!$open_date || !$due_date || !$late_date) {
+        error(15);
+    }
 
-    //modify submission box
-    $subbox = array('id'        => $_POST['id'],
-            'open_date' => outputDate(DATE_database, $openTime),
-            'date'      => outputDate(DATE_database, $dueTime),
-            'late_date' => outputDate(DATE_database, $lateTime),
-            'description'=> $_POST['description'],
-            'type'     => $_POST['type'],
+    if ($_POST['due_period'] == 'pm') {
+        $due_date->add(new DateInterval('PT12H'));
+
+    }
+
+    if ($_POST['open_period'] == 'pm') {
+        $open_date->add(new DateInterval('PT12H'));
+    }
+    
+    if ($_POST['late_period'] == 'pm') {
+        $late_date->add(new DateInterval('PT12H'));
+    }
+
+    /* Late date is greater than due date */
+    if (!empty($_POST['accept_submission']) && $due_date > $late_date) {
+        error(15);
+    }
+
+    $submission_box = array(
+        'id'                => $_POST['id'],
+        'accept_submission' => !empty($_POST['accept_submission']) ? true : false,
+        'open_date'         => $open_date->format(Cfg::get('date_database')),
+        'date'              => $due_date->format(Cfg::get('date_database')),
+        'late_date'         => $late_date->format(Cfg::get('date_database')),
+        'description'       => $_POST['description'],
+        'type'              => $_POST['type'],
     );
-	$subBoxHandler->update($subbox);
+
+	$submission_box_handler->update($submission_box);
 
     localRedir("/submission/listSubmission/");
 }
@@ -71,49 +75,53 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
         $fileId = $_POST['fileId'];
     }
 
-    list($odate,$omonth,$oyear) = explode('/',$_POST['open_date'],3);
-    list($date,$month,$year) = explode('/',$_POST['due_date'],3);
-    list($ldate,$lmonth,$lyear) = explode('/',$_POST['late_date'],3);
+    /* Date and Time */
+    $open_date = DateTime::createFromFormat('d/m/Y', $_POST['open_date'])->setTime($open_hour, $_POST['open_minute']);
+    $due_date  = DateTime::createFromFormat('d/m/Y', $_POST['due_date'])->setTime($open_hour, $_POST['due_minute']);
+    $late_date = DateTime::createFromFormat('d/m/Y', $_POST['late_date'])->setTime($open_hour, $_POST['late_minute']);
 
-    if(!checkdate($omonth,$odate,$oyear) )
-        error(15);//open date is wrong
+    if (!$open_date || !$due_date || !$late_date) {
+        error(15);
+    }
 
-    if(!checkdate($month,$date,$year) )
-        error(15);//due date is wrong
+    if ($_POST['due_period'] == 'pm') {
+        $due_date->add(new DateInterval('PT12H'));
 
-    if(!checkdate($lmonth,$ldate,$lyear) )
-        error(15);//late date is wrong
+    }
 
-    if(mktime(0,0,0,$month,$date,$year) > mktime(0,0,0,$lmonth,$ldate,$lyear))
-        error(15);//late date is greater than due date
+    if ($_POST['open_period'] == 'pm') {
+        $open_date->add(new DateInterval('PT12H'));
+    }
 
-    //validate time
-    checkTime($_POST['open_hour'],$_POST['open_minute']);
-    checkTime($_POST['due_hour'],$_POST['due_minute']);
-    checkTime($_POST['late_hour'],$_POST['late_minute']);
+    if ($_POST['late_period'] == 'pm') {
+        $late_date->add(new DateInterval('PT12H'));
+    }
 
-    $openTime = ausDateToUnix($_POST['open_date'].' '.$_POST['open_hour'].':'.$_POST['open_minute'].' '.$_POST['open_period'], true);
-    $dueTime = ausDateToUnix($_POST['due_date'].' '.$_POST['due_hour'].':'.$_POST['due_minute'].' '.$_POST['due_period'], true);
-    $lateTime = ausDateToUnix($_POST['late_date'].' '.$_POST['late_hour'].':'.$_POST['late_minute'].' '.$_POST['late_period'], true);
+    /* Late date is greater than due date */
+    if (!empty($_POST['accept_submission']) && $due_date > $late_date) {
+        error(15);
+    }
+    
+    /* Create Submission Box */
+    $submission_box = array(
+        'category'          => $_POST['category'],
+        'accept_submission' => !empty($_POST['accept_submission']) ? true : false,
+        'open_date'         => $open_date->format(Cfg::get('date_database')),
+        'date'              => $due_date->format(Cfg::get('date_database')),
+        'late_date'         => $late_date->format(Cfg::get('date_database')),
+        'description'       => $_POST['description'],
+        'type'              => $_POST['type'],
+        'fid'               => $fileId,
+        'created'           => 'NOW()',
+        'owner'             => $_SESSION['id'],
+    );
 
-	//modify submission box
-	$subbox = array('category'        => $_POST['category'],
-			'open_date' => outputDate(DATE_database, $openTime),
-			'date'      => outputDate(DATE_database, $dueTime),
-			'late_date' => outputDate(DATE_database, $lateTime),
-			'description'=> $_POST['description'],
-			'type'     => $_POST['type'],
-			'fid'       => $fileId,
-			'created'   => 'NOW()',
-			'owner'		=> $_SESSION['id'],
-	);
-
-	$subBoxHandler->create($subbox);
+	$submission_box_handler->create($submission_box);
 
     localRedir("/submission/listSubmission/");
 }
 else if(isset($_GET['deleteBox']) && is_numeric($_GET['deleteBox'])) {
-	$subBoxHandler->delete($_GET['deleteBox']);
+	$submission_box_handler->delete($_GET['deleteBox']);
 
 	localRedir("/submission/listSubmission/");
 }

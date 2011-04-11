@@ -2,7 +2,7 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
 	$j(function() {
-		$j('#open_date, #due_date, #late_date').datepicker({ 
+        $j('#open_date, #due_date, #late_date').datepicker({
 			dateFormat: 'dd/mm/yy',
 			showOn: 'both',
 			buttonImage: '/images/demo/calendar/calendar-click.png',
@@ -17,6 +17,17 @@
             }
 		});
 
+        $j('input:checkbox[name=accept_submission]').change(function () {
+            if ($j(this).attr('checked')) {
+                $j('table.standardForm tr:nth-last-child(1), table.standardForm tr:nth-last-child(3)').show();
+            } else {
+                $j('table.standardForm tr:nth-last-child(1), table.standardForm tr:nth-last-child(3)').hide();
+            }
+        });
+
+        if (!$j('input:checkbox[name=accept_submission]').attr('checked')) {
+            $j('table.standardForm tr:nth-last-child(1), table.standardForm tr:nth-last-child(3)').hide();
+        }
 	});
 </script>
 <!-- END custom_head -->
@@ -57,6 +68,11 @@
                     <option value="{TYPE_VALUE}" {TYPE_VALUE_SELECTED}>{TYPE_TEXT}</option>
                     <!-- END type_drop -->
                 </select></td>
+        </tr>
+        <tr>
+            <td><h4>Accept Submissions</h4>
+                <em>Should the submission box accept electronic submissions.</em></td>
+				<td><input name="accept_submission" type="checkbox" value="true" {ACCEPT_SUBMISSION}></td>
         </tr>
         <tr>
             <td class="formLabelWidth"><h4>Open Date</h4>

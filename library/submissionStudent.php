@@ -48,6 +48,22 @@ class SubmissionStudent extends Model {
 		return is_array($this->db->getRow($query));
 	}
 
+    function submittable ($user_id, $submission_box_id) {
+        $query = "
+			sb.description,
+			sb.open_date, sb.date, sb.late_date, sb.created, ss.submitted, r.returned,
+			c.name AS categoryName,
+			FROM submission_box sb
+			LEFT JOIN student_submission ss ON ss.box_id = sb.id
+			LEFT JOIN submission_return sr ON sr.box_id = sb.id AND sb.owner = sr.owner
+			LEFT JOIN category c ON c.id = sb.category
+			LEFT JOIN file f ON sb.fid = f.id
+			WHERE sb.deleted = 0
+			AND (sb.owner = '$userID' OR sb.owner IS NULL)
+			AND b.category IN (" . implode(',', $categoryIDList) . ")
+			AND $orderBy IS NOT NULL";
+    }
+
     function securityCheck($box_id) {
         //check if already submitted
         if($this->checkSubmitted($box_id, $_SESSION['id']))

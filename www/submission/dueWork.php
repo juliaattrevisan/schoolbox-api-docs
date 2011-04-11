@@ -1,9 +1,9 @@
 <?php
+
 require_once SITE_root . '/library/submission.php';
 require_once SITE_root . '/library/submissionReturn.php';
 require_once SITE_root . '/library/group.php';
 require_once SITE_root . '/library/user.php';
-
 
 /**
  * Order by date descending.
@@ -13,10 +13,10 @@ require_once SITE_root . '/library/user.php';
  * @return <type>
  */
 function cmp($a, $b) {
-	if ($a['date'] == $b['date']) {
+	if ($a['relevant_date'] == $b['relevant_date']) {
 		return 0;
 	}
-	else if ($a['date'] < $b['date']) {
+	else if ($a['relevant_date'] < $b['relevant_date']) {
 		return 1;
 	}
 
@@ -43,6 +43,9 @@ $groupHandler = new Group;
 $userHandler = new User;
 $returnHandler = new SubmissionReturn;
 $submissionHandler = new Submission;
+
+/* Instantiate for current date time */
+$current_time = new DateTime();
 
 /* ideally session children would use the id as the array key as this is ridiculous */
 $childList = array();
@@ -221,61 +224,67 @@ foreach(array($allUpcomingWork, $allAwaitingWork, $allReturnedWork) as $current)
 usort($allWork, 'cmp');
 
 $this->setBlock(TEMPLATE_content, 'work', 'work_block');
-$this->setBlock('work', 'action_submit', 'action_submit_block');
-$this->setBlock('work', 'status_due', 'status_due_block');
-$this->setBlock('work', 'status_awaiting_review', 'status_awaiting_review_block');
-$this->setBlock('work', 'status_marked', 'status_marked_block');
 
-/* Alternating row color index
- */
+/* Alternating row color index */
 $j = 0;
 
-if(count($allWork)>0) {
+if(count($allWork) > 0) {
     foreach($allWork as $currentWork) {
-	$this->setVar(array(
-		'WORK_SUBJECT' => $currentWork['categoryName'],
-		'WORK_DESCRIPTION' => $currentWork['description'],
-		'WORK_STATUS' => $status,
-		'WORK_DATE' => date(DATE_short_format, $currentWork['date']),
-		'WORK_BOX_ID' => $currentWork['bid'],
-		'WORK_FILE_ID' => $currentWork['fid'],
-		'ROW_COLOR' => !($j%2) ? 'dark' : ''
-	));
+        
+        if ($currentWork['status'] == UPCOMING_WORK_TYPE) {
 
-	/* Determine action link IDs and statuses
-	 */
-	if ($currentWork['submitted'] != '') {
-		if ($currentWork['returned'] != '') {
-			$this->setVar(array(
-				'MARK' => $currentWork['mark']
-			));
+            if ($current_time > $currentWork['open_date']) {
 
-			$this->setVar('status_due_block', '');
-			$this->setVar('status_awaiting_review_block', '');
-			$this->parse('status_marked_block', 'status_marked');
-		}
-		else {
-			$this->setVar('status_due_block', '');
-			$this->parse('status_awaiting_review_block', 'status_awaiting_review');
-			$this->setVar('status_marked_block', '');
-		}
-	}
-	else {
-		$this->parse('status_due_block', 'status_due');
-		$this->setVar('status_awaiting_review_block', '');
-		$this->setVar('status_marked_block', '');
-	}
+                if ($current_time < $currentWork['date']) {
+                    $status = 'Work due';
+                    $action = 'Submit Work';
+                } elseif ($current_time < $currentWork['late_date']) {
+                    $status = 'Work overdue';
+                    $action = 'Submit Work';
+                } else {
+                    $status = 'Missed due date';
+                    $action = 'Submit Work';
+                }
 
-	$this->parse('work_block', 'work', true);
+            } else {
+                $status = 'Open date approaching';
+                $action = 'View Details';
+            }
+            
+        } elseif ($currentWork['status'] == AWAITING_WORK_TYPE) {
+            $action = 'View Details';
 
-	$this->setVar('action_submit_block', '');
-	$this->setVar('action_view_history_block', '');
-	$this->setVar('status_due_block', '');
-	$this->setVar('status_awaiting_review_block', '');
-	$this->setVar('status_marked_block', '');
-	
-	$j++;
+            if ($current_time < $currentWork['date']) {
+                $status = 'Work submitted';
+            } elseif ($currentWork['submitted'] < $currentWork['late_date']) {
+                $status = 'Work submitted late';
+            }
+        } elseif ($currentWork['status'] == RETURNED_WORK_TYPE) {
+            $action = 'View Details';
+
+            if (!empty($currentWork['mark'])) {
+                $status = 'Work marked';
+            } else {
+                $status = 'Work returned';                
+            }
+        }
+
+        $this->setVar(array(
+            'WORK_SUBJECT' => $currentWork['categoryName'],
+            'WORK_DESCRIPTION' => $currentWork['description'],
+            'WORK_ACTION' => $action,
+            'WORK_STATUS' => $status,
+            'WORK_DATE'   => $currentWork['relevant_date']->format(Cfg::get('date_short')),
+            'WORK_BOX_ID' => $currentWork['bid'],
+            'WORK_FILE_ID' => $currentWork['fid'],
+            'ROW_COLOR' => !($j % 2) ? 'dark' : ''
+        ));
+
+        $this->parse('work_block', 'work', true);
+
+        $j++;
     }
+    
 }
 else {
     $this->setVar('work_block','');
