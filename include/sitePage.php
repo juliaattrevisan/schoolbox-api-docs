@@ -102,7 +102,7 @@ class SitePage extends Page {
 		}
 
 		$templateVar = array(	'TEMPLATE_YEAR' => date('Y'),
-					'SITE_NAME'     => Cfg::get('site_name'),
+					'SITE_NAME'     => Cfg::get('school_name'),
 					'SITE_ADDRESS'	=> Cfg::get('site_address'),
 					'SITE_GREETING' => greeting(),
 					'SITE_LOGINNAME'=> formatName($_SESSION),

@@ -14,7 +14,7 @@ if ($groupHandler->isSuperuser()) {
 	$tableName = 'config';
 
 	$genericHandler = new GenericTable($tableName, $tableIndex);
-	$table = $genericHandler->getTable();
+	$table = $genericHandler->getAll();
 
 	$allRows = array_keys($_POST);
 

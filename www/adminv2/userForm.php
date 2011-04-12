@@ -13,7 +13,12 @@ if(!$groupHandler->isSuperuser())
     error(19);
 
 if(is_numeric($_POST['userID']) && $_POST['username'] ) {
-    
+
+    if($_POST['delete']) {
+        $userHandler->delete($_POST['userID']);
+        localRedir('/adminv2/user/');
+    }
+
     $user = array(  'id'            => $_POST['userID'],
                     'username'      => $_POST['username'],
                     'title'         => $_POST['title'],
@@ -54,9 +59,19 @@ else if( $_POST['username']) {
     $userHandler->create($user);
     localRedir('/adminv2/modify-user/'.$user['id']);
 }
-else if($_POST['delete']) {
-
+else if($_POST['service'] && $_POST['uid'] && $_POST['type']) {
+    /* Update service */
+    $groupHandler->setService($_POST['service']);
+    $groupHandler->setUserGroupType($_POST['sid'], $_POST['uid'], $_POST['type']);
+    //localRedir('/adminv2/modify-user/'.$_POST['uid']);
 }
+else if($_POST['service'] && $_POST['uid']) {
+    /* Add user to group */
+    $groupHandler->setService($_POST['service']);
+    $groupHandler->addUser($_POST['sid'], $_POST['uid'], $_POST['type']);
+    localRedir('/adminv2/modify-user/'.$_POST['uid']);
+}
+
 else if($_POST['login']) {
     require_once SITE_root . '/include/session.php';
     
@@ -65,8 +80,11 @@ else if($_POST['login']) {
     if($sessionHandler->create($_POST['login']))
             localRedir('/');
     else
-        localRedir('/adminv2/home/');
+        localRedir('/adminv2/user/');
 
+}
+else {
+    localRedir('/adminv2/user/');
 }
 
 

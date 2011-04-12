@@ -87,11 +87,18 @@ class ePortfolio {
      * @return <type>
      */
 	function getComponentList() {
-		$query = "SELECT id, name, component, description FROM eportfolio_comp e
-				  LEFT JOIN eportfolio_comp_location l ON l.component = e.id AND uid = '{$this->uid}'
-				  WHERE ( invisible = 'false' OR l.component IS NOT NULL ) ORDER BY name";
+
+            		$query = "SELECT t.eportfolioComponentCategoryID AS categoryID, t.name as categoryName, id, c.name, component, description, allowMultiple,
+                    (SELECT COUNT(*) FROM eportfolio_comp_location hcl WHERE hcl.component = c.id AND hcl.uid = {$this->uid}) as componentCount
+                    FROM eportfolio_comp c
+                    JOIN eportfolio_comp_category t ON t.eportfolioComponentCategoryID = eportfolioCategoryID
+                    LEFT JOIN eportfolio_comp_location l ON l.component = c.id AND uid = {$this->uid}
+
+                  WHERE ( invisible = 'false' OR l.component IS NOT NULL ) GROUP BY id ORDER BY eportfolioCategoryID, c.name";
+
 
 		return $this->db->getAll($query);
+
 	}
 
     /**
@@ -164,9 +171,30 @@ class ePortfolio {
         }
 	}
 
+
+        function addComponent($component) {
+            $query = "SELECT config FROM eportfolio_comp WHERE id = '$component'";
+            $componentSetup = $this->db->getRow($query);
+
+             /* We are inserting component at the top of the left column so we move all the existing components down */
+            $query = "UPDATE eporfolio_comp_location SET position = position+1 WHERE uid = ".$this->uid." AND `column` = 1";
+            $this->db->query($query);
+
+            $this->saveComponentPosition($component, 1, 1, $newComp['config']);
+        }
+
+
+
+
 	function deleteComponentPositions() {
 		$this->db->delete('eportfolio_comp_location', 'uid', $this->uid);
 	}
+
+    function deleteComponent($component) {
+        $query = "DELETE FROM eportfolio_comp_location WHERE cid = '$this->cid' AND homepageComponentLocationID = '$component'";
+        $this->db->query($query);
+    }
+
 
     /**
      * Updates location of components.

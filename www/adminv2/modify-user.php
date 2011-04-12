@@ -21,6 +21,8 @@ if(is_numeric($this->arg[0])) {
         $output = array('USERID'            => $user['uid'],
                         'FIRSTNAME'         => $user['firstname'],
                         'USERNAME'          => $user['username'],
+                        'ESCAPE_FIRSTNAME'  => addslashes($user['firstname']),
+                        'ESCAPE_LASTNAME'   => addslashes($user['lastname']),
                         'FULLNAME'          => formatName($user),
                         'DATABASE_ID'       => $user['synergy_id'],
                         'SUPERUSER_CHECKED' => $user['su']==1?'checked="checked"':'',
@@ -69,6 +71,9 @@ if(is_numeric($this->arg[0])) {
              foreach($groupList as $group) {
                  $outputGroup = array(  'USER_GROUP_ID'     => $group['id'],
                                         'USER_GROUP_NAME'  => $group['name'],
+                                        'READ_CHECKED'      => $group['type']==1?'checked="checked"':'',
+                                        'WRITE_CHECKED'      => $group['type']==2?'checked="checked"':'',
+                                        'ADMIN_CHECKED'      => $group['type']==3?'checked="checked"':'',
                                       );
 
                  $this->setVar($outputGroup);
@@ -83,6 +88,39 @@ if(is_numeric($this->arg[0])) {
          $this->dropDown('all_group', $groupHandler->groupList(), '', TEMPLATE_content, array('id' => 'ALL_GROUP_ID' , 'name'=>'ALL_GROUP_NAME'));
 
          /* Output permissions */
+         $this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
+         $this->setBlock(TEMPLATE_content, 'user_news', 'user_news_block');
+         $this->setBlock(TEMPLATE_content, 'user_cms', 'user_cms_block');
+         $this->setVar(array('user_calendar_block'=>'','user_news_block'=>'', 'user_cms_block'=>''));
+         $permList = $groupHandler->getAllUserAccess($user['uid']);
+         if(is_array($permList)) {
+             foreach($permList as $perm) {
+
+                 $permOutput = array('SERVICE_ID'       =>$perm['service'],
+                                     'READ_CHECKED'     => $perm['type']==1?'checked="checked"':'',
+                                     'WRITE_CHECKED'    => $perm['type']==2?'checked="checked"':'',
+                                     'ADMIN_CHECKED'    => $perm['type']==3?'checked="checked"':'',);
+                 $this->setVar($permOutput);
+
+                 switch($perm['service']) {
+                     case 2: //calendar
+                         $this->dropDown('perm_campus', $userHandler->getCampusList(), $perm['sid'], 'user_calendar', array('id'=>'PERM_CAMPUS_ID','name'=>'PERM_CAMPUS_NAME'));
+                         $this->parse('user_calendar_block', 'user_calendar', true);
+                     break;
+
+                     case 3: //news
+                         $this->parse('user_calendar_block', 'user_news', true);
+                     break;
+
+                     case 5: //cms
+                         $this->parse('user_calendar_block', 'user_cms', true);
+                     break;
+                 }
+             }
+         }
+
+
+         /* Output login log */
         $this->setBlock(TEMPLATE_content, 'login_log', 'login_log_block');
         $loginLog = $userHandler->getUserLogins($user['username']);
         if(is_array($loginLog)) {
@@ -97,8 +135,6 @@ if(is_numeric($this->arg[0])) {
         }
         else
             $this->setVar('login_log_block', '');
-
-         /* Output login log */
 
 
          /* Output activity log */

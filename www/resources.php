@@ -107,6 +107,11 @@ if (is_array($categoryList)) {
 		}
 	}
 
+        /* If no permission to folders handle blank block */
+        if(!$output['CATEGORY_ID']) {
+            $this->setVar('category_list_block', '');
+        }
+
 	/* Prevent certain options from appearing unless you are a superuser
 	 */
 

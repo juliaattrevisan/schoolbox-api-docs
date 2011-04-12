@@ -9,9 +9,10 @@
  * It will be used to fill the image bank with appropriate *
  * size images for display.				   */
 
-require_once("../include/include.php");
-require_once("../include/session.php");
+require_once("../../include/sitePage.php");
 require_once("../include/permission.php");
+
+$page = new SitePage;
 
 define("MAX_IMAGE_SIZE", 60000000);
 

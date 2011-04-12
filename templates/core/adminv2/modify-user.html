@@ -150,28 +150,27 @@ $j(function() {
 	<h3>Groups</h3>
 	<table>
 		<colgroup>
+			<col width="10%" />
+			<col width="50%" />
 			<col width="40%" />
-			<col width="20%" />
-			<col width="20%" />
-			<col width="20%" />
 		
 		</colgroup>
 		<thead>
                   
 			<tr>
+                                <th>Remove</th>
 				<th>Group Name</th>
 				<th>Access</th>
-				<th>Make Owner</th>
-				<th>Remove</th>
+				
 			</tr>
                 </thead>
                 <tbody>
                     <!-- BEGIN user_group -->
 			<tr>
-				<td><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></td>
-				<td><input type="checkbox" name="access[]" /></td>
-				<td><a href="/group/modifyForm.php?owner=1&amp;categoryID=17"> make owner</a></td>
-				<td><a href="/group/modifyForm.php?delete=1&amp;categoryID=17"> remove</a></td>
+                            <td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ><img title="remove" src="/images/famicons/delete.png" /></a></td>
+                            <td><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></td>
+                            <td><form action="/adminv2/userForm.php"><input type="radio" name="type" value="1" {READ_CHECKED} />Read <input type="radio" name="type" value="2" {WRITE_CHECKED} />Write <input type="radio" name="type" value="3" {ADMIN_CHECKED} />Group Admin<input type="hidden" name="uid" value="{USERID}" /><input type="hidden" name="sid" value="{USER_GROUP_ID}" /></form></td>
+				
 			</tr>
                         <!-- END user_group -->
 
@@ -186,8 +185,9 @@ $j(function() {
 						<option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
                                                 <!-- END all_group -->
 					</select>
-					<input type="hidden" value="1" name="uid">
+					<input type="hidden" value="{USERID}" name="uid">
 					<input type="hidden" value="1" name="service">
+                                        <input type="hidden" value="1" name="type">
 					<input type="submit" class="submit-btn-plain" value="Add" name="groupSubmit">
                                     </form>
                                 </td>
@@ -198,6 +198,71 @@ $j(function() {
 </div>
 <div class="level">
 	<h3>Permissions</h3>
+        <table>
+		<colgroup>
+			<col width="10%" />
+			<col width="20%" />
+			<col width="30%" />
+                        <col width="40%" />
+		</colgroup>
+		<thead>
+
+			<tr>
+                                <th>Remove</th>
+                                <th>Service</th>
+				<th>Region</th>
+				<th>Access</th>
+                                
+			</tr>
+                </thead>
+                <tbody>
+                        <!-- BEGIN user_calendar -->
+			<tr>
+				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
+                                <td>Calendar</td>
+                                <td><select name="sid"><!-- BEGIN perm_campus --><option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_CHECKED} >{PERM_CAMPUS_NAME}</option><!-- END perm_campus --></select></td>
+				<td><form action="/adminv2/userForm.php"><input type="radio" name="type" value="1" {READ_CHECKED} />Read <input type="radio" name="type" value="2" {WRITE_CHECKED} />Write <input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate<input type="hidden" name="uid" value="{USERID}" /><input type="hidden" name="sid" value="{USER_GROUP_ID}" /><input type="hidden" name="service" value="{SERVICE_ID}" /></form></td>
+				
+			</tr>
+                        <!-- END user_calendar -->
+                        <!-- BEGIN user_news-->
+			<tr>
+				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
+                                <td>News</td>
+                                <td><select name="sid">{PERM_CAMPUS_BLOCK}</select></td>
+				<td><form action="/adminv2/userForm.php"><input type="radio" name="type" value="1" {READ_CHECKED} />Read <input type="radio" name="type" value="2" {WRITE_CHECKED} />Write <input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate<input type="hidden" name="uid" value="{USERID}" /><input type="hidden" name="sid" value="{USER_GROUP_ID}" /><input type="hidden" name="service" value="{SERVICE_ID}" /></form></td>
+				
+			</tr>
+                        <!-- END user_news -->
+                        <!-- BEGIN user_cms -->
+			<tr>
+				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
+                                <td>CMS</td>
+                                <td>&nbsp;</td>
+				<td><form action="/adminv2/userForm.php"><input type="radio" name="type" value="1" {READ_CHECKED} />Read <input type="radio" name="type" value="2" {WRITE_CHECKED} />Write <input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate<input type="hidden" name="uid" value="{USERID}" /><input type="hidden" name="sid" value="{USER_GROUP_ID}" /><input type="hidden" name="service" value="{SERVICE_ID}" /></form></td>
+			</tr>
+                        <!-- END user_cms -->
+
+			<tr>
+
+				<td colspan="4" class="colours-buttons">
+                                    <form action="/adminv2/userForm.php" method="post" >
+                                    <select class="formfield float-left" name="service">
+						<option value="0">&lt;- Please Select a service -&gt;</option>
+						<option value="2">Calendar</option>
+                                                <option value="3">News</option>
+                                                <option value="5">CMS</option>
+					</select>
+					<input type="hidden" value="{USERID}" name="uid">
+					<input type="hidden" value="0" name="sid">
+                                        <input type="hidden" value="1" name="type">
+					<input type="submit" class="submit-btn-plain" value="Add" name="groupSubmit">
+                                    </form>
+                                </td>
+
+			</tr>
+		</tbody>
+	</table>
 </div>
 <div class="level last">
 	<h3>Recent Activity Logs</h3>

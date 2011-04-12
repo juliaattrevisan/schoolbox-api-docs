@@ -39,6 +39,11 @@ class Group extends Model {
         return $this->db->getAll($query);
     }
 
+    function getAllUserAccess($uid) {
+        $query = "SELECT service, luServices.name, sid, type FROM userAccess JOIN luServices ON service=luServices.id WHERE uid='$uid'";
+        return $this->db->getAll($query);
+    }
+
     function groupExists($relationID) {
         $query = "SELECT cid FROM userGroups WHERE cid = $relationID";
         $result = $this->db->getRow($query);
@@ -66,6 +71,11 @@ class Group extends Model {
             'cid' => $relationID,
         );
         $this->update($data);
+    }
+
+    function setUserGroupType($sid, $uid, $type) {
+        $query = "UPDATE userAccess SET type = '$type' WHERE uid = '$uid' AND service = '. $this->_service .' AND sid = '$sid'";
+        $this->db->query($query);
     }
 
     function getOwner($relationID) {

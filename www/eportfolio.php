@@ -49,6 +49,111 @@ if ($eportfolioHandler->canEdit($userID)) {
     $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
     $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
     $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
+    $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
+
+
+    $this->setBlock('customise_page', 'homepage_component_tab', 'homepage_component_tab_block');
+    $this->setBlock('customise_page', 'homepage_component_page', 'homepage_component_page_block');
+    $this->setBlock('homepage_component_page', 'homepage_component', 'homepage_component_block');
+
+    $this->parse('edit_page_block', 'edit_page');
+	$this->parse('modify_layout_block', 'modify_layout');
+    $this->parse('customise_page_block', 'customise_page');
+
+
+
+
+    /* Output components and component tabs */
+    $componentList = $eportfolioHandler->getComponentList();
+
+    if(is_array($componentList)) {
+        $total = count($componentList);
+        $i = 0;
+        foreach($componentList as $component) {
+            $i++;
+                $class ='';
+            if($component['allowMultiple'] == 'false' && $component['componentCount'] > 0)
+                $class = 'disabled ';
+            if($component['allowMultiple'] == 'false') {
+                $class .= 'one-only';
+            }
+            else
+                $class = '';
+
+            $output = array('HOMEPAGE_COMPONENT_ID'   => scrubTEXT($component['id']),
+                            'HOMEPAGE_COMPONENT_NAME'   => scrubTEXT($component['name']),
+                            'HOMEPAGE_COMPONENT_COUNT'  => $component['componentCount'],
+                            'HOMEPAGE_COMPONENT_DESCRIPTION'    => scrubTEXT($component['description']),
+                            'HOMEPAGE_COMPONENT_CLASS'  => $class,
+                            'HOMEPAGE_COMPONENT_CATEGORY_ID' => $previous['categoryID']);
+            $this->setVar($output);
+
+            if($component['categoryName'] != $previous['categoryName'] && $i > 1) {
+
+                $this->parse('homepage_component_page_block', 'homepage_component_page', true);
+
+                $this->setVar('homepage_component_block', '');
+                $this->parse('homepage_component_block', 'homepage_component', true);
+
+            	/* last rotation */
+                if ($total == $i) {
+                    $this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component['categoryID']);
+                    $this->parse('homepage_component_page_block', 'homepage_component_page', true);
+                }
+
+            } elseif ($total == $i) {
+                /* last rotation */
+                $this->parse('homepage_component_block', 'homepage_component', true);
+                $this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component['categoryID']);
+                $this->parse('homepage_component_page_block', 'homepage_component_page', true);
+            } else {
+                $this->parse('homepage_component_block', 'homepage_component', true);
+            }
+
+            $previous = $component;
+
+            $tabList[$component['categoryID']]['name'] = $component['categoryName'];
+            $tabList[$component['categoryID']]['count']++;
+
+        }
+    }
+
+    foreach($tabList as $id => $tab) {
+        $output = array('COMPONENT_CATEGORY_ID' => $id,
+                        'COMPONENT_CATEGORY_NAME' => $tab['name'],
+                        'COMPONENT_CATEGORY_COUNT' => $tab['count']);
+        $this->setVar($output);
+        $this->parse('homepage_component_tab_block', 'homepage_component_tab', true);
+    }
+
+        $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
+        // Colors
+	$listColor = $eportfolioHandler->getColorList();
+	$this->setVar('COLOUR_ARRAY', 'original');
+	$this->setVar($listColor);
+	$this->parse('colour_list_block', 'colour_list', true);
+
+        // Colors
+	$this->setVar('COLOUR_ARRAY', 'pickers');
+	$this->setVar($listColor);
+	$this->parse('colour_list_block', 'colour_list', true);
+
+
+	// defaults
+	$defaultColour = unserialize(HOMEPAGE_colors);
+	$this->setVar('COLOUR_ARRAY', 'defaults');
+	$this->setVar($defaultColour);
+	$this->parse('colour_list_block', 'colour_list', true);
+
+    //Template control
+	$template = $eportfolioHandler->getTemplate();
+	for($x = 1; $x <= 4; $x++) {
+		$output = array("CURRENT_TEMPLATE_$x"	=> $template == $x ? 'current' : '',
+						);
+		$this->setVar($output);
+	}
+
+
 
     /* Apply theme colours
      */
