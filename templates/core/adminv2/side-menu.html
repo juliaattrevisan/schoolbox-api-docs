@@ -3,15 +3,24 @@
 <script type="text/javascript">
 $j(function () {
 	$j("#side-menu").jstree({
-                "core" : { "initially_open" : [ "node0" ] },
-		"plugins" : [ "themes", "html_data", "dnd" ],
-                "themes" : {
+        "core" : { "initially_open" : [ "node_0" ] },
+		"plugins" : [ "themes", "html_data", "dnd","crrm"],
+        "themes" : {
 			"theme" : "apple",
-			"dots" : false,
+			"dots" : true,
 			"icons" : false
-		}
-	});
+		},
+        
+	}).bind('move_node.jstree', function(e, data) {
+        var pos = data.rslt.p;
+        var tid = data.rslt.r[0].id.split('_').pop();
+        var oid = data.rslt.o[0].id.split('_').pop();
+          $j.ajax({ url: '/adminv2/side-menuForm.php',
+                    data: {pos:pos, tid:tid, oid:oid}});
+
+    });
 });
+
 </script>
 <!-- END custom_head -->
 
@@ -28,6 +37,7 @@ $j(function () {
 </ul>
 <div class="admin-contents">
 	<h2>Side Menu</h2>
+    <a href="/adminv2/modify-side-menu/">Add New</a>
         <div id="side-menu">
         {MENU_TREE}
         </div>

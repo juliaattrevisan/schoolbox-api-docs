@@ -62,7 +62,7 @@ class sideMenu extends Model {
                             $target = " target={$list[$i]['target']}";
                     else $target = '';
 
-                    $text .= '<li id="node'.$list[$i]['id'].'"><span>'.$list[$i]['txt'].'</span><a href="/adminv2/modify-side-menu/'.$list[$i]['id'].'">Edit</a>';
+                    $text .= '<li id="node_'.$list[$i]['id'].'"><a href="/adminv2/modify-side-menu/'.$list[$i]['id'].'">'.$list[$i]['txt'].' <span>Edit</span></a>';
 
                     if(is_array($list[$i]['children'])) {
                             $text .= $this->outputTree($list[$i]['children'], ($level + 1));
@@ -81,7 +81,7 @@ class sideMenu extends Model {
         unset($item['campus']);
         unset($item['group']);
 
-        $item['sequence'] = $this->getLastItemSequence($item['parent']);
+        $item['sequence'] = $this->getLastItemSequence(0);
         $id = parent::create($item);
         $this->addPermissions($id, $campus, $group);
     }
@@ -96,28 +96,37 @@ class sideMenu extends Model {
         $this->addPermissions($item['id'], $item['campus'], $item['group']);
         unset($item['campus'], $item['group']);
         parent::update($item);
-
-        $this->resequenceMenu($parent);
+        
+        $itemCur = $this->getByID($item['id']);
+        $this->resequenceMenu($itemCur['parent']);
     }
 
-    function moveMenuItemUp($id) {
-        //fetch sequence of item below
-        $item = $this->getMenuItem($id);
-        $query = "UPDATE sideMenu SET sequence = (sequence + 1) WHERE parent = {$item['parent']} AND sequence = ({$item['sequence']} - 1)";
+    function moveItemAfter($id, $pid) {
+        /* Place item after $pid in sequence */
+        $item = $this->getByID($pid);
+
+        $query = "UPDATE sideMenu SET sequence = (sequence + 1) WHERE parent = {$item['parent']} AND sequence > ({$item['sequence']} )";
+        print $query;
         $this->db->query($query);
 
-        $query = "UPDATE sideMenu SET sequence = (sequence - 1) WHERE id = $id";
-        $this->db->query($query);
+        parent::update(array('id'=>$id, 'sequence'=>$item['sequence']+1, 'parent'=>$item['parent']));
     }
 
-    function moveMenuItemDown($id) {
-        //fetch sequence of item below
-        $item = $this->getMenuItem($id);
-        $query = "UPDATE sideMenu SET sequence = (sequence - 1) WHERE parent = {$item['parent']} AND sequence = ({$item['sequence']} + 1)";
+    function moveItemBefore($id, $pid) {
+        /* Place item after $pid in sequence */
+        $item = $this->getByID($pid);
+
+        $query = "UPDATE sideMenu SET sequence = (sequence + 1) WHERE parent = {$item['parent']} AND sequence > ({$item['sequence']} - 1 )";
         $this->db->query($query);
 
-        $query = "UPDATE sideMenu SET sequence = (sequence + 1) WHERE id = $id";
-        $this->db->query($query);
+        parent::update(array('id'=>$id, 'sequence'=>$item['sequence'], 'parent'=>$item['parent']));
+    }
+
+    function moveItemLast($id, $pid) {
+        /* Place item after $pid in sequence */
+        $sequence = $this->getLastItemSequence($pid);
+
+        parent::update(array('id'=>$id, 'sequence'=>$sequence, 'parent'=>$pid));
     }
 
     //This function resequences a portion of the menu to ensure that it stays in a sequential order

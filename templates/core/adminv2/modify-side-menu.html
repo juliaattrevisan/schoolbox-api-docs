@@ -11,18 +11,11 @@
 </ul>
 <div class="admin-contents">
 	<h2>Modify Side Menu Item</h2>
-            <form action="" method="post" name="form" id="form" class="standardForm" onsubmit="return(verify());">
+            <form action="/adminv2/side-menuForm.php" method="post" name="form" id="form" class="standardForm" >
                     <table>
-                      <tr>
-                        <td class="formLabelWidth"><h2>Parent</h2>
-						<em>Select where in the menu you would like this item located.</em>
-                        </td>
-                        <td>{MENUITEMLIST}</td>
-                        </tr>
-                      <tr>
                         <td><h2>Name</h2>
                           <em>This is the text that will be displayed on the menu</em></td>
-                        <td><input type="text" name="text" maxlength="250" size="40" value="{TEXT}" />
+                        <td><input type="text" name="txt" maxlength="250" size="40" value="{TEXT}" />
                         </td>
                         </tr>
                       <tr>
@@ -63,6 +56,9 @@
                         <td>&nbsp;</td>
                         <td><input type="hidden" name="id" value="{ID}" />
                           <input type="submit" name="Submit" value="{ACTION}" class="btn" />
+                            <!-- BEGIN delete -->
+                            <input type="submit" name="delete" value="Delete" class="btn" />
+                            <!-- END delete -->
                         </td>
                         </tr>
                     </table>
