@@ -61,27 +61,79 @@ $j(function() {
 			});
 		});
 		
-		$j("a.edit").hover(function() {
-			if(!$j(this).children('em').data('pinned')) {
-				$j(this).children('em').addClass('show-it');
-				
+
+	$j("a.edit").hover(function() {
+		
+		var $this = $j(this);
+		
+		if(!$this.children('em').data('pinned')) {
+			$this.children('em').addClass('show-it');
+		}
+		
+		}, function() {
+			var $this = $j(this);
+			
+			if(!$this.children('em').data('pinned')) {
+				$this.children('em').removeClass('show-it' );
 			}
-			}, function() {
-			if(!$j(this).children('em').data('pinned')) {
-				$j(this).children('em').removeClass('show-it');
+		
+		}).live('click', function(event) {
+			var $this = $j(this);
+			event.preventDefault();
+			
+			if ($this.siblings('.editPanel.delete-it').is(':visible')) {
+				$this.siblings('.editPanel.delete-it').slideUp();
 			}
-			}
-				).live('click', function(event) {
-				event.preventDefault();
-				$j(this).toggleClass('active');
-				$j(this).siblings('.editPanel.hide').slideToggle("fast");
+			
+			$this.toggleClass('active');
+			$this.siblings('.editPanel.settings.hide').slideToggle("fast");
+			$this.children('em').data('pinned', !$this.children('em').data('pinned'));
+			
+	});
+	
+	$j('.close-delete').live('click', function(event){
+		event.preventDefault();
+		var $this = $j(this);
+		
+		if ($this.siblings('.editPanel.settings').is(':visible')) {
+			$this.siblings('.editPanel.settings').slideUp();
+			$this.siblings('a.edit').children('em').data('pinned', !$this.siblings('a.edit').children('em').data('pinned'));
+			$this.siblings('a.edit').removeClass('active');
+			$this.siblings('a.edit').children('em').removeClass('show-it');
+		}
+		$this.siblings('.editPanel.delete-it.hide').slideToggle("fast");
+	});
 
-				$j(this).children('em').data('pinned', !$j(this).children('em').data('pinned'));
-				
+	$j('.delete-accept').live('click',function(event) {
+		
+		event.preventDefault();
+       
+	    //update with an ajax call here.
+		$j.post('/eportfolio/configForm.php', $j(this).closest('form').serialize());
+		
+        $j(this).closest('.box').animate({opacity:0}, 300,
+			function() {
+				$j(this).slideUp(200, function() {
+					$j(this).remove();	
+				});
+		});
+		
+		var componentToDelete = Number($j(this).siblings("input[name=component]").val());
+		var currentAmount = Number($j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html());
+		currentAmount--;
+		$j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html(currentAmount);
+		
+		if ($j('a[rel='+componentToDelete+']').parent().hasClass('disabled')) {
+			$j('a[rel='+componentToDelete+']').parent().removeClass('disabled')
+		}
+		
+	});
 
 
-
-			});
+	$j('.delete-reject').live('click',function(event) {
+		event.preventDefault();
+		$j(this).closest('.delete-it').slideUp();
+	});
 		
 
 	
@@ -160,78 +212,7 @@ $j('.manage h2, a.folder-manage').each(function () {
 		});
 	});
 
-	$j("a.edit").hover(function() {
-		
-		var $this = $j(this);
-		
-		if(!$this.children('em').data('pinned')) {
-			$this.children('em').addClass('show-it');
-		}
-		
-		}, function() {
-			var $this = $j(this);
-			
-			if(!$this.children('em').data('pinned')) {
-				$this.children('em').removeClass('show-it' );
-			}
-		
-		}).live('click', function(event) {
-			var $this = $j(this);
-			event.preventDefault();
-			
-			if ($this.siblings('.editPanel.delete-it').is(':visible')) {
-				$this.siblings('.editPanel.delete-it').slideUp();
-			}
-			
-			$this.toggleClass('active');
-			$this.siblings('.editPanel.settings.hide').slideToggle("fast");
-			$this.children('em').data('pinned', !$this.children('em').data('pinned'));
-			
-	});
 	
-	$j('.close-delete').live('click', function(event){
-		event.preventDefault();
-		var $this = $j(this);
-		
-		if ($this.siblings('.editPanel.settings').is(':visible')) {
-			$this.siblings('.editPanel.settings').slideUp();
-			$this.siblings('a.edit').children('em').data('pinned', !$this.siblings('a.edit').children('em').data('pinned'));
-			$this.siblings('a.edit').removeClass('active');
-			$this.siblings('a.edit').children('em').removeClass('show-it');
-		}
-		$this.siblings('.editPanel.delete-it.hide').slideToggle("fast");
-	});
-
-	$j('.delete-accept').live('click',function(event) {
-		
-		event.preventDefault();
-       
-	    //update with an ajax call here.
-		$j.post('/eportfolio/configForm.php', $j(this).closest('form').serialize());
-		
-        $j(this).closest('.box').animate({opacity:0}, 300,
-			function() {
-				$j(this).slideUp(200, function() {
-					$j(this).remove();	
-				});
-		});
-		
-		var componentToDelete = Number($j(this).siblings("input[name=component]").val());
-		var currentAmount = Number($j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html());
-		currentAmount--;
-		$j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html(currentAmount);
-		
-		if ($j('a[rel='+componentToDelete+']').parent().hasClass('disabled')) {
-			$j('a[rel='+componentToDelete+']').parent().removeClass('disabled')
-		}
-		
-	});
-
-
-	$j('.delete-reject').live('click',function(event) {
-		event.preventDefault();
-		$j(this).closest('.delete-it').slideUp();
-	});
 
 	$j(".add-component a").live('click', function(event) {
 		event.preventDefault();

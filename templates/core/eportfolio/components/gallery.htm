@@ -6,7 +6,7 @@
     <!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
 	<a class="close-delete" href="#"><span>X</span></a>
-  <div class="editPanel hide">
+  <div class="editPanel settings hide">
     <form action="/eportfolio/configForm.php" method="get">
       <input type="hidden" name="uid" value="{ID}" />
       <input type="hidden" name="type" value="config" />
@@ -20,6 +20,17 @@
       <input type="submit" value="Update" />
     </form>
   </div>
+  	<div class="editPanel delete-it hide">
+		<p>Are you sure you want to delete?</p>
+		<form action="#" method="post">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="component" value="{COMPONENT_ID}" />
+			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
+			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
+		</form>
+		<div class="float-fix"></div>
+	</div>
 <!-- END config -->
   <div class="text">
   	<!-- BEGIN thumb_row -->
