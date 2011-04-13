@@ -1,37 +1,41 @@
 <div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
-  <h2>{TEXTBOX_HEADING}</h2>
-  <!-- BEGIN config -->
-  <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
-<a class="close-delete" href="#"><span>X</span></a>
-  <div class="editPanel settings hide">
-    <form action="/homepage/configForm.php" method="get">
-      <input type="hidden" name="cid" value="{ID}" />
-      <input type="hidden" name="type" value="config" />
-	  
-      <input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
-      <label for="size">Text Box: </label>
-      <select name="textBoxID">
-        <!-- BEGIN select -->
-        <option value="{COMPONENT_CONFIG_SELECT_VALUE}"{COMPONENT_CONFIG_SELECT_SELECTED}>{COMPONENT_CONFIG_SELECT_NAME}</option>
-        <!-- END select -->
-      </select>      <input type="submit" value="Update" class="submit-btn update" />
-    </form>
-  </div>
+	<h2>{TEXTBOX_HEADING}</h2>
+	<!-- BEGIN config --> 
+	
+	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
+	<a class="close-delete" href="#"><span>X</span></a>
+	
+	<div class="editPanel settings hide">
+		<form action="/homepage/configForm.php" method="get">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="type" value="config" />
+			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+			<label for="size">Text Box: </label>
+			<select name="textBoxID">
+				<!-- BEGIN select -->
+				<option value="{COMPONENT_CONFIG_SELECT_VALUE}"{COMPONENT_CONFIG_SELECT_SELECTED}>{COMPONENT_CONFIG_SELECT_NAME}</option>
+				<!-- END select -->
+			</select>
+			<input type="submit" value="Update" class="submit-btn update" />
+		</form>
+	</div>
+	
 	<div class="editPanel delete-it hide">
 		<p>Are you sure you want to delete?</p>
 		<form action="#" method="post">
-		  <input type="hidden" name="cid" value="{ID}" />
-                  <input type="hidden" name="component" value="{COMPONENT_ID}" />
-		  <input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
-			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
-			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="component" value="{COMPONENT_ID}" />
+			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> <a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
 		<div class="float-fix"></div>
 	</div>
-  <!-- END config -->
-  <!-- BEGIN text_editable -->
-  <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-  <script type="text/javascript">
+	
+	<!-- END config --> 
+	
+	<!-- BEGIN text_editable --> 
+	<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script> 
+	<script type="text/javascript">
   tinyMCE.init({
 	mode : "exact",
 	elements: "textBoxBody",
@@ -49,35 +53,31 @@
 	file_browser_category_id : {ID},
 	convert_urls : false
 });
-  </script>  
-  <div class="text">
-    <form action="/homepage/textBoxForm.php" method="post" id="textBoxForm" class="standardForm">     
-      <p>
-      <input type="text"  style="width: 99%;" name="textBoxHeading" value="{TEXTBOX_HEADING}" />
-      </p>
-      <p>
-      <textarea rows="20" style="width: 100%;" name="textBoxBody" id="textBoxBody">{TEXTBOX_BODY}</textarea>
-      </p>
-      <input type="hidden" name="categoryID" value="{ID}" />
-      <input type="hidden" name="textBoxID" value="{TEXTBOX_ID}" />
-      <input type="hidden" name="componentID" value="{COMPONENT_HOMEPAGE_ID}" />
-    </form>
-  </div>
-  <p class="interact"><a href="#" class="btn modify" onclick="$j('#textBoxForm').submit(); return false;"><span></span>Save Document</a></p>
-  <!-- END text_editable -->
-  
-  <!-- BEGIN text_locked -->      
-  <div class="text textbox"> 
-    {TEXTBOX_BODY}
-    <div class="float-fix"></div>
-  </div>
-  
-  <!-- BEGIN modify_text -->
-  <p class="interact"><a href="/homepage/textBoxForm.php?delete={TEXTBOX_ID}" onclick="return confirm('Are you sure you want to delete this text box?');" class="btn delete"><span></span>Delete</a><a href="/homepage/{ID}/textBoxModify/{COMPONENT_HOMEPAGE_ID}" class="btn modify"><span></span>Modify</a>
-  <a href="/homepage/{ID}/textBoxCreate/{COMPONENT_HOMEPAGE_ID}" class="btn add"><span></span>Create</a>
-   
-   </p>
-  <!-- END modify_text -->
-      
-  <!-- END text_locked -->
+  </script>
+	<div class="text">
+		<form action="/homepage/textBoxForm.php" method="post" id="textBoxForm" class="standardForm">
+			<p>
+				<input type="text"  style="width: 99%;" name="textBoxHeading" value="{TEXTBOX_HEADING}" />
+			</p>
+			<p>
+				<textarea rows="20" style="width: 100%;" name="textBoxBody" id="textBoxBody">{TEXTBOX_BODY}</textarea>
+			</p>
+			<input type="hidden" name="categoryID" value="{ID}" />
+			<input type="hidden" name="textBoxID" value="{TEXTBOX_ID}" />
+			<input type="hidden" name="componentID" value="{COMPONENT_HOMEPAGE_ID}" />
+		</form>
+	</div>
+	<p class="interact"><a href="#" class="btn modify" onclick="$j('#textBoxForm').submit(); return false;"><span></span>Save Document</a></p>
+	<!-- END text_editable --> 
+	
+	<!-- BEGIN text_locked -->
+	<div class="text textbox"> {TEXTBOX_BODY}
+		<div class="float-fix"></div>
+	</div>
+	
+	<!-- BEGIN modify_text -->
+	<p class="interact"><a href="/homepage/textBoxForm.php?delete={TEXTBOX_ID}" onclick="return confirm('Are you sure you want to delete this text box?');" class="btn delete"><span></span>Delete</a><a href="/homepage/{ID}/textBoxModify/{COMPONENT_HOMEPAGE_ID}" class="btn modify"><span></span>Modify</a> <a href="/homepage/{ID}/textBoxCreate/{COMPONENT_HOMEPAGE_ID}" class="btn add"><span></span>Create</a> </p>
+	<!-- END modify_text --> 
+	
+	<!-- END text_locked --> 
 </div>

@@ -185,7 +185,7 @@ h2 a { color:#013a63; }
 /*--------------------------------------------------------------
  Table Styles 
 --------------------------------------------------------------*/
-table { border: 0; }
+table { border: 0; table-layout:fixed}
 
 th, td {
 	height: 1em;
@@ -193,6 +193,9 @@ th, td {
 	border: 0;
 	vertical-align: middle;
 	line-height:16px;
+	word-wrap:break-word;
+	display: table-cell;
+	
 }
 
 th { font-weight:bold; }
@@ -3759,8 +3762,11 @@ p.bubble-name {
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
 	color:#000;
+	width:111px;
 	z-index:120;
 }
+
+.btn.shared-btn{width:111px !important;}
 
 /* LOGIN Styling */
 .login #container, .login #footer, .login #header { margin:0; }

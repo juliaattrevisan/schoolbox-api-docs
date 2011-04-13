@@ -88,8 +88,12 @@ $j(function() {
 	
 	/* from here down I've changed the component functions!!!!*/
 	
-	$j('#tabs-homepage').tabs({selected:0});
-	$j('#tabs-sub').tabs({selected:0});
+$j('.manage h2, a.folder-manage').each(function () {
+		$j(this).hide();
+	});
+	
+	$j('#tabs-homepage').tabs();
+	$j('#tabs-sub').tabs();
 	
 	
 	$j('.add-component strong').each(function() {
@@ -109,8 +113,8 @@ $j(function() {
 			hide: 'mouseout',
 			position: {
 				corner: {
-				tooltip: 'bottomLeft',
-				target: 'topright'
+					tooltip: 'bottomLeft',
+					target: 'topright'
 				}
 			},
 			api: {
@@ -118,7 +122,6 @@ $j(function() {
 					 onRender: function()
 					 {
 						var self = this;
-						console.log()
 					 }
 				 },
 			style: { 
@@ -146,11 +149,13 @@ $j(function() {
         $j("#tooltip").hide();
     });
 	
-	$j('a.customise').click(function(event) {
+
+	
+	$j('.customise').click(function(event) {
 		event.preventDefault();
 		$j('#tabs-homepage').slideToggle();
 		$j(this).children('span').toggle();
-		$j('.manage h2').each(function () {
+		$j('.manage h2, a.folder-manage').each(function () {
 			$j(this).toggle();
 		});
 	});
@@ -197,10 +202,11 @@ $j(function() {
 		$this.siblings('.editPanel.delete-it.hide').slideToggle("fast");
 	});
 
-
-	$j('.delete-accept').click(function(event) {
+	$j('.delete-accept').live('click',function(event) {
+		
 		event.preventDefault();
-        //update with an ajax call here.
+       
+	    //update with an ajax call here.
 		$j.post('/eportfolio/configForm.php', $j(this).closest('form').serialize());
 		
         $j(this).closest('.box').animate({opacity:0}, 300,
@@ -209,27 +215,35 @@ $j(function() {
 					$j(this).remove();	
 				});
 		});
-
+		
+		var componentToDelete = Number($j(this).siblings("input[name=component]").val());
+		var currentAmount = Number($j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html());
+		currentAmount--;
+		$j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html(currentAmount);
+		
+		if ($j('a[rel='+componentToDelete+']').parent().hasClass('disabled')) {
+			$j('a[rel='+componentToDelete+']').parent().removeClass('disabled')
+		}
+		
 	});
 
 
-	$j('.delete-reject').click(function(event) {
+	$j('.delete-reject').live('click',function(event) {
 		event.preventDefault();
 		$j(this).closest('.delete-it').slideUp();
-		
 	});
 
 	$j(".add-component a").live('click', function(event) {
 		event.preventDefault();
 		var $this = $j(this);
-		$j.post('/eportfolio/configForm.php', {add : $j(this).attr('rel'), cid : cid } );
-        
-		if($this.parent().hasClass('one-only')) {
-			$this.siblings('.notification').fadeIn(200, function() {
-				$j(this).delay(4000).fadeOut();
+		$j.post('/eportfolio/configForm.php', {add : $j(this).attr('rel'), uid : uid }, function(data){
+			$j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
+				$j(this).animate({opacity:1}, 300);
 			});
-			$this.remove();
-			$this.parent().addClass('.disabled');
+        });		
+
+		if($this.parent().hasClass('one-only')) {
+			$this.parent().addClass('disabled');
 		} else if ($j('.how-many').html() == '') {
 			//if there are no modules but you can add one
 			$this.siblings('.how-many').append('You already have <em>1</em>');
@@ -240,10 +254,15 @@ $j(function() {
 			$this.siblings('strong em').html(currentCount);
 		}
 		
-		$this.siblings('.notification').fadeIn(200, function() {
-			$j(this).delay(4000).fadeOut();
-		});
+		if (!$this.siblings('.notification').is(':visible')) {
+			$this.siblings('.notification').fadeIn(200, function() {
+				$j(this).delay(2000).fadeOut();
+			});
+		}
 		
+		var currentAmount = Number($this.siblings('h4').children('strong').children('em').html());
+		currentAmount++;
+		$this.siblings('h4').children('strong').children('em').html(currentAmount);
 		
 	});
 	
@@ -256,7 +275,7 @@ $j(function() {
 	f.setColor("#b6b6ff"); //set initial color
 	
 	$j('#head_font').parent().addClass('active-box');
-	var initialColour = rgbConvert($j('#head_font').css('background-color'));
+	var initialColour = rgbConvert($j('#left_head_font').css('background-color'));
 	checkTextColour();
 	$j('#currentColour').css('background-color',initialColour);
 	$j('#currentColour').val(initialColour);
@@ -296,49 +315,49 @@ $j(function() {
 		current.css('background-color', color);
 		$j('#currentColour').val(color);
 		$j('#currentColour').css('background-color', color);
-        pickers[current.attr['ID']] = color;
+        pickers[current.attr('ID')] = color;
 
 		switch (current.attr('ID')) {
-			case 'bg_primary':
+			case 'left_bg_primary':
 				return $j('.left .text').css('background-color', color);
 			break;
-			case 'bg_secondary':
+			case 'left_bg_secondary':
 				return $j('.left .dark').css('background-color', color);
 			break;
-			case 'head_font':
+			case 'left_head_font':
 				return $j('.left h2').css('color', color);
 			break;
-			case 'head_bg':
+			case 'left_head_bg':
 				return $j('.left h2').css('background-color', color)
 			break;
-			case 'font':
+			case 'left_font':
 				return $j('.left, .left p').css('color', color)
 			break;	
-			case 'link':
+			case 'left_link':
 				return $j('.left a').css('color', color);
 			break;	
-			case 'hover':
+			case 'left_hover':
 				return $j('.right a:hover').css('color', color);
 			break;	
-			case 'bg_primary_right':
+			case 'right_bg_primary':
 				return $j('.right .text').css('background-color', color);
 			break;
-			case 'bg_secondary_right':
+			case 'right_bg_secondary':
 				return $j('.right .dark').css('background-color', color);
 			break;
-			case 'head_font_right':
+			case 'right_head_font':
 				return $j('.right h2').css('color', color);
 			break;
-			case 'head_bg_right':
+			case 'right_head_bg':
 				return $j('.right h2').css('background-color', color);
 			break;
-			case 'font_right':
+			case 'right_font':
 				return $j('.right, .right p').css('color', color);
 			break;	
-			case 'link_right':
+			case 'right_link':
 				return $j('.right a').css('color', color);
 			break;	
-			case 'hover_right':
+			case 'right_hover':
 				return $j('.right a:hover').css('color', color);
 			break;	
 			default:
@@ -380,32 +399,36 @@ $j(function() {
 			default:
 				newChoice = 'template1';
 			break;
-			
 		}
 		
         $j('.privateBlock').removeClass().addClass(newChoice + ' privateBlock');
-		
 		$j('.current').removeClass('current');
-		
 		$j(this).addClass('current');
-
         $j('#templateVal').val(templateChoice);
-		
 	});	
 	
 	$j('#saveTemplate').click(function () {
-        $j.post('/eportfolio/configForm.php', $j(this).closest('form').serialize());
+        $j.post('/eportfolio/configForm.php', $j(this).closest('form').serialize(),
+	   function() {
+			$j('.saved-layout').slideDown(150).delay(2000).slideUp(150);
+	   });
     });
 
     $j('#saveColour').click(function () {
-       $j.post('/eportfolio/configForm.php', {colors: pickers});
+       $j.post('/eportfolio/configForm.php', {colors: pickers, uid: uid},
+	   function() {
+			$j('.saved-colours').slideDown(150).delay(2000).slideUp(150);
+	   });
     });
 	
 	$j("#leftRight").click(function () {	
 		var rightBox;
 		
 		$j('div.leftColumn div.colorBox').each(function () {
-			rightBox = $j('#' + $j(this).attr('id') + '_right');
+			var str = $j(this).attr('id');
+			var newstr = str.replace(/^.*left_(.*).*$/m, '$1');
+
+			rightBox = $j('#' + 'right_'+newstr);
 			rightBox.css('backgroundColor', $j(this).css('backgroundColor'));
 			rightBox.next().val($j(this).next().val());
 		});
@@ -416,15 +439,56 @@ $j(function() {
 		$j('.right h2').css('background-color', $j('.left h2').css('background-color'));
 		$j('.right, .right p').css('color', $j('.left, .left p').css('color'));
 		$j('.right a').css('color', $j('.left a').css('color'));
+		
+		//send off the pickers correctly.
+		pickers.right_head_font = pickers.left_head_font;
+		pickers.right_head_bg = pickers.left_head_bg;
+		pickers.right_font = pickers.left_font;
+		pickers.right_bg_primary = pickers.left_bg_primary;
+		pickers.right_bg_secondary = pickers.left_bg_secondary;
+		pickers.right_link = pickers.left_link;
+		pickers.right_hover = pickers.left_hover;
 
+	});
+	
+	$j('#restore').click(function() {
+		$j('.colorBox').each(function () {
+			$j(this).css('background-color', defaults[$j(this).attr('id')]);
+			//$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
+		});
+		
+		$j('.left h2').css({
+			"color": defaults['left_head_font'],
+			"background-color":defaults['left_head_bg']
+		});
+		$j('.left p, .left h3, .left .listing p.small').css("color", defaults['left_font']);
+		$j('.left a, .left .listing p.small a').css('color', defaults['left_link']);
+		$j('.left .box a:hover, .left .listing p.small a:hover').css('color', defaults['left_hover']);
+		$j('.left .text').css('background',defaults['left_bg_primary']);
+		$j('.left .text.listing .dark ').css('background',defaults['left_bg_secondary']);
+		
+		$j('.right h2').css({
+			"color": defaults['right_head_font'],
+			"background-color":defaults['right_head_bg']
+		});
+		$j('.right p, .right h3, .right .listing p.small').css("color", defaults['right_font']);
+		$j('.right a, .right .listing p.small a').css('color', defaults['right_link']);
+		$j('.right .box a:hover, .right .listing p.small a:hover').css('color', defaults['right_hover']);
+		$j('.right .text').css('background',defaults['right_bg_primary']);
+		$j('.right .text.listing .dark ').css('background',defaults['right_bg_secondary']);
+		
+		pickers = defaults;
+		
 	});
 	
 	$j('#cancel').click(function() {
 		$j('.colorBox').each(function () {
-			$j(this).css('background-color', defaults[$j(this).attr('id')]);
-			$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
+			$j(this).css('background-color', original[$j(this).attr('id')]);
 		});
+		
+		$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
+		
 	});
-	
+
 
 });

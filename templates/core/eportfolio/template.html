@@ -3,7 +3,7 @@
 
 <script type="text/javascript" src="/javascript/jquery.ui.js"></script>
 <script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
-<script type="text/javascript" src="/javascript/demo/jquery.eportfolio.component.js"></script>
+<script type="text/javascript" src="/javascript/jquery.eportfolio.component.js"></script>
 <link rel="stylesheet" type="text/css" href="/javascript/farbtastic/farbtastic.css" />
 <script type="text/javascript" src="/javascript/farbtastic/farbtastic.js"></script>
 
@@ -29,21 +29,23 @@ var {COLOUR_ARRAY} = {
 };
 <!-- END colour_list -->
 
+var uid = {ID};
+
 </script>
 
 <style type="text/css">
-	#content h2{border:0;}	
 
+.left h2 { color: #{left_head_font}; background-color: #{left_head_bg};	}
 .left p, .left h3, .left .listing p.small { color: #{left_font}; }
 .left a, .left .listing p.small a { color: #{left_link}; }
-
+.left .box a:hover, .left .listing p.small a:hover { color: #{left_hover};  }
 .left .text { background: #{left_bg_primary}; }
 .left .text.listing .dark { background: #{left_bg_secondary}; }
 
-
+.right h2 { color: #{right_head_font}; background-color: #{right_head_bg};	}
 .right p, .right h3, .right .listing p.small { color: #{right_font}; }
 .right a, .right .listing p.small a { color: #{right_link}; }
-
+.right .box a:hover, .right .listing p.small a:hover { color: #{right_hover};  }
 .right .text { background: #{right_bg_primary}; }
 .right .text.listing .dark { background: #{right_bg_secondary}; }
 
@@ -229,7 +231,7 @@ a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
 		<form method="POST" action="">
 			<a class="layout {CURRENT_TEMPLATE_1}" title="1" href="#"><img src="/images/70-30.gif" />70-30</a> <a class="layout {CURRENT_TEMPLATE_2}" title="2" href="#"><img src="/images/50-50.gif" />50-50</a> <a class="layout {CURRENT_TEMPLATE_4}" title="4" href="#"><img src="/images/30-70.gif" />30-70</a> <a class="layout {CURRENT_TEMPLATE_3}" title="3" href="#"><img src="/images/100-0.gif" />100-0</a>
 			<input type="hidden" name="template" id="templateVal" value="" />
-			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="uid" value="{ID}" />
 			<div class="float-fix"></div>
             <div class="colours-buttons">
 				<button class="submit-btn-plain" type="button" id="saveTemplate" >Save layout</button>
