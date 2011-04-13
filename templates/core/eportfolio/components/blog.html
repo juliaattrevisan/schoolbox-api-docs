@@ -9,7 +9,7 @@
 		<form action="/eportfolio/configForm.php" method="get">
 			<input type="hidden" name="uid" value="{ID}" />
 			<input type="hidden" name="type" value="config" />
-			<input type="hidden" name="component" value="{COMPONENT_ID}" />
+			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
 			<label for="size">Entries Shown: </label>
 			<select name="size">
 				<!-- BEGIN size -->
@@ -33,6 +33,16 @@
 			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
 			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
 			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
+		</form>
+		<div class="float-fix"></div>
+	</div>
+        <div class="editPanel delete-it hide">
+		<p>Are you sure you want to delete?</p>
+		<form action="#" method="post">
+			<input type="hidden" name="uid" value="{ID}" />
+			<input type="hidden" name="component" value="{COMPONENT_ID}" />
+			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> <a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
 		<div class="float-fix"></div>
 	</div>

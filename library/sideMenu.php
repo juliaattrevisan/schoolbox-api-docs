@@ -25,7 +25,8 @@ class sideMenu extends Model {
         $this->db->query($query);
 
         //initialise root of tree
-        $tree[0]['id'] = 0;
+        $tree[0] =array('id' => 0,
+                        'txt'=> 'Top Level');
 
         //fetch each record and insert into tree
         while($menuitem = $this->db->getNextArray() ) {
@@ -61,12 +62,11 @@ class sideMenu extends Model {
                             $target = " target={$list[$i]['target']}";
                     else $target = '';
 
+                    $text .= '<li id="node'.$list[$i]['id'].'"><span>'.$list[$i]['txt'].'</span><a href="/adminv2/modify-side-menu/'.$list[$i]['id'].'">Edit</a>';
+
                     if(is_array($list[$i]['children'])) {
-                            $text .= '<li><a href="'.$list[$i]['url'].'"'.$target.'><span>'.$list[$i]['txt'].'</span></a>';
                             $text .= $this->outputTree($list[$i]['children'], ($level + 1));
                     }
-                    else
-                            $text .= '<li><a href="'.$list[$i]['url'].'"'.$target.'><span>'.$list[$i]['txt'].'</span></a>';
 
                     $text .= "</li>\n";
             }
@@ -140,13 +140,21 @@ class sideMenu extends Model {
     }
 
     function getMenuItemCampusList($id) {
-        $query = "SELECT * FROM sideMenuCampus WHERE id = '$id'";
-        return $this->db->getAll($query);
+        $query = "SELECT campus FROM sideMenuCampus WHERE id = '$id'";
+        $this->db->query($query);
+        while($row = $this->db->getNextArray()) {
+                $result[] = $row['campus'];
+        }
+        return $result;
     }
 
     function getMenuItemGroupList($id) {
-        $query = "SELECT * FROM sideMenuGroup WHERE id = '$id'";
-        return $this->db->getAll($query);
+        $query = "SELECT gid FROM sideMenuGroup WHERE id = '$id'";
+       $this->db->query($query);
+        while($row = $this->db->getNextArray()) {
+                $result[] = $row['gid'];
+        }
+        return $result;
     }
 
     function addPermissions($id, $campus, $group) {

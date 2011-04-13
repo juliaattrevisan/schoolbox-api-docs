@@ -107,7 +107,7 @@ class ePortfolio {
      * @return <type>
      */
 	function getComponents() {
-		$query = "SELECT position, `column`, component, eportfolio_comp.config dfconfig, eportfolio_comp_location.config, name, method, filename
+		$query = "SELECT eportfolioComponentLocationID, position, `column`, component, eportfolio_comp.config dfconfig, eportfolio_comp_location.config, name, method, filename
 				  FROM eportfolio_comp_location, eportfolio_comp
 				  WHERE component = id AND uid = '{$this->uid}'
 				  ORDER BY position";

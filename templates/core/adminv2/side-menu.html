@@ -1,32 +1,19 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/tree/jquery.jstree.js"></script>
+<script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
 <script type="text/javascript">
-
-$j(function() {
-		$j('ul.sortable').nestedSortable({
-			disableNesting: 'no-nest',
-			forcePlaceholderSize: true,
-			handle: 'div',
-			helper:	'clone',
-			items: 'li',
-			opacity: .6,
-			placeholder: 'placeholder',
-			tabSize: 32,
-			tolerance: 'pointer',
-			toleranceElement: '> div',
-			listType: 'ul',
-			drop: function(event, ui) {
-				//runs when the thing is dropped.
-					
-			}
-		});
-	
-
+$j(function () {
+	$j("#side-menu").jstree({
+                "core" : { "initially_open" : [ "node0" ] },
+		"plugins" : [ "themes", "html_data", "dnd" ],
+                "themes" : {
+			"theme" : "apple",
+			"dots" : false,
+			"icons" : false
+		}
+	});
 });
-
 </script>
- 
-<!-- END custom_head-->
+<!-- END custom_head -->
 
 <h1>Schoolbox Administration</h1>
 <ul class="admin-nav">
@@ -41,8 +28,9 @@ $j(function() {
 </ul>
 <div class="admin-contents">
 	<h2>Side Menu</h2>
+        <div id="side-menu">
         {MENU_TREE}
-
+        </div>
 	
 	<div class="float-fix"></div>
 </div>

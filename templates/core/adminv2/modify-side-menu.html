@@ -1,0 +1,71 @@
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+	<li><a href="/adminv2/home">Home</a></li>
+	<li><a href="/adminv2/user">Users</a></li>
+	<li><a href="/adminv2/side-menu" class="current">Side Menu</a></li>
+	<li><a href="/adminv2/allowed-file">Allowed Files</a></li>
+	<li><a href="/adminv2/setting">Settings</a></li>
+	<li><a href="/adminv2/calendar">Calendar</a></li>
+	<li><a href="/adminv2/list">Lists</a></li>
+	<li><a href="/adminv2/rollover">Rollover</a></li>
+</ul>
+<div class="admin-contents">
+	<h2>Modify Side Menu Item</h2>
+            <form action="" method="post" name="form" id="form" class="standardForm" onsubmit="return(verify());">
+                    <table>
+                      <tr>
+                        <td class="formLabelWidth"><h2>Parent</h2>
+						<em>Select where in the menu you would like this item located.</em>
+                        </td>
+                        <td>{MENUITEMLIST}</td>
+                        </tr>
+                      <tr>
+                        <td><h2>Name</h2>
+                          <em>This is the text that will be displayed on the menu</em></td>
+                        <td><input type="text" name="text" maxlength="250" size="40" value="{TEXT}" />
+                        </td>
+                        </tr>
+                      <tr>
+                        <td><h2>URL</h2>
+                          <em>The location at which the item should point. If
+                          it is local url remember to use a reference relative
+                          to the root.</em></td>
+                        <td> <input type="text" name="url" size="40" maxlength="250" value="{URL}" />
+                        </td>
+                        </tr>
+                      <tr>
+                        <td><h2>Target</h2>
+               	          <em>Select wether you would like this link to open in a new window</em></td>
+                        <td><select name="target">
+                            <option value="">No Target</option>
+                            <option value="_blank" {BLANK_SELECTED}>New Window</option>
+                            </select>
+                        </td>
+                        </tr>
+                      <tr>
+                        <td><h2>Campus Access</h2>
+                                <em>Select the campuses that should be able to view
+                          this link. Note that this link will only be viewable
+                          by people in both the campuses and groups selected</em>
+                        </td>
+                        <td><!-- BEGIN campus -->
+                            <input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}<br />
+                            <!-- END campus -->
+                            </td>
+                        </tr>
+                      <tr>
+                        <td> <h2>Group Access</h2></td>
+                        <td> <!-- BEGIN group -->
+                            <input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />{GROUP_NAME}<br />
+                            <!-- END group --></td>
+                        </tr>
+                      <tr>
+                        <td>&nbsp;</td>
+                        <td><input type="hidden" name="id" value="{ID}" />
+                          <input type="submit" name="Submit" value="{ACTION}" class="btn" />
+                        </td>
+                        </tr>
+                    </table>
+            </form>
+        	<div class="float-fix"></div>
+</div>
