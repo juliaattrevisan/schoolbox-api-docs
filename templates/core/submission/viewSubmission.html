@@ -1,4 +1,3 @@
-
 <h1>{ASSDESC}</h1>
 <span class="header_option">
    <a href="/submission/downloadAll.php?id={BOX_ID}" class="btn download"><span></span>Download All</a>
@@ -11,25 +10,23 @@
             <tr>
                 <th>Submitted By</th>
                 <th>Submitted Date</th>
-                <th class="cntr">Download</th>
-                <th class="cntr">Mark</th>
-                <th class="cntr">Re-Mark</th>
-                <th class="cntr">Delete</th>
+                <th>Mark</th>
+                <th width="5%">Download</th>
+                <th width="5%">Delete</th>
+                <th width="5%">Mark</th>
             </tr>
         </thead>
         <tbody>
-            <!-- BEGIN submitted_block -->
+            <!-- BEGIN submission_block -->
             <tr class="{ON_OFF}">
                 <td style="color:{COLOUR}; white-space: nowrap;"><a href="/search/user/{OWNER_ID}">{OWNER}</a></td>
-                <!-- BEGIN mark -->
-                <td style="color:{COLOUR};">{DATE}</td>
-                <td class="cntr"><a href="/submission/send.php?id={SUB_ID}">Download</a></td>
-                <td class="cntr">{RETURN}</td>
-                <td class="cntr">{REMARK}</td>
-                <td class="cntr"><a href="/submission/viewSubmissionForm.php?delete={SUB_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));">Delete</a></td>
-                <!-- END mark -->
+                <td style="color:{COLOUR};">{SUBMITTED}</td>
+                <td>{MARK}</td>
+                <td><!-- BEGIN download_action --><a href="/submission/send.php?id={SUB_ID}">Download</a><!-- END download_action --></td>
+                <td><!-- BEGIN delete_action --><a href="/submission/viewSubmissionForm.php?delete={SUB_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));">Delete</a><!-- END delete_action --></td>
+                <td><!-- BEGIN mark_action --><a href="/submission/returnWork/{BOX_ID}/{OWNER_ID}">Mark</a><!-- END mark_action --></td>
             </tr>
-            <!-- END submitted_block -->
+            <!-- END submission_block -->
         </tbody>
     </table>
 </div>

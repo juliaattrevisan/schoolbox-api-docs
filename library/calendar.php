@@ -149,24 +149,54 @@ class Calendar extends Model {
 			}
 
 			$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.description,
-                    submission_box.owner, submission_box.id, user.firstname, user.lastname, user.title,
-					DATE_FORMAT(submission_box.date, '%w') as dayIndex, 
-					DATE_FORMAT(submission_box.date, '" . CALENDAR_time_format . "') as dueTime
-				  FROM (category, submission_box )
-				  LEFT JOIN `file` f ON f.id = submission_box.fid 
-				  LEFT JOIN categoryCode co ON co.categoryID = category.id
-                  LEFT JOIN user ON user.id = submission_box.owner
-				  WHERE category.id = submission_box.category 
-					AND submission_box.category IN (".implode(',', $catQuery).")
-					AND submission_box.deleted = 0 
-					AND	DATE(submission_box.date) = DATE(FROM_UNIXTIME('$currentDay'))
-				  GROUP BY submission_box.id, category.id
-				  ORDER BY submission_box.date ";
-				
-			return $this->db->getAll($query);
-		}
-		else
-			return false;
+                        submission_box.owner, submission_box.id, user.firstname, user.lastname, user.title,
+                        DATE_FORMAT(submission_box.date, '%w') as dayIndex,
+                        submission_box.open_date, submission_box.date, submission_box.late_date, submission_box.created, student_submission.submitted, submission_return.returned
+                      FROM (category, submission_box )
+                      LEFT JOIN submission_return ON submission_box.id = submission_return.box_id AND submission_return.owner = {$_SESSION['id']}
+                      LEFT JOIN student_submission ON submission_box.id = student_submission.box_id AND student_submission.owner = {$_SESSION['id']}
+                      LEFT JOIN `file` f ON f.id = submission_box.fid
+                      LEFT JOIN categoryCode co ON co.categoryID = category.id
+                      LEFT JOIN user ON user.id = submission_box.owner
+                      WHERE category.id = submission_box.category
+                        AND submission_box.category IN (".implode(',', $catQuery).")
+                        AND submission_box.deleted = 0
+                        AND	DATE(submission_box.date) = DATE(FROM_UNIXTIME('$currentDay'))
+                      GROUP BY submission_box.id, category.id
+                      ORDER BY submission_box.date";
+
+			$submissions = $this->db->getAll($query);
+
+            if (!empty($submissions)) {
+                /* Convert date fields and set status */
+                $date_fields = array('open_date', 'date', 'created', 'late_date', 'submitted', 'returned');
+
+                foreach ($submissions as &$submission) {
+
+                    foreach ($date_fields as $field_name) {
+                        if (!empty($submission[$field_name])) {
+                            $submission[$field_name] = new DateTime($submission[$field_name]);
+                        }
+                    }
+
+                    if (!empty($submission['returned'])) {
+                        $submission['status'] = 3;
+                        $submission['relevant_date'] = $submission['returned'];
+                    } elseif (!empty($submission['submitted'])) {
+                        $submission['status'] = 2;
+                        $submission['relevant_date'] = $submission['submitted'];
+                    } else {
+                        $submission['status'] = 1;
+                        $submission['relevant_date'] = $submission['date'];
+                    }
+
+                }
+            }
+
+            return $submissions;
+		} else {
+            return false;
+        }
 	}
 
 

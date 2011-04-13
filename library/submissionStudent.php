@@ -48,20 +48,37 @@ class SubmissionStudent extends Model {
 		return is_array($this->db->getRow($query));
 	}
 
-    function submittable ($user_id, $submission_box_id) {
-        $query = "
-			sb.description,
-			sb.open_date, sb.date, sb.late_date, sb.created, ss.submitted, r.returned,
-			c.name AS categoryName,
-			FROM submission_box sb
-			LEFT JOIN student_submission ss ON ss.box_id = sb.id
-			LEFT JOIN submission_return sr ON sr.box_id = sb.id AND sb.owner = sr.owner
-			LEFT JOIN category c ON c.id = sb.category
-			LEFT JOIN file f ON sb.fid = f.id
-			WHERE sb.deleted = 0
-			AND (sb.owner = '$userID' OR sb.owner IS NULL)
-			AND b.category IN (" . implode(',', $categoryIDList) . ")
-			AND $orderBy IS NOT NULL";
+    function getStatus ($user_id, $submission_box_id) {
+        $query = "SELECT sb.open_date, sb.date, sb.late_date, sb.created, ss.submitted, sr.returned, sr.mark
+                  FROM submission_box sb
+                  LEFT JOIN submission_return sr ON sb.id = sr.box_id AND sr.owner = $user_id
+                  LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = $user_id
+                  WHERE sb.id = $submission_box_id
+                      AND sb.deleted = 0";
+
+		$submission = $this->db->getRow($query);
+
+        /* Convert date fields and set status */
+        $date_fields = array('open_date', 'date', 'created', 'late_date', 'submitted', 'returned');
+
+        foreach ($date_fields as $field_name) {
+            if (!empty($submission[$field_name])) {
+                $submission[$field_name] = new DateTime($submission[$field_name]);
+            }
+        }
+
+        if (!empty($submission['returned'])) {
+            $submission['status'] = 3;
+            $submission['relevant_date'] = $submission['returned'];
+        } elseif (!empty($submission['submitted'])) {
+            $submission['status'] = 2;
+            $submission['relevant_date'] = $submission['submitted'];
+        } else {
+            $submission['status'] = 1;
+            $submission['relevant_date'] = $submission['date'];
+        }
+
+        return $submission;
     }
 
     function securityCheck($box_id) {

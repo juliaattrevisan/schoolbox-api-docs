@@ -10,8 +10,10 @@ if(is_numeric($this->arg[0])) {
     $this->setFile(TEMPLATE_content, 'submission/viewSubmission.html');
     $this->setTitle('Submission Box');
 	$this->setTab('submission');
-    $this->setBlock(TEMPLATE_content, 'submitted_block', 'submission_listing');
-    $this->setBlock('submitted_block', 'mark', 'mark_block');
+    $this->setBlock(TEMPLATE_content, 'submission_block', 'submission_listing');
+    $this->setBlock('submission_block', 'download_action', 'download_action_block');
+    $this->setBlock('submission_block', 'delete_action', 'delete_action_block');
+    $this->setBlock('submission_block', 'mark_action', 'mark_action_block');
 
     $submissionHandler = new Submission;
     $studentSubHandler = new SubmissionStudent;
@@ -26,9 +28,8 @@ if(is_numeric($this->arg[0])) {
     $submissionHandler->logPageView(3, $this->arg[0]);
 
     $this->setVar('ASSDESC', scrubTEXT($subBox['categoryName'])." - ".scrubTEXT($subBox['description']));
-	 $this->setVar('CATEGORY_ID', $subBox['cid']);
+	$this->setVar('CATEGORY_ID', $subBox['cid']);
     $this->setVar('BOX_ID', $subBox['id']);
-	$this->setVar('BOX_ID', $this->arg[0]);
 
     /* Get full student list of class to show those who have not submitted */
     if($subBox['code'] && Cfg::get('external_enable')) {
@@ -69,47 +70,44 @@ if(is_numeric($this->arg[0])) {
 
             if(is_array($studentSub)) {
 
-                if(is_array($return)) {
-                    $mark = $return[0]['mark'];
-                    $remark = "<a href=\"/submission/returnWork/".$this->arg[0]."/".$user['uid']."\">Re-mark</a>";
-                }
-                else {
-                    $mark = "<a href=\"/submission/returnWork/".$this->arg[0]."/".$user['uid']."\">Mark</a>";
-                    $remark = '';
-                }
-
-                $output = array(		'OWNER' 	=> formatName($user,'{lastname}, {firstname}'),
-                                        'OWNER_ID' 	=> $user['uid'],
-                                        'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
-                                        'SUB_ID'    => $studentSub['id'],
-                                        'DATE'		=> $studentSub['date'],
-                                        'DELETE'	=> '/submission/viewSubmissionForm.php?delete='.$studentSub['id']."&box_id=" . $this->arg[0],
-                                        'COLOUR'	=> $studentSub['late']?'#ff0000':'#000000',
-                                        'RETURN'	=> $mark,
-                                        'ON_OFF'	=> ++$i%2?'':'dark',
-                                        'REMARK'    => $remark,
+                $output = array(
+                    'OWNER' 	=> formatName($user,'{lastname}, {firstname}'),
+                    'OWNER_ID' 	=> $user['uid'],
+                    'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
+                    'SUB_ID'    => $studentSub['id'],
+                    'SUBMITTED' => $studentSub['date'],
+                    'COLOUR'	=> $studentSub['late']?'#ff0000':'#000000',
+                    'MARK'	    => $return[0]['mark'],
+                    'ON_OFF'	=> ++$i%2?'':'dark',
+                    'REMARK'    => $remark,
                 );
-                $this->setVar($output);
-                $this->parse('mark_block', 'mark', false);
 
+                $this->setVar($output);
+
+                $this->parse('download_action_block', 'download_action', false);
+                $this->parse('delete_action_block', 'delete_action', false);
+                $this->parse('mark_action_block', 'mark_action', false);
             }
             else {
 
-                $output = array(		'OWNER' 	=> formatName($user,'{lastname}, {firstname}'),
-                                        'OWNER_ID' 	=> $user['uid'],
-                                        'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
-                                        'mark_block'    => '<td colspan="2">&nbsp;</td><td>'.$return[0]['mark'].'</td><td>&nbsp;</td>',
-                                        'DATE'		=> '',
-										'COLOUR'	=> '',
-                                        'RETURN'	=> '',
-                                        'ON_OFF'	=> ++$i%2?'':'dark',
+                $output = array(
+                    'OWNER' 	=> formatName($user,'{lastname}, {firstname}'),
+                    'OWNER_ID' 	=> $user['uid'],
+                    'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
+                    'SUBMITTED'	=> '',
+                    'COLOUR'	=> '',
+                    'MARK'	    => $return[0]['mark'],
+                    'ON_OFF'	=> ++$i%2?'':'dark',
                 );
 
                 $this->setVar($output);
 
+                $this->setVar('download_action_block', '');
+                $this->setVar('delete_action_block', '');
+                $this->setVar('mark_action_block', '');
             }
 
-            $this->parse("submission_listing","submitted_block",true);
+            $this->parse('submission_listing', 'submission_block', true);
         }
     }
     else {
@@ -130,9 +128,9 @@ if(is_numeric($this->arg[0])) {
                     'OWNER_ID'      => $line['uid'],
                     'SUB_ID'        => $line['id'],
                     'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
-                    'DATE'          => $line['date'],
+                    'SUBMITTED'     => $line['date'],
                     'COLOUR'        => $line['late']?'#ff0000':'#000000',
-                    'RETURN'        => $mark,
+                    'MARK'          => $return[0]['mark'],
                     'ON_OFF'        => ++$i%2?'':'dark',
             );
 

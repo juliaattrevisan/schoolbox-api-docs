@@ -315,18 +315,27 @@ function formatName($userInfo, $format = NULL){
 	if(empty($format)){
 		$format = NAME_format;
 	}
-	
-	// Replace tags
-    if(is_array($userInfo)) {
-        foreach($userInfo as $tagName => $tagValue){
-            if (is_string($tagName)) {
-                $format = str_replace('{' . $tagName . '}', $tagValue, $format);
-            }
-        }
-        return $format;
-    }
-    else
+
+    /* Replace tags */
+    preg_match_all('|{\w+}|', $format, $tags);
+
+    if (empty($tags) || empty($userInfo)) {
         return false;
+    }
+
+    foreach ($tags[0] as $tag) {
+        $key = trim($tag, '{}');
+
+        if (is_string($userInfo[$key])) {
+            $value = $userInfo[$key];
+        } else {
+            $value = '';
+        }
+
+        $format = str_replace($tag, $value, $format);
+    }
+
+    return $format;
 }
 
 function formatEmail($email) {

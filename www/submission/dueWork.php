@@ -233,7 +233,10 @@ if(count($allWork) > 0) {
         
         if ($currentWork['status'] == UPCOMING_WORK_TYPE) {
 
-            if ($current_time > $currentWork['open_date']) {
+            if (!$currentWork['accept_submission']) {
+                $status = 'Work due';
+                $action = 'View Details';
+            } elseif ($current_time > $currentWork['open_date']) {
 
                 if ($current_time < $currentWork['date']) {
                     $status = 'Work due';
@@ -243,7 +246,7 @@ if(count($allWork) > 0) {
                     $action = 'Submit Work';
                 } else {
                     $status = 'Missed due date';
-                    $action = 'Submit Work';
+                    $action = 'View Details';
                 }
 
             } else {

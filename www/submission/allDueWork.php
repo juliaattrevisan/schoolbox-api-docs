@@ -104,7 +104,7 @@ if (is_array($allWork)) {
 			'WORK_DESCRIPTION' => $currentWork['description'],
 			'WORK_DUEDATE' => outputDate(DATE_short_no_time, $currentWork['dueDate']),
 			'WORK_MARK' => $currentWork['mark'],
-			'WORK_ACTION' => 'bleah',
+			'WORK_ACTION' => '',
 			'WORK_BOX_ID' => $currentWork['bid'],
 			'WORK_FILE_ID' => $currentWork['fid'],
 			'WORK_SUBMIT_FILE_ID' => $currentWork['sid'],

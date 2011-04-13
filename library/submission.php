@@ -105,7 +105,6 @@ class Submission extends Model {
                         assess.title as description,
                         assess.created_at as created,
                         '' as realname,
-                        0 as accept_submission,
                         category.name as categoryName,
                         categoryCode.code as categoryCode
                     FROM assess
@@ -194,7 +193,7 @@ class Submission extends Model {
 
 		$query .= "
 			c.name AS categoryName,
-			b.description,
+			b.description, b.accept_submission,
 			b.open_date, b.date, b.late_date, b.created, s.submitted, r.returned,
 			r.comment,
 			r.mark
@@ -229,7 +228,7 @@ class Submission extends Model {
 		$result = $this->db->getAll($query);
 
         /* Convert date fields and set status */
-        $date_fields = array('open_date', 'date', 'due_date', 'late_date', 'submitted', 'returned');
+        $date_fields = array('open_date', 'date', 'created', 'late_date', 'submitted', 'returned');
 
         foreach ($result as &$work) {
             foreach ($date_fields as $field_name) {

@@ -7,10 +7,12 @@
 
 require_once "include/permission.php";
 require_once "../library/group.php";
+require_once '../library/submissionStudent.php';
 require_once "../library/calendar.php";
 
 $calendarHandler = new Calendar;
 $groupHandler = new Group;
+$subStuHandler = new SubmissionStudent;
 
 $this->setFile(TEMPLATE_content, 'calendar/month.html');
 $this->setTab("calendar");
@@ -94,12 +96,22 @@ for ($i = 0; $i < $totalDays; $i++) {
 	$submissionList = $calendarHandler->getSubmissionEvents($currentDay);
 	if (is_array($submissionList)) {
 		foreach ($submissionList as $submission) {	
-	
+            /* Get status to set action */
+            $current_time = new DateTime();
+
+            $student_submission = $subStuHandler->getStatus($_SESSION['id'], $submission['id']);
+
+            if ($student_submission['status'] == 1 && $current_time > $student_submission['open_date'] && $current_time < $student_submission['late_date']) {
+                $action = 'Submit Work';
+            } else {
+                $action = 'View Details';
+            }
+
 			$output = array(
                             'TIME'        => $submission['dueTime'],
                             'NOTE'        => 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' (' . $submission['synergyCode'] . ')' : '') . ' - ' . $submission['description'],
                             'COLOUR'      => $calendarHandler->displayColour(4),
-                            'MODIFY'      => '<a class="btn go-to float-left" href="/submission/submitWork/' . $submission['id'] . '"><span></span>Submit</a>',
+                            'MODIFY'      => '<a class="btn go-to float-left" href="/submission/submissionHistory/' . $submission['id'] . '"><span></span>'.$action.'</a>',
                             'LOCATION'    => '',
                             'DETAIL'      => '',
                             'EVENT_TYPE'  => 'submission',

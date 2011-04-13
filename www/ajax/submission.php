@@ -7,7 +7,7 @@ require_once SITE_root . '/library/group.php';
 
 $page = new SitePage;
 
-if($_REQUEST['id']) {
+if ($_REQUEST['id']) {
 
 	$submissionHandler = new Submission;
 	$subStudHandler = new SubmissionStudent;
@@ -18,18 +18,32 @@ if($_REQUEST['id']) {
 	/* Check involved in subject */
 	$groupHandler = new Group;
 
-	if(!$groupHandler->involvedInSubject($subBox['cid']) && !$groupHandler->involvedInGroup($_SESSION['id'], $subBox['cid']))
-		exit();
+	if (!$groupHandler->involvedInSubject($subBox['cid']) && !$groupHandler->involvedInGroup($_SESSION['id'], $subBox['cid'])) {
+        exit();
+    }
+    
+    $current_time = new DateTime();
 
-	$output = array('description'	=> scrubTEXT($subBox['description']),
-					'category'		=> scrubTEXT($subBox['categoryName']),
-					'comment'		=> scrubTEXT($subBox['comment']),
-					'fid'			=> $subBox['fid'],
-					'cid'			=> $subBox['cid'],
-					'type'			=> scrubTEXT($subBox['typeName']),
-					'id'			=> $subBox['id'],
-					'submitted'		=> $subStudHandler->checkSubmitted($subBox['id'], $_SESSION['id'])?'true':'false',
-        );
+    /* Get status to set action */
+    $student_submission = $subStudHandler->getStatus($_SESSION['id'], $subBox['id']);
+
+    if ($student_submission['status'] == 1 && $current_time > $student_submission['open_date'] && $current_time < $student_submission['late_date']) {
+        $action = 'Submit Work';
+    } else {
+        $action = 'View Details';
+    }
+
+	$output = array(
+        'id'			=> $subBox['id'],
+        'cid'			=> $subBox['cid'],
+        'category'		=> scrubTEXT($subBox['categoryName']),
+        'fid'			=> $subBox['fid'],
+        'typeName'		=> scrubTEXT($subBox['typeName']),
+        'description'	=> scrubTEXT($subBox['description']),
+        'comment'		=> scrubTEXT($subBox['comment']),
+        'action'		=> $action,
+    );
+    
 }
 
 header("Content-type: application/json");
