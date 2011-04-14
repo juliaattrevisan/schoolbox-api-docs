@@ -16,7 +16,10 @@ $j(function() {
 		'removeCompleted': false,
 		'onSelect'       : function(event, queueID, fileObj) {
 			uploadQueue.push(queueID);
-		}
+		},
+        'onComplete'     : function () {
+            $j('#upload-status').text('test').slideDown();
+        }
 	});
 
 	/* Check for errors with custom file starter
@@ -102,6 +105,7 @@ $j(function() {
 <!-- END custom_head -->
 
 <h1>Upload Multiple Files</h1>
+<div id="upload-status" class="hide"></div>
 <table class="standardForm">
 	<tr>
 		<td class="formLabelWidth"><h4>Location</h4> <em>These files will be located in this folder</em></td>
