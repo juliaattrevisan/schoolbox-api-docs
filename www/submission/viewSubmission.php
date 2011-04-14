@@ -86,7 +86,6 @@ if(is_numeric($this->arg[0])) {
 
                 $this->parse('download_action_block', 'download_action', false);
                 $this->parse('delete_action_block', 'delete_action', false);
-                $this->parse('mark_action_block', 'mark_action', false);
             }
             else {
 
@@ -104,9 +103,9 @@ if(is_numeric($this->arg[0])) {
 
                 $this->setVar('download_action_block', '');
                 $this->setVar('delete_action_block', '');
-                $this->setVar('mark_action_block', '');
             }
 
+            $this->parse('mark_action_block', 'mark_action', false);
             $this->parse('submission_listing', 'submission_block', true);
         }
     }

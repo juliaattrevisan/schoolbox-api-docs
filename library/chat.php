@@ -70,6 +70,11 @@ class Chat extends Model {
             if (!is_object($this->_config['last_time']) || $last_message_time > $this->_config['last_time']) {
                 $this->_config['last_time'] = $last_message_time;
             }
+
+            foreach ($messages as &$message) {
+                $message['time'] = new DateTime($message['time']);
+                $message['time'] = $message['time']->format('D M j Y H:i:s \G\M\TO (T)'); // Thu Apr 14 2011 15:54:52 GMT+1000 (EST)
+            }
         }
 
         return $messages;

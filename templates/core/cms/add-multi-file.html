@@ -77,7 +77,7 @@ $j(function() {
 						'uploadifydie': true,
 						'description': elem.val(),
 						'hidden': hidden
-					}
+					};
 
 					$j('#custom_file_upload').uploadifySettings('scriptData', data);
 
@@ -92,6 +92,10 @@ $j(function() {
 
 //		$j('#custom_file_upload').uploadifyClearQueue();
 	});
+
+    $j('input.submit-btn-plain').click(function () {
+        history.back(-1);
+    });
 });
 </script>
 
@@ -123,4 +127,5 @@ $j(function() {
 		</td>
 	</tr>
 </table>
+<input class="submit-btn-plain" type="submit" name="finish" value="Finish Uploading" />
 <div class="float-fix"></div>

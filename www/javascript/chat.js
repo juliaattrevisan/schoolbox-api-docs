@@ -15,7 +15,7 @@ Chat.prototype = {
 
         this.interval_ref = setInterval(function () {
             self.update();
-        }, 1000);
+        }, 4000);
     },
 
     update: function () {
@@ -63,10 +63,10 @@ Chat.prototype = {
                     user_id: self.config.user_id,
                     type: 'user',
                     time: (new Date()).toString(),
-                    body: message.val(),
+                    body: message.val()
                 }
             }
-        }
+        };
 	
         message.val('');
 	
@@ -96,12 +96,12 @@ Chat.prototype = {
         var messages_el = $j('#component'+this.config.component_id+' ul.chat-messages');
 		
         for (var i in messages) {
-            message = messages[i];
+            var message = messages[i];
 
             message.time = (new Date(message.time)).toLocaleTimeString();
             message.name = formatName(message);
 
-            message_el = $j('<li></li>').addClass('chat-message-' + message.type);
+            var message_el = $j('<li></li>').addClass('chat-message-' + message.type);
 
             if (self.users.admin[message.user_id] != undefined) {
                 message_el.addClass('chat-message-user-admin');
@@ -122,19 +122,19 @@ Chat.prototype = {
     render_users: function (users) {
         var self = this;
 
-        chat_users_el = $j('#component'+this.config.component_id+' ul.chat-users');
+        var chat_users_el = $j('#component'+this.config.component_id+' ul.chat-users');
         chat_users_el.empty();
 
         var x = 0;
 
         for (var i in users.active) {
-            user = users.active[i];
+            var user = users.active[i];
 			
             //every two add in the dark class chimchim
             if (x%2 == 0) {
-                user_el = $j('<li></li>')
+                var user_el = $j('<li></li>')
             } else {
-                user_el = $j('<li class="dark"></li>')
+                var user_el = $j('<li class="dark"></li>')
             }
 
             if (self.users.admin[user.user_id] != undefined) {
@@ -157,13 +157,13 @@ Chat.prototype = {
 
             if (this.is_admin() && user.user_id != self.config.user_id) {
                 if (this.config.muted_users[user.user_id] != 'true') {
-                    user_mute_el = $j('<a href="#">mute</a>');
+                    var user_mute_el = $j('<a href="#">mute</a>');
                 } else {
-                    user_mute_el = $j('<a href="#">unmute</a>');
+                    var user_mute_el = $j('<a href="#">unmute</a>');
                 }
 
                 user_mute_el.click(function () {
-                    user_id = $j(this).parent().data('user_id');
+                    var user_id = $j(this).parent().data('user_id');
 
                     self.mute(user_id);
                 }).appendTo(user_el);
@@ -194,10 +194,6 @@ Chat.prototype = {
             user_id = this.config.user_id;
         }
 
-        if (this.users.admin[user_id] != undefined) {
-            return true;
-        }
-
-        return false;
+        return this.users.admin[user_id] != undefined;
     }
-}
+};

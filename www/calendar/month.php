@@ -94,39 +94,52 @@ for ($i = 0; $i < $totalDays; $i++) {
 	
 	
 	$submissionList = $calendarHandler->getSubmissionEvents($currentDay);
-	if (is_array($submissionList)) {
-		foreach ($submissionList as $submission) {	
+    if (is_array($submissionList)) {
+        foreach ($submissionList as $submission) {
+
             /* Get status to set action */
-            $current_time = new DateTime();
+            if ($groupHandler->isStudent($_SESSION['id'])) {
 
-            $student_submission = $subStuHandler->getStatus($_SESSION['id'], $submission['id']);
+                $current_time = new DateTime();
 
-            if ($student_submission['status'] == 1 && $current_time > $student_submission['open_date'] && $current_time < $student_submission['late_date']) {
-                $action = 'Submit Work';
+                $student_submission = $subStuHandler->getStatus($_SESSION['id'], $submission['id']);
+
+                if (!$submission['accept_submission']) {
+                    $action = 'View Details';
+                } elseif ($student_submission['status'] == 1 && $current_time > $student_submission['open_date'] && $current_time < $student_submission['late_date']) {
+                    $action = 'Submit Work';
+                } else {
+                    $action = 'View Details';
+                }
+
+                $this->setVar('MODIFY', '<a class="btn go-to float-left" href="/submission/submissionHistory/' . $submission['id'] . '"><span></span>' . $action . '</a>');
+
+            } elseif ($groupHandler->isStaff($_SESSION['id'])) {
+                $this->setVar('MODIFY', '<a class="btn go-to float-left" href="/submission/viewSubmission/' . $submission['id'] . '"><span></span>View Submissions</a>');
             } else {
-                $action = 'View Details';
+                $this->setVar('MODIFY', '');
             }
 
-			$output = array(
-                            'TIME'        => $submission['dueTime'],
-                            'NOTE'        => 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' (' . $submission['synergyCode'] . ')' : '') . ' - ' . $submission['description'],
-                            'COLOUR'      => $calendarHandler->displayColour(4),
-                            'MODIFY'      => '<a class="btn go-to float-left" href="/submission/submissionHistory/' . $submission['id'] . '"><span></span>'.$action.'</a>',
-                            'LOCATION'    => '',
-                            'DETAIL'      => '',
-                            'EVENT_TYPE'  => 'submission',
-                            'TYPE'        => 'Due Work',
-                            'AUTHOR'      => formatName($submission),
-                            'AUTHOR_ID'   => $submission['owner'],
-                            'EVENT_LEVEL' => '',
-                        );
+            $output = array(
+                'TIME' => $submission['dueTime'],
+                'NOTE' => 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' (' . $submission['synergyCode'] . ')' : '') . ' - ' . $submission['description'],
+                'COLOUR' => $calendarHandler->displayColour(4),
+                'LOCATION' => '',
+                'DETAIL' => '',
+                'EVENT_TYPE' => 'submission',
+                'TYPE' => 'Due Work',
+                'AUTHOR' => formatName($submission),
+                'AUTHOR_ID' => $submission['owner'],
+                'EVENT_LEVEL' => '',
+            );
 
             $this->setVar($output);
-            $this->parse('time_block','time');
-			$this->parse("note_listing", "note_block", true);
-			$subout = 1;
-		}
-	}
+            $this->parse('time_block', 'time');
+            $this->parse("note_listing", "note_block", true);
+            $subout = 1;
+        }
+    }
+}
 
 
 	if(Cfg::get('site_location') == 'mgs' && Cfg::get('external_enable') && $groupHandler->isStaff($_SESSION['id'])) {

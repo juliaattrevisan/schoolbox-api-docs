@@ -88,20 +88,25 @@ for($i=0; $i < 7; $i++) {
 
 	$submissionList = $calendarHandler->getSubmissionEvents($currentDay);
 	if (is_array($submissionList)) {
-		foreach ($submissionList as $submission) {	
+		foreach ($submissionList as $submission) {
+            
             /* Get status to set action */
             if ($groupHandler->isStudent($_SESSION['id'])) {
-                 $current_time = new DateTime();
+
+                $current_time = new DateTime();
 
                 $student_submission = $subStuHandler->getStatus($_SESSION['id'], $submission['id']);
 
-                if ($student_submission['status'] == 1 && $current_time > $student_submission['open_date'] && $current_time < $student_submission['late_date']) {
+                if (!$submission['accept_submission']) {
+                    $action = 'View Details';
+                } elseif ($student_submission['status'] == 1 && $current_time > $student_submission['open_date'] && $current_time < $student_submission['late_date']) {
                     $action = 'Submit Work';
                 } else {
                     $action = 'View Details';
                 }
 
-                $this->setVar('MODIFY', '<a class="btn go-to float-left" href="/submission/submissionHistory/' . $submission['id'] . '"><span></span>'.$action.'</a>');
+                $this->setVar('MODIFY', '<a class="btn go-to float-left" href="/submission/submissionHistory/' . $submission['id'] . '"><span></span>' . $action . '</a>');
+
             } elseif ($groupHandler->isStaff($_SESSION['id'])) {
                 $this->setVar('MODIFY', '<a class="btn go-to float-left" href="/submission/viewSubmission/' . $submission['id'] . '"><span></span>View Submissions</a>');
             } else {

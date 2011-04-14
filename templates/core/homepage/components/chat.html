@@ -4,7 +4,7 @@
 <script type="text/javascript" src="/javascript/chat.js"></script>
 <script type="text/javascript">
 $j(function () {
-    var config = {
+    window.chat_obj = new Chat({
         category_id: '{ID}',
         component_id: '{CHAT_COMPONENT_ID}',
         user_id: '{CHAT_USER_ID}',
@@ -13,14 +13,12 @@ $j(function () {
             firstname: '{CHAT_NAME_FIRSTNAME}',
             lastname: '{CHAT_NAME_LASTNAME}'
         },
-        last_time: null,
-    }
-
-    window.chat_obj = new Chat(config);
+        last_time: null
+    });
 
     $j('#component{COMPONENT_HOMEPAGE_ID} form.chat-send a').click(function (event) {
         event.preventDefault();
-        message_box = $j('#component{COMPONENT_HOMEPAGE_ID} textarea[name="message"]');
+        var message_box = $j('#component{COMPONENT_HOMEPAGE_ID} textarea[name="message"]');
 
         if (!message_box.val().length) {
                 message_box.animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
@@ -48,8 +46,6 @@ $j(function () {
         $j('.chat-users').slideToggle();
         $j(this).toggleClass('active')
     });
-
-	
 });
 </script>
 <!-- END custom_head -->
@@ -59,7 +55,7 @@ $j(function () {
 	<!-- BEGIN config --> 
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
 	<div class="editPanel settings hide">
-		<form action="/homepage/configForm.php" method="get">
+		<form class="component-config" action="/homepage/configForm.php" method="get">
 			<input type="hidden" name="cid" value="{ID}" />
 			<input type="hidden" name="type" value="config" />
 			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />

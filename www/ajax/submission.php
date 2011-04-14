@@ -27,7 +27,9 @@ if ($_REQUEST['id']) {
     /* Get status to set action */
     $student_submission = $subStudHandler->getStatus($_SESSION['id'], $subBox['id']);
 
-    if ($student_submission['status'] == 1 && $current_time > $student_submission['open_date'] && $current_time < $student_submission['late_date']) {
+    if ($student_submission['accept_submission']) {
+        $action = 'View Details';
+    } elseif ($student_submission['status'] == 1 && $current_time > $student_submission['open_date'] && $current_time < $student_submission['late_date']) {
         $action = 'Submit Work';
     } else {
         $action = 'View Details';

@@ -67,7 +67,10 @@ class SubmissionStudent extends Model {
             }
         }
 
-        if (!empty($submission['returned'])) {
+        if (!empty($submission['returned']) && empty($submission['submitted'])) {
+            $submission['status'] = 1;
+            $submission['relevant_date'] = $submission['date'];
+        } elseif (!empty($submission['returned'])) {
             $submission['status'] = 3;
             $submission['relevant_date'] = $submission['returned'];
         } elseif (!empty($submission['submitted'])) {
