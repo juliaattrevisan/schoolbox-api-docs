@@ -1218,7 +1218,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 .admin-contents .level.green .split { border-color: #cae9b9; }
 
 .admin-contents .one-third {
-	width:36%;
+	width:32%;
 	float:left;
 	margin-right:1%;
 }
@@ -1231,7 +1231,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 .admin-contents .half.last{margin:0;}
 
 .admin-contents .two-thirds {
-	width:63%;
+	width:66%;
 	float:left;
 }
 
@@ -3068,6 +3068,7 @@ CHAT
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
+	word-wrap:break-word;
 }
 
 .chat-message-user-me .chat-message {

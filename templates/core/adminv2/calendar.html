@@ -1,0 +1,87 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<script type="text/javascript">
+
+$j(function() {
+
+	$j.fn.qtip.defaults.position.corner = {
+		target: 'topLeft',
+		tooltip: 'bottomLeft'
+	}
+	
+	$j.fn.qtip.defaults.style = {
+		tip: 'bottomLeft',
+		name: 'green'
+	}
+	
+	$j('.one-third:first h3 span').qtip({
+		content: 'Controls if files of this type can be uploaded'});
+		
+	$j('.one-third:nth-child(2) h3 span').qtip({
+		content: 'A simple name for the type of file'});
+		
+	$j('.one-third:nth-child(3) h3 span').qtip({
+		content: 'The mime type for a file can be found by searching google'});
+	
+})
+
+</script>
+
+<!-- END custom_head-->
+
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+	<li><a href="/adminv2/home" >Home</a></li>
+	<li><a href="/adminv2/user">Users</a></li>
+	<li><a href="/adminv2/side-menu">Side Menu</a></li>
+	<li><a href="/adminv2/allowed-file">Allowed Files</a></li>
+	<li><a href="/adminv2/setting">Settings</a></li>
+	<li><a href="/adminv2/calendar" class="current">Calendar</a></li>
+	<li><a href="/adminv2/list">Lists</a></li>
+	<li><a href="/adminv2/rollover">Rollover</a></li>
+</ul>
+<div class="admin-contents">
+	<h2>Calendar</h2>
+	<div class="level">
+		<div class="one-third">
+			<h3>Bulk<span>?</span></h3>
+			<p>The File that contains the Calendar Infomation must be a Comma Seperated Text File, containing the following:
+                          Date, Start Time, Finish Time, Comment,Priority ie. (2004-12-21,15:30,18:30,This is a Calendar Note,4)</p></td>
+                      	<input type="file" name="file" />
+						<div class="float-fix"></div>
+			
+		</div>
+		<div class="one-third">
+			<h3>Campus<span>?</span></h3>
+			<p>Select the campus' which will be able to view these events</p>
+			<!-- BEGIN campus_check_list -->
+				<label><input type="checkbox" name="campus[]" value="{CAMPUSID}" />{CAMPUSNAME}</label><br />
+			<!-- END campus_check_list -->
+				
+			
+		</div>
+		<div class="one-third last">
+			<h3>Groups<span>?</span></h3>
+			<p>Select the Groups which will be able to view these events</p>
+			<!-- BEGIN user_group_check_list -->
+							<label><input type="checkbox" name="userGroup[]" value="{USERGROUPID}" />{USERGROUPNAME}</label><br />
+						<!-- END user_group_check_list -->
+		</div>
+		<div class="float-fix"></div>
+		<div class="one-third last"><br /><br />
+			<h3>Portal ID of Owner<span>?</span></h3>
+			<p>The field is optional.  If left the current users ID will be used</p>
+
+                          <input name="userid" type="text" id="userid" size="6" maxlength="6" />
+						  <div class="float-fix"></div>
+					  
+		<div class="float-fix"></div>
+ 
+		</div>
+		<div class="float-fix"></div>
+	</div>
+	<a class="btn add float-left submit" href="#"><span></span>Save</a>	
+	<div class="float-fix"></div>
+</div>
