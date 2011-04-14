@@ -93,8 +93,15 @@ $j(function() {
 				
 	});
 		
+	$j('.delete').click(function(event) {
+		event.preventDefault();
+		var nearestAction = $j(this).closest('form').attr('action');
+		var nearestFID =  $j(this).closest('form').find('input[name=fileTypeID]').val();
+		$j(this).closest('form').attr('action', nearestAction+"&delete="+nearestFID);
+		$j(this).closest('form').submit();
 		
-	
+		return false;
+	});
 	
 });
 
@@ -163,7 +170,6 @@ $j(function() {
 				<div class="mime"><p>{FILE_MIME}</p></div>
 				<div class="extensions"><p>{FILE_EXTENSION}</p></div>
 				<div class="inline"><p>{FILE_INLINE}</p>
-					<a href="#" class="btn delete no-marg"><span></span>Delete</a>
 					<a href="#" class="btn modify no-marg"><span></span>Modify</a>
 					<div class="float-fix"></div>
 				</div>
@@ -172,6 +178,8 @@ $j(function() {
 			<div class="float-fix"></div>
 		
 			<div class="row form-holder">
+			
+			<!--/adminv2/allowed-fileForm.php-->
 				<form id="allowed-file{FILE_ID}" method="post" action="/adminv2/allowed-fileForm.php">
                      <input type="hidden" readonly="readonly" name="fileTypeID" value="{FILE_ID}" />
 					<label class="enabled">
@@ -203,7 +211,7 @@ $j(function() {
 								<option value="true">Inline</option>
 								<option value="false">External</option>
 							</select>
-							<a href="#" class="btn delete no-marg"><span></span>Delete</a>
+							<a rel="" href="#" class="btn delete no-marg"><span></span>Delete</a>
 							<a href="#" class="btn tick submit no-marg"><span></span>Save</a>
 						</fieldset>
 					</label>

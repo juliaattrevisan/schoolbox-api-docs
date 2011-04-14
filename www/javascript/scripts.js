@@ -12,8 +12,11 @@ $j(function externalLinks() {
 });
 /*-------------------------------------------------------------------------*/
 $j(function() {
+	
 	$j('#nav ul').droppy({speed: 0});
+	
 	$j('#search-field').autoclear();
+	
 	$j('.standardForm tr:last td').css("border", "0") 
 	
 	$j('.submit').click(function(event) {

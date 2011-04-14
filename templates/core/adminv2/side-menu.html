@@ -1,15 +1,16 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
+
 <script type="text/javascript">
 $j(function () {
 	$j("#side-menu").jstree({
         "core" : { "initially_open" : [ "node_0" ] },
 		"plugins" : [ "themes", "html_data", "dnd","crrm"],
         "themes" : {
-			"theme" : "apple",
+			"theme" : "core",
 			"dots" : true,
 			"icons" : false
-		},
+		}
         
 	}).bind('move_node.jstree', function(e, data) {
         var pos = data.rslt.p;
@@ -37,10 +38,11 @@ $j(function () {
 </ul>
 <div class="admin-contents">
 	<h2>Side Menu</h2>
-    <a href="/adminv2/modify-side-menu/">Add New</a>
+    <a class="btn add float-left" href="/adminv2/modify-side-menu/"><span></span>Add New</a>
+	<div class="float-fix"></div>
+	<br>
         <div id="side-menu">
         {MENU_TREE}
         </div>
-	
 	<div class="float-fix"></div>
 </div>

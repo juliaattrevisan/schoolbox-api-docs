@@ -72,6 +72,9 @@ $j(function() {
 			<input name="tableIndex" type="hidden" value="{TABLE_CURRENT_INDEX}" />
 			<!-- END table_schema -->
 			<table id="tableData">
+				<colgroup>
+					<col width="10%" />
+				</colgroup>
 				<thead>
 					<tr>
 						<!-- BEGIN table_heading -->
@@ -99,7 +102,8 @@ $j(function() {
 			<div class="float-fix"></div>
 			<input type="submit" class="submit-btn-plain" value="Save"/>
 			<div class="float-fix"></div>
-			<a id="addNewRow">New row</a>
+			<a href="#" id="addNewRow" class="btn add float-left"><span></span>New row</a>
+			<div class="float-fix"></div>
 		</form>
 
 	</div>
@@ -121,6 +125,7 @@ $j(function() {
 	$j('#addNewRow').click(function() {
 		var newRow = $j('#newData').find('tr').clone();
 		$j('#tableData').find('tbody').append(newRow);
+		return false;
 	});
 });
 </script>
