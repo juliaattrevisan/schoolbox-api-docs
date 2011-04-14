@@ -39,11 +39,11 @@ else {
     $userID = $_SESSION['id'];
 }
 
-if (is_numeric($this->arg[1]) && in_array($this->arg[1], $childList)) {
-	$userID = $this->arg[1];
+if (is_numeric($this->arg[0]) && in_array($this->arg[0], $childList)) {
+	$userID = $this->arg[0];
 }
-else if (is_numeric($this->arg[1]) && $groupHandler->isStaff()) {
-	$userID = $this->arg[1];
+else if (is_numeric($this->arg[0]) && $groupHandler->isStaff()) {
+	$userID = $this->arg[0];
 }
 
 $user = $userHandler->getByID($userID);

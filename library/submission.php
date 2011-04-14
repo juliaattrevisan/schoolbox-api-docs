@@ -227,25 +227,27 @@ class Submission extends Model {
 
 		$result = $this->db->getAll($query);
 
-        /* Convert date fields and set status */
-        $date_fields = array('open_date', 'date', 'created', 'late_date', 'submitted', 'returned');
+        if (!empty($result)) {
+            /* Convert date fields and set status */
+            $date_fields = array('open_date', 'date', 'created', 'late_date', 'submitted', 'returned');
 
-        foreach ($result as &$work) {
-            foreach ($date_fields as $field_name) {
-                if (!empty($work[$field_name])) {
-                    $work[$field_name] = new DateTime($work[$field_name]);
+            foreach ($result as &$work) {
+                foreach ($date_fields as $field_name) {
+                    if (!empty($work[$field_name])) {
+                        $work[$field_name] = new DateTime($work[$field_name]);
+                    }
                 }
-            }
 
-            if ($type == UPCOMING_WORK_TYPE) {
-                $work['relevant_date'] = $work['date'];
-            } else if ($type == AWAITING_WORK_TYPE) {
-                $work['relevant_date'] = $work['submitted'];
-            } else if ($type == RETURNED_WORK_TYPE) {
-                $work['relevant_date'] = $work['returned'];
-            }
+                if ($type == UPCOMING_WORK_TYPE) {
+                    $work['relevant_date'] = $work['date'];
+                } else if ($type == AWAITING_WORK_TYPE) {
+                    $work['relevant_date'] = $work['submitted'];
+                } else if ($type == RETURNED_WORK_TYPE) {
+                    $work['relevant_date'] = $work['returned'];
+                }
 
-            $work['status'] = $type;
+                $work['status'] = $type;
+            }
         }
 
         return $result;
