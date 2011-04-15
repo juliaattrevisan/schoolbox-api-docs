@@ -1621,7 +1621,7 @@ ASSESS
 }
 
 #assess .standardForm td {
-	width:100%;
+
 	position:relative
 }
 
@@ -1854,12 +1854,7 @@ ASSESS
 	border: 1px solid #dbdbdb;
 }
 
-#assess .mceLayout tbody { border:0; }
 
-#assess .mceLayout .mceToolbar {
-	width:100px;
-	float:left;
-}
 
 #assess ul li .mark, #assess .left-option, #assess .right-option, #assess .inputs .delete, #assess li.inputs .answer-value, #assess li.inputs .list-item { float:left; }
 
@@ -1983,6 +1978,7 @@ ASSESS
 	background:#E0F2DF;
 	border: 1px solid #dbdbdb;
 }
+
 
 #assess table.mceLayout tr.mceFirst td, #assess table.mceLayout tr.mceLast td, #assess table.mceLayout tr.mceFirst td, .defaultSkin .mceIframeContainer { border:0; }
 
@@ -2853,6 +2849,7 @@ ul.js_happening li {
 .cal-bubble .middle h4 {
 	font-size:12px;
 	margin:0 0 16px 0;
+	width:326px
 }
 
 .cal-bubble .middle h4 span {
