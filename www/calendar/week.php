@@ -113,17 +113,18 @@ for($i=0; $i < 7; $i++) {
                 $this->setVar('MODIFY', '');
             }
 
-			$output = array('TIME'			=> $submission['dueTime'],
-							'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['description'],
-							'COLOUR'		=> $calendarHandler->displayColour(4),
-                            'LOCATION'		=> '',
-                            'DETAIL'        => '',
-                            'EVENT_TYPE'    => 'submission',
-                            'TYPE'          => 'Due Work',
-                            'AUTHOR'        => formatName($submission),
-                            'AUTHOR_ID'     => $submission['owner'],
-                            'EVENT_LEVEL'   => '',
-						  );					  
+			$output = array(
+                'TIME'          => $submission['date']->format('g:iA'), // g:i a
+                'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['description'],
+                'COLOUR'		=> $calendarHandler->displayColour(4),
+                'LOCATION'		=> '',
+                'DETAIL'        => '',
+                'EVENT_TYPE'    => 'submission',
+                'TYPE'          => 'Due Work',
+                'AUTHOR'        => formatName($submission),
+                'AUTHOR_ID'     => $submission['owner'],
+                'EVENT_LEVEL'   => '',
+              );
 			
 			$this->setVar($output);
             $this->parse('time_block','time');

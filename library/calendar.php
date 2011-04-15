@@ -151,6 +151,7 @@ class Calendar extends Model {
 			$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.description,
                         submission_box.owner, submission_box.id, user.firstname, user.lastname, user.title,
                         DATE_FORMAT(submission_box.date, '%w') as dayIndex,
+					    DATE_FORMAT(submission_box.date, '" . CALENDAR_time_format . "') as dueTime,
                         submission_box.accept_submission, submission_box.open_date, submission_box.date, submission_box.late_date, submission_box.created, student_submission.submitted, submission_return.returned
                       FROM (category, submission_box )
                       LEFT JOIN submission_return ON submission_box.id = submission_return.box_id AND submission_return.owner = {$_SESSION['id']}
