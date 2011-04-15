@@ -3013,7 +3013,8 @@ CHAT
 
 .box.chat .listing { margin:0; }
 
-.chat .chat-messages { position:relative; }
+.chat .chat-messages { position:relative;max-height: 450px;
+overflow: auto; }
 
 .chat-message-user { padding:2px 0; }
 

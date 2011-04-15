@@ -5,26 +5,48 @@
 </span>
 <div class="indent">
     <p>These are the assignments that have been submitted. Deleting an assignment from here will allow the student to resubmit. Assignments in red are late.</p>
+
     <table class="ruler">
+	
+		<colgroup>
+			<col width="20%" />
+			<col width="20%" />
+			<col width="20%" />
+			<col width="15%" />
+			<col width="15%" />
+			<col width="15%" />
+		</colgroup>
+		
         <thead>
             <tr>
                 <th>Submitted By</th>
                 <th>Submitted Date</th>
                 <th>Mark</th>
-                <th width="5%">Download</th>
-                <th width="5%">Delete</th>
-                <th width="5%">Mark</th>
+                <th>Download</th>
+                <th>Delete</th>
+                <th>Mark</th>
             </tr>
         </thead>
         <tbody>
             <!-- BEGIN submission_block -->
             <tr class="{ON_OFF}">
-                <td style="color:{COLOUR}; white-space: nowrap;"><a href="/search/user/{OWNER_ID}">{OWNER}</a></td>
+                <td style="color:{COLOUR}; white-space: nowrap;">
+				
+				<a  href="/search/user/{OWNER_ID}">{OWNER}</a>
+				
+				</td>
                 <td style="color:{COLOUR};">{SUBMITTED}</td>
                 <td>{MARK}</td>
                 <td><!-- BEGIN download_action --><a href="/submission/send.php?id={SUB_ID}">Download</a><!-- END download_action --></td>
-                <td><!-- BEGIN delete_action --><a href="/submission/viewSubmissionForm.php?delete={SUB_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));">Delete</a><!-- END delete_action --></td>
-                <td><!-- BEGIN mark_action --><a href="/submission/returnWork/{BOX_ID}/{OWNER_ID}">Mark</a><!-- END mark_action --></td>
+                <td><!-- BEGIN delete_action -->
+				<a href="/submission/viewSubmissionForm.php?delete={SUB_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));">Delete</a>
+				<!-- END delete_action --></td>
+                <td>
+				<!-- BEGIN mark_action -->
+				
+				<a href="/submission/returnWork/{BOX_ID}/{OWNER_ID}">Mark</a>
+				
+				<!-- END mark_action --></td>
             </tr>
             <!-- END submission_block -->
         </tbody>

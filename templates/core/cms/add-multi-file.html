@@ -18,7 +18,7 @@ $j(function() {
 			uploadQueue.push(queueID);
 		},
         'onComplete'     : function () {
-            $j('#upload-status').text('test').slideDown();
+            $j('#upload-status').slideDown();
         }
 	});
 
@@ -105,7 +105,7 @@ $j(function() {
 <!-- END custom_head -->
 
 <h1>Upload Multiple Files</h1>
-<div id="upload-status" class="hide"></div>
+<div id="upload-status" class="saved-colours hide">Successfully uploaded files!</div>
 <table class="standardForm">
 	<tr>
 		<td class="formLabelWidth"><h4>Location</h4> <em>These files will be located in this folder</em></td>

@@ -1,54 +1,54 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/stdfuncs.js"></script>
-<script type="text/javascript" src="/javascript/jquery.color.js"></script>
-<script type="text/javascript" src="/javascript/chat.js"></script>
-<script type="text/javascript">
-$j(function () {
-    window.chat_obj = new Chat({
-        category_id: '{ID}',
-        component_id: '{CHAT_COMPONENT_ID}',
-        user_id: '{CHAT_USER_ID}',
-        name: {
-            title: '{CHAT_NAME_TITLE}',
-            firstname: '{CHAT_NAME_FIRSTNAME}',
-            lastname: '{CHAT_NAME_LASTNAME}'
-        },
-        last_time: null
-    });
-
-    $j('#component{COMPONENT_HOMEPAGE_ID} form.chat-send a').click(function (event) {
-        event.preventDefault();
-        var message_box = $j('#component{COMPONENT_HOMEPAGE_ID} textarea[name="message"]');
-
-        if (!message_box.val().length) {
-                message_box.animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
-                message_box.parent().animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
-        } else {
-                window.chat_obj.send();
-        }
-    });
-
-    $j('#component{COMPONENT_HOMEPAGE_ID} textarea[name="message"]').keypress(function (event) {
-        if (event.keyCode == 13) {
-            //this way the actual message is validated.. if it's empty a pretty thing happens.
-            event.preventDefault();
-            if (!$j(this).val().length) {
-                $j(this).animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
-                $j(this).parent().animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
-            } else {
-                window.chat_obj.send();
-            }
-        }
-    });
-
-    $j('.show-users').click(function(event) {
-        event.preventDefault();
-        $j('.chat-users').slideToggle();
-        $j(this).toggleClass('active')
-    });
-});
-</script>
-<!-- END custom_head -->
+	<!-- BEGIN custom_head -->
+	<script type="text/javascript" src="/javascript/stdfuncs.js"></script>
+	<script type="text/javascript" src="/javascript/jquery.color.js"></script>
+	<script type="text/javascript" src="/javascript/chat.js"></script>
+	<script type="text/javascript">
+	$j(function () {
+		window.chat_obj = new Chat({
+			category_id: '{ID}',
+			component_id: '{CHAT_COMPONENT_ID}',
+			user_id: '{CHAT_USER_ID}',
+			name: {
+				title: '{CHAT_NAME_TITLE}',
+				firstname: '{CHAT_NAME_FIRSTNAME}',
+				lastname: '{CHAT_NAME_LASTNAME}'
+			},
+			last_time: null
+		});
+	
+		$j('#component{COMPONENT_HOMEPAGE_ID} form.chat-send a').click(function (event) {
+			event.preventDefault();
+			var message_box = $j('#component{COMPONENT_HOMEPAGE_ID} textarea[name="message"]');
+	
+			if (!message_box.val().length) {
+					message_box.animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
+					message_box.parent().animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
+			} else {
+					window.chat_obj.send();
+			}
+		});
+	
+		$j('#component{COMPONENT_HOMEPAGE_ID} textarea[name="message"]').keypress(function (event) {
+			if (event.keyCode == 13) {
+				//this way the actual message is validated.. if it's empty a pretty thing happens.
+				event.preventDefault();
+				if (!$j(this).val().length) {
+					$j(this).animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
+					$j(this).parent().animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
+				} else {
+					window.chat_obj.send();
+				}
+			}
+		});
+	
+		$j('.show-users').click(function(event) {
+			event.preventDefault();
+			$j('.chat-users').slideToggle();
+			$j(this).toggleClass('active')
+		});
+	});
+	</script>
+	<!-- END custom_head -->
 
 <div class="box chat" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>Chat<span class="light"></span></h2>

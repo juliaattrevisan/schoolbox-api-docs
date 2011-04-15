@@ -199,11 +199,18 @@ $j(function() {
 	$j(".add-component a").live('click', function(event) {
 		event.preventDefault();
 		var $this = $j(this);
-		$j.post('/homepage/configForm.php', {add : $j(this).attr('rel'), cid : cid }, function(data){
-			$j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
-				$j(this).animate({opacity:1}, 300);
-			});
-        });		
+		
+		$j.ajax({
+		 type: "POST",
+			url: '/homepage/configForm.php', 
+			data: {add : $j(this).attr('rel'), cid : cid }, 
+			success: function(data){
+				$j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
+					$j(this).animate({opacity:1}, 300);
+				});
+        	},
+			dataType: "html"
+		});		
 
 		if($this.parent().hasClass('one-only')) {
 			$this.parent().addClass('disabled');
