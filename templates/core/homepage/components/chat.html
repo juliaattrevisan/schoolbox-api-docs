@@ -25,6 +25,7 @@
 					message_box.parent().animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
 			} else {
 					window.chat_obj.send();
+					$j(".chat-messages").attr({ scrollTop: $j(".chat-messages").attr("scrollHeight") });
 			}
 		});
 	
@@ -37,6 +38,7 @@
 					$j(this).parent().animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
 				} else {
 					window.chat_obj.send();
+					$j(".chat-messages").attr({ scrollTop: $j(".chat-messages").attr("scrollHeight") });
 				}
 			}
 		});
