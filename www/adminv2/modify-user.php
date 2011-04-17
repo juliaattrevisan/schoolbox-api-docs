@@ -13,6 +13,7 @@ if(!$groupHandler->isSuperuser())
 if(is_numeric($this->arg[0])) {
 
     $this->setFile(TEMPLATE_content, 'adminv2/modify-user.html');
+    $this->setTitle('Admin - Modify User');
 
     /* Modify existing user */
     $user = $userHandler->getByID($this->arg[0]);
@@ -160,6 +161,7 @@ if(is_numeric($this->arg[0])) {
 }
 else {
     $this->setFile(TEMPLATE_content, 'adminv2/new-user.html');
+    $this->setTitle('Admin - New User');
 
     $this->setVar('DATABASE_TYPE', ucfirst(Cfg::get('external_type')));
 

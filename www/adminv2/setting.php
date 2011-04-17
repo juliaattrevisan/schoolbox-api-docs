@@ -3,6 +3,7 @@
 require_once SITE_root . '/include/config.php';
 
 $this->setFile(TEMPLATE_content, 'adminv2/settings.html');
+$this->setTitle('Admin - Settings');
 
 $this->setBlock(TEMPLATE_content, 'setting_tab', 'setting_tab_block');
 
@@ -11,6 +12,7 @@ $this->setBlock(TEMPLATE_content, 'setting_type_input', 'setting_type_input_bloc
 $this->setBlock(TEMPLATE_content, 'setting_type_textarea', 'setting_type_textarea_block');
 $this->setBlock(TEMPLATE_content, 'setting_type_boolean', 'setting_type_boolean_block');
 $this->setBlock(TEMPLATE_content, 'setting_type_select', 'setting_type_select_block');
+$this->setBlock('setting_type_select', 'setting_select','setting_select_block');
 $this->setBlock(TEMPLATE_content, 'setting_type_check', 'setting_type_check_block');
 
 $output = array(
@@ -91,7 +93,14 @@ foreach($optionList as $option) {
 			break;
 
 			case 'select':
-				$this->parse('setting_type_input_block','setting_type_select',true);
+				$optionList = explode(':',$option['options']);
+                $this->setVar('setting_select_block', '');
+                foreach($optionList as $opt) {
+                    $this->setVar('SELECT_OPTION', $opt);
+                    $this->setVar('SETTING_OPTION_SELECTED', $option['value']==$opt?'selected="selected"':'');
+                    $this->parse('setting_select_block', 'setting_select',true);
+                }
+                $this->parse('setting_type_input_block','setting_type_select',true);
 			break;
 
 			case 'checkbox':

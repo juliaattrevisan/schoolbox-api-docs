@@ -1,5 +1,6 @@
 <?php
 require_once SITE_root . '/library/allowed-file.php';
+$this->setTitle('Admin - Allowed Files');
 
 $this->setFile(TEMPLATE_content, 'adminv2/allowed-files.html');
 $this->setBlock(TEMPLATE_content, 'file', 'file_block');

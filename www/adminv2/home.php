@@ -1,5 +1,6 @@
 <?php
 require_once SITE_root . '/library/group.php';
+$this->setTitle('Admin - Home');
 
 $this->setFile(TEMPLATE_content, 'adminv2/home.html');
 

@@ -3,6 +3,7 @@ require_once SITE_root . '/library/sideMenu.php';
 require_once SITE_root . '/library/user.php';
 
 $this->setFile(TEMPLATE_content, 'adminv2/modify-side-menu.html');
+$this->setTitle('Admin - Modify Side Menu');
 
 $menuHandler = new SideMenu;
 $userHandler = new User;

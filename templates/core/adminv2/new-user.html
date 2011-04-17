@@ -63,7 +63,7 @@ $j(function() {
 	
 	<div class="level">
 		<h3>User Details<span class="question">?</span></h3>
-		<form class="admin-form">
+		<form class="admin-form" method="POST" action="/adminv2/userForm.php" >
 			<div class="split-container">
 				<div class="split">
 					<label for ="preferred" class="preferred">
@@ -137,6 +137,7 @@ $j(function() {
 					</label>
 				</div>
 			</div>
+            <input type="submit" name="submit" value="Add User" />
 		</form>
 		<div class="float-fix"></div>
 	</div>

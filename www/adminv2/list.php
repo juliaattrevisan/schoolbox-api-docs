@@ -2,6 +2,7 @@
 require_once SITE_root . '/library/generic.php';
 
 $this->setFile(TEMPLATE_content, 'adminv2/lists.html');
+$this->setTitle('Admin - Lists');
 
 $this->setBlock(TEMPLATE_content, 'table_tab', 'table_tab_block');
 $this->setBlock(TEMPLATE_content, 'table_heading', 'table_heading_block');

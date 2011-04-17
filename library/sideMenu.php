@@ -32,6 +32,7 @@ class sideMenu extends Model {
         while($menuitem = $this->db->getNextArray() ) {
                 $tree = $this->buildTree($tree, $menuitem);
         }
+
         return $tree;
     }
 
@@ -62,7 +63,7 @@ class sideMenu extends Model {
                             $target = " target={$list[$i]['target']}";
                     else $target = '';
 
-                    $text .= '<li id="node_'.$list[$i]['id'].'"><a href="/adminv2/modify-side-menu/'.$list[$i]['id'].'">'.$list[$i]['txt'].' <span>Edit</span></a>';
+                    $text .= '<li id="node_'.$list[$i]['id'].'"><a href="/adminv2/modify-side-menu/'.$list[$i]['id'].'">'.$list[$i]['txt'].'</a>';
 
                     if(is_array($list[$i]['children'])) {
                             $text .= $this->outputTree($list[$i]['children'], ($level + 1));
