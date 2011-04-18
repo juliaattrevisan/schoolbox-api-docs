@@ -8,7 +8,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../include/model.php';
+require_once dirname(__FILE__) . '/../../include/model.php';
 
 class AssessSection extends Model {
     public $_table = 'assess_section';
