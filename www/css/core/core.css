@@ -1438,7 +1438,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	word-wrap:break-word
 
 }
-.row p, .row fieldset {
+.row p, .row fieldset fieldset{
 	margin:0;
 	padding:7px 0 7px 16px;
 }

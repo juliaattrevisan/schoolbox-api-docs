@@ -182,30 +182,30 @@ $j(function() {
 			<!--/adminv2/allowed-fileForm.php-->
 				<form id="allowed-file{FILE_ID}" method="post" action="/adminv2/allowed-fileForm.php">
                      <input type="hidden" readonly="readonly" name="fileTypeID" value="{FILE_ID}" />
-					<label class="enabled">
+					<fieldset class="enabled">
 						<fieldset>
 							<input type="checkbox" name="enable" {FILE_ENABLED_CHECKED} />
 							<input type="hidden" readonly="readonly" name="enable" value="true" />
 							<button class="float-right open-dialog" id="icon-choice"><img src="/images/mime/22x22/{FILE_ICON}" /></button>
 							<input type="hidden" name="iconFile" id="button{FILE_ID}" class="chosen-one" value="{FILE_ICON}" />
 						</fieldset>
-					</label>
-					<label class="description">
+					</fieldset>
+					<fieldset class="description">
 						<fieldset>
 							<textarea class="text-input textarea" name="description" >{FILE_DESC}</textarea>
 						</fieldset>
-					</label>
-					<label class="mime">
+					</fieldset>
+					<fieldset class="mime">
 						<fieldset>
 							<textarea class="text-input textarea" name="mime" >{FILE_MIME}</textarea>
 						</fieldset>
-					</label>
-					<label class="extensions">
+					</fieldset>
+					<fieldset class="extensions">
 						<fieldset>
 							<input type="text" class="text-input" name="extension" value="{FILE_EXTENSION}"/>
 						</fieldset>
-					</label>
-					<label class="inline">
+					</fieldset>
+					<fieldset class="inline">
 						<fieldset>
 							<select name="inline" id="inline">
 								<option value="true">Inline</option>
@@ -214,7 +214,7 @@ $j(function() {
 							<a rel="" href="#" class="btn delete no-marg"><span></span>Delete</a>
 							<a href="#" class="btn tick submit no-marg"><span></span>Save</a>
 						</fieldset>
-					</label>
+					</fieldset>
 					<div class="float-fix"></div>
 				</form>
 			</div>
