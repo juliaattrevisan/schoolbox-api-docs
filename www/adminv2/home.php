@@ -1,11 +1,12 @@
 <?php
 require_once SITE_root . '/library/group.php';
-$this->setTitle('Admin - Home');
+
 
 $this->setFile(TEMPLATE_content, 'adminv2/home.html');
 
 $this->setBlock(TEMPLATE_content, 'group_summary', 'group_summary_block');
 $this->setBlock(TEMPLATE_content, 'recent_log', 'recent_log_block');
+$this->setTitle('Admin - Home');
 
 $groupHandler = new Group;
 
