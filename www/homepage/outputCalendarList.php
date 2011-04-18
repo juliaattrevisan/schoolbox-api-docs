@@ -1,7 +1,6 @@
 <?php
 /* Output a campus calendar */
 $this->setBlock($componentHandle, "group_events", "group_events_block");
-$this->setBlock('group_events', "modify", "modify_block");
 
 require_once SITE_root.'/library/calendar.php';
 $calendarHandler = new Calendar;
@@ -15,8 +14,8 @@ else
 $this->setVar('CALENDAR_TITLE', 'Campus Calendar');
 
 $query = "SELECT id, UNIX_TIMESTAMP(date) as outputDate,
-			TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTimeString, TIME_FORMAT(endTime, 
-			'".CALENDAR_time_format."') as endTimeString,priority, note, location, detail
+			TIME_FORMAT(startTime, '".Cfg::get('calendar_time_format')."') as startTimeString, TIME_FORMAT(endTime,
+			'".Cfg::get('calendar_time_format')."') as endTimeString,priority, note, location, detail
 		FROM event
 			JOIN eventCampus ON event.id = eventCampus.eventID
 			JOIN eventGroup ON event.id = eventGroup.eventID
@@ -47,9 +46,9 @@ if (is_array($eventList)) {
                                         ($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
                                            ($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
                                        "- "),
-                        'CAL_DATE'	    => date(DATE_short_no_time, $event['outputDate']),
-                        'CAL_ID'	    => $event['id'],
-                        'CAL_NOTE'		=> scrubTEXT($event['note']),
+                        'CAL_DATE'	=> date(Cfg::get('date_notime'), $event['outputDate']),
+                        'CAL_ID'	=> $event['id'],
+                        'CAL_NOTE'	=> scrubTEXT($event['note']),
                         'CAL_LOCATION'	=> scrubTEXT($event['location']),
                         'CAL_DETAIL'	=> scrubTEXT($event['detail']),
                         'CAL_COLOUR'	=> $event['colour'],
@@ -60,7 +59,6 @@ if (is_array($eventList)) {
                         'ON_OFF'	    => ++$j%2? '' : 'dark',
                       );
 
-		
 		$this->setVar($output);
 	
 		if($event['startTimeString'] == "12:00AM" || $event['startTimeString'] == "")
@@ -69,10 +67,6 @@ if (is_array($eventList)) {
 				$this->setVar("CAL_TIME", $event['startTimeString']);
 		else
 				$this->setVar("CAL_TIME", $event['startTimeString']." till ".$event['endTimeString']);
-
-		$this->setVar('modify_block', '');
-		if ($calendarHandler->getPerm($event['id']) >= WRITE_ACCESS)
-			$this->parse('modify_block', 'modify');
 
 		$this->parse("group_events_block", "group_events", true);
 		

@@ -44,7 +44,7 @@ if (is_numeric($this->arg[0])) {
 			'TO_ID'            => $to['revisionID'],
 			'HEADING'          => scrubText($from['heading']),
 			'DIFF'             => $renderer->render($diff),
-			'MODIFIED'         => outputDate(DATE_long_format, $from['modified']),
+			'MODIFIED'         => outputDate(Cfg::get('date_long'), $from['modified']),
 			'AUTHOR'           => formatName($from),
 			'AUTHOR_ID'        => $from['authorID'],
 			'CURRENT_REVISION' => $from['revisionID'],
@@ -63,7 +63,7 @@ if (is_numeric($this->arg[0])) {
 					'WIKI_ID'           => $from['wikiID'],
 					'REVISION_ID'       => $from['revisionID'],
 					'REVISION_COMPARE'  => $revision['revisionID'],
-					'REVISION_DATE'     => outputDate(DATE_short_no_time, $revision['created']),
+					'REVISION_DATE'     => outputDate(Cfg::get('date_notime'), $revision['created']),
 					'REVISION_HEADING'	=> scrubText($revision['heading']),
 					'REVISION_AUTHOR'	=> formatName($revision),
 			);

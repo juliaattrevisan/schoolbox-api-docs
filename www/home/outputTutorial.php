@@ -18,7 +18,7 @@ if (is_array($eventList)) {
 	$j = 0;
 	foreach ($eventList as $event) {
 		$output = array('TUTORIAL_ID'			=> $event['eventID'],
-						'TUTORIAL_DATE'			=> outputDate(DATE_long_format, $event['date']),
+						'TUTORIAL_DATE'			=> outputDate(Cfg::get('date_long'), $event['date']),
 						'TUTORIAL_START'		=> $event['start'],
 						'TUTORIAL_FINISH'		=> $event['finish'],
 						'TUTORIAL_NAME'			=> scrubText($event['name']),
@@ -48,7 +48,7 @@ if (is_array($eventList)) {
 	foreach ($eventList as $event) {
 		$output = array('TUTORIAL_ID'			=> $event['eventID'],
 						'TUTORIAL_WEEK'			=> outputDate('YW', $event['date']) - 1,
-						'TUTORIAL_DATE'			=> outputDate(DATE_short_format, $event['date']),
+						'TUTORIAL_DATE'			=> outputDate(Cfg::get('date_short'), $event['date']),
 						'TUTORIAL_START'		=> $event['start'],
 						'TUTORIAL_FINISH'		=> $event['finish'],
 						'TUTORIAL_NAME'			=> scrubText($event['name']),

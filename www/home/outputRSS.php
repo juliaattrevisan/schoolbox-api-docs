@@ -2,7 +2,7 @@
 $this->setBlock($component['name'], "rss_stories", "rss_block");
 
 require_once('../library/xml.php');
-$rss = new XML(RSS_url, RSS_cache_time);
+$rss = new XML(Cfg::get('welcome_rss_url'), RSS_cache_time);
 	
 $this->setVar('RSS_NAME', $rss->channel->title);
 $this->setVar('RSS_LINK', $rss->channel->link);
@@ -17,7 +17,7 @@ if($rss->channel) {
 
         $this->parse("rss_block", "rss_stories", true);
 
-        if($j == RSS_limit)
+        if($j == Cfg::get('welcome_rss_limit'))
             break;
     }
 

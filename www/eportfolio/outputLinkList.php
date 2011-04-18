@@ -15,7 +15,7 @@ if (is_array($linkList)) {
             'LINK_URL'			=> isLocalURL($link['url']) ? relativeURL($link['url']) : '/redir.php?url='.base64_encode($link['url']),
             'LINK_POSTED_BY'	=> formatName($link),
             'LINK_POSTED_BY_ID'	=> $link['owner'],
-            'LINK_POSTED_DATE'	=> outputDate(DATE_short_format, $link['submitted']),
+            'LINK_POSTED_DATE'	=> outputDate(Cfg::get('date_short'), $link['submitted']),
             'LINK_COMMENT'		=> nl2br(scrubTEXT($link['comment'])),
             'ON_OFF'			=> ++$j%2? '' : 'dark',
         ));

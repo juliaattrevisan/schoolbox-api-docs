@@ -21,7 +21,7 @@ if ($_POST['heading']) {
                     );
 	
 	if ((int)$_POST['expires'] > 0)
-		$news['item_datetime_expires'] = outputDate(DATE_database, strtotime("+" . $_POST['expires'] . " hours"));
+		$news['item_datetime_expires'] = outputDate(Cfg::get('date_database'), strtotime("+" . $_POST['expires'] . " hours"));
 
 	if (is_numeric($_POST['newsID'])) {
 		

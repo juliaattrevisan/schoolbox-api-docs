@@ -102,7 +102,7 @@ if (is_array($allWork)) {
 		$this->setVar(array(
 			'WORK_CATEGORYNAME' => $currentWork['categoryName'],
 			'WORK_DESCRIPTION' => $currentWork['description'],
-			'WORK_DUEDATE' => outputDate(DATE_short_no_time, $currentWork['dueDate']),
+			'WORK_DUEDATE' => outputDate(Cfg::get('date_notime'), $currentWork['dueDate']),
 			'WORK_MARK' => $currentWork['mark'],
 			'WORK_ACTION' => '',
 			'WORK_BOX_ID' => $currentWork['bid'],

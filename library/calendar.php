@@ -112,8 +112,8 @@ class Calendar extends Model {
 
 	function getByID($eventID) {
 		$query = "SELECT id, owner, access, sid, type, note, date, location, detail,
-						DATE_FORMAT(startTime, '" . CALENDAR_time_format . "') startTime, 
-						DATE_FORMAT(endTime, '" . CALENDAR_time_format . "') endTime
+						DATE_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
+						DATE_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') endTime
 				  FROM " . $this->_table . "
 				  WHERE " . $this->_index . " = $eventID";
 		return $this->db->getRow($query);
@@ -127,11 +127,17 @@ class Calendar extends Model {
 		else
 				$where = "";
 	
-		$query = "SELECT id, DATE_FORMAT(date, '%a %D %b') as outputDate,
+		$query = "SELECT event.id, DATE_FORMAT(date, '%a %D %b') as outputDate,
 						DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
-						TIME_FORMAT(startTime, '".CALENDAR_time_format."') as startTimeString, TIME_FORMAT(endTime, 
-		'".CALENDAR_time_format."') as endTimeString, type, note, location, detail
-				  FROM event WHERE access = '2' AND sid = '".$categoryID."' AND( date >= CURRENT_DATE() $where) ORDER BY date, startTime";
+						TIME_FORMAT(startTime, '".Cfg::get('calendar_time_format')."') as startTimeString,
+						TIME_FORMAT(endTime, '".Cfg::get('calendar_time_format')."') as endTimeString,
+						type, note, location, detail,
+						user.id as uid, title, firstname, lastname,
+						eventType, eventColour
+				  FROM event
+				  LEFT JOIN user ON owner = user.id
+				  LEFT JOIN luEventType ON type = eventTypeID
+				  WHERE access = '2' AND sid = '".$categoryID."' AND( date >= CURRENT_DATE() $where) ORDER BY date, startTime";
 		
 		return $this->db->getAll($query);
 	}
@@ -151,7 +157,7 @@ class Calendar extends Model {
 			$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.description,
                         submission_box.owner, submission_box.id, user.firstname, user.lastname, user.title,
                         DATE_FORMAT(submission_box.date, '%w') as dayIndex,
-					    DATE_FORMAT(submission_box.date, '" . CALENDAR_time_format . "') as dueTime,
+					    DATE_FORMAT(submission_box.date, '" . Cfg::get('calendar_time_format') . "') as dueTime,
                         submission_box.accept_submission, submission_box.open_date, submission_box.date, submission_box.late_date, submission_box.created, student_submission.submitted, submission_return.returned
                       FROM (category, submission_box )
                       LEFT JOIN submission_return ON submission_box.id = submission_return.box_id AND submission_return.owner = {$_SESSION['id']}
@@ -241,8 +247,8 @@ class Calendar extends Model {
 		//get single events for the day
 		$query = "SELECT DISTINCT event.id, owner,
                             GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
-							TIME_FORMAT(startTime, '" . CALENDAR_time_format . "') as startTime, 
-							TIME_FORMAT(endTime, '" . CALENDAR_time_format . "') as endTime,
+							TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTime,
+							TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
                             TIME_TO_SEC(startTime) as startTimestamp,
                             TIME_TO_SEC(endTime) as endTimestamp,
 							type, note, access, sid, location, detail,
@@ -268,8 +274,8 @@ class Calendar extends Model {
 	function getDayByGroup($currentDay, $groupList, $campusList) {
 		
 		$query = "SELECT DISTINCT id, owner,
-							TIME_FORMAT(startTime, '" . CALENDAR_time_format . "') as startTime, 
-							TIME_FORMAT(endTime, '" . CALENDAR_time_format . "') as endTime,
+							TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTime,
+							TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
 							type, note, location, detail, access, eventCampus.campusID as sid
 						FROM event 
 						LEFT JOIN eventCampus ON event.id = eventCampus.eventID

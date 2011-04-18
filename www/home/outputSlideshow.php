@@ -6,7 +6,7 @@ $this->setBlock($component['name'], 'image', 'image_block');
 
 $fileHandler = new File;
 
-$allFiles = $fileHandler->getAllInCategory(WELCOME_image_folder, array('filter' => array('image')));
+$allFiles = $fileHandler->getAllInCategory(Cfg::get('welcome_image_folder'), array('filter' => array('image')));
 if(is_array($allFiles)) {
     foreach ($allFiles as $currentFile) {
         $this->setVar(array(

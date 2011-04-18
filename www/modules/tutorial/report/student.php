@@ -75,7 +75,7 @@ if (isset($user['uid'])) {
 				}
 				
 				$output = array('EVENT_ID'	=> $event['eventID'],
-								'DATE'		=> outputDate(DATE_short_no_time, $event['date']),
+								'DATE'		=> outputDate(Cfg::get('date_notime'), $event['date']),
 								'START'		=> $event['start'],
 								'FINISH'	=> $event['finish'],
 								'PRESENT'	=> $event['present']=='true'?'Present':'<em>Absent</em>',

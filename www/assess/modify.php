@@ -48,8 +48,8 @@ if (!empty($_POST)) {
         'user_id'     => $_SESSION['id'],
         'title'       => scrubTEXT($_POST['title']),
         'description' => scrubTEXT($_POST['description']),
-        'start'       => date(DATE_database, $start),
-        'finish'      => date(DATE_database, $finish),
+        'start'       => date(Cfg::get('date_database'), $start),
+        'finish'      => date(Cfg::get('date_database'), $finish),
         'duration'    => scrubTEXT($duration),
         'allow_resit' => scrubTEXT($_POST['allow_resit']),
     ));

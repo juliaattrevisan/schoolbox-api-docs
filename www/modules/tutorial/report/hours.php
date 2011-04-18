@@ -85,8 +85,8 @@ if (is_array($_POST['processed'])) {
 							$processed = $event['tutor2Processed'];
 					
 						$output = array('EVENT_ID'	=> $event['eventID'],
-										'DATE'		=> outputDate(DATE_short_no_time, $event['date']),
-										'MARKED'	=> outputDate(DATE_short_no_time, $event['marked']),
+										'DATE'		=> outputDate(Cfg::get('date_notime'), $event['date']),
+										'MARKED'	=> outputDate(Cfg::get('date_notime'), $event['marked']),
 										'START'		=> $event['start'],
 										'FINISH'	=> $event['finish'],
 										'TUTORIAL'	=> scrubText($event['name']),

@@ -17,7 +17,7 @@ if (is_array($linkList)) {
                                 'LINK_TARGET'           => isLocalURL($link['url']) ? '': 'external',
 				'LINK_POSTED_BY'	=> formatName($link),
 				'LINK_POSTED_BY_ID'	=> $link['owner'],
-				'LINK_POSTED_DATE'	=> outputDate(DATE_short_format, $link['submitted']),
+				'LINK_POSTED_DATE'	=> outputDate(Cfg::get('date_short'), $link['submitted']),
 				'LINK_COMMENT'		=> nl2br(scrubTEXT($link['comment'])),
 				'ON_OFF'			=> ++$j%2? '' : 'dark',
                 'HIDDEN'            => $link['hidden'] ? 'hidden' : '',

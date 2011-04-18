@@ -1,7 +1,6 @@
 <?php
 //event output
 $this->setBlock($componentHandle, "group_events", "group_events_block");
-$this->setBlock('group_events', "modify", "modify_block");
 
 require_once SITE_root.'/library/calendar.php';
 $calendarHandler = new Calendar;
@@ -15,24 +14,30 @@ if (is_array($eventList)) {
 
 		$event['colour'] = $calendarHandler->displayColour($event['type']);
 
-		$this->setVar("CAL_DATE", $event['outputDate']);
-		$this->setVar("CAL_ID", $event['id']);
-		$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
-		
+        $output = array('CAL_TIME'		=> rtrim(
+                                        ($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
+                                           ($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
+                                       "- "),
+                        'CAL_DATE'	=> date(Cfg::get('date_notime'), strtotime($event['outputDate'])),
+                        'CAL_ID'	=> $event['id'],
+                        'CAL_NOTE'	=> scrubTEXT($event['note']),
+                        'CAL_LOCATION'	=> scrubTEXT($event['location']),
+                        'CAL_DETAIL'	=> scrubTEXT($event['detail']),
+                        'CAL_COLOUR'	=> $event['colour'],
+                        'CAL_MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">Modify</a>" : '',
+                        'CAL_TYPE'      => $event['eventType'],
+                        'CAL_AUTHOR'    => formatName($event),
+                        'CAL_ID'	    => $event['id'],
+                        'ON_OFF'	    => ++$j%2? '' : 'dark',
+                      );
+		$this->setVar($output);
+
 		if($event['startTimeString'] == "12:00AM" || $event['startTimeString'] == "")
 				$this->setVar("CAL_TIME", "");
 		else if($event['endTimeString'] == "12:00AM")
 				$this->setVar("CAL_TIME", $event['startTimeString']);
 		else
 				$this->setVar("CAL_TIME", $event['startTimeString']." till ".$event['endTimeString']);
-
-		$this->setVar("CAL_COLOUR",$event['colour']);
-		
-		$this->setVar("CAL_NOTE", nl2br(scrubTEXT($event['note'])));
-
-		$this->setVar('modify_block', '');
-		if ($calendarHandler->getPerm($event['id']) >= WRITE_ACCESS)
-			$this->parse('modify_block', 'modify');
 
 		$this->parse("group_events_block", "group_events", true);
 

@@ -1,9 +1,9 @@
 <?php
 //dont output weather if not enabled or you could just say output weather if enabled
-if(WEATHER_enable)
+if(Cfg::get('weather_enable'))
 {
 	require_once('../library/xml.php');
-	$weather = new XML('http://www.google.com/ig/api?weather=' . urlencode(WEATHER_location));
+	$weather = new XML('http://www.google.com/ig/api?weather=' . urlencode(Cfg::get('weather_location')));
 	
 	$imageLocation = '/weather/image.php?path=';
 

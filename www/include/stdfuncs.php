@@ -313,7 +313,7 @@ function relativeURL($url) {
 function formatName($userInfo, $format = NULL){
 	// Check for custom format
 	if(empty($format)){
-		$format = NAME_format;
+		$format = Cfg::get('name_format');
 	}
 
     /* Replace tags */
@@ -435,7 +435,7 @@ function getRelativeTime($date, $now = 0, $prefix = 'on', $suffix = 'ago') {
 		return ' Last week';
 	if ($diff<4)
 		return $diff . " weeks " . $suffix;
-	return $prefix.' '.date(DATE_short_no_time, $date);
+	return $prefix.' '.date(Cfg::get('date_notime'), $date);
 }
 
 ?>

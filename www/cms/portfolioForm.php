@@ -57,7 +57,7 @@ elseif (is_numeric($_POST['categoryID'])) {
 			$output[] = array('id'			=> $file['id'],
 							  'name'		=> scrubText($file['description']),
 							  'category'	=> $file['category'],
-							  'modified'	=> outputDate(DATE_short_format, $file['submitted']),
+							  'modified'	=> outputDate(Cfg::get('date_short'), $file['submitted']),
 							  'size'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
 							  'icon'		=> !empty($file['iconFile']) && WEBDAV_on ? $allowedFiles->getClass($file["iconFile"]) : "textfile",
 							  );

@@ -8,7 +8,7 @@
 require_once('../library/xml.php');
 
 //create weather
-$location = empty($this->arg[0]) ? WEATHER_location : $this->arg[0];
+$location = empty($this->arg[0]) ? Cfg::get('weather_location') : $this->arg[0];
 $weather = new XML('http://www.google.com/ig/api?weather=' . urlencode($location), 60*60 );
 
 $this->setFile(TEMPLATE_content, 'weather/weather.html');

@@ -80,7 +80,7 @@ $this->setVar(array(
     'BOX_CATEGORYID'    => $submissionBox['cid'],
 	'BOX_DESCRIPTION' => $submissionBox['description'],
 	'BOX_OWNER' => '<a href="'.$_SESSION['mailhandle'].formatEmail($owner).'">'.formatName($owner).'</a>',
-	'BOX_DUEDATE' => date(DATE_short_format, strtotime($submissionBox['date'])),
+	'BOX_DUEDATE' => date(Cfg::get('date_short'), strtotime($submissionBox['date'])),
 ));
 
 /* Check whether a file is associated with the work
@@ -108,7 +108,7 @@ if (is_array($allWork) && count($allWork)) {
 
 	foreach($allWork as $currentWork) {
 		$this->setVar(array(
-			'WORK_DATE' => outputDate(DATE_long_format, $currentWork['date']),
+			'WORK_DATE' => outputDate(Cfg::get('date_long'), $currentWork['date']),
 			'WORK_MARK' => $currentWork['mark'],
 			'WORK_COMMENT' => $currentWork['comment'],
 			'WORK_BOX_ID' => $currentWork['bid'],
@@ -187,7 +187,7 @@ if (is_array($allWork) && count($allWork)) {
 	}
 	
 	$this->setVar(array(
-		'MOST_RECENT_SUBMISSION_DATE' => outputDate(DATE_long_format, $recentSubmission['date']),
+		'MOST_RECENT_SUBMISSION_DATE' => outputDate(Cfg::get('date_long'), $recentSubmission['date']),
 		'MOST_RECENT_SUBMISSION_FILE_ID' => $recentSubmission['sid'],
 	));
 

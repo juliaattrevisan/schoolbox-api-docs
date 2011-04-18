@@ -42,7 +42,7 @@ if(is_array($newsList)) {
                     "NEWS_HEADING"	=> scrubTEXT($news['heading']),
                     "NEWS_BODY"		=> scrubHTML($news['body']),
                     "EMAIL_CONTACT"	=> "<a href=\"/search/user/{$news['uid']}\">$poster</a>",
-                    "POSTED_DATE"	=> outputDate(DATE_short_format, $news['posted']),
+                    "POSTED_DATE"	=> outputDate(Cfg::get('date_short'), $news['posted']),
                 );
 		$this->setVar($output);
 		

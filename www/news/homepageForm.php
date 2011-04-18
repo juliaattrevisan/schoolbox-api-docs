@@ -34,7 +34,7 @@ if($_POST['heading'] && is_numeric($_POST['code'])) {
 		else {
 			/* Modify existing news */
 			$news['id'] = $_POST['id'];
-			$_POST['expires'] > 0 ? $news['datetime_expires'] = date(DATE_database, (mktime()+$_POST['expires']*3600)) : '';
+			$_POST['expires'] > 0 ? $news['datetime_expires'] = date(Cfg::get('date_database'), (mktime()+$_POST['expires']*3600)) : '';
 			
 			$newsHandler->update($news); 
 		}
@@ -43,7 +43,7 @@ if($_POST['heading'] && is_numeric($_POST['code'])) {
 		
 		/* Create news */
 		$news['owner'] = $_SESSION['id'];
-		$news['datetime_expires'] = date(DATE_database, (mktime() + $_POST['expires']*3600));
+		$news['datetime_expires'] = date(Cfg::get('date_database'), (mktime() + $_POST['expires']*3600));
 		$newsHandler->create($news);
 	}
 

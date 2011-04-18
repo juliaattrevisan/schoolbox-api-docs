@@ -35,7 +35,7 @@ $week = $_GET['week'];
 if (!is_numeric($week))
 	$week = date("YW");
 
-$output = array('WEEK_END'	=> date(DATE_short_no_time, strtotime("+".substr($week, 4)." week Saturday", strtotime("1st Jan"))),
+$output = array('WEEK_END'	=> date(Cfg::get('date_notime'), strtotime("+".substr($week, 4)." week Saturday", strtotime("1st Jan"))),
 				'NEXT_WEEK'	=> $week+1,
 				'PREVIOUS_WEEK'	=> $week-1,
 				'WEEK'	=> $week,
@@ -60,7 +60,7 @@ $reasonList = $attendanceHandler->getReasonList();
 if (is_array($eventList)) {
 	foreach ($eventList as $event) {
 		$output = array('EVENT_ID'		=> $event['eventID'],
-						'EVENT_DATE'	=> outputDate(DATE_short_no_time, $event['date']),
+						'EVENT_DATE'	=> outputDate(Cfg::get('date_notime'), $event['date']),
 						'EVENT_START'	=> $event['start'],
 						'EVENT_FINISH'	=> $event['finish'],
 						'EVENT_NAME'	=> scrubText($event['name']),

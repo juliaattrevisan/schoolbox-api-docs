@@ -37,7 +37,7 @@ elseif ($_POST['title'] && is_numeric($_POST['categoryID'])) {
 				  'option_8'	=> $_POST['option_8'],
 				  'option_9'	=> $_POST['option_9'],
 				  'frequency'	=> $_POST['frequency'],
-				  'close'		=> outputDate(DATE_database, ausDateToUnix($_POST['close'])),
+				  'close'		=> outputDate(Cfg::get('date_database'), ausDateToUnix($_POST['close'])),
 				  );
 
 	if (is_numeric($_POST['pollID'])) {

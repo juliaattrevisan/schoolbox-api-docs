@@ -35,7 +35,7 @@ if (is_array($eventList)) {
 		$output = array('EVENT_ID'	=> $event['eventID'],
 						'NAME'		=> scrubText($event['name']),
 						'CODE'		=> !empty($event['code']) ? scrubText($event['code']) : "N/A",
-						'DATE'		=> outputDate(DATE_short_no_time, $event['date']),
+						'DATE'		=> outputDate(Cfg::get('date_notime'), $event['date']),
 						'TYPE'		=> $event['typeName'],
 						'TUTOR1_ID'	=> $event['tutor1ID'],
 						'TUTOR2_ID'	=> $event['tutor2ID'],

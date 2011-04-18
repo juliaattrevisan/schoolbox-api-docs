@@ -86,7 +86,7 @@ foreach ($blogYears as $key => $current) {
             'BLOG_HEADING' => $blog['heading'],
             'BLOG_BODY' => $blog['body'],
             'EMAIL_CONTACT' => "<a href=\"/search/user/{$blog['uid']}\">$poster</a>",
-            'POSTED_DATE' => outputDate(DATE_short_format, $blog['createdTimestamp'])
+            'POSTED_DATE' => outputDate(Cfg::get('date_short'), $blog['createdTimestamp'])
         ));
 
         $this->parse('blog_block', 'blog', true);

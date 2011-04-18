@@ -21,7 +21,7 @@ if (is_array($fileList)) {
             'FILE_MIME_IMAGE'	=> $allowedFiles->getClass($file["iconFile"]),
             'FILE_POSTED_BY'	=> formatName($file),
             'FILE_POSTED_BY_ID'	=> $file['owner'],
-            'FILE_PUBLISHED_DATE'	=> outputDate(DATE_short_format, $file['published']),
+            'FILE_PUBLISHED_DATE'	=> outputDate(Cfg::get('date_short'), $file['published']),
             'FILE_COMMENT'		=> nl2br(scrubTEXT($file['comment'])),
             'ON_OFF'			=> ++$j%2 ? '' : 'dark',
             'HIDDEN'            => $file['hidden'] ? 'hidden' : '',
