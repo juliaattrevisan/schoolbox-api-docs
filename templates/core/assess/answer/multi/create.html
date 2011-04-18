@@ -94,9 +94,9 @@ $j(document).ready(function() {
             error.css('top',  element.parent().outerHeight() );
 
 			if (element.hasClass("tinyValidate")) {
-				var pos = element.siblings('#question_container').position();
+				var pos = $j('#question_container').position();
 				error.css('left', pos.left);
-           		error.css('top',  pos.top + element.siblings('#question_container').outerHeight() +5);
+           		error.css('top',  pos.top + $j('#question_container').outerHeight() +5);
 			}
 			
 			if (element.hasClass("answerDescription")) {
@@ -146,16 +146,15 @@ jQuery.validator.addMethod('nothingChecked', function(value, element) {
 
         $j.each($j('#answerCollection').find('li'), function(index, element) {
             var elem = $j(element);
-
-            var checkit = elem.find('.checkbox').is(':checked');
-
-			console.log('chimp')
+            var checkit = elem.find('.answerCorrect').is(':checked');
 			/*if the element isn't checked add to the count*/
             if (checkit == true) {
                 countDracula++
             }
-			
+
         });
+		
+		console.log(countDracula)
 
 		if (countDracula == 0) {
 			oneFieldChecked = false;
@@ -190,7 +189,7 @@ jQuery.validator.addMethod('nothingChecked', function(value, element) {
 		}	
     });	
 	
-	$j('.checkbox').live('click', function() {
+	$j('.answerCorrect').live('click', function() {
 		$j(this).parent().parent().toggleClass("highlight");
 	});
 	

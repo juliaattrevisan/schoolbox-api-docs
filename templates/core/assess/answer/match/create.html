@@ -80,13 +80,13 @@ $j(document).ready(function() {
 				error.insertAfter(element)
 				error.addClass('message');  // add a class to the wrapper
 				error.css('position', 'absolute');
-				error.css('left', offset.left);
-				error.css('top',  offset.top + element.outerHeight() );
+				error.css('left',0);
+				error.css('top',  element.outerHeight() +10);
 	
 				if (element.hasClass("tinyValidate")) {
-					var pos = element.siblings('#question_container').position();
-					error.css('left', pos.left);
-					error.css('top',  pos.top + element.siblings('#question_container').outerHeight() +5);
+					var pos = $j('#question_container').position();
+					error.css('left', 0);
+					error.css('top',  pos.top + $j('#question_container').outerHeight() );
 				}
 				
 				if (element.hasClass("answerLeft")) {

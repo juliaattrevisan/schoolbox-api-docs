@@ -8,7 +8,7 @@ $j(document).ready(function() {
         theme_advanced_buttons2 : '',
 		theme_advanced_buttons3 : '',
 		elements: "answerBox",
-		content_css : "/css/core/core2.css",
+		content_css : "/css/core/core.css",
 		width : "100%",
         removeformat_selector: 'b,strong,em,i,span,ins',
 //        valid_child_elements: 'span[]',
@@ -22,7 +22,6 @@ $j(document).ready(function() {
 				'class' : 'make-blank',
 				onclick : (function() {
 					var sel = ed.selection.getContent();
-
 					if (sel !== '') {
                		 	ed.selection.setContent('<span>' + sel + '</span>');
 					};
@@ -46,12 +45,6 @@ $j(document).ready(function() {
 				minlength: 1,
 				number:true
 			},
-			question : {
-				required:true,
-				minlength: 1
-				
-				
-			},
 			answer: {
 				required: true,
 				minlength: 1
@@ -60,7 +53,6 @@ $j(document).ready(function() {
 		
 		messages: {
 			question: "Please enter a question.",
-			
 			answer: "Please fill out an answer."
 		},
 		
@@ -71,33 +63,29 @@ $j(document).ready(function() {
             error.insertBefore(element);
             error.addClass('message');  // add a class to the wrapper
             error.css('position', 'absolute');
-            error.css('left', offset.left);
-            error.css('top',  offset.top + element.outerHeight() +5);
+            error.css('left', 0);
+            error.css('top',  element.outerHeight() +10);
 
 			if (element.hasClass("tinyValidate")) {
-				var pos = element.siblings('#question_container').position();
+				var pos = $j('#question_container').position();
 				error.css('left', pos.left);
-           		error.css('top',  pos.top + element.siblings('#question_container').outerHeight() +5);
+           		error.css('top',  pos.top + $j('#question_container').outerHeight() +5);
 			};
 			
 			if (element.hasClass("tinyValidate2")) {
-				var pos2 = element.siblings('#answerBox_parent').position();
+				var pos2 = $j('#answerBox_parent').position();
 				error.css('left', pos2.left);
-           		error.css('top',  pos2.top + element.siblings('#answerBox_parent').outerHeight() +5);
+           		error.css('top',  pos2.top + $j('#answerBox_parent').outerHeight() +5);
 			};
 		}
 	
 	});	
 	
-	
-	
-
-	
 });
 </script>
 <fieldset>
     <label>Answer</label>
-    <div class="textarea-container"><textarea id="answerBox" name="answer" class="tinyValidate2">{ANSWER}</textarea></div>
+    <div class="textarea-container" id="answerBox_parent"><textarea id="answerBox" name="answer" class="tinyValidate2">{ANSWER}</textarea></div>
 </fieldset>
 
 <fieldset>

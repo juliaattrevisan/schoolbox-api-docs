@@ -1,15 +1,15 @@
-
 <script type="text/javascript">
 $j(function() {
 	
 	var validator = $j(".standardForm").submit(function() {
 		 // update underlying textarea before submit validation
-		 tinyMCE.triggerSave();
+		 tinyMCE.triggerSave(); 
+		 
 	 }).validate({
 		rules: { 
 			question: {
 				required: true,
-				minlength: 2
+				minlength: 1
 			},
 			marks: {
 				required: true,
@@ -20,7 +20,6 @@ $j(function() {
 		
 		messages: {
 			question: "Please enter a question.",
-			
 			answer: "Please fill out an answer."
 		},
 		
@@ -35,9 +34,9 @@ $j(function() {
             error.css('top',  element.parent().outerHeight() +5);
 
 			if (element.hasClass("tinyValidate")) {
-				var pos = element.siblings('#question_container').position();
+				var pos = $j('#question_container').position();
 				error.css('left', pos.left);
-           		error.css('top',  pos.top + element.siblings('#question_container').outerHeight() +5);
+           		error.css('top',  pos.top + $j('#question_container').outerHeight());
 			}
 		}
 	

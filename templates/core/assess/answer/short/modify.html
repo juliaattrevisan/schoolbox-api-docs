@@ -35,18 +35,14 @@ $j(function() {
             error.css('top',  offset.top + element.outerHeight() +5);
 
 			if (element.hasClass("tinyValidate")) {
-				var pos = element.siblings('#question_container').position();
+				var pos = $j('#question_container').position();
 				error.css('left', pos.left);
-           		error.css('top',  pos.top + element.siblings('#question_container').outerHeight() +5);
+           		error.css('top',  pos.top + $j('#question_container').outerHeight() +5);
 			}
 		}
 	
 	});
-	
 
-	
-	
-	
 });
 </script>
 

@@ -31,12 +31,64 @@ $j(document).ready(function() {
 			});
 		}
 	});
+	
+		var validator = $j("#createQuestionForm").submit(function() {
+		 // update underlying textarea before submit validation
+		 tinyMCE.triggerSave();
+	 }).validate({
+		rules: { 
+			question: {
+				required: true,
+				minlength: 2
+			},
+			marks: {
+				required: true,
+				minlength: 1,
+				number:true
+			},
+			answer: {
+				required: true,
+				minlength: 1
+			}
+		},
+		
+		messages: {
+			question: "Please enter a question.",
+			answer: "Please fill out an answer."
+		},
+		
+		errorElement: "div",
+        wrapper: "div",  // a wrapper around the error message
+        errorPlacement: function(error, element) {
+            offset = element.offset();
+            error.insertBefore(element);
+            error.addClass('message');  // add a class to the wrapper
+            error.css('position', 'absolute');
+            error.css('left', 0);
+            error.css('top',  element.outerHeight() +10);
+
+			if (element.hasClass("tinyValidate")) {
+				var pos = $j('#question_container').position();
+				error.css('left', pos.left);
+           		error.css('top',  pos.top + $j('#question_container').outerHeight() +5);
+			};
+			
+			if (element.hasClass("tinyValidate2")) {
+				var pos2 = $j('#answerBox_parent').position();
+				error.css('left', pos2.left);
+           		error.css('top',  pos2.top + $j('#answerBox_parent').outerHeight() +5);
+			};
+		}
+	
+	});	
+	
+
 });
 </script>
 
 <fieldset>
     <label>Answer</label>
-    <div class="textarea-container"><textarea id="answerBox" class="fancyBox" name="answer">{ANSWER}</textarea></div>
+    <div class="textarea-container" id="answerBox_parent"><textarea id="answerBox" class="fancyBox" name="answer">{ANSWER}</textarea></div>
 </fieldset>
 
 <fieldset>
