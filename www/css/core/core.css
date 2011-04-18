@@ -1124,6 +1124,8 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	background:none;
 	text-indent:none;
 	padding:0;
+	font-size:18px; 
+	color:#013A63
 }
 
 .admin-contents h2 span {
