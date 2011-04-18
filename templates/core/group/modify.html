@@ -31,6 +31,10 @@ $j(document).ready(function() {
 		minChars: 2,
 		maxHeight: 400,
 		width: $j('#addUser').width(),
+                onSelect: function (value, data) {
+			$j('#userID').val(data);
+			return false;
+		}
 	});
 	
 	$j('#type_form input').each(function () {

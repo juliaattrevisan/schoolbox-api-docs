@@ -56,8 +56,8 @@ else if( $_POST['username']) {
                     'eportfolio_enabled' => $_POST['eportfolio']
     );
 
-    $userHandler->create($user);
-    localRedir('/adminv2/modify-user/'.$user['id']);
+    $id = $userHandler->create($user);
+    localRedir('/adminv2/modify-user/'.$id);
 }
 else if($_POST['service'] && $_POST['uid'] && $_POST['type']) {
     /* Update service */

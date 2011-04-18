@@ -158,6 +158,14 @@ class User extends Model {
         return $this->db->affectedRows();
     }
 
+    function setPasswordInternal($userID, $newPassword) {
+        $newPassword = mysql_real_escape_string($newPassword);
+        $query = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID";
+        $this->db->query($query);
+
+        return $this->db->affectedRows();
+    }
+
     function sendResetPasswordEmail($email) {
         if (false != ($user = $this->getByField('alt_email', $email))) {
             $hash = substr(md5(uniqid() . time()), 0, 25);
@@ -381,9 +389,14 @@ class User extends Model {
         unset($user['defaultCampus']);
         unset($user['su']);
 
-        $user['password'] = 'PASSWORD("' . $user['password'] . '")';
+        if($user['password']) {
+             $this->setPasswordInternal($user['id'], $user['password']);
+        }
+        unset($user['password']);
 
         parent::update($user);
+
+
 
         if (is_array($campusArray)) {
 
@@ -415,16 +428,20 @@ class User extends Model {
         $campusArray = $user['campus'];
         $defaultCampus = $user['defaultCampus'];
         $su = $user['su'];
+        $password = $user['password'];
 
         unset($user['campus']);
         unset($user['defaultCampus']);
         unset($user['su']);
-
-        $user['password'] = 'PASSWORD("' . $user['password'] . '")';
+        unset($user['password']);
+        
         $user['key'] = substr(md5(uniqid() . time()), 0, 25);
 
         $id = parent::create($user);
 
+        if($password) {
+             $this->setPasswordInternal($user['id'], $password);
+        }
 
         if (is_array($campusArray) && $id) {
             foreach ($campusArray as $campus) {
