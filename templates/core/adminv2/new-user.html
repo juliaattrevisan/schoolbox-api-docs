@@ -41,6 +41,9 @@ $j(function() {
 	});
 	
 	
+	
+	
+	
 })
 
 </script>
@@ -60,27 +63,23 @@ $j(function() {
 </ul>
 <div class="admin-contents">
 	<h2><span><a href="/adminv2/user">&laquo; Back to users</a></span>Create a user</h2>
-	
 	<div class="level">
 		<h3>User Details<span class="question">?</span></h3>
 		<form class="admin-form" method="POST" action="/adminv2/userForm.php" >
 			<div class="split-container">
 				<div class="split">
 					<label for ="preferred" class="preferred">
-					Preferred
-					<fieldset>
-						<label>
-							<select name="title">
-								<!-- BEGIN title -->
-								<option value="{NAME_TITLE}" {TITLE_SELECTED}>{NAME_TITLE}</option>
-								<!-- END title -->
-							</select>
-							
-						</label>
-						<label>
-							<input type="text" name="firstname" value="" />
-						</label>
-					</fieldset>
+					Preferred Title
+					<label>
+						<select name="title">
+							<!-- BEGIN title -->
+							<option value="{NAME_TITLE}" {TITLE_SELECTED}>{NAME_TITLE}</option>
+							<!-- END title -->
+						</select>
+					</label>
+					<label class="first">First Name
+						<input type="text" name="firstname" value="" />
+					</label>
 					</label>
 					<label for ="username" class="width2">Username
 						<input type="text" name="username" value="" />
@@ -103,13 +102,13 @@ $j(function() {
 							</tr>
 						</thead>
 						<tbody>
-												<!-- BEGIN campus -->
+							<!-- BEGIN campus -->
 							<tr>
 								<td>{CAMPUS_NAME}</td>
 								<td><input type="radio" name="defaultCampus" value="{CAMPUS_ID}" {DEFAULT_CAMPUS_CHECKED} /></td>
 								<td><input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_CHECKED} /></td>
 							</tr>
-											   <!-- END campus -->
+							<!-- END campus -->
 						</tbody>
 					</table>
 				</div>
@@ -125,22 +124,22 @@ $j(function() {
 					<label for="e-portfolio">E-Portfolio
 						<input type="checkbox" name="eportfolio" value="1" />
 					</label>
-                    <label for ="superuser" class="width2 ">Superuser
+					<label for ="superuser" class="width2 ">Superuser
 						<input type="checkbox" name="superuser" value="1" />
 					</label>
-                    <label for="group">Group
-                        <select name="group">
-                                                <!-- BEGIN system_group -->
-                            <option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
-                                                <!-- END system_group -->
-                        </select>
-                    </label>
+					<label for="group">Group
+						<select name="group">
+							<!-- BEGIN system_group -->
+							<option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
+							<!-- END system_group -->
+						</select>
+					</label>
 					<label for="year">Year
 						<input type="text" name="year" value="" />
 					</label>
 				</div>
 			</div>
-            <input type="submit" name="submit" value="Add User" />
+			<input type="submit" name="submit" value="Add User" />
 		</form>
 		<div class="float-fix"></div>
 	</div>

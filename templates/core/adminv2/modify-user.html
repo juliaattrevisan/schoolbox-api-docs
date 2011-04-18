@@ -61,8 +61,8 @@ $j(function() {
 <div class="admin-contents">
 <h2><span><a href="/adminv2/user">&laquo; Back to users</a></span>Modify user: <strong>{FULLNAME}</strong></h2>
 <form method="POST" action="/adminv2/userForm.php" class="modify-form">
-    <input type="hidden" name="login" value="{USERNAME}" />
-    <a href="#" class="btn user submit"><span></span>Login as user</a>
+	<input type="hidden" name="login" value="{USERNAME}" />
+	<a href="#" class="btn user submit"><span></span>Login as user</a>
 </form>
 <div class="level">
 	<h3>User Details<span class="question">?</span></h3>
@@ -74,9 +74,9 @@ $j(function() {
 				<fieldset>
 					<label>
 						<select name="title">
-                                                    <!-- BEGIN title -->
+							<!-- BEGIN title -->
 							<option value="{NAME_TITLE}" {NAME_TITLE_SELECTED}>{NAME_TITLE}</option>
-                                                    <!-- END title -->
+							<!-- END title -->
 						</select>
 						<input type="text" name="firstname" value="{FIRSTNAME}" />
 					</label>
@@ -88,7 +88,6 @@ $j(function() {
 				<label for ="database" class="">{DATABASE_TYPE} ID
 					<input type="text" name="database_id" value="{DATABASE_ID}"/>
 				</label>
-
 				<div class="float-fix"></div>
 				<table cellpadding="0" width="50%">
 					<colgroup>
@@ -104,13 +103,13 @@ $j(function() {
 						</tr>
 					</thead>
 					<tbody>
-                                            <!-- BEGIN campus -->
+						<!-- BEGIN campus -->
 						<tr>
 							<td>{CAMPUS_NAME}</td>
 							<td><input type="radio" name="defaultCampus" value="{CAMPUS_ID}" {CAMPUS_DEFAULT_CHECKED} /></td>
 							<td><input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_CHECKED} /></td>
 						</tr>
-                                           <!-- END campus -->
+						<!-- END campus -->
 					</tbody>
 				</table>
 			</div>
@@ -126,13 +125,14 @@ $j(function() {
 				<label for="e-portfolio">E-Portfolio
 					<input type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
 				</label>
-                <label for ="superuser" class="width2 ">Superuser
-					<input type="checkbox" name="superuser" value="1" onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME} superuser status?'));" {SUPERUSER_CHECKED} />				</label>
+				<label for ="superuser" class="width2 ">Superuser
+					<input type="checkbox" name="superuser" value="1" onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME} superuser status?'));" {SUPERUSER_CHECKED} />
+				</label>
 				<label for="group">Group
 					<select name="group">
-                        <!-- BEGIN system_group -->
+						<!-- BEGIN system_group -->
 						<option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
-                        <!-- END system_group -->
+						<!-- END system_group -->
 					</select>
 				</label>
 				<label for="year">Year
@@ -140,9 +140,10 @@ $j(function() {
 				</label>
 			</div>
 		</div>
-            <input type="hidden" name="userID" value="{USERID}" />
-            <input type="submit" name="delete" value="Delete User" onclick="return(confirm('Are you sure you want to delete {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME}'));" />
-            <input type="submit" name="submit" value="Update User" />
+		<input type="hidden" name="userID" value="{USERID}" />
+		<input type="submit" name="submit" class="submit-btn-plain" value="Update User" />
+		<input type="submit" name="delete" class="submit-btn-plain" value="Delete User" onclick="return(confirm('Are you sure you want to delete {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME}'));" />
+		<div class="float-fix"></div>
 	</form>
 	<div class="float-fix"></div>
 </div>
@@ -150,116 +151,148 @@ $j(function() {
 	<h3>Groups</h3>
 	<table>
 		<colgroup>
-			<col width="10%" />
-			<col width="50%" />
-			<col width="40%" />
-		
+		<col width="10%" />
+		<col width="50%" />
+		<col width="40%" />
 		</colgroup>
 		<thead>
-                  
 			<tr>
-                                <th>Remove</th>
+				<th>Remove</th>
 				<th>Group Name</th>
 				<th>Access</th>
-				
 			</tr>
-                </thead>
-                <tbody>
-                    <!-- BEGIN user_group -->
+		</thead>
+		<tbody>
+			<!-- BEGIN user_group -->
 			<tr>
-                            <td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ><img title="remove" src="/images/famicons/delete.png" /></a></td>
-                            <td><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></td>
-                            <td><form action="/adminv2/userForm.php"><input type="radio" name="type" value="1" {READ_CHECKED} />Read <input type="radio" name="type" value="2" {WRITE_CHECKED} />Write <input type="radio" name="type" value="3" {ADMIN_CHECKED} />Group Admin<input type="hidden" name="uid" value="{USERID}" /><input type="hidden" name="sid" value="{USER_GROUP_ID}" /></form></td>
-				
+				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ><img title="remove" src="/images/famicons/delete.png" /></a></td>
+				<td><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></td>
+				<td><form action="/adminv2/userForm.php">
+						<input type="radio" name="type" value="1" {READ_CHECKED} />
+						Read
+						<input type="radio" name="type" value="2" {WRITE_CHECKED} />
+						Write
+						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />
+						Group Admin
+						<input type="hidden" name="uid" value="{USERID}" />
+						<input type="hidden" name="sid" value="{USER_GROUP_ID}" />
+					</form></td>
 			</tr>
-                        <!-- END user_group -->
-
+			<!-- END user_group -->
 			
 			<tr>
-
-				<td colspan="4" class="colours-buttons">
-                                    <form action="/adminv2/userForm.php" method="post" >
-                                    <select class="formfield float-left" name="sid">
-						<option value="0">&lt;- Please Select a Group -&gt;</option>
-                                                <!-- BEGIN all_group -->
-						<option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
-                                                <!-- END all_group -->
-					</select>
-					<input type="hidden" value="{USERID}" name="uid">
-					<input type="hidden" value="1" name="service">
-                                        <input type="hidden" value="1" name="type">
-					<input type="submit" class="submit-btn-plain" value="Add" name="groupSubmit">
-                                    </form>
-                                </td>
-
+				<td colspan="4" class="colours-buttons"><form action="/adminv2/userForm.php" method="post" >
+						<select class="formfield float-left" name="sid">
+							<option value="0">&lt;- Please Select a Group -&gt;</option>
+							<!-- BEGIN all_group -->
+							<option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
+							<!-- END all_group -->
+						</select>
+						<input type="hidden" value="{USERID}" name="uid">
+						<input type="hidden" value="1" name="service">
+						<input type="hidden" value="1" name="type">
+						<div class="float-fix"></div>
+						<input type="submit" class="submit-btn-plain" value="Add" name="groupSubmit">
+					</form></td>
 			</tr>
 		</tbody>
 	</table>
 </div>
 <div class="level">
 	<h3>Permissions</h3>
-        <table>
+	<table>
 		<colgroup>
-			<col width="10%" />
-			<col width="20%" />
-			<col width="30%" />
-                        <col width="40%" />
+		<col width="10%" />
+		<col width="20%" />
+		<col width="30%" />
+		<col width="40%" />
 		</colgroup>
 		<thead>
-
 			<tr>
-                                <th>Remove</th>
-                                <th>Service</th>
+				<th>Remove</th>
+				<th>Service</th>
 				<th>Region</th>
 				<th>Access</th>
-                                
 			</tr>
-                </thead>
-                <tbody>
-                        <!-- BEGIN user_calendar -->
+		</thead>
+		<tbody>
+			<!-- BEGIN user_calendar -->
 			<tr>
 				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
-                                <td>Calendar</td>
-                                <td><select name="sid"><!-- BEGIN perm_campus --><option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_CHECKED} >{PERM_CAMPUS_NAME}</option><!-- END perm_campus --></select></td>
-				<td><form action="/adminv2/userForm.php"><input type="radio" name="type" value="1" {READ_CHECKED} />Read <input type="radio" name="type" value="2" {WRITE_CHECKED} />Write <input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate<input type="hidden" name="uid" value="{USERID}" /><input type="hidden" name="sid" value="{USER_GROUP_ID}" /><input type="hidden" name="service" value="{SERVICE_ID}" /></form></td>
-				
+				<td>Calendar</td>
+				<td><select name="sid">
+						<!-- BEGIN perm_campus -->
+						<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_CHECKED} >{PERM_CAMPUS_NAME}</option>
+						<!-- END perm_campus -->
+					</select></td>
+				<td><form action="/adminv2/userForm.php">
+						<input type="radio" name="type" value="1" {READ_CHECKED} />
+						Read
+						<input type="radio" name="type" value="2" {WRITE_CHECKED} />
+						Write
+						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />
+						Moderate
+						<input type="hidden" name="uid" value="{USERID}" />
+						<input type="hidden" name="sid" value="{USER_GROUP_ID}" />
+						<input type="hidden" name="service" value="{SERVICE_ID}" />
+					</form></td>
 			</tr>
-                        <!-- END user_calendar -->
-                        <!-- BEGIN user_news-->
+			<!-- END user_calendar --> 
+			<!-- BEGIN user_news-->
 			<tr>
 				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
-                                <td>News</td>
-                                <td><select name="sid">{PERM_CAMPUS_BLOCK}</select></td>
-				<td><form action="/adminv2/userForm.php"><input type="radio" name="type" value="1" {READ_CHECKED} />Read <input type="radio" name="type" value="2" {WRITE_CHECKED} />Write <input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate<input type="hidden" name="uid" value="{USERID}" /><input type="hidden" name="sid" value="{USER_GROUP_ID}" /><input type="hidden" name="service" value="{SERVICE_ID}" /></form></td>
-				
-			</tr>
-                        <!-- END user_news -->
-                        <!-- BEGIN user_cms -->
-			<tr>
-				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
-                                <td>CMS</td>
-                                <td>&nbsp;</td>
-				<td><form action="/adminv2/userForm.php"><input type="radio" name="type" value="1" {READ_CHECKED} />Read <input type="radio" name="type" value="2" {WRITE_CHECKED} />Write <input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate<input type="hidden" name="uid" value="{USERID}" /><input type="hidden" name="sid" value="{USER_GROUP_ID}" /><input type="hidden" name="service" value="{SERVICE_ID}" /></form></td>
-			</tr>
-                        <!-- END user_cms -->
-
-			<tr>
-
-				<td colspan="4" class="colours-buttons">
-                                    <form action="/adminv2/userForm.php" method="post" >
-                                    <select class="formfield float-left" name="service">
-						<option value="0">&lt;- Please Select a service -&gt;</option>
-						<option value="2">Calendar</option>
-                                                <option value="3">News</option>
-                                                <option value="5">CMS</option>
+				<td>News</td>
+				<td>
+					<select name="sid">
+						{PERM_CAMPUS_BLOCK}
 					</select>
-					<input type="hidden" value="{USERID}" name="uid">
-					<input type="hidden" value="0" name="sid">
-                                        <input type="hidden" value="1" name="type">
-					<input type="submit" class="submit-btn-plain" value="Add" name="groupSubmit">
-                                    </form>
-                                </td>
-
+				</td>
+				<td><form action="/adminv2/userForm.php">
+						<input type="radio" name="type" value="1" {READ_CHECKED} />
+						Read
+						<input type="radio" name="type" value="2" {WRITE_CHECKED} />
+						Write
+						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />
+						Moderate
+						<input type="hidden" name="uid" value="{USERID}" />
+						<input type="hidden" name="sid" value="{USER_GROUP_ID}" />
+						<input type="hidden" name="service" value="{SERVICE_ID}" />
+					</form></td>
+			</tr>
+			<!-- END user_news --> 
+			<!-- BEGIN user_cms -->
+			<tr>
+				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
+				<td>CMS</td>
+				<td>&nbsp;</td>
+				<td><form action="/adminv2/userForm.php">
+						<input type="radio" name="type" value="1" {READ_CHECKED} />
+						Read
+						<input type="radio" name="type" value="2" {WRITE_CHECKED} />
+						Write
+						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />
+						Moderate
+						<input type="hidden" name="uid" value="{USERID}" />
+						<input type="hidden" name="sid" value="{USER_GROUP_ID}" />
+						<input type="hidden" name="service" value="{SERVICE_ID}" />
+					</form></td>
+			</tr>
+			<!-- END user_cms -->
+			
+			<tr>
+				<td colspan="4" class="colours-buttons"><form action="/adminv2/userForm.php" method="post" >
+						<select class="formfield float-left" name="service">
+							<option value="0">&lt;- Please Select a service -&gt;</option>
+							<option value="2">Calendar</option>
+							<option value="3">News</option>
+							<option value="5">CMS</option>
+						</select>
+						<input type="hidden" value="{USERID}" name="uid">
+						<input type="hidden" value="0" name="sid">
+						<input type="hidden" value="1" name="type">
+						<div class="float-fix"></div>
+						<input type="submit" class="submit-btn-plain" value="Add" name="groupSubmit">
+					</form></td>
 			</tr>
 		</tbody>
 	</table>
@@ -276,13 +309,13 @@ $j(function() {
 						<th>IP</th>
 						<th>Result</th>
 					</tr>
-                                        <!-- BEGIN login_log -->
+					<!-- BEGIN login_log -->
 					<tr>
 						<td>{LOGIN_DATE}</td>
 						<td>{LOGIN_IP}</td>
 						<td>{LOGIN_RESULT}</td>
 					</tr>
-                                        <!-- END login_log -->
+					<!-- END login_log -->
 				</tbody>
 			</table>
 		</div>
@@ -296,12 +329,12 @@ $j(function() {
 						<th>Date</th>
 						<th>Action</th>
 					</tr>
-                                        <!-- BEGIN action_log -->
+					<!-- BEGIN action_log -->
 					<tr>
 						<td nowrap="nowrap">{ACTION_DATE}</td>
 						<td>{ACTION_ACTION}</td>
 					</tr>
-                                        <!-- END action_log -->
+					<!-- END action_log -->
 				</tbody>
 			</table>
 		</div>

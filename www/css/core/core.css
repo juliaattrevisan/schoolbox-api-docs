@@ -1565,10 +1565,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	float:left;
 }
 
-.admin-form label.preferred input[type=text] {
-	width:76%;
-	float:left;
-}
+
 
 .admin-form table { color:#797979; }
 
@@ -3251,7 +3248,7 @@ a.layout:hover img { background: #999; }
 #tabs-homepage .ui-tabs-nav li { float:left; }
 
 #tabs-homepage .ui-tabs-nav li a {
-	padding:16px 20px;
+	padding:8px 20px;
 	display:block;
 	-moz-border-radius: 7px 7px 0 0;
 	-webkit-border-radius: 7px 7px 0 0;

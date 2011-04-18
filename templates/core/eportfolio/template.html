@@ -32,37 +32,104 @@ var {COLOUR_ARRAY} = {
 var uid = {ID};
 
 </script>
-
 <style type="text/css">
+.left h2 { color: # {
+left_head_font
+}
+;
+background-color: # {
+left_head_bg
+};
+}
 
-.left h2 { color: #{left_head_font}; background-color: #{left_head_bg};	}
-.left p, .left h3, .left .listing p.small { color: #{left_font}; }
-.left a, .left .listing p.small a { color: #{left_link}; }
-.left .box a:hover, .left .listing p.small a:hover { color: #{left_hover};  }
-.left .text { background: #{left_bg_primary}; }
-.left .text.listing .dark { background: #{left_bg_secondary}; }
+.left p, .left h3, .left .listing p.small { color: # {
+left_font
+}
+;
+}
 
-.right h2 { color: #{right_head_font}; background-color: #{right_head_bg};	}
-.right p, .right h3, .right .listing p.small { color: #{right_font}; }
-.right a, .right .listing p.small a { color: #{right_link}; }
-.right .box a:hover, .right .listing p.small a:hover { color: #{right_hover};  }
-.right .text { background: #{right_bg_primary}; }
-.right .text.listing .dark { background: #{right_bg_secondary}; }
+.left a, .left .listing p.small a { color: # {
+left_link
+}
+;
+}
 
+.left .box a:hover, .left .listing p.small a:hover { color: # {
+left_hover
+}
+;
+}
+
+.left .text { background: # {
+left_bg_primary
+}
+;
+}
+
+.left .text.listing .dark { background: # {
+left_bg_secondary
+}
+;
+}
+
+.right h2 { color: # {
+right_head_font
+}
+;
+background-color: # {
+right_head_bg
+};
+}
+
+.right p, .right h3, .right .listing p.small { color: # {
+right_font
+}
+;
+}
+
+.right a, .right .listing p.small a { color: # {
+right_link
+}
+;
+}
+
+.right .box a:hover, .right .listing p.small a:hover { color: # {
+right_hover
+}
+;
+}
+
+.right .text { background: # {
+right_bg_primary
+}
+;
+}
+
+.right .text.listing .dark { background: # {
+right_bg_secondary
+}
+;
+}
 /* wrap mimetypes in classes */
-<!-- BEGIN allowed_files -->
-a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
-<!-- END allowed_files -->
-
+<!--
+BEGIN allowed_files
+-->
+a. {
+NAME
+} {
+background-image: url(/images/mime/22x22/{ICON});
+}
+<!--
+END allowed_files
+-->
 </style>
 <!-- END custom_head -->
 
-<h1>
-	<span>{HEADING}</span>
-    <!-- BEGIN edit_page -->
-    <a class="customise" href="#">customise page</a>
-    <!-- END edit_page -->
-
+<h1> <span>{HEADING}</span> 
+	<!-- BEGIN edit_page --> 
+	<a class="customise" href="#">Customise Page</a> 
+	<!-- END edit_page --> 
+	
 </h1>
 <!-- BEGIN customise_page -->
 <div id="tabs-homepage">
@@ -75,8 +142,8 @@ a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
 	<div id="tabs-1" class="customise-components">
 		<div id="tabs-sub">
 			<table border="0" cellpadding="0" cellspacing="0">
-							<colgroup>
-					<col width="128" />
+				<colgroup>
+				<col width="128" />
 				</colgroup>
 				<tr>
 					<td valign="top"><ul>
@@ -84,20 +151,19 @@ a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
 							<li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
 							<!-- END homepage_component_tab -->
 						</ul></td>
-					<td><div class="components">
+					<td><div class="components"> 
 							<!-- BEGIN homepage_component_page -->
-							<div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
+							<div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}"> 
 								<!-- BEGIN homepage_component -->
 								<div class="add-component {HOMEPAGE_COMPONENT_CLASS}">
 									<h4>{HOMEPAGE_COMPONENT_NAME} <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong></h4>
 									<p>{HOMEPAGE_COMPONENT_DESCRIPTION}</p>
-									<span class="notification"><strong></strong>Added</span>
-									<a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="btn add"><span></span>Add</a>
+									<span class="notification"><strong></strong>Added</span> <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="btn add"><span></span>Add</a>
 									<div class="float-fix"></div>
 								</div>
-								<!-- END homepage_component -->
+								<!-- END homepage_component --> 
 							</div>
-							<!-- END homepage_component_page -->
+							<!-- END homepage_component_page --> 
 						</div>
 						<div class="float-fix"></div></td>
 				</tr>
@@ -213,19 +279,14 @@ a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
 			<input type="text" id="currentColour" value="#123456" maxlength="7" class="input_text" />
 		</div>
 		<div class="float-fix"></div>
-
 		<div class="colours-buttons">
 			<form method="POST" action="" name="saveColours">
-
 				<button class="submit-btn-plain save-colours" type="button" id="saveColour">Save colour set</button>
-
 				<button class="submit-btn-plain" type="button" id="leftRight" >Copy colours left > right</button>
 				<button class="submit-btn-plain" type="button" id="restore" >Reset Colours</button>
 				<button class="submit-btn-plain" type="button" id="cancel" >Cancel</button>
-
 			</form>
 			<div class="float-fix"></div>
-
 			<div class="saved-colours">Saved colour set!</div>
 		</div>
 	</div>
@@ -236,54 +297,44 @@ a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
 			<input type="hidden" name="template" id="templateVal" value="" />
 			<input type="hidden" name="uid" value="{ID}" />
 			<div class="float-fix"></div>
-            <div class="colours-buttons">
+			<div class="colours-buttons">
 				<button class="submit-btn-plain" type="button" id="saveTemplate" >Save layout</button>
 				<button class="submit-btn-plain" type="button" id="cancelTemplate" >Cancel</button>
 				<div class="float-fix"></div>
 				<div class="saved-layout">Saved layout</div>
 			</div>
-
 		</form>
 		<div class="float-fix"></div>
-
 	</div>
-	<!--/tabs-3-->
+	<!--/tabs-3--> 
 </div>
 <!-- END customise_page -->
 
-
 <div class="{TEMPLATE} privateBlock">
-    <div class="left">
-
+	<div class="left">
 		<div class="box permanent">
 			<h2>My Profile</h2>
-			<div class="pad-it">
-				<img src="/search/portrait.php?id={SYNERGY_ID}&width=150&height=150" alt="{PERSON_NAME}" title="{PERSON_NAME}" />
-				<p>
-					<strong>{PERSON_NAME}</strong><br />
+			<div class="pad-it"> <img src="/search/portrait.php?id={SYNERGY_ID}&width=150&height=150" alt="{PERSON_NAME}" title="{PERSON_NAME}" />
+				<p> <strong>{PERSON_NAME}</strong><br />
 					House: {HOUSE}<br />
 					Campus: {CAMPUS}<br />
-					Year: {YEAR_LEVEL}
-				</p>
+					Year: {YEAR_LEVEL} </p>
 				<div class="float-fix"></div>
 			</div>
-    </div>
-    <!-- BEGIN privateNotes -->
-    <div class="private-notes box">
-        <h2>Teacher Notes</h2>
-		<div class="pad-it">
-			{PRIVATE_NOTES}
-			<!-- BEGIN modify_link -->
-			<p class="interact">
-				<a href="/eportfolio_privateNotes/modify/{ID}" class="btn modify"><span></span>Modify</a>
-			</p>
-			<!-- END modify_link -->
 		</div>
-    </div>
-    <div class="float-fix"></div>
-    <!-- END privateNotes -->
-    {COLUMN1}</div>
-    <div class="right">{COLUMN2}</div>
+		<!-- BEGIN privateNotes -->
+		<div class="private-notes box">
+			<h2>Teacher Notes</h2>
+			<div class="pad-it"> {PRIVATE_NOTES} 
+				<!-- BEGIN modify_link -->
+				<p class="interact"> <a href="/eportfolio_privateNotes/modify/{ID}" class="btn modify"><span></span>Modify</a> </p>
+				<!-- END modify_link --> 
+			</div>
+		</div>
+		<div class="float-fix"></div>
+		<!-- END privateNotes --> 
+		{COLUMN1}</div>
+	<div class="right">{COLUMN2}</div>
 	<div class="float-fix"></div>
 </div>
 <input type="hidden" id="userID" value="{ID}" />
