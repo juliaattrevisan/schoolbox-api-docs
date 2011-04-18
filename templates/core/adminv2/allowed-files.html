@@ -97,7 +97,7 @@ $j(function() {
 		event.preventDefault();
 		var nearestAction = $j(this).closest('form').attr('action');
 		var nearestFID =  $j(this).closest('form').find('input[name=fileTypeID]').val();
-		$j(this).closest('form').attr('action', nearestAction+"&delete="+nearestFID);
+		$j(this).closest('form').attr('action', nearestAction+"?delete="+nearestFID);
 		$j(this).closest('form').submit();
 		
 		return false;
