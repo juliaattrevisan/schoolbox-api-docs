@@ -1774,14 +1774,14 @@ ASSESS
 #assess .col-1, #assess .col-2 { float:left; }
 
 #assess .col-1 {
-	width:70%;
+	width:69%;
 	margin-right:1%;
-	min-width:500px;
+
 }
 
 #assess .col-2 {
 	width:29%;
-	min-width:225px;
+
 }
 
 #assess .col-2 .assess-body { background:#fff; }
@@ -1981,7 +1981,7 @@ ASSESS
 	border: 1px solid #dbdbdb;
 }
 
-
+#assess .section-question img{display:none;}
 #assess table.mceLayout tr.mceFirst td, #assess table.mceLayout tr.mceLast td, #assess table.mceLayout tr.mceFirst td, .defaultSkin .mceIframeContainer { border:0; }
 
 #assess .defaultSkin table.mceLayout, #assess .defaultSkin table.mceLayout tr.mceFirst td { border:0 none; }
