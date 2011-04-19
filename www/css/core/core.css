@@ -480,7 +480,7 @@ th { font-weight:bold; }
 	position:relative;
 }
 
-.top {
+.ui-sortable .top {
 	display:none;
 	position:relative;
 }
@@ -3869,6 +3869,7 @@ p.forgotten { margin:10px 0; }
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 	border-radius: 3px;
+	word-break: break-word;
 }
 
 #category li a:hover {
