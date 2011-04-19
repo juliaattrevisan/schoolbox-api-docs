@@ -13,6 +13,22 @@ class Category extends Model {
 		
 		parent::Model();
 	}
+
+	/**
+	 * Get the code for a category. Uses the categoryCode table in a join, as
+	 * category.code is deprecated
+	 * 
+	 * @param <type> $category_id
+	 * @return <type>
+	 */
+	function getCodeForCategory($category_id) {
+		$query = "SELECT GROUP_CONCAT(categoryCode.code) AS codes
+				  FROM category
+				  LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
+				  WHERE category.id = '$category_id'";
+
+		return $this->db->getRow($query);
+	}
 	
 	function getCategoryList ($categoryID, $config = false) {
 		$query = "SELECT id, name, GROUP_CONCAT(co.code) code, cf.template, parent,

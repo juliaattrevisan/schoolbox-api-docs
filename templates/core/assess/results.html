@@ -25,13 +25,13 @@ $j(function() {
 		<tbody>
 			<!-- BEGIN attempt -->
 			<tr>
-				<td>{ATTEMPT_NAME}</td>
+				<td><a href="/search/user/{USER_ID}">{ATTEMPT_NAME}</a></td>
 				<td>{ATTEMPT_FINISH}</td>
 				<td>{ATTEMPT_TIME_TAKEN}</td>
 				<td>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</td>
 				<td>{ATTEMPT_PERCENTAGE}%</td>
                 <td>{ATTEMPT_UNMARKED_RESPONSES}</td>
-				<td><a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Review</td>
+				<td>{ATTEMPT_REVIEW_LINK}</td>
                 <td>{ATTEMPT_REVIEW_STATUS}</td>
 			</tr>
 			<!-- END attempt -->
