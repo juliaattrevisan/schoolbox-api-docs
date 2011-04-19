@@ -26,7 +26,7 @@ if(is_numeric($_REQUEST['cid']) ) {
 	//AJAX request for drag and drop of components
 	if($_POST['cid'] && $_POST['type'] == 'components')
 	{	
-		$columns = array($_POST['column1'], $_POST['column2']);
+		$columns = array($_POST['column1'], $_POST['column2'], $_POST['column3']);
 		foreach($columns as $key => $column)
 		{
 			// Explode the columns

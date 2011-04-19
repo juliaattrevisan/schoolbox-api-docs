@@ -40,7 +40,7 @@ $homepageHandler = new Homepage($category['id']);
 
 $categoryHandler->logPageView($categoryID);
 
-define('MAX_COLUMN_COUNT',2);
+define('MAX_COLUMN_COUNT',3);
 
 // check perms
 if (($permission = $groupHandler->getPermission($categoryID)) < READ_ACCESS)
