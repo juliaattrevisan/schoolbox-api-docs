@@ -34,7 +34,7 @@ else if (($_POST['serviceSubmit'] == 'Add') && $_POST['uid']) {
 
 /* Update existing user details
  */
-else if(is_numeric($_POST['userID']) && $_POST['username'] ) {
+else if(is_numeric($_POST['userID']) && $_POST['modusername'] ) {
     if ($_POST['delete']) {
         $userHandler->delete($_POST['userID']);
 
@@ -43,7 +43,7 @@ else if(is_numeric($_POST['userID']) && $_POST['username'] ) {
 
     $user = array(
 		'id'				 => $_POST['userID'],
-		'username'			 => $_POST['username'],
+		'username'			 => $_POST['modusername'],
 		'title'				 => $_POST['title'],
 		'firstname'			 => $_POST['firstname'],
 		'lastname'			 => $_POST['lastname'],
@@ -51,7 +51,7 @@ else if(is_numeric($_POST['userID']) && $_POST['username'] ) {
 		'local_email'		 => $_POST['local_email'],
 		'alt_email'			 => $_POST['alt_email'],
 		'group_id'			 => $_POST['group'],
-		'password'			 => $_POST['password'],
+		'password'			 => $_POST['modpassword'],
 		'campus'			 => $_POST['campus'],
 		'su'				 => $_POST['superuser'],
 		'year'				 => $_POST['year'],
@@ -65,9 +65,9 @@ else if(is_numeric($_POST['userID']) && $_POST['username'] ) {
 
 /* Create new user
  */
-else if ($_POST['username']) {
+else if ($_POST['modusername']) {
     $user = array(
-		'username'			 => $_POST['username'],
+		'username'			 => $_POST['modusername'],
 		'title'				 => $_POST['title'],
 		'firstname'			 => $_POST['firstname'],
 		'lastname'			 => $_POST['lastname'],
@@ -75,7 +75,7 @@ else if ($_POST['username']) {
 		'local_email'		 => $_POST['local_email'],
 		'alt_email'			 => $_POST['alt_email'],
 		'group_id'			 => $_POST['group'],
-		'password'			 => $_POST['password'],
+		'password'			 => $_POST['modpassword'],
 		'campus'			 => $_POST['campus'],
 		'su'			 	 => $_POST['superuser'],
 		'year'		 		 => $_POST['year'],
@@ -114,7 +114,6 @@ else if ($_POST['updateServices'] == true) {
 /* Ajax Update SID values
  */
 else if ($_POST['updateSID'] == true) {
-	print_r($_POST);
 	$groupHandler->setService($_POST['service']);
 	$groupHandler->setSID($_POST['previousSid'], $_POST['sid'], $_POST['uid']);
 }

@@ -130,6 +130,11 @@ if(is_numeric($this->arg[0])) {
 					/* News
 					 */
 					case 3:
+						$this->dropDown('perm_campus', $userHandler->getCampusList(), $perm['sid'], 'user_news', array(
+							 'id' => 'PERM_CAMPUS_ID',
+							 'name' => 'PERM_CAMPUS_NAME'
+						));
+
                         $this->parse('user_news_block', 'user_news', true);
 						break;
 
