@@ -83,19 +83,14 @@ else if ($_POST['username']) {
 else if ($_POST['updateGroups'] == true) {
     $groupHandler->setService($_POST['service']);
 
-	/* If assigning a new admin
+	/* If assigning a new admin, demote any existing owners
 	 */
 	if ($_POST['type'] == FULL_ACCESS) {
-		
-		/* Demote any existing owners
-		 */
 		$category = $categoryHandler->getByID($_POST['sid']);
 		$groupHandler->setUserPermission($_POST['sid'], $category['owner'], WRITE_ACCESS);
-
-
 	}
 
-	/* Update other users
+	/* Update user access as normal
 	 */
 	$groupHandler->setUserGroupType($_POST['sid'], $_POST['uid'], $_POST['type']);
 }
