@@ -481,10 +481,11 @@ th { font-weight:bold; }
 }
 
 .top {
-	display
+	display:none;
 	position:relative;
 }
 
+.template5 .top{display:block;}
 .template2 .left { width: 49.5%; }
 
 .template2 .right { width: 49.5%; }
