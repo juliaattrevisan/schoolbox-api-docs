@@ -245,7 +245,8 @@ $j(function() {
 	f.setColor("#b6b6ff"); //set initial color
 	
 	$j('#head_font').parent().addClass('active-box');
-	var initialColour = rgbConvert($j('#left_head_font').css('background-color'));
+	var instantColour = new RGBColor($j('#left_head_font').css('background-color'));
+	var initialColour = instantColour.toHex();
 	checkTextColour();
 	$j('#currentColour').css('background-color',initialColour);
 	$j('#currentColour').val(initialColour);
@@ -258,16 +259,6 @@ $j(function() {
 	
 	function h2d(h) {return parseInt(h,16);} 
 
-	function rgbConvert(str) {
-		str = str.replace(/rgb\(|\)/g, "").split(",");
-		str[0] = parseInt(str[0], 10).toString(16).toLowerCase();
-		str[1] = parseInt(str[1], 10).toString(16).toLowerCase();
-		str[2] = parseInt(str[2], 10).toString(16).toLowerCase();
-		str[0] = (str[0].length == 1) ? '0' + str[0] : str[0];
-		str[1] = (str[1].length == 1) ? '0' + str[1] : str[1];
-		str[2] = (str[2].length == 1) ? '0' + str[2] : str[2];
-		return ('#' + str.join(""));
-	}
 	
 	
 	function checkTextColour() {
@@ -335,6 +326,7 @@ $j(function() {
 			break;
 		}
 	}
+	
 
 	$j('.colour').click(function(event) {
 		event.preventDefault();
@@ -343,8 +335,12 @@ $j(function() {
 		$j(this).addClass('active-box');
 		$j(this).children('.colorBox').addClass('selected');
 		$j(this).next().next('p').addClass('selected');
-		f.setColor(rgbConvert($j(this).children('.colorBox').css('background-color')));
+
+		var color = new RGBColor($j(this).children('.colorBox').css('background-color'));
+
+		f.setColor(color.toHex());
 		checkTextColour()
+		return false;
 	});
 
 	$j('.layouts a').click(function(event) {
