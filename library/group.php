@@ -85,6 +85,18 @@ class Group extends Model {
         $this->db->query($query);
     }
 
+	/**
+	 * Update sid value for a user.
+	 *
+	 * @param <type> $sid
+	 * @param <type> $uid
+	 * @param <type> $type
+	 */
+    function setSID($previousSid, $sid, $uid) {
+        $query = "UPDATE userAccess SET sid = '$sid' WHERE uid = '$uid' AND service = '". $this->_service ."' AND sid = '$previousSid'";
+        $this->db->query($query);
+    }
+
     function getOwner($relationID) {
 
         //get the owner(s) of the group

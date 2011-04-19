@@ -5,9 +5,9 @@
 
 $j(function() {
 
-	/* Ajax update group permissions
+	/* Ajax Update group access permissions
 	 */
-		$j('.updateGroupsForm').find('input[name=type]').change(function() {
+	$j('.updateGroupsForm').find('input[name=type]').change(function() {
 		var data = {
 			type: $j(this).val(),
 			uid: $j(this).siblings('input[name=uid]').val(),
@@ -18,6 +18,36 @@ $j(function() {
 
 		$j.post('/adminv2/userForm.php', data);
 	});
+
+	/* Ajax Update service access permissions
+	 */
+	$j('.updateServicesForm').find('input[name=type]').change(function() {
+		var data = {
+			type: $j(this).val(),
+			uid: $j(this).siblings('input[name=uid]').val(),
+			sid: $j(this).siblings('input[name=sid]').val(),
+			service: $j(this).siblings('input[name=service]').val(),
+			updateServices: true
+		}
+
+		$j.post('/adminv2/userForm.php', data);
+	});
+
+	/* Ajax Update SID values
+	 */
+	$j('.updateSIDForm').find('select[name=sid]').change(function() {
+		var data = {
+			type: $j(this).val(),
+			uid: $j(this).siblings('input[name=uid]').val(),
+			sid: $j(this).val(),
+			previousSid: $j(this).siblings('input[name=previousSid]').val(),
+			service: $j(this).siblings('input[name=service]').val(),
+			updateSID: true
+		}
+
+		$j.post('/adminv2/userForm.php', data);
+	});
+
 
 	$j('table tr:nth-child(2n)').addClass('dark');
 
@@ -206,80 +236,88 @@ $j(function() {
 			<tr>
 				<th>Remove</th>
 				<th>Service</th>
-				<th>Region</th>
 				<th>Access</th>
 			</tr>
 		</thead>
 		<tbody>
 			<!-- BEGIN user_calendar -->
 			<tr>
-				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
+				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td>Calendar</td>
 				<td>
-					<select name="sid">
-						<!-- BEGIN perm_campus -->
-						<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_CHECKED} >{PERM_CAMPUS_NAME}</option>
-						<!-- END perm_campus -->
-					</select>
+					<form action="/adminv2/userForm.php" method="post" class="updateSIDForm">
+						<input type="hidden" name="uid" value="{USERID}" />
+						<input type="hidden" name="service" value="{SERVICE_ID}" />
+						<input type="hidden" name="previousSid" value="{SID}" />
+						<select name="sid">
+							<!-- BEGIN perm_campus -->
+							<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED} >{PERM_CAMPUS_NAME}</option>
+							<!-- END perm_campus -->
+						</select>
+					</form>
 				</td>
 				<td>
-					<form action="/adminv2/userForm.php" method="post" class="updatePermissionsForm">
-						<input type="radio" name="type" value="1" {READ_CHECKED} />
-						Read
-						<input type="radio" name="type" value="2" {WRITE_CHECKED} />
-						Write
-						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />
-						Moderate
+					<form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
+						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
+						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate
 						<input type="hidden" name="uid" value="{USERID}" />
-						<input type="hidden" name="sid" value="{USER_GROUP_ID}" />
+						<input type="hidden" name="sid" value="{SID}" />
 						<input type="hidden" name="service" value="{SERVICE_ID}" />
 					</form>
 				</td>
 			</tr>
 			<!-- END user_calendar --> 
-			<!-- BEGIN user_news-->
+			<!-- BEGIN user_news -->
 			<tr>
-				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
+				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td>News</td>
 				<td>
-					<select name="sid">
-						{PERM_CAMPUS_BLOCK}
-					</select>
-				</td>
-				<td><form action="/adminv2/userForm.php">
-						<input type="radio" name="type" value="1" {READ_CHECKED} />
-						Read
-						<input type="radio" name="type" value="2" {WRITE_CHECKED} />
-						Write
-						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />
-						Moderate
+					<form action="/adminv2/userForm.php" method="post" class="updateSIDForm">
 						<input type="hidden" name="uid" value="{USERID}" />
-						<input type="hidden" name="sid" value="{USER_GROUP_ID}" />
 						<input type="hidden" name="service" value="{SERVICE_ID}" />
-					</form></td>
+						<input type="hidden" name="previousSid" value="{SID}" />
+						<select name="sid">
+							<!-- BEGIN perm_campus -->
+							<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED} >{PERM_CAMPUS_NAME}</option>
+							<!-- END perm_campus -->
+						</select>
+					</form>
+				</td>
+				<td>
+					<form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+
+						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
+						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
+						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate
+						<input type="hidden" name="uid" value="{USERID}" />
+						<input type="hidden" name="sid" value="{SID}" />
+						<input type="hidden" name="service" value="{SERVICE_ID}" />
+					</form>
+				</td>
 			</tr>
 			<!-- END user_news --> 
 			<!-- BEGIN user_cms -->
 			<tr>
-				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
+				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td>CMS</td>
-				<td>&nbsp;</td>
-				<td><form action="/adminv2/userForm.php">
-						<input type="radio" name="type" value="1" {READ_CHECKED} />
-						Read
-						<input type="radio" name="type" value="2" {WRITE_CHECKED} />
-						Write
-						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />
-						Moderate
+				<td>
+				</td>
+				<td>
+					<form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
+						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
+						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate
 						<input type="hidden" name="uid" value="{USERID}" />
-						<input type="hidden" name="sid" value="{USER_GROUP_ID}" />
+						<input type="hidden" name="sid" value="0" />
 						<input type="hidden" name="service" value="{SERVICE_ID}" />
-					</form></td>
+					</form>
+				</td>
 			</tr>
 			<!-- END user_cms -->
-			
 			<tr>
-				<td colspan="4" class="colours-buttons"><form action="/adminv2/userForm.php" method="post" >
+				<td colspan="4" class="colours-buttons">
+					<form action="/adminv2/userForm.php" method="post">
 						<select class="formfield float-left" name="service">
 							<option value="0">&lt;- Please Select a service -&gt;</option>
 							<option value="2">Calendar</option>
@@ -289,9 +327,11 @@ $j(function() {
 						<input type="hidden" value="{USERID}" name="uid">
 						<input type="hidden" value="0" name="sid">
 						<input type="hidden" value="1" name="type">
+						<input type="hidden" name="addService" />
 						<div class="float-fix"></div>
-						<input type="submit" class="submit-btn-plain" value="Add" name="groupSubmit">
-					</form></td>
+						<input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
+					</form>
+				</td>
 			</tr>
 		</tbody>
 	</table>

@@ -37,10 +37,10 @@ if(is_numeric($this->arg[0])) {
 
         /* Output title list */
         $this->dropDown('title', $userHandler->getTitleList(), $user['title'], TEMPLATE_content, array('titleName'=>'NAME_TITLE'));
-        
+
         /* Output group list */
          $this->dropDown('system_group', $userHandler->getGroupList(), $user['group_id'], TEMPLATE_content, array('id'=>'GROUP_ID','name'=>'SYSTEM_GROUP_NAME'));
-        
+
         /* Output campus list */
          $this->setBlock(TEMPLATE_content, 'campus','campus_block');
          $campusList = $userHandler->getCampusList();
@@ -92,34 +92,59 @@ if(is_numeric($this->arg[0])) {
          $this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
          $this->setBlock(TEMPLATE_content, 'user_news', 'user_news_block');
          $this->setBlock(TEMPLATE_content, 'user_cms', 'user_cms_block');
-         $this->setVar(array('user_calendar_block'=>'','user_news_block'=>'', 'user_cms_block'=>''));
-         $permList = $groupHandler->getAllUserAccess($user['uid']);
-         if(is_array($permList)) {
-             foreach($permList as $perm) {
 
-                 $permOutput = array('SERVICE_ID'       =>$perm['service'],
-                                     'READ_CHECKED'     => $perm['type']==1?'checked="checked"':'',
-                                     'WRITE_CHECKED'    => $perm['type']==2?'checked="checked"':'',
-                                     'ADMIN_CHECKED'    => $perm['type']==3?'checked="checked"':'',);
-                 $this->setVar($permOutput);
+		$this->setVar(array(
+			'user_calendar_block' => '',
+			'user_news_block' => '',
+			'user_cms_block'=> ''
+		));
 
-                 switch($perm['service']) {
-                     case 2: //calendar
-                         $this->dropDown('perm_campus', $userHandler->getCampusList(), $perm['sid'], 'user_calendar', array('id'=>'PERM_CAMPUS_ID','name'=>'PERM_CAMPUS_NAME'));
-                         $this->parse('user_calendar_block', 'user_calendar', true);
-                     break;
+		$permList = $groupHandler->getAllUserAccess($user['uid']);
 
-                     case 3: //news
-                         $this->parse('user_calendar_block', 'user_news', true);
-                     break;
+		if (is_array($permList)) {
+			foreach($permList as $perm) {
+				$permOutput = array(
+					'SERVICE_ID'       => $perm['service'],
+					'READ_CHECKED'     => $perm['type']==1?'checked="checked"':'',
+					'WRITE_CHECKED'    => $perm['type']==2?'checked="checked"':'',
+					'ADMIN_CHECKED'    => $perm['type']==3?'checked="checked"':'',
+					'SID'			   => $perm['sid']
+				);
 
-                     case 5: //cms
-                         $this->parse('user_calendar_block', 'user_cms', true);
-                     break;
-                 }
-             }
-         }
+				$this->setVar($permOutput);
 
+				switch($perm['service']) {
+
+					/* Calendar
+					 */
+					case 2:
+						$this->dropDown('perm_campus', $userHandler->getCampusList(), $perm['sid'], 'user_calendar', array(
+							 'id' => 'PERM_CAMPUS_ID',
+							 'name' => 'PERM_CAMPUS_NAME'
+						));
+
+						$this->parse('user_calendar_block', 'user_calendar', true);
+
+						break;
+
+					/* News
+					 */
+					case 3:
+                        $this->parse('user_news_block', 'user_news', true);
+						break;
+
+					/* CMS
+					 */
+                    case 5: //cms
+						$this->parse('user_cms_block', 'user_cms', true);
+						break;
+				}
+
+				/* Clear child blocks after parsing out parent
+				 */
+				$this->setVar('perm_campus_block', '');
+			}
+		}
 
          /* Output login log */
         $this->setBlock(TEMPLATE_content, 'login_log', 'login_log_block');

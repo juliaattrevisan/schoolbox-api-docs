@@ -23,6 +23,15 @@ if (($_POST['groupSubmit'] == 'Add') && $_POST['uid']) {
 	localRedir('/adminv2/modify-user/'.$_POST['uid']);
 }
 
+/* Add user to service
+ */
+else if (($_POST['serviceSubmit'] == 'Add') && $_POST['uid']) {
+    $groupHandler->setService($_POST['service']);
+    $groupHandler->addUser($_POST['sid'], $_POST['uid'], $_POST['type']);
+
+	localRedir('/adminv2/modify-user/'.$_POST['uid']);
+}
+
 /* Update existing user details
  */
 else if(is_numeric($_POST['userID']) && $_POST['username'] ) {
@@ -78,7 +87,7 @@ else if ($_POST['username']) {
     localRedir('/adminv2/modify-user/'.$id);
 }
 
-/* Ajax Update groups and their permissions etc
+/* Ajax Update Groups and their access permissions etc
  */
 else if ($_POST['updateGroups'] == true) {
     $groupHandler->setService($_POST['service']);
@@ -93,6 +102,30 @@ else if ($_POST['updateGroups'] == true) {
 	/* Update user access as normal
 	 */
 	$groupHandler->setUserGroupType($_POST['sid'], $_POST['uid'], $_POST['type']);
+}
+
+/* Ajax Update Service Permissions (sid corresponds to campus)
+ */
+else if ($_POST['updateServices'] == true) {
+    $groupHandler->setService($_POST['service']);
+	$groupHandler->setUserGroupType($_POST['sid'], $_POST['uid'], $_POST['type']);
+}
+
+/* Ajax Update SID values
+ */
+else if ($_POST['updateSID'] == true) {
+	print_r($_POST);
+	$groupHandler->setService($_POST['service']);
+	$groupHandler->setSID($_POST['previousSid'], $_POST['sid'], $_POST['uid']);
+}
+
+/* Remove a service
+ */
+else if (is_numeric($_GET['deleteService']) && is_numeric($_GET['sid']) && is_numeric($_GET['uid'])) {
+	$groupHandler->setService($_GET['deleteService']);
+	$groupHandler->deleteUser($_GET['sid'], $_GET['uid']);
+
+	localRedir('/adminv2/modify-user/'.$_GET['uid']);
 }
 
 /* Switch logins to the current user being viewed
