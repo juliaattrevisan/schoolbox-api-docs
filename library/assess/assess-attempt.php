@@ -121,7 +121,8 @@ class AssessAttempt extends Model {
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
                   AND user_id = '$_SESSION[id]'
-                  AND finish != '0000-00-00 00:00:00'";
+                  AND finish != '0000-00-00 00:00:00'
+				  AND deleted_at IS NULL";
 
         return $this->db->getOne($query);
     }
@@ -142,6 +143,7 @@ class AssessAttempt extends Model {
                   LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
                   WHERE assess.assess_id = '$assess_id'
+				  AND assess_attempt.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 
         return $this->db->getAll($query);
@@ -177,6 +179,7 @@ class AssessAttempt extends Model {
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
                   AND user_id = '$user_id'
+				  AND deleted_at IS NULL
                   ORDER BY start DESC";
 
         return $this->db->getRow($query);

@@ -12,7 +12,6 @@ $attemptHandler = new AssessAttempt();
 $allAssess = $assessHandler->getList($categoryID);
 
 if ($groupHandler->isStaff()) {
-
     $this->setVar('studentLink_block', '');
     $this->parse('teacherLink_block', 'teacherLink');
     $this->parse('createAssessment_block', 'createAssessment');
@@ -80,6 +79,7 @@ if (is_array($allAssess)) {
 				$this->setVar('studentLink_block', '');
 			}
             else {
+				
                 $this->parse('studentLink_block', 'studentLink');
             }
         }

@@ -184,5 +184,19 @@ class AssessResponse extends Model {
 
         return $this->db->getOne($query);
     }
+
+	/**
+	 * Mark as deleted all the responses for an attempt.
+	 * 
+	 * @param <type> $attempt_id
+	 * @return <type>
+	 */
+	function deleteResponsesForAttempt($attempt_id) {
+		$query = "UPDATE {$this->_table} 
+				  SET deleted_at = NOW()
+				  WHERE attempt_id = '$attempt_id'";
+
+		return $this->db->query($query);
+	}
 }
 ?>

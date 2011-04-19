@@ -92,7 +92,8 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 		'ATTEMPT_PERCENTAGE' => $percentage,
 		'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
 		'ATTEMPT_UNMARKED_RESPONSES' => $numNotAutomarked,
-		'ATTEMPT_REVIEW_LINK', "<a href=\"/assess/review/{$page->arg[0]}/{$firstSection['section_id']}/{$currentAttempt['attempt_id']}\">Review</a>",
+		'ATTEMPT_REVIEW_LINK' => "<a href=\"/assess/review/{$page->arg[0]}/{$firstSection['section_id']}/{$currentAttempt['attempt_id']}\">Review</a>",
+		'ATTEMPT_DELETE_LINK' => "<a href=\"/assess/deleteAttempt/{$currentAttempt['attempt_id']}\">Delete</a>",
 	));
 
 	$page->parse('attempt_block', 'attempt', true);
@@ -215,6 +216,7 @@ foreach($allStudents as $currentStudent) {
 			'ATTEMPT_REVIEW_STATUS' => '',
 			'ATTEMPT_UNMARKED_RESPONSES' => '',
 			'ATTEMPT_REVIEW_LINK' => '',
+			'ATTEMPT_DELETE_LINK' => '',
 		));
 
 		$this->parse('attempt_block', 'attempt', true);

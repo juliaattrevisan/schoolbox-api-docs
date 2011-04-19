@@ -15,6 +15,11 @@ ALTER TABLE `assess_luQuestionType`
 	ADD COLUMN `moodle` varchar(255)  COLLATE utf8_general_ci NULL after `description`,
 	CHANGE `automated_marking` `automated_marking` enum('true','false')  COLLATE utf8_general_ci NOT NULL after `moodle`;
 
+/* Allow deleteable attempts
+ */
+ALTER TABLE assess_response ADD COLUMN deleted_at DATETIME;
+ALTER TABLE assess_attempt ADD COLUMN deleted_at DATETIME;
+
 DROP TABLE chat;
 
 /* Create table in target */
