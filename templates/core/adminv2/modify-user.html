@@ -69,18 +69,18 @@ $j(function() {
 	<form class="admin-form" method="POST" action="/adminv2/userForm.php">
 		<div class="split-container">
 			<div class="split">
-				<label for ="preferred" class="preferred">
-				Preferred
-				<fieldset>
-					<label>
-						<select name="title">
-							<!-- BEGIN title -->
-							<option value="{NAME_TITLE}" {NAME_TITLE_SELECTED}>{NAME_TITLE}</option>
-							<!-- END title -->
-						</select>
-						<input type="text" name="firstname" value="{FIRSTNAME}" />
-					</label>
-				</fieldset>
+				
+				<label class="width2 first">Preferred
+					<select name="title">
+						<!-- BEGIN title -->
+						<option value="{NAME_TITLE}" {NAME_TITLE_SELECTED}>{NAME_TITLE}</option>
+						<!-- END title -->
+					</select>
+					
+				</label>
+					
+				<label class="width2 first">First Name
+					<input type="text" name="firstname" value="{FIRSTNAME}" />
 				</label>
 				<label for ="username" class="width2">Username
 					<input type="text" name="username" value="{USERNAME}" />

@@ -17,18 +17,22 @@ $j(function() {
 		zIndex: 2000,
 		
 		update: function () {
-			var left = '', right = '';
+			var left = '', right = ''; top = '';
 			$j('div.left').children('div.box').each(function () {
 				left += $j(this).attr('id').substring(9) + ',';
 			});
 			$j('div.right').children('div.box').each(function () {
 				right += $j(this).attr('id').substring(9) + ',';
 			});
-			$j.post('/homepage/configForm.php', {cid : cid, type: 'components', column1: left, column2: right});
+			$j('div.top').children('div.box').each(function () {
+				top += $j(this).attr('id').substring(9) + ',';
+			});
+			$j.post('/homepage/configForm.php', {cid : cid, type: 'components', column1: left, column2: right, column3: top});
 			
 		},			
 		sort: function (event, ui) {
 			var leftOffset = $j('div.left').offset();
+			var topOffset = $j('div.top').offset();
 		
 			if (event.pageX < (leftOffset.left + $j('div.left').width()) &&
 				event.pageY > (leftOffset.top + $j('div.left').height())) {
@@ -38,9 +42,14 @@ $j(function() {
 			else if (event.pageX > (leftOffset.left + $j('div.left').width()) &&
 					 event.pageY > ($j('div.right').offset().top + $j('div.right').height())) {
 				// right bottom
-				ui.placeholder.appendTo($j('div.right'));
+				ui.placeholder.appendTo($j('div.right'))
 
+			} else if (event.pageX < (topOffset.left + $j('div.top').width()) &&
+				event.pageY < (topOffset.top + $j('div.top').height())) {
+				// top bottom
+				ui.placeholder.appendTo($j('div.top'));
 			} 
+
 			
 			$j('.cal-bubble').hide();
 			
