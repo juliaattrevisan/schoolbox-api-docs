@@ -165,12 +165,12 @@ $this->setVar(array(
  */
 $categoryCode = $categoryHandler->getCodeForCategory($assess['category_id']);
 
-if (($categoryCode['code'] != '') && Cfg::get('external_enable')) {
+if (($categoryCode['codes'] != '') && Cfg::get('external_enable')) {
 	require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalClass.php';
 
 	//if synergy code get synergy students
 	$synHandler = new ExternalClass();
-	$allStudents = $synHandler->getStudents($categoryCode['code']);
+	$allStudents = $synHandler->getStudents($categoryCode['codes']);
 }
 else {
 	//Retrieve student list from group membership
