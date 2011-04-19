@@ -38,7 +38,7 @@ $config[] =  array('name' => 'ldap_base', 'value' => LDAP_base, 'title' => 'LDAP
 $config[] =  array('name' => 'ldap_host_alt', 'value' => defined(LDAP_host2)?LDAP_host2:'', 'title' => 'LDAP Alternate Host', 'description'=>'Address of LDAP server to which search should be performed', 'field'=> 'input', 'type'=>'Security','editable'=>'true','hidden'=>'false');
 $config[] =  array('name' => 'ldap_user_alt', 'value' => defined(LDAP_user2)?LDAP_user2:'', 'title' => 'LDAP Alternate Username', 'description'=>'User account for binding to LDAP, should be complete DN', 'field'=> 'input', 'type'=>'Security','editable'=>'true','hidden'=>'false');
 $config[] =  array('name' => 'ldap_base_alt', 'value' => defined(LDAP_base2)?LDAP_base2:'', 'title' => 'LDAP Alternate Search Base', 'description'=>'Base search path for username lookup', 'field'=> 'input', 'type'=>'Security','editable'=>'true','hidden'=>'false');
-$config[] =  array('name' => 'ldap_username', 'value' => LDAP_search, 'title' => 'LDAP Username Search Field', 'description'=>'Field to search for username in LDAP', 'field'=> 'input', 'type'=>'Security','editable'=>'true','hidden'=>'false');
+$config[] =  array('name' => 'ldap_username', 'value' => defined(LDAP_search)?LDAP_search:'sAMAccountName', 'title' => 'LDAP Username Search Field', 'description'=>'Field to search for username in LDAP', 'field'=> 'input', 'type'=>'Security','editable'=>'true','hidden'=>'false');
 
 
 /* Paths */
