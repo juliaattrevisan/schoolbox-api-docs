@@ -12,80 +12,93 @@ $groupHandler = new Group;
 if(!$groupHandler->isSuperuser())
     error(19);
 
-if(is_numeric($_POST['userID']) && $_POST['username'] ) {
+/* Add user to group
+ */
+if (($_POST['groupSubmit'] == 'Add') && $_POST['uid']) {
+    $groupHandler->setService($_POST['service']);
+    $groupHandler->addUser($_POST['sid'], $_POST['uid'], $_POST['type']);
 
-    if($_POST['delete']) {
+	localRedir('/adminv2/modify-user/'.$_POST['uid']);
+}
+
+/* Update existing user details
+ */
+else if(is_numeric($_POST['userID']) && $_POST['username'] ) {
+    if ($_POST['delete']) {
         $userHandler->delete($_POST['userID']);
+
         localRedir('/adminv2/user/');
     }
 
-    $user = array(  'id'            => $_POST['userID'],
-                    'username'      => $_POST['username'],
-                    'title'         => $_POST['title'],
-                    'firstname'     => $_POST['firstname'],
-                    'lastname'      => $_POST['lastname'],
-                    'synergy_id'    => $_POST['database_id'],
-                    'local_email'   => $_POST['local_email'],
-                    'alt_email'     => $_POST['alt_email'],
-                    'group_id'      => $_POST['group'],
-                    'password'      => $_POST['password'],
-                    'campus'        => $_POST['campus'],
-                    'su'            => $_POST['superuser'],
-                    'year'          => $_POST['year'],
-                    'eportfolio_enabled' => $_POST['eportfolio']
+    $user = array(
+		'id'				 => $_POST['userID'],
+		'username'			 => $_POST['username'],
+		'title'				 => $_POST['title'],
+		'firstname'			 => $_POST['firstname'],
+		'lastname'			 => $_POST['lastname'],
+		'synergy_id'		 => $_POST['database_id'],
+		'local_email'		 => $_POST['local_email'],
+		'alt_email'			 => $_POST['alt_email'],
+		'group_id'			 => $_POST['group'],
+		'password'			 => $_POST['password'],
+		'campus'			 => $_POST['campus'],
+		'su'				 => $_POST['superuser'],
+		'year'				 => $_POST['year'],
+		'eportfolio_enabled' => $_POST['eportfolio']
     );
 
     $userHandler->update($user);
+
     localRedir('/adminv2/modify-user/'.$user['id']);
-
 }
-else if( $_POST['username']) {
 
-    $user = array(  'username'      => $_POST['username'],
-                    'title'         => $_POST['title'],
-                    'firstname'     => $_POST['firstname'],
-                    'lastname'      => $_POST['lastname'],
-                    'synergy_id'    => $_POST['database_id'],
-                    'local_email'   => $_POST['local_email'],
-                    'alt_email'     => $_POST['alt_email'],
-                    'group_id'      => $_POST['group'],
-                    'password'      => $_POST['password'],
-                    'campus'        => $_POST['campus'],
-                    'su'            => $_POST['superuser'],
-                    'year'          => $_POST['year'],
-                    'eportfolio_enabled' => $_POST['eportfolio']
+/* Create new user
+ */
+else if ($_POST['username']) {
+    $user = array(
+		'username'			 => $_POST['username'],
+		'title'				 => $_POST['title'],
+		'firstname'			 => $_POST['firstname'],
+		'lastname'			 => $_POST['lastname'],
+		'synergy_id'		 => $_POST['database_id'],
+		'local_email'		 => $_POST['local_email'],
+		'alt_email'			 => $_POST['alt_email'],
+		'group_id'			 => $_POST['group'],
+		'password'			 => $_POST['password'],
+		'campus'			 => $_POST['campus'],
+		'su'			 	 => $_POST['superuser'],
+		'year'		 		 => $_POST['year'],
+		'eportfolio_enabled' => $_POST['eportfolio']
     );
 
     $id = $userHandler->create($user);
+
     localRedir('/adminv2/modify-user/'.$id);
 }
-else if($_POST['service'] && $_POST['uid'] && $_POST['type']) {
-    /* Update service */
+
+/* Ajax Update groups and their permissions etc
+ */
+else if ($_POST['updateGroups'] == true) {
     $groupHandler->setService($_POST['service']);
     $groupHandler->setUserGroupType($_POST['sid'], $_POST['uid'], $_POST['type']);
-    //localRedir('/adminv2/modify-user/'.$_POST['uid']);
-}
-else if($_POST['service'] && $_POST['uid']) {
-    /* Add user to group */
-    $groupHandler->setService($_POST['service']);
-    $groupHandler->addUser($_POST['sid'], $_POST['uid'], $_POST['type']);
-    localRedir('/adminv2/modify-user/'.$_POST['uid']);
 }
 
+/* Switch logins to the current user being viewed
+ */
 else if($_POST['login']) {
     require_once SITE_root . '/include/session.php';
-    
+
     $sessionHandler = new Session;
 
-    if($sessionHandler->create($_POST['login']))
-            localRedir('/');
-    else
+    if ($sessionHandler->create($_POST['login'])) {
+		localRedir('/');
+	}
+    else {
         localRedir('/adminv2/user/');
-
+	}
 }
 else {
     localRedir('/adminv2/user/');
 }
-
 
 ?>

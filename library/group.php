@@ -73,8 +73,15 @@ class Group extends Model {
         $this->update($data);
     }
 
+	/**
+	 * Update service types for a user.
+	 * 
+	 * @param <type> $sid
+	 * @param <type> $uid
+	 * @param <type> $type
+	 */
     function setUserGroupType($sid, $uid, $type) {
-        $query = "UPDATE userAccess SET type = '$type' WHERE uid = '$uid' AND service = '. $this->_service .' AND sid = '$sid'";
+        $query = "UPDATE userAccess SET type = '$type' WHERE uid = '$uid' AND service = '". $this->_service ."' AND sid = '$sid'";
         $this->db->query($query);
     }
 

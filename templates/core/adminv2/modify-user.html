@@ -4,45 +4,39 @@
 <script type="text/javascript">
 
 $j(function() {
-	
-	$j('table tr:nth-child(2n)').addClass('dark')
 
+	/* Ajax update group permissions
+	 */
+		$j('.updateGroupsForm').find('input[name=type]').change(function() {
+		var data = {
+			type: $j(this).val(),
+			uid: $j(this).siblings('input[name=uid]').val(),
+			sid: $j(this).siblings('input[name=sid]').val(),
+			service: $j(this).siblings('input[name=service]').val(),
+			updateGroups: true
+		}
 
+		$j.post('/adminv2/userForm.php', data);
+	});
 
+	$j('table tr:nth-child(2n)').addClass('dark');
 
 	$j('h3 span').qtip({
 		content: 'Edit the user\'s details.',
 		show: 'mouseover',
 		hide: 'mouseout',
 		style: {
-			 tip: 'bottomLeft',
+			tip: 'bottomLeft',
 			name: 'green'
 		},
 		position: {
-		  corner: {
-			 target: 'topRight',
-			 tooltip: 'bottomLeft'
-		  }
+			corner: {
+				target: 'topRight',
+				tooltip: 'bottomLeft'
+			}
   		}
 	});
-	
-	///this function for the access ticks need to be recondigured.
-	$j('.accessGranted').each(function () {
-		$j(this).click(function () {
-			if ($j(this).attr('src').indexOf('greentick') != -1) {
-				$j(this).attr('src', '/images/emptybox.gif');
-				$j.get('/group/modifyForm.php', {categoryID: $j(this).attr('rel'), userID: '{ID}', write: 1});
-			} else {
-				$j(this).attr('src', '/images/greentick.gif');
-				$j.get('/group/modifyForm.php', {categoryID: $j(this).attr('rel'), userID: '{ID}', write: 2});
-			}		
-		});
-		$j(this).css('cursor','pointer');
-	});
-	
-	
-})
-
+});
 </script>
 
 <!-- END custom_head-->
@@ -167,21 +161,21 @@ $j(function() {
 			<tr>
 				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></td>
-				<td><form action="/adminv2/userForm.php">
-						<input type="radio" name="type" value="1" {READ_CHECKED} />
-						Read
-						<input type="radio" name="type" value="2" {WRITE_CHECKED} />
-						Write
-						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />
-						Group Admin
+				<td>
+					<form action="/adminv2/userForm.php" method="post" class="updateGroupsForm">
+						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
+						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
+						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Group Admin
 						<input type="hidden" name="uid" value="{USERID}" />
 						<input type="hidden" name="sid" value="{USER_GROUP_ID}" />
-					</form></td>
+						<input type="hidden" name="service" value="1" />
+					</form>
+				</td>
 			</tr>
 			<!-- END user_group -->
-			
 			<tr>
-				<td colspan="4" class="colours-buttons"><form action="/adminv2/userForm.php" method="post" >
+				<td colspan="4" class="colours-buttons">
+					<form action="/adminv2/userForm.php" method="post" >
 						<select class="formfield float-left" name="sid">
 							<option value="0">&lt;- Please Select a Group -&gt;</option>
 							<!-- BEGIN all_group -->
@@ -193,7 +187,8 @@ $j(function() {
 						<input type="hidden" value="1" name="type">
 						<div class="float-fix"></div>
 						<input type="submit" class="submit-btn-plain" value="Add" name="groupSubmit">
-					</form></td>
+					</form>
+				</td>
 			</tr>
 		</tbody>
 	</table>
@@ -220,12 +215,15 @@ $j(function() {
 			<tr>
 				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td>Calendar</td>
-				<td><select name="sid">
+				<td>
+					<select name="sid">
 						<!-- BEGIN perm_campus -->
 						<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_CHECKED} >{PERM_CAMPUS_NAME}</option>
 						<!-- END perm_campus -->
-					</select></td>
-				<td><form action="/adminv2/userForm.php">
+					</select>
+				</td>
+				<td>
+					<form action="/adminv2/userForm.php" method="post" class="updatePermissionsForm">
 						<input type="radio" name="type" value="1" {READ_CHECKED} />
 						Read
 						<input type="radio" name="type" value="2" {WRITE_CHECKED} />
@@ -235,7 +233,8 @@ $j(function() {
 						<input type="hidden" name="uid" value="{USERID}" />
 						<input type="hidden" name="sid" value="{USER_GROUP_ID}" />
 						<input type="hidden" name="service" value="{SERVICE_ID}" />
-					</form></td>
+					</form>
+				</td>
 			</tr>
 			<!-- END user_calendar --> 
 			<!-- BEGIN user_news-->
