@@ -30,7 +30,7 @@ if (!isset($_GET['show']))
 // sorting
 $sortOptions = array('date', 'name', 'start', 'finish', 'location', 'code', 'tutorName1', 'typeName');
 if (!isset($_GET['order']) || !in_array($_GET['order'], $sortOptions))
-	$_GET['order'] =  $sortOptions[1];
+	$_GET['order'] =  $sortOptions[0];
 
 foreach ($sortOptions as $option) {
 	$output = array('CLASS_'.strtoupper($option) => '',

@@ -50,7 +50,7 @@ class Event extends Model {
 		$query .= "GROUP BY eventID ";
 		
 		if ($order)
-			$query .= "ORDER BY `" . $order . "` " . ($dir == 'asc' ? 'ASC' : 'DESC');
+			$query .= "ORDER BY `" . $order . "` " . ($dir == 'desc' ? 'DESC' : 'ASC');
 		
 		return $this->db->getAll($query);
 	}
