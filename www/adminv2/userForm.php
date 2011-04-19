@@ -2,11 +2,13 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 require_once SITE_root . '/library/group.php';
+require_once SITE_root . '/library/category.php';
 require_once SITE_root . '/library/user.php';
 
 $page = new SitePage;
 $userHandler = new User;
 $groupHandler = new Group;
+$categoryHandler = new Category;
 
 /* Superusers only */
 if(!$groupHandler->isSuperuser())
@@ -80,7 +82,22 @@ else if ($_POST['username']) {
  */
 else if ($_POST['updateGroups'] == true) {
     $groupHandler->setService($_POST['service']);
-    $groupHandler->setUserGroupType($_POST['sid'], $_POST['uid'], $_POST['type']);
+
+	/* If assigning a new admin
+	 */
+	if ($_POST['type'] == FULL_ACCESS) {
+		
+		/* Demote any existing owners
+		 */
+		$category = $categoryHandler->getByID($_POST['sid']);
+		$groupHandler->setUserPermission($_POST['sid'], $category['owner'], WRITE_ACCESS);
+
+
+	}
+
+	/* Update other users
+	 */
+	$groupHandler->setUserGroupType($_POST['sid'], $_POST['uid'], $_POST['type']);
 }
 
 /* Switch logins to the current user being viewed
