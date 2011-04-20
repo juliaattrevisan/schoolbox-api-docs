@@ -306,6 +306,7 @@ class SitePage extends Page {
                 $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] ==  7 || $_SESSION['gid'] == '8' )  ||
                 $this->site == 'joeys' ||
                 $this->site == 'jpc' ||
+		$this->site == 'cathedral' ||
                 $this->site == 'mggs' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent() )||
                 $this->site == 'bialik' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent() )
                 )
@@ -354,6 +355,10 @@ class SitePage extends Page {
 			}
             else if($this->site == 'joeys') {
                 $this->setVar('WEBMAIL_LOCATION', 'href="http://webmail/" rel="external"');
+            }
+
+  	    else if($this->site == 'cathedral') {
+                $this->setVar('WEBMAIL_LOCATION', 'href="http://mail.cathedral.qld.edu.au/webmail/src/login.php" rel="external"');
             }
             else if($this->site == 'mggs') {
                 $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.mggs.vic.edu.au" rel="external"');
