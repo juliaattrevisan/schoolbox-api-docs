@@ -311,8 +311,16 @@ class User extends Model {
         $query = "UPDATE subject_news SET owner = '$new' WHERE owner = '$curr'";
         $this->db->query($query);
 
+        $query = "UPDATE wikiRevision SET userID = '$new' WHERE userID = '$curr'";
+        $this->db->query($query);
+
         //update all forums
-        $query = "UPDATE forum SET owner = '$new' WHERE owner = '$curr'";
+        $query = "UPDATE forumPost SET userID = '$new' WHERE userID = '$curr'";
+        $this->db->query($query);
+        $query = "UPDATE forumThread SET userID = '$new' WHERE userID = '$curr'";
+        $this->db->query($query);
+
+        $query = "UPDATE event SET owner = '$new' WHERE owner = '$curr'";
         $this->db->query($query);
     }
 
@@ -372,11 +380,34 @@ class User extends Model {
         $query = "DELETE FROM event WHERE access = '1' AND owner = '$id'";
         $this->db->query($query);
 
+        $query = "DELETE FROM newsUser WHERE userID = '$id'";
+        $this->db->query($query);
+
         //delete log entries
         $query = "DELETE FROM homepage_log WHERE user = '$id'";
         $this->db->query($query);
         $query = "DELETE FROM submission_log WHERE user = '$id'";
         $this->db->query($query);
+
+        $query = "DELETE FROM submission_log WHERE user = '$id'";
+        $this->db->query($query);
+
+        /* eportfolio */
+        $query = "DELETE eportfolio_blog, eportfolio_blogComment FROM eportfolio_blog, eportfolio_blogComment WHERE eportfolio_blogComment.bid = eportfolio_blog.id AND eportfolio_blog.owner = '$id'";
+        $this->db->query($query);
+        $query = "DELETE FROM eportfolio_comp_location WHERE uid = '$id'";
+        $this->db->query($query);
+        $query = "DELETE FROM eportfolio_config WHERE uid = '$id'";
+        $this->db->query($query);
+        $query = "DELETE FROM eportfolio_link WHERE owner = '$id'";
+        $this->db->query($query);
+        $query = "DELETE FROM eportfolio_privateNotes WHERE uid= '$id' ";
+        $this->db->query($query);
+        $query = "DELETE FROM eportfolio_textBox WHERE userID = '$id'";
+        $this->db->query($query);
+
+        $this->db->delete('userCampus', 'uid', $user['id']);
+
     }
 
     function update($user) {
