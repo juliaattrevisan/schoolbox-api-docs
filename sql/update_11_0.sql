@@ -17,8 +17,8 @@ ALTER TABLE `assess_luQuestionType`
 
 /* Allow deleteable attempts
  */
-ALTER TABLE assess_response ADD COLUMN deleted_at DATETIME;
-ALTER TABLE assess_attempt ADD COLUMN deleted_at DATETIME;
+ALTER TABLE `assess_response` ADD COLUMN deleted_at DATETIME;
+ALTER TABLE `assess_attempt` ADD COLUMN deleted_at DATETIME;
 
 DROP TABLE chat;
 
