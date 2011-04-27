@@ -106,6 +106,7 @@ class SitePage extends Page {
 					'SITE_ADDRESS'	=> Cfg::get('site_address'),
 					'SITE_GREETING' => greeting(),
 					'SITE_LOGINNAME'=> formatName($_SESSION),
+                    'SITE_USERNAME' => $_SESSION['username'],
 					'SITE_LOCATION'	=> $this->site,
                                         'USER_ID'       => $_SESSION['id'],
 				);
