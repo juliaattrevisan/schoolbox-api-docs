@@ -1,7 +1,5 @@
 <?php
 
-require_once SITE_root . '/include/config.php';
-
 $this->setFile(TEMPLATE_content, 'adminv2/settings.html');
 $this->setTitle('Admin - Settings');
 
@@ -33,8 +31,7 @@ else {
     $selectedType = 'Site';
 }
 
-$configHandler = new Config;
-$typeList = $configHandler->getTypeList();
+$typeList = Cfg::getTypeList();
 
 if (is_array($typeList)) {
     foreach($typeList as $type) {
@@ -53,7 +50,7 @@ if (is_array($typeList)) {
     }
 }
 
-$optionList = $configHandler->getAll('', $selectedType);
+$optionList = Cfg::getAll('', $selectedType);
 
 foreach($optionList as $option) {
 

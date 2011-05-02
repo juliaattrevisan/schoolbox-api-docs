@@ -68,16 +68,18 @@ class Config extends Model {
         }
 
         public function getTypeList() {
+            self::getInstance();
              /* Show non-editable field data as just plain text
 			  * $query = "SELECT DISTINCT `type` FROM `".$this->_table."` WHERE `editable` = 'true' ORDER BY type";
 			  */
-			$query = "SELECT DISTINCT `type` FROM `".$this->_table."` ORDER BY type";
+			$query = "SELECT DISTINCT `type` FROM `config` ORDER BY type";
 
-			return $this->db->getAll($query);
+			return dbManager::getInstance()->getAll($query);
         }
 
         public function getAvailableOptions() {
-                $query = "SELECT name FROM `".$this->_table."` WHERE `editable` = 'true'";
+                self::getInstance();
+                $query = "SELECT name FROM `config` WHERE `editable` = 'true'";
                 $configlist = $this->db->getAll($query);
                 $output = array();
                 if (is_array($configlist)) {
@@ -89,11 +91,11 @@ class Config extends Model {
         }
 
         public function getAll($orderBy = '', $type = '') {
-
+            self::getInstance();
 			/* Show non-editable field data as just plain text
 			 * $query = "SELECT * FROM `".$this->_table."` WHERE `editable` = 'true' ";
 			 */
-			$query = "SELECT * FROM `".$this->_table."` WHERE 1=1 ";
+			$query = "SELECT * FROM `config` WHERE 1=1 ";
 
 			if (!empty($type)) {
 				$query .= "AND `type` = '$type' ";
@@ -103,7 +105,7 @@ class Config extends Model {
 				$query .= "ORDER BY `$orderBy`";
 			}
 
-			return $this->db->getAll($query);
+			return dbManager::getInstance()->getAll($query);
         }
 
         public function updateArray($configList) {
