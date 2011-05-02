@@ -77,10 +77,13 @@ $j(document).ready(function() {
 			},
 			'answerDescription[]': {
 				emptyInputs: true
-			},
+			}
+			/* Removed mandatory correct answre
+			 * ,
 			'answer[]':{
 				nothingChecked:true	
 			}
+			*/
 		},
 		
 		errorElement: "div",
@@ -90,7 +93,7 @@ $j(document).ready(function() {
             error.insertAfter(element)
             error.addClass('message');  // add a class to the wrapper
             error.css('position', 'absolute');
-             error.css('left', 0);
+            error.css('left', 0);
             error.css('top',  element.parent().outerHeight() );
 
 			if (element.hasClass("tinyValidate")) {
@@ -113,9 +116,7 @@ $j(document).ready(function() {
 				var lefty = element.position();
 				$j('.wrong-checkbox').css('left',  115);
            		$j('.wrong-checkbox').css('top',  pos + element.height() + 8);
-
 			}
-
 		}
 	});
 
@@ -136,10 +137,11 @@ $j(document).ready(function() {
         });
 
         return fieldsAreFilled;
-		
     }, 'Please make sure all the answers are filled out');
 
-jQuery.validator.addMethod('nothingChecked', function(value, element) {
+	/* Removed mandatory correct answer from multiple choice
+	 *
+	jQuery.validator.addMethod('nothingChecked', function(value, element) {
         var countDracula = 0;
 	   
 	    var oneFieldChecked = true;
@@ -147,11 +149,11 @@ jQuery.validator.addMethod('nothingChecked', function(value, element) {
         $j.each($j('#answerCollection').find('li'), function(index, element) {
             var elem = $j(element);
             var checkit = elem.find('.answerCorrect').is(':checked');
-			/*if the element isn't checked add to the count*/
+
+			// if the element isn't checked add to the count
             if (checkit == true) {
                 countDracula++
             }
-
         });
 		
 		console.log(countDracula)
@@ -163,6 +165,7 @@ jQuery.validator.addMethod('nothingChecked', function(value, element) {
 		return oneFieldChecked;
 
     }, 'Tick at least one checkbox to highlight the correct answer');
+	*/
 
     /* Add a new answer option
      */
@@ -179,7 +182,6 @@ jQuery.validator.addMethod('nothingChecked', function(value, element) {
 		refreshList();
     });
 	
-	
 	/* Remove an answer option
 	 */
 	$j('.delete').live('click', function(){
@@ -195,12 +197,13 @@ jQuery.validator.addMethod('nothingChecked', function(value, element) {
 	
 	function refreshList() {
 		var alphabetStart = 65;
+
 		$j('li.inputs > div.list-item').each(function() {	
-		  var $this = $j(this);
-		  $this.children('span').html('&#' + alphabetStart + ';)'); 
-		  var convert = String.fromCharCode(alphabetStart);
-		  $this.children('input').val(convert);
-		  alphabetStart++;
+			var $this = $j(this);
+			$this.children('span').html('&#' + alphabetStart + ';)');
+			var convert = String.fromCharCode(alphabetStart);
+			$this.children('input').val(convert);
+			alphabetStart++;
 		});
 	}
 	
@@ -236,5 +239,4 @@ jQuery.validator.addMethod('nothingChecked', function(value, element) {
         </ul>
         <a class="add-answer" id="makeNewAnswer">Add answer option</a>
     </div>
-
 </fieldset>

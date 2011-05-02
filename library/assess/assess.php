@@ -126,6 +126,7 @@ class Assess extends Model {
                   LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
                   WHERE assess_section.assess_id = '$assess_id'
                   AND assess_section.deleted_at IS NULL
+				  AND assess_question.deleted_at IS NULL
                   GROUP BY assess_section.section_id
                   ORDER BY assess_section.sequence";
 

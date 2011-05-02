@@ -17,7 +17,7 @@ class AssessAnswerShort extends AssessAnswer {
      * @param <type> $object
      * @return <type>
      */
-    function create($object, $question_id) {
+    public function create($object, $question_id) {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
 
@@ -40,7 +40,7 @@ class AssessAnswerShort extends AssessAnswer {
      *
      * @param <type> $object
      */
-    function update($object) {
+    public function update($object) {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
 
         parent::update($answer);
@@ -53,7 +53,7 @@ class AssessAnswerShort extends AssessAnswer {
      *
      * @param <type> $page
      */
-    function modify($page, $question_id = '') {
+    public function modify($page, $question_id = '') {
         if (is_numeric($question_id)) {
             $currentAnswer = parent::getForQuestion($question_id);
 
@@ -77,7 +77,7 @@ class AssessAnswerShort extends AssessAnswer {
      * @param <type> $page
      * @param <type> $question_id
      */
-    function prepareResponse($page, $question_id) {
+    public function prepareResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $currentAnswer = $this->getByQuestionID($question_id);
@@ -104,7 +104,7 @@ class AssessAnswerShort extends AssessAnswer {
      *
      * @param <type> $response
      */
-    function saveResponse($data) {
+    public function saveResponse($data) {
         $processedResponse = $data['answer'];
 
         return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
@@ -114,7 +114,7 @@ class AssessAnswerShort extends AssessAnswer {
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.
      */
-    function mark() {
+    public function mark() {
     }
 
     /**
@@ -124,7 +124,7 @@ class AssessAnswerShort extends AssessAnswer {
      * @param <type> $page
      * @param <type> $question_id
      */
-    function reviewResponse($page, $question_id) {
+    public function reviewResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $currentAnswer = $this->getByQuestionID($question_id);
@@ -159,7 +159,7 @@ class AssessAnswerShort extends AssessAnswer {
      * @param <type> $page
      * @param <type> $question_id
      */
-    function exportMoodleAnswer($page, $question_id) {
+    public function exportMoodleAnswer($page, $question_id) {
         $currentAnswer = $this->getByQuestionID($question_id);
 
         /* Show correct answer
@@ -178,7 +178,7 @@ class AssessAnswerShort extends AssessAnswer {
      *
      * @param <type> $obj
      */
-    function importMoodleAnswer($xmlObj, $question_id) {
+    public function importMoodleAnswer($xmlObj, $question_id) {
         $object = array(
             'answer_id' => '',
             'question_id' => $question_id,
@@ -188,5 +188,20 @@ class AssessAnswerShort extends AssessAnswer {
 
         return $this->create($object, $question_id);
     }
+
+	/**
+	 * Get the response for a particular question
+	 *
+	 * @param <type> $response_id
+	 */
+	public function exportResponseToCSV($attempt_id, $question_id) {
+		$response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
+
+		/* Remove tab characters
+		 */
+		$data = str_replace("\t", '', $response['response']);
+
+		return $data;
+	}
 }
 ?>

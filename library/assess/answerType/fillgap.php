@@ -323,5 +323,18 @@ class AssessAnswerFillgap extends AssessAnswer {
 
         return $this->create($object, $question_id);
     }
+
+	/**
+	 * Get the response for a particular question
+	 *
+	 * @param <type> $response_id
+	 */
+	public function exportResponseToCSV($attempt_id, $question_id) {
+		$response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
+
+		$data = implode(', ', unserialize($response['response']));
+
+		return $data;
+	}
 }
 ?>

@@ -130,7 +130,7 @@ class AssessAttempt extends Model {
     /**
      * Get a list of attempts that have been made, along with their authors
      */
-    function getList($assess_id) {
+    public function getList($assess_id) {
         $query = "SELECT
                       assess_attempt.attempt_id,
                       assess_attempt.user_id, firstname, lastname,
@@ -143,6 +143,30 @@ class AssessAttempt extends Model {
                   LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
                   WHERE assess.assess_id = '$assess_id'
+				  AND assess_attempt.deleted_at IS NULL
+                  GROUP BY assess_attempt.attempt_id";
+
+        return $this->db->getAll($query);
+    }
+
+
+    /**
+     * Get a list of attempts that have been made, along with their authors
+     */
+    public function getListByAssessAndSection($assess_id, $section_id) {
+        $query = "SELECT
+                      assess_attempt.attempt_id,
+                      assess_attempt.user_id, firstname, lastname,
+                      assess_attempt.start, assess_attempt.finish,
+                      ROUND(assess_attempt.finish - assess_attempt.start) AS timeTaken,
+                      SUM(assess_response.mark) AS totalMarks,
+                      assess_attempt.reviewed_at
+                  FROM assess_attempt
+                  LEFT JOIN `user` ON assess_attempt.user_id = user.id
+                  LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
+                  LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
+                  WHERE assess.assess_id = '$assess_id'
+				  AND assess_response.section_id = '$section_id'
 				  AND assess_attempt.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 

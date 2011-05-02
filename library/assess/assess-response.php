@@ -198,5 +198,19 @@ class AssessResponse extends Model {
 
 		return $this->db->query($query);
 	}
+
+	/**
+	 * Get a response for a particular attempt/question
+	 * 
+	 * @param <type> $attempt_id
+	 * @param <type> $question_id
+	 */
+	public function getByAttemptAndQuestion($attempt_id, $question_id) {
+		$query = "SELECT * FROM assess_response
+				  WHERE attempt_id = '$attempt_id'
+				  AND question_id = '$question_id'";
+
+		return $this->db->getRow($query);
+	}
 }
 ?>
