@@ -13,6 +13,23 @@ require_once('../library/assess/assess-factory.php');
 require_once('../library/assess/assess-attempt.php');
 require_once('../library/assess/assess-section.php');
 
+/**
+ * Output a csv row
+ * 
+ * @param <type> $data 
+ */
+function outputCSV2($data) {
+    $outstream = fopen("php://output", 'rectum');
+
+    array_walk($data, '__outputCSV', $outstream);
+
+    fclose($outstream);
+}
+
+function __outputCSV(&$vals, $key, $filehandler) {
+	fputcsv($filehandler, $vals, ',', '"');
+}
+
 $factory = new AssessFactory();
 $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();
@@ -104,46 +121,51 @@ for ($k = 0; $k < count($allSections); $k++) {
 
 /* Format output
  */
+header('Content-type: text/ascii');
+header('Content-disposition: attachment; filename="exported_response_' . $this->arg[0] . '.csv"');
+
 if (is_array($sectionValues) && count($sectionValues)) {
 	foreach($sectionValues as $currentSection) {
-		$result .= 'Section ' . $currentSection['section'] . "\n";
+		$questionList = array();
 
 		/* Get a list of questions going
 		 */
 		if (count($currentSection['questions'])) {
-			$result .= "Respondent\t";
+			$questionList[] = "Respondent";
 			
 			foreach($currentSection['questions'] as $currentQuestion) {
-				$result .= $currentQuestion . "\t";
+				$questionList[] = $currentQuestion;
 			}
 		}
 
-		$result .= "\n";
+		/* Output to stdout stream
+		 */
+		echo 'Section ' . $currentSection['section'] . "\n";
+		outputCSV2(array($questionList));
 
 		/* A list of attempts per section
 		 */
 		if (count($currentSection['attempts'])) {
 			foreach($currentSection['attempts'] as $currentAttempt) {
-				$result .= $currentAttempt['name'] . "\t";
+				$currentResult = array();
+
+				$currentResult[] = $currentAttempt['name'];
 
 				/* A list of responses per attempt
 				 */
 				if (count($currentAttempt['responses'])) {
 					foreach($currentAttempt['responses'] as $currentResponse) {
-						$result .= $currentResponse . "\t";
+						$currentResult[] = $currentResponse;
 					}
 				}
 
-				$result .= "\n";
+				outputCSV2(array($currentResult));
 			}
 		}
 	}
+
+	echo "\n";
 }
-
-header('Content-type: text/ascii');
-header('Content-disposition: attachment; filename="exported_response_' . $this->arg[0] . '.txt"');
-
-echo $result;
 
 /* Prevent other template crap from rendering ;)
  */
