@@ -39,6 +39,12 @@ $allSections = $sectionHandler->getList($this->arg[0]);
 for ($k = 0; $k < count($allSections); $k++) {
 	$currentSection = $allSections[$k];
 
+	/* Initialise array data
+	 */
+	$sectionValues[$k]['section'] = '';
+	$sectionValues[$k]['questions'] = '';
+	$sectionValues[$k]['attempts'] = array();
+
     $this->setVar(array(
         'SECTION_SECTION_ID' => $currentSection['section_id'],
         'SECTION_TITLE' => $currentSection['title'],
@@ -81,8 +87,14 @@ for ($k = 0; $k < count($allSections); $k++) {
 				}
 			}
 
-			$attemptValues[$j]['questions'] = $questionValues;
 			$attemptValues[$j]['responses'] = $responseValues;
+
+			/* Only perform on first iteration, as we are accumulating a list
+			 * of questions that were attempted
+			 */
+			if ($j == 0) {
+				$sectionValues[$k]['questions'] = $questionValues;
+			}
 		}
 	}
 
@@ -92,9 +104,47 @@ for ($k = 0; $k < count($allSections); $k++) {
 
 /* Format output
  */
-print_r($sectionValues);
+if (is_array($sectionValues) && count($sectionValues)) {
+	foreach($sectionValues as $currentSection) {
+		$result .= 'Section ' . $currentSection['section'] . "\n";
+
+		/* Get a list of questions going
+		 */
+		if (count($currentSection['questions'])) {
+			$result .= "Respondent\t";
+			
+			foreach($currentSection['questions'] as $currentQuestion) {
+				$result .= $currentQuestion . "\t";
+			}
+		}
+
+		$result .= "\n";
+
+		/* A list of attempts per section
+		 */
+		if (count($currentSection['attempts'])) {
+			foreach($currentSection['attempts'] as $currentAttempt) {
+				$result .= $currentAttempt['name'] . "\t";
+
+				/* A list of responses per attempt
+				 */
+				if (count($currentAttempt['responses'])) {
+					foreach($currentAttempt['responses'] as $currentResponse) {
+						$result .= $currentResponse . "\t";
+					}
+				}
+
+				$result .= "\n";
+			}
+		}
+	}
+}
+
+header('Content-type: text/ascii');
+header('Content-disposition: attachment');
+echo $result;
 
 /* Prevent other template crap from rendering ;)
  */
-die();
+exit(1);
 ?>

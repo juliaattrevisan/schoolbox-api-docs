@@ -166,18 +166,20 @@ class AssessAnswerMulti extends AssessAnswer {
         $i = 0;
         $numCorrect = 0;
 
-        foreach($answer as $currentAnswer) {
-            if ($currentAnswer->correct) {
+		if (is_array($answer)) {
+			foreach($answer as $currentAnswer) {
+				if ($currentAnswer->correct) {
 
-                /* If the user responded with a correct answer, accumulate
-                 */
-                if (is_array($response) && in_array($currentAnswer->value, $response)) {
-                    $numCorrect++;
-                }
+					/* If the user responded with a correct answer, accumulate
+					 */
+					if (is_array($response) && in_array($currentAnswer->value, $response)) {
+						$numCorrect++;
+					}
 
-                $i++;
-            }
-        }
+					$i++;
+				}
+			}
+		}
 
         /* If the student selects exactly the correct responses then give them
          * the marks, otherwise penalise them. The teacher can review and
@@ -374,7 +376,11 @@ class AssessAnswerMulti extends AssessAnswer {
 	public function exportResponseToCSV($attempt_id, $question_id) {
 		$response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
 
-		$data = implode(', ', unserialize($response['response']));
+		$data = unserialize($response['response']);
+
+		if (is_array($data)) {
+			$data = implode(', ', $data);
+		}
 
 		return $data;
 	}
