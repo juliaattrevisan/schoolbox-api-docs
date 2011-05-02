@@ -141,7 +141,8 @@ if (is_array($sectionValues) && count($sectionValues)) {
 }
 
 header('Content-type: text/ascii');
-header('Content-disposition: attachment');
+header('Content-disposition: attachment; filename="exported_response_' . $this->arg[0] . '.txt"');
+
 echo $result;
 
 /* Prevent other template crap from rendering ;)
