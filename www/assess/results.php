@@ -46,7 +46,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 		$finish = $responseHandler->getLastSave($currentAttempt['attempt_id']);
 
 		if (empty($finish)) {
-			$finish = 'Never attempted';
+			$finish = 'Unfinished';
 		}
 		else {
 			$finish = date('jS F Y, g:i:sa', strtotime($finish));
@@ -190,11 +190,13 @@ foreach($allStudents as $currentStudent) {
 			/* Match up attempt wtih student, remove from list
 			 */
 			if ($currentAttempt['user_id'] == $currentStudent['uid']) {
-				processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this);
+				if ($allAttempts[$i]['processed'] != true) {
+					processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this);
 
-				unset($allAttempts[$i]);
+					$allAttempts[$i]['processed'] = true;
 
-				$numAttempts++;
+					$numAttempts++;
+				}
 			}
 		}
 	}
@@ -221,13 +223,17 @@ foreach($allStudents as $currentStudent) {
 
 		$this->parse('attempt_block', 'attempt', true);
 	}
+
+	$numAttempts = 0;
 }
 
 /* Deal with remainder attempts
  */
 if ($allAttempts && count($allAttempts)) {
 	foreach($allAttempts as $currentAttempt) {
-		processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this);
+		if ($currentAttempt['processed'] != true) {
+			processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this);
+		}
 	}
 }
 ?>
