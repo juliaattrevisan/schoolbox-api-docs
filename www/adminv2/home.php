@@ -58,9 +58,9 @@ else {
 $this->setVar($db);
 
 /* Email server check */
-if(Cfg::get('mail_enable')) {
+if(Cfg::get('mail_enable') && Cfg::get('mail_smtp_host')) {
     $socket=socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-    if(socket_connect($socket, Cfg::get('mail_smtp_host'), Cfg::get('mail_smtp_port'))) {
+    if(@socket_connect($socket, Cfg::get('mail_smtp_host'), Cfg::get('mail_smtp_port'))) {
        $email = array('EMAIL_LIGHT'    => 'on',
                        'EMAIL_STATUS'    => 'Online');
     }
