@@ -89,7 +89,13 @@ CREATE TABLE IF NOT EXISTS `homepageComponentCategory`(
 
 insert ignore  into `homepageComponentCategory`(`homepageComponentCategoryID`,`name`) values (1,'Information'),(2,'Collaboration'),(3,'Learning'),(4,'Images'),(5,'Resources'),(6,'Feeds');
 
-ALTER TABLE `file`     CHANGE `mime_type` `mime_type` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL ;
+ALTER TABLE `file` CHANGE `mime_type` `mime_type` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL ;
+
+UPDATE `file` SET mime_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document' WHERE realname LIKE '%.docx' AND mime_type LIKE 'application/vnd.openxmlformats%';
+UPDATE `file` SET mime_type='application/vnd.openxmlformats-officedocument.presentationml.slideshow' WHERE realname LIKE '%.ppsx' AND mime_type LIKE 'application/vnd.openxmlformats%';
+UPDATE `file` SET mime_type='application/vnd.openxmlformats-officedocument.presentationml.presentation' WHERE realname LIKE '%.pptx' AND mime_type LIKE 'application/vnd.openxmlformats%';
+UPDATE `file` SET mime_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' WHERE realname LIKE '%.xlsx' AND mime_type LIKE 'application/vnd.openxmlformats%';
+
 
 /* Create table in target */
 CREATE TABLE IF NOT EXISTS `newsUser`(

@@ -22,9 +22,9 @@ if (is_string($file_path)) {
         file_put_contents($cache_path.'/'.$file_name, $file_contents);
     }
 
-    $file_info = new finfo(FILEINFO_MIME);
+    //$file_info = new finfo(FILEINFO_MIME);
 
-    header('Content-Type: '.$file_info->buffer($file_contents));
+    header('Content-Type: image/gif');
     echo $file_contents;
 }
  
