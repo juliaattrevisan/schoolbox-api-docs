@@ -9,16 +9,18 @@
 <!-- END custom_head -->
 <!-- BEGIN timetable -->
 <h1>Timetable for {PERSON}{YEAR}</h1>
-<table class="timetable"> 
+<table class="timetable" style="display:table"> 
     <tr> 
         <th>&nbsp;</th> 
         <!-- BEGIN day_header --> 
-        <th style="width:{TIMETABLE_FIELD_WIDTH}%;cursor:pointer;">Day {DAY_NUMBER}</th> 
+        <th style="width:12%;cursor:pointer;">Day {DAY_NUMBER}</th> 
         <!-- END day_header --> 
     </tr> 
     <!-- BEGIN period --> 
     <tr> 
-        <th style="white-space:nowrap;width:5%;">{PERIOD_NAME}<div style="font-size:0.8em">{PERIOD_START}-{PERIOD_END}</div></th> 
+        <th style="white-space:nowrap;width:15%;">{PERIOD_NAME}
+		<span style="font-size:0.8em;word-wrap:break-word; text-align:center;display:block">{PERIOD_START}-{PERIOD_END}</span>
+		</th> 
         <!-- BEGIN day --> 
         <td class="{TIMETABLE_CLASS}" {PERIOD_ONCLICK}>{PERIOD_DESC}<br />{PERIOD_CODE}<br />{PERIOD_ROOM}</td> 
         <!-- END day --> 
