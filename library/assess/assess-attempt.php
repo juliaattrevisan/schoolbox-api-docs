@@ -149,7 +149,6 @@ class AssessAttempt extends Model {
         return $this->db->getAll($query);
     }
 
-
     /**
      * Get a list of attempts that have been made, along with their authors
      */
