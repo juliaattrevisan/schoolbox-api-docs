@@ -220,14 +220,13 @@ if (is_array($componentList)) {
 	
 	foreach ($componentList as $component) {
 		
-		$componentHandle = $component['name'] . $component['homepageComponentLocationID'];
+		$componentHandle = $component['method'] . $component['homepageComponentLocationID'];
 
       /* This array provides default sorting capabilities for each component
        * in the homepage. They can be overridden in each of the output?.php
        * homepage component files, to use their own sorting fields.
        */
 		$sortOptions = array('Name', 'Date');
-
 
 		$this->setFile($componentHandle, 'homepage/components/'.$component['filename']);
 		$this->setBlock($componentHandle, "config", "config_block");
