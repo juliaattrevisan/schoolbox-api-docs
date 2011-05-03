@@ -75,10 +75,11 @@ class ExternalUser extends MSSQL{
 	}
 
 	function getCurrentSemester()
-	{		
-		#Get current FileSemester and FileYear
-                $_SESSION['FileSemester'] = 1;
-                $_SESSION['FileYear'] = date('Y');
+	{
+        $query = "SELECT curr_year, curr_sem FROM ttparms WHERE cmpy_code = 01";
+        $current = $this->getRow($query);
+        $_SESSION['FileSemester'] = $current['curr_sem'];
+        $_SESSION['FileYear'] = $current['curr_year'];
 	}
 	
 	function getSubjectList($tassCode, $userID)
