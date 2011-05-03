@@ -33,7 +33,7 @@ $j(document).ready(function() {
 
     /* Submit all the questions before switching between sections
      */
-    $j('.step-nav, .green-go').click(function() {
+    $j('.step-nav, .go-back, .go-to, .tick').click(function() {
 		$j('.assess-header form').each(function(elem, value) {
 			$j(this).submit();
 		});
