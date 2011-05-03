@@ -127,6 +127,11 @@ class AssessAnswerMulti extends AssessAnswer {
                         ));
                     }
                 }
+				else {
+					$page->setVar(array(
+						'ANSWER_CHECKED' => '',
+					));
+				}
 
                 $page->parse('answerOption_block', 'answerOption', true);
             }

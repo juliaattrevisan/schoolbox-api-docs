@@ -15,8 +15,8 @@ require_once('../library/assess/assess-section.php');
 
 /**
  * Output a csv row
- * 
- * @param <type> $data 
+ *
+ * @param <type> $data
  */
 function outputCSV2($data) {
     $outstream = fopen("php://output", 'rectum');
@@ -132,7 +132,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
 		 */
 		if (count($currentSection['questions'])) {
 			$questionList[] = "Respondent";
-			
+
 			foreach($currentSection['questions'] as $currentQuestion) {
 				$questionList[] = $currentQuestion;
 			}
@@ -162,9 +162,9 @@ if (is_array($sectionValues) && count($sectionValues)) {
 				outputCSV2(array($currentResult));
 			}
 		}
-	}
 
-	echo "\n";
+		echo "\n";
+	}
 }
 
 /* Prevent other template crap from rendering ;)

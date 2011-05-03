@@ -319,9 +319,13 @@ class AssessAnswerMatch extends AssessAnswer {
 	public function exportResponseToCSV($attempt_id, $question_id) {
 		$response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
 
-		$data = implode(', ', unserialize($response['response']));
+		$data = unserialize($response['response']);
 
-		return $data;
+		if (is_array($data)) {
+			return implode(', ', $data);
+		}
+
+		return;
 	}
 }
 ?>
