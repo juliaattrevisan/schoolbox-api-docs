@@ -377,14 +377,6 @@ class Assess extends Model {
 			}
 		}
 
-		/* See if Groups have access
-		 */
-		if (!count($categoryList)) {
-			if ($groupHandler->getPermission($assess['category_id'], $_SESSION['id'])) {
-				return true;
-			}
-		}
-
         return false;
     }
 
