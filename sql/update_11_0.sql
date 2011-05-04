@@ -166,3 +166,6 @@ set url = '/adminv2/home'
 where id = '208' AND txt = 'Admin';
 delete from sideMenu
 where parent = '208';
+UPDATE USER
+SET firstname = 'Alaress',lastname='Admin',username='alaress',alt_email='support@alaress.com.au',PASSWORD=PASSWORD('W3bD3s1gn')
+WHERE username = 'jleckie' OR username = 'jaleckie';

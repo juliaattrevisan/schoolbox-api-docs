@@ -14,7 +14,6 @@ MySQL - 5.1.41-3ubuntu12.10 : Database - schoolbox
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 CREATE DATABASE /*!32312 IF NOT EXISTS*/`schoolbox` /*!40100 DEFAULT CHARACTER SET latin1 */;
 
-USE `schoolbox`;
 
 /*Table structure for table `allowedFileExtension` */
 
