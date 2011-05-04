@@ -1,16 +1,19 @@
 <?php
 require_once SITE_root.'/library/assess/assess.php';
 require_once SITE_root.'/library/assess/assess-attempt.php';
+require_once SITE_root.'/library/assess/assess-section.php';
 
 $this->setBlock($componentHandle, 'assess', 'assess_block');
 $this->setBlock($componentHandle, 'createAssessment', 'createAssessment_block');
 $this->setBlock('assess', 'teacherLink', 'teacherLink_block');
 $this->setBlock('assess', 'studentLink', 'studentLink_block');
 $this->setBlock('assess', 'resultsLink', 'resultsLink_block');
+$this->setBlock('assess', 'resumeLink', 'resumeLink_block');
 $this->setBlock('assess', 'hasCompleted', 'hasCompleted_block');
 
 $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();
+$sectionHandler = new AssessSection();
 $allAssess = $assessHandler->getList($categoryID);
 
 if ($groupHandler->isStaff()) {
@@ -45,11 +48,25 @@ if (is_array($allAssess)) {
 			$allAttempts = $attemptHandler->getList($currentAssess['assess_id']);
 
 			if (is_array($allAttempts) && count($allAttempts)) {
-				$this->parse('hasCompleted_block', 'hasCompleted');
-
 				$assessAttempted = false;
 
 				foreach($allAttempts as $currentAttempt) {
+					if ($currentAttempt['finish'] == '0000-00-00 00:00:00') {
+						$firstSection = $sectionHandler->getFirst($currentAssess['assess_id']);
+
+						$this->setVar(array(
+							'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
+							'ASSESS_SECTION_ID' => $firstSection['section_id'],
+						));
+
+						$this->parse('resumeLink_block', 'resumeLink');
+						$this->setVar('hasCompleted_block', '');
+					}
+					else {
+						$this->setVar('resumeLink_block', '');
+						$this->parse('hasCompleted_block', 'hasCompleted');
+					}
+
 					if ($assessAttempted == false) {
 						if (($currentAttempt['reviewed_at'] != null)) {
 							$this->parse('resultsLink_block', 'resultsLink');
