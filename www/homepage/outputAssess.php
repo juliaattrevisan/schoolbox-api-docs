@@ -47,12 +47,18 @@ if (is_array($allAssess)) {
 			if (is_array($allAttempts) && count($allAttempts)) {
 				$this->parse('hasCompleted_block', 'hasCompleted');
 
+				$assessAttempted = false;
+
 				foreach($allAttempts as $currentAttempt) {
-					if ($currentAttempt['reviewed_at'] != null) {
-						$this->parse('resultsLink_block', 'resultsLink');
-					}
-					else {
-						$this->setVar('resultsLink_block', '');
+					if ($assessAttempted == false) {
+						if (($currentAttempt['reviewed_at'] != null)) {
+							$this->parse('resultsLink_block', 'resultsLink');
+
+							$assessAttempted = true;
+						}
+						else {
+							$this->setVar('resultsLink_block', '');
+						}
 					}
 				}
 			}
