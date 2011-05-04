@@ -210,7 +210,7 @@ else if($this->arg[0] == 'multicat') {
 	if(is_array($categoryList)) {
 		foreach($categoryList as $category) {
 
-			$output = array('CATEGORY_NAME'		=>scrubTEXT($category['name']) . $category['code']?' ('.$category['code'].')':'',
+			$output = array('CATEGORY_NAME'		=>scrubTEXT($category['name']) . ($category['code']?' ('.$category['code'].')':''),
 					'CATEGORY_ID'		=> $category['id'],
 					);
 			$this->setVar($output);

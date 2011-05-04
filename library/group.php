@@ -223,6 +223,16 @@ class Group extends Model {
             $groupPermission = $this->db->getOne($query);
             if ($groupPermission)
                 $permission = $groupPermission;
+
+            /* Check subjects, allow users directly involved in a subject access regardless */
+            if($permission < READ_ACCESS && $userID == $_SESSION['id']) {
+                if($this->involvedInSubject($relationID)) {
+                    if($this->isStaff($userID))
+                        $permission = WRITE_ACCESS;
+                    else
+                        $permission = READ_ACCESS;
+                }
+            }
         }
 
         // allow staff write access to NEWS_SERVICE by default except at shore...
@@ -391,10 +401,11 @@ class Group extends Model {
         }
 
         //get list of groups involved in
-        $query = "SELECT category.name, category.id, type FROM userAccess, category
+        $query = "SELECT category.name, category.id, type, GROUP_CONCAT(cc.code) as code FROM userAccess, category LEFT JOIN categoryCode cc ON category.id = categoryID
 		WHERE userAccess.uid = '$id' AND userAccess.sid = category.id AND userAccess.service = '" . $this->_service . "'
 		AND userAccess.type >= '$accessType'
-                ORDER BY category.name";
+        GROUP BY category.id
+        ORDER BY category.name";
 
         $this->db->query($query);
         while ($result = $this->db->getNextArray()) {
