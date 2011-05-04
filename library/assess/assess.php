@@ -369,11 +369,13 @@ class Assess extends Model {
 
 		/* See if you're in the Category first
 		 */
-        foreach ($categoryList as $key => $value) {
-            if ($value['id'] == $assess['category_id']) {
-                return true;
-            }
-        }
+		if (is_array($categoryList)) {
+			foreach ($categoryList as $key => $value) {
+				if ($value['id'] == $assess['category_id']) {
+					return true;
+				}
+			}
+		}
 
 		/* See if Groups have access
 		 */

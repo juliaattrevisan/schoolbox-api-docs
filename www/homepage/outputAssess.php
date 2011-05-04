@@ -7,6 +7,7 @@ $this->setBlock($componentHandle, 'createAssessment', 'createAssessment_block');
 $this->setBlock('assess', 'teacherLink', 'teacherLink_block');
 $this->setBlock('assess', 'studentLink', 'studentLink_block');
 $this->setBlock('assess', 'resultsLink', 'resultsLink_block');
+$this->setBlock('assess', 'hasCompleted', 'hasCompleted_block');
 
 $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();
@@ -37,17 +38,31 @@ if (is_array($allAssess)) {
             'ON_OFF' => $i%2 ? 'dark' : '',
         ));
 
+		/* If at least one attempt was reviewed, provide link to Due
+		 * Work screen, where the attempts are all listed
+		 */
 		if (!$groupHandler->isStaff()) {
-			/* If at least one attempt was reviewed, provide link to Due
-			 * Work screen, where the attempts are all listed
-			 */
 			$allAttempts = $attemptHandler->getList($currentAssess['assess_id']);
 
-			foreach($allAttempts as $currentAttempt) {
-				if ($currentAttempt['reviewed_at'] != null) {
-					$this->parse('resultsLink_block', 'resultsLink');
+			if (is_array($allAttempts) && count($allAttempts)) {
+				$this->parse('hasCompleted_block', 'hasCompleted');
+
+				foreach($allAttempts as $currentAttempt) {
+					if ($currentAttempt['reviewed_at'] != null) {
+						$this->parse('resultsLink_block', 'resultsLink');
+					}
+					else {
+						$this->setVar('resultsLink_block', '');
+					}
 				}
 			}
+			else {
+				$this->setVar('resultsLink_block', '');
+				$this->setVar('hasCompleted_block', '');
+			}
+		}
+		else {
+			$this->setVar('hasCompleted_block', '');
 		}
 
         /* Check if you have completed an assessment already
@@ -94,7 +109,6 @@ if (is_array($allAssess)) {
 				$this->setVar('studentLink_block', '');
 			}
             else {
-				
                 $this->parse('studentLink_block', 'studentLink');
             }
         }

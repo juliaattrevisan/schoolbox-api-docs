@@ -21,14 +21,20 @@
 			<!-- BEGIN assess -->
 			<li class="{ON_OFF}">
 				<h4>{ASSESS_TITLE}</h4>
+				<div class="float-fix"></div>
                 <p>
                     Starts on {ASSESS_START_DATE}<br />
-                    Due by {ASSESS_FINISH_DATE}
+                    Due by {ASSESS_FINISH_DATE}<br />
+
+					<!-- BEGIN hasCompleted -->
+					<strong>Completed</strong>
+					<!-- END hasCompleted -->
                 </p>
+
                 <p>{ASSESS_DESCRIPTION}</p>
 
 				<div class="small-right">
-					<!-- BEGIN studentLink --> 
+					<!-- BEGIN studentLink -->
 					<p class="interact">
                         <a href="/assess/intro/{ASSESS_ASSESS_ID}" class="btn go-to"><span></span>Take test</a>
 						<div class="float-fix"></div>
@@ -37,14 +43,14 @@
 
 					<!-- BEGIN teacherLink -->
 					<p class="interact">
-						<a href="/assess/results/{ASSESS_ASSESS_ID}">View Results</a> | 
-						<a href="/assess/modify/{ASSESS_ASSESS_ID}">Modify</a>
+						<a href="/assess/results/{ASSESS_ASSESS_ID}" class="btn go-to"><span></span>View Results</a>
+						<a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn go-to"><span></span>Modify</a>
 					</p>
 					<!-- END teacherLink -->
 
 					<!-- BEGIN resultsLink -->
 					<p class="interact">
-						<a href="/submission/dueWork">View Results</a>
+						<a href="/submission/dueWork" class="btn go-to"><span></span>View Results</a>
 					</p>
 					<!-- END resultsLink -->
 				</div>
@@ -55,8 +61,7 @@
 		</ul>
 
         <!-- BEGIN createAssessment -->
-            <a href="/assess/create/{ID}" class="btn create"><span></span>Create Assessment</a>
-
+		<a href="/assess/create/{ID}" class="btn create"><span></span>Create Assessment</a>
         <!-- END createAssessment -->
 	</div>
 </div>
