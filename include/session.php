@@ -268,7 +268,7 @@ class Session {
                         //check subject exists.. we cant link to subjects that dont exist its ugly
                         $result = $catHandler->getByCode($subject['code']);
                         if (is_array($result) && is_numeric($result['id'])) {
-                            if (!in_array($result['id'], $catList) && $groupHandler->getPermission($result['id']) >= READ_ACCESS) {
+                            if (!in_array($result['id'], $catList)) {
                                 $subject['id'] = $result['id'];
                                 $subject['name'] = $result['name'];
 
