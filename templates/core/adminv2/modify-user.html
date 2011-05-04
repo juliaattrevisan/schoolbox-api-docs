@@ -94,7 +94,7 @@ $j(function() {
 		<div class="split-container">
 			<div class="split">
 				
-				<label class="width2 first">Preferred
+				<label class="width2 first">Title
 					<select name="title">
 						<!-- BEGIN title -->
 						<option value="{NAME_TITLE}" {NAME_TITLE_SELECTED}>{NAME_TITLE}</option>
@@ -106,8 +106,8 @@ $j(function() {
 				<label class="width2 first">First Name
 					<input type="text" name="firstname" value="{FIRSTNAME}" />
 				</label>
-				<label for ="username" class="width2">Username
-					<input type="text" name="modusername" value="{USERNAME}" />
+				<label for="lastname">Surname
+					<input type="text" name="lastname" value="{LASTNAME}"/>
 				</label>
 				<label for ="database" class="">{DATABASE_TYPE} ID
 					<input type="text" name="database_id" value="{DATABASE_ID}"/>
@@ -140,30 +140,35 @@ $j(function() {
 		</div>
 		<div class="split-container">
 			<div class="split last">
-				<label for="lastname">Surname
-					<input type="text" name="lastname" value="{LASTNAME}"/>
+                <label for ="username" class="width2">Username
+					<input type="text" name="modusername" value="{USERNAME}" />
 				</label>
 				<label for="password">Password
-					<input type="password" name="modpassword" value="" />
+					<input type="password" name="modpassword" value="{PASSWORD}" />
 				</label>
+                <label for="alt_email">Alternate Email
+					<input type="text" name="alt_email" value="{ALT_EMAIL}" />
+				</label>
+                    <label for="group">Group
+                <select name="group">
+                    <!-- BEGIN system_group -->
+                    <option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
+                    <!-- END system_group -->
+                </select>
+            </label>
 				<label for="e-portfolio">E-Portfolio
 					<input type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
 				</label>
 				<label for ="superuser" class="width2 ">Superuser
 					<input type="checkbox" name="superuser" value="1" onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME} superuser status?'));" {SUPERUSER_CHECKED} />
 				</label>
-				<label for="group">Group
-					<select name="group">
-						<!-- BEGIN system_group -->
-						<option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
-						<!-- END system_group -->
-					</select>
-				</label>
+
 				<label for="year">Year
 					<input type="text" name="year" value="{YEAR}" />
 				</label>
 			</div>
 		</div>
+        <div class="float-fix"></div>
 		<input type="hidden" name="userID" value="{USERID}" />
 		<input type="submit" name="submit" class="submit-btn-plain" value="Update User" />
 		<input type="submit" name="delete" class="submit-btn-plain" value="Delete User" onclick="return(confirm('Are you sure you want to delete {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME}'));" />

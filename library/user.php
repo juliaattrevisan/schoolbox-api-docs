@@ -420,10 +420,11 @@ class User extends Model {
         unset($user['defaultCampus']);
         unset($user['su']);
 
-        if($user['password']) {
-             $this->setPasswordInternal($user['id'], $user['password']);
+        if(isset($user['password'])) {
+            $this->setPasswordInternal($user['id'], $user['password']);
+            unset($user['password']);
         }
-        unset($user['password']);
+
 
         parent::update($user);
 

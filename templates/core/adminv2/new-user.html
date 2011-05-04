@@ -68,22 +68,21 @@ $j(function() {
 		<form class="admin-form" method="POST" action="/adminv2/userForm.php" >
 			<div class="split-container">
 				<div class="split">
-					<label for ="preferred" class="preferred">
-					Preferred Title
-					<label>
+					<label for ="title" class="title">
+					Title
 						<select name="title">
 							<!-- BEGIN title -->
 							<option value="{NAME_TITLE}" {TITLE_SELECTED}>{NAME_TITLE}</option>
 							<!-- END title -->
 						</select>
-					</label>
+                        </label>
 					<label class="first">First Name
 						<input type="text" name="firstname" value="" />
 					</label>
+					<label for="lastname">Surname
+						<input type="text" name="lastname" value=""/>
 					</label>
-					<label for ="username" class="width2">Username
-						<input type="text" name="modusername" value="" />
-					</label>
+
 					<label for ="database" class="">{DATABASE_TYPE} ID
 						<input type="text" name="database_id" value=""/>
 					</label>
@@ -115,18 +114,13 @@ $j(function() {
 			</div>
 			<div class="split-container">
 				<div class="split last">
-					<label for="lastname">Surname
-						<input type="text" name="lastname" value=""/>
+                    <label for ="username" class="width2">Username
+						<input type="text" name="modusername" value="" />
 					</label>
 					<label for="password">Password
 						<input type="password" name="modpassword"/>
 					</label>
-					<label for="e-portfolio">E-Portfolio
-						<input type="checkbox" name="eportfolio" value="1" />
-					</label>
-					<label for ="superuser" class="width2 ">Superuser
-						<input type="checkbox" name="superuser" value="1" />
-					</label>
+
 					<label for="group">Group
 						<select name="group">
 							<!-- BEGIN system_group -->
@@ -134,12 +128,19 @@ $j(function() {
 							<!-- END system_group -->
 						</select>
 					</label>
+                    <label for="e-portfolio">E-Portfolio
+						<input type="checkbox" name="eportfolio" value="1" />
+					</label>
+					<label for ="superuser" class="width2 ">Superuser
+						<input type="checkbox" name="superuser" value="1" />
+					</label>
 					<label for="year">Year
 						<input type="text" name="year" value="" />
 					</label>
 				</div>
 			</div>
-			<input type="submit" name="submit" value="Add User" />
+            <div class="float-fix"></div>
+			<input type="submit" class="submit-btn-plain" name="submit" value="Add User" />
 		</form>
 		<div class="float-fix"></div>
 	</div>

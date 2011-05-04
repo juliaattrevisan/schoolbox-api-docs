@@ -25,6 +25,8 @@ if(is_numeric($this->arg[0])) {
                         'ESCAPE_FIRSTNAME'  => addslashes($user['firstname']),
                         'ESCAPE_LASTNAME'   => addslashes($user['lastname']),
                         'FULLNAME'          => formatName($user),
+                        'ALT_EMAIL'         => $user['alt_email'],
+                        'PASSWORD'          => 'donotchange',
                         'DATABASE_ID'       => $user['synergy_id'],
                         'SUPERUSER_CHECKED' => $user['su']==1?'checked="checked"':'',
                         'LASTNAME'          => $user['lastname'],

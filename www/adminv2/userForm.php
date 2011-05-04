@@ -51,12 +51,15 @@ else if(is_numeric($_POST['userID']) && $_POST['modusername'] ) {
 		'local_email'		 => $_POST['local_email'],
 		'alt_email'			 => $_POST['alt_email'],
 		'group_id'			 => $_POST['group'],
-		'password'			 => $_POST['modpassword'],
 		'campus'			 => $_POST['campus'],
 		'su'				 => $_POST['superuser'],
-		'year'				 => $_POST['year'],
+		'year'				 => $_POST['year']==''?'NULL':$_POST['year'],
 		'eportfolio_enabled' => $_POST['eportfolio']
     );
+
+    //Do not change password if its the default output value
+    if($_POST['modpassword'] != 'donotchange')
+        $user['password'] = $_POST['modpassword'];
 
     $userHandler->update($user);
 
