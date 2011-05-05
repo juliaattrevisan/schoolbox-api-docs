@@ -67,7 +67,7 @@ $j(function() {
 			
 		}},
 		$j.contextMenu.separator,
-		{"New File": {
+		{"Add File": {
 			onclick: function () { 
 				var categoryID = $j(this)[0].className.match(/category-([\d]+)/)[1].toString();
 				window.open("/cms/file/new/"+categoryID,"_self"); 
@@ -75,14 +75,14 @@ $j(function() {
 			icon: '/images/famicons/page_add.png'
 		}},
 		{"Add Multiple Files": function () { window.open("/cms/file/multi/"+$j(this).data("category"),"_self"); }},
-		{"New Link": {
+		{"Add Link": {
 			onclick: function () { 
 				var categoryID = $j(this)[0].className.match(/category-([\d]+)/)[1].toString();
 				window.open("/cms/link/new/"+categoryID,"_self"); 
 			},
 			icon: '/images/famicons/link_add.png'
 		}},
-		{"New Folder": {
+		{"Add Folder": {
 			onclick: function () { window.open("/cms/category/new/"+$j(this).data("category"),"_self"); },
 			icon: '/images/famicons/folder_add.png'
 		}},
@@ -151,16 +151,16 @@ $j(function() {
 		}},
 		<!-- END delete_all -->
 		$j.contextMenu.separator,
-		{"New File": {
+		{"Add File": {
 			onclick: function () { window.open("/cms/file/new/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/page_add.png'
 		}},
 		{"Add Multiple Files": function () { window.open("/cms/file/multi/"+$j(this).attr("id").substring(5),"_self"); }},
-		{"New Link": {
+		{"Add Link": {
 			onclick: function () { window.open("/cms/link/new/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/link_add.png'
 		}},
-		{"New Folder": {
+		{"Add Folder": {
 			onclick: function () { window.open("/cms/category/new/"+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/folder_add.png'
 		}},
@@ -435,8 +435,7 @@ $j(function() {
 <style type="text/css">
 /* wrap mimetypes in classes */
 <!-- BEGIN allowed_files -->
-tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
-<!-- END allowed_files -->
+tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); } <!-- END allowed_files -->
 </style>
 <!--[if lt IE 7]>
 <style type='text/css'>
