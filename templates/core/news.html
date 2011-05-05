@@ -10,7 +10,6 @@
 			var el = $j(this).attr('title');
 			$j('div.topic > div').hide();
 			$j('div.topic > div#' + el).show();
-			$j('#category').css('height', $j('.topic').outerHeight());
 		});
 		
 		var params = window.location.href.split("#");
@@ -27,7 +26,6 @@
 		}
 		
 		$j('.news-item:nth-child(2n)' ).addClass('dark');
-		$j('#category').css('height', $j('.topic').outerHeight());
 
 				
 		$j('h2 .header_option a').html('<span></span>Modify');

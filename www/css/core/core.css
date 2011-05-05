@@ -12,6 +12,8 @@ body {
 	margin:0;
 }
 
+.contextMenu{width:200px !important;}
+
 body#tinymce { background:#fff; }
 
 /*--------------------------------------------------------------
@@ -3849,18 +3851,19 @@ p.forgotten { margin:10px 0; }
 	background:#faf9f5;
 	list-style: none;
 	margin: 0;
-	float: left;
-	width:20%;
-	margin-right:2%;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
+	clear:both;
+	width:100%;
+	float:left;
+	margin-bottom:8px;
 }
 
 #category li {
 	display:block;
-	;
-	margin: 7px 16px;
+	margin: 7px 0px 7px 8px;
+	float:left;
 }
 
 #category li a {
@@ -3870,6 +3873,7 @@ p.forgotten { margin:10px 0; }
 	-webkit-border-radius: 3px;
 	border-radius: 3px;
 	word-break: break-word;
+	
 }
 
 #category li a:hover {
@@ -3881,15 +3885,16 @@ p.forgotten { margin:10px 0; }
 #category li a.selected {
 	background:#0aa9c7;
 	color:#fff;
+	border:none;
 }
 
 #category li a.disabled { color: #ccc; }
 
 .topic {
 	margin: 0;
-	float:left;
+	clear:both;
 	display:inline-block;
-	width:77%;
+	width:100%;
 	position:relative;
 }
 
