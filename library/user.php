@@ -472,7 +472,7 @@ class User extends Model {
         $id = parent::create($user);
 
         if($password) {
-             $this->setPasswordInternal($user['id'], $password);
+             $this->setPasswordInternal($id, $password);
         }
 
         if (is_array($campusArray) && $id) {
@@ -488,7 +488,7 @@ class User extends Model {
         /* If ticked, add the new user into the Superusers table as well.
          */
         if ($su) {
-            $this->db->insert('superusers', array('id' => $user['id']));
+            $this->db->insert('superusers', array('id' => $id));
         }
 
         return $id;
