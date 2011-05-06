@@ -88,6 +88,12 @@ if (is_array($allAssess)) {
 			$this->setVar('hasCompleted_block', '');
 		}
 
+		/* Remove resumeLink if you are the owner
+		 */
+		if ($assessHandler->isOwner($currentAssess['assess_id'])) {
+			$this->setVar('resumeLink_block', '');
+		}
+
         /* Check if you have completed an assessment already
          *
          * Set up Attempt vars
