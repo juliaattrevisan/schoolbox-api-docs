@@ -305,12 +305,20 @@ if (!empty($result['news'])) {
     ));
     
     foreach ($result['news'] as $news) {
-        foreach ($categoryStd->breadcrumb($news['code']) as $i => $breadcrumb)
+        foreach ($categoryStd->breadcrumb($news['code']) as $i => $breadcrumb) {
             $news['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
+        }
+
+        if (new DateTime() > new DateTime($news['datetime_expires'])) {
+            $news['link'] = "/homepage/newsArchive/{$news['code']}#{$news['id']}";
+        } else {
+            $news['link'] = "/homepage/{$news['code']}#news-{$news['id']}";
+        }
 
         $page->setVar(array(
             'NEWS_ID'         => $news['id'],
             'NEWS_CODE'       => $news['code'],
+            'NEWS_LINK'       => $news['link'],
             'NEWS_HEADING'    => scrubTEXT($news['heading']),
             'NEWS_BODY'       => cutSentence(scrubTEXT(strip_tags($news['body'])), 150),
             'NEWS_OWNER'      => $news['uid'],

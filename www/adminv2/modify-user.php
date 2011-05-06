@@ -26,7 +26,7 @@ if(is_numeric($this->arg[0])) {
                         'ESCAPE_LASTNAME'   => addslashes($user['lastname']),
                         'FULLNAME'          => formatName($user),
                         'ALT_EMAIL'         => $user['alt_email'],
-                        'PASSWORD'          => 'donotchange',
+                        'PASSWORD'          => 'donotchange',  // why?
                         'DATABASE_ID'       => $user['synergy_id'],
                         'SUPERUSER_CHECKED' => $user['su']==1?'checked="checked"':'',
                         'LASTNAME'          => $user['lastname'],
@@ -56,7 +56,7 @@ if(is_numeric($this->arg[0])) {
 
              if(($key = array_search($campus['id'],$userCampus)) !== FALSE) {
                 $outcampus['CAMPUS_ID_CHECKED'] = 'checked="checked"';
-                if($key==0)
+                if($key == 0)
                     $outcampus['CAMPUS_DEFAULT_CHECKED'] = 'checked="checked"';
 
              }

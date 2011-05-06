@@ -150,8 +150,8 @@ class ExternalTimetable extends MSSQL{
 	//returns the period number for the current time
 	function getPeriodNumber($campus)
 	{
-		$campusString = $this->campusCodes[$campus];
-	
+		$campusString = $this->campusCode[$campus];
+
 		# Since the year information in the TimeFrom and TimeTo fields is not reliable, this rips out just the time
 		# and sets all dates to be the same, then compares.
 		# First it gets the hours and minutes with datepart, casts them to varchar so that they can be concatenated to 
@@ -271,48 +271,48 @@ class ExternalTimetable extends MSSQL{
 
 		if( $this->groupHandler->isStudent($userID))
 		{
-			$query ="SELECT 
-						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber, Timetable.ClassCode 
-					FROM 
-						SynergyOne.dbo.Timetable Timetable, 		
-						SynergyOne.dbo.StudentClasses StudentClasses, 
-						SynergyOne.dbo.SubjectClasses SubjectClasses 
+			$query ="SELECT
+						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber, Timetable.ClassCode
+					FROM
+						SynergyOne.dbo.Timetable Timetable,
+						SynergyOne.dbo.StudentClasses StudentClasses,
+						SynergyOne.dbo.SubjectClasses SubjectClasses
 					WHERE
-						Timetable.ClassCampus = SubjectClasses.ClassCampus AND 
-						Timetable.ClassCode = SubjectClasses.ClassCode AND 
-						Timetable.FileSemester = SubjectClasses.FileSemester AND 
-						Timetable.FileType = SubjectClasses.FileType AND 
-						Timetable.FileYear = SubjectClasses.FileYear AND 
-						StudentClasses.FileSemester = SubjectClasses.FileSemester AND 
-						StudentClasses.FileType = SubjectClasses.FileType AND 
-						StudentClasses.FileYear = SubjectClasses.FileYear AND 
-						StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND 
-						StudentClasses.ClassCode = SubjectClasses.ClassCode AND 
-						((Timetable.FileSemester=".$_SESSION['FileSemester'].") AND (Timetable.FileYear=".$_SESSION['FileYear'].") AND 
+						Timetable.ClassCampus = SubjectClasses.ClassCampus AND
+						Timetable.ClassCode = SubjectClasses.ClassCode AND
+						Timetable.FileSemester = SubjectClasses.FileSemester AND
+						Timetable.FileType = SubjectClasses.FileType AND
+						Timetable.FileYear = SubjectClasses.FileYear AND
+						StudentClasses.FileSemester = SubjectClasses.FileSemester AND
+						StudentClasses.FileType = SubjectClasses.FileType AND
+						StudentClasses.FileYear = SubjectClasses.FileYear AND
+						StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
+						StudentClasses.ClassCode = SubjectClasses.ClassCode AND
+						((Timetable.FileSemester=".$_SESSION['FileSemester'].") AND (Timetable.FileYear=".$_SESSION['FileYear'].") AND
 						(StudentClasses.ID='$synergy_id'))
 						AND StudentClasses.StartDate <= getdate() AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
-						AND DayNumber > 0 AND DayNumber <= ".$timetabledef['dayCount']." AND PeriodNumber <= ".$timetabledef['periodCount']." 
-					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber"; 
+						AND DayNumber > 0 AND DayNumber <= ".$timetabledef['dayCount']." AND PeriodNumber <= ".$timetabledef['periodCount']."
+					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
 		}
 		else
 		{
-			$query = "SELECT Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, 
+			$query = "SELECT Timetable.Room, SubjectClasses.Description, Timetable.DayNumber,
 				Timetable.PeriodNumber, Timetable.ClassCode
-				FROM SynergyOne.dbo.SubjectClasses SubjectClasses, 
+				FROM SynergyOne.dbo.SubjectClasses SubjectClasses,
 				SynergyOne.dbo.Timetable Timetable
-				WHERE 
-				Timetable.ClassCampus = SubjectClasses.ClassCampus AND 
-				Timetable.ClassCode = SubjectClasses.ClassCode AND 
-				Timetable.FileSemester = SubjectClasses.FileSemester AND 
-				Timetable.FileType = SubjectClasses.FileType AND 
+				WHERE
+				Timetable.ClassCampus = SubjectClasses.ClassCampus AND
+				Timetable.ClassCode = SubjectClasses.ClassCode AND
+				Timetable.FileSemester = SubjectClasses.FileSemester AND
+				Timetable.FileType = SubjectClasses.FileType AND
 				Timetable.FileYear = SubjectClasses.FileYear AND
-				SubjectClasses.FileSemester='".$_SESSION['FileSemester']."' AND 
-				SubjectClasses.FileYear='".$_SESSION['FileYear']."' AND 
+				SubjectClasses.FileSemester='".$_SESSION['FileSemester']."' AND
+				SubjectClasses.FileYear='".$_SESSION['FileYear']."' AND
 				Timetable.StaffID='$synergy_id'
-				AND DayNumber > 0 AND DayNumber <= ".$timetabledef['dayCount']." AND PeriodNumber <= ".$timetabledef['periodCount']." 
+				AND DayNumber > 0 AND DayNumber <= ".$timetabledef['dayCount']." AND PeriodNumber <= ".$timetabledef['periodCount']."
 				ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
 		}
-		
+
 		$periodCount = $timetabledef['periodCount'];
 		$dayCount = $timetabledef['dayCount'];
 

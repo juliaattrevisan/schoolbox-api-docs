@@ -11,9 +11,8 @@ if($_SESSION['timetable'] && Cfg::get('external_enable') ) {
 	$timetableHandler = new ExternalTimetable;
 	//get current day and period
 	$daynumber = $timetableHandler->getDayNumber($_SESSION['campus'][0]);
-	$period = $timetableHandler->getPeriodNumber($_SESSION['campus'][0]);
-	$periodNum = $period['PeriodNumber'];
-	
+	$current_period = $timetableHandler->getPeriodNumber($_SESSION['campus'][0]);
+
 	$this->setVar("DAYNUMBER", $daynumber);
 	
 	$timetable = $timetableHandler->getDayTimetable($_SESSION['sid'], $_SESSION['id'], $_SESSION['campus'][0], $daynumber);
@@ -85,12 +84,12 @@ if($_SESSION['timetable'] && Cfg::get('external_enable') ) {
 					$this->setVar('PERIOD_ABSENTEES','');
 					$this->setVar('PERIOD_ONCLICK','');
 				}
-			
-				if($period['periodNumber'] == $periodNum)
-					$this->setVar("TIMETABLE_CLASS", "current");
-				else 
-					$this->setVar("TIMETABLE_CLASS", "normal");
-			
+
+				if($current_period['PeriodNumber'] == $period['periodNumber'])
+					$this->setVar("PERIOD_CLASS", "current");
+				else
+					$this->setVar("PERIOD_CLASS", "normal");
+
 			
 				//output period block
 				$this->parse("timetable_header_block", "timetable_header", true);

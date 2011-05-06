@@ -51,7 +51,8 @@ else if(is_numeric($_POST['userID']) && $_POST['modusername'] ) {
 		'local_email'		 => $_POST['local_email'],
 		'alt_email'			 => $_POST['alt_email'],
 		'group_id'			 => $_POST['group'],
-		'campus'			 => $_POST['campus'],
+        'campus'			 => $_POST['campus'],
+        'defaultCampus'	     => $_POST['defaultCampus'],
 		'su'				 => $_POST['superuser'],
 		'year'				 => $_POST['year']==''?'NULL':$_POST['year'],
 		'eportfolio_enabled' => $_POST['eportfolio']

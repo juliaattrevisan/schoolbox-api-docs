@@ -122,10 +122,11 @@ if(is_array($outputList)) {
                                         }
                                 }
 
-                                if($dayCount == $dayCurrent && $row['periodNumber'] == $periodCurrent['PeriodNumber'] && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq'] )
-                                        $outputPeriod['TIMETABLE_CLASS'] = 'current';
-                                else
-                                        $outputPeriod['TIMETABLE_CLASS'] = 'normal';
+                                if($dayCount == $dayCurrent && $row['periodNumber'] == $periodCurrent['PeriodNumber'] && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq'] ) {
+                                    $outputPeriod['TIMETABLE_CLASS'] = 'current';
+                                } else {
+                                    $outputPeriod['TIMETABLE_CLASS'] = 'normal';
+                                }
 
                                 $this->setVar($outputPeriod);
 

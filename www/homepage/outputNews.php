@@ -17,7 +17,8 @@ if (is_array($newsList)) {
 		
 		$poster = formatName($news);
 		
-		$this->setVar("NEWS_HEADING", scrubTEXT($news['heading']));
+        $this->setVar("NEWS_ID", $news['id']);
+        $this->setVar("NEWS_HEADING", scrubTEXT($news['heading']));
 		$this->setVar("NEWS_BODY", scrubHTML($news['body']));
 		$this->setVar("EMAIL_CONTACT", "<a href=\"/search/user/{$news['uid']}\">" . formatName($news) . "</a>");
 		$this->setVar("POSTED_DATE", getRelativeTime($news['posted']));

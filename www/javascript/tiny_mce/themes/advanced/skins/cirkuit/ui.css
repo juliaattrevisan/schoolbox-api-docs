@@ -979,8 +979,8 @@
 	background-position: 0 -40px !important;
 }
 
-.cirkuitSkin .mce_spellchecker span.mceAction {
-	background-position: -540px -20px !important;
+.cirkuitSkin span.mce_spellchecker {
+    background-position: -120px -20px !important;
 }
 
 .cirkuitSkin span.mce_restoredraft {
