@@ -128,6 +128,15 @@ ALTER TABLE `eportfolio_comp`
 	CHANGE `invisible` `invisible` enum('true','false')  COLLATE utf8_general_ci NOT NULL DEFAULT 'false' after `config`,
 	ADD COLUMN `allowMultiple` enum('true','false')  COLLATE utf8_general_ci NULL after `invisible`;
 
+TRUNCATE `eportfolio_comp`;
+
+insert  into `eportfolio_comp`(`id`,`size`,`method`,`name`,`description`,`eportfolioCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) values (1,1,'outputLinkList','Links','Add links to your favourite sites and resources',1,'links_n.htm','a:3:{s:4:\"sort\";s:4:\"Date\";s:7:\"sortdir\";s:4:\"Desc\";s:4:\"size\";s:1:\"0\";}','false','false'),
+(2,1,'outputTextBox','Text Box','Creates a space where you can enter your own information',1,'textBox.html','a:1:{s:9:\"textBoxID\";i:0;}','false','true'),
+(3,1,'outputBlog','Blog','Write a blog about your experiences',1,'blog.html','a:2:{s:4:\"size\";i:3;s:13:\"comments_size\";i:2;}','false','false'),
+(4,1,'outputFileList','Published Files','Files that you have published to your ePortfolio.',1,'files_n.htm','a:5:{s:6:\"filter\";a:5:{i:0;s:8:\"document\";i:1;s:5:\"audio\";i:2;s:5:\"video\";i:3;s:5:\"image\";i:4;s:5:\"other\";}s:13:\"filterOptions\";a:5:{i:0;s:8:\"document\";i:1;s:5:\"audio\";i:2;s:5:\"video\";i:3;s:5:\"image\";i:4;s:5:\"other\";}s:4:\"sort\";s:11:\"Description\";s:7:\"sortdir\";s:3:\"Asc\";s:4:\"size\";i:0;}','false','false'),
+(5,1,'outputImage','Image Advanced','Completely configurable image display, select the image, control the size and link to another location',1,'image_n.htm','a:3:{s:5:\"pixel\";i:200;s:3:\"url\";s:1:\"#\";s:5:\"image\";s:13:\"Preview Image\";}','false','true'),
+(6,1,'outputImageGallery','Image Gallery','Show a grid of image thumbnails sourced from the files uploaded onto this ePortfolio',1,'gallery.htm','a:1:{s:4:\"size\";i:0;}','false','false');
+
 /* Create table in target */
 CREATE TABLE IF NOT EXISTS `eportfolio_comp_category`(
 	`eportfolioComponentCategoryID` int(10) unsigned NOT NULL  auto_increment ,
@@ -135,6 +144,7 @@ CREATE TABLE IF NOT EXISTS `eportfolio_comp_category`(
 	PRIMARY KEY (`eportfolioComponentCategoryID`)
 ) ENGINE=MyISAM DEFAULT CHARSET='utf8';
 
+insert  into `eportfolio_comp_category`(`eportfolioComponentCategoryID`,`name`) values (1,'General');
 
 /* Alter table in target */
 ALTER TABLE `eportfolio_comp_location`
@@ -160,6 +170,13 @@ ALTER TABLE `submission_box`
 
 ALTER TABLE `submission_return`
 	CHANGE `comment` `comment` TEXT  COLLATE utf8_general_ci NULL after `owner`;
+
+/* Alter table in target */
+ALTER TABLE `user`
+	CHANGE `synergy_id` `synergy_id` int(6) unsigned   NULL after `email_pass`,
+	CHANGE `year` `year` tinyint(10)   NULL after `campus`;
+	
+
 /* Point the Admin Sidemenu Link at the new Admin system & delete the old subNav Options */
 UPDATE sideMenu
 set url = '/adminv2/home'

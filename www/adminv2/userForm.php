@@ -47,7 +47,7 @@ else if(is_numeric($_POST['userID']) && $_POST['modusername'] ) {
 		'title'				 => $_POST['title'],
 		'firstname'			 => $_POST['firstname'],
 		'lastname'			 => $_POST['lastname'],
-		'synergy_id'		 => $_POST['database_id'],
+		'synergy_id'		 => $_POST['database_id']==''?'NULL':$_POST['database_id'],
 		'local_email'		 => $_POST['local_email'],
 		'alt_email'			 => $_POST['alt_email'],
 		'group_id'			 => $_POST['group'],
@@ -55,7 +55,7 @@ else if(is_numeric($_POST['userID']) && $_POST['modusername'] ) {
         'defaultCampus'	     => $_POST['defaultCampus'],
 		'su'				 => $_POST['superuser'],
 		'year'				 => $_POST['year']==''?'NULL':$_POST['year'],
-		'eportfolio_enabled' => $_POST['eportfolio']
+		'eportfolio_enabled' => $_POST['eportfolio']==1?1:0
     );
 
     //Do not change password if its the default output value
@@ -75,15 +75,15 @@ else if ($_POST['modusername']) {
 		'title'				 => $_POST['title'],
 		'firstname'			 => $_POST['firstname'],
 		'lastname'			 => $_POST['lastname'],
-		'synergy_id'		 => $_POST['database_id'],
+		'synergy_id'		 => $_POST['database_id']==''?'NULL':$_POST['database_id'],
 		'local_email'		 => $_POST['local_email'],
 		'alt_email'			 => $_POST['alt_email'],
 		'group_id'			 => $_POST['group'],
 		'password'			 => $_POST['modpassword'],
 		'campus'			 => $_POST['campus'],
 		'su'			 	 => $_POST['superuser'],
-		'year'		 		 => $_POST['year'],
-		'eportfolio_enabled' => $_POST['eportfolio']
+		'year'		 		 => $_POST['year']==''?'NULL':$_POST['year'],
+		'eportfolio_enabled' => $_POST['eportfolio']==1?1:0
     );
 
     $id = $userHandler->create($user);

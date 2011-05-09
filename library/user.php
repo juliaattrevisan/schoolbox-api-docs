@@ -425,9 +425,7 @@ class User extends Model {
             unset($user['password']);
         }
 
-
         parent::update($user);
-
 
 
         if (is_array($campusArray)) {
