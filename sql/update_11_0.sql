@@ -178,7 +178,7 @@ ALTER TABLE `user`
 	
 
 /* Point the Admin Sidemenu Link at the new Admin system & delete the old subNav Options */
-UPDATE sideMenu
+UPDATE `sideMenu`
 set url = '/adminv2/home'
 where id = '208' AND txt = 'Admin';
 delete from sideMenu
