@@ -16,9 +16,9 @@ $pollHandler = new Poll;
 if (!empty($config['pollID']) && is_numeric($config['pollID']))
 	$poll = $pollHandler->getByID($config['pollID']);
 
-if (!isset($poll['pollID']))
+/*if (!isset($poll['pollID']))
 	$poll = $pollHandler->getCurrentPoll($categoryID);
-
+*/
 if ($poll['pollID']) {
 
 	$output = array('POLL_ID'		=> $poll['pollID'],

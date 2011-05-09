@@ -13,9 +13,13 @@ $submission_box_handler = new Submission;
 if(is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour']) {
 
     /* Modify existing submission box */
-    $open_date = DateTime::createFromFormat('d/m/Y', $_POST['open_date'])->setTime($open_hour, $_POST['open_minute']);
-    $due_date  = DateTime::createFromFormat('d/m/Y', $_POST['due_date'])->setTime($open_hour, $_POST['due_minute']);
-    $late_date = DateTime::createFromFormat('d/m/Y', $_POST['late_date'])->setTime($open_hour, $_POST['late_minute']);
+    $open_date = new DateTime( str_replace('/','-',$_POST['open_date']));
+    $due_date  = new DateTime( str_replace('/','-',$_POST['due_date']));
+    $late_date = new Datetime( str_replace('/','-',$_POST['late_date']));
+
+    $open_date->setTime($_POST['open_hour'], $_POST['open_minute']);
+    $due_date->setTime($_POST['due_hour'], $_POST['due_minute']);
+    $late_date->setTime($_POST['late_hour'], $_POST['late_minute']);
 
     if (!$open_date || !$due_date || !$late_date) {
         error(15);
@@ -76,9 +80,9 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
     }
 
     /* Date and Time */
-    $open_date = DateTime::createFromFormat('d/m/Y', $_POST['open_date'])->setTime($open_hour, $_POST['open_minute']);
-    $due_date  = DateTime::createFromFormat('d/m/Y', $_POST['due_date'])->setTime($open_hour, $_POST['due_minute']);
-    $late_date = DateTime::createFromFormat('d/m/Y', $_POST['late_date'])->setTime($open_hour, $_POST['late_minute']);
+    $open_date = DateTime::createFromFormat('d/m/Y', $_POST['open_date'])->setTime($_POST['open_hour'], $_POST['open_minute']);
+    $due_date  = DateTime::createFromFormat('d/m/Y', $_POST['due_date'])->setTime($_POST['due_hour'], $_POST['due_minute']);
+    $late_date = DateTime::createFromFormat('d/m/Y', $_POST['late_date'])->setTime($_POST['late_hour'], $_POST['late_minute']);
 
     if (!$open_date || !$due_date || !$late_date) {
         error(15);

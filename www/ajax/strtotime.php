@@ -14,10 +14,12 @@ if (empty($format)) {
     $format = 'd/m/Y';
 }
 
-$datetime = DateTime::createFromFormat($format, $string);
+//$datetime = DateTime::createFromFormat($format, $string);
+
+
 
 if (!$datetime) {
-    $datetime = new DateTime($string);
+    $datetime = new DateTime( str_replace('/','-',$string));
 }
 
 echo json_encode(array( 'time' => $datetime->format($format) ));

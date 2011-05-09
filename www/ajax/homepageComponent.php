@@ -15,6 +15,7 @@ $componentID = $_POST['add'];
 if (($permission = $groupHandler->getPermission($categoryID)) < WRITE_ACCESS)
 	exit;
 
+/* $homepageComponentLocationID comes in from outerspace here.  so be careful.. it is created in the script that calls this one..  */
 $component = $categoryHandler->getComponent($categoryID, $componentID);
 
 
@@ -36,7 +37,7 @@ $this->setVar('COMPONENT_ID', $component['component']);
 $this->setVar('ID', $categoryID);
 
 $default = unserialize($component['dfconfig']);
-$config = unserialize($component['config']);
+$config = array();
 
 if(is_file($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php'))
         include($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php');

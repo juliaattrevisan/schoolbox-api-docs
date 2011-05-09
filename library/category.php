@@ -131,8 +131,8 @@ class Category extends Model {
 		$query = "SELECT homepageComponentLocationID, position, `column`, component, homepage_comp.config dfconfig,
                         homepage_comp_location.config, name, method, filename
 				  FROM homepage_comp_location JOIN homepage_comp ON component = id
-				  WHERE cid = '" . $categoryID . "' AND component = '".$componentID."'";
-
+				  WHERE cid = '" . $categoryID . "' AND component = '".$componentID."'
+				  ORDER BY `column`, `position` LIMIT 1";
 		return $this->db->getRow($query);
 	
 	}
