@@ -96,7 +96,7 @@ else {
 $this->setVar($ldap);
 
 /* WWW access check */
-if(file_get_contents('http://schoolbox.com.au/design/img/favicon.ico')) {
+if(@file_get_contents('http://schoolbox.com.au/design/img/favicon.ico')) {
    $www = array('WWW_LIGHT'    => 'on',
                 'WWW_STATUS'    => 'Available');
 }
