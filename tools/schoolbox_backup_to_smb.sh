@@ -8,7 +8,7 @@ Backup_Share="//192.168.1.69/Alaress";
 Backup_Username="damian.alexander";
 Backup_Password="Maybe123";
 if [[ -d /tmp/SchoolboxBackup ]]; then
-rm -Rf /tmp/SchoolboxBackup
+umount -f /tmp/SchoolboxBackup
 fi;
 mkdir /tmp/SchoolboxBackup;
 mount -t smbfs -o username=$Backup_Username,password=$Backup_Password $Backup_Share /tmp/SchoolboxBackup;
