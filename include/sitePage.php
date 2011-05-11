@@ -333,12 +333,7 @@ class SitePage extends Page {
 					$this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
 			}
 			else if($this->site == 'wenona') {
-				if($this->groupHandler->isStaff()) {
-					$this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.wenona.nsw.edu.au/owa" rel="external"');
-				}
-				else {
-					$this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
-				}
+				$this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.wenona.nsw.edu.au/owa" rel="external"');
 			}
 			else if($this->site == 'shore') {
 				if($this->groupHandler->isStaff()) {
