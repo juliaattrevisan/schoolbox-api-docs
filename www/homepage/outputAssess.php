@@ -11,6 +11,10 @@ $this->setBlock('assess', 'resultsLink', 'resultsLink_block');
 $this->setBlock('assess', 'resumeLink', 'resumeLink_block');
 $this->setBlock('assess', 'hasCompleted', 'hasCompleted_block');
 
+/* Remove resumeLink by default
+ */
+$this->setVar('resumeLink_block', '');
+
 $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();
 $sectionHandler = new AssessSection();
@@ -86,12 +90,6 @@ if (is_array($allAssess)) {
 		}
 		else {
 			$this->setVar('hasCompleted_block', '');
-		}
-
-		/* Remove resumeLink if you are the owner
-		 */
-		if ($assessHandler->isOwner($currentAssess['assess_id'])) {
-			$this->setVar('resumeLink_block', '');
 		}
 
         /* Check if you have completed an assessment already
