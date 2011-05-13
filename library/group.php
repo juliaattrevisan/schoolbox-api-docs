@@ -416,15 +416,22 @@ class Group extends Model {
     }
 
     function userSummary() {
-        $query = "SELECT groups.`name`, COUNT(*) total,
-                            (SELECT COUNT(DISTINCT `user`.id) 
-                            FROM login_log JOIN `user` ON login_log.username=`user`.username 
-                            WHERE `date` > DATE_SUB(NOW(), INTERVAL " . (Cfg::get('session_length') * 2) . " SECOND)
-                            AND login = 1 AND group_id = groups.id GROUP BY `user`.group_id) logged_in
-                     FROM groups JOIN `user` ON groups.id=`user`.group_id
-                     GROUP BY groups.id ORDER BY groups.`name`";
 
-        return $this->db->getAll($query);
+        $query = "SELECT groups.id, groups.`name`, COUNT(*) total FROM groups JOIN `user` ON groups.id=`user`.group_id GROUP BY groups.id ORDER BY groups.`name`";
+        $result = $this->db->query($query);
+        while ($group = $this->db->getNextArray($result)) {
+              $query = "SELECT COUNT(DISTINCT `user`.id) as loggedIn
+                    FROM login_log JOIN `user` ON login_log.username=`user`.username
+                    WHERE `date` > DATE_SUB(NOW(), INTERVAL " . (Cfg::get('session_length') * 2) . " SECOND) AND group_id = '{$group['id']}' AND login = 1";
+             $loggedIn = $this->db->getOne($query);
+
+             $summary[] = array('name'=>$group['name'],'total'=>$group['total'],'logged_in'=>$loggedIn);
+             
+        }
+
+        return $summary;
+
+        
     }
 
 }

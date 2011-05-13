@@ -47,20 +47,20 @@ class ExternalClass extends MSSQL{
 				$subCodeArray = explode(',',$subCode);
 				foreach($subCodeArray as $code) {
                                         list($year,$code,$class) = explode('-',$code);
-                                        $classQuery .= " ( year_grp = '$year' AND sub_code = '$code' AND class = '$class' ) OR ";
+                                        $classQuery .= " ( year_grp = '$year' AND studsub.sub_code = '$code' AND class = '$class' ) OR ";
 				}
 				$classQuery .= '1=0';
 		}
 		else {
                     list($year,$code,$class) = explode('-',$subCode);
-                    $classQuery = "year_grp = '$year' AND sub_code = '$code' AND class = '$class' ";
+                    $classQuery = " year_grp = '$year' AND sub_code = '$code' AND class = '$class' ";
                 }
 
 
             list($year, $code, $class) = explode('-',$subCode);
             $query = "SELECT tch_code FROM tchsub WHERE semester = '{$_SESSION['FileSemester']}' AND year_num = '{$_SESSION['FileYear']}'
                            AND ( $classQuery )";
-        
+
             $this->query($query);
             while($synrow = $this->getNextArray() ) {
                     $teachers[] = $synrow['tch_code'];

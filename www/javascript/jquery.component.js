@@ -60,9 +60,9 @@ $j(function() {
 	
 	/* from here down I've changed the component functions!!!!*/
 	
-	$j('.manage h2, a.folder-manage').each(function () {
+	/*$j('.manage h2, a.folder-manage').each(function () {
 		$j(this).hide();
-	});
+	})*/;
 	
 	$j('#tabs-homepage').tabs();
 	$j('#tabs-sub').tabs();

@@ -1,6 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 $categoryHandler = new Category;
@@ -26,7 +26,7 @@ $sortOptions = array('Name', 'Date');
 
 $componentHandle=TEMPLATE_content;
 
-$this->setFile($componentHandle, 'homepage/components/'.$component['filename']);
+$this->setFile($componentHandle, 'eportfolio/components/'.$component['filename']);
 $this->setBlock($componentHandle, "config", "config_block");
 
 $this->setVar('COMPONENT_HOMEPAGE_ID', $component['homepageComponentLocationID']);

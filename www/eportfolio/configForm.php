@@ -23,8 +23,8 @@ if (is_numeric($_REQUEST['uid'])) {
 
     $eportfolioHandler = new ePortfolio($_REQUEST['uid']);
 
-    /* AJAX request for drag and drop of components
-     * This is found in jquery.eportfoliocomponent.js
+    /* ajax request for drag and drop of components
+     * this is found in jquery.eportfoliocomponent.js
      */
     if ($_POST['uid'] && $_POST['type'] == 'components') {
         $columns = array($_POST['column1'], $_POST['column2']);

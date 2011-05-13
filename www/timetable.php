@@ -37,7 +37,7 @@ if($groupHandler->isParent()) {
         }
 }
 else {
-	if(is_numeric($this->arg[0])) {
+	if($this->arg[0]) {
 		if($groupHandler->isStaff())
 			$outputList[] = $this->arg[0];
 		else

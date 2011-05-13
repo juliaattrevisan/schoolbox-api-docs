@@ -177,7 +177,7 @@ class ePortfolio {
             $componentSetup = $this->db->getRow($query);
 
              /* We are inserting component at the top of the left column so we move all the existing components down */
-            $query = "UPDATE eporfolio_comp_location SET position = position+1 WHERE uid = ".$this->uid." AND `column` = 1";
+            $query = "UPDATE eportfolio_comp_location SET position = position+1 WHERE uid = ".$this->uid." AND `column` = 1";
             $this->db->query($query);
 
             $this->saveComponentPosition($component, 1, 1, $newComp['config']);
@@ -191,7 +191,7 @@ class ePortfolio {
 	}
 
     function deleteComponent($component) {
-        $query = "DELETE FROM eportfolio_comp_location WHERE cid = '$this->cid' AND homepageComponentLocationID = '$component'";
+        $query = "DELETE FROM eportfolio_comp_location WHERE uid = '$this->uid' AND eportfolioComponentLocationID = '$component'";
         $this->db->query($query);
     }
 
