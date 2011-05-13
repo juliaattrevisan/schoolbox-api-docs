@@ -21,7 +21,7 @@ $allowedFiles = new AllowedFile();
  */
 $user = $userHandler->getById($this->arg[0]);
 
-$userID =& $user['uid'];
+$userID = $user['uid'];
 
 if (!$userID) {
 	error(31);

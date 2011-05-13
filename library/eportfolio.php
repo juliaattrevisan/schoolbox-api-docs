@@ -115,6 +115,17 @@ class ePortfolio {
 		return $this->db->getAll($query);
 	}
 
+    function getComponent($uidID, $componentID) {
+
+		$query = "SELECT eportfolioComponentLocationID, position, `column`, component, eportfolio_comp.config dfconfig,
+                        eportfolio_comp_location.config, name, method, filename
+				  FROM eportfolio_comp_location JOIN eportfolio_comp ON component = id
+				  WHERE uid = '" . $uidID . "' AND component = '".$componentID."'
+				  ORDER BY `column`, `position` LIMIT 1";
+		return $this->db->getRow($query);
+
+	}
+
     /**
      * Colour theme for this user's ePortfolio.
      *
