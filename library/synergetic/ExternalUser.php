@@ -44,9 +44,8 @@ class ExternalUser extends MSSQL{
 					luForm.ID as TeacherFormID, vStudents.StudentForm, luTutor.ID as TeacherTutorID, vStudents.StudentTutor, luForm.Description as FormDescription,
 					vStudents.StudentHouseDescription, vStudents.StudentHouse, vStudents.StudentYearLevel, vStudents.StudentLockerBook,
 					vStudents.StudentEmergencyName, vStudents.StudentEmergencyPhone, vStudents.StudentEmergencyPhoneAlt, vStudents.StudentMedicalAlert,vStudents.StudentSpecialNeedsFlag, AlertMessage
-                         FROM
-					SynergyOne.dbo.vStudents vStudents
-                                        LEFT JOIN CommunityAlerts ON CommunityAlerts.ID = StudentID
+                    FROM SynergyOne.dbo.vStudents vStudents
+                    LEFT JOIN CommunityAlerts ON CommunityAlerts.ID = StudentID
 					LEFT JOIN SynergyOne.dbo.luForm ON vStudents.StudentForm=luForm.Code
 					LEFT JOIN SynergyOne.dbo.luTutor ON vStudents.StudentTutor=luTutor.Code
 			WHERE 	

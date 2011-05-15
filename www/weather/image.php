@@ -8,9 +8,12 @@
  * @version     SVN: $Id$
  * 
  */
+require_once '../../include/sitePage.php';
+
+$page = new SitePage;
 
 $real_url = 'http://www.google.com';
-$cache_path = '../../data/cache/weather';
+$cache_path = Cfg::get('xml_dir').'/../weather/';
 $file_path = $_GET['path'];
 
 if (is_string($file_path)) {

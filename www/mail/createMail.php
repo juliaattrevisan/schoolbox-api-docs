@@ -13,7 +13,7 @@ $page = new SitePage();
 $groupHandler = new Group;
 
 
-if(defined(Cfg::get('mail_enable')) && Cfg::get('mail_enable') == true) {
+if(Cfg::get('mail_enable') == 1) {
 
     if(Cfg::get('mail_type') == 'roundcube' && ($groupHandler->isStudent($_SESSION['gid']) || !$_SESSION['exchange']))
     {

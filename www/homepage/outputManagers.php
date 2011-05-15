@@ -25,6 +25,7 @@
 				$this->parse("staff_member_block", "staff_members", true);
 
 			}
+            $this->setVar("REPLYTO", formatEmail($_SESSION));
 			$this->setVar("EMAILALL", $emailall);
 		} else
 			$this->setVar("staff_member_block", "");

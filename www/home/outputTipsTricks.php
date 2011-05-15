@@ -1,6 +1,7 @@
 <?php
 
-define('TIPS_CID', 1566);
+define('TIPS_CID', 1699);
+print "blah";
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/categoryNews.php';
 

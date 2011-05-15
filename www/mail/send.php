@@ -6,10 +6,14 @@
 ************************************************************/
 //outputs form to get users mail details and processes the information
 
-require_once("../include/session.php");
-require_once("../include/include.php");
+//require_once("../include/session.php");
+//require_once("../include/include.php");
+
+require_once("../../include/sitePage.php");
 require_once('Mail.php');
 require_once('Mail/mime.php');
+
+$page = new SitePage;
 
 define('MAX_RECIPIENTS', 10);
 
