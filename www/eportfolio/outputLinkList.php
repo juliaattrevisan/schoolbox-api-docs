@@ -39,9 +39,10 @@ else {
 $this->setBlock($componentHandle, "submit_link", "submit_link_block");
 
 if ($eportfolioHandler->canEdit($userID)) {
-	$this->setVar("submit_link_block", "");
+	$this->parse("submit_link_block", "submit_link");
 }
 else {
-	$this->parse("submit_link_block", "submit_link");
+	$this->setVar("submit_link_block", "");
+	
 }
 ?>
