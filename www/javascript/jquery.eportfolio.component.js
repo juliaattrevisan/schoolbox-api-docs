@@ -17,7 +17,8 @@ $j(function() {
 			tolerance: 'pointer',
 			
 			update: function () {
-				var left = '', right = '';
+				var left = '';
+				var right = '';
 				$j('div.left').children('div.box').each(function () {
 					left += $j(this).attr('id').substring(9) + ',';
 				});

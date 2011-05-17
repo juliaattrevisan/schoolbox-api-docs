@@ -17,7 +17,9 @@ $j(function() {
 		zIndex: 2000,
 		
 		update: function () {
-			var left = '', right = ''; top = '';
+			var left = ''; 
+			var right = ''; 
+			var top = '';
 			$j('div.left').children('div.box').each(function () {
 				left += $j(this).attr('id').substring(9) + ',';
 			});
