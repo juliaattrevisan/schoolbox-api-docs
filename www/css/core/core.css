@@ -1576,7 +1576,13 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 
 
 .admin-form table { color:#797979; }
-
+.password-container .actual-password{float:left; margin-right:8px;}
+.reveal-password{float:left; margin-top:10px;}
+.reveal-password a{display:block;padding:8px;  border:1px solid #ccc; }
+.reveal-password em{font-size:16px;padding:7px;  border:1px solid #ccc; font-style:normal; background:#edf7e7;
+}
+.reveal-password a.hide-pass{border:0; padding:0; }
+.reveal-password a.hide-pass{text-align:center; margin-top:3px; display:none;}
 .admin-contents .user {
 	position:absolute;
 	top:16px;

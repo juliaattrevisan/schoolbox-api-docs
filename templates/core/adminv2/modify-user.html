@@ -66,6 +66,24 @@ $j(function() {
 			}
   		}
 	});
+	
+	$j('a.show-pass').click(function() {
+		$j(this).siblings('em').show().css('display', 'block');
+		$j(this).siblings('a.hide-pass').show().css('display', 'block');
+		$j(this).hide();	
+		return false;
+	})
+	
+	
+	$j('a.hide-pass').click(function() {
+		$j(this).siblings('em').hide();
+		$j(this).siblings('a.show-pass').show();
+		$j(this).hide();
+		
+	return false;
+	})
+	
+	
 });
 </script>
 
@@ -143,8 +161,18 @@ $j(function() {
                 <label for ="username" class="width2">Username
 					<input type="text" name="modusername" value="{USERNAME}" />
 				</label>
-				<label for="password">Password
-					<input type="password" name="modpassword" value="{PASSWORD}" />
+				<label for="password" class="password-container">
+					
+					<div class="actual-password">Password<br />
+					<input type="password" name="modpassword" class="password" value="{PASSWORD}" />
+					</div>
+					
+					<div class="reveal-password">
+						<a href="#" class="show-pass">Reveal Password</a>
+						<em>329878fan</em>
+						<a href="#" class="hide-pass">hide</a>
+					</div>
+					
 				</label>
                 <label for="alt_email">Alternate Email
 					<input type="text" name="alt_email" value="{ALT_EMAIL}" />
