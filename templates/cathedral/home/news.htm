@@ -1,0 +1,36 @@
+<script type="text/javascript">
+	$j(function() {
+		//$j('ul.topic li').not('.tcs').remove();
+		$j('li.tcs').show();
+	});
+</script>
+
+<div class="box">
+  <h2>TCS Headlines</h2>
+  <div class="text listing">
+  	
+      <!-- BEGIN topic_header -->
+     
+      <!-- END topic_header -->
+    
+    <ul class="topic">
+    <!-- BEGIN topic -->
+    	<li class="hide {TOPIC_CLEAN}">
+    	<ul>
+      <!-- BEGIN news -->
+      <li class="{ON_OFF}">
+      	<h4><a href="{NEWS_URL}" title="{NEWS_TITLE}">{NEWS_TITLE}</a></h4>
+        <p class="interact">{NEWS_TIME}</p>
+        <div class="float-fix"></div>
+      </li>
+      <!-- END news -->
+    </ul>
+ 
+    </li>
+    <!-- END topic -->
+    </ul> 
+
+  </div>      
+  <div class="float-fix"></div>
+</div>
+<div class="float-fix"></div>
