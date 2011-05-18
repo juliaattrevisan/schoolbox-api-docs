@@ -190,7 +190,7 @@ class BulkUser {
 							$output[] = array(
 								'username' => $thisRow[0],
 								'status' => 'Removed',
-								'error' => '',
+								'error' => 'OK',
 							);
 						}
 						else {
@@ -212,7 +212,7 @@ class BulkUser {
 							$output[] = array(
 								'username' => $thisRow[0],
 								'status' => 'Removed',
-								'error' => '',
+								'error' => 'OK',
 							);
 						}
 						else {
