@@ -2,22 +2,20 @@
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
-	
-		$j('#cal_date').datepicker({ 
-			dateFormat: 'dd/mm/yy',
-			showOn: 'both',
-			buttonImage: '/images/demo/calendar/calendar-click.png',
-			buttonImageOnly: true,
-            constrainInput: false,
-            onClose: function (string) {
-                var input = $j(this);
+$j('#cal_date').datepicker({ 
+	dateFormat: 'dd/mm/yy',
+	showOn: 'both',
+	buttonImage: '/images/demo/calendar/calendar-click.png',
+	buttonImageOnly: true,
+	constrainInput: false,
+	onClose: function (string) {
+		var input = $j(this);
 
-                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-		});
-
+		$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+			input.val(data.time);
+		})
+	}
+});
 </script>
 <!-- END custom_head -->
 
@@ -25,23 +23,31 @@
 <form class="standardForm" action="/poll/modifyForm.php" method="post">
 	<table>
 		<tr>
-			<td class="formLabelWidth"><h4>Title</h4>
-				</td>
-			<td><input type="text" name="title" value="{POLL_TITLE}" size="50" /></td>
+			<td class="formLabelWidth">
+				<h4>Title</h4>
+			</td>
+			<td>
+				<input type="text" name="title" value="{POLL_TITLE}" size="50" />
+			</td>
 		</tr>
 		<tr>
-			<td><h4>Question</h4>
+			<td>
+				<h4>Question</h4>
 				<em>What is the poll for</em>
-				</td>
-			<td><input type="text" name="question" value="{QUESTION}" size="50" /></td>
+			</td>
+			<td>
+				<input type="text" name="question" value="{QUESTION}" size="50" />
+			</td>
 		</tr>
 		<tr>
-			<td><h4>Options</h4>
-				<em>You can have a maximum of 
+			<td>
+				<h4>Options</h4>
+				<em>You can have a maximum of
 				ten options<br />
 				to vote on. You must fill in at least two.</em>
-				</td>
-			<td><input type="text" name="option_0" value="{OPTION_0}" />
+			</td>
+			<td>
+				<input type="text" name="option_0" value="{OPTION_0}" />
 				<br />
 				<input type="text" name="option_1" value="{OPTION_1}" />
 				<br />
@@ -60,26 +66,35 @@
 				<input type="text" name="option_8" value="{OPTION_8}" />
 				<br />
 				<input type="text" name="option_9" value="{OPTION_9}" />
-				<br /></td>
+				<br />
+			</td>
 		</tr>
 		<tr>
-			<td><h4>Close Date</h4>
+			<td>
+				<h4>Close Date</h4>
 				<em>No votes can be cast after this date.</em>
-				</td>
-			<td><input name="close" id="cal_date" type="text" size="15" maxlength="30" value="{CLOSE}"/></td>
+			</td>
+			<td>
+				<input name="close" id="cal_date" type="text" size="15" maxlength="30" value="{CLOSE}"/>
+			</td>
 		</tr>
 		<tr>
-			<td><h4>Voting Frequency</h4>
+			<td>
+				<h4>Voting Frequency</h4>
 				<em>Selected how often users can place a new vote.</em>
-				</td>
-				<td><select name="frequency">
+			</td>
+			<td>
+				<select name="frequency">
 					<option value="once" {FREQUENCY_ONCE_SELECTED}>Once</option>
 					<option value="hourly" {FREQUENCY_HOURLY_SELECTED}>Hourly</option>
 					<option value="daily" {FREQUENCY_DAILY_SELECTED}>Daily</option>
-				</select><input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-				<input type="hidden" name="pollID" value="{POLL_ID}" /></td>
-		</tr>
+				</select>
 
+				<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+				<input type="hidden" name="pollID" value="{POLL_ID}" />
+				<input type="hidden" name="homepageComponentID" value="{COMPONENT_HOMEPAGE_ID}" />
+			</td>
+		</tr>
 	</table>
 	<input type="submit" class="submit-btn-plain" value="Save" />
 </form>
