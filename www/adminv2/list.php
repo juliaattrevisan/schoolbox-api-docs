@@ -15,24 +15,39 @@ $this->setBlock(TEMPLATE_content, 'newData', 'newData_block');
 $this->setVar('table_cell_static_block','');
 
 $tableList = array(
-        array(  'name'      => 'groups',
-                'title'     => 'Groups',
-                'index'     => 'id'),
-        array(  'name'      => 'luCampus',
-                'title'     => 'Campus',
-                'index'     => 'id'),
-        array(  'name'      => 'luEventType',
-                'title'     => 'Event Types',
-                'index'     => 'eventTypeID'),
-        array(  'name'      => 'file_type',
-                'title'     => 'Assessment Types',
-                'index'     => 'id')
-    );
+	array(
+		'name'      => 'groups',
+		'title'     => 'Groups',
+		'index'     => 'id'
+	),
+	array(
+		'name'      => 'luCampus',
+		'title'     => 'Campus',
+		'index'     => 'id'
+	),
+	array(
+		'name'      => 'luEventType',
+		'title'     => 'Event Types',
+		'index'     => 'eventTypeID'
+	),
+	array(
+		'name'      => 'file_type',
+		'title'     => 'Assessment Types',
+		'index'     => 'id'
+	),
+	array(
+		'name'      => 'newsTopic',
+		'title'     => 'News Topics',
+		'index'     => 'newsTopicID'
+	)
+);
 
 if (!$this->arg[0]) {
 	$this->arg[0] = 'groups';
 }
 
+/* Left submenu thingy
+ */
 $selectedTable = $tableList[0];
 
 foreach($tableList as $table) {
@@ -60,6 +75,8 @@ foreach($tableList as $table) {
     $this->parse('table_tab_block', 'table_tab',true);
 }
 
+/* Table data
+ */
 $genericHandler = new GenericTable($selectedTable['name'], $selectedTable['index']);
 
 $table = $genericHandler->getAll();

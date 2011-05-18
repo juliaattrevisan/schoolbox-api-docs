@@ -186,3 +186,9 @@ where parent = '208';
 UPDATE `user`
 SET firstname = 'Alaress',lastname='Admin',username='alaress',alt_email='support@alaress.com.au',password=PASSWORD('W3bD3s1gn')
 WHERE username = 'jleckie' OR username = 'jaleckie';
+
+
+/* Reorder the luCampus columns, because this is tied into presentation in the
+ * new admin system.
+ */
+ALTER TABLE `portal`.`luCampus` CHANGE `id` `id` TINYINT(4) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '' FIRST, CHANGE `name` `name` VARCHAR(255) NULL COLLATE utf8_general_ci COMMENT '' AFTER `id`;
