@@ -1,16 +1,16 @@
 <?php
-require_once SITE_root . '/library/bulk-add.php';
+require_once SITE_root . '/library/bulk-user.php';
 
 $this->setTitle('Admin - Bulk Add Users');
 $this->setFile(TEMPLATE_content, 'adminv2/bulkAdd.html');
 $this->setBlock(TEMPLATE_content, 'user', 'user_block');
 
-$bulkAddHandler = new BulkAdd();
+$bulkUserHandler = new BulkUser();
 
 /* Two types of upload.. either single user.. or via csv file..
  */
 if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name']) {
-	$allUsers = $bulkAddHandler->parseCSV($_FILES['bulkadd']['tmp_name']);
+	$allUsers = $bulkUserHandler->add($_FILES['bulkadd']['tmp_name']);
 
 	if ($allUsers && count($allUsers)) {
 		foreach ($allUsers as $currentUser) {
