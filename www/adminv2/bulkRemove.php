@@ -2,7 +2,7 @@
 require_once SITE_root . '/library/bulk-user.php';
 
 $this->setTitle('Admin - Bulk Remove Users');
-$this->setFile(TEMPLATE_content, 'adminv2/bulkAdd.html');
+$this->setFile(TEMPLATE_content, 'adminv2/bulkRemove.html');
 $this->setBlock(TEMPLATE_content, 'user', 'user_block');
 
 $bulkUserHandler = new BulkUser();

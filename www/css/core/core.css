@@ -1277,6 +1277,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	z-index:200
 }
 
+
 .notifications li { position:relative; }
 
 .notifications li strong, .notifications li em, .notifications li p { float:left; }
@@ -1474,11 +1475,11 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 .allowed-files .text-input { width:95%; }
 .allowed-files .textarea {min-height:32px;}
 
-.allowed-files h3 {
+.allowed-files h3, .bulk-users h3 {
 	font-size:12px;
 	margin:0;
 }
-
+.bulk-users h3 em{display:none;}
 .allowed-files tr.add-new td { background:#cae9b9; }
 
 .settings-nav-holder, .admin-contents .settings { float:left; }

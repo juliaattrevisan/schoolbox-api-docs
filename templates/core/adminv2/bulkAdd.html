@@ -15,8 +15,8 @@ $j(function() {
 		name: 'green'
 	}
 		
-	$j('label span').each(function() {
-		activeContent = $j(this).siblings('em').html();
+	$j('thead td').each(function() {
+		activeContent = $j(this).find('em').html();
 		$j(this).qtip({
 			content: activeContent,
 			api: {
@@ -44,17 +44,17 @@ $j(function() {
 	<li><a href="/adminv2/rollover">Rollover</a></li>
 </ul>
 <div class="admin-contents">
-	<h2>Bulk Add</h2>
+	<h3>Bulk Add</h3>
 
 	<div class="level">
-		<table>
+		<table class="bulk-users">
 			<thead>
 				<tr>
-					<td>Username</td>
-					<td>Status</td>
-					<td>Error</td>
+					<td><h3>Username<em>The name of the user, indicated from reading the rows in the CSV file.</em><span>?</span></h3></td>
+					<td><h3>Action<em>The function schoolbox has attempted to complete.</em><span>?</span></h3></td>
+					<td><h3>Response<em>Schoolbox's feedback after attempting to complete the requested function.</em><span>?</span></h3></td>
 				</tr>
-			</head>
+			</thead>
 			<tbody>
 				<!-- BEGIN user -->
 				<tr>
@@ -66,5 +66,8 @@ $j(function() {
 			</tbody>
 		</table>
 	</div>
+	
+	<a href="/adminv2/user" class="btn go-back float-left"><span></span>Back to users</a>
+
 	<div class="float-fix"></div>
 </div>

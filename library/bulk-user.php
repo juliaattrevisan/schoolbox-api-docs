@@ -122,7 +122,7 @@ class BulkUser {
 
 							$output[] = array(
 								'username' => $newUser['username'],
-								'status' => 'Updated',
+								'status' => 'Updated user',
 								'error' => 'OK',
 							);
 						}
