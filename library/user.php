@@ -12,6 +12,27 @@ class User extends Model {
         parent::Model();
     }
 
+	/**
+	 * Gets the ID associated with a particular campus name. Returns false if
+	 * the campus name was not matched.
+	 *
+	 * @param <type> $name
+	 * @return <type>
+	 */
+	public function getCampusID($name) {
+		$query = "SELECT * FROM luCampus";
+
+		$allCampus = $this->db->getAll($query);
+
+		foreach($allCampus as $currentCampus) {
+			if ($currentCampus['name'] == $name) {
+				return $currentCampus['id'];
+			}
+		}
+
+		return false;
+	}
+
     function getAllInCategory($categoryID) {
         $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email
 				  FROM user, userAccess

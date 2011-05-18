@@ -1,0 +1,63 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.autoresize.js"></script>
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+<script type="text/javascript">
+
+$j(function() {
+	$j.fn.qtip.defaults.position.corner = {
+		target: 'topLeft',
+		tooltip: 'bottomLeft'
+	}
+	
+	$j.fn.qtip.defaults.style = {
+		tip: 'bottomLeft',
+		name: 'green'
+	}
+		
+	$j('label span').each(function() {
+		activeContent = $j(this).siblings('em').html();
+		$j(this).qtip({
+			content: activeContent,
+			api: {
+					// Retrieve the content when tooltip is first rendered
+					 onRender: function()
+					 {
+						var self = this;
+					 }
+				 }
+		});
+	});
+});
+</script>
+<!-- END custom_head -->
+
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+	<li><a href="/adminv2/home">Home</a></li>
+	<li><a href="/adminv2/user" class="current">Users</a></li>
+	<li><a href="/adminv2/side-menu">Side Menu</a></li>
+	<li><a href="/adminv2/allowed-file">Allowed Files</a></li>
+	<li><a href="/adminv2/setting">Settings</a></li>
+	<li><a href="/adminv2/calendar">Calendar</a></li>
+	<li><a href="/adminv2/list">Lists</a></li>
+	<li><a href="/adminv2/rollover">Rollover</a></li>
+</ul>
+<div class="admin-contents">
+	<h2>Bulk Add</h2>
+
+	<div class="level">
+		<table>
+			<tbody>
+				<!-- BEGIN user -->
+				<tr>
+					<td>{USER_USERNAME}</td>
+					<td>{USER_STATUS}</td>
+					<td>{USER_ERROR}</td>
+				</tr>
+				<!-- END user -->
+			</tbody>
+		</table>
+	</div>
+	<div class="float-fix"></div>
+</div>
