@@ -46,8 +46,6 @@ if (!$this->arg[0]) {
 	$this->arg[0] = 'groups';
 }
 
-/* Left submenu thingy
- */
 $selectedTable = $tableList[0];
 
 foreach($tableList as $table) {
@@ -75,8 +73,6 @@ foreach($tableList as $table) {
     $this->parse('table_tab_block', 'table_tab',true);
 }
 
-/* Table data
- */
 $genericHandler = new GenericTable($selectedTable['name'], $selectedTable['index']);
 
 $table = $genericHandler->getAll();

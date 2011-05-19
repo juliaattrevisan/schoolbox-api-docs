@@ -11,7 +11,7 @@ if (is_array($submissionList)) {
 
 	foreach($submissionList as $submission) {
 
-		$nameURL = $submission['realname'] != '' ? "/send" . ($submission['inline'] == 'true' ? 'frame' : '') . ".php?id=" . $submission['fileID'] : false;
+		$nameURL = $submission['realname'] != '' ? "/send" . ($submission['inline'] == 'true'&& FILE_use_frame ? 'frame' : '') . ".php?id=" . $submission['fileID'] : false;
 
 		$dateHTML = outputDate("jS M", $submission['date']);
 		$dateURL = false;

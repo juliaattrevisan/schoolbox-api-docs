@@ -116,15 +116,14 @@ class News extends Model {
 		}
 		else if(is_numeric($campusList))
 			$this->db->insert('newsCampus', array('id' => $newsID, 'campus' => $campusList));
-
-
-                if (is_array($userList)) {
-			foreach ($userList as $user) {
-				$this->db->insert('newsUser', array('newsID' => $newsID, 'userID' => $user));
-			}
-		}
  		else
 			$this->db->insert('newsCampus', array('id' => $newsID, 'campus' => 1));
+
+        if (is_array($userList)) {
+			foreach ($userList as $user) {
+				$this->db->insert('newsUser', array('newsID' => $newsID, 'userID' => $user));
+            }
+	    }
 		
 		return $newsID;
 	}
@@ -148,7 +147,7 @@ class News extends Model {
 		
 		$this->db->delete('newsGroup', 'id', $news['item_id']);
 		$this->db->delete('newsCampus', 'id', $news['item_id']);
-                $this->db->delete('newsUser', 'newsID', $news['item_id']);
+        $this->db->delete('newsUser', 'newsID', $news['item_id']);
 		
 		if (is_array($groupList)) {
 			foreach ($groupList as $group) {
@@ -162,15 +161,15 @@ class News extends Model {
 		}	
 		else if(is_numeric($campusList))
 			$this->db->insert('newsCampus', array('id' => $news['item_id'], 'campus' => $campusList));
+        else
+            $this->db->insert('newsCampus', array('id' => $news['item_id'], 'campus' => 1));
 
-
-                if (is_array($userList)) {
+        if (is_array($userList)) {
 			foreach ($userList as $user) {
 				$this->db->insert('newsUser', array('newsID' =>  $news['item_id'], 'userID' => $user));
 			}
 		}
-                else
-                    $this->db->insert('newsCampus', array('id' => $news['item_id'], 'campus' => 1));
+
 	}
 	
 	function delete($newsID) {

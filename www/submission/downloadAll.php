@@ -1,5 +1,4 @@
 <?php
-require_once("../include/include.php");
 require_once('../include/pclzip.lib.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';

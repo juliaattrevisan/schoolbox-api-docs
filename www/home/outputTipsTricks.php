@@ -1,7 +1,7 @@
 <?php
 
 define('TIPS_CID', 1699);
-print "blah";
+
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/categoryNews.php';
 
@@ -17,4 +17,4 @@ if(is_array($news)) {
 else {
     $this->setVar('POS'.$component['position'], '');
 }
-    ?>
+?>
