@@ -1075,6 +1075,12 @@ p.forgot a { font-size: 90%; }
 	color:#ff5a00;
 }
 
+
+.subscribe{position:absolute; right:176px; padding-right:16px; padding-top:4px; height:27px;width:450px;border-right:1px solid #797979; top:0;  z-index:200;}
+.subscribe p{margin:0; margin-right:8px; text-align:right;}
+
+
+
 .lookup {
 	float:left;
 	margin-right:16px;
@@ -1434,6 +1440,7 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 }
 
 .btn.no-marg { margin:0 8px 0 0; }
+.btn.margin-left-right{ margin:0 8px}
 
 .row-holder {
 	width:100%;

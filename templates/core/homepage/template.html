@@ -63,20 +63,34 @@ var cid = {ID};
 </script>
 <!-- END custom_head -->
 
-<div class="float-fix"></div>
-<div style="border:1px solid #f00;width:100%;height:50px;display:block;">
 <!-- BEGIN subscribedModerated -->
-You are being moderated and awaiting authorisation. <a href="/group/joinForm.php?leave={ID}&return=true">Click here to unsubscribe</a>
+<div class="subscribe awaiting-auth">
+
+<a href="/group/joinForm.php?leave={ID}&return=true" class="btn delete margin-left-right"><span></span>Unsubscribe</a>
+<p>You are being moderated and <br />awaiting authorisation. </p>
+<div class="float-fix"></div>
+</div>
 <!-- END subscribedModerated -->
 
 <!-- BEGIN subscribed -->
-You are subscribed to this group. <a href="/group/joinForm.php?leave={ID}&return=true">Click here to unsubscribe</a>
+<div class="subscribe subscribed">
+<a href="/group/joinForm.php?leave={ID}&return=true" class="btn delete margin-left-right"><span></span>Unsubscribe</a>
+<p>You are subscribed to this group. </p>
+<div class="float-fix"></div>
+</div>
 <!-- END subscribed -->
 
 <!-- BEGIN unsubscribed -->
-You are not subscribed yet. <a href="/group/joinForm.php?join={ID}&return=true">Click here to subscribe</a>
-<!-- END unsubscribed -->
+<div class="subscribe not-subscribed">
+<a href="/group/joinForm.php?join={ID}&return=true" class="btn add margin-left-right"><span></span>Subscribe</a>
+<p>You are not subscribed yet. </p>
+<div class="float-fix"></div>
 </div>
+<!-- END unsubscribed -->
+
+
+
+
 <div class="float-fix"></div>
 
 <h1> <span>{HEADING}</span> 
