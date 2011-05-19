@@ -431,7 +431,19 @@ class User extends Model {
 
     }
 
-    function update($user) {
+	/**
+	 * Update an existing user's details
+	 *
+	 * @param <type> $user
+	 */
+    public function update($user) {
+
+		/* Check if the username already exists before updating. If it does
+		 * exist already, prevent existence of duplicate usernames
+		 */
+        if (is_array($this->getByUsername($user['username']))) {
+            error(138);
+		}
 
         $campusArray = $user['campus'];
         $defaultCampus = $user['defaultCampus'];
@@ -448,9 +460,7 @@ class User extends Model {
 
         parent::update($user);
 
-
         if (is_array($campusArray)) {
-
             $this->db->delete('userCampus', 'uid', $user['id']);
 
             foreach ($campusArray as $campus) {
@@ -470,11 +480,19 @@ class User extends Model {
         }
     }
 
-    function create($user) {
-        //sanity checks
-        //check username doesnt already exist
-        if(is_array($this->getByUsername($user['username'])))
-            return 0;
+	/**
+	 * Create a new user record
+	 * 
+	 * @param array $user
+	 * @return <type>
+	 */
+    public function create($user) {
+
+		/* Check if the username already exists
+		 */
+        if (is_array($this->getByUsername($user['username']))) {
+			error(138);
+		}
 
         $campusArray = $user['campus'];
         $defaultCampus = $user['defaultCampus'];

@@ -88,7 +88,7 @@ else if ($_POST['modusername']) {
 
     $id = $userHandler->create($user);
 
-    localRedir('/adminv2/modify-user/'.$id);
+	localRedir('/adminv2/modify-user/'.$id);
 }
 
 /* Ajax Update Groups and their access permissions etc

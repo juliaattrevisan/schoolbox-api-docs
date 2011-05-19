@@ -192,3 +192,8 @@ WHERE username = 'jleckie' OR username = 'jaleckie';
  * new admin system.
  */
 ALTER TABLE `portal`.`luCampus` CHANGE `id` `id` TINYINT(4) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '' FIRST, CHANGE `name` `name` VARCHAR(255) NULL COLLATE utf8_general_ci COMMENT '' AFTER `id`;
+
+/* Used when someone tries to create or update a user with a username that is
+ * already in the db
+ */
+INSERT INTO error (id, message) VALUES (138, 'This username already exists.');
