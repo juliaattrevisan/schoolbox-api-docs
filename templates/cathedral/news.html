@@ -12,20 +12,31 @@
 			$j('div.topic > div#' + el).show();
 		});
 		
-		$j('li.tcs, #tcs').remove();
+		//$j('li.tcs, #tcs').remove();
 
 		
 		var params = window.location.href.split("#");
+		
 		if (params[1] != '' && params[0] != window.location.href) {
 			var parent = $j('#a'+ params[1]).parent();
 			$j(parent).show();
+			
+			if ($j(parent).hasClass('tcs') ) {
+				$j('#category li').not('.tcs').remove();
+			
+			} else {
+				$j('li.tcs, #tcs').remove();
+			}
+				
+			
 			$j('#category a[title='+parent.attr('id')+']').addClass('selected');
 			$j.scrollTo('#a'+ params[1]);
 		
 		} else {
 		
-		$j('#category li:first-child a').addClass('selected');
+			$j('#category li:first-child a').addClass('selected');
 			$j('div.topic > div:first-child').show();
+			$j('li.tcs, #tcs').remove();
 		}
 		
 		$j('.news-item:nth-child(2n)' ).addClass('dark');
@@ -48,7 +59,7 @@
 </ul>
 <div class="topic">
 <!-- BEGIN topic -->
-<div id="{TOPIC_CLEAN}" class="hide">
+<div id="{TOPIC_CLEAN}" class="{TOPIC_CLEAN} hide">
     
   <!-- BEGIN news -->
   <div id="a{NEWS_ID}" class="news-item">
