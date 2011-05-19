@@ -410,7 +410,7 @@ $j(function() {
 			rightBox.next().val($j(this).next().val());
 		});
 
-		$j('.right .text').css('background-color', $j('.left .text').css('background-color'));
+		$j('.right .text, .right .listing').css('background-color', $j('.left .text').css('background-color'));
 		$j('.right .dark').css('background-color', $j('.left .dark').css('background-color'));
 		$j('.right, .right p').css('color', $j('.left').css('color'));
 		$j('.right h2').css('background-color', $j('.left h2').css('background-color'));
@@ -441,8 +441,8 @@ $j(function() {
 		$j('.left p, .left h3, .left .listing p.small').css("color", defaults['left_font']);
 		$j('.left a, .left .listing p.small a').css('color', defaults['left_link']);
 		$j('.left .box a:hover, .left .listing p.small a:hover').css('color', defaults['left_hover']);
-		$j('.left .text').css('background',defaults['left_bg_primary']);
-		$j('.left .text.listing .dark ').css('background',defaults['left_bg_secondary']);
+		$j('.left .text, .left .listing').css('background',defaults['left_bg_primary']);
+		$j('.left .listing .dark ').css('background',defaults['left_bg_secondary']);
 		
 		$j('.right h2').css({
 			"color": defaults['right_head_font'],
@@ -451,8 +451,8 @@ $j(function() {
 		$j('.right p, .right h3, .right .listing p.small').css("color", defaults['right_font']);
 		$j('.right a, .right .listing p.small a').css('color', defaults['right_link']);
 		$j('.right .box a:hover, .right .listing p.small a:hover').css('color', defaults['right_hover']);
-		$j('.right .text').css('background',defaults['right_bg_primary']);
-		$j('.right .text.listing .dark ').css('background',defaults['right_bg_secondary']);
+		$j('.right .text, .right .listing').css('background',defaults['right_bg_primary']);
+		$j('.right .listing .dark ').css('background',defaults['right_bg_secondary']);
 		
 		pickers = defaults;
 		

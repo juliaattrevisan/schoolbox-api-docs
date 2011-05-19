@@ -63,13 +63,9 @@
 
   </script>
 	<div class="text">
-		<form action="/homepage/textBoxForm.php" method="post" id="textBoxForm" class="standardForm">
-			<p>
-				<input type="text"  style="width: 99%;" name="textBoxHeading" value="{TEXTBOX_HEADING}" />
-			</p>
-			<p>
+		<form action="/homepage/textBoxForm.php" method="post" id="textBoxForm" >
+				<input type="text"  style="width: 100%" name="textBoxHeading" value="{TEXTBOX_HEADING}" /><br /><br />
 				<textarea rows="20" style="width: 100%;" name="textBoxBody" id="textBoxBody">{TEXTBOX_BODY}</textarea>
-			</p>
 			<input type="hidden" name="categoryID" value="{ID}" />
 			<input type="hidden" name="textBoxID" value="{TEXTBOX_ID}" />
 			<input type="hidden" name="componentID" value="{COMPONENT_HOMEPAGE_ID}" />
