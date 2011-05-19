@@ -31,6 +31,62 @@ class Group extends Model {
         $this->_service = $service;
     }
 
+	/**
+	 * Determine whether someone can subscribe to a group
+	 *
+	 * @param <type> $userId
+	 * @param <type> $categoryId
+	 * @param <type> $type
+	 * @return <type>
+	 */
+	public function isSubscribed($userId, $categoryId, $type = false) {
+		$query = "SELECT category.id, category.name, userGroups.type, userAccess.uid
+				  FROM category
+				  LEFT JOIN userGroups ON category.id = userGroups.cid
+				  LEFT JOIN userAccess ON userGroups.cid = userAccess.sid
+				  WHERE cid = '{$categoryId}'
+				  AND service = '" . HOMEPAGE_SERVICE . "'
+				  AND uid = '{$userId}'
+				  AND userAccess.type <= '{$type}'
+				  AND userGroups.type >= '" . GROUP_TYPE_MODERATED. "'";
+
+		$result = $this->db->getAll($query);
+
+		/* If there are results, they are already subscribed
+		 */
+		if ($result && count($result)) {
+			return true;
+		}
+
+		return false;
+	}
+	
+	/**
+	 * Determine whether this group can be subscribed to
+	 * 
+	 * @param <type> $categoryId
+	 * @return <type> 
+	 */
+	public function canSubscribe($categoryId) {
+		$query = "SELECT category.id, category.name, userGroups.type
+				  FROM category
+				  LEFT JOIN userGroups ON category.id = userGroups.cid
+				  LEFT JOIN userAccess ON userGroups.cid = userAccess.sid
+				  WHERE cid = '{$categoryId}'
+				  AND service = '" . HOMEPAGE_SERVICE . "'
+				  AND userGroups.type >= '" . GROUP_TYPE_MODERATED. "'";
+
+		$result = $this->db->getAll($query);
+
+		/* If there are results, they are already subscribed
+		 */
+		if ($result && count($result)) {
+			return true;
+		}
+
+		return false;
+	}
+
     function getAllByType($type) {
         $query = "SELECT name, id, userAccess.type accessType
 				  FROM (category, userGroups )

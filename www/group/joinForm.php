@@ -17,5 +17,13 @@ elseif ($_GET['leave']) {
 	$groupHandler->deleteUser($_GET['leave'], $_SESSION['id']);
 }
 
-localRedir('/group/join');
+/* If the Return parameter is set, go back to the referring page.
+ * Otherwise redirect to the generic group/join page
+ */
+if ($_GET['return']) {
+	$page->backToTheFuture(1);
+}
+else {
+	localRedir('/group/join');
+}
 ?>
