@@ -38,7 +38,17 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 
 		for($x=0; is_array($studentList[$x]);$x++){
 			$user = $userHandler->getBySynergy($studentList[$x]['synergy_id']);
-			$studentList[$x]['uid'] = $user['uid'];
+
+			/* If the Synergetic user wasn't found in the portal, just remove
+			 * them from the list. Otherwise the future queries about submitted
+			 * work will break, because there are no uids.
+			 */
+			if (!$user) {
+				unset($studentList[$x]);
+			}
+			else {
+				$studentList[$x]['uid'] = $user['uid'];
+			}
 		}
     }
     else {

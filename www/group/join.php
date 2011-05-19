@@ -34,7 +34,7 @@ if (is_array($moderatedList)) {
 	foreach ($moderatedList as $moderated) {
 		$output = array('GROUP_ID'		=> $moderated['id'],
 						'GROUP_NAME'	=> scrubText($moderated['name']),
-                        'GROUP_CHECKED' => is_numeric($free['accessType']) ? 'checked=\'checked\'' : '',
+                        'GROUP_CHECKED' => is_numeric($moderated['accessType']) ? 'checked=\'checked\'' : '',
 						);
 		$this->setVar($output);
 		

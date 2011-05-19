@@ -6,7 +6,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 $page = new SitePage;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
-
 if (is_numeric($_GET['join'])) {
 	$group = $groupHandler->getByID($_GET['join']);
 	if ($group['type'] == GROUP_TYPE_FREE)
