@@ -230,14 +230,16 @@ class Bulk {
 
 	/**
 	 * Adds categories via csv
+	 *
+	 * CSV Fields:
+	 * 0.	parent
+	 * 1.	title
+	 * 2-n. codes
 	 */
 	public function addCategories($file) {
 		$categoryHandler = new Category();
 
-		$groups = array(
-			1 => 2,
-			2 => 2
-		);
+		$groups = $_POST['groupPerm'];
 
 		if (is_file($file)) {
 			$handle = fopen($file, 'r');
@@ -270,7 +272,7 @@ class Bulk {
 						if ($categoryHandler->getByCode($category[$i])) {
 							$output[] = array(
 								'category' => $category[$i],
-								'status' => 'OK',
+								'status' => 'Skipped',
 								'error' => "Subject code already exists ({$category[$i]})",
 							);
 
@@ -284,17 +286,23 @@ class Bulk {
 						continue;
 					}
 
-					$code = implode(',', $code);
-
 					$newCat = array(
 						'name'		=> $category[1],
 						'parent'	=> $category[0],
 						'template'	=> 1,
 						'group'		=> $groups,
-						'code'		=> $code,
+						'code'		=> implode(',', $code),
 					);
 
-					$categoryHandler->create($newCat);
+					/* Successfully created
+					 */
+					if ($categoryHandler->create($newCat)) {
+						$output[] = array(
+							'category' => $category[1],
+							'status' => 'Added',
+							'error' => 'OK',
+						);
+					}
 				}
 			}
 		}
