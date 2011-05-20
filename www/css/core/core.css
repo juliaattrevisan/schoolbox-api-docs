@@ -1186,6 +1186,8 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	border-radius: 16px;
 	margin:0 8px;
 }
+.admin-contents h3 em {display:none;}
+
 
 .admin-contents h3 span:hover { cursor:help; }
 

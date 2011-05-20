@@ -16,14 +16,27 @@ $j(function() {
 		name: 'green'
 	}
 	
-	$j('.one-third:first h3 span').qtip({
-		content: 'Controls if files of this type can be uploaded'});
+	$j('h3 span').each(function() {
+		activeContent = $j(this).siblings('em').html();
+		$j(this).qtip({
+			content: activeContent,
+			api: {
+					// Retrieve the content when tooltip is first rendered
+					 onRender: function()
+					 {
+						var self = this;
+					 }
+				 }
+		});
+	});
+	
+	$j('#form').validate({
+	  errorPlacement: function(error, element) {
+     error.insertAfter(element.parent().parent().children(':last-child').children('span'));
+   }	
 		
-	$j('.one-third:nth-child(2) h3 span').qtip({
-		content: 'A simple name for the type of file'});
-		
-	$j('.one-third:nth-child(3) h3 span').qtip({
-		content: 'The mime type for a file can be found by searching google'});
+	});
+	
 	
 })
 
@@ -48,19 +61,13 @@ $j(function() {
 	<form action="/adminv2/bulkAddCategories" method="post" enctype="multipart/form-data" name="form" id="form" class="standardForm">
 		<div class="level">
 			<div class="one-third">
-				<h3>Bulk<span>?</span></h3>
-				<p>
-					The File that contains the Category Infomation must be a Comma Seperated Text File
-				</p>
-				<input name="bulkadd" type="file" />
+				<h3>Bulk<span>?</span><em>The File that contains the Category Infomation must be a Comma Seperated Text File</em></h3>
+
+				<label>	<input name="bulkadd" type="file" /></label>
 				<div class="float-fix"></div>
 			</div>
-			<div class="one-third last">
-				<h3>Groups<span>?</span></h3>
-				<p>
-					Select the Group permissions
-				</p>
-
+			<div class="two-thirds last">
+				<h3>Groups<span>?</span><em>Select the Group permissions</em></h3>
 				<h4>Group Permissions</h4>
 				<table>
 					<thead>
@@ -69,15 +76,17 @@ $j(function() {
 							<th>None</th>
 							<th>Read</th>
 							<th>Write</th>
+							<td style="border:0;">&nbsp;</td>
 						</tr>
 					</thead>
 					<tbody>
 						<!-- BEGIN group -->
 						<tr>
 							<td>{GROUP_NAME}</td>
-							<td><input type="radio" class="no_permission" name="groupPerm[{GROUP_ID}]" value="0" /></td>
+							<td><input type="radio" class="no_permission required" name="groupPerm[{GROUP_ID}]" value="0" /></td>
 							<td><input type="radio" name="groupPerm[{GROUP_ID}]" value="1" /></td>
-							<td><input type="radio" name="groupPerm[{GROUP_ID}]" value="2" /></td>
+							<td><input type="radio" name="groupPerm[{GROUP_ID}]" value="2"  /></td>
+							<td><span></span></td>
 						</tr>
 						<!-- END group -->
 					</tbody>
