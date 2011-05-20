@@ -441,8 +441,9 @@ class User extends Model {
 		/* Check if the username already exists before updating. If it does
 		 * exist already, prevent existence of duplicate usernames
 		 */
-        if (is_array($this->getByUsername($user['username']))) {
-            error(138);
+        if ($dupeUser = $this->getByUsername($user['username'])) {
+            if($dupeUser['uid'] != $user['id'])
+                error(138);
 		}
 
         $campusArray = $user['campus'];

@@ -23,4 +23,28 @@
 		<a href="/cms/category/{ID}" class="btn modify"><span></span>Modify Folder</a></p><div class="float-fix"></div>
 		<!-- END stats_data -->
 	</p>
+    <!-- BEGIN subscribedModerated -->
+    <div class="subscribe awaiting-auth">
+
+    <a href="/group/joinForm.php?leave={ID}&return=true" class="btn delete margin-left-right"><span></span>Unsubscribe</a>
+    <p>You are being moderated and <br />awaiting authorisation. </p>
+    <div class="float-fix"></div>
+    </div>
+    <!-- END subscribedModerated -->
+
+    <!-- BEGIN subscribed -->
+    <div class="subscribe subscribed">
+    <a href="/group/joinForm.php?leave={ID}&return=true" class="btn delete margin-left-right"><span></span>Unsubscribe</a>
+    <p>You are subscribed to this group. </p>
+    <div class="float-fix"></div>
+    </div>
+    <!-- END subscribed -->
+
+    <!-- BEGIN unsubscribed -->
+    <div class="subscribe not-subscribed">
+    <a href="/group/joinForm.php?join={ID}&return=true" class="btn add margin-left-right"><span></span>Subscribe</a>
+    <p>You are not subscribed yet. </p>
+    <div class="float-fix"></div>
+    </div>
+    <!-- END unsubscribed -->
 </div>

@@ -183,6 +183,10 @@ class ExternalTimetable extends MSSQL{
 	function getDayTimetable($synergy_id, $userID, $campus, $daynumber)
 	{
 		$timetabledef = $this->getTimetableDefinition($campus);
+
+        if(!is_array($timetabledef)) {
+           return false;
+        }
 	
 		if($this->groupHandler->isStudent($userID))
 		{
@@ -268,6 +272,10 @@ class ExternalTimetable extends MSSQL{
 	function getFullTimetable($synergy_id, $userID, $campus)
 	{	
 		$timetabledef = $this->getTimetableDefinition($campus);
+
+        if(!is_array($timetabledef)) {
+           return false;
+        }
 
 		if( $this->groupHandler->isStudent($userID))
 		{
@@ -359,6 +367,7 @@ class ExternalTimetable extends MSSQL{
 		}
 		usort($timetable, array($this, 'sortTimetable'));
 		return $timetable;
+
 	}
 
 	function sortTimetable($a, $b) {
