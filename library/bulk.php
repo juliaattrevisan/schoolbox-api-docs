@@ -1,10 +1,8 @@
 <?php
-/*
+require_once(dirname(__FILE__) . '/../library/user.php');
+require_once(dirname(__FILE__) . '/../library/category.php');
 
-*/
-require_once dirname(__FILE__) . '/../library/user.php';
-
-class BulkUser {
+class Bulk {
 
 	/**
 	 * Parses and adds data from csv file. Returns a list of users and their
@@ -27,7 +25,7 @@ class BulkUser {
 	 *
 	 * @param <type> $file
 	 */
-	public function add($file) {
+	public function addUsers($file) {
 		$userHandler = new User();
 
 		if (is_file($file)) {
@@ -160,7 +158,7 @@ class BulkUser {
 	 *
 	 * @param <type> $file
 	 */
-	public function remove($file) {
+	public function removeUsers($file) {
 		$userHandler = new User();
 
 		if (is_file($file)) {
@@ -223,6 +221,80 @@ class BulkUser {
 							);
 						}
 					}
+				}
+			}
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Adds categories via csv
+	 */
+	public function addCategories($file) {
+		$categoryHandler = new Category();
+
+		$groups = array(
+			1 => 2,
+			2 => 2
+		);
+
+		if (is_file($file)) {
+			$handle = fopen($file, 'r');
+
+			/* List of outcomes
+			 */
+			$output = array();
+
+			while (($category = fgetcsv($handle, 1000, ",")) !== FALSE) {
+				if (($category[0] != '') && ($category[1] != '')) {
+
+					/* Check parent exists
+					 */
+					if ($categoryHandler->getByID($category[0]) == FALSE) {
+						$output[] = array(
+							'category' => $category[1],
+							'status' => 'Not Added',
+							'error' => "Could not find parent folder {$category[0]}",
+						);
+
+						continue;
+					}
+
+					/* Check if subject code already exists
+					 */
+					$codeExists = false;
+					$code = array();
+
+					for ($i=2; $category[$i]; $i++) {
+						if ($categoryHandler->getByCode($category[$i])) {
+							$output[] = array(
+								'category' => $category[$i],
+								'status' => 'OK',
+								'error' => "Subject code already exists ({$category[$i]})",
+							);
+
+							$codeExists = true;
+						}
+
+						$code[] = $category[$i];
+					}
+
+					if ($codeExists) {
+						continue;
+					}
+
+					$code = implode(',', $code);
+
+					$newCat = array(
+						'name'		=> $category[1],
+						'parent'	=> $category[0],
+						'template'	=> 1,
+						'group'		=> $groups,
+						'code'		=> $code,
+					);
+
+					$categoryHandler->create($newCat);
 				}
 			}
 		}
