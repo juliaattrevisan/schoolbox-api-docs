@@ -832,7 +832,7 @@ input.timeField { width: 30px; }
 	background-color: #fbfbfb;
 	background-image: -moz-linear-gradient(top, #fbfbfb, #f7f7f7);
 	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fbfbfb), color-stop(1, #f7f7f7));
- filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7');
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7');
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
@@ -856,10 +856,10 @@ input.timeField { width: 30px; }
 	color:#000000 !important;
 	background-color: #d6f0f6;
 	background-image:
- -moz-linear-gradient(top, #e4f5f9, #c9ebf3);
+	-moz-linear-gradient(top, #e4f5f9, #c9ebf3);
 	background-image: 
- -webkit-gradient(linear, left top, left bottom, color-stop(0, #e4f5f9), color-stop(1, #c9ebf3));
- filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f5f9', EndColorStr='#c9ebf3');
+	-webkit-gradient(linear, left top, left bottom, color-stop(0, #e4f5f9), color-stop(1, #c9ebf3));
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f5f9', EndColorStr='#c9ebf3');
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f5f9', EndColorStr='#c9ebf3')";
 }
 
@@ -994,7 +994,7 @@ filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff4ee', End
 /*submit button*/
 
 .submit-btn-plain {
-	line-height:14px;
+	line-height:normal;
 	float:left;
 	padding:4px 16px 20px 16px;
 	text-align:center;
