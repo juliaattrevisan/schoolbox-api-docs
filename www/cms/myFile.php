@@ -1,6 +1,6 @@
 <?php
 
-if (WEBDAV_on) {
+if (Cfg::get('webdav_enable')) {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 	$fileHandler = PortfolioWebDAV::factory();
 	$folderHandler = $fileHandler;
@@ -36,7 +36,7 @@ if(is_numeric($this->arg[0])) {
 					);
 	$this->setVar($output);
 	
-	if (WEBDAV_on) {
+	if (Cfg::get('webdav_enable')) {
 		$this->setBlock(TEMPLATE_content, 'location', 'location_block');
 		$this->setVar('location_block', '');
 		
@@ -81,7 +81,7 @@ elseif($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
 	$this->setVar($output);
 	
-	if (WEBDAV_on) {
+	if (Cfg::get('webdav_enable')) {
 		$this->setBlock(TEMPLATE_content, 'desc', 'desc_block');
 		$this->setBlock(TEMPLATE_content, 'location', 'location_block');
 		$this->setVar('desc_block', '');

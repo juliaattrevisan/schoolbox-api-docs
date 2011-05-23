@@ -20,7 +20,7 @@ if(is_numeric($_GET['id']))
 	
 	if(isset($_GET['myFile'])) {
 		
-		if (WEBDAV_on) {
+		if (Cfg::get('webdav_enable')) {
 			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 			$fileHandler = PortfolioWebDAV::factory();
 			$filename = $fileHandler->getFile($_GET['id']);

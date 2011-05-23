@@ -6,7 +6,7 @@ $page = new SitePage;
 
 if (is_numeric($_POST['relationID'])) {
 
-	if (WEBDAV_on) {
+	if (Cfg::get('webdav_enable')) {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 		$folderHandler = PortfolioWebDAV::factory();
 	} else {
@@ -33,7 +33,7 @@ elseif (is_numeric($_POST['categoryID'])) {
 
 	
 
-	if (WEBDAV_on) {
+	if (Cfg::get('webdav_enable')) {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 		$fileHandler = PortfolioWebDAV::factory();
 	} else {
@@ -59,7 +59,7 @@ elseif (is_numeric($_POST['categoryID'])) {
 							  'category'	=> $file['category'],
 							  'modified'	=> outputDate(Cfg::get('date_short'), $file['submitted']),
 							  'size'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
-							  'icon'		=> !empty($file['iconFile']) && WEBDAV_on ? $allowedFiles->getClass($file["iconFile"]) : "textfile",
+							  'icon'		=> !empty($file['iconFile']) && Cfg::get('webdav_enable') ? $allowedFiles->getClass($file["iconFile"]) : "textfile",
 							  );
 		}
 	}

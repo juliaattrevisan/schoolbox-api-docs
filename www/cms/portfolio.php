@@ -2,7 +2,7 @@
 
 ini_set('display_errors', 1);
 
-if (WEBDAV_on) {
+if (Cfg::get('webdav_enable')) {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 } else {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
@@ -35,7 +35,7 @@ if (isset($this->arg[0])) {
 	
 	
 
-if (WEBDAV_on) {
+if (Cfg::get('webdav_enable')) {
 	$folderHandler = PortfolioWebDAV::factory();
 	$fileHandler = $folderHandler;
 	

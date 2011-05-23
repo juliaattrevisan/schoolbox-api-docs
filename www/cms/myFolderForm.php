@@ -4,7 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 $page = new SitePage;
 
 
-if (WEBDAV_on) {
+if (Cfg::get('webdav_enable')) {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 	$folderHandler = PortfolioWebDAV::factory();
 	

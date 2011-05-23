@@ -6,7 +6,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio.php';
 
-if (WEBDAV_on) {
+if (Cfg::get('webdav_enable')) {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 	$fileHandler = PortfolioWebDAV::factory();
 } else {

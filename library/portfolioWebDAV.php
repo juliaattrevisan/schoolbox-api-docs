@@ -274,7 +274,7 @@ class PortfolioWebDAV {
                     }
                     return new self($pathList , "wgs/" . $_SESSION['username'], $_SESSION['password']);
                 }
-                 else if(Cfg::get('site_location') == 'jpc') {
+                else if(Cfg::get('site_location') == 'jpc') {
                    if ($groupHandler->isStaff()) {
                             $pathList = array( 'http://kazon/Staff/'.$_SESSION['username'].'/',
                                                                'http://kazon/doclib/',
@@ -284,7 +284,20 @@ class PortfolioWebDAV {
                                                               );
                     }
                     return new self($pathList , "jpc/".$_SESSION['username'], $_SESSION['password']);
-                 }
+                }
+                else if(Cfg::get('site_location') == 'cathedral') {
+                   if ($groupHandler->isStaff()) {
+                            $pathList = array( 'http://senior-server.school.cathedral.qld.edu.au/staffhome/'.$_SESSION['username'].'/',
+                                                               'http://senior-server/Xdrive/',
+                                                              );
+                    } else {
+                            $pathList = array( 'http://senior-server.school.cathedral.qld.edu.au/studenthome/',
+                                                              );
+                    }
+                    print_r($pathList);
+                    print $_SESSION['username'] . $_SESSION['password'];
+                    return new self($pathList , "cathedral/".$_SESSION['username'], $_SESSION['password']);
+                }
 		
 		
 	}
