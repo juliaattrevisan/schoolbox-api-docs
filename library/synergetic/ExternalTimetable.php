@@ -96,9 +96,9 @@ class ExternalTimetable extends MSSQL{
 
 			*/
 			if((date('W', $date) % 2) == 0)
-				return date('w',$date);
-			else
 				return date('w',$date) + 5;
+			else
+				return date('w',$date);
 		}
 		else	//unknown day number 
 			return 0;
