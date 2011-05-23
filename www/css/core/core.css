@@ -870,7 +870,7 @@ input.timeField { width: 30px; }
 	background-color: #fff4ee;
 	background-image: -moz-linear-gradient(top, #fff4ee, #ffe9dd);
 	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fff4ee), color-stop(1, #ffe9dd));
-filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff4ee', EndColorStr='#ffe9dd');
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff4ee', EndColorStr='#ffe9dd');
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff4ee', EndColorStr='#ffe9dd')";
 	cursor:pointer;
 }
