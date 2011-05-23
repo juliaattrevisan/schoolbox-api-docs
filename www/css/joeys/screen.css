@@ -410,3 +410,7 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 #category li { padding:0; }
 
 #category li a:hover { background:#bebebe; }
+
+.cal-bubble .middle{border-color:#072F63}
+.cal-bubble .bottom{border-right-color:#072F63}
+.cal-bubble .middle .close{background:#072F63; color:#fff;}

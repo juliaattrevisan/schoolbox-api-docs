@@ -257,3 +257,7 @@ td.cal-right .link-case .filter-drop .filter-list {
 #footer ul li,#footer ul li a{
 	color: #a6c3de;	
 }
+
+.cal-bubble .middle{border-color:#0053A0}
+.cal-bubble .bottom{border-right-color:#0053A0}
+.cal-bubble .middle .close{background:#0053A0; color:#fff;}

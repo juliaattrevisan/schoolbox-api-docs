@@ -375,6 +375,9 @@ p.important {
 	color: #f00;
 }
 
+.cal-bubble .middle{border-color:#245398}
+.cal-bubble .bottom{border-right-color:#245398}
+.cal-bubble .middle .close{background:#245398; color:#fff;}
 /*************************
 
 Library

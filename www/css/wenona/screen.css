@@ -399,6 +399,11 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 
 .calTableSelected { background:#EDEDED; }
 
+
+.cal-bubble .middle{border-color:#036}
+.cal-bubble .bottom{border-right-color:#036}
+.cal-bubble .middle .close{background:#036; color:#fff;}
+
 /*****************/
 
 .submit-btn-plain {

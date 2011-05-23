@@ -308,3 +308,7 @@ p.interact a {
 #footer{margin-left:182px;}
 
 #timetable td {border-right:1px solid #ccc;}
+
+.cal-bubble .middle{border-color:#003E7E}
+.cal-bubble .bottom{border-right-color:#003E7E}
+.cal-bubble .middle .close{background:#003E7E; color:#fff;}

@@ -162,3 +162,7 @@ td.cal-right .link-case .filter-drop .filter-list {
     padding: 7px 16px;
     width: auto;
 }
+
+.cal-bubble .middle{border-color:#BCBDD6}
+.cal-bubble .bottom{border-right-color:#BCBDD6}
+.cal-bubble .middle .close{background:#BCBDD6; color:#fff;}

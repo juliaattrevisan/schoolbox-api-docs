@@ -97,6 +97,12 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 }
 #month-view h3, #week-view h3{color:#000;}
 
+.cal-bubble .middle{border-color:#D4E1ED}
+.cal-bubble .bottom{border-right-color:#D4E1ED}
+.cal-bubble .middle .close{background:#D4E1ED; color:#004B93;}
+
+
+
 #search, #search-field{background:#d4e1ed;}
 #infoPanel {margin-top:23px;}
 #infoPanel li{color:#d4e1ed;}

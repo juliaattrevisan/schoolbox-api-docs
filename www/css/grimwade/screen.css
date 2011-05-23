@@ -332,3 +332,7 @@ td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box {
 }
 .calTableSelected{background:#eee;}
 .calTableCurrent{background:#e9e9e9;}
+
+.cal-bubble .middle{border-color:#E0EEEF}
+.cal-bubble .bottom{border-right-color:#E0EEEF}
+.cal-bubble .middle .close{background:#E0EEEF; color:#336F7D;}

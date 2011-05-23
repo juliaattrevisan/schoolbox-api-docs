@@ -291,7 +291,7 @@ $j(function() {
 
 		switch (current.attr('ID')) {
 			case 'left_bg_primary':
-				return $j('.left .text').css('background-color', color);
+				return $j('.left .text, .left .listing').css('background-color', color);
 			break;
 			case 'left_bg_secondary':
 				return $j('.left .dark').css('background-color', color);
@@ -312,7 +312,7 @@ $j(function() {
 				return $j('.right a:hover').css('color', color);
 			break;	
 			case 'right_bg_primary':
-				return $j('.right .text').css('background-color', color);
+				return $j('.right .text, .right .listing').css('background-color', color);
 			break;
 			case 'right_bg_secondary':
 				return $j('.right .dark').css('background-color', color);

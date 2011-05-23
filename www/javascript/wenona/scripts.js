@@ -1,36 +1,15 @@
 $j(function() {
+	
 	$j('ul.js_happening li').click(function(){
-
-		var dynamicHTML = $j(this).children('.hidden-fields').html();
-
-		$j('.cal-bubble .middle').children('.js-data').html(dynamicHTML);
-		var position = $j(this).offset();
-		$j('.cal-bubble').show();
-		var annoyingHeight = ($j('.cal-bubble .middle').height() + ($j('.cal-bubble .top').height()) + ($j('.cal-bubble .bottom').height())) 			
-		$j('.cal-bubble').css("left", (position.left - 270));
-		$j('.cal-bubble').css("top", (position.top - annoyingHeight- 40));	
-		
-		if (($j('.cal-bubble').css("left")) < '450px') {
-			$j('.cal-bubble').css("left", '160px');
-		}
-
+		calendarPos($j(this),355,115);
 	});
 	
 	$j('.text ul.js_happening li').click(function(){
-			var dynamicHTML = $j(this).children('.hidden-fields').html();
-			$j('.cal-bubble .middle').children('.js-data').html(dynamicHTML);
-			var position = $j(this).offset();
-			$j('.cal-bubble').show();
-			var annoyingHeight = ($j('.cal-bubble .middle').height() + ($j('.cal-bubble .top').height()) + ($j('.cal-bubble .bottom').height())) 			
-			$j('.cal-bubble').css("left", (position.left - 550));
-			$j('.cal-bubble').css("top", (position.top - annoyingHeight - 160));	
-			
-			if (($j('.cal-bubble').css("left")) < '450px') {
-				$j('.cal-bubble').css("left", '160px');
-			}
-		});	
+		calendarPos($j(this),250,180);	
+	});
 		
 	$j('#nav li.parent > a span').each(function() {
 		$j(this).append('<strong>&rsaquo;</strong>');
 	});
+	
 });
