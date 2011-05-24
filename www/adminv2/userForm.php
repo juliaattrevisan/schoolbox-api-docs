@@ -10,9 +10,11 @@ $userHandler = new User;
 $groupHandler = new Group;
 $categoryHandler = new Category;
 
-/* Superusers only */
-if(!$groupHandler->isSuperuser())
+/* Superusers only 
+ */
+if (!$groupHandler->isSuperuser()) {
     error(19);
+}
 
 /* Add user to group
  */
@@ -64,7 +66,9 @@ else if(is_numeric($_POST['userID']) && $_POST['modusername'] ) {
         $user['email_pass'] = $_POST['modpassword'];
     }
 
-    $userHandler->update($user);
+    if ($userHandler->update($user) === false) {
+		error(138);
+	}
 
     localRedir('/adminv2/modify-user/'.$user['id']);
 }
@@ -90,6 +94,10 @@ else if ($_POST['modusername']) {
     );
 
     $id = $userHandler->create($user);
+
+	if (!$id) {
+		error(138);
+	}
 
 	localRedir('/adminv2/modify-user/'.$id);
 }

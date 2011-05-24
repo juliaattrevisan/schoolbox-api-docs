@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/../library/user.php');
 require_once(dirname(__FILE__) . '/../library/category.php');
+require_once(dirname(__FILE__) . '/../library/calendar.php');
 
 class Bulk {
 
@@ -28,15 +29,16 @@ class Bulk {
 	public function addUsers($file) {
 		$userHandler = new User();
 
-		if (is_file($file)) {
-			
-			/* List of outcomes for each user in the csv
-			 */
-			$output = array();
+		/* List of outcomes for each user in the csv
+		 */
+		$output = array();
 
-			/* Open and parse csv
+		if (is_file($file)) {
+
+			/* Process rows
 			 */
-			$handle = fopen($file, "r");
+			$handle = fopen($file, 'r');
+			$headerRow = fgetcsv($handle, 1000, ",");
 
 			while (($user = fgetcsv($handle, 1000, ",")) !== FALSE) {
                 $user = array_map('trim', $user);
@@ -115,7 +117,7 @@ class Bulk {
 
 						if (is_array($updateUser)) {
 							$newUser['id'] = $updateUser['id'];
-							
+
 							$userHandler->update($newUser);
 
 							$output[] = array(
@@ -161,13 +163,16 @@ class Bulk {
 	public function removeUsers($file) {
 		$userHandler = new User();
 
+		/* List of outcomes for each user in the csv
+		 */
+		$output = array();
+
 		if (is_file($file)) {
 
-			/* List of outcomes for each user in the csv
+			/* Process rows
 			 */
-			$output = array();
-
-			$handle = fopen($file, "r");
+			$handle = fopen($file, 'r');
+			$headerRow = fgetcsv($handle, 1000, ",");
 
 			while (($thisRow = fgetcsv($handle, 1000, ",")) !== FALSE) {
 				if ($thisRow[0] != "") {
@@ -239,14 +244,17 @@ class Bulk {
 	public function addCategories($file) {
 		$categoryHandler = new Category();
 
-		$groups = $_POST['groupPerm'];
+		/* List of outcomes
+		 */
+		$output = array();
 
 		if (is_file($file)) {
-			$handle = fopen($file, 'r');
+			$groups = array_map('scrubTEXT', $_POST['groupPerm']);
 
-			/* List of outcomes
+			/* Process rows
 			 */
-			$output = array();
+			$handle = fopen($file, 'r');
+			$headerRow = fgetcsv($handle, 1000, ",");
 
 			while (($category = fgetcsv($handle, 1000, ",")) !== FALSE) {
 				if (($category[0] != '') && ($category[1] != '')) {
@@ -302,6 +310,230 @@ class Bulk {
 							'status' => 'Added',
 							'error' => 'OK',
 						);
+					}
+				}
+			}
+		}
+
+		return $output;
+	}
+
+
+	public function addCalendar($file) {
+		if (stristr(file_get_contents($file, NULL, NULL, 0, 20), 'BEGIN:VCALENDAR')) {
+			return $this->addVCalCalendar($file);
+		}
+		else {
+			return $this->addCSVCalendar($file);
+		}
+	}
+
+	/**
+	 * Imports events from csv
+	 *
+	 * @param <type> $file
+	 * @return array
+	 */
+	public function addCSVCalendar($file) {
+		$calendarHandler = new Calendar();
+
+		/* List of outcomes
+		 */
+		$output = array();
+
+		if (is_file($file)) {
+
+			/* Set defaults for id and campus if they are not submitted
+			 */
+			if ($_POST['userid'] == '') {
+				$uid = scrubTEXT($_SESSION['id']);
+			}
+			else {
+				$uid = scrubTEXT($_POST['userid']);
+			}
+
+			/* Set up specified campus list
+			 * Set up specified group list
+			 */
+			$groupList = array();
+			$campusList = array();
+
+			if (is_array($_POST['userGroup'])) {
+				$groupList = array_map('scrubTEXT', $_POST['userGroup']);
+			}
+
+			if (is_array($_POST['campusList'])) {
+				$campusList = array_map('scrubTEXT', $_POST['campusList']);
+			}
+
+			/* Process rows
+			 */
+			$handle = fopen($file, 'r');
+			$headerRow = fgetcsv($handle, 1000, ",");
+
+			while (($thisRow = fgetcsv($handle, 1000, ",")) !== FALSE) {
+
+				/* Skip empty comments and no dates
+				 *
+				 * If access is 3, then the sid corresponds to campus id's
+				 * If access is 2, then the sid corresponds to group id's
+				 */
+				if ((trim($thisRow[0]) != '') && (trim($thisRow[3]) != '')) {
+					$event = array(
+						'owner'			=> $uid,
+						'access'		=> 3,
+						'date'			=> $thisRow[0],
+						'startTime'		=> $thisRow[1],
+						'endTime'		=> $thisRow[2],
+						'note'			=> $thisRow[3],
+						'detail'		=> $thisRow[4],
+						'priority'		=> $thisRow[5],
+						'type'			=> $thisRow[6],
+						'campusList'	=> $campusList,
+						'groupList'		=> $groupList,
+					);
+
+					if ($calendarHandler->create($event)) {
+						$output[] = array(
+							'name' => $thisRow[3],
+							'status' => 'Added',
+							'error' => 'OK',
+						);
+					}
+					else {
+						$output[] = array(
+							'name' => $thisRow[3],
+							'status' => 'Not Added',
+							'error' => 'Could not create event',
+						);
+					}
+				}
+				else {
+					$output[] = array(
+						'name' => $thisRow[3],
+						'status' => 'Not Added',
+						'error' => 'Missing date and/or name',
+					);
+				}
+			}
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Imports from a vcal file, exported from outlook
+	 *
+	 * @param <type> $file
+	 */
+	public function addVCalCalendar($file) {
+		require_once(dirname(__FILE__) .'/iCalcreator.class.php');
+
+		$calendarHandler = new Calendar();
+		$v = new vcalendar();
+
+		/* List of outcomes
+		 */
+		$output = array();
+
+		if (is_file($file)) {
+			if ($_POST['userid'] == '') {
+				$uid = scrubTEXT($_SESSION['id']);
+			}
+			else {
+				$uid = $_POST['userid'];
+			}
+
+			/* Set up specified campus list
+			 * Set up specified group list
+			 */
+			$groupList = array();
+			$campusList = array();
+
+			if (is_array($_POST['userGroup'])) {
+				$groupList = array_map('scrubTEXT', $_POST['userGroup']);
+			}
+
+			if (is_array($_POST['campusList'])) {
+				$campusList = array_map('scrubTEXT', $_POST['campusList']);
+			}
+
+			/* Process vcal events
+			 */
+			$v->setConfig('unique_id', Cfg::get('mail_address'));
+			$v->setProperty('calscale', 'GREGORIAN');
+			$v->setProperty('method', 'PUBLISH');
+			$v->setProperty('X-WR-TIMEZONE', 'Australia/Melbourne');
+
+			date_default_timezone_set('Australia/Melbourne');
+
+			/* Start parse of local file
+			 */
+			$v->parse($file);
+
+			$eventArray = $v->selectComponents(date('Y'), 01, 01, date('Y')+1, 12, 31);
+
+			foreach($eventArray as $year => $yearArray) {
+				foreach($yearArray as $month => $monthArray) {
+					foreach($monthArray as $day => $dailyEventsArray) {
+						foreach($dailyEventsArray as $vevent) {
+							$currddate = $vevent->getProperty('x-current-dtstart');
+
+							/* if member of a recurrence set,
+							 * returns array( 'x-current-dtstart', <DATE>)
+							 * <DATE> = (string) date("Y-m-d [H:i:s][timezone/UTC offset]")
+							 */
+							$dtstart = $vevent->getProperty('dtstart');
+							$duration = $vevent->getProperty('duration');
+							$dtend = $vevent->getProperty('dtend');
+
+							/* dtstart required, one occurence, (orig. start date)
+							 */
+							$summary = $vevent->getProperty('summary');
+							$description = $vevent->getProperty('description');
+							$location = $vevent->getProperty('location');
+
+							/* Start times
+							 */
+							$hour = $dtstart['hour'] ? $dtstart['hour'] : '00';
+							$min = $dtstart['min'] ? $dtstart['min'] : '00';
+							$stime = strtotime($dtstart['year'] . $dtstart['month'] . $dtstart['day'] . 'T' . $hour . $min . '00Z');
+
+							/* End times
+							 */
+							$hour = $dtend['hour'] ? $dtend['hour'] : '00';
+							$min = $dtend['min'] ? $dtend['min'] : '00';
+							$etime = strtotime($dtend['year'] . $dtend['month'] . $dtend['day'] . 'T' . $hour . $min . '00Z');
+
+							$event = array(
+								'owner'			=> $uid,
+								'access'		=> 3,
+								'groupList'		=> array_map('scrubTEXT', $groupList),
+								'campusList'	=> array_map('scrubTEXT', $campusList),
+								'type'			=> 1,
+								'note'			=> $summary,
+								'detail'		=> $description,
+								'location'		=> $location,
+								'startTime'		=> isset($dtstart['hour']) ? date('H:i:s', $stime) : '',
+								'endTime'		=> isset($dtend['hour']) ? date('H:i:s', $etime) : '',
+								'date'			=> date('Y-m-d', $stime),
+							);
+
+							if ($calendarHandler->create($event)) {
+								$output[] = array(
+									'name' => $summary,
+									'status' => 'Added',
+									'error' => 'OK',
+								);
+							}
+							else {
+								$output[] = array(
+									'name' => $summary,
+									'status' => 'Not Added',
+									'error' => 'Could not create event',
+								);
+							}
+						}
 					}
 				}
 			}

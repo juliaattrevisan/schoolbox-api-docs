@@ -1,0 +1,74 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.autoresize.js"></script>
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+<script type="text/javascript">
+
+$j(function() {
+	$j.fn.qtip.defaults.position.corner = {
+		target: 'topLeft',
+		tooltip: 'bottomLeft'
+	}
+	
+	$j.fn.qtip.defaults.style = {
+		tip: 'bottomLeft',
+		name: 'green'
+	}
+		
+	$j('thead td').each(function() {
+		activeContent = $j(this).find('em').html();
+		$j(this).qtip({
+			content: activeContent,
+			api: {
+					// Retrieve the content when tooltip is first rendered
+					 onRender: function()
+					 {
+						var self = this;
+					 }
+				 }
+		});
+	});
+});
+</script>
+<!-- END custom_head -->
+
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+	<li><a href="/adminv2/home">Home</a></li>
+	<li><a href="/adminv2/user">Users</a></li>
+	<li><a href="/adminv2/side-menu">Side Menu</a></li>
+	<li><a href="/adminv2/allowed-file">Allowed Files</a></li>
+	<li><a href="/adminv2/setting">Settings</a></li>
+	<li><a href="/adminv2/calendar" class="current">Calendar</a></li>
+	<li><a href="/adminv2/category">Category</a></li>
+	<li><a href="/adminv2/list">Lists</a></li>
+	<li><a href="/adminv2/rollover">Rollover</a></li>
+</ul>
+<div class="admin-contents">
+	<h3>Bulk Add Calendar Events</h3>
+
+	<div class="level">
+		<table class="bulk-users">
+			<thead>
+				<tr>
+					<td><h3>Event Detail<em>The name of the category, indicated from reading the rows in the CSV file.</em><span>?</span></h3></td>
+					<td><h3>Action<em>The function schoolbox has attempted to complete.</em><span>?</span></h3></td>
+					<td><h3>Response<em>Schoolbox's feedback after attempting to complete the requested function.</em><span>?</span></h3></td>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- BEGIN event -->
+				<tr>
+					<td>{EVENT_NAME}</td>
+					<td>{EVENT_STATUS}</td>
+					<td>{EVENT_ERROR}</td>
+				</tr>
+				<!-- END event -->
+			</tbody>
+		</table>
+	</div>
+	
+	<a href="/adminv2/user" class="btn go-back float-left"><span></span>Back to calendar</a>
+
+	<div class="float-fix"></div>
+</div>

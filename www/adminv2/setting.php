@@ -1,10 +1,16 @@
 <?php
+require_once SITE_root . '/library/group.php';
+
+$groupHandler = new Group();
+
+if (!$groupHandler->isSuperuser()) {
+    error(19);
+}
 
 $this->setFile(TEMPLATE_content, 'adminv2/settings.html');
 $this->setTitle('Admin - Settings');
 
 $this->setBlock(TEMPLATE_content, 'setting_tab', 'setting_tab_block');
-
 $this->setBlock(TEMPLATE_content, 'setting_type_noneditable', 'setting_type_noneditable_block');
 $this->setBlock(TEMPLATE_content, 'setting_type_input', 'setting_type_input_block');
 $this->setBlock(TEMPLATE_content, 'setting_type_textarea', 'setting_type_textarea_block');

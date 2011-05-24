@@ -442,8 +442,9 @@ class User extends Model {
 		 * exist already, prevent existence of duplicate usernames
 		 */
         if ($dupeUser = $this->getByUsername($user['username'])) {
-            if($dupeUser['uid'] != $user['id'])
-                error(138);
+            if($dupeUser['uid'] != $user['id']) {
+                return false;
+			}
 		}
 
         $campusArray = $user['campus'];
@@ -492,7 +493,7 @@ class User extends Model {
 		/* Check if the username already exists
 		 */
         if (is_array($this->getByUsername($user['username']))) {
-			error(138);
+			return false;
 		}
 
         $campusArray = $user['campus'];

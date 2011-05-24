@@ -1,5 +1,12 @@
 <?php
 require_once SITE_root . '/library/generic.php';
+require_once SITE_root . '/library/group.php';
+
+$groupHandler = new Group();
+
+if (!$groupHandler->isSuperuser()) {
+    error(19);
+}
 
 $this->setFile(TEMPLATE_content, 'adminv2/lists.html');
 $this->setTitle('Admin - Lists');
