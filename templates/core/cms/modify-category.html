@@ -4,8 +4,7 @@
 function verify(){
 	var msg = ""
 	//check that description, url, location have been entered
-	if($('name').value == "")
-		msg += "You need to enter a name.\n";
+
 
 	if($('parent').value == "" || isNaN($('parent').value))
 		msg += "You need to select a proper location.\n";
@@ -43,6 +42,14 @@ function verify(){
 	else
 		return true;
 }
+
+$j(function() {
+	
+	$j('#folderForm').validate();
+	
+});
+
+
 </script>
 <!-- END custom_head -->
 
@@ -51,7 +58,7 @@ function verify(){
 	<table class="standardForm" >
 		<tr>
 			<td class="formLabelWidth"><h4>Folder Name</h4></td>
-			<td><input type="text" id="name" name="name" maxlength="250" size="40" value="{NAME}" /></td>
+			<td><label><input type="text" id="name" class="required" name="name" maxlength="250" size="40" value="{NAME}" /></label></td>
 		</tr>
 		<tr>
 			<td><h4>Folder Parent</h4>

@@ -4,7 +4,7 @@ $j(function() {
 		$j('div.right:hidden').remove();
 		
 		/* add drag/drop */
-		$j('#content').sortable({
+		$j('.active-sort').sortable({
 			cursor: 'move',
 			distance: 0,
 			dropOnEmpty: true,
@@ -15,28 +15,31 @@ $j(function() {
 			cancel: '.permanent',
 			placeholder: 'marker',
 			tolerance: 'pointer',
-			
+			connectWith: '.active-sort',
+
 			update: function () {
 				var left = '';
 				var right = '';
-				$j('div.left').children('div.box').each(function () {
+				
+				$j('div.left-active').children('div.box').each(function () {
 					left += $j(this).attr('id').substring(9) + ',';
 				});
-				$j('div.right').children('div.box').each(function () {
+				$j('div.left-active').children('div.box').each(function () {
 					right += $j(this).attr('id').substring(9) + ',';
 				});
+				
 				$j.post('/eportfolio/configForm.php', {uid: $j('#userID').val(), type: 'components', column1: left, column2: right});
 				
 			},			
 			sort: function (event, ui) {
-				var leftOffset = $j('div.left').offset();
+				var leftOffset = $j('div.left-active').offset();
 			
-				if (event.pageX < (leftOffset.left + $j('div.left').width()) &&
-					event.pageY > (leftOffset.top + $j('div.left').height())) {
+				if (event.pageX < (leftOffset.left + $j('div.left-active').width()) &&
+					event.pageY > (leftOffset.top + $j('div.left-active').height())) {
 					// left bottom
-					ui.placeholder.appendTo($j('div.left'));
+					ui.placeholder.appendTo($j('div.left-active'));
 				} 
-				else if (event.pageX > (leftOffset.left + $j('div.left').width()) &&
+				else if (event.pageX > (leftOffset.left + $j('div.left-active').width()) &&
 						 event.pageY > ($j('div.right').offset().top + $j('div.right').height())) {
 					// right bottom
 					ui.placeholder.appendTo($j('div.right'));
@@ -136,10 +139,7 @@ $j(function() {
 		$j(this).closest('.delete-it').slideUp();
 	});
 		
-
-	
-	
-	/* from here down I've changed the component functions!!!!*/
+/* from here down I've changed the component functions!!!!*/
 	
 $j('.manage h2, a.folder-manage').each(function () {
 		$j(this).hide();
@@ -219,7 +219,7 @@ $j('.manage h2, a.folder-manage').each(function () {
 		event.preventDefault();
 		var $this = $j(this);
 		$j.post('/eportfolio/configForm.php', {add : $j(this).attr('rel'), uid : uid }, function(data){
-			$j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
+			$j(data).hide().prependTo('.left-active').css('opacity','0').slideDown(400,function(){
 				$j(this).animate({opacity:1}, 300);
 			});
         });		

@@ -250,6 +250,7 @@ background-image: url(/images/mime/22x22/{ICON});
 
 <div class="{TEMPLATE} privateBlock">
 	<div class="left">
+		
 		<div class="box permanent">
 			<h2>My Profile</h2>
 			<div class="pad-it"> <img src="/search/portrait.php?id={SYNERGY_ID}&width=150&height=150" alt="{PERSON_NAME}" title="{PERSON_NAME}" />
@@ -263,8 +264,9 @@ background-image: url(/images/mime/22x22/{ICON});
 				<div class="float-fix"></div>
 			</div>
 		</div>
+		
 		<!-- BEGIN privateNotes -->
-		<div class="private-notes box">
+		<div class="private-notes box permanent">
 			<h2>Teacher Notes</h2>
 			<div class="pad-it"> {PRIVATE_NOTES} 
 				<!-- BEGIN modify_link -->
@@ -272,10 +274,18 @@ background-image: url(/images/mime/22x22/{ICON});
 				<!-- END modify_link --> 
 			</div>
 		</div>
+		
 		<div class="float-fix"></div>
 		<!-- END privateNotes --> 
-		{COLUMN1}</div>
-	<div class="right">{COLUMN2}</div>
+
+		<div class="left-active active-sort">{COLUMN1}
+			<div class="float-fix"></div>
+		</div>
+		
+		<div class="float-fix"></div>
+		
+	</div>
+	<div class="right active-sort">{COLUMN2}</div>
 	<div class="float-fix"></div>
 </div>
 <input type="hidden" id="userID" value="{ID}" />
