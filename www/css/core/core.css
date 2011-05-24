@@ -1,3 +1,6 @@
+/*--------------------------------------------------------------
+Schoolbox Core CSS
+--------------------------------------------------------------*/
 
 body { font-size: 75%; }   /* IE */
 
@@ -16,7 +19,6 @@ body {
 
 body#tinymce { background:#fff;  }
 #tinymce p{padding:8px;}
-
 
 /*--------------------------------------------------------------
  Main Link Styles 
@@ -60,12 +62,6 @@ hr {
 
 img { border:0; }
 
-/*************** skin colours *****
-#nav h3{color:#F4F1EA}
-
-*/
-/*********** skin ****/
-
 /*--------------------------------------------------------------
 CSS commands
 --------------------------------------------------------------*/
@@ -104,7 +100,6 @@ ul.pad-it { list-style:disc; }
 .hide-it, .hide { display:none; }
 
 .clear { clear:both; }
-
 
 /*--------------------------------------------------------------
  Heading Styles 
@@ -156,7 +151,6 @@ h2 a { color:#013a63; }
 	font-size:10px;
 }
 
-/*pesky header_option divs. ugggly.*/
 .header_option {
 	display: block;
 	float: right;
@@ -207,22 +201,7 @@ th { font-weight:bold; }
 /*--------------------------------------------------------------
  Structural Styles
 --------------------------------------------------------------*/
-/* Ugly, ugly old admin system */
-#admin-old .standardForm h2 {
-	background:none;
-	font-weight:bold;
-	font-size:14px;
-	color:#000;
-	text-indent:0;
-	border-bottom:0;
-}
 
-#admin-old .ruler {
-	background:#F1F1F1;
-	border:1px solid #ccc;
-}
-
-/*BODY*/
 #wrap {
 	min-height: 100%;
 	height: auto !important;
@@ -249,9 +228,11 @@ th { font-weight:bold; }
 	position:relative;
 }
 
-/*HEADER*/
+/*--------------------------------------------------------------
+ HEADER
+--------------------------------------------------------------*/
 #header {
-	height: 136px;
+	height: 136px; 
 	position:relative;
 	min-width:985px;
 }
@@ -331,7 +312,9 @@ th { font-weight:bold; }
 
 #infoPanel li.first a { margin-right:10px }
 
-/*MAIN NAV*/
+/*--------------------------------------------------------------
+ NAV
+--------------------------------------------------------------*/
 
 #nav {
 	top:104px;
@@ -424,6 +407,7 @@ th { font-weight:bold; }
 
 #nav .nav-wrapper.my-links { background-color:#f3faff; }
 
+/* in order to deal with the layering problems in IE, we wrap each UL in a div */
 #nav .nav-wrapper {
 	background: #faf9f5;
 	-moz-border-radius: 0 0 3px 3px;
@@ -431,7 +415,9 @@ th { font-weight:bold; }
 	border-radius: 0 0 3px 3px;
 }
 
-/*TABBED NAV*/
+/*--------------------------------------------------------------
+ TABBED NAV ACROSS THE TOP
+--------------------------------------------------------------*/
 #tabs {
 	position:absolute;
 	right:20px;
@@ -489,9 +475,13 @@ th { font-weight:bold; }
 	position:relative;
 }
 
+/*--------------------------------------------------------------
+ HOMEPAGE TEMPLATES ADJUSTABLE VIA AJAX ON PAGE
+--------------------------------------------------------------*/
+
+/*for full width block at the top of every homepage */
 .template5 .top{display:block;}
 .template2 .left { width: 49.5%; }
-
 .template2 .right { width: 49.5%; }
 
 .template3 .left {
@@ -505,12 +495,13 @@ th { font-weight:bold; }
 }
 
 .template4 .right { width: 69.5%; }
-
 .template4 .left { width: 29.5%; }
+.template1 .right .hide-on-small, 
+.template4 .left .hide-on-small { display: none; }
 
-.template1 .right .hide-on-small, .template4 .left .hide-on-small { display: none; }
-
-/*BOXES*/
+/*--------------------------------------------------------------
+ BOXES
+--------------------------------------------------------------*/
 .marker {
 	border: 2px dashed #E9E3D6;
 	margin-bottom: 16px;
@@ -595,7 +586,8 @@ th { font-weight:bold; }
 	color:#fff;
 }
 
-.box a.edit.active span, .box a.edit.active:hover span {
+.box a.edit.active span, 
+.box a.edit.active:hover span {
 	background:none;
 	color:#000;
 }
@@ -644,6 +636,9 @@ th { font-weight:bold; }
 	min-height:1px;
 }
 
+/*--------------------------------------------------------------
+ LISTING (FOR HOMEPAGE COMPONENTS THAT ALTERNATE) eg. files, blog
+--------------------------------------------------------------*/
 .listing h3 {
 	float: left;
 	line-height: 1.3;
@@ -703,7 +698,9 @@ p.interact-left.home-calendar {
 	width: 100px;
 }
 
-/*FORMS*/
+/*--------------------------------------------------------------
+ FORMS
+--------------------------------------------------------------*/
 .formLabelWidth { width:250px; }
 
 textarea {
@@ -725,7 +722,9 @@ fieldset {
 
 .standardForm table { width: 100%; }
 
-.standardForm .checkAll, .standardForm .delCheck, .standardForm .acceptCheck { top: 0; }
+.standardForm .checkAll, 
+.standardForm .delCheck, 
+.standardForm .acceptCheck { top: 0; }
 
 .message .error {
 	background: #fff99a;
@@ -772,9 +771,6 @@ dl.errors dd { width:85%; }
 
 .text.textbox li { padding:0; }
 
-/***********************
-Forms
-***********************/
 .standardForm td {
 	vertical-align: top;
 	padding: 16px;
@@ -861,6 +857,12 @@ input.timeField { width: 30px; }
 	-webkit-gradient(linear, left top, left bottom, color-stop(0, #e4f5f9), color-stop(1, #c9ebf3));
 	filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f5f9', EndColorStr='#c9ebf3');
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f5f9', EndColorStr='#c9ebf3')";
+	line-height:normal;
+	float:left;
+	padding:4px 16px 20px 16px;
+	text-align:center;
+	margin-bottom:16px;
+	height:23px
 }
 
 .submit-btn-plain:hover {
@@ -902,105 +904,50 @@ input.timeField { width: 30px; }
 }
 
 .btn:hover span { background-position:0 -14px; }
-
 .btn.weather span { background-position:0 -28px; }
-
 .btn.weather:hover span { background-position:0 -42px; }
-
 .btn.up-arrow span { background-position:0 -56px; }
-
 .btn.up-arrow:hover span { background-position:0 -70px; }
-
 .btn.update span { background-position:0 -84px; }
-
 .btn.update:hover span { background-position:0 -98px; }
-
 .btn.email span { background-position:0 -112px; }
-
 .btn.email:hover span { background-position:0 -126px; }
-
 .btn.translate span { background-position:0 -140px; }
-
 .btn.translate:hover span { background-position:0 -154px; }
-
 .btn.add span { background-position:0 -168px; }
-
 .btn.add:hover span { background-position:0 -182px; }
-
 .btn.tick span { background-position:0 -196px; }
-
 .btn.tick:hover span { background-position:0 -210px; }
-
 .btn.report span { background-position:0 -224px; }
-
 .btn.report:hover span { background-position:0 -238px; }
-
 .btn.create span { background-position:0 -252px; }
-
 .btn.create:hover span { background-position:0 -266px; }
-
 .btn.groups span { background-position:0 -280px; }
-
 .btn.groups:hover span { background-position:0 -294px; }
-
 .btn.modify span { background-position:0 -308px; }
-
 .btn.modify:hover span { background-position:0 -322px; }
-
 .btn.delete span { background-position:0 -336px; }
-
 .btn.delete:hover span { background-position:0 -350px; }
-
 .btn.statistics span { background-position:0 -364px; }
-
 .btn.statistics:hover span { background-position:0 -379px; }
-
 .btn.go-to span { background-position:0 -392px; }
-
 .btn.go-to:hover span { background-position:0 -406px; }
-
 .btn.reply span { background-position:0 -420px; }
-
 .btn.reply:hover span { background-position:0 -434px; }
-
 .btn.eportfolio span { background-position:0 -448px; }
-
 .btn.eportfolio:hover span { background-position:0 -462px; }
-
 .btn.help span { background-position:0 -476px; }
-
 .btn.help:hover span { background-position:0 -490px; }
-
 .btn.due-work span { background-position:0 -504px; }
-
 .btn.due-work:hover span { background-position:0 -518px; }
-
 .btn.go-back span { background-position:0 -532px; }
-
 .btn.go-back:hover span { background-position:0 -546px; }
-
 .btn.download span { background-position:0 -560px; }
-
 .btn.download:hover span { background-position:0 -574px; }
-
 .btn.chat span { background-position:0 -588px; }
-
 .btn.chat:hover span { background-position:0 -602px; }
-
 .btn.user span { background-position:0 -616px; }
-
 .btn.user:hover span { background-position:0 -630px; }
-
-/*submit button*/
-
-.submit-btn-plain {
-	line-height:normal;
-	float:left;
-	padding:4px 16px 20px 16px;
-	text-align:center;
-	margin-bottom:16px;
-	height:23px
-}
 
 .btn.submit {
 	border-color:#0aa9c7 !important;
@@ -1010,7 +957,7 @@ input.timeField { width: 30px; }
 	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #e4f5f9), color-stop(1, #c9ebf3));
 	background-image: -webkit-linear-gradient(#e4f5f9, #c9ebf3);
 	background-image: linear-gradient(top, #e4f5f9, #c9ebf3);
- filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f5f9', EndColorStr='#c9ebf3');
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f5f9', EndColorStr='#c9ebf3');
 }
 
 a.icons {
@@ -1080,8 +1027,6 @@ p.forgot a { font-size: 90%; }
 	color:#ff5a00;
 }
 
-
-.subscribe{}
 .subscribe p{text-align:right;}
 
 .lookup {
@@ -1094,9 +1039,9 @@ p.forgot a { font-size: 90%; }
 
 /*--------------------------------------------------------------
 Module Specific Styles (ALPHABETICAL SECTIONS)
---------------------------------------------------------------*/
-/*ADMIN*/ 
 
+ADMIN
+--------------------------------------------------------------*/
 .admin-nav {
 	float:left;
 	height:32px;
@@ -1150,7 +1095,9 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	display:block;
 	line-height:10px;
 }
-.admin-contents h2 strong{background:#fff; font-weight:normal;
+.admin-contents h2 strong{
+	background:#fff; 
+	font-weight:normal;
      -moz-border-radius: 4px; 
   -webkit-border-radius: 4px; 
           border-radius: 4px; 
@@ -1287,7 +1234,6 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	top:16px;
 	z-index:200
 }
-
 
 .notifications li { position:relative; }
 
@@ -1632,31 +1578,24 @@ Module Specific Styles (ALPHABETICAL SECTIONS)
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#edeae3', EndColorStr='#e0ddd7'); 
 }
 
-
-
-/*****************************
+/*--------------------------------------------------------------
 ASSESS
-*******************************/
+--------------------------------------------------------------*/
 #assess table.mceLayout { border:0; }
-
 #assess table td span { font-size:10px; }
 
 #assess .standardForm {
 	background: #FAF9F5;
 	margin-bottom:0;
 }
-
 #assess .standardForm td {
 
 	position:relative
 }
 
 #assess .standardForm thead td, #assess .standardForm { padding:0; }
-
 #assess .standardForm tbody { border-collapse:collapse; }
-
 #assess .assess-header { margin-bottom:20px; }
-
 #assess .additional-details, #assess .assess-body {
 	padding:10px;
 	border:1px solid #dbdbdb;
@@ -1750,7 +1689,7 @@ ASSESS
 	background:#245398;
 	padding:0 15px 0 6px;
 	-moz-border-radius: 0px 6px 0 0;
-	-webkit-border-radius: 0px 6px 0 0; /* Saf3-4 */
+	-webkit-border-radius: 0px 6px 0 0;
 	border-radius: 0px 6px 0 0;
 }
 
@@ -1763,8 +1702,36 @@ ASSESS
 	border:none;
 }
 
-#assess a.summary.time span { background-image:url(/images/icons/time.png); }
+#assess .drop-arrow{
+	background:#ddefd3 url(/images/core/icons/chat-down.png) no-repeat 50% 50%;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	background: white;
+	width: 20px;
+	display: block;
+	height: 20px;
+	line-height: 20px;
+	text-align: center;
+	position: absolute;
+	top: 7px;
+	right: 7px;
+	color: #BEBEBE;
+}
 
+#assess .drop-arrow.active { background:#ddefd3 url(/images/core/icons/chat-up.png) no-repeat 50% 50%; }
+
+#assess .assessment-options{background:#ddefd3}
+#assess .section-options{background:#F1F7FA; border-bottom:1px solid #DBDBDB}
+#assess .drop-arrow:hover {
+	text-decoration:none;
+	color:#000;
+	background-color:#ddefd3;
+}
+
+#assess .allQuestions .drop-arrow {margin:0; background-color:#70b1cb; color:#fff; top:4px; right:4px;}
+
+#assess a.summary.time span { background-image:url(/images/icons/time.png); }
 #assess a.summary.date span { background-image:url(/images/icons/calendar.png); }
 
 #assess a.summary {
@@ -1795,12 +1762,12 @@ ASSESS
 	width:30px;
 }
 
-#assess .col-1, #assess .col-2 { float:left; }
-
+#assess .col-1, 
+#assess .col-2 { float:left; position:relative;}
 #assess .col-1 {
 	width:69%;
 	margin-right:1%;
-
+	
 }
 
 #assess .col-2 {
@@ -1809,7 +1776,6 @@ ASSESS
 }
 
 #assess .col-2 .assess-body { background:#fff; }
-
 #assess .question .question-body { margin:0; }
 
 #assess h3 {
@@ -1854,10 +1820,7 @@ ASSESS
 	min-height:75px;
 }
 
-#assess input { }
-
 #assess ul { margin:0; }
-
 #assess .col-1 .assess-body ul li {
 	min-width: 0;
 	position:relative;
@@ -1867,7 +1830,9 @@ ASSESS
 	margin-bottom:10px;
 }
 
-#assess .col-1 ul li.highlight, #assess.take-test .col-1 ul li.highlight, #assess .col-1 .assess-body ul li.correct { background-color:#e0f2df; }
+#assess .col-1 ul li.highlight,
+#assess.take-test .col-1 ul li.highlight, 
+#assess .col-1 .assess-body ul li.correct { background-color:#e0f2df; }
 
 #assess ul { height:100%; }
 
@@ -1880,9 +1845,12 @@ ASSESS
 	border: 1px solid #dbdbdb;
 }
 
-
-
-#assess ul li .mark, #assess .left-option, #assess .right-option, #assess .inputs .delete, #assess li.inputs .answer-value, #assess li.inputs .list-item { float:left; }
+#assess ul li .mark, 
+#assess .left-option, 
+#assess .right-option, 
+#assess .inputs .delete, 
+#assess li.inputs .answer-value, 
+#assess li.inputs .list-item { float:left; }
 
 #assess ul li .mark, #assess .inputs .delete {
 	height:37px;
@@ -1919,9 +1887,7 @@ ASSESS
 }
 
 #assess li.inputs .answer-value .message { line-height:normal; }
-
 #assess li.inputs .drag-me { padding:0 5px; }
-
 #assess li.inputs .answer-value {
 	border:1px solid #dbdbdb;
 	width:78%;
@@ -2006,16 +1972,18 @@ ASSESS
 }
 
 #assess .section-question img{display:none;}
-#assess table.mceLayout tr.mceFirst td, #assess table.mceLayout tr.mceLast td, #assess table.mceLayout tr.mceFirst td, .defaultSkin .mceIframeContainer { border:0; }
+#assess table.mceLayout tr.mceFirst td, 
+#assess table.mceLayout tr.mceLast td, 
+#assess table.mceLayout tr.mceFirst td, 
+.defaultSkin .mceIframeContainer { border:0; position:inherit;}
 
-#assess .defaultSkin table.mceLayout, #assess .defaultSkin table.mceLayout tr.mceFirst td { border:0 none; }
+#assess .defaultSkin table.mceLayout, 
+#assess .defaultSkin table.mceLayout tr.mceFirst td { border:0 none; }
 
 #assess .defaultSkin td.mceCenter table {
 	margin:0;
 	width:100px;
 }
-
-#assess .defaultSkin td.mceCenter table td { }
 
 .section-box { margin-bottom:10px; }
 
@@ -2048,6 +2016,7 @@ ASSESS
 	margin:0;
 	font-size:11px;
 	color:#fff;
+	position:relative;
 }
 
 #assess ul.section-options {
@@ -2100,7 +2069,8 @@ ul.section-options a.drop-arrow {
 	margin:0;
 }
 
-.section-box .section-question ul, .section-box .section-question ol { padding:0 0 10px 10px; }
+.section-box .section-question ul, 
+.section-box .section-question ol { padding:0 0 10px 10px; }
 
 .section-box .section-question ul {
 	list-style:disc;
@@ -2109,7 +2079,9 @@ ul.section-options a.drop-arrow {
 
 #assess .section-box ul.section-question li ul { margin-bottom:10px; }
 
-.section-box ul.section-question ul, .section-box ul.section-question ul li, .section-box ul.section-question ol li {
+.section-box ul.section-question ul, 
+.section-box ul.section-question ul li,
+.section-box ul.section-question ol li {
 	border:0;
 	padding:0;
 }
@@ -2161,14 +2133,20 @@ ul.section-options a.drop-arrow {
 }
 
 /*all them submit buttons*/
-#assess .add-statement, #assess .add-answer, #assess .make-blank, #assess .green-go, p.interact a.take-test-btn {
+#assess .add-statement, 
+#assess .add-answer, 
+#assess .make-blank, 
+#assess .green-go, p.interact a.take-test-btn {
 	height:25px;
 	border:none;
 	text-indent:-9999em;
 	display:block;
 }
 
-#assess .add-statement:hover, #assess .add-answer:hover, #assess .make-blank:hover, #assess .green-go:hover, p.interact a.take-test-btn:hover {
+#assess .add-statement:hover, 
+#assess .add-answer:hover, 
+#assess .make-blank:hover, 
+#assess .green-go:hover, p.interact a.take-test-btn:hover {
 	background-position:left bottom;
 	cursor:pointer
 }
@@ -2252,7 +2230,10 @@ p.interact a.take-test-btn {
 
 #assess.take-test h3.test-details { background:#f8f8f8; }
 
-#assess.take-test h3 ul, #assess.take-test h3 ol, #assess.mark-test h3 ul, #assess.mark-test h3 ol { margin:10px 10px 10px 33px; }
+#assess.take-test h3 ul, 
+#assess.take-test h3 ol,
+ #assess.mark-test h3 ul, 
+ #assess.mark-test h3 ol { margin:10px 10px 10px 33px; }
 
 #assess.take-test h3 ul li, #assess.mark-test h3 ul li { list-style-type:disc; }
 
@@ -2537,6 +2518,16 @@ p.interact a.take-test-btn {
 	display:none;
 }
 
+
+
+
+
+
+
+
+
+
+
 /*BLOG*/
 .blog-comments { margin-bottom: 10px; }
 
@@ -2556,6 +2547,13 @@ p.interact a.take-test-btn {
 }
 
 .blog-detail ul { list-style: disc; }
+
+
+
+
+
+
+
 
 /*CALENDAR*/
 #calendar { overflow:hidden }
@@ -3176,6 +3174,8 @@ overflow: auto; }
 	font-weight:bold;
 	color:#1d9ffc;
 }
+
+.chat-box .activate-chat{ margin:7px 0; text-align:center; float:none; display:none;}
 
 /********************************************
 COLOUR ADJUSTMENT BOX

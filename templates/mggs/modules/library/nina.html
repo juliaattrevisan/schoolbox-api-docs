@@ -1,17 +1,31 @@
+<script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
+
 <script type="text/javascript">
 	
-	$j(function() {
-		//in order for the boxes to complete their height adjustments effectively.
-		$j('tr td:first-child').each(function() {
-			var oneHeight = $j(this).height();
-			$j(this).children('.library-box').height(oneHeight - 48);
-			$j(this).next().children('.library-box').height(oneHeight - 48);
-		});
-		
-		//autoclear the catalogue search
-		$j('#library-search-field').autoclear();
-			
+$j(function() {
+	//in order for the boxes to complete their height adjustments effectively.
+	$j('tr td:first-child').each(function() {
+		var oneHeight = $j(this).height();
+		$j(this).children('.library-box').height(oneHeight - 48);
+		$j(this).next().children('.library-box').height(oneHeight - 48);
 	});
+	
+	//autoclear the catalogue search
+	$j('#library-search-field').autoclear();
+		
+});
+	
+$j(window).load(function(){	
+	$j('#galleryCycle').cycle({
+        cleartype: true,
+        before: function() {
+            $j('#galleryCycle span').slideUp();
+        },
+        after: function() {
+            $j('span', this).slideDown();
+        }
+    });
+});
 
 </script>
 

@@ -178,6 +178,7 @@ Chat.prototype = {
     render_config: function (config) {
         if (config.state == 'Active') {
             $j('.light').css('background-position', "bottom");
+			$j('.light').addClass('is-active');
         } else {
             this.render_users({});
             
