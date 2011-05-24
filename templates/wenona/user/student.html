@@ -76,47 +76,27 @@
   <tr>
     <td colspan="6"><h2>School Information</h2></td>
   </tr>
-  <tr>
-    <td colspan="6">
-    <table width="100%">
-        <tr>
-          <td valign="top"><ul><!-- BEGIN school_links -->
-            <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=5&Campus={CAMPUS_ID}">Fixtures & Term Dates</a></li>
-              <li><a href="http://intranet.wenona.nsw.edu.au/parents/middle/middleschoolnews/">Middle School News</a></li>
-              <li><a href="http://intranet.wenona.nsw.edu.au/parents/parenthandbook/">Parent Handbook</a></li>
-              <li><a href="http://intranet.wenona.nsw.edu.au/performingarts/">Performing Arts</a></li>
-			  
+    <tr>
+        <td colspan="6"><!-- BEGIN school_links --><!-- END school_links -->
+
               <!-- BEGIN timetable_link -->
-              <li><a href="/timetable/{SYNERGY_ID}">Timetable</a></li>
+              <a href="/timetable/{SYNERGY_ID}" class="btn report float-left"><span></span>Timetable</a>
               <!-- END timetable_link -->
-			  
-              <li><a href="http://intranet.wenona.nsw.edu.au/parents/middle/year9/useful_links.htm">Useful Links</a></li>
-              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=12&Campus={CAMPUS_ID}">Wenona Weekly</a></li>
-            </ul></td>
-          <td valign="top"><ul>
-              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=4&Campus={CAMPUS_ID}">Assessment Information</a></li>
-
-              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=6&Campus={CAMPUS_ID}">Parent/Teacher Evenings</a></li>
-              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=8&Campus={CAMPUS_ID}">Homework Policy</a></li>
-              <li><a href="http://intranet.wenona.nsw.edu.au/jump.aspx?PortalLink=15&Campus={CAMPUS_ID}">Correspondence from Head of School</a></li>
-            </ul></td>
-          <td valign="top"><ul>
-
-
-              <!-- END school_links -->
-
+              <!-- BEGIN due_work -->
+              <!-- <a href="/submission/dueWork/0/{ID}" class="btn due-work float-left"><span></span>Due Work</a> -->
+              <!-- END due_work -->
               <!-- BEGIN helpdesk -->
               <!-- END helpdesk -->
-              <!-- BEGIN due_work -->
-              <!-- <li><a href="/submission/dueWork/0/{ID}">Due Work</a></li> -->
-              <!-- END due_work -->
               <!-- BEGIN eportfolio -->
-              <li><a href="/eportfolio/{ID}">ePortfolio</a></li>
+              <a href="/eportfolio/{ID}" class="btn eportfolio float-left"><span></span>ePortfolio</a>
               <!-- END eportfolio -->
-            </ul></td>
-        </tr>
-      </table>
-  </tr>
+			  <div class="float-fix"></div>
+
+        </td>
+    </tr>
+  <!-- BEGIN contact_synergy -->
+
+  <tr>
     <!-- BEGIN contact_synergy -->
 
   <tr>
