@@ -86,19 +86,23 @@ class ExternalTimetable extends MSSQL{
 		}
 		else if($this->days[$campus] == 10) {
 
-			/*$startDate = $this->getLastSynergeticDay($date);
+            $startDate = $this->getLastSynergeticDay($date);
 
-			//find number of days between both dates
-			$difference = intval(($date - $startDate) / 86400);
+            if($this->synergeticDay[$startDate] > 5)
+                    $this->synergeticDay[$startDate] =+ 2;  //extra days for weekend
 
-			//find number of weeks between 2 dates
-			$weeks = intval(($difference) / 7);
+            $startDate = $startDate - ($this->synergeticDay[$startDate]*86400);
 
-			*/
-			if((date('W', $date) % 2) == 0)
-				return date('w',$date) + 5;
-			else
-				return date('w',$date);
+            //find number of days between both dates
+            $difference = floor(($date - $startDate) / 86400);
+            //find number of weeks between 2 dates
+            $weeks = intval(($difference) / 7);
+
+            if(($weeks % 2) == 0)
+                    return date('w',$date);
+            else
+                    return date('w',$date) + 5;
+
 		}
 		else	//unknown day number 
 			return 0;
