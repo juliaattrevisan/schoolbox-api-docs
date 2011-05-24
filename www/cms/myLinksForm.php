@@ -7,12 +7,59 @@ $page = new SitePage;
 $myLinksHandler = new MyLinks();
 
 if (isset($_POST['url']) && $_POST['url'] && isset($_POST['description']) && $_POST['description']) {
-	$url = scrubTEXT($_POST['url']);
+	$url = scrubTEXT(trim($_POST['url']));
 
-	/* Append http:// if it wasnt included
+	/* Local url:
+	 * http://ilearn
+	 * http://ilearn/
+	 * http://ilearn/test/blah
 	 */
-	if (strncasecmp($url,'http://', 7) && strncasecmp($url, 'https://', 8)) {
-		$url = 'http://' . $url;
+	if (preg_match('#^(http://)([^\.]+)/(.*)?#i', $url, $matches) || preg_match('#^(http://)([^\.]+)$#i', $url, $matches)) {
+
+		/* Remove unused matches
+		 */
+		unset($matches[0]);
+		unset($matches[1]);
+
+		/* Remove empty elements
+		 */
+		foreach(array_keys($matches, '') as $element) {
+			unset($matches[$element]);
+		}
+
+		$url = '//' . implode('/', $matches);
+	}
+
+	/* Local url:
+	 * //ilearn
+	 * //ilearn/test/blah
+	 */
+	else if (preg_match('#^//(.*)?#i', $url, $matches)) {
+		$url = $matches[0];
+	}
+
+	/* Local url:
+	 * ilearn
+	 * ilearn/test/blah
+	 */
+	else if (preg_match('#^([^\.]+)$#', $url, $matches)) {
+		$url = '//' . $matches[0];
+	}
+
+	/* External url:
+	 * google.com
+	 * www.google.com
+	 * http://www.google.com
+	 * https://www.google.com
+	 */
+	else {
+		/* Normal modification to url
+		 * Just return url if it includes protocol
+		 * Otherwise add http protocol if it was not found
+		 */
+		if (!preg_match('#http(s?)://(.*)#i', $url, $matches)) {
+			$url = 'http://' . $url;
+		}
 	}
 
 	$myLinksHandler->create(array(
