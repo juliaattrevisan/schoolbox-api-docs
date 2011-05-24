@@ -1,16 +1,16 @@
 <?php
-/* 
- * Global search result page
+
+/* Global search result page
  */
 
-// execution time
+/* Execution time
+ */
 $time_start = microtime(true);
 
 require_once '../include/sitePage.php';
 require_once '../library/group.php';
 require_once '../library/category.php';
 require_once '../library/allowed-file.php';
-
 require_once 'include/permission.php';
 
 $page        = new SitePage();
@@ -18,7 +18,7 @@ $group       = new Group();
 $categoryStd = new Category();
 $allowedFile = new AllowedFile();
 
-if($_GET['keyword'] &&  strlen($_GET['keyword']) > 2) {
+if ($_GET['keyword'] &&  strlen($_GET['keyword']) > 2) {
 	$keyword      = $_GET['keyword'];
 	$type         = $_GET['type'];
 	$current_page = empty($_GET['page']) ? 1 : $_GET['page'];
@@ -121,16 +121,30 @@ if (!empty($result['user'])) {
     ));
 
     foreach ($result['user'] as $user) {
-        // format email address
+
+		/* Format email address
+		 */
         $address = formatEmail($user);
+
         if ($address) {
-            if (Cfg::get('site_location') == 'wenona')
+            if (Cfg::get('site_location') == 'wenona') {
                 $email = "<a href=\"{$_SESSION['mailhandle']}$address\">Send Email</a>";
-            else
+			}
+            else {
                 $email = "<a href=\"{$_SESSION['mailhandle']}$address\">$address</a>";
+			}
         }
-        else
+        else {
             $email = '';
+		}
+
+		/* If a parent is performing the search, remove the email address
+		 */
+		$groupHandler = new Group();
+		
+		if ($groupHandler->isParent()) {
+			unset($email);
+		}
 
         $page->setVar(array(
             'USER_ID'         => $user['id'],
