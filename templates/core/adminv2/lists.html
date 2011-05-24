@@ -32,6 +32,8 @@ $j(function() {
 		});
 	});
 	
+	$j('#settings').validate();
+	
 });
 
 </script>
@@ -93,7 +95,7 @@ $j(function() {
 						</td>
 						<!-- END table_cell_static -->
 						<!-- BEGIN table_cell -->
-						<td><input name="{TABLE_COLUMN}[]" type="text" value="{TABLE_DATA}" /></td>
+						<td><input class="required" name="{TABLE_COLUMN}[]" type="text" value="{TABLE_DATA}" /></td>
 						<!-- END table_cell -->
 					</tr>
 					<!-- END table_row -->

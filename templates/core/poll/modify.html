@@ -2,32 +2,38 @@
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
-$j('#cal_date').datepicker({ 
-	dateFormat: 'dd/mm/yy',
-	showOn: 'both',
-	buttonImage: '/images/demo/calendar/calendar-click.png',
-	buttonImageOnly: true,
-	constrainInput: false,
-	onClose: function (string) {
-		var input = $j(this);
 
-		$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-			input.val(data.time);
-		})
-	}
+$j(function() {
+	$j('#cal_date').datepicker({ 
+		dateFormat: 'dd/mm/yy',
+		showOn: 'both',
+		buttonImage: '/images/demo/calendar/calendar-click.png',
+		buttonImageOnly: true,
+		constrainInput: false,
+		onClose: function (string) {
+			var input = $j(this);
+	
+			$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+				input.val(data.time);
+			})
+		}
+	});
+	
+	$j('#modPoll').validate();
+	
 });
 </script>
 <!-- END custom_head -->
 
 <h1>{ACTION} Poll</h1>
-<form class="standardForm" action="/poll/modifyForm.php" method="post">
+<form class="standardForm" id="modPoll" action="/poll/modifyForm.php" method="post">
 	<table>
 		<tr>
 			<td class="formLabelWidth">
 				<h4>Title</h4>
 			</td>
 			<td>
-				<input type="text" name="title" value="{POLL_TITLE}" size="50" />
+				<label><input class="required" type="text" name="title" value="{POLL_TITLE}" size="50" /></label>
 			</td>
 		</tr>
 		<tr>
@@ -36,7 +42,7 @@ $j('#cal_date').datepicker({
 				<em>What is the poll for</em>
 			</td>
 			<td>
-				<input type="text" name="question" value="{QUESTION}" size="50" />
+				<label><input class="required" type="text" name="question" value="{QUESTION}" size="50" /></label>
 			</td>
 		</tr>
 		<tr>
@@ -47,26 +53,23 @@ $j('#cal_date').datepicker({
 				to vote on. You must fill in at least two.</em>
 			</td>
 			<td>
-				<input type="text" name="option_0" value="{OPTION_0}" />
-				<br />
-				<input type="text" name="option_1" value="{OPTION_1}" />
-				<br />
-				<input type="text" name="option_2" value="{OPTION_2}" />
-				<br />
-				<input type="text" name="option_3" value="{OPTION_3}" />
-				<br />
-				<input type="text" name="option_4" value="{OPTION_4}" />
-				<br />
-				<input type="text" name="option_5" value="{OPTION_5}" />
-				<br />
-				<input type="text" name="option_6" value="{OPTION_6}" />
-				<br />
-				<input type="text" name="option_7" value="{OPTION_7}" />
-				<br />
-				<input type="text" name="option_8" value="{OPTION_8}" />
-				<br />
-				<input type="text" name="option_9" value="{OPTION_9}" />
-				<br />
+				<label><input type="text" class="required" name="option_0" value="{OPTION_0}" /></label>
+
+				<label><input type="text" class="required" name="option_1" value="{OPTION_1}" /></label>
+
+				<label><input type="text" name="option_2" value="{OPTION_2}" /></label>
+
+				<label><input type="text" name="option_3" value="{OPTION_3}" /></label>
+
+				<label><input type="text" name="option_4" value="{OPTION_4}" /></label>
+
+				<label><input type="text" name="option_5" value="{OPTION_5}" /></label>
+
+				<label><input type="text" name="option_6" value="{OPTION_6}" /></label>
+
+				<label><input type="text" name="option_7" value="{OPTION_7}" /></label>
+				<label><input type="text" name="option_8" value="{OPTION_8}" /></label>
+				<label><input type="text" name="option_9" value="{OPTION_9}" /></label>
 			</td>
 		</tr>
 		<tr>

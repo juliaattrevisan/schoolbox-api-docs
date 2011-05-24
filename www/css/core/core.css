@@ -701,7 +701,29 @@ p.interact-left.home-calendar {
 /*--------------------------------------------------------------
  FORMS
 --------------------------------------------------------------*/
+label{margin-bottom:4px; display:block;}
+
 .formLabelWidth { width:250px; }
+label.error{
+	
+background:#fffddb url(/images/core/icons/label-error.png) no-repeat 6px 2px;
+width:100%; padding:4px;
+text-indent:36px; padding:3px 0; border:1px solid #ffcc00; border-top:0;
+color:#ff5f45 !important;
+display:block;
+
+     -moz-border-radius: 0 0 3px 3px; 
+  -webkit-border-radius: 0 0 3px 3px; 
+          border-radius: 0 0 3px 3px; 
+          
+          
+  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
+
+}
+
+
+label input[type=text]{width:100%; margin:0;}
+input[type=text].error{border:1px solid #ffcc00}
 
 textarea {
 	font-family:Arial, Helvetica, sans-serif;
@@ -1445,7 +1467,7 @@ ADMIN
 .settings-nav-holder { width:16%; }
 
 .admin-contents .settings { width:84%; }
-.admin-contents .settings input[type=text]{width:94%;}
+.admin-contents .settings input[type=text]{width:100%;}
 .settings-nav li a {
 	position:relative;
 	display:block;
@@ -1487,6 +1509,11 @@ ADMIN
 	font-weight:bold;
 }
 
+.admin-form label.error {
+margin:-8px 0 0 0;
+}
+
+
 .admin-form label span {
 	background:#e9e3d6;
 	font-weight:normal;
@@ -1504,6 +1531,8 @@ ADMIN
 	margin:8px 0;
 	padding:2px 0
 }
+
+
 
 .admin-form label { margin:8px 8px 8px 0; }
 
@@ -4023,7 +4052,7 @@ p.forgotten { margin:10px 0; }
 }
 
 .poll ol li {
-	margin-bottom: 0.5em;
+padding:7px;
 	display:list-item;
 	vertical-alignment:top;
 }

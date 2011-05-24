@@ -31,27 +31,30 @@
 	<!-- END config --> 
 	<!-- BEGIN text_editable --> 
 	<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script> 
-	<script type="text/javascript">
-	  tinyMCE.init({
-		mode : "exact",
-		elements: "textBoxBody",
-		theme : "advanced",
-		plugins : "table,inlinepopups,assetmanager,advimage,media,paste",
-		content_css : "/css/{SITE_LOCATION}/tiny.css",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-          theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
-          theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,z,spellchecker",
-          theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
-          theme_advanced_buttons4 : "tablecontrols",
-          pdw_toggle_on : 1,
-          pdw_toggle_toolbars : '2, 3, 4',
-		extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
-		file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
-		file_browser_category_id : {ID},
-		convert_urls : false
-	});
+		<script type="text/javascript">
+  tinyMCE.init({
+    mode : "exact",
+    elements: "textBoxBody",
+    theme : "advanced",
+    skin : "cirkuit",
+    plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
+    content_css : "/css/{SITE_LOCATION}/tiny.css",
+    theme_advanced_toolbar_location : "top",
+    theme_advanced_toolbar_align : "left",
+    theme_advanced_statusbar_location : "bottom",
+    theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
+    theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,z,spellchecker",
+    theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
+    theme_advanced_buttons4 : "tablecontrols",
+    pdw_toggle_on : 1,
+    pdw_toggle_toolbars : '2, 3, 4',
+    extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+    theme_advanced_blockformats : "p,address,h4,h5",
+    file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
+    file_browser_category_id : {ID},
+    tabfocus_elements : ":prev,:next",
+    convert_urls : false
+});
   </script>
 	<div class="text">
 		<form action="/eportfolio/textBoxForm.php" method="post" id="textBoxForm" class="standardForm">
@@ -65,7 +68,7 @@
 			<input type="hidden" name="textBoxID" value="{TEXTBOX_ID}" />
 		</form>
 	</div>
-	<p class="interact"><a href="#" class="btn save" onclick="$j('#textBoxForm').submit(); return false;"><span></span>Saveawfe Document</a></p>
+	<p class="interact"><a href="#" class="btn save" onclick="$j('#textBoxForm').submit(); return false;"><span></span>Save Document</a></p>
 	<!-- END text_editable --> 
 	
 	<!-- BEGIN text_locked -->

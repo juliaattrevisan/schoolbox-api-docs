@@ -24,18 +24,24 @@ tinyMCE.init({
 	convert_urls : false
 });
 
+$j(function() {
+	
+	$j('#wikiForm').validate();
+	
+});
+
 </script>
 <!-- END custom_head -->
 <h1>{ACTION} Wiki</h1>
 <span class="header_option"><a href="/homepage/{CATEGORY_ID}" class="btn go-back"><span></span>Return to Homepage</a></span>
-<form  action="/wiki/modifyForm.php" method="post">
+<form  action="/wiki/modifyForm.php" method="post" id="wikiForm">
     <input type="hidden" name="wikiID" value="{WIKI_ID}" />
     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
     
   <table width="100%" class="standardForm">
     <tr>
       <td class="formLabelWidth"><h4>Heading</h4></td>
-	  <td><input type="text" name="heading" size="60" value="{HEADING}" /></td>
+	  <td><label><input type="text" class="required" name="heading" size="60" value="{HEADING}" /></label></td>
     </tr>
     <tr>
       <td><h4>Body</h4></td>

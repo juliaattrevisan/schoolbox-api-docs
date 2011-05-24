@@ -94,11 +94,15 @@ $j(function() {
 	});
 		
 	$j('.delete').click(function(event) {
+		
+		
 		event.preventDefault();
-		var nearestAction = $j(this).closest('form').attr('action');
-		var nearestFID =  $j(this).closest('form').find('input[name=fileTypeID]').val();
-		$j(this).closest('form').attr('action', nearestAction+"?delete="+nearestFID);
-		$j(this).closest('form').submit();
+		if (confirm("Are you sure you want to delete?")) {
+			var nearestAction = $j(this).closest('form').attr('action');
+			var nearestFID =  $j(this).closest('form').find('input[name=fileTypeID]').val();
+			$j(this).closest('form').attr('action', nearestAction+"?delete="+nearestFID);
+			$j(this).closest('form').submit();
+		}
 		
 		return false;
 	});
@@ -212,8 +216,9 @@ $j(function() {
 								<option value="true">Inline</option>
 								<option value="false">External</option>
 							</select>
-							<a rel="" href="#" class="btn delete no-marg"><span></span>Delete</a>
 							<a href="#" class="btn tick submit no-marg"><span></span>Save</a>
+							<a rel="" href="#" class="btn delete no-marg"><span></span>Delete</a>
+							
 						</fieldset>
 					</fieldset>
 					<div class="float-fix"></div>

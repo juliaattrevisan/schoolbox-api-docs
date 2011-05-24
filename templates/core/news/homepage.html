@@ -25,31 +25,23 @@ tinyMCE.init({
 });
 </script>
 <script language="JavaScript" type="text/javascript">
-function verify()
-{
-        var msg = ""
-        if(document.getElementById('newsForm').heading.value == ""){
-                msg += "You need to enter a heading\n";
-        }
-        if(msg != ""){
-                alert(msg);
-                return false;
-        }
-        else
-	{
-                return true;
-	}
-}
+
+$j(function() {
+	
+	$j('#newsForm').validate();
+	
+});
+
 </script>
 <!-- END custom_head -->
 
 <h1>{ACTION} Homepage News</h1>
-<form action="/news/homepageForm.php" method="post" enctype="multipart/form-data" id="newsForm"  onSubmit="return(verify());">
+<form action="/news/homepageForm.php" method="post" enctype="multipart/form-data" id="newsForm">
 	<table class="standardForm">
 		<tr>
 			<td class="formLabelWidth"><h4>News heading</h4>
 			</td>
-			<td><input type="text" name="heading" size="35" maxlength="50" value="{HEADING}" /></td>
+			<td><label><input type="text" class="required" name="heading" size="35" maxlength="50" value="{HEADING}" /></label></td>
 		</tr>
 		<tr>
 			<td><h4>Expires</h4>

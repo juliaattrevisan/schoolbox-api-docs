@@ -1,4 +1,11 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript">
+
+$j(function() {
+	$j('#form').validate();
+});
+
+</script>
 <!-- END custom_head -->
 
 <h1>Manage My Links</h1>
@@ -31,8 +38,8 @@
 			</tr>
 			<!-- END myLink -->
 			<tr>
-				<td><input name="url" type="text" /></td>
-				<td><input name="description" type="text" /></td>
+				<td><label><input name="url" type="text" class="required"/></label></td>
+				<td><label><input name="description" class="required" type="text" /></label></td>
 				<td><input name="submit" type="submit" value="Add" class="submit-btn-plain" /></td>
 			</tr>
 		</tbody>

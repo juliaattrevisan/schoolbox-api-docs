@@ -11,63 +11,59 @@
 	});
 </script>
 <!-- END custom_head -->
+
 <div class="breadcrumbs navhelp">
 	<p><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a></p>
 </div>
-
 <form action="/forum/modifyForm.php" method="POST" >
-<button class="thread submit-btn-plain">Post Thread</button>
-<div class="float-fix"></div>
-<table  class="standardForm forum">
-	<thead>
-  	<tr>
-    	<th width="40%">Forum</th>
-      <th width="20%">Last Post</th>
-      <th width="10%">Replies</th>
-      <th width="10%">Views</th>
-      <th width="20%">&nbsp;</th>
-    </tr>
-  </thead>
-  <tbody>
-  	<!-- BEGIN thread -->
-  	<tr>
-    	<td>
-		<!-- BEGIN modify_thread -->
-		<input type="checkbox" name="deleteThreads[]" value="{THREAD_ID}" />
-		<!-- END modify_thread -->
-		<h3><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a> {THREAD_LOCKED}</h3>
-        <p>{THREAD_AUTHOR} - {THREAD_TIME}
-		</p>
-      </td>
-      <td>
-        <!-- BEGIN last_post -->
-      	<h3><a href="/search/user/{THREAD_LAST_POST_USER_ID}">{THREAD_LAST_POST_USER}</a></h3>
-        <p>{THREAD_LAST_POST_TIME}</p><!-- END last_post -->
-      </td>
-      <td>
-      	{THREAD_REPLIES}
-      </td>
-      <td>
-      	{THREAD_VIEWS}
-      </td>
-      <td><a href="/forum/thread/{THREAD_ID}/{THREAD_LAST_PAGE}/#bottom" class="btn go-to"><span></span>Go to Forum</a></td>
-    </tr>
-   <!-- END thread -->
-  </tbody>
-</table>
-<button class="thread submit-btn-plain">Post Thread</button>
-<!-- BEGIN delete_button -->
-<input type="submit" name="submit" class="submit-btn-plain" value="Delete Selected" onclick="return(confirm('Are you sure you wish to delete these forum threads?'))" />
-<!-- END delete_button -->
+	<button class="thread submit-btn-plain">Post Thread</button>
+	<div class="float-fix"></div>
+	<table  class="standardForm forum">
+		<thead>
+			<tr>
+				<th width="40%">Forum</th>
+				<th width="20%">Last Post</th>
+				<th width="10%">Replies</th>
+				<th width="10%">Views</th>
+				<th width="20%">&nbsp;</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- BEGIN thread -->
+			<tr>
+				<td><!-- BEGIN modify_thread -->
+					
+					<input type="checkbox" name="deleteThreads[]" value="{THREAD_ID}" />
+					
+					<!-- END modify_thread -->
+					
+					<h3><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a> {THREAD_LOCKED}</h3>
+					<p>{THREAD_AUTHOR} - {THREAD_TIME} </p></td>
+				<td><!-- BEGIN last_post -->
+					
+					<h3><a href="/search/user/{THREAD_LAST_POST_USER_ID}">{THREAD_LAST_POST_USER}</a></h3>
+					<p>{THREAD_LAST_POST_TIME}</p>
+					<!-- END last_post --></td>
+				<td> {THREAD_REPLIES} </td>
+				<td> {THREAD_VIEWS} </td>
+				<td><a href="/forum/thread/{THREAD_ID}/{THREAD_LAST_PAGE}/#bottom" class="btn go-to"><span></span>Go to Forum</a></td>
+			</tr>
+			<!-- END thread -->
+		</tbody>
+	</table>
+	<button class="thread submit-btn-plain">Post Thread</button>
+	<!-- BEGIN delete_button -->
+	<input type="submit" name="submit" class="submit-btn-plain" value="Delete Selected" onclick="return(confirm('Are you sure you wish to delete these forum threads?'))" />
+	<!-- END delete_button -->
 </form>
-<div class="pagination navhelp">
-	<!-- BEGIN previous_button -->
-    <a href="/forum/{CATEGORY_ID}/{PREVIOUS_PAGE}">&lt; Prev</a>
-    <!-- END previous_button -->
-    <!-- BEGIN page_number -->
-    <a class="{CURRENT}" href="/forum/{CATEGORY_ID}/{PAGE_INDEX}">{PAGE_INDEX}</a>
-    <!-- END page_number -->
-    <!-- BEGIN next_button -->
-    <a href="/forum/{CATEGORY_ID}/{NEXT_PAGE}">Next &gt;</a>
-	<!-- END next_button -->
+<div class="pagination navhelp"> 
+	<!-- BEGIN previous_button --> 
+	<a href="/forum/{CATEGORY_ID}/{PREVIOUS_PAGE}">&lt; Prev</a> 
+	<!-- END previous_button --> 
+	<!-- BEGIN page_number --> 
+	<a class="{CURRENT}" href="/forum/{CATEGORY_ID}/{PAGE_INDEX}">{PAGE_INDEX}</a> 
+	<!-- END page_number --> 
+	<!-- BEGIN next_button --> 
+	<a href="/forum/{CATEGORY_ID}/{NEXT_PAGE}">Next &gt;</a> 
+	<!-- END next_button --> 
 </div>

@@ -2,9 +2,8 @@
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript" src="/javascript/mootools.js"></script>
-
-    <script type="text/javascript" src="/javascript/behaviour.js"></script>
-    <script type="text/javascript">
+<script type="text/javascript" src="/javascript/behaviour.js"></script>
+<script type="text/javascript">
         function showRow () {
             var selecLevel = document.getElementById('eventForm').level.options[document.getElementById('eventForm').level.selectedIndex].value;
             
@@ -102,119 +101,130 @@
 					$j(this).parent().addClass('active-checkbox');
 				}
 			});
+			
+			
+			$j('#eventForm').validate();
+			
 		});
 	
     </script>
-    <!-- END custom_head -->
+<!-- END custom_head -->
 
-		<h1><span>{FUNCTION} Event</span></h1>
-    <div class="float-fix"></div>
-            <form  method="post" action="/calendar/modify.php" id="eventForm">
-                    <table class="standardForm">
-                      <tr>
-                        <td class="formLabelWidth"><h4>Title</h4></td>
-						<td><input name="note" type="text" size="50" value="{DESCRIPTION}"/></td>
-                      </tr>
-                      <tr> 
-                        <td class="formLabelWidth" valign="top"><h4>Date</h4>
-                        	<em>The date on which the event will occur. The date should be formatted like this dd/mm/yyyy. </em>
-							</td>
-						<td><input name="date" id="cal_date" type="text" size="15" maxlength="30" value="{DATE}"/></td>
-
-                      </tr>
-                      <!-- BEGIN recurring_dates -->
-                      <tr>
-                       <td class="formLabelWidth" valign="top"><h4>Repeat</h4>
-                       <em>The frequency that this event recurs if at all.</em>
-					  </td>
-					  <td> <select name="repeat" onchange="toggleRepeat(this);">
-                       	   <option value="">Single Event</option>
-                       	   <option value="daily">Daily</option>
-                           <option value="weekly">Weekly</option>
-                           <option value="fortnightly">Fortnightly</option>
-                           <option value="monthly">Monthly</option>
-                           </select></td>
-                      </tr>
-                      <tr id="repeatUntil" style="display: none;">
-                      <td class="formLabelWidth" valign="top"><h3>Repeat Until</h3>
-                      <em>The date at which recurrence should cease.</em></td>
-                      <td><input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/>
-						</td>
-                      </tr>
-                      <!-- END recurring_dates -->
-                      <tr> 
-                        <td><h4>Time</h4><em>Both time slots are optional.</em></td>
-						<td><input name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />
-                          : 
-                          <input name="minute" type="text" maxlength="2" value="{MIN}" class="timeField" /> 
-                          <select name="period">
-                            <option value="am" {AM} >AM</option>
-                            <option value="pm" {PM} >PM</option>
-                          </select> to
-                          <input name="tohour" type="text" maxlength="2" value="{TOHOUR}" class="timeField" />
-                          : 
-                          <input name="tominute" type="text" maxlength="2" value="{TOMIN}" class="timeField" /> 
-                          <select name="toperiod">
-                            <option value="am" {AMTO}>AM</option>
-                            <option value="pm" {PMTO}>PM</option>
-                          </select></td>
-                      </tr>
-                      <tr>
-                        <td><h4>Location</h4></td>
-                        <td><input name="location" type="text" size="50" value="{LOCATION}"/></td>
-                      </tr>
-                      <tr>
-                        <td><h4>Type</h4>
-                        	<em>Select the type of event, this will be represented via different colours</em>                        </td>
-						<td><select name="type">
-                             <!-- BEGIN type_drop -->
-                              <option value="{TYPE_NUMBER}" {TYPE_NUMBER_SELECTED}>{TYPE_NAME}</option>
-                             <!-- END type_drop -->
-                          </select></td>
-                      </tr>
-                      <tr> 
-                        <td><h4>Level</h4><em>Select who you would like to be able to see this event</em>
-						</td>
-						<td><select name="level" id="level" onChange="showRow()">
-                       		 <!-- BEGIN level_drop -->
-                              <option value="{LEVEL_ID}" {LEVEL_ID_SELECTED}>{LEVEL_NAME}</option>
-                             <!-- END level_drop -->
-                        </select></td>
-                      </tr>
-                      <tr id="groupDrop" style="display:none;"> 
-                        <td><h4>Group</h4><em>Select the group which will be able to view this event</em></td>
-						<td><select name="group">
-                            <!-- BEGIN group_drop -->
-                            <option value="{UGROUP_ID}" {UGROUP_ID_SELECTED} />{UGROUP_NAME}</option>
-                            <!-- END group_drop -->                        
-                        </select></td>
-                      </tr>                      
-                      <tr id="campusList" style="display:none;"> 
-                        <td><h4>Campus</h4><em>Select the campus' which will be able to view this event</em>
-						</td>
-						<td><!-- BEGIN campus_list -->
-							<label class="float-left clear">
-								<input type="checkbox" class="campusCheck" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}
-							</label>
-						<!-- END campus_list --></td>
-                      </tr>
-                      <tr id="groupList" style="display:none;"> 
-                        <td><h4>Group</h4><em>Select the group which will be able to view this event</em>
-						</td>
-						<td><!-- BEGIN group_list -->
-							<label  class="float-left clear"><input type="checkbox" name="groupCheck[]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />{GROUP_NAME}</label>
-						<!-- END group_list -->  </td>
-                      </tr>
-                      <tr>
-                        <td><h4>Details</h4></td>
-                        <td ><textarea name="detail" cols="50" rows="3">{DETAIL}</textarea></td>
-                      </tr>
-                    </table>
-
-                    <input type="hidden" name="id" value="{EVENT_ID}" />
-                    <input type="hidden" name="return" value="{RETURN_TO}" />
-
-					<input type="submit" name="Submit" value="{FUNCTION} Event" class="submit-btn-plain">
-						  <!-- BEGIN delete_button --><input type="button" name="delete" value="Delete Event" class="submit-btn-plain" onclick="confirmDelete({EVENT_ID});" /><!-- END delete_button -->
-						  <div class="float-fix"></div>
-            </form>	
+<h1><span>{FUNCTION} Event</span></h1>
+<div class="float-fix"></div>
+<form  method="post" action="/calendar/modify.php" id="eventForm">
+	<table class="standardForm">
+		<tr>
+			<td class="formLabelWidth"><h4>Title</h4></td>
+			<td><label><input class="required" name="note" type="text" size="50" value="{DESCRIPTION}"/></label></td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth" valign="top"><h4>Date</h4>
+				<em>The date on which the event will occur. The date should be formatted like this dd/mm/yyyy. </em></td>
+			<td><input name="date" id="cal_date" type="text" size="15" maxlength="30" value="{DATE}"/></td>
+		</tr>
+		<!-- BEGIN recurring_dates -->
+		<tr>
+			<td class="formLabelWidth" valign="top"><h4>Repeat</h4>
+				<em>The frequency that this event recurs if at all.</em></td>
+			<td><select name="repeat" onchange="toggleRepeat(this);">
+					<option value="">Single Event</option>
+					<option value="daily">Daily</option>
+					<option value="weekly">Weekly</option>
+					<option value="fortnightly">Fortnightly</option>
+					<option value="monthly">Monthly</option>
+				</select></td>
+		</tr>
+		<tr id="repeatUntil" style="display: none;">
+			<td class="formLabelWidth" valign="top"><h3>Repeat Until</h3>
+				<em>The date at which recurrence should cease.</em></td>
+			<td><input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/></td>
+		</tr>
+		<!-- END recurring_dates -->
+		<tr>
+			<td><h4>Time</h4>
+				<em>Both time slots are optional.</em></td>
+			<td><input name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField" />
+				:
+				<input name="minute" type="text" maxlength="2" value="{MIN}" class="timeField" />
+				<select name="period">
+					<option value="am" {AM} >AM</option>
+					<option value="pm" {PM} >PM</option>
+				</select>
+				to
+				<input name="tohour" type="text" maxlength="2" value="{TOHOUR}" class="timeField" />
+				:
+				<input name="tominute" type="text" maxlength="2" value="{TOMIN}" class="timeField" />
+				<select name="toperiod">
+					<option value="am" {AMTO}>AM</option>
+					<option value="pm" {PMTO}>PM</option>
+				</select></td>
+		</tr>
+		<tr>
+			<td><h4>Location</h4></td>
+			<td><input name="location" type="text" size="50" value="{LOCATION}"/></td>
+		</tr>
+		<tr>
+			<td><h4>Type</h4>
+				<em>Select the type of event, this will be represented via different colours</em></td>
+			<td><select name="type">
+					<!-- BEGIN type_drop -->
+					<option value="{TYPE_NUMBER}" {TYPE_NUMBER_SELECTED}>{TYPE_NAME}</option>
+					<!-- END type_drop -->
+				</select></td>
+		</tr>
+		<tr>
+			<td><h4>Level</h4>
+				<em>Select who you would like to be able to see this event</em></td>
+			<td><select name="level" id="level" onChange="showRow()">
+					<!-- BEGIN level_drop -->
+					<option value="{LEVEL_ID}" {LEVEL_ID_SELECTED}>{LEVEL_NAME}</option>
+					<!-- END level_drop -->
+				</select></td>
+		</tr>
+		<tr id="groupDrop" style="display:none;">
+			<td><h4>Group</h4>
+				<em>Select the group which will be able to view this event</em></td>
+			<td><select name="group">
+					<!-- BEGIN group_drop -->
+					<option value="{UGROUP_ID}" {UGROUP_ID_SELECTED} />
+					{UGROUP_NAME}
+					</option>
+					<!-- END group_drop -->
+				</select></td>
+		</tr>
+		<tr id="campusList" style="display:none;">
+			<td><h4>Campus</h4>
+				<em>Select the campus' which will be able to view this event</em></td>
+			<td><!-- BEGIN campus_list -->
+				
+				<label class="float-left clear">
+					<input type="checkbox" class="campusCheck" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />
+					{CAMPUS_NAME} </label>
+				
+				<!-- END campus_list --></td>
+		</tr>
+		<tr id="groupList" style="display:none;">
+			<td><h4>Group</h4>
+				<em>Select the group which will be able to view this event</em></td>
+			<td><!-- BEGIN group_list -->
+				
+				<label  class="float-left clear">
+					<input type="checkbox" name="groupCheck[]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />
+					{GROUP_NAME}</label>
+				
+				<!-- END group_list --></td>
+		</tr>
+		<tr>
+			<td><h4>Details</h4></td>
+			<td ><textarea name="detail" cols="50" rows="3">{DETAIL}</textarea></td>
+		</tr>
+	</table>
+	<input type="hidden" name="id" value="{EVENT_ID}" />
+	<input type="hidden" name="return" value="{RETURN_TO}" />
+	<input type="submit" name="Submit" value="{FUNCTION} Event" class="submit-btn-plain">
+	<!-- BEGIN delete_button -->
+	<input type="button" name="delete" value="Delete Event" class="submit-btn-plain" onclick="confirmDelete({EVENT_ID});" />
+	<!-- END delete_button -->
+	<div class="float-fix"></div>
+</form>
