@@ -108,7 +108,8 @@ class SitePage extends Page {
 					'SITE_LOGINNAME'=> formatName($_SESSION),
                     'SITE_USERNAME' => $_SESSION['username'],
 					'SITE_LOCATION'	=> $this->site,
-                                        'USER_ID'       => $_SESSION['id'],
+                    'USER_ID'       => $_SESSION['id'],
+                    'SITE_VERSION'  => Cfg::get('site_version'),
 				);
                 $this->setVar($templateVar);
 

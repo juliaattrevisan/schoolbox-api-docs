@@ -192,7 +192,7 @@ class ePortfolio {
             $this->db->query($query);
 
             $this->saveComponentPosition($component, 1, 1, $newComp['config']);
-        }
+        } 
 
 
 

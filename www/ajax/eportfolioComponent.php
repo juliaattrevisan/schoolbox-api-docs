@@ -39,7 +39,6 @@ $config = unserialize($component['config']);
 if(is_file($_SERVER['DOCUMENT_ROOT'] . '/eportfolio/' . $component['method'] . '.php'))
         include($_SERVER['DOCUMENT_ROOT'] . '/eportfolio/' . $component['method'] . '.php');
 
-if($permission >= WRITE_ACCESS) {
 if(is_array($default)) {
 
 foreach($default as $name => $value) {
@@ -98,7 +97,6 @@ foreach($default as $name => $value) {
     }
 }
 
-}
 $this->parse("config_block", "config");
 } else
         $this->setVar("config_block", "");
