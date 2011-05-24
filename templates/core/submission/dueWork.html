@@ -157,15 +157,15 @@ $j(function () {
 	</div>
 	<div class="box component">
 		<h2>Recent Work Activity <a href="/submission/allDueWork/{USER_ID}" class="btn"><span></span>View all work</a></h2>
-		<div class="text listing">
+		<div class="listing">
 			<table class="due-dates">
 				<thead>
 					<tr>
 						<th width="20%">Date</th>
 						<th width="15%">Subject</th>
-						<th width="30%">Description</th>
+						<th width="25%">Description</th>
 						<th width="15%">Status</th>
-						<th width="20%"></th>
+						<th width="25%"></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -175,7 +175,7 @@ $j(function () {
 						<td>{WORK_SUBJECT}</td>
 						<td>{WORK_DESCRIPTION}</td>
 						<td valign="top">{WORK_STATUS}</td>
-						<td><a href="/submission/submissionHistory/{WORK_BOX_ID}" class="btn"><span></span>{WORK_ACTION}</a><div class="float-fix"></div></td>
+						<td><a href="/submission/submissionHistory/{WORK_BOX_ID}" class="btn" style="overflow:hidden"><span></span>{WORK_ACTION}</a><div class="float-fix"></div></td>
 					</tr>
 					<!-- END work -->
 				</tbody>
@@ -186,7 +186,7 @@ $j(function () {
 	<!-- BEGIN allAssess -->
 	<div class="box component">
 		<h2>Online Assessments</h2>
-		<div class="text listing">
+		<div class="listing">
 			<table class="due-dates onlineAssessments">
 				<thead>
 					<tr>
@@ -227,7 +227,7 @@ $j(function () {
 <div class="right">
 	<div class="box component">
 		<h2>Subjects</h2>
-		<div class="text listing">
+		<div class="listing">
 			<ul>
 				<!-- BEGIN summary -->
 				<li class="bars {DARK}"> <a href="/homepage/{SUMMARY_CAT_ID}">{SUMMARY_CAT_NAME}</a> 
@@ -248,7 +248,7 @@ $j(function () {
 	</div>
 	<div class="box component">
 		<h2>Activities</h2>
-		<div class="text listing">
+		<div class="listing">
 			<ul>
 				<!-- BEGIN activity -->
 				<li class="{DARK}">
