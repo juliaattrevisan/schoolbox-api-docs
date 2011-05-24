@@ -14,7 +14,7 @@ if (isset($_POST['url']) && $_POST['url'] && isset($_POST['description']) && $_P
 	 * http://ilearn/
 	 * http://ilearn/test/blah
 	 */
-	if (preg_match('#^(http://)([^\.]+)/(.*)?#i', $url, $matches) || preg_match('#^(http://)([^\.]+)$#i', $url, $matches)) {
+	if (preg_match('#^(http://|https://)([^\.]+)/(.*)?#i', $url, $matches) || preg_match('#^(http://|https://)([^\.]+)$#i', $url, $matches)) {
 
 		/* Remove unused matches
 		 */
