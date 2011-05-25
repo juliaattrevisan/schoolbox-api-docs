@@ -2,7 +2,7 @@
 $j(document).ready(function() {
 	
 	//add a clone!
-	var thing = $j('.hidden-clone ul:first-child').clone();
+	var thing = $j('.hidden-clone li:first-child').clone();
 	$j('ul#answerCollection').append(thing);
 	
 	var validator = $j("#createQuestionForm").submit(function() {
@@ -73,38 +73,35 @@ $j(document).ready(function() {
 				}
 			},
 
-			errorElement: "div",
-			wrapper: "div",  // a wrapper around the error message
+
 			errorPlacement: function(error, element) {
+				
 				offset = element.offset();
-				error.insertAfter(element)
-				error.addClass('message');  // add a class to the wrapper
-				error.css('position', 'absolute');
-				error.css('left',0);
-				error.css('top',  element.outerHeight() +10);
-	
-				if (element.hasClass("tinyValidate")) {
-					var pos = $j('#question_container').position();
-					error.css('left', 0);
-					error.css('top',  pos.top + $j('#question_container').outerHeight() );
-				}
+				error.insertAfter(element.parent().children(':last-child'))
+				var lefty = element.position();	
 				
 				if (element.hasClass("answerLeft")) {
-					error.addClass("leftError");
 					var pos = $j('ul#answerCollection').height();
-					var lefty = element.position();
+					error.addClass("leftError");
+					
+					error.width(275);
+					error.css('position', 'absolute');
+					$j('.leftError').css('top',  90);
 					$j('.leftError').css('left', lefty.left + 100);
 					
-					$j('.leftError').css('top',  pos);
 					$j('.leftError').css('z-index',  1000);
 				}
 				
 				if (element.hasClass("answerRight")) {
-					error.addClass("rightError");
 					var pos = $j('ul#answerCollection').height();
-					var lefty = element.position();
+					
+					error.addClass("rightError");
+					
+					error.width(275);
+					error.css('position', 'absolute');
+					$j('.rightError').css('top',  90);
 					$j('.rightError').css('left', lefty.left);
-					$j('.rightError').css('top',  pos);
+					
 					$j('.rightError').css('z-index',  1000);
 				}
 
@@ -158,13 +155,13 @@ $j(document).ready(function() {
 		/* Add a new answer option
 		 */
 		$j('#makeNewAnswer').live('click', function() {
-			var thing = $j('.hidden-clone ul:first-child').clone();
+			var thing = $j('.hidden-clone li:first-child').clone();
 			$j('ul#answerCollection').append(thing);
 			
 				var pos = $j('ul#answerCollection').height();
 				
-           		$j('.leftError').css('top',  pos);
-				$j('.rightError').css('top',  pos);
+           		$j('.leftError').css('top',  pos - 10);
+				$j('.rightError').css('top',  pos - 10);
 			
 		});
 		
@@ -174,6 +171,9 @@ $j(document).ready(function() {
 			if (($j('.inputs').length) !== 3) {
 				$j(this).parent().remove();
 			}	
+			var pos = $j('ul#answerCollection').height();
+			$j('.leftError').css('top',  pos -10);
+			$j('.rightError').css('top',  pos-10);
 		});
 		
 });

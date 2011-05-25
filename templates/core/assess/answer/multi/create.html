@@ -1,11 +1,12 @@
-
 <script type="text/javascript" src="/javascript/jquery.form.2.43.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
 
+	
+
 	//add in one clone to start with
 	$j('.answerCorrect').attr('checked', false);
-		var thing = $j('.hidden-clone ul:first-child').clone();
+		var thing = $j('.hidden-clone li:first-child').clone();
 		$j('ul#answerCollection').append(thing);
 		refreshList();
 
@@ -22,6 +23,9 @@ $j(document).ready(function() {
              */
 			var answerCollection = new Array();
 			tinyMCE.triggerSave();
+			
+			var content = tinyMCE.activeEditor.getContent(); // get the content
+   			$j('#question').val(content); // put it in the textarea
 			
 			/* Collate possible answers and their correctness status
 			 */
@@ -77,45 +81,32 @@ $j(document).ready(function() {
 			},
 			'answerDescription[]': {
 				emptyInputs: true
-			}
-			/* Removed mandatory correct answre
-			 * ,
+			},
 			'answer[]':{
 				nothingChecked:true	
 			}
-			*/
 		},
 		
-		errorElement: "div",
-        wrapper: "div",  // a wrapper around the error message
         errorPlacement: function(error, element) {
             offset = element.offset();
-            error.insertAfter(element)
+            error.insertAfter(element.parent().children(':last-child'))
             error.addClass('message');  // add a class to the wrapper
-            error.css('position', 'absolute');
-            error.css('left', 0);
-            error.css('top',  element.parent().outerHeight() );
-
-			if (element.hasClass("tinyValidate")) {
-				var pos = $j('#question_container').position();
-				error.css('left', pos.left);
-           		error.css('top',  pos.top + $j('#question_container').outerHeight() +5);
-			}
+            var pos = $j('ul#answerCollection').height();
+			var lefty = element.position();
 			
 			if (element.hasClass("answerDescription")) {
-				error.addClass("list-items");
 				var pos = $j('ul#answerCollection').height();
-				var lefty = element.position();
+				error.addClass("list-items");
+				error.css('position', 'absolute');
 				$j('.list-items').css('left', 115);
-           		$j('.list-items').css('top',  pos);
+           		$j('.list-items').css('top', pos);
 			}
 			
 			if (element.hasClass("answerCorrect")) {
 				error.addClass("wrong-checkbox");
-				var pos = $j('ul#answerCollection').height();
-				var lefty = element.position();
-				$j('.wrong-checkbox').css('left',  115);
-           		$j('.wrong-checkbox').css('top',  pos + element.height() + 8);
+				error.css('position', 'absolute');
+				$j('.wrong-checkbox').css('left', 115);
+           		$j('.wrong-checkbox').css('top', pos);
 			}
 		}
 	});
@@ -137,10 +128,10 @@ $j(document).ready(function() {
         });
 
         return fieldsAreFilled;
-    }, 'Please make sure all the answers are filled out');
+    }, 'Please fill out all answers');
 
 	/* Removed mandatory correct answer from multiple choice
-	 *
+	 */
 	jQuery.validator.addMethod('nothingChecked', function(value, element) {
         var countDracula = 0;
 	   
@@ -155,8 +146,6 @@ $j(document).ready(function() {
                 countDracula++
             }
         });
-		
-		console.log(countDracula)
 
 		if (countDracula == 0) {
 			oneFieldChecked = false;
@@ -164,21 +153,14 @@ $j(document).ready(function() {
 		 
 		return oneFieldChecked;
 
-    }, 'Tick at least one checkbox to highlight the correct answer');
-	*/
+    }, 'Tick at least one checkbox');
+
 
     /* Add a new answer option
      */
     $j('#makeNewAnswer').live('click', function() {
-		var thing = $j('.hidden-clone ul:first-child').clone();
+		var thing = $j('.hidden-clone li:first-child').clone();
 		$j('ul#answerCollection').append(thing);
-		var pos = $j('ul#answerCollection').height();
-		
-		$j('.list-items').css('left',  115);
-		$j('.list-items').css('top',  pos);
-		
-		$j('.wrong-checkbox').css('left',  115);
-		$j('.wrong-checkbox').css('top',  pos + 30);
 		refreshList();
     });
 	
@@ -189,6 +171,7 @@ $j(document).ready(function() {
 			$j(this).parent().remove();
 			refreshList()
 		}	
+
     });	
 	
 	$j('.answerCorrect').live('click', function() {
@@ -205,9 +188,15 @@ $j(document).ready(function() {
 			$this.children('input').val(convert);
 			alphabetStart++;
 		});
+		
+		var pos = $j('ul#answerCollection').height();
+		
+		$j('.list-items').css('left',  115);
+		$j('.list-items').css('top',  pos +  27);
+		
+		$j('.wrong-checkbox').css('left',  115);
+		$j('.wrong-checkbox').css('top',  pos);
 	}
-	
-	//$j('ul#answerCollection')
 	
 });
 </script>

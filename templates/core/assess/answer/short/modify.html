@@ -1,6 +1,10 @@
-
 <script type="text/javascript">
 $j(function() {
+	
+	$j('#create').live('click',function() {
+		var content = tinyMCE.activeEditor.getContent(); // get the content
+   		$('#question').val(content); // put it in the textarea
+	});
 
 	var validator = $j(".standardForm").submit(function() {
 		 // update underlying textarea before submit validation
@@ -26,17 +30,9 @@ $j(function() {
 
         errorPlacement: function(error, element) {
             offset = element.offset();
-            error.insertAfter(element)
+         	error.insertAfter(element.parent().children(':last-child'))
             error.addClass('message');  // add a class to the wrapper
-            error.css('position', 'absolute');
-            error.css('left', 0);
-            error.css('top',  element.parent().height());
-
-			if (element.hasClass("tinyValidate")) {
-				var pos = $j('#question_container').position();
-				error.css('left', pos.left);
-           		error.css('top',  pos.top + $j('#question_container').outerHeight());
-			}
+           
 		}
 	
 	});

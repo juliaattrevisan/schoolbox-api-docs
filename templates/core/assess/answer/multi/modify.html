@@ -1,5 +1,7 @@
+<script type="text/javascript" src="/javascript/jquery.form.2.43.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
+		
    	var validator = $j("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave();
@@ -12,7 +14,9 @@ $j(document).ready(function() {
         	/* Form preprocessing
              */
 			var answerCollection = new Array();
-			tinyMCE.triggerSave();
+			
+			var content = tinyMCE.activeEditor.getContent(); // get the content
+   			$j('#question').val(content); // put it in the textarea
 			
 			/* Collate possible answers and their correctness status
 			 */
@@ -69,17 +73,15 @@ $j(document).ready(function() {
 			},
 			'answerDescription[]': {
 				emptyInputs: true
-			}
+			},
 			/* Removed mandatory correct answer
-			 * ,
+			 */
 			'answer[]':{
 				nothingChecked:true	
 			}
-			*/
+
 		},
-		
-		errorElement: "div",
-        wrapper: "div",  // a wrapper around the error message
+
         errorPlacement: function(error, element) {
             offset = element.offset();
             error.insertAfter(element)
@@ -89,9 +91,9 @@ $j(document).ready(function() {
             error.css('top',  element.parent().outerHeight() );
 
 			if (element.hasClass("tinyValidate")) {
-				var pos = element.siblings('#question_container').position();
+				var pos = $j('#question_container').position();
 				error.css('left', pos.left);
-           		error.css('top',  pos.top + element.siblings('#question_container').outerHeight() +5);
+           		error.css('top',  pos.top + $j('#question_container').outerHeight());
 			}
 			
 			if (element.hasClass("answerDescription")) {
@@ -133,9 +135,9 @@ $j(document).ready(function() {
         /* Reposition bubble here somewhere
          */
         return fieldsAreFilled;
-    }, 'Please make sure all the answers are filled out');
+    }, 'Please fill out all answers');
 
-	/*
+
 	jQuery.validator.addMethod('nothingChecked', function(value, element) {
         var countDracula = 0;
 	   
@@ -159,8 +161,8 @@ $j(document).ready(function() {
 		 
 		return oneFieldChecked;
 
-    }, 'Tick at least one checkbox to highlight the correct answer');
-	*/
+    }, 'Tick at least one checkbox');
+
 
     /* Add a new answer option
      */

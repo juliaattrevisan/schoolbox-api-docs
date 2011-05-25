@@ -8,8 +8,11 @@ var validator = $j("#createQuestionForm").submit(function() {
 
 			submitHandler: function() {
 			
-			var theForm = $j('#createQuestionForm');
+				var theForm = $j('#createQuestionForm');
 				var answerCollection = new Array();
+				
+				var content = tinyMCE.activeEditor.getContent(); // get the content
+   				$j('#question').val(content); // put it in the textarea
 		
 				/* Collate possible answers and their correctness status
 				 */
@@ -69,36 +72,36 @@ var validator = $j("#createQuestionForm").submit(function() {
 				}
 			},
 
-			errorElement: "div",
-			wrapper: "div",  // a wrapper around the error message
+			
 			errorPlacement: function(error, element) {
 				offset = element.offset();
 				error.insertAfter(element)
 				error.addClass('message');  // add a class to the wrapper
-				error.css('position', 'absolute');
-				error.css('left', offset.left);
-				error.css('top',  offset.top + element.outerHeight() );
-	
-				if (element.hasClass("tinyValidate")) {
-					var pos = element.siblings('#question_container').position();
-					error.css('left', pos.left);
-					error.css('top',  pos.top + element.siblings('#question_container').outerHeight() +5);
-				}
+				error.css('top',  element.outerHeight());
+				
+				var pos = $j('ul#answerCollection').height();
+				var lefty = element.position();
+
 				
 				if (element.hasClass("answerLeft")) {
-					error.addClass("leftError");
 					var pos = $j('ul#answerCollection').height();
-					var lefty = element.position();
-					$j('.leftError').css('left', lefty.left + 100);
 					
+					error.addClass("leftError");
+
+					error.width(300);
+					error.css('position', 'absolute');
+					$j('.leftError').css('left', lefty.left + 100);
 					$j('.leftError').css('top',  pos);
 					$j('.leftError').css('z-index',  1000);
 				}
 				
 				if (element.hasClass("answerRight")) {
-					error.addClass("rightError");
 					var pos = $j('ul#answerCollection').height();
-					var lefty = element.position();
+					
+					error.addClass("rightError");
+					
+					error.width(300);
+					error.css('position', 'absolute');
 					$j('.rightError').css('left', lefty.left);
 					$j('.rightError').css('top',  pos);
 					$j('.rightError').css('z-index',  1000);
@@ -154,7 +157,7 @@ var validator = $j("#createQuestionForm").submit(function() {
 		/* Add a new answer option
 		 */
 		$j('#makeNewAnswer').live('click', function() {
-			var thing = $j('.hidden-clone ul:first-child').clone();
+			var thing = $j('.hidden-clone li:first-child').clone();
 			$j('ul#answerCollection').append(thing);
 			
 				var pos = $j('ul#answerCollection').height();
@@ -170,6 +173,10 @@ var validator = $j("#createQuestionForm").submit(function() {
 		if (($j('.inputs').length) !== 2) {
 			$j(this).parent().remove();
 		}	
+		var pos = $j('ul#answerCollection').height();
+				
+       $j('.leftError').css('top',  pos);
+		$j('.rightError').css('top',  pos);
     });
 });
 </script>

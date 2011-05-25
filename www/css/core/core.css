@@ -17,8 +17,8 @@ body {
 
 .contextMenu{width:200px !important;}
 
-body#tinymce { background:#fff;  }
-#tinymce p{padding:8px;}
+body#tinymce { background:#fff; padding:8px; }
+#tinymce p{}
 #tinymce p span{background:#E0F2DF;}
 
 /*--------------------------------------------------------------
