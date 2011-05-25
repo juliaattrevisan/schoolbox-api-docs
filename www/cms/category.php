@@ -38,6 +38,7 @@ if(is_numeric($this->arg[0])) {
 					'PARENT_NAME'	=> scrubText($categoryParent['name']),
                     'USER_GROUP' => $_SESSION['gid'],
                     'DATABASE_TYPE' => ucfirst(Cfg::get('external_type')),
+					'REQUIRED_PERMS'=> $_SESSION['gid'],
 					);
 
     $this->setVar($output);
@@ -52,7 +53,6 @@ if(is_numeric($this->arg[0])) {
 		foreach ($groupPermList as $group) {
 			$output = array('GROUP_NAME'		=> scrubText($group['name']),
 							'GROUP_ID'			=> $group['id'],
-							'REQUIRED_PERMS'=> $_SESSION['gid'],
 							'PERM_0_SELECTED'	=> '',
 							'PERM_1_SELECTED'	=> '',
 							'PERM_2_SELECTED'	=> '',
