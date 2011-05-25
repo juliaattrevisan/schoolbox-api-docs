@@ -9,57 +9,8 @@ $myLinksHandler = new MyLinks();
 if (isset($_POST['url']) && $_POST['url'] && isset($_POST['description']) && $_POST['description']) {
 	$url = scrubTEXT(trim($_POST['url']));
 
-	/* Local url:
-	 * http://ilearn
-	 * http://ilearn/
-	 * http://ilearn/test/blah
-	 */
-	if (preg_match('#^(http://|https://)([^\.]+)/(.*)?#i', $url, $matches) || preg_match('#^(http://|https://)([^\.]+)$#i', $url, $matches)) {
-
-		/* Remove unused matches
-		 */
-		unset($matches[0]);
-		unset($matches[1]);
-
-		/* Remove empty elements
-		 */
-		foreach(array_keys($matches, '') as $element) {
-			unset($matches[$element]);
-		}
-
-		$url = '//' . implode('/', $matches);
-	}
-
-	/* Local url:
-	 * //ilearn
-	 * //ilearn/test/blah
-	 */
-	else if (preg_match('#^//(.*)?#i', $url, $matches)) {
-		$url = $matches[0];
-	}
-
-	/* Local url:
-	 * ilearn
-	 * ilearn/test/blah
-	 */
-	else if (preg_match('#^([^\.]+)$#', $url, $matches)) {
-		$url = '//' . $matches[0];
-	}
-
-	/* External url:
-	 * google.com
-	 * www.google.com
-	 * http://www.google.com
-	 * https://www.google.com
-	 */
-	else {
-		/* Normal modification to url
-		 * Just return url if it includes protocol
-		 * Otherwise add http protocol if it was not found
-		 */
-		if (!preg_match('#http(s?)://(.*)#i', $url, $matches)) {
-			$url = 'http://' . $url;
-		}
+	if (isLocalURL($url)) {
+		$url = relativeURL($url);
 	}
 
 	$myLinksHandler->create(array(

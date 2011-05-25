@@ -299,12 +299,12 @@ function relativeURL($url) {
 	 * (that originally caused the issue with links not being correct)
 	 */
     $hosts = array(
-        'http://' . SITE_hostname. '.' . SITE_domain,
-        'https://' . SITE_hostname. '.' . SITE_domain,
+        'http://' . Cfg::get('site_hostname') . '.' . Cfg::get('site_domain'),
+        'https://' . Cfg::get('site_hostname'). '.' . Cfg::get('site_domain'),
         'http://' . $_SERVER['HTTP_HOST'],
         'https://' . $_SERVER['HTTP_HOST'],
-        'http://' . SITE_hostname,
-        'https://' . SITE_hostname,
+        'http://' . Cfg::get('site_hostname'),
+        'https://' . Cfg::get('site_hostname'),
     );
 
     return str_replace($hosts, '', $url);
@@ -438,4 +438,61 @@ function getRelativeTime($date, $now = 0, $prefix = 'on', $suffix = 'ago') {
 	return $prefix.' '.date(Cfg::get('date_notime'), $date);
 }
 
+
+function relativeLinkRegex($url) {
+	/* Local url:
+	 * http://ilearn
+	 * http://ilearn/
+	 * http://ilearn/test/blah
+	 */
+	if (preg_match('#^(http://|https://)([^\.]+)/(.*)?#i', $url, $matches) || preg_match('#^(http://|https://)([^\.]+)$#i', $url, $matches)) {
+
+		/* Remove unused matches
+		 */
+		unset($matches[0]);
+		unset($matches[1]);
+
+		/* Remove empty elements
+		 */
+		foreach(array_keys($matches, '') as $element) {
+			unset($matches[$element]);
+		}
+
+		$url = '//' . implode('/', $matches);
+	}
+
+	/* Local url:
+	 * //ilearn
+	 * //ilearn/test/blah
+	 */
+	else if (preg_match('#^//(.*)?#i', $url, $matches)) {
+		$url = $matches[0];
+	}
+
+	/* Local url:
+	 * ilearn
+	 * ilearn/test/blah
+	 */
+	else if (preg_match('#^([^\.]+)$#', $url, $matches)) {
+		$url = '//' . $matches[0];
+	}
+
+	/* External url:
+	 * google.com
+	 * www.google.com
+	 * http://www.google.com
+	 * https://www.google.com
+	 */
+	else {
+		/* Normal modification to url
+		 * Just return url if it includes protocol
+		 * Otherwise add http protocol if it was not found
+		 */
+		if (!preg_match('#http(s?)://(.*)#i', $url, $matches)) {
+			$url = 'http://' . $url;
+		}
+	}
+
+	return $url;
+}
 ?>
