@@ -68,7 +68,7 @@ $j(document).ready(function() {
 
 				<!-- BEGIN answerInputs -->
 				<!-- END answerInputs -->
-                <input type="submit" value="Update Marks" class="next-step"/>
+                <input type="submit" value="Update Marks" class="submit-btn-plain float-right"/>
                 <div class="float-fix"></div>
 			</div>
 		</form>
@@ -77,14 +77,14 @@ $j(document).ready(function() {
 	<!-- END question -->
 
 	<!-- BEGIN prevSection -->
-	<a class="next-step step-nav" href="/assess/review/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Previous Section</a>
+	<a class="btn go-back float-left" href="/assess/review/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Previous Section</a>
 	<!-- END prevSection -->
 
 	<!-- BEGIN nextSection -->
-	<a class="next-step step-nav" href="/assess/review/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Next Section</a>
+	<a class="btn go-to" href="/assess/review/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Next Section</a>
 	<!-- END nextSection -->
 
 	<!-- BEGIN endAssess -->
-	<a class="green-go" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Finish</a>
+	<a class="btn tick" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Finish</a>
 	<!-- END endAssess -->
 </div>

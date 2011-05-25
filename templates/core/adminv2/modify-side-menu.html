@@ -1,3 +1,13 @@
+<script type="text/javascript">
+
+$j(function() {
+	
+	$j('#form').validate();
+	
+});
+
+</script>
+
 <h1>Schoolbox Administration</h1>
 <ul class="admin-nav">
 	<li><a href="/adminv2/home">Home</a></li>
@@ -14,9 +24,9 @@
 	<h2>Modify Side Menu Item</h2>
             <form action="/adminv2/side-menuForm.php" method="post" name="form" id="form" class="standardForm" >
                     <table>
-                        <td><h2>Name</h2>
+                        <td class="formLabelWidth"><h2>Name</h2>
                           <em>This is the text that will be displayed on the menu</em></td>
-                        <td><input type="text" name="txt" maxlength="250" size="40" value="{TEXT}" />
+                        <td><label><input type="text" name="txt" class="required" maxlength="250" size="40" value="{TEXT}" /></label>
                         </td>
                         </tr>
                       <tr>
@@ -24,7 +34,7 @@
                           <em>The location at which the item should point. If
                           it is local url remember to use a reference relative
                           to the root.</em></td>
-                        <td> <input type="text" name="url" size="40" maxlength="250" value="{URL}" />
+                        <td> <label><input type="text" name="url" size="40"  class="required" maxlength="250" value="{URL}" /></label>
                         </td>
                         </tr>
                       <tr>
