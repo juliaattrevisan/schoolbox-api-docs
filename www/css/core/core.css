@@ -357,6 +357,7 @@ th { font-weight:bold; }
 	margin-left:16px;
 	color: #0066b0;
 	padding: 4px 16px;
+	word-wrap: break-word;
 }
 
 #nav li a:hover, #nav li li a:hover {
@@ -1831,6 +1832,7 @@ ASSESS
 	width:200px;
 	display:block;
 	margin-bottom:5px;
+	position:relative;
 }
 
 #assess .textarea-container {

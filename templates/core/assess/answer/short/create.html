@@ -23,15 +23,13 @@ $j(function() {
 			answer: "Please fill out an answer."
 		},
 		
-		errorElement: "div",
-        wrapper: "div",  // a wrapper around the error message
         errorPlacement: function(error, element) {
             offset = element.offset();
             error.insertAfter(element)
             error.addClass('message');  // add a class to the wrapper
             error.css('position', 'absolute');
             error.css('left', 0);
-            error.css('top',  element.parent().outerHeight() +5);
+            error.css('top',  element.parent().height());
 
 			if (element.hasClass("tinyValidate")) {
 				var pos = $j('#question_container').position();

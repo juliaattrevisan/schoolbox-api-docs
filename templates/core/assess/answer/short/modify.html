@@ -23,21 +23,19 @@ $j(function() {
 			question: "Please enter a question.",
 			answer: "Please fill out an answer."
 		},
-		
-		errorElement: "div",
-        wrapper: "div",  // a wrapper around the error message
+
         errorPlacement: function(error, element) {
             offset = element.offset();
             error.insertAfter(element)
             error.addClass('message');  // add a class to the wrapper
             error.css('position', 'absolute');
-            error.css('left', offset.left);
-            error.css('top',  offset.top + element.outerHeight() +5);
+            error.css('left', 0);
+            error.css('top',  element.parent().height());
 
 			if (element.hasClass("tinyValidate")) {
 				var pos = $j('#question_container').position();
 				error.css('left', pos.left);
-           		error.css('top',  pos.top + $j('#question_container').outerHeight() +5);
+           		error.css('top',  pos.top + $j('#question_container').outerHeight());
 			}
 		}
 	
