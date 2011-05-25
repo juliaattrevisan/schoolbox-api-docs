@@ -40,18 +40,7 @@ $j(function() {
 		messages: {
 			title: "Please enter a title",
 			description: "Please enter a description"
-		},
-		errorElement: "div",
-        wrapper: "div",  // a wrapper around the error message
-        errorPlacement: function(error, element) {
-            offset = element.offset();
-			console.log(offset);
-            error.insertBefore(element);
-            error.addClass('message');  // add a class to the wrapper
-            error.css('position', 'absolute');
-            error.css('left', 0);
-            error.css('top',  element.parent().outerHeight());
-        }
+		}
 	});
 });
 </script>
@@ -72,7 +61,7 @@ $j(function() {
 		</fieldset>
 			<fieldset>
 				<label>Section Title</label>
-				<input name="title" type="text" size="35" class="required"/>
+				<label><input name="title" type="text" size="35" class="required"/></label>
 			</fieldset>
 			<hr />
 			<fieldset>

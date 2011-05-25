@@ -14,7 +14,17 @@ $j(function() {
 	$j('#library-search-field').autoclear();
 		
 });
-	
+
+$j(function(){	
+
+	$j('#galleryCycle').children('div:not(:first-child)').each(function() {
+		$j(this).hide();
+		
+	});
+
+
+}); 
+
 $j(window).load(function(){	
 	$j('#galleryCycle').cycle({
         cleartype: true,
@@ -26,6 +36,8 @@ $j(window).load(function(){
         }
     });
 });
+
+	
 
 </script>
 
@@ -63,6 +75,29 @@ $j(window).load(function(){
 			<td rowspan="3" width="33%"><div class="updates">
 					<h3>New Books</h3>
                         {NEW_BOOKS}
+						
+						
+						<div id="galleryCycle">
+							<div>
+								<img src="/cms/image.php?id=1566&amp;height=222&amp;width=222">
+								<span>alaress yeah</span>
+							</div>
+							
+							<div>
+								<img src="/cms/image.php?id=1568&amp;height=222&amp;width=222">
+								<span>ablahblahh</span>
+							</div>
+							<div>
+								<img src="/cms/image.php?id=1566&amp;height=222&amp;width=222">
+								<span>eargsrehbserbt</span>
+							</div>
+							
+							<div>
+								<img src="/cms/image.php?id=1568&amp;height=222&amp;width=222">
+								<span>ablsrtbsrth srthshh</span>
+							</div>
+						</div>						
+	
 				</div></td>
 		</tr>
 		<tr>
