@@ -50,14 +50,21 @@ $j(function() {
 </ul>
 <div class="admin-contents">
 	<h2>Calendar</h2>
-        <form action="/adminv2/bulkAddCalendar" method="post" enctype="multipart/form-data" name="form" id="form" class="standardForm">
+    <form action="/adminv2/bulkAddCalendar" method="post" enctype="multipart/form-data" name="form" id="form" class="standardForm">
 	<div class="level">
 		<div class="one-third">
 			<h3>Bulk<span>?</span><em>Upload some calendar entries.</em></h3>
-			<p>The File that contains the Calendar Infomation must be a Comma Seperated Text File, containing the following:
-                          Date, Start Time, Finish Time, Comment,Priority ie. (2004-12-21,15:30,18:30,This is a Calendar Note,4)</p></td>
-                      	<input type="file" name="bulkadd" />
-						<div class="float-fix"></div>
+			
+			<p>The File that contains the Calendar Infomation must be a Comma Seperated Text File, containing the following: Date, Start Time, Finish Time, Comment,Priority ie. (2004-12-21,15:30,18:30,This is a Calendar Note,4)</p>
+			
+			<h4>Download CSV template</h4>
+			<a href="/adminv2/csv/calendarBulkAdd.csv" class="btn report float-left" ><span></span>Download</a>
+			<div class="float-fix"></div>
+			<br />
+			
+			<h4>Upload bulk remove users CSV</h4>
+            <input type="file" name="bulkadd" />
+			<div class="float-fix"></div>
 			
 		</div>
 		<div class="one-third">
