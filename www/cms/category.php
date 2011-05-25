@@ -52,6 +52,7 @@ if(is_numeric($this->arg[0])) {
 		foreach ($groupPermList as $group) {
 			$output = array('GROUP_NAME'		=> scrubText($group['name']),
 							'GROUP_ID'			=> $group['id'],
+							'REQUIRED_PERMS'=> $_SESSION['gid'],
 							'PERM_0_SELECTED'	=> '',
 							'PERM_1_SELECTED'	=> '',
 							'PERM_2_SELECTED'	=> '',
