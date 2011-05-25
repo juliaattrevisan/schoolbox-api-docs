@@ -74,5 +74,9 @@ $assessHandler->update(array(
     'deleted_at' => 'NOW()'
 ));
 
-SitePage::backToTheFuture(1);
+$this->setFile(TEMPLATE_content, 'assess/deleted.html');
+
+$this->setVar(array(
+	'CATEGORY_ID' => $assess['category_id'],
+));
 ?>

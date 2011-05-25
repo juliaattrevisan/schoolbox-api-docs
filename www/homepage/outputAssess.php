@@ -140,9 +140,10 @@ if (is_array($allAssess)) {
             }
         }
 
-        /* Modified this check so that only the owner can get these links
+        /* Modified this check so that only the owner or a superuser can get
+		 * these links which allow you to modify the assessment
          */
-        if ($assessHandler->isOwner($currentAssess['assess_id'])) {
+        if ($assessHandler->isOwner($currentAssess['assess_id']) || $groupHandler->isSuperuser()) {
             $this->parse('teacherLink_block', 'teacherLink');
         }
         else {

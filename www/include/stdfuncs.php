@@ -458,7 +458,7 @@ function relativeLinkRegex($url) {
 			unset($matches[$element]);
 		}
 
-		$url = '//' . implode('/', $matches);
+		$url = '/' . implode('/', $matches);
 	}
 
 	/* Local url:
@@ -474,7 +474,7 @@ function relativeLinkRegex($url) {
 	 * ilearn/test/blah
 	 */
 	else if (preg_match('#^([^\.]+)$#', $url, $matches)) {
-		$url = '//' . $matches[0];
+		$url = '/' . $matches[0];
 	}
 
 	/* External url:
