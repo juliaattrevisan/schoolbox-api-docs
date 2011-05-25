@@ -19,6 +19,7 @@ body {
 
 body#tinymce { background:#fff;  }
 #tinymce p{padding:8px;}
+#tinymce p span{background:#E0F2DF;}
 
 /*--------------------------------------------------------------
  Main Link Styles 
@@ -183,7 +184,7 @@ h2 a { color:#013a63; }
 /*--------------------------------------------------------------
  Table Styles 
 --------------------------------------------------------------*/
-table { border: 0; table-layout:fixed}
+table { border: 0; }
 
 th, td {
 	height: 1em;

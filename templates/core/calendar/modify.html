@@ -1,76 +1,27 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
-<script type="text/javascript" src="/javascript/mootools.js"></script>
-<script type="text/javascript" src="/javascript/behaviour.js"></script>
 <script type="text/javascript">
-        function showRow () {
-            var selecLevel = document.getElementById('eventForm').level.options[document.getElementById('eventForm').level.selectedIndex].value;
-            
-            var groupDrop = document.getElementById('groupDrop');
-            var campusList = document.getElementById('campusList');
-            var groupList = document.getElementById('groupList');
-        
-            if( selecLevel == 1 || selecLevel == 4){
-                groupDrop.style.display 	= "none";
-                campusList.style.display 	= "none";
-                groupList.style.display 	= "none";
-            }
-            else if( selecLevel == 2 ){
-                groupDrop.style.display 	= "";
-                campusList.style.display 	= "none";
-                groupList.style.display 	= "none";
-            }
-            else if( selecLevel == 3 ){
-                groupDrop.style.display 	= "none";
-                campusList.style.display 	= "";
-                groupList.style.display 	= "";
-            }
-        }
-        window.onload = new Function('showRow();');
-        
-        Behaviour.addLoadEvent(function () { 
-            $$('.campusCheck').each(function (o) {
-                    o.addEvents({
-                        'mouseup' : function (e) {
-                                if (!countSelected(o)) checkNext(o);
-                        
-                        }
-                    });
-            });
-        });
-        
-        function countSelected (ol) {
-            var s = 0;
-            $$('.campusCheck').each(function (o) { 
-                                        if (o != ol && o.checked == true) 
-                                            s++;
-                                    });
-            return s;
-        }
-        
-        function checkNext(ol) {
-            $$('.campusCheck').each(function (o) { 
-                                        if (o != ol) 
-                                            o.checked = true;
-                                            return;
-                                    });
-        }
-		function toggleRepeat(o) {
-			if (o.value == '')
-				$('repeatUntil').style.display = 'none';
-			else
-				$('repeatUntil').style.display = '';
-		}
-		
+
 		function confirmDelete(eventID) {
 			if (confirm('Delete this event?')) {
 				window.open('/calendar/modify.php?delete=' + eventID + '&return={RETURN_TO}', '_self', '');
-				
 			}
 		}
 		
 		$j(function() {
+			
+			$j('#level').change(function() {
+				
+				$j('#groupDrop, #campusList, #groupList').hide();
+				if ($j(this).val() == "2") {
+					$j('#groupDrop').show()
+				} else if ($j(this).val() == "3") {
+					$j('#campusList, #groupList').show()
+				}
+
+			})
+			
 			$j('#cal_date, #repeat_until').datepicker({ 
 				dateFormat: 'dd/mm/yy',
 				showOn: 'both',
@@ -101,7 +52,6 @@
 					$j(this).parent().addClass('active-checkbox');
 				}
 			});
-			
 			
 			$j('#eventForm').validate();
 			
@@ -176,7 +126,7 @@
 		<tr>
 			<td><h4>Level</h4>
 				<em>Select who you would like to be able to see this event</em></td>
-			<td><select name="level" id="level" onChange="showRow()">
+			<td><select name="level" id="level">
 					<!-- BEGIN level_drop -->
 					<option value="{LEVEL_ID}" {LEVEL_ID_SELECTED}>{LEVEL_NAME}</option>
 					<!-- END level_drop -->

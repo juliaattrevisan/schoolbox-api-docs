@@ -1,60 +1,38 @@
-<!-- BEGIN cutom_head -->
-<script type="text/javascript" src="/javascript/mootools.js"></script>
+<!-- BEGIN custom_head -->
 <script type="text/javascript">
-function verify(){
-	var msg = ""
-	//check that description, url, location have been entered
-
-
-	if($('parent').value == "" || isNaN($('parent').value))
-		msg += "You need to select a proper location.\n";
-	
-	if ($('groupcheck') && !$('groupcheck').checked) {
-		
-		var ok = false;
-		$$('.no_permission').each(function (o) {
-		
-			if (!o.checked)
-				ok = true;
-		});
-		if (!ok)
-			msg += "You need to assign permissions.\n";
-	}
-
-    /* Check that the creator has write access or Individual Permissions set
-     * for their group type.
-     */
-    var hasDefaultPerms = $j('input[name=group[{REQUIRED_PERMS}]][value=2][checked=true]').length;
-    var individualPerms = $j('input[name=groupcheck]').is(':checked');
-
-    if (!hasDefaultPerms && !individualPerms) {
-        if (confirm("Your group currently does not have write access to the folder you are about to create. Do you wish to continue?")) {
-        }
-        else {
-            return false;
-        }
-    }
-    
-	if(msg != "") {
-		alert(msg);
-		return false;
-	}
-	else
-		return true;
-}
-
 $j(function() {
-	
-	$j('#folderForm').validate();
-	
+	$j('#folderForm').validate({
+		
+		//sweet suzy this is broken.
+		
+		 submitHandler: function(form) {
+			var hasDefaultPerms = $j('input[name=group[{REQUIRED_PERMS}]][value=2][checked=true]').length;
+			var individualPerms = $j('input[name=groupcheck]').is(':checked');
+		
+			if ((hasDefaultPerms < 1) && !individualPerms) {
+
+				if (confirm("Your group currently does not have write access to the folder you are about to create. Do you wish to continue?")) {
+					
+					form.ajaxSubmit();
+					
+				} else {
+					
+					return false;
+					
+				}
+			} else {
+				alert('whoops');
+				form.ajaxSubmit();
+			};
+		
+		 }	
+	});
 });
-
-
 </script>
 <!-- END custom_head -->
 
 <h1>{ACTION} Folder</h1>
-<form action="/cms/categoryForm.php" method="post" id="folderForm" onsubmit="return(verify());">
+<form action="/cms/categoryForm.php" method="post" id="folderForm" >
 	<table class="standardForm" >
 		<tr>
 			<td class="formLabelWidth"><h4>Folder Name</h4></td>
@@ -91,7 +69,7 @@ $j(function() {
 					<!-- BEGIN perm_table -->
 					<tr>
 						<td>{GROUP_NAME}</td>
-						<td><input type="radio" class="no_permission" name="group[{GROUP_ID}]" value="0" {PERM_0_SELECTED} /></td>
+						<td><input type="radio" class="no_permission required" name="group[{GROUP_ID}]" value="0" {PERM_0_SELECTED} /></td>
 						<td><input type="radio" name="group[{GROUP_ID}]" value="1" {PERM_1_SELECTED} /></td>
 						<td><input type="radio" name="group[{GROUP_ID}]" value="2" {PERM_2_SELECTED} /></td>
 					</tr>
@@ -129,5 +107,7 @@ $j(function() {
 	</table>
 	<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
 	<input type="submit" label="Submit" name="submit" value="{ACTION} Folder" class="submit-btn-plain"/>
+	
 	<div class="float-fix"></div>
+	
 </form>
