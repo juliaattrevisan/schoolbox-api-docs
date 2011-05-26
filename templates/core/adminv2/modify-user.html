@@ -112,7 +112,7 @@ $j(function() {
 	<form class="admin-form" method="POST" action="/adminv2/userForm.php">
 		<div class="split-container">
 			<div class="split">
-				
+
 				<label class="width2 first">Title
 					<select name="title">
 						<!-- BEGIN title -->
@@ -131,7 +131,7 @@ $j(function() {
 				<label for ="database" class="">{DATABASE_TYPE} ID
 					<input type="text" name="database_id" value="{DATABASE_ID}"/>
 				</label>
-				<div class="float-fix"></div>
+
 				<table cellpadding="0" width="50%">
 					<colgroup>
 					<col width="33%" />
@@ -198,13 +198,13 @@ $j(function() {
 				</label>
 			</div>
 		</div>
-        <div class="float-fix"></div>
+
 		<input type="hidden" name="userID" value="{USERID}" />
 		<input type="submit" name="submit" class="submit-btn-plain" value="Update User" />
 		<input type="submit" name="delete" class="submit-btn-plain" value="Delete User" onclick="return(confirm('Are you sure you want to delete {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME}'));" />
-		<div class="float-fix"></div>
+
 	</form>
-	<div class="float-fix"></div>
+
 </div>
 <div class="level">
 	<h3>Groups</h3>
@@ -285,9 +285,11 @@ $j(function() {
 						<input type="hidden" name="service" value="{SERVICE_ID}" />
 						<input type="hidden" name="previousSid" value="{SID}" />
 						<select name="sid">
+						
 							<!-- BEGIN perm_campus -->
 							<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED} >{PERM_CAMPUS_NAME}</option>
 							<!-- END perm_campus -->
+							
 						</select>
 					</form>
 				</td>
@@ -313,9 +315,11 @@ $j(function() {
 						<input type="hidden" name="service" value="{SERVICE_ID}" />
 						<input type="hidden" name="previousSid" value="{SID}" />
 						<select name="sid">
+						
 							<!-- BEGIN perm_campus -->
 							<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED} >{PERM_CAMPUS_NAME}</option>
 							<!-- END perm_campus -->
+							
 						</select>
 					</form>
 				</td>
@@ -413,5 +417,4 @@ $j(function() {
 			</table>
 		</div>
 	</div>
-	<div class="float-fix"></div>
 </div>

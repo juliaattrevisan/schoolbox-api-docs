@@ -66,7 +66,7 @@ $j(function() {
 	<li><a href="/adminv2/list">Lists</a></li>
 	<li><a href="/adminv2/rollover">Rollover</a></li>
 </ul>
-<div class="admin-contents">
+<div class="admin-contents clearfix">
 	<h2>Home</h2>
         <!--
 	<div class="level green"> <a href="#" class="dismiss">Dismiss all</a>
@@ -84,7 +84,7 @@ $j(function() {
 		</ul>
 		<div class="float-fix"></div>
 	</div> -->
-	<div class="one-third">
+	<div class="one-third clearfix">
 		<div class="level">
 			<h3 class="iconify stats">Server stats</h3>
 			<h4>Storage <span>{DISK_USED}/{DISK_TOTAL}</span></h4>
@@ -95,7 +95,6 @@ $j(function() {
 				</div>
 			</div>
 			<span class="number">{DISK_PERC}%</span>
-			<div class="float-fix"></div>
 			
 			<h4>Memory <span>{MEMORY_USED}/{MEMORY_TOTAL}</span></h4>
 			<div class="bar-holder">
@@ -104,7 +103,6 @@ $j(function() {
 				</div>
 			</div>
 			<span class="number">{MEMORY_PERC}%</span>
-			<div class="float-fix"></div>
 			
 			<ul class="server-statuses">
 				<li class="{EXTERNAL_DB_LIGHT}"><strong>{EXTERNAL_DB} Status</strong><em><span></span></em><span>{EXTERNAL_DB_STATUS}</span></li>
@@ -167,5 +165,5 @@ $j(function() {
 			</table>
 		</div>
 	</div>
-	<div class="float-fix"></div>
+
 </div>

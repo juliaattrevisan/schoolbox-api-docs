@@ -55,9 +55,8 @@ $j(function() {
 <div class="admin-contents">
 	<h2>Lists</h2>
 	
-	<div class="level green hide-it">	
+	<div class="level green hide-it clearfix">	
 		You've successfully updated your settings.
-		<div class="float-fix"></div>
 	</div>
 	
 	<div class="settings-nav-holder">
@@ -68,7 +67,6 @@ $j(function() {
 		</ul>
 	</div>
 	<div class="settings">
-
 		<form id="settings" class="admin-form level" method="post" action="/adminv2/listForm.php">
 			<!-- BEGIN table_schema -->
 			<input name="tableName" type="hidden" value="{TABLE_CURRENT_NAME}" />
@@ -101,16 +99,10 @@ $j(function() {
 					<!-- END table_row -->
 				</tbody>
 			</table>
-
-			<div class="float-fix"></div>
-			<input type="submit" class="submit-btn-plain" value="Save"/>
-			<div class="float-fix"></div>
 			<a href="#" id="addNewRow" class="btn add float-left"><span></span>New row</a>
-			<div class="float-fix"></div>
+			<input type="submit" class="submit-btn-plain" value="Save"/>
 		</form>
-
 	</div>
-	<div class="float-fix"></div>
 </div>
 
 <table id="newData" class="hide-it">
