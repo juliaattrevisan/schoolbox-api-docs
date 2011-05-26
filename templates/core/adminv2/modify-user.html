@@ -274,8 +274,8 @@ $j(function() {
 				<td>
 					<form action="/adminv2/userForm.php" method="post" class="updateSIDForm">
 						<input type="hidden" name="uid" value="{USERID}" />
-						<input type="hidden" name="service" value="{SERVICE_ID}" />
 						<input type="hidden" name="sid" value="{SID}" />
+						<input type="hidden" name="service" value="{SERVICE_ID}" />
 
 						{PERM_CAMPUS_NAME}
 					</form>
@@ -340,7 +340,49 @@ $j(function() {
 			<!-- END user_cms -->
 			<tr>
 				<td colspan="4" class="colours-buttons">
-					<form action="/adminv2/userForm.php" method="post">
+					<script type="text/javascript">
+
+					$j(function() {
+						/* Reset availability options for campuses and services
+						 * 0: please select
+						 * 2: calendar
+						 * 3: news
+						 * 5: cms
+						 */
+						var registry = [{
+							service: 0,
+							sid: []
+						},
+						{
+							service: 2,
+							sid: []
+						},
+						{
+							service: 3,
+							sid: []
+						},
+						{
+							service: 5,
+							sid: []
+						}];
+
+
+						$j.each($j('.updateSIDForm'), function(index, value) {
+							var service = $j(value).find('input[name=service]').val();
+							var sid = $j(value).find('input[name=sid]').val();
+
+							for (var i = 0; i < registry.length; i++) {
+								if (registry[i].service == service) {
+									registry[i].sid.push(sid);
+								}
+							}
+						});
+
+						for (var i = 0; i < registry.length; i++) {
+						}
+					});
+					</script>
+					<form id="serviceCloneForm" action="/adminv2/userForm.php" method="post">
 						<input type="hidden" name="addService" />
 						<input type="hidden" value="{USERID}" name="uid">
 
