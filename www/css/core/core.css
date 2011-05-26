@@ -669,6 +669,7 @@ th { font-weight:bold; }
 .listing .small-right {
 	width:30%;
 	float:right;
+	text-align:right;
 }
 
 .listing .small-right p {
