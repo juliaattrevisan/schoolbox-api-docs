@@ -90,7 +90,7 @@ window.addEvent('domready', function () {
 <!-- END custom_head -->
 <h1>{HEADING}</h1>
 <span class="header_option"><!-- BEGIN sequence_link --><a href="modify.php?eventID={EVENT_ID}&sequence=1">Modify Sequence</a><!-- END sequence_link --></span>
-<form id="eventForm"  method="post" action="modifyForm.php" onsubmit="return verify();">
+<form id="eventForm"  method="post" action="modifyForm.php" onsubmit="return verify();" class="clearfix">
 <input type="hidden" name="actionType" id="actionType" value="{ACTION_TYPE}" />
 <input type="hidden" name="eventID" value="{EVENT_ID}" />
 	<table class="standardForm">
@@ -213,5 +213,4 @@ window.addEvent('domready', function () {
 	<!-- BEGIN delete_sequence -->
 	<input class="submit-btn-plain" type="button" name="delete" id="deleteSequence" value="Delete Sequence" />
 	<!-- END delete_sequence -->
-	<div class="float-fix"></div>
 </form>

@@ -1,6 +1,6 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
- <script type="text/javascript">
+<script type="text/javascript">
   tinyMCE.init({
       mode : "exact",
       elements: "textBoxBody",
@@ -22,56 +22,52 @@
       file_browser_category_id : {ID},
       convert_urls : false
 });
-  </script>  
+  </script>
 <!-- END custom_head -->
+
 <h1>{ACTION} Wiki</h1>
 <span class="header_option"><a href="/homepage/{CATEGORY_ID}">Return to Homepage</a></span>
-
 <div class="highlightedMessage">
-    <div>
-        <p><span>Conflict detected.</span><br />
-            A more recent version of the document has been saved since you
-            opened it. This is the latest revision of the document. The version
-            you created is shown below. Please merge your changes into this
-            version and try saving again.
-        </p>
-    </div>
+	<div>
+		<p><span>Conflict detected.</span><br />
+			A more recent version of the document has been saved since you
+			opened it. This is the latest revision of the document. The version
+			you created is shown below. Please merge your changes into this
+			version and try saving again. </p>
+	</div>
 </div>
-<form  action="/wiki/modifyForm.php" method="post">
-    <input type="hidden" name="wikiID" value="{WIKI_ID}" />
-    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-    <input type="text" name="revision" value="{REVISION}" />
-  <table width="100%" class="standardForm">
-    <tr>
-      <td class="formLabelWidth"><h4>Heading</h4></td>
-	  <td><input type="text" name="heading" size="60" value="{HEADING}" /></td>
-    </tr>
-    <tr>
-      <td><h4>Body</h4></td>
-	  <td><textarea name="body" style="width:100%;height:350px" >{BODY}</textarea></td>
-    </tr>
-  </table>
-  <input type="submit" class="submit-btn-plain" value="Save" />
-  <div class="float-fix"></div>
-</form>
+<form  action="/wiki/modifyForm.php" method="post" class="clearfix">
+	<input type="hidden" name="wikiID" value="{WIKI_ID}" />
+	<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+	<input type="text" name="revision" value="{REVISION}" />
+	<table width="100%" class="standardForm">
+		<tr>
+			<td class="formLabelWidth"><h4>Heading</h4></td>
+			<td><input type="text" name="heading" size="60" value="{HEADING}" /></td>
+		</tr>
+		<tr>
+			<td><h4>Body</h4></td>
+			<td><textarea name="body" style="width:100%;height:350px" >{BODY}</textarea></td>
+		</tr>
+	</table>
+	<input type="submit" class="submit-btn-plain" value="Save" />
 
+</form>
 <div class="highlightedMessage">
-    <div>
-        <p>
-            This is your version of the document. Please merge these changes into
-            the version above.
-        </p>
-    </div>
+	<div>
+		<p> This is your version of the document. Please merge these changes into
+			the version above. </p>
+	</div>
 </div>
 <form class="" action="#" method="post">
-  <table width="100%" class="standardForm">
-    <tr>
-      <td class="formLabelWidth"><h4>Heading</h4></td>
-	  <td><input type="text" name="heading" size="60" value="{YOURS_HEADING}" /></td>
-    </tr>
-    <tr>
-      <td><h4>Body</h4></td>
-	  <td><textarea name="body" style="width:100%;height:350px" >{YOURS_BODY}</textarea></td>
-    </tr>
-  </table>
+	<table width="100%" class="standardForm">
+		<tr>
+			<td class="formLabelWidth"><h4>Heading</h4></td>
+			<td><input type="text" name="heading" size="60" value="{YOURS_HEADING}" /></td>
+		</tr>
+		<tr>
+			<td><h4>Body</h4></td>
+			<td><textarea name="body" style="width:100%;height:350px" >{YOURS_BODY}</textarea></td>
+		</tr>
+	</table>
 </form>

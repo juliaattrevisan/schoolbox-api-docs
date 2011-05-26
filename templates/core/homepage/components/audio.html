@@ -1,45 +1,44 @@
 <div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
-  <h2>Audio</h2>
-  <!-- BEGIN config -->
-  <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
-<a class="close-delete" href="#"><span>X</span></a>
-  <div class="editPanel settings hide">
-    <form action="/homepage/configForm.php" method="get">
-      <input type="hidden" name="cid" value="{ID}" />
-      <input type="hidden" name="type" value="config" />
-      <input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
-      <label for="sort">Sort: </label>
-      <select name="sort">
-        <!-- BEGIN sort -->
-        <option value="{COMPONENT_CONFIG_SORT_VALUE}"{COMPONENT_CONFIG_SORT_SELECTED}>{COMPONENT_CONFIG_SORT_NAME}</option>
-        <!-- END sort -->
-      </select>
-      <select name="sortdir">
-        <!-- BEGIN sortdir -->
-        <option value="{COMPONENT_CONFIG_SORTDIR_VALUE}"{COMPONENT_CONFIG_SORTDIR_SELECTED}>{COMPONENT_CONFIG_SORTDIR_NAME}</option>
-        <!-- END sortdir -->
-      </select>
-      <label for="size">Item Limit: </label>
-      <select name="size">
-        <!-- BEGIN size -->
-        <option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
-        <!-- END size -->
-      </select>      <input type="submit" value="Update" class="submit-btn update" />
-    </form>
-  </div>
-<div class="editPanel delete-it hide">
-<p>Are you sure you want to remove component?</p>
-<form action="#" method="post">
-  <input type="hidden" name="cid" value="{ID}" />
-  <input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
-  <input type="hidden" name="component" value="{COMPONENT_ID}" />
-    <a href="#" class="delete-accept btn delete"><span></span>Yes</a>
-    <a href="#" class="delete-reject btn go-to"><span></span>No</a>
-</form>
-<div class="float-fix"></div>
-</div>  <!-- END config -->
-  <div class="listing" >
-    <script type="text/javascript">
+	<h2>Audio</h2>
+	<!-- BEGIN config --> 
+	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
+	<div class="editPanel settings hide">
+		<form action="/homepage/configForm.php" method="get">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="type" value="config" />
+			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+			<label for="sort">Sort: </label>
+			<select name="sort">
+				<!-- BEGIN sort -->
+				<option value="{COMPONENT_CONFIG_SORT_VALUE}"{COMPONENT_CONFIG_SORT_SELECTED}>{COMPONENT_CONFIG_SORT_NAME}</option>
+				<!-- END sort -->
+			</select>
+			<select name="sortdir">
+				<!-- BEGIN sortdir -->
+				<option value="{COMPONENT_CONFIG_SORTDIR_VALUE}"{COMPONENT_CONFIG_SORTDIR_SELECTED}>{COMPONENT_CONFIG_SORTDIR_NAME}</option>
+				<!-- END sortdir -->
+			</select>
+			<label for="size">Item Limit: </label>
+			<select name="size">
+				<!-- BEGIN size -->
+				<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
+				<!-- END size -->
+			</select>
+			<input type="submit" value="Update" class="submit-btn update" />
+		</form>
+	</div>
+	<div class="editPanel delete-it hide clearfix">
+		<p>Are you sure you want to remove component?</p>
+		<form action="#" method="post">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+			<input type="hidden" name="component" value="{COMPONENT_ID}" />
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> <a href="#" class="delete-reject btn go-to"><span></span>No</a>
+		</form>
+	</div>
+	<!-- END config -->
+	<div class="listing clearfix" > 
+		<script type="text/javascript">
 
 		function loadSWF(audioID, url){
 			var flashvars = {
@@ -54,23 +53,21 @@
 		}
 		
 	</script>
-    <ul>
-      <!-- BEGIN audio_list -->
-      <li class="{ON_OFF}">
-        <h4><a class="icons {AUDIO_MIME_IMAGE}" href="{AUDIO_URL}">{AUDIO_DESCRIPTION}</a></h4>
-        <p class="interact">
-              <div class="play-button">
-              <div id="audio-player-{AUDIO_ID}"><a onclick="loadSWF({AUDIO_ID}, '{AUDIO_URL}'); return false;"></a></div>
-              </div>
-        </p>
-        <p class="hide-on-small">{AUDIO_COMMENT}</p>
-        <div class="float-fix"></div>
-      </li>
-      <!-- END audio_list -->
-    </ul>
-    <div class="float-fix"></div>
-  </div>
-  <!-- BEGIN submit_file -->
-  <p class="interact"><a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post File</a></p>
-  <!-- END submit_file -->
+		<ul>
+			<!-- BEGIN audio_list -->
+			<li class="{ON_OFF} clearfix">
+				<h4><a class="icons {AUDIO_MIME_IMAGE}" href="{AUDIO_URL}">{AUDIO_DESCRIPTION}</a></h4>
+				<p class="interact">
+				<div class="play-button">
+					<div id="audio-player-{AUDIO_ID}"><a onclick="loadSWF({AUDIO_ID}, '{AUDIO_URL}'); return false;"></a></div>
+				</div>
+				</p>
+				<p class="hide-on-small">{AUDIO_COMMENT}</p>>
+			</li>
+			<!-- END audio_list -->
+		</ul>
+	</div>
+	<!-- BEGIN submit_file -->
+	<p class="interact"><a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post File</a></p>
+	<!-- END submit_file --> 
 </div>

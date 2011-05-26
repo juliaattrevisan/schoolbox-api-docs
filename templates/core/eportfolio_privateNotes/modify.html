@@ -30,7 +30,7 @@ tinyMCE.init({
 
 <div class="privateBlock">
     <h1>Modify Teacher Notes</h1>
-    <form action="/eportfolio_privateNotes/modifyForm.php" method="post">
+    <form action="/eportfolio_privateNotes/modifyForm.php" method="post" class="clearfix">
         <fieldset>
             <input name="uid" type="hidden" id="userID" value="{ID}" />
             <textarea name="privateNotes" rows="10" cols="10" id="privateNotes">{PRIVATE_NOTES}</textarea>
@@ -40,6 +40,5 @@ tinyMCE.init({
         </fieldset>
     
 	<input type="submit" value="Save Notes" class="submit-btn-plain" />
-	<div class="float-fix"></div>
 	</form>
 </div>

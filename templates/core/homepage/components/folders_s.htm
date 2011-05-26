@@ -1,53 +1,47 @@
 <div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
-  <h2>{COMPONENT_NAME}</h2>
-<!-- BEGIN config -->
-  <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
-<a class="close-delete" href="#"><span>X</span></a>
-  <div class="editPanel settings hide">
-    <form action="/homepage/configForm.php" method="get">
-      <input type="hidden" name="cid" value="{ID}" />
-      <input type="hidden" name="type" value="config" />
-      <input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
-
-		<label for="componentname">Name: </label>
-		<input type="text" name="componentname" value="{COMPONENT_NAME}" />
-
-      <label for="size">Item Limit: </label>
-      <select name="size">
-      	<!-- BEGIN size -->
-      	<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
-      	<!-- END size -->
-      </select>      <input type="submit" value="Update" class="submit-btn update" />
-    </form>
-  </div>
-	<div class="editPanel delete-it hide">
+	<h2>{COMPONENT_NAME}</h2>
+	<!-- BEGIN config --> 
+	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
+	<div class="editPanel settings hide">
+		<form action="/homepage/configForm.php" method="get">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="type" value="config" />
+			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+			<label for="componentname">Name: </label>
+			<input type="text" name="componentname" value="{COMPONENT_NAME}" />
+			<label for="size">Item Limit: </label>
+			<select name="size">
+				<!-- BEGIN size -->
+				<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
+				<!-- END size -->
+			</select>
+			<input type="submit" value="Update" class="submit-btn update" />
+		</form>
+	</div>
+	<div class="editPanel delete-it hide clearfix">
 		<p>Are you sure you want to remove component?</p>
 		<form action="#" method="post">
-		  <input type="hidden" name="cid" value="{ID}" />
-		  <input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
-                  <input type="hidden" name="component" value="{COMPONENT_ID}" />
-			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
-			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+			<input type="hidden" name="component" value="{COMPONENT_ID}" />
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> <a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
-		<div class="float-fix"></div>
 	</div>
-<!-- END config --> 
-
-  <div class="listing folders">
-    <ul>
-      <!-- BEGIN folders -->
-      <li class="{ON_OFF}">
-        <h4><a class="icons {FOLDER_ICON}" href="/homepage/{FOLDER_ID}/" >{FOLDER_NAME}</a></h4>
-        <!-- BEGIN modify_folder -->
-        <p class="interact"><a href="/cms/category/{FOLDER_ID}">Modify</a></p>
-        <!-- END modify_folder -->
-        <div class="float-fix"></div>
-      </li>
-      <!-- END folders -->
-    </ul>
-    
-  </div>
-  <!-- BEGIN submit_folder -->
-  <p class="interact"><a href="/cms/category/new/{ID}" class="btn add"><span></span>Add Folder</a></p>
-  <!-- END submit_folder -->  
+	<!-- END config -->
+	
+	<div class="listing folders">
+		<ul>
+			<!-- BEGIN folders -->
+			<li class="{ON_OFF} clearfix">
+				<h4><a class="icons {FOLDER_ICON}" href="/homepage/{FOLDER_ID}/" >{FOLDER_NAME}</a></h4>
+				<!-- BEGIN modify_folder -->
+				<p class="interact"><a href="/cms/category/{FOLDER_ID}">Modify</a></p>
+				<!-- END modify_folder -->
+			</li>
+			<!-- END folders -->
+		</ul>
+	</div>
+	<!-- BEGIN submit_folder -->
+	<p class="interact"><a href="/cms/category/new/{ID}" class="btn add"><span></span>Add Folder</a></p>
+	<!-- END submit_folder --> 
 </div>

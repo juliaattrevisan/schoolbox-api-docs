@@ -1,19 +1,15 @@
 <h1>Add Bulk Members - {CATEGORY_NAME}</h1>
-<form action="/group/modifyForm.php" method="post" id="form" >
-  <table class="standardForm">
-    <tr>
-      <td class="formLabelWidth"><h4>User List</h4>
-        <em>To add multiple users to this group place a list of synergetic IDs or portal usernames in the following space then press submit.<br /><br />
-        You can use the synergetic application to extract a csv of all the users you want then copy them into this box.</em>
-		</td>
-		<td><textarea name="bulkAdd" cols="30" rows="20"></textarea></td>
-    </tr>
-    <tr>
-
-  </table>
-  
-<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-<input type="submit" name="Submit" value="Submit" class="submit-btn-plain" />
-<div class="float-fix"></div>
-  
+<form action="/group/modifyForm.php" method="post" id="form" class="clearfix" >
+	<table class="standardForm">
+		<tr>
+			<td class="formLabelWidth"><h4>User List</h4>
+				<em>To add multiple users to this group place a list of synergetic IDs or portal usernames in the following space then press submit.<br />
+				<br />
+				You can use the synergetic application to extract a csv of all the users you want then copy them into this box.</em></td>
+			<td><textarea name="bulkAdd" cols="30" rows="20"></textarea></td>
+		</tr>
+		<tr>
+	</table>
+	<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+	<input type="submit" name="Submit" value="Submit" class="submit-btn-plain" />
 </form>

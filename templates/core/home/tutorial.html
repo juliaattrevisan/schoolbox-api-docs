@@ -1,37 +1,34 @@
-<div class="box">
-  <!-- BEGIN has_tutorials -->
-  <h2>This Weeks Tutorials</h2>
-  <div class="listing">
-  	<ul>
-      <!-- BEGIN tutorial_list -->
-      <li class="{ON_OFF}">
-      	<h3>{TUTORIAL_NAME}</h3>
-        <p class="interact">{TUTORIAL_START} - {TUTORIAL_FINISH}<!-- BEGIN modify_tutorial --> <a href="/modules/tutorial/event/modify.php?eventID={TUTORIAL_ID}" class="btn modify"><span></span>Modify</a><!-- END modify_tutorial --></p>
-        <p>{TUTORIAL_DATE}, {TUTORIAL_LOCATION}</p>
-        <div class="float-fix"></div>
-      </li>
-      <!-- END tutorial_list -->
-      <li>
-      </li>
-    </ul>
-  </div>   
-  <!-- END has_tutorials --> 
-    
-  <!-- BEGIN has_unmarked -->
-  <h2>Unmarked Attendance</h2>
-  <div class="listing">
-  	<ul>
-      <!-- BEGIN unmarked_list -->
-      <li class="{ON_OFF}">
-      	<h3><a href="/modules/tutorial/attendance/list.php?week={TUTORIAL_WEEK}">{TUTORIAL_NAME}</a></h3>
-        <p class="interact">{TUTORIAL_START} - {TUTORIAL_FINISH} <a class="btn modify" href="/modules/tutorial/event/modify.php?eventID={TUTORIAL_ID}"><span></span>Modify</a></p>
-        <p>{TUTORIAL_DATE}, {TUTORIAL_LOCATION}</p>
-        <div class="float-fix"></div>
-      </li>
-      <!-- END unmarked_list -->
-      <li>
-      </li>
-    </ul>
-  </div>   
-  <!-- END has_unmarked --> 
+<div class="box"> 
+	<!-- BEGIN has_tutorials -->
+	<h2>This Weeks Tutorials</h2>
+	<div class="listing">
+		<ul>
+			<!-- BEGIN tutorial_list -->
+			<li class="{ON_OFF} clearfix">
+				<h3>{TUTORIAL_NAME}</h3>
+				<p class="interact">{TUTORIAL_START} - {TUTORIAL_FINISH}<!-- BEGIN modify_tutorial --> <a href="/modules/tutorial/event/modify.php?eventID={TUTORIAL_ID}" class="btn modify"><span></span>Modify</a><!-- END modify_tutorial --></p>
+				<p>{TUTORIAL_DATE}, {TUTORIAL_LOCATION}</p>
+			</li>
+			<!-- END tutorial_list -->
+			<li> </li>
+		</ul>
+	</div>
+	<!-- END has_tutorials --> 
+	
+	<!-- BEGIN has_unmarked -->
+	<h2>Unmarked Attendance</h2>
+	<div class="listing">
+		<ul>
+			<!-- BEGIN unmarked_list -->
+			<li class="{ON_OFF} clearfix">
+				<h3><a href="/modules/tutorial/attendance/list.php?week={TUTORIAL_WEEK}">{TUTORIAL_NAME}</a></h3>
+				<p class="interact">{TUTORIAL_START} - {TUTORIAL_FINISH} <a class="btn modify" href="/modules/tutorial/event/modify.php?eventID={TUTORIAL_ID}"><span></span>Modify</a></p>
+				<p>{TUTORIAL_DATE}, {TUTORIAL_LOCATION}</p>
+				
+			</li>
+			<!-- END unmarked_list -->
+			<li> </li>
+		</ul>
+	</div>
+	<!-- END has_unmarked --> 
 </div>

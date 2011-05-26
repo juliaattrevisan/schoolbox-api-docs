@@ -1,52 +1,46 @@
-
 <link rel="stylesheet" href="/css/jquery.slimbox.css" type="text/css" media="screen" />
 <script type="text/javascript" src="/javascript/jquery.slimbox.js"></script>
 <div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
-  <h2>Image Gallery</h2>
-    <!-- BEGIN config -->
-  <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
-<a class="close-delete" href="#"><span>X</span></a>
-  <div class="editPanel settings hide">
-    <form action="/homepage/configForm.php" method="get">
-      <input type="hidden" name="cid" value="{ID}" />
-      <input type="hidden" name="type" value="config" />
-      <input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
-      <label for="size">Image Rows: </label>
-      <select name="size">
-      	<!-- BEGIN size -->
-      	<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
-      	<!-- END size -->
-      </select>      <input type="submit" value="Update" class="submit-btn update" />
-    </form>
-  </div>
-	<div class="editPanel delete-it hide">
+	<h2>Image Gallery</h2>
+	<!-- BEGIN config --> 
+	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
+	<div class="editPanel settings hide">
+		<form action="/homepage/configForm.php" method="get">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="type" value="config" />
+			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+			<label for="size">Image Rows: </label>
+			<select name="size">
+				<!-- BEGIN size -->
+				<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
+				<!-- END size -->
+			</select>
+			<input type="submit" value="Update" class="submit-btn update" />
+		</form>
+	</div>
+	<div class="editPanel delete-it hide clearfix">
 		<p>Are you sure you want to remove component?</p>
 		<form action="#" method="post">
-		  <input type="hidden" name="cid" value="{ID}" />
-		  <input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
-                  <input type="hidden" name="component" value="{COMPONENT_ID}" />
-			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
-			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+			<input type="hidden" name="component" value="{COMPONENT_ID}" />
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> <a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
-		<div class="float-fix"></div>
 	</div>
-<!-- END config -->
-  <div class="text">
-  <table cellpadding="0" cellspacing="0">
-  	<!-- BEGIN thumb_row -->
-	<tr>
-      <!-- BEGIN thumb_cell -->
-     <td>{THUMBNAIL}</td>
-      <!-- END thumb_cell -->
-	  </tr>
-    <!-- END thumb_row -->
-</table>
-    <div class="float-fix"></div>
-  </div>
-   <!-- BEGIN submit_image -->
-  <a href="/cms/file/multi/{ID}" class="btn up-arrow"><span></span>Post Images</a>
-  <!-- END submit_image -->
-  <p class="interact"><a href="/cms/imageGallery/{ID}" class="btn"><span></span>Full Gallery</a>
-   
-  </p>
+	<!-- END config -->
+	<div class="text clearfix">
+		<table cellpadding="0" cellspacing="0">
+			<!-- BEGIN thumb_row -->
+			<tr> 
+				<!-- BEGIN thumb_cell -->
+				<td>{THUMBNAIL}</td>
+				<!-- END thumb_cell --> 
+			</tr>
+			<!-- END thumb_row -->
+		</table>
+	</div>
+	<!-- BEGIN submit_image --> 
+	<a href="/cms/file/multi/{ID}" class="btn up-arrow"><span></span>Post Images</a> 
+	<!-- END submit_image -->
+	<p class="interact"><a href="/cms/imageGallery/{ID}" class="btn"><span></span>Full Gallery</a> </p>
 </div>

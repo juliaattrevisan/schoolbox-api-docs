@@ -52,7 +52,7 @@ $j(function() {
 	<li><a href="/adminv2/list" class="current">Lists</a></li>
 	<li><a href="/adminv2/rollover">Rollover</a></li>
 </ul>
-<div class="admin-contents">
+<div class="admin-contents clearfix">
 	<h2>Lists</h2>
 	
 	<div class="level green hide-it clearfix">	
@@ -67,7 +67,7 @@ $j(function() {
 		</ul>
 	</div>
 	<div class="settings">
-		<form id="settings" class="admin-form level" method="post" action="/adminv2/listForm.php">
+		<form id="settings" class="admin-form level clearfix" method="post" action="/adminv2/listForm.php">
 			<!-- BEGIN table_schema -->
 			<input name="tableName" type="hidden" value="{TABLE_CURRENT_NAME}" />
 			<input name="tableIndex" type="hidden" value="{TABLE_CURRENT_INDEX}" />

@@ -17,7 +17,7 @@
 			<input type="submit" value="Update" />
 		</form>
 	</div>
-	<div class="editPanel delete-it hide">
+	<div class="editPanel delete-it hide clearfix">
 		<p>Are you sure you want to remove component?</p>
 		<form action="#" method="post">
 			<input type="hidden" name="uid" value="{ID}" />
@@ -26,7 +26,6 @@
 			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
 			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
-		<div class="float-fix"></div>
 	</div>
 	<!-- END config --> 
 	<!-- BEGIN text_editable --> 
@@ -72,8 +71,9 @@
 	<!-- END text_editable --> 
 	
 	<!-- BEGIN text_locked -->
-	<div class="text"> {TEXTBOX_BODY}
-		<div class="float-fix"></div>
+	<div class="text clearfix"> 
+	{TEXTBOX_BODY}
+		
 	</div>
 	
 	<!-- BEGIN modify_text -->

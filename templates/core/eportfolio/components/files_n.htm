@@ -33,7 +33,7 @@
       <input type="submit" value="Update"  class="submit-btn update" />
     </form>
   </div>
-  	<div class="editPanel delete-it hide">
+  	<div class="editPanel delete-it hide clearfix">
 		<p>Are you sure you want to remove component?</p>
 		<form action="#" method="post">
 			<input type="hidden" name="uid" value="{ID}" />
@@ -42,13 +42,12 @@
 			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
 			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
-		<div class="float-fix"></div>
 	</div>
   <!-- END config -->
-  <div class="listing">
+  <div class="listing clearfix">
     <ul>
       <!-- BEGIN files -->
-      <li class="{ON_OFF}">
+      <li class="{ON_OFF} clearfix">
         <!-- BEGIN file_url -->
         <h4><a class="icons {HIDDEN} {FILE_MIME_IMAGE}" href="{FILE_URL}" target="{FILE_TARGET}" >{FILE_DESCRIPTION}</a></h4>
         <!-- END file_url -->
@@ -64,11 +63,9 @@
 			<p class="hide-on-small">{FILE_COMMENT}</p>
 			<p class="small hide-on-small">Published on {FILE_PUBLISHED_DATE}</p>
 		</div>
-        <div class="float-fix"></div>
       </li>
       <!-- END files -->
     </ul>
-    <div class="float-fix"></div>
     <p class="interact">
         <a href="/cms/portfolio" class="btn add"><span></span>Add file</a>
     </p>

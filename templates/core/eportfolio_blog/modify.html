@@ -35,7 +35,7 @@ function verify() {
 <!-- END custom_head -->
 
 <h1>{ACTION} Blog Entry</h1>
-<form method="post" enctype="multipart/form-data" id="blogForm" action="/eportfolio_blog/modifyForm.php" onSubmit="return(verify());">
+<form method="post" enctype="multipart/form-data" id="blogForm" class="clearfix" action="/eportfolio_blog/modifyForm.php" onSubmit="return(verify());">
 	<table class="standardForm">
 		<tr>
 			<td class="formLabelWidth"><h4>Title</h4></td>
@@ -53,5 +53,4 @@ function verify() {
 	<!-- BEGIN delete -->
 	<input type="submit" name="delete" value="Delete Entry" class="submit-btn-plain" />
 	<!-- END delete -->
-	<div class="float-fix"></div>
 </form>

@@ -4,10 +4,10 @@
     <div class="listing">
         <ul class="js_happening">
             <!-- BEGIN note_block -->
-            <li>
+            <li class="clearfix">
                 <p class="interact-left home-calendar">{TIME}&nbsp;</p>
                 <h4 class="eventListing" style="background-color:{COLOUR}">{NOTE}</h4>
-                <div class="hidden-fields">
+                <div class="hidden-fields clearfix">
                     <h4><!-- BEGIN time -->
                         <span class="time"><strong>{TIME}</strong></span>
                         <!-- END time -->{NOTE}
@@ -16,9 +16,7 @@
                         Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br/>
                         {LOCATION} {DETAIL}</p>
                     <div class="modify">{MODIFY}</div>
-                    <div class="float-fix"></div>
                 </div>
-				<div class="float-fix"></div>
             </li>
             <!-- END note_block -->
         </ul>

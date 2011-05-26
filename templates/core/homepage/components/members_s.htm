@@ -2,7 +2,7 @@
   <h2>Members</h2>
   	<!-- BEGIN config -->
     <a class="close-delete" href="#"><span>X</span></a>
-	<div class="editPanel delete-it hide">
+	<div class="editPanel delete-it hide clearfix">
 	<p>Are you sure you want to remove component?</p>
 		<form action="#" method="post">
 		  <input type="hidden" name="cid" value="{ID}" />
@@ -11,7 +11,6 @@
 			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
 			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
-	<div class="float-fix"></div>
 	</div>
 	<!-- END config -->
   <div class="listing">
@@ -24,10 +23,9 @@
     </ul>
     
   </div>
-  <form action="/mail/createMail.php" method="post" name="form2">
+  <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
       <input type="hidden" name="replyto" value="{HEADING} &lt;{REPLYTO}&gt;" />
       <input type="hidden" name="bcc" value="{EMAILALL}" />
       <input type="submit" name="emailall" value="Email all" class="submit-btn-plain float-right email-all" />
-	  <div class="float-fix"></div>
     </form>
 </div>

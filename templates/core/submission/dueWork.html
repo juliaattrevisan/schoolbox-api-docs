@@ -89,13 +89,14 @@ $j(function () {
     <div class="duework-popup cal-bubble">
         <div class="middle">
             <div class="close">x</div>
-            <div class="js-data"><h3>${description}</h3>
+            <div class="js-data clearfix"><h3>${description}</h3>
                 <p class="bubble-name"><span><a href="/homepage/${cid}">${category}</a></span> - <em>${typeName}</em></p>
                 {{if comment}} <p class="comment">${comment}</p> {{/if}}
                 <p class="details">
                     {{if fid > 0}} <a class="btn down-arrow float-left" href="/send.php?id=${fid}&save=1"><span></span>Download</a> {{/if}}
-                   <a class="btn go-to float-left" href="/submission/submissionHistory/${id}"><span></span>${action}</a></p>
-                <div class="float-fix"></div>
+                   <a class="btn go-to float-left" href="/submission/submissionHistory/${id}"><span></span>${action}</a>
+				</p>
+
             </div>
 			<div class="bottom"><strong></strong></div>
         </div>
@@ -175,7 +176,7 @@ $j(function () {
 						<td>{WORK_SUBJECT}</td>
 						<td>{WORK_DESCRIPTION}</td>
 						<td valign="top">{WORK_STATUS}</td>
-						<td><a href="/submission/submissionHistory/{WORK_BOX_ID}" class="btn" style="overflow:hidden"><span></span>{WORK_ACTION}</a><div class="float-fix"></div></td>
+						<td><a href="/submission/submissionHistory/{WORK_BOX_ID}" class="btn" style="overflow:hidden"><span></span>{WORK_ACTION}</a></td>
 					</tr>
 					<!-- END work -->
 				</tbody>
@@ -228,9 +229,9 @@ $j(function () {
 	<div class="box component">
 		<h2>Subjects</h2>
 		<div class="listing">
-			<ul>
+			<ul class="clearfix">
 				<!-- BEGIN summary -->
-				<li class="bars {DARK}"> <a href="/homepage/{SUMMARY_CAT_ID}">{SUMMARY_CAT_NAME}</a> 
+				<li class="bars {DARK} clearfix"> <a href="/homepage/{SUMMARY_CAT_ID}">{SUMMARY_CAT_NAME}</a> 
 					<!-- BEGIN summary_due -->( {SUMMARY_DUE} Due )<!-- END summary_due -->
 					<p>{SUMMARY_TEACHER}</p>
 					<div class="barchart">
@@ -239,9 +240,7 @@ $j(function () {
 						</div>
 						<div class="value">{PERCENTAGE_COMPLETED}%</div>
 					</div>
-					<div class="float-fix"></div>
 				</li>
-				<div class="float-fix"></div>
 				<!-- END summary -->
 			</ul>
 		</div>
@@ -251,10 +250,9 @@ $j(function () {
 		<div class="listing">
 			<ul>
 				<!-- BEGIN activity -->
-				<li class="{DARK}">
+				<li class="{DARK} clearfix">
 					<h4>{ACTIVITY_DESCRIPTION}</h4>
 					<p class="interact">{ACTIVITY_DATE}</p>
-					<div class="float-fix"></div>
 				</li>
 				<!-- END activity -->
 				
@@ -263,4 +261,3 @@ $j(function () {
 	</div>
 </div>
 <!-- END returned_block -->
-<div class="float-fix"></div>

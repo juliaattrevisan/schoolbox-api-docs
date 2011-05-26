@@ -77,14 +77,13 @@ $j(function () {
     <!-- BEGIN recaptcha -->
     <tr>
       <td><h4>Human Checker</h4>
-      	<em>Please type out these two words so that we know you're not a bot </em><br /><div id='recaptcha'><img src="{RECAPTCHA_IMAGE}" alt="" /></div>
-        <div class="float-fix"></div>
+      	<em>Please type out these two words so that we know you're not a bot </em><br />
+		<div id='recaptcha'><img src="{RECAPTCHA_IMAGE}" alt="" /></div>
+        
         <input type="hidden" name="recaptcha_challenge" id="recaptcha_challenge" value="{RECAPTCHA_CHALLENGE}" />
         <input type="text" name="recaptcha_answer" id="recaptcha_answer" size="35" autocomplete="off" />
         <a href="#" id="recaptcha_reload" title="Get new words">Get new words</a>
-		<div class="float-fix"></div>
-		
-		
+	
 		</td>
     </tr>
     <!-- END recaptcha -->

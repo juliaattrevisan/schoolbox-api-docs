@@ -79,13 +79,13 @@ $j(document).ready(function() {
 			<td valign="top"><h4>Add users</h4>
 				<em>You may add users individually by typing their name and selecting from the list.  Alternatively you can add many users via a list of synergetic id's or usernames.</em>
 				</td>
-			<td><form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" method="post">
+			<td><form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
 					<input id="addUser" type="text" size="30" />
 					<input type="hidden" name="userID" id="userID" />
 					<input type="submit" value="Add User" class="submit-btn-plain" />
-					<div class="float-fix"></div>
 				</form>
-				<a href="/group/bulk/{CATEGORY_ID}" class="btn add float-left"><span></span>Add Bulk Members</a><div class="float-fix"></div></td>
+				<a href="/group/bulk/{CATEGORY_ID}" class="btn add float-left"><span></span>Add Bulk Members</a>
+			</td>
 		</tr>
 		<tr>
 			<td valign="top"><h4>Access Type</h4>
@@ -126,10 +126,10 @@ $j(document).ready(function() {
 						</tr>
 						<!-- END member -->
 					</table>
-					<p>
+					<p class="clearfix">
 						<input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
 						<input type="button" id="deleteButton" value="Delete Selected" class="submit-btn-plain" />
-					<div class="float-fix"></div>
+					
 					</p>
 				</form>
 				</td>

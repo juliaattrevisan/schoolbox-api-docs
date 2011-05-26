@@ -1,24 +1,19 @@
 <h2>Folders <!-- BEGIN count -->({CATEGORY_DISP_COUNT} / {CATEGORY_COUNT})<!-- END count --></h2>
 <!-- BEGIN category -->
-<div class="search-item">
-   
-    <div class="search-details">
-	 <img src="/images/icons/60x60/folder.png" />
-    <h3><a href="/homepage/{CATEGORY_ID}">{CATEGORY_NAME}</a></h3>
-    <p class="search-sml">{CATEGORY_BREADCRUMB}</p>
-</div>		
-<div class="search-functions">
-    <a class="btn report" href="/resources/{CATEGORY_ID}"><span></span>Resources</a></p>
-    <a class="btn resources" href="/cms/imageGallery/{CATEGORY_ID}"><span></span>Image Gallery</a>
-    <!-- BEGIN modify --><a href="/cms/category/{CATEGORY_ID}" class="btn modify"><span></span>Modify</a><!-- END modify -->
-	<div class="float-fix"></div>
-</div>
-
-<div class="float-fix"></div>
+<div class="search-item clearfix">
+	<div class="search-details"> <img src="/images/icons/60x60/folder.png" />
+		<h3><a href="/homepage/{CATEGORY_ID}">{CATEGORY_NAME}</a></h3>
+		<p class="search-sml">{CATEGORY_BREADCRUMB}</p>
+	</div>
+	<div class="search-functions clearfix">
+		<a class="btn report" href="/resources/{CATEGORY_ID}"><span></span>Resources</a>
+		<a class="btn resources" href="/cms/imageGallery/{CATEGORY_ID}"><span></span>Image Gallery</a> 
+		<!-- BEGIN modify --><a href="/cms/category/{CATEGORY_ID}" class="btn modify"><span></span>Modify</a><!-- END modify -->
+	</div>
 </div>
 <!-- END category -->
-<div class="pagination">
-    <!-- BEGIN pagination -->
-    <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
-    <!-- END pagination -->
+<div class="pagination"> 
+	<!-- BEGIN pagination --> 
+	<a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a> 
+	<!-- END pagination --> 
 </div>

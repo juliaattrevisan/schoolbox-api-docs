@@ -1,59 +1,51 @@
 <div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
-  <h2>{CALENDAR_TITLE}</h2>
-  <!-- BEGIN config -->
-  <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
-<a class="close-delete" href="#"><span>X</span></a>
-  <div class="editPanel settings hide">
-    <form action="/homepage/configForm.php" method="get">
-      <input type="hidden" name="cid" value="{ID}" />
-      <input type="hidden" name="type" value="config" />
-      <input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
-      <label for="size">Upcoming days to show: </label>
-      <select name="size">
-      	<!-- BEGIN size -->
-      	<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
-      	<!-- END size -->
-      </select>      <input type="submit" value="Update" class="submit-btn update" />
-    </form>
-  </div>
-<div class="editPanel delete-it hide">
-<p>Are you sure you want to remove component?</p>
-		<form action="#" method="post">
-		  <input type="hidden" name="cid" value="{ID}" />
-		  <input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
-                  <input type="hidden" name="component" value="{COMPONENT_ID}" />
-			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
-			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
+	<h2>{CALENDAR_TITLE}</h2>
+	<!-- BEGIN config --> 
+	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
+	<div class="editPanel settings hide">
+		<form action="/homepage/configForm.php" method="get">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="type" value="config" />
+			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+			<label for="size">Upcoming days to show: </label>
+			<select name="size">
+				<!-- BEGIN size -->
+				<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
+				<!-- END size -->
+			</select>
+			<input type="submit" value="Update" class="submit-btn update" />
 		</form>
-		<div class="float-fix"></div>
-</div>
-<!-- END config -->
-	<div class="listing">
-        <ul class="js_happening">
-            <!-- BEGIN group_events -->
-            <li class="{ON_OFF}">
-                <h4 class="eventListing" style="background-color:{CAL_COLOUR}">{CAL_NOTE}<br />
-              On {CAL_DATE} {CAL_TIME}</h4>
-                <div class="float-fix"></div>
-                <div class="hidden-fields">
-                    <h4><!-- BEGIN time -->
-                        <span class="time"><strong>{CAL_TIME}</strong></span>
-                        <!-- END time -->{CAL_NOTE}
-                    </h4>
-                    <p class="meta">Event Type: {CAL_TYPE}<br/>
-                        Created by: <a href="/search/user/{CAL_AUTHOR_ID}">{CAL_AUTHOR}</a><br/>
-                        {CAL_LOCATION} {CAL_DETAIL}</p>
-                    <span class="modify">{CAL_MODIFY}</span>
-					<div class="float-fix"></div>
-                </div>
-				<div class="float-fix"></div>
-            </li>
-            <!-- END group_events -->
-        </ul>
-    <div class="float-fix"></div>
-  </div>
-  <!-- BEGIN submit_event -->
-  <p class="interact"><a href="/calendar/modify.php?level=2&sid={ID}" class="btn add"><span></span>Add Event</a></p>
-  <!-- END submit_event -->
-</div>
+	</div>
+	<div class="editPanel delete-it hide clearfix">
+		<p>Are you sure you want to remove component?</p>
+		<form action="#" method="post">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+			<input type="hidden" name="component" value="{COMPONENT_ID}" />
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> <a href="#" class="delete-reject btn go-to"><span></span>No</a>
+		</form>
+	</div>
+	<!-- END config -->
+	<div class="listing clearfix">
+		<ul class="js_happening">
+			<!-- BEGIN group_events -->
+			<li class="{ON_OFF} clearfix">
+				<h4 class="eventListing clearfix" style="background-color:{CAL_COLOUR}">{CAL_NOTE}<br />On {CAL_DATE} {CAL_TIME}</h4>
 
+				<div class="hidden-fields clearfix">
+					<h4><!-- BEGIN time --> 
+						<span class="time"><strong>{CAL_TIME}</strong></span> 
+						<!-- END time -->{CAL_NOTE} </h4>
+					<p class="meta">Event Type: {CAL_TYPE}<br/>
+						Created by: <a href="/search/user/{CAL_AUTHOR_ID}">{CAL_AUTHOR}</a><br/>
+						{CAL_LOCATION} {CAL_DETAIL}</p>
+					<span class="modify">{CAL_MODIFY}</span>
+				</div>
+			</li>
+			<!-- END group_events -->
+		</ul>
+	</div>
+	<!-- BEGIN submit_event -->
+	<p class="interact"><a href="/calendar/modify.php?level=2&sid={ID}" class="btn add"><span></span>Add Event</a></p>
+	<!-- END submit_event --> 
+</div>

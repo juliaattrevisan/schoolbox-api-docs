@@ -1,8 +1,8 @@
-	<!-- BEGIN custom_head -->
-	<script type="text/javascript" src="/javascript/stdfuncs.js"></script>
-	<script type="text/javascript" src="/javascript/jquery.color.js"></script>
-	<script type="text/javascript" src="/javascript/chat.js"></script>
-	<script type="text/javascript">
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/stdfuncs.js"></script>
+<script type="text/javascript" src="/javascript/jquery.color.js"></script>
+<script type="text/javascript" src="/javascript/chat.js"></script>
+<script type="text/javascript">
 	$j(function () {
 		window.chat_obj = new Chat({
 			category_id: '{ID}',
@@ -53,7 +53,7 @@
 
 	
 	</script>
-	<!-- END custom_head -->
+<!-- END custom_head -->
 
 <div class="box chat" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>Chat<span class="light"></span></h2>
@@ -74,7 +74,7 @@
 			<input type="submit" value="Update" class="submit-btn update" />
 		</form>
 	</div>
-	<div class="editPanel delete-it hide">
+	<div class="editPanel delete-it hide clearfix">
 		<p>Are you sure you want to remove component?</p>
 		<form action="#" method="post">
 			<input type="hidden" name="cid" value="{ID}" />
@@ -82,25 +82,20 @@
 			<input type="hidden" name="component" value="{COMPONENT_ID}" />
 			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> <a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
-		<div class="float-fix"></div>
 	</div>
 	<!-- END config -->
 	<div class="chat-box">
 		<ul class="listing chat-users">
 		</ul>
-		
 		<a href="#" class="show-users"></a>
-		
 		<ul class="chat-messages">
 		</ul>
-		
 		<form action="#" method="post" class="chat-send" id="chatSend">
 			<div class="chat-message-container">
 				<textarea name="message" class="chat-message-box"></textarea>
 			</div>
 			<a href="#" class="btn chat float-right"><span></span>Send</a>
 		</form>
-		
 	</div>
 	<div class="chat-error hide"></div>
 </div>
