@@ -1,6 +1,20 @@
 <?php
 $this->setBlock($componentHandle, "manage_page", "manage_page_block");
 $this->setBlock($componentHandle, "stats_data", "stats_data_block");
+$this->setBlock($componentHandle, "addmylinks", "addmylinks_block");
+
+//My links button
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/my-links.php');
+$mylinkHandler = new MyLinks();
+$url = 'http://'.Cfg::get('site_hostname') . '.' . Cfg::get('site_domain').'/homepage/'.$categoryID;
+
+if($mylinkHandler->linkExists($_SESSION['id'], $url)) {
+    $this->setVar('addmylinks_block','');
+}
+else {
+    $this->setVar('HOMEPAGE_URL', $url);
+    $this->parse('addmylinks_block','addmylinks');
+}
 
 if($permission >= FULL_ACCESS) //is owner of area
     $this->parse("manage_page_block", "manage_page");

@@ -55,7 +55,7 @@ class User extends Model {
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
 					LEFT JOIN superusers ON user.id = superusers.id
-				WHERE user.id = '$id'";
+				WHERE user.id = '$id' ORDER BY userCampus.defaultCampus DESC";
         return $this->db->getRow($query);
     }
 
@@ -67,7 +67,7 @@ class User extends Model {
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
 					LEFT JOIN superusers ON user.id = superusers.id
-				WHERE user.username = " . $this->db->smartQuote($username);
+				WHERE user.username = " . $this->db->smartQuote($username)." ORDER BY userCampus.defaultCampus DESC";
         return $this->db->getRow($query);
     }
 
@@ -103,7 +103,7 @@ class User extends Model {
 				FROM user 
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
-				WHERE user.synergy_id = '$sid'";
+				WHERE user.synergy_id = '$sid' ORDER BY userCampus.defaultCampus DESC";
         return $this->db->getRow($query);
     }
 

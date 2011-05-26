@@ -10,6 +10,9 @@ $groupHandler = new Group();
 
 if($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) || is_array($_POST['category']) ) ) {
 
+    if(!isURL($_REQUEST['url']))
+        error(139);
+
 	$link = array(	'url'			=> $_POST['url'],
 					'description'	=> $_POST['description'],
 					'comment'		=> $_POST['comment'],

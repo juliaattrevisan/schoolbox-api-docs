@@ -49,13 +49,18 @@ class ExternalUser extends MSSQL{
 		
 	}
 
-       function getStaff($synID)
+       function getStaff($tassID)
 	{
-            $query = " SELECT SchoolStaffCode, StaffBuilding, StaffRoom, StaffExtension, StaffMobilePhone
-                FROM SynergyOne.dbo.vStaff vStaff
-                WHERE vStaff.StaffID = $synID ";
+            //$query = " SELECT SchoolStaffCode, StaffBuilding, StaffRoom, StaffExtension, StaffMobilePhone
+            //    FROM SynergyOne.dbo.vStaff vStaff
+            //    WHERE vStaff.StaffID = $synID ";
+
+           /* $query = "SELECT * FROM teacher WHERE tch_code = '$tassID'";
 
             $staff = $this->getRow($query);
+        print_r($staff);
+
+            */
             return $staff;
 
 	}

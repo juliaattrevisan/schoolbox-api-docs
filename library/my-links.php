@@ -52,6 +52,11 @@ class MyLinks extends Model {
 		
 		return false;
 	}
+
+    function linkExists($uid, $link) {
+        $query = "SELECT id FROM bookmarks WHERE owner='$uid' AND url = '".mysql_real_escape_string($link)."'";
+        return $this->db->getOne($query);
+    }
 }
 
 ?>
