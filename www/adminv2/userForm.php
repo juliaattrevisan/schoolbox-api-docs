@@ -16,27 +16,9 @@ if (!$groupHandler->isSuperuser()) {
     error(19);
 }
 
-/* Add user to group
- */
-if (($_POST['groupSubmit'] == 'Add') && $_POST['uid']) {
-    $groupHandler->setService($_POST['service']);
-    $groupHandler->addUser($_POST['sid'], $_POST['uid'], $_POST['type']);
-
-	localRedir('/adminv2/modify-user/'.$_POST['uid']);
-}
-
-/* Add user to service
- */
-else if (($_POST['serviceSubmit'] == 'Add') && $_POST['uid']) {
-    $groupHandler->setService($_POST['service']);
-    $groupHandler->addUser($_POST['sid'], $_POST['uid'], $_POST['type']);
-
-	localRedir('/adminv2/modify-user/'.$_POST['uid']);
-}
-
 /* Update existing user details
  */
-else if(is_numeric($_POST['userID']) && $_POST['modusername'] ) {
+if (is_numeric($_POST['userID']) && $_POST['modusername'] ) {
     if ($_POST['delete']) {
         $userHandler->delete($_POST['userID']);
 
@@ -102,49 +84,67 @@ else if ($_POST['modusername']) {
 	localRedir('/adminv2/modify-user/'.$id);
 }
 
+/* Add user to group
+ */
+else if (isset($_POST['groupSubmit']) && is_numeric($_POST['uid'])) {
+    $groupHandler->setService(scrubTEXT($_POST['service']));
+    $groupHandler->addUser(scrubTEXT($_POST['sid']), scrubTEXT($_POST['uid']), scrubTEXT($_POST['type']));
+
+	localRedir('/adminv2/modify-user/' . scrubTEXT($_POST['uid']) . '#permissions');
+}
+
+/* Add user to service
+ */
+else if (isset($_POST['addService']) && is_numeric($_POST['uid'])) {
+    $groupHandler->setService(scrubTEXT($_POST['service']));
+    $groupHandler->addUser(scrubTEXT($_POST['sid']), scrubTEXT($_POST['uid']), scrubTEXT($_POST['type']));
+
+	localRedir('/adminv2/modify-user/' . scrubTEXT($_POST['uid'] . '#permissions'));
+}
+
 /* Ajax Update Groups and their access permissions etc
  */
 else if ($_POST['updateGroups'] == true) {
-    $groupHandler->setService($_POST['service']);
+    $groupHandler->setService(scrubTEXT($_POST['service']));
 
 	/* If assigning a new admin, demote any existing owners
 	 */
-	if ($_POST['type'] == FULL_ACCESS) {
-		$category = $categoryHandler->getByID($_POST['sid']);
-		$groupHandler->setUserPermission($_POST['sid'], $category['owner'], WRITE_ACCESS);
+	if (scrubTEXT($_POST['type']) == FULL_ACCESS) {
+		$category = $categoryHandler->getByID(scrubTEXT($_POST['sid']));
+		$groupHandler->setUserPermission(scrubTEXT($_POST['sid']), $category['owner'], WRITE_ACCESS);
 	}
 
 	/* Update user access as normal
 	 */
-	$groupHandler->setUserGroupType($_POST['sid'], $_POST['uid'], $_POST['type']);
+	$groupHandler->setUserGroupType(scrubTEXT($_POST['sid']), scrubTEXT($_POST['uid']), scrubTEXT($_POST['type']));
 }
 
 /* Ajax Update Service Permissions (sid corresponds to campus)
  */
-else if ($_POST['updateServices'] == true) {
-    $groupHandler->setService($_POST['service']);
-	$groupHandler->setUserGroupType($_POST['sid'], $_POST['uid'], $_POST['type']);
+else if (scrubTEXT($_POST['updateServices']) == true) {
+    $groupHandler->setService(scrubTEXT($_POST['service']));
+	$groupHandler->setUserGroupType(scrubTEXT($_POST['sid']), scrubTEXT($_POST['uid']), scrubTEXT($_POST['type']));
 }
 
 /* Ajax Update SID values
  */
-else if ($_POST['updateSID'] == true) {
-	$groupHandler->setService($_POST['service']);
-	$groupHandler->setSID($_POST['previousSid'], $_POST['sid'], $_POST['uid']);
+else if (scrubTEXT($_POST['updateSID']) == true) {
+	$groupHandler->setService(scrubTEXT($_POST['service']));
+	$groupHandler->setSID(scrubTEXT($_POST['previousSid']), scrubTEXT($_POST['sid']), scrubTEXT($_POST['uid']));
 }
 
 /* Remove a service
  */
 else if (is_numeric($_GET['deleteService']) && is_numeric($_GET['sid']) && is_numeric($_GET['uid'])) {
-	$groupHandler->setService($_GET['deleteService']);
-	$groupHandler->deleteUser($_GET['sid'], $_GET['uid']);
+	$groupHandler->setService(scrubTEXT($_GET['deleteService']));
+	$groupHandler->deleteUser(scrubTEXT($_GET['sid']), scrubTEXT($_GET['uid']));
 
-	localRedir('/adminv2/modify-user/'.$_GET['uid']);
+	localRedir('/adminv2/modify-user/' . scrubTEXT($_GET['uid'])  . '#permissions');
 }
 
 /* Switch logins to the current user being viewed
  */
-else if($_POST['login']) {
+else if ($_POST['login']) {
     require_once SITE_root . '/include/session.php';
 
     $sessionHandler = new Session;

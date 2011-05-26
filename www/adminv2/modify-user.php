@@ -9,14 +9,42 @@ if(!$groupHandler->isSuperuser())
     error(19);
 
 if(is_numeric($this->arg[0])) {
-
+	$this->setTitle('Admin - Modify User');
     $this->setFile(TEMPLATE_content, 'adminv2/modify-user.html');
-    $this->setTitle('Admin - Modify User');
 
-    /* Modify existing user */
+	/* Permissions clone
+	 */
+	$this->setBlock(TEMPLATE_content, 'campusPermsList','campusPermsList_block');
+
+	/* Output permissions
+	 */
+	$this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
+	$this->setBlock(TEMPLATE_content, 'user_news', 'user_news_block');
+	$this->setBlock(TEMPLATE_content, 'user_cms', 'user_cms_block');
+
+	$this->setVar(array(
+		'user_calendar_block' => '',
+		'user_news_block' => '',
+		'user_cms_block'=> ''
+	));
+
+    /* Modify existing user
+	 */
     $user = $userHandler->getByID($this->arg[0]);
 
-    if(is_array($user)) {
+    if (is_array($user)) {
+
+		/* Prepend a please select at the start of every campus list
+		 */
+		$campusList = array_merge(array(
+			array(
+			 'id' => 0,
+			 'name' => 'Please select'
+			),
+		), $userHandler->getCampusList());
+
+		/* User data
+		 */
         $output = array('USERID'            => $user['uid'],
                         'FIRSTNAME'         => $user['firstname'],
                         'USERNAME'          => $user['username'],
@@ -50,9 +78,12 @@ if(is_numeric($this->arg[0])) {
          $this->dropDown('system_group', $userHandler->getGroupList(), $user['group_id'], TEMPLATE_content, array('id'=>'GROUP_ID','name'=>'SYSTEM_GROUP_NAME'));
 
         /* Output campus list */
-         $this->setBlock(TEMPLATE_content, 'campus','campus_block');
-         $campusList = $userHandler->getCampusList();
-         $userCampus = $userHandler->getUserCampus($user['uid']);
+		$this->setBlock(TEMPLATE_content, 'campus','campus_block');
+
+
+
+		$userCampus = $userHandler->getUserCampus($user['uid']);
+
          foreach($campusList as $campus ) {
 
              $outcampus = array('CAMPUS_ID'         => $campus['id'],
@@ -96,61 +127,61 @@ if(is_numeric($this->arg[0])) {
          /* Output entire group list TODO make this an ajax search */
          $this->dropDown('all_group', $groupHandler->groupList(), '', TEMPLATE_content, array('id' => 'ALL_GROUP_ID' , 'name'=>'ALL_GROUP_NAME'));
 
-         /* Output permissions */
-         $this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
-         $this->setBlock(TEMPLATE_content, 'user_news', 'user_news_block');
-         $this->setBlock(TEMPLATE_content, 'user_cms', 'user_cms_block');
 
-		$this->setVar(array(
-			'user_calendar_block' => '',
-			'user_news_block' => '',
-			'user_cms_block'=> ''
+
+
+
+		/* Clone-able permissions dropdown
+		 */
+		$this->dropDown('perm_campus', $campusList, 0, 'campusPermsList', array(
+			 'id' => 'PERM_CAMPUS_ID',
+			 'name' => 'PERM_CAMPUS_NAME'
 		));
 
+		$this->parse('campusPermsList_block', 'campusPermsList');
+
+		/* Get a list of permissions
+		 */
 		$permList = $groupHandler->getAllUserAccess($user['uid']);
 
 		if (is_array($permList)) {
 			foreach($permList as $perm) {
-				$permOutput = array(
-					'SERVICE_ID'       => $perm['service'],
-					'READ_CHECKED'     => $perm['type']==1?'checked="checked"':'',
-					'WRITE_CHECKED'    => $perm['type']==2?'checked="checked"':'',
-					'ADMIN_CHECKED'    => $perm['type']==3?'checked="checked"':'',
-					'SID'			   => $perm['sid']
-				);
 
-				$this->setVar($permOutput);
+				/* Radio boxes
+				 */
+				$this->setVar(array(
+					'SERVICE_ID'    => $perm['service'],
+					'READ_CHECKED'  => $perm['type'] == READ_ACCESS ? 'checked="checked"' : '',
+					'WRITE_CHECKED' => $perm['type'] == WRITE_ACCESS ? 'checked="checked"' : '',
+					'ADMIN_CHECKED' => $perm['type'] == FULL_ACCESS ? 'checked="checked"' : '',
+					'SID'			=> $perm['sid']
+				));
 
+				/* Show campus name
+				 */
+				foreach($campusList as $campus) {
+					if ($campus['id'] == $perm['sid']) {
+						$this->setVar(array(
+							'PERM_CAMPUS_NAME' => $campus['name'],
+						));
+					}
+				}
+
+				/* Render out service blocx
+				 */
 				switch($perm['service']) {
 
 					/* Calendar
 					 */
-					case 2:
-						$this->dropDown('perm_campus', $userHandler->getCampusList(), $perm['sid'], 'user_calendar', array(
-							 'id' => 'PERM_CAMPUS_ID',
-							 'name' => 'PERM_CAMPUS_NAME'
-						));
-
-						$this->parse('user_calendar_block', 'user_calendar', true);
-
-						break;
+					case 2: $this->parse('user_calendar_block', 'user_calendar', true); break;
 
 					/* News
 					 */
-					case 3:
-						$this->dropDown('perm_campus', $userHandler->getCampusList(), $perm['sid'], 'user_news', array(
-							 'id' => 'PERM_CAMPUS_ID',
-							 'name' => 'PERM_CAMPUS_NAME'
-						));
-
-                        $this->parse('user_news_block', 'user_news', true);
-						break;
+					case 3: $this->parse('user_news_block', 'user_news', true); break;
 
 					/* CMS
 					 */
-                    case 5: //cms
-						$this->parse('user_cms_block', 'user_cms', true);
-						break;
+                    case 5: $this->parse('user_cms_block', 'user_cms', true); break;
 				}
 
 				/* Clear child blocks after parsing out parent

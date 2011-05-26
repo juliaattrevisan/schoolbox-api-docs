@@ -70,20 +70,18 @@ $j(function() {
 	$j('a.show-pass').click(function() {
 		$j(this).siblings('em').show().css('display', 'block');
 		$j(this).siblings('a.hide-pass').show().css('display', 'block');
-		$j(this).hide();	
+		$j(this).hide();
+
 		return false;
-	})
-	
+	});
 	
 	$j('a.hide-pass').click(function() {
 		$j(this).siblings('em').hide();
 		$j(this).siblings('a.show-pass').show();
 		$j(this).hide();
 		
-	return false;
-	})
-	
-	
+		return false;
+	});
 });
 </script>
 
@@ -112,16 +110,13 @@ $j(function() {
 	<form class="admin-form" method="POST" action="/adminv2/userForm.php">
 		<div class="split-container clearfix">
 			<div class="split">
-
 				<label class="width2 first">Title
 					<select name="title">
 						<!-- BEGIN title -->
 						<option value="{NAME_TITLE}" {NAME_TITLE_SELECTED}>{NAME_TITLE}</option>
 						<!-- END title -->
 					</select>
-					
 				</label>
-					
 				<label class="width2 first">First Name
 					<input type="text" name="firstname" value="{FIRSTNAME}" />
 				</label>
@@ -134,9 +129,9 @@ $j(function() {
 
 				<table cellpadding="0" width="50%">
 					<colgroup>
-					<col width="33%" />
-					<col width="33%" />
-					<col width="33%" />
+						<col width="33%" />
+						<col width="33%" />
+						<col width="33%" />
 					</colgroup>
 					<thead>
 						<tr>
@@ -163,9 +158,8 @@ $j(function() {
 					<input type="text" name="modusername" value="{USERNAME}" />
 				</label>
 				<label for="password" class="password-container">
-					
 					<div class="actual-password">Password<br />
-					<input type="password" name="modpassword" class="password" value="{PASSWORD}" />
+						<input type="password" name="modpassword" class="password" value="{PASSWORD}" />
 					</div>
 					<!-- BEGIN reveal_password -->
 					<div class="reveal-password">
@@ -174,25 +168,23 @@ $j(function() {
 						<a href="#" class="hide-pass">hide</a>
 					</div>
                     <!-- END reveal_password -->
-					
 				</label>
                 <label for="alt_email">Alternate Email
 					<input type="text" name="alt_email" value="{ALT_EMAIL}" />
 				</label>
-                    <label for="group">Group
-                <select name="group">
-                    <!-- BEGIN system_group -->
-                    <option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
-                    <!-- END system_group -->
-                </select>
-            </label>
+				<label for="group">Group
+					<select name="group">
+						<!-- BEGIN system_group -->
+						<option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
+						<!-- END system_group -->
+					</select>
+				</label>
 				<label for="e-portfolio">E-Portfolio
 					<input type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
 				</label>
 				<label for ="superuser" class="width2 ">Superuser
 					<input type="checkbox" name="superuser" value="1" onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME} superuser status?'));" {SUPERUSER_CHECKED} />
 				</label>
-
 				<label for="year">Year
 					<input type="text" name="year" value="{YEAR}" />
 				</label>
@@ -202,17 +194,15 @@ $j(function() {
 		<input type="hidden" name="userID" value="{USERID}" />
 		<input type="submit" name="submit" class="submit-btn-plain" value="Update User" />
 		<input type="submit" name="delete" class="submit-btn-plain" value="Delete User" onclick="return(confirm('Are you sure you want to delete {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME}'));" />
-
 	</form>
-
 </div>
 <div class="level clearfix">
 	<h3>Groups</h3>
 	<table>
 		<colgroup>
-		<col width="10%" />
-		<col width="50%" />
-		<col width="40%" />
+			<col width="10%" />
+			<col width="50%" />
+			<col width="40%" />
 		</colgroup>
 		<thead>
 			<tr>
@@ -228,29 +218,32 @@ $j(function() {
 				<td><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></td>
 				<td>
 					<form action="/adminv2/userForm.php" method="post" class="updateGroupsForm">
-						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
-						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
-						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Group Admin
 						<input type="hidden" name="uid" value="{USERID}" />
 						<input type="hidden" name="sid" value="{USER_GROUP_ID}" />
 						<input type="hidden" name="service" value="1" />
+
+						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
+						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
+						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Group Admin
 					</form>
 				</td>
 			</tr>
 			<!-- END user_group -->
 			<tr>
 				<td colspan="4" class="colours-buttons">
-					<form action="/adminv2/userForm.php" method="post" >
+					<form action="/adminv2/userForm.php" method="post">
+						<input type="hidden" name="groupSubmit" />
+						<input type="hidden" value="{USERID}" name="uid">
+						<input type="hidden" value="1" name="service">
+						<input type="hidden" value="1" name="type">
+
 						<select class="formfield float-left" name="sid">
 							<option value="0">&lt;- Please Select a Group -&gt;</option>
 							<!-- BEGIN all_group -->
 							<option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
 							<!-- END all_group -->
 						</select>
-						<input type="hidden" value="{USERID}" name="uid">
-						<input type="hidden" value="1" name="service">
-						<input type="hidden" value="1" name="type">
-						<input type="submit" class="submit-btn-plain" value="Add" name="groupSubmit">
+						<input type="submit" class="submit-btn-plain" value="Add">
 					</form>
 				</td>
 			</tr>
@@ -258,13 +251,13 @@ $j(function() {
 	</table>
 </div>
 <div class="level clearfix">
-	<h3>Permissions</h3>
+	<h3 id="permissions">Permissions</h3>
 	<table>
 		<colgroup>
-		<col width="10%" />
-		<col width="20%" />
-		<col width="30%" />
-		<col width="40%" />
+			<col width="10%" />
+			<col width="20%" />
+			<col width="30%" />
+			<col width="40%" />
 		</colgroup>
 		<thead>
 			<tr>
@@ -282,24 +275,20 @@ $j(function() {
 					<form action="/adminv2/userForm.php" method="post" class="updateSIDForm">
 						<input type="hidden" name="uid" value="{USERID}" />
 						<input type="hidden" name="service" value="{SERVICE_ID}" />
-						<input type="hidden" name="previousSid" value="{SID}" />
-						<select name="sid">
-						
-							<!-- BEGIN perm_campus -->
-							<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED} >{PERM_CAMPUS_NAME}</option>
-							<!-- END perm_campus -->
-							
-						</select>
+						<input type="hidden" name="sid" value="{SID}" />
+
+						{PERM_CAMPUS_NAME}
 					</form>
 				</td>
 				<td>
 					<form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
-						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
-						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
-						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate
 						<input type="hidden" name="uid" value="{USERID}" />
 						<input type="hidden" name="sid" value="{SID}" />
 						<input type="hidden" name="service" value="{SERVICE_ID}" />
+
+						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
+						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
+						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate
 					</form>
 				</td>
 			</tr>
@@ -311,26 +300,21 @@ $j(function() {
 				<td>
 					<form action="/adminv2/userForm.php" method="post" class="updateSIDForm">
 						<input type="hidden" name="uid" value="{USERID}" />
+						<input type="hidden" name="sid" value="{SID}" />
 						<input type="hidden" name="service" value="{SERVICE_ID}" />
-						<input type="hidden" name="previousSid" value="{SID}" />
-						<select name="sid">
-						
-							<!-- BEGIN perm_campus -->
-							<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED} >{PERM_CAMPUS_NAME}</option>
-							<!-- END perm_campus -->
-							
-						</select>
+
+						{PERM_CAMPUS_NAME}
 					</form>
 				</td>
 				<td>
 					<form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+						<input type="hidden" name="uid" value="{USERID}" />
+						<input type="hidden" name="sid" value="{SID}" />
+						<input type="hidden" name="service" value="{SERVICE_ID}" />
 
 						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
 						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
 						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate
-						<input type="hidden" name="uid" value="{USERID}" />
-						<input type="hidden" name="sid" value="{SID}" />
-						<input type="hidden" name="service" value="{SERVICE_ID}" />
 					</form>
 				</td>
 			</tr>
@@ -343,12 +327,13 @@ $j(function() {
 				</td>
 				<td>
 					<form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
-						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
-						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
-						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate
 						<input type="hidden" name="uid" value="{USERID}" />
 						<input type="hidden" name="sid" value="0" />
 						<input type="hidden" name="service" value="{SERVICE_ID}" />
+
+						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
+						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
+						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate
 					</form>
 				</td>
 			</tr>
@@ -356,17 +341,30 @@ $j(function() {
 			<tr>
 				<td colspan="4" class="colours-buttons">
 					<form action="/adminv2/userForm.php" method="post">
+						<input type="hidden" name="addService" />
+						<input type="hidden" value="{USERID}" name="uid">
+
 						<select class="formfield float-left" name="service">
 							<option value="0">&lt;- Please Select a service -&gt;</option>
 							<option value="2">Calendar</option>
 							<option value="3">News</option>
 							<option value="5">CMS</option>
 						</select>
-						<input type="hidden" value="{USERID}" name="uid">
-						<input type="hidden" value="0" name="sid">
-						<input type="hidden" value="1" name="type">
-						<input type="hidden" name="addService" />
 
+						<select name="sid">
+						<!-- BEGIN campusPermsList -->
+							<!-- BEGIN perm_campus -->
+							<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
+							<!-- END perm_campus -->
+						<!-- END campusPermsList -->
+						</select>
+
+						<input type="radio" name="type" value="1" checked="checked" />Read
+						<input type="radio" name="type" value="2" />Write
+						<input type="radio" name="type" value="3" />Moderate
+
+						<div class="float-fix"></div>
+						
 						<input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
 					</form>
 				</td>
