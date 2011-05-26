@@ -19,7 +19,7 @@ function verify()
 <!-- END custom_head -->
 
 <h1>{ACTION} File </h1>
-<form method="post" action="/cms/myFileForm.php" enctype="multipart/form-data" id="fileForm"  onSubmit="return(verify());">
+<form method="post" action="/cms/myFileForm.php" enctype="multipart/form-data" id="fileForm" class="clearfix"  onSubmit="return(verify());">
 <input type="hidden" name="parent" value="{PARENT_ID}" />
   <table class="standardForm">
     <!-- BEGIN browse_row -->
@@ -53,5 +53,4 @@ function verify()
   </table>
   <input type="hidden" name="fileID" value="{FILE_ID}" />
   <input type="submit" name="Submit" value="{ACTION} File" class="submit-btn-plain" />
-  <div class="float-fix"></div>
 </form>

@@ -57,43 +57,45 @@ $j(function() {
 </ul>
 <div class="admin-contents">
 	<h2>Users</h2>
-	<div class="half">
-		<div class="level green clearfix">
-			<h4>Modify User</h4>
-			<form id="modify-user" action="" method="post">
-				<input type="text" id="modify">
-				<input type="hidden" id="user-to-mod">
-				<a class="btn modify float-left next-to-input" href="#"><span></span>Modify</a>
-			</form>
-			<a class="btn add center-it" href="/adminv2/modify-user/"><span></span>Add User</a>
+	<div class="clearfix">
+		<div class="half">
+			<div class="level green clearfix">
+				<h4>Modify User</h4>
+				<form id="modify-user" action="" method="post" class="float-left clearfix">
+					<input type="text" id="modify">
+					<input type="hidden" id="user-to-mod">
+					<a class="btn modify float-left next-to-input" href="#"><span></span>Modify</a>
+				</form>
+				<a class="btn add center-it" href="/adminv2/modify-user/"><span></span>Add User</a>
+			</div>
 		</div>
-	</div>
-	<div class="half last clearfix">
-		<div class="level">
-			<h4>Superusers</h4>
-			<table cellpadding="0" cellspacing="0" class="logged-in">
-				<colgroup>
-				<col width="40%" />
-				<col width="40%" />
-				<col width="20%" />
-				</colgroup>
-				<thead>
-					<tr>
-						<td>Name</td>
-						<td>Last Login</td>
-						<td>Modify</td>
-					</tr>
-				</thead>
-				<tbody>
-					<!-- BEGIN superusers -->
-					<tr>
-						<td>{SUPERUSER_NAME}</td>
-						<td>{SUPERUSER_LOGIN}</td>
-						<td><a href="/adminv2/modify-user/{SUPERUSER_ID}">Modify</a></td>
-					</tr>
-					<!-- END superusers -->
-				</tbody>
-			</table>
+		<div class="half last">
+			<div class="level">
+				<h4>Superusers</h4>
+				<table cellpadding="0" cellspacing="0" class="logged-in">
+					<colgroup>
+					<col width="40%" />
+					<col width="40%" />
+					<col width="20%" />
+					</colgroup>
+					<thead>
+						<tr>
+							<td>Name</td>
+							<td>Last Login</td>
+							<td>Modify</td>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- BEGIN superusers -->
+						<tr>
+							<td>{SUPERUSER_NAME}</td>
+							<td>{SUPERUSER_LOGIN}</td>
+							<td><a href="/adminv2/modify-user/{SUPERUSER_ID}">Modify</a></td>
+						</tr>
+						<!-- END superusers -->
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 	<h3>Bulk Options<span class="question">?</span></h3>

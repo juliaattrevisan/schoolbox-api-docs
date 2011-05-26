@@ -97,18 +97,20 @@ $j(function() {
 			<span class="number">{DISK_PERC}%</span>
 			
 			<h4>Memory <span>{MEMORY_USED}/{MEMORY_TOTAL}</span></h4>
-			<div class="bar-holder">
-				<div class="bar">
-					<span style="width:{MEMORY_PERC}%"><span class="style"></span></span>
+			<div class="clearfix">
+				<div class="bar-holder">
+					<div class="bar">
+						<span style="width:{MEMORY_PERC}%"><span class="style"></span></span>
+					</div>
 				</div>
+				<span class="number">{MEMORY_PERC}%</span>
 			</div>
-			<span class="number">{MEMORY_PERC}%</span>
 			
 			<ul class="server-statuses">
-				<li class="{EXTERNAL_DB_LIGHT}"><strong>{EXTERNAL_DB} Status</strong><em><span></span></em><span>{EXTERNAL_DB_STATUS}</span></li>
-				<li class="{EMAIL_LIGHT}"><strong>Email Status</strong><em><span></span></em><span>{EMAIL_STATUS}</span></li>
-				<li class="{LDAP_LIGHT}"><strong>LDAP status</strong><em><span></span></em><span>{LDAP_STATUS}</span></li>
-				<li class="{WWW_LIGHT}"><strong>WWW Access</strong><em><span></span></em><span>{WWW_STATUS}</span></li>
+				<li class="{EXTERNAL_DB_LIGHT} "><strong>{EXTERNAL_DB} Status</strong><em><span></span></em><span>{EXTERNAL_DB_STATUS}</span></li>
+				<li class="{EMAIL_LIGHT} "><strong>Email Status</strong><em><span></span></em><span>{EMAIL_STATUS}</span></li>
+				<li class="{LDAP_LIGHT} "><strong>LDAP status</strong><em><span></span></em><span>{LDAP_STATUS}</span></li>
+				<li class="{WWW_LIGHT} "><strong>WWW Access</strong><em><span></span></em><span>{WWW_STATUS}</span></li>
 			</ul>
 			
 			<table cellpadding="0" cellspacing="0" class="logged-in">

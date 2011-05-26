@@ -4,7 +4,7 @@ $j(function() {
 	});
 	
 	$j('.text ul.js_happening li').click(function(){
-		calendarPos($j(this),580,240);	
+		calendarPos($j(this),580,180);	
 	});
 		
 

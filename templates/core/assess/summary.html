@@ -2,7 +2,7 @@
 	<h1>Summary of your Assessment<a class="btn modify" href="/assess/modify/{ASSESS_ASSESS_ID}"><span></span>Edit</a></h1>
 	<div class="assess-header">
 		<h2>{ASSESS_TITLE}</h2>
-		<div class="assess-body">
+		<div class="assess-body clearfix">
 				<div class="duration">
 					<h2><span></span>Duration</h2>
 					<p>{ASSESS_DURATION}</p>
@@ -10,14 +10,15 @@
 
 				<p>{ASSESS_DESCRIPTION}</p>
 
-				<p>
+				<p class="clearfix">
 					<strong>Test open:</strong><br />
 					{ASSESS_START}
 					<span class="edit-assess-arrow"></span>
 					{ASSESS_FINISH}
 				</p>
-				<div class="float-fix"></div>
+				
 				<hr />
+				
 				<ul>
 					<!-- BEGIN section -->
 					<li>
@@ -28,8 +29,5 @@
 					<!-- END section -->
 				</ul>
 		</div>
-
-		<div class="float-fix"></div>
-
 	</div>
 </div>

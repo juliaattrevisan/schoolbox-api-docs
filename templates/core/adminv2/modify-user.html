@@ -101,16 +101,16 @@ $j(function() {
 	<li><a href="/adminv2/list">Lists</a></li>
 	<li><a href="/adminv2/rollover">Rollover</a></li>
 </ul>
-<div class="admin-contents">
+<div class="admin-contents clearfix">
 <h2><span><a href="/adminv2/user">&laquo; Back to users</a></span>Modify user: <strong>{FULLNAME}</strong></h2>
-<form method="POST" action="/adminv2/userForm.php" class="modify-form">
+<form method="POST" action="/adminv2/userForm.php" class="modify-form" clear="clearfix">
 	<input type="hidden" name="login" value="{USERNAME}" />
 	<a href="#" class="btn user submit"><span></span>Login as user</a>
 </form>
-<div class="level">
+<div class="level clearfix">
 	<h3>User Details<span class="question">?</span></h3>
 	<form class="admin-form" method="POST" action="/adminv2/userForm.php">
-		<div class="split-container">
+		<div class="split-container clearfix">
 			<div class="split">
 
 				<label class="width2 first">Title
@@ -206,7 +206,7 @@ $j(function() {
 	</form>
 
 </div>
-<div class="level">
+<div class="level clearfix">
 	<h3>Groups</h3>
 	<table>
 		<colgroup>
@@ -250,7 +250,6 @@ $j(function() {
 						<input type="hidden" value="{USERID}" name="uid">
 						<input type="hidden" value="1" name="service">
 						<input type="hidden" value="1" name="type">
-						<div class="float-fix"></div>
 						<input type="submit" class="submit-btn-plain" value="Add" name="groupSubmit">
 					</form>
 				</td>
@@ -258,7 +257,7 @@ $j(function() {
 		</tbody>
 	</table>
 </div>
-<div class="level">
+<div class="level clearfix">
 	<h3>Permissions</h3>
 	<table>
 		<colgroup>
@@ -367,7 +366,7 @@ $j(function() {
 						<input type="hidden" value="0" name="sid">
 						<input type="hidden" value="1" name="type">
 						<input type="hidden" name="addService" />
-						<div class="float-fix"></div>
+
 						<input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
 					</form>
 				</td>
@@ -375,7 +374,7 @@ $j(function() {
 		</tbody>
 	</table>
 </div>
-<div class="level last">
+<div class="level last clearfix">
 	<h3>Recent Activity Logs</h3>
 	<div class="split-container forty">
 		<div class="split">

@@ -52,12 +52,11 @@ $j(function() {
 	<li><a href="/adminv2/list">Lists</a></li>
 	<li><a href="/adminv2/rollover">Rollover</a></li>
 </ul>
-<div class="admin-contents">
+<div class="admin-contents clearfix">
 	<h2>Settings</h2>
 	
-	<div class="level green hide-it">	
+	<div class="level green hide-it clearfix">	
 		You've successfully updated your settings.
-		<div class="float-fix"></div>
 	</div>
 	
 	<div class="settings-nav-holder">
@@ -70,7 +69,7 @@ $j(function() {
 	<div class="settings">
         <!-- BEGIN setting_group -->
 		<div class="split-container">
-			<form id="settings" class="admin-form level" method="post" action="/adminv2/settingForm.php">
+			<form id="settings" class="admin-form level clearfix" method="post" action="/adminv2/settingForm.php">
 				
 				<!-- BEGIN setting_type_noneditable -->
 				<label for="{SETTING_NAME}">{SETTING_TITLE}<span>?</span> <em>{SETTING_DESC}</em>
@@ -119,16 +118,11 @@ $j(function() {
 					</fieldset>
 				</label>
                 <!-- END setting_type_check -->
-				
-				<div class="float-fix"></div>
 				<input type="submit" class="submit-btn-plain" value="Save"/>
-				<div class="float-fix"></div>
 			</form>
 		</div>
         <!-- END setting_group -->
-		
 	</div>
-	<div class="float-fix"></div>
 </div>
 
 <script type="text/javascript">

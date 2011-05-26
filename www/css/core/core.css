@@ -894,7 +894,7 @@ input.timeField { width: 30px; }
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f5f9', EndColorStr='#c9ebf3')";
 	line-height:1;
 	float:left;
-	padding:4px 16px 20px 16px;
+	padding:5px 16px 18px 16px;
 	text-align:center;
 	margin-bottom:16px;
 	height:23px;
@@ -1541,7 +1541,7 @@ margin:-8px 0 0 0;
 	margin:0 8px;
 }
 
-.admin-form label input[type=text] {
+.admin-form label input[type=text],.admin-form label input[type=password] {
 	width:100%;
 	margin:8px 0;
 	padding:2px 0
@@ -3348,7 +3348,7 @@ a.layout:hover img { background: #999; }
 
 #tabs-homepage .ui-tabs-hide { display:none; }
 
-#tabs-homepage .ui-tabs-nav { float:left; }
+#tabs-homepage .ui-tabs-nav {width:100%; margin:0;}
 
 #tabs-homepage .ui-tabs-nav li { float:left; }
 

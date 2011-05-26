@@ -39,18 +39,13 @@ $j(function() {
 
 });
 </script>
-<h2>Assessment Content
-	
-</h2>
-<div class="hide assessment-options pad-it">
-<a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left" ><span></span>Modify</a>
-<a href="/assess/export/{ASSESS_ASSESS_ID}.xml" class="btn go-to float-left" ><span></span>Export</a>
-<a href="/assess/delete/{ASSESS_ASSESS_ID}" onclick="return confirm('Are you sure you want to delete this assessment?');" class="btn delete float-left" ><span></span>Delete</a>
-<div class="float-fix"></div>
+<h2>Assessment Content</h2>
+<div class="hide assessment-options pad-it clearfix">
+<a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left no-marg" ><span></span>Modify</a>
+<a href="/assess/export/{ASSESS_ASSESS_ID}.xml" class="btn go-to float-left no-marg" ><span></span>Export</a>
+<a href="/assess/delete/{ASSESS_ASSESS_ID}" onclick="return confirm('Are you sure you want to delete this assessment?');" class="btn delete float-left no-marg" ><span></span>Delete</a>
 </div>
 <a class="drop-arrow show-assess-options" href="#">&#x25BC;</a>	
-
-
 
 <div class="allQuestions">
 	<div class="assess-body">
@@ -60,14 +55,11 @@ $j(function() {
 			<h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}<a class="drop-arrow show-section-options" href="#">&#x25BC;</a></h3>
 			
 			
-			<div class="hide section-options pad-it">
+			<div class="hide section-options pad-it clearfix">
 				<a href="/assess/section/modify/{SECTION_SECTION_ID}" class="btn modify float-left"><span></span>Edit</a></li>
 				<a onclick="return confirm('Are you sure you want to delete the section?');" href="/assess/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
-				<div class="float-fix"></div>
 			</div>
-			
-			
-			
+
 			<ul class="section-question">
 				<!-- BEGIN question -->
 				<li>

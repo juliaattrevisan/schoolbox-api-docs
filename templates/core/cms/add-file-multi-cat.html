@@ -33,7 +33,7 @@ function clearBrowse(obj, id) {
 <!-- END custom_head -->
 
 <h1>Upload a File to Multiple Locations</h1>
-<form method="post" enctype="multipart/form-data" id="fileForm"  onsubmit="return(verify());" action="/cms/fileForm.php">
+<form method="post" enctype="multipart/form-data" id="fileForm" class="clearfix"  onsubmit="return(verify());" action="/cms/fileForm.php">
   <table class="standardForm">
     <!-- BEGIN browse -->
     <tr>
@@ -82,5 +82,4 @@ function clearBrowse(obj, id) {
     </tr>
   </table>
   <input type="submit" name="Submit" value="Add File" class="submit-btn-plain" />
-  <div class="float-fix"></div>
 </form>

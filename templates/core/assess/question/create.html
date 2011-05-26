@@ -78,7 +78,7 @@ $j(document).ready(function() {
 				Now that you've created a section for the test, use the drop down below to select a question type.
 			</p>
 			
-			<form id="createQuestionForm" action="/assess/question/create" class="standardForm" method="post">
+			<form id="createQuestionForm" action="/assess/question/create" class="standardForm clearfix" method="post">
 				<fieldset class="hidden">
 					<input name="section_id" type="hidden" value="{SECTION_ID}" />
 					<input name="sequence" type="hidden" value="{SEQUENCE}" />
@@ -112,7 +112,6 @@ $j(document).ready(function() {
 					<!-- END answerInputs -->
 				</div>
 				<input type="submit" name="create" id="create" value="Add Question" class="submit-btn-plain"/>
-				<div class="float-fix"></div>
 			</form>
 		</div>
 
@@ -124,14 +123,13 @@ $j(document).ready(function() {
 				Select an Assess Question XML file to import.
 			</p>
 
-			<form action="/assess/question/import/{SECTION_ID}" method="post" class="standardForm" enctype="multipart/form-data">
+			<form action="/assess/question/import/{SECTION_ID}" method="post" class="standardForm clearfix" enctype="multipart/form-data">
 				<fieldset>
 					<label>File</label>
 					<input name="importXML" type="file" />
 				</fieldset>
 
 				<input type="submit" value="Import from XML file"  class="submit-btn-plain float-none"/>
-				<div class="float-fix"></div>
 			</form>
 		</div>
 	</div>

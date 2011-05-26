@@ -1,23 +1,5 @@
 <!-- BEGIN custom_head -->
 <script language="JavaScript" type="text/javascript">
-function verify()
-{
-	var msg = ""
-	//check that description, url, location have been entered
-	if(document.getElementById('urlForm').description.value == ""){
-		msg += "You need to enter a description\n";
-	}
-	if(document.getElementById('urlForm').url.value == ""){
-		msg += "You need to enter a URL\n";
-	}
-	
-	if(msg != ""){
-		alert(msg);
-		return false;
-	}
-	else
-		return true;
-}
 
 $j(document).ready(function() {
     $j('#deleteLink').click(function() {
@@ -25,23 +7,27 @@ $j(document).ready(function() {
             window.location = '/cms/eportfolioLinkForm.php?delete={LINK_ID}&redirect=/eportfolio/{USER_ID}';
         }
     });
+	
+	$j('#urlForm').validate();
+	
+	
 });
 
 </script>
 <!-- END custom_head -->
 
 <h1>{ACTION} Link</h1>
-<form method="post" id="urlForm"  onSubmit="return(verify());" action="/cms/eportfolioLinkForm.php">
+<form method="post" id="urlForm"  onSubmit="return(verify());" class="clearfix" action="/cms/eportfolioLinkForm.php">
   <table class="standardForm">
     <tr>
       <td class="formLabelWidth"><h4>URL</h4>
      <em>The internet address for the website, eg. http://www.google.com</em></td>
-	 <td><input type="text" name="url" size="40" maxlength="250" value="{URL}" /></td>
+	 <td><label><input type="text" class="required" name="url" size="40" maxlength="250" value="{URL}" /></label></td>
     </tr>
     <tr>
       <td><h4>Description</h4>
         <em>One line description of the URL for the title </em></td>
-		<td><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" /></td>
+		<td><label><input type="text" class="required" name="description" maxlength="250" size="40" value="{DESCRIPTION}" /></label></td>
     </tr>
     <tr>
       <td><h4>Comments</h4>
@@ -59,5 +45,4 @@ $j(document).ready(function() {
 	<!-- BEGIN delete_button -->
 	<input id='deleteLink' type="button" class="submit-btn-plain"  value="Delete Link" />
 	<!-- END delete_button -->
-	<div class="float-fix"></div>
 </form>

@@ -31,7 +31,7 @@ $j(document).ready(function() {
 <!-- END custom_head -->
 
 <h1>{ACTION} Link</h1>
-<form method="post" id="urlForm"  onSubmit="return(verify());" action="/cms/linkForm.php">
+<form method="post" id="urlForm" class="clearfix" onSubmit="return(verify());" action="/cms/linkForm.php">
   <table class="standardForm">
     <tr>
       <td class="formLabelWidth"><h4>URL</h4>
@@ -66,5 +66,4 @@ $j(document).ready(function() {
         <!-- BEGIN delete_button -->
         <input id='deleteLink' type="button" class="submit-btn-plain"  value="Delete Link" />
         <!-- END delete_button -->
-		<div class="float-fix"></div>
 </form>

@@ -210,6 +210,8 @@ li p.interact {
 	border-bottom: 1px solid #dbdbdb;
 	padding: 6px 10px;
 }
+
+
 .box .listing .topic ul li {
 	border-bottom: 0;
 }
@@ -221,6 +223,7 @@ li p.interact {
 #category li {
 	border: 0;
 	background: 0;
+	padding:0;
 }
 #category li a {
 	background: #c9c9c9;
@@ -305,7 +308,7 @@ li p.interact {
 }
 
 table.ruler span.header_option a{color:#fff; font-weight:bold; }
-table.ruler span.header_option{margin:-22px 12px 0 0;}
+
 
 #footer {
 	margin: 0;

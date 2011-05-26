@@ -27,10 +27,10 @@
     <tr class="{ON_OFF}">
         
         <td width="150" valign="top" style="vertical-align:top;">
-		<a href="/timetable/{SYNERGYID}"  class="btn report float-left" style="width:60px !important;"><span></span>Timetable</a><br />
+		<p class="clearfix"><a href="/timetable/{SYNERGYID}"  class="btn report float-left" style="width:60px !important;"><span></span>Timetable</a><br />
        <!-- BEGIN eportfolio --> <a href="/eportfolio/{ID}" class="btn eportfolio float-left" style="width:60px !important;"><span></span>ePortfolio</a><!-- END eportfolio -->
-		<a  href="/submission/dueWork/0/{ID}" class="btn due-work float-left" style="width:60px !important;"><span></span>Due Work</a>
-		<div class="float-fix"></div>
+		<a  href="/submission/dueWork/0/{ID}" class="btn due-work float-left" style="width:60px !important;"><span></span>Due Work</a></p>
+		
         </td>
         <td colspan="6" valign="top" style="vertical-align:top;">
             <!-- BEGIN special --><img src="/images/famicons/bell.png" title="Special Needs"/><!-- END special -->
@@ -48,11 +48,11 @@
       <td>&nbsp;</td>
       <td>&nbsp;</td>
       <td><br />
-        <form action="/mail/createMail.php" method="post">
+        <form action="/mail/createMail.php" method="post" class="clearfix">
           <input type="hidden" name="replyto" value="{SUBJECTNAME} &lt;{REPLYTO}&gt;" />
           <input type="hidden" name="bcc" value="{CLASSEMAIL}" />
           <input class="submit-btn-plain" type="submit" name="emailall" value="Email Class" />
-		  <div class="float-fix"></div>
+		
         </form></td>
       <td>&nbsp;</td>
     </tr>

@@ -39,7 +39,7 @@ $j(document).ready(function() {
 <!-- END custom_head -->
 
 <h1>{ACTION} File </h1>
-<form method="post" enctype="multipart/form-data" id="fileForm"  onsubmit="return(verify());" action="/cms/fileForm.php">
+<form method="post" enctype="multipart/form-data" id="fileForm" class="clearfix" onsubmit="return(verify());" action="/cms/fileForm.php">
   <table class="standardForm">
     <!-- BEGIN browse -->
     <tr>
@@ -104,7 +104,6 @@ $j(document).ready(function() {
           <!-- BEGIN delete_button -->
           <input id='deleteFile' type="button" class="submit-btn-plain"  value="Delete File" />
           <!-- END delete_button -->
-		  <div class="float-fix"></div>
   
 </form>
 

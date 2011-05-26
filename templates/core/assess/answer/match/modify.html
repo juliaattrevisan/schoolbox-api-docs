@@ -185,12 +185,11 @@ var validator = $j("#createQuestionForm").submit(function() {
     <div class="answerCollection">
         <ul id="answerCollection">			
 		<!-- BEGIN answerOption -->
-			<li class="answerTemplate inputs">
+			<li class="answerTemplate inputs clearfix">
 				<div class="drag-me left-option"><input name="answerLeft[]" class="answerLeft text-box" type="text" value="{ANSWER_LEFT_VALUE}" /></div>
 				<div class="arrow"><span>MATCHES</span></div>
 				<div class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="{ANSWER_RIGHT_VALUE}" /></div>
 				<div class="delete"></div>
-				<div class="float-fix"></div>
 			</li>
 			<!-- END answerOption -->
 		</ul>
@@ -199,12 +198,11 @@ var validator = $j("#createQuestionForm").submit(function() {
 	
 	<div class="hidden-clone">
 	    <ul>			
-			<li class="answerTemplate inputs">
+			<li class="answerTemplate inputs clearfix">
 				<div class="drag-me left-option"><input name="answerLeft[]" class="answerLeft text-box" type="text" value="" /></div>
 				<div class="arrow"><span>MATCHES</span></div>
 				<div class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="" /></div>
 				<div class="delete"></div>
-				<div class="float-fix"></div>
 			</li>
 		</ul>
 	</div>

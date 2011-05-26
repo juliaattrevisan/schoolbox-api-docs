@@ -41,6 +41,8 @@ $j(function() {
 	});
 	
 	
+	$j('.admin-form').validate();
+	
 	
 	
 	
@@ -62,9 +64,9 @@ $j(function() {
 	<li><a href="/adminv2/list">Lists</a></li>
 	<li><a href="/adminv2/rollover">Rollover</a></li>
 </ul>
-<div class="admin-contents">
+<div class="admin-contents clearfix">
 	<h2><span><a href="/adminv2/user">&laquo; Back to users</a></span>Create a user</h2>
-	<div class="level">
+	<div class="level clearfix">
 		<h3>User Details<span class="question">?</span></h3>
 		<form class="admin-form" method="POST" action="/adminv2/userForm.php" >
 			<div class="split-container">
@@ -78,16 +80,15 @@ $j(function() {
 						</select>
                         </label>
 					<label class="first">First Name
-						<input type="text" name="firstname" value="" />
+						<input type="text" name="firstname" class="required" value="" />
 					</label>
 					<label for="lastname">Surname
-						<input type="text" name="lastname" value=""/>
+						<input type="text" class="required"name="lastname" value=""/>
 					</label>
 
 					<label for ="database" class="">{DATABASE_TYPE} ID
 						<input type="text" name="database_id" value=""/>
 					</label>
-					<div class="float-fix"></div>
 					<table cellpadding="0" width="50%">
 						<colgroup>
 						<col width="33%" />
@@ -116,10 +117,10 @@ $j(function() {
 			<div class="split-container">
 				<div class="split last">
                     <label for ="username" class="width2">Username
-						<input type="text" name="modusername" value="" />
+						<input type="text" class="required" name="modusername" value="" />
 					</label>
 					<label for="password">Password
-						<input type="password" name="modpassword"/>
+						<input type="password" class="required" name="modpassword"/>
 					</label>
                 <label for="alt_email">Alternate Email
 					<input type="text" name="alt_email" value="" />
@@ -142,9 +143,9 @@ $j(function() {
 					</label>
 				</div>
 			</div>
-            <div class="float-fix"></div>
+
 			<input type="submit" class="submit-btn-plain" name="submit" value="Add User" />
 		</form>
-		<div class="float-fix"></div>
+
 	</div>
 </div>

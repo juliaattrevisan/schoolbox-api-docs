@@ -38,14 +38,11 @@ $j(function () {
 	<li><a href="/adminv2/list">Lists</a></li>
 	<li><a href="/adminv2/rollover">Rollover</a></li>
 </ul>
-<div class="admin-contents">
+<div class="admin-contents clearfix">
 	<h2>Side Menu</h2>
 	<p>Drag and drop the menu items to reorder the core left navigation side menu.</p>
-    <a class="btn add float-left" href="/adminv2/modify-side-menu/"><span></span>Add New</a>
-	<div class="float-fix"></div>
-	<br>
-        <div id="side-menu">
-        {MENU_TREE}
-        </div>
-	<div class="float-fix"></div>
+  	<p class="clearfix"><a class="btn add float-left" href="/adminv2/modify-side-menu/"><span></span>Add New</a></p>
+	<div id="side-menu">
+	{MENU_TREE}
+	</div>
 </div>

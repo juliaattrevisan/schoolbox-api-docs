@@ -28,7 +28,7 @@ function verify(){
 <!-- END custom_head -->
 
 <h1>{ACTION} Folder</h1>
-<form action="/cms/myFolderForm.php" method="post"  id="folderForm" onSubmit="return(verify());">
+<form action="/cms/myFolderForm.php" method="post" class="clearfix" id="folderForm" onSubmit="return(verify());">
 <input type="hidden" name="parent" id="parent" value="{PARENT_ID}" />
   <table class="standardForm">
     <tr>
@@ -50,5 +50,4 @@ function verify(){
   </table>
   <input type="hidden" name="folderID" value="{FOLDER_ID}" /> 
   <input type="submit" label="Submit" name="submit" value="{ACTION} Folder" class="submit-btn-plain"/>
-  <div class="float-fix"></div>
 </form>
