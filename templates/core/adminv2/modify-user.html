@@ -48,7 +48,6 @@ $j(function() {
 		$j.post('/adminv2/userForm.php', data);
 	});
 
-
 	$j('table tr:nth-child(2n)').addClass('dark');
 
 	$j('h3 span').qtip({
@@ -81,6 +80,82 @@ $j(function() {
 		$j(this).hide();
 		
 		return false;
+	});
+
+	/* Reset availability options for campuses and services
+	 * 0: please select
+	 * 2: calendar
+	 * 3: news
+	 * 5: cms
+	 */
+	var registry = [{
+		service: 0,
+		sid: []
+	},
+	{
+		service: 2,
+		sid: []
+	},
+	{
+		service: 3,
+		sid: []
+	},
+	{
+		service: 5,
+		sid: []
+	}];
+
+	/* Remember which sids were used for each service
+	 */
+	$j.each($j('.updateSIDForm'), function(index, value) {
+		var service = $j(value).find('input[name=service]').val();
+		var sid = $j(value).find('input[name=sid]').val();
+
+		for (var i = 0; i < registry.length; i++) {
+			if (registry[i].service == service) {
+				registry[i].sid.push(sid);
+			}
+		}
+	});
+
+	/* Make unavailable options invisible
+	 */
+	$j('#serviceCloneForm').find('select[name=service]').change(function() {
+		var service = $j(this).val();
+
+		/* Default states
+		 */
+		$j.each($j('#serviceCloneForm').find('select[name=sid] option'), function (index, element) {
+			$j(element).show();
+		});
+
+		/* Exclusions
+		 */
+		if ($j(this).val() == 5) {
+			$j('#serviceCloneForm').find('select[name=sid]').hide();
+		}
+		else {
+			$j('#serviceCloneForm').find('select[name=sid]').show();
+
+			/* Find this service, and all the options that
+			 * are being used
+			 */
+			for (var i = 0; i < registry.length; i++) {
+
+				/* For this service, remove options that are
+				 * already in use
+				 */
+				if (registry[i].service == service) {
+					$j.each($j('#serviceCloneForm').find('select[name=sid] option[value!=0]'), function(index, element2) {
+						for (var j = 0; j < registry[i].sid.length; j++) {
+							if ($j(element2).val() == registry[i].sid[j]) {
+								$j(element2).hide();
+							}
+						}
+					});
+				}
+			}
+		}
 	});
 });
 </script>
@@ -340,48 +415,7 @@ $j(function() {
 			<!-- END user_cms -->
 			<tr>
 				<td colspan="4" class="colours-buttons">
-					<script type="text/javascript">
 
-					$j(function() {
-						/* Reset availability options for campuses and services
-						 * 0: please select
-						 * 2: calendar
-						 * 3: news
-						 * 5: cms
-						 */
-						var registry = [{
-							service: 0,
-							sid: []
-						},
-						{
-							service: 2,
-							sid: []
-						},
-						{
-							service: 3,
-							sid: []
-						},
-						{
-							service: 5,
-							sid: []
-						}];
-
-
-						$j.each($j('.updateSIDForm'), function(index, value) {
-							var service = $j(value).find('input[name=service]').val();
-							var sid = $j(value).find('input[name=sid]').val();
-
-							for (var i = 0; i < registry.length; i++) {
-								if (registry[i].service == service) {
-									registry[i].sid.push(sid);
-								}
-							}
-						});
-
-						for (var i = 0; i < registry.length; i++) {
-						}
-					});
-					</script>
 					<form id="serviceCloneForm" action="/adminv2/userForm.php" method="post">
 						<input type="hidden" name="addService" />
 						<input type="hidden" value="{USERID}" name="uid">

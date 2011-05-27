@@ -75,34 +75,34 @@ if(is_numeric($this->arg[0])) {
         $this->dropDown('title', $userHandler->getTitleList(), $user['title'], TEMPLATE_content, array('titleName'=>'NAME_TITLE'));
 
         /* Output group list */
-         $this->dropDown('system_group', $userHandler->getGroupList(), $user['group_id'], TEMPLATE_content, array('id'=>'GROUP_ID','name'=>'SYSTEM_GROUP_NAME'));
+        $this->dropDown('system_group', $userHandler->getGroupList(), $user['group_id'], TEMPLATE_content, array('id'=>'GROUP_ID','name'=>'SYSTEM_GROUP_NAME'));
 
         /* Output campus list */
 		$this->setBlock(TEMPLATE_content, 'campus','campus_block');
 
-
-
+		/* User campuses
+		 */
 		$userCampus = $userHandler->getUserCampus($user['uid']);
 
-         foreach($campusList as $campus ) {
+		foreach($userHandler->getCampusList() as $campus) {
+			$outcampus = array(
+				'CAMPUS_ID'         => $campus['id'],
+				'CAMPUS_NAME'           => $campus['name'],
+				'CAMPUS_ID_CHECKED'     => '',
+				'CAMPUS_DEFAULT_CHECKED'    => '',
+			);
 
-             $outcampus = array('CAMPUS_ID'         => $campus['id'],
-                            'CAMPUS_NAME'           => $campus['name'],
-                            'CAMPUS_ID_CHECKED'     => '',
-                            'CAMPUS_DEFAULT_CHECKED'    => '',);
+			if (($key = array_search($campus['id'],$userCampus)) !== false) {
+				$outcampus['CAMPUS_ID_CHECKED'] = 'checked="checked"';
 
-             if(($key = array_search($campus['id'],$userCampus)) !== FALSE) {
-                $outcampus['CAMPUS_ID_CHECKED'] = 'checked="checked"';
-                if($key == 0)
-                    $outcampus['CAMPUS_DEFAULT_CHECKED'] = 'checked="checked"';
+				if ($key == 0) {
+					$outcampus['CAMPUS_DEFAULT_CHECKED'] = 'checked="checked"';
+				}
+			}
 
-             }
-
-
-             $this->setVar($outcampus);
-             $this->parse('campus_block','campus',true);
-         }
-
+			$this->setVar($outcampus);
+			$this->parse('campus_block','campus',true);
+		}
 
          /* Output group list */
          $this->setBlock(TEMPLATE_content, 'user_group', 'user_group_block');
@@ -129,9 +129,12 @@ if(is_numeric($this->arg[0])) {
 
 
 
-
+		/* Get a list of permissions
+		 */
+		$permList = $groupHandler->getAllUserAccess($user['uid']);
 
 		/* Clone-able permissions dropdown
+		 * Remove existing options
 		 */
 		$this->dropDown('perm_campus', $campusList, 0, 'campusPermsList', array(
 			 'id' => 'PERM_CAMPUS_ID',
@@ -140,9 +143,6 @@ if(is_numeric($this->arg[0])) {
 
 		$this->parse('campusPermsList_block', 'campusPermsList');
 
-		/* Get a list of permissions
-		 */
-		$permList = $groupHandler->getAllUserAccess($user['uid']);
 
 		if (is_array($permList)) {
 			foreach($permList as $perm) {

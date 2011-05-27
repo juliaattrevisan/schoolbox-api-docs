@@ -16,24 +16,28 @@ class ExternalUser extends MSSQL{
             $this->groupHandler = new Group;
     }
 
-    function getParent($synID) {
+	/**
+	 * Gets the contact info of the person who is a Student's Contact. The ID
+	 * passed is the Synergetic if of the Contact, not the Student.
+	 *
+	 * @param <type> $synID
+	 * @return <type>
+	 */
+    public function getParent($synID) {
+        $query = "
+			SELECT
+				StudentContactLegalFullName, StudentContactEmail, StudentContactMobilePhone,
+				StudentContactSpouseLegalFullName, StudentContactSpouseMobilePhone, StudentContactSpouseEmail,
+				StudentContactHomePhone, StudentContactSilentPhoneFlag, Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag, Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
+				StudentParentsSeparatedFlag
+			FROM SynergyOne.dbo.vStudentContactAllAddress
+			LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
+			LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
+			WHERE StudentContactID = '$synID'
+			AND FileSemester = " . $_SESSION['FileSemester'] . "
+			AND FileYear = " . $_SESSION[ 'FileYear'];
 
-        $query = "SELECT    StudentContactLegalFullName, StudentContactEmail, StudentContactMobilePhone,
-                            StudentContactSpouseLegalFullName, StudentContactSpouseMobilePhone, StudentContactSpouseEmail,
-                            StudentContactHomePhone, StudentContactSilentPhoneFlag, Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag, Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
-                            StudentParentsSeparatedFlag
-        		  FROM
-				  	SynergyOne.dbo.vStudentContactAllAddress
-                    JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
-                    JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
-				  WHERE
-				  	StudentContactID = $synID
-					AND FileSemester=".$_SESSION['FileSemester']."
-					AND FileYear=".$_SESSION[ 'FileYear']."
-                    ";
         return $this->getRow($query);
-        
-
     }
 
 	function getStudent($synID)
@@ -73,6 +77,34 @@ class ExternalUser extends MSSQL{
 
 	}
 
+	/**
+	 * Gets a list of Contacts for all Students in a particular year level. The
+	 * year level is stored in Synergetic.
+	 *
+	 * Used in reporting.
+	 *
+	 * @param <type> $synID
+	 * @return <type>
+	 */
+	public function getStudentContactListExtended($yearlevel) {
+		$query = "
+			SELECT
+				StudentID, StudentGiven1, StudentSurname, StudentYearLevel
+				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
+				StudentContactAddress1, StudentContactSuburb, StudentContactPostCode, StudentContactState,
+				StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
+				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
+				StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType
+			FROM SynergyOne.dbo.vStudentContactAllAddress
+			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
+			AND FileSemester = " . $_SESSION['FileSemester'] . "
+			AND FileYear = " . $_SESSION[ 'FileYear'] . "
+			AND StudentYearLevel = '$yearlevel'
+			ORDER BY StudentSurname, StudentID, StudentContactType";
+
+		return $this->getAll($query);
+	}
+
 	function getStudentContactList ($synID) {
 		$query = "SELECT StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
                                 StudentContactAddress1, StudentContactSuburb, StudentContactPostCode, StudentContactState,
@@ -81,15 +113,12 @@ class ExternalUser extends MSSQL{
                                 StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType
                           FROM
                                 SynergyOne.dbo.vStudentContactAllAddress
-
                           WHERE
                                 (StudentContactType = 'SC1' OR StudentContactType = 'SC2') AND StudentID = $synID
                                 AND FileSemester=".$_SESSION['FileSemester']."
-                                AND FileYear=".$_SESSION[ 'FileYear']."
-                          ";
+                                AND FileYear=".$_SESSION[ 'FileYear'];
 
-		$parent = $this->getAll($query);
-                return $parent;
+		return $this->getAll($query);
 	}
 
 	function getCurrentSemester()
