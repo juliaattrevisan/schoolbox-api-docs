@@ -1,8 +1,7 @@
 body          { font-size: 75%; font-family: Arial, Helvetica, sans-serif;  }   /* IE */
 html > body   { font-size: 12px; }  /* Other browsers */
 
-body#tinymce { background:#fff;  }
-body#tinymce p{padding:8px;}
+body#tinymce { background:#fff;padding:8px  }
 body#tinymce p span{background:#E0F2DF;}
 
 

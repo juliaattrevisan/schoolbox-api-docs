@@ -14,6 +14,12 @@
 			buttonImageOnly: true,
 			showAnim: 'slideDown'
         });
+		
+		$j('#calendar').prepend('<a class="btn report print-it" href="#"><span></span>Print</a>');
+		 $j('.print-it').click(function() {
+			  window.print();
+			  return false;
+		});
 
 });
 
@@ -34,7 +40,10 @@
 			
 			<td colspan="3" class="cal-right" valign="baseline">
 				<div class="link-case">
-					<a class="filter-change filters" href="#"><span></span>Filters</a>
+				
+				
+				
+				<a class="filter-change filters" href="#"><span></span>Filters</a>
 				<a class="filter-change week " href="/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"><span></span>Week</a>
 				<a class="filter-change month current" href="#"><span></span>Month</a>
 					<div class="filter-drop">
@@ -90,7 +99,6 @@
 				<div class="dayWrap clearfix">
 					<p class="header_option">{ADD}</p>
 					<p class="day-num">{DATE}</p>
-				
 				</div> 
 				<div class="noteWrap">
 					<ul class="js_happening">
@@ -105,9 +113,9 @@
                                     <!-- END time -->{NOTE}
                                 </h4>
                                 <p class="meta">Event Type: {TYPE}<br/>
-                                    Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br/>
+									Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br/>
                                     {LOCATION} {DETAIL}</p>
-                                <div>{MODIFY}</div>
+                                <div class="modify-event">{MODIFY}</div>
                             </div>
                         </li>
 						<!-- END note_block -->
