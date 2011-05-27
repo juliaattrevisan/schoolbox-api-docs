@@ -1006,7 +1006,7 @@ input.timeField { width: 30px; }
   -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
  }
  
-.btn.calendar-add{margin:0; padding: 0 17px 0 0; height:18px; float:none; position:absolute; right:2px; top:3px;}
+.btn.calendar-add{margin:0; padding: 0 17px 0 0; height:18px; float:none; position:absolute; right:2px; top:3px; }
 .btn.calendar-add span{left:2px; top:2px;}
 
 a.icons {
