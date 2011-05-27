@@ -4,17 +4,20 @@
 @page {size:landscape}
 body{font-family:Arial, Helvetica, sans-serif; font-size:10px;}
 #container{margin:0;}
+#calendar h3{float:none; width:100%;text-align:center; font-weight:bold;}
 table {height:100%; vertical-align:top}
 table td{vertical-align:top; text-align:left;}
 table td.dark{padding:4px; text-align:center; background-color:#000 }
 
-#nav, #tabs, #header, #footer, .link-case, .datepicker-box, .header_option, .back, .forward, .dates, .note, .btn, .created{display:none;}
+#nav, #tabs, #header, #footer, .link-case, .datepicker-box, .header_option, .back, .forward, .dates, .note, .btn, .created,
+.calendar-controls .float-left, .calendar-controls .float-right
+{display:none;}
 .cal-mid h3{font-size:16px; font-weight:bold; margin-bottom:16px;}
 .cal-bubble{display:none;}
 .day-num{display:block; }
 .day-block{border-right:1px solid #ccc; width:14.2%;}
 .day-block ul.js_happening{margin:0;margin-top:3px; padding:0; display:block;}
-
+.calendar-controls h3{float:none;}
 .day-block ul.js_happening li{
 	display:block; 
 	padding:3px;

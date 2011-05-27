@@ -2,7 +2,7 @@
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
-      $j(function () {
+	$j(function () {
  
         /* date picker */		 
         $j('.datepicker').datepicker({ 
@@ -15,72 +15,75 @@
 			showAnim: 'slideDown'
         });
 		
-		$j('#calendar').prepend('<a class="btn report print-it" href="#"><span></span>Print</a>');
-		 $j('.print-it').click(function() {
+		$j('.print-it').click(function() {
 			  window.print();
 			  return false;
 		});
 
-});
+		
+	});
 
 </script>
 <!-- END custom_head -->
      <div id="calendar">
-     
+     <div class="calendar-controls clearfix">
+		<div class="float-left clearfix">
+			
+			<a class="back" href="/calendar/week/{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a>
+			
+			<div class="datepicker-box">
+				<input type="hidden" class="datepicker" />
+			</div>
+			
+			<a class="forward" href="/calendar/week/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a>
+		</div>
+		<div class="float-right">
+			<div class="link-case"> 
+			<a class="filter-change month current" href="#"><span></span>Month</a>
+			<a class="filter-change week" href="/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"><span></span>Week</a> 
+			<a class="filter-change filters" href="#"><span></span>Filters</a> 
+			<a class="btn report print-it filter-change" href=""><span></span>Print</a> 
+				<div class="filter-drop clearfix">
+					<div class="filter-list">
+						<form class="clearfix">
+							<div class="filter-cat groups clearfix"> <span>Groups</span> 
+								<!-- BEGIN group -->
+								<label title="{GROUP_NAME}">
+									<input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" checked="checked" class="checkbox"/>
+									{GROUP_NAME} </label>
+								
+								<!-- END group --> 
+							</div>
+							<div class="filter-cat campus"> <span>Campus</span> 
+								<!-- BEGIN campus -->
+								<label title="{CAMPUS_NAME}">
+									<input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox"/>
+									{CAMPUS_NAME} </label>
+								
+								<!-- END campus --> 
+							</div>
+							<div class="filter-cat events last"> <span>Event</span> 
+								<!-- BEGIN event_type -->
+								<label title="{EVENT_TYPE_NAME}">
+									<input type="checkbox" name="events" id="{EVENT_TYPE_ID}" checked="checked" value="type{EVENT_TYPE_ID}" class="checkbox"/>
+									<span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span> </label>
+								<!-- END event_type --> 
+								
+							</div>
+							<!--/filter-list-->
+						</form>
+						<p class="clearfix"><a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a></p>
+						<!--/filter-drop--> 
+					</div>
+				</div>
+			</div>
+		</div>
+		<h3>{MONTH} {YEAR}</h3>
+		
+	</div>
       <table id="month-view" cellpadding="0" cellspacing="0">
       	<thead>
-		<tr>
-			<td colspan="2" class="cal-left" valign="baseline">
-				<a class="back" href="/calendar/month/{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a>
-				<div class="datepicker-box"><input type="hidden" class="datepicker" /></div>
-				<a class="forward" href="/calendar/month/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a>
-			</td>
-			
-			<td colspan="2" class="cal-mid"><h3>{MONTH} {YEAR}</h3></td>
-			
-			<td colspan="3" class="cal-right" valign="baseline">
-				<div class="link-case">
-				
-				
-				
-				<a class="filter-change filters" href="#"><span></span>Filters</a>
-				<a class="filter-change week " href="/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"><span></span>Week</a>
-				<a class="filter-change month current" href="#"><span></span>Month</a>
-					<div class="filter-drop">
-						<div class="filter-list">
-							<form class="clearfix">	
-								<div class="filter-cat groups">
-									<span>Groups</span>
-									<!-- BEGIN group -->
-									<label title="{GROUP_NAME}">
-										<input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" checked="checked" class="checkbox"/>{GROUP_NAME}
-									</label>
-								<!-- END group -->
-								</div>
-								<div class="filter-cat campus">
-									<span>Campus</span>
-									<!-- BEGIN campus -->
-									<label title="{CAMPUS_NAME}">
-										<input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox"/>{CAMPUS_NAME}
-									</label>
-								<!-- END campus -->
-								</div>
-								<div class="filter-cat events last">
-									<span>Event</span>
-									<!-- BEGIN event_type -->
-									<label title="{EVENT_TYPE_NAME}">
-										<input type="checkbox" name="events" id="{EVENT_TYPE_ID}" checked="checked" value="type{EVENT_TYPE_ID}" class="checkbox"/><span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
-									</label>
-									<!-- END event_type -->
-								</div><!--/filter-list-->
-								
-							<a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a>
-						</form>
-					</div><!--/filter-drop-->
-				</div>
-				</div>
-			</td>
-		</tr>
+		
 		<tr>
         	<td class="dark border-left">Sun</td>
             <td class="dark">Mon</td>
@@ -97,7 +100,7 @@
         	<!-- BEGIN day_block -->
         	<td class="day-block {OTHER_MONTH} {MONTABLE_CSS}">
 				<div class="dayWrap clearfix">
-					<p class="header_option">{ADD}</p>
+					<a class="btn add calendar-add" href="{ADD}"><span></span></a>
 					<p class="day-num">{DATE}</p>
 				</div> 
 				<div class="noteWrap">

@@ -998,7 +998,16 @@ input.timeField { width: 30px; }
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f5f9', EndColorStr='#c9ebf3');
 }
 
-.btn.calendar-print{float:none; width:35px}
+.btn.print-it{float:none; padding:0 9px 0 38px; display:inline-block; margin:0;background:#FAF9F5; border:0;
+     -moz-border-radius: 0; 
+  -webkit-border-radius: 0; 
+          border-radius: 0; 
+
+  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
+ }
+ 
+.btn.calendar-add{margin:0; padding: 0 17px 0 0; height:18px; float:none; position:absolute; right:2px; top:3px;}
+.btn.calendar-add span{left:2px; top:2px;}
 
 a.icons {
 	display: block;
@@ -2614,7 +2623,7 @@ p.interact a.take-test-btn {
 #calendar h3 {
 	font-size:18px;
 	font-weight:bold;
-	line-height:25px;
+	line-height:24px;
 }
 
 #week-view .dayWrap {
@@ -2656,7 +2665,7 @@ p.interact a.take-test-btn {
 	border-bottom:0;
 	padding:3px;
 	margin: 5px 10px 0 5px;
-	-moz-border-radius:5px 5px 0 0; /* FF1+ */
+	-moz-border-radius:5px 5px 0 0; 
 	-webkit-border-radius: 5px 5px 0 0; /* Saf3-4 */
 	border-radius: 5px 5px 0 0; /* Opera 10.5, IE 9, Saf5, Chrome */
 }
@@ -2664,15 +2673,21 @@ p.interact a.take-test-btn {
 .day-block ul { margin:5px; }
 
 /*the top of the calendar*/
-td.cal-right, td.cal-left {
+.calendar-controls {
 	text-align:right;
 	padding:0;
 	position:relative;
+	z-index:10;
 }
 
-td.cal-left { text-align:left; }
+.calendar-controls h3{float:left;}
 
-td.cal-left a {
+.calendar-controls .float-left{width:26%;}
+.calendar-controls .float-right{width:50%;}
+
+.calendar-controls{ text-align:left; }
+
+.calendar-controls a {
 	display:block;
 	float:left;
 	height:24px;
@@ -2682,7 +2697,7 @@ td.cal-left a {
 	font-weight:normal;
 }
 
-td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box {
+.calendar-controls. a.back, .calendar-controls. a.forward, .calendar-controls .datepicker-box {
 	margin-top:12px;
 	width:46px;
 	height:24px;
@@ -2693,27 +2708,28 @@ td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box {
 	margin-right:4px;
 }
 
-td.cal-left a.back { background:#faf9f5 url(/images/core/calendar/cal-left.png) no-repeat 50% 50%; }
+.calendar-controls .float-left a.back, .calendar-controls .float-left a.forward  { width:12px;text-indent:-99999em;}
 
-td.cal-left a.forward { background:#faf9f5 url(/images/core/calendar/cal-right.png) no-repeat 50% 50%; }
+.calendar-controls a.back { background:#faf9f5 url(/images/core/calendar/cal-left.png) no-repeat 50% 50%; }
+.calendar-controls a.forward { background:#faf9f5 url(/images/core/calendar/cal-right.png) no-repeat 50% 50%; }
+.calendar-controls a:hover { background-color:#f4f1ea }
 
-td.cal-left a:hover { background-color:#f4f1ea }
-
-td.cal-left .datepicker-box {
+.calendar-controls .datepicker-box {
 	float:left;
 	text-align:center;
-	text-align:center;
+	width:43px;
 }
 
-td.cal-left .datepicker-box:hover { background-color:#f4f1ea }
+.calendar-controls .datepicker-box:hover { background-color:#f4f1ea }
 
 /*the links at the top right*/
+td.cal-mid {padding: 7px 0;}
 td.cal-mid h3 { text-align:center; }
 
-td.cal-right { z-index:1000; }
+.calendar-controls .float-right{ z-index:1000; }
 
-td.cal-right a.filter-change {
-	margin-top:12px;
+.calendar-controls a.filter-change {
+	margin-top:0px;
 	height:24px;
 	line-height:24px;
 	padding:0 9px 0 38px;
@@ -2722,11 +2738,12 @@ td.cal-right a.filter-change {
 	text-decoration:none;
 	background:#faf9f5;
 	position:relative;
+	margin-right: 4px;
 }
 
-td.cal-right a.filter-change.current, td.cal-right a.filter-change:hover { background:#f4f1ea; }
+.calendar-controls a.filter-change.current, .calendar-controls  a.filter-change:hover { background:#f4f1ea; }
 
-td.cal-right a.filter-change span {
+.calendar-controls a.filter-change span {
 	position:absolute;
 	top:5px;
 	left:12px;
@@ -2734,15 +2751,15 @@ td.cal-right a.filter-change span {
 	width:12px;
 }
 
-td.cal-right a.filter-change.week span { background:url(/images/core/calendar/calendar-week.png) no-repeat; }
+.calendar-controls a.filter-change.week span { background:url(/images/core/calendar/calendar-week.png) no-repeat; }
 
-td.cal-right a.filter-change.week.current span, td.cal-right a.filter-change.week:hover span { background:url(/images/core/calendar/calendar-week.png) 0 -14px no-repeat; }
+.calendar-controls a.filter-change.week.current span, .calendar-controls a.filter-change.week:hover span { background:url(/images/core/calendar/calendar-week.png) 0 -14px no-repeat; }
 
-td.cal-right a.filter-change.month span { background:url(/images/core/calendar/calendar-month.png) no-repeat; }
+.calendar-controls a.filter-change.month span { background:url(/images/core/calendar/calendar-month.png) no-repeat; }
 
-td.cal-right a.filter-change.month.current span, td.cal-right a.filter-change.month:hover span { background:url(/images/core/calendar/calendar-month.png) 0 -14px no-repeat; }
+.calendar-controls a.filter-change.month.current span, .calendar-controls a.filter-change.month:hover span { background:url(/images/core/calendar/calendar-month.png) 0 -14px no-repeat; }
 
-td.cal-right a.filters {
+.calendar-controls  a.filters {
 	z-index:5000;
 	position:relative;
 	background:#fffde9 url(/images/core/calendar/filter-list.png) 11px 6px no-repeat;
@@ -2751,51 +2768,54 @@ td.cal-right a.filters {
 	margin-right:4px;
 }
 
-td.cal-right a.filters:hover { background:#e6f6f9 url(/images/core/calendar/filter-list.png) 11px 6px no-repeat; }
+.calendar-controls  a.filters:hover { background:#e6f6f9 url(/images/core/calendar/filter-list.png) 11px 6px no-repeat; }
 
-td.cal-right a.filters.active { background-color:#e6f6f9; }
+.calendar-controls a.filters.active { background-color:#e6f6f9; }
 
-td.cal-right .link-case {
+.calendar-controls  .link-case {
 	position:relative;
-	height:36px;
 	z-index:10;
 }
 
-td.cal-left .ui-datepicker-trigger {
+.calendar-controls .ui-datepicker-trigger {
 	cursor:pointer;
 	display:block;
 	margin:0 auto;
-	padding:4px 16px 0 16px;
+	padding:5px 16px 5px 16px;
 }
 
-#ui-datepicker-div { display:none; }
+.calendar-controls .float-right a.filter-change{float:right; }
+
+#ui-datepicker-div { display:none; z-index:20; }
 
 .ui-datepicker-trigger { padding:0 16px; }
 
 .ui-datepicker-trigger:hover { cursor:pointer; }
 
 /*filter dropdown*/
-td.cal-right .link-case .filter-drop {
+.calendar-controls .link-case .filter-drop {
 	display:none;
 	position:absolute;
 	top:100%;
 	right:168px;
 	width:450px;
+	top:24px;
+	z-index:10000000;
 }
 
-td.cal-right .link-case .filter-drop .filter-list {
+.calendar-controls .link-case .filter-drop .filter-list {
 	background:#e6f6f9;
 	padding:16px 16px 0 16px
 }
 
-td.cal-right .link-case .filter-drop hr {
+.calendar-controls  .link-case .filter-drop hr {
 	height:0px;
 	width:100%;
 	border-bottom:1px solid #8e8f8f;
 	margin:15px 0 0 0;
 }
 
-td.cal-right .link-case .filter-drop a#applyFilters { margin:16px 0; }
+.calendar-controls  .link-case .filter-drop a#applyFilters { margin:16px 0; float:right; width:auto; padding:0 6px 0 28px}
 
 .filter-cat {
 	float:left;
@@ -2836,6 +2856,7 @@ td.cal-right .link-case .filter-drop a#applyFilters { margin:16px 0; }
 	height:20px;
 	background-color: #cae9b9;
 	padding: 3px 5px;
+	position:relative;
 }
 
 .dayWrap p {

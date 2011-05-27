@@ -14,10 +14,14 @@
 			showAnim: 'slideDown'
 		});
 		
-		$j('#calendar').prepend('<a class="btn report print-it" href="#"><span></span>Print</a>');
+		
 		$j('.print-it').click(function() {
 			  window.print();
 			  return false;
+		});
+		
+		$j('.dayWrap').each(function() {
+			$j(this).children('a').addClass('btn add calendar-add').prepend('<span></span>').css("text-indent", "-99999em");
 		});
 		
 	});
@@ -25,20 +29,23 @@
 <!-- END custom_head -->
 
 <div id="calendar">
-
-	<table id="week-view"  cellpadding="0" cellspacing="0" width="100%">
-		<tr>
-			<td colspan="2"class="cal-left"><a class="back" href="/calendar/week/{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a>
-				<div class="datepicker-box">
-					<input type="hidden" class="datepicker" />
-				</div>
-				<a class="forward" href="/calendar/week/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
-			<td colspan="2" class="cal-mid"><h3>{MONTH}</h3></td>
-			<td colspan="3"class="cal-right">
-			<div class="link-case">
-				<a class="filter-change filters" href="#"><span></span>Filters</a>
-				<a class="filter-change week current" href="#"><span></span>Week</a>
-				<a class="filter-change month" href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"><span></span>Month</a>
+	<div class="calendar-controls clearfix">
+		<div class="float-left clearfix">
+			
+			<a class="back" href="/calendar/week/{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a>
+			
+			<div class="datepicker-box">
+				<input type="hidden" class="datepicker" />
+			</div>
+			
+			<a class="forward" href="/calendar/week/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a>
+		</div>
+		<div class="float-right">
+			<div class="link-case"> 
+			<a class="filter-change month" href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"><span></span>Month</a>
+			<a class="filter-change week current" href="#"><span></span>Week</a> 
+			<a class="filter-change filters" href="#"><span></span>Filters</a> 
+			<a class="btn report print-it filter-change" href="#"><span></span>Print</a> 
 				<div class="filter-drop clearfix">
 					<div class="filter-list">
 						<form class="clearfix">
@@ -63,33 +70,37 @@
 								<label title="{EVENT_TYPE_NAME}">
 									<input type="checkbox" name="events" id="{EVENT_TYPE_ID}" checked="checked" value="type{EVENT_TYPE_ID}" class="checkbox"/>
 									<span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span> </label>
-								<!-- END event_type -->
+								<!-- END event_type --> 
 								
 							</div>
-							<!--/filter-list-->		
+							<!--/filter-list-->
 						</form>
 						<p class="clearfix"><a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a></p>
-					<!--/filter-drop--> 
+						<!--/filter-drop--> 
+					</div>
 				</div>
 			</div>
-			</div></td>
+		</div>
+		<h3>{MONTH}</h3>
+		
+	</div>
+	<table id="week-view" cellpadding="0" cellspacing="0" width="100%">
+		<tr class="dates">
+			<td class="dark border-left">Sun</td>
+			<td class="dark">Mon</td>
+			<td class="dark">Tue</td>
+			<td class="dark">Wed</td>
+			<td class="dark">Thu</td>
+			<td class="dark">Fri</td>
+			<td class="dark">Sat</td>
 		</tr>
-	<tr class="dates">
-        	<td class="dark border-left">Sun</td>
-            <td class="dark">Mon</td>
-            <td class="dark">Tue</td>
-            <td class="dark">Wed</td>
-            <td class="dark">Thu</td>
-            <td class="dark">Fri</td>
-            <td class="dark">Sat</td>
-        </tr>
 		<tr> 
 			<!-- BEGIN day_header -->
-			<td class="day-block"><div class="dayWrap clearfix">
-					<p class="day-num">{DATE}</p>
-					<p class="header_option">{ADD}</p>
-					
-				</div></td>
+			<td class="day-block">
+			<div class="dayWrap clearfix">
+				<p class="day-num">{DATE}</p>
+				<a class="btn add calendar-add" href="{ADD}"><span></span></a>			
+			</div></td>
 			<!-- END day_header --> 
 		</tr>
 		<tr valign="top" class="month-week"> 
@@ -100,14 +111,15 @@
 					<li class="{EVENT_TYPE} {EVENT_LEVEL} "> 
 						<!-- BEGIN time --><span class="time">{TIME}&nbsp;</span><!-- END time --> 
 						<span class="note" style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}</span>
-                        <div class="hidden-fields clearfix">
-                            <h4><!-- BEGIN time --><div class="time"><strong>{TIME}</strong></div><!-- END time -->{NOTE}</h4>
-                            <p class="meta">Event Type: {TYPE}<br />
-                            <span class="created">Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br /></span>
-                            {LOCATION} {DETAIL}</p>
-                            <div>{MODIFY}</div>
-                            
-                        </div>
+						<div class="hidden-fields clearfix">
+							<h4><!-- BEGIN time -->
+								<div class="time"><strong>{TIME}</strong></div>
+								<!-- END time -->{NOTE}</h4>
+							<p class="meta">Event Type: {TYPE}<br />
+								<span class="created">Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br />
+								</span> {LOCATION} {DETAIL}</p>
+							<div>{MODIFY}</div>
+						</div>
 					</li>
 					<!-- END note_block -->
 				</ul></td>
