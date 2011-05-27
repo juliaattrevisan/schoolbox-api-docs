@@ -40,7 +40,7 @@ $j(function () {
 
     /* Calendar Popup */
 	$j('.calendarTable ul li span').live("click", function(){
-		$j('.cal-bubble').remove();
+		$j('.duework-popup.cal-bubble.cal-bubble').remove();
 		var position = $j(this).parent().offset();
 		var node = $j(this).closest('li'), ev = node.attr("id").substring(6);
 
@@ -58,7 +58,7 @@ $j(function () {
 	});
 
     $j('.close').live("click", function() {
-        $j('.cal-bubble').remove();
+        $j('.duework-popup.cal-bubble.cal-bubble').remove();
     });
 
     function movePopup (location) {

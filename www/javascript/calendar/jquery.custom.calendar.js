@@ -1,30 +1,24 @@
 	$j(function () {
 		$j(window).resize(function() {
-
 			if ($j('.cal-bubble').is(':visible')) {	
 				$j('.cal-bubble').hide();	
 			}
-			
 		});
 		
 		$j('.close').click(function(){
 			$j('.cal-bubble').hide();		
-			
 		});
 		
-		$j('a.filters').click(function(){
-			
-			//$j('.cal-bubble').hide();
-				
+		$j('a.filters').click(function(){				
 			$j('.filter-drop').toggle();
+			return false;
 
 		});
-		
 		
 		//make all of the checkboxes checked... darn you firefoxxxxxx
 		$j('.filter-list .checkbox').attr('checked', true);
 		
-				//run the filter checker to show and hide the items
+		//run the filter checker to show and hide the items
 		$j('#applyFilters').click(function() {
 			filterChecker()
 		});
@@ -32,7 +26,6 @@
 		function filterChecker() {
 			//specify filter hierarchy
 
-				
 			filterLoop('groups');
 			filterLoop('campus');
 			filterLoop('events');
