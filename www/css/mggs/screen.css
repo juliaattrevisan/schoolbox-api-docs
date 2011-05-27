@@ -422,7 +422,7 @@ Library
 .library-header h1 span{font-size:22px;}
 #library-search {position:absolute; right:16px; top:16px; background:#ffffff;-webkit-border-radius:4px; -moz-border-radius:4px; border-radius:4px; float: right; width: 288px; clear:right; border:0; height:32px; z-index:500}
 #library-search-field { font-weight:bold; color:#959595; font-size:16px;width: 232px; padding: 0 12px;height:31px; line-height:31px; border:0; background:#ffffff;-webkit-border-radius:3px; -moz-border-radius:3px; border-radius:3px; font-family:Arial, Helvetica, sans-serif }
-#library-search-button { -webkit-border-radius:4px; text-indent:-999999em; border:0;-moz-border-radius:4px; border-radius:4px; float:right; margin:0;text-align:center; line-height:32px; height:33px;width:33px; position:absolute; top:0; right:0; background:url("/images/demo/icons/search.png") no-repeat 50% 50%; padding:0;}
+#library-search-button { -webkit-border-radius:4px; text-indent:-999999em; border:0;-moz-border-radius:4px; border-radius:4px; float:right; margin:0;text-align:center; line-height:32px; height:33px;width:33px; position:absolute; top:0; right:0; background:url("/images/core/icons/search.png") no-repeat 50% 50%; padding:0;}
 #library-search-button:hover {  cursor:pointer;}
 
 #morris a.library-box strong{font-size:22px; font-weight:bold; background:none; margin-bottom:10px;}
