@@ -297,7 +297,7 @@ class User extends Model {
         return $this->db->getAll($query);
     }
 
-    function delete($id, $trans) {
+    function delete($id, $trans=0) {
 
         //first transfer ownership of date to another user
         $this->transferOwnership($id, $trans);

@@ -78,9 +78,9 @@ for ($i = 0; $i < $totalDays; $i++) {
 	else
 		$this->setVar('OTHER_MONTH', ' otherMonth');
 
-	$output = array("DATE"		=> date("jS", $currentDay),
-					"ADD"		=> "<a href=\"/calendar/modify.php?date=".date("d-m-Y", $currentDay)."&returnTo=month\">add</a>",
-					"ON_OFF"	=> !($day%2) ? 'dark' : '',
+	$output = array('DATE'		=> date("jS", $currentDay),
+					'ADD'		=> '/calendar/modify.php?date='.date("d-m-Y", $currentDay).'&returnTo=month',
+					'ON_OFF'    => !($day%2) ? 'dark' : '',
 					);
 
     if(date("d-m-Y", $selectedDate) == date("d-m-Y", $currentDay))
