@@ -1,3 +1,14 @@
+
+<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+
+<script type="text/javascript">
+
+$j(function() {
+	$j('.pretty-file-input').prettyFileInput();
+});
+
+</script>
+
 <div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>Drop Box</h2>
 	<!-- BEGIN config --> 
@@ -31,7 +42,7 @@
 			
 			<fieldset class="drop-right">
 				<h3>File</h3>
-				<input name="file" type="file" />
+				<input name="file" type="file" class="pretty-file-input"/>
 			</fieldset>
 
 

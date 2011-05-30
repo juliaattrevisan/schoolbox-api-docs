@@ -1086,7 +1086,35 @@ p.forgot a { font-size: 90%; }
 
 .markTable th { vertical-align:bottom; }
 
+
 /*--------------------------------------------------------------
+CHOOSE FILE SELECTOR
+--------------------------------------------------------------*/
+
+.file-input {
+  cursor: pointer;
+  display: inline-block;
+  overflow: hidden;
+  position: relative;
+  float:left;
+}
+.file-input input {
+  cursor: pointer;
+  font-size: 100px;
+  height: 100%;
+  /*filter: alpha(opacity=1);
+  -moz-opacity: 0.01;
+  opacity: 0.01;*/
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index:20;
+}
+
+.file-input .file-holder{margin-top:4px;display: block;
+float: left;}
+
+/*-------------------------------------------------------------
 Module Specific Styles (ALPHABETICAL SECTIONS)
 
 ADMIN
@@ -2687,7 +2715,7 @@ p.interact a.take-test-btn {
 
 .calendar-controls{ text-align:left; }
 
-.calendar-controls a {
+.calendar-controls a, td.cal-left a {
 	display:block;
 	float:left;
 	height:24px;
@@ -2696,6 +2724,8 @@ p.interact a.take-test-btn {
 	color:#000000;
 	font-weight:normal;
 }
+
+td.cal-left a {padding:0 7px;width:14px;}
 
 .calendar-controls. a.back, .calendar-controls. a.forward, .calendar-controls .datepicker-box {
 	margin-top:12px;
@@ -2709,9 +2739,12 @@ p.interact a.take-test-btn {
 }
 
 .calendar-controls .float-left a.back, .calendar-controls .float-left a.forward  { width:12px;text-indent:-99999em;}
+td.cal-left a{text-indent:-99999em;}
 
-.calendar-controls a.back { background:#faf9f5 url(/images/core/calendar/cal-left.png) no-repeat 50% 50%; }
-.calendar-controls a.forward { background:#faf9f5 url(/images/core/calendar/cal-right.png) no-repeat 50% 50%; }
+
+
+.calendar-controls a.back, td.cal-left a.back { background:#faf9f5 url(/images/core/calendar/cal-left.png) no-repeat 50% 50%; }
+.calendar-controls a.forward, td.cal-left a.forward { background:#faf9f5 url(/images/core/calendar/cal-right.png) no-repeat 50% 50%; }
 .calendar-controls a:hover { background-color:#f4f1ea }
 
 .calendar-controls .datepicker-box {
@@ -3657,9 +3690,9 @@ a.layout:hover img { background: #999; }
 }
 
 .current-date {
-	line-height:42px;
+	line-height:24px;
 	padding:0 10px;
-	height:30px;
+	height:24px;
 	float:left;
 }
 

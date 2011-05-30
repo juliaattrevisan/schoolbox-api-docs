@@ -1,6 +1,6 @@
 <h1>Submission Box Details</h1>
 <h2>{BOX_DESCRIPTION}</h2>
-<div class="submission-history">
+<div class="submission-history clearfix">
 	<h4>Due Date</h4>
 	<p>{BOX_DUEDATE}</p>
 	<h4>Subject</h4>
@@ -17,7 +17,9 @@
 	<form method="post" action="/submission/submitWorkForm.php" class="clearfix" enctype="multipart/form-data" >
 		<p> You must attach your work by locating the file on your drive.
 			Make sure the file is saved and closed before submitting the form. </p>
-		<input type="file" name="file"/>
+
+			<input type="file" class="pretty-file-input" name="file"/>
+
 		<label>
 			<input type="hidden" name="box_id" value="{WORK_BOX_ID}" />
 		</label>
