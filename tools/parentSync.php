@@ -52,23 +52,42 @@ if (count($synergyIds)) {
 				$updatedUser['title'] = trim($currentParent['Title']);
 				$updatedUser['firstname'] = trim($currentParent['Preferred']);
 				$updatedUser['lastname'] = trim($currentParent['Surname']);
-				$updatedUser['alt_email'] = trim($preferredEmail);
+
 				$updatedUser['campus'] = $userHandler->getUserCampus($user['uid']);
 				$updatedUser['defaultCampus'] = array();
+
+				/* Clear email address in Portal if the user is not meant to be
+				 * publicly listed
+				 */
+				if ($currentParent['DirectoryIncludeFlag'] == 0) {
+					$updatedUser['alt_email'] = '';
+
+					$emailString = ', clearing email address';
+				}
+				else {
+					$updatedUser['alt_email'] = trim($preferredEmail);
+
+					$emailString = ', updating email address';
+				}
 
 				unset($updatedUser['gname']);
 				unset($updatedUser['uid']);
 
 				if (PERFORM_UPDATE) {
 					$userHandler->update($updatedUser);
-					echo "Updating #$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email]) to $updatedUser[title]  $updatedUser[firstname] $updatedUser[lastname] ($updatedUser[alt_email])\n";
+
+					$action = 'Updating';
 				}
 				else {
-					echo "Planning update on #$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email]) to $updatedUser[title] $updatedUser[firstname] $updatedUser[lastname] ($updatedUser[alt_email])\n";
+					$action = 'Planning update';
 				}
+
+				echo "$action on #$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email]) to $updatedUser[title] $updatedUser[firstname] $updatedUser[lastname] ($updatedUser[alt_email])$emailString\n";
 			}
 			else {
-				echo "Ignoring #$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email])\n";
+				$action = 'Ignoring';
+
+				echo "$action #$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email])\n";
 			}
 		}
 	}

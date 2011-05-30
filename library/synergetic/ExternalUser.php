@@ -66,8 +66,7 @@ class ExternalUser extends MSSQL{
 				Email, OccupEmail, DefaultEmailCode,
 				DirectoryIncludeFlag
 			FROM SynergyOne.dbo.Community
-			WHERE ID $assignation
-			AND DirectoryIncludeFlag = 1";
+			WHERE ID $assignation";
 
 		if (is_array($synID)) {
 			return $this->getAll($query);
