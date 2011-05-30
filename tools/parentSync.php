@@ -45,10 +45,11 @@ if (count($synergyIds)) {
 			 */
 			$user = $userHandler->getBySynergy($currentSynergyId);
 
-			if (($user['firstname'] != $currentParent['Preferred']) || ($user['lastname'] != $currentParent['Surname']) || ($user['alt_email'] != $preferredEmail)) {
+			if (($user['title'] != $currentParent['Title']) || ($user['firstname'] != $currentParent['Preferred']) || ($user['lastname'] != $currentParent['Surname']) || ($user['alt_email'] != $preferredEmail)) {
 				$updatedUser = $userHandler->getById($user['uid']);
 
 				$updatedUser['id'] = $user['uid'];
+				$updatedUser['title'] = trim($currentParent['Title']);
 				$updatedUser['firstname'] = trim($currentParent['Preferred']);
 				$updatedUser['lastname'] = trim($currentParent['Surname']);
 				$updatedUser['alt_email'] = trim($preferredEmail);
@@ -60,14 +61,14 @@ if (count($synergyIds)) {
 
 				if (PERFORM_UPDATE) {
 					$userHandler->update($updatedUser);
-					echo "Updating #$user[uid] (Synergetic #$currentSynergyId) $user[firstname] $user[lastname] ($user[alt_email]) to $updatedUser[firstname] $updatedUser[lastname] ($updatedUser[alt_email])\n";
+					echo "Updating #$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email]) to $updatedUser[title]  $updatedUser[firstname] $updatedUser[lastname] ($updatedUser[alt_email])\n";
 				}
 				else {
-					echo "Planning update on #$user[uid] (Synergetic #$currentSynergyId) $user[firstname] $user[lastname] ($user[alt_email]) to $updatedUser[firstname] $updatedUser[lastname] ($updatedUser[alt_email])\n";
+					echo "Planning update on #$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email]) to $updatedUser[title] $updatedUser[firstname] $updatedUser[lastname] ($updatedUser[alt_email])\n";
 				}
 			}
 			else {
-				echo "Ignoring #$user[uid] (Synergetic #$currentSynergyId) $user[firstname] $user[lastname] ($user[alt_email])\n";
+				echo "Ignoring #$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email])\n";
 			}
 		}
 	}

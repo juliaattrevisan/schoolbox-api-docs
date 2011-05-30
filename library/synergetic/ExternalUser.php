@@ -61,7 +61,7 @@ class ExternalUser extends MSSQL{
 
         $query = "
 			SELECT
-				ID,
+				ID, Title,
 				Preferred, Surname, 
 				Email, OccupEmail, DefaultEmailCode,
 				DirectoryIncludeFlag
