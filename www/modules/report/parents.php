@@ -5,7 +5,7 @@ require_once(dirname(__FILE__) . '/../../../library/synergetic/ExternalUser.php'
 require_once(dirname(__FILE__) . '/../../include/stdfuncs.php');
 
 $this->setTitle('Parent Contact info');
-$this->setFile(TEMPLATE_content, 'report/parents.html');
+$this->setFile(TEMPLATE_content, 'modules/report/parents.html');
 $this->setBlock(TEMPLATE_content, 'student', 'student_block');
 $this->setBlock('student', 'contact', 'contact_block');
 
