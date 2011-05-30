@@ -4,6 +4,7 @@ require_once(dirname(__FILE__)  .'/../library/user.php');
 require_once(dirname(__FILE__)  .'/../library/synergetic/ExternalUser.php');
 
 define('PARENT_GROUP_ID' , 4);
+define('PERFORM_UPDATE', false);
 
 $userHandler = new User();
 $synergyIds = array();
@@ -52,11 +53,21 @@ if (count($synergyIds)) {
 				$updatedUser['lastname'] = $currentParent['Surname'];
 				$updatedUser['alt_email'] = $preferredEmail;
 				$updatedUser['campus'] = $userHandler->getUserCampus($user['uid']);
+				$updatedUser['defaultCampus'] = array();
 
 				unset($updatedUser['gname']);
 				unset($updatedUser['uid']);
-				
-				$userHandler->update($updatedUser);
+
+				if (PERFORM_UPDATE) {
+					$userHandler->update($updatedUser);
+					echo "Updating #$user[uid] (Synergetic #$currentSynergyId) $user[firstname] $user[lastname] ($user[alt_email]) to $updatedUser[firstname] $updatedUser[lastname] ($updatedUser[alt_email])\n";
+				}
+				else {
+					echo "Planning update on #$user[uid] (Synergetic #$currentSynergyId) $user[firstname] $user[lastname] ($user[alt_email]) to $updatedUser[firstname] $updatedUser[lastname] ($updatedUser[alt_email])\n";
+				}
+			}
+			else {
+				echo "Ignoring #$user[uid] (Synergetic #$currentSynergyId) $user[firstname] $user[lastname] ($user[alt_email])\n";
 			}
 		}
 	}
