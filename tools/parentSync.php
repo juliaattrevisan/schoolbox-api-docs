@@ -49,9 +49,9 @@ if (count($synergyIds)) {
 				$updatedUser = $userHandler->getById($user['uid']);
 
 				$updatedUser['id'] = $user['uid'];
-				$updatedUser['firstname'] = $currentParent['Preferred'];
-				$updatedUser['lastname'] = $currentParent['Surname'];
-				$updatedUser['alt_email'] = $preferredEmail;
+				$updatedUser['firstname'] = trim($currentParent['Preferred']);
+				$updatedUser['lastname'] = trim($currentParent['Surname']);
+				$updatedUser['alt_email'] = trim($preferredEmail);
 				$updatedUser['campus'] = $userHandler->getUserCampus($user['uid']);
 				$updatedUser['defaultCampus'] = array();
 
