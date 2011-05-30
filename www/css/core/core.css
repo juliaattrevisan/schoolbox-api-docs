@@ -1087,7 +1087,7 @@ p.forgot a { font-size: 90%; }
 .markTable th { vertical-align:bottom; }
 
 
-/*--------------------------------------------------------------
+/*------------------------------------------------------------
 CHOOSE FILE SELECTOR
 --------------------------------------------------------------*/
 
@@ -1097,22 +1097,30 @@ CHOOSE FILE SELECTOR
   overflow: hidden;
   position: relative;
   float:left;
+  z-index:10;
+ 
 }
 .file-input input {
+  text-transform:capitalize;
   cursor: pointer;
   font-size: 100px;
   height: 100%;
-  /*filter: alpha(opacity=1);
+  filter: alpha(opacity=1);
   -moz-opacity: 0.01;
-  opacity: 0.01;*/
+  opacity: 0.01;
   position: absolute;
   right: 0;
   top: 0;
   z-index:20;
+  background:#0f0
+  outline:none;
 }
 
-.file-input .file-holder{margin-top:4px;display: block;
-float: left;}
+.file-input .file-holder{
+	margin-top:4px;
+	display: block;
+	float: left;
+}
 
 /*-------------------------------------------------------------
 Module Specific Styles (ALPHABETICAL SECTIONS)
