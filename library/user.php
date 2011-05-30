@@ -33,6 +33,19 @@ class User extends Model {
 		return false;
 	}
 
+    function getGroupID($name)
+    {
+        $query = "SELECT id, name FROM groups";
+
+        foreach($this->db->getAll($query) as $group) {
+            if (strtolower($group['name']) == strtolower($name)) {
+                return $group['id'];
+            }
+        }
+
+        return false;
+    }    
+
     function getAllInCategory($categoryID) {
         $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email
 				  FROM user, userAccess

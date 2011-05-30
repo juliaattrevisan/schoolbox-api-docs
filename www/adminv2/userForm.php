@@ -70,6 +70,7 @@ else if ($_POST['modusername']) {
 		'password'			 => $_POST['modpassword'],
         'email_pass'	     => $_POST['modpassword'],
 		'campus'			 => $_POST['campus'],
+        'defaultCampus'	     => $_POST['defaultCampus'],
 		'su'			 	 => $_POST['superuser'],
 		'year'		 		 => $_POST['year']==''?'NULL':$_POST['year'],
 		'eportfolio_enabled' => $_POST['eportfolio']==1?1:0

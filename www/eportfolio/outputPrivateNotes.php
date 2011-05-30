@@ -10,7 +10,7 @@ $this->setBlock(TEMPLATE_content, 'year_level', 'year_level_block');
 
 //$user = $userHandler->getByID($userID);
 
-$profile = $userHandler->getProfile($userID);
+$profile = $user_handler->getProfile($userID);
 
 if ($profile['year'] > 0) {
     $this->setVar('YEAR', $profile['year']);
