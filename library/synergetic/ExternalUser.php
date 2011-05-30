@@ -18,7 +18,7 @@ class ExternalUser extends MSSQL{
 
 	/**
 	 * Gets the contact info of the person who is a Student's Contact. The ID
-	 * passed is the Synergetic if of the Contact, not the Student.
+	 * passed is the Synergetic of the Contact, not the Student.
 	 *
 	 * @param <type> $synID
 	 * @return <type>
@@ -36,6 +36,42 @@ class ExternalUser extends MSSQL{
 			WHERE StudentContactID = '$synID'
 			AND FileSemester = " . $_SESSION['FileSemester'] . "
 			AND FileYear = " . $_SESSION[ 'FileYear'];
+
+        return $this->getRow($query);
+    }
+
+	/**
+	 * Gets the contact info of the person who is a Student's Contact. The ID
+	 * passed is the Synergetic of the Contact, not the Student. Anyone who is
+	 * not supposed to be having their details publicised (via the
+	 * DirectoryIncludeFlag) are not included in the result set.
+	 *
+	 * Accept array of Synergy IDs, or just an int
+	 *
+	 * @param <type> $synID
+	 * @return <type>
+	 */
+    public function getParentSync($synID) {
+		if (is_array($synID)) {
+			$assignation = ' IN (' . implode(',', $synID) . ')';
+		}
+		else {
+			$assignation = " = '$synID'";
+		}
+
+        $query = "
+			SELECT
+				ID,
+				Preferred, Surname, 
+				Email, OccupEmail, DefaultEmailCode,
+				DirectoryIncludeFlag
+			FROM SynergyOne.dbo.Community
+			WHERE ID $assignation
+			AND DirectoryIncludeFlag = 1";
+
+		if (is_array($synID)) {
+			return $this->getAll($query);
+		}
 
         return $this->getRow($query);
     }

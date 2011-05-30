@@ -546,5 +546,25 @@ class User extends Model {
         return $id;
     }
 
+	/**
+	 * Gets all in the system who are in a particular groupID
+	 *
+	 * @param <type> $groupID
+	 */
+	public function getByGroup($groupID, $hasSynergy = false) {
+		$query = "SELECT *
+				  FROM {$this->_table}
+				  WHERE group_id = '$groupID'";
+
+		/* Optionally exclude those without synergy ids
+		 *		 */
+		if ($hasSynergy) {
+			$query .= " AND synergy_id IS NOT NULL
+					    AND synergy_id > 0 ";
+		}
+
+		return $this->db->getAll($query);
+	}
+
 }
 ?>
