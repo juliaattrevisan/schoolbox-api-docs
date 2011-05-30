@@ -9,9 +9,10 @@ if(Cfg::get('weather_enable'))
 
 	for($i = 0; $i < 3; $i++) {
 		$forecast_conditions = $weather->weather->forecast_conditions[$i];
+        $url = parse_url((string)$forecast_conditions->icon['data']);
 		$this->setVar(array(
 			"DAY$i"     => $forecast_conditions->day_of_week['data'],
-			"IMAGE$i"   => $imageLocation.$forecast_conditions->icon['data'],
+			"IMAGE$i"   => $imageLocation.urlencode($url['path']),
 			"PRECIS$i"  => $forecast_conditions->condition['data'],
 			"HIGH$i"    => round(($forecast_conditions->high['data'] - 32) / 1.8),
 			"LOW$i"     => round(($forecast_conditions->low['data'] - 32) / 1.8)

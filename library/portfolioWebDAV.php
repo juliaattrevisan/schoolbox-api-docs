@@ -288,7 +288,7 @@ class PortfolioWebDAV {
                 else if(Cfg::get('site_location') == 'cathedral') {
                    if ($groupHandler->isStaff()) {
                             $pathList = array( 'http://senior-server.school.cathedral.qld.edu.au/staffhome/'.$_SESSION['username'].'/',
-                                                               'http://senior-server/Xdrive/',
+                                                               'http://senior-server.school.cathedral.qld.edu.au/xdrive/',
                                                               );
                     } else {
                             $pathList = array( 'http://senior-server.school.cathedral.qld.edu.au/studenthome/',

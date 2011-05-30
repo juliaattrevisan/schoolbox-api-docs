@@ -12,13 +12,12 @@ require_once '../../include/sitePage.php';
 
 $page = new SitePage;
 
-$real_url = 'http://www.google.com';
+$real_url = 'http://g0.gstatic.com/';
 $cache_path = Cfg::get('xml_dir').'/../weather/';
-$file_path = $_GET['path'];
+$file_path = urldecode($_GET['path']);
 
 if (is_string($file_path)) {
     $file_name = basename($file_path);
-
     if (file_exists($cache_path.'/'.$file_name)) {
         $file_contents = file_get_contents($cache_path.'/'.$file_name);
     } elseif ($file_contents = file_get_contents($real_url.'/'.$file_path)) {
