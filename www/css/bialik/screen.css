@@ -202,11 +202,16 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 #nav h3 {
 	height:32px; 
 	line-height:32px;
+  
   background-color: #005aa8;
-  background-image: -moz-linear-gradient(top, #005aa8, #00438d); 
-  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #005aa8),color-stop(1, #00438d)); 
-  background-image: linear-gradient(top, #005aa8, #00438d);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#005aa8), to(#00438d)); 
+  background-image: -webkit-linear-gradient(top, #005aa8, #00438d); 
+  background-image:    -moz-linear-gradient(top, #005aa8, #00438d); 
+  background-image:     -ms-linear-gradient(top, #005aa8, #00438d); 
+  background-image:      -o-linear-gradient(top, #005aa8, #00438d); 
+  background-image:         linear-gradient(top, #005aa8, #00438d);
             filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#005aa8', EndColorStr='#00438d'); 
+
 
 	
 	
@@ -228,11 +233,16 @@ td.cal-right .link-case .filter-drop .filter-list {
     background: none repeat scroll 0 0 #FAEDC3;
 }
 .submit-btn-plain {
-	background-color: #e1ffe9;
-	background-image: -moz-linear-gradient(top, #e1ffe9, #bcffd0); 
-	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #e1ffe9),color-stop(1, #bcffd0)); 
-	background-image: linear-gradient(top, #e1ffe9, #bcffd0);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e1ffe9', EndColorStr='#bcffd0'); 
+	
+  background-color: #e1ffe9;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#e1ffe9), to(#bcffd0)); 
+  background-image: -webkit-linear-gradient(top, #e1ffe9, #bcffd0); 
+  background-image:    -moz-linear-gradient(top, #e1ffe9, #bcffd0); 
+  background-image:     -ms-linear-gradient(top, #e1ffe9, #bcffd0); 
+  background-image:      -o-linear-gradient(top, #e1ffe9, #bcffd0); 
+  background-image:         linear-gradient(top, #e1ffe9, #bcffd0);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e1ffe9', EndColorStr='#bcffd0'); 
+
 	border-color: #79ad87;
 	color: #000000 !important;
 	text-shadow: 0 1px 0 #ffffff;
@@ -240,11 +250,16 @@ td.cal-right .link-case .filter-drop .filter-list {
 	font-weight:bold;
 }
 .submit-btn-plain:hover {
-	background-color: #fffbe7;
-	background-image: -moz-linear-gradient(top, #fffbe7, #fff6cb); 
-	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fffbe7),color-stop(1, #fff6cb)); 
-	background-image: linear-gradient(top, #fffbe7, #fff6cb);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fffbe7', EndColorStr='#fff6cb'); 
+	
+  background-color: #fffbe7;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#fffbe7), to(#fff6cb)); 
+  background-image: -webkit-linear-gradient(top, #fffbe7, #fff6cb); 
+  background-image:    -moz-linear-gradient(top, #fffbe7, #fff6cb); 
+  background-image:     -ms-linear-gradient(top, #fffbe7, #fff6cb); 
+  background-image:      -o-linear-gradient(top, #fffbe7, #fff6cb); 
+  background-image:         linear-gradient(top, #fffbe7, #fff6cb);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fffbe7', EndColorStr='#fff6cb'); 
+
 	border-color: #bdbdbd;
 	color: #000000 !important;
 	cursor: pointer;

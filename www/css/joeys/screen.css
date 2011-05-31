@@ -377,12 +377,16 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 .standardForm td { border-color:#bebebe; }
 
 .submit-btn-plain {
-	background-color: #c6ad50;
-	background-image: -moz-linear-gradient(top, #c6ad50, #b69526);
-	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #c6ad50), color-stop(1, #b69526));
-	background-image: -webkit-linear-gradient(#c6ad50, #b69526);
-	background-image: linear-gradient(top, #c6ad50, #b69526);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#c6ad50', EndColorStr='#b69526');
+	
+  background-color: #c6ad50;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#c6ad50), to(#b69526)); 
+  background-image: -webkit-linear-gradient(top, #c6ad50, #b69526); 
+  background-image:    -moz-linear-gradient(top, #c6ad50, #b69526); 
+  background-image:     -ms-linear-gradient(top, #c6ad50, #b69526); 
+  background-image:      -o-linear-gradient(top, #c6ad50, #b69526); 
+  background-image:         linear-gradient(top, #c6ad50, #b69526);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#c6ad50', EndColorStr='#b69526'); 
+
 	border-color: #b69526;
 	color: #fff !important;
 	text-shadow: 0 1px 0 #b69526;
@@ -391,12 +395,16 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 }
 
 .submit-btn-plain:hover {
-	background-color: #dac96e;
-	background-image: -moz-linear-gradient(top, #dac96e, #ccb75a);
-	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #dac96e), color-stop(1, #ccb75a));
-	background-image: -webkit-linear-gradient(#dac96e, #ccb75a);
-	background-image: linear-gradient(top, #dac96e, #ccb75a);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#dac96e', EndColorStr='#ccb75a');
+	
+  background-color: #dac96e;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#dac96e), to(#ccb75a)); 
+  background-image: -webkit-linear-gradient(top, #dac96e, #ccb75a); 
+  background-image:    -moz-linear-gradient(top, #dac96e, #ccb75a); 
+  background-image:     -ms-linear-gradient(top, #dac96e, #ccb75a); 
+  background-image:      -o-linear-gradient(top, #dac96e, #ccb75a); 
+  background-image:         linear-gradient(top, #dac96e, #ccb75a);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#dac96e', EndColorStr='#ccb75a'); 
+
 	border-color: #b69526;
 	color: #ffffff !important;
 	cursor: pointer;

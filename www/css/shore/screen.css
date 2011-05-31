@@ -279,9 +279,12 @@ p.interact a {
 .submit-btn-plain {
 
   background-color: #cae4ff;
-  background-image: -moz-linear-gradient(top, #cae4ff, #9accff); 
-  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #cae4ff),color-stop(1, #9accff)); 
-  background-image: linear-gradient(top, #cae4ff, #9accff);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#cae4ff), to(#9accff)); 
+  background-image: -webkit-linear-gradient(top, #cae4ff, #9accff); 
+  background-image:    -moz-linear-gradient(top, #cae4ff, #9accff); 
+  background-image:     -ms-linear-gradient(top, #cae4ff, #9accff); 
+  background-image:      -o-linear-gradient(top, #cae4ff, #9accff); 
+  background-image:         linear-gradient(top, #cae4ff, #9accff);
             filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#cae4ff', EndColorStr='#9accff'); 
 
     border-color: #003E7E;
@@ -289,13 +292,14 @@ p.interact a {
     text-shadow: 0 1px 0 #9accff;
 }
 .submit-btn-plain:hover {
-
-  background-color: #e1f0ff;
-  background-image: -moz-linear-gradient(top, #e1f0ff, #9accff); 
-  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #e1f0ff),color-stop(1, #9accff)); 
-  background-image: linear-gradient(top, #e1f0ff, #9accff);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e1f0ff', EndColorStr='#9accff'); 
-
+	background-color: #e1f0ff;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#e1f0ff), to(#9accff)); 
+	background-image: -webkit-linear-gradient(top, #e1f0ff, #9accff); 
+	background-image:    -moz-linear-gradient(top, #e1f0ff, #9accff); 
+	background-image:     -ms-linear-gradient(top, #e1f0ff, #9accff); 
+	background-image:      -o-linear-gradient(top, #e1f0ff, #9accff); 
+	background-image:         linear-gradient(top, #e1f0ff, #9accff);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e1f0ff', EndColorStr='#9accff'); 
     border-color: #003E7E;
     color: #000 !important;
     cursor: pointer;

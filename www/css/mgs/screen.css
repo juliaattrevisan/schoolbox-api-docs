@@ -450,14 +450,16 @@ p.interact a { color: #03c; }
 .template4 .left, .template4 .right { background:#fff; }
 
 .submit-btn-plain {
-	background-color: #0065CE;
-	background-image: -moz-linear-gradient(top, #0065CE, #182484); 
+	
+  background-color: #0065CE;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#0065CE), to(#182484)); 
+  background-image: -webkit-linear-gradient(top, #0065CE, #182484); 
+  background-image:    -moz-linear-gradient(top, #0065CE, #182484); 
+  background-image:     -ms-linear-gradient(top, #0065CE, #182484); 
+  background-image:      -o-linear-gradient(top, #0065CE, #182484); 
+  background-image:         linear-gradient(top, #0065CE, #182484);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#0065CE', EndColorStr='#182484'); 
 
-
-	background-image: -moz-linear-gradient(top, #0065CE, #182484); 
-	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #0065CE),color-stop(1, #182484)); 
-	background-image: linear-gradient(top, #0065CE, #182484);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#0065CE', EndColorStr='#182484'); 
 	border-color: #000;
 	color: #ffffff !important;
 	text-shadow: 0 1px 0 #000;
@@ -465,11 +467,16 @@ p.interact a { color: #03c; }
 
 }
 .submit-btn-plain:hover {
-	background-color: #fff6cb;
-	background-image: -moz-linear-gradient(top, #fff6cb, #FFFFA4); 
-	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fff6cb),color-stop(1, #FFFFA4)); 
-	background-image: linear-gradient(top, #fff6cb, #FFFFA4);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff6cb', EndColorStr='#FFFFA4'); 
+	
+  background-color: #fff6cb;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#fff6cb), to(#FFFFA4)); 
+  background-image: -webkit-linear-gradient(top, #fff6cb, #FFFFA4); 
+  background-image:    -moz-linear-gradient(top, #fff6cb, #FFFFA4); 
+  background-image:     -ms-linear-gradient(top, #fff6cb, #FFFFA4); 
+  background-image:      -o-linear-gradient(top, #fff6cb, #FFFFA4); 
+  background-image:         linear-gradient(top, #fff6cb, #FFFFA4);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff6cb', EndColorStr='#FFFFA4'); 
+
 	border-color: #000;
 	color: #000000 !important;
 		text-shadow: 0 1px 0 #fff;

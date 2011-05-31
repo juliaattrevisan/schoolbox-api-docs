@@ -4,7 +4,18 @@
 <script type="text/javascript">
 
 $j(function() {
-	$j('input[type=file].pretty-file-input').prettyFileInput();
+	$j('input[type=file].pretty-file-input').prettyFileInput({
+	
+	additionalButtonClasses: 'no-marg float-left',
+	buttonActiveClass: 'tick',
+	defaultText: '<span></span>Choose file',
+	defaultFileSelectedText: '<span></span>File selected'
+	
+	
+	});
+	
+	$j('.dropBox').validate();
+	
 });
 
 </script>
@@ -34,7 +45,7 @@ $j(function() {
 			<!-- END drop_success -->
 			<fieldset class="drop-left">
 				<h3>Description</h3>
-				<input name="description" type="text" />
+				<label><input name="description" class="required" type="text" /></label>
 				<input type="hidden" name="category" value="{ID}" />
 			</fieldset>
 			
