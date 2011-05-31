@@ -1,50 +1,71 @@
 <!-- BEGIN custom_head -->
-<script language="JavaScript" type="text/javascript">
-function verify()
-{
-	var msg = ""
-	//check that description and category have been entered
-	if(document.getElementById('fileForm').description.value == ""){
-		msg += "You need to enter a description\n";
-	}
-	var ok = false;
-	$j('input.category').each(function () {
-		if ($j(this).attr("checked"))
-			ok = true;
-	});
-	if (!ok)
-		msg += "You need to select a location";
-	
-	if(msg != ""){
-		alert(msg);
-		return false;
-	}
-	else
-		return true;
-}
+<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript">
 
-function clearBrowse(obj, id) {
-	if (obj.value != '') {
-		document.getElementById(id).value = '';
-	}
-}
+$j(function() {
+
+	$j('input[type=file].prettify').prettyFileInput({
+		additionalButtonClasses: 'no-marg float-left',
+		buttonActiveClass: 'tick',
+		defaultText: '<span></span>Choose file',
+		defaultFileSelectedText: '<span></span>File selected'
+	});
 	
+	$j('#fileForm').validate({ 
+		rules: {  
+			'category[]': { 
+				required: true, 
+				minlength: 1
+			} 
+		},
+		messages: {
+			'category[]': "Please tick at least one location"
+		},
+		errorPlacement: function(error, element) {
+            if (element.parent().parent().hasClass('checkboxes')) {
+				error.insertAfter(element.parent().parent().parent().children(':last-child'));
+			} else {
+				error.insertAfter(element);
+			}
+		}
+	});
+	
+	$j(':checkbox').each(function() {
+		if ($j(this).is(':checked')) {
+			$j(this).parent().addClass('active-checkbox');
+		}			 
+	});
+	
+	$j(':checkbox').click(function() {
+		if ($j(this).parent().hasClass('active-checkbox')) {
+			$j(this).parent().removeClass('active-checkbox')
+		} else {
+			$j(this).parent().addClass('active-checkbox');
+		}
+	});
+
+});
+
 </script>
 <!-- END custom_head -->
 
 <h1>Upload a File to Multiple Locations</h1>
-<form method="post" enctype="multipart/form-data" id="fileForm" class="clearfix"  onsubmit="return(verify());" action="/cms/fileForm.php">
+<form method="post" enctype="multipart/form-data" id="fileForm" class="clearfix" action="/cms/fileForm.php">
   <table class="standardForm">
     <!-- BEGIN browse -->
     <tr>
       <td class="formLabelWidth"><h4>File</h4>
         <em>Browse your local disk for a file or upload from your 'my files'.</em></td>
-		<td><input type="file" name="file"  id="browse" onchange="clearBrowse(this, 'myfile');" />
-        <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" /></td>
-    </tr>
-    <tr>
-      <td><strong>or</strong></td>
-	  <td><select name='myfile' id="myfile" onchange="clearBrowse(this, 'browse');">
+		<td><strong>Upload from your computer</strong>
+		
+		<label class="clearfix">
+		<input type="file" name="file"  id="browse" class="prettify" />
+        <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
+		</label>
+		
+		<br />
+		<strong>Select from your existing files</strong><br />
+		<select name='myfile' id="myfile" >
           <option value=''></option>
           <!-- BEGIN optgroup -->
           <optgroup label="&gt; {MYFOLDER_NAME}"  style="padding-left: {MYFOLDER_LEFT}px;">
@@ -53,13 +74,14 @@ function clearBrowse(obj, id) {
           <!-- END my_files -->
           </optgroup>
           <!-- END optgroup -->
-        </select></td>
+        </select>
+		</td>
     </tr>
     <!-- END browse -->
     <tr>
       <td><h4>Description</h4>
         <em>One line description of the file for use as the title</em></td>
-		<td><input type="text" name="description" maxlength="250" size="40" value="" /></td>
+		<td><label><input type="text" name="description" maxlength="250" size="40" class="required" /></label></td>
 
     </tr>
     <tr>
@@ -70,15 +92,16 @@ function clearBrowse(obj, id) {
     <tr>
       <td><h4>Hidden</h4>
         <em>Hide this file from students.</em></td>
-		<td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
+		<td><label class="float-left clear"><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></label></td>
     </tr>
     <tr>
       <td><h4>Location</h4>
         <em>Select the locations where this file should be placed</em></td>
-		<td><!-- BEGIN category_list -->
-        <input type="checkbox" class="category" name="category[]" value="{CATEGORY_ID}">
-        {CATEGORY_NAME}<br />
-        <!-- END category_list --></td>
+		<td class="locations"><div class="clearfix checkboxes"><!-- BEGIN category_list -->
+        <label class="float-left clear">
+			<input type="checkbox" class="category" name="category[]" value="{CATEGORY_ID}">{CATEGORY_NAME}
+		</label>
+        <!-- END category_list --></div></td>
     </tr>
   </table>
   <input type="submit" name="Submit" value="Add File" class="submit-btn-plain" />

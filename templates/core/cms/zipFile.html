@@ -1,3 +1,23 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+
+<script language="JavaScript" type="text/javascript">
+
+$j(document).ready(function() {
+	
+	$j('input[type=file].prettify').prettyFileInput({
+		additionalButtonClasses: 'no-marg float-left',
+		buttonActiveClass: 'tick',
+		defaultText: '<span></span>Choose file',
+		defaultFileSelectedText: '<span></span>File selected'
+	});
+	
+});
+
+
+</script>
+<!-- END custom_head -->
+
 <h1>Zip Upload</h1>
 
 <form action="/cms/zipFileForm.php" method="post" class="standardForm" enctype="multipart/form-data">
@@ -10,7 +30,7 @@
 				<em>You can create a zip file on your computer and uploading it here will decompress it whilst maintaining folder structure. </em>
 			</td>
 			<td>
-				<input name="file" type="file" />
+				<input name="file" type="file" class="prettify" />
 			</td>
 		</tr>
                 <tr>

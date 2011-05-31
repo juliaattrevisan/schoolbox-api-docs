@@ -39,11 +39,14 @@
 			maxHeight: 400,
 			width: 200,
 			onSelect: function (value, data) {
-					if($j('#userList').val()) {
-						$j('.visible-users').empty()
-					}
-					$j('.visible-users').append('<li><input type="hidden" name="userList[]" value="'+data+'"><span>'+value+'</span><a href="#" class="delete-from-list">delete</a></li>');
-					$j('#addUser').val("").focus();
+				if($j('#userList').val()) {
+					$j('.visible-users').empty()
+				};
+				
+				$j('.visible-users')
+				.append('<li><input type="hidden" name="userList[]" value="'+data+'"><span>'+value+'</span><a href="#" class="delete-from-list">delete</a></li>');
+				
+				$j('#addUser').val("").focus();
 			}
 		});
 		
@@ -84,9 +87,32 @@
 			}
 		});
 		
-		$j('#newsForm').validate();
-
+		$j('#newsForm').validate({
+			
+			rules: {  
+			'group[]': { 
+				required: true, 
+				minlength: 1
+			},
+			'campus[]': { 
+				required: true, 
+				minlength: 1
+			}
+			
+		},
+		messages: {
+			'group[]': "Please tick at least one group",
+			'campus[]': "Please tick at least one campus"
+		},
+		errorPlacement: function(error, element) {
+            if (element.parent().parent().hasClass('checkboxes')) {
+				error.insertAfter(element.parent().parent().parent().children(':last-child'));
+			} else {
+				error.insertAfter(element);
+			}
+		}
 	});
+});
 	
 </script>
 <!-- END custom_head -->
@@ -98,25 +124,25 @@
 		<tr>
 			<td class="formLabelWidth"><h4>Groups</h4>
 				<em>This news item will only be visible to the groups you select.</em></td>
-			<td><!-- BEGIN group_selection -->
+			<td><div class="clearfix checkboxes"><!-- BEGIN group_selection -->
 				
 				<label class="float-left clear">
-					<input type="checkbox" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED}/>
-					{GROUP_NAME} </label>
+					<input type="checkbox" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED}/>{GROUP_NAME}
+				</label>
 				
-				<!-- END group_selection --></td>
+				<!-- END group_selection --></div></td>
 		</tr>
 		<!-- BEGIN campus_row -->
 		<tr>
 			<td><h4>Campus</h4>
 				<em>This news item will only be visible to users that are within this campus.</em></td>
-			<td><!-- BEGIN campus_selection -->
+			<td><div class="clearfix checkboxes"><!-- BEGIN campus_selection -->
 				
 				<label class="float-left clear">
 					<input type="checkbox" value="{CAMPUS_ID}" name="campus[]" {CAMPUS_ID_SELECTED} />
 					{CAMPUS_NAME} </label>
 				
-				<!-- END campus_selection --></td>
+				<!-- END campus_selection --></div></td>
 		</tr>
 		<!-- END campus_row -->
 		<tr class="advanced">

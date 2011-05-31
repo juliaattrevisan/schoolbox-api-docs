@@ -1,72 +1,90 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+
 <script language="JavaScript" type="text/javascript">
-function verify()
-{
-	var msg = ""
-	
 	//if ($j('#submission') && !$j('#submission').attr("checked") && $j('#browse').val() == '' && $j('#myfile').val() == '')
 	//	msg += 'You must select a file to upload.\n';
 	//check that description and category have been entered
-	if(document.getElementById('fileForm').description.value == ""){
-		msg += "You need to enter a description\n";
-	}
-	if(document.getElementById('fileForm').category.value == "" || isNaN(document.getElementById('fileForm').category.value)){
-		msg += "You need to select a proper location";
-	}
-	if(msg != ""){
-		alert(msg);
-		return false;
-	}
-	else
-		return true;
-}
-
-function clearBrowse(obj, id) {
-	if (obj.value != '') {
-		document.getElementById(id).value = '';
-	}
-}
 
 $j(document).ready(function() {
-    $j('#deleteFile').click(function() {
+    
+	$j('#deleteFile').click(function() {
         if (confirm('Are you sure you want to delete this file?')) {
             window.location = '/cms/fileForm.php?delete={FILE_ID}&redirect=/homepage/{CATEGORY_ID}';
         }
     });
+
+	$j('input[type=file].prettify').prettyFileInput({
+		additionalButtonClasses: 'no-marg float-left',
+		buttonActiveClass: 'tick',
+		defaultText: '<span></span>Choose file',
+		defaultFileSelectedText: '<span></span>File selected'
+	});
+	
+	$j('#fileForm').validate({
+		/*rules: {
+			file : {
+				required: {
+					depends: function(element) {
+						return $j('#myfile').val() == '';
+					}
+				}
+			},
+			myfile : {
+				required: {
+					depends: function(element) {
+						return $j('#browse').val() == '';
+					}
+				}
+			}
+		}*/
+
+	}); 
+	
+
+
 });
 
 </script>
 <!-- END custom_head -->
 
-<h1>{ACTION} File </h1>
-<form method="post" enctype="multipart/form-data" id="fileForm" class="clearfix" onsubmit="return(verify());" action="/cms/fileForm.php">
+<h1>{ACTION} File</h1>
+<form method="post" enctype="multipart/form-data" id="fileForm" class="clearfix"  action="/cms/fileForm.php">
   <table class="standardForm">
     <!-- BEGIN browse -->
     <tr>
       <td class="formLabelWidth"><h4>File</h4>
         <em>Browse your local disk for a file or upload from your 'my files'. You can <a href="/cms/file/multi/{CATEGORY_ID}">upload multiple files</a> here.</em></td>
-		<td><input type="file" name="file" id="browse" onchange="clearBrowse(this, 'myfile');" />
-        <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" /></td>
+		<td><strong>Upload from your computer</strong>
+		
+		<label class="clearfix">
+			<input type="file" name="file" id="browse" class="prettify"/>
+			<input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
+		</label>
+		
+		<br />
+		<strong>Select from your existing files</strong><br />
+		<select name='myfile' id="myfile">
+			<option value=''></option>
+			<!-- BEGIN optgroup -->
+			<optgroup label="&gt; {MYFOLDER_NAME}"  style="padding-left: {MYFOLDER_LEFT}px;">
+			<!-- BEGIN my_files -->
+			<option value="{MYFILE_ID}" style="padding-left: 14px;">{MYFILE_NAME}</option>
+			<!-- END my_files -->
+			</optgroup>
+			<!-- END optgroup -->
+        </select>
+		
+		
+		
+		</td>
     </tr>
-    <tr>
-      <td><em>or</em>
-	 </td>
-	 <td> <select name='myfile' id="myfile" onchange="clearBrowse(this, 'browse');">
-          <option value=''></option>
-          <!-- BEGIN optgroup -->
-          <optgroup label="&gt; {MYFOLDER_NAME}"  style="padding-left: {MYFOLDER_LEFT}px;">
-          <!-- BEGIN my_files -->
-          <option value="{MYFILE_ID}" style="padding-left: 14px;">{MYFILE_NAME}</option>
-          <!-- END my_files -->
-          </optgroup>
-          <!-- END optgroup -->
-        </select></td>
-    </tr>
+    
     <!-- END browse -->
     <tr>
       <td><h4>Description</h4>
         <em>One line description of the file for use as the title</em></td>
-		<td><input type="text" name="description" maxlength="250" size="40" value="{DESCRIPTION}" /></td>
+		<td><label><input type="text" name="description" maxlength="250" size="40" class="required" value="{DESCRIPTION}" /></label></td>
 
     </tr>
     <tr>

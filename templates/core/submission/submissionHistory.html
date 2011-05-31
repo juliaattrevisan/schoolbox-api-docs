@@ -1,3 +1,19 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+
+
+<script language="JavaScript" type="text/javascript">
+	$j(function() {
+		$j('.prettify').prettyFileInput({	
+			additionalButtonClasses: 'no-marg float-left',
+			buttonActiveClass: 'tick',
+			defaultText: '<span></span>Choose file',
+			defaultFileSelectedText: '<span></span>File selected'
+		});
+	});
+</script>
+<!-- END custom_head -->
+
 <h1>Submission Box Details</h1>
 <h2>{BOX_DESCRIPTION}</h2>
 <div class="submission-history clearfix">
@@ -18,9 +34,9 @@
 		<p> You must attach your work by locating the file on your drive.
 			Make sure the file is saved and closed before submitting the form. </p>
 
-			<input type="file" class="pretty-file-input" name="file"/>
+			<input type="file" class="prettify" name="file"/>
 
-		<label>
+		<label class="clearfix">
 			<input type="hidden" name="box_id" value="{WORK_BOX_ID}" />
 		</label>
 		<label>

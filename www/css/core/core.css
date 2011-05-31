@@ -1105,8 +1105,8 @@ CHOOSE FILE SELECTOR
   position: relative;
   float:left;
   z-index:10;
- 
 }
+
 .file-input input {
   text-transform:capitalize;
   cursor: pointer;
@@ -1119,9 +1119,9 @@ CHOOSE FILE SELECTOR
   right: 0;
   top: 0;
   z-index:20;
-  background:#0f0
   outline:none;
-}
+};
+
 
 .file-input .file-holder{
 	margin-top:4px;
@@ -4086,9 +4086,10 @@ p.forgotten { margin:10px 0; }
 	border: 0;
 }
 
-.wysiwyg {padding:7px 16px; }
-.wysiwyg h2{background:0; text-indent:0; margin-bottom:16px; padding:0;}
-.wysiwyg ul, .wysiwyg ol{margin:0 0 16px 16px; line-height:16px;}
+.wysiwyg, .revision-box {padding:7px 16px; }
+.revision-box {border:1px solid #ccc; margin-bottom:16px;}
+.wysiwyg h2, .revision-box h2{background:0; text-indent:0; margin-bottom:16px; padding:0;}
+.wysiwyg ul, .wysiwyg ol, .revision-box ul, .revision-box ol{margin:0 0 16px 16px; line-height:16px;}
 .submitted-by {
 	margin-bottom:0;
 	text-align:right;
@@ -4187,10 +4188,7 @@ padding:7px;
 }
 
 /*REVISIONS*/
-.left .revision-box {
-	border:1px solid #C3CDD7;
-	padding:10px;
-}
+
 
 .revisionCompare { background-color:#DBE7F2; }
 
