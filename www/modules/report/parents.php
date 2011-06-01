@@ -22,7 +22,7 @@ if (!is_numeric($this->arg[0])) {
  */
 $groupHandler = new Group();
 
-if ($groupHandler->isParent() || $groupHandler->isSuperuser()) {
+if ($groupHandler->isParent() || $groupHandler->isSuperuser() || $groupHandler->isStaff()) {
 
 	$this->setVar(array(
 		'YEAR' => $this->arg[0],
