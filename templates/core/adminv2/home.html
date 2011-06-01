@@ -87,13 +87,14 @@ $j(function() {
 		<div class="level">
 			<h3 class="iconify stats">Server stats</h3>
 			<h4>Storage <span>{DISK_USED}/{DISK_TOTAL}</span></h4>
-		
-			<div class="bar-holder">
-				<div class="bar">
-					<span style="width:{DISK_PERC}%"><span class="style"></span></span>
+			<div class="clearfix">
+				<div class="bar-holder">
+					<div class="bar">
+						<span style="width:{DISK_PERC}%"><span class="style"></span></span>
+					</div>
 				</div>
+				<span class="number">{DISK_PERC}%</span>
 			</div>
-			<span class="number">{DISK_PERC}%</span>
 			
 			<h4>Memory <span>{MEMORY_USED}/{MEMORY_TOTAL}</span></h4>
 			<div class="clearfix">

@@ -1,28 +1,42 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
-
 <script language="JavaScript" type="text/javascript">
-
-$j(document).ready(function() {
-	
-	$j('input[type=file].prettify').prettyFileInput({
-		additionalButtonClasses: 'no-marg float-left',
-		buttonActiveClass: 'tick',
-		defaultText: '<span></span>Choose file',
-		defaultFileSelectedText: '<span></span>File selected'
+	$j(document).ready(function() {
+		$j('input[type=file].prettify').prettyFileInput({
+			additionalButtonClasses: 'no-marg float-left',
+			buttonActiveClass: 'tick',
+			defaultText: '<span></span>Choose file',
+			defaultFileSelectedText: '<span></span>File selected'
+		});
+		
+		$j('#zipUpload').validate({
+			rules: { 
+				file: {
+					required: true,
+					accept: "zip"
+				 }
+			},
+			errorPlacement: function(error, element) {
+				error.insertAfter(element.parent().parent().parent().children(':last-child'));
+			},
+			messages: {
+				file: {
+					required: "Please choose a file",
+					accept: "Only .zip files are allowed, please choose again"
+				}
+			}
+		
+		});
+		
 	});
-	
-});
-
-
 </script>
 <!-- END custom_head -->
 
 <h1>Zip Upload</h1>
 
-<form action="/cms/zipFileForm.php" method="post" class="standardForm" enctype="multipart/form-data">
+<form action="/cms/zipFileForm.php" method="post" id="zipUpload" enctype="multipart/form-data">
 	
-	<table>
+	<table class="standardForm">
 	
 	<tr>
 			<td class="formLabelWidth">
@@ -30,7 +44,7 @@ $j(document).ready(function() {
 				<em>You can create a zip file on your computer and uploading it here will decompress it whilst maintaining folder structure. </em>
 			</td>
 			<td>
-				<input name="file" type="file" class="prettify" />
+				<div class="clearfix"><input name="file" type="file" class="prettify" /></div>
 			</td>
 		</tr>
                 <tr>

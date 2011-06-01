@@ -89,7 +89,7 @@
 		
 		$j('#newsForm').validate({
 			
-			rules: {  
+		rules: {  
 			'group[]': { 
 				required: true, 
 				minlength: 1
@@ -121,6 +121,9 @@
 <form id="newsForm"  method="post" enctype="multipart/form-data" action="/news/modifyForm.php">
 	<input type="hidden" name="newsID" value="{NEWS_ID}" />
 	<table class="standardForm">
+		<colgroup>
+		<col width="250" />
+		</colgroup>
 		<tr>
 			<td class="formLabelWidth"><h4>Groups</h4>
 				<em>This news item will only be visible to the groups you select.</em></td>

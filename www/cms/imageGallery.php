@@ -14,58 +14,51 @@
 require_once '../library/group.php';
 require_once '../library/category.php';
 
-define('IMAGESPERROW', 5);
-
-
-if(is_numeric($this->arg[0]) ) {
+if (is_numeric($this->arg[0])) {
 	
 	$categoryHandler = new Category;
-	if(!$category = $categoryHandler->getByID($this->arg[0]))
+
+	if(!$category = $categoryHandler->getByID($this->arg[0])) {
 		error(2);
+	}
 	
 	$groupHandler = new Group;
-	if ($groupHandler->getPermission($this->arg[0]) < READ_ACCESS)
+	
+	if ($groupHandler->getPermission($this->arg[0]) < READ_ACCESS) {
 		error(6);
+	}
 
 	$this->setFile(TEMPLATE_content, 'cms/image-gallery.html');
 	$this->setTitle('Image Gallery for '.$category['name']);
 	$this->setTab('resources');
 	
-	$this->setBlock(TEMPLATE_content, 'thumb_row', 'row_block');
-	$this->setBlock('thumb_row', 'thumb_cell', 'cell_block');
+	$this->setBlock(TEMPLATE_content, 'image_gallery', 'image_gallery_block');
 	
 	$this->setVar('FOLDER_NAME', $category['name']);
 	$this->setVar('ID',	$category['id']);
 
 	$imageList = $categoryHandler->getImages($category['id']);
 
-	$count = 1; 
-	if(is_array($imageList) ) {
-		foreach( $imageList as $thumbnail ) {
-			$this->setVar('THUMBNAIL', "<a href=\"/cms/image.php?id={$thumbnail['id']}&height=600&width=800\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
-					<img src=\"/cms/image.php?id={$thumbnail['id']}&height=".Cfg::get('thumbnail_size')."&width=".Cfg::get('thumbnail_size')."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
+	if (is_array($imageList)) {
+		foreach($imageList as $thumbnail) {
+			$this->setVar(array(
+				'THUMBNAIL_ID' => $thumbnail['id'],
+				'THUMBNAIL_DESCRIPTION' => $thumbnail['description'],
+				'THUMBNAIL_SIZE' =>	Cfg::get('thumbnail_size'),
+			));
 	
-			$this->parse('cell_block', 'thumb_cell', true);
-			if(($count % IMAGESPERROW) == 0) {
-				$this->parse('row_block', 'thumb_row', true);
-				$this->setVar('cell_block', '');
-			}		
-			
-			$count++;
-		}				
-	
-		for(;$count % IMAGESPERROW != 0; $count++) {
-			$this->setVar('THUMBNAIL', '');
-			$this->parse('cell_block', 'thumb_cell', true);
-		}			
-
-		$this->parse('row_block', 'thumb_row', true);
+			$this->parse('image_gallery_block', 'image_gallery', true);
+		}
+		
+		$this->setVar(array(
+			'IMAGE_HEIGHT' => Cfg::get('thumbnail_size'),
+		));
 	}
-	else
-		$this->setVar('row_block', '');
+	else {
+		$this->setVar('image_gallery_block', '');
+	}
 }
-
-else 
+else {
 	error(2);  
-
+}
 ?>

@@ -56,9 +56,7 @@
 				<div class="small-right">
 					<p class="interact">{MODIFY_BLOG}</p>
 				</div>
-				
 				<p>{BLOG_BODY}</p>
-				
 				<div class="blog-comments"> 
 					<!-- BEGIN comment -->
 					<div class="box"> {COMMENT_BODY}
@@ -70,20 +68,19 @@
 					<p  class="interact"><a href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
 					<!-- END show_all --> 
 				</div>
-				
 				<p class="links-house"> 
 					<!-- BEGIN show_comment --> 
 					<a class="show_comments" href="javascript:void();">Show {BLOG_COMMENTS} Comments</a> - 
 					<!-- END show_comment --> 
 					<a class="interact post_comment" href="javascript:void();">Post comment</a> </p>
-					<form class="" method="post" action="/blog/comment/new/{BLOG_ID}">
-						<p>
-							<textarea name="body" style="width: 100%;"></textarea>
-						</p>
-						<p>
-							<input type="submit" class="submit-btn-plain" name="comment" value="Comment"/>
-						</p>
-					</form>
+				<form class="" method="post" action="/blog/comment/new/{BLOG_ID}">
+					<p>
+						<textarea name="body" style="width: 100%;"></textarea>
+					</p>
+					<p>
+						<input type="submit" class="submit-btn-plain" name="comment" value="Comment"/>
+					</p>
+				</form>
 				<p class="interact hide-on-small">Posted by {BLOG_OWNER} {BLOG_CREATED}</p>
 			</li>
 			<!-- END blog -->
@@ -93,6 +90,5 @@
 		<!-- BEGIN submit --> 
 		<a href="/blog/modify/new/{ID}" class="btn up-arrow"><span></span>Post Entry</a> 
 		<!-- END submit --> 
-		<a href="/homepage/blogArchive/{ID}" class="btn"><span></span>Blog Archive</a>
-	</p>
+		<a href="/homepage/blogArchive/{ID}" class="btn"><span></span>Blog Archive</a> </p>
 </div>

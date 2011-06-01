@@ -22,7 +22,7 @@ $j(document).ready(function() {
 	});
 	
 	$j('#fileForm').validate({
-		/*rules: {
+		rules: {
 			file : {
 				required: {
 					depends: function(element) {
@@ -37,7 +37,7 @@ $j(document).ready(function() {
 					}
 				}
 			}
-		}*/
+		}
 
 	}); 
 	
@@ -51,9 +51,12 @@ $j(document).ready(function() {
 <h1>{ACTION} File</h1>
 <form method="post" enctype="multipart/form-data" id="fileForm" class="clearfix"  action="/cms/fileForm.php">
   <table class="standardForm">
+  	<colgroup>
+		<col width="250" />
+	</colgroup>
     <!-- BEGIN browse -->
     <tr>
-      <td class="formLabelWidth"><h4>File</h4>
+      <td><h4>File</h4>
         <em>Browse your local disk for a file or upload from your 'my files'. You can <a href="/cms/file/multi/{CATEGORY_ID}">upload multiple files</a> here.</em></td>
 		<td><strong>Upload from your computer</strong>
 		

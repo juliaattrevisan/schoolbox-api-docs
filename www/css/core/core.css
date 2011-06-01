@@ -721,7 +721,7 @@ label.error{
 	
 background:#fffddb url(/images/core/icons/label-error.png) no-repeat 6px 2px;
 width:100%; padding:4px;
-text-indent:36px; padding:3px 0; border:1px solid #ffcc00; border-top:0;
+text-indent:36px; padding:3px 0; border:1px solid #ffcc00;
 color:#ff5f45 !important;
 display:block;
 
@@ -736,7 +736,7 @@ display:block;
 
 
 label input[type=text]{width:100%; margin:0;}
-input[type=text].error{border:1px solid #ffcc00}
+input[type=text].error{border:1px solid #ffcc00; border-bottom:0;}
 
 textarea {
 	font-family:Arial, Helvetica, sans-serif;
@@ -886,18 +886,20 @@ input.timeField { width: 30px; }
 	text-shadow: 0 1px 0px #ffffff;
 	color:#000000 !important;
 	
-  background-color: #e4f5f9;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#e4f5f9), to(#c9ebf3)); 
-  background-image: -webkit-linear-gradient(top, #e4f5f9, #c9ebf3); 
-  background-image:    -moz-linear-gradient(top, #e4f5f9, #c9ebf3); 
-  background-image:     -ms-linear-gradient(top, #e4f5f9, #c9ebf3); 
-  background-image:      -o-linear-gradient(top, #e4f5f9, #c9ebf3); 
-  background-image:         linear-gradient(top, #e4f5f9, #c9ebf3);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f5f9', EndColorStr='#c9ebf3'); 
+
+  background-color: #e4f8f5;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#e4f8f5), to(#c9f0eb)); 
+  background-image: -webkit-linear-gradient(top, #e4f8f5, #c9f0eb); 
+  background-image:    -moz-linear-gradient(top, #e4f8f5, #c9f0eb); 
+  background-image:     -ms-linear-gradient(top, #e4f8f5, #c9f0eb); 
+  background-image:      -o-linear-gradient(top, #e4f8f5, #c9f0eb); 
+  background-image:         linear-gradient(top, #e4f8f5, #c9f0eb);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f8f5', EndColorStr='#c9f0eb'); 
+
 
 	line-height:23px;
 	float:left;
-	padding:0 16px 0 16px;
+	padding:0 13px 0 13px;
 	text-align:center;
 	margin-bottom:16px;
 	height:23px;
@@ -3830,6 +3832,34 @@ p.bubble-name {
 }
 
 .bubble .comment { color:#000; }
+
+.image-thumbnail a{padding:8px; margin:4px; text-align:center; background:#fcfcfc;
+     -moz-border-radius: 4px; 
+  -webkit-border-radius: 4px; 
+          border-radius: 4px; 
+		  display:block;
+		  -moz-transition-property: border-color, background-color;
+	-moz-transition-duration: .4s;
+	-moz-transition-timing-function: ease-out;
+	-webkit-transition-property: border-color, background-color;
+	-webkit-transition-duration: .4s;
+	-o-transition-property: border-color, background-color;
+	-o-transition-duration: .4s;
+	-ms-transition-property:border-color, background-color;
+	-ms-transition-duration: .4s;
+   
+  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
+ }
+ .image-thumbnail a:hover{background-color:#f0f0f0;-moz-transition-property: border-color, background-color;
+	-moz-transition-duration: .4s;
+	-moz-transition-timing-function: ease-out;
+	-webkit-transition-property: border-color, background-color;
+	-webkit-transition-duration: .4s;
+	-o-transition-property: border-color, background-color;
+	-o-transition-duration: .4s;
+	-ms-transition-property:border-color, background-color;
+	-ms-transition-duration: .4s;}
+
 
 /* FORUM */
 .forum { margin-bottom:16px; }
