@@ -268,8 +268,8 @@ class PortfolioWebDAV {
                                                                'http://gold/StaffData/',
                                                               );
                     } else {
-                            $pathList = array( 'http://silver/StudentHome/' . (12 - $_SESSION['year'] + 11 ) . '/' . $_SESSION['username'] . '/',
-                                                               'http://silver/StudentData/',
+                            $pathList = array( 'http://mercury/StudentHome/' . (12 - $_SESSION['year'] + 11 ) . '/' . $_SESSION['username'] . '/',
+                                                               'http://mercury/StudentData/',
                                                               );
                     }
                     return new self($pathList , "wgs/" . $_SESSION['username'], $_SESSION['password']);

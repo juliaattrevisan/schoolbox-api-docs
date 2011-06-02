@@ -317,7 +317,7 @@ function formatName($userInfo, $format = NULL){
     preg_match_all('|{\w+}|', $format, $tags);
 
     if (empty($tags) || empty($userInfo)) {
-        return false;
+        return 'Unknown User';
     }
 
     foreach ($tags[0] as $tag) {
@@ -331,8 +331,10 @@ function formatName($userInfo, $format = NULL){
 
         $format = str_replace($tag, $value, $format);
     }
-
-    return $format;
+    if(trim($format))
+        return $format;
+    else
+        return 'Unknown User';
 }
 
 function formatEmail($email) {
