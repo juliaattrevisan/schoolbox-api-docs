@@ -77,16 +77,15 @@ else {
 $this->setFile(TEMPLATE_content, 'homepage/template.html');
 $this->setTitle($category['name']);
 $this->setTab('resources');
-
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 
-$codeCount = count(explode(',',$category['code']));
+$codeCount = count(explode(',', $code));
 
-$output = array('HEADING'				=> scrubTEXT($category['name']) . (isset($code) && $codeCount < 2 ? ' ('.$category['code'].')' : '' ),
-				'CODE'					=> urlencode(urlencode($category['code'])),
+$output = array('HEADING'				=> scrubTEXT($category['name']) . (isset($code) && $codeCount < 2 ? ' ('.$code.')' : '' ),
+				'CODE'					=> urlencode(urlencode($code)),
 				'ID'					=> $categoryID,
 				'TEMPLATE'				=> 'template'.$category['template'],
 				);
