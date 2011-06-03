@@ -37,6 +37,7 @@ if (is_numeric($this->arg[0])) {
 	}
 	else if ($groupHandler->isParent($user['uid'])) {
 		$this->setFile(TEMPLATE_content, 'user/parent.html');
+		$this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
 		$this->setBlock(TEMPLATE_content, 'parent_synergy_form', 'parent_synergy_form_block');
 		$this->setBlock('parent_synergy_form', 'parent_spouse', 'parent_spouse_block');
 	}
