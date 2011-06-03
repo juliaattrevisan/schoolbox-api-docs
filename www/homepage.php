@@ -30,7 +30,6 @@ if(!is_array($category)) {
 	$category = $categoryHandler->getByCode(urldecode(urldecode($code)));
 }
 
-
 $categoryID = $category['id'];
 if (!$categoryID) {
 	error(18);
@@ -50,13 +49,30 @@ if (($permission = $groupHandler->getPermission($categoryID)) < READ_ACCESS)
 if(!isset($category['template']))
 	localRedir('/resources/'.$categoryID);
 
+/* This is using a 20-char field in the Category table. That's how categories
+ * with many categoryCodes have their codes truncated and broken
+ *
+ * Updated to use normalised categoryCode table
+ *
 if($category['code']) {
 	$enroled = $groupHandler->involvedInSubject($category['code']);
 	$code = $category['code'];
 }
 else
 	$enroled = $groupHandler->involvedInGroup($_SESSION['id'], $categoryID);
+*/
 
+/* Use normalised categoryCode table instead
+ */
+$categoryCodes = $categoryHandler->getCodeForCategory($categoryID);
+$code = $categoryCodes['codes'];
+
+if ($code != '') {
+	$enroled = $groupHandler->involvedInSubject($category['code']);
+}
+else {
+	$enroled = $groupHandler->involvedInGroup($_SESSION['id'], $categoryID);
+}
 
 $this->setFile(TEMPLATE_content, 'homepage/template.html');
 $this->setTitle($category['name']);
@@ -155,6 +171,7 @@ if($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
     $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
         // Colors
 	$listColor = $homepageHandler->getColorList();
+	
 	$this->setVar('COLOUR_ARRAY', 'original');
 	$this->setVar($listColor);
 	$this->parse('colour_list_block', 'colour_list', true);
