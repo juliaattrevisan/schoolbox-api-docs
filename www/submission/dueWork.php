@@ -115,7 +115,7 @@ $output = array('CURRENT_DATE'	=> outputDate('F Y', $selectedDate),
 				'NEXT_MONTH'	=> date('Y-m-d', strtotime('+1 month', $selectedDate)),
 				'PREV_MONTH'	=> date('Y-m-d', strtotime('-1 month', $selectedDate)),
 				'SELECTED_DATE'	=> outputDate('Y-m-d', $selectedDate),
-                'USER_ID'       => $this->arg[1],
+                'WORK_USER_ID'  => is_numeric($this->arg[1])?$this->arg[1]:$_SESSION['id'],
 				);
 
 $this->setVar($output);
@@ -278,12 +278,11 @@ if(count($allWork) > 0) {
             'WORK_DATE'   => $currentWork['relevant_date']->format(Cfg::get('date_short')),
             'WORK_BOX_ID' => $currentWork['bid'],
             'WORK_FILE_ID' => $currentWork['fid'],
-            'ROW_COLOR' => !($j % 2) ? 'dark' : ''
+            'ROW_COLOR' => !($j++ % 2) ? 'dark' : ''
         ));
 
         $this->parse('work_block', 'work', true);
 
-        $j++;
     }
     
 }
@@ -319,6 +318,7 @@ foreach($categoryList as $key => $value) {
 /* Make a list of assessments
  */
 $allAssessments = $assessHandler->getList($categoryIDList, 10);
+$j=0;
 
 if ($allAssessments) {
     foreach($allAssessments as $currentAssessment) {
@@ -412,7 +412,7 @@ if ($allAssessments) {
 						$this->setVar('viewMarks_block', '');
 					}
 				}
-
+                $this->setVar('DARK',$j++ % 2 ?'' : 'dark');
 				$this->parse('attempt_block', 'attempt', true);
 			}
 		}

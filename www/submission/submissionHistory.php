@@ -24,7 +24,7 @@ $submissionHandler = new Submission;
 $returnHandler = new SubmissionReturn;
 
 
-if (is_numeric($this->arg[1]) && ($groupHandler->isParentOfChile($this->arg[1]) || $groupHandler->isStaff() || $_SESSION['id'] == $this->arg[1])) {
+if (is_numeric($this->arg[1]) && ($groupHandler->isParentOfChild($this->arg[1]) || $groupHandler->isStaff() || $_SESSION['id'] == $this->arg[1])) {
 	$userID = $this->arg[1];
 }
 else {
@@ -202,7 +202,7 @@ else {
 		'WORK_BOX_ID' => $submissionBox['id']
 	));
 
-    if(mktime() > strtotime($submissionBox['open_date']) && mktime() < strtotime($submissionBox['late_date']) && $submissionBox['accept_submission'])
+    if($userID == $_SESSION['id'] && mktime() > strtotime($submissionBox['open_date']) && mktime() < strtotime($submissionBox['late_date']) && $submissionBox['accept_submission'])
 	    $this->parse('action_submit_block', 'action_submit');
     else
         $this->setVar('action_submit_block','');

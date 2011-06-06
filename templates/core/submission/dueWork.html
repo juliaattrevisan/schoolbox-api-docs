@@ -110,7 +110,7 @@ $j(function () {
 			<thead>
 			<td class="cal-left" colspan="3"><a class="back" href="/submission/dueWork/{PREV_MONTH}/{USER_ID}" title="Back one month"><strong>&lt;&lt;</strong></a>
 					<div class="current-date">{CURRENT_DATE}</div>
-					<a class="forward" href="/submission/dueWork/{NEXT_MONTH}/{USER_ID}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
+					<a class="forward" href="/submission/dueWork/{NEXT_MONTH}/{WORK_USER_ID}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
 				<td></td>
 				<td colspan="3"><select name="subject" id="subjectFilter">
 						<option value="">Show All</option>
@@ -157,16 +157,16 @@ $j(function () {
 		</table>
 	</div>
 	<div class="box component">
-		<h2>Recent Work Activity <a href="/submission/allDueWork/{USER_ID}" class="btn"><span></span>View all work</a></h2>
+		<h2>Recent Work Activity <a href="/submission/allDueWork/{WORK_USER_ID}" class="btn"><span></span>View all work</a></h2>
 		<div class="listing">
 			<table class="due-dates">
 				<thead>
 					<tr>
-						<th width="20%">Date</th>
-						<th width="15%">Subject</th>
+						<th width="22%">Date</th>
+						<th width="20%">Subject</th>
 						<th width="25%">Description</th>
-						<th width="15%">Status</th>
-						<th width="25%"></th>
+						<th width="17%">Status</th>
+						<th width="15%"></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -176,7 +176,7 @@ $j(function () {
 						<td>{WORK_SUBJECT}</td>
 						<td>{WORK_DESCRIPTION}</td>
 						<td valign="top">{WORK_STATUS}</td>
-						<td><a href="/submission/submissionHistory/{WORK_BOX_ID}" class="btn" style="overflow:hidden"><span></span>{WORK_ACTION}</a></td>
+						<td nowrap="nowrap"><a href="/submission/submissionHistory/{WORK_BOX_ID}/{WORK_USER_ID}">{WORK_ACTION}</a></td>
 					</tr>
 					<!-- END work -->
 				</tbody>
@@ -234,12 +234,12 @@ $j(function () {
 				<li class="bars {DARK} clearfix"> <a href="/homepage/{SUMMARY_CAT_ID}">{SUMMARY_CAT_NAME}</a> 
 					<!-- BEGIN summary_due -->( {SUMMARY_DUE} Due )<!-- END summary_due -->
 					<p>{SUMMARY_TEACHER}</p>
-					<div class="barchart">
+					<!-- <div class="barchart">
 						<div>
 							<div id="progressbar-{SUMMARY_CAT_ID}"></div>
 						</div>
 						<div class="value">{PERCENTAGE_COMPLETED}%</div>
-					</div>
+					</div> -->
 				</li>
 				<!-- END summary -->
 			</ul>
