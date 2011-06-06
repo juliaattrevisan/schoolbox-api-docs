@@ -1,94 +1,131 @@
 <?php
 
+/**
+ *
+ * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
+ * @copyright   2011 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ * 
+ */
+
 ini_set('display_errors',1);
 error_reporting(E_ALL & ~E_NOTICE);
 
+header("Content-type: application/json");
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
-require_once SITE_root . '/library/chat.php';
-require_once SITE_root . '/library/group.php';
 require_once SITE_root . '/library/homepage.php';
+require_once SITE_root . '/library/group.php';
+require_once SITE_root . '/library/chat.php';
 
-$data_recv = array();
-$data_send = $_POST['send'];
-
-$category_id = $data_send['config']['category_id'];
-$component_id = $data_send['config']['component_id'];
-
-$chat = new Chat($data_send['config']);
-$group = new Group();
 $page = new SitePage;
+$group_handler = new Group();
+$chat_handler = new Chat();
+$homepage_handler = new Homepage($category_id);
 
-$homepage = new Homepage($category_id);
+$method = $_POST['method'];
+$category_id = $_POST['category_id'];
 
-/* Check in */
-$chat->poll($category_id, $_SESSION['id']);
+$config = $homepage_handler->getComponentConfig($_POST['component_id']);
 
-/* Receive */
-$data_recv = array(
-    'users'    => $chat->users($category_id),
-    'messages' => $chat->receive($category_id, $data_send['config']['last_time']) // must be last
-);
-
-// clear all?
-if ($data_recv['config']['clear']) {
-    $chat->clear($category_id);
-
-    unset($data_recv['config']['clear']);
+if (empty($config['muted_users'])) {
+    $config['muted_users'] = array();
 }
 
-// clear inactive users
-if (!empty($data_recv['users']['inactive'])) {
-    $chat->users_remove($data_recv['users']['inactive']);
+/* Send message */
+if ($method == 'send') {
 
-    foreach ($data_recv['users']['inactive'] as $user) {
-        $chat->system_send($user['category_id'], 'disconnect', formatName($user) . ' disconnected.', $user['time']);
-    }
-}
+    if (!in_array($_SESSION['id'], $config['muted_users']) && $config['state'] == 'Active') {
+        $chat_handler->create_log($_POST['category_id'], $_POST['user_id'], $_POST['body']);
 
-// santize messages
-if (!empty($data_recv['messages'])) {
-    foreach ($data_recv['messages'] as $i => $message) {
-        $data_recv['messages'][$i]['body'] = scrubTEXT($message['body']);
-    }
-}
+        $time = new DateTime();
 
-/* Send */
-if (!empty($data_send['messages'])) {
-    foreach ($data_send['messages'] as $message) {
-        $message = array(
-            'category_id' => $category_id,
-            'user_id'     => $_SESSION['id'],
-            'type'        => 'user',
-            'time'        => $message['time'],
-            'body'        => $message['body']
+        $data = array(
+            'time' => $time->format('D M j Y H:i:s \G\M\TO (T)'),
         );
 
-        $chat->send($message);
+        echo json_encode($data);        
     }
+
 }
 
-/* Config */
-$component_config = $homepage->getComponentConfig($component_id);
-$permission = $group->getPermission($category_id, $_SESSION['id']);
+/* Receive messages */
+else if ($method == 'receive') {
 
-if (empty($data_recv['users']['admin'])) {
-    $component_config['state'] = 'Inactive';
+    if (empty($_POST['last_poll']) || $_POST['last_poll'] == 'null') {
+        $last_poll = new DateTime();
+        $last_poll->sub(new DateInterval('PT1800S')); // 30 minutes
+    } else {
+        $last_poll = new DateTime($_POST['last_poll']);
+    }
+
+    $log = $chat_handler->get_logs($category_id, $last_poll);
+
+    if (empty($log)) {
+        $log = array();
+    }
+
+    $time = new DateTime();
+
+    $data = array(
+        'time' => $time->format('D M j Y H:i:s \G\M\TO (T)'),
+        'log' => $log
+    );
+
+    echo json_encode($data);
+
 }
 
-if ($permission >= WRITE_ACCESS) {
-    $component_config['muted_users'] = $data_send['config']['muted_users'];
+/* Poll */
+else if ($method == 'poll') {
+    $chat_handler->update_poll($category_id, $_SESSION['id']);
+
+    /* Return list of active users */
+    $chat_handler->prune_users($category_id);
+
+    $users = $chat_handler->get_users($category_id);
+
+    if (empty($users)) {
+        $users = array();
+    }
+
+    $time = new DateTime();
+
+    $data = array(
+        'time' => $time->format('D M j Y H:i:s \G\M\TO (T)'),
+        'users' => $users,
+        'config' => $homepage_handler->getComponentConfig($_POST['component_id']),
+    );
+
+    echo json_encode($data);
 }
 
-$homepage->setComponentConfig($component_id, $component_config);
+/* Mute or unmute user */
+else if ($method == 'mute') {
+    $idx = array_search($_POST['user_id'], $config['muted_users']);
 
-$data_recv['config'] = array(
-    'last_time' => $chat->_config['last_time']->format('Y-m-d H:i:s'),
-    'permission' => $permission,
-);
+    if ($idx === false) {
+        $config['muted_users'][] = $_POST['user_id'];
+    } else {
+        unset($config['muted_users'][$idx]);
+    }
 
-$data_recv['config'] = array_merge($data_send['config'], $data_recv['config'], $component_config);
+    $homepage_handler->setComponentConfig($_POST['component_id'], $config);
+    
+    $time = new DateTime();
 
-header("Content-type: application/json");
-echo json_encode($data_recv);
+    $data = array(
+        'time' => $time->format('D M j Y H:i:s \G\M\TO (T)'),
+        'config' => $config
+    );
+
+    echo json_encode($data);
+}
+
+/* Update or get config */
+else if ($method == 'config') {
+    
+}
 
 ?>

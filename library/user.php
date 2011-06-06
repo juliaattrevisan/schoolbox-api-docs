@@ -156,9 +156,9 @@ class User extends Model {
 					FROM user LEFT JOIN groups ON user.group_id = groups.id WHERE ";
 
         if ($keyword != "") {
-            if (is_numeric($keyword))
+            if (is_numeric($keyword)) {
                 $query .= "( synergy_id = $keyword OR year = $keyword ) ";
-            else {
+            } else {
                 if (preg_match('/([[:alpha:]\']+) ([[:alpha:]\']+)/', $keyword, $name))
                     $query .= "( firstname like '%{$name[1]}%' and lastname like '%{$name[2]}%' ) ";
                 else

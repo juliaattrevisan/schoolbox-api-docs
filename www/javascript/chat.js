@@ -1,200 +1,303 @@
-function Chat (config) {
-    this.send_data = {
-        config: {},
-        messages: {}
-    };
+(function($) {
 
-    this.config = config;
-    this.update();
-    this.interval();
-}
-
-Chat.prototype = {
-    interval: function () {
-        var self = this;
-
-        this.interval_ref = setInterval(function () {
-            self.update();
-        }, 4000);
+$.widget("ui.chat",  {
+    options: {
+        state: 'Active',
+        category_id: null,
+        component_id: null,
+        user_id: null,
+        user_name: null,
+        user_perm: 1, // 1 Read Access, 2 Write Access, 3 Full Access
+        log_el: 'ul.chat-messages',
+        users_el: 'ul.chat-users',
+        body_el: 'textarea',
+        send_el: 'input[type="submit"]',
+        base_freq: 4,
+        poll_freq: 8, // seconds,
+        recv_freq: 4
     },
 
-    update: function () {
-        var self = this;
+    _create: function () {
+        var $self = this;
 
-        this.send_data.config = this.config;
+        /* Apply JQuery to elements */
+        this.options.body_el = $(this.options.body_el, $self.element);
+        this.options.users_el = $(this.options.users_el, $self.element);
+        this.options.send_el = $(this.options.send_el, $self.element);
+        this.options.log_el = $(this.options.log_el, $self.element);
 
-        $j.ajax({
+        this.last_poll = null;
+
+        /* Receive interval */
+        this._receive();
+
+        if (this.options.state == 'Active') {
+            
+        } else {
+            return false;
+        }
+
+        this._poll();
+
+        this.interval_cnt = 0;
+        this.interval_ref = setInterval(function () {
+            var run_time = $self.options.base_freq * 1000 * $self.interval_cnt;
+
+            var recv_time = $self.options.recv_freq * 1000;
+            var poll_time = $self.options.poll_freq * 1000 ;
+
+            if (run_time % recv_time == 0 && $self.options.state == 'Active') {
+                $self._receive();
+            }
+
+            if (run_time % poll_time == 0 && $self.options.state == 'Active') {
+                $self._poll();
+            }
+
+            $self.interval_cnt++;
+        }, this.options.base_freq * 1000);
+
+        /* Attach events */
+        this.options.send_el.click(function (event) {
+            var $body_el = $self.options.body_el;
+
+            event.preventDefault();
+
+            if ($body_el.val().length > 0) {
+                $self._send($self);
+			} else {
+                $body_el.animate({ backgroundColor: "#f0f0f0" }, 100).animate({ backgroundColor:'#fff'}, 100);
+                $body_el.parent().animate({ backgroundColor: "#f0f0f0" }, 100).animate({ backgroundColor:'#fff'}, 100);
+			}
+        });
+
+        this.options.body_el.keypress(function (event) {
+            /* Execute send on enter key pressed */
+            if (event.keyCode == 13) {
+                var $body_el = $self.options.body_el;
+
+				event.preventDefault();
+                
+				if ($body_el.val().length > 0) {
+                    $self._send($self);
+				} else {
+                    $body_el.animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
+                    $body_el.parent().animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
+				}
+            }
+        });
+
+    },
+
+    _interval: function () {
+        var $self = this;
+
+        var run_time = $self.options.base_freq * 1000 * $self.interval_cnt;
+
+        var recv_time = $self.options.recv_freq * 1000;
+        var poll_time = $self.options.poll_freq * 1000 ;
+
+        if (run_time % recv_time == 0) {
+            $self._receive();
+        }
+
+        if (run_time % poll_time == 0) {
+            $self._poll();
+        }
+
+        $self.interval_cnt++;        
+    },
+
+    _send: function ($self) {
+        var $message = {
+            method: 'send',
+            category_id: $self.options.category_id,
+            component_id: $self.options.component_id,
+            user_id: $self.options.user_id,
+            last_poll: $self.last_poll,
+            body: $self.options.body_el.val()
+        };
+
+        $($self).trigger('send', null, $message);
+
+        $.ajax({
             type: 'POST',
             url: '/ajax/chat.php',
-            data: {send: this.send_data},
-            success: function (data) {
-                self.recv(data);
+            data: $message,
+            success: function () {
+                $self.options.body_el.val('');
+            },
+            dataType: 'json'
+        });
+    },
+
+    _receive: function () {
+        var $self = this;
+
+        $.ajax({
+            type: 'POST',
+            url: '/ajax/chat.php',
+            data: {
+                method: 'receive',
+                category_id: this.options.category_id,
+                component_id: $self.options.component_id,
+                user_id: this.options.user_id,
+                last_poll: this.last_poll
+            },
+            success: function ($data) {
+                
+                /* Output received messages */
+                var $log = $data.log;
+
+                for (var $i in $log) {
+                    $self._append_message($log[$i]);
+                }
+
+                /* Set last poll to now */
+                $self.last_poll = $data.time;
+
             },
             dataType: 'json'
         });
 
-        this.send_data.messages = {};
     },
 
-    recv: function (data) {
-        this.config = data.config;
-        this.users = data.users;
+    _append_message: function ($message) {
+        var $message_el = $('<li></li>').addClass('chat-message-' + $message.type);
 
-        this.render_config(data.config);
-
-        if (this.config.state == 'Active' || this.is_admin()) {
-            this.render_users(data.users);
-            this.render_messages(data.messages);
-        } else {
-            this.render_inactive(data.messages);
+        if ($message.user_id == this.options.user_id) {
+            $message_el.addClass('chat-message-user-me');
         }
+
+        $message_el.html('<span class="chat-user"><span class="triangulate"></span><span class="chat-username">'+$message.name+'</span><span class="chat-time">'+$message.time+'</span></span><span class="chat-message">'+$message.body+'</span>');
+
+        this.options.log_el.append($message_el).attr({ scrollTop: this.options.log_el.attr("scrollHeight") });
     },
 
-    send: function () {
-        var self = this;
-        var message = $j('#component'+this.config.component_id+' textarea[name="message"]');
+    _poll: function () {
+        var $self = this;
 
-        var data = {
-            messages: {
-                0: {
-                    title: self.config.name.title,
-                    firstname: self.config.name.firstname,
-                    lastname: self.config.name.lastname,
-                    user_id: self.config.user_id,
-                    type: 'user',
-                    time: (new Date()).toString(),
-                    body: message.val()
+        $.ajax({
+            type: 'POST',
+            url: '/ajax/chat.php',
+            data: {
+                method: 'poll',
+                category_id: this.options.category_id,
+                component_id: $self.options.component_id,
+                user_id: this.options.user_id
+            },
+            success: function ($data) {
+                
+                /* Output received users */
+                var $user_list_el = $self.options.users_el;
+
+                var $x = 0;
+
+                $user_list_el.empty();
+
+                for (var $i in $data.users) {
+                    var $user = $data.users[$i];
+
+                    var $user_el = $('<li></li>');
+
+                    $user_el.text($user.name).data('user_id', $user.user_id);
+
+                    //every two add in the dark class chimchim
+                    if ($x%2 != 0) {
+                        $user_el.addClass('dark');
+                    }
+                    $x++;
+
+                    /* If admin */
+                    if ($user.perm > 1) {
+                        $user_el.addClass('chat-user-admin');                        
+                    }
+
+                    /* If self */
+                    if ($user.user_id == $self.options.user_id) {
+                        $user_el.addClass('chat-user-me');
+                    }
+
+                    /* Mute/unmute buttons */
+                    if ($self.options.user_perm > $user.perm && $user.user_id != $self.options.user_id) {
+                        var $mute_el = $('<a href="#">mute</a>');
+
+                        if ($data.config.muted_users != undefined && $.inArray($user.user_id, $data.config.muted_users) > -1) {
+                            $user_el.addClass('chat-user-muted');
+                        }
+
+                        $mute_el.click(function ($event) {
+                            $event.preventDefault();
+
+                            var $user_id = $(this).parent().data('user_id');
+
+                            $self._mute_user($user_id);
+                        });
+
+                        $mute_el.appendTo($user_el);
+                    }
+                    
+                    $user_el.appendTo($user_list_el);
                 }
-            }
-        };
-	
-        message.val('');
-	
-        this.render_messages(data.messages);
-        $j.extend(this.send_data, data);
-    },
 
-    mute: function (user_id) {
-        var self = this;
-        
-        if (self.config.muted_users[user_id] != 'true') {
-            self.config.muted_users[user_id] = 'true';
-        } else {
-            delete self.config.muted_users[user_id];
-        }
-
-        this.render_users(self.users);
-    },
-
-    clear: function () {
-        this.config.clear = true;
-    },
-
-    render_messages: function (messages) {
-        var self = this;
-
-        var messages_el = $j('#component'+this.config.component_id+' ul.chat-messages');
-		
-        for (var i in messages) {
-            var message = messages[i];
-
-            message.time = (new Date(message.time)).toLocaleTimeString();
-            message.name = formatName(message);
-
-            var message_el = $j('<li></li>').addClass('chat-message-' + message.type);
-
-            if (self.users.admin[message.user_id] != undefined) {
-                message_el.addClass('chat-message-user-admin');
-            } else if (message.user_id == self.config.user_id) {
-                message_el.addClass('chat-message-user-me');
-            }
-
-            if (message.type == 'user') {
-                message_el.html('<span class="chat-user"><span class="triangulate"></span><span class="chat-username">'+message.name+'</span><span class="chat-time">'+message.time+'</span></span><span class="chat-message">'+message.body+'</span>');
-            } else {
-                message_el.html('<span class="chat-user"><span class="triangulate"></span></span><span class="chat-message">'+message.body+'</span>');
-            }
-
-            messages_el.append(message_el);
-        }
-    },
-
-    render_users: function (users) {
-        var self = this;
-
-        var chat_users_el = $j('#component'+this.config.component_id+' ul.chat-users');
-        chat_users_el.empty();
-
-        var x = 0;
-
-        for (var i in users.active) {
-            var user = users.active[i];
-			
-            //every two add in the dark class chimchim
-            if (x%2 == 0) {
-                var user_el = $j('<li></li>')
-            } else {
-                var user_el = $j('<li class="dark"></li>')
-            }
-
-            if (self.users.admin[user.user_id] != undefined) {
-                user_el.addClass('chat-user-admin');
-            } else if (user.user_id == self.config.user_id) {
-                user_el.addClass('chat-user-me');
-            }
-
-            user_el.text(formatName(user))
-            .data('user_id', user.user_id);
-
-            // mute logic
-            if (this.config.muted_users == undefined) {
-                this.config.muted_users = {};
-            }
-
-            if (this.config.muted_users[user.user_id] == 'true') {
-                user_el.addClass('chat-user-muted');
-            }
-
-            if (this.is_admin() && user.user_id != self.config.user_id) {
-                if (this.config.muted_users[user.user_id] != 'true') {
-                    var user_mute_el = $j('<a href="#">mute</a>');
+                /* Act on new config */
+                if ($data.config.muted_users != undefined && $.inArray($self.options.user_id, $data.config.muted_users) > -1) {
+                    $self.options.body_el.attr('disabled', 'disabled');
                 } else {
-                    var user_mute_el = $j('<a href="#">unmute</a>');
+                    $self.options.body_el.removeAttr('disabled');
                 }
 
-                user_mute_el.click(function () {
-                    var user_id = $j(this).parent().data('user_id');
+                /* Change state */
+                if ($data.config.state == 'Active') {
+                    $('.light', $self.element).css('background-position', "bottom");
+                    $('.light', $self.element).addClass('is-active');
+                } else {
+                    $j('.light', $self.element).css('background-position', "top");
 
-                    self.mute(user_id);
-                }).appendTo(user_el);
-            }
+                    $self.options.body_el.attr('disabled', 'disabled');
+                }
 
-            chat_users_el.append(user_el);
+            },
+            dataType: 'json'
+        });
 
-            x++;
-        }
     },
 
-    render_config: function (config) {
-        if (config.state == 'Active') {
-            $j('.light').css('background-position', "bottom");
-			$j('.light').addClass('is-active');
-        } else {
-            this.render_users({});
-            
-            $j('.light').css('background-position', "top");
+    _mute_user: function ($user_id) {
+        var $self = this;
 
-            if(!this.is_admin()) {
-                $j('textarea.chat-message-box').attr('disabled', 'true');
-            }
-        }
-    },
-
-    is_admin: function (user_id) {
-        if (user_id == undefined) {
-            user_id = this.config.user_id;
-        }
-
-        return this.users.admin[user_id] != undefined;
+        $.ajax({
+            type: 'POST',
+            url: '/ajax/chat.php',
+            data: {
+                method: 'mute',
+                category_id: $self.options.category_id,
+                component_id: $self.options.component_id,
+                user_id: $user_id
+            },
+            success: function ($data) {
+                $self._poll();
+            },
+            dataType: 'json'
+        });
     }
-};
+});
+
+})(jQuery);
+
+/*
+render_config: function (config) {
+    if (config.state == 'Active') {
+        $j('.light').css('background-position', "bottom");
+        $j('.light').addClass('is-active');
+    } else {
+        this.render_users({});
+
+        $j('.light').css('background-position', "top");
+
+        if(!this.is_admin()) {
+            $j('textarea.chat-message-box').attr('disabled', 'true');
+        }
+    }
+}
+*/

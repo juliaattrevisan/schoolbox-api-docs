@@ -19,7 +19,7 @@ class Homepage {
 			return $this->db->getOne($query);
 	}
 	
-	function getComponentList()
+	function getComponentList($type = null)
 	{
 		$query = "SELECT t.homepageComponentCategoryID AS categoryID, t.name as categoryName, id, c.name, component, description, allowMultiple,
                     (SELECT COUNT(*) FROM homepage_comp_location hcl WHERE hcl.component = c.id AND hcl.cid = {$this->cid}) as componentCount
@@ -27,8 +27,14 @@ class Homepage {
                     JOIN homepageComponentCategory t ON t.homepageComponentCategoryID = homepageCategoryID
                     LEFT JOIN homepage_comp_location l ON l.component = c.id AND cid = {$this->cid}
 
-                  WHERE ( invisible = 'false' OR l.component IS NOT NULL ) GROUP BY id ORDER BY homepageCategoryID, c.name";
+                  WHERE ( invisible = 'false' OR l.component IS NOT NULL )";
 
+
+        if (is_numeric($type)) {
+            $query .= " AND component = $type";
+        }
+
+        $query .= " GROUP BY id ORDER BY homepageCategoryID, c.name";
 
 		return $this->db->getAll($query);
 	}

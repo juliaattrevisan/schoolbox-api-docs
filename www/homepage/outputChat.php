@@ -10,6 +10,8 @@ if (empty($config['state'])) {
 }
 
 $this->setBlock('config', 'chat_state', 'chat_state_block');
+$this->setBlock($componentHandle, 'chat_state_active', 'chat_state_active_block');
+$this->setBlock($componentHandle, 'chat_state_inactive', 'chat_state_inactive_block');
 
 foreach (array('Active', 'Inactive') as $state) {
     $this->setVar(array(
@@ -20,12 +22,25 @@ foreach (array('Active', 'Inactive') as $state) {
     $this->parse("chat_state_block", "chat_state", true);    
 }
 
+if ($config['state'] == 'Active') {
+    $this->setVar('chat_state_inactive_block', '');
+    $this->parse('chat_state_active_block', 'chat_state_active');
+} else {
+    $this->setVar('chat_state_active_block', '');
+
+    if ($permission > 1) {
+        $this->parse('chat_state_inactive_block', 'chat_state_inactive');
+    } else {
+        $this->setVar('chat_state_inactive_block', '');        
+    }
+}
+
 $this->setVar(array(
     'CHAT_COMPONENT_ID' => $component['homepageComponentLocationID'],
-    'CHAT_USER_ID' => $_SESSION['id'],
-    'CHAT_NAME_TITLE' => $_SESSION['title'],
-    'CHAT_NAME_FIRSTNAME' => $_SESSION['firstname'],
-    'CHAT_NAME_LASTNAME' => $_SESSION['lastname'],
+    'CHAT_USER_ID'      => $_SESSION['id'],
+    'CHAT_USER_NAME'    => formatName($_SESSION),
+    'CHAT_USER_PERM' => $group->getPermission($componentID),
+    'CHAT_STATE'        => $config['state'],
 ));
 
 ?>

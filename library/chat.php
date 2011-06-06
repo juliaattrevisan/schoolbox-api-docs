@@ -5,143 +5,96 @@ require_once dirname(__FILE__) . '/../library/group.php';
 require_once dirname(__FILE__) . '/../library/homepage.php';
 
 class Chat extends Model {
-    function __construct ($config = array()) {
+    function __construct () {
             $this->_table = "chat";
             $this->_index = "id";
-            $this->_config = $config;
 
             $this->group = new Group();
-
-            if ($this->_config['last_time'] == 'null') {
-                $this->_config['last_time'] = new DateTime('-15 minutes');
-            } else {
-                $this->_config['last_time'] = new DateTime($this->_config['last_time']);
-            }
 
             parent::Model();
     }
 
-    /*
-     * Creates a message in a specified chat module
-     */
-    function send ($data) {
-        $data['time'] = new DateTime($data['time']);
+    /* Get logs */
+    function get_logs ($category_id, $last_poll = null) {
+        $query = "SELECT title, firstname, lastname, c.*
+                  FROM {$this->_table} c LEFT JOIN user ON c.user_id = user.id
+                  WHERE `category_id` = $category_id";
 
-        if (!is_object($this->_config['last_time']) || $data['time'] > $this->_config['last_time']) {
-            $this->_config['last_time'] = $data['time'];
+        if ($last_poll instanceof DateTime) {
+            $query .= " AND `time` > '" . $last_poll->format('Y-m-d H:i:s') . "'";
         }
 
-        $data['time'] = $data['time']->format('Y-m-d H:i:s');
+        $query .= " ORDER BY time ASC";
 
-        return $this->create($data);
+        $logs = $this->db->getAll($query);
+
+        if (!empty($logs)) {
+
+            foreach ($logs as &$log) {
+                $log_time = new DateTime($log['time']);
+
+                $log['time_js'] = $log_time->format('D M j Y H:i:s \G\M\TO (T)'); // Thu Apr 14 2011 15:54:52 GMT+1000 (EST)
+                $log['name'] = formatName($log);
+            }
+
+        }
+
+        return $logs;
     }
 
-    function system_send ($category_id, $type, $body = null, $time = null) {
-        if ($time == null) {
-            $time = new DateTime();
-        }
+    /* Create logs */
+    function create_log ($category_id, $user_id, $body, $type = 'user') {
+        $time = new DateTime();
 
         return $this->create(array(
             'category_id' => $category_id,
-            'user_id'     => 0,
+            'user_id'     => $user_id,
             'type'        => $type,
             'time'        => $time->format('Y-m-d H:i:s'),
             'body'        => $body
         ));
     }
 
-    /*
-     * Receives messages for a specific chat module
-     */
-    function receive ($category_id, $last_time) {
-        $query = "SELECT title, firstname, lastname, chat.*
-            FROM chat LEFT JOIN user ON chat.user_id = user.id
-            WHERE `category_id` = $category_id";
-
-        $query .= " AND `time` > '" . $this->_config['last_time']->format('Y-m-d H:i:s') . "'";
-        $query .= " ORDER BY time ASC";
-
-        $messages = $this->db->getAll($query);
-
-        if (!empty($messages)) {
-            $last_message = end($messages);
-            $last_message_time = new DateTime($last_message['time']);
-
-            if (!is_object($this->_config['last_time']) || $last_message_time > $this->_config['last_time']) {
-                $this->_config['last_time'] = $last_message_time;
-            }
-
-            foreach ($messages as &$message) {
-                $message['time'] = new DateTime($message['time']);
-                $message['time'] = $message['time']->format('D M j Y H:i:s \G\M\TO (T)'); // Thu Apr 14 2011 15:54:52 GMT+1000 (EST)
-            }
-        }
-
-        return $messages;
-    }
-
-    function clear ($category_id) {
-        $query = "DELETE FROM chat WHERE category_id = $category_id";
+    function clear_log ($category_id) {
+        $query = "DELETE FROM {$this->_table} WHERE category_id = $category_id";
 
         return $this->db->query($query);
     }
 
-    function poll ($category_id, $user_id = null) {
-        if (is_numeric($user_id)) {
-            $query = "INSERT INTO chat_poll (user_id, category_id, time)
-                VALUES ($user_id, $category_id, NOW())
-                ON DUPLICATE KEY UPDATE time = NOW()";
-        }
+    function update_poll ($category_id, $user_id) {
+        $query = "INSERT INTO chat_poll (user_id, category_id, time)
+                  VALUES ($user_id, $category_id, NOW())
+                  ON DUPLICATE KEY UPDATE time = NOW()";
 
         return $this->db->query($query);
     }
 
-    function users ($category_id) {
-        $last_time_limit = new DateTime('-6 seconds');
-        
+    function get_users ($category_id) {
         $query = "SELECT title, firstname, lastname, chat_poll.*
-            FROM chat_poll LEFT JOIN user ON chat_poll.user_id = user.id
-            WHERE `category_id` = $category_id";
+                  FROM chat_poll LEFT JOIN user ON chat_poll.user_id = user.id
+                  WHERE `category_id` = $category_id";
 
-        $users_all = $this->db->getAll($query);
+        $users = $this->db->getAll($query);
 
-        foreach ($users_all as $user) {
-            $user['time'] = new DateTime($user['time']);
-
-            if ($user['time'] > $last_time_limit) {
-                $users['active'][$user['user_id']] = $user;
-            } else {
-                $users['inactive'][$user['user_id']] = $user;
-            }
-
-            if ($this->group->getPermission($this->_config['category_id'], $user['user_id']) >= WRITE_ACCESS) {
-                $users['admin'][$user['user_id']] = $user;
+        if (!empty($users)) {
+            foreach ($users as &$user) {
+                $user['name'] = formatName($user);
+                $user['perm'] = $this->group->getPermission($category_id, $user['user_id']);
             }
         }
 
         return $users;
     }
 
-    function users_remove ($users) {
-        $query = "DELETE FROM chat_poll WHERE ";
+    function prune_users ($category_id) {
+        $time = new DateTime();
+        $time->sub(new DateInterval('PT12S'));
 
-        foreach ($users as $user) {
-            if (empty($or)) {
-                $query .= "`user_id` = " . $user['user_id'];
-
-                $or = true;
-            } else {
-                $query .= " OR `user_id` = " . $user['user_id'];
-            }
-        }
+        $query = "DELETE FROM chat_poll
+                  WHERE time < '".$time->format('Y-m-d H:i:s')."'
+                    AND category_id = $category_id";
 
         return $this->db->query($query);
-    }
-
-    function config ($config = null) {
-        if ($config)
-            $this->_config = $config;
-        return $this->_config;
     }
 }
 
