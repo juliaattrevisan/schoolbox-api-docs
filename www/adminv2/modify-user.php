@@ -58,6 +58,7 @@ if(is_numeric($this->arg[0])) {
                         'SUPERUSER_CHECKED' => $user['su']==1?'checked="checked"':'',
                         'LASTNAME'          => $user['lastname'],
                         'EPORTFOLIO_CHECKED'=> $user['eportfolio_enabled']==1?'checked="checked"':'',
+                        'LOCAL_EMAIL_CHECKED'=> $user['local_email']==1?'checked="checked"':'',
                         'YEAR'              => $user['year'],
                         'DATABASE_TYPE'     => ucfirst(Cfg::get('external_type')),
             );

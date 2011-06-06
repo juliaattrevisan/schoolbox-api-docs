@@ -212,7 +212,7 @@ $j(function() {
 						<tr>
 							<td>Campus</td>
 							<td>Set default</td>
-							<td>Enabled</td>
+							<td>Involved</td>
 						</tr>
 					</thead>
 					<tbody>
@@ -260,6 +260,9 @@ $j(function() {
 				<label for ="superuser" class="width2 ">Superuser
 					<input type="checkbox" name="superuser" value="1" onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME} superuser status?'));" {SUPERUSER_CHECKED} />
 				</label>
+                <label for ="local_email" class="width2 ">Local Email
+						<input type="checkbox" name="local_email" value="1" {LOCAL_EMAIL_CHECKED} />
+			    </label>
 				<label for="year">Year
 					<input type="text" name="year" value="{YEAR}" />
 				</label>
