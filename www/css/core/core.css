@@ -3838,7 +3838,7 @@ p.bubble-name {
   -webkit-border-radius: 4px; 
           border-radius: 4px; 
 		  display:block;
-		  -moz-transition-property: border-color, background-color;
+	-moz-transition-property: border-color, background-color;
 	-moz-transition-duration: .4s;
 	-moz-transition-timing-function: ease-out;
 	-webkit-transition-property: border-color, background-color;
@@ -3847,6 +3847,8 @@ p.bubble-name {
 	-o-transition-duration: .4s;
 	-ms-transition-property:border-color, background-color;
 	-ms-transition-duration: .4s;
+	transition-property:border-color, background-color;
+	transition-duration: .4s;
    
   -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
  }
@@ -3858,7 +3860,9 @@ p.bubble-name {
 	-o-transition-property: border-color, background-color;
 	-o-transition-duration: .4s;
 	-ms-transition-property:border-color, background-color;
-	-ms-transition-duration: .4s;}
+	-ms-transition-duration: .4s;
+	transition-property:border-color, background-color;
+	transition-duration: .4s;}
 
 
 /* FORUM */
