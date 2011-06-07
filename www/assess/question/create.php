@@ -103,9 +103,21 @@ else {
      */
     if (is_numeric($this->arg[1])) {
         $answerHandler = $factory->createAnswerModel($this->arg[1]);
-    }
-    else {
+
         $this->setVar(array(
+			'IMPORT_SELECTED' => '',
+            'DISABLED_SELECTED' => '',
+        ));
+    }
+    else if ($this->arg[1] == 'import'){
+        $this->setVar(array(
+            'IMPORT_SELECTED' => 'selected=\'selected\'',
+            'ANSWER_INPUTS' => ''
+        ));
+	}
+	else {
+        $this->setVar(array(
+			'IMPORT_SELECTED' => '',
             'DISABLED_SELECTED' => 'selected=\'selected\'',
             'ANSWER_INPUTS' => $answerTemplate
         ));

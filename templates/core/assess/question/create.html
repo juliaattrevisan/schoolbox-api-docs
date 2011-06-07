@@ -15,36 +15,38 @@ $j(document).ready(function() {
 	
     var section_id = '{SECTION_ID}';
 
-	if (($j('.question-type-select :selected').text()) == "-- Select Type --") {
+	/* Set current state of dropdown
+	 * Can't get val() of a disabled option element
+	 */
+	if ($j('.question-type-select :selected').text() == '-- Select Type --') {
 		$j('.next-step').hide();
 		$j('.question-holder').hide();
 		$j('.marks-holder').hide();
-		$j('#create').hide();
+		$j('#importQuestion').hide();
 	}
-
-	if (($j('.question-type-select :selected').text()) !== "-- Select Type --") {
-		$j('#type_id').change(function() {
-			var answer = confirm ("If you change the question type any text you've entered will be lost. Proceed?")
-			if (answer) {
-				var url = '/assess/question/create/' + section_id + '/' + $j('#type_id').val();
-				window.location = url;			
-				$j('.next-step').show();
-				$j('.question-holder').show();
-				$j('.marks-holder').show();
-			} 
-		});
-	} else {
-		$j('#type_id').change(function() {
-			var url = '/assess/question/create/' + section_id + '/' + $j('#type_id').val();
-			window.location = url;			
+	else {
+		if ($j('#type_id').val() == 'import') {
+			$j('.next-step').hide();
+			$j('.question-holder').hide();
+			$j('.marks-holder').hide();
+			$j('#create').hide();
+			$j('#importQuestion').show();
+		}
+		else {
 			$j('.next-step').show();
 			$j('.question-holder').show();
 			$j('.marks-holder').show();
-
-		});	
+			$j('#importQuestion').hide();
+		}
 	}
 
-	
+	/* Change state
+	 */
+	$j('#type_id').change(function() {
+		var url = '/assess/question/create/' + section_id + '/' + $j('#type_id').val();
+		window.location = url;
+	});
+
 	tinyMCE.init({
         mode : "exact",
 		elements: "question",
@@ -66,11 +68,7 @@ $j(document).ready(function() {
 		width:"100%",
 		file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
         file_browser_category_id : 0
-
 	});	
-	
-	
-	
 });
 </script>
 
@@ -96,10 +94,11 @@ $j(document).ready(function() {
 				<fieldset>
 					<label>Type</label>
 					<select name="type_id" id="type_id" class="question-type-select">
-						<option disabled {DISABLED_SELECTED}>-- Select Type --</option>
+						<option disabled {DISABLED_SELECTED} value='-1'>-- Select Type --</option>
 						<!-- BEGIN questionType -->
 						<option value="{QUESTIONTYPE_TYPE_ID}" {QUESTIONTYPE_SELECTED}>{QUESTIONTYPE_DESCRIPTION}</option>
 						<!-- END questionType -->
+						<option value="import" {IMPORT_SELECTED}>Import Question</option>
 					</select>
 				</fieldset>
 			
@@ -122,24 +121,22 @@ $j(document).ready(function() {
 				</div>
 				<input type="submit" name="create" id="create" value="Add Question" class="submit-btn-plain"/>
 			</form>
-		</div>
 
-		<br><br>
+			<div id="importQuestion">
+				<p><strong>Import a question and answer from an XML file</strong></p>
+				<p class="help">
+					Select an Assess Question XML file to import.
+				</p>
 
-		<h2>Import a question and answer from an XML file</h2>
-		<div class="assess-body">
-			<p class="help">
-				Select an Assess Question XML file to import.
-			</p>
+				<form action="/assess/question/import/{SECTION_ID}" method="post" class="standardForm clearfix" enctype="multipart/form-data">
+					<fieldset>
+						<label>File</label>
+						<input name="importXML" type="file" class="prettify"/>
+					</fieldset>
 
-			<form action="/assess/question/import/{SECTION_ID}" method="post" class="standardForm clearfix" enctype="multipart/form-data">
-				<fieldset>
-					<label>File</label>
-					<input name="importXML" type="file" class="prettify"/>
-				</fieldset>
-
-				<input type="submit" value="Import from XML file"  class="submit-btn-plain float-none"/>
-			</form>
+					<input type="submit" value="Import from XML file"  class="submit-btn-plain float-none"/>
+				</form>
+			</div>
 		</div>
 	</div>
 </div>

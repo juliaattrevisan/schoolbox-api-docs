@@ -11,27 +11,42 @@ $j(document).ready(function() {
 		$j('.question-holder').hide();
 		$j('.marks-holder').hide();
 	}
+	else {
 
-	if (($j('.question-type-select :selected').text()) !== "-- Select Type --") {
-		$j('#type_id').change(function() {
-			var answer = confirm ("If you change the question type any text you've entered will be lost. Proceed?")
-			if (answer) {
-				var url = '/assess/question/create/' + section_id + '/' + $j('#type_id').val();
-				window.location = url;			
-				$j('.next-step').show();
-				$j('.question-holder').show();
-				$j('.marks-holder').show();
-			} 
-		});
-	} else {
-		$j('#type_id').change(function() {
-			var url = '/assess/question/create/' + section_id + '/' + $j('#type_id').val();
-			window.location = url;			
+		/* Set current state
+		 */
+		if ($j('#type_id').val() == 'import') {
 			$j('.next-step').show();
 			$j('.question-holder').show();
 			$j('.marks-holder').show();
+		}
+		else {
 
-		});	
+			/* Hide import option
+			*/
+			$j('#importQuestion').hide();
+		}
+
+		/* Set state on change
+		$j('#type_id').change(function() {
+			var answer = confirm ("If you change the question type any text you've entered will be lost. Proceed?")
+			
+			if (answer) {
+				if ($j('#type_id').val() == 'import') {
+					$j('.next-step').hide();
+					$j('.question-holder').hide();
+					$j('.marks-holder').hide();
+
+					/* Show import option
+					 */
+					$j('#importQuestion').hide();
+				}
+				else {
+					var url = '/assess/question/create/' + section_id + '/' + $j('#type_id').val();
+					window.location = url;
+				}
+			}
+		});
 	}
 
 	tinyMCE.init({
