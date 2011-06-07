@@ -129,7 +129,7 @@ $j(function() {
 		event.preventDefault();
 		$j('#tabs-homepage').slideToggle();
 		$j(this).children('span').toggle();
-		$j('.manage h2, a.folder-manage').each(function () {
+		$j('.manage h2').each(function () {
 			$j(this).toggle();
 		});
 	});
