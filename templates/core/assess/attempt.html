@@ -44,9 +44,7 @@ $j(document).ready(function() {
 	});
 
 	$j('.textarea-container textarea').blur(function() {
-		if ($j(this).val() !== '') {
-			$j(this).parents('.assess-header form').submit();
-		}
+        $j(this).parents('.assess-header form').submit();
 	});
 	
 	$j('.assess-body input').blur(function() {

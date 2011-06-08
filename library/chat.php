@@ -35,6 +35,7 @@ class Chat extends Model {
 
                 $log['time_js'] = $log_time->format('D M j Y H:i:s \G\M\TO (T)'); // Thu Apr 14 2011 15:54:52 GMT+1000 (EST)
                 $log['name'] = formatName($log);
+                $log['user_perm'] = $this->group->getPermission($category_id, $log['user_id']);
             }
 
         }

@@ -193,7 +193,9 @@ class AssessSection extends Model {
                              AND assess_question.deleted_at IS NULL";
 
             $numResponses = $numQuestions;
-            $numResponses .= " AND response IS NOT NULL";
+            $numResponses .= " AND assess_response.response IS NOT NULL";
+            $numResponses .= " AND assess_response.response != 'N;'";
+            $numResponses .= " AND assess_response.response != ''";
 
             $currentSection['numQuestions'] = $this->db->getOne($numQuestions);
             $currentSection['numResponses'] = $this->db->getOne($numResponses);

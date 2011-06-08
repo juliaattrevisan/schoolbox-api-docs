@@ -60,22 +60,7 @@ class Session {
             * if(Cfg::get('ldap_enable'))
                 $this->setLDAPInfo($username);
             */
-
-            /* Log successful */
-            $loginlogquery = "INSERT INTO login_log (username, date, ip, login)
-                    VALUES ('".mysql_real_escape_string($username)."', NOW(), '$ip', '1')";
-            $this->db->query($loginlogquery);
-            return true;
         }
-        else {
-            /* Log failure */
-            $loginlogquery = "INSERT INTO login_log (username, date, ip, login)
-                        VALUES ('".mysql_real_escape_string($username)."', NOW(), '$ip', '0')";
-            $this->db->query($loginlogquery);
-            return false;
-
-        }
-
 
     }
 
@@ -113,6 +98,19 @@ class Session {
             $result = $this->authenticateSQL($username, $password);
 	}
 
+        $ip = getIP();
+
+        if ($result) {
+            /* Log successful */
+            $loginlogquery = "INSERT INTO login_log (username, date, ip, login)
+                    VALUES ('".mysql_real_escape_string($username)."', NOW(), '$ip', '1')";
+            $this->db->query($loginlogquery);
+        } else {
+            /* Log failure */
+            $loginlogquery = "INSERT INTO login_log (username, date, ip, login)
+                        VALUES ('".mysql_real_escape_string($username)."', NOW(), '$ip', '0')";
+            $this->db->query($loginlogquery);
+        }
 
         return $result;
     }

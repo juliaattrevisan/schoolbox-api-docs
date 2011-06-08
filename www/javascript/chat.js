@@ -165,6 +165,11 @@ $.widget("ui.chat",  {
     _append_message: function ($message) {
         var $message_el = $('<li></li>').addClass('chat-message-' + $message.type);
 
+        /* If admin */
+        if ($message.user_perm > 1) {
+            $message_el.addClass('chat-message-user-admin');
+        }
+
         if ($message.user_id == this.options.user_id) {
             $message_el.addClass('chat-message-user-me');
         }
