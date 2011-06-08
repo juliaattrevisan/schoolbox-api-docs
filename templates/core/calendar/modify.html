@@ -55,6 +55,15 @@
 			
 			$j('#eventForm').validate();
 			
+			$j('#repeatUntilSelect').change(function() {
+				
+				if ($j(this).val() !== '') {
+					$j('#repeatUntil').show();
+				} else {
+					$j('#repeatUntil').hide();
+				}
+			})
+			
 		});
 	
     </script>
@@ -77,7 +86,7 @@
 		<tr>
 			<td class="formLabelWidth" valign="top"><h4>Repeat</h4>
 				<em>The frequency that this event recurs if at all.</em></td>
-			<td><select name="repeat" onchange="toggleRepeat(this);">
+			<td><select name="repeat" id="repeatUntilSelect">
 					<option value="">Single Event</option>
 					<option value="daily">Daily</option>
 					<option value="weekly">Weekly</option>
@@ -86,7 +95,7 @@
 				</select></td>
 		</tr>
 		<tr id="repeatUntil" style="display: none;">
-			<td class="formLabelWidth" valign="top"><h3>Repeat Until</h3>
+			<td class="formLabelWidth" valign="top"><h4>Repeat Until</h4>
 				<em>The date at which recurrence should cease.</em></td>
 			<td><input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/></td>
 		</tr>
