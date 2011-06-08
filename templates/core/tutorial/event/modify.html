@@ -1,70 +1,45 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/mootools.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script language="JavaScript" type="text/javascript">
-function verify () {
-	var msg = ""
-	if($('typeSelect').value == 2 && $('name').value == "")
-		msg += "Name is a required field\n";
 
-	if($('typeSelect').value == 1 && $('classSelect').value == "")
-		msg += "Name is a required field\n";
+$j(function() {
 	
-	if($('cal_date') && $('cal_date').value == "")
-		msg += "Date is a required field\n";
+	$j('#eventForm').submit(function() {
+		var msg = "";
+		
+		if($j('#typeSelect').val() == 2 && $j('#name').val() == "")
+			msg += "Name is a required field\n";
 	
-	if (!checkTime())
-		msg += "Start time cannot be after the finish time\n";
-
-	if(msg != ""){
-		alert(msg);
-		return false;
-	} else if ($('actionType').value == 'sequence') {
-		return confirm('This will modify all events in the sequence. Press OK to continue.');
-	} else
-		return true;
-}
-function toggleRepeat(o) {
-	if (o.value == '')
-		$('repeatUntil').style.display = 'none';
-	else
-		$('repeatUntil').style.display = '';
-
-}
-function checkTime() {
-	if ($('tohour').value == '')
-		return true;
-	else if ($('period').value == $('toperiod').value) {
-		if (parseInt($('hour').value) > parseInt($('tohour').value) && parseInt($('hour').value) != 12)
+		if($j('#typeSelect').val() == 1 && $j('#classSelect').val() == "")
+			msg += "Name is a required field\n";
+		
+		if($j('#cal_date') && $j('#cal_date').val() == "")
+			msg += "Date is a required field\n";
+		
+		if (!checkTime())
+			msg += "Start time cannot be after the finish time\n";
+	
+		if(msg != ""){
+			alert(msg);
 			return false;
-		else if ($('hour').value == $('tohour').value) {
-			if (parseInt($('minute').value) > parseInt($('tominute').value))
-				return false;
-			else
-				return true;
+		} else if ($j('#actionType').val() == 'sequence') {
+			return confirm('This will modify all events in the sequence. Press OK to continue.');
 		} else
 			return true;
-		
-	} else if ($('toperiod').value == 'am')
-		return false;
-	else
-		return true;
-}
-
-window.addEvent('domready', function () {
-	$('typeSelect').addEvent('change', function () {
-		if ($(this).value == 1) {
-			$('nameRow').setStyle('display', 'none');
-			$('codeRow').setStyle('display', 'none');
-			$('classRow').setStyle('display', '');
+	});
+	
+	$j('#typeSelect').change(function () {
+		if ($j(this).val() == 1) {
+			$j('#nameRow, #codeRow').hide();
+			$j('#classRow').show();
 		} else {
-			$('nameRow').setStyle('display', '');
-			$('codeRow').setStyle('display', '');
-			$('classRow').setStyle('display', 'none');
+			$j('#nameRow, #codeRow').show();
+			$j('#classRow').hide();
 		}
 	});
-	if ($('deleteSequence')) {
-		$('deleteSequence').addEvent('click', function () {
+	if ($j('#deleteSequence')) {
+		
+		$j('#deleteSequence').click(function () {
 			if (confirm('Are you sure you want to delete all {TOTAL_EVENTS} events in this sequence?'))
 				window.open('/modules/tutorial/event/modifyForm.php?deleteSequence={EVENT_ID}','_self','');
 		});
@@ -78,19 +53,47 @@ window.addEvent('domready', function () {
         constrainInput: false,
         onClose: function (string) {
             var input = $j(this);
-
             $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
                 input.val(data.time);
             })
         }
 	});
 	
+	$j('#repeat').change(function() {
+		if ($j(this).val() == '')
+			$j('#repeatUntil').hide();
+		else
+			$j('#repeatUntil').show();
+	});
+
 });
+
+function checkTime() {
+	if ($j('tohour').val() == '')
+		return true;
+	else if ($j('#period').val() == $j('#toperiod').val()) {
+		if (parseInt($j('#hour').val()) > parseInt($j('#tohour').val()) && parseInt($j('#hour').val()) != 12)
+			return false;
+		else if ($j('hour').value == $j('tohour').value) {
+			if (parseInt($j('#minute').val()) > parseInt($j('#tominute').val()))
+				return false;
+			else
+				return true;
+		} else
+			return true;
+		
+	} else if ($j('#toperiod').val() == 'am')
+		return false;
+	else
+		return true;
+}
+
+
 </script>
 <!-- END custom_head -->
 <h1>{HEADING}</h1>
 <span class="header_option"><!-- BEGIN sequence_link --><a href="modify.php?eventID={EVENT_ID}&sequence=1">Modify Sequence</a><!-- END sequence_link --></span>
-<form id="eventForm"  method="post" action="modifyForm.php" onsubmit="return verify();" class="clearfix">
+<form id="eventForm"  method="post" action="modifyForm.php" class="clearfix">
 <input type="hidden" name="actionType" id="actionType" value="{ACTION_TYPE}" />
 <input type="hidden" name="eventID" value="{EVENT_ID}" />
 	<table class="standardForm">
@@ -150,7 +153,7 @@ window.addEvent('domready', function () {
 			<td class="formLabelWidth" valign="top"><h4>Repeat</h4>
 				<em>The frequency that this tutorial recurs if at all.</em>
 				</td>
-			<td><select name="repeat" onchange="toggleRepeat(this);">
+			<td><select name="repeat" id="repeat">
 					<option value="">Single Meeting</option>
 					<option value="weekly">Weekly</option>
 					<option value="fortnightly">Fortnightly</option>
@@ -209,7 +212,7 @@ window.addEvent('domready', function () {
 			<td><input type="checkbox" value="1" name="cancelled" {CANCELLED_SELECTED} /></td>
 		</tr>
 	</table>
-	<input class="submit-btn-plain" type="submit" name="submit" value="{ACTION}" />	
+	<input class="submit-btn-plain" type="submit" name="submit" id="submit-button" value="{ACTION}" />	
 	<!-- BEGIN delete_sequence -->
 	<input class="submit-btn-plain" type="button" name="delete" id="deleteSequence" value="Delete Sequence" />
 	<!-- END delete_sequence -->
