@@ -3,7 +3,7 @@ require_once(dirname(__FILE__)  .'/../include/config.php');
 require_once(dirname(__FILE__)  .'/../library/user.php');
 require_once(dirname(__FILE__)  .'/../library/synergetic/ExternalUser.php');
 
-define('PERFORM_UPDATE', false);
+define('PERFORM_UPDATE', true);
 
 $userHandler = new User();
 $synergyIds = array();
