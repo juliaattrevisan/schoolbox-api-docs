@@ -3,13 +3,12 @@ require_once(dirname(__FILE__)  .'/../include/config.php');
 require_once(dirname(__FILE__)  .'/../library/user.php');
 require_once(dirname(__FILE__)  .'/../library/synergetic/ExternalUser.php');
 
-define('PARENT_GROUP_ID' , 4);
-define('PERFORM_UPDATE', true);
+define('PERFORM_UPDATE', false);
 
 $userHandler = new User();
 $synergyIds = array();
 
-$allParents = $userHandler->getByGroup(PARENT_GROUP_ID, true);
+$allParents = $userHandler->getByGroup(unserialize(PARENTGROUPIDS), true);
 
 /* Get a list of Parents' synergy ids to sync
  */

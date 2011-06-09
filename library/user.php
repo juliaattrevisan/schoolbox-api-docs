@@ -554,10 +554,17 @@ class User extends Model {
 	public function getByGroup($groupID, $hasSynergy = false) {
 		$query = "SELECT *
 				  FROM {$this->_table}
-				  WHERE group_id = '$groupID'";
+				  WHERE group_id";
+
+		if (is_array($groupID)) {
+			$query .= " IN " . '(' . implode(',', $groupID) . ')';
+		}
+		else {
+			$query .= " = '$groupID'";
+		}
 
 		/* Optionally exclude those without synergy ids
-		 *		 */
+		 */
 		if ($hasSynergy) {
 			$query .= " AND synergy_id IS NOT NULL
 					    AND synergy_id > 0 ";
