@@ -298,23 +298,27 @@ function endQuery($result = 0)
 /* PRIVATE FUNCTIONS */
 
 // Quote variable to make safe for sql use
-function smartQuote($value)
-{
-   // Stripslashes
-   if (get_magic_quotes_gpc()) {
-       $value = stripslashes($value);
-   }
-   
-   $mysqlFuncs = array('NULL', 
-   					   'NOW()',
-					   );
-   
-   
-   // Quote if not integer or special
-   if (!((is_numeric($value) && $value[0] != 0) || in_array($value, $mysqlFuncs))) {
-       $value = "'" . mysql_real_escape_string($value) . "'";
-   }
-   return $value;
+function smartQuote($value) {
+
+// Stripslashes
+	if (get_magic_quotes_gpc()) {
+		$value = stripslashes($value);
+	}
+
+	$mysqlFuncs = array(
+		'NULL',
+		'NOW()',
+	);
+
+	/* If any non-digits found, assume string. But this might not work for float
+	 * or double values, or exponential representations.
+	 */
+	// Quote if not integer or special
+	if (!((!preg_match('/[^0-9]+/m', $value) && $value[0] != 0) || in_array($value, $mysqlFuncs))) {
+		$value = "'" . mysql_real_escape_string($value) . "'";
+	}
+
+	return $value;
 }
 
 /* DEPRECEATED FUNCTIONS */
