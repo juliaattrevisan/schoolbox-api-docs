@@ -4,7 +4,7 @@ require_once(dirname(__FILE__)  .'/../library/user.php');
 require_once(dirname(__FILE__)  .'/../library/synergetic/ExternalUser.php');
 
 define('PARENT_GROUP_ID' , 4);
-define('PERFORM_UPDATE', false);
+define('PERFORM_UPDATE', true);
 
 $userHandler = new User();
 $synergyIds = array();
