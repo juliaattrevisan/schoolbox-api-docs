@@ -25,7 +25,7 @@ if (is_array($homeworkList)) {
                     }
 		}
 
-		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . scrubText($homework['description']) . ($nameURL ? '</a>' : "");
+		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . scrubText($homework['name']) . ($nameURL ? '</a>' : "");
 
 		$output = array(
 			'HW_NAME'	=> $nameHTML,

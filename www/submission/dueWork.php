@@ -160,7 +160,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 
 			$output = array('EVENT_ID'		=> $event['id'],
 							'TIME'			=> outputDate('h:ia', strtotime($event['date'])),
-							'EVENT'			=> scrubText($event['description']),
+							'EVENT'			=> scrubText($event['name']),
 							'EVENT_PAST' 	=> !$due ? 'fade' : '',
 							'EVENT_CAT_ID'	=> $event['category'],
 							);
@@ -272,7 +272,7 @@ if(count($allWork) > 0) {
 
         $this->setVar(array(
             'WORK_SUBJECT' => $currentWork['categoryName'],
-            'WORK_DESCRIPTION' => $currentWork['description'],
+            'WORK_DESCRIPTION' => $currentWork['name'],
             'WORK_ACTION' => $action,
             'WORK_STATUS' => $status,
             'WORK_DATE'   => $currentWork['relevant_date']->format(Cfg::get('date_short')),
@@ -508,9 +508,9 @@ $activityLog = $submissionHandler->getActivityLog($user['uid'], 15, $categoryIDL
 if (is_array($activityLog)) {
 	foreach ($activityLog as $activity) {
 
-		$taskName = $activity['description'];
+		$taskName = $activity['name'];
 		if ($activity['fid'])
-				$taskName = '<a href="/send.php?id=' . $activity['fid'] . '&save=1">' . $activity['description'] . '</a>';
+				$taskName = '<a href="/send.php?id=' . $activity['fid'] . '&save=1">' . $activity['name'] . '</a>';
 
 		$categoryName = '<a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
 
@@ -521,7 +521,7 @@ if (is_array($activityLog)) {
 			$stringDesc = '<strong>' . $taskName . ' for ' . $categoryName . ' is overdue</strong> ';
 		}
 		else if($activity['new'] == 'submitted') {
-			$stringDesc = 'Work submitted to '.$activity['description'] .' for <a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
+			$stringDesc = 'Work submitted to '.$activity['name'] .' for <a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
 		}
 		else if($activity['new'] == 'returned') {
 			if($activity['typeName'])
@@ -531,10 +531,10 @@ if (is_array($activityLog)) {
 			else
 				$stringDesc = 'Work returned';
 
-			$stringDesc .= ' for '.$activity['description']. ' in <a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
+			$stringDesc .= ' for '.$activity['name']. ' in <a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
 		}
 		else {
-			$stringDesc = $categoryName . ' submissions for ' . scrubText($activity['description']) . ' are now closed ';
+			$stringDesc = $categoryName . ' submissions for ' . scrubText($activity['name']) . ' are now closed ';
 		}
 
 		$output = array('ACTIVITY_DESCRIPTION'	=> $stringDesc,

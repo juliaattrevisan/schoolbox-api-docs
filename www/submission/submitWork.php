@@ -15,7 +15,7 @@ if(is_numeric($this->arg[0])) {
     $late = $studHandler->securityCheck($this->arg[0]);
 
     $output = array('CATEGORY'  => scrubTEXT($subbox['categoryName']),
-                    'FILE'      => scrubTEXT($subbox['description']),
+                    'FILE'      => scrubTEXT($subbox['name']),
                     'BOX_ID'    => $this->arg[0],
                     );
 

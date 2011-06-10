@@ -36,6 +36,7 @@ $handle = array(
     'blog'     => 'blog',
     'wiki'     => 'wiki',
     'forum'    => 'forum',
+    'event'    => 'calendar',
 );
 
 $type_list = array(
@@ -48,6 +49,7 @@ $type_list = array(
     'blog'     => 'Blogs',
     'wiki'     => 'Wikis',
     'forum'    => 'Forums',
+    'event'    => 'Calendar',
 );
 
 if (empty($type)) {
@@ -439,6 +441,45 @@ if (!empty($result['forum'])) {
     $page->parse('RESULT', 'forum_t', true);
 }
 
+// render event
+if (!empty($result['event'])) {
+    $page->setFile('event_t', 'search/event.html');
+    $page->setBlock('event_t', 'event', 'event_block');
+    $page->setVar(array(
+        'EVENT_DISP_COUNT' => count($result['event']),
+        'EVENT_COUNT'      => $count['event'],
+    ));
+
+    foreach ($result['event'] as $event) {
+        $date = new DateTime($event['date']);
+
+        $event_time = '';
+
+        if ( !empty($event['startTime']) ) {
+            $event_time .= $event['startTime'];
+
+            if ( !empty($event['endTime']) ) {
+                $event_time .= ' to '.$event['endTime'];
+            }
+        }
+
+        $page->setVar(array(
+            'EVENT_TITLE'  => scrubTEXT($event['note']),
+            'EVENT_LINK'   => '/calendar/week/'.$date->format('d-m-Y'),
+            'EVENT_TYPE'   => $event['eventType'],
+            'EVENT_DETAIL' => scrubTEXT($event['detail']),
+            'EVENT_DATE'   => $event['date'],
+            'EVENT_LOCATION' => $event['location'],
+            'EVENT_TIME'   => $event_time
+        ));        
+
+        $page->parse('event_block', 'event', true);
+    }
+
+    $page->parse('RESULT', 'event_t', true);
+}
+
+// pagination and execution times
 if (empty($type)) {
     // clear pagination
     $page->setBlock('RESULT', 'pagination', 'pagination_block');

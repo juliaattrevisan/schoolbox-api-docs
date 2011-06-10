@@ -41,6 +41,7 @@ if ($_REQUEST['id']) {
         'category'		=> scrubTEXT($subBox['categoryName']),
         'fid'			=> $subBox['fid'],
         'typeName'		=> scrubTEXT($subBox['typeName']),
+        'name'	        => scrubTEXT($subBox['name']),
         'description'	=> scrubTEXT($subBox['description']),
         'comment'		=> scrubTEXT($subBox['comment']),
         'action'		=> $action,

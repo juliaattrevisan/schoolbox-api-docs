@@ -116,7 +116,7 @@ if(is_numeric($_GET['id'])) {
    $subBoxHandler = new Submission();
 
    $submissionBox = $subBoxHandler->getByID($box_id);
-   $zipName = scrubTEXT($submissionBox['description']);
+   $zipName = scrubTEXT($submissionBox['name']);
 
    $submissionBoxOwner = $subBoxHandler->getBoxOwner($box_id);
 

@@ -16,7 +16,7 @@ if (is_array($submissionList)) {
 		$dateHTML = outputDate("jS M", $submission['date']);
 		$dateURL = false;
 
-		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . scrubText($submission['description']) . ($nameURL ? '</a>' : "");        
+		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . scrubText($submission['name']) . ($nameURL ? '</a>' : "");
 
         /* Actions Block */
         $this->setBlock('duework', 'duework_actions', 'duework_actions_block');

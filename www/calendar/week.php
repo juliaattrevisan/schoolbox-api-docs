@@ -115,7 +115,7 @@ for($i=0; $i < 7; $i++) {
 
 			$output = array(
                 'TIME'          => $submission['date']->format('g:iA'), // g:i a
-                'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['description'],
+                'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['name'],
                 'COLOUR'		=> $calendarHandler->displayColour(4),
                 'LOCATION'		=> '',
                 'DETAIL'        => '',

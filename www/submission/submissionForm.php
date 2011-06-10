@@ -47,6 +47,7 @@ if(is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_POS
         'open_date'         => $open_date->format(Cfg::get('date_database')),
         'date'              => $due_date->format(Cfg::get('date_database')),
         'late_date'         => $late_date->format(Cfg::get('date_database')),
+        'name'              => $_POST['name'],
         'description'       => $_POST['description'],
         'type'              => $_POST['type'],
     );
@@ -65,7 +66,7 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
         $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
         $fileHandler = new File;
-        $data = array(  'description'	=> $_POST['description'],
+        $data = array(  'description'	=> $_POST['name'],
                 'comment'		=> $_POST['comment'],
                 'category'		=> $_POST['category'],
                 'owner'		=> $_SESSION['id'],
@@ -113,6 +114,7 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
         'open_date'         => $open_date->format(Cfg::get('date_database')),
         'date'              => $due_date->format(Cfg::get('date_database')),
         'late_date'         => $late_date->format(Cfg::get('date_database')),
+        'name'              => $_POST['name'],
         'description'       => $_POST['description'],
         'type'              => $_POST['type'],
         'fid'               => $fileId,

@@ -13,7 +13,7 @@ class SubmissionReturn extends Model {
     }
 
 	function getOneByUser($user_id, $box_id = 0) {
-		$query = "SELECT r.*, c.name categoryName, s.description, s.fid FROM ( `".$this->_table."` r, submission_box s, category c )
+		$query = "SELECT r.*, c.name categoryName, s.name, s.description, s.fid FROM ( `".$this->_table."` r, submission_box s, category c )
 				  WHERE r.deleted = 0 AND r.box_id = s.id AND s.category = c.id AND r.owner = $user_id";
 
 		if($box_id)
@@ -24,7 +24,7 @@ class SubmissionReturn extends Model {
 	}
 
 	function getByUser($user_id, $box_id = 0, $limit = false) {
-		$query = "SELECT r.*, c.name categoryName, s.description, s.fid FROM ( `".$this->_table."` r, submission_box s, category c )
+		$query = "SELECT r.*, c.name categoryName, s.name, s.description, s.fid FROM ( `".$this->_table."` r, submission_box s, category c )
 				  WHERE r.deleted = 0 AND r.box_id = s.id AND s.category = c.id AND r.owner = $user_id";
 	
 		if ($box_id) {
@@ -52,7 +52,7 @@ class SubmissionReturn extends Model {
 		$query = "	SELECT
 					r.*,
 					c.name categoryName,
-					s.description, s.fid
+					s.name, s.description, s.fid
 					FROM ( `".$this->_table."` r, submission_box s, category c)
 					WHERE r.deleted = 0
 					AND r.box_id = s.id

@@ -40,7 +40,7 @@ class Submission extends Model {
      */
     function getSubmissionsForSubject($categoryID) {
         $query = "SELECT
-                      submission_box.category, submission_box.description,
+                      submission_box.category, submission_box.name, submission_box.description,
                       student_submission.owner, realname
                   FROM submission_box
                   LEFT JOIN student_submission
@@ -102,7 +102,8 @@ class Submission extends Model {
                         assess.finish as late_date,
                         -1 as fid,
                         assess.deleted_at as deleted,
-                        assess.title as description,
+                        assess.title as name,
+                        assess.description as description,
                         assess.created_at as created,
                         '' as realname,
                         category.name as categoryName,
@@ -148,6 +149,7 @@ class Submission extends Model {
 			f.id AS fid,
 			UNIX_TIMESTAMP(b.date) AS dueDate,
 			c.name AS categoryName,
+			b.name,
 			b.description,
 			b.created, s.submitted, r.returned,
 			r.mark
@@ -193,7 +195,7 @@ class Submission extends Model {
 
 		$query .= "
 			c.name AS categoryName,
-			b.description, b.accept_submission,
+			b.name, b.description, b.accept_submission,
 			b.open_date, b.date, b.late_date, b.created, s.submitted, r.returned,
 			r.comment,
 			r.mark
@@ -303,7 +305,7 @@ class Submission extends Model {
                               UNIX_TIMESTAMP(sb.open_date) AS open,
                               UNIX_TIMESTAMP(sb.date) AS date,
                               UNIX_TIMESTAMP(sb.late_date) AS late,
-                              f.id fileID, f.realname, sb.description, sb.created, ss.id studentWork, af.inline, ss.submitted, sr.returned
+                              f.id fileID, f.realname, sb.name, sb.description, sb.created, ss.id studentWork, af.inline, ss.submitted, sr.returned
                               FROM submission_box sb
                               LEFT JOIN  file f ON sb.fid = f.id AND f.deleted = '0'
                               LEFT JOIN allowedFileTypes af ON f.mime_type = mime
@@ -330,6 +332,7 @@ class Submission extends Model {
                             UNIX_TIMESTAMP(sb.open_date) AS open,
                             UNIX_TIMESTAMP(sb.date) AS date,
                             UNIX_TIMESTAMP(sb.late_date) AS late,
+                            sb.name,
                             sb.description,
                             sb.created
                         FROM submission_box sb
@@ -347,7 +350,8 @@ class Submission extends Model {
                             UNIX_TIMESTAMP(assess.start) AS open,
                             UNIX_TIMESTAMP(assess.finish) AS date,
                             '' AS late,
-                            assess.title AS description,
+                            assess.title AS name,
+                            assess.description AS description,
                             assess.created_at AS created
                         FROM assess
                         LEFT JOIN file_type ON file_type.id = assess.type
@@ -365,7 +369,7 @@ class Submission extends Model {
                               UNIX_TIMESTAMP(sb.open_date) AS open,
                               UNIX_TIMESTAMP(sb.date) AS date,
                               UNIX_TIMESTAMP(sb.late_date) AS late,
-                              f.id fileID, f.realname, sb.description, sb.created, ss.id studentWork, af.inline
+                              f.id fileID, f.realname, sb.name, sb.description, sb.created, ss.id studentWork, af.inline
                               FROM submission_box sb
                               LEFT JOIN  file f ON sb.fid = f.id AND f.deleted = '0'
                               LEFT JOIN allowedFileTypes af ON f.mime_type = mime
@@ -383,6 +387,7 @@ class Submission extends Model {
     function getAllForUser($userID) {
         $query = "(SELECT
                         submission_box.id,
+                        submission_box.name,
                         submission_box.description,
                         submission_box.accept_submission,
                         category.id AS catid,
@@ -403,6 +408,7 @@ class Submission extends Model {
                     (SELECT
                         assess.assess_id,
                         assess.title,
+                        assess.description,
                         true AS accept_submission,
                         assess.category_id AS catid,
                         '' AS code,
@@ -452,25 +458,26 @@ class Submission extends Model {
 	function getActivityLog($userID, $limit = 5, $categoryList) {
         $implodedCategoryList = implode(',',$categoryList);
 
-		$query = " ( SELECT open_date activity_date, f.name typeName, s.description, s.category, c.name categoryName, s.fid, 'new' FROM submission_box s, category c, file_type f
+		$query = " ( SELECT open_date activity_date, f.name typeName, s.name, s.description, s.category, c.name categoryName, s.fid, 'new' FROM submission_box s, category c, file_type f
 					  WHERE s.category = c.id AND f.id = s.type AND open_date < NOW() AND c.id IN (".implode(',',$categoryList).") )
 					UNION
-				    ( SELECT `date`, l.name typeName, u.description, u.category, e.name categoryName, u.fid, 'overdue' FROM ( submission_box u, category e, file_type l )
+				    ( SELECT `date`, l.name typeName, u.name, u.description, u.category, e.name categoryName, u.fid, 'overdue' FROM ( submission_box u, category e, file_type l )
 					  LEFT JOIN student_submission d ON d.box_id = u.id AND d.owner = $userID
 					  WHERE d.id IS NOT NULL AND u.category = e.id AND l.id = u.type AND `date` < NOW() AND e.id IN (".implode(',',$categoryList).") )
 					UNION
-					( SELECT `late_date`, i.name typeName, t.description, t.category, a.name categoryName, t.fid, 'closed' FROM submission_box t, category a, file_type i
+					( SELECT `late_date`, i.name typeName, t.name, t.description, t.category, a.name categoryName, t.fid, 'closed' FROM submission_box t, category a, file_type i
 					  WHERE t.category = a.id AND i.id = t.type AND `late_date` < NOW() AND a.id IN (".implode(',',$categoryList).") )
 					UNION
-					( SELECT g.`submitted` activity_date, g.realname typeName, m.description, m.category, n.name categoryName, m.fid, 'submitted'  FROM  student_submission g, submission_box m, category n
+					( SELECT g.`submitted` activity_date, g.realname typeName, m.name, m.description, m.category, n.name categoryName, m.fid, 'submitted'  FROM  student_submission g, submission_box m, category n
 					  WHERE g.box_id = m.id AND m.category = n.id AND g.owner = $userID )
 					UNION
-				   ( SELECT v.`returned` activity_date, v.mark typeName, w.description, w.category, x.name categoryName, v.id fid, 'returned'  FROM  submission_return v, submission_box w, category x
+				   ( SELECT v.`returned` activity_date, v.mark typeName, w.name, w.description, w.category, x.name categoryName, v.id fid, 'returned'  FROM  submission_return v, submission_box w, category x
 					  WHERE v.box_id = w.id AND w.category = x.id AND v.owner = $userID )
                     UNION
 				   (SELECT start AS activity_date,
                         file_type.name AS typeName,
-                        assess.title AS description,
+                        assess.title AS name,
+                        assess.description AS description,
                         assess.category_id,
                         category.name AS categoryName,
                         '' AS fid,
@@ -484,7 +491,8 @@ class Submission extends Model {
                     UNION
                    (SELECT finish AS activity_date,
                         file_type.name AS typeName,
-                        assess.title AS description,
+                        assess.title AS name,
+                        assess.description AS description,
                         assess.category_id,
                         category.name AS categoryName,
                         '' AS fid,

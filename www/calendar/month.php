@@ -122,7 +122,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 
             $output = array(
                 'TIME' => $submission['date']->format('g:i a'), // g:i a
-                'NOTE' => 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' (' . $submission['synergyCode'] . ')' : '') . ' - ' . $submission['description'],
+                'NOTE' => 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' (' . $submission['synergyCode'] . ')' : '') . ' - ' . $submission['name'],
                 'COLOUR' => $calendarHandler->displayColour(4),
                 'LOCATION' => '',
                 'DETAIL' => '',

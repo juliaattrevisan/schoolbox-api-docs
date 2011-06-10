@@ -23,7 +23,7 @@ if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
             error(25);
     
     $output = array('CATEGORY'  => scrubTEXT($subbox['categoryName']),
-                    'ASSNAME'   => scrubTEXT($subbox['description']),
+                    'ASSNAME'   => scrubTEXT($subbox['name']),
                     'BOX_ID'    => $this->arg[0],
                     'NAME'      => formatName($user),
                     'UID'       => $this->arg[1],

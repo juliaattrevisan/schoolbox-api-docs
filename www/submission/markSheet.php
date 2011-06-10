@@ -63,7 +63,7 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 	if(is_array($subList)) {
         $csv = 'Synergetic ID,Surname,Firstname,';
 		foreach($subList as $sub) {
-            $csv .= scrubTEXT(str_replace(',', ' ', $sub['description'])).',';
+            $csv .= scrubTEXT(str_replace(',', ' ', $sub['name'])).',';
 		}
 	}
 
@@ -162,7 +162,7 @@ else if(is_numeric($this->arg[0])) {
 		foreach($subList as $sub) {
             $this->setVar(array(
                 'BOX_ID'	=> $sub['id'],
-                'SUB_NAME'	=> scrubTEXT($sub['description']),
+                'SUB_NAME'	=> scrubTEXT($sub['name']),
                 'SUB_TYPE'	=> scrubTEXT($sub['typeName'])
             ));
 

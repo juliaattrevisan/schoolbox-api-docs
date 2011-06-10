@@ -16,7 +16,7 @@ if (is_array($submissionList)) {
 	foreach ($submissionList as $submission) {
 	
         $output = array('TIME'			=> $submission['dueTime'],
-                        'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['description'],
+                        'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['name'],
                         'COLOUR'		=> $calendarHandler->displayColour(4),
                         'MODIFY'		=> '',
                         'LOCATION'		=> '',

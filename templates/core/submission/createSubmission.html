@@ -49,12 +49,18 @@
 <form action="/submission/submissionForm.php" method="post" name="form" class="clearfix" id="createSubmissionForm"  enctype="multipart/form-data">
 	<input type="hidden" name="category" value="{CATEGORY}" />
 	<table class="standardForm">
-		<tr>
-			<td class="formLabelWidth"><h4>Title</h4></td>
-			<td><label>
-					<input class="required" name="description" type="text" value="{DESC}" size="30" />
-				</label></td>
-		</tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Title</h4></td>
+            <td><label>
+                    <input class="required" name="name" type="text" value="{NAME}" size="30" />
+                </label></td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Description</h4></td>
+            <td><label>
+                    <textarea name="description" cols="70" rows="3">{DESCRIPTION}</textarea>
+                </label></td>
+        </tr>
 		<!-- BEGIN browse_row -->
 		<tr>
 			<td class="formLabelWidth"><h4>File</h4>

@@ -154,7 +154,7 @@ class Calendar extends Model {
 					$catQuery[] = $cat['id'];
 			}
 
-			$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.description,
+			$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.name, submission_box.description,
                         submission_box.owner, submission_box.id, user.firstname, user.lastname, user.title,
                         DATE_FORMAT(submission_box.date, '%w') as dayIndex,
 					    DATE_FORMAT(submission_box.date, '" . Cfg::get('calendar_time_format') . "') as dueTime,
@@ -206,7 +206,89 @@ class Calendar extends Model {
         }
 	}
 
+    function search ($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+        $keyword = mysql_real_escape_string($keyword);
 
+        if (is_array($_SESSION['campus'])) {
+            $campusList = $_SESSION['campus'];
+
+            $campusQuery = "eventCampus.campusID IN(" . implode(',', $campusList) . ")";
+        } else {
+            $campusList = array(1);
+
+            $campusQuery = '1 = 1';
+        }
+
+        // get accessible groups
+        $groupList = array();
+        $groupQuery = '';
+
+        $this->groupHandler->setService(HOMEPAGE_SERVICE);
+        $tempList = $this->groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects']);
+
+        if (is_array($tempList)) {
+
+            foreach ($tempList as $temp) {
+                $groupList[] = $temp['id'];
+            }
+
+            $groupQuery = "OR (access = '2' AND sid IN (".implode(',', $groupList)."))";
+        }
+
+        $this->groupHandler->setService(CALENDAR_SERVICE);
+
+        //give people with userAccess to moderate Calendar Access to view all Camups Posts
+        if(is_array($_SESSION['campus'])) {
+            if($this->groupHandler->getPermission($_SESSION['campus'][0]) > WRITE_ACCESS)
+                $groupChunk = "";
+            else {
+                $groupChunk = "AND eventGroup.groupID = {$_SESSION['gid']}";
+            }
+        }
+
+        $event_query = "SELECT DISTINCT event.id, owner,
+                            GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
+                            TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTime,
+                            TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
+                            TIME_TO_SEC(startTime) as startTimestamp,
+                            TIME_TO_SEC(endTime) as endTimestamp,
+                            type, note, access, sid, location, detail,
+                            user.id as uid, title, firstname, lastname,
+                            eventType, eventColour,
+                            MATCH (`note`, `detail`, `location`) AGAINST ('$keyword') AS `score`
+                        FROM event
+                        LEFT JOIN user ON owner = user.id
+                        LEFT JOIN luEventType ON type = eventTypeID
+                        LEFT JOIN eventCampus ON event.id = eventCampus.eventID
+                        LEFT JOIN eventGroup ON event.id = eventGroup.eventID
+                        WHERE date >= NOW()
+                            AND (    (access = '1' AND owner = '".$_SESSION['id']."')
+                                  $groupQuery
+                                  OR (access = '3' AND $campusQuery $groupChunk OR owner = '".$_SESSION['id']."')
+                                )
+                            AND MATCH (`note`, `detail`, `location`) AGAINST ('$keyword')
+                        GROUP BY id
+                        ORDER BY $sort_by $sort_dir
+                        LIMIT $offset, $limit";
+
+        $count_query = "SELECT COUNT(*)
+                        FROM event
+                        LEFT JOIN user ON owner = user.id
+                        LEFT JOIN luEventType ON type = eventTypeID
+                        LEFT JOIN eventCampus ON event.id = eventCampus.eventID
+                        LEFT JOIN eventGroup ON event.id = eventGroup.eventID
+                        WHERE date >= NOW()
+                            AND (    (access = '1' AND owner = '".$_SESSION['id']."')
+                                  $groupQuery
+                                  OR (access = '3' AND $campusQuery $groupChunk OR owner = '".$_SESSION['id']."')
+                                )
+                            AND MATCH (`note`, `detail`, `location`) AGAINST ('$keyword')";
+
+        $events = $this->db->getAll($event_query);
+        $count = $this->db->getOne($count_query);
+
+        return $events;
+    }
 
 	function getDayEvents($currentDay) {
 		// return all events occuring on the date specified

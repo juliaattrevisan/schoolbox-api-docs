@@ -78,7 +78,7 @@ if (!in_array($submissionBox['category'], $categoryIDList)) {
 $this->setVar(array(
 	'BOX_CATEGORYNAME' => $submissionBox['categoryName'],
     'BOX_CATEGORYID'    => $submissionBox['cid'],
-	'BOX_DESCRIPTION' => $submissionBox['description'],
+	'BOX_DESCRIPTION' => $submissionBox['name'],
 	'BOX_OWNER' => '<a href="'.$_SESSION['mailhandle'].formatEmail($owner).'">'.formatName($owner).'</a>',
 	'BOX_DUEDATE' => date(Cfg::get('date_short'), strtotime($submissionBox['date'])),
 ));
