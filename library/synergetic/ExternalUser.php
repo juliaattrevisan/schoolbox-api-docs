@@ -123,14 +123,16 @@ class ExternalUser extends MSSQL{
 	 */
 	public function getStudentContactListExtended($yearlevel) {
 		$query = "
-			SELECT
+			SELECT 
 				StudentID, StudentGiven1, StudentSurname, StudentYearLevel
 				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
 				StudentContactAddress1, StudentContactSuburb, StudentContactPostCode, StudentContactState,
 				StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
 				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
-				StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType
+				StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType,
+				DirectoryIncludeFlag
 			FROM SynergyOne.dbo.vStudentContactAllAddress
+			LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
 			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
 			AND FileSemester = " . $_SESSION['FileSemester'] . "
 			AND FileYear = " . $_SESSION[ 'FileYear'] . "
