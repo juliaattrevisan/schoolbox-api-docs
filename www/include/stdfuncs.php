@@ -494,4 +494,5 @@ function relativeLinkRegex($url) {
 
 	return $url;
 }
+
 ?>
