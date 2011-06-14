@@ -33,13 +33,13 @@ class DashboardComponentInstance extends Model {
         $instance_arr = $this->getAllByField('group_id', $group_id);
 
         if ( is_array($instance_arr) && $this->check_dependencies()) {
-            foreach ($instance_arr as &$instance) {
+            foreach ($instance_arr as $i => &$instance) {
 
                 $component = $this->component_model->get_component($instance['component_id']);
                 $instance = $this->factory($component, $instance);
 
                 if ( !($instance instanceof DashboardComponentInterface) ) {
-                    unset($instance);
+                    unset($instance_arr[$i]);
                 }
 
             }
@@ -54,13 +54,13 @@ class DashboardComponentInstance extends Model {
             return false;
         }
 
-        $component_file = dirname(__FILE__) . "../../www/dashboard/component/{$component['class']}.php";
+        $component_file = dirname(__FILE__) . "/../../www/dashboard/component/{$component['class']}.php";
 
         if ( file_exists($component_file) ) {
             
             require_once($component_file);
 
-            if ( class_exists($component['class']) && $component['class'] instanceof DashboardComponentInterface) {
+            if ( class_exists($component['class'])) {
                 $option_default_model = new DashboardComponentOptionDefault($component['id']);
                 $option_model = new DashboardComponentOption($instance['id']);
 
@@ -68,7 +68,10 @@ class DashboardComponentInstance extends Model {
 
                 /* Load dependencies */
                 $dependency_arr = $this->load_dependencies($component);
-                $argument_arr = array_merge($argument_arr, $dependency_arr);
+
+                if ( is_array($dependency_arr) ) {
+                    $argument_arr = array_merge($argument_arr, $dependency_arr);                    
+                }
 
                 /* Instantiate component */
                 $r = new ReflectionClass($component['class']);
@@ -86,7 +89,7 @@ class DashboardComponentInstance extends Model {
         $dependency_arr = explode(',', trim($component['dependencies']));
 
         if ( is_array($dependency_arr) ) {
-            $dependency_path = dirname(__FILE__) . '../../library/';
+            $dependency_path = dirname(__FILE__) . '/../../library/';
 
             foreach ($dependency_arr as &$dependency) {
                 $dependency = trim($dependency);
@@ -106,6 +109,8 @@ class DashboardComponentInstance extends Model {
                     $r = new ReflectionClass($dependency);
 
                     $dependency = $r->newInstance();
+                } else {
+                    $dependency = false;
                 }
             }
         }
