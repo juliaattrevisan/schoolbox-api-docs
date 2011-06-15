@@ -15,8 +15,10 @@
 
             if(!$j('div.results > div[title=' + el + ']').hasClass('loaded')) {
                 $j('div.results > div[title=' + el + ']').load('/search.php', "keyword={KEYWORD}&type=" + el, paginate);
+				
                 $j('div.results > div[title=' + el + ']').addClass('loaded');
-            }
+            	$j('.search-item:nth-child(even)').addClass('dark');
+			}
 
             $j('div.results > div').hide();
             $j('div.results > div[title=' + el + ']').show();
@@ -28,10 +30,14 @@
             $j(parent).show();
             $j('#type a[title='+parent.attr('id')+']').addClass('selected');
             $j.scrollTo('#a'+ params[1]);
+			
         } else {
             $j('#type li:first-child a').addClass('selected');
             $j('div.results > div:first-child').show();
+
         }
+		
+		$j('.results .search-item:nth-child(even)').addClass('dark');
 
     });
 </script>

@@ -641,7 +641,7 @@ th { font-weight:bold; }
 
 
 .box .listing {width:100%;}
-
+.dark{background:#faf9f5;}
 .dark td {
 	background: #faf9f5;
 	zoom:1;
@@ -1108,6 +1108,7 @@ CHOOSE FILE SELECTOR
   float:left;
   z-index:10;
 }
+.file-input:hover{cursor:pointer;}
 
 .file-input input {
   text-transform:capitalize;
@@ -4305,7 +4306,7 @@ table.ruler thead td { padding:0; }
 	padding:10px;
 }
 
-.search-item:nth-child(even) { background:#FAF9F5; }
+
 
 .search-details {
 	width:70%;
