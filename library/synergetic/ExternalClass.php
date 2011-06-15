@@ -38,7 +38,7 @@ class ExternalClass extends MSSQL{
 			vStudents.FileYear = StudentClasses.FileYear AND
 			vStudents.FileSemester = StudentClasses.FileSemester AND
 			vStudents.ID = StudentClasses.ID)
-		WHERE   (StudentStatus = 'N' OR StudentStatus = 'NOR' OR StudentStatus = 'NEW')
+		WHERE   (StudentStatus = 'N' OR StudentStatus = 'NOR' OR StudentStatus = 'NEW' OR StudentStatus = 'LV')
 			AND $classQuery
 			AND (StudentClasses.FileYear='" . $_SESSION['FileYear'] . "')
 			AND (StudentClasses.FileSemester='" . $_SESSION['FileSemester'] .  "')
