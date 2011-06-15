@@ -12,7 +12,13 @@
 require_once dirname(__FILE__) . '/../../../library/dashboard/DashboardComponentInterface.php';
 
  
-class Test extends DashboardComponentInterface {
+class TimetableComponent extends DashboardComponentInterface {
+    private $external_timetable;
+
+    public function init (ExternalTimetable $external_timetable) {
+        $this->external_timetable = $external_timetable;
+    }
+
     public function execute() {
         
     }

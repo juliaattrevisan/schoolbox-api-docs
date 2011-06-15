@@ -1,5 +1,6 @@
 <?php
 
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/autoload.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/page.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/db.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';

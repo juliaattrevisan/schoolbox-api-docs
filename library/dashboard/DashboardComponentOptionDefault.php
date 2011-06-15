@@ -34,6 +34,16 @@ class DashboardComponentOptionDefault extends Model {
 
         return $default_option_arr;
     }
+
+    public function get_default_option_by_key ($component_id, $key) {
+        $default_option = $this->getByArray(array(
+            'component_id' => $component_id,
+            'key'          => $key
+        ));
+
+        return $default_option;
+    }
+    
 }
 
 ?>

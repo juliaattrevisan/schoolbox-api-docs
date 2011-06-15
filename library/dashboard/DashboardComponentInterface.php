@@ -12,17 +12,21 @@
 abstract class DashboardComponentInterface {
     protected $component;
 
+    protected $component_instance;
+
     protected $option_default;
 
     protected $option;
 
     protected $template;
 
+    protected $property;
+
     abstract function execute ();
 
     abstract function render ($template_handle);
 
-    public function __construct (DashboardComponent $component, DashboardComponentInstance $component_instance, DashboardComponentOptionDefault $option_default, DashboardComponentOption $option, Template $template) {
+    public function __construct (Array $property_arr, DashboardComponent $component, DashboardComponentInstance $component_instance, DashboardComponentOptionDefault $option_default, DashboardComponentOption $option, Template $template) {
         $this->component = $component;
 
         $this->component_instance = $component_instance;
@@ -32,6 +36,32 @@ abstract class DashboardComponentInterface {
         $this->option = $option;
 
         $this->template = $template;
+
+        $this->property = $property_arr;
+    }
+
+    public function get_component_id () {
+        return $this->property['component_id'];
+    }
+
+    public function get_instance_id () {
+        return $this->property['instance_id'];
+    }
+
+    public function get_class () {
+        return $this->property['class'];
+    }
+
+    public function get_template () {
+        return $this->property['template'];
+    }
+
+    public function get_name () {
+        return $this->property['name'];
+    }
+
+    public function get_position () {
+        return $this->property['position'];
     }
 
     public function __get($name) {
@@ -40,20 +70,8 @@ abstract class DashboardComponentInterface {
             return $this->$name;
         }
 
-        if ( isset($this->component_instance->$name) ) {
-            return $this->component_instance->$name;
-        }
-
-        if ( isset($this->component->$name) ) {
-            return $this->component->$name;
-        }
-
-        if ( isset($this->option->$name) ) {
-            return $this->option->$name;
-        }
-
-        if ( isset($this->option_default->$name) ) {
-            return $this->option_default->$name;
+        if ( isset($this->property[$name]) ) {
+            return $this->property[$name];
         }
 
         return $this->$name;

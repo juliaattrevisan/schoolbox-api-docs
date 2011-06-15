@@ -34,6 +34,16 @@ class DashboardComponentOption extends Model {
 
         return $options_arr;
     }
+
+    public function get_option_by_key ($instance_id, $key) {
+        $option = $this->getByArray(array(
+            'instance_id' => $instance_id,
+            'key'         => $key
+        ));
+
+        return $option;
+    }
+    
 }
 
 ?>

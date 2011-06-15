@@ -32,7 +32,7 @@ class DashboardComponentInstance extends Model {
     public function get_instances ($group_id) {
         $instance_arr = $this->getAllByField('group_id', $group_id);
 
-        if ( is_array($instance_arr) && $this->check_dependencies()) {
+        if ( is_array($instance_arr)) {
             foreach ($instance_arr as $i => &$instance) {
 
                 $component = $this->component_model->get_component($instance['component_id']);
@@ -57,25 +57,28 @@ class DashboardComponentInstance extends Model {
         $component_file = dirname(__FILE__) . "/../../www/dashboard/component/{$component['class']}.php";
 
         if ( file_exists($component_file) ) {
-            
+
             require_once($component_file);
 
             if ( class_exists($component['class'])) {
                 $option_default_model = new DashboardComponentOptionDefault($component['id']);
                 $option_model = new DashboardComponentOption($instance['id']);
 
-                $argument_arr = array($this->component_model, $this, $option_default_model, $option_model, $this->template_model);
+                /* Prepare properties */
+                $property_arr = $this->merge_properties($component, $instance);
+
+                $argument_arr = array($property_arr, $this->component_model, $this, $option_default_model, $option_model, $this->template_model);
 
                 /* Load dependencies */
                 $dependency_arr = $this->load_dependencies($component);
 
-                if ( is_array($dependency_arr) ) {
-                    $argument_arr = array_merge($argument_arr, $dependency_arr);                    
-                }
-
                 /* Instantiate component */
-                $r = new ReflectionClass($component['class']);
-                $instance_obj = $r->newInstanceArgs($argument_arr);
+                $rc = new ReflectionClass($component['class']);
+                $instance_obj = $rc->newInstanceArgs($argument_arr);
+
+                /* Execute component init */
+                $rm = new ReflectionMethod($component['class'], 'init');
+                $rm->invokeArgs($instance_obj, $dependency_arr);
 
                 return $instance_obj;
             }
@@ -94,17 +97,6 @@ class DashboardComponentInstance extends Model {
             foreach ($dependency_arr as &$dependency) {
                 $dependency = trim($dependency);
 
-                if ( file_exists($dependency_path . $dependency . '.php') ) {
-                    $dependency_file = "$dependency_path/$dependency.php";
-                }
-                elseif ( file_exists($dependency_path . strtolower($dependency) . '.php') ) {
-                    $dependency_file = $dependency_path . strtolower($dependency) . '.php';
-                } else {
-                    return false;
-                }
-
-                require_once($dependency_file);
-
                 if ( class_exists($dependency) ) {
                     $r = new ReflectionClass($dependency);
 
@@ -119,16 +111,21 @@ class DashboardComponentInstance extends Model {
 
     }
 
-    private function check_dependencies () {
-        if ( !($this->component_model instanceof DashboardComponent) ) {
-            return false;
-        }
+    private function merge_properties ($component, $instance) {
+        $property_arr = array(
+            'id'           => $instance['id'],
+            'component_id' => $component['id'],
+            'instance_id'  => $instance['id'],
+            'group_id'     => $instance['group_id'],
+            'class'        => $component['class'],
+            'template'     => $component['template'],
+            'position'     => $instance['position'],
+            'order'        => $instance['order'],
+            'name'         => $component['name'],
+            'description'  => $component['description']
+        );
 
-        if ( !($this->template_model instanceof Template) ) {
-            return false;
-        }
-
-        return true;
+        return $property_arr;
     }
 }
 
