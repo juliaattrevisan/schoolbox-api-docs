@@ -9,13 +9,13 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../../include/model.php';
- 
+
 class DashboardComponentOptionDefault extends Model {
 
     public $_table = 'dashboard_component_option_default';
 
     public $_index = 'id';
+
 
     public function get_default_options ($component_id) {
         $default_option_arr = $this->getAllByField('component_id', $component_id);
@@ -35,7 +35,7 @@ class DashboardComponentOptionDefault extends Model {
         return $default_option_arr;
     }
 
-    public function get_default_option_by_key ($component_id, $key) {
+    public function get_default_option_by_key ($key) {
         $default_option = $this->getByArray(array(
             'component_id' => $component_id,
             'key'          => $key

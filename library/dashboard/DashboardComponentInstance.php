@@ -9,10 +9,6 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../../include/model.php';
-require_once dirname(__FILE__) . '/../../library/dashboard/DashboardComponent.php';
-require_once dirname(__FILE__) . '/../../library/dashboard/DashboardComponentOptionDefault.php';
-require_once dirname(__FILE__) . '/../../library/dashboard/DashboardComponentOption.php';
 
 class DashboardComponentInstance extends Model {
     

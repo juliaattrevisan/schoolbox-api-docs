@@ -9,10 +9,6 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../../library/dashboard/DashboardComponent.php';
-require_once dirname(__FILE__) . '/../../library/dashboard/DashboardComponentInstance.php';
-require_once dirname(__FILE__) . '/../../library/dashboard/DashboardComponentOptionDefault.php';
-require_once dirname(__FILE__) . '/../../library/dashboard/DashboardComponentOption.php';
 
 $component_model      = new DashboardComponent();
 $option_default_model = new DashboardComponentOptionDefault();
@@ -30,9 +26,8 @@ if ( is_array($instance_arr) ) {
     foreach ($instance_arr as $instance) {
 
         /* Execute and render */
-        
         $template_file = 'dashboard/component/'.$instance->get_template().'.html';
-                
+
         $template_target = 'component_position_'.$instance->get_position();
         $template_handle = 'component_'.$instance->get_instance_id();
 

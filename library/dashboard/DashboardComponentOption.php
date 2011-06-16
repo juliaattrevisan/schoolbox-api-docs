@@ -9,7 +9,6 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../../include/model.php';
 
 class DashboardComponentOption extends Model {
     
