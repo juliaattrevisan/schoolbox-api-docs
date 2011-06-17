@@ -5,6 +5,7 @@ $j(window).load(function(){
         cleartype: true,
 		before: function(curr, next, opts) {
 			$j(next).css('margin-left', -$j(next).width()/2);
+			$j(next).css('margin-top', -$j(next).height()/2);
 		},
         after: function()
 		 {
@@ -20,13 +21,20 @@ $j(window).load(function(){
 #galleryCycle img {
 	display:none;
 	left:50% !important;
+	top:50% !important;
+	
+
 }
 
 #galleryCycle {
 	width:100%;
-	margin-top:8px;
+
 }
-.cycle-content{position:relative; z-index:1;margin:0 auto; }
+.cycle-content{position:relative; z-index:1;margin:10px auto; border:4px solid #fff;
+	
+     -moz-box-shadow: 0 0 8px #000; 
+  -webkit-box-shadow: 0 0 8px #000; 
+          box-shadow: 0 0 8px #000; }
 
 #galleryCycle .caption-holder {
 	background: #576369;
