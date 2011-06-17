@@ -1,13 +1,16 @@
 <script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
 <script type="text/javascript">
 $j(window).load(function(){
-		$j('#galleryCycle').cycle({
+	$j('.cycle-content').cycle({
         cleartype: true,
-        before: function() {
-            $j('#galleryCycle span').slideUp();
-        },
-        after: function() {
-            $j('span', this).slideDown();
+		before: function(curr, next, opts) {
+			$j(next).css('margin-left', -$j(next).width()/2);
+		},
+        after: function()
+		 {
+			var append = $j(this).attr('alt');
+			$j('.caption-holder').text(append);
+			
         }
     });
 });
@@ -15,32 +18,25 @@ $j(window).load(function(){
 
 <style type="text/css">
 #galleryCycle img {
-	display: block;
+	display:none;
+	left:50% !important;
 }
 
 #galleryCycle {
-	border: 1px solid #dbdbdb;
-    margin: 10px auto;
+	width:100%;
+	margin-top:8px;
 }
+.cycle-content{position:relative; z-index:1;margin:0 auto; }
 
-#galleryCycle div {
-	position: relative;
-		display:none;
-	
-}
-
-#galleryCycle span {
+#galleryCycle .caption-holder {
 	background: #576369;
 	color: #fff;
-	display: none;
-	width: 100%;
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	padding: 10px 0;
+	padding: 10px;
 	text-decoration: none;
 	opacity: 0.9;
-	text-indent: 10px;
+	z-index:2;
+	text-align:center;
+	margin:0 auto;
 }
 </style>
 
@@ -70,13 +66,17 @@ $j(window).load(function(){
 	</div>
     </a>
     <!-- END config -->
-    <div id="galleryCycle" class="box">
-        <!-- BEGIN image -->
-        <div><img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" /><span>{IMAGE_NAME}</span></div>
-        <!-- END image -->
+    <div id="galleryCycle" class="box clearfix">
+		<div class="cycle-content">
+			<!-- BEGIN image -->
+			<img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
+			<!-- END image -->
+		</div>
+		<div class="caption-holder"></div>
     </div>
+	
 
   <!-- BEGIN submit_image -->
-  <p class="interact"><a href="/cms/file/multi/{ID}" class="btn up-arrow"><span></span>Post Images</a></p>
+  <p class="interact clearfix"><a href="/cms/file/multi/{ID}" class="btn up-arrow"><span></span>Post Images</a></p>
   <!-- END submit_image -->
 </div>

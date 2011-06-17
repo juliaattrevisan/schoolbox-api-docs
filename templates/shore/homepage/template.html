@@ -2,12 +2,9 @@
 <link rel="alternate" type="application/rss+xml" title="RSS" href="/homepage/rss/{ID}" />
 <!-- BEGIN modify_layout -->
 <script type="text/javascript"> var categoryID = {ID}; </script>
-<script type="text/javascript" src="/javascript/jquery.ui.js"></script>
 <script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script type="text/javascript" src="/javascript/color-conversion.js"></script>
-
 <script type="text/javascript" src="/javascript/jquery.component.js"></script>
-
 <link rel="stylesheet" type="text/css" href="/javascript/farbtastic/farbtastic.css" />
 <script type="text/javascript" src="/javascript/farbtastic/farbtastic.js"></script>
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
@@ -19,14 +16,16 @@
 .left a, .left .listing p.small a { color: #{left_link}; }
 .left .box a:hover, .left .listing p.small a:hover { color: #{left_hover};  }
 .left .text { background: #{left_bg_primary}; }
-.left .text.listing .dark { background: #{left_bg_secondary}; }
+.left .listing { background: #{left_bg_primary}; }
+.left .listing .dark { background: #{left_bg_secondary}; }
 
 .right h2 { color: #{right_head_font}; background-color: #{right_head_bg};	}
 .right p, .right h3, .right .listing p.small { color: #{right_font}; }
 .right a, .right .listing p.small a { color: #{right_link}; }
 .right .box a:hover, .right .listing p.small a:hover { color: #{right_hover};  }
 .right .text { background: #{right_bg_primary}; }
-.right .text.listing .dark { background: #{right_bg_secondary}; }
+.right .listing{ background: #{right_bg_primary}; }
+.right .listing .dark { background: #{right_bg_secondary}; }
 
 /* wrap mimetypes in classes */
 
