@@ -138,9 +138,9 @@ h1 {
 h2 {
 	background:#cae9b9;
 	margin:0;
-	-moz-border-radius:3px;
-	border-radius:3px;
-	-webkit-border-radius:5px 5px 0 0;
+	-moz-border-radius:4px;
+	border-radius:4px;
+	-webkit-border-radius:4px;
 	font-size:12px;
 	min-height:32px;
 	line-height:32px;
@@ -148,6 +148,18 @@ h2 {
 	color:#013a63;
 	font-size:18px;
 	font-weight:bold;
+	-moz-box-shadow: 0px 2px 4px #e6e6e6; 
+	-webkit-box-shadow: 0px 2px 4px #e6e6e6; 
+	box-shadow: 0px 2px 4px #e6e6e6; 
+	border:1px solid #ffeea6;	  
+	background-color: #fff6cf;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#fff6cf), to(#ffe993)); 
+	background-image: -webkit-linear-gradient(top, #fff6cf, #ffe993); 
+	background-image:    -moz-linear-gradient(top, #fff6cf, #ffe993); 
+	background-image:     -ms-linear-gradient(top, #fff6cf, #ffe993); 
+	background-image:      -o-linear-gradient(top, #fff6cf, #ffe993); 
+	background-image:         linear-gradient(top, #fff6cf, #ffe993);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff6cf', EndColorStr='#ffe993'); 
 }
 
 h2 a { color:#013a63; }
@@ -525,7 +537,7 @@ th { font-weight:bold; }
 .box {
 	margin-bottom: 16px;
 	position: relative;
-	overflow: hidden;
+	/*overflow: hidden;*/
 	float:left; width:100%;
 }
 

@@ -44,16 +44,13 @@ body {
 }
 
 #content {
-	padding: 0;
-	float: left;
-	width: 100%;
+
 }
 
 #nav {
 	width: 161px;
-	margin: 15px 0 0 15px;
-	float: left;
-	position: static;
+	margin: 15px 0 16px 15px;
+	top:120px;
 }
 
 #nav h3 {
@@ -301,8 +298,8 @@ li p.interact { margin-top: 2px; }
 	margin: 0;
 	background: #c4c4c4;
 	font-size: 11px;
-	padding-left: 20px;
-	margin-top: -35px;
+	margin:-35px 0 0 197px;
+
 }
 
 #footer ul li {
