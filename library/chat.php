@@ -88,8 +88,7 @@ class Chat extends Model {
     }
 
     function prune_users ($category_id) {
-        $time = new DateTime();
-        $time->sub(new DateInterval('PT12S'));
+        $time = new DateTime('-12 seconds');
 
         $query = "DELETE FROM chat_poll
                   WHERE time < '".$time->format('Y-m-d H:i:s')."'

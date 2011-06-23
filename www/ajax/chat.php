@@ -54,8 +54,7 @@ if ($method == 'send') {
 else if ($method == 'receive') {
 
     if (empty($_POST['last_poll']) || $_POST['last_poll'] == 'null') {
-        $last_poll = new DateTime();
-        $last_poll->sub(new DateInterval('PT1800S')); // 30 minutes
+        $last_poll = new DateTime('-30 minutes');
     } else {
         $last_poll = new DateTime($_POST['last_poll']);
     }
