@@ -2,6 +2,7 @@
 Schoolbox Core CSS
 --------------------------------------------------------------*/
 
+
 body { font-size: 75%; }   /* IE */
 
 html > body { font-size: 12px; }  /* Other browsers */
