@@ -21,34 +21,36 @@ $j(document).ready(function() {
 		defaultFileSelectedText: '<span></span>File selected'
 	});
 	
-	$j('#fileForm').validate({
-		rules: {
-			file : {
-				required: {
-					depends: function(element) {
-						return $j('#myfile').val() == '';
+	if ($j('h1.type').text() == "Add File") {
+			
+		$j('#fileForm').validate({
+			rules: {
+				file : {
+					required: {
+						depends: function(element) {
+							return $j('#myfile').val() == '';
+						}
 					}
-				}
-			},
-			myfile : {
-				required: {
-					depends: function(element) {
-						return $j('#browse').val() == '';
+				},
+				myfile : {
+					required: {
+						depends: function(element) {
+							return $j('#browse').val() == '';
+						}
 					}
 				}
 			}
-		}
-
-	}); 
-	
-
+		})
+	} else {
+		$j('#fileForm').validate();
+	}
 
 });
 
 </script>
 <!-- END custom_head -->
 
-<h1>{ACTION} File</h1>
+<h1 class="type">{ACTION} File</h1>
 <form method="post" enctype="multipart/form-data" id="fileForm" class="clearfix"  action="/cms/fileForm.php">
   <table class="standardForm">
   	<colgroup>
@@ -127,6 +129,3 @@ $j(document).ready(function() {
           <!-- END delete_button -->
   
 </form>
-
-
-
