@@ -1497,6 +1497,7 @@ ADMIN
 
 .btn.no-marg { margin:0 8px 0 0; }
 .btn.margin-left-right{ margin:0 8px}
+.submit-btn-plain.no-marg { margin:0 8px 0 0; }
 
 .row-holder {
 	width:100%;

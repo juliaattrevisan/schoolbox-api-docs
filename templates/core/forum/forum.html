@@ -16,8 +16,9 @@
 	<p><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a></p>
 </div>
 <form action="/forum/modifyForm.php" method="POST" >
-	<button class="thread submit-btn-plain clearfix">Post Thread</button>
-	<table  class="standardForm forum">
+	<p class="clearfix"><button class="thread submit-btn-plain clearfix  no-marg">Post Thread</button></p>
+
+	<table class="standardForm forum">
 		<thead>
 			<tr>
 				<th width="40%">Forum</th>
@@ -49,6 +50,7 @@
 			<!-- END thread -->
 		</tbody>
 	</table>
+
 	<button class="thread submit-btn-plain">Post Thread</button>
 	<!-- BEGIN delete_button -->
 	<input type="submit" name="submit" class="submit-btn-plain" value="Delete Selected" onclick="return(confirm('Are you sure you wish to delete these forum threads?'))" />
