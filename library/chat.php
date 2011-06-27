@@ -36,6 +36,8 @@ class Chat extends Model {
                 $log['time_js'] = $log_time->format('D M j Y H:i:s \G\M\TO (T)'); // Thu Apr 14 2011 15:54:52 GMT+1000 (EST)
                 $log['name'] = formatName($log);
                 $log['user_perm'] = $this->group->getPermission($category_id, $log['user_id']);
+                $log['type'] = scrubTEXT($log['type']);
+                $log['body'] = scrubTEXT($log['body']);
             }
 
         }
@@ -50,9 +52,9 @@ class Chat extends Model {
         return $this->create(array(
             'category_id' => $category_id,
             'user_id'     => $user_id,
-            'type'        => $type,
+            'type'        => scrubTEXT($type),
             'time'        => $time->format('Y-m-d H:i:s'),
-            'body'        => $body
+            'body'        => scrubTEXT($body)
         ));
     }
 
