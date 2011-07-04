@@ -110,20 +110,23 @@ if(is_numeric($this->arg[0])) {
         }
     }
     else {
-
         $submissionList = $studentSubHandler->getByBoxID($this->arg[0]);
 
-        if(is_array($submissionList)) {
+        if (is_array($submissionList)) {
             foreach($submissionList as $line) {
 
 				/* If already marked display mark, else provide link to return mark */
                 $return = $returnHandler->getByUser($line['uid'], $this->arg[0]);
-				if(is_array($return))
-					$mark = $return[0]['mark'];
-				else
-					$mark = "<a href=\"/submission/returnWork/".$this->arg[0]."/".$line['uid']."\">Mark</a>";
 
-                $output = array(	'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
+				if (is_array($return)) {
+					$mark = $return[0]['mark'];
+				}
+				else {
+					$mark = "<a href=\"/submission/returnWork/".$this->arg[0]."/".$line['uid']."\">Mark</a>";
+				}
+
+                $output = array(
+					'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
                     'OWNER_ID'      => $line['uid'],
                     'SUB_ID'        => $line['id'],
                     'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
@@ -131,18 +134,20 @@ if(is_numeric($this->arg[0])) {
                     'COLOUR'        => $line['late']?'#ff0000':'#000000',
                     'MARK'          => $return[0]['mark'],
                     'ON_OFF'        => ++$i%2?'':'dark',
-            );
+            	);
 
-            $this->setVar($output);
-            $this->parse('mark_block', 'mark', false);
-            $this->parse("submission_listing","submitted_block",true);
-
+				$this->setVar($output);
+				$this->parse('download_action_block', 'download_action');
+				$this->parse('mark_action_block', 'mark_action', false);
+				$this->parse("submission_listing","submission_block",true);
             }
         }
+		else {
+			$this->setVar('submission_listing', '');
+		}
     }
-
 }
-else
+else {
     error(2);
-
+}
 ?>

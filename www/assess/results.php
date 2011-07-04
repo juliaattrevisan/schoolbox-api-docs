@@ -157,7 +157,8 @@ $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
 $this->setTitle('Results for: ' . $assess['title']);
 
 $this->setVar(array(
-    'ASSESS_TITLE' => $assess['title']
+	'ASSESS_ASSESS_ID' => $assess['assess_id'],
+    'ASSESS_TITLE' => $assess['title'],
 ));
 
 /* Get a list of students who could have submitted data to this Assess, then
@@ -182,49 +183,54 @@ else {
  */
 $allAttempts = $attemptHandler->getList($this->arg[0]);
 
-foreach($allStudents as $currentStudent) {
-	if ($allAttempts && count($allAttempts)) {
-		for ($numAttempts = 0, $i = 0; $i < count($allAttempts); $i++) {
-			$currentAttempt = $allAttempts[$i];
+if (is_array($allStudents) && count($allStudents)) {
+	foreach($allStudents as $currentStudent) {
+		if ($allAttempts && count($allAttempts)) {
+			for ($numAttempts = 0, $i = 0; $i < count($allAttempts); $i++) {
+				$currentAttempt = $allAttempts[$i];
 
-			/* Match up attempt wtih student, remove from list
-			 */
-			if ($currentAttempt['user_id'] == $currentStudent['uid']) {
-				if ($allAttempts[$i]['processed'] != true) {
-					processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this);
+				/* Match up attempt wtih student, remove from list
+				 */
+				if ($currentAttempt['user_id'] == $currentStudent['uid']) {
+					if ($allAttempts[$i]['processed'] != true) {
+						processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this);
 
-					$allAttempts[$i]['processed'] = true;
+						$allAttempts[$i]['processed'] = true;
 
-					$numAttempts++;
+						$numAttempts++;
+					}
 				}
 			}
 		}
+
+		/* If no attempts, just show name
+		 */
+		if (!$numAttempts) {
+			$this->setVar(array(
+				'ASSESS_ASSESS_ID' => '',
+				'ASSESS_FIRST_SECTION_ID' => '',
+				'ATTEMPT_ATTEMPT_ID' => '',
+				'USER_ID' => $currentStudent['uid'],
+				'ATTEMPT_NAME' => $currentStudent['firstname'] . ' ' . $currentStudent['lastname'],
+				'ATTEMPT_FINISH' => '',
+				'ATTEMPT_TIME_TAKEN' => '',
+				'ATTEMPT_TOTAL_MARKS' => '',
+				'ATTEMPT_TOTAL_AVAILABLE_MARKS' => '',
+				'ATTEMPT_PERCENTAGE' => '',
+				'ATTEMPT_REVIEW_STATUS' => '',
+				'ATTEMPT_UNMARKED_RESPONSES' => '',
+				'ATTEMPT_REVIEW_LINK' => '',
+				'ATTEMPT_DELETE_LINK' => '',
+			));
+
+			$this->parse('attempt_block', 'attempt', true);
+		}
+
+		$numAttempts = 0;
 	}
-
-	/* If no attempts, just show name
-	 */
-	if (!$numAttempts) {
-		$this->setVar(array(
-			'ASSESS_ASSESS_ID' => '',
-			'ASSESS_FIRST_SECTION_ID' => '',
-			'ATTEMPT_ATTEMPT_ID' => '',
-			'USER_ID' => $currentStudent['uid'],
-			'ATTEMPT_NAME' => $currentStudent['firstname'] . ' ' . $currentStudent['lastname'],
-			'ATTEMPT_FINISH' => '',
-			'ATTEMPT_TIME_TAKEN' => '',
-			'ATTEMPT_TOTAL_MARKS' => '',
-			'ATTEMPT_TOTAL_AVAILABLE_MARKS' => '',
-			'ATTEMPT_PERCENTAGE' => '',
-			'ATTEMPT_REVIEW_STATUS' => '',
-			'ATTEMPT_UNMARKED_RESPONSES' => '',
-			'ATTEMPT_REVIEW_LINK' => '',
-			'ATTEMPT_DELETE_LINK' => '',
-		));
-
-		$this->parse('attempt_block', 'attempt', true);
-	}
-
-	$numAttempts = 0;
+}
+else {
+	$this->setVar('attempt_block', '');
 }
 
 /* Deal with remainder attempts

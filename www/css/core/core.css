@@ -517,6 +517,11 @@ th { font-weight:bold; }
 .template1 .right .hide-on-small, 
 .template4 .left .hide-on-small { display: none; }
 
+.hide-on-small{
+	float: left;
+	width: 70%;
+	margin-bottom: 8px;
+}
 /*--------------------------------------------------------------
  BOXES
 --------------------------------------------------------------*/
@@ -801,11 +806,11 @@ dl.errors dd { width:85%; }
 }
 
 .text.textbox ul {
-	list-style:circle;
+	list-style:disc;
 	margin:0 0 16px 2.5em
 }
 
-.text.textbox ol { list-style:lower-alpha; }
+.text.textbox ol {margin:0 0 16px 2.5em; }
 
 .text.textbox li { padding:0; }
 
@@ -4126,7 +4131,9 @@ p.forgotten { margin:10px 0; }
 .wysiwyg, .revision-box {padding:7px 16px; }
 .revision-box {border:1px solid #ccc; margin-bottom:16px;}
 .wysiwyg h2, .revision-box h2{background:0; text-indent:0; margin-bottom:16px; padding:0;}
-.wysiwyg ul, .wysiwyg ol, .revision-box ul, .revision-box ol{margin:0 0 16px 16px; line-height:16px;}
+.wysiwyg ul, .wysiwyg ol, .revision-box ul, .revision-box ol{margin:0 0 16px 16px; line-height:16px;list-style:circle; }
+.wysiwyg ol, .revision-box ol{list-style:decimal;}
+
 .submitted-by {
 	margin-bottom:0;
 	text-align:right;

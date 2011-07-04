@@ -60,7 +60,11 @@ class Session {
             * if(Cfg::get('ldap_enable'))
                 $this->setLDAPInfo($username);
             */
+
+            return true;
         }
+        else
+            return false;
 
     }
 
@@ -120,14 +124,15 @@ class Session {
         $ds=ldap_connect(Cfg::get('ldap_host'));
         ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
         ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-        ldap_bind($ds, $this->ldap_escape(Cfg::get('ldap_user')), $this->ldap_escape(Cfg::get('ldap_pass')));
-        $searchString = "(".Cfg::get('ldap_username')."=".$this->ldap_escape($username).")";
+        ldap_bind($ds, $this->ldap_escape(Cfg::get('ldap_user')), utf8_encode(Cfg::get('ldap_pass')));
+        $searchString = "(".Cfg::get('ldap_username')."=".$this->ldap_escape($username, true).")";
         $result = ldap_search($ds,Cfg::get('ldap_base'), $searchString, array('dn'));
         if($result) {
                 $entries = ldap_get_entries($ds, $result);
                 $dn = $entries[0]['dn'];
+
                 if($dn)
-                        return @ldap_bind($ds, $dn, $this->ldap_escape($password));
+                        return @ldap_bind($ds, $dn, utf8_encode($password));
         }
         ldap_unbind($ds);
 
@@ -142,7 +147,7 @@ class Session {
                 $entries = ldap_get_entries($ds, $result);
                 $dn = $entries[0]['dn'];
                 if($dn)
-                    return @ldap_bind($ds, $dn, $this->ldap_escape($password));
+                    return @ldap_bind($ds, $dn, utf8_encode($password));
             }
         }
 

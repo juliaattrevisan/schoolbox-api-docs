@@ -111,7 +111,7 @@ class AssessAnswerFillgap extends AssessAnswer {
      */
     function prepareResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
-        
+
         $currentAnswer = $this->getByQuestionID($question_id);
 
         if ($existing['response']) {
@@ -157,9 +157,25 @@ class AssessAnswerFillgap extends AssessAnswer {
      * @param <type> $response
      */
     function saveResponse($data) {
-        $processedResponse = serialize($data[$this->prefix . $data['question_id']]);
+		$isNotEmpty = false;
 
-        return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
+		foreach ($data[$this->prefix . $data['question_id']] as $answer) {
+			if ($answer != '') {
+				$isNotEmpty = true;
+			}
+		}
+
+		/* Cater for empty answers. If nothing was provided, restore stub
+		 * placeholder (null) which causes %complete indicator to drop
+		 */
+		if ($isNotEmpty) {
+			$processedResponse = serialize($data[$this->prefix . $data['question_id']]);
+		}
+		else {
+			$processedResponse = NULL;
+		}
+
+		return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
     }
 
     /**
@@ -178,7 +194,7 @@ class AssessAnswerFillgap extends AssessAnswer {
         preg_match_all($pattern, $answer, $matches);
 
         $actualAnswers = $matches[1];
-        
+
         /* Find out how much each phrase is worth
          */
         $marksPerAnswer = $currentResponse['marks'] / count($actualAnswers);

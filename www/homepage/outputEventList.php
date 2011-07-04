@@ -27,6 +27,7 @@ if (is_array($eventList)) {
                         'CAL_MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">Modify</a>" : '',
                         'CAL_TYPE'      => $event['eventType'],
                         'CAL_AUTHOR'    => formatName($event),
+                        'CAL_AUTHOR_ID' => $event['owner'],
                         'CAL_ID'	    => $event['id'],
                         'ON_OFF'	    => ++$j%2? '' : 'dark',
                       );

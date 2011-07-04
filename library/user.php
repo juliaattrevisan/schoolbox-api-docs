@@ -214,50 +214,22 @@ class User extends Model {
         return false;
     }
 
-    /* function sendPassword($email) {
-      if (empty($email))
-      return 0;
-
-      /* Only parents can make this work. Look up their username because
-     * alt_email is an optional field, and username is their email address
-     */
-    /* $groupHandler = new Group();
-
-      $user = $this->getByField('alt_email', $email);
-
-      if (isset($user['id'])) {
-      if ($groupHandler->isParent($user['id'])) {
-      require_once SITE_root . '/include/mailer.php';
-      $mailHandler = new Mailer('new-password.html', 'Password reminder for Shore Parent Services', $user['alt_email']);
-      $mailHandler->setVar('PASSWORD', $user['email_pass']);
-      $mailHandler->send();
-
-      return 1;
-      }
-      else {
-      return 2;
-      }
-      }
-      else {
-      return 0;
-      }
-      } */
-
     function sendPassword($email) {
         if (empty($email))
             return false;
-
+        $groupHandler = new Group();
         $user = $this->getByField('alt_email', $email);
         if (isset($user['id'])) {
+            if ($groupHandler->isParent($user['id']) || Cfg::get('site_name') != 'shore'  ) {
+                require_once SITE_root . '/include/mailer.php';
+                $mailHandler = new Mailer('new-password.html', HEADING . ' Password Reminder', $user['alt_email']);
+                $mailHandler->setVar('NAME', $user['firstname']);
+                $mailHandler->setVar('USERNAME', $user['username']);
+                $mailHandler->setVar('PASSWORD', $user['email_pass']);
+                $mailHandler->send();
 
-            require_once SITE_root . '/include/mailer.php';
-            $mailHandler = new Mailer('new-password.html', HEADING . ' Password Reminder', $user['alt_email']);
-            $mailHandler->setVar('NAME', $user['firstname']);
-            $mailHandler->setVar('USERNAME', $user['username']);
-            $mailHandler->setVar('PASSWORD', $user['email_pass']);
-            $mailHandler->send();
-
-            return true;
+                return true;
+            }
         } else
             return false;
     }

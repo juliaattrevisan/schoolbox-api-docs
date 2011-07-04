@@ -64,6 +64,7 @@ else
                         'EVENT_TYPE'    => 'type'.$event['type'],
                         'TYPE'          => $event['eventType'],
                         'AUTHOR'        => formatName($event),
+                        'AUTHOR_ID'        => $event['owner'],
                       );
 		
 		$this->setVar($output);

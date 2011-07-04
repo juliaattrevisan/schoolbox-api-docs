@@ -27,7 +27,9 @@ $this->setBlock("category_block", "new_blog", "new_blog_item");
 $flag = 0;
 
 //check mail status
-if(Cfg::get('mail_enable') && !(Cfg::get('site_location') == 'mgs' && $groupHandler->isStaff()) ) {
+/*Removed as it was causing issues and not well supported
+ *
+ * if(Cfg::get('mail_enable') && !(Cfg::get('site_location') == 'mgs' && $groupHandler->isStaff()) ) {
 
 	$mailbox = $whatnew->newEmail();
 	if($mailbox->unseen > 0) {
@@ -38,7 +40,7 @@ if(Cfg::get('mail_enable') && !(Cfg::get('site_location') == 'mgs' && $groupHand
 		$this->setVar('new_mail_block','');
 	}
 }
-else
+else*/
 	$this->setVar('new_mail_block','');
 
 //for each subject

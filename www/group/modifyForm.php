@@ -96,6 +96,10 @@ elseif (isset($_GET['disband'])) {
 	localRedir("/");
 }
 elseif (isset($_POST['bulkAdd'])) {
+
+    require_once SITE_root. '/library/user.php';
+    $userHandler = new User;
+
 	//get rid of newlines
 	$string = preg_replace("(\r\n|\n|\r)", ",", $_POST['bulkAdd']);
 	
@@ -104,19 +108,17 @@ elseif (isset($_POST['bulkAdd'])) {
 	
 	foreach($list as $key) {
 		trim($key);
-		if(is_numeric($key)) {
-			//numeric assume its a synergy id
-			$query = "SELECT id FROM user WHERE synergy_id = $key";
-			$userid = $groupHandler->db->getRow($query);
-			if($userid['id']) 
-				$groupHandler->addUser($_REQUEST['categoryID'], $userid['id']);
+
+        $user = $userHandler->getBySynergy($key);
+
+        if($user['id']) {
+            $groupHandler->addUser($_REQUEST['categoryID'], $user['id']);
 				
 		} else {
 			//word, assume its a username
-			$query = "SELECT id FROM user WHERE username like '$key'";
-			$userid = $groupHandler->db->getRow($query);
-			if($userid['id'])
-				$groupHandler->addUser($_REQUEST['categoryID'], $userid['id']);
+            $user = $userHandler->getByUsername($key);
+			if($user['id'])
+				$groupHandler->addUser($_REQUEST['categoryID'], $user['id']);
 		}
 	}
 	

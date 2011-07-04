@@ -13,10 +13,14 @@ else
 
 $this->setVar('CALENDAR_TITLE', 'Campus Calendar');
 
-$query = "SELECT id, UNIX_TIMESTAMP(date) as outputDate,
+$query = "SELECT id, UNIX_TIMESTAMP(date) as outputDate, owner
 			TIME_FORMAT(startTime, '".Cfg::get('calendar_time_format')."') as startTimeString, TIME_FORMAT(endTime,
-			'".Cfg::get('calendar_time_format')."') as endTimeString,priority, note, location, detail
+			'".Cfg::get('calendar_time_format')."') as endTimeString,priority, note, location, detail,
+			user.id as uid, title, firstname, lastname,
+			eventType, eventColour
 		FROM event
+		    LEFT JOIN user ON owner = user.id
+		    LEFT JOIN luEventType ON type = eventTypeID
 			JOIN eventCampus ON event.id = eventCampus.eventID
 			JOIN eventGroup ON event.id = eventGroup.eventID
 		WHERE access = 3 
@@ -55,6 +59,7 @@ if (is_array($eventList)) {
                         'CAL_MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">Modify</a>" : '',
                         'CAL_TYPE'      => $event['eventType'],
                         'CAL_AUTHOR'    => formatName($event),
+                        'CAL_AUTHOR_ID' => $event['owner'],
                         'CAL_ID'	    => $event['id'],
                         'ON_OFF'	    => ++$j%2? '' : 'dark',
                       );

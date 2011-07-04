@@ -228,6 +228,9 @@ if(is_numeric($this->arg[0])) {
                 $this->setVar('action_log_block', '');
 
     }
+    else{
+        error(31);
+    }
 }
 else {
     $this->setFile(TEMPLATE_content, 'adminv2/new-user.html');

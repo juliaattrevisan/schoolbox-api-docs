@@ -157,8 +157,6 @@ label { font-weight:bold; }
 .box ul { list-style: none; }
 
 .box ul li, .news-item ul li {
-	list-style: none;
-	background: url(/images/ormond/bullet.gif) no-repeat 0 4px;
 	padding-left: 20px;
 }
 

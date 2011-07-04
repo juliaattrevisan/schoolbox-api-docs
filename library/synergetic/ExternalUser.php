@@ -121,26 +121,29 @@ class ExternalUser extends MSSQL{
 	 * @param <type> $synID
 	 * @return <type>
 	 */
-	public function getStudentContactListExtended($yearlevel) {
-		$query = "
-			SELECT 
-				StudentID, StudentGiven1, StudentSurname, StudentYearLevel
-				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
-				StudentContactAddress1, StudentContactSuburb, StudentContactPostCode, StudentContactState,
-				StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
-				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
-				StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType,
-				DirectoryIncludeFlag
-			FROM SynergyOne.dbo.vStudentContactAllAddress
-			LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
-			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
-			AND FileSemester = " . $_SESSION['FileSemester'] . "
-			AND FileYear = " . $_SESSION[ 'FileYear'] . "
-			AND StudentYearLevel = '$yearlevel'
-			ORDER BY StudentSurname, StudentID, StudentContactType";
+    public function getStudentContactListExtended($yearlevel) {
+            $query = "
+                    SELECT
+                            StudentID, StudentGiven1, StudentSurname, StudentYearLevel,
+                            StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
+                            StudentContactAddress1, StudentContactSuburb, StudentContactPostCode, StudentContactState,
+                            StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
+                            StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
+                            StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType,
+                            StudentContactSilentPhoneFlag, Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag, Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeF$
+                            StudentParentsSeparatedFlag
+                    FROM SynergyOne.dbo.vStudentContactAllAddress
+                    LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
+                    LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
+                    WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
+                    AND FileSemester = " . $_SESSION['FileSemester'] . "
+                    AND FileYear = " . $_SESSION[ 'FileYear'] . "
+                    AND StudentYearLevel = '$yearlevel'
+                    ORDER BY StudentSurname, StudentID, StudentContactType";
 
-		return $this->getAll($query);
-	}
+            return $this->getAll($query);
+    }
+
 
 	function getStudentContactList ($synID) {
 		$query = "SELECT StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,

@@ -84,7 +84,7 @@ p.important {
 
 
 
-#tabs li{float:left; margin:0 0 0 1px;}
+#tabs li{float:right; margin:0 0 0 1px;}
 
 #tabs li a:hover{background-color:#e1f0ff;}
 #tabs li a.navthis{background-color:#fff; border-bottom-color:#fff;}

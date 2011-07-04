@@ -1,9 +1,7 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/recaptcha.css" />
-<script type="text/javascript" src="/javascript/jquery.recaptcha.js"></script>
 <script language="JavaScript" type="text/javascript">
 $j(function () {
-	$j('#recaptcha').recaptcha();
+
 
 	var justSubmit = false;
 	
@@ -26,24 +24,7 @@ $j(function () {
 			alert(message);
 			return false;
 		
-		} else if ($j('#recaptcha_answer').length > 0) {
-			
-			$j.get('/ajax/recaptcha.php', 
-				{'recaptcha_answer' : $j('#recaptcha_answer').val(), 'recaptcha_challenge' : $j('#recaptcha_challenge').val()},
-				function (data) {
-					if (data.verified == 'true') {
-						justSubmit = true;
-						form.triggerHandler('submit');
-					} else {
-						alert('The words you have entered do not match the image, please try again.');
-						$j('#recaptcha_answer').css('background-color', 'pink').focus();
-					}
-				
-				}, 'json'
-			);
-			return false;
 		}
-	
 	});
 	
 	$j('input').change(function () {

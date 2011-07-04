@@ -80,7 +80,7 @@ if (is_numeric($this->arg[0])) {
 	/* Dont display emails of students to parents
 	 */
 	if ($emailAddress) {
-		if ($groupHandler->isStudent($user['uid']) && $groupHandler->isParent()) {
+		if ($groupHandler->isStudent($user['uid']) && $groupHandler->isParent() && !$groupHandler->isParentOfChild($user['uid']) ) {
 			$email = '';
 		}
 		else {
@@ -115,17 +115,18 @@ if (is_numeric($this->arg[0])) {
 		if ($groupHandler->isParent($user['uid']) && !$groupHandler->isStudent()) {
 			$parent = $synUserHandler->getParent($user['synergy_id']);
 
-			if ($parent['SpouseDirectoryIncludeFlag']) {
+			if ($parent['PrimaryDirectoryIncludeFlag']) {
 				$output = array(
-					'HOME_PHONE'	=> $parent['StudentContactHomePhone'],
+                    'NAME' => scrubTEXT($parent['StudentContactLegalFullName']),
+					'HOME_PHONE'	=> $parent['StudentContactSilentPhoneFlag']?$parent['StudentContactHomePhone']:'',
 					'MOBILE_PHONE'  => $parent['StudentContactMobilePhone'],
 				);
 
 				$this->setVar($output);
 
-				if ($parent['StudentContactSpouseLegalFullName'] && !$parent['StudentParentsSeparatedFlag']) {
+				if ($parent['SpouseDirectoryIncludeFlag'] && $parent['StudentContactSpouseLegalFullName'] && !$parent['StudentParentsSeparatedFlag']) {
 					$output = array(
-						'NAME' => scrubTEXT($parent['StudentContactLegalFullName']),
+
 						'SPOUSE_NAME' => scrubTEXT($parent['StudentContactSpouseLegalFullName']),
 						'SPOUSE_MOBILE' => $parent['StudentContactSpouseMobilePhone'],
 						'SPOUSE_EMAIL'=> '<a href="'.$_SESSION['mailhandle'].$parent['StudentContactSpouseEmail'].'\">'.$parent['StudentContactSpouseEmail'].'</a>',
@@ -259,7 +260,7 @@ if (is_numeric($this->arg[0])) {
 				}
 			}
 
-			if ($groupHandler->isStaff() ) {
+			if ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['uid'])  ) {
 				if (trim($synInfo['StudentMedicalAlert'])) {
 					$this->parse('medical_block', 'medical');
 				}

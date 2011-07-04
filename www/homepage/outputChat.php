@@ -39,7 +39,7 @@ $this->setVar(array(
     'CHAT_COMPONENT_ID' => $component['homepageComponentLocationID'],
     'CHAT_USER_ID'      => $_SESSION['id'],
     'CHAT_USER_NAME'    => scrubTEXT(formatName($_SESSION)),
-    'CHAT_USER_PERM'    => $group->getPermission($categoryID),
+    'CHAT_USER_PERM' => $group->getPermission($categoryID),
     'CHAT_STATE'        => $config['state'],
 ));
 

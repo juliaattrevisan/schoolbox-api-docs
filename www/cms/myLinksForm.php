@@ -19,7 +19,7 @@ if (isset($_REQUEST['url']) && $_REQUEST['url'] && isset($_REQUEST['description'
 	$myLinksHandler->create(array(
 		'owner' => $_SESSION['id'],
 		'url' => $url,
-		'description' => scrubTEXT($_REQUEST['description'])
+		'description' => $_REQUEST['description']
 	));
 }
 else if (is_numeric($_GET['delete'])) {

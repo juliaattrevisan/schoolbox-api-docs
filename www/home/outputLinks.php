@@ -3,20 +3,26 @@ $this->setBlock($component['name'], 'quicklink', 'quicklink_block');
 
 require_once('../library/link.php');
 
-if($_SESSION['campus'][0] == 1) //Senior
-    $cid = 6022;
+foreach($_SESSION['campus'] as $campus) {
 
-if($_SESSION['campus'][0] == 2) //Junior
-    $cid = 6023;
+    if($campus == 1) //Senior
+        $cidList[] = 6022;
 
-if($_SESSION['campus'][0] == 3) //Middle
-    $cid = 6024;
+    if($campus == 2) //Junior
+        $cidList[] = 6023;
+
+    if($campus == 3) //Middle
+        $cidList[] = 6024;
+}
 
 $linkHandler = new Link;
+$linkList = array();
 
-$linkList = $linkHandler->getAllInCategory($cid);
-
-if(is_array($linkList)) {
+foreach($cidList as $cid) {
+    $tmp = $linkHandler->getAllInCategory($cid);
+    $linkList = array_merge($linkList, $tmp);
+}
+if(count($linkList)>0) {
     foreach($linkList as $link) {
         $this->setVar(array(
             'ON_OFF'    => ++$j%2 ? '' : 'dark',

@@ -74,13 +74,36 @@ for ($k = 0; $k < count($allSections); $k++) {
 
 	$attemptValues = array();
 
+	/* Get a list of questions
+ 	*/
+	$allQuestions = $sectionHandler->getContents($this->arg[0], $currentSection['section_id']);
+
+	for ($i = 0; $i < count($allQuestions); $i++) {
+		$currentQuestion = $allQuestions[$i];
+
+		$questionValues[$i] = strip_tags($currentQuestion['question']);
+
+		/* This if() clause allows for sections containing no questions.
+		 * because they come out with getContents()
+		 */
+		if ($currentQuestion['type_id']) {
+			$answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
+
+			/* Load answer template into answerOption block
+			 */
+			$responseValues[$i] = strip_tags(str_replace("\t", '', $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $currentQuestion['question_id'])));
+		}
+	}
+
+	$sectionValues[$k]['questions'] = $questionValues;
+
+	/* Get attempts for the assessment
+	 */
 	if ($allAttempts) {
 		for ($j = 0; $j < count($allAttempts); $j++) {
 			$currentAttempt = $allAttempts[$j];
 
 			$attemptValues[$j]['name'] = $currentAttempt['firstname'] . ' ' . $currentAttempt['lastname'];
-
-			$allQuestions = $sectionHandler->getContents($this->arg[0], $currentSection['section_id']);
 
 			if ($allQuestions) {
 				$questionValues = array();
@@ -105,13 +128,6 @@ for ($k = 0; $k < count($allSections); $k++) {
 			}
 
 			$attemptValues[$j]['responses'] = $responseValues;
-
-			/* Only perform on first iteration, as we are accumulating a list
-			 * of questions that were attempted
-			 */
-			if ($j == 0) {
-				$sectionValues[$k]['questions'] = $questionValues;
-			}
 		}
 	}
 
@@ -130,7 +146,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
 
 		/* Get a list of questions going
 		 */
-		if (count($currentSection['questions'])) {
+		if (is_array($currentSection['questions']) && count($currentSection['questions'])) {
 			$questionList[] = "Respondent";
 
 			foreach($currentSection['questions'] as $currentQuestion) {

@@ -105,7 +105,7 @@ class SitePage extends Page {
 		$templateVar = array(	'TEMPLATE_YEAR' => date('Y'),
 					'SITE_NAME'     => Cfg::get('school_name'),
 					'SITE_ADDRESS'	=> Cfg::get('site_address'),
-					'SITE_GREETING' => greeting(),
+					'SITE_GREETING' => greeting(), //TODO fix this so it uses an object, where is this coming from?
 					'SITE_LOGINNAME'=> formatName($_SESSION),
                     'SITE_USERNAME' => $_SESSION['username'],
 					'SITE_LOCATION'	=> $this->site,
@@ -382,12 +382,12 @@ class SitePage extends Page {
 			//provide encoded login details for intranet
 			$this->setVar("ENC_LOGIN", urlencode(base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'].' '.$_SESSION['password'].' '.date('Y m d H i')))));
 
-			$this->setBlock('tabTpl', 'portfolio_tab', 'pf_tab');
+			$this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
 			if($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) {
-				$this->parse('pf_tab', 'portfolio_tab');
+				$this->parse('mf_tab', 'myfiles_tab');
 			}
 			else {
-				$this->setVar('pf_tab', '');
+				$this->setVar('mf_tab', '');
 			}
 		}
 		if($this->site == 'shore') {
@@ -404,7 +404,7 @@ class SitePage extends Page {
 				if(strpos(getIP(),'192.168.') === FALSE)
 						$this->setVar('MYFILES_LOCATION', 'https://mail.student.shore.nsw.edu.au/fileway');
 				else
-						$this->setVar('MYFILES_LOCATION', 'http://cassandra/fileway');
+						$this->setVar('MYFILES_LOCATION', 'https://cassandra/fileway');
 
 				$this->parse('mf_tab', 'myfiles_tab');
 			}
@@ -430,6 +430,15 @@ class SitePage extends Page {
 			
 			
 		}
+        if($this->site == 'cathedral') {
+            $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
+            if($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) {
+                $this->parse('mf_tab', 'myfiles_tab');
+            }
+            else {
+                $this->setVar('mf_tab', '');
+            }
+        }
 
         /* Check if eportfolio tab should be enabled
          */

@@ -291,11 +291,9 @@ class PortfolioWebDAV {
                                                                'http://senior-server.school.cathedral.qld.edu.au/xdrive/',
                                                               );
                     } else {
-                            $pathList = array( 'http://senior-server.school.cathedral.qld.edu.au/studenthome/',
+                            $pathList = array( 'http://senior-server.school.cathedral.qld.edu.au/studenthome/'.$_SESSION['username'].'/',
                                                               );
                     }
-                    print_r($pathList);
-                    print $_SESSION['username'] . $_SESSION['password'];
                     return new self($pathList , "cathedral/".$_SESSION['username'], $_SESSION['password']);
                 }
 		

@@ -93,6 +93,9 @@ class ExternalTimetable extends MSSQL{
 
             $startDate = $startDate - ($this->synergeticDay[$startDate]*86400);
 
+            if(!$startDate) //Just assume the start of the year if we cannot find anything
+                $startDate = mktime(0,0,0,1,1,date('Y'));
+
             //find number of days between both dates
             $difference = floor(($date - $startDate) / 86400);
             //find number of weeks between 2 dates
