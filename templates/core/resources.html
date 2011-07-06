@@ -429,9 +429,23 @@ $j(function() {
 	
 	if (window.location.href.indexOf('debug') != -1)
 		alert((date2.getTime() - date1.getTime()) / 1000);
+		
+	$j('#container').height($j(window).height()-$j('#header').height())
+	$j('#category-window').height($j(window).height()-$j('#header').height())	
+	
+	
+		
+	$j(window).resize(function() {
+
+		$j('#container').height($j(window).height()-$j('#header').height())
+		$j('#category-window').height($j(window).height()-$j('#header').height())
+
+	});
+	
 	
 });
 </script>
+
 <style type="text/css">
 /* wrap mimetypes in classes */
 <!-- BEGIN allowed_files -->
