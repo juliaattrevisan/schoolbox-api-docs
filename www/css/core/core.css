@@ -21,15 +21,16 @@ body#tinymce { background:#fff; padding:8px; }
 #tinymce p{}
 #tinymce p span{background:#E0F2DF;}
 
-
 /*--------------------------------------------------------------
  Main Link Styles 
 --------------------------------------------------------------*/
+
 a {
 	outline:none;
 	text-decoration: none;
 	color:#1d9ffc;
 }
+
 a:hover { text-decoration: underline; }
 
 /*--------------------------------------------------------------
@@ -520,6 +521,7 @@ th { font-weight:bold; }
 	width: 70%;
 	margin-bottom: 8px;
 }
+h4 .hide-on-small{float:none; width:auto;}
 /*--------------------------------------------------------------
  BOXES
 --------------------------------------------------------------*/
@@ -697,6 +699,7 @@ h4.eventListing {
 p.interact {
 	margin: 0 0 0 15px;
 	float: right;
+	text-align:right;
 }
 
 p.interact-left {
@@ -869,7 +872,7 @@ input.timeField { width: 30px; }
 	background-color: #fbfbfb;
 	background-image: -moz-linear-gradient(top, #fbfbfb, #f7f7f7);
 	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fbfbfb), color-stop(1, #f7f7f7));
-	filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7');
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
@@ -900,7 +903,7 @@ input.timeField { width: 30px; }
   background-image:     -ms-linear-gradient(top, #e4f8f5, #c9f0eb); 
   background-image:      -o-linear-gradient(top, #e4f8f5, #c9f0eb); 
   background-image:         linear-gradient(top, #e4f8f5, #c9f0eb);
-            filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f8f5', EndColorStr='#c9f0eb')"; 
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f8f5', EndColorStr='#c9f0eb'); 
 
 
 	line-height:23px;
@@ -925,7 +928,7 @@ input.timeField { width: 30px; }
   background-image:     -ms-linear-gradient(top, #fff4ee, #ffe9dd); 
   background-image:      -o-linear-gradient(top, #fff4ee, #ffe9dd); 
   background-image:         linear-gradient(top, #fff4ee, #ffe9dd);
-            filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff4ee', EndColorStr='#ffe9dd')"; 
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff4ee', EndColorStr='#ffe9dd'); 
 
 	cursor:pointer;
 }
@@ -1010,7 +1013,7 @@ input.timeField { width: 30px; }
 	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #e4f5f9), color-stop(1, #c9ebf3));
 	background-image: -webkit-linear-gradient(#e4f5f9, #c9ebf3);
 	background-image: linear-gradient(top, #e4f5f9, #c9ebf3);
-	filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f5f9', EndColorStr='#c9ebf3')";
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e4f5f9', EndColorStr='#c9ebf3');
 }
 
 .btn.print-it{float:none; padding:0 9px 0 38px; display:inline-block; margin:0;background:#FAF9F5; border:0;
@@ -1124,10 +1127,10 @@ CHOOSE FILE SELECTOR
 	top: 0;
 	z-index:20;
 	outline:none;
-	filter: ~"alpha(opacity=1)"; /* internet explorer */
+	filter: alpha(opacity=1); /* internet explorer */
     opacity: 0.01;           /* fx, safari, opera, chrome */
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(opacity=1)"; /*IE8*/
-}
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(opacity=1)"; /*IE8*/
+};
 
 
 .file-input .file-holder{
@@ -1382,7 +1385,7 @@ ADMIN
 	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #f0f2f3), color-stop(1, #e8ebed));
 	background-image: -webkit-linear-gradient(#f0f2f3, #e8ebed);
 	background-image: linear-gradient(top, #f0f2f3, #e8ebed);
- filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorStr='#f0f2f3', EndColorStr='#e8ebed')";
+ filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#f0f2f3', EndColorStr='#e8ebed');
 }
 
 .admin-contents .bar-holder .bar span {
@@ -1402,7 +1405,7 @@ ADMIN
 	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #eaf3fa), color-stop(1, #e0eef7));
 	background-image: -webkit-linear-gradient(#eaf3fa, #e0eef7);
 	background-image: linear-gradient(top, #eaf3fa, #e0eef7);
- filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorStr='#eaf3fa', EndColorStr='#e0eef7')";
+ filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#eaf3fa', EndColorStr='#e0eef7');
 	border:1px solid #aed0ea;
 }
 
@@ -1462,7 +1465,8 @@ ADMIN
 	margin:0;
 }
 
-
+.sortable li { margin-left
+}
 
 .sortable li li { margin-left:32px; }
 
@@ -1669,7 +1673,7 @@ margin:-8px 0 0 0;
 	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #F4F1EA),color-stop(1, #eae7e0)); 
 	background-image: -webkit-linear-gradient(#F4F1EA, #eae7e0); 
 	background-image: linear-gradient(top, #F4F1EA, #eae7e0);
-	filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorStr='#F4F1EA', EndColorStr='#eae7e0')"; 
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#F4F1EA', EndColorStr='#eae7e0'); 
 	padding:4px 4px 0 4px;
 }
 
@@ -1681,7 +1685,7 @@ margin:-8px 0 0 0;
 	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #edeae3),color-stop(1, #e0ddd7)); 
 	background-image: -webkit-linear-gradient(#edeae3, #e0ddd7); 
 	background-image: linear-gradient(top, #edeae3, #e0ddd7);
-	filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorStr='#edeae3', EndColorStr='#e0ddd7')"; 
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#edeae3', EndColorStr='#e0ddd7'); 
 }
 
 /*--------------------------------------------------------------
@@ -2549,6 +2553,7 @@ p.interact a.take-test-btn {
 	width:86%;
 	float:left;
 	padding:10px 5px;
+	;
 }
 
 .mark-test .matchPairs li.right-columns strong { width:80%; }
@@ -2748,7 +2753,7 @@ p.interact a.take-test-btn {
 
 td.cal-left a {padding:0 7px;width:14px;}
 
-.calendar-controls a.back, .calendar-controls a.forward, .calendar-controls .datepicker-box {
+.calendar-controls. a.back, .calendar-controls. a.forward, .calendar-controls .datepicker-box {
 	margin-top:12px;
 	width:46px;
 	height:24px;
@@ -3093,9 +3098,7 @@ ul.js_happening li {
 	margin: 0;
 	border: 1px solid #ccc;
 	position: relative;
-	overflow:scroll;
 }
-
 
 #category-head, #file-head {
 	margin: 0;
@@ -4131,6 +4134,7 @@ p.forgotten { margin:10px 0; }
 .wysiwyg h2, .revision-box h2{background:0; text-indent:0; margin-bottom:16px; padding:0;}
 .wysiwyg ul, .wysiwyg ol, .revision-box ul, .revision-box ol{margin:0 0 16px 16px; line-height:16px;list-style:circle; }
 .wysiwyg ol, .revision-box ol{list-style:decimal;}
+.wysiwyg td, .revision-box td, .textbox td{border:1px solid #ccc;}
 
 .submitted-by {
 	margin-bottom:0;
@@ -4344,7 +4348,8 @@ p.search-sml { font-size:11px; }
 	margin-right:3px;
 }
 
-.pagination a.bold { background:#CCCCCC;}
+.pagination a.bold { background:#CCCCCC; display:
+}
 
 /* SUBJECT COMPLETION GRAPH*/
 .barchart { width: 100%; }
@@ -4443,7 +4448,7 @@ dd {
 	width: 100%;
 	background: #ececec;
 	border-spacing: 5px;
-border-collapse: separate;
+bord er-collapse: separate;
 }
 
 #timetable td {
@@ -4489,7 +4494,7 @@ border-collapse: separate;
 .timetable td {
 	background:#efefef;
 	color:#000;
-	font-size:80%;
+	font:normal 80% /1em Verdana, arial, sans-serif, serif;
 	cursor:hand;
 	padding:4px;
 	text-align:center;
