@@ -1,8 +1,10 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
+<script type="text/javascript" src="/javascript/jquery.urlinternal.js"></script>
 <script type="text/javascript">
     $j(function() {
         $j('#type a[class!=disabled]').click(function() {
+			
             $j('#type a').removeClass('selected');
             $j(this).addClass('selected');
 
@@ -10,7 +12,9 @@
             var paginate = function(){
                 $j('div.' + 'pagination > a').click(function() {
                     $j('div.results > div[title=' + el + ']').load('/search.php', "keyword={KEYWORD}&type=" + el + "&page="+$j(this).attr('title'), paginate);
-                });
+               		
+			    });
+				
             }
 
             if(!$j('div.results > div[title=' + el + ']').hasClass('loaded')) {
@@ -22,13 +26,31 @@
 
             $j('div.results > div').hide();
             $j('div.results > div[title=' + el + ']').show();
+			
         });
 
         var params = window.location.href.split("#");
+		
+		
         if (params[1] != '' && params[0] != window.location.href) {
-            var parent = $j('#a'+ params[1]).parent();
+			/* var paginate = function(){
+                $j('div.' + 'pagination > a').click(function() {
+                    $j('div.results > div[title=' + params[1] + ']').load('/search.php', "keyword={KEYWORD}&type=" + params[1] + "&page="+$j(this).attr('title'), paginate);
+                	$j('.results .search-item:nth-child(even)').addClass('dark');
+				});
+            }
+			
+			$j('#type a[title=' + params[1] +']').addClass('selected');
+			
+			$j('div.results > div[title=' + params[1] + ']').show();
+			$j('div.results > div[title=' + params[1] + ']').load('/search.php', "keyword={KEYWORD}&type=" + params[1], paginate);
+            $j('div.results > div[title=' + params[1] + ']').addClass('loaded');*/
+		   
+		   
+		    var parent = $j('#a'+ params[1]).parent();
             $j(parent).show();
             $j('#type a[title='+parent.attr('id')+']').addClass('selected');
+			console.log(parent);
             $j.scrollTo('#a'+ params[1]);
 			
         } else {
@@ -38,7 +60,6 @@
         }
 		
 		$j('.results .search-item:nth-child(even)').addClass('dark');
-
     });
 </script>
 <!-- END custom_head -->
@@ -46,7 +67,7 @@
 <h1>Search Results</h1>
 <ul id="type">
     <!-- BEGIN type -->
-    <li><a href="javascript:void(0);" title="{TYPE_TITLE}" class="{TYPE_CLASS}">{TYPE_NAME} ({TYPE_COUNT})</a></li>
+    <li><a href="#" title="{TYPE_TITLE}" class="{TYPE_CLASS}">{TYPE_NAME} ({TYPE_COUNT})</a></li>
     <!-- END type -->
 </ul>
 
