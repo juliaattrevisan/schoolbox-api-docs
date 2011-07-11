@@ -203,9 +203,10 @@ h3, #nav h3, .add-component .notification { color: #FFFFFF; }
 	-webkit-border-radius: 0px;
 	border-radius: 0px;
 }
-.standardForm{background:#f3f3f3 !important;}
-.dark, .dark td, #tree .dark, #assess .standardForm, #assess .additional-details, #assess .assess-body, 
-.blog-comments .box, .post-left, #category, .search-item:nth-child(2n) { background-color:#f3f3f3 !important; }
+.standardForm, .dark, .dark td, #tree .dark, #assess .standardForm, #assess .additional-details,
+#assess .assess-body, .blog-comments .box.post-left, #category{background-color:#f3f3f3 ;}
+
+.search-item:nth-child(2n) { background:#f3f3f3 !important; }
 
 #nav .nav-wrapper {
 	background:#fff;
