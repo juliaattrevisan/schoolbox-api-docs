@@ -1,9 +1,9 @@
 <?php
-require_once dirname(__FILE__) .'/db.php';
+require_once dirname(__FILE__) . '/Database.php';
 
 class Session {
     function  __construct() {
-      $this->db = new dbManager;
+      $this->db = new Database;
     }
 
     public function create($username) {
@@ -60,11 +60,7 @@ class Session {
             * if(Cfg::get('ldap_enable'))
                 $this->setLDAPInfo($username);
             */
-
-            return true;
         }
-        else
-            return false;
 
     }
 
@@ -124,15 +120,14 @@ class Session {
         $ds=ldap_connect(Cfg::get('ldap_host'));
         ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
         ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-        ldap_bind($ds, $this->ldap_escape(Cfg::get('ldap_user')), utf8_encode(Cfg::get('ldap_pass')));
-        $searchString = "(".Cfg::get('ldap_username')."=".$this->ldap_escape($username, true).")";
+        ldap_bind($ds, $this->ldap_escape(Cfg::get('ldap_user')), $this->ldap_escape(Cfg::get('ldap_pass')));
+        $searchString = "(".Cfg::get('ldap_username')."=".$this->ldap_escape($username).")";
         $result = ldap_search($ds,Cfg::get('ldap_base'), $searchString, array('dn'));
         if($result) {
                 $entries = ldap_get_entries($ds, $result);
                 $dn = $entries[0]['dn'];
-
                 if($dn)
-                        return @ldap_bind($ds, $dn, utf8_encode($password));
+                        return @ldap_bind($ds, $dn, $this->ldap_escape($password));
         }
         ldap_unbind($ds);
 
@@ -147,7 +142,7 @@ class Session {
                 $entries = ldap_get_entries($ds, $result);
                 $dn = $entries[0]['dn'];
                 if($dn)
-                    return @ldap_bind($ds, $dn, utf8_encode($password));
+                    return @ldap_bind($ds, $dn, $this->ldap_escape($password));
             }
         }
 
@@ -290,4 +285,3 @@ class Session {
       }
    }
 }
-?>
