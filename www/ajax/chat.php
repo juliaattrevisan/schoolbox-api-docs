@@ -14,10 +14,7 @@ error_reporting(E_ALL & ~E_NOTICE);
 
 header("Content-type: application/json");
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once SITE_root . '/library/homepage.php';
-require_once SITE_root . '/library/group.php';
-require_once SITE_root . '/library/chat.php';
+require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 $page = new SitePage;
 $group_handler = new Group();

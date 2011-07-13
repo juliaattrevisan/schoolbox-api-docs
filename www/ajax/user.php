@@ -1,8 +1,8 @@
 <?php
 
-require_once dirname(__FILE__) . '/../conf/conf.php';
+require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 require_once SITE_root . '/www/include/stdfuncs.php';
-require_once SITE_root . '/library/user.php';
+
 $userHandler = new User;
 $result = $suggestions = $data = array();
 $keyword = $_GET['query'];
@@ -37,5 +37,3 @@ $result = array('query'	=> $_GET['query'],
 
 header('Content-type: application/json');
 echo json_encode($result);
-
-?>

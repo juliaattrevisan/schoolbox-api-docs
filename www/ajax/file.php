@@ -1,10 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
-
-require_once SITE_root . '/library/file.php';
-require_once SITE_root . '/library/link.php';
-
+require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 $page = new SitePage;
 $output = array();

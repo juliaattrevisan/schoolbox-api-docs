@@ -15,7 +15,7 @@
  */
 
 
-require_once SITE_root.'/include/sitePage.php';
+require_once SITE_root.'/include/SitePage.php';
 $page = new SitePage();
 
 define('EBL_LIBRARY_ID', 'shore');

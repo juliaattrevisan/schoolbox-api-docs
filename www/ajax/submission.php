@@ -1,9 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once SITE_root . '/library/submission.php';
-require_once SITE_root . '/library/submissionStudent.php';
-require_once SITE_root . '/library/group.php';
+require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 $page = new SitePage;
 

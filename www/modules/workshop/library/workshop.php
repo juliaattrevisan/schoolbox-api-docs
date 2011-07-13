@@ -1,5 +1,4 @@
 <?php
-require_once SITE_root . '/include/model.php';
 
 class Workshop extends DeprecatedModel {
 

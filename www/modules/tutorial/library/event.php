@@ -1,7 +1,5 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 define('TUTORIAL_db', 'tutorial');
 define('PORTAL_db', SQL_db);
 

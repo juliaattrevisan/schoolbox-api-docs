@@ -9,7 +9,7 @@
 require_once('Mail.php');
 require_once('Mail/mime.php');
 require_once('Mail/mime.php');
-require_once(dirname(__FILE__).'/template.php');
+require_once(dirname(__FILE__).'/Template.php');
 require_once(dirname(__FILE__) . '/Config.php');
 
 class Mailer {
