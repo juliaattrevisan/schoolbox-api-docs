@@ -1,6 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/news.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
@@ -12,16 +12,18 @@ if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)
 	error(19);
 
 if ($_POST['heading']) {
+    $publishedDate = new DateTime( str_replace('/', '-', $_POST['item_datetime_published']) );
+    $expiryDate = new DateTime( str_replace('/', '-', $_POST['item_datetime_expires']) );
+
 	$news = array('item_heading' 	=> $_POST['heading'],
                       'item_body'	=> $_POST['body'],
                       'groupList'	=> $_POST['group'],
                       'campusList'	=> $_POST['campus'],
                       'userList'        => $_POST['userList'],
                       'item_topic_id' 	=> $_POST['item_topic_id'],
+                      'item_datetime_published' => $publishedDate->format(Cfg::get('date_database')),
+                      'item_datetime_expires' => $expiryDate->format(Cfg::get('date_database'))
                     );
-	
-	if ((int)$_POST['expires'] > 0)
-		$news['item_datetime_expires'] = outputDate(Cfg::get('date_database'), strtotime("+" . $_POST['expires'] . " hours"));
 
 	if (is_numeric($_POST['newsID'])) {
 		

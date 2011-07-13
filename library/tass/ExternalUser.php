@@ -6,8 +6,6 @@
 *	This file provides access to synergetic user info		*	    
 *                                                           *
 ************************************************************/
-require_once dirname(__FILE__) .'/../mssql.php';
-require_once dirname(__FILE__) .'/../group.php';
 
 class ExternalUser extends MSSQL{
 

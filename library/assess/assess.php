@@ -37,9 +37,8 @@
  * question. This is used to reformat a question; e.g. matching pairs: changing
  * the inputs to readonly; fillgaps: changing <span></span> elements to <input>s.
  */
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
 
-class Assess extends Model {
+class Assess extends DeprecatedModel {
     var $_table = 'assess';
     var $_index = 'assess_id';
 

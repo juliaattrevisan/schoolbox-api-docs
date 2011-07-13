@@ -9,7 +9,7 @@ class viewEvent
 {
 	function viewEvent()
 	{
-		$this->db = new dbManager();
+		$this->db = new Database();
 		
 		$this->t_body = new Template(TPL_directory);
         $this->t_body->set_file('tplBODY', 'modules/clearinghouse/viewEvent.htm');

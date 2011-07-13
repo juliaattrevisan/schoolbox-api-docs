@@ -11,7 +11,7 @@
 *							    *
 **********************************************************/
 
-require_once $_SERVER['DOCUMENT_ROOT'] .'/../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] .'/../include/SitePage.php';
 
 if(Cfg::get('mail_enable'))
 {

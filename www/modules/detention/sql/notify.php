@@ -17,7 +17,7 @@ class notify
 	function notify($state, $detDate, $studID, $staffID, $offence, $workset, $type, $history)
 	{
 		//setup db
-		$this->db = new dbManager("intranet");
+		$this->db = new Database("intranet");
 		$this->db->dbConnect();
 		//setup db for synergy queries
 		//$this->msdb = mssql_connect(MSSQL_host, MSSQL_user, MSSQL_passwd);

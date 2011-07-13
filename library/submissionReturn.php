@@ -1,15 +1,13 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-
-class SubmissionReturn extends Model {
+class SubmissionReturn extends DeprecatedModel {
 
     function SubmissionReturn () {
 
         $this->_table = "submission_return";
         $this->_index = "id";
 
-        parent::Model();
+        parent::DeprecatedModel();
     }
 
 	function getOneByUser($user_id, $box_id = 0) {

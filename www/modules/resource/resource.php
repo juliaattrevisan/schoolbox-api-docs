@@ -15,7 +15,7 @@ class resource
 	function resource()
 	{
 			//always gonna need the db so lets create one..
-			$this->db = new dbManager();
+			$this->db = new Database();
 			$this->db->dbConnect();
 	}
 

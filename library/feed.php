@@ -5,13 +5,10 @@
 *                                                           *														   
 ************************************************************/
 
-require_once($_SERVER['DOCUMENT_ROOT'] .'/conf/conf.php');
-require_once($_SERVER['DOCUMENT_ROOT'] .'/../include/db.php');
-
 class Feed {
 
 	function Feed() {
-		$this->db = new dbManager(SQL_db);
+		$this->db = new Database(SQL_db);
 	}
 
 	function getFeed($cid, $limit) {

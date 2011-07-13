@@ -27,14 +27,18 @@ if (is_numeric($this->arg[0])) {
 	// check user is news owner
 	if($news['item_owner'] != $_SESSION['id'] && $permission < FULL_ACCESS)
 		error(23);
-	
-	$output = array('ACTION'		=> 'Modify',
-                        'NEWS_ID'		=> $news['item_id'],
-                        'HEADING'		=> $news['item_heading'],
-                        'BODY'			=> $news['item_body'],
-                        'LEAVE_OPTION'          => '<option>Keep Existing</option>',
-                        'DEFAULT_TIME_SELECTED' => '',
-                        );
+
+    $publishedDate = new DateTime( $news['item_datetime_published'] );
+    $expiryDate = new DateTime( $news['item_datetime_expires'] );
+
+	$output = array(
+        'ACTION'		=> 'Modify',
+        'NEWS_ID'		=> $news['item_id'],
+        'HEADING'		=> $news['item_heading'],
+        'BODY'			=> $news['item_body'],
+        'ITEM_DATETIME_PUBLISHED' => $publishedDate->format(Cfg::get('date_select')),
+        'ITEM_DATETIME_EXPIRES' => $expiryDate->format(Cfg::get('date_select')),
+    );
 					
 	$this->setVar($output);
 	
@@ -70,20 +74,21 @@ if (is_numeric($this->arg[0])) {
 else {
 	$this->setFile(TEMPLATE_content, 'news/modify.html');
 	$this->setBlock(TEMPLATE_content, 'campus_row', 'campus_row_block');
-        $this->setBlock(TEMPLATE_content, 'current_users', 'current_users_block');
+    $this->setBlock(TEMPLATE_content, 'current_users', 'current_users_block');
 	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
 	$this->setTitle('Add News');
 	$this->setTab('news');
 
+    $publishedDate = new DateTime();
+    $expiryDate = new DateTime('+1 month');
+
 	$output = array('ACTION'	=> 'Add',
 					'NEWS_ID'	=> '',
 					'HEADING'	=> '',
 					'BODY'		=> '',
-					'LEAVE_OPTION'	=> '',
-					'DEFAULT_TIME_SELECTED' => 'selected="selected"',
-                                        'current_users_block'   => '',
-                                        'delete_button_block'   => '',
+                    'ITEM_DATETIME_PUBLISHED' => $publishedDate->format(Cfg::get('date_select')),
+                    'ITEM_DATETIME_EXPIRES' => $expiryDate->format(Cfg::get('date_select')),
 					);
 
 	$this->setVar($output);
@@ -101,6 +106,8 @@ else {
 		$this->parse('campus_row_block', 'campus_row');
 	else
 		$this->setVar('campus_row_block', '');
+
+    $this->setVar('delete_button_block', '');
 		
 } 
 ?>

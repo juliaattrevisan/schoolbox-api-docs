@@ -14,7 +14,7 @@ class Notify
 	{
 		//constructer
 		//gets the detention info
-		$this->db = new dbManager('detention');
+		$this->db = new Database('detention');
 		$sql = "SELECT d.*, detdate.detdatetime, location.location, detstaff.firstname as detStaffFirstname, 
 			detstaff.lastname as detStaffLastname, 	student.firstname as studentFirstname, 
 			student.lastname as studentLastname, student.username as studentUsername, student.year as studentYear,

@@ -2,7 +2,7 @@
 
 require_once('../include/include.php');
 
-$db = new dbManager;
+$db = new Database;
 $query = "SELECT h.cid, h.config, l.url
 		  FROM homepage_comp_location h
 		  LEFT JOIN link l on l.category = h.cid AND l.description = 'Intranet Site'

@@ -1,6 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once SITE_root . '/library/group.php';
 require_once SITE_root . '/library/category.php';
 require_once SITE_root . '/library/user.php';
@@ -146,7 +146,7 @@ else if (is_numeric($_GET['deleteService']) && is_numeric($_GET['sid']) && is_nu
 /* Switch logins to the current user being viewed
  */
 else if ($_POST['login']) {
-    require_once SITE_root . '/include/session.php';
+    require_once SITE_root . '/include/Session.php';
 
     $sessionHandler = new Session;
 

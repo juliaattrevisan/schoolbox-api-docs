@@ -1,8 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-
-class MyFolder extends Model {
+class MyFolder extends DeprecatedModel {
 
 	function MyFolder ($owner = 0) {
 		if($owner == 0)
@@ -13,7 +11,7 @@ class MyFolder extends Model {
 		$this->_table = "myFolder";
 		$this->_index = "id";
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 	
 	function getFolderList($parent = 0) {

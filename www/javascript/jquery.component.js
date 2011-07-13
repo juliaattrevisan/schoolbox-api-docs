@@ -64,7 +64,7 @@ $j(function() {
 	
 	/*$j('.manage h2, a.folder-manage').each(function () {
 		$j(this).hide();
-	})*/;
+	});*/
 	
 	$j('#tabs-homepage').tabs();
 	$j('#tabs-sub').tabs();

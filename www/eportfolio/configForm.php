@@ -9,7 +9,7 @@
 //allow users to customise their homepages
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
 $page = new SitePage;
 
@@ -48,7 +48,7 @@ if (is_numeric($_REQUEST['uid'])) {
         $eportfolioHandler->addComponent($_POST['add']);
 
         //Output component HTML, we do this by loading sitepage and loading a specially designed harness to produce the homepage component on its own
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
         $page = new SitePage;
         $page->loadContent('/ajax/eportfolioComponent');
         $page->template->pparse('finaloutput', TEMPLATE_content);

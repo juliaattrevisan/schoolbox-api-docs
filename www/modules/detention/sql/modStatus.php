@@ -8,7 +8,7 @@ class status
 	{
 		
 		//setup database
-		$this->mySQLdb = new dbManager("detention");
+		$this->mySQLdb = new Database("detention");
 		$this->mySQLdb->dbConnect();
 
 		$this->id = $id;

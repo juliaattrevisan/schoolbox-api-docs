@@ -7,15 +7,13 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once dirname(__FILE__) . '/../../include/model.php';
-require_once('assess-response.php');
 
 /**
  * Description of AssessQuestion class
  *
  * @author aetworowsky
  */
-class AssessAnswer extends Model {
+class AssessAnswer extends DeprecatedModel {
     public $_table = 'assess_answer';
     public $_index = 'answer_id';
     public $responseHandler;
@@ -25,7 +23,7 @@ class AssessAnswer extends Model {
     private $templatePath = '../templates/core/assess/answer';
 
     function AssessAnswer() {
-        parent::Model();
+        parent::DeprecatedModel();
 
         $this->responseHandler = new AssessResponse();
     }

@@ -6,7 +6,9 @@
 * scripts.					*
 *************************************************/
 
-define("SITE_root", dirname(__FILE__)."/../..");
+define("SITE_root", realpath( dirname(__FILE__) . "/../..") );
+define("WEB_root", SITE_root . '/www');
+
 define('TEMPLATE_body', 		'bodyTpl');
 define('TEMPLATE_content', 		'contentTpl');
 
@@ -15,6 +17,7 @@ $path = SITE_root.'/include/PEAR';
 set_include_path('.' . PATH_SEPARATOR . get_include_path() . PATH_SEPARATOR . $path);
 
 //MySQL config options
+define("SQL_dsn", "mysql:host=localhost;dbname=portal");
 define("SQL_host", "localhost");
 define("SQL_user", "portal");
 define("SQL_passwd", "tnp879");

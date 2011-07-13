@@ -59,7 +59,7 @@ class page
 			$this->t_body->set_block("tplBODY", "assignment", "assignment_block");
 		
 			
-			$db = new dbManager;
+			$db = new Database;
 			$db->dbConnect();
 			
 			$typeDropDown = typeDropDown(&$db, "type", $resource['type']);

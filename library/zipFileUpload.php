@@ -11,11 +11,8 @@
  *
  * Creates Categorys as required (synonymous with folders)
  */
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 
-class ZipFileUpload extends Model {
+class ZipFileUpload extends DeprecatedModel {
 	private $extractTo = '/tmp';
 	private $prefix = 'portal_zip_upload_';
 	private $path = '';
@@ -33,7 +30,7 @@ class ZipFileUpload extends Model {
 	 * Set up paths and clean up any existing junk
 	 */
 	public function __construct() {
-		parent::Model();
+		parent::DeprecatedModel();
 
 		$this->path = $this->extractTo . '/' . $this->prefix . uniqid();
                 $this->allowedFileHandler = new AllowedFile();

@@ -1,7 +1,7 @@
 <?php
 require_once SITE_root . '/include/model.php';
 
-class Workshop extends Model {
+class Workshop extends DeprecatedModel {
 
 	function __construct () {
 	

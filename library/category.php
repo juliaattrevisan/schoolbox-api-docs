@@ -1,8 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../include/model.php';
-
-class Category extends Model {
+class Category extends DeprecatedModel {
 
 	function Category () {
 	
@@ -11,7 +9,7 @@ class Category extends Model {
 		$this->categoryTree = array();
 		$this->nodeList = array();
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 
 	/**

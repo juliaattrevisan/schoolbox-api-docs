@@ -10,14 +10,14 @@
 /* Class defines interface between the menu database and the administration software.   *
  * The following actions can be performed; delete, add, update, return 			 */
 
-class sideMenu extends Model {
+class sideMenu extends DeprecatedModel {
 
     function __construct() {
 
         $this->_table = "sideMenu";
         $this->_index = "id";
 
-        parent::Model();
+        parent::DeprecatedModel();
     }
 
     function getTree() {

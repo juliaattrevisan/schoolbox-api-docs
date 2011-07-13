@@ -16,7 +16,7 @@ class Mail
 	{
 		//check user has submitted their mail account details, if not request that they do
 	
-		$db = new dbManager();
+		$db = new Database();
 	
 		$query = "SELECT username, email_pass, local_email FROM user WHERE id = ".$_SESSION["id"];
 		$info = $db->getRow($query);

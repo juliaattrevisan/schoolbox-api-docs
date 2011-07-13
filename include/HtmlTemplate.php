@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This code that was derived from the original PHPLIB Template class
  * is copyright by Kristian Koehntopp, NetUSE AG and was released
@@ -25,13 +26,13 @@
  * was Kristian Koehntopp <kris@koehntopp.de>
  *
  * @category HTML
- * @package  HTML_Template_PHPLIB
+ * @package  HtmlTemplate
  * @author   Bjoern Schotte <schotte@mayflower.de>
  * @author   Martin Jansen <mj@php.net>
  * @license  http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
  * @link     http://pear.php.net/package/HTML_Template_PHPLIB
  */
-class HTML_Template_PHPLIB
+class HtmlTemplate
 {
     /**
      * If set, echo assignments
@@ -103,10 +104,10 @@ class HTML_Template_PHPLIB
      *
      * @access public
      */
-    function HTML_Template_PHPLIB($root = '.', $unknowns = '', $fallback='')
+    function HtmlTemplate($root = '.', $unknowns = '', $fallback='')
     {
         $this->setRoot($root);
-		if ($uknowns !== '') $this->setUnknowns($unknowns);
+		if ($unknowns !== '') $this->setUnknowns($unknowns);
         if (is_array($fallback)) $this->file_fallbacks = $fallback;
     }
 
@@ -771,18 +772,18 @@ class HTML_Template_PHPLIB
         return false;
     }//function isError($val)
 
-	
+
 	/**
 	 * Deprecated Functions
 	 */
 	function set_file($handle, $filename = '') {
 		return $this->setFile($handle, $filename);
 	}
-	
+
 	function set_block($parent, $handle, $name = '') {
 		return $this->setBlock($parent, $handle, $name);
 	}
-	
+
 	function set_var($varname, $value = '', $append = false) {
 		return $this->setVar($varname, $value, $append);
 	}
@@ -790,22 +791,6 @@ class HTML_Template_PHPLIB
 	function get_var($varname) {
 		return $this->getVar($varname);
 	}
-	
+
 
 }
-
-/**
- * Backwards-compatibility for HTML_Template_PHPLIB.
- * Used to have this name here.
- *
- * @category HTML
- * @package  HTML_Template_PHPLIB
- * @author   Christian Weiske <cweiske@php.net>
- * @license  http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @link     http://pear.php.net/package/HTML_Template_PHPLIB
- */
-class Template extends HTML_Template_PHPLIB
-{
-}
-
-?>

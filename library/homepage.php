@@ -2,13 +2,10 @@
 
 /* This script controls homepage layout functions.  It is used for setting up templates and customising homepage */
 
-require_once(dirname(__FILE__)  .'/../www/conf/conf.php');
-require_once(dirname(__FILE__)  .'/../include/db.php');
-
 class Homepage {
 
 	function Homepage($cid) {
-		$this->db = new dbManager(SQL_db);
+		$this->db = new Database(SQL_db);
 		$this->cid = $cid;
 	}
 

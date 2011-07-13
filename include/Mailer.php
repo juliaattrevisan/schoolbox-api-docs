@@ -10,7 +10,7 @@ require_once('Mail.php');
 require_once('Mail/mime.php');
 require_once('Mail/mime.php');
 require_once(dirname(__FILE__).'/template.php');
-require_once(dirname(__FILE__).'/config.php');
+require_once(dirname(__FILE__) . '/Config.php');
 
 class Mailer {
 function Mailer($template, $subject = "", $to="") {
@@ -141,5 +141,3 @@ function send($to="") {
 }
 
 }
-
-?>

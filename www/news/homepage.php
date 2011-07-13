@@ -25,15 +25,19 @@ if(is_numeric($this->arg[0])) {
 	
 	$this->setTitle('Modify Homepage News');
 	$this->setTab('resources');
-	
-	$output = array(	'ACTION'				=> 'Modify',
-						'NEWS_ID'				=> $newsItem['id'],
-						'HEADING'				=> $newsItem['heading'],
-						'BODY'					=> $newsItem['body'],
-						'CATEGORY_ID'			=> $newsItem['code'],
-						'LEAVE_OPTION'			=> '<option value="0" selected>Keep existing</option>',
-						'DEFAULT_TIME_SELECTED'	=> '',
-					);
+
+    $publishedDate = new DateTime( $news['item_datetime_published'] );
+    $expiryDate = new DateTime( $news['item_datetime_expires'] );
+
+    $output = array(
+        'ACTION'      => 'Modify',
+        'NEWS_ID'     => $newsItem['id'],
+        'HEADING'     => $newsItem['heading'],
+        'BODY'        => $newsItem['body'],
+        'CATEGORY_ID' => $newsItem['code'],
+        'DATETIME_PUBLISHED' => $publishedDate->format(Cfg::get('date_select')),
+        'DATETIME_EXPIRES' => $expiryDate->format(Cfg::get('date_select')),
+    );
 						
 	$this->setVar($output);
 	
@@ -53,15 +57,20 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	
 	$this->setTitle('Create Homepage News');
 	$this->setTab('resources');
-	
+
+    /* Default DateTime */
+    $published = new DateTime();
+    $expires = new DateTime('+1 month');
+
+    /* Set default output */
 	$output = array(	'ACTION'				=> 'Create',
 						'HEADING'				=> '',
 						'BODY'					=> '',
 						'NEWS_ID'				=> '',
 						'CATEGORY_ID'			=> $this->arg[1],
 						'delete_button_block'	=> '',
-						'LEAVE_OPTION'			=> '',
-						'DEFAULT_TIME_SELECTED'	=> 'selected="selected"',
+                        'DATETIME_PUBLISHED' => $published->format( Cfg::get('date_select') ),
+                        'DATETIME_EXPIRES' => $expires->format( Cfg::get('date_select') ),
 					);
 						
 	$this->setVar($output);

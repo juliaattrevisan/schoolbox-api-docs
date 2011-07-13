@@ -1,9 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../include/model.php';
-require_once dirname(__FILE__) . '/../library/group.php';
-
-class ePortfolioBlogComment extends Model {
+class ePortfolioBlogComment extends DeprecatedModel {
     
 	function ePortfolioBlogComment() {
 		$this->_table = "eportfolio_blogComment";
@@ -12,7 +9,7 @@ class ePortfolioBlogComment extends Model {
 		
 		$this->group = new Group();
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 
     /**

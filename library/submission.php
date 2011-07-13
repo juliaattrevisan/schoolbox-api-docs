@@ -1,7 +1,5 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-
 /* Due Work: Recent work. Should be a multiple of 3 because there are three
 * types: Due, Awaiting and Marked.
 */
@@ -10,14 +8,14 @@ define('AWAITING_WORK_TYPE', 2);
 define('RETURNED_WORK_TYPE', 3);
 define('RECENT_WORK_LIMIT', 12);
 
-class Submission extends Model {
+class Submission extends DeprecatedModel {
 
     function Submission () {
 
         $this->_table = "submission_box";
         $this->_index = "id";
 
-        parent::Model();
+        parent::DeprecatedModel();
     }
 
     /**
@@ -562,4 +560,72 @@ class Submission extends Model {
     }
 
 }
+/*
+$userArray = UserCollection::getAllByGroup($group_id);
+
+array(
+    0 => stdClass (
+        'name' => 'ballsack',
+        'phone' => 12345468,
+    )
+);
+
+
+foreach ($userArray as $currentUser) {
+    $currentUser->setName('ass bandit');
+    $currentUser->save();
+}
+
+class dbAbstraction {
+    public function doQuery($query) {
+        run $query
+        hydrateArrayToObjVars();
+    }
+}
+
+class User {
+
+
+    public function hydrateArrayToObjVars($array) {
+        $this->name = $array['name'];
+        $this->phone = $array['phone'];
+    }
+}
+
+
+class GroupCollection {
+    public function getAllByUserID($userID) {
+        $query = "SELECT * FROM groups WHERE userid = $this->userID";
+
+        // hydrate shit
+
+        return $resultArray;
+    }
+}
+
+
+class UserCollection {
+
+    public function getAllByGroup($group_id) {
+        $resultArray = array();
+
+        $allUsers = "SELECT id, group_id FROM users WHERE group_id = $group_id";
+
+
+        foreach($allUsers as $currentUser) {
+            $user = new User($currentUser['id']);
+            $user->setGroups(GroupCollection::getAllByUserId($currentUser['id']));
+
+            //$user->setGroup($group);
+
+            $resultArray[] = $clone->arrayToObjVars($currentUser);
+        }
+
+        return $resultArray;
+    }
+}
+
+*/
+
+
 ?>

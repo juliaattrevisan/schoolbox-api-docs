@@ -9,7 +9,7 @@ class sport
 	{
 		//setup database
 		$this->SQL_db = "sports";
-		$this->mySQLdb = new dbManager($this->SQL_db);
+		$this->mySQLdb = new Database($this->SQL_db);
 
 		$this->campus = 1; 
 

@@ -22,7 +22,7 @@ function ProxyUsage() {
 	else
 		$week = $_GET['week'];
 
-	$proxydb = new dbManager("proxy");
+	$proxydb = new Database("proxy");
 	$proxydb->dbConnect();
 
 	$this->t_body = new Template(TPL_directory);

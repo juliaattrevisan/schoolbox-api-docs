@@ -1,16 +1,13 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-
-class News extends Model {
+class News extends DeprecatedModel {
 
 	function News () {
 	
 		$this->_table = "news_items";
 		$this->_index = "item_id";
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 
 	function getByID($newsID) {
@@ -198,6 +195,7 @@ class News extends Model {
                AND newsGroup.gid = '".$_SESSION['gid']."'
             JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
          WHERE news_items.item_owner != '".$_SESSION['id']."'
+            AND item_datetime_published < NOW()
             AND item_datetime_expires > NOW()
             AND item_deleted = 0
          GROUP BY `".$this->_index."`
@@ -217,11 +215,11 @@ class News extends Model {
        * Otherwise, restrict news post selection by ownership.
        */
       if (!$userHandler->isSuperuser()) {
-         $query .= " WHERE (item_owner = '".$_SESSION['id']."' OR newsUser.userID = '".$_SESSION['id']."') ";
+         $query .= " WHERE (item_owner = '".$_SESSION['id']."' OR (newsUser.userID = '".$_SESSION['id']."' AND item_datetime_published < NOW())) ";
       }
 
       $query .= "
-			AND item_datetime_expires > NOW() 
+			AND item_datetime_expires > NOW()
 			AND item_deleted = 0 
 		GROUP BY `".$this->_index."`
 		ORDER BY newsTopic.newsTopicID, item_datetime_posted DESC
@@ -269,9 +267,9 @@ class News extends Model {
          if($id)
             $query .=" AND news_items.item_id = '$id'";
          else if($archive)
-            $query .=" AND news_items.item_datetime_expires <= NOW() ";
+            $query .=" AND item_datetime_published < NOW() AND news_items.item_datetime_expires <= NOW() ";
          else
-            $query .=" AND news_items.item_datetime_expires > NOW() ";
+            $query .=" AND item_datetime_published < NOW() AND news_items.item_datetime_expires > NOW() ";
 
 
          $query .= " GROUP BY news_items.item_id ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC";
@@ -294,7 +292,7 @@ class News extends Model {
        * Otherwise, restrict news post selection by ownership.
        */
       if (!$userHandler->isSuperuser()) {
-         $query .= " AND (news_items.item_owner = '".$_SESSION['id']."' OR newsUser.userID = '".$_SESSION['id']."') ";
+         $query .= " AND (news_items.item_owner = '".$_SESSION['id']."' OR (newsUser.userID = '".$_SESSION['id']."' AND item_datetime_published < NOW() )) ";
       }
 		
 		if($id)
@@ -351,11 +349,12 @@ class News extends Model {
 				  JOIN newsGroup ON newsGroup.id = news_items.item_id 
 					AND newsGroup.gid IN (" . implode(',', $groupList) . ")
 				  JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
-				  WHERE item_datetime_expires > NOW() 
-					AND item_deleted = 0 
+				  WHERE item_datetime_expires > NOW()
+				    AND item_datetime_published < NOW()
+					AND item_deleted = 0
 				  GROUP BY `".$this->_index."`
 				  ORDER BY item_datetime_modified DESC";
-		
+
 		return $this->db->getAll($query);
 
 	}

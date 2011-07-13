@@ -17,7 +17,7 @@ class modUser
 {
 	function modUser()
 	{
-		$this->db = new dbManager();
+		$this->db = new Database();
 	}
 
 	function displayAddUser()

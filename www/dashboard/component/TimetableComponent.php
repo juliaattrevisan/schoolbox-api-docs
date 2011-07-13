@@ -10,7 +10,7 @@
  */
 
 
-class TimetableComponent extends DashboardComponentInterface {
+class TimetableComponent extends DashboardComponentAbstract {
     private $external_timetable;
 
     private $day_num;

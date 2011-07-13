@@ -1,8 +1,6 @@
 <?php
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/../include/template.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/include/stdfuncs.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/../include/config.php');
+require_once(WEB_root.'/include/stdfuncs.php');
 
 class Page {
 		
@@ -27,8 +25,8 @@ class Page {
 		}
 		$page = rtrim($page, '/');
 		
-		if(is_file($_SERVER['DOCUMENT_ROOT'].'/'.$page . '.php') && $execute)
-			include($_SERVER['DOCUMENT_ROOT'].'/'.$page . '.php');
+		if(is_file(WEB_root.'/'.$page . '.php') && $execute)
+			include(WEB_root.'/'.$page . '.php');
 		else if(is_file($this->templateRoot .'/'. $page . '.html')) 
 			$this->setFile(TEMPLATE_content, $page . '.html');
 		else
@@ -89,6 +87,3 @@ class Page {
 		$this->template->pparse('finaloutput', TEMPLATE_body);
 	}
 }
-
-
-?>

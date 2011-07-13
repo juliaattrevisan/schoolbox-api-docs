@@ -8,7 +8,7 @@
 
 //includes
 require_once("../include/image.php");
-require_once("../../include/sitePage.php");
+require_once("../../include/SitePage.php");
 require_once("../../library/group.php");
 require_once("../../library/user.php");
 $page = new SitePage;

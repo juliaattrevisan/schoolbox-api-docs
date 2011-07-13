@@ -1,7 +1,4 @@
 <?php
-require_once(dirname(__FILE__) . '/../library/user.php');
-require_once(dirname(__FILE__) . '/../library/category.php');
-require_once(dirname(__FILE__) . '/../library/calendar.php');
 
 class Bulk {
 

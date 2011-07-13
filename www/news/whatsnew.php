@@ -12,7 +12,7 @@ class WhatsNew
 	function WhatsNew()
 	{
 		//setup db
-		$this->db = new dbManager;	
+		$this->db = new Database;
 	}
 
 	function submissionDetails($id)

@@ -4,12 +4,12 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
 define('TUTORIAL_db', 'tutorial');
 define('PORTAL_db', SQL_db);
 
-class Enrolment extends Model {
+class Enrolment extends DeprecatedModel {
 	function Enrolment() {
 		$this->_table = "enrolment";
 		$this->_index = "enrolmentID";
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 	
 	function getAllByEvent($code, $eventID) {

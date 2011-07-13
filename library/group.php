@@ -1,7 +1,5 @@
 <?php
 
-require_once dirname(__FILE__) . '/../include/model.php';
-
 define('HOMEPAGE_SERVICE', 1);
 define('CALENDAR_SERVICE', 2);
 define('NEWS_SERVICE', 3);
@@ -17,14 +15,14 @@ define('GROUP_TYPE_RESTRICTED', 1);
 define('GROUP_TYPE_MODERATED', 2);
 define('GROUP_TYPE_FREE', 3);
 
-class Group extends Model {
+class Group extends DeprecatedModel {
 
     function Group($service = HOMEPAGE_SERVICE) {
         $this->_table = 'userGroups';
         $this->_index = 'cid';
         $this->_service = $service;
 
-        parent::Model();
+        parent::DeprecatedModel();
     }
 
     function setService($service = HOMEPAGE_SERVICE) {

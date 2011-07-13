@@ -1,15 +1,13 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-
-class File extends Model {
+class File extends DeprecatedModel {
 
 	function File () {
 	
 		$this->_table = "file";
 		$this->_index = "id";
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 	
 	function getByID($fileID) {

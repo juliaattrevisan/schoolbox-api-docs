@@ -184,7 +184,7 @@ class Attendance
 		$this->t_body->set_var("DATE", date("j/n/Y"));
 	
 		//get teacher name 
-		$mydb = new dbManager;
+		$mydb = new Database;
 		$mydb->dbConnect();
 		$query = "SELECT firstname, lastname FROM user WHERE id = '".$_SESSION['id']."'";
 		$mydb->dbDoQuery($query);

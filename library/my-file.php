@@ -1,9 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
-
-class MyFile extends Model {
+class MyFile extends DeprecatedModel {
 
 	function MyFile ($owner = 0) {
 		if($owner == 0)
@@ -14,7 +11,7 @@ class MyFile extends Model {
 		$this->_table = "myFile";
 		$this->_index = "id";
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 
     /**

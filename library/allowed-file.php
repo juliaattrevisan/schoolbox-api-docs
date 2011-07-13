@@ -1,15 +1,13 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-
-class AllowedFile extends Model {
+class AllowedFile extends DeprecatedModel {
 
 	function AllowedFile () {
 	
 		$this->_table = "allowedFileTypes";
 		$this->_index = "fileTypeID";
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 	
 	function checkError($error) {

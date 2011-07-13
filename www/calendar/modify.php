@@ -1,6 +1,6 @@
 <?php
 
-require_once "../../include/sitePage.php";
+require_once "../../include/SitePage.php";
 $page = new SitePage;
 
 require_once "../../library/calendar.php";

@@ -73,7 +73,7 @@ $query = "SELECT user, sum(size) as totalsize FROM ".$tableName."
 
 
 //setup db connections
-$proxydb = new dbManager("proxy", 1);
+$proxydb = new Database("proxy", 1);
 $proxydb->dbConnect();
 
 //execute the query

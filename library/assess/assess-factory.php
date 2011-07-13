@@ -8,10 +8,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess-question.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess-answer.php');
 
-class AssessFactory extends Model {
+class AssessFactory extends DeprecatedModel {
     var $questionLibraryPath = '../library/assess/questionType';
     var $questionPrefix = 'AssessQuestion';
 

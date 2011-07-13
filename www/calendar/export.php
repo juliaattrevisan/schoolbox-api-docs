@@ -9,7 +9,7 @@
 *							                                *
 /************************************************************/
 
-require_once '../../include/sitePage.php';
+require_once '../../include/SitePage.php';
 require_once '../include/iCalcreator.class.php';
 require_once '../../library/calendar.php';
 $page = new SitePage(false);

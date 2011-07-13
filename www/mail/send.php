@@ -9,7 +9,7 @@
 //require_once("../include/session.php");
 //require_once("../include/include.php");
 
-require_once("../../include/sitePage.php");
+require_once("../../include/SitePage.php");
 require_once('Mail.php');
 require_once('Mail/mime.php');
 
@@ -21,7 +21,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 {
 	//get users email address to use in from field
 	
-	$db = new dbManager();
+	$db = new Database();
 	$db->dbConnect();
 
 	$query = "SELECT firstname, lastname, username, local_email, title, alt_email FROM user WHERE id = '".$_SESSION["id"]."'";

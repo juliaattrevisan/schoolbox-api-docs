@@ -7,15 +7,15 @@
 ************************************************************/
 
 require_once(dirname(__FILE__)  .'/../www/conf/conf.php');
-require_once(dirname(__FILE__)  .'/db.php');
+require_once(dirname(__FILE__) . '/Database.php');
 
-class Model {
+class DeprecatedModel {
 
 	var $_table;
 	var $_index;
 
-	function Model() {
-		$this->db = new dbManager(SQL_db);
+	function DeprecatedModel() {
+		$this->db = new Database(SQL_db);
 	}
 	
 	function getByID($id) {
@@ -111,4 +111,3 @@ class Model {
 		return $this->db->insertID();
 	}
 }
-?>

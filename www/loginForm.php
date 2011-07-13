@@ -1,8 +1,8 @@
 <?php
 
 //require_once 'include/auth.php';
-require_once '../include/sitePage.php';
-require_once '../include/session.php';
+require_once '../include/SitePage.php';
+require_once '../include/Session.php';
 session_start();	
 
 

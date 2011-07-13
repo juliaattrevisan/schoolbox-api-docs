@@ -68,7 +68,7 @@ class initTeamLists
 		include_once("../../include/page.php");
 
 		//setup database
-		$this->db = new dbManager;
+		$this->db = new Database;
 		$this->db->dbConnect();
 
 		//setup blocks

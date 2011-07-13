@@ -1,15 +1,13 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-
-class Poll extends Model {
+class Poll extends DeprecatedModel {
 
 	function Poll () {
 	
 		$this->_table = "poll";
 		$this->_index = "pollID";
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 
 	function getByID($pollID) {

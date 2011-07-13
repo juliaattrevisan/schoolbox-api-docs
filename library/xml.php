@@ -1,7 +1,5 @@
 <?php
 
-require_once($_SERVER['DOCUMENT_ROOT'] .'/conf/conf.php');
-
 define('RSS_cache_time', 3000);
 
 class XML {

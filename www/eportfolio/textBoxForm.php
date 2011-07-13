@@ -1,7 +1,7 @@
 <?php
 define('EPORTFOLIO_COMPONENT_TEXTBOX' , 2);
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-textBox.php';

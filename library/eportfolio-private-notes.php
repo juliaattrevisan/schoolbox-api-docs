@@ -1,14 +1,12 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-
-class ePortfolioPrivateNotes extends Model {
+class ePortfolioPrivateNotes extends DeprecatedModel {
 
 	function ePortfolioPrivateNotes () {
 		$this->_table = 'eportfolio_privateNotes';
 		$this->_index = 'uid';
 
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 
     /**

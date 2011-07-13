@@ -9,7 +9,7 @@
  * 
  */
  
-abstract class DashboardComponentInterface {
+abstract class DashboardComponentAbstract {
     protected $component;
 
     protected $component_instance;

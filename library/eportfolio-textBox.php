@@ -1,14 +1,12 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-
-class ePortfolioTextBox extends Model {
+class ePortfolioTextBox extends DeprecatedModel {
 
 	function ePortfolioTextBox () {
 		$this->_table = 'eportfolio_textBox';
 		$this->_index = 'textBoxID';
 
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 
     /**

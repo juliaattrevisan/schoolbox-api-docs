@@ -1,4 +1,6 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
 tinyMCE.init({
@@ -29,7 +31,22 @@ tinyMCE.init({
 $j(function() {
 	
 	$j('#newsForm').validate();
-	
+
+    $j('#datetime_published, #datetime_expires').datepicker({
+        dateFormat: 'dd/mm/yy',
+        showOn: 'both',
+        buttonImage: '/images/core/calendar/calendar-click.png',
+        buttonImageOnly: true,
+        constrainInput: false,
+        onClose: function (string) {
+            var input = $j(this);
+
+            $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                input.val(data.time);
+            })
+        }
+    });
+
 });
 
 </script>
@@ -43,30 +60,20 @@ $j(function() {
 			</td>
 			<td><label><input type="text" class="required" name="heading" size="35" maxlength="50" value="{HEADING}" /></label></td>
 		</tr>
-		<tr>
-			<td><h4>Expires</h4>
-				<em>Select a period for which the news will remain on your page</em>
-			</td>
-			<td><select name="expires">
-          			{LEAVE_OPTION}						
-					<option value="0.5">In 30 minutes</option>
-					<option value="1">In 1 hour</option>
-					<option value="2">In 2 hours</option>
-					<option value="5">In 5 hours</option>
-					<option value="12">In 12 hours</option>
-					<option value="24">In 24 hours</option>
-					<option value="36">In 36 hour</option>
-					<option value="48">In 2 days</option>
-					<option value="120" {DEFAULT_TIME_SELECTED}>In 5 days</option>
-					<option value="168" >In 1 week</option>
-					<option value="336">In 2 weeks</option>
-					<option value="672">In 1 month</option>
-					<option value="8760">In 1 year</option>
-					<option value="99999">Never</option>
-				</select>
-				<input type="hidden" name="id" value="{NEWS_ID}" />
-				<input type="hidden" name="code" value="{CATEGORY_ID}" /></td>
-		</tr>
+        <tr>
+            <td><h4>Publish Date</h4>
+                <em>Select a date for when this news item will become available.</em>
+            <td>
+                <input type="text" class="required" name="datetime_published" id="datetime_published" size="12" maxlength="50" value="{DATETIME_PUBLISHED}" />
+            </td>
+        </tr>
+        <tr>
+            <td><h4>Expiry Date</h4>
+                <em>Select a date for when this item will expire.</em>
+            <td>
+                <input type="text" class="required" name="datetime_expires" id="datetime_expires" size="12" maxlength="50" value="{DATETIME_EXPIRES}" />
+            </td>
+        </tr>
 		<tr>
 			<td valign="top"><h4>News Body</h4>
 				<em>This is the main portion of your news.</em>
@@ -74,6 +81,8 @@ $j(function() {
 			<td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
 		</tr>
 	</table>
+    <input type="hidden" name="id" value="{NEWS_ID}" />
+    <input type="hidden" name="code" value="{CATEGORY_ID}" />
 	<input type="submit" name="submit" value="{ACTION} News" class="submit-btn-plain"/>
 	<!-- BEGIN delete_button -->
 	<input type="submit" name="delete" value="Delete News" class="submit-btn-plain">

@@ -1,15 +1,13 @@
 <?php
 
-require_once '../include/model.php';
-
-class Duty extends Model {
+class Duty extends DeprecatedModel {
 
 	function Duty () {
 	
 		$this->_table = "duty";
 		$this->_index = "dutyID";
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 	
 	function getAllInCategory($categoryID) {

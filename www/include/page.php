@@ -18,7 +18,7 @@ if( isset($this->db) ){
 }
 else if(!isset($db))
 {
-	$db = new dbManager;
+	$db = new Database;
 	$db->dbConnect();
 }
 

@@ -1,11 +1,9 @@
 <?php
 
-require_once SITE_root . '/include/model.php';
-
 define('FORUM_THREADS_PER_PAGE', 30);
 define('FORUM_POSTS_PER_PAGE', 15);
 
-class Forum extends Model {
+class Forum extends DeprecatedModel {
 
 	function Forum () {
 	
@@ -13,7 +11,7 @@ class Forum extends Model {
 		$this->_index = "threadID";
 		$this->_postTable = "forumPost";
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 	
 	function getRecentThreadList($categoryID, $config) {

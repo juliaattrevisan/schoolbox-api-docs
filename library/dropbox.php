@@ -7,7 +7,6 @@
 
 /* Class defines interface between file database and software.         *
  * The following actions can be performed; delete, add, update */
-require_once dirname(__FILE__) . '/group.php';
 
 define('DROPBOX_COMPONENT', 25);
 
@@ -16,7 +15,7 @@ class Dropbox
 	function Dropbox()
 	{
 		//always gonna need the db so lets create one..
-		$this->db = new dbManager();
+		$this->db = new Database();
 		$this->groupHandler = new Group;
 	}
 

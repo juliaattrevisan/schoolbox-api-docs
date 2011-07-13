@@ -15,7 +15,7 @@ session_start();
 
 require_once dirname(__FILE__) . '/conf/conf.php';
 require_once dirname(__FILE__) . '/include/stdfuncs.php';
-require_once SITE_root . '/include/mailer.php';
+require_once SITE_root . '/include/Mailer.php';
 require_once SITE_root . '/library/reCaptcha.php';
 
 if(validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template']) 

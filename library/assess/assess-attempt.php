@@ -7,10 +7,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once dirname(__FILE__) . '/../../include/model.php';
 
-
-class AssessAttempt extends Model {
+class AssessAttempt extends DeprecatedModel {
     var $_table = 'assess_attempt';
     var $_index = 'attempt_id';
 

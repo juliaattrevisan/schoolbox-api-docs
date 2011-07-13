@@ -3,7 +3,7 @@
 class Helpdesk {
 
 	function Helpdesk() {
-		$this->db = new dbManager();
+		$this->db = new Database();
 	}
 
 	function openHelpdeskJobs($userid) {

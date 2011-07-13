@@ -1,15 +1,13 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-require_once dirname(__FILE__) . '/group.php';
 
-class SubmissionStudent extends Model {
+class SubmissionStudent extends DeprecatedModel {
 
     function SubmissionStudent () {
 
         $this->_table = "student_submission";
         $this->_index = "id";
 
-        parent::Model();
+        parent::DeprecatedModel();
     }
 
 	function getByID($id) {

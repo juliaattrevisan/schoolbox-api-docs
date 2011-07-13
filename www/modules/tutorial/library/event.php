@@ -5,7 +5,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 define('TUTORIAL_db', 'tutorial');
 define('PORTAL_db', SQL_db);
 
-class Event extends Model {
+class Event extends DeprecatedModel {
 	function Event() {
 		$this->_table = "event";
 		$this->_index = "eventID";
@@ -13,7 +13,7 @@ class Event extends Model {
 		$groupHandler = new Group(TUTORIAL_SERVICE);
 		$this->permission = $groupHandler->getPermission(0);
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 	
 	

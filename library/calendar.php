@@ -1,9 +1,6 @@
 <?php
 
-require_once dirname(__FILE__). '/../include/model.php';
-require_once dirname(__FILE__) . '/../library/group.php';
-
-class Calendar extends Model {
+class Calendar extends DeprecatedModel {
 
 	function Calendar () {
 	
@@ -12,7 +9,7 @@ class Calendar extends Model {
 		
 		$this->groupHandler = new Group(CALENDAR_SERVICE);
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 
 	function displayColour($id) {

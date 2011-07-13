@@ -2,7 +2,7 @@
 
 session_start();
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionStudent.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/include/time.php';

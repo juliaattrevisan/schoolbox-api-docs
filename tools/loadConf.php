@@ -1,7 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__)  .'/../www/conf/conf.php');
-require_once(dirname(__FILE__)  .'/../include/config.php');
+require_once(dirname(__FILE__) . '/../include/Config.php');
 
 $configHandler = new Config;
 

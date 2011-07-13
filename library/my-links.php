@@ -1,13 +1,12 @@
 <?php
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../include/model.php');
 
-class MyLinks extends Model {
+class MyLinks extends DeprecatedModel {
 
 	public function MyLinks() {
 		$this->_table = 'bookmarks';
 		$this->_index = 'id';
 
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 
 	/**

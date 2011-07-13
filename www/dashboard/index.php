@@ -9,24 +9,19 @@
  * 
  */
 
-
-$component_model      = new DashboardComponent();
-$option_default_model = new DashboardComponentOptionDefault();
-$option_model         = new DashboardComponentOption();
-$instance_model       = new DashboardComponentInstance($component_model, $option_default_model, $option_model, $this->template);
-
 $this->setFile(TEMPLATE_content, 'dashboard/index.html');
 
-/* Get component instances */
-$group_id = $_SESSION['gid'];
+/* Instance factory */
+$groupID = $_SESSION['gid'];
+$dashboardFactory = new Component_Dashboard_DashboardFactory($this->template, $groupID);
 
-$instance_arr = $instance_model->get_instances($group_id);
+/* Get Component Instances */
+$componentArray = $dashboardFactory->buildComponentList();
 
-if ( is_array($instance_arr) ) {
-    foreach ($instance_arr as $instance) {
+if ( is_array($componentArray) ) {
+    foreach ($componentArray as $component) {
 
-        /* Execute and render */
-        $template_file = 'dashboard/component/'.$instance->get_template().'.html';
+        $template_file = 'dashboard/component/'.$instance->template().'.html';
 
         $template_target = 'component_position_'.$instance->get_position();
         $template_handle = 'component_'.$instance->get_instance_id();
@@ -40,5 +35,3 @@ if ( is_array($instance_arr) ) {
         }
     }
 }
-
-?>

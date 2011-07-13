@@ -1,14 +1,13 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
 
-class Wiki extends Model {
+class Wiki extends DeprecatedModel {
 	function Wiki() {
 		$this->_table = 'wiki';
 		$this->_index = 'wikiID';
 		$this->_revisionTable = 'wikiRevision';
         $this->_openTable = 'wikiOpens';
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 
     /**

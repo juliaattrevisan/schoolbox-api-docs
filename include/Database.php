@@ -11,14 +11,14 @@
 *                                                           *
 ************************************************************/
 
-class dbManager
+class Database
 {
 
 
 static private $instance = false;
 
 /* Constuctor sets up variables and connects to database */
-function dbManager($db = SQL_db, $debug = 1)
+function Database($db = SQL_db, $debug = 1)
 {
 	$this->host = SQL_host;
 	$this->user = SQL_user;
@@ -393,5 +393,3 @@ function dbSmartQuote($value) {
 
 
 }
-
-?>

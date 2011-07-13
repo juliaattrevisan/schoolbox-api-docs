@@ -1,13 +1,11 @@
 <?php
 
-require_once dirname(__FILE__) . '/../include/model.php';
-
-class GenericTable extends Model {
+class GenericTable extends DeprecatedModel {
 
     function __construct($table, $index) {
         $this->_table = $table;
         $this->_index = $index;
-        parent::Model();
+        parent::DeprecatedModel();
     }
 }
 ?>

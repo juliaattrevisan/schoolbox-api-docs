@@ -2,7 +2,7 @@
 
 session_start();
 
-require_once dirname(__FILE__) . '/../include/sitePage.php';
+require_once dirname(__FILE__) . '/../include/SitePage.php';
 
 $page = new SitePage(false);
 

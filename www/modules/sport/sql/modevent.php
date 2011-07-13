@@ -8,7 +8,7 @@ class event
 	{
 		//setup database
 		$SQL_db = "sports";
-		$this->mySQLdb = new dbManager($SQL_db);
+		$this->mySQLdb = new Database($SQL_db);
 		$this->mySQLdb->dbConnect();
 
 		$this->eid = $eid;

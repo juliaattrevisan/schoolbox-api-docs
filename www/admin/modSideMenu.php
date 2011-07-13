@@ -15,7 +15,7 @@ class modSideMenu
 {
 	function modSideMenu()
 	{
-		$this->db = new dbManager;
+		$this->db = new Database;
 		$this->itemList = array();
 	}
 

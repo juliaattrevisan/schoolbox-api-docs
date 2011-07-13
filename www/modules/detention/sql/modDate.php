@@ -11,7 +11,7 @@ class date
 		
 		//setup database
 		$SQL_db = "detention";
-		$this->mySQLdb = new dbManager($SQL_db);
+		$this->mySQLdb = new Database($SQL_db);
 		$this->mySQLdb->dbConnect();
 
 		$this->id = $id;

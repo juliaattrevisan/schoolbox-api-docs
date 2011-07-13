@@ -9,7 +9,7 @@
  * It will be used to fill the image bank with appropriate *
  * size images for display.				   */
 
-require_once("../../include/sitePage.php");
+require_once("../../include/SitePage.php");
 require_once("../include/permission.php");
 
 $page = new SitePage;
@@ -18,7 +18,7 @@ define("MAX_IMAGE_SIZE", 60000000);
 
 if($_GET['id'] && $_GET['width'] && $_GET['height'])
 {
-	$db = new dbManager;
+	$db = new Database;
 	
 	//get file information
     if (is_numeric($_GET['myFile'])) {

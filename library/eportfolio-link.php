@@ -1,8 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/model.php';
-
-class ePortfolioLink extends Model {
+class ePortfolioLink extends DeprecatedModel {
 
     /**
      *
@@ -11,7 +9,7 @@ class ePortfolioLink extends Model {
 		$this->_table = "eportfolio_link";
 		$this->_index = "id";
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 
     /**

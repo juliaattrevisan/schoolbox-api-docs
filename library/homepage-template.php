@@ -1,16 +1,14 @@
 <?php
 
 /* Template management for homepages */
-require_once dirname(__FILE__) . '/../include/model.php';
-require_once dirname(__FILE__) . '/homepage.php';
 
-class HomepageTemplate extends  Model {
+class HomepageTemplate extends  DeprecatedModel {
 
 		function HomepageTemplate() {
 			$this->_table = 'homepageTemplate';
 			$this->_index = 'id';
 			
-			parent::Model();
+			parent::DeprecatedModel();
 		}
 
 		function getTemplateListDropDown() {

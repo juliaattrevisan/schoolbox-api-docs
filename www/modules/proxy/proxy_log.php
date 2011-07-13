@@ -31,7 +31,7 @@ else
 class ProxyLog {
 
 function ProxyLog() {
-	$db = new dbManager();
+	$db = new Database();
 	$db->dbConnect();
 
 	global $months;

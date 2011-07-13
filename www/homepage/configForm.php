@@ -10,7 +10,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] .'/../library/homepage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] .'/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] .'/../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] .'/../include/SitePage.php';
 $page = new SitePage;
 
 $groupHandler = new Group(HOMEPAGE_SERVICE);
@@ -50,7 +50,7 @@ if(is_numeric($_REQUEST['cid']) ) {
         $homepageComponentLocationID = $homepage->addComponent($_POST['add']);
         
         //Output component HTML, we do this by loading sitepage and loading a specially designed harness to produce the homepage component on its own
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
         $page = new SitePage;
         $page->loadContent('/ajax/homepageComponent');
         $page->template->pparse('finaloutput', TEMPLATE_content);

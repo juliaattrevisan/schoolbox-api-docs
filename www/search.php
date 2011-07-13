@@ -7,7 +7,7 @@
  */
 $time_start = microtime(true);
 
-require_once '../include/sitePage.php';
+require_once '../include/SitePage.php';
 require_once '../library/group.php';
 require_once '../library/category.php';
 require_once '../library/allowed-file.php';

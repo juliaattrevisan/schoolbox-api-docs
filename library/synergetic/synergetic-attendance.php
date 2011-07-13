@@ -6,7 +6,6 @@
 *	This file provides access to synergetic attendance		*	    
 *                                                           *
 ************************************************************/
-require_once dirname(__FILE__) .'/mssql.php';
 
 class SynergeticAttendance extends MSSQL{
 

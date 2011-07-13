@@ -1,17 +1,13 @@
 <?php
 
-require_once dirname(__FILE__) . '/../include/model.php';
-require_once dirname(__FILE__) . '/../library/group.php';
-require_once dirname(__FILE__) . '/../library/homepage.php';
-
-class Chat extends Model {
+class Chat extends DeprecatedModel {
     function __construct () {
             $this->_table = "chat";
             $this->_index = "id";
 
             $this->group = new Group();
 
-            parent::Model();
+            parent::DeprecatedModel();
     }
 
     /* Get logs */

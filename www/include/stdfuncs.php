@@ -28,7 +28,7 @@ function error($ec, $message="") {
 	elseif (is_object($this))
 		$this->error($ec, $message);
 	else {
-		require_once dirname(__FILE__) . '/../../include/sitePage.php';
+		require_once dirname(__FILE__) . '/../../include/SitePage.php';
 		$page = new SitePage;
 		$page->error($ec, $message);
 	}
@@ -57,7 +57,7 @@ function greeting() {
 //user to login page with the requested url
 function goLoginPage()
 {
-		require_once dirname(__FILE__) . '/../../include/sitePage.php';
+		require_once dirname(__FILE__) . '/../../include/SitePage.php';
 		$page = new SitePage;
 		$page->goLoginPage();
 }

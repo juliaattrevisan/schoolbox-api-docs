@@ -9,7 +9,7 @@
 //rather than just octet stream
 
 //includes
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
 if(is_numeric($_GET['id']))
 {

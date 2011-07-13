@@ -5,7 +5,7 @@
 *                                                           *
 ************************************************************/
 //enable users to send email
-require_once $_SERVER['DOCUMENT_ROOT'] .'/../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] .'/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] .'/../library/group.php';
 
 $page = new SitePage(); 

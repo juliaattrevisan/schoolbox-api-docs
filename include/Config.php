@@ -1,9 +1,8 @@
 <?php
 
 require_once dirname(__FILE__) . '/../www/conf/conf.php';
-require_once SITE_root . '/include/model.php';
 
-class Config extends Model {
+class Config extends DeprecatedModel {
 
         static private $instance = false;
         static private $data = false;
@@ -27,7 +26,7 @@ class Config extends Model {
         }
 
         static private function load() {
-                $configList = dbManager::getInstance()->getAll("SELECT * FROM `config`");
+                $configList = Database::getInstance()->getAll("SELECT * FROM `config`");
                 if (is_array($configList)) {
                         foreach ($configList as $config) {
                                 if(isset(self::$data[$config['name']])) {
@@ -74,7 +73,7 @@ class Config extends Model {
 			  */
 			$query = "SELECT DISTINCT `type` FROM `config` ORDER BY type";
 
-			return dbManager::getInstance()->getAll($query);
+			return Database::getInstance()->getAll($query);
         }
 
         public function getAvailableOptions() {
@@ -105,7 +104,7 @@ class Config extends Model {
 				$query .= "ORDER BY `$orderBy`";
 			}
 
-			return dbManager::getInstance()->getAll($query);
+			return Database::getInstance()->getAll($query);
         }
 
         public function updateArray($configList) {
@@ -117,8 +116,3 @@ class Config extends Model {
         }
 
 }
-
-/* name shortening */
-class Cfg extends Config { }
-
-?>

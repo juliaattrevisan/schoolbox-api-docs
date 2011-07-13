@@ -1,15 +1,13 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] .'/../include/model.php';
-
-class CategoryNews extends Model {
+class CategoryNews extends DeprecatedModel {
 
 	function CategoryNews () {
 	
 		$this->_table = "subject_news";
 		$this->_index = "id";
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 
 	function getAllForCategory($categoryID, $config = false, $archive = false) {
@@ -19,9 +17,9 @@ class CategoryNews extends Model {
 				  LEFT JOIN user u ON u.id = n.owner 
 				  WHERE code = '$categoryID'  AND deleted = 0 ";
 		if ($archive)
-			$query .= "AND datetime_expires < NOW()";
+			$query .= " AND (datetime_published < NOW() OR owner = {$_SESSION['id']}) AND datetime_expires < NOW()";
     	else
-			$query .= "AND datetime_expires > NOW()";
+			$query .= " AND (datetime_published < NOW() OR owner = {$_SESSION['id']}) AND datetime_expires > NOW()";
 
 		$query .= "ORDER BY datetime_posted DESC";
 		
@@ -59,6 +57,7 @@ class CategoryNews extends Model {
                         AND `userAccess`.uid = {$_SESSION['id']}
                     WHERE (`perms`.cid OR `userAccess`.sid)
                         AND MATCH(`heading`,`body`) AGAINST ('$keyword')
+                        AND (`subject_news`.datetime_published < NOW() OR `subject_news`.owner = {$_SESSION['id']})
                         AND `deleted` = FALSE
                     ORDER BY `$sort_by` $sort_dir
                     LIMIT $offset, $limit;

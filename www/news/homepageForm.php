@@ -1,6 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/categoryNews.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
@@ -13,16 +13,21 @@ if($_POST['heading'] && is_numeric($_POST['code'])) {
 	if (($permission = $groupHandler->getPermission($_POST['code'])) < WRITE_ACCESS)
 		error(19);
 
-	$news = array(	'heading'	=> $_POST['heading'],
-					'body'		=> $_POST['body'],
-					'code'		=> $_POST['code'],
-					
-				);
+    $publishedDate = new DateTime( str_replace('/', '-', $_POST['datetime_published']) );
+    $expiryDate = new DateTime( str_replace('/', '-', $_POST['datetime_expires']) );
+
+    $news = array(
+        'heading' => $_POST['heading'],
+        'body' => $_POST['body'],
+        'code' => $_POST['code'],
+        'datetime_published' => $publishedDate->format(Cfg::get('date_database')),
+        'datetime_expires' => $expiryDate->format(Cfg::get('date_database')),
+    );
 
 	if(is_numeric($_POST['id'])) {
 	
 		$current = $newsHandler->getByID($_POST['id']);
-		
+
 		// check user is owner
 		if ($permission == WRITE_ACCESS && $current['owner'] != $_SESSION['id'] && !NEWS_teacher_edit_other)
 			error(23);
@@ -34,8 +39,7 @@ if($_POST['heading'] && is_numeric($_POST['code'])) {
 		else {
 			/* Modify existing news */
 			$news['id'] = $_POST['id'];
-			$_POST['expires'] > 0 ? $news['datetime_expires'] = date(Cfg::get('date_database'), (mktime()+$_POST['expires']*3600)) : '';
-			
+
 			$newsHandler->update($news); 
 		}
 	}
@@ -43,7 +47,7 @@ if($_POST['heading'] && is_numeric($_POST['code'])) {
 		
 		/* Create news */
 		$news['owner'] = $_SESSION['id'];
-		$news['datetime_expires'] = date(Cfg::get('date_database'), (mktime() + $_POST['expires']*3600));
+
 		$newsHandler->create($news);
 	}
 

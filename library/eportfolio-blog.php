@@ -1,9 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../include/model.php';
-require_once dirname(__FILE__) . '/../library/group.php';
-
-class ePortfolioBlog extends Model {
+class ePortfolioBlog extends DeprecatedModel {
 	function ePortfolioBlog () {
 		$this->_table = "eportfolio_blog";
 		$this->_index = "id";
@@ -11,7 +8,7 @@ class ePortfolioBlog extends Model {
 		
 		$this->group = new Group();
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 
     /**

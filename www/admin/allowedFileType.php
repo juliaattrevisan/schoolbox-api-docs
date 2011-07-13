@@ -14,7 +14,7 @@ class allowedFileType
 	function allowedFileType()
 	{
 		//always gonna need the db so lets create one..
-		$this->db = new dbManager();
+		$this->db = new Database();
 		$this->db->dbConnect();
 	}
 

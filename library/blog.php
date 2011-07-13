@@ -1,9 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../include/model.php';
-require_once dirname(__FILE__) . '/../library/group.php';
-
-class Blog extends Model {
+class Blog extends DeprecatedModel {
 	function Blog () {
 		$this->_table = "blog";
 		$this->_index = "id";
@@ -11,7 +8,7 @@ class Blog extends Model {
 		
 		$this->group = new Group();
 		
-		parent::Model();
+		parent::DeprecatedModel();
 	}
 	
 	function getByID($id) {

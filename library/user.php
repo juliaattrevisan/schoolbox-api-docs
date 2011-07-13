@@ -1,15 +1,13 @@
 <?php
 
-require_once dirname(__FILE__) . '/../include/model.php';
-
-class User extends Model {
+class User extends DeprecatedModel {
 
     function User() {
 
         $this->_table = "user";
         $this->_index = "id";
 
-        parent::Model();
+        parent::DeprecatedModel();
     }
 
 	/**
@@ -205,7 +203,7 @@ class User extends Model {
             $hash = substr(md5(uniqid() . time()), 0, 25);
             $this->update(array('id' => $user['id'], 'hash' => $hash));
 
-            require_once SITE_root . '/include/mailer.php';
+            require_once SITE_root . '/include/Mailer.php';
             $mailHandler = new Mailer('reset-password.html', HEADING . ' Password Reset', $user['alt_email']);
             $mailHandler->setVar('NAME', $user['firstname']);
             $mailHandler->setVar('RESET_LINK', "http://" . $_SERVER['HTTP_HOST'] . "/reset.php?id={$user['id']}&h=" . $hash);
@@ -221,7 +219,7 @@ class User extends Model {
         $user = $this->getByField('alt_email', $email);
         if (isset($user['id'])) {
             if ($groupHandler->isParent($user['id']) || Cfg::get('site_name') != 'shore'  ) {
-                require_once SITE_root . '/include/mailer.php';
+                require_once SITE_root . '/include/Mailer.php';
                 $mailHandler = new Mailer('new-password.html', HEADING . ' Password Reminder', $user['alt_email']);
                 $mailHandler->setVar('NAME', $user['firstname']);
                 $mailHandler->setVar('USERNAME', $user['username']);
