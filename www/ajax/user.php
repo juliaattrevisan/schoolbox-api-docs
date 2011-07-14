@@ -3,6 +3,8 @@ require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 require_once SITE_root . '/www/include/stdfuncs.php';
 
 $userHandler = new User();
+$groupHandler = new Group();
+
 $result = $suggestions = $data = array();
 
 $keyword = $_GET['query'];
@@ -23,7 +25,9 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && is_n
                 }
             }
             else {
-                $suggestions[] = html_entity_decode(scrubText($user['firstname']." ".$user['lastname']), ENT_QUOTES);
+				$person = "{$user['firstname']} {$user['lastname']} - Year {$user['year']}, {$user['gname']}";
+
+                $suggestions[] = html_entity_decode(scrubText($person), ENT_QUOTES);
                 $data[] = $user['uid'];
             }
 		}

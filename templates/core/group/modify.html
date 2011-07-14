@@ -24,41 +24,41 @@ $j(document).ready(function() {
 
         $j.get('/group/modifyForm.php', data);
     });
-	
-	
+
+
 	$j('#addUser').autocomplete({
 		serviceUrl: '/ajax/user.php?groupID=0',
 		minChars: 2,
 		maxHeight: 400,
-		width: $j('#addUser').width(),
-                onSelect: function (value, data) {
+		width: 275,
+		onSelect: function (value, data) {
 			$j('#userID').val(data);
 			return false;
 		}
 	});
-	
+
 	$j('#type_form input').each(function () {
 		$j(this).click(function () {
 			$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', type: $j(this).val()});
 		});
 	});
 
-	
+
 	$j('input.checkAll').each(function () {
 		$j(this).mouseup(function () {
 			var node = $j(this);
 			$j("input." + $j(this).attr("id")).each(function () {
 				$j(this).attr("checked",  !(node.attr("checked")));
-			});			
+			});
 		});
 	});
-	
+
 	$j('#deleteButton').click(function () {
-		if (confirm('Delete all selected users?')) 
+		if (confirm('Delete all selected users?'))
 			$j('#deleteForm').submit();
 	});
-	
-	
+
+
 });
 </script>
 
@@ -120,8 +120,8 @@ $j(document).ready(function() {
 							<td style="white-space: nowrap;"><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
 							<td style="text-align: center;"><input class="greenCheck" type="checkbox" rel="{USER_ID}" {GROUP_CHECKED} /></td>
 							<td style="text-align: center;"><a href="/group/modifyForm.php?delete={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Remove {USER_JAVA}?');">Delete</a></td>
-							<td style="text-align: center; white-space: nowrap;"><!-- BEGIN make_owner --> 
-								<a href="/group/modifyForm.php?owner={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Promote {USER_JAVA} to group admin?');">Make Admin</a> 
+							<td style="text-align: center; white-space: nowrap;"><!-- BEGIN make_owner -->
+								<a href="/group/modifyForm.php?owner={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Promote {USER_JAVA} to group admin?');">Make Admin</a>
 								<!-- END make_owner --></td>
 						</tr>
 						<!-- END member -->
@@ -129,7 +129,7 @@ $j(document).ready(function() {
 					<p class="clearfix">
 						<input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
 						<input type="button" id="deleteButton" value="Delete Selected" class="submit-btn-plain" />
-					
+
 					</p>
 				</form>
 				</td>
