@@ -3098,11 +3098,15 @@ ul.js_happening li {
 	margin: 0;
 	border: 1px solid #ccc;
 	position: relative;
+	overflow:auto; 
+	overflow-x:hidden;
+	text-align:left;
 }
 
 #category-head, #file-head {
 	margin: 0;
 	width: 100%;
+	
 }
 
 #category-list, #file-list {
@@ -3118,6 +3122,8 @@ ul.js_happening li {
 	background:#eee;
 	line-height: 25px;
 	padding: 3px 7px;
+	
+	text-align:left;
 }
 
 #category-list td, #file-list td { width: auto; }

@@ -429,17 +429,11 @@ $j(function() {
 	
 	if (window.location.href.indexOf('debug') != -1)
 		alert((date2.getTime() - date1.getTime()) / 1000);
-		
-	$j('#container').height($j(window).height()-$j('#header').height())
-	$j('#category-window').height($j(window).height()-$j('#header').height())	
+
+	$j('#category-window, #file-window').height($j(window).height()-$j('#header').height()-$j('#footer').height()-50);	
 	
-	
-		
 	$j(window).resize(function() {
-
-		$j('#container').height($j(window).height()-$j('#header').height())
-		$j('#category-window').height($j(window).height()-$j('#header').height())
-
+		$j('#category-window, #file-window').height($j(window).height()-$j('#header').height()-$j('#footer').height()-50)
 	});
 	
 	
