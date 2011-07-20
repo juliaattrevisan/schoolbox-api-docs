@@ -16,14 +16,14 @@ $j(function() {
 		$j(this).toggleClass('active')
 		return false;
 	});
-	
+
 	$j('.show-section-options').click(function() {
 		$j('.section-options').slideToggle();
 		$j(this).toggleClass('active')
 		return false;
 	});
 
-	
+
 	$j(".show-assess-options, .show-section-options").hover(
 	function () {
 		$j(this).children('span').stop(true, true).fadeIn("fast");
@@ -34,7 +34,7 @@ $j(function() {
 		$this.children('span').stop(true, true).fadeOut("fast", function() {
 			$this.removeAttr('style');
 		});
-		
+
 	});
 
 });
@@ -45,7 +45,7 @@ $j(function() {
 <a href="/assess/export/{ASSESS_ASSESS_ID}.xml" class="btn go-to float-left no-marg" ><span></span>Export</a>
 <a href="/assess/delete/{ASSESS_ASSESS_ID}" onclick="return confirm('Are you sure you want to delete this assessment?');" class="btn delete float-left no-marg" ><span></span>Delete</a>
 </div>
-<a class="drop-arrow show-assess-options" href="#">&#x25BC;</a>	
+<a class="drop-arrow show-assess-options" href="#">&#x25BC;</a>
 
 <div class="allQuestions">
 	<div class="assess-body">
@@ -53,8 +53,8 @@ $j(function() {
         <!-- BEGIN section -->
 		<div class="section-box">
 			<h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}<a class="drop-arrow show-section-options" href="#">&#x25BC;</a></h3>
-			
-			
+
+
 			<div class="hide section-options pad-it clearfix">
 				<a href="/assess/section/modify/{SECTION_SECTION_ID}" class="btn modify float-left"><span></span>Edit</a></li>
 				<a onclick="return confirm('Are you sure you want to delete the section?');" href="/assess/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
@@ -70,8 +70,9 @@ $j(function() {
 				</li>
 				<!-- END question -->
 			</ul>
-	
+
             <a class="add-questions" href="/assess/question/create/{SECTION_SECTION_ID}"><span>Add a Question</span></a>
+			<a class="add-questions" href="/assess/questionbank/contents/{SECTION_SECTION_ID}"><span>Copy from QuestionBank</span></a>
 		</div>
         <!-- END section -->
 	</div>

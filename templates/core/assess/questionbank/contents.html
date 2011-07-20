@@ -1,0 +1,28 @@
+<form action='/assess/questionbank/addToSection' method='post'>
+	<input name='section_id' type='hidden' value='{SECTION_ID}' />
+	<ul>
+	<!-- BEGIN question_category -->
+		<li>
+			<h2>{QUESTION_CATEGORY_NAME}</h2>
+			<ul>
+				<!-- BEGIN question -->
+				<li>
+					<!-- BEGIN show_input -->
+					<input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}' />
+					<!-- END show_input -->
+					<p>
+						{QUESTION}
+					</p>
+					({QUESTION_TYPE}, {MARKS} marks)
+					<hr />
+				</li>
+				<!-- END question -->
+			</ul>
+		</li>
+	<!-- END question_category -->
+	</ul>
+
+	<!-- BEGIN show_submit -->
+	<input type='submit' value='Copy to section' />
+	<!-- END show_submit -->
+</form>

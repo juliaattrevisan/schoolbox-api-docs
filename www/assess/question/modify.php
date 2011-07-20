@@ -10,6 +10,7 @@
 require_once '../library/assess/assess.php';
 require_once '../library/assess/assess-section.php';
 require_once '../library/assess/assess-factory.php';
+require_once('../library/assess/assess-questioncategory.php');
 require_once('../library/group.php');
 
 $factory = new AssessFactory();
@@ -66,7 +67,7 @@ else {
     $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
-    
+
     $questionHandler = new AssessQuestion();
     $question = $questionHandler->getByID($this->arg[0]);
     $section = $sectionHandler->getByID($question['section_id']);
@@ -93,7 +94,7 @@ else {
      */
     $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($question['type_id']) . '/modify.html');
     $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
-    
+
     $answerHandler->modify($this, $question['question_id']);
 
     $this->parse('answerInputs_block', 'answerFormFragment', true);
@@ -130,5 +131,26 @@ else {
     $assess->renderAssessContents($section['assess_id'], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
+
+	/* Options for importing into the Question Bank
+	 */
+	$this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
+
+	$questionCategoryHandler = new AssessQuestionCategory();
+	$allQuestionCategories = $questionCategoryHandler->getList();
+
+	if (is_array($allQuestionCategories) && count($allQuestionCategories)) {
+		foreach($allQuestionCategories as $currentQuestionCategory) {
+			$this->setVar(array(
+				'QUESTION_CATEGORY_ID' => $currentQuestionCategory['question_category_id'],
+				'QUESTION_CATEGORY_NAME' => $currentQuestionCategory['name'],
+			));
+
+			$this->parse('question_category_block', 'question_category', true);
+		}
+	}
+	else {
+		$this->setVar('question_category_block', '');
+	}
 }
 ?>
