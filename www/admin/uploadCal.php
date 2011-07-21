@@ -36,7 +36,7 @@ class uploadCal {
         $this->t_body->set_var('TEMPLATE_YEAR', date('Y'));
         $this->t_body->set_var('SITE_NAME', SITE_name);
 
-        $db = new Database();
+        $db = new DeprecatedDatabase();
         $query = "SELECT * FROM luCampus ORDER BY name";
         $db->query($query);
         while($thisCampus = $db->getNextArray())
@@ -46,7 +46,7 @@ class uploadCal {
             $this->t_body->parse("campus_chck_lst", "campus_check_list", true);
         }
 
-        $db = new Database();
+        $db = new DeprecatedDatabase();
         $query = "SELECT * FROM groups ORDER BY name";
         $db->query($query);
         while($thisCampus = $db->getNextArray())
@@ -64,7 +64,7 @@ class uploadCal {
     function processCal()
     {
 
-        $db = new Database();
+        $db = new DeprecatedDatabase();
         $calendarHandler = new Calendar();
         $cal = fopen($_FILES['file']['tmp_name'], 'r');
         if (!$cal)

@@ -9,7 +9,7 @@ class modEvent
 {
 	function modEvent()
 	{
-		$this->db = new Database();
+		$this->db = new DeprecatedDatabase();
 		
 		$this->t_body = new Template(TPL_directory);
         $this->t_body->set_file('tplBODY', 'modules/clearinghouse/modEvent.htm');

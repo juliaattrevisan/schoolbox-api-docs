@@ -31,7 +31,7 @@ else
 class ProxyLog {
 
 function ProxyLog() {
-	$db = new Database();
+	$db = new DeprecatedDatabase();
 	$db->dbConnect();
 
 	global $months;

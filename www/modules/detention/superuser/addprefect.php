@@ -4,7 +4,7 @@ include("../../../include/session.php");
 include("../../../include/include.php");
 include("../../../include/permission.php");
 
-$db = new Database();
+$db = new DeprecatedDatabase();
 
 if ($_SESSION['su'] != 1)
 	die("Superuser access only");

@@ -8,7 +8,7 @@ class offence
 	{
 		
 		//setup database
-		$this->mySQLdb = new Database("detention");
+		$this->mySQLdb = new DeprecatedDatabase("detention");
 		$this->mySQLdb->dbConnect();
 
 		$this->id = $id;

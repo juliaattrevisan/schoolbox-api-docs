@@ -7,7 +7,7 @@ class Event
 
 	function Event()
 	{
-		$this->db = new Database('clearinghouse', 1);
+		$this->db = new DeprecatedDatabase('clearinghouse', 1);
 	}
 	
 	function addEvent($event)

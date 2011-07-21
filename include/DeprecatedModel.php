@@ -7,7 +7,7 @@
 ************************************************************/
 
 require_once(dirname(__FILE__)  .'/../www/conf/conf.php');
-require_once(dirname(__FILE__) . '/Database.php');
+require_once(dirname(__FILE__) . '/DeprecatedDatabase.php');
 
 class DeprecatedModel {
 
@@ -15,7 +15,7 @@ class DeprecatedModel {
 	var $_index;
 
 	function DeprecatedModel() {
-		$this->db = new Database(SQL_db);
+		$this->db = new DeprecatedDatabase(SQL_db);
 	}
 	
 	function getByID($id) {

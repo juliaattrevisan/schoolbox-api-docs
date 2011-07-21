@@ -26,7 +26,7 @@ class Config extends DeprecatedModel {
         }
 
         static private function load() {
-                $configList = Database::getInstance()->getAll("SELECT * FROM `config`");
+                $configList = DeprecatedDatabase::getInstance()->getAll("SELECT * FROM `config`");
                 if (is_array($configList)) {
                         foreach ($configList as $config) {
                                 if(isset(self::$data[$config['name']])) {
@@ -73,7 +73,7 @@ class Config extends DeprecatedModel {
 			  */
 			$query = "SELECT DISTINCT `type` FROM `config` ORDER BY type";
 
-			return Database::getInstance()->getAll($query);
+			return DeprecatedDatabase::getInstance()->getAll($query);
         }
 
         public function getAvailableOptions() {
@@ -104,7 +104,7 @@ class Config extends DeprecatedModel {
 				$query .= "ORDER BY `$orderBy`";
 			}
 
-			return Database::getInstance()->getAll($query);
+			return DeprecatedDatabase::getInstance()->getAll($query);
         }
 
         public function updateArray($configList) {

@@ -12,7 +12,7 @@ class WhatsNew
 	function WhatsNew()
 	{
 		//setup db
-		$this->db = new Database;
+		$this->db = new DeprecatedDatabase;
 	}
 
 	function submissionDetails($id)

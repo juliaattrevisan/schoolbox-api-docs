@@ -8,7 +8,7 @@ class clean {
 	function clean()
         {
 			//always gonna need the db so lets create one..
-			$this->db = new Database();
+			$this->db = new DeprecatedDatabase();
         }
 
 	function cleanSubmissionBoxes()

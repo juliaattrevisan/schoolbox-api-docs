@@ -9,7 +9,7 @@ class page {
 		
 		$userid = $_SESSION['id'];
 		
-		$this->db = new Database();
+		$this->db = new DeprecatedDatabase();
 		$this->db->dbConnect();
 		
 		$no_user = $_REQUEST['no_user'];

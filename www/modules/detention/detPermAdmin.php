@@ -4,7 +4,7 @@ require_once("../../include/include.php");
 require_once("../../include/permission.php");
 require_once("../../include/html-time.php");
 
-$db = new Database();
+$db = new DeprecatedDatabase();
 $db->dbConnect();
 
 echo "<p><strong>School Stewards:</strong><br>\n";

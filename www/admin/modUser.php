@@ -17,7 +17,7 @@ class modUser
 {
 	function modUser()
 	{
-		$this->db = new Database();
+		$this->db = new DeprecatedDatabase();
 	}
 
 	function displayAddUser()

@@ -12,10 +12,10 @@
  * @version     SVN: $Id$
  */
 require_once dirname(__FILE__) . '/../../../conf/conf.php';
-require_once SITE_root . '/include/Database.php';
+require_once SITE_root . '/include/DeprecatedDatabase.php';
 require_once SITE_root . '/library/mssql.php';
 
-$dbh = new Database('tutorial');
+$dbh = new DeprecatedDatabase('tutorial');
 $mssql = new MSSQL;
 
 function e($string) {

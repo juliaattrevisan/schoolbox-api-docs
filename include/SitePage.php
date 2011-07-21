@@ -9,7 +9,7 @@ class SitePage extends Page {
 	function SitePage($login=TRUE) {
 		parent::Page();
 
-		$this->db = new Database;
+		$this->db = new DeprecatedDatabase;
 		$this->setTab('main');
 
 		if($login)
@@ -221,9 +221,9 @@ class SitePage extends Page {
 
 	function error($ec, $message = "") {
 
-		require_once(WEB_root . '/../include/Database.php');
+		require_once(WEB_root . '/../include/DeprecatedDatabase.php');
 
-		$db = new Database(SQL_db, 1);
+		$db = new DeprecatedDatabase(SQL_db, 1);
 
 		$query = "SELECT message FROM error WHERE id = '$ec'";
 		$error = $db->getRow($query);

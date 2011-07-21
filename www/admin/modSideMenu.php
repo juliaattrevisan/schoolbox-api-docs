@@ -15,7 +15,7 @@ class modSideMenu
 {
 	function modSideMenu()
 	{
-		$this->db = new Database;
+		$this->db = new DeprecatedDatabase;
 		$this->itemList = array();
 	}
 

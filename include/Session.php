@@ -1,9 +1,9 @@
 <?php
-require_once dirname(__FILE__) . '/Database.php';
+require_once dirname(__FILE__) . '/DeprecatedDatabase.php';
 
 class Session {
     function  __construct() {
-      $this->db = new Database;
+      $this->db = new DeprecatedDatabase;
     }
 
     public function create($username) {

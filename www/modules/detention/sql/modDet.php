@@ -10,7 +10,7 @@ class det
 		
 		//setup database
 		$SQL_db = "detention";
-		$this->mySQLdb = new Database($SQL_db);
+		$this->mySQLdb = new DeprecatedDatabase($SQL_db);
 		$this->mySQLdb->dbConnect();
 
 		$this->detDate = "";

@@ -13,7 +13,7 @@ class fixEvents
 		$this->t_body->set_file("tplBODY", "admin/fixEvents.htm");
 		$this->message = "";
 		$this->cal = new calendar();
-		$this->db = new Database(SQL_db, 1);
+		$this->db = new DeprecatedDatabase(SQL_db, 1);
 		$groupArray = $this->getAllGroups();
 		$allCampusArray = $this->getAllCampus();		
 		$sql = "SELECT id, sid FROM event WHERE access = 3 AND sid IS NOT NULL";

@@ -8,7 +8,7 @@ class opp
 	 	
 		//setup database
 		$SQL_db = "sports";
-		$this->mySQLdb = new Database($SQL_db);
+		$this->mySQLdb = new DeprecatedDatabase($SQL_db);
 		$this->mySQLdb->dbConnect();
 
 		$this->campus = 1;

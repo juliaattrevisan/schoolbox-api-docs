@@ -588,7 +588,7 @@ class MDB2_Driver_Manager_Common extends MDB2_Module_Common
     /**
      * list all views in the current database
      *
-     * @param string database, the current is default
+     * @param string DeprecatedDatabase, the current is default
      *               NB: not all the drivers can get the view names from
      *               a database other than the current one
      * @return mixed array of view names on success, a MDB2 error on failure
@@ -673,7 +673,7 @@ class MDB2_Driver_Manager_Common extends MDB2_Module_Common
     /**
      * list all tables in the current database
      *
-     * @param string database, the current is default.
+     * @param string DeprecatedDatabase, the current is default.
      *               NB: not all the drivers can get the table names from
      *               a database other than the current one
      * @return mixed array of table names on success, a MDB2 error on failure
@@ -992,7 +992,7 @@ class MDB2_Driver_Manager_Common extends MDB2_Module_Common
     /**
      * list all sequences in the current database
      *
-     * @param string database, the current is default
+     * @param string DeprecatedDatabase, the current is default
      *               NB: not all the drivers can get the sequence names from
      *               a database other than the current one
      * @return mixed array of sequence names on success, a MDB2 error on failure

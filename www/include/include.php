@@ -1,6 +1,6 @@
 <?php 
 require_once($_SERVER['DOCUMENT_ROOT'].'/conf/conf.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . "/../include/Database.php");
+require_once($_SERVER['DOCUMENT_ROOT'] . "/../include/DeprecatedDatabase.php");
 require_once($_SERVER['DOCUMENT_ROOT'].'/../include/Template.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/include/stdfuncs.php');
 

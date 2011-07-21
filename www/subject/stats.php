@@ -20,7 +20,7 @@ class stats
 			 error(0,"category not valid");
 
 		//setup database
-		$this->mySQLdb = new Database();
+		$this->mySQLdb = new DeprecatedDatabase();
 		$this->mySQLdb->dbConnect();
 
 		$this->t_body = new Template(TPL_directory);

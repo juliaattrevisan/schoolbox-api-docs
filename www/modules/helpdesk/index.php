@@ -9,7 +9,7 @@ define( 'DB_NAME_PORTAL', SQL_db);
 $userHandler = new User;
 $groupHandler = new Group;
 
-$db = new Database(SQL_db, 1);
+$db = new DeprecatedDatabase(SQL_db, 1);
 
 //setup file
 $this->setFile(TEMPLATE_content, 'modules/helpdesk/display.html');

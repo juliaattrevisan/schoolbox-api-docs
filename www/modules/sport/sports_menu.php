@@ -57,7 +57,7 @@ class sports_menu
 			  AND news.datetime_expires > now()
 			  ORDER BY news.datetime_posted DESC
 			";
-		$db = new Database();
+		$db = new DeprecatedDatabase();
 		$db->dbDoQuery($query);
 		$i = 0;
 		while ($notes = $db->dbGetNextArray()){

@@ -5,7 +5,7 @@ class detSearch
 	function detSearch()
 	{
 		$this->t_body = new Template(TPL_directory);
-		$this->db = new Database();
+		$this->db = new DeprecatedDatabase();
 		$this->db->dbConnect();
 	}
 

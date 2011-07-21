@@ -25,7 +25,7 @@ $tempID = array ("CALENDAR" 		=> 1000,
 
 
 
-$db = new Database(SQL_db, 1);
+$db = new DeprecatedDatabase(SQL_db, 1);
 $query = "SELECT UPPER(name) as name, id FROM homepage_comp WHERE id > 20 ORDER BY id";
 
 $currentIDs = $db->getAll($query);

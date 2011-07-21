@@ -18,7 +18,7 @@ define("MAX_IMAGE_SIZE", 60000000);
 
 if($_GET['id'] && $_GET['width'] && $_GET['height'])
 {
-	$db = new Database;
+	$db = new DeprecatedDatabase;
 	
 	//get file information
     if (is_numeric($_GET['myFile'])) {

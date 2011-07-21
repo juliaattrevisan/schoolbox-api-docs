@@ -2442,7 +2442,7 @@ class MDB2_Driver_Common extends PEAR
      * @param   string  query
      * @param   bool    if the query is a manipulation query
      * @param   resource connection handle
-     * @param   string  database name
+     * @param   string  DeprecatedDatabase name
      *
      * @return  result or error object
      *

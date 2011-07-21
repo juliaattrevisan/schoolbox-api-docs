@@ -21,7 +21,7 @@ function perm($sid, $service)
 	if($_SESSION['su'] == 1)
 		return 3;
 
-	$db = new Database;
+	$db = new DeprecatedDatabase;
 
 	//individual access
 	$userQuery = "SELECT type FROM userAccess 
@@ -59,7 +59,7 @@ function perm($sid, $service)
 function isMember($id, $uid)
 {
 	// Checks if user is member of the supplied group id (for category groups only, use perm for others) 
-	$db = new Database;
+	$db = new DeprecatedDatabase;
 	$service = HOMEPAGESERVICE;
 	
 	//individual access

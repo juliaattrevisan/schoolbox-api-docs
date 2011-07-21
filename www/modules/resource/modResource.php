@@ -59,7 +59,7 @@ class page
 			$this->t_body->set_block("tplBODY", "assignment", "assignment_block");
 		
 			
-			$db = new Database;
+			$db = new DeprecatedDatabase;
 			$db->dbConnect();
 			
 			$typeDropDown = typeDropDown(&$db, "type", $resource['type']);

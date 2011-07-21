@@ -5,7 +5,7 @@
 class ePortfolio {
 
 	function ePortfolio($uid) {
-		$this->db = new Database(SQL_db);
+		$this->db = new DeprecatedDatabase(SQL_db);
 		$this->uid = $uid;
 	}
 

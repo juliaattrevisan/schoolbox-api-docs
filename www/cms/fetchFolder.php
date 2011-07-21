@@ -21,7 +21,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 class ZipFolder {
 
 function ZipFolder($folder) {
-	$this->db = new Database;
+	$this->db = new DeprecatedDatabase;
 	$this->folder = $folder;
 	$this->tmpName = tempnam(Cfg::get('zip_dir'), 'zip');
 	$this->tmpFolder = $this->tmpName.'dir';

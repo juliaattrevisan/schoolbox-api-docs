@@ -15,7 +15,7 @@ function permType()
 		return 4;
 	}
 
-	$db = new Database();
+	$db = new DeprecatedDatabase();
 	$db->dbConnect();
 
 	//individual access
@@ -32,7 +32,7 @@ function permType()
 function permSS()
 {
 	//Function to determine the School Steward
-	$db = new Database;
+	$db = new DeprecatedDatabase;
 	$db->dbConnect();
 	
 	$query = "SELECT `uid`
@@ -49,7 +49,7 @@ function permSS()
 function permHoH($house)
 {
 	//Function to determine the Head of House 
-	$db = new Database;
+	$db = new DeprecatedDatabase;
 	$db->dbConnect();
 	
 	$query = "SELECT uid 
@@ -66,7 +66,7 @@ function permHoH($house)
 function permHouse()
 {
 	//Function to determine which house detentions to show 
-	$db = new Database;
+	$db = new DeprecatedDatabase;
 	$db->dbConnect();
 	
 	$query = "SELECT sid

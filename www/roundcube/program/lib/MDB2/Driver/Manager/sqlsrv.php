@@ -934,7 +934,7 @@ class MDB2_Driver_Manager_sqlsrv extends MDB2_Driver_Manager_Common
     /**
      * list all views in the current database
      *
-     * @param string database, the current is default
+     * @param string DeprecatedDatabase, the current is default
      *
      * @return mixed array of view names on success, a MDB2 error on failure
      * @access public
@@ -1276,7 +1276,7 @@ class MDB2_Driver_Manager_sqlsrv extends MDB2_Driver_Manager_Common
      *  - No identifier can contain ASCII 0 (0x00) or a byte with a value of 255.
      *  - Before MySQL 4.1, identifier quote characters should not be used in identifiers.
      *  - Database, table, and column names should not end with space characters.
-     *  - Database and table names cannot contain “/”, “\”, “.”, or characters that are not allowed in filenames.
+     *  - Database and table names cannot contain ï¿½/ï¿½, ï¿½\ï¿½, ï¿½.ï¿½, or characters that are not allowed in filenames.
      *
      *  Table/Database name maximum length:
      *  - 64

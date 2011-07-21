@@ -14,7 +14,7 @@ class sideMenu
 	function sideMenu()
 	{
 		//always gonna need the db so lets create one..
-		$this->db = new Database();
+		$this->db = new DeprecatedDatabase();
 		$this->db->dbConnect();
 	}
 

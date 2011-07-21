@@ -5,7 +5,7 @@
 class Homepage {
 
 	function Homepage($cid) {
-		$this->db = new Database(SQL_db);
+		$this->db = new DeprecatedDatabase(SQL_db);
 		$this->cid = $cid;
 	}
 

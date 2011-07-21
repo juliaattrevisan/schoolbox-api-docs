@@ -10,45 +10,72 @@
  */
  
 abstract class Collection {
-    protected $table;
 
-    protected $identifier;
+    /**
+     * An array filters applied to the collection.
+     *
+     * @var Array
+     */
+    protected $filter;
 
-    public function getAll () {
-        $resultSet = new ResultSet($query);
+    /**
+     * A mapper to notify when the Collection becomes out of sync.
+     *
+     * @var CollectionMapper
+     */
+    protected $mapper;
+
+    /**
+     * An array of the models contained in this collection.
+     *
+     * @var Array
+     */
+    protected $models;
+
+    /**
+     * Sets the mapper
+     */
+    public function __construct () {
+        /* Set mapper */
+        $this->attachMapper( Mapper::getInstance() );
     }
-}
 
-class User {
-    public $data
+    /**
+     * Sets a filter and notifies the mapper
+     *
+     * @param Array $filterList
+     * @return Bool
+     */
+    protected function setFilter ($filterList) {
+        if ( !is_array($filterList) ) {
+            return false;
+        }
 
-$data->firstname;
-    $data->lastname;
-    $data->other_metadata;
+        $this->filter = $filterList;
 
+        $this->notifyMapper();
 
-}
+        return true;
+    }
 
+    /**
+     * Attaches a mapper which handles persistence with the db
+     *
+     * @param Mapper $mapper
+     * @return Bool
+     */
+    protected function attachMapper (Mapper $mapper) {
+        $this->mapper = $mapper;
 
+        return true;
+    }
 
-
-
-
-class UserCollection extends Collection {
-
-
-}
-
-
-
-class ResultSet {
-    private $query;
-    private $resultSet;
-
-
-    public function __construct($query) {
-        $this=>resultSet = db:query($query)
-        $this->query = $query;
-
+    /**
+     * Notifies the Mapper that a method has been called
+     *
+     * @return Bool
+     */
+    protected function notifyMapper () {
+        return $this->mapper->updateCollection($this);
     }
 }

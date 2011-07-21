@@ -917,7 +917,7 @@ class MDB2_Driver_Manager_mssql extends MDB2_Driver_Manager_Common
     /**
      * list all views in the current database
      *
-     * @param string database, the current is default
+     * @param string DeprecatedDatabase, the current is default
      *
      * @return mixed array of view names on success, a MDB2 error on failure
      * @access public

@@ -7,7 +7,7 @@ define('LINK_COMPONENT_ID', 2);
 
 require_once '../include/include.php';
 
-$db = new Database;
+$db = new DeprecatedDatabase;
 
 $query = "SELECT * FROM homepage_comp_location WHERE component = ". FILE_COMPONENT_ID ." OR component = " . LINK_COMPONENT_ID;
 $componentList = $db->getAll($query);

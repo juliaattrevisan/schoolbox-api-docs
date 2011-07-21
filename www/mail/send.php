@@ -21,7 +21,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 {
 	//get users email address to use in from field
 	
-	$db = new Database();
+	$db = new DeprecatedDatabase();
 	$db->dbConnect();
 
 	$query = "SELECT firstname, lastname, username, local_email, title, alt_email FROM user WHERE id = '".$_SESSION["id"]."'";
