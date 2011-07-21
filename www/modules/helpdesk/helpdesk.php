@@ -23,7 +23,7 @@ class Helpdesk {
 		LEFT JOIN
 				".HELPDESK_db.".tblEquipment e on j.equipmentID = e.equipmentID
 		LEFT JOIN
-				".SQL_db.".user assignedUser on assignedUser.id = j.portalAssignedUserID
+				`".SQL_db."`.user assignedUser on assignedUser.id = j.portalAssignedUserID
 		WHERE s.description != 'Closed' AND (j.portalAssociatedUserID = {$userid} OR e.portalUserID ={$userid} ) 
 		ORDER BY j.createdDate DESC";
 
