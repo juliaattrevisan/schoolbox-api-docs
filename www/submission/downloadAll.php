@@ -1,6 +1,7 @@
 <?php
-require_once('../include/pclzip.lib.php');
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
+require_once('../include/pclzip.lib.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 
 $page = new SitePage;

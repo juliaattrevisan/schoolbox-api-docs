@@ -1,8 +1,8 @@
 <?php
 
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/wiki.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
 $page = new SitePage;
 $wikiHandler = new Wiki;

@@ -17,7 +17,7 @@ $this->setFile(TEMPLATE_content, 'home.html');
 $this->setTitle('Welcome');
 
 //fetch layout for user
-$query = "SELECT position, name, filename, function 
+$query = "SELECT position, name, filename, function
             FROM welcomeLayout LEFT JOIN welcomeComponent ON componentID = welcomeComponent.id
             WHERE gid = {$_SESSION['gid']}";
 $result = $this->db->query($query);
@@ -33,13 +33,13 @@ while($component = $this->db->getNextArray($result))
 		if(is_file($_SERVER['DOCUMENT_ROOT'].'/home/'.$funcname.'.php')) {
 			include($_SERVER['DOCUMENT_ROOT'].'/home/'.$funcname.'.php');
 		}
-		else 
+		else
 			$this->setVar('POS'.$component['position'], '');
 
 		if($component['name'] == 'Timetable')
 			$timetable = true;
 	}
-	else 
+	else
 		$this->setVar('POS'.$component['position'], '');
 }
 

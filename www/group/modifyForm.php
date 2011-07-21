@@ -1,8 +1,8 @@
 <?php
 
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
 $page = new SitePage;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
@@ -104,22 +104,24 @@ elseif (isset($_POST['bulkAdd'])) {
 	$string = preg_replace("(\r\n|\n|\r)", ",", $_POST['bulkAdd']);
 	
 	//split the list into an array
-	$list = preg_split('[,; ]', $string);
+	$list = preg_split('/[,; ]/', $string);
 	
 	foreach($list as $key) {
-		trim($key);
+		$key = trim($key);
 
-        $user = $userHandler->getBySynergy($key);
+        if ( !empty($key) ) {
 
-        if($user['id']) {
-            $groupHandler->addUser($_REQUEST['categoryID'], $user['id']);
-				
-		} else {
-			//word, assume its a username
-            $user = $userHandler->getByUsername($key);
-			if($user['id'])
-				$groupHandler->addUser($_REQUEST['categoryID'], $user['id']);
-		}
+            if ( is_numeric($key) ) {
+                $user = $userHandler->getBySynergy($key);
+            }
+            else if ( is_string($key) ) {
+                $user = $userHandler->getByUsername($key);
+            }
+
+            if ( !empty($user) && is_numeric($user['uid']) ) {
+                $groupHandler->addUser($_REQUEST['categoryID'], $user['uid']);
+            }
+        }
 	}
 	
 	localRedir('/group/modify/' . $_REQUEST['categoryID']);

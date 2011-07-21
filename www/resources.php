@@ -18,7 +18,7 @@ $this->setTab('resources');
 
 $categoryHandler = new Category;
 $fileHandler = new File;
-$linkHandler = new Link;	
+$linkHandler = new Link;
 $groupHandler = new Group;
 $allowedFiles = new AllowedFile;
 
@@ -36,7 +36,7 @@ if ($groupHandler->getPermission($openCategory) < READ_ACCESS)
 // log view
 if ($openCategory > 0)
 	$categoryHandler->logPageView($openCategory);
-	
+
 // get parentIDs from openCategory to 0
 $parentList[] = $parentID = $openCategory;
 $i = 0;
@@ -60,23 +60,23 @@ if (is_array($categoryList)) {
 		// get permissions
 		if (!isset($permission[$category['id']]))
 			$permission[$category['id']] = $groupHandler->getPermission($category['id']);
-		
+
 		// limit permission by parent
 		//if (isset($permission[$category['parent']]) && $permission[$category['id']] > $permission[$category['parent']])
 		//	$permission[$category['id']] = $permission[$category['parent']];
-		
+
 		// check permission
 		if ($permission[$category['id']] >= READ_ACCESS) {
-		
+
 			$class = array();
-			
+
 			// set parent category
 			$class[] = "child-of-node-{$category['parent']}";
-			
-			/* add plus sign to parent nodes */	
+
+			/* add plus sign to parent nodes */
 			if ($category['isParent'] == '1')
 				$class[] = in_array($category['id'], $parentList) ? 'expanded loaded' : 'collapsed';
-			
+
 			/* select default dir */
 			if ($category['id'] == $openCategory)
 				$class[] = 'selected';
@@ -84,11 +84,11 @@ if (is_array($categoryList)) {
 			/* mark homepages */
 			if ($category['template'] > 0)
 				$class[] = "homepage";
-			
+
 			/* mark write access */
 			if ($permission[$category['id']] == WRITE_ACCESS)
 				$class[] = "write";
-			
+
 			/* mark full access*/
 			if ($permission[$category['id']] == FULL_ACCESS)
 				$class[] = "full";
@@ -97,11 +97,11 @@ if (is_array($categoryList)) {
 			$name = scrubTEXT($category['name']);
 			if($category['code'] != '' && $category['code'] != $category['name'])
 				$name .= ' ('.scrubTEXT($category['code']).')';
-			
+
 			$output = array('CATEGORY_ID'		=> $category['id'],
 							'CATEGORY_NAME'		=> $name,
 							'CLASS'				=> implode(" ", $class),
-							);	
+							);
 			$this->setVar($output);
 			$this->parse('category_list_block', 'category_list', true);
 		}
@@ -132,29 +132,29 @@ else {
 $fileList = $fileHandler->mergeLinks( $fileHandler->getAllInCategory($openCategory), $linkHandler->getAllInCategory($openCategory));
 $permission = $groupHandler->getPermission($openCategory);
 if (is_array($fileList) && count($fileList) > 0) {
-	
+
 	foreach ($fileList as $file) {
 
 		if (empty($file['modified']))
 			$file['modified'] = $file['submitted'];
-						
+
 		$class = array();
-		
+
 		// is link
 		$file['url'] ? $class[] = "link" : null;
-		
+
 		// write access
 		$permission >= WRITE_ACCESS ? $class[] = "write" : null;
 
 		// is hidden
 		$file['hidden'] > 0 ? $class[] = "hidden" : null;
-		
+
 		// icon
 		$class[] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
-		
+
 		if (!($i++%2))
 			$class[] = 'dark';
-	
+
 		$output = array('FILE_ID' 	 	=> $file['id'],
 						'TYPE'			=> $file['url'] ? 'link' : 'file',
 						'FILE_NAME' 	=> cutString(scrubText($file['description']),32),
@@ -164,18 +164,18 @@ if (is_array($fileList) && count($fileList) > 0) {
 						'CATEGORY_ID'	=> $file['category'],
 						'CLASS'			=> implode(" ", $class),
 						);
-						
+
 		$this->setVar($output);
 		$this->parse('file_list_block', 'file_list', true);
 
 	}
 } else
-	$this->setVar('file_list_block', '');	
+	$this->setVar('file_list_block', '');
 
 // output mime classes
 $allowedList = $allowedFiles->getAll();
 if (is_array($allowedList)) {
-	
+
 	// append link icon to resutls
 	$allowedList[]['iconFile'] = "link.png";
 	$last = '';
@@ -184,10 +184,10 @@ if (is_array($allowedList)) {
 			$output = array("NAME"	=> $allowedFiles->getClass($allowed["iconFile"]),
 							"ICON"	=> $allowed["iconFile"],
 							);
-			
+
 			$this->setVar($output);
 			$this->parse("allowed_files_block", "allowed_files", true);
-			
+
 			$last = $allowed["iconFile"];
 		}
 	}

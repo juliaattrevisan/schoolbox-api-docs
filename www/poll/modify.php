@@ -1,8 +1,8 @@
 <?php
 
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/poll.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
 $pollHandler = new Poll;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
