@@ -1,4 +1,20 @@
-<form action='/assess/questionbank/addToSection' method='post'>
+<script type='text/javascript'>
+$j(function() {
+	$j('#deleteButton').mouseup(function() {
+		var allQuestions = $j('#questionBankForm').find('input[name="delete_question_bank_id[]"]:checked');
+
+		if (allQuestions.length && confirm('Do you want to remove the selected questions from the Question Bank?')) {
+			$j.post('/assess/questionbank/delete', $j('#questionBankForm').serialize(), function(response) {
+				alert(response);
+
+				location.reload();
+			});
+		}
+	});
+});
+
+</script>
+<form id='questionBankForm' action='/assess/questionbank/addToSection' method='post'>
 	<input name='section_id' type='hidden' value='{SECTION_ID}' />
 	<ul>
 	<!-- BEGIN question_category -->
@@ -8,8 +24,11 @@
 				<!-- BEGIN question -->
 				<li>
 					<!-- BEGIN show_input -->
-					<input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}' />
+					<input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}' /> Copy into assess
 					<!-- END show_input -->
+
+					<input name='delete_question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}' /> Delete from QuestionBank
+
 					<p>
 						{QUESTION}
 					</p>
@@ -25,4 +44,14 @@
 	<!-- BEGIN show_submit -->
 	<input type='submit' value='Copy to section' />
 	<!-- END show_submit -->
+
+	<!-- BEGIN show_delete -->
+	<input id='deleteButton' type='button' value='Remove from QuestionBank' />
+	<!-- END show_delete -->
+
+	<!-- BEGIN no_questions -->
+	<p>There are no questions in the Question Bank.</p>
+	<!-- END no_questions -->
 </form>
+
+

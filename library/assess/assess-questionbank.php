@@ -21,6 +21,7 @@ class AssessQuestionBank extends DeprecatedModel {
 			FROM assess_question_bank
 			LEFT JOIN assess_question_category ON assess_question_bank.question_category_id = assess_question_category.question_category_id
 			LEFT JOIN assess_luQuestionType ON assess_question_bank.type_id = assess_luQuestionType.type_id
+			WHERE assess_question_bank.deleted_at IS NULL
 			ORDER BY name";
 
 		return $this->db->getAll($query);

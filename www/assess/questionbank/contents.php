@@ -4,6 +4,8 @@ require_once('../library/assess/assess-questionbank.php');
 $this->setFile(TEMPLATE_content, 'assess/questionbank/contents.html');
 $this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
 $this->setBlock(TEMPLATE_content, 'show_submit', 'show_submit_block');
+$this->setBlock(TEMPLATE_content, 'show_delete', 'show_delete_block');
+$this->setBlock(TEMPLATE_content, 'no_questions', 'no_questions_block');
 $this->setBlock('question_category', 'question', 'question_block');
 $this->setBlock('question', 'show_input', 'show_input_block');
 
@@ -51,18 +53,35 @@ if (is_array($allQuestions) && count($allQuestions)) {
 	/* Parse last question_category out
 	 */
 	$this->parse('question_category_block', 'question_category', true);
+
+	/* Hide submit button if we aren't adding contents to a section
+	 */
+	if (is_numeric($this->arg[0])) {
+		$this->parse('show_submit_block', 'show_submit');
+	}
+	else {
+		$this->setVar('show_submit_block', '');
+	}
+
+	/* Show delete functionality
+	 */
+	$this->parse('show_delete_block', 'show_delete');
+
+	/* Hide 'no questions' message
+	 */
+	$this->setVar('no_questions_block', '');
 }
 else {
+
+	/* There are no questions: hide the add/remove functionality and display a
+	 * little message
+	 */
+	$this->setVar('show_submit_block', '');
+	$this->setVar('show_delete_block', '');
 	$this->setVar('question_category_block', '');
+	$this->parse('no_questions_block', 'no_questions');
 }
 
-/* Hide submit button if we aren't adding contents to a section
- */
-if (is_numeric($this->arg[0])) {
-	$this->parse('show_submit_block', 'show_submit');
-}
-else {
-	$this->setVar('show_submit_block', '');
-}
+
 
 ?>
