@@ -21,7 +21,7 @@ abstract class Collection {
     /**
      * A mapper to notify when the Collection becomes out of sync.
      *
-     * @var CollectionMapper
+     * @var Mapper
      */
     protected $mapper;
 
