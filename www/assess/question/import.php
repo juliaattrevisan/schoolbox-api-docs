@@ -38,22 +38,26 @@ if ($sectionHandler->isDeleted($this->arg[0])) {
 
 $xml = simplexml_load_string($data);
 
-$questionHandler = $factory->createQuestionModel(scrubTEXT($xml->typeid));
-$answerHandler = $factory->createAnswerModel(scrubTEXT($xml->typeid));
+if (is_numeric((string)$xml->typeid)) {
+	$questionHandler = $factory->createQuestionModel(scrubTEXT($xml->typeid));
+	$answerHandler = $factory->createAnswerModel(scrubTEXT($xml->typeid));
 
-$question_id = $questionHandler->create(array(
-	'question_id' => '',
-	'section_id' => $currentSection['section_id'],
-	'sequence' => $questionHandler->getNextSequence($currentSection['section_id']),
-	'type_id' => $xml->typeid,
-	'marks' => $xml->marks,
-	'question' => trim((string) $xml->questiontext->text),
-));
+	$question_id = $questionHandler->create(array(
+		'question_id' => '',
+		'section_id' => $currentSection['section_id'],
+		'sequence' => $questionHandler->getNextSequence($currentSection['section_id']),
+		'type_id' => $xml->typeid,
+		'marks' => $xml->marks,
+		'question' => trim((string) $xml->questiontext->text),
+	));
 
-if (method_exists($answerHandler, 'importMoodleAnswer')) {
-	$answer_id = $answerHandler->importMoodleAnswer($xml->answers, $question_id);
+	if (method_exists($answerHandler, 'importMoodleAnswer')) {
+		$answer_id = $answerHandler->importMoodleAnswer($xml->answers, $question_id);
+	}
+
+	localRedir('/assess/question/modify/' . $question_id);
 }
-
-localRedir('/assess/question/modify/' . $question_id);
-
+else {
+	error(135);
+}
 ?>
