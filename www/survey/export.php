@@ -8,13 +8,13 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/assess.php');
-require_once('../library/assess/assess-factory.php');
-require_once('../library/assess/assess-section.php');
+require_once('../library/survey/survey.php');
+require_once('../library/survey/survey-factory.php');
+require_once('../library/survey/survey-section.php');
 
-$factory = new AssessFactory();
-$assessHandler = new Assess();
-$sectionHandler = new AssessSection();
+$factory = new SurveyFactory();
+$assessHandler = new Survey();
+$sectionHandler = new SurveySection();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -32,7 +32,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 
 /* Set up template
  */
-$this->setFile('xml', 'assess/exportToMoodle.html');
+$this->setFile('xml', 'survey/exportToMoodle.html');
 $this->setBlock('xml', 'section', 'section_block');
 $this->setBlock('section', 'answerInputs', 'answerInputs_block');
 $this->setBlock('section', 'question', 'question_block');

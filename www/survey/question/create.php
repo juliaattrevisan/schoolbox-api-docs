@@ -12,14 +12,14 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/assess.php');
-require_once('../library/assess/assess-section.php');
-require_once('../library/assess/assess-factory.php');
+require_once('../library/survey/survey.php');
+require_once('../library/survey/survey-section.php');
+require_once('../library/survey/survey-factory.php');
 require_once('../library/group.php');
 
-$factory = new AssessFactory();
-$assessHandler = new Assess();
-$sectionHandler = new AssessSection();
+$factory = new SurveyFactory();
+$assessHandler = new Survey();
+$sectionHandler = new SurveySection();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -59,7 +59,7 @@ if (!empty($_POST)) {
 
     /* Need to keep this so non-ajaxed questions still redirect
      */
-    localRedir('/assess/question/create/' . scrubTEXT($_POST['section_id']));
+    localRedir('/survey/question/create/' . scrubTEXT($_POST['section_id']));
 }
 else {
     if (!is_numeric($this->arg[0])) {
@@ -82,13 +82,13 @@ else {
 
     /* Render create page
      */
-    $this->setFile(TEMPLATE_content, 'assess/question/create.html');
+    $this->setFile(TEMPLATE_content, 'survey/question/create.html');
     $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setTitle('Create Question');
 
-    $questionHandler = new AssessQuestion();
+    $questionHandler = new SurveyQuestion();
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
@@ -135,7 +135,7 @@ else {
 
             /* Load answer template into answerOption block
              */
-            $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($this->arg[1]) . '/create.html');
+            $this->setFile('answerFormFragment', 'survey/answer/' . $factory->getQuestionType($this->arg[1]) . '/create.html');
             $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
             /* Render existing answers, or clear if none
@@ -168,15 +168,15 @@ else {
         $this->setVar('answerInputs_block', '');
     }
 
-    /* Show this Assess' contents
+    /* Show this Survey' contents
      */
-    $this->setFile('assessContentsFragment', 'assess/contents.html');
-    $this->setBlock('assessContentsFragment', 'section', 'section_block');
+    $this->setFile('surveyContentsFragment', 'survey/contents.html');
+    $this->setBlock('surveyContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assess = new Assess();
-    $assess->renderAssessContents($section['assess_id'], $this);
+    $survey = new Survey();
+    $survey->renderAssessContents($section['assess_id'], $this);
 
-    $this->parse('allQuestions_block', 'assessContentsFragment', true);
+    $this->parse('allQuestions_block', 'surveyContentsFragment', true);
 }
 ?>

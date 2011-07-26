@@ -34,7 +34,7 @@
 		<div class="assess-header">
 			<h2>Question Details</h2>
 			<div class="assess-body">
-				<form id="createQuestionForm" action="/assess/question/modify" class="standardForm" method="post">
+				<form id="createQuestionForm" action="/survey/question/modify" class="standardForm" method="post">
 
 					<fieldset class="hidden">
 						<input name="section_id" type="hidden" value="{SECTION_ID}" />
@@ -52,11 +52,6 @@
 					<fieldset>
 						<label>Question</label>
 						<div class="textarea-container" id="question_container"><textarea name="question" class="mceSimple tinyValidate" id="question" />{QUESTION}</textarea></div>
-					</fieldset>
-
-					<fieldset>
-						<label>Marks</label>
-						<label><input name="marks" type="text" size="3" value="{MARKS}"/></label>
 					</fieldset>
 
 					<div id="answer">
@@ -78,7 +73,7 @@
 					Puts this question into the Question Bank so you can import
 					them into other Online Assessments.
 				</p>
-				<form action='/assess/questionbank/create' class='standardForm' method='post'>
+				<form action='/survey/questionbank/create' class='standardForm' method='post'>
 					<fieldset>
 						<input name='type_id' type='hidden' value='{QUESTIONTYPE_TYPE_ID}' />
 						<input name='question_id' type='hidden' value='{QUESTION_ID}' />

@@ -88,6 +88,8 @@ class AssessQuestion extends DeprecatedModel {
     public function getAllQuestionTypes() {
         $query = "SELECT *
                   FROM assess_luQuestionType
+                  WHERE availability = 'all'
+                  OR availability = 'assess'
                   ORDER BY type_id";
 
         return $this->db->getAll($query);

@@ -1,12 +1,12 @@
 <script type="text/javascript" src="/javascript/jquery.form.2.43.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
-		
+
    	var validator = $j("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave();
-	 
-	 }).validate({
+
+	}).validate({
 
 		submitHandler: function() {
    		    var theForm = $j('#createQuestionForm');
@@ -14,18 +14,18 @@ $j(document).ready(function() {
         	/* Form preprocessing
              */
 			var answerCollection = new Array();
-			
+
 			var content = tinyMCE.activeEditor.getContent(); // get the content
    			$j('#question').val(content); // put it in the textarea
-			
+
 			/* Collate possible answers and their correctness status
 			 */
 			$j.each($j('#answerCollection').find('li'), function(index, element) {
 				var elem = $j(element);
-	
+
 				var description = elem.find('.answerDescription').val();
 				var code = elem.find('.answerCode').attr('value');
-	
+
 				/* Ignore empty answers that weren't removed
 				 */
 				if (($j.trim(description) != '') && ($j.trim(code) != '')) {
@@ -36,7 +36,7 @@ $j(document).ready(function() {
 					});
 				}
 			});
-				
+
 			/* Collate the usual fields containing ids.
 			 * Collate the checkboxes too but append all the possibilities as well!
 			 */
@@ -53,15 +53,15 @@ $j(document).ready(function() {
 			/* Submit via POST and redirect to question creation screen upon done
 			 */
 			$j.post(theForm.attr('action'), data, function(responseText) {
-				window.location = '/assess/question/modify/' + data.question_id;
+				window.location = '/survey/question/modify/' + data.question_id;
 			});
-				
+
 			//tinyMCE.triggerSave();
 
-			return false; 
+			return false;
 		},
 
-		rules: { 
+		rules: {
 			question: {
 				required: true,
 				minlength: 2
@@ -77,7 +77,7 @@ $j(document).ready(function() {
 			/* Removed mandatory correct answer
 			 */
 			'answer[]':{
-				nothingChecked:true	
+				nothingChecked:true
 			}
 
 		},
@@ -95,7 +95,7 @@ $j(document).ready(function() {
 				error.css('left', pos.left);
            		error.css('top',  pos.top + $j('#question_container').outerHeight());
 			}
-			
+
 			if (element.hasClass("answerDescription")) {
 				error.addClass("list-items");
 				var pos = $j('ul#answerCollection').height();
@@ -103,7 +103,7 @@ $j(document).ready(function() {
 				$j('.list-items').css('left', 115);
            		$j('.list-items').css('top',  pos);
 			}
-			
+
 			if (element.hasClass("answerCorrect")) {
 				error.addClass("wrong-checkbox");
 				var pos = $j('ul#answerCollection').height();
@@ -112,7 +112,7 @@ $j(document).ready(function() {
            		$j('.wrong-checkbox').css('top',  pos + 20);
 
 			}
-			
+
 		}
 	});
 
@@ -140,7 +140,7 @@ $j(document).ready(function() {
 
 	jQuery.validator.addMethod('nothingChecked', function(value, element) {
         var countDracula = 0;
-	   
+
 	    var oneFieldChecked = true;
 
         $j.each($j('#answerCollection').find('li'), function(index, element) {
@@ -152,13 +152,13 @@ $j(document).ready(function() {
             if (checkit == true) {
                 countDracula++
             }
-			
+
         });
 
 		if (countDracula == 0) {
 			oneFieldChecked = false;
 		}
-		 
+
 		return oneFieldChecked;
 
     }, 'Tick at least one checkbox');
@@ -169,81 +169,79 @@ $j(document).ready(function() {
     $j('#makeNewAnswer').live('click', function() {
 		var thing = $j('.hidden-clone ul:first-child').clone();
 		$j('ul#answerCollection').append(thing);
-		
+
 		var pos = $j('ul#answerCollection').height();
-		
+
 		$j('.list-items').css('left', 115);
 		$j('.list-items').css('top',  pos);
-		
+
 		$j('.wrong-checkbox').css('left', 115);
 		$j('.wrong-checkbox').css('top',  pos + 30);
-		
+
 		refreshList();
     });
-	
+
 	$j('.answerCorrect').each(function(){
 		if ($j(this).is(':checked')) {
 			$j(this).parent().parent().addClass("highlight");
 		}
 	});
-	
+
 	$j('.answerCorrect').live('click', function() {
 		$j(this).parent().parent().toggleClass("highlight");
 	});
-	
+
 	/* Remove an answer option
 	 */
 	$j('.delete').live('click', function(){
 		if (($j('.inputs').length) !== 1) {
 			$j(this).parent().remove();
 			var pos = $j('ul#answerCollection').height();
-		
+
 			$j('.list-items').css('left', 115);
 			$j('.list-items').css('top',  pos);
-			
+
 			$j('.wrong-checkbox').css('left', 115);
 			$j('.wrong-checkbox').css('top',  pos + 30);
-			
+
 			refreshList()
-		}	
+		}
     });
-	
+
 	function refreshList() {
-		
+
 		var alphabetStart = 65;
-		$j('li.inputs > div.list-item').each(function() {	
+		$j('li.inputs > div.list-item').each(function() {
 		  var $this = $j(this);
-		  $this.children('span').html('&#' + alphabetStart + ';)'); 
+		  $this.children('span').html('&#' + alphabetStart + ';)');
 		  var convert = String.fromCharCode(alphabetStart);
 		  $this.children('input').val(convert);
 		  alphabetStart++;
-		  
+
 		});
 	}
 });
 </script>
 <fieldset>
-		
     <label>Answer</label>
 	<div class="answerCollection">
 		<ul id="answerCollection" >
-		 <!-- BEGIN answerOption -->
+		<!-- BEGIN answerOption -->
 			<li class="inputs clearfix">
 				<div class="list-item">
 					<input name="answerCode[]" class="answerCode text-box" type="hidden" value="{ANSWER_VALUE}" />
-					
+
 					<span>{ANSWER_VALUE})</span>
 				</div>
 				<div class="check-it"><input name="answer[]" {ANSWER_CHECKED} class="answerCorrect" type="checkbox" /></div>
 				<div class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="{ANSWER_DESCRIPTION}" /></div>
 				<div class="delete"></div>
-			</li>	
-			 <!-- END answerOption -->	
+			</li>
+		<!-- END answerOption -->
 		</ul>
 		<a class="add-answer" id="makeNewAnswer">Add answer option</a>
-
 	</div>
-	
+
 	<div class="hidden-clone">
 		<ul>
 			<li class="inputs clearfix">
@@ -254,9 +252,8 @@ $j(document).ready(function() {
 				<div class="check-it"><input name="answer[]" class="answerCorrect"  type="checkbox" /></div>
 				<div class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></div>
 				<div class="delete"></div>
-			</li>	
+			</li>
 		</ul>
 		<a class="add-answer" id="makeNewAnswer">Add answer option</a>
 	</div>
-
 </fieldset>

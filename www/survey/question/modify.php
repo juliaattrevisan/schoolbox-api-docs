@@ -7,15 +7,15 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../library/assess/assess.php';
-require_once '../library/assess/assess-section.php';
-require_once '../library/assess/assess-factory.php';
-require_once('../library/assess/assess-questioncategory.php');
+require_once '../library/survey/survey.php';
+require_once '../library/survey/survey-section.php';
+require_once '../library/survey/survey-factory.php';
+require_once('../library/survey/survey-questioncategory.php');
 require_once('../library/group.php');
 
-$factory = new AssessFactory();
-$assessHandler = new Assess();
-$sectionHandler = new AssessSection();
+$factory = new SurveyFactory();
+$assessHandler = new Survey();
+$sectionHandler = new SurveySection();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -25,7 +25,7 @@ if (!$groupHandler->isStaff()) {
 /* If a question was submitted
  */
 if (!empty($_POST)) {
-    $factory = new AssessFactory();
+    $factory = new SurveyFactory();
 
     if (!is_numeric($_POST['type_id'])) {
         error(116);
@@ -53,7 +53,7 @@ if (!empty($_POST)) {
 
     /* Find the assess summary page
      */
-    localRedir('/assess/summary/' . $section['assess_id']);
+    localRedir('/survey/summary/' . $section['assess_id']);
 }
 else {
     if (!is_numeric($this->arg[0])) {
@@ -62,13 +62,13 @@ else {
 
     /* Render modify page
      */
-    $this->setFile(TEMPLATE_content, 'assess/question/modify.html');
+    $this->setFile(TEMPLATE_content, 'survey/question/modify.html');
     $this->setTitle('Modify Question');
     $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 
-    $questionHandler = new AssessQuestion();
+    $questionHandler = new SurveyQuestion();
     $question = $questionHandler->getByID($this->arg[0]);
     $section = $sectionHandler->getByID($question['section_id']);
 
@@ -92,7 +92,7 @@ else {
 
     /* Load answer template into answerOption block
      */
-    $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($question['type_id']) . '/modify.html');
+    $this->setFile('answerFormFragment', 'survey/answer/' . $factory->getQuestionType($question['type_id']) . '/modify.html');
     $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
     $answerHandler->modify($this, $question['question_id']);
@@ -105,7 +105,7 @@ else {
         'QUESTIONTYPE_SELECTED' => $selected,
     ));
 
-    /* Render contents of this Assess
+    /* Render contents of this Survey
      */
     if (empty($section)) {
         error(51);
@@ -121,13 +121,13 @@ else {
         'DISABLED_SELECTED' => '',
     ));
 
-    /* Show this Assess' contents
+    /* Show this Survey' contents
      */
-    $this->setFile('assessContentsFragment', 'assess/contents.html');
+    $this->setFile('assessContentsFragment', 'survey/contents.html');
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assess = new Assess();
+    $assess = new Survey();
     $assess->renderAssessContents($section['assess_id'], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
@@ -136,7 +136,7 @@ else {
 	 */
 	$this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
 
-	$questionCategoryHandler = new AssessQuestionCategory();
+	$questionCategoryHandler = new SurveyQuestionCategory();
 	$allQuestionCategories = $questionCategoryHandler->getList();
 
 	if (is_array($allQuestionCategories) && count($allQuestionCategories)) {

@@ -7,12 +7,12 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../library/assess/assess.php';
-require_once '../library/assess/assess-question.php';
-require_once '../library/assess/assess-section.php';
+require_once '../library/survey/survey.php';
+require_once '../library/survey/survey-question.php';
+require_once '../library/survey/survey-section.php';
 require_once '../library/group.php';
 
-$assessHandler = new Assess();
+$assessHandler = new Survey();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -30,12 +30,12 @@ if (!empty($_POST)) {
 
     /* Create new Section
      */
-    $section = new AssessSection();
+    $section = new SurveySection();
     $section_id = $section->create($_POST);
 
     /* Redirect to question creation for this section
      */
-    localRedir('/assess/question/create/' . $section_id);
+    localRedir('/survey/question/create/' . $section_id);
 }
 else {
     if (empty($this->arg[0])) {
@@ -53,7 +53,7 @@ else {
     /* Find out whether the test exists to which you are attempting to add a
      * new Section
      */
-    $assessHandler = new Assess();
+    $assessHandler = new Survey();
     $assess = $assessHandler->getByID($this->arg[0]);
 
     if (empty($assess)) {
@@ -62,11 +62,11 @@ else {
 
     /* Render create page
      */
-    $this->setFile(TEMPLATE_content, 'assess/section/create.html');
+    $this->setFile(TEMPLATE_content, 'survey/section/create.html');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setTitle('Create Section');
 
-    $section = new AssessSection();
+    $section = new SurveySection();
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $this->arg[0],
@@ -77,11 +77,11 @@ else {
 
     /* Show this Assess' contents
      */
-    $this->setFile('assessContentsFragment', 'assess/contents.html');
+    $this->setFile('assessContentsFragment', 'survey/contents.html');
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assessHandler = new Assess();
+    $assessHandler = new Survey();
     $assessHandler->renderAssessContents($assess['assess_id'], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);

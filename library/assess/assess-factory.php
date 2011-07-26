@@ -10,11 +10,11 @@
  */
 
 class AssessFactory extends DeprecatedModel {
-    private $questionLibraryPath = '../library/assess/questionType';
-    private $questionPrefix = 'AssessQuestion';
+    protected $questionLibraryPath = '../library/assess/questionType';
+    protected $questionPrefix = 'AssessQuestion';
 
-    private $answerLibraryPath = '../library/assess/answerType';
-    private $answerPrefix = 'AssessAnswer';
+    protected $answerLibraryPath = '../library/assess/answerType';
+    protected $answerPrefix = 'AssessAnswer';
 
     /**
      * Spawn a Question type.

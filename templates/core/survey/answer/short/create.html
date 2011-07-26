@@ -1,12 +1,11 @@
 <script type="text/javascript">
 $j(function() {
-	
 	var validator = $j(".standardForm").submit(function() {
 		 // update underlying textarea before submit validation
-		 tinyMCE.triggerSave(); 
-		 
+		 tinyMCE.triggerSave();
+
 	 }).validate({
-		rules: { 
+		rules: {
 			question: {
 				required: true,
 				minlength: 1
@@ -17,22 +16,18 @@ $j(function() {
 				number:true
 			}
 		},
-		
+
 		messages: {
 			question: "Please enter a question.",
 			answer: "Please fill out an answer."
 		},
-		
+
         errorPlacement: function(error, element) {
             offset = element.offset();
             error.insertAfter(element.parent().children(':last-child'))
             error.addClass('message');  // add a class to the wrapper
-           
 		}
-	
 	});
-	
-	
 });
 </script>
 
