@@ -1,0 +1,148 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript" src="/javascript/jquery.json2.js"></script>
+<script type="text/javascript">
+$j(document).ready(function() {
+
+	$j('.prettify').prettyFileInput({
+		additionalButtonClasses: 'no-marg float-left',
+		buttonActiveClass: 'tick',
+		defaultText: '<span></span>Choose file',
+		defaultFileSelectedText: '<span></span>File selected'
+	});
+
+    var section_id = '{SECTION_ID}';
+
+	/* Set current state of dropdown
+	 * Can't get val() of a disabled option element
+	 */
+	if ($j('.question-type-select :selected').text() == '-- Select Type --') {
+		$j('.next-step').hide();
+		$j('.question-holder').hide();
+		$j('.marks-holder').hide();
+		$j('#importQuestion').hide();
+	}
+	else {
+		if ($j('#type_id').val() == 'import') {
+			$j('.next-step').hide();
+			$j('.question-holder').hide();
+			$j('.marks-holder').hide();
+			$j('#create').hide();
+			$j('#importQuestion').show();
+		}
+		else {
+			$j('.next-step').show();
+			$j('.question-holder').show();
+			$j('.marks-holder').show();
+			$j('#importQuestion').hide();
+		}
+	}
+
+	/* Change state
+	 */
+	$j('#type_id').change(function() {
+		var url = '/assess/question/create/' + section_id + '/' + $j('#type_id').val();
+		window.location = url;
+	});
+
+	tinyMCE.init({
+        mode : "exact",
+		elements: "question",
+        theme : "advanced",
+        skin : "cirkuit",
+        plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,paste,spellchecker",
+        content_css : "/css/core/tiny.css",
+        theme_advanced_toolbar_location : "top",
+        theme_advanced_toolbar_align : "left",
+        theme_advanced_statusbar_location : "bottom",
+        theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
+        theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,z,spellchecker",
+        theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
+        theme_advanced_buttons4 : "tablecontrols,separator,hr,charmap",
+        pdw_toggle_on : 1,
+        pdw_toggle_toolbars : '2, 3, 4',
+        extended_valid_elements : "img[src|border|alt=|title|hspace|vspace|width|height|align|style]",
+        convert_urls : false,
+		width:"100%",
+		file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
+        file_browser_category_id : 0
+	});
+});
+</script>
+
+<!-- END custom_head -->
+<div id="assess" class="create-test">
+<h1>Create Question in Section {CURRENT_SECTION_TITLE}</h1>
+
+<div class="col-1">
+	<div class="assess-header">
+		<h2>Question Details</h2>
+		<div class="assess-body">
+
+			<p class="help">
+				Now that you've created a section for the test, use the drop down below to select a question type.
+			</p>
+
+			<form id="createQuestionForm" action="/assess/question/create" class="standardForm clearfix" method="post">
+				<fieldset class="hidden">
+					<input name="section_id" type="hidden" value="{SECTION_ID}" />
+					<input name="sequence" type="hidden" value="{SEQUENCE}" />
+				</fieldset>
+
+				<fieldset>
+					<label>Type</label>
+					<select name="type_id" id="type_id" class="question-type-select">
+						<option disabled {DISABLED_SELECTED} value='-1'>-- Select Type --</option>
+						<!-- BEGIN questionType -->
+						<option value="{QUESTIONTYPE_TYPE_ID}" {QUESTIONTYPE_SELECTED}>{QUESTIONTYPE_DESCRIPTION}</option>
+						<!-- END questionType -->
+						<option value="import" {IMPORT_SELECTED}>Import Question</option>
+					</select>
+				</fieldset>
+
+				<fieldset class="question-holder">
+					<label>Question</label>
+					<div class="textarea-container" id="question_container">
+						<input name="question" class="mceSimple tinyValidate" id="question" type="text" size="35" value="{QUESTION}" />
+					</div>
+				</fieldset>
+
+				<fieldset class="marks-holder">
+					<label>Marks</label>
+					<label><input name="marks" type="text" size="3" value="{MARKS}"/></label>
+				</fieldset>
+
+				<div id="answer">
+					<!-- BEGIN answerInputs -->
+
+					<!-- END answerInputs -->
+				</div>
+				<input type="submit" name="create" id="create" value="Add Question" class="submit-btn-plain"/>
+			</form>
+
+			<div id="importQuestion">
+				<p><strong>Import a question and answer from an XML file</strong></p>
+				<p class="help">
+					Select an Assess Question XML file to import.
+				</p>
+
+				<form action="/assess/question/import/{SECTION_ID}" method="post" class="standardForm clearfix" enctype="multipart/form-data">
+					<fieldset>
+						<label>File</label>
+						<input name="importXML" type="file" class="prettify"/>
+					</fieldset>
+
+					<input type="submit" value="Import from XML file"  class="submit-btn-plain float-none"/>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="col-2">
+<!-- BEGIN allQuestions -->
+
+<!-- END allQuestions -->
+</div>
+</div>

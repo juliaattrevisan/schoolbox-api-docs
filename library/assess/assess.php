@@ -39,8 +39,8 @@
  */
 
 class Assess extends DeprecatedModel {
-    var $_table = 'assess';
-    var $_index = 'assess_id';
+    public $_table = 'assess';
+    public $_index = 'assess_id';
 
     const ONLINE_ASSESSMENT_TYPE_ID = 11;
     const UNLIMITED_DURATION = -1;
@@ -50,7 +50,7 @@ class Assess extends DeprecatedModel {
      *
      * @param <type> $category_id
      */
-    function getList($category_id, $limit = false) {
+    public function getList($category_id, $limit = false) {
         if (is_array($category_id)) {
             $categoryIDList = implode(',', $category_id);
 
@@ -82,19 +82,19 @@ class Assess extends DeprecatedModel {
      * @param <type> $category_id
      * @return <type>
      */
-    function getSubmissionList($category_id) {
-        $query = "SELECT
-                      assess_id, title, category_id,
-                      DATE_FORMAT(start, '%a, %D %b %l:%i%p') AS start,
-                      DATE_FORMAT(finish, '%a, %D %b %l:%i%p') AS finish,
-                      file_type.name AS type
-                  FROM assess
-                  LEFT JOIN file_type ON assess.type = file_type.id
-                  WHERE category_id = '$category_id'
-                  AND deleted_at IS NULL";
-
-        return $this->db->getAll($query);
-    }
+//    public function getSubmissionList($category_id) {
+//        $query = "SELECT
+//                      assess_id, title, category_id,
+//                      DATE_FORMAT(start, '%a, %D %b %l:%i%p') AS start,
+//                      DATE_FORMAT(finish, '%a, %D %b %l:%i%p') AS finish,
+//                      file_type.name AS type
+//                  FROM assess
+//                  LEFT JOIN file_type ON assess.type = file_type.id
+//                  WHERE category_id = '$category_id'
+//                  AND deleted_at IS NULL";
+//
+//        return $this->db->getAll($query);
+//    }
 
     /**
      * Get an introduction to an Assess.
@@ -102,7 +102,7 @@ class Assess extends DeprecatedModel {
      * @param <type> $assess_id
      * @return <type>
      */
-    function getIntro($assess_id) {
+    public function getIntro($assess_id) {
         $query = "SELECT *
                   FROM {$this->_table}
                   WHERE {$this->_index} = '$assess_id'";
@@ -115,7 +115,7 @@ class Assess extends DeprecatedModel {
      *
      * @param <type> $assess_id
      */
-    function getIntroSummary($assess_id) {
+    public function getIntroSummary($assess_id) {
         $query = "SELECT
                      assess_section.section_id,
                      assess_section.title,
@@ -137,7 +137,7 @@ class Assess extends DeprecatedModel {
      *
      * @param <type> $assess_id
      */
-    function renderAssessContents($assess_id, $page) {
+    public function renderAssessContents($assess_id, $page) {
         $allQuestions = $this->getContents($assess_id);
 
         $sectionTitle = $allQuestions[0]['title'];
@@ -220,11 +220,11 @@ class Assess extends DeprecatedModel {
      * on the create question screens as a table of contents.
      *
      * TODO: Sections disappear when their questions are all deleted?
-     * 
+     *
      * @param <type> $section_id
      * @return <type>
      */
-    function getContents($assess_id) {
+    public function getContents($assess_id) {
         $query = "SELECT assess_id,
                          assess_section.section_id,
                          assess_section.title,
@@ -247,14 +247,14 @@ class Assess extends DeprecatedModel {
     /**
      * Clears the db.
      */
-    function reset() {
-        $this->db->query("DELETE FROM assess");
-        $this->db->query("DELETE FROM assess_answer");
-        $this->db->query("DELETE FROM assess_attempt");
-        $this->db->query("DELETE FROM assess_question");
-        $this->db->query("DELETE FROM assess_response");
-        $this->db->query("DELETE FROM assess_section");
-    }
+//    public function reset() {
+//        $this->db->query("DELETE FROM assess");
+//        $this->db->query("DELETE FROM assess_answer");
+//        $this->db->query("DELETE FROM assess_attempt");
+//        $this->db->query("DELETE FROM assess_question");
+//        $this->db->query("DELETE FROM assess_response");
+//        $this->db->query("DELETE FROM assess_section");
+//    }
 
     /**
      * Display seconds as hours, minutes and seconds. Yoinked from
@@ -266,7 +266,7 @@ class Assess extends DeprecatedModel {
      * @param <type> $padHours
      * @return <type>
      */
-    function sec2hms($sec, $padHours = false)  {
+    public function sec2hms($sec, $padHours = false)  {
         // start with a blank string
         $hms = "";
 
@@ -308,7 +308,7 @@ class Assess extends DeprecatedModel {
      * @param <type> $val
      * @return <type>
      */
-    function parse_sec2hms($val) {
+    public function parse_sec2hms($val) {
         preg_match('/(\d+)hrs\ (\d+)min (\d+)sec/', $val, $matches);
 
         $formatted['hours'] = $matches[1];
@@ -323,7 +323,7 @@ class Assess extends DeprecatedModel {
      *
      * @param <type> $assess_id
      */
-    function allowResit($assess_id) {
+    public function allowResit($assess_id) {
         $query = "SELECT allow_resit
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'";
@@ -338,7 +338,7 @@ class Assess extends DeprecatedModel {
      * @param <type> $user_id
      * @return <type>
      */
-    function isOwner($assess_id, $user_id = '') {
+    public function isOwner($assess_id, $user_id = '') {
         if (!is_numeric($user_id)) {
             $uid = $_SESSION['id'];
         }
@@ -360,7 +360,7 @@ class Assess extends DeprecatedModel {
      *
      * @return <type>
      */
-    function canDoAssessment($assess_id) {
+    public function canDoAssessment($assess_id) {
         $groupHandler = new Group();
         $assess = $this->getByID($assess_id);
 
@@ -381,11 +381,11 @@ class Assess extends DeprecatedModel {
 
     /**
      * Find out whether this assessment has expired.
-     * 
+     *
      * @param <type> $assess_id
      * @return <type>
      */
-    function isExpired($assess_id) {
+    public function isExpired($assess_id) {
         $query = "SELECT COUNT(assess_id)
                   FROM assess
                   WHERE assess_id = '$assess_id'
@@ -406,7 +406,7 @@ class Assess extends DeprecatedModel {
      * @param <type> $assess_id
      * @return <type>
      */
-    function isDeleted($assess_id) {
+    public function isDeleted($assess_id) {
         $query = "SELECT COUNT(assess_id)
                   FROM assess
                   WHERE assess_id = '$assess_id'

@@ -19,7 +19,7 @@ class AssessAnswerMatch extends AssessAnswer {
      * @param <type> $object
      * @return <type>
      */
-    function create($object, $question_id) {
+    public function create($object, $question_id) {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
         $answer['sequence'] = 1;
@@ -47,7 +47,7 @@ class AssessAnswerMatch extends AssessAnswer {
      *
      * @param <type> $object
      */
-    function update($object) {
+    public function update($object) {
         $query = "DELETE FROM {$this->_table}
                   WHERE question_id = '$object[question_id]'";
 
@@ -63,7 +63,7 @@ class AssessAnswerMatch extends AssessAnswer {
      *
      * @param <type> $page
      */
-    function modify($page, $question_id = '') {
+    public function modify($page, $question_id = '') {
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
 
@@ -99,7 +99,7 @@ class AssessAnswerMatch extends AssessAnswer {
      * @param <type> $page
      * @param <type> $question_id
      */
-    function prepareResponse($page, $question_id) {
+    public function prepareResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         /* Define special blocks to handle this special answerOptions scenario,
@@ -161,7 +161,7 @@ class AssessAnswerMatch extends AssessAnswer {
      *
      * @param <type> $response
      */
-    function saveResponse($data) {
+    public function saveResponse($data) {
         $processedResponse = serialize($data['answerRight']);
 
         return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
@@ -171,7 +171,7 @@ class AssessAnswerMatch extends AssessAnswer {
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.
      */
-    function mark($currentResponse) {
+    public function mark($currentResponse) {
         $response = unserialize($currentResponse['response']);
         $answer = unserialize($currentResponse['answer']);
 
@@ -203,7 +203,7 @@ class AssessAnswerMatch extends AssessAnswer {
      * @param <type> $page
      * @param <type> $question_id
      */
-    function reviewResponse($page, $question_id) {
+    public function reviewResponse($page, $question_id) {
         $right = array();
 
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
@@ -262,7 +262,7 @@ class AssessAnswerMatch extends AssessAnswer {
      * @param <type> $page
      * @param <type> $question_id
      */
-    function exportMoodleAnswer($page, $question_id) {
+    public function exportMoodleAnswer($page, $question_id) {
         $page->setBlock('answerFormFragment', 'answerCorrect', 'answerCorrect_block');
 
         $answerGroup = $this->getByQuestionID($question_id);
@@ -290,7 +290,7 @@ class AssessAnswerMatch extends AssessAnswer {
      *
      * @param <type> $obj
      */
-    function importMoodleAnswer($xmlObj, $question_id) {
+    public function importMoodleAnswer($xmlObj, $question_id) {
         foreach($xmlObj->subquestion as $currentAnswer) {
 
             /* Set up data object in accordance with $this->create();

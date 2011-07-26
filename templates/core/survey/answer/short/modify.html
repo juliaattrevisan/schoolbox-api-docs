@@ -1,0 +1,46 @@
+<script type="text/javascript">
+$j(function() {
+	
+	$j('#create').live('click',function() {
+		var content = tinyMCE.activeEditor.getContent(); // get the content
+   		$('#question').val(content); // put it in the textarea
+	});
+
+	var validator = $j(".standardForm").submit(function() {
+		 // update underlying textarea before submit validation
+		 tinyMCE.triggerSave();
+	 }).validate({
+		rules: { 
+			question: {
+				required: true,
+				minlength: 2
+			},
+			marks: {
+				required: true,
+				minlength: 1,
+				number:true
+			}
+
+		},
+		
+		messages: {
+			question: "Please enter a question.",
+			answer: "Please fill out an answer."
+		},
+
+        errorPlacement: function(error, element) {
+            offset = element.offset();
+         	error.insertAfter(element.parent().children(':last-child'))
+            error.addClass('message');  // add a class to the wrapper
+           
+		}
+	
+	});
+
+});
+</script>
+
+<fieldset>
+    <label>Suggested Answer</label>
+    <div class="textarea-container"><textarea id="answerBox" name="answer">{ANSWER}</textarea></div>
+</fieldset>

@@ -134,7 +134,7 @@ $allAttempts = $attemptHandler->getList($this->arg[0]);
 
 if ($allAttempts) {
     foreach($allAttempts as $currentAttempt) {
-        $allResponses = $responseHandler->getAutomarkableResponses($this->arg[0], $currentAttempt['attempt_id']);
+        $allResponses = $responseHandler->getAutomarkableResponses($currentAttempt['attempt_id']);
 
         if (is_array($allResponses)) {
             foreach ($allResponses as $currentResponse) {

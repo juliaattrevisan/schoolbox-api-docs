@@ -89,3 +89,9 @@ INSERT INGORE INTO `error` (`id`, `message`) VALUES('134','No import file found.
 INSERT INGORE INTO `error` (`id`, `message`) VALUES('50','You do not have permission to delete this user\'s file.');
 INSERT INGORE INTO `error` (`id`, `message`) VALUES('52','This link is already shared in your ePortfolio.');
 INSERT IGNORE INTO `error` (`id`, `message`) VALUES('135','This is not a valid Assess Question XML.')
+
+ALTER TABLE `assess_luQuestionType` ADD COLUMN `availability` ENUM('assess','survey','all') NULL AFTER `automated_marking`;
+UPDATE `assess_luQuestionType` SET `availability`='all' WHERE `type_id`='1';
+UPDATE `assess_luQuestionType` SET `availability`='all' WHERE `type_id`='2';
+UPDATE `assess_luQuestionType` SET `availability`='all' WHERE `type_id`='3';
+UPDATE `assess_luQuestionType` SET `availability`='all' WHERE `type_id`='4';

@@ -25,7 +25,7 @@ class AssessResponse extends DeprecatedModel {
      * @param <type> $question_id
      * @return <type>
      */
-    function isResponseExists($attempt_id, $question_id) {
+    public function isResponseExists($attempt_id, $question_id) {
         $query = "SELECT *
                   FROM {$this->_table}
                   WHERE attempt_id = '$attempt_id'
@@ -43,7 +43,7 @@ class AssessResponse extends DeprecatedModel {
      * @param <type> $attempt_id
      * @return <type>
      */
-    function getAutomarkableResponses($assess_id, $attempt_id) {
+    public function getAutomarkableResponses($attempt_id) {
         $query = "SELECT
                       assess_id, response_id,
                       assess_attempt.attempt_id,
@@ -68,7 +68,7 @@ class AssessResponse extends DeprecatedModel {
      *
      * @param <type> $markedResponseIDs
      */
-    function updatedAutomatedMarks($markedResponseIDs) {
+    public function updatedAutomatedMarks($markedResponseIDs) {
         if (count($markedResponseIDs)) {
             $ids = implode(',', $markedResponseIDs);
 
@@ -86,14 +86,14 @@ class AssessResponse extends DeprecatedModel {
      * @param <type> $attempt_id
      * @return <type>
      */
-    function numResponses($attempt_id) {
-        $query = "SELECT COUNT(*) AS numQuestionsAttempted
-                  FROM {$this->_table}
-                  WHERE attempt_id = '$attempt_id'
-                  AND response IS NOT NULL";
-
-        return $this->db->getOne($query);
-    }
+//    function numResponses($attempt_id) {
+//        $query = "SELECT COUNT(*) AS numQuestionsAttempted
+//                  FROM {$this->_table}
+//                  WHERE attempt_id = '$attempt_id'
+//                  AND response IS NOT NULL";
+//
+//        return $this->db->getOne($query);
+//    }
 
     /**
      * Find the number of STUB RESPONSES that have been set up in $attempt_id
@@ -103,7 +103,7 @@ class AssessResponse extends DeprecatedModel {
      * @param <type> $section_id
      * @return <type>
      */
-    function numStubResponsesInSection($attempt_id, $section_id) {
+    public function numStubResponsesInSection($attempt_id, $section_id) {
         $query = "SELECT COUNT(*) AS num
                   FROM {$this->_table}
                   WHERE attempt_id = '$attempt_id'
@@ -120,7 +120,7 @@ class AssessResponse extends DeprecatedModel {
      * @param <type> $section_id
      * @param <type> $limit
      */
-    function assignQuestions($attempt_id, $section_id, $limit, $randomise = false) {
+    public function assignQuestions($attempt_id, $section_id, $limit, $randomise = false) {
         $query = "SELECT question_id
                   FROM assess_question
                   WHERE section_id = '$section_id'
@@ -153,11 +153,11 @@ class AssessResponse extends DeprecatedModel {
     /**
      * Find out when an attempt's responses were last updated, so we can see
      * when the student last saved data.
-     * 
+     *
      * @param <type> $attempt_id
      * @return <type>
      */
-    function getLastSave($attempt_id) {
+    public function getLastSave($attempt_id) {
         $query = "SELECT updated_at
                   FROM {$this->_table}
                   WHERE attempt_id = '$attempt_id'
@@ -173,7 +173,7 @@ class AssessResponse extends DeprecatedModel {
      * @param <type> $attempt_id
      * @return <type>
      */
-    function numNotAutomarked($attempt_id) {
+    public function numNotAutomarked($attempt_id) {
         $query = "SELECT COUNT(*)
                   FROM {$this->_table}
                   LEFT JOIN assess_attempt ON assess_attempt.attempt_id = {$this->_table}.attempt_id
@@ -186,12 +186,12 @@ class AssessResponse extends DeprecatedModel {
 
 	/**
 	 * Mark as deleted all the responses for an attempt.
-	 * 
+	 *
 	 * @param <type> $attempt_id
 	 * @return <type>
 	 */
-	function deleteResponsesForAttempt($attempt_id) {
-		$query = "UPDATE {$this->_table} 
+	public function deleteResponsesForAttempt($attempt_id) {
+		$query = "UPDATE {$this->_table}
 				  SET deleted_at = NOW()
 				  WHERE attempt_id = '$attempt_id'";
 
@@ -200,7 +200,7 @@ class AssessResponse extends DeprecatedModel {
 
 	/**
 	 * Get a response for a particular attempt/question
-	 * 
+	 *
 	 * @param <type> $attempt_id
 	 * @param <type> $question_id
 	 */

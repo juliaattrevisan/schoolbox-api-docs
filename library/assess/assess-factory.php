@@ -10,18 +10,18 @@
  */
 
 class AssessFactory extends DeprecatedModel {
-    var $questionLibraryPath = '../library/assess/questionType';
-    var $questionPrefix = 'AssessQuestion';
+    private $questionLibraryPath = '../library/assess/questionType';
+    private $questionPrefix = 'AssessQuestion';
 
-    var $answerLibraryPath = '../library/assess/answerType';
-    var $answerPrefix = 'AssessAnswer';
+    private $answerLibraryPath = '../library/assess/answerType';
+    private $answerPrefix = 'AssessAnswer';
 
     /**
      * Spawn a Question type.
      *
      * @param <string> $type, the type of Question
      */
-    function createQuestionModel($type_id) {
+    public function createQuestionModel($type_id) {
         return $this->spawn($type_id, $this->questionLibraryPath, $this->questionPrefix);
     }
 
@@ -30,7 +30,7 @@ class AssessFactory extends DeprecatedModel {
      *
      * @param <string> $type, the type of Answer
      */
-    function createAnswerModel($type_id) {
+    public function createAnswerModel($type_id) {
         return $this->spawn($type_id, $this->answerLibraryPath, $this->answerPrefix);
     }
 
@@ -42,7 +42,7 @@ class AssessFactory extends DeprecatedModel {
      * @param <string> $prefix
      * @return class
      */
-    function spawn($type_id, $path, $prefix) {
+    public function spawn($type_id, $path, $prefix) {
         if (is_numeric($type_id)) {
             $type = $this->getQuestionType($type_id);
 
@@ -74,7 +74,7 @@ class AssessFactory extends DeprecatedModel {
     /**
      * Find out which file to include
      */
-    function getQuestionType($type_id) {
+    public function getQuestionType($type_id) {
         $query = "SELECT filename
                   FROM assess_luQuestionType
                   WHERE type_id = '$type_id'";
@@ -85,7 +85,7 @@ class AssessFactory extends DeprecatedModel {
     /**
      * Find out the moodle name
      */
-    function getMoodleQuestionType($type_id) {
+    public function getMoodleQuestionType($type_id) {
         $query = "SELECT moodle
                   FROM assess_luQuestionType
                   WHERE type_id = '$type_id'";

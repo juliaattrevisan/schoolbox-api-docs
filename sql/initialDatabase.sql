@@ -1,8 +1,9 @@
 /*
-SQLyog Ultimate v8.82 
+SQLyog Ultimate v8.82
 MySQL - 5.1.41-3ubuntu12.10 : Database - schoolbox
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -564,7 +565,9 @@ CREATE TABLE `error` (
 
 /*Data for the table `error` */
 
-insert  into `error`(`id`,`message`) values (50,'You do not have permission to delete this user\'s file.'),(52,'This link is already shared in your ePortfolio.');
+insert  into `error`(`id`,`message`) values
+(50,'You do not have permission to delete this user\'s file.'),
+(52,'This link is already shared in your ePortfolio.');
 
 /*Table structure for table `event` */
 

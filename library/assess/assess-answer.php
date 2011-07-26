@@ -22,7 +22,10 @@ class AssessAnswer extends DeprecatedModel {
 
     private $templatePath = '../templates/core/assess/answer';
 
-    function AssessAnswer() {
+	/**
+	 * Get an instance of a responseHandler upon instantiation
+	 */
+    public function __construct() {
         parent::DeprecatedModel();
 
         $this->responseHandler = new AssessResponse();
@@ -34,7 +37,7 @@ class AssessAnswer extends DeprecatedModel {
      * @param <type> $question_id
      * @return <type>
      */
-    function getForQuestion($question_id) {
+    public function getForQuestion($question_id) {
         $query = "SELECT *
                  FROM {$this->_table}
                  WHERE question_id = '$question_id'";
@@ -50,15 +53,15 @@ class AssessAnswer extends DeprecatedModel {
      * This was created because Fillgap question type shows questions in a
      * different way to that in which edit/modify it.
      */
-    function loadTemplate($type) {
-        $path = $this->templatePath . '/' . $type;
-        
-        if (is_readable($path . '/answer.html')) {
-            return file_get_contents($path . '/answer.html');
-        }
-
-        return file_get_contents($path . '/create.html');
-    }
+//    function loadTemplate($type) {
+//        $path = $this->templatePath . '/' . $type;
+//
+//        if (is_readable($path . '/answer.html')) {
+//            return file_get_contents($path . '/answer.html');
+//        }
+//
+//        return file_get_contents($path . '/create.html');
+//    }
 
     /**
      * Gets possible answer(s) for a particular Question. This is used when
@@ -67,7 +70,7 @@ class AssessAnswer extends DeprecatedModel {
      * @param <type> $question_id
      * @return <type>
      */
-    function getByQuestionID($question_id) {
+    public function getByQuestionID($question_id) {
         $query = "SELECT *
                   FROM {$this->_table}
                   WHERE question_id = '$question_id'";
@@ -82,7 +85,7 @@ class AssessAnswer extends DeprecatedModel {
      *
      * @param <type> $response
      */
-    function saveResponse($section_id, $question_id, $processedResponse) {
+    public function saveResponse($section_id, $question_id, $processedResponse) {
         $response = array(
             'attempt_id' => $_SESSION['attempt_id'],
             'section_id' => $section_id,
@@ -101,7 +104,7 @@ class AssessAnswer extends DeprecatedModel {
 
         if (is_numeric($response_id)) {
             $response['response_id'] = $response_id;
-            
+
             if ($responseHandler->update($response)) {
                 $result['response_id'] = $response_id;
             }
@@ -123,7 +126,7 @@ class AssessAnswer extends DeprecatedModel {
      *
      * @param <type> $data
      */
-    function saveReviewedResponse($data, $response_id) {
+    public function saveReviewedResponse($data, $response_id) {
         $reviewedResponse = array(
             'response_id' => $response_id,
             'comment' => scrubTEXT($data['comment']),

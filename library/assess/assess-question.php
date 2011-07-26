@@ -21,7 +21,7 @@ class AssessQuestion extends DeprecatedModel {
      * @param <type> $object
      * @return <type>
      */
-    function create($object) {
+    public function create($object) {
         $question = array_intersect_key($object, array_flip($this->allowedFields));
 
         $question_id = parent::create($question);
@@ -38,34 +38,34 @@ class AssessQuestion extends DeprecatedModel {
      *
      * @param <type> $object
      */
-    function update($object) {
+    public function update($object) {
         $question = array_intersect_key($object, array_flip($this->allowedFields));
 
         parent::update($question);
     }
 
-    /**
-     * Gets the last question entered into a particular section.
-     *
-     * @param integer $section_id
-     * @return array
-     */
-    function getLast($section_id) {
-        $query = "SELECT *
-            FROM `$this->_table`
-            WHERE `section_id` = $section_id
-            AND deleted_at IS NULL
-            ORDER BY `order`
-            DESC LIMIT 1";
-
-        return $this->db->getRow($query);
-    }
+//    /**
+//     * Gets the last question entered into a particular section.
+//     *
+//     * @param integer $section_id
+//     * @return array
+//     */
+//    function getLast($section_id) {
+//        $query = "SELECT *
+//            FROM `$this->_table`
+//            WHERE `section_id` = $section_id
+//            AND deleted_at IS NULL
+//            ORDER BY `order`
+//            DESC LIMIT 1";
+//
+//        return $this->db->getRow($query);
+//    }
 
     /**
      * For a new Question, find out what its sequence should be. If it's the
      * first Question for an Assess, return 0
      */
-    function getNextSequence($section_id) {
+    public function getNextSequence($section_id) {
         $query = "SELECT MAX(sequence)+1 AS num
                   FROM {$this->_table}
                   WHERE section_id = '$section_id'
@@ -85,7 +85,7 @@ class AssessQuestion extends DeprecatedModel {
      *
      * @return <type>
      */
-    function getAllQuestionTypes() {
+    public function getAllQuestionTypes() {
         $query = "SELECT *
                   FROM assess_luQuestionType
                   ORDER BY type_id";
@@ -99,7 +99,7 @@ class AssessQuestion extends DeprecatedModel {
      * @param <type> $type_id
      * @return <type>
      */
-    function getQuestionType($type_id) {
+    public function getQuestionType($type_id) {
         $query = "SELECT *
                   FROM assess_luQuestionType
                   WHERE type_id = '$type_id'";
@@ -113,7 +113,7 @@ class AssessQuestion extends DeprecatedModel {
      * @param <type> $section_id
      * @return <type>
      */
-    function getList($section_id) {
+    public function getList($section_id) {
         $query = "SELECT *
                   FROM {$this->_table}
                   WHERE section_id = '$section_id'
@@ -128,7 +128,7 @@ class AssessQuestion extends DeprecatedModel {
      *
      * @param <type> $section_id
      */
-    function resequenceQuestionsAfterDelete($assess_id, $section_id) {
+    public function resequenceQuestionsAfterDelete($assess_id, $section_id) {
         $sectionHandler = new AssessSection();
 
         $allQuestions = $sectionHandler->getContents($assess_id, $section_id, true);
@@ -158,7 +158,7 @@ class AssessQuestion extends DeprecatedModel {
      *
      * @param <type> $attempt_id
      */
-    function numQuestions($assess_id) {
+    public function numQuestions($assess_id) {
         $query = "SELECT COUNT(assess_question.question_id) AS numQuestions
                   FROM assess
                   LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id

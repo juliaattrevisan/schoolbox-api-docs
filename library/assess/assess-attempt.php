@@ -9,15 +9,15 @@
  */
 
 class AssessAttempt extends DeprecatedModel {
-    var $_table = 'assess_attempt';
-    var $_index = 'attempt_id';
+    public $_table = 'assess_attempt';
+    public $_index = 'attempt_id';
 
     /**
      * Mark an attempt as having been reviewed.
      *
      * @param <type> $attempt_id
      */
-    function reviewed($attempt_id) {
+    public function reviewed($attempt_id) {
         $data = array(
             'attempt_id' => $attempt_id,
             'reviewed_at' => 'NOW()'
@@ -28,11 +28,11 @@ class AssessAttempt extends DeprecatedModel {
 
     /**
      * The number of attempts that have been reviewed for an assess
-     * 
+     *
      * @param <type> $assess_id
      * @return <type>
      */
-    function numReviewed($assess_id) {
+    public function numReviewed($assess_id) {
         $query = "SELECT COUNT(*)
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
@@ -44,11 +44,11 @@ class AssessAttempt extends DeprecatedModel {
     /**
      * The number of attempts made for an assess. Optionally group them by
      * user id to cater for multiple attempts.
-     * 
+     *
      * @param <type> $assess_id
      * @return <type>
      */
-    function numAttempted($assess_id, $groupById = false) {
+    public function numAttempted($assess_id, $groupById = false) {
         $query = "SELECT COUNT(*)
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'";
@@ -66,7 +66,7 @@ class AssessAttempt extends DeprecatedModel {
      * @param integer $user_id
      * @return mixed
      */
-    function start($user_id, $assess_id) {
+    public function start($user_id, $assess_id) {
         if (!is_numeric($user_id) || !is_numeric($assess_id)) {
             return false;
         }
@@ -114,7 +114,7 @@ class AssessAttempt extends DeprecatedModel {
      *
      * @param <type> $assess_id
      */
-    function isComplete($assess_id) {
+    public function isComplete($assess_id) {
         $query = "SELECT COUNT(*) AS completed
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
@@ -176,7 +176,7 @@ class AssessAttempt extends DeprecatedModel {
      * questions which themselves have different available marks from other
      * candidates which could be selected)
      */
-    function getTotalMarks($assess_id, $attempt_id) {
+    public function getTotalMarks($assess_id, $attempt_id) {
         $query = "SELECT SUM(marks) AS totalMarks
                   FROM assess_attempt
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
@@ -190,12 +190,12 @@ class AssessAttempt extends DeprecatedModel {
 
     /**
      * Out of multiple attempts at the same assess, get a user's most recent one
-     * 
+     *
      * @param <type> $assess_id
      * @param <type> $user_id
      * @return <type>
      */
-    function getLatestForUser($assess_id, $user_id) {
+    public function getLatestForUser($assess_id, $user_id) {
         $query = "SELECT *
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
@@ -206,7 +206,13 @@ class AssessAttempt extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    function getMarksForAttempt($attempt_id) {
+	/**
+	 * Get the marks given to an attempt
+	 *
+	 * @param  $attempt_id
+	 * @return
+	 */
+    public function getMarksForAttempt($attempt_id) {
         $query = "SELECT
                       SUM(assess_response.mark) AS totalMarks
                   FROM assess_attempt
@@ -219,12 +225,12 @@ class AssessAttempt extends DeprecatedModel {
 
     /**
      * Find out if the current user has already made an attempt on this test
-     * 
+     *
      * @param <type> $assess_id
      * @param <type> $user_id
      * @return <type>
      */
-    function userHasAttempted($assess_id, $user_id) {
+    public function userHasAttempted($assess_id, $user_id) {
         $query = "SELECT COUNT(*)
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
@@ -240,7 +246,7 @@ class AssessAttempt extends DeprecatedModel {
      * @param <type> $user_id
      * @return <type>
      */
-    function isOwner($attempt_id, $user_id = '') {
+    public function isOwner($attempt_id, $user_id = '') {
         if (!is_numeric($user_id)) {
             $uid = $_SESSION['id'];
         }

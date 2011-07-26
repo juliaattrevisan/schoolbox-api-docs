@@ -1,0 +1,36 @@
+<?php
+/**
+ * Remove a question from the Question Bank
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
+require_once('../library/assess/assess-questionbank.php');
+
+$groupHandler = new Group();
+
+if (!$groupHandler->isStaff()) {
+    error(126);
+}
+
+$questionBankHandler = new AssessQuestionBank();
+
+if (!empty($_POST)) {
+	$i = 0;
+
+	foreach($_POST['delete_question_bank_id'] as $questionBankId) {
+		$questionBankHandler->update(array(
+			'question_bank_id' => scrubText($questionBankId),
+			'deleted_at' => 'NOW()',
+		));
+
+		$i++;
+	}
+}
+
+echo "$i questions removed.";
+
+exit();
+?>

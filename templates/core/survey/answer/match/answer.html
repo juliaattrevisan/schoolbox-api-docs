@@ -1,0 +1,18 @@
+<p class="help">Re-order the items on the right by dragging them to match the items on the left.</p>
+<fieldset>
+    <label>Answer</label>
+        <ul class="left-answer option">
+            <!-- BEGIN answerOptionLeft -->
+            <li class="left-answer clearfix"><strong>{ANSWER_LEFT_VALUE}</strong><div class="arrow"><span>matches</span></div></li>
+			<!-- END answerOptionLeft -->
+        </ul>
+        <ul id="matchPairs_{MATCHPAIRS_QUESTION_ID}" class="match-it option">
+            <!-- BEGIN answerOptionRight -->
+            <li class="right-answer clearfix">
+               <strong> <input name="answerRight[]" class="answerRight" type="hidden" readonly="readonly" value="{ANSWER_RIGHT_VALUE}" />
+                {ANSWER_RIGHT_VALUE}
+				</strong>
+            </li>
+            <!-- END answerOptionRight -->
+        </ul>
+</fieldset>

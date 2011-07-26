@@ -23,7 +23,7 @@ class AssessAnswerFillgap extends AssessAnswer {
      * @param <type> $object
      * @return <type>
      */
-    function create($object, $question_id) {
+    public function create($object, $question_id) {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
 
@@ -46,7 +46,7 @@ class AssessAnswerFillgap extends AssessAnswer {
      *
      * @param <type> $object
      */
-    function update($object) {
+    public function update($object) {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
 
         parent::update($answer);
@@ -59,7 +59,7 @@ class AssessAnswerFillgap extends AssessAnswer {
      *
      * @param <type> $page
      */
-    function modify($page, $question_id = '') {
+    public function modify($page, $question_id = '') {
         if (is_numeric($question_id)) {
             $currentAnswer = parent::getForQuestion($question_id);
 
@@ -109,7 +109,7 @@ class AssessAnswerFillgap extends AssessAnswer {
      * @param <type> $page
      * @param <type> $question_id
      */
-    function prepareResponse($page, $question_id) {
+    public function prepareResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $currentAnswer = $this->getByQuestionID($question_id);
@@ -156,7 +156,7 @@ class AssessAnswerFillgap extends AssessAnswer {
      *
      * @param <type> $response
      */
-    function saveResponse($data) {
+    public function saveResponse($data) {
 		$isNotEmpty = false;
 
 		foreach ($data[$this->prefix . $data['question_id']] as $answer) {
@@ -182,7 +182,7 @@ class AssessAnswerFillgap extends AssessAnswer {
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.
      */
-    function mark($currentResponse) {
+    public function mark($currentResponse) {
         $response = unserialize($currentResponse['response']);
         $answer = $currentResponse['answer'];
 
@@ -222,7 +222,7 @@ class AssessAnswerFillgap extends AssessAnswer {
      * @param <type> $page
      * @param <type> $question_id
      */
-    function reviewResponse($page, $question_id) {
+    public function reviewResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $currentAnswer = $this->getByQuestionID($question_id);
@@ -310,7 +310,7 @@ class AssessAnswerFillgap extends AssessAnswer {
      * @param <type> $page
      * @param <type> $question_id
      */
-    function exportMoodleAnswer($page, $question_id) {
+    public function exportMoodleAnswer($page, $question_id) {
         $currentAnswer = $this->getByQuestionID($question_id);
 
         /* Show correct answer
@@ -329,7 +329,7 @@ class AssessAnswerFillgap extends AssessAnswer {
      *
      * @param <type> $obj
      */
-    function importMoodleAnswer($xmlObj, $question_id) {
+    public function importMoodleAnswer($xmlObj, $question_id) {
         $object = array(
             'answer_id' => '',
             'question_id' => $question_id,

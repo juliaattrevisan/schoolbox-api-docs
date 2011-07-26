@@ -26,9 +26,9 @@ $responseHandler = new AssessResponse();
 if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
     if(!$groupHandler->isStaff() )
             error(19);
-    
+
 	$category = $catHandler->getByID($this->arg[1]);
-    
+
 	/* Get full student list of class  */
     if($category['code'] && Cfg::get('external_enable')) {
         require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalClass.php';
@@ -95,11 +95,11 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
                         $csv .= scrubTEXT($return[0]['mark']).',';
                     }
 				}
-			}   
+			}
             $csv .="\n";
 		}
 	}
-    
+
     $filename = preg_replace('/[^0-9a-zA-Z()_-]/','_', $category['name']);
 
     header ("Pragma: ");
@@ -114,7 +114,7 @@ else if(is_numeric($this->arg[0])) {
 	$this->setFile(TEMPLATE_content, 'submission/markSheet.html');
 	$this->setTitle('Class Mark Sheet');
 	$this->setTab('submission');
-	
+
 	$this->setBlock(TEMPLATE_content, 'sub_head', 'sub_head_block');
 	$this->setBlock(TEMPLATE_content, 'assess_head', 'assess_head_block');
 	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
@@ -179,7 +179,7 @@ else if(is_numeric($this->arg[0])) {
 
                 if (is_array($allAttempts)) {
                     foreach($allAttempts as $currentAttempt) {
-                        $allResponses = $responseHandler->getAutomarkableResponses($sub['id'], $currentAttempt['attempt_id']);
+                        $allResponses = $responseHandler->getAutomarkableResponses($currentAttempt['attempt_id']);
 
                         if (is_array($allResponses)) {
                             foreach ($allResponses as $currentResponse) {
@@ -191,7 +191,7 @@ else if(is_numeric($this->arg[0])) {
                             }
                         }
                     }
-                    
+
                     $responseHandler->updatedAutomatedMarks($markedResponseIDs);
                 }
 

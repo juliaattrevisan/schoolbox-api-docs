@@ -22,7 +22,7 @@ class AssessSection extends DeprecatedModel {
      *
      * @param <type> $section
      */
-    function create($section) {
+    public function create($section) {
         return parent::create($section);
     }
 
@@ -30,7 +30,7 @@ class AssessSection extends DeprecatedModel {
      * For a new Section, find out what its sequence should be. If it's the
      * first Section for an Assess, return 0
      */
-    function getNextSequence($assess_id) {
+    public function getNextSequence($assess_id) {
         $query = "SELECT MAX(sequence)+1 AS num
                   FROM {$this->_table}
                   WHERE assess_id = $assess_id
@@ -50,7 +50,7 @@ class AssessSection extends DeprecatedModel {
      *
      * @param <type> $section_id
      */
-    function getAfter($assess_id, $sequence) {
+    public function getAfter($assess_id, $sequence) {
         $query = "SELECT *
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
@@ -67,7 +67,7 @@ class AssessSection extends DeprecatedModel {
      *
      * @param <type> $section_id
      */
-    function getBefore($assess_id, $sequence) {
+    public function getBefore($assess_id, $sequence) {
         $query = "SELECT *
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
@@ -87,7 +87,7 @@ class AssessSection extends DeprecatedModel {
      * @param <type> $section_id
      * @return <type>
      */
-    function getContents($assess_id, $section_id, $sectionExclusion = false) {
+    public function getContents($assess_id, $section_id, $sectionExclusion = false) {
         $query = "SELECT assess_id,
                          assess_section.section_id,
                          assess_section.title,
@@ -115,7 +115,7 @@ class AssessSection extends DeprecatedModel {
      * @param <type> $attempt_id
      * @param <type> $section_id
      */
-    function getQuestions($attempt_id, $section_id) {
+    public function getQuestions($attempt_id, $section_id) {
         $query = "SELECT
                       assess_response.question_id,
                       assess_question.type_id,
@@ -138,7 +138,7 @@ class AssessSection extends DeprecatedModel {
      * @param <type> $assess_id
      * @return <type>
      */
-    function getList($assess_id) {
+    public function getList($assess_id) {
         $query = "SELECT *
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
@@ -153,18 +153,18 @@ class AssessSection extends DeprecatedModel {
      *
      * @param <type> $assess_id
      */
-    function getLast($assess_id) {
-        $allSections = $this->getList($assess_id);
-
-        return $allSections[count($allSections)-1];
-    }
+//    function getLast($assess_id) {
+//        $allSections = $this->getList($assess_id);
+//
+//        return $allSections[count($allSections)-1];
+//    }
 
     /**
      * Gets the first Section in this Assess.
      *
      * @param <type> $assess_id
      */
-    function getFirst($assess_id) {
+    public function getFirst($assess_id) {
         $allSections = $this->getList($assess_id);
 
         return $allSections[0];
@@ -176,7 +176,7 @@ class AssessSection extends DeprecatedModel {
      * @param <type> $section_id
      * @return <type>
      */
-    function sectionPercentageComplete($section_id) {
+    public function sectionPercentageComplete($section_id) {
         $section = $this->getByID($section_id);
         $sectionList = $this->getList($section['assess_id']);
 
@@ -219,7 +219,7 @@ class AssessSection extends DeprecatedModel {
      *
      * @param <type> $assess_id
      */
-    function resequenceSectionsAfterDelete($assess_id) {
+    public function resequenceSectionsAfterDelete($assess_id) {
         $sectionList = $this->getList($assess_id);
 
         if (is_array($sectionList) && count($sectionList)) {
@@ -244,7 +244,7 @@ class AssessSection extends DeprecatedModel {
      * @param <type> $assess_id
      * @return <type>
      */
-    function isDeleted($section_id) {
+    public function isDeleted($section_id) {
         $query = "SELECT COUNT(section_id)
                   FROM assess_section
                   WHERE section_id = '$section_id'
