@@ -70,7 +70,7 @@ foreach($allSections as $currentSection) {
 
                 /* Load answer template into answerOption block
                  */
-                $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/exportToMoodle.html');
+                $this->setFile('answerFormFragment', 'survey/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/exportToMoodle.html');
                 $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
                 /* Reset answer options from previous iteration

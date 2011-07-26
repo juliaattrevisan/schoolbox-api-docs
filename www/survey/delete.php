@@ -8,17 +8,17 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/assess.php');
-require_once('../library/assess/assess-factory.php');
-require_once('../library/assess/assess-section.php');
+require_once('../library/survey/survey.php');
+require_once('../library/survey/survey-factory.php');
+require_once('../library/survey/survey-section.php');
 require_once('../library/group.php');
 
 /* Get a list of questions and answers to softdelete
  */
-$assessHandler = new Assess();
-$questionHandler = new AssessQuestion();
-$answerHandler = new AssessAnswer();
-$sectionHandler = new AssessSection();
+$assessHandler = new Survey();
+$questionHandler = new SurveyQuestion();
+$answerHandler = new SurveyAnswer();
+$sectionHandler = new SurveySection();
 $groupHandler = new Group();
 
 if (!$groupHandler->isSuperuser()) {
@@ -76,7 +76,7 @@ $assessHandler->update(array(
     'deleted_at' => 'NOW()'
 ));
 
-$this->setFile(TEMPLATE_content, 'assess/deleted.html');
+$this->setFile(TEMPLATE_content, 'survey/deleted.html');
 
 $this->setVar(array(
 	'CATEGORY_ID' => $assess['category_id'],

@@ -7,13 +7,13 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/assess.php');
-require_once('../library/assess/assess-factory.php');
-require_once('../library/assess/assess-section.php');
+require_once('../library/survey/survey.php');
+require_once('../library/survey/survey-factory.php');
+require_once('../library/survey/survey-section.php');
 
-$assessHandler = new Assess();
-$questionHandler = new AssessQuestion();
-$sectionHandler = new AssessSection();
+$assessHandler = new Survey();
+$questionHandler = new SurveyQuestion();
+$sectionHandler = new SurveySection();
 
 $question = $questionHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($question['section_id']);
@@ -38,7 +38,7 @@ if (!$question) {
     error(119);
 }
 
-$factory = new AssessFactory();
+$factory = new SurveyFactory();
 $answerHandler = $factory->createAnswerModel($question['type_id']);
 
 $data = $_POST;

@@ -9,15 +9,15 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/assess.php');
-require_once('../library/assess/assess-section.php');
-require_once('../library/assess/assess-attempt.php');
+require_once('../library/survey/survey.php');
+require_once('../library/survey/survey-section.php');
+require_once('../library/survey/survey-attempt.php');
 require_once('../library/group.php');
 require_once('../library/user.php');
 
-$assessHandler = new Assess();
-$sectionHandler = new AssessSection();
-$attemptHandler = new AssessAttempt();
+$assessHandler = new Survey();
+$sectionHandler = new SurveySection();
+$attemptHandler = new SurveyAttempt();
 $groupHandler = new Group();
 $userHandler = new User();
 
@@ -65,7 +65,7 @@ $this->setVar(array(
     'ASSESS_AUTHOR' => $author['firstname'] . ' ' . $author['lastname'],
 ));
 
-$this->setFile(TEMPLATE_content, 'assess/intro.html');
+$this->setFile(TEMPLATE_content, 'survey/intro.html');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
 $this->setBlock(TEMPLATE_content, 'error', 'error_block');
@@ -127,7 +127,7 @@ if ($assessHandler->allowResit($this->arg[0])) {
 else {
     if ($attemptHandler->isComplete($assess['assess_id'])) {
         $this->setVar(array(
-            'ERROR_STRING' => 'You have already attempted this online assessment and cannot re-sit it.'
+            'ERROR_STRING' => 'You have already attempted this survey and cannot re-sit it.'
         ));
 
         $this->setVar('startTest_block', '');
@@ -135,7 +135,7 @@ else {
     }
     else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess::UNLIMITED_DURATION)) {
         $this->setVar(array(
-            'ERROR_STRING' => 'You have run out of time to complete this online assessment and cannot re-sit it.'
+            'ERROR_STRING' => 'You have run out of time to complete this survey and cannot re-sit it.'
         ));
 
         $this->setVar('startTest_block', '');
@@ -143,7 +143,7 @@ else {
     }
     else if ($assessHandler->isExpired($this->arg[0])) {
         $this->setVar(array(
-            'ERROR_STRING' => 'This online assessment has expired.'
+            'ERROR_STRING' => 'This survey has expired.'
         ));
 
         $this->setVar('startTest_block', '');

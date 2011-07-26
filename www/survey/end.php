@@ -7,18 +7,18 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/assess.php');
-require_once('../library/assess/assess-attempt.php');
-require_once('../library/assess/assess-question.php');
-require_once('../library/assess/assess-response.php');
+require_once('../library/survey/survey.php');
+require_once('../library/survey/survey-attempt.php');
+require_once('../library/survey/survey-question.php');
+require_once('../library/survey/survey-response.php');
 
-$assessHandler = new Assess();
-$attemptHandler = new AssessAttempt();
-$questionHandler = new AssessQuestion();
-$responseHandler = new AssessResponse();
+$assessHandler = new Survey();
+$attemptHandler = new SurveyAttempt();
+$questionHandler = new SurveyQuestion();
+$responseHandler = new SurveyResponse();
 
 if (!is_numeric($_SESSION['attempt_id'])) {
-    localRedir('/assess/intro/' . $this->arg[0]);
+    localRedir('/survey/intro/' . $this->arg[0]);
 }
 
 $assess = $assessHandler->getByID($this->arg[0]);
@@ -40,7 +40,7 @@ if ($assessHandler->isExpired($this->arg[0])) {
     error(120);
 }
 
-$this->setFile(TEMPLATE_content, 'assess/end.html');
+$this->setFile(TEMPLATE_content, 'survey/end.html');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
 $this->setTitle('Assessment: ' . $assess['title']);

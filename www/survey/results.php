@@ -11,11 +11,11 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/assess.php');
-require_once('../library/assess/assess-factory.php');
-require_once('../library/assess/assess-attempt.php');
-require_once('../library/assess/assess-response.php');
-require_once('../library/assess/assess-section.php');
+require_once('../library/survey/survey.php');
+require_once('../library/survey/survey-factory.php');
+require_once('../library/survey/survey-attempt.php');
+require_once('../library/survey/survey-response.php');
+require_once('../library/survey/survey-section.php');
 require_once('../library/group.php');
 require_once('../library/category.php');
 
@@ -92,8 +92,8 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 		'ATTEMPT_PERCENTAGE' => $percentage,
 		'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
 		'ATTEMPT_UNMARKED_RESPONSES' => $numNotAutomarked,
-		'ATTEMPT_REVIEW_LINK' => "<a href=\"/assess/review/{$page->arg[0]}/{$firstSection['section_id']}/{$currentAttempt['attempt_id']}\">Review</a>",
-		'ATTEMPT_DELETE_LINK' => "<a href=\"/assess/deleteAttempt/{$currentAttempt['attempt_id']}\">Delete</a>",
+		'ATTEMPT_REVIEW_LINK' => "<a href=\"/survey/review/{$page->arg[0]}/{$firstSection['section_id']}/{$currentAttempt['attempt_id']}\">Review</a>",
+		'ATTEMPT_DELETE_LINK' => "<a href=\"/survey/deleteAttempt/{$currentAttempt['attempt_id']}\">Delete</a>",
 	));
 
 	$page->parse('attempt_block', 'attempt', true);
@@ -101,11 +101,11 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 
 /* Handlers and stuff
  */
-$factory = new AssessFactory();
-$responseHandler = new AssessResponse();
-$assessHandler = new Assess();
-$attemptHandler = new AssessAttempt();
-$sectionHandler = new AssessSection();
+$factory = new SurveyFactory();
+$responseHandler = new SurveyResponse();
+$assessHandler = new Survey();
+$attemptHandler = new SurveyAttempt();
+$sectionHandler = new SurveySection();
 $groupHandler = new Group();
 $categoryHandler = new Category();
 
@@ -152,7 +152,7 @@ $responseHandler->updatedAutomatedMarks($markedResponseIDs);
 
 /* Set up template
  */
-$this->setFile(TEMPLATE_content, 'assess/results.html');
+$this->setFile(TEMPLATE_content, 'survey/results.html');
 $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
 $this->setTitle('Results for: ' . $assess['title']);
 

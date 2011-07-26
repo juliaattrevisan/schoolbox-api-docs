@@ -8,9 +8,9 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/assess.php');
-require_once('../library/assess/assess-factory.php');
-require_once('../library/assess/assess-section.php');
+require_once('../library/survey/survey.php');
+require_once('../library/survey/survey-factory.php');
+require_once('../library/survey/survey-section.php');
 
 if (!is_numeric($this->arg[0])) {
     error(18);
@@ -23,9 +23,9 @@ else {
     error(134);
 }
 
-$factory = new AssessFactory();
-$assessHandler = new Assess();
-$sectionHandler = new AssessSection();
+$factory = new SurveyFactory();
+$assessHandler = new Survey();
+$sectionHandler = new SurveySection();
 
 $xml = simplexml_load_string($data);
 
@@ -85,5 +85,5 @@ for ($i=0; $i < count($xml->section); $i++) {
     }
 }
 
-localRedir('/assess/modify/' . $assess_id);
+localRedir('/survey/modify/' . $assess_id);
 ?>

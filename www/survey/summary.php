@@ -7,13 +7,13 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/assess.php');
-require_once('../library/assess/assess-section.php');
-require_once('../library/assess/assess-attempt.php');
+require_once('../library/survey/survey.php');
+require_once('../library/survey/survey-section.php');
+require_once('../library/survey/survey-attempt.php');
 
-$assessHandler = new Assess();
-$sectionHandler = new AssessSection();
-$attemptHandler = new AssessAttempt();
+$assessHandler = new Survey();
+$sectionHandler = new SurveySection();
+$attemptHandler = new SurveyAttempt();
 
 $assess = $assessHandler->getIntro($this->arg[0]);
 $allSummary = $assessHandler->getIntroSummary($this->arg[0]);
@@ -40,7 +40,7 @@ $this->setVar(array(
     'FIRST_SECTION' => $allSections[0]['section_id'],
 ));
 
-$this->setFile(TEMPLATE_content, 'assess/summary.html');
+$this->setFile(TEMPLATE_content, 'survey/summary.html');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 

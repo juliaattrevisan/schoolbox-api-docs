@@ -7,11 +7,11 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess-attempt.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/survey/survey.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/survey/survey-attempt.php';
 
-$assessHandler = new Assess();
-$attemptHandler = new AssessAttempt();
+$assessHandler = new Survey();
+$attemptHandler = new SurveyAttempt();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -42,7 +42,7 @@ if (!$assessHandler->isOwner($this->arg[0])) {
 
 $attemptHandler->reviewed($this->arg[1]);
 
-localRedir('/assess/results/' . $this->arg[0]);
+localRedir('/survey/results/' . $this->arg[0]);
 
 die();
 ?>

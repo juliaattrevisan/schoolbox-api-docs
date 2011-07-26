@@ -151,7 +151,7 @@ if ($allQuestions) {
 
         /* Load answer template into answerOption block
          */
-        $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/answer.html');
+        $this->setFile('answerFormFragment', 'survey/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/answer.html');
         $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
         /* Reset answer options from previous iteration
