@@ -10,7 +10,7 @@ $j(document).ready(function() {
 	var validator = $j("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave();
-	 }).validate({
+	}).validate({
 		submitHandler: function() {
    		    var theForm = $j('#createQuestionForm');
 
@@ -20,7 +20,6 @@ $j(document).ready(function() {
 			tinyMCE.triggerSave();
 
 			var content = tinyMCE.activeEditor.getContent(); // get the content
-
    			$j('#question').val(content); // put it in the textarea
 
 			/* Collate possible answers and their correctness status
@@ -77,9 +76,6 @@ $j(document).ready(function() {
 			},
 			'answerDescription[]': {
 				emptyInputs: true
-			},
-			'answer[]':{
-				nothingChecked:true
 			}
 		},
 
@@ -126,32 +122,6 @@ $j(document).ready(function() {
         return fieldsAreFilled;
     }, 'Please fill out all answers');
 
-	/* Removed mandatory correct answer from multiple choice
-	 */
-	jQuery.validator.addMethod('nothingChecked', function(value, element) {
-        var countDracula = 0;
-
-	    var oneFieldChecked = true;
-
-        $j.each($j('#answerCollection').find('li'), function(index, element) {
-            var elem = $j(element);
-            var checkit = elem.find('.answerCorrect').is(':checked');
-
-			// if the element isn't checked add to the count
-            if (checkit == true) {
-                countDracula++
-            }
-        });
-
-		if (countDracula == 0) {
-			oneFieldChecked = false;
-		}
-
-		return oneFieldChecked;
-
-    }, 'Tick at least one checkbox');
-
-
     /* Add a new answer option
      */
     $j('#makeNewAnswer').live('click', function() {
@@ -193,6 +163,7 @@ $j(document).ready(function() {
 		$j('.wrong-checkbox').css('left',  115);
 		$j('.wrong-checkbox').css('top',  pos);
 	}
+
 });
 </script>
 

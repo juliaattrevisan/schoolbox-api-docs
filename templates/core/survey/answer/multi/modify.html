@@ -73,13 +73,7 @@ $j(document).ready(function() {
 			},
 			'answerDescription[]': {
 				emptyInputs: true
-			},
-			/* Removed mandatory correct answer
-			 */
-			'answer[]':{
-				nothingChecked:true
 			}
-
 		},
 
         errorPlacement: function(error, element) {
@@ -136,33 +130,6 @@ $j(document).ready(function() {
          */
         return fieldsAreFilled;
     }, 'Please fill out all answers');
-
-
-	jQuery.validator.addMethod('nothingChecked', function(value, element) {
-        var countDracula = 0;
-
-	    var oneFieldChecked = true;
-
-        $j.each($j('#answerCollection').find('li'), function(index, element) {
-            var elem = $j(element);
-
-            var checkit = elem.find('.answerCorrect').is(':checked');
-
-			// if the element isn't checked add to the count
-            if (checkit == true) {
-                countDracula++
-            }
-
-        });
-
-		if (countDracula == 0) {
-			oneFieldChecked = false;
-		}
-
-		return oneFieldChecked;
-
-    }, 'Tick at least one checkbox');
-
 
     /* Add a new answer option
      */

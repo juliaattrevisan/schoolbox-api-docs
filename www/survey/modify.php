@@ -7,12 +7,12 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/assess.php');
+require_once('../library/survey/survey.php');
 require_once('../library/group.php');
 require_once('include/time.php');
 
 $groupHandler = new Group();
-$assessHandler = new Assess();
+$assessHandler = new Survey();
 
 if (!$groupHandler->isStaff()) {
     error(126);
@@ -60,7 +60,7 @@ else {
 
     /* Render modify page
      */
-    $this->setFile(TEMPLATE_content, 'assess/modify.html');
+    $this->setFile(TEMPLATE_content, 'survey/modify.html');
     $this->setBlock(TEMPLATE_content, 'startHour', 'startHour_block');
     $this->setBlock(TEMPLATE_content, 'startMinute', 'startMinute_block');
     $this->setBlock(TEMPLATE_content, 'startMeridiem', 'startMeridiem_block');
@@ -71,7 +71,7 @@ else {
     $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
-    $this->setTitle('Manage Assessment');
+    $this->setTitle('Manage Survey');
 
     $assess = $assessHandler->getByID($this->arg[0]);
 
@@ -176,11 +176,11 @@ else {
 
     /* Show this Assess' contents
      */
-    $this->setFile('assessContentsFragment', 'assess/contents.html');
+    $this->setFile('assessContentsFragment', 'survey/contents.html');
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assess = new Assess();
+    $assess = new Survey();
     $assess->renderAssessContents($this->arg[0], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);

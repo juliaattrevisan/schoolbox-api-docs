@@ -45,22 +45,24 @@ if (is_array($sectionList) && count($sectionList)) {
         $section = $sectionHandler->getByID($currentSection['section_id']);
         $questionList = $questionHandler->getList($currentSection['section_id']);
 
-        foreach($questionList as $currentQuestion) {
-            $question = $questionHandler->getByID($currentQuestion['question_id']);
-            $answer = $answerHandler->getForQuestion($currentQuestion['question_id']);
+		if (is_array($questionList) && count($questionList)) {
+			foreach($questionList as $currentQuestion) {
+				$question = $questionHandler->getByID($currentQuestion['question_id']);
+				$answer = $answerHandler->getForQuestion($currentQuestion['question_id']);
 
-            /* Perform soft delete
-             */
-            $questionHandler->update(array(
-                'question_id' => $currentQuestion['question_id'],
-                'deleted_at' => 'NOW()',
-            ));
+				/* Perform soft delete
+				 */
+				$questionHandler->update(array(
+					'question_id' => $currentQuestion['question_id'],
+					'deleted_at' => 'NOW()',
+				));
 
-            $answerHandler->update(array(
-                'answer_id' => $answer['answer_id'],
-                'deleted_at' => 'NOW()',
-            ));
-        }
+				$answerHandler->update(array(
+					'answer_id' => $answer['answer_id'],
+					'deleted_at' => 'NOW()',
+				));
+			}
+		}
 
         $section['deleted_at'] = 'NOW()';
         $sectionHandler->update($section);

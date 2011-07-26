@@ -4,7 +4,7 @@ $j(function() {
 		var allQuestions = $j('#questionBankForm').find('input[name="delete_question_bank_id[]"]:checked');
 
 		if (allQuestions.length && confirm('Do you want to remove the selected questions from the Question Bank?')) {
-			$j.post('/assess/questionbank/delete', $j('#questionBankForm').serialize(), function(response) {
+			$j.post('/survey/questionbank/delete', $j('#questionBankForm').serialize(), function(response) {
 				alert(response);
 
 				location.reload();
