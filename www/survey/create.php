@@ -37,14 +37,15 @@ if (!empty($_POST)) {
 
     $assess_id = $assessHandler->create(array(
         'category_id' => scrubTEXT($_POST['category_id']),
-        'user_id'     => $_SESSION['id'],
-        'title'       => scrubTEXT($_POST['title']),
+        'user_id' => $_SESSION['id'],
+        'title' => scrubTEXT($_POST['title']),
         'description' => scrubTEXT($_POST['description']),
-        'start'       => date(Cfg::get('date_database'), $start),
-        'finish'      => date(Cfg::get('date_database'), $finish),
-        'duration'    => scrubTEXT($duration),
+        'start' => date(Cfg::get('date_database'), $start),
+        'finish' => date(Cfg::get('date_database'), $finish),
+        'duration'  => scrubTEXT($duration),
         'allow_resit' => scrubTEXT($_POST['allow_resit']),
-        'created_at'  => 'NOW()',
+		'availability' => 'survey',
+        'created_at' => 'NOW()',
     ));
 
     if (!$assess_id) {
