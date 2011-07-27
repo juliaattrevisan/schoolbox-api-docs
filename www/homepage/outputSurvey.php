@@ -4,7 +4,7 @@ require_once SITE_root . '/library/survey/SurveyAttempt.php';
 require_once SITE_root . '/library/survey/SurveySection.php';
 
 $this->setBlock($componentHandle, 'survey', 'survey_block');
-$this->setBlock($componentHandle, 'createAssessment', 'createAssessment_block');
+$this->setBlock($componentHandle, 'createSurvey', 'createSurvey_block');
 $this->setBlock('survey', 'teacherLink', 'teacherLink_block');
 $this->setBlock('survey', 'studentLink', 'studentLink_block');
 $this->setBlock('survey', 'resultsLink', 'resultsLink_block');
@@ -24,12 +24,12 @@ if ($groupHandler->isStaff()) {
     $this->setVar('studentLink_block', '');
 	$this->setVar('resultsLink_block', '');
     $this->parse('teacherLink_block', 'teacherLink');
-    $this->parse('createAssessment_block', 'createAssessment');
+    $this->parse('createSurvey_block', 'createSurvey');
 }
 else {
     $this->setVar('teacherLink_block', '');
     $this->parse('studentLink_block', 'studentLink');
-    $this->setVar('createAssessment_block', '');
+    $this->setVar('createSurvey_block', '');
 }
 
 if (is_array($allSurveys)) {

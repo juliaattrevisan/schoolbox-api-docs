@@ -113,7 +113,7 @@ $this->setVar(array(
     'ASSESS_TITLE' => $assess['title'],
     'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
     'ATTEMPT_START' => date('jS F Y, g:i:sa', $attemptStartTime),
-    'ATTEMPT_END' => $assess['duration'] == Assess::UNLIMITED_DURATION ? 'No particular time' : date('jS F Y, g:i:sa', $attemptEndTime),
+    'ATTEMPT_END' => $assess['duration'] == Survey::UNLIMITED_DURATION ? 'No particular time' : date('jS F Y, g:i:sa', $attemptEndTime),
     'SECTION_TITLE' => $section['title'],
     'SECTION_DESCRIPTION' => $section['description'],
 ));

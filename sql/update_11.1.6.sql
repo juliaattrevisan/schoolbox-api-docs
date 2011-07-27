@@ -90,8 +90,16 @@ INSERT INGORE INTO `error` (`id`, `message`) VALUES('50','You do not have permis
 INSERT INGORE INTO `error` (`id`, `message`) VALUES('52','This link is already shared in your ePortfolio.');
 INSERT IGNORE INTO `error` (`id`, `message`) VALUES('135','This is not a valid Assess Question XML.')
 
+/* Added availability for questions and assessments/surveys
+ */
 ALTER TABLE `assess_luQuestionType` ADD COLUMN `availability` ENUM('assess','survey','all') NULL AFTER `automated_marking`;
 UPDATE `assess_luQuestionType` SET `availability`='all' WHERE `type_id`='1';
 UPDATE `assess_luQuestionType` SET `availability`='all' WHERE `type_id`='2';
 UPDATE `assess_luQuestionType` SET `availability`='all' WHERE `type_id`='3';
 UPDATE `assess_luQuestionType` SET `availability`='all' WHERE `type_id`='4';
+
+ALTER TABLE `assess` ADD COLUMN `availability` ENUM('assess','survey') DEFAULT 'assess' NULL AFTER `allow_resit`;
+
+/* Survey homepage component
+ */
+INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`homepageCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) VALUES ( '44','1','outputSurvey','Surveys','Online surveys.','3','survey.html','','false','false');

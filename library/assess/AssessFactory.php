@@ -13,13 +13,7 @@ require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationFacto
 class AssessFactory extends EvaluationFactory {
 	protected $factoryName = 'Assess';
 
-	protected $questionSuperclassPath = '../library/evaluation/answerType';
-	protected $answerSuperclassPath = '../library/evaluation/answerType';
-
     protected $questionSubclassPath = '../library/assess/questionType';
     protected $answerSubclassPath = '../library/assess/answerType';
-
-	protected $questionPrefix = 'Question';
-    protected $answerPrefix = 'Answer';
 }
 ?>
