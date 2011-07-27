@@ -6,7 +6,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionStudent.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/include/time.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/Assess.php';
 
 $submission_box_handler = new Submission;
 
@@ -30,7 +30,7 @@ if(is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_POS
         $open_date->setTime($_POST['open_hour']+12, $_POST['open_minute']);
     else
         $open_date->setTime($_POST['open_hour'], $_POST['open_minute']);
-    
+
     if ($_POST['late_period'] == 'pm')
         $late_date->setTime($_POST['late_hour']+12, $_POST['late_minute']);
     else
@@ -57,7 +57,7 @@ if(is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_POS
     localRedir("/submission/listSubmission/");
 }
 else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour']) {
-    
+
     if( isset($_FILES['file']['name']) && $_FILES['file']['name'] ) {
         require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
@@ -106,7 +106,7 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
     if (!empty($_POST['accept_submission']) && $due_date > $late_date) {
         error(15);
     }
-    
+
     /* Create Submission Box */
     $submission_box = array(
         'category'          => $_POST['category'],

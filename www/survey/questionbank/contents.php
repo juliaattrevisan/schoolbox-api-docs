@@ -1,5 +1,5 @@
 <?php
-require_once('../library/assess/assess-questionbank.php');
+require_once('../library/assess/AssessQuestionBank.php');
 
 $this->setFile(TEMPLATE_content, 'assess/questionbank/contents.html');
 $this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');

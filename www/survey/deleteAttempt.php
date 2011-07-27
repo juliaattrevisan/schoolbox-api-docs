@@ -8,9 +8,9 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/survey.php');
-require_once('../library/survey/survey-attempt.php');
-require_once('../library/survey/survey-response.php');
+require_once('../library/survey/Survey.php');
+require_once('../library/survey/SurveyAttempt.php');
+require_once('../library/survey/SurveyResponse.php');
 require_once('../library/group.php');
 
 /* Get a list of questions and answers to softdelete

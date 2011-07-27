@@ -95,20 +95,18 @@ class AssessAnswer extends DeprecatedModel {
         /* If they have already responded to this question in this attempt,
          * then update existing row; otherwise create a new one
          */
-        $responseHandler = new AssessResponse();
-
-        $r = $responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
-        $response_id = $r['response_id'];
+        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $response_id = $existing['response_id'];
 
         if (is_numeric($response_id)) {
             $response['response_id'] = $response_id;
 
-            if ($responseHandler->update($response)) {
+            if ($this->responseHandler->update($response)) {
                 $result['response_id'] = $response_id;
             }
         }
         else {
-            $result['response_id'] = $responseHandler->create($response);
+            $result['response_id'] = $this->responseHandler->create($response);
         }
 
         /* Compile resultant object: contains the question_id which was just

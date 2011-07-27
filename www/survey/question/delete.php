@@ -8,9 +8,9 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../library/assess/assess.php';
-require_once '../library/assess/assess-factory.php';
-require_once '../library/assess/assess-section.php';
+require_once '../library/assess/Assess.php';
+require_once '../library/assess/AssessFactory.php';
+require_once '../library/assess/AssessSection.php';
 require_once('../library/group.php');
 
 $assessHandler = new Assess();

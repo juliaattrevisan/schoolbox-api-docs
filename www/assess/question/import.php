@@ -8,8 +8,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/assess-factory.php');
-require_once('../library/assess/assess-section.php');
+require_once('../library/assess/AssessFactory.php');
+require_once('../library/assess/AssessSection.php');
 
 if (!is_numeric($this->arg[0])) {
     error(18);

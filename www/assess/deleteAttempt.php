@@ -8,9 +8,9 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/assess.php');
-require_once('../library/assess/assess-attempt.php');
-require_once('../library/assess/assess-response.php');
+require_once('../library/assess/Assess.php');
+require_once('../library/assess/AssessAttempt.php');
+require_once('../library/assess/AssessResponse.php');
 require_once('../library/group.php');
 
 /* Get a list of questions and answers to softdelete

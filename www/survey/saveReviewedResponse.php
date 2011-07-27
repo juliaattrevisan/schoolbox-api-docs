@@ -8,9 +8,9 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/survey.php');
-require_once('../library/survey/survey-factory.php');
-require_once('../library/survey/survey-section.php');
+require_once('../library/survey/Survey.php');
+require_once('../library/survey/SurveyFactory.php');
+require_once('../library/survey/SurveySection.php');
 
 $assessHandler = new Survey();
 $questionHandler = new SurveyQuestion();

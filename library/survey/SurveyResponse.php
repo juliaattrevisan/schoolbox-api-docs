@@ -1,5 +1,5 @@
 <?php
-require_once('../library/assess/assess-response.php');
+require_once('../library/assess/AssessResponse.php');
 
 class SurveyResponse extends AssessResponse {
 }

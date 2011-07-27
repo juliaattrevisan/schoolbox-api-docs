@@ -7,8 +7,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/survey/survey.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/survey/survey-attempt.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/survey/Survey.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/survey/SurveyAttempt.php';
 
 $assessHandler = new Survey();
 $attemptHandler = new SurveyAttempt();

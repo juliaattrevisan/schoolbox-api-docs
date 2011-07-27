@@ -7,11 +7,11 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/assess.php');
-require_once('../library/assess/assess-section.php');
-require_once('../library/assess/assess-question.php');
-require_once('../library/assess/assess-answer.php');
-require_once('../library/assess/assess-questionbank.php');
+require_once('../library/assess/Assess.php');
+require_once('../library/assess/AssessSection.php');
+require_once('../library/assess/AssessQuestion.php');
+require_once('../library/assess/AssessAnswer.php');
+require_once('../library/assess/AssessQuestionBank.php');
 require_once('../library/group.php');
 
 $groupHandler = new Group();

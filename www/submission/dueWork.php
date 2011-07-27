@@ -228,7 +228,7 @@ $j = 0;
 
 if(count($allWork) > 0) {
     foreach($allWork as $currentWork) {
-        
+
         if ($currentWork['status'] == UPCOMING_WORK_TYPE) {
 
             if (!$currentWork['accept_submission']) {
@@ -251,7 +251,7 @@ if(count($allWork) > 0) {
                 $status = 'Open date approaching';
                 $action = 'View Details';
             }
-            
+
         } elseif ($currentWork['status'] == AWAITING_WORK_TYPE) {
             $action = 'View Details';
 
@@ -266,7 +266,7 @@ if(count($allWork) > 0) {
             if (!empty($currentWork['mark'])) {
                 $status = 'Work marked';
             } else {
-                $status = 'Work returned';                
+                $status = 'Work returned';
             }
         }
 
@@ -284,7 +284,7 @@ if(count($allWork) > 0) {
         $this->parse('work_block', 'work', true);
 
     }
-    
+
 }
 else {
     $this->setVar('work_block','');
@@ -293,10 +293,10 @@ else {
 
 /* Online Assessments
  */
-require_once(SITE_root . '/library/assess/assess.php');
-require_once(SITE_root . '/library/assess/assess-attempt.php');
-require_once(SITE_root . '/library/assess/assess-response.php');
-require_once(SITE_root . '/library/assess/assess-section.php');
+require_once(SITE_root . '/library/assess/Assess.php');
+require_once(SITE_root . '/library/assess/AssessAttempt.php');
+require_once(SITE_root . '/library/assess/AssessResponse.php');
+require_once(SITE_root . '/library/assess/AssessSection.php');
 
 $this->setBlock(TEMPLATE_content, 'allAssess', 'allAssess_block');
 $this->setBlock('allAssess', 'attempt', 'attempt_block');

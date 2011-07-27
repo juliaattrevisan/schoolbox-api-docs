@@ -1,7 +1,7 @@
 <?php
-require_once SITE_root.'/library/assess/assess.php';
-require_once SITE_root.'/library/assess/assess-attempt.php';
-require_once SITE_root.'/library/assess/assess-section.php';
+require_once SITE_root . '/library/assess/Assess.php';
+require_once SITE_root . '/library/assess/AssessAttempt.php';
+require_once SITE_root . '/library/assess/AssessSection.php';
 
 $this->setBlock($componentHandle, 'assess', 'assess_block');
 $this->setBlock($componentHandle, 'createAssessment', 'createAssessment_block');

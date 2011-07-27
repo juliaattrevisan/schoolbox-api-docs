@@ -5,11 +5,11 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionReturn.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess-attempt.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess-section.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess-response.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess-factory.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/Assess.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessAttempt.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessSection.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessResponse.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessFactory.php');
 
 $subHandler = new Submission;
 $retHandler = new SubmissionReturn();

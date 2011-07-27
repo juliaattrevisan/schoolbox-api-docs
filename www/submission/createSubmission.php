@@ -111,7 +111,7 @@ else if($this->arg[0] == 'new') {
 
 	/* Exclude online assessment type
 	 */
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/Assess.php';
 
 	$types = $subBoxHandler->getTypesExcept(array(Assess::ONLINE_ASSESSMENT_TYPE_ID));
 

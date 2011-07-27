@@ -1,5 +1,5 @@
 <?php
-require_once('../library/assess/assess-factory.php');
+require_once('../library/assess/AssessFactory.php');
 
 class SurveyFactory extends AssessFactory {
 	protected $factoryName = 'Survey';

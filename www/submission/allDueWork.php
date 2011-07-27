@@ -155,10 +155,10 @@ else {
 
 /* Online Assessments
  */
-require_once(SITE_root . '/library/assess/assess.php');
-require_once(SITE_root . '/library/assess/assess-attempt.php');
-require_once(SITE_root . '/library/assess/assess-response.php');
-require_once(SITE_root . '/library/assess/assess-section.php');
+require_once(SITE_root . '/library/assess/Assess.php');
+require_once(SITE_root . '/library/assess/AssessAttempt.php');
+require_once(SITE_root . '/library/assess/AssessResponse.php');
+require_once(SITE_root . '/library/assess/AssessSection.php');
 
 $this->setBlock(TEMPLATE_content, 'allAssess', 'allAssess_block');
 $this->setBlock('allAssess', 'attempt', 'attempt_block');

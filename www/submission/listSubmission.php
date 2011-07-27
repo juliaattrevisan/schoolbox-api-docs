@@ -1,8 +1,8 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/assess-attempt.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/Assess.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessAttempt.php';
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 

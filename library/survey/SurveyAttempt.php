@@ -1,5 +1,5 @@
 <?php
-require_once('../library/assess/assess-attempt.php');
+require_once('../library/assess/AssessAttempt.php');
 
 class SurveyAttempt extends AssessAttempt {
 }

@@ -7,10 +7,10 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/assess.php');
-require_once('../library/assess/assess-attempt.php');
-require_once('../library/assess/assess-question.php');
-require_once('../library/assess/assess-response.php');
+require_once('../library/assess/Assess.php');
+require_once('../library/assess/AssessAttempt.php');
+require_once('../library/assess/AssessQuestion.php');
+require_once('../library/assess/AssessResponse.php');
 
 $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();

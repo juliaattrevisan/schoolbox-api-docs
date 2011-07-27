@@ -7,10 +7,10 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/survey.php');
-require_once('../library/survey/survey-attempt.php');
-require_once('../library/survey/survey-question.php');
-require_once('../library/survey/survey-response.php');
+require_once('../library/survey/Survey.php');
+require_once('../library/survey/SurveyAttempt.php');
+require_once('../library/survey/SurveyQuestion.php');
+require_once('../library/survey/SurveyResponse.php');
 
 $assessHandler = new Survey();
 $attemptHandler = new SurveyAttempt();
