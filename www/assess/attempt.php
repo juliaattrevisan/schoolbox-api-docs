@@ -9,16 +9,18 @@
  * @version     SVN: $Id$
  */
 require_once('../library/assess/Assess.php');
-require_once('../library/assess/AssessFactory.php');
 require_once('../library/assess/AssessSection.php');
+require_once('../library/assess/AssessQuestion.php');
+require_once('../library/assess/AssessFactory.php');
 require_once('../library/assess/AssessAttempt.php');
+require_once('../library/assess/AssessResponse.php');
 
-$factory = new AssessFactory();
 $assessHandler = new Assess();
-$attemptHandler = new AssessAttempt();
-$responseHandler = new AssessResponse();
 $sectionHandler = new AssessSection();
 $questionHandler = new AssessQuestion();
+$factory = new AssessFactory();
+$attemptHandler = new AssessAttempt();
+$responseHandler = new AssessResponse();
 
 if (!is_numeric($this->arg[0])) {
     error(112);

@@ -9,16 +9,18 @@
  * @version     SVN: $Id$
  */
 require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveyFactory.php');
 require_once('../library/survey/SurveySection.php');
+require_once('../library/survey/SurveyQuestion.php');
+require_once('../library/survey/SurveyFactory.php');
 require_once('../library/survey/SurveyAttempt.php');
+require_once('../library/survey/SurveyResponse.php');
 
-$factory = new SurveyFactory();
 $assessHandler = new Survey();
-$attemptHandler = new SurveyAttempt();
-$responseHandler = new SurveyResponse();
 $sectionHandler = new SurveySection();
 $questionHandler = new SurveyQuestion();
+$factory = new SurveyFactory();
+$attemptHandler = new SurveyAttempt();
+$responseHandler = new SurveyResponse();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -82,7 +84,7 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
  */
 if ($assess['allow_resit'] == 1) {
-    if (!(($assess['duration'] == Assess::UNLIMITED_DURATION) || (strtotime($assess['finish']) > time()))) {
+    if (!(($assess['duration'] == Survey::UNLIMITED_DURATION) || (strtotime($assess['finish']) > time()))) {
         error(120);
     }
 }
@@ -90,7 +92,7 @@ else {
     if ($attemptHandler->isComplete($assess['assess_id'])) {
         error(121);
     }
-    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess::UNLIMITED_DURATION)) {
+    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Survey::UNLIMITED_DURATION)) {
         error(122);
     }
 }
@@ -125,11 +127,11 @@ $this->setVar(array(
 if (!$responseHandler->numStubResponsesInSection($_SESSION['attempt_id'], $section['section_id'])) {
     if ($section['random'] == 1) {
         $pool = $section['pool'];
-        $randomise = AssessResponse::RANDOMISE_QUESTIONS;
+        $randomise = SurveyResponse::RANDOMISE_QUESTIONS;
     }
     else {
         $pool = 0;
-        $randomise = AssessResponse::ORDERED_QUESTIONS;
+        $randomise = SurveyResponse::ORDERED_QUESTIONS;
     }
 
     $responseHandler->assignQuestions($_SESSION['attempt_id'], $section['section_id'], $pool, $randomise);
