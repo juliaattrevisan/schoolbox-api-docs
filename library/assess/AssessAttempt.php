@@ -10,7 +10,7 @@
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationAttempt.php');
 
 class AssessAttempt extends EvaluationAttempt {
-    protected $_table = 'assess_attempt';
-    protected $_index = 'attempt_id';
+    public $_table = 'assess_attempt';
+    public $_index = 'attempt_id';
 }
 ?>

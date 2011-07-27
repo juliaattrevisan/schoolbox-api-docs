@@ -11,8 +11,8 @@
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationSection.php');
 
 class AssessSection extends EvaluationSection {
-    protected $_table = 'assess_section';
-    protected $_index = 'section_id';
+    public $_table = 'assess_section';
+    public $_index = 'section_id';
 
     /* A const to determine whether to include sections in getContents
      */

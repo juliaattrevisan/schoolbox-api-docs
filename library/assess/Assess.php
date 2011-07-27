@@ -40,8 +40,8 @@
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/Evaluation.php');
 
 class Assess extends Evaluation {
-    protected $_table = 'assess';
-    protected $_index = 'assess_id';
+    public $_table = 'assess';
+    public $_index = 'assess_id';
 
     const ONLINE_ASSESSMENT_TYPE_ID = 11;
     const UNLIMITED_DURATION = -1;

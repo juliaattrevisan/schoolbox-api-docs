@@ -10,8 +10,8 @@
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationResponse.php');
 
 class SurveyResponse extends EvaluationResponse {
-    protected $_table = 'assess_response';
-    protected $_index = 'response_id';
+    public $_table = 'assess_response';
+    public $_index = 'response_id';
 
     /* A const to determine whether to randomise questions
      */
