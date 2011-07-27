@@ -14,6 +14,11 @@ require_once('../library/assess/AssessAnswer.php');
 require_once('../library/assess/AssessQuestionBank.php');
 require_once('../library/group.php');
 
+$assessHandler = new Assess();
+$sectionHandler = new AssessSection();
+$questionHandler = new AssessQuestion();
+$answerHandler = new AssessAnswer();
+$questionBankHandler = new AssessQuestionBank();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -26,7 +31,6 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
 	/* Find out if you are the owner of the section before adding
 	 * Find out if the section exists first
 	 */
-	$sectionHandler = new AssessSection();
 	$section = $sectionHandler->getByID($section_id);
 
 	/* Check if the section exists
@@ -35,7 +39,6 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
 		error(1);
 	}
 
-	$assessHandler = new Assess();
 	$assess = $assessHandler->getByID($section['assess_id']);
 
 	/* Check if online assessment exists. If it does, check if you own it
@@ -45,10 +48,6 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
 	}
 
 	if ($assess['user_id'] == $_SESSION['id']) {
-		$questionBankHandler = new AssessQuestionBank();
-		$questionHandler = new AssessQuestion();
-		$answerHandler = new AssessAnswer();
-
 		$allQuestionBankIDs = $_POST['question_bank_id'];
 
 		foreach($allQuestionBankIDs as $currentQuestionBankID) {

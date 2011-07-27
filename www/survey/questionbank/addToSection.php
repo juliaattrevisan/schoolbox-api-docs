@@ -7,13 +7,18 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/Assess.php');
-require_once('../library/assess/AssessSection.php');
-require_once('../library/assess/AssessQuestion.php');
-require_once('../library/assess/AssessAnswer.php');
-require_once('../library/assess/AssessQuestionBank.php');
+require_once('../library/survey/Survey.php');
+require_once('../library/survey/SurveySection.php');
+require_once('../library/survey/SurveyQuestion.php');
+require_once('../library/survey/SurveyAnswer.php');
+require_once('../library/survey/SurveyQuestionBank.php');
 require_once('../library/group.php');
 
+$assessHandler = new Survey();
+$sectionHandler = new SurveySection();
+$questionHandler = new SurveyQuestion();
+$answerHandler = new SurveyAnswer();
+$questionBankHandler = new SurveyQuestionBank();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -26,7 +31,6 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
 	/* Find out if you are the owner of the section before adding
 	 * Find out if the section exists first
 	 */
-	$sectionHandler = new AssessSection();
 	$section = $sectionHandler->getByID($section_id);
 
 	/* Check if the section exists
@@ -35,7 +39,6 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
 		error(1);
 	}
 
-	$assessHandler = new Assess();
 	$assess = $assessHandler->getByID($section['assess_id']);
 
 	/* Check if online assessment exists. If it does, check if you own it
@@ -45,10 +48,6 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
 	}
 
 	if ($assess['user_id'] == $_SESSION['id']) {
-		$questionBankHandler = new AssessQuestionBank();
-		$questionHandler = new AssessQuestion();
-		$answerHandler = new AssessAnswer();
-
 		$allQuestionBankIDs = $_POST['question_bank_id'];
 
 		foreach($allQuestionBankIDs as $currentQuestionBankID) {
