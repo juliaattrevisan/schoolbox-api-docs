@@ -1,6 +1,6 @@
 <?php
 
-class AssessQuestionBank extends DeprecatedModel {
+abstract class EvaluationQuestionBank extends DeprecatedModel {
     public $_table = 'assess_question_bank';
     public $_index = 'question_bank_id';
 

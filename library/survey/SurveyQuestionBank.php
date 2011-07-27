@@ -1,7 +1,9 @@
 <?php
-require_once('../library/assess/AssessQuestionBank.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationQuestionBank.php');
 
-class SurveyQuestionBank extends AssessQuestionBank {
+class SurveyQuestionBank extends EvaluationQuestionBank {
+    protected $_table = 'assess_question_bank';
+    protected $_index = 'question_bank_id';
 }
-
 ?>
+
