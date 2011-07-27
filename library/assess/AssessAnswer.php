@@ -8,6 +8,7 @@
  * @version     SVN: $Id$
  */
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationAnswer.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessResponse.php');
 
 class AssessAnswer extends EvaluationAnswer {
     public $_table = 'assess_answer';

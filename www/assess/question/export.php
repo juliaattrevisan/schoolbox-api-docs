@@ -9,6 +9,7 @@
  * @version     SVN: $Id$
  */
 require_once('../library/assess/AssessFactory.php');
+require_once('../library/assess/AssessQuestion.php');
 
 $factory = new AssessFactory();
 $questionHandler = new AssessQuestion();

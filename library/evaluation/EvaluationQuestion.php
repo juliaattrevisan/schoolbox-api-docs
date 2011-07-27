@@ -15,6 +15,10 @@ abstract class EvaluationQuestion extends DeprecatedModel {
 
     private $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question', 'deleted_at');
 
+	public function __construct() {
+		parent::DeprecatedModel();
+	}
+
     /**
      * Creates a Question.
      *
@@ -131,9 +135,7 @@ abstract class EvaluationQuestion extends DeprecatedModel {
      * @param <type> $section_id
      */
     public function resequenceQuestionsAfterDelete($assess_id, $section_id) {
-        $sectionHandler = new AssessSection();
-
-        $allQuestions = $sectionHandler->getContents($assess_id, $section_id, true);
+        $allQuestions = $this->sectionHandler->getContents($assess_id, $section_id, true);
 
         if(is_array($allQuestions) && count($allQuestions)) {
             $newSequence = 1;

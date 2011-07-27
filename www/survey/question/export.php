@@ -8,10 +8,11 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/AssessFactory.php');
+require_once('../library/survey/SurveyFactory.php');
+require_once('../library/survey/SurveyQuestion.php');
 
-$factory = new AssessFactory();
-$questionHandler = new AssessQuestion();
+$factory = new SurveyFactory();
+$questionHandler = new SurveyQuestion();
 
 $currentQuestion = $questionHandler->getById($this->arg[0]);
 
@@ -21,7 +22,7 @@ if (!$currentQuestion) {
 
 /* Set up template
  */
-$this->setFile('xml', 'assess/question/exportToMoodle.html');
+$this->setFile('xml', 'survey/question/exportToMoodle.html');
 $this->setBlock('xml', 'answerInputs', 'answerInputs_block');
 
 /* This if() clause allows for sections containing no questions.
@@ -32,7 +33,7 @@ if ($currentQuestion['type_id']) {
 
 	/* Load answer template into answerOption block
 	 */
-	$this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/exportToMoodle.html');
+	$this->setFile('answerFormFragment', 'survey/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/exportToMoodle.html');
 	$this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
 	$this->setVar(array(

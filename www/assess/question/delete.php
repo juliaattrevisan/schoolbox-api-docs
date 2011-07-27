@@ -9,7 +9,8 @@
  * @version     SVN: $Id$
  */
 require_once '../library/assess/Assess.php';
-require_once '../library/assess/AssessFactory.php';
+require_once '../library/assess/AssessQuestion.php';
+require_once '../library/assess/AssessAnswer.php';
 require_once '../library/assess/AssessSection.php';
 require_once('../library/group.php');
 
@@ -55,8 +56,6 @@ $answerHandler->update(array(
 
 /* Reorder questions because sequence corresponds to question number
  */
-$sectionHandler = new AssessSection();
-
 $section = $sectionHandler->getByID($question['section_id']);
 
 $questionHandler->resequenceQuestionsAfterDelete($section['assess_id'], $section['section_id']);

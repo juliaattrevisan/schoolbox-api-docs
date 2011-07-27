@@ -9,9 +9,31 @@
  * @version     SVN: $Id$
  */
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationQuestion.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessSection.php');
 
 class AssessQuestion extends EvaluationQuestion {
     public $_table = 'assess_question';
     public $_index = 'question_id';
+
+	public function __construct() {
+		parent::__construct();
+
+		$this->sectionHandler = new AssessSection();
+	}
+
+    /**
+     * Get all available question types.
+     *
+     * @return <type>
+     */
+    public function getAllQuestionTypes() {
+        $query = "SELECT *
+                  FROM assess_luQuestionType
+                  WHERE availability = 'all'
+                  OR availability = 'assess'
+                  ORDER BY type_id";
+
+        return $this->db->getAll($query);
+    }
 }
 ?>

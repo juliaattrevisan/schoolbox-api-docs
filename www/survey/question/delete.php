@@ -8,15 +8,16 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../library/assess/Assess.php';
-require_once '../library/assess/AssessFactory.php';
-require_once '../library/assess/AssessSection.php';
+//require_once '../library/survey/Survey.php';
+require_once '../library/survey/SurveyQuestion.php';
+require_once '../library/survey/SurveyAnswer.php';
+require_once '../library/survey/SurveySection.php';
 require_once('../library/group.php');
 
-$assessHandler = new Assess();
-$questionHandler = new AssessQuestion();
-$answerHandler = new AssessAnswer();
-$sectionHandler = new AssessSection();
+$assessHandler = new Survey();
+$questionHandler = new SurveyQuestion();
+$answerHandler = new SurveyAnswer();
+$sectionHandler = new SurveySection();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -55,11 +56,9 @@ $answerHandler->update(array(
 
 /* Reorder questions because sequence corresponds to question number
  */
-$sectionHandler = new AssessSection();
-
 $section = $sectionHandler->getByID($question['section_id']);
 
 $questionHandler->resequenceQuestionsAfterDelete($section['assess_id'], $section['section_id']);
 
-localRedir('/assess/modify/' . $section['assess_id']);
+localRedir('/survey/modify/' . $section['assess_id']);
 ?>

@@ -1,5 +1,6 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationAnswer.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/survey/SurveyResponse.php');
 
 class SurveyAnswer extends EvaluationAnswer {
     public $_table = 'assess_answer';

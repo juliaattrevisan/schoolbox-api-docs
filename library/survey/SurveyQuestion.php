@@ -9,10 +9,17 @@
  * @version     SVN: $Id$
  */
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationQuestion.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/survey/SurveySection.php');
 
 class SurveyQuestion extends EvaluationQuestion {
     public $_table = 'assess_question';
     public $_index = 'question_id';
+
+	public function __construct() {
+		parent::__construct();
+
+		$this->sectionHandler = new SurveySection();
+	}
 
     /**
      * Get all available question types.
