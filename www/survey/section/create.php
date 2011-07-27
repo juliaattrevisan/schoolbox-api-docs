@@ -8,8 +8,8 @@
  * @version     SVN: $Id$
  */
 require_once '../library/survey/Survey.php';
-require_once '../library/survey/SurveyQuestion.php';
 require_once '../library/survey/SurveySection.php';
+require_once '../library/survey/SurveyQuestion.php';
 require_once '../library/group.php';
 
 $assessHandler = new Survey();
@@ -30,8 +30,8 @@ if (!empty($_POST)) {
 
     /* Create new Section
      */
-    $section = new SurveySection();
-    $section_id = $section->create($_POST);
+    $sectionHandler = new SurveySection();
+    $section_id = $sectionHandler->create($_POST);
 
     /* Redirect to question creation for this section
      */
@@ -53,7 +53,6 @@ else {
     /* Find out whether the test exists to which you are attempting to add a
      * new Section
      */
-    $assessHandler = new Survey();
     $assess = $assessHandler->getByID($this->arg[0]);
 
     if (empty($assess)) {
@@ -66,13 +65,13 @@ else {
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setTitle('Create Section');
 
-    $section = new SurveySection();
+    $sectionHandler = new SurveySection();
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $this->arg[0],
         'ASSESS_TITLE' => $assess['title'],
         'SECTION_ID' => '',
-        'SEQUENCE' => $section->getNextSequence($this->arg[0])
+        'SEQUENCE' => $sectionHandler->getNextSequence($this->arg[0])
     ));
 
     /* Show this Assess' contents
@@ -81,7 +80,6 @@ else {
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assessHandler = new Survey();
     $assessHandler->renderAssessContents($assess['assess_id'], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
