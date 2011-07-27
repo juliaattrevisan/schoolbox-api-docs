@@ -44,6 +44,7 @@ $this->setVar(array(
     'ASSESS_FINISH' => $assess['finish'],
     'ASSESS_DURATION' => $assess['duration'],
     'ASSESS_ALLOW_RESIT' => $assess['allow_resit'],
+	'ASSESS_AVAILABILITY' => $assess['availability'],
 ));
 
 $allSections = $sectionHandler->getList($this->arg[0]);

@@ -12,7 +12,6 @@ abstract class AnswerRadio extends EvaluationAnswer {
     const CORRECT_CLASS = 'multiCorrect';
     const INCORRECT_CLASS = 'multiIncorrect';
 
-
     /**
      * Creates an Answer. This is used when creating Questions and Answers in
      * the setup phase.

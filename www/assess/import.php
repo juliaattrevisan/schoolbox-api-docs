@@ -9,8 +9,10 @@
  * @version     SVN: $Id$
  */
 require_once('../library/assess/Assess.php');
-require_once('../library/assess/AssessFactory.php');
 require_once('../library/assess/AssessSection.php');
+require_once('../library/assess/AssessQuestion.php');
+require_once('../library/assess/AssessAnswer.php');
+require_once('../library/assess/AssessFactory.php');
 
 if (!is_numeric($this->arg[0])) {
     error(18);
@@ -23,9 +25,9 @@ else {
     error(134);
 }
 
-$factory = new AssessFactory();
 $assessHandler = new Assess();
 $sectionHandler = new AssessSection();
+$factory = new AssessFactory();
 
 $xml = simplexml_load_string($data);
 
@@ -33,14 +35,15 @@ $xml = simplexml_load_string($data);
  */
 $assess_id = $assessHandler->create(array(
     'category_id' => scrubTEXT($this->arg[0]),
-    'user_id'     => $_SESSION['id'],
-    'title'       => scrubTEXT($xml->title),
+    'user_id' => $_SESSION['id'],
+    'title' => scrubTEXT($xml->title),
     'description' => scrubTEXT($xml->description),
-    'start'       => scrubTEXT($xml->start),
-    'finish'      => scrubTEXT($xml->finish),
-    'duration'    => scrubTEXT($xml->duration),
+    'start' => scrubTEXT($xml->start),
+    'finish' => scrubTEXT($xml->finish),
+    'duration' => scrubTEXT($xml->duration),
     'allow_resit' => scrubTEXT($xml->allow_resit),
-    'created_at'  => 'NOW()',
+	'availability' => scrubTEXT($xml->availability),
+    'created_at' => 'NOW()',
 ));
 
 if (!$assess_id) {

@@ -12,6 +12,15 @@ class AssessAnswerMulti extends AnswerMulti {
     const CORRECT_CLASS = 'multiCorrect';
     const INCORRECT_CLASS = 'multiIncorrect';
 
+	/**
+	 * Get an instance of a responseHandler upon instantiation
+	 */
+    public function __construct() {
+        parent::__construct();
+
+        $this->responseHandler = new AssessResponse();
+    }
+
 	/*
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.

@@ -9,8 +9,10 @@
  * @version     SVN: $Id$
  */
 require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveyFactory.php');
 require_once('../library/survey/SurveySection.php');
+require_once('../library/survey/SurveyQuestion.php');
+require_once('../library/survey/SurveyAnswer.php');
+require_once('../library/survey/SurveyFactory.php');
 
 if (!is_numeric($this->arg[0])) {
     error(18);
@@ -23,9 +25,9 @@ else {
     error(134);
 }
 
-$factory = new SurveyFactory();
 $assessHandler = new Survey();
 $sectionHandler = new SurveySection();
+$factory = new SurveyFactory();
 
 $xml = simplexml_load_string($data);
 
@@ -33,14 +35,15 @@ $xml = simplexml_load_string($data);
  */
 $assess_id = $assessHandler->create(array(
     'category_id' => scrubTEXT($this->arg[0]),
-    'user_id'     => $_SESSION['id'],
-    'title'       => scrubTEXT($xml->title),
+    'user_id' => $_SESSION['id'],
+    'title' => scrubTEXT($xml->title),
     'description' => scrubTEXT($xml->description),
-    'start'       => scrubTEXT($xml->start),
-    'finish'      => scrubTEXT($xml->finish),
-    'duration'    => scrubTEXT($xml->duration),
+    'start' => scrubTEXT($xml->start),
+    'finish' => scrubTEXT($xml->finish),
+    'duration' => scrubTEXT($xml->duration),
     'allow_resit' => scrubTEXT($xml->allow_resit),
-    'created_at'  => 'NOW()',
+	'availability' => scrubTEXT($xml->availability),
+    'created_at' => 'NOW()',
 ));
 
 if (!$assess_id) {
