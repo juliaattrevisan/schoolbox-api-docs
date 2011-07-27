@@ -72,7 +72,7 @@ $this->setBlock(TEMPLATE_content, 'error', 'error_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
 $this->setVar(array(
-    'ASSESS_DURATION' => $assess['duration'] == Assess::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
+    'ASSESS_DURATION' => $assess['duration'] == Survey::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 
 /* Section list and question count
@@ -110,7 +110,7 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
  */
 if ($assessHandler->allowResit($this->arg[0])) {
-    if (!(($assess['duration'] == Assess::UNLIMITED_DURATION) || (strtotime($assess['finish']) > time()))) {
+    if (!(($assess['duration'] == Survey::UNLIMITED_DURATION) || (strtotime($assess['finish']) > time()))) {
         $this->setVar(array(
             'ERROR_STRING' => 'This online assessment has expired.'
         ));
@@ -165,34 +165,4 @@ else {
         $this->setVar('error_block', '');
     }
 }
-
-///* Check if this assess expired
-// */
-//if (strtotime($assess['finish']) < time()) {
-//    $this->setVar(array(
-//        'ERROR_STRING' => 'This online assessment has expired.'
-//    ));
-//
-//    $this->setVar('startTest_block', '');
-//    $this->parse('error_block', 'error');
-//}
-///* If you have made an attempt on this test, or are in the process of attempting,
-// * don't reset the attempt id if you aren't allowed to resit. This prevents
-// * people from resetting the timer by revisiting the intro screen repeatedly.
-// */
-//else {
-//    if (!$attemptHandler->userHasAttempted($this->arg[0], $_SESSION['id']) || $assessHandler->allowResit($this->arg[0])) {
-//        $_SESSION['attempt_id'] = '';
-//
-//        $this->setVar('error_block', '');
-//    }
-//    else {
-//        $this->setVar(array(
-//            'ERROR_STRING' => 'You have already attempted this online assessment and cannot re-sit it.'
-//        ));
-//
-//        $this->setVar('startTest_block', '');
-//        $this->parse('error_block', 'error');
-//    }
-//}
 ?>
