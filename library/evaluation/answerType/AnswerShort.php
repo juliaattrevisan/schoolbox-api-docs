@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-abstract class AnswerShort extends AssessAnswer {
+abstract class AnswerShort extends EvaluationAnswer {
 
     /**
      * Creates an Answer. This is used when creating Questions and Answers in

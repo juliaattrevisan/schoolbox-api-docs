@@ -8,11 +8,13 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationQuestion.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationAnswer.php');
 
 abstract class EvaluationFactory extends DeprecatedModel {
 	protected $factoryName = 'Assess';
 
-	protected $questionSuperclassPath = '../library/evaluation/answerType';
+	protected $questionSuperclassPath = '../library/evaluation/questionType';
 	protected $answerSuperclassPath = '../library/evaluation/answerType';
 
     protected $questionSubclassPath = '../library/assess/questionType';
@@ -63,6 +65,7 @@ abstract class EvaluationFactory extends DeprecatedModel {
 				$superclassFile = $_SERVER['DOCUMENT_ROOT'] . "/$superclassPath/{$superclass}.php";
                 $subclassFile = $_SERVER['DOCUMENT_ROOT'] . "/$subclassPath/{$subclass}.php";
 
+				echo "$superclassFile $subclassFile";
                 /* Instantiate specific question model
                  */
                 if (!is_readable($superclassFile) || !is_readable($subclassFile)) {

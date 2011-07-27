@@ -14,5 +14,14 @@ class AssessAnswer extends EvaluationAnswer {
     public $_index = 'answer_id';
 
     protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer', 'deleted_at');
+
+	/**
+	 * Get an instance of a responseHandler upon instantiation
+	 */
+    public function __construct() {
+        parent::__construct();
+
+        $this->responseHandler = new AssessResponse();
+    }
 }
 ?>

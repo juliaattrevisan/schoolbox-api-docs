@@ -1,5 +1,5 @@
 <?php
 
-abstract class QuestionRadio extends AssessQuestion {
+abstract class QuestionRadio extends EvaluationQuestion {
 }
 ?>

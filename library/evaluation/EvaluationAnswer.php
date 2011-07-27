@@ -8,11 +8,6 @@
  * @version     SVN: $Id$
  */
 
-/**
- * Description of AssessQuestion class
- *
- * @author aetworowsky
- */
 abstract class EvaluationAnswer extends DeprecatedModel {
     public $_table = 'assess_answer';
     public $_index = 'answer_id';
@@ -21,12 +16,10 @@ abstract class EvaluationAnswer extends DeprecatedModel {
     protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer', 'deleted_at');
 
 	/**
-	 * Get an instance of a responseHandler upon instantiation
+	 * Run parent constructor
 	 */
     public function __construct() {
         parent::DeprecatedModel();
-
-        $this->responseHandler = new AssessResponse();
     }
 
     /**

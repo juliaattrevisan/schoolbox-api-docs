@@ -1,5 +1,5 @@
 <?php
 
-abstract class QuestionMulti extends AssessQuestion {
+abstract class QuestionMulti extends EvaluationQuestion {
 }
 ?>

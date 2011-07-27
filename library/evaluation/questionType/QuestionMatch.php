@@ -1,5 +1,5 @@
 <?php
 
-class QuestionMatch extends AssessQuestion {
+class QuestionMatch extends EvaluationQuestion {
 }
 ?>

@@ -8,7 +8,9 @@
  * @version     SVN: $Id$
  */
 
-abstract class AnswerRadio extends AssessAnswer {
+abstract class AnswerRadio extends EvaluationAnswer {
+    const CORRECT_CLASS = 'multiCorrect';
+    const INCORRECT_CLASS = 'multiIncorrect';
 
     /**
      * Automatically marks a response. Customised to be applicable to the way in

@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-abstract class AnswerFillgap extends AssessAnswer {
+abstract class AnswerFillgap extends EvaluationAnswer {
 
     /* HTML input element prefix used in conjunction with a question_id to
      * differentiate this Fillgap's inputs from other Fillgap inputs that might

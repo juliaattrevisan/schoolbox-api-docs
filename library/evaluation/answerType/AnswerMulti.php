@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-abstract class AnswerMulti extends AssessAnswer {
+abstract class AnswerMulti extends EvaluationAnswer {
     const CORRECT_CLASS = 'multiCorrect';
     const INCORRECT_CLASS = 'multiIncorrect';
 

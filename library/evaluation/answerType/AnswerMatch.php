@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-abstract class AnswerMatch extends AssessAnswer {
+abstract class AnswerMatch extends EvaluationAnswer {
     const CORRECT_CLASS = 'matchCorrect';
     const INCORRECT_CLASS = 'matchIncorrect';
 

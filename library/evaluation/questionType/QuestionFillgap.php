@@ -1,5 +1,5 @@
 <?php
 
-abstract class QuestionFillgap extends AssessQuestion {
+abstract class QuestionFillgap extends EvaluationQuestion {
 }
 ?>
