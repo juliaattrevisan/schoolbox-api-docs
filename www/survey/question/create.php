@@ -16,6 +16,7 @@ require_once('../library/survey/Survey.php');
 require_once('../library/survey/SurveySection.php');
 require_once('../library/survey/SurveyQuestion.php');
 require_once('../library/survey/SurveyFactory.php');
+require_once('../library/survey/SurveyResponse.php');
 require_once('../library/group.php');
 
 $assessHandler = new Survey();
