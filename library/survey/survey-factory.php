@@ -7,6 +7,8 @@ class SurveyFactory extends AssessFactory {
 
     protected $answerLibraryPath = '../library/survey/answerType';
     protected $answerPrefix = 'SurveyAnswer';
+
+	protected $filePrefix = 'survey';
 }
 
 ?>

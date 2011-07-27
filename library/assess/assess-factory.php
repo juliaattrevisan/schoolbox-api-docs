@@ -10,11 +10,13 @@
  */
 
 class AssessFactory extends DeprecatedModel {
+	protected $factoryName = 'Assess';
+
     protected $questionLibraryPath = '../library/assess/questionType';
-    protected $questionPrefix = 'AssessQuestion';
+    protected $questionPrefix = 'Question';
 
     protected $answerLibraryPath = '../library/assess/answerType';
-    protected $answerPrefix = 'AssessAnswer';
+    protected $answerPrefix = 'Answer';
 
     /**
      * Spawn a Question type.
@@ -46,26 +48,35 @@ class AssessFactory extends DeprecatedModel {
         if (is_numeric($type_id)) {
             $type = $this->getQuestionType($type_id);
 
+			/* If a type was detected, include superclass and subclass, e.g.
+			 *
+			 * $superclass is in the format "AnswerMulti"
+			 * $subclass is in the format "AssessAnswerMulti"
+			 */
             if ($type) {
-                $file = $_SERVER['DOCUMENT_ROOT'] . "/$path/{$type}.php";
-                $class = $prefix . ucfirst($type);
+				$superclass = $prefix . ucfirst($type);
+				$subclass = $this->factoryName . $superclass;
+
+				$superclassFile = $_SERVER['DOCUMENT_ROOT'] . "/$path/{$superclass}.php";
+                $subclassFile = $_SERVER['DOCUMENT_ROOT'] . "/$path/{$subclass}.php";
 
                 /* Instantiate specific question model
                  */
-                if (!is_readable($file)) {
-                    error();
+                if (!is_readable($superclassFile) || !is_readable($subclassFile)) {
+                    error(133);
                 }
 
-                require_once($file);
+				require_once($superclassFile);
+                require_once($subclassFile);
 
-                return new $class;
+                return new $subclass;
             }
             else {
-                error();
+                error(133);
             }
         }
         else {
-            error();
+            error(133);
         }
 
         return false;

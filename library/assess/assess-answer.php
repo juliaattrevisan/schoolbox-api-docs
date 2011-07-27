@@ -20,8 +20,6 @@ class AssessAnswer extends DeprecatedModel {
 
     protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer', 'deleted_at');
 
-    private $templatePath = '../templates/core/assess/answer';
-
 	/**
 	 * Get an instance of a responseHandler upon instantiation
 	 */
