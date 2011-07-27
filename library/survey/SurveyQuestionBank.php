@@ -4,6 +4,13 @@ require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationQuest
 class SurveyQuestionBank extends EvaluationQuestionBank {
     public $_table = 'assess_question_bank';
     public $_index = 'question_bank_id';
+
+	public function __construct() {
+		parent::__construct();
+
+		$this->questionHandler = new SurveyQuestion();
+		$this->answerHandler = new SurveyAnswer();
+	}
 }
 ?>
 

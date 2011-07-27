@@ -38,11 +38,8 @@ abstract class EvaluationQuestionBank extends DeprecatedModel {
 	 * @return void
 	 */
 	public function addQuestion($questionCategoryID, $typeID, $questionID, $answerID, $marks) {
-		$questionHandler = new AssessQuestion();
-		$answerHandler = new AssessAnswer();
-
-		$question = $questionHandler->getByID($questionID);
-		$answer = $answerHandler->getByID($answerID);
+		$question = $this->questionHandler->getByID($questionID);
+		$answer = $this->answerHandler->getByID($answerID);
 
 		$this->create(array(
 			'question_category_id' => $questionCategoryID,

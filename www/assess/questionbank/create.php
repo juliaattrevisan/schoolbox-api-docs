@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 require_once('../library/assess/AssessQuestionBank.php');
+require_once('../library/assess/AssessQuestion.php');
+require_once('../library/assess/AssessAnswer.php');
 
 $groupHandler = new Group();
 
