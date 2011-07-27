@@ -10,6 +10,7 @@
 require_once '../library/assess/Assess.php';
 require_once '../library/assess/AssessSection.php';
 require_once '../library/assess/AssessQuestion.php';
+require_once '../library/assess/AssessAnswer.php';
 require_once '../library/assess/AssessFactory.php';
 require_once('../library/assess/AssessQuestionCategory.php');
 require_once('../library/group.php');
