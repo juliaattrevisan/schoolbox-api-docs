@@ -81,7 +81,16 @@ class Category extends DeprecatedModel {
 	}
 	
 	function getByCode($code) {
-		$query = "SELECT category.* FROM categoryCode RIGHT JOIN category ON id = categoryID WHERE categoryCode.code = ".$this->db->smartQuote($code)." ";
+        $query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type, cf.template
+                  FROM (category c)
+                  LEFT JOIN categoryCode co ON co.categoryID = c.id
+                  LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGESERVICE . "
+                  LEFT JOIN user u on u.id = a.uid
+                  LEFT JOIN userGroups g ON g.cid = c.id
+                  LEFT JOIN homepage_config cf ON cf.cid = c.id
+                  WHERE co.code = {$this->db->smartQuote($code)}
+                  GROUP BY c.id";
+
 		return $this->db->getRow($query);
 	}
 	

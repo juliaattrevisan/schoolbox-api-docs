@@ -3,7 +3,7 @@
 *                                                           *
 * 		Copyright (c) 2008 Lektec Consulting				*
 *                                                           *
-*	This file provides access to synergetic user info		*	    
+*	This file provides access to synergetic user info		*
 *                                                           *
 ************************************************************/
 
@@ -24,16 +24,12 @@ class ExternalUser extends MSSQL{
     public function getParent($synID) {
         $query = "
 			SELECT
-				StudentContactLegalFullName, StudentContactEmail, StudentContactMobilePhone,
-				StudentContactSpouseLegalFullName, StudentContactSpouseMobilePhone, StudentContactSpouseEmail,
-				StudentContactHomePhone, StudentContactSilentPhoneFlag, Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag, Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
-				StudentParentsSeparatedFlag
-			FROM SynergyOne.dbo.vStudentContactAllAddress
-			LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
-			LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
-			WHERE StudentContactID = '$synID'
-			AND FileSemester = " . $_SESSION['FileSemester'] . "
-			AND FileYear = " . $_SESSION[ 'FileYear'];
+				Contact.Title, Contact.Preferred, Contact.Surname, Contact.Email, Contact.MobilePhone, Contact.DirectoryIncludeFlag,
+                Contact.SpouseID, Spouse.Title SpouseTitle, Spouse.Preferred SpousePreferred, Spouse.Surname SpouseSurname,
+                Spouse.Email SpouseEmail, Spouse.MobilePhone SpouseMobilePhone,Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag
+			FROM SynergyOne.dbo.Community Contact
+			LEFT JOIN SynergyOne.dbo.Community Spouse ON Contact.SpouseID = Spouse.ID
+			WHERE Contact.ID = '$synID'";
 
         return $this->getRow($query);
     }
@@ -60,7 +56,7 @@ class ExternalUser extends MSSQL{
         $query = "
 			SELECT
 				ID, Title,
-				Preferred, Surname, 
+				Preferred, Surname,
 				Email, OccupEmail, DefaultEmailCode,
 				DirectoryIncludeFlag
 			FROM SynergyOne.dbo.Community
@@ -76,7 +72,7 @@ class ExternalUser extends MSSQL{
 	function getStudent($synID)
 	{
 			$query = "
-			SELECT	vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname, vStudents.StudentBirthDate, 
+			SELECT	vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname, vStudents.StudentBirthDate,
 					vStudents.StudentTutorName, vStudents.StudentHeadOfHouse, vStudents.StudentFormStaffName, vStudents.StudentTutorDescription,
 					luForm.ID as TeacherFormID, vStudents.StudentForm, luTutor.ID as TeacherTutorID, vStudents.StudentTutor, luForm.Description as FormDescription,
 					vStudents.StudentHouseDescription, vStudents.StudentHouse, vStudents.StudentYearLevel, vStudents.StudentLockerBook,
@@ -85,18 +81,18 @@ class ExternalUser extends MSSQL{
                     LEFT JOIN CommunityAlerts ON CommunityAlerts.ID = StudentID
 					LEFT JOIN SynergyOne.dbo.luForm ON vStudents.StudentForm=luForm.Code
 					LEFT JOIN SynergyOne.dbo.luTutor ON vStudents.StudentTutor=luTutor.Code
-			WHERE 	
+			WHERE
 				vStudents.StudentID = $synID
 				AND vStudents.FileSemester=".$_SESSION['FileSemester']."
 				AND vStudents.FileYear=".$_SESSION[ 'FileYear']."
-				"; 
-				
+				";
+
 		$student = $this->getRow($query);
 
 		preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches);
 		$student['StudentBirthDate'] = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
 		return $student;
-		
+
 	}
 
        function getStaff($synID)
@@ -124,11 +120,12 @@ class ExternalUser extends MSSQL{
                     SELECT
                             StudentID, StudentGiven1, StudentSurname, StudentYearLevel,
                             StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
-                            StudentContactAddress1, StudentContactSuburb, StudentContactPostCode, StudentContactState,
+                            StudentContactAddress1, StudentContactAddress2, StudentContactAddress3,
+                            StudentContactSuburb, StudentContactPostCode, StudentContactState, StudentContactCountryDesc,
                             StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
                             StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
                             StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType,
-                            StudentContactSilentPhoneFlag, Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag, Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeF$
+                            StudentContactSilentPhoneFlag, Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag, Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
                             StudentParentsSeparatedFlag
                     FROM SynergyOne.dbo.vStudentContactAllAddress
                     LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
@@ -160,7 +157,7 @@ class ExternalUser extends MSSQL{
 	}
 
 	function getCurrentSemester()
-	{		
+	{
 		#Get current FileSemester and FileYear
 		$query = "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag=1";
                 $semester = $this->getRow($query);
@@ -168,14 +165,14 @@ class ExternalUser extends MSSQL{
                 $_SESSION['FileYear'] = $semester['FileYear'];
 		return true;
 	}
-	
+
 	function getSubjectList($synergyID, $userID)
-	{	
+	{
 		if( $this->groupHandler->isStudent($userID) )
 		{
 			$sql ="SELECT StudentClasses.ClassCode, SubjectClasses.Description as name
 					FROM StudentClasses, SubjectClasses
-					WHERE 
+					WHERE
 					StudentClasses.FileType = SubjectClasses.FileType AND
 					StudentClasses.FileYear = SubjectClasses.FileYear AND
 					StudentClasses.FileSemester = SubjectClasses.FileSemester AND
@@ -184,15 +181,15 @@ class ExternalUser extends MSSQL{
 					StudentClasses.FileSemester=".$_SESSION['FileSemester']." AND
 					StudentClasses.FileYear=".$_SESSION[ 'FileYear']." AND
 					StudentClasses.ID=$synergyID
-					AND StudentClasses.StartDate <= getdate() 
+					AND StudentClasses.StartDate <= getdate()
 					AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)";
 		}
 		else
-		{      
-		
+		{
+
 			$sql = "SELECT DISTINCT(c1.ClassCode), c2.description as name
 					FROM SubjectClassStaff c1, SubjectClasses c2
-					WHERE 
+					WHERE
 					c1.FileType = c2.FileType AND
 					c1.FileYear = c2.FileYear AND
 					c1.FileSemester = c2.FileSemester AND
@@ -202,7 +199,7 @@ class ExternalUser extends MSSQL{
 					c1.FileYear = ".$_SESSION[ 'FileYear']." AND
 					c1.StaffID = $synergyID";
 		}
-		
+
 		$this->query($sql);
 		while($subject = $this->getNextArray() ) {
 			$subjectList[] = array('code'=>$subject['ClassCode'], 'name'=>$subject['name']);
@@ -210,22 +207,22 @@ class ExternalUser extends MSSQL{
 
 		if(is_array($subjectList))
 			return $subjectList;
-		else 
+		else
 			return false;
 	}
-	
+
 	function getEnrolledStudents($synergyID)
-	{	
+	{
 		$query = "SELECT Relationships.RelatedID
 				FROM SynergyOne.dbo.Constituencies Constituencies, SynergyOne.dbo.Relationships Relationships
-				WHERE Relationships.RelatedID = Constituencies.ID AND 
-				Relationships.ID = $synergyID AND 
+				WHERE Relationships.RelatedID = Constituencies.ID AND
+				Relationships.ID = $synergyID AND
 				Constituencies.ConstitCode='@SC'
 				AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD')";
-	
-		
+
+
 		return $this->getAll($query);
-		
+
 	}
 
     function getEmail($id) {

@@ -11,6 +11,8 @@ if (!$groupHandler->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'adminv2/home.html');
 $this->setBlock(TEMPLATE_content, 'group_summary', 'group_summary_block');
 $this->setBlock(TEMPLATE_content, 'recent_log', 'recent_log_block');
+$this->setBlock(TEMPLATE_content, 'memory', 'memory_block');
+
 $this->setTitle('Admin - Home');
 
 /* Disk space */
@@ -34,6 +36,10 @@ if(is_readable('/proc/meminfo')) {
                     'MEMORY_TOTAL'  => bytesToString($m['MemTotal']),
                     'MEMORY_PERC'   => round($usedMem / $m['MemTotal'] * 100));
     $this->setVar($memory);
+    $this->parse('memory_block', 'memory');
+}
+else {
+    $this->setVar('memory_block', '');
 }
 
 /* External system checks */

@@ -565,10 +565,93 @@ CREATE TABLE `error` (
 
 /*Data for the table `error` */
 
-insert  into `error`(`id`,`message`) values
-(50,'You do not have permission to delete this user\'s file.'),
-(52,'This link is already shared in your ePortfolio.');
-
+insert into `error` (`id`, `message`) values('1','You are not logged in. You will need to <a href=\"login.php?page=%MESSAGE%\">login</a> before proceeding.');
+insert into `error` (`id`, `message`) values('2','Not enough information was submitted to the form.');
+insert into `error` (`id`, `message`) values('3','Please enter either a file or a url, not both.');
+insert into `error` (`id`, `message`) values('4','Your email could not be retrieved at this time.<br>If you have changed your email password recently, <a href=\"/mail/mailInfo.php\">click here</a> to update the email password stored on the portal.<br><br>Please contact your System Administrator if problems persist.');
+insert into `error` (`id`, `message`) values('5','You do not have permission to download this file.');
+insert into `error` (`id`, `message`) values('6','You do not have write permission to this category.');
+insert into `error` (`id`, `message`) values('7','Mail cannot be sent at this time. Please try again later.');
+insert into `error` (`id`, `message`) values('8','You do not have permission to delete this resource.');
+insert into `error` (`id`, `message`) values('9','Processing failed for the following reason: %MESSAGE%');
+insert into `error` (`id`, `message`) values('10','The size of this file exceeds the allowed limit.');
+insert into `error` (`id`, `message`) values('11','%MESSAGE% is an illegal filetype.<br>You cannot add files of this type to the Portal.<br>If you would like to be able to add files of this type to the Portal please contact the System Administrator.<br>Ensure that you have closed the file before trying to submit it to the Portal.');
+insert into `error` (`id`, `message`) values('12','The category that you are trying to delete is not empty. Please delete all its contents, then try again.');
+insert into `error` (`id`, `message`) values('13','The category that you are trying to view does not exist.');
+insert into `error` (`id`, `message`) values('14','You do not have permission to view this category.');
+insert into `error` (`id`, `message`) values('15','The date that you have submitted is invalid. Please check it, then try again.');
+insert into `error` (`id`, `message`) values('16','There was a problem validating your account: <br><b>%MESSAGE%</b>');
+insert into `error` (`id`, `message`) values('17','The submission box that you are trying to access does not exist or you do not have permission to view it.');
+insert into `error` (`id`, `message`) values('18','The subject selected does not exist.');
+insert into `error` (`id`, `message`) values('19','You do not have permission to view this page.');
+insert into `error` (`id`, `message`) values('20','You do not have permission to create a category in this location.');
+insert into `error` (`id`, `message`) values('21','A problem occurred while trying to access the database.<br>This could have been caused by one of the following reasons:<ul><li>one of the fields has invalid data</li><li>the database query is incorrect</li><li>the database is overloaded</li></ul><br>Please report this message to your System Administrator with the following query attached.<br><br>%MESSAGE%');
+insert into `error` (`id`, `message`) values('22','The database is unavailable at this time. Please try again later.');
+insert into `error` (`id`, `message`) values('23','You do not have permission to modify this news.');
+insert into `error` (`id`, `message`) values('24','You are not enrolled in this subject.');
+insert into `error` (`id`, `message`) values('25','You do not have permission to return this work to this student.');
+insert into `error` (`id`, `message`) values('26','The work you are trying to return either does not exist or has already been returned.');
+insert into `error` (`id`, `message`) values('27','The work you are trying to submit has already been submitted.');
+insert into `error` (`id`, `message`) values('28','You do not have permission to post in this category.');
+insert into `error` (`id`, `message`) values('29','You do not have permission to modify or delete this post.');
+insert into `error` (`id`, `message`) values('30','This user cannot be the group administrator.');
+insert into `error` (`id`, `message`) values('31','No user was found that matches your request.');
+insert into `error` (`id`, `message`) values('32','The absentee system cannot be accessed on the weekend.');
+insert into `error` (`id`, `message`) values('33','That period does not exist today.');
+insert into `error` (`id`, `message`) values('34','You do not have permission to modify this event.');
+insert into `error` (`id`, `message`) values('35','You do not have permission to add an event of this context.');
+insert into `error` (`id`, `message`) values('36','You are attempting to submit work to a submission box that has not yet opened.');
+insert into `error` (`id`, `message`) values('37','You cannot join this group because it has membership restrictions. Contact the group administrator if you would like to be included.');
+insert into `error` (`id`, `message`) values('38','This is already in the database. Please modify, then try again.');
+insert into `error` (`id`, `message`) values('39','No teams exist. You must add teams before trying to add events.');
+insert into `error` (`id`, `message`) values('40','Attendances for Grimwade have not yet been implemented. Please wait until further notice.');
+insert into `error` (`id`, `message`) values('41','That file does not exist.');
+insert into `error` (`id`, `message`) values('42','No email account information was found. Please either use an external mail client to send email, or provide the portal with an email address.');
+insert into `error` (`id`, `message`) values('43','The complete file was not received by the server.  Please try to upload the file again.  If problems persist, contact your System Administrator.');
+insert into `error` (`id`, `message`) values('44','You are trying to view or delete work that either does not exist or does not belong to you.');
+insert into `error` (`id`, `message`) values('45','Your search does not have enough information to provide a realistic result.<br>Please make sure your search includes meaningful words over three letters long.<br>You can use quotation marks to search for specific strings of words, for example \"dog and cat\".');
+insert into `error` (`id`, `message`) values('46','You have tried to read an email that does not exist in your mailbox.  Please recheck the email from <a href=\"/mail.php\">here</a>.');
+insert into `error` (`id`, `message`) values('101','The resource you are trying to access does not exist or you do not have permission to view it.');
+insert into `error` (`id`, `message`) values('102','A booking already exists during the time you have selected.  Please press back and select a time that is free.');
+insert into `error` (`id`, `message`) values('103','The booking you have made is outside the allowed range.  This resource may only be booked between the specified range. Please go back and select a time during this period.');
+insert into `error` (`id`, `message`) values('104','You do not have permission to update or modify this booking.  You must either have placed the booking yourself or be a room maintainer to update this booking.');
+insert into `error` (`id`, `message`) values('47','You do not have permission to modify this user\'s file.');
+insert into `error` (`id`, `message`) values('48','You do not have permission to delete this user\'s file.');
+insert into `error` (`id`, `message`) values('49','The folder you have attempted to retrieve does not contain any files.  As a result a zip file for download is not available.');
+insert into `error` (`id`, `message`) values('105','<p>An error occured while submitting the form:</p>\r\n<p>%MESSAGE%</p>');
+insert into `error` (`id`, `message`) values('51','The section you are trying to add questions to does not exist.');
+insert into `error` (`id`, `message`) values('106','You do not have permission to modify or delete this link.');
+insert into `error` (`id`, `message`) values('107','You do not have permission to modify this blog.');
+insert into `error` (`id`, `message`) values('108','You do not have permission to leave comments on this blog.');
+insert into `error` (`id`, `message`) values('109','You do not have permission to publish this file.');
+insert into `error` (`id`, `message`) values('110','You do not have permission to modify these notes.');
+insert into `error` (`id`, `message`) values('111','There are no blogs in this archive.');
+insert into `error` (`id`, `message`) values('112','This assessment no longer exists.');
+insert into `error` (`id`, `message`) values('113','You have not answered all questions; please go back and submit them.');
+insert into `error` (`id`, `message`) values('114','You have not selected an attempt to review.');
+insert into `error` (`id`, `message`) values('116','Unspecified question type.');
+insert into `error` (`id`, `message`) values('117','Please choose a group for this assessment.');
+insert into `error` (`id`, `message`) values('118','This attempt no longer exists.');
+insert into `error` (`id`, `message`) values('119','This question no longer exists.');
+insert into `error` (`id`, `message`) values('120','This online assessment has expired.');
+insert into `error` (`id`, `message`) values('121','You have already attempted this online assessment and cannot re-sit it.');
+insert into `error` (`id`, `message`) values('122','You have run out of time to complete this online assessment and cannot re-sit it.');
+insert into `error` (`id`, `message`) values('123','This attempt has not been recorded.');
+insert into `error` (`id`, `message`) values('115','This section no longer exists.');
+insert into `error` (`id`, `message`) values('124','You are the owner of this test and therefore cannot attempt it.');
+insert into `error` (`id`, `message`) values('125','Only the test owner can view this page.');
+insert into `error` (`id`, `message`) values('126','Only teachers can create and modify tests.');
+insert into `error` (`id`, `message`) values('127','Only the test owner can review this test.');
+insert into `error` (`id`, `message`) values('128','This attempt no longer exists.');
+insert into `error` (`id`, `message`) values('129','You are not allowed to view this students test.');
+insert into `error` (`id`, `message`) values('130','Only teachers can create and modify their test contents.');
+insert into `error` (`id`, `message`) values('131','Question could not be saved.');
+insert into `error` (`id`, `message`) values('132','Answer could not be saved.');
+insert into `error` (`id`, `message`) values('133','Could not load question: unknown type.');
+insert into `error` (`id`, `message`) values('100','Your e-portfolio has not been enabled.');
+insert into `error` (`id`, `message`) values('134','No import file found.');
+insert into `error` (`id`, `message`) values('50','You do not have permission to delete this user\'s file.');
+insert into `error` (`id`, `message`) values('52','This link is already shared in your ePortfolio.');
 /*Table structure for table `event` */
 
 DROP TABLE IF EXISTS `event`;
@@ -1547,3 +1630,16 @@ CREATE TABLE `wikiRevision` (
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+UPDATE error
+SET message = 'Your email could not be retrieved at this time.<br>If you have changed your email password recently, <a href="/mail/mailInfo.php">click here</a> to update the email password stored on Schoolbox.<br><br>Please contact your System Administrator if problems persist.'
+WHERE message = 'Your email could not be retrieved at this time.<br>If you have changed your email password recently, <a href="/mail/mailInfo.php">click here</a> to update the email password stored on the portal.<br><br>Please contact your System Administrator if problems persist.';
+
+UPDATE error
+SET message = '%MESSAGE% is an illegal filetype.<br>You cannot add files of this type to Schoolbox.<br>If you would like to be able to add files of this type to Schoolbox please contact the System Administrator.<br>Ensure that you have closed the file before trying to submit it to Schoolbox.'
+WHERE message = '%MESSAGE% is an illegal filetype.<br>You cannot add files of this type to the Portal.<br>If you would like to be able to add files of this type to the Portal please contact the System Administrator.<br>Ensure that you have closed the file before trying to submit it to the Portal.';
+UPDATE error
+SET message = 'No email account information was found. Please either use an external mail client to send email, or provide Schoolbox with an email address.'
+WHERE message = 'No email account information was found. Please either use an external mail client to send email, or provide the portal with an email address.';
+ALTER TABLE allowedFileExtension 
+CHANGE extension extension CHAR(10);

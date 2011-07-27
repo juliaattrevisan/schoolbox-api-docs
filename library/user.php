@@ -118,14 +118,15 @@ class User extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'lastname', $sort_dir = 'desc') {
+    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'lastname', $sort_dir = 'asc') {
         $keyword = mysql_real_escape_string($keyword);
 
         // retreive results
         $query = "SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
                         FROM `user`
                         LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-                        LEFT JOIN `luCampus` ON `user`.campus = `luCampus`.id
+			            LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid AND defaultCampus = 1
+                        LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
                         WHERE CONCAT_WS(' ',firstname,lastname) like '%$keyword%'
                         OR username like '%$keyword%' OR alt_email like '%$keyword%'";
 
@@ -135,8 +136,6 @@ class User extends DeprecatedModel {
         // retreive count
         $count_query = "SELECT COUNT(*)
                                 FROM `user`
-                                LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-                                LEFT JOIN `luCampus` ON `user`.campus = `luCampus`.id
                                 WHERE CONCAT_WS(' ',firstname,lastname) like '%$keyword%'
                                 OR username like '%$keyword%' OR alt_email like '%$keyword%'";
 

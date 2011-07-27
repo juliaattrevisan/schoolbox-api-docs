@@ -11,8 +11,6 @@ $page = new SitePage;
 $fileHandler = new File;
 $groupHandler = new Group;
 
-$page->setFile(TEMPLATE_content, 'cms/zipFile.html');
-
 if ($groupHandler->isSuperuser()) {
 
 	/* Force session usage due to flash uploader

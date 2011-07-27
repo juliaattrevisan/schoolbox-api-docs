@@ -36,12 +36,7 @@ if(is_numeric($this->arg[0])) {
 
 		/* Prepend a please select at the start of every campus list
 		 */
-		$campusList = array_merge(array(
-			array(
-			 'id' => 0,
-			 'name' => 'Please select'
-			),
-		), $userHandler->getCampusList());
+		$campusList = $userHandler->getCampusList();
 
 		/* User data
 		 */
@@ -227,9 +222,6 @@ if(is_numeric($this->arg[0])) {
         else
                 $this->setVar('action_log_block', '');
 
-    }
-    else{
-        error(31);
     }
 }
 else {

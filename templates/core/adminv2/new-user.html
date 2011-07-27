@@ -41,11 +41,53 @@ $j(function() {
 	});
 	
 	
-	$j('.admin-form').validate();
+	$j('.admin-form').validate({
+		rules: {
+			year: {
+			  	customValid : true
+			},
+			alt_email: {
+				email:true	
+			}
+		},
+		messages: {
+			defaultCampus: "Please select a default campus",
+			alt_email: "If you are entering an alternative email, please ensure it's a valid address"
+		},
+		errorPlacement: function(error, element) {
+      
+			if (element.hasClass("campus-radio")) {
+				error.css('margin', 0);
+				error.insertAfter(element.closest('table'));
+			} else {
+							
+			error.insertAfter(element)
+			}
+		 }
+		
+	});
 	
-	
-	
-	
+	$j.validator.addMethod("customValid", function(value, element) {
+		inputValue = (parseInt(value));
+		if (isNaN(inputValue)) {
+			
+			value = String(value);
+			
+			if ((value == 'k') || (value == 'elc') || (value == 'ELC') || (value == 'K')) {
+				console.log(value);
+				return true
+			} else {
+				return false;
+			}
+		} else {
+			if ((inputValue > 13) || (inputValue < 0)) {
+				return false
+			}
+			return true;
+		} 
+
+	}, "Please enter one a number in between 0 and 13 OR the letter 'K' OR the the phrase 'ELC'");
+
 })
 
 </script>
@@ -90,7 +132,7 @@ $j(function() {
 						<input type="text" name="database_id" value=""/>
 					</label>
 					
-					<table cellpadding="0" width="50%" class="float-left">
+					<table cellpadding="0" width="50%" class="float-left campus-select">
 						<colgroup>
 						<col width="33%" />
 						<col width="33%" />
@@ -107,7 +149,7 @@ $j(function() {
 							<!-- BEGIN campus -->
 							<tr>
 								<td>{CAMPUS_NAME}</td>
-								<td><input type="radio" name="defaultCampus" value="{CAMPUS_ID}" {CAMPUS_DEFAULT_CHECKED} /></td>
+								<td><input type="radio" name="defaultCampus" value="{CAMPUS_ID}" {CAMPUS_DEFAULT_CHECKED} class="campus-radio required" /></td>
 								<td><input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_CHECKED} /></td>
 							</tr>
 							<!-- END campus -->
@@ -125,7 +167,7 @@ $j(function() {
 						<input type="password"  name="modpassword"/>
 					</label>
                 <label for="alt_email">Alternate Email
-					<input type="text" name="alt_email" value="" />
+					<input type="text" name="alt_email" value="" class="email" />
 				</label>
 					<label for="group">Group
 						<select name="group">

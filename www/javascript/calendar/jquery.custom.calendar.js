@@ -1,7 +1,39 @@
 	$j(function () {
+
+		//unfortunately we have to do this for IE to make sure words don't fail wrap wise.
+		if ($j('#month-view').length > 0) {
+			$j('.js_happening li span').each(function() {
+				$j(this).css({
+					'width': ($j('#month-view').width() - 112) / 7
+				});
+			})
+		} else {
+			$j('.js_happening li span.note').each(function() {
+				$j(this).css({
+					'width': ($j('#week-view').width() - 112) / 7
+				});
+			})
+		}
+		
 		$j(window).resize(function() {
+			
 			if ($j('.cal-bubble').is(':visible')) {	
 				$j('.cal-bubble').hide();	
+			};
+			
+			//unfortunately we have to do this for IE to make sure words don't fail wrap wise.
+			if ($j('#month-view').length > 0) {
+				$j('.js_happening li span').each(function() {
+					$j(this).css({
+						'width': ($j('#month-view').width() - 112) / 7
+					});
+				});
+			} else {
+				$j('.js_happening li span.note').each(function() {
+					$j(this).css({
+						'width': ($j('#week-view').width() - 112) / 7
+					});
+				})
 			}
 		});
 		

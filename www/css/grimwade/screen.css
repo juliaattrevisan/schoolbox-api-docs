@@ -28,9 +28,7 @@ h2 {
 
 .box h2 a { color: #fff; }
 
-.box .listing ul li { background: #f4f4f4; }
 
-.box .listing ul li.dark { backgorund: #e9e9e9; }
 
 #header #tabs li a.navthis {
 	background:none repeat scroll 0 0 #FFFFFF;
@@ -176,14 +174,12 @@ h2 {
 	-moz-border-radius:0;
 	-webkit-border-radius:0;
 	border-radius:0;
-}
-
-#nav h3 {
 	height:29px;
 	padding:0 9px;
 	line-height:29px;
 	font-size:12px;
 	color:#fff;
+	text-transform:capitalize
 }
 
 #nav ul li { border-bottom: 1px solid #498897; }

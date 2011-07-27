@@ -1,12 +1,12 @@
-<div class="dbx-box">
-	<h2 class="dbx-handle">Student Subjects</h2>
-	<div class="dbx-content indent">
+<div class="box clearfix">
+<h2>Student Subjects</h2>
+	<div class="text">
 		<!-- BEGIN student_block -->
-		<a href="/search/user/{STUDENT_ID}"><h3>{STUDENT_NAME}, Year {STUDENT_YEAR}</h3></a>
-			<ul>
-			<!-- BEGIN subject_block -->
-			<li><a href="/homepage/{STUDENT_SUBJECT_CODE}">{STUDENT_SUBJECT_NAME}</a></li>
-			<!-- END subject_block -->
+		<h3><a href="/search/user/{STUDENT_ID}">{STUDENT_NAME}, Year {STUDENT_YEAR}</a></h3>
+			<ul>		
+				<!-- BEGIN subject_block -->
+				<li><a href="/homepage/{STUDENT_SUBJECT_CODE}">{STUDENT_SUBJECT_NAME}</a></li>
+				<!-- END subject_block -->
 			</ul>
 		<!-- END student_block -->
 	</div>

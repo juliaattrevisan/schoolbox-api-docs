@@ -114,22 +114,21 @@ if (is_numeric($this->arg[0])) {
 
 		if ($groupHandler->isParent($user['uid']) && !$groupHandler->isStudent()) {
 			$parent = $synUserHandler->getParent($user['synergy_id']);
-
-			if ($parent['PrimaryDirectoryIncludeFlag']) {
+			if ($parent['DirectoryIncludeFlag']) {
 				$output = array(
-                    'NAME' => scrubTEXT($parent['StudentContactLegalFullName']),
-					'HOME_PHONE'	=> $parent['StudentContactSilentPhoneFlag']?$parent['StudentContactHomePhone']:'',
-					'MOBILE_PHONE'  => $parent['StudentContactMobilePhone'],
+                    'NAME' => scrubTEXT($parent['Title'].' '.$parent['Preferred'].' '.$parent['Surname']),
+					'HOME_PHONE'	=> $parent['SilentPhoneFlag']?$parent['HomePhone']:'',
+					'MOBILE_PHONE'  => $parent['MobilePhone'],
 				);
 
 				$this->setVar($output);
 
-				if ($parent['SpouseDirectoryIncludeFlag'] && $parent['StudentContactSpouseLegalFullName'] && !$parent['StudentParentsSeparatedFlag']) {
+				if ($parent['SpouseDirectoryIncludeFlag'] && $parent['SpouseSurname'] ) {
 					$output = array(
 
-						'SPOUSE_NAME' => scrubTEXT($parent['StudentContactSpouseLegalFullName']),
-						'SPOUSE_MOBILE' => $parent['StudentContactSpouseMobilePhone'],
-						'SPOUSE_EMAIL'=> '<a href="'.$_SESSION['mailhandle'].$parent['StudentContactSpouseEmail'].'\">'.$parent['StudentContactSpouseEmail'].'</a>',
+						'SPOUSE_NAME' =>  scrubTEXT($parent['SpouseTitle'].' '.$parent['SpousePreferred'].' '.$parent['SpouseSurname']),
+						'SPOUSE_MOBILE' => $parent['SpouseMobilePhone'],
+						'SPOUSE_EMAIL'=> '<a href="'.$_SESSION['mailhandle'].$parent['SpouseEmail'].'\">'.$parent['SpouseEmail'].'</a>',
 					);
 
 					$this->setVar($output);

@@ -539,6 +539,8 @@ h4 .hide-on-small{float:none; width:auto;}
 
 .box .text { padding:8px 16px; }
 
+.box h3{font-weight:bold; padding:7px 0;}
+
 .box ul {
 	list-style: none;
 	margin: 0;
@@ -794,7 +796,7 @@ dl.errors dt span {
 	display:block;
 	margin:0 auto;
 	width:91px;
-	overflow:hidden;
+	word-break:break-all
 }
 
 dl.errors dd { width:85%; }
@@ -806,14 +808,16 @@ dl.errors dd { width:85%; }
 	z-index:50
 }
 
-.text.textbox ul {
+.textbox ul {
 	list-style:disc;
 	margin:0 0 16px 2.5em
 }
 
-.text.textbox ol {margin:0 0 16px 2.5em; }
+.textbox ol {margin:0 0 16px 2.5em; }
 
-.text.textbox li { padding:0; }
+.textbox li { padding:0; }
+
+.textbox{overflow:hidden;}
 
 .standardForm td {
 	vertical-align: top;
@@ -2724,7 +2728,6 @@ p.interact a.take-test-btn {
 	border-radius: 5px 5px 0 0; /* Opera 10.5, IE 9, Saf5, Chrome */
 }
 
-.day-block ul { margin:5px; }
 
 /*the top of the calendar*/
 .calendar-controls {
@@ -2766,8 +2769,6 @@ td.cal-left a {padding:0 7px;width:14px;}
 
 .calendar-controls .float-left a.back, .calendar-controls .float-left a.forward  { width:12px;text-indent:-99999em;}
 td.cal-left a{text-indent:-99999em;}
-
-
 
 .calendar-controls a.back, td.cal-left a.back { background:#faf9f5 url(/images/core/calendar/cal-left.png) no-repeat 50% 50%; }
 .calendar-controls a.forward, td.cal-left a.forward { background:#faf9f5 url(/images/core/calendar/cal-right.png) no-repeat 50% 50%; }
@@ -2945,21 +2946,28 @@ td.cal-mid h3 { text-align:center; }
 	vertical-align: top;
 }
 
+ul.js_happening{width:100%;}
+
+ul.js_happening li {
+	margin: 4px;
+	position:relative;
+	min-height:1px;
+	overflow:hidden;
+}
+
+ul.js_happening li:first-child{margin-top:4px;}
 ul.js_happening li span {
 	display:block;
-	padding:5px;
+	padding:3px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 	cursor:pointer;
+	overflow:hidden;
+	
 }
 
 ul.js_happening li span:hover { opacity:0.8; }
-
-ul.js_happening li {
-	margin-bottom:4px;
-	position:relative;
-}
 
 .cal-bubble {
 	z-index:200000;
@@ -2988,7 +2996,7 @@ ul.js_happening li {
           
           
   -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
-
+ 
 }
 
 .cal-bubble .middle .close {
@@ -3013,7 +3021,8 @@ ul.js_happening li {
 .cal-bubble .middle h4 {
 	font-size:12px;
 	margin:0 0 16px 0;
-	width:326px
+	width:326px;
+	word-break: break-word;
 }
 
 .cal-bubble .middle h4 span {
@@ -3031,11 +3040,9 @@ ul.js_happening li {
 }
 
 .cal-bubble .bottom{
-	
-	  width:0px; 
+  width:0px; 
   height:0px; 
-
-    border-bottom:28px solid transparent;  /* left arrow slant */
+  border-bottom:28px solid transparent;  /* left arrow slant */
   border-top:0px solid transparent; /* right arrow slant */
   border-right:28px solid #E9E3D6; /* bottom, add background color here */
   font-size:0px;
@@ -3044,23 +3051,22 @@ ul.js_happening li {
   bottom:-28px;
   right:30px;
   z-index: 200002;
-	}
+}
 
 .cal-bubble .bottom strong{
-	
-	  width:0px; 
-  height:0px; 
-  border-bottom:22px solid transparent;  /* left arrow slant */
-  border-top:0px solid transparent; /* right arrow slant */
-  border-right:22px solid #ffffff; /* bottom, add background color here */
-  font-size:0px;
-  line-height:0px;
-  display:block;
-  position:absolute;
-  bottom:-22px;
-  right:-26px;
-  z-index: 200001;
-	}
+	width:0px; 
+	height:0px; 
+	border-bottom:22px solid transparent;  /* left arrow slant */
+	border-top:0px solid transparent; /* right arrow slant */
+	border-right:22px solid #ffffff; /* bottom, add background color here */
+	font-size:0px;
+	line-height:0px;
+	display:block;
+	position:absolute;
+	bottom:-22px;
+	right:-26px;
+	z-index: 200001;
+}
 
 
 .cal-bubble .time {
@@ -4040,7 +4046,6 @@ p.forgotten { margin:10px 0; }
 #news-header {
 	font-weight:bold;
 	font-size:14px;
-	margin-bottom:16px;
 	padding:7px 0;
 }
 
@@ -4139,8 +4144,11 @@ p.forgotten { margin:10px 0; }
 .revision-box {border:1px solid #ccc; margin-bottom:16px;}
 .wysiwyg h2, .revision-box h2{background:0; text-indent:0; margin-bottom:16px; padding:0;}
 .wysiwyg ul, .wysiwyg ol, .revision-box ul, .revision-box ol{margin:0 0 16px 16px; line-height:16px;list-style:circle; }
+.wysiwyg li{padding:0;}
 .wysiwyg ol, .revision-box ol{list-style:decimal;}
 .wysiwyg td, .revision-box td, .textbox td{border:1px solid #ccc;}
+
+/*.wysiwyg td, .revision-box td, .textbox td{border:1px solid #ccc;}*/
 
 .submitted-by {
 	margin-bottom:0;
@@ -4377,6 +4385,23 @@ li.bars p { margin-bottom:5px; }
 li.bars { display:block; }
 
 /* SUBMISSION */
+.information-notification{
+	color:#fff;
+	padding:0 8px 0 28px;
+	background:#e8f5ff url(/images/famicons/information.png) 8px 50% no-repeat;
+	height:23px;
+	line-height:23px;
+	margin-bottom:8px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	color:#000;
+	z-index:120;
+	border:1px solid #d9effe;
+	}
+
+
+
 .submission-history {
 	float:left;
 	margin-right:2%;

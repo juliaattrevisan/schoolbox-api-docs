@@ -13,7 +13,7 @@ else
 
 $this->setVar('CALENDAR_TITLE', 'Campus Calendar');
 
-$query = "SELECT id, UNIX_TIMESTAMP(date) as outputDate, owner
+$query = "SELECT event.id, UNIX_TIMESTAMP(date) as outputDate, owner,
 			TIME_FORMAT(startTime, '".Cfg::get('calendar_time_format')."') as startTimeString, TIME_FORMAT(endTime,
 			'".Cfg::get('calendar_time_format')."') as endTimeString,priority, note, location, detail,
 			user.id as uid, title, firstname, lastname,

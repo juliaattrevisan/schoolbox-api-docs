@@ -27,8 +27,8 @@ h2 {
 	-webkit-border-radius: 0;
 	border-radius: 0;
 }
-
-#content h2 { color:#000; }
+.admin-contents h2{ height:auto; border:0; margin-bottom:8px;}
+.admin-contents h2 span {margin-bottom:4px;}
 
 #content h2 span a { color:#000; }
 
@@ -36,17 +36,9 @@ h2 {
 
 a:hover { color: #0066CC; }
 
-#content .box h2 {
-	color:#000;
-	-moz-border-radius:0;
-}
-
 .box ul { list-style: none; }
 
-.box ul li, .news-item ul li {
-	list-style: none;
-	background: url(/images/mgs/bullet.gif) no-repeat 0 4px
-}
+.box ul li, .news-item ul li {}
 
 #category {
 	background:none;
@@ -156,15 +148,21 @@ min-height:1px;
 	border-radius:0;
 }
 
+
+
+#nav li{border:0;float:left;}
+
 #nav li a {
 	width: 135px;
-	padding: 3px 0 3px;
 	background: #fff;
 	color: #0033cc;
 	font-size: 90%;
 	margin-left:0;
 	font-size:11px;
+	display:inline-block;
+	padding:0;
 }
+#nav li a {display:block;}
 
 #nav li a:hover, #nav li li a:hover {
 	-moz-border-radius:0;
@@ -173,7 +171,6 @@ min-height:1px;
 }
 
 #nav li li { border-bottom: 1px solid #00458c; }
-
 #nav li li:last-child { border-bottom: 0; }
 
 #nav li li a {
@@ -184,7 +181,8 @@ min-height:1px;
 #nav li a span {
 	display: block;
 	width: 120px;
-	padding: 0 6px 0 9px;
+	padding: 4px 6px 4px 9px;
+	cursor:pointer;
 }
 
 #nav li li a:hover {
@@ -192,16 +190,16 @@ min-height:1px;
 	text-decoration: none;
 }
 
-#nav li.parent > a span { background: url(/images/mgs/nav-arrow.gif) no-repeat 120px 4px; }
+#nav li.parent > a span,
+#nav li.parent > a.hover span{background: url(/images/mgs/nav-arrow.gif) no-repeat 120px 50%;}
 
-#nav li li.parent > a span, #nav li li.parent > a:hover span { background: url(/images/mgs/nav-arrow-white.gif) no-repeat 120px 4px; }
+#nav li li.parent > a:hover span,
+#nav li li.parent > a span,
+#nav li.parent > a:hover span
+{background: url(/images/mgs/nav-arrow-white.gif) no-repeat 120px 50%; }
 
 #nav li a:hover { background: #cef3ff; }
 
-#nav li.parent > a:hover span, #nav li.parent > a.hover span {
-	background: url(/images/mgs/nav-arrow.gif) no-repeat 120px 4px;
-	cursor: pointer;
-}
 
 #nav ul ul {
 	width: 135px;
@@ -400,6 +398,7 @@ h2, .news-item h3, p.heading {
 	font-weight: bold;
 }
 
+.homepage h2{border:none;}
 #content h2 a { color: #000; }
 
 .news-item h3 { padding-bottom: 3px; }

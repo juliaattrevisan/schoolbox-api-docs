@@ -10,78 +10,89 @@ $this->setJavascript('/javascript/fusion.js');
 
 $pollHandler = new Poll();
 
-if (!empty($config['pollID']) && is_numeric($config['pollID'])) {
+if ( !empty($config['pollID']) && is_numeric($config['pollID']) ) {
 	$poll = $pollHandler->getByID($config['pollID']);
-}
 
-if ($poll['pollID']) {
-	$this->setVar(array(
-		'POLL_ID'		=> $poll['pollID'],
-		'POLL_TITLE'	=> scrubText($poll['title']),
-		'POLL_QUESTION'	=> scrubText($poll['question']),
-	));
+    if ($poll['pollID']) {
+        $this->setVar(array(
+            'POLL_ID'		=> $poll['pollID'],
+            'POLL_TITLE'	=> scrubText($poll['title']),
+            'POLL_QUESTION'	=> scrubText($poll['question']),
+        ));
 
-	$pollData = $pollHandler->getData($poll['pollID']);
+        $pollData = $pollHandler->getData($poll['pollID']);
 
-	if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']) || $this->arg[1] == 'pollResults') {
-		$this->setVar('POLL_HEIGHT', count($pollData) * 30 + 70);
-		$this->setVar('poll_vote_block', '');
+        if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']) || $this->arg[1] == 'pollResults') {
+            $this->setVar('POLL_HEIGHT', count($pollData) * 30 + 70);
+            $this->setVar('poll_vote_block', '');
 
-        $this->setVar('poll_answers_block', '');
+            $this->setVar('poll_answers_block', '');
 
-		if (is_array($pollData)) {
-			$i = 0;
+            if (is_array($pollData)) {
+                $i = 0;
 
-			foreach ($pollData as $data) {
-				$this->setVar(array(
-					'POLL_OPTION_INDEX'	=> $i,
-					'POLL_OPTION'		=> scrubText($data['option']),
-					'POLL_ON_OFF'		=> $i % 2 ? 'polloff':'',
-				));
+                foreach ($pollData as $data) {
+                    $this->setVar(array(
+                        'POLL_OPTION_INDEX'	=> $i,
+                        'POLL_OPTION'		=> scrubText($data['option']),
+                        'POLL_ON_OFF'		=> $i % 2 ? 'polloff':'',
+                    ));
 
-				$this->parse("poll_answers_block", "poll_answers", true);
+                    $this->parse("poll_answers_block", "poll_answers", true);
 
-				$i++;
-			}
-		}		
-		
-		$this->parse('poll_chart_block', 'poll_chart');
-	}
-	else {
-		$this->setVar('poll_options_block', '');
+                    $i++;
+                }
+            }
 
-		if (is_array($pollData)) {
-			$i = 0;
+            $this->parse('poll_chart_block', 'poll_chart');
+        }
+        else {
+            $this->setVar('poll_options_block', '');
 
-			foreach ($pollData as $data) {
-				$this->setVar(array(
-					'POLL_OPTION_INDEX'	=> $i,
-					'POLL_OPTION'		=> scrubText($data['option']),
-					'POLL_ON_OFF'		=> $i % 2 ? 'polloff':'',
-				));
+            if (is_array($pollData)) {
+                $i = 0;
 
-				$this->parse('poll_options_block', 'poll_options', true);
+                foreach ($pollData as $data) {
+                    $this->setVar(array(
+                        'POLL_OPTION_INDEX'	=> $i,
+                        'POLL_OPTION'		=> scrubText($data['option']),
+                        'POLL_ON_OFF'		=> $i % 2 ? 'polloff':'',
+                    ));
 
-				$i++;
-			}
-		}
-		
-		$this->setVar('poll_chart_block', '');
-		$this->parse('poll_vote_block', 'poll_vote');
-	}
+                    $this->parse('poll_options_block', 'poll_options', true);
+
+                    $i++;
+                }
+            }
+
+            $this->setVar('poll_chart_block', '');
+            $this->parse('poll_vote_block', 'poll_vote');
+        }
+    }
+    else {
+        $this->setVar(array(
+            'POLL_ID'		=> '',
+            'POLL_TITLE'	=> 'Poll',
+            'POLL_QUESTION'	=> '',
+        ));
+
+        $this->setVar("poll_chart_block", '');
+        $this->setVar("poll_vote_block", "");
+    }
+
+    $current = $poll;
 }
 else {
-	$this->setVar(array(
-		'POLL_ID'		=> '',
-		'POLL_TITLE'	=> 'Poll',
-		'POLL_QUESTION'	=> '',
-	));
+    $this->setVar(array(
+        'POLL_ID'		=> '',
+        'POLL_TITLE'	=> 'Poll',
+        'POLL_QUESTION'	=> '',
+    ));
 
-	$this->setVar("poll_chart_block", '');
-	$this->setVar("poll_vote_block", "");
+    $this->setVar("poll_chart_block", '');
+    $this->setVar("poll_vote_block", "");
 }
 
-$current = $poll;
 
 /* Poll selection
  */

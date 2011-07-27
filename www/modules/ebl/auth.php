@@ -27,4 +27,4 @@ $time = mktime();
 $secret = sha1($userID.$time.EBL_SHARED_SECRET);
 
 
-header('Location: ' .$_GET['url'].'&userid='$userID.'&tstamp='.$time.'&id='.$secret);
+header('Location: ' .$_GET['url'].'&userid='.$userID.'&tstamp='.$time.'&id='.$secret);

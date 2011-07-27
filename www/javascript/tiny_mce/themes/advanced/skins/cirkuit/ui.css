@@ -72,7 +72,8 @@
 .cirkuitSkin table.mceLayout {
 	border: 0;
 	border-left: 1px solid #CCC;
-	border-right: 1px solid #CCC
+	border-right: 1px solid #CCC;
+	background:#fff;
 }
 
 .cirkuitSkin table.mceLayout tr.mceFirst td {
@@ -99,6 +100,7 @@
 .cirkuitSkin .mceIframeContainer {
 	border-top: 1px solid #CCC;
 	border-bottom: 1px solid #CCC;
+	padding:7px 16px;
 	/*height: 100%; 5/22/2010 - Joe Rozzi - taken out comparing to default theme ui.css */
 }
 

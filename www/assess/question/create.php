@@ -178,6 +178,12 @@ else {
     $assessHandler = new Assess();
     $assessHandler->renderAssessContents($section['assess_id'], $this);
 
+	$assess = $assessHandler->getByID($section['assess_id']);
+
+	$this->setVar(array(
+		'ASSESS_CATEGORY_ID' => $assess['category_id'],
+	));
+
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
 }
 ?>

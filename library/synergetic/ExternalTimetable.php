@@ -87,7 +87,7 @@ class ExternalTimetable extends MSSQL{
             $startDate = $this->getLastSynergeticDay($date);
 
             if($this->synergeticDay[$startDate] > 5)
-                    $this->synergeticDay[$startDate] =+ 2;  //extra days for weekend
+                    $this->synergeticDay[$startDate] = $this->synergeticDay[$startDate] + 1;  //extra days for weekend
 
             $startDate = $startDate - ($this->synergeticDay[$startDate]*86400);
 
@@ -132,8 +132,7 @@ class ExternalTimetable extends MSSQL{
 
 			$query = "SELECT *, CONVERT(CHAR(19),CalendarEvents.CalendarDate) as startDate, CalendarEvents.CalendarType as type
 			FROM SynergyOne.dbo.CalendarEvents CalendarEvents
-			WHERE (CalendarEvents.CalendarType LIKE 'd%') AND CalendarEvents.CalendarDate >= '$mssqldate'
-			AND CalendarEvents.CalendarDate <= '$nowmssqldate'
+			WHERE (CalendarEvents.CalendarType LIKE 'd%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
 			ORDER BY CalendarEvents.CalendarDate DESC";
 
 			$result = $this->query($query);

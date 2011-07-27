@@ -17,7 +17,7 @@ $j(function() {
 		}
 
 		$j.post('/adminv2/userForm.php', data);
-	});
+	});		
 
 	/* Ajax Update service access permissions
 	 */
@@ -31,7 +31,7 @@ $j(function() {
 		}
 
 		$j.post('/adminv2/userForm.php', data);
-	});
+	}); 
 
 	/* Ajax Update SID values
 	 */
@@ -48,7 +48,9 @@ $j(function() {
 		$j.post('/adminv2/userForm.php', data);
 	});
 
-	$j('table tr:nth-child(2n)').addClass('dark');
+	$j('table tr.alternate-rows:nth-child(even), table.ruler tr:nth-child(even)').each(function() {
+		$j(this).addClass('dark');
+	})
 
 	$j('h3 span').qtip({
 		content: 'Edit the user\'s details.',
@@ -156,7 +158,100 @@ $j(function() {
 				}
 			}
 		}
+		
 	});
+	
+	/**********
+	Custom Validation
+	**********/
+	$j('.admin-form').validate({
+		rules: {
+			year: {
+			  	customValid : true
+			},
+			alt_email: {
+				email:true	
+			}
+		},
+		messages: {
+			defaultCampus: "Please select a default campus",
+			alt_email: "If you are entering an alternative email, please ensure it's a valid address"
+		},
+		errorPlacement: function(error, element) {
+			if (element.hasClass("campus-radio")) {
+				error.css('margin', 0);
+				error.insertAfter(element.closest('table'));
+			} else {
+							
+			error.insertAfter(element)
+			}
+		 }
+		
+	});
+	
+	$j.validator.addMethod("customValid", function(value, element) {
+		inputValue = (parseInt(value));
+		if (isNaN(inputValue)) {
+			
+			value = String(value);
+			
+			if ((value == 'k') || (value == 'elc') || (value == 'ELC') || (value == 'K')) {
+				console.log(value);
+				return true
+			} else {
+				return false;
+			}
+		} else {
+			if ((inputValue > 13) || (inputValue < 0)) {
+				return false
+			}
+			return true;
+		} 
+
+	}, "Please enter one a number in between 0 and 13 OR the letter 'K' OR the the phrase 'ELC'");
+
+	$j('#serviceCloneForm').validate({
+		rules: {
+			sid: {
+				customCampus: true	
+			},
+			service: {
+				customService: true
+			}
+		}
+		
+	});
+	
+	$j('#groupAdd').validate();
+	
+	$j.validator.addMethod("customCampus", function(value, element) {
+		if ($j(element).is(':visible')) { 
+			if (value !== "") {
+				return true;	
+			} else {
+				return false;	
+			}
+		} else {
+			return true;	
+		}
+
+	}, "Please select an option");
+
+	$j.validator.addMethod("customService", function(value, element) {
+		
+		if (value !== "") {
+			return true;	
+		} else {
+			return false;	
+		}
+
+	}, "Please select an option");
+	
+	$j('#groupSelect, #campusSelect,#serviceSelect').change(function() {
+		$j(this).closest('form').validate().element($j(this));
+	})
+
+	
 });
 </script>
 
@@ -193,10 +288,10 @@ $j(function() {
 					</select>
 				</label>
 				<label class="width2 first">First Name
-					<input type="text" name="firstname" value="{FIRSTNAME}" />
+					<input type="text" name="firstname" value="{FIRSTNAME}" class="required" />
 				</label>
 				<label for="lastname">Surname
-					<input type="text" name="lastname" value="{LASTNAME}"/>
+					<input type="text" name="lastname" value="{LASTNAME}" class="required"/>
 				</label>
 				<label for ="database" class="">{DATABASE_TYPE} ID
 					<input type="text" name="database_id" value="{DATABASE_ID}"/>
@@ -230,7 +325,7 @@ $j(function() {
 		<div class="split-container">
 			<div class="split last">
                 <label for ="username" class="width2">Username
-					<input type="text" name="modusername" value="{USERNAME}" />
+					<input type="text" name="modusername" value="{USERNAME}" class="required" />
 				</label>
 				<label for="password" class="password-container">
 					<div class="actual-password">Password<br />
@@ -276,6 +371,7 @@ $j(function() {
 </div>
 <div class="level clearfix">
 	<h3>Groups</h3>
+	<h4>Manage</h4>
 	<table>
 		<colgroup>
 			<col width="10%" />
@@ -291,7 +387,7 @@ $j(function() {
 		</thead>
 		<tbody>
 			<!-- BEGIN user_group -->
-			<tr>
+			<tr class="alternate-rows">
 				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></td>
 				<td>
@@ -308,20 +404,25 @@ $j(function() {
 			</tr>
 			<!-- END user_group -->
 			<tr>
-				<td colspan="4" class="colours-buttons">
-					<form action="/adminv2/userForm.php" method="post">
-						<input type="hidden" name="groupSubmit" />
-						<input type="hidden" value="{USERID}" name="uid">
-						<input type="hidden" value="1" name="service">
-						<input type="hidden" value="1" name="type">
-
-						<select class="formfield float-left" name="sid">
-							<option value="0">&lt;- Please Select a Group -&gt;</option>
-							<!-- BEGIN all_group -->
-							<option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
-							<!-- END all_group -->
-						</select>
-						<input type="submit" class="submit-btn-plain" value="Add">
+				<td colspan="4"><h4 style="margin-top:16px;">Add</h4>
+					<form action="/adminv2/userForm.php" method="post" class="clearfix" id="groupAdd">
+						<fieldset>
+							<input type="hidden" name="groupSubmit" />
+							<input type="hidden" value="{USERID}" name="uid">
+							<input type="hidden" value="1" name="service">
+							<input type="hidden" value="1" name="type">
+							<label class="clearfix ">
+								<select class="formfield required" name="sid" id="groupSelect">
+									<option value="">&lt;- Please Select a Group -&gt;</option>
+									<!-- BEGIN all_group -->
+									<option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
+									<!-- END all_group -->
+								</select>
+							</label>
+						</fieldset>
+						<label class="clearfix float-left">
+							<input type="submit" class="submit-btn-plain" value="Add">
+						</label>
 					</form>
 				</td>
 			</tr>
@@ -330,7 +431,8 @@ $j(function() {
 </div>
 <div class="level clearfix">
 	<h3 id="permissions">Permissions</h3>
-	<table>
+	<h4>Manage</h4>
+	<table class="alternate-rows">
 		<colgroup>
 			<col width="10%" />
 			<col width="20%" />
@@ -341,12 +443,13 @@ $j(function() {
 			<tr>
 				<th>Remove</th>
 				<th>Service</th>
+				<th>Campus</th>
 				<th>Access</th>
 			</tr>
 		</thead>
 		<tbody>
 			<!-- BEGIN user_calendar -->
-			<tr>
+			<tr class="alternate-rows">
 				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td>Calendar</td>
 				<td>
@@ -372,7 +475,7 @@ $j(function() {
 			</tr>
 			<!-- END user_calendar --> 
 			<!-- BEGIN user_news -->
-			<tr>
+			<tr class="alternate-rows">
 				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td>News</td>
 				<td>
@@ -398,11 +501,10 @@ $j(function() {
 			</tr>
 			<!-- END user_news --> 
 			<!-- BEGIN user_cms -->
-			<tr>
+			<tr class="alternate-rows">
 				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td>CMS</td>
-				<td>
-				</td>
+				<td></td>
 				<td>
 					<form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
 						<input type="hidden" name="uid" value="{USERID}" />
@@ -416,35 +518,65 @@ $j(function() {
 				</td>
 			</tr>
 			<!-- END user_cms -->
-			<tr>
-				<td colspan="4" class="colours-buttons">
+			<tr class="ignore">
+				<td colspan="4">
+					<h4 style="margin-top:16px;">Add</h4>
+					<form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" class="clearfix">
+							<input type="hidden" name="addService" />
+							<input type="hidden" value="{USERID}" name="uid">
+						<table cellpadding="0" cellspacing="0">
+						<colgroup>
+							<col width="10%" />
+							<col width="20%" />
+							<col width="70%" />
 
-					<form id="serviceCloneForm" action="/adminv2/userForm.php" method="post">
-						<input type="hidden" name="addService" />
-						<input type="hidden" value="{USERID}" name="uid">
-
-						<select class="formfield float-left" name="service">
-							<option value="0">&lt;- Please Select a service -&gt;</option>
-							<option value="2">Calendar</option>
-							<option value="3">News</option>
-							<option value="5">CMS</option>
-						</select>
-
-						<select name="sid">
-						<!-- BEGIN campusPermsList -->
-							<!-- BEGIN perm_campus -->
-							<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
-							<!-- END perm_campus -->
-						<!-- END campusPermsList -->
-						</select>
-
-						<input type="radio" name="type" value="1" checked="checked" />Read
-						<input type="radio" name="type" value="2" />Write
-						<input type="radio" name="type" value="3" />Moderate
-
-						<div class="float-fix"></div>
+						</colgroup>
+						<tr>
+							<th>Service</th>
+							<th>Campus</th>
+							<th>Access</th>
+						</tr>
+						
+						<tr>
+						<td>
+						<label>
+							<select class="formfield" name="service" id="serviceSelect">
+								<option value="">&lt;-Select service -&gt;</option>
+								<option value="2">Calendar</option>
+								<option value="3">News</option>
+								<option value="5">CMS</option>
+							</select>
+						</label>
+						</td>
+						<td>
+						<label>
+							<select name="sid" id="campusSelect">
+							<option value="">&lt;-Select campus -&gt;</option>
+							<!-- BEGIN campusPermsList -->
+								<!-- BEGIN perm_campus -->
+								<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
+								<!-- END perm_campus -->
+							<!-- END campusPermsList -->
+							</select>
+						</label>
+						</td>
+						<td>
+	
+							<input type="radio" name="type" value="1" checked="checked" />Read
+							<input type="radio" name="type" value="2" />Write
+							<input type="radio" name="type" value="3" />Moderate
+						</td>
+						</tr>
+						<tr>
+						<td colspan="3">
+				
+						<label class="clearfix float-left">
 						
 						<input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
+						</label>
+						</td>
+						</tr>
+						</table>
 					</form>
 				</td>
 			</tr>

@@ -134,8 +134,7 @@ a:hover { color: #C3536F; }
 .box ul { list-style: none; }
 
 .box ul li, .news-item ul li {
-	list-style: none;
-	background: url(/images/ormond/bullet.gif) no-repeat 0 4px;
+	
 }
 
 .box .listing ul li { background: 0; }

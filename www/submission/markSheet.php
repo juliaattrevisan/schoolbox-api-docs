@@ -122,6 +122,9 @@ else if(is_numeric($this->arg[0])) {
 	$this->setBlock('markItem', 'mark', 'mark_block');
     $this->setBlock('markItem', 'onlineAssessmentMark', 'onlineAssessmentMark_block');
 
+	$this->setBlock(TEMPLATE_content, 'no_submissions', 'no_submissions_block');
+	$this->setBlock(TEMPLATE_content, 'no_assessments', 'no_assessments_block');
+
     if(!$groupHandler->isStaff() )
             error(19);
 
@@ -157,6 +160,15 @@ else if(is_numeric($this->arg[0])) {
 
 	$this->setVar('sub_head_block', '');
 	$this->setVar('assess_head_block', '');
+
+	$this->setVar('no_submissions_block', '');
+	$this->setVar('no_assessments_block', '');
+
+	/* Keep a count of how many submissions and assessments there are,
+	 * so we can display the no-submissions or no-assessments message
+	 */
+	$numSubmissions = 0;
+	$numOnlineAssessments = 0;
 
 	if (is_array($subList)) {
 		foreach($subList as $sub) {
@@ -195,15 +207,30 @@ else if(is_numeric($this->arg[0])) {
                     $responseHandler->updatedAutomatedMarks($markedResponseIDs);
                 }
 
-				$this->parse('assess_head_block','assess_head',true);
+				$this->parse('assess_head_block','assess_head', true);
+
+				$numOnlineAssessments++;
             }
 			else {
-				$this->parse('sub_head_block','sub_head',true);
+				$this->parse('sub_head_block','sub_head', true);
+
+				$numSubmissions++;
 			}
 		}
 	}
 	else {
-		$this->setVar('sub_head_block','');
+		$this->setVar('sub_head_block', '');
+	}
+
+	/* Check if there are any submission boxes/online assessments; if not,
+	 * push out the message; otherwise hide it
+	 */
+	if (!$numSubmissions) {
+		$this->parse('no_submissions_block', 'no_submissions');
+	}
+
+	if (!$numOnlineAssessments) {
+		$this->parse('no_assessments_block', 'no_assessments');
 	}
 
 	if(is_array($studentList)) {
@@ -218,7 +245,7 @@ else if(is_numeric($this->arg[0])) {
 			$this->setVar('mark_block','');
             $this->setVar('onlineAssessmentMark_block','');
 
-			if(is_array($subList)) {
+			if (is_array($subList)) {
 				foreach($subList as $sub) {
                     if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
                         $firstSection = $sectionHandler->getFirst($sub['id']);
@@ -238,12 +265,18 @@ else if(is_numeric($this->arg[0])) {
                         $this->parse('onlineAssessmentMark_block', 'onlineAssessmentMark');
                     }
                     else {
-                        $return = $retHandler->getByUser($student['uid'],$sub['id']);
+                        /* If a UID was found for the student, try to get his
+                         * submissions. Otherwise skip him (this occurs when he
+                         * exists in Synergetic but not in schoolbox)
+                         */
+                        if (is_numeric($student['uid'])) {
+                            $return = $retHandler->getByUser($student['uid'],$sub['id']);
 
-                        $this->setVar(array(
-                            'MARK'		=> scrubTEXT($return[0]['mark']),
-                            'BOX_ID'	=> $sub['id'],
-                        ));
+                            $this->setVar(array(
+                                'MARK' => scrubTEXT($return[0]['mark']),
+                                'BOX_ID' => $sub['id'],
+                            ));
+                        }
 
                         $this->parse('mark_block','mark');
 						$this->setVar('onlineAssessmentMark_block', '');

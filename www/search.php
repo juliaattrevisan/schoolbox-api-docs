@@ -155,7 +155,7 @@ if (!empty($result['user'])) {
             'USER_EMAIL'      => $email,
             'USER_COUNT'      => $count['user'],
             'USER_YEAR'       => empty($user['year']) ? '' : "Year {$user['year']}",
-            'USER_CAMPUS'     => $user['campus_name'],
+            'USER_CAMPUS'     => stristr($user['group_name'], $user['campus_name'])?'':$user['campus_name'],
             'USER_GROUP'      => $user['group_name'],
         ));
 

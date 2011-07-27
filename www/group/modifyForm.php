@@ -101,11 +101,11 @@ elseif (isset($_POST['bulkAdd'])) {
     $userHandler = new User;
 
 	//get rid of newlines
-	$string = preg_replace("(\r\n|\n|\r)", ",", $_POST['bulkAdd']);
+	$string = preg_replace('/(\r\n|\n|\r)/', ',', $_POST['bulkAdd']);
 	
 	//split the list into an array
 	$list = preg_split('/[,; ]/', $string);
-	
+
 	foreach($list as $key) {
 		$key = trim($key);
 

@@ -154,11 +154,6 @@ label { font-weight:bold; }
 	background: #CF0034;
 }
 
-.box ul { list-style: none; }
-
-.box ul li, .news-item ul li {
-	padding-left: 20px;
-}
 
 .box .listing ul li { background: 0; }
 

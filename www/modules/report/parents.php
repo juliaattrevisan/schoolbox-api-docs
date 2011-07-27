@@ -49,6 +49,7 @@ if ($groupHandler->isParent() || $groupHandler->isSuperuser() || $groupHandler->
 				/* Clear children blocks after parsing out the parent
 				 */
 				$this->setVar('contact_block', '');
+
                 $showContact = false;
 
 				$this->setVar(array(
@@ -58,6 +59,18 @@ if ($groupHandler->isParent() || $groupHandler->isSuperuser() || $groupHandler->
 			}
 
 			if ($currentContact['PrimaryDirectoryIncludeFlag'] == 1) {
+				$address = $currentContact['StudentContactAddress1'];
+
+				/* Combine additional address details
+				 */
+				if ($currentContact['StudentContactAddress2'] != '') {
+					$address .= ',<br />' . $currentContact['StudentContactAddress2'];
+				}
+
+				if ($currentContact['StudentContactAddress3'] != '') {
+					$address .= ',<br />' . $currentContact['StudentContactAddress3'];
+				}
+
 				$this->setVar(array(
 					'CONTACT_CONTACT_TYPE' => $currentContact['StudentContactType'],
 					'CONTACT_TITLE' => $currentContact['StudentContactTitle'],
@@ -65,16 +78,33 @@ if ($groupHandler->isParent() || $groupHandler->isSuperuser() || $groupHandler->
 					'CONTACT_SURNAME' => $currentContact['StudentContactSurname'],
 					'CONTACT_PHONE' => $currentContact['StudentContactPhoneActual'],
 					'CONTACT_MOBILE' => $currentContact['StudentContactMobilePhone'],
-					'CONTACT_STREET' => $currentContact['StudentContactAddress1'],
+					'CONTACT_STREET' => $address,
 					'CONTACT_SUBURB' => $currentContact['StudentContactSuburb'],
 					'CONTACT_STATE' => $currentContact['StudentContactState'],
 					'CONTACT_POSTCODE' => $currentContact['StudentContactPostCode'],
+					'CONTACT_COUNTRY' => $currentContact['StudentContactCountryDesc'],
+					'CONTACT_EMAIL' => $currentContact['StudentContactDefaultEmail'],
 				));
+
                 $showContact = true;
+
 			    $this->parse('primary_block','primary');
             }
             else {
-                $this->setVar('primary_block','');
+				/* Clear fields for spouse
+				 */
+				$this->setVar(array(
+					'CONTACT_PHONE' => '',
+					'CONTACT_MOBILE' => '',
+                    'CONTACT_STREET' => '',
+                    'CONTACT_SUBURB' => '',
+                    'CONTACT_STATE' => '',
+                    'CONTACT_POSTCODE' => '',
+					'CONTACT_COUNTRY' => '',
+					'CONTACT_EMAIL' => '',
+				));
+
+                $this->setVar('primary_block', '');
             }
 
 			if ($currentContact['StudentContactSpousePreferred'] != '' && $currentContact['SpouseDirectoryIncludeFlag'] == 1) {
@@ -83,21 +113,20 @@ if ($groupHandler->isParent() || $groupHandler->isSuperuser() || $groupHandler->
                     'SPOUSE_TITLE' => $currentContact['StudentContactSpouseTitle'],
                     'SPOUSE_FIRSTNAME' => $currentContact['StudentContactSpousePreferred'],
                     'SPOUSE_SURNAME' => $currentContact['StudentContactSpouseSurname'],
-                    'SPOUSE_PHONE' => $currentContact['StudentContactSpousePhoneActual'],
-                    'SPOUSE_MOBILE' => $currentContact['StudentContactSpouseMobilePhone'],
-                    'SPOUSE_STREET' => $currentContact['StudentContactSpouseAddress1'],
-                    'SPOUSE_SUBURB' => $currentContact['StudentContactSpouseSuburb'],
-                    'SPOUSE_STATE' => $currentContact['StudentContactSpouseState'],
-                    'SPOUSE_POSTCODE' => $currentContact['StudentContactSpousePostCode'],
+                    'CONTACT_PHONE' => $currentContact['StudentContactSpouseOccupPhone'],
+                    'CONTACT_MOBILE' => $currentContact['StudentContactSpouseMobilePhone'],
+					'CONTACT_EMAIL' => $currentContact['StudentContactSpouseDefaultEmail'],
                 ));
+
                 $showContact = true;
+
                 $this->parse('spouse_block', 'spouse');
             }
             else {
                 $this->setVar('spouse_block', '');
             }
 
-            if($showContact){
+            if ($showContact === true){
 				$this->parse('contact_block', 'contact', true);
 			}
 			else {
