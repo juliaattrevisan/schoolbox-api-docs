@@ -53,7 +53,6 @@ class Autoloader {
         else if ( $classFile = self::getClassFile($className) ) {
             self::includeFile($classFile);
         }
-        
     }
 
     /**

@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 require_once('../library/assess/Assess.php');
+require_once('../library/assess/AssessQuestion.php');
+require_once('../library/assess/AssessAnswer.php');
 require_once('../library/assess/AssessFactory.php');
 require_once('../library/assess/AssessSection.php');
 
