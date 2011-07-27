@@ -1,7 +1,7 @@
 <?php
-require_once('../library/assess/AssessFactory.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationFactory.php');
 
-class SurveyFactory extends AssessFactory {
+class SurveyFactory extends EvaluationFactory {
 	protected $factoryName = 'Survey';
 
     protected $questionSubclassPath = '../library/survey/questionType';
