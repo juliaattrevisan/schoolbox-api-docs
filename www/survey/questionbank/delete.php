@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/AssessQuestionBank.php');
+require_once('../library/survey/SurveyQuestionBank.php');
 
 $groupHandler = new Group();
 

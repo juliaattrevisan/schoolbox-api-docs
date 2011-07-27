@@ -1,4 +1,6 @@
 <?php
+require_once('../library/assess/AssessQuestion.php');
+require_once('../library/assess/AssessAnswer.php');
 require_once('../library/assess/AssessQuestionBank.php');
 
 $this->setFile(TEMPLATE_content, 'assess/questionbank/contents.html');

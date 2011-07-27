@@ -1,7 +1,9 @@
 <?php
-require_once('../library/assess/AssessQuestionBank.php');
+require_once('../library/survey/SurveyQuestion.php');
+require_once('../library/survey/SurveyAnswer.php');
+require_once('../library/survey/SurveyQuestionBank.php');
 
-$this->setFile(TEMPLATE_content, 'assess/questionbank/contents.html');
+$this->setFile(TEMPLATE_content, 'survey/questionbank/contents.html');
 $this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
 $this->setBlock(TEMPLATE_content, 'show_submit', 'show_submit_block');
 $this->setBlock(TEMPLATE_content, 'show_delete', 'show_delete_block');
@@ -13,7 +15,7 @@ $this->setVar(array(
 	'SECTION_ID' => $this->arg[0],
 ));
 
-$questionBankHandler = new AssessQuestionBank();
+$questionBankHandler = new SurveyQuestionBank();
 
 $allQuestions = $questionBankHandler->getContents();
 
