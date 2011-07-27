@@ -11,8 +11,8 @@
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationQuestion.php');
 
 class SurveyQuestion extends EvaluationQuestion {
-    protected $_table = 'assess_question';
-    protected $_index = 'question_id';
+    public $_table = 'assess_question';
+    public $_index = 'question_id';
 
     /**
      * Get all available question types.
