@@ -17,6 +17,8 @@ require_once('../library/assess/Assess.php');
 require_once('../library/assess/AssessFactory.php');
 require_once('../library/assess/AssessSection.php');
 require_once('../library/assess/AssessAttempt.php');
+require_once('../library/assess/AssessAnswer.php');
+require_once('../library/assess/AssessResponse.php');
 
 $factory = new AssessFactory();
 $assessHandler = new Assess();
