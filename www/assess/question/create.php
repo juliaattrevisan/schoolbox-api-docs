@@ -14,12 +14,14 @@
  */
 require_once('../library/assess/Assess.php');
 require_once('../library/assess/AssessSection.php');
+require_once('../library/assess/AssessQuestion.php');
 require_once('../library/assess/AssessFactory.php');
 require_once('../library/group.php');
 
-$factory = new AssessFactory();
 $assessHandler = new Assess();
 $sectionHandler = new AssessSection();
+$questionHandler = new AssessQuestion();
+$factory = new AssessFactory();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -87,8 +89,6 @@ else {
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setTitle('Create Question');
-
-    $questionHandler = new AssessQuestion();
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
@@ -174,8 +174,8 @@ else {
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assess = new Assess();
-    $assess->renderAssessContents($section['assess_id'], $this);
+    $assessHandler = new Assess();
+    $assessHandler->renderAssessContents($section['assess_id'], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
 }

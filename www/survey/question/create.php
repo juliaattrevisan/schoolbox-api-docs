@@ -13,14 +13,15 @@
  * @version     SVN: $Id$
  */
 require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveyQuestion.php');
 require_once('../library/survey/SurveySection.php');
+require_once('../library/survey/SurveyQuestion.php');
 require_once('../library/survey/SurveyFactory.php');
 require_once('../library/group.php');
 
-$factory = new SurveyFactory();
 $assessHandler = new Survey();
 $sectionHandler = new SurveySection();
+$questionHandler = new SurveyQuestion();
+$factory = new SurveyFactory();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -88,8 +89,6 @@ else {
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setTitle('Create Question');
-
-    $questionHandler = new SurveyQuestion();
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
