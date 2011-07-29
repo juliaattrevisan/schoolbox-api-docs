@@ -87,7 +87,7 @@ abstract class EvaluationSection extends DeprecatedModel {
      * @param <type> $section_id
      * @return <type>
      */
-    public function getContents($assess_id, $section_id, $sectionExclusion = false) {
+    public function getContents($assess_id, $section_id, $sectionExclusion = false, $question_id = false) {
         $query = "SELECT assess_id,
                          assess_section.section_id,
                          assess_section.title,
@@ -103,6 +103,12 @@ abstract class EvaluationSection extends DeprecatedModel {
         if ($sectionExclusion) {
             $query .= " AND question_id IS NOT NULL";
         }
+
+		/* Optionally filter by question
+		 */
+		if ($question_id) {
+			$query .= " AND question_id = '$question_id'";
+		}
 
         $query .= " ORDER BY sectionSequence, assess_question.sequence";
 

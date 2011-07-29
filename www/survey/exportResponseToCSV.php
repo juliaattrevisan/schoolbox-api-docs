@@ -17,9 +17,7 @@ require_once('../library/survey/SurveyAttempt.php');
 require_once('../library/survey/SurveyExporter.php');
 
 $assessHandler = new Survey();
-$sectionHandler = new SurveySection();
 $factory = new SurveyFactory();
-$attemptHandler = new SurveyAttempt();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -35,7 +33,14 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-$surveyExporter = new SurveyExporter($assess, $factory, new SurveySection(), new SurveyAttempt());
+$surveyExporter = new SurveyExporter($assess, $factory, new SurveySection(), new SurveyAttempt(), new SurveyQuestion());
+
+/* Optionally filter by question
+ */
+if (is_numeric($this->arg[1])) {
+	$surveyExporter->setFilterByQuestion($this->arg[1]);
+}
+
 $sectionValues = $surveyExporter->getSectionValues();
 
 /* Format output

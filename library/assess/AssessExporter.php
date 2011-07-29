@@ -154,6 +154,25 @@ class AssessExporter {
 	}
 
 	/**
+	 * Set a question_id to filter by
+	 *
+	 * @param  $question_id
+	 * @return void
+	 */
+	public function setFilterByQuestion($question_id) {
+		$this->filterByQuestion = $question_id;
+	}
+
+	/**
+	 * Get a question_id to filter by
+	 *
+	 * @return
+	 */
+	public function getFilterByQuestion() {
+		return $this->filterByQuestion;
+	}
+
+	/**
 	 * Gets the questions and summary of results for each section
 	 *
 	 * @return array
@@ -170,7 +189,7 @@ class AssessExporter {
 
 			/* Get a list of questions to use as heading data
 			*/
-			$allQuestions = $this->getSectionHandler()->getContents($this->getAssessID(), $currentSection['section_id']);
+			$allQuestions = $this->getSectionHandler()->getContents($this->getAssessID(), $currentSection['section_id'], false, $this->getFilterByQuestion());
 
 			$this->sectionValues[$k]['questions'] = $this->getQuestionData($allQuestions);
 

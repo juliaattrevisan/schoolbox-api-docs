@@ -2,31 +2,33 @@
 
 class SurveyExporter {
 	private $sectionValues = array();
+	private $filterByQuestion = false;
 
-	public function __construct($assess, $factory, $sectionHandler, $attemptHandler) {
-		$this->setSurveyID($assess['assess_id']);
+	public function __construct($assess, $factory, $sectionHandler, $attemptHandler, $questionHandler) {
+		$this->setAssessID($assess['assess_id']);
 		$this->setFactory($factory);
 		$this->setSectionHandler($sectionHandler);
 		$this->setAttemptHandler($attemptHandler);
+		$this->setQuestionHandler($questionHandler);
 	}
 
 	/**
-	 * Sets survey_id
+	 * Sets assess_id
 	 *
-	 * @param  $survey_id
+	 * @param  $assess_id
 	 * @return void
 	 */
-	private function setSurveyID($survey_id) {
-		$this->survey_id = $survey_id;
+	private function setAssessID($assess_id) {
+		$this->assess_id = $assess_id;
 	}
 
 	/**
-	 * Gets survey_id
+	 * Gets assess_id
 	 *
 	 * @return
 	 */
-	private function getSurveyID() {
-		return $this->survey_id;
+	private function getAssessID() {
+		return $this->assess_id;
 	}
 
 	/**
@@ -84,6 +86,25 @@ class SurveyExporter {
 	 */
 	private function getAttemptHandler() {
 		return $this->attemptHandler;
+	}
+
+	/**
+	 * Sets a questionHandler
+	 *
+	 * @param  $questionHandler
+	 * @return void
+	 */
+	private function setQuestionHandler($questionHandler) {
+		$this->questionHandler = $questionHandler;
+	}
+
+	/**
+	 * Gets a questionHandler
+	 *
+	 * @return
+	 */
+	private function getQuestionHandler() {
+		return $this->questionHandler;
 	}
 
 	/**
@@ -154,13 +175,47 @@ class SurveyExporter {
 	}
 
 	/**
+	 * Set a question_id to filter by
+	 *
+	 * @param  $question_id
+	 * @return void
+	 */
+	public function setFilterByQuestion($question_id) {
+		$this->filterByQuestion = $question_id;
+	}
+
+	/**
+	 * Get a question_id to filter by
+	 *
+	 * @return
+	 */
+	public function getFilterByQuestion() {
+		return $this->filterByQuestion;
+	}
+
+	/**
 	 * Gets the questions and summary of results for each section
 	 *
 	 * @return array
 	 */
 	public function getSectionValues() {
-		$allSections = $this->getSectionHandler()->getList($this->getSurveyID());
 
+		/* Determine whether to get all sections, or just the one belonging to
+		 * the question by which to filter
+		 */
+		if ($this->getFilterByQuestion()) {
+			$question = $this->getQuestionHandler()->getByID($this->getFilterByQuestion());
+
+			/* Need to be in array format, for iteration
+			 */
+			$allSections = array($this->getSectionHandler()->getByID($question['section_id']));
+		}
+		else {
+			$allSections = $this->getSectionHandler()->getList($this->getAssessID());
+		}
+
+		/* Process
+		 */
 		for ($k = 0; $k < count($allSections); $k++) {
 			$currentSection = $allSections[$k];
 
@@ -170,13 +225,13 @@ class SurveyExporter {
 
 			/* Get a list of questions to use as heading data
 			*/
-			$allQuestions = $this->getSectionHandler()->getContents($this->getSurveyID(), $currentSection['section_id']);
+			$allQuestions = $this->getSectionHandler()->getContents($this->getAssessID(), $currentSection['section_id'], false, $this->getFilterByQuestion());
 
 			$this->sectionValues[$k]['questions'] = $this->getQuestionData($allQuestions);
 
 			/* Get attempts for the assessment
 			 */
-			$allAttempts = $this->getAttemptHandler()->getListByAssessAndSection($this->getSurveyID(), $currentSection['section_id']);
+			$allAttempts = $this->getAttemptHandler()->getListByAssessAndSection($this->getAssessID(), $currentSection['section_id']);
 
 			if ($allAttempts) {
 				for ($j = 0; $j < count($allAttempts); $j++) {
@@ -188,6 +243,7 @@ class SurveyExporter {
 						$responseValues = array();
 
 						for ($i = 0; $i < count($allQuestions); $i++) {
+
 							$this->updateResponseSummary($allQuestions[$i], $allAttempts[$j], $k, $i);
 
 							/* This if() clause allows for sections containing no questions.
