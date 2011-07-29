@@ -2,12 +2,14 @@
 
 class AssessExporter {
 	private $sectionValues = array();
+	private $filterByQuestion = false;
 
-	public function __construct($assess, $factory, $sectionHandler, $attemptHandler) {
+	public function __construct($assess, $factory, $sectionHandler, $attemptHandler, $questionHandler) {
 		$this->setAssessID($assess['assess_id']);
 		$this->setFactory($factory);
 		$this->setSectionHandler($sectionHandler);
 		$this->setAttemptHandler($attemptHandler);
+		$this->setQuestionHandler($questionHandler);
 	}
 
 	/**
@@ -84,6 +86,25 @@ class AssessExporter {
 	 */
 	private function getAttemptHandler() {
 		return $this->attemptHandler;
+	}
+
+	/**
+	 * Sets a questionHandler
+	 *
+	 * @param  $questionHandler
+	 * @return void
+	 */
+	private function setQuestionHandler($questionHandler) {
+		$this->questionHandler = $questionHandler;
+	}
+
+	/**
+	 * Gets a questionHandler
+	 *
+	 * @return
+	 */
+	private function getQuestionHandler() {
+		return $this->questionHandler;
 	}
 
 	/**
@@ -178,8 +199,23 @@ class AssessExporter {
 	 * @return array
 	 */
 	public function getSectionValues() {
-		$allSections = $this->getSectionHandler()->getList($this->getAssessID());
 
+		/* Determine whether to get all sections, or just the one belonging to
+		 * the question by which to filter
+		 */
+		if ($this->getFilterByQuestion()) {
+			$question = $this->getQuestionHandler()->getByID($this->getFilterByQuestion());
+
+			/* Need to be in array format, for iteration
+			 */
+			$allSections = array($this->getSectionHandler()->getByID($question['section_id']));
+		}
+		else {
+			$allSections = $this->getSectionHandler()->getList($this->getAssessID());
+		}
+
+		/* Process
+		 */
 		for ($k = 0; $k < count($allSections); $k++) {
 			$currentSection = $allSections[$k];
 
@@ -207,6 +243,7 @@ class AssessExporter {
 						$responseValues = array();
 
 						for ($i = 0; $i < count($allQuestions); $i++) {
+
 							$this->updateResponseSummary($allQuestions[$i], $allAttempts[$j], $k, $i);
 
 							/* This if() clause allows for sections containing no questions.

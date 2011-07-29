@@ -17,9 +17,7 @@ require_once('../library/assess/AssessAttempt.php');
 require_once('../library/assess/AssessExporter.php');
 
 $assessHandler = new Assess();
-$sectionHandler = new AssessSection();
 $factory = new AssessFactory();
-$attemptHandler = new AssessAttempt();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -35,7 +33,14 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-$assessExporter = new AssessExporter($assess, $factory, new AssessSection(), new AssessAttempt());
+$assessExporter = new AssessExporter($assess, $factory, new AssessSection(), new AssessAttempt(), new AssessQuestion());
+
+/* Optionally filter by question
+ */
+if (is_numeric($this->arg[1])) {
+	$assessExporter->setFilterByQuestion($this->arg[1]);
+}
+
 $sectionValues = $assessExporter->getSectionValues();
 
 /* Format output
