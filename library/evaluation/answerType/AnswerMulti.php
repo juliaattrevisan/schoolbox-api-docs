@@ -238,5 +238,25 @@ abstract class AnswerMulti extends EvaluationAnswer {
 		return $data;
 	}
 
+	/**
+	 * Gets the text associated with an array-based multiple choice answer
+	 *
+	 * @param  $question_id
+	 * @param  $value
+	 * @return string
+	 */
+	public function getAnswerText($question_id, $value) {
+		$answer = $this->getByQuestionID($question_id);
+
+		$allOptions = unserialize($answer['answer']);
+
+		foreach($allOptions as $currentOption) {
+			if ($currentOption->value == $value) {
+				return $currentOption->description;
+			}
+		}
+
+		return '';
+	}
 }
 ?>

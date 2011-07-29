@@ -55,6 +55,8 @@ $allSections = $sectionHandler->getList($this->arg[0]);
 
 for ($k = 0; $k < count($allSections); $k++) {
 	$currentSection = $allSections[$k];
+	$questionValues = array();
+	$responseValues = array();
 
 	/* Initialise array data
 	 */

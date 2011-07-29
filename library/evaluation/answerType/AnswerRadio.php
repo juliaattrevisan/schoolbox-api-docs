@@ -148,7 +148,10 @@ abstract class AnswerRadio extends EvaluationAnswer {
      * @param <type> $response
      */
     public function saveResponse($data) {
-        $processedResponse = serialize($data['answer']);
+
+		/* Enforce array format for radio answers
+		 */
+        $processedResponse = serialize(array($data['answer']));
 
         return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
     }
@@ -238,6 +241,27 @@ abstract class AnswerRadio extends EvaluationAnswer {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Gets the text associated with an array-based multiple choice answer
+	 *
+	 * @param  $question_id
+	 * @param  $value
+	 * @return string
+	 */
+	public function getAnswerText($question_id, $value) {
+		$answer = $this->getByQuestionID($question_id);
+
+		$allOptions = unserialize($answer['answer']);
+
+		foreach($allOptions as $currentOption) {
+			if ($currentOption->value == $value) {
+				return $currentOption->description;
+			}
+		}
+
+		return '';
 	}
 }
 ?>

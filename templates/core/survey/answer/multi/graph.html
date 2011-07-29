@@ -1,0 +1,25 @@
+<script type='text/javascript'>
+$j(function() {
+	$j.plot($j("#{GRAPH_ID}"), [
+		<!-- BEGIN series -->
+		{
+			label: "{SERIES_LABEL}",
+			data: [[{SERIES_INDEX}, {SERIES_DATA}]],
+			bars: {
+				show: true,
+				align: 'center'
+			}
+		}<!-- BEGIN series_separator -->,<!-- END series_separator -->
+		<!-- END series -->
+	], {
+		xaxis: {
+			show: false,
+			tickLength: 0
+		},
+		yaxis: {
+			tickDecimals: 0
+		}
+	});
+});
+</script>
+<div id='{GRAPH_ID}' style="width:600px;height:300px;"></div>
