@@ -11,20 +11,6 @@ class SurveyAnswerShort extends AnswerShort {
     }
 
 	/**
-	 * Get the response for a particular question
-	 *
-	 * @param <type> $response_id
-	 */
-	public function exportResponseToArray($attempt_id, $question_id) {
-		$response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
-
-		$data = $response['response'];
-
-		return $data;
-	}
-
-
-	/**
 	 * Graph the results for this answer type
 	 *
 	 * @param  $page

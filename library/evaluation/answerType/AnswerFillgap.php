@@ -234,5 +234,18 @@ abstract class AnswerFillgap extends EvaluationAnswer {
 
 		return;
 	}
+
+	/**
+	 * Get the response for a particular question
+	 *
+	 * @param <type> $response_id
+	 */
+	public function exportResponseToArray($attempt_id, $question_id) {
+		$response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
+
+		$data = unserialize($response['response']);
+
+		return $data;
+	}
 }
 ?>
