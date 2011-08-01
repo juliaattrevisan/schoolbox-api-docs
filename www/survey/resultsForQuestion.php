@@ -91,6 +91,11 @@ if (is_array($sectionValues) && count($sectionValues)) {
 		if ($questionHandler->hasLegend($sectionValues[0]['questions'][0]['type_id'])) {
 			$allLegendItems = $sectionValues[0]['questions'][0]['summary'];
 
+			/* Sort legend items explicitly, otherwise they will appear in the
+			 * order they were submitted
+			 */
+			uasort($allLegendItems, 'cmp');
+
 			foreach($allLegendItems as $key => $value) {
 				$this->setVar(array(
 					'LEGEND_ITEM_LETTER' => $key,
@@ -108,4 +113,17 @@ if (is_array($sectionValues) && count($sectionValues)) {
 	}
 }
 
+/**
+ * Custom comparison function as used on php.net
+ *
+ * @param  $a
+ * @param  $b
+ * @return int
+ */
+function cmp($a, $b) {
+    if ($a == $b) {
+        return 0;
+    }
+    return ($a < $b) ? -1 : 1;
+}
 ?>
