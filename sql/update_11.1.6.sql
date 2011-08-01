@@ -103,3 +103,9 @@ ALTER TABLE `assess` ADD COLUMN `availability` ENUM('assess','survey') DEFAULT '
 /* Survey homepage component
  */
 INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`homepageCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) VALUES ( '44','1','outputSurvey','Surveys','Online surveys.','3','survey.html','','false','false');
+
+/* Whether or not exported responses for a question have a legend
+ * Also applicable for View All Responses for a Survey question
+ */
+ALTER TABLE assess_luQuestionType ADD COLUMN has_legend ENUM('true', 'false') DEFAULT 'true';
+UPDATE assess_luQuestionType SET has_legend='false' WHERE type_id='1';

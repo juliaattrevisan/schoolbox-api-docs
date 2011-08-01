@@ -18,6 +18,7 @@ require_once('../library/survey/SurveyExporter.php');
 
 $assessHandler = new Survey();
 $factory = new SurveyFactory();
+$questionHandler = new SurveyQuestion();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -33,7 +34,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-$surveyExporter = new SurveyExporter($assess, $factory, new SurveySection(), new SurveyAttempt(), new SurveyQuestion());
+$surveyExporter = new SurveyExporter($assess, $factory, new SurveySection(), new SurveyAttempt(), $questionHandler);
 
 /* Optionally filter by question
  */
@@ -47,6 +48,8 @@ $sectionValues = $surveyExporter->getSectionValues();
  */
 $this->setFile(TEMPLATE_content, 'survey/resultsForQuestion.html');
 $this->setBlock(TEMPLATE_content, 'respondent', 'respondent_block');
+$this->setBlock(TEMPLATE_content, 'has_legend', 'has_legend_block');
+$this->setBlock('has_legend', 'legend_item', 'legend_item_block');
 
 if (is_array($sectionValues) && count($sectionValues)) {
 	foreach($sectionValues as $currentSection) {
@@ -79,5 +82,30 @@ $this->setVar(array(
 	'SURVEY_NAME' => $assess['title'],
 	'QUESTION_QUESTION' => $questionList
 ));
+
+/* Render legend. There should only be one section and one question when using
+ * this script, but for polymorphism it appears in an array structure
+ */
+if (is_array($sectionValues) && count($sectionValues)) {
+	if (is_array($sectionValues[0]['questions']) && count($sectionValues[0]['questions'])) {
+		if ($questionHandler->hasLegend($sectionValues[0]['questions'][0]['type_id'])) {
+			$allLegendItems = $sectionValues[0]['questions'][0]['summary'];
+
+			foreach($allLegendItems as $key => $value) {
+				$this->setVar(array(
+					'LEGEND_ITEM_LETTER' => $key,
+					'LEGEND_ITEM_TEXT' => $value['text'],
+				));
+
+				$this->parse('legend_item_block', 'legend_item', true);
+			}
+
+			$this->parse('has_legend_block', 'has_legend');
+		}
+		else {
+			$this->setVar('has_legend_block', '');
+		}
+	}
+}
 
 ?>

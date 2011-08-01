@@ -113,6 +113,21 @@ abstract class EvaluationQuestion extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
+	/**
+	 * Whether a question type has an applicable legend
+	 *
+	 * @param  $type_id
+	 * @return array|bool
+	 */
+	public function hasLegend($type_id) {
+		$query = "SELECT *
+				  FROM assess_luQuestionType
+				  WHERE type_id = '$type_id'
+				  AND has_legend = 'true'";
+
+		return $this->db->getRow($query);
+	}
+
     /**
      * Get a list of questions in a section
      *
