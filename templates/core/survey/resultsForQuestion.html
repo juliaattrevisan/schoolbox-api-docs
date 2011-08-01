@@ -1,0 +1,32 @@
+<!-- BEGIN custom_head -->
+<script type='text/javascript' src='/javascript/excanvas.compiled.js'></script>
+<script type='text/javascript' src='/javascript/flot/jquery.flot.js'></script>
+<script type='text/javascript' src='/javascript/flot/jquery.flot.pie.js'></script>
+<!-- END custom_head -->
+
+<div id="assess">
+	<h1>{SURVEY_NAME}</h1>
+
+	<div class='assess-header'>
+		<h2>{QUESTION_QUESTION}</h2>
+		<div class="assess-body">
+			<table>
+				<thead>
+					<tr>
+						<td>Respondent</td>
+						<td>Response</td>
+					</tr>
+				</thead>
+				<tbody>
+					<!-- BEGIN respondent -->
+					<tr>
+						<td>{RESPONDENT_NAME}</td>
+						<td>{RESPONDENT_RESPONSE}</td>
+					</tr>
+					<!-- END respondent -->
+				</tbody>
+			</table>
+
+		</div>
+	</div>
+</div>

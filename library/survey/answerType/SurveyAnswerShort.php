@@ -18,7 +18,11 @@ class SurveyAnswerShort extends AnswerShort {
 	 * @return void
 	 */
 	public function graphResults($page, $currentQuestion) {
-		$page->setVar('graph_block', '');
+		$componentHandle = 'temp' . $currentQuestion['question_id'];
+
+		$page->setFile($componentHandle, 'survey/answer/short/graph.html');
+
+		$page->parse('graph_block', $componentHandle);
 	}
 }
 ?>

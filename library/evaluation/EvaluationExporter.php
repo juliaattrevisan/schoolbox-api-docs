@@ -127,32 +127,6 @@ class EvaluationExporter {
 	}
 
 	/**
-	 * Output a csv row, using the __outputCSV method
-	 *
-	 * @param <type> $data
-	 */
-	public function outputCSV2($data) {
-		$outstream = fopen("php://output", 'rectum');
-
-		array_walk($data, array($this, '__outputCSV'), $outstream);
-
-		fclose($outstream);
-	}
-
-	/**
-	 * Output a csv row.
-	 *
-	 * @param  $vals
-	 * @param  $key
-	 * @param  $filehandler
-	 * @return void
-	 */
-	public function __outputCSV(&$vals, $key, $filehandler) {
-		fputcsv($filehandler, $vals, ',', '"');
-	}
-
-
-	/**
 	 * Get needed fields for a given list of questions. This can be used
 	 * to create columns for CSV export, or as headings when graphing.
 	 *
@@ -266,8 +240,6 @@ class EvaluationExporter {
 					$attemptValues[$j]['name'] = $currentAttempt['firstname'] . ' ' . $currentAttempt['lastname'];
 
 					if ($allQuestions) {
-						$responseValues = array();
-
 						for ($i = 0; $i < count($allQuestions); $i++) {
 
 							$this->updateResponseSummary($allQuestions[$i], $allAttempts[$j], $k, $i);
@@ -280,7 +252,7 @@ class EvaluationExporter {
 
 								/* Load answer template into answerOption block
 								 */
-								$responseValues[$i] = strip_tags(str_replace("\t", '', $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $allQuestions[$i]['question_id'])));
+								$responseValues = strip_tags(str_replace("\t", '', $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $allQuestions[$i]['question_id'])));
 							}
 						}
 					}
@@ -293,6 +265,88 @@ class EvaluationExporter {
 		}
 
 		return $this->sectionValues;
+	}
+
+	/**
+	 * Export responses from all attempts for a particular assess and question
+	 *
+	 * @param  $assess_id
+	 * @param  $question_id
+	 * @return void
+	 */
+	public function exportResponsesToCSV($assess_id, $question_id) {
+		$sectionValues = $this->getSectionValues();
+
+		/* Format output
+		 */
+		$filename_id = $assess_id;
+
+		if (is_numeric($question_id)) {
+			$filename_id .= "_{$question_id}";
+		}
+
+		header('Content-type: text/ascii');
+		header('Content-disposition: attachment; filename="exported_response_' . $filename_id . '.csv"');
+
+		if (is_array($sectionValues) && count($sectionValues)) {
+			foreach($sectionValues as $currentSection) {
+				$questionList = array();
+
+				/* Get a list of questions going
+				 */
+				if (is_array($currentSection['questions']) && count($currentSection['questions'])) {
+					$questionList[] = "Respondent";
+
+					foreach($currentSection['questions'] as $currentQuestion) {
+						$questionList[] = $currentQuestion['question'];
+					}
+				}
+
+				/* Output to stdout stream
+				 */
+				echo 'Section ' . $currentSection['section'] . "\n";
+				$this->outputCSV2(array($questionList));
+
+				/* A list of attempts per section
+				 */
+				if (count($currentSection['attempts'])) {
+					foreach($currentSection['attempts'] as $currentAttempt) {
+						$this->outputCSV2(array($currentAttempt));
+					}
+				}
+
+				echo "\n";
+			}
+		}
+
+		/* Prevent other template crap from rendering ;)
+		 */
+		exit(1);
+	}
+
+	/**
+	 * Output a csv row, using the __outputCSV method
+	 *
+	 * @param <type> $data
+	 */
+	public function outputCSV2($data) {
+		$outstream = fopen("php://output", 'rectum');
+
+		array_walk($data, array($this, '__outputCSV'), $outstream);
+
+		fclose($outstream);
+	}
+
+	/**
+	 * Output a csv row.
+	 *
+	 * @param  $vals
+	 * @param  $key
+	 * @param  $filehandler
+	 * @return void
+	 */
+	public function __outputCSV(&$vals, $key, $filehandler) {
+		fputcsv($filehandler, $vals, ',', '"');
 	}
 }
 

@@ -31,7 +31,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-$surveyExporter = new SurveyExporter($assess,  new SurveyFactory(), new SurveySection(), new SurveyAttempt());
+$surveyExporter = new SurveyExporter($assess,  new SurveyFactory(), new SurveySection(), new SurveyAttempt(), new SurveyQuestion());
 $sectionValues = $surveyExporter->getSectionValues();
 
 /* Data collected, now we can show it.
@@ -39,7 +39,8 @@ $sectionValues = $surveyExporter->getSectionValues();
  * For each section, for each question, summarise all attempts' results
  */
 $this->setFile(TEMPLATE_content, 'survey/results.html');
-$this->setBlock(TEMPLATE_content, 'question', 'question_block');
+$this->setBlock(TEMPLATE_content, 'section', 'section_block');
+$this->setBlock('section', 'question', 'question_block');
 $this->setBlock('question', 'graph', 'graph_block');
 
 $this->setVar(array(
@@ -48,24 +49,42 @@ $this->setVar(array(
 
 $factory = new SurveyFactory();
 
-foreach($sectionValues[0]['questions'] as $currentQuestion) {
+if (is_array($sectionValues) && count($sectionValues)) {
+	foreach($sectionValues as $currentSection) {
+		if (is_array($currentSection['questions']) && count($currentSection['questions'])) {
+			foreach($currentSection['questions'] as $currentQuestion) {
 
-	/* Question data
-	 */
-	$this->setVar(array(
-		'QUESTION_QUESTION' => $currentQuestion['question']
-	));
+				/* Question data
+				 */
+				$this->setVar(array(
+					'ASSESS_ID' => $assess['assess_id'],
+					'QUESTION_QUESTION' => $currentQuestion['question'],
+					'QUESTION_QUESTION_ID' => $currentQuestion['question_id']
+				));
 
-	/* Answer and Response data
-	 */
-	$answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
+				/* Answer and Response data
+				 */
+				$answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
-	$answerHandler->graphResults($this, $currentQuestion);
+				$answerHandler->graphResults($this, $currentQuestion);
 
-	$this->parse('question_block', 'question', true);
+				$this->parse('question_block', 'question', true);
 
-	/* Clear children after parsing out the parent
-	 */
-	$this->setVar('series_block', '');
+				/* Clear children after parsing out the parent
+				 */
+				$this->setVar('series_block', '');
+			}
+		}
+
+		$this->setVar(array(
+			'SECTION_NAME' => $currentSection['section']
+		));
+
+		$this->parse('section_block', 'section', true);
+
+		/* Clear children after parsing out the parent
+		 */
+		$this->setVar('question_block', '');
+	}
 }
 ?>

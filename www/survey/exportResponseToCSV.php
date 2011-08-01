@@ -29,7 +29,7 @@ if (!$assess) {
     error(112);
 }
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($assessHandler->isDeleted($assess['assess_id'])) {
 	error(112);
 }
 
@@ -41,57 +41,5 @@ if (is_numeric($this->arg[1])) {
 	$surveyExporter->setFilterByQuestion($this->arg[1]);
 }
 
-$sectionValues = $surveyExporter->getSectionValues();
-
-/* Format output
- */
-header('Content-type: text/ascii');
-header('Content-disposition: attachment; filename="exported_response_' . $this->arg[0] . '.csv"');
-
-if (is_array($sectionValues) && count($sectionValues)) {
-	foreach($sectionValues as $currentSection) {
-		$questionList = array();
-
-		/* Get a list of questions going
-		 */
-		if (is_array($currentSection['questions']) && count($currentSection['questions'])) {
-			$questionList[] = "Respondent";
-
-			foreach($currentSection['questions'] as $currentQuestion) {
-				$questionList[] = $currentQuestion['question'];
-			}
-		}
-
-		/* Output to stdout stream
-		 */
-		echo 'Section ' . $currentSection['section'] . "\n";
-		$surveyExporter->outputCSV2(array($questionList));
-
-		/* A list of attempts per section
-		 */
-		if (count($currentSection['attempts'])) {
-			foreach($currentSection['attempts'] as $currentAttempt) {
-				$currentResult = array();
-
-				$currentResult[] = $currentAttempt['name'];
-
-				/* A list of responses per attempt
-				 */
-				if (count($currentAttempt['responses'])) {
-					foreach($currentAttempt['responses'] as $currentResponse) {
-						$currentResult[] = $currentResponse;
-					}
-				}
-
-				$surveyExporter->outputCSV2(array($currentResult));
-			}
-		}
-
-		echo "\n";
-	}
-}
-
-/* Prevent other template crap from rendering ;)
- */
-exit(1);
+$surveyExporter->exportResponsesToCSV($assess['assess_id'], $this->arg[1]);
 ?>
