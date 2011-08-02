@@ -2,7 +2,14 @@
 <script type="text/javascript">
 
 $j(function() {
-	$j('#form').validate();
+	$j('#form').validate({
+		messages: {
+			url: {
+				required: 'thing',
+				url: "Please enter a URL beginning with http:// or https://"	
+			}
+		}
+	});
 });
 
 </script>
@@ -38,8 +45,8 @@ $j(function() {
 			</tr>
 			<!-- END myLink -->
 			<tr>
-				<td><label><input name="url" type="text" class="required"/></label></td>
-				<td><label><input name="description" class="required" type="text" /></label></td>
+				<td><label><input name="url" type="text" class="required url"/></label></td>
+				<td><label><input name="description" class="required " type="text" /></label></td>
 				<td><input name="submit" type="submit" value="Add" class="submit-btn-plain" /></td>
 			</tr>
 		</tbody>

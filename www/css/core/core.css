@@ -4143,7 +4143,7 @@ p.forgotten { margin:10px 0; }
 .wysiwyg, .revision-box {padding:7px 16px; }
 .revision-box {border:1px solid #ccc; margin-bottom:16px;}
 .wysiwyg h2, .revision-box h2{background:0; text-indent:0; margin-bottom:16px; padding:0;}
-.wysiwyg ul, .wysiwyg ol, .revision-box ul, .revision-box ol{margin:0 0 16px 16px; line-height:16px;list-style:circle; }
+.wysiwyg ul, .wysiwyg ol, .revision-box ul, .revision-box ol{margin:0 0 16px 16px; line-height:16px;list-style:disc; }
 .wysiwyg li{padding:0;}
 .wysiwyg ol, .revision-box ol{list-style:decimal;}
 .wysiwyg td, .revision-box td, .textbox td{border:1px solid #ccc;}
