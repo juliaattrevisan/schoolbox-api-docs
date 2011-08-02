@@ -808,16 +808,7 @@ dl.errors dd { width:85%; }
 	z-index:50
 }
 
-.textbox ul {
-	list-style:disc;
-	margin:0 0 16px 2.5em
-}
 
-.textbox ol {margin:0 0 16px 2.5em; }
-
-.textbox li { padding:0; }
-
-.textbox{overflow:hidden;}
 
 .standardForm td {
 	vertical-align: top;
@@ -4142,11 +4133,33 @@ p.forgotten { margin:10px 0; }
 
 .wysiwyg, .revision-box {padding:7px 16px; }
 .revision-box {border:1px solid #ccc; margin-bottom:16px;}
-.wysiwyg h2, .revision-box h2{background:0; text-indent:0; margin-bottom:16px; padding:0;}
-.wysiwyg ul, .wysiwyg ol, .revision-box ul, .revision-box ol{margin:0 0 16px 16px; line-height:16px;list-style:disc; }
-.wysiwyg li{padding:0;}
-.wysiwyg ol, .revision-box ol{list-style:decimal;}
-.wysiwyg td, .revision-box td, .textbox td{border:1px solid #ccc;}
+
+.wysiwyg h2, 
+.revision-box h2{background:0; text-indent:0; margin-bottom:16px; padding:0;}
+
+.wysiwyg ul, 
+.wysiwyg ol, 
+.revision-box ul, 
+.revision-box ol, 
+.textbox ol {margin:0 0 16px 16px; line-height:16px;list-style:disc; }
+.wysiwyg li, 
+.textbox li {padding:0;}
+
+.wysiwyg ol, 
+.revision-box ol, 
+.textbox ol {list-style:decimal;}
+
+.wysiwyg td, 
+.revision-box td, 
+.textbox td{border:1px solid #ccc;}
+
+.textbox ul {list-style:disc ;margin:0 0 16px 2.5em}
+
+.textbox{overflow:hidden;}
+
+.textbox img, 
+.wysywig img, 
+.revision-box img{display:block;}
 
 /*.wysiwyg td, .revision-box td, .textbox td{border:1px solid #ccc;}*/
 
