@@ -37,6 +37,7 @@
 	<p><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a> > {THREAD_TITLE} {LOCKED}</p>
 </div>
 <p class="clearfix">
+<a href="/homepage/{CATEGORY_ID}" class="btn go-back float-left"><span></span>Return to homepage</a>
 <!-- BEGIN reply -->
 <button class="reply submit-btn-plain">Post Reply</button> 
 <!-- END reply -->
@@ -44,6 +45,8 @@
 <button class="lock submit-btn-plain">{LOCK_UNLOCK} Thread</button>
 <button class="delete submit-btn-plain">Delete Thread</button>
 <!-- END modify_thread -->
+
+
 </p>
 <div class="forum">
 	<table cellpadding="0" cellspacing="0" border="0" width="100%">
@@ -77,12 +80,19 @@
     <!-- END post -->
 	</table>
  </div>
-<p><a name="bottom"></a>
-{reply_block}
-{modify_thread_block}
+<p class="clearfix"><a name="bottom"></a>
+<a href="/homepage/{CATEGORY_ID}" class="btn go-back float-left"><span></span>Return to homepage</a>
+<!-- BEGIN reply -->
+<button class="reply submit-btn-plain">Post Reply</button> 
+<!-- END reply -->
+<!-- BEGIN modify_thread -->
+<button class="lock submit-btn-plain">{LOCK_UNLOCK} Thread</button>
+<button class="delete submit-btn-plain">Delete Thread</button>
+<!-- END modify_thread -->
 </p>
 
 <div class="pagination navhelp">
+
 	<!-- BEGIN previous_button -->
     <a href="/forum/thread/{THREAD_ID}/{PREVIOUS_PAGE}">&lt; Prev</a>
     <!-- END previous_button -->
