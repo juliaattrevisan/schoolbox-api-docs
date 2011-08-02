@@ -122,8 +122,12 @@ if(is_array($outputList)) {
                                         }
                                 }
 
-                                if($dayCount == $dayCurrent && $row['periodNumber'] == $periodCurrent['PeriodNumber'] && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq'] ) {
-                                    $outputPeriod['TIMETABLE_CLASS'] = 'current';
+                                if($dayCount == $dayCurrent) {
+                                    if($row['periodNumber'] == $periodCurrent['PeriodNumber'] && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq'] ) {
+                                        $outputPeriod['TIMETABLE_CLASS'] = 'dayCurrent current';
+                                    } else {
+                                        $outputPeriod['TIMETABLE_CLASS'] = 'dayCurrent';
+                                    }
                                 } else {
                                     $outputPeriod['TIMETABLE_CLASS'] = 'normal';
                                 }
