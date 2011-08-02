@@ -6,7 +6,13 @@ $j(document).ready(function() {
             window.location = '/cms/linkForm.php?delete={LINK_ID}&redirect=/homepage/{CATEGORY_ID}';
         }
     });
-	$j('#urlForm').validate()
+	$j('#urlForm').validate({
+		messages: {
+			url: {
+				url: "Please enter a URL beginning with http:// or https://"	
+			}
+		}
+	})
 });
 
 </script>
@@ -18,7 +24,7 @@ $j(document).ready(function() {
     <tr>
       <td class="formLabelWidth"><h4>URL</h4>
      <em>The internet address for the website, eg. http://www.google.com</em></td>
-	 <td><label><input class="required" type="text" name="url" size="40" maxlength="250" value="{URL}" /></label></td>
+	 <td><label><input class="required url" type="text" name="url" size="40" maxlength="250" value="{URL}" /></label></td>
     </tr>
     <tr>
       <td><h4>Description</h4>
