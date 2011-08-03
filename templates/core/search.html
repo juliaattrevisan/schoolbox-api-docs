@@ -1,78 +1,59 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
-<script type="text/javascript" src="/javascript/jquery.urlinternal.js"></script>
+<script type="text/javascript" src="/javascript/jquery.search.js"></script>
 <script type="text/javascript">
-    $j(function() {
-        $j('#type a[class!=disabled]').click(function() {
-			
-            $j('#type a').removeClass('selected');
-            $j(this).addClass('selected');
+$j(function() {
+	$j('#type a[class!=disabled]').click(function() {
 
-            var el = $j(this).attr('title');
-            var paginate = function(){
-                $j('div.' + 'pagination > a').click(function() {
-                    $j('div.results > div[title=' + el + ']').load('/search.php', "keyword={KEYWORD}&type=" + el + "&page="+$j(this).attr('title'), paginate);
-               		
-			    });
-				
-            }
+		/* Depends on what you selected
+		 */
+		var keyword = "{KEYWORD}";
+		var section = $j(this).attr('title');
+		var pageNumber = 1;
 
-            if(!$j('div.results > div[title=' + el + ']').hasClass('loaded')) {
-                $j('div.results > div[title=' + el + ']').load('/search.php', "keyword={KEYWORD}&type=" + el, paginate);
-				
-                $j('div.results > div[title=' + el + ']').addClass('loaded');
-            	$j('.search-item:nth-child(even)').addClass('dark');
-			}
+		/* Set up configuration using a parameterised config object
+		 */
+		search.init({
+			keyword: keyword,
+			section: section,
+			pageNumber: pageNumber
+		});
 
-            $j('div.results > div').hide();
-            $j('div.results > div[title=' + el + ']').show();
-			
-        });
+		/* Load result set via ajax into target div
+		 */
+		search.load();
 
-        var params = window.location.href.split("#");
-		
-		
-        if (params[1] != '' && params[0] != window.location.href) {
-			/* var paginate = function(){
-                $j('div.' + 'pagination > a').click(function() {
-                    $j('div.results > div[title=' + params[1] + ']').load('/search.php', "keyword={KEYWORD}&type=" + params[1] + "&page="+$j(this).attr('title'), paginate);
-                	$j('.results .search-item:nth-child(even)').addClass('dark');
-				});
-            }
-			
-			$j('#type a[title=' + params[1] +']').addClass('selected');
-			
-			$j('div.results > div[title=' + params[1] + ']').show();
-			$j('div.results > div[title=' + params[1] + ']').load('/search.php', "keyword={KEYWORD}&type=" + params[1], paginate);
-            $j('div.results > div[title=' + params[1] + ']').addClass('loaded');*/
-		   
-		   
-		    var parent = $j('#a'+ params[1]).parent();
-            $j(parent).show();
-            $j('#type a[title='+parent.attr('id')+']').addClass('selected');
-			console.log(parent);
-            $j.scrollTo('#a'+ params[1]);
-			
-        } else {
-            $j('#type li:first-child a').addClass('selected');
-            $j('div.results > div:first-child').show();
+		/* Add pagination events to links
+		 */
+		search.paginate();
 
-        }
-		
-		$j('.results .search-item:nth-child(even)').addClass('dark');
-    });
+		/* Hide all divs, and only show the current one
+		 */
+		search.hideTabs();
+
+		/* Tab styling
+		 */
+		$j('#type a').removeClass('selected');
+		$j(this).addClass('selected');
+	});
+});
 </script>
 <!-- END custom_head -->
 
 <h1>Search Results</h1>
+
 <ul id="type">
     <!-- BEGIN type -->
-    <li><a href="#" title="{TYPE_TITLE}" class="{TYPE_CLASS}">{TYPE_NAME} ({TYPE_COUNT})</a></li>
+    <li>
+		<a href="#" title="{TYPE_TITLE}" class="{TYPE_CLASS}">{TYPE_NAME} ({TYPE_COUNT})</a>
+	</li>
     <!-- END type -->
 </ul>
 
 <div class="results">
     <!-- BEGIN result -->
-    <div title="{RESULT_TITLE}" class="{RESULT_CLASS}">{RESULT}</div>
+    <div title="{RESULT_TITLE}" class="{RESULT_CLASS}">
+		{RESULT}
+	</div>
     <!-- END result -->
 </div>
