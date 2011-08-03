@@ -23,20 +23,14 @@ $j(function() {
 		}
 	}
 
-	/* Set the new hash structure and run search
-	 */
-	search.setHash(section, pageNumber);
-	search.runOnce(keyword, $j('#type a[title=' + section + ']'), pageNumber);
+	search.runOnce(keyword, section, $j('#type a[title=' + section + ']'), pageNumber);
 
-	/* When you change sections
+	/* Runs when you change sections
 	 */
 	$j('#type a[class!=disabled]').click(function(event) {
 		event.preventDefault();
 
-		/* Set the new hash structure and run search
-		 */
-		search.setHash($j(this).attr('title'), pageNumber);
-		search.runOnce(keyword, $j(this), pageNumber);
+		search.runOnce(keyword, $j(this).attr('title'), $j(this), pageNumber);
 	});
 });
 </script>

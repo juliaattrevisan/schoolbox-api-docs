@@ -3,20 +3,44 @@
  * you clicked on etc.
  */
 search = {
+
+	/* The url that puts out search results
+	 */
 	url: '/search.php',
+
+	/* The search section (type) that was selected e.g. all, people, etc.
+	 */
 	section: '',
+
+	/* The actual section's HTML element that was selected
+	 */
+	sectionElement: '',
+
+	/* The div into which search results get loaded
+	 */
 	targetDiv: '',
+
+	/* The keyword to search for
+	 */
 	keyword: '',
+
+	/* A comma-separated string/int tuple, e.g. all,1 / user,1 / user,2
+	 *
+	 * This is used to parameterise the search method. This interface is now
+	 * expected each time a search is run.
+	 */
 	hash: '',
 
 	/**
-	 * Set up destination divs and stuff
+	 * Set up destination divs and stuff, storing them in the global search
+	 * object literal
 	 *
 	 * @param config
 	 */
 	init: function(config) {
 		this.setKeyword(config.keyword);
 		this.setSection(config.section);
+		this.setSectionElement(config.sectionElement);
 		this.setPageNumber(config.pageNumber);
 		this.setTargetDiv(config.section);
 	},
@@ -36,9 +60,7 @@ search = {
 				 */
 				search.paginate();
 
-				/* Alternating row colours when data is loaded
-				 */
-				$j('.search-item:nth-child(even)').addClass('dark');
+				search.updateStyles();
 			});
 		}
 	},
@@ -62,7 +84,12 @@ search = {
 			 */
 			search.applyHash(search.getHash());
 
-			$j(search.getTargetDiv()).load(search.getUrl(), "keyword=" + search.getKeyword() + "&type=" + search.getSection() + "&page=" + search.getPageNumber(), search.paginate);
+			/* Load search results in, update pagination and styles
+			 */
+			$j(search.getTargetDiv()).load(search.getUrl(), "keyword=" + search.getKeyword() + "&type=" + search.getSection() + "&page=" + search.getPageNumber(), function() {
+				search.paginate();
+				search.updateStyles();
+			});
 		});
 	},
 
@@ -89,15 +116,26 @@ search = {
 		$j(this.getTargetDiv()).show();
 	},
 
-	runOnce: function(keyword, section, pageNumber) {
-		search.applyHash(search.getHash());
-		search.setTargetDiv(search.getSection());
-
+	/**
+	 * Perform a search using the keyword, section and pageNumber to organise
+	 * results.
+	 *
+	 * @param keyword
+	 * @param section
+	 * @param pageNumber
+	 */
+	runOnce: function(keyword, section, sectionElement, pageNumber) {
 		search.init({
 			keyword: keyword,
-			section: $j(section).attr('title'),
+			section: section,
+			sectionElement: sectionElement,
 			pageNumber: pageNumber
 		});
+
+		/* Set up hash configuration
+		 */
+		search.setHash(section, pageNumber);
+		search.applyHash(search.getHash());
 
 		/* Load result set via ajax into target div
 		 */
@@ -110,16 +148,46 @@ search = {
 		/* Hide all divs, and only show the current one
 		 */
 		search.hideTabs();
+	},
 
-		/* Tab styling
+	/**
+	 * Update UI styles
+	 *
+	 * @param sectionElement
+	 */
+	updateStyles: function() {
+		/* Alternating row colours when data is loaded
+		 */
+		$j('.search-item:nth-child(even)').addClass('dark');
+
+		/* Remove all selected classes
 		 */
 		$j('#type a').removeClass('selected');
-		$j(section).addClass('selected');
+
+		/* Select only the current section
+		 */
+		this.getSectionElement().addClass('selected');
 	},
 
 	/* Getters and Setters
 	 * These store/retrieve class variables
 	 */
+
+	/**
+	 * Set the reference for the section element currently selected
+	 *
+	 * @param sectionElement
+	 */
+	setSectionElement: function(sectionElement) {
+		this.sectionElement = sectionElement;
+	},
+
+	/**
+	 * Get the reference for the section element currently selected
+	 */
+	getSectionElement: function() {
+		return this.sectionElement;
+	},
 
 	/**
 	 * Set the hash configuration, a comma-separated tuple
