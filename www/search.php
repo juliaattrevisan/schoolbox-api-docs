@@ -52,7 +52,7 @@ $type_list = array(
     'event'    => 'Calendar',
 );
 
-if (empty($type)) {
+if (empty($type) || $type == 'all') {
     // perform search for each handle
     $page->setFile(TEMPLATE_content, 'search.html');
     $page->setBlock(TEMPLATE_content, 'type', 'type_block');
@@ -98,7 +98,8 @@ if (empty($type)) {
         $page->parse('type_block', 'type', true);
         $page->parse('result_block', 'result', true);
     }
-} elseif (!empty($handle[$type])) {
+}
+elseif (!empty($handle[$type])) {
     // include & instantiate
     require_once("../library/{$handle[$type]}.php");
     $type_class = ucfirst($handle[$type]);
@@ -143,7 +144,7 @@ if (!empty($result['user'])) {
 		/* If a parent is performing the search, remove the email address
 		 */
 		$groupHandler = new Group();
-		
+
 		if ($groupHandler->isParent()) {
 			unset($email);
 		}
@@ -171,7 +172,7 @@ if (!empty($result['user'])) {
         //Show student timetables to staff and parents of child
         if($group->isStudent($user['id'])) {
             if ($group->isStaff() || $group->isParentOfChild($user['id'])) {
-                
+
                 /* Timetable shouldn't appear if synergy is disabled in the conf
                  */
                 if (Cfg::get('external_enable') && $user['synergy_id']) {
@@ -180,7 +181,7 @@ if (!empty($result['user'])) {
                 else {
                     $page->setVar('timetable_block', '');
                 }
-                
+
                 if(HELPDESK_enable)
                     $page->parse('helpdesk_block', 'helpdesk');
 
@@ -234,7 +235,7 @@ if (!empty($result['file'])) {
             'FILE_BREADCRUMB'  => $file['breadcrumb'],
             'FILE_COUNT'       => $count['file'],
         ));
-        
+
         if ($file['perms_type'] < 2 && $file['userAccess_type'] < 2)
             $page->setVar('modify_block');
         else
@@ -242,7 +243,7 @@ if (!empty($result['file'])) {
 
         $page->parse('file_block', 'file', true);
     }
-    
+
     $page->parse('RESULT', 'file_t', true);
 }
 
@@ -319,7 +320,7 @@ if (!empty($result['news'])) {
         'NEWS_DISP_COUNT' => count($result['news']),
         'NEWS_COUNT'      => $count['news'],
     ));
-    
+
     foreach ($result['news'] as $news) {
         foreach ($categoryStd->breadcrumb($news['code']) as $i => $breadcrumb) {
             $news['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
@@ -358,7 +359,7 @@ if (!empty($result['blog'])) {
         'BLOG_DISP_COUNT' => count($result['blog']),
         'BLOG_COUNT'      => $count['blog'],
     ));
-    
+
     foreach ($result['blog'] as $blog) {
         foreach ($categoryStd->breadcrumb($blog['cid']) as $i => $breadcrumb)
             $blog['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
@@ -407,7 +408,7 @@ if (!empty($result['wiki'])) {
 
         $page->parse('wiki_block', 'wiki', true);
     }
-    
+
     $page->parse('RESULT', 'wiki_t', true);
 }
 
@@ -471,7 +472,7 @@ if (!empty($result['event'])) {
             'EVENT_DATE'   => $event['date'],
             'EVENT_LOCATION' => $event['location'],
             'EVENT_TIME'   => $event_time
-        ));        
+        ));
 
         $page->parse('event_block', 'event', true);
     }

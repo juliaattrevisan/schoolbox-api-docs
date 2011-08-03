@@ -2,39 +2,41 @@
 <script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
 <script type="text/javascript" src="/javascript/jquery.search.js"></script>
 <script type="text/javascript">
+
 $j(function() {
-	$j('#type a[class!=disabled]').click(function() {
 
-		/* Depends on what you selected
-		 */
-		var keyword = "{KEYWORD}";
-		var section = $j(this).attr('title');
-		var pageNumber = 1;
+	/* Set initial conditions
+	 */
+	var keyword = "{KEYWORD}";
+	var section = 'all';
+	var pageNumber = 1;
 
-		/* Set up configuration using a parameterised config object
-		 */
-		search.init({
-			keyword: keyword,
-			section: section,
-			pageNumber: pageNumber
-		});
+	if (window.location.hash.length > 1) {
+		var params = search.fetchHash();
 
-		/* Load result set via ajax into target div
-		 */
-		search.load();
+		if (params.length) {
+			var section = params[0];
+		}
 
-		/* Add pagination events to links
-		 */
-		search.paginate();
+		if (params.length > 1) {
+			var pageNumber = params[1];
+		}
+	}
 
-		/* Hide all divs, and only show the current one
-		 */
-		search.hideTabs();
+	/* Set the new hash structure and run search
+	 */
+	search.setHash(section, pageNumber);
+	search.runOnce(keyword, $j('#type a[title=' + section + ']'), pageNumber);
 
-		/* Tab styling
+	/* When you change sections
+	 */
+	$j('#type a[class!=disabled]').click(function(event) {
+		event.preventDefault();
+
+		/* Set the new hash structure and run search
 		 */
-		$j('#type a').removeClass('selected');
-		$j(this).addClass('selected');
+		search.setHash($j(this).attr('title'), pageNumber);
+		search.runOnce(keyword, $j(this), pageNumber);
 	});
 });
 </script>
@@ -45,7 +47,7 @@ $j(function() {
 <ul id="type">
     <!-- BEGIN type -->
     <li>
-		<a href="#" title="{TYPE_TITLE}" class="{TYPE_CLASS}">{TYPE_NAME} ({TYPE_COUNT})</a>
+		<a href='#' title="{TYPE_TITLE}" class="{TYPE_CLASS}">{TYPE_NAME} ({TYPE_COUNT})</a>
 	</li>
     <!-- END type -->
 </ul>

@@ -7,6 +7,7 @@ search = {
 	section: '',
 	targetDiv: '',
 	keyword: '',
+	hash: '',
 
 	/**
 	 * Set up destination divs and stuff
@@ -24,16 +25,21 @@ search = {
 	 * Load data in
 	 */
 	load: function() {
-		if (!$j(this.getTargetDiv()).hasClass('loaded')) {
-			$j(this.getTargetDiv()).load(this.getUrl(), "keyword=" + this.getKeyword() + "&type=" + this.getSection(), function() {
+		if (!$j(this).hasClass('loaded')) {
+			$j(this.getTargetDiv()).load(this.getUrl(), "keyword=" + this.getKeyword() + "&type=" + this.getSection() + "&page=" + search.getPageNumber(), function() {
+
+				/* Flag it as having loaded
+				 */
+				$j(search.getTargetDiv()).addClass('loaded');
+
+				/* Add pagination again
+				 */
 				search.paginate();
 
 				/* Alternating row colours when data is loaded
 				 */
 				$j('.search-item:nth-child(even)').addClass('dark');
 			});
-
-			$j(this.getTargetDiv()).addClass('loaded');
 		}
 	},
 
@@ -41,11 +47,92 @@ search = {
 	 * Add pagination events to all the <a> links
 	 */
 	paginate: function(){
-		$j('div.pagination > a').click(function() {
+		$j('div.pagination > a').live('click', function(event) {
+			event.preventDefault();
+
+			/* Set the page number
+			 */
 			search.setPageNumber($j(this).text());
+
+			/* Update hash configuration
+			 */
+			search.setHash(search.getSection(), search.getPageNumber());
+
+			/* Slap the hash into the url
+			 */
+			search.applyHash(search.getHash());
 
 			$j(search.getTargetDiv()).load(search.getUrl(), "keyword=" + search.getKeyword() + "&type=" + search.getSection() + "&page=" + search.getPageNumber(), search.paginate);
 		});
+	},
+
+	/**
+	 * Determine what the current hash configuration is, in the url. Split it
+	 * into its separate components
+	 */
+	fetchHash: function() {
+		return window.location.hash.toString().substring(1, window.location.hash.length).split(',');
+	},
+
+	/**
+	 * Put a new hash in the url
+	 */
+	applyHash: function(hash) {
+		window.location.hash = hash;
+	},
+
+	/**
+	 * Hide irrelevant tabs
+	 */
+	hideTabs: function() {
+		$j('div.results > div').hide();
+		$j(this.getTargetDiv()).show();
+	},
+
+	runOnce: function(keyword, section, pageNumber) {
+		search.applyHash(search.getHash());
+		search.setTargetDiv(search.getSection());
+
+		search.init({
+			keyword: keyword,
+			section: $j(section).attr('title'),
+			pageNumber: pageNumber
+		});
+
+		/* Load result set via ajax into target div
+		 */
+		search.load();
+
+		/* Add pagination events to links
+		 */
+		search.paginate();
+
+		/* Hide all divs, and only show the current one
+		 */
+		search.hideTabs();
+
+		/* Tab styling
+		 */
+		$j('#type a').removeClass('selected');
+		$j(section).addClass('selected');
+	},
+
+	/* Getters and Setters
+	 * These store/retrieve class variables
+	 */
+
+	/**
+	 * Set the hash configuration, a comma-separated tuple
+	 */
+	setHash: function(section, pageNumber) {
+		this.hash = section + ',' + pageNumber;
+	},
+
+	/**
+	 * Get the current hash configuration
+	 */
+	getHash: function() {
+		return this.hash;
 	},
 
 	/**
@@ -76,14 +163,6 @@ search = {
 	 */
 	getPageNumber: function() {
 		return this.pageNumber;
-	},
-
-	/**
-	 * Hide irrelevant tabs
-	 */
-	hideTabs: function() {
-		$j('div.results > div').hide();
-		$j(this.getTargetDiv()).show();
 	},
 
 	/**
