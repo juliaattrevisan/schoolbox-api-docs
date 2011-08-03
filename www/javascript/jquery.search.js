@@ -167,6 +167,13 @@ search = {
 		/* Select only the current section
 		 */
 		this.getSectionElement().addClass('selected');
+
+		/* If this was in section "all", then hide pagination. We don't paginate
+		 * through this particular section
+		 */
+		if (this.getSection() == 'all') {
+			$j('.pagination').remove();
+		}
 	},
 
 	/* Getters and Setters
