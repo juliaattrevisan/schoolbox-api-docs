@@ -124,7 +124,7 @@ if ($allQuestions) {
 		/* Clear child blocks after parsing out the parent
 		 */
 		$answerHandler->cleanupParse($this);
-		
+
         $this->setVar('answerFormFragment', '');
         $this->setVar('answerInputs_block', '');
     }
