@@ -17,7 +17,7 @@ $bulkHandler = new Bulk();
 /* Two types of upload.. either single user.. or via csv file..
  */
 if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name']) {
-	$allCategories = $bulkHandler->addCategories($_FILES['bulkadd']['tmp_name']);
+	$allCategories = $bulkHandler->addCategories($_FILES['bulkadd']['tmp_name'], scrubTEXT($_POST['template']));
 
 	if ($allCategories && count($allCategories)) {
 		foreach ($allCategories as $currentCategory) {

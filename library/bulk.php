@@ -238,7 +238,7 @@ class Bulk {
 	 * 1.	title
 	 * 2-n. codes
 	 */
-	public function addCategories($file) {
+	public function addCategories($file, $templateID) {
 		$categoryHandler = new Category();
 
 		/* List of outcomes
@@ -294,7 +294,7 @@ class Bulk {
 					$newCat = array(
 						'name'		=> $category[1],
 						'parent'	=> $category[0],
-						'template'	=> 1,
+						'template'	=> $templateID,
 						'group'		=> $groups,
 						'code'		=> implode(',', $code),
 					);
