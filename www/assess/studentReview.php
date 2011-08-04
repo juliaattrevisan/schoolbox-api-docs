@@ -85,9 +85,11 @@ $this->setTitle('Assessment: ' . $assess['title']);
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => $assess['title'],
+	'ASSESS_CATEGORY_ID' => $assess['category_id'],
     'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
     'SECTION_TITLE' => $section['title'],
     'SECTION_DESCRIPTION' => $section['description'],
+
 ));
 
 /* Load all the questions for this section.
