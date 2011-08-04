@@ -141,6 +141,16 @@ abstract class AnswerRadio extends EvaluationAnswer {
         }
     }
 
+	/**
+	 * Clear child blocks after parsing out the parent. Keep this in its own
+	 * method for polymorphic algorithm
+	 *
+	 * @param  $page
+	 * @return void
+	 */
+	public function cleanupParse($page) {
+	}
+
     /**
      * Saves a response for this Answer type. This should be customised based on
      * the format and structure of the answer (e.g. serialize multichoice)
