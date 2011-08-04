@@ -10,6 +10,7 @@
 require_once('../library/assess/Assess.php');
 require_once('../library/assess/AssessAttempt.php');
 require_once('../library/assess/AssessQuestion.php');
+require_once('../library/assess/AssessFactory.php');
 require_once('../library/assess/AssessResponse.php');
 
 $assessHandler = new Assess();
@@ -68,4 +69,34 @@ else {
     $this->parse('alreadyEnded_block', 'alreadyEnded');
     $this->setVar('endAssess_block', '');
 }
+
+/* Perform automated marking on responses which support this feature. Only
+ * mark responses which haven't been automarked previously, which allows
+ * teachers to customise response marks without being overwritten again.
+ *
+ * Once automated marking has been performed, remember which responses were
+ * affected so we don't refetch them the next time the page loads.
+ */
+$allAttempts = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $_SESSION['attempt_id']);
+
+$factory = new AssessFactory();
+
+if ($allAttempts) {
+    foreach($allAttempts as $currentAttempt) {
+        $allResponses = $responseHandler->getAutomarkableResponses($_SESSION['attempt_id']);
+
+        if (is_array($allResponses)) {
+            foreach ($allResponses as $currentResponse) {
+                $answerHandler = $factory->createAnswerModel($currentResponse['type_id']);
+
+                $answerHandler->mark($currentResponse);
+
+                $markedResponseIDs[] = $currentResponse['response_id'];
+            }
+        }
+    }
+}
+
+$responseHandler->updatedAutomatedMarks($markedResponseIDs);
+
 ?>

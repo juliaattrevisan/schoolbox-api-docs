@@ -123,33 +123,6 @@ if (!$assessHandler->isOwner($this->arg[0])) {
     error(125);
 }
 
-/* Perform automated marking on responses which support this feature. Only
- * mark responses which haven't been automarked previously, which allows
- * teachers to customise response marks without being overwritten again.
- *
- * Once automated marking has been performed, remember which responses were
- * affected so we don't refetch them the next time the page loads.
- */
-$allAttempts = $attemptHandler->getList($this->arg[0]);
-
-if ($allAttempts) {
-    foreach($allAttempts as $currentAttempt) {
-        $allResponses = $responseHandler->getAutomarkableResponses($currentAttempt['attempt_id']);
-
-        if (is_array($allResponses)) {
-            foreach ($allResponses as $currentResponse) {
-                $answerHandler = $factory->createAnswerModel($currentResponse['type_id']);
-
-                $answerHandler->mark($currentResponse);
-
-                $markedResponseIDs[] = $currentResponse['response_id'];
-            }
-        }
-    }
-}
-
-$responseHandler->updatedAutomatedMarks($markedResponseIDs);
-
 /* Set up template
  */
 $this->setFile(TEMPLATE_content, 'assess/results.html');
