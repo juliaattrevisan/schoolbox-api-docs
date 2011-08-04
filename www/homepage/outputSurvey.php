@@ -109,10 +109,14 @@ if (is_array($allSurveys)) {
 		 * 4. You aren't the owner of the test
          */
         if ($currentSurvey['allow_resit'] == 1) {
+			/* Disabled: doing so will allow teachers to give their test a "dry run" and
+ 			 * they can delete their attempts afterwards
+			 *
 			if ($surveyHandler->isOwner($currentSurvey['assess_id'])) {
 				$this->setVar('studentLink_block', '');
 			}
-            else if (($currentSurvey['duration'] == Survey::UNLIMITED_DURATION) || (strtotime($currentSurvey['finish']) > time())) {
+			 */
+            if (($currentSurvey['duration'] == Survey::UNLIMITED_DURATION) || (strtotime($currentSurvey['finish']) > time())) {
 				$this->parse('studentLink_block', 'studentLink');
             }
             else {
@@ -132,9 +136,14 @@ if (is_array($allSurveys)) {
             else if (((int)time() - (int)strtotime($currentSurvey['start'])) < 0) {
                 $this->setVar('studentLink_block', '');
             }
+
+			/* Disabled: doing so will allow teachers to give their test a "dry run" and
+ 			 * they can delete their attempts afterwards
+			 *
 			else if ($surveyHandler->isOwner($currentSurvey['assess_id'])) {
 				$this->setVar('studentLink_block', '');
 			}
+			*/
             else {
                 $this->parse('studentLink_block', 'studentLink');
             }

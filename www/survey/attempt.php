@@ -45,9 +45,13 @@ if (!$section) {
     error(115);
 }
 
+/* Disabled: doing so will allow teachers to give their test a "dry run" and
+ * they can delete their attempts afterwards
+
 if ($assessHandler->isOwner($this->arg[0])) {
     error(124);
 }
+*/
 
 if ($assessHandler->isExpired($this->arg[0])) {
     error(120);

@@ -109,10 +109,15 @@ if (is_array($allAssess)) {
 		 * 4. You aren't the owner of the test
          */
         if ($currentAssess['allow_resit'] == 1) {
+
+			/* Disabled: doing so will allow teachers to give their test a "dry run" and
+ 			 * they can delete their attempts afterwards
+			 *
 			if ($assessHandler->isOwner($currentAssess['assess_id'])) {
 				$this->setVar('studentLink_block', '');
 			}
-            else if (($currentAssess['duration'] == Assess::UNLIMITED_DURATION) || (strtotime($currentAssess['finish']) > time())) {
+			 */
+            if (($currentAssess['duration'] == Assess::UNLIMITED_DURATION) || (strtotime($currentAssess['finish']) > time())) {
 				$this->parse('studentLink_block', 'studentLink');
             }
             else {
@@ -132,9 +137,14 @@ if (is_array($allAssess)) {
             else if (((int)time() - (int)strtotime($currentAssess['start'])) < 0) {
                 $this->setVar('studentLink_block', '');
             }
+
+			/* Disabled: doing so will allow teachers to give their test a "dry run" and
+ 			 * they can delete their attempts afterwards
+			 *
 			else if ($assessHandler->isOwner($currentAssess['assess_id'])) {
 				$this->setVar('studentLink_block', '');
 			}
+			*/
             else {
                 $this->parse('studentLink_block', 'studentLink');
             }
