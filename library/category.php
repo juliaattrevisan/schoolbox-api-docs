@@ -291,36 +291,60 @@ class Category extends DeprecatedModel {
 		return $categoryID;
 	}
 
-	function update ($data) {
+	public function update($data) {
 
 		/* Redo group permissions */
 		if (is_array($data['group'])) {
 			$this->deletePerms($data['id']);
+
 			foreach($data['group'] as $groupID => $perm) {
 				$this->insertPerm($data['id'], $groupID, $perm);
 			}
 		}
+
 		unset($data['group']);
 
 		/* Setup homepage template */
-		if($data['template']) {
+
+		/* If -1 is set as template, remove homepage config, remove homepage
+		 * components, then set the category's templateID to zero
+		 */
+		require_once dirname(__FILE__) . '/../library/homepage.php';
+
+		if ($data['template'] == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
+			$homepage = new Homepage($data['id']);
+			$homepage->db->delete('homepage_config', 'cid', $data['id']);
+			$homepage->deleteComponentPositions();
+
+			$data['template'] = 0;
+		}
+
+		/* Continue normally
+		 */
+		if ($data['template']) {
 			require_once dirname(__FILE__) . '/homepage-template.php';
+
 			$templateHandler = new HomepageTemplate;
 			$templateHandler->createTemplate($data['id'], $data['template']);
 		}
-		else
+		else {
 			unset($data['template']);
+		}
 
 		/* Insert synergetic subject code */
-        if(isset($data['code'])) {
+        if (isset($data['code'])) {
             $this->db->delete('categoryCode', 'categoryID', $data['id']);
+
             $codeList = explode(",", $data['code']);
-            if (is_array($codeList)) {
+
+			if (is_array($codeList)) {
                 $codeList = array_map('trim',$codeList);
                 $codeList = array_unique($codeList);
+
                 foreach ($codeList as $code) {
-                    if($code)
+                    if ($code) {
                         $this->db->insert('categoryCode', array('categoryID' => $data['id'], 'code' => $code));
+					}
                 }
             }
         }

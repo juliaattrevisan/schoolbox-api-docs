@@ -4,6 +4,10 @@
 
 class Homepage {
 
+	/* Used to remove homepage components and reset template
+	 */
+	const REMOVE_HOMEPAGE_TEMPLATE_ID = -1;
+
 	function Homepage($cid) {
 		$this->db = new DeprecatedDatabase(SQL_db);
 		$this->cid = $cid;
@@ -15,7 +19,7 @@ class Homepage {
 			$query = "SELECT template FROM homepage_config WHERE cid = '".$this->cid."'";
 			return $this->db->getOne($query);
 	}
-	
+
 	function getComponentList($type = null)
 	{
 		$query = "SELECT t.homepageComponentCategoryID AS categoryID, t.name as categoryName, id, c.name, component, description, allowMultiple,
@@ -38,10 +42,10 @@ class Homepage {
 
 	function getColorList()
 	{
-		$query = "SELECT left_head_font, left_head_bg, left_font, left_bg_primary, left_bg_secondary, left_link, left_hover, 
+		$query = "SELECT left_head_font, left_head_bg, left_font, left_bg_primary, left_bg_secondary, left_link, left_hover,
 						right_head_font, right_head_bg, right_font, right_bg_primary, right_bg_secondary, right_link, right_hover
 						FROM homepage_config WHERE cid = '{$this->cid}'";
-		$colourList = $this->db->getRow($query); 
+		$colourList = $this->db->getRow($query);
 
 		// use defaults for missing colours
 		$defaultColours = unserialize(HOMEPAGE_colors);
@@ -53,7 +57,7 @@ class Homepage {
 		return $colourList;
 	}
 
-	
+
 	function savePageTemplate($template)
 	{
 			$query = "SELECT cid FROM homepage_config WHERE cid = '".$this->cid."'";
@@ -79,40 +83,40 @@ class Homepage {
 	}
 
 	function deleteHomepage()
-	{		
+	{
 		$this->db->delete('homepage_config', 'cid', $this->cid);
 		$this->deleteComponentPositions();
-		
+
 		require_once dirname(__FILE__) . '/group.php';
 		$groupHandler = new Group;
 		$groupHandler->disbandGroup($this->cid);
-		
+
 		$this->emptyHomepage();
 	}
-	
+
 	function emptyHomepage()
 	{
 		/* Delete components, TODO move this into calling component delete functions */
 		require_once dirname(__FILE__) . '/forum.php';
 		$forumHandler = new Forum;
-		$forumHandler->homepageClean($this->cid);		
-		
+		$forumHandler->homepageClean($this->cid);
+
 		require_once dirname(__FILE__) . '/categoryNews.php';
 		$newsHandler = new CategoryNews;
-		$newsHandler->homepageClean($this->cid);		
-		
+		$newsHandler->homepageClean($this->cid);
+
 		require_once dirname(__FILE__) . '/wiki.php';
 		$wikiHandler = new Wiki;
 		$wikiHandler->homepageClean($this->cid);
-		
+
 		require_once dirname(__FILE__) . '/poll.php';
 		$pollHandler = new Poll;
 		$pollHandler->homepageClean($this->cid);
-		
+
 		require_once dirname(__FILE__) . '/dropbox.php';
 		$dboxHandler = new Dropbox;
 		$dboxHandler->homepageClean($this->cid);
-		
+
 		require_once dirname(__FILE__) . '/submission.php';
 		$submissionBoxHandler = new Submission;
 		$submissionBoxHandler->homepageClean($this->cid);
@@ -141,7 +145,7 @@ class Homepage {
         $this->db->query($query);
 	}
 
-		
+
 	function updateComponentPosition($component, $column, $position)
 	{
 		$query = array(
@@ -152,7 +156,7 @@ class Homepage {
 
 		$result = $this->db->update('homepage_comp_location', 'homepageComponentLocationID', $query);
 	}
-		
+
 	function updateComponentConfig($component, $config)
 	{
 		$query = array(
@@ -161,7 +165,7 @@ class Homepage {
 		);
 		$this->db->update('homepage_comp_location', 'homepageComponentLocationID', $query);
 	}
-		
+
 	// For updating available components
 	function updateComponents($submitListComp){
 		// Get components
@@ -183,8 +187,8 @@ class Homepage {
 					unset($submitListComp[array_search($comp['component'], $submitListComp)]);
 			}
 		}
-		
-		// Add new ones to end finding their 
+
+		// Add new ones to end finding their
 		$newListComp = $currentListComp;
 		if (is_array($submitListComp)) {
 			foreach($submitListComp as $key => $comp)
@@ -212,7 +216,7 @@ class Homepage {
 		}
 		$newListComp = is_array($newListComp) ? $newListComp : array();
 		$newListComp = array_values($newListComp);
-		
+
 		// Update
 		$this->deleteComponentPositions();
 		if (is_array($newListComp)) {
@@ -220,9 +224,9 @@ class Homepage {
 				$this->saveComponentPosition($newComp['component'], $newComp['column'], $newComp['position'], $newComp['config']);
 		}
 	}
-	
-	
-	
+
+
+
 	function saveComponentPosition($component, $column, $position, $config)
 	{
 		$query = array(
@@ -233,7 +237,7 @@ class Homepage {
 			"config" => $config
 		);
 		$this->db->insert('homepage_comp_location', $query);
-        
+
         return $this->db->insertID();
 
 	}
@@ -254,18 +258,18 @@ class Homepage {
 
         return $config;
     }
-	
+
 	function saveDisplayProperties($listColor)
 	{
 		$query = "UPDATE homepage_config SET ";
 		foreach($listColor as $key => $color)
-		{		
+		{
 			$query .= "$key = '$color', ";
 		}
 		$query = substr($query, 0, -2);
 		$query .= " WHERE cid = '".$this->cid."'";
 		return $this->db->query($query);
-		
+
 	}
 
 }
