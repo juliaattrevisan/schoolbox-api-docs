@@ -1,12 +1,27 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript">
 
 $j(function() {
-	
-	$j('#form').validate();
-	
+//	$j('#form').validate();
+
+	$j('#form input[name=url]').autocomplete({
+		serviceUrl: '/ajax/findCategory.php?keyword=' + $j('#form input[name=url]').attr('value'),
+		minChars: 2,
+		maxHeight: 300,
+		width: 275,
+        noCache: true,
+		onSelect: function (value, data) {
+			console.log(data);
+			$j('#form input[name=url]').val(data);
+		}
+	});
+
 });
 
 </script>
+<!-- END custom_head -->
 
 <h1>Schoolbox Administration</h1>
 <ul class="admin-nav">
@@ -24,54 +39,80 @@ $j(function() {
 	<h2>Modify Side Menu Item</h2>
 	<form action="/adminv2/side-menuForm.php" method="post" name="form" id="form" class="standardForm" >
 		<table>
-			<td class="formLabelWidth"><h2>Name</h2>
-			  <em>This is the text that will be displayed on the menu</em></td>
-			<td><label><input type="text" name="txt" class="required" maxlength="250" size="40" value="{TEXT}" /></label>
-			</td>
-			</tr>
-		  <tr>
-			<td><h2>URL</h2>
-			  <em>The location at which the item should point. If
-			  it is local url remember to use a reference relative
-			  to the root.</em></td>
-			<td> <label><input type="text" name="url" size="40"  class="required" maxlength="250" value="{URL}" /></label>
-			</td>
-			</tr>
-		  <tr>
-			<td><h2>Target</h2>
-			  <em>Select whether you would like this link to open in a new window</em></td>
-			<td><select name="target">
-				<option value="">No Target</option>
-				<option value="_blank" {BLANK_SELECTED}>New Window</option>
-				</select>
-			</td>
-			</tr>
-		  <tr>
-			<td><h2>Campus Access</h2>
-					<em>Select the campuses that should be able to view
-			  this link. Note that this link will only be viewable
-			  by people in both the campuses and groups selected</em>
-			</td>
-			<td><!-- BEGIN campus -->
-				<input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}<br />
-				<!-- END campus -->
-				</td>
-			</tr>
-		  <tr>
-			<td> <h2>Group Access</h2></td>
-			<td> <!-- BEGIN group -->
-				<input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />{GROUP_NAME}<br />
-				<!-- END group --></td>
-			</tr>
-		  <tr>
-			<td>&nbsp;</td>
-			<td><input type="hidden" name="id" value="{ID}" />
-			  <input type="submit" name="Submit" value="{ACTION}" class="submit-btn-plain" />
-				<!-- BEGIN delete -->
-				<input type="submit" name="delete" value="Delete" class="submit-btn-plain"  />
-				<!-- END delete -->
-			</td>
-			</tr>
+			<tbody>
+				<tr>
+					<td class="formLabelWidth">
+						<h2>Name</h2>
+						<em>This is the text that will be displayed on the menu</em>
+					</td>
+					<td>
+						<label>
+							<input type="text" name="txt" class="required" maxlength="250" size="40" value="{TEXT}" />
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<h2>URL</h2>
+
+						<em>The location at which the item should point. If
+						it is local url remember to use a reference relative
+						to the root.</em>
+					</td>
+					<td>
+						<label>
+							<input type="text" name="url" size="40"  class="required" maxlength="250" value="{URL}" />
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<h2>Target</h2>
+						<em>Select whether you would like this link to open in a new window</em>
+					</td>
+					<td>
+						<select name="target">
+							<option value="">No Target</option>
+							<option value="_blank" {BLANK_SELECTED}>New Window</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<h2>Campus Access</h2>
+						<em>Select the campuses that should be able to view
+						this link. Note that this link will only be viewable
+						by people in both the campuses and groups selected</em>
+					</td>
+					<td>
+						<!-- BEGIN campus -->
+						<input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}<br />
+						<!-- END campus -->
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<h2>Group Access</h2>
+					</td>
+					<td>
+						<!-- BEGIN group -->
+						<input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />{GROUP_NAME}<br />
+						<!-- END group -->
+					</td>
+				</tr>
+		  		<tr>
+					<td>
+						&nbsp;
+					</td>
+					<td>
+						<input type="hidden" name="id" value="{ID}" />
+					  	<input type="submit" name="Submit" value="{ACTION}" class="submit-btn-plain" />
+						<!-- BEGIN delete -->
+						<input type="submit" name="delete" value="Delete" class="submit-btn-plain"  />
+						<!-- END delete -->
+					</td>
+				</tr>
+			</tbody>
 		</table>
 	</form>
 </div>

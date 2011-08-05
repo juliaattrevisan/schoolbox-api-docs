@@ -4,19 +4,25 @@ require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 $page = new SitePage();
 $categoryHandler = new Category();
 
+$suggestions = array();
 $data = array();
+
 $allResults = $categoryHandler->search('ENG10');
 
 if (is_array($allResults) && count($allResults)) {
 	foreach($allResults as $currentResult) {
-		$data[] = array(
-			'id' => $currentResult['id'],
-			'name' => $currentResult['name'],
-			'url' => '/homepage/' . $currentResult['id'],
-		);
+		$suggestions[] = $currentResult['name'];
+		$data[] = '/homepage/' . $currentResult['id'];
 	}
 }
 
-print_r($data);
+$result = array(
+	'query'	=> 'ENG10',
+	'suggestions' => $suggestions,
+	'data' => $data
+);
 
+header('Content-type: application/json');
+echo json_encode($result);
+exit();
 ?>

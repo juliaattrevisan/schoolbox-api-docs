@@ -398,7 +398,7 @@ class Category extends DeprecatedModel {
 	/**
 	 * Search for a category. Now uses the normalised categoryCode table
 	 *
-	 * @param  $keyword
+	 * @param $keyword
 	 * @param int $offset
 	 * @param int $limit
 	 * @param null $count
@@ -410,8 +410,8 @@ class Category extends DeprecatedModel {
 		$keyword = mysql_real_escape_string($keyword);
 
 		$query = "SELECT `category`.*,
-						MATCH(`name`) AGAINST ('*$keyword*' IN BOOLEAN MODE) AS `score`,
-						MATCH(`categoryCode`.code) AGAINST ('*$keyword*' IN BOOLEAN MODE) AS `cscore`,
+						MATCH(`name`) AGAINST (\"*$keyword*\" IN BOOLEAN MODE) AS `score`,
+						MATCH(`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE) AS `cscore`,
 						`perms`.type AS perms_type,
 						`userAccess`.type AS userAccess_type
 					FROM `category`
@@ -424,27 +424,12 @@ class Category extends DeprecatedModel {
 					LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
 					WHERE (`perms`.cid OR `userAccess`.sid)
 						AND (
-							MATCH(`name`) AGAINST ('*$keyword*' IN BOOLEAN MODE)
-							OR MATCH(`name`,`categoryCode`.code) AGAINST ('*$keyword*' IN BOOLEAN MODE)
+							MATCH(`name`) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
+							OR MATCH(`name`,`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
 						)
 					ORDER BY `$sort_by` $sort_dir
 					LIMIT $offset, $limit;
 		";
-
-//		$count_query = "SELECT COUNT(*)
-//						FROM `category`
-//						LEFT JOIN `perms` ON `category`.id = `perms`.cid
-//							AND `perms`.gid = {$_SESSION['gid']}
-//							AND `perms`.type > 0
-//						LEFT JOIN `userAccess` ON `category`.id = `userAccess`.sid
-//							AND `userAccess`.service = 1
-//							AND `userAccess`.uid = {$_SESSION['id']}
-//						LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
-//						WHERE (`perms`.cid OR `userAccess`.sid)
-//							AND MATCH(`name`,`categoryCode`.code) AGAINST ('*$keyword*' IN BOOLEAN MODE)
-//		";
-//
-//		$count = $this->db->getOne($count_query);
 
 		return $this->db->getAll($query);
 	}
