@@ -7,7 +7,7 @@ $j(function() {
 	$j('#form').validate();
 
 	$j('#url').autocomplete({
-		serviceUrl: '/ajax/findCategory.php?keyword=' + $j('#form input[name=url]').attr('value'),
+		serviceUrl: '/ajax/findCategory.php?groupID=0',
 		minChars: 2,
 		maxHeight: 300,
 		width: 275,

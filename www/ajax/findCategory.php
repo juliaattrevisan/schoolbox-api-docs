@@ -7,8 +7,11 @@ $categoryHandler = new Category();
 $suggestions = array();
 $data = array();
 
+$group = $_GET['groupID'];
+$query = $_GET['query'];
 
-$allResults = $categoryHandler->search('ENG10');
+//help steve!
+$allResults = $categoryHandler->search($group);
 
 if (is_array($allResults) && count($allResults)) {
 	foreach($allResults as $currentResult) {
@@ -18,7 +21,7 @@ if (is_array($allResults) && count($allResults)) {
 }
 
 $result = array(
-	'query'	=> $_GET['query'],
+	'query'	=> $query,
 	'suggestions' => $suggestions,
 	'data' => $data
 );
