@@ -122,14 +122,12 @@ $j(function() {
     $j(".box h2").mouseout(function(e){
         $j("#tooltip").hide();
     });
-	
 
-	
 	$j('.customise').click(function(event) {
 		event.preventDefault();
 		$j('#tabs-homepage').slideToggle();
 		$j(this).children('span').toggle();
-		$j('.manage h2, a.folder-manage').each(function () {
+		$j('h2.hide').each(function () {
 			$j(this).toggle();
 		});
 	});

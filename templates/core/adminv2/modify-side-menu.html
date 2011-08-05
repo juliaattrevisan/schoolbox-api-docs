@@ -4,9 +4,9 @@
 <script type="text/javascript">
 
 $j(function() {
-//	$j('#form').validate();
+	$j('#form').validate();
 
-	$j('#form input[name=url]').autocomplete({
+	$j('#url').autocomplete({
 		serviceUrl: '/ajax/findCategory.php?keyword=' + $j('#form input[name=url]').attr('value'),
 		minChars: 2,
 		maxHeight: 300,
@@ -61,7 +61,7 @@ $j(function() {
 					</td>
 					<td>
 						<label>
-							<input type="text" name="url" size="40"  class="required" maxlength="250" value="{URL}" />
+							<input type="text" name="url" id="url" size="40" class="required" maxlength="250" value="{URL}" />
 						</label>
 					</td>
 				</tr>
@@ -101,8 +101,8 @@ $j(function() {
 					</td>
 				</tr>
 		  		<tr>
-					<td>
-						&nbsp;
+					<td>&nbsp;
+						
 					</td>
 					<td>
 						<input type="hidden" name="id" value="{ID}" />

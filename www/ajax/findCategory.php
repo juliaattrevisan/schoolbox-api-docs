@@ -7,6 +7,7 @@ $categoryHandler = new Category();
 $suggestions = array();
 $data = array();
 
+
 $allResults = $categoryHandler->search('ENG10');
 
 if (is_array($allResults) && count($allResults)) {
@@ -17,12 +18,12 @@ if (is_array($allResults) && count($allResults)) {
 }
 
 $result = array(
-	'query'	=> 'ENG10',
+	'query'	=> $_GET['query'],
 	'suggestions' => $suggestions,
 	'data' => $data
 );
 
 header('Content-type: application/json');
 echo json_encode($result);
-exit();
+
 ?>
