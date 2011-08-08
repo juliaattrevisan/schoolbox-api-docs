@@ -29,3 +29,7 @@ UPDATE homepage_comp SET `name`= 'Image' WHERE id = 15;
 /* Error messages for category creation
  */
 INSERT INTO error VALUES (136, "Unable to create or modify folder as class code already exists.");
+
+/* Spelling correction.
+ */
+UPDATE `config` SET `title`='Synchronise Data' WHERE `configID`='57';
