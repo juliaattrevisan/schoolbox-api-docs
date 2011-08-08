@@ -28,4 +28,4 @@ UPDATE homepage_comp SET `name`= 'Image' WHERE id = 15;
 
 /* Error messages for category creation
  */
-INSERT INTO error VALUES (136, "One or more provided category codes already exists.");
+INSERT INTO error VALUES (136, "Unable to create or modify folder as class code already exists.");
