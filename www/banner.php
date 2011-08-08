@@ -11,7 +11,7 @@
 		<table border="0" cellpadding="0" cellspacing="0" width="100%">
 			<tr>
 				<td align="left">
-					<span style="color:#fff; font-size:12px;font-family:Arial, Helvetica, sans-serif; ">Finished? Click the cross to close this window and return to the <? echo HEADING;?>.</span>
+					<span style="color:#fff; font-size:12px;font-family:Arial, Helvetica, sans-serif; ">Finished? Click the delete icon to close this window and return to the <? echo HEADING;?>.</span>
 
 					</td>
 				<td align="right" valign="middle">
