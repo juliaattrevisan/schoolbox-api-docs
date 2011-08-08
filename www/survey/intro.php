@@ -133,7 +133,7 @@ else {
         $this->setVar('startTest_block', '');
         $this->parse('error_block', 'error');
     }
-    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess::UNLIMITED_DURATION)) {
+    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Survey::UNLIMITED_DURATION)) {
         $this->setVar(array(
             'ERROR_STRING' => 'You have run out of time to complete this survey and cannot re-sit it.'
         ));
