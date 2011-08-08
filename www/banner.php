@@ -11,12 +11,11 @@
 		<table border="0" cellpadding="0" cellspacing="0" width="100%">
 			<tr>
 				<td align="left">
-					<font color="white" size="2">
-			Finished? Click the cross to close this window and return to the <? echo HEADING;?>.
-					</font>
+					<span style="color:#fff; font-size:12px;font-family:Arial, Helvetica, sans-serif; ">Finished? Click the cross to close this window and return to the <? echo HEADING;?>.</span>
+
 					</td>
-				<td align="right">
-			<a href='javascript:top.close()'><img src="/images/cross.gif" width="25" height="25" border="0" align="absmiddle"></a>
+				<td align="right" valign="middle">
+					<a href='javascript:top.close()' style="padding:4px; display:block;"><img src="/images/famicons/delete.png"  border="0" /></a>
 				</td>
 			</tr>
 		</table>
