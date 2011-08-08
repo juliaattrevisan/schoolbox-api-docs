@@ -7,12 +7,12 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../library/assess/Assess.php';
-require_once '../library/assess/AssessQuestion.php';
-require_once '../library/assess/AssessSection.php';
+require_once '../library/survey/Survey.php';
+require_once '../library/survey/SurveyQuestion.php';
+require_once '../library/survey/SurveySection.php';
 require_once '../library/group.php';
 
-$assessHandler = new Assess();
+$assessHandler = new Survey();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -42,14 +42,14 @@ if (!empty($_POST)) {
 
     /* Redirect to summary
      */
-    localRedir('/assess/summary/' . scrubTEXT($_POST['assess_id']));
+    localRedir('/survey/summary/' . scrubTEXT($_POST['assess_id']));
 }
 else {
     if (!is_numeric($this->arg[0])) {
         error(112);
     }
 
-    $sectionHandler = new AssessSection();
+    $sectionHandler = new SurveySection();
     $section = $sectionHandler->getByID($this->arg[0]);
 
     if (!$assessHandler->isOwner($section['assess_id'])) {
@@ -62,11 +62,9 @@ else {
 
     /* Render modify page
      */
-    $this->setFile(TEMPLATE_content, 'assess/section/modify.html');
+    $this->setFile(TEMPLATE_content, 'survey/section/modify.html');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setTitle('Create Section');
-
-
 
     $assess = $assessHandler->getByID($section['assess_id']);
 
@@ -83,11 +81,11 @@ else {
 
     /* Show this Assess' contents
      */
-    $this->setFile('assessContentsFragment', 'assess/contents.html');
+    $this->setFile('assessContentsFragment', 'survey/contents.html');
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assessHandler = new Assess();
+    $assessHandler = new Survey();
     $assessHandler->renderAssessContents($assess['assess_id'], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
