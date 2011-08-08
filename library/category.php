@@ -253,11 +253,67 @@ class Category extends DeprecatedModel {
 		$this->db->insert('perms', $perm);
 	}
 
-	function create($data) {
+	/**
+	 * Determine whether a categoryCode already exists. Accepts an array of
+	 * categoryCodes, or a single categoryCode string
+	 *
+	 * @param  $code
+	 * @return array|bool
+	 */
+	public function isCodeExists($codeList) {
+		if (empty($codeList)) {
+			return false;
+		}
 
+		$query = "SELECT * FROM categoryCode WHERE ";
+
+		/* Re-implode the filtered components into a query-friendly format
+		 */
+		if (is_array($codeList) && count($codeList)) {
+
+			foreach($codeList as $currentCode) {
+				$temp[] = '"' . $currentCode . '"';
+			}
+
+			$codeList = implode(',', $temp);
+
+			$query .= " code IN ({$codeList}) ";
+		}
+		else {
+			$query .= " code = '$codeList' ";
+		}
+
+		return $this->db->getAll($query);
+	}
+
+	/**
+	 * Create a new category
+	 *
+	 * @param  $data
+	 * @return int
+	 */
+	public function create($data) {
 		$group = $data['group'];
 		unset($data['group']);
 
+		/* Check if the category code exists. If it already does, spawn error;
+		 * otherwise continue creating. array_filter() removes empty, false
+		 * and null elements from the array
+		 */
+		$codeList = explode(',', trim($data['code']));
+
+		if (is_array($codeList) && count($codeList)) {
+			$codeList = array_values(array_filter($codeList, 'trim'));
+		}
+
+		$codeExists = $this->isCodeExists($codeList);
+
+		if ($codeExists) {
+			error(136);
+		}
+
+		/* Continue normally
+		 */
 		$categoryID = parent::create($data);
 
 		/* Setup group permissions */
@@ -291,7 +347,29 @@ class Category extends DeprecatedModel {
 		return $categoryID;
 	}
 
+	/**
+	 * Update category
+	 *
+	 * @param  $data
+	 * @return void
+	 */
 	public function update($data) {
+
+		/* Check if the category code exists. If it already does, spawn error;
+		 * otherwise continue creating. array_filter() removes empty, false
+		 * and null elements from the array
+		 */
+		$codeList = explode(',', trim($data['code']));
+
+		if (is_array($codeList) && count($codeList)) {
+			$codeList = array_values(array_filter($codeList, 'trim'));
+		}
+
+		$codeExists = $this->isCodeExists($codeList);
+
+		if ($codeExists) {
+			error(136);
+		}
 
 		/* Redo group permissions */
 		if (is_array($data['group'])) {

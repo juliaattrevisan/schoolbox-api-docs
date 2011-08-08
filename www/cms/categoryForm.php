@@ -8,6 +8,9 @@ $categoryHandler = new Category;
 $groupHandler = new Group;
 
 if ($_POST['name']) {
+	/* scrubTEXT($_POST['group']): This keeps throwing a warning, is this used anywhere?
+	 */
+
 	$category = array(
 		'name' => scrubTEXT($_POST['name']),
 		'parent' => scrubTEXT($_POST['parent']),
