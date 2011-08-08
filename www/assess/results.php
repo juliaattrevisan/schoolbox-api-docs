@@ -70,6 +70,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 	 */
 	if ($currentAttempt['reviewed_at'] != '') {
 		$reviewedAt = 'Reviewed on ' . date('jS F Y, g:i:sa', strtotime($currentAttempt['reviewed_at']));
+		
 	}
 	else {
 		$reviewedAt = 'Not reviewed';

@@ -8,6 +8,7 @@ $j(document).ready(function() {
 	$j('.assess-header form').each(function(index, formElement) {
    		 $j(formElement).validate({
 			submitHandler: function() {
+				showAlert(formElement);
 				$j.post($j(formElement).attr('action'), $j(formElement).serialize(), function(responseText) {
 					var dataFunction = new Function('return ' + responseText);
 					var result = dataFunction();
@@ -26,13 +27,15 @@ $j(document).ready(function() {
                             offset = element.offset();
                             error.insertBefore(element)
 			}
-
    		});
 	});  	   
 		
 	$j('.textarea-container textarea').blur(function() {
+
 		if ($j(this).val() !== '') {
-			$j.post($j(this).parents('.assess-header form').attr('action'), $j(this).parents('.assess-header form').serialize(), function(responseText) {
+			$j.post($j(this).parents('.assess-header form').attr('action'), 
+			$j(this).parents('.assess-header form').serialize(), 
+			function(responseText) {
 				var dataFunction = new Function('return ' + responseText);
 				var result = dataFunction();
 			});
@@ -42,15 +45,33 @@ $j(document).ready(function() {
 	
 	$j('.marks-amount input').blur(function() {
 		
-		$j.post($j(this).parents('.assess-header form').attr('action'), $j(this).parents('.assess-header form').serialize(), function(responseText) {
-				var dataFunction = new Function('return ' + responseText);
-				var result = dataFunction();
-			});
-			return false;	
-
+		showAlert($j(this));
+		
+		$j.post($j(this).parents('.assess-header form').attr('action'), 
+		$j(this).parents('.assess-header form').serialize(), 
+		function(responseText) {
+			var dataFunction = new Function('return ' + responseText);
+			var result = dataFunction();
+		});
+		return false;	
 	});
+
+	var assessAttempted = '{ASSESS_PREVIOUSLY_REVIEWED}';
 	
+	if (assessAttempted == 'true') {
+		$j('.tick').html('<span></span>Resubmit Review')
+	}
 	
+	function showAlert(target) {
+		var relevantLabel = $j(target).closest('form').find('.assess-alert');
+		if (assessAttempted == "false") {
+			relevantLabel.fadeIn(200);
+		}
+		if (assessAttempted == "true") {
+			relevantLabel.html('<span>In order to finish your edits to this finalised review, click \'Resubmit Review\' at the bottom of the page\</span>').fadeIn(200);
+		}
+	}
+
 });
 </script>
 <!-- END custom_head -->
@@ -62,13 +83,18 @@ $j(document).ready(function() {
 	</div>
 	<!-- BEGIN question -->
 	<div class='assess-header'>
-		<form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='validation_{RESPONSE_ID}' method="post">
+		<form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" name="question-submit" class='validation_{RESPONSE_ID}' method="post">
 			<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}<span> - ({QUESTION_MARKS} marks)</span></h3>
 			<div class="assess-body clearfix">
 
 				<!-- BEGIN answerInputs -->
 				<!-- END answerInputs -->
-                <input type="submit" value="Update Marks" class="submit-btn-plain float-right"/>
+			  <label class="alert-holder clearfix">
+			  	<div class="assess-alert">
+					<span>In order to finalise your assessment, please click the "Finalise" button at the bottom of the page.</span>
+				</div>
+			    <input type="submit" value="Update Marks" class="submit-btn-plain float-right"/>
+			</label>
                
 			</div>
 		</form>
@@ -85,6 +111,6 @@ $j(document).ready(function() {
 	<!-- END nextSection -->
 
 	<!-- BEGIN endAssess -->
-	<a class="btn tick" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Finish</a>
+	<a class="btn tick" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Finalise Assessment</a>
 	<!-- END endAssess -->
 </div>

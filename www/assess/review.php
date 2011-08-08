@@ -71,6 +71,16 @@ else {
     error(114);
 }
 
+/* Find out whether the attempt has been previously finalised
+ */
+if ($attempt['reviewed_at'] != '') {
+	$reviewedAt = 'true';
+}
+else {
+	$reviewedAt = 'false';
+}
+
+
 /* Set up template
  */
 $this->setFile(TEMPLATE_content, 'assess/review.html');
@@ -90,6 +100,7 @@ $this->setVar(array(
     'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
     'SECTION_TITLE' => $section['title'],
     'SECTION_DESCRIPTION' => $section['description'],
+	'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
 ));
 
 /* Load all the questions for this section.

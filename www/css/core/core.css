@@ -2624,9 +2624,9 @@ p.interact a.take-test-btn {
 	display:none;
 }
 
-
-
-
+.alert-holder{position:relative;}
+.assess-alert {display:none;background:#feffb8; border:1px solid #ead498; position:absolute; right:0; height:40px; width:100%; top:-4px; text-align:right;}
+.assess-alert span{background:url(/images/famicons/error.png) no-repeat 0 50%; padding-right:150px; padding-left:20px; line-height:20px; float:right; display:block; height:100%; line-height:40px;}
 
 
 
