@@ -161,7 +161,7 @@ abstract class EvaluationAttempt extends DeprecatedModel {
                       assess_attempt.attempt_id,
                       assess_attempt.user_id, firstname, lastname,
                       assess_attempt.start, assess_attempt.finish,
-                      ROUND(assess_attempt.finish - assess_attempt.start) AS timeTaken,
+                      (UNIX_TIMESTAMP(assess_attempt.finish) - UNIX_TIMESTAMP(assess_attempt.start)) AS timeTaken,
                       SUM(assess_response.mark) AS totalMarks,
                       assess_attempt.reviewed_at
                   FROM assess_attempt
@@ -176,15 +176,19 @@ abstract class EvaluationAttempt extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    /**
-     * Get a list of attempts that have been made, along with their authors
-     */
+	/**
+	 * Get a list of attempts that have been made, along with their authors
+	 *
+	 * @param  $assess_id
+	 * @param  $section_id
+	 * @return array|bool
+	 */
     public function getListByAssessAndSection($assess_id, $section_id) {
         $query = "SELECT
                       assess_attempt.attempt_id,
                       assess_attempt.user_id, firstname, lastname,
                       assess_attempt.start, assess_attempt.finish,
-                      ROUND(assess_attempt.finish - assess_attempt.start) AS timeTaken,
+                      (UNIX_TIMESTAMP(assess_attempt.finish) - UNIX_TIMESTAMP(assess_attempt.start)) AS timeTaken,
                       SUM(assess_response.mark) AS totalMarks,
                       assess_attempt.reviewed_at
                   FROM assess_attempt
