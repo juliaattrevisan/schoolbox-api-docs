@@ -65,8 +65,8 @@ if (is_array($sectionValues) && count($sectionValues)) {
 
 		/* A list of attempts
 		 */
-		if (count($currentSection['attempts'])) {
-			foreach($currentSection['attempts'] as $currentAttempt) {
+		if (count($currentQuestion['attempts'])) {
+			foreach($currentQuestion['attempts'] as $currentAttempt) {
 				$this->setVar(array(
 					'RESPONDENT_NAME' => $currentAttempt['name'],
 					'RESPONDENT_RESPONSE' => $currentAttempt['responses']

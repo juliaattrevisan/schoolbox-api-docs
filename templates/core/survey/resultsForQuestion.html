@@ -2,6 +2,17 @@
 <script type='text/javascript' src='/javascript/excanvas.compiled.js'></script>
 <script type='text/javascript' src='/javascript/flot/jquery.flot.js'></script>
 <script type='text/javascript' src='/javascript/flot/jquery.flot.pie.js'></script>
+<style type='text/css'>
+#assess .halfCol {
+	width: 50%;
+	margin: 0px;
+	padding: 0px;
+}
+
+#assess .halfCol h3 {
+	padding: 0px;
+}
+</style>
 <!-- END custom_head -->
 
 <div id="assess">
@@ -10,32 +21,36 @@
 	<div class='assess-header'>
 		<h2>{QUESTION_QUESTION}</h2>
 		<div class="assess-body">
-			<table>
-				<thead>
-					<tr>
-						<th><strong>Respondent</strong></th>
-						<th><strong>Response</strong></th>
-					</tr>
-				</thead>
-				<tbody>
-					<!-- BEGIN respondent -->
-					<tr>
-						<td>{RESPONDENT_NAME}</td>
-						<td>{RESPONDENT_RESPONSE}</td>
-					</tr>
-					<!-- END respondent -->
-				</tbody>
-			</table>
-
+			<div class='halfCol float-left'>
+				<table>
+					<thead>
+						<tr>
+							<th><strong>Respondent</strong></th>
+							<th><strong>Response</strong></th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- BEGIN respondent -->
+						<tr>
+							<td>{RESPONDENT_NAME}</td>
+							<td>{RESPONDENT_RESPONSE}</td>
+						</tr>
+						<!-- END respondent -->
+					</tbody>
+				</table>
+			</div>
 			<!-- BEGIN has_legend -->
-			<h3>Legend</h3>
-			<dl>
-				<!-- BEGIN legend_item -->
-				<dt>{LEGEND_ITEM_LETTER}</dt>
-				<dd>{LEGEND_ITEM_TEXT}</dd>
-				<!-- END legend_item -->
-			</dl>
+			<div class='halfCol float-right'>
+				<h3>Legend</h3>
+				<dl>
+					<!-- BEGIN legend_item -->
+					<dt>{LEGEND_ITEM_LETTER}</dt>
+					<dd>{LEGEND_ITEM_TEXT}</dd>
+					<!-- END legend_item -->
+				</dl>
+			</div>
 			<!-- END has_legend -->
+
 			<div class='float-fix'></div>
 		</div>
 	</div>

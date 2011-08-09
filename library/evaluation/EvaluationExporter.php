@@ -237,11 +237,8 @@ class EvaluationExporter {
 				for ($j = 0; $j < count($allAttempts); $j++) {
 					$currentAttempt = $allAttempts[$j];
 
-					$attemptValues[$j]['name'] = $currentAttempt['firstname'] . ' ' . $currentAttempt['lastname'];
-
 					if ($allQuestions) {
 						for ($i = 0; $i < count($allQuestions); $i++) {
-
 							$this->updateResponseSummary($allQuestions[$i], $allAttempts[$j], $k, $i);
 
 							/* This if() clause allows for sections containing no questions.
@@ -254,14 +251,13 @@ class EvaluationExporter {
 								 */
 								$responseValues = strip_tags(str_replace("\t", '', $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $allQuestions[$i]['question_id'])));
 							}
+
+							$this->sectionValues[$k]['questions'][$i]['attempts'][$j]['name'] = $currentAttempt['firstname'] . ' ' . $currentAttempt['lastname'];
+							$this->sectionValues[$k]['questions'][$i]['attempts'][$j]['responses'] = $responseValues;
 						}
 					}
-
-					$attemptValues[$j]['responses'] = $responseValues;
 				}
 			}
-
-			$this->sectionValues[$k]['attempts'] = $attemptValues;
 		}
 
 		return $this->sectionValues;
@@ -290,28 +286,25 @@ class EvaluationExporter {
 
 		if (is_array($sectionValues) && count($sectionValues)) {
 			foreach($sectionValues as $currentSection) {
-				$questionList = array();
+				echo 'Section: ' . $currentSection['section'] . "\n";
 
-				/* Get a list of questions going
-				 */
 				if (is_array($currentSection['questions']) && count($currentSection['questions'])) {
-					$questionList[] = "Respondent";
-
 					foreach($currentSection['questions'] as $currentQuestion) {
-						$questionList[] = $currentQuestion['question'];
-					}
-				}
+						echo $currentQuestion['question'] . "\n";
+						echo "Respondent\n";
 
-				/* Output to stdout stream
-				 */
-				echo 'Section ' . $currentSection['section'] . "\n";
-				$this->outputCSV2(array($questionList));
+						/* Generate attempts for this question
+						 */
+						foreach($currentQuestion['attempts'] as $currentAttempt) {
+							$attemptList = array();
 
-				/* A list of attempts per section
-				 */
-				if (count($currentSection['attempts'])) {
-					foreach($currentSection['attempts'] as $currentAttempt) {
-						$this->outputCSV2(array($currentAttempt));
+							$attemptList[] = $currentAttempt['name'];
+							$attemptList[] = $currentAttempt['responses'];
+
+							$this->outputCSV2(array($attemptList));
+						}
+
+						echo "\n";
 					}
 				}
 
@@ -349,5 +342,4 @@ class EvaluationExporter {
 		fputcsv($filehandler, $vals, ',', '"');
 	}
 }
-
 ?>
