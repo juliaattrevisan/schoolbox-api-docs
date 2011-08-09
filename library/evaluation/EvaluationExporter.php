@@ -169,6 +169,7 @@ class EvaluationExporter {
 			$currentResponse = $answerHandler->exportResponseToArray($currentAttempt['attempt_id'], $currentQuestion['question_id']);
 
 			if (is_array($currentResponse)) {
+
 				foreach($currentResponse as $individualResponse) {
 
 					/* Find out if you need to extract the response text for the
@@ -186,8 +187,10 @@ class EvaluationExporter {
 
 			/* Inconcatenatable non-summarisable data (short answer) which only
 			 * need to be collated into a giant list
+			 *
+			 * Also prevent non-responses from being legendised
 			 */
-			else {
+			else if ($currentResponse) {
 				$this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$currentResponse]['values']++;
 			}
 		}
