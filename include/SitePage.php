@@ -9,7 +9,7 @@ class SitePage extends Page {
        function SitePage($login=TRUE) {
            parent::Page();
 
-           $this->db = new dbManager;
+		$this->db = new DeprecatedDatabase;
            $this->setTab('main');
 
            if($login)
@@ -37,11 +37,11 @@ class SitePage extends Page {
 
                $filename = rtrim(implode("/", $path), '/');
 
-               if(is_file($_SERVER['DOCUMENT_ROOT'].'/'.$filename.'.php') && $execute) {
-                   include($_SERVER['DOCUMENT_ROOT'].'/'.$filename. '.php');
+			if(is_file(WEB_root.'/'.$filename.'.php') && $execute) {
+				include(WEB_root.'/'.$filename. '.php');
                    return true;
-               } elseif(is_file($_SERVER['DOCUMENT_ROOT'].'/'.$filename.'/index.php') && $execute) {
-                   include($_SERVER['DOCUMENT_ROOT'].'/'.$filename. '/index.php');
+			} elseif(is_file(WEB_root.'/'.$filename.'/index.php') && $execute) {
+				include(WEB_root.'/'.$filename. '/index.php');
                    return true;
                } else if(is_file($this->templateRoot . '/' . $this->getTemplate($filename . '.html'))) {
                    $this->setFile(TEMPLATE_content, $filename . '.html');
@@ -102,7 +102,7 @@ class SitePage extends Page {
            $templateVar = array(	'TEMPLATE_YEAR' => date('Y'),
                        'SITE_NAME'     => Cfg::get('school_name'),
                        'SITE_ADDRESS'	=> Cfg::get('site_address'),
-                       'SITE_GREETING' => greeting(), //TODO fix this so it uses an object, where is this coming from?
+					   'SITE_GREETING' => greeting(), // TODO: This should be an object
                        'SITE_LOGINNAME'=> formatName($_SESSION),
                        'SITE_USERNAME' => $_SESSION['username'],
                        'SITE_LOCATION'	=> $this->site,
@@ -167,7 +167,7 @@ class SitePage extends Page {
                if ( !isset($_SESSION['id']) ) {
                        //Catch already logged in users via kerberos or other means
                        if(Cfg::get('kerb_enable') && $_SERVER['REMOTE_USER'] ) {
-                           require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/session.php';
+
                            $sessionHandler = new Session;
                            list($username, $domain) = explode('@',$_SERVER['REMOTE_USER']);
                            if(!$sessionHandler->create($username))
@@ -221,9 +221,7 @@ class SitePage extends Page {
 
        function error($ec, $message = "") {
 
-           require_once($_SERVER['DOCUMENT_ROOT'].'/../include/db.php');
-
-           $db = new dbManager(SQL_db, 1);
+		$db = new DeprecatedDatabase(SQL_db, 1);
 
            $query = "SELECT message FROM error WHERE id = '$ec'";
            $error = $db->getRow($query);
@@ -375,7 +373,7 @@ class SitePage extends Page {
            //custom code for each site is performed here
            if($this->site == 'wenona')
            {
-               require_once $_SERVER['DOCUMENT_ROOT'] . '/include/wenona.php';
+			require_once WEB_root . '/include/wenona.php';
                //provide encoded login details for intranet
                $this->setVar("ENC_LOGIN", urlencode(base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'].' '.$_SESSION['password'].' '.date('Y m d H i')))));
 

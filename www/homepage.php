@@ -12,11 +12,12 @@ if (strpos($_SERVER['REQUEST_URI'], ".php?category=") ||
 	$category = isset($_GET['category']) ? $_GET['category'] : $_GET['code'];
 	localRedir("/homepage/" . $category);
 }
-
+/*
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/homepage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
+*/
 
 $categoryHandler = new Category; 
 $groupHandler = new Group(HOMEPAGE_SERVICE);
