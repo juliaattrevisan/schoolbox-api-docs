@@ -292,9 +292,15 @@ class EvaluationExporter {
 				echo 'Section: ' . $currentSection['section'] . "\n";
 
 				if (is_array($currentSection['questions']) && count($currentSection['questions'])) {
+
+					/* Question index
+					 */
+					$i = 1;
+
 					foreach($currentSection['questions'] as $currentQuestion) {
-						echo $currentQuestion['question'] . "\n";
-						echo "Respondent\n";
+						echo "Q$i. {$currentQuestion['question']}\n";
+
+						$this->outputCSV2(array(array("Respondent", "Response")));
 
 						/* Generate attempts for this question
 						 */
@@ -308,6 +314,8 @@ class EvaluationExporter {
 						}
 
 						echo "\n";
+
+						$i++;
 					}
 				}
 
