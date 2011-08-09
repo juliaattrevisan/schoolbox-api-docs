@@ -533,6 +533,22 @@ class Category extends DeprecatedModel {
 					LIMIT $offset, $limit;
 		";
 
+
+		$count_query = "SELECT COUNT(*)
+						FROM `category`
+						LEFT JOIN `perms` ON `category`.id = `perms`.cid
+							AND `perms`.gid = {$_SESSION['gid']}
+							AND `perms`.type > 0
+						LEFT JOIN `userAccess` ON `category`.id = `userAccess`.sid
+							AND `userAccess`.service = 1
+							AND `userAccess`.uid = {$_SESSION['id']}
+						LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
+						WHERE (`perms`.cid OR `userAccess`.sid)
+							AND MATCH(`name`,`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
+		";
+
+		$count = $this->db->getOne($count_query);
+
 		return $this->db->getAll($query);
 	}
 
