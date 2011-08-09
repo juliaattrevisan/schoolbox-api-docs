@@ -151,6 +151,32 @@ abstract class EvaluationAttempt extends DeprecatedModel {
     }
 
 	/**
+	 * Get a list of attempts that have been made for a particular user
+	 *
+	 * @param  $assess_id
+	 * @return array|bool
+	 */
+    public function getListForUser($assess_id, $user_id) {
+        $query = "SELECT
+                      assess_attempt.attempt_id,
+                      assess_attempt.user_id, firstname, lastname,
+                      assess_attempt.start, assess_attempt.finish,
+                      (UNIX_TIMESTAMP(assess_attempt.finish) - UNIX_TIMESTAMP(assess_attempt.start)) AS timeTaken,
+                      SUM(assess_response.mark) AS totalMarks,
+                      assess_attempt.reviewed_at
+                  FROM assess_attempt
+                  LEFT JOIN `user` ON assess_attempt.user_id = user.id
+                  LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
+                  LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
+                  WHERE assess.assess_id = '$assess_id'
+				  AND assess_attempt.deleted_at IS NULL
+				  AND user.id = '$user_id'
+                  GROUP BY assess_attempt.attempt_id";
+
+        return $this->db->getAll($query);
+    }
+
+	/**
 	 * Get a list of attempts that have been made, along with their authors
 	 *
 	 * @param  $assess_id

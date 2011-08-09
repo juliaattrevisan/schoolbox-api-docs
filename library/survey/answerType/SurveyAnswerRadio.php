@@ -30,6 +30,13 @@ class SurveyAnswerRadio extends AnswerRadio {
 
 		if (is_array($currentQuestion['summary']) && count($currentQuestion['summary'])) {
 			foreach($currentQuestion['summary'] as $key => $value) {
+
+				/* If the option hasn't been responded to
+				 */
+				if ($value['text'] == '') {
+					$value['text'] = 'Unanswered';
+				}
+
 				$page->setVar(array(
 					'SERIES_LABEL' => $value['text'],
 					'SERIES_DATA' => $value['values'],

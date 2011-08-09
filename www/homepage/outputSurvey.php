@@ -49,7 +49,7 @@ if (is_array($allSurveys)) {
 		 * Work screen, where the attempts are all listed
 		 */
 		if (!$groupHandler->isStaff()) {
-			$allAttempts = $attemptHandler->getList($currentSurvey['assess_id']);
+			$allAttempts = $attemptHandler->getListForUser($currentSurvey['assess_id'], $_SESSION['id']);
 
 			if (is_array($allAttempts) && count($allAttempts)) {
 				$assessAttempted = false;

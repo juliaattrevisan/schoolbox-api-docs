@@ -12,6 +12,9 @@ $j(function() {
 		}<!-- BEGIN series_separator -->,<!-- END series_separator -->
 		<!-- END series -->
 	], {
+		legend: {
+			container: $j('#legend_{GRAPH_ID}')
+		},
 		xaxis: {
 			show: false,
 			tickLength: 0
@@ -23,4 +26,5 @@ $j(function() {
 });
 </script>
 <div id='{GRAPH_ID}' style="width:600px;height:300px;"></div>
+<div id='legend_{GRAPH_ID}'></div>
 

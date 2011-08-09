@@ -94,7 +94,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
 			/* Sort legend items explicitly, otherwise they will appear in the
 			 * order they were submitted
 			 */
-			uasort($allLegendItems, 'cmp');
+			uksort($allLegendItems, 'cmp');
 
 			foreach($allLegendItems as $key => $value) {
 				$this->setVar(array(
