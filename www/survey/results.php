@@ -51,6 +51,8 @@ $factory = new SurveyFactory();
 
 if (is_array($sectionValues) && count($sectionValues)) {
 	foreach($sectionValues as $currentSection) {
+		$i = 1;
+
 		if (is_array($currentSection['questions']) && count($currentSection['questions'])) {
 			foreach($currentSection['questions'] as $currentQuestion) {
 
@@ -59,7 +61,8 @@ if (is_array($sectionValues) && count($sectionValues)) {
 				$this->setVar(array(
 					'ASSESS_ID' => $assess['assess_id'],
 					'QUESTION_QUESTION' => $currentQuestion['question'],
-					'QUESTION_QUESTION_ID' => $currentQuestion['question_id']
+					'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+					'QUESTION_INDEX' => $i++,
 				));
 
 				/* Answer and Response data
