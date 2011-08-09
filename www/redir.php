@@ -38,11 +38,9 @@
 		<frame src="banner.php" name="BottomFrame" noresize scrolling="no">
 	</frameset>
 	<noframes>
-
 		<body bgcolor="#ffffff">
 			<p></p>
 		</body>
-
 	</noframes>
 
 </html>

@@ -1,15 +1,20 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/css/jquery.countdown.css" media="screen" />
-<script type="text/javascript" src="/javascript/jquery.swappable.js"></script>
 <script type="text/javascript" src="/javascript/jquery.countdown.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
 
     $j('.assess-header form').submit(function() {
         $j.post($j(this).attr('action'), $j(this).serialize(), function(responseText) {
-            var dataFunction = new Function('return ' + responseText);
-            var result = dataFunction();
-
+           
+		   console.log(responseText);
+		   
+		    var dataFunction = new Function('return ' + responseText + ';'); 
+           
+		   console.log(dataFunction);
+		   
+		    var result = dataFunction();
+			
             /* Save successful, so hide form and disable submit butan.
              * Update section completion value
              */
@@ -40,15 +45,15 @@ $j(document).ready(function() {
 	});
 
 	$j('.checkbox').click(function() {
-		$j(this).parents('.assess-header form').submit();
+		$j(this).closest('.assess-header form').submit();
 	});
 
 	$j('.textarea-container textarea').blur(function() {
-        $j(this).parents('.assess-header form').submit();
+        $j(this).closest('.assess-header form').submit();
 	});
 
 	$j('.assess-body input').blur(function() {
-		$j(this).parents('.assess-header form').submit();
+		$j(this).closest('.assess-header form').submit();
 	});
 
     /* Set up countdown
@@ -66,22 +71,20 @@ $j(document).ready(function() {
         });
 	 }
 
-
 	 if ($j('#countdown').html() == '') {
 		 $j('#countdown').parent().hide();
 	 }
-
-	$j(".match-it").swappable({
-		items: '.right-answer',
-		cursorAt: {top:-1},
-		stop: function() {
-			$j(this).parents('.assess-header form').submit();
+	 
+	 $j('input[type=checkbox], input[type=radio]').each(function() {
+		if ($j(this).is(':selected')) {
+			$j(this).parent().addClass('selected');	
 		}
-	});
-
-	$j( ".right-answer" ).droppable({ hoverClass: 'drophover' });
-
-	$j(".match-it").disableSelection();
+	 })
+	 
+	 $j('label').click(function() {
+		 $j(this).toggleClass('selected');
+	 });
+	
 });
 </script>
 <!-- END custom_head -->
