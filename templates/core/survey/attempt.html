@@ -6,20 +6,17 @@ $j(document).ready(function() {
 
     $j('.assess-header form').submit(function() {
         $j.post($j(this).attr('action'), $j(this).serialize(), function(responseText) {
-           
-		   console.log(responseText);
-		   
-		    var dataFunction = new Function('return ' + responseText + ';'); 
-           
-		   console.log(dataFunction);
-		   
+
+		   console.log('return ' + responseText);
+
+		    var dataFunction = new Function('return ' + responseText);
+
 		    var result = dataFunction();
-			
+
             /* Save successful, so hide form and disable submit butan.
              * Update section completion value
              */
             if (result.response_id != '') {
-
                 for (var i=0; i < result.percentageComplete.length; i++) {
                     var sectionSelector = $j('#sectionPercentageComplete_' + result.percentageComplete[i].section_id);
                     var percentage = result.percentageComplete[i].percentageComplete.toString();
@@ -58,7 +55,7 @@ $j(document).ready(function() {
 
     /* Set up countdown
      */
-	 var timeLeft = '{ASSESS_TIME_REMAINING}'
+	 var timeLeft = '{ASSESS_TIME_REMAINING}';
 
 	 if ((timeLeft) > 0) {
         $j('#countdown').countdown({
@@ -74,17 +71,17 @@ $j(document).ready(function() {
 	 if ($j('#countdown').html() == '') {
 		 $j('#countdown').parent().hide();
 	 }
-	 
+
 	 $j('input[type=checkbox], input[type=radio]').each(function() {
 		if ($j(this).is(':selected')) {
-			$j(this).parent().addClass('selected');	
+			$j(this).parent().addClass('selected');
 		}
-	 })
-	 
+	 });
+
 	 $j('label').click(function() {
 		 $j(this).toggleClass('selected');
 	 });
-	
+
 });
 </script>
 <!-- END custom_head -->

@@ -19,7 +19,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 */
 
-$categoryHandler = new Category; 
+$categoryHandler = new Category;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 $allowedFiles = new AllowedFile;
 
@@ -171,7 +171,7 @@ if($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
     $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
         // Colors
 	$listColor = $homepageHandler->getColorList();
-	
+
 	$this->setVar('COLOUR_ARRAY', 'original');
 	$this->setVar($listColor);
 	$this->parse('colour_list_block', 'colour_list', true);
@@ -197,7 +197,7 @@ if($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
 	}
 
 
-}	
+}
 else {
 	$this->setVar('edit_page_block', '');
 	$this->setVar('modify_layout_block', '');
@@ -211,7 +211,7 @@ $this->setVar($colours);
 // output mime classes
 $allowedList = $allowedFiles->getAll();
 if (is_array($allowedList)) {
-	
+
 	// append link icon to resutls
 	$allowedList[]['iconFile'] = "link.png";
 	$last = '';
@@ -220,10 +220,10 @@ if (is_array($allowedList)) {
 			$output = array("NAME"	=> $allowedFiles->getClass($allowed["iconFile"]),
 							"ICON"	=> $allowed["iconFile"],
 							);
-			
+
 			$this->setVar($output);
 			$this->parse("allowed_files_block", "allowed_files", true);
-			
+
 			$last = $allowed["iconFile"];
 		}
 	}
@@ -233,9 +233,9 @@ if (is_array($allowedList)) {
 // output components
 $componentList = $categoryHandler->getComponents($categoryID);
 if (is_array($componentList)) {
-	
+
 	foreach ($componentList as $component) {
-		
+
 		$componentHandle = $component['method'] . $component['homepageComponentLocationID'];
 
       /* This array provides default sorting capabilities for each component
@@ -249,7 +249,7 @@ if (is_array($componentList)) {
 
 		$this->setVar('COMPONENT_HOMEPAGE_ID', $component['homepageComponentLocationID']);
                 $this->setVar('COMPONENT_ID', $component['component']);
-		
+
 		$default = unserialize($component['dfconfig']);
 		$config = unserialize($component['config']);
 
@@ -314,11 +314,11 @@ if (is_array($componentList)) {
                             $this->setVar('COMPONENT_CONFIG_' . strtoupper($name), $config[$name]);
                     }
                 }
-                
+
             }
              $this->parse("config_block", "config");
 		} else
-			$this->setVar("config_block", "");	
+			$this->setVar("config_block", "");
 
 		if($componentHandle) {
 			$this->parse('COLUMN'.$component['column'], $componentHandle, true);

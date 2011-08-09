@@ -18,5 +18,3 @@ class SurveyResponse extends EvaluationResponse {
     const RANDOMISE_QUESTIONS = 1;
     const ORDERED_QUESTIONS = 2;
 }
-?>
-

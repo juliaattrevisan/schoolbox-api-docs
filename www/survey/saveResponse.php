@@ -23,9 +23,11 @@ $section = $sectionHandler->getByID($question['section_id']);
 /* TODO: Check if this test is for your category
  */
 
+/* Disabled: authors can try their own surveys
 if ($assessHandler->isOwner($section['assess_id'])) {
     error(124);
 }
+*/
 
 if ($assessHandler->isExpired($section['assess_id'])) {
     error(120);

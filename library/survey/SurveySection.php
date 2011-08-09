@@ -19,4 +19,3 @@ class SurveySection extends EvaluationSection {
     const SECTION_EXCLUDE = true;
 }
 ?>
-

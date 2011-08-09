@@ -1,6 +1,6 @@
-<?php 
+<?php
 
-/************************************************			
+/************************************************
 * This file contains most config options,	*
 * Settings here will reflect through all 	*
 * scripts.					*
@@ -17,11 +17,11 @@ $path = SITE_root.'/include/PEAR';
 set_include_path('.' . PATH_SEPARATOR . get_include_path() . PATH_SEPARATOR . $path);
 
 //MySQL config options
-define("SQL_dsn", "mysql:host=localhost;dbname=portal");
+define("SQL_dsn", "mysql:host=localhost;dbname=portal-dev");
 define("SQL_host", "localhost");
-define("SQL_user", "portal");
+define("SQL_user", "root");
 define("SQL_passwd", "tnp879");
-define("SQL_db", "portal");
+define("SQL_db", "portal-dev");
 
 
 
@@ -62,7 +62,7 @@ define('LDAP_search', 'SAMAccountName');
 //Kerberos Authentication
 define('KERB_enable', true);
 
-// Note that the following directories should exist outside the webroot and 
+// Note that the following directories should exist outside the webroot and
 // be writable by the apache process
 
 //Template Options
@@ -84,7 +84,7 @@ define('DROPBOX_directory', 		SITE_root.'/data/dropbox');			//Student dropbox fi
 define('ZIP_directory',				SITE_root.'/data/zip');			//Cache for zip files
 define("THUMBNAIL_IMAGE_CACHE", 	SITE_root.'/data/thumbnails');	//Thumbnail cache
 define('CACHE_xml',					SITE_root . '/data/cache/xml');
-define("THUMBNAIL_size", 		100); 
+define("THUMBNAIL_size", 		100);
 define("FILE_max_upload", 		"10");						//Maximum number of files that can be uploaded via bulk uploader
 define("MAX_FILE_SIZE", 		10485760); 					//Maximum filesize in bytes allowed to be uploaded (default 10MB) (also set in php.ini)
 //define("URLS_use_frame", 		false);						//Open links in frame
@@ -132,7 +132,7 @@ define("SYNERGY_enable", false);				//Use this to disable synergy modules
 define("EXTERNAL_db", 'tass');				//Defines what module to use 'synergetic' / 'tass'
 define("MSSQL_host","synergy");
 define("MSSQL_user","intranet");
-define("MSSQL_passwd","Qu4LitY");  
+define("MSSQL_passwd","Qu4LitY");
 define("MSSQL_db","SynergyOne");
 define("SYNERGY_portal","http://synergy.portal.com");
 
@@ -166,7 +166,7 @@ define('FROM_address', 'portal@lektec.com.au');
 define('FROM_name', HEADING);
 define('CONTACT_address', 'ryan@lektec.com.au');
 
-//RSS Feed 
+//RSS Feed
 define('RSS_url', 'http://www.abc.net.au/news/indexes/justin/rss.xml');
 define('RSS_limit', 6);
 
@@ -207,7 +207,7 @@ define('HOMEPAGE_colors', serialize(array(
  'right_bg_secondary' => 'faf9f5',
  'right_link' => '1d9ffc',
  'right_hover' => 'ff5a00',
-	
+
 )));
 
 //module config options

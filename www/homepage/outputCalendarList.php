@@ -23,18 +23,18 @@ $query = "SELECT event.id, UNIX_TIMESTAMP(date) as outputDate, owner,
 		    LEFT JOIN luEventType ON type = eventTypeID
 			JOIN eventCampus ON event.id = eventCampus.eventID
 			JOIN eventGroup ON event.id = eventGroup.eventID
-		WHERE access = 3 
-			AND eventCampus.campusID IN(".implode(",", $_SESSION['campus']).") 
-			AND eventGroup.groupID = {$_SESSION['gid']} 
-			AND ( date >= CURRENT_DATE() $where) 
+		WHERE access = 3
+			AND eventCampus.campusID IN(".implode(",", $_SESSION['campus']).")
+			AND eventGroup.groupID = {$_SESSION['gid']}
+			AND ( date >= CURRENT_DATE() $where)
 		ORDER BY date, startTime";
 
-$eventList = $this->db->getAll($query);	
+$eventList = $this->db->getAll($query);
 
 $this->setVar('group_events_block', '');
 
 if (is_array($eventList)) {
-	
+
 	foreach ($eventList as $event) {
 
         if($event['startTime'] == "0:00" || strtolower($event['startTime']) == "12:00am" || strtolower($event['startTime']) == "12:00 am" || $event['startTime'] == '')
@@ -42,10 +42,10 @@ if (is_array($eventList)) {
         else if($event['endTime'] == "0:00" || strtolower($event['endTime']) == "12:00am" || strtolower($event['endTime']) == "12:00 am" || $event['endTime'] == '')
                 $this->setVar("TIME", $event['startTime']);
         else
-                $this->setVar("TIME", $event['startTime']." - ".$event['endTime']);        
+                $this->setVar("TIME", $event['startTime']." - ".$event['endTime']);
 
 		$event['colour'] = $calendarHandler->displayColour($event['type']);
-        
+
         $output = array('CAL_TIME'		=> rtrim(
                                         ($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
                                            ($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
@@ -65,7 +65,7 @@ if (is_array($eventList)) {
                       );
 
 		$this->setVar($output);
-	
+
 		if($event['startTimeString'] == "12:00AM" || $event['startTimeString'] == "")
 				$this->setVar("CAL_TIME", "");
 		else if($event['endTimeString'] == "12:00AM")
@@ -74,8 +74,8 @@ if (is_array($eventList)) {
 				$this->setVar("CAL_TIME", $event['startTimeString']." till ".$event['endTimeString']);
 
 		$this->parse("group_events_block", "group_events", true);
-		
-		
+
+
 	}
 } else
 	$this->setVar("group_events_block", '');
@@ -85,9 +85,9 @@ if (is_array($eventList)) {
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_event", "submit_event_block");
-if($permission < WRITE_ACCESS)		
+if($permission < WRITE_ACCESS)
 	$this->setVar("submit_event_block", "");
 else
-	$this->parse("submit_event_block", "submit_event");	
-		
+	$this->parse("submit_event_block", "submit_event");
+
 ?>
