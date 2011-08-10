@@ -1,3 +1,4 @@
+<!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
 <script type="text/javascript">
 $j(window).load(function(){
@@ -11,7 +12,7 @@ $j(window).load(function(){
 		 {
 			var append = $j(this).attr('alt');
 			$j('.caption-holder').text(append);
-			
+
         }
     });
 });
@@ -22,7 +23,7 @@ $j(window).load(function(){
 	display:none;
 	left:50% !important;
 	top:50% !important;
-	
+
 
 }
 
@@ -31,9 +32,9 @@ $j(window).load(function(){
 
 }
 .cycle-content{position:relative; z-index:1;margin:10px auto; border:4px solid #fff;
-	
-     -moz-box-shadow: 0 0 8px #000; 
-  -webkit-box-shadow: 0 0 8px #000; 
+
+     -moz-box-shadow: 0 0 8px #000;
+  -webkit-box-shadow: 0 0 8px #000;
           box-shadow: 0 0 8px #000; }
 
 #galleryCycle .caption-holder {
@@ -47,21 +48,23 @@ $j(window).load(function(){
 	margin:0 auto;
 }
 </style>
+<!-- END custom_head -->
 
 <div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
     <h2>Image Scroller</h2>
     <!-- BEGIN config -->
     <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
-<a class="close-delete" href="#"><span>X</span></a>
-        <div class="editPanel settings hide">
-            <form action="/homepage/configForm.php" method="get">
-                <input type="hidden" name="cid" value="{ID}" />
-                <input type="hidden" name="type" value="config" />
-                <input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
-                <label for="url">Pixels:</label>
-                <input type="text" name="pixel" value="{COMPONENT_PIXEL}" size="4"/>      <input type="submit" value="Update" class="submit-btn update" />
-    </form>
-  </div>
+	<a class="close-delete" href="#"><span>X</span></a>
+	<div class="editPanel settings hide">
+		<form action="/homepage/configForm.php" method="get">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="type" value="config" />
+			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+			<label for="url">Pixels:</label>
+			<input type="text" name="pixel" value="{COMPONENT_PIXEL}" size="4"/>
+			<input type="submit" value="Update" class="submit-btn update" />
+    	</form>
+  	</div>
 	<div class="editPanel delete-it hide clearfix">
 		<p>Are you sure you want to remove component?</p>
 		<form action="#" method="post">
@@ -82,9 +85,8 @@ $j(window).load(function(){
 		</div>
 		<div class="caption-holder"></div>
     </div>
-	
 
-  <!-- BEGIN submit_image -->
-  <p class="interact clearfix"><a href="/cms/file/multi/{ID}" class="btn up-arrow"><span></span>Post Images</a></p>
-  <!-- END submit_image -->
+	<!-- BEGIN submit_image -->
+	<p class="interact clearfix"><a href="/cms/file/multi/{ID}" class="btn up-arrow"><span></span>Post Images</a></p>
+	<!-- END submit_image -->
 </div>

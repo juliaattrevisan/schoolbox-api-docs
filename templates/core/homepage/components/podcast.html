@@ -1,6 +1,22 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+function loadPodcastSWF(audioID, url){
+	var flashvars = {
+		filename: url
+	};
+	var params = {
+		movie: "/flash/player_mp3.swf",
+		wmode: "transparent"
+	};
+
+	swfobject.embedSWF("/flash/mp3small.swf", "podcast-player-"+audioID, "22", "22", "9.0.0", "/flash/expressInstall.swf", flashvars, params);
+}
+</script>
+<!-- END custom_head -->
+
 <div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>{PODCAST_COMPONENT_TITLE}</h2>
-	<!-- BEGIN config --> 
+	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
 	<div class="editPanel settings hide">
 		<form action="/homepage/configForm.php" method="get">
@@ -28,22 +44,7 @@
 		</form>
 	</div>
 	<!-- END config -->
-	<div class="listing clearfix" > 
-		<script type="text/javascript">
-
-		function loadPodcastSWF(audioID, url){
-			var flashvars = {
-				filename: url
-			};
-			var params = {
-				movie: "/flash/player_mp3.swf",
-				wmode: "transparent"
-			};
-			
-			swfobject.embedSWF("/flash/mp3small.swf", "podcast-player-"+audioID, "22", "22", "9.0.0", "/flash/expressInstall.swf", flashvars, params);
-		}
-		
-	</script>
+	<div class="listing clearfix" >
 		<ul>
 			<!-- BEGIN podcast_list -->
 			<li class="{ON_OFF} clearfix">

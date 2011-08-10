@@ -1,6 +1,23 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+function loadSWF(audioID, url){
+	var flashvars = {
+		filename: url
+	};
+	var params = {
+		movie: "/flash/player_mp3.swf",
+		wmode: "transparent"
+	};
+
+	swfobject.embedSWF("/flash/mp3small.swf", "audio-player-"+audioID, "22", "22", "9.0.0", "/flash/expressInstall.swf", flashvars, params);
+}
+
+</script>
+<!-- END custom_head -->
+
 <div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>Audio</h2>
-	<!-- BEGIN config --> 
+	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
 	<div class="editPanel settings hide">
 		<form action="/homepage/configForm.php" method="get">
@@ -37,22 +54,7 @@
 		</form>
 	</div>
 	<!-- END config -->
-	<div class="listing clearfix" > 
-		<script type="text/javascript">
-
-		function loadSWF(audioID, url){
-			var flashvars = {
-				filename: url
-			};
-			var params = {
-				movie: "/flash/player_mp3.swf",
-				wmode: "transparent"
-			};
-			
-			swfobject.embedSWF("/flash/mp3small.swf", "audio-player-"+audioID, "22", "22", "9.0.0", "/flash/expressInstall.swf", flashvars, params);
-		}
-		
-	</script>
+	<div class="listing clearfix" >
 		<ul>
 			<!-- BEGIN audio_list -->
 			<li class="{ON_OFF} clearfix">
@@ -69,5 +71,5 @@
 	</div>
 	<!-- BEGIN submit_file -->
 	<p class="interact"><a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post File</a></p>
-	<!-- END submit_file --> 
+	<!-- END submit_file -->
 </div>

@@ -1,22 +1,24 @@
+<!-- BEGIN custom_head -->
 <script type="text/javascript">
 	$j(function(){
 		$j('div.blog-comments, div.blog form').hide();
-		
+
 		$j('a.show_comments').click(function(){
 				$j(this).closest('li').find('div.blog-comments').toggle();
 				return false;
 		});
-		
+
 		$j('a.post_comment').click(function(){
 				$j(this).closest('li').find('form').toggle();
 				return false;
 		});
 	});
 </script>
+<!-- END custom_head -->
 
 <div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>Blog</h2>
-	<!-- BEGIN config --> 
+	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
 	<div class="editPanel settings hide">
 		<form action="/homepage/configForm.php" method="get">
@@ -57,22 +59,23 @@
 					<p class="interact">{MODIFY_BLOG}</p>
 				</div>
 				<p>{BLOG_BODY}</p>
-				<div class="blog-comments"> 
+				<div class="blog-comments">
 					<!-- BEGIN comment -->
 					<div class="box"> {COMMENT_BODY}
 						<p class="interact">{COMMENT_OWNER} | {COMMENT_CREATED} | {DELETE_COMMENT}</p>
 					</div>
-					<!-- END comment --> 
-					
+					<!-- END comment -->
+
 					<!-- BEGIN show_all -->
 					<p  class="interact"><a href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
-					<!-- END show_all --> 
+					<!-- END show_all -->
 				</div>
-				<p class="links-house"> 
-					<!-- BEGIN show_comment --> 
-					<a class="show_comments" href="javascript:void();">Show {BLOG_COMMENTS} Comments</a> - 
-					<!-- END show_comment --> 
-					<a class="interact post_comment" href="javascript:void();">Post comment</a> </p>
+				<p class="links-house">
+					<!-- BEGIN show_comment -->
+					<a class="show_comments" href="javascript:void();">Show {BLOG_COMMENTS} Comments</a> -
+					<!-- END show_comment -->
+					<a class="interact post_comment" href="javascript:void();">Post comment</a>
+				</p>
 				<form class="" method="post" action="/blog/comment/new/{BLOG_ID}">
 					<p>
 						<textarea name="body" style="width: 100%;"></textarea>
@@ -86,9 +89,10 @@
 			<!-- END blog -->
 		</ul>
 	</div>
-	<p class="interact"> 
-		<!-- BEGIN submit --> 
-		<a href="/blog/modify/new/{ID}" class="btn up-arrow"><span></span>Post Entry</a> 
-		<!-- END submit --> 
-		<a href="/homepage/blogArchive/{ID}" class="btn"><span></span>Blog Archive</a> </p>
+	<p class="interact">
+		<!-- BEGIN submit -->
+		<a href="/blog/modify/new/{ID}" class="btn up-arrow"><span></span>Post Entry</a>
+		<!-- END submit -->
+		<a href="/homepage/blogArchive/{ID}" class="btn"><span></span>Blog Archive</a>
+	</p>
 </div>
