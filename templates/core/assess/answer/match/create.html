@@ -63,7 +63,7 @@ $j(document).ready(function() {
 				marks: {
 					required: true,
 					minlength: 1,
-					number:true
+					greaterThanZero:true
 				},
 				'answerLeft[]': {
 					emptyLeftInputs: true
@@ -75,36 +75,7 @@ $j(document).ready(function() {
 
 
 			errorPlacement: function(error, element) {
-				
-				offset = element.offset();
 				error.insertAfter(element.parent().children(':last-child'))
-				var lefty = element.position();	
-				
-				if (element.hasClass("answerLeft")) {
-					var pos = $j('ul#answerCollection').height();
-					error.addClass("leftError");
-					
-					error.width(275);
-					error.css('position', 'absolute');
-					$j('.leftError').css('top',  90);
-					$j('.leftError').css('left', lefty.left + 100);
-					
-					$j('.leftError').css('z-index',  1000);
-				}
-				
-				if (element.hasClass("answerRight")) {
-					var pos = $j('ul#answerCollection').height();
-					
-					error.addClass("rightError");
-					
-					error.width(275);
-					error.css('position', 'absolute');
-					$j('.rightError').css('top',  90);
-					$j('.rightError').css('left', lefty.left);
-					
-					$j('.rightError').css('z-index',  1000);
-				}
-
 			}			
 
 		});
@@ -151,18 +122,18 @@ $j(document).ready(function() {
 			return fieldsAreFilled;
 			
 		}, 'You\'ve missed a an item on the right');
+		
+		jQuery.validator.addMethod("greaterThanZero", function(value, element) {
+   			return this.optional(element) || (parseFloat(value) > 0);
+		}, "Amount must be greater than zero");
 
 		/* Add a new answer option
 		 */
 		$j('#makeNewAnswer').live('click', function() {
 			var thing = $j('.hidden-clone li:first-child').clone();
 			$j('ul#answerCollection').append(thing);
-			
-				var pos = $j('ul#answerCollection').height();
-				
-           		$j('.leftError').css('top',  pos - 10);
-				$j('.rightError').css('top',  pos - 10);
-			
+			placeErrors()
+			return false;
 		});
 		
 		/* Remove an answer option
@@ -170,37 +141,49 @@ $j(document).ready(function() {
 		$j('.delete').live('click', function(){
 			if (($j('.inputs').length) !== 3) {
 				$j(this).parent().remove();
-			}	
-			var pos = $j('ul#answerCollection').height();
-			$j('.leftError').css('top',  pos -10);
-			$j('.rightError').css('top',  pos-10);
+			}
+			placeErrors()	
 		});
+		
+		function placeErrors() {
+			var pos = $j('ul#answerCollection').height();
+			$j('#leftError').css('top',  pos );
+			$j('#rightError').css('top',  pos);
+		}
+		
+		
 		
 });
 </script>
-<fieldset>
-    <label>Answer</label>
-    <div class="answerCollection">
+
+<label>Answer
+    <div class="answer-collection">
         <ul id="answerCollection">			
 			<li class="answerTemplate inputs clearfix">
-				<div class="drag-me left-option"><input name="answerLeft[]" class="answerLeft text-box" type="text" value="" /></div>
+				<label class="drag-me left-option"><input name="answerLeft[]" class="answerLeft text-box" type="text" value="" /></label>
 				<div class="arrow"><span>MATCHES</span></div>
-				<div class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="" /></div>
+				<label class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="" /></label>
 				<div class="delete"></div>
 			</li>
 		</ul>
+		
+		<label for="answerRight[]" generated="true" class="error" id="rightError" >You've missed a an item on the right</label>
+		<label for="answerLeft[]" generated="true" class="error" id="leftError"> You've missed a an item on the left</label>
+		
     </div>
-	<p><a class="add-answer" id="makeNewAnswer">Add answer option</a></p>
+	<p class="clearfix">
+		<a href="#" class="add-answer btn add float-left" id="makeNewAnswer"><span></span>Add answer option</a>
+	</p>
 	
-	<div class="hidden-clone">
+	<div class="hidden-clone hide">
 	    <ul>			
 			<li class="answerTemplate inputs clearfix">
-				<div class="drag-me left-option"><input name="answerLeft[]" class="answerLeft text-box" type="text" value="" /></div>
+				<label class="drag-me left-option"><input name="answerLeft[]" class="answerLeft text-box" type="text" value="" /></label>
 				<div class="arrow"><span>MATCHES</span></div>
-				<div class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="" /></div>
+				<label class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="" /></label>
 				<div class="delete"></div>
 			</li>
 		</ul>
 	</div>
 	
-</fieldset>
+</label>

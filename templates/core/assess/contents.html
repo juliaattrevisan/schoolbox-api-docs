@@ -12,13 +12,13 @@ $j(function() {
 	});
 
 	$j('.show-assess-options').click(function() {
-		$j('.assessment-options').slideToggle();
+		$j('.assessment-options').slideToggle("fast");
 		$j(this).toggleClass('active')
 		return false;
 	});
 
 	$j('.show-section-options').click(function() {
-		$j('.section-options').slideToggle();
+		$j(this).parent().siblings('.question-list').children(":first-child").slideToggle();
 		$j(this).toggleClass('active')
 		return false;
 	});
@@ -37,7 +37,7 @@ $j(function() {
 	});
 	
 	$j('.show-options').click(function() {
-		$j(this).parent().siblings('p').slideToggle();
+		$j(this).parent().siblings('p').slideToggle("fast");
 		return false;
 	});
 	
@@ -61,7 +61,7 @@ $j(function() {
 			
 				<li class="hide section-options clearfix">
 					<a href="/assess/section/modify/{SECTION_SECTION_ID}" class="btn modify float-left"><span></span>Edit</a>
-					<a onclick="return confirm('Are you sure you want to delete the section?');" href="/assess/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
+					<a href="/assess/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
 				</li>
 			
 				<!-- BEGIN question -->
@@ -70,7 +70,7 @@ $j(function() {
 					{QUESTION_QUESTION} - ({QUESTION_MARKS} marks)
 					<a href="/assess/question/export/{QUESTION_QUESTION_ID}">Export</a> | 
 					<a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a> | 
-					<a class="delete-question" href="/assess/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
+					<a class="delete" href="/assess/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
 				</li>
 				<!-- END question -->
 				<li class="clearfix">

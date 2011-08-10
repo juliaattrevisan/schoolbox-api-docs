@@ -1,6 +1,7 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/css/jquery.countdown.css" media="screen" />
 <script type="text/javascript" src="/javascript/jquery.swappable.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
 <script type="text/javascript" src="/javascript/jquery.countdown.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
@@ -82,35 +83,40 @@ $j(document).ready(function() {
 	$j( ".right-answer" ).droppable({ hoverClass: 'drophover' });
 	
 	$j(".match-it").disableSelection();
+	
+	
+	$j('a.finish-assessment').click(function() {
+		location.href = $j(this).attr('href');
+	}).confirm({
+		buttons: {
+			wrapper:'<button></button>',
+			separator:'  '
+  		}
+	});
 });
 </script>
 <!-- END custom_head -->
-<div id="assess" class="take-test">
-	<div class="col-1">
-		<h2>Assessment Section: {SECTION_TITLE}</h2>
-		<div class="assess-body margin-bottom-10">
-			<h3 class="test-details">Test Details:</h3>
-			<p class="pad-it">{SECTION_DESCRIPTION}</p>
-		</div>
-		
+<div class="evaluation-content take-test">
+	<h2>Assessment Section: {SECTION_TITLE}</h2>
+
+	<h3 class="test-details">Test Details:</h3>
+	<p class="pad-it">{SECTION_DESCRIPTION}</p>
+
 		<!-- BEGIN question -->
-		<div class='assess-header'>
-			<form action="/assess/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
-				<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION} <span>({QUESTION_MARKS} marks)</span></h3>
-				<div class="assess-body wysiwyg"> 
-					
-					<!-- BEGIN answerInputs --> 
-					<!-- END answerInputs --> 
-					
-					<!--<input type="submit" value="Save Answer" class="save-answer" />-->
-					<div class="float-fix"></div>
-				</div>
-			</form>
-		</div>
+		<form action="/assess/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
+			<div class="wysiwyg no-pad clearfix"> 
+			<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION} <span>({QUESTION_MARKS} marks)</span></h3>
+			
+				<!-- BEGIN answerInputs --> 
+				<!-- END answerInputs --> 
+			</div>
+		</form>
 		<!-- END question --> 
 		
 		<!-- BEGIN endAssess --> 
-		<a href="/assess/end/{ASSESS_ASSESS_ID}" class="btn tick"><span></span>Finish</a> 
+		<p class="clearfix" style="text-align:right;">
+			<a href="/assess/end/{ASSESS_ASSESS_ID}" class="btn tick finish-assessment"><span></span>Finish</a> 
+		</p>
 		<!-- END endAssess --> 
 		
 		<!-- BEGIN prevSection --> 
@@ -120,26 +126,25 @@ $j(document).ready(function() {
 		<!-- BEGIN nextSection --> 
 		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="btn go-to"><span></span>Next Section</a> 
 		<!-- END nextSection --> 
+</div>
+<div class="evaluation-menu">
+	<h2>Assessment Name: {ASSESS_TITLE}</h2>
+	
+	<div class="time-holder"> <strong>Time remaining</strong>
+		<div id="countdown"></div>
 	</div>
-	<div class="col-2">
-		<h2>Assessment Name: {ASSESS_TITLE}</h2>
-		<div class="assess-body">
-			<div class="time-holder"> <strong>Time remaining</strong>
-				<div id="countdown"></div>
-			</div>
-			You began at: {ATTEMPT_START}<br />
-			You must finish this assessment by: {ATTEMPT_END}
-			<hr />
-			
-			<!-- BEGIN sectionPercentageComplete -->
-			<div id="sectionPercentageComplete_{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}" class="percentage-complete">
-				<h3>Section {SECTION_SEQUENCE} - <span>{SECTION_PERCENTAGE_COMPLETE_TITLE}</span></h3>
-				<div class="pad-it">
-					<div class="percentage-bar" style="width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}%"></div>
-					<div class="percentage-text"><em>{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}</em>% Complete</div>
-				</div>
-			</div>
-			<!-- END sectionPercentageComplete --> 
+	
+	You began at: {ATTEMPT_START}<br />
+	You must finish this assessment by: {ATTEMPT_END}
+	<hr />
+		
+	<!-- BEGIN sectionPercentageComplete -->
+	<div id="sectionPercentageComplete_{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}" class="percentage-complete">
+		<h3>Section {SECTION_SEQUENCE} - <span>{SECTION_PERCENTAGE_COMPLETE_TITLE}</span></h3>
+		<div class="pad-it">
+			<div class="percentage-bar" style="width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}%"></div>
+			<div class="percentage-text"><em>{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}</em>% Complete</div>
 		</div>
 	</div>
+	<!-- END sectionPercentageComplete --> 
 </div>

@@ -1,7 +1,7 @@
 <script type="text/javascript">
 $j(function() {
 	
-	var validator = $j(".standardForm").submit(function() {
+	var validator = $j("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave(); 
 		 
@@ -14,7 +14,7 @@ $j(function() {
 			marks: {
 				required: true,
 				minlength: 1,
-				number:true
+				greaterThanZero:true
 			}
 		},
 		
@@ -32,11 +32,13 @@ $j(function() {
 	
 	});
 	
+	jQuery.validator.addMethod("greaterThanZero", function(value, element) {
+   		return this.optional(element) || (parseFloat(value) > 0);
+	}, "Amount must be greater than zero");
 	
 });
 </script>
 
-<fieldset>
-    <label>Suggested Answer</label>
-    <div class="textarea-container"><textarea id="answer"  name="answer">{ANSWER}</textarea></div>
-</fieldset>
+<label>Suggested Answer
+<div class="textarea-container"><textarea id="answer"  name="answer">{ANSWER}</textarea></div>
+</label>

@@ -31,69 +31,68 @@
 	<h1>Modify Question</h1>
 	<div class="evaluation-content">
 		<h2>Question Details</h2>
-		<form id="createQuestionForm" action="/assess/question/modify" class="standardForm" method="post">
+		<form id="createQuestionForm" action="/assess/question/modify" class="" method="post">
 
-					<label class="hide">
-						<input name="section_id" type="hidden" value="{SECTION_ID}" />
-						<input name="question_id" type="hidden" value="{QUESTION_ID}" />
-						<input name="answer_id" type="hidden" value="{ANSWER_ID}" />
-						<input name="sequence" type="hidden" value="{SEQUENCE}" />
-					</label>
+		<label class="hide">
+			<input name="section_id" type="hidden" value="{SECTION_ID}" />
+			<input name="question_id" type="hidden" value="{QUESTION_ID}" />
+			<input name="answer_id" type="hidden" value="{ANSWER_ID}" />
+			<input name="sequence" type="hidden" value="{SEQUENCE}" />
+		</label>
 
-					
-					<label>Type
-						<input type="hidden" name="type_id" value="{QUESTIONTYPE_TYPE_ID}" />
-						<span>{QUESTIONTYPE_DESCRIPTION}</span>
-					</label>
+		<label>Type
+			<input type="hidden" name="type_id" value="{QUESTIONTYPE_TYPE_ID}" />
+			<span>{QUESTIONTYPE_DESCRIPTION}</span>
+		</label>
 
+		<label>Question
+			<div class="textarea-container" id="question_container"><textarea name="question" class="mceSimple tinyValidate" id="question" />{QUESTION}</textarea></div>
+		</label>
 
-					<fieldset>
-						<label>Question</label>
-						<div class="textarea-container" id="question_container"><textarea name="question" class="mceSimple tinyValidate" id="question" />{QUESTION}</textarea></div>
-					</fieldset>
+		<label>Marks
+			<input name="marks" type="text" size="3" value="{MARKS}"/>
+		</label>
 
-					<fieldset>
-						<label>Marks</label>
-						<label><input name="marks" type="text" size="3" value="{MARKS}"/></label>
-					</fieldset>
+		<div id="answer">
+			<!-- BEGIN answerInputs -->
 
-					<div id="answer">
-						<!-- BEGIN answerInputs -->
+			<!-- END answerInputs -->
+		</div>
 
-						<!-- END answerInputs -->
-					</div>
+		<label class="clearfix">
+			<input type="submit" name="create" id="create" value="Modify" class="submit-btn-plain"/>
+		</label>	
+	</form>
+	
+	
+	<h2>Import into Question Bank</h2>
 
-					<fieldset>
-						<input type="submit" name="create" id="create" value="Modify" class="submit-btn-plain"/>
-					</fieldset>
-			<h2>Import into Question Bank</h2>
+	
+	<form action='/assess/questionbank/create' class='' method='post'>
+	
+	<p>
+		Puts this question into the Question Bank so you can import
+		them into other Online Assessments.
+	</p>
+		<label class="hide">
+			<input name='type_id' type='hidden' value='{QUESTIONTYPE_TYPE_ID}' />
+			<input name='question_id' type='hidden' value='{QUESTION_ID}' />
+			<input name='answer_id' type='hidden' value='{ANSWER_ID}' />
+			<input name='marks' type='hidden' value='{MARKS}' />
+		</label>
+		<label>Question Category
+				<select name='question_category'>
+					<!-- BEGIN question_category -->
+					<option value='{QUESTION_CATEGORY_ID}'>{QUESTION_CATEGORY_NAME}</option>
+					<!-- END question_category -->
+				</select>
+		</label>
 
-				
-				<form action='/assess/questionbank/create' class='standardForm' method='post'>
-				
-				<p>
-					Puts this question into the Question Bank so you can import
-					them into other Online Assessments.
-				</p>
-					<label class="hide">
-						<input name='type_id' type='hidden' value='{QUESTIONTYPE_TYPE_ID}' />
-						<input name='question_id' type='hidden' value='{QUESTION_ID}' />
-						<input name='answer_id' type='hidden' value='{ANSWER_ID}' />
-						<input name='marks' type='hidden' value='{MARKS}' />
-					</label>
-					<label>Question Category
-							<select name='question_category'>
-								<!-- BEGIN question_category -->
-								<option value='{QUESTION_CATEGORY_ID}'>{QUESTION_CATEGORY_NAME}</option>
-								<!-- END question_category -->
-							</select>
-					</label>
-
-					<label>
-						<input type='submit' class='submit-btn-plain' value='Add To Question Bank' />
-					</label>
-				</form>
-
+		<label class="clearfix">
+			<input type='submit' class='submit-btn-plain' value='Add To Question Bank' />
+		</label>
+	</form>
+	</div>
 	<div class="evaluation-menu">
 	<!-- BEGIN allQuestions -->
 

@@ -1,12 +1,6 @@
-<fieldset>
-    <div>
-        <ul class="multiple-choice">
-            <!-- BEGIN answerOption -->
-            <li>
-				<span>{ANSWER_VALUE})</span>
-                <input name="answer[]" class="answerCorrect checkbox" type="checkbox" value="{ANSWER_VALUE}" {ANSWER_CHECKED}/>{ANSWER_DESCRIPTION}
-            </li>
-            <!-- END answerOption -->
-        </ul>
-    </div>
-</fieldset>
+<!-- BEGIN answerOption -->
+<label>
+	{ANSWER_VALUE})
+	<input name="answer[]" class="answerCorrect checkbox" type="checkbox" value="{ANSWER_VALUE}" {ANSWER_CHECKED}/><span>{ANSWER_DESCRIPTION}</span>
+</label>
+<!-- END answerOption -->

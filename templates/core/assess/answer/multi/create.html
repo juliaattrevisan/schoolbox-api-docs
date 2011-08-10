@@ -2,13 +2,11 @@
 <script type="text/javascript">
 $j(document).ready(function() {
 
-	
-
 	//add in one clone to start with
 	$j('.answerCorrect').attr('checked', false);
-		var thing = $j('.hidden-clone li:first-child').clone();
-		$j('ul#answerCollection').append(thing);
-		refreshList();
+	var thing = $j('.hidden-clone li:first-child').clone();
+	$j('ul#answerCollection').append(thing);
+	refreshList();
 
 	var validator = $j("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
@@ -18,7 +16,6 @@ $j(document).ready(function() {
 
 		submitHandler: function() {
    		    var theForm = $j('#createQuestionForm');
-
         	/* Form preprocessing
              */
 			var answerCollection = new Array();
@@ -77,7 +74,7 @@ $j(document).ready(function() {
 			marks: {
 				required: true,
 				minlength: 1,
-				number:true
+				greaterThanZero:true
 			},
 			'answerDescription[]': {
 				emptyInputs: true
@@ -88,25 +85,17 @@ $j(document).ready(function() {
 		},
 		
         errorPlacement: function(error, element) {
-            offset = element.offset();
-            error.insertAfter(element.parent().children(':last-child'))
             error.addClass('message');  // add a class to the wrapper
-            var pos = $j('ul#answerCollection').height();
-			var lefty = element.position();
+			
+            var pos = $j('#answerCollection').height();
 			
 			if (element.hasClass("answerDescription")) {
-				var pos = $j('ul#answerCollection').height();
-				error.addClass("list-items");
-				error.css('position', 'absolute');
-				$j('.list-items').css('left', 115);
-           		$j('.list-items').css('top', pos);
-			}
+				error.insertAfter(element.closest('#answerCollection'))
+			} else if (element.hasClass("answerCorrect") ) {
+				error.insertAfter(element.closest('#answerCollection'))
 			
-			if (element.hasClass("answerCorrect")) {
-				error.addClass("wrong-checkbox");
-				error.css('position', 'absolute');
-				$j('.wrong-checkbox').css('left', 115);
-           		$j('.wrong-checkbox').css('top', pos);
+			} else {
+				 error.insertAfter(element.parent().children(':last-child'))
 			}
 		}
 	});
@@ -155,13 +144,18 @@ $j(document).ready(function() {
 
     }, 'Tick at least one checkbox');
 
-
+	jQuery.validator.addMethod("greaterThanZero", function(value, element) {
+   		return this.optional(element) || (parseFloat(value) > 0);
+	}, "Amount must be greater than zero");
+	
     /* Add a new answer option
      */
     $j('#makeNewAnswer').live('click', function() {
 		var thing = $j('.hidden-clone li:first-child').clone();
 		$j('ul#answerCollection').append(thing);
 		refreshList();
+		
+		return false;
     });
 	
 	/* Remove an answer option
@@ -169,19 +163,20 @@ $j(document).ready(function() {
 	$j('.delete').live('click', function(){
 		if (($j('.inputs').length) !== 3) {
 			$j(this).parent().remove();
-			refreshList()
 		}	
-
+		refreshList();
     });	
 	
 	$j('.answerCorrect').live('click', function() {
+		refreshList();
 		$j(this).parent().parent().toggleClass("highlight");
 	});
 	
 	function refreshList() {
+		
 		var alphabetStart = 65;
 
-		$j('li.inputs > div.list-item').each(function() {	
+		$j('li.inputs > .list-item').each(function() {	
 			var $this = $j(this);
 			$this.children('span').html('&#' + alphabetStart + ';)');
 			var convert = String.fromCharCode(alphabetStart);
@@ -189,41 +184,47 @@ $j(document).ready(function() {
 			alphabetStart++;
 		});
 		
-		var pos = $j('ul#answerCollection').height();
+		var pos = $j('#answerCollection').height();
 		
-		$j('.list-items').css('left',  115);
-		$j('.list-items').css('top',  pos +  27);
-		
-		$j('.wrong-checkbox').css('left',  115);
-		$j('.wrong-checkbox').css('top',  pos);
+		$j('#listItems').css({
+			'top': pos
+		});
+
+		$j('#wrongCheckbox').css({
+			'top':  pos
+		});
 	}
-	
 });
 </script>
 
-<fieldset>
-    <label>Answer</label>
-    <div class="answerCollection">
+<label>Answer
+    <div class="answer-collection">
         <ul id="answerCollection" >
 			<li class="inputs clearfix">
-				<div class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></div>
-				<div class="check-it"><input name="answer[]" class="answerCorrect" checkbox="checkbox" type="checkbox" value="" /></div>
-				<div class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></div>
+				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></label>
+				<label class="check-it"><input name="answer[]" class="answerCorrect" checkbox="checkbox" type="checkbox" value="" /></label>
+				<label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></label>
 				<div class="delete"></div>
 			</li>		
         </ul>
-        <a class="add-answer" id="makeNewAnswer">Add answer option</a>
+		
+		<label for="answerDescription[]" generated="true" id="listItems" class="error">Please fill out all answers</label>
+		<label for="answer[]" generated="true" class="error" id="wrongCheckbox">Tick at least one checkbox</label>
+		
+		<p class="clearfix">
+        <a class="add-answer btn add float-left" id="makeNewAnswer" href="#"><span></span>Add answer option</a>
+		</p>
     </div>
 	
-	<div class="hidden-clone">
+	<div class="hide hidden-clone">
         <ul>
 			<li class="inputs clearfix">
-				<div class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></div>
-				<div class="check-it"><input name="answer[]" class="answerCorrect " checkbox="checkbox" type="checkbox" value="" /></div>
-				<div class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></div>
+				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></label>
+				<label class="check-it"><input name="answer[]" class="answerCorrect " checkbox="checkbox" type="checkbox" value="" /></label>
+				<label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></label>
 				<div class="delete"></div>
 			</li>		
         </ul>
         <a class="add-answer" id="makeNewAnswer">Add answer option</a>
     </div>
-</fieldset>
+</label>

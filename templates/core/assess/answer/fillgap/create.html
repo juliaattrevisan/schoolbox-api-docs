@@ -18,7 +18,7 @@ $j(document).ready(function() {
 		setup : function(ed) {
 			ed.addButton('addSpans', {
 				title : 'wraps selected text with custom tag',
-				image : 'img/icons.gif',
+				image : '/javascript/tiny_mce/themes/advanced/img/icons.gif',
 				'class' : 'make-blank',
 				onclick : (function() {
 					var sel = ed.selection.getContent();
@@ -43,7 +43,7 @@ $j(document).ready(function() {
 			marks: {
 				required: true,
 				minlength: 1,
-				number:true
+				greaterThanZero:true
 			},
 			answer: {
 				required: true,
@@ -64,15 +64,18 @@ $j(document).ready(function() {
 	
 	});	
 	
+	jQuery.validator.addMethod("greaterThanZero", function(value, element) {
+   		return this.optional(element) || (parseFloat(value) > 0);
+	}, "Amount must be greater than zero");
+	
 });
 </script>
-<fieldset>
-    <label>Answer</label>
-    <div class="textarea-container" id="answerBox_parent"><textarea id="answerBox" name="answer" class="tinyValidate2">{ANSWER}</textarea></div>
-</fieldset>
 
-<fieldset>
-    <label>Answer List</label>
+<label>Answer
+    <div class="textarea-container" id="answerBox_parent"><textarea id="answerBox" name="answer" class="tinyValidate2">{ANSWER}</textarea></div>
+</label>
+
+<label>Answer List
     <p>The following words/phrases are answers:</p>
     <div class="answerList">
         <ul>
@@ -81,4 +84,4 @@ $j(document).ready(function() {
             <!-- END answer_list_items -->
         </ul>
     </div>
-</fieldset>
+</label>
