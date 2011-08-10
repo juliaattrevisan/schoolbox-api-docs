@@ -10,7 +10,7 @@
 			<input type="hidden" name="type" value="config" />
 			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
 			<label for="sort">Sort: </label>
-			<select name="sort">
+			<select id='sort' name="sort">
 				<!-- BEGIN sort -->
 				<option value="{COMPONENT_CONFIG_SORT_VALUE}"{COMPONENT_CONFIG_SORT_SELECTED}>{COMPONENT_CONFIG_SORT_NAME}</option>
 				<!-- END sort -->
@@ -20,7 +20,7 @@
 				<option value="{COMPONENT_CONFIG_SORTDIR_VALUE}"{COMPONENT_CONFIG_SORTDIR_SELECTED}>{COMPONENT_CONFIG_SORTDIR_NAME}</option>
 				<!-- END sortdir -->
 			</select>
-			<label for="size">Item Limit: </label>
+			<label id='size' for="size">Item Limit: </label>
 			<select name="size">
 				<!-- BEGIN size -->
 				<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
@@ -47,7 +47,7 @@
 				<div class="small-right">
 					<!-- BEGIN modify_link --><p class="interact"><a href="/cms/eportfolioLink/{LINK_ID}">Modify</a></p><!-- END modify_link -->
 				</div>
-				
+
 				<p>{LINK_COMMENT}</p>
 				<p class="interact">Posted by <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a> on {LINK_POSTED_DATE}</p>
 			</li>

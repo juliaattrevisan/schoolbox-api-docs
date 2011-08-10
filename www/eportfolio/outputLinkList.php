@@ -1,5 +1,5 @@
 <?php
-require_once '../library/eportfolio-link.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-link.php';
 
 $this->setBlock($componentHandle, 'link', 'link_block');
 $this->setBlock('link', 'modify_link', 'modify_link_block');
@@ -19,14 +19,14 @@ if (is_array($linkList)) {
             'LINK_COMMENT'		=> nl2br(scrubTEXT($link['comment'])),
             'ON_OFF'			=> ++$j%2? '' : 'dark',
         ));
-		
+
 		if (!$eportfolioHandler->canEdit($userID)) {
 			$this->setVar('modify_link_block', '');
         }
 		else {
 			$this->parse('modify_link_block', 'modify_link');
         }
-		
+
 		$this->parse("link_block", "link", true);
 	}
 }
@@ -43,6 +43,6 @@ if ($eportfolioHandler->canEdit($userID)) {
 }
 else {
 	$this->setVar("submit_link_block", "");
-	
+
 }
 ?>

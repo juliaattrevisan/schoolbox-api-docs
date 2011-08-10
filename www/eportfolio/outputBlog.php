@@ -1,7 +1,7 @@
 <?php
 
-require_once '../library/eportfolio-blog.php';
-require_once '../library/eportfolio-blog-comment.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-blog.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-blog-comment.php';
 
 $blogHandle = new ePortfolioBlog();
 $blogHandle->config($config);
@@ -45,7 +45,7 @@ if (!empty($blogs)) {
 			'BLOG_SHADING'  => ++$j%2 ? '' : 'dark',
 			'BLOG_COMMENTS' => ''
 		));
-		
+
 		/* Comments
          */
 		$this->setVar('comment_block','');

@@ -1,7 +1,7 @@
 <?php
 define('PUBLISHED_FILE', 1);
 
-require_once '../library/my-file.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
 
 $this->setBlock($componentHandle, 'files', 'files_block');
 $this->setBlock('files', 'file_url', 'file_url_block');

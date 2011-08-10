@@ -174,25 +174,30 @@ abstract class AnswerMulti extends EvaluationAnswer {
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
-            foreach($allAnswers as $currentAnswer) {
-                if ($currentAnswer->correct) {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => '100'
-                    ));
-                }
-                else {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => '0'
-                    ));
-                }
+			if (is_array($allAnswers) && count($allAnswers)) {
+				foreach($allAnswers as $currentAnswer) {
+					if ($currentAnswer->correct) {
+						$page->setVar(array(
+							'ACTUAL_CORRECT_VALUE' => '100'
+						));
+					}
+					else {
+						$page->setVar(array(
+							'ACTUAL_CORRECT_VALUE' => '0'
+						));
+					}
 
-                $page->setVar(array(
-                    'ANSWER_VALUE' => $currentAnswer->value,
-                    'ANSWER_DESCRIPTION' => $currentAnswer->description,
-                ));
+					$page->setVar(array(
+						'ANSWER_VALUE' => $currentAnswer->value,
+						'ANSWER_DESCRIPTION' => $currentAnswer->description,
+					));
 
-                $page->parse('answerOption_block', 'answerOption', true);
-            }
+					$page->parse('answerOption_block', 'answerOption', true);
+				}
+			}
+			else {
+				$page->setVar('answerOption_block', '');
+			}
         }
     }
 

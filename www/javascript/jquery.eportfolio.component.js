@@ -2,7 +2,7 @@ $j(function() {
 
 		/* remove invisible column */
 		$j('div.right:hidden').remove();
-		
+
 		/* add drag/drop */
 		$j('.active-sort').sortable({
 			cursor: 'move',
@@ -20,37 +20,37 @@ $j(function() {
 			update: function () {
 				var left = '';
 				var right = '';
-				
+
 				$j('div.left-active').children('div.box').each(function () {
 					left += $j(this).attr('id').substring(9) + ',';
 				});
 				$j('div.left-active').children('div.box').each(function () {
 					right += $j(this).attr('id').substring(9) + ',';
 				});
-				
+
 				$j.post('/eportfolio/configForm.php', {uid: $j('#userID').val(), type: 'components', column1: left, column2: right});
-				
-			},			
+
+			},
 			sort: function (event, ui) {
 				var leftOffset = $j('div.left-active').offset();
-			
+
 				if (event.pageX < (leftOffset.left + $j('div.left-active').width()) &&
 					event.pageY > (leftOffset.top + $j('div.left-active').height())) {
 					// left bottom
 					ui.placeholder.appendTo($j('div.left-active'));
-				} 
+				}
 				else if (event.pageX > (leftOffset.left + $j('div.left-active').width()) &&
 						 event.pageY > ($j('div.right').offset().top + $j('div.right').height())) {
 					// right bottom
 					ui.placeholder.appendTo($j('div.right'));
 
-				} 
-				
+				}
+
 			}
 		});
-		
+
 		$j('div.box h2').css('cursor', 'move');
-		
+
 		/* show/hide text based components */
 		$j(document).keydown(function (event) {
 			if (event.shiftKey) {
@@ -64,41 +64,41 @@ $j(function() {
 				$j(this).css('display', 'none');
 			});
 		});
-		
+
 
 	$j("a.edit").hover(function() {
-		
+
 		var $this = $j(this);
-		
+
 		if(!$this.children('em').data('pinned')) {
 			$this.children('em').addClass('show-it');
 		}
-		
+
 		}, function() {
 			var $this = $j(this);
-			
+
 			if(!$this.children('em').data('pinned')) {
 				$this.children('em').removeClass('show-it' );
 			}
-		
+
 		}).live('click', function(event) {
 			var $this = $j(this);
 			event.preventDefault();
-			
+
 			if ($this.siblings('.editPanel.delete-it').is(':visible')) {
 				$this.siblings('.editPanel.delete-it').slideUp();
 			}
-			
+
 			$this.toggleClass('active');
 			$this.siblings('.editPanel.settings.hide').slideToggle("fast");
 			$this.children('em').data('pinned', !$this.children('em').data('pinned'));
-			
+
 	});
-	
+
 	$j('.close-delete').live('click', function(event){
 		event.preventDefault();
 		var $this = $j(this);
-		
+
 		if ($this.siblings('.editPanel.settings').is(':visible')) {
 			$this.siblings('.editPanel.settings').slideUp();
 			$this.siblings('a.edit').children('em').data('pinned', !$this.siblings('a.edit').children('em').data('pinned'));
@@ -109,28 +109,28 @@ $j(function() {
 	});
 
 	$j('.delete-accept').live('click',function(event) {
-		
+
 		event.preventDefault();
-       
+
 	    //update with an ajax call here.
 		$j.post('/eportfolio/configForm.php', $j(this).closest('form').serialize());
-		
+
         $j(this).closest('.box').animate({opacity:0}, 300,
 			function() {
 				$j(this).slideUp(200, function() {
-					$j(this).remove();	
+					$j(this).remove();
 				});
 		});
-		
+
 		var componentToDelete = Number($j(this).siblings("input[name=component]").val());
 		var currentAmount = Number($j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html());
 		currentAmount--;
 		$j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html(currentAmount);
-		
+
 		if ($j('a[rel='+componentToDelete+']').parent().hasClass('disabled')) {
 			$j('a[rel='+componentToDelete+']').parent().removeClass('disabled')
 		}
-		
+
 	});
 
 
@@ -138,19 +138,19 @@ $j(function() {
 		event.preventDefault();
 		$j(this).closest('.delete-it').slideUp();
 	});
-		
+
 /* from here down I've changed the component functions!!!!*/
-	
+
 /*$j('.manage h2, a.folder-manage').each(function () {
 		$j(this).hide();
 	});*/
-	
+
 	$j('#tabs-homepage').tabs();
 	$j('#tabs-sub').tabs();
-	
-	
+
+
 	$j('.add-component strong').each(function() {
-		
+
 		var howManyInstances = $j(this).children('em').html();
 		if (howManyInstances == 0) {
 			howManyInstances = '<strong>no</strong> instances '
@@ -159,7 +159,7 @@ $j(function() {
 		} else {
 			howManyInstances = '<strong>' + howManyInstances + '</strong> instances '
 		}
-		
+
 		$j(this).qtip({
 			content: 'You have '+ howManyInstances +'of this component currently active',
 			show: 'mouseover',
@@ -177,7 +177,7 @@ $j(function() {
 						var self = this;
 					 }
 				 },
-			style: { 
+			style: {
 				background: '#fffde9',
 				color: 'black',
 				border: {
@@ -189,7 +189,7 @@ $j(function() {
 		   }
 		});
 	});
-		
+
 	$j(".box h2").mousemove(function(e){
         $j("#tooltip").show();
         $j("#tooltip").css({
@@ -197,13 +197,13 @@ $j(function() {
             left: (e.pageX + 20) + "px"
         });
     });
-	
+
     $j(".box h2").mouseout(function(e){
         $j("#tooltip").hide();
     });
-	
 
-	
+
+
 	$j('.customise').click(function(event) {
 		event.preventDefault();
 		$j('#tabs-homepage').slideToggle();
@@ -213,7 +213,6 @@ $j(function() {
 		});
 	});
 
-	
 
 	$j(".add-component a").live('click', function(event) {
 		event.preventDefault();
@@ -222,7 +221,7 @@ $j(function() {
 			$j(data).hide().prependTo('.left-active').css('opacity','0').slideDown(400,function(){
 				$j(this).animate({opacity:1}, 300);
 			});
-        });		
+        });
 
 		if($this.parent().hasClass('one-only')) {
 			$this.parent().addClass('disabled');
@@ -235,19 +234,19 @@ $j(function() {
 			currentCount++;
 			$this.siblings('strong em').html(currentCount);
 		}
-		
+
 		if (!$this.siblings('.notification').is(':visible')) {
 			$this.siblings('.notification').fadeIn(200, function() {
 				$j(this).delay(2000).fadeOut();
 			});
 		}
-		
+
 		var currentAmount = Number($this.siblings('h4').children('strong').children('em').html());
 		currentAmount++;
 		$this.siblings('h4').children('strong').children('em').html(currentAmount);
-		
+
 	});
-	
+
 	$j('div.colorBox').each(function () {
 		$j(this).css('backgroundColor', pickers[$j(this).attr('id')]);
 		//$j(this).next().val(pickers[$j(this).attr('id')]);
@@ -255,7 +254,7 @@ $j(function() {
 
 	var f = $j.farbtastic('#picker');
 	f.setColor("#b6b6ff"); //set initial color
-	
+
 	$j('#head_font').parent().addClass('active-box');
 	var instantColour = new RGBColor($j('#left_head_font').css('background-color'));
 	var initialColour = instantColour.toHex();
@@ -264,22 +263,22 @@ $j(function() {
 	$j('#currentColour').val(initialColour);
 
 	f.linkTo(onColorChange);
-	
-	$j('#currentColour').keyup(function() {	
-		f.setColor($j(this).val());	
+
+	$j('#currentColour').keyup(function() {
+		f.setColor($j(this).val());
 	});
-	
-	function h2d(h) {return parseInt(h,16);} 
-	
+
+	function h2d(h) {return parseInt(h,16);}
+
 	function checkTextColour() {
 		var currentColour = $j('#currentColour').val().substr(1);
 			if (h2d(currentColour) < 4473924) {
 			$j('#currentColour').css('color', '#ffffff');
 		} else {
 			$j('#currentColour').css('color', '#000000');
-		};	
+		};
 	};
-	
+
 	function onColorChange(color) {
 		checkTextColour();
 		var current = $j('.selected');
@@ -303,13 +302,13 @@ $j(function() {
 			break;
 			case 'left_font':
 				return $j('.left, .left p').css('color', color)
-			break;	
+			break;
 			case 'left_link':
 				return $j('.left a').css('color', color);
-			break;	
+			break;
 			case 'left_hover':
 				return $j('.right a:hover').css('color', color);
-			break;	
+			break;
 			case 'right_bg_primary':
 				return $j('.right .text, .right .listing').css('background-color', color);
 			break;
@@ -324,13 +323,13 @@ $j(function() {
 			break;
 			case 'right_font':
 				return $j('.right, .right p').css('color', color);
-			break;	
+			break;
 			case 'right_link':
 				return $j('.right a').css('color', color);
-			break;	
+			break;
 			case 'right_hover':
 				return $j('.right a:hover').css('color', color);
-			break;	
+			break;
 			default:
 				return $j('.left .text').css('background-color', color);
 			break;
@@ -352,10 +351,10 @@ $j(function() {
 
 	$j('.layouts a').click(function(event) {
 		event.preventDefault();
-		
+
 		var templateChoice = $j(this).attr('title');
 		var newChoice = "";
-		
+
 		switch (templateChoice) {
 			case '1':
 				newChoice = 'template1';
@@ -373,13 +372,13 @@ $j(function() {
 				newChoice = 'template1';
 			break;
 		}
-		
+
         $j('.privateBlock').removeClass().addClass(newChoice + ' privateBlock');
 		$j('.current').removeClass('current');
 		$j(this).addClass('current');
         $j('#templateVal').val(templateChoice);
-	});	
-	
+	});
+
 	$j('#saveTemplate').click(function () {
         $j.post('/eportfolio/configForm.php', $j(this).closest('form').serialize(),
 	   function() {
@@ -393,10 +392,10 @@ $j(function() {
 			$j('.saved-colours').slideDown(150).delay(2000).slideUp(150);
 	   });
     });
-	
-	$j("#leftRight").click(function () {	
+
+	$j("#leftRight").click(function () {
 		var rightBox;
-		
+
 		$j('div.leftColumn div.colorBox').each(function () {
 			var str = $j(this).attr('id');
 			var newstr = str.replace(/^.*left_(.*).*$/m, '$1');
@@ -412,7 +411,7 @@ $j(function() {
 		$j('.right h2').css('background-color', $j('.left h2').css('background-color'));
 		$j('.right, .right p').css('color', $j('.left, .left p').css('color'));
 		$j('.right a').css('color', $j('.left a').css('color'));
-		
+
 		//send off the pickers correctly.
 		pickers.right_head_font = pickers.left_head_font;
 		pickers.right_head_bg = pickers.left_head_bg;
@@ -423,13 +422,13 @@ $j(function() {
 		pickers.right_hover = pickers.left_hover;
 
 	});
-	
+
 	$j('#restore').click(function() {
 		$j('.colorBox').each(function () {
 			$j(this).css('background-color', defaults[$j(this).attr('id')]);
 			//$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
 		});
-		
+
 		$j('.left h2').css({
 			"color": defaults['left_head_font'],
 			"background-color":defaults['left_head_bg']
@@ -439,7 +438,7 @@ $j(function() {
 		$j('.left .box a:hover, .left .listing p.small a:hover').css('color', defaults['left_hover']);
 		$j('.left .text, .left .listing').css('background',defaults['left_bg_primary']);
 		$j('.left .listing .dark ').css('background',defaults['left_bg_secondary']);
-		
+
 		$j('.right h2').css({
 			"color": defaults['right_head_font'],
 			"background-color":defaults['right_head_bg']
@@ -449,18 +448,18 @@ $j(function() {
 		$j('.right .box a:hover, .right .listing p.small a:hover').css('color', defaults['right_hover']);
 		$j('.right .text, .right .listing').css('background',defaults['right_bg_primary']);
 		$j('.right .listing .dark ').css('background',defaults['right_bg_secondary']);
-		
+
 		pickers = defaults;
-		
+
 	});
-	
+
 	$j('#cancel').click(function() {
 		$j('.colorBox').each(function () {
 			$j(this).css('background-color', original[$j(this).attr('id')]);
 		});
-		
+
 		$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
-		
+
 	});
 
 

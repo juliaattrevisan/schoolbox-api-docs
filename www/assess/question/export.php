@@ -10,6 +10,7 @@
  */
 require_once('../library/assess/AssessFactory.php');
 require_once('../library/assess/AssessQuestion.php');
+require_once('../library/assess/AssessResponse.php');
 
 $factory = new AssessFactory();
 $questionHandler = new AssessQuestion();

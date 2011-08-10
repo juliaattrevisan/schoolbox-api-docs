@@ -1,21 +1,22 @@
 <div class="box" id="component{COMPONENT_ID}">
 	<h2>Blog</h2>
-	
-	<!-- BEGIN config --> 
+
+	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
+
 	<div class="editPanel settings hide">
 		<form action="/eportfolio/configForm.php" method="get">
 			<input type="hidden" name="uid" value="{ID}" />
 			<input type="hidden" name="type" value="config" />
 			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
 			<label for="size">Entries Shown: </label>
-			<select name="size">
+			<select id='size' name="size">
 				<!-- BEGIN size -->
 				<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
 				<!-- END size -->
 			</select>
 			<label for="comments_size">Comments Shown: </label>
-			<select name="comments_size">
+			<select id='comments_size' name="comments_size">
 				<!-- BEGIN comments_size -->
 				<option value="{COMPONENT_CONFIG_COMMENTS_SIZE_VALUE}"{COMPONENT_CONFIG_COMMENTS_SIZE_SELECTED}>{COMPONENT_CONFIG_COMMENTS_SIZE_NAME}</option>
 				<!-- END comments_size -->
@@ -23,49 +24,73 @@
 			<input type="submit" value="Update"  class="submit-btn-plain" />
 		</form>
 	</div>
+
 	<div class="editPanel delete-it hide clearfix">
-		<p>Are you sure you want to remove component?</p>
+		<p>
+			Are you sure you want to remove component?
+		</p>
+
 		<form action="#" method="post">
-			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="uid" value="{ID}" />
 			<input type="hidden" name="component" value="{COMPONENT_ID}" />
 			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
 			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> <a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
 	</div>
-	
 	<!-- END config -->
+
 	<div class="listing blog">
 		<ul>
 			<!-- BEGIN blog -->
 			<li class="{BLOG_SHADING} clearfix">
-				<h4><em>{BLOG_HEADING}</em>
+				<h4>
+					<em>{BLOG_HEADING}</em>
 					<p>{BLOG_BODY}</p>
 				</h4>
 				<div class="small-right clearfix">
-					<p class="interact">{MODIFY_BLOG}</p>
-					<p class="interact">Posted by {BLOG_OWNER} {BLOG_CREATED}</p>
+					<p class="interact">
+						{MODIFY_BLOG}
+					</p>
+
+					<p class="interact">
+						Posted by {BLOG_OWNER} {BLOG_CREATED}
+					</p>
+
 					<!-- BEGIN show_comment -->
-					<p><a class="show_comments" href="javascript:void();">Show {BLOG_COMMENTS} Comments</a></p>
-					<!-- END show_comment --> 
+					<p>
+						<a class="show_comments" href="javascript:void();">Show {BLOG_COMMENTS} Comments</a>
+					</p>
+					<!-- END show_comment -->
 				</div>
-				<div class="blog_comments"> 
+				<div class="blog_comments">
 					<!-- BEGIN comment -->
-					<p class="blog_title">{COMMENT_BODY}</p>
-					<p class="small hide-on-small separate">{COMMENT_OWNER} <br />
+					<p class="blog_title">
+						{COMMENT_BODY}
+					</p>
+
+					<p class="small hide-on-small separate">
+						{COMMENT_OWNER} <br />
 						{COMMENT_CREATED}<br />
-						{DELETE_COMMENT}</p>
-					
-					<!-- END comment --> 
-					
+						{DELETE_COMMENT}
+					</p>
+					<!-- END comment -->
+
 					<!-- BEGIN show_all -->
-					<p><a class="interact" href="/eportfolio_blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
-					<!-- END show_all --> 
+					<p>
+						<a class="interact" href="/eportfolio_blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a>
+					</p>
+					<!-- END show_all -->
 				</div>
-				<p><a class="interact post_comment" href="javascript:void();" >Post comment</a></p>
+
+				<p>
+					<a class="interact post_comment" href="javascript:void();" >Post comment</a>
+				</p>
+
 				<form  method="post" action="/eportfolio_blog/comment/new/{BLOG_ID}">
 					<p>
 						<textarea name="body" style="width: 100%;"></textarea>
 					</p>
+
 					<p>
 						<input type="submit" name="comment" value="Comment"/>
 					</p>
@@ -73,23 +98,25 @@
 			</li>
 			<!-- END blog -->
 		</ul>
-		<p class="interact pad-it"> 
-			<!-- BEGIN submit --><a href="/eportfolio_blog/modify/new/{ID}" class="btn up-arrow"><span></span>Post Entry</a><!-- END submit --> 
+		<p class="interact pad-it">
+			<!-- BEGIN submit -->
+			<a href="/eportfolio_blog/modify/new/{ID}" class="btn up-arrow"><span></span>Post Entry</a>
+			<!-- END submit -->
 		</p>
 	</div>
-</div>
-<script type="text/javascript">
+	<script type='text/javascript'>
 	$j(function(){
 		$j('div.blog_comments, div.blog form').hide();
-		
+
 		$j('a.show_comments').click(function(){
-				$j(this).closest('li').find('div.blog_comments').toggle();
-				return false;
+			$j(this).closest('li').find('div.blog_comments').toggle();
+			return false;
 		});
-		
+
 		$j('a.post_comment').click(function(){
-				$j(this).closest('li').find('form').toggle();
-				return false;
+			$j(this).closest('li').find('form').toggle();
+			return false;
 		});
 	});
-</script> 
+	</script>
+</div>

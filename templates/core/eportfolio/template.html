@@ -10,7 +10,7 @@
 
 <!-- END modify_layout -->
 <script type="text/javascript">
-	
+
 	<!-- BEGIN colour_list -->
 	var {COLOUR_ARRAY} = {
 		'left_head_font'	: '#{left_head_font}',
@@ -20,7 +20,7 @@
 		'left_bg_secondary'	: '#{left_bg_secondary}',
 		'left_link'			: '#{left_link}',
 		'left_hover'		: '#{left_hover}',
-	
+
 		'right_head_font'	: '#{right_head_font}',
 		'right_head_bg'	: '#{right_head_bg}',
 		'right_font'	: '#{right_font}',
@@ -32,7 +32,7 @@
 	<!-- END colour_list -->
 
 	var uid = {ID};
-	
+
 	</script>
 	<style type="text/css">
 	.left h2 { color: #{left_head_font}; background-color: #{left_head_bg};	}
@@ -42,7 +42,7 @@
 	.left .text { background: #{left_bg_primary}; }
 	.left .listing { background: #{left_bg_primary}; }
 	.left .listing .dark { background: #{left_bg_secondary}; }
-	
+
 	.right h2 { color: #{right_head_font}; background-color: #{right_head_bg};	}
 	.right p, .right h3, .right .listing p.small { color: #{right_font}; }
 	.right a, .right .listing p.small a { color: #{right_link}; }
@@ -50,23 +50,23 @@
 	.right .text { background: #{right_bg_primary}; }
 	.right .listing{ background: #{right_bg_primary}; }
 	.right .listing .dark { background: #{right_bg_secondary}; }
-	
+
 	<!-- BEGIN allowed_files -->
-	a. {NAME} {	
+	a. {NAME} {
 	background-image: url(/images/mime/22x22/{ICON});
 	}
-	
+
 	<!-- END allowed_files -->
-	
+
 	</style>
-	
+
 <!-- END custom_head -->
 
 <h1>
-	<span>{HEADING}</span> 
-	<!-- BEGIN edit_page --> 
-	<a class="customise" href="#">Customise Page</a> 
-	<!-- END edit_page --> 
+	<span>{HEADING}</span>
+	<!-- BEGIN edit_page -->
+	<a class="customise" href="#">Customise Page</a>
+	<!-- END edit_page -->
 </h1>
 <!-- BEGIN customise_page -->
 <div id="tabs-homepage">
@@ -82,24 +82,34 @@
 				<col width="128" />
 				</colgroup>
 				<tr>
-					<td valign="top"><ul>
+					<td valign="top">
+						<ul>
 							<!-- BEGIN homepage_component_tab -->
-							<li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
+							<li>
+								<a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a>
+							</li>
 							<!-- END homepage_component_tab -->
-						</ul></td>
-					<td><div class="components clearfix"> 
+						</ul>
+					</td>
+					<td>
+						<div class="components clearfix">
 							<!-- BEGIN homepage_component_page -->
-							<div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}"> 
+							<div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
 								<!-- BEGIN homepage_component -->
 								<div class="add-component {HOMEPAGE_COMPONENT_CLASS} clearfix">
-									<h4>{HOMEPAGE_COMPONENT_NAME} <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong></h4>
-									<p>{HOMEPAGE_COMPONENT_DESCRIPTION}</p>
+									<h4>
+										{HOMEPAGE_COMPONENT_NAME} <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong>
+									</h4>
+
+									<p>
+										{HOMEPAGE_COMPONENT_DESCRIPTION}
+									</p>
 									<span class="notification"><strong></strong>Added</span> <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="btn add"><span></span>Add</a>
-									
+
 								</div>
-								<!-- END homepage_component --> 
+								<!-- END homepage_component -->
 							</div>
-							<!-- END homepage_component_page --> 
+							<!-- END homepage_component_page -->
 						</div>
 					</td>
 				</tr>
@@ -117,13 +127,13 @@
 						<div id="left_head_font" class="colorBox  selected"></div>
 						<input name="colors[left_head_font]" type="hidden" />
 						<p>Text</p>
-						
+
 					</div>
 					<div class="colour clearfix">
 						<div id="left_head_bg" class="colorBox"></div>
 						<input name="colors[left_head_bg]" type="hidden" />
 						<p>Background</p>
-						
+
 					</div>
 				</div>
 				<div class="colours-split ">
@@ -132,7 +142,7 @@
 						<div id="left_bg_primary" class="colorBox"></div>
 						<input name="colors[left_bg_primary]" type="hidden" />
 						<p>Primary Background</p>
-						
+
 					</div>
 					<div class="colour clearfix">
 						<div id="left_bg_secondary" class="colorBox"></div>
@@ -224,18 +234,18 @@
 			<div class="colours-buttons clearfix">
 				<button class="submit-btn-plain" type="button" id="saveTemplate" >Save layout</button>
 				<button class="submit-btn-plain" type="button" id="cancelTemplate" >Cancel</button>
-				
+
 				<div class="saved-layout">Saved layout</div>
 			</div>
 		</form>
 	</div>
-	<!--/tabs-3--> 
+	<!--/tabs-3-->
 </div>
 <!-- END customise_page -->
 
 <div class="{TEMPLATE} privateBlock">
 	<div class="left clearfix">
-		
+
 		<div class="box permanent clearfix">
 			<h2>My Profile</h2>
 			<div class="pad-it">
@@ -249,17 +259,17 @@
                 </p>
 			</div>
 		</div>
-		
+
 		<!-- BEGIN privateNotes -->
 		<div class="private-notes box permanent clearfix">
 			<h2>Teacher Notes</h2>
-			<div class="pad-it clearfix"> {PRIVATE_NOTES} 
+			<div class="pad-it clearfix"> {PRIVATE_NOTES}
 				<!-- BEGIN modify_link -->
 				<p class="interact"> <a href="/eportfolio_privateNotes/modify/{ID}" class="btn modify"><span></span>Modify</a> </p>
-				<!-- END modify_link --> 
+				<!-- END modify_link -->
 			</div>
 		</div>
-		<!-- END privateNotes --> 
+		<!-- END privateNotes -->
 		<div class="left-active active-sort">
 			{COLUMN1}
 		</div>
