@@ -1488,6 +1488,7 @@ ADMIN
 }
 
 .btn.no-marg { margin:0 8px 0 0; }
+.btn.marg{margin:8px;}
 .btn.margin-left-right{ margin:0 8px}
 .submit-btn-plain.no-marg { margin:0 8px 0 0; }
 
@@ -1684,42 +1685,71 @@ margin:-8px 0 0 0;
 }
 
 /*--------------------------------------------------------------
-ASSESS
+EVALUATION
 --------------------------------------------------------------*/
-#assess table.mceLayout { border:0; }
-#assess table td span { font-size:10px; }
 
-#assess .standardForm {
-	background: #FAF9F5;
-	margin-bottom:0;
+.additional-details span.time { color:#F00; }
+
+/****** ASSESS LAYOUT ********/
+.evaluation-content, 
+.evaluation-menu { 
+	position:relative;
 }
-#assess .standardForm td {
-
-	position:relative
+.evaluation-content {
+	width:69%;
+	float:left;
+}
+.evaluation-menu {
+	width:29%;
+	float:right;
 }
 
-#assess .standardForm thead td, #assess .standardForm { padding:0; }
-#assess .standardForm tbody { border-collapse:collapse; }
-#assess .assess-header { margin-bottom:20px; }
-#assess .additional-details, #assess .assess-body {
-	padding:10px;
-	border:1px solid #dbdbdb;
+/****** ASSESS FORMS ********/
+.evaluation-content{ 
 	-moz-border-radius: 0 0 3px 3px;
 	-webkit-border-radius:0 0 3px 3px;
 	border-radius:0 0 3px 3px;
-	background:  #FAF9F5
+}
+.evaluation-content form,
+.evaluation-menu .pad-it{padding:10px;	border:1px solid #dbdbdb;background:  #FAF9F5; margin-bottom:16px;}
+.evaluation-content label{font-weight:bold; padding:8px 0; border-bottom:1px solid #ededed}
+.evaluation-content label.error{padding:3px 0; border-bottom:1px solid #FFCC00;}
+.evaluation-content label:first-child{padding:0 0 8px 0}
+.evaluation-content label input[type="text"]
+{margin-top:8px; width:50%; display:block;border:1px solid #dbdbdb;}
+.evaluation-content label .textarea-container{margin-top:8px;}
+
+.evaluation-content fieldset {
+	margin-bottom:15px;
+	position:relative;
 }
 
-#assess .assess-body hr {
-	height:0px;
-	border-top:1px solid #DBDBDB;
+.evaluation-content fieldset label {
+	font-weight:bold;
+	width:200px;
+	display:block;
+	margin-bottom:5px;
+	position:relative;
+}
+
+.evaluation-content .textarea-container {
+	background:#fff;
+	padding:10px;
+	border:1px solid #dbdbdb;
+	margin-bottom:10px;
+}
+
+.evaluation-content textarea {
 	width:100%;
-	margin:10px 0;
+	border:0;
+	resize: none;
+	min-height:75px;
 }
 
-#assess .additional-details span.time { color:#F00; }
+.evaluation-content strong{display:block;}
+.evaluation-content span{font-weight:normal;}
 
-#assess .section h3 {
+.evaluation-menu .assess-section h3 {
 	background:#1597cb;
 	color:#fff;
 	font-size:11px;
@@ -1727,30 +1757,19 @@ ASSESS
 	border:none;
 }
 
-#assess .section h3 span { display:inline; }
+.evaluation-menu .assess-section { background:#fff;margin-bottom:10px; }
+.evaluation-menu .assess-section .question-list{ margin-bottom:16px;}
+.evaluation-menu .assess-section .question-list li{padding:7px 16px; border-top:1px solid #ededed; position:relative;}
+.evaluation-menu .assess-section .question-list li .border{border:1px solid #ededed; position:relative; z-index:2}
+.evaluation-menu .assess-section .question-list li .arrow{position:absolute; right:30px; top:-11px;width:0px; height:0px;
+border-bottom: 11px solid #EDEDED;
 
-#assess .section { margin-bottom:10px; }
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;z-index:3;display:block;}
 
-#assess .section p {
-	padding:10px;
-	border:1px solid #dbdbdb;
-	border-top:0;
-}
+.evaluation-menu .assess-section .question-list li:first-child{border:0;}
 
-#assess .section p ins {
-	height:20px;
-	display:block;
-	background:#ff0;
-	margin-bottom:10px;
-}
-
-#assess .section p span {
-	display:block;
-	font-weight:normal;
-	text-align:left;
-}
-
-#assess #countdown {
+.evaluation-menu #countdown {
 	text-align:center;
 	font-size:14px;
 	padding:9px;
@@ -1807,7 +1826,7 @@ ASSESS
 	border:none;
 }
 
-#assess .drop-arrow{
+.evaluation-menu .drop-arrow{
 	background:#ddefd3 url(/images/core/icons/chat-down.png) no-repeat 50% 50%;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
@@ -1824,17 +1843,18 @@ ASSESS
 	color: #BEBEBE;
 }
 
-#assess .drop-arrow.active { background:#ddefd3 url(/images/core/icons/chat-up.png) no-repeat 50% 50%; }
+.evaluation-menu  .drop-arrow.active { background:#ddefd3 url(/images/core/icons/chat-up.png) no-repeat 50% 50%; }
 
-#assess .assessment-options{background:#ddefd3}
-#assess .section-options{background:#F1F7FA; border-bottom:1px solid #DBDBDB}
-#assess .drop-arrow:hover {
+.assessment-options{background:#ddefd3}
+.assess-section-options{background:#F1F7FA; border-bottom:1px solid #DBDBDB}
+
+.assessment-content .drop-arrow:hover {
 	text-decoration:none;
 	color:#000;
 	background-color:#ddefd3;
 }
 
-#assess .allQuestions .drop-arrow {margin:0; background-color:#70b1cb; color:#fff; top:4px; right:4px;}
+.evaluation-content .drop-arrow {margin:0; background-color:#70b1cb; color:#fff; top:4px; right:4px;}
 
 #assess a.summary.time span { background-image:url(/images/icons/time.png); }
 #assess a.summary.date span { background-image:url(/images/icons/calendar.png); }
@@ -1860,30 +1880,17 @@ ASSESS
 
 #assess a.summary em { font-style:normal; }
 
-#assess .edit-assess-arrow {
+.edit-assess-arrow {
 	background:url(/images/core/assess/green-arrow.png) no-repeat 50% 0;
 	display:inline-block;
 	height:10px;
 	width:30px;
 }
 
-#assess .col-1, 
-#assess .col-2 { float:left; position:relative;}
-#assess .col-1 {
-	width:69%;
-	margin-right:1%;
-	
-}
-
-#assess .col-2 {
-	width:29%;
-
-}
-
-#assess .col-2 .assess-body { background:#fff; }
+.evaluation-menu{ background:#fff; }
 #assess .question .question-body { margin:0; }
 
-#assess h3 {
+.evaluation-content h3 {
 	font-size:13px;
 	font-weight:bold;
 	padding:10px;
@@ -1891,43 +1898,13 @@ ASSESS
 	line-height:16px;
 }
 
-#assess h3 span {
+.evaluation-content h3 span {
 	display:block;
 	font-weight:normal;
 }
 
-#assess fieldset {
-	margin-bottom:15px;
-	position:relative;
-}
-
-#assess fieldset.hidden { margin:0; }
-
-#assess fieldset label {
-	font-weight:bold;
-	width:200px;
-	display:block;
-	margin-bottom:5px;
-	position:relative;
-}
-
-#assess .textarea-container {
-	background:#fff;
-	padding:10px;
-	border:1px solid #dbdbdb;
-	margin-bottom:10px;
-}
-
-#assess textarea {
-	width:100%;
-	font-size:12px;
-	font-family:Arial, Helvetica, sans-serif;
-	border:0;
-	min-height:75px;
-}
-
-#assess ul { margin:0; }
-#assess .col-1 .assess-body ul li {
+.evaluation-content ul { margin:0; }
+.evaluation-content ul li {
 	min-width: 0;
 	position:relative;
 	padding:5px;
@@ -1936,13 +1913,13 @@ ASSESS
 	margin-bottom:10px;
 }
 
-#assess .col-1 ul li.highlight,
-#assess.take-test .col-1 ul li.highlight, 
-#assess .col-1 .assess-body ul li.correct { background-color:#e0f2df; }
+.evaluation-content ul li.highlight,
+.evaluation-content .col-1 ul li.highlight, 
+.evaluation-content .assess-body ul li.correct { background-color:#e0f2df; }
 
-#assess ul { height:100%; }
+.evaluation-content ul { height:100%; }
 
-#assess .drag-me {
+.evaluation-content .drag-me {
 	width:36%;
 	font-size:11px;
 	background:#fff;
@@ -2221,16 +2198,6 @@ ul.section-options a.drop-arrow {
 	color: #255297;
 	padding:0;
 	font-size:10px;
-}
-
-#assess .add-section {
-	background: #ebebeb url(/images/core/assess/add-section.gif) no-repeat 6px 50%;
-	display:block;
-	font-size:10px;
-	padding:9px 0 8px 28px;
-	display:block;
-	font-size:10px;
-	margin-bottom:10px;
 }
 
 .section-box h3 span:hover {

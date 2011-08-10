@@ -73,76 +73,66 @@ $j(document).ready(function() {
 </script>
 
 <!-- END custom_head -->
-<div id="assess" class="create-test">
 <h1>Create Question in Section {CURRENT_SECTION_TITLE}</h1>
+<div class="evaluation-content">
+	<h2>Question Details</h2>
+	<form id="createQuestionForm" action="/assess/question/create" class="clearfix" method="post">
+		
+		<p class="help">
+			Now that you've created a section for the test, use the drop down below to select a question type.
+		</p>
+		
+		<label class="hide">
+			<input name="section_id" type="hidden" value="{SECTION_ID}" />
+			<input name="sequence" type="hidden" value="{SEQUENCE}" />
+		</label>
+		
+		<label><strong>Type</strong>
+			<select name="type_id" id="type_id" class="question-type-select">
+				<option disabled {DISABLED_SELECTED} value='-1'>-- Select Type --</option>
+				<!-- BEGIN questionType -->
+				<option value="{QUESTIONTYPE_TYPE_ID}" {QUESTIONTYPE_SELECTED}>{QUESTIONTYPE_DESCRIPTION}</option>
+				<!-- END questionType -->
+				<option value="import" {IMPORT_SELECTED}>Import Question</option>
+			</select>
+		</label>
 
-<div class="col-1">
-	<div class="assess-header">
-		<h2>Question Details</h2>
-		<div class="assess-body">
-
-			<p class="help">
-				Now that you've created a section for the test, use the drop down below to select a question type.
-			</p>
-
-			<form id="createQuestionForm" action="/assess/question/create" class="standardForm clearfix" method="post">
-				<fieldset class="hidden">
-					<input name="section_id" type="hidden" value="{SECTION_ID}" />
-					<input name="sequence" type="hidden" value="{SEQUENCE}" />
-				</fieldset>
-
-				<fieldset>
-					<label>Type</label>
-					<select name="type_id" id="type_id" class="question-type-select">
-						<option disabled {DISABLED_SELECTED} value='-1'>-- Select Type --</option>
-						<!-- BEGIN questionType -->
-						<option value="{QUESTIONTYPE_TYPE_ID}" {QUESTIONTYPE_SELECTED}>{QUESTIONTYPE_DESCRIPTION}</option>
-						<!-- END questionType -->
-						<option value="import" {IMPORT_SELECTED}>Import Question</option>
-					</select>
-				</fieldset>
-
-				<fieldset class="question-holder">
-					<label>Question</label>
-					<div class="textarea-container" id="question_container">
-						<input name="question" class="mceSimple tinyValidate" id="question" type="text" size="35" value="{QUESTION}" />
-					</div>
-				</fieldset>
-
-				<fieldset class="marks-holder">
-					<label>Marks</label>
-					<label><input name="marks" type="text" size="3" value="{MARKS}"/></label>
-				</fieldset>
-
-				<div id="answer">
-					<!-- BEGIN answerInputs -->
-
-					<!-- END answerInputs -->
-				</div>
-				<input type="submit" name="create" id="create" value="Add Question" class="submit-btn-plain"/>
-			</form>
-
-			<div id="importQuestion">
-				<p><strong>Import a question and answer from an XML file</strong></p>
-				<p class="help">
-					Select an Assess Question XML file to import.
-				</p>
-
-				<form action="/assess/question/import/{SECTION_ID}" method="post" class="standardForm clearfix" enctype="multipart/form-data">
-					<fieldset>
-						<label>File</label>
-						<input name="importXML" type="file" class="prettify"/>
-					</fieldset>
-
-					<input type="submit" value="Import from XML file"  class="submit-btn-plain float-none"/>
-				</form>
+		<label class="question-holder">Question
+			<div class="textarea-container" id="question_container">
+				<input name="question" class="mceSimple tinyValidate" id="question" type="text" size="35" value="{QUESTION}" />	
 			</div>
+		</label>
+
+		<label class="marks-holder">Marks
+			<input name="marks" type="text" size="3" value="{MARKS}"/>
+		</label>
+
+		<div id="answer">
+			<!-- BEGIN answerInputs -->
+
+			<!-- END answerInputs -->
 		</div>
-	</div>
+		
+		<label class="clearfix">
+			<input type="submit" name="create" id="create" value="Add Question" class="submit-btn-plain"/>
+		</label>
+	</form>
+
+	<h2>Import a question and answer from an XML file</h2>
+	<form action="/assess/question/import/{SECTION_ID}" method="post" class="clearfix" enctype="multipart/form-data">
+		<p>Select an Assess Question XML file to import.</p>
+		<label class="clearfix"><strong>File</strong>
+			<input name="importXML" type="file" class="prettify"/>
+		</label>
+		
+		<label class="clearfix">
+			<input type="submit" value="Import from XML file"  class="submit-btn-plain float-none no-marg"/>
+		</label>
+	</form>
 </div>
-<div class="col-2">
+
+<div class="evaluation-menu">
 <!-- BEGIN allQuestions -->
 
 <!-- END allQuestions -->
-</div>
 </div>

@@ -28,26 +28,24 @@
 	});
 </script>
 <!-- END custom_head -->
-<div id="assess" class="create-test">
 	<h1>Modify Question</h1>
-	<div class="col-1">
-		<div class="assess-header">
-			<h2>Question Details</h2>
-			<div class="assess-body">
-				<form id="createQuestionForm" action="/assess/question/modify" class="standardForm" method="post">
+	<div class="evaluation-content">
+		<h2>Question Details</h2>
+		<form id="createQuestionForm" action="/assess/question/modify" class="standardForm" method="post">
 
-					<fieldset class="hidden">
+					<label class="hide">
 						<input name="section_id" type="hidden" value="{SECTION_ID}" />
 						<input name="question_id" type="hidden" value="{QUESTION_ID}" />
 						<input name="answer_id" type="hidden" value="{ANSWER_ID}" />
 						<input name="sequence" type="hidden" value="{SEQUENCE}" />
-					</fieldset>
+					</label>
 
-					<fieldset>
-						<label>Type</label>
+					
+					<label>Type
 						<input type="hidden" name="type_id" value="{QUESTIONTYPE_TYPE_ID}" />
 						<span>{QUESTIONTYPE_DESCRIPTION}</span>
-					</fieldset>
+					</label>
+
 
 					<fieldset>
 						<label>Question</label>
@@ -68,42 +66,36 @@
 					<fieldset>
 						<input type="submit" name="create" id="create" value="Modify" class="submit-btn-plain"/>
 					</fieldset>
-				</form>
-			</div>
-		</div>
-		<div>
 			<h2>Import into Question Bank</h2>
-			<div class="assess-body">
+
+				
+				<form action='/assess/questionbank/create' class='standardForm' method='post'>
+				
 				<p>
 					Puts this question into the Question Bank so you can import
 					them into other Online Assessments.
 				</p>
-				<form action='/assess/questionbank/create' class='standardForm' method='post'>
-					<fieldset>
+					<label class="hide">
 						<input name='type_id' type='hidden' value='{QUESTIONTYPE_TYPE_ID}' />
 						<input name='question_id' type='hidden' value='{QUESTION_ID}' />
 						<input name='answer_id' type='hidden' value='{ANSWER_ID}' />
 						<input name='marks' type='hidden' value='{MARKS}' />
-
-						<label>Question Category</label>
-						<label>
+					</label>
+					<label>Question Category
 							<select name='question_category'>
 								<!-- BEGIN question_category -->
 								<option value='{QUESTION_CATEGORY_ID}'>{QUESTION_CATEGORY_NAME}</option>
 								<!-- END question_category -->
 							</select>
-						</label>
-					</fieldset>
-					<fieldset>
+					</label>
+
+					<label>
 						<input type='submit' class='submit-btn-plain' value='Add To Question Bank' />
-					</fieldset>
+					</label>
 				</form>
-			</div>
-		</div>
-	</div>
-	<div class="col-2">
+
+	<div class="evaluation-menu">
 	<!-- BEGIN allQuestions -->
 
 	<!-- END allQuestions -->
 	</div>
-</div>

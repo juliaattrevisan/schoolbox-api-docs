@@ -2,7 +2,7 @@
 <script type="text/javascript">
 $j(function() {
 
-	$j('a.delete-question').click(function() {
+	$j('a.delete').click(function() {
 		location.href = $j(this).attr('href');
 	}).confirm({
 		buttons: {
@@ -23,7 +23,6 @@ $j(function() {
 		return false;
 	});
 
-
 	$j(".show-assess-options, .show-section-options").hover(
 	function () {
 		$j(this).children('span').stop(true, true).fadeIn("fast");
@@ -36,44 +35,57 @@ $j(function() {
 		});
 
 	});
-
+	
+	$j('.show-options').click(function() {
+		$j(this).parent().siblings('p').slideToggle();
+		return false;
+	});
+	
 });
 </script>
-<h2>Assessment Content</h2>
-<div class="hide assessment-options pad-it clearfix">
-<a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left no-marg" ><span></span>Modify</a>
-<a href="/assess/export/{ASSESS_ASSESS_ID}" class="btn go-to float-left no-marg" ><span></span>Export</a>
-<a href="/assess/delete/{ASSESS_ASSESS_ID}" onclick="return confirm('Are you sure you want to delete this assessment?');" class="btn delete float-left no-marg" ><span></span>Delete</a>
-</div>
-<a class="drop-arrow show-assess-options" href="#">&#x25BC;</a>
 
-<div class="allQuestions">
-	<div class="assess-body">
-	<a class="add-section" href="/assess/section/create/{ASSESS_ASSESS_ID}">Add sections to this assessment</a>
-        <!-- BEGIN section -->
-		<div class="section-box">
+<h2>Manage Assessment</h2>
+	<div class="pad-it ">
+		<div class="hide assessment-options pad-it clearfix"> <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left no-marg" ><span></span>Modify</a> <a href="/assess/export/{ASSESS_ASSESS_ID}" class="btn go-to float-left no-marg" ><span></span>Export</a> <a href="/assess/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left no-marg" ><span></span>Delete</a> </div>
+		<a class="drop-arrow show-assess-options" href="#">&#x25BC;</a>
+		
+		<p class="clearfix">
+			<a class="btn add" href="/assess/section/create/{ASSESS_ASSESS_ID}"><span></span>Add section</a> 
+		</p>
+		
+		<!-- BEGIN section -->
+		<div class="assess-section">
 			<h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}<a class="drop-arrow show-section-options" href="#">&#x25BC;</a></h3>
 
-
-			<div class="hide section-options pad-it clearfix">
-				<a href="/assess/section/modify/{SECTION_SECTION_ID}" class="btn modify float-left"><span></span>Edit</a></li>
-				<a onclick="return confirm('Are you sure you want to delete the section?');" href="/assess/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
-			</div>
-
-			<ul class="section-question">
+			<ul class="question-list">
+			
+				<li class="hide section-options clearfix">
+					<a href="/assess/section/modify/{SECTION_SECTION_ID}" class="btn modify float-left"><span></span>Edit</a>
+					<a onclick="return confirm('Are you sure you want to delete the section?');" href="/assess/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
+				</li>
+			
 				<!-- BEGIN question -->
 				<li>
-						<p><span>Q{QUESTION_SEQUENCE})</span> {QUESTION_QUESTION} - ({QUESTION_MARKS} marks)</p>
-						<p class="pad-it"><a href="/assess/question/export/{QUESTION_QUESTION_ID}">Export</a> |
-						<a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
-						<a class="delete-question" href="/assess/question/delete/{QUESTION_QUESTION_ID}">Delete</a></p>
+					<strong>Q{QUESTION_SEQUENCE})</strong> 
+					{QUESTION_QUESTION} - ({QUESTION_MARKS} marks)
+					<a href="/assess/question/export/{QUESTION_QUESTION_ID}">Export</a> | 
+					<a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a> | 
+					<a class="delete-question" href="/assess/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
 				</li>
 				<!-- END question -->
+				<li class="clearfix">
+					<p class="clearfix no-marg">
+						<a class="btn add show-options" href="#"><span></span>Add a Question</a> 
+					</p>
+					<p class="hide clearfix border">
+						<span class="arrow"></span>
+						<a class="btn download marg" href="/assess/questionbank/contents/{SECTION_SECTION_ID}"><span></span>QuestionBank</a>
+						<a class="btn add marg" href="/assess/question/create/{SECTION_SECTION_ID}"><span></span>New</a>
+					</p>
+				</li>
 			</ul>
 
-            <a class="add-questions" href="/assess/question/create/{SECTION_SECTION_ID}"><span>Add a Question</span></a>
-			<a class="add-questions" href="/assess/questionbank/contents/{SECTION_SECTION_ID}"><span>Copy from QuestionBank</span></a>
 		</div>
-        <!-- END section -->
+		<!-- END section -->
 	</div>
-</div>
+	
