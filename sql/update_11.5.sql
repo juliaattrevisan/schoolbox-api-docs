@@ -33,3 +33,7 @@ INSERT INTO error VALUES (136, "Unable to create or modify folder as class code 
 /* Spelling correction.
  */
 UPDATE `config` SET `title`='Synchronise Data' WHERE `configID`='57';
+
+/* Eportfolio textbox component
+ */
+ALTER TABLE `eportfolio_textBox` ADD COLUMN componentLocationID INT(11) NULL ;

@@ -26,7 +26,7 @@ class ePortfolio {
 
     /**
      * Gets all the images associated with an eportfolio
-     * 
+     *
      * @param <type> $userID
      * @param <type> $limit
      * @return <type>
@@ -152,7 +152,7 @@ class ePortfolio {
 
     /**
      * Remembers themes for a template.
-     * 
+     *
      * @param <type> $template
      */
 	function savePageTemplate($template) {
@@ -189,7 +189,7 @@ class ePortfolio {
             $this->db->query($query);
 
             $this->saveComponentPosition($component, 1, 1, $newComp['config']);
-        } 
+        }
 
 
 
@@ -203,7 +203,6 @@ class ePortfolio {
         $this->db->query($query);
     }
 
-
     /**
      * Updates location of components.
      *
@@ -212,19 +211,19 @@ class ePortfolio {
      * @param <type> $position
      */
 	function updateComponentPosition($component, $column, $position) {
-		$query = array(
-			'component' => $component,
+		$data = array(
+			'eportfolioComponentLocationID' => $component,
 			'uid' => $this->uid,
 			'column' => $column,
 			'position' => $position
 		);
 
-		$result = $this->db->update('eportfolio_comp_location', array('component', 'uid'), $query);
+		$this->db->update('eportfolio_comp_location', 'eportfolioComponentLocationID', $data);
 	}
 
     /**
      * Records component configuration
-     * 
+     *
      * @param <type> $component
      * @param <type> $config
      */

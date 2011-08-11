@@ -24,7 +24,7 @@ $j(function() {
 				$j('div.left-active').children('div.box').each(function () {
 					left += $j(this).attr('id').substring(9) + ',';
 				});
-				$j('div.left-active').children('div.box').each(function () {
+				$j('div.right').children('div.box').each(function () {
 					right += $j(this).attr('id').substring(9) + ',';
 				});
 

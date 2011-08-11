@@ -9,42 +9,38 @@ class ePortfolioTextBox extends DeprecatedModel {
 		parent::DeprecatedModel();
 	}
 
-    /**
-     * Gets all the textboxes associated with the specified user.
-     * @param <type> $userID
-     * @return <type>
-     */
-	function getAllByUser($userID) {
-		$query = "SELECT * FROM ".$this->_table." WHERE userID = $userID AND deleted = 'false' ORDER BY heading";
+	/**
+	 * Get a textbox record using only a componentLocationID
+	 *
+	 * @param  $componentLocationID
+	 * @return array|bool
+	 */
+	public function getByComponentLocationID($componentLocationID) {
+		$query = "SELECT config FROM eportfolio_comp_location WHERE eportfolioComponentLocationID = '$componentLocationID'";
 
-		return $this->db->getAll($query);
+		$record = unserialize($this->db->getOne($query));
+
+		if ($record) {
+			return $this->getByID($record['textBoxID']);
+		}
+
+		return false;
 	}
 
-    /**
-     * Get the latest textbox.
-     *
-     * @param <type> $userID
-     * @return <type>
-     */
-	function getCurrent($userID) {
-		$textBoxList = $this->getAllByUser($userID);
+	/**
+	 * Delete a textbox only needing to know what the componentLocation is,
+	 * since the textboxID could be empty in the case that they've created the
+	 * component but not added content
+	 *
+	 * @param  $componentLocationID
+	 * @return void
+	 */
+	public function delete($componentLocationID) {
+		$query = "SELECT textBoxID FROM {$this->_table} WHERE componentLocationID = '$componentLocationID'";
 
-		return $textBoxList[0];
-	}
+		$record = $this->db->getRow($query);
 
-    /**
-     * Deletes a textbox.
-     * 
-     * @param <type> $textBoxID
-     * @return <type>
-     */
-	function delete($textBoxID) {
-		$data = array(
-            'textBoxID' => $textBoxID,
-		    'deleted' => 'true',
-        );
-
-		return $this->update($data);
+		parent::delete($record['textBoxID']);
 	}
 }
 ?>

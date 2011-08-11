@@ -1,3 +1,20 @@
+<!-- BEGIN custom_head -->
+<script type='text/javascript'>
+$j(function(){
+	$j('div.blog_comments, div.blog form').hide();
+
+	$j('a.show_comments').click(function(){
+		$j(this).closest('li').find('div.blog_comments').toggle();
+		return false;
+	});
+
+	$j('a.post_comment').click(function(){
+		$j(this).closest('li').find('form').toggle();
+		return false;
+	});
+});
+</script>
+<!-- END custom_head -->
 <div class="box" id="component{COMPONENT_ID}">
 	<h2>Blog</h2>
 
@@ -104,19 +121,4 @@
 			<!-- END submit -->
 		</p>
 	</div>
-	<script type='text/javascript'>
-	$j(function(){
-		$j('div.blog_comments, div.blog form').hide();
-
-		$j('a.show_comments').click(function(){
-			$j(this).closest('li').find('div.blog_comments').toggle();
-			return false;
-		});
-
-		$j('a.post_comment').click(function(){
-			$j(this).closest('li').find('form').toggle();
-			return false;
-		});
-	});
-	</script>
 </div>

@@ -211,7 +211,7 @@ if ($eportfolioHandler->canEdit($userID)) {
 
             $this->setVar('COMPONENT_HOMEPAGE_ID', $component['eportfolioComponentLocationID']);
             $this->setVar('COMPONENT_ID', $component['component']);
-            
+
 
             $default = unserialize($component['dfconfig']);
             $config = unserialize($component['config']);
