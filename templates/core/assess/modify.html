@@ -5,30 +5,30 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
 $j(document).ready(function() {
-		/* date picker */
-		$j('#start_date, #finish_date').datepicker({
-			dateFormat: 'dd/mm/yy',
-			showOn: 'both',
-			buttonImage: '/images/core/calendar/calendar-click.png',
-			buttonImageOnly: true,
-            constrainInput: false,
-            onClose: function (string) {
-                var input = $j(this);
+	/* date picker */
+	$j('#start_date, #finish_date').datepicker({
+		dateFormat: 'dd/mm/yy',
+		showOn: 'both',
+		buttonImage: '/images/core/calendar/calendar-click.png',
+		buttonImageOnly: true,
+		constrainInput: false,
+		onClose: function (string) {
+			var input = $j(this);
 
-                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-		});
-		/* date picker */
+			$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+				input.val(data.time);
+			})
+		}
+	});
+	/* date picker */
 
 	$j('.show-duration').click(function() {
-		if ($j('.hide-it').is(':visible')) {
-			$j('.hide-it').hide();
+		if ($j('.edit-duration').is(':visible')) {
+			$j('.edit-duration').toggle();
 			$j('#minHours').val('0');
 			$j('#minDuration').val('00');
 		} else {
-			$j('.hide-it').show();
+			$j('.edit-duration').toggle();
 			$j('#minDuration').val('15');
 		}
 	});
@@ -126,7 +126,7 @@ $j(document).ready(function() {
 					<label class="float-left">
 						<input type="checkbox" class="float-left show-duration" {ASSESS_DURATION_CHECKED}/>
 					</label>
-					<fieldset class="hide float-left">
+					<fieldset class="hide float-left edit-duration">
 						<select name="duration[hour]" id="minHours" class="groupedSelect min-hours">
 							<!-- BEGIN durationHour -->
 							<option value="{DURATION_HOUR_VALUE}" {DURATION_HOUR_SELECTED}>{DURATION_HOUR_VALUE}</option>

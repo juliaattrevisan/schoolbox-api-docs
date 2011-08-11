@@ -1,25 +1,23 @@
-<fieldset>
-    <label>Answer given:</label>
-    <div class="box">
-        <!-- BEGIN answerOption -->
-        {ANSWER}
-        <!-- END answerOption -->
-    </div>
-</fieldset>
-<fieldset>
-	<label>Answer given:</label>
+	<strong>Answer given:</strong>
+<div class="answer-given-container">
 
-<div class="box">
-    {CORRECT_ANSWER}
+	<!-- BEGIN answerOption -->
+	{ANSWER}
+	<!-- END answerOption -->
 </div>
-</fieldset>
+    <strong>Correct Answer:</strong>
+<div class="correct-answer-container">
 
-<fieldset>
-    <label>Enter your comments:</label>
-    <div class="textarea-container">
-        <textarea name="comment">{REVIEWED_COMMENT}</textarea>
-    </div>
-    <p class="marks-amount">
-        <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/> / {QUESTION_MARKS}
-    </p>
-</fieldset>
+	{CORRECT_ANSWER}
+</div>
+
+<label><strong>Enter your comments:</strong>
+<div class="textarea-container">
+	<textarea name="comment">{REVIEWED_COMMENT}</textarea>
+</div>
+</label>
+<p class="marks-amount">
+
+	<input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/> / {QUESTION_MARKS}
+
+</p>

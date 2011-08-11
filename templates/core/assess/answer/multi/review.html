@@ -1,21 +1,23 @@
-<fieldset>
-    <div>
-        <ul class="multiple-choice-mark">
-            <!-- BEGIN answerOption -->
-            <li class="{ACTUAL_CORRECT_VALUE} {CORRECT}">
-                <input disabled="disabled" type="checkbox" {ANSWER_CHECKED} class="hide"/> {ANSWER_DESCRIPTION}
-				<span class="tick-cross"></span>
-            </li>
-            <!-- END answerOption -->
-        </ul>
-    </div>
-</fieldset>
-<fieldset>
-    <label>Enter your comments:</label>
-    <div class="textarea-container">
-        <textarea name="comment">{REVIEWED_COMMENT}</textarea>
-    </div>
-    <p class="marks-amount">
-        <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/> / {QUESTION_MARKS}
-    </p>
-</fieldset>
+<p class="information-notification">Please note: An option with a grey background is a correct response which was not selected.</p>
+
+<strong>Question Options:</strong>
+<div class="answer-given-container">
+	<ul class="multiple-choice-mark">
+		<!-- BEGIN answerOption -->
+		<li class="{ACTUAL_CORRECT_VALUE} {CORRECT}">
+			<input disabled="disabled" type="checkbox" {ANSWER_CHECKED} class="hide"/> {ANSWER_DESCRIPTION}
+			<span class="tick-cross"></span>
+		</li>
+		<!-- END answerOption -->
+	</ul>
+</div>
+
+<label><strong>Enter your comments:</strong>
+	<div class="textarea-container">
+		<textarea name="comment">{REVIEWED_COMMENT}</textarea>
+	</div>
+</label>
+
+<p class="marks-amount">
+	<input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/> / {QUESTION_MARKS}
+</p>

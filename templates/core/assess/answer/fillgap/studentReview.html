@@ -1,23 +1,20 @@
-<fieldset>
-    <label>Answer given:</label>
-    <div class="box">
-        <!-- BEGIN answerOption -->
-        {ANSWER}
-        <!-- END answerOption -->
-    </div>
-</fieldset>
-<fieldset>
-	<label>Answer given:</label>
+<strong>Answer given:</strong>
+<div class="answer-given-container">
 
-<div class="box">
-    {CORRECT_ANSWER}
+	<!-- BEGIN answerOption -->
+	{ANSWER}
+	<!-- END answerOption -->
 </div>
-</fieldset>
+<strong>Correct Answer:</strong>
+<div class="correct-answer-container">
+	{CORRECT_ANSWER}
+</div>
 
-<fieldset class="teacher-comments">
-    <label>Teacher's comments:</label>
+<label><strong>Teacher's comments:</strong>
     <div class="textarea-container">{REVIEWED_COMMENT}</div>
-</fieldset>
+</label>
     <p class="marks-amount">
         {REVIEWED_MARKS} / {QUESTION_MARKS}
     </p>
+
+
