@@ -3,13 +3,14 @@
 $j(function() {
 
 	$j('.checkbox').click(function() {	
-		if ($j('.hide-this').is(":visible")) {
-			$j('.hide-this :input').attr('disabled', 'true');
+		if ($j('.hide-questions').is(":visible")) {
+			$j('.hide-questions :input').attr('disabled', 'true');
 		} else {
-			$j('.hide-this :input').removeAttr('disabled');	
+			$j('.hide-questions :input').removeAttr('disabled');	
 		}
-		$j('.hide-this').toggle();
+		$j('.hide-questions').toggle();
 	});
+	
 	
 	jQuery.validator.addMethod("combo", function(value, element) 
 		{
@@ -61,7 +62,7 @@ $j(function() {
 			<input name="random" type="checkbox" value="1" class="checkbox"/><span>Questions should be selected randomly</span>
 			</label>
 
-			<label class="hide">Total Questions Displayed
+			<label class="hide hide-questions">Total Questions Displayed
 				<input name="pool" disabled="disabled" type="text" class="pool" /> Maximum number of questions to show
 			</label>
 		

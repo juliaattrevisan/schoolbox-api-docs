@@ -1,11 +1,12 @@
 <script type="text/javascript">
 $j(function() {
-	var validator = $j(".standardForm").submit(function() {
+	
+	var validator = $j("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
-		 tinyMCE.triggerSave();
-
+		 tinyMCE.triggerSave(); 
+		 
 	 }).validate({
-		rules: {
+		rules: { 
 			question: {
 				required: true,
 				minlength: 1
@@ -13,19 +14,27 @@ $j(function() {
 			marks: {
 				required: true,
 				minlength: 1,
-				number:true
+				greaterThanZero:true
 			}
 		},
-
+		
 		messages: {
-			question: "Please enter a question."
+			question: "Please enter a question.",
+			answer: "Please fill out an answer."
 		},
-
+		
         errorPlacement: function(error, element) {
             offset = element.offset();
             error.insertAfter(element.parent().children(':last-child'))
             error.addClass('message');  // add a class to the wrapper
+           
 		}
+	
 	});
+	
+	jQuery.validator.addMethod("greaterThanZero", function(value, element) {
+   		return this.optional(element) || (parseFloat(value) > 0);
+	}, "Amount must be greater than zero");
+	
 });
 </script>

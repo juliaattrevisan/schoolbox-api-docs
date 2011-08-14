@@ -1757,7 +1757,7 @@ EVALUATION
 .evaluation-content strong{display:block;}
 .evaluation-content span{font-weight:normal;}
 
-.evaluation-menu .assess-section h3 {
+.evaluation-menu .evaluation-section h3 {
 	background:#1597cb;
 	color:#fff;
 	font-size:11px;
@@ -1766,7 +1766,7 @@ EVALUATION
 }
 
 /************EVALUATION MENU (The column on the right hand side) ***********/
-.evaluation-menu .assess-section { background:#fff;margin-bottom:10px; }
+.evaluation-menu .evaluation-section { background:#fff;margin-bottom:10px; }
 .evaluation-menu .question-list{ margin-bottom:16px;}
 .evaluation-menu .question-list li{padding:7px 16px; border-top:1px solid #ededed; position:relative; overflow:hidden}
 .evaluation-menu .question-list li .border{border:1px solid #ededed; position:relative; z-index:2}
@@ -1808,8 +1808,8 @@ border-bottom: 11px solid #EDEDED;border-left: 11px solid transparent; border-ri
 
 .evaluation-menu  .drop-arrow.active { background:#ddefd3 url(/images/core/icons/chat-up.png) no-repeat 50% 50%; }
 
-.assessment-options{background:#ddefd3}
-.assess-section-options{background:#F1F7FA; border-bottom:1px solid #DBDBDB}
+.evaluation-options{background:#ddefd3}
+.evaluation-section-options{background:#F1F7FA; border-bottom:1px solid #DBDBDB}
 
 .assessment-content .drop-arrow:hover {
 	text-decoration:none;
@@ -2265,6 +2265,28 @@ margin:10px 0;
 
 
 .row-switcher { background-color:#ededed; }
+
+/*results for the evaluation */
+
+.evaluation-question-section h2 {padding-left:0; margin-bottom:16px;}
+.evaluation-question-section h2 span{background:url(/images/core/transparencies/40-white.png) repeat; color:#000; display:block; float:left; padding:0 16px;
+     -moz-border-radius: 4px 0 0 4px; 
+  -webkit-border-radius: 4px 0 0 4px; 
+          border-radius: 4px 0 0 4px; 
+          margin-right:16px;
+          font-size:14px;
+  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
+
+
+}
+.evaluation-question-result{border:1px solid #e7e7e7; margin-bottom:16px;}
+.evaluation-question-result h3{font-weight:bold; font-size:16px; margin-bottom:16px; color:#000;}
+.evaluation-question-result .results{width:50%; float:left; border:0; padding:0;}
+.evaluation-question-result .legend{width:50%; float:left;}
+
+
+
+
 /************************
  END EVALUATION
  ************************/

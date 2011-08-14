@@ -2,7 +2,7 @@
 <script type="text/javascript">
 $j(function() {
 
-	$j('a.delete-question').click(function() {
+	$j('a.delete').click(function() {
 		location.href = $j(this).attr('href');
 	}).confirm({
 		buttons: {
@@ -11,20 +11,19 @@ $j(function() {
   		}
 	});
 
-	$j('.show-assess-options').click(function() {
-		$j('.assessment-options').slideToggle();
+	$j('.show-survey-options').click(function() {
+		$j('.survey-options').slideToggle("fast");
 		$j(this).toggleClass('active')
 		return false;
 	});
 
 	$j('.show-section-options').click(function() {
-		$j('.section-options').slideToggle();
+		$j(this).parent().siblings('.question-list').children(":first-child").slideToggle();
 		$j(this).toggleClass('active')
 		return false;
 	});
 
-
-	$j(".show-assess-options, .show-section-options").hover(
+	$j(".show-survey-options, .show-section-options").hover(
 	function () {
 		$j(this).children('span').stop(true, true).fadeIn("fast");
 		$j(this).css('background-image', "none");
@@ -36,44 +35,57 @@ $j(function() {
 		});
 
 	});
-
+	
+	$j('.show-options').click(function() {
+		$j(this).parent().siblings('p').slideToggle("fast");
+		return false;
+	});
+	
 });
 </script>
-<h2>Survey Content</h2>
-<div class="hide assessment-options pad-it clearfix">
-<a href="/survey/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left no-marg" ><span></span>Modify</a>
-<a href="/survey/export/{ASSESS_ASSESS_ID}" class="btn go-to float-left no-marg" ><span></span>Export</a>
-<a href="/survey/delete/{ASSESS_ASSESS_ID}" onclick="return confirm('Are you sure you want to delete this survey?');" class="btn delete float-left no-marg" ><span></span>Delete</a>
-</div>
-<a class="drop-arrow show-assess-options" href="#">&#x25BC;</a>
 
-<div class="allQuestions">
-	<div class="assess-body">
-	<a class="add-section" href="/survey/section/create/{ASSESS_ASSESS_ID}">Add sections to this survey</a>
-        <!-- BEGIN section -->
-		<div class="section-box">
+<h2>Manage Survey</h2>
+	<div class="pad-it ">
+		<div class="hide survey-options pad-it clearfix"> <a href="/survey/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left no-marg" ><span></span>Modify</a> <a href="/survey/export/{ASSESS_ASSESS_ID}" class="btn go-to float-left no-marg" ><span></span>Export</a> <a href="/survey/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left no-marg" ><span></span>Delete</a> </div>
+		<a class="drop-arrow show-survey-options" href="#">&#x25BC;</a>
+		
+		<p class="clearfix">
+			<a class="btn add" href="/survey/section/create/{ASSESS_ASSESS_ID}"><span></span>Add section</a> 
+		</p>
+		
+		<!-- BEGIN section -->
+		<div class="evaluation-section">
 			<h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}<a class="drop-arrow show-section-options" href="#">&#x25BC;</a></h3>
 
-
-			<div class="hide section-options pad-it clearfix">
-				<a href="/survey/section/modify/{SECTION_SECTION_ID}" class="btn modify float-left"><span></span>Edit</a></li>
-				<a onclick="return confirm('Are you sure you want to delete the section?');" href="/survey/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
-			</div>
-
-			<ul class="section-question">
+			<ul class="question-list">
+			
+				<li class="hide evaluation-section-options clearfix">
+					<a href="/survey/section/modify/{SECTION_SECTION_ID}" class="btn modify float-left"><span></span>Edit</a>
+					<a href="/survey/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
+				</li>
+			
 				<!-- BEGIN question -->
 				<li>
-						<p><span>Q{QUESTION_SEQUENCE})</span> {QUESTION_QUESTION}</p>
-						<p class="pad-it"><a href="/survey/question/export/{QUESTION_QUESTION_ID}">Export</a> |
-						<a href="/survey/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
-						<a class="delete-question" href="/survey/question/delete/{QUESTION_QUESTION_ID}">Delete</a></p>
+					<strong>Q{QUESTION_SEQUENCE})</strong> 
+					{QUESTION_QUESTION}
+					<a href="/survey/question/export/{QUESTION_QUESTION_ID}">Export</a> | 
+					<a href="/survey/question/modify/{QUESTION_QUESTION_ID}">Edit</a> | 
+					<a class="delete" href="/survey/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
 				</li>
 				<!-- END question -->
+				<li class="clearfix">
+					<p class="clearfix no-marg">
+						<a class="btn add show-options" href="#"><span></span>Add a Question</a> 
+					</p>
+					<p class="hide clearfix border">
+						<span class="arrow"></span>
+						<a class="btn download marg" href="/survey/questionbank/contents/{SECTION_SECTION_ID}"><span></span>QuestionBank</a>
+						<a class="btn add marg" href="/survey/question/create/{SECTION_SECTION_ID}"><span></span>New</a>
+					</p>
+				</li>
 			</ul>
 
-            <a class="add-questions" href="/survey/question/create/{SECTION_SECTION_ID}"><span>Add a Question</span></a>
-			<a class="add-questions" href="/survey/questionbank/contents/{SECTION_SECTION_ID}"><span>Copy from QuestionBank</span></a>
 		</div>
-        <!-- END section -->
+		<!-- END section -->
 	</div>
-</div>
+	

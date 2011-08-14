@@ -14,7 +14,6 @@ $j(document).ready(function() {
 		constrainInput: false,
 		onClose: function (string) {
 			var input = $j(this);
-
 			$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
 				input.val(data.time);
 			})
@@ -159,7 +158,7 @@ $j(document).ready(function() {
 			</tr>
 		</table>
 		<label class="clearfix">
-			<input type="submit" value="Continue" class="submit-btn-plain" />
+			<input type="submit" value="Continue" class="submit-btn-plain no-marg" />
 		</label>
 	</form>
 
@@ -169,8 +168,8 @@ $j(document).ready(function() {
 		<label>
 			<input name="importXML" type="file" />
 		</label>
-		<label>
-			<input type="submit" value="Import from XML file"  class="submit-btn-plain float-none"/>
+		<label class="clearfix">
+			<input type="submit" value="Import from XML file"  class="submit-btn-plain no-marg"/>
 		</label>
 	</form>
 	<!-- END importXML -->

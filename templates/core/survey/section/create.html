@@ -1,20 +1,17 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" media="screen" href="/css/core/assess.css" />
-<script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
 <script type="text/javascript">
-
 $j(function() {
 
-	$j('.checkbox').click(function() {
-		if ($j('.hide-this').is(":visible")) {
-			$j('.hide-this :input').attr('disabled', 'true');
+	$j('.checkbox').click(function() {	
+		if ($j('.hide-questions').is(":visible")) {
+			$j('.hide-questions :input').attr('disabled', 'true');
 		} else {
-			$j('.hide-this :input').removeAttr('disabled');
+			$j('.hide-questions :input').removeAttr('disabled');	
 		}
-		$j('.hide-this').toggle();
+		$j('.hide-questions').toggle();
 	});
-
-	jQuery.validator.addMethod("combo", function(value, element)
+	
+	jQuery.validator.addMethod("combo", function(value, element) 
 		{
 		if (($j('.checkbox').is(':checked')) && ($j('.pool').val() == ""))
 		{
@@ -23,8 +20,8 @@ $j(function() {
 		else return true;
 	  },
 	  "You've selected random selection of questions. Please enter the number of questions to put in the pool."
-	);
-
+	);	
+	
 	$j('#createSection').validate({
 		rules: {
 			title: {
@@ -36,7 +33,6 @@ $j(function() {
 				combo: true
 			}
 		},
-
 		messages: {
 			title: "Please enter a title",
 			description: "Please enter a description"
@@ -45,58 +41,43 @@ $j(function() {
 });
 </script>
 <!-- END custom_head -->
-<div id="assess">
-	<h1>Create Section in {ASSESS_TITLE}</h1>
-	<div class="col-1">
+<h1>Create Section in {ASSESS_TITLE}</h1>
+<div class="evaluation-content">
+	<h2>Section Details</h2>
+		<form name="create" action="/survey/section/create" id="createSection" method="post">
+		<fieldset class="hide">
+			<input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
+			<input name="section_id" type="hidden" value="{SECTION_ID}" />
+			<input name="sequence" type="hidden" value="{SEQUENCE}" />
+		</fieldset>
+		
+		<label>Section Title
+			<input name="title" type="text" size="35" class="required"/>
+		</label>
 
-		<div class="assess-header">
-			<h2>Section Details</h2>
-			<div class="assess-body">
+		<label>
+			<strong>Shuffle Questions</strong>
+				<input name="random" type="checkbox" value="1" class="checkbox"/><span>Questions should be selected randomly</span>
+			</label>
 
-			<form name="create" action="/survey/section/create" id="createSection" method="post">
-				<fieldset class="hidden">
-					<input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
-					<input name="section_id" type="hidden" value="{SECTION_ID}" />
-					<input name="sequence" type="hidden" value="{SEQUENCE}" />
-				</fieldset>
+			<label class="hide-questions">Total Questions Displayed
+				<input name="pool" disabled="disabled" type="text" class="pool" /> Maximum number of questions to show
+			</label>
+		
 
-				<fieldset>
-					<label>Section Title</label>
-					<label><input name="title" type="text" size="35" class="required"/></label>
-				</fieldset>
-
-				<hr />
-
-				<fieldset>
-					<label>Shuffle Questions</label>
-					<label><input name="random" type="checkbox" value="1" class="checkbox"/> Questions should be selected randomly</label>
-				</fieldset>
-
-				<hr />
-
-				<fieldset class="hide-this">
-					<label>Total Questions Displayed</label>
-					<input name="pool" disabled="disabled" type="text" class="pool" /> Maximum number of questions to show
-				<hr />
-				</fieldset>
-
-				<fieldset>
-					<label>Description</label>
-					<div class="textarea-container">
-						<textarea name="description"></textarea>
-					</div>
-				</fieldset>
-
-				<fieldset>
-					<input type="submit" id="create" value="Create Section" class="submit-btn-plain float-right"/>
-				</fieldset>
-			</form>
+		<label>Description
+			<div class="textarea-container">
+			<textarea name="description"></textarea>
 			</div>
-		</div>
-	</div>
-	<div class="col-2">
-	<!-- BEGIN allQuestions -->
+		</label>
+		
+		<label class="clearfix">
+			<input type="submit" id="create" value="Create Section" class="submit-btn-plain float-right no-marg"/>
+		</label>
+	</form>
+</div>
+<div class="evaluation-menu">
+<!-- BEGIN allQuestions -->
 
-	<!-- END allQuestions -->
-	</div>
+<!-- END allQuestions -->
 </div>

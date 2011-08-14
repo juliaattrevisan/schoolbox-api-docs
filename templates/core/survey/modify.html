@@ -5,30 +5,30 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
 $j(document).ready(function() {
-		/* date picker */
-		$j('#start_date, #finish_date').datepicker({
-			dateFormat: 'dd/mm/yy',
-			showOn: 'both',
-			buttonImage: '/images/core/calendar/calendar-click.png',
-			buttonImageOnly: true,
-            constrainInput: false,
-            onClose: function (string) {
-                var input = $j(this);
+	/* date picker */
+	$j('#start_date, #finish_date').datepicker({
+		dateFormat: 'dd/mm/yy',
+		showOn: 'both',
+		buttonImage: '/images/core/calendar/calendar-click.png',
+		buttonImageOnly: true,
+		constrainInput: false,
+		onClose: function (string) {
+			var input = $j(this);
 
-                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-		});
-		/* date picker */
+			$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+				input.val(data.time);
+			})
+		}
+	});
+	/* date picker */
 
 	$j('.show-duration').click(function() {
-		if ($j('.hide-it').is(':visible')) {
-			$j('.hide-it').hide();
+		if ($j('.edit-duration').is(':visible')) {
+			$j('.edit-duration').toggle();
 			$j('#minHours').val('0');
 			$j('#minDuration').val('00');
 		} else {
-			$j('.hide-it').show();
+			$j('.edit-duration').toggle();
 			$j('#minDuration').val('15');
 		}
 	});
@@ -54,128 +54,130 @@ $j(document).ready(function() {
 });
 </script>
 <!-- END custom_head -->
+<h1>Survey - {ASSESS_TITLE}</h1>
+<div class="evaluation-content">
+	<h2>Create and modify your survey</h2>
+	<form name="create" action="/survey/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">
+		<input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
+		<table class="standardForm" width="100%">
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Title</h4>
+					<em>The name of the test</em>
+					<label>
+						<input name="title" type="text" size="35" maxlength="50" value="{ASSESS_TITLE}" id="title"/>
+					</label>
+				</td>
+			</tr>
+			<tr>
+				<!-- Available from this time -->
+				<td>
+					<h4>Start</h4>
+					<em>Test opens at this time</em>
+					<fieldset>
+					<select name="start[hour]">
+						<!-- BEGIN startHour -->
+						<option value="{START_HOUR_VALUE}" {START_HOUR_SELECTED}>{START_HOUR_VALUE}</option>
+						<!-- END startHour -->
+					</select>
+					<select name="start[minute]">
+						<!-- BEGIN startMinute -->
+						<option value="{START_MINUTE_VALUE}" {START_MINUTE_SELECTED}>{START_MINUTE_VALUE}</option>
+						<!-- END startMinute -->
+					</select>
 
-<div id="assess">
-	<h1>Manage Survey {ASSESS_TITLE}</h1>
-	<div class="col-1">
-		<h2>Create and modify your survey</h2>
-		<form name="create" action="/survey/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">
-			<input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
-			<table class="standardForm" width="100%">
-				<tr>
-					<td class="formLabelWidth">
-						<h4>Title</h4>
-						<em>The name of the test</em>
-						<label>
-							<input name="title" type="text" size="35" maxlength="50" value="{ASSESS_TITLE}" id="title"/>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<!-- Available from this time -->
-					<td>
-						<h4>Start</h4>
-						<em>Test opens at this time</em>
-						<select name="start[hour]">
-							<!-- BEGIN startHour -->
-							<option value="{START_HOUR_VALUE}" {START_HOUR_SELECTED}>{START_HOUR_VALUE}</option>
-							<!-- END startHour -->
-						</select>
-						<select name="start[minute]">
-							<!-- BEGIN startMinute -->
-							<option value="{START_MINUTE_VALUE}" {START_MINUTE_SELECTED}>{START_MINUTE_VALUE}</option>
-							<!-- END startMinute -->
-						</select>
-						<select name="start[meridiem]">
-							<!-- BEGIN startMeridiem -->
-							<option value="{START_MERIDIEM_VALUE}" {START_MERIDIEM_SELECTED}>{START_MERIDIEM_VALUE}</option>
-							<!-- END startMeridiem -->
-						</select>
-						<input name="start[date]" id="start_date" type="text" size="15" maxlength="30" value="{ASSESS_START_DATE}" />
-					</td>
-				</tr>
-				<tr>
-					<!-- Available until this time -->
-					<td>
-						<h4>Finish</h4>
-						<em>Test closes at this time</em>
-						<select name="finish[hour]">
-							<!-- BEGIN finishHour -->
-							<option value="{FINISH_HOUR_VALUE}" {FINISH_HOUR_SELECTED}>{FINISH_HOUR_VALUE}</option>
-							<!-- END finishHour -->
-						</select>
-						<select name="finish[minute]" >
-							<!-- BEGIN finishMinute -->
-							<option value="{FINISH_MINUTE_VALUE}" {FINISH_MINUTE_SELECTED} class="required">{FINISH_MINUTE_VALUE}</option>
-							<!-- END finishMinute -->
-						</select>
-						<select name="finish[meridiem]">
-							<!-- BEGIN finishMeridiem -->
-							<option value="{FINISH_MERIDIEM_VALUE}" {FINISH_MERIDIEM_SELECTED}>{FINISH_MERIDIEM_VALUE}</option>
-							<!-- END finishMeridiem -->
-						</select>
-						<input name="finish[date]" id="finish_date" type="text" size="15" maxlength="30" value="{ASSESS_FINISH_DATE}" />
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<h4>Duration</h4>
-						<em>To set a test duration, tick the box and fill out a time.</em>
-						<label class="float-left">
-							<input type="checkbox" class="float-left show-duration" {ASSESS_DURATION_CHECKED}/>
-						</label>
-						<fieldset class="hide-it float-left">
-							<select name="duration[hour]" id="minHours" class="groupedSelect min-hours">
-								<!-- BEGIN durationHour -->
-								<option value="{DURATION_HOUR_VALUE}" {DURATION_HOUR_SELECTED}>{DURATION_HOUR_VALUE}</option>
-								<!-- END durationHour -->
-							</select>
-							hr
-							<select name="duration[minute]" id="minDuration" class="groupedSelect min-minutes">
-								<!-- BEGIN durationMinute -->
-								<option value="{DURATION_MINUTE_VALUE}" {DURATION_MINUTE_SELECTED}>{DURATION_MINUTE_VALUE}</option>
-								<!-- END durationMinute -->
-							</select>
-							min
-						</fieldset>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<h4>Description</h4>
-						<div class="textarea-container">
-							<textarea name="description">{ASSESS_DESCRIPTION}</textarea>
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<h4>Allow Re-sit</h4>
-						<em>Allow students to take this test multiple times</em>
-						<input name="allow_resit" type="checkbox" value="1" {ALLOW_RESIT_CHECKED}/>
-					</td>
-				</tr>
-			</table>
-			<input type="submit" value="Continue" class="submit-btn-plain" />
-		</form>
+					<select name="start[meridiem]">
+						<!-- BEGIN startMeridiem -->
+						<option value="{START_MERIDIEM_VALUE}" {START_MERIDIEM_SELECTED}>{START_MERIDIEM_VALUE}</option>
+						<!-- END startMeridiem -->
+					</select>
 
-		<div class='float-fix'></div>
+					<input name="start[date]" id="start_date" type="text" size="15" maxlength="30" value="{ASSESS_START_DATE}" />
+					</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<!-- Available until this time -->
+				<td>
+					<h4>Finish</h4>
+					<em>Test closes at this time</em>
+					<select name="finish[hour]">
+						<!-- BEGIN finishHour -->
+						<option value="{FINISH_HOUR_VALUE}" {FINISH_HOUR_SELECTED}>{FINISH_HOUR_VALUE}</option>
+						<!-- END finishHour -->
+					</select>
+					<select name="finish[minute]" >
+						<!-- BEGIN finishMinute -->
+						<option value="{FINISH_MINUTE_VALUE}" {FINISH_MINUTE_SELECTED} class="required">{FINISH_MINUTE_VALUE}</option>
+						<!-- END finishMinute -->
+					</select>
+					<select name="finish[meridiem]">
+						<!-- BEGIN finishMeridiem -->
+						<option value="{FINISH_MERIDIEM_VALUE}" {FINISH_MERIDIEM_SELECTED}>{FINISH_MERIDIEM_VALUE}</option>
+						<!-- END finishMeridiem -->
+					</select>
+					<input name="finish[date]" id="finish_date" type="text" size="15" maxlength="30" value="{ASSESS_FINISH_DATE}" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<h4>Duration</h4>
+					<em>To set a test duration, tick the box and fill out a time.</em>
+					<label class="float-left">
+						<input type="checkbox" class="float-left show-duration" {ASSESS_DURATION_CHECKED}/>
+					</label>
+					<fieldset class="hide float-left edit-duration">
+						<select name="duration[hour]" id="minHours" class="groupedSelect min-hours">
+							<!-- BEGIN durationHour -->
+							<option value="{DURATION_HOUR_VALUE}" {DURATION_HOUR_SELECTED}>{DURATION_HOUR_VALUE}</option>
+							<!-- END durationHour -->
+						</select>
+						hr
+						<select name="duration[minute]" id="minDuration" class="groupedSelect min-minutes">
+							<!-- BEGIN durationMinute -->
+							<option value="{DURATION_MINUTE_VALUE}" {DURATION_MINUTE_SELECTED}>{DURATION_MINUTE_VALUE}</option>
+							<!-- END durationMinute -->
+						</select>
+						min
+					</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<h4>Description</h4>
+					<div class="textarea-container">
+						<textarea name="description">{ASSESS_DESCRIPTION}</textarea>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<h4>Allow Re-sit</h4>
+					<em>Allow students to take this test multiple times</em>
+					<input name="allow_resit" type="checkbox" value="1" {ALLOW_RESIT_CHECKED}/>
+				</td>
+			</tr>
+		</table>
+		<label class="clearfix">
+			<input type="submit" value="Continue" class="submit-btn-plain no-marg" />
+		</label>
+	</form>
 
-		<!-- BEGIN importXML -->
-		<h2>Import an survey from an XML file</h2>
-		<form action="/survey/import/{ASSESS_CATEGORY_ID}" method="post" enctype="multipart/form-data">
-			<label>
-				<input name="importXML" type="file" />
-			</label>
-			<label>
-				<input type="submit" value="Import from XML file"  class="submit-btn-plain float-none"/>
-			</label>
-		</form>
-		<!-- END importXML -->
-	</div>
-	<div class="col-2">
-		<!-- BEGIN allQuestions -->
+	<!-- BEGIN importXML -->
+	<h2>Import an assessment from an XML file</h2>
+	<form action="/survey/import/{ASSESS_CATEGORY_ID}" method="post" enctype="multipart/form-data">
+		<label>
+			<input name="importXML" type="file" />
+		</label>
+		<label class="clearfix">
+			<input type="submit" value="Import from XML file"  class="submit-btn-plain no-marg"/>
+		</label>
+	</form>
+	<!-- END importXML -->
+	
+</div>
+<div class="evaluation-menu">
+	<!-- BEGIN allQuestions -->
 
-		<!-- END allQuestions -->
-	</div>
+	<!-- END allQuestions -->
 </div>

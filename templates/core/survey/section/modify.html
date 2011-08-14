@@ -1,37 +1,35 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" media="screen" href="/css/core/assess.css" />
 <script type="text/javascript">
 
 $j(function() {
-
+		
 	if ($j('.checkbox').attr("checked")) {
-		$j('.hide-this').show();
-		$j('.hide-this :input').removeAttr('disabled');
+		$j('.hide-questions').show();
+		$j('.hide-questions :input').removeAttr('disabled');	
 	}
-
-	$j('.checkbox').click(function() {
-		if ($j('.hide-this').css("display") == "block") {
-			$j('.hide-this').hide();
-			$j('.hide-this :input').attr('disabled', 'true');
+	
+	$j('.checkbox').click(function() {	
+		if ($j('.hide-questions').css("display") == "block") {
+			$j('.hide-questions').hide();
+			$j('.hide-questions :input').attr('disabled', 'true');
 		} else {
-			$j('.hide-this').show();
-			$j('.hide-this :input').removeAttr('disabled');
+			$j('.hide-questions').show();
+			$j('.hide-questions :input').removeAttr('disabled');	
 		}
-
 	});
-
+	
 	jQuery.validator.addMethod(
 	  "combo",
 	  function(value, element) {
-		if ($j('.checkbox').is(':checked'))
+		if (($j('.checkbox').is(':checked')) && ($j('.pool').val() == ""))
 		{
 		  return false;
 		}
 		else return true;
 	  },
 	  "You've selected random selection of questions. Please enter the amount of questions to put in the pool."
-	);
-
+	);	
+	
 	$j('#modifySection').validate({
 		rules: {
 			title: {
@@ -42,7 +40,7 @@ $j(function() {
 				combo: true
 			}
 		},
-
+		
 		messages: {
 			title: "Please enter a title",
 			description: "Please enter a description"
@@ -52,49 +50,43 @@ $j(function() {
 </script>
 <!-- END custom_head -->
 
-<div id="assess">
-	<h1>Modify Section {TITLE} in {ASSESS_TITLE}</h1>
-	<div class="col-1">
-		<div class="assess-header">
-			<h2>Section Details</h2>
-			<div class="assess-body">
-				<form name="create" action="/survey/section/modify" class="standardForm" id="modifySection" method="post">
-					<fieldset class="hidden">
-						<input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
-						<input name="section_id" type="hidden" value="{SECTION_ID}" />
-						<input name="sequence" type="hidden" value="{SEQUENCE}" />
-					</fieldset>
+<h1>Modify Section {TITLE} in {ASSESS_TITLE}</h1>
+<div class="evaluation-content">
+	<h2>Section Details</h2>
+	
+	<form name="create" action="/survey/section/modify" class="" id="modifySection" method="post">
+		<label class="hide">
+			<input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
+			<input name="section_id" type="hidden" value="{SECTION_ID}" />
+			<input name="sequence" type="hidden" value="{SEQUENCE}" />
+		</label>
 
-					<fieldset>
-						<label>Section Title</label>
-						<input name="title" type="text" size="35" value="{TITLE}" />
-					</fieldset>
+		<label>Section Title
+			<input name="title" type="text" size="35" value="{TITLE}" />
+		</label>
+		
 
-					<fieldset>
-						<label>Shuffle Questions</label>
-						<input name="random" type="checkbox" class="checkbox" value="1" {RANDOM_SELECTED} /> Questions should be selected randomly
-					</fieldset>
+		<label><strong>Shuffle Questions</strong>
+			<input name="random" type="checkbox" class="checkbox" value="1" {RANDOM_SELECTED} /><span>Questions should be selected randomly</span>
+		</label>
+	
+		<label class="hide hide-questions">
+			Total Questions Displayed
+			<input name="pool" type="text" disabled="disabled" class="pool number" value="{POOL}"/> Maximum number of questions to show
+		</label>
+	
+		<label>Description
+			<div class="textarea-container"><textarea name="description">{DESCRIPTION}</textarea></div>
+		</label>
+	
+		<label class="clearfix ">
+			<input type="submit" id="create" value="Modify" class="submit-btn-plain no-marg">
+		</label>
+	</form>
+</div>
 
-					<fieldset class="hide-this">
-						<label>Total Questions Displayed</label>
-						<input name="pool" type="text" disabled="disabled" class="pool" value="{POOL}"/> Maximum number of questions to show
-					</fieldset>
+<div class="evaluation-menu">
+<!-- BEGIN allQuestions -->
 
-					<fieldset>
-						<label>Description</label>
-						<div class="textarea-container"><textarea name="description">{DESCRIPTION}</textarea></div>
-					</fieldset>
-
-					<fieldset>
-						<input type="submit" id="create" value="Modify" class="submit-btn-plain">
-					</fieldset>
-				</form>
-			</div>
-		</div>
-	</div>
-	<div class="col-2">
-	<!-- BEGIN allQuestions -->
-
-	<!-- END allQuestions -->
-	</div>
+<!-- END allQuestions -->
 </div>
