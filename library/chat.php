@@ -11,10 +11,14 @@ class Chat extends DeprecatedModel {
     }
 
     /* Get logs */
-    function get_logs ($category_id, $last_poll = null) {
+    function get_logs ($category_id, $last_poll = null, $not_user_id = 0) {
         $query = "SELECT title, firstname, lastname, c.*
                   FROM {$this->_table} c LEFT JOIN user ON c.user_id = user.id
                   WHERE `category_id` = $category_id";
+
+        if ( !empty($not_user_id) ) {
+            $query .= " AND `user_id` != $not_user_id";
+        }
 
         if ($last_poll instanceof DateTime) {
             $query .= " AND `time` > '" . $last_poll->format('Y-m-d H:i:s') . "'";
@@ -48,9 +52,9 @@ class Chat extends DeprecatedModel {
         return $this->create(array(
             'category_id' => $category_id,
             'user_id'     => $user_id,
-            'type'        => scrubTEXT($type),
+            'type'        => $type,
             'time'        => $time->format('Y-m-d H:i:s'),
-            'body'        => scrubTEXT($body)
+            'body'        => $body
         ));
     }
 

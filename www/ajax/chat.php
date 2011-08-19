@@ -12,7 +12,7 @@
 ini_set('display_errors',1);
 error_reporting(E_ALL & ~E_NOTICE);
 
-header("Content-type: application/json");
+header("Content-type: application/json; charset=UTF-8");
 
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
@@ -51,12 +51,10 @@ if ($method == 'send') {
 else if ($method == 'receive') {
 
     if (empty($_POST['last_poll']) || $_POST['last_poll'] == 'null') {
-        $last_poll = new DateTime('-30 minutes');
+        $log = $chat_handler->get_logs($category_id, new DateTime('-30 minutes'));
     } else {
-        $last_poll = new DateTime($_POST['last_poll']);
+        $log = $chat_handler->get_logs($category_id, new DateTime($_POST['last_poll']), $_SESSION['id']);
     }
-
-    $log = $chat_handler->get_logs($category_id, $last_poll);
 
     if (empty($log)) {
         $log = array();

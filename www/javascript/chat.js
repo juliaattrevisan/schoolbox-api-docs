@@ -109,16 +109,25 @@ $.widget("ui.chat",  {
     },
 
     _send: function ($self) {
+        var $d = new Date();
+        var $time = $d.getFullYear() + '-' + $d.getMonth() + '-' + $d.getDay() + ' ' + $d.getHours() + ':' + $d.getMinutes() + ':' + $d.getSeconds();
+
         var $message = {
             method: 'send',
             category_id: $self.options.category_id,
             component_id: $self.options.component_id,
             user_id: $self.options.user_id,
+            user_perm: $self.options.user_perm,
             last_poll: $self.last_poll,
+            name: $self.options.user_name,
+            time: $time,
+            type: 'user',
             body: $self.options.body_el.val()
         };
 
         $($self).trigger('send', null, $message);
+
+        $self._append_message($message);
 
         $.ajax({
             type: 'POST',
