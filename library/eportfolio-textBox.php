@@ -16,15 +16,9 @@ class ePortfolioTextBox extends DeprecatedModel {
 	 * @return array|bool
 	 */
 	public function getByComponentLocationID($componentLocationID) {
-		$query = "SELECT config FROM eportfolio_comp_location WHERE eportfolioComponentLocationID = '$componentLocationID'";
+		$query = "SELECT * FROM eportfolio_textBox WHERE componentLocationID = '$componentLocationID'";
 
-		$record = unserialize($this->db->getOne($query));
-
-		if ($record) {
-			return $this->getByID($record['textBoxID']);
-		}
-
-		return false;
+		return $this->db->getRow($query);
 	}
 
 	/**
