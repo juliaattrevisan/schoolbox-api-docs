@@ -12,29 +12,12 @@ $submission_box_handler = new Submission;
 
 if(is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour']) {
 
-    /* Modify existing submission box */
-    $open_date = new DateTime( str_replace('/','-',$_POST['open_date']));
-    $due_date  = new DateTime( str_replace('/','-',$_POST['due_date']));
-    $late_date = new Datetime( str_replace('/','-',$_POST['late_date']));
-
-    if (!$open_date || !$due_date || !$late_date) {
-        error(15);
-    }
-
-    if ($_POST['due_period'] == 'pm')
-        $due_date->setTime($_POST['due_hour']+12, $_POST['due_minute']);
-    else
-        $due_date->setTime($_POST['due_hour'], $_POST['due_minute']);
-
-    if ($_POST['open_period'] == 'pm')
-        $open_date->setTime($_POST['open_hour']+12, $_POST['open_minute']);
-    else
-        $open_date->setTime($_POST['open_hour'], $_POST['open_minute']);
-
-    if ($_POST['late_period'] == 'pm')
-        $late_date->setTime($_POST['late_hour']+12, $_POST['late_minute']);
-    else
-        $late_date->setTime($_POST['late_hour'], $_POST['late_minute']);
+	/* Prevent 12pm to 12am-next-day bug by checking that the hour submitted is
+	 * not equal to 12. This stops the date incrementing to the next day.
+	 */
+	$due_date = getDateTimeByComponents($_POST['due_date'], $_POST['due_hour'], $_POST['due_minute'], $_POST['due_period']);
+	$late_date = getDateTimeByComponents($_POST['late_date'], $_POST['late_hour'], $_POST['late_minute'], $_POST['late_period']);
+	$open_date = getDateTimeByComponents($_POST['open_date'], $_POST['open_hour'], $_POST['open_minute'], $_POST['open_period']);
 
     /* Late date is greater than due date */
     if (!empty($_POST['accept_submission']) && $due_date > $late_date) {
@@ -44,9 +27,9 @@ if(is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_POS
     $submission_box = array(
         'id'                => $_POST['id'],
         'accept_submission' => !empty($_POST['accept_submission']) ? true : false,
-        'open_date'         => $open_date->format(Cfg::get('date_database')),
-        'date'              => $due_date->format(Cfg::get('date_database')),
-        'late_date'         => $late_date->format(Cfg::get('date_database')),
+        'open_date'         => $open_date,
+        'date'              => $due_date,
+        'late_date'         => $late_date,
         'name'              => $_POST['name'],
         'description'       => $_POST['description'],
         'type'              => $_POST['type'],
@@ -72,35 +55,17 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
                 'owner'		=> $_SESSION['id'],
         );
         $fileId = $fileHandler->create($data, $_FILES['file']);
-
     }
     else {
         $fileId = $_POST['fileId'];
     }
 
-    /* Date and Time */
-    $open_date = new DateTime( str_replace('/','-',$_POST['open_date']));
-    $due_date  = new DateTime( str_replace('/','-',$_POST['due_date']));
-    $late_date = new Datetime( str_replace('/','-',$_POST['late_date']));
-
-    if (!$open_date || !$due_date || !$late_date) {
-        error(15);
-    }
-
-    if ($_POST['due_period'] == 'pm')
-        $due_date->setTime($_POST['due_hour']+12, $_POST['due_minute']);
-    else
-        $due_date->setTime($_POST['due_hour'], $_POST['due_minute']);
-
-    if ($_POST['open_period'] == 'pm')
-        $open_date->setTime($_POST['open_hour']+12, $_POST['open_minute']);
-    else
-        $open_date->setTime($_POST['open_hour'], $_POST['open_minute']);
-
-    if ($_POST['late_period'] == 'pm')
-        $late_date->setTime($_POST['late_hour']+12, $_POST['late_minute']);
-    else
-        $late_date->setTime($_POST['late_hour'], $_POST['late_minute']);
+	/* Prevent 12pm to 12am-next-day bug by checking that the hour submitted is
+	 * not equal to 12. This stops the date incrementing to the next day.
+	 */
+	$due_date = getDateTimeByComponents($_POST['due_date'], $_POST['due_hour'], $_POST['due_minute'], $_POST['due_period']);
+	$late_date = getDateTimeByComponents($_POST['late_date'], $_POST['late_hour'], $_POST['late_minute'], $_POST['late_period']);
+	$open_date = getDateTimeByComponents($_POST['open_date'], $_POST['open_hour'], $_POST['open_minute'], $_POST['open_period']);
 
     /* Late date is greater than due date */
     if (!empty($_POST['accept_submission']) && $due_date > $late_date) {
@@ -111,9 +76,9 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
     $submission_box = array(
         'category'          => $_POST['category'],
         'accept_submission' => !empty($_POST['accept_submission']) ? true : false,
-        'open_date'         => $open_date->format(Cfg::get('date_database')),
-        'date'              => $due_date->format(Cfg::get('date_database')),
-        'late_date'         => $late_date->format(Cfg::get('date_database')),
+        'open_date'         => $open_date,
+        'date'              => $due_date,
+        'late_date'         => $late_date,
         'name'              => $_POST['name'],
         'description'       => $_POST['description'],
         'type'              => $_POST['type'],

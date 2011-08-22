@@ -4,7 +4,7 @@
 *         Copyright (c) 2003-2004 Lektec Consulting         *
 *                                                           *
 *	A collection of standard common functions				*
-*   $Id: stdfuncs.php,v 1.5 2004/04/27 05:16:48 jleckie Exp $						    
+*   $Id: stdfuncs.php,v 1.5 2004/04/27 05:16:48 jleckie Exp $
 *                                                           *
 ************************************************************/
 
@@ -13,13 +13,13 @@ function conType() {
         //detect connection type
         $port = getenv("SERVER_PORT");
         if($port == 80)
-                $contype = "http://"; 
+                $contype = "http://";
         else if($port == 443)
                 $contype = "https://";
-        
+
         return $contype;
 }
-        
+
 //Function for handling error conditions
 function error($ec, $message="") {
 	global $page;
@@ -33,10 +33,10 @@ function error($ec, $message="") {
 		$page->error($ec, $message);
 	}
 }
- 
+
 //Function for redirecting to a specified file
 function localRedir($file) {
-        $contype = conType(); 
+        $contype = conType();
         header("Location: ".$contype.$_SERVER['HTTP_HOST'].$file);
         exit;
 }
@@ -63,14 +63,14 @@ function goLoginPage()
 }
 
 //function for returning user ip (tries to work around issues with proxies)
-function getIP() 
+function getIP()
 {
 	if ($_SERVER['HTTP_CLIENT_IP']) $ip = $_SERVER['HTTP_CLIENT_IP'];
 	else if($_SERVER['HTTP_X_FORWARDED_FOR']) $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 	else if($_SERVER['REMOTE_ADDR']) $ip = $_SERVER['REMOTE_ADDR'];
 	else $ip = "UNKNOWN";
 	return $ip;
-} 
+}
 
 //converts a size integer to human readable size
 function bytesToString($size) {
@@ -89,8 +89,8 @@ function scrubHTML($html) {
 	$config = HTMLPurifier_Config::createDefault();
     $config->set('Filter', 'YouTube', true);
 	$config->set('Filter', 'Custom', array(new HTMLPurifier_Filter_Quicktime(),
-										   new HTMLPurifier_Filter_Shockwave(), 
-										   new HTMLPurifier_Filter_Flash(), 
+										   new HTMLPurifier_Filter_Shockwave(),
+										   new HTMLPurifier_Filter_Flash(),
 										   new HTMLPurifier_Filter_WindowsMedia(),
 										   new HTMLPurifier_Filter_Real()));
     $config->set('Attr', 'AllowedFrameTargets', array('_blank', '_self', '_parent', '_top'));
@@ -99,7 +99,7 @@ function scrubHTML($html) {
 }
 
 function scrubTEXT($text) {
- 
+
 	//cleans plain text of all nasty stuff
 	//can be used on input to database or output
 
@@ -121,7 +121,7 @@ function scrubTEXT($text) {
  * @return	int					unix timestamp or false if invalid date given
  */
 function ausDateToUnix($date, $incTime=false) {
-	
+
 	if (strstr($date, '-')) {
 		$seperator = '-';
 	} else if (strstr($date, '/')) {
@@ -129,9 +129,9 @@ function ausDateToUnix($date, $incTime=false) {
 	} else {
 		return false;
 	}
-	
+
 	$hour = $minute = 0;
-	
+
 	if ($incTime) {
 		$parts = explode(' ', $date);
 		if (count($parts) == 3) {
@@ -145,23 +145,23 @@ function ausDateToUnix($date, $incTime=false) {
 			}
 			else if($meridiem == 'am' && $hour == 12) {
 				$hour = 0;
-			} 
+			}
 		}
 	}
-	
+
 	$parts = explode($seperator, $date);
 	$unixDate = mktime($hour, $minute, 0, $parts[1], $parts[0], $parts[2]);
-	
+
 	return $unixDate;
 }
 
 function outputDate($format, $date) {
 	//this function attempts to remove output issues associated with mysql dates
 	//removes null dates and times
-	
+
 	if($date == '0000-00-00' || $date == '0000-00-00 00:00:00' || $date < 1)
 		return '';
-	
+
 	//if format contains a time check if it is null if so remove the time from the format
 	if(strpos($format, ':')) {
 		$time = date('g:ia',$date);
@@ -170,7 +170,7 @@ function outputDate($format, $date) {
 			return date($format, $date);
 		}
 	}
-	
+
 	return date($format, $date);
 }
 
@@ -181,17 +181,17 @@ function isEmail($email) {
 function outputCSV($line, $delimiter=',', $enclosure='"') {
    // No leading delimiter
    $writeDelimiter = FALSE;
-  
+
    foreach($line as $dataElement){
 	   // Replaces a double quote with two double quotes
 	   $dataElement=str_replace("\"", "\"\"", $dataElement);
-	  
+
 	   // Adds a delimiter before each field (except the first)
 	   if($writeDelimiter) $string .= $delimiter;
-	  
+
 	   // Encloses each field with $enclosure and adds it to the string
 	   $string .= $enclosure . $dataElement . $enclosure;
-	  
+
 	   // Delimiters are used every time except the first.
 	   $writeDelimiter = TRUE;
    }
@@ -203,10 +203,10 @@ function convertFromURL($string)
 	 if (get_magic_quotes_gpc()) {
 			 $string = stripslashes($string);
 	}
-	
+
 	//Assumption: no '-' in names all first chars are capitals
 	//$temp = str_replace('and','%26',$string);
-	
+
 	return urldecode(str_replace(array('-','^'), array(' ','&'), $string));
 
 }
@@ -222,7 +222,7 @@ function cutString($content, $chars) {
 	$length = strlen($content);
 
 	return $summary . (strlen($content) > strlen($summary) ? ".." : "");
-	
+
 }
 
 function shortenName($name, $length) {
@@ -234,7 +234,7 @@ function shortenName($name, $length) {
 		$cutOut = $currentLength - $length + 3;
 		$endPoint = $currentLength - ceil(($currentLength - $cutOut) * 0.25);
 		$startPoint = ceil($endPoint - $cutOut);
-		
+
 		return substr($name, 0, $startPoint) . '...' . substr($name, $endPoint);
 	}
 }
@@ -243,7 +243,7 @@ function cutSentence($content, $chars) {
 	/* Cut off a summary at the fullstop within the character limit, alternatively just at the word */
 	if(strlen($content) < $chars)
 		return $content;
-		
+
 	$summary=substr($content, 0, $chars);
 	$position=strrpos($summary, ".")+1;
 	$positionQ = strrpos($summary, "?")+1;
@@ -276,10 +276,10 @@ function delfile($str)
     foreach(glob($str) as $fn) {
         unlink($fn);
     }
-} 
+}
 
 function isLocalURL($url)
-{	
+{
 	//returns true if the url is for a local page
     list($hostname, $domain) = explode('.',$_SERVER['HTTP_HOST'],2);
 
@@ -343,7 +343,7 @@ function formatEmail($email) {
 	}
 	else if($email['alt_email'])
 		return $email['alt_email'];
-	else 
+	else
 		return false;
 }
 
@@ -407,15 +407,15 @@ function plural($num) {
 }
 
 function getRelativeTime($date, $now = 0, $prefix = 'on', $suffix = 'ago') {
-	
-	if(!$now) 
+
+	if(!$now)
 		$now = time();
-	
+
 	if(!is_numeric($date))
-		$date = strtotime($date);		
-		
+		$date = strtotime($date);
+
 	$diff = $now - $date;
-	
+
 	if ($diff<60)
 		return $diff . " second" . plural($diff) . " " . $suffix;
 	$diff = round($diff/60);
@@ -495,4 +495,16 @@ function relativeLinkRegex($url) {
 	return $url;
 }
 
+/**
+ * Converts component-based date/time into database-friendly format
+ *
+ * @param  $date
+ * @param  $hour
+ * @param  $minute
+ * @param  $period
+ * @return string
+ */
+function getDateTimeByComponents($date, $hour, $minute, $period) {
+	return date(Cfg::get('date_database'), strtotime(scrubTEXT(str_replace('/', '-', $date) . " {$hour}:{$minute}{$period}")));
+}
 ?>
