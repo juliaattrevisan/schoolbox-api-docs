@@ -35,6 +35,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 }
 
 $surveyExporter = new SurveyExporter($assess, $factory, new SurveySection(), new SurveyAttempt(), $questionHandler);
+$surveyExporter->setLegendHTML(true);
 
 /* Optionally filter by question
  */

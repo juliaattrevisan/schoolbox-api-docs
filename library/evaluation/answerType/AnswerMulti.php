@@ -247,7 +247,12 @@ abstract class AnswerMulti extends EvaluationAnswer {
 		$data = unserialize($response['response']);
 
 		if (is_array($data)) {
-			$data = implode(', ', $data);
+			if ($this->getLegendHTML() !== false) {
+				$data = '<ul><li>' . implode('</li><li>', $data) . '</li></ul>';
+			}
+			else {
+				$data = strip_tags(implode(', ', $data));
+			}
 		}
 
 		return $data;

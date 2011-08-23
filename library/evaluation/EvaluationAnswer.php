@@ -12,15 +12,38 @@ abstract class EvaluationAnswer extends DeprecatedModel {
     public $_table = 'assess_answer';
     public $_index = 'answer_id';
     public $responseHandler;
-
     protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer', 'deleted_at');
 
+	/* Whether or not to include HTML formatting when exporting CSV results
+	 */
+	protected $legendHTML = false;
+
 	/**
+	 * Constructor.
+	 *
 	 * Run parent constructor
 	 */
     public function __construct() {
         parent::DeprecatedModel();
     }
+
+	/**
+	 * Sets legendHTML
+	 *
+	 * @return
+	 */
+	public function setLegendHTML($val) {
+		$this->legendHTML = $val;
+	}
+
+	/**
+	 * Gets legendHTML
+	 *
+	 * @return
+	 */
+	public function getLegendHTML() {
+		return $this->legendHTML;
+	}
 
     /**
      * Gets the Answer record for a particular Question.

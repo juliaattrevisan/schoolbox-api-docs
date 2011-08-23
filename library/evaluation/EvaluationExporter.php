@@ -3,13 +3,42 @@
 class EvaluationExporter {
 	protected $sectionValues = array();
 	protected $filterByQuestion = false;
+	protected $legendHTML = false;
 
+	/**
+	 * Constructor
+	 *
+	 * @param  $assess
+	 * @param  $factory
+	 * @param  $sectionHandler
+	 * @param  $attemptHandler
+	 * @param  $questionHandler
+	 */
 	public function __construct($assess, $factory, $sectionHandler, $attemptHandler, $questionHandler) {
 		$this->setAssessID($assess['assess_id']);
 		$this->setFactory($factory);
 		$this->setSectionHandler($sectionHandler);
 		$this->setAttemptHandler($attemptHandler);
 		$this->setQuestionHandler($questionHandler);
+	}
+
+	/**
+	 * Sets legendHTML
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	public function setLegendHTML($val) {
+		$this->legendHTML = $val;
+	}
+
+	/**
+	 * Gets legendHTML
+	 *
+	 * @return bool
+	 */
+	public function getLegendHTML() {
+		return $this->legendHTML;
 	}
 
 	/**
@@ -250,9 +279,14 @@ class EvaluationExporter {
 							if ($allQuestions[$i]['type_id']) {
 								$answerHandler = $this->getFactory()->createAnswerModel($allQuestions[$i]['type_id']);
 
+								/* Specify whether to include html formatting in
+								 * this output
+								 */
+								$answerHandler->setLegendHTML($this->getLegendHTML());
+
 								/* Load answer template into answerOption block
 								 */
-								$responseValues = strip_tags(str_replace("\t", '', $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $allQuestions[$i]['question_id'])));
+								$responseValues = str_replace("\t", '', $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $allQuestions[$i]['question_id']));
 							}
 
 							$this->sectionValues[$k]['questions'][$i]['attempts'][$j]['name'] = $currentAttempt['firstname'] . ' ' . $currentAttempt['lastname'];
