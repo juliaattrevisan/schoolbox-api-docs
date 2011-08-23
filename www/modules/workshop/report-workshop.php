@@ -35,7 +35,7 @@ if (is_numeric($_GET['workshopID'])) {
 							$workshop['end'],
 							);
 
-			$string .= outputCSV($output)."\n";
+			$string .= TextFormatter::outputCSV($output)."\n";
 		}
 	}
 

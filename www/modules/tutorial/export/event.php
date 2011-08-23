@@ -21,7 +21,7 @@ $eventList = $eventHandler->getAll('all', 'date', 'asc', $user['uid']);
 
 if (is_array($eventList)) {
 	foreach ($eventList as $event) {
-		
+
 		$output = array($event['eventID'],
 						outputDate('Y-m-d', $event['date']),
 						scrubText($event['name']),
@@ -34,9 +34,9 @@ if (is_array($eventList)) {
 						scrubText($event['tutorName2']),
 						$event['cancelled'] == 'true' ? 'Cancelled' : '',
 						);
-		
-		$line .= outputCSV($output)."\n";		
-		
+
+		$line .= TextFormatter::outputCSV($output)."\n";
+
 	}
 
 }

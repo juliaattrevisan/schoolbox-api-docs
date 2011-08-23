@@ -16,7 +16,7 @@ $string = "Synergy ID,Firstname,Surname,Email,Campus,Session 1,Session 1 Room,Se
 $userList = $workshopHandler->getAllUsers();
 if (is_array($userList)) {
 	foreach ($userList as $user) {
-		
+
 		$workshopList = $workshopHandler->getByUser($user['id']);
 		$session = array();
 		if (is_array($workshopList)) {
@@ -24,7 +24,7 @@ if (is_array($userList)) {
 				$session[$workshop['sessionID']] = $workshop;
 			}
 		}
-		
+
 		$output = array($user['synergy_id'],
 						$user['firstname'],
 						$user['lastname'],
@@ -39,14 +39,14 @@ if (is_array($userList)) {
 						$session[4]['title'],
 						$session[4]['room'],
 						);
-		
-		$string .= outputCSV($output)."\n";
+
+		$string .= TextFormatter::outputCSV($output)."\n";
 	}
 }
 
 header('Content-type: text/csv');
 header("Pragma: ");
-header("Cache-control: ");	
+header("Cache-control: ");
 header('Content-Disposition: inline; filename="participant-list-all.csv"');
 print $string;
 

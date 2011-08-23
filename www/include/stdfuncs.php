@@ -119,26 +119,6 @@ function isValidEmail($email) {
 	return false;
 }
 
-function outputCSV($line, $delimiter=',', $enclosure='"') {
-   // No leading delimiter
-   $writeDelimiter = FALSE;
-
-   foreach($line as $dataElement){
-	   // Replaces a double quote with two double quotes
-	   $dataElement=str_replace("\"", "\"\"", $dataElement);
-
-	   // Adds a delimiter before each field (except the first)
-	   if($writeDelimiter) $string .= $delimiter;
-
-	   // Encloses each field with $enclosure and adds it to the string
-	   $string .= $enclosure . $dataElement . $enclosure;
-
-	   // Delimiters are used every time except the first.
-	   $writeDelimiter = TRUE;
-   }
-	return $string;
-}
-
 function formatName($userInfo, $format = NULL){
 	// Check for custom format
 	if(empty($format)){

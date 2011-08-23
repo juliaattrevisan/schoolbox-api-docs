@@ -25,19 +25,19 @@ $line = "PortalID,SynergyID,Title,Firstname,Surname,Email,Marked,Tutorial,Code,T
 $tutorList = $eventHandler->getTutorList();
 if (is_array($tutorList)) {
 	foreach ($tutorList as $tutor) {
-	
+
 		$user = $userHandler->getBySynergy($tutor['id']);
 		if (isset($user['uid'])) {
 			$eventList = $eventHandler->getByTutor($user['uid'], $from, $to);
-			
+
 			if (is_array($eventList)) {
 				foreach ($eventList as $event) {
-				
+
 					if ($event['tutor1ID'] == $user['uid'])
 						$processed = $event['tutor1Processed'];
 					else
 						$processed = $event['tutor2Processed'];
-					
+
 					$output = array($user['uid'],
 								  	$user['synergy_id'],
 									$user['title'],
@@ -56,11 +56,11 @@ if (is_array($tutorList)) {
 									number_format($event['hours'], 2),
 									'PROCESSED_SELECTED' => $processed == 'true' ? 'Processed' : '',
 									);
-					
-					$line .= outputCSV($output)."\n";
+
+					$line .= TextFormatter::outputCSV($output)."\n";
 				}
-				
-				
+
+
 			}
 		}
 	}
