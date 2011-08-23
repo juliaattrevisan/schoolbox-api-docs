@@ -295,7 +295,7 @@ if (!empty($result['link'])) {
             $link['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
 
         $page->setVar(array(
-            'LINK_URL'         => isLocalURL($link['url']) ? relativeURL($link['url']) : '/redir.php?url='.base64_encode($link['url']),
+            'LINK_URL'         => Url::isLocalURL($link['url']) ? Url::relativeURL($link['url']) : '/redir.php?url='.base64_encode($link['url']),
             'LINK_ICON'        => $link['iconFile'],
             'LINK_DESCRIPTION' => scrubTEXT($link['description']),
             'LINK_COMMENT'     => TextFormatter::cutSentence(scrubTEXT($link['comment']), 150),

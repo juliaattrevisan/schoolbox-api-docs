@@ -521,8 +521,8 @@ class SitePage extends Page {
            $this->db->query($query);
            if($this->db->countRows() > 0){
                while($link = $this->db->getNextArray()){
-                   if(isLocalURL($link['url'])){
-                       $this->setVar("MLINK", "<a href=\"".relativeURL($link['url'])."\"><span>".scrubTEXT($link['description'])."</span></a>");
+                   if(Url::isLocalURL($link['url'])){
+                       $this->setVar("MLINK", "<a href=\"".Url::relativeURL($link['url'])."\"><span>".scrubTEXT($link['description'])."</span></a>");
                    }
                    else {
                                        $this->setVar("MLINK", "<a href=\"/redir.php?url=".base64_encode($link['url'])."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");

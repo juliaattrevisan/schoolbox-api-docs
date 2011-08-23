@@ -60,8 +60,6 @@ function getIP()
 	return $ip;
 }
 
-
-
 function scrubHTML($html) {
 	require_once dirname(__FILE__) . '/../../include/HTMLPurifier/HTMLPurifier.auto.php';
 
@@ -91,6 +89,95 @@ function scrubTEXT($text) {
 	return $text;
 }
 
+/**
+ * Check if an email address is valid. Stolen and adapted from the Ormond
+ * ContactForm class.
+ *
+ * This should obsolete isEmail()
+ *
+ * @return bool
+ */
+function isValidEmail($email) {
+	if (!preg_match('/^([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}$/', $email)) {
+		return false;
+	}
+
+	/* Do domain lookup
+	 */
+	list($alias, $domain) = explode('@', $email);
+
+	/* This prevents appending of localhost to lookup
+	 */
+	$domain .= '.';
+
+	/* Check for mx records or that it resolves
+	 */
+	if (getmxrr($domain, $temp) || checkdnsrr($domain, 'ANY')) {
+		return true;
+	}
+
+	return false;
+}
+
+function outputCSV($line, $delimiter=',', $enclosure='"') {
+   // No leading delimiter
+   $writeDelimiter = FALSE;
+
+   foreach($line as $dataElement){
+	   // Replaces a double quote with two double quotes
+	   $dataElement=str_replace("\"", "\"\"", $dataElement);
+
+	   // Adds a delimiter before each field (except the first)
+	   if($writeDelimiter) $string .= $delimiter;
+
+	   // Encloses each field with $enclosure and adds it to the string
+	   $string .= $enclosure . $dataElement . $enclosure;
+
+	   // Delimiters are used every time except the first.
+	   $writeDelimiter = TRUE;
+   }
+	return $string;
+}
+
+function formatName($userInfo, $format = NULL){
+	// Check for custom format
+	if(empty($format)){
+		$format = Cfg::get('name_format');
+	}
+
+    /* Replace tags */
+    preg_match_all('|{\w+}|', $format, $tags);
+
+    if (empty($tags) || empty($userInfo)) {
+        return 'Unknown User';
+    }
+
+    foreach ($tags[0] as $tag) {
+        $key = trim($tag, '{}');
+
+        if (is_string($userInfo[$key])) {
+            $value = $userInfo[$key];
+        } else {
+            $value = '';
+        }
+
+        $format = str_replace($tag, $value, $format);
+    }
+    if(trim($format))
+        return $format;
+    else
+        return 'Unknown User';
+}
+
+function formatEmail($email) {
+	if($email['local_email']) {
+			return $email['username']."@".Cfg::get('mail_address');
+	}
+	else if($email['alt_email'])
+		return $email['alt_email'];
+	else
+		return false;
+}
 
 /*
  * convert an australian date to a unixtimestamp
@@ -154,255 +241,12 @@ function outputDate($format, $date) {
 }
 
 /**
- * Unused.
+ * Pluralise something. Used in getRelativeTime()
  *
- * @param  $email
- * @return int
- */
-//function isEmail($email) {
-//	return eregi("^[\w]+([\w\.\-]+)*@[\w]+(\.[\w]+)*(\.[a-z]{2,3})$",$email);
-//}
-
-/**
- * Check if an email address is valid. Stolen and adapted from the Ormond
- * ContactForm class.
- *
- * This should obsolete isEmail()
- *
- * @return bool
- */
-function isValidEmail($email) {
-	if (!preg_match('/^([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}$/', $email)) {
-		return false;
-	}
-
-	/* Do domain lookup
-	 */
-	list($alias, $domain) = explode('@', $email);
-
-	/* This prevents appending of localhost to lookup
-	 */
-	$domain .= '.';
-
-	/* Check for mx records or that it resolves
-	 */
-	if (getmxrr($domain, $temp) || checkdnsrr($domain, 'ANY')) {
-		return true;
-	}
-
-	return false;
-}
-
-function outputCSV($line, $delimiter=',', $enclosure='"') {
-   // No leading delimiter
-   $writeDelimiter = FALSE;
-
-   foreach($line as $dataElement){
-	   // Replaces a double quote with two double quotes
-	   $dataElement=str_replace("\"", "\"\"", $dataElement);
-
-	   // Adds a delimiter before each field (except the first)
-	   if($writeDelimiter) $string .= $delimiter;
-
-	   // Encloses each field with $enclosure and adds it to the string
-	   $string .= $enclosure . $dataElement . $enclosure;
-
-	   // Delimiters are used every time except the first.
-	   $writeDelimiter = TRUE;
-   }
-	return $string;
-}
-
-/**
- * Unused.
- *
- * @param  $string
+ * @param  $num
  * @return string
  */
-//function convertFromURL($string)
-//{
-//	 if (get_magic_quotes_gpc()) {
-//			 $string = stripslashes($string);
-//	}
-//
-//	//Assumption: no '-' in names all first chars are capitals
-//	//$temp = str_replace('and','%26',$string);
-//
-//	return urldecode(str_replace(array('-','^'), array(' ','&'), $string));
-//
-//}
-
-function convertToURL($string)
-{
-	return strtolower(preg_replace(array("/[^a-zA-Z\d\s\-\+\/]*/", "/(\s|-|\/)+/", "/\+/"), array("", "-", "p"), trim($string)));
-}
-
-/**
- * Unused.
- *
- * @param  $name
- * @param  $length
- * @return string
- */
-//function shortenName($name, $length) {
-//	/* shorten a string by replacing a portion of it with '...' */
-//	$currentLength = strlen($name);
-//	if ($currentLength <= $length)
-//		return $name;
-//	else {
-//		$cutOut = $currentLength - $length + 3;
-//		$endPoint = $currentLength - ceil(($currentLength - $cutOut) * 0.25);
-//		$startPoint = ceil($endPoint - $cutOut);
-//
-//		return substr($name, 0, $startPoint) . '...' . substr($name, $endPoint);
-//	}
-//}
-
-/**
- * Unused.
- *
- * @param  $str
- * @return void
- */
-//function delfile($str)
-//{
-//    foreach(glob($str) as $fn) {
-//        unlink($fn);
-//    }
-//}
-
-function isLocalURL($url)
-{
-	//returns true if the url is for a local page
-    list($hostname, $domain) = explode('.',$_SERVER['HTTP_HOST'],2);
-
-    $pattern = '#^(http(s)?://)('.$hostname.')|('.$_SERVER['HTTP_HOST'].')|('.Cfg::get('site_hostname').'(.'.Cfg::get('site_domain').'))/(.*)?#i';
-
-    return preg_match($pattern, $url);
-
-}
-
-function relativeURL($url) {
-    list($hostname, $domain) = explode('.',$_SERVER['HTTP_HOST'],2);
-
-	/* Takes into account subdomain name e.g. ilearn/ and ilearn.joeys
-	 * (that originally caused the issue with links not being correct)
-	 */
-    $hosts = array(
-        'http://' . Cfg::get('site_hostname') . '.' . Cfg::get('site_domain'),
-        'https://' . Cfg::get('site_hostname'). '.' . Cfg::get('site_domain'),
-        'http://' . $_SERVER['HTTP_HOST'],
-        'https://' . $_SERVER['HTTP_HOST'],
-        'http://' . Cfg::get('site_hostname'),
-        'https://' . Cfg::get('site_hostname'),
-    );
-
-    return str_replace($hosts, '', $url);
-}
-
-function formatName($userInfo, $format = NULL){
-	// Check for custom format
-	if(empty($format)){
-		$format = Cfg::get('name_format');
-	}
-
-    /* Replace tags */
-    preg_match_all('|{\w+}|', $format, $tags);
-
-    if (empty($tags) || empty($userInfo)) {
-        return 'Unknown User';
-    }
-
-    foreach ($tags[0] as $tag) {
-        $key = trim($tag, '{}');
-
-        if (is_string($userInfo[$key])) {
-            $value = $userInfo[$key];
-        } else {
-            $value = '';
-        }
-
-        $format = str_replace($tag, $value, $format);
-    }
-    if(trim($format))
-        return $format;
-    else
-        return 'Unknown User';
-}
-
-function formatEmail($email) {
-	if($email['local_email']) {
-			return $email['username']."@".Cfg::get('mail_address');
-	}
-	else if($email['alt_email'])
-		return $email['alt_email'];
-	else
-		return false;
-}
-
-function isUrl($url) {
-	$cmp = @parse_url($url);
-	if (is_array($cmp) && isset($cmp['host'])){
-		return true;
-	}
-	return false;
-}
-
-if (!function_exists('json_encode'))
-{
-  function json_encode($a=false)
-  {
-    if (is_null($a)) return 'null';
-    if ($a === false) return 'false';
-    if ($a === true) return 'true';
-    if (is_scalar($a))
-    {
-      if (is_float($a))
-      {
-        // Always use "." for floats.
-        return floatval(str_replace(",", ".", strval($a)));
-      }
-
-      if (is_string($a))
-      {
-        static $jsonReplaces = array(array("\\", "/", "\n", "\t", "\r", "\b", "\f", '"'), array('\\\\', '\\/', '\\n', '\\t', '\\r', '\\b', '\\f', '\"'));
-        return '"' . str_replace($jsonReplaces[0], $jsonReplaces[1], $a) . '"';
-      }
-      else
-        return $a;
-    }
-    $isList = true;
-    for ($i = 0, reset($a); $i < count($a); $i++, next($a))
-    {
-      if (key($a) !== $i)
-      {
-        $isList = false;
-        break;
-      }
-    }
-    $result = array();
-    if ($isList)
-    {
-      foreach ($a as $v) $result[] = json_encode($v);
-      return '[' . join(',', $result) . ']';
-    }
-    else
-    {
-      foreach ($a as $k => $v) $result[] = json_encode($k).':'.json_encode($v);
-      return '{' . join(',', $result) . '}';
-    }
-  }
-}
-
-
-
-	/**
-	 * Pluralise something. Used in getRelativeTime()
-	 *
-	 * @param  $num
-	 * @return string
-	 */
-	function plural($num) {
+function plural($num) {
 		if ($num != 1) {
 			return 's';
 		}
@@ -438,66 +282,6 @@ function getRelativeTime($date, $now = 0, $prefix = 'on', $suffix = 'ago') {
 		return $diff . " weeks " . $suffix;
 	return $prefix.' '.date(Cfg::get('date_notime'), $date);
 }
-
-/**
- * Unused.
- */
-//function relativeLinkRegex($url) {
-//	/* Local url:
-//	 * http://ilearn
-//	 * http://ilearn/
-//	 * http://ilearn/test/blah
-//	 */
-//	if (preg_match('#^(http://|https://)([^\.]+)/(.*)?#i', $url, $matches) || preg_match('#^(http://|https://)([^\.]+)$#i', $url, $matches)) {
-//
-//		/* Remove unused matches
-//		 */
-//		unset($matches[0]);
-//		unset($matches[1]);
-//
-//		/* Remove empty elements
-//		 */
-//		foreach(array_keys($matches, '') as $element) {
-//			unset($matches[$element]);
-//		}
-//
-//		$url = '/' . implode('/', $matches);
-//	}
-//
-//	/* Local url:
-//	 * //ilearn
-//	 * //ilearn/test/blah
-//	 */
-//	else if (preg_match('#^//(.*)?#i', $url, $matches)) {
-//		$url = $matches[0];
-//	}
-//
-//	/* Local url:
-//	 * ilearn
-//	 * ilearn/test/blah
-//	 */
-//	else if (preg_match('#^([^\.]+)$#', $url, $matches)) {
-//		$url = '/' . $matches[0];
-//	}
-//
-//	/* External url:
-//	 * google.com
-//	 * www.google.com
-//	 * http://www.google.com
-//	 * https://www.google.com
-//	 */
-//	else {
-//		/* Normal modification to url
-//		 * Just return url if it includes protocol
-//		 * Otherwise add http protocol if it was not found
-//		 */
-//		if (!preg_match('#http(s?)://(.*)#i', $url, $matches)) {
-//			$url = 'http://' . $url;
-//		}
-//	}
-//
-//	return $url;
-//}
 
 /**
  * Converts component-based date/time into database-friendly format

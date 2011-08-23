@@ -20,7 +20,7 @@ $image = $this->db->getRow($query);
 
 if (!is_array($image)) {
 
-    /* Try to find another image if we can't find the configured one. 
+    /* Try to find another image if we can't find the configured one.
      */
     $query = "SELECT id, description FROM myFile WHERE owner = '{$userID}' AND deleted = '0' AND INSTR(mime_type, 'image/')";
 
@@ -46,7 +46,7 @@ if ($continue) {
     $this->setVar("PREVIEW_IMAGE_URL", $imageurl);
     $this->setVar("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));
 
-    if (isUrl($config['url'])) {
+    if (Url::isUrl($config['url'])) {
         $this->setVar("CONTENT_URL_START", "<a href=\"/redir.php?url=".base64_encode($config['url'])."\" target=\"_blank\">");
         $this->setVar("CONTENT_URL_END", "</a>");
     }

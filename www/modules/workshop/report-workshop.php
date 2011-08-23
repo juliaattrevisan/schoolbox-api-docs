@@ -15,7 +15,7 @@ if (!$groupHandler->isStaff() && !$_SESSION['su'])
 if (is_numeric($_GET['workshopID'])) {
 
 	$workshop = $workshopHandler->getByID($_GET['workshopID']);
-	if (!isset($workshop['workshopID'])) 
+	if (!isset($workshop['workshopID']))
 		error(2);
 
 	$string = "Synergy ID,Firstname,Surname,Email,Campus,Workshop,Room,Start,Finish\n";
@@ -23,7 +23,7 @@ if (is_numeric($_GET['workshopID'])) {
 	$userList = $workshopHandler->getUserList($workshop['workshopID']);
 	if (is_array($userList)) {
 		foreach ($userList as $user) {
-			
+
 			$output = array($user['synergy_id'],
 							$user['firstname'],
 							$user['lastname'],
@@ -34,15 +34,15 @@ if (is_numeric($_GET['workshopID'])) {
 							$workshop['start'],
 							$workshop['end'],
 							);
-			
+
 			$string .= outputCSV($output)."\n";
 		}
 	}
 
 	header('Content-type: text/csv');
 	header("Pragma: ");
-	header("Cache-control: ");	
-	header('Content-Disposition: inline; filename="participant-list-' . convertToURL($workshop['title']) . '.csv"');
+	header("Cache-control: ");
+	header('Content-Disposition: inline; filename="participant-list-' . Url::convertToURL($workshop['title']) . '.csv"');
 	print $string;
 
 

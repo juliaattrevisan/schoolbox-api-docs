@@ -56,7 +56,7 @@ $query = "SELECT url, description FROM bookmarks WHERE owner = '".$_SESSION['id'
 $db->dbDoQuery($query);
 if($db->dbCountRows() > 0){
 	while($link = $db->dbGetNextArray()){
-		if(isLocalURL($link['url'])){
+		if(Url::isLocalURL($link['url'])){
 			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\"><span>".scrubTEXT($link['description'])."</span></a>");
 		}
 		else {

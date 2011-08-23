@@ -3,13 +3,13 @@
 class AllowedFile extends DeprecatedModel {
 
 	function AllowedFile () {
-	
+
 		$this->_table = "allowedFileTypes";
 		$this->_index = "fileTypeID";
-		
+
 		parent::DeprecatedModel();
 	}
-	
+
 	function checkError($error) {
 		switch($error)
 		{
@@ -54,30 +54,30 @@ class AllowedFile extends DeprecatedModel {
                 $mime = $this->db->getOne($query);
                 return $mime;
 	}
-	
-	
+
+
 	function fileSecurityCheck($file, $typeCheck = true) {
 		$this->checkError($file['error']);
-	
+
 		/* Check file is in upload dir, or that it exists on the file system
 		 * in the case of zipFileUpload()
 		 */
 		if (!is_uploaded_file($file['tmp_name']) && !is_file($file['tmp_name'])) {
 			return array('code' => 9, 'message' => "Security infringement, possible file upload attack.");
 		}
-		
+
 		//file size test
 		if ($file['size'] <= 0) {
 			return array('code' => 10);
 		}
-		
+
 		if ($typeCheck) {
 			return $this->isAllowed($file['name']);
 		}
 	}
 
 	function getClass ($iconFile) {
-		return convertToURL(substr($iconFile, 0, strrpos($iconFile, ".")));
+		return Url::convertToURL(substr($iconFile, 0, strrpos($iconFile, ".")));
 	}
 
 	/**

@@ -13,8 +13,8 @@ if (is_array($linkList)) {
 		$output = array(
 				'LINK_ID'		=> $link['id'],
 				'LINK_NAME'		=> scrubTEXT($link['description']),
-				'LINK_URL'		=> isLocalURL($link['url']) ? relativeURL($link['url']) : '/redir.php?url='.base64_encode($link['url']),
-                                'LINK_TARGET'           => isLocalURL($link['url']) ? '': 'external',
+				'LINK_URL'		=> Url::isLocalURL($link['url']) ? Url::relativeURL($link['url']) : '/redir.php?url='.base64_encode($link['url']),
+				'LINK_TARGET'           => Url::isLocalURL($link['url']) ? '': 'external',
 				'LINK_POSTED_BY'	=> formatName($link),
 				'LINK_POSTED_BY_ID'	=> $link['owner'],
 				'LINK_POSTED_DATE'	=> outputDate(Cfg::get('date_short'), $link['submitted']),
@@ -23,14 +23,14 @@ if (is_array($linkList)) {
                 'HIDDEN'            => $link['hidden'] ? 'hidden' : '',
 				);
 		$this->setVar($output);
-		
-		if ($permission < WRITE_ACCESS)		
+
+		if ($permission < WRITE_ACCESS)
 			$this->setVar('modify_link_block', '');
 		else
-			$this->parse('modify_link_block', 'modify_link');	
-		
+			$this->parse('modify_link_block', 'modify_link');
+
 		$this->parse("link_block", "link", true);
-		
+
 
 	}
 } else
@@ -44,10 +44,10 @@ $this->setvar(array(
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_link", "submit_link_block");
-if ($permission < WRITE_ACCESS)		
+if ($permission < WRITE_ACCESS)
 	$this->setVar("submit_link_block", "");
 else
-	$this->parse("submit_link_block", "submit_link");	
+	$this->parse("submit_link_block", "submit_link");
 
 
 

@@ -10,7 +10,7 @@ $groupHandler = new Group();
 
 if($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) || is_array($_POST['category']) ) ) {
 
-    if(!isURL($_REQUEST['url']))
+    if(!Url::isURL($_REQUEST['url']))
         error(139);
 
 	$link = array(	'url'			=> $_POST['url'],
@@ -20,49 +20,49 @@ if($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) || 
 				);
 
 	if(is_numeric($_POST['linkID'])) {
-		
+
 		/* Modify existing link */
-		
+
 		/* Double check permission on link */
 		$currentLink = $linkHandler->getById($_POST['linkID']);
 		if ($groupHandler->getPermission($currentLink['cid']) < WRITE_ACCESS)
 			error(6);
-		
+
 		$link['id'] = $_POST['linkID'];
 		$linkHandler->update($link);
-		
+
 		$page->backToTheFuture(2);
 	}
 	else {
 		/* Add link */
 		$link['owner'] = $_SESSION['id'];
-		
+
 		/* Add to multiple locations */
 		if(is_array($_POST['category']) ){
 			foreach($_POST['category'] as $cat ){
-				
+
 				if ($groupHandler->getPermission($cat) < WRITE_ACCESS)
 					error(6);
-				
+
 				$link['category'] = $cat;
 				$linkHandler->create($link);
 			}
 			// multi link only accessible through link
 			$page->backToTheFuture(3);
 		}
-		else { 
+		else {
 			if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS)
 					error(6);
-		
-			$link['category'] = $_POST['category'];	
+
+			$link['category'] = $_POST['category'];
 			$linkHandler->create($link);
 		}
-		
+
 		$page->backToTheFuture(2);
 	}
 }
 else if(is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
-	
+
 	$result = "success";
 	/* Move link from one category to another, after checking permission on both from and to categories */
 	if(!$link = $linkHandler->getByID($_POST['move']))
@@ -73,11 +73,11 @@ else if(is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
 
 	if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS)
 		$result = "Insufficient permssions";
-	
+
 	$linkHandler->update(array('id'=>$_POST['move'], 'category'=> $_POST['categoryID']));
 
 	header("Content-type: application/json");
-	print json_encode(array('result' => $result));	
+	print json_encode(array('result' => $result));
 
 }
 else if($_GET['delete']) {
@@ -89,7 +89,7 @@ else if($_GET['delete']) {
 		error(6);
 
 	$linkHandler->delete($_GET['delete']);
-	
+
     if ($_GET['redirect'] == '') {
         $page->backToTheFuture(1);
     }

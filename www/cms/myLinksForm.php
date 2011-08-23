@@ -8,7 +8,7 @@ $myLinksHandler = new MyLinks();
 
 if (isset($_REQUEST['url']) && $_REQUEST['url'] && isset($_REQUEST['description']) && $_REQUEST['description']) {
 
-    if(!isURL($_REQUEST['url']))
+    if(!Url::isURL($_REQUEST['url']))
         error(139);
 
     if($myLinksHandler->linkExists($_SESSION['id'],$_REQUEST['url']))
