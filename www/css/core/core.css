@@ -2161,27 +2161,17 @@ ul.section-options a.drop-arrow {
 	
 .evaluation-content.student-review p.marks-amount {
 	float:right; 
-margin:10px 0;
+	margin:10px 0;
 	border:1px solid #e7e7e7;
-	
-
      -moz-transform: rotate(5.5deg);  
        -o-transform: rotate(5.5deg);  
   -webkit-transform: rotate(5.5deg);  
       -ms-transform: rotate(5.5deg);  
           transform: rotate(5.5deg);  
-           
-               zoom: 1;
-
-
      -moz-border-radius: 12px; 
   -webkit-border-radius: 12px; 
-          border-radius: 12px; 
-          
-          
+          border-radius: 12px;   
   -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
-
-
 }
 
 /*match*/
@@ -2239,8 +2229,6 @@ margin:10px 0;
 .evaluation-content.mark-test ul.multiple-choice-mark li.multiIncorrect{ background-color: #F5CFCF; }
 .evaluation-content.mark-test ul.multiple-choice-mark li.multiIncorrect .tick-cross{background: url(/images/famicons/cross.png) 0 0 no-repeat;}
 
-
-
 /*review test */
 .evaluation-content.student-review p.marks-amount { font-size:24px; }
 
@@ -2261,13 +2249,9 @@ margin:10px 0;
 .evaluation-content .assess-alert span{background:url(/images/famicons/error.png) no-repeat 0 50%; padding-right:150px; padding-left:20px; line-height:20px; float:right; display:block; height:100%; line-height:40px;}
 
 
-
-
-
 .row-switcher { background-color:#ededed; }
 
 /*results for the evaluation */
-
 .evaluation-question-section h2 {padding-left:0; margin-bottom:16px;}
 .evaluation-question-section h2 span{background:url(/images/core/transparencies/40-white.png) repeat; color:#000; display:block; float:left; padding:0 16px;
      -moz-border-radius: 4px 0 0 4px; 
@@ -2276,16 +2260,25 @@ margin:10px 0;
           margin-right:16px;
           font-size:14px;
   -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
-
-
 }
 .evaluation-question-result{border:1px solid #e7e7e7; margin-bottom:16px;}
 .evaluation-question-result h3{font-weight:bold; font-size:16px; margin-bottom:16px; color:#000;}
-.evaluation-question-result .results{width:50%; float:left; border:0; padding:0;}
-.evaluation-question-result .legend{width:50%; float:left;}
+.evaluation-question-result .evaluation-results{width:48%; float:left; border:0; padding:0;}
+.evaluation-question-result .evaluation-legend{width:48%; float:right;}
 
 
-
+.evaluation-response li{float:left; }
+.evaluation-response li a{padding:2px 6px; margin-right:2px; display:block;  	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px; color:#000; margin-bottom:2px;background:#EDEDED}
+.evluation-legend{}
+.evaluation-legend ul li a{padding:7px 16px; margin-bottom:4px; background:#EDEDED; margin-bottom:4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	 color:#000; display:block; font-weight:bold;}
+.evaluation-legend ul li a.active, .evaluation-response ul li a.active{background:#cae9b9 }	
+.evaluation-legend ul li span{font-weight:normal;}
 
 /************************
  END EVALUATION
@@ -4039,10 +4032,9 @@ li.bars { display:block; }
 /* SUBMISSION */
 .information-notification{
 	color:#fff;
-	padding:0 8px 0 28px;
-	background:#e8f5ff url(/images/famicons/information.png) 8px 50% no-repeat;
-	height:23px;
-	line-height:23px;
+	padding:2px 8px 2px 28px;
+	background:#e8f5ff url(/images/famicons/information.png) 8px 4px no-repeat;
+	line-height:16px;
 	margin-bottom:8px;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;

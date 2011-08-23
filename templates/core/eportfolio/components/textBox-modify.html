@@ -25,33 +25,25 @@ tinyMCE.init({
 	convert_urls : false
 });
 
-$j(function() {
-	$j('.interact').find('.save').click(function(event) {
-		event.preventDefault();
-
-		$j('#textBoxForm').submit();
-	});
-});
 </script>
 <!-- END custom_head -->
 
-<div class="text">
+<h2>Edit textbox</h2>
 	<form action="/eportfolio/textBox/modifyForm.php" method="post" id="textBoxForm" class="standardForm">
 		<input type="hidden" name="userID" value="{USER_ID}" />
 		<input type="hidden" name="textBoxID" value="{TEXTBOX_ID}" />
 		<input type="hidden" name="componentLocationID" value="{COMPONENT_LOCATION_ID}" />
+		<fieldset class="pad-it">
+			<label>
+				<input type="text" name="heading" value="{TEXTBOX_HEADING}" />
+			</label>
+			
+			<label class="privateBlock">
+				<textarea rows="20" name="body" id="body">{TEXTBOX_BODY}</textarea>
+			</label>
+		</fieldset>
 
-		<label>Heading
-			<input type="text" name="heading" value="{TEXTBOX_HEADING}" />
-		</label>
-
-		<label>Body
-			<textarea rows="20" name="body" id="body">{TEXTBOX_BODY}</textarea>
-		</label>
-
-		<p class="interact">
-			<a href="#" class="btn save"><span></span>Save Textbox</a>
-		</p>
+		<input type="submit" class="submit-btn-plain" value="Save Textbox" />
 	</form>
-</div>
+
 
