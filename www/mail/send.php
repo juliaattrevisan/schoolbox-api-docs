@@ -20,7 +20,7 @@ define('MAX_RECIPIENTS', 10);
 function sendMail($to, $cc, $bcc, $subject, $message)
 {
 	//get users email address to use in from field
-	
+
 	$db = new DeprecatedDatabase();
 	$db->dbConnect();
 
@@ -29,12 +29,29 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 	$name = formatName($user);
 
-	if($user['alt_email'])
-		$from_email = $name.'<'.$user['alt_email'].'>';
-	else if($user['local_email'] || Cfg::get('site_location') == 'wenona')
-		$from_email = $name.'<'.$user['username']."@".Cfg::get('mail_address').'>';
-	else 
+	/* Validate From email address
+	 */
+	if ($user['alt_email']) {
+		if (isValidEmail($user['alt_email'])) {
+			$from_email = $name . '<' . $user['alt_email'] . '>';
+		}
+		else {
+			error(42);
+		}
+	}
+	else if ($user['local_email'] || Cfg::get('site_location') == 'wenona') {
+		$email = $user['username'] . '@' . Cfg::get('mail_address');
+
+		if (isValidEmail($email)) {
+			$from_email = $name . '<' . $email . '>';
+		}
+		else {
+			error(42);
+		}
+	}
+	else {
 		error(42);
+	}
 
 	//if id is submitted to form convert to email
 	if(is_numeric($to)) {
@@ -45,7 +62,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 			$to = $toemail['alt_email'];
 		else if($user['local_email'] || Cfg::get('site_location') == 'wenona')
 			$to = $toemail['username']."@".Cfg::get('mail_address');
-		else 
+		else
 			error(43);
 	}
 
@@ -73,16 +90,16 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 						'Subject'   => $subject,
 						'Reply-To'	=> $from_email,
 						);
-						
+
 	$recipients['To'] = $to;
-											
+
 	if(strrchr($cc, '@'))
 	{
 		$cc = str_replace(";",",",$cc);
 		$headers['Cc'] = $cc;
 		$recipients['Cc'] = $cc;
 	}
-	
+
 	if(strrchr($bcc, '@'))
 	{
 		$bcc = str_replace(";",",",$bcc);
@@ -93,7 +110,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	$mime = new Mail_mime("\r\n");
 
 	$mime->setHTMLBody($message);
-	
+
 	foreach ($_FILES["file"]["error"] as $key => $error) {
    		if ($error == UPLOAD_ERR_OK) {
 			$mime->addAttachment($_FILES['file']['tmp_name'][$key], $_FILES['file']['type'][$key], $_FILES['file']['name'][$key]);
@@ -101,14 +118,14 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	}
 
 	$body = $mime->get();
-	
+
 	if(Cfg::get('mail_smtp_host'))
 		$params['host'] = Cfg::get('mail_smtp_host');
-	
+
 	$mail =& Mail::factory('smtp', $params);
-	
+
 	$hdrs = $mime->headers($headers);
-	
+
 	$return = $mail->send($recipients, $hdrs, $body);
 	if (PEAR::isError($return))
 		error(9, $return->getMessage());
@@ -119,12 +136,12 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 if(isset($_POST['to']) && $_POST['to'] && Cfg::get('mail_enable'))
 {
 	sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message']);
-	
+
 	//output code to send the browser to where it came from
 	$back = -2;
 	include("../include/back.php");
 	exit;
-}	
+}
 else
 {
 	localRedir('/mail/createMail.php');

@@ -174,8 +174,44 @@ function outputDate($format, $date) {
 	return date($format, $date);
 }
 
-function isEmail($email) {
-	return eregi("^[\w]+([\w\.\-]+)*@[\w]+(\.[\w]+)*(\.[a-z]{2,3})$",$email);
+/**
+ * Unused.
+ *
+ * @param  $email
+ * @return int
+ */
+//function isEmail($email) {
+//	return eregi("^[\w]+([\w\.\-]+)*@[\w]+(\.[\w]+)*(\.[a-z]{2,3})$",$email);
+//}
+
+/**
+ * Check if an email address is valid. Stolen and adapted from the Ormond
+ * ContactForm class.
+ *
+ * This should obsolete isEmail()
+ *
+ * @return bool
+ */
+function isValidEmail($email) {
+	if (!preg_match('/^([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}$/', $email)) {
+		return false;
+	}
+
+	/* Do domain lookup
+	 */
+	list($alias, $domain) = explode('@', $email);
+
+	/* This prevents appending of localhost to lookup
+	 */
+	$domain .= '.';
+
+	/* Check for mx records or that it resolves
+	 */
+	if (getmxrr($domain, $temp) || checkdnsrr($domain, 'ANY')) {
+		return true;
+	}
+
+	return false;
 }
 
 function outputCSV($line, $delimiter=',', $enclosure='"') {
@@ -198,18 +234,24 @@ function outputCSV($line, $delimiter=',', $enclosure='"') {
 	return $string;
 }
 
-function convertFromURL($string)
-{
-	 if (get_magic_quotes_gpc()) {
-			 $string = stripslashes($string);
-	}
-
-	//Assumption: no '-' in names all first chars are capitals
-	//$temp = str_replace('and','%26',$string);
-
-	return urldecode(str_replace(array('-','^'), array(' ','&'), $string));
-
-}
+/**
+ * Unused.
+ *
+ * @param  $string
+ * @return string
+ */
+//function convertFromURL($string)
+//{
+//	 if (get_magic_quotes_gpc()) {
+//			 $string = stripslashes($string);
+//	}
+//
+//	//Assumption: no '-' in names all first chars are capitals
+//	//$temp = str_replace('and','%26',$string);
+//
+//	return urldecode(str_replace(array('-','^'), array(' ','&'), $string));
+//
+//}
 
 function convertToURL($string)
 {
@@ -225,19 +267,26 @@ function cutString($content, $chars) {
 
 }
 
-function shortenName($name, $length) {
-	/* shorten a string by replacing a portion of it with '...' */
-	$currentLength = strlen($name);
-	if ($currentLength <= $length)
-		return $name;
-	else {
-		$cutOut = $currentLength - $length + 3;
-		$endPoint = $currentLength - ceil(($currentLength - $cutOut) * 0.25);
-		$startPoint = ceil($endPoint - $cutOut);
-
-		return substr($name, 0, $startPoint) . '...' . substr($name, $endPoint);
-	}
-}
+/**
+ * Unused.
+ *
+ * @param  $name
+ * @param  $length
+ * @return string
+ */
+//function shortenName($name, $length) {
+//	/* shorten a string by replacing a portion of it with '...' */
+//	$currentLength = strlen($name);
+//	if ($currentLength <= $length)
+//		return $name;
+//	else {
+//		$cutOut = $currentLength - $length + 3;
+//		$endPoint = $currentLength - ceil(($currentLength - $cutOut) * 0.25);
+//		$startPoint = ceil($endPoint - $cutOut);
+//
+//		return substr($name, 0, $startPoint) . '...' . substr($name, $endPoint);
+//	}
+//}
 
 function cutSentence($content, $chars) {
 	/* Cut off a summary at the fullstop within the character limit, alternatively just at the word */
@@ -270,13 +319,18 @@ function cutSentence($content, $chars) {
 	}
 }
 
-
-function delfile($str)
-{
-    foreach(glob($str) as $fn) {
-        unlink($fn);
-    }
-}
+/**
+ * Unused.
+ *
+ * @param  $str
+ * @return void
+ */
+//function delfile($str)
+//{
+//    foreach(glob($str) as $fn) {
+//        unlink($fn);
+//    }
+//}
 
 function isLocalURL($url)
 {
@@ -437,63 +491,65 @@ function getRelativeTime($date, $now = 0, $prefix = 'on', $suffix = 'ago') {
 	return $prefix.' '.date(Cfg::get('date_notime'), $date);
 }
 
-
-function relativeLinkRegex($url) {
-	/* Local url:
-	 * http://ilearn
-	 * http://ilearn/
-	 * http://ilearn/test/blah
-	 */
-	if (preg_match('#^(http://|https://)([^\.]+)/(.*)?#i', $url, $matches) || preg_match('#^(http://|https://)([^\.]+)$#i', $url, $matches)) {
-
-		/* Remove unused matches
-		 */
-		unset($matches[0]);
-		unset($matches[1]);
-
-		/* Remove empty elements
-		 */
-		foreach(array_keys($matches, '') as $element) {
-			unset($matches[$element]);
-		}
-
-		$url = '/' . implode('/', $matches);
-	}
-
-	/* Local url:
-	 * //ilearn
-	 * //ilearn/test/blah
-	 */
-	else if (preg_match('#^//(.*)?#i', $url, $matches)) {
-		$url = $matches[0];
-	}
-
-	/* Local url:
-	 * ilearn
-	 * ilearn/test/blah
-	 */
-	else if (preg_match('#^([^\.]+)$#', $url, $matches)) {
-		$url = '/' . $matches[0];
-	}
-
-	/* External url:
-	 * google.com
-	 * www.google.com
-	 * http://www.google.com
-	 * https://www.google.com
-	 */
-	else {
-		/* Normal modification to url
-		 * Just return url if it includes protocol
-		 * Otherwise add http protocol if it was not found
-		 */
-		if (!preg_match('#http(s?)://(.*)#i', $url, $matches)) {
-			$url = 'http://' . $url;
-		}
-	}
-
-	return $url;
-}
+/**
+ * Unused.
+ */
+//function relativeLinkRegex($url) {
+//	/* Local url:
+//	 * http://ilearn
+//	 * http://ilearn/
+//	 * http://ilearn/test/blah
+//	 */
+//	if (preg_match('#^(http://|https://)([^\.]+)/(.*)?#i', $url, $matches) || preg_match('#^(http://|https://)([^\.]+)$#i', $url, $matches)) {
+//
+//		/* Remove unused matches
+//		 */
+//		unset($matches[0]);
+//		unset($matches[1]);
+//
+//		/* Remove empty elements
+//		 */
+//		foreach(array_keys($matches, '') as $element) {
+//			unset($matches[$element]);
+//		}
+//
+//		$url = '/' . implode('/', $matches);
+//	}
+//
+//	/* Local url:
+//	 * //ilearn
+//	 * //ilearn/test/blah
+//	 */
+//	else if (preg_match('#^//(.*)?#i', $url, $matches)) {
+//		$url = $matches[0];
+//	}
+//
+//	/* Local url:
+//	 * ilearn
+//	 * ilearn/test/blah
+//	 */
+//	else if (preg_match('#^([^\.]+)$#', $url, $matches)) {
+//		$url = '/' . $matches[0];
+//	}
+//
+//	/* External url:
+//	 * google.com
+//	 * www.google.com
+//	 * http://www.google.com
+//	 * https://www.google.com
+//	 */
+//	else {
+//		/* Normal modification to url
+//		 * Just return url if it includes protocol
+//		 * Otherwise add http protocol if it was not found
+//		 */
+//		if (!preg_match('#http(s?)://(.*)#i', $url, $matches)) {
+//			$url = 'http://' . $url;
+//		}
+//	}
+//
+//	return $url;
+//}
 
 /**
  * Converts component-based date/time into database-friendly format
