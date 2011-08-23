@@ -11,34 +11,34 @@ if (is_numeric($_POST['categoryID'])) {
 	$linkHandler = new Link;
 	$allowedFiles = new AllowedFile;
 
-	
+
 	$fileList = $fileHandler->getAllInCategory($_POST['categoryID'],  in_array($_POST['filter'], $allowFilter) ? array('filter' => $_POST['filter']) : false);
-	
+
 	if (!in_array($_POST['filter'], $allowFilter)) {
-		
+
 		$linkList = $linkHandler->getAllInCategory($_POST['categoryID']);
 		$fileList = $fileHandler->mergeLinks( $fileList, $linkList);
-    	
-    	
+
+
     	// add homepage "file"
     	if (isset($_POST['homelink'])) {
-    	    
+
     	    require_once SITE_root . '/library/category.php';
     	    $categoryHandler = new Category;
             $category = $categoryHandler->getByID($_POST['categoryID']);
-            
+
             if ($category['template'] > 0) {
                 $homepage = array('id'          => $category['id'],
                                   'description' => 'Homepage',
                                   'size'        => 1,
                                   'iconFile'    => 'vcard_fiquet.png',
                                   );
-                
+
                 array_unshift($fileList, $homepage);
             }
         }
 	}
-	
+
 	if (!is_array($fileList)) {
 		$output = array();
 	} else {
@@ -46,11 +46,11 @@ if (is_numeric($_POST['categoryID'])) {
 			$file['user'] = formatName($file);
 			$file['relative'] = getRelativeTime($file['modified'], 0, '');
 			$file['mimeClass'] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
-			$file['description'] = cutString($file['description'], 32);
+			$file['description'] = TextFormatter::cutString($file['description'], 32);
 			$output[] = $file;
 		}
 	}
-	
+
 	$_SESSION['resourcesID'] = $_POST['categoryID'];
 }
 

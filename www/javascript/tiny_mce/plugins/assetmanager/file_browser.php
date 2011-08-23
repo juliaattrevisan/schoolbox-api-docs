@@ -36,44 +36,44 @@ $categoryList = $categoryHandler->getCategoryNode($_GET['categoryID']);
 
 $page->setVar('folder_list_block', '');
 if (is_array($categoryList)) {
-	
+
     foreach ($categoryList as $category) {
-		
+
 		$permission[$category['id']] = $groupHandler->getPermission($category['id']);
 		if ($permission[$category['id']] >= READ_ACCESS) {
-			
+
 			$class = array();
-			
+
 			$class[] = 'child-of-node-' . $category['parent'];
-			
+
 			/* check upload permissions */
-			if ($permission[$category['id']] == WRITE_ACCESS) 
+			if ($permission[$category['id']] == WRITE_ACCESS)
 				$class[] = 'write';
-			
-			/* add plus sign to parent nodes */	
+
+			/* add plus sign to parent nodes */
 			if ($category['isParent'] == '1')
 				$class[] = in_array($category['id'], $parentList) ? 'expanded loaded' : 'collapsed';
 
 			/* append code to name */
 			$name = scrubTEXT($category['name']);
 			if(!empty($category['code']) && $category['code'] != $category['name'])
-				$name .= ' ('.scrubTEXT($category['code']).')';			
-			
+				$name .= ' ('.scrubTEXT($category['code']).')';
+
 			/* select default dir */
 			if ($category['id'] == $_GET['categoryID'])
 				$class[] = 'selected';
-			
+
 			$output = array('CATEGORY_ID'	=> $category['id'],
 							'TITLE'			=> $name,
 							'CLASS'			=> implode(" ", $class),
 							);
 			$page->setVar($output);
 			$page->parse('folder_list_block', 'folder_list', true);
-			
+
 		}
 	}
-} 
-	
+}
+
 
 
 $category = $categoryHandler->getByID($_GET['categoryID']);
@@ -93,7 +93,7 @@ $fileList = $fileHandler->getAllInCategory($_GET['categoryID'], $filter);
 $page->setVar($output);
 
 if (is_array($fileList)) {
-    
+
     // add homepage "file"
     if ($category['template'] > 0) {
         $homepage = array('id'          => $category['id'],
@@ -101,16 +101,16 @@ if (is_array($fileList)) {
                           'size'        => 1,
                           'iconFile'    => 'vcard_fiquet.png',
                           );
-        
+
         array_unshift($fileList, $homepage);
-    
+
     }
-    
+
 	foreach ($fileList as $file) {
-		
+
 		$output = array ( 'FILE_ID' 	=> $file['id'],
 						  'DESCRIPTION'	=> $file['description'],
-						  'TITLE_SHORT' => cutString($file['description'], 10),
+						  'TITLE_SHORT' => TextFormatter::cutString($file['description'], 10),
 						  'SIZE'  		=> round($file['file_size']/1024),
 						  'FILE_ICON'	=> $file['iconFile'],
 						  );
@@ -122,9 +122,9 @@ if (is_array($fileList)) {
 			$page->parse('thumbnail_image_block', 'thumbnail_image');
 		else
 			$page->parse('thumbnail_flash_block', 'thumbnail_flash');
-		
+
 		$page->parse('file_block', 'file', true);
-		
+
 	}
 } else
 	$page->setVar('file_block', '');

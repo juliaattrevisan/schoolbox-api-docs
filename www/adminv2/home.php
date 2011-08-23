@@ -21,8 +21,8 @@ $free = disk_free_space(Cfg::get('file_dir'));
 $used = $total - $free;
 $perc = round(($used/$total)*100);
 
-$disk = array('DISK_USED'   => bytesToString($used),
-                'DISK_TOTAL' => bytesToString($total),
+$disk = array('DISK_USED'   => TextFormatter::bytesToString($used),
+                'DISK_TOTAL' => TextFormatter::bytesToString($total),
                 'DISK_PERC' => $perc);
 $this->setVar($disk);
 
@@ -32,8 +32,8 @@ if(is_readable('/proc/meminfo')) {
         $m[strtok($ri, ':')] = str_replace(' kB','',strtok(''))*1024;
 
     $usedMem = $m['MemTotal'] - $m['MemFree'] - $m['Cached'];
-    $memory = array('MEMORY_USED'   => bytesToString($usedMem),
-                    'MEMORY_TOTAL'  => bytesToString($m['MemTotal']),
+    $memory = array('MEMORY_USED'   => TextFormatter::bytesToString($usedMem),
+                    'MEMORY_TOTAL'  => TextFormatter::bytesToString($m['MemTotal']),
                     'MEMORY_PERC'   => round($usedMem / $m['MemTotal'] * 100));
     $this->setVar($memory);
     $this->parse('memory_block', 'memory');
@@ -73,7 +73,7 @@ if(Cfg::get('mail_enable') && Cfg::get('mail_smtp_host')) {
     }
     else {
        $email = array('EMAIL_LIGHT'    => '',
-                      'EMAIL_STATUS'    => 'Offline');   
+                      'EMAIL_STATUS'    => 'Offline');
     }
     socket_close($socket);
 }

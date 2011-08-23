@@ -41,18 +41,6 @@ function localRedir($file) {
         exit;
 }
 
-//Function
-function greeting() {
-	if(date("A")=="AM")
-		$greeting =  "Good Morning";
-	else if(date("G") < 17)
-		$greeting =  "Good Afternoon";
-	else
-		$greeting =  "Good Evening";
-
-	return $greeting;
-}
-
 //This function is used when the session is not correct simply redirects
 //user to login page with the requested url
 function goLoginPage()
@@ -72,16 +60,7 @@ function getIP()
 	return $ip;
 }
 
-//converts a size integer to human readable size
-function bytesToString($size) {
-       $a = array("B", "KB", "MB", "GB", "TB", "PB");
 
-       for($i = 0; $size >= 1024; $i++) {
-              $size /= 1024;
-       }
-
-      return round($size,2)." ".$a[$i];
-}
 
 function scrubHTML($html) {
 	require_once dirname(__FILE__) . '/../../include/HTMLPurifier/HTMLPurifier.auto.php';
@@ -258,15 +237,6 @@ function convertToURL($string)
 	return strtolower(preg_replace(array("/[^a-zA-Z\d\s\-\+\/]*/", "/(\s|-|\/)+/", "/\+/"), array("", "-", "p"), trim($string)));
 }
 
-function cutString($content, $chars) {
-	/* cut a string to the character limit and append ... */
-	$summary = substr($content, 0, $chars);
-	$length = strlen($content);
-
-	return $summary . (strlen($content) > strlen($summary) ? ".." : "");
-
-}
-
 /**
  * Unused.
  *
@@ -287,37 +257,6 @@ function cutString($content, $chars) {
 //		return substr($name, 0, $startPoint) . '...' . substr($name, $endPoint);
 //	}
 //}
-
-function cutSentence($content, $chars) {
-	/* Cut off a summary at the fullstop within the character limit, alternatively just at the word */
-	if(strlen($content) < $chars)
-		return $content;
-
-	$summary=substr($content, 0, $chars);
-	$position=strrpos($summary, ".")+1;
-	$positionQ = strrpos($summary, "?")+1;
-	$positionB = strrpos($summary, "!")+1;
-	if($position > 1 && $position > $positionQ && $position > $positionB) {
-		$output=substr($summary, 0, $position);
-		return $output;
-	}
-	else if($positionQ > 1 && $positionQ > $positionB) {
-		$output=substr($summary, 0, $positionQ);
-		return $output;
-	}
-	else if($positionB > 1) {
-		$output=substr($summary, 0, $positionB);
-		return $output;
-	}
-	else {
-		$position = strrpos($summary, " ");
-		$output=substr($summary, 0, $position);
-		if($output)
-			return $output."...";
-		else
-			return "";
-	}
-}
 
 /**
  * Unused.
@@ -455,10 +394,19 @@ if (!function_exists('json_encode'))
   }
 }
 
-function plural($num) {
-	if ($num != 1)
-		return "s";
-}
+
+
+	/**
+	 * Pluralise something. Used in getRelativeTime()
+	 *
+	 * @param  $num
+	 * @return string
+	 */
+	function plural($num) {
+		if ($num != 1) {
+			return 's';
+		}
+	}
 
 function getRelativeTime($date, $now = 0, $prefix = 'on', $suffix = 'ago') {
 

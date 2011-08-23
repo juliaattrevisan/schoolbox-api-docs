@@ -157,10 +157,10 @@ if (is_array($fileList) && count($fileList) > 0) {
 
 		$output = array('FILE_ID' 	 	=> $file['id'],
 						'TYPE'			=> $file['url'] ? 'link' : 'file',
-						'FILE_NAME' 	=> cutString(scrubText($file['description']),32),
+						'FILE_NAME' 	=> TextFormatter::cutString(scrubText($file['description']),32),
 						'FILE_MODIFIED'	=> getRelativeTime($file['modified'], 0, ''),
 						'FILE_OWNER'	=> formatName($file),
-						'FILE_SIZE'		=> $file['file_size'] > 0 ? bytesToString($file['file_size']) : "--",
+						'FILE_SIZE'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",
 						'CATEGORY_ID'	=> $file['category'],
 						'CLASS'			=> implode(" ", $class),
 						);
