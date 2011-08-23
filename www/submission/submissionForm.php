@@ -19,6 +19,10 @@ if(is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_POS
 	$late_date = getDateTimeByComponents($_POST['late_date'], $_POST['late_hour'], $_POST['late_minute'], $_POST['late_period']);
 	$open_date = getDateTimeByComponents($_POST['open_date'], $_POST['open_hour'], $_POST['open_minute'], $_POST['open_period']);
 
+    if (!$open_date || !$due_date || !$late_date) {
+        error(15);
+    }
+
     /* Late date is greater than due date */
     if (!empty($_POST['accept_submission']) && $due_date > $late_date) {
         error(15);
@@ -66,6 +70,10 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
 	$due_date = getDateTimeByComponents($_POST['due_date'], $_POST['due_hour'], $_POST['due_minute'], $_POST['due_period']);
 	$late_date = getDateTimeByComponents($_POST['late_date'], $_POST['late_hour'], $_POST['late_minute'], $_POST['late_period']);
 	$open_date = getDateTimeByComponents($_POST['open_date'], $_POST['open_hour'], $_POST['open_minute'], $_POST['open_period']);
+
+    if (!$open_date || !$due_date || !$late_date) {
+        error(15);
+    }
 
     /* Late date is greater than due date */
     if (!empty($_POST['accept_submission']) && $due_date > $late_date) {
