@@ -27,22 +27,29 @@ class Config extends DeprecatedModel {
 
         static private function load() {
                 $configList = DeprecatedDatabase::getInstance()->getAll("SELECT * FROM `config`");
-                if (is_array($configList)) {
-                        foreach ($configList as $config) {
-                                if(isset(self::$data[$config['name']])) {
-                                    //turn variable into an array if multiples
-                                    if(!is_array(self::$data[$config['name']])) {
-                                        $tempValue = self::$data[$config['name']];
-                                        unset(self::$data[$config['name']]);
-                                        self::$data[$config['name']][] = $tempValue;
-                                    }
-                                    self::$data[$config['name']][] = $config['value'];
-                                }
-                                else
-                                    self::$data[$config['name']] = $config['value'];
-                        }
-                }
+ 				self::inject($configList);
         }
+
+
+		static public function inject($configList) {
+				if (is_array($configList)) {
+						foreach ($configList as $config) {
+								if(isset(self::$data[$config['name']])) {
+									//turn variable into an array if multiples
+									if(!is_array(self::$data[$config['name']])) {
+										$tempValue = self::$data[$config['name']];
+										unset(self::$data[$config['name']]);
+										self::$data[$config['name']][] = $tempValue;
+									}
+									self::$data[$config['name']][] = $config['value'];
+								}
+								else
+									self::$data[$config['name']] = $config['value'];
+						}
+				}
+		}
+
+
 
         static public function get($configName) {
                 self::getInstance();
@@ -60,9 +67,8 @@ class Config extends DeprecatedModel {
                 }
         }
 
-        static public function set($configName, $value) {
+        static public function set($configName, $configValue) {
                 self::getInstance();
-
                 self::update(array('name' => $configName, 'value' => $configValue));
         }
 
