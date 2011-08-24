@@ -9,8 +9,8 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function test12HourWithTimeMorningMeridiem() {
-		$input = '23/08/2011 8:15 am';
-		$expected = '2011-08-23 08:15:00';
+		$input = '02/08/2011 8:15 am';
+		$expected = '2011-08-02 08:15:00';
 
 		$date = new Alaress_Date_Format($input);
 		$result = $date->getDatabase();
@@ -50,4 +50,51 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($result, $expected);
 	}
 
+	/**
+	 * Australian Date, 12-hour format
+	 * Returns correct datetime in mysql format
+	 *
+	 * @return void
+	 */
+	public function testNoon() {
+		$input = '23/08/2011 12:00 pm';
+		$expected = '2011-08-23 12:00:00';
+
+		$date = new Alaress_Date_Format($input);
+		$result = $date->getDatabase();
+
+		$this->assertEquals($result, $expected);
+	}
+
+	/**
+	 * Australian Date, 12-hour format
+	 * Returns correct datetime in mysql format
+	 *
+	 * @return void
+	 */
+	public function testMidnight() {
+		$input = '23/08/2011 12:00 Am';
+		$expected = '2011-08-23 00:00:00';
+
+		$date = new Alaress_Date_Format($input);
+		$result = $date->getDatabase();
+
+		$this->assertEquals($result, $expected);
+	}
+
+	/**
+	 * Australian Date, 12-hour format
+	 * Returns correct datetime in mysql format
+	 *
+	 * @return void
+	 */
+	public function testDashes() {
+		$input = '23-08-2011 12:00 Am';
+		$expected = '2011-08-23 00:00:00';
+
+		$date = new Alaress_Date_Format($input, 'd-m-y');
+		$result = $date->getDatabase();
+
+		$this->assertEquals($result, $expected);
+	}
 }

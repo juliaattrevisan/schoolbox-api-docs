@@ -16,21 +16,16 @@ abstract class Alaress_Date_Abstract {
 	private $second = '00';
 	private $meridiem = '';
 	private $dateSeparator = '-';
+	private $inputDateFormat = 'd/m/y h:m z';
 
-	public function __construct($dateTime) {
+	public function __construct($dateTime, $inputDateFormat) {
+		if ($inputDateFormat !== null) {
+			$this->setInputDateFormat($inputDateFormat);
+		}
 
 		/* Snap out all the bits, exit if no separator could be found (this
 		 * indicates an illegal dateTime format anyway)
 		 */
-		if (strstr($dateTime, '-')) {
-			$this->setDateSeparator('-');
-		}
-		else if (strstr($dateTime, '/')) {
-			$this->setDateSeparator('/');
-		}
-		else {
-			return false;
-		}
 
 		/* Components of the datetime string.
 		 *
@@ -63,40 +58,38 @@ abstract class Alaress_Date_Abstract {
 	}
 
 	/**
-	 * Remember the date components
+	 * Figure out which date components are located where, based on the
+	 * input dateFormat specified. The separator is always $matches[2]
+	 *
+	 * Permitted formats:
+	 *
+	 * y-m-d h:i:s
+	 * d/m/y h:i:s z
+	 * m/d/y h:i
+	 * d-m-y h:i:s
 	 *
 	 * @param  $dateComponent
-	 * @return void
+	 * @param  $dateFormat
+	 * @return
 	 */
 	private function setDateComponents($dateComponent) {
-		$date = explode($this->getDateSeparator(), $dateComponent);
+		preg_match('/([dym])([\-\/])([dm])[\-\/]([dmy])/', $this->getInputDateFormat(), $matches);
 
-		/* American format vs normal people format
+		$partMap = array(
+			1 => 0, // First date part
+			3 => 1, // Second date part
+			4 => 2, // Third date part
+		);
+
+		$this->setDateSeparator($matches[2]);
+
+		/* Explode out the date and remember values
 		 */
-		if ($this->getDateSeparator() == '-') {
-			if (strlen($date[1])) {
-				$this->setDay($date[1]);
-			}
+		$dateParts = explode($this->getDateSeparator(), $dateComponent);
 
-			if (strlen($date[0])) {
-				$this->setMonth($date[0]);
-			}
-		}
-		else if ($this->getDateSeparator() == '/') {
-			if (strlen($date[0])) {
-				$this->setDay($date[0]);
-			}
-
-			if (strlen($date[1])) {
-				$this->setMonth($date[1]);
-			}
-		}
-
-		/* Year
-		 */
-		if (strlen($date[2])) {
-			$this->setYear($date[2]);
-		}
+		$this->setDay($dateParts[$partMap[array_search('d', $matches)]]);
+		$this->setMonth($dateParts[$partMap[array_search('m', $matches)]]);
+		$this->setYear($dateParts[$partMap[array_search('y', $matches)]]);
 	}
 
 	/**
@@ -109,9 +102,10 @@ abstract class Alaress_Date_Abstract {
 	private function setTimeComponents($timeComponent, $meridiemComponent) {
 		$time = explode(':', $timeComponent);
 
-		if (count($time) == 2) {
+		if (count($time) >= 2) {
 			$hour = $time[0];
 			$minute = $time[1];
+			$second = $time[2];
 
 			$meridiem = strtolower($meridiemComponent);
 
@@ -134,10 +128,22 @@ abstract class Alaress_Date_Abstract {
 				$this->setMinute($minute);
 			}
 
+			if (strlen($time[2])) {
+				$this->setSecond($second);
+			}
+
 			if (strlen($meridiemComponent)) {
 				$this->setMeridiem($meridiem);
 			}
 		}
+	}
+
+	private function setInputDateFormat($val) {
+		$this->inputDateFormat = $val;
+	}
+
+	private function getInputDateFormat() {
+		return $this->inputDateFormat;
 	}
 
 	/**

@@ -13,8 +13,8 @@ class Alaress_Date_Format implements Alaress_Date_Interface {
 	 *
 	 * @param  $dateTime
 	 */
-	public function __construct($dateTime) {
-		$this->strategy = new Alaress_Date_V52($dateTime);
+	public function __construct($dateTime, $dateFormat = null) {
+		$this->strategy = new Alaress_Date_V52($dateTime, $dateFormat);
 	}
 
 	/**

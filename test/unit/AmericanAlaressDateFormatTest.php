@@ -12,7 +12,7 @@ class AmericanAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = '08-23-2011 10:12 AM';
 		$expected = '2011-08-23 10:12:00';
 
-		$date = new Alaress_Date_Format($input);
+		$date = new Alaress_Date_Format($input, 'm-d-y');
 		$result = $date->getDatabase();
 
 		$this->assertEquals($result, $expected);
@@ -28,7 +28,7 @@ class AmericanAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = '08-23-2011 10:12 PM';
 		$expected = '2011-08-23 22:12:00';
 
-		$date = new Alaress_Date_Format($input);
+		$date = new Alaress_Date_Format($input, 'm-d-y');
 		$result = $date->getDatabase();
 
 		$this->assertEquals($result, $expected);
@@ -44,7 +44,7 @@ class AmericanAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = '08-23-2011';
 		$expected = '2011-08-23 00:00:00';
 
-		$date = new Alaress_Date_Format($input);
+		$date = new Alaress_Date_Format($input, 'm-d-y');
 		$result = $date->getDatabase();
 
 		$this->assertEquals($result, $expected);
