@@ -97,7 +97,7 @@ $j(document).ready(function() {
 		<p class="pad-it">{SECTION_DESCRIPTION}</p>
 	<!-- BEGIN question -->
 
-		<form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" name="question-submit" class='validation_{RESPONSE_ID}' method="post">
+		<form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" name="question-submit" class='validation_{RESPONSE_ID} questionForm' method="post">
 		<div class="wysiwyg no-pad clearfix">
 			<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}<span> - ({QUESTION_MARKS} marks)</span></h3>
 		</div>
