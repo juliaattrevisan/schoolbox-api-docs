@@ -267,8 +267,6 @@ $j(function() {
 	});
 	
 	function h2d(h) {return parseInt(h,16);} 
-
-	
 	
 	function checkTextColour() {
 		var currentColour = $j('#currentColour').val().substr(1);

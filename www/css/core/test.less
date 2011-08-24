@@ -1,0 +1,22 @@
+/* we'll start with the submi */
+
+@submit-border: #09BDA9;
+@submit-text-shadow: 0 1px 0px white;
+@submit-text-color: #000000;
+@submit-gradient-top:#0f0;
+@submit-gradient-bottom:#ff0;
+
+/*SUBMIT BUTTON*/
+.submit-btn-plain {
+	border-color:@submit-border;
+	text-shadow: @submit-text-shadow;
+	color:@submit-text-color !important;
+  background-color: @submit-gradient-top;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(@submit-gradient-top), to(@submit-gradient-bottom)); 
+  background-image: -webkit-linear-gradient(top, @submit-gradient-top, @submit-gradient-bottom); 
+  background-image:    -moz-linear-gradient(top, @submit-gradient-top, @submit-gradient-bottom); 
+  background-image:     -ms-linear-gradient(top, @submit-gradient-top, @submit-gradient-bottom); 
+  background-image:      -o-linear-gradient(top, @submit-gradient-top, @submit-gradient-bottom); 
+  background-image:         linear-gradient(top, @submit-gradient-top, @submit-gradient-bottom);
+            filter: none; 
+}
