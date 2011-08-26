@@ -515,17 +515,19 @@ class SitePage extends Page {
                $this->setVar("msubject_section", "");
        }
 
-       function renderLinkList() {
+		function renderLinkList() {
            $this->setBlock("navTpl", "mlink_block", "my_links");
            $query = "SELECT url, description FROM bookmarks WHERE owner = '".$_SESSION['id']."'";
            $this->db->query($query);
            if($this->db->countRows() > 0){
                while($link = $this->db->getNextArray()){
-                   if(Url::isLocalURL($link['url'])){
-                       $this->setVar("MLINK", "<a href=\"".Url::relativeURL($link['url'])."\"><span>".scrubTEXT($link['description'])."</span></a>");
+				   $url = new Url($link['url']);
+
+                   if($url->isLocalURL()){
+                       $this->setVar("MLINK", "<a href=\"".$url->getRelativeURL()."\"><span>".scrubTEXT($link['description'])."</span></a>");
                    }
                    else {
-                                       $this->setVar("MLINK", "<a href=\"/redir.php?url=".base64_encode($link['url'])."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
+                   	$this->setVar("MLINK", "<a href=\"" . $url->getBase64EncodedRedirect() . "\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
                    }
 
                    $this->parse("my_links", "mlink_block", true);

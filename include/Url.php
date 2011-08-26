@@ -88,7 +88,7 @@ class Url {
 	 *
 	 * @return string
 	 */
-	public function getBase64DecodedRedirect() {
+	public function getBase64EncodedRedirect() {
 		return '/redir.php?url=' . base64_encode($this->getUrl());
 	}
 

@@ -39,7 +39,7 @@ if ($continue) {
 	$url = new Url($config['url']);
 
     if ($url->isUrl()) {
-        $this->setVar("CONTENT_URL_START", "<a href=\"" . $url->getBase64DecodedRedirect() . "\" target=\"_blank\">");
+        $this->setVar("CONTENT_URL_START", "<a href=\"" . $url->getBase64EncodedRedirect() . "\" target=\"_blank\">");
         $this->setVar("CONTENT_URL_END", "</a>");
     } else {
         $this->setVar("CONTENT_URL_START", "");

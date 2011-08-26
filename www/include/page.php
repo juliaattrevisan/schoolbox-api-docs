@@ -64,7 +64,7 @@ if($db->dbCountRows() > 0){
 		else {
             /* Why did this double-urlencode? Removed.
              */
-			$this->t_body->set_var("MLINK", "<a href=\"" . $url->getBase64DecodedRedirect() ."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
+			$this->t_body->set_var("MLINK", "<a href=\"" . $url->getBase64EncodedRedirect() ."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
 		}
 
 		$this->t_body->parse("my_links", "mlink_block", true);

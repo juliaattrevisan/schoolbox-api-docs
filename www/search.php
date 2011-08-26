@@ -301,7 +301,7 @@ if (!empty($result['link'])) {
 			$linkUrl = $url->getRelativeURL();
 		}
 		else {
-			$linkUrl = $url->getBase64DecodedRedirect();
+			$linkUrl = $url->getBase64EncodedRedirect();
 		}
 
         $page->setVar(array(

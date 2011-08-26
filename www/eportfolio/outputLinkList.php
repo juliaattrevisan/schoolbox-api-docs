@@ -15,7 +15,7 @@ if (is_array($linkList)) {
 			$linkUrl = $url->getRelativeURL();
 		}
 		else {
-			$linkUrl = $url->getBase64DecodedRedirect();
+			$linkUrl = $url->getBase64EncodedRedirect();
 		}
 
 		$this->setVar(array(

@@ -16,7 +16,7 @@ if (is_array($linkList)) {
 			$linkTarget = '';
 		}
 		else {
-			$linkUrl = $url->getBase64DecodedRedirect();
+			$linkUrl = $url->getBase64EncodedRedirect();
 			$linkTarget = 'external';
 		}
 
