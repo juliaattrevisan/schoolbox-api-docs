@@ -23,10 +23,9 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && is_n
                     $suggestions[] = scrubText($user['firstname']." ".$user['lastname'].' <'.$email.'>');
                     $data[] = scrubText($user['firstname']." ".$user['lastname']).' <'.$email.'>';
                 }
-            }
+            } 
             else {
 				$person = "{$user['firstname']} {$user['lastname']} - Year {$user['year']}, {$user['gname']}";
-
                 $suggestions[] = html_entity_decode(scrubText($person), ENT_QUOTES);
                 $data[] = $user['uid'];
             }
