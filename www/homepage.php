@@ -238,6 +238,11 @@ if (is_array($componentList)) {
 
 		$componentHandle = $component['method'] . $component['homepageComponentLocationID'];
 
+        //Check template exists, skip component if it doesnt
+        if(!$this->getTemplate('homepage/components/'.$component['filename']))
+            continue;
+
+
       /* This array provides default sorting capabilities for each component
        * in the homepage. They can be overridden in each of the output?.php
        * homepage component files, to use their own sorting fields.
