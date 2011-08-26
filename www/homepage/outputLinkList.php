@@ -9,18 +9,28 @@ $linkList = $linkHandler->getAllInCategory($categoryID, $config);
 
 if (is_array($linkList)) {
 	foreach ($linkList as $link) {
+		$url = new Url($link['url']);
+
+		if ($url->isLocalUrl()) {
+			$linkUrl = $url->getRelativeURL();
+			$linkTarget = '';
+		}
+		else {
+			$linkUrl = $url->getBase64DecodedRedirect();
+			$linkTarget = 'external';
+		}
 
 		$output = array(
-				'LINK_ID'		=> $link['id'],
-				'LINK_NAME'		=> scrubTEXT($link['description']),
-				'LINK_URL'		=> Url::isLocalURL($link['url']) ? Url::relativeURL($link['url']) : '/redir.php?url='.base64_encode($link['url']),
-				'LINK_TARGET'           => Url::isLocalURL($link['url']) ? '': 'external',
-				'LINK_POSTED_BY'	=> formatName($link),
-				'LINK_POSTED_BY_ID'	=> $link['owner'],
-				'LINK_POSTED_DATE'	=> outputDate(Cfg::get('date_short'), $link['submitted']),
-				'LINK_COMMENT'		=> nl2br(scrubTEXT($link['comment'])),
-				'ON_OFF'			=> ++$j%2? '' : 'dark',
-                'HIDDEN'            => $link['hidden'] ? 'hidden' : '',
+				'LINK_ID' => $link['id'],
+				'LINK_NAME' => scrubTEXT($link['description']),
+				'LINK_URL' => $linkUrl,
+				'LINK_TARGET' => $linkTarget,
+				'LINK_POSTED_BY' => formatName($link),
+				'LINK_POSTED_BY_ID' => $link['owner'],
+				'LINK_POSTED_DATE' => outputDate(Cfg::get('date_short'), $link['submitted']),
+				'LINK_COMMENT' => nl2br(scrubTEXT($link['comment'])),
+				'ON_OFF' => ++$j%2? '' : 'dark',
+                'HIDDEN'  => $link['hidden'] ? 'hidden' : '',
 				);
 		$this->setVar($output);
 

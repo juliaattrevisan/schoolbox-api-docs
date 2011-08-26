@@ -21,12 +21,14 @@ if(is_array($headlineList) )
 	foreach($headlineList as $item)
 	{
 		$j++;
+		$url = new Url($previous['topicName']);
+
 		$output = array('NEWS_TITLE'	=> $item['item_heading'],
 						'NEWS_URL'		=> '/news/#'.$item['item_id'],
 						'NEWS_TIME'		=> getRelativeTime($item['item_datetime_modified'], 0 , ''),
 						'ON_OFF'		=> ++$k%2? '' : 'dark',
 						'NEWS_TOPIC'	=> scrubText($previous['topicName']),
-						'TOPIC_CLEAN'	=> Url::convertToURL($previous['topicName']),
+						'TOPIC_CLEAN'	=> $url->getSlug(),
 						);
 		$this->setVar($output);
 		$topicList[$item['topicName']] = 1;
@@ -44,8 +46,10 @@ if(is_array($headlineList) )
 
 			/* last rotation */
 			if ($total == $j) {
+				$url = new Url($item['topicName']);
+
 				$this->setVar('NEWS_TOPIC', scrubText($item['topicName']));
-				$this->setVar('TOPIC_CLEAN', Url::convertToURL($item['topicName']));
+				$this->setVar('TOPIC_CLEAN', $url->getSlug());
 
 				$this->parse('topic_block', 'topic', true);
 			}
@@ -72,8 +76,10 @@ else
 
 // output tabs
 foreach ($topicList as $topic => $bin) {
+	$url = new Url($topic);
+
 	$output = array('NEWS_TOPIC'	=> scrubText($topic),
-				    'TOPIC_CLEAN'	=> Url::convertToURL($topic),
+				    'TOPIC_CLEAN'	=> $url->getSlug(),
 					);
 	$this->setVar($output);
 	$this->parse('topic_header_block', 'topic_header', true);

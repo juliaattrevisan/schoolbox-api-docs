@@ -77,7 +77,9 @@ class AllowedFile extends DeprecatedModel {
 	}
 
 	function getClass ($iconFile) {
-		return Url::convertToURL(substr($iconFile, 0, strrpos($iconFile, ".")));
+		$url = new Url(substr($iconFile, 0, strrpos($iconFile, ".")));
+
+		return $url->getSlug();
 	}
 
 	/**

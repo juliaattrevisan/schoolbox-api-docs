@@ -63,37 +63,45 @@ if(is_array($items))
 		$fullname = formatName($article);
 		$owner = "<a href=\"/search/user/{$article['uid']}\">$fullname</a>";
 
+		$url = new Url($previous['topicName']);
+
 		$output = array('NEWS_ID'		=> $article['item_id'],
 						'NEWS_TITLE'	=> $article['item_heading'],
 						'POSTER'		=> $owner,
 						'DATETIME' 		=> $_SESSION['su'] == 1 ? $article['post_datetime']." expires on ".$article['expire_datetime'] : $article['post_datetime'],
 						'NEWS_BODY'		=> scrubHTML($article['item_body']),
 						'TOPIC_NAME'	=> scrubText($previous['topicName']),
-						'TOPIC_CLEAN'	=> Url::convertToURL($previous['topicName']),
+						'TOPIC_CLEAN'	=> $url->getSlug(),
 						);
 
 		$this->setVar($output);
 		$topicList[$article['topicName']] = 1;
 
-		if ($article['topicName'] != $previous['topicName'] && $i > 1) {
-			/* end topic */
-			$this->parse('topic_block', 'topic', true);
+		$url = new Url($article['topicName']);
 
+		if ($article['topicName'] != $previous['topicName'] && $i > 1) {
+
+			/* End topic
+			 */
+			$this->parse('topic_block', 'topic', true);
 			$this->setVar("news_block", "");
 			$this->parse("news_block", "news", true);
 
-			/* last rotation */
+			/* Last rotation
+			 */
 			if ($total == $i) {
 				$this->setVar('TOPIC_NAME', scrubText($article['topicName']));
-				$this->setVar('TOPIC_CLEAN', Url::convertToURL($article['topicName']));
+				$this->setVar('TOPIC_CLEAN', $url->getSlug());
 				$this->parse('topic_block', 'topic', true);
 			}
 
-		} elseif ($total == $i) {
-			/* last rotation */
+		}
+		else if ($total == $i) {
+			/* Last rotation
+			 */
 			$this->parse("news_block", "news", true);
 			$this->setVar('TOPIC_NAME', scrubText($article['topicName']));
-			$this->setVar('TOPIC_CLEAN', Url::convertToURL($article['topicName']));
+			$this->setVar('TOPIC_CLEAN', $url->getSlug());
 
 			$this->parse('topic_block', 'topic', true);
 		} else {
@@ -108,8 +116,10 @@ if(is_array($items))
 	// output tabs
     if(is_array($topicList)) {
         foreach ($topicList as $topic => $bin) {
+			$url = new Url($topic);
+
             $output = array('NEWS_TOPIC'	=> scrubText($topic),
-                            'TOPIC_CLEAN'	=> Url::convertToURL($topic),
+                            'TOPIC_CLEAN'	=> $url->getSlug(),
                         );
             $this->setVar($output);
             $this->parse('topic_header_block', 'topic_header', true);

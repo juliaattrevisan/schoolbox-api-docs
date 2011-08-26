@@ -56,13 +56,15 @@ $query = "SELECT url, description FROM bookmarks WHERE owner = '".$_SESSION['id'
 $db->dbDoQuery($query);
 if($db->dbCountRows() > 0){
 	while($link = $db->dbGetNextArray()){
-		if(Url::isLocalURL($link['url'])){
+		$url = new Url($link['url']);
+
+		if($url->isLocalURL()){
 			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\"><span>".scrubTEXT($link['description'])."</span></a>");
 		}
 		else {
             /* Why did this double-urlencode? Removed.
              */
-			$this->t_body->set_var("MLINK", "<a href=\"/redir.php?url=".urlencode($link['url'])."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
+			$this->t_body->set_var("MLINK", "<a href=\"" . $url->getBase64DecodedRedirect() ."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
 		}
 
 		$this->t_body->parse("my_links", "mlink_block", true);

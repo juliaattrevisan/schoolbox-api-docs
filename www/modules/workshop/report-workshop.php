@@ -39,10 +39,12 @@ if (is_numeric($_GET['workshopID'])) {
 		}
 	}
 
+	$url = new Url($workshop['title']);
+
 	header('Content-type: text/csv');
 	header("Pragma: ");
 	header("Cache-control: ");
-	header('Content-Disposition: inline; filename="participant-list-' . Url::convertToURL($workshop['title']) . '.csv"');
+	header('Content-Disposition: inline; filename="participant-list-' . $url->getSlug() . '.csv"');
 	print $string;
 
 
