@@ -220,10 +220,16 @@ var cid = {ID};
 	<!--/tabs-2-->
 	<div id="tabs-3" class="customise-components layouts">
 		<form method="POST" action="">
-			<p class="clearfix"><a class="layout {CURRENT_TEMPLATE_1}" title="1" href="#"><img src="/images/70-30.gif" />70-30</a> <a class="layout {CURRENT_TEMPLATE_2}" title="2" href="#"><img src="/images/50-50.gif" />50-50</a> <a class="layout {CURRENT_TEMPLATE_4}" title="4" href="#"><img src="/images/30-70.gif" />30-70</a> <a class="layout {CURRENT_TEMPLATE_3}" title="3" href="#"><img src="/images/100-0.gif" />100-0</a></p>
-			<input type="hidden" name="template" id="templateVal" value="" />
-			<input type="hidden" name="cid" value="{ID}" />
-            <div class="colours-buttons clearfix">
+			
+			<div class="slider-house">
+				<div id="slider"></div>
+            </div>
+			
+			
+			<div class="colours-buttons clearfix">
+				
+				
+				
 				<div class="clearfix">
 				<button class="submit-btn-plain" type="button" id="saveTemplate" >Save layout</button>
 				<button class="submit-btn-plain " type="button" id="cancelTemplate" >Cancel</button>
@@ -239,9 +245,9 @@ var cid = {ID};
 </div>
 <!-- END customise_page -->
 
-<div class="{TEMPLATE} homepage">
-    <div class="top">{COLUMN3}</div>
-	<div class="left">{COLUMN1}</div>
-	<div class="right">{COLUMN2}</div>
+<div class="{TEMPLATE} homepage clearfix">
+    <div class="top clearfix">{COLUMN3}</div>
+	<div class="left clearfix">{COLUMN1}</div>
+	<div class="right clearfix">{COLUMN2}</div>
 </div>
 <input type="hidden" id="categoryID" value="{ID}" />

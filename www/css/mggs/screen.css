@@ -393,6 +393,7 @@ Library
 #nina, #morris{min-height:1px;}
 
 .library-boxes{width:100%; border-collapse:collapse;}
+.library-boxes td{border:16px solid #fff; border-top:0; border-left:0;}
 .library-boxes .resources{background:#f2e9f3 url(/images/mggs/library/nina-laptop.jpg) no-repeat;}
 .library-boxes .reading{background:#ebf7d9 url(/images/mggs/library/nina-book.jpg) no-repeat;}
 .library-boxes .updates{background:none;}
@@ -402,10 +403,10 @@ Library
 .library-boxes .click-view{background:#f6ebd0 url(/images/mggs/library/nina-play.jpg) no-repeat;}
 .library-boxes  td{padding:0; vertical-align:top; height:33%;}
 .library-boxes  tr{height:33%;}
-.library-boxes .library-box {margin:0 16px 16px 0; min-height:170px; padding:16px;}
+.library-boxes .library-box { min-height:170px; padding:16px;}
 .library-box ul li{ line-height:22px;}
 .library-box a{color:#3e8dfe; font-weight:bold;}
-
+.library-box{}
 .library-box h3, .updates h3{font-size:22px; font-weight:bold; background:none; margin-bottom:10px;}
 .updates h3{margin-top:16px;}
 .library-header ul{float:left; margin-bottom:16px;}
@@ -460,4 +461,5 @@ Library
 #morris .cybersmart{min-height:inherit;}
 #morris .cybersmart p{line-height:18px; margin-bottom:0;}
 
+#galleryCycle div{position:absolute; left:0; top:0;}
 .login-words{height:50px; width:428px; background: url(/images/mggs/mggs-login-words.png) no-repeat; position:absolute; right:50px; bottom:0;}

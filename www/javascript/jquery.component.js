@@ -3,19 +3,52 @@ $j(function() {
 	/* remove invisible column */
 	$j('div.right:hidden').remove();
 	
-	/* add drag/drop */
+	
+	$j("#slider" ).slider({
+		'min': 30,
+		'max':70,
+		slide: function(event, ui) {
+			$j('.left').css('width', (ui.value-.5)+'%')
+			$j('.right').css('width', (100 - ui.value-.5)+'%')
+		},
+		create: function(event, ui){
+			$j('.ui-slider-handle').append('<span></span>');
+		}
+	});
+	
+	
+	function emptyColumnsCheck(target) {		
+		if (target.find('.box').length == 0) {
+			target.addClass('empty-column');
+			if ($j('#tabs-homepage').is(':visible')) {
+				$j('.empty-column').each(function() {
+					$j(this).show();
+				})
+			}
+			target.html('<p class="placeholder">You can drag components into this space.</p>');
+		} else {
+			target.children('.placeholder').remove();
+			target.removeClass('empty-column');
+		}
+	}
+	
+	emptyColumnsCheck($j('div.top'))
+	emptyColumnsCheck($j('div.right'))
+	emptyColumnsCheck($j('div.left'))
+	
 	$j('div.homepage').sortable({
 		cursor: 'move',
 		distance: 0,
 		dropOnEmpty: true,
-		forcePlaceholderSize: true,
 		handle: 'h2',
 		helper: 'clone',
 		items: '.box',
 		placeholder: 'marker',
 		tolerance: 'pointer',
 		zIndex: 2000,
-		
+		start: function() {
+			$j('.marker').text('This is the new position of your component');
+		},
 		update: function () {
 			var left = ''; 
 			var right = ''; 
@@ -30,7 +63,9 @@ $j(function() {
 				top += $j(this).attr('id').substring(9) + ',';
 			});
 			$j.post('/homepage/configForm.php', {cid : cid, type: 'components', column1: left, column2: right, column3: top});
-			
+			emptyColumnsCheck($j('div.top'))
+			emptyColumnsCheck($j('div.right'))
+			emptyColumnsCheck($j('div.left'))
 		},			
 		sort: function (event, ui) {
 			var leftOffset = $j('div.left').offset();
@@ -47,12 +82,13 @@ $j(function() {
 				ui.placeholder.appendTo($j('div.right'))
 
 			} else if (event.pageX < (topOffset.left + $j('div.top').width()) &&
-				event.pageY < (topOffset.top + $j('div.top').height())) {
+					   event.pageY < (topOffset.top + $j('div.top').height())) {  
+						   
 				// top bottom
-				ui.placeholder.appendTo($j('div.top'));
-			} 
-
-			
+				if ($j('div.top').find('.box').length == 0) {
+					ui.placeholder.appendTo($j('div.top'));
+				}
+			}
 			$j('.cal-bubble').hide();
 			
 		}
@@ -124,12 +160,12 @@ $j(function() {
     });
 
 	$j('.customise').click(function(event) {
-		event.preventDefault();
-		$j('#tabs-homepage').slideToggle();
+		$j('#tabs-homepage, .empty-column').slideToggle();
 		$j(this).children('span').toggle();
 		$j('h2.hide').each(function () {
 			$j(this).toggle();
 		});
+		return false;
 	});
 
 	$j("a.edit").hover(function() {
@@ -215,7 +251,11 @@ $j(function() {
 			data: {add : $j(this).attr('rel'), cid : cid }, 
 			success: function(data){
 				$j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
+					emptyColumnsCheck($j('div.top'))
+					emptyColumnsCheck($j('div.right'))
+					emptyColumnsCheck($j('div.left'))
 					$j(this).animate({opacity:1}, 300);
+					
 				});
         	},
 			dataType: "html"
@@ -242,6 +282,7 @@ $j(function() {
 		var currentAmount = Number($this.siblings('h4').children('strong').children('em').html());
 		currentAmount++;
 		$this.siblings('h4').children('strong').children('em').html(currentAmount);
+		
 		
 	});
 	
