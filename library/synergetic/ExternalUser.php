@@ -230,9 +230,61 @@ class ExternalUser extends MSSQL{
         return $this->getOne($query);
     }
 
+	/**
+	 * Gets all Students' account info from Synergetic
+	 *
+	 * @return array|bool
+	 */
+    public function getStudentUserAccountInfo() {
+		$query = "
+			SELECT
+				vStudents.StudentID, NetworkLogin, vStudents.StudentTitle, vStudents.StudentPreferred, vStudents.StudentSurname,
+				vStudents.StudentYearLevel, vStudents.StudentHouse, StudentCampus
+			FROM SynergyOne.dbo.vStudents vStudents
+			LEFT JOIN Community ON Community.ID = StudentID
+			WHERE vStudents.FileSemester = '{$_SESSION['FileSemester']}'
+			AND vStudents.FileYear = '{$_SESSION[ 'FileYear']}'
+		";
 
+        return $this->getAll($query);
+    }
 
+	/**
+	 * Gets all Parents' account info from Synergetic
+	 * Used for Bialik sync
+	 *
+	 * @return array|bool
+	 */
+	public function getParentUserAccountInfo() {
+		$query = "
+			SELECT DISTINCT
+				StudentContactID,
+				StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
+				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
+				StudentYearLevel
+			FROM SynergyOne.dbo.vStudentContactAllAddress
+			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
+			AND FileSemester = '{$_SESSION['FileSemester']}'
+			AND FileYear = '{$_SESSION[ 'FileYear']}'
+			ORDER BY StudentContactID
+		";
+
+        return $this->getAll($query);
+	}
+
+	/**
+	 * Gets all Staff's account info from Synergetic
+	 *
+	 * @return array|bool
+	 */
+    public function getStaffUserAccountInfo() {
+		$query = "
+			SELECT
+				*, StaffID, NetworkLogin, StaffTitle, StaffPreferredName, StaffSurname, Email, StaffCampus
+			FROM SynergyOne.dbo.vStaff vStaff
+			LEFT JOIN Community ON Community.ID = StaffID
+		";
+
+        return $this->getAll($query);
+    }
 }
-
-
-?>
