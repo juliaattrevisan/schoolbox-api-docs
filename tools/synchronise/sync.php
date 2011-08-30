@@ -42,10 +42,11 @@ $allStrategies = array(
 foreach($allStrategies as $currentStrategy) {
 	$sync = new SynergeticSync($currentStrategy);
 
-	// Just echo out a plan
-	$sync->setPerformUpdate(true);
+	/* Do not alter the db
+	 */
+	$sync->setPerformUpdate(false);
 
-	/* Set Verbosity
+	/* Set Verbosity so you can see intentions
 	 */
 	$sync->setVerbose(false);
 

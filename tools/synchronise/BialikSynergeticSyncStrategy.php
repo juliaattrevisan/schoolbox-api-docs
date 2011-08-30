@@ -8,7 +8,7 @@
 abstract class BialikSynergeticSyncStrategy extends SynergeticSyncStrategy {
 
 	/**
-	 * Figure out the Bialik Group ID based on a Student's year level
+	 * Figure out the Group ID based on a Student's year level
 	 *
 	 * @param  $year
 	 * @return bool|int
@@ -46,7 +46,6 @@ abstract class BialikSynergeticSyncStrategy extends SynergeticSyncStrategy {
 
 	/**
 	 * Figure out which Campus belongs to this Student
-	 * Used by Bialik
 	 *
 	 * @param  $year
 	 * @return bool|string

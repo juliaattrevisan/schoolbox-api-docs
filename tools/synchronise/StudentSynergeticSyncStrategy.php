@@ -3,7 +3,7 @@
  * Adds Students in Synergetic to the Schoolbox User table. Applies Campus based
  * on the Students' Year Level.
  */
-class StudentSynergeticSyncStrategy extends BialikSynergeticSyncStrategy implements SynergeticSyncStrategyInterface {
+class StudentSynergeticSyncStrategy extends BialikSynergeticSyncStrategy {
 	protected $strategyTitle = "Student Synchronisation";
 
 	/**
