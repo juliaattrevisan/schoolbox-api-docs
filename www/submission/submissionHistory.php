@@ -75,11 +75,14 @@ if (!in_array($submissionBox['category'], $categoryIDList)) {
 	error(17);
 }
 
+$emailObj = new Email();
+$emailAddress = $emailObj->formatEmailFromArray($owner);
+
 $this->setVar(array(
 	'BOX_CATEGORYNAME' => $submissionBox['categoryName'],
     'BOX_CATEGORYID'    => $submissionBox['cid'],
 	'BOX_DESCRIPTION' => $submissionBox['name'],
-	'BOX_OWNER' => '<a href="'.$_SESSION['mailhandle'].formatEmail($owner).'">'.formatName($owner).'</a>',
+	'BOX_OWNER' => '<a href="'.$_SESSION['mailhandle'].$emailAddress.'">'.formatName($owner).'</a>',
 	'BOX_DUEDATE' => date(Cfg::get('date_short'), strtotime($submissionBox['date'])),
 ));
 
@@ -119,7 +122,7 @@ if (is_array($allWork) && count($allWork)) {
 
 		if ($currentWork['sid'] != null) {
 			$this->setVar('action_submit_block', '');
-			
+
 			/* Remember most recent submission
 			 */
 			$recentSubmission['sid'] = $currentWork['sid'];
@@ -185,7 +188,7 @@ if (is_array($allWork) && count($allWork)) {
 
 		$this->setVar('overdue_block', '');
 	}
-	
+
 	$this->setVar(array(
 		'MOST_RECENT_SUBMISSION_DATE' => outputDate(Cfg::get('date_long'), $recentSubmission['date']),
 		'MOST_RECENT_SUBMISSION_FILE_ID' => $recentSubmission['sid'],

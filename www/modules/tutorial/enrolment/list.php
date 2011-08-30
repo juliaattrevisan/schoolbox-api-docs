@@ -30,11 +30,11 @@ if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)
 	error(19);
 
 if (is_numeric($_GET['eventID'])) {
-	
+
 	$event = $eventHandler->getByID($_GET['eventID']);
-	if (!isset($event['eventID'])) 
+	if (!isset($event['eventID']))
 		error(2);
-		
+
 	// check user is one of the tutors
 	if ($permission < FULL_ACCESS && !in_array($_SESSION['id'], array($event['tutor1ID'], $event['tutor2ID'])))
 		error(19);
@@ -46,7 +46,7 @@ if (is_numeric($_GET['eventID'])) {
 					'WEEK'			=> date("YW", $event['date']) - 1,
 					);
 	$page->setVar($output);
-	
+
 	$code = $event['typeID'] == 1 ? $event['code'] : '';
 	$enrolmentList = $enrolmentHandler->getAllByEvent($code, $event['eventID']);
 	if (is_array($enrolmentList)) {
@@ -56,14 +56,14 @@ if (is_numeric($_GET['eventID'])) {
 			$attendance = $attendanceHandler->getByStudent($enrolment['studentID'], $event['code']);
 			$percentage = $attendance['expected'] > 0 ? number_format(($attendance['present']/$attendance['expected'])*100, 2) . " %" : 'N/A';
 			$user = $userHandler->getByID($enrolment['studentID']);
-			
+
 			$output = array('STUDENT_ID'	=> $enrolment['studentID'],
 							'STUDENT_NAME'	=> formatName($user),
 							'PERCENTAGE'	=> $percentage,
 							'ON_OFF' 		=>  ++$j%2? 'dark' : '',
 							);
 			$page->setVar($output);
-			
+
 			// remove button
 			$page->setVar('remove_block', '');
 			$page->setVar('remove_grey_block', '');
@@ -71,10 +71,10 @@ if (is_numeric($_GET['eventID'])) {
 				$page->parse('remove_block', 'remove');
 			else
 				$page->parse('remove_grey_block', 'remove_grey');
-		
-			$emailAll .= formatEmail($user).",";
-			
-			
+
+			$emailObj = new Email();
+			$emailAll .= $emailObj->formatEmailFromArray($user) . ',';
+
 			// output attendance per date
 			$attendanceList = $attendanceHandler->getAllByStudent($enrolment['studentID'], $event['code'], $event['eventID']);
 			if (is_array($attendanceList)) {
@@ -85,37 +85,40 @@ if (is_numeric($_GET['eventID'])) {
 									'REASON'		=> scrubText($attendance['reason']),
 									);
 					$page->setVar($output);
-					
+
 					// hide image if attendance not marked
 					$page->setVar('image_block', '');
 					if (!empty($attendance['present']))
 						$page->parse('image_block', 'image');
-					
+
 					// only parse date headings once
 					if ($i == 1)
 						$page->parse('date_list_block', 'date_list', true);
-						
+
 					$page->parse('attendance_list_block', 'attendance_list', true);
 				}
 			}
-			
-			
+
+
 			$page->parse('enrolment_list_block', 'enrolment_list', true);
 		}
-		
-		$output = array('REPLY_TO'	=> formatEmail($_SESSION),
+
+		$emailObj = new Email();
+		$email = $emailObj->formatEmailFromArray($_SESSION);
+
+		$output = array('REPLY_TO'	=> $email,
 						'EMAIL_ALL'	=> $emailAll,
 						);
-						
+
 		$page->setVar($output);
-		
+
 		$page->parse('has_enrolments_block', 'has_enrolments');
-		
+
 	} else
 		$page->setVar('has_enrolments_block', '<p>There are no students enrolled in this class.</p>');
-	
+
 	$page->outputPage();
-	
+
 } else
 	error(2);
 

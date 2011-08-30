@@ -121,15 +121,15 @@ function formatName($userInfo, $format = NULL){
         return 'Unknown User';
 }
 
-function formatEmail($email) {
-	if($email['local_email']) {
-			return $email['username']."@".Cfg::get('mail_address');
-	}
-	else if($email['alt_email'])
-		return $email['alt_email'];
-	else
-		return false;
-}
+//function formatEmail($email) {
+//	if($email['local_email']) {
+//			return $email['username']."@".Cfg::get('mail_address');
+//	}
+//	else if($email['alt_email'])
+//		return $email['alt_email'];
+//	else
+//		return false;
+//}
 
 /*
  * convert an australian date to a unixtimestamp

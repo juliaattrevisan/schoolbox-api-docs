@@ -25,10 +25,13 @@ if (is_array($userList)) {
 			}
 		}
 
+		$emailObj = new Email();
+		$email = $emailObj->formatEmailFromArray($user);
+
 		$output = array($user['synergy_id'],
 						$user['firstname'],
 						$user['lastname'],
-						formatEmail($user),
+						$email,
 						$user['campusName'],
 						$session[1]['title'],
 						$session[1]['room'],

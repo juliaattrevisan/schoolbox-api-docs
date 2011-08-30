@@ -14,13 +14,15 @@ $page->setBlock(TEMPLATE_content, 'recaptcha', 'recaptcha_block');
 $page->setTitle('Feedback');
 
 $page->setVar('recaptcha_block', '');
-if (is_numeric($_SESSION['id'])) 
+if (is_numeric($_SESSION['id']))
 	$user = $userHandler->getByID($_SESSION['id']);
 //else
 	//$page->parse('recaptcha_block', 'recaptcha');
 
-$output = array('NAME'	=> isset($user) ? formatName($user) : '',
-				'EMAIL'	=> isset($user) ? formatEmail($user) : '',
+$email = new Email();
+
+$output = array('NAME'	=> isset($user) ? $email->formatEmailFromArray($user) : '',
+				'EMAIL'	=> isset($user) ? $email->formatEmailFromArray($user) : '',
 				//'RECAPTCHA_IMAGE'		=> RECAPTCHA_SECURE_URL . '/image?c=' . ReCaptcha::getChallenge(),
 				//'RECAPTCHA_CHALLENGE'	=> ReCaptcha::getChallenge(),
 				);

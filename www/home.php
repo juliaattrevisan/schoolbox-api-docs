@@ -4,7 +4,6 @@
 *         Copyright (c) 2002-2003 Lektec Consulting         *
 *                                                           *
 ************************************************************/
-
 require_once 'include/stdfuncs.php';
 require_once '../library/group.php';
 $groupHandler = new Group;

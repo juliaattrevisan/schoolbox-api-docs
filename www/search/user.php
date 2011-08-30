@@ -75,7 +75,8 @@ if (is_numeric($this->arg[0])) {
 	$this->setVar($blank);
 
 	//Format email address link
-	$emailAddress = formatEmail($user);
+	$emailObj = new Email();
+	$emailAddress = $emailObj->formatEmailFromArray($user);
 
 	/* Dont display emails of students to parents
 	 */
@@ -160,7 +161,7 @@ if (is_numeric($this->arg[0])) {
 			else {
 				$this->parse('due_work_block', 'due_work');
 			}
- 
+
 			if (HELPDESK_enable == true) {
 				$this->parse('helpdesk_block', 'helpdesk');
 			}
@@ -173,7 +174,10 @@ if (is_numeric($this->arg[0])) {
 			if ($synInfo['StudentFormStaffName'] && $synInfo['TeacherFormID']) {
 				$form = $userHandler->getByField('synergy_id', $synInfo['TeacherFormID']);
 
-				if ($formEmail = formatEmail($form)) {
+				$emailObj = new Email();
+				$emailAddress = $emailObj->formatEmailFromArray($form);
+
+				if ($formEmail = $emailAddress) {
 					$formTeacher = '<a href="'.$_SESSION['mailhandle'].$formEmail.'">'.scrubTEXT($synInfo['StudentFormStaffName']).'</a>';
 				}
 				else {
@@ -184,7 +188,10 @@ if (is_numeric($this->arg[0])) {
 			if ($synInfo['StudentTutorName'] && $synInfo['TeacherTutorID']) {
 				$tutor = $userHandler->getByField('synergy_id', $synInfo['TeacherTutorID']);
 
-				if ($tutorEmail = formatEmail($tutor)) {
+				$emailObj = new Email();
+				$emailAddress = $emailObj->formatEmailFromArray($form);
+
+				if ($tutorEmail = $emailAddress) {
 					$tutorTeacher = '<a href="'.$_SESSION['mailhandle'].$tutorEmail.'">'.scrubTEXT($synInfo['StudentTutorName']).'</a>';
 				}
 				else {

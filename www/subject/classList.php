@@ -4,7 +4,7 @@
 *         Copyright (c) 2002-2003 Lektec Consulting         *
 *                                                           *
 ************************************************************/
-//ClassList object..displays class list with most recent visit 
+//ClassList object..displays class list with most recent visit
 
 require_once 'include/permission.php';
 require_once '../library/category.php';
@@ -18,7 +18,7 @@ if(isStaff($_SESSION['gid']))
 	$categoryHandler = new Category;
 	$synergeticClass = new ExternalClass;
 
-	
+
 	$this->setFile(TEMPLATE_content, 'class/classList.htm');
 	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
     $this->setBlock('student_list', 'medical', 'medical_block');
@@ -34,28 +34,30 @@ if(isStaff($_SESSION['gid']))
 	}
 	else
 		$category = $categoryHandler->getByCode($code);
-	
+
 	if(is_array($category)) {
-		$this->setVar("SUBJECTNAME", $category['name'] ." ($code)");	
-	
+		$this->setVar("SUBJECTNAME", $category['name'] ." ($code)");
+
 		$classList = $synergeticClass->getStudents($code);
 		if(is_array($classList)) {
 			foreach($classList as $student) {
-				
+
 				$email = '';
 				$emailaddr = '';
 				$user = $userHandler->getBySynergy($student['synergy_id']);
-			
+
 				if(is_array($user)){
-					$emailaddr = formatEmail($user);
-					if($emailaddr){				
+					$emailObj = new Email();
+					$emailaddr = $emailObj->formatEmailFromArray($user);
+
+					if($emailaddr){
 						$emaillink = "<a href=\"".$_SESSION['mailhandle'].$emailaddr."\">Email</a>";
 						$classEmail .= $emailaddr.", ";
 					}
 				}
-		
+
 				$lastVisit = $categoryHandler->lastVisit($category['id'], $user['uid']);
-			
+
 				$studentOutput = array(	'SURNAME' 	=> $student['lastname'],
 										'FIRSTNAME' => $student['firstname'],
 										'YEARLEVEL' => $student['yearlevel'],
@@ -68,7 +70,7 @@ if(isStaff($_SESSION['gid']))
                                         'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
 										'ON_OFF' => ++$j%2? '' : 'dark',
 										);
-									
+
 				$this->setVar($studentOutput);
 				if($student['StudentMedicalAlert'])
                     $this->parse('medical_block','medical');
@@ -85,29 +87,31 @@ if(isStaff($_SESSION['gid']))
                 else
                     $this->setVar('eportfolio_block','');
 
-				$this->parse("student_list_block", "student_list", true);		
+				$this->parse("student_list_block", "student_list", true);
 			}
 		}
 		else
 			$this->setVar('student_list_block', '');
 	}
-	else 
+	else
 		$this->setVar('student_list_block', '');
-	
-	
-	$this->setVar("REPLYTO", formatEmail($_SESSION));
+
+	$emailObj = new Email();
+	$email = $emailObj->formatEmailFromArray($_SESSION);
+
+	$this->setVar("REPLYTO", $email);
 	$this->setVar("CLASSEMAIL", $classEmail);
-	
+
 }
 else
 {
 	error(19);
-}    
-
-			
+}
 
 
-    
+
+
+
 
 
 ?>

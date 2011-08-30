@@ -127,7 +127,9 @@ if (!empty($result['user'])) {
 
 		/* Format email address
 		 */
-        $address = formatEmail($user);
+		$emailObj = new Email();
+
+        $address = $emailObj->formatEmailFromArray($user);
 
         if ($address) {
             if (Cfg::get('site_location') == 'wenona') {

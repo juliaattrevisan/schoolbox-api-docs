@@ -23,11 +23,13 @@ if (is_numeric($_GET['workshopID'])) {
 	$userList = $workshopHandler->getUserList($workshop['workshopID']);
 	if (is_array($userList)) {
 		foreach ($userList as $user) {
+			$emailObj = new Email();
+			$email = $emailObj->formatEmailFromArray($user);
 
 			$output = array($user['synergy_id'],
 							$user['firstname'],
 							$user['lastname'],
-							formatEmail($user),
+							$email,
 							$user['campusName'],
 							$workshop['title'],
 							$workshop['room'],

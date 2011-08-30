@@ -42,14 +42,18 @@ class schoolbox_addressbook_backend extends rcube_addressbook {
 
         $this->user_count = $count;
         $this->result = $this->count();
-	if(is_array($users)) {
+
+		if(is_array($users)) {
         	foreach ($users as $user) {
+				$emailObj = new Email();
+				$email = $emailObj->formatEmailFromArray($user);
+
         	    $this->result->add(array(
         	        'ID'        => $user['id'],
         	        'name'      => formatName($user),
         	        'firstname' => $user['firstname'],
         	        'surname'   => $user['lastname'],
-        	        'email'     => formatEmail($user)
+        	        'email'     => $email
         	    ));
         	}
 	}
@@ -63,15 +67,18 @@ class schoolbox_addressbook_backend extends rcube_addressbook {
 
         $this->user_count = $count;
         $this->result = $this->count();
-        
+
 	if(is_array($users) ) {
         	foreach ($users as $user) {
+				$emailObj = new Email();
+				$email = $emailObj->formatEmailFromArray($user);
+
         	    $this->result->add(array(
         	        'ID'        => $user['id'],
         	        'name'      => formatName($user),
         	        'firstname' => $user['firstname'],
         	        'surname'   => $user['lastname'],
-        	        'email'     => formatEmail($user)
+        	        'email'     => $email,
         	    ));
         	}
 	}
@@ -86,12 +93,15 @@ class schoolbox_addressbook_backend extends rcube_addressbook {
         $this->result = $this->count();
 
         foreach ($users as $user) {
+			$emailObj = new Email();
+			$email = $emailObj->formatEmailFromArray($user);
+
             $this->result->add(array(
                 'ID'        => $user['id'],
                 'name'      => formatName($user),
                 'firstname' => $user['firstname'],
                 'surname'   => $user['lastname'],
-                'email'     => formatEmail($user)
+                'email'     => $email,
             ));
         }
 

@@ -452,7 +452,10 @@ foreach ($categoryList as $category) {
 			foreach ($teacherList as $teacherSynID) {
 				$teacher = $userHandler->getBySynergy($teacherSynID);
 				$teacherName = formatName($teacher);
-				$emailAddress = formatEmail($teacher);
+
+				$emailObj = new Email();
+				$emailAddress = $emailObj->formatEmailFromArray($teacher);
+
 				$teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
 			}
 		}

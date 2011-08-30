@@ -1,6 +1,7 @@
 <?php
 /**
- * Adds validation and detection methods
+ * Adds validation and detection methods for email addresses and things related
+ * to email addresses.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -11,8 +12,10 @@
 class Email {
 	private $email = null;
 
-	public function __construct($email) {
-		$this->setEmail($email);
+	public function __construct($email = null) {
+		if ($email !== null) {
+			$this->setEmail($email);
+		}
 	}
 
 	/**
@@ -40,6 +43,27 @@ class Email {
 		 */
 		if (getmxrr($domain, $temp) || checkdnsrr($domain, 'ANY')) {
 			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Format an email address from a User array, or an array which contains the
+	 * local_email, alt_email and username fields.
+	 *
+	 * This creates local_email versions if specified, otherwise returns the
+	 * alt_email field
+	 *
+	 * @param  $email
+	 * @return bool|string
+	 */
+	public function formatEmailFromArray($user) {
+		if ($user['local_email']) {
+			return $user['username'] . '@' . Cfg::get('mail_address');
+		}
+		else if ($user['alt_email']) {
+			return $user['alt_email'];
 		}
 
 		return false;

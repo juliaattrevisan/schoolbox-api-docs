@@ -17,13 +17,14 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && is_n
 		foreach ($userList as $user) {
 
             if($_GET['email']) {
-                $email = formatEmail($user);
+				$emailObj = new Email();
+				$email = $emailObj->formatEmailFromArray($user);
 
                 if($email) {
                     $suggestions[] = scrubText($user['firstname']." ".$user['lastname'].' <'.$email.'>');
                     $data[] = scrubText($user['firstname']." ".$user['lastname']).' <'.$email.'>';
                 }
-            } 
+            }
             else {
 				$person = "{$user['firstname']} {$user['lastname']} - Year {$user['year']}, {$user['gname']}";
                 $suggestions[] = html_entity_decode(scrubText($person), ENT_QUOTES);

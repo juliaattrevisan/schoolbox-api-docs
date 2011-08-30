@@ -38,12 +38,15 @@ if (is_array($tutorList)) {
 					else
 						$processed = $event['tutor2Processed'];
 
+					$emailObj = new Email();
+					$email = $emailObj->formatEmailFromArray($user);
+
 					$output = array($user['uid'],
 								  	$user['synergy_id'],
 									$user['title'],
 									$user['firstname'],
 									$user['lastname'],
-									formatEmail($user),
+									$email,
 									outputDate('Y-m-d', $event['marked']),
 									scrubText($event['name']),
 									scrubText($event['code']),
@@ -59,13 +62,10 @@ if (is_array($tutorList)) {
 
 					$line .= TextFormatter::outputCSV($output)."\n";
 				}
-
-
 			}
 		}
 	}
 }
-
 
 header('Content-type: text/csv');
 header('Content-Disposition: inline; filename="hours-performed-'.outputDate('dMY', $from).'-'.outputDate('dMY', $to).'.csv"');

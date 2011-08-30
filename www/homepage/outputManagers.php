@@ -9,23 +9,26 @@
 
 		if (is_array($managerList)) {
 			foreach ($managerList as $manager) {
-			
+
 				$name = formatName($manager);
-				$email = formatEmail($manager);
-				
+
+				$emailObj = new Email();
+				$email = $emailObj->formatEmailFromArray($manager);
+
 				$this->setVar("MEMBER_NAME", "<a href=\"/search/user/{$manager['uid']}\">$name</a>");
-					
+
 				if($manager['type'] == 3)
 					$name .= " (Group Admin.)";
-						
+
 				if($email)
 					$emailall .= $email.",";
-				
+
 				$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 				$this->parse("staff_member_block", "staff_members", true);
 
 			}
-            $this->setVar("REPLYTO", formatEmail($_SESSION));
+
+            $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
 			$this->setVar("EMAILALL", $emailall);
 		} else
 			$this->setVar("staff_member_block", "");
