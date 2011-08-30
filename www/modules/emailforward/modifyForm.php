@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/../../../include/Config.php');
+require_once(dirname(__FILE__) . '/../../../include/config.php');
 require_once(dirname(__FILE__) . '/../../../library/user.php');
 require_once(dirname(__FILE__) . '/../../include/stdfuncs.php');
 require_once('ormondLDAP.php');
@@ -47,7 +47,7 @@ if ($message == '') {
 /* Display response message
  */
 $this->setTitle(HEADING . ' - Change Email Forward Confirmation');
-$this->setFile(TEMPLATE_content, '../ormond/modules/emailforward/modifyForm.html');
+$this->setFile(TEMPLATE_content, 'modules/emailforward/modifyForm.html');
 
 $this->setVar(array(
 	'MESSAGE' => $message,

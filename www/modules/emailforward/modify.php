@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/../../../include/Config.php');
+require_once(dirname(__FILE__) . '/../../../include/config.php');
 require_once(dirname(__FILE__) . '/../../../library/user.php');
 require_once(dirname(__FILE__) . '/../../include/stdfuncs.php');
 require_once('ormondLDAP.php');
@@ -7,7 +7,7 @@ require_once('ormondLDAP.php');
 $ldap = new OrmondLDAP();
 
 $this->setTitle(HEADING . ' - Change Email Forward');
-$this->setFile(TEMPLATE_content, '../ormond/modules/emailforward/modify.html');
+$this->setFile(TEMPLATE_content, 'modules/emailforward/modify.html');
 
 $userHandler = new User();
 $user = $userHandler->getByID($_SESSION['id']);

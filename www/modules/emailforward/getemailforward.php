@@ -6,7 +6,7 @@ require_once($_SERVER['DOCUMENT_ROOT']."/include/include.php");
 class EmailForward {
 
 function EmailForward() {
-        $this->db = new dbManager();
+       // $this->db = new dbManager();
 }
 
 function displayForm() {
@@ -24,7 +24,7 @@ function displayForm() {
         $this->t_body->set_var('USERNAME', $user['username']);
         $userdn = $this->getLDAPdn($user['username']);
         $mailaddress = $this->getLDAPemail($user['username'], $userdn);
-        $this->t_body->set_var('EMAIL', $mailaddress);    
+        $this->t_body->set_var('EMAIL', $mailaddress);
 
         $this->t_body->pparse('finalout','tplBODY');
 
@@ -45,7 +45,7 @@ function displayConfirmation($message, $emailad, $password, $uname) {
            $dn = $this->getLDAPdn($uname);
            $ldapconn = ldap_connect("francis2.ormond.unimelb.edu.au", 389);
            $ldapbind = @ldap_bind($ldapconn,$dn,$password);
-           
+
            $emailarray["mailRoutingAddress"] = $emailad;
 
            if($ldapbind) {
