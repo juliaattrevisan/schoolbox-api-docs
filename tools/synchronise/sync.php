@@ -14,6 +14,7 @@ require_once(dirname(__FILE__) . '/../../library/synergetic/ExternalUser.php');
 require_once(dirname(__FILE__) . '/SynergeticSync.php');
 require_once(dirname(__FILE__) . '/SynergeticSyncStrategyInterface.php');
 require_once(dirname(__FILE__) . '/SynergeticSyncStrategy.php');
+require_once(dirname(__FILE__) . '/BialikSynergeticSyncStrategy.php');
 
 /* Individual Strategies
  */
@@ -31,8 +32,8 @@ require_once(dirname(__FILE__) . '/UpdateParentSynergeticSyncStrategy.php');
  */
 $allStrategies = array(
 //	'UpdateParentSynergeticSyncStrategy'
-	'StaffSynergeticSyncStrategy',
-	'ParentSynergeticSyncStrategy',
+//	'StaffSynergeticSyncStrategy',
+//	'ParentSynergeticSyncStrategy',
 	'StudentSynergeticSyncStrategy'
 );
 
@@ -42,7 +43,7 @@ foreach($allStrategies as $currentStrategy) {
 	$sync = new SynergeticSync($currentStrategy);
 
 	// Just echo out a plan
-	// $sync->setPerformUpdate(true);
+	 $sync->setPerformUpdate(true);
 
 	$sync->generateTitle();
 	$sync->synchronise();

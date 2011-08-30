@@ -3,7 +3,7 @@
  * Adds Students in Synergetic to the Schoolbox User table. Applies Campus based
  * on the Students' Year Level.
  */
-class StudentSynergeticSyncStrategy extends SynergeticSyncStrategy implements SynergeticSyncStrategyInterface {
+class StudentSynergeticSyncStrategy extends BialikSynergeticSyncStrategy implements SynergeticSyncStrategyInterface {
 	protected $strategyTitle = "Student Synchronisation";
 
 	/**
@@ -24,10 +24,35 @@ class StudentSynergeticSyncStrategy extends SynergeticSyncStrategy implements Sy
 	public function createIfExists() {
 		foreach($this->getList() as $currentUser) {
 
-			/* TODO: Do db create here
+			/* Database update
 			 */
+			if ($this->getPerformUpdate() === true) {
+				$newUser = array();
 
-			$this->verboseResult($currentUser);
+				/* Login details
+				 */
+				$newUser['username'] = $currentUser['NetworkLogin'];
+				$newUser['password'] = '1234';
+
+				/* User details
+				 */
+				$newUser['title'] = $currentUser['StudentTitle'];
+				$newUser['firstname'] = $currentUser['StudentPreferred'];
+				$newUser['surname'] = $currentUser['StudentSurname'];
+				$newUser['year'] = $currentUser['StudentYearLevel'];
+
+				/* Campus config: needs to map to a campus id
+				 */
+				$newUser['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+
+				/* Student Group ID
+				 */
+				$newUser['group_id'] = 3;
+
+				print_r($newUser);
+			}
+
+			// $this->verboseResult($currentUser);
 		}
 	}
 
@@ -46,7 +71,7 @@ class StudentSynergeticSyncStrategy extends SynergeticSyncStrategy implements Sy
 		$data[] = "surname: {$currentUser['StudentSurname']}";
 		$data[] = "year: {$currentUser['StudentYearLevel']}";
 		$data[] = "campus: {$this->getCampusFromYearLevel($currentUser['StudentYearLevel'])}";
-		$data[] = "groupIDs: " . implode(',', unserialize(STUDENTGROUPIDS));
+		$data[] = "group_id: " . $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
 
 		$this->generateVerboseResult($data);
 	}

@@ -3,7 +3,7 @@
  * Adds Parents in Synergetic to the Schoolbox User table. Applies Campus based
  * on the Students' Year Level.
  */
-class ParentSynergeticSyncStrategy extends SynergeticSyncStrategy implements SynergeticSyncStrategyInterface {
+class ParentSynergeticSyncStrategy extends BialikSynergeticSyncStrategy implements SynergeticSyncStrategyInterface {
 	protected $strategyTitle = "Parent Synchronisation";
 
 	/**

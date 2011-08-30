@@ -43,39 +43,6 @@ abstract class SynergeticSyncStrategy implements SynergeticSyncStrategyInterface
 	}
 
 	/**
-	 * Figure out which Campus belongs to this Student
-	 *
-	 * @param  $year
-	 * @return bool|string
-	 */
-	protected function getCampusFromYearLevel($year) {
-		switch ($year) {
-			case '02':
-			case '03':
-			case '04':
-			case '05':
-			case '06':
-			case '07':
-			case '08':
-			case '09':
-			case '10':
-			case '11':
-			case '12':
-				return 'main';
-				break;
-			case '00':
-			case '01':
-			case '30':
-			case '40':
-				return 'elc';
-				break;
-			default:
-				return false;
-				break;
-		}
-	}
-
-	/**
 	 * Print a nice heading before the rest of the confirmation messages
 	 *
 	 * @return void

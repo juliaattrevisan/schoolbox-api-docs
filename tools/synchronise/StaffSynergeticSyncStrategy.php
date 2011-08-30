@@ -3,7 +3,7 @@
  * Adds Staff in Synergetic to the Schoolbox User table. Applies Campus based
  * on the Staff's campus field.
  */
-class StaffSynergeticSyncStrategy extends SynergeticSyncStrategy implements SynergeticSyncStrategyInterface {
+class StaffSynergeticSyncStrategy extends BialikSynergeticSyncStrategy implements SynergeticSyncStrategyInterface {
 	protected $strategyTitle = "Staff Synchronisation";
 
 	/**
