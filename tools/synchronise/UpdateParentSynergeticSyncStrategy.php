@@ -106,30 +106,32 @@ class UpdateParentSynergeticSyncStrategy extends SynergeticSyncStrategy implemen
 	 * @return void
 	 */
 	private function updateVerboseResult($user, $currentSynergyId, $updatedUser, $currentParent) {
-		if ($this->getPerformUpdate() === true) {
-			$action = 'Updating';
-		}
-		else {
-			$action = 'Planning update';
-		}
+		if ($this->getVerbose() === true) {
+			if ($this->getPerformUpdate() === true) {
+				$action = 'Updating';
+			}
+			else {
+				$action = 'Planning update';
+			}
 
-		/* Update email addresses for publicly listed people
-		 * Otherwise clear email address for those who aren't publicly listed
-		 */
-		if ($this->isPubliclyListed($currentParent)) {
-			 $emailString = 'and updating email address';
-		}
-		else {
-			$emailString  = 'and clearing email address';
-		}
+			/* Update email addresses for publicly listed people
+			 * Otherwise clear email address for those who aren't publicly listed
+			 */
+			if ($this->isPubliclyListed($currentParent)) {
+				 $emailString = 'and updating email address';
+			}
+			else {
+				$emailString  = 'and clearing email address';
+			}
 
-		$str = array();
-		$str[] = "$action on";
-		$str[] = "#$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email])";
-		$str[] = "to $updatedUser[title] $updatedUser[firstname] $updatedUser[lastname] ($updatedUser[alt_email])";
-		$str[] = "$emailString\n";
+			$str = array();
+			$str[] = "$action on";
+			$str[] = "#$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email])";
+			$str[] = "to $updatedUser[title] $updatedUser[firstname] $updatedUser[lastname] ($updatedUser[alt_email])";
+			$str[] = "$emailString\n";
 
-		print_r(implode(' ', $str));
+			print_r(implode(' ', $str));
+		}
 	}
 
 	/**
@@ -140,10 +142,12 @@ class UpdateParentSynergeticSyncStrategy extends SynergeticSyncStrategy implemen
 	 * @return void
 	 */
 	private function ignoreVerboseResult($user, $currentSynergyId) {
-		$str = array();
-		$str[] = 'Ignoring';
-		$str[] = "#$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email])\n";
+		if ($this->getVerbose() === true) {
+			$str = array();
+			$str[] = 'Ignoring';
+			$str[] = "#$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email])\n";
 
-		print_r(implode(' ', $str));
+			print_r(implode(' ', $str));
+		}
 	}
 }

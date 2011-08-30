@@ -35,8 +35,36 @@ class StaffSynergeticSyncStrategy extends BialikSynergeticSyncStrategy implement
 				$currentUser['preferredEmail'] = $currentUser['Email'];
 			}
 
-			/* TODO: Do db create here
+			/* Database update
 			 */
+			if ($this->getPerformUpdate() === true) {
+				$newUser = array();
+
+				/* Login details
+				 */
+				$newUser['username'] = $currentUser['NetworkLogin'];
+				$newUser['password'] = '1234';
+
+				/* User details
+				 */
+				$newUser['title'] = $currentUser['StaffTitle'];
+				$newUser['firstname'] = $currentUser['StaffPreferredName'];
+				$newUser['surname'] = $currentUser['StaffSurname'];
+				$newUser['email'] = $currentUser['preferredEmail'];
+
+				/* Campus config: needs to map to a campus id
+				 */
+				$newUser['campus'] = array($this->getCampusFromCode($currentUser['StaffCampus']));
+
+				/* Staff Group ID
+				 */
+				$newUser['group_id'] = 2;
+
+				if ($this->getVerbose() === true) {
+//					print_r($newUser);
+				}
+			}
+
 			$this->verboseResult($currentUser);
 		}
 	}
@@ -48,40 +76,18 @@ class StaffSynergeticSyncStrategy extends BialikSynergeticSyncStrategy implement
 	 * @return void
 	 */
 	private function verboseResult($currentUser) {
-		$data = array();
-		$data[] = "username: {$currentUser['NetworkLogin']}";
-		$data[] = "password: unknown";
-		$data[] = "title: {$currentUser['StaffTitle']}";
-		$data[] = "firstname: {$currentUser['StaffPreferredName']}";
-		$data[] = "surname: {$currentUser['StaffSurname']}";
-		$data[] = "email: {$currentUser['preferredEmail']}";
-		$data[] = "campus: {$this->getCampusFromCode($currentUser['StaffCampus'])}";
-		$data[] = "groupIDs: " . implode(',', unserialize(STAFFGROUPIDS));
+		if ($this->getVerbose() === true) {
+			$data = array();
+			$data[] = "username: {$currentUser['NetworkLogin']}";
+			$data[] = "password: unknown";
+			$data[] = "title: {$currentUser['StaffTitle']}";
+			$data[] = "firstname: {$currentUser['StaffPreferredName']}";
+			$data[] = "surname: {$currentUser['StaffSurname']}";
+			$data[] = "email: {$currentUser['preferredEmail']}";
+			$data[] = "campus: {$this->getCampusFromCode($currentUser['StaffCampus'])}";
+			$data[] = "groupIDs: " . implode(',', unserialize(STAFFGROUPIDS));
 
-		$this->generateVerboseResult($data);
-	}
-
-	/**
-	 * Figure out which campus a staff member is in, based on the code provided
-	 * @param  $code
-	 * @return bool|string
-	 */
-	private function getCampusFromCode($code) {
-
-		/* TODO: Finalise these
-		 */
-		switch($code) {
-			case 'S':
-			case 'M':
-			case 'P':
-				return 'main';
-				break;
-			case 'ELC':
-				return 'elc';
-				break;
-			default:
-				return false;
-				break;
+			$this->generateVerboseResult($data);
 		}
 	}
 }

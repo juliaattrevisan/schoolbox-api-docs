@@ -38,6 +38,16 @@ class SynergeticSync {
 	}
 
 	/**
+	 * Delegation method to directly access Verbose from Sync context
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	public function setVerbose($val) {
+		$this->getStrategy()->setVerbose($val);
+	}
+
+	/**
 	 * Delegation method to directly access Strategy from Sync context
 	 *
 	 * @param  $val

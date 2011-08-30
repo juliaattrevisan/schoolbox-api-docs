@@ -31,10 +31,10 @@ require_once(dirname(__FILE__) . '/UpdateParentSynergeticSyncStrategy.php');
  * Otherwise it will echo out a plan
  */
 $allStrategies = array(
-//	'UpdateParentSynergeticSyncStrategy'
-//	'StaffSynergeticSyncStrategy',
-//	'ParentSynergeticSyncStrategy',
-	'StudentSynergeticSyncStrategy'
+	'UpdateParentSynergeticSyncStrategy',
+	'StaffSynergeticSyncStrategy',
+	'ParentSynergeticSyncStrategy',
+	'StudentSynergeticSyncStrategy',
 );
 
 /* Do each strat
@@ -43,7 +43,11 @@ foreach($allStrategies as $currentStrategy) {
 	$sync = new SynergeticSync($currentStrategy);
 
 	// Just echo out a plan
-	 $sync->setPerformUpdate(true);
+	$sync->setPerformUpdate(true);
+
+	/* Set Verbosity
+	 */
+	$sync->setVerbose(false);
 
 	$sync->generateTitle();
 	$sync->synchronise();

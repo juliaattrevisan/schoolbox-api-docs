@@ -9,6 +9,7 @@ abstract class SynergeticSyncStrategy implements SynergeticSyncStrategyInterface
 	protected $performUpdate = false;
 	protected $list = null;
 	protected $strategyTitle = '';
+	protected $verbose = true;
 
 	/**
 	 * Constructor
@@ -177,5 +178,24 @@ abstract class SynergeticSyncStrategy implements SynergeticSyncStrategyInterface
 	 */
 	public function getStrategyTitle() {
 		return $this->strategyTitle;
+	}
+
+	/**
+	 * Set Verbose estting
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	public function setVerbose($val) {
+		$this->verbose = $val;
+	}
+
+	/**
+	 * Get Verbose setting
+	 *
+	 * @return bool
+	 */
+	public function getVerbose() {
+		return $this->verbose;
 	}
 }

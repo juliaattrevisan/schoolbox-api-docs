@@ -49,10 +49,12 @@ class StudentSynergeticSyncStrategy extends BialikSynergeticSyncStrategy impleme
 				 */
 				$newUser['group_id'] = 3;
 
-				print_r($newUser);
+				if ($this->getVerbose() === true) {
+//					print_r($newUser);
+				}
 			}
 
-			// $this->verboseResult($currentUser);
+			$this->verboseResult($currentUser);
 		}
 	}
 
@@ -63,16 +65,18 @@ class StudentSynergeticSyncStrategy extends BialikSynergeticSyncStrategy impleme
 	 * @return void
 	 */
 	private function verboseResult($currentUser) {
-		$data = array();
-		$data[] = "username: {$currentUser['NetworkLogin']}";
-		$data[] = "password: unknown";
-		$data[] = "title: {$currentUser['StudentTitle']}";
-		$data[] = "firstname: {$currentUser['StudentPreferred']}";
-		$data[] = "surname: {$currentUser['StudentSurname']}";
-		$data[] = "year: {$currentUser['StudentYearLevel']}";
-		$data[] = "campus: {$this->getCampusFromYearLevel($currentUser['StudentYearLevel'])}";
-		$data[] = "group_id: " . $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
+		if ($this->getVerbose() === true) {
+			$data = array();
+			$data[] = "username: {$currentUser['NetworkLogin']}";
+			$data[] = "password: unknown";
+			$data[] = "title: {$currentUser['StudentTitle']}";
+			$data[] = "firstname: {$currentUser['StudentPreferred']}";
+			$data[] = "surname: {$currentUser['StudentSurname']}";
+			$data[] = "year: {$currentUser['StudentYearLevel']}";
+			$data[] = "campus: {$this->getCampusFromYearLevel($currentUser['StudentYearLevel'])}";
+			$data[] = "group_id: " . $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
 
-		$this->generateVerboseResult($data);
+			$this->generateVerboseResult($data);
+		}
 	}
 }

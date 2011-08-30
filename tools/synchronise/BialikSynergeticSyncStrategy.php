@@ -79,4 +79,28 @@ abstract class BialikSynergeticSyncStrategy extends SynergeticSyncStrategy {
 				break;
 		}
 	}
+
+	/**
+	 * Figure out which campus a staff member is in, based on the code provided
+	 *
+	 * @param  $code
+	 * @return bool|string
+	 */
+	protected function getCampusFromCode($code) {
+		switch($code) {
+			case 'S':
+			case 'M':
+			case 'P':
+				// return 'main';
+				return 1;
+				break;
+			case 'ELC':
+				// return 'elc';
+				return 2;
+				break;
+			default:
+				return false;
+				break;
+		}
+	}
 }
