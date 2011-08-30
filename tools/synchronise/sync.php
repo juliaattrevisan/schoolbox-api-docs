@@ -16,17 +16,20 @@ require_once(dirname(__FILE__) . '/../../library/synergetic/ExternalUser.php');
 
 /* Main classes
  */
-require_once(dirname(__FILE__) . '/SynergeticSync.php');
-require_once(dirname(__FILE__) . '/SynergeticSyncStrategyInterface.php');
-require_once(dirname(__FILE__) . '/SynergeticSyncStrategy.php');
-require_once(dirname(__FILE__) . '/BialikSynergeticSyncStrategy.php');
+require_once(dirname(__FILE__) . '/main/SynergeticSync.php');
+require_once(dirname(__FILE__) . '/main/SynergeticSyncStrategyInterface.php');
+require_once(dirname(__FILE__) . '/main/SynergeticSyncStrategy.php');
 
-/* Individual Strategies
+/* Bialik custom classes
  */
-require_once(dirname(__FILE__) . '/StaffSynergeticSyncStrategy.php');
-require_once(dirname(__FILE__) . '/ParentSynergeticSyncStrategy.php');
-require_once(dirname(__FILE__) . '/StudentSynergeticSyncStrategy.php');
-require_once(dirname(__FILE__) . '/UpdateParentSynergeticSyncStrategy.php');
+require_once(dirname(__FILE__) . '/bialik/BialikSynergeticSyncStrategy.php');
+require_once(dirname(__FILE__) . '/bialik/StaffSynergeticSyncStrategy.php');
+require_once(dirname(__FILE__) . '/bialik/ParentSynergeticSyncStrategy.php');
+require_once(dirname(__FILE__) . '/bialik/StudentSynergeticSyncStrategy.php');
+
+/* MGGS custom classes
+ */
+require_once(dirname(__FILE__) . '/mggs/UpdateParentSynergeticSyncStrategy.php');
 
 /* lol
  *
@@ -53,7 +56,7 @@ foreach($allStrategies as $currentStrategy) {
 
 	/* Set Verbosity so you can see intentions
 	 */
-	$sync->setVerbose(false);
+	$sync->setVerbose(true);
 
 	$sync->generateTitle();
 	$sync->synchronise();
