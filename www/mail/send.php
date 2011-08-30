@@ -32,7 +32,9 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	/* Validate From email address
 	 */
 	if ($user['alt_email']) {
-		if (isValidEmail($user['alt_email'])) {
+		$email = new Email($user['alt_email']);
+
+		if ($email->isValid()) {
 			$from_email = $name . '<' . $user['alt_email'] . '>';
 		}
 		else {
@@ -40,10 +42,10 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 		}
 	}
 	else if ($user['local_email'] || Cfg::get('site_location') == 'wenona') {
-		$email = $user['username'] . '@' . Cfg::get('mail_address');
+		$email = new Email($user['username'] . '@' . Cfg::get('mail_address'));
 
-		if (isValidEmail($email)) {
-			$from_email = $name . '<' . $email . '>';
+		if ($email->isValid()) {
+			$from_email = $name . '<' . $email->getEmail() . '>';
 		}
 		else {
 			error(42);

@@ -89,35 +89,7 @@ function scrubTEXT($text) {
 	return $text;
 }
 
-/**
- * Check if an email address is valid. Stolen and adapted from the Ormond
- * ContactForm class.
- *
- * This should obsolete isEmail()
- *
- * @return bool
- */
-function isValidEmail($email) {
-	if (!preg_match('/^([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}$/', $email)) {
-		return false;
-	}
 
-	/* Do domain lookup
-	 */
-	list($alias, $domain) = explode('@', $email);
-
-	/* This prevents appending of localhost to lookup
-	 */
-	$domain .= '.';
-
-	/* Check for mx records or that it resolves
-	 */
-	if (getmxrr($domain, $temp) || checkdnsrr($domain, 'ANY')) {
-		return true;
-	}
-
-	return false;
-}
 
 function formatName($userInfo, $format = NULL){
 	// Check for custom format
