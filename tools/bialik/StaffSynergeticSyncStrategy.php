@@ -12,9 +12,7 @@ class StaffSynergeticSyncStrategy extends SynergeticSyncStrategy implements Syne
 	 * @return void
 	 */
 	public function generateList() {
-		$allUsers = $this->getExternalUserHandler()->getStaffUserAccountInfo();
-
-		$this->collateList($allUsers);
+		$this->collateList($this->getExternalUserHandler()->getStaffUserAccountInfo());
 	}
 
 	/**
@@ -25,41 +23,42 @@ class StaffSynergeticSyncStrategy extends SynergeticSyncStrategy implements Syne
 	 */
 	public function createIfExists() {
 		foreach($this->getList() as $currentUser) {
-			/* The drop down in synergetic's Phone and Occupation tabs indicates
-			 * which email the person prefers to use.
+
+			/* The drop down in Synergetic's Phone and Occupation tabs indicates
+			 * which email the person prefers to use. Create a field in the
+			 * $currentUser structure to remember this email address
 			 */
 			if ($currentUser['DefaultEmailCode'] == 'O') {
-				$preferredEmail = $currentUser['OccupEmail'];
+				$currentUser['preferredEmail'] = $currentUser['OccupEmail'];
 			}
 			else {
-				$preferredEmail = $currentUser['Email'];
+				$currentUser['preferredEmail'] = $currentUser['Email'];
 			}
 
-			if ($this->getPerformUpdate() === true) {
-
-				/* TODO: Do db create here
-				 */
-
-				$action = "Created account for:  ";
-			}
-			else {
-				$action = "Planned creation of:  ";
-			}
-
-			$data = array();
-			$data[] = "username: {$currentUser['NetworkLogin']}";
-			$data[] = "password: unknown";
-			$data[] = "title: {$currentUser['StaffTitle']}";
-			$data[] = "firstname: {$currentUser['StaffPreferredName']}";
-			$data[] = "surname: {$currentUser['StaffSurname']}";
-			$data[] = "email: {$preferredEmail}";
-			$data[] = "campus: {$this->getCampusFromCode($currentUser['StaffCampus'])}";
-			$data[] = "groupIDs: " . implode(',', unserialize(STAFFGROUPIDS));
-
-			$str = "$action [" . implode(', ', $data) . "]\n";
-
-			print_r($str);
+			/* TODO: Do db create here
+			 */
+			$this->verboseResult($currentUser);
 		}
+	}
+
+	/**
+	 * Verbose feedback on what just happened
+	 *
+	 * @param  $currentUser
+	 * @return void
+	 */
+	private function verboseResult($currentUser) {
+		$data = array();
+		$data[] = "username: {$currentUser['NetworkLogin']}";
+		$data[] = "password: unknown";
+		$data[] = "title: {$currentUser['StaffTitle']}";
+		$data[] = "firstname: {$currentUser['StaffPreferredName']}";
+		$data[] = "surname: {$currentUser['StaffSurname']}";
+		$data[] = "email: {$currentUser['preferredEmail']}";
+		$data[] = "campus: {$this->getCampusFromCode($currentUser['StaffCampus'])}";
+		$data[] = "groupIDs: " . implode(',', unserialize(STAFFGROUPIDS));
+
+		$this->generateVerboseResult($data);
 	}
 
 	/**

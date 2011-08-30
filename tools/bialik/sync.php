@@ -20,6 +20,7 @@ require_once(dirname(__FILE__) . '/SynergeticSyncStrategy.php');
 require_once(dirname(__FILE__) . '/StaffSynergeticSyncStrategy.php');
 require_once(dirname(__FILE__) . '/ParentSynergeticSyncStrategy.php');
 require_once(dirname(__FILE__) . '/StudentSynergeticSyncStrategy.php');
+require_once(dirname(__FILE__) . '/UpdateParentSynergeticSyncStrategy.php');
 
 /* lol
  *
@@ -28,7 +29,8 @@ require_once(dirname(__FILE__) . '/StudentSynergeticSyncStrategy.php');
  *
  * Otherwise it will echo out a plan
  */
-$strategies = array(
+$allStrategies = array(
+//	'UpdateParentSynergeticSyncStrategy'
 	'StaffSynergeticSyncStrategy',
 	'ParentSynergeticSyncStrategy',
 	'StudentSynergeticSyncStrategy'
@@ -36,10 +38,15 @@ $strategies = array(
 
 /* Do each strat
  */
-foreach($strategies as $currentStrategy) {
+foreach($allStrategies as $currentStrategy) {
 	$sync = new SynergeticSync($currentStrategy);
 
-	$sync->getStrategy()->generateTitle();
+	// Just echo out a plan
+	// $sync->setPerformUpdate(true);
+
+	$sync->generateTitle();
 	$sync->synchronise();
+
+	echo "\n\n";
 }
 

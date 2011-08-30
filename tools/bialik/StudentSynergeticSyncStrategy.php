@@ -12,9 +12,7 @@ class StudentSynergeticSyncStrategy extends SynergeticSyncStrategy implements Sy
 	 * @return void
 	 */
 	public function generateList() {
-		$allUsers = $this->getExternalUserHandler()->getStudentUserAccountInfo();
-
-		$this->collateList($allUsers);
+		$this->collateList($this->getExternalUserHandler()->getStudentUserAccountInfo());
 	}
 
 	/**
@@ -25,31 +23,31 @@ class StudentSynergeticSyncStrategy extends SynergeticSyncStrategy implements Sy
 	 */
 	public function createIfExists() {
 		foreach($this->getList() as $currentUser) {
-			if ($this->getPerformUpdate() === true) {
 
-				/* TODO: Do db create here
-				 */
+			/* TODO: Do db create here
+			 */
 
-				$action = "Created account for:  ";
-			}
-			else {
-				$action = "Planned creation of:  ";
-			}
-
-			$data = array();
-			$data[] = "username: {$currentUser['NetworkLogin']}";
-			$data[] = "password: unknown";
-			$data[] = "title: {$currentUser['StudentTitle']}";
-			$data[] = "firstname: {$currentUser['StudentPreferred']}";
-			$data[] = "surname: {$currentUser['StudentSurname']}";
-			$data[] = "year: {$currentUser['StudentYearLevel']}";
-			$data[] = "campus: {$this->getCampusFromYearLevel($currentUser['StudentYearLevel'])}";
-			$data[] = "groupIDs: " . implode(',', unserialize(STUDENTGROUPIDS));
-
-			$str = "$action [" . implode(', ', $data) . "]\n";
-
-			print_r($str);
+			$this->verboseResult($currentUser);
 		}
 	}
 
+	/**
+	 * Verbose feedback on what just happened
+	 *
+	 * @param  $currentUser
+	 * @return void
+	 */
+	private function verboseResult($currentUser) {
+		$data = array();
+		$data[] = "username: {$currentUser['NetworkLogin']}";
+		$data[] = "password: unknown";
+		$data[] = "title: {$currentUser['StudentTitle']}";
+		$data[] = "firstname: {$currentUser['StudentPreferred']}";
+		$data[] = "surname: {$currentUser['StudentSurname']}";
+		$data[] = "year: {$currentUser['StudentYearLevel']}";
+		$data[] = "campus: {$this->getCampusFromYearLevel($currentUser['StudentYearLevel'])}";
+		$data[] = "groupIDs: " . implode(',', unserialize(STUDENTGROUPIDS));
+
+		$this->generateVerboseResult($data);
+	}
 }

@@ -19,13 +19,12 @@ class SynergeticSync {
 	}
 
 	/**
-	 * Facade method to directly access Strategy from Sync context
+	 * Delegation method for generating a title stored in the Strategy
 	 *
-	 * @param  $val
 	 * @return void
 	 */
-	public function setPerformUpdate($val) {
-		$this->getStrategy()->setPerformUpdate($val);
+	public function generateTitle() {
+		$this->getStrategy()->generateTitle();
 	}
 
 	/**
@@ -38,10 +37,31 @@ class SynergeticSync {
 		$this->getStrategy()->createIfExists();
 	}
 
+	/**
+	 * Delegation method to directly access Strategy from Sync context
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	public function setPerformUpdate($val) {
+		$this->getStrategy()->setPerformUpdate($val);
+	}
+
+	/**
+	 * Set the Strategy
+	 *
+	 * @param  $val
+	 * @return void
+	 */
 	public function setStrategy($val) {
 		$this->strategy = $val;
 	}
 
+	/**
+	 * Get the Strategy
+	 *
+	 * @return null
+	 */
 	public function getStrategy() {
 		return $this->strategy;
 	}
