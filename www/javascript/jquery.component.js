@@ -13,7 +13,27 @@ $j(function() {
 		},
 		create: function(event, ui){
 			$j('.ui-slider-handle').append('<span></span>');
+		},
+		'stop':function(event,ui) {
+			var leftColWidth = ui.value-.5;
+			var rightColWidth = 99.5 - ui.value;
+			console.log(leftColWidth, rightColWidth);
+			/*********
+			Oh hello steve ^_^ You will need to save this leftColWidth and rightColWidth and load them onto the
+			/templates/core/homepage/template.html page in their respective tokens:
+			
+			{TEMPLATE_LEFT_COLUMN_WIDTH}
+			{TEMPLATE_RIGHT_COLUMN_WIDTH}
+		
+			I assume you'll be using something like this here:
+		
+			$j.post('/homepage/configForm.php', $j(this).closest('form').serialize(),
+			   function() {
+					$j('.saved-layout').slideDown(150).delay(2000).slideUp(150);
+			   });
+			********/
 		}
+
 	});
 	
 	
@@ -63,6 +83,7 @@ $j(function() {
 				top += $j(this).attr('id').substring(9) + ',';
 			});
 			$j.post('/homepage/configForm.php', {cid : cid, type: 'components', column1: left, column2: right, column3: top});
+			
 			emptyColumnsCheck($j('div.top'))
 			emptyColumnsCheck($j('div.right'))
 			emptyColumnsCheck($j('div.left'))
@@ -82,8 +103,7 @@ $j(function() {
 				ui.placeholder.appendTo($j('div.right'))
 
 			} else if (event.pageX < (topOffset.left + $j('div.top').width()) &&
-					   event.pageY < (topOffset.top + $j('div.top').height())) {  
-						   
+					   event.pageY < (topOffset.top + $j('div.top').height())) {    
 				// top bottom
 				if ($j('div.top').find('.box').length == 0) {
 					ui.placeholder.appendTo($j('div.top'));
