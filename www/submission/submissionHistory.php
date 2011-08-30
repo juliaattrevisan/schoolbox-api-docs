@@ -82,7 +82,7 @@ $this->setVar(array(
 	'BOX_CATEGORYNAME' => $submissionBox['categoryName'],
     'BOX_CATEGORYID'    => $submissionBox['cid'],
 	'BOX_DESCRIPTION' => $submissionBox['name'],
-	'BOX_OWNER' => '<a href="'.$_SESSION['mailhandle'].$emailAddress.'">'.formatName($owner).'</a>',
+	'BOX_OWNER' => '<a href="'.$_SESSION['mailhandle'].$emailAddress.'">'.$userHandler->formatName($owner).'</a>',
 	'BOX_DUEDATE' => date(Cfg::get('date_short'), strtotime($submissionBox['date'])),
 ));
 

@@ -28,13 +28,15 @@ $this->setBlock('blog', 'show_comment', 'show_comment_block');
 
 
 if(!empty($blogs)) {
+	$userHandler = new User();
+
 	foreach($blogs as $blog) {
 		if($blog['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || (NEWS_teacher_edit_other && $permission >= WRITE_ACCESS))
 			$this->setVar('MODIFY_BLOG', "<a href=\"/blog/modify/{$blog['id']}\">Modify</a>");
 		else
 			$this->setVar('MODIFY_BLOG', '');
-		
-		$blog['name'] = formatName($blog);
+
+		$blog['name'] = $userHandler->formatName($blog);
 		$this->setVar(array(
 			'BLOG_ID'		=> $blog['id'],
 			'BLOG_HEADING'  => scrubTEXT($blog['heading']),
@@ -44,14 +46,14 @@ if(!empty($blogs)) {
 			'BLOG_SHADING'  => ++$j%2 ? '' : 'dark',
 			'BLOG_COMMENTS' => ''
 		));
-		
+
 		// comments
 		$this->setVar('comment_block','');
 
 		$comments = $commentHandle->getByBID($blog['id']);
 		$totalComments = $commentHandle->count($blog['id']);
 		$showingComments = count($comments);
-			
+
 		$this->setVar('BLOG_TOTAL_COMMENTS', $totalComments);
 		if($totalComments > $showingComments)
 			$this->parse('show_all_block','show_all');
@@ -59,24 +61,25 @@ if(!empty($blogs)) {
 			$this->setVar('show_all_block','');
 
 		if(!empty($comments)) {
-			
+
 			$this->setVar('BLOG_COMMENTS', $showingComments);
 			$this->parse('show_comment_block','show_comment' );
-			
+
+			$userHandler = new User();
 
 			foreach($comments as $comment) {
-				$comment['name'] = formatName($comment);
+				$comment['name'] = $userHandler->formatName($comment);
 				$this->setVar(array(
 					'COMMENT_BODY'    => scrubTEXT($comment['body']),
 					'COMMENT_OWNER'   => "<a href=\"/search/user/{$comment['owner']}\">{$comment['name']}</a>",
 					'COMMENT_CREATED' => getRelativeTime($comment['created'])
 				));
-				
+
 				if($comment['owner'] == $_SESSION['id'] || $permission >= WRITE_ACCESS)
 					$this->setVar('DELETE_COMMENT', "<a href=\"/blog/comment/delete/{$comment['id']}\">Delete</a>");
 				else
 					$this->setVar('DELETE_COMMENT', '');
-				
+
 				$this->parse('comment_block', 'comment', true);
 			}
 		} else {
@@ -93,7 +96,7 @@ if ($permission < WRITE_ACCESS)
 	$this->setVar('submit_block', '');
 else
 	$this->parse('submit_block', 'submit');
-	
+
 
 
 ?>

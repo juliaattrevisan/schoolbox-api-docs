@@ -42,7 +42,7 @@ class User extends DeprecatedModel {
         }
 
         return false;
-    }    
+    }
 
     function getAllInCategory($categoryID) {
         $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email
@@ -62,7 +62,7 @@ class User extends DeprecatedModel {
 
         $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, eportfolio_enabled,
 						synergy_id, local_email, alt_email, email_pass, userCampus.campus, IF(superusers.id, 1, 0) as su
-				FROM user 
+				FROM user
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
 					LEFT JOIN superusers ON user.id = superusers.id
@@ -111,7 +111,7 @@ class User extends DeprecatedModel {
 
         $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id,
 						synergy_id, local_email, alt_email, userCampus.campus, year, eportfolio_enabled
-				FROM user 
+				FROM user
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
 				WHERE user.synergy_id = '$sid' ORDER BY userCampus.defaultCampus DESC";
@@ -233,9 +233,9 @@ class User extends DeprecatedModel {
 
     /**
      * Gets the profile information for the user.
-     * 
+     *
      * @param <type> $userID
-     * @return <type> 
+     * @return <type>
      */
     function getProfile($userID) {
         $query = "SELECT `year`, luCampus.name AS campus, house.house
@@ -466,7 +466,7 @@ class User extends DeprecatedModel {
 
 	/**
 	 * Create a new user record
-	 * 
+	 *
 	 * @param array $user
 	 * @return <type>
 	 */
@@ -487,7 +487,7 @@ class User extends DeprecatedModel {
         unset($user['defaultCampus']);
         unset($user['su']);
         unset($user['password']);
-        
+
         $user['key'] = substr(md5(uniqid() . time()), 0, 25);
 
         $id = parent::create($user);
@@ -542,5 +542,46 @@ class User extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
+	/**
+	 * Format a name from a user object
+	 *
+	 * @param  $userInfo
+	 * @param null $format
+	 * @return mixed|null|string
+	 */
+	public function formatName($userInfo, $format = NULL){
+
+		// Check for custom format
+		if (empty($format)){
+			$format = Cfg::get('name_format');
+		}
+
+		/* Replace tags */
+		preg_match_all('|{\w+}|', $format, $tags);
+
+		if (empty($tags) || empty($userInfo)) {
+			return 'Unknown User';
+		}
+
+		foreach ($tags[0] as $tag) {
+			$key = trim($tag, '{}');
+
+			if (is_string($userInfo[$key])) {
+				$value = $userInfo[$key];
+			}
+			else {
+				$value = '';
+			}
+
+			$format = str_replace($tag, $value, $format);
+		}
+
+		if (trim($format)) {
+			return $format;
+		}
+		else {
+			return 'Unknown User';
+		}
+	}
 }
 ?>

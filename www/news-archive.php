@@ -17,8 +17,8 @@ $this->setBlock(TEMPLATE_content, 'add_news', 'add_news_block');
 $this->setBlock(TEMPLATE_content, 'news', 'news_block');
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
-$this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');	
-$this->setBlock(TEMPLATE_content, 'archive_button', 'archive_button_block');	
+$this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
+$this->setBlock(TEMPLATE_content, 'archive_button', 'archive_button_block');
 
 $groupHandler = new Group(NEWS_SERVICE);
 
@@ -27,9 +27,9 @@ if(($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS)
 	$this->parse('add_news_block', 'add_news');
 else
 	$this->setVar('add_news_block', '');
-	
-$this->setVar('archive_button_block', '');	
-	
+
+$this->setVar('archive_button_block', '');
+
 $myNews = new News();
 
 $pageNum = $this->arg[0];
@@ -40,12 +40,12 @@ $newsList = $myNews->getNews(0, true);
 
 if(!$pageNum)
 	$pageNum = 1;
-	
+
 $newsPerPage = 15;
 $totalPages = ceil(count($newsList)/$newsPerPage);
-$newsIndex = $newsPerPage * ($pageNum-1);		
+$newsIndex = $newsPerPage * ($pageNum-1);
 
-if($pageNum<2)	
+if($pageNum<2)
 	$this->setVar('previous_button_block', '');
 else
 	$this->parse('previous_button_block', 'previous_button');
@@ -61,9 +61,9 @@ if($totalPages > 1) {
 			 $this->setVar('CURRENT', ' current');
 		else
 			 $this->setVar('CURRENT', '');
-			 
+
 		$this->setVar('PAGE_INDEX', $j);
-		$this->parse('page_number_block','page_number', true); 
+		$this->parse('page_number_block','page_number', true);
 	}
 }
 else
@@ -74,16 +74,18 @@ $outputPagination = array('PREVIOUS_PAGE' 	=> $pageNum - 1,
 						  'LAST_PAGE'		=> $totalPages,
 						  'ARCHIVED'		=> $show=="archived" ? "&archived=1" : "",
 						  );
-						  
-$this->setVar($outputPagination);	
 
-	
+$this->setVar($outputPagination);
+
+
 $items = $myNews->getNews(0, true, $newsIndex, $newsPerPage);
 
 if(is_array($items))
 {
 	$i = 0;
 	$total = count($items);
+	$userHandler = new User();
+
 	foreach($items as $article)
 	{
 		$i++;
@@ -92,10 +94,10 @@ if(is_array($items))
 			$this->setVar("MODIFY", "<a href=\"/news/modify/".$article['item_id']."\">modify</a>");
 		else
 			$this->setVar("MODIFY", "");
-		
-		$fullname = formatName($article);
+
+		$fullname = $userHandler->formatName($article);
 		$owner = "<a href=\"/search/user/{$article['uid']}\">$fullname</a>";
-	
+
 		$output = array('NEWS_ID'		=> $article['item_id'],
 						'NEWS_TITLE'	=> $article['item_heading'],
 						'TOPIC'			=> $article['topicName'],
@@ -104,11 +106,11 @@ if(is_array($items))
 						'NEWS_BODY'		=> nl2br(scrubHTML($article['item_body'])),
 						'TOPIC_NAME'	=> scrubText($previous['topicName']),
 						);
-						
+
 		$this->setVar($output);
-		
-		
-		$this->parse("news_block", "news", true);		
+
+
+		$this->parse("news_block", "news", true);
 
 	}
 }

@@ -17,10 +17,10 @@ if (($code != '') && Cfg::get('external_enable')) {
 			$teacher = $userHandler->getBySynergy($synid);
 
 			if (is_array($teacher)) {
-				$name = formatName($teacher);
+				$name = $userHandler->formatName($teacher);
 
 				$this->setVar('MEMBER_NAME', "<a href=\"/search/user/{$teacher['uid']}\">{$name}</a>");
-				$this->parse("staff_teacher_block", "staff_teachers", true);	
+				$this->parse("staff_teacher_block", "staff_teachers", true);
 			}
 
 			$this->setVar('ON_OFF', ++$j%2? '' : 'dark');

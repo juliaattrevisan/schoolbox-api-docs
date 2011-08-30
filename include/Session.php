@@ -51,7 +51,7 @@ class Session {
             //superuser value, used to bypass most security checks
             if($user['su'] == 1)
                 $_SESSION['su'] = 1;
-            
+
 
             if(Cfg::get('external_enable'))
                 $this->setSynergyInfo($userHandler);
@@ -231,7 +231,7 @@ class Session {
                     $email = $synUser->getEmail($synergy_id);
                     $mydb->update('user', 'id', array('id' => $_SESSION['id'], 'alt_email' => $email));
                 }
- 
+
                 if ($synergy_id) {
                     $children = $synUser->getEnrolledStudents($synergy_id);
                     if (is_array($children)) {
@@ -252,7 +252,14 @@ class Session {
                                         }
                                     }
                                 }
-                                $_SESSION['children'][] = array('id' => $portal['uid'], 'sid' => $child['RelatedID'], 'gid' => $portal['group_id'], 'name' => formatName($portal), 'subjects' => $subjects);
+
+                                $_SESSION['children'][] = array(
+									'id' => $portal['uid'],
+									'sid' => $child['RelatedID'],
+									'gid' => $portal['group_id'],
+									'name' => $userHandler->formatName($portal),
+									'subjects' => $subjects
+								);
                             }
                        }
                    }

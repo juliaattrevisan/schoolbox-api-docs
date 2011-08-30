@@ -10,6 +10,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/PEAR/Text/Diff/Renderer/in
 
 $wiki  = new Wiki;
 $group = new Group(HOMEPAGE_SERVICE);
+$userHandler = new User();
 
 if (is_numeric($this->arg[0])) {
 	$this->setFile(TEMPLATE_content, 'wiki/diff.html');
@@ -45,7 +46,7 @@ if (is_numeric($this->arg[0])) {
 			'HEADING'          => scrubText($from['heading']),
 			'DIFF'             => $renderer->render($diff),
 			'MODIFIED'         => outputDate(Cfg::get('date_long'), $from['modified']),
-			'AUTHOR'           => formatName($from),
+			'AUTHOR'           => $userHandler->formatName($from),
 			'AUTHOR_ID'        => $from['authorID'],
 			'CURRENT_REVISION' => $from['revisionID'],
 			'LOCKED'           => $from['locked'] == 'true' ? '(Locked)' : '',
@@ -65,7 +66,7 @@ if (is_numeric($this->arg[0])) {
 					'REVISION_COMPARE'  => $revision['revisionID'],
 					'REVISION_DATE'     => outputDate(Cfg::get('date_notime'), $revision['created']),
 					'REVISION_HEADING'	=> scrubText($revision['heading']),
-					'REVISION_AUTHOR'	=> formatName($revision),
+					'REVISION_AUTHOR'	=> $userHandler->formatName($revision),
 			);
 
 			if($revision['revisionID']==$from['revisionID'])

@@ -16,6 +16,7 @@ print serialize($c);
 
 require_once SITE_root.'/library/file.php';
 $fileHandler = new File;
+$userHandler = new User();
 
 $fileList = $fileHandler->getAllInCategory($categoryID, $config);
 
@@ -25,7 +26,7 @@ if (is_array($fileList)) {
 		$output = array('FILE_DESCRIPTION'	=> scrubTEXT($file['description']),
 						'FILE_ID'			=> $file['id'],
 						'FILE_MIME_IMAGE'	=> $allowedFiles->getClass($file["iconFile"]),
-						'FILE_POSTED_BY'	=> formatName($file),
+						'FILE_POSTED_BY'	=> $userHandler->formatName($file),
 						'FILE_POSTED_BY_ID'	=> $file['owner'],
 						'FILE_POSTED_DATE'	=> outputDate(Cfg::get('date_short'), $file['submitted']),
 						'FILE_COMMENT'		=> nl2br(scrubTEXT($file['comment'])),

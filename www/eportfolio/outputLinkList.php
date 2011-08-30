@@ -4,6 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-link.php';
 $this->setBlock($componentHandle, 'link', 'link_block');
 $this->setBlock('link', 'modify_link', 'modify_link_block');
 
+$userHandler = new User();
 $linkHandler = new ePortfolioLink;
 $linkList = $linkHandler->getAllInUser($userID, $config);
 
@@ -22,7 +23,7 @@ if (is_array($linkList)) {
             'LINK_ID' => $link['id'],
             'LINK_NAME' => scrubTEXT($link['description']),
             'LINK_URL' => $linkUrl,
-            'LINK_POSTED_BY' => formatName($link),
+            'LINK_POSTED_BY' => $userHandler->formatName($link),
             'LINK_POSTED_BY_ID' => $link['owner'],
             'LINK_POSTED_DATE' => outputDate(Cfg::get('date_short'), $link['submitted']),
             'LINK_COMMENT' => nl2br(scrubTEXT($link['comment'])),

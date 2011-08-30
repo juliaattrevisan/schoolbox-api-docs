@@ -13,6 +13,7 @@ $page->setBlock('event_list', 'tutor', 'tutor_block');
 $page->setTitle('Tutorials');
 
 $groupHandler = new Group(TUTORIAL_SERVICE);
+$userHandler = new User();
 
 // check access
 if ($groupHandler->getPermission(0) < WRITE_ACCESS)
@@ -29,9 +30,9 @@ $pageOutput = false;
 
 if (is_array($eventList)) {
 	$i = 0;
-	
+
 	foreach ($eventList as $event) {
-		
+
 		$output = array('EVENT_ID'		=> $event['eventID'],
 						'NAME'			=> scrubText($event['name']),
 						'CODE'			=> !empty($event['code']) ? scrubText($event['code']) : 'N/A',
@@ -43,28 +44,28 @@ if (is_array($eventList)) {
 						'ON_OFF' 		=>  ++$i%2? 'dark' : '',
 						);
 		$page->setVar($output);
-		
+
 		// output tutors
-		$page->setVar('tutor_block', '');			
+		$page->setVar('tutor_block', '');
 		$tutorList = $eventHandler->getTutorsByEvent($event['code'], $event['eventID']);
 		if (is_array($tutorList)) {
 			foreach ($tutorList as $tutor) {
-				$output = array('TUTOR_NAME'	=> formatName($tutor),
+				$output = array('TUTOR_NAME'	=> $userHandler->formatName($tutor),
 								'TUTOR_ID'		=> $tutor['id'],
 								);
 				$page->setVar($output);
 				$page->parse('tutor_block', 'tutor', true);
 			}
 		}
-		
+
 		$page->parse('event_list_block', 'event_list', true);
-		
+
 	}
 	$pageOutput = true;
 	$page->parse('has_events_block', 'has_events', true);
 	$page->setVar('event_list_block', '');
-} 
-	
+}
+
 
 
 $eventList = $eventHandler->getConsultationStatistics($_GET['show']);
@@ -72,7 +73,7 @@ $eventList = $eventHandler->getConsultationStatistics($_GET['show']);
 if (is_array($eventList)) {
 	$i = 0;
 	foreach ($eventList as $event) {
-	
+
 		$output = array('EVENT_ID'		=> $event['eventID'],
 						'NAME'			=> scrubText($event['name']),
 						'CODE'			=> $event['code'],
@@ -84,32 +85,32 @@ if (is_array($eventList)) {
 						'ON_OFF' 		=>  ++$i%2? 'dark' : '',
 						);
 		$page->setVar($output);
-		
+
 		// output tutors
-		$page->setVar('tutor_block', '');			
+		$page->setVar('tutor_block', '');
 		$tutorList = $eventHandler->getTutorsByEvent($event['code'], $event['eventID']);
 		if (is_array($tutorList)) {
 			foreach ($tutorList as $tutor) {
-				$output = array('TUTOR_NAME'	=> formatName($tutor),
+				$output = array('TUTOR_NAME'	=> $userHandler->formatName($tutor),
 								'TUTOR_ID'		=> $tutor['id'],
 								);
 				$page->setVar($output);
 				$page->parse('tutor_block', 'tutor', true);
 			}
 		}
-		
+
 		$page->parse('event_list_block', 'event_list', true);
-		
+
 	}
-	
+
 	$pageOutput = true;
 	$page->parse('has_events_block', 'has_events', true);
 
 }
-	
-	
+
+
 if (!$pageOutput)
 	$page->setVar('has_events_block', 'No events to display.');
-	
+
 $page->outputPage();
 ?>

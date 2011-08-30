@@ -8,6 +8,8 @@ $linkHandler = new Link;
 $linkList = $linkHandler->getAllInCategory($categoryID, $config);
 
 if (is_array($linkList)) {
+	$userHandler = new User();
+
 	foreach ($linkList as $link) {
 		$url = new Url($link['url']);
 
@@ -25,7 +27,7 @@ if (is_array($linkList)) {
 				'LINK_NAME' => scrubTEXT($link['description']),
 				'LINK_URL' => $linkUrl,
 				'LINK_TARGET' => $linkTarget,
-				'LINK_POSTED_BY' => formatName($link),
+				'LINK_POSTED_BY' => $userHandler->formatName($link),
 				'LINK_POSTED_BY_ID' => $link['owner'],
 				'LINK_POSTED_DATE' => outputDate(Cfg::get('date_short'), $link['submitted']),
 				'LINK_COMMENT' => nl2br(scrubTEXT($link['comment'])),

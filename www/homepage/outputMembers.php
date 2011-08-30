@@ -10,7 +10,7 @@
 		if (is_array($userList)) {
 			foreach ($userList as $user) {
 
-				$name = formatName($user);
+				$name = $userHandler->formatName($user);
 
 				$emailObj = new Email();
 				$email = $emailObj->formatEmailFromArray($user);

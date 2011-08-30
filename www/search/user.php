@@ -94,8 +94,10 @@ if (is_numeric($this->arg[0])) {
 		}
 	}
 
+	$userHandler = new User();
+
 	$outputUser = array(
-		'NAME' => formatName($user),
+		'NAME' => $userHandler->formatName($user),
 		'ID' => $this->arg[0],
 		'CAMPUS_ID' => $user['campus'],
 		'EMAIL_ADDRESS' => $emailAddress,

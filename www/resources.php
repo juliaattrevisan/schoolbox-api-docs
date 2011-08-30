@@ -131,7 +131,9 @@ else {
 // output files, column 2
 $fileList = $fileHandler->mergeLinks( $fileHandler->getAllInCategory($openCategory), $linkHandler->getAllInCategory($openCategory));
 $permission = $groupHandler->getPermission($openCategory);
+
 if (is_array($fileList) && count($fileList) > 0) {
+	$userHandler = new User();
 
 	foreach ($fileList as $file) {
 
@@ -159,7 +161,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 						'TYPE'			=> $file['url'] ? 'link' : 'file',
 						'FILE_NAME' 	=> TextFormatter::cutString(scrubText($file['description']),32),
 						'FILE_MODIFIED'	=> getRelativeTime($file['modified'], 0, ''),
-						'FILE_OWNER'	=> formatName($file),
+						'FILE_OWNER'	=> $userHandler->formatName($file),
 						'FILE_SIZE'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",
 						'CATEGORY_ID'	=> $file['category'],
 						'CLASS'			=> implode(" ", $class),

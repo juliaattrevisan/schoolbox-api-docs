@@ -5,6 +5,8 @@ $this->setBlock("student_block", "subject_block", "subject_item");
 
 if(is_array($_SESSION['children'])) {
 	$i = 0;
+	$userHandler = new User();
+
 	foreach($_SESSION['children'] as $child)
 	{
 		if (!(Cfg::get('site_location') == 'wenona' && $child['gid'] == 3)) {
@@ -12,9 +14,9 @@ if(is_array($_SESSION['children'])) {
 			$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
 			$user = $this->db->getRow($query);
 			$this->setVar("STUDENT_ID", $child['id']);
-			$this->setVar("STUDENT_NAME", formatName($user,'{firstname} {lastname}'));
+			$this->setVar("STUDENT_NAME", $userHandler->formatName($user,'{firstname} {lastname}'));
 			$this->setVar("STUDENT_YEAR", $user['year']==0?'K':$user['year']);
-		
+
 			if(is_array($child['subjects']) ) {
 				foreach($child['subjects'] as $subject)
 				{
@@ -23,11 +25,11 @@ if(is_array($_SESSION['children'])) {
 					$this->parse("subject_item", "subject_block", true);
 				}
 			}
-	
+
 			$this->parse("student_subjects", "student_block", true);
 			$this->setVar('subject_item', '');
 		}
-	
+
 	}
 	if ($i > 0)
 		$this->parse('POS'.$component['position'], $component['name']);

@@ -9,6 +9,7 @@ $this->setBlock('files', 'file_no_url', 'file_no_url_block');
 $this->setBlock('files', 'modify_file', 'modify_file_block');
 $this->setBlock('files', 'unpublish', 'unpublish_block');
 
+$userHandler = new User();
 $fileHandler = new MyFile($userID);
 $fileList = $fileHandler->getAllPublished($config);
 $sortOptions = array('Description');
@@ -19,7 +20,7 @@ if (is_array($fileList)) {
             'FILE_DESCRIPTION'	=> scrubTEXT($file['description']),
             'FILE_ID'			=> $file['id'],
             'FILE_MIME_IMAGE'	=> $allowedFiles->getClass($file["iconFile"]),
-            'FILE_POSTED_BY'	=> formatName($file),
+            'FILE_POSTED_BY'	=> $userHandler->formatName($file),
             'FILE_POSTED_BY_ID'	=> $file['owner'],
             'FILE_PUBLISHED_DATE'	=> outputDate(Cfg::get('date_short'), $file['published']),
             'FILE_COMMENT'		=> nl2br(scrubTEXT($file['comment'])),

@@ -29,12 +29,13 @@ class Chat extends DeprecatedModel {
         $logs = $this->db->getAll($query);
 
         if (!empty($logs)) {
+			$userHandler = new User();
 
             foreach ($logs as &$log) {
                 $log_time = new DateTime($log['time']);
 
                 $log['time_js'] = $log_time->format('D M j Y H:i:s \G\M\TO (T)'); // Thu Apr 14 2011 15:54:52 GMT+1000 (EST)
-                $log['name'] = formatName($log);
+                $log['name'] = $userHandler->formatName($log);
                 $log['user_perm'] = $this->group->getPermission($category_id, $log['user_id']);
                 $log['type'] = scrubTEXT($log['type']);
                 $log['body'] = scrubTEXT($log['body']);
@@ -80,8 +81,10 @@ class Chat extends DeprecatedModel {
         $users = $this->db->getAll($query);
 
         if (!empty($users)) {
+			$userHandler = new User();
+
             foreach ($users as &$user) {
-                $user['name'] = formatName($user);
+                $user['name'] = $userHandler->formatName($user);
                 $user['perm'] = $this->group->getPermission($category_id, $user['user_id']);
             }
         }

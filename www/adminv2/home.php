@@ -152,9 +152,11 @@ if(is_array($recentLog) ) {
 
         }
 
+		$userHandler = new User();
+
         $output = array('LOG_DATE'      => date(Cfg::get('date_short'), strtotime($log['occurred'])),
                         'LOG_ACTION'    => $action,
-                        'LOG_NAME'      => formatName($log));
+                        'LOG_NAME'      => $userHandler->formatName($log));
         $this->setVar($output);
         $this->parse('recent_log_block','recent_log',true);
     }

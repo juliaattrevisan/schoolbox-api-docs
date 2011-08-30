@@ -10,6 +10,8 @@ $this->setVar('CALENDAR_TITLE', 'Group Calendar');
 $this->setVar('group_events_block', '');
 
 if (is_array($eventList)) {
+	$userHandler = new User();
+
 	foreach ($eventList as $event) {
 
 		$event['colour'] = $calendarHandler->displayColour($event['type']);
@@ -26,7 +28,7 @@ if (is_array($eventList)) {
                         'CAL_COLOUR'	=> $event['colour'],
                         'CAL_MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">Modify</a>" : '',
                         'CAL_TYPE'      => $event['eventType'],
-                        'CAL_AUTHOR'    => formatName($event),
+                        'CAL_AUTHOR'    => $userHandler->formatName($event),
                         'CAL_AUTHOR_ID' => $event['owner'],
                         'CAL_ID'	    => $event['id'],
                         'ON_OFF'	    => ++$j%2? '' : 'dark',
@@ -49,9 +51,9 @@ if (is_array($eventList)) {
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_event", "submit_event_block");
-if ($permission < WRITE_ACCESS)		
+if ($permission < WRITE_ACCESS)
 	$this->setVar("submit_event_block", "");
 else
-			$this->parse("submit_event_block", "submit_event");	
-		
+			$this->parse("submit_event_block", "submit_event");
+
 ?>

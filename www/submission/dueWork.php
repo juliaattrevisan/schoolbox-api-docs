@@ -451,7 +451,7 @@ foreach ($categoryList as $category) {
 		if (is_array($teacherList)) {
 			foreach ($teacherList as $teacherSynID) {
 				$teacher = $userHandler->getBySynergy($teacherSynID);
-				$teacherName = formatName($teacher);
+				$teacherName = $userHandler->formatName($teacher);
 
 				$emailObj = new Email();
 				$emailAddress = $emailObj->formatEmailFromArray($teacher);

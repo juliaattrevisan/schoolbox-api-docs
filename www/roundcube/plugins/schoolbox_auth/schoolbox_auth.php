@@ -23,7 +23,7 @@ class schoolbox_auth extends rcube_plugin
         // change action to login
         if (empty($args['action']) && empty($_SESSION['user_id']) && !empty($_SESSION['username']) && !empty($_SESSION['email_pass']))
           $args['action'] = 'login';
-        
+
         return $args;
     }
 
@@ -41,7 +41,9 @@ class schoolbox_auth extends rcube_plugin
     }
 
     function user_create($args) {
-        $args['user_name'] = formatName($_SESSION);
+		$userHandler = new User();
+
+        $args['user_name'] = $userHandler->formatName($_SESSION);
         return $args;
     }
 

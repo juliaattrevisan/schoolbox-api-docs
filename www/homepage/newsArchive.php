@@ -6,6 +6,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 $categoryHandler = new Category;
 $groupHandler = new Group;
 $newsHandler = new CategoryNews;
+$userHandler = new User();
 
 $this->setFile(TEMPLATE_content, "homepage/newsArchive.html");
 $this->setBlock(TEMPLATE_content, "submit_news", "submit_news_block");
@@ -25,7 +26,7 @@ if($groupHandler->getPermission($category['id']) >= WRITE_ACCESS)
 else
 	$this->setVar("submit_news_block", "");
 
-	
+
 $newsList = $newsHandler->getAllForCategory($category['id'], false, true);
 
 if(is_array($newsList)) {
@@ -34,9 +35,11 @@ if(is_array($newsList)) {
 			$this->setVar("MOD_NEWS", "<a href=\"/news/homepage/".$news['id']."\">Modify</a>");
 		else
 			$this->setVar("MOD_NEWS", "");
-		
-		$poster = formatName($news);
-		
+
+		$userHandler = new User();
+
+		$poster = $userHandler->formatName($news);
+
 		$output = array(
                     "NEWS_ID"           => $news['id'],
                     "NEWS_HEADING"	=> scrubTEXT($news['heading']),
@@ -45,12 +48,12 @@ if(is_array($newsList)) {
                     "POSTED_DATE"	=> outputDate(Cfg::get('date_short'), $news['posted']),
                 );
 		$this->setVar($output);
-		
+
 		$this->parse("news_block", "news", true);
 	}
 } else
 	$this->setVar("news_block", "");
 
 
-	
+
 ?>

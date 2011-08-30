@@ -24,6 +24,7 @@ $this->setBlock('blog', 'show_all', 'show_all_block');
 $this->setBlock('blog', 'show_comment', 'show_comment_block');
 
 $blogs = $blogHandle->getByOwnerID($userID);
+$userHandler = new User();
 
 if (!empty($blogs)) {
 	foreach ($blogs as $blog) {
@@ -34,7 +35,7 @@ if (!empty($blogs)) {
             $this->setVar('MODIFY_BLOG', '');
         }
 
-		$blog['name'] = formatName($blog);
+		$blog['name'] = $userHandler->formatName($blog);
 
 		$this->setVar(array(
 			'BLOG_ID'		=> $blog['id'],
@@ -68,7 +69,7 @@ if (!empty($blogs)) {
 			$this->parse('show_comment_block','show_comment' );
 
 			foreach ($comments as $comment) {
-				$comment['name'] = formatName($comment);
+				$comment['name'] = $userHandler->formatName($comment);
 
 				$this->setVar(array(
 					'COMMENT_BODY'    => scrubTEXT($comment['body']),

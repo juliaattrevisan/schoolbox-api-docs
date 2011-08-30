@@ -3,7 +3,7 @@
 require_once(SITE_root.'/library/user.php');
 require_once(SITE_root.'/library/group.php');
 require_once(HELPDESK_location.'/include/sql.php');
-	
+
 define( 'DB_NAME_PORTAL', SQL_db);
 
 $userHandler = new User;
@@ -35,7 +35,7 @@ else
 
 foreach($userList as $userID) {
     $user = $userHandler->getByID($userID);
-    $this->setVar("USER_CURR", formatName($user));
+    $this->setVar("USER_CURR", $userHandler->formatName($user));
 
     /* Output user jobs */
     $parms = array( 'portalID'              => $userID,
@@ -84,7 +84,7 @@ foreach($userList as $userID) {
 
     $this->parse('userlist', 'user', true);
 
-   
+
 }
 
 $db->dbChangedb(SQL_db);

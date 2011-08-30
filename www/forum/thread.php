@@ -37,7 +37,7 @@ if (!$forumHandler->hasForum($category['id']))
 // check permissions
 if ($groupHandler->getPermission($category['id']) < READ_ACCESS)
 	error(19);
-	
+
 $this->setTitle(scrubText($thread['title']));
 
 $threadLocked = $thread['locked'] == 'true' ? true : false;
@@ -49,7 +49,7 @@ $output = array('CATEGORY'			=> scrubText($category['name']),
 				'THREAD_TITLE'		=> scrubText($thread['title']),
 				'LOCK_UNLOCK'		=> $threadLocked ? 'Unlock' : 'Lock',
 				'LOCKED'			=> $threadLocked ? '(Locked)' : '',
-				
+
 				);
 $this->setVar($output);
 
@@ -71,15 +71,15 @@ $postList = $forumHandler->getPostList($thread['threadID']);
 $pageNum = $this->arg[1];
 if(!$pageNum)
 	$pageNum = 1;
-	
+
 $postPerPage = FORUM_POSTS_PER_PAGE;
 $totalPages = ceil(count($postList)/$postPerPage);
-$postIndex = $postPerPage * ($pageNum-1);		
+$postIndex = $postPerPage * ($pageNum-1);
 
 $this->setVar('previous_button_block', '');
 $this->setVar('next_button_block', '');
 
-if($pageNum >= 2)	
+if($pageNum >= 2)
 	$this->parse('previous_button_block', 'previous_button');
 
 if($pageNum < $totalPages)
@@ -91,9 +91,9 @@ if($totalPages > 1) {
 			 $this->setVar('CURRENT', 'current');
 		else
 			 $this->setVar('CURRENT', '');
-			 
+
 		$this->setVar('PAGE_INDEX', $j);
-		$this->parse('page_number_block','page_number', true); 
+		$this->parse('page_number_block','page_number', true);
 	}
 }
 else
@@ -103,21 +103,23 @@ $outputPagination = array('PREVIOUS_PAGE' 	=> $pageNum - 1,
 						  'NEXT_PAGE'		=> $pageNum + 1,
 						  'LAST_PAGE'		=> $totalPages,
 						  );
-$this->setVar($outputPagination);	
+$this->setVar($outputPagination);
 
 /* output posts */
 $postList = $forumHandler->getPostList($thread['threadID'], $postIndex, $postPerPage);
 if (is_array($postList)) {
+	$userHandler = new User();
+
 	foreach ($postList as $post) {
-		
+
 		$user = array('title'		=> $post['userTitle'],
 					  'firstname'	=> $post['userFirstname'],
-					  'lastname'	=> $post['userLastname'], 
+					  'lastname'	=> $post['userLastname'],
 					  );
-					  
+
 		$output = array('POST_ID'			=> $post['postID'],
 						'POST_TITLE'		=> scrubText($post['title']),
-						'POST_AUTHOR'		=> scrubText(formatName($user)),
+						'POST_AUTHOR'		=> scrubText($userHandler->formatName($user)),
 						'POST_GROUP'		=> scrubText($post['userGroup']),
 						'POST_TIME'			=> getRelativeTime($post['date'], 0, ""),
 						'POST_USER_ID'		=> $post['userID'],
@@ -126,25 +128,25 @@ if (is_array($postList)) {
 						'POST_CENSORED'		=> $post['censored'] == 'true' ? '(Administrator)' : '',
 						);
 		$this->setVar($output);
-		
+
 		// edit / delete post
 		$this->setVar('modify_block', '');
 		if ((!$threadLocked && $post['userID'] == $_SESSION['id']) || $groupHandler->getPermission($category['id']) >= WRITE_ACCESS)
 			$this->parse('modify_block', 'modify');
-		
+
 		// edited time
 		$this->setVar('modified_block', '');
 		if ($post['modified'] > 0)
 			$this->parse('modified_block', 'modified');
-		
+
 		// reply to this post
 		$this->setVar('reply_post_block', '');
 		if (!$threadLocked || $groupHandler->getPermission($category['id']) >= WRITE_ACCESS)
 			$this->parse('reply_post_block', 'reply_post');
-			
+
 		$this->parse('post_block', 'post', true);
 	}
-	
+
 } else
 	$this->setVar('post_block', '<p>There are no posts to display. Create a new post.</p>');
 

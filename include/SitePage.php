@@ -99,11 +99,13 @@ class SitePage extends Page {
                $this->saveHistory();
            }
 
+		   $userHandler = new User();
+
            $templateVar = array(	'TEMPLATE_YEAR' => date('Y'),
                        'SITE_NAME'     => Cfg::get('school_name'),
                        'SITE_ADDRESS'	=> Cfg::get('site_address'),
 					   'SITE_GREETING' => TextFormatter::greeting(), // TODO: This should be an object
-                       'SITE_LOGINNAME'=> formatName($_SESSION),
+                       'SITE_LOGINNAME'=> $userHandler->formatName($_SESSION),
                        'SITE_USERNAME' => $_SESSION['username'],
                        'SITE_LOCATION'	=> $this->site,
                        'USER_ID'       => $_SESSION['id'],
@@ -537,29 +539,31 @@ class SitePage extends Page {
                $this->setVar("my_links", "");
        }
 
-       function renderStudents() {
-           //my students section
-           $this->setBlock('navTpl', 'mstudent', 'mstudent_section');
-           $this->setBlock('mstudent', 'mstudent_block', 'my_students');
+		public function renderStudents() {
+			/* My students section
+			 */
+			$this->setBlock('navTpl', 'mstudent', 'mstudent_section');
+			$this->setBlock('mstudent', 'mstudent_block', 'my_students');
 
-           if(is_array($_SESSION['children']))
-           {
-               foreach($_SESSION['children'] as $child)
-               {
-                   $query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
-                   $user = $this->db->getRow($query);
-                   $this->setVar("MSTUDENT_ID", $child['id']);
-                   $this->setVar("MSTUDENT_NAME", formatName($user,'{firstname}'));
-                   $this->setVar("MSTUDENT_YEAR", $user['year']==0?'K':$user['year']);
+			if (is_array($_SESSION['children'])) {
+				$userHandler = new User();
 
-                   $this->parse("my_students", "mstudent_block", true);
+				foreach($_SESSION['children'] as $child) {
+					$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
+					$user = $this->db->getRow($query);
+					$this->setVar("MSTUDENT_ID", $child['id']);
+					$this->setVar("MSTUDENT_NAME", $userHandler->formatName($user,'{firstname}'));
+					$this->setVar("MSTUDENT_YEAR", $user['year']==0?'K':$user['year']);
 
-               }
-               $this->parse("mstudent_section", "mstudent");
-           }
-           else
-               $this->setVar("mstudent_section", "");
-       }
+					$this->parse("my_students", "mstudent_block", true);
+				}
+
+				$this->parse("mstudent_section", "mstudent");
+			}
+			else {
+				$this->setVar("mstudent_section", "");
+			}
+		}
 
        function renderScriptIncludes() {
            $this->setBlock('headerTpl', 'header_javascript', 'header_javascript_block');

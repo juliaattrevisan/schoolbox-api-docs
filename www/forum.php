@@ -56,15 +56,15 @@ $threadList = $forumHandler->getThreadList($category['id']);
 $pageNum = $this->arg[1];
 if(!$pageNum)
 	$pageNum = 1;
-	
+
 $threadPerPage = FORUM_THREADS_PER_PAGE;
 $totalPages = ceil(count($threadList)/$threadPerPage);
-$threadIndex = $threadPerPage * ($pageNum-1);		
+$threadIndex = $threadPerPage * ($pageNum-1);
 
 $this->setVar('previous_button_block', '');
 $this->setVar('next_button_block', '');
 
-if($pageNum >= 2)	
+if($pageNum >= 2)
 	$this->parse('previous_button_block', 'previous_button');
 
 if($pageNum < $totalPages)
@@ -76,9 +76,9 @@ if($totalPages > 1) {
 			 $this->setVar('CURRENT', ' current');
 		else
 			 $this->setVar('CURRENT', '');
-			 
+
 		$this->setVar('PAGE_INDEX', $j);
-		$this->parse('page_number_block','page_number', true); 
+		$this->parse('page_number_block','page_number', true);
 	}
 }
 else
@@ -88,49 +88,56 @@ $outputPagination = array('PREVIOUS_PAGE' 	=> $pageNum - 1,
 						  'NEXT_PAGE'		=> $pageNum + 1,
 						  'LAST_PAGE'		=> $totalPages,
 						  );
-$this->setVar($outputPagination);	
+$this->setVar($outputPagination);
 
 /* output threads */
 $threadList = $forumHandler->getThreadList($category['id'], $threadIndex, $threadPerPage);
+
 if (is_array($threadList)) {
+	$userHandler = new User();
+
 	foreach ($threadList as $thread) {
-		
-		$user = array('title'		=> $thread['userTitle'],
-					  'firstname'	=> $thread['userFirstname'],
-					  'lastname'	=> $thread['userLastname'],
-					  );
-			  
-		$output = array('THREAD_ID'					=> $thread['threadID'],
-						'THREAD_TITLE'				=> scrubText($thread['title']),
-						'THREAD_AUTHOR'				=> scrubText(formatName($user)),
-						'THREAD_TIME'				=> getRelativeTime($thread['date'], 0, ""),
-						'THREAD_LAST_POST_TIME'		=> getRelativeTime($thread['last_post_date'], 0, ""),
-						'THREAD_LAST_POST_ID'		=> $thread['last_post_id'],
-						'THREAD_LAST_POST_USER_ID'	=> $thread['last_post_user_id'],
-						'THREAD_LAST_POST_USER'		=> scrubText($thread['last_post_user']),
-						'THREAD_REPLIES'			=> $thread['replies'],
-						'THREAD_VIEWS'				=> $thread['views'],
-						'THREAD_LAST_PAGE'			=> ceil((($thread['replies'] + 1) / FORUM_POSTS_PER_PAGE)),
-						'THREAD_LOCKED'				=> $thread['locked'] == 'true' ? '(Locked)' : '',
-						);
+		$user = array(
+			'title' => $thread['userTitle'],
+			'firstname'	=> $thread['userFirstname'],
+			'lastname' => $thread['userLastname'],
+		);
+
+		$output = array(
+			'THREAD_ID' => $thread['threadID'],
+			'THREAD_TITLE' => scrubText($thread['title']),
+			'THREAD_AUTHOR' => scrubText($userHandler->formatName($user)),
+			'THREAD_TIME' => getRelativeTime($thread['date'], 0, ""),
+			'THREAD_LAST_POST_TIME' => getRelativeTime($thread['last_post_date'], 0, ""),
+			'THREAD_LAST_POST_ID' => $thread['last_post_id'],
+			'THREAD_LAST_POST_USER_ID' => $thread['last_post_user_id'],
+			'THREAD_LAST_POST_USER' => scrubText($thread['last_post_user']),
+			'THREAD_REPLIES' => $thread['replies'],
+			'THREAD_VIEWS' => $thread['views'],
+			'THREAD_LAST_PAGE' => ceil((($thread['replies'] + 1) / FORUM_POSTS_PER_PAGE)),
+			'THREAD_LOCKED' => $thread['locked'] == 'true' ? '(Locked)' : '',
+		);
 
 		$this->setVar($output);
 
 		/* Delete checkbox */
 		$this->setVar('modify_thread_block', '');
-		if ($perm >= WRITE_ACCESS)
-			$this->parse('modify_thread_block', 'modify_thread', true);
 
+		if ($perm >= WRITE_ACCESS) {
+			$this->parse('modify_thread_block', 'modify_thread', true);
+		}
 
 		/* last post block */
 		$this->setVar('last_post_block', '');
-		if ($thread['replies'] > 0)
+
+		if ($thread['replies'] > 0) {
 			$this->parse('last_post_block', 'last_post', true);
+		}
 
 		$this->parse('thread_block', 'thread', true);
 	}
-} else
+}
+else {
 	$this->setVar('thread_block', '<p>There are no threads to display. Create a new thread.</p>');
-
-
+}
 ?>

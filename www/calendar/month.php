@@ -25,7 +25,7 @@ $this->setBlock("note_block", "time", "time_block");
 list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->arg[0]);
 
 $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
-if ($selectedDate <= 0) 
+if ($selectedDate <= 0)
 	$selectedDate = time();
 
 $selectedDay	= date("j", $selectedDate);
@@ -46,7 +46,7 @@ $this->setVar('FORWARD', date("j-n-Y", strtotime("+1 month", $selectedDate)));
 // output calendar
 $firstDay 		= date("w", mktime(0,0,0,$selectedMonth, 1, $selectedYear));
 //$numDaysinMonth = date("t", $selectedMonth);
-$numDaysinMonth = date("d", mktime(0, 0, 0, $selectedMonth + 1, 0, $year)); // 
+$numDaysinMonth = date("d", mktime(0, 0, 0, $selectedMonth + 1, 0, $year)); //
 $numWeeksMonth 	= ceil(($firstDay + $numDaysinMonth)/7);
 $totalDays 		= $numWeeksMonth * 7 + (6 - $firstDay);
 
@@ -70,9 +70,9 @@ $startDay = mktime(3,0,0,$selectedMonth, 1, $selectedYear) - strtotime("+$firstD
 
 for ($i = 0; $i < $totalDays; $i++) {
 	$currentDay = strtotime("+$i day", $startDay);
-	
-	$day = $i % 7;	
-	
+
+	$day = $i % 7;
+
 	if($i >= $firstDay && $i < $numDaysinMonth+$firstDay)
 		$this->setVar('OTHER_MONTH', '');
 	else
@@ -91,8 +91,8 @@ for ($i = 0; $i < $totalDays; $i++) {
         $this->setVar("MONTABLE_CSS", "calTable");
 
 	$this->setVar($output);
-	
-	
+
+
 	$submissionList = $calendarHandler->getSubmissionEvents($currentDay);
     if (is_array($submissionList)) {
         foreach ($submissionList as $submission) {
@@ -120,6 +120,8 @@ for ($i = 0; $i < $totalDays; $i++) {
                 $this->setVar('MODIFY', '');
             }
 
+			$userHandler = new User();
+
             $output = array(
                 'TIME' => $submission['date']->format('g:i a'), // g:i a
                 'NOTE' => 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' (' . $submission['synergyCode'] . ')' : '') . ' - ' . $submission['name'],
@@ -128,7 +130,7 @@ for ($i = 0; $i < $totalDays; $i++) {
                 'DETAIL' => '',
                 'EVENT_TYPE' => 'submission',
                 'TYPE' => 'Due Work',
-                'AUTHOR' => formatName($submission),
+                'AUTHOR' => $userHandler->formatName($submission),
                 'AUTHOR_ID' => $submission['owner'],
                 'EVENT_LEVEL' => '',
             );
@@ -144,7 +146,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 		$birthdayList = $calendarHandler->getStudentBirthdays($currentDay);
 		if(is_array($birthdayList) && in_array(3, $_SESSION['campus'])) {
 			foreach($birthdayList as $birthday) {
-		
+
 				$output = array('TIME'		=> '',
 								'NOTE'		=> 'Student Birthday - '.$birthday['name'].' in '.$birthday['form'].' turns '.$birthday['age'],
                                 'LOCATION'	=> '',
@@ -157,7 +159,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 				$this->setVar($output);
                 $this->setVar('time_block','');
 				$this->parse("note_listing", "note_block", true);
-			
+
 				$subout = 1;
 			}
 		}
@@ -165,6 +167,8 @@ for ($i = 0; $i < $totalDays; $i++) {
 
 	$eventList = $calendarHandler->getDayEvents($currentDay);
 	if(is_array($eventList)) {
+		$userHandler = new User();
+
 		foreach($eventList as $event) {
 
 			$output = array('TIME' => rtrim(
@@ -178,7 +182,7 @@ for ($i = 0; $i < $totalDays; $i++) {
                             'MODIFY'      => $calendarHandler->getPerm($event['id']) > 1 ? '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $event['id'] . '&returnTo=month"><span></span>Modify</a>' : '',
                             'EVENT_TYPE' => 'type' . $event['type'],
                             'TYPE' => $event['eventType'],
-                            'AUTHOR' => formatName($event),
+                            'AUTHOR' => $userHandler->formatName($event),
                         );
 
             if($event['access'] == 3 ) {
@@ -206,10 +210,10 @@ for ($i = 0; $i < $totalDays; $i++) {
 
 	} else
 		if(!$subout) $this->setVar("note_listing", "");
-	
+
 	$this->parse('day_listing', 'day_block', true);
 	$this->setVar('note_listing', '');
-	
+
 	if ($day == 6 && $i) {
 		$this->parse('month_week_listing', 'month_week', true);
 		$this->setVar('day_listing', '');

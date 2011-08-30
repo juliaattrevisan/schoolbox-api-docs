@@ -12,9 +12,11 @@ $this->setVar("DATE", date("l jS F"));
 
 //first lets output submission events
 $submissionList = $calendarHandler->getSubmissionEvents($currDay);
+$userHandler = new User();
+
 if (is_array($submissionList)) {
 	foreach ($submissionList as $submission) {
-	
+
         $output = array('TIME'			=> $submission['dueTime'],
                         'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['name'],
                         'COLOUR'		=> $calendarHandler->displayColour(4),
@@ -23,17 +25,17 @@ if (is_array($submissionList)) {
                         'DETAIL'        => '',
                         'EVENT_TYPE'    => 'submission',
                         'TYPE'          => 'Due Work',
-                        'AUTHOR'        => formatName($submission),
+                        'AUTHOR'        => $userHandler->formatName($submission),
                         'AUTHOR_ID'     => $submission['owner'],
                         'EVENT_LEVEL'   => '',
                       );
-			
-		$this->setVar($output); 
+
+		$this->setVar($output);
 		$this->parse("note_listing","note_block", true);
 		$subout = 1;
 	}
 }
-	
+
 
 $eventList = $calendarHandler->getDayEvents($currDay);
 
@@ -43,6 +45,8 @@ if(!is_array($eventList))
 }
 else
 {
+	$userHandler = new User();
+
 	foreach($eventList as $event)
 	{
 		if($event['startTime'] == "0:00" || strtolower($event['startTime']) == "12:00am" || strtolower($event['startTime']) == "12:00 am" || $event['startTime'] == '')
@@ -51,7 +55,7 @@ else
 				$this->setVar("TIME", $event['startTime']);
 		else
 				$this->setVar("TIME", $event['startTime']." - ".$event['endTime']);
-		
+
         $output = array('TIME'		=> rtrim(
                                         ($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
                                            ($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
@@ -63,10 +67,10 @@ else
                         'MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">Modify</a>" : '',
                         'EVENT_TYPE'    => 'type'.$event['type'],
                         'TYPE'          => $event['eventType'],
-                        'AUTHOR'        => formatName($event),
+                        'AUTHOR'        => $userHandler->formatName($event),
                         'AUTHOR_ID'        => $event['owner'],
                       );
-		
+
 		$this->setVar($output);
 		$this->parse("note_listing","note_block", true);
 

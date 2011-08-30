@@ -91,44 +91,34 @@ function scrubTEXT($text) {
 
 
 
-function formatName($userInfo, $format = NULL){
-	// Check for custom format
-	if(empty($format)){
-		$format = Cfg::get('name_format');
-	}
-
-    /* Replace tags */
-    preg_match_all('|{\w+}|', $format, $tags);
-
-    if (empty($tags) || empty($userInfo)) {
-        return 'Unknown User';
-    }
-
-    foreach ($tags[0] as $tag) {
-        $key = trim($tag, '{}');
-
-        if (is_string($userInfo[$key])) {
-            $value = $userInfo[$key];
-        } else {
-            $value = '';
-        }
-
-        $format = str_replace($tag, $value, $format);
-    }
-    if(trim($format))
-        return $format;
-    else
-        return 'Unknown User';
-}
-
-//function formatEmail($email) {
-//	if($email['local_email']) {
-//			return $email['username']."@".Cfg::get('mail_address');
+//function formatName($userInfo, $format = NULL){
+//	// Check for custom format
+//	if(empty($format)){
+//		$format = Cfg::get('name_format');
 //	}
-//	else if($email['alt_email'])
-//		return $email['alt_email'];
-//	else
-//		return false;
+//
+//    /* Replace tags */
+//    preg_match_all('|{\w+}|', $format, $tags);
+//
+//    if (empty($tags) || empty($userInfo)) {
+//        return 'Unknown User';
+//    }
+//
+//    foreach ($tags[0] as $tag) {
+//        $key = trim($tag, '{}');
+//
+//        if (is_string($userInfo[$key])) {
+//            $value = $userInfo[$key];
+//        } else {
+//            $value = '';
+//        }
+//
+//        $format = str_replace($tag, $value, $format);
+//    }
+//    if(trim($format))
+//        return $format;
+//    else
+//        return 'Unknown User';
 //}
 
 /*

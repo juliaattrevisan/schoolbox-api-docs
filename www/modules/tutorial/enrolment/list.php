@@ -58,7 +58,7 @@ if (is_numeric($_GET['eventID'])) {
 			$user = $userHandler->getByID($enrolment['studentID']);
 
 			$output = array('STUDENT_ID'	=> $enrolment['studentID'],
-							'STUDENT_NAME'	=> formatName($user),
+							'STUDENT_NAME'	=> $userHandler->formatName($user),
 							'PERCENTAGE'	=> $percentage,
 							'ON_OFF' 		=>  ++$j%2? 'dark' : '',
 							);

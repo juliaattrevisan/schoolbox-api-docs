@@ -20,6 +20,8 @@ else {
    $threadList = $forumHandler->getRecentThreadList($categoryID, $config);
 
    if (is_array($threadList)) {
+	   $userHandler = new User();
+
       foreach ($threadList as $thread) {
 
          $user = array('title'		=> $thread['userTitle'],
@@ -28,7 +30,7 @@ else {
                     );
 
          $output = array('THREAD_ID'			=> $thread['threadID'],
-                     'THREAD_USER'		=> formatName($user),
+                     'THREAD_USER'		=> $userHandler->formatName($user),
                      'THREAD_USER_ID'	=> $thread['userID'],
                      'THREAD_DATE'		=> getRelativeTime($thread['date']),
                      'THREAD_TITLE'		=> scrubTEXT($thread['title']),

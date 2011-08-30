@@ -16,14 +16,16 @@ if($this->arg[0]) {
 	$this->setFile(TEMPLATE_content, 'attendance/studentList.html');
 	$this->setTitle('Attendances');
 	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
-	
+
 	$timetableHandler = new SynergeticTimetable;
 	$attendanceHandler = new SynergeticAttendance;
-	
+
 	$daynum = $timetableHandler->getDayNumber($_SESSION['campus'][0]);
 	$peroidnum = $timetableHandler->getPeriodNumber($this->arg[0], $daynum);
 
-	$pageVar = array(	'TEACHERNAME'	=> formatName($_SESSION),
+	$userHandler = new User();
+
+	$pageVar = array(	'TEACHERNAME'	=> $userHandler->formatName($_SESSION),
 						'DAYNO'			=> 'Day&nbsp;'.$daynum,
 						'DATE'			=> date('j/n/Y'),
 						'PERNUMBER'		=> $periodnum,
@@ -32,8 +34,8 @@ if($this->arg[0]) {
 						'SUBJECTNAME'	=> $timetableHandler->getSubjectName($this->arg[0]),
 					);
 	$this->setVar($pageVar);
-	
-	
+
+
 }
 else {
 	//output teachers class list
@@ -44,17 +46,19 @@ else {
 	$timetableHandler = new SynergeticTimetable;
 	$daynum = $timetableHandler->getDayNumber($_SESSION['campus'][0]);
 
-	$pageVar = array(	'TEACHERNAME'	=> formatName($_SESSION),
+	$userHandler = new User();
+
+	$pageVar = array(	'TEACHERNAME'	=> $userHandler->formatName($_SESSION),
 						'DAYNO'			=> 'Day&nbsp;'.$daynum,
 						'DATE'			=> date('j/n/Y'),
 					);
 	$this->setVar($pageVar);
-	
+
 	$subjectList = $timetableHandler->getDaySubjects($_SESSION['sid'], $daynum);
-	
+
 	if(is_array($subjectList)) {
 		foreach($subjectList as $subject) {
-		
+
 			$outputSubject = array(	'ROOM'		=> $subject['Room'],
 									'DESC'		=> $subject['Description'],
 									'PERNO'		=> $subject['PeriodNumber'],

@@ -71,9 +71,9 @@ if(is_numeric($this->arg[0])) {
             if(is_array($studentSub)) {
 
                 $output = array(
-                    'OWNER' 	=> formatName($user,'{lastname}, {firstname}'),
+                    'OWNER' 	=> $userHandler->formatName($user,'{lastname}, {firstname}'),
                     'OWNER_ID' 	=> $user['uid'],
-                    'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
+                    'OWNER_ESCAPED' => addslashes($userHandler->formatName($student,'{lastname}, {firstname}')),
                     'SUB_ID'    => $studentSub['id'],
                     'SUBMITTED' => $studentSub['date'],
                     'COLOUR'	=> $studentSub['late']?'#ff0000':'#000000',
@@ -90,9 +90,9 @@ if(is_numeric($this->arg[0])) {
             else {
 
                 $output = array(
-                    'OWNER' 	=> formatName($user,'{lastname}, {firstname}'),
+                    'OWNER' 	=> $userHandler->formatName($user,'{lastname}, {firstname}'),
                     'OWNER_ID' 	=> $user['uid'],
-                    'OWNER_ESCAPED' => addslashes(formatName($student,'{lastname}, {firstname}')),
+                    'OWNER_ESCAPED' => addslashes($userHandler->$userHandler->formatName($student,'{lastname}, {firstname}')),
                     'SUBMITTED'	=> '',
                     'COLOUR'	=> '',
                     'MARK'	    => $return[0]['mark'],
@@ -126,10 +126,10 @@ if(is_numeric($this->arg[0])) {
 				}
 
                 $output = array(
-					'OWNER' 	=> formatName($line,'{lastname}, {firstname}'),
+					'OWNER' 	=> $userHandler->formatName($line,'{lastname}, {firstname}'),
                     'OWNER_ID'      => $line['uid'],
                     'SUB_ID'        => $line['id'],
-                    'OWNER_ESCAPED' => addslashes(formatName($line,'{lastname}, {firstname}')),
+                    'OWNER_ESCAPED' => addslashes($userHandler->formatName($line,'{lastname}, {firstname}')),
                     'SUBMITTED'     => $line['date'],
                     'COLOUR'        => $line['late']?'#ff0000':'#000000',
                     'MARK'          => $return[0]['mark'],

@@ -11,6 +11,7 @@ $eventHandler = new Event;
 $attendanceHandler = new Attendance;
 $enrolmentHandler = new Enrolment;
 $groupHandler = new Group(TUTORIAL_SERVICE);
+$userHandler = new User();
 
 $page->setFile(TEMPLATE_content, 'tutorial/attendance/list.html');
 $page->setBlock(TEMPLATE_content, 'event', 'event_block');
@@ -45,13 +46,13 @@ $page->setVar($output);
 if ($week < date("YW", strtotime("31st Dec")))
 	$page->parse('next_link_block', 'next_link');
 else
-	$page->setVar('next_link_block', '');	
-	
+	$page->setVar('next_link_block', '');
+
 if ($week > 0)
 	$page->parse('previous_link_block', 'previous_link');
 else
-	$page->setVar('previous_link_block', '');				
-			
+	$page->setVar('previous_link_block', '');
+
 
 
 // output events
@@ -67,11 +68,11 @@ if (is_array($eventList)) {
 						'EVENT_CODE'	=> scrubText($event['code']),
 						'ACTION'		=> 'Save',
 						'DISABLED'		=> "", // disable modifying attendance after 1 month
-						
+
 						);
 		$page->setVar($output);
 		$attendanceList = $attendanceHandler->getAllByEvent($event['eventID']);
-		
+
 		// output each student
 		$enrolled = array();
 		if (is_array($attendanceList)) {
@@ -81,14 +82,14 @@ if (is_array($eventList)) {
 			foreach ($attendanceList as $attendance) {
 			    $enrolled[] = $attendance['studentID'];
 				$output = array('STUDENT_ID'			=> $attendance['studentID'],
-								'STUDENT_NAME'			=> formatName($attendance),
-								'STUDENT_NAME_ESCAPED' 	=> addslashes(scrubText(formatName($attendance))),
+								'STUDENT_NAME'			=> $userHandler->formatName($attendance),
+								'STUDENT_NAME_ESCAPED' 	=> addslashes(scrubText($userHandler->formatName($attendance))),
 								'ATTENDANCE_SELECTED'	=> $attendance['present'] != 'false' ? 'checked="checked"' : '',
 								'ACTION'				=> !empty($attendance['present']) ? "Modify" : "Save",
 								'ON_OFF'				=> ++$j%2 ? 'dark':'',
 								);
 				$page->setVar($output);
-				
+
 				// remove button
 				$page->setVar('remove_block', '');
 				$page->setVar('remove_grey_block', '');
@@ -96,7 +97,7 @@ if (is_array($eventList)) {
 					$page->parse('remove_block', 'remove');
 				else
 					$page->parse('remove_grey_block', 'remove_grey');
-				
+
 				// reason dropdown, $page->dropDown wasn't working for me
 				if (is_array($reasonList)) {
 					$page->setVar('reason_select_block', '');
@@ -109,7 +110,7 @@ if (is_array($eventList)) {
 					}
 				}
 				//$page->dropDown('reason_select', $attendanceHandler->getReasonList(), $attendance['reason'], 'student', array('reason' => 'REASON'));
-				
+
 				$page->parse('student_block', 'student', true);
 
 			}
@@ -117,7 +118,7 @@ if (is_array($eventList)) {
 		} else
 			$page->setVar('has_students_block', '<p>There are no students enrolled for this event.</p>');
 
-		$page->setVar('list_add_block', '');	
+		$page->setVar('list_add_block', '');
 		if ($event['typeID'] == 2 && !empty($event['code'])) {
 		    $students = $enrolmentHandler->getAllByEvent($event['code']);
 		    $i = 0;
@@ -126,7 +127,7 @@ if (is_array($eventList)) {
 		            if (!in_array($student['studentID'], $enrolled)) {
 		                $i++;
     		            $page->setVar(array(
-    		              'ADDUSER_NAME'   => formatName($student),
+    		              'ADDUSER_NAME'   => $userHandler->formatName($student),
     		              'ADDUSER_ID'    => $student['studentID'],
     		            ));
     		            $page->parse('adduser_block', 'adduser', true);
@@ -136,7 +137,7 @@ if (is_array($eventList)) {
 		          $page->parse('list_add_block', 'list_add');
 		    }
 		}
-			
+
 		$page->parse('event_block', 'event', true);
 	}
 } else

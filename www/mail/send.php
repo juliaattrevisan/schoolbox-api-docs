@@ -24,10 +24,12 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	$db = new DeprecatedDatabase();
 	$db->dbConnect();
 
+	$userHandler = new User();
+
 	$query = "SELECT firstname, lastname, username, local_email, title, alt_email FROM user WHERE id = '".$_SESSION["id"]."'";
 	$user = $db->dbGetSingleRow($query);
 
-	$name = formatName($user);
+	$name = $userHandler->formatName($user);
 
 	/* Validate From email address
 	 */

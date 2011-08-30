@@ -128,7 +128,6 @@ if (!empty($result['user'])) {
 		/* Format email address
 		 */
 		$emailObj = new Email();
-
         $address = $emailObj->formatEmailFromArray($user);
 
         if ($address) {
@@ -146,6 +145,7 @@ if (!empty($result['user'])) {
 		/* If a parent is performing the search, remove the email address
 		 */
 		$groupHandler = new Group();
+		$userHandler = new User();
 
 		if ($groupHandler->isParent()) {
 			unset($email);
@@ -154,7 +154,7 @@ if (!empty($result['user'])) {
         $page->setVar(array(
             'USER_ID'         => $user['id'],
             'USER_SYNERGY_ID' => $user['synergy_id'],
-            'USER_NAME'       => formatName($user),
+            'USER_NAME'       => $userHandler->formatName($user),
             'USER_EMAIL'      => $email,
             'USER_COUNT'      => $count['user'],
             'USER_YEAR'       => empty($user['year']) ? '' : "Year {$user['year']}",
@@ -221,9 +221,12 @@ if (!empty($result['file'])) {
         'FILE_COUNT'      => $count['file'],
     ));
 
+	$userHandler = new User();
+
     foreach ($result['file'] as $file) {
-        foreach ($categoryStd->breadcrumb($file['category']) as $i => $breadcrumb)
+        foreach ($categoryStd->breadcrumb($file['category']) as $i => $breadcrumb) {
             $file['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
+		}
 
         $page->setVar(array(
             'FILE_ID'          => $file['id'],
@@ -232,7 +235,7 @@ if (!empty($result['file'])) {
             'FILE_DESCRIPTION' => scrubTEXT($file['description']),
             'FILE_COMMENT'     => TextFormatter::cutSentence(scrubTEXT($file['comment']), 150),
             'FILE_OWNER'       => $file['uid'],
-            'FILE_OWNER_NAME'  => formatName($file),
+            'FILE_OWNER_NAME'  => $userHandler->formatName($file),
             'FILE_CREATED'     => getRelativeTime($file['submitted']),
             'FILE_BREADCRUMB'  => $file['breadcrumb'],
             'FILE_COUNT'       => $count['file'],
@@ -306,13 +309,15 @@ if (!empty($result['link'])) {
 			$linkUrl = $url->getBase64EncodedRedirect();
 		}
 
+		$userHandler = new User();
+
         $page->setVar(array(
             'LINK_URL'         => $linkUrl,
             'LINK_ICON'        => $link['iconFile'],
             'LINK_DESCRIPTION' => scrubTEXT($link['description']),
             'LINK_COMMENT'     => TextFormatter::cutSentence(scrubTEXT($link['comment']), 150),
             'LINK_OWNER'       => $link['uid'],
-            'LINK_OWNER_NAME'  => formatName($link),
+            'LINK_OWNER_NAME'  => $userHandler->formatName($link),
             'LINK_CREATED'     => getRelativeTime($link['submitted']),
             'LINK_BREADCRUMB'  => $link['breadcrumb'],
             'LINK_COUNT'       => $count['link'],
@@ -344,6 +349,8 @@ if (!empty($result['news'])) {
             $news['link'] = "/homepage/{$news['code']}#news-{$news['id']}";
         }
 
+		$userHandler = new User();
+
         $page->setVar(array(
             'NEWS_ID'         => $news['id'],
             'NEWS_CODE'       => $news['code'],
@@ -351,7 +358,7 @@ if (!empty($result['news'])) {
             'NEWS_HEADING'    => scrubTEXT($news['heading']),
             'NEWS_BODY'       => TextFormatter::cutSentence(scrubTEXT(strip_tags($news['body'])), 150),
             'NEWS_OWNER'      => $news['uid'],
-            'NEWS_OWNER_NAME' => formatName($news),
+            'NEWS_OWNER_NAME' => $userHandler->formatName($news),
             'NEWS_CREATED'    => getRelativeTime($news['datetime_posted']),
             'NEWS_BREADCRUMB' => $news['breadcrumb'],
             'NEWS_COUNT'      => $count['news'],
@@ -372,16 +379,19 @@ if (!empty($result['blog'])) {
         'BLOG_COUNT'      => $count['blog'],
     ));
 
+	$userHandler = new User();
+
     foreach ($result['blog'] as $blog) {
-        foreach ($categoryStd->breadcrumb($blog['cid']) as $i => $breadcrumb)
+        foreach ($categoryStd->breadcrumb($blog['cid']) as $i => $breadcrumb) {
             $blog['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
+		}
 
         $page->setVar(array(
             'BLOG_CID'        => $blog['cid'],
             'BLOG_HEADING'    => scrubTEXT($blog['heading']),
             'BLOG_BODY'       => TextFormatter::cutSentence(scrubTEXT(strip_tags($blog['body'])), 150),
             'BLOG_OWNER'      => $blog['uid'],
-            'BLOG_OWNER_NAME' => formatName($blog),
+            'BLOG_OWNER_NAME' => $userHandler->formatName($blog),
             'BLOG_CREATED'    => getRelativeTime($blog['created']),
             'BLOG_BREADCRUMB' => $blog['breadcrumb'],
             'BLOG_COUNT'      => $count['blog'],
@@ -402,9 +412,12 @@ if (!empty($result['wiki'])) {
         'WIKI_COUNT'      => $count['wiki'],
     ));
 
+	$userHandler = new User();
+
     foreach ($result['wiki'] as $wiki) {
-        foreach ($categoryStd->breadcrumb($wiki['categoryID']) as $i => $breadcrumb)
+        foreach ($categoryStd->breadcrumb($wiki['categoryID']) as $i => $breadcrumb) {
             $wiki['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
+		}
 
         $page->setVar(array(
             'WIKI_ID'         => $wiki['wikiID'],
@@ -412,7 +425,7 @@ if (!empty($result['wiki'])) {
             'WIKI_HEADING'    => scrubTEXT($wiki['heading']),
             'WIKI_BODY'       => TextFormatter::cutSentence(scrubTEXT(strip_tags($wiki['body'])), 150),
             'WIKI_OWNER'      => $wiki['userID'],
-            'WIKI_OWNER_NAME' => formatName($wiki),
+            'WIKI_OWNER_NAME' => $userHandler->formatName($wiki),
             'WIKI_CREATED'    => getRelativeTime($wiki['created']),
             'WIKI_BREADCRUMB' => $wiki['breadcrumb'],
             'WIKI_COUNT'      => $count['wiki'],
@@ -433,9 +446,12 @@ if (!empty($result['forum'])) {
         'FORUM_COUNT'      => $count['forum'],
     ));
 
+	$userHandler = new User();
+
     foreach ($result['forum'] as $forum) {
-        foreach ($categoryStd->breadcrumb($forum['categoryID']) as $i => $breadcrumb)
+        foreach ($categoryStd->breadcrumb($forum['categoryID']) as $i => $breadcrumb) {
             $forum['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
+		}
 
         $page->setVar(array(
             'FORUM_CID'        => $forum['categoryID'],
@@ -443,7 +459,7 @@ if (!empty($result['forum'])) {
             'FORUM_TITLE'      => scrubTEXT($forum['threadTitle']),
             'FORUM_BODY'       => TextFormatter::cutSentence(scrubTEXT(strip_tags($forum['body'])), 150),
             'FORUM_OWNER'      => $forum['uid'],
-            'FORUM_OWNER_NAME' => formatName($forum),
+            'FORUM_OWNER_NAME' => $userHandler->formatName($forum),
             'FORUM_CREATED'    => getRelativeTime($forum['date']),
             'FORUM_BREADCRUMB' => $forum['breadcrumb'],
         ));

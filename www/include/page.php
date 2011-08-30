@@ -128,12 +128,14 @@ $this->t_body->set_block("mstudent", "mstudent_block", "my_students");
 
 if(is_array($_SESSION['children']))
 {
+	$userHandler = new User();
+
 	foreach($_SESSION['children'] as $child)
 	{
 		$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
 		$user = $db->dbGetSingleRow($query);
 		$this->t_body->set_var("MSTUDENT_ID", $child['id']);
-		$this->t_body->set_var("MSTUDENT_NAME", formatName($user,'{firstname}'));
+		$this->t_body->set_var("MSTUDENT_NAME", $userHandler->formatName($user,'{firstname}'));
 		$this->t_body->set_var("MSTUDENT_YEAR", $user['year']);
 
 		$this->t_body->parse("my_students", "mstudent_block", true);

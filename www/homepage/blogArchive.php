@@ -79,8 +79,10 @@ foreach ($blogYears as $key => $current) {
 
         /* Put blog contents in
          */
-        $poster = formatName($blog);
-        
+		$userHandler = new User();
+
+        $poster = $userHandler->formatName($blog);
+
         $this->setVar(array(
             'BLOG_ID' => $blog['id'],
             'BLOG_HEADING' => $blog['heading'],

@@ -61,7 +61,10 @@ elseif (is_numeric($_POST['files'])) {
 	$fileList = $fileHandler->mergeLinks( $fileHandler->getAllInCategory($_POST['files']), $linkHandler->getAllInCategory($_POST['files']));
 	$permission = $groupHandler->getPermission($_POST['files']);
 	$output = array();
+
 	if (is_array($fileList) && $permission >= READ_ACCESS) {
+		$userHandler = new User();
+
 		foreach ($fileList as $file) {
 
 			if (empty($file['modified']))
@@ -72,7 +75,7 @@ elseif (is_numeric($_POST['files'])) {
 							  'category'	=> $file['category'],
 							  'modified'	=> getRelativeTime($file['modified'], 0, ''),
 							//'size'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",
-							  'owner'		=> formatName($file),
+							  'owner'		=> $userHandler->formatName($file),
 							  'icon'		=> !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile",
 							  'link'		=> isset($file['url']) ? 'true' : 'false',
 							  'hidden'		=> $file['hidden'] ? 'true' : 'false',

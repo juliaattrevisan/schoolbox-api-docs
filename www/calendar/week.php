@@ -24,7 +24,7 @@ $this->setBlock("note_block", "time", "time_block");
 list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->arg[0]);
 
 $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
-if ($selectedDate <= 0) 
+if ($selectedDate <= 0)
 	$selectedDate = time();
 
 $selectedDay	= date("j", $selectedDate);
@@ -89,7 +89,7 @@ for($i=0; $i < 7; $i++) {
 	$submissionList = $calendarHandler->getSubmissionEvents($currentDay);
 	if (is_array($submissionList)) {
 		foreach ($submissionList as $submission) {
-            
+
             /* Get status to set action */
             if ($groupHandler->isStudent($_SESSION['id'])) {
 
@@ -113,6 +113,8 @@ for($i=0; $i < 7; $i++) {
                 $this->setVar('MODIFY', '');
             }
 
+			$userHandler = new User();
+
 			$output = array(
                 'TIME'          => $submission['date']->format('g:iA'), // g:i a
                 'NOTE'			=> 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' ('.$submission['synergyCode'].')' : '') . ' - ' . $submission['name'],
@@ -121,11 +123,11 @@ for($i=0; $i < 7; $i++) {
                 'DETAIL'        => '',
                 'EVENT_TYPE'    => 'submission',
                 'TYPE'          => 'Due Work',
-                'AUTHOR'        => formatName($submission),
+                'AUTHOR'        => $userHandler->formatName($submission),
                 'AUTHOR_ID'     => $submission['owner'],
                 'EVENT_LEVEL'   => '',
               );
-			
+
 			$this->setVar($output);
             $this->parse('time_block','time');
 			$this->parse("note_listing", "note_block", true);
@@ -138,7 +140,7 @@ for($i=0; $i < 7; $i++) {
 		$birthdayList = $calendarHandler->getStudentBirthdays($currentDay);
 		if(is_array($birthdayList) && in_array(3, $_SESSION['campus'])) {
 			foreach($birthdayList as $birthday) {
-		
+
 				$output = array('TIME'		=> '',
 								'NOTE'		=> 'Student Birthday - '.$birthday['name'].' in '.$birthday['form'].' turns '.$birthday['age'],
 								'COLOUR'	=> $calendarHandler->displayColour(1),
@@ -150,22 +152,21 @@ for($i=0; $i < 7; $i++) {
                                 'AUTHOR'    => '',
                                 'AUTHOR_ID' => '',
                                 'EVENT_LEVEL'   => '',
-							  );					  
+							  );
 				$this->setVar($output);
                 $this->setVar('time_block','');
 				$this->parse("note_listing", "note_block", true);
-			
+
 				$subout = 1;
 			}
 		}
 	}
 
 	$eventList = $calendarHandler->getDayEvents($currentDay);
-	
+
 	if(is_array($eventList)) {
 		foreach($eventList as $event) {
-
-
+			$userHandler = new User();
 
 			$output = array('TIME'		=> rtrim(
 											($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
@@ -178,7 +179,7 @@ for($i=0; $i < 7; $i++) {
                             'DETAIL'    => $event['detail'],
 				            'EVENT_TYPE'=> 'type'.$event['type'],
                             'TYPE'      => $event['eventType'],
-                            'AUTHOR'    => formatName($event),
+                            'AUTHOR'    => $userHandler->formatName($event),
                             'AUTHOR_ID' => $event['owner'],
                 );
 
@@ -202,14 +203,14 @@ for($i=0; $i < 7; $i++) {
                $this->parse('time_block','time');
             else
                $this->setVar('time_block','');
-			
-			
+
+
 			$this->parse("note_listing", "note_block", true);
 		}
 
 	} else
 		if(!$subout) $this->setVar("note_listing", "");
-	
+
 	$this->parse("day_listing", "day_block", true);
 	$this->setVar("note_listing","");
 }

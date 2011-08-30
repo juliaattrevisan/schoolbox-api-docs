@@ -51,6 +51,8 @@ if(is_array($items))
 {
 	$i = 0;
 	$total = count($items);
+	$userHandler = new User();
+
 	foreach($items as $article)
 	{
 		$i++;
@@ -60,7 +62,7 @@ if(is_array($items))
 		else
 			$this->setVar("MODIFY", "");
 
-		$fullname = formatName($article);
+		$fullname = $userHandler->formatName($article);
 		$owner = "<a href=\"/search/user/{$article['uid']}\">$fullname</a>";
 
 		$url = new Url($previous['topicName']);

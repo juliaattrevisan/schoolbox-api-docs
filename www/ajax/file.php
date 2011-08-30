@@ -42,8 +42,10 @@ if (is_numeric($_POST['categoryID'])) {
 	if (!is_array($fileList)) {
 		$output = array();
 	} else {
+		$userHandler = new User();
+
 		foreach ($fileList as $file) {
-			$file['user'] = formatName($file);
+			$file['user'] = $userHandler->formatName($file);
 			$file['relative'] = getRelativeTime($file['modified'], 0, '');
 			$file['mimeClass'] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
 			$file['description'] = TextFormatter::cutString($file['description'], 32);

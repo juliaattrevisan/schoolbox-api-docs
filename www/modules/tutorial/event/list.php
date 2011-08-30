@@ -56,7 +56,7 @@ if ($groupHandler->getPermission(0) >= FULL_ACCESS && is_numeric($_GET['userID']
 $eventList = $eventHandler->getAll($_GET['show'], $_GET['order'], $_GET['dir'], $user['uid']);
 $output = array('SHOW'	=> ucwords(scrubText($_GET['show'])),
 				'USER_URL'  => isset($user['uid']) ? 'userID=' . $user['uid'] : '',
-				'USER_NAME'	=> isset($user['uid']) ? ' - ' . formatName($user) : '',
+				'USER_NAME'	=> isset($user['uid']) ? ' - ' . $userHandler->formatName($user) : '',
 				);
 $page->setVar($output);
 
@@ -74,22 +74,22 @@ if (is_array($eventList)) {
 						'CANCELLED'	=> $event['cancelled'] == 'true' ? 'cancelled' : '',
 						'PASSED'	=> $event['date'] < strtotime("12am") ? 'passed' : '',
 						'ON_OFF' =>  ++$j%2? 'dark' : '',
-						
+
 						);
 		$page->setVar($output);
 		$page->setVar('modify_link_block', '');
 		if ($groupHandler->getPermission(0) >= WRITE_ACCESS)
 			$page->parse('modify_link_block', 'modify_link');
-		
+
 		$page->parse('event_list_block', 'event_list', true);
 	}
 	$page->setVar('modify_title_block', '');
 	if ($groupHandler->getPermission(0) >= WRITE_ACCESS)
-		$page->parse('modify_title_block', 'modify_title');	
-	
+		$page->parse('modify_title_block', 'modify_title');
+
 	$page->parse('has_events_block', 'has_events');
 } else
 	$page->setVar('has_events_block', 'There are no upcoming events assigned to you.');
-	
+
 $page->outputPage();
 ?>

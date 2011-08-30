@@ -38,6 +38,8 @@ class schoolbox_addressbook_backend extends rcube_addressbook {
     }
 
     public function list_records($cols=null, $subset=0) {
+		$userHandler = new User();
+
         $users = $this->user->search('', ($this->list_page - 1) * $this->page_size, $this->list_page * $this->page_size, $count);
 
         $this->user_count = $count;
@@ -50,7 +52,7 @@ class schoolbox_addressbook_backend extends rcube_addressbook {
 
         	    $this->result->add(array(
         	        'ID'        => $user['id'],
-        	        'name'      => formatName($user),
+        	        'name'      => $userHandler->formatName($user),
         	        'firstname' => $user['firstname'],
         	        'surname'   => $user['lastname'],
         	        'email'     => $email
@@ -62,20 +64,22 @@ class schoolbox_addressbook_backend extends rcube_addressbook {
     }
 
     public function search($fields, $value, $strict=false, $select=true, $nocount=false, $required=array()) {
-	$groups = array_merge(unserialize(STUDENTGROUPIDS),unserialize(STAFFGROUPIDS));
+		$groups = array_merge(unserialize(STUDENTGROUPIDS),unserialize(STAFFGROUPIDS));
         $users = $this->user->ajaxSearch($value, $groups, 20);
 
         $this->user_count = $count;
         $this->result = $this->count();
 
-	if(is_array($users) ) {
+		if(is_array($users) ) {
+			$userHandler = new User();
+
         	foreach ($users as $user) {
 				$emailObj = new Email();
 				$email = $emailObj->formatEmailFromArray($user);
 
         	    $this->result->add(array(
         	        'ID'        => $user['id'],
-        	        'name'      => formatName($user),
+        	        'name'      => $userHandler->formatName($user),
         	        'firstname' => $user['firstname'],
         	        'surname'   => $user['lastname'],
         	        'email'     => $email,
@@ -92,13 +96,15 @@ class schoolbox_addressbook_backend extends rcube_addressbook {
         $this->user_count = $count;
         $this->result = $this->count();
 
+		$userHandler = new User();
+
         foreach ($users as $user) {
 			$emailObj = new Email();
 			$email = $emailObj->formatEmailFromArray($user);
 
             $this->result->add(array(
                 'ID'        => $user['id'],
-                'name'      => formatName($user),
+                'name'      => $userHandler->formatName($user),
                 'firstname' => $user['firstname'],
                 'surname'   => $user['lastname'],
                 'email'     => $email,

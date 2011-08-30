@@ -13,7 +13,7 @@ require_once("../include/syn_timetable.php");
 
 //check if they are a staff member, students cannot access this
 if(isStudent($_SESSION['gid']))
-{               
+{
       error(19);
 }
 
@@ -25,7 +25,7 @@ class Absentee
 		$this->date = date("Y-m-d");
 		$this->campus = 'G';
 		$this->period = $absperiod;
-		
+
 		$this->msdb = @mssql_connect(Cfg::get('external_db_host'), Cfg::get('external_db_user'), Cfg::get('external_db_passwd'));
 	}
 
@@ -39,7 +39,7 @@ class Absentee
 
                 $this->t_body->set_var("DAYNUMBER", $subCode);
                 $this->t_body->set_var("PERNUMBER", $this->period);
-                $this->t_body->set_var("SUBCODE", $subCode);   
+                $this->t_body->set_var("SUBCODE", $subCode);
                 $this->t_body->set_var("DATE",  date("j/n/Y"));
 
                 $this->t_body->set_var("SUBJECTNAME", "Homeroom");
@@ -48,7 +48,7 @@ class Absentee
                         SELECT CommunityStudents.Surname,
                                 CommunityStudents.Preferred,
                                 Students.ID,
-                                Absences.AbsenceType,       
+                                Absences.AbsenceType,
                                 Absences.Description
                         FROM    Students Students
                         INNER JOIN StudentSemester ON Students.ID = StudentSemester.ID
@@ -112,13 +112,13 @@ class Absentee
                 }
 
                 $this->t_body->pparse("finaloutput", "tplBODY");
-         
+
 	}
 
  	function createAbsCodeHTML($code)
         {
                 $abscodeHTML = "";
-       
+
                 $query = "SELECT * FROM SynergyOne.dbo.luAbsenceType";
                 $result = mssql_query($query, $this->msdb);
 
@@ -148,7 +148,7 @@ class Absentee
 
                 $this->t_body->set_var("DAYNO", "");
                 $this->t_body->set_var("DATE", date("j/n/Y"));
-       
+
                 //get teacher name
                 $mydb = new DeprecatedDatabase;
                 $mydb->dbConnect();
@@ -156,7 +156,8 @@ class Absentee
                 $mydb->query($query);
                 $teacher = $mydb->getNextArray();
 
-                $this->t_body->set_var("TEACHERNAME", formatName($teacher));
+				$userHandler = new User();
+                $this->t_body->set_var("TEACHERNAME", $userHandler->formatName($teacher));
 
 		$query = "SELECT Timetable.ClassCode
                           FROM SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable Timetable
@@ -190,11 +191,11 @@ class Absentee
         }
 
  	function involvedInSubjectSyn($code)
-        {      
+        {
                 //returns 1 when user is involved in subject according to synergy
                 //setup database
 
-                $query ="SELECT StaffID 
+                $query ="SELECT StaffID
                          FROM SynergyOne.dbo.Timetable Timetable
                          WHERE Timetable.FileSemester='".$_SESSION['FileSemester']."' AND Timetable.FileYear='".$_SESSION['FileYear']."'
                          AND Timetable.StaffID = '".$_SESSION['sid']."' AND Timetable.ClassCode = '$code'
@@ -213,7 +214,7 @@ class Absentee
         }
 
 	function insertAbsence($studid, $abstype, $reason)
-	{ 
+	{
 		if ($this->period == "PM")
 			$seq = 2;
 		else
@@ -223,19 +224,19 @@ class Absentee
 			  VALUES
 			  ('$studid', '".$this->date."', '".$this->period."', '".$this->period."', '$abstype', '$reason', '$seq')
 			";
-		mssql_query($query, $this->msdb);	
+		mssql_query($query, $this->msdb);
 
 	}
-	
+
 	function deleteAbsence($stuid){
 		$query = "DELETE FROM SynergyOne.dbo.Absences
 			  WHERE	ID = '$stuid'
 			  AND	AbsenceDate = '".$this->date."'
 			  AND	AbsencePeriod = '".$this->period."'
 			";
-		mssql_query($query, $this->msdb);   
+		mssql_query($query, $this->msdb);
 	}
-	
+
 	function updateAbsence($studid, $abstype, $reason)
 	{
 		$query = "UPDATE SynergyOne.dbo.Absences
@@ -246,7 +247,7 @@ class Absentee
 			  AbsenceDate = '".$this->date."' AND
 			  AbsencePeriod = '".$this->period."'
 			";
-		mssql_query($query, $this->msdb);			 
+		mssql_query($query, $this->msdb);
 	}
 
 	function checkAbsent($stuid)
@@ -269,11 +270,11 @@ class Absentee
 			return 0;
 	}
 }
-         
+
 
 $page = new Absentee;
 //check if its a weekend.. cant mark roll on weekend
-if(date("w") == 0 ||date("w") == 6)    
+if(date("w") == 0 ||date("w") == 6)
         error(32);
 
 if (isset($_POST['submit']) && $_POST['submit'] && isset($_POST['pernum']) && $_POST['pernum'])
@@ -288,14 +289,14 @@ if (isset($_POST['submit']) && $_POST['submit'] && isset($_POST['pernum']) && $_
 		$attend = "attend".$i;
 		$abscode = "abscode".$i;
 		$reason = "reason".$i;
-		$stuid = "stud".$i;	
-		
+		$stuid = "stud".$i;
+
 		//check if student is absent, if so, update or insert absence into db
 		if ($page->checkAbsent($_POST[$stuid])){
 
 			if ($_POST[$attend] == 0){
 				//update existing record
-				$page->updateAbsence($_POST[$stuid], $_POST[$abscode], $_POST[$reason]); 
+				$page->updateAbsence($_POST[$stuid], $_POST[$abscode], $_POST[$reason]);
 			}
 			else {
 				//delete item from synergy
@@ -312,7 +313,7 @@ if (isset($_POST['submit']) && $_POST['submit'] && isset($_POST['pernum']) && $_
 	$back = -2;
 	include("../include/back.php");
 }
-else if (isset($_GET['code']) && $_GET['code'] && isStaff($_SESSION['gid']) && $page->involvedInSubjectSyn($_GET['code'])) 
+else if (isset($_GET['code']) && $_GET['code'] && isStaff($_SESSION['gid']) && $page->involvedInSubjectSyn($_GET['code']))
 {
 	//display absentee page
 	$page = new Absentee($_GET['period']);

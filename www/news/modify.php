@@ -5,21 +5,22 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 $newsHandler = new News;
 $groupHandler = new Group(NEWS_SERVICE);
+$userHandler = new User();
 
 // check permission
 if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)
 	error(23);
 
 if (is_numeric($this->arg[0])) {
-	
+
 	$this->setFile(TEMPLATE_content, 'news/modify.html');
 	$this->setBlock(TEMPLATE_content, 'campus_row', 'campus_row_block');
         $this->setBlock(TEMPLATE_content, 'current_users', 'current_users_block');
 	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
-	
+
 	$this->setTitle('Modify News');
 	$this->setTab('news');
-	
+
 	$news = $newsHandler->getByID($this->arg[0]);
 	if (!isset($news['item_id']))
 		error(101);
@@ -39,12 +40,12 @@ if (is_numeric($this->arg[0])) {
         'ITEM_DATETIME_PUBLISHED' => $publishedDate->format(Cfg::get('date_select')),
         'ITEM_DATETIME_EXPIRES' => $expiryDate->format(Cfg::get('date_select')),
     );
-					
+
 	$this->setVar($output);
-	
+
 	$groupList = $newsHandler->getGroupList();
 	$campusList = $newsHandler->getCampusList();
-	
+
 	$this->checkList('group_selection', $groupList, $news['groupList']);
 	$this->checkList('campus_selection', $campusList, $news['campusList'], 'campus_row');
 
@@ -52,7 +53,7 @@ if (is_numeric($this->arg[0])) {
         if(is_array($userList)) {
             foreach($userList as $user){
                 $userOut = array(  'USER_ID'    => $user['id'],
-                                    'USER_NAME' => formatName($user),
+                                    'USER_NAME' => $userHandler->formatName($user),
                                 );
                 $this->setVar($userOut);
                 $this->parse('current_users_block', 'current_users', true);
@@ -62,12 +63,12 @@ if (is_numeric($this->arg[0])) {
             $this->setVar('current_users_block', '');
 
 	$this->dropDown('topic_list', $newsHandler->getTopicList(), $news['item_topic_id'], TEMPLATE_content, array('newsTopicID' => 'TOPIC_ID', 'name' => 'TOPIC_NAME'));
-	
+
 	if (count($campusList) > 1)
 		$this->parse('campus_row_block', 'campus_row');
 	else
 		$this->setVar('campus_row_block', '');
-		
+
 	$this->parse("delete_button_block", "delete_button");
 
 }
@@ -108,6 +109,6 @@ else {
 		$this->setVar('campus_row_block', '');
 
     $this->setVar('delete_button_block', '');
-		
-} 
+
+}
 ?>

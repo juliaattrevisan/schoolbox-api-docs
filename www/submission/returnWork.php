@@ -21,11 +21,11 @@ if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
     //Check user owners box they are returning to
     if($subbox['owner'] != $_SESSION['id'])
             error(25);
-    
+
     $output = array('CATEGORY'  => scrubTEXT($subbox['categoryName']),
                     'ASSNAME'   => scrubTEXT($subbox['name']),
                     'BOX_ID'    => $this->arg[0],
-                    'NAME'      => formatName($user),
+                    'NAME'      => $userHandler->formatName($user),
                     'UID'       => $this->arg[1],
                     'COMMENT'   => $subReturn['comment'],
                     'MARK'      => $subReturn['mark'],

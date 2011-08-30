@@ -32,23 +32,23 @@ if (is_numeric($_GET['userID']))
 
 $output = array('FROM'			=> outputDate("d/m/Y", $from),
 				'TO'			=> outputDate("d/m/Y", $to),
-				'STUDENT'		=> isset($user) ? formatName($user) : '',
+				'STUDENT'		=> isset($user) ? $userHandler->formatName($user) : '',
 				'STUDENT_ID'	=> $user['uid'],
 				);
 $page->setVar($output);
 
 if (isset($user['uid'])) {
-	
+
 		$eventList = $eventHandler->getByStudent($user['uid'], $from, $to);
 		if (is_array($eventList)) {
-			
+
 			$i = 0;
 			$total = count($eventList);
 			foreach ($eventList as $event) {
-				
+
 				$i++;
 				if ($event['code'] != $last['code'] && $i > 1) {
-					
+
 					$output = array('TUTORIAL'		=> scrubText($last['name']),
 									'CODE'			=> scrubText($last['code']),
 									'TYPE'			=> $last['typeName'],
@@ -57,23 +57,23 @@ if (isset($user['uid'])) {
 									'TOTAL_MISSED'		=> number_format($totalMissed, 2),
 									);
 					$page->setVar($output);
-					
+
 					$page->parse('class_list_block', 'class_list', true);
 					$page->setVar('event_list_block', '');
-					
+
 					$totalAttended = 0;
 					$totalMissed = 0;
-					
+
 				}
-				
+
 				$hoursAttended = $event['hours'];
 				$hoursMissed = 0;
 				if ($event['present']!='true') {
 					$hoursAttended = 0;
 					$hoursMissed = $event['hours'];
-					
+
 				}
-				
+
 				$output = array('EVENT_ID'	=> $event['eventID'],
 								'DATE'		=> outputDate(Cfg::get('date_notime'), $event['date']),
 								'START'		=> $event['start'],
@@ -85,7 +85,7 @@ if (isset($user['uid'])) {
 								);
 				$page->setVar($output);
 				$page->parse('event_list_block', 'event_list', true);
-				
+
 				$last = $event;
 				$totalAttended += $hoursAttended;
 				$totalMissed += $hoursMissed;
@@ -100,16 +100,16 @@ if (isset($user['uid'])) {
 							'TOTAL_ATTENDED'	=> number_format($totalAttended, 2),
 							'TOTAL_MISSED'		=> number_format($totalMissed, 2),
 							);
-			$page->setVar($output);			
+			$page->setVar($output);
 			$page->parse('class_list_block', 'class_list', true);
 
 		} else
-			$page->setVar('class_list_block', '<p>No attendance to display.</p>');	
-		
+			$page->setVar('class_list_block', '<p>No attendance to display.</p>');
+
 		$page->parse('has_events_block', 'has_events');
-} 	
+}
 else
-	$page->setVar('has_events_block', '');	
+	$page->setVar('has_events_block', '');
 
 
 

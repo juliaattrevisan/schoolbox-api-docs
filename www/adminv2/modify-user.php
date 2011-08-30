@@ -1,8 +1,9 @@
 <?php
 require_once SITE_root . '/library/user.php';
 require_once SITE_root . '/library/group.php';
-$userHandler = new User;
-$groupHandler = new Group;
+
+$userHandler = new User();
+$groupHandler = new Group();
 
 /* Superusers only */
 if(!$groupHandler->isSuperuser())
@@ -45,7 +46,7 @@ if(is_numeric($this->arg[0])) {
                         'USERNAME'          => $user['username'],
                         'ESCAPE_FIRSTNAME'  => addslashes($user['firstname']),
                         'ESCAPE_LASTNAME'   => addslashes($user['lastname']),
-                        'FULLNAME'          => formatName($user),
+                        'FULLNAME'          => $userHandler->formatName($user),
                         'ALT_EMAIL'         => $user['alt_email'],
                         'PASSWORD'          => 'donotchange',  // set to foreign string to avoid reveals and to indicate password has not been changed
                         'CLEAR_PASSWORD'     => $user['email_pass'],

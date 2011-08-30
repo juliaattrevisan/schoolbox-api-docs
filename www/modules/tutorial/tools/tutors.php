@@ -11,7 +11,7 @@ $handle = fopen($argv[1], "r");
 while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
 	$user = $userHandler->getBySynergy($data[0]);
 	if (isset($user['uid'])) {
-		print formatName($user)."\n";
+		print $userHandler->formatName($user)."\n";
 		$groupHandler->addUser(0, $user['uid'], WRITE_ACCESS);
 	}
 }
