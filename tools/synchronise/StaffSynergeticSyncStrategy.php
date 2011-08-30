@@ -2,6 +2,11 @@
 /**
  * Adds Staff in Synergetic to the Schoolbox User table. Applies Campus based
  * on the Staff's campus field.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 class StaffSynergeticSyncStrategy extends BialikSynergeticSyncStrategy {
 	protected $strategyTitle = "Staff Synchronisation";

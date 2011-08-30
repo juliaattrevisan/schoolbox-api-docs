@@ -1,7 +1,13 @@
 <?php
 /**
  * Update Schoolbox with Synergetic data if there is something different
- * contained in Synergetic db
+ * contained in Synergetic database. This was formerly known as parentSync.php
+ * and was amalgamated with the Bialik sync classes.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 class UpdateParentSynergeticSyncStrategy extends SynergeticSyncStrategy implements SynergeticSyncStrategyInterface {
 	protected $strategyTitle = "Update Schoolbox Parent Details Synchronisation";

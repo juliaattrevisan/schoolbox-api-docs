@@ -2,6 +2,12 @@
 /**
  * Class definition for Synergetic Synchronisation. Contains Strategies so you
  * can change the actual steps performed without altering the overall algorithm
+ * (Template Design Pattern, Strategy Design Pattern)
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 class SynergeticSync {
 	private $strategy = null;

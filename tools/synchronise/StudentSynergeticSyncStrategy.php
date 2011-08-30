@@ -2,6 +2,11 @@
 /**
  * Adds Students in Synergetic to the Schoolbox User table. Applies Campus based
  * on the Students' Year Level.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 class StudentSynergeticSyncStrategy extends BialikSynergeticSyncStrategy {
 	protected $strategyTitle = "Student Synchronisation";

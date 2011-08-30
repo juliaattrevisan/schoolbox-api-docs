@@ -1,6 +1,11 @@
 <?php
 /**
  * Perform Schoolbox User/Synergetic synchronisations
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 

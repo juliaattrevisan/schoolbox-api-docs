@@ -1,6 +1,13 @@
 <?php
 /**
- * Class definition for Synergetic Synchronisation Strategies
+ * Class definition for Synergetic Synchronisation Strategies. Strategies are
+ * individual classes that handle particular steps of an algorithm. This class
+ * defines shared Strategy methods and shouldn't be instantiated, only extended
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 abstract class SynergeticSyncStrategy implements SynergeticSyncStrategyInterface {
 	protected $userHandler;
