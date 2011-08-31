@@ -2,6 +2,7 @@
 
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 

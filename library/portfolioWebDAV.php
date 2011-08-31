@@ -287,12 +287,24 @@ class PortfolioWebDAV {
                 }
                 else if(Cfg::get('site_location') == 'cathedral') {
                    if ($groupHandler->isStaff()) {
-                            $pathList = array( 'http://senior-server.school.cathedral.qld.edu.au/staffhome/'.$_SESSION['username'].'/',
-                                                               'http://senior-server.school.cathedral.qld.edu.au/xdrive/',
-                                                              );
+                       if($_SESSION['campus'][0] == 4 || $_SESSION['campus'][0] == 5) {
+                            $pathList = array( 'http://junior-server.school.cathedral.qld.edu.au/staffhome/'.$_SESSION['username'].'/',
+                                                'http://junior-server.school.cathedral.qld.edu.au/ydrive/',);
+                       }
+                       else {
+
+                           $pathList = array( 'http://senior-server.school.cathedral.qld.edu.au/staffhome/'.$_SESSION['username'].'/',
+                                            'http://senior-server.school.cathedral.qld.edu.au/xdrive/',);
+                       }
+
                     } else {
-                            $pathList = array( 'http://senior-server.school.cathedral.qld.edu.au/studenthome/'.$_SESSION['username'].'/',
+                            if($_SESSION['campus'][0] == 4 || $_SESSION['campus'][0] == 5) {
+                                 $pathList = array( 'http://junior-server.school.cathedral.qld.edu.au/studenthome/'.$_SESSION['username'].'/',
                                                               );
+                            }else {
+                                $pathList = array( 'http://senior-server.school.cathedral.qld.edu.au/studenthome/'.$_SESSION['username'].'/',
+                                                              );
+                            }
                     }
                     return new self($pathList , "cathedral/".$_SESSION['username'], $_SESSION['password']);
                 }

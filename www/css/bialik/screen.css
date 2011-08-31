@@ -186,6 +186,8 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 	
 }
 
+#calendar h3{color:#000;}
+
 .otherMonth .dayWrap, .past .dayWrap {
     background-color: #b6d6f4;
 }

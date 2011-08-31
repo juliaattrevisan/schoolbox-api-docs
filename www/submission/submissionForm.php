@@ -44,7 +44,7 @@ if(is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_POS
     localRedir("/submission/listSubmission/");
 }
 else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour']) {
-
+    
     if( isset($_FILES['file']['name']) && $_FILES['file']['name'] ) {
         require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
@@ -79,7 +79,7 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
     if (!empty($_POST['accept_submission']) && $due_date > $late_date) {
         error(15);
     }
-
+    
     /* Create Submission Box */
     $submission_box = array(
         'category'          => $_POST['category'],

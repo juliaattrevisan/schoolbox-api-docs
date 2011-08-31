@@ -4,7 +4,13 @@
 <script type="text/javascript">
 	$j(function() {	
 		
-
+		$j('#category a').click(function() {
+			$j('#category a').removeClass('selected');
+			$j(this).addClass('selected');
+			var el = $j(this).attr('title');
+			$j('div.topic > div').hide();
+			$j('div.topic > div#' + el).show();
+		});
 		
 		var params = window.location.href.split("#");
 		if (params[1] != '' && params[0] != window.location.href) {
@@ -18,7 +24,7 @@
 		$j('#category li:first-child a').addClass('selected');
 			$j('div.topic > div:first-child').show();
 		}
-		
+
 		$j('.header_option a').addClass("btn modify");
 		$j('.header_option a').html("<span></span>Modify");
 		
@@ -26,42 +32,41 @@
 </script>
 <!-- END custom_head -->
 
-<h1><span>Announcements</span> 
-<!-- BEGIN add_news --> <a class="btn add" href="/news/modify"><span></span>Add Announcements</a><!-- END add_news --></h1>
-<div class="float-fix"></div>
-
-  <!-- BEGIN topic_header -->
-
-  <!-- END topic_header -->
-
-<div class="topic">
-<!-- BEGIN topic -->
-<div id="{TOPIC_CLEAN}" class="hide">
-    
-  <!-- BEGIN news -->
-  <div id="a{NEWS_ID}" class="news-item clearfix">
-    <h3 id="news-header"><a name="{NEWS_ID}"></a><span>{NEWS_TITLE}</span><span class="header_option">{MODIFY}</span></h3>
-   	<div class="wysiwyg"> {NEWS_BODY}
-    <hr />
-    <p class="interact">Submitted by {POSTER} on {DATETIME}</p>
-	   <div class="float-fix"></div>
+<h1><span>Announcements</span>
+<!-- BEGIN add_news -->
+<a class="btn add" href="/news/modify"><span></span>Add Announcements</a></span>
+<!-- END add_news -->
+    </h1>
+<div class="newsWrapper clearfix">
+	<ul id="category">
+		<!-- BEGIN topic_header -->
+		<li><a href="#" title="{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
+		<!-- END topic_header -->
+	</ul>
+	<div class="topic">
+		<!-- BEGIN topic -->
+		<div id="{TOPIC_CLEAN}" class="hide">
+			<!-- BEGIN news -->
+			<div id="a{NEWS_ID}" class="news-item clearfix">
+				<h3 id="news-header">{NEWS_TITLE}<span class="header_option in-h2">{MODIFY}</span></h3>
+				<div class="wysiwyg"> {NEWS_BODY}
+					<p class="submitted-by">Submitted by {POSTER} on {DATETIME}</p>
+				</div>
+			</div>
+			<!-- END news -->
+		</div>
+		<!-- END topic -->
 	</div>
- 
-  </div>
-  <!-- END news -->
 </div>
-<!-- END topic -->
-</div>
-
 <div class="pagination">
-  <!-- BEGIN previous_button -->
-  <a class="prev" href="/news-archive/{PREVIOUS_PAGE}">&lt;&lt; Prev</a><!-- END previous_button -->
-  <!-- BEGIN page_number -->
-  <a class="number{CURRENT}" href="/news-archive/{PAGE_INDEX}">{PAGE_INDEX}</a><!-- END page_number -->
-  <!-- BEGIN next_button -->
-  <a class="next" href="/news-archive/{NEXT_PAGE}">Next &gt;&gt;</a><!-- END next_button -->
+	<!-- BEGIN previous_button -->
+	<a class="prev" href="/news-archive/{PREVIOUS_PAGE}">&lt;&lt; Prev</a><!-- END previous_button -->
+	<!-- BEGIN page_number -->
+	<a class="number{CURRENT}" href="/news-archive/{PAGE_INDEX}">{PAGE_INDEX}</a><!-- END page_number -->
+	<!-- BEGIN next_button -->
+	<a class="next" href="/news-archive/{NEXT_PAGE}">Next &gt;&gt;</a><!-- END next_button -->
 </div>
 
 <!-- BEGIN archive_button -->
-	<p class="interact"><a href="/news-archive/" class="btn"><span></span>View Archived Announcements</a></p>
+<p class="interact"><a href="/news-archive/" class="btn"><span></span>View Archived Announcements</a></p>
 <!-- END archive_button -->

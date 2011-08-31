@@ -7,13 +7,13 @@ require_once '../library/my-file.php';
 $groupHandler = new Group;
 
 if(is_numeric($this->arg[0])) {
-	
+
 	/* Modify existing file */
-	
+
 	require_once '../library/file.php';
 	require_once '../library/submission.php';
 	$fileHandler = new File;
-	
+
 	$file = $fileHandler->getByID($this->arg[0]);
 
 	if(!is_array($file))
@@ -28,9 +28,9 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock('optgroup', 'my_files', 'my_files_block');
 	$this->setBlock(TEMPLATE_content, 'submission_box', 'submission_box_block');
 
-	$this->setTitle('Modify File');	
+	$this->setTitle('Modify File');
 	$this->setTab('resources');
-	
+
 	//$this->setVar('browse_block', '');
 	$output = array('ACTION'		=> 'Modify',
                         'FILE_ID'		=> $file['id'],
@@ -74,7 +74,7 @@ if(is_numeric($this->arg[0])) {
 	/* Output different controls for submission boxes */
 	$this->setVar('submission_box_block', '');
 	if ($groupHandler->isStaff()) {
-			
+
 		$subBoxHandler = new Submission;
 		$subBox = $subBoxHandler->getByField('fid', $file['id']);
 
@@ -91,13 +91,13 @@ if(is_numeric($this->arg[0])) {
 		}
 		$this->parse('submission_box_block', 'submission_box');
 	}
-	
-	
+
+
 } else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-	
+
 	/* Add new file to system */
 	require_once '../library/category.php';
-	
+
 	$this->setFile(TEMPLATE_content, 'cms/modify-file.html');
 	$this->setBlock(TEMPLATE_content, 'optgroup', 'optgroup_block');
 	$this->setBlock('optgroup', 'my_files', 'my_files_block');
@@ -105,9 +105,9 @@ if(is_numeric($this->arg[0])) {
     $this->setBlock(TEMPLATE_content, 'delete_button','delete_button_block');
     $this->setVar('delete_button_block','');
 
-	$this->setTitle('Add File');	
+	$this->setTitle('Add File');
 	$this->setTab('resources');
-	
+
 	$categoryHandler = new Category;
 	$category = $categoryHandler->getByID($this->arg[1]);
 	if(!is_array($category))
@@ -135,7 +135,7 @@ if(is_numeric($this->arg[0])) {
 
 	$myFolderHandler = new MyFolder;
 	$myFileHandler = new MyFile;
-	
+
 	$folderTree = $myFolderHandler->getFolderTree();
 	if (is_array($folderTree)) {
 		foreach ($folderTree as $folder) {
@@ -157,7 +157,7 @@ if(is_numeric($this->arg[0])) {
 			$this->setVar('my_files_block', '');
 		}
 	}
-	
+
 	$this->setVar('submission_box_block', '');
 	if ($groupHandler->isStaff())
 		$this->parse('submission_box_block', 'submission_box');
@@ -166,12 +166,12 @@ if(is_numeric($this->arg[0])) {
 else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 	/* Upload multiple files at once */
 	require_once '../library/category.php';
-	
+
 	$this->setFile(TEMPLATE_content, 'cms/add-multi-file.html');
 
-	$this->setTitle('Upload Multiple Files');	
+	$this->setTitle('Upload Multiple Files');
 	$this->setTab('resources');
-	
+
 	$categoryHandler = new Category;
 	$category = $categoryHandler->getByID($this->arg[1]);
 	if(!is_array($category))
@@ -179,7 +179,7 @@ else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 
 	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS)
 		error(6);
-		
+
 	$output = array('CATEGORY_NAME'		=> scrubTEXT($category['name']),
 					'CATEGORY_ID'		=> $category['id'],
 					'FILE_max_upload'	=> Cfg::get('file_upload_count'),
@@ -191,58 +191,77 @@ else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 else if($this->arg[0] == 'multicat') {
 	/* Upload a file to multiple categories */
 	require_once '../library/group.php';
-	
+
 	$this->setFile(TEMPLATE_content, 'cms/add-file-multi-cat.html');
 	$this->setBlock(TEMPLATE_content, 'optgroup', 'optgroup_block');
 	$this->setBlock('optgroup', 'my_files', 'my_files_block');
 	$this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
+	$this->setBlock(TEMPLATE_content, 'no_categories', 'no_categories_block');
 
-	$this->setTitle('Upload a File to Multiple Locations');	
+	$this->setTitle('Upload a File to Multiple Locations');
 	$this->setTab('resources');
-	
-	$output = array('MAX_FILE_SIZE'	=> Cfg::get('max_file_size'),
-			);
+
+	$output = array(
+		'MAX_FILE_SIZE'	=> Cfg::get('max_file_size'),
+	);
+
 	$this->setVar($output);
-	
+
 	$groupHandler = new Group;
 	$categoryList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], WRITE_ACCESS);
 
-	if(is_array($categoryList)) {
+	if (is_array($categoryList)) {
 		foreach($categoryList as $category) {
+			$output = array(
+				'CATEGORY_NAME' =>scrubTEXT($category['name']) . ($category['code']?' ('.$category['code'].')':''),
+				'CATEGORY_ID' => $category['id'],
+			);
 
-			$output = array('CATEGORY_NAME'		=>scrubTEXT($category['name']) . ($category['code']?' ('.$category['code'].')':''),
-					'CATEGORY_ID'		=> $category['id'],
-					);
 			$this->setVar($output);
+
 			$this->parse('category_list_block', 'category_list', true);
 		}
+
+		$this->setVar('no_categories_block', '');
+	}
+	else {
+		$this->parse('no_categories_block', 'no_categories');
+		$this->setVar('category_list_block', '');
 	}
 
 	$myFolderHandler = new MyFolder;
 	$myFileHandler = new MyFile;
-	
+
 	$folderTree = $myFolderHandler->getFolderTree();
+
 	if (is_array($folderTree)) {
 		foreach ($folderTree as $folder) {
-			$output = array('MYFOLDER_NAME'	=> trim($folder['name']),
-							'MYFOLDER_LEFT'	=> number_format($folder['depth'] * 14, 0),
-							);
+			$output = array(
+				'MYFOLDER_NAME'	=> trim($folder['name']),
+				'MYFOLDER_LEFT'	=> number_format($folder['depth'] * 14, 0),
+			);
+
 			$this->setVar($output);
+
 			$fileList = $myFileHandler->getAllInFolder($folder['id']);
+
 			if (is_array($fileList)) {
 				foreach ($fileList as $file) {
-					$output = array('MYFILE_ID'		=> $file['id'],
-									'MYFILE_NAME'	=> $file['description'],
-									);
+					$output = array(
+						'MYFILE_ID' => $file['id'],
+						'MYFILE_NAME' => $file['description'],
+					);
+
 					$this->setVar($output);
+
 					$this->parse('my_files_block', 'my_files', true);
 				}
 			}
+
 			$this->parse('optgroup_block', 'optgroup', true);
 			$this->setVar('my_files_block', '');
 		}
 	}
-
 }
 else {
 	error(2);

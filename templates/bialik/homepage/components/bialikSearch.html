@@ -1,0 +1,34 @@
+<div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
+	<h2>Bialik Library Search</h2>
+
+	<!-- BEGIN config -->
+	<a class="close-delete" href="#"><span>X</span></a>
+	<div class="editPanel delete-it hide clearfix">
+		<p>Are you sure you want to remove component?</p>
+		<form action="#" method="post">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="component" value="{COMPONENT_ID}" />
+			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> <a href="#" class="delete-reject btn go-to"><span></span>No</a>
+		</form>
+	</div>
+	<!-- END config -->
+
+	<div class='text clearfix'>
+		<form action="http://elibcat.bialik.vic.edu.au/amlibweb/webquery.dll" enctype="application/x-www-form-urlencoded" method="post" target="_blank">
+			<div>
+				<input name="v20" type="hidden" value="20" />
+				<input name="v22" type="hidden" value="20E" />
+
+				<input name="v2" size="40" type="text" /> in
+				<select name="v3">
+					<option selected="selected" value="All">Anywhere</option>
+					<option value="T">Title</option>
+					<option value="A">Author</option>
+					<option value="S">Subject</option>
+				</select>
+				<input type="submit" value="Search" />
+			</div>
+		</form>
+	</div>
+</div>

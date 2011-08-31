@@ -1,28 +1,15 @@
 <script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
-
 <script type="text/javascript">
 	
 $j(function() {
-	//in order for the boxes to complete their height adjustments effectively.
-	$j('tr td:first-child').each(function() {
-		var oneHeight = $j(this).height();
-		//$j(this).children('.library-box').height(oneHeight - 48);
-	});
-	
 	//autoclear the catalogue search
 	$j('#library-search-field').autoclear();
-		
-});
-
-$j(function(){	
-
 	$j('#galleryCycle').children('div:not(:first-child)').each(function() {
 		$j(this).hide();
-		
 	});
 
-
 }); 
+
 
 $j(window).load(function(){	
 	$j('#galleryCycle').cycle({
@@ -37,6 +24,11 @@ $j(window).load(function(){
 });
 
 	
+$j(window).resize(function() {
+
+});
+
+	
 
 </script>
 
@@ -44,43 +36,39 @@ $j(window).load(function(){
 	<div class="library-header clearfix">
 		<div class="library-content">
 			<div class="clearfix">
-				<form id="library-search" action="/search.php" method="get">
-					<fieldset>
-						<input id="library-search-field" type="text" title="Catalogue Search" name="keyword" />
-						<input id="library-search-button" type="submit" value="Search" />
-					</fieldset>
-				</form>
+		<form id="library-search" action="/search.php" method="get">
+			<fieldset>
+				<input id="library-search-field" type="text" title="Catalogue Search" name="keyword" />
+				<input id="library-search-button" type="submit" value="Search" />
+			</fieldset>
+		</form>
 				<h1>Nina Crone <span>Library</span></h1>
 			</div>
 		<ul class="clearfix">
 			<li><a href="/modules/library/nina">Home</a></li>
-			<li><a href="http://libcat.mggs.vic.edu.au/">Catalogue</a></li>
+			<li><a href="http://libcat.mggs.vic.edu.au:8181">Catalogue</a></li>
 			<li><a href="/homepage/4292">Online Resources</a></li>
 			<li><a href="/homepage/4774">Remarkable Reading</a></li>
 			<li><a href="/homepage/4767">Research Tools</a></li>
 			<li><a href="/modules/library/morris">Morris Hall Library</a></li>
 		</ul>
-		
-		</div>
-		
+	</div>
 	</div>
 	<table class="library-boxes" height="100%" >
 		<tr>
-			<td width="33%"><div class="library-box resources">
+			<td width="33%" class="resources"><div class="library-box">
 					<h3>Online Resources</h3>
 			                  {ONLINE_RESOURCES}
+					</div>
 
-					
-				</div></td>
-			<td width="33%"><div class="library-box reading">
+				</td>
+			<td width="33%" class="reading"><div class="library-box">
 					<h3>Remarkable Reading</h3>
 					{REMARKABLE_READING}
-				</div></td>
+					</td>
 			<td rowspan="3" width="33%"><div class="updates">
 					<h3>New Books</h3>
                         {NEW_BOOKS}
-						
-				
 						<div id="galleryCycle">
                             <!-- BEGIN image -->
 							<div>
@@ -92,21 +80,22 @@ $j(window).load(function(){
 				</div></td>
 		</tr>
 		<tr>
-			<td><div class="library-box quick-facts">
+			<td class="quick-facts"><div class="library-box">
 					<h3>Quick Facts</h3>
                         {QUICK_FACTS}
-				</div></td>
-			<td><div class="library-box in-the-news">
+						</div>
+				</td>
+			<td class="in-the-news"><div class="library-box">
 					<h3>In The News</h3>
                        {IN_THE_NEWS}
 				</div></td>
 		</tr>
 		<tr>
-			<td><div class="library-box research-tools">
+			<td class="research-tools"><div class="library-box">
 					<h3>Research Tools</h3>
                       {RESEARCH_TOOLS}
 				</div></td>
-			<td><div class="library-box click-view">
+			<td class="click-view"><div class="library-box ">
 					<h3>Click View</h3>
                         {CLICK_VIEW}
 				</div></td>

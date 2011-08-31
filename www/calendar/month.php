@@ -183,6 +183,7 @@ for ($i = 0; $i < $totalDays; $i++) {
                             'EVENT_TYPE' => 'type' . $event['type'],
                             'TYPE' => $event['eventType'],
                             'AUTHOR' => $userHandler->formatName($event),
+                            'AUTHOR_ID' => $event['owner'],
                         );
 
             if($event['access'] == 3 ) {

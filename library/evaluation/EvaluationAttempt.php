@@ -131,7 +131,7 @@ abstract class EvaluationAttempt extends DeprecatedModel {
 	 * @param  $assess_id
 	 * @return array|bool
 	 */
-    public function getList($assess_id) {
+    public function getList($assess_id, $user_id = false) {
         $query = "SELECT
                       assess_attempt.attempt_id,
                       assess_attempt.user_id, firstname, lastname,
@@ -144,8 +144,13 @@ abstract class EvaluationAttempt extends DeprecatedModel {
                   LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
                   WHERE assess.assess_id = '$assess_id'
-				  AND assess_attempt.deleted_at IS NULL
-                  GROUP BY assess_attempt.attempt_id";
+				  AND assess_attempt.deleted_at IS NULL ";
+
+	    if (is_numeric($user_id)) {
+            $query .= "AND assess_attempt.user_id = '$user_id' ";
+        }
+
+        $query .= "GROUP BY assess_attempt.attempt_id";
 
         return $this->db->getAll($query);
     }

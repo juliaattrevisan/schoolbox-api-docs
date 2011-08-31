@@ -1,19 +1,38 @@
+<script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
 <script type="text/javascript">
 	
-	$j(function() {
-		//in order for the boxes to complete their height adjustments effectively.
-		$j('tr td:first-child').each(function() {
-			var oneHeight = $j(this).height();
-			$j(this).children('.library-box').css("min-height", oneHeight - 41);
-			$j(this).next().children('.library-box').css("min-height",oneHeight - 41);
-		});
-		
-		//autoclear the catalogue search
-		$j('#library-search-field').autoclear();
-		
-		$j('.community').height($j('.taller').innerHeight() -41);
-			
+$j(function() {
+    //in order for the boxes to complete their height adjustments effectively.
+    $j('tr td:first-child').each(function() {
+        var oneHeight = $j(this).height();
+        $j(this).children('.library-box').css("min-height", oneHeight - 41);
+        $j(this).next().children('.library-box').css("min-height",oneHeight - 41);
+    });
+
+    //autoclear the catalogue search
+    $j('#library-search-field').autoclear();
+
+    $j('.community').height($j('.taller').innerHeight() -41);
+
+    $j('#galleryCycle').children('div:not(:first-child)').each(function() {
+		$j(this).hide();
 	});
+});
+
+$j(window).load(function(){
+	$j('#galleryCycle').cycle({
+        cleartype: true,
+        before: function() {
+            $j('#galleryCycle span').slideUp();
+        },
+        after: function() {
+            $j('span', this).slideDown();
+        }
+    });
+});
+
+
+
 
 </script>
 
@@ -24,7 +43,7 @@
 		<h1>Morris Hall Library <span>Whose library? Our Library!</span></h1>
 		<ul>
 			<li><a href="/modules/library/morris">Home</a></li>
-			<li><a href="http://libcat.mggs.vic.edu.au/">Catalogue</a></li>
+			<li><a href="http://libcat.mggs.vic.edu.au:8181">Catalogue</a></li>
 			<li><a href="/homepage/4778">Let's Read</a></li>
 			<li><a href="/homepage/4780">Finding Out</a></li>
 			<li><a href="/homepage/4779">Digital Citizenship</a></li>
@@ -44,12 +63,17 @@
 			<td width="33%"><a href="/homepage/4780" class=" library-box finding-out">
 					<strong>Finding Out</strong>
 				</a></td>
-			<td rowspan="2" width="33%" class="taller">
+			<td rowspan="3" width="33%" class="taller">
 			<div class="library-box community">
 					<h3>Our Community</h3>
-                {OUR_COMMUNITY}
-					<h5>Gallery</h5>
-					{GALLERY}
+						<div id="galleryCycle">
+                            <!-- BEGIN image -->
+							<div>
+								<img src="/cms/image.php?id={IMAGE_ID}&amp;height=222&amp;width=222">
+								<!-- <span>{IMAGE_NAME}</span> -->
+							</div>
+                            <!-- END image -->
+						</div>
 					
 					<h5>Did you know</h5>
 
@@ -71,16 +95,12 @@
 					{CURIOUS_QUOTES}
 
 				</div></td>
-			<td><div class="library-box words">
-					<h5>Wonderful Words</h5>
-					{WONDERFUL_WORDS}
-				</div></td>
 		</tr>
 		
 		<tr>
 			<td colspan="3"><div class="library-box cybersmart">
 				<h6>Reminder</h6>
-			    {REMINDER}	
+			    {REMINDER}
                 </div>
             </td>
 		</tr>

@@ -2,6 +2,7 @@
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.color.js"></script>
 <script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
@@ -10,6 +11,7 @@
         mode : "textareas",
         theme : "advanced",
         skin : "cirkuit",
+
         plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
         content_css : "/css/core/tiny.css",
        theme_advanced_toolbar_location : "top",
@@ -107,7 +109,7 @@
 		});
 		
 		$j('#newsForm').validate({
-
+			
 		rules: {  
 			'group[]': { 
 				required: true, 
@@ -195,13 +197,13 @@
                 <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" size="12" maxlength="50" value="{ITEM_DATETIME_PUBLISHED}" />
             </td>
         </tr>
-        <tr>
+		<tr>
             <td><h4>Expiry Date</h4>
                 <em>Select a date for when this item will expire.</em>
             <td>
                 <input type="text" class="required" name="item_datetime_expires" id="item_datetime_expires" size="12" maxlength="50" value="{ITEM_DATETIME_EXPIRES}" />
             </td>
-        </tr>
+		</tr>
 		<tr>
 			<td><h4>Headline</h4></td>
 			<td><label>

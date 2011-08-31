@@ -17,8 +17,8 @@ $j(function(){
 <!-- END custom_head -->
 <div class="box" id="component{COMPONENT_ID}">
 	<h2>Blog</h2>
-
-	<!-- BEGIN config -->
+	
+	<!-- BEGIN config --> 
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
 
 	<div class="editPanel settings hide">
@@ -55,7 +55,7 @@ $j(function(){
 		</form>
 	</div>
 	<!-- END config -->
-
+	
 	<div class="listing blog">
 		<ul>
 			<!-- BEGIN blog -->
@@ -77,9 +77,9 @@ $j(function(){
 					<p>
 						<a class="show_comments" href="javascript:void();">Show {BLOG_COMMENTS} Comments</a>
 					</p>
-					<!-- END show_comment -->
+					<!-- END show_comment --> 
 				</div>
-				<div class="blog_comments">
+				<div class="blog_comments"> 
 					<!-- BEGIN comment -->
 					<p class="blog_title">
 						{COMMENT_BODY}
@@ -90,13 +90,13 @@ $j(function(){
 						{COMMENT_CREATED}<br />
 						{DELETE_COMMENT}
 					</p>
-					<!-- END comment -->
-
+					<!-- END comment --> 
+					
 					<!-- BEGIN show_all -->
 					<p>
 						<a class="interact" href="/eportfolio_blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a>
 					</p>
-					<!-- END show_all -->
+					<!-- END show_all --> 
 				</div>
 
 				<p>
@@ -115,7 +115,7 @@ $j(function(){
 			</li>
 			<!-- END blog -->
 		</ul>
-		<p class="interact pad-it">
+		<p class="interact pad-it"> 
 			<!-- BEGIN submit -->
 			<a href="/eportfolio_blog/modify/new/{ID}" class="btn up-arrow"><span></span>Post Entry</a>
 			<!-- END submit -->

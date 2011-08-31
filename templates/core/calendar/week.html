@@ -3,8 +3,8 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
 	$j(function () {
-	    /* date picker */		 
-		$j('.datepicker').datepicker({ 
+	    /* date picker */
+		$j('.datepicker').datepicker({
 			dateFormat: 'dd-mm-yy',
 			onSelect: function(dateText, inst) {window.open('/calendar/week/'+dateText, "_self")},
 			defaultDate: $j.datepicker.parseDate("dd-mm-yy", "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"),
@@ -13,8 +13,8 @@
 			buttonImageOnly: true,
 			showAnim: 'slideDown'
 		});
-		
-		
+
+
 		$j('.print-it').click(function() {
 			  window.print();
 			  return false;
@@ -27,58 +27,60 @@
 <div id="calendar">
 	<div class="calendar-controls clearfix">
 		<div class="float-left clearfix">
-			
+
 			<a class="back" href="/calendar/week/{BACK}" title="Back one month"><strong>&lt;&lt;</strong></a>
-			
+
 			<div class="datepicker-box">
 				<input type="hidden" class="datepicker" />
 			</div>
-			
+
 			<a class="forward" href="/calendar/week/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a>
 		</div>
 		<div class="float-right">
-			<div class="link-case"> 
-			<a class="filter-change month" href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"><span></span>Month</a>
-			<a class="filter-change week current" href="#"><span></span>Week</a> 
-			<a class="filter-change filters" href="#"><span></span>Filters</a> 
-			<a class="btn report print-it filter-change" href="#"><span></span>Print</a> 
+			<div class="link-case">
+				<a class="filter-change month" href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"><span></span>Month</a>
+				<a class="filter-change week current" href="#"><span></span>Week</a>
+				<a class="filter-change filters" href="#"><span></span>Filters</a>
+				<a class="btn report print-it filter-change" href="#"><span></span>Print</a>
 				<div class="filter-drop clearfix">
 					<div class="filter-list">
 						<form class="clearfix">
-							<div class="filter-cat groups clearfix"> <span>Groups</span> 
+							<div class="filter-cat groups clearfix">
+								<span>Groups</span>
 								<!-- BEGIN group -->
 								<label title="{GROUP_NAME}">
 									<input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" checked="checked" class="checkbox"/>
-									{GROUP_NAME} </label>
-								
-								<!-- END group --> 
+									{GROUP_NAME}
+								</label>
+								<!-- END group -->
 							</div>
-							<div class="filter-cat campus"> <span>Campus</span> 
+							<div class="filter-cat campus">
+								<span>Campus</span>
 								<!-- BEGIN campus -->
 								<label title="{CAMPUS_NAME}">
 									<input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox"/>
-									{CAMPUS_NAME} </label>
-								
-								<!-- END campus --> 
+									{CAMPUS_NAME}
+								</label>
+								<!-- END campus -->
 							</div>
-							<div class="filter-cat events last"> <span>Event</span> 
+							<div class="filter-cat events last">
+								<span>Event</span>
 								<!-- BEGIN event_type -->
 								<label title="{EVENT_TYPE_NAME}">
 									<input type="checkbox" name="events" id="{EVENT_TYPE_ID}" checked="checked" value="type{EVENT_TYPE_ID}" class="checkbox"/>
-									<span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span> </label>
-								<!-- END event_type --> 
-								
+									<span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
+								</label>
+								<!-- END event_type -->
 							</div>
 							<!--/filter-list-->
 						</form>
 						<p class="clearfix"><a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a></p>
-						<!--/filter-drop--> 
+						<!--/filter-drop-->
 					</div>
 				</div>
 			</div>
 		</div>
 		<h3>{MONTH}</h3>
-		
 	</div>
 	<table id="week-view" cellpadding="0" cellspacing="0" width="100%">
 		<tr class="dates">
@@ -90,36 +92,43 @@
 			<td class="dark">Fri</td>
 			<td class="dark">Sat</td>
 		</tr>
-		<tr> 
+		<tr>
 			<!-- BEGIN day_header -->
 			<td class="day-block">
-			<div class="dayWrap clearfix">
-				<p class="day-num">{DATE}</p>
-				<a class="btn add calendar-add" href="{ADD}"><span></span></a>			
-			</div></td>
-			<!-- END day_header --> 
+				<div class="dayWrap clearfix">
+					<p class="day-num">{DATE}</p>
+					<a class="btn add calendar-add" href="{ADD}"><span></span></a>
+				</div>
+			</td>
+			<!-- END day_header -->
 		</tr>
-		<tr valign="top" class="month-week"> 
-			
+		<tr valign="top" class="month-week">
+
 			<!-- BEGIN day_block -->
-			<td class="day-block {MONTABLE_CSS}"><ul class="js_happening">
+			<td class="day-block {MONTABLE_CSS}">
+				<ul class="js_happening">
 					<!-- BEGIN note_block -->
-					<li class="{EVENT_TYPE} {EVENT_LEVEL} "> 
-						<!-- BEGIN time --><span class="time">{TIME}&nbsp;</span><!-- END time --> 
+					<li class="{EVENT_TYPE} {EVENT_LEVEL} ">
+						<!-- BEGIN time --><span class="time">{TIME}&nbsp;</span><!-- END time -->
 						<span class="note" style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}</span>
 						<div class="hidden-fields clearfix">
 							<h4><!-- BEGIN time -->
-								<div class="time"><strong>{TIME}</strong></div>
-								<!-- END time -->{NOTE}</h4>
+								<div class="time">
+									<strong>{TIME}</strong>
+								</div>
+								<!-- END time -->{NOTE}
+							</h4>
 							<p class="meta">Event Type: {TYPE}<br />
-								<span class="created">Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br />
-								</span> {LOCATION} {DETAIL}</p>
+								<span class="created">Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></span>
+								{LOCATION} {DETAIL}
+							</p>
 							<div>{MODIFY}</div>
 						</div>
 					</li>
-					<!-- END note_block -->
-				</ul></td>
-			<!-- END day_block --> 
+				<!-- END note_block -->
+				</ul>
+			</td>
+			<!-- END day_block -->
 		</tr>
 	</table>
 

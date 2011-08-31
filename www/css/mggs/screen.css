@@ -376,6 +376,9 @@ table.ruler span.header_option a{color:#fff; font-weight:bold; }
 p.important {
 	color: #f00;
 }
+.admin-contents h2{margin-bottom:8px;}
+.admin-contents h2 span a{color:#000;}
+
 
 .cal-bubble .middle{border-color:#245398}
 .cal-bubble .bottom{border-right-color:#245398}

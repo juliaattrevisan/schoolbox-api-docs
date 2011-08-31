@@ -379,27 +379,27 @@ class Bulk {
 					$event = array(
 						'owner'			=> $uid,
 						'access'		=> 3,
-						'date'			=> $thisRow[0],
-						'startTime'		=> $thisRow[1],
-						'endTime'		=> $thisRow[2],
-						'note'			=> $thisRow[3],
-						'detail'		=> $thisRow[4],
-						'priority'		=> $thisRow[5],
-						'type'			=> $thisRow[6],
+						'date'			=> outputDate(Cfg::get('date_database'), ausDateToUnix(scrubHTML($thisRow[0]))),
+						'startTime'		=> scrubHTML($thisRow[1]),
+						'endTime'		=> scrubHTML($thisRow[2]),
+						'note'			=> scrubHTML($thisRow[3]),
+						'detail'		=> scrubHTML($thisRow[4]),
+						'priority'		=> scrubHTML($thisRow[5]),
+						'type'			=> scrubHTML($thisRow[6]),
 						'campusList'	=> $campusList,
 						'groupList'		=> $groupList,
 					);
 
 					if ($calendarHandler->create($event)) {
 						$output[] = array(
-							'name' => $thisRow[3],
+							'name' => scrubHTML($thisRow[3]),
 							'status' => 'Added',
 							'error' => 'OK',
 						);
 					}
 					else {
 						$output[] = array(
-							'name' => $thisRow[3],
+							'name' => scrubHTML($thisRow[3]),
 							'status' => 'Not Added',
 							'error' => 'Could not create event',
 						);
@@ -407,7 +407,7 @@ class Bulk {
 				}
 				else {
 					$output[] = array(
-						'name' => $thisRow[3],
+						'name' => scrubHTML($thisRow[3]),
 						'status' => 'Not Added',
 						'error' => 'Missing date and/or name',
 					);

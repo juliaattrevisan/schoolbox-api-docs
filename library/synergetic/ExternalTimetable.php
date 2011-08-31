@@ -66,7 +66,7 @@ class ExternalTimetable extends MSSQL{
 			return date("w", $date);
 		else if($this->days[$campus] == 7)
 		{
-			$startDate = $this->getLastSynergeticDay($date);
+			$startDate = $this->getLastSynergeticDay($date, $campus);
 		
 			//find number of days between both dates
 			$difference = intval(($date - $startDate) / 86400);
@@ -84,7 +84,7 @@ class ExternalTimetable extends MSSQL{
 		}
 		else if($this->days[$campus] == 10) {
 
-            $startDate = $this->getLastSynergeticDay($date);
+            $startDate = $this->getLastSynergeticDay($date, $campus);
 
             if($this->synergeticDay[$startDate] > 5)
                     $this->synergeticDay[$startDate] = $this->synergeticDay[$startDate] + 1;  //extra days for weekend
@@ -110,7 +110,7 @@ class ExternalTimetable extends MSSQL{
 	}
 
 
-	function getLastSynergeticDay($date){
+	function getLastSynergeticDay($date, $campus){
 			//This function gets all start of term days entered into synergetic from the date provided backwards.
 			//It caches this info so you can get it later again.
 			//Be careful if you call this function with a date in the past then in the future it may cause an error
@@ -130,24 +130,47 @@ class ExternalTimetable extends MSSQL{
 			$mssqldate = date('Y',$date)."-01-01 00:00:00";
 			$nowmssqldate = date('Y-m-d',$date).' 00:00:00';
 
+            /* First attempt to get calendar dates based on campus */
+
 			$query = "SELECT *, CONVERT(CHAR(19),CalendarEvents.CalendarDate) as startDate, CalendarEvents.CalendarType as type
 			FROM SynergyOne.dbo.CalendarEvents CalendarEvents
-			WHERE (CalendarEvents.CalendarType LIKE 'd%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
+			WHERE (CalendarEvents.CalendarType LIKE '".$this->campusCode[$campus]."_D%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
 			ORDER BY CalendarEvents.CalendarDate DESC";
 
 			$result = $this->query($query);
 			//Cache all date and days into variable
 			while($day = $this->getNextArray($result)) {
 				//cut out d from CalenderType string
-				$this->synergeticDay[strtotime($day['startDate'])] = substr($day['type'], 1, 1);
+				$this->synergeticDay[strtotime($day['startDate'])] = substr($day['type'], -1);
 			}
-			
+
 			//yes this is meant to get the first element and return it
 			if(is_array($this->synergeticDay)) {
 				foreach($this->synergeticDay as $date => $day){
 					return $date;
 				}
-			}
+			} else {
+
+                /*  Else get calendar dates from the general pool   */
+
+                $query = "SELECT *, CONVERT(CHAR(19),CalendarEvents.CalendarDate) as startDate, CalendarEvents.CalendarType as type
+                FROM SynergyOne.dbo.CalendarEvents CalendarEvents
+                WHERE (CalendarEvents.CalendarType LIKE 'D%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
+                ORDER BY CalendarEvents.CalendarDate DESC";
+
+                $result = $this->query($query);
+                //Cache all date and days into variable
+                while($day = $this->getNextArray($result)) {
+                    //cut out d from CalenderType string
+                    $this->synergeticDay[strtotime($day['startDate'])] = substr($day['type'], -1);
+                }
+
+               if(is_array($this->synergeticDay)) {
+				foreach($this->synergeticDay as $date => $day){
+					return $date;
+				}
+                }
+            }
 
 	}
 

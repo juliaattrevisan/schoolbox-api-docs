@@ -36,8 +36,8 @@ if(Cfg::get('mail_enable') == 1) {
 
             $output = array('SUBJECT' 	=> '',
                             'BODY'	=> '',
-                            'REPLYTO'	=> $_REQUEST['replyto'],
-                            'BCC'	=> $_REQUEST['bcc'],
+                            'REPLYTO'	=> scrubTEXT($_REQUEST['replyto']),
+                            'BCC'	=> scrubTEXT($_REQUEST['bcc']),
 
                                     );
 

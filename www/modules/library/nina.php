@@ -9,8 +9,8 @@ $rr= $textBoxHandler->getByID(531);
 $nb=$textBoxHandler->getByID(940);
 $qf=$textBoxHandler->getByID(532);
 $itn=$textBoxHandler->getByID(534);
-$rt=$textBoxHandler->getByID(535);
-$cv=$textBoxHandler->getByID(536);
+$rt=$textBoxHandler->getByID(941);
+$cv=$textBoxHandler->getByID(942);
 
 $this->setVar('ONLINE_RESOURCES',scrubHTML($or['body']) );
 $this->setVar('REMARKABLE_READING', scrubHTML($rr['body']) );

@@ -18,6 +18,7 @@ require_once('../library/assess/AssessResponse.php');
 require_once('../library/assess/AssessSection.php');
 require_once('../library/group.php');
 require_once('../library/category.php');
+require_once('../library/user.php');
 
 /**
  * Process an Attempt row. Functionised because it is used in an iteration to
@@ -159,11 +160,24 @@ $allAttempts = $attemptHandler->getList($this->arg[0]);
 
 if (is_array($allStudents) && count($allStudents)) {
 	foreach($allStudents as $currentStudent) {
+
+		/* Get the actual user by the uid if it exists, or the synergy id if
+		 * they don't have a portal account
+		 */
+		if ($currentStudent['uid']) {
+			$user = $userHandler->getByID($currentStudent['uid']);
+		}
+		else if ($currentStudent['synergy_id']) {
+			$user = $userHandler->getBySynergy($currentStudent['synergy_id']);
+		}
+
+		/* Process attempts for this student
+		 */
 		if ($allAttempts && count($allAttempts)) {
 			for ($numAttempts = 0, $i = 0; $i < count($allAttempts); $i++) {
 				$currentAttempt = $allAttempts[$i];
 
-				/* Match up attempt wtih student, remove from list
+				/* Match up attempt with student then remove from list
 				 */
 				if ($currentAttempt['user_id'] == $currentStudent['uid']) {
 					if ($allAttempts[$i]['processed'] != true) {

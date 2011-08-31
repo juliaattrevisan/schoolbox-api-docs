@@ -326,7 +326,7 @@ class SitePage extends Page {
                }
                else if($this->site == 'ormond')
                {
-                   if($_SESSION['exchange'])
+                   if( $this->groupHandler->isStaff() )
                        $this->setVar("WEBMAIL_LOCATION", 'href="http://owa.ormond.unimelb.edu.au" rel="external"');
                    else
                        $this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');

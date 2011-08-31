@@ -11,9 +11,7 @@ require_once '../library/category.php';
 require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalClass.php';
 require_once '../library/user.php';
 
-
-if(isStaff($_SESSION['gid']))
-{
+if(isStaff($_SESSION['gid'])) {
 	$userHandler = new User;
 	$categoryHandler = new Category;
 	$synergeticClass = new ExternalClass;
@@ -24,26 +22,35 @@ if(isStaff($_SESSION['gid']))
     $this->setBlock('student_list', 'medical', 'medical_block');
     $this->setBlock('student_list', 'special', 'special_block');
     $this->setBlock('student_list', 'eportfolio', 'eportfolio_block');
+
+	$this->setBlock('student_list', 'surname_with_link', 'surname_with_link_block');
+	$this->setBlock('student_list', 'surname_without_link', 'surname_without_link_block');
+	$this->setBlock('student_list', 'firstname_with_link', 'firstname_with_link_block');
+	$this->setBlock('student_list', 'firstname_without_link', 'firstname_without_link_block');
+
 	$this->setTitle('Class List');
 
 	$code = urldecode(implode('/', $this->arg));
 
-	if(stristr($code,',')) {
+	if (stristr($code,',')) {
 		$codeArray = explode(',',$code);
 		$category = $categoryHandler->getByCode($codeArray[0]);
 	}
-	else
+	else {
 		$category = $categoryHandler->getByCode($code);
+	}
 
-	if(is_array($category)) {
+	if (is_array($category)) {
 		$this->setVar("SUBJECTNAME", $category['name'] ." ($code)");
 
 		$classList = $synergeticClass->getStudents($code);
-		if(is_array($classList)) {
+
+		if (is_array($classList)) {
 			foreach($classList as $student) {
 
 				$email = '';
 				$emailaddr = '';
+
 				$user = $userHandler->getBySynergy($student['synergy_id']);
 
 				if(is_array($user)){
@@ -72,26 +79,54 @@ if(isStaff($_SESSION['gid']))
 										);
 
 				$this->setVar($studentOutput);
-				if($student['StudentMedicalAlert'])
+
+				if ($student['StudentMedicalAlert']) {
                     $this->parse('medical_block','medical');
-                else
+				}
+                else {
                     $this->setVar('medical_block','');
+				}
 
-                if($student['StudentSpecialNeedsFlag'])
+                if ($student['StudentSpecialNeedsFlag']) {
                     $this->parse('special_block','special');
-                else
+				}
+                else {
                     $this->setVar('special_block','');
+				}
 
-                if($user['eportfolio_enabled'])
-                    $this->parse('eportfolio_block','eportfolio');
-                else
-                    $this->setVar('eportfolio_block','');
+				/* If the user has an enabled eportfolio, enable link
+				 */
+                if ($user['eportfolio_enabled']) {
+                    $this->parse('eportfolio_block', 'eportfolio');
+				}
+                else {
+                    $this->setVar('eportfolio_block', '');
+				}
+                
+                /* Parse out the name blocks: if they were found in Schoolbox,
+				 * give the names links - otherwise leave them unlinked
+				 */
+				if (is_array($user)) {
+					$this->parse('surname_with_link_block', 'surname_with_link');
+					$this->setVar('surname_without_link_block', '');
 
+					$this->parse('firstname_with_link_block', 'firstname_with_link');
+					$this->setVar('firstname_without_link_block', '');
+				}
+				else {
+					$this->parse('surname_without_link_block', 'surname_without_link');
+					$this->setVar('surname_with_link_block', '');
+
+					$this->parse('firstname_without_link_block', 'firstname_without_link');
+					$this->setVar('firstname_with_link_block', '');
+				}
+                
 				$this->parse("student_list_block", "student_list", true);
 			}
 		}
-		else
+		else {
 			$this->setVar('student_list_block', '');
+		}
 	}
 	else
 		$this->setVar('student_list_block', '');
@@ -103,15 +138,7 @@ if(isStaff($_SESSION['gid']))
 	$this->setVar("CLASSEMAIL", $classEmail);
 
 }
-else
-{
+else {
 	error(19);
 }
-
-
-
-
-
-
-
 ?>

@@ -16,8 +16,14 @@
     <!-- BEGIN student_list -->
     <tr class="{ON_OFF}">
       <td rowspan="2"><img src="/search/portrait.php?id={SYNERGYID}&height=80&width=60" /></td>
-      <td><a href="/search/user/{ID}">{SURNAME}</a></td>
-      <td><a href="/search/user/{ID}">{FIRSTNAME}</a></td>
+			<td>
+				<!-- BEGIN surname_with_link --><a href="/search/user/{ID}">{SURNAME}</a><!-- END surname_with_link -->
+				<!-- BEGIN surname_without_link -->{SURNAME}<!-- END surname_without_link -->
+			</td>
+			<td>
+				<!-- BEGIN firstname_with_link --><a href="/search/user/{ID}">{FIRSTNAME}</a><!-- END firstname_with_link -->
+				<!-- BEGIN firstname_without_link -->{FIRSTNAME}<!-- END firstname_without_link -->
+			</td>
       <td>{SYNERGYID}</td>
       <td>{YEARLEVEL}</td>
       <td>{HOUSE}</td>
@@ -50,7 +56,7 @@
       <td>&nbsp;</td>
       <td><br />
         <form action="/mail/createMail.php" method="post">
-          <input type="hidden" name="replyto" value="{SUBJECTNAME} &lt;{REPLYTO}&gt;" />
+          <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;" />
           <input type="hidden" name="bcc" value="{CLASSEMAIL}" />
           <input class="submit-btn-plain" type="submit" name="emailall" value="Email Class" />
 		  <div class="float-fix"></div>

@@ -76,7 +76,7 @@ if ($groupHandler->isParent() || $groupHandler->isSuperuser() || $groupHandler->
 					'CONTACT_TITLE' => $currentContact['StudentContactTitle'],
 					'CONTACT_FIRSTNAME' => $currentContact['StudentContactPreferred'],
 					'CONTACT_SURNAME' => $currentContact['StudentContactSurname'],
-					'CONTACT_PHONE' => $currentContact['StudentContactPhoneActual'],
+					'CONTACT_PHONE' => $currentContact['StudentContactSilentPhoneFlag']?'':$currentContact['StudentContactPhoneActual'],
 					'CONTACT_MOBILE' => $currentContact['StudentContactMobilePhone'],
 					'CONTACT_STREET' => $address,
 					'CONTACT_SUBURB' => $currentContact['StudentContactSuburb'],
@@ -113,9 +113,8 @@ if ($groupHandler->isParent() || $groupHandler->isSuperuser() || $groupHandler->
                     'SPOUSE_TITLE' => $currentContact['StudentContactSpouseTitle'],
                     'SPOUSE_FIRSTNAME' => $currentContact['StudentContactSpousePreferred'],
                     'SPOUSE_SURNAME' => $currentContact['StudentContactSpouseSurname'],
-                    'CONTACT_PHONE' => $currentContact['StudentContactSpouseOccupPhone'],
-                    'CONTACT_MOBILE' => $currentContact['StudentContactSpouseMobilePhone'],
-					'CONTACT_EMAIL' => $currentContact['StudentContactSpouseDefaultEmail'],
+                    'SPOUSE_CONTACT_MOBILE' => $currentContact['StudentContactSpouseMobilePhone'],
+					'SPOUSE_CONTACT_EMAIL' => $currentContact['StudentContactSpouseDefaultEmail'],
                 ));
 
                 $showContact = true;
@@ -144,4 +143,3 @@ if ($groupHandler->isParent() || $groupHandler->isSuperuser() || $groupHandler->
 else {
 	error(19);
 }
-?>
