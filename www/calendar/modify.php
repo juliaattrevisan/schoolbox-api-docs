@@ -12,9 +12,12 @@ $groupHandler = new Group;
 
 if (isset($_POST['date'])) {
 
-	$date = ausDateToUnix($_POST['date']);
-	$until = ausDateToUnix($_POST['repeat_until']);	
-		
+	$dateObj = new Alaress_Date_Format($_POST['date']);
+	$date = $dateObj->getUnixTimestamp();
+
+	$untilObj = new Alaress_Date_Format($_POST['repeat_until']);
+	$until = $untilObj->getUnixTimestamp();
+
 	$event = array('owner' 		=> $_SESSION['id'],
 				   'access'		=> $_POST['level'],
 				   'sid'		=> $_POST['group'],
@@ -33,20 +36,20 @@ if (isset($_POST['date'])) {
 		$i = 0;
 		for ($date; $date <= $until; $date = strtotime($validRepeat[$_POST['repeat']], $date)) {
 			if ($i++ > 100) break;
-				
+
 			$dateArray[] = date("Y-m-d", $date);
-		}		
-	
+		}
+
 	} else {
 		$dateArray[] = date("Y-m-d", $date);
-	}	  
-				  
+	}
+
 	if(is_numeric($_POST['id'])) {
-	
+
 		$event['id'] = $_POST['id'];
 		$event['date'] = $dateArray[0];
 		$calendarHandler->update($event);
-	} 
+	}
 	else {
 		for ($i = 0; $i < count($dateArray); $i++) {
 			$event['date'] = $dateArray[$i];
@@ -63,36 +66,36 @@ if (isset($_POST['date'])) {
 	$date = explode("-", $calendar['date']);
 	$date = array_reverse($date);
 	$page->backToTheFuture(2);
-	
+
 } elseif (is_numeric($_GET['eventID'])) {
 
-	
+
 
 	$page->setFile(TEMPLATE_content, 'calendar/modify.html');
 	$page->setTab("calendar");
-	
+
 	$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 	$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
 	$event = $calendarHandler->getByID($_GET['eventID']);
 	if (!$event['id'])
 		error(2);
-	
+
 	// check security perms
 	if($calendarHandler->getPerm($event['id']) < 2)
 		error(34);
 
-	
+
 	if ($event['startTime'] != "12:00AM")
 		preg_match("/([\d]{1,2}):([\d]{2})(AM|PM)/", $event['startTime'], $startTime);
 	else
 		$startTime = array('','','','');
-	
+
 	if ($event['endTime'] != "12:00AM")
 		preg_match("/([\d]{1,2}):([\d]{2})(AM|PM)/", $event['endTime'], $endTime);
 	else
 		$endTime = array('','','','');
-	
+
 	$output = array('TITLE'			=> HEADING." - Update Calender Event",
 					'FUNCTION'		=> 'Update',
 					'EVENT_ID'		=> $event['id'],
@@ -112,11 +115,11 @@ if (isset($_POST['date'])) {
                     'DETAIL'        => $event['detail'],
 					'RETURN_TO'		=> scrubText($_GET['returnTo']),
 					);
-					
+
 	$page->setVar($output);
 
 	$page->dropDown('type_drop', $calendarHandler->getTypeList(), $event['type'],TEMPLATE_content, array('eventTypeID'=>'TYPE_NUMBER', 'eventType'=>'TYPE_NAME'));
-	
+
 	$campusList = $calendarHandler->getCampusList();
 	if (count($campusList) > 1) {
 		$page->checkList('campus_list', $campusList, $calendarHandler->getEventCampus($event['id']));
@@ -124,7 +127,7 @@ if (isset($_POST['date'])) {
 		$page->setBlock(TEMPLATE_content, 'campus_list', 'campus_list_block');
 		$page->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
 	}
-	
+
 	$groupList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], WRITE_ACCESS);
 	$page->dropDown('group_drop', $groupList, $event['sid'], TEMPLATE_content, array('id'=>'UGROUP_ID','name'=>'UGROUP_NAME'));
 	$page->checkList('group_list', $calendarHandler->getGroupList(), $calendarHandler->getEventGroup($event['id']));
@@ -134,14 +137,14 @@ if (isset($_POST['date'])) {
 		$levelList[] = array('LEVEL_ID'	=> 2, 'LEVEL_NAME'	=> 'Group');
 	if (count($campusList) > 0)
 		$levelList[] = array('LEVEL_ID'	=> 3, 'LEVEL_NAME'	=> 'Campus');
-	
+
 	$page->dropDown('level_drop', $levelList, $event['access']);
 
 	$page->parse('delete_button_block', 'delete_button', true);
-	$page->setVar('recurring_dates_block', '');	
-	
-	$page->outputPage();	
-	
+	$page->setVar('recurring_dates_block', '');
+
+	$page->outputPage();
+
 } else {
 
 	$page->setFile(TEMPLATE_content, 'calendar/modify.html');
@@ -150,9 +153,9 @@ if (isset($_POST['date'])) {
 	$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
 	list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $_GET['date']);
-	
+
 	$selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
-	if ($selectedDate <= 0) 
+	if ($selectedDate <= 0)
 		$selectedDate = time();
 
 	$output = array('TITLE'			=> HEADING." - Add Single Event",
@@ -173,12 +176,12 @@ if (isset($_POST['date'])) {
                     'LOCATION'    	=> '',
                     'DETAIL'	    => '',
 					'RETURN_TO'		=> scrubText($_GET['returnTo'])
-					
+
 					);
 	$page->setVar($output);
-	
+
 	$page->dropDown('type_drop', $calendarHandler->getTypeList(), '',TEMPLATE_content, array('eventTypeID'=>'TYPE_NUMBER', 'eventType'=>'TYPE_NAME'));
-	
+
 	$campusList = $calendarHandler->getCampusList();
 	if (count($campusList) > 1) {
 		$page->checkList('campus_list', $campusList, array($_SESSION['campus'][0]));
@@ -199,14 +202,14 @@ if (isset($_POST['date'])) {
 		$levelList[] = array('LEVEL_ID'	=> 2, 'LEVEL_NAME'	=> 'Group');
 	if (count($campusList) > 0)
 		$levelList[] = array('LEVEL_ID'	=> 3, 'LEVEL_NAME'	=> 'Campus');
-	
+
 	$page->dropDown('level_drop', $levelList, $_GET['level']);
 
 	$page->setVar('delete_button_block', '');
 	$page->parse('recurring_dates_block', 'recurring_dates');
-	
+
 	$page->outputPage();
-	
+
 }
 
 ?>

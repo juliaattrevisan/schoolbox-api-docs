@@ -16,8 +16,11 @@ $groupHandler = new Group(TUTORIAL_SERVICE);
 if ($groupHandler->getPermission(0) < FULL_ACCESS)
 	error(19);
 
-$from = ausDateToUnix($_GET['from']);
-$to = ausDateToUnix($_GET['to']);
+$dateObj = new Alaress_Date_Format($_GET['from']);
+$from = $dateObj->getUnixTimestamp();
+
+$toObj = new Alaress_Date_Format($_GET['to']);
+$to = $toObj->getUnixTimestamp();
 
 $line = "PortalID,SynergyID,Title,Firstname,Surname,Email,Marked,Tutorial,Code,Type,Tutorial Date,Start Time,Finish Time,Students Enrolled,Student Attended,Hours,Processed\n";
 

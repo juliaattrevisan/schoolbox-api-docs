@@ -23,8 +23,8 @@ if (!empty($_POST)) {
 
     /* Format date, time
      */
-    $start = ausDateToUnix($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['minute'].' '.$_POST['start']['meridiem'], true);
-    $finish = ausDateToUnix($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem'], true);
+    $start = new Alaress_Date_Format($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['minute'].' '.$_POST['start']['meridiem']);
+    $finish = new Alaress_Date_Format($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem']);
 
     /* Cater for unlimited duration tests. Can't use zero because of countdown
      * timer, so we use -1
@@ -40,8 +40,8 @@ if (!empty($_POST)) {
         'user_id' => $_SESSION['id'],
         'title' => scrubTEXT($_POST['title']),
         'description' => scrubTEXT($_POST['description']),
-        'start' => date(Cfg::get('date_database'), $start),
-        'finish' => date(Cfg::get('date_database'), $finish),
+        'start' => $start->getDatabase(),
+        'finish' => $finish->getDatabase(),
         'duration'  => scrubTEXT($duration),
         'allow_resit' => scrubTEXT($_POST['allow_resit']),
 		'availability' => 'survey',

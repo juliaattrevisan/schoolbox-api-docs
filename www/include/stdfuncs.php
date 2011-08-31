@@ -88,47 +88,6 @@ function scrubTEXT($text) {
 	//$text = scrubHTML($text);
 	return $text;
 }
-/*
- * convert an australian date to a unixtimestamp
- *
- * @param	str		$date		date should be in the format of dd-mm-yyyy or dd/mm/yyyy
- * @param	bool	$incTime	if set, try to get the time from the end of the string
- * @return	int					unix timestamp or false if invalid date given
- */
-function ausDateToUnix($date, $incTime=false) {
-
-	if (strstr($date, '-')) {
-		$seperator = '-';
-	} else if (strstr($date, '/')) {
-		$seperator = '/';
-	} else {
-		return false;
-	}
-
-	$hour = $minute = 0;
-
-	if ($incTime) {
-		$parts = explode(' ', $date);
-		if (count($parts) == 3) {
-			$date = $parts[0];
-			$time = explode(':', $parts[1]);
-			$hour = $time[0];
-			$minute =$time[1];
-			$meridiem = strtolower($parts[2]);
-			if ($meridiem == 'pm' && $hour < 12 ) {
-				$hour = $hour + 12;
-			}
-			else if($meridiem == 'am' && $hour == 12) {
-				$hour = 0;
-			}
-		}
-	}
-
-	$parts = explode($seperator, $date);
-	$unixDate = mktime($hour, $minute, 0, $parts[1], $parts[0], $parts[2]);
-
-	return $unixDate;
-}
 
 function outputDate($format, $date) {
 	//this function attempts to remove output issues associated with mysql dates

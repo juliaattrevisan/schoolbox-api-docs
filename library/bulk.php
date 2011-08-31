@@ -375,11 +375,13 @@ class Bulk {
 				 * If access is 3, then the sid corresponds to campus id's
 				 * If access is 2, then the sid corresponds to group id's
 				 */
+				$date = new Alaress_Date_Format(scrubHTML($thisRow[0]));
+
 				if ((trim($thisRow[0]) != '') && (trim($thisRow[3]) != '')) {
 					$event = array(
 						'owner'			=> $uid,
 						'access'		=> 3,
-						'date'			=> outputDate(Cfg::get('date_database'), ausDateToUnix(scrubHTML($thisRow[0]))),
+						'date'			=> $date->getDatabase(),
 						'startTime'		=> scrubHTML($thisRow[1]),
 						'endTime'		=> scrubHTML($thisRow[2]),
 						'note'			=> scrubHTML($thisRow[3]),

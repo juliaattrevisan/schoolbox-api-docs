@@ -22,8 +22,8 @@ if (is_array($_POST['processed'])) {
 		else
 			$eventHandler->process($eventID, $tutorID, false);
 	}
-	
-	
+
+
 	$page->backToTheFuture(1);
 
 } else {
@@ -32,22 +32,25 @@ if (is_array($_POST['processed'])) {
 	$page->setBlock(TEMPLATE_content, 'has_events', 'has_events_block');
 	$page->setBlock('has_events', 'tutor_list', 'tutor_list_block');
 	$page->setBlock('tutor_list', 'event_list', 'event_list_block');
-	
+
 	$page->setTitle('Tutorial Management');
-	
+
 	if (!isset($_GET['to']))
 		$_GET['to'] = date("d/m/Y", strtotime("saturday"));
-	
+
 	if (!isset($_GET['from']))
 		$_GET['from'] = date("d/m/Y", strtotime("-2 week, sunday"));
-	
+
 	if (!isset($_GET['filter']))
 		$_GET['filter'] = 'unprocessed';
-	
-		
-	$from = ausDateToUnix($_GET['from']);
-	$to = ausDateToUnix($_GET['to']);
-	
+
+
+	$fromObj = new Alaress_Date_Format($_GET['from']);
+	$from = $fromObj->getUnixTimestamp();
+
+	$toObj = new Alaress_Date_Format($_GET['to']);
+	$to = $toObj->getUnixTimestamp();
+
 	$output = array('FROM'		=> outputDate("d/m/Y", $from),
 					'TO'		=> outputDate("d/m/Y", $to),
 					'FILTER_PROCESSED_SELECTED' => '',
@@ -56,19 +59,19 @@ if (is_array($_POST['processed'])) {
 					'FILTER_'.strtoupper($_GET['filter']).'_SELECTED'	=> 'checked="checked"',
 	);
 	$page->setVar($output);
-	
+
 	$_SESSION['hoursReport'] = array();
-	
+
 	$userHandler = new User;
 	$tutorList = $eventHandler->getTutorList();
 	if (is_array($tutorList)) {
 		$i = 0;
 		foreach ($tutorList as $tutor) {
-		
+
 			$user = $userHandler->getBySynergy($tutor['id']);
 			if (isset($user['uid'])) {
 				$eventList = $eventHandler->getByTutor($user['uid'], $from, $to, $_GET['filter']);
-				
+
 				if (is_array($eventList)) {
 					$i = 0;
 					$totalHours = 0;
@@ -78,12 +81,12 @@ if (is_array($_POST['processed'])) {
 										'TUTOR_NAME'	=> scrubText($tutor['name']),
 										);
 						$page->setVar($output);
-					
+
 						if ($event['tutor1ID'] == $user['uid'])
 							$processed = $event['tutor1Processed'];
 						else
 							$processed = $event['tutor2Processed'];
-					
+
 						$output = array('EVENT_ID'	=> $event['eventID'],
 										'DATE'		=> outputDate(Cfg::get('date_notime'), $event['date']),
 										'MARKED'	=> outputDate(Cfg::get('date_notime'), $event['marked']),
@@ -100,33 +103,33 @@ if (is_array($_POST['processed'])) {
 										);
 						$page->setVar($output);
 						$page->parse('event_list_block', 'event_list', true);
-						
+
 						$totalHours += $event['hours'];
 						$_SESSION['hoursReport'][] = array($event['eventID'], $user['uid']);
-						
+
 					}
 
 					$output = array('TOTAL'			=> number_format($totalHours, 2),
 									);
 					$page->setVar($output);
-		
+
 					$page->parse('tutor_list_block', 'tutor_list', true);
 					$page->setVar('event_list_block', '');
 				}
 			}
 		}
-		
+
 		if ($i == 0)
 			$page->setVar('has_events_block', '<p>No results to display.</p>');
 		else
 			$page->parse('has_events_block', 'has_events');
-		
+
 	} else
-		$page->setVar('has_events_block', 'No tutors to display.');	
-	
-	
-	
-	
+		$page->setVar('has_events_block', 'No tutors to display.');
+
+
+
+
 	$page->outputPage();
 }
 

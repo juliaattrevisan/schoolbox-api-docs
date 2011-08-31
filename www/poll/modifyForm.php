@@ -14,7 +14,7 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
 	if ($groupHandler->getPermission($_POST['categoryID']) < READ_ACCESS) {
 		error(19);
 	}
-	
+
 	$pollHandler->placeVote($_POST['pollID'], $_POST['vote']);
 
 	localRedir("/homepage/" . $_POST['categoryID']);
@@ -26,7 +26,9 @@ else if ($_POST['title'] && is_numeric($_POST['categoryID'])) {
 	if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
 		error(19);
 	}
-	
+
+	$date = new Alaress_Date_Format($_POST['close']);
+
 	$poll = array(
 		'categoryID'	=> $_POST['categoryID'],
 		'title'			=> $_POST['title'],
@@ -42,7 +44,7 @@ else if ($_POST['title'] && is_numeric($_POST['categoryID'])) {
 		'option_8'		=> $_POST['option_8'],
 		'option_9'		=> $_POST['option_9'],
 		'frequency'		=> $_POST['frequency'],
-		'close'			=> outputDate(Cfg::get('date_database'), ausDateToUnix($_POST['close'])),
+		'close'			=> $date->getDatabase(),
 	);
 
 	if (is_numeric($_POST['pollID'])) {
@@ -67,7 +69,7 @@ else if ($_POST['title'] && is_numeric($_POST['categoryID'])) {
 	$homepageHandler->updateComponentConfig(scrubTEXT($_POST['homepageComponentID']), $config);
 
 	localRedir("/homepage/" . scrubTEXT($_POST['categoryID']));
-} 
+}
 else if (is_numeric($_GET['delete'])) {
 
 	$poll = $pollHandler->getByID($_GET['delete']);
