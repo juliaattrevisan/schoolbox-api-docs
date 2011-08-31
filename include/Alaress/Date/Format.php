@@ -13,8 +13,10 @@ class Alaress_Date_Format implements Alaress_Date_Interface {
 	 *
 	 * @param  $dateTime
 	 */
-	public function __construct($dateTime, $dateFormat = null) {
-		$this->strategy = new Alaress_Date_V52($dateTime, $dateFormat);
+	public function __construct($dateTime = null, $dateFormat = null) {
+		if ($dateTime !== null) {
+			$this->strategy = new Alaress_Date_V52($dateTime, $dateFormat);
+		}
 	}
 
 	/**
@@ -33,6 +35,24 @@ class Alaress_Date_Format implements Alaress_Date_Interface {
 	 */
 	public function getDatabase() {
 		return $this->strategy->getDatabase();
+	}
+
+	/**
+	 * Get a date only
+	 *
+	 * @return string
+	 */
+	public function getDateOnly() {
+		return $this->strategy->getDateOnly();
+	}
+
+	/**
+	 * Get an Australian format
+	 *
+	 * @return string
+	 */
+	public function getAustralian() {
+		return $this->strategy->getAustralian();
 	}
 
 	/**

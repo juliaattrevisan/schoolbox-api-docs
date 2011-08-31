@@ -17,6 +17,24 @@ class Alaress_Date_V52 extends Alaress_Date_Abstract implements Alaress_Date_Int
 	}
 
 	/**
+	 * Get the date only
+	 *
+	 * @return string
+	 */
+	public function getDateOnly() {
+		return $this->getUsingFormat('jS M Y');
+	}
+
+	/**
+	 * Transform the datetime into an Australianised version
+	 *
+	 * @return string
+	 */
+	public function getAustralian() {
+		return $this->getUsingFormat('d-m-Y H:i:s');
+	}
+
+	/**
 	 * Transform the datetime into an Americanised version
 	 *
 	 * @return string

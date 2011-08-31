@@ -138,10 +138,21 @@ abstract class Alaress_Date_Abstract {
 		}
 	}
 
+	/**
+	 * Set input date format
+	 *
+	 * @param  $val
+	 * @return void
+	 */
 	private function setInputDateFormat($val) {
 		$this->inputDateFormat = $val;
 	}
 
+	/**
+	 * Get input date format
+	 *
+	 * @return string
+	 */
 	private function getInputDateFormat() {
 		return $this->inputDateFormat;
 	}
