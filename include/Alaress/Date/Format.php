@@ -1,21 +1,33 @@
 <?php
 /**
+ * Alaress_Date_Format
+ *
  * Facade class. This facilitates a layer of abstraction so you can switch in
  * and out of date processing classes via the $strategy class variable.
  *
- * Uses the Alaress_Date_Interface to enforce method definition across all
- * strategy implementations.
+ * Uses the Alaress_Date_Format_Interface to enforce method definition across
+ * all strategy implementations.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
-class Alaress_Date_Format implements Alaress_Date_Interface {
+class Alaress_Date_Format implements Alaress_Date_Format_Interface {
 
 	/**
 	 * Set up datetime data for processing. Choose your strategy here!
+	 * Choose your locale as well; this would probably come from the Config
+	 * table rather than have a concrete instantiation
 	 *
 	 * @param  $dateTime
 	 */
 	public function __construct($dateTime = null, $dateFormat = null) {
 		if ($dateTime !== null) {
-			$this->strategy = new Alaress_Date_V52($dateTime, $dateFormat);
+			$strategy = new Alaress_Date_Strategy_V52($dateTime, $dateFormat);
+			$strategy->setLocale(new Alaress_Date_Locale_Australian());
+
+			$this->setStrategy($strategy);
 		}
 	}
 
@@ -25,7 +37,7 @@ class Alaress_Date_Format implements Alaress_Date_Interface {
 	 * @return string
 	 */
 	public function getUnixTimestamp() {
-		return $this->strategy->getUnixTimestamp();
+		return $this->getStrategy()->getUnixTimestamp();
 	}
 
 	/**
@@ -34,7 +46,7 @@ class Alaress_Date_Format implements Alaress_Date_Interface {
 	 * @return string
 	 */
 	public function getDatabase() {
-		return $this->strategy->getDatabase();
+		return $this->getStrategy()->getDatabase();
 	}
 
 	/**
@@ -43,7 +55,7 @@ class Alaress_Date_Format implements Alaress_Date_Interface {
 	 * @return string
 	 */
 	public function getDateOnly() {
-		return $this->strategy->getDateOnly();
+		return $this->getStrategy()->getDateOnly();
 	}
 
 	/**
@@ -52,15 +64,25 @@ class Alaress_Date_Format implements Alaress_Date_Interface {
 	 * @return string
 	 */
 	public function getAustralian() {
-		return $this->strategy->getAustralian();
+		return $this->getStrategy()->getAustralian();
 	}
 
 	/**
-	 * Get an American format
+	 * Set strategy object
 	 *
-	 * @return string
+	 * @param  $val
+	 * @return void
 	 */
-	public function getAmerican() {
-		return $this->strategy->getAmerican();
+	private function setStrategy($val) {
+		$this->strategy = $val;
+	}
+
+	/**
+	 * Get strategy object
+	 *
+	 * @return
+	 */
+	private function getStrategy() {
+		return $this->strategy;
 	}
 }

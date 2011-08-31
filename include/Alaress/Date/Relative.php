@@ -1,5 +1,15 @@
 <?php
-
+/**
+ * Alaress_Date_Relative
+ *
+ * A particular case of Alaress_Date_Format which handles a difference in time
+ * and presents it as a human-friendly text string.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
 class Alaress_Date_Relative extends Alaress_Date_Format {
 	private $prefix = 'on';
 	private $suffix = 'ago';

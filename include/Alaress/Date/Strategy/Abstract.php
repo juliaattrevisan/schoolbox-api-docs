@@ -1,13 +1,20 @@
 <?php
 /**
+ * Alaress_Date_Strategy_Abstract
+ *
  * Stock-standard way of doing it, for backwards compatibility when not using
  * PHP 5.3 which has that wacky DateTime object.
  *
  * This is the superclass. It could have been merged with Alaress_Date_V52
  * but this keeps things a bit more reusable and easier to read/subclass for
  * other usage
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
-abstract class Alaress_Date_Abstract {
+abstract class Alaress_Date_Strategy_Abstract {
 	private $year = '0000';
 	private $month = '00';
 	private $day = '00';
@@ -17,6 +24,7 @@ abstract class Alaress_Date_Abstract {
 	private $meridiem = '';
 	private $dateSeparator = '-';
 	private $inputDateFormat = 'd/m/y h:m z';
+	private $locale = null;
 
 	public function __construct($dateTime, $inputDateFormat) {
 		if ($inputDateFormat !== null) {
@@ -308,7 +316,23 @@ abstract class Alaress_Date_Abstract {
 	private function getMeridiem() {
 		return $this->meridiem;
 	}
+
+	/**
+	 * Set Locale configuration object
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	public function setLocale($val) {
+		$this->locale = $val;
+	}
+
+	/**
+	 * Get Locale configuration object
+	 *
+	 * @return
+	 */
+	protected function getLocale() {
+		return $this->locale;
+	}
 }
-
-
-

@@ -1,11 +1,19 @@
 <?php
 /**
+ * Alaress_Date_V52
+ *
  * Stock-standard way of doing it, for backwards compatibility when not using
  * PHP 5.3 which has that wacky DateTime object.
  *
- * Uses the Alaress_Date_Interface to enforce method definition
+ * Uses the Alaress_Date_Format_Interface to enforce method definition
+ * Localisation for date formats
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
-class Alaress_Date_V52 extends Alaress_Date_Abstract implements Alaress_Date_Interface {
+class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Interface {
 
 	/**
 	 * Transform the datetime into a unix timestamp
@@ -13,7 +21,7 @@ class Alaress_Date_V52 extends Alaress_Date_Abstract implements Alaress_Date_Int
 	 * @return string
 	 */
 	public function getUnixTimeStamp() {
-		return $this->getUsingFormat('U');
+		return $this->getUsingFormat($this->getLocale()->timestampFormat());
 	}
 
 	/**
@@ -22,7 +30,7 @@ class Alaress_Date_V52 extends Alaress_Date_Abstract implements Alaress_Date_Int
 	 * @return string
 	 */
 	public function getDateOnly() {
-		return $this->getUsingFormat('jS M Y');
+		return $this->getUsingFormat($this->getLocale()->noTimeFormat());
 	}
 
 	/**
@@ -31,16 +39,7 @@ class Alaress_Date_V52 extends Alaress_Date_Abstract implements Alaress_Date_Int
 	 * @return string
 	 */
 	public function getAustralian() {
-		return $this->getUsingFormat('d-m-Y H:i:s');
-	}
-
-	/**
-	 * Transform the datetime into an Americanised version
-	 *
-	 * @return string
-	 */
-	public function getAmerican() {
-		return $this->getUsingFormat('m-d-Y H:i:s');
+		return $this->getUsingFormat($this->getLocale()->localFormat());
 	}
 
 	/**
@@ -50,8 +49,7 @@ class Alaress_Date_V52 extends Alaress_Date_Abstract implements Alaress_Date_Int
 	 * @return string
 	 */
 	public function getDatabase() {
-		$result = $this->getUsingFormat('Y-m-d H:i:s');
-		//$result = $this->getUsingFormat(Cfg::get('date_database'));
+		$result = $this->getUsingFormat($this->getLocale()->databaseFormat());
 
 		$illegal = array(
 			'0000-00-00 00:00:00',

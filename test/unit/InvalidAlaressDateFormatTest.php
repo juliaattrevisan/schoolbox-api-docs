@@ -3,21 +3,6 @@
 class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 
 	/**
-	 * Returns correct datetime in American format
-	 *
-	 * @return void
-	 */
-	public function test12HourWithTimeEveningMeridiemToAmerican() {
-		$input = '23/08/2011 12:15 Pm';
-		$expected = '08-23-2011 12:15:00';
-
-		$date = new Alaress_Date_Format($input);
-		$result = $date->getAmerican();
-
-		$this->assertEquals($result, $expected);
-	}
-
-	/**
 	 * Empty string input
 	 * Returns empty string
 	 *
