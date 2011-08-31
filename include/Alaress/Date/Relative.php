@@ -30,7 +30,9 @@ class Alaress_Date_Relative extends Alaress_Date_Format {
 			$dateTime = date('Y-m-d H:i:s', $dateTime);
 		}
 
-		/* Input format needs to all be in lower case for James' ninja code
+		/* Presume a db datetime stamp
+		 *
+		 * Input format needs to all be in lower case for James' ninja code
 		 */
 		parent::__construct($dateTime, 'y-m-d h:i:s');
 	}
