@@ -103,12 +103,15 @@ if (is_array($threadList)) {
 			'lastname' => $thread['userLastname'],
 		);
 
+		$threadTime = new Alaress_Date_Relative($thread['date']);
+		$threadLastPostTime = new Alaress_Date_Relative($thread['last_post_date']);
+
 		$output = array(
 			'THREAD_ID' => $thread['threadID'],
 			'THREAD_TITLE' => scrubText($thread['title']),
 			'THREAD_AUTHOR' => scrubText($userHandler->formatName($user)),
-			'THREAD_TIME' => getRelativeTime($thread['date'], 0, ""),
-			'THREAD_LAST_POST_TIME' => getRelativeTime($thread['last_post_date'], 0, ""),
+			'THREAD_TIME' => $threadTime->setPrefix('')->getRelativeTime(),
+			'THREAD_LAST_POST_TIME' => $threadLastPostTime->setPrefix('')->getRelativeTime(),
 			'THREAD_LAST_POST_ID' => $thread['last_post_id'],
 			'THREAD_LAST_POST_USER_ID' => $thread['last_post_user_id'],
 			'THREAD_LAST_POST_USER' => scrubText($thread['last_post_user']),

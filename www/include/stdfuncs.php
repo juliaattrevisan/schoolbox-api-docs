@@ -88,39 +88,6 @@ function scrubTEXT($text) {
 	//$text = scrubHTML($text);
 	return $text;
 }
-
-
-
-//function formatName($userInfo, $format = NULL){
-//	// Check for custom format
-//	if(empty($format)){
-//		$format = Cfg::get('name_format');
-//	}
-//
-//    /* Replace tags */
-//    preg_match_all('|{\w+}|', $format, $tags);
-//
-//    if (empty($tags) || empty($userInfo)) {
-//        return 'Unknown User';
-//    }
-//
-//    foreach ($tags[0] as $tag) {
-//        $key = trim($tag, '{}');
-//
-//        if (is_string($userInfo[$key])) {
-//            $value = $userInfo[$key];
-//        } else {
-//            $value = '';
-//        }
-//
-//        $format = str_replace($tag, $value, $format);
-//    }
-//    if(trim($format))
-//        return $format;
-//    else
-//        return 'Unknown User';
-//}
-
 /*
  * convert an australian date to a unixtimestamp
  *
@@ -180,49 +147,6 @@ function outputDate($format, $date) {
 	}
 
 	return date($format, $date);
-}
-
-/**
- * Pluralise something. Used in getRelativeTime()
- *
- * @param  $num
- * @return string
- */
-function plural($num) {
-		if ($num != 1) {
-			return 's';
-		}
-	}
-
-function getRelativeTime($date, $now = 0, $prefix = 'on', $suffix = 'ago') {
-
-	if(!$now)
-		$now = time();
-
-	if(!is_numeric($date))
-		$date = strtotime($date);
-
-	$diff = $now - $date;
-
-	if ($diff<60)
-		return $diff . " second" . plural($diff) . " " . $suffix;
-	$diff = round($diff/60);
-	if ($diff<60)
-		return $diff . " minute" . plural($diff) . " " . $suffix;
-	$diff = round($diff/60);
-	if ($diff<24)
-		return $diff . " hour" . plural($diff) . " " . $suffix;
-	$diff = round($diff/24);
-	if ($diff<2)
-		return ' Yesterday';
-	if ($diff<7)
-		return $diff . " days " . $suffix;
-	$diff = round($diff/7);
-	if ($diff<2)
-		return ' Last week';
-	if ($diff<4)
-		return $diff . " weeks " . $suffix;
-	return $prefix.' '.date(Cfg::get('date_notime'), $date);
 }
 
 /**

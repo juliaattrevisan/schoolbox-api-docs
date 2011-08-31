@@ -39,10 +39,12 @@ if(is_numeric($this->arg[0])) {
 		$userHandler = new User();
 
 		foreach($comments as $comment) {
+			$actionDate = new Alaress_Date_Relative($comment['created']);
+
 			$this->setVar(array(
 				'COMMENT_BODY'    => $comment['body'],
 				'COMMENT_OWNER'   => $userHandler->formatName($comment),
-				'COMMENT_CREATED' => getRelativeTime($comment['created']),
+				'COMMENT_CREATED' => $actionDate->getRelativeTime(),
 				'DELETE_COMMENT'  => "<a href=\"/blog/comment/delete/{$comment['id']}\">Delete</a>"
 			));
 

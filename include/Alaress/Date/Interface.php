@@ -5,7 +5,10 @@
 interface Alaress_Date_Interface {
 	public function getUnixTimestamp();
 	public function getDatabase();
-	public function getDateOnly();
-	public function getAustralian();
+
+	/* TODO: find out where these aren't being implemented correctly
+	 */
+//	public function getDateOnly();
+//	public function getAustralian();
 	public function getAmerican();
 }

@@ -228,6 +228,8 @@ if (!empty($result['file'])) {
             $file['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
 		}
 
+		$createdTime = new Alaress_Date_Relative($file['submitted']);
+
         $page->setVar(array(
             'FILE_ID'          => $file['id'],
             'FILE_ICON'        => $file['iconFile'],
@@ -236,7 +238,7 @@ if (!empty($result['file'])) {
             'FILE_COMMENT'     => TextFormatter::cutSentence(scrubTEXT($file['comment']), 150),
             'FILE_OWNER'       => $file['uid'],
             'FILE_OWNER_NAME'  => $userHandler->formatName($file),
-            'FILE_CREATED'     => getRelativeTime($file['submitted']),
+            'FILE_CREATED'     => $createdTime->getRelativeTime(),
             'FILE_BREADCRUMB'  => $file['breadcrumb'],
             'FILE_COUNT'       => $count['file'],
         ));
@@ -310,6 +312,7 @@ if (!empty($result['link'])) {
 		}
 
 		$userHandler = new User();
+		$createdTime = new Alaress_Date_Relative($link['submitted']);
 
         $page->setVar(array(
             'LINK_URL'         => $linkUrl,
@@ -318,7 +321,7 @@ if (!empty($result['link'])) {
             'LINK_COMMENT'     => TextFormatter::cutSentence(scrubTEXT($link['comment']), 150),
             'LINK_OWNER'       => $link['uid'],
             'LINK_OWNER_NAME'  => $userHandler->formatName($link),
-            'LINK_CREATED'     => getRelativeTime($link['submitted']),
+            'LINK_CREATED'     => $createdTime->getRelativeTime(),
             'LINK_BREADCRUMB'  => $link['breadcrumb'],
             'LINK_COUNT'       => $count['link'],
         ));
@@ -350,6 +353,7 @@ if (!empty($result['news'])) {
         }
 
 		$userHandler = new User();
+		$createdTime = new Alaress_Date_Relative($news['datetime_posted']);
 
         $page->setVar(array(
             'NEWS_ID'         => $news['id'],
@@ -359,7 +363,7 @@ if (!empty($result['news'])) {
             'NEWS_BODY'       => TextFormatter::cutSentence(scrubTEXT(strip_tags($news['body'])), 150),
             'NEWS_OWNER'      => $news['uid'],
             'NEWS_OWNER_NAME' => $userHandler->formatName($news),
-            'NEWS_CREATED'    => getRelativeTime($news['datetime_posted']),
+            'NEWS_CREATED'    => $createdTime->getRelativeTime(),
             'NEWS_BREADCRUMB' => $news['breadcrumb'],
             'NEWS_COUNT'      => $count['news'],
         ));
@@ -386,13 +390,15 @@ if (!empty($result['blog'])) {
             $blog['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
 		}
 
+		$createdTime = new Alaress_Date_Relative($blog['created']);
+
         $page->setVar(array(
             'BLOG_CID'        => $blog['cid'],
             'BLOG_HEADING'    => scrubTEXT($blog['heading']),
             'BLOG_BODY'       => TextFormatter::cutSentence(scrubTEXT(strip_tags($blog['body'])), 150),
             'BLOG_OWNER'      => $blog['uid'],
             'BLOG_OWNER_NAME' => $userHandler->formatName($blog),
-            'BLOG_CREATED'    => getRelativeTime($blog['created']),
+            'BLOG_CREATED'    => $createdTime->getRelativeTime(),
             'BLOG_BREADCRUMB' => $blog['breadcrumb'],
             'BLOG_COUNT'      => $count['blog'],
         ));
@@ -419,6 +425,8 @@ if (!empty($result['wiki'])) {
             $wiki['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
 		}
 
+		$createdTime = new Alaress_Date_Relative($wiki['created']);
+
         $page->setVar(array(
             'WIKI_ID'         => $wiki['wikiID'],
             'WIKI_CID'        => $wiki['categoryID'],
@@ -426,7 +434,7 @@ if (!empty($result['wiki'])) {
             'WIKI_BODY'       => TextFormatter::cutSentence(scrubTEXT(strip_tags($wiki['body'])), 150),
             'WIKI_OWNER'      => $wiki['userID'],
             'WIKI_OWNER_NAME' => $userHandler->formatName($wiki),
-            'WIKI_CREATED'    => getRelativeTime($wiki['created']),
+            'WIKI_CREATED'    => $createdTime->getRelativeTime(),
             'WIKI_BREADCRUMB' => $wiki['breadcrumb'],
             'WIKI_COUNT'      => $count['wiki'],
         ));
@@ -453,6 +461,8 @@ if (!empty($result['forum'])) {
             $forum['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
 		}
 
+		$createdTime = new Alaress_Date_Relative($forum['date']);
+
         $page->setVar(array(
             'FORUM_CID'        => $forum['categoryID'],
             'FORUM_THREADID'   => $forum['threadID'],
@@ -460,7 +470,7 @@ if (!empty($result['forum'])) {
             'FORUM_BODY'       => TextFormatter::cutSentence(scrubTEXT(strip_tags($forum['body'])), 150),
             'FORUM_OWNER'      => $forum['uid'],
             'FORUM_OWNER_NAME' => $userHandler->formatName($forum),
-            'FORUM_CREATED'    => getRelativeTime($forum['date']),
+            'FORUM_CREATED'    => $createdTime->getRelativeTime(),
             'FORUM_BREADCRUMB' => $forum['breadcrumb'],
         ));
 

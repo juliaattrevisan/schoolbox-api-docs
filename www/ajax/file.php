@@ -44,9 +44,12 @@ if (is_numeric($_POST['categoryID'])) {
 	} else {
 		$userHandler = new User();
 
+		$fileTime = new Alaress_Date_Relative($file['modified']);
+		$fileTime->setPrefix('');
+
 		foreach ($fileList as $file) {
 			$file['user'] = $userHandler->formatName($file);
-			$file['relative'] = getRelativeTime($file['modified'], 0, '');
+			$file['relative'] = $fileTime->getRelativeTime();
 			$file['mimeClass'] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
 			$file['description'] = TextFormatter::cutString($file['description'], 32);
 			$output[] = $file;

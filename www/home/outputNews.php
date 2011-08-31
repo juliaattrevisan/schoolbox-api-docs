@@ -23,9 +23,12 @@ if(is_array($headlineList) )
 		$j++;
 		$url = new Url($previous['topicName']);
 
+		$newsTime = new Alaress_Date_Relative($item['item_datetime_modified']);
+		$newsTime->setPrefix('');
+
 		$output = array('NEWS_TITLE'	=> $item['item_heading'],
 						'NEWS_URL'		=> '/news/#'.$item['item_id'],
-						'NEWS_TIME'		=> getRelativeTime($item['item_datetime_modified'], 0 , ''),
+						'NEWS_TIME'		=> $newsTime->getRelativeTime(),
 						'ON_OFF'		=> ++$k%2? '' : 'dark',
 						'NEWS_TOPIC'	=> scrubText($previous['topicName']),
 						'TOPIC_CLEAN'	=> $url->getSlug(),

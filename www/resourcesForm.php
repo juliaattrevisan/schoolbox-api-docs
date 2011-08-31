@@ -70,10 +70,12 @@ elseif (is_numeric($_POST['files'])) {
 			if (empty($file['modified']))
 				$file['modified'] = $file['submitted'];
 
+			$modifiedTime = new Alaress_Date_Relative($file['modified']);
+
 			$output[] = array('id'			=> $file['id'],
 							  'name'		=> scrubText($file['description']),
 							  'category'	=> $file['category'],
-							  'modified'	=> getRelativeTime($file['modified'], 0, ''),
+							  'modified'	=> $modifiedTime->setPrefix('')->getRelativeTime(),
 							//'size'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",
 							  'owner'		=> $userHandler->formatName($file),
 							  'icon'		=> !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile",

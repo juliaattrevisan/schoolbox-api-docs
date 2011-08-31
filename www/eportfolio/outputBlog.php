@@ -37,12 +37,14 @@ if (!empty($blogs)) {
 
 		$blog['name'] = $userHandler->formatName($blog);
 
+		$createdTime = new Alaress_Date_Relative($blog['created']);
+
 		$this->setVar(array(
 			'BLOG_ID'		=> $blog['id'],
 			'BLOG_HEADING'  => scrubTEXT($blog['heading']),
 			'BLOG_BODY'     => scrubHTML($blog['body']),
 			'BLOG_OWNER'    => "<a href=\"/search/user/{$blog['owner']}\">{$blog['name']}</a>",
-			'BLOG_CREATED'  => getRelativeTime($blog['created']),
+			'BLOG_CREATED'  => $createdTime->getRelativeTime(),
 			'BLOG_SHADING'  => ++$j%2 ? '' : 'dark',
 			'BLOG_COMMENTS' => ''
 		));
@@ -71,10 +73,12 @@ if (!empty($blogs)) {
 			foreach ($comments as $comment) {
 				$comment['name'] = $userHandler->formatName($comment);
 
+				$createdTime = new Alaress_Date_Relative($comment['created']);
+
 				$this->setVar(array(
 					'COMMENT_BODY'    => scrubTEXT($comment['body']),
 					'COMMENT_OWNER'   => "<a href=\"/search/user/{$comment['owner']}\">{$comment['name']}</a>",
-					'COMMENT_CREATED' => getRelativeTime($comment['created'])
+					'COMMENT_CREATED' => $createdTime->getRelativeTime()
 				));
 
 				if ($comment['owner'] == $_SESSION['id'] || $permission >= WRITE_ACCESS) {

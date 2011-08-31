@@ -157,10 +157,12 @@ if (is_array($fileList) && count($fileList) > 0) {
 		if (!($i++%2))
 			$class[] = 'dark';
 
+		$fileModifiedTime = new Alaress_Date_Relative($file['modified']);
+
 		$output = array('FILE_ID' 	 	=> $file['id'],
 						'TYPE'			=> $file['url'] ? 'link' : 'file',
 						'FILE_NAME' 	=> TextFormatter::cutString(scrubText($file['description']),32),
-						'FILE_MODIFIED'	=> getRelativeTime($file['modified'], 0, ''),
+						'FILE_MODIFIED'	=> $fileModifiedTime->setPrefix('')->getRelativeTime(),
 						'FILE_OWNER'	=> $userHandler->formatName($file),
 						'FILE_SIZE'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",
 						'CATEGORY_ID'	=> $file['category'],

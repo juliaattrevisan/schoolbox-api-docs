@@ -9,8 +9,9 @@ $this->setVar('RSS_NAME', !empty($rss->channel->title) ? scrubTEXT($rss->channel
 $this->setVar('RSS_LINK', $rss->channel->link);
 $this->setVar("rss_block", '');
 
-if($rss->channel) {
+if ($rss->channel) {
     $j = 0;
+
     foreach($rss->channel->item as $i => $item) {
         $this->setVar(array(
             'ON_OFF'    => ++$j%2 ? '' : 'dark',
@@ -18,20 +19,27 @@ if($rss->channel) {
             'RSS_URL'   => base64_encode($item->link),
             'RSS_BRIEF' => scrubHTML($item->description)
         ));
-        if($item->pubDate) {
-            $this->setVar('RSS_POSTED_DATE', getRelativeTime($item->pubDate));
+
+		$postedDate = new Alaress_Date_Relative($item->pubDate);
+
+        if ($item->pubDate) {
+            $this->setVar(array(
+				'RSS_POSTED_DATE' => $postedDate->getRelativeTime()
+			));
+
             $this->parse('rss_date_block', 'rss_date');
-        } else {
+        }
+		else {
             $this->setVar('rss_date_block', '');
         }
-            
+
         $this->parse("rss_block", "rss_stories", true);
 
-        if($j == $config['size'] && $config['size'] != 0)
+        if ($j == $config['size'] && $config['size'] != 0) {
             break;
+		}
     }
-} else {
+}
+else {
     $this->setVar("rss_block", '');
 }
-		
-?>

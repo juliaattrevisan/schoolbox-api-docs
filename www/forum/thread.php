@@ -117,14 +117,20 @@ if (is_array($postList)) {
 					  'lastname'	=> $post['userLastname'],
 					  );
 
+		$postTime = new Alaress_Date_Relative($post['date']);
+		$postTime->setPrefix('');
+
+		$modifiedTime = new Alaress_Date_Relative($post['date']);
+		$modifiedTime->setNow(strtotime($post['modified']))->setPrefix('')->setSuffix('later');
+
 		$output = array('POST_ID'			=> $post['postID'],
 						'POST_TITLE'		=> scrubText($post['title']),
 						'POST_AUTHOR'		=> scrubText($userHandler->formatName($user)),
 						'POST_GROUP'		=> scrubText($post['userGroup']),
-						'POST_TIME'			=> getRelativeTime($post['date'], 0, ""),
+						'POST_TIME'			=> $postTime->getRelativeTime(),
 						'POST_USER_ID'		=> $post['userID'],
 						'POST_BODY'			=> scrubHTML($post['body']),
-						'POST_MODIFIED'		=> getRelativeTime($post['date'], strtotime($post['modified']), '', 'later'),
+						'POST_MODIFIED'		=> $modifiedTime->getRelativeTime(),
 						'POST_CENSORED'		=> $post['censored'] == 'true' ? '(Administrator)' : '',
 						);
 		$this->setVar($output);

@@ -540,8 +540,11 @@ if (is_array($activityLog)) {
 			$stringDesc = $categoryName . ' submissions for ' . scrubText($activity['name']) . ' are now closed ';
 		}
 
+		$activityTime = new Alaress_Date_Relative($activity['activity_date']);
+		$activityTime->setPrefix('');
+
 		$output = array('ACTIVITY_DESCRIPTION'	=> $stringDesc,
-						'ACTIVITY_DATE'			=> getRelativeTime($activity['activity_date'], 0 , ''),
+						'ACTIVITY_DATE'			=> $activityTime->getRelativeTime(),
 						'DARK'					=> $j++ % 2 ? 'dark' : '',
 						);
 		$this->setVar($output);
