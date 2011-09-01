@@ -15,9 +15,14 @@ if(is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_POS
 	/* Prevent 12pm to 12am-next-day bug by checking that the hour submitted is
 	 * not equal to 12. This stops the date incrementing to the next day.
 	 */
-	$due_date = getDateTimeByComponents($_POST['due_date'], $_POST['due_hour'], $_POST['due_minute'], $_POST['due_period']);
-	$late_date = getDateTimeByComponents($_POST['late_date'], $_POST['late_hour'], $_POST['late_minute'], $_POST['late_period']);
-	$open_date = getDateTimeByComponents($_POST['open_date'], $_POST['open_hour'], $_POST['open_minute'], $_POST['open_period']);
+	$dueDate = new Alaress_Date_Format($_POST['due_date'] . ' ' . $_POST['due_hour'] . ':' . $_POST['due_minute'] . ' ' . $_POST['due_period'], 'd/m/y');
+	$due_date = $dueDate->getDatabase();
+
+	$lateDate = new Alaress_Date_Format($_POST['late_date'] . ' ' . $_POST['late_hour'] . ':' . $_POST['late_minute'] . ' ' . $_POST['late_period'], 'd/m/y');
+	$late_date = $lateDate->getDatabase();
+
+	$openDate = new Alaress_Date_Format($_POST['open_date'] . ' ' . $_POST['open_hour'] . ':' . $_POST['open_minute'] . ' ' . $_POST['open_period'], 'd/m/y');
+	$open_date = $openDate->getDatabase();
 
     if (!$open_date || !$due_date || !$late_date) {
         error(15);
@@ -44,7 +49,7 @@ if(is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_POS
     localRedir("/submission/listSubmission/");
 }
 else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour']) {
-    
+
     if( isset($_FILES['file']['name']) && $_FILES['file']['name'] ) {
         require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
@@ -67,9 +72,14 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
 	/* Prevent 12pm to 12am-next-day bug by checking that the hour submitted is
 	 * not equal to 12. This stops the date incrementing to the next day.
 	 */
-	$due_date = getDateTimeByComponents($_POST['due_date'], $_POST['due_hour'], $_POST['due_minute'], $_POST['due_period']);
-	$late_date = getDateTimeByComponents($_POST['late_date'], $_POST['late_hour'], $_POST['late_minute'], $_POST['late_period']);
-	$open_date = getDateTimeByComponents($_POST['open_date'], $_POST['open_hour'], $_POST['open_minute'], $_POST['open_period']);
+	$dueDate = new Alaress_Date_Format($_POST['due_date'] . ' ' . $_POST['due_hour'] . ':' . $_POST['due_minute'] . ' ' . $_POST['due_period'], 'd/m/y');
+	$due_date = $dueDate->getDatabase();
+
+	$lateDate = new Alaress_Date_Format($_POST['late_date'] . ' ' . $_POST['late_hour'] . ':' . $_POST['late_minute'] . ' ' . $_POST['late_period'], 'd/m/y');
+	$late_date = $lateDate->getDatabase();
+
+	$openDate = new Alaress_Date_Format($_POST['open_date'] . ' ' . $_POST['open_hour'] . ':' . $_POST['open_minute'] . ' ' . $_POST['open_period'], 'd/m/y');
+	$open_date = $openDate->getDatabase();
 
     if (!$open_date || !$due_date || !$late_date) {
         error(15);
@@ -79,7 +89,7 @@ else if($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POS
     if (!empty($_POST['accept_submission']) && $due_date > $late_date) {
         error(15);
     }
-    
+
     /* Create Submission Box */
     $submission_box = array(
         'category'          => $_POST['category'],

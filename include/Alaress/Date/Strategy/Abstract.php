@@ -23,7 +23,7 @@ abstract class Alaress_Date_Strategy_Abstract {
 	private $second = '00';
 	private $meridiem = '';
 	private $dateSeparator = '-';
-	private $inputDateFormat = 'd/m/y h:m z';
+	private $inputDateFormat = 'd/m/y';
 	private $locale = null;
 
 	public function __construct($dateTime, $inputDateFormat) {

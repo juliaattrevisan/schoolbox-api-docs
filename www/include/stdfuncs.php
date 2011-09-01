@@ -107,17 +107,17 @@ function scrubTEXT($text) {
 //
 //	return date($format, $date);
 //}
-
-/**
- * Converts component-based date/time into database-friendly format
- *
- * @param  $date
- * @param  $hour
- * @param  $minute
- * @param  $period
- * @return string
- */
-function getDateTimeByComponents($date, $hour, $minute, $period) {
-	return date(Cfg::get('date_database'), strtotime(scrubTEXT(str_replace('/', '-', $date) . " {$hour}:{$minute}{$period}")));
-}
+//
+///**
+// * Converts component-based date/time into database-friendly format
+// *
+// * @param  $date
+// * @param  $hour
+// * @param  $minute
+// * @param  $period
+// * @return string
+// */
+//function getDateTimeByComponents($date, $hour, $minute, $period) {
+//	return date(Cfg::get('date_database'), strtotime(scrubTEXT(str_replace('/', '-', $date) . " {$hour}:{$minute}{$period}")));
+//}
 ?>
