@@ -13,7 +13,9 @@ if (is_array($submissionList)) {
 
 		$nameURL = $submission['realname'] != '' ? "/send" . ($submission['inline'] == 'true'&& FILE_use_frame ? 'frame' : '') . ".php?id=" . $submission['fileID'] : false;
 
-		$dateHTML = outputDate("jS M", $submission['date']);
+		$date = new Alaress_Date_Format($submission['date'], 'U');
+
+		$dateHTML = $date->getDateOnly();
 		$dateURL = false;
 
 		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . scrubText($submission['name']) . ($nameURL ? '</a>' : "");
@@ -43,7 +45,7 @@ if (is_array($submissionList)) {
             $this->setVar('DUE_ACTION', '/submission/viewSubmission/' . $submission['id']);
             $this->setVar('DUE_ACTION_NAME', 'View Work');
 
-            $this->parse('duework_actions_block', 'duework_actions');            
+            $this->parse('duework_actions_block', 'duework_actions');
         } else {
             $this->setVar('duework_actions_block', '');
         }

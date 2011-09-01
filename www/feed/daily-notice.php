@@ -19,9 +19,11 @@ $page->setVar($output);
 $newsList = $newsHandler->getDailyNotice(false);
 if (is_array($newsList)) {
 	foreach ($newsList as $news) {
+		$itemDate = new Alaress_Date_Format($news['item_datetime_posted'], 'U');
+
 		$output = array('ITEM_TITLE'		=> $news['item_heading'],
 						'ITEM_DESCRIPTION'	=> "<![CDATA[" . $news['item_body'] ."]]>",
-						'ITEM_DATE'			=> outputDate('r', $news['item_datetime_posted']),
+						'ITEM_DATE'			=> $itemDate->getShort(),
 						'ITEM_LINK'			=> SITE_address . '/news/#' . $news['item_id'],
 						);
 		$page->setVar($output);
@@ -30,7 +32,7 @@ if (is_array($newsList)) {
 } else
 	$page->setVar('rss_item_block', '');
 
-	
+
 header('Content-type: application/rss+xml');
 $page->outputPage(true);
 

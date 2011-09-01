@@ -11,10 +11,13 @@
  */
 
 interface Alaress_Date_Locale_Interface {
-	public function databaseFormat();
+	public function localShortFormat();
 	public function longFormat();
 	public function shortFormat();
 	public function noTimeFormat();
-	public function localFormat();
+	public function timeFormat();
+	public function databaseFormat();
+	public function databaseDateFormat();
+	public function databaseTimeFormat();
 	public function timestampFormat();
 }

@@ -79,11 +79,16 @@ if (is_numeric($_GET['eventID'])) {
 			$attendanceList = $attendanceHandler->getAllByStudent($enrolment['studentID'], $event['code'], $event['eventID']);
 			if (is_array($attendanceList)) {
 				$page->setVar('attendance_list_block', '');
+
+				$attendanceDate = new Alaress_Date_Format($attendance['date']);
+
 				foreach ($attendanceList as $attendance) {
-					$output = array('DATE'			=> outputDate("j/n", $attendance['date']),
-									'ATTENDANCE' 	=> $attendance['present'] == 'true' ? "attendance-tick" : (!empty($attendance['reason']) ? "attendance-cross-blue" : "attendance-cross"),
-									'REASON'		=> scrubText($attendance['reason']),
-									);
+					$output = array(
+						'DATE' => date("j/n", $attendanceDate->getUnixTimestamp()),
+						'ATTENDANCE' => $attendance['present'] == 'true' ? "attendance-tick" : (!empty($attendance['reason']) ? "attendance-cross-blue" : "attendance-cross"),
+						'REASON' => scrubText($attendance['reason']),
+					);
+
 					$page->setVar($output);
 
 					// hide image if attendance not marked

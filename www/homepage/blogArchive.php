@@ -83,12 +83,14 @@ foreach ($blogYears as $key => $current) {
 
         $poster = $userHandler->formatName($blog);
 
+		$postedDate = new Alaress_Date_Format($blog['createdTimestamp'], 'U');
+
         $this->setVar(array(
             'BLOG_ID' => $blog['id'],
             'BLOG_HEADING' => $blog['heading'],
             'BLOG_BODY' => $blog['body'],
             'EMAIL_CONTACT' => "<a href=\"/search/user/{$blog['uid']}\">$poster</a>",
-            'POSTED_DATE' => outputDate(Cfg::get('date_short'), $blog['createdTimestamp'])
+            'POSTED_DATE' => $postedDate->getShort()
         ));
 
         $this->parse('blog_block', 'blog', true);

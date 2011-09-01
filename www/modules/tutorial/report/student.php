@@ -30,11 +30,15 @@ $to = $toObj->getUnixTimestamp();
 $eventHandler = new Event;
 $userHandler = new User;
 
-if (is_numeric($_GET['userID']))
+if (is_numeric($_GET['userID'])) {
 	$user = $userHandler->getByID($_GET['userID'], 3);
+}
 
-$output = array('FROM'			=> outputDate("d/m/Y", $from),
-				'TO'			=> outputDate("d/m/Y", $to),
+$fromDate = new Alaress_Date_Format($from, 'U');
+$toDate = new Alaress_Date_Format($from, 'U');
+
+$output = array('FROM'			=> $fromDate->getLocalShort(),
+				'TO'			=> $toDate->getLocalShort(),
 				'STUDENT'		=> isset($user) ? $userHandler->formatName($user) : '',
 				'STUDENT_ID'	=> $user['uid'],
 				);
@@ -77,8 +81,10 @@ if (isset($user['uid'])) {
 
 				}
 
+				$date = new Alaress_Date_Format($event['date'], 'U');
+
 				$output = array('EVENT_ID'	=> $event['eventID'],
-								'DATE'		=> outputDate(Cfg::get('date_notime'), $event['date']),
+								'DATE'		=> $date->getDateOnly(),
 								'START'		=> $event['start'],
 								'FINISH'	=> $event['finish'],
 								'PRESENT'	=> $event['present']=='true'?'Present':'<em>Absent</em>',

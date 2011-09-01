@@ -99,10 +99,12 @@ if (is_array($allWork)) {
 			$this->setVar('work_block', '');
 		}
 
+		$dueDate = new Alaress_Date_Format($currentWork['dueDate'], 'U');
+
 		$this->setVar(array(
 			'WORK_CATEGORYNAME' => $currentWork['categoryName'],
 			'WORK_DESCRIPTION' => $currentWork['name'],
-			'WORK_DUEDATE' => outputDate(Cfg::get('date_notime'), $currentWork['dueDate']),
+			'WORK_DUEDATE' => $dueDate->getDateOnly(),
 			'WORK_MARK' => $currentWork['mark'],
 			'WORK_ACTION' => '',
 			'WORK_BOX_ID' => $currentWork['bid'],

@@ -10,20 +10,32 @@
  * @version     SVN: $Id$
  */
 abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Interface {
-	protected $database;
+	protected $local;
+	protected $localShort;
 	protected $long;
 	protected $short;
 	protected $noTime;
-	protected $local;
+	protected $time;
+	protected $database;
+	protected $databaseTime;
 	protected $timestamp;
 
 	/**
-	 * Get a database format
+	 * Get the preferred local format
 	 *
 	 * @return
 	 */
-	public function databaseFormat() {
-		return $this->database;
+	public function localFormat() {
+		return $this->local;
+	}
+
+	/**
+	 * Get the preferred local short format
+	 *
+	 * @return
+	 */
+	public function localShortFormat() {
+		return $this->local;
 	}
 
 	/**
@@ -54,12 +66,39 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	}
 
 	/**
-	 * Get the preferred local format
+	 * Get the time-only format
 	 *
 	 * @return
 	 */
-	public function localFormat() {
-		return $this->local;
+	public function timeFormat() {
+		return $this->time;
+	}
+
+	/**
+	 * Get a database format
+	 *
+	 * @return
+	 */
+	public function databaseFormat() {
+		return $this->database;
+	}
+
+	/**
+	 * Get a database date format
+	 *
+	 * @return
+	 */
+	public function databaseDateFormat() {
+		return $this->databaseDate;
+	}
+
+	/**
+	 * Get a database time format
+	 *
+	 * @return
+	 */
+	public function databaseTimeFormat() {
+		return $this->databaseTime;
 	}
 
 	/**

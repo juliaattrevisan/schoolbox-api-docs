@@ -11,7 +11,8 @@ if (is_array($homeworkList)) {
 
             	$nameURL = $homework['realname'] != '' ? "/send" . ($homework['inline'] == 'true' ? 'frame' : '') . ".php?id=" . $homework['fileID'] : false;
 
-		$dateHTML = outputDate("jS M", $homework['date']);
+		$date = new Alaress_Date_Format($homework['date'], 'U');
+		$dateHTML = $date->getShort();
 		$dateURL = false;
 
 		if($enroled) {
@@ -42,9 +43,9 @@ if (is_array($homeworkList)) {
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_hw", "submit_hw_block");
-if ($permission < WRITE_ACCESS)		
+if ($permission < WRITE_ACCESS)
 	$this->setVar("submit_hw_block", "");
 else
-	$this->parse("submit_hw_block", "submit_hw");	
-		
+	$this->parse("submit_hw_block", "submit_hw");
+
 ?>

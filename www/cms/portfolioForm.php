@@ -54,10 +54,12 @@ elseif (is_numeric($_POST['categoryID'])) {
 	$output = array();
 	if (is_array($fileList)) {
 		foreach ($fileList as $file) {
+			$modifiedDate = new Alaress_Date_Format($file['submitted'], 'U');
+
 			$output[] = array('id'			=> $file['id'],
 							  'name'		=> scrubText($file['description']),
 							  'category'	=> $file['category'],
-							  'modified'	=> outputDate(Cfg::get('date_short'), $file['submitted']),
+							  'modified'	=> $modifiedDate->getShort(),
 							  'size'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",
 							  'icon'		=> !empty($file['iconFile']) && Cfg::get('webdav_enable') ? $allowedFiles->getClass($file["iconFile"]) : "textfile",
 							  );

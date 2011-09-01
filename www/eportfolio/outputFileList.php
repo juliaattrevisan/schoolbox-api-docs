@@ -16,13 +16,15 @@ $sortOptions = array('Description');
 
 if (is_array($fileList)) {
 	foreach ($fileList as $file) {
+		$publishedDate = new Alaress_Date_Format($file['published'], 'U');
+
 		$this->setVar(array(
             'FILE_DESCRIPTION'	=> scrubTEXT($file['description']),
             'FILE_ID'			=> $file['id'],
             'FILE_MIME_IMAGE'	=> $allowedFiles->getClass($file["iconFile"]),
             'FILE_POSTED_BY'	=> $userHandler->formatName($file),
             'FILE_POSTED_BY_ID'	=> $file['owner'],
-            'FILE_PUBLISHED_DATE'	=> outputDate(Cfg::get('date_short'), $file['published']),
+            'FILE_PUBLISHED_DATE'	=> $publishedDate->getShort(),
             'FILE_COMMENT'		=> nl2br(scrubTEXT($file['comment'])),
             'ON_OFF'			=> ++$j%2 ? '' : 'dark',
             'HIDDEN'            => $file['hidden'] ? 'hidden' : '',

@@ -16,11 +16,13 @@ if (is_array($eventList)) {
 
 		$event['colour'] = $calendarHandler->displayColour($event['type']);
 
+		$calendarDate = new Alaress_Date_Format(strtotime($event['outputDate']), 'U');
+
         $output = array('CAL_TIME'		=> rtrim(
                                         ($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
                                            ($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
                                        "- "),
-                        'CAL_DATE'	=> date(Cfg::get('date_notime'), strtotime($event['outputDate'])),
+                        'CAL_DATE'	=> $calendarDate->getDateOnly(),
                         'CAL_ID'	=> $event['id'],
                         'CAL_NOTE'	=> scrubTEXT($event['note']),
                         'CAL_LOCATION'	=> scrubTEXT($event['location']),

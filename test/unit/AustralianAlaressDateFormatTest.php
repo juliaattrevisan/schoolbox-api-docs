@@ -97,4 +97,34 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals($result, $expected);
 	}
+
+	public function testUnixTimestamp() {
+		$input = date('U', strtotime('2011-08-31 19:21:00'));
+		$expected = '2011-08-31 19:21:00';
+
+		$date = new Alaress_Date_Format($input, 'U');
+		$result = $date->getDatabase();
+
+		$this->assertEquals($result, $expected);
+	}
+
+	public function testTime() {
+		$input = date('U', strtotime('2011-08-31 19:21:00'));
+		$expected = '07:21pm';
+
+		$date = new Alaress_Date_Format($input, 'U');
+		$result = $date->getTimeOnly();
+
+		$this->assertEquals($result, $expected);
+	}
+
+	public function testTimeOnly() {
+		$input = date('U', strtotime('2011-08-31 19:21:00'));
+		$expected = '19:21:00';
+
+		$date = new Alaress_Date_Format($input, 'U');
+		$result = $date->getDatabaseTime();
+
+		$this->assertEquals($result, $expected);
+	}
 }

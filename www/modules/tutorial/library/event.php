@@ -134,6 +134,9 @@ class Event extends DeprecatedModel {
 	}
 
 	function getUncompleted ($from = 0, $to = 0, $userID = false) {
+		$fromDate = new Alaress_Date_Format($from, 'U');
+		$toDate = new Alaress_Date_Format($to, 'U');
+
 		$query = "SELECT e.*, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish,
 					concat(t1.firstname,' ',t1.lastname) tutorName1, concat(t2.firstname,' ',t2.lastname) tutorName2 , y.type typeName
 				  FROM ".TUTORIAL_db.".".$this->_table." e
@@ -144,9 +147,9 @@ class Event extends DeprecatedModel {
 				  WHERE a.studentID IS NULL ";
 
 		if ($from > 0)
-			$query .= "AND DATE(e.date) >= DATE('".outputDate("Y-m-d",$from)."') ";
+			$query .= "AND DATE(e.date) >= DATE('".$fromDate->getDatabaseDate()."') ";
 		if ($to > 0)
-			$query .= "AND DATE(e.date) <= DATE('".outputDate("Y-m-d",$to)."') ";
+			$query .= "AND DATE(e.date) <= DATE('".$toDate->getDatabaseDate()."') ";
 
 		if ($userID)
 			$query .= "AND (e.tutor1ID = ".$userID." OR e.tutor2ID = ".$userID.") ";
@@ -157,6 +160,9 @@ class Event extends DeprecatedModel {
 	}
 
 	function getByTutor ($tutorID, $from = 0, $to = 0, $filter = 'both') {
+		$fromDate = new Alaress_Date_Format($from, 'U');
+		$toDate = new Alaress_Date_Format($to, 'U');
+
 		$query = "SELECT *, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish,
 					(TIME_TO_SEC(TIMEDIFF(finish, start))/3600) hours, count(a.studentID) enrolled , UNIX_TIMESTAMP(a.created) marked, y.type typeName
 
@@ -166,9 +172,9 @@ class Event extends DeprecatedModel {
 				  WHERE a.studentID IS NOT NULL ";
 
 		if ($from > 0)
-			$query .= "AND DATE(a.created) >= DATE('".outputDate("Y-m-d",$from)."') ";
+			$query .= "AND DATE(a.created) >= DATE('".$fromDate->getDatabaseDate()."') ";
 		if ($to > 0)
-			$query .= "AND DATE(a.created) <= DATE('".outputDate("Y-m-d",$to)."') ";
+			$query .= "AND DATE(a.created) <= DATE('".$toDate->getDatabaseDate()."') ";
 
 		if ($filter == 'unprocessed')
 			$query .= "AND ((e.tutor1ID = $tutorID AND e.tutor1Processed = 'false') OR (e.tutor2ID = $tutorID AND e.tutor2Processed = 'false')) ";
@@ -183,6 +189,9 @@ class Event extends DeprecatedModel {
 	}
 
 	function getTotalHoursByTutor($tutorID, $from = 0, $to = 0) {
+		$fromDate = new Alaress_Date_Format($from, 'U');
+		$toDate = new Alaress_Date_Format($to, 'U');
+
 		$query = "SELECT SUM(TIME_TO_SEC(TIMEDIFF(finish, start))/3600) hours
 
 				  FROM ".TUTORIAL_db.".".$this->_table." e
@@ -190,9 +199,9 @@ class Event extends DeprecatedModel {
 				  WHERE a.studentID IS NOT NULL AND (e.tutor1ID = $tutorID OR e.tutor2ID = $tutorID) ";
 
 		if ($from > 0)
-			$query .= "AND DATE(a.created) >= DATE('".outputDate("Y-m-d",$from)."')";
+			$query .= "AND DATE(a.created) >= DATE('".$fromDate->getDatabaseDate()."')";
 		if ($to > 0)
-			$query .= "AND DATE(a.created) <= DATE('".outputDate("Y-m-d",$to)."')";
+			$query .= "AND DATE(a.created) <= DATE('".$toDate->getDatabaseDate()."')";
 
 		$query .= "GROUP BY a.eventID ORDER BY e.date";
 
@@ -200,6 +209,9 @@ class Event extends DeprecatedModel {
 	}
 
 	function getByStudent ($studentID, $from = 0, $to = 0) {
+		$fromDate = new Alaress_Date_Format($from, 'U');
+		$toDate = new Alaress_Date_Format($to, 'U');
+
 		$query = "SELECT *, UNIX_TIMESTAMP(e.date) date, TIME_FORMAT(start, '%l:%i %p') start, TIME_FORMAT(finish, '%l:%i %p') finish,
 					(TIME_TO_SEC(SUBTIME(finish, start))/3600) hours, concat(s.firstname,' ',s.lastname) studentName, y.type typeName
 				  FROM ".TUTORIAL_db.".".$this->_table." e
@@ -209,9 +221,9 @@ class Event extends DeprecatedModel {
 				  WHERE a.studentID = $studentID ";
 
 		if ($from > 0)
-			$query .= "AND DATE(e.date) >= DATE('".outputDate("Y-m-d",$from)."')";
+			$query .= "AND DATE(e.date) >= DATE('".$fromDate->getDatabaseDate()."')";
 		if ($to > 0)
-			$query .= "AND DATE(e.date) <= DATE('".outputDate("Y-m-d",$to)."')";
+			$query .= "AND DATE(e.date) <= DATE('".$toDate->getDatabaseDate()."')";
 
 		$query .= "GROUP BY a.eventID ORDER BY e.typeID DESC, e.code, e.date";
 

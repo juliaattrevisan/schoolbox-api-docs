@@ -21,29 +21,28 @@ $eventList = $eventHandler->getAll('all', 'date', 'asc', $user['uid']);
 
 if (is_array($eventList)) {
 	foreach ($eventList as $event) {
+		$date = new Alaress_Date_Format($event['date'], 'U');
 
-		$output = array($event['eventID'],
-						outputDate('Y-m-d', $event['date']),
-						scrubText($event['name']),
-						$event['start'],
-						$event['finish'],
-						scrubText($event['location']),
-						!empty($event['code']) ? scrubText($event['code']) : 'N/A',
-						$event['typeName'],
-						scrubText($event['tutorName1']),
-						scrubText($event['tutorName2']),
-						$event['cancelled'] == 'true' ? 'Cancelled' : '',
-						);
+		$output = array(
+			$event['eventID'],
+			$date->getLocal(),
+			scrubText($event['name']),
+			$event['start'],
+			$event['finish'],
+			scrubText($event['location']),
+			!empty($event['code']) ? scrubText($event['code']) : 'N/A',
+			$event['typeName'],
+			scrubText($event['tutorName1']),
+			scrubText($event['tutorName2']),
+			$event['cancelled'] == 'true' ? 'Cancelled' : '',
+		);
 
 		$line .= TextFormatter::outputCSV($output)."\n";
-
 	}
-
 }
 
+$date = new Alaress_Date_Format(time(), 'U');
+
 header('Content-type: text/csv');
-header('Content-Disposition: inline; filename="tutorial-list-'.date('dMY').'.csv"');
+header('Content-Disposition: inline; filename="tutorial-list-'.$date->getLocalShort().'.csv"');
 print $line;
-
-
-?>

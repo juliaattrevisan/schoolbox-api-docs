@@ -32,13 +32,15 @@ if (is_numeric($this->arg[0])) {
 
 	$userHandler = new User();
 
+	$modifiedDate = new Alaress_Date_Format($wiki['modified']);
+
 	// output wiki
 	$output = array(
 		'WIKI_ID' => $wiki['wikiID'],
 		'CATEGORY_ID' => $wiki['categoryID'],
 		'HEADING' => scrubText($wiki['heading']),
 		'BODY' => scrubHTML($wiki['body']),
-		'MODIFIED' => outputDate(Cfg::get('date_long'), $wiki['modified']),
+		'MODIFIED' => $modifiedDate->getLong(),
 		'AUTHOR' => $userHandler->formatName($wiki),
 		'AUTHOR_ID' => $wiki['authorID'],
 		'CURRENT_REVISION' => $wiki['revisionID'],
@@ -59,11 +61,13 @@ if (is_numeric($this->arg[0])) {
 		foreach ($revisionList as $revision) {
 			$i++;
 
+			$revisionDate = new Alaress_Date_Format($revision['created']);
+
 			$this->setVar(array(
 					'WIKI_ID'           => $wiki['wikiID'],
 					'REVISION_ID'       => $wiki['revisionID'],
 					'REVISION_COMPARE'  => $revision['revisionID'],
-					'REVISION_DATE'     => outputDate(Cfg::get('date_notime'), $revision['created']),
+					'REVISION_DATE'     => $revisionDate->getDateOnly(),
 					'REVISION_HEADING'	=> scrubText($revision['heading']),
 					'REVISION_AUTHOR'	=> $userHandler->formatName($revision),
 					'REVISION_CURRENT'	=> $revision['revisionID']==$wiki['revisionID']?'revisionCurrent':'',

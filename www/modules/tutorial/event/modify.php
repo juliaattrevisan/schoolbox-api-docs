@@ -18,7 +18,7 @@ if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)
 	$page->error(19);
 
 if (is_numeric($_GET['eventID'])) {
-	
+
 	$event = $eventHandler->getByID($_GET['eventID']);
 	if (!isset($event['eventID']))
 		$page->error(2);
@@ -32,17 +32,17 @@ if (is_numeric($_GET['eventID'])) {
 	$page->setBlock(TEMPLATE_content, 'date_sequence', 'date_sequence_block');
 	$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 	$page->setBlock(TEMPLATE_content, 'delete_sequence', 'delete_sequence_block');
-	
+
 	$page->setVar('recurring_dates_block', '');
-	
+
 	$page->setVar('date_block', '');
 	$page->setVar('date_sequence_block', '');
 	$page->setVar('sequence_link_block', '');
 	$page->setVar('delete_sequence_block', '');
-	
+
 	if (!isset($_GET['sequence'])) {
 		/* modify page */
-		$page->parse('date_block', 'date');	
+		$page->parse('date_block', 'date');
 		$page->setVar('HEADING', 'Modify Tutorial');
 		$page->parse('sequence_link_block', 'sequence_link');
 	} else {
@@ -51,14 +51,18 @@ if (is_numeric($_GET['eventID'])) {
 		$page->parse('date_sequence_block', 'date_sequence');
 		$page->parse('delete_sequence_block', 'delete_sequence');
 	}
-	
-	$sequence = $eventHandler->getSequence($event['sequenceID']);	
+
+	$sequence = $eventHandler->getSequence($event['sequenceID']);
 
 	list($hour, $minute) = explode(":", $event['start']);
 	list($minute, $period) = explode(" ", $minute);
 
 	list($tohour, $tominute) = explode(":", $event['finish']);
-	list($tominute, $toperiod) = explode(" ", $tominute);	
+	list($tominute, $toperiod) = explode(" ", $tominute);
+
+	$date = new Alaress_Date_Format($event['date']);
+	$startDate = new Alaress_Date_Format($sequence['start_date']);
+	$endDate = new Alaress_Date_Format($sequence['end_date']);
 
 	$output = array('ACTION'		=> 'Modify',
 					'ACTION_TYPE'	=> isset($_GET['sequence']) ? 'sequence' : 'single',
@@ -67,7 +71,7 @@ if (is_numeric($_GET['eventID'])) {
 					'NAME'			=> $event['name'],
 					'CODE'			=> $event['code'],
 					'LOCATION'		=> $event['location'],
-					'DATE'			=> outputDate("d/m/Y", $event['date']),
+					'DATE'			=> $date->getLocal(),
 					'HOUR'			=> $hour,
 					'MIN'			=> $minute,
 					'AM'			=> $period == 'AM' ? 'selected="selected"' : '',
@@ -78,10 +82,10 @@ if (is_numeric($_GET['eventID'])) {
 					'PMTO'			=> $toperiod == 'PM' ? 'selected="selected"' : '',
 					'DESCRIPTION'	=> $event['description'],
 					'CANCELLED_SELECTED'	=> $event['cancelled'] == 'true' ? 'checked="checked"' : '',
-					
+
 					'NAME_ENABLED'	=> $event['typeID']==2 ? 'table-row' : 'none',
 					'CLASS_ENABLED'	=> $event['typeID']==1 ? 'table-row' : 'none',
-					
+
 					'WEEKDAY_SUNDAY_SELECTED'		=> '',
 					'WEEKDAY_MONDAY_SELECTED'		=> 'selected="selected"',
 					'WEEKDAY_TUESDAY_SELECTED'		=> '',
@@ -89,14 +93,14 @@ if (is_numeric($_GET['eventID'])) {
 					'WEEKDAY_THURSDAY_SELECTED'		=> '',
 					'WEEKDAY_FRIDAY_SELECTED'		=> '',
 					'WEEKDAY_SATURDAY_SELECTED'		=> '',
-					
+
 					'RECURRENCE_ONCE_SELECTED'		=> '',
 					'RECURRENCE_WEEK_SELECTED'		=> 'selected="selected"',
 					'RECURRENCE_FORTNIGHT_SELECTED'	=> '',
-					
+
 					'TOTAL_EVENTS'	=> $sequence['total'],
-					'START_DATE'	=> outputDate("d/m/Y", $sequence['start_date']),
-					'END_DATE'		=> outputDate("d/m/Y", $sequence['end_date']),
+					'START_DATE'	=> $startDate->getLocal(),
+					'END_DATE'		=> $endDate->getLocal(),
 					);
 
 	$tutor1 = $userHandler->getByID($event['tutor1ID']);
@@ -105,9 +109,9 @@ if (is_numeric($_GET['eventID'])) {
 	$page->dropDown('tutor_list_1', $eventHandler->getTutorList(), $tutor1['synergy_id'], TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
 	$page->dropDown('tutor_list_2', $eventHandler->getTutorList(), $tutor2['synergy_id'], TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
 
-	$page->dropDown('type_list', $eventHandler->getTypeList(), $event['typeID'], TEMPLATE_content, array('typeID' => 'TYPE_ID', 'type' => 'TYPE_NAME'));	
-	$page->dropDown('class_list', $eventHandler->getClassList(), $event['classID'], TEMPLATE_content, array('classID' => 'CLASS_ID', 'class' => 'CLASS_NAME', 'code' => 'CLASS_CODE'));	
-	
+	$page->dropDown('type_list', $eventHandler->getTypeList(), $event['typeID'], TEMPLATE_content, array('typeID' => 'TYPE_ID', 'type' => 'TYPE_NAME'));
+	$page->dropDown('class_list', $eventHandler->getClassList(), $event['classID'], TEMPLATE_content, array('classID' => 'CLASS_ID', 'class' => 'CLASS_NAME', 'code' => 'CLASS_CODE'));
+
 	$page->setVar($output);
 
 } else {
@@ -121,7 +125,7 @@ if (is_numeric($_GET['eventID'])) {
 	$page->setVar('sequence_link_block', '');
 	$page->setVar('date_sequence_block', '');
 	$page->setVar('delete_sequence_block', '');
-	
+
 	$output = array('ACTION'		=> 'Add',
 					'HEADING'		=> 'Add Tutorial',
 					'EVENT_ID'		=> '',
@@ -140,8 +144,8 @@ if (is_numeric($_GET['eventID'])) {
 					'CANCELLED_SELECTED'	=> '',
 
 					'NAME_ENABLED'	=> 'none',
-					'CLASS_ENABLED'	=> 'table-row',					
-					
+					'CLASS_ENABLED'	=> 'table-row',
+
 					'WEEKDAY_SUNDAY_SELECTED'		=> '',
 					'WEEKDAY_MONDAY_SELECTED'		=> 'selected="selected"',
 					'WEEKDAY_TUESDAY_SELECTED'		=> '',
@@ -149,7 +153,7 @@ if (is_numeric($_GET['eventID'])) {
 					'WEEKDAY_THURSDAY_SELECTED'		=> '',
 					'WEEKDAY_FRIDAY_SELECTED'		=> '',
 					'WEEKDAY_SATURDAY_SELECTED'		=> '',
-					
+
 					'RECURRENCE_ONCE_SELECTED'		=> '',
 					'RECURRENCE_WEEK_SELECTED'		=> 'selected="selected"',
 					'RECURRENCE_FORTNIGHT_SELECTED'	=> '',
@@ -158,10 +162,10 @@ if (is_numeric($_GET['eventID'])) {
 	$page->dropDown('tutor_list_1', $eventHandler->getTutorList(), $_SESSION['sid'], TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
 	$page->dropDown('tutor_list_2', $eventHandler->getTutorList(), '', TEMPLATE_content, array('id' => 'TUTOR_ID', 'name' => 'TUTOR_NAME'));
 
-	$page->dropDown('type_list', $eventHandler->getTypeList(), '', TEMPLATE_content, array('typeID' => 'TYPE_ID', 'type' => 'TYPE_NAME'));	
-	$page->dropDown('class_list', $eventHandler->getClassList(), '', TEMPLATE_content, array('classID' => 'CLASS_ID', 'class' => 'CLASS_NAME', 'code'	=> 'CLASS_CODE'));	
-	
-	
+	$page->dropDown('type_list', $eventHandler->getTypeList(), '', TEMPLATE_content, array('typeID' => 'TYPE_ID', 'type' => 'TYPE_NAME'));
+	$page->dropDown('class_list', $eventHandler->getClassList(), '', TEMPLATE_content, array('classID' => 'CLASS_ID', 'class' => 'CLASS_NAME', 'code'	=> 'CLASS_CODE'));
+
+
 	$page->setVar($output);
 }
 

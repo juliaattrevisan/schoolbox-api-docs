@@ -19,13 +19,15 @@ if (is_array($linkList)) {
 			$linkUrl = $url->getBase64EncodedRedirect();
 		}
 
+		$postedDate = new Alaress_Date_Format($link['submitted'], 'U');
+
 		$this->setVar(array(
             'LINK_ID' => $link['id'],
             'LINK_NAME' => scrubTEXT($link['description']),
             'LINK_URL' => $linkUrl,
             'LINK_POSTED_BY' => $userHandler->formatName($link),
             'LINK_POSTED_BY_ID' => $link['owner'],
-            'LINK_POSTED_DATE' => outputDate(Cfg::get('date_short'), $link['submitted']),
+            'LINK_POSTED_DATE' => $postedDate->getShort(),
             'LINK_COMMENT' => nl2br(scrubTEXT($link['comment'])),
             'ON_OFF' => ++$j%2? '' : 'dark',
         ));

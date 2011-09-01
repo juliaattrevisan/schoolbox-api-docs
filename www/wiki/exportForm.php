@@ -11,7 +11,7 @@ $groupHandler = new Group(HOMEPAGE_SERVICE);
 if (isset($_GET['wikiID'])) {
    // wiki exists
    $wiki = $wikiHandler->getByID($_GET['wikiID']);
-   
+
    if (!isset($wiki['wikiID'])) {
       error(2);
    }
@@ -23,7 +23,7 @@ if (isset($_GET['wikiID'])) {
    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
       error(19);
    }
-   
+
    // check locked
    if ($wiki['locked'] == 'true' && $permission < WRITE_ACCESS) {
       error(19);
@@ -31,11 +31,13 @@ if (isset($_GET['wikiID'])) {
 
    $wikiContents = $wikiHandler->getByID($_GET['wikiID']);
 
+	$modifiedDate = new Alaress_Date_Format($wikiContents['modified'], 'U');
+
    $output = array(
       'AUTHOR' => $wikiContents['firstname'] . ' ' . $wikiContents['lastname'],
       'HEADING' => $wikiContents['heading'],
       'BODY' => $wikiContents['body'],
-      'LASTMODIFIED' => outputDate('l d F, Y, H:i:sa', $wikiContents['modified']),
+      'LASTMODIFIED' => $modifeidDate->getLong(),
    );
 
    /* Load Page templating, to keep consistent, rather than dumping raw output.

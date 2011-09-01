@@ -51,8 +51,8 @@ if (is_array($_POST['processed'])) {
 	$toObj = new Alaress_Date_Format($_GET['to']);
 	$to = $toObj->getUnixTimestamp();
 
-	$output = array('FROM'		=> outputDate("d/m/Y", $from),
-					'TO'		=> outputDate("d/m/Y", $to),
+	$output = array('FROM'		=> $fromObj->getLocalShort(),
+					'TO'		=> $toObj->getLocalShort(),
 					'FILTER_PROCESSED_SELECTED' => '',
 					'FILTER_UNPROCESSED_SELECTED' => '',
 					'FILTER_BOTH_SELECTED' => '',
@@ -87,9 +87,12 @@ if (is_array($_POST['processed'])) {
 						else
 							$processed = $event['tutor2Processed'];
 
+						$date = new Alaress_Date_Format($event['date'], 'U');
+						$markedDate = new Alaress_Date_Format($event['marked'], 'U');
+
 						$output = array('EVENT_ID'	=> $event['eventID'],
-										'DATE'		=> outputDate(Cfg::get('date_notime'), $event['date']),
-										'MARKED'	=> outputDate(Cfg::get('date_notime'), $event['marked']),
+										'DATE'		=> $date->getDateOnly(),
+										'MARKED'	=> $markedDate->getdateOnly(),
 										'START'		=> $event['start'],
 										'FINISH'	=> $event['finish'],
 										'TUTORIAL'	=> scrubText($event['name']),

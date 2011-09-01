@@ -16,10 +16,22 @@
  * @version     SVN: $Id$
  */
 class Alaress_Date_Locale_Australian extends Alaress_Date_Locale_Abstract {
-	protected $database = 'Y-m-d H:i:s';
-	protected $long = 'l F jS Y g:ia';
-	protected $short = 'jS M Y g:ia';
-	protected $noTime = 'jS M Y';
+
+	/* Pretty formatting
+	 */
 	protected $local = 'd-m-Y H:i:s';
+	protected $localShort = 'd/m/Y';
+
+	protected $long = 'l F jS Y g:ia';
+	protected $short = 'jS M Y g:ia'; // Closest to 'r'
+
+	protected $noTime = 'jS M Y';
+	protected $time = 'h:ia';
+
+	/* Database specific formatting
+	 */
+	protected $database = 'Y-m-d H:i:s';
+	protected $databaseDate = 'Y-m-d';
+	protected $databaseTime = 'H:i:s';
 	protected $timestamp = 'U';
 }

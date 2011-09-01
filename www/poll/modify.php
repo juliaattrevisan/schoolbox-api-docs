@@ -8,21 +8,23 @@ $pollHandler = new Poll;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
 if (is_numeric($this->arg[0])) {
-	
+
 	$poll = $pollHandler->getByID($this->arg[0]);
 
 	if (!isset($poll['pollID'])) {
 		error(101);
 	}
-	
+
 	// check permission
 	if ($groupHandler->getPermission($poll['categoryID']) < WRITE_ACCESS) {
 		error(19);
 	}
 
 	$this->setFile(TEMPLATE_content, "poll/modify.html");
-	$this->setVar("TITLE", HEADING." - Modify Poll");	
-	
+	$this->setVar("TITLE", HEADING." - Modify Poll");
+
+	$closeDate = new Alaress_Date_Format($poll['close'], 'U');
+
 	$output = array(
 		'ACTION'					=> 'Modify',
 		'POLL_ID'					=> $poll['pollID'],
@@ -39,13 +41,13 @@ if (is_numeric($this->arg[0])) {
 		'OPTION_7'					=> $poll['option_7'],
 		'OPTION_8'					=> $poll['option_8'],
 		'OPTION_9'					=> $poll['option_9'],
-		'CLOSE'						=> outputDate("d/m/Y", $poll['close']),
+		'CLOSE'						=> $closeDate->getDateOnly(),
 		'FREQUENCY_ONCE_SELECTED'	=> '',
 		'FREQUENCY_HOURLY_SELECTED'	=> '',
 		'FREQUENCY_DAILY_SELECTED'	=> '',
 		'FREQUENCY_' . strtoupper($poll['frequency']) . '_SELECTED'	=> 'selected="selected"',
 	);
-					
+
 	$this->setVar($output);
 }
 else if (is_numeric($this->arg[1])) {

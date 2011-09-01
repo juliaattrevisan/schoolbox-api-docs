@@ -27,7 +27,14 @@ abstract class Alaress_Date_Strategy_Abstract {
 	private $locale = null;
 
 	public function __construct($dateTime, $inputDateFormat) {
-		if ($inputDateFormat !== null) {
+
+		/* Support for unix timestamp variant by converting it to a db format
+		 */
+		if ($inputDateFormat == 'U') {
+			$dateTime = date('Y-m-d H:i:s', $dateTime);
+			$this->setInputDateFormat('y-m-d h:i:s');
+		}
+		else if ($inputDateFormat !== null) {
 			$this->setInputDateFormat($inputDateFormat);
 		}
 

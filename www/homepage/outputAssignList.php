@@ -10,10 +10,13 @@ $this->setBlock($componentHandle, "assign", "assign_block");
 if (is_array($assignmentList)) {
 	foreach ($assignmentList as $assignment) {
 
-		if($assignment['date'])
-			$date = outputDate("jS M", $assignment['date']);
-		else
+		if ($assignment['date']) {
+			$dateObj = new Alaress_Date_Format($assignment['date'], 'U');
+			$date = $dateObj->getDateOnly();
+		}
+		else {
 			$date = "No date";
+		}
 
 		//if staff or student is enrolled and there is work due provide a link
 		if($enroled)
@@ -27,7 +30,7 @@ if (is_array($assignmentList)) {
 		}
 		else
 			$dueDate = $date;
-			
+
 			$this->setVar("ASSIGN_DATE", $dueDate);
 
 		//set name
@@ -42,12 +45,12 @@ if (is_array($assignmentList)) {
 		}
 		else
 			$this->setVar("ASSIGN_NAME", scrubTEXT($assignment['name']));
-		
+
 		$this->setVar("ASSIGN_COMMENT", nl2br(scrubTEXT($assignment['comment'])));
-		
+
 		$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 		$this->parse("assign_block", "assign", true);
-		
+
 
 
 
@@ -57,9 +60,9 @@ if (is_array($assignmentList)) {
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_ass", "submit_ass_block");
-if($permission < WRITE_ACCESS)		
+if($permission < WRITE_ACCESS)
 	$this->setVar("submit_ass_block", "");
 else
-	$this->parse("submit_ass_block", "submit_ass");	
+	$this->parse("submit_ass_block", "submit_ass");
 
 ?>

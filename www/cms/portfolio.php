@@ -105,10 +105,12 @@ if (is_array($fileList) && count($fileList) > 0) {
 		// icon
 		$class[] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
 
+		$modifiedTime = new Alaress_Date_Format($file['submitted'], 'U');
+
 		$output = array('FILE_ID' 	 	=> $file['id'],
 						'TYPE'			=> 'file',
 						'FILE_NAME' 	=> scrubText($file['description']),
-						'FILE_MODIFIED'	=> outputDate(Cfg::get('date_short'), $file['submitted']),
+						'FILE_MODIFIED'	=> $modifiedTime->getShort(),
 						'FILE_SIZE'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",
 						'FOLDER_ID'		=> $file['parent'],
 						'CLASS'			=> implode(" ", $class),

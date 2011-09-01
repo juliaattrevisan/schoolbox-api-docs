@@ -12,6 +12,8 @@
 interface Alaress_Date_Format_Interface {
 	public function getUnixTimestamp();
 	public function getDatabase();
+	public function getLong();
+	public function getShort();
 	public function getDateOnly();
 	public function getAustralian();
 }

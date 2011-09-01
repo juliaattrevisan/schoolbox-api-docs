@@ -62,8 +62,10 @@ $page->setVar($output);
 
 if (is_array($eventList)) {
 	foreach ($eventList as $event) {
+		$date = new Alaress_Date_Format($event['date']);
+
 		$output = array('EVENT_ID'	=> $event['eventID'],
-						'DATE'		=> outputDate('l, jS M Y', $event['date']),
+						'DATE'		=> $date->getDateOnly(),
 						'START'		=> $event['startTime'],
 						'FINISH'	=> $event['finishTime'],
 						'NAME'		=> scrubText($event['name']),

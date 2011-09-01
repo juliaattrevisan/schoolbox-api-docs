@@ -16,12 +16,48 @@
 class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Interface {
 
 	/**
-	 * Transform the datetime into a unix timestamp
+	 * Transform the datetime into a localised version
 	 *
 	 * @return string
 	 */
-	public function getUnixTimeStamp() {
-		return $this->getUsingFormat($this->getLocale()->timestampFormat());
+	public function getLocal() {
+		return $this->getUsingFormat($this->getLocale()->localFormat());
+	}
+
+	/**
+	 * Transform the datetime into a localised short version
+	 *
+	 * @return string
+	 */
+	public function getLocalShort() {
+		return $this->getUsingFormat($this->getLocale()->localShortFormat());
+	}
+
+	/**
+	 * Transform the datetime into an Australianised version
+	 *
+	 * @return string
+	 */
+	public function getAustralian() {
+		return $this->getLocal();
+	}
+
+	/**
+	 * Use long format
+	 *
+	 * @return string
+	 */
+	public function getLong() {
+		return $this->getUsingFormat($this->getLocale()->longFormat());
+	}
+
+	/**
+	 * Use short format
+	 *
+	 * @return string
+	 */
+	public function getShort() {
+		return $this->getUsingFormat($this->getLocale()->shortFormat());
 	}
 
 	/**
@@ -34,12 +70,12 @@ class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract implement
 	}
 
 	/**
-	 * Transform the datetime into an Australianised version
+	 * Get the date only
 	 *
 	 * @return string
 	 */
-	public function getAustralian() {
-		return $this->getUsingFormat($this->getLocale()->localFormat());
+	public function getTimeOnly() {
+		return $this->getUsingFormat($this->getLocale()->timeFormat());
 	}
 
 	/**
@@ -62,6 +98,33 @@ class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract implement
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Transform the datetime into a database date
+	 *
+	 * @return string
+	 */
+	public function getDatabaseDate() {
+		return $this->getUsingFormat($this->getLocale()->databaseDateFormat());
+	}
+
+	/**
+	 * Transform the datetime into a database time
+	 *
+	 * @return string
+	 */
+	public function getDatabaseTime() {
+		return $this->getUsingFormat($this->getLocale()->databaseTimeFormat());
+	}
+
+	/**
+	 * Transform the datetime into a unix timestamp
+	 *
+	 * @return string
+	 */
+	public function getUnixTimeStamp() {
+		return $this->getUsingFormat($this->getLocale()->timestampFormat());
 	}
 
 	/**

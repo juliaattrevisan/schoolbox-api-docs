@@ -44,17 +44,20 @@ if (is_array($tutorList)) {
 					$emailObj = new Email();
 					$email = $emailObj->formatEmailFromArray($user);
 
+					$markedDate = new Alaress_Date_Format($event['marked'], 'U');
+					$eventDate = new Alaress_Date_Format($event['date'], 'U');
+
 					$output = array($user['uid'],
 								  	$user['synergy_id'],
 									$user['title'],
 									$user['firstname'],
 									$user['lastname'],
 									$email,
-									outputDate('Y-m-d', $event['marked']),
+									$markedDate->getLocalShort(),
 									scrubText($event['name']),
 									scrubText($event['code']),
 									$event['typeName'],
-									outputDate('Y-m-d', $event['date']),
+									$eventDate->getLocalShort(),
 									$event['start'],
 									$event['finish'],
 									$event['enrolled'],
@@ -70,8 +73,10 @@ if (is_array($tutorList)) {
 	}
 }
 
+$fromDate = new Alaress_Date_Format($from);
+$toDate = new Alaress_Date_Format($to);
+
 header('Content-type: text/csv');
-header('Content-Disposition: inline; filename="hours-performed-'.outputDate('dMY', $from).'-'.outputDate('dMY', $to).'.csv"');
+header('Content-Disposition: inline; filename="hours-performed-'. $fromDate->getLocalShort() .'-'. $toDate->getLocalShort() .'.csv"');
 print $line;
 
-?>

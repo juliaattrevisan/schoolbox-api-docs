@@ -38,6 +38,8 @@ if (is_numeric($this->arg[0])) {
 	$diff = &new Text_Diff(str_split($from['body']), str_split($to['body']));
 	$renderer = &new Text_Diff_Renderer_inline();
 
+	$modifiedDate = new Alaress_Date_Format($from['modified'], 'U');
+
 	$this->setVar(array(
 			'WIKI_ID'          => $from['wikiID'],
 			'CATEGORY_ID'      => $from['categoryID'],
@@ -45,7 +47,7 @@ if (is_numeric($this->arg[0])) {
 			'TO_ID'            => $to['revisionID'],
 			'HEADING'          => scrubText($from['heading']),
 			'DIFF'             => $renderer->render($diff),
-			'MODIFIED'         => outputDate(Cfg::get('date_long'), $from['modified']),
+			'MODIFIED'         => $modifiedDate->getLong(),
 			'AUTHOR'           => $userHandler->formatName($from),
 			'AUTHOR_ID'        => $from['authorID'],
 			'CURRENT_REVISION' => $from['revisionID'],
@@ -60,11 +62,13 @@ if (is_numeric($this->arg[0])) {
 		foreach ($revisionList as $revision) {
 			$i++;
 
+			$revisionDate = new Alaress_Date_Format($revision['created'], 'U');
+
 			$output = array(
 					'WIKI_ID'           => $from['wikiID'],
 					'REVISION_ID'       => $from['revisionID'],
 					'REVISION_COMPARE'  => $revision['revisionID'],
-					'REVISION_DATE'     => outputDate(Cfg::get('date_notime'), $revision['created']),
+					'REVISION_DATE'     => $revisionDate->getDateOnly(),
 					'REVISION_HEADING'	=> scrubText($revision['heading']),
 					'REVISION_AUTHOR'	=> $userHandler->formatName($revision),
 			);

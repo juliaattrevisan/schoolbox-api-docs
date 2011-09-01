@@ -5,8 +5,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/mssql.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
 
-			
-		
+
+
 $page = new SitePage;
 $eventHandler = new Event;
 $userHandler = new User;
@@ -16,25 +16,25 @@ $query = "SELECT * FROM ".TUTORIAL_db.".tutorialTemp ";
 $eventList = $eventHandler->db->getAll($query);
 if (is_array($eventList)) {
 	foreach ($eventList as $event) {
-		
+
 		$date = strtotime($event['date'], mktime(0,0,0,8,9,2010));
-		
+
 		if ($date < 86400) {
 			//print "{$event['name']} - invalid date\n";
 			continue;
 		}
-		
+
 		$start = strtotime($event['date'] . ' pm');
-		
+
 		// get class
 		$query = "SELECT * FROM ".TUTORIAL_db.".luClass WHERE `class` = " . $eventHandler->db->smartQuote($event['name']) . " OR `code` = " .  $eventHandler->db->smartQuote($event['code']);
 		$class = $eventHandler->db->getRow($query);
-		
+
 		if (!isset($class['classID'])) {
 			die("no class for " . $event['name'] . " / " . $event['code']);
 			continue;
 		}
-		
+
 		// get tutor
 		$names = explode(" ", $event['tutor']);
 		$firstname = array_shift($names);
@@ -46,29 +46,29 @@ if (is_array($eventList)) {
 					  WHERE ((vCommunityAddressesConstit.ConstitCode='TUTRES2010') OR (vCommunityAddressesConstit.ConstitCode='TUTNONRES2010'))
 					  AND Given1 = ".$eventHandler->db->smartQuote($firstname)." AND Surname = ".$eventHandler->db->smartQuote($surname)."";
 		$tutor = $mssql->getRow($query);
-		
+
 		$event['tutor'] = trim($event['tutor']);
-		
+
 		if ($event['tutor'] == 'Dirk den Hartog')
 			$tutor['synergy_id'] = 20252;
         elseif ($event['tutor'] == 'Jess Corbett')
-            $tutor['synergy_id'] = 19150;			
+            $tutor['synergy_id'] = 19150;
         elseif ($event['tutor'] == 'Ghazi Ahamat')
-            $tutor['synergy_id'] = 19600;			
+            $tutor['synergy_id'] = 19600;
         elseif ($event['tutor'] == 'Alan Horsfall')
             $tutor['synergy_id'] = 7719;
         elseif ($event['tutor'] == 'Fi Belcher')
-            $tutor['synergy_id'] = 20868;  
+            $tutor['synergy_id'] = 20868;
         elseif ($event['tutor'] == 'Josh Mendelsohn')
-            $tutor['synergy_id'] = 16651;   
-                    
-			
+            $tutor['synergy_id'] = 16651;
+
+
 //		elseif ($event['tutor'] == 'David Jones')
 //			$tutor['synergy_id'] = 1008;
 //		elseif ($event['tutor'] == 'Jeremy Rosen')
-//			$tutor['synergy_id'] = 20072;	
+//			$tutor['synergy_id'] = 20072;
 //		elseif ($event['tutor'] == 'Ben Dowdle')
-//			$tutor['synergy_id'] = 10691;	
+//			$tutor['synergy_id'] = 10691;
 //		elseif ($event['tutor'] == 'Bei En Zou')
 //			$tutor['synergy_id'] = 21191;
 //		elseif ($event['tutor'] == 'Ben Bowring')
@@ -84,7 +84,7 @@ if (is_array($eventList)) {
 //		elseif ($event['tutor'] == 'Chris Wareham')
 //			$tutor['synergy_id'] = 21532;
 //		elseif ($event['tutor'] == 'Tim McEvoy')
-//			$tutor['synergy_id'] = 8274;	
+//			$tutor['synergy_id'] = 8274;
 //		elseif ($event['tutor'] == 'Tom Graham')
 //			$tutor['synergy_id'] = 9285;
 //		elseif ($event['tutor'] == 'Nik Parkin')
@@ -104,12 +104,12 @@ if (is_array($eventList)) {
 //			$tutor['synergy_id'] = 10683;
 //		elseif ($event['tutor'] == 'TBA')
 //			$tutor['synergy_id'] = 0;
-			
+
 		if (!isset($tutor['synergy_id'])) {
 			print $event['tutor']." no synergy_id found \n"; //die("{$event['tutor']} not in synergy");
 			continue;
 		}
-		
+
 		if ($tutor['synergy_id'] > 0) {
 			$user = $userHandler->getBySynergy($tutor['synergy_id']);
 			if (!isset($user['uid'])) {
@@ -117,47 +117,50 @@ if (is_array($eventList)) {
 				continue;
 			}
 		}
-		
+
+		$startDate = new Alaress_Date_Format($start, 'U');
+		$finishDate = new Alaress_Date_Format(strtotime("+1 hour", $start), 'U');
+
 		$data = array('typeID'		=> 1,
 					  'classID'		=> $class['classID'],
 					  'name'		=> $class['class'],
 					  'code'		=> $class['code'],
 					  'location'	=> $event['location'],
-					  'start'		=> outputDate("H:i:s", $start),
-					  'finish'		=> outputDate("H:i:s", strtotime("+1 hour", $start)),
+					  'start'		=> $startDate->getDatabaseTime(),
+					  'finish'		=> $finishDate->getDatabaseTime(),
 					  'tutor1ID'	=> $user['uid'],
 					  );
-		
+
 		// calculate date sequence
-		
+
 
 		$dateArray = array();
-		$until = mktime(12,0,0,10,4,2010);						   
+		$until = mktime(12,0,0,10,4,2010);
 		$validRepeat = array('weekly' => '+1 week', 'fortnightly' => '+2 weeks', 'monthly' => '+1 month');
 		$repeat = 'weekly';
 		if (isset($validRepeat[$repeat]) && $until) {
 			$i = 0;
 			for ($date; $date <= $until; $date = strtotime($validRepeat[$repeat], $date)) {
 				if ($i++ > 100) break;
-				
+
 				/* skip mid semester break */
 				if ($date >= strtotime('2010-09-18 10am') && $date <= strtotime('2010-10-03 2pm'))
 					continue;
-					
+
 				$dateArray[] = date("Y-m-d", $date);
-			}		
-		
+			}
+
 		} else {
 			$dateArray[] = date("Y-m-d", $date);
-		}	  
-			
+		}
+
 		// get sequence
 		$data['sequenceID'] = $eventHandler->getNewSequenceID();
 
 		for ($i = 0; $i < count($dateArray); $i++) {
-		
+
 			$data['date'] = $dateArray[$i];
-		
+
 			// check event doesnt exist
 			$query = "SELECT * FROM ".TUTORIAL_db.".`event` WHERE classID = " . $data['classID'] . " AND `date` = '".$data['date']."'";
 			$current = $eventHandler->db->getRow($query);
@@ -170,9 +173,9 @@ if (is_array($eventList)) {
 				print "skipped {$data['code']} - {$data['name']} on {$data['date']}\n";
 			}
 		}
-		
+
 	}
-	
+
 	print "done\n";
 }
 

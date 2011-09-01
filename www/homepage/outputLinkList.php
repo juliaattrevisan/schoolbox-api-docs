@@ -22,18 +22,21 @@ if (is_array($linkList)) {
 			$linkTarget = 'external';
 		}
 
+		$date = new Alaress_Date_Format($link['submitted'], 'U');
+
 		$output = array(
-				'LINK_ID' => $link['id'],
-				'LINK_NAME' => scrubTEXT($link['description']),
-				'LINK_URL' => $linkUrl,
-				'LINK_TARGET' => $linkTarget,
-				'LINK_POSTED_BY' => $userHandler->formatName($link),
-				'LINK_POSTED_BY_ID' => $link['owner'],
-				'LINK_POSTED_DATE' => outputDate(Cfg::get('date_short'), $link['submitted']),
-				'LINK_COMMENT' => nl2br(scrubTEXT($link['comment'])),
-				'ON_OFF' => ++$j%2? '' : 'dark',
-                'HIDDEN'  => $link['hidden'] ? 'hidden' : '',
-				);
+			'LINK_ID' => $link['id'],
+			'LINK_NAME' => scrubTEXT($link['description']),
+			'LINK_URL' => $linkUrl,
+			'LINK_TARGET' => $linkTarget,
+			'LINK_POSTED_BY' => $userHandler->formatName($link),
+			'LINK_POSTED_BY_ID' => $link['owner'],
+			'LINK_POSTED_DATE' => $date->getShort(),
+			'LINK_COMMENT' => nl2br(scrubTEXT($link['comment'])),
+			'ON_OFF' => ++$j%2? '' : 'dark',
+			'HIDDEN'  => $link['hidden'] ? 'hidden' : '',
+		);
+
 		$this->setVar($output);
 
 		if ($permission < WRITE_ACCESS)

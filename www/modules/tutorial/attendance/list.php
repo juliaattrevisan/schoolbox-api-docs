@@ -60,8 +60,10 @@ $eventList = $eventHandler->getWeek($week);
 $reasonList = $attendanceHandler->getReasonList();
 if (is_array($eventList)) {
 	foreach ($eventList as $event) {
+		$date = new Alaress_Date_Format($event['date'], 'U');
+
 		$output = array('EVENT_ID'		=> $event['eventID'],
-						'EVENT_DATE'	=> outputDate(Cfg::get('date_notime'), $event['date']),
+						'EVENT_DATE'	=> $date->getDateOnly(),
 						'EVENT_START'	=> $event['start'],
 						'EVENT_FINISH'	=> $event['finish'],
 						'EVENT_NAME'	=> scrubText($event['name']),

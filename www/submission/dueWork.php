@@ -107,15 +107,18 @@ if (isset($this->arg[0]))
 if ($selectedDate <= 0)
 	$selectedDate = time();
 
+$selectedDateObj = new Alaress_Date_Format($selectedDate, 'U');
+
 // output general data
-$output = array('CURRENT_DATE'	=> outputDate('F Y', $selectedDate),
-				'NOT_TODAY'		=> date('dmY', $selectedDate) != date('dmY') ? 'not-today' : '',
-				'TODAY_DATE'	=> date('Y-m-d'),
-				'NEXT_MONTH'	=> date('Y-m-d', strtotime('+1 month', $selectedDate)),
-				'PREV_MONTH'	=> date('Y-m-d', strtotime('-1 month', $selectedDate)),
-				'SELECTED_DATE'	=> outputDate('Y-m-d', $selectedDate),
-                'WORK_USER_ID'  => is_numeric($this->arg[1])?$this->arg[1]:$_SESSION['id'],
-				);
+$output = array(
+	'CURRENT_DATE'	=> date('F Y', $selectedDateObj->getUnixTimestamp()),
+	'NOT_TODAY'		=> date('dmY', $selectedDate) != date('dmY') ? 'not-today' : '',
+	'TODAY_DATE'	=> date('Y-m-d'),
+	'NEXT_MONTH'	=> date('Y-m-d', strtotime('+1 month', $selectedDate)),
+	'PREV_MONTH'	=> date('Y-m-d', strtotime('-1 month', $selectedDate)),
+	'SELECTED_DATE'	=> $selectedDateObj->getLocalShort(),
+	'WORK_USER_ID'  => is_numeric($this->arg[1])?$this->arg[1]:$_SESSION['id'],
+);
 
 $this->setVar($output);
 
@@ -157,8 +160,10 @@ for ($i = 0; $i < $totalDays; $i++) {
 
 			$due = ( $event['realname'] && $event['open_date'] < time() && $event['late_date'] > time() && $event['accept_submission'] );
 
+			$date = new Alaress_Date_Format(strtotime($event['date']), 'U');
+
 			$output = array('EVENT_ID'		=> $event['id'],
-							'TIME'			=> outputDate('h:ia', strtotime($event['date'])),
+							'TIME'			=> $date->getTime(),
 							'EVENT'			=> scrubText($event['name']),
 							'EVENT_PAST' 	=> !$due ? 'fade' : '',
 							'EVENT_CAT_ID'	=> $event['category'],

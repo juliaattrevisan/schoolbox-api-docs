@@ -109,8 +109,10 @@ if (is_array($allWork) && count($allWork)) {
 	$this->setVar('action_submit_block', '');
 
 	foreach($allWork as $currentWork) {
+		$workDate = new Alaress_Date_Format($currentWork['date']);
+
 		$this->setVar(array(
-			'WORK_DATE' => outputDate(Cfg::get('date_long'), $currentWork['date']),
+			'WORK_DATE' => $workDate->getLong(),
 			'WORK_MARK' => $currentWork['mark'],
 			'WORK_COMMENT' => $currentWork['comment'],
 			'WORK_BOX_ID' => $currentWork['bid'],
@@ -188,8 +190,10 @@ if (is_array($allWork) && count($allWork)) {
 		$this->setVar('overdue_block', '');
 	}
 
+	$recentSubmissionDate = new Alaress_Date_Format($recentSubmission['date'], 'U');
+
 	$this->setVar(array(
-		'MOST_RECENT_SUBMISSION_DATE' => outputDate(Cfg::get('date_long'), $recentSubmission['date']),
+		'MOST_RECENT_SUBMISSION_DATE' => $recentSubmissionDate->getLong(),
 		'MOST_RECENT_SUBMISSION_FILE_ID' => $recentSubmission['sid'],
 	));
 

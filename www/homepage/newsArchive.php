@@ -40,12 +40,14 @@ if(is_array($newsList)) {
 
 		$poster = $userHandler->formatName($news);
 
+		$postedDate = new Alaress_Date_Format($news['posted'], 'U');
+
 		$output = array(
                     "NEWS_ID"           => $news['id'],
                     "NEWS_HEADING"	=> scrubTEXT($news['heading']),
                     "NEWS_BODY"		=> scrubHTML($news['body']),
                     "EMAIL_CONTACT"	=> "<a href=\"/search/user/{$news['uid']}\">$poster</a>",
-                    "POSTED_DATE"	=> outputDate(Cfg::get('date_short'), $news['posted']),
+                    "POSTED_DATE"	=> $postedDate->getShort()
                 );
 		$this->setVar($output);
 

@@ -32,21 +32,39 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface {
 	}
 
 	/**
-	 * Get a unix timestamp
+	 * Get an Australian format
 	 *
 	 * @return string
 	 */
-	public function getUnixTimestamp() {
-		return $this->getStrategy()->getUnixTimestamp();
+	public function getLocal() {
+		return $this->getStrategy()->getLocal();
 	}
 
 	/**
-	 * Get a database format
+	 * Get an Australian format
 	 *
 	 * @return string
 	 */
-	public function getDatabase() {
-		return $this->getStrategy()->getDatabase();
+	public function getAustralian() {
+		return $this->getStrategy()->getAustralian();
+	}
+
+	/**
+	 * Delegation method to get a long format
+	 *
+	 * @return
+	 */
+	public function getLong() {
+		return $this->getStrategy()->getLong();
+	}
+
+	/**
+	 * Delegation method to get a short format
+	 *
+	 * @return
+	 */
+	public function getShort() {
+		return $this->getStrategy()->getShort();
 	}
 
 	/**
@@ -59,12 +77,48 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface {
 	}
 
 	/**
-	 * Get an Australian format
+	 * Get a time only
 	 *
 	 * @return string
 	 */
-	public function getAustralian() {
-		return $this->getStrategy()->getAustralian();
+	public function getTimeOnly() {
+		return $this->getStrategy()->getTimeOnly();
+	}
+
+	/**
+	 * Delegation method to get a database format
+	 *
+	 * @return
+	 */
+	public function getDatabase() {
+		return $this->getStrategy()->getDatabase();
+	}
+
+	/**
+	 * Delegation method to get a database dateformat
+	 *
+	 * @return
+	 */
+	public function getDatabaseDate() {
+		return $this->getStrategy()->getDatabaseDate();
+	}
+
+	/**
+	 * Delegation method to get a database timeformat
+	 *
+	 * @return
+	 */
+	public function getDatabaseTime() {
+		return $this->getStrategy()->getDatabaseTime();
+	}
+
+	/**
+	 * Get a unix timestamp
+	 *
+	 * @return string
+	 */
+	public function getUnixTimestamp() {
+		return $this->getStrategy()->getUnixTimestamp();
 	}
 
 	/**
