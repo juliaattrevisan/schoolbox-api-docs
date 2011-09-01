@@ -3,23 +3,41 @@
 require_once dirname(__FILE__) . '/../include/Bootstrap.php';
 
 class SitePage extends Page {
-
     private $ajax;
 
-       function SitePage($login=TRUE) {
-           parent::Page();
+	public function SitePage($login=TRUE) {
+		parent::Page();
 
 		$this->db = new DeprecatedDatabase;
-           $this->setTab('main');
+		$this->setTab('main');
 
-           if($login)
-               $this->initSession();
+		if ($login) {
+			$this->initSession();
+		}
 
-           $this->setSite();
-       }
+		$this->setSite();
+	}
 
+	/**
+	 * Detect connection type
+	 * Returns the connection type (http:// or https://)
+	 *
+	 * @return string
+	 */
+	public function conType() {
+		$port = getenv("SERVER_PORT");
 
-       function loadContent($pageFile, $execute=TRUE) {
+		if ($port == 80) {
+			$contype = "http://";
+		}
+		else if ($port == 443) {
+			$contype = "https://";
+		}
+
+		return $contype;
+	}
+
+		function loadContent($pageFile, $execute=TRUE) {
            $this->pageName = $pageFile;
 
            /* sanitise data, force all 404s through pageNotFound() */
@@ -182,7 +200,7 @@ class SitePage extends Page {
                }
 
                //if ip tracking enabled ensure user has same ip as when they logged in
-               if(TRACKIP && $_SESSION['ip'] != getIP())
+               if(TRACKIP && $_SESSION['ip'] != Session::getIP())
                        $this->goLoginPage();
 
                //if session remember is disabled and check session has not expired
@@ -336,13 +354,13 @@ class SitePage extends Page {
                }
                else if($this->site == 'shore') {
                    if($this->groupHandler->isStaff()) {
-                       if(strpos(getIP(),'192.168.') === FALSE)
+                       if(strpos(Session::getIP(),'192.168.') === FALSE)
                            $this->setVar('WEBMAIL_LOCATION', 'href="https://mail.shore.nsw.edu.au/exchange/" rel="external"');
                        else
                            $this->setVar('WEBMAIL_LOCATION', 'href="http://shorexch01/exchange" rel="external"');
                    }
                    else if($this->groupHandler->isStudent()) {
-                       if(strpos(getIP(),'192.168.') === FALSE)
+                       if(strpos(Session::getIP(),'192.168.') === FALSE)
                            $this->setVar('WEBMAIL_LOCATION', 'href="https://mail.student.shore.nsw.edu.au/exchange/" rel="external"');
                        else
                            $this->setVar('WEBMAIL_LOCATION', 'href="http://cassandra/exchange" rel="external"');
@@ -390,7 +408,7 @@ class SitePage extends Page {
            if($this->site == 'shore') {
                $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
                if($this->groupHandler->isStaff()) {
-                   if(strpos(getIP(),'192.168.') === FALSE)
+                   if(strpos(Session::getIP(),'192.168.') === FALSE)
                            $this->setVar('MYFILES_LOCATION', 'https://mail.shore.nsw.edu.au/fileway');
                    else
                            $this->setVar('MYFILES_LOCATION', 'http://shorexch01/fileway');
@@ -398,7 +416,7 @@ class SitePage extends Page {
                    $this->parse('mf_tab', 'myfiles_tab');
                }
                else if($this->groupHandler->isStudent()) {
-                   if(strpos(getIP(),'192.168.') === FALSE)
+                   if(strpos(Session::getIP(),'192.168.') === FALSE)
                            $this->setVar('MYFILES_LOCATION', 'https://mail.student.shore.nsw.edu.au/fileway');
                    else
                            $this->setVar('MYFILES_LOCATION', 'http://cassandra/fileway');
@@ -628,7 +646,7 @@ class SitePage extends Page {
        }
 
        function localRedir($file) {
-               $contype = conType();
+               $contype = $this->conType();
                header("Location: ".$contype.$_SERVER['HTTP_HOST'].$file);
                exit;
        }

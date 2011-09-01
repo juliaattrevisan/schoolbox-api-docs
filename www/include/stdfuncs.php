@@ -8,17 +8,17 @@
 *                                                           *
 ************************************************************/
 
-//returns the connection type (http:// or https://)
-function conType() {
-        //detect connection type
-        $port = getenv("SERVER_PORT");
-        if($port == 80)
-                $contype = "http://";
-        else if($port == 443)
-                $contype = "https://";
-
-        return $contype;
-}
+////returns the connection type (http:// or https://)
+//function conType() {
+//        //detect connection type
+//        $port = getenv("SERVER_PORT");
+//        if($port == 80)
+//                $contype = "http://";
+//        else if($port == 443)
+//                $contype = "https://";
+//
+//        return $contype;
+//}
 
 //Function for handling error conditions
 function error($ec, $message="") {
@@ -36,7 +36,8 @@ function error($ec, $message="") {
 
 //Function for redirecting to a specified file
 function localRedir($file) {
-        $contype = conType();
+		require_once dirname(__FILE__) . '/../../include/SitePage.php';
+        $contype = SitePage::conType();
         header("Location: ".$contype.$_SERVER['HTTP_HOST'].$file);
         exit;
 }
