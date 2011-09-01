@@ -50,15 +50,15 @@ function goLoginPage()
 		$page->goLoginPage();
 }
 
-//function for returning user ip (tries to work around issues with proxies)
-function getIP()
-{
-	if ($_SERVER['HTTP_CLIENT_IP']) $ip = $_SERVER['HTTP_CLIENT_IP'];
-	else if($_SERVER['HTTP_X_FORWARDED_FOR']) $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-	else if($_SERVER['REMOTE_ADDR']) $ip = $_SERVER['REMOTE_ADDR'];
-	else $ip = "UNKNOWN";
-	return $ip;
-}
+////function for returning user ip (tries to work around issues with proxies)
+//function getIP()
+//{
+//	if ($_SERVER['HTTP_CLIENT_IP']) $ip = $_SERVER['HTTP_CLIENT_IP'];
+//	else if($_SERVER['HTTP_X_FORWARDED_FOR']) $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+//	else if($_SERVER['REMOTE_ADDR']) $ip = $_SERVER['REMOTE_ADDR'];
+//	else $ip = "UNKNOWN";
+//	return $ip;
+//}
 
 function scrubHTML($html) {
 	require_once dirname(__FILE__) . '/../../include/HTMLPurifier/HTMLPurifier.auto.php';

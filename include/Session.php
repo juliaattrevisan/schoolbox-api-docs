@@ -6,6 +6,29 @@ class Session {
       $this->db = new DeprecatedDatabase;
     }
 
+	/**
+	 * Function for returning user ip (tries to work around issues with proxies)
+	 * Access it via Session class
+	 *
+	 * @return string
+	 */
+	public function getIP() {
+		if ($_SERVER['HTTP_CLIENT_IP']) {
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		}
+		else if ($_SERVER['HTTP_X_FORWARDED_FOR']) {
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		}
+		else if($_SERVER['REMOTE_ADDR']) {
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+		else {
+			$ip = "UNKNOWN";
+		}
+
+		return $ip;
+	}
+
     public function create($username) {
         require_once(dirname(__FILE__)  .'/../library/user.php');
         require_once(dirname(__FILE__)  .'/../library/group.php');
@@ -20,7 +43,7 @@ class Session {
 
         $user = $userHandler->getByUsername($username);
 
-        $ip = getIP();
+        $ip = Session::getIP();
 
         if(is_array($user)) {
 
@@ -100,7 +123,7 @@ class Session {
             $result = $this->authenticateSQL($username, $password);
 	}
 
-        $ip = getIP();
+        $ip = Session::getIP();
 
         if ($result) {
             /* Log successful */
@@ -189,7 +212,7 @@ class Session {
     {
         // Function to check that host isnt brute forceing the login
         // Returns true if too many logins false if ok
-        $ip = getIP();
+        $ip = Session::getIP();
         $graceperiod = time() - Cfg::get('login_grace');
 
         $query = "SELECT id FROM login_log WHERE ip = '$ip' AND login = '0' AND date > FROM_UNIXTIME($graceperiod)";
