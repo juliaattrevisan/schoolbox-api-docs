@@ -8,18 +8,6 @@
 *                                                           *
 ************************************************************/
 
-////returns the connection type (http:// or https://)
-//function conType() {
-//        //detect connection type
-//        $port = getenv("SERVER_PORT");
-//        if($port == 80)
-//                $contype = "http://";
-//        else if($port == 443)
-//                $contype = "https://";
-//
-//        return $contype;
-//}
-
 //Function for handling error conditions
 function error($ec, $message="") {
 	global $page;
@@ -42,23 +30,13 @@ function localRedir($file) {
         exit;
 }
 
-//This function is used when the session is not correct simply redirects
-//user to login page with the requested url
-function goLoginPage()
-{
-		require_once dirname(__FILE__) . '/../../include/SitePage.php';
-		$page = new SitePage;
-		$page->goLoginPage();
-}
-
-////function for returning user ip (tries to work around issues with proxies)
-//function getIP()
+////This function is used when the session is not correct simply redirects
+////user to login page with the requested url
+//function goLoginPage()
 //{
-//	if ($_SERVER['HTTP_CLIENT_IP']) $ip = $_SERVER['HTTP_CLIENT_IP'];
-//	else if($_SERVER['HTTP_X_FORWARDED_FOR']) $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-//	else if($_SERVER['REMOTE_ADDR']) $ip = $_SERVER['REMOTE_ADDR'];
-//	else $ip = "UNKNOWN";
-//	return $ip;
+//		require_once dirname(__FILE__) . '/../../include/SitePage.php';
+//		$page = new SitePage;
+//		$page->goLoginPage();
 //}
 
 function scrubHTML($html) {
@@ -89,36 +67,3 @@ function scrubTEXT($text) {
 	//$text = scrubHTML($text);
 	return $text;
 }
-
-//function outputDate($format, $date) {
-//	//this function attempts to remove output issues associated with mysql dates
-//	//removes null dates and times
-//
-//	if($date == '0000-00-00' || $date == '0000-00-00 00:00:00' || $date < 1)
-//		return '';
-//
-//	//if format contains a time check if it is null if so remove the time from the format
-//	if(strpos($format, ':')) {
-//		$time = date('g:ia',$date);
-//		if($time == '12:00am') {
-//			$format = preg_replace('/[a-z]:[a-z]+/i','',$format);
-//			return date($format, $date);
-//		}
-//	}
-//
-//	return date($format, $date);
-//}
-//
-///**
-// * Converts component-based date/time into database-friendly format
-// *
-// * @param  $date
-// * @param  $hour
-// * @param  $minute
-// * @param  $period
-// * @return string
-// */
-//function getDateTimeByComponents($date, $hour, $minute, $period) {
-//	return date(Cfg::get('date_database'), strtotime(scrubTEXT(str_replace('/', '-', $date) . " {$hour}:{$minute}{$period}")));
-//}
-?>

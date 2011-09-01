@@ -2,21 +2,31 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/conf/conf.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/include/stdfuncs.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/include/Session.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/include/SitePage.php');
 
 session_start();
 
+$gotoLoginPage = false;
+
 if (!isset($_SESSION['id'])) {
-	goLoginPage();
+	$gotoLoginPage = true;
 }
 
 //if ip tracking enabled ensure user has same ip as when they logged in
 if (TRACKIP && $_SESSION['ip'] != Session::getIP()) {
-	goLoginPage();
+	$gotoLoginPage = true;
 }
 
 //if session remember is disabled and check session has not expired
 if (!$_SESSION['remember'] && (($_SESSION['lasttime'] + SESSIONLENGTH) < mktime())) {
-	goLoginPage();
+	$gotoLoginPage = true;
+}
+
+/* Go to login page if any of the above conditions are defeated
+ */
+if ($gotoLoginPage === true) {
+	$page = new SitePage;
+	$page->goLoginPage();
 }
 
 //reset session timer

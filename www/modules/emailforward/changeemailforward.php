@@ -2,6 +2,7 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/include/session.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/conf/conf.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/include/stdfuncs.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/include/SitePage.php');
 
 include ('./createlm.php');
 
@@ -25,7 +26,8 @@ function getLDAPdn ($username) {
 # Check if has a valid session, otherwise, take to login page
 session_start();
 if ( !isset($_SESSION['id']) ) {
-        goLoginPage();
+	$page = new SitePage;
+	$page->goLoginPage();
 }
 
 # Get username based on userID
@@ -57,10 +59,10 @@ if ($newpassword1 == $newpassword2) {
 
    if($ldapbind) {
       print "<p>Changing password ...";
-      if(ldap_mod_replace ($ldapconn, $dn, $passwordarray)) { 
-         print " success"; 
-      } else { 
-         print " failed!"; 
+      if(ldap_mod_replace ($ldapconn, $dn, $passwordarray)) {
+         print " success";
+      } else {
+         print " failed!";
       }
    } else {
       print "Connection failed, please retry your password";
