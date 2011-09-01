@@ -2,7 +2,7 @@
 $this->setBlock($component['name'], "rss_stories", "rss_block");
 
 require_once('../library/xml.php');
-$rss = new XML(Cfg::get('welcome_rss_url'), RSS_cache_time);
+$rss = new Xml(Cfg::get('welcome_rss_url'), RSS_cache_time);
 	
 $this->setVar('RSS_NAME', $rss->channel->title);
 $this->setVar('RSS_LINK', base64_encode($rss->channel->link) );

@@ -65,6 +65,7 @@ class Component_InstanceMapper extends Mapper {
             LEFT JOIN `component_definition` cd ON ci.component_definition_id = cd.id
             WHERE `module` = :module
                 AND `identifier` = :identifier
+            ORDER BY ci.sequence ASC
         ");
 
         $statement->bindParam(":module", $module);

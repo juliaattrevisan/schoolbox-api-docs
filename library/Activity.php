@@ -7,9 +7,9 @@
 
 //display what has change since the last login for the user
 
-class WhatsNew
+class Activity
 {
-	function WhatsNew()
+	function Activity()
 	{
 		//setup db
 		$this->db = new DeprecatedDatabase;

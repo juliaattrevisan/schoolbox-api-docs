@@ -2,7 +2,7 @@
 
 define('RSS_cache_time', 3000);
 
-class XML {
+class Xml {
     public $xml;
 
     function __construct ($url, $cache_time = 7200) {

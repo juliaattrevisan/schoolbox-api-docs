@@ -74,7 +74,7 @@ class PEAR_XMLParser
     }
 
     /**
-     * @param string xml content
+     * @param string Xml content
      * @return true|PEAR_Error
      */
     function parse($data)
@@ -164,7 +164,7 @@ class PEAR_XMLParser
      * End element handler for XML parser
      *
      * @access private
-     * @param  object XML parser object
+     * @param  object Xml parser object
      * @param  string
      * @return void
      */
@@ -249,7 +249,7 @@ class PEAR_XMLParser
      * Handler for character data
      *
      * @access private
-     * @param  object XML parser object
+     * @param  object Xml parser object
      * @param  string CDATA
      * @return void
      */

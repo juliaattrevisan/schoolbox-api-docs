@@ -1,10 +1,10 @@
 <?php
 
-require_once("news/whatsnew.php");
+require_once("news/Activity.php");
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 
-$whatnew = new WhatsNew();
+$whatnew = new Activity();
 
 $groupHandler = new Group;
 

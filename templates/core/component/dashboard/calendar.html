@@ -1,0 +1,24 @@
+<div class="box text">
+    <h2>Today's Events <span>- <a href="/calendar/week/">{DATE}</a></span></h2>
+
+    <div class="listing">
+        <ul class="js_happening">
+            <!-- BEGIN note_block -->
+            <li class="clearfix">
+                <p class="interact-left home-calendar">{TIME}&nbsp;</p>
+                <h4 class="eventListing" style="background-color:{COLOUR}">{NOTE}</h4>
+                <div class="hidden-fields clearfix">
+                    <h4><!-- BEGIN time -->
+                        <span class="time"><strong>{TIME}</strong></span>
+                        <!-- END time -->{NOTE}
+                    </h4>
+                    <p class="meta">Event Type: {TYPE}<br/>
+                        Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br/>
+                        {LOCATION} {DETAIL}</p>
+                    <div class="modify">{MODIFY}</div>
+                </div>
+            </li>
+            <!-- END note_block -->
+        </ul>
+    </div>
+</div>

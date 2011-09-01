@@ -7,7 +7,7 @@ $this->setVar('podcast_list_block', '');
 require_once SITE_root.'/library/xml.php';
 
 if(!empty($config['url'])) {
-    $xml = new XML($config['url']);
+    $xml = new Xml($config['url']);
     if( $xml->channel) {
         $this->setVar('PODCAST_COMPONENT_TITLE', scrubText($xml->channel->title));
         $j = 0;

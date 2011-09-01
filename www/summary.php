@@ -84,7 +84,7 @@ else
 
 //$weather = new Weather("All", WEATHER_LOCATION);
 $location = empty($_GET['location']) ? Cfg::get('weather_location') : $_GET['location'];
-$weather = new XML('http://www.google.com/ig/api?weather=' . urlencode("Melbourne, Victoria"), 60*60 );
+$weather = new Xml('http://www.google.com/ig/api?weather=' . urlencode("Melbourne, Victoria"), 60*60 );
 
 	
 for($i = 1; $i <= 3; $i++) {

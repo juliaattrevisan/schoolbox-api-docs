@@ -13,7 +13,7 @@ if (extension_loaded('xhprof')) {
 if ( isset($_GET['page']) ) {
     $pageName = $_GET['page'];
 } else {
-    $pageName = 'home';
+    $pageName = 'dashboard';
 }
 
 $page = new SitePage();
