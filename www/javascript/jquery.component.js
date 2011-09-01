@@ -1,207 +1,445 @@
-$j(function() {
+setupCustomise = {
+	
+	emptyColumnCheck: function(target) {
+		for (i=0; i < target.length; i++ ) {
+			var column = $j(target[i]);			
+			if (column.find('.box').length == 0) {
+				column.addClass('empty-column');
+				if ($j('#tabs-homepage').is(':visible')) {
+					$j('.empty-column').each(function() {
+						$j(this).show();
+					})
+				}
+				column.html('<p class="placeholder">You can drag components into this space.</p>');
+			} else {
+				column.children('.placeholder').remove();
+				column.removeClass('empty-column');
+			}
+		}
+	},
+	
+	customisationDropdown: {
+
+        /**
+        * Sets up the tabs and then one by one initialises the three tabs contained
+		 * within the dropdown panel.
+		* 
+        */
+		init: function() { 
+			$j('#tabs-homepage').tabs();
+			$j('#tabs-sub').tabs();
+			$j('.customise').click(function(event) {
+				$j('#tabs-homepage, .empty-column').slideToggle();
+				$j(this).children('span').toggle();
+				$j('h2.hide').each(function () {
+					$j(this).toggle();
+				});
+				return false;
+			});
+			this.customisationDropdown.colours();
+			this.customisationDropdown.components();
+			this.customisationDropdown.columnWidths();
+		},
+
+		/**
+		 * Allows for control of the components in the customise dropdown.
+		 */
+		components: function() {
+			$j('.add-component strong').each(function() {
+				var howManyInstances = $j(this).children('em').html();
+				if (howManyInstances == 0) {
+					howManyInstances = '<strong>no</strong> instances '
+				} else if (howManyInstances == 1)  {
+					howManyInstances = '<strong>1</strong> instance '
+				} else {
+					howManyInstances = '<strong>' + howManyInstances + '</strong> instances '
+				}
 		
-	/* remove invisible column */
-	$j('div.right:hidden').remove();
+				$j(this).qtip({
+					content: 'You have '+ howManyInstances +'of this component currently active',
+					show: 'mouseover',
+					hide: 'mouseout',
+					position: {
+						corner: {
+							tooltip: 'bottomLeft',
+							target: 'topright'
+						}
+					},
+					api: {
+							// Retrieve the content when tooltip is first rendered
+							 onRender: function()
+							 {
+								var self = this;
+							 }
+						 },
+					style: {
+						background: '#fffde9',
+						color: 'black',
+						border: {
+							width: 3,
+							radius: 4,
+							color: '#fff9bf'
+						},
+						name: 'green' // Inherit from preset style
+				   }
+				});
+			});
+			
+			
+			$j(".add-component a").live('click', function(event) {
+				event.preventDefault();
+				var $this = $j(this);
+				
+				$j.ajax({
+				 type: "POST",
+					url: '/homepage/configForm.php',
+					data: {add : $j(this).attr('rel'), cid : cid },
+					success: function(data){
+						$j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
+							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')])
+							$j(this).animate({opacity:1}, 300);
+							
+						});
+					},
+					dataType: "html"
+				});		
+		
+				if($this.parent().hasClass('one-only')) {
+					$this.parent().addClass('disabled');
+				} else if ($j('.how-many').html() == '') {
+					//if there are no modules but you can add one
+					$this.siblings('.how-many').append('You already have <em>1</em>');
+				} else {
+					//include the current amount of the module
+					var currentCount = Number($this.siblings('strong em'));
+					currentCount++;
+					$this.siblings('strong em').html(currentCount);
+				}
+				
+				if (!$this.siblings('.notification').is(':visible')) {
+					$this.siblings('.notification').fadeIn(200, function() {
+						$j(this).delay(2000).fadeOut();
+					});
+				}
+				
+				var currentAmount = Number($this.siblings('h4').children('strong').children('em').html());
+				currentAmount++;
+				$this.siblings('h4').children('strong').children('em').html(currentAmount);		
+			});		
+		},
+		
+		colours: function() {
+			
+			$j('div.colorBox').each(function () {
+				$j(this).css('backgroundColor', pickers[$j(this).attr('id')]);
+				//$j(this).next().val(pickers[$j(this).attr('id')]);
+			});
+	
+			var f = $j.farbtastic('#picker');
+			f.setColor("#b6b6ff"); //set initial color
+			
+			$j('#head_font').parent().addClass('active-box');
+			var instantColour = new RGBColor($j('#left_head_font').css('background-color'));
+			var initialColour = instantColour.toHex();
+			checkTextColour();
+			$j('#currentColour').css('background-color',initialColour);
+			$j('#currentColour').val(initialColour);
+		
+			f.linkTo(onColorChange);
+		
+			$j('#currentColour').keyup(function() {
+				f.setColor($j(this).val());
+			});
+		
+			function h2d(h) {return parseInt(h,16);}
+		
+			function checkTextColour() {
+				var currentColour = $j('#currentColour').val().substr(1);
+					if (h2d(currentColour) < 4473924) {
+					$j('#currentColour').css('color', '#ffffff');
+				} else {
+					$j('#currentColour').css('color', '#000000');
+				};	
+			};
+			
+			function onColorChange(color) {
+				checkTextColour();
+				var current = $j('.selected');
+				current.css('background-color', color);
+				$j('#currentColour').val(color);
+				$j('#currentColour').css('background-color', color);
+				pickers[current.attr('ID')] = color;
+	
+				switch (current.attr('ID')) {
+					case 'left_bg_primary':
+						return $j('.left .text, .left .listing').css('background-color', color);
+					break;
+					case 'left_bg_secondary':
+						return $j('.left .dark').css('background-color', color);
+					break;
+					case 'left_head_font':
+						return $j('.left h2').css('color', color);
+					break;
+					case 'left_head_bg':
+						return $j('.left h2').css('background-color', color)
+					break;
+					case 'left_font':
+						return $j('.left, .left p').css('color', color)
+					break;	
+					case 'left_link':
+						return $j('.left a').css('color', color);
+					break;	
+					case 'left_hover':
+						return $j('.right a:hover').css('color', color);
+					break;	
+					case 'right_bg_primary':
+						return $j('.right .text, .right .listing').css('background-color', color);
+					break;
+					case 'right_bg_secondary':
+						return $j('.right .dark').css('background-color', color);
+					break;
+					case 'right_head_font':
+						return $j('.right h2').css('color', color);
+					break;
+					case 'right_head_bg':
+						return $j('.right h2').css('background-color', color);
+					break;
+					case 'right_font':
+						return $j('.right, .right p').css('color', color);
+					break;	
+					case 'right_link':
+						return $j('.right a').css('color', color);
+					break;	
+					case 'right_hover':
+						return $j('.right a:hover').css('color', color);
+					break;	
+					default:
+						return $j('.left .text').css('background-color', color);
+					break;
+				}
+			}
 	
 	
-	$j("#slider" ).slider({
-		'min': 30,
-		'max':70,
-		slide: function(event, ui) {
-			$j('.left').css('width', (ui.value-.5)+'%')
-			$j('.right').css('width', (100 - ui.value-.5)+'%')
-		},
-		create: function(event, ui){
-			$j('.ui-slider-handle').append('<span></span>');
-		},
-		'stop':function(event,ui) {
-			var leftColWidth = ui.value-.5;
-			var rightColWidth = 99.5 - ui.value;
-			console.log(leftColWidth, rightColWidth);
-			/*********
-			Oh hello steve ^_^ You will need to save this leftColWidth and rightColWidth and load them onto the
-			/templates/core/homepage/template.html page in their respective tokens:
-
-			{TEMPLATE_LEFT_COLUMN_WIDTH}
-			{TEMPLATE_RIGHT_COLUMN_WIDTH}
-
-			I assume you'll be using something like this here:
-
-			$j.post('/homepage/configForm.php', $j(this).closest('form').serialize(),
+			$j('.colour').click(function(event) {
+				event.preventDefault();
+				$j('.selected').removeClass('selected');
+				$j('.active-box').removeClass('active-box');
+				$j(this).addClass('active-box');
+				$j(this).children('.colorBox').addClass('selected');
+				$j(this).next().next('p').addClass('selected');
+		
+				var color = new RGBColor($j(this).children('.colorBox').css('background-color'));
+		
+				f.setColor(color.toHex());
+				checkTextColour()
+				return false;
+			});	
+			
+			$j("#leftRight").click(function () {	
+				var rightBox;
+				
+				$j('div.leftColumn div.colorBox').each(function () {
+					var str = $j(this).attr('id');
+					var newstr = str.replace(/^.*left_(.*).*$/m, '$1');
+		
+					rightBox = $j('#' + 'right_'+newstr);
+					rightBox.css('backgroundColor', $j(this).css('backgroundColor'));
+					rightBox.next().val($j(this).next().val());
+				});
+		
+				$j('.right .text, .right .listing').css('background-color', $j('.left .text').css('background-color'));
+				$j('.right .dark').css('background-color', $j('.left .dark').css('background-color'));
+				$j('.right, .right p').css('color', $j('.left').css('color'));
+				$j('.right h2').css('background-color', $j('.left h2').css('background-color'));
+				$j('.right, .right p').css('color', $j('.left, .left p').css('color'));
+				$j('.right a').css('color', $j('.left a').css('color'));
+				
+				//send off the pickers correctly.
+				pickers.right_head_font = pickers.left_head_font;
+				pickers.right_head_bg = pickers.left_head_bg;
+				pickers.right_font = pickers.left_font;
+				pickers.right_bg_primary = pickers.left_bg_primary;
+				pickers.right_bg_secondary = pickers.left_bg_secondary;
+				pickers.right_link = pickers.left_link;
+				pickers.right_hover = pickers.left_hover;
+		
+			});
+			
+			$j('#restore').click(function() {
+				$j('.colorBox').each(function () {
+					$j(this).css('background-color', defaults[$j(this).attr('id')]);
+					//$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
+				});
+				
+				$j('.left h2').css({
+					"color": defaults['left_head_font'],
+					"background-color":defaults['left_head_bg']
+				});
+				$j('.left p, .left h3, .left .listing p.small').css("color", defaults['left_font']);
+				$j('.left a, .left .listing p.small a').css('color', defaults['left_link']);
+				$j('.left .box a:hover, .left .listing p.small a:hover').css('color', defaults['left_hover']);
+				$j('.left .text, .left .listing').css('background',defaults['left_bg_primary']);
+				$j('.left .listing .dark ').css('background',defaults['left_bg_secondary']);
+				
+				$j('.right h2').css({
+					"color": defaults['right_head_font'],
+					"background-color":defaults['right_head_bg']
+				});
+				$j('.right p, .right h3, .right .listing p.small').css("color", defaults['right_font']);
+				$j('.right a, .right .listing p.small a').css('color', defaults['right_link']);
+				$j('.right .box a:hover, .right .listing p.small a:hover').css('color', defaults['right_hover']);
+				$j('.right .text, .right .listing').css('background',defaults['right_bg_primary']);
+				$j('.right .listing .dark ').css('background',defaults['right_bg_secondary']);
+				
+				pickers = defaults;
+				
+			});
+				
+			$j('#cancel').click(function() {
+				$j('.colorBox').each(function () {
+					$j(this).css('background-color', original[$j(this).attr('id')]);
+				});
+				
+				$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
+				
+			});
+			
+			$j('#saveColour').click(function () {
+			   $j.post('/homepage/configForm.php', {colors: pickers, cid: cid},
 			   function() {
-					$j('.saved-layout').slideDown(150).delay(2000).slideUp(150);
+					$j('.saved-colours').slideDown(150).delay(2000).slideUp(150);
 			   });
-			********/
-		}
-
-	});
-
-
-	function emptyColumnsCheck(target) {
-		if (target.find('.box').length == 0) {
-			target.addClass('empty-column');
-			if ($j('#tabs-homepage').is(':visible')) {
-				$j('.empty-column').each(function() {
-					$j(this).show();
-				})
-			}
-			target.html('<p class="placeholder">You can drag components into this space.</p>');
-		} else {
-			target.children('.placeholder').remove();
-			target.removeClass('empty-column');
-		}
-	}
-
-	emptyColumnsCheck($j('div.top'))
-	emptyColumnsCheck($j('div.right'))
-	emptyColumnsCheck($j('div.left'))
-
-	$j('div.homepage').sortable({
-		cursor: 'move',
-		distance: 0,
-		dropOnEmpty: true,
-		handle: 'h2',
-		helper: 'clone',
-		items: '.box',
-		placeholder: 'marker',
-		tolerance: 'pointer',
-		zIndex: 2000,
-		start: function() {
-			$j('.marker').text('This is the new position of your component');
+			});	
 		},
-		update: function () {
-			var left = '';
-			var right = '';
-			var top = '';
-			$j('div.left').children('div.box').each(function () {
-				left += $j(this).attr('id').substring(9) + ',';
-			});
-			$j('div.right').children('div.box').each(function () {
-				right += $j(this).attr('id').substring(9) + ',';
-			});
-			$j('div.top').children('div.box').each(function () {
-				top += $j(this).attr('id').substring(9) + ',';
-			});
-			$j.post('/homepage/configForm.php', {cid : cid, type: 'components', column1: left, column2: right, column3: top});
-
-			emptyColumnsCheck($j('div.top'))
-			emptyColumnsCheck($j('div.right'))
-			emptyColumnsCheck($j('div.left'))
-		},
-		sort: function (event, ui) {
-			var leftOffset = $j('div.left').offset();
-			var topOffset = $j('div.top').offset();
-
-			if (event.pageX < (leftOffset.left + $j('div.left').width()) &&
-				event.pageY > (leftOffset.top + $j('div.left').height())) {
-				// left bottom
-				ui.placeholder.appendTo($j('div.left'));
-			}
-			else if (event.pageX > (leftOffset.left + $j('div.left').width()) &&
-					 event.pageY > ($j('div.right').offset().top + $j('div.right').height())) {
-				// right bottom
-				ui.placeholder.appendTo($j('div.right'))
-
-			} else if (event.pageX < (topOffset.left + $j('div.top').width()) &&
-					   event.pageY < (topOffset.top + $j('div.top').height())) {
-				// top bottom
-				if ($j('div.top').find('.box').length == 0) {
-					ui.placeholder.appendTo($j('div.top'));
-				}
-			}
-			$j('.cal-bubble').hide();
-
-		}
-	});
-
-	$j('div.box h2').css('cursor', 'move');
-
-	/* from here down I've changed the component functions!!!!*/
-
-	/*$j('.manage h2, a.folder-manage').each(function () {
-		$j(this).hide();
-	});*/
-
-	$j('#tabs-homepage').tabs();
-	$j('#tabs-sub').tabs();
-
-
-	$j('.add-component strong').each(function() {
-
-		var howManyInstances = $j(this).children('em').html();
-		if (howManyInstances == 0) {
-			howManyInstances = '<strong>no</strong> instances '
-		} else if (howManyInstances == 1)  {
-			howManyInstances = '<strong>1</strong> instance '
-		} else {
-			howManyInstances = '<strong>' + howManyInstances + '</strong> instances '
-		}
-
-		$j(this).qtip({
-			content: 'You have '+ howManyInstances +'of this component currently active',
-			show: 'mouseover',
-			hide: 'mouseout',
-			position: {
-				corner: {
-					tooltip: 'bottomLeft',
-					target: 'topright'
-				}
-			},
-			api: {
-					// Retrieve the content when tooltip is first rendered
-					 onRender: function()
-					 {
-						var self = this;
-					 }
-				 },
-			style: {
-				background: '#fffde9',
-				color: 'black',
-				border: {
-					width: 3,
-					radius: 4,
-					color: '#fff9bf'
+		
+		columnWidths: function() {
+			$j("#slider" ).slider({
+				'min': 30,
+				'max':70,
+				slide: function(event, ui) {
+					$j('.left').css('width', (ui.value-.5)+'%')
+					$j('.right').css('width', (100 - ui.value-.5)+'%')
 				},
-				name: 'green' // Inherit from preset style
-		   }
+				create: function(event, ui){
+					$j('.ui-slider-handle').append('<span></span>');
+				},
+				'stop':function(event,ui) {
+					var leftColWidth = ui.value-.5;
+					var rightColWidth = 99.5 - ui.value;
+					console.log(leftColWidth, rightColWidth);
+					/*********
+					Oh hello steve ^_^ You will need to save this leftColWidth and rightColWidth and load them onto the
+					/templates/core/homepage/template.html page in their respective tokens:
+		
+					{TEMPLATE_LEFT_COLUMN_WIDTH}
+					{TEMPLATE_RIGHT_COLUMN_WIDTH}
+		
+					I assume you'll be using something like this here:
+		
+					$j.post('/homepage/configForm.php', $j(this).closest('form').serialize(),
+					   function() {
+							$j('.saved-layout').slideDown(150).delay(2000).slideUp(150);
+					   });
+					********/
+				}
+				
+			});
+			$j('#saveTemplate').click(function () {
+				$j.post(
+					'/homepage/configForm.php', 
+					$j(this).closest('form').serialize(),
+					function() {$j('.saved-layout').slideDown(150).delay(2000).slideUp(150);}
+				);
+			})
+		}			
+	},
+	
+	sortComponents: function() { 
+	
+		$j('div.homepage').sortable({
+			cursor: 'move',
+			distance: 0,
+			dropOnEmpty: true,
+			handle: 'h2',
+			helper: 'clone',
+			items: '.box',
+			placeholder: 'marker',
+			tolerance: 'pointer',
+			zIndex: 2000,
+			start: function() {
+				$j('.marker').text('This is the new position of your component');
+			},
+			update: function () {
+				var left = '';
+				var right = '';
+				var top = '';
+				$j('div.left').children('div.box').each(function () {
+					left += $j(this).attr('id').substring(9) + ',';
+				});
+				$j('div.right').children('div.box').each(function () {
+					right += $j(this).attr('id').substring(9) + ',';
+				});
+				$j('div.top').children('div.box').each(function () {
+					top += $j(this).attr('id').substring(9) + ',';
+				});
+				$j.post('/homepage/configForm.php', {cid : cid, type: 'components', column1: left, column2: right, column3: top});
+	
+				setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')])
+			},
+			sort: function (event, ui) {
+				var leftOffset = $j('div.left').offset();
+				var topOffset = $j('div.top').offset();
+	
+				if (event.pageX < (leftOffset.left + $j('div.left').width()) &&
+					event.pageY > (leftOffset.top + $j('div.left').height())) {
+					// left bottom
+					ui.placeholder.appendTo($j('div.left'));
+				}
+				else if (event.pageX > (leftOffset.left + $j('div.left').width()) &&
+						 event.pageY > ($j('div.right').offset().top + $j('div.right').height())) {
+					// right bottom
+					ui.placeholder.appendTo($j('div.right'))
+	
+				} else if (event.pageX < (topOffset.left + $j('div.top').width()) &&
+						   event.pageY < (topOffset.top + $j('div.top').height())) {
+					// top bottom
+					if ($j('div.top').find('.box').length == 0) {
+						ui.placeholder.appendTo($j('div.top'));
+					}
+				}
+				$j('.cal-bubble').hide();
+	
+			}
 		});
-	});
+	},
 
-	$j(".box h2").mousemove(function(e){
-        $j("#tooltip").show();
-        $j("#tooltip").css({
-            top: (e.pageY -8) + "px",
-            left: (e.pageX + 20) + "px"
-        });
-    });
-
-    $j(".box h2").mouseout(function(e){
-        $j("#tooltip").hide();
-    });
-
-	$j('.customise').click(function(event) {
-		$j('#tabs-homepage, .empty-column').slideToggle();
-		$j(this).children('span').toggle();
-		$j('h2.hide').each(function () {
-			$j(this).toggle();
+	activeComponents: function() {
+		
+		$j('.box h2').css('cursor', 'move');
+		$j(".box h2").mousemove(function(e){
+			$j("#tooltip").show();
+			$j("#tooltip").css({
+				top: (e.pageY -8) + "px",
+				left: (e.pageX + 20) + "px"
+			});
 		});
-		return false;
-	});
-
-	$j("a.edit").hover(function() {
+		$j(".box h2").mouseout(function(e){
+			$j("#tooltip").hide();
+		});
 		
-		var $this = $j(this);
-		
-		if(!$this.children('em').data('pinned')) {
-			$this.children('em').addClass('show-it');
-		}
-		
-		}, function() {
+		$j("a.edit").hover(function() {
 			var $this = $j(this);
 			
 			if(!$this.children('em').data('pinned')) {
-				$this.children('em').removeClass('show-it' );
+				$this.children('em').addClass('show-it');
 			}
+			
+			}, function() {
+				var $this = $j(this);
+				
+				if(!$this.children('em').data('pinned')) {
+					$this.children('em').removeClass('show-it' );
+				}
 		
 		}).live('click', function(event) {
 			var $this = $j(this);
@@ -214,315 +452,77 @@ $j(function() {
 			$this.toggleClass('active');
 			$this.siblings('.editPanel.settings.hide').slideToggle("fast");
 			$this.children('em').data('pinned', !$this.children('em').data('pinned'));
+				
+		});
+		
+		$j('.close-delete').live('click', function(event){
+			event.preventDefault();
+			var $this = $j(this);
 			
-	});
-	
-	$j('.close-delete').live('click', function(event){
-		event.preventDefault();
-		var $this = $j(this);
-		
-		if ($this.siblings('.editPanel.settings').is(':visible')) {
-			$this.siblings('.editPanel.settings').slideUp();
-			$this.siblings('a.edit').children('em').data('pinned', !$this.siblings('a.edit').children('em').data('pinned'));
-			$this.siblings('a.edit').removeClass('active');
-			$this.siblings('a.edit').children('em').removeClass('show-it');
-		}
-		$this.siblings('.editPanel.delete-it.hide').slideToggle("fast");
-	});
-
-	$j('.delete-accept').live('click',function(event) {
-		
-		event.preventDefault();
-       
-	    //update with an ajax call here.
-		$j.post('/homepage/configForm.php', $j(this).closest('form').serialize());
-		
-        $j(this).closest('.box').animate({opacity:0}, 300,
-			function() {
-				$j(this).slideUp(200, function() {
-					$j(this).remove();
-				});
+			if ($this.siblings('.editPanel.settings').is(':visible')) {
+				$this.siblings('.editPanel.settings').slideUp();
+				$this.siblings('a.edit').children('em').data('pinned', !$this.siblings('a.edit').children('em').data('pinned'));
+				$this.siblings('a.edit').removeClass('active');
+				$this.siblings('a.edit').children('em').removeClass('show-it');
+			}
+			$this.siblings('.editPanel.delete-it.hide').slideToggle("fast");
 		});
-		
-		var componentToDelete = Number($j(this).siblings("input[name=component]").val());
-		var currentAmount = Number($j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html());
-		currentAmount--;
-		$j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html(currentAmount);
-		
-		if ($j('a[rel='+componentToDelete+']').parent().hasClass('disabled')) {
-			$j('a[rel='+componentToDelete+']').parent().removeClass('disabled')
-		}
-		
-	});
-
-
-	$j('.delete-reject').live('click',function(event) {
-		event.preventDefault();
-		$j(this).closest('.delete-it').slideUp();
-	});
-
-	$j(".add-component a").live('click', function(event) {
-		event.preventDefault();
-		var $this = $j(this);
-		
-		$j.ajax({
-		 type: "POST",
-			url: '/homepage/configForm.php',
-			data: {add : $j(this).attr('rel'), cid : cid },
-			success: function(data){
-				$j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
-					emptyColumnsCheck($j('div.top'))
-					emptyColumnsCheck($j('div.right'))
-					emptyColumnsCheck($j('div.left'))
-					$j(this).animate({opacity:1}, 300);
-					
-				});
-        	},
-			dataType: "html"
-		});		
-
-		if($this.parent().hasClass('one-only')) {
-			$this.parent().addClass('disabled');
-		} else if ($j('.how-many').html() == '') {
-			//if there are no modules but you can add one
-			$this.siblings('.how-many').append('You already have <em>1</em>');
-		} else {
-			//include the current amount of the module
-			var currentCount = Number($this.siblings('strong em'));
-			currentCount++;
-			$this.siblings('strong em').html(currentCount);
-		}
-		
-		if (!$this.siblings('.notification').is(':visible')) {
-			$this.siblings('.notification').fadeIn(200, function() {
-				$j(this).delay(2000).fadeOut();
+	
+		$j('.delete-accept').live('click',function(event) {
+			event.preventDefault();
+			//update with an ajax call here.
+			$j.post('/homepage/configForm.php', $j(this).closest('form').serialize());
+			
+			$j(this).closest('.box').animate({opacity:0}, 300,
+				function() {
+					$j(this).slideUp(200, function() {
+						$j(this).remove();
+					});
 			});
-		}
-		
-		var currentAmount = Number($this.siblings('h4').children('strong').children('em').html());
-		currentAmount++;
-		$this.siblings('h4').children('strong').children('em').html(currentAmount);
-		
-		
-	});
+			
+			var componentToDelete = Number($j(this).siblings("input[name=component]").val());
+			var currentAmount = Number($j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html());
+			currentAmount--;
+			$j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html(currentAmount);
+			
+			if ($j('a[rel='+componentToDelete+']').parent().hasClass('disabled')) {
+				$j('a[rel='+componentToDelete+']').parent().removeClass('disabled')
+			}
+			
+		});
 	
-	$j('div.colorBox').each(function () {
-		$j(this).css('backgroundColor', pickers[$j(this).attr('id')]);
-		//$j(this).next().val(pickers[$j(this).attr('id')]);
-	});
-
-	var f = $j.farbtastic('#picker');
-	f.setColor("#b6b6ff"); //set initial color
-	
-	$j('#head_font').parent().addClass('active-box');
-	var instantColour = new RGBColor($j('#left_head_font').css('background-color'));
-	var initialColour = instantColour.toHex();
-	checkTextColour();
-	$j('#currentColour').css('background-color',initialColour);
-	$j('#currentColour').val(initialColour);
-
-	f.linkTo(onColorChange);
-
-	$j('#currentColour').keyup(function() {
-		f.setColor($j(this).val());
-	});
-
-	function h2d(h) {return parseInt(h,16);}
-
-	function checkTextColour() {
-		var currentColour = $j('#currentColour').val().substr(1);
-			if (h2d(currentColour) < 4473924) {
-			$j('#currentColour').css('color', '#ffffff');
-		} else {
-			$j('#currentColour').css('color', '#000000');
-		};	
-	};
-	
-	function onColorChange(color) {
-		checkTextColour();
-		var current = $j('.selected');
-		current.css('background-color', color);
-		$j('#currentColour').val(color);
-		$j('#currentColour').css('background-color', color);
-        pickers[current.attr('ID')] = color;
-
-		switch (current.attr('ID')) {
-			case 'left_bg_primary':
-				return $j('.left .text, .left .listing').css('background-color', color);
-			break;
-			case 'left_bg_secondary':
-				return $j('.left .dark').css('background-color', color);
-			break;
-			case 'left_head_font':
-				return $j('.left h2').css('color', color);
-			break;
-			case 'left_head_bg':
-				return $j('.left h2').css('background-color', color)
-			break;
-			case 'left_font':
-				return $j('.left, .left p').css('color', color)
-			break;	
-			case 'left_link':
-				return $j('.left a').css('color', color);
-			break;	
-			case 'left_hover':
-				return $j('.right a:hover').css('color', color);
-			break;	
-			case 'right_bg_primary':
-				return $j('.right .text, .right .listing').css('background-color', color);
-			break;
-			case 'right_bg_secondary':
-				return $j('.right .dark').css('background-color', color);
-			break;
-			case 'right_head_font':
-				return $j('.right h2').css('color', color);
-			break;
-			case 'right_head_bg':
-				return $j('.right h2').css('background-color', color);
-			break;
-			case 'right_font':
-				return $j('.right, .right p').css('color', color);
-			break;	
-			case 'right_link':
-				return $j('.right a').css('color', color);
-			break;	
-			case 'right_hover':
-				return $j('.right a:hover').css('color', color);
-			break;	
-			default:
-				return $j('.left .text').css('background-color', color);
-			break;
-		}
+		$j('.delete-reject').live('click',function(event) {
+			event.preventDefault();
+			$j(this).closest('.delete-it').slideUp();
+		});
 	}
+};
 
+$j(function() {
+    /**
+     * Initialise the customisation dropdown and create all its javascript driven elements
+     * ie:
+     * /Components Tab
+     * /Colours Tab
+     * /Column Widths tab
+     */
 
-	$j('.colour').click(function(event) {
-		event.preventDefault();
-		$j('.selected').removeClass('selected');
-		$j('.active-box').removeClass('active-box');
-		$j(this).addClass('active-box');
-		$j(this).children('.colorBox').addClass('selected');
-		$j(this).next().next('p').addClass('selected');
-
-		var color = new RGBColor($j(this).children('.colorBox').css('background-color'));
-
-		f.setColor(color.toHex());
-		checkTextColour()
-		return false;
-	});
-
-	$j('.layouts a').click(function(event) {
-		event.preventDefault();
-		
-		var templateChoice = $j(this).attr('title');
-		var newChoice = "";
-		
-		switch (templateChoice) {
-			case '1':
-				newChoice = 'template1';
-			break;
-			case '2':
-				newChoice = 'template2';
-			break;
-			case '3':
-				newChoice = 'template3';
-			break;
-			case '4':
-				newChoice = 'template4';
-			break;
-			default:
-				newChoice = 'template1';
-			break;
-		}
-		
-        $j('.homepage').removeClass().addClass(newChoice + ' homepage ui-sortable');
-		$j('.current').removeClass('current');
-		$j(this).addClass('current');
-        $j('#templateVal').val(templateChoice);
-	});	
+	setupCustomise.customisationDropdown.init();
 	
-	$j('#saveTemplate').click(function () {
-        $j.post('/homepage/configForm.php', $j(this).closest('form').serialize(),
-	   function() {
-			$j('.saved-layout').slideDown(150).delay(2000).slideUp(150);
-	   });
-    });
-
-    $j('#saveColour').click(function () {
-       $j.post('/homepage/configForm.php', {colors: pickers, cid: cid},
-	   function() {
-			$j('.saved-colours').slideDown(150).delay(2000).slideUp(150);
-	   });
-    });
+	/**
+		If a column is empty, insert placeholder into the space where you can drag components to.
+	**/
+	setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')])
 	
-	$j("#leftRight").click(function () {	
-		var rightBox;
-		
-		$j('div.leftColumn div.colorBox').each(function () {
-			var str = $j(this).attr('id');
-			var newstr = str.replace(/^.*left_(.*).*$/m, '$1');
-
-			rightBox = $j('#' + 'right_'+newstr);
-			rightBox.css('backgroundColor', $j(this).css('backgroundColor'));
-			rightBox.next().val($j(this).next().val());
-		});
-
-		$j('.right .text, .right .listing').css('background-color', $j('.left .text').css('background-color'));
-		$j('.right .dark').css('background-color', $j('.left .dark').css('background-color'));
-		$j('.right, .right p').css('color', $j('.left').css('color'));
-		$j('.right h2').css('background-color', $j('.left h2').css('background-color'));
-		$j('.right, .right p').css('color', $j('.left, .left p').css('color'));
-		$j('.right a').css('color', $j('.left a').css('color'));
-		
-		//send off the pickers correctly.
-		pickers.right_head_font = pickers.left_head_font;
-		pickers.right_head_bg = pickers.left_head_bg;
-		pickers.right_font = pickers.left_font;
-		pickers.right_bg_primary = pickers.left_bg_primary;
-		pickers.right_bg_secondary = pickers.left_bg_secondary;
-		pickers.right_link = pickers.left_link;
-		pickers.right_hover = pickers.left_hover;
-
-	});
+	/**
+		setup the ability to sort components, drag them around across columns.
+	**/
+	setupCustomise.sortComponents();
 	
-	$j('#restore').click(function() {
-		$j('.colorBox').each(function () {
-			$j(this).css('background-color', defaults[$j(this).attr('id')]);
-			//$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
-		});
-		
-		$j('.left h2').css({
-			"color": defaults['left_head_font'],
-			"background-color":defaults['left_head_bg']
-		});
-		$j('.left p, .left h3, .left .listing p.small').css("color", defaults['left_font']);
-		$j('.left a, .left .listing p.small a').css('color', defaults['left_link']);
-		$j('.left .box a:hover, .left .listing p.small a:hover').css('color', defaults['left_hover']);
-		$j('.left .text, .left .listing').css('background',defaults['left_bg_primary']);
-		$j('.left .listing .dark ').css('background',defaults['left_bg_secondary']);
-		
-		$j('.right h2').css({
-			"color": defaults['right_head_font'],
-			"background-color":defaults['right_head_bg']
-		});
-		$j('.right p, .right h3, .right .listing p.small').css("color", defaults['right_font']);
-		$j('.right a, .right .listing p.small a').css('color', defaults['right_link']);
-		$j('.right .box a:hover, .right .listing p.small a:hover').css('color', defaults['right_hover']);
-		$j('.right .text, .right .listing').css('background',defaults['right_bg_primary']);
-		$j('.right .listing .dark ').css('background',defaults['right_bg_secondary']);
-		
-		pickers = defaults;
-		
-	});
+	/**
+		The  controls for the individual components
+		ie. edit, delete
+	**/
+	setupCustomise.activeComponents();
 	
-	$j('#cancel').click(function() {
-		$j('.colorBox').each(function () {
-			$j(this).css('background-color', original[$j(this).attr('id')]);
-		});
-		
-		$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
-		
-	});
-
-
 });

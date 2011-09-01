@@ -3663,15 +3663,6 @@ p.bubble-name {
 }
 
 /* ePortfolio */
-.privateBlock {
-	width: 100%;
-	padding-bottom: 20px;
-}
-
-.privateBlock .box {
-	float: left;
-	width:100%;
-}
 
 .privateBlock .private-notes ul { margin:16px; }
 

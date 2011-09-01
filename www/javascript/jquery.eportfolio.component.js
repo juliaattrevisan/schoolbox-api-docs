@@ -1,54 +1,117 @@
 $j(function() {
 
-		/* remove invisible column */
-		$j('div.right:hidden').remove();
+	/* remove invisible column */
+	$j('div.right:hidden').remove();
 
-		/* add drag/drop */
-		$j('.active-sort').sortable({
-			cursor: 'move',
-			distance: 0,
-			dropOnEmpty: true,
-			forcePlaceholderSize: true,
-			handle: 'h2',
-			helper: 'clone',
-			items: '.box',
-			cancel: '.permanent',
-			placeholder: 'marker',
-			tolerance: 'pointer',
-			connectWith: '.active-sort',
+	$j("#slider" ).slider({
+		'min': 30,
+		'max':70,
+		slide: function(event, ui) {
+			$j('.left').css('width', (ui.value-.5)+'%')
+			$j('.right').css('width', (100 - ui.value-.5)+'%')
+		},
+		create: function(event, ui){
+			$j('.ui-slider-handle').append('<span></span>');
+		},
+		'stop':function(event,ui) {
+			var leftColWidth = ui.value-.5;
+			var rightColWidth = 99.5 - ui.value;
+			console.log(leftColWidth, rightColWidth);
+			/*********
+			Oh hello steve ^_^ You will need to save this leftColWidth and rightColWidth and load them onto the
+			/templates/core/homepage/template.html page in their respective tokens:
 
-			update: function () {
-				var left = '';
-				var right = '';
+			{TEMPLATE_LEFT_COLUMN_WIDTH}
+			{TEMPLATE_RIGHT_COLUMN_WIDTH}
 
-				$j('div.left-active').children('div.box').each(function () {
-					left += $j(this).attr('id').substring(9) + ',';
-				});
-				$j('div.right').children('div.box').each(function () {
-					right += $j(this).attr('id').substring(9) + ',';
-				});
+			I assume you'll be using something like this here:
 
-				$j.post('/eportfolio/configForm.php', {uid: $j('#userID').val(), type: 'components', column1: left, column2: right});
+			$j.post('/homepage/configForm.php', $j(this).closest('form').serialize(),
+			   function() {
+					$j('.saved-layout').slideDown(150).delay(2000).slideUp(150);
+			   });
+			********/
+		}
 
-			},
-			sort: function (event, ui) {
-				var leftOffset = $j('div.left-active').offset();
+	});
 
-				if (event.pageX < (leftOffset.left + $j('div.left-active').width()) &&
-					event.pageY > (leftOffset.top + $j('div.left-active').height())) {
-					// left bottom
-					ui.placeholder.appendTo($j('div.left-active'));
-				}
-				else if (event.pageX > (leftOffset.left + $j('div.left-active').width()) &&
-						 event.pageY > ($j('div.right').offset().top + $j('div.right').height())) {
-					// right bottom
-					ui.placeholder.appendTo($j('div.right'));
 
-				}
-
+	function emptyColumnsCheck(target) {
+		if (target.find('.box').length == 0) {
+			target.addClass('empty-column');
+			if ($j('#tabs-homepage').is(':visible')) {
+				$j('.empty-column').each(function() {
+					$j(this).show();
+				})
 			}
-		});
+			target.html('<p class="placeholder">You can drag components into this space.</p>');
+		} else {
+			target.children('.placeholder').remove();
+			target.removeClass('empty-column');
+		}
+	}
 
+	emptyColumnsCheck($j('div.top'))
+	emptyColumnsCheck($j('div.right'))
+	emptyColumnsCheck($j('div.left'))
+
+	$j('.homepage').sortable({
+		cursor: 'move',
+		distance: 0,
+		dropOnEmpty: true,
+		handle: 'h2',
+		helper: 'clone',
+		items: '.box:not(".permanent")',
+		placeholder: 'marker',
+		tolerance: 'pointer',
+		zIndex: 2000,
+		start: function() {
+			$j('.marker').text('This is the new position of your component');
+		},
+		update: function () {
+			var left = '';
+			var right = '';
+			var top = '';
+			$j('div.left').children('div.box').each(function () {
+				left += $j(this).attr('id').substring(9) + ',';
+			});
+			$j('div.right').children('div.box').each(function () {
+				right += $j(this).attr('id').substring(9) + ',';
+			});
+			$j('div.top').children('div.box').each(function () {
+				top += $j(this).attr('id').substring(9) + ',';
+			});
+			$j.post('/eportfolio/configForm.php', {uid  : uid, type: 'components', column1: left, column2: right, column3: top});
+
+			emptyColumnsCheck($j('div.top'))
+			emptyColumnsCheck($j('div.right'))
+			emptyColumnsCheck($j('div.left'))
+		},
+		sort: function (event, ui) {
+			var leftOffset = $j('div.left').offset();
+			var topOffset = $j('div.top').offset();
+
+			if (event.pageX < (leftOffset.left + $j('div.left').width()) &&
+				event.pageY > (leftOffset.top + $j('div.left').height())) {
+				// left bottom
+				ui.placeholder.appendTo($j('div.left'));
+			}
+			else if (event.pageX > (leftOffset.left + $j('div.left').width()) &&
+					 event.pageY > ($j('div.right').offset().top + $j('div.right').height())) {
+				// right bottom
+				ui.placeholder.appendTo($j('div.right'))
+
+			} else if (event.pageX < (topOffset.left + $j('div.top').width()) &&
+					   event.pageY < (topOffset.top + $j('div.top').height())) {
+				// top bottom
+				if ($j('div.top').find('.box').length == 0) {
+					ui.placeholder.appendTo($j('div.top'));
+				}
+			}
+			$j('.cal-bubble').hide();
+
+		}
+	});
 		$j('div.box h2').css('cursor', 'move');
 
 		/* show/hide text based components */
