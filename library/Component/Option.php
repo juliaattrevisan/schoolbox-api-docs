@@ -10,18 +10,11 @@
  */
  
 class Component_Option extends Model {
+    public $id;
 
-    /**
-     * @var string Contains custom table name
-     */
-    public static $_table = 'component_option';
+    public $componentOptionDefinitionId;
 
-    /**
-     * @return Orm
-     */
-    public function defaultOption () {
+    public $instanceId;
 
-        return $this->belongs_to('Component_OptionDefault');
-
-    }
+    public $value;
 }

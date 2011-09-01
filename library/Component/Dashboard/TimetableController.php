@@ -9,7 +9,7 @@
  * 
  */
  
-class Component_Dashboard_TimetableController extends Component_AbstractController {
+class Component_Dashboard_TimetableController extends Component_ControllerAbstract {
     private $externalTimetable;
 
     private $dayNumber;
@@ -18,9 +18,9 @@ class Component_Dashboard_TimetableController extends Component_AbstractControll
 
     private $timetable;
 
-    public function __construct (Template $templateObject, ExternalTimetable $externalTimetable) {
-        parent::__construct($templateObject);
-        
+    public function __construct (Component_Instance $instance, User $user, Template $template, ExternalTimetable $externalTimetable) {
+        parent::__construct($instance, $user, $template);
+
         $this->externalTimetable = $externalTimetable;
     }
 
@@ -38,12 +38,12 @@ class Component_Dashboard_TimetableController extends Component_AbstractControll
 
         }
 
-        return false;
+        return true;
     }
 
-    public function render ($template_handle) {
-        $this->setBlock($template_handle, "timetable_period", "timetable_period_block");
-        $this->setBlock($template_handle, "timetable_header", "timetable_header_block");
+    public function render ($templateHandle) {
+        $this->setBlock($templateHandle, "timetable_period", "timetable_period_block");
+        $this->setBlock($templateHandle, "timetable_header", "timetable_header_block");
 
         $this->setVar("DAYNUMBER", $this->dayNumber);
 
@@ -123,9 +123,12 @@ class Component_Dashboard_TimetableController extends Component_AbstractControll
 
             //timetable field width
             $this->setVar("TIMETABLE_FIELD_WIDTH", floor(((98 - ($periodCount * 0.05)) / $periodCount)));
-        }
 
-        return false;
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
 }

@@ -10,5 +10,11 @@
  */
  
 class Component_Definition extends Model {
+    public $id;
 
+    public $name;
+
+    public $class;
+
+    public $description;
 }

@@ -9,27 +9,31 @@
  * 
  */
  
-abstract class Component_AbstractController {
+abstract class Component_ControllerAbstract {
+    /**
+     * @var \Component_Instance
+     */
+    protected $instance;
+
+    /**
+     * @var User
+     */
+    protected $user;
+
     /**
      * @var Template Stores the global template object.
      */
-    protected $templateObject;
+    protected $template;
 
     /**
-     * @param Template $templateObject
+     * @param Component_Instance $instance
+     * @param User $user
+     * @param Template $template
      */
-    public function __construct (Template $templateObject) {
-        $this->setTemplate($templateObject);
-    }
-
-    /**
-     * Setter for $templateObject.
-     *
-     * @param Template $templateObject
-     * @return void
-     */
-    public function setTemplate (Template $templateObject) {
-        $this->templateObject = $templateObject;
+    public function __construct (Component_Instance $instance, User $user, Template $template) {
+        $this->instance = $instance;
+        $this->user = $user;
+        $this->template = $template;
     }
 
     /**
@@ -63,8 +67,8 @@ abstract class Component_AbstractController {
         if ( method_exists($this, $method) ) {
             $object = $this;
         }
-        elseif ( method_exists($this->templateObject, $method) ) {
-            $object = $this->templateObject;
+        elseif ( method_exists($this->template, $method) ) {
+            $object = $this->template;
         }
 
         if ( !empty($object) ) {
@@ -77,4 +81,12 @@ abstract class Component_AbstractController {
 
     }
 
+    public function __get ($property) {
+        if ( isset($this->instance->$property) ) {
+            return $this->instance->$property;
+        }
+        else {
+            return $this->$property;
+        }
+    }
 }

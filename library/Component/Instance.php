@@ -1,4 +1,4 @@
-<?php
+  <?php
 
 /**
  * 
@@ -10,23 +10,17 @@
  */
  
 class Component_Instance extends Model {
+    public $id;
 
-    /**
-     * @var string Contains custom table name
-     */
-    public static $_table = 'component_instance';
+    public $definitionId;
 
-    /**
-     * @static
-     * @param ORM $orm
-     * @param String $foreignTable
-     * @param Integer $foreignID
-     * @return ORM
-     */
-    public static function context (ORM $orm, $foreignTable, $foreignID) {
-        return $orm->where('foreign_table', $foreignTable)
-                   ->where('foreign_id', $foreignID)
-                   ->order_by_asc('position')
-                   ->order_by_asc('order');
-    }
+    public $definition;
+
+    public $module;
+
+    public $identifier;
+
+    public $position;
+
+    public $sequence;
 }

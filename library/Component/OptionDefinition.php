@@ -9,11 +9,6 @@
  * 
  */
  
-class Component_OptionDefault extends Model {
-    
-    /**
-     * @var string Contains custom table name
-     */
-    public static $_table = 'component_option_default';
+class Component_OptionDefinition extends Model {
 
 }
