@@ -30,15 +30,6 @@ function localRedir($file) {
         exit;
 }
 
-////This function is used when the session is not correct simply redirects
-////user to login page with the requested url
-//function goLoginPage()
-//{
-//		require_once dirname(__FILE__) . '/../../include/SitePage.php';
-//		$page = new SitePage;
-//		$page->goLoginPage();
-//}
-
 function scrubHTML($html) {
 	require_once dirname(__FILE__) . '/../../include/HTMLPurifier/HTMLPurifier.auto.php';
 
