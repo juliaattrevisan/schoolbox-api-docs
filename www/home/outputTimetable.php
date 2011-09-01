@@ -1,7 +1,5 @@
 <?php
 
-require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalTimetable.php';
-	
 $this->setBlock(TEMPLATE_content, "timetable", "timetable_block");	
 $this->setBlock("timetable", "timetable_period", "timetable_period_block");
 $this->setBlock("timetable", "timetable_header", "timetable_header_block");
@@ -16,7 +14,7 @@ if($_SESSION['timetable'] && Cfg::get('external_enable') ) {
 	$this->setVar("DAYNUMBER", $daynumber);
 	
 	$timetable = $timetableHandler->getDayTimetable($_SESSION['sid'], $_SESSION['id'], $_SESSION['campus'][0], $daynumber);
-	
+
 	$periodCount=0;
 	
 	if(is_array($timetable)) {

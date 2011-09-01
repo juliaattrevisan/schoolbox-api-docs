@@ -23,7 +23,6 @@ $attemptHandler = new AssessAttempt();
 $groupHandler = new Group;
 
 if(Cfg::get('external_enable')) {
-    require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalClass.php';
     $synHandler = new ExternalClass();
 }
 

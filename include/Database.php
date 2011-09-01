@@ -10,5 +10,176 @@
  */
 
 class Database {
-    
+    /**
+     * An instance of database
+     *
+     * @var Database
+     */
+    static private $instance;
+
+    /**
+     * Database source name
+     *
+     * @var String
+     */
+    private $dsn;
+
+    /**
+     * Username for authenticated connection
+     *
+     * @var String
+     */
+    private $username;
+
+    /**
+     * Password for authenticated connection
+     *
+     * @var String
+     */
+    private $password;
+
+    /**
+     * An array of additional PDO connection options
+     *
+     * @var Array
+     */
+    private $options;
+
+    /**
+     * The database connection, and instance of PDO
+     *
+     * @var PDO
+     */
+    private $connection;
+
+    /**
+     * Returns the singleton instance of Database. If it doesn't exist it is instantiated.
+     *
+     * @static
+     * @return Database
+     */
+    static public function getInstance() {
+        if ( !self::$instance ) {
+                self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+
+    private function __construct () {
+        
+    }
+
+    /**
+     * Establishes the database connection
+     *
+     * @param String $dsn
+     * @param String $username
+     * @param String $password
+     * @param Array $options
+     * @return Bool
+     */
+    public function connect ($dsn, $username, $password, $options = array()) {
+        if ( empty($dsn) || !is_string($dsn) ) {
+            return false;
+        }
+
+        /* Set connection parameters */
+        $this->dsn = $dsn;
+        $this->username = $username;
+        $this->password = $password;
+        $this->options = $options;
+
+        /* Create PDO connection */
+        try {
+            $this->connection = new PDO($dsn, $username, $password);
+        }
+        catch (PDOException $exception) {
+            $this->error($exception);
+        }
+
+        return true;
+    }
+
+    /**
+     * Wrapper for PDO::exec
+     * PDO::exec() executes an SQL statement in a single function call, returning the number
+     * of rows affected by the statement.
+     *
+     * @param String $statement
+     * @return Integer
+     */
+    public function exec ($statement) {
+
+        return $this->connection->exec($statement);
+
+    }
+
+    /**
+     * Wrapper for PDO::prepare
+     * PDO::prepare prepares a statement for execution and returns a PDOStatement object.
+     *
+     * @param String $statement
+     * @param Array $driverOptions
+     * @return PDOStatement
+     */
+    public function prepare ($statement, $driverOptions = array()) {
+
+        return $this->connection->prepare($statement, $driverOptions);
+
+    }
+
+    /**
+     * Wrapper for PDO::query
+     * PDO::query() executes an SQL statement in a single function call, returning the result set (if any)
+     * returned by the statement as a PDOStatement object.
+     *
+     * @param String $statement
+     * @return PDOStatement
+     */
+    public function query ($statement) {
+
+        return $this->connection->query($statement);
+
+    }
+
+    /**
+     * Wrapper for PDO::lastInsertId
+     * Returns the ID of the last inserted row, or the last value from a sequence object, depending
+     * on the underlying driver. For example, PDO_PGSQL() requires you to specify the name of a sequence object
+     * for the name parameter.
+     *
+     * @param Null $name
+     * @return String
+     */
+    public function lastInsertId ($name = null) {
+
+        return $this->connection->lastInsertId($name);
+
+    }
+
+    /**
+     * Returns whether or not the database connection has been initialised.
+     *
+     * @return Bool
+     */
+    public function isConnected () {
+        if ( isset($this->connection) && !empty($this->connection) ) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    /**
+     * Prints the PDOException error message and dies
+     *
+     * @param PDOException $exception
+     * @return void
+     */
+    private function error (PDOException $exception) {
+        die("Database Error: {$exception->getMessage()}");
+    }
 }

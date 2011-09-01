@@ -9,73 +9,93 @@
  * 
  */
  
-abstract class Collection {
+class Collection implements ArrayAccess, Iterator, Countable {
 
-    /**
-     * An array filters applied to the collection.
-     *
-     * @var Array
-     */
-    protected $filter;
+    protected $pointer;
 
-    /**
-     * A mapper to notify when the Collection becomes out of sync.
-     *
-     * @var Mapper
-     */
-    protected $mapper;
+    protected $container;
 
-    /**
-     * An array of the models contained in this collection.
-     *
-     * @var Array
-     */
-    protected $models;
-
-    /**
-     * Sets the mapper
-     */
-    public function __construct () {
-        /* Set mapper */
-        $this->attachMapper( Mapper::getInstance() );
+    public function __construct ($objectList = array()) {
+        $this->container = $objectList;
     }
 
     /**
-     * Sets a filter and notifies the mapper
+     * Sets the container
      *
-     * @param Array $filterList
+     * @param Array $modelList
      * @return Bool
      */
-    protected function setFilter ($filterList) {
-        if ( !is_array($filterList) ) {
+    public function set ($modelList) {
+        if ( !is_array($modelList) ) {
             return false;
         }
 
-        $this->filter = $filterList;
+        $this->rewind();
 
-        $this->notifyMapper();
-
-        return true;
-    }
-
-    /**
-     * Attaches a mapper which handles persistence with the db
-     *
-     * @param Mapper $mapper
-     * @return Bool
-     */
-    protected function attachMapper (Mapper $mapper) {
-        $this->mapper = $mapper;
+        $this->container = $modelList;
 
         return true;
     }
 
     /**
-     * Notifies the Mapper that a method has been called
+     * Gets the container
      *
-     * @return Bool
+     * @return Array
      */
-    protected function notifyMapper () {
-        return $this->mapper->updateCollection($this);
+    public function get () {
+        return $this->container;
+    }
+
+    /* ArrayAccess interface methods */
+    public function offsetSet ($offset, $value) {
+        if ( empty($offset) ) {
+            $this->container[] = $value;
+        }
+        else {
+            $this->container[$offset] = $value;
+        }
+    }
+
+    public function offsetGet ($offset) {
+        if ( isset($this->container[$offset]) ) {
+            return $this->container[$offset];
+        }
+        else {
+            return null;
+        }
+    }
+
+    public function offsetExists ($offset) {
+        return isset($this->container[$offset]);
+    }
+
+    public function offsetUnset ($offset) {
+        unset($this->container[$offset]);
+    }
+
+    /* Iterator interface methods */
+    public function rewind () {
+        $this->pointer = 0;
+    }
+
+    public function current () {
+        return $this->container[$this->pointer];
+    }
+
+    public function key () {
+        return $this->pointer;
+    }
+
+    public function next () {
+        $this->pointer++;
+    }
+
+    public function valid () {
+        return isset($this->container[$this->pointer]);
+    }
+
+    /* Countable interface methods */
+    public function count () {
+        return count($this->container);
     }
 }

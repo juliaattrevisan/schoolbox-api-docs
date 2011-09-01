@@ -39,7 +39,7 @@ class Autoloader {
     }
 
     /**
-     * @param  $className The name of the class to be included
+     * @param String $className The name of the class to be included
      * @return void
      */
     public static function load ($className) {
@@ -56,8 +56,8 @@ class Autoloader {
     }
 
     /**
-     * @param  $className The name of the relevant class
-     * @return bool|string The path to the file containing the class or false
+     * @param String $className The name of the relevant class
+     * @return String|Bool The path to the file containing the class or false
      */
     private static function getClassFile ($className) {
         $classSegments = explode('_', $className);
@@ -93,8 +93,8 @@ class Autoloader {
     }
 
     /**
-     * @param  $className The name of the relevant class
-     * @return bool|string The path to the file containing the class or false
+     * @param String $className The name of the relevant class
+     * @return String|Bool The path to the file containing the class or false
      */
     private static function getDeprecatedClassFile ($className) {
         $classSegments = preg_split('/(?<=\\w)(?=[A-Z])/', $className);
@@ -108,7 +108,7 @@ class Autoloader {
         /* Determine path */
         $path = '';
 
-        if ( $pathSegments[0] == 'External') {
+        if ( $pathSegments[0] == 'external') {
             array_unshift($pathSegments, Config::get('external_type'));
         }
 
@@ -156,8 +156,8 @@ class Autoloader {
     }
 
     /**
-     * @param  $filename The file name or path to be checked for existance
-     * @return bool Wether or not the file exists
+     * @param String $filename The file name or path to be checked for existance
+     * @return Bool Wether or not the file exists
      */
     private static function fileExists ($filename) {
         if ( empty($filename) ) {
@@ -179,8 +179,8 @@ class Autoloader {
 
     /**
      * @static
-     * @param  $file Includes files from paths defined in Autoloader::$includePathArray
-     * @return bool
+     * @param String $file Includes files from paths defined in Autoloader::$includePathArray
+     * @return Bool
      */
     private static function includeFile ($file) {
         if ( empty(self::$includePathArray) ) {

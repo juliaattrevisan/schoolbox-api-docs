@@ -1,4 +1,5 @@
 <?php
+
 require_once SITE_root . '/library/submission.php';
 require_once SITE_root . '/library/submissionReturn.php';
 require_once SITE_root . '/library/group.php';
@@ -62,7 +63,6 @@ if (is_array($_SESSION['children'])) {
 $subjectList = false;
 
 if (Cfg::get('external_enable') && $user['synergy_id'])  {
-        require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalUser.php';
 	$synUser = new ExternalUser;
 	$subjectList = $synUser->getSubjectList($user['synergy_id'], $user['uid']);
 }

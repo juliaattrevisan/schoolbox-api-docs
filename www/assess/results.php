@@ -143,8 +143,6 @@ $this->setVar(array(
 $categoryCode = $categoryHandler->getCodeForCategory($assess['category_id']);
 
 if (($categoryCode['codes'] != '') && Cfg::get('external_enable')) {
-	require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalClass.php';
-
 	//if synergy code get synergy students
 	$synHandler = new ExternalClass();
 	$allStudents = $synHandler->getStudents($categoryCode['codes']);

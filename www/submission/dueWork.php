@@ -83,7 +83,6 @@ if (is_array($_SESSION['children'])) {
 // get category list
 $subjectList = false;
 if (Cfg::get('external_enable') && $user['synergy_id'])  {
-        require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalUser.php';
 	$synUser = new ExternalUser;
 	$subjectList = $synUser->getSubjectList($user['synergy_id'], $user['uid']);
 }
@@ -435,7 +434,6 @@ foreach ($categoryList as $category) {
 	$categoryID = $category['id'];
 	/* yes it actually requires THIS MUCH code to get a teachers name. */
 	if (Cfg::get('external_enable')) {
-                require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalClass.php';
 		$synClass = new ExternalClass;
 
 		$teacherOutput = array();

@@ -111,7 +111,6 @@ if (is_numeric($this->arg[0])) {
 
 	//advanced synergetic information
 	if (Cfg::get('external_enable') && $user['synergy_id']) {
-		require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalUser.php';
 
 		$synUserHandler = new ExternalUser();
 

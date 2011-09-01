@@ -31,7 +31,7 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 
 	/* Get full student list of class  */
     if($category['code'] && Cfg::get('external_enable')) {
-        require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalClass.php';
+
         //if synergy code get synergy students
         $synHandler = new ExternalClass();
         $studentList = $synHandler->getStudents($category['code']);
@@ -139,7 +139,7 @@ else if(is_numeric($this->arg[0])) {
 
 	/* Get full student list of class  */
     if($category['code'] && Cfg::get('external_enable')) {
-        require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalClass.php';
+
         //if synergy code get synergy students
         $synHandler = new ExternalClass();
         $studentList = $synHandler->getStudents($category['code']);

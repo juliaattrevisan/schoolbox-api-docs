@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/../include/Config.php');
 require_once(dirname(__FILE__)  .'/../library/user.php');
-require_once(dirname(__FILE__)  .'/../library/synergetic/ExternalUser.php');
+require_once( dirname(__FILE__) . '/../library/Synergetic/ExternalUser.php' );
 
 define('PERFORM_UPDATE', true);
 

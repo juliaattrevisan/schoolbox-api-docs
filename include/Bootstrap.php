@@ -16,9 +16,8 @@ require_once dirname(__FILE__) . '/Autoloader.php';
 $autoloader = Autoloader::initialise();
 
 /* Configure Database connection */
-//Orm::configure(SQL_dsn);
-//Orm::configure('username', SQL_user);
-//Orm::configure('password', SQL_passwd);
+$database = Database::getInstance();
+$database->connect(SQL_dsn, SQL_user, SQL_passwd);
 
 /* Set default time zone */
 date_default_timezone_set(Cfg::get('date_timezone'));

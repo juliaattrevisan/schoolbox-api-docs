@@ -13,25 +13,28 @@ $this->setFile(TEMPLATE_content, 'dashboard/index.html');
 
 /* Instance factory */
 $groupID = $_SESSION['gid'];
-$dashboardFactory = new Component_Dashboard_DashboardFactory($this->template, $groupID);
 
-/* Get Component Instances */
-$componentArray = $dashboardFactory->buildComponentList();
+$componentFactory = new Component_Dashboard_Factory(new User, $this->template);
+$componentCollection = $componentFactory->buildComponentList($groupID);
 
-if ( is_array($componentArray) ) {
-    foreach ($componentArray as $component) {
+foreach ($componentCollection as $component) {
 
-        $template_file = 'dashboard/component/'.$instance->template().'.html';
+    /* Break apart class name by underscores, get only last segment, remove last 10 characters then send it to lowercase */
+    $templateName = strtolower( substr( array_pop( explode('_', $component->definition->class) ), 0, -10 ) );
 
-        $template_target = 'component_position_'.$instance->get_position();
-        $template_handle = 'component_'.$instance->get_instance_id();
+    $templateFile = 'component/dashboard/'.$templateName.'.html';
 
-        if ( $this->setFile($template_handle, $template_file) !== false ) {
+    $templateTarget = 'component_position_'.$component->position;
+    $templateHandle = 'component_'.$component->id;
 
-            if ( $instance->execute() !== false && $instance->render($template_handle) !== false ) {
-                $this->parse($template_target, $template_handle, true);
+    if ( $component->execute() !== false ) {
+
+        if ( $this->setFile($templateHandle, $templateFile) !== false ) {
+
+            if ( $component->render($templateHandle) !== false ) {
+                $this->parse($templateTarget, $templateHandle, true);
             }
-
         }
+
     }
 }

@@ -5,7 +5,6 @@
 *                                                           *
 ************************************************************/
 //timetable object that displays the users timetable
-require_once SITE_root . '/library/'.Cfg::get('external_type').'/ExternalTimetable.php';
 require_once '../library/user.php';
 require_once '../library/group.php';
 require_once '../library/category.php';

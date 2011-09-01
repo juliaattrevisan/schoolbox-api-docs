@@ -212,7 +212,6 @@ class Session {
     }
 
     function setSynergyInfo($userHandler) {
-        require_once dirname(__FILE__) .'/../library/'.Cfg::get('external_type').'/ExternalUser.php';
         require_once dirname(__FILE__) .'/../library/group.php';
         require_once dirname(__FILE__) .'/../library/category.php';
         $synUser = new ExternalUser;
