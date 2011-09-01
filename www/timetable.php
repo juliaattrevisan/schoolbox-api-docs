@@ -53,7 +53,7 @@ if(is_array($outputList)) {
         $user = $userHandler->getBySynergy($sid);
 
 
-        $outputUser = array('PERSON'	=> formatName($user),
+        $outputUser = array('PERSON'	=> $userHandler->formatName($user),
                              'YEAR'		=> $user['year']?', Year '.$user['year']:'',
                            );
         $this->setVar($outputUser);

@@ -16,7 +16,7 @@ class Session {
         $this->destroy();
 
         //Start a new session
-	session_start();
+	    session_start();
 
         $user = $userHandler->getByUsername($username);
 
@@ -60,6 +60,8 @@ class Session {
             * if(Cfg::get('ldap_enable'))
                 $this->setLDAPInfo($username);
             */
+
+            return true;
         }
 
     }

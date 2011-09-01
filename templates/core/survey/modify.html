@@ -63,7 +63,6 @@ $j(document).ready(function() {
 			<tr>
 				<td class="formLabelWidth">
 					<h4>Title</h4>
-					<em>The name of the test</em>
 					<label>
 						<input name="title" type="text" size="35" maxlength="50" value="{ASSESS_TITLE}" id="title"/>
 					</label>
@@ -73,7 +72,7 @@ $j(document).ready(function() {
 				<!-- Available from this time -->
 				<td>
 					<h4>Start</h4>
-					<em>Test opens at this time</em>
+					<em>The survey will only be available between the start and finish date</em>
 					<fieldset>
 					<select name="start[hour]">
 						<!-- BEGIN startHour -->
@@ -100,7 +99,7 @@ $j(document).ready(function() {
 				<!-- Available until this time -->
 				<td>
 					<h4>Finish</h4>
-					<em>Test closes at this time</em>
+					<em>The last time this survey will be available to complete</em>
 					<select name="finish[hour]">
 						<!-- BEGIN finishHour -->
 						<option value="{FINISH_HOUR_VALUE}" {FINISH_HOUR_SELECTED}>{FINISH_HOUR_VALUE}</option>
@@ -121,40 +120,10 @@ $j(document).ready(function() {
 			</tr>
 			<tr>
 				<td>
-					<h4>Duration</h4>
-					<em>To set a test duration, tick the box and fill out a time.</em>
-					<label class="float-left">
-						<input type="checkbox" class="float-left show-duration" {ASSESS_DURATION_CHECKED}/>
-					</label>
-					<fieldset class="hide float-left edit-duration">
-						<select name="duration[hour]" id="minHours" class="groupedSelect min-hours">
-							<!-- BEGIN durationHour -->
-							<option value="{DURATION_HOUR_VALUE}" {DURATION_HOUR_SELECTED}>{DURATION_HOUR_VALUE}</option>
-							<!-- END durationHour -->
-						</select>
-						hr
-						<select name="duration[minute]" id="minDuration" class="groupedSelect min-minutes">
-							<!-- BEGIN durationMinute -->
-							<option value="{DURATION_MINUTE_VALUE}" {DURATION_MINUTE_SELECTED}>{DURATION_MINUTE_VALUE}</option>
-							<!-- END durationMinute -->
-						</select>
-						min
-					</fieldset>
-				</td>
-			</tr>
-			<tr>
-				<td>
 					<h4>Description</h4>
 					<div class="textarea-container">
 						<textarea name="description">{ASSESS_DESCRIPTION}</textarea>
 					</div>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<h4>Allow Re-sit</h4>
-					<em>Allow students to take this test multiple times</em>
-					<input name="allow_resit" type="checkbox" value="1" {ALLOW_RESIT_CHECKED}/>
 				</td>
 			</tr>
 		</table>

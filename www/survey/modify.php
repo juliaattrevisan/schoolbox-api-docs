@@ -33,15 +33,6 @@ if (!empty($_POST)) {
     $start = new Alaress_Date_Format($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['minute'].' '.$_POST['start']['meridiem']);
     $finish = new Alaress_Date_Format($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem']);
 
-    /* Cater for unlimited duration tests. Can't use zero because of countdown
-     * timer, so we use -1
-     */
-    $duration = ($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60;
-
-    if ($duration == 0) {
-        $duration = Survey::UNLIMITED_DURATION;
-    }
-
     $assessHandler->update(array(
         'assess_id'   => $this->arg[0],
         'category_id' => scrubTEXT($_POST['category_id']),
@@ -50,7 +41,7 @@ if (!empty($_POST)) {
         'description' => scrubTEXT($_POST['description']),
         'start'       => $start->getDatabase(),
         'finish'      => $finish->getDatabase(),
-        'duration'    => scrubTEXT($duration),
+        'duration'    => Survey::UNLIMITED_DURATION,
         'allow_resit' => scrubTEXT($_POST['allow_resit']),
     ));
 
@@ -67,8 +58,6 @@ else {
     $this->setBlock(TEMPLATE_content, 'finishHour', 'finishHour_block');
     $this->setBlock(TEMPLATE_content, 'finishMinute', 'finishMinute_block');
     $this->setBlock(TEMPLATE_content, 'finishMeridiem', 'finishMeridiem_block');
-    $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
-    $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
     $this->setTitle('Manage Survey');
@@ -90,8 +79,6 @@ else {
         'ASSESS_DESCRIPTION' => $assess['description'],
         'ASSESS_START_DATE'  => date('d/m/Y', $assessStartTime),
         'ASSESS_FINISH_DATE' => date('d/m/Y', $assessFinishTime),
-        'ALLOW_RESIT_CHECKED' => $assess['allow_resit'] == 1 ? 'checked=\'checked\'' : '',
-        'ASSESS_DURATION_CHECKED' => $assess['duration'] >= 0 ? 'checked=\'checked\'' : '',
     ));
 
     /* Render starting times
@@ -152,27 +139,6 @@ else {
         $this->parse('finishMeridiem_block', 'finishMeridiem', true);
     }
 
-    /* Render duration
-     */
-    $duration = $assessHandler->parse_sec2hms($assessHandler->sec2hms($assess['duration']));
-
-    for ($i=0; $i<=3; $i++) {
-        $this->setVar(array(
-            'DURATION_HOUR_VALUE' => $i,
-            'DURATION_HOUR_SELECTED' => $i == $duration['hours'] ? 'selected=\'selected\'' : '',
-        ));
-
-        $this->parse('durationHour_block', 'durationHour', true);
-    }
-
-    for ($i=0; $i<=45; $i += 15) {
-        $this->setVar(array(
-            'DURATION_MINUTE_VALUE' => $i == 0 ? $i = '00' : $i,
-            'DURATION_MINUTE_SELECTED' => $i == $duration['minutes'] ? 'selected=\'selected\'' : '',
-        ));
-
-        $this->parse('durationMinute_block', 'durationMinute', true);
-    }
 
     /* Show this Assess' contents
      */
