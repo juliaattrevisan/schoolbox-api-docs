@@ -1,108 +1,84 @@
 <?php
-
-/************************************************************
-*                                                           *
-*         Copyright (c) 2002-2003 Lektec Consulting         *
-*                                                           *
-************************************************************/
-
-//allow users to customise their homepages
-
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
-$page = new SitePage;
-
+$page = new SitePage();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
-if(is_numeric($_REQUEST['cid']) ) {
-	
-
-	if($groupHandler->getPermission($_REQUEST['cid']) < WRITE_ACCESS) 
+if (is_numeric($_REQUEST['cid'])) {
+	if ($groupHandler->getPermission($_REQUEST['cid']) < WRITE_ACCESS) {
 		error(19);
-	
+	}
+
 	$homepage = new Homepage($_REQUEST['cid']);
-	
-	//AJAX request for drag and drop of components
-	if($_POST['cid'] && $_POST['type'] == 'components')
-	{	
+
+	/* AJAX request for drag and drop of components
+	 */
+	if ($_POST['cid'] && $_POST['type'] == 'components') {
 		$columns = array($_POST['column1'], $_POST['column2'], $_POST['column3']);
-		foreach($columns as $key => $column)
-		{
+
+		foreach ($columns as $key => $column) {
 			// Explode the columns
 			$key++;
 			$components[$key] = explode(',', $column);
-	
+
 			// Update the db
-			foreach($components[$key] as $ckey => $component)
-			{
+			foreach ($components[$key] as $ckey => $component) {
 				$ckey++;
 				$homepage->updateComponentPosition($component, $key, $ckey);
 			}
 		}
 	}
-    elseif($_POST['cid'] && is_numeric($_POST['delete'])) {
-        //AJAX request to delete component from homepage
-        $homepage->deleteComponent($_POST['delete']);
-    }
-    else if($_POST['cid'] && is_numeric($_POST['add'])) {
-        //Add component to page and output render of component
-        $homepageComponentLocationID = $homepage->addComponent($_POST['add']);
-        
-        //Output component HTML, we do this by loading sitepage and loading a specially designed harness to produce the homepage component on its own
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-        $page = new SitePage;
-        $page->loadContent('/ajax/homepageComponent');
-        $page->template->pparse('finaloutput', TEMPLATE_content);
+	/* AJAX request to delete component from homepage
+	 */
+	else if ($_POST['cid'] && is_numeric($_POST['delete'])) {
+		$homepage->deleteComponent($_POST['delete']);
+	}
+	/* Add component to page and output render of component
+	 */
+	else if ($_POST['cid'] && is_numeric($_POST['add'])) {
+		$homepageComponentLocationID = $homepage->addComponent($_POST['add']);
 
-    }
-    elseif($_POST['cid'] && is_array($_POST['colors'])) {
-        /* AJAX Save homepage colours */
-        //strip hash
-        foreach($_POST['colors'] as $key => $value) {
-            $color[$key] = substr($value,1);
-        }
+		//Output component HTML, we do this by loading sitepage and loading a specially designed harness to produce the homepage component on its own
+		//require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
-        $homepage->saveDisplayProperties($color);
+		$page->loadContent('/ajax/homepageComponent');
+		$page->template->pparse('finaloutput', TEMPLATE_content);
+	}
+	/* AJAX Save homepage colours
+	 * strip hash
+	 */
+	else if ($_POST['cid'] && is_array($_POST['colors'])) {
+		foreach ($_POST['colors'] as $key => $value) {
+			$color[$key] = substr($value, 1);
+		}
+;
+		$homepage->saveDisplayProperties($color);
+	}
+	/* AJAX Save homepage template
+	 */
+	else if ($_POST['cid'] && is_numeric($_POST['template'])) {
 
-    }
-    elseif($_POST['cid'] && is_numeric($_POST['template'])) {
-        /* AJAX Save homepage template */
-        print $_POST['template'];
-       $homepage->savePageTemplate($_POST['template']);
+		print $_POST['template'];
 
-    }
-	elseif($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component'])
-	{	
-		//Post config options from homepage
+		$homepage->savePageTemplate($_POST['template']);
+	}
+	/* Post config options from homepage
+	 */
+	else if ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
 		$config = $_GET;
+
 		unset($config['cid'], $config['type'], $config['component']);
+
 		//all remaining options and serialised and sent to db
 		$config = serialize($config);
 		$homepage->updateComponentConfig($_GET['component'], $config);
-		localRedir("/homepage/".$_GET['cid']);
-	}
-      /*
-	elseif(is_numeric($_POST['cid']))
-	{
-		//Submission of customise page
-		$homepage->savePageTemplate($_POST['template']);
-		$homepage->updateComponents($_POST['components']);
-		
-		//strip hash
-		if (is_array($_POST['colors'])) {
-			foreach($_POST['colors'] as $key => $value) {
-				$color[$key] = substr($value,1);
-			}
-			
-			$homepage->saveDisplayProperties($color);
-		}
 
-		localRedir("/homepage/".$_POST['cid']);
+		localRedir("/homepage/" . $_GET['cid']);
 	}
-     * 
-     */
+	else if ($_POST['cid'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
+		$homepage->updateColumnWidths(scrubTEXT($_POST['leftColWidth']), scrubTEXT($_POST['rightColWidth']));
+	}
 }
-else
+else {
 	error(2);
-
-?>
+}

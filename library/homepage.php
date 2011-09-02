@@ -40,6 +40,37 @@ class Homepage {
 		return $this->db->getAll($query);
 	}
 
+	/**
+	 * Gets the column widths for a particular homepage
+	 *
+	 * @return array|bool
+	 */
+	public function getColumnWidths() {
+		$query = "SELECT left_column_width, right_column_width
+				  FROM homepage_config
+				  WHERE cid = '{$this->cid}'";
+
+		return $this->db->getRow($query);
+	}
+
+	/**
+	 * Update column widths
+	 *
+	 * @param  $left
+	 * @param  $right
+	 * @return void
+	 */
+	public function updateColumnWidths($left, $right) {
+		$query = "UPDATE homepage_config
+				  SET
+				  	left_column_width = '{$left}',
+				  	right_column_width = '{$right}'
+				  WHERE cid = '{$this->cid}'";
+
+		$this->db->query($query);
+	}
+
+
 	function getColorList()
 	{
 		$query = "SELECT left_head_font, left_head_bg, left_font, left_bg_primary, left_bg_secondary, left_link, left_hover,
