@@ -12,7 +12,7 @@
 <script type="text/javascript">
 
 	var cid = {ID};
-	var ajaxURL = '/homepage/configForm.php'
+	var postToURL = '/homepage/configForm.php'
 
 	$j(function() {
 		/**
@@ -20,7 +20,7 @@
 		 * ie:
 		 */
 
-		setupCustomise.customisationDropdown.init(ajaxURL);
+		setupCustomise.customisationDropdown.init(cid, postToURL);
 
 		/**
 			If a column is empty, insert placeholder into the space where you can drag components to.
@@ -30,13 +30,13 @@
 		/**
 			setup the ability to sort components, drag them around across columns.
 		**/
-		setupCustomise.sortComponents(cid, ajaxURL);
+		setupCustomise.sortComponents(cid, postToURL);
 
 		/**
 			The  controls for the individual components
 			ie. edit, delete
 		**/
-		setupCustomise.activeComponents(ajaxURL);
+		setupCustomise.activeComponents(postToURL);
 	});
 
 

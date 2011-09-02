@@ -25,7 +25,7 @@ setupCustomise = {
 		 * within the dropdown panel.
 		* 
         */
-		init: function() {
+		init: function(relevantID, ajaxURL) {
 			$j('#tabs-homepage').tabs();
 			$j('#tabs-sub').tabs();
 			$j('.customise').click(function(event) {
@@ -36,7 +36,7 @@ setupCustomise = {
 				});
 				return false;
 			});
-			this.colours(ajaxURL);
+			this.colours(relevantID, ajaxURL);
 			this.components(ajaxURL);
 			this.columnWidths(ajaxURL);
 		},
@@ -128,7 +128,8 @@ setupCustomise = {
 			});		
 		},
 		
-		colours: function() {
+		colours: function(relevantID, ajaxURL) {
+			console.log(relevantID, ajaxURL)
 			
 			$j('div.colorBox').each(function () {
 				$j(this).css('backgroundColor', pickers[$j(this).attr('id')]);
@@ -305,7 +306,7 @@ setupCustomise = {
 			});
 			
 			$j('#saveColour').click(function () {
-			   $j.post(ajaxURL, {colors: pickers, cid: cid},
+			   $j.post(ajaxURL, {colors: pickers, cid: relevantID, uid: relevantID},
 			   function() {
 					$j('.saved-colours').slideDown(150).delay(2000).slideUp(150);
 			   });
