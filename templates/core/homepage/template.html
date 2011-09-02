@@ -9,6 +9,40 @@
 <link rel="stylesheet" type="text/css" href="/javascript/farbtastic/farbtastic.css" />
 <script type="text/javascript" src="/javascript/farbtastic/farbtastic.js"></script>
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<script type="text/javascript">
+
+	var cid = {ID};
+	var ajaxURL = '/homepage/configForm.php'
+
+	$j(function() {
+		/**
+		 * Initialise the customisation dropdown and create all its javascript driven elements
+		 * ie:
+		 */
+
+		setupCustomise.customisationDropdown.init(ajaxURL);
+
+		/**
+			If a column is empty, insert placeholder into the space where you can drag components to.
+		**/
+		setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')])
+
+		/**
+			setup the ability to sort components, drag them around across columns.
+		**/
+		setupCustomise.sortComponents(cid, ajaxURL);
+
+		/**
+			The  controls for the individual components
+			ie. edit, delete
+		**/
+		setupCustomise.activeComponents(ajaxURL);
+	});
+
+
+
+</script>
+
 <!-- END modify_layout -->
 
 <style type="text/css">
@@ -58,7 +92,7 @@ var {COLOUR_ARRAY} = {
 };
 <!-- END colour_list -->
 
-var cid = {ID};
+
 
 </script>
 <!-- END custom_head -->
@@ -74,7 +108,7 @@ var cid = {ID};
 	<ul class="clearfix">
 		<li><a href="#tabs-1">Components</a></li>
 		<li><a href="#tabs-2">Colours</a></li>
-		<li><a href="#tabs-3">Column Layout</a></li>
+		<li><a href="#tabs-3">Column Widths</a></li>
 	</ul>
 	<div id="tabs-1" class="customise-components">
 		<div id="tabs-sub">
@@ -220,16 +254,26 @@ var cid = {ID};
 	</div>
 	<!--/tabs-2-->
 	<div id="tabs-3" class="customise-components layouts">
-		<form method="POST" action="">
-			<div class="slider-house">
-				<div id="slider"></div>
-            </div>
-			
+		<form method="POST" action="" class="pad-it">
+			<p class="information-notification pad-it ">In order to adjust the
+				widths of the left and right columns on the page, drag the slider
+				below left and right. If you can't see the columns because they're too far down the page
+			you can use the slide guide below the slider to see the effect your change is having.</p>
+			<div class="clearfix slide-guide">
+				<h3>Column width slider</h3>
+				<div class="slider-house">
+					<div id="slider"></div>
+				</div>
+			</div>
+			<div class="clearfix slide-guide">
+				<h3>Slide guide</h3>
+				<div class="left permanent" style="width: {TEMPLATE_LEFT_COLUMN_WIDTH}%"> -- LEFT COLUMN --</div>
+				<div class="right permanent" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%"> -- RIGHT COLUMN --</div>
+			</div>
 			<div class="colours-buttons clearfix">
-				
 				<div class="clearfix">
-				<button class="submit-btn-plain" type="button" id="saveTemplate" >Save layout</button>
-				<button class="submit-btn-plain " type="button" id="cancelTemplate" >Cancel</button>
+					<button class="submit-btn-plain" type="button" id="saveTemplate" >Save layout</button>
+					<button class="submit-btn-plain " type="button" id="cancelTemplate" >Cancel</button>
 				</div>
 				<div class="saved-layout">Saved layout</div>
 			</div>

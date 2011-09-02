@@ -109,6 +109,8 @@ CSS commands
 	line-height:16px;
 }
 
+.no-marg{margin:0;}
+
 ul.pad-it { list-style:disc; }
 
 .hide-it, .hide { display:none; }
@@ -3117,12 +3119,11 @@ COLOUR ADJUSTMENT BOX
 }
 
 /* column width slider */
-#tabs-homepage .slider-house{ padding: 16px; margin:16px;
+#tabs-homepage .slider-house{
      -moz-border-radius: 2px; 
   -webkit-border-radius: 2px; 
-          border-radius: 2px; 
-          
-          
+          border-radius: 2px;
+	margin:16px 24px;
   -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
 }
 #tabs-homepage #slider{height:14px; border:1px solid #d1d1d1; background: #ededed;
@@ -3172,6 +3173,20 @@ width:38px; height:30px; background:#ccc; top:0; position:absolute; margin-left:
 }
 
 #tabs-homepage #slider .ui-slider-handle span{ position:absolute; width:15px; height:11px; display:block; top:10px; left:11px;background:url(/images/core/component/slider-handle-background.png) no-repeat 50% 50%;}
+
+.slide-guide {margin-bottom:16px;border:#e7e7e7; padding: 8px;}
+.slide-guide h3{margin-bottom: 8px;
+font-weight: bold;
+font-size: 14px;}
+.slide-guide .left, .slide-guide .right{
+	min-height:20px;
+	text-align:center;
+	line-height:20px;
+	background:#e7e7e7;
+
+}
+
+
 
 #tabs-homepage { display:none; }
 

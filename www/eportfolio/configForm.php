@@ -27,7 +27,7 @@ if (is_numeric($_REQUEST['uid'])) {
      * this is found in jquery.eportfoliocomponent.js
      */
     if ($_POST['uid'] && $_POST['type'] == 'components') {
-        $columns = array($_POST['column1'], $_POST['column2']);
+        $columns = array($_POST['column1'], $_POST['column2'],$_POST['column3']);
 
         foreach ($columns as $key => $column) {
             /* Explode the columns */
