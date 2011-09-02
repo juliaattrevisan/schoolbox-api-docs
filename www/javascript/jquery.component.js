@@ -1,6 +1,7 @@
 setupCustomise = {
 	ajaxURL: '',
 	categoryID: '',
+	key: 'cid',
 
 	emptyColumnCheck: function(target) {
 		for (i=0; i < target.length; i++ ) {
@@ -308,7 +309,13 @@ setupCustomise = {
 
 
 			$j('#saveColour').click(function () {
-			   $j.post(setupCustomise.ajaxURL, {colors: pickers, cid: setupCustomise.categoryID }, function() {
+				var data = {
+					colors: pickers
+				};
+
+				data[setupCustomise.key] = setupCustomise.categoryID;
+
+			   $j.post(setupCustomise.ajaxURL, data, function() {
 					$j('.saved-colours').slideDown(150).delay(2000).slideUp(150);
 			   });
 			});
@@ -328,14 +335,13 @@ setupCustomise = {
 				},
 				'stop':function(event, ui) {
 					var data = {
-						cid: setupCustomise.categoryID,
 						leftColWidth: ui.value - 0.5,
 						rightColWidth: 99.5 - ui.value
-					}
+					};
 
-					$j.post(setupCustomise.ajaxURL, data, function() {
-						console.log('done');
-					});
+					data[setupCustomise.key] = setupCustomise.categoryID;
+
+					$j.post(setupCustomise.ajaxURL, data);
 				}
 			});
 
@@ -377,7 +383,17 @@ setupCustomise = {
 				$j('.homepage div.top').children('div.box').each(function () {
 					top += $j(this).attr('id').substring(9) + ',';
 				});
-				$j.post(setupCustomise.ajaxURL, {cid : setupCustomise.categoryID, type: 'components', column1: left, column2: right, column3: top});
+
+				var data = {
+					type: 'components',
+					column1: left,
+					column2: right,
+					column3: top
+				}
+
+				data[setupCustomise.key] = setupCustomise.categoryID;
+
+				$j.post(setupCustomise.ajaxURL, data);
 
 				setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')])
 			},
