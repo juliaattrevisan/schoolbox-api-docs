@@ -25,7 +25,7 @@ setupCustomise = {
 		 * within the dropdown panel.
 		* 
         */
-		init: function() { 
+		init: function() {
 			$j('#tabs-homepage').tabs();
 			$j('#tabs-sub').tabs();
 			$j('.customise').click(function(event) {
@@ -36,15 +36,15 @@ setupCustomise = {
 				});
 				return false;
 			});
-			this.customisationDropdown.colours();
-			this.customisationDropdown.components();
-			this.customisationDropdown.columnWidths();
+			this.colours(ajaxURL);
+			this.components(ajaxURL);
+			this.columnWidths(ajaxURL);
 		},
 
 		/**
 		 * Allows for control of the components in the customise dropdown.
 		 */
-		components: function() {
+		components: function(ajaxURL) {
 			$j('.add-component strong').each(function() {
 				var howManyInstances = $j(this).children('em').html();
 				if (howManyInstances == 0) {
@@ -92,7 +92,7 @@ setupCustomise = {
 				
 				$j.ajax({
 				 type: "POST",
-					url: '/homepage/configForm.php',
+					url: ajaxURL,
 					data: {add : $j(this).attr('rel'), cid : cid },
 					success: function(data){
 						$j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
@@ -305,20 +305,21 @@ setupCustomise = {
 			});
 			
 			$j('#saveColour').click(function () {
-			   $j.post('/homepage/configForm.php', {colors: pickers, cid: cid},
+			   $j.post(ajaxURL, {colors: pickers, cid: cid},
 			   function() {
 					$j('.saved-colours').slideDown(150).delay(2000).slideUp(150);
 			   });
 			});	
 		},
 		
-		columnWidths: function() {
+		columnWidths: function(ajaxURL) {
 			$j("#slider" ).slider({
 				'min': 30,
 				'max':70,
 				slide: function(event, ui) {
 					$j('.left').css('width', (ui.value-.5)+'%')
 					$j('.right').css('width', (100 - ui.value-.5)+'%')
+					
 				},
 				create: function(event, ui){
 					$j('.ui-slider-handle').append('<span></span>');
@@ -336,7 +337,7 @@ setupCustomise = {
 		
 					I assume you'll be using something like this here:
 		
-					$j.post('/homepage/configForm.php', $j(this).closest('form').serialize(),
+					$j.post(ajaxURL, $j(this).closest('form').serialize(),
 					   function() {
 							$j('.saved-layout').slideDown(150).delay(2000).slideUp(150);
 					   });
@@ -346,7 +347,7 @@ setupCustomise = {
 			});
 			$j('#saveTemplate').click(function () {
 				$j.post(
-					'/homepage/configForm.php', 
+					ajaxURL,
 					$j(this).closest('form').serialize(),
 					function() {$j('.saved-layout').slideDown(150).delay(2000).slideUp(150);}
 				);
@@ -354,15 +355,15 @@ setupCustomise = {
 		}			
 	},
 	
-	sortComponents: function() { 
-	
+	sortComponents: function(relevantID, ajaxURL) {
+
 		$j('div.homepage').sortable({
 			cursor: 'move',
 			distance: 0,
 			dropOnEmpty: true,
 			handle: 'h2',
 			helper: 'clone',
-			items: '.box',
+			items: '.box:not(".permanent")',
 			placeholder: 'marker',
 			tolerance: 'pointer',
 			zIndex: 2000,
@@ -373,38 +374,38 @@ setupCustomise = {
 				var left = '';
 				var right = '';
 				var top = '';
-				$j('div.left').children('div.box').each(function () {
+				$j('.homepage div.left').children('div.box').each(function () {
 					left += $j(this).attr('id').substring(9) + ',';
 				});
-				$j('div.right').children('div.box').each(function () {
+				$j('.homepage div.right').children('div.box').each(function () {
 					right += $j(this).attr('id').substring(9) + ',';
 				});
-				$j('div.top').children('div.box').each(function () {
+				$j('.homepage div.top').children('div.box').each(function () {
 					top += $j(this).attr('id').substring(9) + ',';
 				});
-				$j.post('/homepage/configForm.php', {cid : cid, type: 'components', column1: left, column2: right, column3: top});
+				$j.post(ajaxURL, {cid : relevantID, uid: relevantID, type: 'components', column1: left, column2: right, column3: top});
 	
-				setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')])
+				setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')])
 			},
 			sort: function (event, ui) {
-				var leftOffset = $j('div.left').offset();
-				var topOffset = $j('div.top').offset();
+				var leftOffset = $j('.homepage div.left').offset();
+				var topOffset = $j('.homepage div.top').offset();
 	
-				if (event.pageX < (leftOffset.left + $j('div.left').width()) &&
-					event.pageY > (leftOffset.top + $j('div.left').height())) {
+				if (event.pageX < (leftOffset.left + $j('.homepage div.left').width()) &&
+					event.pageY > (leftOffset.top + $j('.homepage div.left').height())) {
 					// left bottom
-					ui.placeholder.appendTo($j('div.left'));
+					ui.placeholder.appendTo($j('.homepage div.left'));
 				}
-				else if (event.pageX > (leftOffset.left + $j('div.left').width()) &&
-						 event.pageY > ($j('div.right').offset().top + $j('div.right').height())) {
+				else if (event.pageX > (leftOffset.left + $j('.homepage div.left').width()) &&
+						 event.pageY > ($j('.homepage div.right').offset().top + $j('.homepage div.right').height())) {
 					// right bottom
-					ui.placeholder.appendTo($j('div.right'))
+					ui.placeholder.appendTo($j('.homepage div.right'))
 	
-				} else if (event.pageX < (topOffset.left + $j('div.top').width()) &&
-						   event.pageY < (topOffset.top + $j('div.top').height())) {
+				} else if (event.pageX < (topOffset.left + $j('.homepage div.top').width()) &&
+						   event.pageY < (topOffset.top + $j('.homepage div.top').height())) {
 					// top bottom
-					if ($j('div.top').find('.box').length == 0) {
-						ui.placeholder.appendTo($j('div.top'));
+					if ($j('.homepage div.top').find('.box').length == 0) {
+						ui.placeholder.appendTo($j('.homepage div.top'));
 					}
 				}
 				$j('.cal-bubble').hide();
@@ -413,7 +414,7 @@ setupCustomise = {
 		});
 	},
 
-	activeComponents: function() {
+	activeComponents: function(ajaxURL) {
 		
 		$j('.box h2').css('cursor', 'move');
 		$j(".box h2").mousemove(function(e){
@@ -471,7 +472,7 @@ setupCustomise = {
 		$j('.delete-accept').live('click',function(event) {
 			event.preventDefault();
 			//update with an ajax call here.
-			$j.post('/homepage/configForm.php', $j(this).closest('form').serialize());
+			$j.post(ajaxURL, $j(this).closest('form').serialize());
 			
 			$j(this).closest('.box').animate({opacity:0}, 300,
 				function() {
@@ -497,32 +498,3 @@ setupCustomise = {
 		});
 	}
 };
-
-$j(function() {
-    /**
-     * Initialise the customisation dropdown and create all its javascript driven elements
-     * ie:
-     * /Components Tab
-     * /Colours Tab
-     * /Column Widths tab
-     */
-
-	setupCustomise.customisationDropdown.init();
-	
-	/**
-		If a column is empty, insert placeholder into the space where you can drag components to.
-	**/
-	setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')])
-	
-	/**
-		setup the ability to sort components, drag them around across columns.
-	**/
-	setupCustomise.sortComponents();
-	
-	/**
-		The  controls for the individual components
-		ie. edit, delete
-	**/
-	setupCustomise.activeComponents();
-	
-});
