@@ -10,7 +10,7 @@ $userHandler = new User;
 $groupHandler = new Group;
 $categoryHandler = new Category;
 
-/* Superusers only 
+/* Superusers only
  */
 if (!$groupHandler->isSuperuser()) {
     error(19);
@@ -88,59 +88,59 @@ else if ($_POST['modusername']) {
 /* Add user to group
  */
 else if (isset($_POST['groupSubmit']) && is_numeric($_POST['uid'])) {
-    $groupHandler->setService(scrubTEXT($_POST['service']));
-    $groupHandler->addUser(scrubTEXT($_POST['sid']), scrubTEXT($_POST['uid']), scrubTEXT($_POST['type']));
+    $groupHandler->setService(Scrub::text($_POST['service']));
+    $groupHandler->addUser(Scrub::text($_POST['sid']), Scrub::text($_POST['uid']), Scrub::text($_POST['type']));
 
-	localRedir('/adminv2/modify-user/' . scrubTEXT($_POST['uid']) . '#permissions');
+	localRedir('/adminv2/modify-user/' . Scrub::text($_POST['uid']) . '#permissions');
 }
 
 /* Add user to service
  */
 else if (isset($_POST['addService']) && is_numeric($_POST['uid'])) {
-    $groupHandler->setService(scrubTEXT($_POST['service']));
-    $groupHandler->addUser(scrubTEXT($_POST['sid']), scrubTEXT($_POST['uid']), scrubTEXT($_POST['type']));
+    $groupHandler->setService(Scrub::text($_POST['service']));
+    $groupHandler->addUser(Scrub::text($_POST['sid']), Scrub::text($_POST['uid']), Scrub::text($_POST['type']));
 
-	localRedir('/adminv2/modify-user/' . scrubTEXT($_POST['uid'] . '#permissions'));
+	localRedir('/adminv2/modify-user/' . Scrub::text($_POST['uid'] . '#permissions'));
 }
 
 /* Ajax Update Groups and their access permissions etc
  */
 else if ($_POST['updateGroups'] == true) {
-    $groupHandler->setService(scrubTEXT($_POST['service']));
+    $groupHandler->setService(Scrub::text($_POST['service']));
 
 	/* If assigning a new admin, demote any existing owners
 	 */
-	if (scrubTEXT($_POST['type']) == FULL_ACCESS) {
-		$category = $categoryHandler->getByID(scrubTEXT($_POST['sid']));
-		$groupHandler->setUserPermission(scrubTEXT($_POST['sid']), $category['owner'], WRITE_ACCESS);
+	if (Scrub::text($_POST['type']) == FULL_ACCESS) {
+		$category = $categoryHandler->getByID(Scrub::text($_POST['sid']));
+		$groupHandler->setUserPermission(Scrub::text($_POST['sid']), $category['owner'], WRITE_ACCESS);
 	}
 
 	/* Update user access as normal
 	 */
-	$groupHandler->setUserGroupType(scrubTEXT($_POST['sid']), scrubTEXT($_POST['uid']), scrubTEXT($_POST['type']));
+	$groupHandler->setUserGroupType(Scrub::text($_POST['sid']), Scrub::text($_POST['uid']), Scrub::text($_POST['type']));
 }
 
 /* Ajax Update Service Permissions (sid corresponds to campus)
  */
-else if (scrubTEXT($_POST['updateServices']) == true) {
-    $groupHandler->setService(scrubTEXT($_POST['service']));
-	$groupHandler->setUserGroupType(scrubTEXT($_POST['sid']), scrubTEXT($_POST['uid']), scrubTEXT($_POST['type']));
+else if (Scrub::text($_POST['updateServices']) == true) {
+    $groupHandler->setService(Scrub::text($_POST['service']));
+	$groupHandler->setUserGroupType(Scrub::text($_POST['sid']), Scrub::text($_POST['uid']), Scrub::text($_POST['type']));
 }
 
 /* Ajax Update SID values
  */
-else if (scrubTEXT($_POST['updateSID']) == true) {
-	$groupHandler->setService(scrubTEXT($_POST['service']));
-	$groupHandler->setSID(scrubTEXT($_POST['previousSid']), scrubTEXT($_POST['sid']), scrubTEXT($_POST['uid']));
+else if (Scrub::text($_POST['updateSID']) == true) {
+	$groupHandler->setService(Scrub::text($_POST['service']));
+	$groupHandler->setSID(Scrub::text($_POST['previousSid']), Scrub::text($_POST['sid']), Scrub::text($_POST['uid']));
 }
 
 /* Remove a service
  */
 else if (is_numeric($_GET['deleteService']) && is_numeric($_GET['sid']) && is_numeric($_GET['uid'])) {
-	$groupHandler->setService(scrubTEXT($_GET['deleteService']));
-	$groupHandler->deleteUser(scrubTEXT($_GET['sid']), scrubTEXT($_GET['uid']));
+	$groupHandler->setService(Scrub::text($_GET['deleteService']));
+	$groupHandler->deleteUser(Scrub::text($_GET['sid']), Scrub::text($_GET['uid']));
 
-	localRedir('/adminv2/modify-user/' . scrubTEXT($_GET['uid'])  . '#permissions');
+	localRedir('/adminv2/modify-user/' . Scrub::text($_GET['uid'])  . '#permissions');
 }
 
 /* Switch logins to the current user being viewed

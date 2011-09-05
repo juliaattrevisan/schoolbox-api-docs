@@ -34,15 +34,15 @@ $xml = simplexml_load_string($data);
 /* Set up assess
  */
 $assess_id = $assessHandler->create(array(
-    'category_id' => scrubTEXT($this->arg[0]),
+    'category_id' => Scrub::text($this->arg[0]),
     'user_id' => $_SESSION['id'],
-    'title' => scrubTEXT($xml->title),
-    'description' => scrubTEXT($xml->description),
-    'start' => scrubTEXT($xml->start),
-    'finish' => scrubTEXT($xml->finish),
-    'duration' => scrubTEXT($xml->duration),
-    'allow_resit' => scrubTEXT($xml->allow_resit),
-	'availability' => scrubTEXT($xml->availability),
+    'title' => Scrub::text($xml->title),
+    'description' => Scrub::text($xml->description),
+    'start' => Scrub::text($xml->start),
+    'finish' => Scrub::text($xml->finish),
+    'duration' => Scrub::text($xml->duration),
+    'allow_resit' => Scrub::text($xml->allow_resit),
+	'availability' => Scrub::text($xml->availability),
     'created_at' => 'NOW()',
 ));
 
@@ -70,8 +70,8 @@ for ($i=0; $i < count($xml->section); $i++) {
     for ($j=0; $j < count($currentSection->question); $j++) {
         $currentQuestion = $currentSection->question[$j];
 
-        $questionHandler = $factory->createQuestionModel(scrubTEXT($currentQuestion->typeid));
-        $answerHandler = $factory->createAnswerModel(scrubTEXT($currentQuestion->typeid));
+        $questionHandler = $factory->createQuestionModel(Scrub::text($currentQuestion->typeid));
+        $answerHandler = $factory->createAnswerModel(Scrub::text($currentQuestion->typeid));
 
         $question_id = $questionHandler->create(array(
             'question_id' => '',

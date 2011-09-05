@@ -27,7 +27,7 @@ else {
 	if(is_array($fileList)) {
 		foreach($fileList as $file) {
 			$output = array('DROPBOX_MIME_IMAGE'	=> $allowedFiles->getClass($file["iconFile"]),
-							'DROPBOX_DESCRIPTION' => scrubTEXT($file['description']),
+							'DROPBOX_DESCRIPTION' => Scrub::text($file['description']),
 							'DROPBOX_ID'		=> $file['id'],
 							'DROP_SUBMITTED_BY' => "<a href=\"/search/user/{$file['uid']}\">".$userHandler->formatName($file).'</a>',
 							'DROP_SUBMITTED_TIME'=>$file['subdate'],

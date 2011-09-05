@@ -168,7 +168,7 @@ class Category extends DeprecatedModel {
 			foreach ($categoryList as $category) {
 
 				$thisRow['CAT_ID'] = $category['id'];
-				$thisRow['CAT_NAME'] = $indent . scrubTEXT($category['name']) . ' ' . scrubTEXT($category['code']);
+				$thisRow['CAT_NAME'] = $indent . Scrub::text($category['name']) . ' ' . Scrub::text($category['code']);
 				array_push($this->categoryTree, $thisRow);
 
 				$this->getCategoryTree($category['id'], $indent . "&nbsp; &nbsp;|&nbsp;");

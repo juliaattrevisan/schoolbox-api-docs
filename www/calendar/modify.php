@@ -113,7 +113,7 @@ if (isset($_POST['date'])) {
 					'DESCRIPTION' 	=> $event['note'],
                     'LOCATION'      => $event['location'],
                     'DETAIL'        => $event['detail'],
-					'RETURN_TO'		=> scrubText($_GET['returnTo']),
+					'RETURN_TO'		=> Scrub::text($_GET['returnTo']),
 					);
 
 	$page->setVar($output);
@@ -175,7 +175,7 @@ if (isset($_POST['date'])) {
                     'DESCRIPTION'	=> '',
                     'LOCATION'    	=> '',
                     'DETAIL'	    => '',
-					'RETURN_TO'		=> scrubText($_GET['returnTo'])
+					'RETURN_TO'		=> Scrub::text($_GET['returnTo'])
 
 					);
 	$page->setVar($output);

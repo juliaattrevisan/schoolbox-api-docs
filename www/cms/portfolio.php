@@ -85,7 +85,7 @@ if (is_array($folderList)) {
 		$class[] = "write";
 
 		$output = array('CATEGORY_ID'		=> $folder['id'],
-						'CATEGORY_NAME'	=> scrubText($folder['name']),
+						'CATEGORY_NAME'	=> Scrub::text($folder['name']),
 						'CLASS'			=> implode(" ", $class),
 						);
 		$this->setVar($output);
@@ -109,7 +109,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 
 		$output = array('FILE_ID' 	 	=> $file['id'],
 						'TYPE'			=> 'file',
-						'FILE_NAME' 	=> scrubText($file['description']),
+						'FILE_NAME' 	=> Scrub::text($file['description']),
 						'FILE_MODIFIED'	=> $modifiedTime->getShort(),
 						'FILE_SIZE'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",
 						'FOLDER_ID'		=> $file['parent'],

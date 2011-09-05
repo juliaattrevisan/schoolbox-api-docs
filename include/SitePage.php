@@ -502,7 +502,7 @@ class SitePage extends Page {
 
                while($group = $this->db->getNextArray())
                {
-                       $this->setVar("MGNAME", scrubTEXT($group['name']));
+                       $this->setVar("MGNAME", Scrub::text($group['name']));
                        $this->setVar("MGID", $group['sid']);
                        $this->parse("my_groups", "mgroup_block", true);
                }
@@ -544,10 +544,10 @@ class SitePage extends Page {
 				   $url = new Url($link['url']);
 
                    if($url->isLocalURL()){
-                       $this->setVar("MLINK", "<a href=\"".$url->getRelativeURL()."\"><span>".scrubTEXT($link['description'])."</span></a>");
+                       $this->setVar("MLINK", "<a href=\"".$url->getRelativeURL()."\"><span>".Scrub::text($link['description'])."</span></a>");
                    }
                    else {
-                   	$this->setVar("MLINK", "<a href=\"" . $url->getBase64EncodedRedirect() . "\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
+                   	$this->setVar("MLINK", "<a href=\"" . $url->getBase64EncodedRedirect() . "\" target=\"_blank\"><span>".Scrub::text($link['description'])."</span></a>");
                    }
 
                    $this->parse("my_links", "mlink_block", true);
@@ -628,7 +628,7 @@ class SitePage extends Page {
        }
 
        function setTitle($title = '') {
-           $this->setVar('TITLE', Cfg::get('title') . (!empty($title) ? ' - '.scrubTEXT($title) : ''));
+           $this->setVar('TITLE', Cfg::get('title') . (!empty($title) ? ' - '.Scrub::text($title) : ''));
        }
 
        function getTemplate($template) {

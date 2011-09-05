@@ -21,7 +21,7 @@ class ModuleJobList {
 		}
 
 		//checks to see if we are displaying an associated search
-		if(	$searchParms['portalID'] != '' || 
+		if(	$searchParms['portalID'] != '' ||
 			$searchParms['equipmentPortalUserID'] != '' ||
 			$searchParms['equipmentID'] != '' ||
 			$searchParms['portalAssociatedUserID'] != ''||
@@ -31,9 +31,9 @@ class ModuleJobList {
 		else {
 			$this->associatedDisplay = false;
 		}
-		
+
 		$this->_tpl = new Module( TPL_DIR);
-		
+
 		if(!$this->associatedDisplay) {
 			$this->_tpl->set_file( 'tplContent', $this->_TPL_NAME_ASSIGNED);
 		}
@@ -48,7 +48,7 @@ class ModuleJobList {
 		else {
 			$this->_sql = SQL_jobList( $searchParms);
 		}
-		
+
 	}
 
 	function getContent() {
@@ -59,18 +59,18 @@ class ModuleJobList {
 		if( mysql_num_rows( $query) == 0) {
 			return;
 		}
-		
+
 		$lastid = -1;
 		$this->_tpl->set_block('tplContent','jobBlock', 'jobB');
 		if(!$this->associatedDisplay) {
 			$this->_tpl->set_block('tplContent','userJobBlock', 'userjobB');
 		}
 
-	
+
 		while( $row = mysql_fetch_array( $query)) {
 			$row = stripslashes_array($row);
-			$href = 'jobDetails.php?jobID=' . $row[ 'jobID'];    
-			
+			$href = 'jobDetails.php?jobID=' . $row[ 'jobID'];
+
 			if(!$this->associatedDisplay) {
 				if($lastid != $row['portalAssignedUserID'] || mysql_num_rows($query) == 1)
 				{
@@ -79,8 +79,8 @@ class ModuleJobList {
 						$this->_tpl->set_var('jobB', '');
 					}
 					$this->_tpl->set_var('OWNER', $row['assignedUserName']);
-				}	
-			
+				}
+
 				if($row['equipmentUserName'])
 					$this->_tpl->set_var( 'NAME', '<a href="' . $href . '">' . $row[ 'equipmentUserName'] . '</a>');
 				else if($row['associatedUserName'])
@@ -88,23 +88,23 @@ class ModuleJobList {
 				else if($row['userNonSynergy'])
 					$this->_tpl->set_var( 'NAME', '<a href="' . $href . '">'.$row['userNonSynergy'].'</a>');
 				else
-					$this->_tpl->set_var( 'NAME', '<a href="' . $href . '">Unknown</a>');		
+					$this->_tpl->set_var( 'NAME', '<a href="' . $href . '">Unknown</a>');
 			}
 			else {
-				if($row['assignedUserName'])	
+				if($row['assignedUserName'])
 					$this->_tpl->set_var('NAME', '<a href="' . $href . '">' . $row['assignedUserName']. '</a>');
 				else
 					$this->_tpl->set_var('NAME', '<a href="' . $href . '">Unknown</a>');
 			}
-				
-			$this->_tpl->set_var( 'DESCRIPTION', scrubTEXT($row[ 'description']));					
+
+			$this->_tpl->set_var( 'DESCRIPTION', Scrub::text($row[ 'description']));
 			$this->_tpl->set_var( 'CREATEDDATE', $row[ 'createdDate']);
 			$this->_tpl->set_var( 'STATUS', "<div style='color: #{$row['colour']}'>".$row[ 'status'].'</div>');
 			$this->_tpl->parse( 'jobB', 'jobBlock', true);
-			$lastid = $row['portalAssignedUserID'];	
-		 		
+			$lastid = $row['portalAssignedUserID'];
+
 		}
-		
+
 		if(!$this->associatedDisplay){
 			$this->_tpl->parse( 'userjobB', 'userJobBlock',true);
 		}
@@ -116,7 +116,7 @@ class ModuleJobList {
 
 		# The 'add job' button should only be displayed if the jobs listed are for a single user or equipment item
 	function showAddButton( $parms) {
-	
+
 		$this->_tpl->set_var( 'EQUIPMENT_ID', $parms[ 'equipmentID']);
 	}
 }

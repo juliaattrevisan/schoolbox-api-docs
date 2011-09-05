@@ -12,11 +12,11 @@ if ($_POST['name']) {
 	 */
 
 	$category = array(
-		'name' => scrubTEXT($_POST['name']),
-		'parent' => scrubTEXT($_POST['parent']),
-		'template' => scrubTEXT($_POST['template']),
-		'code' => scrubTEXT($_POST['code']),
-		'group' => scrubTEXT($_POST['group']),
+		'name' => Scrub::text($_POST['name']),
+		'parent' => Scrub::text($_POST['parent']),
+		'template' => Scrub::text($_POST['template']),
+		'code' => Scrub::text($_POST['code']),
+		'group' => Scrub::text($_POST['group']),
 	);
 
 	if (is_numeric($_POST['categoryID'])) {

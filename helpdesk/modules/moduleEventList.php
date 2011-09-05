@@ -39,7 +39,7 @@ class ModuleEventList extends HelpDeskPage{
 		else {
 			$this->_showDelete = false;
 		}
-		
+
 		$this->_jobID = $searchParms[ 'jobID'];
 		$this->_tpl = new Module( TPL_DIR);
 		$this->_tpl->set_file( 'tplContent', $this->_tpl_name);
@@ -48,7 +48,7 @@ class ModuleEventList extends HelpDeskPage{
 	function getContent() {
 		$this->_tpl->set_var( 'JOB_ID', $this->_jobID);
 
-			# Set the bits for the 'add new event' row 
+			# Set the bits for the 'add new event' row
 		$this->populateSelect( 'EventType', 0, '(event type - optional)', '');
 
 			# Set the table border
@@ -59,7 +59,7 @@ class ModuleEventList extends HelpDeskPage{
 			$this->_tpl->set_Var( 'TABLE_CLASS', 'table_event');
 		}
 
-		if( !isset( $this->_query)) {    
+		if( !isset( $this->_query)) {
 			mysql_connect( DB_HOST, DB_USER, DB_PASSWD);
 			mysql_select_db( DB_NAME);
 			$query = mysql_query( $this->_sql)
@@ -86,12 +86,12 @@ class ModuleEventList extends HelpDeskPage{
 					$description = $row[ 'eventTypeDescription'];
 				}
 				if( isset( $row[ 'jobEventDescription'])) {
-					$description .= "<br />".scrubTEXT($row[ 'jobEventDescription']);
+					$description .= "<br />".Scrub::text($row[ 'jobEventDescription']);
 				}
-				
-	
+
+
 				$this->_tpl->set_var( 'DESCRIPTION', $description);
-	
+
 				if($row['eventOwnerName'])
 				{
 					$a = '<a href="userDetails.php?portalID=' . $row[ 'portalUserID'] . '">';
@@ -99,9 +99,9 @@ class ModuleEventList extends HelpDeskPage{
 				}
 				else
 					$this->_tpl->set_var( 'USER', 'Unknown');
-					
+
 				$this->_tpl->set_var( 'DATE', $row[ 'createdDate']);
-				
+
 				if($this->_showDelete){
 					$this->_tpl->set_var( 'JOB_EVENT_ID', $row[ 'jobEventID']);
 					$this->_tpl->parse('delete', 'event_delete', false);

@@ -34,7 +34,7 @@ class Component_Dashboard_NewsController extends Component_ControllerAbstract {
         $this->setVar("topic_header_block", "");
 
         if ( is_array($this->headlineList) ) {
-            
+
             $j = $k = 0;
             $total = count($this->headlineList);
 
@@ -48,9 +48,9 @@ class Component_Dashboard_NewsController extends Component_ControllerAbstract {
                 $output = array(
                     'NEWS_TITLE' => $item['item_heading'], 'NEWS_URL' => '/news/#' . $item['item_id'],
                     'NEWS_TIME' => $newsTime->getRelativeTime(), 'ON_OFF' => ++$k % 2 ? '' : 'dark',
-                    'NEWS_TOPIC' => scrubText($previous['topicName']), 'TOPIC_CLEAN' => $url->getSlug(),
+                    'NEWS_TOPIC' => Scrub::text($previous['topicName']), 'TOPIC_CLEAN' => $url->getSlug(),
                 );
-                
+
                 $this->setVar($output);
                 $topicList[$item['topicName']] = 1;
 
@@ -69,7 +69,7 @@ class Component_Dashboard_NewsController extends Component_ControllerAbstract {
                     if ( $total == $j ) {
                         $url = new Url( $item['topicName'] );
 
-                        $this->setVar('NEWS_TOPIC', scrubText($item['topicName']));
+                        $this->setVar('NEWS_TOPIC', Scrub::text($item['topicName']));
                         $this->setVar('TOPIC_CLEAN', $url->getSlug());
 
                         $this->parse('topic_block', 'topic', true);
@@ -89,7 +89,7 @@ class Component_Dashboard_NewsController extends Component_ControllerAbstract {
 
                 $previous = $item;
             }
-            
+
         }
         else {
             $this->setVar("topic_block", "<li>No news articles available</li>");
@@ -99,7 +99,7 @@ class Component_Dashboard_NewsController extends Component_ControllerAbstract {
         foreach ($topicList as $topic => $bin) {
             $url = new Url($topic);
 
-            $output = array('NEWS_TOPIC'	=> scrubText($topic),
+            $output = array('NEWS_TOPIC'	=> Scrub::text($topic),
                             'TOPIC_CLEAN'	=> $url->getSlug(),
                             );
             $this->setVar($output);

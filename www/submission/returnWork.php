@@ -22,8 +22,8 @@ if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
     if($subbox['owner'] != $_SESSION['id'])
             error(25);
 
-    $output = array('CATEGORY'  => scrubTEXT($subbox['categoryName']),
-                    'ASSNAME'   => scrubTEXT($subbox['name']),
+    $output = array('CATEGORY'  => Scrub::text($subbox['categoryName']),
+                    'ASSNAME'   => Scrub::text($subbox['name']),
                     'BOX_ID'    => $this->arg[0],
                     'NAME'      => $userHandler->formatName($user),
                     'UID'       => $this->arg[1],

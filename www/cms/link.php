@@ -25,9 +25,9 @@ if(is_numeric($this->arg[0])) {
 	$output = array('ACTION'			=> 'Modify',
 					'LINK_ID'			=> $link['id'],
 					'URL'				=> $link['url'],
-					'DESCRIPTION'		=> scrubText($link['description']),
-					'COMMENT'			=> scrubText($link['comment']),
-					'CATEGORY_NAME'		=> scrubText($link['categoryName']),
+					'DESCRIPTION'		=> Scrub::text($link['description']),
+					'COMMENT'			=> Scrub::text($link['comment']),
+					'CATEGORY_NAME'		=> Scrub::text($link['categoryName']),
 					'CATEGORY_ID'		=> $link['cid'],
 					'HIDDEN_SELECTED'	=> 	$link['hidden'] > 0 ? 'checked="checked"' : '',
 					);
@@ -61,7 +61,7 @@ if(is_numeric($this->arg[0])) {
 					'DESCRIPTION'		=> '',
 					'COMMENT'			=> '',
 					'HIDDEN_SELECTED'	=> '',
-					'CATEGORY_NAME'		=> scrubText($category['name']),
+					'CATEGORY_NAME'		=> Scrub::text($category['name']),
 					'CATEGORY_ID'		=> $category['id'],
 					);
 	$this->setVar($output);
@@ -91,7 +91,7 @@ else if($this->arg[0] == 'multicat') {
 			}
 
 			$this->setVar(array(
-				'CATEGORY_NAME'	=> scrubTEXT($name),
+				'CATEGORY_NAME'	=> Scrub::text($name),
 				'CATEGORY_ID' => $category['id'],
 			));
 

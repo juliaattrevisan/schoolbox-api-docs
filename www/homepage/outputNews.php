@@ -22,7 +22,7 @@ if (is_array($newsList)) {
 
         $this->setVar(array(
 			"NEWS_ID" => $news['id'],
-			"NEWS_HEADING" => scrubTEXT($news['heading']),
+			"NEWS_HEADING" => Scrub::text($news['heading']),
 			"NEWS_BODY" => scrubHTML($news['body']),
 			"EMAIL_CONTACT" => "<a href=\"/search/user/{$news['uid']}\">" . $userHandler->formatName($news) . "</a>",
 			"POSTED_DATE" => $postedTime->getRelativeTime(),

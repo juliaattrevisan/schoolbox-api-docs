@@ -7,11 +7,11 @@ $eportfolioHandler = new ePortfolio($_SESSION['id']);
 $linkHandler = new ePortfolioLink;
 
 if (is_numeric($this->arg[0])) {
-	
+
 	/* Modify existing link
      */
 	$link = $linkHandler->getByID($this->arg[0]);
-	
+
     if (!is_array($link)) {
 		error(41);
     }
@@ -24,16 +24,16 @@ if (is_numeric($this->arg[0])) {
 
 	$this->setFile(TEMPLATE_content, 'cms/modify-eportfolio-link.html');
 
-	$this->setTitle('Modify Link');	
+	$this->setTitle('Modify Link');
 	$this->setTab('resources');
-	
+
 	$output = array(
         'USER_ID'           => $link['owner'],
         'ACTION'			=> 'Modify',
         'LINK_ID'			=> $link['id'],
         'URL'				=> $link['url'],
-        'DESCRIPTION'		=> scrubText($link['description']),
-        'COMMENT'			=> scrubText($link['comment']),
+        'DESCRIPTION'		=> Scrub::text($link['description']),
+        'COMMENT'			=> Scrub::text($link['comment']),
         'HIDDEN_SELECTED'	=> $link['hidden'] > 0 ? 'checked="checked"' : '',
     );
 

@@ -54,7 +54,7 @@ if ($groupHandler->getPermission(0) >= FULL_ACCESS && is_numeric($_GET['userID']
 
 // output events
 $eventList = $eventHandler->getAll($_GET['show'], $_GET['order'], $_GET['dir'], $user['uid']);
-$output = array('SHOW'	=> ucwords(scrubText($_GET['show'])),
+$output = array('SHOW'	=> ucwords(Scrub::text($_GET['show'])),
 				'USER_URL'  => isset($user['uid']) ? 'userID=' . $user['uid'] : '',
 				'USER_NAME'	=> isset($user['uid']) ? ' - ' . $userHandler->formatName($user) : '',
 				);
@@ -68,11 +68,11 @@ if (is_array($eventList)) {
 						'DATE'		=> $date->getDateOnly(),
 						'START'		=> $event['startTime'],
 						'FINISH'	=> $event['finishTime'],
-						'NAME'		=> scrubText($event['name']),
-						'CODE'		=> !empty($event['code']) ? scrubText($event['code']) : 'N/A',
+						'NAME'		=> Scrub::text($event['name']),
+						'CODE'		=> !empty($event['code']) ? Scrub::text($event['code']) : 'N/A',
 						'TYPE'		=> $event['typeName'],
-						'LOCATION'	=> scrubText($event['location']),
-						'TUTORS'	=> scrubText($event['tutorName1'] . (!empty($event['tutorName2'])?", ".$event['tutorName2']:"")),
+						'LOCATION'	=> Scrub::text($event['location']),
+						'TUTORS'	=> Scrub::text($event['tutorName1'] . (!empty($event['tutorName2'])?", ".$event['tutorName2']:"")),
 						'CANCELLED'	=> $event['cancelled'] == 'true' ? 'cancelled' : '',
 						'PASSED'	=> $event['date'] < strtotime("12am") ? 'passed' : '',
 						'ON_OFF' =>  ++$j%2? 'dark' : '',

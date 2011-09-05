@@ -50,7 +50,7 @@ if (isset($_GET['wikiID'])) {
 
    /* Construct headers so this pops up a Save-As dialog
     */
-   $filename = scrubText($wikiContents['heading']);
+   $filename = Scrub::text($wikiContents['heading']);
 
    header('Content-type: text/html');
    header("Content-Disposition: attachment filename=\"".$filename."\"");

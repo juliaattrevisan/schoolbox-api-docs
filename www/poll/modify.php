@@ -63,7 +63,7 @@ else if (is_numeric($this->arg[1])) {
 		'ACTION'					=> 'Add',
 		'POLL_ID'					=> '',
 		'CATEGORY_ID'				=> $this->arg[1],
-		'COMPONENT_HOMEPAGE_ID'		=> scrubTEXT($this->arg[2]),
+		'COMPONENT_HOMEPAGE_ID'		=> Scrub::text($this->arg[2]),
 		'POLL_TITLE'				=> '',
 		'QUESTION'					=> '',
 		'OPTION_0'					=> '',

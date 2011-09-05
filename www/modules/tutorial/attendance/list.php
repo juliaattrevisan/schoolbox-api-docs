@@ -66,8 +66,8 @@ if (is_array($eventList)) {
 						'EVENT_DATE'	=> $date->getDateOnly(),
 						'EVENT_START'	=> $event['start'],
 						'EVENT_FINISH'	=> $event['finish'],
-						'EVENT_NAME'	=> scrubText($event['name']),
-						'EVENT_CODE'	=> scrubText($event['code']),
+						'EVENT_NAME'	=> Scrub::text($event['name']),
+						'EVENT_CODE'	=> Scrub::text($event['code']),
 						'ACTION'		=> 'Save',
 						'DISABLED'		=> "", // disable modifying attendance after 1 month
 
@@ -85,7 +85,7 @@ if (is_array($eventList)) {
 			    $enrolled[] = $attendance['studentID'];
 				$output = array('STUDENT_ID'			=> $attendance['studentID'],
 								'STUDENT_NAME'			=> $userHandler->formatName($attendance),
-								'STUDENT_NAME_ESCAPED' 	=> addslashes(scrubText($userHandler->formatName($attendance))),
+								'STUDENT_NAME_ESCAPED' 	=> addslashes(Scrub::text($userHandler->formatName($attendance))),
 								'ATTENDANCE_SELECTED'	=> $attendance['present'] != 'false' ? 'checked="checked"' : '',
 								'ACTION'				=> !empty($attendance['present']) ? "Modify" : "Save",
 								'ON_OFF'				=> ++$j%2 ? 'dark':'',
@@ -104,7 +104,7 @@ if (is_array($eventList)) {
 				if (is_array($reasonList)) {
 					$page->setVar('reason_select_block', '');
 					foreach ($reasonList as $reason) {
-						$output = array('REASON_NAME'		=> scrubText($reason['reason']),
+						$output = array('REASON_NAME'		=> Scrub::text($reason['reason']),
 										'REASON_SELECTED'	=> $reason['reason'] == $attendance['reason'] ? 'selected="selected"' : '',
 										);
 						$page->setVar($output);

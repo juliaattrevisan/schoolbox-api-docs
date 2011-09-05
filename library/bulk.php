@@ -343,10 +343,10 @@ class Bulk {
 			/* Set defaults for id and campus if they are not submitted
 			 */
 			if ($_POST['userid'] == '') {
-				$uid = scrubTEXT($_SESSION['id']);
+				$uid = Scrub::text($_SESSION['id']);
 			}
 			else {
-				$uid = scrubTEXT($_POST['userid']);
+				$uid = Scrub::text($_POST['userid']);
 			}
 
 			/* Set up specified campus list
@@ -437,7 +437,7 @@ class Bulk {
 
 		if (is_file($file)) {
 			if ($_POST['userid'] == '') {
-				$uid = scrubTEXT($_SESSION['id']);
+				$uid = Scrub::text($_SESSION['id']);
 			}
 			else {
 				$uid = $_POST['userid'];

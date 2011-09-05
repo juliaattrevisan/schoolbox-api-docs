@@ -28,7 +28,7 @@ if (is_numeric($this->arg[0])) {
 	$output = array('ACTION'		=> 'Modify',
 					'WIKI_ID'		=> $previousRevision['wikiID'],
 					'CATEGORY_ID'	=> $previousRevision['categoryID'],
-					'HEADING'		=> scrubText($previousRevision['heading']),
+					'HEADING'		=> Scrub::text($previousRevision['heading']),
 					'BODY'          => $previousRevision['body'],
                     'REVISION'      => $wiki['latestRevision'],
 					);
@@ -47,7 +47,7 @@ if (is_numeric($this->arg[0])) {
 	$output = array('ACTION'		=> 'Add',
 					'WIKI_ID'		=> '',
 					'CATEGORY_ID'	=> $this->arg[1],
-					'HEADING'		=> scrubText($wiki['heading']),
+					'HEADING'		=> Scrub::text($wiki['heading']),
 					'BODY'			=> $wiki['body']
 					);
 	$this->setVar($output);

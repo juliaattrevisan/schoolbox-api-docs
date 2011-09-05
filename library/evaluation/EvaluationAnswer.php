@@ -124,8 +124,8 @@ abstract class EvaluationAnswer extends DeprecatedModel {
     public function saveReviewedResponse($data, $response_id) {
         $reviewedResponse = array(
             'response_id' => $response_id,
-            'comment' => scrubTEXT($data['comment']),
-            'mark' => scrubTEXT($data['reviewedMarks']),
+            'comment' => Scrub::text($data['comment']),
+            'mark' => Scrub::text($data['reviewedMarks']),
         );
 
         if ($this->responseHandler->update($reviewedResponse)) {

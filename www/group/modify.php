@@ -25,7 +25,7 @@ if (is_numeric($this->arg[0])) {
 	if($groupHandler->getPermission($this->arg[0]) < FULL_ACCESS)
 		error(19);
 
-	$output = array('CATEGORY_NAME'		=> scrubText($category['name']),
+	$output = array('CATEGORY_NAME'		=> Scrub::text($category['name']),
 					'CATEGORY_ID'		=> $category['id'],
 					'GROUP_OWNER'		=> $userHandler->formatName($category),
 					'OWNER_ID'			=> $category['owner'],

@@ -21,7 +21,7 @@ $workshopList = $workshopHandler->getAll('sessionID');
 if (is_array($workshopList)) {
 	foreach ($workshopList as $workshop) {
 		$output = array('WORKSHOP_ID'		=> $workshop['workshopID'],
-						'WORKSHOP_TITLE'	=> scrubText($workshop['title']),
+						'WORKSHOP_TITLE'	=> Scrub::text($workshop['title']),
 						'WORKSHOP_BOOKED'	=> $workshop['booked'],
 						'ON_OFF'			=> ++$i % 2 ? 'dark' : '',
 						);

@@ -24,25 +24,25 @@ if (!empty($_POST)) {
 		error(112);
 	}
 
-    if (!$assessHandler->isOwner(scrubTEXT($_POST['assess_id']))) {
+    if (!$assessHandler->isOwner(Scrub::text($_POST['assess_id']))) {
         error(130);
     }
 
     $sectionHandler = new AssessSection();
 
     $sectionHandler->update(array(
-        'assess_id' => scrubTEXT($_POST['assess_id']),
-        'section_id' => scrubTEXT($_POST['section_id']),
-        'sequence' => scrubTEXT($_POST['sequence']),
-        'title' => scrubTEXT($_POST['title']),
-        'random' => scrubTEXT($_POST['random']),
-        'pool' => scrubTEXT($_POST['pool']),
-        'description' => scrubTEXT($_POST['description']),
+        'assess_id' => Scrub::text($_POST['assess_id']),
+        'section_id' => Scrub::text($_POST['section_id']),
+        'sequence' => Scrub::text($_POST['sequence']),
+        'title' => Scrub::text($_POST['title']),
+        'random' => Scrub::text($_POST['random']),
+        'pool' => Scrub::text($_POST['pool']),
+        'description' => Scrub::text($_POST['description']),
     ));
 
     /* Redirect to summary
      */
-    localRedir('/survey/summary/' . scrubTEXT($_POST['assess_id']));
+    localRedir('/survey/summary/' . Scrub::text($_POST['assess_id']));
 }
 else {
     if (!is_numeric($this->arg[0])) {

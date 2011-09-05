@@ -23,7 +23,7 @@ if (!($blog = $blogHandler->getByCID($this->arg[0]))) {
 }
 
 $this->setVar(array(
-    'CATEGORY_NAME'	=> scrubText($category['name']),
+    'CATEGORY_NAME'	=> Scrub::text($category['name']),
     'TITLE'			=> 'Blog Archive',
     'ID'			=> $category['id'],
 ));

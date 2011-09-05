@@ -14,8 +14,8 @@ if(is_numeric($this->arg[0])) {
     $subbox = $subHandler->getByID($this->arg[0]);
     $late = $studHandler->securityCheck($this->arg[0]);
 
-    $output = array('CATEGORY'  => scrubTEXT($subbox['categoryName']),
-                    'FILE'      => scrubTEXT($subbox['name']),
+    $output = array('CATEGORY'  => Scrub::text($subbox['categoryName']),
+                    'FILE'      => Scrub::text($subbox['name']),
                     'BOX_ID'    => $this->arg[0],
                     );
 

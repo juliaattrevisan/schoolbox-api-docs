@@ -24,7 +24,7 @@ class ModuleJobDetails extends HelpdeskPage{
 		$this->_tpl->set_file( 'tplContent', $this->_TPL_NAME);
 		$this->_jobID = $jobID;
 		$this->_sql = SQL_jobDetails( $this->_jobID);
-		
+
 		//if user has permission allow them to delete attachments
 		if($_SESSION['authlevel'] == 3) {
 			$this->_showDelete = true;
@@ -41,7 +41,7 @@ class ModuleJobDetails extends HelpdeskPage{
 		$row = mysql_fetch_array( $query);
 		print mysql_error();
 		$row = stripslashes_array($row);
-		
+
 		if($row['priority'] == "")
 			$row['priority'] = "Normal";
 
@@ -59,7 +59,7 @@ class ModuleJobDetails extends HelpdeskPage{
 		}
 
 		$this->_tpl->set_var( 'JOB_ID', $row[ 'jobID']);
-		$this->_tpl->set_var( 'DESCRIPTION', scrubTEXT($row[ 'description']));
+		$this->_tpl->set_var( 'DESCRIPTION', Scrub::text($row[ 'description']));
 		$this->_tpl->set_var( 'PROBLEM', $row[ 'problem']);
 		$this->_tpl->set_var( 'STATUS', $row[ 'status']);
 		$this->_tpl->set_var( 'CREATED_USER', $row[ 'createdUser']);
@@ -73,7 +73,7 @@ class ModuleJobDetails extends HelpdeskPage{
 		$this->_tpl->set_var( 'EQUIPMENT_USER_PORTAL_ID', $row[ 'equipmentOwnerPortalID']);
 		$this->_tpl->set_var( 'EQUIPMENT_MODEL', $row[ 'equipmentModel']);
 		$this->_tpl->set_var( 'ASSOCIATED_USER', $row[ 'associatedUserName']);
-		$this->_tpl->set_var( 'ASSOCIATED_USER_ID', $row[ 'associatedUserSynergyID']);		
+		$this->_tpl->set_var( 'ASSOCIATED_USER_ID', $row[ 'associatedUserSynergyID']);
 		$this->_tpl->set_var( 'ASSOCIATED_USER_PORTAL_ID', $row[ 'portalAssociatedUserID']);
 		$this->_tpl->set_var( 'CAMPUS', $row[ 'campus']);
 		$this->_tpl->set_var( 'EVENT_LIST', $this->eventList);
@@ -120,7 +120,7 @@ class ModuleJobDetails extends HelpdeskPage{
 			mysql_select_db( DB_NAME_PORTAL);
 			$query = mysql_query( SQL_userDetails( $row[ 'associatedUserID']));
 			if ($query != 1){
-			$row_ms = mysql_fetch_array($query); 
+			$row_ms = mysql_fetch_array($query);
 			mysql_close( $link_ms);
 			$this->_tpl->set_var( 'ASSOCIATED_USER', $row_ms[ 'firstname'] . ' ' . $row_ms[ 'surname']);
 			}
@@ -131,40 +131,40 @@ class ModuleJobDetails extends HelpdeskPage{
 
 			# Specs - not yet implemented
 		#$query = mysql_query( SQL_jobSpecs( $jobID));
-		
+
 		# File list
-	
+
 		$this->_tpl->set_block( 'tplContent', 'fileDelete', 'fDelete');
 		$this->_tpl->set_block( 'tplContent', 'fileList', 'blkFileList');
-		$this->_tpl->set_block( 'fileList', 'fileItem', 'blkFileItem');	
-	
-		
+		$this->_tpl->set_block( 'fileList', 'fileItem', 'blkFileItem');
+
+
 		$sql = SQL_fileList($row[ 'jobID']);
 		$res = mysql_query($sql);
-	
-		if(($numRows = mysql_num_rows($res)) > 0) 
+
+		if(($numRows = mysql_num_rows($res)) > 0)
 		{
-			
+
 			while (list($fileID, $jobID, $fileName) = mysql_fetch_array($res)) {
-		
+
 				$this->_tpl->set_var('FILE_ITEM_LINK', $jobID . "." . $fileID . "." . $fileName);
 				$this->_tpl->set_var('FILE_ITEM_NAME', $fileName);
-				
-				
-				
-					
+
+
+
+
 				if($this->_showDelete){
-					
-					$this->_tpl->set_var( 'JOB_FILE_ID', $fileID);	
+
+					$this->_tpl->set_var( 'JOB_FILE_ID', $fileID);
 					$this->_tpl->parse('fDelete', 'fileDelete', false);
 				}
 				else{
 					$this->_tpl->set_var('fDelete', '');
 				}
-						
-				$this->_tpl->parse( 'blkFileItem', 'fileItem', true);		
+
+				$this->_tpl->parse( 'blkFileItem', 'fileItem', true);
 			}
-			
+
 			$this->_tpl->parse('blkFileList', 'fileList');
 		}
 		else

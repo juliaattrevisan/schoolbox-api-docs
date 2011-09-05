@@ -23,8 +23,8 @@ if (is_array($eventList)) {
 						'TUTORIAL_DATE'			=> $tutorialDate->getLong(),
 						'TUTORIAL_START'		=> $event['start'],
 						'TUTORIAL_FINISH'		=> $event['finish'],
-						'TUTORIAL_NAME'			=> scrubText($event['name']),
-						'TUTORIAL_LOCATION'		=> scrubText($event['location']),
+						'TUTORIAL_NAME'			=> Scrub::text($event['name']),
+						'TUTORIAL_LOCATION'		=> Scrub::text($event['location']),
 						'TUTORIAL_CANCELLED'	=> $event['cancelled'] == 'true' ? 'cancelled' : '',
 						'ON_OFF'				=> ++$j%2 ? '' : 'dark',
 
@@ -57,8 +57,8 @@ if (is_array($eventList)) {
 						'TUTORIAL_DATE'			=> $tutorialDate->getShort(),
 						'TUTORIAL_START'		=> $event['start'],
 						'TUTORIAL_FINISH'		=> $event['finish'],
-						'TUTORIAL_NAME'			=> scrubText($event['name']),
-						'TUTORIAL_LOCATION'		=> scrubText($event['location']),
+						'TUTORIAL_NAME'			=> Scrub::text($event['name']),
+						'TUTORIAL_LOCATION'		=> Scrub::text($event['location']),
 						'TUTORIAL_CANCELLED'	=> $event['cancelled'] == 'true' ? 'cancelled' : '',
 						'ON_OFF'				=> ++$j%2 ? 'dark' : '',
 						);

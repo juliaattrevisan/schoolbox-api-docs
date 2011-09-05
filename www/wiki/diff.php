@@ -45,7 +45,7 @@ if (is_numeric($this->arg[0])) {
 			'CATEGORY_ID'      => $from['categoryID'],
 			'FROM_ID'          => $from['revisionID'],
 			'TO_ID'            => $to['revisionID'],
-			'HEADING'          => scrubText($from['heading']),
+			'HEADING'          => Scrub::text($from['heading']),
 			'DIFF'             => $renderer->render($diff),
 			'MODIFIED'         => $modifiedDate->getLong(),
 			'AUTHOR'           => $userHandler->formatName($from),
@@ -69,7 +69,7 @@ if (is_numeric($this->arg[0])) {
 					'REVISION_ID'       => $from['revisionID'],
 					'REVISION_COMPARE'  => $revision['revisionID'],
 					'REVISION_DATE'     => $revisionDate->getDateOnly(),
-					'REVISION_HEADING'	=> scrubText($revision['heading']),
+					'REVISION_HEADING'	=> Scrub::text($revision['heading']),
 					'REVISION_AUTHOR'	=> $userHandler->formatName($revision),
 			);
 

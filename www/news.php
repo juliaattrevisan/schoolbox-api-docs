@@ -72,7 +72,7 @@ if(is_array($items))
 						'POSTER'		=> $owner,
 						'DATETIME' 		=> $_SESSION['su'] == 1 ? $article['post_datetime']." expires on ".$article['expire_datetime'] : $article['post_datetime'],
 						'NEWS_BODY'		=> scrubHTML($article['item_body']),
-						'TOPIC_NAME'	=> scrubText($previous['topicName']),
+						'TOPIC_NAME'	=> Scrub::text($previous['topicName']),
 						'TOPIC_CLEAN'	=> $url->getSlug(),
 						);
 
@@ -92,7 +92,7 @@ if(is_array($items))
 			/* Last rotation
 			 */
 			if ($total == $i) {
-				$this->setVar('TOPIC_NAME', scrubText($article['topicName']));
+				$this->setVar('TOPIC_NAME', Scrub::text($article['topicName']));
 				$this->setVar('TOPIC_CLEAN', $url->getSlug());
 				$this->parse('topic_block', 'topic', true);
 			}
@@ -102,7 +102,7 @@ if(is_array($items))
 			/* Last rotation
 			 */
 			$this->parse("news_block", "news", true);
-			$this->setVar('TOPIC_NAME', scrubText($article['topicName']));
+			$this->setVar('TOPIC_NAME', Scrub::text($article['topicName']));
 			$this->setVar('TOPIC_CLEAN', $url->getSlug());
 
 			$this->parse('topic_block', 'topic', true);
@@ -120,7 +120,7 @@ if(is_array($items))
         foreach ($topicList as $topic => $bin) {
 			$url = new Url($topic);
 
-            $output = array('NEWS_TOPIC'	=> scrubText($topic),
+            $output = array('NEWS_TOPIC'	=> Scrub::text($topic),
                             'TOPIC_CLEAN'	=> $url->getSlug(),
                         );
             $this->setVar($output);

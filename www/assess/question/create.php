@@ -38,7 +38,7 @@ if (!empty($_POST)) {
 		error(112);
 	}
 
-    if (!$assessHandler->isOwner(scrubTEXT($section['assess_id']))) {
+    if (!$assessHandler->isOwner(Scrub::text($section['assess_id']))) {
         error(130);
     }
 
@@ -46,8 +46,8 @@ if (!empty($_POST)) {
 		error(115);
 	}
 
-    $questionHandler = $factory->createQuestionModel(scrubTEXT($_POST['type_id']));
-    $answerHandler = $factory->createAnswerModel(scrubTEXT($_POST['type_id']));
+    $questionHandler = $factory->createQuestionModel(Scrub::text($_POST['type_id']));
+    $answerHandler = $factory->createAnswerModel(Scrub::text($_POST['type_id']));
 
     $question_id = $questionHandler->create($_POST);
     $answer_id = $answerHandler->create($_POST, $question_id);
@@ -62,7 +62,7 @@ if (!empty($_POST)) {
 
     /* Need to keep this so non-ajaxed questions still redirect
      */
-    localRedir('/assess/question/create/' . scrubTEXT($_POST['section_id']));
+    localRedir('/assess/question/create/' . Scrub::text($_POST['section_id']));
 }
 else {
     if (!is_numeric($this->arg[0])) {

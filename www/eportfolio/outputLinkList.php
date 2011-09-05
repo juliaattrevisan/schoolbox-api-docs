@@ -23,12 +23,12 @@ if (is_array($linkList)) {
 
 		$this->setVar(array(
             'LINK_ID' => $link['id'],
-            'LINK_NAME' => scrubTEXT($link['description']),
+            'LINK_NAME' => Scrub::text($link['description']),
             'LINK_URL' => $linkUrl,
             'LINK_POSTED_BY' => $userHandler->formatName($link),
             'LINK_POSTED_BY_ID' => $link['owner'],
             'LINK_POSTED_DATE' => $postedDate->getShort(),
-            'LINK_COMMENT' => nl2br(scrubTEXT($link['comment'])),
+            'LINK_COMMENT' => nl2br(Scrub::text($link['comment'])),
             'ON_OFF' => ++$j%2? '' : 'dark',
         ));
 

@@ -36,11 +36,11 @@ if (($perm = $groupHandler->getPermission($category['id'])) < READ_ACCESS)
 
 
 
-$this->setTitle(scrubText($category['name']) . ' Forum');
+$this->setTitle(Scrub::text($category['name']) . ' Forum');
 
 
 /* output breadcrumbs */
-$output = array('CATEGORY'		=> scrubText($category['name']),
+$output = array('CATEGORY'		=> Scrub::text($category['name']),
 				'CATEGORY_ID'	=> $category['id'],
 				);
 $this->setVar($output);
@@ -108,13 +108,13 @@ if (is_array($threadList)) {
 
 		$output = array(
 			'THREAD_ID' => $thread['threadID'],
-			'THREAD_TITLE' => scrubText($thread['title']),
-			'THREAD_AUTHOR' => scrubText($userHandler->formatName($user)),
+			'THREAD_TITLE' => Scrub::text($thread['title']),
+			'THREAD_AUTHOR' => Scrub::text($userHandler->formatName($user)),
 			'THREAD_TIME' => $threadTime->setPrefix('')->getRelativeTime(),
 			'THREAD_LAST_POST_TIME' => $threadLastPostTime->setPrefix('')->getRelativeTime(),
 			'THREAD_LAST_POST_ID' => $thread['last_post_id'],
 			'THREAD_LAST_POST_USER_ID' => $thread['last_post_user_id'],
-			'THREAD_LAST_POST_USER' => scrubText($thread['last_post_user']),
+			'THREAD_LAST_POST_USER' => Scrub::text($thread['last_post_user']),
 			'THREAD_REPLIES' => $thread['replies'],
 			'THREAD_VIEWS' => $thread['views'],
 			'THREAD_LAST_PAGE' => ceil((($thread['replies'] + 1) / FORUM_POSTS_PER_PAGE)),

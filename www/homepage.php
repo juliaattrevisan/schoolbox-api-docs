@@ -87,7 +87,7 @@ $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $codeCount = count(explode(',', $code));
 
 $output = array(
-	'HEADING' => scrubTEXT($category['name']) . (isset($code) && $codeCount < 2 ? ' (' . $code . ')' : ''),
+	'HEADING' => Scrub::text($category['name']) . (isset($code) && $codeCount < 2 ? ' (' . $code . ')' : ''),
 	'CODE' => urlencode(urlencode($code)),
 	'ID' => $categoryID,
 	//'TEMPLATE'				=> 'template'.$category['template'],
@@ -126,10 +126,10 @@ if ($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
 			}
 
 			$output = array(
-				'HOMEPAGE_COMPONENT_ID' => scrubTEXT($component['id']),
-				'HOMEPAGE_COMPONENT_NAME' => scrubTEXT($component['name']),
+				'HOMEPAGE_COMPONENT_ID' => Scrub::text($component['id']),
+				'HOMEPAGE_COMPONENT_NAME' => Scrub::text($component['name']),
 				'HOMEPAGE_COMPONENT_COUNT' => $component['componentCount'],
-				'HOMEPAGE_COMPONENT_DESCRIPTION' => scrubTEXT($component['description']),
+				'HOMEPAGE_COMPONENT_DESCRIPTION' => Scrub::text($component['description']),
 				'HOMEPAGE_COMPONENT_CLASS' => $class,
 				'HOMEPAGE_COMPONENT_CATEGORY_ID' => $previous['categoryID']
 			);

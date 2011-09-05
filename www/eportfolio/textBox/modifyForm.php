@@ -10,13 +10,13 @@ $eportfolioHandler = new ePortfolio($_SESSION['id']);
 $textBoxHandler = new ePortfolioTextBox();
 
 if (isset($_POST['heading']) && isset($_POST['body'])) {
-	if (!$eportfolioHandler->canEdit(scrubTEXT($_POST['userID']))) {
+	if (!$eportfolioHandler->canEdit(Scrub::text($_POST['userID']))) {
 		error(19);
     }
 
 	$textBox = array(
-		'userID' => scrubTEXT($_POST['userID']),
-		'componentLocationID' => scrubTEXT($_POST['componentLocationID']),
+		'userID' => Scrub::text($_POST['userID']),
+		'componentLocationID' => Scrub::text($_POST['componentLocationID']),
         'heading' => scrubHTML($_POST['heading']),
         'body' => scrubHTML($_POST['body']),
     );
@@ -24,7 +24,7 @@ if (isset($_POST['heading']) && isset($_POST['body'])) {
 	/* If an ID was provided, update existing record; otherwise create
 	 */
 	if (is_numeric($_POST['textBoxID'])) {
-		$textBox['textBoxID'] = scrubTEXT($_POST['textBoxID']);
+		$textBox['textBoxID'] = Scrub::text($_POST['textBoxID']);
 
 		$textBoxHandler->update($textBox);
 	}
@@ -35,7 +35,7 @@ if (isset($_POST['heading']) && isset($_POST['body'])) {
 	localRedir('/eportfolio/' . $_SESSION['id']);
 }
 else if (is_numeric($_POST['delete'])) {
-	$textBoxHandler->delete(scrubTEXT($_POST['delete']));
+	$textBoxHandler->delete(Scrub::text($_POST['delete']));
 }
 else {
 	error(2);

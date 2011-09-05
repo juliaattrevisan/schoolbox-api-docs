@@ -36,14 +36,14 @@ if (!empty($_POST)) {
     }
 
     $assess_id = $assessHandler->create(array(
-        'category_id' => scrubTEXT($_POST['category_id']),
+        'category_id' => Scrub::text($_POST['category_id']),
         'user_id' => $_SESSION['id'],
-        'title' => scrubTEXT($_POST['title']),
-        'description' => scrubTEXT($_POST['description']),
+        'title' => Scrub::text($_POST['title']),
+        'description' => Scrub::text($_POST['description']),
         'start' => $start->getDatabase(),
         'finish' => $finish->getDatabase(),
-        'duration' => scrubTEXT($duration),
-        'allow_resit' => scrubTEXT($_POST['allow_resit']),
+        'duration' => Scrub::text($duration),
+        'allow_resit' => Scrub::text($_POST['allow_resit']),
 		'availability' => 'assess',
         'created_at' => 'NOW()',
     ));

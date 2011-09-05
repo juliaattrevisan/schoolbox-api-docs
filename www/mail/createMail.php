@@ -8,7 +8,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] .'/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] .'/../library/group.php';
 
-$page = new SitePage(); 
+$page = new SitePage();
 
 $groupHandler = new Group;
 
@@ -36,8 +36,8 @@ if(Cfg::get('mail_enable') == 1) {
 
             $output = array('SUBJECT' 	=> '',
                             'BODY'	=> '',
-                            'REPLYTO'	=> scrubTEXT($_REQUEST['replyto']),
-                            'BCC'	=> scrubTEXT($_REQUEST['bcc']),
+                            'REPLYTO'	=> Scrub::text($_REQUEST['replyto']),
+                            'BCC'	=> Scrub::text($_REQUEST['bcc']),
 
                                     );
 

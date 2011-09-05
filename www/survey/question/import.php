@@ -39,8 +39,8 @@ if ($sectionHandler->isDeleted($this->arg[0])) {
 $xml = simplexml_load_string($data);
 
 if (is_numeric((string)$xml->typeid)) {
-	$questionHandler = $factory->createQuestionModel(scrubTEXT($xml->typeid));
-	$answerHandler = $factory->createAnswerModel(scrubTEXT($xml->typeid));
+	$questionHandler = $factory->createQuestionModel(Scrub::text($xml->typeid));
+	$answerHandler = $factory->createAnswerModel(Scrub::text($xml->typeid));
 
 	$question_id = $questionHandler->create(array(
 		'question_id' => '',

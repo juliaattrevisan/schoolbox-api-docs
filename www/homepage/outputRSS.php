@@ -4,7 +4,7 @@ $this->setBlock('rss_stories', 'rss_date', 'rss_date_block');
 
 $rss = new Xml($config['url'], RSS_cache_time);
 
-$this->setVar('RSS_NAME', !empty($rss->channel->title) ? scrubTEXT($rss->channel->title) : 'Please enter a feed URL');
+$this->setVar('RSS_NAME', !empty($rss->channel->title) ? Scrub::text($rss->channel->title) : 'Please enter a feed URL');
 $this->setVar('RSS_LINK', $rss->channel->link);
 $this->setVar("rss_block", '');
 
@@ -14,7 +14,7 @@ if ($rss->channel) {
     foreach($rss->channel->item as $i => $item) {
         $this->setVar(array(
             'ON_OFF'    => ++$j%2 ? '' : 'dark',
-            'RSS_TITLE' => scrubTEXT($item->title),
+            'RSS_TITLE' => Scrub::text($item->title),
             'RSS_URL'   => base64_encode($item->link),
             'RSS_BRIEF' => scrubHTML($item->description)
         ));

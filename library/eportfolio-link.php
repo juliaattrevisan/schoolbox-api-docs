@@ -8,7 +8,7 @@ class ePortfolioLink extends DeprecatedModel {
 	function ePortfolioLink() {
 		$this->_table = "eportfolio_link";
 		$this->_index = "id";
-		
+
 		parent::DeprecatedModel();
 	}
 
@@ -27,7 +27,7 @@ class ePortfolioLink extends DeprecatedModel {
 
     /**
      * Gets all the links owned by $userID
-     * 
+     *
      * @param <type> $userID
      * @param <type> $config
      * @return <type>
@@ -46,66 +46,66 @@ class ePortfolioLink extends DeprecatedModel {
 		$config['sortdir'] = strtoupper($config['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
 
 		$query .= " ORDER BY " . $sortFields[$config['sort']] . " " . $config['sortdir'];
-		
+
 		if ($config['size'] > 0) {
 			$query .= " LIMIT 0, " . $config['size'];
         }
 
 		return $this->db->getAll($query);
 	}
-	
+
 	function appendHTTP($url) {
 		if( strncasecmp($url,"http://", 7) && strncasecmp($url, "https://", 8) )
 			$url = "http://".$url;
 		return $url;
 	}
-	
+
 	function logAction ($linkID, $action) {
 		$logEntry = array(	'object'	=> 'link',
 							'objectId'	=> $linkID,
 							'action'	=> $action,
 							'user'		=> $_SESSION['id'],
 							);
-		
+
 		$this->db->insert('cmsLog', $logEntry);
 	}
-	
+
 	function update($data) {
 
-        if(isset($data['url'])) 
+        if(isset($data['url']))
             $data['url'] = $this->appendHTTP(trim($data['url']));
-		
+
 		parent::update($data);
-		
+
 		/* Update log entry */
 		$this->logAction($data[$this->_index], 'modify');
-	
+
 	}
-	
+
 	function create($data) {
-		
+
 		$data['submitted'] = 'NOW()';
 		$data['url'] = $this->appendHTTP(trim($data['url']));
-		
+
 		$linkID = parent::create($data);
-		
+
 		/* Insert log entry */
 		$this->logAction($linkID, 'create');
-		
+
 		return $linkID;
 	}
-	
+
 	function delete($id) {
-		
+
 		parent::delete($id);
-	
+
 		/* Delete log entry */
 		$this->logAction($id, 'delete');
-	
+
 	}
-        
+
 	function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
-		$keyword = scrubText($keyword);
+		$keyword = Scrub::text($keyword);
 
 		$query = "SELECT `link`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
 						MATCH(`url`,`description`,`comment`) AGAINST ('$keyword') AS `score`

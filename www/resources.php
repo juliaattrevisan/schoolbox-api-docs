@@ -94,9 +94,9 @@ if (is_array($categoryList)) {
 				$class[] = "full";
 
 			/* append code to name */
-			$name = scrubTEXT($category['name']);
+			$name = Scrub::text($category['name']);
 			if($category['code'] != '' && $category['code'] != $category['name'])
-				$name .= ' ('.scrubTEXT($category['code']).')';
+				$name .= ' ('.Scrub::text($category['code']).')';
 
 			$output = array('CATEGORY_ID'		=> $category['id'],
 							'CATEGORY_NAME'		=> $name,
@@ -161,7 +161,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 
 		$output = array('FILE_ID' 	 	=> $file['id'],
 						'TYPE'			=> $file['url'] ? 'link' : 'file',
-						'FILE_NAME' 	=> TextFormatter::cutString(scrubText($file['description']),32),
+						'FILE_NAME' 	=> TextFormatter::cutString(Scrub::text($file['description']),32),
 						'FILE_MODIFIED'	=> $fileModifiedTime->setPrefix('')->getRelativeTime(),
 						'FILE_OWNER'	=> $userHandler->formatName($file),
 						'FILE_SIZE'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",

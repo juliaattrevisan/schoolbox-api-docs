@@ -34,12 +34,12 @@ if(is_numeric($this->arg[0])) {
 	//$this->setVar('browse_block', '');
 	$output = array('ACTION'		=> 'Modify',
                         'FILE_ID'		=> $file['id'],
-                        'DESCRIPTION'		=> scrubText($file['description']),
-                        'COMMENT'		=> scrubText($file['comment']),
+                        'DESCRIPTION'		=> Scrub::text($file['description']),
+                        'COMMENT'		=> Scrub::text($file['comment']),
                         'HIDDEN_SELECTED'	=> $file['hidden'] > 0 ? 'checked="checked"' : '',
                         'MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
                         'CATEGORY_ID'		=> $file['cid'],
-                        'CATEGORY_NAME'		=> scrubText($file['categoryName']),
+                        'CATEGORY_NAME'		=> Scrub::text($file['categoryName']),
                         'DUE_DAY'		=> '',
                         'DUE_MONTH'		=> '',
                         'DUE_YEAR'		=> '',
@@ -123,7 +123,7 @@ if(is_numeric($this->arg[0])) {
                         'HIDDEN_SELECTED'	=> '',
                         'MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
                         'SUBBOX'			=> '<input type="checkbox" name="submission" id="submission" value="1" >',
-                        'CATEGORY_NAME'		=> scrubTEXT($category['name']),
+                        'CATEGORY_NAME'		=> Scrub::text($category['name']),
                         'CATEGORY_ID'		=> $category['id'],
                         'DUE_DAY'		=> is_numeric($this->arg[2])?$this->arg[2]:'',
                         'DUE_MONTH'		=> is_numeric($this->arg[3])?$this->arg[3]:'',
@@ -180,7 +180,7 @@ else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS)
 		error(6);
 
-	$output = array('CATEGORY_NAME'		=> scrubTEXT($category['name']),
+	$output = array('CATEGORY_NAME'		=> Scrub::text($category['name']),
 					'CATEGORY_ID'		=> $category['id'],
 					'FILE_max_upload'	=> Cfg::get('file_upload_count'),
 					'SESSION_NAME'		=> session_name(),
@@ -213,7 +213,7 @@ else if($this->arg[0] == 'multicat') {
 	if (is_array($categoryList)) {
 		foreach($categoryList as $category) {
 			$output = array(
-				'CATEGORY_NAME' =>scrubTEXT($category['name']) . ($category['code']?' ('.$category['code'].')':''),
+				'CATEGORY_NAME' =>Scrub::text($category['name']) . ($category['code']?' ('.$category['code'].')':''),
 				'CATEGORY_ID' => $category['id'],
 			);
 

@@ -24,7 +24,7 @@ if (!empty($_POST)) {
 
 	foreach($_POST['delete_question_bank_id'] as $questionBankId) {
 		$questionBankHandler->update(array(
-			'question_bank_id' => scrubText($questionBankId),
+			'question_bank_id' => Scrub::text($questionBankId),
 			'deleted_at' => 'NOW()',
 		));
 

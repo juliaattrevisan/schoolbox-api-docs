@@ -32,14 +32,14 @@ else if (is_numeric($this->arg[0])) {
     $eportfolioHandler = new ePortfolio($blog['owner']);
 
 	$this->setTitle('Modify Blog Entry');
-    
+
     if (!$eportfolioHandler->canEdit($blog['owner'])) {
         error(23);
     }
-	
+
 	$this->setVar(array(
 		'ACTION'		=> 'Modify',
-		'ENTRY_HEADING' => scrubTEXT($blog['heading']),
+		'ENTRY_HEADING' => Scrub::text($blog['heading']),
 		'ENTRY_BODY'    => scrubHTML($blog['body']),
 		'UID'			=> $blog['owner'],
 		'ID'			=> $this->arg[0],

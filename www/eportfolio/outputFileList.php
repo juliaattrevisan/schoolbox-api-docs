@@ -19,13 +19,13 @@ if (is_array($fileList)) {
 		$publishedDate = new Alaress_Date_Format($file['published'], 'U');
 
 		$this->setVar(array(
-            'FILE_DESCRIPTION'	=> scrubTEXT($file['description']),
+            'FILE_DESCRIPTION'	=> Scrub::text($file['description']),
             'FILE_ID'			=> $file['id'],
             'FILE_MIME_IMAGE'	=> $allowedFiles->getClass($file["iconFile"]),
             'FILE_POSTED_BY'	=> $userHandler->formatName($file),
             'FILE_POSTED_BY_ID'	=> $file['owner'],
             'FILE_PUBLISHED_DATE'	=> $publishedDate->getShort(),
-            'FILE_COMMENT'		=> nl2br(scrubTEXT($file['comment'])),
+            'FILE_COMMENT'		=> nl2br(Scrub::text($file['comment'])),
             'ON_OFF'			=> ++$j%2 ? '' : 'dark',
             'HIDDEN'            => $file['hidden'] ? 'hidden' : '',
         ));

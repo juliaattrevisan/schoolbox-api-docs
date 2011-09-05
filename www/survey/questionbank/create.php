@@ -21,14 +21,14 @@ $questionBankHandler = new SurveyQuestionBank();
 
 if (!empty($_POST)) {
 	$questionBankHandler->addQuestion(
-		scrubTEXT($_POST['question_category']),
-		scrubTEXT($_POST['type_id']),
-		scrubTEXT($_POST['question_id']),
-		scrubTEXT($_POST['answer_id']),
-		scrubTEXT($_POST['marks'])
+		Scrub::text($_POST['question_category']),
+		Scrub::text($_POST['type_id']),
+		Scrub::text($_POST['question_id']),
+		Scrub::text($_POST['answer_id']),
+		Scrub::text($_POST['marks'])
 	);
 
-	localRedir('/survey/questionbank/created/' . scrubTEXT($_POST['question_id']));
+	localRedir('/survey/questionbank/created/' . Scrub::text($_POST['question_id']));
 }
 else {
 	error(2);

@@ -16,8 +16,8 @@ if ( !empty($config['pollID']) && is_numeric($config['pollID']) ) {
     if ($poll['pollID']) {
         $this->setVar(array(
             'POLL_ID'		=> $poll['pollID'],
-            'POLL_TITLE'	=> scrubText($poll['title']),
-            'POLL_QUESTION'	=> scrubText($poll['question']),
+            'POLL_TITLE'	=> Scrub::text($poll['title']),
+            'POLL_QUESTION'	=> Scrub::text($poll['question']),
         ));
 
         $pollData = $pollHandler->getData($poll['pollID']);
@@ -34,7 +34,7 @@ if ( !empty($config['pollID']) && is_numeric($config['pollID']) ) {
                 foreach ($pollData as $data) {
                     $this->setVar(array(
                         'POLL_OPTION_INDEX'	=> $i,
-                        'POLL_OPTION'		=> scrubText($data['option']),
+                        'POLL_OPTION'		=> Scrub::text($data['option']),
                         'POLL_ON_OFF'		=> $i % 2 ? 'polloff':'',
                     ));
 
@@ -55,7 +55,7 @@ if ( !empty($config['pollID']) && is_numeric($config['pollID']) ) {
                 foreach ($pollData as $data) {
                     $this->setVar(array(
                         'POLL_OPTION_INDEX'	=> $i,
-                        'POLL_OPTION'		=> scrubText($data['option']),
+                        'POLL_OPTION'		=> Scrub::text($data['option']),
                         'POLL_ON_OFF'		=> $i % 2 ? 'polloff':'',
                     ));
 
@@ -103,7 +103,7 @@ $pollList = $pollHandler->getAllByCategory($categoryID);
 if (is_array($pollList)) {
 	foreach ($pollList as $poll) {
 		$this->setVar(array(
-			'COMPONENT_CONFIG_SELECT_NAME' 		=> scrubText($poll['title']),
+			'COMPONENT_CONFIG_SELECT_NAME' 		=> Scrub::text($poll['title']),
 			'COMPONENT_CONFIG_SELECT_VALUE' 	=> $poll['pollID'],
 			'COMPONENT_CONFIG_SELECT_SELECTED'	=> $poll['pollID'] == $current['pollID'] ? 'selected="selected"' : '',
 		));

@@ -30,7 +30,7 @@ if(is_array($headlineList) )
 						'NEWS_URL'		=> '/news/#'.$item['item_id'],
 						'NEWS_TIME'		=> $newsTime->getRelativeTime(),
 						'ON_OFF'		=> ++$k%2? '' : 'dark',
-						'NEWS_TOPIC'	=> scrubText($previous['topicName']),
+						'NEWS_TOPIC'	=> Scrub::text($previous['topicName']),
 						'TOPIC_CLEAN'	=> $url->getSlug(),
 						);
 		$this->setVar($output);
@@ -51,7 +51,7 @@ if(is_array($headlineList) )
 			if ($total == $j) {
 				$url = new Url($item['topicName']);
 
-				$this->setVar('NEWS_TOPIC', scrubText($item['topicName']));
+				$this->setVar('NEWS_TOPIC', Scrub::text($item['topicName']));
 				$this->setVar('TOPIC_CLEAN', $url->getSlug());
 
 				$this->parse('topic_block', 'topic', true);
@@ -81,7 +81,7 @@ else
 foreach ($topicList as $topic => $bin) {
 	$url = new Url($topic);
 
-	$output = array('NEWS_TOPIC'	=> scrubText($topic),
+	$output = array('NEWS_TOPIC'	=> Scrub::text($topic),
 				    'TOPIC_CLEAN'	=> $url->getSlug(),
 					);
 	$this->setVar($output);

@@ -18,7 +18,7 @@ if ($_REQUEST['id']) {
 	if (!$groupHandler->involvedInSubject($subBox['cid']) && !$groupHandler->involvedInGroup($_SESSION['id'], $subBox['cid'])) {
         exit();
     }
-    
+
     $current_time = new DateTime();
 
     /* Get status to set action */
@@ -35,15 +35,15 @@ if ($_REQUEST['id']) {
 	$output = array(
         'id'			=> $subBox['id'],
         'cid'			=> $subBox['cid'],
-        'category'		=> scrubTEXT($subBox['categoryName']),
+        'category'		=> Scrub::text($subBox['categoryName']),
         'fid'			=> $subBox['fid'],
-        'typeName'		=> scrubTEXT($subBox['typeName']),
-        'name'	        => scrubTEXT($subBox['name']),
-        'description'	=> scrubTEXT($subBox['description']),
-        'comment'		=> scrubTEXT($subBox['comment']),
+        'typeName'		=> Scrub::text($subBox['typeName']),
+        'name'	        => Scrub::text($subBox['name']),
+        'description'	=> Scrub::text($subBox['description']),
+        'comment'		=> Scrub::text($subBox['comment']),
         'action'		=> $action,
     );
-    
+
 }
 
 header("Content-type: application/json");

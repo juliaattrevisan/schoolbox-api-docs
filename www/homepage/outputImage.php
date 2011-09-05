@@ -34,7 +34,7 @@ if ($continue) {
 
 
     $this->setVar("PREVIEW_IMAGE_URL", $imageurl);
-    $this->setVar("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));
+    $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image['comment']));
 
 	$url = new Url($config['url']);
 

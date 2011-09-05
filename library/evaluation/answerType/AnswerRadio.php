@@ -46,7 +46,7 @@ abstract class AnswerRadio extends EvaluationAnswer {
      * @param <type> $object
      */
     public function update($object) {
-        $question_id = scrubTEXT($_POST['question_id']);
+        $question_id = Scrub::text($_POST['question_id']);
 
         $query = "DELETE FROM {$this->_table}
                   WHERE question_id = '$question_id'";

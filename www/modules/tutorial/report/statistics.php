@@ -24,7 +24,7 @@ if (!isset($_GET['show']))
 
 $eventHandler = new Event;
 $eventList = $eventHandler->getStatistics($_GET['show']);
-$page->setVar('SHOW', ucwords(scrubText($_GET['show'])));
+$page->setVar('SHOW', ucwords(Scrub::text($_GET['show'])));
 
 $pageOutput = false;
 
@@ -34,10 +34,10 @@ if (is_array($eventList)) {
 	foreach ($eventList as $event) {
 
 		$output = array('EVENT_ID'		=> $event['eventID'],
-						'NAME'			=> scrubText($event['name']),
-						'CODE'			=> !empty($event['code']) ? scrubText($event['code']) : 'N/A',
+						'NAME'			=> Scrub::text($event['name']),
+						'CODE'			=> !empty($event['code']) ? Scrub::text($event['code']) : 'N/A',
 						'TYPE'			=> 'Tutorials',
-						'LOCATION'		=> scrubText($event['location']),
+						'LOCATION'		=> Scrub::text($event['location']),
 						'COUNT'			=> $eventHandler->getEventCount($event['code'], $event['eventID']),
 						'STUDENT_COUNT'	=> $eventHandler->getStudentCount($event['code'], $event['eventID']),
 						'ATTENDANCE' 	=> $event['expected'] > 0 ? number_format(($event['attended'] / $event['expected'])*100, 2) : 'N/A',
@@ -75,11 +75,11 @@ if (is_array($eventList)) {
 	foreach ($eventList as $event) {
 
 		$output = array('EVENT_ID'		=> $event['eventID'],
-						'NAME'			=> scrubText($event['name']),
+						'NAME'			=> Scrub::text($event['name']),
 						'CODE'			=> $event['code'],
 						'TYPE'			=> 'Consultation',
 						'COUNT'			=> $event['classes'],
-						'LOCATION'		=> scrubText($event['location']),
+						'LOCATION'		=> Scrub::text($event['location']),
 						'STUDENT_COUNT'	=> $event['students'],
 						'ATTENDANCE' 	=> $event['expected'] > 0 ? number_format(($event['attended'] / $event['expected'])*100, 2) : 'N/A',
 						'ON_OFF' 		=>  ++$i%2? 'dark' : '',

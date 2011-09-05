@@ -48,7 +48,7 @@ else if ($_POST['title'] && is_numeric($_POST['categoryID'])) {
 	);
 
 	if (is_numeric($_POST['pollID'])) {
-		$poll['pollID'] = scrubTEXT($_POST['pollID']);
+		$poll['pollID'] = Scrub::text($_POST['pollID']);
 
 		$pollHandler->update($poll);
 	}
@@ -66,9 +66,9 @@ else if ($_POST['title'] && is_numeric($_POST['categoryID'])) {
 		'pollID' => $poll['pollID']
 	));
 
-	$homepageHandler->updateComponentConfig(scrubTEXT($_POST['homepageComponentID']), $config);
+	$homepageHandler->updateComponentConfig(Scrub::text($_POST['homepageComponentID']), $config);
 
-	localRedir("/homepage/" . scrubTEXT($_POST['categoryID']));
+	localRedir("/homepage/" . Scrub::text($_POST['categoryID']));
 }
 else if (is_numeric($_GET['delete'])) {
 

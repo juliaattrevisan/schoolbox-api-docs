@@ -18,7 +18,7 @@ if (is_array($submissionList)) {
 		$dateHTML = $date->getDateOnly();
 		$dateURL = false;
 
-		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . scrubText($submission['name']) . ($nameURL ? '</a>' : "");
+		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . Scrub::text($submission['name']) . ($nameURL ? '</a>' : "");
 
         /* Actions Block */
         $this->setBlock('duework', 'duework_actions', 'duework_actions_block');
@@ -53,9 +53,9 @@ if (is_array($submissionList)) {
 		$output = array(
             'DUE_ID'    => $submission['id'],
 			'DUE_NAME'	=> $nameHTML,
-			'DUE_TYPE'	=> scrubTEXT($submission['typeName']),
+			'DUE_TYPE'	=> Scrub::text($submission['typeName']),
 			'DUE_DATE'	=> $dateHTML,
-			'DUE_COMMENT' => nl2br(scrubTEXT($submission['comment'])),
+			'DUE_COMMENT' => nl2br(Scrub::text($submission['comment'])),
 			'ON_OFF' => ++$j%2? '' : 'dark',
 		);
 

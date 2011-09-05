@@ -11,38 +11,38 @@ class displayHome
 	function displayHome()
 	{
 		$this->db = new DeprecatedDatabase();
-		
+
 		$this->t_body = new Template(TPL_directory);
         $this->t_body->set_file('tplBODY', 'modules/clearinghouse/home.htm');
 		$this->t_body->set_var('TITLE', HEADING." - PD Clearing House");
-	
+
   		include_once("../../include/page.php");
-		
+
 		$this->folderID = FOLDER_ID;
 		$this->t_body->set_var('FOLDER_ID', $this->folderID);
-	
+
 	}
-	
+
 	function upcomingEvents()
 	{
 		$this->t_body->set_block('tplBODY', 'event', 'event_block');
 		$eventObj = new Event;
 		$events = $eventObj->getUpcomingEvents(10);
-		
+
 		foreach($events as $event)
 		{
-			$tplVar = array(	'EVENT_NAME' => scrubTEXT($event['name']),
+			$tplVar = array(	'EVENT_NAME' => Scrub::text($event['name']),
 										'EVENT_ID' => $event['id'],
-										'EVENT_COST' => scrubTEXT('$'.$event['cost']),
-										'EVENT_DESC' => scrubTEXT($event['description']),
-										'EVENT_ORGANISER' => scrubTEXT($event['organiser']),
+										'EVENT_COST' => Scrub::text('$'.$event['cost']),
+										'EVENT_DESC' => Scrub::text($event['description']),
+										'EVENT_ORGANISER' => Scrub::text($event['organiser']),
 										'EVENT_DATE' => date('l jS \of F Y g:ia', $event['start']),
 									);
-			
+
 			$this->t_body->set_var($tplVar);
 			$this->t_body->parse('event_block', 'event', true);
 		}
-		
+
 	}
 
 	function searchBox()
@@ -51,13 +51,13 @@ class displayHome
 		$year = $this->db->getAll($query);
 		array_unshift($year, array('name'=>'All'));
 		$this->doDropDown('year', $year);
-		
+
 		$query = "SELECT * FROM luFormat";
 		$format = $this->db->getAll($query);
 		array_unshift($format, array('name'=>'All'));
 		$this->doDropDown('format', $format);
 	}
-	
+
 	function news()
 	{
 		//news output
@@ -65,7 +65,7 @@ class displayHome
 
 		require("../../subject/subjectNews.php");
 		$news = new news($this->folderID);
-		
+
 		$subnews = $news->getNews();
 		if(is_array($subnews))
 		{
@@ -81,7 +81,7 @@ class displayHome
 					$this->t_body->set_var("EMAIL_CONTACT", "<a href=\"{$_SESSION['mailhandle']}{$article['Contact']}\">{$article['Poster']}</a>");
 				else
 					$this->t_body->set_var("EMAIL_CONTACT", $article['Poster']);
-		
+
 				$this->t_body->set_var("POSTED_DATE", $article['Datetime']);
 				$this->t_body->parse("news_block", "news", true);
 			}
@@ -93,19 +93,19 @@ class displayHome
 
 		//setup block for submission button
 		$this->t_body->set_block('tplBODY', 'submit_news', 'submit_news_block');
-		//if($this->perm < 2)		
+		//if($this->perm < 2)
 		//	$this->t_body->set_var("submit_news_block", "");
 		//else
-			$this->t_body->parse('submit_news_block', 'submit_news');	
+			$this->t_body->parse('submit_news_block', 'submit_news');
 	}
-	
+
 	function files()
 	{
 		//file output
 		$this->t_body->set_block('tplBODY', 'files', 'files_block');
-	
+
 		$query = "SELECT id, description, realname, inline FROM intranet.file LEFT JOIN allowedFileTypes ON file.mime_type = allowedFileTypes.mime
-		WHERE category = '".$this->folderID."' AND file.deleted = '0' ORDER BY submitted DESC 
+		WHERE category = '".$this->folderID."' AND file.deleted = '0' ORDER BY submitted DESC
 		LIMIT 0, 15";
 
 		$files = $this->db->getAll($query);
@@ -117,40 +117,40 @@ class displayHome
 				if($file['realname'] != "")
 				{
 					if($file['inline']== 'true')
-						$url = "<a href=\"/sendframe.php?id=".$file['id']."\" target=\"_blank\">".scrubTEXT($file['description'])."</a>";
+						$url = "<a href=\"/sendframe.php?id=".$file['id']."\" target=\"_blank\">".Scrub::text($file['description'])."</a>";
 					else
-						$url = "<a href=\"/send.php?id=".$file['id']."\">".scrubTEXT($file['description'])."</a>";
-		
+						$url = "<a href=\"/send.php?id=".$file['id']."\">".Scrub::text($file['description'])."</a>";
+
 					$this->t_body->set_var("FILE_NAME", $url);
 				}
 				else
-					$this->t_body->set_var("FILE_NAME", scrubTEXT($file['description']));
-				
+					$this->t_body->set_var("FILE_NAME", Scrub::text($file['description']));
+
 				$this->t_body->parse('files_block', 'files', true);
 			}
 		}
 		else
 			$this->t_body->set_var('files_block', '');
 	}
-	
+
 	function outputPage()
 	{
 		$this->t_body->pparse('finaloutput','tplBODY');
 	}
 
 	/* PRIVATE */
-	
+
 	function doDropDown($name, $array)
 	{
 		$this->t_body->set_block('tplBODY', $name.'_select', $name.'var');
-		
+
 		foreach($array as $value)
 		{
 			$this->t_body->set_var(strtoupper($name).'_ID', $value[$name.'ID']);
 			$this->t_body->set_var(strtoupper($name).'_NAME', $value['name']);
 			$this->t_body->parse($name.'var', $name.'_select', true);
 		}
-	
+
 	}
 
 }

@@ -45,14 +45,14 @@ if (is_array($eventList)) {
 
 		$output = array(
 			'EVENT_ID'	=> $event['eventID'],
-			'NAME'		=> scrubText($event['name']),
-			'CODE'		=> !empty($event['code']) ? scrubText($event['code']) : "N/A",
+			'NAME'		=> Scrub::text($event['name']),
+			'CODE'		=> !empty($event['code']) ? Scrub::text($event['code']) : "N/A",
 			'DATE'		=> $date->getDateOnly(),
 			'TYPE'		=> $event['typeName'],
 			'TUTOR1_ID'	=> $event['tutor1ID'],
 			'TUTOR2_ID'	=> $event['tutor2ID'],
-			'TUTOR1'	=> scrubText($event['tutorName1']),
-			'TUTOR2'	=> scrubText($event['tutorName2']),
+			'TUTOR1'	=> Scrub::text($event['tutorName1']),
+			'TUTOR2'	=> Scrub::text($event['tutorName2']),
 			'ON_OFF'	=> ++$j%2 ? 'dark' : '',
 		);
 

@@ -13,8 +13,8 @@ if ($groupHandler->isSuperuser()) {
 	 */
 	$exclusion = array('tableName', 'tableIndex');
 
-	$tableIndex = scrubTEXT($_POST['tableIndex']);
-	$tableName = scrubTEXT($_POST['tableName']);
+	$tableIndex = Scrub::text($_POST['tableIndex']);
+	$tableName = Scrub::text($_POST['tableName']);
 
 	$genericHandler = new GenericTable($tableName, $tableIndex);
 	$table = $genericHandler->getAll();
@@ -29,7 +29,7 @@ if ($groupHandler->isSuperuser()) {
 		/* Accumulate a set of data from the relevant data columns
 		 */
 		foreach ($allColumns as $currentColumn) {
-			$data[$currentColumn] = scrubTEXT($_POST[$currentColumn][$i]);
+			$data[$currentColumn] = Scrub::text($_POST[$currentColumn][$i]);
 		}
 
 		/* Determine whether this is a new record, or whether to update existing
@@ -41,7 +41,7 @@ if ($groupHandler->isSuperuser()) {
 			$genericHandler->create($data);
 		}
 	}
-	
+
 	$page->backToTheFuture(1);
 }
 else {

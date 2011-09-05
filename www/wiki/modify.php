@@ -26,7 +26,7 @@ if (is_numeric($this->arg[0])) {
 	$output = array('ACTION'		=> 'Modify',
 					'WIKI_ID'		=> $wiki['wikiID'],
 					'CATEGORY_ID'	=> $wiki['categoryID'],
-					'HEADING'		=> scrubText($wiki['heading']),
+					'HEADING'		=> Scrub::text($wiki['heading']),
 					'BODY'			=> $wiki['body'],
                     'REVISION'      => $wiki['latestRevision'],
 					);
@@ -42,7 +42,7 @@ if (is_numeric($this->arg[0])) {
 	$output = array('ACTION'                        => 'Add',
                         'WIKI_ID'	=> '',
                         'CATEGORY_ID'	=> $this->arg[1],
-                        'HEADING'	=> scrubText($wiki['heading']),
+                        'HEADING'	=> Scrub::text($wiki['heading']),
                         'BODY'		=> $wiki['body'],
                         'REVISION'      => '',
                         );

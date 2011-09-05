@@ -35,14 +35,14 @@ if (!empty($_POST)) {
 
     $assessHandler->update(array(
         'assess_id'   => $this->arg[0],
-        'category_id' => scrubTEXT($_POST['category_id']),
+        'category_id' => Scrub::text($_POST['category_id']),
         'user_id'     => $_SESSION['id'],
-        'title'       => scrubTEXT($_POST['title']),
-        'description' => scrubTEXT($_POST['description']),
+        'title'       => Scrub::text($_POST['title']),
+        'description' => Scrub::text($_POST['description']),
         'start'       => $start->getDatabase(),
         'finish'      => $finish->getDatabase(),
         'duration'    => Survey::UNLIMITED_DURATION,
-        'allow_resit' => scrubTEXT($_POST['allow_resit']),
+        'allow_resit' => Scrub::text($_POST['allow_resit']),
     ));
 
     localRedir('/assess/summary/' . $this->arg[0]);

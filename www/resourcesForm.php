@@ -22,9 +22,9 @@ if (is_numeric($_POST['folders'])) {
 			if ($permission[$category['id']] >= READ_ACCESS) {
 
 				//append code to name
-				$name = scrubTEXT($category['name']);
+				$name = Scrub::text($category['name']);
 				if($category['code'] != '' && $category['code'] != $category['name'])
-					$name .= ' ('.scrubTEXT($category['code']).')';
+					$name .= ' ('.Scrub::text($category['code']).')';
 
 				$children = (int)$categoryHandler->hasChildren($category['id']);
 				$output[] = array('id'			=> $category['id'],
@@ -73,7 +73,7 @@ elseif (is_numeric($_POST['files'])) {
 			$modifiedTime = new Alaress_Date_Relative($file['modified']);
 
 			$output[] = array('id'			=> $file['id'],
-							  'name'		=> scrubText($file['description']),
+							  'name'		=> Scrub::text($file['description']),
 							  'category'	=> $file['category'],
 							  'modified'	=> $modifiedTime->setPrefix('')->getRelativeTime(),
 							//'size'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",

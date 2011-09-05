@@ -2,7 +2,7 @@
 
 require_once '../library/group.php';
 require_once '../library/blog.php';
-$groupHandle = new Group(); 
+$groupHandle = new Group();
 $blogHandle  = new Blog();
 
 $this->setFile(TEMPLATE_content, 'blog/modify.html');
@@ -29,10 +29,10 @@ if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	$this->setTitle('Modify Blog Entry');
 	if(!$blogHandle->permission($entry['id']))
 		error(23);
-	
+
 	$this->setVar(array(
 		'ACTION'		=> 'Modify',
-		'ENTRY_HEADING' => scrubTEXT($entry['heading']),
+		'ENTRY_HEADING' => Scrub::text($entry['heading']),
 		'ENTRY_BODY'    => scrubHTML($entry['body']),
 		'CID'			=> $entry['cid'],
 		'ID'			=> $this->arg[0],

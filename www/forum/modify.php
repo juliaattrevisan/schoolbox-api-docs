@@ -32,7 +32,7 @@ if (is_numeric($this->arg[0])) {
 	if ($groupHandler->getPermission($category['id']) < READ_ACCESS)
 		error(19);
 
-	$this->setTitle(scrubText($category['name'] . ' Forum'));
+	$this->setTitle(Scrub::text($category['name'] . ' Forum'));
 
 	/* edit post */
 	if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
@@ -77,10 +77,10 @@ if (is_numeric($this->arg[0])) {
 	$output = array('ACTION'		=> isset($post['postID']) ? 'Modify' : 'Add',
 					'THREAD_POST'	=> $thread['postID'] == $post['postID'] || !isset($thread['threadID']) ? 'Thread' : 'Post',
 					'THREAD_ID'		=> $thread['threadID'],
-					'THREAD_TITLE'	=> scrubText($thread['title']),
+					'THREAD_TITLE'	=> Scrub::text($thread['title']),
 					'POST_ID'		=> $post['postID'],
 					'CATEGORY_ID'	=> $category['id'],
-					'CATEGORY'		=> scrubText($category['name']),
+					'CATEGORY'		=> Scrub::text($category['name']),
 					'BODY'			=> scrubHTML($post['body']),
 					);
 	$this->setVar($output);

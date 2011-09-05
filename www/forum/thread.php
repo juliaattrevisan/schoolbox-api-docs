@@ -38,15 +38,15 @@ if (!$forumHandler->hasForum($category['id']))
 if ($groupHandler->getPermission($category['id']) < READ_ACCESS)
 	error(19);
 
-$this->setTitle(scrubText($thread['title']));
+$this->setTitle(Scrub::text($thread['title']));
 
 $threadLocked = $thread['locked'] == 'true' ? true : false;
 
 /* output breadcrumbs */
-$output = array('CATEGORY'			=> scrubText($category['name']),
+$output = array('CATEGORY'			=> Scrub::text($category['name']),
 				'CATEGORY_ID'		=> $category['id'],
 				'THREAD_ID'			=> $thread['threadID'],
-				'THREAD_TITLE'		=> scrubText($thread['title']),
+				'THREAD_TITLE'		=> Scrub::text($thread['title']),
 				'LOCK_UNLOCK'		=> $threadLocked ? 'Unlock' : 'Lock',
 				'LOCKED'			=> $threadLocked ? '(Locked)' : '',
 
@@ -124,9 +124,9 @@ if (is_array($postList)) {
 		$modifiedTime->setNow(strtotime($post['modified']))->setPrefix('')->setSuffix('later');
 
 		$output = array('POST_ID'			=> $post['postID'],
-						'POST_TITLE'		=> scrubText($post['title']),
-						'POST_AUTHOR'		=> scrubText($userHandler->formatName($user)),
-						'POST_GROUP'		=> scrubText($post['userGroup']),
+						'POST_TITLE'		=> Scrub::text($post['title']),
+						'POST_AUTHOR'		=> Scrub::text($userHandler->formatName($user)),
+						'POST_GROUP'		=> Scrub::text($post['userGroup']),
 						'POST_TIME'			=> $postTime->getRelativeTime(),
 						'POST_USER_ID'		=> $post['userID'],
 						'POST_BODY'			=> scrubHTML($post['body']),

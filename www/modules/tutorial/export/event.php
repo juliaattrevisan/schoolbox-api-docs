@@ -26,14 +26,14 @@ if (is_array($eventList)) {
 		$output = array(
 			$event['eventID'],
 			$date->getLocal(),
-			scrubText($event['name']),
+			Scrub::text($event['name']),
 			$event['start'],
 			$event['finish'],
-			scrubText($event['location']),
-			!empty($event['code']) ? scrubText($event['code']) : 'N/A',
+			Scrub::text($event['location']),
+			!empty($event['code']) ? Scrub::text($event['code']) : 'N/A',
 			$event['typeName'],
-			scrubText($event['tutorName1']),
-			scrubText($event['tutorName2']),
+			Scrub::text($event['tutorName1']),
+			Scrub::text($event['tutorName2']),
 			$event['cancelled'] == 'true' ? 'Cancelled' : '',
 		);
 

@@ -35,19 +35,19 @@ if ($_GET['news'] == 'all') {
 	$newsList = $myNews->getAllByGroup($group, $campus);
 	if (is_array($newsList)) {
 		foreach ($newsList as $news) {
-			$dNotice .= '<p class="heading">' . scrubText($news['item_heading']). '</p>';
+			$dNotice .= '<p class="heading">' . Scrub::text($news['item_heading']). '</p>';
 			$dNotice .= scrubHTML($news['item_body']) . '<p>&nbsp;</p>';
 		}
 	}
 	$page->setVar('DAILY_TITLE', 'DAILY NOTICES');
 	$page->setVar('DAILY_BODY',  $dNotice);
-	
+
 } else {
 	$dNotice = $myNews->getDailyNotice(1, $campus);
-	$page->setVar('DAILY_TITLE', scrubText($dNotice[0]['item_heading']));
+	$page->setVar('DAILY_TITLE', Scrub::text($dNotice[0]['item_heading']));
 	$page->setVar('DAILY_BODY',  $dNotice[0]['item_body']);
 }
-//output calendar	
+//output calendar
 $cal = new Calendar;
 
 $currDay = time();
@@ -73,7 +73,7 @@ else
 				$page->setVar("TIME", $event['startTime']);
 		else
 				$page->setVar("TIME", $event['startTime']." - ".$event['endTime']);
-		
+
 		$page->setVar("NOTE_COLOUR", $cal->displayColour($event['priority']));
 		$page->setVar("NOTE_DESCRIPTION", $event['note']);
 		$page->parse("note_listing","note_block", true);
@@ -86,7 +86,7 @@ else
 $location = empty($_GET['location']) ? Cfg::get('weather_location') : $_GET['location'];
 $weather = new Xml('http://www.google.com/ig/api?weather=' . urlencode("Melbourne, Victoria"), 60*60 );
 
-	
+
 for($i = 1; $i <= 3; $i++) {
 	$forecast_conditions = $weather->weather->forecast_conditions[$i];
 	$output = array("DAY$i"     => $forecast_conditions->day_of_week['data'],

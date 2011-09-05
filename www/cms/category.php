@@ -36,10 +36,10 @@ if(is_numeric($this->arg[0])) {
 	$output = array(
 		'ACTION'		=> 'Modify',
 		'CATEGORY_ID'	=> $category['id'],
-		'NAME'			=> scrubText($category['name']),
-		'CODE'			=> scrubText($category['code']),
+		'NAME'			=> Scrub::text($category['name']),
+		'CODE'			=> Scrub::text($category['code']),
 		'PARENT_ID'		=> $category['parent'],
-		'PARENT_NAME'	=> scrubText($categoryParent['name']),
+		'PARENT_NAME'	=> Scrub::text($categoryParent['name']),
 		'USER_GROUP' => $_SESSION['gid'],
 		'DATABASE_TYPE' => ucfirst(Cfg::get('external_type')),
 		'REQUIRED_PERMS'=> $_SESSION['gid'],
@@ -71,7 +71,7 @@ if(is_numeric($this->arg[0])) {
 	if (is_array($groupPermList)) {
 		foreach ($groupPermList as $group) {
 			$output = array(
-				'GROUP_NAME'		=> scrubText($group['name']),
+				'GROUP_NAME'		=> Scrub::text($group['name']),
 				'GROUP_ID'			=> $group['id'],
 				'PERM_0_SELECTED'	=> '',
 				'PERM_1_SELECTED'	=> '',
@@ -137,7 +137,7 @@ else if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 		'NAME' => '',
 		'CODE' => '',
 		'PARENT_ID'	=> $categoryParent['id'],
-		'PARENT_NAME' => scrubText($categoryParent['name']),
+		'PARENT_NAME' => Scrub::text($categoryParent['name']),
 		'REQUIRED_PERMS' => $_SESSION['gid'],
 		'GROUP_NAME' => '',
 		'DATABASE_TYPE' => ucfirst(Cfg::get('database_type')),
@@ -154,7 +154,7 @@ else if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	if (is_array($groupPermList)) {
 		foreach ($groupPermList as $group) {
 			$output = array(
-				'GROUP_NAME'		=> scrubText($group['name']),
+				'GROUP_NAME'		=> Scrub::text($group['name']),
 				'GROUP_ID'			=> $group['id'],
 				'PERM_0_SELECTED'	=> 'checked="checked"',
 				'PERM_1_SELECTED'	=> '',

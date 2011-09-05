@@ -175,9 +175,9 @@ for ($i = 0; $i < $totalDays; $i++) {
                                     ($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
                                     ($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
                                     "- "),
-                            'NOTE' => scrubTEXT($event['note']),
-                            'LOCATION' => scrubTEXT($event['location']),
-                            'DETAIL' => scrubTEXT($event['detail']),
+                            'NOTE' => Scrub::text($event['note']),
+                            'LOCATION' => Scrub::text($event['location']),
+                            'DETAIL' => Scrub::text($event['detail']),
                             'COLOUR' => '#' . $event['eventColour'],
                             'MODIFY'      => $calendarHandler->getPerm($event['id']) > 1 ? '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $event['id'] . '&returnTo=month"><span></span>Modify</a>' : '',
                             'EVENT_TYPE' => 'type' . $event['type'],

@@ -66,20 +66,20 @@ class Feed {
 		while($row = $this->db->getNextArray()){
 			if ($row['realname'] != '') {
 				if ($row['inline'] == 'true' && FILE_use_frame) {
-					$url = "<a href=\"/sendframe.php?id=".$row['id']."\" target=\"_blank\">".scrubTEXT($row['name'])."</a>";
+					$url = "<a href=\"/sendframe.php?id=".$row['id']."\" target=\"_blank\">".Scrub::text($row['name'])."</a>";
 				}
 				else {
-					$url = '<a href="/send.php?id='.$row['id'].'">'.scrubTEXT($row['name']).'</a>';
+					$url = '<a href="/send.php?id='.$row['id'].'">'.Scrub::text($row['name']).'</a>';
 				}
 			}
 			else {
-				$url = scrubTEXT($row['name']);
+				$url = Scrub::text($row['name']);
 			}
 
 			$file[] = array(
 				'date' => $row['submitted'],
 				'type' => 'file',
-				'message' => $userHandler->formatName($row) . ' uploaded the file '.scrubTEXT($row['name']),
+				'message' => $userHandler->formatName($row) . ' uploaded the file '.Scrub::text($row['name']),
 				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">' . $userHandler->formatName($row) . '</a> uploaded the file '.$url,
 			);
 		}
@@ -102,8 +102,8 @@ class Feed {
 			$link[] = array(
 				'date' => $row['submitted'],
 				'type' => 'link',
-				'message' => $userHandler->formatName($row).' submitted the link '.scrubTEXT($row['name']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row).'</a> submitted the link <a href="'.$row['url'].'">'.scrubTEXT($row['name']).'</a>',
+				'message' => $userHandler->formatName($row).' submitted the link '.Scrub::text($row['name']),
+				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row).'</a> submitted the link <a href="'.$row['url'].'">'.Scrub::text($row['name']).'</a>',
 			);
 		}
 		return $link;
@@ -134,8 +134,8 @@ class Feed {
             $onlineAssessments[] = array(
                 'date' => $row['created_at'],
                 'type' => 'onlineassessment',
-                'message' => $userHandler->formatName($row) . ' posted the online assessment ' . scrubTEXT($row['heading']),
-                'messageHTML' => '<a href="/search/user/'.$row['uid'].'">' . $userHandler->formatName($row) . '</a> posted the online assessment <a href="/assess/intro/' . $row['assess_id'] . '">' . scrubTEXT($row['heading']) . '</a>',
+                'message' => $userHandler->formatName($row) . ' posted the online assessment ' . Scrub::text($row['heading']),
+                'messageHTML' => '<a href="/search/user/'.$row['uid'].'">' . $userHandler->formatName($row) . '</a> posted the online assessment <a href="/assess/intro/' . $row['assess_id'] . '">' . Scrub::text($row['heading']) . '</a>',
             );
         }
 
@@ -156,8 +156,8 @@ class Feed {
 			$news[] = array(
 				'date' => $row['submitted'],
 				'type' => 'news',
-				'message' => $userHandler->formatName($row) . ' posted the news '.scrubTEXT($row['heading']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> posted the news <a href="/resources/'.$row['id'].'">' . scrubTEXT($row['heading']) . '</a>',
+				'message' => $userHandler->formatName($row) . ' posted the news '.Scrub::text($row['heading']),
+				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> posted the news <a href="/resources/'.$row['id'].'">' . Scrub::text($row['heading']) . '</a>',
 			);
 		}
 
@@ -177,8 +177,8 @@ class Feed {
 			$folder[] = array(
 				'date' => $row['submitted'],
 				'type' => 'folder',
-				'message' => $userHandler->formatName($row) . ' created the folder '.scrubTEXT($row['name']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> created the folder <a href="/resources/'.$row['id'].'">' . scrubTEXT($row['name']) . '</a>',
+				'message' => $userHandler->formatName($row) . ' created the folder '.Scrub::text($row['name']),
+				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> created the folder <a href="/resources/'.$row['id'].'">' . Scrub::text($row['name']) . '</a>',
 			);
 		}
 
@@ -200,8 +200,8 @@ class Feed {
 			$forum[] = array(
 				'date' => $row['submitted'],
 				'type' => 'forum',
-				'message' => $userHandler->formatName($row) . ' made the comment '.scrubTEXT($row['heading']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> made the comment <a href="/forum/viewForum.php?mgsid='.$row['id'].'&cid='.$cid.'">' . scrubTEXT($row['heading']) . '</a>',
+				'message' => $userHandler->formatName($row) . ' made the comment '.Scrub::text($row['heading']),
+				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> made the comment <a href="/forum/viewForum.php?mgsid='.$row['id'].'&cid='.$cid.'">' . Scrub::text($row['heading']) . '</a>',
 			);
 		}
 
@@ -228,8 +228,8 @@ class Feed {
 			$wiki[] = array(
 				'date' => $row['submitted'],
 				'type' => 'wiki',
-				'message' => $userHandler->formatName($row) . ' updated the wiki '.scrubTEXT($row['heading']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> updated the wiki <a href="/wiki/'.$row['wikiID'].'">' . scrubTEXT($row['heading']) . '</a>',
+				'message' => $userHandler->formatName($row) . ' updated the wiki '.Scrub::text($row['heading']),
+				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> updated the wiki <a href="/wiki/'.$row['wikiID'].'">' . Scrub::text($row['heading']) . '</a>',
 			);
 		}
 
@@ -259,8 +259,8 @@ class Feed {
 			$blog[] = array(
 				'date' => $row['submitted'],
 				'type' => 'blog',
-				'message' => $userHandler->formatName($row) . ' updated the blog ' . scrubTEXT($row['heading']),
-				'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> updated the blog <a href="/blog/' . $row['blogID'] . '">' . scrubTEXT($row['heading']) . '</a>',
+				'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
+				'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> updated the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text($row['heading']) . '</a>',
 			);
 		}
 
@@ -290,8 +290,8 @@ class Feed {
 			$blogComments[] = array(
 				'date' => $row['submitted'],
 				'type' => 'blog',
-				'message' => $userHandler->formatName($row) . ' updated the blog ' . scrubTEXT($row['heading']),
-				'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> commented on the blog <a href="/blog/' . $row['blogID'] . '">' . scrubTEXT($row['heading']) . '</a>',
+				'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
+				'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> commented on the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text($row['heading']) . '</a>',
 			);
 		}
 

@@ -17,11 +17,11 @@ $freeList = $groupHandler->getAllByType(GROUP_TYPE_FREE);
 if (is_array($freeList)) {
 	foreach ($freeList as $free) {
 		$output = array('GROUP_ID'		=> $free['id'],
-						'GROUP_NAME'	=> scrubText($free['name']),
+						'GROUP_NAME'	=> Scrub::text($free['name']),
                         'GROUP_CHECKED' => is_numeric($free['accessType']) ? 'checked=\'checked\'' : '',
 						);
 		$this->setVar($output);
-		
+
 		$this->parse('free_list_block', 'free_list', true);
 	}
 } else
@@ -33,15 +33,15 @@ $moderatedList = $groupHandler->getAllByType(GROUP_TYPE_MODERATED);
 if (is_array($moderatedList)) {
 	foreach ($moderatedList as $moderated) {
 		$output = array('GROUP_ID'		=> $moderated['id'],
-						'GROUP_NAME'	=> scrubText($moderated['name']),
+						'GROUP_NAME'	=> Scrub::text($moderated['name']),
                         'GROUP_CHECKED' => is_numeric($moderated['accessType']) ? 'checked=\'checked\'' : '',
 						);
 		$this->setVar($output);
-		
+
 		$this->setVar('waiting_block', '');
 		if (is_numeric($moderated['accessType']) && $moderated['accessType'] == DENY_ACCESS)
 			$this->parse('waiting_block', 'waiting');
-		
+
 		$this->parse('moderated_list_block', 'moderated_list', true);
 	}
 } else

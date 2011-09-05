@@ -26,7 +26,7 @@ if (!$groupHandler->isStaff()) {
 }
 
 if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['question_bank_id']) && count($_POST['question_bank_id'])) {
-	$section_id = scrubTEXT($_POST['section_id']);
+	$section_id = Scrub::text($_POST['section_id']);
 
 	/* Find out if you are the owner of the section before adding
 	 * Find out if the section exists first
@@ -51,7 +51,7 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
 		$allQuestionBankIDs = $_POST['question_bank_id'];
 
 		foreach($allQuestionBankIDs as $currentQuestionBankID) {
-			$questionBank = $questionBankHandler->getByID(scrubTEXT($currentQuestionBankID));
+			$questionBank = $questionBankHandler->getByID(Scrub::text($currentQuestionBankID));
 
 			$question_id = $questionHandler->create(array(
 				'section_id' => $section_id,

@@ -2,41 +2,41 @@
 if (Cfg::get('webdav_enable')) {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 	$folderHandler = PortfolioWebDAV::factory();
-	
+
 } else {
 	require_once '../library/my-folder.php';
 	$folderHandler = new MyFolder;
 }
 
 if(is_numeric($this->arg[0]) && $this->arg[0] > 0) {
-	
+
 	if(!($folder = $folderHandler->getByID($this->arg[0])))
 		error(2);
-		
+
 	if (Cfg::get('webdav_enable') && $folderHandler->isRoot($this->arg[0]))
 		error(2);
-		
-	
+
+
 	$this->setFile(TEMPLATE_content, "cms/myFolder.html");
 	$this->setBlock(TEMPLATE_content, 'parent_list', 'parent_list_block');
 
 
-	$this->setTitle('Modify Folder');	
+	$this->setTitle('Modify Folder');
 	$this->setTab('resources');
-	
+
 	$output = array('ACTION'		=> 'Modify',
 					'FOLDER_ID'		=> $folder['id'],
-					'NAME'			=> scrubText($folder['name']),
+					'NAME'			=> Scrub::text($folder['name']),
 					'PARENT_ID'		=> $folder['parent'],
 					);
 	$this->setVar($output);
-	
+
 	if (Cfg::get('webdav_enable')) {
 		$this->setBlock(TEMPLATE_content, 'location', 'location_block');
 		$this->setVar('location_block', '');
-		
+
 	} else {
-	
+
 		$parentTree = $folderHandler->getFolderTree(0, 0, $folder['id']);
 		$parentTree = is_array($parentTree) ? $parentTree : array();
 		array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
@@ -52,7 +52,7 @@ if(is_numeric($this->arg[0]) && $this->arg[0] > 0) {
 	}
 
 
-	
+
 } else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
 	$this->setFile(TEMPLATE_content, 'cms/myFolder.html');
@@ -60,7 +60,7 @@ if(is_numeric($this->arg[0]) && $this->arg[0] > 0) {
 
 
 	$this->setTitle('Add Folder');
-	$this->setTab('resources');	
+	$this->setTab('resources');
 
 	$output = array('ACTION'		=> 'Add',
 					'FOLDER_ID'		=> '',
@@ -68,15 +68,15 @@ if(is_numeric($this->arg[0]) && $this->arg[0] > 0) {
 					'PARENT_ID'		=> $this->arg[1],
 					);
 	$this->setVar($output);
-	
+
 
 
 	if (Cfg::get('webdav_enable')) {
 		$this->setBlock(TEMPLATE_content, 'location', 'location_block');
 		$this->setVar('location_block', '');
-		
+
 	} else {
-	
+
 		$parentTree = $folderHandler->getFolderTree();
 		$parentTree = is_array($parentTree) ? $parentTree : array();
 		array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
@@ -90,9 +90,9 @@ if(is_numeric($this->arg[0]) && $this->arg[0] > 0) {
 			$this->parse('parent_list_block', 'parent_list', true);
 		}
 	}
-	
 
-	
+
+
 } else
 	$this->error(2);
 

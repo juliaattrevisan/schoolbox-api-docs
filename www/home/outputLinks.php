@@ -26,7 +26,7 @@ if(count($linkList)>0) {
     foreach($linkList as $link) {
         $this->setVar(array(
             'ON_OFF'    => ++$j%2 ? '' : 'dark',
-            'LINK_TITLE' => scrubTEXT($link['description']),
+            'LINK_TITLE' => Scrub::text($link['description']),
             'LINK_URL'   => scrubHTML($link['url'])
         ));
 

@@ -13,12 +13,12 @@ if (is_array($fileList)) {
 	foreach ($fileList as $file) {
 		$output = array('AUDIO_MIME_IMAGE'	=> $allowedFiles->getClass($file['iconFile']),
 						'AUDIO_URL'			=> '/send.php?id=' . $file['id'],
-						'AUDIO_DESCRIPTION'	=> scrubText($file['description']),
-						'AUDIO_COMMENT'		=> scrubText($file['comment']),
+						'AUDIO_DESCRIPTION'	=> Scrub::text($file['description']),
+						'AUDIO_COMMENT'		=> Scrub::text($file['comment']),
 						'AUDIO_ID'			=> $file['id'],
 						'ON_OFF'			=> ++$j%2 ? '' : 'dark',
 						);
-						
+
 		$this->setVar($output);
 		$this->parse('audio_list_block', 'audio_list', true);
 	}
@@ -34,9 +34,9 @@ if (!empty($config['url']))
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_file", "submit_file_block");
-if ($permission < WRITE_ACCESS)		
+if ($permission < WRITE_ACCESS)
 	$this->setVar("submit_file_block", "");
 else
-	$this->parse("submit_file_block", "submit_file");	
+	$this->parse("submit_file_block", "submit_file");
 
 ?>

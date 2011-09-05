@@ -76,7 +76,7 @@ if (is_numeric($_REQUEST['cid'])) {
 		localRedir("/homepage/" . $_GET['cid']);
 	}
 	else if ($_POST['cid'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
-		$homepage->updateColumnWidths(scrubTEXT($_POST['leftColWidth']), scrubTEXT($_POST['rightColWidth']));
+		$homepage->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
 	}
 }
 else {

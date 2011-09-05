@@ -63,7 +63,7 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 	if(is_array($subList)) {
         $csv = 'Synergetic ID,Surname,Firstname,';
 		foreach($subList as $sub) {
-            $csv .= scrubTEXT(str_replace(',', ' ', $sub['name'])).',';
+            $csv .= Scrub::text(str_replace(',', ' ', $sub['name'])).',';
 		}
 	}
 
@@ -71,7 +71,7 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 
 	if(is_array($studentList)) {
 		foreach($studentList as $student) {
-            $csv .= $student['uid'].','.scrubTEXT($student['lastname']).','.scrubTEXT($student['firstname']).',';
+            $csv .= $student['uid'].','.Scrub::text($student['lastname']).','.Scrub::text($student['firstname']).',';
 
 			if(is_array($subList)) {
 				foreach($subList as $sub) {
@@ -88,11 +88,11 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
                             $val = '';
                         }
 
-                        $csv .= scrubTEXT($val).',';
+                        $csv .= Scrub::text($val).',';
                     }
                     else {
                         $return = $retHandler->getByUser($student['uid'],$sub['id']);
-                        $csv .= scrubTEXT($return[0]['mark']).',';
+                        $csv .= Scrub::text($return[0]['mark']).',';
                     }
 				}
 			}
@@ -174,8 +174,8 @@ else if(is_numeric($this->arg[0])) {
 		foreach($subList as $sub) {
             $this->setVar(array(
                 'BOX_ID'	=> $sub['id'],
-                'SUB_NAME'	=> scrubTEXT($sub['name']),
-                'SUB_TYPE'	=> scrubTEXT($sub['typeName'])
+                'SUB_NAME'	=> Scrub::text($sub['name']),
+                'SUB_TYPE'	=> Scrub::text($sub['typeName'])
             ));
 
             if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
@@ -236,8 +236,8 @@ else if(is_numeric($this->arg[0])) {
 	if(is_array($studentList)) {
 		foreach($studentList as $student) {
 
-			$output = array('SURNAME'	=> scrubTEXT($student['lastname']),
-							'FIRSTNAME'	=> scrubTEXT($student['firstname']),
+			$output = array('SURNAME'	=> Scrub::text($student['lastname']),
+							'FIRSTNAME'	=> Scrub::text($student['firstname']),
 							'UID'		=> $student['uid'],
 							'ON_OFF'    => ++$i%2?'':'dark',);
 			$this->setVar($output);
@@ -273,7 +273,7 @@ else if(is_numeric($this->arg[0])) {
                             $return = $retHandler->getByUser($student['uid'],$sub['id']);
 
                             $this->setVar(array(
-                                'MARK' => scrubTEXT($return[0]['mark']),
+                                'MARK' => Scrub::text($return[0]['mark']),
                                 'BOX_ID' => $sub['id'],
                             ));
                         }

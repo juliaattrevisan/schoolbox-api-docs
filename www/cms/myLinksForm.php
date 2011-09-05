@@ -16,7 +16,7 @@ if (isset($_REQUEST['url']) && $_REQUEST['url'] && isset($_REQUEST['description'
     if($myLinksHandler->linkExists($_SESSION['id'],$_REQUEST['url']))
         error(140);
 
-	$url = scrubTEXT(trim($_REQUEST['url']));
+	$url = Scrub::text(trim($_REQUEST['url']));
 
 	$myLinksHandler->create(array(
 		'owner' => $_SESSION['id'],

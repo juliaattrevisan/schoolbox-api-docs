@@ -14,7 +14,7 @@ $this->setBlock(TEMPLATE_content, "news", "news_block");
 if (!($category = $categoryHandler->getByID($this->arg[0])))
 	$this->error(2);
 
-$output = array('CATEGORY_NAME'	=> scrubText($category['name']),
+$output = array('CATEGORY_NAME'	=> Scrub::text($category['name']),
 				'TITLE'			=> 'News Archive',
 				'ID'			=> $category['id'],
 				);
@@ -44,7 +44,7 @@ if(is_array($newsList)) {
 
 		$output = array(
                     "NEWS_ID"           => $news['id'],
-                    "NEWS_HEADING"	=> scrubTEXT($news['heading']),
+                    "NEWS_HEADING"	=> Scrub::text($news['heading']),
                     "NEWS_BODY"		=> scrubHTML($news['body']),
                     "EMAIL_CONTACT"	=> "<a href=\"/search/user/{$news['uid']}\">$poster</a>",
                     "POSTED_DATE"	=> $postedDate->getShort()

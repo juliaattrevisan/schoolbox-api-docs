@@ -20,7 +20,7 @@ if (is_numeric($_POST['relationID'])) {
 		foreach ($folderList as $folder) {
 			$children = (int)$folderHandler->hasChildren($folder['id']);
 			$output[] = array('id'			=> $folder['id'],
-							  'name'		=> scrubText($folder['name']),
+							  'name'		=> Scrub::text($folder['name']),
 							  'parent'		=> $folder['parent'],
 							  'isParent'	=> $children ? 1 : 0,
 							  );
@@ -57,7 +57,7 @@ elseif (is_numeric($_POST['categoryID'])) {
 			$modifiedDate = new Alaress_Date_Format($file['submitted'], 'U');
 
 			$output[] = array('id'			=> $file['id'],
-							  'name'		=> scrubText($file['description']),
+							  'name'		=> Scrub::text($file['description']),
 							  'category'	=> $file['category'],
 							  'modified'	=> $modifiedDate->getShort(),
 							  'size'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",

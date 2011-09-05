@@ -164,7 +164,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 
 			$output = array('EVENT_ID'		=> $event['id'],
 							'TIME'			=> $date->getTime(),
-							'EVENT'			=> scrubText($event['name']),
+							'EVENT'			=> Scrub::text($event['name']),
 							'EVENT_PAST' 	=> !$due ? 'fade' : '',
 							'EVENT_CAT_ID'	=> $event['category'],
 							);
@@ -483,7 +483,7 @@ foreach ($categoryList as $category) {
     $categoryIDs[] = $categoryID;
 
 	$output = array('SUMMARY_CAT_ID'	=> $categoryID,
-					'SUMMARY_CAT_NAME'	=> scrubText($category['name']),
+					'SUMMARY_CAT_NAME'	=> Scrub::text($category['name']),
 					'SUMMARY_TOTAL'		=> $summary[$category['id']]['total'],
 					'SUMMARY_DUE'		=> $summary[$category['id']]['due'],
 					'SUMMARY_TEACHER'	=> Cfg::get('external_enable') ? implode(', ', $teacherOutput) : '',
@@ -518,7 +518,7 @@ if (is_array($activityLog)) {
 		if ($activity['fid'])
 				$taskName = '<a href="/send.php?id=' . $activity['fid'] . '&save=1">' . $activity['name'] . '</a>';
 
-		$categoryName = '<a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
+		$categoryName = '<a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
 
 		if ($activity['new'] == 'new') {
 			$stringDesc = 'New ' . $activity['typeName'] . ' ' . $taskName . ' added for ' . $categoryName;
@@ -527,7 +527,7 @@ if (is_array($activityLog)) {
 			$stringDesc = '<strong>' . $taskName . ' for ' . $categoryName . ' is overdue</strong> ';
 		}
 		else if($activity['new'] == 'submitted') {
-			$stringDesc = 'Work submitted to '.$activity['name'] .' for <a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
+			$stringDesc = 'Work submitted to '.$activity['name'] .' for <a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
 		}
 		else if($activity['new'] == 'returned') {
 			if($activity['typeName'])
@@ -537,10 +537,10 @@ if (is_array($activityLog)) {
 			else
 				$stringDesc = 'Work returned';
 
-			$stringDesc .= ' for '.$activity['name']. ' in <a href="/homepage/' . $activity['category'] . '">' . scrubText($activity['categoryName']) . '</a>';
+			$stringDesc .= ' for '.$activity['name']. ' in <a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
 		}
 		else {
-			$stringDesc = $categoryName . ' submissions for ' . scrubText($activity['name']) . ' are now closed ';
+			$stringDesc = $categoryName . ' submissions for ' . Scrub::text($activity['name']) . ' are now closed ';
 		}
 
 		$activityTime = new Alaress_Date_Relative($activity['activity_date']);

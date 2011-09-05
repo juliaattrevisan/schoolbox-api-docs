@@ -2,7 +2,7 @@
 $this->setBlock($component['name'], "rss_stories", "rss_block");
 
 $rss = new Xml(Cfg::get('welcome_rss_url'), RSS_cache_time);
-	
+
 $this->setVar('RSS_NAME', $rss->channel->title);
 $this->setVar('RSS_LINK', base64_encode($rss->channel->link) );
 
@@ -10,7 +10,7 @@ if($rss->channel) {
     foreach($rss->channel->item as $i => $item) {
         $this->setVar(array(
             'ON_OFF'    => ++$j%2 ? '' : 'dark',
-            'RSS_TITLE' => scrubTEXT($item->title),
+            'RSS_TITLE' => Scrub::text($item->title),
             'RSS_URL'   => scrubHTML($item->link)
         ));
 

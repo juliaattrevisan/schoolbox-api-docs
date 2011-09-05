@@ -26,12 +26,12 @@ if (is_array($homeworkList)) {
                     }
 		}
 
-		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . scrubText($homework['name']) . ($nameURL ? '</a>' : "");
+		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . Scrub::text($homework['name']) . ($nameURL ? '</a>' : "");
 
 		$output = array(
 			'HW_NAME'	=> $nameHTML,
 			'HW_DATE'	=> $dateHTML,
-			'HW_COMMENT' => nl2br(scrubTEXT($homework['comment'])),
+			'HW_COMMENT' => nl2br(Scrub::text($homework['comment'])),
 			'ON_OFF' => ++$j%2? '' : 'dark',
 		);
 

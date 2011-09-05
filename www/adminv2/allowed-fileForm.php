@@ -17,8 +17,8 @@ if ($groupHandler->isSuperuser()) {
 	/* Delete or create/update
 	 */
 	if (is_numeric($_GET['delete'])) {
-		$allowedFileTypesHandler->delete(scrubTEXT($_GET['delete']));
-		$allowedFileExtensionHandler->delete(scrubTEXT($_GET['delete']));
+		$allowedFileTypesHandler->delete(Scrub::text($_GET['delete']));
+		$allowedFileExtensionHandler->delete(Scrub::text($_GET['delete']));
 	}
 	else {
 		$data = array();
@@ -35,7 +35,7 @@ if ($groupHandler->isSuperuser()) {
 				$allExtensions = explode(',', $_POST[$currentColumn]);
 			}
 			else {
-				$data[$currentColumn] = scrubTEXT($_POST[$currentColumn]);
+				$data[$currentColumn] = Scrub::text($_POST[$currentColumn]);
 			}
 		}
 
@@ -57,7 +57,7 @@ if ($groupHandler->isSuperuser()) {
 		foreach($allExtensions as $currentExtension) {
 			$data = array(
 				'fileTypeID' => $fileTypeID,
-				'extension' => scrubTEXT(trim($currentExtension))
+				'extension' => Scrub::text(trim($currentExtension))
 			);
 
 			$allowedFileExtensionHandler->create($data);

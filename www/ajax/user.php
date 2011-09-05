@@ -21,13 +21,13 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && is_n
 				$email = $emailObj->formatEmailFromArray($user);
 
                 if($email) {
-                    $suggestions[] = scrubText($user['firstname']." ".$user['lastname'].' <'.$email.'>');
-                    $data[] = scrubText($user['firstname']." ".$user['lastname']).' <'.$email.'>';
+                    $suggestions[] = Scrub::text($user['firstname']." ".$user['lastname'].' <'.$email.'>');
+                    $data[] = Scrub::text($user['firstname']." ".$user['lastname']).' <'.$email.'>';
                 }
             }
             else {
 				$person = "{$user['firstname']} {$user['lastname']} - Year {$user['year']}, {$user['gname']}";
-                $suggestions[] = html_entity_decode(scrubText($person), ENT_QUOTES);
+                $suggestions[] = html_entity_decode(Scrub::text($person), ENT_QUOTES);
                 $data[] = $user['uid'];
             }
 		}

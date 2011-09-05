@@ -55,9 +55,9 @@ if (is_array($categoryList)) {
 				$class[] = in_array($category['id'], $parentList) ? 'expanded loaded' : 'collapsed';
 
 			/* append code to name */
-			$name = scrubTEXT($category['name']);
+			$name = Scrub::text($category['name']);
 			if(!empty($category['code']) && $category['code'] != $category['name'])
-				$name .= ' ('.scrubTEXT($category['code']).')';
+				$name .= ' ('.Scrub::text($category['code']).')';
 
 			/* select default dir */
 			if ($category['id'] == $_GET['categoryID'])

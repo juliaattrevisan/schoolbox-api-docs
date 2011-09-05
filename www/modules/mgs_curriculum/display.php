@@ -13,14 +13,14 @@ if($groupHandler->isStaff() ) {
         if(is_array($subject)) {
             $this->setFile(TEMPLATE_content, 'modules/mgs_curriculum/result.html');
 
-            $output = array('SUBJECT_NAME'=> scrubTEXT($subject['Heading']),
-                            'UNIT_NAME'   => scrubTEXT($subject['UnitName'.$this->arg[1]]),
-                            'HOURS'       => nl2br(scrubTEXT($subject['NoOfHours'.$this->arg[1]])),
-                            'UNDEROUT'    => nl2br(scrubTEXT($subject['UnderOut'.$this->arg[1]])),
-                            'UNITCONT'    => nl2br(scrubTEXT($subject['UnitCont'.$this->arg[1]])),
-                            'SKILLS'      => nl2br(scrubTEXT($subject['Skills'.$this->arg[1]])),
-                            'ASSESSMENT'  => nl2br(scrubTEXT($subject['Assessment'.$this->arg[1]])),
-                            'RESOURCES'   => nl2br(scrubTEXT($subject['Resources'.$this->arg[1]])),
+            $output = array('SUBJECT_NAME'=> Scrub::text($subject['Heading']),
+                            'UNIT_NAME'   => Scrub::text($subject['UnitName'.$this->arg[1]]),
+                            'HOURS'       => nl2br(Scrub::text($subject['NoOfHours'.$this->arg[1]])),
+                            'UNDEROUT'    => nl2br(Scrub::text($subject['UnderOut'.$this->arg[1]])),
+                            'UNITCONT'    => nl2br(Scrub::text($subject['UnitCont'.$this->arg[1]])),
+                            'SKILLS'      => nl2br(Scrub::text($subject['Skills'.$this->arg[1]])),
+                            'ASSESSMENT'  => nl2br(Scrub::text($subject['Assessment'.$this->arg[1]])),
+                            'RESOURCES'   => nl2br(Scrub::text($subject['Resources'.$this->arg[1]])),
                             );
             $this->setVar($output);
 

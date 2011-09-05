@@ -41,7 +41,7 @@ if (!empty($blogs)) {
 
 		$this->setVar(array(
 			'BLOG_ID'		=> $blog['id'],
-			'BLOG_HEADING'  => scrubTEXT($blog['heading']),
+			'BLOG_HEADING'  => Scrub::text($blog['heading']),
 			'BLOG_BODY'     => scrubHTML($blog['body']),
 			'BLOG_OWNER'    => "<a href=\"/search/user/{$blog['owner']}\">{$blog['name']}</a>",
 			'BLOG_CREATED'  => $createdTime->getRelativeTime(),
@@ -76,7 +76,7 @@ if (!empty($blogs)) {
 				$createdTime = new Alaress_Date_Relative($comment['created']);
 
 				$this->setVar(array(
-					'COMMENT_BODY'    => scrubTEXT($comment['body']),
+					'COMMENT_BODY'    => Scrub::text($comment['body']),
 					'COMMENT_OWNER'   => "<a href=\"/search/user/{$comment['owner']}\">{$comment['name']}</a>",
 					'COMMENT_CREATED' => $createdTime->getRelativeTime()
 				));

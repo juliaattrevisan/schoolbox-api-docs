@@ -24,7 +24,7 @@ if (!empty($_POST)) {
 		error(112);
 	}
 
-    if (!$assessHandler->isOwner(scrubTEXT($_POST['assess_id']))) {
+    if (!$assessHandler->isOwner(Scrub::text($_POST['assess_id']))) {
         error(130);
     }
 

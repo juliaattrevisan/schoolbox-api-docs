@@ -44,7 +44,7 @@ if ($continue) {
     $imageurl = "/cms/image.php?myFile=1&id={$image['id']}&height={$config['pixel']}&width={$config['pixel']}";
 
     $this->setVar("PREVIEW_IMAGE_URL", $imageurl);
-    $this->setVar("PREVIEW_IMAGE_DESC", scrubTEXT($image['comment']));
+    $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image['comment']));
 
 	$url = new Url($config['url']);
 

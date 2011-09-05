@@ -37,16 +37,16 @@ if (is_array($assignmentList)) {
 		if($assignment['realname'])
 		{
 			if($assignment['inline'] == 'true')
-				$url = "<a href=\"/sendframe.php?id=".$assignment['fileID']."\" onclick=\"window.open(this.href,'_blank',''); return false;\">".scrubTEXT($assignment['name'])."</a>";
+				$url = "<a href=\"/sendframe.php?id=".$assignment['fileID']."\" onclick=\"window.open(this.href,'_blank',''); return false;\">".Scrub::text($assignment['name'])."</a>";
 			else
-				$url = "<a href=\"/send.php?id=".$assignment['fileID']."\">".scrubTEXT($assignment['name'])."</a>";
+				$url = "<a href=\"/send.php?id=".$assignment['fileID']."\">".Scrub::text($assignment['name'])."</a>";
 
 			$this->setVar("ASSIGN_NAME", $url);
 		}
 		else
-			$this->setVar("ASSIGN_NAME", scrubTEXT($assignment['name']));
+			$this->setVar("ASSIGN_NAME", Scrub::text($assignment['name']));
 
-		$this->setVar("ASSIGN_COMMENT", nl2br(scrubTEXT($assignment['comment'])));
+		$this->setVar("ASSIGN_COMMENT", nl2br(Scrub::text($assignment['comment'])));
 
 		$this->setVar('ON_OFF', ++$j%2? '' : 'dark');
 		$this->parse("assign_block", "assign", true);

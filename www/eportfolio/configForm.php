@@ -88,7 +88,7 @@ if (is_numeric($_REQUEST['uid'])) {
 		localRedir("/eportfolio/" . $_GET['uid']);
     }
 	else if ($_POST['uid'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
-		$eportfolioHandler->updateColumnWidths(scrubTEXT($_POST['leftColWidth']), scrubTEXT($_POST['rightColWidth']));
+		$eportfolioHandler->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
 	}
 }
 else {

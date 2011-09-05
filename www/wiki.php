@@ -38,7 +38,7 @@ if (is_numeric($this->arg[0])) {
 	$output = array(
 		'WIKI_ID' => $wiki['wikiID'],
 		'CATEGORY_ID' => $wiki['categoryID'],
-		'HEADING' => scrubText($wiki['heading']),
+		'HEADING' => Scrub::text($wiki['heading']),
 		'BODY' => scrubHTML($wiki['body']),
 		'MODIFIED' => $modifiedDate->getLong(),
 		'AUTHOR' => $userHandler->formatName($wiki),
@@ -68,7 +68,7 @@ if (is_numeric($this->arg[0])) {
 					'REVISION_ID'       => $wiki['revisionID'],
 					'REVISION_COMPARE'  => $revision['revisionID'],
 					'REVISION_DATE'     => $revisionDate->getDateOnly(),
-					'REVISION_HEADING'	=> scrubText($revision['heading']),
+					'REVISION_HEADING'	=> Scrub::text($revision['heading']),
 					'REVISION_AUTHOR'	=> $userHandler->formatName($revision),
 					'REVISION_CURRENT'	=> $revision['revisionID']==$wiki['revisionID']?'revisionCurrent':'',
 			));

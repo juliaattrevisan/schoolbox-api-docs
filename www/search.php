@@ -234,8 +234,8 @@ if (!empty($result['file'])) {
             'FILE_ID'          => $file['id'],
             'FILE_ICON'        => $file['iconFile'],
             'FILE_SIZE'        => TextFormatter::bytesToString($file['file_size']),
-            'FILE_DESCRIPTION' => scrubTEXT($file['description']),
-            'FILE_COMMENT'     => TextFormatter::cutSentence(scrubTEXT($file['comment']), 150),
+            'FILE_DESCRIPTION' => Scrub::text($file['description']),
+            'FILE_COMMENT'     => TextFormatter::cutSentence(Scrub::text($file['comment']), 150),
             'FILE_OWNER'       => $file['uid'],
             'FILE_OWNER_NAME'  => $userHandler->formatName($file),
             'FILE_CREATED'     => $createdTime->getRelativeTime(),
@@ -270,7 +270,7 @@ if (!empty($result['category'])) {
 
         $page->setVar(array(
             'CATEGORY_ID' => $category['id'],
-            'CATEGORY_NAME' => scrubTEXT($category['name']),
+            'CATEGORY_NAME' => Scrub::text($category['name']),
             'CATEGORY_CODE' => $category['code'],
             'CATEGORY_BREADCRUMB' => $category['breadcrumb'],
             'CATEGORY_COUNT'      => $count['category'],
@@ -317,8 +317,8 @@ if (!empty($result['link'])) {
         $page->setVar(array(
             'LINK_URL'         => $linkUrl,
             'LINK_ICON'        => $link['iconFile'],
-            'LINK_DESCRIPTION' => scrubTEXT($link['description']),
-            'LINK_COMMENT'     => TextFormatter::cutSentence(scrubTEXT($link['comment']), 150),
+            'LINK_DESCRIPTION' => Scrub::text($link['description']),
+            'LINK_COMMENT'     => TextFormatter::cutSentence(Scrub::text($link['comment']), 150),
             'LINK_OWNER'       => $link['uid'],
             'LINK_OWNER_NAME'  => $userHandler->formatName($link),
             'LINK_CREATED'     => $createdTime->getRelativeTime(),
@@ -359,8 +359,8 @@ if (!empty($result['news'])) {
             'NEWS_ID'         => $news['id'],
             'NEWS_CODE'       => $news['code'],
             'NEWS_LINK'       => $news['link'],
-            'NEWS_HEADING'    => scrubTEXT($news['heading']),
-            'NEWS_BODY'       => TextFormatter::cutSentence(scrubTEXT(strip_tags($news['body'])), 150),
+            'NEWS_HEADING'    => Scrub::text($news['heading']),
+            'NEWS_BODY'       => TextFormatter::cutSentence(Scrub::text(strip_tags($news['body'])), 150),
             'NEWS_OWNER'      => $news['uid'],
             'NEWS_OWNER_NAME' => $userHandler->formatName($news),
             'NEWS_CREATED'    => $createdTime->getRelativeTime(),
@@ -394,8 +394,8 @@ if (!empty($result['blog'])) {
 
         $page->setVar(array(
             'BLOG_CID'        => $blog['cid'],
-            'BLOG_HEADING'    => scrubTEXT($blog['heading']),
-            'BLOG_BODY'       => TextFormatter::cutSentence(scrubTEXT(strip_tags($blog['body'])), 150),
+            'BLOG_HEADING'    => Scrub::text($blog['heading']),
+            'BLOG_BODY'       => TextFormatter::cutSentence(Scrub::text(strip_tags($blog['body'])), 150),
             'BLOG_OWNER'      => $blog['uid'],
             'BLOG_OWNER_NAME' => $userHandler->formatName($blog),
             'BLOG_CREATED'    => $createdTime->getRelativeTime(),
@@ -430,8 +430,8 @@ if (!empty($result['wiki'])) {
         $page->setVar(array(
             'WIKI_ID'         => $wiki['wikiID'],
             'WIKI_CID'        => $wiki['categoryID'],
-            'WIKI_HEADING'    => scrubTEXT($wiki['heading']),
-            'WIKI_BODY'       => TextFormatter::cutSentence(scrubTEXT(strip_tags($wiki['body'])), 150),
+            'WIKI_HEADING'    => Scrub::text($wiki['heading']),
+            'WIKI_BODY'       => TextFormatter::cutSentence(Scrub::text(strip_tags($wiki['body'])), 150),
             'WIKI_OWNER'      => $wiki['userID'],
             'WIKI_OWNER_NAME' => $userHandler->formatName($wiki),
             'WIKI_CREATED'    => $createdTime->getRelativeTime(),
@@ -466,8 +466,8 @@ if (!empty($result['forum'])) {
         $page->setVar(array(
             'FORUM_CID'        => $forum['categoryID'],
             'FORUM_THREADID'   => $forum['threadID'],
-            'FORUM_TITLE'      => scrubTEXT($forum['threadTitle']),
-            'FORUM_BODY'       => TextFormatter::cutSentence(scrubTEXT(strip_tags($forum['body'])), 150),
+            'FORUM_TITLE'      => Scrub::text($forum['threadTitle']),
+            'FORUM_BODY'       => TextFormatter::cutSentence(Scrub::text(strip_tags($forum['body'])), 150),
             'FORUM_OWNER'      => $forum['uid'],
             'FORUM_OWNER_NAME' => $userHandler->formatName($forum),
             'FORUM_CREATED'    => $createdTime->getRelativeTime(),
@@ -503,10 +503,10 @@ if (!empty($result['event'])) {
         }
 
         $page->setVar(array(
-            'EVENT_TITLE'  => scrubTEXT($event['note']),
+            'EVENT_TITLE'  => Scrub::text($event['note']),
             'EVENT_LINK'   => '/calendar/week/'.$date->format('d-m-Y'),
             'EVENT_TYPE'   => $event['eventType'],
-            'EVENT_DETAIL' => scrubTEXT($event['detail']),
+            'EVENT_DETAIL' => Scrub::text($event['detail']),
             'EVENT_DATE'   => $event['date'],
             'EVENT_LOCATION' => $event['location'],
             'EVENT_TIME'   => $event_time

@@ -36,7 +36,7 @@ else {
 				'THREAD_USER'		=> $userHandler->formatName($user),
 				'THREAD_USER_ID'	=> $thread['userID'],
 				'THREAD_DATE'		=> $threadTime->getRelativeTime(),
-				'THREAD_TITLE'		=> scrubTEXT($thread['title']),
+				'THREAD_TITLE'		=> Scrub::text($thread['title']),
 				'ON_OFF'			=> ++$j%2? '' : 'dark',
 			));
 

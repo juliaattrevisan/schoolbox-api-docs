@@ -15,7 +15,7 @@ if ($textBox['deleted'] == 'true') {
 }
 
 $output = array(
-	'TEXTBOX_HEADING' => !empty($textBox['heading']) ? scrubText($textBox['heading']) : 'Text Box',
+	'TEXTBOX_HEADING' => !empty($textBox['heading']) ? Scrub::text($textBox['heading']) : 'Text Box',
 	'TEXTBOX_BODY' => scrubHTML($textBox['body']),
 	'TEXTBOX_ID' => $textBox['textBoxID'],
 );
@@ -59,7 +59,7 @@ $textBoxList = $textBoxHandler->getAllByCategory($categoryID);
 if (is_array($textBoxList)) {
 	foreach ($textBoxList as $textBox) {
 		$output = array(
-			'COMPONENT_CONFIG_SELECT_NAME' => scrubText($textBox['heading']),
+			'COMPONENT_CONFIG_SELECT_NAME' => Scrub::text($textBox['heading']),
 			'COMPONENT_CONFIG_SELECT_VALUE' => $textBox['textBoxID'],
 			'COMPONENT_CONFIG_SELECT_SELECTED' => $textBox['textBoxID'] == $current['textBoxID'] ? 'selected="selected"' : '',
 		);

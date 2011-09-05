@@ -23,7 +23,7 @@ if (is_array($fileList)) {
 			'FILE_ID'				=> $file['fileTypeID'],
 			'FILE_ENABLED'			=> $file['enable'] == 'true' ? 'Yes' : 'No',
 			'FILE_ENABLED_CHECKED'  => $file['enable'] == 'true' ? 'checked="checked"' : '',
-			'FILE_DESC'				=> scrubTEXT($file['description']),
+			'FILE_DESC'				=> Scrub::text($file['description']),
 			'FILE_MIME'				=> $file['mime'],
 			'FILE_EXTENSION'		=> $file['extension'],
 			'FILE_ICON'				=> $file['iconFile'],

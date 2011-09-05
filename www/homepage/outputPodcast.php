@@ -10,7 +10,7 @@ if(!empty($config['url'])) {
     $xml = new Xml($config['url']);
 
     if ($xml->channel) {
-        $this->setVar('PODCAST_COMPONENT_TITLE', scrubText($xml->channel->title));
+        $this->setVar('PODCAST_COMPONENT_TITLE', Scrub::text($xml->channel->title));
         $j = 0;
 
 	    foreach ($xml->channel->item as $item) {
@@ -18,9 +18,9 @@ if(!empty($config['url'])) {
 
 			if ($fileType->isAudio()) {
 				$this->setVar(array(
-					'PODCAST_URL' => scrubText($item->enclosure['url']),
-					'PODCAST_TITLE' => scrubText($item->title),
-					'PODCAST_DESCRIPTION' => scrubText($item->description),
+					'PODCAST_URL' => Scrub::text($item->enclosure['url']),
+					'PODCAST_TITLE' => Scrub::text($item->title),
+					'PODCAST_DESCRIPTION' => Scrub::text($item->description),
 					'ON_OFF'  => ++$j%2 ? '' : 'dark',
 					'PODCAST_ID' => md5($item->title),
 				));

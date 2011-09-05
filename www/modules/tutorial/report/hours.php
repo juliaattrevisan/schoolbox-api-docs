@@ -78,7 +78,7 @@ if (is_array($_POST['processed'])) {
 					foreach ($eventList as $event) {
 
 						$output = array('TUTOR_ID'		=> $user['uid'],
-										'TUTOR_NAME'	=> scrubText($tutor['name']),
+										'TUTOR_NAME'	=> Scrub::text($tutor['name']),
 										);
 						$page->setVar($output);
 
@@ -95,8 +95,8 @@ if (is_array($_POST['processed'])) {
 										'MARKED'	=> $markedDate->getdateOnly(),
 										'START'		=> $event['start'],
 										'FINISH'	=> $event['finish'],
-										'TUTORIAL'	=> scrubText($event['name']),
-										'CODE'		=> !empty($event['code']) ? scrubText($event['code']) : 'N/A',
+										'TUTORIAL'	=> Scrub::text($event['name']),
+										'CODE'		=> !empty($event['code']) ? Scrub::text($event['code']) : 'N/A',
 										'TYPE'		=> $event['typeName'],
 										'ENROLLED'	=> $event['enrolled'],
 										'ATTENDED'	=> $attendanceHandler->getCountByEvent($event['eventID']),

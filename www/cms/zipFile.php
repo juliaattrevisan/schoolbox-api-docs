@@ -12,9 +12,9 @@ if ($groupHandler->isSuperuser() && is_numeric($this->arg[0])) {
         $cat = $categoryHandler->getByID($this->arg[0]);
 
 
-        $this->setVar('CATEGORY_NAME', scrubTEXT($cat['name']));
+        $this->setVar('CATEGORY_NAME', Scrub::text($cat['name']));
         $this->setVar('CID', $cat['id']);
-        
+
 	/* Set up permissions options
 	 */
 	$groupPermList = $categoryHandler->getGroupPerms(0);
@@ -22,7 +22,7 @@ if ($groupHandler->isSuperuser() && is_numeric($this->arg[0])) {
 	if (is_array($groupPermList)) {
 		foreach ($groupPermList as $group) {
 			$this->setVar(array(
-				'GROUP_NAME'		=> scrubText($group['name']),
+				'GROUP_NAME'		=> Scrub::text($group['name']),
 				'GROUP_ID'			=> $group['id'],
 				'PERM_0_SELECTED'	=> 'checked="checked"',
 				'PERM_1_SELECTED'	=> '',

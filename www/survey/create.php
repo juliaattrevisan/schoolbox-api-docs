@@ -27,10 +27,10 @@ if (!empty($_POST)) {
     $finish = new Alaress_Date_Format($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem']);
 
     $assess_id = $assessHandler->create(array(
-        'category_id' => scrubTEXT($_POST['category_id']),
+        'category_id' => Scrub::text($_POST['category_id']),
         'user_id' => $_SESSION['id'],
-        'title' => scrubTEXT($_POST['title']),
-        'description' => scrubTEXT($_POST['description']),
+        'title' => Scrub::text($_POST['title']),
+        'description' => Scrub::text($_POST['description']),
         'start' => $start->getDatabase(),
         'finish' => $finish->getDatabase(),
         'duration'  => $duration = Survey::UNLIMITED_DURATION,

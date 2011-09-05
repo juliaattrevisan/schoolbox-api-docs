@@ -10,39 +10,39 @@ class viewEvent
 	function viewEvent()
 	{
 		$this->db = new DeprecatedDatabase();
-		
+
 		$this->t_body = new Template(TPL_directory);
         $this->t_body->set_file('tplBODY', 'modules/clearinghouse/viewEvent.htm');
 		$this->t_body->set_var('TITLE', HEADING." - PD Clearing House");
-	
+
   		include_once("../../include/page.php");
-	
+
 	}
 
 	function outputEvent($id)
 	{
-		$eventObj = new Event();	
+		$eventObj = new Event();
 		$event = $eventObj->getSingleEvent($id);
-		
+
 		if(is_array($event))
 		{
 			$tplArray = array(	'ID' => $event['id'],
 											'ACTION' => 'Modify',
-											'NAME' => scrubTEXT($event['name']),
+											'NAME' => Scrub::text($event['name']),
 											'DATE' => date('l jS \of F Y g:ia', $event['start']),
 											'DURATION' => timeToString($event['duration']),
-											'COST' => scrubTEXT('$'.$event['cost']),
-											'DESCRIPTION' => scrubTEXT($event['description']),
-											'ORGANISER' => scrubTEXT($event['organiser']),
-											'PRESENTER' => scrubTEXT($event['presenter']),
+											'COST' => Scrub::text('$'.$event['cost']),
+											'DESCRIPTION' => Scrub::text($event['description']),
+											'ORGANISER' => Scrub::text($event['organiser']),
+											'PRESENTER' => Scrub::text($event['presenter']),
 											'CATEGORY' => $event['category'],
 											'FORMAT' => $event['format'],
 											'YEAR' => $event['year'],
-											'VENUE' => scrubTEXT($event['venue']),
-											'ADDRESS' => scrubTEXT($event['address']),
+											'VENUE' => Scrub::text($event['venue']),
+											'ADDRESS' => Scrub::text($event['address']),
 											'URL' => $event['url'],
 										);
-			
+
 			$this->t_body->set_var($tplArray);
 		}
 		else
@@ -50,12 +50,12 @@ class viewEvent
 			error(0);
 		}
 	}
-	
+
 	function outputPage()
 	{
 		$this->t_body->pparse('finaloutput','tplBODY');
 	}
-	
+
 
 }
 

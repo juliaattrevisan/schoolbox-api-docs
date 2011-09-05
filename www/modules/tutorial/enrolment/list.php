@@ -40,8 +40,8 @@ if (is_numeric($_GET['eventID'])) {
 		error(19);
 
 
-	$output = array('EVENT_NAME'	=> scrubText($event['name']),
-					'EVENT_CODE'	=> scrubText($event['code']),
+	$output = array('EVENT_NAME'	=> Scrub::text($event['name']),
+					'EVENT_CODE'	=> Scrub::text($event['code']),
 					'EVENT_ID'		=> $event['eventID'],
 					'WEEK'			=> date("YW", $event['date']) - 1,
 					);
@@ -86,7 +86,7 @@ if (is_numeric($_GET['eventID'])) {
 					$output = array(
 						'DATE' => date("j/n", $attendanceDate->getUnixTimestamp()),
 						'ATTENDANCE' => $attendance['present'] == 'true' ? "attendance-tick" : (!empty($attendance['reason']) ? "attendance-cross-blue" : "attendance-cross"),
-						'REASON' => scrubText($attendance['reason']),
+						'REASON' => Scrub::text($attendance['reason']),
 					);
 
 					$page->setVar($output);

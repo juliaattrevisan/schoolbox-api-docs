@@ -21,7 +21,7 @@ class ZipFolder {
 
    function createZip() {
       $archive = new PclZip($this->tmpZip);
-      
+
       mkdir($this->tmpFolder);
       $this->createDirectory($this->tmpFolder, $this->folder, $this->fileList);
       $archive->create($this->tmpFolder.'/',PCLZIP_OPT_REMOVE_PATH, $this->tmpFolder);
@@ -46,7 +46,7 @@ class ZipFolder {
          }
       }
    }
-   
+
    function uniqueFileName($fileName, $depth=1) {
       if(is_file($fileName)) {
          $pathParts = pathinfo($fileName);
@@ -117,7 +117,7 @@ if(is_numeric($_GET['id'])) {
    $subBoxHandler = new Submission();
 
    $submissionBox = $subBoxHandler->getByID($box_id);
-   $zipName = scrubTEXT($submissionBox['name']);
+   $zipName = Scrub::text($submissionBox['name']);
 
    $submissionBoxOwner = $subBoxHandler->getBoxOwner($box_id);
 

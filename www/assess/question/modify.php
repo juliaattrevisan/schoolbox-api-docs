@@ -31,7 +31,7 @@ if (!empty($_POST)) {
         error(116);
     }
 
-    $section = $sectionHandler->getByID(scrubTEXT($_POST['section_id']));
+    $section = $sectionHandler->getByID(Scrub::text($_POST['section_id']));
 
 	if ($assessHandler->isDeleted($section['assess_id'])) {
 		error(112);
@@ -45,8 +45,8 @@ if (!empty($_POST)) {
 		error(115);
 	}
 
-    $questionHandler = $factory->createQuestionModel(scrubTEXT($_POST['type_id']));
-    $answerHandler = $factory->createAnswerModel(scrubTEXT($_POST['type_id']));
+    $questionHandler = $factory->createQuestionModel(Scrub::text($_POST['type_id']));
+    $answerHandler = $factory->createAnswerModel(Scrub::text($_POST['type_id']));
 
     $questionHandler->update($_POST);
     $answerHandler->update($_POST);

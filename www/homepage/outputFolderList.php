@@ -13,7 +13,7 @@ if (is_array($folderList)) {
 		{
 			//set name
 			$output = array('FOLDER_ID'		=> $folder['id'],
-							'FOLDER_NAME'	=> scrubTEXT($folder['name']),
+							'FOLDER_NAME'	=> Scrub::text($folder['name']),
 							'FOLDER_ICON'	=> $folder['template']?'house':'folder_blue_full',
 							'ON_OFF'		=> ++$j%2? '' : 'dark',
 							);

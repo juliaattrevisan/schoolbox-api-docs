@@ -16,12 +16,12 @@ if (is_numeric($this->arg[0])) {
 	// check access
 	if(!$_SESSION['su'] && $category['owner'] != $_SESSION['id'])
 		error(19);
-		
-	$output = array('CATEGORY_NAME'	=> scrubText($category['name']),
+
+	$output = array('CATEGORY_NAME'	=> Scrub::text($category['name']),
 					'CATEGORY_ID'	=> $category['id'],
 					);
 	$this->setVar($output);
-		
+
 } else
 	error(2);
 

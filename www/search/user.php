@@ -118,7 +118,7 @@ if (is_numeric($this->arg[0])) {
 			$parent = $synUserHandler->getParent($user['synergy_id']);
 			if ($parent['DirectoryIncludeFlag']) {
 				$output = array(
-                    'NAME' => scrubTEXT($parent['Title'].' '.$parent['Preferred'].' '.$parent['Surname']),
+                    'NAME' => Scrub::text($parent['Title'].' '.$parent['Preferred'].' '.$parent['Surname']),
 					'HOME_PHONE'	=> $parent['SilentPhoneFlag']?$parent['HomePhone']:'',
 					'MOBILE_PHONE'  => $parent['MobilePhone'],
 				);
@@ -128,7 +128,7 @@ if (is_numeric($this->arg[0])) {
 				if ($parent['SpouseDirectoryIncludeFlag'] && $parent['SpouseSurname'] ) {
 					$output = array(
 
-						'SPOUSE_NAME' =>  scrubTEXT($parent['SpouseTitle'].' '.$parent['SpousePreferred'].' '.$parent['SpouseSurname']),
+						'SPOUSE_NAME' =>  Scrub::text($parent['SpouseTitle'].' '.$parent['SpousePreferred'].' '.$parent['SpouseSurname']),
 						'SPOUSE_MOBILE' => $parent['SpouseMobilePhone'],
 						'SPOUSE_EMAIL'=> '<a href="'.$_SESSION['mailhandle'].$parent['SpouseEmail'].'\">'.$parent['SpouseEmail'].'</a>',
 					);
@@ -179,10 +179,10 @@ if (is_numeric($this->arg[0])) {
 				$emailAddress = $emailObj->formatEmailFromArray($form);
 
 				if ($formEmail = $emailAddress) {
-					$formTeacher = '<a href="'.$_SESSION['mailhandle'].$formEmail.'">'.scrubTEXT($synInfo['StudentFormStaffName']).'</a>';
+					$formTeacher = '<a href="'.$_SESSION['mailhandle'].$formEmail.'">'.Scrub::text($synInfo['StudentFormStaffName']).'</a>';
 				}
 				else {
-					$formTeacher = scrubTEXT($synInfo['StudentFormStaffName']);
+					$formTeacher = Scrub::text($synInfo['StudentFormStaffName']);
 				}
 			}
 
@@ -193,29 +193,29 @@ if (is_numeric($this->arg[0])) {
 				$emailAddress = $emailObj->formatEmailFromArray($form);
 
 				if ($tutorEmail = $emailAddress) {
-					$tutorTeacher = '<a href="'.$_SESSION['mailhandle'].$tutorEmail.'">'.scrubTEXT($synInfo['StudentTutorName']).'</a>';
+					$tutorTeacher = '<a href="'.$_SESSION['mailhandle'].$tutorEmail.'">'.Scrub::text($synInfo['StudentTutorName']).'</a>';
 				}
 				else {
-					$tutorTeacher = scrubTEXT($synInfo['StudentTutorName']);
+					$tutorTeacher = Scrub::text($synInfo['StudentTutorName']);
 				}
 			}
 
 			$output = array(
-				'TUTOR_GROUP' => scrubTEXT($synInfo['StudentTutorDescription']),
+				'TUTOR_GROUP' => Scrub::text($synInfo['StudentTutorDescription']),
 				'TUTOR' => $tutorTeacher,
-				'YEAR_LEVEL' => scrubTEXT($synInfo['StudentYearLevel']),
-				'HOUSE' => scrubTEXT($synInfo['StudentHouseDescription']),
-				'HOH' => scrubTEXT($synInfo['StudentHeadOfHouse']),
-				'FORM' => scrubTEXT($synInfo['StudentForm']),
-				'FORM_DESCRIPTION' => scrubTEXT($synInfo['FormDescription']),
+				'YEAR_LEVEL' => Scrub::text($synInfo['StudentYearLevel']),
+				'HOUSE' => Scrub::text($synInfo['StudentHouseDescription']),
+				'HOH' => Scrub::text($synInfo['StudentHeadOfHouse']),
+				'FORM' => Scrub::text($synInfo['StudentForm']),
+				'FORM_DESCRIPTION' => Scrub::text($synInfo['FormDescription']),
 				'FORM_STAFF' => $formTeacher,
-				'LOCKER' => scrubTEXT($synInfo['StudentLockerBook']),
+				'LOCKER' => Scrub::text($synInfo['StudentLockerBook']),
 				'BIRTHDATE' => date('jS \o\f F, Y', $synInfo['StudentBirthDate']),
-				'EMERGENCY_NAME' => scrubTEXT($synInfo['StudentEmergencyName']),
-				'EMERGENCY_PHONE' => scrubTEXT($synInfo['StudentEmergencyPhone']),
-				'EMERGENCY_ALT_PHONE' =>scrubTEXT($synInfo['StudentEmergencyPhoneAlt']),
-				'MEDICAL_NOTE' => scrubTEXT($synInfo['StudentMedicalAlert']),
-				'CONTACT_ALERT_MESSAGE' => scrubTEXT($synInfo['AlertMessage']),
+				'EMERGENCY_NAME' => Scrub::text($synInfo['StudentEmergencyName']),
+				'EMERGENCY_PHONE' => Scrub::text($synInfo['StudentEmergencyPhone']),
+				'EMERGENCY_ALT_PHONE' =>Scrub::text($synInfo['StudentEmergencyPhoneAlt']),
+				'MEDICAL_NOTE' => Scrub::text($synInfo['StudentMedicalAlert']),
+				'CONTACT_ALERT_MESSAGE' => Scrub::text($synInfo['AlertMessage']),
 			);
 
 			$this->setVar($output);
@@ -228,30 +228,30 @@ if (is_numeric($this->arg[0])) {
 						$j++;
 
 						if ($studentContact['StudentContactDefaultEmail']) {
-							$contactName = '<a href="'.$_SESSION['mailhandle'].$studentContact['StudentContactDefaultEmail'].'">'.scrubTEXT($studentContact['StudentContactTitle'].' '.$studentContact['StudentContactPreferred'].' '.$studentContact['StudentContactSurname']).'</a>';
+							$contactName = '<a href="'.$_SESSION['mailhandle'].$studentContact['StudentContactDefaultEmail'].'">'.Scrub::text($studentContact['StudentContactTitle'].' '.$studentContact['StudentContactPreferred'].' '.$studentContact['StudentContactSurname']).'</a>';
 						}
 						else {
-							$contactName = scrubTEXT($studentContact['StudentContactTitle'].' '.$studentContact['StudentContactPreferred'].' '.$studentContact['StudentContactSurname']);
+							$contactName = Scrub::text($studentContact['StudentContactTitle'].' '.$studentContact['StudentContactPreferred'].' '.$studentContact['StudentContactSurname']);
 						}
 
 						if ($studentContact['StudentContactSpouseDefaultEmail']) {
-							$spouseName = '<a href="'.$_SESSION['mailhandle'].$studentContact['StudentContactSpouseDefaultEmail'].'">'.scrubTEXT($studentContact['StudentContactSpouseTitle'].' '.$studentContact['StudentContactSpousePreferred'].' '.$studentContact['StudentContactSpouseSurname']).'</a>';
+							$spouseName = '<a href="'.$_SESSION['mailhandle'].$studentContact['StudentContactSpouseDefaultEmail'].'">'.Scrub::text($studentContact['StudentContactSpouseTitle'].' '.$studentContact['StudentContactSpousePreferred'].' '.$studentContact['StudentContactSpouseSurname']).'</a>';
 						}
 						else {
-							$spouseName = scrubTEXT($studentContact['StudentContactSpouseTitle'].' '.$studentContact['StudentContactSpousePreferred'].' '.$studentContact['StudentContactSpouseSurname']);
+							$spouseName = Scrub::text($studentContact['StudentContactSpouseTitle'].' '.$studentContact['StudentContactSpousePreferred'].' '.$studentContact['StudentContactSpouseSurname']);
 						}
 
 						$output = array(
-							'CONTACT_NAME' => scrubTEXT($studentContact['StudentContactTitle'].' '.$studentContact['StudentContactPreferred'].' '.$studentContact['StudentContactSurname']),
-							'CONTACT_ADDRESS' => scrubTEXT($studentContact['StudentContactAddress1']).'<br>'.scrubTEXT($studentContact['StudentContactSuburb'].', '.$studentContact['StudentContactState'].' '.$studentContact['StudentContactPostCode']),
-							'CONTACT_HOME_PHONE' => scrubTEXT($studentContact['StudentContactPhoneActual']),
-							'CONTACT_MOBILE_PHONE' => scrubTEXT($studentContact['StudentContactMobilePhone']),
-							'CONTACT_OCCUP_PHONE' => scrubTEXT($studentContact['StudentContactOccupPhone']),
+							'CONTACT_NAME' => Scrub::text($studentContact['StudentContactTitle'].' '.$studentContact['StudentContactPreferred'].' '.$studentContact['StudentContactSurname']),
+							'CONTACT_ADDRESS' => Scrub::text($studentContact['StudentContactAddress1']).'<br>'.Scrub::text($studentContact['StudentContactSuburb'].', '.$studentContact['StudentContactState'].' '.$studentContact['StudentContactPostCode']),
+							'CONTACT_HOME_PHONE' => Scrub::text($studentContact['StudentContactPhoneActual']),
+							'CONTACT_MOBILE_PHONE' => Scrub::text($studentContact['StudentContactMobilePhone']),
+							'CONTACT_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactOccupPhone']),
 							'CONTACT_EMAIL' => $studentContact['StudentContactDefaultEmail'],
 							'CONTACT_NAME_EMAIL' => $contactName,
-							'SPOUSE_NAME' => scrubTEXT($studentContact['StudentContactSpouseTitle'].' '.$studentContact['StudentContactSpousePreferred'].' '.$studentContact['StudentContactSpouseSurname']),
-							'SPOUSE_MOBILE_PHONE' => scrubTEXT($studentContact['StudentContactSpouseMobilePhone']),
-							'SPOUSE_OCCUP_PHONE' => scrubTEXT($studentContact['StudentContactSpouseOccupPhone']),
+							'SPOUSE_NAME' => Scrub::text($studentContact['StudentContactSpouseTitle'].' '.$studentContact['StudentContactSpousePreferred'].' '.$studentContact['StudentContactSpouseSurname']),
+							'SPOUSE_MOBILE_PHONE' => Scrub::text($studentContact['StudentContactSpouseMobilePhone']),
+							'SPOUSE_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactSpouseOccupPhone']),
 							'SPOUSE_EMAIL' => $studentContact['StudentContactSpouseDefaultEmail'],
 							'SPOUSE_NAME_EMAIL' => $spouseName,
 						);

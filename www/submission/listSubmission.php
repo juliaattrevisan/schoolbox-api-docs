@@ -43,9 +43,9 @@ if(is_array($subList)) {
 			$this->setVar('STUDENTS', count($studentList));
 
 			if($prevCat['code'] != "")
-                    $this->setVar('CATEGORY', scrubTEXT($prevCat['name'])." (".$prevCat['code'].")");
+                    $this->setVar('CATEGORY', Scrub::text($prevCat['name'])." (".$prevCat['code'].")");
             else
-                    $this->setVar('CATEGORY', scrubTEXT($prevCat['name']));
+                    $this->setVar('CATEGORY', Scrub::text($prevCat['name']));
 
             $this->setVar('CATEGORY_ID', $prevCat['catid']);
 
@@ -59,9 +59,9 @@ if(is_array($subList)) {
         if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
             $this->setVar(array(
                 'ASSESS_ASSESS_ID' => $sub['id'],
-                'ASSESS_TITLE' => scrubTEXT($sub['name']),
+                'ASSESS_TITLE' => Scrub::text($sub['name']),
                 'ASSESS_TYPE' => $sub['type'],
-                'JAVAASSDESC' => addslashes(scrubTEXT($sub['name'])),
+                'JAVAASSDESC' => addslashes(Scrub::text($sub['name'])),
                 'ASSESS_START' => $sub['open_date'],
                 'ASSESS_FINISH' => $sub['date'],
                 'ASSESS_ATTEMPTS' => $attemptHandler->numAttempted($sub['id']),
@@ -75,9 +75,9 @@ if(is_array($subList)) {
         else {
             $this->setVar(array(
                 'ID'          => $sub['id'],
-                'ASSDESC'     => scrubTEXT($sub['name']),
+                'ASSDESC'     => Scrub::text($sub['name']),
                 'TYPE'        => $sub['type'],
-                'JAVAASSDESC' => addslashes(scrubTEXT($sub['name'])),
+                'JAVAASSDESC' => addslashes(Scrub::text($sub['name'])),
                 'OPENDATE'    => $sub['accept_submission'] ? $sub['open_date'] : '',
                 'DUEDATE'     => $sub['date'],
                 'MARKED'      => (int) $totals['marked'],
@@ -107,10 +107,10 @@ if(is_array($subList)) {
 	$this->setVar('STUDENTS', count($studentList));
 
     if ($prevCat['code'] != "") {
-        $this->setVar("CATEGORY", scrubTEXT($prevCat['name'])." (".$prevCat['code'].")");
+        $this->setVar("CATEGORY", Scrub::text($prevCat['name'])." (".$prevCat['code'].")");
     }
     else {
-        $this->setVar("CATEGORY", scrubTEXT($prevCat['name']));
+        $this->setVar("CATEGORY", Scrub::text($prevCat['name']));
     }
 
     $this->setVar('CATEGORY_ID', $prevCat['catid']);

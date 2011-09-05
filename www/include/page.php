@@ -59,12 +59,12 @@ if($db->dbCountRows() > 0){
 		$url = new Url($link['url']);
 
 		if($url->isLocalURL()){
-			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\"><span>".scrubTEXT($link['description'])."</span></a>");
+			$this->t_body->set_var("MLINK", "<a href=\"".$link['url']."\"><span>".Scrub::text($link['description'])."</span></a>");
 		}
 		else {
             /* Why did this double-urlencode? Removed.
              */
-			$this->t_body->set_var("MLINK", "<a href=\"" . $url->getBase64EncodedRedirect() ."\" target=\"_blank\"><span>".scrubTEXT($link['description'])."</span></a>");
+			$this->t_body->set_var("MLINK", "<a href=\"" . $url->getBase64EncodedRedirect() ."\" target=\"_blank\"><span>".Scrub::text($link['description'])."</span></a>");
 		}
 
 		$this->t_body->parse("my_links", "mlink_block", true);
@@ -90,7 +90,7 @@ if($db->dbCountRows() > 0)
 
 	while($group = $db->dbGetNextArray())
 	{
-			$this->t_body->set_var("MGNAME", scrubTEXT($group['name']));
+			$this->t_body->set_var("MGNAME", Scrub::text($group['name']));
 			$this->t_body->set_var("MGID", $group['sid']);
 			$this->t_body->parse("my_groups", "mgroup_block", true);
 	}

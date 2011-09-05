@@ -8,7 +8,7 @@ $textBox = $textBoxHandler->getByField('componentLocationID', $component['eportf
 /* Set tokens for the textbox
  */
 $this->setVar(array(
-    'TEXTBOX_HEADING' => !empty($textBox['heading']) ? scrubText($textBox['heading']) : 'Text Box',
+    'TEXTBOX_HEADING' => !empty($textBox['heading']) ? Scrub::text($textBox['heading']) : 'Text Box',
     'TEXTBOX_BODY' => scrubHTML($textBox['body']),
     'TEXTBOX_ID' => $textBox['textBoxID'],
 ));

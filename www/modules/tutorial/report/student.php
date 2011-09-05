@@ -56,8 +56,8 @@ if (isset($user['uid'])) {
 				$i++;
 				if ($event['code'] != $last['code'] && $i > 1) {
 
-					$output = array('TUTORIAL'		=> scrubText($last['name']),
-									'CODE'			=> scrubText($last['code']),
+					$output = array('TUTORIAL'		=> Scrub::text($last['name']),
+									'CODE'			=> Scrub::text($last['code']),
 									'TYPE'			=> $last['typeName'],
 									'ATTENDANCE'	=> number_format(($totalAttended/($totalAttended+$totalMissed))*100, 2),
 									'TOTAL_ATTENDED'	=> number_format($totalAttended, 2),
@@ -102,8 +102,8 @@ if (isset($user['uid'])) {
 			}
 
 			// last class
-			$output = array('TUTORIAL'		=> scrubText($last['name']),
-							'CODE'			=> scrubText($last['code']),
+			$output = array('TUTORIAL'		=> Scrub::text($last['name']),
+							'CODE'			=> Scrub::text($last['code']),
 							'TYPE'			=> $last['typeName'],
 							'ATTENDANCE'	=> number_format(($totalAttended/($totalAttended+$totalMissed))*100, 2),
 							'TOTAL_ATTENDED'	=> number_format($totalAttended, 2),

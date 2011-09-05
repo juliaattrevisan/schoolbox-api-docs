@@ -87,7 +87,7 @@ class ModuleJobEdit extends HelpDeskPage {
 				'description'	=> '',
 				'problemID'	=> '',
 			);
-			
+
 			$this->createdRemove();
 
 			foreach( array_keys( $row) as $key) {
@@ -117,7 +117,7 @@ class ModuleJobEdit extends HelpDeskPage {
 			$this->_tpl->set_block( 'tplContent', 'JOB_ID_BLOCK');
 			$this->_tpl->set_var( 'JOB_ID_BLOCK', '');
 		}
-	
+
 		if($row[ 'priorityID'] == "")
 			$row[ 'priorityID'] = 2;
 
@@ -157,16 +157,16 @@ class ModuleJobEdit extends HelpDeskPage {
 			$this->_tpl->set_var( 'NO_DATE_CHECK', '');
 			preg_match( '/(\d+)-(\d+)-(\d+)/', $row[ 'dueDate'], $matches);
 			$selectedDay = $matches[1];
-			$selectedMonth = $matches[2]; 
+			$selectedMonth = $matches[2];
 			$selectedYear = $matches[3];
 		}
-		
+
 		if($row['assignedUserID'] == ''){
 			$row['assignedUserID'] = $_SESSION['portal_ID'];
 		}
-		
+
 		$this->setEquipment( $row[ 'equipmentID']);
-		
+
 			# usage is : $this->populateSelect( table/block name (must be same), initiallySelected);
 		$this->populateSelect( 'AssignedUser', $row['assignedUserID']);
 		$this->populateSelect( 'Campus', $row[ 'campusID']);
@@ -182,39 +182,39 @@ class ModuleJobEdit extends HelpDeskPage {
 		# File list
 		$this->_tpl->set_block( 'tplContent', 'fileList', 'blkFileList');
 		$this->_tpl->set_block( 'fileList', 'fileItem', 'blkFileItem');
-		
-				
-		
+
+
+
 		$link = mysql_connect( DB_HOST, DB_USER, DB_PASSWD);
 		mysql_select_db( DB_NAME, $link);
-		
+
 		$query = SQL_fileList($row[ 'jobID']);
-		
+
 		$res = mysql_query($query);
-		
+
 		$jobID = $row['jobID'];
-	
+
 		if (($numRows = mysql_num_rows($res)) > 0) {
-			
+
 			while (list($fileID, $jobID, $name) = mysql_fetch_array($res)) {
-				
+
 				$this->_tpl->set_var('FILE_ITEM_LINK', $jobID . "." . $fileID . "." . $name);
 				$this->_tpl->set_var('FILE_ITEM_NAME', $name);
-				
+
 				$this->_tpl->parse( 'blkFileItem', 'fileItem', true);
-						
+
 			}
-			
+
 			$this->_tpl->parse('blkFileList', 'fileList');
-			
+
 			$this->_tpl->set_var( 'FILE_ID', $fileID);
-	
-		
-			
-		
-		
+
+
+
+
+
 		} else {
-		
+
 			$this->_tpl->set_var('blkFileList','');
 		}
 
@@ -286,15 +286,15 @@ class ModuleJobEdit extends HelpDeskPage {
 
 		# Update an job item
 	function update( &$details) {
-	
+
 		mysql_connect( DB_HOST, DB_USER, DB_PASSWD);
 		mysql_select_db( DB_NAME);
-		
+
 		//first retrieve current information regarding job so we know what is being updated.
 		$jobDetailsSQL = SQL_JobDetails($details['jobID']);
 		$query = mysql_query( $jobDetailsSQL);
 		$prevDetails = mysql_fetch_array( $query);
-		
+
 		//update the job
 		$sql = SQL_jobUpdate( $details);
 		mysql_query( $sql);
@@ -302,13 +302,13 @@ class ModuleJobEdit extends HelpDeskPage {
 		if( mysql_error() <> '') {
 			die( 'Error accessing database to update job : ' . print_r( $details) . '<br><br' . mysql_error());
 		}
-		
+
 		$moduleEventAdd = new ModuleEventAdd();
-		
+
 		foreach( array_keys( $details) as $key){
 			$eventTypeID = 0;
 
-			if($key == 'assignedUserID' && $details[$key] != $prevDetails[$key]) {	
+			if($key == 'assignedUserID' && $details[$key] != $prevDetails[$key]) {
 				//if reassigned create event reassign event with users name
 				$eventTypeID = DB_ID_EVENT_JOB_REASSIGNED;
 				$description = "to " . getUserFull($details[$key]);
@@ -327,7 +327,7 @@ class ModuleJobEdit extends HelpDeskPage {
 				$eventTypeID = DB_ID_EVENT_JOB_UPDATED;
 				$description = $this->HTMLToReadable($key) ." field altered";
 			}
-			
+
 			if($eventTypeID)
 			{
 				//if event has occurred insert
@@ -342,30 +342,30 @@ class ModuleJobEdit extends HelpDeskPage {
 			}
 		}
 	}
-	
-	
+
+
 	function saveAttachment( $jobID, $attachment) {
 
-	
+
 		mysql_connect( DB_HOST, DB_USER, DB_PASSWD);
 		mysql_select_db( DB_NAME);
-		
-		
-		$sql = SQL_fileAdd( array('jobID' => $jobID, 'name' => scrubTEXT($attachment['name'])));
-		
+
+
+		$sql = SQL_fileAdd( array('jobID' => $jobID, 'name' => Scrub::text($attachment['name'])));
+
 		mysql_query( $sql);
 		$fileID = mysql_insert_id();
 
 		if( mysql_error() <> '') {
 			die( 'Error accessing database to update file : ' . '<br><br' . mysql_error());
 		}
-		
-		
-		$saveAs = $jobID . "." . $fileID . "." . scrubTEXT($attachment['name']);
-		
+
+
+		$saveAs = $jobID . "." . $fileID . "." . Scrub::text($attachment['name']);
+
 		move_uploaded_file($attachment['tmp_name'], UPL_DIR . $saveAs);
-		
-	
+
+
 	}
 
 	function setContent( $content) {
@@ -389,7 +389,7 @@ class ModuleJobEdit extends HelpDeskPage {
 	function removeAssociatedUserField() {
 		$this->_associatedUserField = false;
 	}
-     
+
 	function setAssociatedUserList( $associatedUserList) {
 		$this->removeAssociatedUserField();
 		$this->_tpl->set_var( 'ASSOCIATED_USER_LIST', $associatedUserList);
@@ -428,7 +428,7 @@ class ModuleJobEdit extends HelpDeskPage {
 			$sql = SQL_equipmentDetails( $equipmentID);
 			$query = mysql_query( $sql);
 			$row = mysql_fetch_array( $query);
-	
+
 			$this->_tpl->set_var( 'EQUIPMENT_ID', $equipmentID);
 			$this->_tpl->set_var( 'EQUIPMENT_SERIAL', $row[ 'serial']);
 			mysql_close();
