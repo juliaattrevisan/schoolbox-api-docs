@@ -11,6 +11,9 @@
 /* Load Configuration Files */
 require_once dirname(__FILE__) . '/../www/conf/conf.php';
 
+/* Load HTML Purifier */
+require_once dirname(__FILE__) . '/HTMLPurifier/HTMLPurifier.auto.php';
+
 /* Load the Autoloader */
 require_once dirname(__FILE__) . '/Autoloader.php';
 $autoloader = Autoloader::initialise();
