@@ -129,7 +129,7 @@ if (is_array($postList)) {
 						'POST_GROUP'		=> Scrub::text($post['userGroup']),
 						'POST_TIME'			=> $postTime->getRelativeTime(),
 						'POST_USER_ID'		=> $post['userID'],
-						'POST_BODY'			=> scrubHTML($post['body']),
+						'POST_BODY'			=> Scrub::html($post['body']),
 						'POST_MODIFIED'		=> $modifiedTime->getRelativeTime(),
 						'POST_CENSORED'		=> $post['censored'] == 'true' ? '(Administrator)' : '',
 						);

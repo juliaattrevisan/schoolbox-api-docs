@@ -16,7 +16,7 @@ if ($rss->channel) {
             'ON_OFF'    => ++$j%2 ? '' : 'dark',
             'RSS_TITLE' => Scrub::text($item->title),
             'RSS_URL'   => base64_encode($item->link),
-            'RSS_BRIEF' => scrubHTML($item->description)
+            'RSS_BRIEF' => Scrub::html($item->description)
         ));
 
 		$postedDate = new Alaress_Date_Relative($item->pubDate);

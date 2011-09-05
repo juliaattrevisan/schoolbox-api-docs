@@ -36,7 +36,7 @@ if ($_GET['news'] == 'all') {
 	if (is_array($newsList)) {
 		foreach ($newsList as $news) {
 			$dNotice .= '<p class="heading">' . Scrub::text($news['item_heading']). '</p>';
-			$dNotice .= scrubHTML($news['item_body']) . '<p>&nbsp;</p>';
+			$dNotice .= Scrub::html($news['item_body']) . '<p>&nbsp;</p>';
 		}
 	}
 	$page->setVar('DAILY_TITLE', 'DAILY NOTICES');

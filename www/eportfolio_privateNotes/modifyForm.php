@@ -11,14 +11,14 @@ $privateNotes = $ePortfolioPrivateNotesHandler->getByID($_POST['uid']);
 
 $privateNotes = array(
     'uid' => $_POST['uid'],
-    'privateNotes' => scrubHTML( $_POST['privateNotes'] )
+    'privateNotes' => Scrub::html($_POST['privateNotes'])
 );
 
-if ( $ePortfolioPrivateNotesHandler->getByID($_POST['uid']) ) {
+if ($ePortfolioPrivateNotesHandler->getByID($_POST['uid'])) {
     $ePortfolioPrivateNotesHandler->update($privateNotes);
 }
 else {
     $ePortfolioPrivateNotesHandler->create($privateNotes);
 }
 
-$page->localRedir('/eportfolio/' . $_POST['uid']);
+$page->localRedir('/eportfolio/' . Scrub::text($_POST['uid']));

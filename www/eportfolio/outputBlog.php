@@ -42,7 +42,7 @@ if (!empty($blogs)) {
 		$this->setVar(array(
 			'BLOG_ID'		=> $blog['id'],
 			'BLOG_HEADING'  => Scrub::text($blog['heading']),
-			'BLOG_BODY'     => scrubHTML($blog['body']),
+			'BLOG_BODY'     => Scrub::html($blog['body']),
 			'BLOG_OWNER'    => "<a href=\"/search/user/{$blog['owner']}\">{$blog['name']}</a>",
 			'BLOG_CREATED'  => $createdTime->getRelativeTime(),
 			'BLOG_SHADING'  => ++$j%2 ? '' : 'dark',

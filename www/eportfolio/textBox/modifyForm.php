@@ -17,8 +17,8 @@ if (isset($_POST['heading']) && isset($_POST['body'])) {
 	$textBox = array(
 		'userID' => Scrub::text($_POST['userID']),
 		'componentLocationID' => Scrub::text($_POST['componentLocationID']),
-        'heading' => scrubHTML($_POST['heading']),
-        'body' => scrubHTML($_POST['body']),
+        'heading' => Scrub::html($_POST['heading']),
+        'body' => Scrub::html($_POST['body']),
     );
 
 	/* If an ID was provided, update existing record; otherwise create

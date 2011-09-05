@@ -81,7 +81,7 @@ if (is_numeric($this->arg[0])) {
 					'POST_ID'		=> $post['postID'],
 					'CATEGORY_ID'	=> $category['id'],
 					'CATEGORY'		=> Scrub::text($category['name']),
-					'BODY'			=> scrubHTML($post['body']),
+					'BODY'			=> Scrub::html($post['body']),
 					);
 	$this->setVar($output);
 
@@ -102,7 +102,7 @@ if (is_numeric($this->arg[0])) {
 						  );
 
 			$output = array('QUOTE_USER'	=> $userHandler->formatName($user),
-							'QUOTE_BODY'	=> scrubHTML($quote['body']),
+							'QUOTE_BODY'	=> Scrub::html($quote['body']),
 							);
 			$this->setVar($output);
 			$this->parse('quote_block', 'quote', true);

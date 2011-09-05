@@ -33,7 +33,7 @@ if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	$this->setVar(array(
 		'ACTION'		=> 'Modify',
 		'ENTRY_HEADING' => Scrub::text($entry['heading']),
-		'ENTRY_BODY'    => scrubHTML($entry['body']),
+		'ENTRY_BODY'    => Scrub::html($entry['body']),
 		'CID'			=> $entry['cid'],
 		'ID'			=> $this->arg[0],
 	));

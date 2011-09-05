@@ -39,7 +39,7 @@ if (is_numeric($this->arg[0])) {
 		'WIKI_ID' => $wiki['wikiID'],
 		'CATEGORY_ID' => $wiki['categoryID'],
 		'HEADING' => Scrub::text($wiki['heading']),
-		'BODY' => scrubHTML($wiki['body']),
+		'BODY' => Scrub::html($wiki['body']),
 		'MODIFIED' => $modifiedDate->getLong(),
 		'AUTHOR' => $userHandler->formatName($wiki),
 		'AUTHOR_ID' => $wiki['authorID'],

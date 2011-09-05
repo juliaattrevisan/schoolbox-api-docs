@@ -71,7 +71,7 @@ if(is_array($items))
 						'NEWS_TITLE'	=> $article['item_heading'],
 						'POSTER'		=> $owner,
 						'DATETIME' 		=> $_SESSION['su'] == 1 ? $article['post_datetime']." expires on ".$article['expire_datetime'] : $article['post_datetime'],
-						'NEWS_BODY'		=> scrubHTML($article['item_body']),
+						'NEWS_BODY'		=> Scrub::html($article['item_body']),
 						'TOPIC_NAME'	=> Scrub::text($previous['topicName']),
 						'TOPIC_CLEAN'	=> $url->getSlug(),
 						);

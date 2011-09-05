@@ -40,7 +40,7 @@ else if (is_numeric($this->arg[0])) {
 	$this->setVar(array(
 		'ACTION'		=> 'Modify',
 		'ENTRY_HEADING' => Scrub::text($blog['heading']),
-		'ENTRY_BODY'    => scrubHTML($blog['body']),
+		'ENTRY_BODY'    => Scrub::html($blog['body']),
 		'UID'			=> $blog['owner'],
 		'ID'			=> $this->arg[0],
 	));

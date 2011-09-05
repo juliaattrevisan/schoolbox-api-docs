@@ -172,7 +172,7 @@ for($i=0; $i < 7; $i++) {
 											($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
 										   	($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
 										   "- "),
-							'NOTE'		=> scrubHTML($event['note']),
+							'NOTE'		=> Scrub::html($event['note']),
 							'COLOUR'	=> $calendarHandler->displayColour($event['type']),
                             'MODIFY'    => $calendarHandler->getPerm($event['id']) > 1 ? '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $event['id'] . '&returnTo=month"><span></span>Modify</a>' : '',
                             'LOCATION'	=> $event['location'],

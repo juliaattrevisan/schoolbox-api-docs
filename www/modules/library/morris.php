@@ -14,16 +14,16 @@ $oc=$textBoxHandler->getByID(936);
 $rem=$textBoxHandler->getByID(937);
 $ww=$textBoxHandler->getByID(924);
 
-$this->setVar('LETS_READ',scrubHTML($lr['body']) );
-$this->setVar('CURIOUS_QUOTES', scrubHTML($cq['body']) );
-$this->setVar('FINDING_OUT', scrubHTML($fo['body']) );
-$this->setVar('OUR_COMMUNITY', scrubHTML($oc['body']) );
-$this->setVar('GALLERY', scrubHTML($itn['body']) );
-$this->setVar('DID_YOU_KNOW',scrubHTML($dyk['body']) );
-$this->setVar('DIGITAL_CITIZEN',scrubHTML($dc['body']) );
-$this->setVar('THINKS',scrubHTML($th['body']) );
-$this->setVar('WONDERFUL_WORDS',scrubHTML($ww['body']) );
-$this->setVar('REMINDER',scrubHTML($rem['body']) );
+$this->setVar('LETS_READ',Scrub::html($lr['body']) );
+$this->setVar('CURIOUS_QUOTES', Scrub::html($cq['body']) );
+$this->setVar('FINDING_OUT', Scrub::html($fo['body']) );
+$this->setVar('OUR_COMMUNITY', Scrub::html($oc['body']) );
+$this->setVar('GALLERY', Scrub::html($itn['body']) );
+$this->setVar('DID_YOU_KNOW',Scrub::html($dyk['body']) );
+$this->setVar('DIGITAL_CITIZEN',Scrub::html($dc['body']) );
+$this->setVar('THINKS',Scrub::html($th['body']) );
+$this->setVar('WONDERFUL_WORDS',Scrub::html($ww['body']) );
+$this->setVar('REMINDER',Scrub::html($rem['body']) );
 
 require_once SITE_root.'/library/file.php';
 $this->setBlock(TEMPLATE_content, 'image', 'image_block');

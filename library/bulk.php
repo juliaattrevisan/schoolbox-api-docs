@@ -246,7 +246,7 @@ class Bulk {
 		$output = array();
 
 		if (is_file($file)) {
-			$groups = array_map('scrubTEXT', $_POST['groupPerm']);
+			$groups = array_map(array(Scrub, 'text'), $_POST['groupPerm']);
 
 			/* Process rows
 			 */
@@ -356,11 +356,11 @@ class Bulk {
 			$campusList = array();
 
 			if (is_array($_POST['userGroup'])) {
-				$groupList = array_map('scrubTEXT', $_POST['userGroup']);
+				$groupList = array_map(array(Scrub, 'text'), $_POST['userGroup']);
 			}
 
 			if (is_array($_POST['campusList'])) {
-				$campusList = array_map('scrubTEXT', $_POST['campusList']);
+				$campusList = array_map(array(Scrub, 'text'), $_POST['campusList']);
 			}
 
 			/* Process rows
@@ -375,33 +375,33 @@ class Bulk {
 				 * If access is 3, then the sid corresponds to campus id's
 				 * If access is 2, then the sid corresponds to group id's
 				 */
-				$date = new Alaress_Date_Format(scrubHTML($thisRow[0]));
+				$date = new Alaress_Date_Format(Scrub::html($thisRow[0]));
 
 				if ((trim($thisRow[0]) != '') && (trim($thisRow[3]) != '')) {
 					$event = array(
 						'owner'			=> $uid,
 						'access'		=> 3,
 						'date'			=> $date->getDatabase(),
-						'startTime'		=> scrubHTML($thisRow[1]),
-						'endTime'		=> scrubHTML($thisRow[2]),
-						'note'			=> scrubHTML($thisRow[3]),
-						'detail'		=> scrubHTML($thisRow[4]),
-						'priority'		=> scrubHTML($thisRow[5]),
-						'type'			=> scrubHTML($thisRow[6]),
+						'startTime'		=> Scrub::html($thisRow[1]),
+						'endTime'		=> Scrub::html($thisRow[2]),
+						'note'			=> Scrub::html($thisRow[3]),
+						'detail'		=> Scrub::html($thisRow[4]),
+						'priority'		=> Scrub::html($thisRow[5]),
+						'type'			=> Scrub::html($thisRow[6]),
 						'campusList'	=> $campusList,
 						'groupList'		=> $groupList,
 					);
 
 					if ($calendarHandler->create($event)) {
 						$output[] = array(
-							'name' => scrubHTML($thisRow[3]),
+							'name' => Scrub::html($thisRow[3]),
 							'status' => 'Added',
 							'error' => 'OK',
 						);
 					}
 					else {
 						$output[] = array(
-							'name' => scrubHTML($thisRow[3]),
+							'name' => Scrub::html($thisRow[3]),
 							'status' => 'Not Added',
 							'error' => 'Could not create event',
 						);
@@ -409,7 +409,7 @@ class Bulk {
 				}
 				else {
 					$output[] = array(
-						'name' => scrubHTML($thisRow[3]),
+						'name' => Scrub::html($thisRow[3]),
 						'status' => 'Not Added',
 						'error' => 'Missing date and/or name',
 					);
@@ -450,11 +450,11 @@ class Bulk {
 			$campusList = array();
 
 			if (is_array($_POST['userGroup'])) {
-				$groupList = array_map('scrubTEXT', $_POST['userGroup']);
+				$groupList = array_map(array(Scrub, 'text'), $_POST['userGroup']);
 			}
 
 			if (is_array($_POST['campusList'])) {
-				$campusList = array_map('scrubTEXT', $_POST['campusList']);
+				$campusList = array_map(array(Scrub, 'text'), $_POST['campusList']);
 			}
 
 			/* Process vcal events
@@ -507,8 +507,8 @@ class Bulk {
 							$event = array(
 								'owner'			=> $uid,
 								'access'		=> 3,
-								'groupList'		=> array_map('scrubTEXT', $groupList),
-								'campusList'	=> array_map('scrubTEXT', $campusList),
+								'groupList'		=> array_map(array(Scrub, 'text'), $groupList),
+								'campusList'	=> array_map(array(Scrub, 'text'), $campusList),
 								'type'			=> 1,
 								'note'			=> $summary,
 								'detail'		=> $description,

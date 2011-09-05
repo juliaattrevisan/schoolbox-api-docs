@@ -32,7 +32,7 @@ class Component_Dashboard_SuggestionController extends Component_ControllerAbstr
     public function render ($templateHandle) {
         if ( is_array($this->categoryNews) ) {
             $this->setVar('TIPS_TRICKS_HEADING', Scrub::text($this->categoryNews[0]['heading']));
-            $this->setVar('TIPS_TRICKS', scrubHTML($this->categoryNews[0]['body']));
+            $this->setVar('TIPS_TRICKS', Scrub::html($this->categoryNews[0]['body']));
 
             return true;
         }

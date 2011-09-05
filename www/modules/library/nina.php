@@ -12,13 +12,13 @@ $itn=$textBoxHandler->getByID(534);
 $rt=$textBoxHandler->getByID(941);
 $cv=$textBoxHandler->getByID(942);
 
-$this->setVar('ONLINE_RESOURCES',scrubHTML($or['body']) );
-$this->setVar('REMARKABLE_READING', scrubHTML($rr['body']) );
-$this->setVar('NEW_BOOKS', scrubHTML($nb['body']) );
-$this->setVar('QUICK_FACTS', scrubHTML($qf['body']) );
-$this->setVar('IN_THE_NEWS', scrubHTML($itn['body']) );
-$this->setVar('RESEARCH_TOOLS',scrubHTML($rt['body']) );
-$this->setVar('CLICK_VIEW',scrubHTML($cv['body']) );
+$this->setVar('ONLINE_RESOURCES',Scrub::html($or['body']) );
+$this->setVar('REMARKABLE_READING', Scrub::html($rr['body']) );
+$this->setVar('NEW_BOOKS', Scrub::html($nb['body']) );
+$this->setVar('QUICK_FACTS', Scrub::html($qf['body']) );
+$this->setVar('IN_THE_NEWS', Scrub::html($itn['body']) );
+$this->setVar('RESEARCH_TOOLS',Scrub::html($rt['body']) );
+$this->setVar('CLICK_VIEW',Scrub::html($cv['body']) );
 
 require_once SITE_root.'/library/file.php';
 $this->setBlock(TEMPLATE_content, 'image', 'image_block');

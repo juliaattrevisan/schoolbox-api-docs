@@ -45,7 +45,7 @@ if(is_array($newsList)) {
 		$output = array(
                     "NEWS_ID"           => $news['id'],
                     "NEWS_HEADING"	=> Scrub::text($news['heading']),
-                    "NEWS_BODY"		=> scrubHTML($news['body']),
+                    "NEWS_BODY"		=> Scrub::html($news['body']),
                     "EMAIL_CONTACT"	=> "<a href=\"/search/user/{$news['uid']}\">$poster</a>",
                     "POSTED_DATE"	=> $postedDate->getShort()
                 );

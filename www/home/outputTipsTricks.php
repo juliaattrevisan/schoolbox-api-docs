@@ -9,7 +9,7 @@ $newsHandler = new CategoryNews;
 $news = $newsHandler->getAllForCategory(TIPS_CID, array( 'size', 1 ));
 if ( is_array($news) ) {
     $this->setVar('TIPS_TRICKS_HEADING', Scrub::text($news[0]['heading']));
-    $this->setVar('TIPS_TRICKS', scrubHTML($news[0]['body']));
+    $this->setVar('TIPS_TRICKS', Scrub::html($news[0]['body']));
 
     $this->parse('POS' . $component['position'], $component['name']);
 }

@@ -55,7 +55,7 @@ class Component_Dashboard_LinkController extends Component_ControllerAbstract {
             foreach ( $this->linkList as $link ) {
                 $this->setVar(array(
                                    'ON_OFF' => ++$j % 2 ? '' : 'dark', 'LINK_TITLE' => Scrub::text($link['description']),
-                                   'LINK_URL' => scrubHTML($link['url'])
+                                   'LINK_URL' => Scrub::html($link['url'])
                               ));
 
                 $this->parse("quicklink_block", "quicklink", true);

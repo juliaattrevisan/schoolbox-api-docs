@@ -103,7 +103,7 @@ if(is_array($items))
 						'TOPIC'			=> $article['topicName'],
 						'POSTER'		=> $owner,
 						'DATETIME' 		=> $_SESSION['su'] == 1 ? $article['post_datetime']." expires on ".$article['expire_datetime'] : $article['post_datetime'],
-						'NEWS_BODY'		=> nl2br(scrubHTML($article['item_body'])),
+						'NEWS_BODY'		=> nl2br(Scrub::html($article['item_body'])),
 						'TOPIC_NAME'	=> Scrub::text($previous['topicName']),
 						);
 

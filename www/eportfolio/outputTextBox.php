@@ -9,6 +9,6 @@ $textBox = $textBoxHandler->getByField('componentLocationID', $component['eportf
  */
 $this->setVar(array(
     'TEXTBOX_HEADING' => !empty($textBox['heading']) ? Scrub::text($textBox['heading']) : 'Text Box',
-    'TEXTBOX_BODY' => scrubHTML($textBox['body']),
+    'TEXTBOX_BODY' => Scrub::html($textBox['body']),
     'TEXTBOX_ID' => $textBox['textBoxID'],
 ));

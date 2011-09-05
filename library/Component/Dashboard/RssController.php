@@ -34,7 +34,7 @@ class Component_Dashboard_RssController extends Component_ControllerAbstract {
             foreach ( $this->rss->channel->item as $i => $item ) {
                 $this->setVar(array(
                                    'ON_OFF' => ++$j % 2 ? '' : 'dark', 'RSS_TITLE' => Scrub::text($item->title),
-                                   'RSS_URL' => scrubHTML($item->link)
+                                   'RSS_URL' => Scrub::html($item->link)
                               ));
 
                 $this->parse("rss_block", "rss_stories", true);
