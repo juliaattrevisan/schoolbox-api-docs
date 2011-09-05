@@ -2,7 +2,6 @@
 $this->setBlock($componentHandle, 'rss_stories', 'rss_block');
 $this->setBlock('rss_stories', 'rss_date', 'rss_date_block');
 
-require_once SITE_root.'/library/xml.php';
 $rss = new Xml($config['url'], RSS_cache_time);
 
 $this->setVar('RSS_NAME', !empty($rss->channel->title) ? scrubTEXT($rss->channel->title) : 'Please enter a feed URL');
