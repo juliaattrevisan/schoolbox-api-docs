@@ -2,16 +2,16 @@
 <script type="text/javascript">
 $j(function() {
 
-	$j('.checkbox').click(function() {	
+	$j('.checkbox').click(function() {
 		if ($j('.hide-questions').is(":visible")) {
 			$j('.hide-questions :input').attr('disabled', 'true');
 		} else {
-			$j('.hide-questions :input').removeAttr('disabled');	
+			$j('.hide-questions :input').removeAttr('disabled');
 		}
 		$j('.hide-questions').toggle();
 	});
-	
-	jQuery.validator.addMethod("combo", function(value, element) 
+
+	jQuery.validator.addMethod("combo", function(value, element)
 		{
 		if (($j('.checkbox').is(':checked')) && ($j('.pool').val() == ""))
 		{
@@ -20,8 +20,8 @@ $j(function() {
 		else return true;
 	  },
 	  "You've selected random selection of questions. Please enter the number of questions to put in the pool."
-	);	
-	
+	);
+
 	$j('#createSection').validate({
 		rules: {
 			title: {
@@ -50,27 +50,26 @@ $j(function() {
 			<input name="section_id" type="hidden" value="{SECTION_ID}" />
 			<input name="sequence" type="hidden" value="{SEQUENCE}" />
 		</fieldset>
-		
+
 		<label>Section Title
 			<input name="title" type="text" size="35" class="required"/>
 		</label>
 
-		<label>
+		<label style='display:none;'>
 			<strong>Shuffle Questions</strong>
-				<input name="random" type="checkbox" value="1" class="checkbox"/><span>Questions should be selected randomly</span>
-			</label>
+			<input name="random" type="checkbox" value="1" class="checkbox"/><span>Questions should be selected randomly</span>
+		</label>
 
-			<label class="hide-questions">Total Questions Displayed
-				<input name="pool" disabled="disabled" type="text" class="pool" /> Maximum number of questions to show
-			</label>
-		
+		<label class="hide-questions">Total Questions Displayed
+			<input name="pool" disabled="disabled" type="text" class="pool" /> Maximum number of questions to show
+		</label>
 
 		<label>Description
 			<div class="textarea-container">
 			<textarea name="description"></textarea>
 			</div>
 		</label>
-		
+
 		<label class="clearfix">
 			<input type="submit" id="create" value="Create Section" class="submit-btn-plain float-right no-marg"/>
 		</label>

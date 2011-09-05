@@ -32,9 +32,16 @@ class AllowedFile extends DeprecatedModel {
 		}
 	}
 
-        function getExtension($filename) {
-            return substr(strrchr($filename, "."), 1);
-        }
+	/**
+	 * Determine the file extension for a given filename/path
+	 * TODO: Refactor into FileType
+	 *
+	 * @param  $filename
+	 * @return string
+	 */
+	public function getExtension($filename) {
+		return substr(strrchr($filename, "."), 1);
+	}
 
         function isAllowed($filename) {
 
@@ -88,7 +95,7 @@ class AllowedFile extends DeprecatedModel {
 	 *
 	 * @param <type> $errorArray
 	 */
-	function handleError($errorArray) {
+	public function handleError($errorArray) {
 
 		/* Show error associated with error code, and optional message
 		 */

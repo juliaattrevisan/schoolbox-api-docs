@@ -46,3 +46,6 @@ ALTER TABLE homepage_config ADD COLUMN left_column_width FLOAT DEFAULT 49.5 AFTE
 ALTER TABLE eportfolio_config ADD COLUMN right_column_width FLOAT DEFAULT 49.5 AFTER template;
 ALTER TABLE eportfolio_config ADD COLUMN left_column_width FLOAT DEFAULT 49.5 AFTER template;
 
+/* Podcast update
+ */
+UPDATE homepage_comp SET description = "Subscribe to an audio-only podcast." WHERE method = 'outputPodcast';

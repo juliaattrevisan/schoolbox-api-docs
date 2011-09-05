@@ -46,14 +46,15 @@ function loadPodcastSWF(audioID, url){
 	<!-- END config -->
 	<div class="listing clearfix" >
 		<ul>
+			<li>Audio-based podcasts are listed below.</li>
 			<!-- BEGIN podcast_list -->
 			<li class="{ON_OFF} clearfix">
 				<h4><a class="icons soundmp3" href="{PODCAST_URL}">{PODCAST_TITLE}</a></h4>
 				<div class="small-right">
 					<p class="interact">
-					<div class="play-button">
-						<div id="podcast-player-{PODCAST_ID}"><a onclick="loadPodcastSWF('{PODCAST_ID}', '{PODCAST_URL}'); return false;"></a></div>
-					</div>
+						<div class="play-button">
+							<div id="podcast-player-{PODCAST_ID}"><a onclick="loadPodcastSWF('{PODCAST_ID}', '{PODCAST_URL}'); return false;"></a></div>
+						</div>
 					</p>
 				</div>
 
