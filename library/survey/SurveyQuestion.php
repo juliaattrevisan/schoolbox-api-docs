@@ -1,6 +1,8 @@
 <?php
 /**
- * AssessQuestion class. All QuestionTypes inherit from this class. At time of
+ * SurveyQuestion
+ *
+ * All QuestionTypes inherit from this class. At time of
  * writing, there is nothing needed in the children QuestionType classes.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -36,4 +38,3 @@ class SurveyQuestion extends EvaluationQuestion {
         return $this->db->getAll($query);
     }
 }
-?>

@@ -2,4 +2,3 @@
 
 class AssessQuestionFillgap extends QuestionFillgap {
 }
-?>

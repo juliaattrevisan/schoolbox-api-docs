@@ -1,5 +1,7 @@
 <?php
 /**
+ * AssessAnswerMatch
+ *
  * Handler for Matching Pairs questions.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -7,7 +9,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
 class AssessAnswerMatch extends AnswerMatch {
 
 	/**
@@ -107,4 +108,3 @@ class AssessAnswerMatch extends AnswerMatch {
 		}
 	}
 }
-?>

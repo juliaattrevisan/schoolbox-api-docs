@@ -1,6 +1,8 @@
 <?php
 /**
- * AssessAnswer class. All AnswerTypes inherit from this class.
+ * AssessAnswer
+ *
+ * All AnswerTypes inherit from this class.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
@@ -25,4 +27,3 @@ class AssessAnswer extends EvaluationAnswer {
         $this->responseHandler = new AssessResponse();
     }
 }
-?>

@@ -1,6 +1,8 @@
 <?php
 /**
- * AssessQuestion class. All QuestionTypes inherit from this class. At time of
+ * EvaluationQuestion
+ *
+ * All QuestionTypes inherit from this class. At time of
  * writing, there is nothing needed in the children QuestionType classes.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -8,7 +10,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
 abstract class EvaluationQuestion extends DeprecatedModel {
     public $_table = 'assess_question';
     public $_index = 'question_id';
@@ -47,23 +48,6 @@ abstract class EvaluationQuestion extends DeprecatedModel {
 
         parent::update($question);
     }
-
-//    /**
-//     * Gets the last question entered into a particular section.
-//     *
-//     * @param integer $section_id
-//     * @return array
-//     */
-//    function getLast($section_id) {
-//        $query = "SELECT *
-//            FROM `$this->_table`
-//            WHERE `section_id` = $section_id
-//            AND deleted_at IS NULL
-//            ORDER BY `order`
-//            DESC LIMIT 1";
-//
-//        return $this->db->getRow($query);
-//    }
 
     /**
      * For a new Question, find out what its sequence should be. If it's the
@@ -189,4 +173,3 @@ abstract class EvaluationQuestion extends DeprecatedModel {
         return $this->db->getOne($query);
     }
 }
-?>

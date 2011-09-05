@@ -1,5 +1,7 @@
 <?php
 /**
+ * AssessFactory
+ *
  * Builder for Question Types. This class spawns the various QuestionType and
  * AnswerType models (handlers) depending on a type_id.
  *
@@ -16,4 +18,3 @@ class AssessFactory extends EvaluationFactory {
     protected $questionSubclassPath = '../library/assess/questionType';
     protected $answerSubclassPath = '../library/assess/answerType';
 }
-?>

@@ -2,4 +2,3 @@
 
 class AssessQuestionShort extends QuestionShort {
 }
-?>

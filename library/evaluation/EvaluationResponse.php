@@ -1,13 +1,14 @@
 <?php
 /**
- * AssessResponse class. Responses are managed here
+ * EvaluationResponse
+ *
+ * Abstract interface for Responses
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
 abstract class EvaluationResponse extends DeprecatedModel {
     public $_table = 'assess_response';
     public $_index = 'response_id';
@@ -79,21 +80,6 @@ abstract class EvaluationResponse extends DeprecatedModel {
             $this->db->query($query);
         }
     }
-
-    /**
-     * Find the number of responses in $attempt_id
-     *
-     * @param <type> $attempt_id
-     * @return <type>
-     */
-//    function numResponses($attempt_id) {
-//        $query = "SELECT COUNT(*) AS numQuestionsAttempted
-//                  FROM {$this->_table}
-//                  WHERE attempt_id = '$attempt_id'
-//                  AND response IS NOT NULL";
-//
-//        return $this->db->getOne($query);
-//    }
 
     /**
      * Find the number of STUB RESPONSES that have been set up in $attempt_id
@@ -212,4 +198,3 @@ abstract class EvaluationResponse extends DeprecatedModel {
 		return $this->db->getRow($query);
 	}
 }
-?>

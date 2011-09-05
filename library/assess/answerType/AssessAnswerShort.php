@@ -1,5 +1,7 @@
 <?php
 /**
+ * AssessAnswerShort
+ *
  * Handler for Short Answer questions.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -7,7 +9,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
 class AssessAnswerShort extends AnswerShort {
 
 	/**
@@ -61,4 +62,3 @@ class AssessAnswerShort extends AnswerShort {
         $page->parse('answerOption_block', 'answerOption', true);
     }
 }
-?>

@@ -1,6 +1,8 @@
 <?php
 /**
- * AssessResponse class. Responses are managed here
+ * AssessResponse
+ *
+ * Responses are managed here
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
@@ -18,4 +20,3 @@ class AssessResponse extends EvaluationResponse {
     const RANDOMISE_QUESTIONS = 1;
     const ORDERED_QUESTIONS = 2;
 }
-?>

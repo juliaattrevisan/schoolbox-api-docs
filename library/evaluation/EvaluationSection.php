@@ -1,7 +1,8 @@
 <?php
 /**
- * AssessSection class. All Sections are managed here.
+ * EvaluationSection
  *
+ * All Sections are managed here.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
@@ -254,4 +255,3 @@ abstract class EvaluationSection extends DeprecatedModel {
         return false;
     }
 }
-?>

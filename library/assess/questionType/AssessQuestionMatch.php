@@ -2,4 +2,3 @@
 
 class AssessQuestionMatch extends QuestionMatch {
 }
-?>

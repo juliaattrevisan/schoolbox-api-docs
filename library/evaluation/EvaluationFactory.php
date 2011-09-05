@@ -1,5 +1,7 @@
 <?php
 /**
+ * EvaluationFactory
+ *
  * Builder for Question Types. This class spawns the various QuestionType and
  * AnswerType models (handlers) depending on a type_id.
  *
@@ -87,9 +89,12 @@ abstract class EvaluationFactory extends DeprecatedModel {
         return false;
     }
 
-    /**
-     * Find out which file to include
-     */
+	/**
+	 * Find out which file to include
+	 *
+	 * @param  $type_id
+	 * @return
+	 */
     public function getQuestionType($type_id) {
         $query = "SELECT filename
                   FROM assess_luQuestionType
@@ -98,9 +103,12 @@ abstract class EvaluationFactory extends DeprecatedModel {
         return $this->db->getOne($query);
     }
 
-    /**
-     * Find out the moodle name
-     */
+	/**
+	 * Find out the moodle name
+	 *
+	 * @param  $type_id
+	 * @return
+	 */
     public function getMoodleQuestionType($type_id) {
         $query = "SELECT moodle
                   FROM assess_luQuestionType
@@ -109,4 +117,3 @@ abstract class EvaluationFactory extends DeprecatedModel {
         return $this->db->getOne($query);
     }
 }
-?>

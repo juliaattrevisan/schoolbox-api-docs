@@ -1,4 +1,14 @@
 <?php
+/**
+ * AssessQuestionBank
+ *
+ * Manages saved questions in the QuestionBank
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationQuestionBank.php');
 
 class AssessQuestionBank extends EvaluationQuestionBank {
@@ -12,4 +22,3 @@ class AssessQuestionBank extends EvaluationQuestionBank {
 		$this->answerHandler = new AssessAnswer();
 	}
 }
-?>

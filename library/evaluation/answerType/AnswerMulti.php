@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
 abstract class AnswerMulti extends EvaluationAnswer {
 
     /**
@@ -292,4 +291,3 @@ abstract class AnswerMulti extends EvaluationAnswer {
 		return $data;
 	}
 }
-?>

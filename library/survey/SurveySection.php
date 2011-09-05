@@ -1,7 +1,8 @@
 <?php
 /**
- * AssessSection class. All Sections are managed here.
+ * SurveySection
  *
+ * All Sections are managed here.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
@@ -18,4 +19,3 @@ class SurveySection extends EvaluationSection {
      */
     const SECTION_EXCLUDE = true;
 }
-?>

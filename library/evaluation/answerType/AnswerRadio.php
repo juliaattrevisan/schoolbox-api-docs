@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
 abstract class AnswerRadio extends EvaluationAnswer {
     const CORRECT_CLASS = 'multiCorrect';
     const INCORRECT_CLASS = 'multiIncorrect';
@@ -293,4 +292,3 @@ abstract class AnswerRadio extends EvaluationAnswer {
 		return $data;
 	}
 }
-?>

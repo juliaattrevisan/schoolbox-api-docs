@@ -1,5 +1,14 @@
 <?php
-
+/**
+ * EvaluationQuestionBank
+ *
+ * Abstract interface for all question banks
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
 abstract class EvaluationQuestionBank extends DeprecatedModel {
     public $_table = 'assess_question_bank';
     public $_index = 'question_bank_id';
@@ -50,4 +59,3 @@ abstract class EvaluationQuestionBank extends DeprecatedModel {
 		));
 	}
 }
-?>

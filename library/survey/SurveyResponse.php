@@ -1,6 +1,8 @@
 <?php
 /**
- * AssessResponse class. Responses are managed here
+ * SurveyResponse
+ *
+ * Responses are managed here
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd

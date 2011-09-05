@@ -2,4 +2,3 @@
 
 class AssessQuestionMulti extends QuestionMulti {
 }
-?>

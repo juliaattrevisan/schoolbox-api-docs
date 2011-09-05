@@ -1,7 +1,8 @@
 <?php
 /**
- * Assess class for Online Assessments
+ * Assess
  *
+ * Class for Online Assessments
  *
  * Adding a new answer type
  * ------------------------
@@ -78,4 +79,3 @@ class Assess extends Evaluation {
         return $this->db->getAll($query);
     }
 }
-?>

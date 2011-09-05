@@ -1,5 +1,7 @@
 <?php
 /**
+ * AssessAnswerFillgap
+ *
  * Handler for Fill Gap questions.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -7,7 +9,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
 class AssessAnswerFillgap extends AnswerFillgap {
 
 	/**
@@ -142,4 +143,3 @@ class AssessAnswerFillgap extends AnswerFillgap {
 		$page->parse('answerOption_block', 'answerOption', true);
 	}
 }
-?>

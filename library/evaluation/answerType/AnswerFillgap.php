@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
 abstract class AnswerFillgap extends EvaluationAnswer {
 
     /* HTML input element prefix used in conjunction with a question_id to
@@ -263,4 +262,3 @@ abstract class AnswerFillgap extends EvaluationAnswer {
 		return $data;
 	}
 }
-?>

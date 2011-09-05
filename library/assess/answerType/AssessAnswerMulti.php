@@ -1,5 +1,7 @@
 <?php
 /**
+ * AssessAnswerMulti
+ *
  * Handler for Multiple Choice questions.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -7,7 +9,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
 class AssessAnswerMulti extends AnswerMulti {
     const CORRECT_CLASS = 'multiCorrect';
     const INCORRECT_CLASS = 'multiIncorrect';
@@ -169,4 +170,3 @@ class AssessAnswerMulti extends AnswerMulti {
         }
     }
 }
-?>

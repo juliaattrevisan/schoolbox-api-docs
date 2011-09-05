@@ -1,13 +1,14 @@
 <?php
 /**
- * AssessAnswer class. All AnswerTypes inherit from this class.
+ * EvaluationAnswer
+ *
+ * All AnswerTypes inherit from this class.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
 abstract class EvaluationAnswer extends DeprecatedModel {
     public $_table = 'assess_answer';
     public $_index = 'answer_id';
@@ -134,4 +135,3 @@ abstract class EvaluationAnswer extends DeprecatedModel {
         return array();
     }
 }
-?>

@@ -1,7 +1,6 @@
 <?php
 /**
- * Assess class for Online Assessments
- *
+ * Evaluation
  *
  * Adding a new answer type
  * ------------------------
@@ -37,7 +36,6 @@
  * question. This is used to reformat a question; e.g. matching pairs: changing
  * the inputs to readonly; fillgaps: changing <span></span> elements to <input>s.
  */
-
 abstract class Evaluation extends DeprecatedModel {
     public $_table = 'assess';
     public $_index = 'assess_id';
@@ -388,4 +386,3 @@ abstract class Evaluation extends DeprecatedModel {
         return false;
     }
 }
-?>

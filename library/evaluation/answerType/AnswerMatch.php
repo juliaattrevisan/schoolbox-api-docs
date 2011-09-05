@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
 abstract class AnswerMatch extends EvaluationAnswer {
     const CORRECT_CLASS = 'matchCorrect';
     const INCORRECT_CLASS = 'matchIncorrect';
@@ -271,4 +270,3 @@ abstract class AnswerMatch extends EvaluationAnswer {
 		return $data;
 	}
 }
-?>

@@ -2,4 +2,3 @@
 
 class AssessQuestionRadio extends QuestionRadio {
 }
-?>

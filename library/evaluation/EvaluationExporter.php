@@ -1,5 +1,14 @@
 <?php
-
+/**
+ * EvaluationExporter
+ *
+ * Manages results export to various formats
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
 class EvaluationExporter {
 	protected $sectionValues = array();
 	protected $filterByQuestion = false;
@@ -20,139 +29,6 @@ class EvaluationExporter {
 		$this->setSectionHandler($sectionHandler);
 		$this->setAttemptHandler($attemptHandler);
 		$this->setQuestionHandler($questionHandler);
-	}
-
-	/**
-	 * Sets legendHTML
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	public function setLegendHTML($val) {
-		$this->legendHTML = $val;
-	}
-
-	/**
-	 * Gets legendHTML
-	 *
-	 * @return bool
-	 */
-	public function getLegendHTML() {
-		return $this->legendHTML;
-	}
-
-	/**
-	 * Sets assess_id
-	 *
-	 * @param  $assess_id
-	 * @return void
-	 */
-	protected function setAssessID($assess_id) {
-		$this->assess_id = $assess_id;
-	}
-
-	/**
-	 * Gets assess_id
-	 *
-	 * @return
-	 */
-	protected function getAssessID() {
-		return $this->assess_id;
-	}
-
-	/**
-	 * Sets a factory
-	 *
-	 * @param  $factory
-	 * @return void
-	 */
-	protected function setFactory($factory) {
-		$this->factory = $factory;
-	}
-
-	/**
-	 * Gets a factory
-	 *
-	 * @return
-	 */
-	protected function getFactory() {
-		return $this->factory;
-	}
-
-	/**
-	 * Sets a sectionHandler
-	 *
-	 * @param  $sectionHandler
-	 * @return void
-	 */
-	protected function setSectionHandler($sectionHandler) {
-		$this->sectionHandler = $sectionHandler;
-	}
-
-	/**
-	 * Gets a sectionHandler
-	 *
-	 * @return
-	 */
-	protected function getSectionHandler() {
-		return $this->sectionHandler;
-	}
-
-	/**
-	 * Sets a attemptHandler
-	 *
-	 * @param  $attemptHandler
-	 * @return void
-	 */
-	protected function setAttemptHandler($attemptHandler) {
-		$this->attemptHandler = $attemptHandler;
-	}
-
-	/**
-	 * Gets a attemptHandler
-	 *
-	 * @return
-	 */
-	protected function getAttemptHandler() {
-		return $this->attemptHandler;
-	}
-
-	/**
-	 * Sets a questionHandler
-	 *
-	 * @param  $questionHandler
-	 * @return void
-	 */
-	protected function setQuestionHandler($questionHandler) {
-		$this->questionHandler = $questionHandler;
-	}
-
-	/**
-	 * Gets a questionHandler
-	 *
-	 * @return
-	 */
-	protected function getQuestionHandler() {
-		return $this->questionHandler;
-	}
-
-	/**
-	 * Set a question_id to filter by
-	 *
-	 * @param  $question_id
-	 * @return void
-	 */
-	public function setFilterByQuestion($question_id) {
-		$this->filterByQuestion = $question_id;
-	}
-
-	/**
-	 * Get a question_id to filter by
-	 *
-	 * @return
-	 */
-	public function getFilterByQuestion() {
-		return $this->filterByQuestion;
 	}
 
 	/**
@@ -386,5 +262,138 @@ class EvaluationExporter {
 	public function __outputCSV(&$vals, $key, $filehandler) {
 		fputcsv($filehandler, $vals, ',', '"');
 	}
+
+
+	/**
+	 * Sets legendHTML
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	public function setLegendHTML($val) {
+		$this->legendHTML = $val;
+	}
+
+	/**
+	 * Gets legendHTML
+	 *
+	 * @return bool
+	 */
+	public function getLegendHTML() {
+		return $this->legendHTML;
+	}
+
+	/**
+	 * Sets assess_id
+	 *
+	 * @param  $assess_id
+	 * @return void
+	 */
+	protected function setAssessID($assess_id) {
+		$this->assess_id = $assess_id;
+	}
+
+	/**
+	 * Gets assess_id
+	 *
+	 * @return
+	 */
+	protected function getAssessID() {
+		return $this->assess_id;
+	}
+
+	/**
+	 * Sets a factory
+	 *
+	 * @param  $factory
+	 * @return void
+	 */
+	protected function setFactory($factory) {
+		$this->factory = $factory;
+	}
+
+	/**
+	 * Gets a factory
+	 *
+	 * @return
+	 */
+	protected function getFactory() {
+		return $this->factory;
+	}
+
+	/**
+	 * Sets a sectionHandler
+	 *
+	 * @param  $sectionHandler
+	 * @return void
+	 */
+	protected function setSectionHandler($sectionHandler) {
+		$this->sectionHandler = $sectionHandler;
+	}
+
+	/**
+	 * Gets a sectionHandler
+	 *
+	 * @return
+	 */
+	protected function getSectionHandler() {
+		return $this->sectionHandler;
+	}
+
+	/**
+	 * Sets a attemptHandler
+	 *
+	 * @param  $attemptHandler
+	 * @return void
+	 */
+	protected function setAttemptHandler($attemptHandler) {
+		$this->attemptHandler = $attemptHandler;
+	}
+
+	/**
+	 * Gets a attemptHandler
+	 *
+	 * @return
+	 */
+	protected function getAttemptHandler() {
+		return $this->attemptHandler;
+	}
+
+	/**
+	 * Sets a questionHandler
+	 *
+	 * @param  $questionHandler
+	 * @return void
+	 */
+	protected function setQuestionHandler($questionHandler) {
+		$this->questionHandler = $questionHandler;
+	}
+
+	/**
+	 * Gets a questionHandler
+	 *
+	 * @return
+	 */
+	protected function getQuestionHandler() {
+		return $this->questionHandler;
+	}
+
+	/**
+	 * Set a question_id to filter by
+	 *
+	 * @param  $question_id
+	 * @return void
+	 */
+	public function setFilterByQuestion($question_id) {
+		$this->filterByQuestion = $question_id;
+	}
+
+	/**
+	 * Get a question_id to filter by
+	 *
+	 * @return
+	 */
+	public function getFilterByQuestion() {
+		return $this->filterByQuestion;
+	}
 }
-?>
