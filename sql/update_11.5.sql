@@ -43,3 +43,6 @@ ALTER TABLE `eportfolio_textBox` ADD COLUMN componentLocationID INT(11) NULL ;
 ALTER TABLE homepage_config ADD COLUMN right_column_width FLOAT DEFAULT 49.5 AFTER template;
 ALTER TABLE homepage_config ADD COLUMN left_column_width FLOAT DEFAULT 49.5 AFTER template;
 
+ALTER TABLE eportfolio_config ADD COLUMN right_column_width FLOAT DEFAULT 49.5 AFTER template;
+ALTER TABLE eportfolio_config ADD COLUMN left_column_width FLOAT DEFAULT 49.5 AFTER template;
+

@@ -7,34 +7,35 @@
 <script type="text/javascript" src="/javascript/jquery.component.js"></script>
 <link rel="stylesheet" type="text/css" href="/javascript/farbtastic/farbtastic.css" />
 <script type="text/javascript" src="/javascript/farbtastic/farbtastic.js"></script>
-
-<!-- END modify_layout -->
 <script type="text/javascript">
-
-	var uid = {ID};
-	var ajaxURL = '/eportfolio/configForm.php';
-
 	$j(function() {
+		/* Set up variables and urls
+		 */
+		setupCustomise.ajaxURL = '/eportfolio/configForm.php';
+		setupCustomise.key = 'uid';
+		setupCustomise.id = {ID};
+
 		/**
 		 * Initialise the customisation dropdown and create all its javascript driven elements
 		 * ie:
 		 */
-		setupCustomise.customisationDropdown.init(uid, ajaxURL);
-		/**
-			If a column is empty, insert placeholder into the space where you can drag components to.
-		**/
-		setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')])
-		/**
-			setup the ability to sort components, drag them around across columns.
-		**/
-		setupCustomise.sortComponents(uid, ajaxURL);
-		/**
-			The  controls for the individual components
-			ie. edit, delete
-		**/
-		setupCustomise.activeComponents(ajaxURL);
-	});
+		setupCustomise.customisationDropdown.init();
 
+		/* If a column is empty, insert placeholder into the space where you can drag components to.
+		 */
+		setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')]);
+
+		/* setup the ability to sort components, drag them around across columns.
+		 */
+		setupCustomise.sortComponents();
+
+		/* The controls for the individual components ie. edit, delete
+		 */
+		setupCustomise.activeComponents();
+	});
+</script>
+<!-- END modify_layout -->
+<script type="text/javascript">
 	<!-- BEGIN colour_list -->
 	var {COLOUR_ARRAY} = {
 		'left_head_font'	: '#{left_head_font}',
@@ -54,10 +55,8 @@
 		'right_hover'	: '#{right_hover}'
 	};
 	<!-- END colour_list -->
-
-
-	</script>
-	<style type="text/css">
+</script>
+<style type="text/css">
 .left h2 { color: #{left_head_font}; background-color: #{left_head_bg};	}
 .left p, .left h3, .left .listing p.small,.left { color: #{left_font}; }
 .left a, .left .listing p.small a { color: #{left_link}; }
@@ -74,15 +73,13 @@
 .right .listing{ background: #{right_bg_primary}; }
 .right .listing .dark { background: #{right_bg_secondary}; }
 
-	<!-- BEGIN allowed_files -->
-	a. {NAME} {
+<!-- BEGIN allowed_files -->
+a.{NAME} {
 	background-image: url(/images/mime/22x22/{ICON});
-	}
+}
+<!-- END allowed_files -->
 
-	<!-- END allowed_files -->
-
-	</style>
-
+</style>
 <!-- END custom_head -->
 
 <h1>
@@ -150,13 +147,11 @@
 						<div id="left_head_font" class="colorBox  selected"></div>
 						<input name="colors[left_head_font]" type="hidden" />
 						<p>Text</p>
-
 					</div>
 					<div class="colour clearfix">
 						<div id="left_head_bg" class="colorBox"></div>
 						<input name="colors[left_head_bg]" type="hidden" />
 						<p>Background</p>
-
 					</div>
 				</div>
 				<div class="colours-split ">
@@ -165,7 +160,6 @@
 						<div id="left_bg_primary" class="colorBox"></div>
 						<input name="colors[left_bg_primary]" type="hidden" />
 						<p>Primary Background</p>
-
 					</div>
 					<div class="colour clearfix">
 						<div id="left_bg_secondary" class="colorBox"></div>
@@ -267,6 +261,9 @@
 				<div class="right permanent" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%"> -- RIGHT COLUMN --</div>
 			</div>
 			<div class="colours-buttons clearfix">
+				<p style='text-decoration:blink;color:#f00;font-size:30px;font-weight:bold'>
+					Tom: don't need Save Layout butonye, the slider ajaxes anyway
+				</p>
 				<div class="clearfix">
 					<button class="submit-btn-plain" type="button" id="saveTemplate" >Save layout</button>
 					<button class="submit-btn-plain " type="button" id="cancelTemplate" >Cancel</button>
@@ -279,9 +276,7 @@
 </div>
 <!-- END customise_page -->
 
-
-
-<div class="{TEMPLATE} homepage clearfix privateBlock">
+<div class="homepage clearfix privateBlock">
     <div class="top clearfix">{COLUMN3}</div>
 	<div class="left clearfix " style="width: {TEMPLATE_LEFT_COLUMN_WIDTH}%">
 
@@ -313,7 +308,6 @@
 		<div class="left-active active-sort">
 			{COLUMN1}
 		</div>
-
 	</div>
 	<div class="right active-sort clearfix" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%">
 		{COLUMN2}

@@ -40,11 +40,15 @@ if (is_numeric($_REQUEST['uid'])) {
                 $eportfolioHandler->updateComponentPosition($component, $key, $ckey);
             }
         }
-    } elseif ($_POST['uid'] && is_numeric($_POST['delete'])) {
-        //AJAX request to delete component from homepage
+    }
+	/* AJAX request to delete component from homepage
+	 */
+	else if ($_POST['uid'] && is_numeric($_POST['delete'])) {
         $eportfolioHandler->deleteComponent($_POST['delete']);
-    } else if ($_POST['uid'] && is_numeric($_POST['add'])) {
-        //Add component to page and output render of component
+    }
+	/* Add component to page and output render of component
+	 */
+	else if ($_POST['uid'] && is_numeric($_POST['add'])) {
         $eportfolioHandler->addComponent($_POST['add']);
 
         //Output component HTML, we do this by loading sitepage and loading a specially designed harness to produce the homepage component on its own
@@ -52,28 +56,42 @@ if (is_numeric($_REQUEST['uid'])) {
         $page = new SitePage;
         $page->loadContent('/ajax/eportfolioComponent');
         $page->template->pparse('finaloutput', TEMPLATE_content);
-    } elseif ($_POST['uid'] && is_array($_POST['colors'])) {
-        /* AJAX Save homepage colours */
-        //strip hash
+    }
+	/* AJAX Save homepage colours
+	 * strip hash
+	 */
+	else if ($_POST['uid'] && is_array($_POST['colors'])) {
         foreach ($_POST['colors'] as $key => $value) {
             $color[$key] = substr($value, 1);
         }
 
         $eportfolioHandler->saveDisplayProperties($color);
-    } elseif ($_POST['uid'] && is_numeric($_POST['template'])) {
-        /* AJAX Save homepage template */
+    }
+	/* AJAX Save homepage template
+	 */
+	else if ($_POST['uid'] && is_numeric($_POST['template'])) {
         print $_POST['template'];
         $eportfolioHandler->savePageTemplate($_POST['template']);
-    } elseif ($_GET['uid'] && $_GET['type'] == 'config' && $_GET['component']) {
-        //Post config options from homepage
+    }
+	/* Post config options from homepage
+	 */
+	else if ($_GET['uid'] && $_GET['type'] == 'config' && $_GET['component']) {
         $config = $_GET;
-        unset($config['uid'], $config['type'], $config['component']);
-        //all remaining options and serialised and sent to db
+
+		unset($config['uid'], $config['type'], $config['component']);
+
+        /* All remaining options and serialised and sent to db
+         */
         $config = serialize($config);
         $eportfolioHandler->updateComponentConfig($_GET['component'], $config);
-        localRedir("/eportfolio/" . $_GET['uid']);
+
+		localRedir("/eportfolio/" . $_GET['uid']);
     }
-} else {
+	else if ($_POST['uid'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
+		$eportfolioHandler->updateColumnWidths(scrubTEXT($_POST['leftColWidth']), scrubTEXT($_POST['rightColWidth']));
+	}
+}
+else {
     error(2);
 }
 ?>

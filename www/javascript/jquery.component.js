@@ -1,6 +1,6 @@
 setupCustomise = {
 	ajaxURL: '',
-	categoryID: '',
+	id: '',
 	key: 'cid',
 
 	emptyColumnCheck: function(target) {
@@ -24,10 +24,10 @@ setupCustomise = {
 	customisationDropdown: {
 
         /**
-        * Sets up the tabs and then one by one initialises the three tabs contained
+         * Sets up the tabs and then one by one initialises the three tabs contained
 		 * within the dropdown panel.
-		*
-        */
+		 *
+         */
 		init: function() {
 			$j('#tabs-homepage').tabs();
 			$j('#tabs-sub').tabs();
@@ -40,7 +40,7 @@ setupCustomise = {
 				return false;
 			});
 
-			this.colours(setupCustomise.categoryID);
+			this.colours(setupCustomise.id);
 			this.components();
 			this.columnWidths();
 		},
@@ -97,7 +97,7 @@ setupCustomise = {
 				$j.ajax({
 				 type: "POST",
 					url: setupCustomise.ajaxURL,
-					data: {add : $j(this).attr('rel'), cid : setupCustomise.categoryID },
+					data: {add : $j(this).attr('rel'), cid : setupCustomise.id },
 					success: function(data){
 						$j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
 							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')])
@@ -313,7 +313,7 @@ setupCustomise = {
 					colors: pickers
 				};
 
-				data[setupCustomise.key] = setupCustomise.categoryID;
+				data[setupCustomise.key] = setupCustomise.id;
 
 			   $j.post(setupCustomise.ajaxURL, data, function() {
 					$j('.saved-colours').slideDown(150).delay(2000).slideUp(150);
@@ -339,7 +339,7 @@ setupCustomise = {
 						rightColWidth: 99.5 - ui.value
 					};
 
-					data[setupCustomise.key] = setupCustomise.categoryID;
+					data[setupCustomise.key] = setupCustomise.id;
 
 					$j.post(setupCustomise.ajaxURL, data);
 				}
@@ -391,7 +391,7 @@ setupCustomise = {
 					column3: top
 				}
 
-				data[setupCustomise.key] = setupCustomise.categoryID;
+				data[setupCustomise.key] = setupCustomise.id;
 
 				$j.post(setupCustomise.ajaxURL, data);
 

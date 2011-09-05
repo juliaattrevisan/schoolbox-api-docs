@@ -359,5 +359,34 @@ class ePortfolio {
 
         return false;
     }
+
+	/**
+	 * Gets the column widths for a particular eportfolio
+	 *
+	 * @return array|bool
+	 */
+	public function getColumnWidths() {
+		$query = "SELECT left_column_width, right_column_width
+				  FROM eportfolio_config
+				  WHERE uid = '{$this->uid}'";
+
+		return $this->db->getRow($query);
+	}
+
+	/**
+	 * Update column widths
+	 *
+	 * @param  $left
+	 * @param  $right
+	 * @return void
+	 */
+	public function updateColumnWidths($left, $right) {
+		$query = "UPDATE eportfolio_config
+				  SET
+				  	left_column_width = '{$left}',
+				  	right_column_width = '{$right}'
+				  WHERE uid = '{$this->uid}'";
+
+		$this->db->query($query);
+	}
 }
-?>

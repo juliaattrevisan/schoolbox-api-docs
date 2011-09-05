@@ -14,7 +14,8 @@
 		/* Set up variables and urls
 		 */
 		setupCustomise.ajaxURL = '/homepage/configForm.php';
-		setupCustomise.categoryID = {ID};
+		setupCustomise.key = 'cid';
+		setupCustomise.id = {ID};
 
 		/**
 		 * Initialise the customisation dropdown and create all its javascript driven elements
@@ -264,6 +265,9 @@ var {COLOUR_ARRAY} = {
 				<div class="right permanent" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%"> -- RIGHT COLUMN --</div>
 			</div>
 			<div class="colours-buttons clearfix">
+				<p style='text-decoration:blink;color:#f00;font-size:30px;font-weight:bold'>
+					Tom: don't need Save Layout butonye, the slider ajaxes anyway
+				</p>
 				<div class="clearfix">
 					<button class="submit-btn-plain" type="button" id="saveTemplate" >Save layout</button>
 					<button class="submit-btn-plain " type="button" id="cancelTemplate" >Cancel</button>
