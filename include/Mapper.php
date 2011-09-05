@@ -68,6 +68,7 @@ abstract class Mapper {
 
     protected function __construct () {
         $this->database = Database::getInstance();
+        
 
         $this->mapping();
     }

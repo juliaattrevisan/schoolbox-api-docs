@@ -4,8 +4,6 @@
 *         Copyright (c) 2002-2003 Lektec Consulting         *
 *                                                           *
 ************************************************************/
-//weather display object
-require_once('../library/xml.php');
 
 //create weather
 $location = empty($this->arg[0]) ? Cfg::get('weather_location') : $this->arg[0];

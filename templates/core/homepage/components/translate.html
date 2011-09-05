@@ -1,39 +1,3 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-<script type="text/javascript">
-function doTranslate() {
-    var text = document.getElementById("textToTranslate").value;
-
-    google.language.detect(text, function(result) {
-        if (!result.error && result.language) {
-            var translateInto = document.getElementById("translateInto").value;
-
-            google.language.translate(text, result.language, translateInto, function(result) {
-                if (result.translation) {
-                    $j('#translatedTextWrapper').css('display', 'block');
-                    $j('#translatedText p').html(result.translation);
-                    $j('#translatedTextWrapper').animate({ 'opacity' : 1 }, 250);
-                }
-            });
-        }
-    });
-}
-
-google.load("language", "1");
-
-$j(document).ready(function() {
-    $j('#translatedTextWrapper').css('opacity', 0);
-    $j('#translatedTextWrapper').css('display', 'none');
-
-    $j('#translateTextForm').submit(function() {
-        doTranslate();
-
-        return false;
-    });
-});
-</script>
-<!-- END custom_head -->
-
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>Language Translator</h2>
 	<!-- BEGIN config -->
@@ -251,4 +215,39 @@ $j(document).ready(function() {
         </fieldset>
     </form>
     -->
+    <!-- BEGIN custom_head -->
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+    function doTranslate() {
+        var text = document.getElementById("textToTranslate").value;
+
+        google.language.detect(text, function(result) {
+            if (!result.error && result.language) {
+                var translateInto = document.getElementById("translateInto").value;
+
+                google.language.translate(text, result.language, translateInto, function(result) {
+                    if (result.translation) {
+                        $j('#translatedTextWrapper').css('display', 'block');
+                        $j('#translatedText p').html(result.translation);
+                        $j('#translatedTextWrapper').animate({ 'opacity' : 1 }, 250);
+                    }
+                });
+            }
+        });
+    }
+
+    google.load("language", "1");
+
+    $j(document).ready(function() {
+        $j('#translatedTextWrapper').css('opacity', 0);
+        $j('#translatedTextWrapper').css('display', 'none');
+
+        $j('#translateTextForm').submit(function() {
+            doTranslate();
+
+            return false;
+        });
+    });
+    </script>
+    <!-- END custom_head -->
 </div>

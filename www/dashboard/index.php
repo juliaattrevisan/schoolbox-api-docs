@@ -20,7 +20,7 @@ $componentCollection = $componentFactory->buildComponentList($groupID);
 foreach ($componentCollection as $component) {
 
     /* Break apart class name by underscores, get only last segment, remove last 10 characters then send it to lowercase */
-    $templateName = strtolower( substr( array_pop( explode('_', $component->definition->class) ), 0, -10 ) );
+    $templateName = ucfirst( substr( array_pop( explode('_', $component->definition->class) ), 0, -10 ) );
 
     $templateFile = 'component/dashboard/'.$templateName.'.html';
 

@@ -27,6 +27,8 @@ class Component_Dashboard_ActivityController extends Component_ControllerAbstrac
     }
 
     public function render ($templateHandle) {
+        parent::render($templateHandle);
+
         $this->setBlock($templateHandle, 'category_block', 'new_category');
         $this->setBlock($templateHandle, 'mail_block', 'new_mail_block');
         $this->setBlock('category_block', 'new_online_assessment', 'online_assessment_block');
