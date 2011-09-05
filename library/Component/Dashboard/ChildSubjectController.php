@@ -42,7 +42,7 @@ class Component_Dashboard_ChildSubjectController extends Component_ControllerAbs
 
                 if ( is_array($child['subjects']) ) {
                     foreach ( $child['subjects'] as $subject ) {
-                        $this->setVar("STUDENT_SUBJECT_NAME", scrubTEXT($subject['name']));
+                        $this->setVar("STUDENT_SUBJECT_NAME", Scrub::text($subject['name']));
                         $this->setVar("STUDENT_SUBJECT_CODE", urlencode(urlencode($subject['code'])));
                         $this->parse("subject_item", "subject_block", true);
                     }

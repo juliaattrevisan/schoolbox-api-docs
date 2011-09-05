@@ -50,7 +50,7 @@ class Component_Dashboard_TutorialController extends Component_ControllerAbstrac
                 $output = array(
                     'TUTORIAL_ID' => $event['eventID'], 'TUTORIAL_DATE' => $tutorialDate->getLong(),
                     'TUTORIAL_START' => $event['start'], 'TUTORIAL_FINISH' => $event['finish'],
-                    'TUTORIAL_NAME' => scrubText($event['name']), 'TUTORIAL_LOCATION' => scrubText($event['location']),
+                    'TUTORIAL_NAME' => Scrub::text($event['name']), 'TUTORIAL_LOCATION' => Scrub::text($event['location']),
                     'TUTORIAL_CANCELLED' => $event['cancelled'] == 'true' ? 'cancelled' : '',
                     'ON_OFF' => ++$j % 2 ? '' : 'dark',
 
@@ -84,8 +84,8 @@ class Component_Dashboard_TutorialController extends Component_ControllerAbstrac
                     'TUTORIAL_ID' => $event['eventID'],
                     'TUTORIAL_WEEK' => date('YW', $weekDate->getUnixTimestamp()) - 1,
                     'TUTORIAL_DATE' => $tutorialDate->getShort(), 'TUTORIAL_START' => $event['start'],
-                    'TUTORIAL_FINISH' => $event['finish'], 'TUTORIAL_NAME' => scrubText($event['name']),
-                    'TUTORIAL_LOCATION' => scrubText($event['location']),
+                    'TUTORIAL_FINISH' => $event['finish'], 'TUTORIAL_NAME' => Scrub::text($event['name']),
+                    'TUTORIAL_LOCATION' => Scrub::text($event['location']),
                     'TUTORIAL_CANCELLED' => $event['cancelled'] == 'true' ? 'cancelled' : '',
                     'ON_OFF' => ++$j % 2 ? 'dark' : '',
                 );
