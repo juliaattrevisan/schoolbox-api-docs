@@ -18,7 +18,7 @@ $questionHandler = new SurveyQuestion();
 $responseHandler = new SurveyResponse();
 
 if (!is_numeric($_SESSION['attempt_id'])) {
-    localRedir('/survey/intro/' . $this->arg[0]);
+    SitePage::localRedir('/survey/intro/' . $this->arg[0]);
 }
 
 $assess = $assessHandler->getByID($this->arg[0]);
@@ -72,4 +72,3 @@ else {
     $this->parse('alreadyEnded_block', 'alreadyEnded');
     $this->setVar('endAssess_block', '');
 }
-?>

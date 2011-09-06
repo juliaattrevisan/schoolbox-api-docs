@@ -60,5 +60,5 @@ $sectionHandler->update($section);
 
 $sectionHandler->resequenceSectionsAfterDelete($section['assess_id']);
 
-localRedir('/assess/modify/' . $section['assess_id']);
-?>
+SitePage::localRedir('/survey/modify/' . $section['assess_id']);
+

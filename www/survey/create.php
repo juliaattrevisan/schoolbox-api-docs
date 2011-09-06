@@ -42,7 +42,7 @@ if (!empty($_POST)) {
         error(112);
     }
 
-    localRedir('/survey/section/create/' . $assess_id);
+    SitePage::localRedir('/survey/section/create/' . $assess_id);
 }
 else {
     if (!is_numeric($this->arg[0])) {
@@ -172,4 +172,3 @@ else {
     $this->parse('importXML_block', 'importXML');
 }
 
-?>

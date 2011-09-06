@@ -88,5 +88,4 @@ for ($i=0; $i < count($xml->section); $i++) {
     }
 }
 
-localRedir('/survey/modify/' . $assess_id);
-?>
+SitePage::localRedir('/survey/modify/' . $assess_id);

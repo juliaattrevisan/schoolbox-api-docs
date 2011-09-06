@@ -28,11 +28,8 @@ if (!empty($_POST)) {
 		Scrub::text($_POST['marks'])
 	);
 
-	localRedir('/survey/questionbank/created/' . Scrub::text($_POST['question_id']));
+	SitePage::localRedir('/survey/questionbank/created/' . Scrub::text($_POST['question_id']));
 }
 else {
 	error(2);
 }
-
-
-?>

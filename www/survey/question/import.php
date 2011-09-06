@@ -55,9 +55,9 @@ if (is_numeric((string)$xml->typeid)) {
 		$answer_id = $answerHandler->importMoodleAnswer($xml->answers, $question_id);
 	}
 
-	localRedir('/assess/question/modify/' . $question_id);
+	SitePage::localRedir('/survey/question/modify/' . $question_id);
 }
 else {
 	error(135);
 }
-?>
+

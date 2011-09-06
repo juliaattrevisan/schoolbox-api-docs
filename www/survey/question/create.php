@@ -62,7 +62,7 @@ if (!empty($_POST)) {
 
     /* Need to keep this so non-ajaxed questions still redirect
      */
-    localRedir('/survey/question/create/' . Scrub::text($_POST['section_id']));
+    SitePage::localRedir('/survey/question/create/' . Scrub::text($_POST['section_id']));
 }
 else {
     if (!is_numeric($this->arg[0])) {
@@ -180,4 +180,3 @@ else {
 
     $this->parse('allQuestions_block', 'surveyContentsFragment', true);
 }
-?>

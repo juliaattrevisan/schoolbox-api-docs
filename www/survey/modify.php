@@ -45,7 +45,7 @@ if (!empty($_POST)) {
         'allow_resit' => Scrub::text($_POST['allow_resit']),
     ));
 
-    localRedir('/assess/summary/' . $this->arg[0]);
+    SitePage::localRedir('/survey/summary/' . $this->arg[0]);
 }
 else {
 
@@ -155,4 +155,4 @@ else {
      */
     $this->setVar('importXML_block', '');
 }
-?>
+
