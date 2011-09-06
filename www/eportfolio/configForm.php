@@ -1,17 +1,9 @@
 <?php
+/* Allow users to customise their homepages
+ */
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-/* * **********************************************************
- *                                                           *
- *         Copyright (c) 2002-2003 Lektec Consulting         *
- *                                                           *
- * ********************************************************** */
-
-//allow users to customise their homepages
-
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio.php';
-
-$page = new SitePage;
+$page = new SitePage();
 
 if (is_numeric($_REQUEST['uid'])) {
 
@@ -85,7 +77,7 @@ if (is_numeric($_REQUEST['uid'])) {
         $config = serialize($config);
         $eportfolioHandler->updateComponentConfig($_GET['component'], $config);
 
-		localRedir("/eportfolio/" . $_GET['uid']);
+		SitePage::localRedir('/eportfolio/' . $_GET['uid']);
     }
 	else if ($_POST['uid'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
 		$eportfolioHandler->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
@@ -94,4 +86,3 @@ if (is_numeric($_REQUEST['uid'])) {
 else {
     error(2);
 }
-?>

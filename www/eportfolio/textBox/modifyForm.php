@@ -1,7 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio.php';
+require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-textBox.php';
 
 $page = new SitePage();
@@ -32,7 +30,7 @@ if (isset($_POST['heading']) && isset($_POST['body'])) {
 		$textBoxHandler->create($textBox);
 	}
 
-	localRedir('/eportfolio/' . $_SESSION['id']);
+	SitePage::localRedir('/eportfolio/' . $_SESSION['id']);
 }
 else if (is_numeric($_POST['delete'])) {
 	$textBoxHandler->delete(Scrub::text($_POST['delete']));
