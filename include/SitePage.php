@@ -645,11 +645,21 @@ class SitePage extends Page {
            return $this->template->getVar($varname);
        }
 
-       function localRedir($file) {
-               $contype = $this->conType();
-               header("Location: ".$contype.$_SERVER['HTTP_HOST'].$file);
-               exit;
-       }
+		/**
+		 * Redirect to a specific url
+		 * conType() is accessed statically here because localRedir()
+		 * is often accessed statically itself.
+		 *
+		 * Usage - SitePage::localRedir($url)
+		 *
+		 * @static
+		 * @param  $file
+		 * @return void
+		 */
+		static public function localRedir($file) {
+			header('Location: ' . SitePage::conType() . $_SERVER['HTTP_HOST'] . $file);
+			exit;
+		}
 
        function goLoginPage($error = '', $page = ''){
            $this->setSite();

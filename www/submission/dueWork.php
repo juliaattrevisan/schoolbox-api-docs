@@ -163,7 +163,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 			$date = new Alaress_Date_Format(strtotime($event['date']), 'U');
 
 			$output = array('EVENT_ID'		=> $event['id'],
-							'TIME'			=> $date->getTime(),
+							'TIME'			=> $date->getTimeOnly(),
 							'EVENT'			=> Scrub::text($event['name']),
 							'EVENT_PAST' 	=> !$due ? 'fade' : '',
 							'EVENT_CAT_ID'	=> $event['category'],
