@@ -2,6 +2,7 @@ setupCustomise = {
 	ajaxURL: '',
 	id: '',
 	key: 'cid',
+	leftColumnWidth: '',
 
 	emptyColumnCheck: function(target) {
 		for (i=0; i < target.length; i++ ) {
@@ -325,6 +326,7 @@ setupCustomise = {
 			$j("#slider" ).slider({
 				'min': 30,
 				'max':70,
+				value: setupCustomise.leftColumnWidth,
 				slide: function(event, ui) {
 					$j('.left').css('width', (ui.value-.5)+'%')
 					$j('.right').css('width', (100 - ui.value-.5)+'%')
@@ -341,17 +343,13 @@ setupCustomise = {
 
 					data[setupCustomise.key] = setupCustomise.id;
 
-					$j.post(setupCustomise.ajaxURL, data);
+					$j.post(setupCustomise.ajaxURL, data,
+						function() {
+							$j('.saved-layout').hide().slideDown(150).delay(2000).slideUp(150);
+			   		})
 				}
 			});
 
-			var self = this;
-
-			$j('#saveTemplate').click(function () {
-				$j.post(setupCustomise.ajaxURL, $j(this).closest('form').serialize(), function() {
-					$j('.saved-layout').slideDown(150).delay(2000).slideUp(150);
-				});
-			})
 		}
 	},
 

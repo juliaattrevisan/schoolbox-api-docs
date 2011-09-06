@@ -14,7 +14,7 @@
 		setupCustomise.ajaxURL = '/eportfolio/configForm.php';
 		setupCustomise.key = 'uid';
 		setupCustomise.id = {ID};
-
+		setupCustomise.leftColumnWidth = '{TEMPLATE_LEFT_COLUMN_WIDTH}';
 		/**
 		 * Initialise the customisation dropdown and create all its javascript driven elements
 		 * ie:
@@ -260,16 +260,7 @@ a.{NAME} {
 				<div class="left permanent" style="width: {TEMPLATE_LEFT_COLUMN_WIDTH}%"> -- LEFT COLUMN --</div>
 				<div class="right permanent" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%"> -- RIGHT COLUMN --</div>
 			</div>
-			<div class="colours-buttons clearfix">
-				<p style='text-decoration:blink;color:#f00;font-size:30px;font-weight:bold'>
-					Tom: don't need Save Layout butonye, the slider ajaxes anyway
-				</p>
-				<div class="clearfix">
-					<button class="submit-btn-plain" type="button" id="saveTemplate" >Save layout</button>
-					<button class="submit-btn-plain " type="button" id="cancelTemplate" >Cancel</button>
-				</div>
-				<div class="saved-layout">Saved layout</div>
-			</div>
+			<div class="saved-layout">Saved layout</div>
 		</form>
 	</div>
 	<!--/tabs-3-->

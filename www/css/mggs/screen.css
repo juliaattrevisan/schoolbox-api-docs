@@ -442,7 +442,7 @@ Library
 #morris .library-header h1 span{font-style:italic; padding-left:48px;}
 #morris .library-box{border:2px solid #000;} 
 #morris .library-box{padding:11px 14px;}
-
+ 
 #morris .library-box.lets-read{background:#f2fff2 url(/images/mggs/library/morris-book.jpg) no-repeat; border-color:#05da00}
 #morris .library-box.finding-out{background:#eaf9ff url(/images/mggs/library/morris-globe.jpg) no-repeat; border-color:#00b6ff;}
 #morris .library-box.community, #morris .library-box.words, #morris .library-box.cybersmart{margin-right:0;}
@@ -464,5 +464,5 @@ Library
 #morris .cybersmart{min-height:inherit;}
 #morris .cybersmart p{line-height:18px; margin-bottom:0;}
 
-#galleryCycle div{position:absolute; left:0; top:0;}
+.updates #galleryCycle div{position:absolute; left:0; top:0;}
 .login-words{height:50px; width:428px; background: url(/images/mggs/mggs-login-words.png) no-repeat; position:absolute; right:50px; bottom:0;}
