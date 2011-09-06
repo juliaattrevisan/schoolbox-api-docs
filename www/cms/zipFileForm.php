@@ -7,9 +7,9 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/zipFileUpload.php';
 
 require_once('../include/pclzip.lib.php');
 
-$page = new SitePage;
-$fileHandler = new File;
-$groupHandler = new Group;
+$page = new SitePage();
+$fileHandler = new File();
+$groupHandler = new Group();
 
 if ($groupHandler->isSuperuser()) {
 
@@ -43,9 +43,9 @@ if ($groupHandler->isSuperuser()) {
 
 		foreach ($allErrors as $currentError) {
 			$page->setVar(array(
-							   'FILENAME' => $currentError['file'],
-							   'MESSAGE' => $currentError['message'],
-						  ));
+				'FILENAME' => $currentError['file'],
+				'MESSAGE' => $currentError['message'],
+			));
 
 			$page->parse('error_block', 'error', true);
 		}
