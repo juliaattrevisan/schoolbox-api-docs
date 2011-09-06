@@ -11,21 +11,21 @@ class Mail
 
 	function Mail()
 	{}
-  
+
 	function checkMailDetails()
 	{
 		//check user has submitted their mail account details, if not request that they do
-	
+
 		$db = new DeprecatedDatabase();
-	
+
 		$query = "SELECT username, email_pass, local_email FROM user WHERE id = ".$_SESSION["id"];
 		$info = $db->getRow($query);
 
-		if($info["username"] == "" || $info["email_pass"] == "" || $info['local_email'] == 0) 
+		if($info["username"] == "" || $info["email_pass"] == "" || $info['local_email'] == 0)
 		{
 				//failed to get information about user
 				return false;
-	
+
 		}
 		else
 		{       //get all the info out
@@ -33,13 +33,13 @@ class Mail
 				$this->mail_host = Cfg::get('mail_host');
 				$this->password = $info["email_pass"];
 				return true;
-		} 
+		}
 	}
 
 	function submitMailDetails()
 	{
 		//redirect the user to the submit mail details form
-		localRedir("/mail/mailInfo.php");
+		SitePage::localRedir("/mail/mailInfo.php");
 	}
 
 	function openMailBox()
@@ -49,18 +49,18 @@ class Mail
 			$this->server="{".$this->mail_host.":143/imap/notls/norsh}INBOX";
 		else
 			$this->server="{".$this->mail_host.":110/pop3}INBOX";
-		
+
 		$inbox = @imap_open ($this->server, $this->user, $this->password);
 		$this->inbox = $inbox;
 		return $inbox;
 	}
-	
+
 	function mailboxStatus($inbox){
 		if($status =  imap_status($inbox, $this->server, SA_ALL) )
 			return $status;
 		else
-			print "imap failed: ".imap_last_error();	
-	
+			print "imap failed: ".imap_last_error();
+
 	}
 
 	function mailExists($msgid, $inbox)
@@ -74,23 +74,23 @@ class Mail
 	function purgeMailBox()
 	{
 		//delete all email in mailbox
-		
+
 		//open mailbox
 		$inbox = $this->openMailBox();
-	
+
 		$total = imap_num_msg($inbox);
-	
+
 		// delete all messages
 		for($x=1; $x<$total; $x++)
 		{
 			if($this->mailExists($x, $inbox))
 				imap_delete($inbox, $x);
 		}
-	
+
 		//clean up
 		imap_close($inbox, CL_EXPUNGE);
-		//reload the page.. 
-		localRedir("/mail.php");
+		//reload the page..
+		SitePage::localRedir("/mail.php");
 	}
 
 
@@ -105,14 +105,14 @@ class Mail
 				imap_delete($inbox, $deleteArray[$x]);
 			}
 		}
-	
+
 		//clean up
 		imap_expunge($inbox);
 		imap_close($inbox, CL_EXPUNGE);
-		//reload the page.. 
-		localRedir("/mail.php");
+		//reload the page..
+		SitePage::localRedir("/mail.php");
 	}
-	
+
 	function deleteMailSingle($delete)
 	{
 		//open

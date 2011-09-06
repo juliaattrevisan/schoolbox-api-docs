@@ -7,7 +7,7 @@
 require_once("../include/session.php");
 require_once("../include/include.php");
 require_once("../include/permission.php");
-
+require_once("../include/SitePage.php");
 
 class editDuties
 {
@@ -153,7 +153,7 @@ class editDuties
 
 		fclose($handle);
 
-		localRedir('/subject/editDuties.php?category=' . $this->category .'&Year=' . $year . '&Month=' . $month . '&Day=' . $day);
+		SitePage::localRedir('/subject/editDuties.php?category=' . $this->category .'&Year=' . $year . '&Month=' . $month . '&Day=' . $day);
 		exit;
 	}
 }

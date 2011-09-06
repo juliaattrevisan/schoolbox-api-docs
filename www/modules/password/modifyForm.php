@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/../../../include/Config.php');
 require_once(dirname(__FILE__) . '/../../../library/user.php');
-require_once(dirname(__FILE__) . '/../../include/stdfuncs.php');
+require_once(dirname(__FILE__) . '/../../../include/SitePage.php');
 
 /* Check inputs
  */
@@ -40,7 +40,7 @@ if ($_POST['uname'] && $_POST['password1']) {
 	}
 }
 else {
-	localRedir('modify');
+	SitePage::localRedir('modify');
 }
 
 /* Display response message

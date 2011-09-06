@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/../../../include/config.php');
 require_once(dirname(__FILE__) . '/../../../library/user.php');
-require_once(dirname(__FILE__) . '/../../include/stdfuncs.php');
+require_once(dirname(__FILE__) . '/../../../include/SitePage.php');
 require_once('ormondLDAP.php');
 
 if ($_POST['emailad'] && $_POST['password']) {
@@ -17,7 +17,7 @@ else if ($_POST['password']) {
 	$message = 'You did not enter a forwarding address, please resubmit.';
 }
 else {
-	localRedir('/modules/emailforward/modify');
+	SitePage::localRedir('/modules/emailforward/modify');
 }
 
 /* Update

@@ -3,6 +3,7 @@
 require_once('../../include/session.php');
 require_once('../../include/include.php');
 require_once('../../include/time.php');
+require_once('../../include/SitePage.php');
 require_once('event.php');
 
 class modEvent
@@ -12,58 +13,58 @@ class modEvent
 		$this->db = new DeprecatedDatabase();
 
 		$this->t_body = new Template(TPL_directory);
-        $this->t_body->set_file('tplBODY', 'modules/clearinghouse/modEvent.htm');
-		$this->t_body->set_var('TITLE', HEADING." - PD Clearing House");
+		$this->t_body->set_file('tplBODY', 'modules/clearinghouse/modEvent.htm');
+		$this->t_body->set_var('TITLE', HEADING . " - PD Clearing House");
 
-  		include_once("../../include/page.php");
+		include_once("../../include/page.php");
 
 	}
 
 	function setVars($id)
 	{
-
-		$tplArray = array(	'ACTION' => 'Create',
-										'NAME' => '',
-										'ID' => '',
-										'DATE' => '',
-										'HOUR' => '',
-										'MIN' => '',
-										'PM' => '',
-										'DURATION' => '',
-										'COST' => '',
-										'DESCRIPTION' => '',
-										'KEYWORDS' => '',
-										'ORGANISER' => '',
-										'PRESENTER' => '',
-										'VENUE' => '',
-										'ADDRESS' => '',
-										'URL' => '',
-										);
+		$tplArray = array(
+			'ACTION' => 'Create',
+			'NAME' => '',
+			'ID' => '',
+			'DATE' => '',
+			'HOUR' => '',
+			'MIN' => '',
+			'PM' => '',
+			'DURATION' => '',
+			'COST' => '',
+			'DESCRIPTION' => '',
+			'KEYWORDS' => '',
+			'ORGANISER' => '',
+			'PRESENTER' => '',
+			'VENUE' => '',
+			'ADDRESS' => '',
+			'URL' => '',
+		);
 
 		$this->t_body->set_block('tplBODY', 'delete_button', 'delete_button_block');
 
-		if(is_numeric($id))
-		{
+		if (is_numeric($id)) {
 			$eventObj = new Event();
 			$event = $eventObj->getSingleEvent($id);
 
-			$tplArray = array(	'ACTION' => 'Modify',
-											'ID' => $event['id'],
-											'NAME' => Scrub::text($event['name']),
-											'DATE' => date('j/n/Y', strtotime($event['start'])),
-											'HOUR' => date('g', strtotime($event['start'])),
-											'MIN' => date('i', strtotime($event['start'])),
-											'PM' =>  date('a', strtotime($event['start'])) == 'pm' ? 'selected="selected"' : '',
-											'DURATION' => $event['duration'] / 60,
-											'COST' => Scrub::text($event['cost']),
-											'DESCRIPTION' => Scrub::text($event['description']),
-											'KEYWORDS' => Scrub::text($event['keywords']),
-											'ORGANISER' => Scrub::text($event['organiser']),
-											'PRESENTER' => Scrub::text($event['presenter']),
-											'VENUE' => Scrub::text($event['venue']),
-											'ADDRESS' => Scrub::text($event['address']),
-											'URL' => $event['url'],
-										);
+			$tplArray = array(
+				'ACTION' => 'Modify',
+				'ID' => $event['id'],
+				'NAME' => Scrub::text($event['name']),
+				'DATE' => date('j/n/Y', strtotime($event['start'])),
+				'HOUR' => date('g', strtotime($event['start'])),
+				'MIN' => date('i', strtotime($event['start'])),
+				'PM' => date('a', strtotime($event['start'])) == 'pm' ? 'selected="selected"' : '',
+				'DURATION' => $event['duration'] / 60,
+				'COST' => Scrub::text($event['cost']),
+				'DESCRIPTION' => Scrub::text($event['description']),
+				'KEYWORDS' => Scrub::text($event['keywords']),
+				'ORGANISER' => Scrub::text($event['organiser']),
+				'PRESENTER' => Scrub::text($event['presenter']),
+				'VENUE' => Scrub::text($event['venue']),
+				'ADDRESS' => Scrub::text($event['address']),
+				'URL' => $event['url'],
+			);
 
 			$this->t_body->set_var($tplArray);
 
@@ -73,7 +74,7 @@ class modEvent
 		else
 		{
 			$this->t_body->set_var($tplArray);
-			$this->t_body->set_var('delete_button_block','');
+			$this->t_body->set_var('delete_button_block', '');
 		}
 
 		$this->outputDropDowns($event['categoryID'], $event['yearID'], $event['formatID']);
@@ -107,81 +108,83 @@ class modEvent
 
 	function doDropDown($name, $array, $selected)
 	{
-		$this->t_body->set_block('tplBODY', $name.'_select', $name.'var');
+		$this->t_body->set_block('tplBODY', $name . '_select', $name . 'var');
 
-		foreach($array as $value)
+		foreach ($array as $value)
 		{
-			$this->t_body->set_var(strtoupper($name).'_ID', $value[$name.'ID']);
-			$this->t_body->set_var(strtoupper($name).'_NAME', $value['name']);
-			if($value[$name.'ID'] == $selected)
-				$this->t_body->set_var(strtoupper($name).'_SELECT', 'selected="selected"');
+			$this->t_body->set_var(strtoupper($name) . '_ID', $value[$name . 'ID']);
+			$this->t_body->set_var(strtoupper($name) . '_NAME', $value['name']);
+			if ($value[$name . 'ID'] == $selected) {
+				$this->t_body->set_var(strtoupper($name) . '_SELECT', 'selected="selected"');
+			}
 			else
-				$this->t_body->set_var(strtoupper($name).'_SELECT', '');
-			$this->t_body->parse($name.'var', $name.'_select', true);
+			{
+				$this->t_body->set_var(strtoupper($name) . '_SELECT', '');
+			}
+			$this->t_body->parse($name . 'var', $name . '_select', true);
 		}
-
 	}
-
 }
 
-if($_POST['delete'])
-{
+if ($_POST['delete']) {
 	//delete event
 	$event = new Event;
 	$event->deleteEvent($_POST['id']);
-	localRedir('/modules/clearinghouse/index.php');
+	SitePage::localRedir('/modules/clearinghouse/index.php');
 }
-else if($_POST['name'])
-{
-	//check and reformat time information
-	list($date,$month,$year) = explode('/',$_POST['date'],3);
-	if( !checkdate($month, $date, $year) )
+else {
+	if ($_POST['name']) {
+		//check and reformat time information
+		list($date, $month, $year) = explode('/', $_POST['date'], 3);
+		if (!checkdate($month, $date, $year)) {
 			error(9);
-	checkTime($_POST['hour'], $_POST['min']);
-	list($hours, $minutes, $seconds) = explode(':', createTime($_POST['hour'], $_POST['min'], $_POST['period']),3);
-	$startTime = mktime($hours, $minutes, $seconds, $month, $date, $year) ;
-	$endTime = $startTime + ($_POST['duration'] * $_POST['durationPeriod'] * 60);
+		}
+		checkTime($_POST['hour'], $_POST['min']);
+		list($hours, $minutes, $seconds) = explode(':', createTime($_POST['hour'], $_POST['min'], $_POST['period']), 3);
+		$startTime = mktime($hours, $minutes, $seconds, $month, $date, $year);
+		$endTime = $startTime + ($_POST['duration'] * $_POST['durationPeriod'] * 60);
 
-	$eventArray = array(	'name' => $_POST['name'],
-								'start' => date('Y-m-d H:i:s', $startTime),
-								'endTime' =>date('Y-m-d H:i:s', $endTime),
-								'cost' => $_POST['cost'],
-								'description' => $_POST['description'],
-								'keywords' => $_POST['keywords'],
-								'categoryID' => $_POST['category'],
-								'yearID' => $_POST['year'],
-								'formatID' => $_POST['format'],
-								'organiser' =>$_POST['organiser'],
-								'venue' => $_POST['venue'],
-								'address' => $_POST['address'],
-								'presenter' => $_POST['presenter'],
-								'url' => $_POST['url'],
-							);
+		$eventArray = array(
+			'name' => $_POST['name'],
+			'start' => date('Y-m-d H:i:s', $startTime),
+			'endTime' => date('Y-m-d H:i:s', $endTime),
+			'cost' => $_POST['cost'],
+			'description' => $_POST['description'],
+			'keywords' => $_POST['keywords'],
+			'categoryID' => $_POST['category'],
+			'yearID' => $_POST['year'],
+			'formatID' => $_POST['format'],
+			'organiser' => $_POST['organiser'],
+			'venue' => $_POST['venue'],
+			'address' => $_POST['address'],
+			'presenter' => $_POST['presenter'],
+			'url' => $_POST['url'],
+		);
 
-	$eventObj = new Event;
+		$eventObj = new Event;
 
-	if($_POST['id'])
-	{
-		//modify event
-		$id = $_POST['id'];
-		$eventArray['id'] = $_POST['id'];
-		$eventObj->modEvent($eventArray);
+		if ($_POST['id']) {
+			//modify event
+			$id = $_POST['id'];
+			$eventArray['id'] = $_POST['id'];
+			$eventObj->modEvent($eventArray);
+		}
+		else
+		{
+			$eventArray['submitter'] = $_SESSION['id'];
+			$id = $eventObj->addEvent($eventArray);
+		}
+
+		SitePage::localRedir('/modules/clearinghouse/viewEvent.php?id=' . $id);
 	}
 	else
 	{
-		$eventArray['submitter'] = $_SESSION['id'];
-		$id = $eventObj->addEvent($eventArray);
+		//output page
+		$page = new modEvent;
+		$page->setVars($_GET['id']);
+		$page->outputPage();
+
 	}
-
-	localRedir('/modules/clearinghouse/viewEvent.php?id='.$id);
-}
-else
-{
-	//output page
-	$page = new modEvent;
-	$page->setVars($_GET['id']);
-	$page->outputPage();
-
 }
 
 ?>
