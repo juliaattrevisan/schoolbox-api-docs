@@ -46,7 +46,7 @@ abstract class Exception_Abstract extends Exception {
 	 * @param  $val
 	 * @return void
 	 */
-	protected function setLocalisation($schoolName) {
+	public function setLocalisation($schoolName) {
 		$className = "Exception_Locale_{$schoolName}_{$this->getExceptionType()}";
 
 		if (class_exists($className, true)) {

@@ -10,6 +10,6 @@
  * @version     SVN: $Id$
  */
 class Exception_Locale_Default_User {
-	const DUPLICATE_USER = 'A duplicate user has been found in the db.';
-	const ASS_BLASTER = 'Ouch!';
+	const DUPLICATE_USER = 'User already exists.';
+	const PASSWORDS_DO_NOT_MATCH = 'Passwords do not match.';
 }
