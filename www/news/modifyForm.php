@@ -11,7 +11,7 @@ if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS) {
 
 if ($_POST['heading']) {
 	$publishedDate = new Alaress_Date_Format($_POST['item_datetime_published'], 'd/m/y');
-	$expiryDate = new Alaress_Date_Format($_POST['item_datetime_published'], 'd/m/y');
+	$expiryDate = new Alaress_Date_Format($_POST['item_datetime_expires'], 'd/m/y');
 
 	$news = array(
 		'item_heading' => $_POST['heading'],

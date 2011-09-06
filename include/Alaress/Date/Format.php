@@ -32,12 +32,33 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface {
 	}
 
 	/**
-	 * Get an Australian format
+	 * Add days and reinitialise
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	public function addDays($val) {
+		$time = $this->getStrategy()->getUnixTimestamp() + (60*60*24*$val);
+
+		$this->getStrategy()->__construct($time, 'U');
+	}
+
+	/**
+	 * Get an local format
 	 *
 	 * @return string
 	 */
 	public function getLocal() {
 		return $this->getStrategy()->getLocal();
+	}
+
+	/**
+	 * Get a date-only local format
+	 *
+	 * @return string
+	 */
+	public function getLocalShort() {
+		return $this->getStrategy()->getLocalShort();
 	}
 
 	/**
