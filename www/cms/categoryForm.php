@@ -8,15 +8,12 @@ $categoryHandler = new Category();
 $groupHandler = new Group();
 
 if ($_POST['name']) {
-
-	/* scrubTEXT($_POST['group']): This keeps throwing a warning, is this used anywhere?
-	 */
 	$category = array(
 		'name' => Scrub::text($_POST['name']),
 		'parent' => Scrub::text($_POST['parent']),
 		'template' => Scrub::text($_POST['template']),
 		'code' => Scrub::text($_POST['code']),
-		'group' => Scrub::text($_POST['group']),
+		'group' => array_map(array(Scrub, 'text'), $_POST['group']),
 	);
 
 	if (is_numeric($_POST['categoryID'])) {
@@ -36,6 +33,14 @@ if ($_POST['name']) {
 	}
 
 	if ($_POST['groupcheck']) {
+
+		/* Prevent students with write access from being able to
+		 * create folders
+		 */
+		if ($groupHandler->isStudent() && isset($_POST['groupcheck'])) {
+			error(20);
+		}
+
 		/* Setup group and forward to group management page */
 		$groupHandler->createGroup($category['id']);
 		$groupHandler->addUser($category['id'], $_SESSION['id'], 3);
