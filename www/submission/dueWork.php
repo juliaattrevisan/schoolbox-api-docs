@@ -25,6 +25,8 @@ function cmp($a, $b) {
 
 $this->setFile(TEMPLATE_content, 'submission/dueWork.html');
 $this->setTab('submission');
+$this->setTitle('Due Work');
+
 $this->setBlock(TEMPLATE_content, 'week', 'week_block');
 $this->setBlock('week', 'day', 'day_block');
 $this->setBlock('day', 'event', 'event_block');

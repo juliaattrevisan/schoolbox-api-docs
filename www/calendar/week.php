@@ -15,6 +15,7 @@ $subStuHandler = new SubmissionStudent;
 
 $this->setFile(TEMPLATE_content, 'calendar/week.html');
 $this->setTab("calendar");
+$this->setTitle('Calendar Week');
 
 $this->setBlock(TEMPLATE_content, "day_header", "day_header_block");
 $this->setBlock(TEMPLATE_content, "day_block", "day_listing");

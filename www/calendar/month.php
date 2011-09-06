@@ -16,6 +16,7 @@ $subStuHandler = new SubmissionStudent;
 
 $this->setFile(TEMPLATE_content, 'calendar/month.html');
 $this->setTab("calendar");
+$this->setTitle('Calendar Month');
 
 $this->setBlock(TEMPLATE_content, "month_week", "month_week_listing");
 $this->setBlock("month_week", "day_block", "day_listing");
@@ -59,7 +60,6 @@ $endOfWeek 	 	= strtotime("+6 days", $startOfWeek);
 $this->setVar('MONTH', date("F", mktime(0,0,0,$selectedMonth, 1, $selectedYear)));
 
 $output = array('YEAR'	 => date("Y",$startOfWeek),
-				'TITLE'	 => HEADING." - Calendar",
 				'DAY'	 => $selectedDay,
 				);
 $this->setVar($output);

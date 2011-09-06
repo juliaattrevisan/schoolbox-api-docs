@@ -4,7 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/Assess.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessAttempt.php';
 
 $this->setFile(TEMPLATE_content, 'submission/listSubmission.html');
-$this->setTitle('List of Submission Boxes');
+$this->setTitle('Submissions');
 $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'submission_listing', 'submission_block');
 $this->setBlock(TEMPLATE_content, 'category_listing', 'category_block');
