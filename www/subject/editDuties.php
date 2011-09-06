@@ -10,7 +10,7 @@ require_once("../include/permission.php");
 
 
 class editDuties
-{	
+{
 	function editDuties($cat, $currYear=0, $currMonth=0, $currDay=0)
 	{
 		$this->category = $cat;
@@ -41,8 +41,8 @@ class editDuties
 		$currentDate = mktime (0,0,0,$this->currMonth, $this->currDay, $this->currYear);
 		$previousDay = mktime (0,0,0,$this->currMonth, ($this->currDay-1), $this->currYear);
         $nextDay = mktime (0,0,0,$this->currMonth, ($this->currDay+1), $this->currYear);
-		
-		$queryDate = date("Y-m-d", $currentDate); 
+
+		$queryDate = date("Y-m-d", $currentDate);
 
 
 		$this->t_body->set_var("WEEKBACK", "editDuties.php?category=".$this->category."&Year=".date("Y",$previousWeek).
@@ -50,14 +50,14 @@ class editDuties
         $this->t_body->set_var("WEEKFORWARD", "editDuties.php?category=".$this->category."&Year=".date("Y",$nextWeek).
                                 "&Month=".date("m",$nextWeek)."&Day=".date("d", $nextWeek));
 		$this->t_body->set_var("TODAY", "editDuties.php?category=".$this->category."&Year=".date("Y").
-                                "&Month=".date("m")."&Day=".date("d"));								
+                                "&Month=".date("m")."&Day=".date("d"));
 		$this->t_body->set_var("DAYBACK", "editDuties.php?category=".$this->category."&Year=".date("Y",$previousDay).
                                 "&Month=".date("m",$previousDay)."&Day=".date("d", $previousDay));
         $this->t_body->set_var("DAYFORWARD", "editDuties.php?category=".$this->category."&Year=".date("Y",$nextDay).
                                 "&Month=".date("m",$nextDay)."&Day=".date("d", $nextDay));
 
-		
-		
+
+
 		$this->t_body->set_file("tplBODY", "subjects/editDuties.htm");
 		$this->t_body->set_block("tplBODY", "duty_list", "d_block");
 		include_once("../include/page.php");
@@ -74,7 +74,7 @@ class editDuties
 		while($row = $this->db->dbGetNextArray())
 		{
 			if($row['user'] == ""){$update = 'false';}else{$update = 'true';}
-			
+
 			$this->t_body->set_var("DUTYID", $row['dutyTypeID']);
 			$this->t_body->set_var("I", $i);
 			$this->t_body->set_var("UPDATE", $update);
@@ -83,18 +83,18 @@ class editDuties
 			$this->t_body->parse("d_block", "duty_list", true);
 			$i++;
 		}
-		$this->t_body->set_var("MAXI", $i-1);	
+		$this->t_body->set_var("MAXI", $i-1);
 		if($i == 0)
 		{
 			$this->t_body->set_var("d_block", '');
 		}
-		$this->t_body->pparse("finaloutput", "tplBODY");	
+		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
-	
+
 	function doUpdate()
 	{
 		$queryDate = $_POST['qdate'];
-		
+
 		for($i=0;$i<=$_POST['maxi'];$i++)
 		{
 			$dutyTypeID = $_POST['dutyTypeID'.$i];
@@ -104,35 +104,35 @@ class editDuties
 			if($user != "")
 			{
 				if($update == "true")
-				{	
-					$sql = "UPDATE duty SET user = '$user' 
+				{
+					$sql = "UPDATE duty SET user = '$user'
 						where cid = '".$this->category."' and date = '".$queryDate."' and dutyTypeID = '$dutyTypeID'";
-					$this->db->dbDoQuery($sql);			
+					$this->db->dbDoQuery($sql);
 				}
 				else
-				{	
+				{
 					$sql = "INSERT INTO duty(cid, date, dutyTypeID, user) VALUES('$this->category','$queryDate','$dutyTypeID','$user')";
 					$this->db->dbDoQuery($sql);
-				}				
+				}
 			}
 		}
 	}
-	
+
 	function parseCSV() {
 		if (!is_file($_FILES['file']['tmp_name']))
 			return false;
-			
+
 		$handle = fopen($_FILES['file']['tmp_name'], "r");
 
 		while (($data = fgetcsv($handle, 4000, ",")) !== FALSE) {
-			
+
 			list($day, $month, $year) = explode("/", $data[0]);
 			if($day)
 				$date = $year . '-' . $month . '-' . $day;
 			else
 				$date = '';
-			
-			
+
+
 			$length = count($data);
 			for ($j=0; $j < $length; $j++) {
 				if ($date && !empty($data[$j+1])) {
@@ -150,20 +150,20 @@ class editDuties
 				}
 			}
 		}
-		
-		
+
 		fclose($handle);
+
 		localRedir('/subject/editDuties.php?category=' . $this->category .'&Year=' . $year . '&Month=' . $month . '&Day=' . $day);
 		exit;
-	
 	}
 }
 
 $page = new editDuties($_GET['category'], $_GET['Year'], $_GET['Month'], $_GET['Day']);
+
 if($_POST['Submit'] == 'Save')
 	$page->doUpdate();
 if($_FILES['file']['name'])
-	$page->parseCSV();	
+	$page->parseCSV();
 
 
 $page->doOutput($message);

@@ -160,7 +160,7 @@ class Submission extends DeprecatedModel {
 			AND (s.owner = '$userID' OR s.owner IS NULL)
 			AND b.category IN (" . implode(',', $categoryIDList) . ")
 			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC";
-        
+
 		return $this->db->getAll($query);
 	}
 
@@ -188,7 +188,7 @@ class Submission extends DeprecatedModel {
 		}
 		else if ($type == RETURNED_WORK_TYPE) {
 			$query .= ' UNIX_TIMESTAMP(r.returned) AS date, ';
-			$orderBy = 'UNIX_TIMESTAMP(r.returned)'; 
+			$orderBy = 'UNIX_TIMESTAMP(r.returned)';
 		}
 
 		$query .= "
@@ -390,7 +390,7 @@ class Submission extends DeprecatedModel {
                         submission_box.accept_submission,
                         category.id AS catid,
                         GROUP_CONCAT(co.code) code,
-                        category.name,
+                        category.name AS category_name,
                         DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date,
                         DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date,
                         submission_box.type AS type_id,
@@ -439,7 +439,7 @@ class Submission extends DeprecatedModel {
 	/**
 	 * Get all the types except the id's mentioned in $vals. Used to exclude
 	 * Online Assessments from selection on createSubmission/
-	 * 
+	 *
 	 * @param <type> $vals
 	 * @return <type>
 	 */
