@@ -1,19 +1,20 @@
 <?php
+require_once('../../include/Bootstrap.php');
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-
-$page = new SitePage;
+$page = new SitePage();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
 if (is_numeric($_GET['join'])) {
 	$group = $groupHandler->getByID($_GET['join']);
-	if ($group['type'] == GROUP_TYPE_FREE)
+
+	if ($group['type'] == GROUP_TYPE_FREE) {
 		$groupHandler->addUser($_GET['join'], $_SESSION['id']);
-	elseif ($group['type'] == GROUP_TYPE_MODERATED)
+	}
+	else if ($group['type'] == GROUP_TYPE_MODERATED) {
 		$groupHandler->addUser($_GET['join'], $_SESSION['id'], DENY_ACCESS);
+	}
 }
-elseif ($_GET['leave']) {
+else if ($_GET['leave']) {
 	$groupHandler->deleteUser($_GET['leave'], $_SESSION['id']);
 }
 
@@ -24,6 +25,7 @@ if ($_GET['return']) {
 	$page->backToTheFuture(1);
 }
 else {
-	localRedir('/group/join');
+	SitePage::localRedir('/group/join');
 }
-?>
+
+exit();
