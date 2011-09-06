@@ -67,7 +67,7 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
 			));
 		}
 
-		localRedir('/assess/modify/' . $assess['assess_id']);
+		SitePage::localRedir('/assess/modify/' . $assess['assess_id']);
 	}
 	else {
 		error(131);
@@ -78,6 +78,3 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
 else {
 	error(2);
 }
-
-
-?>

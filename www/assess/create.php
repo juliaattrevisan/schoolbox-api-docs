@@ -52,7 +52,7 @@ if (!empty($_POST)) {
         error(112);
     }
 
-    localRedir('/assess/section/create/' . $assess_id);
+    SitePage::localRedir('/assess/section/create/' . $assess_id);
 }
 else {
     if (!is_numeric($this->arg[0])) {
@@ -203,4 +203,4 @@ else {
     $this->parse('importXML_block', 'importXML');
 }
 
-?>
+

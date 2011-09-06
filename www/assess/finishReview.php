@@ -42,7 +42,7 @@ if (!$assessHandler->isOwner($this->arg[0])) {
 
 $attemptHandler->reviewed($this->arg[1]);
 
-localRedir('/assess/results/' . $this->arg[0]);
+SitePage::localRedir('/assess/results/' . $this->arg[0]);
 
 die();
-?>
+

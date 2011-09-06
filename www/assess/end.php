@@ -19,7 +19,7 @@ $questionHandler = new AssessQuestion();
 $responseHandler = new AssessResponse();
 
 if (!is_numeric($_SESSION['attempt_id'])) {
-    localRedir('/assess/intro/' . $this->arg[0]);
+    SitePage::localRedir('/assess/intro/' . $this->arg[0]);
 }
 
 $assess = $assessHandler->getByID($this->arg[0]);
@@ -103,4 +103,4 @@ if ($allAttempts) {
 
 $responseHandler->updatedAutomatedMarks($markedResponseIDs);
 
-?>
+

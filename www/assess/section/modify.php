@@ -42,7 +42,7 @@ if (!empty($_POST)) {
 
     /* Redirect to summary
      */
-    localRedir('/assess/summary/' . Scrub::text($_POST['assess_id']));
+    SitePage::localRedir('/assess/summary/' . Scrub::text($_POST['assess_id']));
 }
 else {
     if (!is_numeric($this->arg[0])) {
@@ -92,5 +92,3 @@ else {
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
 }
-
-?>

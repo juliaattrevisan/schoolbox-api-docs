@@ -35,7 +35,7 @@ if (!empty($_POST)) {
 
     /* Redirect to question creation for this section
      */
-    localRedir('/assess/question/create/' . $section_id);
+    SitePage::localRedir('/assess/question/create/' . $section_id);
 }
 else {
     if (empty($this->arg[0])) {
@@ -85,4 +85,4 @@ else {
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
 }
 
-?>
+

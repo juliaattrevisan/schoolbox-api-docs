@@ -53,7 +53,7 @@ if (!empty($_POST)) {
 
     /* Find the assess summary page
      */
-    localRedir('/assess/summary/' . $section['assess_id']);
+    SitePage::localRedir('/assess/summary/' . $section['assess_id']);
 }
 else {
     if (!is_numeric($this->arg[0])) {
@@ -159,4 +159,4 @@ else {
 		$this->setVar('question_category_block', '');
 	}
 }
-?>
+
