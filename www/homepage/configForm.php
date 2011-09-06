@@ -73,7 +73,7 @@ if (is_numeric($_REQUEST['cid'])) {
 		$config = serialize($config);
 		$homepage->updateComponentConfig($_GET['component'], $config);
 
-		localRedir("/homepage/" . $_GET['cid']);
+		SitePage::localRedir("/homepage/" . $_GET['cid']);
 	}
 	else if ($_POST['cid'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
 		$homepage->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
