@@ -5,6 +5,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/link.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
 $this->setFile(TEMPLATE_content, 'resources.html');
 $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
@@ -25,31 +26,39 @@ $allowedFiles = new AllowedFile;
 
 if (is_numeric($this->arg[0])) {
 	$_SESSION['resourcesID'] = $this->arg[0];
-	localRedir('/resources/');
-} else
+	SitePage::localRedir('/resources/');
+}
+else
+{
 	$openCategory = (int)$_SESSION['resourcesID'];
+}
 
 // check permissions on selected category
-if ($groupHandler->getPermission($openCategory) < READ_ACCESS)
+if ($groupHandler->getPermission($openCategory) < READ_ACCESS) {
 	$openCategory = 0;
+}
 
 // log view
-if ($openCategory > 0)
+if ($openCategory > 0) {
 	$categoryHandler->logPageView($openCategory);
+}
 
 // get parentIDs from openCategory to 0
 $parentList[] = $parentID = $openCategory;
 $i = 0;
 while ($parentID > 0) {
-	if ($i++ > 100) break;
+	if ($i++ > 100) {
+		break;
+	}
 	$parentList[] = $parentID = (int)$categoryHandler->getParent($parentID);
 }
 
-$output = array('WRITE'	=> $groupHandler->getPermission(0) >= WRITE_ACCESS ? 'write' : '',
-				'FULL'	=> $groupHandler->getPermission(0) >= FULL_ACCESS ? 'full' : '',
-				'OPEN' 	=> $openCategory,
-				'HTTP_HOST'	=> $_SERVER['HTTP_HOST'],
-				);
+$output = array(
+	'WRITE' => $groupHandler->getPermission(0) >= WRITE_ACCESS ? 'write' : '',
+	'FULL' => $groupHandler->getPermission(0) >= FULL_ACCESS ? 'full' : '',
+	'OPEN' => $openCategory,
+	'HTTP_HOST' => $_SERVER['HTTP_HOST'],
+);
 $this->setVar($output);
 
 // output folders, column 1
@@ -58,8 +67,9 @@ if (is_array($categoryList)) {
 
 	foreach ($categoryList as $category) {
 		// get permissions
-		if (!isset($permission[$category['id']]))
+		if (!isset($permission[$category['id']])) {
 			$permission[$category['id']] = $groupHandler->getPermission($category['id']);
+		}
 
 		// limit permission by parent
 		//if (isset($permission[$category['parent']]) && $permission[$category['id']] > $permission[$category['parent']])
@@ -74,43 +84,50 @@ if (is_array($categoryList)) {
 			$class[] = "child-of-node-{$category['parent']}";
 
 			/* add plus sign to parent nodes */
-			if ($category['isParent'] == '1')
+			if ($category['isParent'] == '1') {
 				$class[] = in_array($category['id'], $parentList) ? 'expanded loaded' : 'collapsed';
+			}
 
 			/* select default dir */
-			if ($category['id'] == $openCategory)
+			if ($category['id'] == $openCategory) {
 				$class[] = 'selected';
+			}
 
 			/* mark homepages */
-			if ($category['template'] > 0)
+			if ($category['template'] > 0) {
 				$class[] = "homepage";
+			}
 
 			/* mark write access */
-			if ($permission[$category['id']] == WRITE_ACCESS)
+			if ($permission[$category['id']] == WRITE_ACCESS) {
 				$class[] = "write";
+			}
 
 			/* mark full access*/
-			if ($permission[$category['id']] == FULL_ACCESS)
+			if ($permission[$category['id']] == FULL_ACCESS) {
 				$class[] = "full";
+			}
 
 			/* append code to name */
 			$name = Scrub::text($category['name']);
-			if($category['code'] != '' && $category['code'] != $category['name'])
-				$name .= ' ('.Scrub::text($category['code']).')';
+			if ($category['code'] != '' && $category['code'] != $category['name']) {
+				$name .= ' (' . Scrub::text($category['code']) . ')';
+			}
 
-			$output = array('CATEGORY_ID'		=> $category['id'],
-							'CATEGORY_NAME'		=> $name,
-							'CLASS'				=> implode(" ", $class),
-							);
+			$output = array(
+				'CATEGORY_ID' => $category['id'],
+				'CATEGORY_NAME' => $name,
+				'CLASS' => implode(" ", $class),
+			);
 			$this->setVar($output);
 			$this->parse('category_list_block', 'category_list', true);
 		}
 	}
 
-        /* If no permission to folders handle blank block */
-        if(!$output['CATEGORY_ID']) {
-            $this->setVar('category_list_block', '');
-        }
+	/* If no permission to folders handle blank block */
+	if (!$output['CATEGORY_ID']) {
+		$this->setVar('category_list_block', '');
+	}
 
 	/* Prevent certain options from appearing unless you are a superuser
 	 */
@@ -129,7 +146,7 @@ else {
 }
 
 // output files, column 2
-$fileList = $fileHandler->mergeLinks( $fileHandler->getAllInCategory($openCategory), $linkHandler->getAllInCategory($openCategory));
+$fileList = $fileHandler->mergeLinks($fileHandler->getAllInCategory($openCategory), $linkHandler->getAllInCategory($openCategory));
 $permission = $groupHandler->getPermission($openCategory);
 
 if (is_array($fileList) && count($fileList) > 0) {
@@ -137,8 +154,9 @@ if (is_array($fileList) && count($fileList) > 0) {
 
 	foreach ($fileList as $file) {
 
-		if (empty($file['modified']))
+		if (empty($file['modified'])) {
 			$file['modified'] = $file['submitted'];
+		}
 
 		$class = array();
 
@@ -154,27 +172,32 @@ if (is_array($fileList) && count($fileList) > 0) {
 		// icon
 		$class[] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
 
-		if (!($i++%2))
+		if (!($i++ % 2)) {
 			$class[] = 'dark';
+		}
 
 		$fileModifiedTime = new Alaress_Date_Relative($file['modified']);
 
-		$output = array('FILE_ID' 	 	=> $file['id'],
-						'TYPE'			=> $file['url'] ? 'link' : 'file',
-						'FILE_NAME' 	=> TextFormatter::cutString(Scrub::text($file['description']),32),
-						'FILE_MODIFIED'	=> $fileModifiedTime->setPrefix('')->getRelativeTime(),
-						'FILE_OWNER'	=> $userHandler->formatName($file),
-						'FILE_SIZE'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",
-						'CATEGORY_ID'	=> $file['category'],
-						'CLASS'			=> implode(" ", $class),
-						);
+		$output = array(
+			'FILE_ID' => $file['id'],
+			'TYPE' => $file['url'] ? 'link' : 'file',
+			'FILE_NAME' => TextFormatter::cutString(Scrub::text($file['description']), 32),
+			'FILE_MODIFIED' => $fileModifiedTime->setPrefix('')->getRelativeTime(),
+			'FILE_OWNER' => $userHandler->formatName($file),
+			'FILE_SIZE' => $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",
+			'CATEGORY_ID' => $file['category'],
+			'CLASS' => implode(" ", $class),
+		);
 
 		$this->setVar($output);
 		$this->parse('file_list_block', 'file_list', true);
 
 	}
-} else
+}
+else
+{
 	$this->setVar('file_list_block', '');
+}
 
 // output mime classes
 $allowedList = $allowedFiles->getAll();
@@ -185,9 +208,10 @@ if (is_array($allowedList)) {
 	$last = '';
 	foreach ($allowedList as $allowed) {
 		if ($last != $allowed["iconFile"]) {
-			$output = array("NAME"	=> $allowedFiles->getClass($allowed["iconFile"]),
-							"ICON"	=> $allowed["iconFile"],
-							);
+			$output = array(
+				"NAME" => $allowedFiles->getClass($allowed["iconFile"]),
+				"ICON" => $allowed["iconFile"],
+			);
 
 			$this->setVar($output);
 			$this->parse("allowed_files_block", "allowed_files", true);
@@ -195,7 +219,9 @@ if (is_array($allowedList)) {
 			$last = $allowed["iconFile"];
 		}
 	}
-} else
+}
+else
+{
 	$this->setVar('allowed_files_block', '');
+}
 
-?>

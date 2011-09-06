@@ -6,7 +6,7 @@ session_start();
 //Also now supports handling of files which are attached to the email
 //Typically this script would be used for contact forms and enquiry forms on a website
 //It requires the following variables;
-//			template - template filename to be used 			
+//			template - template filename to be used
 //			email - email address of sender
 //The following are optional but recommended variables
 //			subject - subject of email to be sent
@@ -14,49 +14,49 @@ session_start();
 //			confirmation - location to redirect user to after submission, ie a confirmation page
 
 require_once dirname(__FILE__) . '/conf/conf.php';
-require_once dirname(__FILE__) . '/include/stdfuncs.php';
+require_once dirname(__FILE__) . '/../include/SitePage.php';
 require_once SITE_root . '/include/Mailer.php';
 require_once SITE_root . '/library/reCaptcha.php';
 
-if(validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template']) 
+if(validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])
 	&& (isset($_SESSION['id']) || ReCaptcha::checkResponse($_POST['recaptcha_answer'], $_POST['recaptcha_challenge']))) {
-	
+
 	$mailHandler = new Mailer($_POST['template'], 'OurSchool Feedback - ' . $_POST['subject'], Cfg::get('mail_support_address'));
-	
+
 	foreach($_POST as $key => $var) {
 		if(!checkSpamHeaders($var))
-			localRedir('/');
-			
+			SitePage::localRedir('/');
+
 		$key = strtoupper($key);
 		if(is_array($var))
 			$output[$key] = implode(', ',$var);
 		else
 			$output[$key] = $var;
 	}
-	
+
 	foreach($_FILES as $file) {
 		$mailHandler->addFile($file['tmp_name'], $file['type'], $file['name']);
 	}
-	
+
 	$mailHandler->setVar($output);
 	$mailHandler->setFrom($_POST['email'], $_POST['name']);
 	$mailHandler->setVar('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
 	$mailHandler->send();
-	
+
 	if($_POST['receipt']) {
 		$receiptHandler = new Mailer($_POST['receipt'], $_POST['receipt_subject'], $_POST['email']);
 		$receiptHandler->setVar($output);
 		$receiptHandler->setVar('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
 		$receiptHandler->send();
-		
+
 	}
-	
+
 }
 
 if(preg_match("/^[a-zA-Z0-9\/\-\_]+/", $_POST['confirmation']) )
-	localRedir($_POST['confirmation']);
+	SitePage::localRedir($_POST['confirmation']);
 else
-	localRedir('/thank-you');
+	SitePage::localRedir('/thank-you');
 
 function checkSpamHeaders($text)
 {
@@ -70,8 +70,8 @@ function checkSpamHeaders($text)
 
 	return TRUE;
 }
-	
-	
+
+
 function validateEmailAddress($email)
 {
 	//check from contains valid email
@@ -89,7 +89,7 @@ function validateEmailAddress($email)
 		return TRUE;
 	else if(checkdnsrr($domain, 'ANY') )
 		return TRUE;
-	else 
+	else
 		return FALSE;
 }
 ?>

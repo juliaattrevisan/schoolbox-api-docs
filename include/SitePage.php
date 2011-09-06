@@ -2,10 +2,12 @@
 
 require_once dirname(__FILE__) . '/../include/Bootstrap.php';
 
-class SitePage extends Page {
-    private $ajax;
+class SitePage extends Page
+{
+	private $ajax;
 
-	public function SitePage($login=TRUE) {
+	public function SitePage($login = TRUE)
+	{
 		parent::Page();
 
 		$this->db = new DeprecatedDatabase;
@@ -24,770 +26,918 @@ class SitePage extends Page {
 	 *
 	 * @return string
 	 */
-	public function conType() {
+	public function conType()
+	{
 		$port = getenv("SERVER_PORT");
 
 		if ($port == 80) {
 			$contype = "http://";
 		}
-		else if ($port == 443) {
-			$contype = "https://";
+		else {
+			if ($port == 443) {
+				$contype = "https://";
+			}
 		}
 
 		return $contype;
 	}
 
-		function loadContent($pageFile, $execute=TRUE) {
-           $this->pageName = $pageFile;
+	function loadContent($pageFile, $execute = TRUE)
+	{
+		$this->pageName = $pageFile;
 
-           /* sanitise data, force all 404s through pageNotFound() */
-           if( !preg_match("/^[a-zA-Z0-9\/\-\_\.]+/", $pageFile) || $pageFile == 'common/404') {
-               $this->pageNotFound();
-           }
+		/* sanitise data, force all 404s through pageNotFound() */
+		if (!preg_match("/^[a-zA-Z0-9\/\-\_\.]+/", $pageFile) || $pageFile == 'common/404') {
+			$this->pageNotFound();
+		}
 
-           $this->arg = array();
-           $path = explode('/', trim($pageFile, '/'));
+		$this->arg = array();
+		$path = explode('/', trim($pageFile, '/'));
 
-                   $total = count($path);
+		$total = count($path);
 
-           /* iterate backwards through the path */
-           for ($i = 0; $i < $total; $i++) {
+		/* iterate backwards through the path */
+		for ($i = 0; $i < $total; $i++) {
 
-               $filename = rtrim(implode("/", $path), '/');
+			$filename = rtrim(implode("/", $path), '/');
 
-			if(is_file(WEB_root.'/'.$filename.'.php') && $execute) {
-				include(WEB_root.'/'.$filename. '.php');
-                   return true;
-			} elseif(is_file(WEB_root.'/'.$filename.'/index.php') && $execute) {
-				include(WEB_root.'/'.$filename. '/index.php');
-                   return true;
-               } else if(is_file($this->templateRoot . '/' . $this->getTemplate($filename . '.html'))) {
-                   $this->setFile(TEMPLATE_content, $filename . '.html');
-                   return true;
-               } else if(is_file($this->templateRoot .'/'. $filename . '/index.html')) {
-                   $this->setFile(TEMPLATE_content, $filename . '/index.html');
-                   return true;
-               }
+			if (is_file(WEB_root . '/' . $filename . '.php') && $execute) {
+				include(WEB_root . '/' . $filename . '.php');
+				return true;
+			}
+			elseif (is_file(WEB_root . '/' . $filename . '/index.php') && $execute) {
+				include(WEB_root . '/' . $filename . '/index.php');
+				return true;
+			}
+			else {
+				if (is_file($this->templateRoot . '/' . $this->getTemplate($filename . '.html'))) {
+					$this->setFile(TEMPLATE_content, $filename . '.html');
+					return true;
+				}
+				else {
+					if (is_file($this->templateRoot . '/' . $filename . '/index.html')) {
+						$this->setFile(TEMPLATE_content, $filename . '/index.html');
+						return true;
+					}
+				}
+			}
 
-               /* move last element to arguments */
-               array_unshift($this->arg, array_pop($path));
-           }
+			/* move last element to arguments */
+			array_unshift($this->arg, array_pop($path));
+		}
 
-           $this->pageNotFound();
-       }
+		$this->pageNotFound();
+	}
 
-       function setSite() {
-           if(Cfg::get('site_detect') == 'domain') {
-               //Get site templates via domain name
-               if(preg_match('/([\w]+)\./', $_SERVER['HTTP_HOST'], $match)) {
-                   $this->site = $match[1];
-                   return true;
-               }
-           }
-           else if(Cfg::get('site_detect') == 'campus') {
-               //Get site template via users campus
-               if(Cfg::get('site_location') == 'mgs') {
-                   if($_SESSION['campus'][0] == 3)
-                       $this->site = 'grimwade';
-                   else
-                       $this->site = 'mgs';
+	function setSite()
+	{
+		if (Cfg::get('site_detect') == 'domain') {
+			//Get site templates via domain name
+			if (preg_match('/([\w]+)\./', $_SERVER['HTTP_HOST'], $match)) {
+				$this->site = $match[1];
+				return true;
+			}
+		}
+		else {
+			if (Cfg::get('site_detect') == 'campus') {
+				//Get site template via users campus
+				if (Cfg::get('site_location') == 'mgs') {
+					if ($_SESSION['campus'][0] == 3) {
+						$this->site = 'grimwade';
+					}
+					else
+					{
+						$this->site = 'mgs';
+					}
 
-                   return true;
-               }
-               else {
-                   $this->site = Cfg::get('site_location');
-               }
-           }
+					return true;
+				}
+				else {
+					$this->site = Cfg::get('site_location');
+				}
+			}
+		}
 
-           $this->site = Cfg::get('site_location');
+		$this->site = Cfg::get('site_location');
 
-       }
+	}
 
-       function setAjax ($state = true) {
-           $this->ajax = $state;
-       }
+	function setAjax($state = true)
+	{
+		$this->ajax = $state;
+	}
 
-       function outputPage($lite=FALSE) {
-           if ($this->ajax) {
-               return true;
-           }
+	function outputPage($lite = FALSE)
+	{
+		if ($this->ajax) {
+			return true;
+		}
 
-           if(!$lite) {
-               $this->buildPage();
-               $this->saveHistory();
-           }
+		if (!$lite) {
+			$this->buildPage();
+			$this->saveHistory();
+		}
 
-		   $userHandler = new User();
+		$userHandler = new User();
 
-           $templateVar = array(	'TEMPLATE_YEAR' => date('Y'),
-                       'SITE_NAME'     => Cfg::get('school_name'),
-                       'SITE_ADDRESS'	=> Cfg::get('site_address'),
-					   'SITE_GREETING' => TextFormatter::greeting(), // TODO: This should be an object
-                       'SITE_LOGINNAME'=> $userHandler->formatName($_SESSION),
-                       'SITE_USERNAME' => $_SESSION['username'],
-                       'SITE_LOCATION'	=> $this->site,
-                       'USER_ID'       => $_SESSION['id'],
-                       'SITE_VERSION'  => Cfg::get('site_version'),
-                   );
-                   $this->setVar($templateVar);
+		$templateVar = array('TEMPLATE_YEAR' => date('Y'),
+							 'SITE_NAME' => Cfg::get('school_name'),
+							 'SITE_ADDRESS' => Cfg::get('site_address'),
+							 'SITE_GREETING' => TextFormatter::greeting(), // TODO: This should be an object
+							 'SITE_LOGINNAME' => $userHandler->formatName($_SESSION),
+							 'SITE_USERNAME' => $_SESSION['username'],
+							 'SITE_LOCATION' => $this->site,
+							 'USER_ID' => $_SESSION['id'],
+							 'SITE_VERSION' => Cfg::get('site_version'),
+		);
+		$this->setVar($templateVar);
 
-           $title = $this->getVar('TITLE');
-           if (empty($title))
-               $this->setTitle();
+		$title = $this->getVar('TITLE');
+		if (empty($title)) {
+			$this->setTitle();
+		}
 
-           $this->template->pparse('finaloutput', TEMPLATE_body);
-       }
+		$this->template->pparse('finaloutput', TEMPLATE_body);
+	}
 
-       function buildPage($customHead = true) {
+	function buildPage($customHead = true)
+	{
 
-           $this->groupHandler = new Group;
+		$this->groupHandler = new Group;
 
-           $this->setFile(TEMPLATE_body, 'include/body.html' );
-           $this->setFile('headerTpl', 'include/header.html' );
-           $this->setFile('footerTpl', 'include/footer.html' );
-           $this->setFile('bannerTpl', 'include/banner.html' );
-           $this->setFile('navTpl', 'include/nav.html' );
-           $this->setFile('tabTpl', 'include/tab.html' );
+		$this->setFile(TEMPLATE_body, 'include/body.html');
+		$this->setFile('headerTpl', 'include/header.html');
+		$this->setFile('footerTpl', 'include/footer.html');
+		$this->setFile('bannerTpl', 'include/banner.html');
+		$this->setFile('navTpl', 'include/nav.html');
+		$this->setFile('tabTpl', 'include/tab.html');
 
-           $this->renderScriptIncludes();
-           $this->renderSideNav();
-           $this->renderTabBar();
-           $this->renderGroupList();
-           $this->renderSubjectList();
-           $this->renderLinkList();
-           $this->renderStudents();
+		$this->renderScriptIncludes();
+		$this->renderSideNav();
+		$this->renderTabBar();
+		$this->renderGroupList();
+		$this->renderSubjectList();
+		$this->renderLinkList();
+		$this->renderStudents();
 
-           $this->parse('MAIN_HEADER_REGION', 'headerTpl');
-           $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
-           $this->parse('MAIN_BANNER_REGION', 'bannerTpl');
+		$this->parse('MAIN_HEADER_REGION', 'headerTpl');
+		$this->parse('MAIN_FOOTER_REGION', 'footerTpl');
+		$this->parse('MAIN_BANNER_REGION', 'bannerTpl');
 
-           if ($_SESSION['id']) {
-               $this->parse('MAIN_NAV_REGION', 'navTpl');
-               $this->parse('MAIN_TAB_REGION', 'tabTpl');
-           } else {
-               $this->setVar('MAIN_NAV_REGION', '');
-               $this->setVar('MAIN_TAB_REGION', '');
-           }
+		if ($_SESSION['id']) {
+			$this->parse('MAIN_NAV_REGION', 'navTpl');
+			$this->parse('MAIN_TAB_REGION', 'tabTpl');
+		}
+		else {
+			$this->setVar('MAIN_NAV_REGION', '');
+			$this->setVar('MAIN_TAB_REGION', '');
+		}
 
-           $this->parse('MAIN_CONTENT_REGION', TEMPLATE_content);
+		$this->parse('MAIN_CONTENT_REGION', TEMPLATE_content);
 
-           if ($this->getVar('custom_head') && $customHead)
-               $this->parse('CUSTOM_HEADER_REGION', 'custom_head');
-           else
-               $this->setVar('CUSTOM_HEADER_REGION', '');
-       }
+		if ($this->getVar('custom_head') && $customHead) {
+			$this->parse('CUSTOM_HEADER_REGION', 'custom_head');
+		}
+		else
+		{
+			$this->setVar('CUSTOM_HEADER_REGION', '');
+		}
+	}
 
-       function setTab($tab) {
-           $this->currentTab = $tab;
-       }
+	function setTab($tab)
+	{
+		$this->currentTab = $tab;
+	}
 
-       function initSession() {
-               session_start();
+	function initSession()
+	{
+		session_start();
 
-               if ( !isset($_SESSION['id']) ) {
-                       //Catch already logged in users via kerberos or other means
-                       if(Cfg::get('kerb_enable') && $_SERVER['REMOTE_USER'] ) {
+		if (!isset($_SESSION['id'])) {
+			//Catch already logged in users via kerberos or other means
+			if (Cfg::get('kerb_enable') && $_SERVER['REMOTE_USER']) {
 
-                           $sessionHandler = new Session;
-                           list($username, $domain) = explode('@',$_SERVER['REMOTE_USER']);
-                           if(!$sessionHandler->create($username))
-                                   $this->goLoginPage();
+				$sessionHandler = new Session;
+				list($username, $domain) = explode('@', $_SERVER['REMOTE_USER']);
+				if (!$sessionHandler->create($username)) {
+					$this->goLoginPage();
+				}
 
-                       }
-                       else {
-                           $this->goLoginPage();
-                       }
-               }
+			}
+			else {
+				$this->goLoginPage();
+			}
+		}
 
-               //if ip tracking enabled ensure user has same ip as when they logged in
-               if(TRACKIP && $_SESSION['ip'] != Session::getIP())
-                       $this->goLoginPage();
+		//if ip tracking enabled ensure user has same ip as when they logged in
+		if (TRACKIP && $_SESSION['ip'] != Session::getIP()) {
+			$this->goLoginPage();
+		}
 
-               //if session remember is disabled and check session has not expired
-               if(!$_SESSION['remember'] && (($_SESSION['lasttime'] + SESSIONLENGTH) < mktime()))
-                       $this->goLoginPage();
+		//if session remember is disabled and check session has not expired
+		if (!$_SESSION['remember'] && (($_SESSION['lasttime'] + SESSIONLENGTH) < mktime())) {
+			$this->goLoginPage();
+		}
 
-               //reset session timer
-               $_SESSION['lasttime'] = mktime();
-       }
+		//reset session timer
+		$_SESSION['lasttime'] = mktime();
+	}
 
-       function saveHistory() {
-           /* Function saves user page history in session so we can go back to where they came from */
-           if(!is_array($_SESSION['history']))
-               $_SESSION['history'] = array();
+	function saveHistory()
+	{
+		/* Function saves user page history in session so we can go back to where they came from */
+		if (!is_array($_SESSION['history'])) {
+			$_SESSION['history'] = array();
+		}
 
-           /* Dont handle duplicates (page refreshes) */
-           if($_SESSION['history'][0] != $_SERVER['REQUEST_URI']) {
+		/* Dont handle duplicates (page refreshes) */
+		if ($_SESSION['history'][0] != $_SERVER['REQUEST_URI']) {
 
-               array_unshift($_SESSION['history'], $_SERVER['REQUEST_URI']);
+			array_unshift($_SESSION['history'], $_SERVER['REQUEST_URI']);
 
-               if(count($_SESSION['history']) > 3)
-                   array_pop($_SESSION['history']);
-           }
-       }
+			if (count($_SESSION['history']) > 3) {
+				array_pop($_SESSION['history']);
+			}
+		}
+	}
 
-       function backToTheFuture($page) {
-           /* In Dans honour, time is ours */
-           if(is_array($_SESSION['history']) ) {
-               if(count($_SESSION['history']) >= $page)
-                   localRedir($_SESSION['history'][$page-1]);
-               else
-                   localRedir($_SESSION['history'][(count($_SESSION['history'])-1)]);
-           }
-           else /* Lost in space and time, just go home */
-               localRedir('/');
+	function backToTheFuture($page)
+	{
+		/* In Dans honour, time is ours */
+		if (is_array($_SESSION['history'])) {
+			if (count($_SESSION['history']) >= $page) {
+				SitePage::localRedir($_SESSION['history'][$page - 1]);
+			}
+			else
+			{
+				SitePage::localRedir($_SESSION['history'][(count($_SESSION['history']) - 1)]);
+			}
+		}
+		else /* Lost in space and time, just go home */
+		{
+			SitePage::localRedir('/');
+		}
 
-       }
+	}
 
-       function error($ec, $message = "") {
+	function error($ec, $message = "")
+	{
 
 		$db = new DeprecatedDatabase(SQL_db, 1);
 
-           $query = "SELECT message FROM error WHERE id = '$ec'";
-           $error = $db->getRow($query);
+		$query = "SELECT message FROM error WHERE id = '$ec'";
+		$error = $db->getRow($query);
 
-           $output = str_replace("%MESSAGE%", $message, $error['message']);
+		$output = str_replace("%MESSAGE%", $message, $error['message']);
 
-           header("HTTP/1.0 400 Bad Request");
-           $this->setVar(TEMPLATE_content, '');
+		header("HTTP/1.0 400 Bad Request");
+		$this->setVar(TEMPLATE_content, '');
 
-           $this->setFile(TEMPLATE_content, 'common/error.html');
-           $this->setTitle('Error Encountered');
-           $this->setVar("OUTPUT", $output);
-           $this->buildPage(false);
-           $this->outputPage(true);
-           exit;
+		$this->setFile(TEMPLATE_content, 'common/error.html');
+		$this->setTitle('Error Encountered');
+		$this->setVar("OUTPUT", $output);
+		$this->buildPage(false);
+		$this->outputPage(true);
+		exit;
 
-       }
+	}
 
-       function renderSideNav() {
-           //this section handles the drop down menu
-           if($_SESSION['su'])
-               $query = "SELECT sideMenu.id, parent, txt, url, target FROM sideMenu ORDER BY parent, sequence, txt";
-           else if(is_array($_SESSION['campus']))
-               $query = "	SELECT DISTINCT(sideMenu.id), parent, txt, url, target FROM sideMenu, sideMenuCampus, sideMenuGroup
-                             WHERE (sideMenu.id = sideMenuCampus.id AND sideMenuCampus.campus IN (".implode(',',$_SESSION['campus']).") )
-                               AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '".$_SESSION['gid']."')
+	function renderSideNav()
+	{
+		//this section handles the drop down menu
+		if ($_SESSION['su']) {
+			$query = "SELECT sideMenu.id, parent, txt, url, target FROM sideMenu ORDER BY parent, sequence, txt";
+		}
+		else {
+			if (is_array($_SESSION['campus'])) {
+				$query = "	SELECT DISTINCT(sideMenu.id), parent, txt, url, target FROM sideMenu, sideMenuCampus, sideMenuGroup
+                             WHERE (sideMenu.id = sideMenuCampus.id AND sideMenuCampus.campus IN (" . implode(',', $_SESSION['campus']) . ") )
+                               AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '" . $_SESSION['gid'] . "')
                              ORDER BY parent, sequence, txt";
-           else
-               $query = "	SELECT DISTINCT(sideMenu.id), parent, txt, url, target FROM sideMenu, sideMenuCampus, sideMenuGroup
+			}
+			else
+			{
+				$query = "	SELECT DISTINCT(sideMenu.id), parent, txt, url, target FROM sideMenu, sideMenuCampus, sideMenuGroup
                              WHERE (sideMenu.id = sideMenuCampus.id AND sideMenuCampus.campus = 1)
-                               AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '".$_SESSION['gid']."')
+                               AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '" . $_SESSION['gid'] . "')
                              ORDER BY parent, sequence, txt";
-           $this->db->query($query);
+			}
+		}
+		$this->db->query($query);
 
-           //initialise root of tree
-           $list[0]['id'] = 0;
+		//initialise root of tree
+		$list[0]['id'] = 0;
 
-           //fetch each record and insert into tree
-           while($menuitem = $this->db->getNextArray() ) {
-               $list = $this->__insertChild($list, $menuitem);
-           }
+		//fetch each record and insert into tree
+		while ($menuitem = $this->db->getNextArray()) {
+			$list = $this->__insertChild($list, $menuitem);
+		}
 
-           //output tree with html
-           $this->setVar("MCSSMENU", $this->__outputMenu($list[0]['children'], 1));
-       }
+		//output tree with html
+		$this->setVar("MCSSMENU", $this->__outputMenu($list[0]['children'], 1));
+	}
 
-       function renderTabBar() {
+	function renderTabBar()
+	{
 
-           //this section hanldes the display of the timetable tab
-           $this->setBlock('tabTpl', 'timetable_tab', 'tt_tab');
-           //if the have a timetable or their children have a timetable
-           if($_SESSION['timetable'] || is_array($_SESSION['children'][0]['subjects']))
-               $this->parse('tt_tab','timetable_tab');
-           else
-               $this->setVar('tt_tab', '');
+		//this section hanldes the display of the timetable tab
+		$this->setBlock('tabTpl', 'timetable_tab', 'tt_tab');
+		//if the have a timetable or their children have a timetable
+		if ($_SESSION['timetable'] || is_array($_SESSION['children'][0]['subjects'])) {
+			$this->parse('tt_tab', 'timetable_tab');
+		}
+		else
+		{
+			$this->setVar('tt_tab', '');
+		}
 
-           /* output submission box links */
-           $this->setBlock('tabTpl', 'duework_tab', 'dw_tab');
-           $this->setBlock('tabTpl', 'submission_tab', 'sm_tab');
-           if($this->groupHandler->isStaff() ) {
-                   $this->parse('sm_tab','submission_tab');
-                   $this->setVar('dw_tab','');
-           }
-           else if($this->groupHandler->isStudent()) {
-                   $this->parse('dw_tab','duework_tab');
-                   $this->setVar('sm_tab','');
-           }
-           else {
-               $this->setVar('sm_tab','');
-               $this->setVar('dw_tab','');
-           }
+		/* output submission box links */
+		$this->setBlock('tabTpl', 'duework_tab', 'dw_tab');
+		$this->setBlock('tabTpl', 'submission_tab', 'sm_tab');
+		if ($this->groupHandler->isStaff()) {
+			$this->parse('sm_tab', 'submission_tab');
+			$this->setVar('dw_tab', '');
+		}
+		else {
+			if ($this->groupHandler->isStudent()) {
+				$this->parse('dw_tab', 'duework_tab');
+				$this->setVar('sm_tab', '');
+			}
+			else {
+				$this->setVar('sm_tab', '');
+				$this->setVar('dw_tab', '');
+			}
+		}
 
-           //this section handles the display of the webmail tab
-           // if configuration states mail is available and user has access to local mail account display it
-           $this->setBlock('tabTpl', 'webmail_tab', 'wm_tab');
+		//this section handles the display of the webmail tab
+		// if configuration states mail is available and user has access to local mail account display it
+		$this->setBlock('tabTpl', 'webmail_tab', 'wm_tab');
 
-           if((MAIL_enable && $_SESSION['local_email']) ||
-                   ($this->site == 'wenona' && $this->groupHandler->isStaff()) ||
-                   $this->site == 'ormond' ||
-                   $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] ==  7 || $_SESSION['gid'] == '8' )  ||
-                   $this->site == 'joeys' ||
-                   $this->site == 'jpc' ||
-           $this->site == 'cathedral' ||
-                   $this->site == 'mggs' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent() )||
-                   $this->site == 'bialik' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent() )
-                   )
-           {
-               if($this->site == 'mgs' || $this->site == 'grimwade')
-               {
+		if ((MAIL_enable && $_SESSION['local_email']) ||
+			($this->site == 'wenona' && $this->groupHandler->isStaff()) ||
+			$this->site == 'ormond' ||
+			$this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] == 7 || $_SESSION['gid'] == '8') ||
+			$this->site == 'joeys' ||
+			$this->site == 'jpc' ||
+			$this->site == 'cathedral' ||
+			$this->site == 'mggs' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) ||
+			$this->site == 'bialik' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent())
+		) {
+			if ($this->site == 'mgs' || $this->site == 'grimwade') {
 
-                                   if($this->groupHandler->isStaff()) {
-                                       $this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/owa" rel="external"');
-                                   }
-                                   else if(in_array($_SESSION['year'], array('7'))) {
-                                       $this->setVar('WEBMAIL_LOCATION', 'href="https://owa.mgs.vic.edu.au/owa" rel="external"');
-                                   }
-                   else
-                                       $this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/OWA"');
+				if ($this->groupHandler->isStaff()) {
+					$this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/owa" rel="external"');
+				}
+				else {
+					if (in_array($_SESSION['year'], array('7'))) {
+						$this->setVar('WEBMAIL_LOCATION', 'href="https://owa.mgs.vic.edu.au/owa" rel="external"');
+					}
+					else
+					{
+						$this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/OWA"');
+					}
+				}
 
-               }
-               else if($this->site == 'ormond')
-               {
-                   if( $this->groupHandler->isStaff() )
-                       $this->setVar("WEBMAIL_LOCATION", 'href="http://owa.ormond.unimelb.edu.au" rel="external"');
-                   else
-                       $this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
-               }
-               else if($this->site == 'wenona') {
-                   $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.wenona.nsw.edu.au/owa" rel="external"');
-               }
-               else if($this->site == 'shore') {
-                   if($this->groupHandler->isStaff()) {
-                       if(strpos(Session::getIP(),'192.168.') === FALSE)
-                           $this->setVar('WEBMAIL_LOCATION', 'href="https://mail.shore.nsw.edu.au/exchange/" rel="external"');
-                       else
-                           $this->setVar('WEBMAIL_LOCATION', 'href="http://shorexch01/exchange" rel="external"');
-                   }
-                   else if($this->groupHandler->isStudent()) {
-                       if(strpos(Session::getIP(),'192.168.') === FALSE)
-                           $this->setVar('WEBMAIL_LOCATION', 'href="https://mail.student.shore.nsw.edu.au/exchange/" rel="external"');
-                       else
-                           $this->setVar('WEBMAIL_LOCATION', 'href="http://cassandra/exchange" rel="external"');
-                   }
-               }
-               else if($this->site == 'joeys') {
-                   $this->setVar('WEBMAIL_LOCATION', 'href="http://webmail/" rel="external"');
-               }
+			}
+			else {
+				if ($this->site == 'ormond') {
+					if ($this->groupHandler->isStaff()) {
+						$this->setVar("WEBMAIL_LOCATION", 'href="http://owa.ormond.unimelb.edu.au" rel="external"');
+					}
+					else
+					{
+						$this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
+					}
+				}
+				else {
+					if ($this->site == 'wenona') {
+						$this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.wenona.nsw.edu.au/owa" rel="external"');
+					}
+					else {
+						if ($this->site == 'shore') {
+							if ($this->groupHandler->isStaff()) {
+								if (strpos(Session::getIP(), '192.168.') === FALSE) {
+									$this->setVar('WEBMAIL_LOCATION', 'href="https://mail.shore.nsw.edu.au/exchange/" rel="external"');
+								}
+								else
+								{
+									$this->setVar('WEBMAIL_LOCATION', 'href="http://shorexch01/exchange" rel="external"');
+								}
+							}
+							else {
+								if ($this->groupHandler->isStudent()) {
+									if (strpos(Session::getIP(), '192.168.') === FALSE) {
+										$this->setVar('WEBMAIL_LOCATION', 'href="https://mail.student.shore.nsw.edu.au/exchange/" rel="external"');
+									}
+									else
+									{
+										$this->setVar('WEBMAIL_LOCATION', 'href="http://cassandra/exchange" rel="external"');
+									}
+								}
+							}
+						}
+						else {
+							if ($this->site == 'joeys') {
+								$this->setVar('WEBMAIL_LOCATION', 'href="http://webmail/" rel="external"');
+							}
 
-             else if($this->site == 'cathedral') {
-                   $this->setVar('WEBMAIL_LOCATION', 'href="http://mail.cathedral.qld.edu.au/webmail/src/login.php" rel="external"');
-               }
-               else if($this->site == 'mggs') {
-                   $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.mggs.vic.edu.au" rel="external"');
-               }
-               else if($this->site == 'bialik') {
-                   $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.bialik.vic.edu.au/exchange" rel="external"');
-               }
-               else if($this->site == 'jpc') {
-                   $this->setVar('WEBMAIL_LOCATION', 'href="http://jpcmail.jpcvictoria.catholic.edu.au/owa" rel="external"');
-               }
+							else {
+								if ($this->site == 'cathedral') {
+									$this->setVar('WEBMAIL_LOCATION', 'href="http://mail.cathedral.qld.edu.au/webmail/src/login.php" rel="external"');
+								}
+								else {
+									if ($this->site == 'mggs') {
+										$this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.mggs.vic.edu.au" rel="external"');
+									}
+									else {
+										if ($this->site == 'bialik') {
+											$this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.bialik.vic.edu.au/exchange" rel="external"');
+										}
+										else {
+											if ($this->site == 'jpc') {
+												$this->setVar('WEBMAIL_LOCATION', 'href="http://jpcmail.jpcvictoria.catholic.edu.au/owa" rel="external"');
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 
-           $this->parse('wm_tab','webmail_tab');
-           }
-           else
-           {
-               $this->setVar('wm_tab', '');
-           }
+			$this->parse('wm_tab', 'webmail_tab');
+		}
+		else
+		{
+			$this->setVar('wm_tab', '');
+		}
 
-           //custom code for each site is performed here
-           if($this->site == 'wenona')
-           {
+		//custom code for each site is performed here
+		if ($this->site == 'wenona') {
 			require_once WEB_root . '/include/wenona.php';
-               //provide encoded login details for intranet
-               $this->setVar("ENC_LOGIN", urlencode(base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'].' '.$_SESSION['password'].' '.date('Y m d H i')))));
+			//provide encoded login details for intranet
+			$this->setVar("ENC_LOGIN", urlencode(base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'] . ' ' . $_SESSION['password'] . ' ' . date('Y m d H i')))));
 
-               $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
-               if($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) {
-                   $this->parse('mf_tab', 'myfiles_tab');
-               }
-               else {
-                   $this->setVar('mf_tab', '');
-               }
-           }
-           if($this->site == 'shore') {
-               $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
-               if($this->groupHandler->isStaff()) {
-                   if(strpos(Session::getIP(),'192.168.') === FALSE)
-                           $this->setVar('MYFILES_LOCATION', 'https://mail.shore.nsw.edu.au/fileway');
-                   else
-                           $this->setVar('MYFILES_LOCATION', 'http://shorexch01/fileway');
+			$this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
+			if ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) {
+				$this->parse('mf_tab', 'myfiles_tab');
+			}
+			else {
+				$this->setVar('mf_tab', '');
+			}
+		}
+		if ($this->site == 'shore') {
+			$this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
+			if ($this->groupHandler->isStaff()) {
+				if (strpos(Session::getIP(), '192.168.') === FALSE) {
+					$this->setVar('MYFILES_LOCATION', 'https://mail.shore.nsw.edu.au/fileway');
+				}
+				else
+				{
+					$this->setVar('MYFILES_LOCATION', 'http://shorexch01/fileway');
+				}
 
-                   $this->parse('mf_tab', 'myfiles_tab');
-               }
-               else if($this->groupHandler->isStudent()) {
-                   if(strpos(Session::getIP(),'192.168.') === FALSE)
-                           $this->setVar('MYFILES_LOCATION', 'https://mail.student.shore.nsw.edu.au/fileway');
-                   else
-                           $this->setVar('MYFILES_LOCATION', 'http://cassandra/fileway');
+				$this->parse('mf_tab', 'myfiles_tab');
+			}
+			else {
+				if ($this->groupHandler->isStudent()) {
+					if (strpos(Session::getIP(), '192.168.') === FALSE) {
+						$this->setVar('MYFILES_LOCATION', 'https://mail.student.shore.nsw.edu.au/fileway');
+					}
+					else
+					{
+						$this->setVar('MYFILES_LOCATION', 'http://cassandra/fileway');
+					}
 
-                   $this->parse('mf_tab', 'myfiles_tab');
-               }
-               else {
-                   $this->setVar('MYFILES_LOCATION', '#');
-                   $this->setVar('mf_tab', '');
-               }
-
-
-               /* Remove these links if parent logged in:
-                * Webmail, Resources
-                */
-               if ($this->groupHandler->isParent()) {
-                   $this->setVar('wm_tab', '');
-
-                   $this->setBlock('tabTpl', 'resource_tab', 'res_tab');
-                   $this->setVar('res_tab', '');
-
-                   $this->setBlock('bannerTpl', 'user_name', 'usr_name');
-                   $this->setVar('usr_name', '');
-
-               }
+					$this->parse('mf_tab', 'myfiles_tab');
+				}
+				else {
+					$this->setVar('MYFILES_LOCATION', '#');
+					$this->setVar('mf_tab', '');
+				}
+			}
 
 
-           }
-           if($this->site == 'cathedral') {
-               $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
-               if($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) {
-                   $this->parse('mf_tab', 'myfiles_tab');
-               }
-               else {
-                   $this->setVar('mf_tab', '');
-               }
-           }
+			/* Remove these links if parent logged in:
+							* Webmail, Resources
+							*/
+			if ($this->groupHandler->isParent()) {
+				$this->setVar('wm_tab', '');
 
-           /* Check if eportfolio tab should be enabled
-            */
-           $this->setBlock('tabTpl', 'eportfolio_tab', 'ep_tab');
+				$this->setBlock('tabTpl', 'resource_tab', 'res_tab');
+				$this->setVar('res_tab', '');
 
-           if ($_SESSION['eportfolio_enabled']) {
-               $this->parse('ep_tab', 'eportfolio_tab');
-               $this->setVar('EPORTFOLIO_USER_ID', $_SESSION['id']);
-           }
-           else {
-               $this->setVar('ep_tab', '');
-           }
+				$this->setBlock('bannerTpl', 'user_name', 'usr_name');
+				$this->setVar('usr_name', '');
 
-           // choose tab to highlight
-           $output = array('TAB_MAIN_ON'		=> '',
-                           'TAB_NEWS_ON'		=> '',
-                           'TAB_WEBMAIL_ON'	=> '',
-                           'TAB_CALENDAR_ON'	=> '',
-                           'TAB_TIMETABLE_ON'	=> '',
-                           'TAB_RESOURCES_ON'	=> '',
-                           'TAB_MYFILES_ON'	=> '',
-                           'TAB_PORTFOLIO_ON'	=> '',
-                           'TAB_EPORTFOLIO_ON'	=> '',
-                           'TAB_' . strtoupper($this->currentTab) . '_ON'	=> ' navthis',
-                           );
+			}
 
-           $this->setVar($output);
-       }
 
-       function renderGroupList() {
-           //this section handle mygroups section in the template
-           $this->setBlock("navTpl", "mgroup", "mgroup_section");
-           $this->setBlock("mgroup", "mgroup_block", "my_groups");
+		}
+		if ($this->site == 'cathedral') {
+			$this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
+			if ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) {
+				$this->parse('mf_tab', 'myfiles_tab');
+			}
+			else {
+				$this->setVar('mf_tab', '');
+			}
+		}
 
-           $query = "SELECT category.name, userAccess.sid, userAccess.type
+		/* Check if eportfolio tab should be enabled
+					*/
+		$this->setBlock('tabTpl', 'eportfolio_tab', 'ep_tab');
+
+		if ($_SESSION['eportfolio_enabled']) {
+			$this->parse('ep_tab', 'eportfolio_tab');
+			$this->setVar('EPORTFOLIO_USER_ID', $_SESSION['id']);
+		}
+		else {
+			$this->setVar('ep_tab', '');
+		}
+
+		// choose tab to highlight
+		$output = array('TAB_MAIN_ON' => '',
+						'TAB_NEWS_ON' => '',
+						'TAB_WEBMAIL_ON' => '',
+						'TAB_CALENDAR_ON' => '',
+						'TAB_TIMETABLE_ON' => '',
+						'TAB_RESOURCES_ON' => '',
+						'TAB_MYFILES_ON' => '',
+						'TAB_PORTFOLIO_ON' => '',
+						'TAB_EPORTFOLIO_ON' => '',
+						'TAB_' . strtoupper($this->currentTab) . '_ON' => ' navthis',
+		);
+
+		$this->setVar($output);
+	}
+
+	function renderGroupList()
+	{
+		//this section handle mygroups section in the template
+		$this->setBlock("navTpl", "mgroup", "mgroup_section");
+		$this->setBlock("mgroup", "mgroup_block", "my_groups");
+
+		$query = "SELECT category.name, userAccess.sid, userAccess.type
                      FROM userAccess, category
-                     WHERE userAccess.uid = '".$_SESSION['id']."'
+                     WHERE userAccess.uid = '" . $_SESSION['id'] . "'
                      AND userAccess.sid = category.id
                      AND userAccess.type > 0
                      AND category.template <> 0
                      ORDER BY category.name
                ";
-           $this->db->query($query);
-           if($this->db->countRows() > 0)
-           {
+		$this->db->query($query);
+		if ($this->db->countRows() > 0) {
 
-               while($group = $this->db->getNextArray())
-               {
-                       $this->setVar("MGNAME", Scrub::text($group['name']));
-                       $this->setVar("MGID", $group['sid']);
-                       $this->parse("my_groups", "mgroup_block", true);
-               }
-               $this->parse("mgroup_section", "mgroup");
-           }
-           else
-               $this->setVar("mgroup_section", "");
-       }
+			while ($group = $this->db->getNextArray())
+			{
+				$this->setVar("MGNAME", Scrub::text($group['name']));
+				$this->setVar("MGID", $group['sid']);
+				$this->parse("my_groups", "mgroup_block", true);
+			}
+			$this->parse("mgroup_section", "mgroup");
+		}
+		else
+		{
+			$this->setVar("mgroup_section", "");
+		}
+	}
 
-       function renderSubjectList() {
-           //this section handles the mysubjects section in the template
-           $this->setBlock("navTpl", "msubject", "msubject_section");
-           $this->setBlock("msubject", "msubject_block", "my_subjects");
+	function renderSubjectList()
+	{
+		//this section handles the mysubjects section in the template
+		$this->setBlock("navTpl", "msubject", "msubject_section");
+		$this->setBlock("msubject", "msubject_block", "my_subjects");
 
-           if(is_array($_SESSION['subjects']))
-           {
-               foreach($_SESSION['subjects'] as $subject)
-               {
-                   if($this->groupHandler->isStaff())
-                       $this->setVar("MSUBJECT", $subject['name']." (".$subject['code'].")");
-                   else
-                       $this->setVar("MSUBJECT", $subject['name']);
-
-                   $this->setVar("MSUBCODE", urlencode(urlencode($subject['code'])));
-                   $this->parse("my_subjects","msubject_block",true);
-               }
-               $this->parse("msubject_section","msubject");
-           }
-           else
-               $this->setVar("msubject_section", "");
-       }
-
-		function renderLinkList() {
-           $this->setBlock("navTpl", "mlink_block", "my_links");
-           $query = "SELECT url, description FROM bookmarks WHERE owner = '".$_SESSION['id']."'";
-           $this->db->query($query);
-           if($this->db->countRows() > 0){
-               while($link = $this->db->getNextArray()){
-				   $url = new Url($link['url']);
-
-                   if($url->isLocalURL()){
-                       $this->setVar("MLINK", "<a href=\"".$url->getRelativeURL()."\"><span>".Scrub::text($link['description'])."</span></a>");
-                   }
-                   else {
-                   	$this->setVar("MLINK", "<a href=\"" . $url->getBase64EncodedRedirect() . "\" target=\"_blank\"><span>".Scrub::text($link['description'])."</span></a>");
-                   }
-
-                   $this->parse("my_links", "mlink_block", true);
-               }
-           }
-           else
-               $this->setVar("my_links", "");
-       }
-
-		public function renderStudents() {
-			/* My students section
-			 */
-			$this->setBlock('navTpl', 'mstudent', 'mstudent_section');
-			$this->setBlock('mstudent', 'mstudent_block', 'my_students');
-
-			if (is_array($_SESSION['children'])) {
-				$userHandler = new User();
-
-				foreach($_SESSION['children'] as $child) {
-					$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
-					$user = $this->db->getRow($query);
-					$this->setVar("MSTUDENT_ID", $child['id']);
-					$this->setVar("MSTUDENT_NAME", $userHandler->formatName($user,'{firstname}'));
-					$this->setVar("MSTUDENT_YEAR", $user['year']==0?'K':$user['year']);
-
-					$this->parse("my_students", "mstudent_block", true);
+		if (is_array($_SESSION['subjects'])) {
+			foreach ($_SESSION['subjects'] as $subject)
+			{
+				if ($this->groupHandler->isStaff()) {
+					$this->setVar("MSUBJECT", $subject['name'] . " (" . $subject['code'] . ")");
+				}
+				else
+				{
+					$this->setVar("MSUBJECT", $subject['name']);
 				}
 
-				$this->parse("mstudent_section", "mstudent");
+				$this->setVar("MSUBCODE", urlencode(urlencode($subject['code'])));
+				$this->parse("my_subjects", "msubject_block", true);
+			}
+			$this->parse("msubject_section", "msubject");
+		}
+		else
+		{
+			$this->setVar("msubject_section", "");
+		}
+	}
+
+	function renderLinkList()
+	{
+		$this->setBlock("navTpl", "mlink_block", "my_links");
+		$query = "SELECT url, description FROM bookmarks WHERE owner = '" . $_SESSION['id'] . "'";
+		$this->db->query($query);
+		if ($this->db->countRows() > 0) {
+			while ($link = $this->db->getNextArray()) {
+				$url = new Url($link['url']);
+
+				if ($url->isLocalURL()) {
+					$this->setVar("MLINK", "<a href=\"" . $url->getRelativeURL() . "\"><span>" . Scrub::text($link['description']) . "</span></a>");
+				}
+				else {
+					$this->setVar("MLINK", "<a href=\"" . $url->getBase64EncodedRedirect() . "\" target=\"_blank\"><span>" . Scrub::text($link['description']) . "</span></a>");
+				}
+
+				$this->parse("my_links", "mlink_block", true);
+			}
+		}
+		else
+		{
+			$this->setVar("my_links", "");
+		}
+	}
+
+	public function renderStudents()
+	{
+		/* My students section
+					 */
+		$this->setBlock('navTpl', 'mstudent', 'mstudent_section');
+		$this->setBlock('mstudent', 'mstudent_block', 'my_students');
+
+		if (is_array($_SESSION['children'])) {
+			$userHandler = new User();
+
+			foreach ($_SESSION['children'] as $child) {
+				$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
+				$user = $this->db->getRow($query);
+				$this->setVar("MSTUDENT_ID", $child['id']);
+				$this->setVar("MSTUDENT_NAME", $userHandler->formatName($user, '{firstname}'));
+				$this->setVar("MSTUDENT_YEAR", $user['year'] == 0 ? 'K' : $user['year']);
+
+				$this->parse("my_students", "mstudent_block", true);
+			}
+
+			$this->parse("mstudent_section", "mstudent");
+		}
+		else {
+			$this->setVar("mstudent_section", "");
+		}
+	}
+
+	function renderScriptIncludes()
+	{
+		$this->setBlock('headerTpl', 'header_javascript', 'header_javascript_block');
+		$this->setBlock('headerTpl', 'header_css', 'header_css_block');
+
+		if (is_array($this->jscript)) {
+			foreach ($this->jscript as $scriptOutput) {
+				$this->setVar($scriptOutput);
+				$this->parse('header_javascript_block', 'header_javascript', true);
+			}
+		}
+		else
+		{
+			$this->setVar('header_javascript_block', '');
+		}
+
+		if (is_array($this->css)) {
+			foreach ($this->css as $cssOutput) {
+				$this->setVar($cssOutput);
+				$this->parse('header_css_block', 'header_css', true);
+			}
+		}
+		else
+		{
+			$this->setVar('header_css_block', '');
+		}
+
+	}
+
+
+	function setJavascript($file)
+	{
+		$this->jscript[] = array('HEADER_SCRIPT_LOCATION' => $file);
+	}
+
+	function setCSS($file, $type = 'screen')
+	{
+		$this->css[] = array('HEADER_CSS_TYPE' => $type, 'HEADER_CSS_LOCATION' => $file);
+	}
+
+	function setFile($handle, $file)
+	{
+		$this->template->setFile($handle, $this->getTemplate($file));
+
+		if ($handle == TEMPLATE_content) {
+			$this->templateFile = $file;
+			$this->setBlock($handle, "custom_head", "custom_head_block");
+			$this->setVar('custom_head_block', '');
+		}
+
+	}
+
+	function setTitle($title = '')
+	{
+		$this->setVar('TITLE', Cfg::get('title') . (!empty($title) ? ' - ' . Scrub::text($title) : ''));
+	}
+
+	function getTemplate($template)
+	{
+		if (is_file($this->templateRoot . '/' . $this->site . '/' . $template)) {
+			return $this->site . '/' . $template;
+		}
+		else {
+			if (is_file($this->templateRoot . '/core/' . $template)
+			) //change this back to "core" for the rest of the releases.
+			{
+				return 'core/' . $template;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+
+	function getVar($varname)
+	{
+		return $this->template->getVar($varname);
+	}
+
+	/**
+	 * Redirect to a specific url
+	 * conType() is accessed statically here because localRedir()
+	 * is often accessed statically itself.
+	 *
+	 * Usage - SitePage::localRedir($url)
+	 *
+	 * @static
+	 * @param  $file
+	 * @return void
+	 */
+	static public function localRedir($file)
+	{
+		header('Location: ' . SitePage::conType() . $_SERVER['HTTP_HOST'] . $file);
+		exit;
+	}
+
+	function goLoginPage($error = '', $page = '')
+	{
+		$this->setSite();
+		$this->setFile(TEMPLATE_body, 'common/login.html');
+		$this->setVar('TITLE', Cfg::get('title') . " - Login");
+
+		if ($page) {
+			$this->setVar('HIDDEN', rawurldecode($page));
+		}
+		else
+		{
+			$this->setVar('HIDDEN', $_SERVER['REQUEST_URI']);
+		}
+
+		if ($error) {
+			$this->setVar('ERROR', $error);
+		}
+		else {
+			if (!$page && $_SERVER['REQUEST_URI'] != '/login/' && $_SERVER['REQUEST_URI'] != '/') {
+				$this->setVar('ERROR', 'You are currently not logged in.  Your session has either expired or you are beginning a new session.  Please log in below to continue browsing the portal.');
+			}
+			else
+			{
+				$this->setVar('ERROR', 'To begin a new session please login with your username and password.');
+			}
+		}
+
+
+		$this->outputPage(TRUE);
+		exit;
+	}
+
+	function pageNotFound()
+	{
+		header("HTTP/1.0 404 Not Found");
+		$this->setVar(TEMPLATE_content, '');
+		$this->setFile(TEMPLATE_content, 'common/404.html');
+		$this->setTitle('Page Not Found');
+
+		$this->buildPage(FALSE);
+		$this->outputPage(TRUE);
+		exit;
+	}
+
+	function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = '')
+	{
+		$this->setBlock($template, $handle, $handle . '_block');
+		$selected = is_array($selected) ? $selected : array();
+		if (is_array($data)) {
+			foreach ($data as $row) {
+				foreach ($row as $key => $value) {
+					$mapping[$key] ? $key = $mapping[$key] : '';
+					$this->setVar($key, $value);
+					if (in_array($value, $selected)) {
+						$this->setVar($key . '_SELECTED', 'checked="checked"');
+					}
+					else
+					{
+						$this->setVar($key . '_SELECTED', '');
+					}
+				}
+				$this->parse($handle . '_block', $handle, true);
+			}
+		}
+		else
+		{
+			$this->setVar($handle . '_block', '');
+		}
+	}
+
+	function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = '')
+	{
+		$this->setBlock($template, $handle, $handle . '_block');
+		$selected = is_array($selected) ? $selected : array($selected);
+		if (is_array($data)) {
+			foreach ($data as $row) {
+				foreach ($row as $key => $value) {
+					$mapping[$key] ? $key = $mapping[$key] : '';
+					$this->setVar($key, $value);
+					if (in_array($value, $selected)) {
+						$this->setVar($key . '_SELECTED', 'selected="selected"');
+					}
+					else
+					{
+						$this->setVar($key . '_SELECTED', '');
+					}
+				}
+
+				$this->parse($handle . '_block', $handle, true);
+			}
+		}
+		else
+		{
+			$this->setVar($handle . '_block', '');
+		}
+	}
+
+	function canRead($perm)
+	{
+		return $perm >= 1 ? true : false;
+	}
+
+	function canWrite($perm)
+	{
+		return $perm >= 2 ? true : false;
+	}
+
+	//Private Functions
+
+
+	//function used to create data structure for drop down menu
+	function __insertChild($list, $element)
+	{
+		for ($i = 0; $list[$i]; $i++)
+		{
+			//if item is parent insert item
+			if ($list[$i]['id'] == $element['parent']) {
+				$list[$i]['children'][] = $element;
+				return $list;
+			}
+
+			if (is_array($list[$i]['children'])) {
+				$sublist = $this->__insertChild($list[$i]['children'], $element);
+				$list[$i]['children'] = $sublist;
+			}
+		}
+		return $list;
+	}
+
+	function __outputMenu($list, $level)
+	{
+
+		$text = "<ul>\n";
+
+		for ($i = 0; $list[$i]; $i++)
+		{
+			if ($list[$i]['target']) {
+				$target = " target={$list[$i]['target']}";
 			}
 			else {
-				$this->setVar("mstudent_section", "");
+				$target = '';
 			}
+
+			if (is_array($list[$i]['children'])) {
+				$text .= '<li class="parent"><a href="' . $list[$i]['url'] . '"' . $target . '><span>' . $list[$i]['txt'] . '</span></a>';
+				$text .= $this->__outputMenu($list[$i]['children'], ($level + 1));
+			}
+			else
+			{
+				$text .= '<li><a href="' . $list[$i]['url'] . '"' . $target . '><span>' . $list[$i]['txt'] . '</span></a>';
+			}
+
+			$text .= "</li>\n";
 		}
-
-       function renderScriptIncludes() {
-           $this->setBlock('headerTpl', 'header_javascript', 'header_javascript_block');
-           $this->setBlock('headerTpl', 'header_css', 'header_css_block');
-
-           if(is_array($this->jscript)) {
-               foreach($this->jscript as $scriptOutput) {
-                   $this->setVar($scriptOutput);
-                   $this->parse('header_javascript_block','header_javascript', true);
-               }
-           }
-           else
-               $this->setVar('header_javascript_block', '');
-
-           if(is_array($this->css)) {
-               foreach($this->css as $cssOutput) {
-                   $this->setVar($cssOutput);
-                   $this->parse('header_css_block','header_css', true);
-               }
-           }
-           else
-               $this->setVar('header_css_block', '');
-
-       }
+		$text .= "</ul>\n";
+		return $text;
+	}
 
 
-       function setJavascript($file) {
-           $this->jscript[] = array('HEADER_SCRIPT_LOCATION'=>$file);
-       }
-
-       function setCSS($file, $type='screen') {
-           $this->css[] = array('HEADER_CSS_TYPE'=>$type,'HEADER_CSS_LOCATION'=>$file);
-       }
-
-       function setFile($handle, $file) {
-           $this->template->setFile($handle, $this->getTemplate($file));
-
-           if($handle == TEMPLATE_content) {
-               $this->templateFile = $file;
-               $this->setBlock($handle, "custom_head", "custom_head_block");
-               $this->setVar('custom_head_block', '');
-           }
-
-       }
-
-       function setTitle($title = '') {
-           $this->setVar('TITLE', Cfg::get('title') . (!empty($title) ? ' - '.Scrub::text($title) : ''));
-       }
-
-       function getTemplate($template) {
-           if(is_file($this->templateRoot.'/'.$this->site.'/'.$template))
-               return $this->site.'/'.$template;
-           else if(is_file($this->templateRoot.'/core/'.$template))
-               //change this back to "core" for the rest of the releases.
-               return 'core/'.$template;
-           else
-               return false;
-       }
-
-       function getVar($varname) {
-           return $this->template->getVar($varname);
-       }
-
-		/**
-		 * Redirect to a specific url
-		 * conType() is accessed statically here because localRedir()
-		 * is often accessed statically itself.
-		 *
-		 * Usage - SitePage::localRedir($url)
-		 *
-		 * @static
-		 * @param  $file
-		 * @return void
-		 */
-		static public function localRedir($file) {
-			header('Location: ' . SitePage::conType() . $_SERVER['HTTP_HOST'] . $file);
-			exit;
-		}
-
-       function goLoginPage($error = '', $page = ''){
-           $this->setSite();
-           $this->setFile(TEMPLATE_body, 'common/login.html');
-           $this->setVar('TITLE', Cfg::get('title')." - Login");
-
-           if($page)
-               $this->setVar('HIDDEN',rawurldecode($page));
-           else
-               $this->setVar('HIDDEN',$_SERVER['REQUEST_URI']);
-
-           if($error)
-               $this->setVar('ERROR', $error);
-           else if(!$page && $_SERVER['REQUEST_URI'] != '/login/' && $_SERVER['REQUEST_URI'] != '/' )
-               $this->setVar('ERROR', 'You are currently not logged in.  Your session has either expired or you are beginning a new session.  Please log in below to continue browsing the portal.');
-           else
-               $this->setVar('ERROR', 'To begin a new session please login with your username and password.');
-
-
-           $this->outputPage(TRUE);
-           exit;
-       }
-
-       function pageNotFound() {
-           header("HTTP/1.0 404 Not Found");
-           $this->setVar(TEMPLATE_content, '');
-           $this->setFile(TEMPLATE_content, 'common/404.html');
-           $this->setTitle('Page Not Found');
-
-           $this->buildPage(FALSE);
-           $this->outputPage(TRUE);
-           exit;
-       }
-
-       function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping='') {
-           $this->setBlock($template, $handle, $handle.'_block');
-           $selected = is_array($selected) ? $selected : array();
-           if (is_array($data)) {
-               foreach($data as $row) {
-                   foreach($row as $key => $value) {
-                                           $mapping[$key]?$key=$mapping[$key]:'';
-                       $this->setVar($key, $value);
-                       if(in_array($value, $selected))
-                           $this->setVar($key.'_SELECTED', 'checked="checked"');
-                       else
-                           $this->setVar($key.'_SELECTED', '');
-                   }
-                   $this->parse($handle.'_block', $handle, true);
-               }
-           } else
-               $this->setVar($handle.'_block', '');
-       }
-
-       function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping='') {
-           $this->setBlock($template, $handle, $handle.'_block');
-           $selected = is_array($selected) ? $selected : array($selected);
-           if (is_array($data)) {
-               foreach($data as $row) {
-                   foreach($row as $key => $value) {
-                       $mapping[$key]?$key=$mapping[$key]:'';
-                       $this->setVar($key, $value);
-                       if(in_array($value, $selected))
-                           $this->setVar($key.'_SELECTED', 'selected="selected"');
-                       else
-                           $this->setVar($key.'_SELECTED', '');
-                   }
-
-                   $this->parse($handle.'_block', $handle, true);
-               }
-           } else
-               $this->setVar($handle.'_block', '');
-       }
-
-       function canRead($perm) {
-           return $perm >= 1 ? true : false;
-       }
-
-       function canWrite($perm) {
-           return $perm >= 2 ? true : false;
-       }
-
-       //Private Functions
-
-
-       //function used to create data structure for drop down menu
-       function __insertChild($list, $element)
-       {
-           for($i=0; $list[$i]; $i++)
-           {
-               //if item is parent insert item
-               if($list[$i]['id'] == $element['parent'])
-               {
-                   $list[$i]['children'][] = $element;
-                   return $list;
-               }
-
-               if(is_array($list[$i]['children']))
-               {
-                   $sublist = $this->__insertChild($list[$i]['children'], $element);
-                   $list[$i]['children'] = $sublist;
-               }
-           }
-           return $list;
-       }
-
-       function __outputMenu($list, $level)
-       {
-
-           $text = "<ul>\n";
-
-           for($i=0; $list[$i]; $i++)
-           {
-               if($list[$i]['target'])
-                   $target = " target={$list[$i]['target']}";
-               else $target = '';
-
-               if(is_array($list[$i]['children'])) {
-                   $text .= '<li class="parent"><a href="'.$list[$i]['url'].'"'.$target.'><span>'.$list[$i]['txt'].'</span></a>';
-                   $text .= $this->__outputMenu($list[$i]['children'], ($level + 1));
-               }
-               else
-                   $text .= '<li><a href="'.$list[$i]['url'].'"'.$target.'><span>'.$list[$i]['txt'].'</span></a>';
-
-               $text .= "</li>\n";
-           }
-           $text .= "</ul>\n";
-           return $text;
-       }
-
-
-   }
+}

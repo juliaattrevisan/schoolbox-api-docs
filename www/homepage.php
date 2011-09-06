@@ -6,12 +6,14 @@
  ************************************************************/
 
 // fix url
+require_once '../include/SitePage.php';
 require_once 'include/stdfuncs.php';
+
 if (strpos($_SERVER['REQUEST_URI'], ".php?category=") ||
 	strpos($_SERVER['REQUEST_URI'], ".php?code=")
 ) {
 	$category = isset($_GET['category']) ? $_GET['category'] : $_GET['code'];
-	localRedir("/homepage/" . $category);
+	SitePage::localRedir("/homepage/" . $category);
 }
 /*
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
@@ -27,12 +29,14 @@ $allowedFiles = new AllowedFile;
 if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
 	$category = $categoryHandler->getByID($this->arg[0]);
 }
+
 if (!is_array($category)) {
 	$code = implode('/', $this->arg);
 	$category = $categoryHandler->getByCode(urldecode(urldecode($code)));
 }
 
 $categoryID = $category['id'];
+
 if (!$categoryID) {
 	error(18);
 }
@@ -44,12 +48,13 @@ $categoryHandler->logPageView($categoryID);
 define('MAX_COLUMN_COUNT', 3);
 
 // check perms
-if (($permission = $groupHandler->getPermission($categoryID)) < READ_ACCESS)
+if (($permission = $groupHandler->getPermission($categoryID)) < READ_ACCESS) {
 	error(14);
+}
 
-
-if (!isset($category['template']))
-	localRedir('/resources/' . $categoryID);
+if (!isset($category['template'])) {
+	SitePage::localRedir('/resources/' . $categoryID);
+}
 
 /* This is using a 20-char field in the Category table. That's how categories
  * with many categoryCodes have their codes truncated and broken
@@ -90,21 +95,22 @@ $output = array(
 	'HEADING' => Scrub::text($category['name']) . (isset($code) && $codeCount < 2 ? ' (' . $code . ')' : ''),
 	'CODE' => urlencode(urlencode($code)),
 	'ID' => $categoryID,
-	//'TEMPLATE'				=> 'template'.$category['template'],
 );
 
 $this->setVar($output);
 
-if ($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
+/* has elevated priviliges, can write to page
+ */
+if ($permission >= WRITE_ACCESS) {
 	$this->setBlock('customise_page', 'homepage_component_tab', 'homepage_component_tab_block');
 	$this->setBlock('customise_page', 'homepage_component_page', 'homepage_component_page_block');
 	$this->setBlock('homepage_component_page', 'homepage_component', 'homepage_component_block');
-
 	$this->parse('edit_page_block', 'edit_page');
 	$this->parse('modify_layout_block', 'modify_layout');
 	$this->parse('customise_page_block', 'customise_page');
 
-	/* Output components and component tabs */
+	/* Output components and component tabs
+	 */
 	$componentList = $homepageHandler->getComponentList();
 
 	if (is_array($componentList)) {
@@ -118,6 +124,7 @@ if ($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
 			if ($component['allowMultiple'] == 'false' && $component['componentCount'] > 0) {
 				$class = 'disabled ';
 			}
+
 			if ($component['allowMultiple'] == 'false') {
 				$class .= 'one-only';
 			}
@@ -141,21 +148,24 @@ if ($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
 				$this->setVar('homepage_component_block', '');
 				$this->parse('homepage_component_block', 'homepage_component', true);
 
-				/* last rotation */
+				/* last rotation
+				 */
 				if ($total == $i) {
 					$this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component['categoryID']);
 					$this->parse('homepage_component_page_block', 'homepage_component_page', true);
 				}
-
-			}
-			else if ($total == $i) {
-				/* last rotation */
-				$this->parse('homepage_component_block', 'homepage_component', true);
-				$this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component['categoryID']);
-				$this->parse('homepage_component_page_block', 'homepage_component_page', true);
 			}
 			else {
-				$this->parse('homepage_component_block', 'homepage_component', true);
+				if ($total == $i) {
+					/* last rotation
+					 */
+					$this->parse('homepage_component_block', 'homepage_component', true);
+					$this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component['categoryID']);
+					$this->parse('homepage_component_page_block', 'homepage_component_page', true);
+				}
+				else {
+					$this->parse('homepage_component_block', 'homepage_component', true);
+				}
 			}
 
 			$previous = $component;
@@ -212,12 +222,12 @@ if ($permission >= WRITE_ACCESS) { //has elevated priviliges, can write to page
 	 */
 	$template = $homepageHandler->getTemplate();
 	for ($x = 1; $x <= 4; $x++) {
-		$output = array("CURRENT_TEMPLATE_$x" => $template == $x ? 'current' : '',
+		$output = array(
+			"CURRENT_TEMPLATE_$x" => $template == $x ? 'current' : '',
 		);
+
 		$this->setVar($output);
 	}
-
-
 }
 else {
 	$this->setVar('edit_page_block', '');
@@ -225,21 +235,23 @@ else {
 	$this->setVar('customise_page_block', '');
 }
 
-
 $colours = $homepageHandler->getColorList();
 $this->setVar($colours);
 
 // output mime classes
 $allowedList = $allowedFiles->getAll();
+
 if (is_array($allowedList)) {
 
 	// append link icon to resutls
 	$allowedList[]['iconFile'] = "link.png";
 	$last = '';
+
 	foreach ($allowedList as $allowed) {
 		if ($last != $allowed["iconFile"]) {
-			$output = array("NAME" => $allowedFiles->getClass($allowed["iconFile"]),
-							"ICON" => $allowed["iconFile"],
+			$output = array(
+				"NAME" => $allowedFiles->getClass($allowed["iconFile"]),
+				"ICON" => $allowed["iconFile"],
 			);
 
 			$this->setVar($output);
@@ -248,26 +260,27 @@ if (is_array($allowedList)) {
 			$last = $allowed["iconFile"];
 		}
 	}
-} else
+}
+else {
 	$this->setVar('allowed_files_block', '');
+}
 
 // output components
 $componentList = $categoryHandler->getComponents($categoryID);
+
 if (is_array($componentList)) {
-
 	foreach ($componentList as $component) {
-
 		$componentHandle = $component['method'] . $component['homepageComponentLocationID'];
 
 		//Check template exists, skip component if it doesnt
-		if (!$this->getTemplate('homepage/components/' . $component['filename']))
+		if (!$this->getTemplate('homepage/components/' . $component['filename'])) {
 			continue;
-
+		}
 
 		/* This array provides default sorting capabilities for each component
-			   * in the homepage. They can be overridden in each of the output?.php
-			   * homepage component files, to use their own sorting fields.
-			   */
+		 * in the homepage. They can be overridden in each of the output?.php
+		 * homepage component files, to use their own sorting fields.
+		 */
 		$sortOptions = array('Name', 'Date');
 
 		$this->setFile($componentHandle, 'homepage/components/' . $component['filename']);
@@ -279,33 +292,33 @@ if (is_array($componentList)) {
 		$default = unserialize($component['dfconfig']);
 		$config = unserialize($component['config']);
 
-		if (is_file($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php'))
+		if (is_file($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php')) {
 			include($_SERVER['DOCUMENT_ROOT'] . '/homepage/' . $component['method'] . '.php');
+		}
 
 		if ($permission >= WRITE_ACCESS) {
 			if (is_array($default)) {
-
 				foreach ($default as $name => $value) {
-
 					switch ($name) {
-
 						case "size":
 							$this->setBlock("config", "size", "size_block" . $component['homepageComponentLocationID']);
+
 							for ($i = 0; $i <= 10; $i++) {
 								$this->setVar('COMPONENT_CONFIG_SIZE_NAME', $i == 0 ? 'All' : $i);
 								$this->setVar('COMPONENT_CONFIG_SIZE_VALUE', $i);
 								$this->setVar('COMPONENT_CONFIG_SIZE_SELECTED', $i == $config[$name] ? ' selected="selected"' : '');
 								$this->parse("size_block" . $component['homepageComponentLocationID'], "size", true);
 							}
+
 							break;
 
 						case "image":
 							$this->setBlock("config", "image", "image_block" . $component['homepageComponentLocationID']);
 
 							$imageList = $categoryHandler->getImages($categoryID);
+
 							if (is_array($imageList)) {
 								foreach ($imageList as $image) {
-
 									$this->setVar('COMPONENT_CONFIG_IMAGE', $image['description']);
 									$this->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', $image['description'] == $config[$name] ? ' selected="selected"' : '');
 									$this->parse("image_block" . $component['homepageComponentLocationID'], "image", true);
@@ -316,35 +329,37 @@ if (is_array($componentList)) {
 						case "sort":
 							$this->setBlock("config", "sort", "sort_block" . $component['homepageComponentLocationID']);
 
-							foreach ($sortOptions as $sort)
-							{
+							foreach ($sortOptions as $sort) {
 								$this->setVar('COMPONENT_CONFIG_SORT_NAME', $sort);
 								$this->setVar('COMPONENT_CONFIG_SORT_VALUE', $sort);
 								$this->setVar('COMPONENT_CONFIG_SORT_SELECTED', $sort == $config[$name] ? ' selected="selected"' : '');
 								$this->parse("sort_block" . $component['homepageComponentLocationID'], "sort", true);
 							}
+
 							break;
 
 						case "sortdir":
 							$this->setBlock("config", "sortdir", "sortdir_block" . $component['homepageComponentLocationID']);
 							$sortOptions = array('Asc', 'Desc');
-							foreach ($sortOptions as $sort)
-							{
+
+							foreach ($sortOptions as $sort) {
 								$this->setVar('COMPONENT_CONFIG_SORTDIR_NAME', $sort);
 								$this->setVar('COMPONENT_CONFIG_SORTDIR_VALUE', $sort);
 								$this->setVar('COMPONENT_CONFIG_SORTDIR_SELECTED', $sort == $config[$name] ? ' selected="selected"' : '');
 								$this->parse("sortdir_block" . $component['homepageComponentLocationID'], "sortdir", true);
 							}
+
 							break;
 						default:
 							$this->setVar('COMPONENT_CONFIG_' . strtoupper($name), $config[$name]);
 					}
 				}
-
 			}
 			$this->parse("config_block", "config");
-		} else
+		}
+		else {
 			$this->setVar("config_block", "");
+		}
 
 		if ($componentHandle) {
 			$this->parse('COLUMN' . $component['column'], $componentHandle, true);
@@ -355,9 +370,7 @@ if (is_array($componentList)) {
 
 //set any columns with nothing in them to null
 for ($i = 1; $i <= MAX_COLUMN_COUNT; $i++) {
-	if (!$columnFlag[$i])
+	if (!$columnFlag[$i]) {
 		$this->setVar('COLUMN' . $i, '');
+	}
 }
-
-
-?>

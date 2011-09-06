@@ -6,6 +6,7 @@
 ************************************************************/
 //absentee system, interfaces with synergetic database to
 
+require_once("include/SitePage.php");
 require_once("include/session.php");
 require_once("include/include.php");
 require_once("include/permission.php");
@@ -20,16 +21,16 @@ if(isStudent($_SESSION['gid']))
 if ($_SESSION['campus'][0] == 3)
 {
 	//grimwade uses absentees system in synergy
-	localRedir("/absentees/absentees.php");
+	SitePage::localRedir("/absentees/absentees.php");
 }
-else 
+else
 {
 	//senior school uses attendances system in synergy
 	if ($_GET['code'] && isset($_GET['code'])){
 		$code = $_GET['code'];
-		localRedir("/absentees/attendances.php?code=$code");
+		SitePage::localRedir("/absentees/attendances.php?code=$code");
 	}
 	else{
-		localRedir("/absentees/attendances.php");
+		SitePage::localRedir("/absentees/attendances.php");
 	}
 }

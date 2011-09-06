@@ -4,12 +4,12 @@
 *         Copyright (c) 2002-2003 Lektec Consulting         *
 *                                                           *
 ************************************************************/
-require_once 'include/stdfuncs.php';
+require_once '../include/SitePage.php';
 require_once '../library/group.php';
 $groupHandler = new Group;
 
 if (strpos($_SERVER['REQUEST_URI'], 'home.php'))
-	localRedir('/home');
+	SitePage::localRedir('/home');
 
 //displays list of files either by search or during browsing.
 $this->setFile(TEMPLATE_content, 'home.html');
@@ -59,4 +59,3 @@ else {
     $this->parse('greeting_name_block', 'greeting_name');
 }
 
-?>
