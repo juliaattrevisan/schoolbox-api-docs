@@ -1,5 +1,6 @@
 <?php
 
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/news.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
