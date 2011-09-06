@@ -119,7 +119,7 @@ else if (is_numeric($_GET['toggleLock'])) {
 	/* forum exists
 	 */
 	if (!$forumHandler->hasForum($thread['categoryID'])) {
-		localRedir('/homepage/' . $thread['categoryID']);
+		SitePage::localRedir('/homepage/' . $thread['categoryID']);
 	}
 
 	/* check permissions
@@ -149,7 +149,7 @@ else if (is_numeric($_GET['deleteThread'])) {
 	/* forum exists
 	 */
 	if (!$forumHandler->hasForum($thread['categoryID'])) {
-		localRedir('/homepage/' . $thread['categoryID']);
+		SitePage::localRedir('/homepage/' . $thread['categoryID']);
 	}
 
 	/* check permissions

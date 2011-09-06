@@ -21,11 +21,3 @@ function error($ec, $message="") {
 		$page->error($ec, $message);
 	}
 }
-
-//Function for redirecting to a specified file
-function localRedir($file) {
-		require_once dirname(__FILE__) . '/../../include/SitePage.php';
-        $contype = SitePage::conType();
-        header("Location: ".$contype.$_SERVER['HTTP_HOST'].$file);
-        exit;
-}
