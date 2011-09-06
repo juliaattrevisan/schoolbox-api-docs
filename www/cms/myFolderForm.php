@@ -1,64 +1,69 @@
 <?php
-
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-$page = new SitePage;
 
+$page = new SitePage();
 
 if (Cfg::get('webdav_enable')) {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 	$folderHandler = PortfolioWebDAV::factory();
-	
-} else {
+}
+else {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
-	$folderHandler = new MyFolder;
+	$folderHandler = new MyFolder();
 }
 
-
 if (isset($_POST['name'])) {
+	$folder = array(
+		'parent' => $_POST['parent'],
+		'name' => $_POST['name'],
+	);
 
-	$folder = array('parent'	=> $_POST['parent'],
-				    'name'		=> $_POST['name'],
-				    );
-				  
 	if (is_numeric($_POST['folderID'])) {
-		// check user owns folder
+		/* check user owns folder
+		 */
 		$current = $folderHandler->getByID($_POST['folderID']);
-		if ($current['owner'] != $_SESSION['id'])
+
+		if ($current['owner'] != $_SESSION['id']) {
 			$page->error(47);
-			
-	
+		}
+
 		$folder['id'] = $_POST['folderID'];
 		$folderHandler->update($folder);
-	} else
+	}
+	else
+	{
 		$folder['id'] = $folderHandler->create($folder);
-		
-	localRedir('/cms/portfolio/' . $folder['id']);
+	}
+
+	SitePage::localRedir('/cms/portfolio/' . $folder['id']);
 }
 elseif (is_numeric($_GET['delete'])) {
 
-	if(!$folder = $folderHandler->getByID($_GET['delete']))
+	if (!$folder = $folderHandler->getByID($_GET['delete'])) {
 		error(2);
-		
-	if ($folder['owner'] != $_SESSION['id'])
+	}
+
+	if ($folder['owner'] != $_SESSION['id']) {
 		$page->error(48);
-			
+	}
+
 	$folderHandler->delete($_GET['delete']);
-	
-	localRedir('/cms/portfolio/' . $folder['parent']);
-		
+
+	SitePage::localRedir('/cms/portfolio/' . $folder['parent']);
 }
 elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
 	/* Move file from one category to another, after checking permission on both from and to categories */
-	if($_POST['move'] == $_POST['categoryID'] || !$folder = $folderHandler->getByID($_POST['move']))
+	if ($_POST['move'] == $_POST['categoryID'] || !$folder = $folderHandler->getByID($_POST['move'])) {
 		echo "Failed";
+	}
 
-	if ($folder['owner'] != $_SESSION['id'])
+	if ($folder['owner'] != $_SESSION['id']) {
 		echo "Insufficient permssions";
-	
-	$folderHandler->update(array('id'=>$_POST['move'], 'parent'=>$_POST['categoryID']));
+	}
+
+	$folderHandler->update(array('id' => $_POST['move'], 'parent' => $_POST['categoryID']));
 }
 elseif (is_numeric($_POST['portfolioID'])) {
 	$_SESSION['portfolioID'] = $_POST['portfolioID'];
 }
 
-?>

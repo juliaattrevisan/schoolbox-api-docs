@@ -3,14 +3,14 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
-$page = new SitePage;
-$categoryHandler = new Category;
-$groupHandler = new Group;
+$page = new SitePage();
+$categoryHandler = new Category();
+$groupHandler = new Group();
 
 if ($_POST['name']) {
+
 	/* scrubTEXT($_POST['group']): This keeps throwing a warning, is this used anywhere?
 	 */
-
 	$category = array(
 		'name' => Scrub::text($_POST['name']),
 		'parent' => Scrub::text($_POST['parent']),
@@ -40,14 +40,14 @@ if ($_POST['name']) {
 		$groupHandler->createGroup($category['id']);
 		$groupHandler->addUser($category['id'], $_SESSION['id'], 3);
 
-		localRedir('/group/modify/'.$category['id']);
+		SitePage::localRedir('/group/modify/'.$category['id']);
 	}
 	else {
 		/* Redirect to / if the homepage was removed from a category
 		 * Otherwise go back to the category
 		 */
 		if ($_POST['template'] == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
-			localRedir('/resources/' . $category['id']);
+			SitePage::localRedir('/resources/' . $category['id']);
 		}
 		else {
 			$page->backToTheFuture(2);
@@ -95,4 +95,4 @@ else if (is_numeric($_GET['deleteAll'])) {
 else {
 	error(2);
 }
-?>
+

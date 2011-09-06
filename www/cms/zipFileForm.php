@@ -41,11 +41,11 @@ if ($groupHandler->isSuperuser()) {
 		$page->setFile(TEMPLATE_content, 'cms/zipFileError.html');
 		$page->setBlock(TEMPLATE_content, 'error', 'error_block');
 
-		foreach($allErrors as $currentError) {
+		foreach ($allErrors as $currentError) {
 			$page->setVar(array(
-				'FILENAME' => $currentError['file'],
-				'MESSAGE' => $currentError['message'],
-			));
+							   'FILENAME' => $currentError['file'],
+							   'MESSAGE' => $currentError['message'],
+						  ));
 
 			$page->parse('error_block', 'error', true);
 		}
@@ -53,10 +53,9 @@ if ($groupHandler->isSuperuser()) {
 		$page->outputPage();
 	}
 	else {
-		localRedir('/resources');
+		SitePage::localRedir('/resources');
 	}
 }
 else {
 	error(19);
 }
-?>

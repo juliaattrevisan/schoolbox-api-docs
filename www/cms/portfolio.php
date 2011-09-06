@@ -29,7 +29,7 @@ $allowedFiles = new AllowedFile;
 
 if (isset($this->arg[0])) {
 	$_SESSION['portfolioID'] = $this->arg[0];
-	localRedir('/cms/portfolio/');
+	SitePage::localRedir('/cms/portfolio/');
 } else
 	$openFolder = $_SESSION['portfolioID'];
 
