@@ -2,6 +2,8 @@
 require_once SITE_root . '/library/file.php';
 
 $this->setBlock($componentHandle, 'image', 'image_block');
+$this->setBlock('config', 'caption_state', 'caption_state_block');
+$this->setBlock($componentHandle, 'show_caption', 'show_caption_block');
 
 /* Make sure there a config option
  */
@@ -20,6 +22,16 @@ $fileHandler = new File;
 $allFiles = $fileHandler->getAllInCategory($categoryID, array('filter' => array('image')));
 
 if (is_array($allFiles)) {
+	foreach (array('Active', 'Inactive') as $state) {
+		$this->setVar(array(
+			'COMPONENT_CONFIG_CAPTION_STATE_NAME' => $state,
+			'COMPONENT_CONFIG_CAPTION_STATE_VALUE' => $state,
+			'COMPONENT_CONFIG_CAPTION_STATE_SELECTED' => $state == $config['captionState'] ? ' selected="selected"' : ''
+		));
+
+		$this->parse("caption_state_block", "caption_state", true);
+	}
+
 	foreach ($allFiles as $currentFile) {
 		$this->setVar(array(
 			'IMAGE_ID' => $currentFile['id'],
@@ -42,4 +54,11 @@ if ($permission < WRITE_ACCESS) {
 }
 else {
 	$this->parse('submit_image_block', 'submit_image');
+}
+
+if ($config['captionState'] == 'Active') {
+	$this->parse('show_caption_block', 'show_caption');
+}
+else {
+	$this->setVar('show_caption_block', '');
 }
