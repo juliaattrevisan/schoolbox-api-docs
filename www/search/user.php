@@ -119,8 +119,8 @@ if (is_numeric($this->arg[0])) {
 			if ($parent['DirectoryIncludeFlag']) {
 				$output = array(
                     'NAME' => Scrub::text($parent['Title'].' '.$parent['Preferred'].' '.$parent['Surname']),
-					'HOME_PHONE'	=> $parent['SilentPhoneFlag']?$parent['HomePhone']:'',
-					'MOBILE_PHONE'  => $parent['MobilePhone'],
+					'HOME_PHONE' => $parent['SilentPhoneFlag']?$parent['HomePhone']:'',
+					'MOBILE_PHONE' => $parent['MobilePhone'],
 				);
 
 				$this->setVar($output);
@@ -128,9 +128,9 @@ if (is_numeric($this->arg[0])) {
 				if ($parent['SpouseDirectoryIncludeFlag'] && $parent['SpouseSurname'] ) {
 					$output = array(
 
-						'SPOUSE_NAME' =>  Scrub::text($parent['SpouseTitle'].' '.$parent['SpousePreferred'].' '.$parent['SpouseSurname']),
+						'SPOUSE_NAME' => Scrub::text($parent['SpouseTitle'].' '.$parent['SpousePreferred'].' '.$parent['SpouseSurname']),
 						'SPOUSE_MOBILE' => $parent['SpouseMobilePhone'],
-						'SPOUSE_EMAIL'=> '<a href="'.$_SESSION['mailhandle'].$parent['SpouseEmail'].'\">'.$parent['SpouseEmail'].'</a>',
+						'SPOUSE_EMAIL' => '<a href="'.$_SESSION['mailhandle'].$parent['SpouseEmail'].'\">'.$parent['SpouseEmail'].'</a>',
 					);
 
 					$this->setVar($output);
@@ -216,6 +216,7 @@ if (is_numeric($this->arg[0])) {
 				'EMERGENCY_ALT_PHONE' =>Scrub::text($synInfo['StudentEmergencyPhoneAlt']),
 				'MEDICAL_NOTE' => Scrub::text($synInfo['StudentMedicalAlert']),
 				'CONTACT_ALERT_MESSAGE' => Scrub::text($synInfo['AlertMessage']),
+				'STUDENT_TYPE' => Scrub::text($synInfo['StudentBoarder']),
 			);
 
 			$this->setVar($output);

@@ -292,11 +292,11 @@ class Bulk {
 					}
 
 					$newCat = array(
-						'name'		=> $category[1],
-						'parent'	=> $category[0],
-						'template'	=> $templateID,
-						'group'		=> $groups,
-						'code'		=> implode(',', $code),
+						'name' => $category[1],
+						'parent' => $category[0],
+						'template' => $templateID,
+						'group' => $groups,
+						'code' => implode(',', $code),
 					);
 
 					/* Successfully created
@@ -315,7 +315,12 @@ class Bulk {
 		return $output;
 	}
 
-
+	/**
+	 * Wrapper for uploading a calendar file which could be in either format
+	 *
+	 * @param  $file
+	 * @return array
+	 */
 	public function addCalendar($file) {
 		if (stristr(file_get_contents($file, NULL, NULL, 0, 20), 'BEGIN:VCALENDAR')) {
 			return $this->addVCalCalendar($file);
@@ -379,17 +384,18 @@ class Bulk {
 
 				if ((trim($thisRow[0]) != '') && (trim($thisRow[3]) != '')) {
 					$event = array(
-						'owner'			=> $uid,
-						'access'		=> 3,
-						'date'			=> $date->getDatabase(),
-						'startTime'		=> Scrub::html($thisRow[1]),
-						'endTime'		=> Scrub::html($thisRow[2]),
-						'note'			=> Scrub::html($thisRow[3]),
-						'detail'		=> Scrub::html($thisRow[4]),
-						'priority'		=> Scrub::html($thisRow[5]),
-						'type'			=> Scrub::html($thisRow[6]),
-						'campusList'	=> $campusList,
-						'groupList'		=> $groupList,
+						'owner' => $uid,
+						'access' => 3,
+						'date' => $date->getDatabase(),
+						'startTime' => Scrub::html($thisRow[1]),
+						'endTime' => Scrub::html($thisRow[2]),
+						'note' => Scrub::html($thisRow[3]),
+						'detail' => Scrub::html($thisRow[4]),
+						'location' => Scrub::html($thisRow[5]),
+						'priority' => Scrub::html($thisRow[6]),
+						'type' => Scrub::html($thisRow[7]),
+						'campusList' => $campusList,
+						'groupList' => $groupList,
 					);
 
 					if ($calendarHandler->create($event)) {
@@ -542,4 +548,3 @@ class Bulk {
 	}
 }
 
-?>

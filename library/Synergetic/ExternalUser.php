@@ -69,23 +69,29 @@ class ExternalUser extends MSSQL{
         return $this->getRow($query);
     }
 
-	function getStudent($synID)
-	{
-			$query = "
-			SELECT	vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname, vStudents.StudentBirthDate,
+	/**
+	 * Get a guy's info from Synergetic
+	 *
+	 * @param  $synID
+	 * @return array|bool
+	 */
+	public function getStudent($synID) {
+		$query = "SELECT
+					vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname, vStudents.StudentBirthDate,
 					vStudents.StudentTutorName, vStudents.StudentHeadOfHouse, vStudents.StudentFormStaffName, vStudents.StudentTutorDescription,
 					luForm.ID as TeacherFormID, vStudents.StudentForm, luTutor.ID as TeacherTutorID, vStudents.StudentTutor, luForm.Description as FormDescription,
 					vStudents.StudentHouseDescription, vStudents.StudentHouse, vStudents.StudentYearLevel, vStudents.StudentLockerBook,
-					vStudents.StudentEmergencyName, vStudents.StudentEmergencyPhone, vStudents.StudentEmergencyPhoneAlt, vStudents.StudentMedicalAlert,vStudents.StudentSpecialNeedsFlag, AlertMessage
+					vStudents.StudentEmergencyName, vStudents.StudentEmergencyPhone, vStudents.StudentEmergencyPhoneAlt, vStudents.StudentMedicalAlert,vStudents.StudentSpecialNeedsFlag, AlertMessage,
+					vStudents.StudentBoarder
                     FROM SynergyOne.dbo.vStudents vStudents
                     LEFT JOIN CommunityAlerts ON CommunityAlerts.ID = StudentID
 					LEFT JOIN SynergyOne.dbo.luForm ON vStudents.StudentForm=luForm.Code
 					LEFT JOIN SynergyOne.dbo.luTutor ON vStudents.StudentTutor=luTutor.Code
-			WHERE
-				vStudents.StudentID = $synID
-				AND vStudents.FileSemester=".$_SESSION['FileSemester']."
-				AND vStudents.FileYear=".$_SESSION[ 'FileYear']."
-				";
+				WHERE
+					vStudents.StudentID = $synID
+					AND vStudents.FileSemester=".$_SESSION['FileSemester']."
+					AND vStudents.FileYear=".$_SESSION[ 'FileYear']."
+		";
 
 		$student = $this->getRow($query);
 

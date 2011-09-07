@@ -49,3 +49,15 @@ ALTER TABLE eportfolio_config ADD COLUMN left_column_width FLOAT DEFAULT 49.5 AF
 /* Podcast update
  */
 UPDATE homepage_comp SET description = "Subscribe to an audio-only podcast." WHERE method = 'outputPodcast';
+
+/* Day/Boarder status for each user
+ */
+-- ALTER TABLE USER ADD COLUMN student_type ENUM('D', 'B') NOT NULL DEFAULT 'D';
+--
+-- CREATE TABLE student_type (
+-- 	id VARCHAR(255) NOT NULL DEFAULT 'D',
+-- 	`name` VARCHAR(255),
+-- 	PRIMARY KEY(id)
+-- );
+--
+-- INSERT INTO student_type (id, `name`) VALUES ('D', 'Day'), ('B', 'Boarder');
