@@ -1,5 +1,7 @@
 <?php
 /**
+ * Url
+ *
  * Formats urls into more meaningful stuff
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -9,9 +11,18 @@
  */
 class Url {
 	private $url = '';
+	private $useCfg = false;
 
-	public function __construct($url) {
+	public function __construct($url, $useCfg = false) {
 		$this->setUrl(trim($url));
+
+		$this->setUseCfg($useCfg);
+
+		if ($this->getUseCfg()) {
+			$this->setSiteHostname(Cfg::get('site_hostname'));
+			$this->setSiteDomain(Cfg::get('site_domain'));
+			$this->setServerHost($_SERVER['HTTP_HOST']);
+		}
 	}
 
 	/**
@@ -57,9 +68,9 @@ class Url {
 	 * @return int
 	 */
 	public function isLocalURL() {
-		list($hostname, $domain) = explode('.',$_SERVER['HTTP_HOST'], 2);
+		list($hostname, $domain) = explode('.', $this->getServerHost(), 2);
 
-		$pattern = '#^(http(s)?://)('.$hostname.')|('.$_SERVER['HTTP_HOST'].')|('.Cfg::get('site_hostname').'(.'.Cfg::get('site_domain').'))/(.*)?#i';
+		$pattern = '#^(http(s)?://)('.$hostname.')|('.$this->getServerHost().')|('.$this->getSiteHostname().'(.'.$this->getSiteDomain().'))/(.*)?#i';
 
 		return preg_match($pattern, $this->getUrl());
 	}
@@ -71,18 +82,18 @@ class Url {
 	 * @return mixed
 	 */
 	public function getRelativeURL() {
-		list($hostname, $domain) = explode('.',$_SERVER['HTTP_HOST'],2);
+		list($hostname, $domain) = explode('.',$this->getServerHost(),2);
 
 		/* Takes into account subdomain name e.g. ilearn/ and ilearn.joeys
 		 * (that originally caused the issue with links not being correct)
 		 */
 		$hosts = array(
-			'http://' . Cfg::get('site_hostname') . '.' . Cfg::get('site_domain'),
-			'https://' . Cfg::get('site_hostname'). '.' . Cfg::get('site_domain'),
-			'http://' . $_SERVER['HTTP_HOST'],
-			'https://' . $_SERVER['HTTP_HOST'],
-			'http://' . Cfg::get('site_hostname'),
-			'https://' . Cfg::get('site_hostname'),
+			'http://' . $this->getSiteHostname() . '.' . $this->getSiteDomain(),
+			'https://' . $this->getSiteHostname() . '.' . $this->getSiteDomain(),
+			'http://' . $this->getServerHost(),
+			'https://' . $this->getServerHost(),
+			'http://' . $this->getSiteHostname(),
+			'https://' . $this->getSiteHostname(),
 		);
 
 		return str_replace($hosts, '', $this->getUrl());
@@ -95,6 +106,26 @@ class Url {
 	 */
 	public function getBase64EncodedRedirect() {
 		return '/redir.php?url=' . base64_encode($this->getUrl());
+	}
+
+	/**
+	 * Set useCfg. This determines whether to use the Cfg object, or
+	 * alternatively whatever input params you want
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	public function setUseCfg($val) {
+		$this->useCfg = $val;
+	}
+
+	/**
+	 * Get useCfg
+	 *
+	 * @return bool
+	 */
+	private function getUseCfg() {
+		return $this->useCfg;
 	}
 
 	/**
@@ -114,5 +145,61 @@ class Url {
 	 */
 	private function getUrl() {
 		return $this->url;
+	}
+
+	/**
+	 * Set site hostname
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	public function setSiteHostname($val) {
+		$this->siteHostname = $val;
+	}
+
+	/**
+	 * Get site hostname
+	 *
+	 * @return
+	 */
+	private function getSiteHostname() {
+		return $this->siteHostname;
+	}
+
+	/**
+	 * Set site domain
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	public function setSiteDomain($val) {
+		$this->siteDomain = $val;
+	}
+
+	/**
+	 * Get site domain
+	 *
+	 * @return
+	 */
+	private function getSiteDomain() {
+		return $this->siteDomain;
+	}
+
+	/**
+	 * Set server host ($_SERVER['HTTP_HOST'])
+	 * @param  $val
+	 * @return void
+	 */
+	public function setServerHost($val) {
+		$this->serverHost = $val;
+	}
+
+	/**
+	 * Get server host
+	 *
+	 * @return
+	 */
+	private function getServerHost() {
+		return $this->serverHost;
 	}
 }
