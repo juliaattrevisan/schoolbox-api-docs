@@ -17,6 +17,13 @@ define('GROUP_TYPE_FREE', 3);
 
 class Group extends DeprecatedModel {
 
+	/* Enum in groups table
+	 */
+	const STAFF_GROUP_TYPE = 'staff';
+	const PARENT_GROUP_TYPE = 'parent';
+	const STUDENT_GROUP_TYPE = 'student';
+	const GUEST_GROUP_TYPE = 'guest';
+
     function Group($service = HOMEPAGE_SERVICE) {
         $this->_table = 'userGroups';
         $this->_index = 'cid';
@@ -58,12 +65,12 @@ class Group extends DeprecatedModel {
 
 		return false;
 	}
-	
+
 	/**
 	 * Determine whether this group can be subscribed to
-	 * 
+	 *
 	 * @param <type> $categoryId
-	 * @return <type> 
+	 * @return <type>
 	 */
 	public function canSubscribe($categoryId) {
 		$query = "SELECT category.id, category.name, userGroups.type
@@ -83,6 +90,78 @@ class Group extends DeprecatedModel {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get the groups which are of the specified type
+	 *
+	 * @param  $name
+	 * @return array|bool
+	 */
+	public function getGroupType($name) {
+		$query = "SELECT id, name FROM groups WHERE group_type = \"{$name}\"";
+
+		return $this->db->getAll($query);
+	}
+
+	/**
+	 * Get the groups which are of the specified type, but return
+	 * an array of id's which is synonymous with the old conf way
+	 * of serializing/unserializing this result set.
+	 *
+	 * @param  $name
+	 * @return array|bool
+	 */
+	public function getGroupTypeIds($name) {
+		$query = "SELECT id FROM groups WHERE group_type = \"{$name}\"";
+
+		$allIds = $this->db->getAll($query);
+
+		$ids = array();
+
+		if (is_array($allIds) && count($allIds)) {
+			foreach($allIds as $currentId) {
+				$ids[] = $currentId['id'];
+			}
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Alias for getting Staff Group Type IDs
+	 *
+	 * @return bool|int
+	 */
+	public function getStaffGroupTypeIds() {
+		return $this->getGroupTypeIds(Group::STAFF_GROUP_TYPE);
+	}
+
+	/**
+	 * Alias for getting Parent Group Type IDs
+	 *
+	 * @return bool|int
+	 */
+	public function getParentGroupTypeIds() {
+		return $this->getGroupTypeIds(Group::PARENT_GROUP_TYPE);
+	}
+
+	/**
+	 * Alias for getting Student Group Type IDs
+	 *
+	 * @return bool|int
+	 */
+	public function getStudentGroupTypeIds() {
+		return $this->getGroupTypeIds(Group::STUDENT_GROUP_TYPE);
+	}
+
+	/**
+	 * Alias for getting Guest Group Type IDs
+	 *
+	 * @return bool|int
+	 */
+	public function getGuestGroupTypeIds() {
+		return $this->getGroupTypeIds(Group::GUEST_GROUP_TYPE);
 	}
 
     function getAllByType($type) {
@@ -129,7 +208,7 @@ class Group extends DeprecatedModel {
 
 	/**
 	 * Update service types for a user.
-	 * 
+	 *
 	 * @param <type> $sid
 	 * @param <type> $uid
 	 * @param <type> $type
@@ -155,7 +234,7 @@ class Group extends DeprecatedModel {
 
         //get the owner(s) of the group
         $query = "SELECT title, firstname, lastname, uid
-				  FROM userAccess, user 
+				  FROM userAccess, user
 				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type = '" . FULL_ACCESS;
         return $this->db->getRow($query); //only one owner at the moment
     }
@@ -183,7 +262,7 @@ class Group extends DeprecatedModel {
 
     function getMemberList($relationID) {
         $query = "SELECT title, firstname, lastname, uid, type, group_id
-				  FROM userAccess, user 
+				  FROM userAccess, user
 				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type < " . FULL_ACCESS . " AND type > " . DENY_ACCESS
                 . " ORDER BY lastname, firstname";
         return $this->db->getAll($query);
@@ -191,7 +270,7 @@ class Group extends DeprecatedModel {
 
     function getWaitingList($relationID) {
         $query = "SELECT title, firstname, lastname, uid
-				  FROM userAccess, user 
+				  FROM userAccess, user
 				  WHERE service = " . $this->_service . " AND sid = $relationID AND type = " . DENY_ACCESS . " AND user.id = uid";
         return $this->db->getAll($query);
     }
@@ -317,7 +396,7 @@ class Group extends DeprecatedModel {
 
         $query = "SELECT ID
 					  FROM SynergyOne.dbo.vCommunityAddressesConstit vCommunityAddressesConstit
-					  WHERE ((vCommunityAddressesConstit.ConstitCode='TUTRES2009') OR (vCommunityAddressesConstit.ConstitCode='TUTNONRES2009')) 
+					  WHERE ((vCommunityAddressesConstit.ConstitCode='TUTRES2009') OR (vCommunityAddressesConstit.ConstitCode='TUTNONRES2009'))
 					  AND ID = " . $user['synergy_id'];
 
         $tutor = $mssql->getRow($query);
@@ -341,10 +420,12 @@ class Group extends DeprecatedModel {
         } else
             return false;
 
-        if (in_array($groupID, unserialize(STUDENTGROUPIDS)))
+        if (in_array($groupID, $this->getGroupTypeIds(Group::STUDENT_GROUP_TYPE))) {
             return true;
-        else
+		}
+        else {
             return false;
+		}
     }
 
     /*
@@ -383,7 +464,7 @@ class Group extends DeprecatedModel {
         } else
             return false;
 
-        if (in_array($groupID, unserialize(STAFFGROUPIDS)))
+        if (in_array($groupID, $this->getStaffGroupTypeIds()))
             return true;
         else
             return false;
@@ -402,7 +483,7 @@ class Group extends DeprecatedModel {
         } else
             return false;
 
-        if (in_array($groupID, unserialize(PARENTGROUPIDS)))
+        if (in_array($groupID, $this->getParentGroupTypeIds()))
             return true;
         else
             return false;
@@ -480,12 +561,12 @@ class Group extends DeprecatedModel {
              $loggedIn = $this->db->getOne($query);
 
              $summary[] = array('name'=>$group['name'],'total'=>$group['total'],'logged_in'=>$loggedIn);
-             
+
         }
 
         return $summary;
 
-        
+
     }
 
 }

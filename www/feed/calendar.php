@@ -17,7 +17,9 @@ $output = array(
 );
 $page->setVar($output);
 
-$calendarList = $calendarHandler->getDayByGroup(time(), unserialize(STUDENTGROUPIDS), array(1,2,3));
+$groupHandler = new Group();
+
+$calendarList = $calendarHandler->getDayByGroup(time(), $groupHandler->getStudentGroupTypeIds(), array(1,2,3));
 
 if (is_array($calendarList)) {
 	foreach ($calendarList as $calendar) {

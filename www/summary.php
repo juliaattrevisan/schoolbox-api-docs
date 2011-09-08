@@ -55,8 +55,9 @@ $currDay = time();
 $page->setVar("DATE", date("l jS F"));
 
 
+$groupHandler = new Group();
 
-$eventList = $cal->getDayByGroup($currDay, unserialize(STUDENTGROUPIDS), $campus);
+$eventList = $cal->getDayByGroup($currDay, $groupHandler->getStudentGroupTypeIds(), $campus);
 
 if(!is_array($eventList))
 {

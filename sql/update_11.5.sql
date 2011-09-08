@@ -69,3 +69,12 @@ UPDATE `config` SET `title`='Schoolbox Feedback Address' WHERE `configID`='68';
 UPDATE `config` SET `value`='schoolbox@alaress.com.au' WHERE `configID`='68';
 UPDATE `config` SET `value`='schoolbox@alaress.com.au' WHERE `configID`='66';
 UPDATE `config` SET `title`='External DB Schoolbox URL' WHERE `configID`='56';
+
+/* Group Type
+ */
+ALTER TABLE groups ADD COLUMN group_type enum ('guest','student','parent','staff') DEFAULT 'guest';
+UPDATE `groups` SET `group_type`='staff' WHERE `id`='1';
+UPDATE `groups` SET `group_type`='staff' WHERE `id`='2';
+UPDATE `groups` SET `group_type`='student' WHERE `id`='3';
+UPDATE `groups` SET `group_type`='parent' WHERE `id`='4';
+UPDATE `groups` SET `group_type`='student' WHERE `id`='5';

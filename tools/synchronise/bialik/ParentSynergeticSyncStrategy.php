@@ -70,6 +70,8 @@ class ParentSynergeticSyncStrategy extends BialikSynergeticSyncStrategy {
 	 * @return void
 	 */
 	private function verboseResult($currentUser) {
+		$groupHandler = new Group();
+
 		if ($this->getVerbose() === true) {
 			$data = array();
 			$data[] = "username: {$currentUser['StudentContactID']}";
@@ -79,7 +81,7 @@ class ParentSynergeticSyncStrategy extends BialikSynergeticSyncStrategy {
 			$data[] = "surname: {$currentUser['StudentContactSurname']}";
 			$data[] = "email: {$currentUser['StudentContactDefaultEmail']}";
 			$data[] = "campus: {$this->getCampusFromYearLevel($currentUser['StudentYearLevel'])}";
-			$data[] = "groupIDs: " . implode(',', unserialize(PARENTGROUPIDS));
+			$data[] = "groupIDs: " . implode(',', $groupHandler->getParentGroupTypeIds());
 
 			$this->generateVerboseResult($data);
 		}

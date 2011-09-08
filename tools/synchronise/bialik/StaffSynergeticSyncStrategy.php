@@ -81,6 +81,8 @@ class StaffSynergeticSyncStrategy extends BialikSynergeticSyncStrategy {
 	 * @return void
 	 */
 	private function verboseResult($currentUser) {
+		$groupHandler = new Group();
+
 		if ($this->getVerbose() === true) {
 			$data = array();
 			$data[] = "username: {$currentUser['NetworkLogin']}";
@@ -90,7 +92,7 @@ class StaffSynergeticSyncStrategy extends BialikSynergeticSyncStrategy {
 			$data[] = "surname: {$currentUser['StaffSurname']}";
 			$data[] = "email: {$currentUser['preferredEmail']}";
 			$data[] = "campus: {$this->getCampusFromCode($currentUser['StaffCampus'])}";
-			$data[] = "groupIDs: " . implode(',', unserialize(STAFFGROUPIDS));
+			$data[] = "groupIDs: " . implode(',', $groupHandler->getStaffGroupTypeIds());
 
 			$this->generateVerboseResult($data);
 		}

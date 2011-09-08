@@ -1,13 +1,13 @@
 <?php
 /************************************************************
-*                                                           *
-*         Copyright (c) 2003-2004 Lektec Consulting         *
-*                                                           *
-*	This file provides permission functions for checking 	*
-*	what level of access the user has to services.			*
-*   $Id: permission.php,v 1.5 2004/04/27 05:16:48 jleckie Exp $						    
-*                                                           *
-************************************************************/
+ *														   *
+ *		 Copyright (c) 2003-2004 Lektec Consulting		 *
+ *														   *
+ *	This file provides permission functions for checking	 *
+ *	what level of access the user has to services.			*
+ *   $Id: permission.php,v 1.5 2004/04/27 05:16:48 jleckie Exp $
+ *														   *
+ ************************************************************/
 
 function perm($sid, $service)
 {
@@ -18,38 +18,39 @@ function perm($sid, $service)
 	//	  3 on owner
 
 	//if superuser just return highest permission type
-	if($_SESSION['su'] == 1)
+	if ($_SESSION['su'] == 1) {
 		return 3;
+	}
 
 	$db = new DeprecatedDatabase;
 
 	//individual access
-	$userQuery = "SELECT type FROM userAccess 
-	WHERE service = ".$service." AND sid = ".$sid." AND uid = ".$_SESSION['id']."";
-     
-	$result = $db->getRow($userQuery);            
+	$userQuery = "SELECT type FROM userAccess
+	WHERE service = " . $service . " AND sid = " . $sid . " AND uid = " . $_SESSION['id'] . "";
+
+	$result = $db->getRow($userQuery);
 	$perm = $result['type'];
-	if($perm == "")
+	if ($perm == "") {
 		$perm = 0;
-	
+	}
+
 	//if user has write access or is owner or service doesnt include category check group permission
-	if($perm < 2 && $service == 1)
-	{                       
-		$permQuery = "SELECT type FROM perms 
-		WHERE cid='".$sid."' AND gid='".$_SESSION['gid']."' ORDER BY type DESC";
+	if ($perm < 2 && $service == 1) {
+		$permQuery = "SELECT type FROM perms
+		WHERE cid='" . $sid . "' AND gid='" . $_SESSION['gid'] . "' ORDER BY type DESC";
 		$result = $db->getRow($permQuery);
-		if($result['type']) 
-		{
+		if ($result['type']) {
 			$perm = $result['type'];
 		}
 		else
 		{
 			//if they dont have user permission deny access
-			if($perm != 1)
+			if ($perm != 1) {
 				$perm = 0;
+			}
 		}
 	}
-	elseif(isStaff($_SESSION['gid']) && $service == 3 && $perm < 2)
+	elseif (isStaff($_SESSION['gid']) && $service == 3 && $perm < 2)
 	{
 		$perm = 2;
 	}
@@ -58,20 +59,23 @@ function perm($sid, $service)
 
 function isMember($id, $uid)
 {
-	// Checks if user is member of the supplied group id (for category groups only, use perm for others) 
+	// Checks if user is member of the supplied group id (for category groups only, use perm for others)
 	$db = new DeprecatedDatabase;
 	$service = HOMEPAGESERVICE;
-	
-	//individual access
-	$userQuery = "SELECT type FROM userAccess 
-	WHERE service = $service AND sid = $id AND uid = $uid";
-     
-	$result = $db->getRow($userQuery);   
 
-	if($result['type'])
+	//individual access
+	$userQuery = "SELECT type FROM userAccess
+	WHERE service = $service AND sid = $id AND uid = $uid";
+
+	$result = $db->getRow($userQuery);
+
+	if ($result['type']) {
 		return true;
+	}
 	else
-		return false; 
+	{
+		return false;
+	}
 }
 
 
@@ -80,10 +84,14 @@ function isStudent($gid)
 	//Function check wether $id belongs to student
 	//Returns 1 if student else 0
 
-	if(in_array($gid, unserialize(STUDENTGROUPIDS)))
+	$groupHandler = new Group();
+
+	if (in_array($gid, $groupHandler->getStudentGroupTypeIds())) {
 		return true;
-	else
+	}
+	else {
 		return false;
+	}
 }
 
 function isStaff($gid)
@@ -91,30 +99,41 @@ function isStaff($gid)
 	//Function check wether $id belongs to staff
 	//Returns 1 if student else 0
 
-	if(in_array($gid, unserialize(STAFFGROUPIDS)))
+	$groupHandler = new Group();
+
+	if (in_array($gid, $groupHandler->getStaffGroupTypeIds())) {
 		return true;
+	}
 	else
+	{
 		return false;
+	}
 }
 
 function isParent($gid)
 {
+	$groupHandler = new Group();
+
 	//Function check if parent
-	if(in_array($gid, unserialize(PARENTGROUPIDS)))
+	if (in_array($gid, $groupHandler->getParentGroupTypeIds())) {
 		return true;
+	}
 	else
+	{
 		return false;
-	
+	}
+
 }
 
-function isParentOfChild($id) {
-	if(is_array($_SESSION['children'])) {
-		foreach($_SESSION['children'] as $child) {
-			if($child['id'] == $id)
+function isParentOfChild($id)
+{
+	if (is_array($_SESSION['children'])) {
+		foreach ($_SESSION['children'] as $child) {
+			if ($child['id'] == $id) {
 				return true;
+			}
 		}
 	}
 	return false;
 }
 
-?>

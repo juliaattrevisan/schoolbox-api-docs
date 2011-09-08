@@ -24,7 +24,7 @@ class clean {
 	{
 		//remove all log entries
 		$this->cleanLoginLog();
-		
+
 		$query = "DELETE FROM homepage_log";
 		$this->db->query($query);
 		print "Homepage last visit records cleaned<br>";
@@ -44,11 +44,11 @@ class clean {
 		//unlink all student submissions
 		$query = "SELECT id FROM student_submission";
 		$this->db->query($query);
-	
+
 		while( $sub = $this->db->getNextArray() )
 		{
-			if(!@unlink(Cfg::get('submission_dir')."/".$sub['id'].".dat"))					
-				print "Failed to delete ".Cfg::get('submission_dir')."/".$sub['id'].".dat<br>";					
+			if(!@unlink(Cfg::get('submission_dir')."/".$sub['id'].".dat"))
+				print "Failed to delete ".Cfg::get('submission_dir')."/".$sub['id'].".dat<br>";
 		}
 
 		$query = "DELETE FROM student_submission";
@@ -61,15 +61,15 @@ class clean {
 
 	}
 
-	function cleanReturnedWork()	
+	function cleanReturnedWork()
 	{
 		$query = "SELECT id FROM submission_return";
 		$this->db->query($query);
-	
+
 		while( $ret = $this->db->getNextArray() )
 		{
 			if(!@unlink(Cfg::get('returns_dir')."/".$ret['id'].".dat"))
-				print "Failed to delete ".Cfg::get('returns_dir')."/".$ret['id'].".dat<br>";					
+				print "Failed to delete ".Cfg::get('returns_dir')."/".$ret['id'].".dat<br>";
 		}
 
 		$query = "DELETE FROM submission_return";
@@ -81,8 +81,8 @@ class clean {
 	function cleanNews()
 	{
 		//deletes all news that is either deleted or has expired
-		$query = "DELETE news_items, newsGroup, newsCampus FROM news_items, newsCampus, newsGroup 
-					WHERE news_items.item_id = newsGroup.id AND news_items.item_id = newsCampus.id 
+		$query = "DELETE news_items, newsGroup, newsCampus FROM news_items, newsCampus, newsGroup
+					WHERE news_items.item_id = newsGroup.id AND news_items.item_id = newsCampus.id
 						AND (item_datetime_expires < NOW() || item_deleted = '1')";
 		$this->db->dbDoQuery($query);
 		print "Deleted ".$this->db->affectedRows()." news items<br>";
@@ -96,25 +96,25 @@ class clean {
 		$this->db->query($query);
 		print "Deleted ".$this->db->affectedRows()." subject news items<br>";
 	}
-	
+
 	function cleanDeletedFiles() {
 		//deletes all files that are deleted
 		$query = "SELECT id FROM file WHERE deleted = '1'";
 		$this->db->query($query);
-		
+
 		while($file = $this->db->getNextArray()) {
 			if(!@unlink(Cfg::get('file_dir')."/".$file['id'].".dat"))
-			print "Failed to delete ".Cfg::get('file_dir')."/".$file['id'].".dat<br>";		
+			print "Failed to delete ".Cfg::get('file_dir')."/".$file['id'].".dat<br>";
 		}
-		
+
 		$query = "DELETE FROM file WHERE deleted = '1'";
 		$this->db->query($query);
 		print "Deleted ".$this->db->affectedRows()." files<br>";
 	}
-	
+
 	function cleanFileSystem() {
 		//delete all files from the filesystem that do no have a corresponding record in the database
-		
+
 		//normal files
 		foreach(glob(Cfg::get('file_dir').'/*.dat') as $file) {
 			preg_match('/.*\/([0-9]+).dat/', $file, $matches);
@@ -124,7 +124,7 @@ class clean {
 					print "Deleting $file<br>";
 					if(!@unlink($file))
 						print "Failed to delete $file<br>";
-				
+
 				}
 			}
 		}
@@ -132,21 +132,21 @@ class clean {
 		//thumbnails
 		foreach(glob(Cfg::get('thumbnail_dir').'/*.jpg') as $file) {
 			preg_match('/.*\/([0-9]+)-.*\.jpg/', $file, $matches);
-			
+
 			if($matches[1]) {
 				$query = "SELECT id FROM file WHERE id = '{$matches[1]}'";
-				
+
 				if(!$this->db->getRow($query)) {
 					print "Deleting $file<br>";
 					if(!@unlink($file))
 						print "Failed to delete $file<br>";
-				
+
 				}
 			}
 		}
-		
 
-		
+
+
 		//student submissions
 		foreach(glob(Cfg::get('submission_dir').'/*.dat') as $file) {
 		print $file;
@@ -158,11 +158,11 @@ class clean {
 					print "Deleting $file<br>";
 					if(!@unlink($file))
 						print "Failed to delete $file<br>";
-					
+
 				}
 			}
 		}
-		
+
 		//returns
 		foreach(glob(Cfg::get('returns_dir').'/*.dat') as $file) {
 			preg_match('/.*\/([0-9]+).dat/', $file, $matches);
@@ -172,30 +172,32 @@ class clean {
 					print "Deleting $file<br>";
 					if(!@unlink($file))
 						print "Failed to delete $file<br>";
-					
+
 				}
 			}
 		}
-		
-		
-		
+
+
+
 	}
-	
+
 	function rollStudents() {
-		$query = "UPDATE user SET year = year + 1 WHERE group_id IN(".implode(',',unserialize(STUDENTGROUPIDS)).") AND year IS NOT NULL";
+		$groupHandler = new Group();
+
+		$query = "UPDATE user SET year = year + 1 WHERE group_id IN(".implode(',', $groupHandler->getStudentGroupTypeIds()).") AND year IS NOT NULL";
 		$this->db->query($query);
 		print "Updated ".$this->db->countRowsAffected()." student year levels<br>";
 	}
-	
+
 	function cleanThumbnails() {
-		
+
 		foreach(glob(Cfg::get('thumbnail_dir').'/*.jpg') as $file) {
 					print "Deleting $file<br>";
 					if(!@unlink($file))
 						print "Failed to delete $file<br>";
 		}
 	}
- 
+
 }
 
 $clean = new clean;

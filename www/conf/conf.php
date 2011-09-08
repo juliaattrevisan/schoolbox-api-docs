@@ -183,9 +183,9 @@ define("HOMEPAGESERVICE", 1);				//Value that represents the homepage module in 
 define("FORUM_COMPONENT", 5);
 
 /* Retire these, move them into group table */
-define("STUDENTGROUPIDS", serialize(array(3,5)));	//List of id numbers representing student groups
-define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
-define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
+//define("STUDENTGROUPIDS", serialize(array(3,5)));	//List of id numbers representing student groups
+//define("STAFFGROUPIDS", serialize(array(1,2)));		//Staff group ids
+//define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 
 /* Move into group table */
 define('GROUP_can_change_password', serialize(array(1,2,3,4,5)));

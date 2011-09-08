@@ -6,9 +6,10 @@ require_once( dirname(__FILE__) . '/../library/Synergetic/ExternalUser.php' );
 define('PERFORM_UPDATE', true);
 
 $userHandler = new User();
+$groupHandler = new Group();
 $synergyIds = array();
 
-$allParents = $userHandler->getByGroup(unserialize(PARENTGROUPIDS), true);
+$allParents = $userHandler->getByGroup($groupHandler->getParentGroupTypeIds(), true);
 
 /* Get a list of Parents' synergy ids to sync
  */

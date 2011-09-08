@@ -16,7 +16,9 @@ $output = array('TITLE'			=> HEADING . ' - News',
 				);
 $page->setVar($output);
 
-$newsList = $newsHandler->getAllByGroup(unserialize(STUDENTGROUPIDS), array(1,2,3));
+$groupHandler = new Group();
+
+$newsList = $newsHandler->getAllByGroup($groupHandler->getStudentGroupTypeIds(), array(1,2,3));
 
 if (is_array($newsList)) {
 	foreach ($newsList as $news) {

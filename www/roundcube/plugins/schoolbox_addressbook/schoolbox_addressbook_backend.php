@@ -64,7 +64,9 @@ class schoolbox_addressbook_backend extends rcube_addressbook {
     }
 
     public function search($fields, $value, $strict=false, $select=true, $nocount=false, $required=array()) {
-		$groups = array_merge(unserialize(STUDENTGROUPIDS),unserialize(STAFFGROUPIDS));
+		$groupHandler = new Group();
+
+		$groups = array_merge($groupHandler->getStudentGroupTypeIds(), $groupHandler->getStaffGroupTypeIds());
         $users = $this->user->ajaxSearch($value, $groups, 20);
 
         $this->user_count = $count;

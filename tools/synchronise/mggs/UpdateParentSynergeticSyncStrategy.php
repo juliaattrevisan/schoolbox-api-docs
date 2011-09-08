@@ -18,7 +18,7 @@ class UpdateParentSynergeticSyncStrategy extends SynergeticSyncStrategy implemen
 	 * @return void
 	 */
 	public function generateList() {
-		$this->collateList($this->getUserHandler()->getByGroup(unserialize(PARENTGROUPIDS), true));
+		$this->collateList($this->getUserHandler()->getByGroup($this->getGroupHandler()->getParentGroupTypeIds(), true));
 	}
 
 	/**
