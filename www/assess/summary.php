@@ -31,12 +31,15 @@ if (!$assessHandler->isOwner($this->arg[0])) {
     error(125);
 }
 
+$assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
+$assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
+
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $this->arg[0],
     'ASSESS_TITLE' => $assess['title'],
     'ASSESS_DESCRIPTION' => $assess['description'],
-    'ASSESS_START' => date('jS F Y, g:i:sa', strtotime($assess['start'])),
-    'ASSESS_FINISH' => date('jS F Y, g:i:sa', strtotime($assess['finish'])),
+    'ASSESS_START' => $assessStartDate->getShort(),
+    'ASSESS_FINISH' => $assessFinishDate->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
 ));
 

@@ -40,7 +40,9 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 	 * they never even attempted the test.
 	 */
 	if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
-		$finish = date('jS F Y, g:i:sa', strtotime($currentAttempt['finish']));
+		$attemptFinishDate = new Alaress_Date_Format(strtotime($currentAttempt['finish']), 'U');
+
+		$finish = $attemptFinishDate->getShort();
 		$timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
 	}
 	else {
@@ -50,7 +52,9 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 			$finish = 'Unfinished';
 		}
 		else {
-			$finish = date('jS F Y, g:i:sa', strtotime($finish));
+			$attemptFinishDate = new Alaress_Date_Format(strtotime($finish), 'U');
+
+			$finish = $attemptFinishDate->getShort();
 		}
 
 		$timeTaken = 'Incomplete';
@@ -70,8 +74,9 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 	/* Check when the test was reviewed
 	 */
 	if ($currentAttempt['reviewed_at'] != '') {
-		$reviewedAt = 'Reviewed on ' . date('jS F Y, g:i:sa', strtotime($currentAttempt['reviewed_at']));
+		$reviewedDate = new Alaress_Date_Format(strtotime($currentAttempt['reviewed_at']), 'U');
 
+		$reviewedAt = 'Reviewed on ' . $reviewedDate->getShort();
 	}
 	else {
 		$reviewedAt = 'Not reviewed';

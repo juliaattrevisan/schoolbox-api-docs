@@ -114,12 +114,15 @@ $this->setTitle('Assessment: ' . $assess['title']);
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the Assessment.
  */
+$attemptStartDate = new Alaress_Date_Format($attemptStartTime, 'U');
+$attemptEndDate = new Alaress_Date_Format($attemptEndTime, 'U');
+
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => $assess['title'],
     'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
-    'ATTEMPT_START' => date('jS F Y, g:i:sa', $attemptStartTime),
-    'ATTEMPT_END' => $assess['duration'] == Assess::UNLIMITED_DURATION ? 'No particular time' : date('jS F Y, g:i:sa', $attemptEndTime),
+    'ATTEMPT_START' => $attemptStartDate->getShort(),
+    'ATTEMPT_END' => $assess['duration'] == Assess::UNLIMITED_DURATION ? 'No particular time' : $attemptEndDate->getShort(),
     'SECTION_TITLE' => $section['title'],
     'SECTION_DESCRIPTION' => $section['description'],
 ));

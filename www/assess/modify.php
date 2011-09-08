@@ -82,14 +82,17 @@ else {
     $assessStartTime = strtotime($assess['start']);
     $assessFinishTime = strtotime($assess['finish']);
 
+	$assessStartDate = new Alaress_Date_Format($assessStartTime, 'U');
+	$assessFinishDate = new Alaress_Date_Format($assessFinishTime, 'U');
+
     $this->setVar(array(
         'ACTION' => 'modify',
         'ASSESS_ASSESS_ID' => $assess['assess_id'],
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'ASSESS_TITLE' => $assess['title'],
         'ASSESS_DESCRIPTION' => $assess['description'],
-        'ASSESS_START_DATE'  => date('d/m/Y', $assessStartTime),
-        'ASSESS_FINISH_DATE' => date('d/m/Y', $assessFinishTime),
+        'ASSESS_START_DATE'  => $assessStartDate->getLocalShort(),
+        'ASSESS_FINISH_DATE' => $assessFinishDate->getLocalShort(),
         'ALLOW_RESIT_CHECKED' => $assess['allow_resit'] == 1 ? 'checked=\'checked\'' : '',
         'ASSESS_DURATION_CHECKED' => $assess['duration'] >= 0 ? 'checked=\'checked\'' : '',
     ));

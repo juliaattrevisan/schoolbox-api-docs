@@ -51,23 +51,27 @@ $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
 if ($attempt['finish'] == '0000-00-00 00:00:00') {
+	$attemptFinishDate = new Alaress_Date_Format(time(), 'U');
+
     $attemptHandler->update(array(
         'attempt_id' => $_SESSION['attempt_id'],
-        'finish' => date('Y-m-d H:i:s', time()),
+        'finish' => $attemptFinishDate->getDatabase(),
     ));
 
     $this->setVar(array(
         'ASSESS_TITLE' => $assess['title'],
-        'ATTEMPT_END' => date('jS F Y, g:i:sa', time())
+        'ATTEMPT_END' => $attemptfinishDate->getShort(),
     ));
 
     $this->setVar('alreadyEnded_block', '');
     $this->parse('endAssess_block', 'endAssess');
 }
 else {
+	$attemptFinishDate = new Alaress_Date_Format(strtotime($attempt['finish']), 'U');
+
     $this->setVar(array(
         'ASSESS_TITLE' => $assess['title'],
-        'ATTEMPT_END' => date('jS F Y, g:i:sa', strtotime($attempt['finish']))
+        'ATTEMPT_END' => $attemptFinishDate->getShort(),
     ));
 
     $this->parse('alreadyEnded_block', 'alreadyEnded');
