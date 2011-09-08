@@ -1,12 +1,23 @@
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>Wiki</h2>
-	<!-- BEGIN config --> 
+	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
 	<div class="editPanel settings hide">
 		<form action="/homepage/configForm.php" method="get">
 			<input type="hidden" name="cid" value="{ID}" />
 			<input type="hidden" name="type" value="config" />
 			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+			<label for="sort">Sort: </label>
+			<select name="sort">
+				<!-- BEGIN sort -->
+				<option value="{COMPONENT_CONFIG_SORT_VALUE}"{COMPONENT_CONFIG_SORT_SELECTED}>{COMPONENT_CONFIG_SORT_NAME}</option>
+				<!-- END sort -->
+			</select>
+			<select name="sortdir">
+				<!-- BEGIN sortdir -->
+				<option value="{COMPONENT_CONFIG_SORTDIR_VALUE}"{COMPONENT_CONFIG_SORTDIR_SELECTED}>{COMPONENT_CONFIG_SORTDIR_NAME}</option>
+				<!-- END sortdir -->
+			</select>
 			<label for="size">Item Limit: </label>
 			<select name="size">
 				<!-- BEGIN size -->
@@ -32,20 +43,20 @@
 			<li class="{ON_OFF} clearfix">
 				<h4><a class="icons textfile" href="/wiki/{WIKI_ID}">{WIKI_HEADING}</a></h4>
 				<div class="small-right">
-					<p class="interact"> 
-						<!-- BEGIN modify_wiki --> 
-						<a href="/wiki/modify/{WIKI_ID}">Modify</a> 
-						<!-- END modify_wiki --> 
+					<p class="interact">
+						<!-- BEGIN modify_wiki -->
+						<a href="/wiki/modify/{WIKI_ID}">Modify</a>
+						<!-- END modify_wiki -->
 					</p>
 				</div>
 				<p class="interact hide-on-small">Created by <a href="/search/user/{WIKI_AUTHOR_ID}">{WIKI_AUTHOR}</a> {WIKI_MODIFIED}</p>
 			</li>
-			
+
 			<!-- END wiki_row -->
 		</ul>
 	</div>
 	<!-- BEGIN submit_wiki -->
 	<p class="interact"><a href="/wiki/modify/new/{ID}" class="btn add"><span></span>Create Document</a></p>
-	<!-- END submit_wiki --> 
-	
+	<!-- END submit_wiki -->
+
 </div>

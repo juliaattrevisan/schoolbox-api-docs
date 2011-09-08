@@ -82,3 +82,7 @@ UPDATE `groups` SET `group_type`='student' WHERE `id`='5';
 /* Group Types can change password
  */
 ALTER TABLE groups ADD COLUMN can_change_password ENUM ('true', 'false') DEFAULT 'true';
+
+/* Wiki sort options
+ */
+UPDATE `homepage_comp` SET `config`='a:3:{s:4:\"sort\";s:5:\"Title\";s:7:\"sortdir\";s:4:\"Desc\";s:4:\"size\";s:1:\"0\";}' WHERE `id`='34';

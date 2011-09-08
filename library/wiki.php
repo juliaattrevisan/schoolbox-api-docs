@@ -6,7 +6,7 @@ class Wiki extends DeprecatedModel {
 		$this->_index = 'wikiID';
 		$this->_revisionTable = 'wikiRevision';
         $this->_openTable = 'wikiOpens';
-		
+
 		parent::DeprecatedModel();
 	}
 
@@ -26,7 +26,7 @@ class Wiki extends DeprecatedModel {
 
     /**
      * Locates the previous revision without needing to rely on a -1 offset.
-     * 
+     *
      * @param <type> $wikiID
      * @param <type> $revisionID
      * @return <type>
@@ -42,7 +42,7 @@ class Wiki extends DeprecatedModel {
 
         return $this->getByID($wikiID, $previousRevision['revisionID']);
     }
-	
+
 	function getByID($wikiID, $revisionID = 0) {
 		$query = "SELECT r.*, w.categoryID, w.locked, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(r.created) modified, latestRevision,
 				  u.title, u.firstname, u.lastname, r.userID authorID
@@ -52,29 +52,36 @@ class Wiki extends DeprecatedModel {
 				  WHERE w.deleted = 'false' AND r.wikiID = $wikiID ";
 		if ($revisionID > 0 && is_numeric($revisionID))
 			$query .= "AND r.revisionID = $revisionID ";
-			
+
 		$query .= "ORDER BY r.created DESC LIMIT 1";
 		return $this->db->getRow($query);
 	}
-	
+
 	function getRevisionList($wikiID) {
 		$query = "SELECT r.*, UNIX_TIMESTAMP(r.created) created, u.title, u.firstname, u.lastname
-				  FROM ".$this->_revisionTable." r 
+				  FROM ".$this->_revisionTable." r
 				  LEFT JOIN user u ON u.id = r.userID
 				  WHERE wikiID = $wikiID
 				  ORDER BY r.created DESC";
 		return $this->db->getAll($query);
 	}
-	
-	function getByCategory($categoryID) {
+
+	/**
+	 * Get a wiki for a category
+	 *
+	 * @param  $categoryID
+	 * @param string $orderBy
+	 * @param string $sortDir
+	 * @return array|bool
+	 */
+	public function getByCategory($categoryID, $orderBy = 'created', $sortDir = 'Desc') {
 		$query = "SELECT r.*, w.locked, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.lastname
 				  FROM wiki w
-				  LEFT JOIN ".$this->_revisionTable." r ON r.revisionID = (SELECT r.revisionID FROM ".$this->_revisionTable." r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1) 
+				  LEFT JOIN ".$this->_revisionTable." r ON r.revisionID = (SELECT r.revisionID FROM ".$this->_revisionTable." r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1)
 				  LEFT JOIN user u ON u.id = r.userID
-				  WHERE w.deleted = 'false' AND categoryID = ".(int)$categoryID." "; 
-			
-		$query .= " ORDER BY r.created DESC, w.created DESC";
-		
+				  WHERE w.deleted = 'false' AND categoryID = '{$categoryID}'
+				  ORDER BY r.{$orderBy} {$sortDir}";
+
 		return $this->db->getAll($query);
 	}
 
@@ -82,14 +89,14 @@ class Wiki extends DeprecatedModel {
 		$query = "DELETE w, r FROM  `".$this->_table."` w, ".$this->_revisionTable." r  WHERE w.wikiID=r.wikiID AND categoryID='$cid'";
 		$this->db->query($query);
 	}
-	
+
 	function createRevision ($data) {
 		$data['created'] = 'NOW()';
 		$data['userID'] = $_SESSION['id'];
 		$this->db->insert($this->_revisionTable, $data);
 		return $this->db->insertID();
 	}
-	
+
 	function create($data) {
 		$data['created'] = 'NOW()';
 
@@ -97,18 +104,18 @@ class Wiki extends DeprecatedModel {
 							'body'		=> $data['body'],
 					  );
 		unset($data['heading'], $data['body']);
-		
+
 		$wikiID = parent::create($data);
 		if($wikiID) {
 			$revision['wikiID'] = $wikiID;
 			$revisionID = $this->createRevision($revision);
 			parent::update(array('wikiID' => $wikiID, 'latestRevision' => $revisionID));
 		}
-		
-		
+
+
 		return $wikiID;
 	}
-	
+
 	function update($data) {
 
 		$coreFields = array('categoryID', 'locked');
@@ -136,14 +143,14 @@ class Wiki extends DeprecatedModel {
 		$wiki = $this->getByID($wikiID, $revisionID);
 		if (!isset($wiki['wikiID']))
 			return false;
-			
+
 		$data = array('wikiID'	=> $wiki['wikiID'],
 					  'heading'	=> $wiki['heading'],
 					  'body'	=> $wiki['body']);
-		
+
 		$revisionID =  $this->createRevision($data);
 		parent::update(array('wikiID' => $data['wikiID'], 'latestRevision' => $revisionID));
-		
+
 		return $revisionID;
 	}
 
