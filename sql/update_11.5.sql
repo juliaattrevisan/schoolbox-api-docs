@@ -62,3 +62,10 @@ UPDATE config SET required = 'true';
 UPDATE `config` SET `required`='false' WHERE `configID` IN (13,14,15,16,17,18,19,20,21);
 UPDATE `config` SET `required`='false' WHERE `configID` IN (65);
 UPDATE `config` SET `required`='false' WHERE `configID` IN (50,51,52,53,54,55,56,57);
+
+/* Update config to remove references to Portal
+ */
+UPDATE `config` SET `title`='Schoolbox Feedback Address' WHERE `configID`='68';
+UPDATE `config` SET `value`='schoolbox@alaress.com.au' WHERE `configID`='68';
+UPDATE `config` SET `value`='schoolbox@alaress.com.au' WHERE `configID`='66';
+UPDATE `config` SET `title`='External DB Schoolbox URL' WHERE `configID`='56';
