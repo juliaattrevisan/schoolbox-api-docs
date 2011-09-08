@@ -50,14 +50,15 @@ ALTER TABLE eportfolio_config ADD COLUMN left_column_width FLOAT DEFAULT 49.5 AF
  */
 UPDATE homepage_comp SET description = "Subscribe to an audio-only podcast." WHERE method = 'outputPodcast';
 
-/* Day/Boarder status for each user
+/* Optional config fields for validation
  */
--- ALTER TABLE USER ADD COLUMN student_type ENUM('D', 'B') NOT NULL DEFAULT 'D';
---
--- CREATE TABLE student_type (
--- 	id VARCHAR(255) NOT NULL DEFAULT 'D',
--- 	`name` VARCHAR(255),
--- 	PRIMARY KEY(id)
--- );
---
--- INSERT INTO student_type (id, `name`) VALUES ('D', 'Day'), ('B', 'Boarder');
+ALTER TABLE config ADD COLUMN required ENUM ('false', 'true') DEFAULT 'false';
+UPDATE config SET required = 'true';
+
+/* Disable LDAP mandatoryness
+ * Disable Webmail URL mandatoryness
+ * Disable External DB mandatoryness
+ */
+UPDATE `config` SET `required`='false' WHERE `configID` IN (13,14,15,16,17,18,19,20,21);
+UPDATE `config` SET `required`='false' WHERE `configID` IN (65);
+UPDATE `config` SET `required`='false' WHERE `configID` IN (50,51,52,53,54,55,56,57);
