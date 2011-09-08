@@ -60,14 +60,16 @@ else {
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
     $this->setTitle('Manage Assessment');
 
+	$assessDate = new Alaress_Date_Format(time(), 'U');
+
     $this->setVar(array(
         'ACTION' => 'create',
         'ASSESS_ASSESS_ID' => '',
         'ASSESS_CATEGORY_ID' => $this->arg[0],
         'ASSESS_TITLE' => '',
         'ASSESS_DESCRIPTION' => '',
-        'ASSESS_START_DATE'  => date('d/m/Y'),
-        'ASSESS_FINISH_DATE' => date('d/m/Y')
+        'ASSESS_START_DATE'  => $assessDate->getLocalShort(),
+        'ASSESS_FINISH_DATE' => $assessDate->getLocalShort()
     ));
 
     /* Select default settings

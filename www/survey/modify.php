@@ -68,8 +68,8 @@ else {
         error(112);
     }
 
-    $assessStartTime = strtotime($assess['start']);
-    $assessFinishTime = strtotime($assess['finish']);
+    $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
+    $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
     $this->setVar(array(
         'ACTION' => 'modify',
@@ -77,8 +77,8 @@ else {
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'ASSESS_TITLE' => $assess['title'],
         'ASSESS_DESCRIPTION' => $assess['description'],
-        'ASSESS_START_DATE'  => date('d/m/Y', $assessStartTime),
-        'ASSESS_FINISH_DATE' => date('d/m/Y', $assessFinishTime),
+        'ASSESS_START_DATE'  => $assessStartDate->getLocalShort(),
+        'ASSESS_FINISH_DATE' => $assessFinishDate->getLocalShort(),
     ));
 
     /* Render starting times
