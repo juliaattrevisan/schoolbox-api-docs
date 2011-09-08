@@ -2,6 +2,7 @@
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/Assess.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessAttempt.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Synergetic/ExternalClass.php';
 
 $this->setFile(TEMPLATE_content, 'submission/listSubmission.html');
 $this->setTitle('Submissions');
