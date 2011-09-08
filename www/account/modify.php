@@ -6,7 +6,9 @@ $this->setBlock(TEMPLATE_content, 'success', 'success_block');
 $this->setTitle('Change Password');
 $this->setTab('main');
 
-if (!in_array($_SESSION['gid'], unserialize(GROUP_can_change_password)) && !$_SESSION['su']) {
+$groupHandler = new Group();
+
+if (!in_array($_SESSION['gid'], $groupHandler->canChangePassword()) && !$_SESSION['su']) {
 	error(19);
 }
 

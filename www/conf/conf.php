@@ -188,7 +188,7 @@ define("FORUM_COMPONENT", 5);
 //define("PARENTGROUPIDS", serialize(array(4)));		//Parent group ids
 
 /* Move into group table */
-define('GROUP_can_change_password', serialize(array(1,2,3,4,5)));
+//define('GROUP_can_change_password', serialize(array(1,2,3,4,5)));
 
 
 

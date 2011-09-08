@@ -9,6 +9,6 @@
  */
 
 $groupHandler = new Group();
-$result = $groupHandler->getGroupTypeIds(Group::STUDENT_GROUP_TYPE);
+$result = $groupHandler->canChangePassword();
 
 print_r($result);

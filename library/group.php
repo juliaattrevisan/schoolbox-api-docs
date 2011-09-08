@@ -93,15 +93,25 @@ class Group extends DeprecatedModel {
 	}
 
 	/**
-	 * Get the groups which are of the specified type
+	 * Get the array of ids for groups that can change passwords
 	 *
 	 * @param  $name
 	 * @return array|bool
 	 */
-	public function getGroupType($name) {
-		$query = "SELECT id, name FROM groups WHERE group_type = \"{$name}\"";
+	public function canChangePassword() {
+		$query = "SELECT id FROM groups WHERE can_change_password = 'true'";
 
-		return $this->db->getAll($query);
+		$allIds = $this->db->getAll($query);
+
+		$ids = array();
+
+		if (is_array($allIds) && count($allIds)) {
+			foreach($allIds as $currentId) {
+				$ids[] = $currentId['id'];
+			}
+		}
+
+		return $ids;
 	}
 
 	/**

@@ -3,8 +3,9 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
 $userHandler = new User();
+$groupHandler = new Group();
 
-if (!in_array($_SESSION['gid'], unserialize(GROUP_can_change_password)) && !$_SESSION['su']) {
+if (!in_array($_SESSION['gid'], $groupHandler->canChangePassword()) && !$_SESSION['su']) {
 	error(19);
 }
 

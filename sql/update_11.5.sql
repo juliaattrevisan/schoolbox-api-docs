@@ -78,3 +78,7 @@ UPDATE `groups` SET `group_type`='staff' WHERE `id`='2';
 UPDATE `groups` SET `group_type`='student' WHERE `id`='3';
 UPDATE `groups` SET `group_type`='parent' WHERE `id`='4';
 UPDATE `groups` SET `group_type`='student' WHERE `id`='5';
+
+/* Group Types can change password
+ */
+ALTER TABLE groups ADD COLUMN can_change_password ENUM ('true', 'false') DEFAULT 'true';
