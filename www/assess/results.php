@@ -32,7 +32,7 @@ require_once('../library/user.php');
  * @param <type> $currentAttempt
  * @param <type> $page
  */
-function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page) {
+function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page, $currentStudent) {
 	$firstSection = $sectionHandler->getFirst($page->arg[0]);
 
 	/* Finish time. Show the datetime when the person clicked Finish.
@@ -71,7 +71,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 	 */
 	if ($currentAttempt['reviewed_at'] != '') {
 		$reviewedAt = 'Reviewed on ' . date('jS F Y, g:i:sa', strtotime($currentAttempt['reviewed_at']));
-		
+
 	}
 	else {
 		$reviewedAt = 'Not reviewed';
@@ -130,6 +130,7 @@ if (!$assessHandler->isOwner($this->arg[0])) {
 $this->setFile(TEMPLATE_content, 'assess/results.html');
 $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
 $this->setTitle('Results for: ' . $assess['title']);
+$this->setTab('submission');
 
 $this->setVar(array(
 	'ASSESS_ASSESS_ID' => $assess['assess_id'],
@@ -143,7 +144,9 @@ $this->setVar(array(
 $categoryCode = $categoryHandler->getCodeForCategory($assess['category_id']);
 
 if (($categoryCode['codes'] != '') && Cfg::get('external_enable')) {
-	//if synergy code get synergy students
+	/* If synergy code get synergy students
+	 */
+	require_once(dirname(__FILE__) . '/../../library/Synergetic/ExternalUser.php');
 	$synHandler = new ExternalClass();
 	$allStudents = $synHandler->getStudents($categoryCode['codes']);
 }
@@ -179,7 +182,7 @@ if (is_array($allStudents) && count($allStudents)) {
 				 */
 				if ($currentAttempt['user_id'] == $currentStudent['uid']) {
 					if ($allAttempts[$i]['processed'] != true) {
-						processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this);
+						processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $currentStudent);
 
 						$allAttempts[$i]['processed'] = true;
 
@@ -224,8 +227,7 @@ else {
 if ($allAttempts && count($allAttempts)) {
 	foreach($allAttempts as $currentAttempt) {
 		if ($currentAttempt['processed'] != true) {
-			processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this);
+			processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, array());
 		}
 	}
 }
-?>

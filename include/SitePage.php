@@ -140,19 +140,22 @@ class SitePage extends Page
 
 		$userHandler = new User();
 
-		$templateVar = array('TEMPLATE_YEAR' => date('Y'),
-							 'SITE_NAME' => Cfg::get('school_name'),
-							 'SITE_ADDRESS' => Cfg::get('site_address'),
-							 'SITE_GREETING' => TextFormatter::greeting(), // TODO: This should be an object
-							 'SITE_LOGINNAME' => $userHandler->formatName($_SESSION),
-							 'SITE_USERNAME' => $_SESSION['username'],
-							 'SITE_LOCATION' => $this->site,
-							 'USER_ID' => $_SESSION['id'],
-							 'SITE_VERSION' => Cfg::get('site_version'),
+		$templateVar = array(
+			'TEMPLATE_YEAR' => date('Y'),
+			'SITE_NAME' => Cfg::get('school_name'),
+			'SITE_ADDRESS' => Cfg::get('site_address'),
+			'SITE_GREETING' => TextFormatter::greeting(), // TODO: This should be an object
+			'SITE_LOGINNAME' => $userHandler->formatName($_SESSION),
+			'SITE_USERNAME' => $_SESSION['username'],
+			'SITE_LOCATION' => $this->site,
+			'USER_ID' => $_SESSION['id'],
+			'SITE_VERSION' => Cfg::get('site_version'),
 		);
+
 		$this->setVar($templateVar);
 
 		$title = $this->getVar('TITLE');
+
 		if (empty($title)) {
 			$this->setTitle();
 		}
@@ -567,6 +570,7 @@ class SitePage extends Page
 						'TAB_MYFILES_ON' => '',
 						'TAB_PORTFOLIO_ON' => '',
 						'TAB_EPORTFOLIO_ON' => '',
+						'TAB_SUBMISSION_ON' => '',
 						'TAB_' . strtoupper($this->currentTab) . '_ON' => ' navthis',
 		);
 
