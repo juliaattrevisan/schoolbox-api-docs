@@ -5,12 +5,12 @@ $this->setBlock('wiki_row', 'modify_wiki', 'modify_wiki_block');
 
 /* Custom sorting options
  */
-$sortOptions = array('heading', 'created', 'modified');
+$sortOptions = array('Heading', 'Created', 'Modified');
 
 $wikiHandler = new Wiki();
 $userHandler = new User();
 
-$wikiList = $wikiHandler->getByCategory($categoryID, $config['sort'], $config['sortdir'], $config['size']);
+$wikiList = $wikiHandler->getByCategory($categoryID, strtolower($config['sort']), $config['sortdir'], $config['size']);
 
 if (is_array($wikiList)) {
 	foreach ($wikiList as $wiki) {

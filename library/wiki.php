@@ -81,8 +81,7 @@ class Wiki extends DeprecatedModel
 	 * @param string $sortDir
 	 * @return array|bool
 	 */
-	public function getByCategory($categoryID, $orderBy = 'created', $sortDir = 'Desc', $limit = false)
-	{
+	public function getByCategory($categoryID, $orderBy = 'created', $sortDir = 'Desc', $limit = false) {
 		$query = "SELECT r.*, w.locked, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.lastname
 				  FROM wiki w
 				  LEFT JOIN " . $this->_revisionTable . " r ON r.revisionID = (SELECT r.revisionID FROM " . $this->_revisionTable . " r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1)
@@ -90,7 +89,7 @@ class Wiki extends DeprecatedModel
 				  WHERE w.deleted = 'false' AND categoryID = '{$categoryID}'
 				  ORDER BY r.{$orderBy} {$sortDir}";
 
-		if (is_numeric($limit)) {
+		if (is_numeric($limit) && ($limit > 0)) {
 			$query .= " LIMIT $limit";
 		}
 
