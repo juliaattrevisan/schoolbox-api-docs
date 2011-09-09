@@ -10,7 +10,7 @@ $sortOptions = array('heading', 'created', 'modified');
 $wikiHandler = new Wiki();
 $userHandler = new User();
 
-$wikiList = $wikiHandler->getByCategory($categoryID, $config['sort'], $config['sortdir']);
+$wikiList = $wikiHandler->getByCategory($categoryID, $config['sort'], $config['sortdir'], $config['size']);
 
 if (is_array($wikiList)) {
 	foreach ($wikiList as $wiki) {

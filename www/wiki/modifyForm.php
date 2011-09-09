@@ -32,6 +32,8 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 		}
 
 		$data['wikiID'] = $wiki['wikiID'];
+		$data['categoryID'] = $wiki['categoryID'];
+		$data = $wikiHandler->createStubLinks($data);
 
 		/* Check if there has been a revision added for this wiki since you
 		 * last received a lastRevision id.
@@ -58,6 +60,8 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 			}
 
 			$data['categoryID'] = $_POST['categoryID'];
+			$data = $wikiHandler->createStubLinks($data);
+
 			$wiki['wikiID'] = $wikiHandler->create($data);
 		}
 	}
@@ -124,3 +128,4 @@ else {
 		}
 	}
 }
+

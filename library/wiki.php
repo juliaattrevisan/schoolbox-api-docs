@@ -1,65 +1,72 @@
 <?php
 
-class Wiki extends DeprecatedModel {
-	function Wiki() {
+class Wiki extends DeprecatedModel
+{
+	function Wiki()
+	{
 		$this->_table = 'wiki';
 		$this->_index = 'wikiID';
 		$this->_revisionTable = 'wikiRevision';
-        $this->_openTable = 'wikiOpens';
+		$this->_openTable = 'wikiOpens';
 
 		parent::DeprecatedModel();
 	}
 
-    /**
-     * Gets the latest revision record for the specified wiki.
-     *
-     * @param <type> $wikiID
-     * @return <type>
-     */
-    function getLatestRevision($wikiID) {
-        $query = 'SELECT latestRevision FROM ' . $this->_table . " WHERE wikiID = '$wikiID'";
+	/**
+	 * Gets the latest revision record for the specified wiki.
+	 *
+	 * @param <type> $wikiID
+	 * @return <type>
+	 */
+	function getLatestRevision($wikiID)
+	{
+		$query = 'SELECT latestRevision FROM ' . $this->_table . " WHERE wikiID = '$wikiID'";
 
-        $latestRevisionID = $this->db->getRow($query);
+		$latestRevisionID = $this->db->getRow($query);
 
-        return $this->getByID($wikiID, $latestRevisionID);
-    }
+		return $this->getByID($wikiID, $latestRevisionID);
+	}
 
-    /**
-     * Locates the previous revision without needing to rely on a -1 offset.
-     *
-     * @param <type> $wikiID
-     * @param <type> $revisionID
-     * @return <type>
-     */
-    function getPreviousRevision($wikiID, $revisionID) {
-        $query = 'SELECT revisionID
+	/**
+	 * Locates the previous revision without needing to rely on a -1 offset.
+	 *
+	 * @param <type> $wikiID
+	 * @param <type> $revisionID
+	 * @return <type>
+	 */
+	function getPreviousRevision($wikiID, $revisionID)
+	{
+		$query = 'SELECT revisionID
                   FROM ' . $this->_revisionTable . "
                   WHERE wikiID = '$wikiID'
                   AND revisionID < '$revisionID'
                   ORDER BY revisionID DESC";
 
-        $previousRevision = $this->db->getRow($query);
+		$previousRevision = $this->db->getRow($query);
 
-        return $this->getByID($wikiID, $previousRevision['revisionID']);
-    }
+		return $this->getByID($wikiID, $previousRevision['revisionID']);
+	}
 
-	function getByID($wikiID, $revisionID = 0) {
+	function getByID($wikiID, $revisionID = 0)
+	{
 		$query = "SELECT r.*, w.categoryID, w.locked, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(r.created) modified, latestRevision,
 				  u.title, u.firstname, u.lastname, r.userID authorID
-				  FROM ".$this->_revisionTable." r
-				  LEFT JOIN ".$this->_table." w ON w.wikiID = r.wikiID
+				  FROM " . $this->_revisionTable . " r
+				  LEFT JOIN " . $this->_table . " w ON w.wikiID = r.wikiID
 				  LEFT JOIN user u ON u.id = r.userID
 				  WHERE w.deleted = 'false' AND r.wikiID = $wikiID ";
-		if ($revisionID > 0 && is_numeric($revisionID))
+		if ($revisionID > 0 && is_numeric($revisionID)) {
 			$query .= "AND r.revisionID = $revisionID ";
+		}
 
 		$query .= "ORDER BY r.created DESC LIMIT 1";
 		return $this->db->getRow($query);
 	}
 
-	function getRevisionList($wikiID) {
+	function getRevisionList($wikiID)
+	{
 		$query = "SELECT r.*, UNIX_TIMESTAMP(r.created) created, u.title, u.firstname, u.lastname
-				  FROM ".$this->_revisionTable." r
+				  FROM " . $this->_revisionTable . " r
 				  LEFT JOIN user u ON u.id = r.userID
 				  WHERE wikiID = $wikiID
 				  ORDER BY r.created DESC";
@@ -74,39 +81,47 @@ class Wiki extends DeprecatedModel {
 	 * @param string $sortDir
 	 * @return array|bool
 	 */
-	public function getByCategory($categoryID, $orderBy = 'created', $sortDir = 'Desc') {
+	public function getByCategory($categoryID, $orderBy = 'created', $sortDir = 'Desc', $limit = false)
+	{
 		$query = "SELECT r.*, w.locked, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.lastname
 				  FROM wiki w
-				  LEFT JOIN ".$this->_revisionTable." r ON r.revisionID = (SELECT r.revisionID FROM ".$this->_revisionTable." r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1)
+				  LEFT JOIN " . $this->_revisionTable . " r ON r.revisionID = (SELECT r.revisionID FROM " . $this->_revisionTable . " r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1)
 				  LEFT JOIN user u ON u.id = r.userID
 				  WHERE w.deleted = 'false' AND categoryID = '{$categoryID}'
 				  ORDER BY r.{$orderBy} {$sortDir}";
 
+		if (is_numeric($limit)) {
+			$query .= " LIMIT $limit";
+		}
+
 		return $this->db->getAll($query);
 	}
 
-	function homepageClean($cid) {
-		$query = "DELETE w, r FROM  `".$this->_table."` w, ".$this->_revisionTable." r  WHERE w.wikiID=r.wikiID AND categoryID='$cid'";
+	function homepageClean($cid)
+	{
+		$query = "DELETE w, r FROM  `" . $this->_table . "` w, " . $this->_revisionTable . " r  WHERE w.wikiID=r.wikiID AND categoryID='$cid'";
 		$this->db->query($query);
 	}
 
-	function createRevision ($data) {
+	function createRevision($data)
+	{
 		$data['created'] = 'NOW()';
 		$data['userID'] = $_SESSION['id'];
 		$this->db->insert($this->_revisionTable, $data);
 		return $this->db->insertID();
 	}
 
-	function create($data) {
+	function create($data)
+	{
 		$data['created'] = 'NOW()';
 
-		$revision = array( 'heading'	=> $data['heading'],
-							'body'		=> $data['body'],
-					  );
+		$revision = array('heading' => $data['heading'],
+						  'body' => $data['body'],
+		);
 		unset($data['heading'], $data['body']);
 
 		$wikiID = parent::create($data);
-		if($wikiID) {
+		if ($wikiID) {
 			$revision['wikiID'] = $wikiID;
 			$revisionID = $this->createRevision($revision);
 			parent::update(array('wikiID' => $wikiID, 'latestRevision' => $revisionID));
@@ -116,54 +131,59 @@ class Wiki extends DeprecatedModel {
 		return $wikiID;
 	}
 
-	function update($data) {
+	function update($data)
+	{
 
 		$coreFields = array('categoryID', 'locked');
-		foreach($coreFields as $field) {
-			if($data[$field]) {
+		foreach ($coreFields as $field) {
+			if ($data[$field]) {
 				$coreData[$field] = $data[$field];
 				unset($data[$field]);
 			}
 		}
 
 		//Update fields in core table
-		if(is_array($coreData)) {
+		if (is_array($coreData)) {
 			$coreData['wikiID'] = $data['wikiID'];
 			parent::update($coreData);
 		}
 
 		//Otherwise update revisions if more than just the wikiID is left
-		if(count($data) > 1) {
+		if (count($data) > 1) {
 			$revisionID = $this->createRevision($data);
 			parent::update(array('wikiID' => $data['wikiID'], 'latestRevision' => $revisionID));
 		}
 	}
 
-	function revert($wikiID, $revisionID) {
+	function revert($wikiID, $revisionID)
+	{
 		$wiki = $this->getByID($wikiID, $revisionID);
-		if (!isset($wiki['wikiID']))
+		if (!isset($wiki['wikiID'])) {
 			return false;
+		}
 
-		$data = array('wikiID'	=> $wiki['wikiID'],
-					  'heading'	=> $wiki['heading'],
-					  'body'	=> $wiki['body']);
+		$data = array('wikiID' => $wiki['wikiID'],
+					  'heading' => $wiki['heading'],
+					  'body' => $wiki['body']);
 
-		$revisionID =  $this->createRevision($data);
+		$revisionID = $this->createRevision($data);
 		parent::update(array('wikiID' => $data['wikiID'], 'latestRevision' => $revisionID));
 
 		return $revisionID;
 	}
 
-	function delete ($wikiID) {
-		$data = array('wikiID'	=> $wikiID,
-					  'deleted'	=> 'true');
+	function delete($wikiID)
+	{
+		$data = array('wikiID' => $wikiID,
+					  'deleted' => 'true');
 		return parent::update($data);
 	}
 
-    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
-            $keyword = mysql_real_escape_string($keyword);
+	function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc')
+	{
+		$keyword = mysql_real_escape_string($keyword);
 
-            $query = "SELECT wiki.*, wikiRevision.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
+		$query = "SELECT wiki.*, wikiRevision.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
                         FROM `wikiRevision`
                         LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID AND `wikiRevision`.revisionID = `wiki`.latestRevision
@@ -181,7 +201,7 @@ class Wiki extends DeprecatedModel {
                         LIMIT $offset, $limit;
             ";
 
-            $count_query = "SELECT COUNT(*)
+		$count_query = "SELECT COUNT(*)
                         FROM `wikiRevision`
                         LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID AND `wikiRevision`.revisionID = `wiki`.latestRevision
                         LEFT JOIN `user` ON `wikiRevision`.userID = `user`.id
@@ -196,10 +216,81 @@ class Wiki extends DeprecatedModel {
                             AND `deleted` = 'false'
             ";
 
-            $count = $this->db->getOne($count_query);
+		$count = $this->db->getOne($count_query);
 
-            return $this->db->getAll($query);
-        }
+		return $this->db->getAll($query);
+	}
+
+	/**
+	 * Figure out if there are any empty links - these are assumed to be stubs.
+	 * If a title attribute is provided, use that as the stub wiki heading
+	 *
+	 * @param  $data
+	 * @return
+	 */
+	public function createStubLinks($data) {
+		$allMatches = array();
+
+		preg_match_all('/<a title="([^"]*)">/', $data['body'], $allMatches);
+
+		if (count($allMatches[1])) {
+			$pattern = array();
+			$replace = array();
+
+			for ($i=0; $i < count($allMatches[1]); $i++) {
+				$currentMatch = $allMatches[1][$i];
+
+				/* Try using title attribute as a heading
+				 * Otherwise ignore creation of empty stubs
+				 */
+				if (strlen(trim($currentMatch))) {
+					$stubData = array();
+
+					$stubData['categoryID'] = $data['categoryID'];
+					$stubData['heading'] = trim($currentMatch);
+					$stubData['body'] = "This is a stub page for $stubData[heading].";
+
+					/* Replacement links. Create a link to the stub if it
+					 * already exists, otherwise create the stub then link
+					 * to it.
+					 */
+					$existingStub = $this->getWikiByHeading($stubData['heading']);
+
+					if ($existingStub) {
+						$index = $existingStub['wikiID'];
+					}
+					else {
+						$index = $this->create($stubData);
+					}
+
+					$pattern[] = $allMatches[0][$i];
+					$replace[] = "<a href='/wiki/{$index}'>";
+				}
+			}
+		}
+
+		/* Perform replacements if required
+		 */
+		if (count($pattern)) {
+			$data['body'] = str_replace($pattern, $replace, $data['body']);
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Get a wiki ID for the prescribed heading.
+	 *
+	 * @param  $heading
+	 * @return array|bool
+	 */
+	public function getWikiByHeading($heading) {
+		$query = "SELECT wiki.wikiID FROM wiki
+					LEFT JOIN wikiRevision ON wiki.latestRevision = wikiRevision.revisionID
+					WHERE heading = \"$heading\"";
+
+		return $this->db->getRow($query);
+	}
 }
 
 ?>
