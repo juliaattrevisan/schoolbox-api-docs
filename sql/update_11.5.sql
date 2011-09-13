@@ -86,3 +86,7 @@ ALTER TABLE groups ADD COLUMN can_change_password ENUM ('true', 'false') DEFAULT
 /* Wiki sort options
  */
 UPDATE `homepage_comp` SET `config`='a:3:{s:4:\"sort\";s:5:\"Title\";s:7:\"sortdir\";s:4:\"Desc\";s:4:\"size\";s:1:\"0\";}' WHERE `id`='34';
+
+/* Wiki stub
+ */
+ALTER TABLE wiki ADD COLUMN stub ENUM('false', 'true') DEFAULT 'false';

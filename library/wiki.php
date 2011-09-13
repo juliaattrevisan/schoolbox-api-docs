@@ -47,19 +47,27 @@ class Wiki extends DeprecatedModel
 		return $this->getByID($wikiID, $previousRevision['revisionID']);
 	}
 
-	function getByID($wikiID, $revisionID = 0)
-	{
-		$query = "SELECT r.*, w.categoryID, w.locked, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(r.created) modified, latestRevision,
+	/**
+	 * Gets a wiki by its id
+	 *
+	 * @param  $wikiID
+	 * @param int $revisionID
+	 * @return array|bool
+	 */
+	public function getByID($wikiID, $revisionID = 0) {
+		$query = "SELECT r.*, w.categoryID, w.locked, w.stub, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(r.created) modified, latestRevision,
 				  u.title, u.firstname, u.lastname, r.userID authorID
 				  FROM " . $this->_revisionTable . " r
 				  LEFT JOIN " . $this->_table . " w ON w.wikiID = r.wikiID
 				  LEFT JOIN user u ON u.id = r.userID
 				  WHERE w.deleted = 'false' AND r.wikiID = $wikiID ";
+
 		if ($revisionID > 0 && is_numeric($revisionID)) {
 			$query .= "AND r.revisionID = $revisionID ";
 		}
 
 		$query .= "ORDER BY r.created DESC LIMIT 1";
+
 		return $this->db->getRow($query);
 	}
 
@@ -110,30 +118,50 @@ class Wiki extends DeprecatedModel
 		return $this->db->insertID();
 	}
 
-	function create($data)
-	{
+	/**
+	 * Creates a wiki page and assigns latest revision
+	 *
+	 * @param  $data
+	 * @return int
+	 */
+	public function create($data) {
 		$data['created'] = 'NOW()';
 
-		$revision = array('heading' => $data['heading'],
-						  'body' => $data['body'],
+		$revision = array(
+			'heading' => $data['heading'],
+			'body' => $data['body']
 		);
+
 		unset($data['heading'], $data['body']);
 
 		$wikiID = parent::create($data);
+
 		if ($wikiID) {
 			$revision['wikiID'] = $wikiID;
 			$revisionID = $this->createRevision($revision);
-			parent::update(array('wikiID' => $wikiID, 'latestRevision' => $revisionID));
-		}
 
+			parent::update(array(
+				'wikiID' => $wikiID,
+				'latestRevision' => $revisionID
+			));
+		}
+		else {
+			error(2);
+		}
 
 		return $wikiID;
 	}
 
-	function update($data)
-	{
+	/**
+	 * Updates a wiki's data with the latest revision if applicable
+	 * Note that wikis now know whether they are stubs or not
+	 *
+	 * @param  $data
+	 * @return void
+	 */
+	public function update($data) {
+		$coreFields = array('categoryID', 'locked', 'stub');
 
-		$coreFields = array('categoryID', 'locked');
 		foreach ($coreFields as $field) {
 			if ($data[$field]) {
 				$coreData[$field] = $data[$field];
@@ -150,7 +178,11 @@ class Wiki extends DeprecatedModel
 		//Otherwise update revisions if more than just the wikiID is left
 		if (count($data) > 1) {
 			$revisionID = $this->createRevision($data);
-			parent::update(array('wikiID' => $data['wikiID'], 'latestRevision' => $revisionID));
+
+			parent::update(array(
+				'wikiID' => $data['wikiID'],
+				'latestRevision' => $revisionID,
+			));
 		}
 	}
 
@@ -246,6 +278,7 @@ class Wiki extends DeprecatedModel
 					$stubData = array();
 
 					$stubData['categoryID'] = $data['categoryID'];
+					$stubData['stub'] = 'true';
 					$stubData['heading'] = trim($currentMatch);
 					$stubData['body'] = "This is a stub page for $stubData[heading].";
 
@@ -290,6 +323,34 @@ class Wiki extends DeprecatedModel
 
 		return $this->db->getRow($query);
 	}
+
+	/**
+	 * Turns all stub links red
+	 *
+	 * @param  $body
+	 * @return mixed
+	 */
+	public function activateStubLinks($body) {
+		$allMatches = array();
+
+		preg_match_all("/<a\ href=['\"]+\/wiki\/(\d+)['\"]+>/", $body, $allMatches, PREG_SET_ORDER);
+
+		if (count($allMatches)) {
+			for ($i=0; $i < count($allMatches); $i++) {
+				$currentMatch = $allMatches[$i];
+
+				$wiki = $this->getByID($currentMatch[1]);
+
+				/* Append a link class to change link colour
+				 */
+				if ($wiki['stub'] == 'true') {
+					$link = str_replace('<a', '<a class="red"', $allMatches[$i][0]);
+					$body = str_replace($allMatches[$i][0], $link, $body);
+				}
+			}
+		}
+
+		return $body;
+	}
 }
 
-?>

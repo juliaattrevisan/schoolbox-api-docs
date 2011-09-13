@@ -3,12 +3,10 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/wiki.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
-$wikiHandler = new Wiki;
+$wikiHandler = new Wiki();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
-
 if (is_numeric($this->arg[0])) {
-
 	$this->setFile(TEMPLATE_content, 'wiki.html');
 	$this->setBlock(TEMPLATE_content, 'modify_link', 'modify_link_block');
 	$this->setBlock(TEMPLATE_content, 'delete_link', 'delete_link_block');
@@ -20,26 +18,31 @@ if (is_numeric($this->arg[0])) {
 
 	$wiki = $wikiHandler->getByID($this->arg[0], $this->arg[1]);
 
-	if (!isset($wiki['wikiID']))
+	if (!isset($wiki['wikiID'])) {
 		error(101);
+	}
 
 	// check permission
-	if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS)
+	if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
 		error(19);
+	}
 
 	$this->setTitle('Wiki');
 	$this->setTab('resources');
 
 	$userHandler = new User();
+	$modifiedDate = new Alaress_Date_Format($wiki['modified'], 'U');
 
-	$modifiedDate = new Alaress_Date_Format($wiki['modified']);
-
-	// output wiki
+	/* Detect stub links in the wiki body and determine whether the links should
+	 * be cosmetically customised
+	 *
+	 * Output wiki contents
+	 */
 	$output = array(
 		'WIKI_ID' => $wiki['wikiID'],
 		'CATEGORY_ID' => $wiki['categoryID'],
 		'HEADING' => Scrub::text($wiki['heading']),
-		'BODY' => Scrub::html($wiki['body']),
+		'BODY' => $wikiHandler->activateStubLinks($wiki['body']),
 		'MODIFIED' => $modifiedDate->getLong(),
 		'AUTHOR' => $userHandler->formatName($wiki),
 		'AUTHOR_ID' => $wiki['authorID'],
@@ -61,16 +64,16 @@ if (is_numeric($this->arg[0])) {
 		foreach ($revisionList as $revision) {
 			$i++;
 
-			$revisionDate = new Alaress_Date_Format($revision['created']);
+			$revisionDate = new Alaress_Date_Format($revision['created'], 'U');
 
 			$this->setVar(array(
-					'WIKI_ID'           => $wiki['wikiID'],
-					'REVISION_ID'       => $wiki['revisionID'],
-					'REVISION_COMPARE'  => $revision['revisionID'],
-					'REVISION_DATE'     => $revisionDate->getDateOnly(),
-					'REVISION_HEADING'	=> Scrub::text($revision['heading']),
-					'REVISION_AUTHOR'	=> $userHandler->formatName($revision),
-					'REVISION_CURRENT'	=> $revision['revisionID']==$wiki['revisionID']?'revisionCurrent':'',
+				'WIKI_ID' => $wiki['wikiID'],
+				'REVISION_ID' => $wiki['revisionID'],
+				'REVISION_COMPARE' => $revision['revisionID'],
+				'REVISION_DATE' => $revisionDate->getDateOnly(),
+				'REVISION_HEADING' => Scrub::text($revision['heading']),
+				'REVISION_AUTHOR' => $userHandler->formatName($revision),
+				'REVISION_CURRENT' => $revision['revisionID'] == $wiki['revisionID'] ? 'revisionCurrent' : '',
 			));
 
 			if ($wiki['revisionID'] == $revision['revisionID']) {
@@ -93,25 +96,30 @@ if (is_numeric($this->arg[0])) {
 
 	// output links
 	$this->setVar('revert_link_block', '');
-	if ($wiki['revisionID'] != $finalRevision && $permission >= WRITE_ACCESS)
+	if ($wiki['revisionID'] != $finalRevision && $permission >= WRITE_ACCESS) {
 		$this->parse('revert_link_block', 'revert_link');
+	}
 
 	$this->setVar('delete_link_block', '');
-	if ($permission >= WRITE_ACCESS)
+	if ($permission >= WRITE_ACCESS) {
 		$this->parse('delete_link_block', 'delete_link');
+	}
 
 	$this->setVar('lock_link_block', '');
-	if ($permission >= WRITE_ACCESS)
+	if ($permission >= WRITE_ACCESS) {
 		$this->parse('lock_link_block', 'lock_link');
+	}
 
 	$this->setVar('modify_link_block', '');
-	if (($permission >= READ_ACCESS && $wiki['locked'] == 'false') || $permission >= WRITE_ACCESS)
+	if (($permission >= READ_ACCESS && $wiki['locked'] == 'false') || $permission >= WRITE_ACCESS) {
 		$this->parse('modify_link_block', 'modify_link');
+	}
 
 	$this->setVar('export_link_block', '');
-	if ($permission >= READ_ACCESS)
+	if ($permission >= READ_ACCESS) {
 		$this->parse('export_link_block', 'export_link');
-
-} else
+	}
+}
+else {
 	error(2);
-?>
+}

@@ -3,7 +3,8 @@
 <script type="text/javascript">
 $j(window).load(function(){
 	$j('.cycle-content').cycle({
-        cleartype: true,
+		timeout: {COMPONENT_CONFIG_TIMING_VALUE_MS},
+		cleartype: true,
 		before: function(curr, next, opts) {
 			$j(next).css('margin-left', -$j(next).width()/2);
 			$j(next).css('margin-top', -$j(next).height()/2);
@@ -12,7 +13,6 @@ $j(window).load(function(){
 		 {
 			var append = $j(this).attr('alt');
 			$j('.caption-holder').text(append);
-
         }
     });
 });
@@ -61,14 +61,22 @@ $j(window).load(function(){
 
 			<label for="url">
 				Pixels:
-				<input type="text" name="pixel" value="{COMPONENT_PIXEL}" size="4"/>
+				<input id='url' type="text" name="pixel" value="{COMPONENT_PIXEL}" size="4"/>
 			</label>
 			<label for="caption">
 				Captions:
-				<select name="captionState">
+				<select id='caption' name="captionState">
 					<!-- BEGIN caption_state -->
 					<option value="{COMPONENT_CONFIG_CAPTION_STATE_VALUE}" {COMPONENT_CONFIG_CAPTION_STATE_SELECTED}>{COMPONENT_CONFIG_CAPTION_STATE_NAME}</option>
 					<!-- END caption_state -->
+				</select>
+			</label>
+			<label for="timing">
+				Timing:
+				<select id='timing' name="timing">
+					<!-- BEGIN timing -->
+					<option value="{COMPONENT_CONFIG_TIMING_VALUE}" {COMPONENT_CONFIG_TIMING_SELECTED}>{COMPONENT_CONFIG_TIMING_VALUE} seconds</option>
+					<!-- END timing -->
 				</select>
 			</label>
 

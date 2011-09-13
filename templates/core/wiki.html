@@ -1,8 +1,8 @@
 <!-- BEGIN custom_head -->
 <!-- END custom_head -->
-  <h1>{HEADING} {LOCKED}</h1>
-  
-  <span class="header_option">
+<h1>{HEADING} {LOCKED}</h1>
+
+<span class="header_option">
 	  <!-- BEGIN modify_link -->
 	  <a href="/wiki/modify/{WIKI_ID}" class="btn modify"><span></span>Modify</a>
 	   <!-- END modify_link -->
@@ -14,29 +14,29 @@
 	  <a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}" class="btn tick"><span></span>{LOCK_UNLOCK}</a><!-- END lock_link -->
 	  <!-- BEGIN export_link -->
 	  <a href="/wiki/exportForm.php?wikiID={WIKI_ID}" class="btn up-arrow"><span></span>{EXPORT}</a><!-- END export_link -->
-	
+
 	  <a href="/homepage/{CATEGORY_ID}" class="btn go-back"><span></span>Return to homepage</a>
   </span>
-  
-  <div class="left">
-  	<div class="wysiwig revision-box">
-    {BODY}
-    </div>
-    <p>Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</p>
+
+<div class="left">
+	<div class="wysiwig revision-box">
+		{BODY}
 	</div>
-  <div class="right">
-      <h2>Revisions</h2>
-      <table width="100%">
-        <tr>
-          <th>Date</th>
-          <th>Author</th>
-        </tr>
-        <!-- BEGIN revision_list -->
-        <tr class="{REVISION_CURRENT}">
-          <td><a href="/wiki/{WIKI_ID}/{REVISION_COMPARE}">{REVISION_DATE}</a></td>
-          <td>{REVISION_AUTHOR}</td>
-          <td><!-- BEGIN revision_comparison --><a href="/wiki/diff/{WIKI_ID}/{REVISION_ID}/{REVISION_COMPARE}">Compare</a><!-- END revision_comparison --></td>
-        </tr>
-        <!-- END revision_list -->
-      </table>
-    </div>
+	<p>Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</p>
+</div>
+<div class="right">
+	<h2>Revisions</h2>
+	<table width="100%">
+		<tr>
+			<th>Date</th>
+			<th>Author</th>
+		</tr>
+		<!-- BEGIN revision_list -->
+		<tr class="{REVISION_CURRENT}">
+			<td><a href="/wiki/{WIKI_ID}/{REVISION_COMPARE}">{REVISION_DATE}</a></td>
+			<td>{REVISION_AUTHOR}</td>
+			<td><!-- BEGIN revision_comparison --><a href="/wiki/diff/{WIKI_ID}/{REVISION_ID}/{REVISION_COMPARE}">Compare</a><!-- END revision_comparison --></td>
+		</tr>
+		<!-- END revision_list -->
+	</table>
+</div>
