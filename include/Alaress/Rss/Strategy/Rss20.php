@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Rss_Strategy_Rss20 {
+class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface {
 
 	/**
 	 * Get a list of $limit RSS items
@@ -48,7 +48,24 @@ class Alaress_Rss_Strategy_Rss20 {
 		return $data;
 	}
 
+
+	/**
+	 * Get the title of the stream
+	 *
+	 * @param  $input
+	 * @return
+	 */
 	public function getTitle($input) {
-		print_r($input);
+		return $input->xml->channel->title;
+	}
+
+	/**
+	 * Get the link of the stream
+	 *
+	 * @param  $input
+	 * @return
+	 */
+	public function getLink($input) {
+		return $input->xml->channel->link;
 	}
 }

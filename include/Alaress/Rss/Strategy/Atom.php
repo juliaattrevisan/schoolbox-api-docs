@@ -67,5 +67,4 @@ class Alaress_Rss_Strategy_Atom implements Alaress_Rss_Strategy_Interface {
 	public function getLink($input) {
 		return $input->xml->link[0]->attributes()->href;
 	}
-
 }
