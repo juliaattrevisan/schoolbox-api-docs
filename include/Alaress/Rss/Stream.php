@@ -8,16 +8,15 @@
  * The Alaress_Rss_Stream constructor takes a source url, but it
  * can be overridden by using setSource() after instantiation
  *
- * The default source url is the alaress feedburner url
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
 class Alaress_Rss_Stream {
-	private $source = 'http://feeds2.feedburner.com/alaress';
+	private $source = null;
 	private $limit = 6;
+	private $output = array();
 
 	/* This can be dynamically chosen based on structure
 	 * of input data. Choose strategy in the setup
@@ -43,19 +42,21 @@ class Alaress_Rss_Stream {
 	 *
 	 * @return void
 	 */
-	private function setup() {
-		$this->setInput(new Xml($this->getSource(), RSS_cache_time));
+	public function setup() {
+		if ($this->getSource() != null) {
+			$this->setInput(new Xml($this->getSource(), RSS_cache_time));
 
-		/* Decide if the feed is an ATOM feed or a regular RSS 2.0
-		 */
-		if ($this->isInputAtom()) {
-			$rssStrategy = 'Alaress_Rss_Strategy_Atom';
-		}
-		else if ($this->isInputRss20()) {
-			$rssStrategy = 'Alaress_Rss_Strategy_Rss20';
-		}
+			/* Decide if the feed is an ATOM feed or a regular RSS 2.0
+			 */
+			if ($this->isInputAtom()) {
+				$rssStrategy = 'Alaress_Rss_Strategy_Atom';
+			}
+			else if ($this->isInputRss20()) {
+				$rssStrategy = 'Alaress_Rss_Strategy_Rss20';
+			}
 
-		$this->setRssStrategy(new $rssStrategy());
+			$this->setRssStrategy(new $rssStrategy());
+		}
 	}
 
 	/**
@@ -79,7 +80,7 @@ class Alaress_Rss_Stream {
 	 * @return bool
 	 */
 	private function isInputRss20() {
-		if (isset($this->getInput()->xml->attributes()->version) && ($this->getInput()->xml->attributes()->version == '2.0')) {
+		if (isset($this->getInput()->xml) && ($this->getInput()->xml->attributes()->version == '2.0')) {
 			return true;
 		}
 
@@ -92,9 +93,56 @@ class Alaress_Rss_Stream {
 	 * @return
 	 */
 	public function stream() {
-		$this->setup();
+		if ($this->getSource() != null) {
+			$this->setup();
 
-		return $this->getRssStrategy()->get($this->getInput(), $this->getLimit());
+			$this->setOutput($this->getRssStrategy()->get($this->getInput(), $this->getLimit()));
+		}
+	}
+
+	/**
+	 * Get an RSS stream title
+	 *
+	 * @return
+	 */
+	public function getTitle() {
+		if ($this->getSource() != null) {
+			return $this->getRssStrategy()->getTitle($this->getInput());
+		}
+
+		return 'Please enter a feed URL';
+	}
+
+	/**
+	 * Get an RSS stream link
+	 *
+	 * @return
+	 */
+	public function getLink() {
+		if ($this->getSource() != null) {
+			return $this->getRssStrategy()->getLink($this->getInput());
+		}
+
+		return '';
+	}
+
+	/**
+	 * Set output contents
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	private function setOutput($val) {
+		$this->output = $val;
+	}
+
+	/**
+	 * Get output contents
+	 *
+	 * @return
+	 */
+	public function getOutput() {
+		return $this->output;
 	}
 
 	/**

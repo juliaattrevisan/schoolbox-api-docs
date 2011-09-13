@@ -47,4 +47,25 @@ class Alaress_Rss_Strategy_Atom implements Alaress_Rss_Strategy_Interface {
 
 		return $data;
 	}
+
+	/**
+	 * Get the title of the stream
+	 *
+	 * @param  $input
+	 * @return
+	 */
+	public function getTitle($input) {
+		return $input->xml->title;
+	}
+
+	/**
+	 * Get the link of the stream
+	 *
+	 * @param  $input
+	 * @return
+	 */
+	public function getLink($input) {
+		return $input->xml->link[0]->attributes()->href;
+	}
+
 }

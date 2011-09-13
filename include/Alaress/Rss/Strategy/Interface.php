@@ -20,4 +20,20 @@ interface Alaress_Rss_Strategy_Interface {
 	 * @return void
 	 */
 	public function get($source, $limit);
+
+	/**
+	 * Get the title of the stream
+	 *
+	 * @param  $input
+	 * @return
+	 */
+	public function getTitle($input);
+
+	/**
+	 * Get the link of the stream
+	 *
+	 * @param  $input
+	 * @return
+	 */
+	public function getLink($input);
 }

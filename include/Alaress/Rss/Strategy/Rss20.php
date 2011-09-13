@@ -47,4 +47,8 @@ class Alaress_Rss_Strategy_Rss20 {
 
 		return $data;
 	}
+
+	public function getTitle($input) {
+		print_r($input);
+	}
 }
