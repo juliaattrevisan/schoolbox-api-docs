@@ -94,7 +94,7 @@ foreach ($optionList as $option) {
 				break;
 
 			case 'textarea' :
-				$this->parse('setting_type_input_block', 'setting_type_input', true);
+				$this->parse('setting_type_textarea_block', 'setting_type_textarea', true);
 				break;
 
 			case 'boolean' :

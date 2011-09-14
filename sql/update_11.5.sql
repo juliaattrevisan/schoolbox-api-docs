@@ -93,3 +93,8 @@ UPDATE `homepage_comp` SET `config`='a:3:{s:4:\"sort\";s:5:\"Title\";s:7:\"sortd
 /* Wiki stub
  */
 ALTER TABLE wiki ADD COLUMN stub ENUM('false', 'true') DEFAULT 'false';
+
+/* Policy
+ */
+INSERT INTO config (`name`, title, description) VALUES ('policy', 'Policy', 'A policy description which appears in the footer of each page.');
+UPDATE `config` SET `field`='textarea',`type`='Site',`editable`='true' WHERE `name`='policy';

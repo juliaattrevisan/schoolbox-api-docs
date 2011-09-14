@@ -1,13 +1,28 @@
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>Language Translator</h2>
 	<!-- BEGIN config -->
-	<a class="close-delete" href="#"><span>X</span></a>
+	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
+	<div class="editPanel settings hide">
+		<form action="/homepage/configForm.php" method="get">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="type" value="config" />
+			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+
+			<label for='language'>Default language: </label>
+			<select id='language' name='language'>
+				<!-- BEGIN language -->
+				<option value="{COMPONENT_LANGUAGE_CODE}"{COMPONENT_LANGUAGE_SELECTED}>{COMPONENT_LANGUAGE_NAME}</option>
+				<!-- END language -->
+			</select>
+			<input type="submit" value="Update" class="submit-btn update" />
+		</form>
+	</div>
 	<div class="editPanel delete-it hide clearfix">
 		<p>Are you sure you want to remove component?</p>
 		<form action="#" method="post">
 			<input type="hidden" name="cid" value="{ID}" />
-			<input type="hidden" name="component" value="{COMPONENT_ID}" />
 			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+			<input type="hidden" name="component" value="{COMPONENT_ID}" />
 			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> <a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
 	</div>
@@ -20,64 +35,9 @@
 				</label>
 				<label for="textToTranslate" class="righty"> into<br />
 					<select id="translateInto">
-						<option value="af">Afrikaans</option>
-						<option value="sq">Albanian</option>
-						<option value="ar">Arabic</option>
-						<option value="hy">Armenian ALPHA</option>
-						<option value="az">Azerbaijani ALPHA</option>
-						<option value="eu">Basque ALPHA</option>
-						<option value="be">Belarusian</option>
-						<option value="bg">Bulgarian</option>
-						<option value="ca">Catalan</option>
-						<option value="zh-CN">Chinese (Simplified)</option>
-						<option value="zh-TW">Chinese (Traditional)</option>
-						<option value="hr">Croatian</option>
-						<option value="cs">Czech</option>
-						<option value="da">Danish</option>
-						<option value="nl">Dutch</option>
-						<option value="en">English</option>
-						<option value="et">Estonian</option>
-						<option value="tl">Filipino</option>
-						<option value="fi">Finnish</option>
-						<option value="fr" selected="selected">French</option>
-						<option value="gl">Galician</option>
-						<option value="ka">Georgian ALPHA</option>
-						<option value="de">German</option>
-						<option value="el">Greek</option>
-						<option value="ht">Haitian Creole ALPHA</option>
-						<option value="iw">Hebrew</option>
-						<option value="hi">Hindi</option>
-						<option value="hu">Hungarian</option>
-						<option value="is">Icelandic</option>
-						<option value="id">Indonesian</option>
-						<option value="ga">Irish</option>
-						<option value="it">Italian</option>
-						<option value="ja">Japanese</option>
-						<option value="ko">Korean</option>
-						<option value="lv">Latvian</option>
-						<option value="lt">Lithuanian</option>
-						<option value="mk">Macedonian</option>
-						<option value="ms">Malay</option>
-						<option value="mt">Maltese</option>
-						<option value="no">Norwegian</option>
-						<option value="fa">Persian</option>
-						<option value="pl">Polish</option>
-						<option value="pt">Portuguese</option>
-						<option value="ro">Romanian</option>
-						<option value="ru">Russian</option>
-						<option value="sr">Serbian</option>
-						<option value="sk">Slovak</option>
-						<option value="sl">Slovenian</option>
-						<option value="es">Spanish</option>
-						<option value="sw">Swahili</option>
-						<option value="sv">Swedish</option>
-						<option value="th">Thai</option>
-						<option value="tr">Turkish</option>
-						<option value="uk">Ukrainian</option>
-						<option value="ur">Urdu ALPHA</option>
-						<option value="vi">Vietnamese</option>
-						<option value="cy">Welsh</option>
-						<option value="yi">Yiddish</option>
+						<!-- BEGIN translate_into -->
+						<option value="{COMPONENT_LANGUAGE_CODE}"{COMPONENT_LANGUAGE_SELECTED}>{COMPONENT_LANGUAGE_NAME}</option>
+						<!-- END translate_into -->
 					</select>
 				</label>
 
