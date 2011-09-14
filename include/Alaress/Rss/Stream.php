@@ -44,18 +44,26 @@ class Alaress_Rss_Stream {
 	 */
 	public function setup() {
 		if ($this->getSource() != null) {
-			$this->setInput(new Xml($this->getSource(), RSS_cache_time));
+			$this->setInput(new Xml($this->getSource()));
 
 			/* Decide if the feed is an ATOM feed or a regular RSS 2.0
 			 */
 			if ($this->isInputAtom()) {
-				$rssStrategy = 'Alaress_Rss_Strategy_Atom';
+				$this->setRssStrategy(new Alaress_Rss_Strategy_Atom());
 			}
 			else if ($this->isInputRss20()) {
-				$rssStrategy = 'Alaress_Rss_Strategy_Rss20';
+				$this->setRssStrategy(new Alaress_Rss_Strategy_Rss20());
 			}
+			else {
+				/* Special case for feedburner: needs to use LastRSS to
+				 * interpret the content, for some reason Xml won't do it
+				 */
+				$lastRss = new Alaress_Rss_Strategy_LastRss();
 
-			$this->setRssStrategy(new $rssStrategy());
+				$this->setInput($lastRss->get($this->getSource()));
+
+				$this->setRssStrategy(new Alaress_Rss_Strategy_Feedburner());
+			}
 		}
 	}
 
@@ -80,6 +88,20 @@ class Alaress_Rss_Stream {
 	 * @return bool
 	 */
 	private function isInputRss20() {
+		if (isset($this->getInput()->xml) && ($this->getInput()->xml->attributes()->version == '2.0')) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Decide if the feed is an RSS 2.0 feed
+	 *
+	 * @param  $rss
+	 * @return bool
+	 */
+	private function isInputFeedburner() {
 		if (isset($this->getInput()->xml) && ($this->getInput()->xml->attributes()->version == '2.0')) {
 			return true;
 		}
