@@ -13,7 +13,7 @@ ALTER TABLE `assess` ADD COLUMN `availability` ENUM('assess','survey') DEFAULT '
 
 /* Survey homepage component
  */
-INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`homepageCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) VALUES ( '44','1','outputSurvey','Surveys','Online surveys.','3','survey.html','','false','false');
+INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`homepageCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) VALUES ( '44','1','outputSurvey','Surveys','Create surveys with multiple questions and graphical summaries','3','survey.html','','false','false');
 
 /* Whether or not exported responses for a question have a legend
  * Also applicable for View All Responses for a Survey question
@@ -48,7 +48,10 @@ ALTER TABLE eportfolio_config ADD COLUMN left_column_width FLOAT DEFAULT 49.5 AF
 
 /* Podcast update
  */
-UPDATE homepage_comp SET description = "Subscribe to an audio-only podcast." WHERE method = 'outputPodcast';
+UPDATE homepage_comp SET description = "Provides an audio player for podcast feeds" WHERE method = 'outputPodcast';
+
+UPDATE homepage_comp SET `description`='Provides an area for teachers to receive files from students without the need for a submission box and due date' WHERE `method`='outputDropBox';
+UPDATE homepage_comp SET `description`='Provide links to interesting, related and helpful resources on Schoolbox or the WWW.' WHERE `method`='outputLinkList';
 
 /* Optional config fields for validation
  */
