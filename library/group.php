@@ -138,6 +138,16 @@ class Group extends DeprecatedModel {
 		return $ids;
 	}
 
+    /**
+     * Returns group type based on a group id
+     * @param  int $groupID
+     * @return string
+     */
+    public function getGroupType($groupID) {
+        $query = "SELECT group_type FROM groups WHERE id = \"{$groupID}\"";
+        return $this->db->getOne($query);
+    }
+
 	/**
 	 * Alias for getting Staff Group Type IDs
 	 *
@@ -251,7 +261,7 @@ class Group extends DeprecatedModel {
 
     function allowOwner($userID) {
         //checks if the user can become the owner of group
-        if (GROUP_staff_only_owner) {
+        if ( Cfg::get('group_staff_only')) {
             return $this->isStaff($userID);
         } else
             return true;
@@ -430,7 +440,7 @@ class Group extends DeprecatedModel {
         } else
             return false;
 
-        if (in_array($groupID, $this->getGroupTypeIds(Group::STUDENT_GROUP_TYPE))) {
+        if($this->getGroupType($groupID) ==  Group::STUDENT_GROUP_TYPE) {
             return true;
 		}
         else {
@@ -474,10 +484,12 @@ class Group extends DeprecatedModel {
         } else
             return false;
 
-        if (in_array($groupID, $this->getStaffGroupTypeIds()))
+        if($this->getGroupType($groupID) ==  Group::STAFF_GROUP_TYPE) {
             return true;
-        else
+		}
+        else {
             return false;
+		}
     }
 
     function isParent($userID = 0) {
@@ -490,13 +502,14 @@ class Group extends DeprecatedModel {
             $groupID = $user['group_id'];
         } elseif (is_numeric($_SESSION['gid'])) {
             $groupID = $_SESSION['gid'];
-        } else
             return false;
 
-        if (in_array($groupID, $this->getParentGroupTypeIds()))
+        if($this->getGroupType($groupID) ==  Group::PARENT_GROUP_TYPE) {
             return true;
-        else
+		}
+        else {
             return false;
+		}
     }
 
     function isParentOfChild($childID) {

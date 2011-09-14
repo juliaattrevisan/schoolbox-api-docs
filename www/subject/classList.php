@@ -9,8 +9,11 @@
 require_once 'include/permission.php';
 require_once '../library/category.php';
 require_once '../library/user.php';
+require_once '../library/group.php';
 
-if(isStaff($_SESSION['gid'])) {
+$groupHandler=new Group;
+
+if($groupHandler->isStaff($_SESSION['gid'])) {
 	$userHandler = new User;
 	$categoryHandler = new Category;
 	$synergeticClass = new ExternalClass;

@@ -225,7 +225,7 @@ if (is_numeric($this->arg[0])) {
 
 			if (is_array($studentContactList)) {
 				foreach ($studentContactList as $studentContact) {
-					if ($studentContact['StudentContactID'] == $_SESSION['sid'] || $studentContact['StudentContactSpouseID'] == $_SESSION['sid'] || isStaff($_SESSION['gid']) || $_SESSION['su']) {
+					if ($studentContact['StudentContactID'] == $_SESSION['sid'] || $studentContact['StudentContactSpouseID'] == $_SESSION['sid'] || $groupHandler->isStaff($_SESSION['gid']) || $_SESSION['su']) {
 						$j++;
 
 						if ($studentContact['StudentContactDefaultEmail']) {

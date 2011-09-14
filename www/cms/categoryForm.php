@@ -37,15 +37,17 @@ if ($_POST['name']) {
 		/* Prevent students with write access from being able to
 		 * create folders
 		 */
-		if ($groupHandler->isStudent() && isset($_POST['groupcheck'])) {
-			error(20);
+		if ($groupHandler->allowOwner($_SESSION['id']) ) {
+
+            /* Setup group and forward to group management page */
+            $groupHandler->createGroup($category['id']);
+            $groupHandler->addUser($category['id'], $_SESSION['id'], 3);
+
+            SitePage::localRedir('/group/modify/'.$category['id']);
+
 		}
+         error(20);
 
-		/* Setup group and forward to group management page */
-		$groupHandler->createGroup($category['id']);
-		$groupHandler->addUser($category['id'], $_SESSION['id'], 3);
-
-		SitePage::localRedir('/group/modify/'.$category['id']);
 	}
 	else {
 		/* Redirect to / if the homepage was removed from a category
