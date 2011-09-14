@@ -503,6 +503,7 @@ class Group extends DeprecatedModel {
         } elseif (is_numeric($_SESSION['gid'])) {
             $groupID = $_SESSION['gid'];
             return false;
+        }
 
         if($this->getGroupType($groupID) ==  Group::PARENT_GROUP_TYPE) {
             return true;
@@ -593,4 +594,3 @@ class Group extends DeprecatedModel {
     }
 
 }
-?>
