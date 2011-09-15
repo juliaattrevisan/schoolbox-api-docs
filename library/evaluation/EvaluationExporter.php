@@ -166,11 +166,14 @@ class EvaluationExporter {
 
 								$responseValues = str_replace("\t", '', $data['responseText']);
 								$commentValues = $data['comment'];
-							}
 
-							$this->sectionValues[$k]['questions'][$i]['attempts'][$j]['name'] = $currentAttempt['firstname'] . ' ' . $currentAttempt['lastname'];
-							$this->sectionValues[$k]['questions'][$i]['attempts'][$j]['responses'] = $responseValues;
-							$this->sectionValues[$k]['questions'][$i]['attempts'][$j]['comment'] = $commentValues;
+								$this->sectionValues[$k]['questions'][$i]['attempts'][$j] = array(
+									'synergy_id' => $currentAttempt['synergy_id'],
+									'name' => $currentAttempt['firstname'] . ' ' . $currentAttempt['lastname'],
+									'responses' => $responseValues,
+									'comment' => html_entity_decode(str_replace("\n", '', strip_tags($commentValues)), ENT_QUOTES)
+								);
+							}
 						}
 					}
 				}
@@ -214,13 +217,14 @@ class EvaluationExporter {
 					foreach($currentSection['questions'] as $currentQuestion) {
 						echo "Q$i. {$currentQuestion['question']}\n";
 
-						$this->outputCSV2(array(array("Respondent", "Response", "Teacher's Comment")));
+						$this->outputCSV2(array(array("Synergy ID", "Respondent", "Response", "Teacher's Comment")));
 
 						/* Generate attempts for this question
 						 */
 						foreach($currentQuestion['attempts'] as $currentAttempt) {
 							$attemptList = array();
 
+							$attemptList[] = $currentAttempt['synergy_id'];
 							$attemptList[] = $currentAttempt['name'];
 							$attemptList[] = $currentAttempt['responses'];
 							$attemptList[] = $currentAttempt['comment'];

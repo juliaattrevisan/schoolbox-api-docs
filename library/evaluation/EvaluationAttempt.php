@@ -218,7 +218,7 @@ abstract class EvaluationAttempt extends DeprecatedModel {
     public function getListByAssessAndSection($assess_id, $section_id) {
         $query = "SELECT
                       assess_attempt.attempt_id,
-                      assess_attempt.user_id, firstname, lastname,
+                      assess_attempt.user_id, user.synergy_id, firstname, lastname,
                       assess_attempt.start, assess_attempt.finish,
                       (UNIX_TIMESTAMP(assess_attempt.finish) - UNIX_TIMESTAMP(assess_attempt.start)) AS timeTaken,
                       SUM(assess_response.mark) AS totalMarks,
