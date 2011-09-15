@@ -239,12 +239,16 @@ abstract class AnswerFillgap extends EvaluationAnswer {
 
 		if (is_array($data)) {
 			if ($this->getLegendHTML() !== false) {
-				$data = '<ul><li>' . implode('</li><li>', $data) . '</li></ul>';
+				$data['responseText'] = '<ul><li>' . implode('</li><li>', $data) . '</li></ul>';
 			}
 			else {
-				$data = strip_tags(implode(', ', $data));
+				$data['responseText'] = strip_tags(implode(', ', $data));
 			}
 		}
+
+		/* Append commentary
+ 		 */
+		$data['comment'] = $response['comment'];
 
 		return $data;
 	}
@@ -259,15 +263,7 @@ abstract class AnswerFillgap extends EvaluationAnswer {
 	public function getAnswerText($question_id, $value) {
 		$answer = $this->getByQuestionID($question_id);
 
-		$allOptions = unserialize($answer['answer']);
-
-		foreach($allOptions as $currentOption) {
-			if ($currentOption->value == $value) {
-				return $currentOption->description;
-			}
-		}
-
-		return '';
+		return $answer['answer'];
 	}
 
 	/**

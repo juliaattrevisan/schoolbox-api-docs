@@ -162,11 +162,15 @@ class EvaluationExporter {
 
 								/* Load answer template into answerOption block
 								 */
-								$responseValues = str_replace("\t", '', $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $allQuestions[$i]['question_id']));
+								$data = $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $allQuestions[$i]['question_id']);
+
+								$responseValues = str_replace("\t", '', $data['responseText']);
+								$commentValues = $data['comment'];
 							}
 
 							$this->sectionValues[$k]['questions'][$i]['attempts'][$j]['name'] = $currentAttempt['firstname'] . ' ' . $currentAttempt['lastname'];
 							$this->sectionValues[$k]['questions'][$i]['attempts'][$j]['responses'] = $responseValues;
+							$this->sectionValues[$k]['questions'][$i]['attempts'][$j]['comment'] = $commentValues;
 						}
 					}
 				}
@@ -210,7 +214,7 @@ class EvaluationExporter {
 					foreach($currentSection['questions'] as $currentQuestion) {
 						echo "Q$i. {$currentQuestion['question']}\n";
 
-						$this->outputCSV2(array(array("Respondent", "Response")));
+						$this->outputCSV2(array(array("Respondent", "Response", "Teacher's Comment")));
 
 						/* Generate attempts for this question
 						 */
@@ -219,6 +223,7 @@ class EvaluationExporter {
 
 							$attemptList[] = $currentAttempt['name'];
 							$attemptList[] = $currentAttempt['responses'];
+							$attemptList[] = $currentAttempt['comment'];
 
 							$this->outputCSV2(array($attemptList));
 						}
