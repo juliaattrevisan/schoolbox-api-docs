@@ -1,21 +1,15 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionReturn.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
-
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/Assess.php');
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessAttempt.php');
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessSection.php');
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessResponse.php');
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessFactory.php');
 
-$subHandler = new Submission;
+$subHandler = new Submission();
 $retHandler = new SubmissionReturn();
 $catHandler = new Category();
-$groupHandler = new Group;
-$userHandler = new User;
+$groupHandler = new Group();
+$userHandler = new User();
 
 $factory = new AssessFactory();
 $assessHandler = new Assess();
@@ -23,20 +17,21 @@ $attemptHandler = new AssessAttempt();
 $sectionHandler = new AssessSection();
 $responseHandler = new AssessResponse();
 
-if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
-    if(!$groupHandler->isStaff() )
-            error(19);
+if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
+	if (!$groupHandler->isStaff()) {
+		error(19);
+	}
 
 	$category = $catHandler->getByID($this->arg[1]);
 
 	/* Get full student list of class  */
-    if($category['code'] && Cfg::get('external_enable')) {
+    if ($category['code'] && Cfg::get('external_enable')) {
 
         //if synergy code get synergy students
         $synHandler = new ExternalClass();
         $studentList = $synHandler->getStudents($category['code']);
 
-		for($x=0; is_array($studentList[$x]);$x++){
+		for ($x=0; is_array($studentList[$x]);$x++){
 			$user = $userHandler->getBySynergy($studentList[$x]['synergy_id']);
 
 			/* If the Synergetic user wasn't found in the portal, just remove
@@ -53,15 +48,15 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
     }
     else {
         //Retrieve student list from group membership
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
         $groupHandler = new Group;
         $studentList = $groupHandler->getMemberList($this->arg[1]);
     }
 
 	$subList = $subHandler->getAllForUserCategory($this->arg[1], $_SESSION['id']);
 
-	if(is_array($subList)) {
+	if (is_array($subList)) {
         $csv = 'Synergetic ID,Surname,Firstname,';
+
 		foreach($subList as $sub) {
             $csv .= Scrub::text(str_replace(',', ' ', $sub['name'])).',';
 		}
@@ -69,11 +64,11 @@ if($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 
     $csv .= "\n";
 
-	if(is_array($studentList)) {
+	if (is_array($studentList)) {
 		foreach($studentList as $student) {
             $csv .= $student['uid'].','.Scrub::text($student['lastname']).','.Scrub::text($student['firstname']).',';
 
-			if(is_array($subList)) {
+			if (is_array($subList)) {
 				foreach($subList as $sub) {
                     if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
                         $firstSection = $sectionHandler->getFirst($sub['id']);
@@ -125,33 +120,35 @@ else if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'no_submissions', 'no_submissions_block');
 	$this->setBlock(TEMPLATE_content, 'no_assessments', 'no_assessments_block');
 
-    if(!$groupHandler->isStaff() )
-            error(19);
+	if (!$groupHandler->isStaff()) {
+		error(19);
+	}
 
     $category = $catHandler->getByID($this->arg[0]);
 
-	if($category['code'] != "")
-			$this->setVar('CATEGORY', $category['name'].' ('.$category['code'].')');
-	else
-			$this->setVar('CATEGORY', $category['name']);
+	if ($category['code'] != "") {
+		$this->setVar('CATEGORY', $category['name'] . ' (' . $category['code'] . ')');
+	}
+	else {
+		$this->setVar('CATEGORY', $category['name']);
+	}
 
 	$this->setVar('CID', $category['id']);
 
 	/* Get full student list of class  */
-    if($category['code'] && Cfg::get('external_enable')) {
+    if ($category['code'] && Cfg::get('external_enable')) {
 
         //if synergy code get synergy students
         $synHandler = new ExternalClass();
         $studentList = $synHandler->getStudents($category['code']);
-
-		for($x=0; is_array($studentList[$x]);$x++){
+print_r($studentList);
+		for ($x=0; is_array($studentList[$x]);$x++){
 			$user = $userHandler->getBySynergy($studentList[$x]['synergy_id']);
 			$studentList[$x]['uid'] = $user['uid'];
 		}
     }
     else {
         //Retrieve student list from group membership
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
         $groupHandler = new Group;
         $studentList = $groupHandler->getMemberList($this->arg[0]);
     }
@@ -173,9 +170,9 @@ else if(is_numeric($this->arg[0])) {
 	if (is_array($subList)) {
 		foreach($subList as $sub) {
             $this->setVar(array(
-                'BOX_ID'	=> $sub['id'],
-                'SUB_NAME'	=> Scrub::text($sub['name']),
-                'SUB_TYPE'	=> Scrub::text($sub['typeName'])
+				'BOX_ID' => $sub['id'],
+				'SUB_NAME' => Scrub::text($sub['name']),
+				'SUB_TYPE' => Scrub::text($sub['typeName'])
             ));
 
             if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
@@ -233,13 +230,16 @@ else if(is_numeric($this->arg[0])) {
 		$this->parse('no_assessments_block', 'no_assessments');
 	}
 
-	if(is_array($studentList)) {
+	if (is_array($studentList)) {
 		foreach($studentList as $student) {
 
-			$output = array('SURNAME'	=> Scrub::text($student['lastname']),
-							'FIRSTNAME'	=> Scrub::text($student['firstname']),
-							'UID'		=> $student['uid'],
-							'ON_OFF'    => ++$i%2?'':'dark',);
+			$output = array(
+				'SURNAME' => Scrub::text($student['lastname']),
+				'FIRSTNAME' => Scrub::text($student['firstname']),
+				'UID' => $student['uid'],
+				'ON_OFF' => ++$i % 2 ? '' : 'dark',
+			);
+
 			$this->setVar($output);
 
 			$this->setVar('mark_block','');
@@ -300,7 +300,6 @@ else if(is_numeric($this->arg[0])) {
 		$this->setVar('student_list_block', '');
     }
 }
-else
+else {
 	error(2);
-
-?>
+}

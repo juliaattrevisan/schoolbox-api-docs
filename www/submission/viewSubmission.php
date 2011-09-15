@@ -1,12 +1,5 @@
 <?php
-
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionStudent.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionReturn.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
-
-if(is_numeric($this->arg[0])) {
-
+if (is_numeric($this->arg[0])) {
     $this->setFile(TEMPLATE_content, 'submission/viewSubmission.html');
     $this->setTitle('Submission Box');
 	$this->setTab('submission');
@@ -15,9 +8,9 @@ if(is_numeric($this->arg[0])) {
     $this->setBlock('submission_block', 'delete_action', 'delete_action_block');
     $this->setBlock('submission_block', 'mark_action', 'mark_action_block');
 
-    $submissionHandler = new Submission;
-    $studentSubHandler = new SubmissionStudent;
-	$returnHandler = new SubmissionReturn;
+    $submissionHandler = new Submission();
+    $studentSubHandler = new SubmissionStudent();
+	$returnHandler = new SubmissionReturn();
 
     $subBox = $submissionHandler->getByID($this->arg[0]);
 
@@ -31,8 +24,9 @@ if(is_numeric($this->arg[0])) {
 	$this->setVar('CATEGORY_ID', $subBox['cid']);
     $this->setVar('BOX_ID', $subBox['id']);
 
-    /* Get full student list of class to show those who have not submitted */
-    if($subBox['code'] && Cfg::get('external_enable')) {
+    /* Get full student list of class to show those who have not submitted
+     */
+    if ($subBox['code'] && Cfg::get('external_enable')) {
 
         //if synergy code get synergy students
         $synHandler = new ExternalClass();
@@ -40,18 +34,15 @@ if(is_numeric($this->arg[0])) {
     }
     else {
         //Retrieve student list from group membership
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-        $groupHandler = new Group;
+        $groupHandler = new Group();
         $studentList = $groupHandler->getMemberList($subBox['category']);
     }
 
+    $userHandler = new User();
 
-    $userHandler = new User;
-
-    if(is_array($studentList)) {
+    if (is_array($studentList)) {
         foreach($studentList as $student) {
-
-            if($student['uid']) {
+            if ($student['uid']) {
 				$user = $userHandler->getByID($student['uid']);
 				$studentSub = $studentSubHandler->getByUserID($this->arg[0], $student['uid']);
 			}
@@ -59,27 +50,28 @@ if(is_numeric($this->arg[0])) {
 				$user = $userHandler->getBySynergy($student['synergy_id']);
                 $studentSub = $studentSubHandler->getBySynergyID($this->arg[0], $student['synergy_id']);
 			}
-            else
-                continue;
+			else {
+				continue;
+			}
 
-            if(!is_array($user))
-                continue;
+			if (!is_array($user)) {
+				continue;
+			}
 
-            /* If already marked display mark, else provide link to return mark */
+			/* If already marked display mark, else provide link to return mark */
             $return = $returnHandler->getByUser($user['uid'], $this->arg[0]);
 
-            if(is_array($studentSub)) {
-
+            if (is_array($studentSub)) {
                 $output = array(
-                    'OWNER' 	=> $userHandler->formatName($user,'{lastname}, {firstname}'),
-                    'OWNER_ID' 	=> $user['uid'],
-                    'OWNER_ESCAPED' => addslashes($userHandler->formatName($student,'{lastname}, {firstname}')),
-                    'SUB_ID'    => $studentSub['id'],
-                    'SUBMITTED' => $studentSub['date'],
-                    'COLOUR'	=> $studentSub['late']?'#ff0000':'#000000',
-                    'MARK'	    => $return[0]['mark'],
-                    'ON_OFF'	=> ++$i%2?'':'dark',
-                    'REMARK'    => $remark,
+					'OWNER' => $userHandler->formatName($user, '{lastname}, {firstname}'),
+					'OWNER_ID' => $user['uid'],
+					'OWNER_ESCAPED' => addslashes($userHandler->formatName($student, '{lastname}, {firstname}')),
+					'SUB_ID' => $studentSub['id'],
+					'SUBMITTED' => $studentSub['date'],
+					'COLOUR' => $studentSub['late'] ? '#ff0000' : '#000000',
+					'MARK' => $return[0]['mark'],
+					'ON_OFF' => ++$i % 2 ? '' : 'dark',
+					'REMARK' => $remark,
                 );
 
                 $this->setVar($output);
@@ -88,15 +80,14 @@ if(is_numeric($this->arg[0])) {
                 $this->parse('delete_action_block', 'delete_action', false);
             }
             else {
-
                 $output = array(
-                    'OWNER' 	=> $userHandler->formatName($user,'{lastname}, {firstname}'),
-                    'OWNER_ID' 	=> $user['uid'],
-                    'OWNER_ESCAPED' => addslashes($userHandler->$userHandler->formatName($student,'{lastname}, {firstname}')),
-                    'SUBMITTED'	=> '',
-                    'COLOUR'	=> '',
-                    'MARK'	    => $return[0]['mark'],
-                    'ON_OFF'	=> ++$i%2?'':'dark',
+					'OWNER' => $userHandler->formatName($user, '{lastname}, {firstname}'),
+					'OWNER_ID' => $user['uid'],
+					'OWNER_ESCAPED' => addslashes($userHandler->$userHandler->formatName($student, '{lastname}, {firstname}')),
+					'SUBMITTED' => '',
+					'COLOUR' => '',
+					'MARK' => $return[0]['mark'],
+					'ON_OFF' => ++$i % 2 ? '' : 'dark',
                 );
 
                 $this->setVar($output);
@@ -126,20 +117,21 @@ if(is_numeric($this->arg[0])) {
 				}
 
                 $output = array(
-					'OWNER' 	=> $userHandler->formatName($line,'{lastname}, {firstname}'),
-                    'OWNER_ID'      => $line['uid'],
-                    'SUB_ID'        => $line['id'],
-                    'OWNER_ESCAPED' => addslashes($userHandler->formatName($line,'{lastname}, {firstname}')),
-                    'SUBMITTED'     => $line['date'],
-                    'COLOUR'        => $line['late']?'#ff0000':'#000000',
-                    'MARK'          => $return[0]['mark'],
-                    'ON_OFF'        => ++$i%2?'':'dark',
+					'OWNER' => $userHandler->formatName($line, '{lastname}, {firstname}'),
+					'OWNER_ID' => $line['uid'],
+					'SUB_ID' => $line['id'],
+					'OWNER_ESCAPED' => addslashes($userHandler->formatName($line, '{lastname}, {firstname}')),
+					'SUBMITTED' => $line['date'],
+					'COLOUR' => $line['late'] ? '#ff0000' : '#000000',
+					'MARK' => $return[0]['mark'],
+					'ON_OFF' => ++$i % 2 ? '' : 'dark',
             	);
 
 				$this->setVar($output);
 				$this->parse('download_action_block', 'download_action');
 				$this->parse('mark_action_block', 'mark_action', false);
-				$this->parse("submission_listing","submission_block",true);
+				$this->parse("submission_listing","submission_block", true);
+				$this->parse('delete_action_block', 'delete_action');
             }
         }
 		else {
@@ -150,4 +142,3 @@ if(is_numeric($this->arg[0])) {
 else {
     error(2);
 }
-?>
