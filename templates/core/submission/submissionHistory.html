@@ -1,10 +1,11 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript"
+		src="/javascript/jquery.prettyFileInput.js"></script>
 
 
 <script language="JavaScript" type="text/javascript">
 	$j(function() {
-		$j('.prettify').prettyFileInput({	
+		$j('.prettify').prettyFileInput({
 			additionalButtonClasses: 'no-marg float-left',
 			buttonActiveClass: 'tick',
 			defaultText: '<span></span>Choose file',
@@ -18,91 +19,108 @@
 <h2>{BOX_DESCRIPTION}</h2>
 <div class="submission-history clearfix">
 	<h4>Due Date</h4>
+
 	<p>{BOX_DUEDATE}</p>
 	<h4>Subject</h4>
+
 	<p><a href="/homepage/{BOX_CATEGORYID}">{BOX_CATEGORYNAME}</a></p>
 	<h4>Teacher</h4>
+
 	<p>{BOX_OWNER}</p>
-	
-	<!-- BEGIN download --> 
-	<a href="/send.php?id={WORK_FILE_ID}&save=1" class="btn download float-left"><span></span>Download</a> 
-	<!-- END download --> 
-	
+
+	<!-- BEGIN download -->
+	<a href="/send.php?id={WORK_FILE_ID}&save=1"
+	   class="btn download float-left"><span></span>Download</a>
+	<!-- END download -->
+
 	<!-- BEGIN action_submit -->
 	<h4 style="margin-top:8px;">Submit Work</h4>
-	<form method="post" action="/submission/submitWorkForm.php" class="clearfix" enctype="multipart/form-data" >
-		<p> You must attach your work by locating the file on your drive.
-			Make sure the file is saved and closed before submitting the form. </p>
 
-			<input type="file" class="prettify" name="file"/>
+	<form method="post" action="/submission/submitWorkForm.php" class="clearfix"
+		  enctype="multipart/form-data">
+		<p> You must attach your work by locating the file on your drive.
+			Make sure the file is saved and closed before submitting the
+			form. </p>
+
+		<input type="file" class="prettify" name="file"/>
 
 		<label class="clearfix">
-			<input type="hidden" name="box_id" value="{WORK_BOX_ID}" />
+			<input type="hidden" name="box_id" value="{WORK_BOX_ID}"/>
 		</label>
 		<label>
-			<input type="submit" name="Submit2" value="Submit" class="submit-btn-plain" />
+			<input type="submit" name="Submit2" value="Submit"
+				   class="submit-btn-plain"/>
 		</label>
 	</form>
-	<!-- END action_submit --> 
+	<!-- END action_submit -->
 </div>
 
 <!-- BEGIN recent_submission -->
 
 <div class="submission-history background" id="submitted">
 	<h4>Your most recent submission</h4>
-	<p class="clearfix"><a href="/submission/send.php?id={MOST_RECENT_SUBMISSION_FILE_ID}" class="btn float-left"><span></span>View Submitted Work</a></p>
+
+	<p class="clearfix"><a
+			href="/submission/send.php?id={MOST_RECENT_SUBMISSION_FILE_ID}"
+			class="btn float-left"><span></span>View Submitted Work</a></p>
+
 	<p class="{OVERDUE}">Submitted on {MOST_RECENT_SUBMISSION_DATE}</p>
-	<!-- BEGIN overdue --> 
-	(Overdue) 
-	<!-- END overdue --> 
-	
+	<!-- BEGIN overdue -->
+	(Overdue)
+	<!-- END overdue -->
+
 </div>
-<!-- END recent_submission --> 
+<!-- END recent_submission -->
 <!-- BEGIN returned_work -->
-<div class="submission-history background clearfix" >
+<div class="submission-history background clearfix">
 	<div class="clearfix">
 		<h4>Up-to-date Returned Work</h4>
+
 		<div class="mark-box">
-			<div class="mark-content"> Mark <span class="actual-mark"> {RETURNED_WORK_MARK} </span> </div>
+			<div class="mark-content"> Mark <span class="actual-mark"> {RETURNED_WORK_MARK} </span>
+			</div>
 		</div>
-		<div class="mark-comment"> {RETURNED_WORK_COMMENT} </div>
+		<div class="mark-comment"> {RETURNED_WORK_COMMENT}</div>
 	</div>
-	<a href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1" class="btn float-left"><span></span>View Returned Work</a> </div>
+	<a href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1"
+	   class="btn float-left"><span></span>View Returned Work</a></div>
 <!-- END returned_work -->
-</div>
+
 <h2>History</h2>
-<div class="box component"> 
+<div class="box component">
 	<!-- BEGIN subject -->
 	<table class="subjectList">
-		<col width="20%" />
-		<col width="5%" />
-		<col width="25%" />
-		<col width="30%" />
+		<col width="20%"/>
+		<col width="5%"/>
+		<col width="25%"/>
+		<col width="30%"/>
 		<thead>
-			<tr>
-				<th>Date</th>
-				<th>Mark</th>
-				<th>Comment</th>
-				<th>Action</th>
-			</tr>
+		<tr>
+			<th>Date</th>
+			<th>Mark</th>
+			<th>Comment</th>
+			<th>Action</th>
+		</tr>
 		</thead>
 		<tbody>
-			<!-- BEGIN work -->
-			<tr class="{ROW_COLOR}">
-				<td>{WORK_DATE}</td>
-				<td>{WORK_MARK}</td>
-				<td>{WORK_COMMENT}</td>
-				<td><!-- BEGIN action_view_submitted --> 
-					<a href="/submission/send.php?id={WORK_SUBMIT_FILE_ID}" class="btn float-left"> <span></span>View Submitted Work </a><br />
-					
-					<!-- END action_view_submitted --> 
-					
-					<!-- BEGIN action_view_returned --> 
-					<a href="/submission/send.php?id={WORK_RETURN_FILE_ID}&return=1" class="btn float-left"> <span></span>View Returned Work </a> 
-					<!-- END action_view_returned --></td>
-			</tr>
-			<!-- END work -->
+		<!-- BEGIN work -->
+		<tr class="{ROW_COLOR}">
+			<td>{WORK_DATE}</td>
+			<td>{WORK_MARK}</td>
+			<td>{WORK_COMMENT}</td>
+			<td><!-- BEGIN action_view_submitted -->
+				<a href="/submission/send.php?id={WORK_SUBMIT_FILE_ID}"
+				   class="btn float-left"> <span></span>View Submitted Work </a><br/>
+
+				<!-- END action_view_submitted -->
+
+				<!-- BEGIN action_view_returned -->
+				<a href="/submission/send.php?id={WORK_RETURN_FILE_ID}&return=1"
+				   class="btn float-left"> <span></span>View Returned Work </a>
+				<!-- END action_view_returned --></td>
+		</tr>
+		<!-- END work -->
 		</tbody>
 	</table>
-	<!-- END subject --> 
+	<!-- END subject -->
 </div>

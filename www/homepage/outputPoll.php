@@ -4,9 +4,11 @@ require_once SITE_root.'/library/poll.php';
 $this->setBlock($componentHandle, "poll_vote", "poll_vote_block");
 $this->setBlock("poll_vote", "poll_options", "poll_options_block");
 $this->setBlock($componentHandle, "show_results", "show_results_block");
-$this->setBlock($componentHandle, "poll_chart", "poll_chart_block");
-$this->setBlock('poll_chart', "poll_answers", "poll_answers_block");
-$this->setJavascript('/javascript/fusion.js');
+
+$this->setBlock($componentHandle, "poll_responses", "poll_responses_block");
+$this->setBlock($componentHandle, "response_count", "response_count_block");
+$this->setBlock('poll_responses', 'series_separator', 'series_separator_block');
+
 
 $pollHandler = new Poll();
 
@@ -22,32 +24,44 @@ if ( !empty($config['pollID']) && is_numeric($config['pollID']) ) {
 
         $pollData = $pollHandler->getData($poll['pollID']);
 
-        if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']) || $this->arg[1] == 'pollResults') {
+        if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']) || $this->arg[1] == 'pollResults')  {
             $this->setVar('POLL_HEIGHT', count($pollData) * 30 + 70);
             $this->setVar('poll_vote_block', '');
-
             $this->setVar('poll_answers_block', '');
+			$this->setVar('poll_responses_block', '');
+			$this->setVar('show_results_block', '');
+			$this->setVar('response_count', count($pollData));
 
             if (is_array($pollData)) {
                 $i = 0;
-
+				$a = 'A';
                 foreach ($pollData as $data) {
                     $this->setVar(array(
                         'POLL_OPTION_INDEX'	=> $i,
                         'POLL_OPTION'		=> Scrub::text($data['option']),
                         'POLL_ON_OFF'		=> $i % 2 ? 'polloff':'',
+						'OPTION'		=> htmlspecialchars($data['option']),
+						'OPTION_SHORT'	=> $a++,
+						'VALUE'			=> htmlspecialchars($data['result']),
                     ));
 
-                    $this->parse("poll_answers_block", "poll_answers", true);
+					if ($i < (count($pollData))-1) {
+						$this->parse('series_separator_block', 'series_separator');
+					}
+					else {
+						$this->setVar('series_separator_block', '');
+					}
+					$this->parse("poll_responses_block", "poll_responses", true);
 
                     $i++;
+
                 }
             }
 
-            $this->parse('poll_chart_block', 'poll_chart');
         }
         else {
             $this->setVar('poll_options_block', '');
+
 
             if (is_array($pollData)) {
                 $i = 0;
@@ -63,6 +77,15 @@ if ( !empty($config['pollID']) && is_numeric($config['pollID']) ) {
 
                     $i++;
                 }
+
+				/* Show results button
+				 */
+
+
+				if ($pollHandler->hasResults($poll['pollID'])) {
+					$this->parse('show_results_block', 'show_results');
+				}
+
             }
 
             $this->setVar('poll_chart_block', '');
@@ -70,6 +93,7 @@ if ( !empty($config['pollID']) && is_numeric($config['pollID']) ) {
         }
     }
     else {
+		$this->setVar('show_results_block', '');
         $this->setVar(array(
             'POLL_ID'		=> '',
             'POLL_TITLE'	=> 'Poll',
@@ -91,6 +115,7 @@ else {
 
     $this->setVar("poll_chart_block", '');
     $this->setVar("poll_vote_block", "");
+	
 }
 
 
@@ -112,14 +137,6 @@ if (is_array($pollList)) {
 	}
 }
 
-/* Show results
- */
-$this->setVar('show_results_block', '');
-
-if ($pollHandler->hasResults($poll['pollID'])) {
-	$this->parse('show_results_block', 'show_results');
-}
-
 /* Admin controls
  */
 $this->setBlock($componentHandle, "modify_poll", "modify_poll_block");
@@ -130,5 +147,4 @@ if ($permission < WRITE_ACCESS)	{
 else {
 	$this->parse("modify_poll_block", "modify_poll");
 }
-
 ?>

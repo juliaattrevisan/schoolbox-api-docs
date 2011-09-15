@@ -1,4 +1,29 @@
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
+<!-- BEGIN custom_head -->
+<script type='text/javascript' src='/javascript/excanvas.compiled.js'></script>
+<script type='text/javascript' src='/javascript/flot/jquery.flot.js'></script>
+<!-- END custom_head-->
+<script type='text/javascript'>
+	$j(function() {
+		$j.plot($j("#poll-graph{POLL_ID}"),
+			[
+				<!-- BEGIN poll_responses -->
+				{
+					label: "{POLL_OPTION}",
+					data: [[{POLL_OPTION_INDEX}, {VALUE}]],
+					bars: {show:true}
+				}<!-- BEGIN series_separator -->,<!-- END series_separator -->
+				<!-- END poll_responses -->
+			],
+				{
+					legend:{margin: [-150,0] },
+					xaxis: {show:false}
+				}
+
+		);
+	});
+	</script>
+
 	<h2>{POLL_TITLE}</h2>
 	<!-- BEGIN config --> 
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
@@ -58,36 +83,9 @@
 	</div>
 	<!-- END poll_vote --> 
 	<!-- BEGIN poll_chart -->
-	<div class="text poll">
+	<div class="pad-it">
 		<h3>{POLL_QUESTION}</h3>
-		<br />
-		<div id="pollResult{COMPONENT_HOMEPAGE_ID}" style="margin-top: 5px; width: 100%">
-			<noscript>
-			<p>Flash player v9.0 required to view poll.</p>
-			</noscript>
-		</div>
-		<script type="text/javascript" src="/javascript/fusion.js"></script> 
-		<script type="text/javascript">
-	
-		$j(document).ready(function () {
-			resetPoll();
-			$j(window).resize(function () { resetPoll(); });
-			$j(document).bind("componentMove", function () { resetPoll(); });
-		});
-		
-		function resetPoll() {
-			var chart = new FusionCharts("/flash/FCF_Column3D.swf", "myChartId", $j("#pollResult{COMPONENT_HOMEPAGE_ID}").width(), "300", "8", "#FFFFFF");
-			chart.setDataURL("/poll/poll-xml.php%3FpollID%3D{POLL_ID}");
-			chart.addParam("wmode", "transparent");
-			chart.render("pollResult{COMPONENT_HOMEPAGE_ID}");
-		}
-
-    </script>
-		<ol>
-			<!-- BEGIN poll_answers -->
-			<li>{POLL_OPTION}</li>
-			<!-- END poll_answers -->
-		</ol>
+		<div id='poll-graph{POLL_ID}' style="width:600px;height:500px;"></div>
 	</div>
 	<!-- END poll_chart -->
 	<p class="interact"> 
@@ -96,7 +94,6 @@
 		<!-- END show_results --> 
 		<!-- BEGIN modify_poll --> 
 		<a href="/poll/modifyForm.php?delete={POLL_ID}" onclick="return confirm('Delete Poll?');" class="btn delete"><span></span>Delete</a> <a href="/poll/modify/{POLL_ID}" class="btn modify"><span></span>Modify</a><a href="/poll/modify/new/{ID}/{COMPONENT_HOMEPAGE_ID}" class="btn create"><span></span>Create</a> 
-		<!-- END modify_poll --> 
-		
+		<!-- END modify_poll -->
 	</p>
 </div>
