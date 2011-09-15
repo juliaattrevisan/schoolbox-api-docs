@@ -42,4 +42,3 @@ if (is_numeric($this->arg[1])) {
 }
 
 $assessExporter->exportResponsesToCSV($assess['assess_id'], $this->arg[1]);
-?>

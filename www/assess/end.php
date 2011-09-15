@@ -60,7 +60,7 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
 
     $this->setVar(array(
         'ASSESS_TITLE' => $assess['title'],
-        'ATTEMPT_END' => $attemptfinishDate->getShort(),
+        'ATTEMPT_END' => $attemptFinishDate->getShort(),
     ));
 
     $this->setVar('alreadyEnded_block', '');
