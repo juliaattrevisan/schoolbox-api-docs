@@ -33,14 +33,14 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 	/* Validate From email address
 	 */
-	if ($user['alt_email']) {
+	if (strlen($user['alt_email'])) {
 		$email = new Email($user['alt_email']);
 
 		if ($email->isValid()) {
-		$from_email = $name.'<'.$user['alt_email'].'>';
+			$from_email = $name.'<'.$user['alt_email'].'>';
 		}
 		else {
-		error(42);
+			error(42);
 		}
 	}
 	else if ($user['local_email'] || Cfg::get('site_location') == 'wenona') {
