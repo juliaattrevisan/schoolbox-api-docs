@@ -9,12 +9,12 @@
  *
  */
 
-class Component_Dashboard_ShortcutController extends Component_ControllerAbstract {
+class Component_Dashboard_ShortcutController extends Component_Dashboard_ControllerAbstract {
 
     protected $group;
 
-    public function __construct (Component_Instance $instance, User $user, Template $template, Group $group) {
-        parent::__construct($instance, $user, $template);
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, Group $group) {
+        parent::__construct($instance, $user, $sitepage);
 
         $this->group = $group;
     }
@@ -23,7 +23,11 @@ class Component_Dashboard_ShortcutController extends Component_ControllerAbstrac
         return true;
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
+        if ( !$this->loadTemplate($templateHandle, 'shortcut') ) {
+            return false;
+        }
+
         $this->setBlock($templateHandle, 'student_only', 'student_only_block');
         $this->setBlock($templateHandle, 'staff_only', 'staff_only_block');
         

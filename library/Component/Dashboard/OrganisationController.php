@@ -9,12 +9,12 @@
  *
  */
 
-class Component_Dashboard_OrganisationController extends Component_ControllerAbstract {
+class Component_Dashboard_OrganisationController extends Component_Dashboard_ControllerAbstract {
 
     protected $group;
 
-    public function __construct (Component_Instance $instance, User $user, Template $template, Group $group) {
-        parent::__construct($instance, $user, $template);
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, Group $group) {
+        parent::__construct($instance, $user, $sitepage);
 
         $this->group = $group;
     }
@@ -24,7 +24,7 @@ class Component_Dashboard_OrganisationController extends Component_ControllerAbs
         return true;
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
         $this->setBlock($templateHandle, 'extras_staff', 'extras_staff_block');
 
         if ( $this->group->isStaff() ) {

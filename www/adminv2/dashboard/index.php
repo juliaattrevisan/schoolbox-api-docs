@@ -1,0 +1,81 @@
+<?php
+
+/**
+ *
+ * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
+ * @copyright   2011 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ *
+ */
+
+$group = new Group();
+
+if ( !$group->isSuperuser() ) {
+    error(19);
+}
+
+$this->setFile(TEMPLATE_content, 'adminv2/dashboard/dashboard.html');
+$this->setTitle('Admin - Dashboard');
+
+/* Group Selector */
+$this->setBlock(TEMPLATE_content, 'group', 'group_block');
+
+$userHandle = new User;
+$groupList = $userHandle->getGroupList();
+
+if ( is_array($groupList) ) {
+    foreach ( $groupList as $group ) {
+        $this->setVar(array(
+            'group.id'   => $group['id'],
+            'group.name' => $group['name']
+        ));
+
+        $this->parse('group_block', 'group', true);
+    }
+}
+
+/* Component Palette */
+$this->setBlock(TEMPLATE_content, 'definition', 'definition_block');
+
+$definitionCollection = Component_DefinitionMapper::getInstance()->findAll();
+
+foreach ( $definitionCollection as $definition ) {
+    $this->setVar(array(
+        'definition.id'          => $definition->id,
+        'definition.name'        => $definition->name,
+        'definition.description' => $definition->description
+    ));
+
+    $this->parse('definition_block', 'definition', true);
+}
+
+/* Initial group placeholders */
+$this->setBlock(TEMPLATE_content, 'layout', 'layout_block');
+$this->setFile('layout', 'adminv2/dashboard/layout.html');
+
+$this->setBlock('layout', 'position_top', 'position_top_block');
+$this->setBlock('layout', 'position_left', 'position_left_block');
+$this->setBlock('layout', 'position_right', 'position_right_block');
+
+$componentFactory = new Component_Dashboard_Factory(new User, $this);
+
+$componentCollection = $componentFactory->buildComponentList($groupList[0]['id']);
+
+foreach($componentCollection as $component) {
+    $position = "position_{$component->position}";
+
+    if ( !$this->template->exists("{$position}_block") ) {
+        $this->setFile($position, 'adminv2/dashboard/placeholder.html');
+    }
+
+    $this->setVar(array(
+        'component.id'              => $component->id,
+        'component.definition.id'   => $component->definition->id,
+        'component.definition.name' => $component->definition->name,
+    ));
+
+    $this->parse("{$position}_block", $position, true);
+}
+
+$this->parse('layout_block', 'layout');

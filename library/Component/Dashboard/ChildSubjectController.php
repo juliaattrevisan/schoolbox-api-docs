@@ -9,7 +9,7 @@
  *
  */
 
-class Component_Dashboard_ChildSubjectController extends Component_ControllerAbstract {
+class Component_Dashboard_ChildSubjectController extends Component_Dashboard_ControllerAbstract {
 
     private $children;
 
@@ -24,7 +24,10 @@ class Component_Dashboard_ChildSubjectController extends Component_ControllerAbs
         }
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
+        if ( !$this->loadTemplate($templateHandle, 'childSubject') ) {
+            return false;
+        }
 
         $this->setBlock($templateHandle, "student_block", "student_subjects");
         $this->setBlock("student_block", "subject_block", "subject_item");

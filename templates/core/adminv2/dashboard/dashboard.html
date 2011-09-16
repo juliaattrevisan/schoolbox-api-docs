@@ -1,0 +1,74 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+
+(function($) {
+    $(document).ready(function () {
+        $('#definition-palette li').draggable({
+            helper: 'clone',
+            connectToSortable: '#dashboard-layout div.layout-position'
+        });
+
+        $('#dashboard-layout div.layout-position').sortable({
+            helper: 'clone',
+            connectWith: '#dashboard-layout div.layout-position',
+            receive: function (event, ui) {
+            },
+            update: function (event, ui) {
+                if ( ui.sender != null ) {
+                    console.log(ui.helper, ui.item, ui.placeholder, ui.sender, ui);
+                }
+            }
+        });
+
+        $('#group-select').change(function () {
+            var $groupId = $(this).val();
+
+            $.get('/adminv2/dashboard/get-dashboard/'+$groupId, function ($layout) {
+                $('#dashboard-layout').empty().append($layout);
+
+                $('#dashboard-layout div.layout-position').sortable({
+                    connectWith: '#dashboard-layout div.layout-position'
+                });
+            });
+        })
+                
+    });
+})(jQuery);
+
+</script>
+<!-- END custom_head-->
+
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+	<li><a href="/adminv2/home" >Home</a></li>
+	<li><a href="/adminv2/user">Users</a></li>
+    <li><a href="/adminv2/side-menu">Side Menu</a></li>
+    <li><a href="/adminv2/dashboard" class="current">Dashboard</a></li>
+	<li><a href="/adminv2/allowed-file">Allowed Files</a></li>
+	<li><a href="/adminv2/setting">Settings</a></li>
+	<li><a href="/adminv2/calendar">Calendar</a></li>
+	<li><a href="/adminv2/category">Category</a></li>
+	<li><a href="/adminv2/list">Lists</a></li>
+	<li><a href="/adminv2/rollover">Rollover</a></li>
+</ul>
+<div class="admin-contents">
+	<h2>Dashboard</h2>
+    <div>
+        <div>
+            <select id="group-select">
+                <!-- BEGIN group -->
+                <option value="{group.id}">{group.name}</option>
+                <!-- END group -->
+            </select>
+        </div>
+        <ul id="definition-palette">
+            <!-- BEGIN definition -->
+            <li class="component-definition">{definition.name}</li>
+            <!-- END definition -->
+        </ul>
+
+        <div id="dashboard-layout">
+            <!-- BEGIN layout --><!-- END layout -->
+        </div>
+    </div>
+</div>

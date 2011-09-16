@@ -9,7 +9,7 @@
  *
  */
 
-class Component_Dashboard_TutorialController extends Component_ControllerAbstract {
+class Component_Dashboard_TutorialController extends Component_Dashboard_ControllerAbstract {
 
     protected $group;
 
@@ -17,8 +17,8 @@ class Component_Dashboard_TutorialController extends Component_ControllerAbstrac
 
     protected $eventList;
 
-    public function __construct (Component_Instance $instance, User $user, Template $template, Group $group) {
-        parent::__construct($instance, $user, $template);
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, Group $group) {
+        parent::__construct($instance, $user, $sitepage);
 
         $this->group = $group;
         $this->group->setService(TUTORIAL_SERVICE);
@@ -34,7 +34,11 @@ class Component_Dashboard_TutorialController extends Component_ControllerAbstrac
         $this->uncompleteEventList = $this->event->getUncompleted(0, strtotime("-1 day"), $_SESSION['id']);
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
+        if ( !$this->loadTemplate($templateHandle, 'tutorial') ) {
+            return false;
+        }
+
         $this->setBlock($templateHandle, 'has_tutorials', 'has_tutorials_block');
         $this->setBlock('has_tutorials', 'tutorial_list', 'tutorial_list_block');
         $this->setBlock('tutorial_list', 'modify_tutorial', 'modify_tutorial_block');

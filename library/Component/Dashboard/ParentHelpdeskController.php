@@ -9,12 +9,12 @@
  *
  */
 
-class Component_Dashboard_ParentHelpdeskController extends Component_ControllerAbstract {
+class Component_Dashboard_ParentHelpdeskController extends Component_Dashboard_ControllerAbstract {
 
     protected $helpdesk;
 
-    public function __construct (Component_Instance $instance, User $user, Template $template) {
-        parent::__construct($instance, $user, $template);
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage) {
+        parent::__construct($instance, $user, $sitepage);
 
         require_once( 'modules/helpdesk/helpdesk.php' );
 
@@ -32,7 +32,11 @@ class Component_Dashboard_ParentHelpdeskController extends Component_ControllerA
         }
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
+        if ( !$this->loadTemplate($templateHandle, 'parentHelpdesk') ) {
+            return false;
+        }
+
         $this->setBlock($templateHandle, "student_helpdesk_block", "student_helpdesk");
         $this->setBlock("student_helpdesk_block", "student_job_block", "student_job");
 

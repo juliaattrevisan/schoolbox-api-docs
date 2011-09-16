@@ -11,8 +11,6 @@
  
 class Collection implements ArrayAccess, Iterator, Countable {
 
-    protected $pointer;
-
     protected $container;
 
     public function __construct ($objectList = array()) {
@@ -46,6 +44,10 @@ class Collection implements ArrayAccess, Iterator, Countable {
         return $this->container;
     }
 
+    public function toArray () {
+        return $this->container;
+    }
+
     /* ArrayAccess interface methods */
     public function offsetSet ($offset, $value) {
         if ( empty($offset) ) {
@@ -75,23 +77,23 @@ class Collection implements ArrayAccess, Iterator, Countable {
 
     /* Iterator interface methods */
     public function rewind () {
-        $this->pointer = 0;
+        reset($this->container);
     }
 
     public function current () {
-        return $this->container[$this->pointer];
+        return current($this->container);
     }
 
     public function key () {
-        return $this->pointer;
+        return key($this->container);
     }
 
     public function next () {
-        $this->pointer++;
+        next($this->container);
     }
 
     public function valid () {
-        return isset($this->container[$this->pointer]);
+        return current($this->container) !== false;
     }
 
     /* Countable interface methods */

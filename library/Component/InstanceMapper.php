@@ -84,4 +84,96 @@ class Component_InstanceMapper extends Mapper {
 
         return $instanceCollection;
     }
+
+    public function save ($object) {
+        if ( is_a($object, 'Component_Instance') ) {
+            $dirtyInstanceCollection = new Collection;
+            $dirtyInstanceCollection[] = $object;
+        }
+        else {
+            $dirtyInstanceCollection = $object;
+        }
+
+        foreach ( $dirtyInstanceCollection as $dirtyInstance ) {
+
+            $instanceMapper = Component_InstanceMapper::getInstance();
+
+            /* Find original instance otherwise use blank instance for following conditional statements */
+            if ( !$cleanInstance = $instanceMapper->findById($dirtyInstance->id) ) {
+                $cleanInstance = new Component_Instance;
+            }
+
+            if ( $dirtyInstance->position != $cleanInstance->position || $dirtyInstance->sequence != $cleanInstance->sequence ) {
+
+                if ( !empty($cleanInstance->id) ) {
+                    $sourceInstanceCollection = $instanceMapper->findByColumnList(array(
+                        'module'     => 'dashboard',
+                        'identifier' => $cleanInstance->identifier,
+                        'position'   => $cleanInstance->position
+                    ));
+
+                    foreach ( clone $sourceInstanceCollection as $index => $sourceInstance ) {
+                        if ( $sourceInstance->id == $cleanInstance->id ) {
+                            unset($sourceInstanceCollection[$index]);
+                        }
+                        else if ( $sourceInstance->sequence > $dirtyInstance->sequence ) {
+                            $sourceInstance->sequence--;
+                        }
+                    }
+
+                    parent::save($sourceInstanceCollection);
+                }
+
+                $destinationInstanceCollection = $instanceMapper->findByColumnList(array(
+                    'module'     => 'dashboard',
+                    'identifier' => $dirtyInstance->identifier,
+                    'position'   => $dirtyInstance->position
+                ));
+
+                foreach ( $destinationInstanceCollection as $destinationInstance ) {
+                    if ( $destinationInstance->sequence >= $dirtyInstance->sequence ) {
+                        $destinationInstance->sequence++;
+                    }
+                }
+
+                parent::save($destinationInstanceCollection);
+
+            }
+        }
+
+        return parent::save($dirtyInstanceCollection);
+    }
+
+    public function delete ($object) {
+        $instanceMapper = Component_InstanceMapper::getInstance();
+
+        if ( is_a($object, 'Component_Instance') ) {
+            $instanceCollection = new Collection;
+            $instanceCollection[] = $object;
+        }
+        else {
+            $instanceCollection = $object;
+        }
+
+        foreach ( $instanceCollection as $instance ) {
+            $sourceInstanceCollection = $instanceMapper->findByColumnList(array(
+                'module'     => 'dashboard',
+                'identifier' => $instance->identifier,
+                'position'   => $instance->position
+            ));
+
+            foreach ( clone $sourceInstanceCollection as $index => $sourceInstance ) {
+                if ( $sourceInstance->id == $instance->id ) {
+                    unset($sourceInstanceCollection[$index]);
+                }
+                else if ( $sourceInstance->sequence > $instance->sequence ) {
+                    $sourceInstance->sequence--;
+                }
+            }
+
+            parent::save($sourceInstanceCollection);
+        }
+
+        return parent::delete($instanceCollection);
+    }
 }

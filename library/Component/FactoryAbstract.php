@@ -27,10 +27,10 @@ abstract class Component_FactoryAbstract {
 
     /**
      * @param User $user
-     * @param Template $template
+     * @param SitePage $sitepage
      */
-    public function __construct (User $user, Template $template) {
-        $this->dependencyList = array($user, $template);
+    public function __construct (User $user, SitePage $sitepage) {
+        $this->dependencyList = array($user, $sitepage);
     }
 
     

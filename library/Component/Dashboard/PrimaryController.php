@@ -9,7 +9,7 @@
  *
  */
 
-class Component_Dashboard_PrimaryController extends Component_ControllerAbstract {
+class Component_Dashboard_PrimaryController extends Component_Dashboard_ControllerAbstract {
 
     protected $homeroom;
 
@@ -30,7 +30,7 @@ class Component_Dashboard_PrimaryController extends Component_ControllerAbstract
         return true;
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
         $this->setVar('MY_CLASS', $this->homeroom);
 
         return true;

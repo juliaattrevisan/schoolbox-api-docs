@@ -9,14 +9,14 @@
  *
  */
 
-class Component_Dashboard_HelpdeskController extends Component_ControllerAbstract {
+class Component_Dashboard_HelpdeskController extends Component_Dashboard_ControllerAbstract {
 
     protected $helpdesk;
 
     protected $jobList;
 
-    public function __construct (Component_Instance $instance, User $user, Template $template) {
-        parent::__construct($instance, $user, $template);
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage) {
+        parent::__construct($instance, $user, $sitepage);
 
         /* TODO: Integrate this library in to the main library folder */
         require_once $_SERVER['DOCUMENT_ROOT'] . 'modules/helpdesk/helpdesk.php';
@@ -35,7 +35,11 @@ class Component_Dashboard_HelpdeskController extends Component_ControllerAbstrac
         }
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
+        if ( !$this->loadTemplate($templateHandle, 'helpdesk') ) {
+            return false;
+        }
+
         if ( is_array($this->jobList) ) {
             foreach ( $this->jobList as $job ) {
                 $this->setVar("PROBLEM", ucfirst($job['problem']));

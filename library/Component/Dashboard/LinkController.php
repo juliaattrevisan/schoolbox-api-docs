@@ -9,14 +9,14 @@
  *
  */
 
-class Component_Dashboard_LinkController extends Component_ControllerAbstract {
+class Component_Dashboard_LinkController extends Component_Dashboard_ControllerAbstract {
 
     protected $link;
 
     protected $linkList;
 
-    public function __construct (Component_Instance $instance, User $user, Template $template, Link $link) {
-        parent::__construct($instance, $user, $template);
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, Link $link) {
+        parent::__construct($instance, $user, $sitepage);
 
         $this->link = $link;
     }
@@ -50,7 +50,11 @@ class Component_Dashboard_LinkController extends Component_ControllerAbstract {
         return true;
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
+        if ( !$this->loadTemplate($templateHandle, 'link') ) {
+            return false;
+        }
+
         if ( count($this->linkList) > 0 ) {
             foreach ( $this->linkList as $link ) {
                 $this->setVar(array(

@@ -9,13 +9,17 @@
  *
  */
 
-class Component_Dashboard_GreetingController extends Component_ControllerAbstract {
+class Component_Dashboard_GreetingController extends Component_Dashboard_ControllerAbstract {
 
     public function execute () {
         return true;
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
+        if ( !$this->loadTemplate($templateHandle, 'greeting') ) {
+            return false;
+        }
+        
         return true;
     }
 

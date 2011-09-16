@@ -9,7 +9,7 @@
  *
  */
 
-class Component_Dashboard_TimetableController extends Component_ControllerAbstract {
+class Component_Dashboard_TimetableController extends Component_Dashboard_ControllerAbstract {
 
     private $externalTimetable;
 
@@ -19,8 +19,8 @@ class Component_Dashboard_TimetableController extends Component_ControllerAbstra
 
     private $timetable;
 
-    public function __construct (Component_Instance $instance, User $user, Template $template, ExternalTimetable $externalTimetable) {
-        parent::__construct($instance, $user, $template);
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, ExternalTimetable $externalTimetable) {
+        parent::__construct($instance, $user, $sitepage);
 
         $this->externalTimetable = $externalTimetable;
     }
@@ -42,7 +42,11 @@ class Component_Dashboard_TimetableController extends Component_ControllerAbstra
         return true;
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
+        if ( !$this->loadTemplate($templateHandle, 'timetable') ) {
+            return false;
+        }
+
         $this->setBlock($templateHandle, "timetable_period", "timetable_period_block");
         $this->setBlock($templateHandle, "timetable_header", "timetable_header_block");
 

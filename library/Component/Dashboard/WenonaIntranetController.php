@@ -9,13 +9,13 @@
  *
  */
 
-class Component_Dashboard_WenonaIntranetController extends Component_ControllerAbstract {
+class Component_Dashboard_WenonaIntranetController extends Component_Dashboard_ControllerAbstract {
 
     public function execute () {
         return true;
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
         return true;
     }
 

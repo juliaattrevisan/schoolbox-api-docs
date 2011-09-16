@@ -58,5 +58,23 @@ abstract class Model {
 
         return $this->state;
     }
-    
+
+    public function toArray () {
+        $modelReflection = new ReflectionObject($this);
+        
+        $propertyReflectionList = $modelReflection->getProperties(ReflectionProperty::IS_PUBLIC);
+
+        $propertyList = array();
+
+        if ( !empty($propertyReflectionList) ) {
+            foreach ( $propertyReflectionList as $propertyReflection ) {
+                $propertyName = $propertyReflection->getName();
+                $propertyValue = $propertyReflection->getValue($this);
+
+                $propertyList[$propertyName] = $propertyValue;
+            }
+        }
+
+        return $propertyList;
+    }
 }

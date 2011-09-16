@@ -9,12 +9,12 @@
  *
  */
 
-class Component_Dashboard_WeatherController extends Component_ControllerAbstract {
+class Component_Dashboard_WeatherController extends Component_Dashboard_ControllerAbstract {
 
     protected $weather;
 
-    public function __construct (Component_Instance $instance, User $user, Template $template) {
-        parent::__construct($instance, $user, $template);
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage) {
+        parent::__construct($instance, $user, $sitepage);
 
         $this->weather = new Xml('http://www.google.com/ig/api?weather=' . urlencode(Cfg::get('weather_location')));
     }
@@ -28,7 +28,11 @@ class Component_Dashboard_WeatherController extends Component_ControllerAbstract
         }
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
+        if ( !$this->loadTemplate($templateHandle, 'weather') ) {
+            return false;
+        }
+
         $imageLocation = '/weather/image.php?path=';
 
         for($i = 0; $i < 3; $i++) {

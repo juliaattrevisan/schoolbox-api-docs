@@ -9,12 +9,12 @@
  *
  */
 
-class Component_Dashboard_RssController extends Component_ControllerAbstract {
+class Component_Dashboard_RssController extends Component_Dashboard_ControllerAbstract {
 
     protected $rss;
 
-    public function __construct (Component_Instance $instance, User $user, Template $template) {
-        parent::__construct($instance, $user, $template);
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage) {
+        parent::__construct($instance, $user, $sitepage);
 
         $this->rss = new Xml(Cfg::get('welcome_rss_url'), RSS_cache_time);
     }
@@ -24,7 +24,11 @@ class Component_Dashboard_RssController extends Component_ControllerAbstract {
         return true;
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
+        if ( !$this->loadTemplate($templateHandle, 'rss') ) {
+            return false;
+        }
+
         $this->setBlock($templateHandle, "rss_stories", "rss_block");
 
         $this->setVar('RSS_NAME', $this->rss->channel->title);

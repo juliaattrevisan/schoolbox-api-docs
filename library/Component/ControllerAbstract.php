@@ -10,6 +10,7 @@
  */
  
 abstract class Component_ControllerAbstract {
+
     /**
      * @var \Component_Instance
      */
@@ -21,19 +22,19 @@ abstract class Component_ControllerAbstract {
     protected $user;
 
     /**
-     * @var Template Stores the global template object.
+     * @var SitePage
      */
-    protected $template;
+    protected $sitepage;
 
     /**
      * @param Component_Instance $instance
      * @param User $user
-     * @param Template $template
+     * @param SitePage $sitepage
      */
-    public function __construct (Component_Instance $instance, User $user, Template $template) {
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage) {
         $this->instance = $instance;
         $this->user = $user;
-        $this->template = $template;
+        $this->sitepage = $sitepage;
     }
 
     /**
@@ -45,36 +46,73 @@ abstract class Component_ControllerAbstract {
     abstract function execute ();
 
     /**
+     * @param $templateHandle
+     * @param string $templateName
+     * @param string $templatePath
+     * @return bool
+     */
+    protected function loadTemplate ($templateHandle, $templateName = '', $templatePath = '') {
+
+        $templateFile = $this->getTemplate($templateName, $templatePath);
+
+        if ( !$this->sitepage->setFile($templateHandle, $templateFile) ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function getTemplate ($templateName = '', $templatePath = '') {
+        if ( empty($templateName) ) {
+            /* Break apart class name by underscores, get only last segment, remove last 10 characters then send it to lowercase */
+            $templateName = ucfirst( substr( array_pop( explode('_', $this->definition->class) ), 0, -10 ) );
+        }
+
+        if ( empty($templatePath) ) {
+            $templatePath = "component";
+        }
+
+        $templateFile = "$templatePath/$templateName.html";
+
+        return $templateFile;
+    }
+
+    /**
      * Renders view using Component_AbstractController::$templateObject.
      *
-     * @abstract
      * @param String $templateHandle
      * @return void
      */
-    abstract function render ($templateHandle);
+    protected function renderTemplate ($templateHandle) {
+
+        if ( !$this->loadTemplate($templateHandle) ) {
+            return false;
+        }
+        
+    }
 
     /**
-     * Allows calls to the template object in this style:
+     * Allows calls to the sitepage object in this style:
      * $this->setBlock();
      * Exists to ease porting of existing components.
      *
      * @param String $method
-     * @param Array $argumentArray
+     * @param Array $argumentList
      * @return mixed
      */
-    public function __call($method, $argumentArray) {
+    public function __call($method, $argumentList) {
 
         if ( method_exists($this, $method) ) {
             $object = $this;
         }
-        elseif ( method_exists($this->template, $method) ) {
-            $object = $this->template;
+        elseif ( method_exists($this->sitepage, $method) ) {
+            $object = $this->sitepage;
         }
 
         if ( !empty($object) ) {
             $rm = new ReflectionMethod($object, $method);
 
-            return $rm->invokeArgs($object, $argumentArray);
+            return $rm->invokeArgs($object, $argumentList);
         } else {
             return $this->$method();
         }

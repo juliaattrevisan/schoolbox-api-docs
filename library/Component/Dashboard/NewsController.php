@@ -9,12 +9,12 @@
  *
  */
 
-class Component_Dashboard_NewsController extends Component_ControllerAbstract {
+class Component_Dashboard_NewsController extends Component_Dashboard_ControllerAbstract {
 
     protected $news;
 
-    public function __construct (Component_Instance $instance, User $user, Template $template, News $news) {
-        parent::__construct($instance, $user, $template);
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, News $news) {
+        parent::__construct($instance, $user, $sitepage);
 
         $this->news = $news;
     }
@@ -25,7 +25,11 @@ class Component_Dashboard_NewsController extends Component_ControllerAbstract {
         return true;
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
+        if ( !$this->loadTemplate($templateHandle, 'news') ) {
+            return false;
+        }
+
         $this->setBlock($templateHandle, "topic_header", "topic_header_block");
         $this->setBlock($templateHandle, "topic", "topic_block");
         $this->setBlock('topic', "news", "news_block");

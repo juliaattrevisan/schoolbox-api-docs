@@ -59,7 +59,7 @@ class Page {
 	}
 
 	function setFile($handle, $file) {
-		$this->template->setFile($handle, $file);
+		return $this->template->setFile($handle, $file);
 	}
 
         function dropDown($handle, $data, $selected='', $mapping='', $template=TEMPLATE_content) {

@@ -68,9 +68,25 @@ abstract class Mapper {
 
     protected function __construct () {
         $this->database = Database::getInstance();
-        
 
         $this->mapping();
+    }
+
+    /**
+     * @brief Retrieves the entire collection unfiltered
+     * @return Collection
+     */
+    public function findAll () {
+        $statement = $this->database->prepare("
+            SELECT {$this->getColumnString()}
+            FROM `{$this->table}`
+        ");
+
+        $statement->execute();
+
+        $rowset = $statement->fetchAll();
+
+        return $this->hydrate($rowset);
     }
 
     /**
@@ -90,9 +106,13 @@ abstract class Mapper {
 
         $statement->bindParam(':identifierValue', $identifierValue);
 
-        $rowset = $statement->execute()->fetchAll();
+        $statement->execute();
 
-        return $this->hydrate($rowset);
+        $rowset = $statement->fetchAll();
+
+        $collection = $this->hydrate($rowset);
+
+        return $collection[0];
     }
 
     /**
@@ -112,11 +132,55 @@ abstract class Mapper {
 
         $statement->bindParam(":$columnName", $columnValue);
 
-        $rowset = $statement->execute()->fetchAll();
+        $statement->execute();
+
+        $rowset = $statement->fetchAll();
 
         return $this->hydrate($rowset);
     }
 
+    /**
+     * @brief Returns a collection with models which match the values pairs in the column list
+     * @param Array $columnList
+     * @return Bool|Collection
+     */
+    public function findByColumnList ($columnList) {
+        if ( !is_array($columnList) ) {
+            return false;
+        }
+
+        $query = "
+            SELECT {$this->getColumnString()}
+            FROM `{$this->table}`
+            WHERE
+        ";
+
+        $index = 0;
+
+        foreach ( $columnList as $columnName => $columnValue ) {
+            if ( $index > 0 ) {
+                $query .= " AND ";
+            }
+            
+            $query .= "`$columnName` = '$columnValue'";
+
+            $index++;
+        }
+
+        $statement = $this->database->prepare($query);
+
+        $statement->execute();
+
+        $rowset = $statement->fetchAll();
+
+        return $this->hydrate($rowset);
+    }
+
+    /**
+     * @brief Saves an object to the database. Updates or inserts
+     * @param $object
+     * @return Bool
+     */
     public function save ($object) {
         if ( is_subclass_of($object, 'Model') ) {
             $collection = new Collection;
@@ -140,12 +204,45 @@ abstract class Mapper {
                 $statement->bindParam(":$columnName", $model->$propertyName);
             }
 
-            $statement->execute();
+            if ( $statement->execute() ) {
+                return false;
+            }
         }
 
         return true;
     }
 
+    public function delete ($object) {
+        $identifierName = $this->identifier['column'];
+
+        if ( is_subclass_of($object, 'Model') ) {
+            $collection = new Collection;
+            $collection[] = $object;
+        }
+        else {
+            $collection = $object;
+        }
+
+        $statement = $this->database->prepare("
+            DELETE FROM  `{$this->table}`
+            WHERE `{$identifierName}` = :identifierValue
+        ");
+
+        foreach ( $collection as $model ) {
+            $statement->bindParam(':identifierValue', $model->id);
+
+            if ( !$statement->execute() ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @brief Attempts to complete a partially defined map
+     * @return Bool
+     */
     protected function mapping () {
         if ( empty($this->model) ) {
             $modelName = substr( get_class($this), 0, -6 );
@@ -224,8 +321,8 @@ abstract class Mapper {
     /**
      * @param Array $rowset
      * @param String $alias
-     * @param Bool $forceCollection
-     * @return Collection|Model
+     * @param Callback $callback
+     * @return Collection
      */
     public function hydrate ($rowset, $alias = '', $callback = null) {
         $modelList = array();
@@ -254,6 +351,11 @@ abstract class Mapper {
         return new Collection($modelList);
     }
 
+    /**
+     * @brief Returns an SQL fragement containing a comma separated list of column names possibly aliased
+     * @param String $alias
+     * @return String
+     */
     public function getColumnString ($alias = '') {
 
         $columnList = array();
@@ -273,6 +375,10 @@ abstract class Mapper {
         return implode(', ', $columnList);
     }
 
+    /**
+     * @brief Returns a comma separated list of PDO placeholders. Works with Mapper::getColumnString
+     * @return String
+     */
     public function getPlaceholderString () {
         $placeholderList = array();
 
@@ -283,6 +389,10 @@ abstract class Mapper {
         return implode(', ', $placeholderList);
     }
 
+    /**
+     * @brief Returns an SQL fragment containg the assignment portion of an UPDATE query
+     * @return String
+     */
     public function getUpdateString () {
         $assignmentList = array();
 
@@ -293,6 +403,11 @@ abstract class Mapper {
         return implode(', ', $assignmentList);
     }
 
+    /**
+     * @brief Converts an underscore separated string to camel case
+     * @param String $string
+     * @return String
+     */
     protected function toCamelcase ($string) {
         $segmentList = explode('_', $string);
 
@@ -303,6 +418,11 @@ abstract class Mapper {
         return implode($segmentList);
     }
 
+    /**
+     * @brief Explodes a camel case string apart at the humps using underscores
+     * @param String $string
+     * @return String
+     */
     public function toUnderscore ($string) {
         $string = str_replace('_', '', $string);
 

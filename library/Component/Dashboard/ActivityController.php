@@ -9,14 +9,14 @@
  *
  */
 
-class Component_Dashboard_ActivityController extends Component_ControllerAbstract {
+class Component_Dashboard_ActivityController extends Component_Dashboard_ControllerAbstract {
 
     protected $group;
 
     protected $activity;
 
-    public function __construct (Component_Instance $instance, User $user, Template $template, Group $group, Activity $activity) {
-        parent::__construct($instance, $user, $template);
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, Group $group, Activity $activity) {
+        parent::__construct($instance, $user, $sitepage);
 
         $this->group = $group;
         $this->activity = $activity;
@@ -26,8 +26,10 @@ class Component_Dashboard_ActivityController extends Component_ControllerAbstrac
         $this->catList = $this->group->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
     }
 
-    public function render ($templateHandle) {
-        parent::render($templateHandle);
+    public function renderTemplate ($templateHandle) {
+        if ( !$this->loadTemplate($templateHandle, 'activity') ) {
+            return false;
+        }
 
         $this->setBlock($templateHandle, 'category_block', 'new_category');
         $this->setBlock($templateHandle, 'mail_block', 'new_mail_block');

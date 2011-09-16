@@ -16,8 +16,8 @@ class Component_Dashboard_Factory extends Component_FactoryAbstract {
      */
     protected $module = 'dashboard';
 
-    public function __construct(User $user, Template $template) {
-        parent::__construct($user, $template);
+    public function  __construct(User $user, SitePage $sitepage) {
+        parent::__construct($user, $sitepage);
     }
 
 }

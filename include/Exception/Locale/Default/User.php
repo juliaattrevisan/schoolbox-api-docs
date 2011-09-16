@@ -12,4 +12,5 @@
 class Exception_Locale_Default_User {
 	const DUPLICATE_USER = 'User already exists.';
 	const PASSWORDS_DO_NOT_MATCH = 'Passwords do not match.';
+    const CRUSHED_NUTSACK = 'NUT SMOOTHIE!';
 }

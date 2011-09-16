@@ -9,12 +9,12 @@
  *
  */
 
-class Component_Dashboard_CalendarController extends Component_ControllerAbstract {
+class Component_Dashboard_CalendarController extends Component_Dashboard_ControllerAbstract {
 
     protected $calendar;
 
-    public function __construct (Component_Instance $instance, User $user, Template $template, Calendar $calendar) {
-        parent::__construct($instance, $user, $template);
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, Calendar $calendar) {
+        parent::__construct($instance, $user, $sitepage);
 
         $this->calendar = $calendar;
     }
@@ -31,7 +31,11 @@ class Component_Dashboard_CalendarController extends Component_ControllerAbstrac
         return true;
     }
 
-    public function render ($templateHandle) {
+    public function renderTemplate ($templateHandle) {
+        if ( !$this->loadTemplate($templateHandle, 'calendar') ) {
+            return false;
+        }
+
         $this->setBlock($templateHandle, "note_block", "note_listing");
 
         if ( is_array($this->submissionList) ) {

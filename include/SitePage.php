@@ -6,6 +6,8 @@ class SitePage extends Page
 {
 	private $ajax;
 
+    private $lite;
+
 	public function SitePage($login = TRUE)
 	{
 		parent::Page();
@@ -127,13 +129,17 @@ class SitePage extends Page
 		$this->ajax = $state;
 	}
 
+    function setLite ($state) {
+        $this->lite = $state;
+    }
+
 	function outputPage($lite = FALSE)
 	{
 		if ($this->ajax) {
 			return true;
 		}
 
-		if (!$lite) {
+		if (!$lite && !$this->lite) {
 			$this->buildPage();
 			$this->saveHistory();
 		}
@@ -730,7 +736,9 @@ class SitePage extends Page
 
 	function setFile($handle, $file)
 	{
-		$this->template->setFile($handle, $this->getTemplate($file));
+		if ( !$this->template->setFile($handle, $this->getTemplate($file)) ) {
+            return false;
+        }
 
 		if ($handle == TEMPLATE_content) {
 			$this->templateFile = $file;
@@ -738,6 +746,7 @@ class SitePage extends Page
 			$this->setVar('custom_head_block', '');
 		}
 
+        return true;
 	}
 
 	function setTitle($title = '')
