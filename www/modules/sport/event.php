@@ -5,7 +5,7 @@
 require_once("../../include/include.php");
 require_once("../../include/html-time.php");
 require_once("../../include/session.php");
-require_once("../../include/permission.php");
+//require_once("../../include/permission.php");
 require_once("sql/modsport.php");
 require_once("sql/modopp.php");
 require_once("sql/modvenue.php");
@@ -46,14 +46,14 @@ class initEvent
 								error(9, "Event date not between start and finish date of season1");
                                                 	$year = $currSeason['syear'];
 						}
-						//mth part of finish year 
+						//mth part of finish year
                                         	else if ($mth[$num] < $currSeason['smonth'] && $mth[$num] <= $currSeason['emonth']){
 							//check if day is within the season dates for the last month
 							if ($mth[$num] == $currSeason['emonth'] && $day[$num] > $currSeason['eday'])
 								error(9, "Event date not between start and finish date of season2");
                                         	        $year = $currSeason['eyear'];
 						}
-						//season does not span a year!!! 
+						//season does not span a year!!!
 						else if($mth[$num] >= $currSeason['smonth'] && $mth[$num] <= $currSeason['emonth'])
 						{
 							//check if day is within the season dates
@@ -61,7 +61,7 @@ class initEvent
 								error(9, "Event date not between start and finish date of season2");
                                         	        $year = $currSeason['syear'];
 						}
-						else 
+						else
 							error(9, "Event date not between start and finish date of season3");
 
                                                 $datetime = date("Y-m-d H:i:s" , mktime($hour[$num], $min[$num], "00" , $mth[$num], $day[$num]
@@ -100,14 +100,14 @@ class initEvent
 							error(9, "Event date not between start and finish date of season1");
                                                 $year = $currSeason['syear'];
 					}
-					//mth part of finish year 
+					//mth part of finish year
                                         else if ($mth < $currSeason['smonth'] && $mth <= $currSeason['emonth']){
 						//check if day is within the season dates for the last month
 						if ($mth == $currSeason['emonth'] && $day > $currSeason['eday'])
 							error(9, "Event date not between start and finish date of season2");
                                                 $year = $currSeason['eyear'];
 					}
-					//season does not span a year!!! 
+					//season does not span a year!!!
 					else if($mth >= $currSeason['smonth'] && $mth <= $currSeason['emonth'])
 					{
 						//check if day is within the season dates
@@ -115,10 +115,10 @@ class initEvent
 							error(9, "Event date not between start and finish date of season2");
                                                 $year = $currSeason['syear'];
 					}
-					else 
-                                         
+					else
+
 					       error(9, "Event date not between start and finish date of season3");
-						
+
                                         $datetime = date("Y-m-d H:i:s" , mktime($hourmod, $min, "00" , $mth, $day, $year));
                                         //insert into database
                                         $myEvent = new event();
@@ -157,7 +157,7 @@ class initEvent
 		$this->t_body->set_file("tplBODY", "modules/sports/admin/event.htm");
 	 	//output page
 		include_once("../../include/page.php");
-	
+
 		//setup blocks
 		$this->t_body->set_block("tplBODY", "modevents_body", "modevents_block");
 		$this->t_body->set_block("modevents_body", "modevents_list", "modevents_listing");
@@ -178,19 +178,19 @@ class initEvent
 		$this->t_body->set_var("DISPLAY", "Add Event for ".$sport[0]['name']);
 		$this->t_body->set_var("ID", $sid);
 		$this->t_body->set_var("NAV", "<a href=\"event.php?id=".$sid."&flag=1&type=".$type."\"><b>Back</b></a>");
-		
+
 		$myTeam = new sport();
-		$teams = $myTeam->getTeams($sid); 
+		$teams = $myTeam->getTeams($sid);
 		if (!$teams)
 			error(39);
 		$teamList = $this->createHTMLlist($teams, "", "section", "tid");
 		$this->t_body->set_var("TEAM", $teamList);
-		
+
 		$myOpp = new opp();
-		$opps = $myOpp->getOpp(); 
+		$opps = $myOpp->getOpp();
 		$oppList = $this->createHTMLlist($opps, $opp, "opp", "oid");
 		$this->t_body->set_var("OPP", $oppList);
-		
+
 		$myVenue = new venue();
 		$venues = $myVenue->getVenues();
 		$venList = $this->createHTMLlist($venues, $ven, "venue", "vid");
@@ -203,7 +203,7 @@ class initEvent
 		else {
 			$this->t_body->set_var("AM", "selected");
 			$this->t_body->set_var("PM", "");
-		}		
+		}
 		if (!$day) {
 			$day = date("j", mktime(0,0,0,date("m"),(date("d")+(6-date("w"))),date("Y")));
 			$mth = date("n", mktime(0,0,0,date("m"),(date("d")+(6-date("w"))),date("Y")));
@@ -211,15 +211,15 @@ class initEvent
 			$hour = "8";
 		}
 		$this->t_body->set_var("DAY", createDateList($day, "day"));
-		$this->t_body->set_var("MTH", createMonthList($mth, "mth"));	
+		$this->t_body->set_var("MTH", createMonthList($mth, "mth"));
 		$this->t_body->set_var("HOUR", $hour);
 		$this->t_body->set_var("MIN", $min);
 
-		
-	 	$this->t_body->set_var("modevents_block", "");	
+
+	 	$this->t_body->set_var("modevents_block", "");
 		$this->t_body->parse("addevent_block", "add_event", true);
 		$this->t_body->parse("menu_block", "menu", true);
-		$this->t_body->pparse("finaloutput", "tplBODY"); 
+		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 
 	function displayEvent($sid, $type)
@@ -233,13 +233,13 @@ class initEvent
 
 		$myEvent = new event();
 		$eventlist = $myEvent->getEventDetails($sid, $type);
-		if ($eventlist) {		
+		if ($eventlist) {
 
 			$myTeam = new sport();
-			$teams = $myTeam->getTeams($sid); 
-		
+			$teams = $myTeam->getTeams($sid);
+
 			$myOpp = new opp();
-			$opps = $myOpp->getOpp(); 
+			$opps = $myOpp->getOpp();
 
 			$myVenue = new venue();
 			$venues = $myVenue->getVenues();
@@ -252,17 +252,17 @@ class initEvent
 
 				$oppList = $this->createHTMLlist($opps, $event['oid'], "opp", "oid");
 				$this->t_body->set_var("OPP", $oppList);
-			
+
 				$venList = $this->createHTMLlist($venues, $event['vid'], "venue", "vid");
 				$this->t_body->set_var("VENUE", $venList);
-				
+
                		        $this->t_body->set_var("DAY", createDateList($event['day'], "day[]"));
                        		$this->t_body->set_var("MTH", createMonthList($event['month'], "mth[]"));
-				
-				$this->t_body->set_var("NP", "");		
-				$this->t_body->set_var("WIN", "");		
-				$this->t_body->set_var("LOSS", "");		
-				$this->t_body->set_var("DRAW", "");		
+
+				$this->t_body->set_var("NP", "");
+				$this->t_body->set_var("WIN", "");
+				$this->t_body->set_var("LOSS", "");
+				$this->t_body->set_var("DRAW", "");
 
 				if ($event['period'] == "PM"){
 					$this->t_body->set_var("PM", "selected");
@@ -271,20 +271,20 @@ class initEvent
 				else {
 					$this->t_body->set_var("AM", "selected");
 					$this->t_body->set_var("PM", "");
-				}	
+				}
 				$this->t_body->set_var("HOUR", $event['hour']);
 				$this->t_body->set_var("MIN", $event['min']);
-	
+
 				$this->t_body->parse("modevents_listing", "modevents_list", true);
 			}
-		}	
+		}
 		else
 			$this->t_body->set_var("modevents_listing", "<font color=\"#FF0000\"><b>No events available</b></font>");
-			
+
 		$this->t_body->set_var("addevent_block", "");
 		$this->t_body->set_var("menu_block", "");
 		$this->t_body->parse("modevents_block", "modevents_body", true);
-		$this->t_body->pparse("finaloutput", "tplBODY"); 
+		$this->t_body->pparse("finaloutput", "tplBODY");
 
 	}
 
@@ -293,19 +293,19 @@ class initEvent
 		$htmlList = "<option value=\"\">Not Selected</option>";
 		foreach ($array as $arr)
 		{
-	 		if ($id == $arr[$idvalue]) 
+	 		if ($id == $arr[$idvalue])
 				$htmlList .= "<option value=\"".$arr[$idvalue]."\" selected>".$arr[$namevalue]."</option>";
 			else
 				$htmlList .= "<option value=\"".$arr[$idvalue]."\">".$arr[$namevalue]."</option>";
-		}		
+		}
 		return $htmlList;
 	}
-	
-}  
+
+}
 if (perm(1,3) > 0){
 	$page = new initEvent($_REQUEST['flag'], $_REQUEST['id']);
 }
 else
 	error(19);
-	
+
 ?>

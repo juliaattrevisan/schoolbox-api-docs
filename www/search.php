@@ -11,7 +11,7 @@ require_once '../include/SitePage.php';
 require_once '../library/group.php';
 require_once '../library/category.php';
 require_once '../library/allowed-file.php';
-require_once 'include/permission.php';
+//require_once 'include/permission.php';
 
 $page        = new SitePage();
 $group       = new Group();

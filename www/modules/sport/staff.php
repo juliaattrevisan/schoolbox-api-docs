@@ -4,7 +4,7 @@
 
 require_once("../../include/include.php");
 require_once("../../include/session.php");
-require_once("../../include/permission.php");
+//require_once("../../include/permission.php");
 require_once("../../include/html-time.php");
 require_once("sql/modstaff.php");
 
@@ -25,7 +25,7 @@ class initStaff
         		        	$myStaff = new staff();
         		       		if ($myStaff->addStaff($_POST['lname'], $_POST['fname'], $_POST['phone'], $_POST['email'])){
         	                		$this->displayAddStaff();
-       		 	        	}      
+       		 	        	}
                	 			else
                         			print "could not add staff member";
         			}
@@ -69,7 +69,7 @@ class initStaff
         			$this->displayStaff();
 				break;
 		}
-	
+
 	}
 
 	function initDisplay()
@@ -80,7 +80,7 @@ class initStaff
 		$this->t_body->set_file("tplBODY", "modules/sports/admin/staff.htm");
 	 	//output page
 		include_once("../../include/page.php");
-	
+
 		//setup blocks
 		$this->t_body->set_block("tplBODY", "modstaff_body", "modstaff_block");
 		$this->t_body->set_block("modstaff_body", "modstaff_list", "modstaff_listing");
@@ -96,18 +96,18 @@ class initStaff
 		//displays form to add a staff member and stores it in database
 		$this->t_body->set_var("NAV", "<a href=\"staff.php\"><b>Back</b></a>");
 		$this->t_body->set_var("DISPLAY", "Add Staff");
-	 	$this->t_body->set_var("modstaff_block", "");	
+	 	$this->t_body->set_var("modstaff_block", "");
 		$this->t_body->parse("addstaff_block", "add_staff", true);
-		$this->t_body->pparse("finaloutput", "tplBODY"); 
+		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
-	
+
 	function displayStaff()
 	{
 		//display list of staff to begin with
 		$this->t_body->set_var("NAV", "<a href=\"staff.php?flag=1\"><b>Add Staff</b></a>");
 		$this->t_body->set_var("DISPLAY", "Modify Staff");
 
-		$myStaff = new staff(); 
+		$myStaff = new staff();
 		$staff = $myStaff->getStaff();
 		if ($staff)
 		{
@@ -119,11 +119,11 @@ class initStaff
 				$this->t_body->set_var("PHONE", $info['phone']);
 				$this->t_body->set_var("EMAIL", $info['email']);
 				$this->t_body->parse("modstaff_listing", "modstaff_list", true);
-			}		
+			}
 		}
 		$this->t_body->set_var("addstaff_block", "");
 		$this->t_body->parse("modstaff_block", "modstaff_body", true);
-		$this->t_body->pparse("finaloutput", "tplBODY"); 
+		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 }
 if (perm(1,3) > 0){

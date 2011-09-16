@@ -2,7 +2,7 @@
 
 include_once("../../include/include.php");
 include_once("../../include/session.php");
-include_once("../../include/permission.php");
+//include_once("../../include/permission.php");
 include_once("sql/modevent.php");
 include_once("sql/modsport.php");
 
@@ -22,13 +22,13 @@ foreach ($sportslist as $sport)
 
 
 	if ($eventlist){
- 	  foreach ($eventlist as $event){	
+ 	  foreach ($eventlist as $event){
   		$line = '';
 		$date = $event['day']."/".$event['month']."/".$event['year'];
 		$time = $event['hour'].":".$event['min']." ".$event['period'];
 		$line = $sport['name']."\t".$event['section']."\t".$event['opp']."\t".$event['venue']."\t".$event['melref']."\t".$date."\t".$time."\t".$event['fname1']." ".$event['lname1']."\t".$event['fname2']." ".$event['lname2']."\t";
   		$data .= trim($line)."\n";
-	  }	
+	  }
 	}
 }
 
@@ -47,8 +47,8 @@ header("Content-type: application/octet-stream");
 
 header("Content-Disposition: attachment; filename=sports_fixture.xls");
 
-echo $header."\n".$data; 
+echo $header."\n".$data;
 }
 else
 	error(19);
-?> 
+?>

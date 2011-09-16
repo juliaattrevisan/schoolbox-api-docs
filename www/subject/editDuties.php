@@ -6,7 +6,7 @@
 
 require_once("../include/session.php");
 require_once("../include/include.php");
-require_once("../include/permission.php");
+//require_once("../include/permission.php");
 require_once("../include/SitePage.php");
 
 class editDuties

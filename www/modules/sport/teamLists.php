@@ -4,7 +4,7 @@
 
 require_once("../../include/include.php");
 require_once("../../include/session.php");
-require_once("../../include/permission.php");
+//require_once("../../include/permission.php");
 require_once("../../include/html-time.php");
 require_once("../../include/html-parse.php");
 require_once("sql/modsport.php");
@@ -30,7 +30,7 @@ class initTeamLists
                                          //add each student to team query id based on synid
                                         foreach ($synids as $synid){
                                                 $mySport->addStudToTeam($tid, $synid);
-                                        }   
+                                        }
                                 }
                                 else if ($_GET['studid'] && isset($_GET['studid'])){
                                         $mySport->addStudToTeam($tid, $_GET['studid']);
@@ -38,7 +38,7 @@ class initTeamLists
                                 else
                                         print "not adding or nothing chosen";
 				$this->initDisplay();
-                                $this->displayTeamLists($this->id);   
+                                $this->displayTeamLists($this->id);
 				break;
 			case 3:
 				//delete student from team
@@ -48,15 +48,15 @@ class initTeamLists
                                 $this->displayTeamLists($this->id);
 				break;
 			default:
- 				//display all team lists for this sport     
+ 				//display all team lists for this sport
 				$this->initDisplay();
-                                if ($_GET['display'])     
+                                if ($_GET['display'])
                                         $this->displayTeamLists($this->id, $_GET['display']);
                                 else
                                         $this->displayTeamLists($this->id);
 				break;
-				
-		}	
+
+		}
 	}
 
 	function initDisplay()
@@ -77,7 +77,7 @@ class initTeamLists
 		$this->t_body->set_block("tplBODY", "team_list", "team_listing");
 		$this->t_body->set_block("team_list", "team_header", "team_heading");
 		$this->t_body->set_block("team_list", "stud_list", "stud_listing");
-		$this->t_body->set_block("tplBODY", "search", "search_sect"); 
+		$this->t_body->set_block("tplBODY", "search", "search_sect");
 		$this->t_body->set_var("TITLE", "Sport Team List Adminitration");
 	}
 
@@ -87,18 +87,18 @@ class initTeamLists
 		$sport = $mySport->getSports($sid);
 #		if (!$display){
 		if (!$display && perm(1,3) > 0){
-			$this->t_body->set_var("NAV", 
+			$this->t_body->set_var("NAV",
 				"<a href=\"sport.php?dest=1\"><b>Admin Menu</b></a>&nbsp;&nbsp;
 				<a href=\"teamLists.php?flag=1&name=".$sport[0]['name']."&id=".$sid."\">
 				<b>Add Students</b></a>&nbsp;&nbsp;
 			");
 		}
 		else if ($display){
-			$this->t_body->set_var("NAV", " 
+			$this->t_body->set_var("NAV", "
 					<form>
-                        		<input type=\"button\" name=\"print\" value=\"Print Teams\" 
+                        		<input type=\"button\" name=\"print\" value=\"Print Teams\"
 						class=\"formbutton\" onClick=\"javascript:window.print()\">
-                        		<input type=\"button\" name=\"back\" value=\"Back to Menu\" 
+                        		<input type=\"button\" name=\"back\" value=\"Back to Menu\"
 						class=\"formbutton\" onClick=\"history.go(-1)\">
                         		</form>
 			");
@@ -109,10 +109,10 @@ class initTeamLists
 		$this->t_body->set_var("DISPLAY", "Team Lists for ".$sport[0]['name']);
 		$this->t_body->set_var("SID", $sid);
 		$teaminfo = $mySport->getTeams($sid);
-		
+
 		if ($teaminfo){
-		  $append = 0; 
-		  foreach ($teaminfo as $team){		
+		  $append = 0;
+		  foreach ($teaminfo as $team){
 			$studids = array();
 			$studids = $mySport->getStudTeamList($team['tid']);
 			$this->t_body->set_var("SUBHEADING", $team['section']);
@@ -125,9 +125,9 @@ class initTeamLists
 			}
 			if ($values){
 				//trim off trailing comma
-		 		$values = substr($values, 0, strlen($values) - 1);	
-				$query = "SELECT * FROM intranet.user 
-					  WHERE synergy_id IN (".$values.") 
+		 		$values = substr($values, 0, strlen($values) - 1);
+				$query = "SELECT * FROM intranet.user
+					  WHERE synergy_id IN (".$values.")
 					  ORDER BY lastname, firstname, year
 				";
 				$this->db->dbDoQuery($query);
@@ -171,7 +171,7 @@ class initTeamLists
 		$this->t_body->set_var("search_sect", "");
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
-	
+
 	function displayStudSearch($sid, $name, $other = "", $future = "")
 	{
 		$db = mssql_connect(Cfg::get('external_db_host'), Cfg::get('external_db_user'), Cfg::get('external_db_passwd'));
@@ -187,7 +187,7 @@ class initTeamLists
 		if ($future)
 			$fileyr = $_SESSION['FileYear'] + 1;
 		else
-			$fileyr = $_SESSION['FileYear'];	
+			$fileyr = $_SESSION['FileYear'];
 		$this->t_body->set_var("FILEYR", $fileyr);
 
 		//setup teams list
@@ -199,25 +199,25 @@ class initTeamLists
 			$teamarray[$tname] = $teams['tid'];
 		}
 		$html_teamarr = html_select("team", $teamarray, "");
-		$this->t_body->set_var("TEAMS", $html_teamarr);	 		
+		$this->t_body->set_var("TEAMS", $html_teamarr);
 		}
 		//setup students list
 		if ($other == ""){
 			if ($_SESSION['campus'][0] != 3){
 			//if list in synergy exists for this sport, display students to choose from as well as search function
 			$query = "
-				SELECT 	DISTINCT (vStudents.StudentID) as synid, 
-					vStudents.StudentSurname as lname, 
-					vStudents.StudentGiven1 as fname, 
-					vStudents.StudentYearLevel as year, 
+				SELECT 	DISTINCT (vStudents.StudentID) as synid,
+					vStudents.StudentSurname as lname,
+					vStudents.StudentGiven1 as fname,
+					vStudents.StudentYearLevel as year,
 					vStudentClasses.ClassDescription
-				FROM 	SynergyOne.dbo.vStudentClasses vStudentClasses, 
+				FROM 	SynergyOne.dbo.vStudentClasses vStudentClasses,
 					SynergyOne.dbo.vStudents vStudents
-				WHERE 	vStudentClasses.StudentID = vStudents.StudentID 
-				AND 	vStudentClasses.FileYear = vStudents.FileYear 
-				AND 	(vStudentClasses.FileYear = $fileyr) 
-				AND 	(vStudentClasses.FileType In ('R','S','W')) 
-				AND 	(vStudents.StudentYearLevel ".$studentyear.") 
+				WHERE 	vStudentClasses.StudentID = vStudents.StudentID
+				AND 	vStudentClasses.FileYear = vStudents.FileYear
+				AND 	(vStudentClasses.FileYear = $fileyr)
+				AND 	(vStudentClasses.FileType In ('R','S','W'))
+				AND 	(vStudents.StudentYearLevel ".$studentyear.")
 				AND 	(vStudentClasses.ClassDescription like '".$name."')
 			   	ORDER BY vStudents.StudentYearLevel, vStudents.StudentSurname, vStudents.StudentGiven1
 			";
@@ -233,8 +233,8 @@ class initTeamLists
 				WHERE	(vStudents.StudentYearLevel ".$studentyear.")
 				AND	(vStudents.FileYear = $fileyr)
 				ORDER BY vStudents.StudentYearLevel, vStudents.StudentSurname, vStudents.StudentGiven1
-			";	
-			}	
+			";
+			}
                 	$result = mssql_query($query, $db);
 			if ($result != 1){
 				if (mssql_num_rows($result) > 0){
@@ -245,7 +245,7 @@ class initTeamLists
 						$this->t_body->set_var("YEAR", $list['year']);
 						$this->t_body->set_var("SYNID", $list['synid']);
 						$this->t_body->parse("synstud_listing", "synstud_list", true);
-					}		
+					}
 					$this->t_body->set_var("SUBHEADING", "Synergy Listing");
 					$this->t_body->parse("syn_listing", "syn_list", true);
 					$this->t_body->set_var("search_sect", "");
@@ -260,11 +260,11 @@ class initTeamLists
 		}
 		//search already done, list students matching search name
 		else {
-			$query = "SELECT * FROM intranet.user WHERE group_id IN ('3','4','5') AND ("; 
+			$query = "SELECT * FROM intranet.user WHERE group_id IN ('3','4','5') AND (";
 			$input =  explode(' ', $other);
 			foreach($input as $token)
 			{
-        			$query .= "firstname like '$token%' OR lastname like '$token%' OR "; 
+        			$query .= "firstname like '$token%' OR lastname like '$token%' OR ";
 			}
 			$query = substr($query, 0, strlen($query) - 3);
 			$query.= ")";
@@ -277,7 +277,7 @@ class initTeamLists
 					$this->t_body->set_var("YEAR", $list['year']);
 					$this->t_body->set_var("SYNID", $list['synergy_id']);
 					$this->t_body->parse("synstud_listing", "synstud_list", true);
-				}	
+				}
 				$this->t_body->set_var("SUBHEADING", "Synergy Listing");
 				$this->t_body->parse("syn_listing", "syn_list", true);
 				$this->t_body->set_var("search_sect", "");
@@ -300,10 +300,10 @@ class initTeamLists
 		$this->t_body->set_var("SID", $sid);
 		$this->t_body->set_var("NAV", "<a href=\"teamLists.php?flag=1&future=1&id=$sid&name=$name\"><b>Display $nextyr students?</b></a>&nbsp;&nbsp;&nbsp;<a href=\"/modules/sport/teamLists.php?id=".$sid."\"><b>Back</b></a>");
 		$this->t_body->set_var("team_listing", "");
-		$this->t_body->pparse("finaloutput", "tplBODY");	
+		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
-	
-	
+
+
 	function modStudTeams($tid, $studid)
 	{
 		if (perm(1,3) > 0){
@@ -313,9 +313,9 @@ class initTeamLists
 			$mySport->addStudToTeam($tid, $studid);
 		 }
 		 else {
-			//add each student to team query id based on synid 
+			//add each student to team query id based on synid
                         foreach ($studid as $synid){
-                        	$syns.= "'$synid',";  
+                        	$syns.= "'$synid',";
                         }
                         if ($syns){
        	                	//trim off trailing comma
@@ -328,7 +328,7 @@ class initTeamLists
 					}
 				}
                         }
-	 	 }	
+	 	 }
 		}
 		else
 			error(19);
@@ -340,7 +340,7 @@ class initTeamLists
 			while ($stud = $this->db->dbGetNextArray){
 				$students[] = $stud;
 			}
-			return $students;	
+			return $students;
 		}
 		else
 			return 0;

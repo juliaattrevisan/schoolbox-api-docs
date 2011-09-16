@@ -25,15 +25,15 @@ if (is_numeric($this->arg[0])) {
     $this->setVar('BOX_ID', $subBox['id']);
 
     /* Get full student list of class to show those who have not submitted
+     * If synergy code get synergy students
      */
     if ($subBox['code'] && Cfg::get('external_enable')) {
-
-        //if synergy code get synergy students
         $synHandler = new ExternalClass();
         $studentList = $synHandler->getStudents($subBox['code']);
     }
+	/* Retrieve student list from group membership
+	 */
     else {
-        //Retrieve student list from group membership
         $groupHandler = new Group();
         $studentList = $groupHandler->getMemberList($subBox['category']);
     }
@@ -46,7 +46,7 @@ if (is_numeric($this->arg[0])) {
 				$user = $userHandler->getByID($student['uid']);
 				$studentSub = $studentSubHandler->getByUserID($this->arg[0], $student['uid']);
 			}
-            else if($student['synergy_id']) {
+            else if ($student['synergy_id']) {
 				$user = $userHandler->getBySynergy($student['synergy_id']);
                 $studentSub = $studentSubHandler->getBySynergyID($this->arg[0], $student['synergy_id']);
 			}
@@ -83,7 +83,7 @@ if (is_numeric($this->arg[0])) {
                 $output = array(
 					'OWNER' => $userHandler->formatName($user, '{lastname}, {firstname}'),
 					'OWNER_ID' => $user['uid'],
-					'OWNER_ESCAPED' => addslashes($userHandler->$userHandler->formatName($student, '{lastname}, {firstname}')),
+					'OWNER_ESCAPED' => addslashes($userHandler->formatName($student, '{lastname}, {firstname}')),
 					'SUBMITTED' => '',
 					'COLOUR' => '',
 					'MARK' => $return[0]['mark'],

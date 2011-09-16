@@ -6,7 +6,7 @@
 ************************************************************/
 //ClassList object..displays class list with most recent visit
 
-require_once 'include/permission.php';
+//require_once 'include/permission.php';
 require_once '../library/category.php';
 require_once '../library/user.php';
 require_once '../library/group.php';
@@ -104,7 +104,7 @@ if($groupHandler->isStaff($_SESSION['gid'])) {
                 else {
                     $this->setVar('eportfolio_block', '');
 				}
-                
+
                 /* Parse out the name blocks: if they were found in Schoolbox,
 				 * give the names links - otherwise leave them unlinked
 				 */
@@ -122,7 +122,7 @@ if($groupHandler->isStaff($_SESSION['gid'])) {
 					$this->parse('firstname_without_link_block', 'firstname_without_link');
 					$this->setVar('firstname_with_link_block', '');
 				}
-                
+
 				$this->parse("student_list_block", "student_list", true);
 			}
 		}

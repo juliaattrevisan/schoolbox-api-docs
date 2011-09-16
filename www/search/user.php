@@ -2,7 +2,7 @@
 
 require_once '../library/user.php';
 require_once '../library/group.php';
-require_once 'include/permission.php';
+//require_once 'include/permission.php';
 
 //display user description page
 if (is_numeric($this->arg[0])) {

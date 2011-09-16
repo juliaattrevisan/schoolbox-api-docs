@@ -5,7 +5,7 @@
 *                                                           *
 ************************************************************/
 
-require_once "include/permission.php";
+//require_once "include/permission.php";
 require_once "../library/group.php";
 require_once '../library/submissionStudent.php';
 require_once "../library/calendar.php";

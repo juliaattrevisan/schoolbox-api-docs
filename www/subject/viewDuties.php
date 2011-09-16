@@ -6,11 +6,11 @@
 
 require_once("../include/session.php");
 require_once("../include/include.php");
-require_once("../include/permission.php");
+//require_once("../include/permission.php");
 
 
 class editDuties
-{	
+{
 	function editDuties($cat, $currYear=0, $currMonth=0, $currDay=0)
 	{
 		$this->category = $cat;
@@ -39,17 +39,17 @@ class editDuties
 		$previousWeek = mktime (0,0,0,$this->currMonth, ($this->currDay-7), $this->currYear);
         	$nextWeek = mktime (0,0,0,$this->currMonth, ($this->currDay+7), $this->currYear);
 		$currentDate = mktime (0,0,0,$this->currMonth, $this->currDay, $this->currYear);
-		
+
 
 		$this->t_body->set_var("WEEKBACK", "viewDuties.php?category=".$this->category."&Year=".date("Y",$previousWeek).
                                 "&Month=".date("m",$previousWeek)."&Day=".date("d", $previousWeek));
         	$this->t_body->set_var("WEEKFORWARD", "viewDuties.php?category=".$this->category."&Year=".date("Y",$nextWeek).
                                 "&Month=".date("m",$nextWeek)."&Day=".date("d", $nextWeek));
 		$this->t_body->set_var("TODAY", "viewDuties.php?category=".$this->category."&Year=".date("Y").
-                                "&Month=".date("m")."&Day=".date("d"));								
+                                "&Month=".date("m")."&Day=".date("d"));
 
-		
-		
+
+
 		$this->t_body->set_file("tplBODY", "subjects/viewDuties.htm");
 		$this->t_body->set_block("tplBODY", "duty_list", "d_block");
 		include_once("../include/page.php");
@@ -61,7 +61,7 @@ class editDuties
                         $sql = "SELECT l.*, d.user, d.date, d.cid FROM luDuties l LEFT JOIN duty d ON l.dutyTypeID = d.dutyTypeID and d.date = '".
                                 $queryDate."' where l.cid = ".$this->category ;
                         $this->db->query($sql);
-			
+
 			while($row = $this->db->getNextArray())
 			{
 				$dutiesList[$row['dutyTypeID']] = $row['name'];
@@ -79,12 +79,12 @@ class editDuties
                                 "&Month=".date("m",$currentDate)."&Day=".date("d", $currentDate) );
 			$this->t_body->set_var("TITLE", HEADING." - View Duties");
 			$this->t_body->set_var("CID", $this->category );
-			
+
 			if($this->perm < 2)
 			{
 				$this->t_body->set_block("tplBODY", "duty_edit", "d_edit");
 				$this->t_body->set_block("d_edit", "");
-			}			
+			}
 
 			foreach($userArray as $id => $user)
 			{
@@ -103,10 +103,10 @@ class editDuties
 			//{
 			//	$this->t_body->set_var("d_block".$j, '');
 			//}
-		
-		$this->t_body->pparse("finaloutput", "tplBODY");	
+
+		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
-	
+
 }
 
 $page = new editDuties($_GET['category'], $_GET['Year'], $_GET['Month'], $_GET['Day']);

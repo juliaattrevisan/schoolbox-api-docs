@@ -141,7 +141,7 @@ else if(is_numeric($this->arg[0])) {
         //if synergy code get synergy students
         $synHandler = new ExternalClass();
         $studentList = $synHandler->getStudents($category['code']);
-print_r($studentList);
+
 		for ($x=0; is_array($studentList[$x]);$x++){
 			$user = $userHandler->getBySynergy($studentList[$x]['synergy_id']);
 			$studentList[$x]['uid'] = $user['uid'];

@@ -4,7 +4,7 @@
 
 require_once("../../include/session.php");
 require_once("../../include/include.php");
-require_once("../../include/permission.php");
+//require_once("../../include/permission.php");
 require_once("../../include/html-time.php");
 require_once("sql/modopp.php");
 
@@ -26,14 +26,14 @@ class initOpp
                                         else
                                                 print "could not add opposition";
                                 }
-                                else   
+                                else
                                         $this->displayAddOpp();
 				break;
 			case 2:
  				//save opposition
 				$this->initDisplay();
                                 if (isset($_POST['opp']) && $_POST['opp'])
-                                {       
+                                {
                                         $oid = $_POST['oid'];
                                         $opp = $_POST['opp'];
                                         $num = 0;
@@ -58,10 +58,10 @@ class initOpp
 			default:
  				//display opposition list
 				$this->initDisplay();
-				
+
                                 $this->displayOpp();
 				break;
-		}		
+		}
 	}
 
 	function initDisplay()
@@ -72,7 +72,7 @@ class initOpp
 		$this->t_body->set_file("tplBODY", "modules/sports/admin/opp.htm");
 	 	//output page
 		include_once("../../include/page.php");
-	
+
 		//setup blocks
 		$this->t_body->set_block("tplBODY", "modopp_body", "modopp_block");
 		$this->t_body->set_block("modopp_body", "modopp_list", "modopp_listing");
@@ -88,9 +88,9 @@ class initOpp
 		//displays form to add an opposition team and store it in database
 		$this->t_body->set_var("NAV", "<a href=\"opp.php\"><b>Back</b></a>");
 		$this->t_body->set_var("DISPLAY", "Add Opp");
-	 	$this->t_body->set_var("modopp_block", "");	
+	 	$this->t_body->set_var("modopp_block", "");
 		$this->t_body->parse("addopp_block", "add_opp", true);
-		$this->t_body->pparse("finaloutput", "tplBODY"); 
+		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 
 
@@ -101,17 +101,17 @@ class initOpp
 		$this->t_body->set_var("DISPLAY", "Modify Oppositions");
 
 		$myOpp = new opp();
-		$opps = $myOpp->getOpp();		
+		$opps = $myOpp->getOpp();
 		if ($opps){
-			foreach ($opps as $opp) {	
+			foreach ($opps as $opp) {
 				$this->t_body->set_var("OID", $opp['oid']);
 				$this->t_body->set_var("OPP", $opp['opp']);
-				$this->t_body->parse("modopp_listing", "modopp_list", true);	
+				$this->t_body->parse("modopp_listing", "modopp_list", true);
 			}
 		}
 		$this->t_body->set_var("addopp_block", "");
 		$this->t_body->parse("modopp_block", "modopp_body", true);
-		$this->t_body->pparse("finaloutput", "tplBODY"); 
+		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
 }
 if (perm(1,3) > 0){

@@ -4,7 +4,7 @@
 
 require_once("../../include/include.php");
 require_once("../../include/session.php");
-require_once("../../include/permission.php");
+//require_once("../../include/permission.php");
 require_once("../../include/html-time.php");
 require_once("sql/modsport.php");
 require_once("sql/modopp.php");
@@ -68,7 +68,7 @@ class initResults
  			$this->t_body->set_file("tplBODY", "modules/sports/sports_results.htm");
 			//setup blocks
  			$this->t_body->set_block("tplBODY", "fixture", "fixture_sect");
-                	$this->t_body->set_block("fixture", "sports_list", "sports_listing");      
+                	$this->t_body->set_block("fixture", "sports_list", "sports_listing");
                 	$this->t_body->set_block("sports_list", "event_list", "event_listing");
                 	$this->t_body->set_block("sports_list", "headers", "headers_block");
  			$this->t_body->set_var("TITLE", "Sports Results");
@@ -89,7 +89,7 @@ class initResults
 		}
                 $this->t_body->set_var("DISPLAY", "");
                 $this->t_body->set_var("NAV", "");
-	
+
 	}
 
 	function displayResults($sid, $specdate)
@@ -101,7 +101,7 @@ class initResults
 		}
 		$mySport = new sport();
 		if ($sid != 0)
-			$sports = $mySport->getSports($sid);	
+			$sports = $mySport->getSports($sid);
 		else
 			$sports = $mySport->getSports();
 		$noevents = 1;
@@ -116,15 +116,15 @@ class initResults
                         	$this->t_body->set_var("NAV", "<a href=\"sport.php?dest=4\"><b>Admin Menu</b></a>");
 			}
 			foreach($sports as $sport){
-	
+
 				$prevdate = NULL;
 				$myEvent = new event();
 				if ($this->redir) {
- 					$mySeason = new Season;  
-                                	$cs = $mySeason->getCurrent();      
+ 					$mySeason = new Season;
+                                	$cs = $mySeason->getCurrent();
                                 	$this->t_body->set_var("DATE", $cs['sday']."/".$cs['smonth']."/".$cs['syear']." - ".$cs['eday']."/".$cs['emonth']."/".$cs['eyear']);
 				}
-	 			//get events where type = 2 ie.only get past events 
+	 			//get events where type = 2 ie.only get past events
 				if (!$specdate) {
 					$eventlist = $myEvent->getEventDetails($sport['sid'], 1);
 				}
@@ -137,13 +137,13 @@ class initResults
                 			foreach ($eventlist as $event)
                        			{
 						$noevents = 0;
-		 				$date = $event['day']."/".$event['month']; 
+		 				$date = $event['day']."/".$event['month'];
   						if ($date != $prevdate && $prevdate != NULL) {
                                                 	$this->t_body->parse("sports_listing", "sports_list", true);
                                         	}
        						$this->t_body->set_var("SPORTNAME", $sport['name']."&nbsp;$date");
-                       				$this->t_body->set_var("TEAM", $event['section']); 
-                       				$this->t_body->set_var("OPP", $event['opp']); 
+                       				$this->t_body->set_var("TEAM", $event['section']);
+                       				$this->t_body->set_var("OPP", $event['opp']);
                                                 if ($this->redir){
 							$this->t_body->set_var("VENUE", $event['venue']);
 							if ($event['win'] == 3)
@@ -152,9 +152,9 @@ class initResults
 								$this->t_body->set_var("WIN", "WIN");
 							else if ($event['win'] == 2)
 								$this->t_body->set_var("WIN", "LOSS");
-							else 
+							else
 								$this->t_body->set_var("WIN", "N/P");
-						
+
 						}
                                                	else{
 							$this->t_body->set_var("EVENTID", $event['eid']);
@@ -163,7 +163,7 @@ class initResults
 							for ($i = 0; $i < 4; $i++){
 								if ($event['win'] == $i)
                                						$this->t_body->set_var("WIN".$i, "selected");
-                              					else 
+                              					else
                                        					$this->t_body->set_var("WIN".$i, "");
 							}
 						}
@@ -190,7 +190,7 @@ class initResults
 				}
 				if ($isevents)
 					$this->t_body->parse("sports_listing", "sports_list", true);
-					
+
 				$isevents = 1;
 			}
 		}
@@ -210,7 +210,7 @@ class initResults
 		}
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
-	
+
 	function displayResultsMenu()
 	{
  		$this->t_body->set_var("DISPLAY", "Results Search");
@@ -218,22 +218,22 @@ class initResults
                 $this->t_body->set_var("ID", $sid);
                 $this->t_body->set_var("REDIR", $this->search);
 		$date = getdate();
-		$this->t_body->set_var("DAY", createDateList($date['mday'], "day"));	
-		$this->t_body->set_var("MTH", createMonthList($date['mon'], "month"));	
-		$this->t_body->set_var("YEAR", createYearList($date['year'], "year"));	
+		$this->t_body->set_var("DAY", createDateList($date['mday'], "day"));
+		$this->t_body->set_var("MTH", createMonthList($date['mon'], "month"));
+		$this->t_body->set_var("YEAR", createYearList($date['year'], "year"));
 
 		$select = "<select name=\"sportselect\" class=\"formfield\">";
-		$mySport = new sport();	
-		$sports = $mySport->getSports();	
-		$select.="<option value=\"0\">All Sports</option>"; 
+		$mySport = new sport();
+		$sports = $mySport->getSports();
+		$select.="<option value=\"0\">All Sports</option>";
 		foreach ($sports as $sport)
-		{	 
-			$select.="<option value=\"".$sport['sid']."\">".$sport['name']."</option>"; 
-		}	
+		{
+			$select.="<option value=\"".$sport['sid']."\">".$sport['name']."</option>";
+		}
 		$select .= "</select>";
 		$this->t_body->set_var("SPORTSELECT", $select);
 		$this->t_body->set_var("modevents", "");
-		
+
 		/*if ($this->search)
 			$this->t_body->set_var("adminmenu_block", "");
 		else
@@ -242,7 +242,7 @@ class initResults
 		$this->t_body->parse("results_form", "results_menu", true);
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
-	
+
 	function array_column_sort($array, $column)
 	{
 		foreach ($array as $row)
@@ -250,6 +250,6 @@ class initResults
 		array_multisort($sortarr, $array);
 		return $array;
 	}
-}  
+}
 $page = new initResults();
 ?>
