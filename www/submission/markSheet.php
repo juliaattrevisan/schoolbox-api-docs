@@ -233,67 +233,72 @@ else if(is_numeric($this->arg[0])) {
 	if (is_array($studentList)) {
 		foreach($studentList as $student) {
 
-			$output = array(
-				'SURNAME' => Scrub::text($student['lastname']),
-				'FIRSTNAME' => Scrub::text($student['firstname']),
-				'UID' => $student['uid'],
-				'ON_OFF' => ++$i % 2 ? '' : 'dark',
-			);
+			/* If there is no uid associated with the student, prevent them
+			 * from appearing in the markSheet.
+			 */
+			if (is_numeric($student['uid'])) {
+				$output = array(
+					'SURNAME' => Scrub::text($student['lastname']),
+					'FIRSTNAME' => Scrub::text($student['firstname']),
+					'UID' => $student['uid'],
+					'ON_OFF' => ++$i % 2 ? '' : 'dark',
+				);
 
-			$this->setVar($output);
+				$this->setVar($output);
 
-			$this->setVar('mark_block','');
-            $this->setVar('onlineAssessmentMark_block','');
+				$this->setVar('mark_block','');
+				$this->setVar('onlineAssessmentMark_block','');
 
-			if (is_array($subList)) {
-				foreach($subList as $sub) {
-                    if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
-                        $firstSection = $sectionHandler->getFirst($sub['id']);
-                        $mostRecentAttempt = $attemptHandler->getLatestForUser($sub['id'], $student['uid']);
-                        $marks = $attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
-                        $total = $attemptHandler->getTotalMarks($sub['id'], $mostRecentAttempt['attempt_id']);
+				if (is_array($subList)) {
+					foreach($subList as $sub) {
+						if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
+							$firstSection = $sectionHandler->getFirst($sub['id']);
+							$mostRecentAttempt = $attemptHandler->getLatestForUser($sub['id'], $student['uid']);
+							$marks = $attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
+							$total = $attemptHandler->getTotalMarks($sub['id'], $mostRecentAttempt['attempt_id']);
 
-                        $this->setVar(array(
-                            'ASSESS_ASSESS_ID' => $sub['id'],
-                            'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
-                            'ATTEMPT_ID' => $mostRecentAttempt['attempt_id'],
-                            'MARK' => ($marks && $total) ? number_format($marks, 2) . ' / ' . number_format($total, 2)  : '',
-                            'BOX_ID' => ''
-                        ));
+							$this->setVar(array(
+								'ASSESS_ASSESS_ID' => $sub['id'],
+								'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
+								'ATTEMPT_ID' => $mostRecentAttempt['attempt_id'],
+								'MARK' => ($marks && $total) ? number_format($marks, 2) . ' / ' . number_format($total, 2)  : '',
+								'BOX_ID' => ''
+							));
 
-						$this->setVar('mark_block','');
-                        $this->parse('onlineAssessmentMark_block', 'onlineAssessmentMark');
-                    }
-                    else {
-                        /* If a UID was found for the student, try to get his
-                         * submissions. Otherwise skip him (this occurs when he
-                         * exists in Synergetic but not in schoolbox)
-                         */
-                        if (is_numeric($student['uid'])) {
-                            $return = $retHandler->getByUser($student['uid'],$sub['id']);
+							$this->setVar('mark_block','');
+							$this->parse('onlineAssessmentMark_block', 'onlineAssessmentMark');
+						}
+						else {
+							/* If a UID was found for the student, try to get his
+							 * submissions. Otherwise skip him (this occurs when he
+							 * exists in Synergetic but not in schoolbox)
+							 */
+							if (is_numeric($student['uid'])) {
+								$return = $retHandler->getByUser($student['uid'],$sub['id']);
 
-                            $this->setVar(array(
-                                'MARK' => Scrub::text($return[0]['mark']),
-                                'BOX_ID' => $sub['id'],
-                            ));
-                        }
+								$this->setVar(array(
+									'MARK' => Scrub::text($return[0]['mark']),
+									'BOX_ID' => $sub['id'],
+								));
+							}
 
-                        $this->parse('mark_block','mark');
+							$this->parse('mark_block','mark');
+							$this->setVar('onlineAssessmentMark_block', '');
+						}
+
+						$this->parse('markItem_block', 'markItem', true);
+						$this->setVar('mark_block', '');
 						$this->setVar('onlineAssessmentMark_block', '');
-                    }
-
-					$this->parse('markItem_block', 'markItem', true);
-					$this->setVar('mark_block', '');
+					}
+				}
+				else {
+					$this->setVar('mark_block','');
 					$this->setVar('onlineAssessmentMark_block', '');
 				}
-			}
-			else {
-				$this->setVar('mark_block','');
-                $this->setVar('onlineAssessmentMark_block', '');
-			}
 
-			$this->parse('student_list_block', 'student_list', true);
-			$this->setVar('markItem_block', '');
+				$this->parse('student_list_block', 'student_list', true);
+				$this->setVar('markItem_block', '');
+			}
 		}
 	}
 	else {
