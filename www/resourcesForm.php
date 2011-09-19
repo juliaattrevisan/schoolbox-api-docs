@@ -76,7 +76,7 @@ elseif (is_numeric($_POST['files'])) {
 							  'name'		=> Scrub::text($file['description']),
 							  'category'	=> $file['category'],
 							  'modified'	=> $modifiedTime->setPrefix('')->getRelativeTime(),
-							//'size'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",
+							//'size'		=> $file['file_size'] > 0 ? Alaress_Byte_Format::bytesToString($file['file_size']) : "--",
 							  'owner'		=> $userHandler->formatName($file),
 							  'icon'		=> !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile",
 							  'link'		=> isset($file['url']) ? 'true' : 'false',

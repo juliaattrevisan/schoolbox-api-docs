@@ -21,8 +21,8 @@ $free = disk_free_space(Cfg::get('file_dir'));
 $used = $total - $free;
 $perc = round(($used/$total)*100);
 
-$disk = array('DISK_USED'   => TextFormatter::bytesToString($used),
-                'DISK_TOTAL' => TextFormatter::bytesToString($total),
+$disk = array('DISK_USED'   => Alaress_Byte_Format::bytesToString($used),
+                'DISK_TOTAL' => Alaress_Byte_Format::bytesToString($total),
                 'DISK_PERC' => $perc);
 $this->setVar($disk);
 
@@ -32,8 +32,8 @@ if(is_readable('/proc/meminfo')) {
         $m[strtok($ri, ':')] = str_replace(' kB','',strtok(''))*1024;
 
     $usedMem = $m['MemTotal'] - $m['MemFree'] - $m['Cached'];
-    $memory = array('MEMORY_USED'   => TextFormatter::bytesToString($usedMem),
-                    'MEMORY_TOTAL'  => TextFormatter::bytesToString($m['MemTotal']),
+    $memory = array('MEMORY_USED'   => Alaress_Byte_Format::bytesToString($usedMem),
+                    'MEMORY_TOTAL'  => Alaress_Byte_Format::bytesToString($m['MemTotal']),
                     'MEMORY_PERC'   => round($usedMem / $m['MemTotal'] * 100));
     $this->setVar($memory);
     $this->parse('memory_block', 'memory');

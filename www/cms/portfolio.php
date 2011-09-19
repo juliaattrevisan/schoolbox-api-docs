@@ -111,7 +111,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 						'TYPE'			=> 'file',
 						'FILE_NAME' 	=> Scrub::text($file['description']),
 						'FILE_MODIFIED'	=> $modifiedTime->getShort(),
-						'FILE_SIZE'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",
+						'FILE_SIZE'		=> $file['file_size'] > 0 ? Alaress_Byte_Format::bytesToString($file['file_size']) : "--",
 						'FOLDER_ID'		=> $file['parent'],
 						'CLASS'			=> implode(" ", $class),
                         'PUBLISHED'     => $file['published'] != '' ? $file['published'] : '',

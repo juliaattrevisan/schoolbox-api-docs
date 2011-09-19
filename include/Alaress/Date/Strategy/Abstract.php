@@ -120,7 +120,9 @@ abstract class Alaress_Date_Strategy_Abstract {
 		if (count($time) >= 2) {
 			$hour = $time[0];
 			$minute = $time[1];
-			$second = $time[2];
+            if(isset($time[2])) {
+			    $second = $time[2];
+            }
 
 			$meridiem = strtolower($meridiemComponent);
 
@@ -135,15 +137,10 @@ abstract class Alaress_Date_Strategy_Abstract {
 
 			/* Save components
 			 */
-			if (strlen($time[0])) {
-				$this->setHour($hour);
-			}
+			$this->setHour($hour);
+			$this->setMinute($minute);
 
-			if (strlen($time[1])) {
-				$this->setMinute($minute);
-			}
-
-			if (strlen($time[2])) {
+			if (isset($second)) {
 				$this->setSecond($second);
 			}
 

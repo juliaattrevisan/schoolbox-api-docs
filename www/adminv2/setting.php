@@ -127,6 +127,11 @@ if(is_array($optionList)) {
                 case 'checkbox':
                     $this->parse('setting_type_input_block', 'setting_type_checkbox', true);
                     break;
+
+                case 'bytes':
+                    $this->setVar('SETTING_VALUE', Alaress_Byte_Format::bytesToString($option['value']));
+                    $this->parse('setting_type_input_block', 'setting_type_input', true);
+                    break;
             }
         }
     }

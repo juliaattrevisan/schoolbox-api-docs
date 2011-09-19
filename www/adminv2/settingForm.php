@@ -25,7 +25,12 @@ if ($groupHandler->isSuperuser()) {
 		/* Get the relevant record and put the new data in
 		 */
 		$record = $genericHandler->getByField('name', $currentRow);
-		$record['value'] = $_POST[$currentRow];
+
+        /* handle conversion to bytes */
+        if($record['field']=='bytes')
+            $record['value'] = Alaress_Byte_Format::stringToBytes($_POST[$currentRow]);
+        else    
+		    $record['value'] = $_POST[$currentRow];
 
 		/* Update each row
 		 */

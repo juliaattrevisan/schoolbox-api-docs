@@ -60,7 +60,7 @@ elseif (is_numeric($_POST['categoryID'])) {
 							  'name'		=> Scrub::text($file['description']),
 							  'category'	=> $file['category'],
 							  'modified'	=> $modifiedDate->getShort(),
-							  'size'		=> $file['file_size'] > 0 ? TextFormatter::bytesToString($file['file_size']) : "--",
+							  'size'		=> $file['file_size'] > 0 ? Alaress_Byte_Format::bytesToString($file['file_size']) : "--",
 							  'icon'		=> !empty($file['iconFile']) && Cfg::get('webdav_enable') ? $allowedFiles->getClass($file["iconFile"]) : "textfile",
 							  );
 		}

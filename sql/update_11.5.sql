@@ -68,8 +68,8 @@ UPDATE `config` SET `required`='false' WHERE `configID` IN (50,51,52,53,54,55,56
 
 /* Update config to remove references to Portal
  */
-UPDATE `config` SET `title`='Schoolbox Feedback Address' WHERE `configID`='68';
-UPDATE `config` SET `title`='External DB URL' WHERE `configID`='56';
+UPDATE `config` SET `title`='Schoolbox Feedback Address' WHERE `name` like 'mail_support_address';
+UPDATE `config` SET `title`='External DB Portal URL' WHERE `name`='external_portal';
 
 /* Group Type
  */
@@ -97,5 +97,10 @@ ALTER TABLE wiki ADD COLUMN stub ENUM('false', 'true') DEFAULT 'false';
  */
 INSERT INTO config (`name`, title, description, field, `type`, editable, required) VALUES ('policy', 'Policy', 'A policy description which appears in the footer of each page.','textarea','Site','true','true');
 
+/* Add new policies for portrait photos */
 INSERT INTO config (`name`, title, description, field, `value`, `type`, editable, required) VALUES ('protect_teacher_photo', 'Hide Teacher Photo', 'Tick this box to prevent teacher photos being displayed to student and parents in search results.','boolean','1', 'Resources','true','true');
 INSERT INTO config (`name`, title, description, field, `value`, `type`, editable, required) VALUES ('protect_student_photo', 'Hide Student Photo', 'Tick this box to hide student photos from other students','boolean','1', 'Resources','true','true');
+
+/* Added in support for human readable bytes in config */
+ALTER TABLE `config` CHANGE `field` `field` ENUM('input','textarea','boolean','select','checkbox','bytes') CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'input' NULL ;
+UPDATE `config` SET `field`='bytes', description='The maximum size of a single file that can be uploaded. Excepts human formats like 40M and 1GB.' WHERE `name` like 'max_file_size';

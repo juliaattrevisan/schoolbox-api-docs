@@ -233,7 +233,7 @@ if (!empty($result['file'])) {
         $page->setVar(array(
             'FILE_ID'          => $file['id'],
             'FILE_ICON'        => $file['iconFile'],
-            'FILE_SIZE'        => TextFormatter::bytesToString($file['file_size']),
+            'FILE_SIZE'        => Alaress_Byte_Format::bytesToString($file['file_size']),
             'FILE_DESCRIPTION' => Scrub::text($file['description']),
             'FILE_COMMENT'     => TextFormatter::cutSentence(Scrub::text($file['comment']), 150),
             'FILE_OWNER'       => $file['uid'],

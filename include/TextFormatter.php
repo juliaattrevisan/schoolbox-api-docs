@@ -25,21 +25,7 @@ class TextFormatter {
 		return 'Good Evening';
 	}
 
-	/**
-	 * Converts a size integer to human readable size
-	 *
-	 * @param  $size
-	 * @return string
-	 */
-	public function bytesToString($size) {
-		$a = array('B', 'KB', 'MB', 'GB', 'TB', 'PB');
 
-		for ($i = 0; $size >= 1024; $i++) {
-			$size /= 1024;
-		}
-
-		return round($size,2) . ' ' . $a[$i];
-	}
 
 	/**
 	 * Cut a string to the character limit and append ellipsis (...)
