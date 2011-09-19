@@ -69,13 +69,12 @@ UPDATE `config` SET `required`='false' WHERE `configID` IN (50,51,52,53,54,55,56
 /* Update config to remove references to Portal
  */
 UPDATE `config` SET `title`='Schoolbox Feedback Address' WHERE `configID`='68';
-UPDATE `config` SET `value`='schoolbox@alaress.com.au' WHERE `configID`='68';
-UPDATE `config` SET `value`='schoolbox@alaress.com.au' WHERE `configID`='66';
-UPDATE `config` SET `title`='External DB Schoolbox URL' WHERE `configID`='56';
+UPDATE `config` SET `title`='External DB URL' WHERE `configID`='56';
 
 /* Group Type
  */
-ALTER TABLE groups ADD COLUMN group_type enum ('guest','student','parent','staff') DEFAULT 'guest';
+ALTER TABLE `groups` DROP COLUMN `staff`;
+ALTER TABLE `groups` ADD COLUMN group_type enum ('guest','student','parent','staff') DEFAULT 'guest';
 UPDATE `groups` SET `group_type`='staff' WHERE `id`='1';
 UPDATE `groups` SET `group_type`='staff' WHERE `id`='2';
 UPDATE `groups` SET `group_type`='student' WHERE `id`='3';
@@ -96,5 +95,7 @@ ALTER TABLE wiki ADD COLUMN stub ENUM('false', 'true') DEFAULT 'false';
 
 /* Policy
  */
-INSERT INTO config (`name`, title, description) VALUES ('policy', 'Policy', 'A policy description which appears in the footer of each page.');
-UPDATE `config` SET `field`='textarea',`type`='Site',`editable`='true' WHERE `name`='policy';
+INSERT INTO config (`name`, title, description, field, `type`, editable, required) VALUES ('policy', 'Policy', 'A policy description which appears in the footer of each page.','textarea','Site','true','true');
+
+INSERT INTO config (`name`, title, description, field, `value`, `type`, editable, required) VALUES ('protect_teacher_photo', 'Hide Teacher Photo', 'Tick this box to prevent teacher photos being displayed to student and parents in search results.','boolean','1', 'Resources','true','true');
+INSERT INTO config (`name`, title, description, field, `value`, `type`, editable, required) VALUES ('protect_student_photo', 'Hide Student Photo', 'Tick this box to hide student photos from other students','boolean','1', 'Resources','true','true');

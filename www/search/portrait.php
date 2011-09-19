@@ -38,7 +38,11 @@ if(is_numeric($_GET['id']) && Cfg::get('external_enable'))
 
     $user = $userHandler->getBySynergy($_GET['id']);
 
-    if( $groupHandler->isStaff() || $groupHandler->isParentOfChild($user['uid'])) {
+    if( $groupHandler->isStaff() ||  //Allow all staff access to all photos
+        $groupHandler->isParentOfChild($user['uid']) || //Allow parents access to their childrens photos
+        (Cfg::get('protect_student_photo')==0 && $groupHandler->isStudent() && $groupHandler->isStudent($_GET['id'])  ) || //If policy allows let students see other students photos
+        (Cfg::get('protect_teacher_photo')==0 && $groupHandler->isStaff($_GET['id']) ) //If policy disabled allow access to staff photos
+      ) {
 
         //get file details
         $db = mssql_connect(Cfg::get('external_db_host'),Cfg::get('external_db_user'),Cfg::get('external_db_passwd'));
