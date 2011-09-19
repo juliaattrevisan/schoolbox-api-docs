@@ -31,26 +31,24 @@ $outputList == false;
 if($groupHandler->isParent()) {
         if(is_array($_SESSION['children'])) {
             foreach($_SESSION['children'] as $child) {
-                    $outputList[] = $child['sid'];
+                    $outputList[] = $userHandler->getByID($child['id']);
             }
         }
 }
 else {
 	if($this->arg[0]) {
 		if($groupHandler->isStaff())
-			$outputList[] = $this->arg[0];
+			$outputList[] = $userHandler->getByID($this->arg[0]);
 		else
 			error(19);
 	}
 	else
-		$outputList[] = $_SESSION['sid'];
+		$outputList[] = $userHandler->getByID($_SESSION['id']);
 }
 
 
 if(is_array($outputList)) {
-    foreach($outputList as $sid) {
-        $user = $userHandler->getBySynergy($sid);
-
+    foreach($outputList as $user) {
 
         $outputUser = array('PERSON'	=> $userHandler->formatName($user),
                              'YEAR'		=> $user['year']?', Year '.$user['year']:'',
@@ -60,7 +58,7 @@ if(is_array($outputList)) {
         $periodCurrent = $timetableHandler->getPeriodNumber($user['campus']);
         $dayCurrent = $timetableHandler->getDayNumber($user['campus']);
 
-        $timetable = $timetableHandler->getFullTimetable($sid, $user['uid'], $user['campus']);
+        $timetable = $timetableHandler->getFullTimetable($user['synergy_id'], $user['uid'], $user['campus']);
 
         if(is_array($timetable)) {
                 $days = count($timetable[0]['day']);
