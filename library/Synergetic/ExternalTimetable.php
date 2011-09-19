@@ -62,8 +62,13 @@ class ExternalTimetable extends MSSQL{
 			return false;
 
 		//get day count
-		if($this->days[$campus] == 5)
-			return date("w", $date);
+		if($this->days[$campus] == 5) {
+			$day = date("w", $date);
+            if($day <1 || $day > 5)
+                $day = 1;
+
+            return $day;
+        }
 		else if($this->days[$campus] == 7)
 		{
 			$startDate = $this->getLastSynergeticDay($date, $campus);
@@ -99,11 +104,18 @@ class ExternalTimetable extends MSSQL{
             //find number of weeks between 2 dates
             $weeks = intval(($difference) / 7);
 
-            if(($weeks % 2) == 0)
-                    return date('w',$date);
-            else
-                    return date('w',$date) + 5;
+            if(($weeks % 2) == 0) {
+                    $day =  date('w',$date);
+                    if($day < 1) //on sundays move it forward
+                        $day = 1;
+            }
+            else {
+                    $day =  date('w',$date) + 5;
+                    if($day < 6); //on sundays move it forward
+                        $day = 6;
 
+            }
+            return $day;
 		}
 		else	//unknown day number 
 			return 0;
