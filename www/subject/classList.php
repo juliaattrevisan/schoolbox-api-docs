@@ -6,10 +6,6 @@
 ************************************************************/
 //ClassList object..displays class list with most recent visit
 
-require_once '../library/category.php';
-require_once '../library/user.php';
-require_once '../library/group.php';
-
 $groupHandler=new Group;
 
 if($groupHandler->isStaff()) {

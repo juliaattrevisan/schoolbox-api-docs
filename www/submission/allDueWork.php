@@ -1,10 +1,5 @@
 <?php
 
-require_once SITE_root . '/library/submission.php';
-require_once SITE_root . '/library/submissionReturn.php';
-require_once SITE_root . '/library/group.php';
-require_once SITE_root . '/library/user.php';
-
 $this->setFile(TEMPLATE_content, 'submission/allDueWork.html');
 $this->setTab('submission');
 
