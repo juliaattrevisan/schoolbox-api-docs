@@ -1,14 +1,16 @@
 <?php
 require_once SITE_root.'/library/poll.php';
 
+//variables for
 $this->setBlock($componentHandle, "poll_vote", "poll_vote_block");
-$this->setBlock("poll_vote", "poll_options", "poll_options_block");
 $this->setBlock($componentHandle, "show_results", "show_results_block");
+$this->setBlock("poll_vote", "poll_options", "poll_options_block");
 
 $this->setBlock($componentHandle, "poll_responses", "poll_responses_block");
 $this->setBlock($componentHandle, "response_count", "response_count_block");
 $this->setBlock('poll_responses', 'series_separator', 'series_separator_block');
 
+$this->setBlock($componentHandle, "poll_chart", "poll_chart_block");
 
 $pollHandler = new Poll();
 
@@ -27,8 +29,6 @@ if ( !empty($config['pollID']) && is_numeric($config['pollID']) ) {
         if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']) || $this->arg[1] == 'pollResults')  {
             $this->setVar('POLL_HEIGHT', count($pollData) * 30 + 70);
             $this->setVar('poll_vote_block', '');
-            $this->setVar('poll_answers_block', '');
-			$this->setVar('poll_responses_block', '');
 			$this->setVar('show_results_block', '');
 			$this->setVar('response_count', count($pollData));
 
@@ -52,16 +52,14 @@ if ( !empty($config['pollID']) && is_numeric($config['pollID']) ) {
 						$this->setVar('series_separator_block', '');
 					}
 					$this->parse("poll_responses_block", "poll_responses", true);
-
                     $i++;
-
                 }
             }
-
+			$this->parse('poll_chart_block', 'poll_chart');
         }
         else {
             $this->setVar('poll_options_block', '');
-
+			
 
             if (is_array($pollData)) {
                 $i = 0;
@@ -78,17 +76,13 @@ if ( !empty($config['pollID']) && is_numeric($config['pollID']) ) {
                     $i++;
                 }
 
-				/* Show results button
-				 */
-
-
 				if ($pollHandler->hasResults($poll['pollID'])) {
 					$this->parse('show_results_block', 'show_results');
 				}
 
             }
-
             $this->setVar('poll_chart_block', '');
+			$this->setVar('show_results_block', '');
             $this->parse('poll_vote_block', 'poll_vote');
         }
     }
@@ -115,7 +109,7 @@ else {
 
     $this->setVar("poll_chart_block", '');
     $this->setVar("poll_vote_block", "");
-	
+	$this->setVar('show_results_block', '');
 }
 
 

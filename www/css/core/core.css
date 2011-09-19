@@ -594,6 +594,8 @@ h4 .hide-on-small{float:none; width:auto;}
 	overflow: hidden;
 	width:100%;
 	background:#fff;
+	-ms-word-break: break-all;
+	word-break: break-all;
 }
 
 .box .text { padding:8px 16px; }
@@ -638,7 +640,7 @@ h4 .hide-on-small{float:none; width:auto;}
 	-webkit-border-radius: 3px;
 	border-radius: 3px;
 	color:#000 !important;
-	width:44px;
+	width:50px;
 	height:20px;
 	display:none;
 }
@@ -702,6 +704,8 @@ h4 .hide-on-small{float:none; width:auto;}
 	background:#dcdcdc;
 	text-align: right;
 }
+
+.box .editPanel label{display:inline;}
 
 .box .editPanel p {
 	margin:0;
@@ -3123,8 +3127,11 @@ COLOUR ADJUSTMENT BOX
      -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
           border-radius: 2px;
-	margin:16px 24px;
-  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+	margin:16px 29.5%;
+  -moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+
 }
 #tabs-homepage #slider{height:14px; border:1px solid #d1d1d1; background: #ededed;
 width:100%;
@@ -3872,6 +3879,7 @@ p.forgotten { margin:10px 0; }
 	padding: 0;
 	margin: 0;
 	height: 1%;
+
 }
 
 /************ WYSYWIG STYLES *************/
@@ -3920,34 +3928,10 @@ p.forgotten { margin:10px 0; }
 }
 
 /*POLLING*/
-#pollForm { text-align: left; }
 
-#pollForm h3 { margin-bottom: 1em; }
-
-#pollForm label {
-	display: block;
-	margin-bottom: 0.5em;
-}
-
-#pollForm label input { margin-right: 10px; }
-
-.poll { text-align: center; }
-
-.poll ol {
-	text-align: left;
-	margin-left:16px;
-	list-style:upper-alpha;
-}
-
-.poll ol li {
-padding:7px;
-	display:list-item;
-	vertical-alignment:top;
-}
+.poll .legendLabel{padding:0;}
 
 /*RESOURCES MULTI - UPLOAD*/
-
-
 .uploadifyQueue .cancel {
 	float:left;
 	margin-right:8px;
@@ -3989,8 +3973,6 @@ padding:7px;
 }
 
 /*REVISIONS*/
-
-
 .revisionCompare { background-color:#DBE7F2; }
 
 .revisionCurrent {
