@@ -208,7 +208,7 @@ else if($this->arg[0] == 'multicat') {
 	$this->setVar($output);
 
 	$groupHandler = new Group;
-	$categoryList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], WRITE_ACCESS);
+	$categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], TRUE, WRITE_ACCESS);
 
 	if (is_array($categoryList)) {
 		foreach($categoryList as $category) {

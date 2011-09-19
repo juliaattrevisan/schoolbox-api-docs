@@ -78,7 +78,7 @@ else if($this->arg[0] == 'multicat') {
 	$this->setTab('resources');
 
 	$groupHandler = new Group;
-	$categoryList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 2);
+	$categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
 
 	if(is_array($categoryList)) {
 		foreach($categoryList as $category) {

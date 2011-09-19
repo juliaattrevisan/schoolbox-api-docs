@@ -128,7 +128,7 @@ if (isset($_POST['date'])) {
 		$page->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
 	}
 
-	$groupList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], WRITE_ACCESS);
+	$groupList = $groupHandler->involvedInCategoryList($_SESSION['id'],true, WRITE_ACCESS);
 	$page->dropDown('group_drop', $groupList, $event['sid'], TEMPLATE_content, array('id'=>'UGROUP_ID','name'=>'UGROUP_NAME'));
 	$page->checkList('group_list', $calendarHandler->getGroupList(), $calendarHandler->getEventGroup($event['id']));
 
@@ -191,7 +191,7 @@ if (isset($_POST['date'])) {
 	}
 	$page->checkList('group_list', $calendarHandler->getGroupList(), '');
 
-	$groupList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], WRITE_ACCESS);
+	$groupList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
 	if($_GET['level'] == 2)
 		$page->dropDown('group_drop', $groupList, $_GET['sid'], TEMPLATE_content, array('id'=>'UGROUP_ID','name'=>'UGROUP_NAME'));
 	else

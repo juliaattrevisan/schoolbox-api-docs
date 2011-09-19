@@ -546,6 +546,52 @@ class Group extends DeprecatedModel {
         return false;
     }
 
+    /*
+     * New function to make retrieving the list of user subjects easier, is deprecating involvedCategoryList
+     */
+    function involvedInCategoryList($userID, $includeSubjectList = true, $accessType = READ_ACCESS) {
+
+        $catList = array();
+
+        if($includeSubjectList == true && Cfg::get('external_enable')) {
+            //Fetch subject list
+            if($userID == $_SESSION['id']) {
+                $catList = $_SESSION['subjects'];
+            }
+            else {
+                $userHandler = new User;
+                $user = $userHandler->getByID($userID);
+
+                $externalUser = new ExternalUser;
+	            $externalSubjectList = $externalUser->getSubjectList($user['synergy_id'], $user['uid']);
+                foreach ($externalSubjectList as $subject) {
+                    //convert code to id and get name
+                    $query = "SELECT name, id, cc.code FROM category JOIN categoryCode cc ON id = categoryID WHERE cc.code = '" . $subject['code'] . "'";
+                    if (is_array($catTmp = $this->db->getRow($query)))
+                        $catList[] = $catTmp;
+                }
+            }
+        }
+
+         //get list of groups involved in
+        $query = "SELECT category.name, category.id, type, GROUP_CONCAT(cc.code) as code FROM userAccess, category LEFT JOIN categoryCode cc ON category.id = categoryID
+		WHERE userAccess.uid = '$userID' AND userAccess.sid = category.id AND userAccess.service = '" . $this->_service . "'
+		AND userAccess.type >= '$accessType'
+        GROUP BY category.id
+        ORDER BY category.name";
+
+        $this->db->query($query);
+        while ($result = $this->db->getNextArray()) {
+            $catList[] = $result;
+        }
+
+        return $catList;
+    }
+
+
+    /*
+     * Deprecated in favour of involvedInCateogoryList above...
+     */
     function involvedCategoryList($id, $subjects = '', $accessType=READ_ACCESS) {
         //returns a list of categories that the user is involved in
         //optional accessType specifies read=1 , write=2, ownership=3 access levels

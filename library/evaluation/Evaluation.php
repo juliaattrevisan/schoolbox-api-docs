@@ -329,7 +329,7 @@ abstract class Evaluation extends DeprecatedModel {
         $groupHandler = new Group();
         $assess = $this->getByID($assess_id);
 
-        $categoryList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
+        $categoryList = $groupHandler->involvedCategoryList($_SESSION['id']);
 
 		/* See if you're in the Category first
 		 */

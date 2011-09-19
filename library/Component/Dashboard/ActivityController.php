@@ -23,7 +23,7 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
     }
 
     public function execute () {
-        $this->catList = $this->group->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
+        $this->catList = $this->group->involvedInCategoryList($_SESSION['id']);
     }
 
     public function renderTemplate ($templateHandle) {

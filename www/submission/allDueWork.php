@@ -54,15 +54,7 @@ if (is_array($_SESSION['children'])) {
 	$this->parse('is_parent_block', 'is_parent');
 }
 
-// get category list
-$subjectList = false;
-
-if (Cfg::get('external_enable') && $user['synergy_id'])  {
-	$synUser = new ExternalUser;
-	$subjectList = $synUser->getSubjectList($user['synergy_id'], $user['uid']);
-}
-
-$categoryList = $groupHandler->involvedCategoryList($user['uid'], $subjectList, 1);
+$categoryList = $groupHandler->involvedInCategoryList($userID, true, READ_ACCESS);
 
 if (is_array($categoryList)) {
 	foreach($categoryList as $category) {

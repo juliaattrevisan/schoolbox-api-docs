@@ -143,7 +143,7 @@ class Calendar extends DeprecatedModel {
 	
 		//get a list of all the possible submission box categories
 		$this->groupHandler->setService(HOMEPAGE_SERVICE);
-		$catList = $this->groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
+		$catList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
 		$this->groupHandler->setService(CALENDAR_SERVICE);
 		
 		if(is_array($catList)) {
@@ -221,7 +221,7 @@ class Calendar extends DeprecatedModel {
         $groupQuery = '';
 
         $this->groupHandler->setService(HOMEPAGE_SERVICE);
-        $tempList = $this->groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects']);
+        $tempList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
 
         if (is_array($tempList)) {
 
@@ -305,7 +305,7 @@ class Calendar extends DeprecatedModel {
 		$groupList = array();
 		$groupQuery = '';
 		$this->groupHandler->setService(HOMEPAGE_SERVICE);
-		$tempList = $this->groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects']);
+		$tempList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
 		if (is_array($tempList)) {
 			foreach ($tempList as $temp) {
 				$groupList[] = $temp['id'];

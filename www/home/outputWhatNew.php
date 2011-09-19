@@ -8,7 +8,7 @@ $whatnew = new Activity();
 
 $groupHandler = new Group;
 
-$catList = $groupHandler->involvedCategoryList($_SESSION['id'], $_SESSION['subjects'], 1);
+$catList = $groupHandler->involvedInCategoryList($_SESSION['id']);
 
 $this->setBlock($component['name'], 'category_block', 'new_category');
 $this->setBlock($component['name'], 'mail_block', 'new_mail_block');

@@ -38,7 +38,8 @@ $this->setVar('SELECTED_YEAR', $selectedYear);
 
 
 // setup movement buttons
-$this->checkList('group', $groupHandler->involvedCategoryList($_SESSION['id']),$groupHandler->involvedCategoryList($_SESSION['id']), TEMPLATE_content, array('name'=>'GROUP_NAME','id'=>'GROUP_ID'));
+$catList = $groupHandler->involvedInCategoryList($_SESSION['id']);
+$this->checkList('group', $catList,$catList, TEMPLATE_content, array('name'=>'GROUP_NAME','id'=>'GROUP_ID'));
 $this->checkList('campus', $calendarHandler->getCampusList(),$_SESSION['campus']);
 $this->checkList('event_type', $calendarHandler->getTypeList(), '', TEMPLATE_content, array('eventType'=>'EVENT_TYPE_NAME','eventTypeID'=>'EVENT_TYPE_ID', 'eventColour'=>'EVENT_TYPE_COLOUR') );
 $this->setVar('BACK', 	 date("j-n-Y", strtotime("-1 week", $selectedDate)));

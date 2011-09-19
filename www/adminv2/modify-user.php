@@ -103,7 +103,7 @@ if(is_numeric($this->arg[0])) {
 
          /* Output group list */
          $this->setBlock(TEMPLATE_content, 'user_group', 'user_group_block');
-         $groupList = $groupHandler->involvedCategoryList($user['uid']);
+         $groupList = $groupHandler->involvedInCategoryList($user['uid'],false);
          if(is_array($groupList)) {
              foreach($groupList as $group) {
                  $outputGroup = array(  'USER_GROUP_ID'     => $group['id'],
