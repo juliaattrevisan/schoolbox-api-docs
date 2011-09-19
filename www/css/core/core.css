@@ -1652,9 +1652,9 @@ ADMIN
 .admin-form label.error {
 margin:-8px 0 0 0;
 }
+.admin-form textarea{width:100%;}
 
-
-.admin-form label span {
+.admin-form label span.help {
 	background:#e9e3d6;
 	font-weight:normal;
 	font-size:14px;
@@ -1671,8 +1671,6 @@ margin:-8px 0 0 0;
 	margin:8px 0;
 	padding:2px 0
 }
-
-
 
 .admin-form label { margin:8px 8px 8px 0; }
 

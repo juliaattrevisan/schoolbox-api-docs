@@ -2,9 +2,33 @@
 <script type="text/javascript" src="/javascript/jquery.autoresize.js"></script>
 <script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
-
-
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
+	tinyMCE.init({
+        mode : "exact",
+		elements: 'policy',
+        theme : "advanced",
+        skin : "cirkuit",
+        plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
+        content_css : "/css/core/tiny.css",
+       theme_advanced_toolbar_location : "top",
+        theme_advanced_toolbar_align : "left",
+        theme_advanced_statusbar_location : "bottom",
+        theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
+        theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,spellchecker",
+        theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
+        theme_advanced_buttons4 : "tablecontrols",
+        pdw_toggle_on : 1,
+        pdw_toggle_toolbars : '2, 3, 4',
+        extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+        file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
+        file_browser_category_id : 0,
+        tabfocus_elements : ":prev,:next",
+        convert_urls : false,
+		force_br_newlines : false,
+        force_p_newlines : true
+	});
+
 
 $j(function() {
 
@@ -74,32 +98,32 @@ $j(function() {
 			<form id="settings" class="admin-form level clearfix" method="post" action="/adminv2/settingForm.php">
 
 				<!-- BEGIN setting_type_noneditable -->
-				<label for="{SETTING_NAME}">{SETTING_TITLE}<span>?</span> <em>{SETTING_DESC}</em>
+				<label for="{SETTING_NAME}">{SETTING_TITLE}<span class="help">?</span> <em>{SETTING_DESC}</em>
 					<p>{SETTING_VALUE}</p>
 				</label>
 				<!-- END setting_type_noneditable -->
 
                 <!-- BEGIN setting_type_input -->
-				<label for="{SETTING_NAME}">{SETTING_TITLE}<span>?</span> <em>{SETTING_DESC}</em>
+				<label for="{SETTING_NAME}">{SETTING_TITLE}<span class="help">?</span> <em>{SETTING_DESC}</em>
 					<input class="{OPTION_REQUIRED}" type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
 				</label>
                 <!-- END setting_type_input -->
 
                 <!-- BEGIN setting_type_textarea -->
-				<label for="{SETTING_NAME}">{SETTING_TITLE}<span>?</span> <em>{SETTING_DESC}</em>
+				<label for="{SETTING_NAME}">{SETTING_TITLE}<span class="help">?</span> <em>{SETTING_DESC}</em>
 					<textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
 				</label>
                 <!-- END setting_type_textarea -->
 
                 <!-- BEGIN setting_type_boolean -->
-				<label for="{SETTING_NAME}">{SETTING_TITLE}<span>?</span> <em>{SETTING_DESC}</em><br />
+				<label for="{SETTING_NAME}">{SETTING_TITLE}<span class="help">?</span> <em>{SETTING_DESC}</em><br />
 					<input name="{SETTING_NAME}" type="checkbox" value="{SETTING_VALUE}" {SETTING_CHECKED} />
 					<input name="{SETTING_NAME}" type="hidden" value="{SETTING_VALUE}" />
 				</label>
                 <!-- END setting_type_boolean -->
 
                 <!-- BEGIN setting_type_select -->
-				<label for="{SETTING_NAME}">{SETTING_TITLE}<span>?</span> <em>{SETTING_DESC}</em><br />
+				<label for="{SETTING_NAME}">{SETTING_TITLE}<span class="help">?</span> <em>{SETTING_DESC}</em><br />
 					<select name="{SETTING_NAME}">
                         <!-- BEGIN setting_select -->
 						<option value="{SELECT_OPTION}" {SETTING_OPTION_SELECTED}>{SELECT_OPTION}</option>
@@ -110,7 +134,7 @@ $j(function() {
 
                 <!-- BEGIN setting_type_check -->
 				<label for="{SETTING_NAME}">
-				{SETTING_TITLE}<span>?</span> <em>{SETTING_DESC}</em>
+				{SETTING_TITLE}<span class="help">?</span> <em>{SETTING_DESC}</em>
 					<fieldset>
                         <!-- BEGIN setting_checkbox -->
 						<label>
