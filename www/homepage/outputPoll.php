@@ -11,6 +11,7 @@ $this->setBlock($componentHandle, "response_count", "response_count_block");
 $this->setBlock('poll_responses', 'series_separator', 'series_separator_block');
 
 $this->setBlock($componentHandle, "poll_chart", "poll_chart_block");
+$this->setVar('poll_responses_block', '');
 
 $pollHandler = new Poll();
 
@@ -35,6 +36,7 @@ if ( !empty($config['pollID']) && is_numeric($config['pollID']) ) {
             if (is_array($pollData)) {
                 $i = 0;
 				$a = 'A';
+
                 foreach ($pollData as $data) {
                     $this->setVar(array(
                         'POLL_OPTION_INDEX'	=> $i,
@@ -55,11 +57,12 @@ if ( !empty($config['pollID']) && is_numeric($config['pollID']) ) {
                     $i++;
                 }
             }
+
 			$this->parse('poll_chart_block', 'poll_chart');
         }
         else {
             $this->setVar('poll_options_block', '');
-			
+
 
             if (is_array($pollData)) {
                 $i = 0;

@@ -5,7 +5,7 @@
 <script type='text/javascript' src='/javascript/flot/jquery.flot.resize.js'></script>
 <!-- END custom_head-->
 	<h2>{POLL_TITLE}</h2>
-	<!-- BEGIN config --> 
+	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
 	<div class="editPanel settings hide">
 		<form action="/homepage/configForm.php" method="get">
@@ -30,8 +30,8 @@
 			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> <a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
 	</div>
-	<!-- END config --> 
-	<!-- BEGIN poll_vote --> 
+	<!-- END config -->
+	<!-- BEGIN poll_vote -->
 	<script type="text/javascript">
     function validatePoll () {
 		var valid = false;
@@ -42,7 +42,7 @@
 		);
 		if (valid)
 			return valid;
-			
+
 		alert('Please select an option.');
 		return valid;
 	}
@@ -61,7 +61,7 @@
 			<input type="submit" value="Vote" onclick="return validatePoll();" class="submit-btn-plain"/>
 		</form>
 	</div>
-	<!-- END poll_vote --> 
+	<!-- END poll_vote -->
 	<!-- BEGIN poll_chart -->
 	<script type='text/javascript'>
 	$j(function() {
@@ -76,7 +76,7 @@
 				<!-- END poll_responses -->
 			],
 				{
-					
+
 					xaxis: {show:false}
 				}
 		);
@@ -87,14 +87,15 @@
 		<div id='poll-graph{POLL_ID}' style="width:100%; height:300px; "></div>
 	</div>
 	<!-- END poll_chart -->
-	<p class="interact"> 
+	<p class="interact">
 		<!-- BEGIN show_results -->
 			<a href="/homepage/{ID}/pollResults" class="btn"><span></span>Show results</a>
-		<!-- END show_results --> 
-		<!-- BEGIN modify_poll --> 
+		<!-- END show_results -->
+		<!-- BEGIN modify_poll -->
 			<a href="/poll/modifyForm.php?delete={POLL_ID}" onclick="return confirm('Delete Poll?');" class="btn delete"><span></span>Delete</a>
 			<a href="/poll/modify/{POLL_ID}" class="btn modify"><span></span>Modify</a>
 			<a href="/poll/modify/new/{ID}/{COMPONENT_HOMEPAGE_ID}" class="btn create"><span></span>Create New Poll</a>
 		<!-- END modify_poll -->
 	</p>
+		<div id='poll_legend{POLL_ID}'></div>
 </div>
