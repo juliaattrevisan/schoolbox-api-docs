@@ -175,6 +175,26 @@ setupCustomise = {
 				pickers[current.attr('ID')] = color;
 
 				switch (current.attr('ID')) {
+					
+					case 'top_bg_primary':
+						return $j('.top .text, .top .listing').css('background-color', color);
+					break;
+					case 'top_bg_secondary':
+						return $j('.top .dark').css('background-color', color);
+					break;
+					case 'top_head_font':
+						return $j('.top h2').css('color', color);
+					break;
+					case 'top_head_bg':
+						return $j('.top h2').css('background-color', color)
+					break;
+					case 'top_font':
+						return $j('.top, .top p').css('color', color)
+					break;
+					case 'top_link':
+						return $j('.top a').css('color', color);
+					break;
+					
 					case 'left_bg_primary':
 						return $j('.left .text, .left .listing').css('background-color', color);
 					break;
@@ -275,36 +295,32 @@ setupCustomise = {
 					//$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
 				});
 
-				$j('.left h2').css({
-					"color": defaults['left_head_font'],
-					"background-color":defaults['left_head_bg']
-				});
-				$j('.left p, .left h3, .left .listing p.small').css("color", defaults['left_font']);
-				$j('.left a, .left .listing p.small a').css('color', defaults['left_link']);
-				$j('.left .box a:hover, .left .listing p.small a:hover').css('color', defaults['left_hover']);
-				$j('.left .text, .left .listing').css('background',defaults['left_bg_primary']);
-				$j('.left .listing .dark ').css('background',defaults['left_bg_secondary']);
-
-				$j('.right h2').css({
-					"color": defaults['right_head_font'],
-					"background-color":defaults['right_head_bg']
-				});
-				$j('.right p, .right h3, .right .listing p.small').css("color", defaults['right_font']);
-				$j('.right a, .right .listing p.small a').css('color', defaults['right_link']);
-				$j('.right .box a:hover, .right .listing p.small a:hover').css('color', defaults['right_hover']);
-				$j('.right .text, .right .listing').css('background',defaults['right_bg_primary']);
-				$j('.right .listing .dark ').css('background',defaults['right_bg_secondary']);
+				resetColours('top');
+				resetColours('left');
+				resetColours('right');
 
 				pickers = defaults;
 
 			});
+
+			function resetColours(area) {
+				$j('.'+area+' h2').css({
+					"color": defaults[area+'_head_font'],
+					"background-color":defaults[area+'_head_bg']
+				});
+				$j('.'+area+' p, .'+area+' h3, .'+area+' .listing p.small').css("color", defaults[area+'_font']);
+				$j('.'+area+' a, .'+area+' .listing p.small a').css('color', defaults[area+'_link']);
+				$j('.'+area+' .box a:hover, .'+area+' .listing p.small a:hover').css('color', defaults[area+'_hover']);
+				$j('.'+area+' .text, .'+area+' .listing').css('background',defaults[area+'_bg_primary']);
+				$j('.'+area+'.listing .dark ').css('background',defaults[area+'_bg_secondary']);
+			}
 
 			$j('#cancel').click(function() {
 				$j('.colorBox').each(function () {
 					$j(this).css('background-color', original[$j(this).attr('id')]);
 				});
 
-				$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
+				$j('.text, .dark, h2(:not(.hide)), a, p').removeAttr("style");
 
 			});
 
