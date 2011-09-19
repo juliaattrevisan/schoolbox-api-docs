@@ -16,10 +16,13 @@ $this->setBlock(TEMPLATE_content, 'table_heading', 'table_heading_block');
 $this->setBlock(TEMPLATE_content, 'table_row', 'table_row_block');
 $this->setBlock('table_row', 'table_cell_static', 'table_cell_static_block');
 $this->setBlock('table_row', 'table_cell', 'table_cell_block');
+$this->setBlock('table_row', 'table_cell_select', 'table_cell_select_block');
+$this->setBlock('table_cell_select','table_cell_select_option','table_cell_select_option_block');
 $this->setBlock(TEMPLATE_content, 'table_schema', 'table_schema_block');
 $this->setBlock(TEMPLATE_content, 'newData', 'newData_block');
 
 $this->setVar('table_cell_static_block','');
+$this->setVar('table_cell_select_block','');
 
 $tableList = array(
 	array(
@@ -82,6 +85,7 @@ foreach($tableList as $table) {
 
 $genericHandler = new GenericTable($selectedTable['name'], $selectedTable['index']);
 
+$tableDefinition = $genericHandler->getDefinition();
 $table = $genericHandler->getAll();
 
 foreach($table as $row) {
@@ -89,8 +93,15 @@ foreach($table as $row) {
         $this->setVar('TABLE_DATA', $data);
 		$this->setVar('TABLE_COLUMN', $keys);
 
+        /* Search definition for row */
+        foreach($tableDefinition as $col) {
+            if($col['Field']==$keys)
+                break;
+        }
+
+
         if (!$rowOne) {
-            $this->setVar('TABLE_HEAD', $keys);
+            $this->setVar('TABLE_HEAD', ucwords(str_replace('_',' ',$keys)));
             $this->parse('table_heading_block','table_heading',true);
 
 			/* New row template. Indexes are readonly.
@@ -110,6 +121,22 @@ foreach($table as $row) {
         if ($keys == $selectedTable['index']) {
             $this->parse('table_cell_block','table_cell_static',true);
 		}
+        else if(stristr($col['Type'],'enum') ){
+            $this->setVar('table_cell_select_option_block','');
+            
+            preg_match('/enum\((.*)\)/', $col['Type'], $match);
+            $list = explode(',',str_replace('\'','',$match[1]));
+            foreach($list as $option) {
+                $this->setVar('OPTION_VALUE', $option);
+                if($option==$data) {
+                    $this->setVar('OPTION_VALUE_SELECTED', 'selected="selected"');
+                }else {
+                    $this->setVar('OPTION_VALUE_SELECTED', '');
+                }
+                $this->parse('table_cell_select_option_block','table_cell_select_option',true);
+            }
+            $this->parse('table_cell_block','table_cell_select',true);
+        }
         else {
             $this->parse('table_cell_block','table_cell',true);
 		}

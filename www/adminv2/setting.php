@@ -18,6 +18,7 @@ $this->setBlock(TEMPLATE_content, 'setting_type_boolean', 'setting_type_boolean_
 $this->setBlock(TEMPLATE_content, 'setting_type_select', 'setting_type_select_block');
 $this->setBlock('setting_type_select', 'setting_select', 'setting_select_block');
 $this->setBlock(TEMPLATE_content, 'setting_type_check', 'setting_type_check_block');
+$this->setBlock(TEMPLATE_content, 'setting_save', 'setting_save_block');
 
 $output = array(
 	'setting_type_noneditable_block' => '',
@@ -58,72 +59,83 @@ if (is_array($typeList)) {
 }
 
 $optionList = Cfg::getAll('', $selectedType);
+$editable = false;
 
-foreach ($optionList as $option) {
-	$output = array(
-		'SETTING_TITLE' => $option['title'],
-		'SETTING_DESC' => $option['description'],
-		'SETTING_NAME' => $option['name'],
-		'SETTING_VALUE' => $option['value'],
-	);
+if(is_array($optionList)) {
+    foreach ($optionList as $option) {
+        $output = array(
+            'SETTING_TITLE' => $option['title'],
+            'SETTING_DESC' => $option['description'],
+            'SETTING_NAME' => $option['name'],
+            'SETTING_VALUE' => $option['value'],
+        );
 
-	$this->setVar($output);
+        $this->setVar($output);
 
-	if ($option['editable'] == 'false') {
-		$this->parse('setting_type_noneditable_block', 'setting_type_noneditable', true);
-	}
-	else {
+        if ($option['editable'] == 'false') {
+            $this->parse('setting_type_noneditable_block', 'setting_type_noneditable', true);
+        }
+        else {
+            $editable = true;
+            /* Decide whether this option should have
+             * javascript validation enforced
+             */
+            if ($option['required'] == 'true') {
+                $this->setVar(array(
+                    'OPTION_REQUIRED' => 'required'
+                ));
+            }
+            else {
+                $this->setVar(array(
+                    'OPTION_REQUIRED' => ''
+                ));
+            }
 
-		/* Decide whether this option should have
-		 * javascript validation enforced
-		 */
-		if ($option['required'] == 'true') {
-			$this->setVar(array(
-				'OPTION_REQUIRED' => 'required'
-			));
-		}
-		else {
-			$this->setVar(array(
-				'OPTION_REQUIRED' => ''
-			));
-		}
+            switch ($option['field']) {
+                case 'input':
+                    $this->parse('setting_type_input_block', 'setting_type_input', true);
+                    break;
 
-		switch ($option['field']) {
-			case 'input':
-				$this->parse('setting_type_input_block', 'setting_type_input', true);
-				break;
+                case 'textarea' :
+                    $this->parse('setting_type_textarea_block', 'setting_type_textarea', true);
+                    break;
 
-			case 'textarea' :
-				$this->parse('setting_type_textarea_block', 'setting_type_textarea', true);
-				break;
+                case 'boolean' :
+                    if ($option['value'] == 1) {
+                        $checked = 'checked="checked"';
+                    }
+                    else {
+                        $checked = '';
+                    }
 
-			case 'boolean' :
-				if ($option['value'] == 1) {
-					$checked = 'checked="checked"';
-				}
-				else {
-					$checked = '';
-				}
+                    $this->setVar('SETTING_CHECKED', $checked);
+                    $this->parse('setting_type_input_block', 'setting_type_boolean', true);
 
-				$this->setVar('SETTING_CHECKED', $checked);
-				$this->parse('setting_type_input_block', 'setting_type_boolean', true);
+                    break;
 
-				break;
+                case 'select':
+                    $optionList = explode(':', $option['options']);
+                    $this->setVar('setting_select_block', '');
+                    foreach ($optionList as $opt) {
+                        $this->setVar('SELECT_OPTION', $opt);
+                        $this->setVar('SETTING_OPTION_SELECTED', $option['value'] == $opt ? 'selected="selected"' : '');
+                        $this->parse('setting_select_block', 'setting_select', true);
+                    }
+                    $this->parse('setting_type_input_block', 'setting_type_select', true);
+                    break;
 
-			case 'select':
-				$optionList = explode(':', $option['options']);
-				$this->setVar('setting_select_block', '');
-				foreach ($optionList as $opt) {
-					$this->setVar('SELECT_OPTION', $opt);
-					$this->setVar('SETTING_OPTION_SELECTED', $option['value'] == $opt ? 'selected="selected"' : '');
-					$this->parse('setting_select_block', 'setting_select', true);
-				}
-				$this->parse('setting_type_input_block', 'setting_type_select', true);
-				break;
+                case 'checkbox':
+                    $this->parse('setting_type_input_block', 'setting_type_checkbox', true);
+                    break;
+            }
+        }
+    }
+}
 
-			case 'checkbox':
-				$this->parse('setting_type_input_block', 'setting_type_checkbox', true);
-				break;
-		}
-	}
+/* Do not output save button if options are not editable */
+if($editable) {
+    $this->parse('setting_save_block','setting_save');
+}
+else {
+    $this->setVar('setting_save_block','');
 }

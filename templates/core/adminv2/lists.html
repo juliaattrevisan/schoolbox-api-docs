@@ -95,6 +95,13 @@ $j(function() {
 						<!-- BEGIN table_cell -->
 						<td><input class="required" name="{TABLE_COLUMN}[]" type="text" value="{TABLE_DATA}" /></td>
 						<!-- END table_cell -->
+                        <!-- BEGIN table_cell_select -->
+                            <td><select name="{TABLE_COLUMN}[]">
+                                <!-- BEGIN table_cell_select_option -->
+                                    <option value="{OPTION_VALUE}" {OPTION_VALUE_SELECTED}>{OPTION_VALUE}</option>
+                                <!-- END table_cell_select_option -->
+                            </select></td>
+                        <!-- END table_cell_select -->
 					</tr>
 					<!-- END table_row -->
 				</tbody>

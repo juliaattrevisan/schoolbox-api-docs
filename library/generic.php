@@ -7,5 +7,10 @@ class GenericTable extends DeprecatedModel {
         $this->_index = $index;
         parent::DeprecatedModel();
     }
+
+    function getDefinition() {
+        $query = "SHOW COLUMNS FROM `$this->_table`";
+        return $this->db->getAll($query);
+    }
 }
 ?>
