@@ -13,8 +13,10 @@ $this->setFile(TEMPLATE_content, 'forum/forum.html');
 $this->setBlock(TEMPLATE_content, 'thread', 'thread_block');
 $this->setBlock('thread', 'last_post', 'last_post_block');
 $this->setBlock('thread', 'modify_thread', 'modify_thread_block');
+$this->setBlock('thread', 'modified', 'modified_block');
 $this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
+$this->setBlock(TEMPLATE_content, 'modify_heading', 'modify_heading_block');
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
@@ -139,9 +141,10 @@ if (is_array($threadList)) {
 
 		/* Delete checkbox */
 		$this->setVar('modify_thread_block', '');
-
+		$this->setVar('modify_heading_block', '');
 		if ($perm >= WRITE_ACCESS) {
 			$this->parse('modify_thread_block', 'modify_thread', true);
+			$this->parse('modify_heading_block',  'modify_heading', true);
 		}
 
 		/* last post block */

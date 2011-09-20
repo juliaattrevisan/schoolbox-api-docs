@@ -10,12 +10,11 @@ $data = array();
 $group = $_GET['groupID'];
 $query = $_GET['query'];
 
-//help steve!
 $allResults = $categoryHandler->search($group);
 
 if (is_array($allResults) && count($allResults)) {
 	foreach($allResults as $currentResult) {
-		$suggestions[] = $currentResult['name'];
+		$suggestions[] = $currentResult['name'] . ' - /homepage/' . $currentResult['id'];
 		$data[] = '/homepage/' . $currentResult['id'];
 	}
 }

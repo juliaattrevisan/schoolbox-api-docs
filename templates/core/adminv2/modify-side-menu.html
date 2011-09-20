@@ -55,9 +55,8 @@ $j(function() {
 					<td>
 						<h2>URL</h2>
 
-						<em>The location at which the item should point. If
-						it is local url remember to use a reference relative
-						to the root.</em>
+						<em>Start typing in a homepage name and then select
+						from the list that drops down. </em>
 					</td>
 					<td>
 						<label>
@@ -86,7 +85,7 @@ $j(function() {
 					</td>
 					<td>
 						<!-- BEGIN campus -->
-						<input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}<br />
+						<label><input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}</label>
 						<!-- END campus -->
 					</td>
 				</tr>
@@ -96,7 +95,7 @@ $j(function() {
 					</td>
 					<td>
 						<!-- BEGIN group -->
-						<input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />{GROUP_NAME}<br />
+					<label><input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />{GROUP_NAME}</label>
 						<!-- END group -->
 					</td>
 				</tr>

@@ -11,8 +11,11 @@ $this->setBlock('post', 'reply_post', 'reply_post_block');
 $this->setBlock('post', 'modify', 'modify_block');
 $this->setBlock('post', 'modified', 'modified_block');
 
+
 $this->setBlock(TEMPLATE_content, 'reply', 'reply_block');
 $this->setBlock(TEMPLATE_content, 'modify_thread', 'modify_thread_block');
+
+
 
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
@@ -60,6 +63,7 @@ $output = array(
 $this->setVar($output);
 
 $this->setVar('modify_thread_block', '');
+
 
 if ($groupHandler->getPermission($category['id']) >= WRITE_ACCESS) {
 	$this->parse('modify_thread_block', 'modify_thread');
@@ -156,8 +160,11 @@ if (is_array($postList)) {
 
 		// edit / delete post
 		$this->setVar('modify_block', '');
+		$this->setVar('modify_heading_block', '');
+
 		if ((!$threadLocked && $post['userID'] == $_SESSION['id']) || $groupHandler->getPermission($category['id']) >= WRITE_ACCESS) {
 			$this->parse('modify_block', 'modify');
+
 		}
 
 		// edited time
