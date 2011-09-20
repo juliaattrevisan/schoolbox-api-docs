@@ -48,12 +48,14 @@ class Eportfolio_Resume_Abstract extends Eportfolio_Objective_Abstract {
 
 			$component = $instance->getByField('user_id', $instance->getUserId());
 
+			$key = strtoupper($currentComponent['block']) . '_CONTENT';
+
 			if ($component) {
 				$this->getPage()->setVar(array(
-					'CONTENT' => $component['body']
+					$key => $component['body']
 				));
 
-				$this->getPage()->parse($currentComponent['block'] . '_block', $currentComponent['block'], true);
+				$this->getPage()->parse($currentComponent['block'] . '_block', $currentComponent['block']);
 			}
 			else {
 				$this->getPage()->setVar($currentComponent['block'] . '_block', '');

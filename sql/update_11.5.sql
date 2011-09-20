@@ -196,5 +196,6 @@ INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCateg
 
 /* Resume (Objective Component composite)
  */
-INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputResumeStandard', 'Standard Resume', 'A standard resume', 2, 'resume.html', 'false');
+INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputResumeStandard', 'Standard Resume', 'A standard resume', 2, 'resume/standard.html', 'false');
+INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputResumeExtended', 'Extended Resume', 'An extended resume', 2, 'resume/extended.html', 'false');
 
