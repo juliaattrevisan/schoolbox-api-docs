@@ -17,6 +17,16 @@ class Eportfolio_Objective_Award extends Eportfolio_Objective_Abstract implement
 	protected $facadePrimaryKey = 'objectiveAwardID';
 
 	/**
+	 * Special formatting
+	 *
+	 * @param  $body
+	 * @return string
+	 */
+	public function getBody($body) {
+		return $this->listify($body);
+	}
+
+	/**
 	 * Render a component on the page with appropriate tokens
 	 *
 	 * @param  $page
@@ -27,7 +37,7 @@ class Eportfolio_Objective_Award extends Eportfolio_Objective_Abstract implement
 
 		$this->getPage()->setVar(array(
 			'OBJECTIVE_AWARD_ID' => $data['id'],
-			'OBJECTIVE_AWARD' => $this->listify($data['body']),
+			'OBJECTIVE_AWARD' => $this->getBody($data['body']),
 		));
 	}
 

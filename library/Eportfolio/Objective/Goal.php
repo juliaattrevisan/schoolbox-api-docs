@@ -17,6 +17,16 @@ class Eportfolio_Objective_Goal extends Eportfolio_Objective_Abstract implements
 	protected $facadePrimaryKey = 'objectiveGoalID';
 
 	/**
+	 * Special formatting
+	 *
+	 * @param  $body
+	 * @return string
+	 */
+	public function getBody($body) {
+		return $this->listify($body);
+	}
+
+	/**
 	 * Render a component on the page with appropriate tokens
 	 *
 	 * @param  $page
@@ -27,7 +37,7 @@ class Eportfolio_Objective_Goal extends Eportfolio_Objective_Abstract implements
 
 		$this->getPage()->setVar(array(
 			'OBJECTIVE_GOAL_ID' => $data['id'],
-			'OBJECTIVE_GOAL' => $this->listify($data['body']),
+			'OBJECTIVE_GOAL' => $this->getBody($data['body']),
 		));
 	}
 

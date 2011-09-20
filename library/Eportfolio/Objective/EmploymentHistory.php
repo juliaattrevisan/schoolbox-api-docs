@@ -27,7 +27,7 @@ class Eportfolio_Objective_EmploymentHistory extends Eportfolio_Objective_Abstra
 
 		$this->getPage()->setVar(array(
 			'OBJECTIVE_EMPLOYMENTHISTORY_ID' => $data['id'],
-			'OBJECTIVE_EMPLOYMENTHISTORY' => $this->listify($data['body']),
+			'OBJECTIVE_EMPLOYMENTHISTORY' => $this->getBody($data['body']),
 		));
 	}
 

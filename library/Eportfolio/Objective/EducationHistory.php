@@ -27,7 +27,7 @@ class Eportfolio_Objective_EducationHistory extends Eportfolio_Objective_Abstrac
 
 		$this->getPage()->setVar(array(
 			'OBJECTIVE_EDUCATIONTHISTORY_ID' => $data['id'],
-			'OBJECTIVE_EDUCATIONHISTORY' => $this->listify($data['body']),
+			'OBJECTIVE_EDUCATIONHISTORY' => $this->getBody($data['body']),
 		));
 	}
 

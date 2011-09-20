@@ -27,7 +27,7 @@ class Eportfolio_Objective_CoverLetter extends Eportfolio_Objective_Abstract imp
 
 		$this->getPage()->setVar(array(
 			'OBJECTIVE_COVERLETTER_ID' => $data['id'],
-			'OBJECTIVE_COVERLETTER' => $this->listify($data['body']),
+			'OBJECTIVE_COVERLETTER' => $this->getBody($data['body']),
 		));
 	}
 

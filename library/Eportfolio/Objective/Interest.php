@@ -27,7 +27,7 @@ class Eportfolio_Objective_Interest extends Eportfolio_Objective_Abstract implem
 
 		$this->getPage()->setVar(array(
 			'OBJECTIVE_INTEREST_ID' => $data['id'],
-			'OBJECTIVE_INTEREST' => $this->listify($data['body']),
+			'OBJECTIVE_INTEREST' => $this->getBody($data['body']),
 		));
 	}
 

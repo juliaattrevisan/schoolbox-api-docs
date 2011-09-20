@@ -34,6 +34,16 @@ class Eportfolio_Objective_Abstract extends DeprecatedModel {
 	}
 
 	/**
+	 * Special formatting. By default just return what was entered.
+	 *
+	 * @param  $body
+	 * @return string
+	 */
+	public function getBody($body) {
+		return $body;
+	}
+
+	/**
 	 * Turns newline-separated body into list element
 	 *
 	 * @param  $body

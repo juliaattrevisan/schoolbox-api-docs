@@ -17,6 +17,16 @@ class Eportfolio_Objective_Skill extends Eportfolio_Objective_Abstract implement
 	protected $facadePrimaryKey = 'objectiveSkillID';
 
 	/**
+	 * Special formatting
+	 *
+	 * @param  $body
+	 * @return string
+	 */
+	public function getBody($body) {
+		return $this->listify($body);
+	}
+
+	/**
 	 * Render a component on the page with appropriate tokens
 	 *
 	 * @param  $page
@@ -27,7 +37,7 @@ class Eportfolio_Objective_Skill extends Eportfolio_Objective_Abstract implement
 
 		$this->getPage()->setVar(array(
 			'OBJECTIVE_SKILL_ID' => $data['id'],
-			'OBJECTIVE_SKILL' => $this->listify($data['body']),
+			'OBJECTIVE_SKILL' => $this->getBody($data['body']),
 		));
 	}
 

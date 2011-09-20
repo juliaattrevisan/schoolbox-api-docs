@@ -52,7 +52,7 @@ class Eportfolio_Resume_Abstract extends Eportfolio_Objective_Abstract {
 
 			if ($component) {
 				$this->getPage()->setVar(array(
-					$key => $component['body']
+					$key => $instance->getBody($component['body'])
 				));
 
 				$this->getPage()->parse($currentComponent['block'] . '_block', $currentComponent['block']);
