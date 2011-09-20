@@ -1,4 +1,4 @@
 <?php
-$skill = new Eportfolio_Objective_Skill($this, $component['eportfolioComponentLocationID']);
-$skill->render();
+$objectiveComponent = new Eportfolio_Objective_Skill($this, $component['eportfolioComponentLocationID']);
+$objectiveComponent->render();
 
