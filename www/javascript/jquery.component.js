@@ -95,10 +95,18 @@ setupCustomise = {
 				event.preventDefault();
 				var $this = $j(this);
 
+				/* Polymorphic key
+				 */
+				var data = {
+					add : $j(this).attr('rel')
+				};
+
+				data[setupCustomise.key] = setupCustomise.id;
+
 				$j.ajax({
 				 type: "POST",
 					url: setupCustomise.ajaxURL,
-					data: {add : $j(this).attr('rel'), cid : setupCustomise.id },
+					data: data,
 					success: function(data){
 						$j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
 							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')])
@@ -175,7 +183,7 @@ setupCustomise = {
 				pickers[current.attr('ID')] = color;
 
 				switch (current.attr('ID')) {
-					
+
 					case 'top_bg_primary':
 						return $j('.top .text, .top .listing').css('background-color', color);
 					break;
@@ -194,7 +202,7 @@ setupCustomise = {
 					case 'top_link':
 						return $j('.top a').css('color', color);
 					break;
-					
+
 					case 'left_bg_primary':
 						return $j('.left .text, .left .listing').css('background-color', color);
 					break;

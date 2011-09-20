@@ -104,3 +104,20 @@ INSERT INTO config (`name`, title, description, field, `value`, `type`, editable
 /* Added in support for human readable bytes in config */
 ALTER TABLE `config` CHANGE `field` `field` ENUM('input','textarea','boolean','select','checkbox','bytes') CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'input' NULL ;
 UPDATE `config` SET `field`='bytes', description='The maximum size of a single file that can be uploaded. Excepts human formats like 40M and 1GB.' WHERE `name` like 'max_file_size';
+
+/* Eportfolio Objective
+ */
+CREATE TABLE eportfolio_objective_skill (
+	id BIGINT(20) NOT NULL AUTO_INCREMENT,
+	user_id BIGINT(20),
+	component_location_id BIGINT(20),
+	body TEXT,
+PRIMARY KEY (id));
+
+/* Lengthen name, it's too short
+ */
+ALTER TABLE `eportfolio_comp` CHANGE `method` `method` VARCHAR(255);
+
+/* Eportfolio Objective Skill Component
+ */
+INSERT INTO eportfolio_comp (size, method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1, 'outputObjectiveSkill', 'Skills', 'A list of your skills', 1, 'objectiveSkill.html', 'false');

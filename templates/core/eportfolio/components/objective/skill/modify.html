@@ -1,0 +1,18 @@
+<!-- BEGIN custom_head -->
+<!-- END custom_head -->
+
+<h2>Edit Skill</h2>
+<form action="/eportfolio/objective/skill/modifyForm.php" method="post" id="modifyForm" class="standardForm">
+	<input type="hidden" name="userID" value="{USER_ID}" />
+	<input type="hidden" name="objectiveSkillID" value="{OBJECTIVE_SKILL_ID}" />
+	<input type="hidden" name="componentLocationID" value="{COMPONENT_LOCATION_ID}" />
+	<fieldset class="pad-it">
+		<label>
+			<textarea rows="20" name="body" id="body">{OBJECTIVE_SKILL}</textarea>
+		</label>
+	</fieldset>
+
+	<input type="submit" class="submit-btn-plain" value="Save" />
+</form>
+
+
