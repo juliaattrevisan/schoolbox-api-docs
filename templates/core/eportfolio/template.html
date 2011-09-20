@@ -38,6 +38,15 @@
 <script type="text/javascript">
 	<!-- BEGIN colour_list -->
 	var {COLOUR_ARRAY} = {
+	var {COLOUR_ARRAY} = {
+		'top_head_font'	: '#{top_head_font}',
+		'top_head_bg'		: '#{top_head_bg}',
+		'top_font'			: '#{top_font}',
+		'top_bg_primary'	: '#{top_bg_primary}',
+		'top_bg_secondary'	: '#{top_bg_secondary}',
+		'top_link'			: '#{top_link}',
+		'top_hover'		: '#{top_hover}',
+			
 		'left_head_font'	: '#{left_head_font}',
 		'left_head_bg'		: '#{left_head_bg}',
 		'left_font'			: '#{left_font}',
@@ -57,6 +66,15 @@
 	<!-- END colour_list -->
 </script>
 <style type="text/css">
+
+.top h2 { color: #{top_head_font}; background-color: #{top_head_bg};	}
+.top p, .top h3, .top .listing p.small { color: #{top_font}; }
+.top a, .top .listing p.small a { color: #{top_link}; }
+.top .box a:hover, .top .listing p.small a:hover { color: #{top_hover};  }
+.top .text { background: #{top_bg_primary}; }
+.top .listing{ background: #{top_bg_primary}; }
+.top .listing .dark { background: #{top_bg_secondary}; }		
+
 .left h2 { color: #{left_head_font}; background-color: #{left_head_bg};	}
 .left p, .left h3, .left .listing p.small,.left { color: #{left_font}; }
 .left a, .left .listing p.small a { color: #{left_link}; }
@@ -139,7 +157,51 @@ a.{NAME} {
 	<!--/tabs-1-->
 	<div id="tabs-2" class="customise-components">
 		<div class="clearfix">
-			<div class="colours leftColumn">
+			<div class="colours leftColumn clearfix">
+				<h3>Top Column</h3>
+				<div class="colours-split top-split">
+					<h3>Heading</h3>
+					<div class="colour clearfix">
+						<div id="top_head_font" class="colorBox"></div>
+						<input name="colors[top_head_font]" type="hidden" />
+						<p>Text</p>
+					</div>
+					<div class="colour clearfix">
+						<div id="top_head_bg" class="colorBox"></div>
+						<input name="colors[top_head_bg]" type="hidden" />
+						<p>Background</p>
+					</div>
+				</div>
+				<div class="colours-split">
+					<h3>Heading</h3>
+					<div class="colour clearfix">
+						<div id="top_bg_primary" class="colorBox"></div>
+						<input name="colors[top_bg_primary]" type="hidden" />
+						<p>Primary Background</p>
+					</div>
+					<div class="colour clearfix">
+						<div id="top_bg_secondary" class="colorBox"></div>
+						<input name="colors[top_bg_secondary]" type="hidden" />
+						<p>Secondary Background</p>
+					</div>
+					<div class="colour clearfix">
+						<div id="top_font" class="colorBox"></div>
+						<input name="colors[top_font]" type="hidden" />
+						<p>Text</p>
+					</div>
+					<div class="colour clearfix">
+						<div id="top_link" class="colorBox"></div>
+						<input name="colors[top_link]" type="hidden" />
+						<p>Link</p>
+					</div>
+					<div class="colour clearfix">
+						<div id="top_hover" class="colorBox"></div>
+						<input name="colors[top_hover]" type="hidden" />
+						<p>Link Hover</p>
+					</div>
+				</div>
+			</div>
+			<div class="colours">
 				<h3>Left Column</h3>
 				<div class="colours-split top-split">
 					<h3>Heading</h3>
@@ -290,10 +352,10 @@ a.{NAME} {
 			</div>
 		</div>
 		<!-- END privateNotes -->
-
-		<div class="left-active active-sort">
-			{COLUMN1}
-		</div>
+		    <div class="top clearfix">{COLUMN3}</div>
+	<div class="left-active active-sort">
+		{COLUMN1}
+	</div>
 	</div>
 	<div class="right active-sort clearfix" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%">
 		{COLUMN2}
