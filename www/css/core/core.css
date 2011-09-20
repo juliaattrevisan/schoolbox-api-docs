@@ -457,13 +457,13 @@ th { font-weight:bold; }
 
 #tabs li a {
 	font-weight:bold;
-	font-size:15px;
+	font-size:14px;
 	color: #579dcf;
 	height: 32px;
 	line-height: 32px;
 	display: block;
 	float: left;
-	padding: 0 12px;
+	padding: 0 15px;
 }
 
 #header #tabs li.navthis a {
