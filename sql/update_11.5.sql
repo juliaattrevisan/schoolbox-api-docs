@@ -194,4 +194,7 @@ PRIMARY KEY (id));
 
 INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveEducationHistory', 'Education History', 'An education history for your resume', 2, 'objectiveEducationHistory.html', 'false');
 
+/* Resume (Objective Component composite)
+ */
+INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputResumeStandard', 'Standard Resume', 'A standard resume', 2, 'resume.html', 'false');
 
