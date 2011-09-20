@@ -9,7 +9,13 @@
  * 
  */
  
-class Plagscan_Document {
+class Plagscan_Document extends Model {
+    const STATUS_QUEUED = 1;
+
+    const STATUS_PROCESSING = 2;
+
+    const STATUS_COMPLETE = 3;
+
     public $id;
 
     public $file;
@@ -22,7 +28,5 @@ class Plagscan_Document {
 
     public $state;
 
-    public $score;
-
-    public $words;
+    public $status;
 }

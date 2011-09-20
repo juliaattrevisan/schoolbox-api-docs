@@ -115,11 +115,12 @@ class SubmissionStudent extends DeprecatedModel {
     function create($boxID, $file) {
         $late = $this->securityCheck($boxID);
 
-        $studentSub = array ('owner'    => $_SESSION['id'],
-                'realname'  => $file['name'],
-                'submitted' => 'NOW()',
-                'box_id'    => $boxID,
-                'late'      => $late,
+        $studentSub = array (
+            'owner'     => $_SESSION['id'],
+            'realname'  => $file['name'],
+            'submitted' => 'NOW()',
+            'box_id'    => $boxID,
+            'late'      => $late,
         );
 
 		

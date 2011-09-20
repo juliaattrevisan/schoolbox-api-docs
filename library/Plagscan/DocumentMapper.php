@@ -9,7 +9,18 @@
  * 
  */
  
-class Plagscan_DocumentMapper {
+class Plagscan_DocumentMapper extends Mapper {
+    private $gateway;
+
+    protected function __construct () {
+        parent::__construct();
+
+        $plagscanApiKey = Config::get('plagscan_api_key');
+        $plagscanUsername = Config::get('plagscan_username');
+
+        $this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
+    }
+
     protected function mapping () {
         $this->hasMap(array(
             'column'     => 'id',
@@ -31,8 +42,8 @@ class Plagscan_DocumentMapper {
         ));
 
         $this->hasMap(array(
-            'column'     => 'state',
-            'property'   => 'state',
+            'column'     => 'status',
+            'property'   => 'status',
             'type'       => Mapper::TYPE_INTEGER,
         ));
 
@@ -42,14 +53,17 @@ class Plagscan_DocumentMapper {
             'type'       => Mapper::TYPE_STRING,
         ));
 
-        $this->hasMap(array(
-            'column'     => 'words',
-            'property'   => 'words',
-            'type'       => Mapper::TYPE_INTEGER,
-        ));
-
         parent::mapping();
     }
 
-    
+    public function save ($dirtyDocument) {
+        if ( !$this->findById($dirtyDocument->id) ) {
+            $plagscanId = $this->gateway->submit($dirtyDocument->file['name'], $dirtyDocument->file['file']);
+
+            $dirtyDocument->plagscanId = $plagscanId;
+            $dirtyDocument->state = Plagscan_Document::STATUS_QUEUED;
+        }
+
+        return parent::save($dirtyDocument);
+    }
 }
