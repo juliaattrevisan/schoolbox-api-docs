@@ -105,6 +105,13 @@ INSERT INTO config (`name`, title, description, field, `value`, `type`, editable
 ALTER TABLE `config` CHANGE `field` `field` ENUM('input','textarea','boolean','select','checkbox','bytes') CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'input' NULL ;
 UPDATE `config` SET `field`='bytes', description='The maximum size of a single file that can be uploaded. Excepts human formats like 40M and 1GB.' WHERE `name` like 'max_file_size';
 
+/* EPORTFOLIO BITS
+ */
+
+/* Lengthen name, it's too short
+ */
+ALTER TABLE `eportfolio_comp` CHANGE `method` `method` VARCHAR(255);
+
 /* Eportfolio Objective
  */
 CREATE TABLE eportfolio_objective_skill (
@@ -114,10 +121,28 @@ CREATE TABLE eportfolio_objective_skill (
 	body TEXT,
 PRIMARY KEY (id));
 
-/* Lengthen name, it's too short
+/* Eportfolio Objective
  */
-ALTER TABLE `eportfolio_comp` CHANGE `method` `method` VARCHAR(255);
+CREATE TABLE eportfolio_objective_goal (
+	id BIGINT(20) NOT NULL AUTO_INCREMENT,
+	user_id BIGINT(20),
+	component_location_id BIGINT(20),
+	body TEXT,
+PRIMARY KEY (id));
+
+/* Eportfolio Objective
+ */
+CREATE TABLE eportfolio_objective_award (
+	id BIGINT(20) NOT NULL AUTO_INCREMENT,
+	user_id BIGINT(20),
+	component_location_id BIGINT(20),
+	body TEXT,
+PRIMARY KEY (id));
+
+
 
 /* Eportfolio Objective Skill Component
  */
 INSERT INTO eportfolio_comp (size, method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1, 'outputObjectiveSkill', 'Skills', 'A list of your skills', 1, 'objectiveSkill.html', 'false');
+INSERT INTO eportfolio_comp (size, method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1, 'outputObjectiveGoal', 'Goals', 'A list of your goals', 1, 'objectiveGoal.html', 'false');
+INSERT INTO eportfolio_comp (size, method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1, 'outputObjectiveAward', 'Awards', 'A list of your awards', 1, 'objectiveAward.html', 'false');

@@ -1,0 +1,18 @@
+<!-- BEGIN custom_head -->
+<!-- END custom_head -->
+
+<h2>Edit Awards</h2>
+<form action="/eportfolio/objective/award/modifyForm.php" method="post" id="modifyForm" class="standardForm">
+	<input type="hidden" name="userID" value="{USER_ID}" />
+	<input type="hidden" name="objectiveAwardID" value="{OBJECTIVE_AWARD_ID}" />
+	<input type="hidden" name="componentLocationID" value="{COMPONENT_LOCATION_ID}" />
+	<fieldset class="pad-it">
+		<label>
+			<textarea rows="20" name="body" id="body">{OBJECTIVE_AWARD}</textarea>
+		</label>
+	</fieldset>
+
+	<input type="submit" class="submit-btn-plain" value="Save" />
+</form>
+
+

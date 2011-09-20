@@ -1,0 +1,18 @@
+<!-- BEGIN custom_head -->
+<!-- END custom_head -->
+
+<h2>Edit Goals</h2>
+<form action="/eportfolio/objective/goal/modifyForm.php" method="post" id="modifyForm" class="standardForm">
+	<input type="hidden" name="userID" value="{USER_ID}" />
+	<input type="hidden" name="objectiveGoalID" value="{OBJECTIVE_GOAL_ID}" />
+	<input type="hidden" name="componentLocationID" value="{COMPONENT_LOCATION_ID}" />
+	<fieldset class="pad-it">
+		<label>
+			<textarea rows="20" name="body" id="body">{OBJECTIVE_GOAL}</textarea>
+		</label>
+	</fieldset>
+
+	<input type="submit" class="submit-btn-plain" value="Save" />
+</form>
+
+
