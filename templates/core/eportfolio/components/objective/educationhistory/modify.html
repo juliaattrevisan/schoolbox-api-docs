@@ -1,0 +1,18 @@
+<!-- BEGIN custom_head -->
+<!-- END custom_head -->
+
+<h2>Edit Education History</h2>
+<form action="/eportfolio/objective/educationhistory/modifyForm.php" method="post" id="modifyForm" class="standardForm">
+	<input type="hidden" name="userID" value="{USER_ID}" />
+	<input type="hidden" name="objectiveEducationHistoryID" value="{OBJECTIVE_EDUCATIONHISTORY_ID}" />
+	<input type="hidden" name="componentLocationID" value="{COMPONENT_LOCATION_ID}" />
+	<fieldset class="pad-it">
+		<label>
+			<textarea rows="20" name="body" id="body">{OBJECTIVE_EDUCATIONHISTORY}</textarea>
+		</label>
+	</fieldset>
+
+	<input type="submit" class="submit-btn-plain" value="Save" />
+</form>
+
+

@@ -111,8 +111,13 @@ UPDATE `config` SET `field`='bytes', description='The maximum size of a single f
 /* Lengthen name, it's too short
  */
 ALTER TABLE `eportfolio_comp` CHANGE `method` `method` VARCHAR(255);
+ALTER TABLE `eportfolio_comp` CHANGE `filename` `filename` VARCHAR(255);
 
-/* Eportfolio Objective
+/* Resume grouping
+ */
+INSERT INTO `eportfolio_comp_category`(`eportfolioComponentCategoryID`,`name`) VALUES ( '2','Resume');
+
+/* Eportfolio Objective: Skills
  */
 CREATE TABLE eportfolio_objective_skill (
 	id BIGINT(20) NOT NULL AUTO_INCREMENT,
@@ -121,7 +126,9 @@ CREATE TABLE eportfolio_objective_skill (
 	body TEXT,
 PRIMARY KEY (id));
 
-/* Eportfolio Objective
+INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveSkill', 'Skills', 'A list of your skills', 2, 'objectiveSkill.html', 'false');
+
+/* Eportfolio Objective: Goals
  */
 CREATE TABLE eportfolio_objective_goal (
 	id BIGINT(20) NOT NULL AUTO_INCREMENT,
@@ -130,7 +137,9 @@ CREATE TABLE eportfolio_objective_goal (
 	body TEXT,
 PRIMARY KEY (id));
 
-/* Eportfolio Objective
+INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveGoal', 'Goals', 'A list of your goals', 2, 'objectiveGoal.html', 'false');
+
+/* Eportfolio Objective: Awards
  */
 CREATE TABLE eportfolio_objective_award (
 	id BIGINT(20) NOT NULL AUTO_INCREMENT,
@@ -139,10 +148,50 @@ CREATE TABLE eportfolio_objective_award (
 	body TEXT,
 PRIMARY KEY (id));
 
+INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveAward', 'Awards', 'A list of your awards', 2, 'objectiveAward.html', 'false');
 
-
-/* Eportfolio Objective Skill Component
+/* Eportfolio Objective: Cover Letter
  */
-INSERT INTO eportfolio_comp (size, method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1, 'outputObjectiveSkill', 'Skills', 'A list of your skills', 1, 'objectiveSkill.html', 'false');
-INSERT INTO eportfolio_comp (size, method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1, 'outputObjectiveGoal', 'Goals', 'A list of your goals', 1, 'objectiveGoal.html', 'false');
-INSERT INTO eportfolio_comp (size, method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1, 'outputObjectiveAward', 'Awards', 'A list of your awards', 1, 'objectiveAward.html', 'false');
+CREATE TABLE eportfolio_objective_coverletter (
+	id BIGINT(20) NOT NULL AUTO_INCREMENT,
+	user_id BIGINT(20),
+	component_location_id BIGINT(20),
+	body TEXT,
+PRIMARY KEY (id));
+
+INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveCoverLetter', 'Cover Letter', 'A cover letter for your resume', 2, 'objectiveCoverLetter.html', 'false');
+
+/* Eportfolio Objective: Interest
+ */
+CREATE TABLE eportfolio_objective_interest (
+	id BIGINT(20) NOT NULL AUTO_INCREMENT,
+	user_id BIGINT(20),
+	component_location_id BIGINT(20),
+	body TEXT,
+PRIMARY KEY (id));
+
+INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveInterest', 'Interests', 'A list of interests for your resume', 2, 'objectiveInterest.html', 'false');
+
+/* Eportfolio Objective: Employment History
+ */
+CREATE TABLE eportfolio_objective_employmenthistory (
+	id BIGINT(20) NOT NULL AUTO_INCREMENT,
+	user_id BIGINT(20),
+	component_location_id BIGINT(20),
+	body TEXT,
+PRIMARY KEY (id));
+
+INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveEmploymentHistory', 'Employment History', 'An employment history for your resume', 2, 'objectiveEmploymentHistory.html', 'false');
+
+/* Eportfolio Objective: Education History
+ */
+CREATE TABLE eportfolio_objective_educationhistory (
+	id BIGINT(20) NOT NULL AUTO_INCREMENT,
+	user_id BIGINT(20),
+	component_location_id BIGINT(20),
+	body TEXT,
+PRIMARY KEY (id));
+
+INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveEducationHistory', 'Education History', 'An education history for your resume', 2, 'objectiveEducationHistory.html', 'false');
+
+
