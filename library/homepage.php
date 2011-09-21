@@ -161,7 +161,7 @@ class Homepage {
         $query = "UPDATE homepage_comp_location SET position = position+1 WHERE cid = ".$this->cid." AND `column` = 1";
         $this->db->query($query);
 
-        return $this->saveComponentPosition($component, 1, 1, $newComp['config']);
+        return $this->saveComponentPosition($component, 1, 1, $componentSetup['config']);
 
     }
 
