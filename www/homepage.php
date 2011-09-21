@@ -5,22 +5,11 @@
  *														   *
  ************************************************************/
 
-// fix url
-require_once '../include/SitePage.php';
-require_once 'include/stdfuncs.php';
-
-if (strpos($_SERVER['REQUEST_URI'], ".php?category=") ||
-	strpos($_SERVER['REQUEST_URI'], ".php?code=")
-) {
+if (strpos($_SERVER['REQUEST_URI'], ".php?category=") || strpos($_SERVER['REQUEST_URI'], ".php?code=") ) {
 	$category = isset($_GET['category']) ? $_GET['category'] : $_GET['code'];
 	SitePage::localRedir("/homepage/" . $category);
 }
-/*
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/homepage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
-*/
+
 
 $categoryHandler = new Category;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
@@ -55,19 +44,6 @@ if (($permission = $groupHandler->getPermission($categoryID)) < READ_ACCESS) {
 if (!isset($category['template'])) {
 	SitePage::localRedir('/resources/' . $categoryID);
 }
-
-/* This is using a 20-char field in the Category table. That's how categories
- * with many categoryCodes have their codes truncated and broken
- *
- * Updated to use normalised categoryCode table
- *
-if($category['code']) {
-	$enroled = $groupHandler->involvedInSubject($category['code']);
-	$code = $category['code'];
-}
-else
-	$enroled = $groupHandler->involvedInGroup($_SESSION['id'], $categoryID);
-*/
 
 /* Use normalised categoryCode table instead
  */
@@ -213,9 +189,21 @@ if ($permission >= WRITE_ACCESS) {
 
 	/* Defaults
 	 */
-	$defaultColour = unserialize(HOMEPAGE_colors);
+	$defaultColour = array('head_font'=>Cfg::get('homepage_colour_head_font'),
+                            'head_bg'=>Cfg::get('homepage_colour_head_bg'),
+                            'font'=>Cfg::get('homepage_colour_font'),
+                            'bg_primary'=>Cfg::get('homepage_colour_bg_primary'),
+                            'bg_secondary'=>Cfg::get('homepage_colour_bg_secondary'),
+                            'link'=>Cfg::get('homepage_colour_link'),
+                            'hover'=>Cfg::get('homepage_colour_hover')
+                           );
+    $columns = array('top','left','right');
 	$this->setVar('COLOUR_ARRAY', 'defaults');
-	$this->setVar($defaultColour);
+    foreach($columns as $col){
+	    foreach($defaultColour as $field=>$colour) {
+            $this->setVar($col.'_'.$field, $colour);
+        }
+    }
 	$this->parse('colour_list_block', 'colour_list', true);
 
 	/* Template control

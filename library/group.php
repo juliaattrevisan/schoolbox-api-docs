@@ -558,7 +558,7 @@ class Group extends DeprecatedModel {
             if($userID == $_SESSION['id']) {
                 $catList = $_SESSION['subjects'];
             }
-            else {
+            else { 
                 $userHandler = new User;
                 $user = $userHandler->getByID($userID);
 
