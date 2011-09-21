@@ -41,17 +41,17 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($result, $expected);
 	}
 
-	public function testRelativeUrl() {
-		$input = '/ilearn';
-		$expected = 'http://ilearn.joeys.org';
-
-		$url = new Url($input, false);
-		$url->setSiteHostname('http://joeys.org');
-		$url->setSiteDomain('joeys');
-		$url->setServerHost('http://joeys.org.au');
-
-		$result = $url->getRelativeUrl();
-
-		$this->assertEquals($result, $expected);
-	}
+//	public function testRelativeUrl() {
+//		$input = '/ilearn';
+//		$expected = 'http://ilearn.joeys.org';
+//
+//		$url = new Url($input, false);
+//		$url->setSiteHostname('http://joeys.org');
+//		$url->setSiteDomain('joeys');
+//		$url->setServerHost('http://joeys.org.au');
+//
+//		$result = $url->getRelativeUrl();
+//
+//		$this->assertEquals($result, $expected);
+//	}
 }

@@ -90,12 +90,22 @@ class Wiki extends DeprecatedModel
 	 * @return array|bool
 	 */
 	public function getByCategory($categoryID, $orderBy = 'created', $sortDir = 'Desc', $limit = false) {
+
+		/* Adjust the table in which to sort -_-
+		 */
+		if ($orderBy == 'created') {
+			$orderBy = 'w.created';
+		}
+		else {
+			$orderBy = 'r.' . $orderBy;
+		}
+
 		$query = "SELECT r.*, w.locked, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.lastname
 				  FROM wiki w
 				  LEFT JOIN " . $this->_revisionTable . " r ON r.revisionID = (SELECT r.revisionID FROM " . $this->_revisionTable . " r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1)
 				  LEFT JOIN user u ON u.id = r.userID
 				  WHERE w.deleted = 'false' AND categoryID = '{$categoryID}'
-				  ORDER BY r.{$orderBy} {$sortDir}";
+				  ORDER BY {$orderBy} {$sortDir}";
 
 		if (is_numeric($limit) && ($limit > 0)) {
 			$query .= " LIMIT $limit";

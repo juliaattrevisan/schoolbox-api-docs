@@ -28,16 +28,16 @@ class ScrubTextTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($result, $expected);
 	}
 */
-	public function testArrayMap() {
-		$input = array(
-			"<strong><b>dog's bollocks</b></strong>",
-			"<em><b>cat's \"claw's\"</b></em>",
-		);
-
-		$expected = array_map('scrubTEXT', $input);
-
-		$result = array_map(array(Scrub, 'text'), $input);
-
-		$this->assertEquals($result, $expected);
-	}
+//	public function testArrayMap() {
+//		$input = array(
+//			"<strong><b>dog's bollocks</b></strong>",
+//			"<em><b>cat's \"claw's\"</b></em>",
+//		);
+//
+//		$expected = array_map('scrubTEXT', $input);
+//
+//		$result = array_map(array(Scrub, 'text'), $input);
+//
+//		$this->assertEquals($result, $expected);
+//	}
 }

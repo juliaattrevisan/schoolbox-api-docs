@@ -10,7 +10,14 @@ $sortOptions = array('Heading', 'Created', 'Modified');
 $wikiHandler = new Wiki();
 $userHandler = new User();
 
-$wikiList = $wikiHandler->getByCategory($categoryID, strtolower($config['sort']), $config['sortdir'], $config['size']);
+/* Dodge around addComponent when config for this instance is empty
+ */
+if (count($config)) {
+	$wikiList = $wikiHandler->getByCategory($categoryID, strtolower($config['sort']), $config['sortdir'], $config['size']);
+}
+else {
+	$wikiList = $wikiHandler->getByCategory($categoryID);
+}
 
 if (is_array($wikiList)) {
 	foreach ($wikiList as $wiki) {
