@@ -1,34 +1,19 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-private-notes.php';
 
-$privateNotesHandler = new ePortfolioPrivateNotes;
+/* Profile card
+ */
+$profile = new Eportfolio_Profile_Card($this, $userID);
+$profile->render();
 
-$privateNotes = $privateNotesHandler->getByID($userID);
-
-$this->setBlock(TEMPLATE_content, 'privateNotes', 'privateNotes_block');
-$this->setBlock(TEMPLATE_content, 'year_level', 'year_level_block');
-
-$user = $userHandler->getByID($userID);
-
-//$profile = $user_handler->getProfile($userID);
-
-if ($profile['year'] > 0) {
-    $this->setVar('YEAR', $profile['year']);
-    $this->parse('year_level_block', 'year_level');
-} else {
-    $this->setVar('year_level_block', '');
-}
-
-$this->setVar(array(
-    'PRIVATE_NOTES' => $privateNotes['privateNotes'],
-    'HOUSE' => $profile['house'],
-    'CAMPUS' => $profile['campus'],
-));
+/* Render private notes
+ */
+$privateNotes = new Eportfolio_Private_Notes($this, $userID);
 
 if ($eportfolioHandler->canEditPrivateNotes($userID)) {
-    $this->parse('privateNotes_block', 'privateNotes');
+	$privateNotes->setCanEditPrivateNotes(true);
 }
 else {
-    $this->setVar('privateNotes_block', '');
+    $privateNotes->setCanEditPrivateNotes(false);
 }
-?>
+
+$privateNotes->render();
