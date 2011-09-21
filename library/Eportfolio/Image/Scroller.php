@@ -12,6 +12,7 @@
  */
 class Eportfolio_Image_Scroller extends Eportfolio_Image_Abstract {
 	private $timings = array(2, 5, 10, 15, 20, 30);
+	private $defaultTiming = 2;
 
 	/**
 	 * Setup blocks and stuff
@@ -134,6 +135,10 @@ class Eportfolio_Image_Scroller extends Eportfolio_Image_Abstract {
 	private function renderTimings() {
 		$config = $this->getConfig();
 
+		$this->getPage()->setVar(array(
+			'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getDefaultTiming() * 1000
+		));
+
 		foreach($this->getTimings() as $currentTime) {
 			if ($currentTime == $config['timing']) {
 				$this->getPage()->setVar(array(
@@ -179,5 +184,14 @@ class Eportfolio_Image_Scroller extends Eportfolio_Image_Abstract {
 	 */
 	private function getTimings() {
 		return $this->timings;
+	}
+
+	/**
+	 * Return default timing when config is not set
+	 *
+	 * @return int
+	 */
+	private function getDefaultTiming() {
+		return $this->defaultTiming;
 	}
 }
