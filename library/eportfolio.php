@@ -229,12 +229,11 @@ class ePortfolio {
      */
 	function updateComponentConfig($component, $config) {
 		$query = array(
-			'component' => $component,
-			'uid' => $this->uid,
+			'eportfolioComponentLocationID' => $component,
 			'config' => $config
 		);
 
-		$this->db->update('eportfolio_comp_location', array('component', 'uid'), $query);
+		$this->db->update('eportfolio_comp_location', array('eportfolioComponentLocationID'), $query);
 	}
 
 	// For updating available components

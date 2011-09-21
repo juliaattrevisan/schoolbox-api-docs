@@ -7,7 +7,7 @@
 *	This implements MySQL connections.  All standard 		*
 *	functions are accessible plus some incapsulated 		*
 *	functions like getSingleRow and getAllRows.				*
-*	It also includes error handling and a debug mode.		*		    
+*	It also includes error handling and a debug mode.		*
 *                                                           *
 ************************************************************/
 
@@ -40,11 +40,11 @@ function connect()
 {
 	if(!isset($this->dbf))
 		$this->dbf = mysql_connect($this->host, $this->user, $this->passwd);
-	
+
 	if(!isset($this->dbf)){
-		print "Unable to connect ".$this->user."@".$this->host." using ".$this->db; 
+		print "Unable to connect ".$this->user."@".$this->host." using ".$this->db;
 		exit;
-	}	
+	}
 	if(!$this->changeDb($this->db))
 		print "Unable to access ".$this->db.", check the permissions";
 }
@@ -72,7 +72,7 @@ function changeDb($db)
 function query($sql_q)
 {
 	$this->result = mysql_query($sql_q, $this->dbf) or $mysql_eval_error = mysql_error();
-	
+
 	if (isset($mysql_eval_error)) {
 		if($this->debug)
 		{
@@ -82,7 +82,7 @@ function query($sql_q)
 		else
 			error(21, $mysql_eval_error);
 	}
-	
+
 	return $this->result;
 }
 
@@ -164,7 +164,7 @@ function insert($table, $array)
 
 	$names = '';
 	$values = '';
-	
+
 	foreach($array as $key => $value)
 	{
 		$names .= '`'.$key.'`' . ',';
@@ -176,7 +176,7 @@ function insert($table, $array)
 	}
 	$names = substr($names, 0, -1);
 	$values = substr($values, 0, -1);
-	
+
 	$query = "INSERT INTO `$table` ($names) VALUES ($values)";
 	return $this->query($query);
 }
@@ -186,7 +186,7 @@ function insertMultiRow($table, $array, $names=false)
 {
 	if(!($table && is_array($array)))
 		return FALSE;
-	
+
 	//	try to get the names from the first row if they are not sent seperatly
 	if (!$names) {
 		$names = array_keys($array[0]);
@@ -194,9 +194,9 @@ function insertMultiRow($table, $array, $names=false)
 	$cols = '`'. implode('`,`', $names). '`';
 	$rows = array();
 	foreach ($array as $row) {
-		
+
 		$values = '(';
-		
+
 		foreach($row as $key => $value)
 		{
 			if (!is_array($value)) {
@@ -208,19 +208,19 @@ function insertMultiRow($table, $array, $names=false)
 		$values = substr($values, 0, -1). ')';
 		$rows[] = $values;
 	}
-	
+
 	$query = "INSERT INTO `$table` ($cols) VALUES ";
 	$query .= implode(',', $rows);
-	
+
 	return $this->query($query);
 }
 
 /* Updates a row */
 function update($table, $identifier, $array)
 {
-	if(!$table) 
+	if(!$table)
 		return FALSE;
-		
+
 	if(is_array($identifier)) {
 		foreach($identifier as $ident){
 			if(!$array[$ident] )
@@ -233,11 +233,11 @@ function update($table, $identifier, $array)
 
 		$identifier = array($identifier);
 	}
-	
+
 	$set = '';
 	foreach($array as $key => $value)
 	{
-	
+
 		if(!in_array($key, $identifier)) {
 			if (!is_array($value)) {
 				$set .= '`'.$key.'`='.$this->smartQuote($value).',';
@@ -248,9 +248,9 @@ function update($table, $identifier, $array)
 	}
 	$set = substr($set, 0, -1);
 	$query = "UPDATE `$table` SET $set WHERE 1=1";
-	
+
 	foreach($identifier as $ident) {
-		$query .= " AND `$ident`= ".$this->smartQuote($array[$ident]); 
+		$query .= " AND `$ident`= ".$this->smartQuote($array[$ident]);
 	}
 
 	return $this->query($query);
@@ -275,7 +275,7 @@ function insertID()
 {
 	$return_id = mysql_insert_id($this->dbf);
 	return $return_id;
-}	
+}
 
 /* Returns the number of rows affected by the last update */
 function affectedRows()
@@ -377,7 +377,7 @@ function dbDeleteRow($table, $identifier, $value) {
 
 function dbInsertId() {
 	return $this->insertID();
-}	
+}
 
 function dbCountRowsAffected() {
 	return $this->affectedRows();
