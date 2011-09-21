@@ -33,7 +33,7 @@ class Eportfolio_Objective_Goal extends Eportfolio_Objective_Abstract implements
 	 * @return void
 	 */
 	public function render() {
-		$data = $this->getByField('component_location_id', $this->getComponentLocationId());
+		$data = $this->getByField('user_id', $this->getUserId());
 
 		$this->getPage()->setVar(array(
 			'OBJECTIVE_GOAL_ID' => $data['id'],
@@ -48,7 +48,7 @@ class Eportfolio_Objective_Goal extends Eportfolio_Objective_Abstract implements
 	 * @return void
 	 */
 	public function renderModify() {
-		$data = $this->getByComponentLocationID($this->getComponentLocationId());
+		$data = $this->getForUser($this->getUserId());
 
 		$this->getPage()->setFile(TEMPLATE_content, 'eportfolio/components/objective/goal/modify.html');
 

@@ -123,40 +123,36 @@ INSERT INTO `eportfolio_comp_category`(`eportfolioComponentCategoryID`,`name`) V
 CREATE TABLE eportfolio_objective_skill (
 	id BIGINT(20) NOT NULL AUTO_INCREMENT,
 	user_id BIGINT(20),
-	component_location_id BIGINT(20),
 	body TEXT,
 PRIMARY KEY (id));
 
-INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveSkill', 'Skills', 'A list of your skills', 2, 'objectiveSkill.html', 'false');
+INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveSkill', 'Skills', 'A list of your skills for your resume', 2, 'objectiveSkill.html', 'false');
 
 /* Eportfolio Objective: Goals
  */
 CREATE TABLE eportfolio_objective_goal (
 	id BIGINT(20) NOT NULL AUTO_INCREMENT,
 	user_id BIGINT(20),
-	component_location_id BIGINT(20),
 	body TEXT,
 PRIMARY KEY (id));
 
-INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveGoal', 'Goals', 'A list of your goals', 2, 'objectiveGoal.html', 'false');
+INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveGoal', 'Goals', 'A list of your goals for your resume', 2, 'objectiveGoal.html', 'false');
 
 /* Eportfolio Objective: Awards
  */
 CREATE TABLE eportfolio_objective_award (
 	id BIGINT(20) NOT NULL AUTO_INCREMENT,
 	user_id BIGINT(20),
-	component_location_id BIGINT(20),
 	body TEXT,
 PRIMARY KEY (id));
 
-INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveAward', 'Awards', 'A list of your awards', 2, 'objectiveAward.html', 'false');
+INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveAward', 'Awards', 'A list of your awards for your resume', 2, 'objectiveAward.html', 'false');
 
 /* Eportfolio Objective: Cover Letter
  */
 CREATE TABLE eportfolio_objective_coverletter (
 	id BIGINT(20) NOT NULL AUTO_INCREMENT,
 	user_id BIGINT(20),
-	component_location_id BIGINT(20),
 	body TEXT,
 PRIMARY KEY (id));
 
@@ -167,7 +163,6 @@ INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCateg
 CREATE TABLE eportfolio_objective_interest (
 	id BIGINT(20) NOT NULL AUTO_INCREMENT,
 	user_id BIGINT(20),
-	component_location_id BIGINT(20),
 	body TEXT,
 PRIMARY KEY (id));
 
@@ -178,7 +173,6 @@ INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCateg
 CREATE TABLE eportfolio_objective_employmenthistory (
 	id BIGINT(20) NOT NULL AUTO_INCREMENT,
 	user_id BIGINT(20),
-	component_location_id BIGINT(20),
 	body TEXT,
 PRIMARY KEY (id));
 
@@ -189,7 +183,6 @@ INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCateg
 CREATE TABLE eportfolio_objective_educationhistory (
 	id BIGINT(20) NOT NULL AUTO_INCREMENT,
 	user_id BIGINT(20),
-	component_location_id BIGINT(20),
 	body TEXT,
 PRIMARY KEY (id));
 

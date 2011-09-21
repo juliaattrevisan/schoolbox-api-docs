@@ -33,7 +33,7 @@ class Eportfolio_Objective_Award extends Eportfolio_Objective_Abstract implement
 	 * @return void
 	 */
 	public function render() {
-		$data = $this->getByField('component_location_id', $this->getComponentLocationId());
+		$data = $this->getByField('user_id', $this->getUserId());
 
 		$this->getPage()->setVar(array(
 			'OBJECTIVE_AWARD_ID' => $data['id'],
@@ -48,13 +48,12 @@ class Eportfolio_Objective_Award extends Eportfolio_Objective_Abstract implement
 	 * @return void
 	 */
 	public function renderModify() {
-		$data = $this->getByComponentLocationID($this->getComponentLocationId());
+		$data = $this->getForUser($this->getUserId());
 
 		$this->getPage()->setFile(TEMPLATE_content, 'eportfolio/components/objective/award/modify.html');
 
 		$this->getPage()->setVar(array(
 			'USER_ID' => $this->getUserId(),
-			'COMPONENT_LOCATION_ID' => $this->getComponentLocationId(),
 			'OBJECTIVE_AWARD_ID' => $data['id'],
 			'OBJECTIVE_AWARD' => $data['body'],
 		));

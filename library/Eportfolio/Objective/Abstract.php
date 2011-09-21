@@ -62,11 +62,11 @@ class Eportfolio_Objective_Abstract extends DeprecatedModel {
 	public function getForUser($user_id) {
 		$query = "SELECT * FROM {$this->_table} WHERE user_id = '$user_id'";
 
-		return $this->db->getAll($query);
+		return $this->db->getRow($query);
 	}
 
 	/**
-	 * Get a textbox record using only a componentLocationID
+	 * Get a component record using only a componentLocationID
 	 *
 	 * @param  $componentLocationID
 	 * @return array|bool
@@ -78,19 +78,16 @@ class Eportfolio_Objective_Abstract extends DeprecatedModel {
 	}
 
 	/**
-	 * Delete a textbox only needing to know what the componentLocation is,
-	 * since the textboxID could be empty in the case that they've created the
-	 * component but not added content
+	 * Delete a component only needing to know what the componentLocation is.
+	 * Do not actually delete any data
 	 *
 	 * @param  $componentLocationID
 	 * @return void
 	 */
 	public function delete() {
-		$query = "SELECT id FROM {$this->_table} WHERE component_location_id = '{$this->getComponentLocationId()}'";
+		$query = "SELECT id FROM eportfolio_comp_location WHERE eportfolioComponentLocationID = '{$this->getComponentLocationId()}'";
 
-		$record = $this->db->getRow($query);
-
-		parent::delete($record['id']);
+		$this->db->getRow($query);
 	}
 
 	/**
@@ -108,7 +105,6 @@ class Eportfolio_Objective_Abstract extends DeprecatedModel {
 
 		$data = array(
 			'user_id' => $this->getUserId(),
-			'component_location_id' => Scrub::text($post['componentLocationID']),
 			'body' => Scrub::html($post['body']),
 		);
 

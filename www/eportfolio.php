@@ -292,11 +292,9 @@ if ($eportfolioHandler->canEdit($userID)) {
 							break;
 					}
 				}
-				$this->parse('config_block', 'config');
 			}
-			else {
-				$this->setVar('config_block', '');
-			}
+
+			$this->parse('config_block', 'config');
 
 			if ($componentHandle) {
 				$this->parse('COLUMN' . $component['column'], $componentHandle, true);

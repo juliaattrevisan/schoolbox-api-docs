@@ -396,7 +396,7 @@ setupCustomise = {
 				var left = '';
 				var right = '';
 				var top = '';
-				$j('.homepage div.left').children('div.box').each(function () {
+				$j('.homepage div.left').children('div.box').each(function () {console.log($j(this));
 					left += $j(this).attr('id').substring(9) + ',';
 				});
 				$j('.homepage div.right').children('div.box').each(function () {

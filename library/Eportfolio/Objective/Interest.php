@@ -17,13 +17,23 @@ class Eportfolio_Objective_Interest extends Eportfolio_Objective_Abstract implem
 	protected $facadePrimaryKey = 'objectiveInterestID';
 
 	/**
+	 * Special formatting
+	 *
+	 * @param  $body
+	 * @return string
+	 */
+	public function getBody($body) {
+		return $this->listify($body);
+	}
+
+	/**
 	 * Render a component on the page with appropriate tokens
 	 *
 	 * @param  $page
 	 * @return void
 	 */
 	public function render() {
-		$data = $this->getByField('component_location_id', $this->getComponentLocationId());
+		$data = $this->getByField('user_id', $this->getUserId());
 
 		$this->getPage()->setVar(array(
 			'OBJECTIVE_INTEREST_ID' => $data['id'],
@@ -38,7 +48,7 @@ class Eportfolio_Objective_Interest extends Eportfolio_Objective_Abstract implem
 	 * @return void
 	 */
 	public function renderModify() {
-		$data = $this->getByComponentLocationID($this->getComponentLocationId());
+		$data = $this->getForUser($this->getUserId());
 
 		$this->getPage()->setFile(TEMPLATE_content, 'eportfolio/components/objective/interest/modify.html');
 

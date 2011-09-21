@@ -33,7 +33,7 @@ class Eportfolio_Objective_Skill extends Eportfolio_Objective_Abstract implement
 	 * @return void
 	 */
 	public function render() {
-		$data = $this->getByField('component_location_id', $this->getComponentLocationId());
+		$data = $this->getByField('user_id', $this->getUserId());
 
 		$this->getPage()->setVar(array(
 			'OBJECTIVE_SKILL_ID' => $data['id'],
@@ -48,7 +48,7 @@ class Eportfolio_Objective_Skill extends Eportfolio_Objective_Abstract implement
 	 * @return void
 	 */
 	public function renderModify() {
-		$data = $this->getByComponentLocationID($this->getComponentLocationId());
+		$data = $this->getForUser($this->getUserId());
 
 		$this->getPage()->setFile(TEMPLATE_content, 'eportfolio/components/objective/skill/modify.html');
 

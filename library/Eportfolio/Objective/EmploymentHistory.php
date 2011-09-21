@@ -23,7 +23,7 @@ class Eportfolio_Objective_EmploymentHistory extends Eportfolio_Objective_Abstra
 	 * @return void
 	 */
 	public function render() {
-		$data = $this->getByField('component_location_id', $this->getComponentLocationId());
+		$data = $this->getByField('user_id', $this->getUserId());
 
 		$this->getPage()->setVar(array(
 			'OBJECTIVE_EMPLOYMENTHISTORY_ID' => $data['id'],
@@ -38,7 +38,7 @@ class Eportfolio_Objective_EmploymentHistory extends Eportfolio_Objective_Abstra
 	 * @return void
 	 */
 	public function renderModify() {
-		$data = $this->getByComponentLocationID($this->getComponentLocationId());
+		$data = $this->getForUser($this->getUserId());
 
 		$this->getPage()->setFile(TEMPLATE_content, 'eportfolio/components/objective/employmenthistory/modify.html');
 
