@@ -1781,8 +1781,14 @@ line-height: 40px;
 text-shadow:0px 1px 1px #fff;
     font-size:16px;
     padding: 7px 8px;
+    position:relative;
 }
-
+.dashboard .component .delete-this{position:absolute; top:4px; right:4px; width:24px;
+    height:24px; display:block; line-height:24px; text-align:center;
+        -moz-border-radius: 16px;
+    -webkit-border-radius: 16px;
+    border-radius: 16px;
+color:#000; font-weight:bold; background:#fff;}
 .dashboard .marker{margin:8px; padding:0; height:60px;}
 .dashboard #dashboard-layout .component.ui-sortable-helper,
 .dashboard .ui-draggable-dragging{opacity:0.8; background: #E7E7E7 url(/images/famicons/arrow_in.png) no-repeat 50% 8px;

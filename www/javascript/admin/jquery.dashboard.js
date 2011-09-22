@@ -1,6 +1,30 @@
 (function($) {
     $(document).ready(function () {
 
+        $j.fn.qtip.defaults.position.corner = {
+            target: 'topLeft',
+            tooltip: 'bottomLeft'
+        }
+
+        $j.fn.qtip.defaults.style = {
+            tip: 'bottomLeft',
+            name: 'green'
+        }
+
+        $j('h2 span').each(function() {
+            activeContent = $j(this).siblings('em').html();
+            $j(this).qtip({
+                content: activeContent,
+                api: {
+                        // Retrieve the content when tooltip is first rendered
+                         onRender: function()
+                         {
+                            var self = this;
+                         }
+                     }
+            });
+        });
+
         $('#definition-palette .component').draggable({
             helper: 'clone',
             connectToSortable: '#dashboard-layout .component-holder'
@@ -18,9 +42,22 @@
             },
             placeholder: 'marker',
             items: '.component',
-            cursor: 'move'
+            cursor: 'move',
+            stop: function(event, ui) {
+                if (!(ui.item.find('.delete-this').length > 0)) {
+                ui.item.append('<a href="#" class="delete-this">x</a>')
+                }
+                
+            }
 			
         });
+
+        $('.delete-this').live('click',function() {
+            $(this).parent().slideUp(100,function(){
+                $(this).remove()
+            })
+            return false;
+        })
 
         $('#group-select').change(function () {
             var $groupId = $(this).val();
