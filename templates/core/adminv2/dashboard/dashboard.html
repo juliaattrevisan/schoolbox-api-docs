@@ -15,24 +15,24 @@
 	<li><a href="/adminv2/list">Lists</a></li>
 	<li><a href="/adminv2/rollover">Rollover</a></li>
 </ul>
-<div class="admin-contents">
+<div class="admin-contents dashboard clearfix">
 	<h2>Dashboard</h2>
-    <div>
-        <div>
-            <select id="group-select">
-                <!-- BEGIN group -->
-                <option value="{group.id}">{group.name}</option>
-                <!-- END group -->
-            </select>
-        </div>
-        <ul id="definition-palette">
-            <!-- BEGIN definition -->
-            <li class="component-definition">{definition.name}</li>
-            <!-- END definition -->
-        </ul>
 
-        <div id="dashboard-layout">
-            <!-- BEGIN layout --><!-- END layout -->
-        </div>
+    <div id="definition-palette">
+        <select id="group-select">
+            <!-- BEGIN group -->
+            <option value="{group.id}">{group.name}</option>
+            <!-- END group -->
+        </select>
+
+        <!-- BEGIN definition -->
+        <div class="component">{definition.name}</div>
+        <!-- END definition -->
+
     </div>
+
+    <div id="dashboard-layout" class="clearfix">
+        <!-- BEGIN layout --><!-- END layout -->
+    </div>
+
 </div>
