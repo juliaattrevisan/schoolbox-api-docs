@@ -134,6 +134,6 @@ class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract implement
 	 * @return string
 	 */
 	public function getUsingFormat($format) {
-		return date($format, strtotime($this->getDateTime()));
+		return date($format, $this->getDateTime());
 	}
 }

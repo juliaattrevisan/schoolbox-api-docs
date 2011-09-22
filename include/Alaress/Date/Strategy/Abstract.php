@@ -31,33 +31,34 @@ abstract class Alaress_Date_Strategy_Abstract {
 		/* Support for unix timestamp variant by converting it to a db format
 		 */
 		if ($inputDateFormat == 'U') {
-			$dateTime = date('Y-m-d H:i:s', $dateTime);
-			$this->setInputDateFormat('y-m-d h:i:s');
+            $this->setByTimestamp($dateTime);
+            return true;
 		}
 		else if ($inputDateFormat !== null) {
 			$this->setInputDateFormat($inputDateFormat);
-		}
 
-		/* Snap out all the bits, exit if no separator could be found (this
-		 * indicates an illegal dateTime format anyway)
-		 */
+            /* Snap out all the bits, exit if no separator could be found (this
+             * indicates an illegal dateTime format anyway)
+             */
 
-		/* Components of the datetime string.
-		 *
-		 * The datetime string follows this format:
-		 * 14/08/2011 12:50 AM
-		 *
-		 * parts[0] is the date
-		 * parts[1] is the time
-		 * parts[2] is the meridiem (am/pm)
-		 */
-		$parts = explode(' ', $dateTime);
+            /* Components of the datetime string.
+             *
+             * The datetime string follows this format:
+             * 14/08/2011 12:50 AM
+             *
+             * parts[0] is the date
+             * parts[1] is the time
+             * parts[2] is the meridiem (am/pm)
+             */
+            $parts = explode(' ', $dateTime);
 
-		/* Remember date components
-		 * Remember time components
-		 */
-		$this->setDateComponents($parts[0]);
-		$this->setTimeComponents($parts[1], $parts[2]);
+            /* Remember date components
+             * Remember time components
+             */
+            $this->setDateComponents($parts[0]);
+            $this->setTimeComponents($parts[1], $parts[2]);
+            return true;
+        }
 	}
 
 	/**
@@ -66,11 +67,12 @@ abstract class Alaress_Date_Strategy_Abstract {
 	 * @return string
 	 */
 	protected function getDateTime() {
-		$date = "{$this->getYear()}{$this->getDateSeparator()}{$this->getMonth()}{$this->getDateSeparator()}{$this->getDay()}";
-		$time = "{$this->getHour()}:{$this->getMinute()}:{$this->getSecond()}";
-
-		return $date . ' ' . $time;
-	}
+        //bug in mktime.. https://bugs.php.net/bug.php?id=47806 causes this to return 1999 when year = 0
+        if($this->getYear() + $this->getDay() + $this->getMonth() > 0)
+            return mktime((int)$this->getHour(), (int)$this->getMinute(), (int)$this->getSecond(), (int)$this->getMonth(), (int)$this->getDay(), (int)$this->getYear() );
+	    else
+            return 0;
+    }
 
 	/**
 	 * Figure out which date components are located where, based on the
@@ -149,6 +151,20 @@ abstract class Alaress_Date_Strategy_Abstract {
 			}
 		}
 	}
+
+    /**
+     * Set date by unix timestamp
+     * @param $timestamp
+     * @return void
+     */
+    private function setByTimestamp($timestamp) {
+        $this->setDay(date('j'), $timestamp);
+        $this->setMonth(date('n'), $timestamp);
+        $this->setYear(date('Y'), $timestamp);
+        $this->setHour(date('H'), $timestamp);
+        $this->setMinute(date('i'), $timestamp);
+        $this->setSecond(date('s'), $timestamp);
+    }
 
 	/**
 	 * Set input date format
