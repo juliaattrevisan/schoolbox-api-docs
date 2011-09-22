@@ -103,7 +103,7 @@ class ExternalUser extends MSSQL{
 
        function getStaff($synID)
 	{
-            $query = " SELECT SchoolStaffCode, StaffBuilding, StaffRoom, StaffExtension, StaffMobilePhone
+            $query = " SELECT SchoolStaffCode, StaffBuilding, StaffRoom, StaffExtension, StaffMobilePhone, StaffCampusDescription, StaffCategoryDescription, StaffDepartment
                 FROM SynergyOne.dbo.vStaff vStaff
                 WHERE vStaff.StaffID = $synID ";
 

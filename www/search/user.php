@@ -307,6 +307,11 @@ if (is_numeric($this->arg[0])) {
 
 			$this->setVar('EXTENSION', $synInfo['StaffExtension']);
 			$this->setVar('MOBILE', $synInfo['StaffMobilePhone']);
+			$this->setVar('DEPARTMENT', $synInfo['StaffDepartment']);
+			$this->setVar('ROOM', $synInfo['StaffRoom']);
+            $this->setVar('BUILDING', $synInfo['StaffBuilding']);
+			$this->setVar('CAMPUS', $synInfo['StaffCampusDescription']);
+            $this->setVar('CATEGORY', $synInfo['StaffCategoryDescription']);
 
 			$this->parse('staff_synergy_block','staff_synergy');
 		}
