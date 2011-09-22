@@ -22,6 +22,7 @@
                 <th>Submitted By</th>
                 <th>Submitted Date</th>
                 <th>Mark</th>
+                <th>Plagiarism</th>
                 <th>Download</th>
                 <th>Delete</th>
                 <th>Mark</th>
@@ -37,6 +38,7 @@
 				</td>
                 <td style="color:{COLOUR};">{SUBMITTED}</td>
                 <td>{MARK}</td>
+                <td>{SCORE}</td>
                 <td><!-- BEGIN download_action --><a href="/submission/send.php?id={SUB_ID}">Download</a><!-- END download_action --></td>
                 <td><!-- BEGIN delete_action -->
 				<a href="/submission/viewSubmissionForm.php?delete={SUB_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));">Delete</a>

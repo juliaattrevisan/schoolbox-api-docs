@@ -58,10 +58,17 @@ class Plagscan_DocumentMapper extends Mapper {
 
     public function save ($dirtyDocument) {
         if ( !$this->findById($dirtyDocument->id) ) {
-            $plagscanId = $this->gateway->submit($dirtyDocument->file['name'], $dirtyDocument->file['file']);
+            $documentId = $this->gateway->submit($dirtyDocument->file['name'], $dirtyDocument->file['file']);
 
-            $dirtyDocument->plagscanId = $plagscanId;
-            $dirtyDocument->state = Plagscan_Document::STATUS_QUEUED;
+            if ( !empty($documentId) ) {
+                $this->gateway->check($documentId);
+
+                $dirtyDocument->plagscanId = $documentId;
+                $dirtyDocument->status = Plagscan_Document::STATUS_QUEUED;
+            }
+            else {
+                return false;
+            }
         }
 
         return parent::save($dirtyDocument);

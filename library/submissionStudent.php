@@ -18,25 +18,25 @@ class SubmissionStudent extends DeprecatedModel {
 
     function getBySynergyID($subBoxID, $synergyID) {
         $query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username, local_email, alt_email,
-        DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id
-        FROM student_submission, user
-        WHERE synergy_id = '$synergyID' AND owner = user.id AND box_id = '$subBoxID'";
+        DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id, pd.score
+        FROM student_submission, user, plagscan_document pd
+        WHERE synergy_id = '$synergyID' AND owner = user.id AND box_id = '$subBoxID' AND pd.file_id =  $subBoxID";
         return $this->db->getRow($query);
     }
 
     function getByUserID($subBoxID, $userID) {
         $query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username, local_email, alt_email,
-        DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id
-        FROM student_submission, user
-        WHERE owner = '$userID' AND owner = user.id AND box_id = '$subBoxID'";
+        DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id, pd.score
+        FROM student_submission, user, plagscan_document pd
+        WHERE owner = '$userID' AND owner = user.id AND box_id = '$subBoxID' AND pd.file_id =  $subBoxID";
         return $this->db->getRow($query);
     }
 
     function getByBoxID($subBoxID) {
          $query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username, local_email, alt_email,
-                DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id
-                FROM student_submission, user
-                WHERE owner = user.id AND box_id = '$subBoxID' ORDER BY lastname, firstname";
+                DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date, late, marked, user.synergy_id as synergy_id, pd.score
+                FROM student_submission, user, plagscan_document pd
+                WHERE owner = user.id AND box_id = '$subBoxID' AND pd.file_id = student_submission.id ORDER BY lastname, firstname";
          return $this->db->getAll($query);
     }
 

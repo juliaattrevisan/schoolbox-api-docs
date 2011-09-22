@@ -70,6 +70,7 @@ if (is_numeric($this->arg[0])) {
 					'SUBMITTED' => $studentSub['date'],
 					'COLOUR' => $studentSub['late'] ? '#ff0000' : '#000000',
 					'MARK' => $return[0]['mark'],
+                    'SCORE' => $studentSub['score'],
 					'ON_OFF' => ++$i % 2 ? '' : 'dark',
 					'REMARK' => $remark,
                 );
@@ -87,6 +88,7 @@ if (is_numeric($this->arg[0])) {
 					'SUBMITTED' => '',
 					'COLOUR' => '',
 					'MARK' => $return[0]['mark'],
+                    'SCORE' => '',
 					'ON_OFF' => ++$i % 2 ? '' : 'dark',
                 );
 
@@ -116,6 +118,13 @@ if (is_numeric($this->arg[0])) {
 					$mark = "<a href=\"/submission/returnWork/".$this->arg[0]."/".$line['uid']."\">Mark</a>";
 				}
 
+                if ( empty($line['score']) ) {
+                    $score = '-';
+                }
+                else {
+                    $score = "{$line['score']}%";
+                }
+
                 $output = array(
 					'OWNER' => $userHandler->formatName($line, '{lastname}, {firstname}'),
 					'OWNER_ID' => $line['uid'],
@@ -124,6 +133,7 @@ if (is_numeric($this->arg[0])) {
 					'SUBMITTED' => $line['date'],
 					'COLOUR' => $line['late'] ? '#ff0000' : '#000000',
 					'MARK' => $return[0]['mark'],
+                    'SCORE' => $score,
 					'ON_OFF' => ++$i % 2 ? '' : 'dark',
             	);
 

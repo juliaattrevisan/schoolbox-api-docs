@@ -23,14 +23,23 @@ class Plagscan_ServiceController {
     public function notifyComplete ($documentId) {
         $documentCollection = Plagscan_DocumentMapper::getInstance()->findByColumn('plagscan_id', $documentId);
 
-        $document = $documentCollection[0];
+        if ( $documentCollection ) {
+            $document = $documentCollection[0];
 
-        $document->status = Plagscan_Document::STATUS_COMPLETE;
+            $documentSummary = $this->gateway->retrieve($documentId, 0);
 
-        Plagscan_DocumentMapper::getInstance()->save($document);
+            $document->score = $documentSummary->LEVEL / 10;
+            $document->status = Plagscan_Document::STATUS_COMPLETE;
+
+            Plagscan_DocumentMapper::getInstance()->save($document);
+        }
+        else {
+            return false;
+        }
     }
 }
 
+/* Handles responses from PlagScan which indicate a document has completed plagiarism scanning */
 $documentId = $_SERVER["QUERY_STRING"];
 
 if ( !empty($documentId) ) {

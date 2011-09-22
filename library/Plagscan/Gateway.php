@@ -18,6 +18,8 @@ class Plagscan_Gateway {
 
     const METHOD_RETRIEVE = 'Retrieve';
 
+    const METHOD_CHECK = 'Check';
+
     private $username;
 
     private $apiKey;
@@ -53,6 +55,29 @@ class Plagscan_Gateway {
         $documentData = file_get_contents($documentFile);
         $documentType = $fileInfo->buffer($documentData);
 
+        /* Workaround for DOCX mime coming up as a ZIP mime */
+        $documentExtension = strtolower( trim( array_pop( explode('.', $documentName) ) ) );
+
+        if ( $documentExtension == 'docx' ) {
+            $documentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        }
+
+        $validDocumentTypeList = array(
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/msword',
+            'application/pdf',
+            'text/plain',
+            'text/richtext',
+            'text/rtf',
+            'text/html',
+            'text/enriched',
+            'text/plain',
+        );
+
+        if ( !in_array($documentType, $validDocumentTypeList) ) {
+            return false;
+        }
+
         $documentParameter .= "Content-Disposition: form-data; name=\"DATA\"; filename=\"$documentName\"\n";
         $documentParameter .= "Content-Type: $documentType\n";
         $documentParameter .= "Content-Transfer-Encoding: binary\n\n";
@@ -72,9 +97,30 @@ class Plagscan_Gateway {
             'MODE'   => $retrieveMode
         ));
 
-        $response = $this->parseXmlResponse($this->response);
+        if ( $this->createRequest($parameterList) ) {
+            $response = $this->parseXmlResponse($this->response);
 
-        print_r($response);
+            return $response;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public function check ($documentId) {
+        $parameterList = $this->createParameters(array(
+            'METHOD' => self::METHOD_CHECK,
+            'PID'    => $documentId,
+        ));
+
+        if ( $this->createRequest($parameterList) ) {
+            $response = $this->parseXmlResponse($this->response);
+
+            return $response;
+        }
+        else {
+            return false;
+        }
     }
 
     private function createRequest ($parameterList, $rawParameterList = array()) {
@@ -120,6 +166,8 @@ class Plagscan_Gateway {
             fclose($socket);
 
             $this->response = $response;
+
+            return true;
         }
         else {
             $this->errorCode = $errorCode;
