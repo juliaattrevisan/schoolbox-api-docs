@@ -13,9 +13,6 @@
 
 define('IMAGESPERROW', 5);
 
-require_once '../library/user.php';
-require_once '../library/eportfolio.php';
-
 if (is_numeric($this->arg[0]) ) {
     $userHandler = new User();
 	$eportfolioHandler = new ePortfolio($this->arg[0]);

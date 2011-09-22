@@ -9,7 +9,7 @@
  * It will be used to fill the image bank with appropriate *
  * size images for display.				   */
 
-require_once("../../include/SitePage.php");
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage;
 

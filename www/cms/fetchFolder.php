@@ -11,11 +11,9 @@
 *							                                *
 /************************************************************/
 
-require_once("../include/include.php");
-require_once("../include/session.php");
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+
 require_once('../include/pclzip.lib.php');
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 
 
 class ZipFolder {
@@ -165,6 +163,7 @@ function removeDir($path) {
 
 }
 
+$page = new SitePage();
 $zip = new ZipFolder($_GET['folder']);
 $zip->sendZip();
 

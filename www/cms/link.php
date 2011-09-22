@@ -1,11 +1,9 @@
 <?php
 
-require_once '../library/group.php';
 $groupHandler = new Group;
 
 if(is_numeric($this->arg[0])) {
 
-	require_once '../library/link.php';
 	$linkHandler = new Link;
 
 	/* Modify existing link */
@@ -35,8 +33,6 @@ if(is_numeric($this->arg[0])) {
 
 
 } else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-
-	require_once '../library/category.php';
 	$categoryHandler = new Category;
 
 	/* Add new link to system */
@@ -69,7 +65,6 @@ if(is_numeric($this->arg[0])) {
 }
 else if($this->arg[0] == 'multicat') {
 	/* Upload a link to multiple categories */
-	require_once '../library/group.php';
 
 	$this->setFile(TEMPLATE_content, 'cms/add-link-multi-cat.html');
 	$this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');

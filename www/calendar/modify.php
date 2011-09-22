@@ -1,11 +1,7 @@
 <?php
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-require_once "../../include/SitePage.php";
 $page = new SitePage;
-
-require_once "../../library/calendar.php";
-require_once "../../library/group.php";
-
 $calendarHandler = new Calendar;
 $groupHandler = new Group;
 

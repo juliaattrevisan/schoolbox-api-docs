@@ -1,8 +1,5 @@
 <?php
-
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionReturn.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage;
 $returnHandler = new SubmissionReturn;

@@ -1,9 +1,5 @@
 <?php
-
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-link.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
 $eportfolioHandler = new ePortfolio($_SESSION['id']);

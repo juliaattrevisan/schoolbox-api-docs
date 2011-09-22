@@ -5,8 +5,10 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/page.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/include/stdfuncs.php';
 
+$page = new SitePage;
 $wikiHandler = new Wiki;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
+
 
 if (isset($_GET['wikiID'])) {
    // wiki exists
@@ -15,10 +17,6 @@ if (isset($_GET['wikiID'])) {
    if (!isset($wiki['wikiID'])) {
       error(2);
    }
-
-   /* uid is empty unless I use session_start()
-    */
-   session_start();
 
    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
       error(19);
@@ -43,7 +41,6 @@ if (isset($_GET['wikiID'])) {
    /* Load Page templating, to keep consistent, rather than dumping raw output.
     * This also allows you to format the exported wiki page.
     */
-   $page = new Page;
    $page->setFile(TEMPLATE_body, 'core/wiki/exportedPage.html');
    $page->setVar($output);
    $page->parse('finaloutput', TEMPLATE_body);

@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-session_start();
+$page = new SitePage;
 
 $submission_box_handler = new Submission();
 
@@ -42,7 +42,7 @@ if (is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_PO
 
 	$submission_box_handler->update($submission_box);
 
-	SitePage::localRedir("/submission/listSubmission/");
+	$page->localRedir("/submission/listSubmission/");
 }
 else if ($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour']) {
 	if (isset($_FILES['file']['name']) && $_FILES['file']['name']) {
@@ -103,10 +103,10 @@ else if ($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_PO
 
 	$submission_box_handler->create($submission_box);
 
-	SitePage::localRedir("/submission/listSubmission/");
+	$page->localRedir("/submission/listSubmission/");
 }
 else if (isset($_GET['deleteBox']) && is_numeric($_GET['deleteBox'])) {
 	$submission_box_handler->delete($_GET['deleteBox']);
 
-	SitePage::localRedir("/submission/listSubmission/");
+	$page->localRedir("/submission/listSubmission/");
 }

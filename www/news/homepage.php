@@ -26,8 +26,8 @@ if(is_numeric($this->arg[0])) {
 	$this->setTitle('Modify Homepage News');
 	$this->setTab('resources');
 
-    $publishedDate = new DateTime( $news['item_datetime_published'] );
-    $expiryDate = new DateTime( $news['item_datetime_expires'] );
+	$publishedDate = new Alaress_Date_Format($newsItem['datetime_published'], 'y-m-d');
+	$expiryDate = new Alaress_Date_Format($newsItem['datetime_expires'], 'y-m-d');
 
     $output = array(
         'ACTION'      => 'Modify',
@@ -35,8 +35,8 @@ if(is_numeric($this->arg[0])) {
         'HEADING'     => $newsItem['heading'],
         'BODY'        => $newsItem['body'],
         'CATEGORY_ID' => $newsItem['code'],
-        'DATETIME_PUBLISHED' => $publishedDate->format(Cfg::get('date_select')),
-        'DATETIME_EXPIRES' => $expiryDate->format(Cfg::get('date_select')),
+		'DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
+		'DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
     );
 						
 	$this->setVar($output);
@@ -59,8 +59,8 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	$this->setTab('resources');
 
     /* Default DateTime */
-    $published = new DateTime();
-    $expires = new DateTime('+1 month');
+	$publishedDate = new Alaress_Date_Format(time(), 'U');
+	$expiryDate = new Alaress_Date_Format(strtotime('+7 days'), 'U');
 
     /* Set default output */
 	$output = array(	'ACTION'				=> 'Create',
@@ -69,8 +69,8 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 						'NEWS_ID'				=> '',
 						'CATEGORY_ID'			=> $this->arg[1],
 						'delete_button_block'	=> '',
-                        'DATETIME_PUBLISHED' => $published->format( Cfg::get('date_select') ),
-                        'DATETIME_EXPIRES' => $expires->format( Cfg::get('date_select') ),
+		                'DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
+		                'DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
 					);
 						
 	$this->setVar($output);

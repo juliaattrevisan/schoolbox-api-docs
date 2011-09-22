@@ -1,8 +1,5 @@
 <?php
-
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/link.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
 $linkHandler = new Link();

@@ -1,6 +1,6 @@
 <?php
-require_once '../library/category.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $groupHandler = new Group();
 $categoryHandler = new Category();

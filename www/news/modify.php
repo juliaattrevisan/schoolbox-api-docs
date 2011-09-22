@@ -30,17 +30,17 @@ if (is_numeric($this->arg[0])) {
 	if ($news['item_owner'] != $_SESSION['id'] && $permission < FULL_ACCESS) {
 		error(23);
 	}
-
-	$publishedDate = new DateTime($news['item_datetime_published']);
-	$expiryDate = new DateTime($news['item_datetime_expires']);
+print $news['item_datetime_published'];
+	$publishedDate = new Alaress_Date_Format($news['item_datetime_published'], 'y-m-d');
+	$expiryDate = new Alaress_Date_Format($news['item_datetime_expires'], 'y-m-d');
 
 	$output = array(
 		'ACTION' => 'Modify',
 		'NEWS_ID' => $news['item_id'],
 		'HEADING' => $news['item_heading'],
 		'BODY' => $news['item_body'],
-		'ITEM_DATETIME_PUBLISHED' => $publishedDate->format(Cfg::get('date_select')),
-		'ITEM_DATETIME_EXPIRES' => $expiryDate->format(Cfg::get('date_select')),
+		'ITEM_DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
+		'ITEM_DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
 	);
 
 	$this->setVar($output);
@@ -94,9 +94,7 @@ else {
 	$this->setTab('news');
 
 	$publishedDate = new Alaress_Date_Format(time(), 'U');
-
-	$expiryDate = new Alaress_Date_Format(time(), 'U');
-	$expiryDate->addDays(7);
+	$expiryDate = new Alaress_Date_Format(strtotime('+7 days'), 'U');
 
 	$output = array(
 		'ACTION' => 'Add',

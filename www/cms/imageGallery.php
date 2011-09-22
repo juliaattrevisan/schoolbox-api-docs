@@ -11,8 +11,6 @@
  * Clicking the large image makes it open in a new window at 	*
  * its orginal size						*/
 
-require_once '../library/group.php';
-require_once '../library/category.php';
 
 if (is_numeric($this->arg[0])) {
 	

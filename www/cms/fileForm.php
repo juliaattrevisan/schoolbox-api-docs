@@ -1,9 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 /* Force session usage due to flash uploader
  * http://www.uploadify.com/forums/discussion/43/using-sessions-tricking-basic-authentication/p1
@@ -254,7 +250,6 @@ else {
 						}
 					}
 
-					require_once SITE_root . '/library/link.php';
 					$linkHandler = new Link;
 
 					$linkList = explode(',', rtrim($_GET['linkList'], ','));
