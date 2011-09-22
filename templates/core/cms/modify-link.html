@@ -22,26 +22,26 @@ $j(document).ready(function() {
 <form method="post" id="urlForm" class="clearfix" onSubmit="return(verify());" action="/cms/linkForm.php">
   <table class="standardForm">
     <tr>
-      <td class="formLabelWidth"><h4>URL</h4>
-     <em>The internet address for the website, eg. http://www.google.com</em></td>
-	 <td><label><input class="required url" type="text" name="url" size="40" maxlength="250" value="{URL}" /></label></td>
-    </tr>
-    <tr>
-      <td><h4>Description</h4>
+      <td><h4>Title</h4>
         <em>One line description of the URL for the title </em></td>
 		<td><label><input type="text" name="description" maxlength="250" size="40" class="required" value="{DESCRIPTION}" /></label></td>
     </tr>
     <tr>
-      <td><h4>Comments</h4>
+    <tr>
+      <td class="formLabelWidth"><h4>URL</h4>
+     <em>The internet address for the website, eg. http://www.google.com</em></td>
+	 <td><label><input class="required url" type="text" name="url" size="40" maxlength="250" value="{URL}" /></label></td>
+    </tr>
+      <td><h4>Description</h4>
         <em>Any further details you wish to make about the URL, useful for enhancing search results</em>
       </td>
-	  <td><textarea name="comment" cols="40" rows="4">{COMMENT}</textarea></td>
+	  <td><textarea name="comment" cols="40" rows="4" style="width:100%">{COMMENT}</textarea></td>
     </tr>
     <tr>
       <td><h4>Location</h4>
-        <em>The link will be located in this folder. You can <a href="/cms/link/multicat/">upload a link to multiple locations</a> here: <strong>{CATEGORY_NAME}</strong></em>
+        <em>The link will be located in this folder. You can <a href="/cms/link/multicat/">upload a link to multiple locations</a> here.</em>
       </td>
-	  <td><input name="category" value="{CATEGORY_ID}" type="hidden" /></td>
+	  <td><input name="category" value="{CATEGORY_ID}" type="hidden" /><strong>{CATEGORY_NAME}</strong></td>
     </tr>
     <tr>
       <td><h4>Hidden</h4>
