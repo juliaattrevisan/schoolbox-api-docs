@@ -40,7 +40,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 	 * they never even attempted the test.
 	 */
 	if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
-		$attemptFinishDate = new Alaress_Date_Format(strtotime($currentAttempt['finish']), 'U');
+		$attemptFinishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d');
 
 		$finish = $attemptFinishDate->getShort();
 		$timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
@@ -167,16 +167,6 @@ $allAttempts = $attemptHandler->getList($this->arg[0]);
 if (is_array($allStudents) && count($allStudents)) {
 	foreach($allStudents as $currentStudent) {
 
-		/* Get the actual user by the uid if it exists, or the synergy id if
-		 * they don't have a portal account
-		 */
-		if ($currentStudent['uid']) {
-			$user = $userHandler->getByID($currentStudent['uid']);
-		}
-		else if ($currentStudent['synergy_id']) {
-			$user = $userHandler->getBySynergy($currentStudent['synergy_id']);
-		}
-
 		/* Process attempts for this student
 		 */
 		if ($allAttempts && count($allAttempts)) {
@@ -230,9 +220,12 @@ else {
 /* Deal with remainder attempts
  */
 if ($allAttempts && count($allAttempts)) {
+
+    $userHandler = new User;
+
 	foreach($allAttempts as $currentAttempt) {
 		if ($currentAttempt['processed'] != true) {
-			processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, array());
+			processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $userHandler->getByID($currentAttempt['user_id']));
 		}
 	}
 }
