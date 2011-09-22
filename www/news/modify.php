@@ -103,6 +103,7 @@ else {
 		'NEWS_ID' => '',
 		'HEADING' => '',
 		'BODY' => '',
+        'current_users_block' => '',
 		'ITEM_DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
 		'ITEM_DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
 	);

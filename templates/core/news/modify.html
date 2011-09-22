@@ -146,14 +146,34 @@
 		<col width="250" />
 		</colgroup>
 		<tr>
+			<td><h4>Headline</h4></td>
+			<td><label>
+					<input type="text" class="required" name="heading" size="35" maxlength="50" value="{HEADING}" />
+				</label>
+			</td>
+		</tr>
+		<tr>
+			<td><h4>Article</h4>
+				<em>This is the main portion of your news.</em></td>
+			<td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
+		</tr>
+        		<tr>
+			<td><h4>Topic</h4></td>
+			<td><select name="item_topic_id">
+					<!-- BEGIN topic_list -->
+					<option value="{TOPIC_ID}" {TOPIC_ID_SELECTED}>{TOPIC_NAME}</option>
+					<!-- END topic_list -->
+				</select></td>
+		</tr>
+        		<tr>
 			<td class="formLabelWidth"><h4>Groups</h4>
 				<em>This news item will only be visible to the groups you select.</em></td>
 			<td><div class="clearfix checkboxes"><!-- BEGIN group_selection -->
-				
+
 				<label class="float-left clear">
 					<input type="checkbox" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED}/>{GROUP_NAME}
 				</label>
-				
+
 				<!-- END group_selection --></div></td>
 		</tr>
 		<!-- BEGIN campus_row -->
@@ -161,11 +181,11 @@
 			<td><h4>Campus</h4>
 				<em>This news item will only be visible to users that are within this campus.</em></td>
 			<td><div class="clearfix checkboxes"><!-- BEGIN campus_selection -->
-				
+
 				<label class="float-left clear">
 					<input type="checkbox" value="{CAMPUS_ID}" name="campus[]" {CAMPUS_ID_SELECTED} />
 					{CAMPUS_NAME} </label>
-				
+
 				<!-- END campus_selection --></div></td>
 		</tr>
 		<!-- END campus_row -->
@@ -182,15 +202,8 @@
 				</ul>
 			</td>
 		</tr>
-		<tr>
-			<td><h4>Topic</h4></td>
-			<td><select name="item_topic_id">
-					<!-- BEGIN topic_list -->
-					<option value="{TOPIC_ID}" {TOPIC_ID_SELECTED}>{TOPIC_NAME}</option>
-					<!-- END topic_list -->
-				</select></td>
-		</tr>
-        <tr>
+
+        <tr class="advanced">
             <td><h4>Publish Date</h4>
                 <em>Select a date for when this news item will become available.</em>
             <td>
@@ -203,18 +216,6 @@
             <td>
                 <input type="text" class="required" name="item_datetime_expires" id="item_datetime_expires" size="12" maxlength="50" value="{ITEM_DATETIME_EXPIRES}" />
             </td>
-		</tr>
-		<tr>
-			<td><h4>Headline</h4></td>
-			<td><label>
-					<input type="text" class="required" name="heading" size="35" maxlength="50" value="{HEADING}" />
-				</label>
-			</td>
-		</tr>
-		<tr>
-			<td><h4>Article</h4>
-				<em>This is the main portion of your news.</em></td>
-			<td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
 		</tr>
 	</table>
 	<input class="submit-btn-plain" type="submit" name="submit" value="{ACTION} News" />

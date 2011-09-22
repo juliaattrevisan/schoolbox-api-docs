@@ -196,6 +196,8 @@ INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCateg
 
 /* Add in 3rd column css support (top area) */
 ALTER TABLE `homepage_config`     ADD COLUMN `top_head_font` CHAR(7) NULL AFTER `right_hover`,     ADD COLUMN `top_head_bg` CHAR(7) NULL AFTER `top_head_font`,     ADD COLUMN `top_font` CHAR(7) NULL AFTER `top_head_bg`,     ADD COLUMN `top_bg_primary` CHAR(7) NULL AFTER `top_font`,     ADD COLUMN `top_bg_secondary` CHAR(7) NULL AFTER `top_bg_primary`,     ADD COLUMN `top_link` CHAR(7) NULL AFTER `top_bg_secondary`,     ADD COLUMN `top_hover` CHAR(7) NULL AFTER `top_link`;
+ALTER TABLE `eportfolio_config`     ADD COLUMN `top_head_font` CHAR(7) NULL AFTER `right_hover`,     ADD COLUMN `top_head_bg` CHAR(7) NULL AFTER `top_head_font`,     ADD COLUMN `top_font` CHAR(7) NULL AFTER `top_head_bg`,     ADD COLUMN `top_bg_primary` CHAR(7) NULL AFTER `top_font`,     ADD COLUMN `top_bg_secondary` CHAR(7) NULL AFTER `top_bg_primary`,     ADD COLUMN `top_link` CHAR(7) NULL AFTER `top_bg_secondary`,     ADD COLUMN `top_hover` CHAR(7) NULL AFTER `top_link`;
+
 
 /* Convert default colours to config options */
 INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'homepage_colour_head_font','013a63','Heading Text','Colour of the heading text on homepage and eportfolio components','input',NULL,'Colours','true','false','false');
@@ -205,3 +207,9 @@ INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`op
 INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'homepage_colour_bg_secondary','faf9f5','Secondary Background','Secondary background colour homepage and eportfolio components','input',NULL,'Colours','true','false','false');
 INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'homepage_colour_link','1d9ffc','Link','Colour of links on homepage and eportfolio components','input',NULL,'Colours','true','false','false');
 INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'homepage_colour_hover','ff5a00','Link Hover','Colour of links when your mouse over them on homepage and eportfolio components','input',NULL,'Colours','true','false','false');
+
+/* Added in new category to eportfolio components */
+INSERT INTO `eportfolio_comp_category`(`eportfolioComponentCategoryID`,`name`) VALUES ( NULL,'Images');
+UPDATE `eportfolio_comp` SET eportfolioCategoryID = (SELECT eportfolioComponentCategoryID FROM `eportfolio_comp_category` WHERE name like 'Images') WHERE method like 'outputImage%';
+
+

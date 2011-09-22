@@ -10,7 +10,6 @@
  * size images for display.				   */
 
 require_once("../../include/SitePage.php");
-//require_once("../include/permission.php");
 
 $page = new SitePage;
 
@@ -45,8 +44,14 @@ if($_GET['id'] && $_GET['width'] && $_GET['height'])
             error(5);
         }
     }
+    else if(isset($imageInfo['category'])) {
+        $groupHandler = new Group;
+
+        if($groupHandler->getPermission($imageInfo['category']) < READ_ACCESS )
+            error(5);
+    }
     else {
-        perm($imageInfo['category'], HOMEPAGESERVICE);
+        error(5);
     }
 
 	//is image exists, the user has permission and its not deleted then output the image

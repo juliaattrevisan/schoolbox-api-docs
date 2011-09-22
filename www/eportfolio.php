@@ -154,9 +154,21 @@ if ($eportfolioHandler->canEdit($userID)) {
 
 	/* Defaults
 	 */
-	$defaultColour = unserialize(HOMEPAGE_colors);
+	$defaultColour = array('head_font'=>Cfg::get('homepage_colour_head_font'),
+                            'head_bg'=>Cfg::get('homepage_colour_head_bg'),
+                            'font'=>Cfg::get('homepage_colour_font'),
+                            'bg_primary'=>Cfg::get('homepage_colour_bg_primary'),
+                            'bg_secondary'=>Cfg::get('homepage_colour_bg_secondary'),
+                            'link'=>Cfg::get('homepage_colour_link'),
+                            'hover'=>Cfg::get('homepage_colour_hover')
+                           );
+    $columns = array('top','left','right');
 	$this->setVar('COLOUR_ARRAY', 'defaults');
-	$this->setVar($defaultColour);
+    foreach($columns as $col){
+	    foreach($defaultColour as $field=>$colour) {
+            $this->setVar($col.'_'.$field, $colour);
+        }
+    }
 	$this->parse('colour_list_block', 'colour_list', true);
 
 	/* Template control
