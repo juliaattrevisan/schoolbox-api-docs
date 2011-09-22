@@ -47,12 +47,23 @@ $j(function() {
         }
     });
 
+    $j('.customise').click(function(event) {
+        event.preventDefault();
+        $j(this).children('span').toggle();
+        $j('.advanced').toggle();
+        if ($j('.advanced').is(':visible')) {
+            $j('.advanced').children('td').delay(1000).animate({opacity:'1'});
+        } else {
+             $j('.advanced').queue('fx', []);
+        }
+    });
+
 });
 
 </script>
 <!-- END custom_head -->
 
-<h1>{ACTION} Homepage News</h1>
+<h1>{ACTION} Homepage News<a class="customise" href="#"><span>Show Advanced Options</span><span style="display:none">Close Advanced Options</span></a></h1>
 <form action="/news/homepageForm.php" method="post" class="clearfix" enctype="multipart/form-data" id="newsForm">
 	<table class="standardForm">
 		<tr>
@@ -60,7 +71,13 @@ $j(function() {
 			</td>
 			<td><label><input type="text" class="required" name="heading" size="35" maxlength="50" value="{HEADING}" /></label></td>
 		</tr>
-        <tr>
+		<tr>
+			<td valign="top"><h4>News Body</h4>
+				<em>This is the main portion of your news.</em>
+				</td>
+			<td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
+		</tr>
+        <tr class="advanced">
             <td><h4>Publish Date</h4>
                 <em>Select a date for when this news item will become available.</em>
             <td>
@@ -74,12 +91,6 @@ $j(function() {
                 <input type="text" class="required" name="datetime_expires" id="datetime_expires" size="12" maxlength="50" value="{DATETIME_EXPIRES}" />
             </td>
         </tr>
-		<tr>
-			<td valign="top"><h4>News Body</h4>
-				<em>This is the main portion of your news.</em>
-				</td>
-			<td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
-		</tr>
 	</table>
     <input type="hidden" name="id" value="{NEWS_ID}" />
     <input type="hidden" name="code" value="{CATEGORY_ID}" />
