@@ -74,8 +74,10 @@ class Alaress_Rss_Stream {
 	 * @return bool
 	 */
 	private function isInputAtom() {
-		if (isset($this->getInput()->xml->link[0]) && strstr($this->getInput()->xml->link[0]->attributes()->type,'atom+xml')) {
-			return true;
+		foreach($this->getInput()->xml->link as $currentLink) {
+			if (strstr($currentLink->attributes()->type, 'atom+xml')) {
+				return true;
+			}
 		}
 
 		return false;
