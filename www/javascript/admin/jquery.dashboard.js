@@ -47,7 +47,7 @@
                 if (!(ui.item.find('.delete-this').length > 0)) {
                 ui.item.append('<a href="#" class="delete-this">x</a>')
                 }
-                
+                console.log(ui.item);
             }
 			
         });
