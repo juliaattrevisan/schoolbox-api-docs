@@ -16,9 +16,18 @@ $j(function() {
 		'removeCompleted': false,
 		'onSelect'       : function(event, queueID, fileObj) {
 			uploadQueue.push(queueID);
+
 		},
         'onComplete'     : function () {
             $j('#upload-status').slideDown();
+        },
+        'onSelectOnce': function() {
+           if (!$j('.uploadifyQueueItem').find('.heading-table').length > 0) {
+               $j('.uploadifyQueueItem').prepend('<table width="100%" class="heading-table"><tr><td width="50%"><h4 style="margin: 0">Local File</h4></td><td width="50%"><h4 style="margin: 0">Title</h4></td></tr></table>');
+                console.log('eggs')
+
+           };
+
         }
 	});
 
@@ -28,6 +37,8 @@ $j(function() {
 		event.preventDefault();
 		var errors = 0;
 		var prefill = true;
+
+
 
 		/* Since this is a custom upload method, we need to detect whether
 		 * there are any previously uploaded files as they become inaccessible
