@@ -89,7 +89,7 @@ $j(function() {
 					var data = {
 						'category': '{CATEGORY_ID}',
 						'uploadifydie': true,
-						'description': elem.val(),
+						'description': escape(elem.val()),
 						'hidden': hidden
 					};
 
