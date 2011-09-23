@@ -32,6 +32,18 @@ class Group extends DeprecatedModel {
         parent::DeprecatedModel();
     }
 
+	/**
+	 * Get a group by name
+	 *
+	 * @param  $name
+	 * @return array|bool
+	 */
+	public function searchByName($name) {
+		$query = "SELECT * FROM groups WHERE name LIKE \"%{$name}%\"";
+
+		return $this->db->getAll($query);
+	}
+
     function setService($service = HOMEPAGE_SERVICE) {
         $this->_service = $service;
     }
@@ -558,7 +570,7 @@ class Group extends DeprecatedModel {
             if($userID == $_SESSION['id']) {
                 $catList = $_SESSION['subjects'];
             }
-            else { 
+            else {
                 $userHandler = new User;
                 $user = $userHandler->getByID($userID);
 

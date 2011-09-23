@@ -13,6 +13,18 @@ class Category extends DeprecatedModel {
 	}
 
 	/**
+	 * Get a category by name
+	 *
+	 * @param  $name
+	 * @return array|bool
+	 */
+	public function searchByName($name) {
+		$query = "SELECT * FROM category WHERE name LIKE \"%{$name}%\"";
+
+		return $this->db->getAll($query);
+	}
+
+	/**
 	 * Get the code for a category. Uses the categoryCode table in a join, as
 	 * category.code is deprecated
 	 *

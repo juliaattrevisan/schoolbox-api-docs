@@ -37,6 +37,34 @@ $j(document).ready(function() {
 		}
 	});
 
+	/**
+	 * Add to this group from people in an existing system group
+	 */
+	$j('#addUsersBySystemGroup').autocomplete({
+		serviceUrl: '/ajax/addUserByGroup.php?type=system',
+		minChars: 2,
+		maxHeight: 400,
+		width: 275,
+		onSelect: function (value, data) {
+			$j('#systemGroupID').val(data);
+			return false;
+		}
+	});
+
+	/**
+	 * Add to this group from people in an existing system group
+	 */
+	$j('#addUsersByIndividualGroup').autocomplete({
+		serviceUrl: '/ajax/addUserByGroup.php?type=individual',
+		minChars: 2,
+		maxHeight: 400,
+		width: 275,
+		onSelect: function (value, data) {
+			$j('#individualGroupID').val(data);
+			return false;
+		}
+	});
+
 	$j('#type_form input').each(function () {
 		$j(this).click(function () {
 			$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', type: $j(this).val()});
@@ -79,12 +107,29 @@ $j(document).ready(function() {
 			<td valign="top"><h4>Add users</h4>
 				<em>You may add users individually by typing their name and selecting from the list.  Alternatively you can add many users via a list of synergetic id's or usernames.</em>
 				</td>
-			<td><form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
+			<td>
+				<form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
 					<input id="addUser" type="text" size="30" />
 					<input type="hidden" name="userID" id="userID" />
 					<input type="submit" value="Add User" class="submit-btn-plain" />
 				</form>
 				<a href="/group/bulk/{CATEGORY_ID}" class="btn add float-left"><span></span>Add Bulk Members</a>
+
+				<hr style='clear:both;'>
+
+				<form action="/group/addUserByGroup.php?type=system&destinationID={CATEGORY_ID}" class="clearfix" method="post">
+					<input id="addUsersBySystemGroup" type="text" size="30" />
+					<input type="hidden" name="systemGroupID" id="systemGroupID" />
+					<input type="submit" value="Add System Group" class="submit-btn-plain" />
+				</form>
+
+				<hr style='clear:both;'>
+
+				<form action="/group/addUserByGroup.php?type=individual&destinationID={CATEGORY_ID}" class="clearfix" method="post">
+					<input id="addUsersByIndividualGroup" type="text" size="30" />
+					<input type="hidden" name="individualGroupID" id="individualGroupID" />
+					<input type="submit" value="Add Individual Group" class="submit-btn-plain" />
+				</form>
 			</td>
 		</tr>
 		<tr>
