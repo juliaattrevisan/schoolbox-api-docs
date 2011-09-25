@@ -11,8 +11,6 @@
  * Clicking the large image makes it open in a new window at 	*
  * its orginal size						*/
 
-define('IMAGESPERROW', 5);
-
 if (is_numeric($this->arg[0]) ) {
     $userHandler = new User();
 	$eportfolioHandler = new ePortfolio($this->arg[0]);
@@ -23,15 +21,15 @@ if (is_numeric($this->arg[0]) ) {
 
     $user = $userHandler->getByID($this->arg[0]);
 
-	$this->setFile(TEMPLATE_content, 'cms/image-gallery.html');
+	$this->setFile(TEMPLATE_content, 'cms/eportfolio-image-gallery.html');
 	$this->setTitle('Image Gallery for '. $user['firstname'] . ' ' . $user['lastname']);
-	$this->setTab('resources');
+	$this->setTab('eportfolio');
 
-	$this->setBlock(TEMPLATE_content, 'thumb_row', 'row_block');
-	$this->setBlock('thumb_row', 'thumb_cell', 'cell_block');
+    $this->setBlock(TEMPLATE_content, 'image_gallery', 'image_gallery_block');
 
     $this->setVar(array(
-        'FOLDER_NAME' => $user['firstname'] . ' ' . $user['lastname']
+        'FOLDER_NAME' => $user['firstname'] . ' ' . $user['lastname'],
+        'USER_ID'       => $user['uid'],
     ));
     
 	$imageList = $imageList = $eportfolioHandler->getImages($this->arg[0]);
@@ -39,32 +37,24 @@ if (is_numeric($this->arg[0]) ) {
 	$count = 1;
 
 	if (is_array($imageList)) {
-		foreach ($imageList as $thumbnail) {
-			$this->setVar('THUMBNAIL', "<a href=\"/cms/image.php?myFile=1&id={$thumbnail['id']}&height=600&width=800\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
-					<img src=\"/cms/image.php?myFile=1&id={$thumbnail['id']}&height=".Cfg::get('thumbnail_size')."&width=".Cfg::get('thumbnail_size')."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\"></a>");
+		foreach($imageList as $thumbnail) {
+			$this->setVar(array(
+				'THUMBNAIL_ID' => $thumbnail['id'],
+				'THUMBNAIL_DESCRIPTION' => $thumbnail['description'],
+				'THUMBNAIL_SIZE' =>	Cfg::get('thumbnail_size'),
+			));
 
-			$this->parse('cell_block', 'thumb_cell', true);
-
-			if (($count % IMAGESPERROW) == 0) {
-				$this->parse('row_block', 'thumb_row', true);
-				$this->setVar('cell_block', '');
-			}
-
-			$count++;
+			$this->parse('image_gallery_block', 'image_gallery', true);
 		}
 
-		for (;$count % IMAGESPERROW != 0; $count++) {
-			$this->setVar('THUMBNAIL', '');
-			$this->parse('cell_block', 'thumb_cell', true);
-		}
-
-		$this->parse('row_block', 'thumb_row', true);
+		$this->setVar(array(
+			'IMAGE_HEIGHT' => Cfg::get('thumbnail_size'),
+		));
 	}
 	else {
-		$this->setVar('row_block', '');
+		$this->setVar('image_gallery_block', '');
     }
 }
 else {
 	error(2);
 }
-?>

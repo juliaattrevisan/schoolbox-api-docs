@@ -68,10 +68,12 @@ abstract class Alaress_Date_Strategy_Abstract {
 	 */
 	protected function getDateTime() {
         //bug in mktime.. https://bugs.php.net/bug.php?id=47806 causes this to return 1999 when year = 0
-        if($this->getYear() + $this->getDay() + $this->getMonth() > 0)
-            return mktime((int)$this->getHour(), (int)$this->getMinute(), (int)$this->getSecond(), (int)$this->getMonth(), (int)$this->getDay(), (int)$this->getYear() );
-	    else
+        if ($this->getYear() + $this->getDay() + $this->getMonth() > 0) {
+            return mktime((int)$this->getHour(), (int)$this->getMinute(), (int)$this->getSecond(), (int)$this->getMonth(), (int)$this->getDay(), (int)$this->getYear());
+        }
+        else {
             return 0;
+         }
     }
 
 	/**

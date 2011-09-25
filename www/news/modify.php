@@ -30,7 +30,7 @@ if (is_numeric($this->arg[0])) {
 	if ($news['item_owner'] != $_SESSION['id'] && $permission < FULL_ACCESS) {
 		error(23);
 	}
-print $news['item_datetime_published'];
+
 	$publishedDate = new Alaress_Date_Format($news['item_datetime_published'], 'y-m-d');
 	$expiryDate = new Alaress_Date_Format($news['item_datetime_expires'], 'y-m-d');
 

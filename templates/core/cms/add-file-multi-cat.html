@@ -52,6 +52,20 @@ $j(function() {
 <h1>Upload a File to Multiple Locations</h1>
 <form method="post" enctype="multipart/form-data" id="fileForm" class="clearfix" action="/cms/fileForm.php">
 	<table class="standardForm">
+     <colgroup>
+		<col width="250" />
+	</colgroup>
+        <tr>
+			<td>
+				<h4>Title</h4>
+				<em>One line description of the file for use as the title</em>
+			</td>
+			<td>
+				<label>
+					<input type="text" name="description" maxlength="250" size="40" class="required" />
+				</label>
+			</td>
+		</tr>
 		<!-- BEGIN browse -->
 		<tr>
 			<td class="formLabelWidth">
@@ -84,32 +98,10 @@ $j(function() {
 		<tr>
 			<td>
 				<h4>Description</h4>
-				<em>One line description of the file for use as the title</em>
-			</td>
-			<td>
-				<label>
-					<input type="text" name="description" maxlength="250" size="40" class="required" />
-				</label>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<h4>Comments</h4>
 				<em>Any further details you wish to make about the file, useful for enhancing search results</em>
 			</td>
 			<td>
 				<textarea name="comment" cols="40" rows="4"></textarea>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<h4>Hidden</h4>
-				<em>Hide this file from students.</em>
-			</td>
-			<td>
-				<label class="float-left clear">
-					<input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} />
-				</label>
 			</td>
 		</tr>
 		<tr>
@@ -128,6 +120,17 @@ $j(function() {
 					<p>You must be involved in a Class/Group prior to using this.</p>
 					<!-- END no_categories -->
 				</div>
+			</td>
+		</tr>
+        <tr>
+			<td>
+				<h4>Hidden</h4>
+				<em>Hide this file from students.</em>
+			</td>
+			<td>
+				<label class="float-left clear">
+					<input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} />
+				</label>
 			</td>
 		</tr>
 	</table>
