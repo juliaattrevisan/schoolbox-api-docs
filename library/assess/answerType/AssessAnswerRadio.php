@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class AssessAnswerRadio extends AnswerMulti {
+class AssessAnswerRadio extends AnswerRadio {
     const CORRECT_CLASS = 'multiCorrect';
     const INCORRECT_CLASS = 'multiIncorrect';
 
