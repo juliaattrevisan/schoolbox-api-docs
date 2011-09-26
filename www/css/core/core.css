@@ -770,7 +770,6 @@ p.interact {
 p.interact-left {
 	float: left;
 	clear: none;
-	white-space: nowrap;
 	width: 120px;
 }
 
@@ -779,6 +778,8 @@ p.interact-left.home-calendar {
 	margin:0;
 	margin-top:2px;
 }
+
+
 
 .box .thumb {
 	display: block;
@@ -1803,6 +1804,8 @@ color:#000; font-weight:bold; background:#fff;}
     -webkit-border-radius: 4px;
     border-radius: 4px;}
 .dashboard #dashboard-layout #position-right{margin: 0 0 0 .5%}
+
+
 
 /*--------------------------------------------------------------
 EVALUATION
@@ -3178,6 +3181,11 @@ COLOUR ADJUSTMENT BOX
 	padding: 0 0 0 30px;
 	margin: 0;
 }
+
+
+.calendar-event .interact-left{width:40%; margin-right:4%; word-wrap: break-word;}
+.calendar-event .eventListing{padding:0;width:56%;}
+.calendar-event .eventListing span{ background:url(/images/famicons/calendar.png) no-repeat 3px 50%;padding-left:24px;font-weight:normal; display:block;}
 
 /* column width slider */
 #tabs-homepage .slider-house{

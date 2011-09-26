@@ -27,11 +27,13 @@
 	</div>
 	<!-- END config -->
 	<div class="listing clearfix">
-		<ul class="js_happening">
+		<ul class="js_happening calendar-event">
 			<!-- BEGIN group_events -->
 			<li class="{ON_OFF} clearfix">
-				<h4 class="eventListing clearfix" style="background-color:{CAL_COLOUR}">{CAL_NOTE}<br />
-					On {CAL_DATE} {CAL_TIME}</h4>
+
+				<p class="interact-left"><strong>{CAL_DATE}</strong><br>{CAL_TIME}</p>
+                <h4 class="eventListing"><span style="background-color:{CAL_COLOUR}">{CAL_NOTE}</span></h4>
+
 				<div class="hidden-fields clearfix">
 					<h4><!-- BEGIN time --> 
 						<span class="time"><strong>{CAL_TIME}</strong></span> 
