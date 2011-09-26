@@ -10,7 +10,7 @@
 width="25" height="25" border="0"></a></td>
       <td align="right" width="30"><a href="/send.php?id=<?=$_GET['id']?>&save=1"><img src="/images/saveas.gif" width="25" 
 height="25" border="0"></a></td>
-      <td align="right" width="30"><a href='javascript:top.close()'><img src="/images/cross.gif" width="25" height="25" 
+      <td align="right" width="30"><a href='javascript:window.close()'><img src="/images/cross.gif" width="25" height="25"
 border="0"></a></td>
     </tr>
   </table>

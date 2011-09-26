@@ -1,31 +1,36 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
 $j(function() {
+
 	$j('#folderForm').validate({
-		
-		//sweet suzy this is broken.
-		
-		 submitHandler: function(form) {
-			var hasDefaultPerms = $j('input[name=group[{REQUIRED_PERMS}]][value=2][checked=true]').length;
+		debug: true,
+		rules: {
+			'group[{REQUIRED_PERMS}]': {
+				groupCheck: true
+			}
+		}
+	});
+
+
+	jQuery.validator.addMethod("groupCheck", function(value, element, params) {
+			 var hasDefaultPerms = $j("input[name='group[{REQUIRED_PERMS}]']:checked").val();
 			var individualPerms = $j('input[name=groupcheck]').is(':checked');
-		
-			if ((hasDefaultPerms < 1) && !individualPerms) {
+
+			if ((hasDefaultPerms == '0') && !individualPerms) {
 
 				if (confirm("Your group currently does not have write access to the folder you are about to create. Do you wish to continue?")) {
-					
-					form.ajaxSubmit();
-					
+					return true;
 				} else {
-					
 					return false;
-					
 				}
 			} else {
-				form.ajaxSubmit();
-			};
-		
-		 }	
-	});
+				return true;
+			}
+	},"Please select either read or write for this group.");
+
+
+
+
 });
 </script>
 <!-- END custom_head -->

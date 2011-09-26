@@ -31,6 +31,7 @@
 		<meta http-equiv="content-type" 
 		content="text/html;charset=iso-8859-1">
 		<title><?php echo HEADING; ?></title>
+
 	</head>
 
 	<frameset rows="*,26" border="0" framespacing="0" frameborder="no">
