@@ -13,26 +13,9 @@
 	</div>
 	<!-- END config -->
 	<div class="listing">
-		<!-- BEGIN subscribedModerated -->
-		<div class="subscribe awaiting-auth clearfix"> <a href="/group/joinForm.php?leave={ID}&return=true" class="btn delete margin-left-right"><span></span>Unsubscribe</a>
-			<p>You are being moderated and <br />
-				awaiting authorisation. </p>
-		</div>
-		<!-- END subscribedModerated -->
+            <p class="interact">
 
-		<!-- BEGIN subscribed -->
-		<div class="subscribe subscribed clearfix"> <a href="/group/joinForm.php?leave={ID}&return=true" class="btn delete margin-left-right"><span></span>Unsubscribe</a>
-			<p>You are subscribed to this group. </p>
-		</div>
-		<!-- END subscribed -->
-
-		<!-- BEGIN unsubscribed -->
-		<div class="subscribe not-subscribed  clearfix"> <a href="/group/joinForm.php?join={ID}&return=true" class="btn add margin-left-right"><span></span>Subscribe</a>
-			<p>You are not subscribed yet. </p>
-		</div>
-		<!-- END unsubscribed -->
-
-		<p class="interact"> <a href="/resources/{ID}" class="btn"><span></span>Browse Resources</a>
+		 <a href="/resources/{ID}" class="btn"><span></span>Browse Resources</a>
 			<!-- BEGIN addmylinks -->
 			<a href="/cms/myLinksForm.php?url={HOMEPAGE_URL}&description={HEADING}" class="btn"><span></span>Add to My Links</a>
 			<!-- END addmylinks -->
@@ -41,9 +24,18 @@
 			<!-- END manage_page -->
 			<!-- BEGIN stats_data -->
 			<a href="/cms/category/{ID}" class="btn modify"><span></span>Modify Folder</a>
-		</p>
-		<div class="float-fix"></div>
 		<!-- END stats_data -->
+        <!-- BEGIN subscribedModerated -->
+		<a href="/group/joinForm.php?leave={ID}&return=true" class="btn delete"><span></span>Awaiting approval</a>
+		<!-- END subscribedModerated -->
+
+		<!-- BEGIN subscribed -->
+		<a href="/group/joinForm.php?leave={ID}&return=true" class="btn delete"><span></span>Leave Group</a>
+		<!-- END subscribed -->
+
+		<!-- BEGIN unsubscribed --><a href="/group/joinForm.php?join={ID}&return=true" class="btn add"><span></span>Join Group</a>
+		<!-- END unsubscribed -->
+		<div class="float-fix"></div>
 		</p>
 	</div>
 </div>

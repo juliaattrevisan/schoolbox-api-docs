@@ -38,14 +38,18 @@ $this->setVar('unsubscribed_block', '');
 
 /* If you are subscribed but are awaiting authorisation
  */
-if ($groupHandler->isSubscribed($_SESSION['id'], $categoryID, DENY_ACCESS)) {
+$type = $groupHandler->involvedInGroup($_SESSION['id'], $categoryID);
+if ($type == DENY_ACCESS && $type !== NULL) {
 	$this->parse('subscribedModerated_block', 'subscribedModerated');
 }
 
 /* If you are subscribed with something greater than DENY_ACCESS
  */
-else if ($groupHandler->isSubscribed($_SESSION['id'], $categoryID, WRITE_ACCESS)) {
+else if ($type == READ_ACCESS && $type == WRITE_ACCESS) {
 	$this->parse('subscribed_block', 'subscribed');
+}
+else if($type == FULL_ACCESS) {
+    
 }
 
 /* You aren't subscribed to the group yet.
