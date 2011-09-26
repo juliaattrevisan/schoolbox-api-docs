@@ -63,11 +63,11 @@ abstract class Alaress_Date_Strategy_Abstract {
 
 	/**
 	 * Get a datetime string from the components
+	 * bug in mktime.. https://bugs.php.net/bug.php?id=47806 causes this to return 1999 when year = 0
 	 *
 	 * @return string
 	 */
 	protected function getDateTime() {
-        //bug in mktime.. https://bugs.php.net/bug.php?id=47806 causes this to return 1999 when year = 0
         if ($this->getYear() + $this->getDay() + $this->getMonth() > 0) {
             return mktime((int)$this->getHour(), (int)$this->getMinute(), (int)$this->getSecond(), (int)$this->getMonth(), (int)$this->getDay(), (int)$this->getYear());
         }
@@ -160,12 +160,12 @@ abstract class Alaress_Date_Strategy_Abstract {
      * @return void
      */
     private function setByTimestamp($timestamp) {
-        $this->setDay(date('j'), $timestamp);
-        $this->setMonth(date('n'), $timestamp);
-        $this->setYear(date('Y'), $timestamp);
-        $this->setHour(date('H'), $timestamp);
-        $this->setMinute(date('i'), $timestamp);
-        $this->setSecond(date('s'), $timestamp);
+        $this->setDay(date('j', $timestamp));
+        $this->setMonth(date('n', $timestamp));
+        $this->setYear(date('Y', $timestamp));
+        $this->setHour(date('H', $timestamp));
+        $this->setMinute(date('i', $timestamp));
+        $this->setSecond(date('s', $timestamp));
     }
 
 	/**
