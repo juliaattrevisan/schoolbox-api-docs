@@ -23,6 +23,8 @@ if (is_numeric($this->arg[0])) {
     $this->setVar('ASSDESC', Scrub::text($subBox['categoryName'])." - ".Scrub::text($subBox['name']));
 	$this->setVar('CATEGORY_ID', $subBox['cid']);
     $this->setVar('BOX_ID', $subBox['id']);
+    $dueDate = new Alaress_Date_Format($subBox['date'], 'y-m-d');
+    $this->setVar('DUE_DATE', $dueDate->getLong());
 
     /* Get full student list of class to show those who have not submitted
      * If synergy code get synergy students

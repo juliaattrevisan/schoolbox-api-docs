@@ -161,12 +161,6 @@ else if(is_numeric($this->arg[0])) {
 	$this->setVar('no_submissions_block', '');
 	$this->setVar('no_assessments_block', '');
 
-	/* Keep a count of how many submissions and assessments there are,
-	 * so we can display the no-submissions or no-assessments message
-	 */
-	$numSubmissions = 0;
-	$numOnlineAssessments = 0;
-
 	if (is_array($subList)) {
 		foreach($subList as $sub) {
             $this->setVar(array(
@@ -206,28 +200,15 @@ else if(is_numeric($this->arg[0])) {
 
 				$this->parse('assess_head_block','assess_head', true);
 
-				$numOnlineAssessments++;
             }
 			else {
 				$this->parse('sub_head_block','sub_head', true);
 
-				$numSubmissions++;
 			}
 		}
 	}
 	else {
 		$this->setVar('sub_head_block', '');
-	}
-
-	/* Check if there are any submission boxes/online assessments; if not,
-	 * push out the message; otherwise hide it
-	 */
-	if (!$numSubmissions) {
-		$this->parse('no_submissions_block', 'no_submissions');
-	}
-
-	if (!$numOnlineAssessments) {
-		$this->parse('no_assessments_block', 'no_assessments');
 	}
 
 	if (is_array($studentList)) {
