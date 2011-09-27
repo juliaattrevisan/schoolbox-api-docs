@@ -1,33 +1,25 @@
-<div id="assess">
-	<h1>Summary of your Survey<a class="btn modify" href="/survey/modify/{ASSESS_ASSESS_ID}"><span></span>Edit</a></h1>
-	<div class="assess-header">
+<h1>Summary of your Survey<a class="btn modify" href="/assess/modify/{ASSESS_ASSESS_ID}"><span></span>Edit</a></h1>
+<div class="evaluation-content">
 		<h2>{ASSESS_TITLE}</h2>
-		<div class="assess-body clearfix">
-				<div class="duration">
-					<h2><span></span>Duration</h2>
-					<p>{ASSESS_DURATION}</p>
-				</div>
+	<div class="pad-it">
+        <p>{ASSESS_DESCRIPTION}</p>
 
-				<p>{ASSESS_DESCRIPTION}</p>
+        <p class="clearfix">
+            <strong>Survey open:</strong><br />
+            {ASSESS_START}
+            <span class="edit-assess-arrow"></span>
+            {ASSESS_FINISH}
+        </p>
 
-				<p class="clearfix">
-					<strong>Test open:</strong><br />
-					{ASSESS_START}
-					<span class="edit-assess-arrow"></span>
-					{ASSESS_FINISH}
-				</p>
-
-				<hr />
-
-				<ul>
-					<!-- BEGIN section -->
-					<li>
-						<a class="summary" href="/survey/section/modify/{SECTION_SECTION_ID}">
-							<strong>Section {SECTION_SEQUENCE}: {SECTION_TITLE}</strong> ({SECTION_NUMQUESTIONS} questions) - <span style="color:#1965B4; text-decoration:underline">Edit</span>
-						</a>
-					</li>
-					<!-- END section -->
-				</ul>
-		</div>
+        <ul>
+            <!-- BEGIN section -->
+            <li>
+                <a href="/survey/section/modify/{SECTION_SECTION_ID}">
+                    <strong>Section {SECTION_SEQUENCE}: {SECTION_TITLE}</strong> ({SECTION_NUMQUESTIONS} questions) - <span style="color:#1965B4; text-decoration:underline">Edit</span>
+                </a>
+            </li>
+            <!-- END section -->
+        </ul>
 	</div>
 </div>
+
