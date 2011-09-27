@@ -136,16 +136,10 @@ class Eportfolio_Image_Scroller extends Eportfolio_Image_Abstract {
 		$config = $this->getConfig();
 
 		$this->getPage()->setVar(array(
-			'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getDefaultTiming() * 1000
+			'COMPONENT_CONFIG_TIMING_VALUE_MS' => $config['timing'] * 1000
 		));
 
 		foreach($this->getTimings() as $currentTime) {
-			if ($currentTime == $config['timing']) {
-				$this->getPage()->setVar(array(
-					'COMPONENT_CONFIG_TIMING_VALUE_MS' => $currentTime * 1000
-				));
-			}
-
 			$this->getPage()->setVar(array(
 				'COMPONENT_CONFIG_TIMING_VALUE' => $currentTime,
 				'COMPONENT_CONFIG_TIMING_SELECTED' => $currentTime == $config['timing'] ? ' selected="selected"' : '',

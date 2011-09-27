@@ -2,6 +2,7 @@
 
 		//output managers
 		$this->setBlock($componentHandle, "staff_members", "staff_member_block");
+        $this->setBlock($componentHandle, "member_email", "member_email_block");
 
 		require_once SITE_root.'/library/user.php';
 		$userHandler = new User;
@@ -30,7 +31,9 @@
 
             $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
 			$this->setVar("EMAILALL", $emailall);
-		} else
+            $this->parse("member_email_block", "member_email");
+		} else {
 			$this->setVar("staff_member_block", "");
-
+            $this->setVar('member_email_block','');
+        }
 ?>

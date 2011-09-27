@@ -214,3 +214,8 @@ INSERT INTO `eportfolio_comp_category`(`eportfolioComponentCategoryID`,`name`) V
 UPDATE `eportfolio_comp` SET eportfolioCategoryID = (SELECT eportfolioComponentCategoryID FROM `eportfolio_comp_category` WHERE name like 'Images') WHERE method like 'outputImage%';
 
 
+/* Add in seperation of questionbank */
+ALTER TABLE `assess_question_category`     ADD COLUMN `availability` ENUM('assess','survey') NULL AFTER `name`;
+
+/* Add in support for new question templates */
+ALTER TABLE `portal-dev`.`assess_luQuestionType`     ADD COLUMN `template_dir` VARCHAR(255) NULL AFTER `filename`;
