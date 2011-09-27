@@ -11,10 +11,6 @@
 
 $this->setAjax(true);
 
-/*$_POST = array(
-    'instanceId' => 8,
-);*/
-
 /* Simple Validation */
 if ( empty($_POST['instanceId']) ) {
     exit;

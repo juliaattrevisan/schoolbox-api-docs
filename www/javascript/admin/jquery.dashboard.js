@@ -25,37 +25,71 @@
             });
         });
 
-        $('#definition-palette .component').draggable({
-            helper: 'clone',
-            connectToSortable: '#dashboard-layout .component-holder'
-        });
+        function initializeLayout () {
+            $('#dashboard-layout .component-holder').sortable({
+                helper: 'clone',
+                connectWith: '#dashboard-layout .component-holder',
+                update: function (event, ui) {
+                    var $instanceId = $(ui.item).attr('id').match(/instance\-id\-(\d+)/);
 
-        $('#dashboard-layout .component-holder').sortable({
-            helper: 'clone',
-            connectWith: '#dashboard-layout .component-holder',
-            receive: function (event, ui) {
-            },
-            update: function (event, ui) {
-                if ( ui.sender != null ) {
-                    console.log(ui.helper, ui.item, ui.placeholder, ui.sender, ui);
+                    if ( $instanceId != null ) {
+                        $instanceId = $instanceId[1];
+                    }
+
+                    var $definitionId = $(ui.item).attr('class').match(/definition\-id\-(\d+)/)[1];
+
+                    var $groupId = $('#group-select').val();
+
+                    var $position = $(ui.item).parent().parent().attr('id').match(/position\-(\w+)/)[1];
+
+                    var $sequence = $(ui.item).index() + 1;
+
+                    var $component = {
+                        definitionId: $definitionId,
+                        groupId: $groupId,
+                        position: $position,
+                        sequence: $sequence
+                    };
+
+                    if ( $instanceId != null ) {
+                        $component.instanceId = $instanceId;
+                    }
+
+                    $.post('/adminv2/dashboard/save-instance', $component, function ($instance) {console.log($instance);
+                        $(ui.item).attr('id', 'instance-id-'+$instance.id);
+                    });
+                },
+                placeholder: 'marker',
+                items: '.component',
+                cursor: 'move',
+                stop: function(event, ui) {
+                    if (!(ui.item.find('.delete-this').length > 0)) {
+                        ui.item.append('<a href="#" class="delete-this">x</a>')
+                    }
                 }
-            },
-            placeholder: 'marker',
-            items: '.component',
-            cursor: 'move',
-            stop: function(event, ui) {
-                if (!(ui.item.find('.delete-this').length > 0)) {
-                ui.item.append('<a href="#" class="delete-this">x</a>')
-                }
-                console.log(ui.item);
-            }
-			
-        });
+
+            });
+
+            $('#definition-palette .component').draggable({
+                helper: 'clone',
+                connectToSortable: '#dashboard-layout .component-holder'
+            });
+        }
+
+        initializeLayout();
 
         $('.delete-this').live('click',function() {
+            var $instanceId = $(this).parent().attr('id').match(/^instance\-id\-(\d+)$/)[1];
+
             $(this).parent().slideUp(100,function(){
-                $(this).remove()
+                $(this).remove();
             })
+
+
+            $.post('/adminv2/dashboard/remove-instance', {instanceId: $instanceId}, function () {
+
+            });
+
             return false;
         })
 
@@ -65,29 +99,12 @@
             $.get('/adminv2/dashboard/get-dashboard/'+$groupId, function ($layout) {
                 $('#dashboard-layout').fadeOut(function() {
                     $(this).empty().append($layout);
+
                     $(this).fadeIn();
-                });
 
-              $('#group-select').change(function () {
-                    var $groupId = $(this).val();
-
-                    $.get('/adminv2/dashboard/get-dashboard/'+$groupId, function ($layout) {
-                       $('#dashboard-layout').fadeOut(function() {
-                            $(this).empty().append($layout);
-                            $(this).fadeIn();
-                        });
-
-                        $('#dashboard-layout .layout-position').sortable({
-                            connectWith: '#dashboard-layout .component-holder',
-                            helper: 'clone'
-                        });
-                    });
-                })
-
-                $('#dashboard-layout div.layout-position').sortable({
-                    connectWith: '#dashboard-layout .component-holder'
+                    initializeLayout();
                 });
             });
-        })
+        });
     });
 })(jQuery);

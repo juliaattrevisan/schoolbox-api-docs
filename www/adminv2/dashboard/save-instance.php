@@ -11,13 +11,6 @@
 
 $this->setAjax(true);
 
-/*$_POST = array(
-    'groupId' => '1',
-    'definitionId' => 2,
-    'position' => 'top',
-    'sequence' => 1
-);*/
-
 /* Simple Validation */
 foreach ( array('groupId', 'definitionId', 'position', 'sequence') as $field ) {
     if ( empty($_POST[$field]) ) {
@@ -25,8 +18,14 @@ foreach ( array('groupId', 'definitionId', 'position', 'sequence') as $field ) {
     }
 }
 
+if ( !empty($_POST['instanceId']) ) {
+    $instance = Component_InstanceMapper::getInstance()->findById($_POST['instanceId']);
+}
+else {
+    $instance = new Component_Instance;
+}
+
 if ( $definition = Component_DefinitionMapper::getInstance()->findById($_POST['definitionId']) ) {
-    $instance = new Component_Instance();
 
     $instance->definitionId = $definition->id;
     $instance->module       = 'dashboard';
@@ -35,4 +34,7 @@ if ( $definition = Component_DefinitionMapper::getInstance()->findById($_POST['d
     $instance->sequence     = $_POST['sequence'];
 
     Component_InstanceMapper::getInstance()->save($instance);
+
+    header('Content-type: application/json');
+    echo json_encode($instance);
 }

@@ -27,6 +27,8 @@ $componentFactory = new Component_Dashboard_Factory(new User, $this);
 
 $componentCollection = $componentFactory->buildComponentList($groupId);
 
+$occupiedPositionList = array();
+
 foreach($componentCollection as $component) {
     $position = "position_{$component->position}";
 
@@ -35,10 +37,20 @@ foreach($componentCollection as $component) {
     }
 
     $this->setVar(array(
-        'component.id'              => $component->id,
+        'component.instance.id'     => $component->instance->id,
         'component.definition.id'   => $component->definition->id,
         'component.definition.name' => $component->definition->name,
     ));
 
     $this->parse("{$position}_block", $position, true);
+
+    if ( !in_array($component->position, $occupiedPositionList) ) {
+        $occupiedPositionList[] = $component->position;
+    }
+}
+
+$emptyPositionList = array_diff(array('top', 'left', 'right'), $occupiedPositionList);
+
+foreach ( $emptyPositionList as $emptyPosition ) {
+    $this->setVar("position_{$emptyPosition}_block", '');
 }
