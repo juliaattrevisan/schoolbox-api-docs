@@ -55,7 +55,7 @@
                         $component.instanceId = $instanceId;
                     }
 
-                    $.post('/adminv2/dashboard/save-instance', $component, function ($instance) {console.log($instance);
+                    $.post('/adminv2/dashboard/save-instance', $component, function ($instance) {
                         $(ui.item).attr('id', 'instance-id-'+$instance.id);
                     });
                 },

@@ -19,7 +19,7 @@ class Component_Dashboard_HelpdeskController extends Component_Dashboard_Control
         parent::__construct($instance, $user, $sitepage);
 
         /* TODO: Integrate this library in to the main library folder */
-        require_once $_SERVER['DOCUMENT_ROOT'] . 'modules/helpdesk/helpdesk.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/helpdesk/helpdesk.php';
 
         $this->helpdesk = new Helpdesk;
     }
