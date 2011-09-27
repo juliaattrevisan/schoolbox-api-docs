@@ -4,7 +4,7 @@
 <script type="text/javascript">
 $j(document).ready(function() {
 
-    $j('.assess-header form').submit(function() {
+    $j('.evaluation-header form').submit(function() {
         $j.post($j(this).attr('action'), $j(this).serialize(), function(responseText) {
 
 		   console.log('return ' + responseText);
@@ -36,21 +36,21 @@ $j(document).ready(function() {
     /* Submit all the questions before switching between sections
      */
     $j('.step-nav, .go-back, .go-to, .tick').click(function() {
-		$j('.assess-header form').each(function(elem, value) {
+		$j('.evaluation-header form').each(function(elem, value) {
 			$j(this).submit();
 		});
 	});
 
 	$j('.checkbox').click(function() {
-		$j(this).closest('.assess-header form').submit();
+		$j(this).closest('.evaluation-header form').submit();
 	});
 
 	$j('.textarea-container textarea').blur(function() {
-        $j(this).closest('.assess-header form').submit();
+        $j(this).closest('.evaluation-header form').submit();
 	});
 
-	$j('.assess-body input').blur(function() {
-		$j(this).closest('.assess-header form').submit();
+	$j('.evaluation-body input').blur(function() {
+		$j(this).closest('.evaluation-header form').submit();
 	});
 
     /* Set up countdown
@@ -85,61 +85,49 @@ $j(document).ready(function() {
 });
 </script>
 <!-- END custom_head -->
-<div id="assess" class="take-test">
-	<div class="col-1">
-		<h2>Survey Section: {SECTION_TITLE}</h2>
-		<div class="assess-body margin-bottom-10">
-			<h3 class="test-details">Survey Details:</h3>
-			<p class="pad-it">{SECTION_DESCRIPTION}</p>
-		</div>
+<div class="evaluation-content take-test">
+    <h2>Survey Section: {SECTION_TITLE}</h2>
+	<h3 class="test-details">Survey Details:</h3>
+	<p class="pad-it wysywig">{SECTION_DESCRIPTION}</p>
 
 		<!-- BEGIN question -->
-		<div class='assess-header'>
-			<form action="/survey/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
-				<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}</h3>
-				<div class="assess-body">
-
-					<!-- BEGIN answerInputs -->
-					<!-- END answerInputs -->
-
-					<!--<input type="submit" value="Save Answer" class="save-answer" />-->
-					<div class="float-fix"></div>
-				</div>
-			</form>
-		</div>
+		<form action="/assess/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
+			<div class="wysiwyg no-pad clearfix">
+			<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}</h3>
+			</div>
+			<div class="evaluation-answer clearfix">
+				<!-- BEGIN answerInputs -->
+				<!-- END answerInputs -->
+			</div>
+		</form>
 		<!-- END question -->
 
-		<!-- BEGIN endAssess -->
-		<a href="/survey/end/{ASSESS_ASSESS_ID}" class="btn tick"><span></span>Finish</a>
-		<!-- END endAssess -->
+		<p class="clearfix text-align-right" >
+			<!-- BEGIN endAssess -->
+			<a href="/assess/end/{ASSESS_ASSESS_ID}" class="btn tick finish-assessment"><span></span>Finish</a>
+			<!-- END endAssess --> .
 
-		<!-- BEGIN prevSection -->
-		<a href="/survey/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="btn go-back float-left"><span></span>Previous Section</a>
-		<!-- END prevSection -->
+			<!-- BEGIN prevSection -->
+			<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="btn go-back float-left"><span></span>Previous Section</a>
+			<!-- END prevSection -->
 
-		<!-- BEGIN nextSection -->
-		<a href="/survey/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="btn go-to"><span></span>Next Section</a>
-		<!-- END nextSection -->
-	</div>
-	<div class="col-2">
-		<h2>Survey Name: {ASSESS_TITLE}</h2>
-		<div class="assess-body">
-			<div class="time-holder"> <strong>Time remaining</strong>
-				<div id="countdown"></div>
+			<!-- BEGIN nextSection -->
+			<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="btn go-to"><span></span>Next Section</a>
+			<!-- END nextSection -->
+		</p>
+</div>
+<div class="evaluation-menu">
+
+	<h2>Survey Name: {ASSESS_TITLE}</h2>
+	<div class="pad-it">
+		<!-- BEGIN sectionPercentageComplete -->
+		<div id="sectionPercentageComplete_{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}" class="evaluation-section percentage-complete">
+			<h3>Section {SECTION_SEQUENCE} - <span>{SECTION_PERCENTAGE_COMPLETE_TITLE}</span></h3>
+			<div class="pad-it">
+				<div class="percentage-bar" style="width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}%"></div>
+				<div class="percentage-text"><em>{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}</em>% Complete</div>
 			</div>
-			You began at: {ATTEMPT_START}<br />
-			You must finish this survey by: {ATTEMPT_END}
-			<hr />
-
-			<!-- BEGIN sectionPercentageComplete -->
-			<div id="sectionPercentageComplete_{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}" class="percentage-complete">
-				<h3>Section {SECTION_SEQUENCE} - <span>{SECTION_PERCENTAGE_COMPLETE_TITLE}</span></h3>
-				<div class="pad-it">
-					<div class="percentage-bar" style="width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}%"></div>
-					<div class="percentage-text"><em>{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}</em>% Complete</div>
-				</div>
-			</div>
-			<!-- END sectionPercentageComplete -->
 		</div>
+		<!-- END sectionPercentageComplete -->
 	</div>
 </div>
