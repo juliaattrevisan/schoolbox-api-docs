@@ -224,7 +224,7 @@ else {
 					$page->backToTheFuture(1);
 				}
 				else {
-					localRedir($_GET['redirect']);
+					SitePage::localRedir($_GET['redirect']);
 				}
 			}
 			else {

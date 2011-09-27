@@ -13,7 +13,8 @@ if (empty($config['pixel'])) {
 }
 
 $this->setVar(array(
-	'COMPONENT_PIXEL' => $config['pixel']
+	'COMPONENT_PIXEL' => $config['pixel'],
+    'COMPONENT_CONFIG_TIMING_VALUE_MS' => $config['timing']?$config['timing'] * 1000:'2000',
 ));
 
 $this->parse('config_block', 'config', true);
@@ -52,12 +53,6 @@ else {
 $allTimes = array(2, 5, 10, 15, 20, 30);
 
 foreach($allTimes as $currentTime) {
-	if ($currentTime == $config['timing']) {
-		$this->setVar(array(
-			'COMPONENT_CONFIG_TIMING_VALUE_MS' => $currentTime * 1000
-		));
-	}
-
 	$this->setVar(array(
 		'COMPONENT_CONFIG_TIMING_VALUE' => $currentTime,
 		'COMPONENT_CONFIG_TIMING_SELECTED' => $currentTime == $config['timing'] ? ' selected="selected"' : '',

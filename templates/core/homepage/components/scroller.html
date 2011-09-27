@@ -3,7 +3,7 @@
 <script type="text/javascript">
 $j(window).load(function(){
 	$j('.cycle-content').cycle({
-		timeout: {COMPONENT_CONFIG_TIMING_VALUE_MS},
+		timeout: {COMPONENT_CONFIG_TIMING_VALUE},
 		cleartype: true,
 		before: function(curr, next, opts) {
 			$j(next).css('margin-left', -$j(next).width()/2);
@@ -49,7 +49,7 @@ $j(window).load(function(){
 <!-- END custom_head -->
 
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
-    <h2>Image Scroller</h2>
+    <h2>Image Carousel</h2>
     <!-- BEGIN config -->
     <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
 	<a class="close-delete" href="#"><span>X</span></a>

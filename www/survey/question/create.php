@@ -136,7 +136,7 @@ else {
 
             /* Load answer template into answerOption block
              */
-            $this->setFile('answerFormFragment', 'survey/answer/' . $factory->getQuestionType($this->arg[1]) . '/create.html');
+            $this->setFile('answerFormFragment', 'survey/answer/' . $factory->getQuestionTemplate($this->arg[1]) . '/create.html');
             $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
             /* Render existing answers, or clear if none

@@ -92,7 +92,7 @@ else {
 
     /* Load answer template into answerOption block
      */
-    $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($question['type_id']) . '/modify.html');
+    $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionTemplate($question['type_id']) . '/modify.html');
     $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
     $answerHandler->modify($this, $question['question_id']);

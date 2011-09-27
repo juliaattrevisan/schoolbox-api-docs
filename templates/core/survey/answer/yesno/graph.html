@@ -1,0 +1,27 @@
+<script type='text/javascript'>
+$j(function() {
+	$j.plot($j("#{GRAPH_ID}"), [
+		<!-- BEGIN series -->
+		{ label: "{SERIES_LABEL}", data: {SERIES_DATA} }<!-- BEGIN series_separator -->,<!-- END series_separator -->
+		<!-- END series -->
+	],
+	{
+		series: {
+			pie: {
+				show: true,
+                label: {
+                    show: true,
+                    radius: 7/8,
+                    formatter: function(label, series){
+                        return '<div style="font-size:11px;text-align:center;padding:2px;color:#000;font-weight:bold;">'+label+'<br/>'+Math.round(series.percent)+'%</div>';
+                    }
+                }
+			}
+		},
+		legend: {
+			show: false
+		}
+	});
+});
+</script>
+<div id='{GRAPH_ID}' style="width:600px;height:300px;"></div>

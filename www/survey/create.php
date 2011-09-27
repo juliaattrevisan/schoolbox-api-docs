@@ -23,8 +23,9 @@ if (!empty($_POST)) {
 
     /* Format date, time
      */
-    $start = new Alaress_Date_Format($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['minute'].' '.$_POST['start']['meridiem']);
-    $finish = new Alaress_Date_Format($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem']);
+    print $_POST['start']['date'];
+    $start = new Alaress_Date_Format($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['minute'].' '.$_POST['start']['meridiem'], 'd/m/y');
+    $finish = new Alaress_Date_Format($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem'], 'd/m/y');
 
     $assess_id = $assessHandler->create(array(
         'category_id' => Scrub::text($_POST['category_id']),
@@ -61,6 +62,7 @@ else {
     $this->setTitle('Manage Assessment');
 
 	$assessDate = new Alaress_Date_Format(time(), 'U');
+    $assessEndDate = new Alaress_Date_Format(strtotime('+1 week'), 'U');
 
     $this->setVar(array(
         'ACTION' => 'create',
@@ -69,7 +71,7 @@ else {
         'ASSESS_TITLE' => '',
         'ASSESS_DESCRIPTION' => '',
         'ASSESS_START_DATE'  => $assessDate->getLocalShort(),
-        'ASSESS_FINISH_DATE' => $assessDate->getLocalShort()
+        'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort()
     ));
 
     /* Select default settings

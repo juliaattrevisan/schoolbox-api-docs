@@ -49,6 +49,11 @@ $tableList = array(
 		'name'      => 'newsTopic',
 		'title'     => 'News Topics',
 		'index'     => 'newsTopicID'
+	),
+    	array(
+		'name'      => 'assess_question_category',
+		'title'     => 'Question Bank',
+		'index'     => 'question_category_id'
 	)
 );
 
