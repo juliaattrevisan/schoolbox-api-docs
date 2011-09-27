@@ -32,6 +32,11 @@ $j(document).ready(function() {
 		}
 	}
 
+
+if ($j('.question-type-select :selected').text() == 'Import Question') {
+		$j('.xml-add').show();
+	}
+
 	/* Change state
 	 */
 	$j('#type_id').change(function() {
@@ -109,7 +114,7 @@ $j(document).ready(function() {
 			<input type="submit" name="create" id="create" value="Add Question" class="submit-btn-plain"/>
 		</label>
 	</form>
-
+<div class="hide xml-add">
 	<h2>Import a question and answer from an XML file</h2>
 	<form action="/assess/question/import/{SECTION_ID}" method="post" class="clearfix" enctype="multipart/form-data">
 		<p>Select an Assess Question XML file to import.</p>
@@ -121,6 +126,7 @@ $j(document).ready(function() {
 			<input type="submit" value="Import from XML file"  class="submit-btn-plain float-none no-marg"/>
 		</label>
 	</form>
+	</div>
 </div>
 
 <div class="evaluation-menu">
