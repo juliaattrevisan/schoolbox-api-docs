@@ -9,12 +9,9 @@ $j(function() {
 </script>
 <div id="assess">
 	<h1>Submissions for {ASSESS_TITLE}</h1>
-	<p>
-		Download a text file containing all these results which can be opened
-		in Excel:
-		<a href="/assess/exportResponseToCSV/{ASSESS_ASSESS_ID}">Download</a>
-	</p>
-
+	<span class="header_option">
+    <a href="/assess/exportResponseToCSV/{ASSESS_ASSESS_ID}" class="btn download"><span></span>Download All</a>
+</span>
 	<table>
 		<thead>
 			<tr>

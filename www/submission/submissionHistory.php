@@ -1,10 +1,4 @@
 <?php
-
-require_once SITE_root . '/library/submission.php';
-require_once SITE_root . '/library/submissionReturn.php';
-require_once SITE_root . '/library/group.php';
-require_once SITE_root . '/library/user.php';
-
 $this->setFile(TEMPLATE_content, 'submission/submissionHistory.html');
 $this->setTab('submission');
 
@@ -42,7 +36,7 @@ if (!isset($user['uid'])) {
 }
 
 
-$categoryList = $groupHandler->involvedCategoryList($user['uid']);
+$categoryList = $groupHandler->involvedInCategoryList($user['uid']);
 
 if (is_array($categoryList)) {
 	foreach($categoryList as $category) {

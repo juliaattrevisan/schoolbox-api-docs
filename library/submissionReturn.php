@@ -34,7 +34,6 @@ class SubmissionReturn extends DeprecatedModel {
 		if (is_numeric($limit)) {
 			$query .= " LIMIT $limit";
 		}
-
 		return $this->db->getAll($query);
 	}
 
