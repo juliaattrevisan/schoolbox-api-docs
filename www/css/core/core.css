@@ -4328,7 +4328,7 @@ bord er-collapse: separate;
 }
 
 
-.timetable td.dayCurrent.current {
+.timetable td.dayCurrent.current, #timetable td.current {
 	background:#06c;
 	color:#fff;
 }
