@@ -16,6 +16,8 @@ class Component_Dashboard_WenonaIntranetController extends Component_Dashboard_C
     }
 
     public function renderTemplate ($templateHandle) {
+        $this->loadTemplate($templateHandle, 'empty');
+
         return true;
     }
 
