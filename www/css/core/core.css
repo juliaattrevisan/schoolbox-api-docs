@@ -4321,10 +4321,20 @@ bord er-collapse: separate;
 	text-align:center;
 }
 
-.timetable td.current {
+.timetable td.dayCurrent {
+	background:#a0a0a0;
+	color:#fff;
+
+}
+
+
+.timetable td.dayCurrent.current {
 	background:#06c;
 	color:#fff;
 }
+
+
+
 
 .home { position:relative; }
 
