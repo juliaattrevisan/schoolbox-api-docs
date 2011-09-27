@@ -4,8 +4,8 @@ $j(function() {
 		calendarPos($j(this),350,50);
 	});
 	
-	$j('.text ul.js_happening li').click(function(){
-		calendarPos($j(this),275,50);	
+	$j('.box ul.js_happening li').click(function(){
+		calendarPos($j(this),0,50);
 	})
 		
 	$j('#nav li.parent > a span').each(function() {

@@ -1840,6 +1840,10 @@ EVALUATION
 
 .evaluation-content .standardForm,.evaluation-content .questionForm{padding:0;}
 .evaluation-content.student-review .question{padding:0; background:none;}
+
+.evaluation-content.question-bank .question{border:1px solid #e0e0e0; background:#f8f8f8; margin-bottom:16px; padding:7px 16px; }
+.evaluation-content.question-bank .question p{ padding:7px 16px;  background:#fff;}
+.evaluation-content.question-bank h3{background:#fff; font-size:16px; padding:7px 16px; margin-bottom:16px; border:1px solid #000;}
 .evaluation-content label{font-weight:bold; padding:8px 0; border-bottom:1px solid #ededed}
 .evaluation-content label.error{padding:3px 0; border-bottom:1px solid #FFCC00;}
 .evaluation-content label:first-child{padding:0 0 8px 0}

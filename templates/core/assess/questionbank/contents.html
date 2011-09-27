@@ -14,46 +14,44 @@ $j(function() {
 });
 
 </script>
-
+<div class="evaluation-content question-bank">
 <h2>Online Assessment Question Bank</h2>
 	<form id='questionBankForm' action='/assess/questionbank/addToSection' method='post'>
 		<input name='section_id' type='hidden' value='{SECTION_ID}' />
-		<ul>
+
 		<!-- BEGIN question_category -->
-			<li>
-				<h2>{QUESTION_CATEGORY_NAME}</h2>
-				<ul>
+
+				<h3><strong>{QUESTION_CATEGORY_NAME}</strong></h3>
+
 					<!-- BEGIN question -->
-					<li>
+					<div class="question">
+
+						{QUESTION}({QUESTION_TYPE}, {MARKS} marks)
+
 						<!-- BEGIN show_input -->
-						<input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}' /> Copy into assess
+						<label><input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}' /> Copy into assess</label>
 						<!-- END show_input -->
+						<label><input name='delete_question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}' />Delete from QuestionBank</label>
+					</div>
 
-						<input name='delete_question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}' /> Delete from QuestionBank
-
-						<p>
-							{QUESTION}
-						</p>
-						({QUESTION_TYPE}, {MARKS} marks)
-						<hr />
-					</li>
 					<!-- END question -->
-				</ul>
-			</li>
-		<!-- END question_category -->
-		</ul>
 
+
+		<!-- END question_category -->
+
+		<p class="clearfix">
 		<!-- BEGIN show_submit -->
-		<input type='submit' value='Copy to section' />
+		<input type='submit' value='Copy to section' class="submit-btn-plain"/>
 		<!-- END show_submit -->
 
 		<!-- BEGIN show_delete -->
-		<input id='deleteButton' type='button' value='Remove from QuestionBank' />
+		<input id='deleteButton' type='submit' value='Remove from QuestionBank' class="submit-btn-plain"/>
 		<!-- END show_delete -->
 
 		<!-- BEGIN no_questions -->
-		<p>There are no questions in the Question Bank.</p>
+		There are no questions in the Question Bank.
 		<!-- END no_questions -->
+		</p>
 	</form>
 </div>
 
