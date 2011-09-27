@@ -44,7 +44,7 @@ class Component_Dashboard_LinkController extends Component_Dashboard_ControllerA
 
         foreach ( $cidList as $cid ) {
             $tmp = $this->link->getAllInCategory($cid);
-            $this->linkList = array_merge($linkList, $tmp);
+            $this->linkList = array_merge($linkList, array($tmp));
         }
 
         return true;
@@ -54,6 +54,8 @@ class Component_Dashboard_LinkController extends Component_Dashboard_ControllerA
         if ( !$this->loadTemplate($templateHandle, 'link') ) {
             return false;
         }
+
+        $this->setBlock($templateHandle, 'quicklink', 'quicklink_block');
 
         if ( count($this->linkList) > 0 ) {
             foreach ( $this->linkList as $link ) {

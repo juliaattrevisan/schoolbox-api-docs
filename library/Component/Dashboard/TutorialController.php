@@ -25,7 +25,7 @@ class Component_Dashboard_TutorialController extends Component_Dashboard_Control
 
         /* TODO: Integrate this library in to the main library folder */
         require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
-        $this->event = $event;
+        $this->event = new Event;
     }
 
     public function execute () {

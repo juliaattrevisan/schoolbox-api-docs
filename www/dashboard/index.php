@@ -17,6 +17,8 @@ $groupID = $_SESSION['gid'];
 $componentFactory = new Component_Dashboard_Factory(new User, $this);
 $componentCollection = $componentFactory->buildComponentList($groupID);
 
+$occupiedPositionList = array();
+
 foreach ($componentCollection as $component) {
 
     $templateTarget = "component_position_{$component->position}";
@@ -26,7 +28,17 @@ foreach ($componentCollection as $component) {
 
         if ( $component->renderTemplate($templateHandle) !== false ) {
             $this->parse($templateTarget, $templateHandle, true);
+
+            if ( !in_array($component->instance->position, $occupiedPositionList) ) {
+                $occupiedPositionList[] = $component->instance->position;
+            }
         }
 
     }
+}
+
+$emptyPositionList = array_diff(array('top', 'left', 'right'), $occupiedPositionList);
+
+foreach ( $emptyPositionList as $emptyPosition ) {
+    $this->setVar("component_position_{$emptyPosition}", '');
 }
