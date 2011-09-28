@@ -1,5 +1,5 @@
 UPDATE `config`
-SET `value` = '11.5' where `name` = 'site_version';
+SET `value` = '11.5.0' where `name` = 'site_version';
 
 /* Added availability for questions and assessments/surveys
  */
