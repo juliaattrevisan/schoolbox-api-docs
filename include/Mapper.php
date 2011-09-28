@@ -35,6 +35,7 @@ abstract class Mapper {
      */
     const TYPE_LOB = 3;
 
+
     protected $database;
 
     protected $table;

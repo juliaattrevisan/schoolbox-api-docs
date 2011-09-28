@@ -36,6 +36,31 @@ class Component_DefinitionMapper extends Mapper {
             'type'       => Mapper::TYPE_STRING,
         ));
 
+        $this->hasMap(array(
+            'column'     => 'module',
+            'property'   => 'module',
+            'type'       => Mapper::TYPE_STRING,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'visible',
+            'property'   => 'visble',
+            'type'       => Mapper::TYPE_STRING,
+        ));
+
         parent::mapping();
+    }
+
+    public function findAll () {
+        $statement = $this->database->prepare("
+            SELECT {$this->getColumnString()}
+            FROM `{$this->table}` WHERE visible = 'true'
+        ");
+
+        $statement->execute();
+
+        $rowset = $statement->fetchAll();
+
+        return $this->hydrate($rowset);
     }
 }

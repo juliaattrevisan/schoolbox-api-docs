@@ -63,7 +63,7 @@ class Component_InstanceMapper extends Mapper {
             SELECT {$this->getColumnString('ci')}, {$definitionMapper->getColumnString('cd')}
             FROM `{$this->table}` ci
             LEFT JOIN `component_definition` cd ON ci.component_definition_id = cd.id
-            WHERE `module` = :module
+            WHERE ci.`module` = :module
                 AND `identifier` = :identifier
             ORDER BY ci.sequence ASC
         ");

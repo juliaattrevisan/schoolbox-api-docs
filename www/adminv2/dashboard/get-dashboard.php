@@ -28,7 +28,7 @@ $componentFactory = new Component_Dashboard_Factory(new User, $this);
 $componentCollection = $componentFactory->buildComponentList($groupId);
 
 $occupiedPositionList = array();
-
+print_r($componentCollection);
 foreach($componentCollection as $component) {
     $position = "position_{$component->position}";
 
