@@ -17,33 +17,28 @@
 		<ul>
 			<!-- BEGIN assess -->
 			<li class="{ON_OFF} clearfix">
-				<h4><strong>{ASSESS_TITLE}</strong><br />
-					Starts on {ASSESS_START_DATE}<br />
-					Due by {ASSESS_FINISH_DATE}<br />
-					<br />
-					<em>{ASSESS_DESCRIPTION}</em></h4>
-				<p class="small-right"> 
-					<!-- BEGIN resumeLink --> 
-					<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}" >Resume Test</a><br />
-					<!-- END resumeLink --> 
-					
-					<!-- BEGIN studentLink --> 
-					<a href="/assess/intro/{ASSESS_ASSESS_ID}" >Take test</a><br />
-					<!-- END studentLink --> 
-					
-					<!-- BEGIN teacherLink --> 
-					
+                <!-- BEGIN assessLink -->
+				<h4><a href="/assess/intro/{ASSESS_ASSESS_ID}" >{ASSESS_TITLE}</a></h4>
+                <!-- END assessLink -->
+                <!-- BEGIN resumeLink -->
+                <h4><a href="/assess/attempt/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}">{ASSESS_TITLE}</a></h4>
+                <!-- END resumeLink -->
+                <!-- BEGIN assessNoLink -->
+                <h4>{ASSESS_TITLE}</h4>
+                <!-- END assessNoLink -->
+			    <p class="summ hide-on-small">{ASSESS_DESCRIPTION}</p>
+				<p class="small-right">
+                    <!-- BEGIN dueDate -->
+                    {ASSESS_FINISH_DATE}<br />
+                    <!-- END dueDate -->
+
+					<!-- BEGIN teacherLink -->
 					<a href="/assess/results/{ASSESS_ASSESS_ID}">View Results</a><br />
 					<a href="/assess/modify/{ASSESS_ASSESS_ID}">Modify</a><br />
-					<!-- END teacherLink --> 
+					<!-- END teacherLink -->
+
 					
-					<!-- BEGIN resultsLink --> 
-					<a href="/submission/dueWork" >View Results</a><br />
-					<!-- END resultsLink --> 
-					
-					<!-- BEGIN hasCompleted --> 
-					<strong>Completed</strong> 
-					<!-- END hasCompleted --> 
+
 				</p>
 			</li>
 			<!-- END assess -->

@@ -7,10 +7,9 @@ require_once SITE_root . '/library/assess/AssessSection.php';
 $this->setBlock($componentHandle, 'assess', 'assess_block');
 $this->setBlock($componentHandle, 'createAssessment', 'createAssessment_block');
 $this->setBlock('assess', 'teacherLink', 'teacherLink_block');
-$this->setBlock('assess', 'studentLink', 'studentLink_block');
-$this->setBlock('assess', 'resultsLink', 'resultsLink_block');
 $this->setBlock('assess', 'resumeLink', 'resumeLink_block');
-$this->setBlock('assess', 'hasCompleted', 'hasCompleted_block');
+$this->setBlock('assess', 'assessLink', 'assessLink_block');
+$this->setBlock('assess', 'assessNoLink', 'assessNoLink_block');
 
 /* Remove resumeLink by default
  */
@@ -23,14 +22,11 @@ $sectionHandler = new AssessSection();
 $allAssess = $assessHandler->getList($categoryID);
 
 if ($groupHandler->isStaff()) {
-    $this->setVar('studentLink_block', '');
-	$this->setVar('resultsLink_block', '');
     $this->parse('teacherLink_block', 'teacherLink');
     $this->parse('createAssessment_block', 'createAssessment');
 }
 else {
     $this->setVar('teacherLink_block', '');
-    $this->parse('studentLink_block', 'studentLink');
     $this->setVar('createAssessment_block', '');
 }
 
@@ -41,65 +37,18 @@ if (is_array($allAssess)) {
 
 		/* Hide it from students if the start date hasn't passed yet
 		 */
-		if ($groupHandler->isStudent() && (((int)time() - (int)strtotime($currentAssess['start'])) < 0)) {
+		if ($groupHandler->isStudent() && ((int)time() < (int)strtotime($currentAssess['start']))) {
 			$this->setVar('assess_block', '');
 		}
 		else {
 			$this->setVar(array(
 				'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
 				'ASSESS_TITLE' => $currentAssess['title'],
-				'ASSESS_START_DATE' => date('jS F Y, g:i:sa', strtotime($currentAssess['start'])),
-				'ASSESS_FINISH_DATE' => date('jS F Y, g:i:sa', strtotime($currentAssess['finish'])),
+				'ASSESS_START_DATE' => date('jS M Y', strtotime($currentAssess['start'])),
+				'ASSESS_FINISH_DATE' => date('jS M Y', strtotime($currentAssess['finish'])),
 				'ASSESS_DESCRIPTION' => $currentAssess['description'],
 				'ON_OFF' => $i%2 ? 'dark' : '',
 			));
-
-			/* If at least one attempt was reviewed, provide link to Due
-			 * Work screen, where the attempts are all listed
-			 */
-			if (!$groupHandler->isStaff()) {
-				$allAttempts = $attemptHandler->getListForUser($currentSurvey['assess_id'], $_SESSION['id']);
-
-				if (is_array($allAttempts) && count($allAttempts)) {
-					$assessAttempted = false;
-
-					foreach($allAttempts as $currentAttempt) {
-						if ($currentAttempt['finish'] == '0000-00-00 00:00:00') {
-							$firstSection = $sectionHandler->getFirst($currentAssess['assess_id']);
-
-							$this->setVar(array(
-								'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
-								'ASSESS_SECTION_ID' => $firstSection['section_id'],
-							));
-
-							$this->parse('resumeLink_block', 'resumeLink');
-							$this->setVar('hasCompleted_block', '');
-						}
-						else {
-							$this->setVar('resumeLink_block', '');
-							$this->parse('hasCompleted_block', 'hasCompleted');
-						}
-
-						if ($assessAttempted == false) {
-							if (($currentAttempt['reviewed_at'] != null)) {
-								$this->parse('resultsLink_block', 'resultsLink');
-
-								$assessAttempted = true;
-							}
-							else {
-								$this->setVar('resultsLink_block', '');
-							}
-						}
-					}
-				}
-				else {
-					$this->setVar('resultsLink_block', '');
-					$this->setVar('hasCompleted_block', '');
-				}
-			}
-			else {
-				$this->setVar('hasCompleted_block', '');
-			}
 
 			/* Check if you have completed an assessment already
 			 *
@@ -117,52 +66,60 @@ if (is_array($allAssess)) {
 			 * 3. The current time has passed the test's starting time
 			 * 4. You aren't the owner of the test
 			 */
-			if ($currentAssess['allow_resit'] == 1) {
+            if(is_array($attempt)) {
+                // If the last assess is not completed provide resume link
+                if ($attempt['finish'] == '0000-00-00 00:00:00' && ($attemptTimeRemaining < 0 || $currentAssess['duration'] == Assess::UNLIMITED_DURATION)) {
+                    $firstSection = $sectionHandler->getFirst($currentAssess['assess_id']);
 
-				/* Disabled: doing so will allow teachers to give their test a "dry run" and
-				 * they can delete their attempts afterwards
-				 *
-				if ($assessHandler->isOwner($currentAssess['assess_id'])) {
-					$this->setVar('studentLink_block', '');
-				}
-				 */
-				if (($currentAssess['duration'] == Assess::UNLIMITED_DURATION) || (strtotime($currentAssess['finish']) > time())) {
-					$this->parse('studentLink_block', 'studentLink');
-				}
-				else {
-					$this->setVar('studentLink_block', '');
-				}
+                    $this->setVar(array(
+                        'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
+                        'ASSESS_SECTION_ID' => $firstSection['section_id'],
+                        'ASSESS_FINISH_DATE'     => 'In progress'
+                    ));
+
+                    $this->parse('resumeLink_block', 'resumeLink');
+                    $this->setVar('assessLink_block', '');
+                    $this->setVar('resumeLink_block', '');
+                }
+                // allow to resit
+                else if ($currentAssess['allow_resit'] == 1) {
+                    $this->parse('assessLink_block', 'assessLink');
+                    $this->setVar('assessNoLink_block', '');
+                    $this->setVar('resumeLink_block', '');
+                }
+                // else dont let them complete it again
+                else {
+                    $this->parse('assessNoLink_block', 'assessNoLink');
+                    $this->setVar('assessLink_block', '');
+                    $this->setVar('resumeLink_block', '');
+                    $this->setVar('ASSESS_FINISH_DATE', 'Completed');
+                }
+
 			}
 			else {
-				if ($attemptHandler->isComplete($currentAssess['assess_id'])) {
-					$this->setVar('studentLink_block', '');
-				}
-				else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0)) {
-					$this->setVar('studentLink_block', '');
-				}
-				else if ($assessHandler->isExpired($currentAssess['assess_id'])) {
-					$this->setVar('studentLink_block', '');
-				}
-				else if (((int)time() - (int)strtotime($currentAssess['start'])) < 0) {
-					$this->setVar('studentLink_block', '');
-				}
 
-				/* Disabled: doing so will allow teachers to give their test a "dry run" and
-				 * they can delete their attempts afterwards
-				 *
-				else if ($assessHandler->isOwner($currentAssess['assess_id'])) {
-					$this->setVar('studentLink_block', '');
+                /* only show test link to owner and enrolled students */
+                if ($assessHandler->isExpired($currentAssess['assess_id'])) {
+                    $this->parse('assessNoLink_block', 'assessNoLink');
+					$this->setVar('assessLink_block', '');
+                    $this->setVar('resumeLink_block', '');
 				}
-				*/
-				else {
-					$this->parse('studentLink_block', 'studentLink');
+                else if($enroled || $currentAssess['user_id'] == $_SESSION['uid'] ) {
+					$this->parse('assessLink_block', 'assessLink');
+                    $this->setVar('assessNoLink_block', '');
+                    $this->setVar('resumeLink_block', '');
 				}
+                else {
+                    $this->parse('assessNoLink_block', 'assessNoLink');
+					$this->setVar('assessLink_block', '');
+                    $this->setVar('resumeLink_block', '');
+                }
 			}
 
 			/* Modified this check so that only the owner or a superuser can get
 			 * these links which allow you to modify the assessment
 			 */
-			if ($assessHandler->isOwner($currentAssess['assess_id']) || $groupHandler->isSuperuser()) {
+			if ($currentAssess['user_id'] == $_SESSION['uid'] || $groupHandler->isSuperuser()) {
 				$this->parse('teacherLink_block', 'teacherLink');
 			}
 			else {
