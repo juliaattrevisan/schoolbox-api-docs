@@ -17,12 +17,12 @@ $path = SITE_root.'/include/PEAR';
 set_include_path('.' . PATH_SEPARATOR . get_include_path() . PATH_SEPARATOR . $path);
 
 //MySQL config options
-define("SQL_dsn", "mysql:host=localhost;dbname=portal-dev");
+
 define("SQL_host", "localhost");
 define("SQL_user", "root");
 define("SQL_passwd", "tnp879");
 define("SQL_db", "portal-dev");
-
+define("SQL_dsn", "mysql:host=".SQL_host.";dbname=".SQL_db);
 
 
 
