@@ -37,6 +37,7 @@ if ( is_array($groupList) ) {
                     $instance->sequence     = $component['position']?$component['position']:2;
 
                     Component_InstanceMapper::getInstance()->save($instance);
+                }
             }
         }
         
