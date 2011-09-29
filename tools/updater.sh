@@ -6,7 +6,7 @@ clear;
 ## Designed for Schoolbox V11.0+
 echo -e "<br />SCHOOLBOX UPDATER: V1.0\n\n\n\n";
 schoolbox_dir=`cd ../ && pwd`
-working_dir="`cd ../ && pwd`/update_tmp"
+working_dir="/tmp/update_tmp"
 isdir() {
 if [ ! -d $working_dir ]; then
 echo -e "<br />Creating Working Directory..."
@@ -127,8 +127,11 @@ mysql -u $sqluser --password=$sqlpass $sqldb < $working_dir/update_$new_ver.sql;
 errorCheck;
 }
 updateFiles(){
+echo -e "<br />Removing Old Files...";
+rm -Rf $schoolbox_dir/*;
+errorCheck;
 echo -e "<br />Extracting Files and Updating..."
-tar --overwrite -xvzf $working_dir/release_$new_ver.tgz -C $schoolbox_dir >> /dev/null;
+tar --overwrite --overwrite-dir -xvzf $working_dir/release_$new_ver.tgz -C $schoolbox_dir >> /dev/null;
 errorCheck 1;
 echo -e "<br />Removing Template Config File..."
 rm -Rf $schoolbox_dir/www/conf/conf.php;
