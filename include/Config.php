@@ -68,8 +68,7 @@ class Config extends DeprecatedModel {
         }
 
         static public function set($configName, $configValue) {
-                self::getInstance();
-                self::update(array('name' => $configName, 'value' => $configValue));
+                return DeprecatedDatabase::getInstance()::update(array('name' => $configName, 'value' => $configValue));
         }
 
         public function getTypeList() {
