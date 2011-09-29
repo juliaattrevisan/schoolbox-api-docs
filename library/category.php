@@ -82,7 +82,7 @@ class Category extends DeprecatedModel {
 		$query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type, cf.template
 				  FROM (category c)
 				  LEFT JOIN categoryCode co ON co.categoryID = c.id
-				  LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGESERVICE . "
+				  LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGE_SERVICE . "
 				  LEFT JOIN user u on u.id = a.uid
 				  LEFT JOIN userGroups g ON g.cid = c.id
 				  LEFT JOIN homepage_config cf ON cf.cid = c.id
@@ -96,7 +96,7 @@ class Category extends DeprecatedModel {
         $query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type, cf.template
                   FROM (category c)
                   LEFT JOIN categoryCode co ON co.categoryID = c.id
-                  LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGESERVICE . "
+                  LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGE_SERVICE . "
                   LEFT JOIN user u on u.id = a.uid
                   LEFT JOIN userGroups g ON g.cid = c.id
                   LEFT JOIN homepage_config cf ON cf.cid = c.id

@@ -66,7 +66,7 @@ if (empty($type) || $type == 'all') {
         $type_handle = new $type_class;
 
         // search
-        $result[$type_name] = $type_handle->search($keyword, 0, SEARCH_all_limit, $count[$type_name]);
+        $result[$type_name] = $type_handle->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name]);
     }
 
     $count['all'] = array_sum($count);
@@ -106,7 +106,7 @@ elseif (!empty($handle[$type])) {
     $handle[$type] = new $type_class;
 
     // perform search for individual category (without formatting for ajax call)
-    $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * SEARCH_type_limit, SEARCH_type_limit, $count[$type]);
+    $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
 }
 
 // render users
@@ -537,7 +537,7 @@ if (empty($type)) {
     // render pagination
     $page->setBlock('RESULT', 'pagination', 'pagination_block');
 
-    $number_pages = ceil($count[$type] / SEARCH_type_limit);
+    $number_pages = ceil($count[$type] / Cfg::get('search_type_limit'));
 
     if ($number_pages > 1) {
         if (($current_page - 5) <= 1) {
