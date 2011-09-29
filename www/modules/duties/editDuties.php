@@ -4,10 +4,8 @@
 //lwcawood
 //------------------------------------------------------
 
-require_once("../include/session.php");
-require_once("../include/include.php");
-//require_once("../include/permission.php");
-require_once("../include/SitePage.php");
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
 
 class editDuties
 {
@@ -17,7 +15,7 @@ class editDuties
 		$this->service = 1;
 		$this->checkPerms();
 		$this->db = new DeprecatedDatabase();
-		$this->t_body = new Template(TPL_directory);
+		$this->page = new SitePage();
 		if(!$currYear) { $this->currYear = date("Y"); } else { $this->currYear = $currYear; }
         if(!$currMonth) { $this->currMonth = date("n"); } else { $this->currMonth = $currMonth; }
         if(!$currDay) { $this->currDay = date("j"); } else { $this->currDay = $currDay; }
@@ -44,49 +42,50 @@ class editDuties
 
 		$queryDate = date("Y-m-d", $currentDate);
 
+        		$this->page->setFile('/modules/duties/editDuties.html');
+		$this->page->setBlock(TEMPLATE_content, "duty_list", "d_block");
 
-		$this->t_body->set_var("WEEKBACK", "editDuties.php?category=".$this->category."&Year=".date("Y",$previousWeek).
+
+		$this->page->setVar("WEEKBACK", "editDuties.php?category=".$this->category."&Year=".date("Y",$previousWeek).
                                 "&Month=".date("m",$previousWeek)."&Day=".date("d", $previousWeek));
-        $this->t_body->set_var("WEEKFORWARD", "editDuties.php?category=".$this->category."&Year=".date("Y",$nextWeek).
+        $this->page->setVar("WEEKFORWARD", "editDuties.php?category=".$this->category."&Year=".date("Y",$nextWeek).
                                 "&Month=".date("m",$nextWeek)."&Day=".date("d", $nextWeek));
-		$this->t_body->set_var("TODAY", "editDuties.php?category=".$this->category."&Year=".date("Y").
+		$this->page->setVar("TODAY", "editDuties.php?category=".$this->category."&Year=".date("Y").
                                 "&Month=".date("m")."&Day=".date("d"));
-		$this->t_body->set_var("DAYBACK", "editDuties.php?category=".$this->category."&Year=".date("Y",$previousDay).
+		$this->page->setVar("DAYBACK", "editDuties.php?category=".$this->category."&Year=".date("Y",$previousDay).
                                 "&Month=".date("m",$previousDay)."&Day=".date("d", $previousDay));
-        $this->t_body->set_var("DAYFORWARD", "editDuties.php?category=".$this->category."&Year=".date("Y",$nextDay).
+        $this->page->setVar("DAYFORWARD", "editDuties.php?category=".$this->category."&Year=".date("Y",$nextDay).
                                 "&Month=".date("m",$nextDay)."&Day=".date("d", $nextDay));
 
 
 
-		$this->t_body->set_file("tplBODY", "subjects/editDuties.htm");
-		$this->t_body->set_block("tplBODY", "duty_list", "d_block");
-		include_once("../include/page.php");
+
 		//$sql = "SELECT * FROM duty where date = now() AND cid = ".$this->category ;
 		$sql = "SELECT l.*, d.user, d.date, d.cid FROM luDuties l LEFT JOIN duty d ON l.dutyTypeID = d.dutyTypeID and d.date = '".$queryDate."' where l.cid = ".$this->category ;
 		$this->db->dbDoQuery($sql);
 		$i = 0;
-		$this->t_body->set_var("DATE", date('l, jS \of F', $currentDate));
-		$this->t_body->set_var("QDATE", $queryDate);
-		$this->t_body->set_var("GET", "?category=".$this->category."&Year=".date("Y",$currentDate).
+		$this->page->setVar("DATE", date('l, jS \of F', $currentDate));
+		$this->page->setVar("QDATE", $queryDate);
+		$this->page->setVar("GET", "?category=".$this->category."&Year=".date("Y",$currentDate).
                                 "&Month=".date("m",$currentDate)."&Day=".date("d", $currentDate) );
-		$this->t_body->set_var("TITLE", HEADING." - Duty Editor");
-		$this->t_body->set_var("CID", $this->category );
+		$this->page->setVar("TITLE", HEADING." - Duty Editor");
+		$this->page->setVar("CID", $this->category );
 		while($row = $this->db->dbGetNextArray())
 		{
 			if($row['user'] == ""){$update = 'false';}else{$update = 'true';}
 
-			$this->t_body->set_var("DUTYID", $row['dutyTypeID']);
-			$this->t_body->set_var("I", $i);
-			$this->t_body->set_var("UPDATE", $update);
-			$this->t_body->set_var("DUTY", $row['name']);
-			$this->t_body->set_var("ASSIGNEDUSER", $row['user']);
+			$this->page->setVar("DUTYID", $row['dutyTypeID']);
+			$this->page->setVar("I", $i);
+			$this->page->setVar("UPDATE", $update);
+			$this->page->setVar("DUTY", $row['name']);
+			$this->page->setVar("ASSIGNEDUSER", $row['user']);
 			$this->t_body->parse("d_block", "duty_list", true);
 			$i++;
 		}
-		$this->t_body->set_var("MAXI", $i-1);
+		$this->page->setVar("MAXI", $i-1);
 		if($i == 0)
 		{
-			$this->t_body->set_var("d_block", '');
+			$this->page->setVar("d_block", '');
 		}
 		$this->t_body->pparse("finaloutput", "tplBODY");
 	}
