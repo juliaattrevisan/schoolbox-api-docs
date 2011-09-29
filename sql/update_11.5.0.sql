@@ -180,9 +180,9 @@ ALTER TABLE `eportfolio_textBox`
 ALTER TABLE homepage_config ADD COLUMN right_column_width FLOAT DEFAULT 79.5 AFTER template;
 ALTER TABLE homepage_config ADD COLUMN left_column_width FLOAT DEFAULT 29.5 AFTER template;
 
-UPDATE homepage_config SET left_column_wdith=79.5, right_column_width = 29.5  WHERE homepage_config WHERE template = 1;
-UPDATE homepage_config SET left_column_wdith=49.5, right_column_width = 49.5 WHERE homepage_config WHERE template = 2;
-UPDATE homepage_config SET left_column_wdith=29.5, right_column_width = 79.5 WHERE homepage_config WHERE template = 4;
+UPDATE homepage_config SET left_column_wdith=79.5, right_column_width = 29.5  WHERE  template = 1;
+UPDATE homepage_config SET left_column_wdith=49.5, right_column_width = 49.5 WHERE template = 2;
+UPDATE homepage_config SET left_column_wdith=29.5, right_column_width = 79.5 WHERE template = 4;
 UPDATE homepage_comp_location, homepage_config SET `column` = 3 WHERE homepage_comp_location.cid = homepage_config.cid AND homepage_config.template=3
 
 ALTER TABLE eportfolio_config ADD COLUMN right_column_width FLOAT DEFAULT 79.5 AFTER template;
@@ -194,7 +194,7 @@ UPDATE homepage_comp SET description = 'Provides an embedded audio player to ena
 
 UPDATE homepage_comp SET `description`='Provides an area for teachers to receive files from students without the need for a submission box and due date' WHERE `method`='outputDropBox';
 UPDATE homepage_comp SET `description`='Provide links to interesting, related and helpful resources on Schoolbox or the WWW.' WHERE `method`='outputLinkList';
-UPDATE homepage_comp SET title='Image Carousel', `description`='Automatically fades through all the images uploaded to this homepage.' WHERE `method`='outputScroller';
+UPDATE homepage_comp SET `name`='Image Carousel', `description`='Automatically fades through all the images uploaded to this homepage.' WHERE `method`='outputScroller';
 
 /* Optional config fields for validation
  */
@@ -350,7 +350,7 @@ ALTER TABLE `eportfolio_config`     ADD COLUMN `top_head_font` CHAR(7) NULL AFTE
 
 
 /* Convert default colours to config options */
-ALTER TABLE `config` CHANGE `type` `type` enum('Site','Security','Paths','Resources','Email','Welcome','Localisation','External DB','Colours')  COLLATE utf8_general_ci NULL after `options`,
+ALTER TABLE `config` CHANGE `type` `type` enum('Site','Security','Paths','Resources','Email','Welcome','Localisation','External DB','Colours')  COLLATE utf8_general_ci NULL after `options`;
 INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'homepage_colour_head_font','013a63','Heading Text','Colour of the heading text on homepage and eportfolio components','input',NULL,'Colours','true','false','false');
 INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'homepage_colour_head_bg','cae9b9','Heading Background','Colour of the background of the headings on homepage and eportfolio components','input',NULL,'Colours','true','false','false');
 INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'homepage_colour_font','000000','Body Text','Colour of the body text on homepage and eportfolio components','input',NULL,'Colours','true','false','false');
