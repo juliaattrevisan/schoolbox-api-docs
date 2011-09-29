@@ -122,7 +122,7 @@ errorCheck;
 }
 updateDatabase() {
 echo -e "<br />Updating Database..."
-mysql -u $sqluser --password=$sqlpass $sqldb < $working_dir/update_$new_ver.sql; >> /dev/null;
+mysql -f -u $sqluser --password=$sqlpass $sqldb < $working_dir/update_$new_ver.sql; >> /dev/null;
 errorCheck;
 }
 updateFiles(){
