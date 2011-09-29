@@ -6,9 +6,8 @@
  * Time: 6:38 PM
  * To change this template use File | Settings | File Templates.
  */
- 
-require_once(dirname(__FILE__)  .'/../www/conf/conf.php');
-require_once(dirname(__FILE__) . '/../include/Config.php');
+
+require_once(dirname(__FILE__) . '/../include/Bootstrap.php');
 
 $configHandler = new Config;
 
