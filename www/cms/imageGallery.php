@@ -13,17 +13,15 @@
 
 
 if (is_numeric($this->arg[0])) {
-	
+
+    $groupHandler = new Group;
 	$categoryHandler = new Category;
 
 	if(!$category = $categoryHandler->getByID($this->arg[0])) {
 		error(2);
 	}
-	
-	$groupHandler = new Group;
-	
 	if ($groupHandler->getPermission($this->arg[0]) < READ_ACCESS) {
-		error(6);
+	    error(6);
 	}
 
 	$this->setFile(TEMPLATE_content, 'cms/image-gallery.html');
