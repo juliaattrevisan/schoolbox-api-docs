@@ -165,6 +165,9 @@ echo -e "<br />Update to $new_ver Complete!"
 echo -e "<br />Removing all temporary Files..."
 rm -Rf $working_dir;
 errorCheck;
+echo -e "<br />Removing Minifier Cache...";
+rm -Rf /tmp/minify*
+errorCheck;
 }
 loadConfig;
 isdir;
