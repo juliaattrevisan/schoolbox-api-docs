@@ -413,3 +413,15 @@ ALTER TABLE `submission_return`
 	CHANGE `comment` `comment` varchar(255)  COLLATE utf8_general_ci NULL after `owner`,
 	CHANGE `submitted` `submitted` datetime   NULL after `deleted`,
 	CHANGE `returned` `returned` datetime   NOT NULL after `submitted`;
+
+# Adds in Default Categories to QuestionBank
+INSERT INTO assess_question_category (NAME,availability) VALUES('Maths','assess');
+INSERT INTO assess_question_category (NAME,availability) VALUES('English','assess');
+INSERT INTO assess_question_category (NAME,availability) VALUES('Geography','assess');
+INSERT INTO assess_question_category (NAME,availability) VALUES('Science','assess');
+INSERT INTO assess_question_category (NAME,availability) VALUES('History','assess');
+INSERT INTO assess_question_category (NAME,availability) VALUES('LOTE','assess');
+
+INSERT INTO assess_question_category (NAME,availability) VALUES('Elective Selection','survey');
+INSERT INTO assess_question_category (NAME,availability) VALUES('Teacher Review','survey');
+INSERT INTO assess_question_category (NAME,availability) VALUES('Medical','survey');
