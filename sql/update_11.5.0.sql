@@ -404,17 +404,17 @@ CREATE TABLE `plagscan_document`(
 ) ENGINE=MyISAM DEFAULT CHARSET='utf8';
 
 /* Add description to submission box */
-ALTER TABLE `submission_box`
-	CHANGE `description` `description` varchar(750)  COLLATE utf8_general_ci NOT NULL after `deleted`,
-	ADD COLUMN `name` varchar(150)  COLLATE utf8_general_ci NULL after `description`,
-	CHANGE `created` `created` datetime   NOT NULL DEFAULT '0000-00-00 00:00:00' after `name`;
+ALTER TABLE `submission_box` CHANGE `description` `name` VARCHAR(150) CHARACTER SET utf8 COLLATE utf8_general_ci NULL;
+ALTER TABLE `submission_box`  ADD COLUMN `description` TEXT NULL AFTER `name`;
 
 ALTER TABLE `submission_return`
 	CHANGE `comment` `comment` varchar(255)  COLLATE utf8_general_ci NULL after `owner`,
 	CHANGE `submitted` `submitted` datetime   NULL after `deleted`,
 	CHANGE `returned` `returned` datetime   NOT NULL after `submitted`;
 
-# Adds in Default Categories to QuestionBank
+INSERT INTO `portal-dev`.`config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'date_timezone','Australia/Victoria','Timezone','Set the local timezone for the server, use the PHP timezones available on the site','select','Australia/Victoria:Australia/NSW:Australia/Queensland:Australia/West:Australia/South','Localisation','true','false','true');
+
+/* Adds in Default Categories to QuestionBank */
 INSERT INTO assess_question_category (NAME,availability) VALUES('Maths','assess');
 INSERT INTO assess_question_category (NAME,availability) VALUES('English','assess');
 INSERT INTO assess_question_category (NAME,availability) VALUES('Geography','assess');

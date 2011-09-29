@@ -239,12 +239,12 @@ class SitePage extends Page
 		}
 
 		//if ip tracking enabled ensure user has same ip as when they logged in
-		if (TRACKIP && $_SESSION['ip'] != Session::getIP()) {
+		if (Cfg::get('track_ip') && $_SESSION['ip'] != Session::getIP()) {
 			$this->goLoginPage();
 		}
 
 		//if session remember is disabled and check session has not expired
-		if (!$_SESSION['remember'] && (($_SESSION['lasttime'] + SESSIONLENGTH) < mktime())) {
+		if (!$_SESSION['remember'] && (($_SESSION['lasttime'] + Cfg::get('session_length')) < mktime())) {
 			$this->goLoginPage();
 		}
 
