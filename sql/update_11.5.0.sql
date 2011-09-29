@@ -370,7 +370,7 @@ UPDATE `eportfolio_comp` SET eportfolioCategoryID = (SELECT eportfolioComponentC
 
 
 /* Add in support for new question templates */
-ALTER TABLE `portal-dev`.`assess_luQuestionType`     ADD COLUMN `template_dir` VARCHAR(255) NULL AFTER `filename`;
+ALTER TABLE `assess_luQuestionType`     ADD COLUMN `template_dir` VARCHAR(255) NULL AFTER `filename`;
 
 ALTER TABLE `allowedFileExtension`
 	CHANGE `extension` `extension` char(12)  COLLATE utf8_general_ci NULL after `fileTypeID`;
@@ -412,7 +412,7 @@ ALTER TABLE `submission_return`
 	CHANGE `submitted` `submitted` datetime   NULL after `deleted`,
 	CHANGE `returned` `returned` datetime   NOT NULL after `submitted`;
 
-INSERT INTO `portal-dev`.`config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'date_timezone','Australia/Victoria','Timezone','Set the local timezone for the server, use the PHP timezones available on the site','select','Australia/Victoria:Australia/NSW:Australia/Queensland:Australia/West:Australia/South','Localisation','true','false','true');
+INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'date_timezone','Australia/Victoria','Timezone','Set the local timezone for the server, use the PHP timezones available on the site','select','Australia/Victoria:Australia/NSW:Australia/Queensland:Australia/West:Australia/South','Localisation','true','false','true');
 
 /* Adds in Default Categories to QuestionBank */
 INSERT INTO assess_question_category (NAME,availability) VALUES('Maths','assess');
