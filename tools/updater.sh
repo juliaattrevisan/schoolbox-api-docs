@@ -1,8 +1,7 @@
 #!/bin/bash
 clear;
 ### Schoolbox Updater V1.0 by Damian Alexander
-## Performs Recursive updates provided there is a sequential path!... Note It will terminate if fails. 
-## Will backup at each stage of recursive update to /tmp/ with identifiers.
+## Will only run 1 update from current version to next version (w/o any input, so can be looped until Version is current)
 ## Designed for Schoolbox V11.0+
 echo -e "<br />SCHOOLBOX UPDATER: V1.0\n\n\n\n";
 schoolbox_dir=`cd ../ && pwd`
@@ -43,16 +42,16 @@ index="$working_dir/versions.txt";
 
 grabVersion() {
 echo -e "<br />Grabbing the v$new_ver database update file...";
-wget http://schoolbox.com.au/schoolboxinstaller/update_$new_ver.sql -O $working_dir/update_$new_ver.sql
+wget -q http://schoolbox.com.au/schoolboxinstaller/update_$new_ver.sql -O $working_dir/update_$new_ver.sql
 errorCheck 1;
 echo -e "<br />Grabbing the v$new_ver core files update archive...";
-wget http://schoolbox.com.au/schoolboxinstaller/release_$new_ver.tgz -O $working_dir/release_$new_ver.tgz;
+wget -q http://schoolbox.com.au/schoolboxinstaller/release_$new_ver.tgz -O $working_dir/release_$new_ver.tgz;
 errorCheck 1;
 }
 listVersions() {
-wget http://schoolbox.com.au/schoolboxinstaller/versions.txt
+wget -q http://schoolbox.com.au/schoolboxinstaller/versions.txt
 errorCheck 1;
-cat $working_dir/versions.txt|cut -d "=" -f1
+cat $working_dir/versions.txt|cut -d ":" -f2
 }
 loadConfig() {
 confloc=`echo "$schoolbox_dir/www/conf/conf.php"`;
