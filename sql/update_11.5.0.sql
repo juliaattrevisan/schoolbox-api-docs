@@ -169,6 +169,8 @@ INSERT INTO error VALUES (136, "Unable to create or modify folder as class code 
  */
 UPDATE `config` SET `title`='Synchronise Data' WHERE `configID`='57';
 
+ALTER TABLE `config` DROP KEY `configName`, ADD UNIQUE `configName` (`name`);
+
 /* Eportfolio textbox component
  */
 ALTER TABLE `eportfolio_textBox`
