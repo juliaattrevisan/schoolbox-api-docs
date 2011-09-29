@@ -22,11 +22,9 @@ $sectionHandler = new AssessSection();
 $allAssess = $assessHandler->getList($categoryID);
 
 if ($groupHandler->isStaff()) {
-    $this->parse('teacherLink_block', 'teacherLink');
     $this->parse('createAssessment_block', 'createAssessment');
 }
 else {
-    $this->setVar('teacherLink_block', '');
     $this->setVar('createAssessment_block', '');
 }
 
@@ -47,7 +45,7 @@ if (is_array($allAssess)) {
 				'ASSESS_START_DATE' => date('jS M Y', strtotime($currentAssess['start'])),
 				'ASSESS_FINISH_DATE' => date('jS M Y', strtotime($currentAssess['finish'])),
 				'ASSESS_DESCRIPTION' => $currentAssess['description'],
-				'ON_OFF' => $i%2 ? 'dark' : '',
+				'ON_OFF' => $i++%2 ? 'dark' : '',
 			));
 
 			/* Check if you have completed an assessment already
@@ -79,7 +77,7 @@ if (is_array($allAssess)) {
 
                     $this->parse('resumeLink_block', 'resumeLink');
                     $this->setVar('assessLink_block', '');
-                    $this->setVar('resumeLink_block', '');
+                    $this->setVar('assessNoLink_block', '');
                 }
                 // allow to resit
                 else if ($currentAssess['allow_resit'] == 1) {
@@ -99,7 +97,7 @@ if (is_array($allAssess)) {
 			else {
 
                 /* only show test link to owner and enrolled students */
-                if ($assessHandler->isExpired($currentAssess['assess_id'])) {
+                if (strtotime($currentSurvey['finish']) < mktime()) {
                     $this->parse('assessNoLink_block', 'assessNoLink');
 					$this->setVar('assessLink_block', '');
                     $this->setVar('resumeLink_block', '');
@@ -128,8 +126,6 @@ if (is_array($allAssess)) {
 
 			$this->parse('assess_block', 'assess', true);
 		}
-
-        $i++;
     }
 }
 else {

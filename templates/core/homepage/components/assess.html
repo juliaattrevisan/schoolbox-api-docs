@@ -26,20 +26,19 @@
                 <!-- BEGIN assessNoLink -->
                 <h4>{ASSESS_TITLE}</h4>
                 <!-- END assessNoLink -->
-			    <p class="summ hide-on-small">{ASSESS_DESCRIPTION}</p>
-				<p class="small-right">
-                    <!-- BEGIN dueDate -->
-                    {ASSESS_FINISH_DATE}<br />
-                    <!-- END dueDate -->
+				<div class="small-right">
+                    <p>
+                    {ASSESS_FINISH_DATE}
 
 					<!-- BEGIN teacherLink -->
 					<a href="/assess/results/{ASSESS_ASSESS_ID}">View Results</a><br />
 					<a href="/assess/modify/{ASSESS_ASSESS_ID}">Modify</a><br />
 					<!-- END teacherLink -->
 
-					
+                    </p>
 
-				</p>
+				</div>
+                <p class="summ hide-on-small">{ASSESS_DESCRIPTION}</p>
 			</li>
 			<!-- END assess -->
 		</ul>

@@ -16,38 +16,31 @@
 	<div class="listing">
 		<ul>
 			<!-- BEGIN survey -->
-			<li class="{ON_OFF} clearfix">
-				<h4><strong>{SURVEY_TITLE}</strong><br />
-					Starts on {SURVEY_START_DATE}<br />
-					Due by {SURVEY_FINISH_DATE}<br />
-					<br />
-					<em>{SURVEY_DESCRIPTION}</em></h4>
-				<p class="small-right">
-					<!-- BEGIN resumeLink -->
-					<a href="/survey/attempt/{SURVEY_ASSESS_ID}/{SURVEY_SECTION_ID}" >Resume Test</a><br />
-					<!-- END resumeLink -->
-
-					<!-- BEGIN studentLink -->
-					<a href="/survey/intro/{SURVEY_ASSESS_ID}" >Take test</a><br />
-					<!-- END studentLink -->
-
+            <li class="{ON_OFF} clearfix">
+                <!-- BEGIN surveyLink -->
+				<h4><a href="/survey/intro/{SURVEY_ASSESS_ID}" >{SURVEY_TITLE}</a></h4>
+                <!-- END surveyLink -->
+                <!-- BEGIN resumeLink -->
+                <h4><a href="/survey/attempt/{SURVEY_ASSESS_ID}/{SURVEY_SECTION_ID}">{SURVEY_TITLE}</a></h4>
+                <!-- END resumeLink -->
+                <!-- BEGIN surveyNoLink -->
+                <h4>{SURVEY_TITLE}</h4>
+                <!-- END surveyNoLink -->
+				<div class="small-right">
+                    <p>
+                    {SURVEY_FINISH_DATE}
 					<!-- BEGIN teacherLink -->
 					<a href="/survey/results/{SURVEY_ASSESS_ID}">View Results</a><br />
 					<a href="/survey/modify/{SURVEY_ASSESS_ID}">Modify</a><br />
 					<!-- END teacherLink -->
 
-					<!-- BEGIN resultsLink -->
-					<a href="/submission/dueWork" >View Results</a><br />
-					<!-- END resultsLink -->
+                    </p>
 
-					<!-- BEGIN hasCompleted -->
-					<strong>Completed</strong>
-					<!-- END hasCompleted -->
-				</p>
+				</div>
+                <p class="summ hide-on-small">{SURVEY_DESCRIPTION}</p>
 			</li>
 			<!-- END survey -->
 		</ul>
-
 		<!-- BEGIN createSurvey -->
 		<a href="/survey/create/{ID}" class="btn create"><span></span>Create Survey</a>
 		<!-- END createSurvey -->

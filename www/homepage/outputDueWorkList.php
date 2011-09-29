@@ -55,7 +55,7 @@ if (is_array($submissionList)) {
 			'DUE_NAME'	=> $nameHTML,
 			'DUE_TYPE'	=> Scrub::text($submission['typeName']),
 			'DUE_DATE'	=> $dateHTML,
-			'DUE_COMMENT' => nl2br(Scrub::text($submission['comment'])),
+			'DUE_COMMENT' => nl2br(Scrub::text($submission['description'])),
 			'ON_OFF' => ++$j%2? '' : 'dark',
 		);
 
