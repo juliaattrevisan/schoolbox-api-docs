@@ -425,3 +425,7 @@ INSERT INTO assess_question_category (NAME,availability) VALUES('LOTE','assess')
 INSERT INTO assess_question_category (NAME,availability) VALUES('Elective Selection','survey');
 INSERT INTO assess_question_category (NAME,availability) VALUES('Teacher Review','survey');
 INSERT INTO assess_question_category (NAME,availability) VALUES('Medical','survey');
+
+/* Update question type table */
+TRUNCATE `assess_luQuestionType`;
+insert  into `assess_luQuestionType`(`type_id`,`filename`,`template_dir`,`description`,`moodle`,`automated_marking`,`availability`,`has_legend`) values (1,'short','short','Short Answer','shortanswer','false','assess','false'),(2,'multi','multi','Multiple Choice','multichoice','true','all','true'),(3,'fillgap','fillgap','Cloze Exercise','cloze','true','assess','true'),(4,'match','match','Matching Pairs','matching','true','assess','true'),(5,'radio','radio','Single Answer','radio','true','survey','true'),(6,'rating','ratingAgree','Rating Scale (Agree)',NULL,'false','survey','true'),(7,'rating','ratingLike','Rating Scale (Like)',NULL,'false','survey','true'),(8,'rating','ratingImportant','Rating Scale (Important)',NULL,'false','survey','true'),(9,'rating','ratingSatisfied','Rating Scale (Satisfied)',NULL,'false','survey','true'),(10,'radio','yesno','Yes/No',NULL,'false','survey','true'),(11,'radio','truefalse','True/False',NULL,'false','survey','true');
