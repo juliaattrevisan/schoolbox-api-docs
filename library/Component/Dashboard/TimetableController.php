@@ -90,7 +90,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                 $this->setVar('PERIOD_ABSENTEES', '');
                             }
                             else {
-                                $this->setVar('PERIOD_DESC', "<a href=\"/homepage.php?code=" . urlencode($period['code']) . "\">{$period['description']}</a>");
+                                $this->setVar('PERIOD_DESC', "<a href=\"/homepage/" . urlencode($period['code']) . "\">{$period['description']}</a>");
                                 $this->setVar('PERIOD_CODE', '(' . $period['code'] . ')');
                                 $this->setVar('PERIOD_ROOM', $period['room']);
 
