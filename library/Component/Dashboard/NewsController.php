@@ -100,15 +100,21 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
         }
 
         // output tabs
-        foreach ($topicList as $topic => $bin) {
-            $url = new Url($topic);
+        if(is_array($topicList)) {
+            foreach ($topicList as $topic => $bin) {
+                $url = new Url($topic);
 
-            $output = array('NEWS_TOPIC'	=> Scrub::text($topic),
-                            'TOPIC_CLEAN'	=> $url->getSlug(),
-                            );
-            $this->setVar($output);
-            $this->parse('topic_header_block', 'topic_header', true);
+                $output = array('NEWS_TOPIC'	=> Scrub::text($topic),
+                                'TOPIC_CLEAN'	=> $url->getSlug(),
+                                );
+                $this->setVar($output);
+                $this->parse('topic_header_block', 'topic_header', true);
+            }
         }
+        else{
+            $this->setVar('topci_header_block','');
+        }
+
 
         return true;
     }
