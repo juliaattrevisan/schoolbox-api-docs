@@ -179,15 +179,15 @@ ALTER TABLE `eportfolio_textBox`
 
 /* New category column widths
  */
-ALTER TABLE homepage_config ADD COLUMN right_column_width FLOAT DEFAULT 79.5 AFTER template;
+ALTER TABLE homepage_config ADD COLUMN right_column_width FLOAT DEFAULT 69.5 AFTER template;
 ALTER TABLE homepage_config ADD COLUMN left_column_width FLOAT DEFAULT 29.5 AFTER template;
 
-UPDATE homepage_config SET left_column_width=79.5, right_column_width = 29.5  WHERE  template = 1;
+UPDATE homepage_config SET left_column_width=69.5, right_column_width = 29.5  WHERE  template = 1;
 UPDATE homepage_config SET left_column_width=49.5, right_column_width = 49.5 WHERE template = 2;
-UPDATE homepage_config SET left_column_width=29.5, right_column_width = 79.5 WHERE template = 4;
+UPDATE homepage_config SET left_column_width=29.5, right_column_width = 69.5 WHERE template = 4;
 UPDATE homepage_comp_location, homepage_config SET `column` = 3 WHERE homepage_comp_location.cid = homepage_config.cid AND homepage_config.template=3;
 
-ALTER TABLE eportfolio_config ADD COLUMN right_column_width FLOAT DEFAULT 79.5 AFTER template;
+ALTER TABLE eportfolio_config ADD COLUMN right_column_width FLOAT DEFAULT 69.5 AFTER template;
 ALTER TABLE eportfolio_config ADD COLUMN left_column_width FLOAT DEFAULT 29.5 AFTER template;
 
 /* Podcast update
