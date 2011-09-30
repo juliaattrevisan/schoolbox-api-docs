@@ -2,6 +2,9 @@
 clear;
 ### Schoolbox Updater V1.0 by Damian Alexander
 ## Will only run 1 update from current version to next version (w/o any input, so can be looped until Version is current)
+##### PHP MINIMUM REQUIREMENTS
+desired_major="5"; ### MAJOR Version, IE 5 in PHP V5.3
+desired_minor="3"; ### MINOR Version, IE 3 in PHP v5.3
 ## Designed for Schoolbox V11.0+
 echo -e "SCHOOLBOX UPDATER: V1.0\n\n\n\n";
 schoolbox_dir=`cd ../ && pwd`
@@ -71,6 +74,23 @@ cur_ver=`echo "SELECT value FROM config WHERE NAME = 'site_version'"|mysql -u $s
 cur_ver=`echo $cur_ver|cut -d " " -f2`;
 echo "... $cur_ver"
 }
+phpVersionCheck() {
+echo "Beginning PHP Version Check...";
+php_major=`php -v|grep built|cut -d "-" -f1|cut -d " " -f2|cut -d "." -f1`
+php_minor=`php -v|grep built|cut -d "-" -f1|cut -d " " -f2|cut -d "." -f2`
+desired_major=`expr $desired_major - 1`;
+desired_minor=`expr $desired_minor - 1`;
+if [[ $php_major -gt $desired_major && $php_minor -gt $desired_minor ]]; then
+echo "V$php_major.$php_minor is OK";
+else
+desired_major=`expr $desired_major + 1`;
+desired_minor=`expr $desired_minor + 1`;
+echo "... Version Check Failed, v$php_major.$php_minor is NOT OK... Minimum is v$desired_major.$desired_minor";
+cleanup;
+exit;
+fi;
+}
+
 compareVersions() {
 cd $working_dir;
 grabIndex;
@@ -83,7 +103,7 @@ new_ver=`cat $index|grep "$new_ver_id:"|cut -d ":" -f2`;
 if [[ ${#new_ver} -gt 3 ]]; then
 echo "... Update to v$new_ver Found! Continuing...";
 else
-echo "Your Version is current($cur_ver) Exiting!";
+echo "Your Version is current($cur_ver) or you do not have any access to any new updates Exiting!";
 exit;
 fi;
 }
@@ -119,6 +139,7 @@ errorCheck;
 echo -e "Granting Required Permissions to Data Directory..."
 chmod -R 777 $schoolbox_dir/data;
 errorCheck;
+echo -e "Update to $new_ver Complete!"
 }
 updateDatabase() {
 echo -e "Updating Database..."
@@ -160,7 +181,6 @@ done;
 echo "Custom Scripts Queue Processing Complete...";
 }
 cleanup(){
-echo -e "Update to $new_ver Complete!"
 echo -e "Removing all temporary Files..."
 rm -Rf $working_dir;
 errorCheck;
@@ -171,6 +191,7 @@ errorCheck;
 loadConfig;
 isdir;
 compareVersions;
+phpVersionCheck;
 grabVersion;
 backupInstall;
 updateFiles;
