@@ -20,11 +20,9 @@ $sectionHandler = new SurveySection();
 $allSurveys = $surveyHandler->getList($categoryID);
 
 if ($groupHandler->isStaff()) {
-    $this->parse('teacherLink_block', 'teacherLink');
     $this->parse('createSurvey_block', 'createSurvey');
 }
 else {
-    $this->setVar('teacherLink_block', '');
     $this->setVar('createSurvey_block', '');
 }
 
