@@ -200,6 +200,7 @@
       this.currentValue = this.htmldecode(this.el.val());
       var q = this.getQuery(this.currentValue);
       this.selectedIndex = -1;
+      this.onChange();
       if (this.ignoreValueChange) {
         this.ignoreValueChange = false;
         return;
@@ -371,15 +372,23 @@
     },
 
     onSelect: function(i) {
-      var me, fn, s, d;
-      me = this;
-      fn = me.options.onSelect;
-      s = this.htmldecode(me.suggestions[i]);
-      d = me.data[i];
-      me.el.val(me.getValue(s));
-      if ($.isFunction(fn)) { fn(s, d, me.el, me); }
+    var me, fn, s, d;
+    me = this;
+    fn = me.options.onSelect;
+    s = this.htmldecode(me.suggestions[i]);
+    d = me.data[i];
+    me.el.val(me.getValue(s));
+    if ($.isFunction(fn)) { fn(s, d, me.el, me); }
     },
-    
+
+    onChange: function() {
+    var me, fn;
+    me = this;
+    fn = me.options.onChange;
+
+    if ($.isFunction(fn)) { fn(me.el, me); }
+    },
+
     getValue: function(value){
         var del, currVal, arr, me;
         me = this;

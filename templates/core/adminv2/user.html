@@ -13,8 +13,17 @@ $j(function() {
         noCache: true,
 		onSelect: function (value, data) {
 			$j('#user-to-mod').val(data);
-		}
+            $j('.next-to-input').removeClass('disabled');
+		},
+        onChange: function (element) {
+            $j('#user-to-mod').val('');
+            $j('.next-to-input').addClass('disabled');
+        }
 	});
+
+    $j('#modify').change(function () {console.log('a');
+        $j('#user-to-mod').val('');
+    });
 
 	$j('.next-to-input').click(function() {
 		 window.open('/adminv2/modify-user/'+$j('#user-to-mod').val(), '_self');
@@ -64,7 +73,7 @@ $j(function() {
 				<form id="modify-user" action="" method="post" class="float-left clearfix">
 					<input type="text" id="modify">
 					<input type="hidden" id="user-to-mod">
-					<a class="btn modify float-left next-to-input" href="#"><span></span>Modify</a>
+					<a class="btn modify float-left next-to-input disabled" href="#"><span></span>Modify</a>
 				</form>
 				<a class="btn add center-it" href="/adminv2/modify-user/"><span></span>Add User</a>
 			</div>
