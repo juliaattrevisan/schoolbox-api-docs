@@ -53,7 +53,7 @@ class Scrub {
 			new HTMLPurifier_Filter_Shockwave(),
 			new HTMLPurifier_Filter_Flash(),
 			new HTMLPurifier_Filter_WindowsMedia(),
-			new HTMLPurifier_Filter_Real()
+			new HTMLPurifier_Filter_Real(),
 		));
 
 		$config->set('Attr', 'AllowedFrameTargets', array(
@@ -63,6 +63,13 @@ class Scrub {
 			'_top'
 		));
 
-		return HTMLPurifier::instance()->purify($html, $config);
+
+		$purifier = HTMLPurifier::instance();
+
+        /* HTML Purifier hack to prevent authentication information from being stripped out of URL */
+        $registry = HTMLPurifier_URISchemeRegistry::instance();
+        $registry->register('http', new Alaress_HTMLPurifier_URIScheme_Http);
+
+        return $purifier->purify($html, $config);
 	}
 }
