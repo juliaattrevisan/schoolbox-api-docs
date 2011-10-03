@@ -1161,7 +1161,7 @@ p.forgot a { font-size: 90%; }
 	margin-top:5px;
 }
 
-.markTable th { vertical-align:bottom; }
+.markTable th { vertical-align:bottom; text-align:left;}
 
 
 /*------------------------------------------------------------
