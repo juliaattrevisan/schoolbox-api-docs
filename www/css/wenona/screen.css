@@ -1,432 +1,252 @@
+/*
+Wenona skin redux, 3/10/2011
+*/
 
-/*---------------------------------------
-	Layout Styles
-----------------------------------------*/
+/**********
+Template structure
+**********/
 body {
-	background: 0;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	background: url(/images/wenona/bg.gif) repeat-y;
+	background: #003366
 }
 
-a { color: #006; }
-
-a:hover { color: #c00; }
-
-#container {
-	padding: 0;
-	margin: 0;
-	background:none;
+a {
+	color: #bf0000
 }
 
-#nav {
-	position: absolute;
-	float: left;
-	top: 46px;
-	width: 150px;
-	margin:0;
-}
+h2 {
+	background: #a7caef;
+	color: #003366;
 
-#nav ul {
-	border:0 none;
-	-moz-border-radius:0;
-	-webkit-border-radius:0;
-	border-radius:0;
-	width:auto;
-	padding:0;
-}
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
 
-#nav ul li a { margin:0; }
+	-webkit-box-shadow: 1px 1px 2px #b9b9b9;
+	-moz-box-shadow: 1px 1px 2px #b9b9b9;
+	box-shadow: 1px 1px 2px #b9b9b9;
 
-#nav h3 {
-	-moz-border-radius:0;
-	-webkit-border-radius:0;
-	border-radius:0;
-	border:0;
-	font-size:12px;
-	color:#fff;
 }
 
 #header {
-	height: 70px;
-	background: #003366 url(/images/wenona/headerv3.gif) scroll 150px 0;
-	border-bottom: 2px solid #cc0000;
+	height: 152px;
 }
 
-#search {
-	width: 275px;
-	margin-top: 10px;
-	background:0;
+.login #header {
+	height: 100px;
+
 }
 
-#search-button { margin-top: 4px; }
-
-#search-field {
-	background: none repeat scroll 0 0 #FFFFFF;
-	border: 1px solid #E3E3E3;
-	font-size: 12px;
-	font-weight: normal;
-	height: 22px;
-	line-height: 22px;
-	margin-left: 35px;
-	width: 149px;
-	color:#000;
+.header-wrap {
+	height: 100px;
+	background-color: #7099c5;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#7099c5), to(#4b77b0));
+	background-image: -webkit-linear-gradient(top, #7099c5, #4b77b0);
+	background-image: -moz-linear-gradient(top, #7099c5, #4b77b0);
+	background-image: -ms-linear-gradient(top, #7099c5, #4b77b0);
+	background-image: -o-linear-gradient(top, #7099c5, #4b77b0);
+	background-image: linear-gradient(top, #7099c5, #4b77b0);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#7099c5', EndColorStr = '#4b77b0');
+	-webkit-box-shadow: 0px 1px 4px #002e5c;
+	-moz-box-shadow: 0px 1px 4px #002e5c;
+	box-shadow: 0px 1px 4px #002e5c;
+	border-bottom: 1px solid #5883b8;
 }
 
-#content {
-	padding: 20px 20px 20px 160px;
-	background: 0;
-	margin: 0;
-	width:auto;
+.login #header {
+	margin-bottom: 16px;
 }
 
-.news-item .header_option { right:0; }
-
-.standardForm h3 { font-weight:bold; }
-
-label { font-weight:bold; }
-
-.post-left, .standardForm {
-  background-color: #ededed;
-}
-.standardForm td, .post{
-	border-color:#dedede
+.login #container {
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	border-radius: 7px;
 }
 
-.standardForm td h4{color:#000;}
-
-#tabs {
-	bottom: 0;
-	right: 0;
-	left: 151px;
+#header .logo {
+	top: 0;
+	left: 0;
+	width: 324px;
+	height: 101px;
+	padding: 0;
 }
 
-#tabs li {
-	margin: 0 15px 0 0;
-	float:left;
+#search-field, #search {
+	background: #fff;
+	color: #797979;
 }
 
-#tabs li a {
+#infoPanel li {
+	color: #cecece
+}
+
+#infoPanel li a {
 	color: #fff;
-	font-weight: bold;
-	background: 0;
-	border: 0;
-	padding: 0 10px;
-	display: block;
-	line-height: 24px;
-	font-size: 90%;
-	height:auto;
-	margin:0;
-	-moz-border-radius:0;
-	-webkit-border-radius:0;
-	border-radius:0;
 }
 
-#search-button {
-	width:auto;
-	height:auto;
-	border:0;
+#nav {
+	top: 120px;
 }
 
-#tabs li a:hover { background: 0; }
-
-#tabs li a.navthis {
-	color: #3f4042;
+#nav .nav-wrapper {
 	background: #fff;
 }
 
-.box.grey { background: 0; }
-
-.box a { color: #006; }
-
-.box a:hover { color: #c00; }
-
-.box a.edit {
-	background: 0;
-	height: 18px;
-	line-height: 18px;
-}
-
-.box .listing ul li.dark, #content table tr.dark, #content table tr.dark td { background: #ececec; }
-
-
-#content .box a.edit:hover {
-	color: #fff;
-	background: #CF0034;
-}
-
-
-.box .listing ul li { background: 0; }
-
-.box h2 {
-	font-size: 110%;
-	height: 18px;
-	line-height: 18px;
-	min-height: 18px;
-	padding: 0;
-	text-indent: 4px;
-}
-
-.homepage .box h2 {
-	height:32px;
-	line-height:32px;
-	text-indent:10px;
-}
-
-#calendar table .header_option { margin-top: 7px; }
-
-#nav #footer li { background: 0; }
-
-#nav #footer li a {
-	width: auto;
-	background: 0;
-	padding: 0;
-}
-
-#nav #footer li a:hover { text-decoration: underline; }
-
-/*---------------------------------------
-	News Styles
-----------------------------------------*/
-h3#news-header {
-	font-size: 116%;
-	line-height: 26px;
-	text-indent: 4px;
-	background: 0;
-	border-bottom: 2px solid #002452;
-	font-weight: bold;
-	color: #000;
-}
-
-.news-item {
-	padding: 0;
-	background: 0;
-	clear: left;
-}
-
-.news-item .interact { float: left; }
-
-.header_option { margin-top: -36px; }
-
-h1 + .header_option { margin-top: -33px; }
-
-/*---------------------------------------
-	Component Styles
-----------------------------------------*/
-h1 {
-	background: 0;
-	font-size: 1.5em;
-	font-weight: bold;
-	border-bottom: 2px solid #B51C21;
-	line-height: normal;
-	margin-bottom: 10px;
-	text-indent: 3px;
-	padding: 3px 0;
-	position: relative;
-	text-transform: capitalize;
-}
-
-h1 a.customise { font-size: 12px; }
-
-h2 {
-	border-bottom: 2px solid #002452;
-	font-weight: bold;
-	color: #000;
-	background: 0;
-	text-indent: 4px;
-}
-
-
-
-
-.homepage h2 { background-position: 0 -4px; }
-
-/*---------------------------------------
-	Nav Styles
-----------------------------------------*/
 #nav h3 {
-	background: url(/images/wenona/linkBG.gif) repeat-x;
-	line-height: 24px;
-	padding-left: 5px;
-	height:24px;
+	color: #fff;
+
+	background-color: #cc0000;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#cc0000), to(#b40000));
+	background-image: -webkit-linear-gradient(top, #cc0000, #b40000);
+	background-image: -moz-linear-gradient(top, #cc0000, #b40000);
+	background-image: -ms-linear-gradient(top, #cc0000, #b40000);
+	background-image: -o-linear-gradient(top, #cc0000, #b40000);
+	background-image: linear-gradient(top, #cc0000, #b40000);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#cc0000', EndColorStr = '#b40000');
+	padding: 0 0 0 16px;
 }
 
-#nav ul {
-	padding:0;
-	margin:0;
+#nav h3 img {
+	margin-right: 7px
+}
+
+#nav li a, #nav li a:hover, #nav li li a:hover {
+	color: #003366
+}
+
+#nav li a:hover, #nav li li a:hover {
+	background: #aaccf0;
 }
 
 #nav ul ul {
-	border: 1px solid #00458C;
-	border-bottom: 0;
-	background: #9CC7DE;
+	border-color: #c6d9f2;
+	background: #fff;
 }
 
-#nav li li a {
-	background: #9CC7DE;
+#tabs li a {
+	background: #004a94;
+	color: #fff;
+	-webkit-box-shadow: 0px -1px 2px #002e5c;
+	-moz-box-shadow: 0px -1px 2px #002e5c;
+	box-shadow: 0px -1px 2px #002e5c;
+	margin-right: 4px;
+
+	-webkit-border-radius: 7px 7px 0 0;
+	-moz-border-radius: 7px 7px 0 0;
+	border-radius: 7px 7px 0 0;
+
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+
+}
+
+#tabs li a.navthis {
+	color: #003366;
+	background: #fff;
+}
+
+/**********
+Components
+**********/
+#category {
+	background: #f3f3f3;
+}
+
+#category li a.selected, #category li a:hover, #tabs-homepage #tabs-sub li.ui-tabs-selected a {
+	background: #aaccf0;
+	color: #003366;
+}
+
+.dark, .dark td {
+	background: #f3f3f3;
+}
+
+.box a.edit span, .box a.close-delete {
+	color: white;
+	height: 22px;
+	width: 22px;
+	background: transparent url(/images/wenona/component-drop-arrow.png) no-repeat;
+}
+
+.box a.close-delete span {
+	color: #fff;
+}
+
+.box a.edit:hover span, .box a.close-delete:hover {
+	color: #000;
+	background: transparent url(/images/wenona/component-drop-arrow.png) no-repeat 0 100%;
+}
+
+.box a.close-delete:hover span {
 	color: #000;
 }
 
-#nav li { border-bottom: 0; }
-
-#nav li li { border-bottom: 1px solid #00458C; }
-
-#nav li a {
-	background: #003366 url(/images/wenona/white_arrow.png) no-repeat scroll 2px 5px;
-	width: 130px;
-	font-size: 90%;
-	color: #fff;
-	padding: 3px 6px 3px 14px;
+.customise-components {
+	background: #f8f8f8
 }
 
-#nav li li a:hover {
-	background: #0054ac;
-	color: #fff;
-	text-decoration: none;
+.colours-buttons {
+	background: #fff;
 }
 
-#nav li a:hover {
-	background-color: #9CC7DE;
-	text-decoration: none;
+#tabs-homepage li.ui-state-default a {
+	background: #004A94;
+	color: #fff
 }
 
-#nav li.parent > a.hover span, #nav li.parent > a span, #nav li.parent > a:hover span { cursor: pointer; }
-
-#nav ul ul {
-	width: 150px;
-	left: 150px;
-	top: -2px;
-	-moz-box-shadow: 0px 0px 0 #ffffff;
-	-webkit-box-shadow: 0px 0px 0 #ffffff;
-	box-shadow: 0px 0px 0 #ffffff;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	border-radius: 0;
-	padding:0;
-	margin:0;
+#tabs-homepage li.ui-tabs-selected a {
+	background: #f8f8f8;
+	color: #036;
 }
 
-#nav li a, #nav li a:hover, #nav ul li a:hover {
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	border-radius: 0;
+.standardForm {
+	background: #f8f8f8;
 }
 
-#nav ul ul ul {
-	left: 150px;
-	top: -2px;
+.standardForm td {
+	border-color: #ccc;
 }
 
-/*---------------------------------------
-	Footer Styles
-----------------------------------------*/
-#footer {
-	margin: 0 0 0 10px;
-	padding: 0;
-	border: 0;
-	width: 130px;
-}
-
-#footer ul {
-	margin-top: 20px;
-	background:none;
-}
-
-#footer ul li {
-	display: block;
-	color: #fff;
-	font-size: 80%;
-	background: 0;
-	margin: 0;
-	padding: 0;
-}
-
-#footer ul li a { color: #fff; }
-
-/* Literacy Week Countdown
- */
-div.box.literacy p {
-	text-align: center;
-	margin-top: 20px;
-}
-
-#category li{
-	padding:0;
-}
-
-#category{
-	background:#f0f0f0	
-}
-
-#category li a.selected{
-	background:#003366;
-}
-
-/*******************
+/*********
 CALENDAR
-********************/
+**********/
+.dayWrap {
+	background: #C00;
+}
 
-.dayWrap p { color: #000000; }
-
-.otherMonth .dayWrap p, .otherMonth .dayWrap a { color: #797979; }
-
-td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, td.cal-right a.filter-change, .day-block { background-color: #fbfbfb; }
-
-td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-change.current, td.cal-right a.filter-change:hover { background-color: #fbfbfb; }
-
-#assess h3 { color:#000; }
-
-.dayWrap { background-color: #ededed; }
-
-.calTableCurrent .dayWrap { background-color:#ffffff; }
-
-.otherMonth .dayWrap, .past .dayWrap { background-color: #b6d6f4; }
+.dayWrap p {
+	color: #fff;
+}
 
 #month-view td.dark, #week-view td.dark {
-	background-color:  #003366;
-	color:#fff;
+	background: #f8f8f8;
+	text-align: center;
 }
 
-#month-view h3, #week-view h3 { color:#000; }
+.calTableCurrent .dayWrap {
+	background: #b40000
+}
 
-.calTableCurrent { background:#fff; }
+.otherMonth .dayWrap, .past .dayWrap {
+	background-color: #ccc;
+}
 
-.calTableSelected { background:#EDEDED; }
+.otherMonth .dayWrap p, .otherMonth .dayWrap a {
+	color: #000;
+}
 
-
-.cal-bubble .middle{border-color:#036}
-.cal-bubble .bottom{border-right-color:#036}
-.cal-bubble .middle .close{background:#036; color:#fff;}
-
-/*****************/
-
+/**********
+Buttons
+**********/
 .submit-btn-plain {
-	background-color: #cc0000;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#cc0000), to(#9e0000)); 
-	background-image: -webkit-linear-gradient(top, #cc0000, #9e0000); 
-	background-image:    -moz-linear-gradient(top, #cc0000, #9e0000); 
-	background-image:     -ms-linear-gradient(top, #cc0000, #9e0000); 
-	background-image:      -o-linear-gradient(top, #cc0000, #9e0000); 
-	background-image:         linear-gradient(top, #cc0000, #9e0000);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#cc0000', EndColorStr='#9e0000'); 
-	border-color: #cc0000;
-	color: #fff !important;
-	text-shadow: 0 1px 0 #cc0000;
-	font-family:Arial, Helvetica, sans-serif;
-	font-weight:bold;
-}
-
-.submit-btn-plain:hover {
-	background-color: #dd0000;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#dd0000), to(#d10000)); 
-	background-image: -webkit-linear-gradient(top, #dd0000, #d10000); 
-	background-image:    -moz-linear-gradient(top, #dd0000, #d10000); 
-	background-image:     -ms-linear-gradient(top, #dd0000, #d10000); 
-	background-image:      -o-linear-gradient(top, #dd0000, #d10000); 
-	background-image:         linear-gradient(top, #dd0000, #d10000);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#dd0000', EndColorStr='#d10000'); 
-	border-color: #cc0000;
-	color: #fff !important;
-	text-shadow: 0 1px 0 #cc0000;
-	font-family:Arial, Helvetica, sans-serif;
-	font-weight:bold;
+	border-color: #9dc2eb;
+	background-color: #d5e6f8;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#d5e6f8), to(#a1c7ee));
+	background-image: -webkit-linear-gradient(top, #d5e6f8, #a1c7ee);
+	background-image: -moz-linear-gradient(top, #d5e6f8, #a1c7ee);
+	background-image: -ms-linear-gradient(top, #d5e6f8, #a1c7ee);
+	background-image: -o-linear-gradient(top, #d5e6f8, #a1c7ee);
+	background-image: linear-gradient(top, #d5e6f8, #a1c7ee);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#d5e6f8', EndColorStr = '#a1c7ee');
+	text-shadow: none;
 }
