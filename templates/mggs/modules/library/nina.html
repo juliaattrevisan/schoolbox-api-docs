@@ -1,14 +1,14 @@
 <script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
 <script type="text/javascript">
-	
+
 $j(function() {
 	//autoclear the catalogue search
 	$j('#library-search-field').autoclear();
 	$j('#galleryCycle').children('div:not(:first-child)').each(function() {
 		$j(this).hide();
 	});
-
-}); 
+		
+});
 
 
 $j(window).load(function(){	
@@ -23,7 +23,7 @@ $j(window).load(function(){
     });
 });
 
-	
+
 $j(window).resize(function() {
 
 });
@@ -36,23 +36,22 @@ $j(window).resize(function() {
 	<div class="library-header clearfix">
 		<div class="library-content">
 			<div class="clearfix">
-		<form id="library-search" action="/search.php" method="get">
-			<fieldset>
-				<input id="library-search-field" type="text" title="Catalogue Search" name="keyword" />
-				<input id="library-search-button" type="submit" value="Search" />
-			</fieldset>
-		</form>
+				<!-- <form id="library-search" action="/search.php" method="get">
+					<fieldset>
+						<input id="library-search-field" type="text" title="Catalogue Search" name="keyword" />
+						<input id="library-search-button" type="submit" value="Search" />
+					</fieldset>
+				</form> -->
 				<h1>Nina Crone <span>Library</span></h1>
 			</div>
 		<ul class="clearfix">
 			<li><a href="/modules/library/nina">Home</a></li>
-			<li><a href="http://libcat.mggs.vic.edu.au:8181">Catalogue</a></li>
-			<li><a href="/homepage/4292">Online Resources</a></li>
+			<li><a href="http://libcat.mggs.vic.edu.au:8181"  rel="external">Catalogue</a></li>
 			<li><a href="/homepage/4774">Remarkable Reading</a></li>
 			<li><a href="/homepage/4767">Research Tools</a></li>
 			<li><a href="/modules/library/morris">Morris Hall Library</a></li>
 		</ul>
-	</div>
+		</div>
 	</div>
 	<table class="library-boxes" height="100%" >
 		<tr>
@@ -60,15 +59,17 @@ $j(window).resize(function() {
 					<h3>Online Resources</h3>
 			                  {ONLINE_RESOURCES}
 					</div>
-
+					
 				</td>
 			<td width="33%" class="reading"><div class="library-box">
 					<h3>Remarkable Reading</h3>
 					{REMARKABLE_READING}
 					</td>
 			<td rowspan="3" width="33%"><div class="updates">
-					<h3>New Books</h3>
-                        {NEW_BOOKS}
+				<h3>What's New</h3>
+                {NEW_BOOKS}
+                <h3>New Books</h3>
+
 						<div id="galleryCycle">
                             <!-- BEGIN image -->
 							<div>
@@ -80,21 +81,10 @@ $j(window).resize(function() {
 				</div></td>
 		</tr>
 		<tr>
-			<td class="quick-facts"><div class="library-box">
-					<h3>Quick Facts</h3>
-                        {QUICK_FACTS}
-						</div>
-				</td>
-			<td class="in-the-news"><div class="library-box">
-					<h3>In The News</h3>
-                       {IN_THE_NEWS}
-				</div></td>
-		</tr>
-		<tr>
 			<td class="research-tools"><div class="library-box">
 					<h3>Research Tools</h3>
                       {RESEARCH_TOOLS}
-				</div></td>
+					  </div></td>
 			<td class="click-view"><div class="library-box ">
 					<h3>Click View</h3>
                         {CLICK_VIEW}
