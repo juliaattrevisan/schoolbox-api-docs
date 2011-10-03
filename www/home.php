@@ -6,4 +6,7 @@
 ************************************************************/
 
 /* Page deprecated and replaced  by new dashboard system*/
+
+require_once(dirname(__FILE__) . '/../include/Bootstrap.php');
+
 SitePage::localRedir('/');

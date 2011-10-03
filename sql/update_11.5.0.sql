@@ -241,7 +241,7 @@ UPDATE `homepage_comp` SET `config`='a:3:{s:4:\"sort\";s:7:\"Heading\";s:7:\"sor
 
 /* Policy
  */
-INSERT INTO config (`name`, title, description, field, `type`, editable, required) VALUES ('policy', 'Policy', 'A policy description which appears in the footer of each page.','textarea','Site','true','true');
+INSERT INTO config (`name`, title, description, field, `type`, editable, required) VALUES ('policy', 'Policy', 'A policy description which appears in the footer of each page.','textarea','Site','true','false');
 
 /* Add new policies for portrait photos */
 INSERT INTO config (`name`, title, description, field, `value`, `type`, editable, required) VALUES ('protect_teacher_photo', 'Hide Teacher Photo', 'Tick this box to prevent teacher photos being displayed to student and parents in search results.','boolean','1', 'Resources','true','true');
